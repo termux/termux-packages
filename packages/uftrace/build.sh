@@ -12,7 +12,7 @@ TERMUX_PKG_DEPENDS="capstone, libandroid-execinfo, libandroid-glob, libandroid-s
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 # See https://github.com/termux/termux-packages/pull/21712 about arm build failure:
-TERMUX_PKG_BLACKLISTED_ARCHES="arm"
+TERMUX_PKG_EXCLUDED_ARCHES="arm"
 
 # https://github.com/android/ndk/issues/1987#issuecomment-1886021103
 if [ "$TERMUX_ARCH" = "x86_64" ]; then

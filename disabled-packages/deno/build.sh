@@ -13,7 +13,7 @@ TERMUX_PKG_DEPENDS="libffi"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 # Due to dependency on librusty-v8.
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686, x86_64"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686, x86_64"
 
 termux_step_post_get_source() {
 	git fetch --unshallow

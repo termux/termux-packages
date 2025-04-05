@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=http://distcache.FreeBSD.org/ports-distfiles/libexecinfo-${TER
 TERMUX_PKG_SHA256=c9a21913e7fdac8ef6b33250b167aa1fc0a7b8a175145e26913a4c19d8a59b1f
 
 # Apparently not working for these arches:
-TERMUX_PKG_BLACKLISTED_ARCHES="i686, x86_64"
+TERMUX_PKG_EXCLUDED_ARCHES="i686, x86_64"
 
 termux_step_post_get_source() {
 	cp $TERMUX_PKG_BUILDER_DIR/LICENSE ./

@@ -103,11 +103,11 @@ _update() {
 	export TERMUX_PKG_BUILDER_DIR
 	TERMUX_PKG_BUILDER_DIR="$(realpath "$1")" # Directory containing build.sh.
 
-	IFS="," read -r -a BLACKLISTED_ARCH <<<"${TERMUX_PKG_BLACKLISTED_ARCHES:-}"
+	IFS="," read -r -a EXCLUDED_ARCH <<<"${TERMUX_PKG_EXCLUDED_ARCHES:-}"
 	export TERMUX_ARCH="" # Arch to test updates.
 	for arch in aarch64 arm i686 x86_64; do
 		# shellcheck disable=SC2076
-		if [[ ! " ${BLACKLISTED_ARCH[*]} " =~ " ${arch} " ]]; then
+		if [[ ! " ${EXCLUDED_ARCH[*]} " =~ " ${arch} " ]]; then
 			TERMUX_ARCH="${arch}"
 			break
 		fi

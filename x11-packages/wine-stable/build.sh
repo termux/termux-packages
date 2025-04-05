@@ -78,7 +78,7 @@ if [ "$TERMUX_ARCH" = "x86_64" ]; then
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-archs=i386,x86_64"
 fi
 
-TERMUX_PKG_BLACKLISTED_ARCHES="arm"
+TERMUX_PKG_EXCLUDED_ARCHES="arm"
 
 _setup_llvm_mingw_toolchain() {
 	# LLVM-mingw's version number must not be the same as the NDK's.

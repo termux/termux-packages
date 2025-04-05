@@ -27,7 +27,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 # 14 |         (stat.st_mode & libc::S_IFMT) == libc::S_IFSOCK
 #    |                         ^^^^^^^^^^^^ expected `u32`, found `u16`
 # ```
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 termux_pkg_auto_update() {
 	local e=0

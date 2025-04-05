@@ -11,7 +11,7 @@ TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_AUTO_UPDATE=true
 
 # missing support in wasmer-emscripten, wasmer-vm
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 termux_step_pre_configure() {
 	# https://github.com/rust-lang/compiler-builtins#unimplemented-functions

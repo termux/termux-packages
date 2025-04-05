@@ -11,7 +11,7 @@ _LLVM_MAJOR_VERSION_NEXT=$((_LLVM_MAJOR_VERSION + 1))
 TERMUX_PKG_DEPENDS="libc++, libevent, libgc, libgmp, libiconv, libllvm (<< $_LLVM_MAJOR_VERSION_NEXT), libxml2, libyaml, openssl, pcre2, zlib"
 TERMUX_PKG_RECOMMENDS="clang, libffi, make, pkg-config"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686, x86_64"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686, x86_64"
 
 termux_step_make() {
 	local SHARDS_VERSION=0.18.0

@@ -8,7 +8,7 @@ TERMUX_PKG_GIT_BRANCH="main"
 TERMUX_PKG_DEPENDS="dotnet-host, dotnet-runtime-8.0"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_BLACKLISTED_ARCHES="arm"
+TERMUX_PKG_EXCLUDED_ARCHES="arm"
 
 termux_step_post_get_source() {
 	git fetch --tags

@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=e4ea65bb1861e0e495386bfa8bc673bd014e96d3cf9d91e9038f91435cbe62
 TERMUX_PKG_DEPENDS="libandroid-support, libgmp, libgc, libffi"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_NO_STATICSPLIT=true
-TERMUX_PKG_BLACKLISTED_ARCHES="i686, x86_64"
+TERMUX_PKG_EXCLUDED_ARCHES="i686, x86_64"
 TERMUX_PKG_HAS_DEBUG=false
 
 # See https://gitlab.com/embeddable-common-lisp/ecl/-/blob/develop/INSTALL

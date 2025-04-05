@@ -11,7 +11,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 # htslib is not available for arm.
-TERMUX_PKG_BLACKLISTED_ARCHES="arm"
+TERMUX_PKG_EXCLUDED_ARCHES="arm"
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -llog"

@@ -19,7 +19,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 #     |
 #     = note: `#[deny(arithmetic_overflow)]` on by default
 # ```
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 # Github CI seems pretty upset
 # Received request to deprovision: The request was cancelled by the remote provider.

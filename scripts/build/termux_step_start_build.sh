@@ -10,7 +10,7 @@ termux_step_start_build() {
 		TERMUX_PKG_PLATFORM_INDEPENDENT=true
 	fi
 
-	if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" ] && [ "$TERMUX_PKG_BLACKLISTED_ARCHES" != "${TERMUX_PKG_BLACKLISTED_ARCHES/$TERMUX_ARCH/}" ]; then
+	if [ -n "${TERMUX_PKG_EXCLUDED_ARCHES:=""}" ] && [ "$TERMUX_PKG_EXCLUDED_ARCHES" != "${TERMUX_PKG_EXCLUDED_ARCHES/$TERMUX_ARCH/}" ]; then
 		echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
 		exit 0
 	fi

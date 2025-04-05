@@ -27,7 +27,7 @@ TERMUX_PKG_HOSTBUILD=true
 # ^             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ```
 # Furthermore libkokkos does not support ILP32
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 termux_step_host_build() {
 	termux_setup_cmake

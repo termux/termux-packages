@@ -11,7 +11,7 @@ TERMUX_PKG_DEPENDS="libc++, libllvm, libtbb"
 # OIDN supports 64-bit platforms only and won't build on Linux ARM64, see
 # https://github.com/OpenImageDenoise/oidn/issues/125#issuecomment-916479769
 # and https://github.com/OpenImageDenoise/oidn/#prerequisites.
-TERMUX_PKG_BLACKLISTED_ARCHES="aarch64, arm, i686"
+TERMUX_PKG_EXCLUDED_ARCHES="aarch64, arm, i686"
 
 termux_step_pre_configure() {
 	local ISPC_VERSION=1.18.0

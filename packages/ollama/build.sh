@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION="0.6.4"
 TERMUX_PKG_SRCURL=git+https://github.com/ollama/ollama
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 termux_step_make_install() {
 	cd $TERMUX_PKG_SRCDIR

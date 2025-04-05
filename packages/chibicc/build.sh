@@ -11,7 +11,7 @@ TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_DEPENDS="binutils-is-llvm | binutils, libandroid-glob"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_BLACKLISTED_ARCHES="aarch64, arm, i686"
+TERMUX_PKG_EXCLUDED_ARCHES="aarch64, arm, i686"
 
 termux_step_post_get_source() {
 	git fetch --unshallow

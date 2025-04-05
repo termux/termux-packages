@@ -25,4 +25,4 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 # XXX: TileDB assumes that `std::string_view::size_type` == `std::uint64_t`,
 # XXX: but this is not true on 32-bit Android.
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"

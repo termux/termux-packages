@@ -12,7 +12,7 @@ TERMUX_PKG_DEPENDS="libandroid-complex-math, libandroid-glob, libandroid-spawn, 
 TERMUX_PKG_AUTO_UPDATE=true
 
 # box86 is for arm only
-TERMUX_PKG_BLACKLISTED_ARCHES="aarch64, i686, x86_64"
+TERMUX_PKG_EXCLUDED_ARCHES="aarch64, i686, x86_64"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DANDROID=ON

@@ -14,7 +14,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 #   if (!slash::string2l(argv_[2].data(), argv_[2].size(), &cursor_)) {
 #                                                          ^~~~~~~~
 # ```
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 termux_step_post_get_source() {
 	rm -fr third/rocksdb

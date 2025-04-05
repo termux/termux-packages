@@ -14,7 +14,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DWASMEDGE_USE_LLVM=OFF
 "
 # Until fmt 11.0.3 is released with https://github.com/fmtlib/fmt/issues/4140:
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 termux_step_pre_configure() {
 	case "${TERMUX_ARCH}" in

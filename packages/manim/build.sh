@@ -12,7 +12,7 @@ TERMUX_PKG_PYTHON_TARGET_DEPS="'av>=9.0.0,<14.0.0', 'beautifulsoup4>=4.12', 'cli
 TERMUX_PKG_PYTHON_COMMON_DEPS="poetry"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst

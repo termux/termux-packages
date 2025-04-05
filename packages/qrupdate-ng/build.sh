@@ -9,7 +9,7 @@ TERMUX_PKG_DEPENDS="libopenblas"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_SYSTEM_NAME=Linux
 "
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 termux_step_pre_configure() {
 	termux_setup_flang

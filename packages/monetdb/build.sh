@@ -19,7 +19,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 # #error "we need _Atomic(unsigned long long) to be lock free"
 #  ^
 # ```
-TERMUX_PKG_BLACKLISTED_ARCHES="i686"
+TERMUX_PKG_EXCLUDED_ARCHES="i686"
 
 termux_step_post_get_source() {
 	find . -name '*.c' | xargs -n 1 sed -i \

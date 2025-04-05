@@ -16,7 +16,7 @@ TERMUX_PKG_DEPENDS="libandroid-complex-math-static, libc++, libllvm (= $DEP_QUAL
 TERMUX_PKG_BUILD_DEPENDS="libllvm-static"
 
 # Upstream doesn't support 32-bit arches well. See https://github.com/llvm/llvm-project/issues/57621.
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 # See http://llvm.org/docs/CMake.html:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

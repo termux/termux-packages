@@ -12,7 +12,7 @@ TERMUX_PKG_REPLACES="poac"
 TERMUX_PKG_BUILD_DEPENDS="nlohmann-json"
 TERMUX_PKG_DEPENDS="fmt, libc++, libcurl, libgit2, libspdlog, libtbb"
 TERMUX_PKG_SUGGESTS="clang, make, pkg-config"
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 termux_step_make() {
 	make RELEASE=1 -j$TERMUX_PKG_MAKE_PROCESSES
