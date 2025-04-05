@@ -1,0 +1,23 @@
+For some reason, thunderbird currently has a system tray icon that upstream only
+appears to have enabled on x86_64 GNU/Linux X11
+(not ARM GNU/Linux X11 or 32-bit x86 GNU/Linux X11).
+
+since the system tray code appears to have a dependency on dbus, but this thunderbird
+is built with --disable-dbus, this disables the system tray code
+(otherwise this other error would happen)
+error: could not find system library 'dbus-1' required by the 'libdbus-sys' crate
+
+This fixes this build error when targeting x86_64:
+ld.lld: error: undefined symbol: nsLinuxSysTrayHandlerConstructor
+
+--- a/comm/mailnews/base/src/components.conf
++++ b/comm/mailnews/base/src/components.conf
+@@ -338,7 +338,7 @@ elif buildconfig.substs["OS_ARCH"] == "WINNT":
+             "headers": ["/comm/mailnews/base/src/nsMessengerWinIntegration.h"],
+         },
+     ]
+-elif buildconfig.substs["OS_ARCH"] == "Linux" and buildconfig.substs["TARGET_CPU"] == "x86_64":
++elif buildconfig.substs["OS_ARCH"] == "Linux" and buildconfig.substs["TARGET_CPU"] == "Disabling this":
+     Classes += [
+         {
+             "cid": "{d9e45fee-1dd1-11b2-938c-9147855ed837}",
