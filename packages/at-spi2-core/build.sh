@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Assistive Technology Service Provider Interface (AT-SPI)
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.56.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/at-spi2-core/${TERMUX_PKG_VERSION%.*}/at-spi2-core-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=fd177fecd8c95006ff0a355eafd7066fe110a2e17eb5eb5fe17ff70e49a4eace
 TERMUX_PKG_AUTO_UPDATE=true
@@ -22,4 +23,21 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_pre_configure() {
 	termux_setup_gir
 	termux_setup_glib_cross_pkg_config_wrapper
+
+	export TERMUX_MESON_ENABLE_SOVERSION=1
+}
+
+termux_step_post_massage() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION_GUARD_FILES=(
+		'lib/libatk-1.0.so.0'
+		'lib/libatk-bridge-2.0.so.0'
+		'lib/libatspi.so.0'
+	)
+
+	local f
+	for f in "${_SOVERSION_GUARD_FILES[@]}"; do
+		[ -e "${f}" ] || termux_error_exit "SOVERSION guard check failed."
+	done
 }
