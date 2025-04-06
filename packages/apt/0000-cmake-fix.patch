@@ -1,7 +1,7 @@
-diff -uNr apt-2.1.13/apt-pkg/CMakeLists.txt apt-2.1.13.mod/apt-pkg/CMakeLists.txt
---- apt-2.1.13/apt-pkg/CMakeLists.txt	2020-12-10 16:40:27.000000000 +0200
-+++ apt-2.1.13.mod/apt-pkg/CMakeLists.txt	2020-12-11 18:10:24.236801758 +0200
-@@ -52,7 +52,7 @@
+diff -u -r ../apt-2.9.3/apt-pkg/CMakeLists.txt ./apt-pkg/CMakeLists.txt
+--- ../apt-2.9.3/apt-pkg/CMakeLists.txt	2024-05-14 11:01:31.000000000 +0000
++++ ./apt-pkg/CMakeLists.txt	2024-05-14 18:33:35.039473088 +0000
+@@ -61,7 +61,7 @@
  )
  
  target_link_libraries(apt-pkg
@@ -10,10 +10,11 @@ diff -uNr apt-2.1.13/apt-pkg/CMakeLists.txt apt-2.1.13.mod/apt-pkg/CMakeLists.tx
                               ${CMAKE_THREAD_LIBS_INIT}
                               ${ZLIB_LIBRARIES}
                               ${BZIP2_LIBRARIES}
-diff -uNr apt-2.2.0/CMakeLists.txt apt-2.2.0.mod/CMakeLists.txt
---- apt-2.2.0/CMakeLists.txt	2020-12-10 16:40:27.000000000 +0200
-+++ apt-2.2.0.mod/CMakeLists.txt	2020-12-11 18:10:24.236801758 +0200
-@@ -189,14 +189,6 @@
+Only in ./apt-pkg: CMakeLists.txt.orig
+diff -u -r ../apt-2.9.3/CMakeLists.txt ./CMakeLists.txt
+--- ../apt-2.9.3/CMakeLists.txt	2024-05-14 11:01:31.000000000 +0000
++++ ./CMakeLists.txt	2024-05-14 18:38:48.263646165 +0000
+@@ -195,14 +195,6 @@
    endif()
  endif()
  
@@ -28,18 +29,19 @@ diff -uNr apt-2.2.0/CMakeLists.txt apt-2.2.0.mod/CMakeLists.txt
  # Configure some variables like package, version and architecture.
  set(PACKAGE ${PROJECT_NAME})
  set(PACKAGE_MAIL "APT Development Team <deity@lists.debian.org>")
-@@ -209,10 +201,6 @@
+@@ -216,11 +208,6 @@
    message(STATUS "Found dpkg data dir: ${DPKG_DATADIR_CMD}")
    set(DPKG_DATADIR "${DPKG_DATADIR_CMD}" CACHE PATH "dpkg data directory")
  endif()
 -if (NOT DEFINED COMMON_ARCH)
 -  execute_process(COMMAND dpkg-architecture -qDEB_HOST_ARCH
--                  OUTPUT_VARIABLE COMMON_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
+-                  OUTPUT_VARIABLE COMMON_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE
+-                  COMMAND_ERROR_IS_FATAL ANY)
 -endif()
  if (NOT DEFINED ROOT_GROUP)
    execute_process(COMMAND id -gn root
-                   OUTPUT_VARIABLE ROOT_GROUP OUTPUT_STRIP_TRAILING_WHITESPACE)
-@@ -243,7 +231,6 @@
+                   OUTPUT_VARIABLE ROOT_GROUP OUTPUT_STRIP_TRAILING_WHITESPACE
+@@ -254,7 +241,6 @@
  add_subdirectory(dselect)
  add_subdirectory(ftparchive)
  add_subdirectory(methods)
@@ -47,9 +49,30 @@ diff -uNr apt-2.2.0/CMakeLists.txt apt-2.2.0.mod/CMakeLists.txt
  
  if (USE_NLS)
  add_subdirectory(po)
-diff -uNr apt-2.1.13/methods/CMakeLists.txt apt-2.1.13.mod/methods/CMakeLists.txt
---- apt-2.1.13/methods/CMakeLists.txt	2020-12-10 16:40:27.000000000 +0200
-+++ apt-2.1.13.mod/methods/CMakeLists.txt	2020-12-11 18:11:00.833144879 +0200
+Only in .: CMakeLists.txt.orig
+Only in .: CMakeLists.txt.rej
+diff -u -r ../apt-2.9.3/doc/CMakeLists.txt ./doc/CMakeLists.txt
+--- ../apt-2.9.3/doc/CMakeLists.txt	2024-05-14 11:01:31.000000000 +0000
++++ ./doc/CMakeLists.txt	2024-05-14 18:33:35.040473072 +0000
+@@ -3,15 +3,6 @@
+ endif()
+ 
+ set(LINGUAS
+-    de
+-    es
+-    fr
+-    it
+-    ja
+-    nl
+-    pl
+-    pt_BR
+-    pt
+ )
+ 
+ set(TRANSLATED_ENTITIES
+diff -u -r ../apt-2.9.3/methods/CMakeLists.txt ./methods/CMakeLists.txt
+--- ../apt-2.9.3/methods/CMakeLists.txt	2024-05-14 11:01:31.000000000 +0000
++++ ./methods/CMakeLists.txt	2024-05-14 18:33:35.040473072 +0000
 @@ -11,7 +11,6 @@
  add_executable(cdrom cdrom.cc)
  add_executable(http http.cc basehttp.cc $<TARGET_OBJECTS:connectlib>)
@@ -72,23 +95,3 @@ diff -uNr apt-2.1.13/methods/CMakeLists.txt apt-2.1.13.mod/methods/CMakeLists.tx
          RUNTIME DESTINATION ${CMAKE_INSTALL_LIBEXECDIR}/apt/methods)
  
  add_links(${CMAKE_INSTALL_LIBEXECDIR}/apt/methods mirror mirror+ftp mirror+http mirror+https mirror+file mirror+copy)
-diff --git a/doc/CMakeLists.txt b/doc/CMakeLists.txt
-index 3060949..3ce03b6 100644
---- a/doc/CMakeLists.txt
-+++ b/doc/CMakeLists.txt
-@@ -1,15 +1,6 @@
- include(Documentation)
- 
- set(LINGUAS
--    de
--    es
--    fr
--    it
--    ja
--    nl
--    pl
--    pt_BR
--    pt
- )
- 
- set(TRANSLATED_ENTITIES
