@@ -3,12 +3,13 @@ TERMUX_PKG_DESCRIPTION="Fundamental algorithms for scientific computing in Pytho
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.15.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/scipy/scipy
 TERMUX_PKG_DEPENDS="libc++, libopenblas, python, python-numpy"
 TERMUX_PKG_BUILD_DEPENDS="python-numpy-static"
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, 'Cython>=3.0.8', meson-python, build"
 _NUMPY_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python-numpy/build.sh; echo $TERMUX_PKG_VERSION)
-TERMUX_PKG_PYTHON_BUILD_DEPS="'pybind11>=2.12.0', 'numpy==$_NUMPY_VERSION'"
+TERMUX_PKG_PYTHON_BUILD_DEPS="pythran, 'pybind11>=2.12.0', 'numpy==$_NUMPY_VERSION'"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 
@@ -19,7 +20,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dfortran_std=none
 -Dblas=openblas
 -Dlapack=openblas
--Duse-pythran=false
+-Duse-pythran=true
 --cross-file $TERMUX_MESON_WHEEL_CROSSFILE
 "
 
