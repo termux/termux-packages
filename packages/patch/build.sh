@@ -9,9 +9,9 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-xattr ac_cv_path_ED=$TERMUX_PREFIX/bin/ed"
 TERMUX_PKG_GROUPS="base-devel"
 
-termux_step_pre_configure() { 
- 	# https://android.googlesource.com/platform/bionic/+/master/docs/32-bit-abi.md#is-32_bit-on-lp32-y2038 
- 	if [ $TERMUX_ARCH_BITS = 32 ]; then 
- 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-year2038" 
- 	fi
+termux_step_pre_configure() {
+	# https://android.googlesource.com/platform/bionic/+/master/docs/32-bit-abi.md#is-32_bit-on-lp32-y2038
+	if [ $TERMUX_ARCH_BITS = 32 ]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-year2038"
+	fi
 }
