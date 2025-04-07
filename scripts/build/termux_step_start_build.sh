@@ -79,6 +79,10 @@ termux_step_start_build() {
 			termux_error_exit "Cannot continue this build, hostbuilt tools are missing"
 		fi
 
+		# Set TERMUX_ELF_CLEANER for on-device continued build
+		if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ] && [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+			TERMUX_ELF_CLEANER="$(command -v termux-elf-cleaner)"
+		fi
 		# The rest in this function can be skipped when doing
 		# a continued build
 		return
@@ -102,7 +106,7 @@ termux_step_start_build() {
 				"apt") apt install -y termux-elf-cleaner;;
 				"pacman") pacman -S termux-elf-cleaner --needed --noconfirm;;
 			esac
-			ln -sf $TERMUX_ELF_CLEANER "$(command -v termux-elf-cleaner)"
+			TERMUX_ELF_CLEANER="$(command -v termux-elf-cleaner)"
 		else
 			local TERMUX_ELF_CLEANER_VERSION
 			TERMUX_ELF_CLEANER_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/build.sh; echo \$TERMUX_PKG_VERSION")
