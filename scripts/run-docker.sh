@@ -54,12 +54,17 @@ $SUDO docker start $CONTAINER_NAME >/dev/null 2>&1 || {
 		--tty \
 		$TERMUX_BUILDER_IMAGE_NAME
 	if [ "$UNAME" != Darwin ]; then
-		if [ $(id -u) -ne 1001 -a $(id -u) -ne 0 ]; then
+		#NOTE: these changes are taken from PR #21413 - https://github.com/termux/termux-packages/pull/21413
+		REPO_UID="$(stat -c %u $REPOROOT)"
+		REPO_GID="$(stat -c %g $REPOROOT)"
+		if [ "$REPO_UID" -eq "0" ]; then
+			echo "Warning, the repository is cloned by root. Because of this, some script functions will not work in container."
+		elif [ $REPO_UID -ne 1001 ]; then
 			echo "Changed builder uid/gid... (this may take a while)"
-			$SUDO docker exec $DOCKER_TTY $CONTAINER_NAME sudo chown -R $(id -u) $CONTAINER_HOME_DIR
-			$SUDO docker exec $DOCKER_TTY $CONTAINER_NAME sudo chown -R $(id -u) /data
-			$SUDO docker exec $DOCKER_TTY $CONTAINER_NAME sudo usermod -u $(id -u) builder
-			$SUDO docker exec $DOCKER_TTY $CONTAINER_NAME sudo groupmod -g $(id -g) builder
+			$SUDO docker exec $DOCKER_TTY $CONTAINER_NAME sudo chown -R $REPO_UID $CONTAINER_HOME_DIR
+			$SUDO docker exec $DOCKER_TTY $CONTAINER_NAME sudo chown -R $REPO_UID /data
+			$SUDO docker exec $DOCKER_TTY $CONTAINER_NAME sudo usermod -u $REPO_UID builder
+			$SUDO docker exec $DOCKER_TTY $CONTAINER_NAME sudo groupmod -g $REPO_GID builder
 		fi
 	fi
 }
