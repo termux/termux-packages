@@ -102,7 +102,7 @@ termux_step_start_build() {
 				"apt") apt install -y termux-elf-cleaner;;
 				"pacman") pacman -S termux-elf-cleaner --needed --noconfirm;;
 			esac
-			TERMUX_ELF_CLEANER="$(command -v termux-elf-cleaner)"
+			ln -sf $TERMUX_ELF_CLEANER "$(command -v termux-elf-cleaner)"
 		else
 			local TERMUX_ELF_CLEANER_VERSION
 			TERMUX_ELF_CLEANER_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/build.sh; echo \$TERMUX_PKG_VERSION")
