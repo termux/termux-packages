@@ -79,6 +79,10 @@ termux_step_start_build() {
 			termux_error_exit "Cannot continue this build, hostbuilt tools are missing"
 		fi
 
+		# Set TERMUX_ELF_CLEANER for on-device continued build
+		if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ] && [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+			TERMUX_ELF_CLEANER="$(command -v termux-elf-cleaner)"
+		fi
 		# The rest in this function can be skipped when doing
 		# a continued build
 		return
