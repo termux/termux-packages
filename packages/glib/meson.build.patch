@@ -77,7 +77,7 @@
  
  glib_conf.set('HAVE_BIND_TEXTDOMAIN_CODESET', have_bind_textdomain_codeset)
  
-@@ -2634,11 +2624,7 @@
+@@ -2666,16 +2656,13 @@
  gobject_introspection_required_version = '>= 1.80.0'
  gir_scanner = find_program('g-ir-scanner', required: get_option('introspection'), version: gobject_introspection_required_version)
  gobject_introspection = dependency('gobject-introspection-1.0', required: get_option('introspection'), version: gobject_introspection_required_version)
@@ -90,3 +90,10 @@
  
  gir_args = [
    '--quiet',
+ ]
+-if gobject_introspection.version().version_compare('>=1.83.2')
++# TODO: Remove this after gobject-introspection 1.84.0 update in host system
++if false and gobject_introspection.version().version_compare('>=1.83.2')
+   gir_args += [
+     '--doc-format=gi-docgen',
+   ]
