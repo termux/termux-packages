@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A source code editing widget"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="299.5.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gitlab.gnome.org/World/gedit/libgedit-gtksourceview/-/archive/${TERMUX_PKG_VERSION}/libgedit-gtksourceview-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=49b66fe7e2d33dbf643107ae16fe324edf91bb21e86a927b2c5981f63f4cbb12
 TERMUX_PKG_AUTO_UPDATE=true
