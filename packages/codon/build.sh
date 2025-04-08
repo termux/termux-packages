@@ -5,6 +5,7 @@ TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 _LLVM_COMMIT=c5a1d86495d28ab045258f120a8e2c9f3ef67a3b
 TERMUX_PKG_VERSION="0.18.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
 	https://github.com/exaloop/codon/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
 	https://github.com/exaloop/codon/releases/download/v$TERMUX_PKG_VERSION/codon-linux-x86_64.tar.gz
