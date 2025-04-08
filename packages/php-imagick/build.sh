@@ -10,19 +10,14 @@ TERMUX_PKG_SHA256=aa2e311efb7348350c7332876252720af6fb71210d13268de765bc41f51128
 TERMUX_PKG_DEPENDS="php, imagemagick"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+\.\d+'
-TERMUX_PKG_UPDATE_TAG_TYPE="latest-regex"
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 termux_pkg_auto_update() {
-	#
 	local latest_release
-	latest_release="$(termux_github_api_get_tag \
-		"${TERMUX_PKG_SRCURL}" \
-		"${TERMUX_PKG_UPDATE_TAG_TYPE}" \
-		"${TERMUX_PKG_UPDATE_VERSION_REGEXP}"
-	)"
+	latest_release="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")"
 
-	if [[ "${latest_release}" == "${TERMUX_PKG_VERSION}" ]]; then
-		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+	if ! grep -P "^${TERMUX_PKG_UPDATE_VERSION_REGEXP}\$" <<<"$latest_release"; then
+		echo "WARN: '$latest_release' did not match the regex exclusively. Not updating."
 		return
 	fi
 
@@ -32,7 +27,7 @@ termux_pkg_auto_update() {
 termux_step_pre_configure() {
 	$TERMUX_PREFIX/bin/phpize
 
-	if [ "$TERMUX_ARCH_BITS" = 32 ];then
+	if [ "$TERMUX_ARCH_BITS" = 32 ]; then
 		LDFLAGS+=" -lm"
 	fi
 }
