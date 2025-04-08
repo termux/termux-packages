@@ -1,0 +1,18 @@
+diff --git a/apt-pkg/pkgcache.h b/apt-pkg/pkgcache.h
+index 27719b75b..d66045145 100644
+--- a/apt-pkg/pkgcache.h
++++ b/apt-pkg/pkgcache.h
+@@ -635,8 +635,13 @@ struct pkgCache::SourceVersion
+    map_pointer<pkgCache::Group> Group;
+    /** \brief complete version string */
+    map_stringitem_t VerStr;
++#if defined(__clang__)
++   map_pointer<Version> VersionList [[clang::unavailable("not yet available")]];
++   map_pointer<SourceVersion> NextSourceVersion [[clang::unavailable("not yet available")]];
++#else
+    map_pointer<Version> VersionList [[gnu::unavailable("not yet available")]];
+    map_pointer<SourceVersion> NextSourceVersion [[gnu::unavailable("not yet available")]];
++#endif
+ 
+    /** \brief Private pointer */
+    map_pointer<void> d;

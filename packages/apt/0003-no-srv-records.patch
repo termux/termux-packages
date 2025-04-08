@@ -1,6 +1,7 @@
-diff -uNr apt-2.1.18/apt-pkg/contrib/srvrec.cc apt-2.1.18.mod/apt-pkg/contrib/srvrec.cc
---- apt-2.1.18/apt-pkg/contrib/srvrec.cc	2021-01-13 18:37:30.000000000 +0200
-+++ apt-2.1.18.mod/apt-pkg/contrib/srvrec.cc	2021-02-03 21:38:17.382553856 +0200
+diff --git a/apt-pkg/contrib/srvrec.cc b/apt-pkg/contrib/srvrec.cc
+index 3ddb95abb..3275b6da2 100644
+--- a/apt-pkg/contrib/srvrec.cc
++++ b/apt-pkg/contrib/srvrec.cc
 @@ -6,6 +6,7 @@
  
     ##################################################################### */
@@ -9,14 +10,15 @@ diff -uNr apt-2.1.18/apt-pkg/contrib/srvrec.cc apt-2.1.18.mod/apt-pkg/contrib/sr
  #include <config.h>
  
  #include <netdb.h>
-@@ -202,3 +203,4 @@
+@@ -210,3 +211,4 @@ SrvRec PopFromSrvRecs(std::vector<SrvRec> &Recs)
  
     return selected;
  }
 +#endif
-diff -uNr apt-2.1.18/apt-pkg/contrib/srvrec.h apt-2.1.18.mod/apt-pkg/contrib/srvrec.h
---- apt-2.1.18/apt-pkg/contrib/srvrec.h	2021-01-13 18:37:30.000000000 +0200
-+++ apt-2.1.18.mod/apt-pkg/contrib/srvrec.h	2021-02-03 21:38:17.386553898 +0200
+diff --git a/apt-pkg/contrib/srvrec.h b/apt-pkg/contrib/srvrec.h
+index 1e981d3d7..f49c91737 100644
+--- a/apt-pkg/contrib/srvrec.h
++++ b/apt-pkg/contrib/srvrec.h
 @@ -8,6 +8,7 @@
  									/*}}}*/
  #ifndef SRVREC_H
@@ -25,15 +27,16 @@ diff -uNr apt-2.1.18/apt-pkg/contrib/srvrec.h apt-2.1.18.mod/apt-pkg/contrib/srv
  
  #include <string>
  #include <vector>
-@@ -54,3 +55,4 @@
+@@ -55,3 +56,4 @@ APT_PUBLIC bool GetSrvRecords(std::string host, int port, std::vector<SrvRec> &R
  APT_PUBLIC SrvRec PopFromSrvRecs(std::vector<SrvRec> &Recs);
  
  #endif
 +#endif
-diff -uNr apt-2.1.18/cmdline/apt-helper.cc apt-2.1.18.mod/cmdline/apt-helper.cc
---- apt-2.1.18/cmdline/apt-helper.cc	2021-01-13 18:37:30.000000000 +0200
-+++ apt-2.1.18.mod/cmdline/apt-helper.cc	2021-02-03 21:38:17.386553898 +0200
-@@ -106,6 +106,7 @@
+diff --git a/cmdline/apt-helper.cc b/cmdline/apt-helper.cc
+index 4404259d8..518c98179 100644
+--- a/cmdline/apt-helper.cc
++++ b/cmdline/apt-helper.cc
+@@ -106,6 +106,7 @@ static bool DoDownloadFile(CommandLine &CmdL)				/*{{{*/
  
     return true;
  }
@@ -41,7 +44,7 @@ diff -uNr apt-2.1.18/cmdline/apt-helper.cc apt-2.1.18.mod/cmdline/apt-helper.cc
  									/*}}}*/
  static bool DoSrvLookup(CommandLine &CmdL)				/*{{{*/
  {
-@@ -134,6 +135,7 @@
+@@ -134,6 +135,7 @@ static bool DoSrvLookup(CommandLine &CmdL)				/*{{{*/
     return true;
  }
  									/*}}}*/
@@ -49,20 +52,21 @@ diff -uNr apt-2.1.18/cmdline/apt-helper.cc apt-2.1.18.mod/cmdline/apt-helper.cc
  static const APT::Configuration::Compressor *FindCompressor(std::vector<APT::Configuration::Compressor> const &compressors, std::string const &name) /*{{{*/
  {
     APT::Configuration::Compressor const * compressor = NULL;
-@@ -311,7 +313,9 @@
+@@ -341,7 +343,9 @@ static std::vector<aptDispatchWithHelp> GetCommands()			/*{{{*/
  {
     return {
-        {"download-file", &DoDownloadFile, _("download the given uri to the target-path")},
+       {"download-file", &DoDownloadFile, _("download the given uri to the target-path")},
 +#ifndef __ANDROID__
-        {"srv-lookup", &DoSrvLookup, _("lookup a SRV record (e.g. _http._tcp.ftp.debian.org)")},
+       {"srv-lookup", &DoSrvLookup, _("lookup a SRV record (e.g. _http._tcp.ftp.debian.org)")},
 +#endif
-        {"cat-file", &DoCatFile, _("concatenate files, with automatic decompression")},
-        {"auto-detect-proxy", &DoAutoDetectProxy, _("detect proxy using apt.conf")},
-        {"wait-online", &DoWaitOnline, _("wait for system to be online")},
-diff -uNr apt-2.1.18/methods/connect.cc apt-2.1.18.mod/methods/connect.cc
---- apt-2.1.18/methods/connect.cc	2021-01-13 18:37:30.000000000 +0200
-+++ apt-2.1.18.mod/methods/connect.cc	2021-02-03 21:41:48.220687372 +0200
-@@ -49,7 +49,9 @@
+       {"cat-file", &DoCatFile, _("concatenate files, with automatic decompression")},
+       {"hash-file", &DoHashFile, _("hash file")},
+       {"auto-detect-proxy", &DoAutoDetectProxy, _("detect proxy using apt.conf")},
+diff --git a/methods/connect.cc b/methods/connect.cc
+index 96c169e79..27d7c727b 100644
+--- a/methods/connect.cc
++++ b/methods/connect.cc
+@@ -52,7 +52,9 @@ static std::string LastService;
  static struct addrinfo *LastHostAddr = 0;
  static struct addrinfo *LastUsed = 0;
  
@@ -72,7 +76,7 @@ diff -uNr apt-2.1.18/methods/connect.cc apt-2.1.18.mod/methods/connect.cc
  
  // Set of IP/hostnames that we timed out before or couldn't resolve
  static std::set<std::string> bad_addr;
-@@ -486,6 +488,10 @@
+@@ -489,6 +491,10 @@ ResultState Connect(std::string Host, int Port, const char *Service,
     // Used by getaddrinfo(); prefer port if given, else fallback to service
     std::string ServiceNameOrPort = Port != 0 ? std::to_string(Port) : Service;
  
@@ -83,7 +87,7 @@ diff -uNr apt-2.1.18/methods/connect.cc apt-2.1.18.mod/methods/connect.cc
     if(LastHost != Host || LastService != ServiceNameOrPort)
     {
        SrvRecords.clear();
-@@ -503,7 +509,6 @@
+@@ -506,7 +512,6 @@ ResultState Connect(std::string Host, int Port, const char *Service,
        }
     }
  
@@ -91,7 +95,7 @@ diff -uNr apt-2.1.18/methods/connect.cc apt-2.1.18.mod/methods/connect.cc
     // try to connect in the priority order of the srv records
     std::string initialHost{std::move(Host)};
     auto const initialPort = Port;
-@@ -525,6 +530,7 @@
+@@ -528,6 +533,7 @@ ResultState Connect(std::string Host, int Port, const char *Service,
     }
     Host = std::move(initialHost);
     Port = initialPort;
