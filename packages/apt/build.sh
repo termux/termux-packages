@@ -1,19 +1,18 @@
 TERMUX_PKG_HOMEPAGE=https://packages.debian.org/apt
 TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
-TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_LICENSE="BSD 3-Clause, GPL-2.0-only, GPL-2.0-or-later, MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.8.1"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="3.1.5"
 # old tarball are removed in https://deb.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SRCURL=https://salsa.debian.org/apt-team/apt/-/archive/${TERMUX_PKG_VERSION}/apt-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=87ca18392c10822a133b738118505f7d04e0b31ba1122bf5d32911311cb2dc7e
+TERMUX_PKG_SRCURL=https://salsa.debian.org/apt-team/apt/-/archive/${TERMUX_PKG_VERSION}/apt-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=cb5be2295cb4baa79789c2864f79863cc1fa324e21440cc68036a4448b019104
 # apt-key requires utilities from coreutils, findutils, gpgv, grep, sed.
-TERMUX_PKG_DEPENDS="coreutils, dpkg, findutils, gpgv, grep, libandroid-glob, libbz2, libc++, libiconv, libgcrypt, libgnutls, liblz4, liblzma, sed, termux-keyring, termux-licenses, xxhash, zlib, zstd"
-TERMUX_PKG_BUILD_DEPENDS="docbook-xsl,libdb"
+TERMUX_PKG_DEPENDS="coreutils, dpkg, findutils, grep, libandroid-glob, libbz2, libc++, libiconv, liblz4, liblzma, libseccomp, openssl, sed, sequoia-sqv | gpgv, termux-keyring, termux-licenses, xxhash, zlib, zstd"
+TERMUX_PKG_BUILD_DEPENDS="docbook-xsl, libdb, gnupg, sequoia-sqv"
 TERMUX_PKG_CONFLICTS="apt-transport-https, libapt-pkg, unstable-repo, game-repo, science-repo"
 TERMUX_PKG_REPLACES="apt-transport-https, libapt-pkg, unstable-repo, game-repo, science-repo"
 TERMUX_PKG_PROVIDES="unstable-repo, game-repo, science-repo"
-TERMUX_PKG_SUGGESTS="gnupg"
+TERMUX_PKG_SUGGESTS="gnupg, less"
 TERMUX_PKG_ESSENTIAL=true
 
 TERMUX_PKG_CONFFILES="
@@ -30,6 +29,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DUSE_NLS=OFF
 -DWITH_DOC=OFF
 -DWITH_DOC_MANPAGES=ON
+-DDEFAULT_PAGER=$TERMUX_PREFIX/bin/less
 "
 
 # ubuntu uses instead $PREFIX/lib instead of $PREFIX/libexec to
@@ -78,14 +78,18 @@ termux_step_post_make_install() {
 		echo "deb https://packages-cf.termux.dev/apt/termux-main/ stable main"
 		echo "# The main termux repository, without cloudflare cache"
 		echo "# deb https://packages.termux.dev/apt/termux-main/ stable main"
-	} > $TERMUX_PREFIX/etc/apt/sources.list
+	} > "$TERMUX_PREFIX/etc/apt/sources.list"
 
 	# apt-transport-tor
-	ln -sfr $TERMUX_PREFIX/lib/apt/methods/http $TERMUX_PREFIX/lib/apt/methods/tor
-	ln -sfr $TERMUX_PREFIX/lib/apt/methods/http $TERMUX_PREFIX/lib/apt/methods/tor+http
-	ln -sfr $TERMUX_PREFIX/lib/apt/methods/https $TERMUX_PREFIX/lib/apt/methods/tor+https
+	ln -sfr "$TERMUX_PREFIX/lib/apt/methods/http" "$TERMUX_PREFIX/lib/apt/methods/tor"
+	ln -sfr "$TERMUX_PREFIX/lib/apt/methods/http" "$TERMUX_PREFIX/lib/apt/methods/tor+http"
+	ln -sfr "$TERMUX_PREFIX/lib/apt/methods/https" "$TERMUX_PREFIX/lib/apt/methods/tor+https"
 	# Workaround for "empty" subpackage:
 	local dir=$TERMUX_PREFIX/share/apt-transport-tor
-	mkdir -p $dir
-	touch $dir/.placeholder
+	mkdir -p "$dir"
+	touch "$dir/.placeholder"
+
+	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+		-e "s|@TERMUX_ARCH@|${TERMUX_ARCH}|g" \
+		"$TERMUX_SCRIPTDIR/packages/apt/emergency-restore.sh.in" > "$TERMUX_PREFIX/bin/apt-emergency-restore"
 }
