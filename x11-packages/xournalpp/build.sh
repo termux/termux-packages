@@ -4,11 +4,15 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE, copyright.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.2.6"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/xournalpp/xournalpp/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=dce483e01e267b0d20afb88c59bf53b8ca1bd8518a31f98ef5061a334d6dc4eb
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libandroid-execinfo, libc++, libcairo, librsvg, libsndfile, libx11, libxi, libxml2, libzip, pango, poppler, portaudio, zlib"
 TERMUX_PKG_REPLACES="xournal"
+# Lua 5.4 would be a dependency if plugins were wanted
+# Explicitly disable plugins for now to avoid prefix pollution
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DHELP2MAN=NO
+-DENABLE_PLUGINS=OFF
 "
