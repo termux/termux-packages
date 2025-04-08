@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A GLib/GTK+ set of document-centric objects and utilitie
 TERMUX_PKG_LICENSE="GPL-2.0, GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.10.59"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/goffice/${TERMUX_PKG_VERSION%.*}/goffice-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=b08f7173325594b71fbbea476a30b5b3120c3dadff5c0a26d140e4e524916622
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libgsf, librsvg, libspectre, libxml2, libxslt, pango, zlib"
