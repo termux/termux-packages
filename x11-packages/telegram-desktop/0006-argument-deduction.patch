@@ -1,0 +1,31 @@
+--- a/Telegram/lib_base/base/platform/linux/base_linux_xcb_utilities.cpp
++++ b/Telegram/lib_base/base/platform/linux/base_linux_xcb_utilities.cpp
+@@ -139,7 +139,7 @@
+ 		}
+ 	}
+ 
+-	const auto ptr = it->second.second.emplace_back(new Fn(handler)).get();
++	const auto ptr = it->second.second.emplace_back(new Fn<void(xcb_generic_event_t*)>(handler)).get();
+ 	return rpl::lifetime([=] {
+ 		const auto it = EventHandlers.find(connection);
+ 		it->second.second.erase(
+--- a/Telegram/SourceFiles/platform/linux/current_geo_location_linux.cpp
++++ b/Telegram/SourceFiles/platform/linux/current_geo_location_linux.cpp
+@@ -118,7 +118,7 @@
+ 				.accuracy = Core::GeoLocationAccuracy::Exact,
+ 			});
+ 		}),
+-		new Fn(callback));
++		new Fn<void(Core::GeoLocation)>(callback));
+ }
+ 
+ void ResolveLocationAddress(
+@@ -193,7 +193,7 @@
+ 
+ 			(*callback)({ .name = checked.join(u", "_q) });
+ 		}),
+-		new Fn(callback));
++		new Fn<void(Core::GeoAddress)>(callback));
+ }
+ 
+ } // namespace Platform
