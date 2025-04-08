@@ -1,10 +1,10 @@
---- a/bin/clang-target-wrapper.sh.orig
-+++ b/bin/clang-target-wrapper.sh
-@@ -94,6 +94,7 @@
- FLAGS="$FLAGS -unwindlib=libunwind"
- FLAGS="$FLAGS -stdlib=libc++"
- FLAGS="$FLAGS -fuse-ld=lld"
+--- a/bin/clang-target-wrapper.sh.orig	2025-04-08 13:06:00.549965053 +0530
++++ b/bin/clang-target-wrapper.sh	2025-04-08 13:06:05.309069139 +0530
+@@ -93,6 +93,7 @@
+ esac
+ 
+ FLAGS="$FLAGS -target $TARGET"
 +FLAGS="$FLAGS --sysroot=@TERMUX_PREFIX@/opt/llvm-mingw-w64"
  FLAGS="$FLAGS --end-no-unused-arguments"
  
- $CCACHE "$CLANG" $FLAGS "$@"
+ $CCACHE "$CLANG" $FLAGS "$@" $LINKER_FLAGS
