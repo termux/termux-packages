@@ -2,12 +2,16 @@ TERMUX_PKG_HOMEPAGE=https://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
-TERMUX_PKG_VERSION="9.9p2"
+TERMUX_PKG_VERSION="10.0p2"
 TERMUX_PKG_SRCURL=https://github.com/openssh/openssh-portable/archive/refs/tags/V_$(sed 's/\./_/g; s/p/_P/g' <<< $TERMUX_PKG_VERSION).tar.gz
-TERMUX_PKG_SHA256=082dffcf651b9db762ddbe56ca25cc75a0355a7bea41960b47f3c139974c5e3e
+TERMUX_PKG_SHA256=a25b32645dc6b474064b9deb07afc9d8e37b127d026a1170b54feb929145140c
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="krb5, ldns, libandroid-support, libedit, openssh-sftp-server, openssl, termux-auth, zlib"
+TERMUX_PKG_RECOMMENDS="termux-services"
 TERMUX_PKG_CONFLICTS="dropbear"
+# Certain packages are not safe to build on device because their
+# build.sh script deletes specific files in $TERMUX_PREFIX.
+TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 # --disable-strip to prevent host "install" command to use "-s", which won't work for target binaries:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-etc-default-login
@@ -42,21 +46,22 @@ ac_cv_lib_crypt_crypt=no
 ac_cv_search_getrrsetbyname=no
 ac_cv_func_bzero=yes
 "
-# Configure script require this variable to set
-# prefixed path to program 'passwd'
+# Configure script requires this variable to set prefixed path to program 'passwd'
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="PATH_PASSWD_PROG=${TERMUX_PREFIX}/bin/passwd"
 
 TERMUX_PKG_MAKE_INSTALL_TARGET="install-nokeys"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/slogin share/man/man1/slogin.1"
 TERMUX_PKG_CONFFILES="etc/ssh/ssh_config etc/ssh/sshd_config"
 
-termux_step_pre_configure() {
-	# Certain packages are not safe to build on device because their
-	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if $TERMUX_ON_DEVICE_BUILD; then
-		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
-	fi
+termux_pkg_auto_update() {
+	local latest_tag version
+	latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" newest-tag)"
+	[[ -z "${latest_tag}" ]] && termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
+	version="$(sed -E 's/V_([0-9]+)_([0-9]+)_P([0-9]+)/\1.\2p\3/' <<< "${latest_tag}")"
+	termux_pkg_upgrade_version "$version"
+}
 
+termux_step_pre_configure() {
 	autoreconf
 
 	CPPFLAGS+=" -DHAVE_ATTRIBUTE__SENTINEL__=1 -DBROKEN_SETRESGID"
@@ -66,41 +71,38 @@ termux_step_pre_configure() {
 termux_step_post_configure() {
 	# We need to remove this file before installing, since otherwise the
 	# install leaves it alone which means no updated timestamps.
-	rm -f $TERMUX_PREFIX/etc/ssh/moduli
-	rm -f $TERMUX_PREFIX/etc/ssh/ssh_config
-	rm -f $TERMUX_PREFIX/etc/ssh/sshd_config
+	rm -f "$TERMUX_PREFIX/etc/ssh/moduli"
+	rm -f "$TERMUX_PREFIX/etc/ssh/ssh_config"
+	rm -f "$TERMUX_PREFIX/etc/ssh/sshd_config"
 }
 
 termux_step_post_make_install() {
-	install -Dm700 $TERMUX_PKG_BUILDER_DIR/source-ssh-agent.sh $TERMUX_PREFIX/bin/source-ssh-agent
-	install -Dm700 $TERMUX_PKG_BUILDER_DIR/ssh-with-agent.sh $TERMUX_PREFIX/bin/ssha
-	install -Dm700 $TERMUX_PKG_BUILDER_DIR/sftp-with-agent.sh $TERMUX_PREFIX/bin/sftpa
-	install -Dm700 $TERMUX_PKG_BUILDER_DIR/scp-with-agent.sh $TERMUX_PREFIX/bin/scpa
-
+	mkdir -p "$TERMUX_PREFIX/var/run"
+	echo "OpenSSH needs this directory to put sshd.pid in" > "$TERMUX_PREFIX/var/run/README.openssh"
 	# Install ssh-copy-id:
-	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
-		$TERMUX_PKG_BUILDER_DIR/ssh-copy-id.sh \
-		> $TERMUX_PREFIX/bin/ssh-copy-id
-	chmod +x $TERMUX_PREFIX/bin/ssh-copy-id
+	echo "#!$TERMUX_PREFIX/bin/sh" > "$TERMUX_PREFIX/bin/ssh-copy-id"
+	tail -n+2 "$TERMUX_PKG_SRCDIR/contrib/ssh-copy-id" >> "$TERMUX_PREFIX/bin/ssh-copy-id"
+	sed -i -e "s|SANE_SH:-.*|SANE_SH:-$TERMUX_PREFIX/bin/bash}|g" "$TERMUX_PREFIX/bin/ssh-copy-id"
+	chmod 0700 "$TERMUX_PREFIX/bin/ssh-copy-id"
+	# Install ssh-copy-id's man page
+	mkdir -p "$TERMUX_PREFIX/share/man/man1"
+	cp "$TERMUX_PKG_SRCDIR/contrib/ssh-copy-id.1" "$TERMUX_PREFIX/share/man/man1"
 
-	mkdir -p $TERMUX_PREFIX/var/run
-	echo "OpenSSH needs this folder to put sshd.pid in" >> $TERMUX_PREFIX/var/run/README.openssh
-
-	mkdir -p $TERMUX_PREFIX/etc/ssh/
-	cp $TERMUX_PKG_SRCDIR/moduli $TERMUX_PREFIX/etc/ssh/moduli
+	mkdir -p "$TERMUX_PREFIX/etc/ssh/"
+	cp "$TERMUX_PKG_SRCDIR/moduli" "$TERMUX_PREFIX/etc/ssh/moduli"
 
 	# Setup termux-services scripts
-	mkdir -p $TERMUX_PREFIX/var/service/sshd/log
-	ln -sf $TERMUX_PREFIX/share/termux-services/svlogger $TERMUX_PREFIX/var/service/sshd/log/run
-	sed "s%@TERMUX_PREFIX@%$TERMUX_PREFIX%g" $TERMUX_PKG_BUILDER_DIR/sv/sshd.run.in > $TERMUX_PREFIX/var/service/sshd/run
-	chmod 700 $TERMUX_PREFIX/var/service/sshd/run
-	touch $TERMUX_PREFIX/var/service/sshd/down
+	mkdir -p "$TERMUX_PREFIX/var/service/sshd/log"
+	ln -sf "$TERMUX_PREFIX/share/termux-services/svlogger" "$TERMUX_PREFIX/var/service/sshd/log/run"
+	sed "s%@TERMUX_PREFIX@%$TERMUX_PREFIX%g" "$TERMUX_PKG_BUILDER_DIR/sv/sshd.run.in" > "$TERMUX_PREFIX/var/service/sshd/run"
+	chmod 700 "$TERMUX_PREFIX/var/service/sshd/run"
+	touch "$TERMUX_PREFIX/var/service/sshd/down"
 
-	mkdir -p $TERMUX_PREFIX/var/service/ssh-agent/log
-	ln -sf $TERMUX_PREFIX/share/termux-services/svlogger $TERMUX_PREFIX/var/service/ssh-agent/log/run
-	sed "s%@TERMUX_PREFIX@%$TERMUX_PREFIX%g" $TERMUX_PKG_BUILDER_DIR/sv/ssh-agent.run.in > $TERMUX_PREFIX/var/service/ssh-agent/run
-	chmod 700 $TERMUX_PREFIX/var/service/ssh-agent/run
-	touch $TERMUX_PREFIX/var/service/ssh-agent/down
+	mkdir -p "$TERMUX_PREFIX/var/service/ssh-agent/log"
+	ln -sf "$TERMUX_PREFIX/share/termux-services/svlogger" "$TERMUX_PREFIX/var/service/ssh-agent/log/run"
+	sed "s%@TERMUX_PREFIX@%$TERMUX_PREFIX%g" "$TERMUX_PKG_BUILDER_DIR/sv/ssh-agent.run.in" > "$TERMUX_PREFIX/var/service/ssh-agent/run"
+	chmod 700 "$TERMUX_PREFIX/var/service/ssh-agent/run"
+	touch "$TERMUX_PREFIX/var/service/ssh-agent/down"
 }
 
 termux_step_post_massage() {
@@ -108,34 +110,50 @@ termux_step_post_massage() {
 	mkdir -p etc/ssh/ssh_config.d
 	mkdir -p etc/ssh/sshd_config.d
 
-	# Verify that we have man pages packaged (#1538).
+	# Verify that we have man pages packaged.
+	# https://github.com/termux/termux-packages/issues/1538
 	local manpage
-	for manpage in ssh-keyscan.1 ssh-add.1 scp.1 ssh-agent.1 ssh.1; do
-		if [ ! -f share/man/man1/$manpage.gz ]; then
-			termux_error_exit "Missing man page $manpage"
-		fi
+	local -a EXPECTED_MAN_PAGES=(
+		'scp.1' 'ssh-add.1' 'ssh-agent.1' 'ssh-copy-id.1' 'ssh-keygen.1' 'ssh-keyscan.1' 'ssh.1'
+		'moduli.5' 'ssh_config.5' 'sshd_config.5'
+		'ssh-keysign.8' 'ssh-pkcs11-helper.8' 'ssh-sk-helper.8' 'sshd.8'
+	)
+
+	for manpage in "${EXPECTED_MAN_PAGES[@]}"; do
+		[[ -f "share/man/man${manpage#*.}/$manpage.gz" ]] || termux_error_exit "Missing man page $manpage in openssh"
+	done
+
+	cd "$TERMUX_PKG_MASSAGEDIR/../subpackages/openssh-sftp-server/massage/$TERMUX_PREFIX" || termux_error_exit "Failed to check openssh-sftp-server man pages"
+	for manpage in 'sftp.1' 'sftp-server.8'; do
+		[[ -f "share/man/man${manpage#*.}/$manpage.gz" ]] || termux_error_exit "Missing man page $manpage in openssh"
 	done
 }
 
 termux_step_create_debscripts() {
-	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
-	echo "mkdir -p \$PREFIX/var/empty" >> postinst
-	echo "mkdir -p \$HOME/.ssh" >> postinst
-	echo "touch \$HOME/.ssh/authorized_keys" >> postinst
-	echo "chmod 700 \$HOME/.ssh" >> postinst
-	echo "chmod 600 \$HOME/.ssh/authorized_keys" >> postinst
-	echo "" >> postinst
-	echo "for a in rsa ecdsa ed25519; do" >> postinst
-	echo "	  KEYFILE=$TERMUX_PREFIX/etc/ssh/ssh_host_\${a}_key" >> postinst
-	echo "	  test ! -f \$KEYFILE && ssh-keygen -N '' -t \$a -f \$KEYFILE" >> postinst
-	echo "done" >> postinst
-	echo "exit 0" >> postinst
-	chmod 0755 postinst
-}
-
-termux_pkg_auto_update() {
-	local latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" newest-tag)"
-	[[ -z "${latest_tag}" ]] && termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
-	local version="$(echo ${latest_tag} | sed -E 's/V_([0-9]+)_([0-9]+)_P([0-9]+)/\1.\2p\3/')"
-	termux_pkg_upgrade_version $version
+	{
+	echo "#!$TERMUX_PREFIX/bin/sh"
+	echo "mkdir -p \"$TERMUX_PREFIX/var/empty\""
+	echo "mkdir -p \"\$HOME/.ssh\""
+	echo "touch \"\$HOME/.ssh/authorized_keys\""
+	echo "chmod 700 \"\$HOME/.ssh\""
+	echo "chmod 600 \"\$HOME/.ssh/authorized_keys\""
+	echo ""
+	echo "for a in rsa ecdsa ed25519; do"
+	echo "	KEYFILE=\"$TERMUX_PREFIX/etc/ssh/ssh_host_\${a}_key\""
+	echo "	test ! -f \"\$KEYFILE\" && ssh-keygen -N '' -t \$a -f \"\$KEYFILE\""
+	echo "done"
+	echo ""
+	echo "echo \"\""
+	echo "echo \"If you plan to use the 'ssh-agent'\""
+	echo "echo \"it is recommended to run it as a service.\""
+	echo "echo \"Run 'pkg i termux-services'\""
+	echo "echo \"to install the ('runit') service manager\""
+	echo "echo \"\""
+	echo "echo \"You can enable the ssh-agent service\""
+	echo "echo \"using 'sv-enable ssh-agent'\""
+	echo "echo \"You can also enable sshd to autostart\""
+	echo "echo \"using 'sv-enable sshd'\""
+	echo "exit 0"
+	} > postinst
+	chmod 0700 postinst
 }
