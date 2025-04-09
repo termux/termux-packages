@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=https://archive.xfce.org/src/xfce/libxfce4windowing/${TERMUX_P
 TERMUX_PKG_SHA256=0b9b95aee8b868a2953920c2feafc026672ad19584976f19e89119e93ab1abc8
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="atk, gdk-pixbuf, glib, gtk3, harfbuzz, libcairo, libdisplay-info, libwayland, libwnck, libx11, libxrandr, pango, zlib"
-TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, libwayland-protocols, xfce4-dev-tools"
+TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, libwayland-protocols, libwayland-cross-scanner, xfce4-dev-tools"
 TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -18,9 +18,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-wayland
 --enable-x11
 XDT_GEN_VISIBILITY=${TERMUX_PREFIX}/bin/xdt-gen-visibility
-WAYLAND_SCANNER=$(command -v wayland-scanner)
 "
 
 termux_step_pre_configure() {
 	termux_setup_gir
+	termux_setup_wayland_cross_pkg_config_wrapper
 }
