@@ -9,7 +9,7 @@ TERMUX_PKG_SRCURL=(https://github.com/TigerVNC/tigervnc/archive/refs/tags/v${TER
                    https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-${TERMUX_PKG_VERSION[1]}.tar.xz)
 TERMUX_PKG_SHA256=(7f231906801e89f09a212e86701f3df1722e36767d6055a4e619390570548537
                    b14a116d2d805debc5b5b2aac505a279e69b217dae2fae2dfcb62400471a9970)
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libgmp, libgnutls, libjpeg-turbo, libnettle, libpixman, libx11, libxau, libxdamage, libxdmcp, libxext, libxfixes, libxfont2, libxrandr, libxshmfence, libxtst, opengl, openssl, perl, xkeyboard-config, xorg-xauth, xorg-xkbcomp, zlib"
 TERMUX_PKG_BUILD_DEPENDS="xorg-font-util, xorg-server, xorg-util-macros, xorgproto, xtrans"
 TERMUX_PKG_SUGGESTS="aterm, xorg-twm"
