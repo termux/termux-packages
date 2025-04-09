@@ -20,6 +20,14 @@ TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
 --prefix ${TERMUX_PREFIX}/opt/${TERMUX_PKG_NAME}/cross
 "
 
+termux_step_post_get_source() {
+	# Remove this marker all the time in order to prevent this:
+	# No files in subpackage 'libwayland-cross-scanner' when built for
+	# all with package 'libwayland', so the subpackage was not created.
+	# If unexpected, check to make sure the files are where you expect.
+	rm -rf $TERMUX_HOSTBUILD_MARKER
+}
+
 termux_step_host_build() {
 	# Download and unpack and build libexpat for host
 	EXPAT_SRC="$TERMUX_PKG_SRCDIR/expat"
@@ -43,5 +51,5 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
-	export PATH="$TERMUX_PREFIX/opt/$TERMUX_PKG_NAME/cross/bin:$PATH"
+	termux_setup_wayland_cross_pkg_config_wrapper
 }

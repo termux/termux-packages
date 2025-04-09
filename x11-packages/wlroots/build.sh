@@ -23,7 +23,7 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
-	export PATH="$TERMUX_PREFIX/opt/libwayland/cross/bin:$PATH"
+	termux_setup_wayland_cross_pkg_config_wrapper
 
 	# XXX: use alloca for shm_open
 	export CPPFLAGS+=" -Wno-alloca -Wno-strict-prototypes"

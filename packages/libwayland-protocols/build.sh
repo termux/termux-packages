@@ -11,3 +11,7 @@ TERMUX_PKG_BUILD_DEPENDS="libwayland, libwayland-cross-scanner"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dtests=false
 "
+
+termux_step_pre_configure() {
+	termux_setup_wayland_cross_pkg_config_wrapper
+}
