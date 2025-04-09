@@ -103,7 +103,7 @@ termux_create_debian_subpackages() {
 
 		# If the subpackage is not in the $TERMUX_PKG_DEPENDS for the parent package,
 		# and TERMUX_SUBPKG_DEPEND_ON_PARENT doesn't have a value, the subpackage should depend on its parent
-		[[ " ${TERMUX_PKG_DEPENDS//,/ } " == *" $SUB_PKG_NAME "* ]] && : "${TERMUX_SUBPKG_DEPEND_ON_PARENT:=true}"
+		[[ " ${TERMUX_PKG_DEPENDS//,/ } " != *" $SUB_PKG_NAME "* ]] && : "${TERMUX_SUBPKG_DEPEND_ON_PARENT:=true}"
 
 		case "$TERMUX_SUBPKG_DEPEND_ON_PARENT" in
 			'unversioned') TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_NAME";;
