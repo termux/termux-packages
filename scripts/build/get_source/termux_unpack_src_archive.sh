@@ -3,7 +3,6 @@ termux_extract_src_archive() {
 	# If this isn't desired then this can be fixed in termux_step_post_get_source.
 	local STRIP=1
 	local PKG_SRCURL=(${TERMUX_PKG_SRCURL[@]})
-	local PKG_SHA256=(${TERMUX_PKG_SHA256[@]})
 	for i in $(seq 0 $(( ${#PKG_SRCURL[@]}-1 ))); do
 		local file="$TERMUX_PKG_CACHEDIR/$(basename "${PKG_SRCURL[$i]}")"
 		local folder
