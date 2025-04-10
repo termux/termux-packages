@@ -1,0 +1,11 @@
+--- a/src/libanalyze/subprojects/subprojectstate.cpp
++++ b/src/libanalyze/subprojects/subprojectstate.cpp
+@@ -190,7 +190,7 @@
+     return hash(url + "//" + revision);
+   }
+ makeDefault:
+-#ifdef __linux__
++#if defined(__linux__) && !defined(__ANDROID__)
+   auto ftime = std::filesystem::last_write_time(path);
+   const auto systemTime =
+       std::chrono::clock_cast<std::chrono::system_clock>(ftime);
