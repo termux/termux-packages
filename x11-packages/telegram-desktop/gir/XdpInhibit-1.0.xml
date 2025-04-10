@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<dump>
+  <interface name="XdpInhibitInhibit" get-type="xdp_inhibit_inhibit_get_type">
+    <property name="version" type="guint" flags="227" default-value="0"/>
+    <signal name="handle-inhibit" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="guint"/>
+      <param type="GVariant"/>
+    </signal>
+    <signal name="handle-create-monitor" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+    </signal>
+    <signal name="handle-query-end-response" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="state-changed" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+    </signal>
+  </interface>
+  <class name="XdpInhibitInhibitProxy" get-type="xdp_inhibit_inhibit_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="XdpInhibitInhibit"/>
+  </class>
+  <class name="XdpInhibitInhibitSkeleton" get-type="xdp_inhibit_inhibit_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="XdpInhibitInhibit"/>
+  </class>
+  <interface name="XdpInhibitObject" get-type="xdp_inhibit_object_get_type">
+    <prerequisite name="GDBusObject"/>
+    <property name="inhibit" type="XdpInhibitInhibit" flags="227"/>
+  </interface>
+  <class name="XdpInhibitObjectProxy" get-type="xdp_inhibit_object_proxy_get_type" parents="GDBusObjectProxy,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="XdpInhibitObject"/>
+  </class>
+  <class name="XdpInhibitObjectSkeleton" get-type="xdp_inhibit_object_skeleton_get_type" parents="GDBusObjectSkeleton,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="XdpInhibitObject"/>
+  </class>
+  <class name="XdpInhibitObjectManagerClient" get-type="xdp_inhibit_object_manager_client_get_type" parents="GDBusObjectManagerClient,GObject">
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GDBusObjectManager"/>
+  </class>
+</dump>

@@ -1,0 +1,37 @@
+From 3ad1b3cac8850812815058b31c0c025d975d3664 Mon Sep 17 00:00:00 2001
+From: Antonio Rojas <arojas@archlinux.org>
+Date: Sat, 1 Mar 2025 01:20:04 +0100
+Subject: [PATCH] Fix build with Qt 6.9
+
+---
+ base/platform/linux/base_linux_xdp_utilities.cpp | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/base/platform/linux/base_linux_xdp_utilities.cpp b/base/platform/linux/base_linux_xdp_utilities.cpp
+index 8aca67c9..80626af1 100644
+--- a/Telegram/lib_base/base/platform/linux/base_linux_xdp_utilities.cpp
++++ b/Telegram/lib_base/base/platform/linux/base_linux_xdp_utilities.cpp
+@@ -16,7 +16,11 @@
+ #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+ #include <qpa/qplatformintegration.h>
+ #include <private/qguiapplication_p.h>
++#if QT_VERSION >= QT_VERSION_CHECK(6, 9, 0)
++#include <private/qdesktopunixservices_p.h>
++#else
+ #include <private/qgenericunixservices_p.h>
++#endif // Qt >= 6.9.0
+ #endif // Qt >= 6.5.0
+ 
+ #include <sstream>
+@@ -39,7 +43,11 @@ std::string ParentWindowID(QWindow *window) {
+ 	}
+ 
+ #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
++#if QT_VERSION >= QT_VERSION_CHECK(6, 9, 0)
++	if (const auto services = dynamic_cast<QDesktopUnixServices*>(
++#else
+ 	if (const auto services = dynamic_cast<QGenericUnixServices*>(
++#endif // Qt >= 6.9.0
+ 			QGuiApplicationPrivate::platformIntegration()->services())) {
+ 		return services->portalWindowIdentifier(window).toStdString();
+ 	}
