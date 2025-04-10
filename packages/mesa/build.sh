@@ -10,7 +10,7 @@ _LLVM_MAJOR_VERSION_NEXT=$((_LLVM_MAJOR_VERSION + 1))
 TERMUX_PKG_SRCURL=https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=5ff426ed6ce0588fd96d18975bdff451ae2ab2fe98b5d1528842ee71ec66711b
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libglvnd, libllvm (<< ${_LLVM_MAJOR_VERSION_NEXT}), libwayland, libx11, libxext, libxfixes, libxshmfence, libxxf86vm, ncurses, vulkan-loader, zlib, zstd"
+TERMUX_PKG_DEPENDS="libandroid-shmem, libbthread, libc++, libdrm, libglvnd, libllvm (<< ${_LLVM_MAJOR_VERSION_NEXT}), libwayland, libx11, libxext, libxfixes, libxshmfence, libxxf86vm, ncurses, vulkan-loader, zlib, zstd"
 TERMUX_PKG_SUGGESTS="mesa-dev"
 TERMUX_PKG_BUILD_DEPENDS="libwayland-protocols, libxrandr, llvm, llvm-tools, mlir, xorgproto"
 TERMUX_PKG_CONFLICTS="libmesa, ndk-sysroot (<= 25b)"
@@ -19,6 +19,7 @@ TERMUX_PKG_REPLACES="libmesa"
 # FIXME: Set `shared-llvm` to disabled if possible
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --cmake-prefix-path $TERMUX_PREFIX
+-Dvulkan-icd-dir=$TERMUX_PREFIX/share/vulkan/icd.d
 -Dcpp_rtti=false
 -Dgbm=enabled
 -Dopengl=true
@@ -31,6 +32,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dshared-llvm=enabled
 -Dplatforms=x11,wayland
 -Dgallium-drivers=swrast,virgl,zink
+-Dvulkan-drivers=virtio
 -Dosmesa=true
 -Dglvnd=enabled
 -Dxmlconfig=disabled
@@ -45,7 +47,7 @@ termux_step_pre_configure() {
 	termux_setup_cmake
 
 	CPPFLAGS+=" -D__USE_GNU"
-	LDFLAGS+=" -landroid-shmem"
+	LDFLAGS+=" -lbthread -landroid-shmem"
 
 	_WRAPPER_BIN=$TERMUX_PKG_BUILDDIR/_wrapper/bin
 	mkdir -p $_WRAPPER_BIN
