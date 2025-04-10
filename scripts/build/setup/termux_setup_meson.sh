@@ -49,7 +49,6 @@ termux_setup_meson() {
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 
-	local CONTENT=""
 	echo "[binaries]" > $TERMUX_MESON_CROSSFILE
 	echo "ar = '$AR'" >> $TERMUX_MESON_CROSSFILE
 	echo "c = '$CC'" >> $TERMUX_MESON_CROSSFILE
