@@ -238,6 +238,7 @@ jobs:
       if: ${{ steps.build-info.outputs.skip-building != 'true' }}
       env:
         DOCKER_BUILD: ${{ steps.build-info.outputs.docker-build }}
+        TERMUX_DOCKER__CONTAINER_EXEC_COMMAND__PRE_CHECK_IF_WILL_BUILD_PACKAGES: "true"
       run: |
         declare -a packages=()
         for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
