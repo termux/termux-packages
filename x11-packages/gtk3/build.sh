@@ -7,7 +7,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gitlab.gnome.org/GNOME/gtk/-/archive/$TERMUX_PKG_VERSION/gtk-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=a2958d82986c81794e953a3762335fa7c78948706d23cced421f7245ca544cbc
 TERMUX_PKG_DEPENDS="adwaita-icon-theme, at-spi2-core, coreutils, desktop-file-utils, fontconfig, fribidi, gdk-pixbuf, glib, glib-bin, gtk-update-icon-cache, harfbuzz, libcairo, libepoxy, libwayland, libxcomposite, libxcursor, libxdamage, libxfixes, libxi, libxinerama, libxkbcommon, libxrandr, pango, shared-mime-info, ttf-dejavu"
-TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross, libwayland-protocols, xorgproto"
+TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross, libwayland-protocols, libwayland-cross-scanner, xorgproto"
 TERMUX_PKG_CONFLICTS="libgtk3"
 TERMUX_PKG_REPLACES="libgtk3"
 # Prevent updating to unstable branch or gtk4

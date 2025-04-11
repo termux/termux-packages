@@ -27,7 +27,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	export PATH="$TERMUX_PREFIX/opt/libwayland/cross/bin:$PATH"
+	termux_setup_wayland_cross_pkg_config_wrapper
 
 	export LDFLAGS+=" -landroid-shmem"
 }
