@@ -24,3 +24,15 @@ termux_step_setup_toolchain() {
 		termux_setup_toolchain_gnu
 	fi
 }
+
+termux_step_setup_build32_environment() {
+	termux_set_crosses_arch
+	TERMUX_PREFIX_LIB="$TERMUX_PREFIX_MULTI_LIB"
+	if [ "$TERMUX_PKG_ONLY_BUILD32" = "false" ]; then
+		TERMUX_PKG_BUILDDIR="$TERMUX_PKG_BUILD32DIR"
+	fi
+	termux_step_setup_arch_variables
+	termux_step_setup_pkg_config_libdir
+	termux_step_setup_toolchain
+	cd $TERMUX_PKG_BUILDDIR
+}

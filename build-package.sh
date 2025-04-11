@@ -426,6 +426,30 @@ termux_check_package_in_building_packages_list() {
 	return $?
 }
 
+# Change the 64-bit architecture type to its 32-bit counterpart in the `TERMUX_ARCH` variable
+termux_set_crosses_arch() {
+	case $TERMUX_ARCH in
+		"aarch64") TERMUX_ARCH="arm";;
+		"x86_64") TERMUX_ARCH="i686";;
+		*) termux_error_exit "It is impossible to set crosses arch for ${TERMUX_ARCH} arch, because it is 32 bit. Only 64 bit arch are supported."
+	esac
+}
+
+# Run functions for normal compilation and cross compilation
+termux_run_cross_function() {
+	local func="${1}"
+	cd "$TERMUX_PKG_BUILDDIR"
+	if [ "$TERMUX_PKG_ONLY_BUILD32" = "false" ]; then
+		"${func}"
+	fi
+	if [ "$TERMUX_PKG_BUILD32" = "true" ]; then
+		(
+			termux_step_setup_build32_environment
+			"${func}32"
+		)
+	fi
+}
+
 # Special hook to prevent use of "sudo" inside package build scripts.
 # build-package.sh shouldn't perform any privileged operations.
 sudo() {
@@ -689,17 +713,14 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 
 		# Even on continued build we might need to setup paths
 		# to tools so need to run part of configure step
-		cd "$TERMUX_PKG_BUILDDIR"
-		termux_step_configure
+		termux_run_cross_function termux_step_configure
 
 		if [ "$TERMUX_CONTINUE_BUILD" == "false" ]; then
 			cd "$TERMUX_PKG_BUILDDIR"
 			termux_step_post_configure
 		fi
-		cd "$TERMUX_PKG_BUILDDIR"
-		termux_step_make
-		cd "$TERMUX_PKG_BUILDDIR"
-		termux_step_make_install
+		termux_run_cross_function termux_step_make
+		termux_run_cross_function termux_step_make_install
 		cd "$TERMUX_PKG_BUILDDIR"
 		termux_step_post_make_install
 		termux_step_install_service_scripts

@@ -1,5 +1,5 @@
 termux_step_strip_elf_symbols() {
-	termux_step_strip_elf_symbols__from_paths . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" \)
+	termux_step_strip_elf_symbols__from_paths . \( -path "./bin/*" -o -path "./lib/*" -o -path "./lib32/*" -o -path "./libexec/*" \)
 }
 
 termux_step_strip_elf_symbols__from_paths() {
