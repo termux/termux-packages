@@ -1,0 +1,24 @@
+Fixes https://github.com/termux/termux-packages/issues/24214
+
+--- a/drivers/unix/file_access_unix_pipe.cpp
++++ b/drivers/unix/file_access_unix_pipe.cpp
+@@ -67,7 +67,7 @@ Error FileAccessUnixPipe::open_internal(const String &p_path, int p_mode_flags)
+ 	path_src = p_path;
+ 	ERR_FAIL_COND_V_MSG(fd[0] >= 0 || fd[1] >= 0, ERR_ALREADY_IN_USE, "Pipe is already in use.");
+ 
+-	path = String("/tmp/") + p_path.replace("pipe://", "").replace("/", "_");
++	path = String("@TERMUX_PREFIX@/tmp/") + p_path.replace("pipe://", "").replace("/", "_");
+ 	const CharString path_utf8 = path.utf8();
+ 
+ 	struct stat st = {};
+--- a/drivers/unix/os_unix.cpp
++++ b/drivers/unix/os_unix.cpp
+@@ -309,7 +309,7 @@ String OS_Unix::get_version() const {
+ }
+ 
+ String OS_Unix::get_temp_path() const {
+-	return "/tmp";
++	return "@TERMUX_PREFIX@/tmp";
+ }
+ 
+ double OS_Unix::get_unix_time() const {
