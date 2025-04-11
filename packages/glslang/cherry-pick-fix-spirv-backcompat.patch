@@ -1,0 +1,64 @@
+Cherry-pick of https://github.com/KhronosGroup/glslang/commit/0018771b46c492e28ca916b00eda96093381a3b2
+
+From 0018771b46c492e28ca916b00eda96093381a3b2 Mon Sep 17 00:00:00 2001
+From: Juan Ramos <github@jpr.mozmail.com>
+Date: Sat, 1 Mar 2025 10:55:31 -0800
+Subject: [PATCH] Fix spirv backcompat
+
+closes #3882
+---
+ SPIRV/CMakeLists.txt |  5 ++---
+ glslang/stub.cpp     | 20 +++++++++++++++++---
+ 2 files changed, 19 insertions(+), 6 deletions(-)
+
+diff --git a/SPIRV/CMakeLists.txt b/SPIRV/CMakeLists.txt
+index 4b3ec1e3d5..d746839a80 100644
+--- a/SPIRV/CMakeLists.txt
++++ b/SPIRV/CMakeLists.txt
+@@ -91,6 +91,7 @@ set_target_properties(SPIRV PROPERTIES
+ target_include_directories(SPIRV PUBLIC
+     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
+     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
++glslang_only_export_explicit_symbols(SPIRV)
+ 
+ if (ENABLE_SPVREMAPPER)
+     add_library(SPVRemapper ${LIB_TYPE} ${SPVREMAP_SOURCES} ${SPVREMAP_HEADERS})
+@@ -128,9 +129,7 @@ if(GLSLANG_ENABLE_INSTALL)
+         install(TARGETS SPVRemapper EXPORT glslang-targets)
+     endif()
+ 
+-    if (NOT BUILD_SHARED_LIBS)
+-        install(TARGETS SPIRV EXPORT glslang-targets)
+-    endif()
++    install(TARGETS SPIRV EXPORT glslang-targets)
+ 
+     install(FILES ${PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/glslang/SPIRV/)
+ endif()
+diff --git a/glslang/stub.cpp b/glslang/stub.cpp
+index b9aec6d15e..9c286fb909 100644
+--- a/glslang/stub.cpp
++++ b/glslang/stub.cpp
+@@ -32,6 +32,20 @@
+ // POSSIBILITY OF SUCH DAMAGE.
+ //
+ 
+-// This empty source file exists to support building stubbed versions of
+-// deprecated libraries which have been integrated into the main glslang
+-// library. It should be deleted once the stub libraries are fully removed.
++#ifdef GLSLANG_IS_SHARED_LIBRARY
++#ifdef _WIN32
++#ifdef GLSLANG_EXPORTING
++#define STUB_EXPORT __declspec(dllexport)
++#else
++#define STUB_EXPORT __declspec(dllimport)
++#endif
++#endif
++#endif // GLSLANG_IS_SHARED_LIBRARY
++
++#ifndef STUB_EXPORT
++#define STUB_EXPORT
++#endif
++
++// Force stub library to export function to preserve backcompat.
++// https://github.com/KhronosGroup/glslang/issues/3882
++STUB_EXPORT int stub_library_function() { return 0; }
