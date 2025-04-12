@@ -12,7 +12,7 @@ TERMUX_PKG_BUILD_DEPENDS="docbook-xsl,libdb"
 TERMUX_PKG_CONFLICTS="apt-transport-https, libapt-pkg, unstable-repo, game-repo, science-repo"
 TERMUX_PKG_REPLACES="apt-transport-https, libapt-pkg, unstable-repo, game-repo, science-repo"
 TERMUX_PKG_PROVIDES="unstable-repo, game-repo, science-repo"
-TERMUX_PKG_SUGGESTS="gnupg"
+TERMUX_PKG_SUGGESTS="gnupg, less"
 TERMUX_PKG_ESSENTIAL=true
 
 TERMUX_PKG_CONFFILES="
@@ -28,6 +28,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DUSE_NLS=OFF
 -DWITH_DOC=OFF
 -DWITH_DOC_MANPAGES=ON
+-DDEFAULT_PAGER=$TERMUX_PREFIX/bin/less
 "
 
 # ubuntu uses instead $PREFIX/lib instead of $PREFIX/libexec to
