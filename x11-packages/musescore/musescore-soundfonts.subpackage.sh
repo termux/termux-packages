@@ -1,5 +1,5 @@
 TERMUX_SUBPKG_DESCRIPTION="MuseScore sound fonts"
 TERMUX_SUBPKG_PLATFORM_INDEPENDENT="yes"
 TERMUX_SUBPKG_INCLUDE="
-share/mscore-4.4/sound
+share/mscore-*/sound
 "
