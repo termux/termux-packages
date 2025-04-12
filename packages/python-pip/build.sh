@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The PyPA recommended tool for installing Python packages
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="25.0.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/pypa/pip/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=334371888f0c679c04e819ddc234562feaea81331658a76842b62dc9dc83a832
 TERMUX_PKG_AUTO_UPDATE=true
@@ -13,7 +14,7 @@ TERMUX_PKG_ANTI_BUILD_DEPENDS="clang"
 TERMUX_PKG_BREAKS="python (<< 3.11.1-1)"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, setuptools==69.5.1, docutils, myst_parser, sphinx_copybutton, sphinx_inline_tabs, sphinxcontrib.towncrier, completion"
+TERMUX_PKG_PYTHON_COMMON_DEPS="docutils, myst_parser, sphinx_copybutton, sphinx_inline_tabs, sphinxcontrib.towncrier, completion"
 
 termux_pkg_auto_update() {
 	local tag
