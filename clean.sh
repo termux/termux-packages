@@ -88,6 +88,9 @@ fi
 			cgct_dir_escaped="$(printf "%s" "$CGCT_DIR" | sed -zE -e 's/[][\.|$(){}?+*^]/\\&/g')"
 			find "$deletion_dir" -mindepth 1 -regextype posix-extended ! -regex "^$cgct_dir_escaped(/.*)?" -delete 2>/dev/null || true
 		fi
+
+		# Remove list of built packages.
+		rm -Rf "/data/data/.built-packages"
 	fi
 
 	rm -Rf "$TERMUX_TOPDIR"
