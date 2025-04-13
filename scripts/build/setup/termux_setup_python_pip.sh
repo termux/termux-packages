@@ -19,7 +19,8 @@ termux_setup_python_pip() {
 		mkdir -p "$_VENV_DIR"
 		python${TERMUX_PYTHON_VERSION} -m venv --system-site-packages "$_VENV_DIR"
 		. "$_VENV_DIR/bin/activate"
-		return
+		
+		pip install 'setuptools==78.1.0' 'wheel==0.46.1'
 	else
 		local _CROSSENV_VERSION=1.4.0
 		local _CROSSENV_TAR=crossenv-$_CROSSENV_VERSION.tar.gz
@@ -60,11 +61,9 @@ termux_setup_python_pip() {
 		. "${TERMUX_PYTHON_CROSSENV_PREFIX}/bin/activate"
 
 		# Since 3.12, distutils is removed from python, but setuptools>=60 provides it
-		build-pip install 'setuptools==67.6.1' wheel
-		cross-pip install 'setuptools==67.6.1' wheel
-		if [ "${TERMUX_PYTHON_VERSION#*.}" -lt "12" ]; then
-			export SETUPTOOLS_USE_DISTUTILS=stdlib
-		fi
+		# Since wheel 0.46, setuptools>=70 is required to provide bdist_wheel
+		build-pip install 'setuptools==78.1.0' 'wheel==0.46.1'
+		cross-pip install 'setuptools==78.1.0' 'wheel==0.46.1'
 
 		export PATH="${TERMUX_PYTHON_CROSSENV_PREFIX}/build/bin:${PATH}"
 		local _CROSS_PATH="${TERMUX_PYTHON_CROSSENV_PREFIX}/cross/bin"
