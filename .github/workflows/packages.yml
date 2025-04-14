@@ -55,7 +55,7 @@ jobs:
           OLD_COMMIT=$(jq --raw-output .before "$GITHUB_EVENT_PATH")
           HEAD_COMMIT=$(jq --raw-output .after "$GITHUB_EVENT_PATH")
           if [ "$BASE_COMMIT" = "null" ]; then
-            if ! git log "$OLD_COMMIT" 2> /dev/null; then
+            if ! git log "$OLD_COMMIT" > /dev/null; then
               if [ "$(git branch --show-current)" = "master" ]; then
                 echo "Force push detected on master branch. Unable to proceed."
                 exit 1
