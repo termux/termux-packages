@@ -60,9 +60,7 @@ jobs:
                 echo "Force push detected on master branch. Unable to proceed."
                 exit 1
               else
-                echo "::warning:: Force push detected on non-master branch. Trying to proceed at any cost but may not work as expected."
-                OLD_COMMIT=$(jq --raw-output .commits[0].id "$GITHUB_EVENT_PATH")
-                echo "::warning:: OLD_COMMIT is set to $OLD_COMMIT which may not be correct if you have pushed more than 20 commits."
+                OLD_COMMIT=$(git fetch origin master >&2; git merge-base origin/master $HEAD_COMMIT)
               fi
             fi
             echo "Processing commit range: ${OLD_COMMIT}..${HEAD_COMMIT}"
