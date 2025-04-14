@@ -1,12 +1,12 @@
-# Requires gobject-introspection 1.84.0
-
 --- a/src/meson.build
 +++ b/src/meson.build
-@@ -454,7 +454,6 @@
- 
-    libadwaita_gir_extra_args = [
+@@ -455,7 +455,8 @@
       '--quiet',
--     '--doc-format=gi-docgen',
       '-DADWAITA_COMPILATION',
     ]
- 
+-   if gir_dep.version().version_compare('>=1.83.2')
++   # TODO: Remove this after gobject-introspection 1.84.0 update in host system
++   if false and gir_dep.version().version_compare('>=1.83.2')
+      libadwaita_gir_extra_args += [
+        '--doc-format=gi-docgen',
+      ]
