@@ -1,0 +1,13 @@
+https://lists.openembedded.org/g/openembedded-core/message/179249
+--- a/third_party/angle/src/libANGLE/renderer/serial_utils.h
++++ b/third_party/angle/src/libANGLE/renderer/serial_utils.h
+@@ -129,7 +129,9 @@
+   private:
+     static constexpr uint64_t kInvalid = 0;
+     std::atomic<uint64_t> mValue       = kInvalid;
++#if defined(__LP64__)
+     static_assert(decltype(mValue)::is_always_lock_free, "Must always be lock free");
++#endif
+ };
+ 
+ // Used as default/initial serial

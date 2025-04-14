@@ -1,0 +1,92 @@
+--- a/net/dns/dns_config_service_linux.cc
++++ b/net/dns/dns_config_service_linux.cc
+@@ -2,6 +2,10 @@
+ // Use of this source code is governed by a BSD-style license that can be
+ // found in the LICENSE file.
+ 
++#include <sys/types.h>
++
++#ifndef __TERMUX__
++
+ #include "net/dns/dns_config_service_linux.h"
+ 
+ #include <netdb.h>
+@@ -530,3 +534,8 @@
+ }
+ 
+ }  // namespace net
++
++#else // __TERMUX__
++// XXX: Actually, Termux has no DNS config, fallback to use the stub of fushsia.
++#include "./dns_config_service_fuchsia.cc"
++#endif // __TERMUX__
+--- a/net/dns/dns_reloader.cc
++++ b/net/dns/dns_reloader.cc
+@@ -31,7 +31,7 @@
+ // an old musl bug that was fixed by musl c8fdcfe5, but Fuchsia's SDK doesn't
+ // have that change.
+ #if defined(__RES) && __RES >= 19991006 && !BUILDFLAG(IS_APPLE) && \
+-    !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA)
++    !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA) && !defined(__TERMUX__)
+ // We define this so we don't need to restate the complex condition here twice
+ // below - it would be easy for the copies below to get out of sync.
+ #define USE_RES_NINIT
+--- a/net/dns/public/resolv_reader.cc
++++ b/net/dns/public/resolv_reader.cc
+@@ -32,6 +32,8 @@
+     const struct __res_state& res) {
+   std::vector<IPEndPoint> nameservers;
+ 
++#ifndef __TERMUX__
++
+   if (!(res.options & RES_INIT))
+     return absl::nullopt;
+ 
+@@ -88,6 +90,12 @@
+   }
+ #endif
+ 
++#else // __TERMUX__
++  // From Android 8, getprop of net.dns%d has been invalid. So just
++  // assume the nameserver is 8.8.8.8.
++  nameservers.push_back(IPEndPoint(IPAddress(8, 8, 8, 8), 53));
++#endif // __TERMUX__
++
+   return nameservers;
+ }
+ 
+--- a/net/dns/public/scoped_res_state.cc
++++ b/net/dns/public/scoped_res_state.cc
+@@ -10,6 +10,15 @@
+ #include "base/check.h"
+ #include "build/build_config.h"
+ 
++#ifdef __TERMUX__
++static int res_ninit(struct __res_state*) {
++  return 0;
++}
++static void res_nclose(struct __res_state*) {
++  return;
++}
++#endif
++
+ namespace net {
+ 
+ ScopedResState::ScopedResState() {
+--- a/net/dns/public/scoped_res_state.h
++++ b/net/dns/public/scoped_res_state.h
+@@ -11,6 +11,14 @@
+ #include "net/base/net_export.h"
+ #include "third_party/abseil-cpp/absl/types/optional.h"
+ 
++#ifdef __TERMUX__
++// On Android NDK without JNI, there is no valid way to get nameservers.
++// So just provide a dummy struct and functions.
++struct __res_state {
++  int _dummy_state;
++};
++#endif
++
+ namespace net {
+ 
+ // Helper class to open, read and close a __res_state.

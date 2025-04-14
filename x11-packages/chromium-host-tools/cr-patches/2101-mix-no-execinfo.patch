@@ -1,0 +1,69 @@
+musl does not have execinfo.h, and hence no implementation of
+. backtrace()
+. backtrace_symbols()
+for discussion about this, see https://www.openwall.com/lists/musl/2021/07/16/1
+--
+--- a/v8/src/codegen/external-reference-table.cc
++++ b/v8/src/codegen/external-reference-table.cc
+@@ -11,7 +11,9 @@
+
+ #if defined(DEBUG) && defined(V8_OS_LINUX) && !defined(V8_OS_ANDROID)
+ #define SYMBOLIZE_FUNCTION
++#if defined(__GLIBC__)
+ #include <execinfo.h>
++#endif
+
+ #include <vector>
+
+@@ -96,7 +98,7 @@
+ }
+
+ const char* ExternalReferenceTable::ResolveSymbol(void* address) {
+-#ifdef SYMBOLIZE_FUNCTION
++#if defined(SYMBOLIZE_FUNCTION) && defined(__GLIBC__)
+   char** names = backtrace_symbols(&address, 1);
+   const char* name = names[0];
+   // The array of names is malloc'ed. However, each name string is static
+--- a/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
++++ b/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
+@@ -58,7 +58,7 @@
+ #define HAVE_ERRNO_H 1
+ 
+ /* Define to 1 if you have the <execinfo.h> header file. */
+-#define HAVE_EXECINFO_H 1
++/* #define HAVE_EXECINFO_H 1 */
+ 
+ /* Define to 1 if you have the <fcntl.h> header file. */
+ #define HAVE_FCNTL_H 1
+--- a/base/debug/stack_trace.cc
++++ b/base/debug/stack_trace.cc
+@@ -251,7 +253,9 @@
+ }
+ 
+ void StackTrace::OutputToStream(std::ostream* os) const {
++#if defined(__GLIBC__) && !defined(_AIX)
+   OutputToStreamWithPrefix(os, nullptr);
++#endif
+ }
+ 
+ std::string StackTrace::ToString() const {
+@@ -281,7 +281,7 @@
+ }
+ std::string StackTrace::ToStringWithPrefix(const char* prefix_string) const {
+   std::stringstream stream;
+-#if !defined(__UCLIBC__) && !defined(_AIX)
++#if defined(__GLIBC__) && !defined(_AIX)
+   OutputToStreamWithPrefix(&stream, prefix_string);
+ #endif
+   return stream.str();
+--- a/base/debug/stack_trace_unittest.cc
++++ b/base/debug/stack_trace_unittest.cc
+@@ -33,7 +33,7 @@
+ typedef testing::Test StackTraceTest;
+ #endif
+ 
+-#if !defined(__UCLIBC__) && !defined(_AIX)
++#if !defined(__UCLIBC__) && !defined(_AIX) && defined(__GLIBC__)
+ // StackTrace::OutputToStream() is not implemented under uclibc, nor AIX.
+ // See https://crbug.com/706728
+ 

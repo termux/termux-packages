@@ -1,0 +1,235 @@
+[83/248] CXX obj/components/omnibox/browser/browser/browser_jumbo_1.o
+  In file included from gen/components/omnibox/browser/browser_jumbo_1.cc:23:
+  ./../../../src/components/omnibox/browser/autocomplete_result.cc:63:16: error: redefinition of 'is_android'
+    63 | constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
+        |                ^
+  ./../../../src/components/omnibox/browser/autocomplete_controller.cc:102:16: note: previous definition is here
+    102 | constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
+        |                ^
+  In file included from gen/components/omnibox/browser/browser_jumbo_1.cc:24:
+  ./../../../src/components/omnibox/browser/base_search_provider.cc:43:16: error: redefinition of 'is_android'
+    43 | constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
+        |                ^
+  ./../../../src/components/omnibox/browser/autocomplete_controller.cc:102:16: note: previous definition is here
+    102 | constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
+        |                ^
+  In file included from gen/components/omnibox/browser/browser_jumbo_1.cc:29:
+  ./../../../src/components/omnibox/browser/clipboard_provider.cc:48:16: error: redefinition of 'is_android'
+    48 | constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
+        |                ^
+  ./../../../src/components/omnibox/browser/autocomplete_controller.cc:102:16: note: previous definition is here
+    102 | constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
+        |                ^
+  3 errors generated.
+diff --git a/components/omnibox/browser/autocomplete_controller.cc b/components/omnibox/browser/autocomplete_controller.cc
+index bb09106..1611212 100644
+--- a/components/omnibox/browser/autocomplete_controller.cc
++++ b/components/omnibox/browser/autocomplete_controller.cc
+@@ -99,7 +99,7 @@ namespace {
+ 
+ using ScoringSignals = ::metrics::OmniboxEventProto::Suggestion::ScoringSignals;
+ 
+-constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
++constexpr bool is_android_ac = !!BUILDFLAG(IS_ANDROID);
+ 
+ // Appends available autocompletion of the given type, subtype, and number to
+ // the existing available autocompletions string, encoding according to the
+@@ -291,7 +291,7 @@ void AutocompleteController::ExtendMatchSubtypes(
+       }
+     } else if (match.provider->type() ==
+                AutocompleteProvider::TYPE_QUERY_TILE) {
+-      DCHECK(is_android);
++      DCHECK(is_android_ac);
+       // QueryTiles are now shown in zero-prefix context on Android.
+       subtypes->emplace(omnibox::SUBTYPE_ZERO_PREFIX_QUERY_TILE);
+     } else if (match.provider->type() ==
+@@ -1220,7 +1220,7 @@ void AutocompleteController::AttachActions() {
+     // Do not look for matching tabs on Android unless we collected all the
+     // suggestions. Tab matching is an expensive process with multiple JNI calls
+     // involved. Run it only when all the suggestions are collected.
+-    bool perform_tab_match = is_android ? done() : true;
++    bool perform_tab_match = is_android_ac ? done() : true;
+     if (perform_tab_match) {
+       internal_result_.ConvertOpenTabMatches(provider_client_.get(), &input_);
+     }
+diff --git a/components/omnibox/browser/autocomplete_result.cc b/components/omnibox/browser/autocomplete_result.cc
+index 14190aa..2f5d431 100644
+--- a/components/omnibox/browser/autocomplete_result.cc
++++ b/components/omnibox/browser/autocomplete_result.cc
+@@ -60,9 +60,9 @@ typedef AutocompleteMatchType ACMatchType;
+ 
+ namespace {
+ 
+-constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
+-constexpr bool is_ios = !!BUILDFLAG(IS_IOS);
+-constexpr bool is_desktop = !(is_android || is_ios);
++constexpr bool is_android_ar = !!BUILDFLAG(IS_ANDROID);
++constexpr bool is_ios_ar = !!BUILDFLAG(IS_IOS);
++constexpr bool is_desktop = !(is_android_ar || is_ios_ar);
+ 
+ // Rotates |it| to be in the front of |matches|.
+ // |it| must be a valid iterator of |matches| or equal to |matches->end()|.
+@@ -77,19 +77,19 @@ void RotateMatchToFront(ACMatches::iterator it, ACMatches* matches) {
+ // Maximum number of pedals to show.
+ // On iOS, the UI for pedals gets too visually cluttered with too many pedals.
+ constexpr size_t kMaxPedalCount =
+-    is_ios ? 1 : std::numeric_limits<size_t>::max();
++    is_ios_ar ? 1 : std::numeric_limits<size_t>::max();
+ // Maximum index of a match in a result for which the pedal should be displayed.
+ constexpr size_t kMaxPedalMatchIndex =
+-    is_ios ? 3 : std::numeric_limits<size_t>::max();
++    is_ios_ar ? 3 : std::numeric_limits<size_t>::max();
+ 
+ }  // namespace
+ 
+ // static
+ size_t AutocompleteResult::GetMaxMatches(bool is_zero_suggest) {
+   constexpr size_t kDefaultMaxAutocompleteMatches =
+-      is_android ? 10 : (is_ios ? 10 : 8);
++      is_android_ar ? 10 : (is_ios_ar ? 10 : 8);
+   constexpr size_t kDefaultMaxZeroSuggestMatches =
+-      is_android ? 15 : (is_ios ? 20 : 8);
++      is_android_ar ? 15 : (is_ios_ar ? 20 : 8);
+ #if BUILDFLAG(IS_IOS)
+   // By default, iPad has the same max as iPhone.
+   // `kDefaultMaxAutocompleteMatches` defines a hard limit on the number of
+@@ -148,7 +148,7 @@ size_t AutocompleteResult::GetMaxMatches(bool is_zero_suggest) {
+ 
+ // static
+ size_t AutocompleteResult::GetDynamicMaxMatches() {
+-  constexpr const int kDynamicMaxMatchesLimit = is_android ? 15 : 10;
++  constexpr const int kDynamicMaxMatchesLimit = is_android_ar ? 15 : 10;
+   if (!base::FeatureList::IsEnabled(omnibox::kDynamicMaxAutocomplete))
+     return AutocompleteResult::GetMaxMatches();
+   return base::GetFieldTrialParamByFeatureAsInt(
+@@ -289,7 +289,7 @@ void AutocompleteResult::Sort(
+     const AutocompleteInput& input,
+     TemplateURLService* template_url_service,
+     absl::optional<AutocompleteMatch> default_match_to_preserve) {
+-  if (!is_ios)
++  if (!is_ios_ar)
+     DemoteOnDeviceSearchSuggestions();
+ 
+   const auto& page_classification = input.current_page_classification();
+@@ -298,7 +298,7 @@ void AutocompleteResult::Sort(
+ 
+   // Because tail suggestions are a "last resort", we cull the tail suggestions
+   // if there are any non-default, non-tail suggestions.
+-  if (!is_android && !is_ios)
++  if (!is_android_ar && !is_ios_ar)
+     MaybeCullTailSuggestions(&matches_, comparing_object);
+ 
+   DeduplicateMatches(input, template_url_service);
+@@ -388,7 +388,7 @@ void AutocompleteResult::SortAndCull(
+   // and the current input & platform are supported, delegate to the framework.
+   if (use_grouping_for_zps) {
+     PSections sections;
+-    if constexpr (is_android) {
++    if constexpr (is_android_ar) {
+       if (omnibox::IsNTPPage(page_classification)) {
+         sections.push_back(
+             std::make_unique<AndroidNTPZpsSection>(suggestion_groups_map_));
+@@ -429,7 +429,7 @@ void AutocompleteResult::SortAndCull(
+         sections.push_back(
+             std::make_unique<DesktopWebZpsSection>(suggestion_groups_map_));
+       }
+-    } else if constexpr (is_ios) {
++    } else if constexpr (is_ios_ar) {
+       if (ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_TABLET) {
+         if (omnibox::IsNTPPage(page_classification)) {
+           sections.push_back(
+@@ -555,7 +555,7 @@ void AutocompleteResult::TrimOmniboxActions(bool is_zero_suggest) {
+   // - In every case, ACTION_IN_SUGGEST is preferred over HISTORY_CLUSTERS
+   // - In every case, HISTORY_CLUSTERS is preferred over PEDALs.
+   // - TAB_SWITCH actions are not considered because they're never attached.
+-  if constexpr (is_android) {
++  if constexpr (is_android_ar) {
+     const size_t ACTIONS_IN_SUGGEST_CUTOFF_THRESHOLD =
+         OmniboxFieldTrial::kActionsInSuggestPromoteEntitySuggestion.Get() ? 1
+                                                                           : 2;
+@@ -781,7 +781,7 @@ void AutocompleteResult::ConvertOpenTabMatches(
+       match.has_tab_match = tab_info->second.has_matching_tab;
+       // Do not attach the action for iOS or Android since they have separate
+       // UI treatment for tab matches (no button row as on desktop and realbox).
+-      if (!is_android && !is_ios && match.has_tab_match.value()) {
++      if (!is_android_ar && !is_ios_ar && match.has_tab_match.value()) {
+         // The default action for suggestions from the open tab provider in
+         // keyword mode is to switch to the open tab so no button is necessary.
+         if (!match.from_keyword ||
+diff --git a/components/omnibox/browser/base_search_provider.cc b/components/omnibox/browser/base_search_provider.cc
+index 80eaf44..e696172 100644
+--- a/components/omnibox/browser/base_search_provider.cc
++++ b/components/omnibox/browser/base_search_provider.cc
+@@ -40,7 +40,7 @@
+ #include "url/origin.h"
+ 
+ namespace {
+-constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
++constexpr bool is_android_bsp = !!BUILDFLAG(IS_ANDROID);
+ 
+ bool MatchTypeAndContentsAreEqual(const AutocompleteMatch& lhs,
+                                   const AutocompleteMatch& rhs) {
+@@ -198,7 +198,7 @@ AutocompleteMatch BaseSearchProvider::CreateSearchSuggestion(
+ 
+   // Attach Actions in Suggest to the newly created match on Android if Google
+   // is the default search engine.
+-  if (is_android &&
++  if (is_android_bsp &&
+       search::TemplateURLIsGoogle(template_url, search_terms_data)) {
+     for (const omnibox::ActionInfo& action_info :
+          suggestion.entity_info().action_suggestions()) {
+diff --git a/components/omnibox/browser/clipboard_provider.cc b/components/omnibox/browser/clipboard_provider.cc
+index 80b915f..de313ac 100644
+--- a/components/omnibox/browser/clipboard_provider.cc
++++ b/components/omnibox/browser/clipboard_provider.cc
+@@ -45,7 +45,7 @@
+ #endif                                    // !BUILDFLAG(IS_IOS)
+ 
+ namespace {
+-constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
++constexpr bool is_android_cp = !!BUILDFLAG(IS_ANDROID);
+ 
+ const size_t kMaxClipboardSuggestionShownNumTimesSimpleSize = 20;
+ 
+@@ -242,7 +242,7 @@ void ClipboardProvider::AddCreatedMatchWithTracking(
+                                            matches_.empty(), match.type,
+                                            clipboard_contents_age);
+ 
+-  if (is_android &&
++  if (is_android_cp &&
+       OmniboxFieldTrial::kOmniboxModernizeVisualUpdateMergeClipboardOnNTP
+           .Get() &&
+       omnibox::IsNTPPage(input.current_page_classification())) {
+diff --git a/components/omnibox/browser/zero_suggest_provider.cc b/components/omnibox/browser/zero_suggest_provider.cc
+index ec49b99..9c73bf0 100644
+--- a/components/omnibox/browser/zero_suggest_provider.cc
++++ b/components/omnibox/browser/zero_suggest_provider.cc
+@@ -53,8 +53,8 @@ using OIT = metrics::OmniboxInputType;
+ namespace {
+ 
+ using ResultType = ZeroSuggestProvider::ResultType;
+-constexpr bool is_ios = !!BUILDFLAG(IS_IOS);
+-constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
++constexpr bool is_ios_zsp = !!BUILDFLAG(IS_IOS);
++constexpr bool is_android_zsp = !!BUILDFLAG(IS_ANDROID);
+ 
+ // Represents whether ZeroSuggestProvider is allowed to display zero-prefix
+ // suggestions, and if not, why not.
+@@ -296,7 +296,7 @@ ZeroSuggestProvider::ResultType ZeroSuggestProvider::ResultTypeToRun(
+   if (omnibox::IsOtherWebPage(page_class)) {
+     if (focus_type_input_type ==
+             std::make_pair(OFT::INTERACTION_FOCUS, OIT::URL) &&
+-        (is_ios || is_android)) {
++        (is_ios_zsp || is_android_zsp)) {
+       return ResultType::kRemoteSendURL;
+     }
+     if (focus_type_input_type ==
+@@ -311,7 +311,7 @@ ZeroSuggestProvider::ResultType ZeroSuggestProvider::ResultTypeToRun(
+   if (omnibox::IsSearchResultsPage(page_class)) {
+     if (focus_type_input_type ==
+             std::make_pair(OFT::INTERACTION_FOCUS, OIT::URL) &&
+-        (is_ios || is_android)) {
++        (is_ios_zsp || is_android_zsp)) {
+       return ResultType::kRemoteSendURL;
+     }
+     if (focus_type_input_type ==

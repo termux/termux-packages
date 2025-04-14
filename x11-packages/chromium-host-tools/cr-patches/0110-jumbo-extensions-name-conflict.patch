@@ -1,0 +1,30 @@
+[3/264] CXX obj/extensions/browser/browser_sources/browser_sources_jumbo_1.o
+  ./../../../src/extensions/browser/api/declarative/declarative_api.cc:32:32: error: target of using declaration conflicts with declaration already in scope
+    32 | using extensions::api::events::Rule;
+        |                                ^
+  gen/extensions/common/api/events.h:32:8: note: target of using declaration
+    32 | struct Rule {
+        |        ^
+  ../../../src/components/content_settings/core/browser/content_settings_rule.h:42:8: note: conflicting declaration
+    42 | struct Rule {
+        |        ^
+--- a/extensions/browser/api/declarative/declarative_api.cc
++++ b/extensions/browser/api/declarative/declarative_api.cc
+@@ -29,8 +29,6 @@
+ #include "extensions/common/extension_api.h"
+ #include "extensions/common/permissions/permissions_data.h"
+ 
+-using extensions::api::events::Rule;
+-
+ namespace AddRules = extensions::api::events::Event::AddRules;
+ namespace GetRules = extensions::api::events::Event::GetRules;
+ namespace RemoveRules = extensions::api::events::Event::RemoveRules;
+@@ -282,7 +280,7 @@
+ }
+ 
+ ExtensionFunction::ResponseValue EventsEventGetRulesFunction::RunInternal() {
+-  std::vector<const Rule*> rules;
++  std::vector<const extensions::api::events::Rule*> rules;
+   if (params_->rule_identifiers) {
+     rules_registry_->GetRules(extension_id(), *params_->rule_identifiers,
+                               &rules);

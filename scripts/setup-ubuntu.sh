@@ -297,6 +297,9 @@ PACKAGES+=" libwebpmux3 libwebpmux3:i386"
 # Required by chromium-based packages
 PACKAGES+=" libfontconfig1"
 PACKAGES+=" libfontconfig1:i386"
+PACKAGES+=" libcups2-dev"
+PACKAGES+=" libglib2.0-0t64:i386"
+PACKAGES+=" libexpat1:i386"
 
 # Required by wine-stable
 PACKAGES+=" libfreetype-dev:i386"

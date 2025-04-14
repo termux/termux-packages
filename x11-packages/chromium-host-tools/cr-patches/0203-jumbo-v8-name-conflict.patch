@@ -1,0 +1,54 @@
+
+[29/2287] CXX host/obj/v8/v8_compiler/v8_compiler_jumbo_1.o
+  In file included from host/gen/v8/v8_compiler_jumbo_1.cc:39:
+  ./../../../src/v8/src/compiler/decompression-optimizer.cc:56:6: error: redefinition of 'Replace'
+    56 | void Replace(Node* const node, Node* const replacement) {
+        |      ^
+  ./../../../src/v8/src/compiler/backend/bitcast-elider.cc:47:6: note: previous definition is here
+    47 | void Replace(Node* node, Node* replacement) {
+        |      ^
+  1 error generated.
+--- a/v8/src/compiler/decompression-optimizer.cc
++++ b/v8/src/compiler/decompression-optimizer.cc
+@@ -53,7 +53,7 @@
+          IsTaggedPhi(node) || IsWord64BitwiseOp(node);
+ }
+ 
+-void Replace(Node* const node, Node* const replacement) {
++void Replace_DO(Node* const node, Node* const replacement) {
+   for (Edge edge : node->use_edges()) {
+     edge.UpdateTo(replacement);
+   }
+@@ -355,7 +355,7 @@
+   for (Edge edge : node->use_edges()) {
+     Node* user = edge.from();
+     if (user->opcode() == IrOpcode::kTruncateInt64ToInt32) {
+-      Replace(user, node);
++      Replace_DO(user, node);
+     } else {
+       if (replacement == nullptr) {
+         replacement =
+--- a/v8/src/compiler/backend/bitcast-elider.cc
++++ b/v8/src/compiler/backend/bitcast-elider.cc
+@@ -44,7 +44,7 @@
+ #endif
+ }
+ 
+-void Replace(Node* node, Node* replacement) {
++void Replace_BE(Node* node, Node* replacement) {
+   for (Edge edge : node->use_edges()) {
+     edge.UpdateTo(replacement);
+   }
+@@ -68,10 +68,10 @@
+     if (input == nullptr) continue;
+     if (input->opcode() == IrOpcode::kTruncateInt64ToInt32 &&
+         OwnedByWord32Op(input)) {
+-      Replace(input, input->InputAt(0));
++      Replace_BE(input, input->InputAt(0));
+       Revisit(node);
+     } else if (is_builtin_ && IsBitcast(input)) {
+-      Replace(input, input->InputAt(0));
++      Replace_BE(input, input->InputAt(0));
+       Revisit(node);
+     } else {
+       Enqueue(input);

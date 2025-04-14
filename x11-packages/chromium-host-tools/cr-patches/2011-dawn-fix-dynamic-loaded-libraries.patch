@@ -1,0 +1,23 @@
+--- a/third_party/dawn/src/dawn/native/X11Functions.cpp
++++ b/third_party/dawn/src/dawn/native/X11Functions.cpp
+@@ -17,12 +17,20 @@
+ namespace dawn::native {
+ 
+ X11Functions::X11Functions() {
++#ifdef __TERMUX__
++    if (!mX11Lib.Open("libX11.so") || !mX11Lib.GetProc(&xSetErrorHandler, "XSetErrorHandler") ||
++#else
+     if (!mX11Lib.Open("libX11.so.6") || !mX11Lib.GetProc(&xSetErrorHandler, "XSetErrorHandler") ||
++#endif
+         !mX11Lib.GetProc(&xGetWindowAttributes, "XGetWindowAttributes")) {
+         mX11Lib.Close();
+     }
+ 
++#ifdef __TERMUX__
++    if (!mX11XcbLib.Open("libX11-xcb.so") ||
++#else
+     if (!mX11XcbLib.Open("libX11-xcb.so.1") ||
++#endif
+         !mX11XcbLib.GetProc(&xGetXCBConnection, "XGetXCBConnection")) {
+         mX11XcbLib.Close();
+     }

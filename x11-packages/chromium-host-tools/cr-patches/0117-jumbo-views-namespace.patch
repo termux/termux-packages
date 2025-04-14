@@ -1,0 +1,43 @@
+[3/1683] CXX obj/ui/views/views/views_jumbo_5.o
+  In file included from gen/ui/views/views_jumbo_5.cc:31:
+  ./../../../src/ui/views/style/typography_provider.cc:144:28: error: no member named 'IsChromeRefresh2023' in namespace 'views::features'; did you mean '::features::IsChromeRefresh2023'?
+    144 |       details.size_delta = features::IsChromeRefresh2023()
+        |                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        |                            ::features::IsChromeRefresh2023
+  ../../../src/ui/base/ui_base_features.h:257:41: note: '::features::IsChromeRefresh2023' declared here
+    257 | COMPONENT_EXPORT(UI_BASE_FEATURES) bool IsChromeRefresh2023();
+        |                                         ^
+  1 error generated.
+--- a/ui/views/style/typography_provider.cc
++++ b/ui/views/style/typography_provider.cc
+@@ -141,7 +141,7 @@
+       details.weight = gfx::Font::Weight::BOLD;
+       break;
+     case style::CONTEXT_BUTTON_MD:
+-      details.size_delta = features::IsChromeRefresh2023()
++      details.size_delta = ::features::IsChromeRefresh2023()
+                                ? gfx::PlatformFont::GetFontSizeDelta(13)
+                                : ui::kLabelFontSizeDelta;
+       details.weight = MediumWeightForUI();
+
+[3/1682] CXX obj/ui/views/views/views_jumbo_6.o
+  In file included from gen/ui/views/views_jumbo_6.cc:51:
+  ./../../../src/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc:620:11: error: no member named 'IsSystemCursorSizeSupported' in namespace 'views::features'; did you mean '::features::IsSystemCursorSizeSupported'?
+    620 |       if (features::IsSystemCursorSizeSupported()) {
+        |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        |           ::features::IsSystemCursorSizeSupported
+  ../../../src/ui/base/ui_base_features.h:87:41: note: '::features::IsSystemCursorSizeSupported' declared here
+    87 | COMPONENT_EXPORT(UI_BASE_FEATURES) bool IsSystemCursorSizeSupported();
+        |                                         ^
+  1 error generated.
+--- a/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc
++++ b/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc
+@@ -617,7 +617,7 @@
+       cursor_manager_->SetDisplay(
+           display::Screen::GetScreen()->GetDisplayNearestWindow(
+               host_->window()));
+-      if (features::IsSystemCursorSizeSupported()) {
++      if (::features::IsSystemCursorSizeSupported()) {
+         native_cursor_manager_->InitCursorSizeObserver(cursor_manager_);
+       }
+     }

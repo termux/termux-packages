@@ -1,0 +1,153 @@
+[26/1707] CXX obj/ui/views/views/views_jumbo_1.o
+  In file included from gen/ui/views/views_jumbo_1.cc:26:
+  In file included from ./../../../src/ui/views/animation/ink_drop_host.cc:27:
+  ../../../src/ui/views/view_class_properties.h:106:1: error: explicit specialization of 'GetProperty<bool>' after instantiation
+    106 | DECLARE_EXPORTED_UI_CLASS_PROPERTY_TYPE(VIEWS_EXPORT, bool)
+        | ^
+  ../../../src/ui/base/class_property.h:302:20: note: expanded from macro 'DECLARE_EXPORTED_UI_CLASS_PROPERTY_TYPE'
+    302 |   PropertyHandler::GetProperty(const ClassProperty<T>* property) const;      \
+        |                    ^
+  ./../../../src/ui/views/accessibility/accessibility_paint_checks.cc:29:13: note: implicit instantiation first required here
+    29 |   if (view->GetProperty(kSkipAccessibilityPaintChecks))
+        |             ^
+  In file included from gen/ui/views/views_jumbo_1.cc:40:
+  ./../../../src/ui/views/badge_painter.cc:84:7: error: no member named 'IsChromeRefresh2023' in namespace 'views::features'; did you mean '::features::IsChromeRefresh2023'?
+    84 |   if (features::IsChromeRefresh2023()) {
+        |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        |       ::features::IsChromeRefresh2023
+  ../../../src/ui/base/ui_base_features.h:257:41: note: '::features::IsChromeRefresh2023' declared here
+    257 | COMPONENT_EXPORT(UI_BASE_FEATURES) bool IsChromeRefresh2023();
+        |                                         ^
+  15 errors generated.
+--- a/ui/views/accessibility/accessibility_paint_checks.cc
++++ b/ui/views/accessibility/accessibility_paint_checks.cc
+@@ -14,6 +14,7 @@
+ #include "ui/views/view.h"
+ #include "ui/views/view_utils.h"
+ #include "ui/views/widget/widget.h"
++#include "ui/views/view_class_properties.h"
+ 
+ namespace views {
+ 
+--- a/ui/views/badge_painter.cc
++++ b/ui/views/badge_painter.cc
+@@ -81,7 +81,7 @@
+ }
+ 
+ gfx::FontList BadgePainter::GetBadgeFont(const gfx::FontList& context_font) {
+-  if (features::IsChromeRefresh2023()) {
++  if (::features::IsChromeRefresh2023()) {
+     return views::TypographyProvider::Get().GetFont(
+         views::style::CONTEXT_BADGE, views::style::STYLE_SECONDARY);
+   }
+--- a/ui/views/bubble/bubble_frame_view.cc
++++ b/ui/views/bubble/bubble_frame_view.cc
+@@ -103,7 +103,7 @@
+   main_image_->SetVisible(false);
+   subtitle_->SetVisible(false);
+ 
+-  if (features::IsChromeRefresh2023()) {
++  if (::features::IsChromeRefresh2023()) {
+     default_title_->SetTextStyle(style::STYLE_HEADLINE_4);
+   }
+ 
+@@ -152,7 +152,7 @@
+ std::unique_ptr<Button> BubbleFrameView::CreateCloseButton(
+     Button::PressedCallback callback) {
+   auto close_button = CreateVectorImageButtonWithNativeTheme(
+-      std::move(callback), features::IsChromeRefresh2023()
++      std::move(callback), ::features::IsChromeRefresh2023()
+                                ? vector_icons::kCloseChromeRefreshIcon
+                                : vector_icons::kCloseRoundedIcon);
+   close_button->SetTooltipText(l10n_util::GetStringUTF16(IDS_APP_CLOSE));
+@@ -414,19 +414,19 @@
+     // since the origin for the view is outside the visible border.
+     // For pre-CR2023, there should be no visual change.
+     const int border_margin_left =
+-        features::IsChromeRefresh2023() ? title_margins_.left() : kBorderMargin;
++        ::features::IsChromeRefresh2023() ? title_margins_.left() : kBorderMargin;
+     const int border_margin_top =
+-        features::IsChromeRefresh2023() ? title_margins_.top() : kBorderMargin;
++        ::features::IsChromeRefresh2023() ? title_margins_.top() : kBorderMargin;
+     const gfx::Insets border_insets = GetBorder()->GetInsets();
+     const int main_image_dimension = kMainImageDialogWidthIncrease -
+                                      border_insets.left() - border_margin_left -
+                                      kBorderStrokeThickness;
+     const int image_inset_left =
+-        features::IsChromeRefresh2023()
++        ::features::IsChromeRefresh2023()
+             ? border_insets.left() + border_margin_left
+             : border_margin_left - kBorderStrokeThickness;
+     const int image_inset_top =
+-        features::IsChromeRefresh2023()
++        ::features::IsChromeRefresh2023()
+             ? border_insets.top() + border_margin_top
+             : border_margin_top - kBorderStrokeThickness;
+     const gfx::Insets image_insets =
+@@ -1053,7 +1053,7 @@
+ 
+ BubbleFrameView::ButtonsPositioning BubbleFrameView::GetButtonsPositioning()
+     const {
+-  if (!features::IsChromeRefresh2023()) {
++  if (!::features::IsChromeRefresh2023()) {
+     return ButtonsPositioning::kOnFrameEdge;
+   }
+ 
+--- a/ui/views/controls/button/checkbox.cc
++++ b/ui/views/controls/button/checkbox.cc
+@@ -103,7 +103,7 @@
+   // the checkbox view (otherwise it gets clipped which looks weird).
+   views::InstallEmptyHighlightPathGenerator(this);
+ 
+-  if (features::IsChromeRefresh2023()) {
++  if (::features::IsChromeRefresh2023()) {
+     InkDrop::Install(image(), std::make_unique<InkDropHost>(image()));
+     SetInkDropView(image());
+     InkDrop::Get(image())->SetMode(InkDropHost::InkDropMode::ON);
+@@ -195,7 +195,7 @@
+ gfx::ImageSkia Checkbox::GetImage(ButtonState for_state) const {
+   const int icon_state = GetIconState(for_state);
+ 
+-  if (features::IsChromeRefresh2023()) {
++  if (::features::IsChromeRefresh2023()) {
+     const SkColor container_color = GetIconImageColor(icon_state);
+     if (GetChecked()) {
+       const gfx::ImageSkia check_icon = gfx::CreateVectorIcon(
+@@ -230,7 +230,7 @@
+   gfx::Rect bounds = image()->GetMirroredContentsBounds();
+   // Don't add extra insets in the ChromeRefresh case so that the focus ring can
+   // be drawn in the ChromeRefresh style.
+-  if (!features::IsChromeRefresh2023()) {
++  if (!::features::IsChromeRefresh2023()) {
+     bounds.Inset(1);
+   }
+   path.addRect(RectToSkRect(bounds));
+@@ -238,7 +238,7 @@
+ }
+ 
+ SkColor Checkbox::GetIconImageColor(int icon_state) const {
+-  if (features::IsChromeRefresh2023()) {
++  if (::features::IsChromeRefresh2023()) {
+     if (icon_state & IconState::CHECKED) {
+       return GetColorProvider()->GetColor(
+           (icon_state & IconState::ENABLED)
+@@ -281,7 +281,7 @@
+ }
+ 
+ const gfx::VectorIcon& Checkbox::GetVectorIcon() const {
+-  if (features::IsChromeRefresh2023()) {
++  if (::features::IsChromeRefresh2023()) {
+     return GetChecked() ? kCheckboxCheckCr2023Icon : kCheckboxNormalCr2023Icon;
+   }
+ 
+--- a/ui/views/cascading_property.cc
++++ b/ui/views/cascading_property.cc
+@@ -56,7 +56,7 @@
+   const SkColor default_color =
+       view->GetColorProvider()->GetColor(ui::kColorFocusableBorderFocused);
+   const SkColor background_color = GetCascadingBackgroundColor(view);
+-  return features::IsChromeRefresh2023()
++  return ::features::IsChromeRefresh2023()
+              ? color_utils::BlendForMinContrast(
+                    default_color, background_color, absl::nullopt,
+                    color_utils::kMinimumVisibleContrastRatio)

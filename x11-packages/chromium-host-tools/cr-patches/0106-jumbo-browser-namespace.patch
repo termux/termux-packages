@@ -1,0 +1,23 @@
+[1/1576] CXX obj/content/browser/browser/browser_jumbo_5.o
+  In file included from gen/content/browser/browser_jumbo_5.cc:71:
+  ./../../../src/content/browser/devtools/protocol/fedcm_handler.cc:348:3: error: unexpected namespace name 'Page': expected expression
+    348 |   Page& page = frame_host_->GetPage();
+        |   ^
+  ./../../../src/content/browser/devtools/protocol/fedcm_handler.cc:348:9: error: use of undeclared identifier 'page'
+    348 |   Page& page = frame_host_->GetPage();
+        |         ^
+  ./../../../src/content/browser/devtools/protocol/fedcm_handler.cc:349:73: error: use of undeclared identifier 'page'
+    349 |   return PageUserData<FederatedAuthRequestPageData>::GetOrCreateForPage(page);
+        |                                                                         ^
+  3 errors generated.
+--- a/content/browser/devtools/protocol/fedcm_handler.cc
++++ b/content/browser/devtools/protocol/fedcm_handler.cc
+@@ -345,7 +345,7 @@
+   if (!frame_host_) {
+     return nullptr;
+   }
+-  Page& page = frame_host_->GetPage();
++  content::Page& page = frame_host_->GetPage();
+   return PageUserData<FederatedAuthRequestPageData>::GetOrCreateForPage(page);
+ }
+ 

@@ -1,0 +1,21 @@
+[4/22] CXX obj/extensions/renderer/renderer/renderer_jumbo_2.o
+  In file included from gen/extensions/renderer/renderer_jumbo_2.cc:41:
+  ./../../../src/extensions/renderer/renderer_context_data.cc:18:14: error: no member named 'kEnableIsolatedWebAppsInRenderer' in namespace 'extensions::switches'; did you mean '::switches::kEnableIsolatedWebAppsInRenderer'?
+    18 |              switches::kEnableIsolatedWebAppsInRenderer) &&
+        |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        |              ::switches::kEnableIsolatedWebAppsInRenderer
+  ../../../src/content/public/common/content_switches.h:115:34: note: '::switches::kEnableIsolatedWebAppsInRenderer' declared here
+    115 | CONTENT_EXPORT extern const char kEnableIsolatedWebAppsInRenderer[];
+        |                                  ^
+  1 error generated.
+--- a/extensions/renderer/renderer_context_data.cc
++++ b/extensions/renderer/renderer_context_data.cc
+@@ -15,7 +15,7 @@
+ // static
+ bool RendererContextData::IsIsolatedWebAppContextAndEnabled() {
+   return base::CommandLine::ForCurrentProcess()->HasSwitch(
+-             switches::kEnableIsolatedWebAppsInRenderer) &&
++             ::switches::kEnableIsolatedWebAppsInRenderer) &&
+          blink::IsIsolatedContext();
+ }
+ 

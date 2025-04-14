@@ -1,0 +1,474 @@
+Enable jumbo build for the following component(s)/source_set(s):
+
+# - //third_party/boringssl:boringssl # Too much to patch
+- //third_party/leveldatabase:leveldatabase
+- //net/third_party/quiche:quiche
+
+diff -uNr a/third_party/leveldatabase/BUILD.gn b/third_party/leveldatabase/BUILD.gn
+--- a/third_party/leveldatabase/BUILD.gn
++++ b/third_party/leveldatabase/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
+ import("//testing/test.gni")
+ 
+@@ -112,7 +113,7 @@
+   }
+ }
+ 
+-component("leveldatabase") {
++jumbo_component("leveldatabase") {
+   sources = leveldb_sources
+ 
+   configs -= [ "//build/config/compiler:chromium_code" ]
+diff -uNr a/net/third_party/quiche/BUILD.gn b/net/third_party/quiche/BUILD.gn
+--- a/net/third_party/quiche/BUILD.gn
++++ b/net/third_party/quiche/BUILD.gn
+@@ -25,6 +25,7 @@
+ #             (*) only used on platforms where epoll tests are built
+ 
+ import("//build/config/chromeos/ui_mode.gni")
++import("//build/config/jumbo.gni")
+ import("//net/third_party/quiche/src/build/source_list.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
+ import("//third_party/protobuf/proto_library.gni")
+@@ -51,7 +52,7 @@
+   ]
+ }
+ 
+-component("quiche") {
++jumbo_component("quiche") {
+   sources = [
+               "overrides/quiche_platform_impl/quiche_bug_tracker_impl.h",
+               "overrides/quiche_platform_impl/quiche_client_stats_impl.h",
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr2_sender.cc b/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr2_sender.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr2_sender.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr2_sender.cc
+@@ -19,6 +19,8 @@
+ #include "quiche/common/platform/api/quiche_logging.h"
+ #include "quiche/common/print_elements.h"
+ 
++#define kDefaultMinimumCongestionWindow kDefaultMinimumCongestionWindow_BBR2
++
+ namespace quic {
+ 
+ namespace {
+@@ -575,3 +577,5 @@
+ }
+ 
+ }  // namespace quic
++
++#undef kDefaultMinimumCongestionWindow
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr_sender.cc b/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr_sender.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr_sender.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr_sender.cc
+@@ -18,6 +18,8 @@
+ #include "quiche/quic/platform/api/quic_flags.h"
+ #include "quiche/quic/platform/api/quic_logging.h"
+ 
++#define kDefaultMinimumCongestionWindow kDefaultMinimumCongestionWindow_BBR
++
+ namespace quic {
+ 
+ namespace {
+@@ -894,3 +896,5 @@
+ }
+ 
+ }  // namespace quic
++
++#undef kDefaultMinimumCongestionWindow
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/congestion_control/tcp_cubic_sender_bytes.cc b/net/third_party/quiche/src/quiche/quic/core/congestion_control/tcp_cubic_sender_bytes.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/congestion_control/tcp_cubic_sender_bytes.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/congestion_control/tcp_cubic_sender_bytes.cc
+@@ -16,6 +16,8 @@
+ #include "quiche/quic/platform/api/quic_flags.h"
+ #include "quiche/quic/platform/api/quic_logging.h"
+ 
++#define kDefaultMinimumCongestionWindow kDefaultMinimumCongestionWindow_CUBIC
++
+ namespace quic {
+ 
+ namespace {
+@@ -385,3 +387,5 @@
+ }
+ 
+ }  // namespace quic
++
++#undef kDefaultMinimumCongestionWindow
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/crypto/aead_base_decrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/aead_base_decrypter.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/crypto/aead_base_decrypter.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/crypto/aead_base_decrypter.cc
+@@ -22,7 +22,7 @@
+ using ::quiche::DLogOpenSslErrors;
+ namespace {
+ 
+-const EVP_AEAD* InitAndCall(const EVP_AEAD* (*aead_getter)()) {
++const EVP_AEAD* InitAndCallDec(const EVP_AEAD* (*aead_getter)()) {
+   // Ensure BoringSSL is initialized before calling |aead_getter|. In Chromium,
+   // the static initializer is disabled.
+   CRYPTO_library_init();
+@@ -35,7 +35,7 @@
+                                      size_t key_size, size_t auth_tag_size,
+                                      size_t nonce_size,
+                                      bool use_ietf_nonce_construction)
+-    : aead_alg_(InitAndCall(aead_getter)),
++    : aead_alg_(InitAndCallDec(aead_getter)),
+       key_size_(key_size),
+       auth_tag_size_(auth_tag_size),
+       nonce_size_(nonce_size),
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/crypto/aead_base_encrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/aead_base_encrypter.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/crypto/aead_base_encrypter.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/crypto/aead_base_encrypter.cc
+@@ -18,7 +18,7 @@
+ using ::quiche::DLogOpenSslErrors;
+ namespace {
+ 
+-const EVP_AEAD* InitAndCall(const EVP_AEAD* (*aead_getter)()) {
++const EVP_AEAD* InitAndCallEnc(const EVP_AEAD* (*aead_getter)()) {
+   // Ensure BoringSSL is initialized before calling |aead_getter|. In Chromium,
+   // the static initializer is disabled.
+   CRYPTO_library_init();
+@@ -31,7 +31,7 @@
+                                      size_t key_size, size_t auth_tag_size,
+                                      size_t nonce_size,
+                                      bool use_ietf_nonce_construction)
+-    : aead_alg_(InitAndCall(aead_getter)),
++    : aead_alg_(InitAndCallEnc(aead_getter)),
+       key_size_(key_size),
+       auth_tag_size_(auth_tag_size),
+       nonce_size_(nonce_size),
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_12_decrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_12_decrypter.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_12_decrypter.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_12_decrypter.cc
+@@ -7,6 +7,9 @@
+ #include "openssl/aead.h"
+ #include "openssl/tls1.h"
+ 
++#define kKeySize   kKeySize_AES128GCM12Dec
++#define kNonceSize kNonceSize_AES128GCM12Dec
++
+ namespace quic {
+ 
+ namespace {
+@@ -30,3 +33,6 @@
+ }
+ 
+ }  // namespace quic
++
++#undef kKeySize
++#undef kNonceSize
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_12_encrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_12_encrypter.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_12_encrypter.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_12_encrypter.cc
+@@ -6,6 +6,9 @@
+ 
+ #include "openssl/evp.h"
+ 
++#define kKeySize   kKeySize_AES128GCM12Enc
++#define kNonceSize kNonceSize_AES128GCM12Enc
++
+ namespace quic {
+ 
+ namespace {
+@@ -25,3 +28,6 @@
+ Aes128Gcm12Encrypter::~Aes128Gcm12Encrypter() {}
+ 
+ }  // namespace quic
++
++#undef kKeySize
++#undef kNonceSize
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_decrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_decrypter.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_decrypter.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_decrypter.cc
+@@ -9,6 +9,9 @@
+ #include "quiche/quic/platform/api/quic_flag_utils.h"
+ #include "quiche/quic/platform/api/quic_flags.h"
+ 
++#define kKeySize   kKeySize_AES128GCMDec
++#define kNonceSize kNonceSize_AES128GCMDec
++
+ namespace quic {
+ 
+ namespace {
+@@ -32,3 +35,6 @@
+ }
+ 
+ }  // namespace quic
++
++#undef kKeySize
++#undef kNonceSize
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_encrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_encrypter.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_encrypter.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_encrypter.cc
+@@ -6,6 +6,9 @@
+ 
+ #include "openssl/evp.h"
+ 
++#define kKeySize   kKeySize_AES128GCMEnc
++#define kNonceSize kNonceSize_AES128GCMEnc
++
+ namespace quic {
+ 
+ namespace {
+@@ -25,3 +28,6 @@
+ Aes128GcmEncrypter::~Aes128GcmEncrypter() {}
+ 
+ }  // namespace quic
++
++#undef kKeySize
++#undef kNonceSize
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_256_gcm_decrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_256_gcm_decrypter.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_256_gcm_decrypter.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_256_gcm_decrypter.cc
+@@ -9,6 +9,9 @@
+ #include "quiche/quic/platform/api/quic_flag_utils.h"
+ #include "quiche/quic/platform/api/quic_flags.h"
+ 
++#define kKeySize   kKeySize_AES256GCMDec
++#define kNonceSize kNonceSize_AES256GCMDec
++
+ namespace quic {
+ 
+ namespace {
+@@ -32,3 +35,6 @@
+ }
+ 
+ }  // namespace quic
++
++#undef kKeySize
++#undef kNonceSize
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_256_gcm_encrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_256_gcm_encrypter.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_256_gcm_encrypter.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_256_gcm_encrypter.cc
+@@ -6,6 +6,9 @@
+ 
+ #include "openssl/evp.h"
+ 
++#define kKeySize   kKeySize_AES256GCMEnc
++#define kNonceSize kNonceSize_AES256GCMEnc
++
+ namespace quic {
+ 
+ namespace {
+@@ -25,3 +28,6 @@
+ Aes256GcmEncrypter::~Aes256GcmEncrypter() {}
+ 
+ }  // namespace quic
++
++#undef kKeySize
++#undef kNonceSize
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_decrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_decrypter.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_decrypter.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_decrypter.cc
+@@ -7,6 +7,9 @@
+ #include "openssl/aead.h"
+ #include "openssl/tls1.h"
+ 
++#define kKeySize   kKeySize_ChaCha20Poly1305Dec
++#define kNonceSize kNonceSize_ChaCha20Poly1305Dec
++
+ namespace quic {
+ 
+ namespace {
+@@ -39,3 +42,6 @@
+ }
+ 
+ }  // namespace quic
++
++#undef kKeySize
++#undef kNonceSize
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_encrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_encrypter.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_encrypter.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_encrypter.cc
+@@ -6,6 +6,9 @@
+ 
+ #include "openssl/evp.h"
+ 
++#define kKeySize   kKeySize_ChaCha20Poly1305Enc
++#define kNonceSize kNonceSize_ChaCha20Poly1305Enc
++
+ namespace quic {
+ 
+ namespace {
+@@ -33,3 +36,6 @@
+ }
+ 
+ }  // namespace quic
++
++#undef kKeySize
++#undef kNonceSize
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_tls_decrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_tls_decrypter.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_tls_decrypter.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_tls_decrypter.cc
+@@ -9,6 +9,9 @@
+ #include "quiche/quic/platform/api/quic_flag_utils.h"
+ #include "quiche/quic/platform/api/quic_flags.h"
+ 
++#define kKeySize   kKeySize_ChaCha20Poly1305TLSDec
++#define kNonceSize kNonceSize_ChaCha20Poly1305TLSDec
++
+ namespace quic {
+ 
+ namespace {
+@@ -41,3 +44,6 @@
+ }
+ 
+ }  // namespace quic
++
++#undef kKeySize
++#undef kNonceSize
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_tls_encrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_tls_encrypter.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_tls_encrypter.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_tls_encrypter.cc
+@@ -6,6 +6,9 @@
+ 
+ #include "openssl/evp.h"
+ 
++#define kKeySize   kKeySize_ChaCha20Poly1305TLSEnc
++#define kNonceSize kNonceSize_ChaCha20Poly1305TLSEnc
++
+ namespace quic {
+ 
+ namespace {
+@@ -33,3 +36,6 @@
+ }
+ 
+ }  // namespace quic
++
++#undef kKeySize
++#undef kNonceSize
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/crypto/crypto_secret_boxer.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/crypto_secret_boxer.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/crypto/crypto_secret_boxer.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/crypto/crypto_secret_boxer.cc
+@@ -13,6 +13,8 @@
+ #include "quiche/quic/core/crypto/quic_random.h"
+ #include "quiche/quic/platform/api/quic_logging.h"
+ 
++#define kAEAD kAEAD_CryptoSecretBoxer
++
+ namespace quic {
+ 
+ // kSIVNonceSize contains the number of bytes of nonce in each AES-GCM-SIV box.
+@@ -144,3 +146,5 @@
+ }
+ 
+ }  // namespace quic
++
++#undef kAEAD
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/http/web_transport_http3.cc b/net/third_party/quiche/src/quiche/quic/core/http/web_transport_http3.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/http/web_transport_http3.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/http/web_transport_http3.cc
+@@ -469,3 +469,5 @@
+ }
+ 
+ }  // namespace quic
++
++#undef ENDPOINT
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/quic_idle_network_detector.cc b/net/third_party/quiche/src/quiche/quic/core/quic_idle_network_detector.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/quic_idle_network_detector.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/quic_idle_network_detector.cc
+@@ -12,7 +12,7 @@
+ 
+ namespace quic {
+ 
+-namespace {
++namespace quic_idle_network_detector {
+ 
+ class AlarmDelegate : public QuicAlarm::DelegateWithContext {
+  public:
+@@ -40,7 +40,7 @@
+       time_of_first_packet_sent_after_receiving_(QuicTime::Zero()),
+       idle_network_timeout_(QuicTime::Delta::Infinite()),
+       alarm_(alarm_factory->CreateAlarm(
+-          arena->New<AlarmDelegate>(this, context), arena)) {}
++          arena->New<quic_idle_network_detector::AlarmDelegate>(this, context), arena)) {}
+ 
+ void QuicIdleNetworkDetector::OnAlarm() {
+   if (handshake_timeout_.IsInfinite()) {
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/quic_network_blackhole_detector.cc b/net/third_party/quiche/src/quiche/quic/core/quic_network_blackhole_detector.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/quic_network_blackhole_detector.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/quic_network_blackhole_detector.cc
+@@ -8,7 +8,7 @@
+ 
+ namespace quic {
+ 
+-namespace {
++namespace quic_network_blackhole_detector {
+ 
+ class AlarmDelegate : public QuicAlarm::DelegateWithContext {
+  public:
+@@ -31,7 +31,7 @@
+     QuicAlarmFactory* alarm_factory, QuicConnectionContext* context)
+     : delegate_(delegate),
+       alarm_(alarm_factory->CreateAlarm(
+-          arena->New<AlarmDelegate>(this, context), arena)) {}
++          arena->New<quic_network_blackhole_detector::AlarmDelegate>(this, context), arena)) {}
+ 
+ void QuicNetworkBlackholeDetector::OnAlarm() {
+   QuicTime next_deadline = GetEarliestDeadline();
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/quic_stream.cc b/net/third_party/quiche/src/quiche/quic/core/quic_stream.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/quic_stream.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/quic_stream.cc
+@@ -1445,3 +1445,5 @@
+ }
+ 
+ }  // namespace quic
++
++#undef ENDPOINT
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/quic_stream_id_manager.cc b/net/third_party/quiche/src/quiche/quic/core/quic_stream_id_manager.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/quic_stream_id_manager.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/quic_stream_id_manager.cc
+@@ -243,3 +243,5 @@
+ }
+ 
+ }  // namespace quic
++
++#undef ENDPOINT
+diff -uNr a/net/third_party/quiche/src/quiche/quic/core/tls_handshaker.cc b/net/third_party/quiche/src/quiche/quic/core/tls_handshaker.cc
+--- a/net/third_party/quiche/src/quiche/quic/core/tls_handshaker.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/tls_handshaker.cc
+@@ -418,3 +418,5 @@
+ }
+ 
+ }  // namespace quic
++
++#undef ENDPOINT
+diff -uNr a/net/third_party/quiche/src/quiche/spdy/core/spdy_framer.cc b/net/third_party/quiche/src/quiche/spdy/core/spdy_framer.cc
+--- a/net/third_party/quiche/src/quiche/spdy/core/spdy_framer.cc
++++ b/net/third_party/quiche/src/quiche/spdy/core/spdy_framer.cc
+@@ -23,6 +23,8 @@
+ #include "quiche/spdy/core/spdy_protocol.h"
+ #include "quiche/spdy/core/zero_copy_output_buffer.h"
+ 
++#define kPadLengthFieldSize kPadLengthFieldSize_SpdyFramer
++
+ namespace spdy {
+ 
+ namespace {
+@@ -1368,3 +1370,5 @@
+ }
+ 
+ }  // namespace spdy
++
++#undef kPadLengthFieldSize
+diff -uNr a/net/third_party/quiche/src/quiche/spdy/core/spdy_protocol.cc b/net/third_party/quiche/src/quiche/spdy/core/spdy_protocol.cc
+--- a/net/third_party/quiche/src/quiche/spdy/core/spdy_protocol.cc
++++ b/net/third_party/quiche/src/quiche/spdy/core/spdy_protocol.cc
+@@ -19,6 +19,8 @@
+ #include "quiche/spdy/core/http2_header_block.h"
+ #include "quiche/spdy/core/spdy_alt_svc_wire_format.h"
+ 
++#define kPadLengthFieldSize kPadLengthFieldSize_SpdyProtocol
++
+ namespace spdy {
+ 
+ const char* const kHttp2ConnectionHeaderPrefix =
+@@ -623,3 +625,5 @@
+ }
+ 
+ }  // namespace spdy
++
++#undef kPadLengthFieldSize

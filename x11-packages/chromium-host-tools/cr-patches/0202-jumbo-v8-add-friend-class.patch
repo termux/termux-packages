@@ -1,0 +1,79 @@
+[3/1482] CXX host/obj/v8/v8_base_without_compiler/v8_base_without_compiler_jumbo_4.o
+  In file included from host/gen/v8/v8_base_without_compiler_jumbo_4.cc:20:
+  ./../../../src/v8/src/heap/cppgc-js/unified-heap-marking-verifier.cc:62:46: error: 'GetSlotThreadSafe' is a protected member of 'v8::TracedReferenceBase'
+    62 |         reinterpret_cast<const Address*>(ref.GetSlotThreadSafe()));
+        |                                              ^
+  ../../../src/v8/include/v8-traced-handle.h:107:15: note: declared protected here
+    107 |   const void* GetSlotThreadSafe() const {
+        |               ^
+  In file included from host/gen/v8/v8_base_without_compiler_jumbo_4.cc:26:
+  In file included from ./../../../src/v8/src/heap/factory.cc:79:
+  In file included from ../../../src/v8/src/wasm/module-decoder-impl.h:17:
+  In file included from ../../../src/v8/src/wasm/constant-expression-interface.h:12:
+  ../../../src/v8/src/wasm/decoder.h:29:9: warning: 'TRACE' macro redefined [-Wmacro-redefined]
+    29 | #define TRACE(...)                                        \
+        |         ^
+  ./../../../src/v8/src/heap/code-range.cc:95:9: note: previous definition is here
+    95 | #define TRACE(...) \
+        |         ^
+  1 warning and 1 error generated.
+--- a/v8/include/v8-traced-handle.h
++++ b/v8/include/v8-traced-handle.h
+@@ -26,6 +26,7 @@
+ namespace internal {
+ 
+ class BasicTracedReferenceExtractor;
++class BasicTracedReferenceExtractor_UHMV;
+ 
+ enum class TracedReferenceStoreMode {
+   kInitializingStore,
+@@ -112,6 +113,7 @@
+   V8_EXPORT void CheckValue() const;
+ 
+   friend class internal::BasicTracedReferenceExtractor;
++  friend class internal::BasicTracedReferenceExtractor_UHMV;
+   template <typename F>
+   friend class Local;
+   template <typename U>
+--- a/v8/src/heap/code-range.cc
++++ b/v8/src/heap/code-range.cc
+@@ -92,7 +92,7 @@
+   return kReservedCodeRangePages * MemoryAllocator::GetCommitPageSize();
+ }
+ 
+-#define TRACE(...) \
++#define TRACE_IN_CODE_RANGE(...) \
+   if (v8_flags.trace_code_range_allocation) PrintF(__VA_ARGS__)
+ 
+ bool CodeRange::InitReservation(v8::PageAllocator* page_allocator,
+@@ -137,7 +137,7 @@
+       kMaxPCRelativeCodeRangeInMB > 1024 ? kMaxPCRelativeCodeRangeInMB : 4096;
+   auto preferred_region = GetPreferredRegion(kRadiusInMB, kPageSize);
+ 
+-  TRACE("=== Preferred region: [%p, %p)\n",
++  TRACE_IN_CODE_RANGE("=== Preferred region: [%p, %p)\n",
+         reinterpret_cast<void*>(preferred_region.begin()),
+         reinterpret_cast<void*>(preferred_region.end()));
+ 
+@@ -166,10 +166,10 @@
+     Address step =
+         RoundDown(preferred_region.size() / kAllocationTries, kPageSize);
+     for (int i = 0; i < kAllocationTries; i++) {
+-      TRACE("=== Attempt #%d, hint=%p\n", i,
++      TRACE_IN_CODE_RANGE("=== Attempt #%d, hint=%p\n", i,
+             reinterpret_cast<void*>(params.requested_start_hint));
+       if (candidate_cage.InitReservation(params)) {
+-        TRACE("=== Attempt #%d (%p): [%p, %p)\n", i,
++        TRACE_IN_CODE_RANGE("=== Attempt #%d (%p): [%p, %p)\n", i,
+               reinterpret_cast<void*>(params.requested_start_hint),
+               reinterpret_cast<void*>(candidate_cage.region().begin()),
+               reinterpret_cast<void*>(candidate_cage.region().end()));
+@@ -190,7 +190,7 @@
+     params.base_alignment = base_alignment;
+     params.requested_start_hint = the_hint;
+     if (!VirtualMemoryCage::InitReservation(params)) return false;
+-    TRACE("=== Fallback attempt, hint=%p: [%p, %p)\n",
++    TRACE_IN_CODE_RANGE("=== Fallback attempt, hint=%p: [%p, %p)\n",
+           reinterpret_cast<void*>(params.requested_start_hint),
+           reinterpret_cast<void*>(region().begin()),
+           reinterpret_cast<void*>(region().end()));

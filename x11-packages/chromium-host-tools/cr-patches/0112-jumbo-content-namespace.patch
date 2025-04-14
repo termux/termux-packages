@@ -1,0 +1,21 @@
+[13/168] CXX obj/components/payments/content/content/content_jumbo_1.o
+  In file included from gen/components/payments/content/content_jumbo_1.cc:23:
+  ./../../../src/components/payments/content/secure_payment_confirmation_app.cc:97:36: error: no member named 'kSecurePaymentConfirmationDebug' in namespace 'payments::features'; did you mean '::features::kSecurePaymentConfirmationDebug'?
+    97 |   if (base::FeatureList::IsEnabled(features::kSecurePaymentConfirmationDebug)) {
+        |                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        |                                    ::features::kSecurePaymentConfirmationDebug
+  ../../../src/content/public/common/content_features.h:198:37: note: '::features::kSecurePaymentConfirmationDebug' declared here
+    198 | CONTENT_EXPORT BASE_DECLARE_FEATURE(kSecurePaymentConfirmationDebug);
+        |                                     ^
+  1 error generated.
+--- a/components/payments/content/secure_payment_confirmation_app.cc
++++ b/components/payments/content/secure_payment_confirmation_app.cc
+@@ -94,7 +94,7 @@
+           ? blink::mojom::AuthenticationExtensionsClientInputs::New()
+           : request_->extensions.Clone();
+ 
+-  if (base::FeatureList::IsEnabled(features::kSecurePaymentConfirmationDebug)) {
++  if (base::FeatureList::IsEnabled(::features::kSecurePaymentConfirmationDebug)) {
+     options->user_verification =
+         device::UserVerificationRequirement::kPreferred;
+     // The `device::PublicKeyCredentialDescriptor` constructor with 2 parameters

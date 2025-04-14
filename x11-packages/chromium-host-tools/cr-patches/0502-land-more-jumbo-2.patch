@@ -1,0 +1,426 @@
+Enable jumbo build for the following component(s)/source_set(s):
+
+- //device/bluetooth:deprecated_experimental_mojo
+- //device/bluetooth:bluetooth
+
+diff -uNr a/device/bluetooth/BUILD.gn b/device/bluetooth/BUILD.gn
+--- a/device/bluetooth/BUILD.gn
++++ b/device/bluetooth/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ import("//build/config/chromeos/ui_mode.gni")
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//device/bluetooth/cast_bluetooth.gni")
+ 
+ if (is_android) {
+@@ -28,7 +29,7 @@
+ 
+ # Experimental implementation not ready for production use yet. See
+ # public/mojom/README.md
+-source_set("deprecated_experimental_mojo") {
++jumbo_source_set("deprecated_experimental_mojo") {
+   sources = [
+     "//device/bluetooth/public/mojom/connect_result_type_converter.h",
+     "//device/bluetooth/public/mojom/gatt_result_type_converter.h",
+@@ -45,12 +46,16 @@
+     "socket.cc",
+     "socket.h",
+   ]
++  jumbo_excluded_sources = []
+ 
+   if (is_chromeos || is_linux) {
+     sources += [
+       "bluez/metrics_recorder.cc",
+       "bluez/metrics_recorder.h",
+     ]
++    jumbo_excluded_sources += [
++      "bluez/metrics_recorder.cc", # Conflict with //device/bluetooth:bluetooth
++    ]
+   }
+ 
+   deps = [
+@@ -107,7 +112,7 @@
+   ]
+ }
+ 
+-component("bluetooth") {
++jumbo_component("bluetooth") {
+   sources = [
+     "bluetooth_adapter.cc",
+     "bluetooth_adapter.h",
+@@ -159,6 +164,7 @@
+     "string_util_icu.cc",
+     "string_util_icu.h",
+   ]
++  jumbo_excluded_sources = []
+ 
+   defines = [ "DEVICE_BLUETOOTH_IMPLEMENTATION" ]
+ 
+@@ -570,6 +576,10 @@
+         "floss/floss_version.h",
+         "floss/test_helpers.h",
+       ]
++      jumbo_excluded_sources += [ 
++        "floss/floss_advertiser_client.cc", # Fail to compile with floss_dbus_client.cc
++        "bluez/metrics_recorder.cc",        # Conflict with //device/bluetooth:deprecated_experimental_mojo
++      ] 
+       if (is_chromeos) {
+         import("//chromeos/dbus/config/use_real_dbus_clients.gni")
+         configs += [ "//chromeos/dbus/config:use_real_dbus_clients_config" ]
+diff -uNr a/device/bluetooth/bluez/bluetooth_remote_gatt_characteristic_bluez.cc b/device/bluetooth/bluez/bluetooth_remote_gatt_characteristic_bluez.cc
+--- a/device/bluetooth/bluez/bluetooth_remote_gatt_characteristic_bluez.cc
++++ b/device/bluetooth/bluez/bluetooth_remote_gatt_characteristic_bluez.cc
+@@ -30,7 +30,7 @@
+ 
+ namespace bluez {
+ 
+-namespace {
++namespace brgcb {
+ 
+ // Stream operator for logging vector<uint8_t>.
+ std::ostream& operator<<(std::ostream& out, const std::vector<uint8_t> bytes) {
+@@ -178,6 +178,7 @@
+     WriteType write_type,
+     base::OnceClosure callback,
+     ErrorCallback error_callback) {
++  using bluez::brgcb::operator<<;
+   DVLOG(1) << "Sending GATT characteristic write request to characteristic: "
+            << GetIdentifier() << ", UUID: " << GetUUID().canonical_value()
+            << ", with value: " << value << ", with response: "
+@@ -207,6 +208,7 @@
+     DeprecatedWriteRemoteCharacteristic(const std::vector<uint8_t>& value,
+                                         base::OnceClosure callback,
+                                         ErrorCallback error_callback) {
++  using bluez::brgcb::operator<<;
+   DVLOG(1) << "Sending GATT characteristic write request to characteristic: "
+            << GetIdentifier() << ", UUID: " << GetUUID().canonical_value()
+            << ", with value: " << value << ".";
+diff -uNr a/device/bluetooth/bluez/bluetooth_remote_gatt_descriptor_bluez.cc b/device/bluetooth/bluez/bluetooth_remote_gatt_descriptor_bluez.cc
+--- a/device/bluetooth/bluez/bluetooth_remote_gatt_descriptor_bluez.cc
++++ b/device/bluetooth/bluez/bluetooth_remote_gatt_descriptor_bluez.cc
+@@ -23,7 +23,7 @@
+ 
+ namespace bluez {
+ 
+-namespace {
++namespace brgdb {
+ 
+ // Stream operator for logging vector<uint8_t>.
+ std::ostream& operator<<(std::ostream& out, const std::vector<uint8_t> bytes) {
+@@ -99,6 +99,7 @@
+     const std::vector<uint8_t>& new_value,
+     base::OnceClosure callback,
+     ErrorCallback error_callback) {
++  using bluez::brgdb::operator<<;
+   DVLOG(1) << "Sending GATT characteristic descriptor write request to "
+            << "characteristic: " << GetIdentifier()
+            << ", UUID: " << GetUUID().canonical_value()
+diff -uNr a/device/bluetooth/dbus/bluetooth_admin_policy_client.cc b/device/bluetooth/dbus/bluetooth_admin_policy_client.cc
+--- a/device/bluetooth/dbus/bluetooth_admin_policy_client.cc
++++ b/device/bluetooth/dbus/bluetooth_admin_policy_client.cc
+@@ -15,6 +15,9 @@
+ #include "dbus/object_proxy.h"
+ #include "third_party/cros_system_api/dbus/service_constants.h"
+ 
++#define kNoResponseError         kNoResponseError_BAPC
++#define kUnknownAdminPolicyError kUnknownAdminPolicyError_BAPC
++
+ const char kNoResponseError[] = "org.chromium.Error.NoResponse";
+ const char kUnknownAdminPolicyError[] = "org.chromium.Error.UnknownAdminPolicy";
+ 
+@@ -193,3 +196,6 @@
+ }
+ 
+ }  // namespace bluez
++
++#undef kNoResponseError
++#undef kUnknownAdminPolicyError
+diff -uNr a/device/bluetooth/dbus/bluetooth_advertisement_monitor_manager_client.cc b/device/bluetooth/dbus/bluetooth_advertisement_monitor_manager_client.cc
+--- a/device/bluetooth/dbus/bluetooth_advertisement_monitor_manager_client.cc
++++ b/device/bluetooth/dbus/bluetooth_advertisement_monitor_manager_client.cc
+@@ -17,6 +17,9 @@
+ #include "dbus/object_proxy.h"
+ #include "third_party/cros_system_api/dbus/service_constants.h"
+ 
++#define kNoResponseError kNoResponseError_BAMMC
++#define kFailedError     kFailedError_BAMMC
++
+ namespace {
+ const char kNoResponseError[] = "org.chromium.Error.NoResponse";
+ const char kFailedError[] = "org.chromium.Error.Failed";
+@@ -221,3 +224,6 @@
+ }
+ 
+ }  // namespace bluez
++
++#undef kNoResponseError
++#undef kFailedError
+diff -uNr a/device/bluetooth/dbus/bluetooth_gatt_characteristic_service_provider_impl.cc b/device/bluetooth/dbus/bluetooth_gatt_characteristic_service_provider_impl.cc
+--- a/device/bluetooth/dbus/bluetooth_gatt_characteristic_service_provider_impl.cc
++++ b/device/bluetooth/dbus/bluetooth_gatt_characteristic_service_provider_impl.cc
+@@ -15,6 +15,10 @@
+ #include "device/bluetooth/dbus/bluetooth_gatt_characteristic_delegate_wrapper.h"
+ #include "third_party/cros_system_api/dbus/service_constants.h"
+ 
++#define kErrorInvalidArgs       kErrorInvalidArgs_BGCSPI
++#define kErrorPropertyReadOnly  kErrorPropertyReadOnly_BGCSPI
++#define kErrorFailed            kErrorFailed_BGCSPI
++
+ namespace bluez {
+ 
+ namespace {
+@@ -574,3 +578,7 @@
+ }
+ 
+ }  // namespace bluez
++
++#undef kErrorInvalidArgs
++#undef kErrorPropertyReadOnly
++#undef kErrorFailed
+diff -uNr a/device/bluetooth/dbus/bluetooth_gatt_descriptor_service_provider_impl.cc b/device/bluetooth/dbus/bluetooth_gatt_descriptor_service_provider_impl.cc
+--- a/device/bluetooth/dbus/bluetooth_gatt_descriptor_service_provider_impl.cc
++++ b/device/bluetooth/dbus/bluetooth_gatt_descriptor_service_provider_impl.cc
+@@ -14,6 +14,10 @@
+ #include "device/bluetooth/dbus/bluetooth_gatt_attribute_helpers.h"
+ #include "third_party/cros_system_api/dbus/service_constants.h"
+ 
++#define kErrorInvalidArgs       kErrorInvalidArgs_BGDSPI
++#define kErrorPropertyReadOnly  kErrorPropertyReadOnly_BGDSPI
++#define kErrorFailed            kErrorFailed_BGDSPI
++
+ namespace bluez {
+ 
+ namespace {
+@@ -421,3 +425,7 @@
+ }
+ 
+ }  // namespace bluez
++
++#undef kErrorInvalidArgs
++#undef kErrorPropertyReadOnly
++#undef kErrorFailed
+diff -uNr a/device/bluetooth/dbus/bluetooth_gatt_service_service_provider_impl.cc b/device/bluetooth/dbus/bluetooth_gatt_service_service_provider_impl.cc
+--- a/device/bluetooth/dbus/bluetooth_gatt_service_service_provider_impl.cc
++++ b/device/bluetooth/dbus/bluetooth_gatt_service_service_provider_impl.cc
+@@ -8,6 +8,9 @@
+ #include "base/logging.h"
+ #include "third_party/cros_system_api/dbus/service_constants.h"
+ 
++#define kErrorInvalidArgs       kErrorInvalidArgs_BGSSPI
++#define kErrorPropertyReadOnly  kErrorPropertyReadOnly_BGSSPI
++
+ namespace bluez {
+ 
+ namespace {
+@@ -226,3 +229,6 @@
+ }
+ 
+ }  // namespace bluez
++
++#undef kErrorInvalidArgs
++#undef kErrorPropertyReadOnly
+diff -uNr a/device/bluetooth/dbus/bluetooth_le_advertisement_service_provider.cc b/device/bluetooth/dbus/bluetooth_le_advertisement_service_provider.cc
+--- a/device/bluetooth/dbus/bluetooth_le_advertisement_service_provider.cc
++++ b/device/bluetooth/dbus/bluetooth_le_advertisement_service_provider.cc
+@@ -19,6 +19,8 @@
+ #include "device/bluetooth/dbus/fake_bluetooth_le_advertisement_service_provider.h"
+ #include "third_party/cros_system_api/dbus/service_constants.h"
+ 
++#define kErrorInvalidArgs kErrorInvalidArgs_BLASP
++
+ namespace bluez {
+ 
+ namespace {
+@@ -483,3 +485,5 @@
+ }
+ 
+ }  // namespace bluez
++
++#undef kErrorInvalidArgs
+diff -uNr a/device/bluetooth/dbus/fake_bluetooth_adapter_client.cc b/device/bluetooth/dbus/fake_bluetooth_adapter_client.cc
+--- a/device/bluetooth/dbus/fake_bluetooth_adapter_client.cc
++++ b/device/bluetooth/dbus/fake_bluetooth_adapter_client.cc
+@@ -20,6 +20,8 @@
+ #include "device/bluetooth/dbus/fake_bluetooth_device_client.h"
+ #include "third_party/cros_system_api/dbus/service_constants.h"
+ 
++#define kSimulationIntervalMs kSimulationIntervalMs_FBAC
++
+ namespace bluez {
+ 
+ namespace {
+@@ -377,3 +379,5 @@
+ }
+ 
+ }  // namespace bluez
++
++#undef kSimulationIntervalMs
+diff -uNr a/device/bluetooth/dbus/fake_bluetooth_device_client.cc b/device/bluetooth/dbus/fake_bluetooth_device_client.cc
+--- a/device/bluetooth/dbus/fake_bluetooth_device_client.cc
++++ b/device/bluetooth/dbus/fake_bluetooth_device_client.cc
+@@ -40,6 +40,8 @@
+ #include "device/bluetooth/dbus/fake_bluetooth_profile_service_provider.h"
+ #include "third_party/cros_system_api/dbus/service_constants.h"
+ 
++#define kSimulationIntervalMs kSimulationIntervalMs_FBDC
++
+ namespace bluez {
+ 
+ namespace {
+@@ -2001,3 +2003,5 @@
+ }
+ 
+ }  // namespace bluez
++
++#undef kSimulationIntervalMs
+diff -uNr a/device/bluetooth/dbus/fake_bluetooth_gatt_characteristic_service_provider.cc b/device/bluetooth/dbus/fake_bluetooth_gatt_characteristic_service_provider.cc
+--- a/device/bluetooth/dbus/fake_bluetooth_gatt_characteristic_service_provider.cc
++++ b/device/bluetooth/dbus/fake_bluetooth_gatt_characteristic_service_provider.cc
+@@ -20,7 +20,7 @@
+ 
+ namespace bluez {
+ 
+-namespace {
++namespace fbgcsp {
+ 
+ bool CanWrite(const std::vector<std::string>& flags) {
+   if (find(flags.begin(), flags.end(),
+@@ -133,7 +133,7 @@
+     return;
+   }
+ 
+-  if (!CanRead(flags_)) {
++  if (!fbgcsp::CanRead(flags_)) {
+     DVLOG(1) << "GATT characteristic not readable.";
+     std::move(callback).Run(
+         device::BluetoothGattService::GattErrorCode::kFailed,
+@@ -163,7 +163,7 @@
+     return;
+   }
+ 
+-  if (!CanWrite(flags_)) {
++  if (!fbgcsp::CanWrite(flags_)) {
+     DVLOG(1) << "GATT characteristic not writeable.";
+     std::move(error_callback).Run();
+     return;
+@@ -194,7 +194,7 @@
+     return;
+   }
+ 
+-  if (!CanWrite(flags_)) {
++  if (!fbgcsp::CanWrite(flags_)) {
+     DVLOG(1) << "GATT characteristic not writeable.";
+     std::move(error_callback).Run();
+     return;
+@@ -220,7 +220,7 @@
+     return false;
+   }
+ 
+-  if (!CanNotify(flags_)) {
++  if (!fbgcsp::CanNotify(flags_)) {
+     DVLOG(1) << "GATT characteristic not notifiable.";
+     return false;
+   }
+diff -uNr a/device/bluetooth/dbus/fake_bluetooth_gatt_descriptor_service_provider.cc b/device/bluetooth/dbus/fake_bluetooth_gatt_descriptor_service_provider.cc
+--- a/device/bluetooth/dbus/fake_bluetooth_gatt_descriptor_service_provider.cc
++++ b/device/bluetooth/dbus/fake_bluetooth_gatt_descriptor_service_provider.cc
+@@ -18,7 +18,7 @@
+ 
+ namespace bluez {
+ 
+-namespace {
++namespace fbgdsp {
+ 
+ bool CanWrite(const std::vector<std::string>& flags) {
+   if (find(flags.begin(), flags.end(), bluetooth_gatt_descriptor::kFlagWrite) !=
+@@ -121,7 +121,7 @@
+     return;
+   }
+ 
+-  if (!CanRead(flags_)) {
++  if (!fbgdsp::CanRead(flags_)) {
+     std::move(callback).Run(
+         device::BluetoothGattService::GattErrorCode::kFailed,
+         /*value=*/std::vector<uint8_t>());
+@@ -160,7 +160,7 @@
+     return;
+   }
+ 
+-  if (!CanWrite(flags_)) {
++  if (!fbgdsp::CanWrite(flags_)) {
+     DVLOG(1) << "GATT descriptor not writeable.";
+     std::move(error_callback).Run();
+     return;
+diff -uNr a/device/bluetooth/floss/floss_adapter_client.cc b/device/bluetooth/floss/floss_adapter_client.cc
+--- a/device/bluetooth/floss/floss_adapter_client.cc
++++ b/device/bluetooth/floss/floss_adapter_client.cc
+@@ -17,6 +17,8 @@
+ #include "dbus/object_proxy.h"
+ #include "device/bluetooth/floss/floss_dbus_client.h"
+ 
++#define HandleExported HandleExported_FAC
++
+ namespace floss {
+ 
+ namespace {
+@@ -837,3 +839,5 @@
+     const std::string& arg2);
+ 
+ }  // namespace floss
++
++#undef HandleExported
+diff -uNr a/device/bluetooth/floss/floss_socket_manager.cc b/device/bluetooth/floss/floss_socket_manager.cc
+--- a/device/bluetooth/floss/floss_socket_manager.cc
++++ b/device/bluetooth/floss/floss_socket_manager.cc
+@@ -6,6 +6,8 @@
+ #include "base/containers/contains.h"
+ #include "base/types/expected.h"
+ 
++#define HandleExported HandleExported_FSM
++
+ namespace floss {
+ namespace {
+ void HandleExported(const std::string& method_name,
+@@ -769,3 +771,5 @@
+     dbus::ErrorResponse* error_response);
+ 
+ }  // namespace floss
++
++#undef HandleExported
+diff -uNr a/device/bluetooth/server_socket.cc b/device/bluetooth/server_socket.cc
+--- a/device/bluetooth/server_socket.cc
++++ b/device/bluetooth/server_socket.cc
+@@ -17,6 +17,8 @@
+ #include "mojo/public/cpp/bindings/self_owned_receiver.h"
+ #include "net/base/io_buffer.h"
+ 
++#define HoldReferenceUntilDisconnected HoldReferenceUntilDisconnected_DBSS
++
+ namespace bluetooth {
+ namespace {
+ // TODO(b/269348144) - BluetoothSocket is constructed in UI thread and must also
+@@ -106,3 +108,5 @@
+ }
+ 
+ }  // namespace bluetooth
++
++#undef HoldReferenceUntilDisconnected
+diff -uNr a/device/bluetooth/socket.cc b/device/bluetooth/socket.cc
+--- a/device/bluetooth/socket.cc
++++ b/device/bluetooth/socket.cc
+@@ -16,6 +16,8 @@
+ #include "mojo/public/cpp/bindings/receiver.h"
+ #include "net/base/io_buffer.h"
+ 
++#define HoldReferenceUntilDisconnected HoldReferenceUntilDisconnected_DBS
++
+ namespace bluetooth {
+ namespace {
+ // TODO(b/269348144) - BluetoothSocket is constructed in UI thread and must also
+@@ -207,3 +209,5 @@
+ }
+ 
+ }  // namespace bluetooth
++
++#undef HoldReferenceUntilDisconnected

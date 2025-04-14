@@ -1,0 +1,43 @@
+[3/1577] CXX obj/content/browser/browser/browser_jumbo_22.o
+  In file included from gen/content/browser/browser_jumbo_22.cc:16:
+  ./../../../src/content/browser/media/cdm_storage_manager.cc:20:12: error: redefinition of 'kUmaPrefix'
+    20 | const char kUmaPrefix[] = "Media.EME.CdmStorageManager.";
+        |            ^
+  ./../../../src/content/browser/media/cdm_storage_database.cc:29:12: note: previous definition is here
+    29 | const char kUmaPrefix[] = "Media.EME.CdmStorageDatabaseSQLiteError.";
+        |            ^
+  1 error generated.
+--- a/content/browser/media/cdm_storage_manager.cc
++++ b/content/browser/media/cdm_storage_manager.cc
+@@ -13,6 +13,8 @@
+ #include "media/cdm/cdm_type.h"
+ #include "media/mojo/mojom/cdm_storage.mojom.h"
+ 
++#define kUmaPrefix kUmaPrefix_CSM
++
+ namespace content {
+ 
+ namespace {
+@@ -257,3 +259,5 @@
+   return histogram_name;
+ }
+ }  // namespace content
++
++#undef kUmaPrefix
+--- a/content/browser/media/cdm_storage_database.cc
++++ b/content/browser/media/cdm_storage_database.cc
+@@ -10,6 +10,8 @@
+ #include "base/metrics/histogram_functions.h"
+ #include "sql/statement.h"
+ 
++#define kUmaPrefix kUmaPrefix_CSD
++
+ namespace content {
+ 
+ namespace {
+@@ -529,3 +531,5 @@
+ }
+ 
+ }  // namespace content
++
++#undef kUmaPrefix

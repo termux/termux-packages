@@ -1,0 +1,21 @@
+Origin: https://bitbucket.org/chromiumembedded/cef/pull-requests/380/linux-fix-compile-errors-when-allocator
+
+--- a/base/process/memory_linux.cc
++++ b/base/process/memory_linux.cc
+@@ -18,6 +18,16 @@
+ #include "base/threading/thread_restrictions.h"
+ #include "build/build_config.h"
+ 
++#if !BUILDFLAG(USE_ALLOCATOR_SHIM) && defined(LIBC_GLIBC)
++extern "C" {
++void* __libc_malloc(size_t size);
++void* __libc_calloc(size_t n, size_t size);
++void* __libc_realloc(void* address, size_t size);
++void* __libc_memalign(size_t alignment, size_t size);
++void __libc_free(void* ptr);
++}  // extern "C"
++#endif
++
+ namespace base {
+ 
+ namespace {

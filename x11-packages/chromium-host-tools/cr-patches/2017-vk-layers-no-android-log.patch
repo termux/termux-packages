@@ -1,0 +1,64 @@
+--- a/third_party/vulkan-deps/vulkan-validation-layers/src/layers/error_message/logging.h
++++ b/third_party/vulkan-deps/vulkan-validation-layers/src/layers/error_message/logging.h
+@@ -33,7 +33,7 @@
+ #include "generated/vk_layer_dispatch_table.h"
+ #include "generated/vk_object_types.h"
+ 
+-#if defined __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #include <android/log.h>
+ #define LOGCONSOLE(...) ((void)__android_log_print(ANDROID_LOG_INFO, "VALIDATION", __VA_ARGS__))
+ [[maybe_unused]] static const char *kForceDefaultCallbackKey = "debug.vvl.forcelayerlog";
+--- a/third_party/vulkan-deps/vulkan-validation-layers/src/layers/vk_layer_config.cpp
++++ b/third_party/vulkan-deps/vulkan-validation-layers/src/layers/vk_layer_config.cpp
+@@ -74,7 +74,7 @@
+ #endif
+ 
+ std::string GetEnvironment(const char *variable) {
+-#if !defined(__ANDROID__) && !defined(_WIN32)
++#if !(defined(__ANDROID__) && !defined(__TERMUX__)) && !defined(_WIN32)
+     const char *output = getenv(variable);
+     return output == NULL ? "" : output;
+ #elif defined(_WIN32)
+--- a/third_party/vulkan-deps/vulkan-validation-layers/src/layers/utils/android_ndk_types.h
++++ b/third_party/vulkan-deps/vulkan-validation-layers/src/layers/utils/android_ndk_types.h
+@@ -29,7 +29,9 @@
+ 
+ #pragma once
+ 
+-#if defined(__ANDROID__) && !defined(VK_USE_PLATFORM_ANDROID_KHR)
++#include <sys/cdefs.h>
++
++#if (defined(__ANDROID__) && !defined(__TERMUX__)) && !defined(VK_USE_PLATFORM_ANDROID_KHR)
+ #error "VK_USE_PLATFORM_ANDROID_KHR not defined for Android build!"
+ #endif
+ 
+--- a/third_party/vulkan-deps/vulkan-utility-libraries/src/src/layer/layer_settings_manager.cpp
++++ b/third_party/vulkan-deps/vulkan-utility-libraries/src/src/layer/layer_settings_manager.cpp
+@@ -32,7 +32,7 @@
+ #include <array>
+ #include <algorithm>
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ static std::string GetAndroidProperty(const char *name) {
+     std::string output;
+     const prop_info *pi = __system_property_find(name);
+@@ -51,7 +51,7 @@
+ #endif
+ 
+ static std::string GetEnvironment(const char *variable) {
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+     std::string result = GetAndroidProperty(variable);
+     // Workaround for screenshot layer backward compatibility
+     if (result.empty() && std::string(variable) == "debug.vulkan.screenshot.frames") {
+@@ -199,7 +199,7 @@
+     }
+ #endif
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+     std::string env_path = GetEnvironment("debug.vulkan.khronos_profiles.settings_path");
+ #else
+     // Look for an environment variable override for the settings file location

@@ -1,0 +1,104 @@
+--- a/base/system/sys_info_linux.cc
++++ b/base/system/sys_info_linux.cc
+@@ -126,7 +126,7 @@
+   return std::string();
+ }
+ 
+-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
++#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID) && !defined(__TERMUX__)
+ // static
+ SysInfo::HardwareInfo SysInfo::GetHardwareInfoSync() {
+   static const size_t kMaxStringSize = 100u;
+@@ -149,3 +149,81 @@
+ #endif
+ 
+ }  // namespace base
++
++#ifdef __TERMUX__
++
++#include <dlfcn.h>
++#include <sys/system_properties.h>
++
++#include "base/logging.h"
++
++#if 0 // (__ANDROID_API__ >= 21 /* 5.0 - Lollipop */)
++
++namespace {
++
++typedef int(SystemPropertyGetFunction)(const char*, char*);
++
++SystemPropertyGetFunction* DynamicallyLoadRealSystemPropertyGet() {
++  // libc.so should already be open, get a handle to it.
++  void* handle = dlopen("libc.so", RTLD_NOLOAD);
++  if (!handle) {
++    LOG(FATAL) << "Cannot dlopen libc.so: " << dlerror();
++  }
++  SystemPropertyGetFunction* real_system_property_get =
++      reinterpret_cast<SystemPropertyGetFunction*>(
++          dlsym(handle, "__system_property_get"));
++  if (!real_system_property_get) {
++    LOG(FATAL) << "Cannot resolve __system_property_get(): " << dlerror();
++  }
++  return real_system_property_get;
++}
++
++static base::LazyInstance<base::internal::LazySysInfoValue<
++    SystemPropertyGetFunction*,
++    DynamicallyLoadRealSystemPropertyGet>>::Leaky
++    g_lazy_real_system_property_get = LAZY_INSTANCE_INITIALIZER;
++
++}  // namespace
++
++// Android 'L' removes __system_property_get from the NDK, however it is still
++// a hidden symbol in libc. Until we remove all calls of __system_property_get
++// from Chrome we work around this by defining a weak stub here, which uses
++// dlsym to but ensures that Chrome uses the real system
++// implementatation when loaded.  http://crbug.com/392191.
++BASE_EXPORT int __system_property_get(const char* name, char* value) {
++  return g_lazy_real_system_property_get.Get().value()(name, value);
++}
++
++#endif
++
++namespace {
++
++std::string HardwareManufacturerName() {
++  char device_model_str[PROP_VALUE_MAX];
++  __system_property_get("ro.product.manufacturer", device_model_str);
++  return std::string(device_model_str);
++}
++
++}  // anonymous namespace
++
++namespace base {
++
++std::string SysInfo::HardwareModelName() {
++  char device_model_str[PROP_VALUE_MAX];
++  __system_property_get("ro.product.model", device_model_str);
++  return std::string(device_model_str);
++}
++
++// static
++SysInfo::HardwareInfo SysInfo::GetHardwareInfoSync() {
++  HardwareInfo info;
++  info.manufacturer = HardwareManufacturerName();
++  info.model = HardwareModelName();
++  DCHECK(IsStringUTF8(info.manufacturer));
++  DCHECK(IsStringUTF8(info.model));
++  return info;
++}
++
++}
++
++#endif // __TERMUX__
+--- ./base/system/sys_info.cc	2022-11-13 00:36:18.488042961 +0800
++++ /home/uchkks/Desktop/sys_info.cc	2022-11-13 00:36:06.418042900 +0800
+@@ -94,7 +94,7 @@
+ #endif
+ 
+ #if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_WIN) && \
+-    !BUILDFLAG(IS_CHROMEOS)
++    !BUILDFLAG(IS_CHROMEOS) && !defined(__TERMUX__)
+ std::string SysInfo::HardwareModelName() {
+   return std::string();
+ }

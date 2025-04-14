@@ -1,0 +1,582 @@
+https://sources.debian.org/data/main/c/chromium/122.0.6261.57-1/debian/patches/bookworm/undo-internal-alloc.patch
+
+Revert commit b4d62daa178298eaa6fc8b9bc7ec6835c95ad86e to work around error
+
+/usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/hashtable_policy.h:2058:28: error: excess elements in struct initializer
+      __buckets_alloc_type __alloc(_M_node_allocator());
+                           ^       ~~~~~~~~~~~~~~~~~~~
+
+--- a/base/allocator/partition_allocator/src/partition_alloc/BUILD.gn
++++ b/base/allocator/partition_allocator/src/partition_alloc/BUILD.gn
+@@ -388,7 +388,6 @@ if (is_clang_or_gcc) {
+       "gwp_asan_support.h",
+       "internal_allocator.cc",
+       "internal_allocator.h",
+-      "internal_allocator_forward.h",
+       "lightweight_quarantine.cc",
+       "lightweight_quarantine.h",
+       "memory_reclaimer.cc",
+@@ -457,6 +456,8 @@ if (is_clang_or_gcc) {
+     if (use_starscan) {
+       sources += [
+         "starscan/logging.h",
++        "starscan/metadata_allocator.cc",
++        "starscan/metadata_allocator.h",
+         "starscan/pcscan.cc",
+         "starscan/pcscan.h",
+         "starscan/pcscan_internal.cc",
+--- a/base/allocator/partition_allocator/src/partition_alloc/internal_allocator.cc
++++ b/base/allocator/partition_allocator/src/partition_alloc/internal_allocator.cc
+@@ -17,28 +17,4 @@ PartitionRoot& InternalAllocatorRoot() {
+ 
+   return *allocator;
+ }
+-
+-// static
+-void* InternalPartitionAllocated::operator new(size_t count) {
+-  return InternalAllocatorRoot().Alloc<AllocFlags::kNoHooks>(count);
+-}
+-// static
+-void* InternalPartitionAllocated::operator new(size_t count,
+-                                               std::align_val_t alignment) {
+-  return InternalAllocatorRoot().AlignedAlloc<AllocFlags::kNoHooks>(
+-      static_cast<size_t>(alignment), count);
+-}
+-// static
+-void InternalPartitionAllocated::operator delete(void* ptr) {
+-  InternalAllocatorRoot().Free<FreeFlags::kNoHooks>(ptr);
+-}
+-// static
+-void InternalPartitionAllocated::operator delete(void* ptr, std::align_val_t) {
+-  InternalAllocatorRoot().Free<FreeFlags::kNoHooks>(ptr);
+-}
+-
+-// A deleter for `std::unique_ptr<T>`.
+-void InternalPartitionDeleter::operator()(void* ptr) const {
+-  InternalAllocatorRoot().Free<FreeFlags::kNoHooks>(ptr);
+-}
+ }  // namespace partition_alloc::internal
+--- a/base/allocator/partition_allocator/src/partition_alloc/internal_allocator.h
++++ b/base/allocator/partition_allocator/src/partition_alloc/internal_allocator.h
+@@ -8,7 +8,6 @@
+ #include <new>
+ #include <type_traits>
+ 
+-#include "partition_alloc/internal_allocator_forward.h"
+ #include "partition_alloc/partition_alloc_base/component_export.h"
+ #include "partition_alloc/partition_root.h"
+ 
+@@ -24,38 +23,6 @@ namespace partition_alloc::internal {
+ PA_COMPONENT_EXPORT(PARTITION_ALLOC)
+ PartitionRoot& InternalAllocatorRoot();
+ 
+-// A class that meets C++ named requirements, Allocator.
+-template <typename T>
+-InternalAllocator<T>::value_type* InternalAllocator<T>::allocate(
+-    std::size_t count) {
+-  PA_CHECK(count <=
+-           std::numeric_limits<std::size_t>::max() / sizeof(value_type));
+-  return static_cast<value_type*>(
+-      InternalAllocatorRoot().Alloc<AllocFlags::kNoHooks>(count *
+-                                                          sizeof(value_type)));
+-}
+-template <typename T>
+-void InternalAllocator<T>::deallocate(value_type* ptr, std::size_t) {
+-  InternalAllocatorRoot().Free<FreeFlags::kNoHooks>(ptr);
+-}
+-
+-// Create an object on heap in the internal partition.
+-template <typename T, typename... Args>
+-T* ConstructAtInternalPartition(Args&&... args) {
+-  auto* memory = static_cast<T*>(
+-      InternalAllocatorRoot().Alloc<AllocFlags::kNoHooks>(sizeof(T)));
+-  return new (memory) T(std::forward<Args>(args)...);
+-}
+-
+-// Destroy an object on heap in the internal partition.
+-template <typename T>
+-void DestroyAtInternalPartition(T* ptr) {
+-  // Destroying an array is not supported.
+-  static_assert(!std::is_array_v<T>);
+-  ptr->~T();
+-  InternalAllocatorRoot().Free<FreeFlags::kNoHooks>(ptr);
+-}
+-
+ }  // namespace partition_alloc::internal
+ 
+ #endif  // BASE_ALLOCATOR_PARTITION_ALLOCATOR_SRC_PARTITION_ALLOC_INTERNAL_ALLOCATOR_H_
+--- a/base/allocator/partition_allocator/src/partition_alloc/internal_allocator_forward.h
++++ /dev/null
+@@ -1,67 +0,0 @@
+-// Copyright 2024 The Chromium Authors
+-// Use of this source code is governed by a BSD-style license that can be
+-// found in the LICENSE file.
+-
+-#ifndef BASE_ALLOCATOR_PARTITION_ALLOCATOR_SRC_PARTITION_ALLOC_INTERNAL_ALLOCATOR_FORWARD_H_
+-#define BASE_ALLOCATOR_PARTITION_ALLOCATOR_SRC_PARTITION_ALLOC_INTERNAL_ALLOCATOR_FORWARD_H_
+-
+-#include <new>
+-#include <type_traits>
+-
+-#include "partition_alloc/partition_alloc_base/component_export.h"
+-#include "partition_alloc/partition_alloc_forward.h"
+-
+-// Internal Allocator can be used to get heap allocations required to
+-// implement Partition Allocator's feature.
+-// As Internal Allocator being Partition Allocator with minimal configuration,
+-// it is not allowed to use this allocator for PA's core implementation to avoid
+-// reentrancy issues. Also don't use this when satisfying the very first PA-E
+-// allocation of the process.
+-
+-namespace partition_alloc::internal {
+-
+-PA_COMPONENT_EXPORT(PARTITION_ALLOC)
+-PartitionRoot& InternalAllocatorRoot();
+-
+-// A class that meets C++ named requirements, Allocator.
+-template <typename T>
+-class InternalAllocator {
+- public:
+-  // Member types required by allocator completeness requirements.
+-  using value_type = T;
+-  using size_type = std::size_t;
+-  using difference_type = std::ptrdiff_t;
+-  using propagate_on_container_move_assignment = std::true_type;
+-
+-  value_type* allocate(std::size_t count);
+-
+-  void deallocate(value_type* ptr, std::size_t);
+-};
+-
+-// Inherit this to make a class allocated on the internal partition.
+-struct PA_COMPONENT_EXPORT(PARTITION_ALLOC) InternalPartitionAllocated {
+-  static void* operator new(size_t count);
+-  static void* operator new(size_t count, std::align_val_t alignment);
+-  // Though we do not forward placement new, we need to define this explicitly
+-  // to allow it.
+-  static void* operator new(std::size_t, void* ptr) { return ptr; }
+-  static void operator delete(void* ptr);
+-  static void operator delete(void* ptr, std::align_val_t);
+-};
+-
+-// Create an object on heap in the internal partition.
+-template <typename T, typename... Args>
+-T* ConstructAtInternalPartition(Args&&... args);
+-
+-// Destroy an object on heap in the internal partition.
+-template <typename T>
+-void DestroyAtInternalPartition(T* ptr);
+-
+-// A deleter for `std::unique_ptr<T>`.
+-struct PA_COMPONENT_EXPORT(PARTITION_ALLOC) InternalPartitionDeleter final {
+-  void operator()(void* ptr) const;
+-};
+-
+-}  // namespace partition_alloc::internal
+-
+-#endif  // BASE_ALLOCATOR_PARTITION_ALLOCATOR_SRC_PARTITION_ALLOC_INTERNAL_ALLOCATOR_FORWARD_H_
+--- a/base/allocator/partition_allocator/src/partition_alloc/shim/nonscannable_allocator.cc
++++ b/base/allocator/partition_allocator/src/partition_alloc/shim/nonscannable_allocator.cc
+@@ -10,7 +10,7 @@
+ #include "partition_alloc/shim/allocator_shim_default_dispatch_to_partition_alloc.h"
+ 
+ #if BUILDFLAG(USE_STARSCAN)
+-#include "partition_alloc/internal_allocator.h"
++#include "partition_alloc/starscan/metadata_allocator.h"
+ #include "partition_alloc/starscan/pcscan.h"
+ #endif
+ #endif  // BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)
+@@ -68,7 +68,7 @@ void NonScannableAllocatorImpl<quarantin
+       quarantinable ? partition_alloc::PartitionOptions::kAllowed
+                     : partition_alloc::PartitionOptions::kDisallowed;
+   opts.backup_ref_ptr = partition_alloc::PartitionOptions::kDisabled;
+-  allocator_.reset(partition_alloc::internal::ConstructAtInternalPartition<
++  allocator_.reset(partition_alloc::internal::MakePCScanMetadata<
+                    partition_alloc::PartitionAllocator>(opts));
+   if constexpr (quarantinable) {
+     partition_alloc::internal::PCScan::RegisterNonScannableRoot(
+--- a/base/allocator/partition_allocator/src/partition_alloc/shim/nonscannable_allocator.h
++++ b/base/allocator/partition_allocator/src/partition_alloc/shim/nonscannable_allocator.h
+@@ -18,7 +18,7 @@
+ #include "partition_alloc/partition_alloc.h"
+ 
+ #if BUILDFLAG(USE_STARSCAN)
+-#include "partition_alloc/internal_allocator_forward.h"
++#include "partition_alloc/starscan/metadata_allocator.h"
+ #endif
+ #endif  // BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)
+ 
+@@ -67,7 +67,7 @@ class NonScannableAllocatorImpl final {
+ 
+ #if BUILDFLAG(USE_STARSCAN)
+   std::unique_ptr<partition_alloc::PartitionAllocator,
+-                  partition_alloc::internal::InternalPartitionDeleter>
++                  partition_alloc::internal::PCScanMetadataDeleter>
+       allocator_;
+   std::atomic_bool pcscan_enabled_{false};
+ #endif  // BUILDFLAG(USE_STARSCAN)
+--- /dev/null
++++ b/base/allocator/partition_allocator/src/partition_alloc/starscan/metadata_allocator.cc
+@@ -0,0 +1,35 @@
++// Copyright 2021 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#include "partition_alloc/partition_root.h"
++
++#include <cstring>
++
++#include "partition_alloc/partition_alloc_base/component_export.h"
++#include "partition_alloc/partition_alloc_base/no_destructor.h"
++
++namespace partition_alloc::internal {
++
++namespace {
++constexpr PartitionOptions kConfig{};
++}  // namespace
++
++PA_COMPONENT_EXPORT(PARTITION_ALLOC)
++PartitionRoot& PCScanMetadataAllocator() {
++  static internal::base::NoDestructor<PartitionRoot> allocator(kConfig);
++  return *allocator;
++}
++
++// TODO(tasak): investigate whether PartitionAlloc tests really need this
++// function or not. If we found no tests need, remove it.
++void ReinitPCScanMetadataAllocatorForTesting() {
++  // First, purge memory owned by PCScanMetadataAllocator.
++  PCScanMetadataAllocator().PurgeMemory(PurgeFlags::kDecommitEmptySlotSpans |
++                                        PurgeFlags::kDiscardUnusedSystemPages);
++  // Then, reinit the allocator.
++  PCScanMetadataAllocator().ResetForTesting(true);  // IN-TEST
++  PCScanMetadataAllocator().Init(kConfig);
++}
++
++}  // namespace partition_alloc::internal
+--- /dev/null
++++ b/base/allocator/partition_allocator/src/partition_alloc/starscan/metadata_allocator.h
+@@ -0,0 +1,86 @@
++// Copyright 2021 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#ifndef BASE_ALLOCATOR_PARTITION_ALLOCATOR_SRC_PARTITION_ALLOC_STARSCAN_METADATA_ALLOCATOR_H_
++#define BASE_ALLOCATOR_PARTITION_ALLOCATOR_SRC_PARTITION_ALLOC_STARSCAN_METADATA_ALLOCATOR_H_
++
++#include <utility>
++
++#include "partition_alloc/partition_alloc_base/component_export.h"
++#include "partition_alloc/partition_alloc_constants.h"
++#include "partition_alloc/partition_root.h"
++
++namespace partition_alloc::internal {
++
++PA_COMPONENT_EXPORT(PARTITION_ALLOC)
++PartitionRoot& PCScanMetadataAllocator();
++void ReinitPCScanMetadataAllocatorForTesting();
++
++// STL allocator which is needed to keep internal data structures required by
++// PCScan.
++template <typename T>
++class MetadataAllocator {
++ public:
++  using value_type = T;
++
++  MetadataAllocator() = default;
++
++  template <typename U>
++  MetadataAllocator(const MetadataAllocator<U>&) {}  // NOLINT
++
++  template <typename U>
++  MetadataAllocator& operator=(const MetadataAllocator<U>&) {
++    return *this;
++  }
++
++  template <typename U>
++  bool operator==(const MetadataAllocator<U>&) {
++    return true;
++  }
++
++  template <typename U>
++  bool operator!=(const MetadataAllocator<U>& o) {
++    return !operator==(o);
++  }
++
++  value_type* allocate(size_t size) {
++    return static_cast<value_type*>(
++        PCScanMetadataAllocator()
++            .AllocInline<partition_alloc::AllocFlags::kNoHooks>(
++                size * sizeof(value_type)));
++  }
++
++  void deallocate(value_type* ptr, size_t size) {
++    PCScanMetadataAllocator().FreeInline<FreeFlags::kNoHooks>(ptr);
++  }
++};
++
++// Inherit from it to make a class allocated on the metadata partition.
++struct AllocatedOnPCScanMetadataPartition {
++  static void* operator new(size_t size) {
++    return PCScanMetadataAllocator()
++        .AllocInline<partition_alloc::AllocFlags::kNoHooks>(size);
++  }
++  static void operator delete(void* ptr) {
++    PCScanMetadataAllocator().FreeInline<FreeFlags::kNoHooks>(ptr);
++  }
++};
++
++template <typename T, typename... Args>
++T* MakePCScanMetadata(Args&&... args) {
++  auto* memory = static_cast<T*>(
++      PCScanMetadataAllocator()
++          .AllocInline<partition_alloc::AllocFlags::kNoHooks>(sizeof(T)));
++  return new (memory) T(std::forward<Args>(args)...);
++}
++
++struct PCScanMetadataDeleter final {
++  inline void operator()(void* ptr) const {
++    PCScanMetadataAllocator().FreeInline<FreeFlags::kNoHooks>(ptr);
++  }
++};
++
++}  // namespace partition_alloc::internal
++
++#endif  // BASE_ALLOCATOR_PARTITION_ALLOCATOR_SRC_PARTITION_ALLOC_STARSCAN_METADATA_ALLOCATOR_H_
+--- a/base/allocator/partition_allocator/src/partition_alloc/starscan/pcscan.cc
++++ b/base/allocator/partition_allocator/src/partition_alloc/starscan/pcscan.cc
+@@ -93,6 +93,7 @@ void PCScan::SetClearType(ClearType clea
+ 
+ void PCScan::UninitForTesting() {
+   PCScanInternal::Instance().ClearRootsForTesting();  // IN-TEST
++  ReinitPCScanMetadataAllocatorForTesting();          // IN-TEST
+ }
+ 
+ void PCScan::ReinitForTesting(InitConfig config) {
+--- a/base/allocator/partition_allocator/src/partition_alloc/starscan/pcscan_internal.cc
++++ b/base/allocator/partition_allocator/src/partition_alloc/starscan/pcscan_internal.cc
+@@ -20,7 +20,6 @@
+ #include "build/build_config.h"
+ #include "partition_alloc/address_pool_manager.h"
+ #include "partition_alloc/allocation_guard.h"
+-#include "partition_alloc/internal_allocator.h"
+ #include "partition_alloc/page_allocator.h"
+ #include "partition_alloc/page_allocator_constants.h"
+ #include "partition_alloc/partition_address_space.h"
+@@ -41,6 +40,7 @@
+ #include "partition_alloc/partition_alloc_constants.h"
+ #include "partition_alloc/partition_page.h"
+ #include "partition_alloc/reservation_offset_table.h"
++#include "partition_alloc/starscan/metadata_allocator.h"
+ #include "partition_alloc/starscan/pcscan_scheduling.h"
+ #include "partition_alloc/starscan/raceful_worklist.h"
+ #include "partition_alloc/starscan/scan_loop.h"
+@@ -176,16 +176,16 @@ static_assert(kSuperPageSize >= sizeof(Q
+ #endif  // PA_CONFIG(STARSCAN_USE_CARD_TABLE)
+ 
+ template <typename T>
+-using MetadataVector = std::vector<T, InternalAllocator<T>>;
++using MetadataVector = std::vector<T, MetadataAllocator<T>>;
+ template <typename T>
+-using MetadataSet = std::set<T, std::less<>, InternalAllocator<T>>;
++using MetadataSet = std::set<T, std::less<>, MetadataAllocator<T>>;
+ template <typename K, typename V>
+ using MetadataHashMap =
+     std::unordered_map<K,
+                        V,
+                        std::hash<K>,
+                        std::equal_to<>,
+-                       InternalAllocator<std::pair<const K, V>>>;
++                       MetadataAllocator<std::pair<const K, V>>>;
+ 
+ struct GetSlotStartResult final {
+   PA_ALWAYS_INLINE bool is_found() const {
+@@ -478,7 +478,7 @@ class PCScanScanLoop;
+ // This class is responsible for performing the entire PCScan task.
+ // TODO(bikineev): Move PCScan algorithm out of PCScanTask.
+ class PCScanTask final : public base::RefCountedThreadSafe<PCScanTask>,
+-                         public InternalPartitionAllocated {
++                         public AllocatedOnPCScanMetadataPartition {
+  public:
+   // Creates and initializes a PCScan state.
+   PCScanTask(PCScan& pcscan, size_t quarantine_last_size);
+--- a/base/allocator/partition_allocator/src/partition_alloc/starscan/pcscan_internal.h
++++ b/base/allocator/partition_allocator/src/partition_alloc/starscan/pcscan_internal.h
+@@ -13,9 +13,9 @@
+ #include <utility>
+ #include <vector>
+ 
+-#include "partition_alloc/internal_allocator_forward.h"
+ #include "partition_alloc/partition_alloc_base/memory/scoped_refptr.h"
+ #include "partition_alloc/partition_alloc_base/no_destructor.h"
++#include "partition_alloc/starscan/metadata_allocator.h"
+ #include "partition_alloc/starscan/pcscan.h"
+ #include "partition_alloc/starscan/starscan_fwd.h"
+ #include "partition_alloc/starscan/write_protector.h"
+@@ -32,14 +32,13 @@ class PCScanInternal final {
+   using Root = PCScan::Root;
+   using TaskHandle = scoped_refptr<PCScanTask>;
+ 
+-  using SuperPages =
+-      std::vector<uintptr_t, internal::InternalAllocator<uintptr_t>>;
+-  using RootsMap = std::unordered_map<
+-      Root*,
+-      SuperPages,
+-      std::hash<Root*>,
+-      std::equal_to<>,
+-      internal::InternalAllocator<std::pair<Root* const, SuperPages>>>;
++  using SuperPages = std::vector<uintptr_t, MetadataAllocator<uintptr_t>>;
++  using RootsMap =
++      std::unordered_map<Root*,
++                         SuperPages,
++                         std::hash<Root*>,
++                         std::equal_to<>,
++                         MetadataAllocator<std::pair<Root* const, SuperPages>>>;
+ 
+   static PCScanInternal& Instance() {
+     // Since the data that PCScanInternal holds is cold, it's fine to have the
+@@ -116,7 +115,7 @@ class PCScanInternal final {
+       void*,
+       std::hash<internal::base::PlatformThreadId>,
+       std::equal_to<>,
+-      internal::InternalAllocator<
++      MetadataAllocator<
+           std::pair<const internal::base::PlatformThreadId, void*>>>;
+ 
+   PCScanInternal();
+--- a/base/allocator/partition_allocator/src/partition_alloc/starscan/raceful_worklist.h
++++ b/base/allocator/partition_allocator/src/partition_alloc/starscan/raceful_worklist.h
+@@ -9,10 +9,10 @@
+ #include <atomic>
+ #include <vector>
+ 
+-#include "partition_alloc/internal_allocator_forward.h"
+ #include "partition_alloc/partition_alloc_base/compiler_specific.h"
+ #include "partition_alloc/partition_alloc_base/rand_util.h"
+ #include "partition_alloc/partition_alloc_check.h"
++#include "partition_alloc/starscan/metadata_allocator.h"
+ 
+ namespace partition_alloc::internal {
+ 
+@@ -30,7 +30,7 @@ class RacefulWorklist {
+     std::atomic<bool> is_being_visited{false};
+     std::atomic<bool> is_visited{false};
+   };
+-  using Underlying = std::vector<Node, internal::InternalAllocator<Node>>;
++  using Underlying = std::vector<Node, MetadataAllocator<Node>>;
+ 
+  public:
+   class RandomizedView {
+@@ -88,7 +88,7 @@ template <typename Function>
+ void RacefulWorklist<T>::RandomizedView::Visit(Function f) {
+   auto& data = worklist_.data_;
+   std::vector<typename Underlying::iterator,
+-              internal::InternalAllocator<typename Underlying::iterator>>
++              MetadataAllocator<typename Underlying::iterator>>
+       to_revisit;
+ 
+   // To avoid worklist iteration, quick check if the worklist was already
+--- a/base/allocator/partition_allocator/src/partition_alloc/starscan/snapshot.cc
++++ b/base/allocator/partition_allocator/src/partition_alloc/starscan/snapshot.cc
+@@ -7,7 +7,6 @@
+ #include <memory>
+ #include <mutex>
+ 
+-#include "partition_alloc/internal_allocator.h"
+ #include "partition_alloc/partition_alloc_check.h"
+ #include "partition_alloc/starscan/pcscan_internal.h"
+ 
+--- a/base/allocator/partition_allocator/src/partition_alloc/starscan/snapshot.h
++++ b/base/allocator/partition_allocator/src/partition_alloc/starscan/snapshot.h
+@@ -8,13 +8,12 @@
+ #include <memory>
+ #include <utility>
+ 
+-#include "partition_alloc/internal_allocator_forward.h"
+ #include "partition_alloc/starscan/pcscan_internal.h"
+ #include "partition_alloc/starscan/raceful_worklist.h"
+ 
+ namespace partition_alloc::internal {
+ 
+-class StarScanSnapshot final : public InternalPartitionAllocated {
++class StarScanSnapshot final : public AllocatedOnPCScanMetadataPartition {
+  public:
+   using SuperPageBase = uintptr_t;
+   using SuperPagesWorklist = RacefulWorklist<SuperPageBase>;
+--- a/base/allocator/partition_allocator/src/partition_alloc/starscan/stats_collector.cc
++++ b/base/allocator/partition_allocator/src/partition_alloc/starscan/stats_collector.cc
+@@ -4,7 +4,6 @@
+ 
+ #include "partition_alloc/starscan/stats_collector.h"
+ 
+-#include "partition_alloc/internal_allocator.h"
+ #include "partition_alloc/partition_alloc_base/time/time.h"
+ #include "partition_alloc/starscan/logging.h"
+ #include "partition_alloc/starscan/stats_reporter.h"
+--- a/base/allocator/partition_allocator/src/partition_alloc/starscan/stats_collector.h
++++ b/base/allocator/partition_allocator/src/partition_alloc/starscan/stats_collector.h
+@@ -14,10 +14,9 @@
+ #include <unordered_map>
+ #include <utility>
+ 
+-#include "partition_alloc/internal_allocator_forward.h"
+ #include "partition_alloc/partition_alloc_base/threading/platform_thread.h"
+ #include "partition_alloc/partition_alloc_base/time/time.h"
+-#include "partition_alloc/partition_alloc_check.h"
++#include "partition_alloc/starscan/metadata_allocator.h"
+ #include "partition_alloc/starscan/starscan_fwd.h"
+ 
+ namespace partition_alloc {
+@@ -74,14 +73,13 @@ class StatsCollector final {
+     using IdType = StatsCollector::IdType<context>;
+     using PerThreadEvents =
+         std::array<DeferredTraceEvent, static_cast<size_t>(IdType::kNumIds)>;
+-    using UnderlyingMap =
+-        std::unordered_map<internal::base::PlatformThreadId,
+-                           PerThreadEvents,
+-                           std::hash<internal::base::PlatformThreadId>,
+-                           std::equal_to<>,
+-                           internal::InternalAllocator<
+-                               std::pair<const internal::base::PlatformThreadId,
+-                                         PerThreadEvents>>>;
++    using UnderlyingMap = std::unordered_map<
++        internal::base::PlatformThreadId,
++        PerThreadEvents,
++        std::hash<internal::base::PlatformThreadId>,
++        std::equal_to<>,
++        MetadataAllocator<std::pair<const internal::base::PlatformThreadId,
++                                    PerThreadEvents>>>;
+ 
+     inline void RegisterBeginEventFromCurrentThread(IdType id);
+     inline void RegisterEndEventFromCurrentThread(IdType id);
+@@ -139,9 +137,8 @@ class StatsCollector final {
+   void ReportTracesAndHists(partition_alloc::StatsReporter& reporter) const;
+ 
+  private:
+-  using MetadataString = std::basic_string<char,
+-                                           std::char_traits<char>,
+-                                           internal::InternalAllocator<char>>;
++  using MetadataString =
++      std::basic_string<char, std::char_traits<char>, MetadataAllocator<char>>;
+ 
+   MetadataString ToUMAString(ScannerId id) const;
+   MetadataString ToUMAString(MutatorId id) const;
+--- a/base/allocator/partition_allocator/src/partition_alloc/starscan/write_protector.h
++++ b/base/allocator/partition_allocator/src/partition_alloc/starscan/write_protector.h
+@@ -10,7 +10,7 @@
+ #include <mutex>
+ 
+ #include "build/build_config.h"
+-#include "partition_alloc/internal_allocator_forward.h"
++#include "partition_alloc/starscan/metadata_allocator.h"
+ #include "partition_alloc/starscan/pcscan.h"
+ #include "partition_alloc/starscan/raceful_worklist.h"
+ 
+@@ -19,7 +19,7 @@ namespace partition_alloc::internal {
+ // Interface for page protection/unprotection. This is used in DCScan to catch
+ // concurrent mutator writes. Protection is done when the scanner starts
+ // scanning a range. Unprotection happens at the end of the scanning phase.
+-class WriteProtector : public internal::InternalPartitionAllocated {
++class WriteProtector : public AllocatedOnPCScanMetadataPartition {
+  public:
+   virtual ~WriteProtector() = default;
+ 
