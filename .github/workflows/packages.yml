@@ -44,6 +44,8 @@ jobs:
       env:
         MANUAL_INPUT_PACKAGES: ${{ github.event.inputs.packages }}
       run: |
+        cat $GITHUB_EVENT_PATH
+        exit 1
         if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
           BASE_COMMIT=$(jq --raw-output .pull_request.base.sha "$GITHUB_EVENT_PATH")
           # We are intentionally not using .commits[0].id and .commits[-1].id as github seems to
