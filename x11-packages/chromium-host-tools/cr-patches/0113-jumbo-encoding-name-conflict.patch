@@ -1,0 +1,74 @@
+[16/36] CXX obj/media/cast/encoding/encoding_jumbo_1.o
+In file included from gen/media/cast/encoding_jumbo_1.cc:14:
+  ./../../../src/media/cast/encoding/av1_encoder.cc:26:11: error: redefinition of 'kRestartFramePeriods'
+    26 | const int kRestartFramePeriods = 3;
+        |           ^
+  ./../../../src/media/cast/encoding/vpx_encoder.cc:28:11: note: previous definition is here
+    28 | const int kRestartFramePeriods = 3;
+        |           ^
+--- a/media/cast/encoding/av1_encoder.cc
++++ b/media/cast/encoding/av1_encoder.cc
+@@ -14,6 +14,16 @@
+ #include "third_party/libaom/source/libaom/aom/aomcx.h"
+ #include "third_party/openscreen/src/cast/streaming/encoded_frame.h"
+ 
++#define HasSufficientFeedback                  HasSufficientFeedback_AV1
++#define kRestartFramePeriods                   kRestartFramePeriods_AV1
++#define kEncodingSpeedAccHalfLife              kEncodingSpeedAccHalfLife_AV1
++#define kHiTargetEncoderUtilization            kHiTargetEncoderUtilization_AV1
++#define kMidTargetEncoderUtilization           kMidTargetEncoderUtilization_AV1
++#define kLoTargetEncoderUtilization            kLoTargetEncoderUtilization_AV1
++#define kEquivalentEncodingSpeedStepPerQpStep  kEquivalentEncodingSpeedStepPerQpStep_AV1
++#define kHighestEncodingSpeed                  kHighestEncodingSpeed_AV1
++#define kLowestEncodingSpeed                   kLowestEncodingSpeed_AV1
++
+ namespace media {
+ namespace cast {
+ 
+@@ -403,3 +413,13 @@
+ 
+ }  // namespace cast
+ }  // namespace media
++
++#undef HasSufficientFeedback
++#undef kRestartFramePeriods
++#undef kEncodingSpeedAccHalfLife
++#undef kHiTargetEncoderUtilization
++#undef kMidTargetEncoderUtilization
++#undef kLoTargetEncoderUtilization
++#undef kEquivalentEncodingSpeedStepPerQpStep
++#undef kHighestEncodingSpeed
++#undef kLowestEncodingSpeed
+--- a/media/cast/encoding/vpx_encoder.cc
++++ b/media/cast/encoding/vpx_encoder.cc
+@@ -16,6 +16,16 @@
+ 
+ using Dependency = openscreen::cast::EncodedFrame::Dependency;
+ 
++#define HasSufficientFeedback                  HasSufficientFeedback_VPX
++#define kRestartFramePeriods                   kRestartFramePeriods_VPX
++#define kEncodingSpeedAccHalfLife              kEncodingSpeedAccHalfLife_VPX
++#define kHiTargetEncoderUtilization            kHiTargetEncoderUtilization_VPX
++#define kMidTargetEncoderUtilization           kMidTargetEncoderUtilization_VPX
++#define kLoTargetEncoderUtilization            kLoTargetEncoderUtilization_VPX
++#define kEquivalentEncodingSpeedStepPerQpStep  kEquivalentEncodingSpeedStepPerQpStep_VPX
++#define kHighestEncodingSpeed                  kHighestEncodingSpeed_VPX
++#define kLowestEncodingSpeed                   kLowestEncodingSpeed_VPX
++
+ namespace media {
+ namespace cast {
+ 
+@@ -451,3 +461,13 @@
+ 
+ }  // namespace cast
+ }  // namespace media
++
++#undef kEncodeSuffix
++#undef kRestartFramePeriods
++#undef kEncodingSpeedAccHalfLife
++#undef kHiTargetEncoderUtilization
++#undef kMidTargetEncoderUtilization
++#undef kLoTargetEncoderUtilization
++#undef kEquivalentEncodingSpeedStepPerQpStep
++#undef kHighestEncodingSpeed
++#undef kLowestEncodingSpeed

@@ -1,0 +1,169 @@
+This reverts https://github.com/chromium/chromium/commit/bcf739b95713071687ff25010683248de0092f6a
+
+--- a/components/qr_code_generator/BUILD.gn
++++ b/components/qr_code_generator/BUILD.gn
+@@ -11,6 +11,11 @@
+   enable_qr_print = false
+ }
+ 
++buildflag_header("rust_buildflags") {
++  header = "rust_buildflags.h"
++  flags = [ "ENABLE_RUST=$enable_rust" ]
++}
++
+ # Separate target to:
+ # - Limit `visibility` (stricter than dir-level `DEPS` would allow)
+ # - Allow `//chrome/services/qr_code_generator_service/public/cpp` to check the
+@@ -23,7 +28,10 @@
+     "features.cc",
+     "features.h",
+   ]
+-  deps = [ "//base" ]
++  deps = [
++    ":rust_buildflags",
++    "//base",
++  ]
+   visibility = [
+     ":qr_code_generator",
+     ":unit_tests",
+@@ -39,19 +47,27 @@
+   ]
+   deps = [
+     ":qr_code_generator_features",
+-    ":qr_code_generator_ffi_glue",
++    ":rust_buildflags",
+     "//base",
+   ]
++  if (enable_rust) {
++    deps += [
++      ":qr_code_generator_ffi_glue",
++      "//build/rust:cxx_cppdeps",
++    ]
++  }
+   public_deps = [ "//base" ]
+ }
+ 
+-rust_static_library("qr_code_generator_ffi_glue") {
+-  allow_unsafe = true  # Needed for FFI that underpins the `cxx` crate.
+-  crate_root = "qr_code_generator_ffi_glue.rs"
+-  sources = [ "qr_code_generator_ffi_glue.rs" ]
+-  cxx_bindings = [ "qr_code_generator_ffi_glue.rs" ]
+-  visibility = [ ":qr_code_generator" ]
+-  deps = [ "//third_party/rust/qr_code/v2:lib" ]
++if (enable_rust) {
++  rust_static_library("qr_code_generator_ffi_glue") {
++    allow_unsafe = true  # Needed for FFI that underpins the `cxx` crate.
++    crate_root = "qr_code_generator_ffi_glue.rs"
++    sources = [ "qr_code_generator_ffi_glue.rs" ]
++    cxx_bindings = [ "qr_code_generator_ffi_glue.rs" ]
++    visibility = [ ":qr_code_generator" ]
++    deps = [ "//third_party/rust/qr_code/v2:lib" ]
++  }
+ }
+ 
+ source_set("unit_tests") {
+@@ -60,6 +76,7 @@
+   deps = [
+     ":qr_code_generator",
+     ":qr_code_generator_features",
++    ":rust_buildflags",
+     "//base",
+     "//base/test:test_support",
+     "//testing/gtest",
+--- a/components/qr_code_generator/features.h
++++ b/components/qr_code_generator/features.h
+@@ -6,6 +6,7 @@
+ #define COMPONENTS_QR_CODE_GENERATOR_FEATURES_H_
+ 
+ #include "base/feature_list.h"
++#include "components/qr_code_generator/rust_buildflags.h"
+ 
+ namespace qr_code_generator {
+ 
+@@ -13,8 +14,10 @@
+ // but product code should instead use `IsRustyQrCodeGeneratorFeatureEnabled`.
+ BASE_DECLARE_FEATURE(kRustyQrCodeGeneratorFeature);
+ 
+-// Returns true if Rust should be used for QR code generation - i.e. if
+-// the `"RustyQrCodeGenerator"` base::Feature has been enabled.
++// Returns true if Rust should be used for QR code generation:
++// 1) the GN-level `enable_rust` is true.
++// *and*
++// 2) the `"RustyQrCodeGenerator"` base::Feature has been enabled.
+ //
+ // If Rust is used for QR code generation then:
+ // 1) //components/qr_code_generator becomes a thin wrapper around a 3rd-party
+@@ -26,7 +29,11 @@
+ // See https://crbug.com/1431991 for more details about the feature and the
+ // Rust QR Code Generator project.
+ inline bool IsRustyQrCodeGeneratorFeatureEnabled() {
++#if BUILDFLAG(ENABLE_RUST)
+   return base::FeatureList::IsEnabled(kRustyQrCodeGeneratorFeature);
++#else
++  return false;
++#endif
+ }
+ 
+ }  // namespace qr_code_generator
+--- a/components/qr_code_generator/qr_code_generator.cc
++++ b/components/qr_code_generator/qr_code_generator.cc
+@@ -11,12 +11,15 @@
+ #include <vector>
+ 
+ #include "base/check_op.h"
+-#include "base/containers/span_rust.h"
+ #include "base/memory/raw_ptr.h"
+ #include "base/notreached.h"
+ #include "base/numerics/safe_conversions.h"
+ #include "components/qr_code_generator/features.h"
++
++#if BUILDFLAG(ENABLE_RUST)
++#include "base/containers/span_rust.h"
+ #include "components/qr_code_generator/qr_code_generator_ffi_glue.rs.h"
++#endif
+ 
+ namespace qr_code_generator {
+ 
+@@ -572,6 +575,7 @@
+   return sum;
+ }
+ 
++#if BUILDFLAG(ENABLE_RUST)
+ absl::optional<QRCodeGenerator::GeneratedCode> GenerateQrCodeUsingRust(
+     base::span<const uint8_t> in,
+     absl::optional<int> min_version) {
+@@ -596,6 +600,7 @@
+   CHECK_EQ(code.data.size(), static_cast<size_t>(code.qr_size * code.qr_size));
+   return code;
+ }
++#endif
+ 
+ }  // namespace
+ 
+@@ -618,9 +613,11 @@
+ absl::optional<QRCodeGenerator::GeneratedCode> QRCodeGenerator::Generate(
+     base::span<const uint8_t> in,
+     absl::optional<int> min_version) {
++#if BUILDFLAG(ENABLE_RUST)
+   if (IsRustyQrCodeGeneratorFeatureEnabled()) {
+     return GenerateQrCodeUsingRust(in, min_version);
+   }
++#endif
+
+   if (in.size() > kMaxInputSize) {
+     return absl::nullopt;
+--- a/components/qr_code_generator/qr_code_generator_unittest.cc
++++ b/components/qr_code_generator/qr_code_generator_unittest.cc
+@@ -298,9 +298,12 @@
+   ASSERT_FALSE(qr.Generate(huge_input, std::make_optional(-1)));
+ }
+ 
++#if BUILDFLAG(ENABLE_RUST)
+ INSTANTIATE_TEST_SUITE_P(RustEnabled,
+                          QRCodeGeneratorTest,
+                          ::testing::Values(RustFeatureState::kRustEnabled));
++#endif
++
+ INSTANTIATE_TEST_SUITE_P(RustDisabled,
+                          QRCodeGeneratorTest,
+                          ::testing::Values(RustFeatureState::kRustDisabled));

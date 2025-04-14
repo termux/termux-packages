@@ -1,0 +1,404 @@
+Enable jumbo build for the following component(s)/source_set(s):
+
+- //base:i18n
+- //url:url
+- //crypto:crypto
+- //gin:gin
+- //google_apis:google_apis
+- //google_apis/gcm:gcm
+- //headless:headless_non_renderer
+- //ipc:ipc
+- //ipc:message_support
+- //sql:sql
+- //ui/accessibility/platform:platform
+
+--- a/base/BUILD.gn
++++ b/base/BUILD.gn
+@@ -2652,7 +2652,7 @@
+   }
+ }
+ 
+-component("i18n") {
++jumbo_component("i18n") {
+   output_name = "base_i18n"
+   sources = [
+     "i18n/base_i18n_export.h",
+--- a/url/BUILD.gn
++++ b/url/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/buildflag_header.gni")
++import("//build/config/jumbo.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
+ import("//testing/test.gni")
+ import("features.gni")
+@@ -19,7 +20,7 @@
+   flags = [ "USE_PLATFORM_ICU_ALTERNATIVES=$use_platform_icu_alternatives" ]
+ }
+ 
+-component("url") {
++jumbo_component("url") {
+   sources = [
+     "gurl.cc",
+     "gurl.h",
+--- a/crypto/BUILD.gn
++++ b/crypto/BUILD.gn
+@@ -4,6 +4,7 @@
+ 
+ import("//build/buildflag_header.gni")
+ import("//build/config/chromeos/ui_mode.gni")
++import("//build/config/jumbo.gni")
+ import("//components/nacl/toolchain.gni")
+ import("//crypto/features.gni")
+ import("//testing/test.gni")
+@@ -13,7 +14,7 @@
+   flags = [ "USE_NSS_CERTS=$use_nss_certs" ]
+ }
+ 
+-component("crypto") {
++jumbo_component("crypto") {
+   output_name = "crcrypto"  # Avoid colliding with OpenSSL's libcrypto.
+   sources = [
+     "aead.cc",
+--- a/dbus/BUILD.gn
++++ b/dbus/BUILD.gn
+@@ -3,13 +3,14 @@
+ # found in the LICENSE file.
+
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//testing/test.gni")
+ import("//third_party/protobuf/proto_library.gni")
+
+ assert(use_dbus)
+
+-component("dbus") {
++jumbo_component("dbus") {
+   sources = [
+     "bus.cc",
+     "bus.h",
+diff -uNr a/gin/BUILD.gn b/gin/BUILD.gn
+--- a/gin/BUILD.gn
++++ b/gin/BUILD.gn
+@@ -6,11 +6,12 @@
+   import("//build/config/android/rules.gni")
+ }
+ import("//base/allocator/partition_allocator/partition_alloc.gni")
++import("//build/config/jumbo.gni")
+ import("//testing/test.gni")
+ import("//tools/v8_context_snapshot/v8_context_snapshot.gni")
+ import("//v8/gni/v8.gni")
+ 
+-component("gin") {
++jumbo_component("gin") {
+   sources = [
+     "arguments.cc",
+     "arguments.h",
+@@ -78,6 +79,9 @@
+     "wrappable.h",
+     "wrapper_info.cc",
+   ]
++  jumbo_excluded_sources = [
++    "converter.cc", # Fail to compile
++  ]
+ 
+   if (use_partition_alloc) {
+     sources += [
+diff -uNr a/gin/per_isolate_data.cc b/gin/per_isolate_data.cc
+--- a/gin/per_isolate_data.cc
++++ b/gin/per_isolate_data.cc
+@@ -41,7 +41,7 @@
+ 
+ PerIsolateData::PerIsolateData(
+     Isolate* isolate,
+-    ArrayBuffer::Allocator* allocator,
++    v8::ArrayBuffer::Allocator* allocator,
+     IsolateHolder::AccessMode access_mode,
+     scoped_refptr<base::SingleThreadTaskRunner> task_runner,
+     scoped_refptr<base::SingleThreadTaskRunner> low_priority_task_runner)
+diff -uNr a/google_apis/BUILD.gn b/google_apis/BUILD.gn
+--- a/google_apis/BUILD.gn
++++ b/google_apis/BUILD.gn
+@@ -6,6 +6,7 @@
+ import("//build/config/chrome_build.gni")
+ import("//build/config/chromeos/ui_mode.gni")
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//extensions/buildflags/buildflags.gni")
+ import("//testing/test.gni")
+ import("//third_party/protobuf/proto_library.gni")
+@@ -111,7 +112,7 @@
+   }
+ }
+ 
+-component("google_apis") {
++jumbo_component("google_apis") {
+   sources = [
+     "credentials_mode.cc",
+     "credentials_mode.h",
+diff -uNr a/google_apis/gaia/oauth2_access_token_fetcher_impl.cc b/google_apis/gaia/oauth2_access_token_fetcher_impl.cc
+--- a/google_apis/gaia/oauth2_access_token_fetcher_impl.cc
++++ b/google_apis/gaia/oauth2_access_token_fetcher_impl.cc
+@@ -25,6 +25,9 @@
+ #include "services/network/public/cpp/simple_url_loader.h"
+ #include "services/network/public/mojom/url_response_head.mojom.h"
+ 
++#define kAccessTokenKey kAccessTokenKey_Access
++#define kExpiresInKey   kExpiresInKey_Access
++
+ namespace {
+ 
+ constexpr char kGetAccessTokenBodyFormat[] =
+@@ -441,3 +444,6 @@
+ 
+   return true;
+ }
++
++#undef kAccessTokenKey
++#undef kExpiresInKey
+diff -uNr a/google_apis/gaia/oauth2_mint_token_flow.cc b/google_apis/gaia/oauth2_mint_token_flow.cc
+--- a/google_apis/gaia/oauth2_mint_token_flow.cc
++++ b/google_apis/gaia/oauth2_mint_token_flow.cc
+@@ -31,6 +31,9 @@
+ #include "net/cookies/cookie_constants.h"
+ #include "services/network/public/mojom/url_response_head.mojom.h"
+ 
++#define kAccessTokenKey kAccessTokenKey_Mint
++#define kExpiresInKey   kExpiresInKey_Mint
++
+ namespace {
+ 
+ const char kValueFalse[] = "false";
+@@ -515,3 +518,6 @@
+         }
+       })");
+ }
++
++#undef kAccessTokenKey
++#undef kExpiresInKey
+
+diff -uNr a/google_apis/gcm/BUILD.gn b/google_apis/gcm/BUILD.gn
+--- a/google_apis/gcm/BUILD.gn
++++ b/google_apis/gcm/BUILD.gn
+@@ -2,10 +2,11 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//testing/test.gni")
+ import("//third_party/protobuf/proto_library.gni")
+ 
+-component("gcm") {
++jumbo_component("gcm") {
+   sources = [
+     "base/gcm_constants.cc",
+     "base/gcm_constants.h",
+diff -uNr a/google_apis/gcm/engine/instance_id_delete_token_request_handler.cc b/google_apis/gcm/engine/instance_id_delete_token_request_handler.cc
+--- a/google_apis/gcm/engine/instance_id_delete_token_request_handler.cc
++++ b/google_apis/gcm/engine/instance_id_delete_token_request_handler.cc
+@@ -10,6 +10,13 @@
+ #include "base/strings/string_number_conversions.h"
+ #include "google_apis/gcm/base/gcm_util.h"
+ 
++#define kGMSVersionKey kGMSVersionKey_InstanceIDDeleteTokenRequestHandler
++#define kSenderKey     kSenderKey_InstanceIDDeleteTokenRequestHandler
++#define kInstanceIDKey kInstanceIDKey_InstanceIDDeleteTokenRequestHandler
++#define kScopeKey      kScopeKey_InstanceIDDeleteTokenRequestHandler
++#define kExtraScopeKey kExtraScopeKey_InstanceIDDeleteTokenRequestHandler
++#define kTokenPrefix   kTokenPrefix_InstanceIDDeleteTokenRequestHandler
++
+ namespace gcm {
+ 
+ namespace {
+@@ -61,3 +68,10 @@
+ }
+ 
+ }  // namespace gcm
++
++#undef kGMSVersionKey
++#undef kSenderKey
++#undef kInstanceIDKey
++#undef kScopeKey
++#undef kExtraScopeKey
++#undef kTokenPrefix
+diff -uNr a/google_apis/gcm/engine/unregistration_request.cc b/google_apis/gcm/engine/unregistration_request.cc
+--- a/google_apis/gcm/engine/unregistration_request.cc
++++ b/google_apis/gcm/engine/unregistration_request.cc
+@@ -25,6 +25,19 @@
+ #include "services/network/public/cpp/simple_url_loader.h"
+ #include "services/network/public/mojom/url_response_head.mojom.h"
+ 
++#define kRequestContentType      kRequestContentType_UnRegistrationRequest
++#define kCategoryKey             kCategoryKey_UnRegistrationRequest
++#define kSubtypeKey              kSubtypeKey_UnRegistrationRequest
++#define kDeleteKey               kDeleteKey_UnRegistrationRequest
++#define kDeleteValue             kDeleteValue_UnRegistrationRequest
++#define kDeviceIdKey             kDeviceIdKey_UnRegistrationRequest
++#define kLoginHeader             kLoginHeader_UnRegistrationRequest
++#define kErrorPrefix             kErrorPrefix_UnRegistrationRequest
++#define kInvalidParameters       kInvalidParameters_UnRegistrationRequest
++#define kInternalServerError     kInternalServerError_UnRegistrationRequest
++#define kDeviceRegistrationError kDeviceRegistrationError_UnRegistrationRequest
++#define GetStatusFromError       GetStatusFromError_UnRegistrationRequest
++
+ namespace gcm {
+ 
+ namespace {
+@@ -295,3 +308,16 @@
+ }
+ 
+ }  // namespace gcm
++
++#undef kRequestContentType
++#undef kCategoryKey
++#undef kSubtypeKey
++#undef kDeleteKey
++#undef kDeleteValue
++#undef kDeviceIdKey
++#undef kLoginHeader
++#undef kErrorPrefix
++#undef kInvalidParameters
++#undef kInternalServerError
++#undef kDeviceRegistrationError
++#undef GetStatusFromError
+diff -uNr a/headless/BUILD.gn b/headless/BUILD.gn
+--- a/headless/BUILD.gn
++++ b/headless/BUILD.gn
+@@ -4,6 +4,7 @@
+ 
+ import("//build/config/c++/c++.gni")
+ import("//build/config/chrome_build.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/python.gni")
+ import("//build/util/lastchange.gni")
+ import("//build/util/process_version.gni")
+@@ -299,7 +300,7 @@
+ }
+ 
+ # Code that is not needed in a renderer process.
+-component("headless_non_renderer") {
++jumbo_component("headless_non_renderer") {
+   sources = [
+     "lib/browser/command_line_handler.cc",
+     "lib/browser/command_line_handler.h",
+@@ -362,6 +363,9 @@
+     "public/util/user_agent.cc",
+     "public/util/user_agent.h",
+   ]
++  jumbo_excluded_sources = [
++    "lib/utility/headless_content_utility_client.cc", # Conflict with //headless:headless_shell_lib
++  ]
+ 
+   configs += [ "//build/config/compiler:wexit_time_destructors" ]
+ 
+diff -uNr a/headless/lib/browser/headless_web_contents_impl.cc b/headless/lib/browser/headless_web_contents_impl.cc
+--- a/headless/lib/browser/headless_web_contents_impl.cc
++++ b/headless/lib/browser/headless_web_contents_impl.cc
+@@ -337,10 +337,10 @@
+       browser_context->options()->font_render_hinting();
+ 
+   base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
+-  if (command_line->HasSwitch(switches::kForceWebRtcIPHandlingPolicy)) {
++  if (command_line->HasSwitch(::switches::kForceWebRtcIPHandlingPolicy)) {
+     web_contents_->GetMutableRendererPrefs()->webrtc_ip_handling_policy =
+         command_line->GetSwitchValueASCII(
+-            switches::kForceWebRtcIPHandlingPolicy);
++            ::switches::kForceWebRtcIPHandlingPolicy);
+   }
+ 
+   web_contents_->SetDelegate(web_contents_delegate_.get());
+diff -uNr a/ipc/BUILD.gn b/ipc/BUILD.gn
+--- a/ipc/BUILD.gn
++++ b/ipc/BUILD.gn
+@@ -4,6 +4,7 @@
+ 
+ import("//build/buildflag_header.gni")
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/nacl/config.gni")
+ import("//ipc/features.gni")
+ import("//mojo/public/tools/bindings/mojom.gni")
+@@ -17,7 +18,7 @@
+   flags = [ "IPC_MESSAGE_LOG_ENABLED=$enable_ipc_logging" ]
+ }
+ 
+-component("ipc") {
++jumbo_component("ipc") {
+   sources = [
+     # These are the param_traits sources needed by all platforms,
+     # including ios. The rest are added in a conditional block below.
+@@ -107,7 +108,7 @@
+   }
+ }
+ 
+-component("message_support") {
++jumbo_component("message_support") {
+   sources = [
+     "ipc_message.cc",
+     "ipc_message.h",
+diff -uNr a/ipc/ipc_sync_channel.cc b/ipc/ipc_sync_channel.cc
+--- a/ipc/ipc_sync_channel.cc
++++ b/ipc/ipc_sync_channel.cc
+@@ -35,6 +35,8 @@
+ 
+ using base::WaitableEvent;
+ 
++#define OnEventReady OnEventReadySyncChannel
++
+ namespace IPC {
+ 
+ namespace {
+@@ -616,3 +618,5 @@
+ }
+ 
+ }  // namespace IPC
++
++#undef OnEventReady
+diff -uNr a/ipc/ipc_sync_message_filter.cc b/ipc/ipc_sync_message_filter.cc
+--- a/ipc/ipc_sync_message_filter.cc
++++ b/ipc/ipc_sync_message_filter.cc
+@@ -17,6 +17,8 @@
+ #include "mojo/public/cpp/bindings/associated_receiver.h"
+ #include "mojo/public/cpp/bindings/sync_handle_registry.h"
+ 
++#define OnEventReady OnEventReadySyncMessageFilter
++
+ namespace IPC {
+ 
+ namespace {
+@@ -199,3 +201,5 @@
+ }
+ 
+ }  // namespace IPC
++
++#undef OnEventReady
+diff -uNr a/sql/BUILD.gn b/sql/BUILD.gn
+--- a/sql/BUILD.gn
++++ b/sql/BUILD.gn
+@@ -2,10 +2,11 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
+ import("//testing/test.gni")
+ 
+-component("sql") {
++jumbo_component("sql") {
+   sources = [
+     "database.cc",
+     "database.h",
+diff -uNr a/ui/accessibility/platform/BUILD.gn b/ui/accessibility/platform/BUILD.gn
+--- a/ui/accessibility/platform/BUILD.gn
++++ b/ui/accessibility/platform/BUILD.gn
+@@ -27,7 +27,7 @@
+   import("//build/config/android/rules.gni")
+ }
+ 
+-component("platform") {
++jumbo_component("platform") {
+   output_name = "accessibility_platform"
+ 
+   defines = [ "IS_AX_PLATFORM_IMPL" ]

@@ -1,0 +1,38 @@
+[1/1482] CXX host/obj/v8/v8_base_without_compiler/v8_base_without_compiler_jumbo_3.o
+  ../../../../src/v8/src/handles/global-handles.cc:759:9: error: no member named 'kGCTypeProcessWeakCallbacks' in 'v8::internal::(anonymous namespace)::GCType'; did you mean simply 'kGCTypeProcessWeakCallbacks'?
+    759 |         GCType::kGCTypeProcessWeakCallbacks, kNoGCCallbackFlags,
+        |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        |         kGCTypeProcessWeakCallbacks
+  ../../../src/v8/include/v8-callbacks.h:160:3: note: 'kGCTypeProcessWeakCallbacks' declared here
+    160 |   kGCTypeProcessWeakCallbacks = 1 << 4,
+        |   ^
+  In file included from host/gen/v8/v8_base_without_compiler_jumbo_3.cc:57:
+  ./../../../src/v8/src/handles/global-handles.cc:771:9: error: no member named 'kGCTypeProcessWeakCallbacks' in 'v8::internal::(anonymous namespace)::GCType'; did you mean simply 'kGCTypeProcessWeakCallbacks'?
+    771 |         GCType::kGCTypeProcessWeakCallbacks, kNoGCCallbackFlags,
+        |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        |         kGCTypeProcessWeakCallbacks
+  ../../../src/v8/include/v8-callbacks.h:160:3: note: 'kGCTypeProcessWeakCallbacks' declared here
+    160 |   kGCTypeProcessWeakCallbacks = 1 << 4,
+        |   ^
+  2 errors generated.
+
+--- a/v8/src/handles/global-handles.cc
++++ b/v8/src/handles/global-handles.cc
+@@ -756,7 +756,7 @@
+   if (scope.CheckReenter()) {
+     TRACE_EVENT0("v8", "V8.GCPhantomHandleProcessingCallback");
+     isolate()->heap()->CallGCPrologueCallbacks(
+-        GCType::kGCTypeProcessWeakCallbacks, kNoGCCallbackFlags,
++        ::v8::GCType::kGCTypeProcessWeakCallbacks, kNoGCCallbackFlags,
+         GCTracer::Scope::HEAP_EXTERNAL_PROLOGUE);
+     {
+       TRACE_GC(isolate_->heap()->tracer(),
+@@ -768,7 +768,7 @@
+       }
+     }
+     isolate()->heap()->CallGCEpilogueCallbacks(
+-        GCType::kGCTypeProcessWeakCallbacks, kNoGCCallbackFlags,
++        ::v8::GCType::kGCTypeProcessWeakCallbacks, kNoGCCallbackFlags,
+         GCTracer::Scope::HEAP_EXTERNAL_EPILOGUE);
+   }
+ }

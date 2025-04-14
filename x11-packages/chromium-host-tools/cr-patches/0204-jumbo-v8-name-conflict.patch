@@ -1,0 +1,46 @@
+[3/1663] CXX host/obj/v8/v8_turboshaft/v8_turboshaft_jumbo_1.o
+  In file included from host/gen/v8/v8_turboshaft_jumbo_1.cc:25:
+  ./../../../src/v8/src/compiler/turboshaft/maglev-graph-building-phase.cc:241:26: error: reference to 'GraphBuilder' is ambiguous
+  241 |   maglev::GraphProcessor<GraphBuilder, true> builder(data.graph(), temp_zone);
+      |                          ^
+  ./../../../src/v8/src/compiler/turboshaft/maglev-graph-building-phase.cc:17:7: note: candidate found by name lookup is 'v8::internal::compiler::turboshaft::GraphBuilder'
+  17 | class GraphBuilder {
+      |       ^
+  ./../../../src/v8/src/compiler/turboshaft/graph-builder.cc:51:8: note: candidate found by name lookup is 'v8::internal::compiler::turboshaft::(anonymous namespace)::GraphBuilder'
+  51 | struct GraphBuilder {
+      |        ^
+  In file included from host/gen/v8/v8_turboshaft_jumbo_1.cc:25:
+  ./../../../src/v8/src/compiler/turboshaft/maglev-graph-building-phase.cc:241:26: error: reference to 'GraphBuilder' is ambiguous
+  241 |   maglev::GraphProcessor<GraphBuilder, true> builder(data.graph(), temp_zone);
+      |                          ^
+  ./../../../src/v8/src/compiler/turboshaft/maglev-graph-building-phase.cc:17:7: note: candidate found by name lookup is 'v8::internal::compiler::turboshaft::GraphBuilder'
+  17 | class GraphBuilder {
+      |       ^
+  ./../../../src/v8/src/compiler/turboshaft/graph-builder.cc:51:8: note: candidate found by name lookup is 'v8::internal::compiler::turboshaft::(anonymous namespace)::GraphBuilder'
+  51 | struct GraphBuilder {
+      |        ^
+--- a/v8/src/compiler/turboshaft/maglev-graph-building-phase.cc
++++ b/v8/src/compiler/turboshaft/maglev-graph-building-phase.cc
+@@ -14,11 +14,11 @@
+ 
+ #include "src/compiler/turboshaft/define-assembler-macros.inc"
+ 
+-class GraphBuilder {
++class GraphBuilder_MGBP {
+  public:
+   using Assembler = TSAssembler<>;
+ 
+-  GraphBuilder(Graph& graph, Zone* temp_zone)
++  GraphBuilder_MGBP(Graph& graph, Zone* temp_zone)
+       : temp_zone_(temp_zone),
+         assembler_(graph, graph, temp_zone),
+         node_mapping_(temp_zone),
+@@ -238,7 +238,7 @@
+       compilation_info->toplevel_compilation_unit(), maglev_graph);
+   maglev_graph_builder.Build();
+ 
+-  maglev::GraphProcessor<GraphBuilder, true> builder(data.graph(), temp_zone);
++  maglev::GraphProcessor<GraphBuilder_MGBP, true> builder(data.graph(), temp_zone);
+   builder.ProcessGraph(maglev_graph);
+ }
+ 

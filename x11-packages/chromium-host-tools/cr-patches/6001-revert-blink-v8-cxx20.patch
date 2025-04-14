@@ -1,0 +1,725 @@
+This reverts https://github.com/chromium/chromium/commit/940af9f2c87b436559b97c53763aa9eaaf1254eb
+
+--- a/third_party/blink/renderer/bindings/core/v8/native_value_traits.h
++++ b/third_party/blink/renderer/bindings/core/v8/native_value_traits.h
+@@ -5,7 +5,6 @@
+ #ifndef THIRD_PARTY_BLINK_RENDERER_BINDINGS_CORE_V8_NATIVE_VALUE_TRAITS_H_
+ #define THIRD_PARTY_BLINK_RENDERER_BINDINGS_CORE_V8_NATIVE_VALUE_TRAITS_H_
+ 
+-#include <concepts>
+ #include <type_traits>
+ 
+ #include "third_party/blink/renderer/bindings/core/v8/idl_types_base.h"
+@@ -31,7 +30,7 @@
+ //     return toInt32(isolate, value, exceptionState, NormalConversion);
+ //   }
+ // }
+-template <typename T>
++template <typename T, typename SFINAEHelper = void>
+ struct NativeValueTraits;
+ 
+ // This declaration serves only as a blueprint for specializations: the
+@@ -46,15 +45,22 @@
+ 
+ namespace bindings {
+ 
++template <typename T, typename = void>
++struct NativeValueTraitsHasIsNull : std::false_type {};
++
+ template <typename T>
+-struct ImplTypeFor {
+-  using type = T;
+-};
++struct NativeValueTraitsHasIsNull<
++    T,
++    std::void_t<decltype(std::declval<T>().IsNull())>> : std::true_type {};
+ 
+ template <typename T>
+-  requires std::derived_from<T, IDLBase>
+-struct ImplTypeFor<T> {
+-  using type = typename T::ImplType;
++struct NativeValueTraitsHasNullValue {
++  // true if |T| supports IDL null value.
++  static constexpr bool value =
++      // ScriptValue, String, and union types have IsNull member function.
++      bindings::NativeValueTraitsHasIsNull<T>::value ||
++      // Pointer types have nullptr as IDL null value.
++      std::is_pointer<T>::value;
+ };
+ 
+ }  // namespace bindings
+@@ -72,17 +78,37 @@
+ // If present, |NullValue()| will be used when converting from the nullable type
+ // T?, and should be used if the impl type has an existing "null" state. If not
+ // present, WTF::Optional will be used to wrap the type.
+-template <typename T>
++template <typename T, typename SFINAEHelper = void>
+ struct NativeValueTraitsBase {
+   STATIC_ONLY(NativeValueTraitsBase);
+ 
+-  using ImplType = bindings::ImplTypeFor<T>::type;
++  using ImplType = T;
++
++  static constexpr bool has_null_value =
++      bindings::NativeValueTraitsHasNullValue<ImplType>::value;
++
++  template <typename... ExtraArgs>
++  static decltype(auto) ArgumentValue(v8::Isolate* isolate,
++                                      int argument_index,
++                                      v8::Local<v8::Value> value,
++                                      ExceptionState& exception_state,
++                                      ExtraArgs... extra_args) {
++    return NativeValueTraits<std::remove_pointer_t<T>>::NativeValue(
++        isolate, value, exception_state,
++        std::forward<ExtraArgs>(extra_args)...);
++  }
++};
++
++template <typename T>
++struct NativeValueTraitsBase<
++    T,
++    std::enable_if_t<std::is_base_of<IDLBase, T>::value>> {
++  STATIC_ONLY(NativeValueTraitsBase);
++
++  using ImplType = typename T::ImplType;
+ 
+-  // Pointer types have nullptr as IDL null value.
+-  // ScriptValue, String, and union types have IsNull member function.
+   static constexpr bool has_null_value =
+-      std::is_pointer_v<ImplType> ||
+-      requires(ImplType value) { value.IsNull(); };
++      bindings::NativeValueTraitsHasNullValue<ImplType>::value;
+ 
+   // This should only be true for certain subclasses of ScriptWrappable
+   // that satisfy the assumptions of CreateIDLSequenceFromV8ArraySlow() with
+--- a/third_party/blink/renderer/bindings/core/v8/native_value_traits_buffer_sources.cc
++++ b/third_party/blink/renderer/bindings/core/v8/native_value_traits_buffer_sources.cc
+@@ -7,7 +7,6 @@
+ #include "third_party/blink/renderer/core/core_export.h"
+ #include "third_party/blink/renderer/core/execution_context/execution_context.h"
+ #include "third_party/blink/renderer/core/frame/web_feature.h"
+-#include "third_party/blink/renderer/core/typed_arrays/flexible_array_buffer_view.h"
+ #include "third_party/blink/renderer/core/typed_arrays/typed_flexible_array_buffer_view.h"
+ 
+ namespace blink {
+@@ -699,11 +698,12 @@
+ // ArrayBufferView
+ 
+ template <typename T>
+-  requires std::derived_from<T, DOMArrayBufferView>
+-NotShared<T> NativeValueTraits<NotShared<T>>::NativeValue(
+-    v8::Isolate* isolate,
+-    v8::Local<v8::Value> value,
+-    ExceptionState& exception_state) {
++NotShared<T> NativeValueTraits<
++    NotShared<T>,
++    typename std::enable_if_t<std::is_base_of<DOMArrayBufferView, T>::value>>::
++    NativeValue(v8::Isolate* isolate,
++                v8::Local<v8::Value> value,
++                ExceptionState& exception_state) {
+   return NativeValueImpl<
+       RecipeTrait<NotShared<T>>, ToDOMViewType<T, kNotShared>,
+       Nullablity::kIsNotNullable, BufferSizeCheck::kCheck,
+@@ -712,12 +712,13 @@
+ }
+ 
+ template <typename T>
+-  requires std::derived_from<T, DOMArrayBufferView>
+-NotShared<T> NativeValueTraits<NotShared<T>>::ArgumentValue(
+-    v8::Isolate* isolate,
+-    int argument_index,
+-    v8::Local<v8::Value> value,
+-    ExceptionState& exception_state) {
++NotShared<T> NativeValueTraits<
++    NotShared<T>,
++    typename std::enable_if_t<std::is_base_of<DOMArrayBufferView, T>::value>>::
++    ArgumentValue(v8::Isolate* isolate,
++                  int argument_index,
++                  v8::Local<v8::Value> value,
++                  ExceptionState& exception_state) {
+   return ArgumentValueImpl<
+       RecipeTrait<NotShared<T>>, ToDOMViewType<T, kNotShared>,
+       Nullablity::kIsNotNullable, BufferSizeCheck::kCheck,
+@@ -728,11 +729,12 @@
+ // [AllowShared] ArrayBufferView
+ 
+ template <typename T>
+-  requires std::derived_from<T, DOMArrayBufferView>
+-MaybeShared<T> NativeValueTraits<MaybeShared<T>>::NativeValue(
+-    v8::Isolate* isolate,
+-    v8::Local<v8::Value> value,
+-    ExceptionState& exception_state) {
++MaybeShared<T> NativeValueTraits<
++    MaybeShared<T>,
++    typename std::enable_if_t<std::is_base_of<DOMArrayBufferView, T>::value>>::
++    NativeValue(v8::Isolate* isolate,
++                v8::Local<v8::Value> value,
++                ExceptionState& exception_state) {
+   return NativeValueImpl<RecipeTrait<MaybeShared<T>>,
+                          ToDOMViewType<T, kMaybeShared>,
+                          Nullablity::kIsNotNullable, BufferSizeCheck::kCheck,
+@@ -741,12 +743,13 @@
+ }
+ 
+ template <typename T>
+-  requires std::derived_from<T, DOMArrayBufferView>
+-MaybeShared<T> NativeValueTraits<MaybeShared<T>>::ArgumentValue(
+-    v8::Isolate* isolate,
+-    int argument_index,
+-    v8::Local<v8::Value> value,
+-    ExceptionState& exception_state) {
++MaybeShared<T> NativeValueTraits<
++    MaybeShared<T>,
++    typename std::enable_if_t<std::is_base_of<DOMArrayBufferView, T>::value>>::
++    ArgumentValue(v8::Isolate* isolate,
++                  int argument_index,
++                  v8::Local<v8::Value> value,
++                  ExceptionState& exception_state) {
+   return ArgumentValueImpl<RecipeTrait<MaybeShared<T>>,
+                            ToDOMViewType<T, kMaybeShared>,
+                            Nullablity::kIsNotNullable, BufferSizeCheck::kCheck,
+@@ -757,12 +760,12 @@
+ // [AllowShared, BufferSourceTypeNoSizeLimit] ArrayBufferView
+ 
+ template <typename T>
+-  requires std::derived_from<T, DOMArrayBufferView>
+-MaybeShared<T>
+-NativeValueTraits<IDLBufferSourceTypeNoSizeLimit<MaybeShared<T>>>::NativeValue(
+-    v8::Isolate* isolate,
+-    v8::Local<v8::Value> value,
+-    ExceptionState& exception_state) {
++MaybeShared<T> NativeValueTraits<
++    IDLBufferSourceTypeNoSizeLimit<MaybeShared<T>>,
++    typename std::enable_if_t<std::is_base_of<DOMArrayBufferView, T>::value>>::
++    NativeValue(v8::Isolate* isolate,
++                v8::Local<v8::Value> value,
++                ExceptionState& exception_state) {
+   return NativeValueImpl<
+       RecipeTrait<MaybeShared<T>>, ToDOMViewType<T, kMaybeShared>,
+       Nullablity::kIsNotNullable, BufferSizeCheck::kDoNotCheck,
+@@ -771,12 +774,13 @@
+ }
+ 
+ template <typename T>
+-  requires std::derived_from<T, DOMArrayBufferView>
+-MaybeShared<T> NativeValueTraits<IDLBufferSourceTypeNoSizeLimit<
+-    MaybeShared<T>>>::ArgumentValue(v8::Isolate* isolate,
+-                                    int argument_index,
+-                                    v8::Local<v8::Value> value,
+-                                    ExceptionState& exception_state) {
++MaybeShared<T> NativeValueTraits<
++    IDLBufferSourceTypeNoSizeLimit<MaybeShared<T>>,
++    typename std::enable_if_t<std::is_base_of<DOMArrayBufferView, T>::value>>::
++    ArgumentValue(v8::Isolate* isolate,
++                  int argument_index,
++                  v8::Local<v8::Value> value,
++                  ExceptionState& exception_state) {
+   return ArgumentValueImpl<
+       RecipeTrait<MaybeShared<T>>, ToDOMViewType<T, kMaybeShared>,
+       Nullablity::kIsNotNullable, BufferSizeCheck::kDoNotCheck,
+@@ -787,11 +791,12 @@
+ // Nullable ArrayBufferView
+ 
+ template <typename T>
+-  requires std::derived_from<T, DOMArrayBufferView>
+-NotShared<T> NativeValueTraits<IDLNullable<NotShared<T>>>::NativeValue(
+-    v8::Isolate* isolate,
+-    v8::Local<v8::Value> value,
+-    ExceptionState& exception_state) {
++NotShared<T> NativeValueTraits<
++    IDLNullable<NotShared<T>>,
++    typename std::enable_if_t<std::is_base_of<DOMArrayBufferView, T>::value>>::
++    NativeValue(v8::Isolate* isolate,
++                v8::Local<v8::Value> value,
++                ExceptionState& exception_state) {
+   return NativeValueImpl<
+       RecipeTrait<NotShared<T>>, ToDOMViewType<T, kNotShared>,
+       Nullablity::kIsNullable, BufferSizeCheck::kCheck,
+@@ -800,12 +805,13 @@
+ }
+ 
+ template <typename T>
+-  requires std::derived_from<T, DOMArrayBufferView>
+-NotShared<T> NativeValueTraits<IDLNullable<NotShared<T>>>::ArgumentValue(
+-    v8::Isolate* isolate,
+-    int argument_index,
+-    v8::Local<v8::Value> value,
+-    ExceptionState& exception_state) {
++NotShared<T> NativeValueTraits<
++    IDLNullable<NotShared<T>>,
++    typename std::enable_if_t<std::is_base_of<DOMArrayBufferView, T>::value>>::
++    ArgumentValue(v8::Isolate* isolate,
++                  int argument_index,
++                  v8::Local<v8::Value> value,
++                  ExceptionState& exception_state) {
+   return ArgumentValueImpl<
+       RecipeTrait<NotShared<T>>, ToDOMViewType<T, kNotShared>,
+       Nullablity::kIsNullable, BufferSizeCheck::kCheck,
+@@ -816,11 +822,12 @@ NotShared<T> NativeValueTraits<IDLNullab
+ // Nullable [AllowShared] ArrayBufferView
+ 
+ template <typename T>
+-  requires std::derived_from<T, DOMArrayBufferView>
+-MaybeShared<T> NativeValueTraits<IDLNullable<MaybeShared<T>>>::NativeValue(
+-    v8::Isolate* isolate,
+-    v8::Local<v8::Value> value,
+-    ExceptionState& exception_state) {
++MaybeShared<T> NativeValueTraits<
++    IDLNullable<MaybeShared<T>>,
++    typename std::enable_if_t<std::is_base_of<DOMArrayBufferView, T>::value>>::
++    NativeValue(v8::Isolate* isolate,
++                v8::Local<v8::Value> value,
++                ExceptionState& exception_state) {
+   return NativeValueImpl<RecipeTrait<MaybeShared<T>>,
+                          ToDOMViewType<T, kMaybeShared>,
+                          Nullablity::kIsNullable, BufferSizeCheck::kCheck,
+@@ -829,12 +836,13 @@
+ }
+ 
+ template <typename T>
+-  requires std::derived_from<T, DOMArrayBufferView>
+-MaybeShared<T> NativeValueTraits<IDLNullable<MaybeShared<T>>>::ArgumentValue(
+-    v8::Isolate* isolate,
+-    int argument_index,
+-    v8::Local<v8::Value> value,
+-    ExceptionState& exception_state) {
++MaybeShared<T> NativeValueTraits<
++    IDLNullable<MaybeShared<T>>,
++    typename std::enable_if_t<std::is_base_of<DOMArrayBufferView, T>::value>>::
++    ArgumentValue(v8::Isolate* isolate,
++                  int argument_index,
++                  v8::Local<v8::Value> value,
++                  ExceptionState& exception_state) {
+   return ArgumentValueImpl<RecipeTrait<MaybeShared<T>>,
+                            ToDOMViewType<T, kMaybeShared>,
+                            Nullablity::kIsNullable, BufferSizeCheck::kCheck,
+@@ -845,9 +853,9 @@
+ // Nullable [AllowShared, BufferSourceTypeNoSizeLimit] ArrayBufferView
+ 
+ template <typename T>
+-  requires std::derived_from<T, DOMArrayBufferView>
+-MaybeShared<T>
+-NativeValueTraits<IDLNullable<IDLBufferSourceTypeNoSizeLimit<MaybeShared<T>>>>::
++MaybeShared<T> NativeValueTraits<
++    IDLNullable<IDLBufferSourceTypeNoSizeLimit<MaybeShared<T>>>,
++    typename std::enable_if_t<std::is_base_of<DOMArrayBufferView, T>::value>>::
+     ArgumentValue(v8::Isolate* isolate,
+                   int argument_index,
+                   v8::Local<v8::Value> value,
+@@ -862,11 +870,13 @@
+ // [AllowShared, FlexibleArrayBufferView] ArrayBufferView
+ 
+ template <typename T>
+-  requires std::derived_from<T, FlexibleArrayBufferView>
+-T NativeValueTraits<T>::ArgumentValue(v8::Isolate* isolate,
+-                                      int argument_index,
+-                                      v8::Local<v8::Value> value,
+-                                      ExceptionState& exception_state) {
++T NativeValueTraits<T,
++                    typename std::enable_if_t<
++                        std::is_base_of<FlexibleArrayBufferView, T>::value>>::
++    ArgumentValue(v8::Isolate* isolate,
++                  int argument_index,
++                  v8::Local<v8::Value> value,
++                  ExceptionState& exception_state) {
+   return ArgumentValueImpl<RecipeTrait<T>, ToFlexibleArrayBufferView,
+                            Nullablity::kIsNotNullable, BufferSizeCheck::kCheck,
+                            ResizableAllowance::kDisallowResizable,
+@@ -878,12 +888,13 @@
+ // ArrayBufferView
+ 
+ template <typename T>
+-  requires std::derived_from<T, FlexibleArrayBufferView>
+-T NativeValueTraits<IDLBufferSourceTypeNoSizeLimit<T>>::ArgumentValue(
+-    v8::Isolate* isolate,
+-    int argument_index,
+-    v8::Local<v8::Value> value,
+-    ExceptionState& exception_state) {
++T NativeValueTraits<IDLBufferSourceTypeNoSizeLimit<T>,
++                    typename std::enable_if_t<
++                        std::is_base_of<FlexibleArrayBufferView, T>::value>>::
++    ArgumentValue(v8::Isolate* isolate,
++                  int argument_index,
++                  v8::Local<v8::Value> value,
++                  ExceptionState& exception_state) {
+   return ArgumentValueImpl<
+       RecipeTrait<T>, ToFlexibleArrayBufferView, Nullablity::kIsNotNullable,
+       BufferSizeCheck::kDoNotCheck, ResizableAllowance::kDisallowResizable,
+@@ -894,12 +905,13 @@
+ // Nullable [AllowShared, FlexibleArrayBufferView] ArrayBufferView
+ 
+ template <typename T>
+-  requires std::derived_from<T, FlexibleArrayBufferView>
+-T NativeValueTraits<IDLNullable<T>>::ArgumentValue(
+-    v8::Isolate* isolate,
+-    int argument_index,
+-    v8::Local<v8::Value> value,
+-    ExceptionState& exception_state) {
++T NativeValueTraits<IDLNullable<T>,
++                    typename std::enable_if_t<
++                        std::is_base_of<FlexibleArrayBufferView, T>::value>>::
++    ArgumentValue(v8::Isolate* isolate,
++                  int argument_index,
++                  v8::Local<v8::Value> value,
++                  ExceptionState& exception_state) {
+   return ArgumentValueImpl<RecipeTrait<T>, ToFlexibleArrayBufferView,
+                            Nullablity::kIsNullable, BufferSizeCheck::kCheck,
+                            ResizableAllowance::kDisallowResizable,
+--- a/third_party/blink/renderer/bindings/core/v8/native_value_traits_impl.h
++++ b/third_party/blink/renderer/bindings/core/v8/native_value_traits_impl.h
+@@ -5,9 +5,6 @@
+ #ifndef THIRD_PARTY_BLINK_RENDERER_BINDINGS_CORE_V8_NATIVE_VALUE_TRAITS_IMPL_H_
+ #define THIRD_PARTY_BLINK_RENDERER_BINDINGS_CORE_V8_NATIVE_VALUE_TRAITS_IMPL_H_
+ 
+-#include <concepts>
+-#include <type_traits>
+-
+ #include "third_party/abseil-cpp/absl/types/optional.h"
+ #include "third_party/blink/renderer/bindings/core/v8/idl_types.h"
+ #include "third_party/blink/renderer/bindings/core/v8/native_value_traits.h"
+@@ -736,8 +733,9 @@
+ };
+ 
+ template <typename T>
+-  requires std::derived_from<T, DOMArrayBufferView>
+-struct NativeValueTraits<T> {
++struct NativeValueTraits<
++    T,
++    typename std::enable_if_t<std::is_base_of<DOMArrayBufferView, T>::value>> {
+   // NotShared<T> or MaybeShared<T> should be used instead.
+   static T* NativeValue(v8::Isolate* isolate,
+                         v8::Local<v8::Value> value,
+@@ -749,8 +747,9 @@
+ };
+ 
+ template <typename T>
+-  requires std::derived_from<T, DOMArrayBufferView>
+-struct NativeValueTraits<IDLNullable<T>> {
++struct NativeValueTraits<
++    IDLNullable<T>,
++    typename std::enable_if_t<std::is_base_of<DOMArrayBufferView, T>::value>> {
+   // NotShared<T> or MaybeShared<T> should be used instead.
+   static T* NativeValue(v8::Isolate* isolate,
+                         v8::Local<v8::Value> value,
+@@ -762,8 +761,9 @@
+ };
+ 
+ template <typename T>
+-  requires std::derived_from<T, DOMArrayBufferView>
+-struct NativeValueTraits<NotShared<T>>
++struct NativeValueTraits<
++    NotShared<T>,
++    typename std::enable_if_t<std::is_base_of<DOMArrayBufferView, T>::value>>
+     : public NativeValueTraitsBase<NotShared<T>> {
+   static NotShared<T> NativeValue(v8::Isolate* isolate,
+                                   v8::Local<v8::Value> value,
+@@ -776,8 +776,9 @@
+ };
+ 
+ template <typename T>
+-  requires std::derived_from<T, DOMArrayBufferView>
+-struct NativeValueTraits<IDLNullable<NotShared<T>>>
++struct NativeValueTraits<
++    IDLNullable<NotShared<T>>,
++    typename std::enable_if_t<std::is_base_of<DOMArrayBufferView, T>::value>>
+     : public NativeValueTraitsBase<NotShared<T>> {
+   static NotShared<T> NativeValue(v8::Isolate* isolate,
+                                   v8::Local<v8::Value> value,
+@@ -790,8 +791,9 @@
+ };
+ 
+ template <typename T>
+-  requires std::derived_from<T, DOMArrayBufferView>
+-struct NativeValueTraits<MaybeShared<T>>
++struct NativeValueTraits<
++    MaybeShared<T>,
++    typename std::enable_if_t<std::is_base_of<DOMArrayBufferView, T>::value>>
+     : public NativeValueTraitsBase<MaybeShared<T>> {
+   static MaybeShared<T> NativeValue(v8::Isolate* isolate,
+                                     v8::Local<v8::Value> value,
+@@ -804,8 +806,9 @@
+ };
+ 
+ template <typename T>
+-  requires std::derived_from<T, DOMArrayBufferView>
+-struct NativeValueTraits<IDLBufferSourceTypeNoSizeLimit<MaybeShared<T>>>
++struct NativeValueTraits<
++    IDLBufferSourceTypeNoSizeLimit<MaybeShared<T>>,
++    typename std::enable_if_t<std::is_base_of<DOMArrayBufferView, T>::value>>
+     : public NativeValueTraitsBase<MaybeShared<T>> {
+   // FlexibleArrayBufferView uses this in its implementation, so we cannot
+   // delete it.
+@@ -820,8 +823,9 @@
+ };
+ 
+ template <typename T>
+-  requires std::derived_from<T, DOMArrayBufferView>
+-struct NativeValueTraits<IDLNullable<MaybeShared<T>>>
++struct NativeValueTraits<
++    IDLNullable<MaybeShared<T>>,
++    typename std::enable_if_t<std::is_base_of<DOMArrayBufferView, T>::value>>
+     : public NativeValueTraitsBase<MaybeShared<T>> {
+   static MaybeShared<T> NativeValue(v8::Isolate* isolate,
+                                     v8::Local<v8::Value> value,
+@@ -834,9 +838,9 @@
+ };
+ 
+ template <typename T>
+-  requires std::derived_from<T, DOMArrayBufferView>
+ struct NativeValueTraits<
+-    IDLNullable<IDLBufferSourceTypeNoSizeLimit<MaybeShared<T>>>>
++    IDLNullable<IDLBufferSourceTypeNoSizeLimit<MaybeShared<T>>>,
++    typename std::enable_if_t<std::is_base_of<DOMArrayBufferView, T>::value>>
+     : public NativeValueTraitsBase<MaybeShared<T>> {
+   // BufferSourceTypeNoSizeLimit must be used only as arguments.
+   static MaybeShared<T> NativeValue(v8::Isolate* isolate,
+@@ -850,8 +854,11 @@
+ };
+ 
+ template <typename T>
+-  requires std::derived_from<T, FlexibleArrayBufferView>
+-struct NativeValueTraits<T> : public NativeValueTraitsBase<T> {
++struct NativeValueTraits<
++    T,
++    typename std::enable_if_t<
++        std::is_base_of<FlexibleArrayBufferView, T>::value>>
++    : public NativeValueTraitsBase<T> {
+   // FlexibleArrayBufferView must be used only as arguments.
+   static T NativeValue(v8::Isolate* isolate,
+                        v8::Local<v8::Value> value,
+@@ -864,8 +871,10 @@
+ };
+ 
+ template <typename T>
+-  requires std::derived_from<T, FlexibleArrayBufferView>
+-struct NativeValueTraits<IDLBufferSourceTypeNoSizeLimit<T>>
++struct NativeValueTraits<
++    IDLBufferSourceTypeNoSizeLimit<T>,
++    typename std::enable_if_t<
++        std::is_base_of<FlexibleArrayBufferView, T>::value>>
+     : public NativeValueTraitsBase<T> {
+   // BufferSourceTypeNoSizeLimit and FlexibleArrayBufferView must be used only
+   // as arguments.
+@@ -880,8 +889,11 @@
+ };
+ 
+ template <typename T>
+-  requires std::derived_from<T, FlexibleArrayBufferView>
+-struct NativeValueTraits<IDLNullable<T>> : public NativeValueTraitsBase<T> {
++struct NativeValueTraits<
++    IDLNullable<T>,
++    typename std::enable_if_t<
++        std::is_base_of<FlexibleArrayBufferView, T>::value>>
++    : public NativeValueTraitsBase<T> {
+   // FlexibleArrayBufferView must be used only as arguments.
+   static T NativeValue(v8::Isolate* isolate,
+                        v8::Local<v8::Value> value,
+@@ -1217,8 +1229,9 @@
+ }
+ 
+ template <typename T>
+-  requires NativeValueTraits<IDLSequence<T>>::has_null_value
+-struct NativeValueTraits<IDLNullable<IDLSequence<T>>>
++struct NativeValueTraits<IDLNullable<IDLSequence<T>>,
++                         typename std::enable_if_t<
++                             NativeValueTraits<IDLSequence<T>>::has_null_value>>
+     : public NativeValueTraitsBase<HeapVector<AddMemberIfNeeded<T>>*> {
+   using ImplType = typename NativeValueTraits<IDLSequence<T>>::ImplType*;
+ 
+@@ -1294,8 +1307,9 @@
+     : public NativeValueTraits<IDLSequence<T>> {};
+ 
+ template <typename T>
+-  requires NativeValueTraits<IDLSequence<T>>::has_null_value
+-struct NativeValueTraits<IDLNullable<IDLArray<T>>>
++struct NativeValueTraits<IDLNullable<IDLArray<T>>,
++                         typename std::enable_if_t<
++                             NativeValueTraits<IDLSequence<T>>::has_null_value>>
+     : public NativeValueTraits<IDLNullable<IDLSequence<T>>> {};
+ 
+ // Record types
+@@ -1425,8 +1439,10 @@
+ 
+ // Callback function types
+ template <typename T>
+-  requires std::derived_from<T, CallbackFunctionBase>
+-struct NativeValueTraits<T> : public NativeValueTraitsBase<T*> {
++struct NativeValueTraits<
++    T,
++    typename std::enable_if_t<std::is_base_of<CallbackFunctionBase, T>::value>>
++    : public NativeValueTraitsBase<T*> {
+   static T* NativeValue(v8::Isolate* isolate,
+                         v8::Local<v8::Value> value,
+                         ExceptionState& exception_state) {
+@@ -1449,8 +1465,9 @@
+ };
+ 
+ template <typename T>
+-  requires std::derived_from<T, CallbackFunctionBase>
+-struct NativeValueTraits<IDLNullable<T>>
++struct NativeValueTraits<
++    IDLNullable<T>,
++    typename std::enable_if_t<std::is_base_of<CallbackFunctionBase, T>::value>>
+     : public NativeValueTraitsBase<IDLNullable<T>> {
+   static T* NativeValue(v8::Isolate* isolate,
+                         v8::Local<v8::Value> value,
+@@ -1479,8 +1496,10 @@
+ 
+ // Callback interface types
+ template <typename T>
+-  requires std::derived_from<T, CallbackInterfaceBase>
+-struct NativeValueTraits<T> : public NativeValueTraitsBase<T*> {
++struct NativeValueTraits<
++    T,
++    typename std::enable_if_t<std::is_base_of<CallbackInterfaceBase, T>::value>>
++    : public NativeValueTraitsBase<T*> {
+   static T* NativeValue(v8::Isolate* isolate,
+                         v8::Local<v8::Value> value,
+                         ExceptionState& exception_state) {
+@@ -1504,8 +1523,9 @@
+ 
+ // Interface types
+ template <typename T>
+-  requires std::derived_from<T, CallbackInterfaceBase>
+-struct NativeValueTraits<IDLNullable<T>>
++struct NativeValueTraits<
++    IDLNullable<T>,
++    typename std::enable_if_t<std::is_base_of<CallbackInterfaceBase, T>::value>>
+     : public NativeValueTraitsBase<IDLNullable<T>> {
+   static T* NativeValue(v8::Isolate* isolate,
+                         v8::Local<v8::Value> value,
+@@ -1534,8 +1554,11 @@
+ 
+ // Dictionary types
+ template <typename T>
+-  requires std::derived_from<T, bindings::DictionaryBase>
+-struct NativeValueTraits<T> : public NativeValueTraitsBase<T*> {
++struct NativeValueTraits<
++    T,
++    typename std::enable_if_t<
++        std::is_base_of<bindings::DictionaryBase, T>::value>>
++    : public NativeValueTraitsBase<T*> {
+   static T* NativeValue(v8::Isolate* isolate,
+                         v8::Local<v8::Value> value,
+                         ExceptionState& exception_state) {
+@@ -1546,11 +1569,14 @@
+ // We don't support nullable dictionary types in general since it's quite
+ // confusing and often misused.
+ template <typename T>
+-  requires std::derived_from<T, bindings::DictionaryBase> &&
+-           (std::same_as<T, GPUColorTargetState> ||
+-            std::same_as<T, GPURenderPassColorAttachment> ||
+-            std::same_as<T, GPUVertexBufferLayout>)
+-struct NativeValueTraits<IDLNullable<T>> : public NativeValueTraitsBase<T*> {
++struct NativeValueTraits<
++    IDLNullable<T>,
++    typename std::enable_if_t<
++        std::is_base_of<bindings::DictionaryBase, T>::value &&
++        (std::is_same<T, GPUColorTargetState>::value ||
++         std::is_same<T, GPURenderPassColorAttachment>::value ||
++         std::is_same<T, GPUVertexBufferLayout>::value)>>
++    : public NativeValueTraitsBase<T*> {
+   static T* NativeValue(v8::Isolate* isolate,
+                         v8::Local<v8::Value> value,
+                         ExceptionState& exception_state) {
+@@ -1562,8 +1588,11 @@
+ 
+ // Enumeration types
+ template <typename T>
+-  requires std::derived_from<T, bindings::EnumerationBase>
+-struct NativeValueTraits<T> : public NativeValueTraitsBase<T> {
++struct NativeValueTraits<
++    T,
++    typename std::enable_if_t<
++        std::is_base_of<bindings::EnumerationBase, T>::value>>
++    : public NativeValueTraitsBase<T> {
+   static T NativeValue(v8::Isolate* isolate,
+                        v8::Local<v8::Value> value,
+                        ExceptionState& exception_state) {
+@@ -1573,8 +1602,10 @@
+ 
+ // Interface types
+ template <typename T>
+-  requires std::derived_from<T, ScriptWrappable>
+-struct NativeValueTraits<T> : public NativeValueTraitsBase<T*> {
++struct NativeValueTraits<
++    T,
++    typename std::enable_if_t<std::is_base_of<ScriptWrappable, T>::value>>
++    : public NativeValueTraitsBase<T*> {
+   // This signifies that CreateIDLSequenceFromV8ArraySlow() may apply
+   // certain optimization based on assumptions about `NativeValue()`
+   // implementation below. For subclasses of ScriptWrappable that have
+@@ -1611,8 +1642,9 @@
+ };
+ 
+ template <typename T>
+-  requires std::derived_from<T, ScriptWrappable>
+-struct NativeValueTraits<IDLNullable<T>>
++struct NativeValueTraits<
++    IDLNullable<T>,
++    typename std::enable_if_t<std::is_base_of<ScriptWrappable, T>::value>>
+     : public NativeValueTraitsBase<IDLNullable<T>> {
+   static inline T* NativeValue(v8::Isolate* isolate,
+                                v8::Local<v8::Value> value,
+@@ -1647,8 +1679,10 @@
+ };
+ 
+ template <typename T>
+-  requires std::derived_from<T, bindings::UnionBase>
+-struct NativeValueTraits<T> : public NativeValueTraitsBase<T*> {
++struct NativeValueTraits<
++    T,
++    typename std::enable_if_t<std::is_base_of<bindings::UnionBase, T>::value>>
++    : public NativeValueTraitsBase<T*> {
+   static T* NativeValue(v8::Isolate* isolate,
+                         v8::Local<v8::Value> value,
+                         ExceptionState& exception_state) {
+@@ -1664,8 +1698,10 @@
+ };
+ 
+ template <typename T>
+-  requires std::derived_from<T, bindings::UnionBase>
+-struct NativeValueTraits<IDLNullable<T>> : public NativeValueTraitsBase<T*> {
++struct NativeValueTraits<
++    IDLNullable<T>,
++    typename std::enable_if_t<std::is_base_of<bindings::UnionBase, T>::value>>
++    : public NativeValueTraitsBase<T*> {
+   static T* NativeValue(v8::Isolate* isolate,
+                         v8::Local<v8::Value> value,
+                         ExceptionState& exception_state) {
+@@ -1686,8 +1722,9 @@
+ 
+ // Nullable types
+ template <typename InnerType>
+-  requires(!NativeValueTraits<InnerType>::has_null_value)
+-struct NativeValueTraits<IDLNullable<InnerType>>
++struct NativeValueTraits<
++    IDLNullable<InnerType>,
++    typename std::enable_if_t<!NativeValueTraits<InnerType>::has_null_value>>
+     : public NativeValueTraitsBase<IDLNullable<InnerType>> {
+   // https://webidl.spec.whatwg.org/#es-nullable-type
+   using ImplType =
+@@ -1719,8 +1756,9 @@
+ 
+ // Optional types
+ template <typename T>
+-  requires std::is_arithmetic_v<typename NativeValueTraits<T>::ImplType>
+-struct NativeValueTraits<IDLOptional<T>>
++struct NativeValueTraits<IDLOptional<T>,
++                         typename std::enable_if_t<std::is_arithmetic<
++                             typename NativeValueTraits<T>::ImplType>::value>>
+     : public NativeValueTraitsBase<typename NativeValueTraits<T>::ImplType> {
+   using ImplType = typename NativeValueTraits<T>::ImplType;
+ 
+@@ -1742,8 +1780,9 @@
+ };
+ 
+ template <typename T>
+-  requires std::is_pointer_v<typename NativeValueTraits<T>::ImplType>
+-struct NativeValueTraits<IDLOptional<T>>
++struct NativeValueTraits<IDLOptional<T>,
++                         typename std::enable_if_t<std::is_pointer<
++                             typename NativeValueTraits<T>::ImplType>::value>>
+     : public NativeValueTraitsBase<typename NativeValueTraits<T>::ImplType> {
+   using ImplType = typename NativeValueTraits<T>::ImplType;
+ 

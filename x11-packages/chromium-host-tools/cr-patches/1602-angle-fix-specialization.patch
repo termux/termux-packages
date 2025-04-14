@@ -1,0 +1,38 @@
+--- a/third_party/angle/src/libANGLE/renderer/vulkan/MemoryTracking.h
++++ b/third_party/angle/src/libANGLE/renderer/vulkan/MemoryTracking.h
+@@ -123,6 +123,20 @@
+ };
+ }  // namespace vk
+ 
++}  // namespace rx
++
++// Introduce std::hash for MemoryAllocInfoMapKey.
++namespace std
++{
++template <>
++struct hash<rx::vk::MemoryAllocInfoMapKey>
++{
++    size_t operator()(const rx::vk::MemoryAllocInfoMapKey &key) const { return key.hash(); }
++};
++}  // namespace std
++
++namespace rx
++{
+ // Memory tracker for allocations and deallocations, which is used in RendererVk.
+ class MemoryAllocationTracker : angle::NonCopyable
+ {
+@@ -202,14 +216,4 @@
+ };
+ }  // namespace rx
+ 
+-// Introduce std::hash for MemoryAllocInfoMapKey.
+-namespace std
+-{
+-template <>
+-struct hash<rx::vk::MemoryAllocInfoMapKey>
+-{
+-    size_t operator()(const rx::vk::MemoryAllocInfoMapKey &key) const { return key.hash(); }
+-};
+-}  // namespace std
+-
+ #endif  // LIBANGLE_RENDERER_VULKAN_MEMORYTRACKING_H_

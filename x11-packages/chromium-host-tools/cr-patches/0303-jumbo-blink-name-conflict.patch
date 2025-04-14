@@ -1,0 +1,49 @@
+[1/247] CXX obj/third_party/blink/renderer/modules/webaudio/webaudio/webaudio_jumbo_2.o
+  In file included from gen/third_party/blink/renderer/modules/webaudio/webaudio_jumbo_2.cc:39:
+  ./../../../src/third_party/blink/renderer/modules/webaudio/realtime_audio_destination_handler.cc:30:20: error: redefinition of 'kDefaultNumberOfInputChannels'
+    30 | constexpr unsigned kDefaultNumberOfInputChannels = 2;
+        |                    ^
+  ./../../../src/third_party/blink/renderer/modules/webaudio/convolver_handler.cc:33:20: note: previous definition is here
+    33 | constexpr unsigned kDefaultNumberOfInputChannels = 2;
+        |                    ^
+  1 error generated.
+--- a/third_party/blink/renderer/modules/webaudio/convolver_handler.cc
++++ b/third_party/blink/renderer/modules/webaudio/convolver_handler.cc
+@@ -30,7 +30,7 @@
+ // worse phase errors. Given these constraints 32768 is a good compromise.
+ constexpr unsigned kMaxFftSize = 32768;
+ 
+-constexpr unsigned kDefaultNumberOfInputChannels = 2;
++constexpr unsigned kDefaultNumberOfInputChannels_CH = 2;
+ constexpr unsigned kDefaultNumberOfOutputChannelsCH = 1;
+ 
+ }  // namespace
+@@ -41,7 +41,7 @@
+   AddOutput(kDefaultNumberOfOutputChannelsCH);
+ 
+   // Node-specific default mixing rules.
+-  channel_count_ = kDefaultNumberOfInputChannels;
++  channel_count_ = kDefaultNumberOfInputChannels_CH;
+   SetInternalChannelCountMode(kClampedMax);
+   SetInternalChannelInterpretation(AudioBus::kSpeakers);
+ 
+--- a/third_party/blink/renderer/modules/webaudio/realtime_audio_destination_handler.cc
++++ b/third_party/blink/renderer/modules/webaudio/realtime_audio_destination_handler.cc
+@@ -27,7 +27,7 @@
+ 
+ namespace {
+ 
+-constexpr unsigned kDefaultNumberOfInputChannels = 2;
++constexpr unsigned kDefaultNumberOfInputChannels_RADH = 2;
+ 
+ }  // namespace
+ 
+@@ -55,7 +55,7 @@
+       task_runner_(Context()->GetExecutionContext()->GetTaskRunner(
+           TaskType::kInternalMediaRealTime)) {
+   // Node-specific default channel count and mixing rules.
+-  channel_count_ = kDefaultNumberOfInputChannels;
++  channel_count_ = kDefaultNumberOfInputChannels_RADH;
+   SetInternalChannelCountMode(kExplicit);
+   SetInternalChannelInterpretation(AudioBus::kSpeakers);
+ }

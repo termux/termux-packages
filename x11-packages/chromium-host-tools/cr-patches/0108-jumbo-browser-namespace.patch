@@ -1,0 +1,21 @@
+[60/1424] CXX obj/components/password_manager/core/browser/browser/browser_jumbo_2.o
+  In file included from gen/components/password_manager/core/browser/browser_jumbo_2.cc:35:
+  ./../../../src/components/password_manager/core/browser/sync_credentials_filter.cc:69:43: error: no member named 'kSigninAllowed' in namespace 'password_manager::prefs'; did you mean '::prefs::kSigninAllowed'?
+    69 |   return !client_->GetPrefs()->GetBoolean(prefs::kSigninAllowed);
+        |                                           ^~~~~~~~~~~~~~~~~~~~~
+        |                                           ::prefs::kSigninAllowed
+  ../../../src/components/signin/public/base/signin_pref_names.h:35:19: note: '::prefs::kSigninAllowed' declared here
+    35 | extern const char kSigninAllowed[];
+        |                   ^
+  1 error generated.
+--- a/components/password_manager/core/browser/sync_credentials_filter.cc
++++ b/components/password_manager/core/browser/sync_credentials_filter.cc
+@@ -66,7 +66,7 @@
+ #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+   // On desktop, this normally leads to immediate browser sign-in, in which case
+   // we shouldn't offer saving. One exception is if browser sign-in is disabled.
+-  return !client_->GetPrefs()->GetBoolean(prefs::kSigninAllowed);
++  return !client_->GetPrefs()->GetBoolean(::prefs::kSigninAllowed);
+ #else
+   // On mobile, sign-in via the web page doesn't lead to browser sign-in, so
+   // offer saving.

@@ -1,0 +1,126 @@
+[13/1581] CXX obj/components/sync/service/service/service_jumbo_1.o
+  ./../../../src/components/sync/service/sync_session_durations_metrics_recorder.cc:17:17: error: redefinition of 'SubtractInactiveTime'
+  17 | base::TimeDelta SubtractInactiveTime(base::TimeDelta total_length,
+      |                 ^
+  ./../../../src/components/sync/service/history_sync_session_durations_metrics_recorder.cc:21:17: note: previous definition is here
+  21 | base::TimeDelta SubtractInactiveTime(base::TimeDelta total_length,
+      |                 ^
+  In file included from gen/components/sync/service/service_jumbo_1.cc:30:
+  ./../../../src/components/sync/service/sync_session_durations_metrics_recorder.cc:248:7: error: call to 'LogDuration' is ambiguous
+  248 |       LogDuration("WithAccount", session_length);
+      |       ^~~~~~~~~~~
+  7 errors generated.
+--- a/components/sync/service/sync_session_durations_metrics_recorder.cc
++++ b/components/sync/service/sync_session_durations_metrics_recorder.cc
+@@ -14,7 +14,7 @@
+ 
+ namespace {
+ 
+-base::TimeDelta SubtractInactiveTime(base::TimeDelta total_length,
++base::TimeDelta SubtractInactiveTime_SSDMR(base::TimeDelta total_length,
+                                      base::TimeDelta inactive_time) {
+   // Subtract any time the user was inactive from our session length. If this
+   // ends up giving the session negative length, which can happen if the feature
+@@ -26,7 +26,7 @@
+   return session_length;
+ }
+ 
+-void LogDuration(const std::string& histogram_suffix,
++void LogDuration_SSDMR(const std::string& histogram_suffix,
+                  base::TimeDelta session_length) {
+   DVLOG(1) << "Logging Session.TotalDuration*." + histogram_suffix << " of "
+            << session_length;
+@@ -127,9 +127,9 @@
+ 
+   base::TimeDelta total_inactivity_time = total_session_time - session_length;
+   LogSigninDuration(
+-      SubtractInactiveTime(signin_session_time, total_inactivity_time));
++      SubtractInactiveTime_SSDMR(signin_session_time, total_inactivity_time));
+   LogSyncAndAccountDuration(
+-      SubtractInactiveTime(sync_account_session_time_, total_inactivity_time));
++      SubtractInactiveTime_SSDMR(sync_account_session_time_, total_inactivity_time));
+ }
+ 
+ void SyncSessionDurationsMetricsRecorder::OnAccountsInCookieUpdated(
+@@ -245,14 +245,14 @@
+     base::TimeDelta session_length) {
+   switch (signin_status_) {
+     case FeatureState::ON:
+-      LogDuration("WithAccount", session_length);
++      LogDuration_SSDMR("WithAccount", session_length);
+       break;
+     case FeatureState::UNKNOWN:
+       // Since the feature wasn't working for the user if we didn't know its
+       // state, log the status as off.
+       [[fallthrough]];
+     case FeatureState::OFF:
+-      LogDuration("WithoutAccount", session_length);
++      LogDuration_SSDMR("WithoutAccount", session_length);
+       break;
+   }
+ }
+@@ -267,22 +267,22 @@
+                       " known when LogSyncAndAccountDuration() is called";
+       break;
+     case GetFeatureStates(FeatureState::ON, FeatureState::ON):
+-      LogDuration("OptedInToSyncWithAccount", session_length);
++      LogDuration_SSDMR("OptedInToSyncWithAccount", session_length);
+       break;
+     case GetFeatureStates(FeatureState::ON, FeatureState::UNKNOWN):
+       // Sync engine not initialized yet, default to it being off.
+       [[fallthrough]];
+     case GetFeatureStates(FeatureState::ON, FeatureState::OFF):
+-      LogDuration("NotOptedInToSyncWithAccount", session_length);
++      LogDuration_SSDMR("NotOptedInToSyncWithAccount", session_length);
+       break;
+     case GetFeatureStates(FeatureState::OFF, FeatureState::ON):
+-      LogDuration("OptedInToSyncWithoutAccount", session_length);
++      LogDuration_SSDMR("OptedInToSyncWithoutAccount", session_length);
+       break;
+     case GetFeatureStates(FeatureState::OFF, FeatureState::UNKNOWN):
+       // Sync engine not initialized yet, default to it being off.
+       [[fallthrough]];
+     case GetFeatureStates(FeatureState::OFF, FeatureState::OFF):
+-      LogDuration("NotOptedInToSyncWithoutAccount", session_length);
++      LogDuration_SSDMR("NotOptedInToSyncWithoutAccount", session_length);
+       break;
+     default:
+       NOTREACHED() << "Unexpected feature states: "
+--- a/components/sync/service/history_sync_session_durations_metrics_recorder.cc
++++ b/components/sync/service/history_sync_session_durations_metrics_recorder.cc
+@@ -18,7 +18,7 @@
+ 
+ namespace {
+ 
+-base::TimeDelta SubtractInactiveTime(base::TimeDelta total_length,
++base::TimeDelta SubtractInactiveTime_HSSDMR(base::TimeDelta total_length,
+                                      base::TimeDelta inactive_time) {
+   // Subtract any time the user was inactive from our session length. If this
+   // ends up giving the session negative length, which can happen if the feature
+@@ -30,7 +30,7 @@
+   return session_length;
+ }
+ 
+-void LogDuration(std::string_view histogram_suffix,
++void LogDuration_HSSDMR(std::string_view histogram_suffix,
+                  base::TimeDelta session_length) {
+   base::UmaHistogramCustomTimes(
+       base::StrCat({"Session.TotalDurationMax1Day.", histogram_suffix}),
+@@ -97,7 +97,7 @@
+   base::TimeDelta total_inactivity_time = total_session_time - session_length;
+ 
+   LogHistorySyncDuration(history_sync_enabled_,
+-                         SubtractInactiveTime(history_sync_state_session_time,
++                         SubtractInactiveTime_HSSDMR(history_sync_state_session_time,
+                                               total_inactivity_time));
+ }
+ 
+@@ -122,7 +122,7 @@
+ void HistorySyncSessionDurationsMetricsRecorder::LogHistorySyncDuration(
+     bool history_sync_enabled,
+     base::TimeDelta session_length) {
+-  LogDuration(history_sync_enabled ? "WithHistorySync" : "WithoutHistorySync",
++  LogDuration_HSSDMR(history_sync_enabled ? "WithHistorySync" : "WithoutHistorySync",
+               session_length);
+ }
+ 

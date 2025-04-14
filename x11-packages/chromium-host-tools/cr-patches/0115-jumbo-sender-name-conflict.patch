@@ -1,0 +1,95 @@
+[4/20] CXX obj/media/cast/sender/sender_jumbo_1.o
+  In file included from gen/media/cast/sender_jumbo_1.cc:10:
+  ./../../../src/media/cast/sender/openscreen_frame_sender.cc:29:22: error: redefinition of 'kMaxFrameBurst'
+    29 | static constexpr int kMaxFrameBurst = 5;
+        |                      ^
+  ./../../../src/media/cast/sender/frame_sender_impl.cc:32:15: note: previous definition is here
+    32 | constexpr int kMaxFrameBurst = 5;
+        |               ^
+  In file included from gen/media/cast/sender_jumbo_1.cc:13:
+  ./../../../src/media/cast/sender/video_sender.cc:64:16: error: redefinition of 'kHistogramDroppedFrames'
+    64 | constexpr char kHistogramDroppedFrames[] =
+        |                ^
+  ./../../../src/media/cast/sender/audio_sender.cc:26:16: note: previous definition is here
+    26 | constexpr char kHistogramDroppedFrames[] =
+        |                ^
+  In file included from gen/media/cast/sender_jumbo_1.cc:13:
+  ./../../../src/media/cast/sender/video_sender.cc:68:16: error: redefinition of 'kHistogramFrameDropped'
+    68 | constexpr char kHistogramFrameDropped[] =
+        |                ^
+  ./../../../src/media/cast/sender/audio_sender.cc:30:16: note: previous definition is here
+    30 | constexpr char kHistogramFrameDropped[] =
+        |                ^
+  3 errors generated.
+--- a/media/cast/sender/openscreen_frame_sender.cc
++++ b/media/cast/sender/openscreen_frame_sender.cc
+@@ -21,6 +21,8 @@
+ #include "media/cast/constants.h"
+ #include "third_party/openscreen/src/cast/streaming/encoded_frame.h"
+ 
++#define kMaxFrameBurst kMaxFrameBurst_OFS
++
+ namespace media::cast {
+ namespace {
+ 
+@@ -361,3 +363,5 @@
+   }
+ }
+ }  // namespace media::cast
++
++#undef kMaxFrameBurst
+--- a/media/cast/sender/frame_sender_impl.cc
++++ b/media/cast/sender/frame_sender_impl.cc
+@@ -20,6 +20,8 @@
+ #include "media/cast/constants.h"
+ #include "third_party/openscreen/src/cast/streaming/encoded_frame.h"
+ 
++#define kMaxFrameBurst kMaxFrameBurst_FSI
++
+ namespace media::cast {
+ namespace {
+ 
+@@ -551,3 +553,5 @@
+ }
+ 
+ }  // namespace media::cast
++
++#undef kMaxFrameBurst
+--- a/media/cast/sender/audio_sender.cc
++++ b/media/cast/sender/audio_sender.cc
+@@ -19,6 +19,9 @@
+ #include "media/cast/sender/openscreen_frame_sender.h"
+ #include "third_party/openscreen/src/cast/streaming/sender.h"
+ 
++#define kHistogramDroppedFrames kHistogramDroppedFrames_AS
++#define kHistogramFrameDropped  kHistogramFrameDropped_AS
++
+ namespace media::cast {
+ namespace {
+ 
+@@ -166,3 +169,6 @@
+ }
+ 
+ }  // namespace media::cast
++
++#undef kHistogramDroppedFrames
++#undef kHistogramFrameDropped
+--- a/media/cast/sender/video_sender.cc
++++ b/media/cast/sender/video_sender.cc
+@@ -26,6 +26,9 @@
+ #include "third_party/openscreen/src/cast/streaming/encoded_frame.h"
+ #include "third_party/openscreen/src/cast/streaming/sender.h"
+ 
++#define kHistogramDroppedFrames kHistogramDroppedFrames_VS
++#define kHistogramFrameDropped  kHistogramFrameDropped_VS
++
+ namespace media::cast {
+ 
+ namespace {
+@@ -429,3 +432,6 @@
+ }
+ 
+ }  // namespace media::cast
++
++#undef kHistogramDroppedFrames
++#undef kHistogramFrameDropped

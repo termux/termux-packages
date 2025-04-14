@@ -1,0 +1,572 @@
+[1/1661] CXX obj/components/autofill/core/browser/browser/browser_jumbo_2.o
+  ./../../../src/components/autofill/core/browser/form_parsing/credit_card_field_parser.cc:36:35: error: redefinition of 'GetMatchPatterns'
+    36 | base::span<const MatchPatternRef> GetMatchPatterns(base::StringPiece name,
+        |                                   ^
+  ./../../../src/components/autofill/core/browser/form_parsing/address_field_parser.cc:26:35: note: previous definition is here
+    26 | base::span<const MatchPatternRef> GetMatchPatterns(base::StringPiece name,
+        |                                   ^
+--- a/components/autofill/core/browser/form_parsing/credit_card_field_parser.cc
++++ b/components/autofill/core/browser/form_parsing/credit_card_field_parser.cc
+@@ -33,12 +33,12 @@
+ 
+ namespace {
+ 
+-base::span<const MatchPatternRef> GetMatchPatterns(base::StringPiece name,
++base::span<const MatchPatternRef> GetMatchPatterns_CCFP(base::StringPiece name,
+                                                    ParsingContext& context) {
+   return GetMatchPatterns(name, context.page_language, context.pattern_source);
+ }
+ 
+-base::span<const MatchPatternRef> GetMatchPatterns(FieldType type,
++base::span<const MatchPatternRef> GetMatchPatterns_CCFP(FieldType type,
+                                                    ParsingContext& context) {
+   return GetMatchPatterns(type, context.page_language, context.pattern_source);
+ }
+@@ -82,16 +82,16 @@
+   bool cardholder_name_match_has_low_confidence = false;
+ 
+   base::span<const MatchPatternRef> name_on_card_patterns =
+-      GetMatchPatterns("NAME_ON_CARD", context);
++      GetMatchPatterns_CCFP("NAME_ON_CARD", context);
+ 
+   base::span<const MatchPatternRef> name_on_card_contextual_patterns =
+-      GetMatchPatterns("NAME_ON_CARD_CONTEXTUAL", context);
++      GetMatchPatterns_CCFP("NAME_ON_CARD_CONTEXTUAL", context);
+ 
+   base::span<const MatchPatternRef> last_name_patterns =
+-      GetMatchPatterns("LAST_NAME", context);
++      GetMatchPatterns_CCFP("LAST_NAME", context);
+ 
+   base::span<const MatchPatternRef> cvc_patterns =
+-      GetMatchPatterns(CREDIT_CARD_VERIFICATION_CODE, context);
++      GetMatchPatterns_CCFP(CREDIT_CARD_VERIFICATION_CODE, context);
+ 
+   // Credit card fields can appear in many different orders.
+   // We loop until no more credit card related fields are found, see |break| at
+@@ -196,7 +196,7 @@
+     // doesn't have bad side effects.
+     raw_ptr<AutofillField> current_number_field;
+     base::span<const MatchPatternRef> patterns =
+-        GetMatchPatterns(CREDIT_CARD_NUMBER, context);
++        GetMatchPatterns_CCFP(CREDIT_CARD_NUMBER, context);
+     if (ParseFieldSpecifics(context, scanner, kCardNumberRe, kMatchNumTelAndPwd,
+                             patterns, &current_number_field, "kCardNumberRe")) {
+       credit_card_field->numbers_.push_back(current_number_field.get());
+@@ -335,7 +335,7 @@
+ 
+   // Another way to eliminate days - filter out 'day' fields.
+   base::span<const MatchPatternRef> day_patterns =
+-      GetMatchPatterns("DAY", *context);
++      GetMatchPatterns_CCFP("DAY", *context);
+   if (FormFieldParser::ParseFieldSpecifics(
+           *context, scanner, kDayRe,
+           kDefaultMatchParamsWith<FormControlType::kSelectOne,
+@@ -431,13 +431,13 @@
+   size_t saved_cursor = scanner->SaveCursor();
+ 
+   base::span<const MatchPatternRef> debit_cards_patterns =
+-      GetMatchPatterns("DEBIT_CARD", context);
++      GetMatchPatterns_CCFP("DEBIT_CARD", context);
+ 
+   base::span<const MatchPatternRef> debit_gift_card_patterns =
+-      GetMatchPatterns("DEBIT_GIFT_CARD", context);
++      GetMatchPatterns_CCFP("DEBIT_GIFT_CARD", context);
+ 
+   base::span<const MatchPatternRef> gift_card_patterns =
+-      GetMatchPatterns("GIFT_CARD", context);
++      GetMatchPatterns_CCFP("GIFT_CARD", context);
+ 
+   if (ParseFieldSpecifics(context, scanner, kDebitCardRe, kMatchParams,
+                           debit_cards_patterns, nullptr, "kDebitCardRe")) {
+@@ -560,18 +560,18 @@
+       FormControlType::kInputSearch>;
+ 
+   base::span<const MatchPatternRef> cc_exp_month_patterns =
+-      GetMatchPatterns(CREDIT_CARD_EXP_MONTH, context);
++      GetMatchPatterns_CCFP(CREDIT_CARD_EXP_MONTH, context);
+ 
+   base::span<const MatchPatternRef> cc_exp_year_patterns =
+-      GetMatchPatterns("CREDIT_CARD_EXP_YEAR", context);
++      GetMatchPatterns_CCFP("CREDIT_CARD_EXP_YEAR", context);
+ 
+   base::span<const MatchPatternRef> cc_exp_month_before_year_patterns =
+-      GetMatchPatterns("CREDIT_CARD_EXP_MONTH_BEFORE_YEAR", context);
++      GetMatchPatterns_CCFP("CREDIT_CARD_EXP_MONTH_BEFORE_YEAR", context);
+ 
+   base::span<const MatchPatternRef> cc_exp_year_after_month_patterns =
+-      GetMatchPatterns("CREDIT_CARD_EXP_YEAR_AFTER_MONTH", context);
++      GetMatchPatterns_CCFP("CREDIT_CARD_EXP_YEAR_AFTER_MONTH", context);
+   base::span<const MatchPatternRef>
+-      cc_exp_year_after_month_patterns_experimental = GetMatchPatterns(
++      cc_exp_year_after_month_patterns_experimental = GetMatchPatterns_CCFP(
+           "CREDIT_CARD_EXP_YEAR_AFTER_MONTH_EXPERIMENTAL", context);
+ 
+   if (ParseFieldSpecifics(context, scanner, kExpirationMonthRe, kMatchCCType,
+@@ -618,7 +618,7 @@
+ 
+   // Try to look for a 2-digit year expiration date.
+   base::span<const MatchPatternRef> cc_exp_2digit_year_patterns =
+-      GetMatchPatterns(CREDIT_CARD_EXP_DATE_2_DIGIT_YEAR, context);
++      GetMatchPatterns_CCFP(CREDIT_CARD_EXP_DATE_2_DIGIT_YEAR, context);
+   if (ParseFieldSpecifics(context, scanner, kExpirationDate2DigitYearRe,
+                           kMatchCCType, cc_exp_2digit_year_patterns,
+                           &expiration_date_, "kExpirationDate2DigitYearRe")) {
+@@ -629,7 +629,7 @@
+ 
+   // Try to look for a generic expiration date field. (2 or 4 digit year)
+   base::span<const MatchPatternRef> cc_exp_date_patterns =
+-      GetMatchPatterns("CREDIT_CARD_EXP_DATE", context);
++      GetMatchPatterns_CCFP("CREDIT_CARD_EXP_DATE", context);
+   if (ParseFieldSpecifics(context, scanner, kExpirationDateRe, kMatchCCType,
+                           cc_exp_date_patterns, &expiration_date_,
+                           "kExpirationDateRe")) {
+@@ -646,7 +646,7 @@
+ 
+   // Try to look for a 4-digit year expiration date.
+   base::span<const MatchPatternRef> cc_exp_date_4_digit_year_patterns =
+-      GetMatchPatterns(CREDIT_CARD_EXP_DATE_4_DIGIT_YEAR, context);
++      GetMatchPatterns_CCFP(CREDIT_CARD_EXP_DATE_4_DIGIT_YEAR, context);
+   if (FieldCanFitDataForFieldType(current_field_max_length,
+                                   CREDIT_CARD_EXP_DATE_4_DIGIT_YEAR) &&
+       ParseFieldSpecifics(context, scanner, kExpirationDate4DigitYearRe,
+--- a/components/autofill/core/browser/form_parsing/address_field_parser.cc
++++ b/components/autofill/core/browser/form_parsing/address_field_parser.cc
+@@ -23,12 +23,12 @@
+ 
+ namespace {
+ 
+-base::span<const MatchPatternRef> GetMatchPatterns(base::StringPiece name,
++base::span<const MatchPatternRef> GetMatchPatterns_AFP(base::StringPiece name,
+                                                    ParsingContext& context) {
+   return GetMatchPatterns(name, context.page_language, context.pattern_source);
+ }
+ 
+-base::span<const MatchPatternRef> GetMatchPatterns(FieldType type,
++base::span<const MatchPatternRef> GetMatchPatterns_AFP(FieldType type,
+                                                    ParsingContext& context) {
+   return GetMatchPatterns(type, context.page_language, context.pattern_source);
+ }
+@@ -143,19 +143,19 @@
+   size_t saved_cursor = scanner->SaveCursor();
+ 
+   base::span<const MatchPatternRef> email_patterns =
+-      GetMatchPatterns("EMAIL_ADDRESS", context);
++      GetMatchPatterns_AFP("EMAIL_ADDRESS", context);
+ 
+   base::span<const MatchPatternRef> address_patterns =
+-      GetMatchPatterns("ADDRESS_LOOKUP", context);
++      GetMatchPatterns_AFP("ADDRESS_LOOKUP", context);
+ 
+   base::span<const MatchPatternRef> address_ignore_patterns =
+-      GetMatchPatterns("ADDRESS_NAME_IGNORED", context);
++      GetMatchPatterns_AFP("ADDRESS_NAME_IGNORED", context);
+ 
+   base::span<const MatchPatternRef> attention_ignore_patterns =
+-      GetMatchPatterns("ATTENTION_IGNORED", context);
++      GetMatchPatterns_AFP("ATTENTION_IGNORED", context);
+ 
+   base::span<const MatchPatternRef> region_ignore_patterns =
+-      GetMatchPatterns("REGION_IGNORED", context);
++      GetMatchPatterns_AFP("REGION_IGNORED", context);
+ 
+   // Allow address fields to appear in any order.
+   size_t begin_trailing_non_labeled_fields = 0;
+@@ -337,7 +337,7 @@
+     return false;
+ 
+   base::span<const MatchPatternRef> company_patterns =
+-      GetMatchPatterns("COMPANY_NAME", context);
++      GetMatchPatterns_AFP("COMPANY_NAME", context);
+ 
+   return ParseField(context, scanner, kCompanyRe, company_patterns, &company_,
+                     "kCompanyRe");
+@@ -376,25 +376,25 @@
+   const size_t saved_cursor_position = scanner->CursorPosition();
+ 
+   base::span<const MatchPatternRef> street_location_patterns =
+-      GetMatchPatterns(ADDRESS_HOME_STREET_LOCATION, context);
++      GetMatchPatterns_AFP(ADDRESS_HOME_STREET_LOCATION, context);
+   base::span<const MatchPatternRef> street_name_patterns =
+-      GetMatchPatterns(ADDRESS_HOME_STREET_NAME, context);
++      GetMatchPatterns_AFP(ADDRESS_HOME_STREET_NAME, context);
+   base::span<const MatchPatternRef> house_number_patterns =
+-      GetMatchPatterns(ADDRESS_HOME_HOUSE_NUMBER, context);
++      GetMatchPatterns_AFP(ADDRESS_HOME_HOUSE_NUMBER, context);
+   base::span<const MatchPatternRef> apartment_number_patterns =
+-      GetMatchPatterns(ADDRESS_HOME_APT_NUM, context);
++      GetMatchPatterns_AFP(ADDRESS_HOME_APT_NUM, context);
+   base::span<const MatchPatternRef> overflow_patterns =
+-      GetMatchPatterns("OVERFLOW", context);
++      GetMatchPatterns_AFP("OVERFLOW", context);
+   base::span<const MatchPatternRef> overflow_and_landmark_patterns =
+-      GetMatchPatterns("OVERFLOW_AND_LANDMARK", context);
++      GetMatchPatterns_AFP("OVERFLOW_AND_LANDMARK", context);
+   base::span<const MatchPatternRef> between_streets_or_landmark_patterns =
+-      GetMatchPatterns("BETWEEN_STREETS_OR_LANDMARK", context);
++      GetMatchPatterns_AFP("BETWEEN_STREETS_OR_LANDMARK", context);
+   base::span<const MatchPatternRef> between_streets_patterns =
+-      GetMatchPatterns("BETWEEN_STREETS", context);
++      GetMatchPatterns_AFP("BETWEEN_STREETS", context);
+   base::span<const MatchPatternRef> between_streets_line_1_patterns =
+-      GetMatchPatterns("BETWEEN_STREETS_LINE_1", context);
++      GetMatchPatterns_AFP("BETWEEN_STREETS_LINE_1", context);
+   base::span<const MatchPatternRef> between_streets_line_2_patterns =
+-      GetMatchPatterns("BETWEEN_STREETS_LINE_2", context);
++      GetMatchPatterns_AFP("BETWEEN_STREETS_LINE_2", context);
+ 
+   AutofillField* old_street_location = street_location_;
+   AutofillField* old_street_name = street_name_;
+@@ -607,7 +607,7 @@
+   std::u16string label_pattern = kAddressLine1LabelRe;
+ 
+   base::span<const MatchPatternRef> address_line1_patterns =
+-      GetMatchPatterns("ADDRESS_LINE_1", context);
++      GetMatchPatterns_AFP("ADDRESS_LINE_1", context);
+ 
+   // TODO(crbug.com/1121990): Remove duplicate calls when launching
+   // AutofillParsingPatternProvider. The old code calls ParseFieldSpecifics()
+@@ -654,7 +654,7 @@
+   label_pattern = kAddressLine2LabelRe;
+ 
+   base::span<const MatchPatternRef> address_line2_patterns =
+-      GetMatchPatterns("ADDRESS_LINE_2", context);
++      GetMatchPatterns_AFP("ADDRESS_LINE_2", context);
+ 
+   if (!ParseField(context, scanner, pattern, address_line2_patterns, &address2_,
+                   "kAddressLine2Re") &&
+@@ -666,7 +666,7 @@
+   }
+ 
+   base::span<const MatchPatternRef> address_line_extra_patterns =
+-      GetMatchPatterns("ADDRESS_LINE_EXTRA", context);
++      GetMatchPatterns_AFP("ADDRESS_LINE_EXTRA", context);
+ 
+   // Optionally parse address line 3. This uses the same regexp as address 2
+   // above.
+@@ -701,10 +701,10 @@
+     return false;
+ 
+   base::span<const MatchPatternRef> zip_code_patterns =
+-      GetMatchPatterns("ZIP_CODE", context);
++      GetMatchPatterns_AFP("ZIP_CODE", context);
+ 
+   base::span<const MatchPatternRef> four_digit_zip_code_patterns =
+-      GetMatchPatterns("ZIP_4", context);
++      GetMatchPatterns_AFP("ZIP_4", context);
+   if (!ParseFieldSpecifics(context, scanner, kZipCodeRe, kZipCodeMatchType,
+                            zip_code_patterns, &zip_, "kZipCodeRe")) {
+     return false;
+@@ -723,7 +723,7 @@
+     return false;
+ 
+   base::span<const MatchPatternRef> city_patterns =
+-      GetMatchPatterns("CITY", context);
++      GetMatchPatterns_AFP("CITY", context);
+   return ParseFieldSpecifics(context, scanner, kCityRe, kCityMatchType,
+                              city_patterns, &city_, "kCityRe");
+ }
+@@ -734,7 +734,7 @@
+     return false;
+ 
+   base::span<const MatchPatternRef> patterns_state =
+-      GetMatchPatterns("STATE", context);
++      GetMatchPatterns_AFP("STATE", context);
+   return ParseFieldSpecifics(context, scanner, kStateRe, kStateMatchType,
+                              patterns_state, &state_, "kStateRe");
+ }
+@@ -977,10 +977,10 @@
+     return RESULT_MATCH_NONE;
+ 
+   base::span<const MatchPatternRef> zip_code_patterns =
+-      GetMatchPatterns("ZIP_CODE", context);
++      GetMatchPatterns_AFP("ZIP_CODE", context);
+ 
+   base::span<const MatchPatternRef> four_digit_zip_code_patterns =
+-      GetMatchPatterns("ZIP_4", context);
++      GetMatchPatterns_AFP("ZIP_4", context);
+ 
+   ParseNameLabelResult result = ParseNameAndLabelSeparately(
+       context, scanner, kZipCodeRe, kZipCodeMatchType, zip_code_patterns, &zip_,
+@@ -1037,7 +1037,7 @@
+     return RESULT_MATCH_NONE;
+ 
+   base::span<const MatchPatternRef> city_patterns =
+-      GetMatchPatterns("CITY", context);
++      GetMatchPatterns_AFP("CITY", context);
+   return ParseNameAndLabelSeparately(context, scanner, kCityRe, kCityMatchType,
+                                      city_patterns, &city_, "kCityRe");
+ }
+@@ -1049,7 +1049,7 @@
+     return RESULT_MATCH_NONE;
+ 
+   base::span<const MatchPatternRef> patterns_state =
+-      GetMatchPatterns("STATE", context);
++      GetMatchPatterns_AFP("STATE", context);
+   return ParseNameAndLabelSeparately(context, scanner, kStateRe,
+                                      kStateMatchType, patterns_state, &state_,
+                                      "kStateRe");
+@@ -1062,10 +1062,10 @@
+     return RESULT_MATCH_NONE;
+ 
+   base::span<const MatchPatternRef> country_patterns =
+-      GetMatchPatterns("COUNTRY", context);
++      GetMatchPatterns_AFP("COUNTRY", context);
+ 
+   base::span<const MatchPatternRef> country_location_patterns =
+-      GetMatchPatterns("COUNTRY_LOCATION", context);
++      GetMatchPatterns_AFP("COUNTRY_LOCATION", context);
+ 
+   ParseNameLabelResult country_result = ParseNameAndLabelSeparately(
+       context, scanner, kCountryRe,
+@@ -1101,7 +1101,7 @@
+   }
+ 
+   base::span<const MatchPatternRef> between_streets_or_landmark_patterns =
+-      GetMatchPatterns("BETWEEN_STREETS_OR_LANDMARK", context);
++      GetMatchPatterns_AFP("BETWEEN_STREETS_OR_LANDMARK", context);
+   auto result = ParseNameAndLabelSeparately(
+       context, scanner, kBetweenStreetsOrLandmarkRe,
+       kBetweenStreetsOrLandmarkMatchType, between_streets_or_landmark_patterns,
+@@ -1125,7 +1125,7 @@
+   }
+ 
+   base::span<const MatchPatternRef> overflow_and_landmark_patterns =
+-      GetMatchPatterns("OVERFLOW_AND_LANDMARK", context);
++      GetMatchPatterns_AFP("OVERFLOW_AND_LANDMARK", context);
+   auto result = ParseNameAndLabelSeparately(
+       context, scanner, kOverflowAndLandmarkRe, kOverflowAndLandmarkMatchType,
+       overflow_and_landmark_patterns, &overflow_and_landmark_,
+@@ -1147,7 +1147,7 @@
+   }
+ 
+   base::span<const MatchPatternRef> overflow_patterns =
+-      GetMatchPatterns("OVERFLOW", context);
++      GetMatchPatterns_AFP("OVERFLOW", context);
+   return ParseNameAndLabelSeparately(context, scanner, kOverflowRe,
+                                      kOverflowMatchType, overflow_patterns,
+                                      &overflow_, "kOverflowRe");
+@@ -1167,7 +1167,7 @@
+   }
+ 
+   base::span<const MatchPatternRef> landmark_patterns =
+-      GetMatchPatterns("LANDMARK", context);
++      GetMatchPatterns_AFP("LANDMARK", context);
+   return ParseNameAndLabelSeparately(context, scanner, kLandmarkRe,
+                                      kLandmarkMatchType, landmark_patterns,
+                                      &landmark_, "kLandmarkRe");
+@@ -1188,7 +1188,7 @@
+   }
+ 
+   base::span<const MatchPatternRef> between_streets_patterns =
+-      GetMatchPatterns("BETWEEN_STREETS", context);
++      GetMatchPatterns_AFP("BETWEEN_STREETS", context);
+   return ParseNameAndLabelSeparately(
+       context, scanner, kBetweenStreetsRe, kBetweenStreetsMatchType,
+       between_streets_patterns, &between_streets_, "kBetweenStreetsRe");
+@@ -1243,7 +1243,7 @@
+   }
+ 
+   base::span<const MatchPatternRef> admin_level2_patterns =
+-      GetMatchPatterns("ADMIN_LEVEL_2", context);
++      GetMatchPatterns_AFP("ADMIN_LEVEL_2", context);
+   return ParseNameAndLabelSeparately(
+       context, scanner, kAdminLevel2Re, kAdminLevel2MatchType,
+       admin_level2_patterns, &admin_level2_, "kAdminLevel2Re");
+--- a/components/autofill/core/browser/form_parsing/travel_field_parser.cc
++++ b/components/autofill/core/browser/form_parsing/travel_field_parser.cc
+@@ -13,7 +13,7 @@
+ namespace autofill {
+ 
+ namespace {
+-base::span<const MatchPatternRef> GetMatchPatterns(base::StringPiece name,
++base::span<const MatchPatternRef> GetMatchPatterns_TFP(base::StringPiece name,
+                                                    ParsingContext& context) {
+   return GetMatchPatterns(name, context.page_language, context.pattern_source);
+ }
+@@ -30,13 +30,13 @@
+   }
+ 
+   base::span<const MatchPatternRef> passport_patterns =
+-      GetMatchPatterns("PASSPORT", context);
++      GetMatchPatterns_TFP("PASSPORT", context);
+   base::span<const MatchPatternRef> travel_origin_patterns =
+-      GetMatchPatterns("TRAVEL_ORIGIN", context);
++      GetMatchPatterns_TFP("TRAVEL_ORIGIN", context);
+   base::span<const MatchPatternRef> travel_destination_patterns =
+-      GetMatchPatterns("TRAVEL_DESTINATION", context);
++      GetMatchPatterns_TFP("TRAVEL_DESTINATION", context);
+   base::span<const MatchPatternRef> flight_patterns =
+-      GetMatchPatterns("FLIGHT", context);
++      GetMatchPatterns_TFP("FLIGHT", context);
+ 
+   auto travel_field = std::make_unique<TravelFieldParser>();
+   if (ParseField(context, scanner, kPassportRe, passport_patterns,
+--- a/components/autofill/core/browser/form_parsing/name_field_parser.cc
++++ b/components/autofill/core/browser/form_parsing/name_field_parser.cc
+@@ -20,7 +20,7 @@
+ namespace autofill {
+ namespace {
+ 
+-base::span<const MatchPatternRef> GetMatchPatterns(base::StringPiece name,
++base::span<const MatchPatternRef> GetMatchPatterns_NFP(base::StringPiece name,
+                                                    ParsingContext& context) {
+   return GetMatchPatterns(name, context.page_language, context.pattern_source);
+ }
+@@ -154,9 +154,9 @@
+   // Exclude e.g. "username" or "nickname" fields.
+   scanner->SaveCursor();
+   base::span<const MatchPatternRef> name_ignored_patterns =
+-      GetMatchPatterns("NAME_IGNORED", context);
++      GetMatchPatterns_NFP("NAME_IGNORED", context);
+   base::span<const MatchPatternRef> address_name_ignored_patterns =
+-      GetMatchPatterns("ADDRESS_NAME_IGNORED", context);
++      GetMatchPatterns_NFP("ADDRESS_NAME_IGNORED", context);
+   bool should_ignore =
+       ParseFieldSpecifics(context, scanner, kNameIgnoredRe,
+                           kNameIgnoredMatchParams, name_ignored_patterns,
+@@ -177,7 +177,7 @@
+   raw_ptr<AutofillField> field = nullptr;
+ 
+   base::span<const MatchPatternRef> name_patterns =
+-      GetMatchPatterns("FULL_NAME", context);
++      GetMatchPatterns_NFP("FULL_NAME", context);
+   if (ParseField(context, scanner, kFullNameRe, name_patterns, &field,
+                  "kFullNameRe")) {
+     return std::make_unique<FullNameField>(field);
+@@ -210,19 +210,19 @@
+   scanner->SaveCursor();
+ 
+   base::span<const MatchPatternRef> honorific_prefix_patterns =
+-      GetMatchPatterns("HONORIFIC_PREFIX", context);
++      GetMatchPatterns_NFP("HONORIFIC_PREFIX", context);
+   base::span<const MatchPatternRef> name_ignored_patterns =
+-      GetMatchPatterns("NAME_IGNORED", context);
++      GetMatchPatterns_NFP("NAME_IGNORED", context);
+   base::span<const MatchPatternRef> address_name_ignored_patterns =
+-      GetMatchPatterns("ADDRESS_NAME_IGNORED", context);
++      GetMatchPatterns_NFP("ADDRESS_NAME_IGNORED", context);
+   base::span<const MatchPatternRef> first_name_patterns =
+-      GetMatchPatterns("FIRST_NAME", context);
++      GetMatchPatterns_NFP("FIRST_NAME", context);
+   base::span<const MatchPatternRef> middle_name_patterns =
+-      GetMatchPatterns("MIDDLE_NAME", context);
++      GetMatchPatterns_NFP("MIDDLE_NAME", context);
+   base::span<const MatchPatternRef> first_last_name_patterns =
+-      GetMatchPatterns("LAST_NAME_FIRST", context);
++      GetMatchPatterns_NFP("LAST_NAME_FIRST", context);
+   base::span<const MatchPatternRef> second_last_name_patterns =
+-      GetMatchPatterns("LAST_NAME_SECOND", context);
++      GetMatchPatterns_NFP("LAST_NAME_SECOND", context);
+ 
+   // Allow name fields to appear in any order.
+   while (!scanner->IsEnd()) {
+@@ -316,17 +316,17 @@
+   auto v = base::WrapUnique(new FirstLastNameField());
+ 
+   base::span<const MatchPatternRef> name_specific_patterns =
+-      GetMatchPatterns("NAME_GENERIC", context);
++      GetMatchPatterns_NFP("NAME_GENERIC", context);
+   base::span<const MatchPatternRef> middle_name_patterns =
+-      GetMatchPatterns("MIDDLE_NAME", context);
++      GetMatchPatterns_NFP("MIDDLE_NAME", context);
+   base::span<const MatchPatternRef> last_name_patterns =
+-      GetMatchPatterns("LAST_NAME", context);
++      GetMatchPatterns_NFP("LAST_NAME", context);
+   // Check that the field should not be ignored.
+ 
+   base::span<const MatchPatternRef> name_ignored_patterns =
+-      GetMatchPatterns("NAME_IGNORED", context);
++      GetMatchPatterns_NFP("NAME_IGNORED", context);
+   base::span<const MatchPatternRef> address_name_ignored_patterns =
+-      GetMatchPatterns("ADDRESS_NAME_IGNORED", context);
++      GetMatchPatterns_NFP("ADDRESS_NAME_IGNORED", context);
+   scanner->SaveCursor();
+ 
+   bool should_ignore =
+@@ -371,7 +371,7 @@
+ 
+   raw_ptr<AutofillField> next = nullptr;
+   base::span<const MatchPatternRef> name_specific_patterns =
+-      GetMatchPatterns("NAME_GENERIC", context);
++      GetMatchPatterns_NFP("NAME_GENERIC", context);
+ 
+   if (ParseField(context, scanner, kNameGenericRe, name_specific_patterns,
+                  &v->first_name_, "kNameGenericRe") &&
+@@ -412,19 +412,19 @@
+   // Allow name fields to appear in any order.
+ 
+   base::span<const MatchPatternRef> honorific_prefix_patterns =
+-      GetMatchPatterns("HONORIFIC_PREFIX", context);
++      GetMatchPatterns_NFP("HONORIFIC_PREFIX", context);
+   base::span<const MatchPatternRef> name_ignored_patterns =
+-      GetMatchPatterns("NAME_IGNORED", context);
++      GetMatchPatterns_NFP("NAME_IGNORED", context);
+   base::span<const MatchPatternRef> address_name_ignored_patterns =
+-      GetMatchPatterns("ADDRESS_NAME_IGNORED", context);
++      GetMatchPatterns_NFP("ADDRESS_NAME_IGNORED", context);
+   base::span<const MatchPatternRef> first_name_patterns =
+-      GetMatchPatterns("FIRST_NAME", context);
++      GetMatchPatterns_NFP("FIRST_NAME", context);
+   base::span<const MatchPatternRef> middle_name_initial_patterns =
+-      GetMatchPatterns("MIDDLE_INITIAL", context);
++      GetMatchPatterns_NFP("MIDDLE_INITIAL", context);
+   base::span<const MatchPatternRef> middle_name_patterns =
+-      GetMatchPatterns("MIDDLE_NAME", context);
++      GetMatchPatterns_NFP("MIDDLE_NAME", context);
+   base::span<const MatchPatternRef> last_name_patterns =
+-      GetMatchPatterns("LAST_NAME", context);
++      GetMatchPatterns_NFP("LAST_NAME", context);
+ 
+   while (!scanner->IsEnd()) {
+     // Skip over address label fields, which can have misleading names
+--- a/components/autofill/core/browser/data_model/autofill_structured_address_regex_provider.cc
++++ b/components/autofill/core/browser/data_model/autofill_structured_address_regex_provider.cc
+@@ -53,7 +53,7 @@
+ // * https://en.wikipedia.org/wiki/English_honorifics
+ // * https://en.wikipedia.org/wiki/German_honorifics
+ // TODO(crbug.com/1107770): Include more languages and categories.
+-const char kHonorificPrefixRe[] =
++const char kHonorificPrefixRe_[] =
+     "(?:"
+     "Master|Mr\\.?|Miss\\.?|Mrs\\.?|Missus|Ms\\.?|Mx\\.?|M\\.?|Ma'am|Sir|"
+     "Gentleman|Sire|Mistress|Madam|Ma'am|Dame|Lord|Lady|Esq|Excellency|"
+@@ -270,7 +270,7 @@
+   return CaptureTypeWithPattern(
+       NAME_FULL,
+       {NoCapturePattern(
+-           kHonorificPrefixRe,
++           kHonorificPrefixRe_,
+            CaptureOptions{.quantifier = MatchQuantifier::kOptional}),
+        CaptureTypeWithPattern(
+            NAME_FIRST, kSingleWordRe,
+@@ -294,7 +294,7 @@
+   return CaptureTypeWithPattern(
+       NAME_FULL,
+       {NoCapturePattern(
+-           kHonorificPrefixRe,
++           kHonorificPrefixRe_,
+            CaptureOptions{.quantifier = MatchQuantifier::kOptional}),
+        CaptureTypeWithPattern(NAME_LAST,
+                               {kOptionalLastNamePrefixRe, kSingleWordRe},
+@@ -334,7 +334,7 @@
+   return CaptureTypeWithPattern(
+       NAME_FULL,
+       {NoCapturePattern(
+-           kHonorificPrefixRe,
++           kHonorificPrefixRe_,
+            CaptureOptions{.quantifier = MatchQuantifier::kOptional}),
+        CaptureTypeWithPattern(
+            NAME_FIRST, kMultipleLazyWordsRe,
+--- a/components/autofill/core/browser/data_model/autofill_structured_address_name.cc
++++ b/components/autofill/core/browser/data_model/autofill_structured_address_name.cc
+@@ -26,8 +26,9 @@
+   if (value.empty())
+     return std::u16string();
+ 
++  const char *name_seperators = kNameSeparators;
+   std::vector<std::u16string> middle_name_tokens =
+-      base::SplitString(value, base::ASCIIToUTF16(kNameSeparators),
++      base::SplitString(value, base::ASCIIToUTF16(name_seperators),
+                         base::WhitespaceHandling::TRIM_WHITESPACE,
+                         base::SplitResult::SPLIT_WANT_NONEMPTY);
+ 

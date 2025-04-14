@@ -1,0 +1,38 @@
+[21/1352] CXX obj/extensions/common/common/common_jumbo_3.o
+  In file included from gen/extensions/common/common_jumbo_3.cc:7:
+  ./../../../src/extensions/common/manifest_handlers/shared_module_info.cc:160:36: error: no member named 'kExport' in 'extensions::api::requirements::ManifestKeys'; did you mean 'api::shared_module::ManifestKeys::kExport'?
+    160 |                                    ManifestKeys::kExport, kAllowlist));
+        |                                    ^~~~~~~~~~~~~~~~~~~~~
+        |                                    api::shared_module::ManifestKeys::kExport
+  gen/extensions/common/api/shared_module.h:141:25: note: 'api::shared_module::ManifestKeys::kExport' declared here
+    141 |   static constexpr char kExport[] = "export";
+        |                         ^
+  In file included from gen/extensions/common/common_jumbo_3.cc:7:
+  ./../../../src/extensions/common/manifest_handlers/shared_module_info.cc:214:53: error: no member named 'kImport' in 'extensions::api::requirements::ManifestKeys'; did you mean 'api::shared_module::ManifestKeys::kImport'?
+    214 |               errors::kInvalidImportRepeatedImport, ManifestKeys::kImport));
+        |                                                     ^~~~~~~~~~~~~~~~~~~~~
+        |                                                     api::shared_module::ManifestKeys::kImport
+  gen/extensions/common/api/shared_module.h:140:25: note: 'api::shared_module::ManifestKeys::kImport' declared here
+    140 |   static constexpr char kImport[] = "import";
+        |                         ^
+  2 errors generated.
+--- a/extensions/common/manifest_handlers/shared_module_info.cc
++++ b/extensions/common/manifest_handlers/shared_module_info.cc
+@@ -157,7 +157,7 @@
+       manifest_keys.export_->allowlist->empty()) {
+     extension->AddInstallWarning(
+         extensions::InstallWarning(errors::kInvalidExportAllowlistEmpty,
+-                                   ManifestKeys::kExport, kAllowlist));
++                                   ManifestKeys2::kExport, kAllowlist));
+   }
+ 
+   if (has_export && manifest_keys.export_->allowlist) {
+@@ -211,7 +211,7 @@
+         if (unique_imports.contains(import.id)) {
+           unique_imports_warning = true;
+           extension->AddInstallWarning(InstallWarning(
+-              errors::kInvalidImportRepeatedImport, ManifestKeys::kImport));
++              errors::kInvalidImportRepeatedImport, ManifestKeys2::kImport));
+         } else {
+           unique_imports.insert(import.id);
+         }
