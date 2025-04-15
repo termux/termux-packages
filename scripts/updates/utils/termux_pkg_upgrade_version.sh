@@ -1,4 +1,20 @@
 # shellcheck shell=bash
+_termux_should_cleanup() {
+	local space_available big_package="$1"
+	[[ "${big_package}" == "true" ]] && return 0 # true
+
+	if [[ -d "/var/lib/docker" ]]; then
+		# Get available space in bytes
+		space_available="$(df "/var/lib/docker" | awk 'NR==2 { print $4 * 1024 }')"
+
+		if (( space_available <= TERMUX_CLEANUP_BUILT_PACKAGES_THRESHOLD )); then
+			return 0 # true
+		fi
+	fi
+
+	return 1 # false
+}
+
 termux_pkg_upgrade_version() {
 	if [[ "$#" -lt 1 ]]; then
 		termux_error_exit <<-EndUsage
@@ -97,17 +113,6 @@ termux_pkg_upgrade_version() {
 	done
 
 	local force_cleanup="false"
-	local space_available
-
-	if [[ -d "/var/lib/docker" ]]; then
-		# Get available space in bytes
-		space_available="$(df "/var/lib/docker" | awk 'NR==2 { print $4 * 1024 }')"
-
-		if (( space_available <= TERMUX_CLEANUP_BUILT_PACKAGES_THRESHOLD )); then
-			force_cleanup="true"
-		fi
-	fi
-
 
 	local big_package=false
 	while IFS= read -r p; do
@@ -117,21 +122,15 @@ termux_pkg_upgrade_version() {
 		fi
 	done < "${TERMUX_SCRIPTDIR}/scripts/big-pkgs.list"
 
-	if [[ "${big_package}" == "true" ]]; then
-		"${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
-	fi
+	_termux_should_cleanup "${big_package}" && "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
 
 	if ! "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./build-package.sh -C -a "${TERMUX_ARCH}" -i "${TERMUX_PKG_NAME}"; then
-		if [[ "${big_package}" == "true" ]]; then
-			"${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
-		fi
+		_termux_should_cleanup "${big_package}" && "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
 		git checkout -- "${TERMUX_PKG_BUILDER_DIR}"
 		termux_error_exit "ERROR: failed to build."
 	fi
 
-	if [[ "${big_package}" == "true" ]] || [[ "${force_cleanup}" == "true" ]]; then
-		"${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
-	fi
+	_termux_should_cleanup "${big_package}" && "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
 
 	if [[ "${GIT_COMMIT_PACKAGES}" == "true" ]]; then
 		echo "INFO: Committing package."
