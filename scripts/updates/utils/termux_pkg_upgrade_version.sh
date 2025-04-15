@@ -24,8 +24,8 @@ termux_pkg_upgrade_version() {
 
 	local LATEST_VERSION="$1"
 	local SKIP_VERSION_CHECK="${2:-}"
-	local EPOCH
-	EPOCH="${TERMUX_PKG_VERSION%%:*}" # If there is no epoch, this will be the full version.
+	local EPOCH; EPOCH="${TERMUX_PKG_VERSION%%:*}" # If there is no epoch, this will be the full version.
+	local CURRENT_REF; CURRENT_REF="$(git rev-parse --abbrev-ref HEAD)"
 	# Check if it isn't the full version and add ':'.
 	if [[ "${EPOCH}" != "${TERMUX_PKG_VERSION}" ]]; then
 		EPOCH="${EPOCH}:"
@@ -122,32 +122,41 @@ termux_pkg_upgrade_version() {
 		fi
 	done < "${TERMUX_SCRIPTDIR}/scripts/big-pkgs.list"
 
-	_termux_should_cleanup "${big_package}" && "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
-
-	if ! "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./build-package.sh -C -a "${TERMUX_ARCH}" -i "${TERMUX_PKG_NAME}"; then
+	if [[ -z "${TERMUX_PKG_AUTO_UPDATE_GROUP}" ]]; then
 		_termux_should_cleanup "${big_package}" && "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
-		git checkout -- "${TERMUX_PKG_BUILDER_DIR}"
-		termux_error_exit "ERROR: failed to build."
+
+		if ! "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./build-package.sh -C -a "${TERMUX_ARCH}" -i "${TERMUX_PKG_NAME}"; then
+			_termux_should_cleanup "${big_package}" && "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
+			git checkout -- "${TERMUX_PKG_BUILDER_DIR}"
+			termux_error_exit "ERROR: failed to build."
+		fi
+
+		_termux_should_cleanup "${big_package}" && "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
 	fi
 
-	_termux_should_cleanup "${big_package}" && "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
-
 	if [[ "${GIT_COMMIT_PACKAGES}" == "true" ]]; then
-		echo "INFO: Committing package."
+		echo "INFO: Committing package${TERMUX_PKG_AUTO_UPDATE_GROUP:+" to ${TERMUX_PKG_AUTO_UPDATE_GROUP} update group"}."
 		stderr="$(
+			if [[ -n "${TERMUX_PKG_AUTO_UPDATE_GROUP}" ]]; then
+				# Switch to auto-update branch, create if needed
+				git checkout -b "auto-update/${TERMUX_PKG_AUTO_UPDATE_GROUP}/${GITHUB_RUN_ID}" || \
+					git checkout "auto-update/${TERMUX_PKG_AUTO_UPDATE_GROUP}/${GITHUB_RUN_ID}"
+			fi
 			git add "${TERMUX_PKG_BUILDER_DIR}" 2>&1 >/dev/null
 			git commit -m "bump(${repo}/${TERMUX_PKG_NAME}): ${LATEST_VERSION}" \
 				-m "This commit has been automatically submitted by Github Actions." 2>&1 >/dev/null
 		)" || {
 			git reset HEAD --hard
+			[[ -n "${TERMUX_PKG_AUTO_UPDATE_GROUP}" ]] && git checkout "${CURRENT_REF}"
 			termux_error_exit <<-EndOfError
 			ERROR: git commit failed. See below for details.
 			${stderr}
 			EndOfError
 		}
+		[[ -n "${TERMUX_PKG_AUTO_UPDATE_GROUP}" ]] && git checkout "${CURRENT_REF}"
 	fi
 
-	if [[ "${GIT_PUSH_PACKAGES}" == "true" ]]; then
+	if [[ "${GIT_PUSH_PACKAGES}" == "true" && -z "${TERMUX_PKG_AUTO_UPDATE_GROUP}" ]]; then
 		echo "INFO: Pushing package."
 		stderr="$(
 			# Fetch and pull before attempting to push to avoid a situation

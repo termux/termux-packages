@@ -37,15 +37,6 @@ ac_cv_func_setpwuid=no
 "
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
-termux_step_post_get_source() {
-	# Version guard
-	local ver_e=${TERMUX_PKG_VERSION#*:}
-	local ver_x=$(. $TERMUX_SCRIPTDIR/x11-packages/octave-x/build.sh; echo ${TERMUX_PKG_VERSION#*:})
-	if [ "${ver_e}" != "${ver_x}" ]; then
-		termux_error_exit "Version mismatch between octave and octave-x."
-	fi
-}
-
 termux_step_pre_configure() {
 	termux_setup_flang
 

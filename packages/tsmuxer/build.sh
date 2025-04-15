@@ -9,12 +9,3 @@ TERMUX_PKG_SRCURL=https://github.com/justdan96/tsMuxer/archive/refs/tags/${_VERS
 TERMUX_PKG_SHA256=e975d7ab9a73448b1c2c1ded311977a6f0dc77398edb720158dbcf213d9cf4df
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="freetype, libc++, zlib"
-
-termux_step_post_get_source() {
-	# Version guard
-	local ver_t=${TERMUX_PKG_VERSION#*:}
-	local ver_g=$(. $TERMUX_SCRIPTDIR/x11-packages/tsmuxergui/build.sh; echo ${TERMUX_PKG_VERSION#*:})
-	if [ "${ver_t}" != "${ver_g}" ]; then
-		termux_error_exit "Version mismatch between tsmuxer and tsmuxergui."
-	fi
-}

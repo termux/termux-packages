@@ -8,17 +8,12 @@ TERMUX_PKG_SRCURL=https://webkitgtk.org/releases/webkitgtk-${TERMUX_PKG_VERSION}
 TERMUX_PKG_SHA256=94904a55cf12d44a4e36ceadafff02d46da73d76be9b4769f34cbfdf0eebf88e
 TERMUX_PKG_DEPENDS="enchant, fontconfig, freetype, glib, gst-plugins-bad, gst-plugins-base, gst-plugins-good, gstreamer, gtk4, harfbuzz, harfbuzz-icu, libc++, libcairo, libdrm, libgcrypt, libhyphen, libicu, libjpeg-turbo, libpng, libsoup3, libtasn1, libwebp, libxml2, libx11, libxcomposite, libxdamage, libxslt, libxt, littlecms, openjpeg, pango, woff2, zlib"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, xorgproto"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_AUTO_UPDATE_GROUP=x11/webkit
 TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 
 termux_step_post_get_source() {
-	# Version guard
-	local ver_e=${TERMUX_PKG_VERSION#*:}
-	local ver_x=$(. $TERMUX_SCRIPTDIR/x11-packages/webkit2gtk-4.1/build.sh; echo ${TERMUX_PKG_VERSION#*:})
-	if [ "${ver_e}" != "${ver_x}" ]; then
-		termux_error_exit "Version mismatch between webkit2gtk-4.1 and webkitgtk-6.0."
-	fi
-
 	local p
 	for p in $TERMUX_SCRIPTDIR/x11-packages/webkit2gtk-4.1/*.patch; do
 		echo "Applying $(basename "${p}")"
