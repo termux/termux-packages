@@ -1,0 +1,42 @@
+https://sources.debian.org/patches/chromium/122.0.6261.128-1/fixes/absl-optional.patch
+
+--- a/usr/include/c++/10/optional
++++ b/usr/include/c++/10/optional
+@@ -478,8 +478,12 @@
+       constexpr _Optional_base() = default;
+ 
+       // Constructors for engaged optionals.
++#if defined(__clang__)
++      template<typename... _Args>
++#else
+       template<typename... _Args,
+ 	       enable_if_t<is_constructible_v<_Tp, _Args&&...>, bool> = false>
++#endif
+         constexpr explicit _Optional_base(in_place_t, _Args&&... __args)
+         : _M_payload(in_place,
+ 		     std::forward<_Args>(__args)...) { }
+@@ -757,8 +761,12 @@
+ 	    emplace(std::move(*__t));
+ 	}
+ 
++#if defined(__clang__)
++      template<typename... _Args>
++#else
+       template<typename... _Args,
+ 	       _Requires<is_constructible<_Tp, _Args&&...>> = false>
++#endif
+ 	explicit constexpr
+ 	optional(in_place_t, _Args&&... __args)
+ 	: _Base(std::in_place, std::forward<_Args>(__args)...) { }
+@@ -844,7 +852,11 @@
+ 	}
+ 
+       template<typename... _Args>
++#if defined(__clang__)
++	_Tp&
++#else
+ 	enable_if_t<is_constructible_v<_Tp, _Args&&...>, _Tp&>
++#endif
+ 	emplace(_Args&&... __args)
+ 	{
+ 	  this->_M_reset();
