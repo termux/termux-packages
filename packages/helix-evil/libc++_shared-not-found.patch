@@ -1,0 +1,12 @@
+--- a/helix-loader/src/grammar.rs	2022-03-31 12:52:29.105571523 +0530
++++ b/helix-loader/src/grammar.rs	2022-03-31 13:06:19.215571207 +0530
+@@ -319,6 +319,9 @@
+     } else {
+         command
+             .arg("-shared")
++            .arg("-L@TERMUX_PREFIX@/lib")
++            .arg("-Wl,-rpath=@TERMUX_PREFIX@/lib")
++            .arg("-Wno-error=implicit-int")
+             .arg("-fPIC")
+             .arg("-fno-exceptions")
+             .arg("-g")
