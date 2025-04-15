@@ -2,12 +2,12 @@ TERMUX_PKG_HOMEPAGE="https://helix-editor.com/"
 TERMUX_PKG_DESCRIPTION="A post-modern modal text editor written in rust"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="25.01.1"
+TERMUX_PKG_VERSION="2025.04.13"
 # TERMUX_PKG_REVISION=1
-TERMUX_PKG_GIT_BRANCH="release-20250413"
+# TERMUX_PKG_GIT_BRANCH="release-20250413"
 TERMUX_PKG_VERSION=2025.04.13
 TERMUX_PKG_SRCURL="https://github.com/usagi-flow/evil-helix/archive/refs/tags/release-${TERMUX_PKG_VERSION//\.}.tar.gz"
-# TERMUX_PKG_SHA256=3f2364463e2e58b0e78ea16fd37a23a93ec2b086323b9ca1e6e310d86a9b3663
+TERMUX_PKG_SHA256="60e0aadf9e833e0b579028b7f21803722b3705d74dd062bac96ff8ac4da91a5a"
 TERMUX_PKG_RECOMMENDS="clang"
 TERMUX_PKG_SUGGESTS="helix-grammars, bash-completion, clangd, delve, elvish, lldb, nodejs | nodejs-lts"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -18,7 +18,6 @@ TERMUX_PKG_REPLACES=helix
 
 termux_step_pre_configure() {
 	termux_setup_rust
-
 	# clash with rust host build
 	unset CFLAGS
 }
