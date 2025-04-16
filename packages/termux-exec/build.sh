@@ -52,13 +52,13 @@ termux_step_post_massage() {
 		make $QUIET_BUILD $TERMUX_PKG_EXTRA_MAKE_ARGS TERMUX_EXEC_PKG__TESTS__API_LEVEL=28 build-libtermux-exec_nos_c_tre_runtime-binary-tests
 
 		local TERMUX_EXEC__TESTS__TESTS_PATH="$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/libexec/installed-tests/termux-exec"
-		local LIBTERMUX_EXEC__NOS__C__TESTS_PATH="$TERMUX_EXEC__TESTS__TESTS_PATH/lib/termux-exec_nos_c_tre"
+		local LIBTERMUX_EXEC__NOS__C__TESTS_PATH="$TERMUX_EXEC__TESTS__TESTS_PATH/lib/termux-exec_nos_c/tre"
 
-		install -m700 build/output/usr/libexec/installed-tests/termux-exec/lib/termux-exec_nos_c_tre/bin/libtermux-exec_nos_c_tre_runtime-binary-tests-fsanitize28 \
+		install -m700 build/output/usr/libexec/installed-tests/termux-exec/lib/termux-exec_nos_c/tre/bin/libtermux-exec_nos_c_tre_runtime-binary-tests-fsanitize28 \
 			"$LIBTERMUX_EXEC__NOS__C__TESTS_PATH/bin/libtermux-exec_nos_c_tre_runtime-binary-tests-fsanitize28"
 		$TERMUX_ELF_CLEANER --api-level 28 "$LIBTERMUX_EXEC__NOS__C__TESTS_PATH/bin/libtermux-exec_nos_c_tre_runtime-binary-tests-fsanitize28"
 
-		install -m700 build/output/usr/libexec/installed-tests/termux-exec/lib/termux-exec_nos_c_tre/bin/libtermux-exec_nos_c_tre_runtime-binary-tests-nofsanitize28 \
+		install -m700 build/output/usr/libexec/installed-tests/termux-exec/lib/termux-exec_nos_c/tre/bin/libtermux-exec_nos_c_tre_runtime-binary-tests-nofsanitize28 \
 			"$LIBTERMUX_EXEC__NOS__C__TESTS_PATH/bin/libtermux-exec_nos_c_tre_runtime-binary-tests-nofsanitize28"
 		$TERMUX_ELF_CLEANER --api-level 28 "$LIBTERMUX_EXEC__NOS__C__TESTS_PATH/bin/libtermux-exec_nos_c_tre_runtime-binary-tests-nofsanitize28"
 		printf "%s\n\n" "Install libtermux-exec_nos_c_tre_runtime-binary-tests for TERMUX_PKG_API_LEVEL '$TERMUX_PKG_API_LEVEL' successful"
