@@ -2,27 +2,19 @@ TERMUX_PKG_HOMEPAGE=https://bitcoincore.org/
 TERMUX_PKG_DESCRIPTION="Bitcoin Core"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="28.1"
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://github.com/bitcoin/bitcoin/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=26f82493554d176c1dd65ca82383891701c81e00e7f824c2dfb9a3d3e6701082
+TERMUX_PKG_VERSION="29.0"
+TERMUX_PKG_SRCURL=https://github.com/bitcoin/bitcoin/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=e2347dcca0ce657c85fcd81d793d8d84502c85f673686579e8cf8a4c9c412ba2
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, libevent"
 TERMUX_PKG_BUILD_DEPENDS="boost-headers"
 TERMUX_PKG_SERVICE_SCRIPT=("bitcoind" 'exec bitcoind 2>&1')
-TERMUX_PKG_BUILD_IN_SRC=true
-
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
---disable-tests
---disable-fuzz-binary
---with-daemon
---with-gui=no
---without-libs
---prefix=${TERMUX_PKG_SRCDIR}/depends/$TERMUX_HOST_PLATFORM
---bindir=$TERMUX_PREFIX/bin
---mandir=$TERMUX_PREFIX/share/man
+-DBUILD_DAEMON=ON
+-DBUILD_FUZZ_BINARY=OFF
+-DBUILD_GUI=OFF
+-DBUILD_TESTS=OFF
+-DBUILD_TX=ON
+-DBUILD_UTIL=ON
+-DBUILD_WALLET_TOOL=ON
 "
-
-termux_step_pre_configure() {
-	./autogen.sh
-}
