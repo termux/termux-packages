@@ -1,0 +1,13 @@
+# ERROR: ./lib/libtsk.so contains undefined symbols: log
+
+--- a/tsk/Makefile.am
++++ b/tsk/Makefile.am
+@@ -8,7 +8,7 @@
+     vs/libtskvs.la fs/libtskfs.la hashdb/libtskhashdb.la \
+     auto/libtskauto.la pool/libtskpool.la util/libtskutil.la  util/Bitlocker/libtskbitlocker.la
+ # current:revision:age
+-libtsk_la_LDFLAGS = -version-info 23:0:0 $(LIBTSK_LDFLAGS)
++libtsk_la_LDFLAGS = -version-info 23:0:0 $(LIBTSK_LDFLAGS) -lm
+ 
+ EXTRA_DIST = tsk_tools_i.h docs/Doxyfile docs/*.dox docs/*.html \
+    tsk.pc.in
