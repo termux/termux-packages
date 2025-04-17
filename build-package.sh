@@ -323,6 +323,10 @@ termux_step_post_make_install() {
 	return
 }
 
+# Install hooks (alpm-hooks) and hook-scripts into the pacman package
+# shellcheck source=scripts/build/termux_step_install_pacman_hooks.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_install_pacman_hooks.sh"
+
 # Add service scripts from array TERMUX_PKG_SERVICE_SCRIPT, if it is set
 # shellcheck source=scripts/build/termux_step_install_service_scripts.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_install_service_scripts.sh"
@@ -702,6 +706,7 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		termux_step_make_install
 		cd "$TERMUX_PKG_BUILDDIR"
 		termux_step_post_make_install
+		termux_step_install_pacman_hooks
 		termux_step_install_service_scripts
 		termux_step_install_license
 		cd "$TERMUX_PKG_MASSAGEDIR"
