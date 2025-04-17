@@ -1,0 +1,16 @@
++++ ./Source/cmCurl.cxx
+@@ -175,11 +175,11 @@
+ 
+   if (!netrc_level.empty()) {
+     if (netrc_level == "OPTIONAL") {
+-      curl_netrc_level = CURL_NETRC_OPTIONAL;
++      curl_netrc_level = (CURL_NETRC_OPTION) CURL_NETRC_OPTIONAL;
+     } else if (netrc_level == "REQUIRED") {
+-      curl_netrc_level = CURL_NETRC_REQUIRED;
++      curl_netrc_level = (CURL_NETRC_OPTION) CURL_NETRC_REQUIRED;
+     } else if (netrc_level == "IGNORED") {
+-      curl_netrc_level = CURL_NETRC_IGNORED;
++      curl_netrc_level = (CURL_NETRC_OPTION) CURL_NETRC_IGNORED;
+     } else {
+       e = cmStrCat("NETRC accepts OPTIONAL, IGNORED or REQUIRED but got: ",
+                    netrc_level);
