@@ -1,0 +1,13 @@
+[Trigger]
+Type = Path
+Operation = Install
+Operation = Upgrade
+Operation = Remove
+Target = @TERMUX_PREFIX_TARGET@/share/fonts/*/
+Target = !@TERMUX_PREFIX_TARGET@/share/fonts/encodings/*
+
+[Action]
+Description = Updating X fontdir indices...
+When = PostTransaction
+Exec = @TERMUX_PREFIX@/share/libalpm/scripts/xorg-mkfontscale
+NeedsTargets
