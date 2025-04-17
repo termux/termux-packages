@@ -2,10 +2,10 @@
 set -e
 PREFIX="@TERMUX_PREFIX@"
 
-if [ "${1}" = purge ]; then
+if [[ "${1}" = purge || "@TERMUX_PACKAGE_FORMAT@" = "pacman" ]]; then
 	MIMEDIR="${PREFIX}/share/mime"
 
-	if [ -d "${MIMEDIR}" ]; then
+	if [[ -d "${MIMEDIR}" ]]; then
 		rm -f "${MIMEDIR}"/{globs,globs2,icons,treemagic,generic-icons,types,magic,XMLnamespaces,subclasses,aliases,mime.cache}
 		rm -rf "${MIMEDIR}"/{application,audio,image,inode,message,model,multipart,text,video,x-content,x-epoc}
 		rmdir --ignore-fail-on-non-empty "${MIMEDIR}"
