@@ -1,0 +1,48 @@
+on 64-bit Android-x86, unlike Android ARM, st_nlink is 64 bits wide, not 32 bits.
+https://cs.android.com/android/platform/superproject/+/android15-qpr2-release:bionic/libc/include/sys/stat.h;l=68
+
+This probably happened because upstream's Android-stat-related commit
+https://github.com/sbcl/sbcl/commit/30d48e68d8d554e60a89bc8fab87bb9eeea65b80
+was never tested on 64-bit Android-x86.
+That is completely forgivable because, in 2014, it might not yet have been
+obvious or expected in any way that 64-bit Android-x86 would ever
+be meaningfully usable or testable in any real-world situation, and additionally,
+it's uncertain whether the headers the author of that commit would have been
+looking at at the time would have even been from a version of Android that
+supported 64-bit x86 at all, since Android-x86 was originally
+an entirely downstream project, and the official headers for Android 4, for example,
+don't contain this information. It was added in Android 5, which released several
+months AFTER this commit was made to SBCL.
+https://cs.android.com/android/platform/superproject/+/android-4.2.2_r1.1:bionic/libc/include/sys/stat.h
+
+This change makes the stat.1, stat-mode.2, stat-mode.7 and stat-mode.8 tests
+of contrib/sb-posix/posix-tests.lisp pass successfully on 64-bit Android-x86. 
+
+
+--- a/contrib/sb-posix/constants.lisp
++++ b/contrib/sb-posix/constants.lisp
+@@ -325,7 +325,10 @@
+               ((unsigned 32) dev "dev_t" "st_dev")
+               #+android
+               ((unsigned 64) dev "unsigned long long" "st_dev")
++              #-(and android x86-64)
+               (nlink-t nlink "nlink_t" "st_nlink")
++              #+(and android x86-64)
++              ((unsigned 64) nlink "unsigned long" "st_nlink")
+               (uid-t uid "uid_t" "st_uid")
+               ;; Linux/MIPS uses unsigned long instead of dev_t here.
+               #-(or mips android)
+--- a/src/runtime/wrap.h
++++ b/src/runtime/wrap.h
+@@ -68,7 +68,11 @@ typedef short wst_nlink_t;
+ typedef short wst_uid_t;
+ typedef short wst_gid_t;
+ #else
++#if defined(LISP_FEATURE_ANDROID) && defined(LISP_FEATURE_X86_64)
++typedef unsigned long wst_nlink_t;
++#else
+ typedef nlink_t wst_nlink_t;
++#endif
+ typedef uid_t wst_uid_t;
+ typedef gid_t wst_gid_t;
+ #endif
