@@ -83,7 +83,7 @@ readarray -t COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT" ||
 	RESPONSE="$(graphql_request "$RELATED_PRS_QUERY" || infoexit "Couldn't query associated PRs for commit(s), not performing CI fast path")"
 
 	# Ensure response is valid and obtain all associated PR numbers
-	readarray -t PRS < <(jq '.data.repository | to_entries[] | .value.associatedPullRequests.edges.[]?.node?.number?' <<< "$RESPONSE") \
+	readarray -t PRS < <(jq '.data.repository | to_entries[] | .value.associatedPullRequests.edges.[]?.node?.number?' <<< "$RESPONSE" | sort -u) \
 		|| infoexit "GraphQL response is invalid, not performing CI fast path"
 
 	# Check that all commits come from the one and only one PR, bail if not
