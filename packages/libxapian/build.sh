@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://xapian.org
 TERMUX_PKG_DESCRIPTION="Xapian search engine library"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.4.27"
+TERMUX_PKG_VERSION="1.4.28"
 TERMUX_PKG_SRCURL=https://oligarchy.co.uk/xapian/${TERMUX_PKG_VERSION}/xapian-core-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=bcbc99cfbf16080119c2571fc296794f539bd542ca3926f17c2999600830ab61
+TERMUX_PKG_SHA256=3d0976e142217c1baba48bf89b405e674422e7e4448ae5016f67fe0dd49daa07
 TERMUX_PKG_AUTO_UPDATE=true
 # Note that we cannot /proc/sys/kernel/random/uuid (permission denied on
 # new android versions) so need libuuid.
