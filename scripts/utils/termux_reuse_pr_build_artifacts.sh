@@ -40,8 +40,17 @@ ci_artifact_url() {
 	|| return $?
 }
 
+mask_output() {
+	# Print output only in the case of error
+	local output status
+	if ! output=$("$@" 2>&1); then
+		echo "$output"
+		return 1
+	fi
+}
 
-git fetch origin "$OLD_COMMIT:ref/tmp/$OLD_COMMIT" || infoexit "failed to fetch $OLD_COMMIT from origin, not performing CI fast path"
+
+mask_output git fetch origin "$OLD_COMMIT:ref/tmp/$OLD_COMMIT" || infoexit "failed to fetch $OLD_COMMIT from origin, not performing CI fast path"
 readarray -t COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT" || :) || :
 
 (( ${#COMMITS[*]} == 0 )) && infoexit "Unable to obtain full commit history. Not performing CI fast path."
@@ -108,8 +117,8 @@ readarray -t COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT" ||
 	DIRS_REGEX="$(paste -sd'|' <<< "${TERMUX_PACKAGE_DIRECTORIES[@]}")" || exit 0
 
 	# fetch PR commit tree
-	git fetch origin "$PR_BASE_COMMIT:ref/tmp/$PR_BASE_COMMIT" || infoexit "failed to fetch PR base tree, not performing CI fast path"
-	git fetch origin "$PR_HEAD_COMMIT:ref/tmp/$PR_HEAD_COMMIT" || infoexit "failed to fetch PR head tree, not performing CI fast path"
+	mask_output git fetch origin "$PR_BASE_COMMIT:ref/tmp/$PR_BASE_COMMIT" || infoexit "failed to fetch PR base tree, not performing CI fast path"
+	mask_output git fetch origin "$PR_HEAD_COMMIT:ref/tmp/$PR_HEAD_COMMIT" || infoexit "failed to fetch PR head tree, not performing CI fast path"
 
 	# Here we compare changes from PR with changes from push
 	# this is to make sure nobody injected additional changes to PR branch after CI was invoked
