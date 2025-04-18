@@ -283,8 +283,8 @@ _run_update() {
 		set -euo pipefail
 		# Pass cached tag we obtained earlier
 		[[ -n "${_LATEST_TAGS[${pkg_dir##*/}]:-}" ]] && export __CACHED_TAG="${_LATEST_TAGS[${pkg_dir##*/}]}" || :
-		_update "${pkg_dir}" >(tee /dev/fd/2) 2>&1 # Duplicate output to stdout as well.
-		exit "${PIPESTATUS[0]}"                    # Return exit code of _update.
+		exec > >(tee /dev/fd/2) 2>&1 # output everything to stdout as well.
+		_update "${pkg_dir}"
 	); then
 		_ALREADY_SEEN+=("$(basename "${pkg_dir}")")
 	else
