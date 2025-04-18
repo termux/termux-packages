@@ -41,6 +41,7 @@ ci_artifact_url() {
 }
 
 
+git fetch origin "$OLD_COMMIT:ref/tmp/$OLD_COMMIT" || infoexit "failed to fetch $OLD_COMMIT from origin, not performing CI fast path"
 readarray -t COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT" || :) || :
 
 (( ${#COMMITS[*]} == 0 )) && infoexit "Unable to obtain full commit history. Not performing CI fast path."
