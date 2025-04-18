@@ -42,7 +42,7 @@ ci_artifact_url() {
 
 mask_output() {
 	# Print output only in the case of error
-	local output status
+	local output
 	if ! output=$("$@" 2>&1); then
 		echo "$output"
 		return 1
@@ -90,16 +90,14 @@ readarray -t COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT" ||
 	(( ${#PRS[*]} == 0 )) && infoexit "push does not have a linked PR, not performing CI fast path"
 	(( ${#PRS[*]}	> 1 )) && infoexit "push contains commits from more than one PR, not performing CI fast path"
 
-	read -rd' ' PR_BASE_COMMIT PR_HEAD_COMMIT PR_COMMIT_TITLE PR_COMMIT_BODY < <(jq -r '
+	read -rd' ' PR_HEAD_COMMIT PR_COMMIT_TITLE PR_COMMIT_BODY < <(jq -r '
 		.data.repository[].associatedPullRequests |
-			(.nodes[0].baseRefOid,
-			 .nodes[0].headRefOid,
+			(.nodes[0].headRefOid,
 			 .edges[0].node.title,
 			 .edges[0].node.body)' <<< "$RESPONSE" || :)
-	[[ -n "${PR_BASE_COMMIT:-}" ]] || infoexit "failed to read associated PR base commit, not performing CI fast path"
 	[[ -n "${PR_HEAD_COMMIT:-}" ]] || infoexit "failed to read associated PR head commit, not performing CI fast path"
 
-	echo "::group::Detected PR #${#PRS[*]}: ${PR_COMMIT_TITLE}"
+	echo "::group::Detected PR #${PRS[0]}: ${PR_COMMIT_TITLE} — https://github.com/termux/termux-packages/pull/${PRS[0]}"
 	echo "${PR_COMMIT_BODY}"
 	echo "::endgroup::"
 
@@ -117,20 +115,19 @@ readarray -t COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT" ||
 	DIRS_REGEX="$(paste -sd'|' <<< "${TERMUX_PACKAGE_DIRECTORIES[@]}")" || exit 0
 
 	# fetch PR commit tree
-	mask_output git fetch origin "$PR_BASE_COMMIT:ref/tmp/$PR_BASE_COMMIT" || infoexit "failed to fetch PR base tree, not performing CI fast path"
 	mask_output git fetch origin "$PR_HEAD_COMMIT:ref/tmp/$PR_HEAD_COMMIT" || infoexit "failed to fetch PR head tree, not performing CI fast path"
+
+	# obtain the common ancestor commit where the PR diverged
+	PR_MERGE_BASE="$(git merge-base "ref/tmp/$PR_HEAD_COMMIT" "$HEAD_COMMIT")" || infoexit "failed to obtain PR merge base, not performing CI fast path"
 
 	# Here we compare changes from PR with changes from push
 	# this is to make sure nobody injected additional changes to PR branch after CI was invoked
 	# but before we fetched data in this check with GraphQL and `git fetch`.
 	# We cannot apply `git diff --no-index` to commit ranges so we are going to strip indexes manually with sed.
 	diff -q \
-			<(git diff "$PR_BASE_COMMIT" "$PR_HEAD_COMMIT" | sed -n -E '/^diff --git a\// { p; n; /^index /!p; b } ; p') \
-			<(git diff "$OLD_COMMIT" "$HEAD_COMMIT" | sed -n -E '/^diff --git a\// { p; n; /^index /!p; b } ; p') &> /dev/null \
+			<(git diff "$PR_MERGE_BASE" "$PR_HEAD_COMMIT" | sed -n -E '/^diff --git a\// { p; n; /^index /!p; b } ; p') \
+			<(git diff "$OLD_COMMIT" "$HEAD_COMMIT" | sed -n -E '/^diff --git a\// { p; n; /^index /!p; b } ; p') \
 	|| infoexit "PR head does not match pushed commit changes, probably PR ref was force pushed right after PR was merged. Not performing CI fast path."
-
-	# obtain the common ancestor commit where the PR diverged
-	PR_MERGE_BASE="$(git merge-base "ref/tmp/$PR_BASE_COMMIT" "$HEAD_COMMIT")" || infoexit "failed to obtain PR merge base, not performing CI fast path"
 
 	# obtain list of all files changed since this PR diverged
 	readarray -t PR_BASE_TO_HEAD_CHANGED_FILES < <(
