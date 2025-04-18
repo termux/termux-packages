@@ -28,35 +28,9 @@
  dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY > /dev/null 2>&1 &
 --- a/startlxqtwayland.in
 +++ b/startlxqtwayland.in
-@@ -16,19 +16,19 @@
- fi
+@@ -80,7 +80,7 @@
  
- if [ -z "$XDG_DATA_DIRS" ]; then
--    XDG_DATA_DIRS="$XDG_DATA_HOME:/usr/local/share:/usr/share"
-+    XDG_DATA_DIRS="$XDG_DATA_HOME:@TERMUX_PREFIX@/local/share:@TERMUX_PREFIX@/share"
- else
--    if ! contains "$XDG_DATA_DIRS" "/usr/share"; then
--        XDG_DATA_DIRS="$XDG_DATA_DIRS:/usr/share"
-+    if ! contains "$XDG_DATA_DIRS" "@TERMUX_PREFIX@/share"; then
-+        XDG_DATA_DIRS="$XDG_DATA_DIRS:@TERMUX_PREFIX@/share"
-     fi
- fi
- export XDG_DATA_DIRS
- 
- if [ -z "$XDG_CONFIG_DIRS" ]; then
--    export XDG_CONFIG_DIRS="/etc:/etc/xdg:/usr/share"
-+    export XDG_CONFIG_DIRS="@TERMUX_PREFIX@/etc:@TERMUX_PREFIX@/etc/xdg:@TERMUX_PREFIX@/share"
- else
--    if ! contains "$XDG_CONFIG_DIRS" '/etc/xdg'; then
--        XDG_CONFIG_DIRS="$XDG_CONFIG_DIRS:/etc/xdg"
-+    if ! contains "$XDG_CONFIG_DIRS" '@TERMUX_PREFIX@/etc/xdg'; then
-+        XDG_CONFIG_DIRS="$XDG_CONFIG_DIRS:@TERMUX_PREFIX@/etc/xdg"
-     fi
- fi
- 
-@@ -79,7 +79,7 @@
- 
- share_dir="$(dirname $(dirname "$0"))"/share
+ export XDG_CURRENT_DESKTOP="LXQt:$COMPOSITOR:wlroots"
  
 -valid_layouts=$(grep -A98 '! layout' /usr/share/X11/xkb/rules/base.lst | awk '{print $1}' | grep -v '!')
 +valid_layouts=$(grep -A98 '! layout' @TERMUX_PREFIX@/share/X11/xkb/rules/base.lst | awk '{print $1}' | grep -v '!')
