@@ -45,15 +45,15 @@ jobs:
         MANUAL_INPUT_PACKAGES: ${{ github.event.inputs.packages }}
       run: |
         if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
-          BASE_COMMIT=$(jq --raw-output .pull_request.base.sha "$GITHUB_EVENT_PATH")
+          BASE_COMMIT="${{ github.event.pull_request.base.ref }}"
           # We are intentionally not using .commits[0].id and .commits[-1].id as github seems to
           # only send 20 commits in the payload for github action runs instead of the 2048 documented
           # limit. Perhaps 2048 is the limit just for webhooks, where they haven't documented
           # properly that the limit for github actions is only 20:
           #
           # https://docs.github.com/en/webhooks/webhook-events-and-payloads#push
-          OLD_COMMIT=$(jq --raw-output .before "$GITHUB_EVENT_PATH")
-          HEAD_COMMIT=$(jq --raw-output .after "$GITHUB_EVENT_PATH")
+          OLD_COMMIT="${{ github.event.before }}"
+          HEAD_COMMIT="${{ github.event.after }}"
           if [ "$BASE_COMMIT" = "null" ]; then
             if ! git log "$OLD_COMMIT" > /dev/null; then
               if [ "$(git branch --show-current)" = "master" ]; then
@@ -67,7 +67,7 @@ jobs:
             CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${OLD_COMMIT}" "${HEAD_COMMIT}")
           else
             # Pull requests.
-            echo "Processing pull request #$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH"): ${BASE_COMMIT}..HEAD"
+            echo "Processing pull request #${{ github.event.pull_request.number }}: ${BASE_COMMIT}..HEAD"
             CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${BASE_COMMIT}" "HEAD")
           fi
         fi
