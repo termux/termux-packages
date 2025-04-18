@@ -26,7 +26,7 @@ graphql_request() {
 		-H "Accept: application/vnd.github.v3+json" \
 		-H 'Content-Type: application/json' \
 		-X POST \
-		--data "{ \"query\": \"$(tr '\t\n' '	' <<< "${QUERY//\"/\\\"}\"}")" \
+		--data "{ \"query\": \"$(tr '\t\n' '  ' <<< "${QUERY//\"/\\\"}\"}")" \
 		"https://api.github.com/graphql" \
 	|| return $?
 }
@@ -74,10 +74,8 @@ readarray -t COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT" ||
 	RESPONSE="$(graphql_request "$RELATED_PRS_QUERY" || infoexit "Couldn't query associated PRs for commit(s), not performing CI fast path")"
 
 	# Ensure response is valid and obtain all associated PR numbers
-	readarray -t PRS < <(
-		jq '.data.repository | to_entries[] | .value.associatedPullRequests.edges.[]?.node?.number?' <<< "$RESPONSE" \
-			|| infoexit "GraphQL response is invalid, not performing CI fast path"
-		) ||:
+	readarray -t PRS < <(jq '.data.repository | to_entries[] | .value.associatedPullRequests.edges.[]?.node?.number?' <<< "$RESPONSE") \
+		|| infoexit "GraphQL response is invalid, not performing CI fast path"
 
 	# Check that all commits come from the one and only one PR, bail if not
 	(( ${#PRS[*]} == 0 )) && infoexit "push does not have a linked PR, not performing CI fast path"
