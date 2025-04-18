@@ -45,8 +45,8 @@ jobs:
         MANUAL_INPUT_PACKAGES: ${{ github.event.inputs.packages }}
       run: |
         if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
-          BASE_COMMIT="${{ github.event.pull_request.base.ref }}"
           git fetch origin "${{ github.event.pull_request.base.ref }}" 2>/dev/null
+          BASE_COMMIT="${{ github.event.pull_request.base.ref }}"
           # We are intentionally not using .commits[0].id and .commits[-1].id as github seems to
           # only send 20 commits in the payload for github action runs instead of the 2048 documented
           # limit. Perhaps 2048 is the limit just for webhooks, where they haven't documented
