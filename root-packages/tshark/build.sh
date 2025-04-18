@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Network protocol analyzer and sniffer"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.4.6"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.wireshark.org/download/src/all-versions/wireshark-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=4fffcee3d18d1daac12f780c2e8da511824dffb3b0fd6446b53ab7516538edcd
 TERMUX_PKG_AUTO_UPDATE=true
