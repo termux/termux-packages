@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+cd "$(realpath "$(dirname "$0")")/../.."
+
 GITHUB_EVENT_NAME="${1:-}"
 TARGET_ARCH="${2:-}"
 
@@ -38,8 +40,10 @@ ci_artifact_url() {
   || return $?
 }
 
-read -d'\n' -ra COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT" || :)
-(( ${#COMMITS[*]} )) && infoexit "Unable to obtain full commit history. Not performing CI fast path."
+
+read -d$'\n' -ra COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT" || :) || :
+
+(( ${#COMMITS[*]} == 0 )) && infoexit "Unable to obtain full commit history. Not performing CI fast path."
 
 [[ "${GITHUB_EVENT_NAME:-}" == "push" ]] && {
   # Check if we can perform CI fast path.
@@ -47,7 +51,7 @@ read -d'\n' -ra COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT"
   # and make sure buildsystem nor dependencies were changed.
   # If so we can reuse PR check artifacts and upload them to apt repo to save some CI time
 
-   read -d'\n' -ra TERMUX_PACKAGE_DIRECTORIES < <(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json)
+  read -d$'\n' -ra TERMUX_PACKAGE_DIRECTORIES < <(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json) || :
 
   # We should obtain data about all commits in this push to check that they are from the same PR if any
   RELATED_PRS_QUERY="
@@ -69,16 +73,16 @@ read -d'\n' -ra COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT"
   RESPONSE="$(graphql_request "$RELATED_PRS_QUERY" || infoexit "Couldn't query associated PRs for commit(s), not performing CI fast path")"
 
   # Ensure response is valid and obtain all associated PR numbers
-  read -d'\n' -ra PRS < <(
-    jq '.data.repository | to_entries[] | .value.associatedPullRequests.edges
-      | (.[] // []) | (.node? // []) | (.number? // 0)' <<< "$RESPONSE" \
-    ) || infoexit "GraphQL response is invalid, not performing CI fast path"
+  read -d$'\n' -ra PRS < <(
+    jq '.data.repository | to_entries[] | .value.associatedPullRequests.edges.[]?.node?.number?' <<< "$RESPONSE" \
+      || infoexit "GraphQL response is invalid, not performing CI fast path"
+    ) ||:
 
   # Check that all commits come from the one and only one PR, bail if not
   (( ${#PRS[*]} == 0 )) && infoexit "push does not have a linked PR, not performing CI fast path"
   (( ${#PRS[*]}  > 1 )) && infoexit "push contains commits from more than one PR, not performing CI fast path"
 
-  read -rd' ' PR_BASE_COMMIT PR_HEAD_COMMIT PR_COMMIT_TITLE PR_COMMIT_BODY < <(jq -r '\
+  read -rd' ' PR_BASE_COMMIT PR_HEAD_COMMIT PR_COMMIT_TITLE PR_COMMIT_BODY < <(jq -r '
     .data.repository | to_entries[0].value.associatedPullRequests.nodes[0].baseRefOid,
     .data.repository | to_entries[0].value.associatedPullRequests.nodes[0].headRefOid,
     .data.repository | to_entries[0].value.associatedPullRequests.edges[0].node.title,
@@ -120,12 +124,12 @@ read -d'\n' -ra COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT"
   PR_MERGE_BASE="$(git merge-base "ref/tmp/$PR_BASE_COMMIT" "$HEAD_COMMIT")" || infoexit "failed to obtain PR merge base, not performing CI fast path"
 
   # obtain list of all files changed since this PR diverged
-  read -d'\n' -ra PR_BASE_TO_HEAD_CHANGED_FILES < <(
+  read -d$'\n' -ra PR_BASE_TO_HEAD_CHANGED_FILES < <(
     git diff-tree --name-only -r "$PR_MERGE_BASE..$OLD_COMMIT"
   ) || :
 
   # obtain list of all packages changed by this PR
-  read -d'\n' -ra PR_CHANGED_PACKAGES < <(
+  read -d$'\n' -ra PR_CHANGED_PACKAGES < <(
     git diff-tree --name-only -r "$OLD_COMMIT..$HEAD_COMMIT" \
       | grep -E "^($DIRS_REGEX)/[^/]+/" \
       | sed -E "s#^(($DIRS_REGEX)/[^/]+)/.*#\1#" \
@@ -134,13 +138,13 @@ read -d'\n' -ra COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT"
   echo "Packages changed by this PR: ${PR_CHANGED_PACKAGES[*]:-none}"
 
   # obtain list of all buildsystem files changed since this PR diverged
-  read -d'\n' -ra PR_BASE_TO_HEAD_CHANGED_BUILDSYSTEM_FILES < <(
+  read -d$'\n' -ra PR_BASE_TO_HEAD_CHANGED_BUILDSYSTEM_FILES < <(
     grep -e "^scripts/" -e "^ndk-patches/" -e "^build-package.sh$" <<< "$PR_BASE_TO_HEAD_CHANGED_FILES"
   ) || :
   echo "Buildsystem files changed since PR divergence: ${PR_BASE_TO_HEAD_CHANGED_BUILDSYSTEM_FILES[*]:-none}"
 
   # obtain list of all packages changes since this PR diverged
-  read -d'\n' -ra PR_BASE_TO_HEAD_CHANGED_PACKAGES < <(
+  read -d$'\n' -ra PR_BASE_TO_HEAD_CHANGED_PACKAGES < <(
     echo "$PR_BASE_TO_HEAD_CHANGED_FILES" \
       | grep -E "^($DIRS_REGEX)/[^/]+/" \
       | sed -E "s#^(($DIRS_REGEX)/[^/]+)/.*#\1#" \
@@ -149,7 +153,7 @@ read -d'\n' -ra COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT"
   echo "Packages updated since PR divergence: ${PR_BASE_TO_HEAD_CHANGED_PACKAGES[*]:-none}"
 
   # obtain the set of all dependencies of packages changed by this PR
-  read -d'\n' -ra PR_CHANGED_PACKAGES_DEPS < <(
+  read -d$'\n' -ra PR_CHANGED_PACKAGES_DEPS < <(
     for dep in "${PR_CHANGED_PACKAGES[@]:-}"; do
       ./scripts/buildorder.py "$dep" "${TERMUX_PACKAGE_DIRECTORIES[@]}" | awk '{print $NF}'
     done | sort -u
@@ -157,7 +161,7 @@ read -d'\n' -ra COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT"
   echo "Dependencies changed by this PR: ${PR_CHANGED_PACKAGES_DEPS[*]:-none}"
 
   # obtain the set of all build dependencies changed since this PR diverged
-  read -d'\n' -ra PR_BASE_TO_HEAD_CHANGED_DEPS < <(
+  read -d$'\n' -ra PR_BASE_TO_HEAD_CHANGED_DEPS < <(
     grep -Fx \
       -f <(echo "${PR_BASE_TO_HEAD_CHANGED_PACKAGES[@]}") \
       - <<< "${PR_CHANGED_PACKAGES_DEPS[@]}"
