@@ -277,23 +277,19 @@ _check_updated() {
 
 _run_update() {
 	local pkg_dir="$1"
-	[[ -n "${_LATEST_TAGS[${pkg_dir##*/}]:-}" ]] && export __CACHED_TAG="${_LATEST_TAGS[${pkg_dir##*/}]}"
 	# Run each package update in separate process since we include their environment variables.
 	local output=""
-	{
-		output=$(
-			set -euo pipefail
-			_update "${pkg_dir}" 2>&1 | tee /dev/fd/3 # fd 3 is used to output to stdout as well.
-			exit "${PIPESTATUS[0]}"                   # Return exit code of _update.
-		)
-	} 3>&1
-	# shellcheck disable=SC2181
-	if [[ $? -ne 0 ]]; then
-		_FAILED_UPDATES["$(basename "${pkg_dir}")"]="${output}"
-	else
+	if output=$(
+		set -euo pipefail
+		# Pass cached tag we obtained earlier
+		[[ -n "${_LATEST_TAGS[${pkg_dir##*/}]:-}" ]] && export __CACHED_TAG="${_LATEST_TAGS[${pkg_dir##*/}]}" || :
+		_update "${pkg_dir}" >(tee /dev/fd/2) 2>&1 # Duplicate output to stdout as well.
+		exit "${PIPESTATUS[0]}"                    # Return exit code of _update.
+	); then
 		_ALREADY_SEEN+=("$(basename "${pkg_dir}")")
+	else
+		_FAILED_UPDATES["$(basename "${pkg_dir}")"]="${output}"
 	fi
-	unset __CACHED_TAG
 }
 
 declare -a _CACHED_ISSUE_TITLES=()
