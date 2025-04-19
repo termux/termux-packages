@@ -1,0 +1,121 @@
+Makes Termux App on-device pass all tests (most of the time),
+after building SBCL when the run-tests.sh script in the tests
+folder is run on bare metal 64-bit ARM Android.
+
+Fixes https://github.com/termux/termux-packages/issues/24176
+
+contains some code from https://bugs.launchpad.net/sbcl/+bug/1956852
+
+- posix-tests.lisp: prepend @TERMUX_PREFIX@ to absolute paths
+  and slightly rewrite mkstemp.null-terminate to work with
+  absolute paths that contain periods in folder names (com.termux)
+- fd-stream.lisp: call termux_tmpfile() instead of tmpfile() directly,
+  which avoids calling the implementation of tmpfile() that would be
+  loaded via dlopen() of libc.so, which does not respect $TMPDIR
+  on Android 13 and older.
+- linux-os.c: implement termux_tmpfile() wrapper of prefix-prepended
+  custom implementation of tmpfile() which is inlined in the custom
+  stdio.h header of the Termux custom NDK
+- run-program.test.sh: prepend @TERMUX_PREFIX@ to absolute paths
+
+--- a/contrib/sb-posix/posix-tests.lisp
++++ b/contrib/sb-posix/posix-tests.lisp
+@@ -247,7 +247,7 @@
+ (deftest stat.5
+     (let* ((stat-1 (sb-posix:stat "/"))
+            (inode-1 (sb-posix:stat-ino stat-1))
+-           (stat-2 (sb-posix:stat "/bin/sh"
++           (stat-2 (sb-posix:stat "@TERMUX_PREFIX@/bin/sh"
+                                    stat-1))
+            (inode-2 (sb-posix:stat-ino stat-2)))
+       (values
+@@ -506,7 +506,7 @@
+   3 #\f #\o #\o)
+ 
+ (deftest opendir.1
+-  (let ((dir (sb-posix:opendir "/")))
++  (let ((dir (sb-posix:opendir "@TERMUX_PREFIX@")))
+     (unwind-protect (sb-alien:null-alien dir)
+       (unless (sb-alien:null-alien dir)
+         (sb-posix:closedir dir))))
+@@ -514,7 +514,7 @@
+ 
+ #-(or (and darwin x86) haiku)
+ (deftest readdir.1
+-  (let ((dir (sb-posix:opendir "/")))
++  (let ((dir (sb-posix:opendir "@TERMUX_PREFIX@")))
+     (unwind-protect
+        (block dir-loop
+          (loop for dirent = (sb-posix:readdir dir)
+@@ -921,7 +921,7 @@
+ 
+ #-win32
+ (deftest mkstemp.null-terminate
+-    (let* ((default (make-pathname :directory '(:absolute "tmp")))
++    (let* ((default (make-pathname :directory '(:absolute "@TERMUX_PREFIX@/tmp")))
+            (filename (namestring (make-pathname :name "mkstemp-1"
+                                                 :type "XXXXXX"
+                                                 :defaults default)))
+@@ -936,9 +936,9 @@
+                                            (make-string n :initial-element #\x))
+                              :defaults default))
+           (unwind-protect
+-               (values (integerp fd) (subseq temp 0 (position #\. temp)))
++               (values (integerp fd) (subseq temp 0 (position #\. temp :from-end t)))
+             (delete-file temp))))
+-  t "/tmp/mkstemp-1")
++  t "/@TERMUX_PREFIX@/tmp/mkstemp-1")
+ 
+ (deftest envstuff
+     (let ((name1 "ASLIFJLSDKFJKAHGSDKLJH")
+--- a/src/code/fd-stream.lisp
++++ b/src/code/fd-stream.lisp
+@@ -2876,7 +2876,7 @@
+ ;;; race conditions and (at least on Linux) does not make use of any shell environment variables
+ ;;; to determine a directory - in fact it doesn't make a directory entry at all.
+ (defun sb-unix:unix-tmpfile ()
+-  (make-stdio-file (alien-funcall (extern-alien "tmpfile" (function system-area-pointer)))))
++  (make-stdio-file (alien-funcall (extern-alien "termux_tmpfile" (function system-area-pointer)))))
+ 
+ (defun sb-unix:unix-fclose (file)
+   (alien-funcall (extern-alien "fclose" (function int system-area-pointer))
+--- a/src/runtime/linux-os.c
++++ b/src/runtime/linux-os.c
+@@ -416,3 +416,8 @@ char *os_get_runtime_executable_path()
+ 
+     return copied_string(path);
+ }
++
++FILE *termux_tmpfile(void)
++{
++    return tmpfile();
++}
+--- a/tests/run-program.test.sh
++++ b/tests/run-program.test.sh
+@@ -50,7 +50,7 @@ run_sbcl --eval "(defvar *exit-ok* $EXIT_LISP_WIN)" <<'EOF'
+     #+haiku
+     "/bin/env"
+     #-haiku
+-    "/usr/bin/env")
++    "@TERMUX_PREFIX@/bin/env")
+ 
+   ;; Unix environment strings are ordinarily passed with SBCL convention
+   ;; (instead of CMU CL alist-of-keywords convention).
+@@ -84,7 +84,7 @@ run_sbcl --eval "(defvar *exit-ok* $EXIT_LISP_WIN)" <<'EOF'
+  #+unix
+  (flet ((try (sb-impl::*default-external-format* x y)
+          (let* ((process (run-program
+-                          "/bin/sh" (list "-c" (format nil "echo ~c, $SB_TEST_FOO." x))
++                          "@TERMUX_PREFIX@/bin/sh" (list "-c" (format nil "echo ~c, $SB_TEST_FOO." x))
+                           :environment (list (format nil "SB_TEST_FOO=~c" y))
+                           :output :stream
+                           :wait t))
+@@ -132,7 +132,7 @@ run_sbcl --eval "(defvar *exit-ok* $EXIT_LISP_WIN)" <<'EOF'
+   ;; note: this test will be inconclusive if the child's stderr is
+   ;; fully buffered.)
+   (let ((str (with-output-to-string (s)
+-               (our-run-program "/bin/sh"
++               (our-run-program "@TERMUX_PREFIX@/bin/sh"
+                             '("-c" "(echo Foo; sleep 2; echo Bar)>&2")
+                             :output s :search t :error :output :wait t))))
+     (assert (string= str (format nil "Foo~%Bar~%"))))
