@@ -1,0 +1,61 @@
+#!/bin/bash
+cd "$(realpath "$(dirname "$0")")/../.." || { echo "cd failed"; exit 1; }
+readarray -t TERMUX_PACKAGE_DIRECTORIES < <(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json)
+readarray -t PACKAGES < <(grep -rl termux_setup_golang --include=build.sh "${TERMUX_PACKAGE_DIRECTORIES[@]}" | cut -d/ -f2 | sort -u || :) || :
+ARCH="$1"
+REPORT_PATH="${TMPDIR:-/tmp}/golang-validation-report.txt"
+
+# Converts milliseconds to human-readable format.
+# Example: `ms_to_human_readable 123456789` => 34h 17m 36s 789ms
+ms_to_human_readable() {
+	echo "$(($1/3600000))h $(($1%3600000/60000))m $(($1%60000/1000))s $(($1%1000))ms" | sed 's/0h //;s/0m //;s/0s //'
+}
+
+should_cleanup() {
+	local space_available TERMUX_CLEANUP_BUILT_PACKAGES_THRESHOLD="$(( 5 * 1024 ** 3 ))" # 5 GiB
+
+	if [[ -d "/var/lib/docker" ]]; then
+		# Get available space in bytes
+		space_available="$(df "/var/lib/docker" | awk 'NR==2 { print $4 * 1024 }')"
+
+		(( space_available <= TERMUX_CLEANUP_BUILT_PACKAGES_THRESHOLD )) && return 0 # true
+	fi
+
+	return 1 # false
+}
+
+# Target of this script is pretty much simple:
+# 1. Obtain list of all go packages.
+# 2. Build them.
+# 3. Create logfile containing only build logs of failed build attempts.
+
+echo "INFO: Report file path: ${REPORT_PATH}"
+echo "INFO: Rebuild list: ${PACKAGES[*]}" | tee "${REPORT_PATH}"
+
+output=
+declare -A failed=()
+start_building_arch="$(date +%10s%3N)"
+for package in "${PACKAGES[@]}"; do
+	output="$(
+		start="$(date +%10s%3N)"
+		exec > >(tee /dev/fd/2) 2>&1 # output everything to both variable and stdout.
+
+		# Header
+		echo "INFO: Building ${package} for ${ARCH}"
+		should_cleanup && ./scripts/run-docker.sh ./clean.sh
+		./scripts/run-docker.sh ./build-package.sh -I -f -a "${ARCH}" "${package}"
+		status="${PIPESTATUS[0]}"
+		echo # newline
+		echo "INFO: Building ${package} for ${ARCH} took $(ms_to_human_readable $(( $(date +%10s%3N) - start )))"
+		echo # newline
+		exit "$status"
+	)" || failed["${package} ${ARCH}"]="${output}"
+done
+echo "INFO: Building all packages for ${ARCH} took $(ms_to_human_readable $(( $(date +%10s%3N) - start_building_arch )))" | tee -a "${REPORT_PATH}"
+echo # newline
+
+for entry in "${!failed[@]}"; do
+	echo "${failed["${entry}"]}" >> "${REPORT_PATH}"
+done
+
+(( ${#failed[*]} )) && exit 1
