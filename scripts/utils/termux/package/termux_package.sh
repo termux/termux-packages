@@ -55,7 +55,7 @@ termux_package__is_package_version_built() {
 
 
 ##
-# Check if the package name has a prefix called `glibc`.
+# Check if the package name has a prefix called `glibc` or `glibc32`.
 # .
 # .
 # **Parameters:**
@@ -70,7 +70,7 @@ termux_package__is_package_version_built() {
 termux_package__is_package_name_have_glibc_prefix() {
 
     for __pkgname_part in ${1//-/ }; do
-        if [ "$__pkgname_part" = "glibc" ]; then
+        if [ "$__pkgname_part" = "glibc" ] || [ "$__pkgname_part" = "glibc32" ]; then
             return 0
         fi
     done
