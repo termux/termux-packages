@@ -9,6 +9,8 @@ TERMUX_PKG_DEPENDS="aspell, hunspell, libc++, libvoikko, qt6-qtbase, qt6-qtdecla
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION}), qt6-qttools, qt6-qtbase-cross-tools"
 # hspell can be added to TERMUX_PKG_BUILD_DEPENDS and TERMUX_PKG_RECOMMENDS when available
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_AUTO_UPDATE_GROUP=x11/kframeworks6
+TERMUX_PKG_ALIGN_VERSION_WITH=kf6-kconfig
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_SYSTEM_NAME=Linux
 -DKDE_INSTALL_QMLDIR=lib/qt6/qml

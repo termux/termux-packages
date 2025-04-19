@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Please align the version with `poppler` package.
 TERMUX_PKG_VERSION="24.05.0"
 TERMUX_PKG_REVISION=4
+TERMUX_PKG_ALIGN_VERSION_WITH=poppler
 # Do not forget to bump revision of reverse dependencies and rebuild them
 # when SOVERSION is changed.
 _POPPLER_SOVERSION=137
@@ -33,10 +34,6 @@ termux_step_pre_configure() {
 
 	if ! test "${_POPPLER_SOVERSION}"; then
 		termux_error_exit "Please set _POPPLER_SOVERSION variable."
-	fi
-	local sover_main=$(. $TERMUX_SCRIPTDIR/packages/poppler/build.sh; echo $_POPPLER_SOVERSION)
-	if [ "${sover_main}" != "${_POPPLER_SOVERSION}" ]; then
-		termux_error_exit "SOVERSION mismatch with \"poppler\" package."
 	fi
 	local sover_cmake=$(sed -En 's/^set\(POPPLER_SOVERSION_NUMBER "([0-9]+)"\)$/\1/p' CMakeLists.txt)
 	if [ "${sover_cmake}" != "${_POPPLER_SOVERSION}" ]; then

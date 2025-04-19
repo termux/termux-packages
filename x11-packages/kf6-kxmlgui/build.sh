@@ -8,6 +8,8 @@ TERMUX_PKG_SHA256=e106482d3bb15f7afdeeb5542e0f0f3ca26b9b5c6374a03ca18153d5d2750d
 TERMUX_PKG_DEPENDS="kf6-kcolorscheme (>= ${TERMUX_PKG_VERSION}), kf6-kconfig (>= ${TERMUX_PKG_VERSION}), kf6-kconfigwidgets (>= ${TERMUX_PKG_VERSION}), kf6-kcoreaddons (>= ${TERMUX_PKG_VERSION}), kf6-kglobalaccel (>= ${TERMUX_PKG_VERSION}), kf6-kguiaddons (>= ${TERMUX_PKG_VERSION}), kf6-ki18n (>= ${TERMUX_PKG_VERSION}), kf6-kiconthemes (>= ${TERMUX_PKG_VERSION}), kf6-kitemviews (>= ${TERMUX_PKG_VERSION}), kf6-kwidgetsaddons (>= ${TERMUX_PKG_VERSION}), libc++, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION}), qt6-qttools"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_AUTO_UPDATE_GROUP=x11/kframeworks6
+TERMUX_PKG_ALIGN_VERSION_WITH=kf6-kconfig
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DKDE_INSTALL_QMLDIR=lib/qt6/qml
 -DKDE_INSTALL_QTPLUGINDIR=lib/qt6/plugins

@@ -6,6 +6,8 @@ TERMUX_PKG_VERSION="6.13.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/ki18n-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=008c0a32235dc2a7d3aa2fa9a98a540f1b4baf6ab5efd14839a11fda6e746a14
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_AUTO_UPDATE_GROUP=x11/kframeworks6
+TERMUX_PKG_ALIGN_VERSION_WITH=kf6-kconfig
 TERMUX_PKG_DEPENDS="gettext, iso-codes, libc++, qt6-qtbase, qt6-qtdeclarative"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION}), python, qt6-qttools"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

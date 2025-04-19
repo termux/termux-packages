@@ -12,6 +12,9 @@ set -u
 # Push changes to remote.
 : "${GIT_PUSH_PACKAGES:=false}"
 
+# Ensure unique workflow run ID exists or generate one.
+: "${GITHUB_RUN_ID:=$(shuf -i 1000000000-9999999999 -n 1)}"
+
 export TERMUX_PKG_UPDATE_METHOD=""             # Which method to use for updating? (repology, github or gitlab)
 export TERMUX_PKG_UPDATE_TAG_TYPE=""           # Whether to use latest-release-tag or newest-tag.
 export TERMUX_GITLAB_API_HOST="gitlab.com"     # Default host for gitlab-ci.
@@ -128,6 +131,13 @@ _update() {
 declare -A _LATEST_TAGS=()
 declare -A _FAILED_UPDATES=()
 declare -a _ALREADY_SEEN=() # Array of packages successfully updated or skipped.
+
+# get list of auto-update groups.
+readarray -t AUTO_UPDATE_GROUPS < <(
+	grep -hr TERMUX_PKG_AUTO_UPDATE_GROUP --include=build.sh "${TERMUX_SCRIPTDIR}" \
+		| sort -u \
+		| sed -e "s/^TERMUX_PKG_AUTO_UPDATE_GROUP=['\"]*//" -e "s/['\"]*\$//" || :
+)
 
 # _fetch_and_cache_tags fetches all possible tags using termux_pkg_auto_update, but using Ninja build system.
 # The key difference is that we make the process concurrent, allowing us to fetch tags simultaneously rather than one at a time.
@@ -292,6 +302,38 @@ _run_update() {
 	fi
 }
 
+_create_pending_prs_for_auto_update_groups() {
+	local changed_files current_ref versions title
+	current_ref="$(git rev-parse --abbrev-ref HEAD)"
+	for group in ${AUTO_UPDATE_GROUPS[@]}; do
+		# switch to potential PR branch if it exists.
+		git checkout "auto-update/${group}/${GITHUB_RUN_ID}" || continue
+
+		# obtain all build.sh files compared to origin.
+		readarray -t changed_files < <(git diff --name-only "$(git merge-base "${current_ref}" HEAD)" HEAD | grep '/build.sh$')
+
+		# read all versions
+		readarray -t versions < <(
+			for _build_sh in "${changed_files[@]}"; do
+			( # do everything in subshell to avoid variable mess
+				set +e +u
+				. "${_build_sh}" >/dev/null 2>&1
+				[[ -n "${TERMUX_PKG_VERSION#*:}" ]] && echo "${TERMUX_PKG_VERSION#*:}"
+			)
+			done | sort -u
+		)
+
+		if  (( "${#versions[*]}" == 1 )); then
+			title="bump(${group}): ${versions[@]}"
+		else
+			title="bump(${group}): group update"
+		fi
+
+		gh pr create --title "${title}" --body "This PR has been automatically submitted by Github Actions." --base "master"
+		git checkout "${current_ref}"
+	done
+}
+
 declare -a _CACHED_ISSUE_TITLES=()
 # Check if an issue with same title already exists and is open.
 _gh_check_issue_exists() {
@@ -315,6 +357,29 @@ _gh_check_issue_exists() {
 	return 1
 }
 
+declare -a _CACHED_PR_TITLES=()
+# Check if a PR with same title already exists and is open.
+_gh_check_pr_exists() {
+	local pkg_dir="$1" auto_update_group
+	if [[ -z "${_CACHED_PR_TITLES[*]}" ]]; then
+		readarray -t _CACHED_PR_TITLES < <(
+			gh pr list \
+				--limit 10000 \
+				--author termuxbot2 --label "bot" \
+				--state open \
+				--search "bump in:title type:issue" \
+				--json title | jq -r '.[] | .title' | sort -u
+		)
+	fi
+
+	auto_update_group="$(grep TERMUX_PKG_AUTO_UPDATE_GROUP "${pkg_dir}/build.sh" \
+		| sed -e "s/^TERMUX_PKG_AUTO_UPDATE_GROUP=['\"]*//" -e "s/['\"]*\$//" || :)"
+
+	[[ -z "${auto_update_group}" ]] && return 1
+
+	printf "%s\n" "${arr[@]}" | grep -q "^bump(${auto_update_group})"
+}
+
 _should_update() {
 	local pkg_dir="$1"
 
@@ -332,6 +397,12 @@ _should_update() {
 	if [[ " ${_ALREADY_SEEN[*]} ${!_FAILED_UPDATES[*]} " =~ " $(basename "${pkg_dir}") " ]]; then
 		return 1 # Skip.
 	fi
+
+	if [[ "${BUILD_PACKAGES}" == "true" && "${GITHUB_ACTIONS:-}" == "true" ]] && _gh_check_pr_exists "${pkg_dir}"; then
+		echo "INFO: Skipping '$(basename "${pkg_dir}")', existing update PR for it hasn't been merged yet."
+		return 1
+	fi
+
 	if [[ "${BUILD_PACKAGES}" == "true" ]] && [[ "${GITHUB_ACTIONS:-}" == "true" ]] && _gh_check_issue_exists "$(basename "${pkg_dir}")"; then
 		echo "INFO: Skipping '$(basename "${pkg_dir}")', an update issue for it hasn't been resolved yet."
 		return 1
@@ -398,6 +469,8 @@ else
 	done
 fi
 unset _unix_millis
+
+_create_pending_prs_for_auto_update_groups
 
 ################################################FAILURE HANDLING#################################################
 

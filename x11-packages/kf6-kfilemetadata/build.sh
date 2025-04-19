@@ -10,6 +10,8 @@ TERMUX_PKG_DEPENDS="attr, ebook-tools, exiv2, ffmpeg, kf6-karchive (>= ${TERMUX_
 TERMUX_PKG_BUILD_DEPENDS="catdoc, extra-cmake-modules (>= ${TERMUX_PKG_VERSION}), kdegraphics-mobipocket, qt6-qttools"
 TERMUX_PKG_RECOMMENDS="catdoc, kdegraphics-mobipocket"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_AUTO_UPDATE_GROUP=x11/kframeworks6
+TERMUX_PKG_ALIGN_VERSION_WITH=kf6-kconfig
 # libappimage can be added to TERMUX_PKG_BUILD_DEPENDS and TERMUX_PKG_RECOMMENDS when available
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_SYSTEM_NAME=Linux

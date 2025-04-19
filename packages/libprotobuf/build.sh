@@ -25,15 +25,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 TERMUX_PKG_NO_STATICSPLIT=true
 
-termux_step_post_get_source() {
-	# Version guard
-	local ver_e=${TERMUX_PKG_VERSION#*:}
-	local ver_x=$(. $TERMUX_SCRIPTDIR/packages/protobuf-static/build.sh; echo ${TERMUX_PKG_VERSION#*:})
-	if [ "${ver_e}" != "${ver_x}" ]; then
-		termux_error_exit "Version mismatch between libprotobuf and protobuf-static."
-	fi
-}
-
 termux_step_post_make_install() {
 	install -Dm600 -t $TERMUX_PREFIX/share/doc/libutf8-range \
 		$TERMUX_PKG_SRCDIR/third_party/utf8_range/LICENSE

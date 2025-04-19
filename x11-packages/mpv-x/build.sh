@@ -6,7 +6,9 @@ TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="0.40.0"
 TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=10a0f4654f62140a6dd4d380dcf0bbdbdcf6e697556863dc499c296182f081a3
-TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_AUTO_UPDATE_GROUP=x11/mpv
+TERMUX_PKG_ALIGN_VERSION_WITH=mpv
 TERMUX_PKG_DEPENDS="alsa-lib, ffmpeg, jack, libandroid-glob, libandroid-shmem, libarchive, libass, libbluray, libcaca, libdrm, libdvdnav, libiconv, libjpeg-turbo, liblua52, libsixel, libuchardet, libx11, libxext, libxinerama, libxpresent, libxrandr, libxss, libzimg, littlecms, openal-soft, pipewire, pulseaudio, rubberband, zlib, libplacebo"
 TERMUX_PKG_CONFLICTS="mpv"
 TERMUX_PKG_REPLACES="mpv"
@@ -24,15 +26,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dxv=disabled
 -Dandroid-media-ndk=disabled
 "
-
-termux_step_post_get_source() {
-	# Version guard
-	local ver_m=$(. $TERMUX_SCRIPTDIR/packages/mpv/build.sh; echo ${TERMUX_PKG_VERSION#*:})
-	local ver_x=${TERMUX_PKG_VERSION#*:}
-	if [ "${ver_m}" != "${ver_x}" ]; then
-		termux_error_exit "Version mismatch between mpv and mpv-x."
-	fi
-}
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob -landroid-shmem"
