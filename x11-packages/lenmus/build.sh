@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A free program to help you in the study of music theory 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=6.0.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/lenmus/lenmus/archive/refs/tags/Release_${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=1fa5b8edc468c800598845aa809b4a4e93058ed13af40bfacd037c44d1c4bc1d
 TERMUX_PKG_AUTO_UPDATE=true
