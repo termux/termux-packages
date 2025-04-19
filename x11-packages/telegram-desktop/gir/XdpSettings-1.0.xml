@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<dump>
+  <interface name="XdpSettingsSettings" get-type="xdp_settings_settings_get_type">
+    <property name="version" type="guint" flags="227" default-value="0"/>
+    <signal name="handle-read-all" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="GStrv"/>
+    </signal>
+    <signal name="handle-read" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-read-one" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="setting-changed" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+    </signal>
+  </interface>
+  <class name="XdpSettingsSettingsProxy" get-type="xdp_settings_settings_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="XdpSettingsSettings"/>
+  </class>
+  <class name="XdpSettingsSettingsSkeleton" get-type="xdp_settings_settings_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="XdpSettingsSettings"/>
+  </class>
+  <interface name="XdpSettingsObject" get-type="xdp_settings_object_get_type">
+    <prerequisite name="GDBusObject"/>
+    <property name="settings" type="XdpSettingsSettings" flags="227"/>
+  </interface>
+  <class name="XdpSettingsObjectProxy" get-type="xdp_settings_object_proxy_get_type" parents="GDBusObjectProxy,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="XdpSettingsObject"/>
+  </class>
+  <class name="XdpSettingsObjectSkeleton" get-type="xdp_settings_object_skeleton_get_type" parents="GDBusObjectSkeleton,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="XdpSettingsObject"/>
+  </class>
+  <class name="XdpSettingsObjectManagerClient" get-type="xdp_settings_object_manager_client_get_type" parents="GDBusObjectManagerClient,GObject">
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GDBusObjectManager"/>
+  </class>
+</dump>

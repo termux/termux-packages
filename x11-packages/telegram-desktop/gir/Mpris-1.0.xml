@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<dump>
+  <interface name="MprisMediaPlayer2" get-type="mpris_media_player2_get_type">
+    <property name="can-quit" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="can-raise" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="can-set-fullscreen" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="desktop-entry" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="fullscreen" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="has-track-list" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="identity" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="supported-mime-types" type="GStrv" flags="227"/>
+    <property name="supported-uri-schemes" type="GStrv" flags="227"/>
+    <signal name="handle-raise" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-quit" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+  </interface>
+  <class name="MprisMediaPlayer2Proxy" get-type="mpris_media_player2_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="MprisMediaPlayer2"/>
+  </class>
+  <class name="MprisMediaPlayer2Skeleton" get-type="mpris_media_player2_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="MprisMediaPlayer2"/>
+  </class>
+  <interface name="MprisMediaPlayer2Player" get-type="mpris_media_player2_player_get_type">
+    <property name="can-control" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="can-go-next" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="can-go-previous" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="can-pause" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="can-play" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="can-seek" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="loop-status" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="maximum-rate" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="metadata" type="GVariant" flags="227"/>
+    <property name="minimum-rate" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="playback-status" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="position" type="gint64" flags="227" default-value="0"/>
+    <property name="rate" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="shuffle" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="volume" type="gdouble" flags="227" default-value="0.000000"/>
+    <signal name="handle-next" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-previous" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-pause" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-play-pause" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-stop" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-play" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-seek" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gint64"/>
+    </signal>
+    <signal name="handle-set-position" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gint64"/>
+    </signal>
+    <signal name="handle-open-uri" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="seeked" return="void" when="last">
+      <param type="gint64"/>
+    </signal>
+  </interface>
+  <class name="MprisMediaPlayer2PlayerProxy" get-type="mpris_media_player2_player_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="MprisMediaPlayer2Player"/>
+  </class>
+  <class name="MprisMediaPlayer2PlayerSkeleton" get-type="mpris_media_player2_player_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="MprisMediaPlayer2Player"/>
+  </class>
+  <interface name="MprisObject" get-type="mpris_object_get_type">
+    <prerequisite name="GDBusObject"/>
+    <property name="media-player2" type="MprisMediaPlayer2" flags="227"/>
+    <property name="media-player2-player" type="MprisMediaPlayer2Player" flags="227"/>
+  </interface>
+  <class name="MprisObjectProxy" get-type="mpris_object_proxy_get_type" parents="GDBusObjectProxy,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="MprisObject"/>
+  </class>
+  <class name="MprisObjectSkeleton" get-type="mpris_object_skeleton_get_type" parents="GDBusObjectSkeleton,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="MprisObject"/>
+  </class>
+  <class name="MprisObjectManagerClient" get-type="mpris_object_manager_client_get_type" parents="GDBusObjectManagerClient,GObject">
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GDBusObjectManager"/>
+  </class>
+</dump>

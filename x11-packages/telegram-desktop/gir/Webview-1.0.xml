@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<dump>
+  <interface name="WebviewMaster" get-type="webview_master_get_type">
+    <signal name="handle-get-start-data" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-message-received" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-navigation-started" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="handle-navigation-done" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="handle-script-dialog" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gint"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-navigation-state-update" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="gboolean"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="handle-data-request" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="guint64"/>
+      <param type="gchararray"/>
+      <param type="gint64"/>
+      <param type="gint64"/>
+    </signal>
+  </interface>
+  <class name="WebviewMasterProxy" get-type="webview_master_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="WebviewMaster"/>
+  </class>
+  <class name="WebviewMasterSkeleton" get-type="webview_master_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="WebviewMaster"/>
+  </class>
+  <interface name="WebviewHelper" get-type="webview_helper_get_type">
+    <signal name="handle-create" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gboolean"/>
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-reload" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-resolve" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-navigate" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-init" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-eval" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-set-opaque-bg" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="handle-get-win-id" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-data-response" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="GUnixFDList"/>
+      <param type="guint64"/>
+      <param type="GVariant"/>
+      <param type="gint64"/>
+      <param type="gint64"/>
+      <param type="gint64"/>
+      <param type="gint64"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="started" return="void" when="last">
+    </signal>
+  </interface>
+  <class name="WebviewHelperProxy" get-type="webview_helper_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="WebviewHelper"/>
+  </class>
+  <class name="WebviewHelperSkeleton" get-type="webview_helper_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="WebviewHelper"/>
+  </class>
+  <interface name="WebviewObject" get-type="webview_object_get_type">
+    <prerequisite name="GDBusObject"/>
+    <property name="helper" type="WebviewHelper" flags="227"/>
+    <property name="master" type="WebviewMaster" flags="227"/>
+  </interface>
+  <class name="WebviewObjectProxy" get-type="webview_object_proxy_get_type" parents="GDBusObjectProxy,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="WebviewObject"/>
+  </class>
+  <class name="WebviewObjectSkeleton" get-type="webview_object_skeleton_get_type" parents="GDBusObjectSkeleton,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="WebviewObject"/>
+  </class>
+  <class name="WebviewObjectManagerClient" get-type="webview_object_manager_client_get_type" parents="GDBusObjectManagerClient,GObject">
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GDBusObjectManager"/>
+  </class>
+</dump>

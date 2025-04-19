@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<dump>
+  <interface name="SnapcraftSettings" get-type="snapcraft_settings_get_type">
+    <signal name="handle-check" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-check-sub" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-get" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-get-sub" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-set" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-set-sub" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+  </interface>
+  <class name="SnapcraftSettingsProxy" get-type="snapcraft_settings_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="SnapcraftSettings"/>
+  </class>
+  <class name="SnapcraftSettingsSkeleton" get-type="snapcraft_settings_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="SnapcraftSettings"/>
+  </class>
+  <interface name="SnapcraftObject" get-type="snapcraft_object_get_type">
+    <prerequisite name="GDBusObject"/>
+    <property name="settings" type="SnapcraftSettings" flags="227"/>
+  </interface>
+  <class name="SnapcraftObjectProxy" get-type="snapcraft_object_proxy_get_type" parents="GDBusObjectProxy,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="SnapcraftObject"/>
+  </class>
+  <class name="SnapcraftObjectSkeleton" get-type="snapcraft_object_skeleton_get_type" parents="GDBusObjectSkeleton,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="SnapcraftObject"/>
+  </class>
+  <class name="SnapcraftObjectManagerClient" get-type="snapcraft_object_manager_client_get_type" parents="GDBusObjectManagerClient,GObject">
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GDBusObjectManager"/>
+  </class>
+</dump>
