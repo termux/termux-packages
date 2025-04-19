@@ -9,7 +9,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 #     $TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_protobuf.sh
 # - ALWAYS bump revision of reverse dependencies and rebuild them.
 TERMUX_PKG_VERSION="2:30.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/protocolbuffers/protobuf/archive/v${TERMUX_PKG_VERSION#*:}.tar.gz
 TERMUX_PKG_SHA256=9df0e9e8ebe39f4fbbb9cf7db3d811287fe3616b2f191eb2bf5eaa12539c881f
 TERMUX_PKG_AUTO_UPDATE=false
@@ -35,8 +35,8 @@ termux_step_post_get_source() {
 }
 
 termux_step_post_make_install() {
-	install -Dm600 -t $TERMUX_PREFIX/share/doc/libutf8-range \
-		$TERMUX_PKG_SRCDIR/third_party/utf8_range/LICENSE
+	# conflict with file in protobuf-static
+	rm $TERMUX_PREFIX/lib/libupb.a
 
 	# Copy lib/*.cmake to opt/protobuf-cmake/shared for future use
 	mkdir -p $TERMUX_PREFIX/opt/protobuf-cmake/shared

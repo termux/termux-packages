@@ -1,0 +1,31 @@
+For some reason, this by itself makes libncnn select
+/home/builder/.termux-build/_cache/protobuf-30.0/bin/protoc
+instead of
+/data/data/com.termux/files/usr/bin/protoc-30.0.0
+
+--- a/tools/caffe/CMakeLists.txt
++++ b/tools/caffe/CMakeLists.txt
+@@ -1,5 +1,4 @@
+ 
+-find_package(protobuf CONFIG)
+ 
+ if(protobuf_FOUND)
+     set(PROTOBUF_FOUND ${protobuf_FOUND})
+--- a/tools/onnx/CMakeLists.txt
++++ b/tools/onnx/CMakeLists.txt
+@@ -1,5 +1,4 @@
+ 
+-find_package(protobuf CONFIG)
+ 
+ if(protobuf_FOUND)
+     set(PROTOBUF_FOUND ${protobuf_FOUND})
+--- a/tools/pnnx/CMakeLists.txt
++++ b/tools/pnnx/CMakeLists.txt
+@@ -95,7 +95,6 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+ endif()
+ 
+ if((PNNX_TORCH_USE_CXX11_ABI AND PNNX_COMPILER_USE_CXX11_ABI) OR (NOT PNNX_TORCH_USE_CXX11_ABI AND NOT PNNX_COMPILER_USE_CXX11_ABI))
+-    find_package(protobuf CONFIG)
+ 
+     if(protobuf_FOUND)
+         set(PROTOBUF_FOUND ${protobuf_FOUND})
