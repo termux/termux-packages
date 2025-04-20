@@ -198,7 +198,7 @@ readarray -t COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT" ||
 				and .workflowRun.file.path == ".github/workflows/packages.yml"
 				and .conclusion == "SUCCESS"
 				and .status == "COMPLETED")
-				| .workflowRun.databaseId][0]' <<< "$RESPONSE" || :
+				| .workflowRun.databaseId][0] // empty' <<< "$RESPONSE" || :
 		)"
 		if [[ -n "${WORKFLOW_ID}" ]]; then
 			echo "We can safely reuse CI artifacts from https://github.com/termux/termux-packages/actions/runs/${WORKFLOW_ID}"
