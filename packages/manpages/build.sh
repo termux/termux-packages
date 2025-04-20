@@ -5,13 +5,14 @@ TERMUX_PKG_LICENSE_FILE="LICENSES/Linux-man-pages-copyleft.txt, _man-pages-posix
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(6.13
                     2017)
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=(
 	a2c8a0c2efe8a978ce51ce800461eb9e8931f12cc7ba4b7faa3082b69ba7f12c
 	ce67bb25b5048b20dad772e405a83f4bc70faf051afa289361c81f9660318bc3
 )
 TERMUX_PKG_SRCURL=(https://www.kernel.org/pub/linux/docs/man-pages/man-pages-${TERMUX_PKG_VERSION[0]}.tar.xz
                    https://www.kernel.org/pub/linux/docs/man-pages/man-pages-posix/man-pages-posix-${TERMUX_PKG_VERSION[1]}-a.tar.xz)
-TERMUX_PKG_DEPENDS="man"
+TERMUX_PKG_DEPENDS="mandoc"
 TERMUX_PKG_CONFLICTS="linux-man-pages"
 TERMUX_PKG_REPLACES="linux-man-pages"
 TERMUX_PKG_PROVIDES="linux-man-pages"
