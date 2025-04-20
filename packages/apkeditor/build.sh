@@ -16,7 +16,7 @@ termux_step_make_install() {
 		$TERMUX_PREFIX/libexec/apkeditor/apkeditor.jar
 	cat <<- EOF > $TERMUX_PREFIX/bin/apkeditor
 	#!${TERMUX_PREFIX}/bin/sh
-	exec java -jar $TERMUX_PREFIX/share/java/apkeditor.jar "\$@"
+	exec java -jar $TERMUX_PREFIX/libexec/apkeditor/apkeditor.jar "\$@"
 	EOF
 	chmod 700 $TERMUX_PREFIX/bin/apkeditor
 }
