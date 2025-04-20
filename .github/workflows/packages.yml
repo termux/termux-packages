@@ -78,7 +78,14 @@ jobs:
 
         if [[ "${{ github.event_name }}" == "pull_request" && -n "$(git rev-list --merges "$(git fetch origin master >&2; git merge-base origin/master $HEAD_COMMIT)..$HEAD_COMMIT")" ]]; then
           # Github does not allow multiline errors, but it will interpret the escape sequence %0A as a line break.
-          echo "::error ::Merge commits are not allowed in pull requests.%0AYou should rebase your commits or squash them.%0Ahttps://docs.github.com/en/get-started/using-git/using-git-rebase-on-the-command-line"
+          message="$(sed 's/^ *//; /^$/d' <<< "
+            Merge commits are not allowed in pull requests.
+            You should rebase your commits or squash them.
+            https://docs.github.com/en/get-started/using-git/using-git-rebase-on-the-command-line
+          ")"
+          echo "::error ::${message//$'\n'/%0A}"
+          # post the message in PR only once
+          [[ "aarch64" == "${{ matrix.target_arch }}" ]] && GH_TOKEN="${{ secrets.GITHUB_TOKEN }}" gh pr comment "${{ github.event.pull_request.html_url }}" --body "$message"
           exit 1
         fi
 
