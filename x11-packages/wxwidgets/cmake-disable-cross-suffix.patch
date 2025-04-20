@@ -1,0 +1,43 @@
++++ ./build/cmake/functions.cmake
+@@ -275,7 +275,6 @@
+ 
+     set(cross_target)
+     if (CMAKE_CROSSCOMPILING)
+-        set(cross_target "-${CMAKE_SYSTEM_NAME}")
+     endif()
+ 
+     set(lib_prefix "lib")
++++ ./build/cmake/config.cmake
+@@ -130,12 +130,6 @@
+         set(WX_CHARTYPE ansi)
+         set(lib_unicode_suffix)
+     endif()
+-    if(CMAKE_CROSSCOMPILING)
+-        set(cross_compiling yes)
+-        set(host_alias ${CMAKE_SYSTEM_NAME})
+-    else()
+-        set(cross_compiling no)
+-    endif()
+ 
+     set(BUILT_WX_LIBS)
+     set(STD_BASE_LIBS)
+@@ -181,8 +181,8 @@
+ 
+     set(CC ${CMAKE_C_COMPILER})
+     set(CXX ${CMAKE_CXX_COMPILER})
+-    set(WXCONFIG_CFLAGS ${CMAKE_THREAD_LIBS_INIT})
+-    set(WXCONFIG_LDFLAGS ${CMAKE_THREAD_LIBS_INIT})
++    set(WXCONFIG_CFLAGS)
++    set(WXCONFIG_LDFLAGS)
+     set(WXCONFIG_CPPFLAGS)
+     if(wxBUILD_SHARED)
+         wx_string_append(WXCONFIG_CPPFLAGS " -DWXUSINGDLL")
++++ ./wx-config.in
+@@ -419,7 +419,6 @@
+ 
+ 
+ # Extract the user specification from the options parsed.
+-m_host=${input_option_host:+"${input_option_host}-?"}
+ m_host=${m_host:-$this_host}
+ m_toolkit=${input_option_toolkit:-'[^-]+'}
+ m_widgetset=${input_option_widgetset-'(univ)?'}
