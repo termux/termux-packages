@@ -73,6 +73,9 @@ def bump_revision(file: str) -> None:
     opened_file = open(file, "r")
     file_read = opened_file.read().split("\n")
     revision = 0
+    offset = 0
+    version_is_multiline = 0
+    count = 0
 
     if "TERMUX_PKG_REVISION" in "\n".join(file_read):
         for line in file_read:
@@ -86,12 +89,28 @@ def bump_revision(file: str) -> None:
                     )
                 break
 
-    else:
-        for line in file_read:
-            if line.startswith("TERMUX_PKG_VERSION"):
-                file_read.insert(file_read.index(line) + 1, "TERMUX_PKG_REVISION=1")
-                revision = 1
-                break
+    if revision == 0:
+        if "TERMUX_PKG_VERSION+=(" in "\n".join(file_read):
+            for line in file_read:
+                if line.startswith("TERMUX_PKG_VERSION+=("):
+                    count += 1
+                    continue
+                if count != 0 and not line.startswith("TERMUX_PKG_VERSION+=("):
+                    break
+        else:
+            offset = 1
+            for line in file_read:
+                if line.startswith("TERMUX_PKG_VERSION="):
+                    if "(" in line and not ")" in line:
+                        version_is_multiline = 1
+                        continue
+                    else:
+                        break
+                if version_is_multiline and ")" in line:
+                    break
+
+        file_read.insert(file_read.index(line) + offset, "TERMUX_PKG_REVISION=1")
+        revision = 1
 
     opened_file.close()
     opened_file = open(file,"w")
