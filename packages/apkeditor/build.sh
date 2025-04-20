@@ -9,20 +9,10 @@ TERMUX_PKG_DEPENDS="openjdk-17"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
-TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
-
-RAW_JAR=$TERMUX_PKG_CACHEDIR/APKEditor-${TERMUX_PKG_VERSION}.jar
-
-termux_step_get_source() {
-	mkdir -p $TERMUX_PKG_SRCDIR
-	termux_download $TERMUX_PKG_SRCURL \
-		$RAW_JAR \
-		$TERMUX_PKG_SHA256
-}
 
 termux_step_make_install() {
-	install -Dm600 $RAW_JAR \
-		$TERMUX_PREFIX/share/java/apkeditor.jar
+	install -Dm600 $TERMUX_PKG_SRCDIR/APKEditor-${TERMUX_PKG_VERSION}.jar \
+		$TERMUX_PREFIX/libexec/apkeditor/apkeditor.jar
 	cat <<- EOF > $TERMUX_PREFIX/bin/apkeditor
 	#!${TERMUX_PREFIX}/bin/sh
 	exec java -jar $TERMUX_PREFIX/share/java/apkeditor.jar "\$@"
