@@ -5,4 +5,3 @@ lib/libprotoc.so*
 lib/pkgconfig/protobuf-lite.pc
 "
 TERMUX_SUBPKG_DESCRIPTION="Compiler for protocol buffer definition files"
-
