@@ -11,7 +11,10 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 
 termux_step_make_install() {
-	install -Dm600 $TERMUX_PKG_SRCDIR/APKEditor-${TERMUX_PKG_VERSION}.jar \
+	termux_download $TERMUX_PKG_SRCURL \
+ 		$TERMUX_PKG_CACHEDIR/APKEditor-${TERMUX_PKG_VERSION}.jar \
+   		$TERMUX_PKG_SHA256
+	install -Dm600 $TERMUX_PKG_CACHEDIR/APKEditor-${TERMUX_PKG_VERSION}.jar \
 		$TERMUX_PREFIX/libexec/apkeditor/apkeditor.jar
 	cat <<- EOF > $TERMUX_PREFIX/bin/apkeditor
 	#!${TERMUX_PREFIX}/bin/sh
