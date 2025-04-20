@@ -1,0 +1,15 @@
+diff --git a/share/tools/create_manpage_completions.py b/share/tools/create_manpage_completions.py
+index 1fc26a846..83468ea87 100755
+--- a/share/tools/create_manpage_completions.py
++++ b/share/tools/create_manpage_completions.py
+@@ -1027,8 +1027,9 @@ def get_paths_from_man_locations():
+         except FileNotFoundError:
+             pass
+     # Fallback: hard-code some common paths. These should be likely for FHS Linux distros, BSDs, and macOS.
++    # We need to patch this to work properly on Termux.
+     if not parent_paths:
+-        parent_paths = ["/usr/share/man", "/usr/local/man", "/usr/local/share/man"]
++        parent_paths = ["@TERMUX_PREFIX@/share/man"]
+         print(
+             "Unable to get the manpath, falling back to %s." % ":".join(parent_paths),
+             "Explictly set $MANPATH to fix this error.",
