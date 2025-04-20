@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/REAndroid/APKEditor
-TERMUX_PKG_DESCRIPTION="Powerful Android APK editor - aapt/aapt2 independent."
+TERMUX_PKG_DESCRIPTION="Android binary resource files editor"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@Veha0001"
 TERMUX_PKG_VERSION=1.4.2
