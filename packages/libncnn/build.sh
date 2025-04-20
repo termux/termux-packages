@@ -2,15 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://github.com/Tencent/ncnn
 TERMUX_PKG_DESCRIPTION="A high-performance neural network inference framework optimized for the mobile platform"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=4b97730b0d033b4dc2a790e5c35745e0dbf51569
-TERMUX_PKG_VERSION="20230627"
-TERMUX_PKG_REVISION=9
-TERMUX_PKG_SRCURL=git+https://github.com/Tencent/ncnn
-TERMUX_PKG_GIT_BRANCH=master
-TERMUX_PKG_SHA256=a81ee5b6df97830919f8ed8554c99a4f223976ed82eee0cc9f214de0ce53dd2a
+TERMUX_PKG_VERSION="20241226"
+TERMUX_PKG_SRCURL=https://github.com/Tencent/ncnn/releases/download/${TERMUX_PKG_VERSION}/ncnn-${TERMUX_PKG_VERSION}-full-source.zip
+TERMUX_PKG_SHA256=b2145f7b01422f5ee66777d1c2c29de935191ed39865193951e1a7228202a6c1
 TERMUX_PKG_AUTO_UPDATE=false
-TERMUX_PKG_DEPENDS="abseil-cpp, glslang, libc++, vulkan-loader"
-TERMUX_PKG_BUILD_DEPENDS="protobuf-static, python, vulkan-headers, vulkan-loader-android"
+TERMUX_PKG_DEPENDS="abseil-cpp, glslang, libc++, libandroid-stub, libprotobuf, vulkan-loader"
+TERMUX_PKG_BUILD_DEPENDS="python, vulkan-headers, vulkan-loader-android"
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, pybind11"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -34,25 +31,12 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DVulkan_INCLUDE_DIRS=${TERMUX_PREFIX}/include
 "
 
-termux_step_post_get_source() {
-	git fetch --unshallow
-	git checkout "${_COMMIT}"
-	git submodule update --init --recursive --depth=1
-	git clean -ffxd
-
-	local version=$(git log -1 --format=%cs | sed -e "s|-||g")
-	if [[ "${version}" != "${TERMUX_PKG_VERSION}" ]]; then
-		termux_error_exit <<- EOL
-		Version mismatch detected!
-		build.sh: ${TERMUX_PKG_VERSION}
-		git repo: ${version}
-		EOL
-	fi
-
-	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
-	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
-		termux_error_exit "Checksum mismatch for source files"
-	fi
+# The original "termux_extract_src_archive" always strips the first components
+# but the source of libncnn is directly under the root directory of the zip file
+termux_extract_src_archive() {
+	local file="$TERMUX_PKG_CACHEDIR/$(basename "$TERMUX_PKG_SRCURL")"
+	mkdir -p "$TERMUX_PKG_SRCDIR"
+	unzip -q "$file" -d "$TERMUX_PKG_SRCDIR"
 }
 
 termux_step_pre_configure() {
@@ -65,15 +49,6 @@ termux_step_pre_configure() {
 	LDFLAGS+=" $("${TERMUX_SCRIPTDIR}/packages/libprotobuf/interface_link_libraries.sh")"
 	LDFLAGS+=" -lutf8_range -lutf8_validity"
 	LDFLAGS+=" -landroid -ljnigraphics -llog"
-
-	mkdir -p "$TERMUX_PKG_TMPDIR/bin"
-	cat <<- EOF > "$TERMUX_PKG_TMPDIR/bin/$(basename ${CC})"
-		#!/bin/bash
-		set -- "\${@/-lprotobuf/-l:libprotobuf.a}"
-		exec $TERMUX_STANDALONE_TOOLCHAIN/bin/$(basename ${CC}) "\$@"
-	EOF
-	chmod +x "$TERMUX_PKG_TMPDIR/bin/$(basename ${CC})"
-	export PATH="$TERMUX_PKG_TMPDIR/bin:$PATH"
 }
 
 termux_step_post_make_install() {
