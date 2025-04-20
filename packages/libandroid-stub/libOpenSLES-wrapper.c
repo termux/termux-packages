@@ -9,8 +9,10 @@
 
 #ifdef __LP64__
 #define LIB "/system/lib64/libOpenSLES.so"
+#define SKCODEC "/system/lib64/libskcodec.so"
 #else
 #define LIB "/system/lib/libOpenSLES.so"
+#define SKCODEC "/system/lib/libskcodec.so"
 #endif
 
 #define IIDS(s) \
@@ -84,7 +86,12 @@ static struct {
 #undef STUB
 
 __attribute__((constructor)) static void init() {
+    // simulate LD_PRELOAD=/system/lib64/libskcodec.so
+    void *skcodec_handle = dlopen(SKCODEC, RTLD_GLOBAL); // ignore errors, we only need to upload it to global namespace
     void* handle = dlopen(LIB, RTLD_LOCAL);
+    if (skcodec_handle)
+        dlclose(skcodec_handle); // if the library is needed by any of libOpenSLES dependencies it will not be unloaded
+
     // Nothing bad happened, normal case for termux-docker.
     if (!handle)
         return;
