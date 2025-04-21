@@ -60,6 +60,7 @@
     <property name="css-name" type="gchararray" flags="235" default-value="NULL"/>
     <property name="css-classes" type="GStrv" flags="227"/>
     <property name="layout-manager" type="GtkLayoutManager" flags="1073742051"/>
+    <property name="limit-events" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <signal name="destroy" return="void" when="cleanup" no-recurse="1" no-hooks="1">
     </signal>
     <signal name="show" return="void" when="first">
@@ -143,8 +144,8 @@
     <property name="startup-id" type="gchararray" flags="226" default-value="NULL"/>
     <property name="mnemonics-visible" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="focus-visible" type="gboolean" flags="1073742051" default-value="TRUE"/>
-    <property name="maximized" type="gboolean" flags="1073742055" default-value="FALSE"/>
-    <property name="fullscreened" type="gboolean" flags="1073742055" default-value="FALSE"/>
+    <property name="maximized" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="fullscreened" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <signal name="activate-focus" return="void" when="last" action="1">
     </signal>
     <signal name="activate-default" return="void" when="last" action="1">
@@ -635,6 +636,17 @@
     <member name="GTK_BUTTONS_CANCEL" nick="cancel" value="3"/>
     <member name="GTK_BUTTONS_YES_NO" nick="yes-no" value="4"/>
     <member name="GTK_BUTTONS_OK_CANCEL" nick="ok-cancel" value="5"/>
+  </enum>  <enum name="GtkShortcutType" get-type="gtk_shortcut_type_get_type">
+    <member name="GTK_SHORTCUT_ACCELERATOR" nick="accelerator" value="0"/>
+    <member name="GTK_SHORTCUT_GESTURE_PINCH" nick="gesture-pinch" value="1"/>
+    <member name="GTK_SHORTCUT_GESTURE_STRETCH" nick="gesture-stretch" value="2"/>
+    <member name="GTK_SHORTCUT_GESTURE_ROTATE_CLOCKWISE" nick="gesture-rotate-clockwise" value="3"/>
+    <member name="GTK_SHORTCUT_GESTURE_ROTATE_COUNTERCLOCKWISE" nick="gesture-rotate-counterclockwise" value="4"/>
+    <member name="GTK_SHORTCUT_GESTURE_TWO_FINGER_SWIPE_LEFT" nick="gesture-two-finger-swipe-left" value="5"/>
+    <member name="GTK_SHORTCUT_GESTURE_TWO_FINGER_SWIPE_RIGHT" nick="gesture-two-finger-swipe-right" value="6"/>
+    <member name="GTK_SHORTCUT_GESTURE" nick="gesture" value="7"/>
+    <member name="GTK_SHORTCUT_GESTURE_SWIPE_LEFT" nick="gesture-swipe-left" value="8"/>
+    <member name="GTK_SHORTCUT_GESTURE_SWIPE_RIGHT" nick="gesture-swipe-right" value="9"/>
   </enum>  <flags name="GtkStyleContextPrintFlags" get-type="gtk_style_context_print_flags_get_type">
     <member name="GTK_STYLE_CONTEXT_PRINT_NONE" nick="none" value="0"/>
     <member name="GTK_STYLE_CONTEXT_PRINT_RECURSE" nick="recurse" value="1"/>
@@ -720,7 +732,7 @@
     <member name="GTK_DEBUG_GEOMETRY" nick="geometry" value="16"/>
     <member name="GTK_DEBUG_ICONTHEME" nick="icontheme" value="32"/>
     <member name="GTK_DEBUG_PRINTING" nick="printing" value="64"/>
-    <member name="GTK_DEBUG_BUILDER" nick="builder" value="128"/>
+    <member name="GTK_DEBUG_BUILDER_TRACE" nick="builder-trace" value="128"/>
     <member name="GTK_DEBUG_SIZE_REQUEST" nick="size-request" value="256"/>
     <member name="GTK_DEBUG_NO_CSS_CACHE" nick="no-css-cache" value="512"/>
     <member name="GTK_DEBUG_INTERACTIVE" nick="interactive" value="1024"/>
@@ -733,6 +745,7 @@
     <member name="GTK_DEBUG_ICONFALLBACK" nick="iconfallback" value="262144"/>
     <member name="GTK_DEBUG_INVERT_TEXT_DIR" nick="invert-text-dir" value="524288"/>
     <member name="GTK_DEBUG_CSS" nick="css" value="1048576"/>
+    <member name="GTK_DEBUG_BUILDER" nick="builder" value="2097152"/>
   </flags>
   <enum name="GtkDialogError" get-type="gtk_dialog_error_get_type">
     <member name="GTK_DIALOG_ERROR_FAILED" nick="failed" value="0"/>
@@ -1207,6 +1220,12 @@
     <member name="GTK_ACCESSIBLE_RELATION_ROW_INDEX_TEXT" nick="row-index-text" value="15"/>
     <member name="GTK_ACCESSIBLE_RELATION_ROW_SPAN" nick="row-span" value="16"/>
     <member name="GTK_ACCESSIBLE_RELATION_SET_SIZE" nick="set-size" value="17"/>
+    <member name="GTK_ACCESSIBLE_RELATION_LABEL_FOR" nick="label-for" value="18"/>
+    <member name="GTK_ACCESSIBLE_RELATION_DESCRIPTION_FOR" nick="description-for" value="19"/>
+    <member name="GTK_ACCESSIBLE_RELATION_CONTROLLED_BY" nick="controlled-by" value="20"/>
+    <member name="GTK_ACCESSIBLE_RELATION_DETAILS_FOR" nick="details-for" value="21"/>
+    <member name="GTK_ACCESSIBLE_RELATION_ERROR_MESSAGE_FOR" nick="error-message-for" value="22"/>
+    <member name="GTK_ACCESSIBLE_RELATION_FLOW_FROM" nick="flow-from" value="23"/>
   </enum>  <enum name="GtkAccessibleTristate" get-type="gtk_accessible_tristate_get_type">
     <member name="GTK_ACCESSIBLE_TRISTATE_FALSE" nick="false" value="0"/>
     <member name="GTK_ACCESSIBLE_TRISTATE_TRUE" nick="true" value="1"/>
@@ -1268,6 +1287,7 @@
     <member name="GTK_GRAPHICS_OFFLOAD_ENABLED" nick="enabled" value="0"/>
     <member name="GTK_GRAPHICS_OFFLOAD_DISABLED" nick="disabled" value="1"/>
   </enum>  <flags name="GtkIconLookupFlags" get-type="gtk_icon_lookup_flags_get_type">
+    <member name="GTK_ICON_LOOKUP_NONE" nick="none" value="0"/>
     <member name="GTK_ICON_LOOKUP_FORCE_REGULAR" nick="force-regular" value="1"/>
     <member name="GTK_ICON_LOOKUP_FORCE_SYMBOLIC" nick="force-symbolic" value="2"/>
     <member name="GTK_ICON_LOOKUP_PRELOAD" nick="preload" value="4"/>
@@ -1324,18 +1344,7 @@
   </enum>  <flags name="GtkShortcutActionFlags" get-type="gtk_shortcut_action_flags_get_type">
     <member name="GTK_SHORTCUT_ACTION_EXCLUSIVE" nick="exclusive" value="1"/>
   </flags>
-  <enum name="GtkShortcutType" get-type="gtk_shortcut_type_get_type">
-    <member name="GTK_SHORTCUT_ACCELERATOR" nick="accelerator" value="0"/>
-    <member name="GTK_SHORTCUT_GESTURE_PINCH" nick="gesture-pinch" value="1"/>
-    <member name="GTK_SHORTCUT_GESTURE_STRETCH" nick="gesture-stretch" value="2"/>
-    <member name="GTK_SHORTCUT_GESTURE_ROTATE_CLOCKWISE" nick="gesture-rotate-clockwise" value="3"/>
-    <member name="GTK_SHORTCUT_GESTURE_ROTATE_COUNTERCLOCKWISE" nick="gesture-rotate-counterclockwise" value="4"/>
-    <member name="GTK_SHORTCUT_GESTURE_TWO_FINGER_SWIPE_LEFT" nick="gesture-two-finger-swipe-left" value="5"/>
-    <member name="GTK_SHORTCUT_GESTURE_TWO_FINGER_SWIPE_RIGHT" nick="gesture-two-finger-swipe-right" value="6"/>
-    <member name="GTK_SHORTCUT_GESTURE" nick="gesture" value="7"/>
-    <member name="GTK_SHORTCUT_GESTURE_SWIPE_LEFT" nick="gesture-swipe-left" value="8"/>
-    <member name="GTK_SHORTCUT_GESTURE_SWIPE_RIGHT" nick="gesture-swipe-right" value="9"/>
-  </enum>  <enum name="GtkSorterOrder" get-type="gtk_sorter_order_get_type">
+  <enum name="GtkSorterOrder" get-type="gtk_sorter_order_get_type">
     <member name="GTK_SORTER_ORDER_PARTIAL" nick="partial" value="0"/>
     <member name="GTK_SORTER_ORDER_NONE" nick="none" value="1"/>
     <member name="GTK_SORTER_ORDER_TOTAL" nick="total" value="2"/>
@@ -2295,6 +2304,7 @@
     <property name="title-widget" type="GtkWidget" flags="1073742051"/>
     <property name="show-title-buttons" type="gboolean" flags="1073742051" default-value="TRUE"/>
     <property name="decoration-layout" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="use-native-controls" type="gboolean" flags="1073742051" default-value="FALSE"/>
   </class>
   <class name="GtkIconTheme" get-type="gtk_icon_theme_get_type" parents="GObject">
     <property name="display" type="GdkDisplay" flags="1073741827"/>
@@ -2961,6 +2971,7 @@
     <property name="activate-on-single-click" type="gboolean" flags="1073741827" default-value="TRUE"/>
     <property name="accept-unpaired-release" type="gboolean" flags="1073741827" default-value="FALSE"/>
     <property name="show-separators" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="tab-behavior" type="GtkListTabBehavior" flags="1073741827" default-value="GTK_LIST_TAB_ALL"/>
     <signal name="move-cursor" return="void" when="last" action="1">
       <param type="GtkMovementStep"/>
       <param type="gint"/>
@@ -3612,7 +3623,7 @@
     <property name="gtk-enable-animations" type="gboolean" flags="227" default-value="TRUE"/>
     <property name="gtk-error-bell" type="gboolean" flags="227" default-value="TRUE"/>
     <property name="gtk-show-status-shapes" type="gboolean" flags="227" default-value="FALSE"/>
-    <property name="gtk-print-backends" type="gchararray" flags="227" default-value="cups,file"/>
+    <property name="gtk-print-backends" type="gchararray" flags="227" default-value="file"/>
     <property name="gtk-print-preview-command" type="gchararray" flags="227" default-value="evince --unlink-tempfile --preview --print-settings %s %f"/>
     <property name="gtk-enable-accels" type="gboolean" flags="227" default-value="TRUE"/>
     <property name="gtk-im-module" type="gchararray" flags="227" default-value="NULL"/>
@@ -3650,6 +3661,8 @@
     <property name="n-items" type="guint" flags="225" default-value="0"/>
     <property name="scope" type="GtkShortcutScope" flags="1073742051" default-value="GTK_SHORTCUT_SCOPE_LOCAL"/>
   </class>
+  <interface name="GtkShortcutManager" get-type="gtk_shortcut_manager_get_type">
+  </interface>
   <class name="GtkShortcutLabel" get-type="gtk_shortcut_label_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
     <implements name="GtkAccessible"/>
     <implements name="GtkBuildable"/>
@@ -3657,8 +3670,6 @@
     <property name="accelerator" type="gchararray" flags="227" default-value="NULL"/>
     <property name="disabled-text" type="gchararray" flags="227" default-value="NULL"/>
   </class>
-  <interface name="GtkShortcutManager" get-type="gtk_shortcut_manager_get_type">
-  </interface>
   <class name="GtkShortcutTrigger" get-type="gtk_shortcut_trigger_get_type" parents="GObject" abstract="1">
   </class>
   <class name="GtkNeverTrigger" get-type="gtk_never_trigger_get_type" parents="GtkShortcutTrigger,GObject">
@@ -4225,6 +4236,7 @@
     <implements name="GtkConstraintTarget"/>
     <property name="side" type="GtkPackType" flags="1073742051" default-value="GTK_PACK_START"/>
     <property name="decoration-layout" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="use-native-controls" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="empty" type="gboolean" flags="1073742049" default-value="TRUE"/>
   </class>
   <class name="GtkWindowGroup" get-type="gtk_window_group_get_type" parents="GObject">
