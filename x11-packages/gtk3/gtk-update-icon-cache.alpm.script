@@ -1,0 +1,13 @@
+#!@TERMUX_PREFIX@/bin/bash
+
+set -e
+
+sort -r | while read -r i; do
+	dir=$(dirname "${i}")
+	if [[ -e "${i}" ]]; then
+		gtk-update-icon-cache --force --quiet "${dir}"
+	elif [[ -d "${dir}" ]]; then
+		rm -f "${dir}/icon-theme.cache"
+		rmdir --ignore-fail-on-non-empty "${dir}"
+	fi
+done
