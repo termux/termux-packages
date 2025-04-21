@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/termuxdev4/py2pkg/
+TERMUX_PKG_DESCRIPTION="Convert Python Scripts into debian packages in seconds"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="termuxdev4 <calestialashley@gmail.com>"
+TERMUX_PKG_VERSION=1.0.0
+TERMUX_PKG_SRCURL=https://github.com/termuxdev4/py2pkg/raw/fe3cd2eb0807aed0c80e170ffcb9854845be9d3f/py2pkg.tar.lz
+TERMUX_PKG_SHA256=7ce4cfeafa67f021501ae65d37636134b5ee21569a059bdc0bce2cdd15547f90
+TERMUX_PKG_DEPENDS="python3"
+TERMUX_PKG_BUILD_IN_SRC=true
