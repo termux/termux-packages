@@ -1,6 +1,8 @@
 TERMUX_SUBPKG_INCLUDE="
 bin/gtk-update-icon-cache
 share/man/man1/gtk-update-icon-cache.1.gz
+share/libalpm/hooks/gtk-update-icon-cache.hook
+share/libalpm/scripts/gtk-update-icon-cache
 "
 
 TERMUX_SUBPKG_DEPENDS="gdk-pixbuf, glib"
@@ -21,4 +23,7 @@ termux_step_create_subpkg_debscripts() {
 	unset i
 	exit 0
 	EOF
+	if [[ "$TERMUX_PACKAGE_FORMAT" == "pacman" ]]; then
+		echo "post_install" > postupg
+	fi
 }
