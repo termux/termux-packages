@@ -79,11 +79,13 @@
   <boxed name="GskPathMeasure" get-type="gsk_path_measure_get_type"/>
   <boxed name="GskStroke" get-type="gsk_stroke_get_type"/>
   <boxed name="GskTransform" get-type="gsk_transform_get_type"/>
-  <class name="GskGLRenderer" get-type="gsk_gl_renderer_get_type" parents="GskRenderer,GObject">
+  <class name="GskVulkanRenderer" get-type="gsk_vulkan_renderer_get_type" parents="GskGpuRenderer,GskRenderer,GObject">
     <implements name="GdkDmabufDownloader"/>
   </class>
-  <class name="GskNglRenderer" get-type="gsk_ngl_renderer_get_type" parents="GskGpuRenderer,GskRenderer,GObject">
+  <class name="GskGLRenderer" get-type="gsk_gl_renderer_get_type" parents="GskGpuRenderer,GskRenderer,GObject">
     <implements name="GdkDmabufDownloader"/>
+  </class>
+  <class name="GskNglRenderer" get-type="gsk_ngl_renderer_get_type" parents="GskRenderer,GObject">
   </class>
   <enum name="GskRenderNodeType" get-type="gsk_render_node_type_get_type">
     <member name="GSK_NOT_A_RENDER_NODE" nick="not-a-render-node" value="0"/>
@@ -198,8 +200,5 @@
     <member name="GSK_PATH_FOREACH_ALLOW_CUBIC" nick="cubic" value="2"/>
     <member name="GSK_PATH_FOREACH_ALLOW_CONIC" nick="conic" value="4"/>
   </flags>
-  <class name="GskVulkanRenderer" get-type="gsk_vulkan_renderer_get_type" parents="GskGpuRenderer,GskRenderer,GObject">
-    <implements name="GdkDmabufDownloader"/>
-  </class>
   <error-quark function="gsk_serialization_error_quark" domain="gsk-serialization-error-quark"/>
 </dump>
