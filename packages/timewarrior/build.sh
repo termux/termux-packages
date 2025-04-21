@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://timewarrior.net/
 TERMUX_PKG_DESCRIPTION="Command-line time tracker"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.7.1"
+TERMUX_PKG_VERSION="1.8.0"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SRCURL=git+https://github.com/GothenburgBitFactory/timewarrior
 TERMUX_PKG_DEPENDS="libandroid-glob, libc++"
@@ -11,5 +11,8 @@ TERMUX_PKG_DEPENDS="libandroid-glob, libc++"
 TERMUX_PKG_RM_AFTER_INSTALL="share/man"
 
 termux_step_pre_configure() {
+	# Fix i686 builds.
+	CXXFLAGS+=" -Wno-c++11-narrowing"
+
 	LDFLAGS+=" -landroid-glob"
 }
