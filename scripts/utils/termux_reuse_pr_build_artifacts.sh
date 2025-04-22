@@ -6,8 +6,11 @@ cd "$(realpath "$(dirname "$0")")/../.."
 GITHUB_EVENT_NAME="${1:-}"
 TARGET_ARCH="${2:-}"
 
+unset PR WORKFLOW_ID
+
 infoexit() {
 	echo "$@"
+	[[ -n "${PR}" && -n "${CI}" ]] && echo "::error ::Failed to reuse PR #${PR} ${WORKFLOW_ID:+"(workflow run ${WORKFLOW_ID})"} build artifacts, see \`Gathering build summary\` step logs."
 	exit 1
 } >&2
 
@@ -36,8 +39,30 @@ ci_artifact_url() {
 		-H "Authorization: token ${GITHUB_TOKEN}" \
 		-H "Accept: application/vnd.github.v3+json" \
 		"https://api.github.com/repos/termux/termux-packages/actions/runs/${1}/artifacts" \
-		| jq -r '[.artifacts[] | select(.name | startswith("debs-'"${TARGET_ARCH}"'")) | .archive_download_url][0] // empty' \
+		| jq -r '[.artifacts[]? | select(.name | startswith("debs-'"${TARGET_ARCH}"'")) | .archive_download_url][0] // error' \
 	|| return $?
+}
+
+download_ci_artifacts() {
+	local WORKFLOW_ID="$1" CI_ARTIFACT_URL CI_ARTIFACT_ZIP
+	CI_ARTIFACT_ZIP="$HOME/.termux-build/_cache/artifact-${WORKFLOW_ID}.zip"
+	CI_ARTIFACT_URL="$(ci_artifact_url "${WORKFLOW_ID}")" || { echo "Failed to get CI artifact URL" >&2; return 1; }
+	echo "CI artifact URL is ${CI_ARTIFACT_URL}"
+
+	mkdir -p "$(dirname "${CI_ARTIFACT_ZIP}")"
+	# Re-downloading should not happen, but let's suppose artifact is outdated
+	rm -f "${CI_ARTIFACT_ZIP}"
+	curl \
+		--fail \
+		--show-error \
+		--location \
+		-H "Authorization: token $GITHUB_TOKEN" \
+		"${CI_ARTIFACT_URL}" \
+		--output "${CI_ARTIFACT_ZIP}" \
+		|| { echo "Failed to download PR artifact." >&2; return 1; }
+
+	unzip -p "${CI_ARTIFACT_ZIP}" '*.tar' | tar xvf - --wildcards --strip-components=1 -C output 'debs/*.deb' \
+		|| { echo "Failed to unpack PR artifact." >&2; return 1; }
 }
 
 mask_output() {
@@ -90,6 +115,7 @@ readarray -t COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT" ||
 	(( ${#PRS[*]} == 0 )) && infoexit "push does not have a linked PR, not performing CI fast path"
 	(( ${#PRS[*]}	> 1 )) && infoexit "push contains commits from more than one PR, not performing CI fast path"
 
+	PR="${PRS[0]}"
 	read -rd' ' PR_HEAD_COMMIT PR_COMMIT_TITLE PR_COMMIT_BODY < <(jq -r '
 		.data.repository[].associatedPullRequests |
 			(.nodes[0].headRefOid,
@@ -202,7 +228,13 @@ readarray -t COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT" ||
 		)"
 		if [[ -n "${WORKFLOW_ID}" ]]; then
 			echo "We can safely reuse CI artifacts from https://github.com/termux/termux-packages/actions/runs/${WORKFLOW_ID}"
-			echo "CI artifact URL is $(ci_artifact_url "${WORKFLOW_ID}" || infoexit "Failed to get CI artifact URL")"
+			if download_ci_artifacts "${WORKFLOW_ID}"; then
+				# Notify CI about skipping packages building because we reuse PR artifact.
+				echo "skip-building=true" >> "${GITHUB_OUTPUT:-/dev/null}"
+				echo "::notice::Reusing PR #${PRS[0]} (workflow run ${WORKFLOW_ID}) build artifacts, building is skipped."
+			else
+				infoexit "Failed to download and unpack PR artifacts"
+			fi
 		else
 			echo "We can safely reuse CI artifacts, but did not find any matching CI run."
 		fi
