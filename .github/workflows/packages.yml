@@ -220,13 +220,14 @@ jobs:
         fi
 
     - name: Free additional disk space (if needed)
-      if: ${{ steps.build-info.outputs.docker-build == 'false' }}
+      if: ${{ steps.build-info.outputs.docker-build == 'false' && steps.build-info.outputs.skip-building != 'true' }}
       run: |
         ./scripts/setup-ubuntu.sh
         sudo apt install ninja-build
         ./scripts/free-space.sh
 
     - name: Build packages
+      if: ${{ steps.build-info.outputs.skip-building != 'true' }}
       env:
         DOCKER_BUILD: ${{ steps.build-info.outputs.docker-build }}
       run: |
