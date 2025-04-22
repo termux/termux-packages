@@ -10,6 +10,8 @@ lib/clang/*/lib/linux/
 lib/clang/*/share/asan_ignorelist.txt
 lib/clang/*/share/cfi_ignorelist.txt
 lib/clang/*/share/hwasan_ignorelist.txt
+share/libalpm/hooks/update-libcompiler-rt.hook
+share/libalpm/scripts/update-libcompiler-rt
 "
 TERMUX_SUBPKG_DEPEND_ON_PARENT=false
 TERMUX_SUBPKG_DEPENDS=libc++
@@ -24,17 +26,19 @@ termux_step_create_subpkg_debscripts() {
 	EOF
 
 	cat <<- EOF > ./postinst
-	#!$TERMUX_PREFIX/bin/sh
-	find $RT_PATH -type l ! -name "libclang_rt*$TERMUX_ARCH*" -exec rm -rf "{}" \;
-	if [ -e $RT_OPT_DIR ]; then
-	    find $RT_OPT_DIR -type f ! -name "libclang_rt*$TERMUX_ARCH*" -exec ln -sf "{}" $RT_PATH \;
+	#!$TERMUX_PREFIX/bin/bash
+	if [[ -e "$RT_OPT_DIR" ]]; then
+	    find $RT_OPT_DIR -type f ! -name "lib*-$TERMUX_ARCH-*" -exec ln -sf "{}" $RT_PATH \;
 	fi
 	exit 0
 	EOF
+	if [[ "$TERMUX_PACKAGE_FORMAT" == "pacman" ]]; then
+		echo "post_install" > postupg
+	fi
 
 	cat <<- EOF > ./prerm
 	#!$TERMUX_PREFIX/bin/sh
-	find $RT_PATH -type l ! -name "libclang_rt*$TERMUX_ARCH*" -exec rm -rf "{}" \;
+	find $RT_PATH -type l ! -name "lib*-$TERMUX_ARCH-*" -exec rm -rf "{}" \;
 	exit 0
 	EOF
 }

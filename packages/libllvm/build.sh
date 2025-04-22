@@ -6,6 +6,7 @@ TERMUX_PKG_MAINTAINER="@finagolfin"
 # Keep flang version and revision in sync when updating (enforced by check in termux_step_pre_configure).
 LLVM_MAJOR_VERSION=20
 TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.1.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=b6183c41281ee3f23da7fda790c6d4f5877aed103d1e759763b1008bdd0e2c50
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-${TERMUX_PKG_VERSION}.src.tar.xz
@@ -164,4 +165,9 @@ termux_step_post_make_install() {
 			chmod u+x $tool
 		done
 	fi
+}
+
+termux_step_pre_massage() {
+	[[ "$TERMUX_PACKAGE_FORMAT" != "pacman" ]] && return
+	sed -i "s|@LLVM_MAJOR_VERSION@|${LLVM_MAJOR_VERSION}|g" ./share/libalpm/scripts/update-libcompiler-rt
 }
