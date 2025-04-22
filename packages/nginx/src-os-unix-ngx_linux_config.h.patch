@@ -1,0 +1,13 @@
+# libcrypt.so is found but crypt.h is not. workaround it.
+
+--- a/src/os/unix/ngx_linux_config.h
++++ b/src/os/unix/ngx_linux_config.h
+@@ -60,7 +60,7 @@
+ #include <ngx_auto_config.h>
+ 
+ 
+-#if (NGX_HAVE_CRYPT_H)
++#if (NGX_HAVE_CRYPT_H) || (NGX_HAVE_CRYPT)
+ #include <crypt.h>
+ #endif
+ 
