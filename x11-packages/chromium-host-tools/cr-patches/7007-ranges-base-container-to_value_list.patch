@@ -1,0 +1,18 @@
+--- a/base/containers/to_value_list.h
++++ b/base/containers/to_value_list.h
+@@ -34,10 +34,11 @@
+                std::indirect_result_t<Proj, std::ranges::iterator_t<Range>>>
+ Value::List ToValueList(Range&& range, Proj proj = {}) {
+   auto container = Value::List::with_capacity(std::ranges::size(range));
+-  std::ranges::for_each(
+-      std::forward<Range>(range),
+-      [&]<typename T>(T&& value) { container.Append(std::forward<T>(value)); },
+-      std::move(proj));
++  auto func = [&]<typename T>(T&& value) { container.Append(std::forward<T>(value)); };
++  auto first = std::ranges::begin(range);
++  auto last = std::ranges::end(range);
++  for (; first != last; ++first)
++    std::invoke(func, std::invoke(proj, *first));
+   return container;
+ }
+ 

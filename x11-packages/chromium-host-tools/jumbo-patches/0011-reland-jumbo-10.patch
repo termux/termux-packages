@@ -1,0 +1,1222 @@
+From 2c60fb7a3d59351e91f13313c88370bfc9f673d4 Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <licy183@termux.dev>
+Date: Sat, 19 Apr 2025 01:11:34 +0800
+Subject: [PATCH] reland jumbo 10
+
+Enable jumbo build for the following component(s)/source_set(s):
+
+- //device/bluetooth:deprecated_experimental_mojo
+- //device/bluetooth:bluetooth
+- //device/fido:fido
+- //device/gamepad:gamepad
+- //extensions/browser:browser_sources
+- //extensions/common:common
+- //extensions/renderer:renderer
+
+---
+ device/bluetooth/BUILD.gn                          | 14 ++++++++++++--
+ .../bluetooth_remote_gatt_characteristic_bluez.cc  |  4 +++-
+ .../bluetooth_remote_gatt_descriptor_bluez.cc      |  3 ++-
+ .../dbus/bluetooth_admin_policy_client.cc          |  6 ++++++
+ ...uetooth_advertisement_monitor_manager_client.cc |  6 ++++++
+ ...th_gatt_characteristic_service_provider_impl.cc |  8 ++++++++
+ ...etooth_gatt_descriptor_service_provider_impl.cc |  8 ++++++++
+ ...bluetooth_gatt_service_service_provider_impl.cc |  6 ++++++
+ .../bluetooth_le_advertisement_service_provider.cc |  4 ++++
+ .../dbus/fake_bluetooth_adapter_client.cc          |  4 ++++
+ .../bluetooth/dbus/fake_bluetooth_device_client.cc |  4 ++++
+ ...uetooth_gatt_characteristic_service_provider.cc | 10 +++++-----
+ ...e_bluetooth_gatt_descriptor_service_provider.cc |  6 +++---
+ device/bluetooth/floss/floss_adapter_client.cc     |  4 ++++
+ device/bluetooth/floss/floss_socket_manager.cc     |  4 ++++
+ device/bluetooth/server_socket.cc                  |  4 ++++
+ device/bluetooth/socket.cc                         |  4 ++++
+ device/fido/BUILD.gn                               |  3 ++-
+ device/fido/get_assertion_request_handler.cc       |  4 ++++
+ device/fido/make_credential_request_handler.cc     |  4 ++++
+ device/gamepad/BUILD.gn                            |  3 ++-
+ device/gamepad/dualshock4_controller.cc            |  6 ++++++
+ device/gamepad/nintendo_controller.cc              |  4 ++++
+ device/gamepad/xbox_hid_controller.cc              |  4 ++++
+ extensions/BUILD.gn                                |  3 ++-
+ extensions/browser/BUILD.gn                        |  3 ++-
+ .../api/declarative/rules_registry_service.cc      |  4 ++++
+ .../webrequest_condition_attribute.cc              |  5 ++++-
+ .../browser/api/hid/hid_connection_resource.cc     |  4 ++++
+ extensions/browser/api/hid/hid_device_manager.cc   |  6 ++++++
+ extensions/browser/api/usb/usb_device_manager.cc   |  6 ++++++
+ extensions/browser/api/usb/usb_device_resource.cc  |  4 ++++
+ .../extension_web_request_event_router.cc          |  5 ++++-
+ .../api/web_request/upload_data_presenter.cc       |  5 ++++-
+ .../browser/api/web_request/web_request_api.cc     | 10 +++++++++-
+ .../web_request_proxying_url_loader_factory.cc     |  4 ++++
+ .../web_request/web_request_proxying_websocket.cc  |  4 ++++
+ .../browser/guest_view/app_view/app_view_guest.cc  | 12 ++++++------
+ extensions/browser/message_tracker.cc              |  4 ++++
+ extensions/browser/script_injection_tracker.cc     |  4 ++++
+ .../service_worker/service_worker_task_queue.cc    |  6 ++++++
+ extensions/browser/service_worker/worker_id_set.cc |  6 ++++++
+ extensions/common/BUILD.gn                         |  8 +++++++-
+ .../manifest_handlers/icon_variants_handler.cc     |  9 ++++++++-
+ .../common/manifest_handlers/icons_handler.cc      |  4 ++++
+ .../common/manifest_handlers/requirements_info.cc  |  5 ++++-
+ .../common/manifest_handlers/shared_module_info.cc |  5 ++++-
+ extensions/renderer/BUILD.gn                       |  5 +++--
+ .../renderer/extension_localization_throttle.cc    |  4 ++++
+ .../renderer/extension_url_loader_throttle.cc      |  4 ++++
+ 50 files changed, 234 insertions(+), 32 deletions(-)
+
+diff --git a/device/bluetooth/BUILD.gn b/device/bluetooth/BUILD.gn
+index d27d7140cc..a5a49039c0 100644
+--- a/device/bluetooth/BUILD.gn
++++ b/device/bluetooth/BUILD.gn
+@@ -4,6 +4,7 @@
+ 
+ import("//build/buildflag_header.gni")
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//device/bluetooth/cast_bluetooth.gni")
+ import("//device/bluetooth/emulation/buildflags.gni")
+ 
+@@ -36,7 +37,7 @@ config("bluetooth_emulation_config") {
+ 
+ # Experimental implementation not ready for production use yet. See
+ # public/mojom/README.md
+-source_set("deprecated_experimental_mojo") {
++jumbo_source_set("deprecated_experimental_mojo") {
+   sources = [
+     "//device/bluetooth/public/mojom/connect_result_type_converter.h",
+     "//device/bluetooth/public/mojom/gatt_result_type_converter.h",
+@@ -55,12 +56,16 @@ source_set("deprecated_experimental_mojo") {
+     "socket.cc",
+     "socket.h",
+   ]
++  jumbo_excluded_sources = []
+ 
+   if (is_chromeos || is_linux) {
+     sources += [
+       "bluez/metrics_recorder.cc",
+       "bluez/metrics_recorder.h",
+     ]
++    jumbo_excluded_sources += [
++      "bluez/metrics_recorder.cc", # Conflict with //device/bluetooth:bluetooth
++    ]
+   }
+ 
+   deps = [
+@@ -122,7 +127,7 @@ source_set("fake_bluetooth") {
+   public_configs = [ ":bluetooth_emulation_config" ]
+ }
+ 
+-component("bluetooth") {
++jumbo_component("bluetooth") {
+   sources = [
+     "bluetooth_adapter.cc",
+     "bluetooth_adapter.h",
+@@ -172,6 +177,7 @@ component("bluetooth") {
+     "string_util_icu.cc",
+     "string_util_icu.h",
+   ]
++  jumbo_excluded_sources = []
+ 
+   defines = [ "DEVICE_BLUETOOTH_IMPLEMENTATION" ]
+ 
+@@ -580,6 +586,10 @@ component("bluetooth") {
+         "floss/floss_version.h",
+         "floss/test_helpers.h",
+       ]
++      jumbo_excluded_sources += [ 
++        "floss/floss_advertiser_client.cc", # Fail to compile with floss_dbus_client.cc
++        "bluez/metrics_recorder.cc",        # Conflict with //device/bluetooth:deprecated_experimental_mojo
++      ] 
+       if (is_chromeos) {
+         import("//chromeos/dbus/config/use_real_dbus_clients.gni")
+         configs += [ "//chromeos/dbus/config:use_real_dbus_clients_config" ]
+diff --git a/device/bluetooth/bluez/bluetooth_remote_gatt_characteristic_bluez.cc b/device/bluetooth/bluez/bluetooth_remote_gatt_characteristic_bluez.cc
+index a46c7ee2c6..f3ec47a4fd 100644
+--- a/device/bluetooth/bluez/bluetooth_remote_gatt_characteristic_bluez.cc
++++ b/device/bluetooth/bluez/bluetooth_remote_gatt_characteristic_bluez.cc
+@@ -30,7 +30,7 @@
+ 
+ namespace bluez {
+ 
+-namespace {
++namespace brgcb {
+ 
+ // Stream operator for logging span<uint8_t>.
+ std::ostream& operator<<(std::ostream& out, base::span<const uint8_t> bytes) {
+@@ -178,6 +178,7 @@ void BluetoothRemoteGattCharacteristicBlueZ::WriteRemoteCharacteristic(
+     WriteType write_type,
+     base::OnceClosure callback,
+     ErrorCallback error_callback) {
++  using bluez::brgcb::operator<<;
+   DVLOG(1) << "Sending GATT characteristic write request to characteristic: "
+            << GetIdentifier() << ", UUID: " << GetUUID().canonical_value()
+            << ", with value: " << value << ", with response: "
+@@ -207,6 +208,7 @@ void BluetoothRemoteGattCharacteristicBlueZ::
+     DeprecatedWriteRemoteCharacteristic(base::span<const uint8_t> value,
+                                         base::OnceClosure callback,
+                                         ErrorCallback error_callback) {
++  using bluez::brgcb::operator<<;
+   DVLOG(1) << "Sending GATT characteristic write request to characteristic: "
+            << GetIdentifier() << ", UUID: " << GetUUID().canonical_value()
+            << ", with value: " << value << ".";
+diff --git a/device/bluetooth/bluez/bluetooth_remote_gatt_descriptor_bluez.cc b/device/bluetooth/bluez/bluetooth_remote_gatt_descriptor_bluez.cc
+index 8e298f176e..3459a923bd 100644
+--- a/device/bluetooth/bluez/bluetooth_remote_gatt_descriptor_bluez.cc
++++ b/device/bluetooth/bluez/bluetooth_remote_gatt_descriptor_bluez.cc
+@@ -23,7 +23,7 @@
+ 
+ namespace bluez {
+ 
+-namespace {
++namespace brgdb {
+ 
+ // Stream operator for logging span<uint8_t>.
+ std::ostream& operator<<(std::ostream& out, base::span<const uint8_t> bytes) {
+@@ -99,6 +99,7 @@ void BluetoothRemoteGattDescriptorBlueZ::WriteRemoteDescriptor(
+     base::span<const uint8_t> new_value,
+     base::OnceClosure callback,
+     ErrorCallback error_callback) {
++  using bluez::brgdb::operator<<;
+   DVLOG(1) << "Sending GATT characteristic descriptor write request to "
+            << "characteristic: " << GetIdentifier()
+            << ", UUID: " << GetUUID().canonical_value()
+diff --git a/device/bluetooth/dbus/bluetooth_admin_policy_client.cc b/device/bluetooth/dbus/bluetooth_admin_policy_client.cc
+index ba06e1e16e..a3e5b3f63a 100644
+--- a/device/bluetooth/dbus/bluetooth_admin_policy_client.cc
++++ b/device/bluetooth/dbus/bluetooth_admin_policy_client.cc
+@@ -15,6 +15,9 @@
+ #include "dbus/object_proxy.h"
+ #include "third_party/cros_system_api/dbus/service_constants.h"
+ 
++#define kNoResponseError         kNoResponseError_BAPC
++#define kUnknownAdminPolicyError kUnknownAdminPolicyError_BAPC
++
+ const char kNoResponseError[] = "org.chromium.Error.NoResponse";
+ const char kUnknownAdminPolicyError[] = "org.chromium.Error.UnknownAdminPolicy";
+ 
+@@ -193,3 +196,6 @@ BluetoothAdminPolicyClient::Create() {
+ }
+ 
+ }  // namespace bluez
++
++#undef kNoResponseError
++#undef kUnknownAdminPolicyError
+diff --git a/device/bluetooth/dbus/bluetooth_advertisement_monitor_manager_client.cc b/device/bluetooth/dbus/bluetooth_advertisement_monitor_manager_client.cc
+index 170d2fcee7..f01252f4f5 100644
+--- a/device/bluetooth/dbus/bluetooth_advertisement_monitor_manager_client.cc
++++ b/device/bluetooth/dbus/bluetooth_advertisement_monitor_manager_client.cc
+@@ -17,6 +17,9 @@
+ #include "dbus/object_proxy.h"
+ #include "third_party/cros_system_api/dbus/service_constants.h"
+ 
++#define kNoResponseError kNoResponseError_BAMMC
++#define kFailedError     kFailedError_BAMMC
++
+ namespace {
+ const char kNoResponseError[] = "org.chromium.Error.NoResponse";
+ const char kFailedError[] = "org.chromium.Error.Failed";
+@@ -221,3 +224,6 @@ BluetoothAdvertisementMonitorManagerClient::Create() {
+ }
+ 
+ }  // namespace bluez
++
++#undef kNoResponseError
++#undef kFailedError
+diff --git a/device/bluetooth/dbus/bluetooth_gatt_characteristic_service_provider_impl.cc b/device/bluetooth/dbus/bluetooth_gatt_characteristic_service_provider_impl.cc
+index 5a59853bb9..70d038edd1 100644
+--- a/device/bluetooth/dbus/bluetooth_gatt_characteristic_service_provider_impl.cc
++++ b/device/bluetooth/dbus/bluetooth_gatt_characteristic_service_provider_impl.cc
+@@ -20,6 +20,10 @@
+ #include "device/bluetooth/dbus/bluetooth_gatt_characteristic_delegate_wrapper.h"
+ #include "third_party/cros_system_api/dbus/service_constants.h"
+ 
++#define kErrorInvalidArgs       kErrorInvalidArgs_BGCSPI
++#define kErrorPropertyReadOnly  kErrorPropertyReadOnly_BGCSPI
++#define kErrorFailed            kErrorFailed_BGCSPI
++
+ namespace bluez {
+ 
+ namespace {
+@@ -579,3 +583,7 @@ BluetoothGattCharacteristicServiceProviderImpl::object_path() const {
+ }
+ 
+ }  // namespace bluez
++
++#undef kErrorInvalidArgs
++#undef kErrorPropertyReadOnly
++#undef kErrorFailed
+diff --git a/device/bluetooth/dbus/bluetooth_gatt_descriptor_service_provider_impl.cc b/device/bluetooth/dbus/bluetooth_gatt_descriptor_service_provider_impl.cc
+index 803e448e86..8cd39815d0 100644
+--- a/device/bluetooth/dbus/bluetooth_gatt_descriptor_service_provider_impl.cc
++++ b/device/bluetooth/dbus/bluetooth_gatt_descriptor_service_provider_impl.cc
+@@ -19,6 +19,10 @@
+ #include "device/bluetooth/dbus/bluetooth_gatt_attribute_helpers.h"
+ #include "third_party/cros_system_api/dbus/service_constants.h"
+ 
++#define kErrorInvalidArgs       kErrorInvalidArgs_BGDSPI
++#define kErrorPropertyReadOnly  kErrorPropertyReadOnly_BGDSPI
++#define kErrorFailed            kErrorFailed_BGDSPI
++
+ namespace bluez {
+ 
+ namespace {
+@@ -426,3 +430,7 @@ BluetoothGattDescriptorServiceProviderImpl::object_path() const {
+ }
+ 
+ }  // namespace bluez
++
++#undef kErrorInvalidArgs
++#undef kErrorPropertyReadOnly
++#undef kErrorFailed
+diff --git a/device/bluetooth/dbus/bluetooth_gatt_service_service_provider_impl.cc b/device/bluetooth/dbus/bluetooth_gatt_service_service_provider_impl.cc
+index c390d83057..7a7f3b3b54 100644
+--- a/device/bluetooth/dbus/bluetooth_gatt_service_service_provider_impl.cc
++++ b/device/bluetooth/dbus/bluetooth_gatt_service_service_provider_impl.cc
+@@ -8,6 +8,9 @@
+ #include "base/logging.h"
+ #include "third_party/cros_system_api/dbus/service_constants.h"
+ 
++#define kErrorInvalidArgs       kErrorInvalidArgs_BGSSPI
++#define kErrorPropertyReadOnly  kErrorPropertyReadOnly_BGSSPI
++
+ namespace bluez {
+ 
+ namespace {
+@@ -226,3 +229,6 @@ const dbus::ObjectPath& BluetoothGattServiceServiceProviderImpl::object_path()
+ }
+ 
+ }  // namespace bluez
++
++#undef kErrorInvalidArgs
++#undef kErrorPropertyReadOnly
+diff --git a/device/bluetooth/dbus/bluetooth_le_advertisement_service_provider.cc b/device/bluetooth/dbus/bluetooth_le_advertisement_service_provider.cc
+index ab82ed0b35..ff1d56e0c1 100644
+--- a/device/bluetooth/dbus/bluetooth_le_advertisement_service_provider.cc
++++ b/device/bluetooth/dbus/bluetooth_le_advertisement_service_provider.cc
+@@ -19,6 +19,8 @@
+ #include "device/bluetooth/dbus/fake_bluetooth_le_advertisement_service_provider.h"
+ #include "third_party/cros_system_api/dbus/service_constants.h"
+ 
++#define kErrorInvalidArgs kErrorInvalidArgs_BLASP
++
+ namespace bluez {
+ 
+ namespace {
+@@ -529,3 +531,5 @@ BluetoothLEAdvertisementServiceProvider::Create(
+ }
+ 
+ }  // namespace bluez
++
++#undef kErrorInvalidArgs
+diff --git a/device/bluetooth/dbus/fake_bluetooth_adapter_client.cc b/device/bluetooth/dbus/fake_bluetooth_adapter_client.cc
+index 598003e425..0e03e41532 100644
+--- a/device/bluetooth/dbus/fake_bluetooth_adapter_client.cc
++++ b/device/bluetooth/dbus/fake_bluetooth_adapter_client.cc
+@@ -20,6 +20,8 @@
+ #include "device/bluetooth/dbus/fake_bluetooth_device_client.h"
+ #include "third_party/cros_system_api/dbus/service_constants.h"
+ 
++#define kSimulationIntervalMs kSimulationIntervalMs_FBAC
++
+ namespace bluez {
+ 
+ namespace {
+@@ -382,3 +384,5 @@ void FakeBluetoothAdapterClient::PostDelayedTask(base::OnceClosure callback) {
+ }
+ 
+ }  // namespace bluez
++
++#undef kSimulationIntervalMs
+diff --git a/device/bluetooth/dbus/fake_bluetooth_device_client.cc b/device/bluetooth/dbus/fake_bluetooth_device_client.cc
+index b6c0ee5143..dd0fe5f30b 100644
+--- a/device/bluetooth/dbus/fake_bluetooth_device_client.cc
++++ b/device/bluetooth/dbus/fake_bluetooth_device_client.cc
+@@ -41,6 +41,8 @@
+ #include "device/bluetooth/dbus/fake_bluetooth_profile_service_provider.h"
+ #include "third_party/cros_system_api/dbus/service_constants.h"
+ 
++#define kSimulationIntervalMs kSimulationIntervalMs_FBDC
++
+ namespace bluez {
+ 
+ namespace {
+@@ -2002,3 +2004,5 @@ void FakeBluetoothDeviceClient::AddPrepareWriteRequest(
+ }
+ 
+ }  // namespace bluez
++
++#undef kSimulationIntervalMs
+diff --git a/device/bluetooth/dbus/fake_bluetooth_gatt_characteristic_service_provider.cc b/device/bluetooth/dbus/fake_bluetooth_gatt_characteristic_service_provider.cc
+index 30a502584b..f8290bb533 100644
+--- a/device/bluetooth/dbus/fake_bluetooth_gatt_characteristic_service_provider.cc
++++ b/device/bluetooth/dbus/fake_bluetooth_gatt_characteristic_service_provider.cc
+@@ -20,7 +20,7 @@
+ 
+ namespace bluez {
+ 
+-namespace {
++namespace fbgcsp {
+ 
+ bool CanWrite(const std::vector<std::string>& flags) {
+   if (find(flags.begin(), flags.end(),
+@@ -133,7 +133,7 @@ void FakeBluetoothGattCharacteristicServiceProvider::GetValue(
+     return;
+   }
+ 
+-  if (!CanRead(flags_)) {
++  if (!fbgcsp::CanRead(flags_)) {
+     DVLOG(1) << "GATT characteristic not readable.";
+     std::move(callback).Run(
+         device::BluetoothGattService::GattErrorCode::kFailed,
+@@ -163,7 +163,7 @@ void FakeBluetoothGattCharacteristicServiceProvider::SetValue(
+     return;
+   }
+ 
+-  if (!CanWrite(flags_)) {
++  if (!fbgcsp::CanWrite(flags_)) {
+     DVLOG(1) << "GATT characteristic not writeable.";
+     std::move(error_callback).Run();
+     return;
+@@ -194,7 +194,7 @@ void FakeBluetoothGattCharacteristicServiceProvider::PrepareSetValue(
+     return;
+   }
+ 
+-  if (!CanWrite(flags_)) {
++  if (!fbgcsp::CanWrite(flags_)) {
+     DVLOG(1) << "GATT characteristic not writeable.";
+     std::move(error_callback).Run();
+     return;
+@@ -220,7 +220,7 @@ bool FakeBluetoothGattCharacteristicServiceProvider::NotificationsChange(
+     return false;
+   }
+ 
+-  if (!CanNotify(flags_)) {
++  if (!fbgcsp::CanNotify(flags_)) {
+     DVLOG(1) << "GATT characteristic not notifiable.";
+     return false;
+   }
+diff --git a/device/bluetooth/dbus/fake_bluetooth_gatt_descriptor_service_provider.cc b/device/bluetooth/dbus/fake_bluetooth_gatt_descriptor_service_provider.cc
+index b078f43b4a..ba8e1309c4 100644
+--- a/device/bluetooth/dbus/fake_bluetooth_gatt_descriptor_service_provider.cc
++++ b/device/bluetooth/dbus/fake_bluetooth_gatt_descriptor_service_provider.cc
+@@ -18,7 +18,7 @@
+ 
+ namespace bluez {
+ 
+-namespace {
++namespace fbgdsp {
+ 
+ bool CanWrite(const std::vector<std::string>& flags) {
+   if (find(flags.begin(), flags.end(), bluetooth_gatt_descriptor::kFlagWrite) !=
+@@ -121,7 +121,7 @@ void FakeBluetoothGattDescriptorServiceProvider::GetValue(
+     return;
+   }
+ 
+-  if (!CanRead(flags_)) {
++  if (!fbgdsp::CanRead(flags_)) {
+     std::move(callback).Run(
+         device::BluetoothGattService::GattErrorCode::kFailed,
+         /*value=*/std::vector<uint8_t>());
+@@ -160,7 +160,7 @@ void FakeBluetoothGattDescriptorServiceProvider::SetValue(
+     return;
+   }
+ 
+-  if (!CanWrite(flags_)) {
++  if (!fbgdsp::CanWrite(flags_)) {
+     DVLOG(1) << "GATT descriptor not writeable.";
+     std::move(error_callback).Run();
+     return;
+diff --git a/device/bluetooth/floss/floss_adapter_client.cc b/device/bluetooth/floss/floss_adapter_client.cc
+index 2f62e1a7b6..5a78d7cd6b 100644
+--- a/device/bluetooth/floss/floss_adapter_client.cc
++++ b/device/bluetooth/floss/floss_adapter_client.cc
+@@ -17,6 +17,8 @@
+ #include "dbus/object_proxy.h"
+ #include "device/bluetooth/floss/floss_dbus_client.h"
+ 
++#define HandleExported HandleExported_FAC
++
+ namespace floss {
+ 
+ namespace {
+@@ -910,3 +912,5 @@ template void FlossAdapterClient::CallAdapterMethod(
+     const std::string& arg2);
+ 
+ }  // namespace floss
++
++#undef HandleExported
+diff --git a/device/bluetooth/floss/floss_socket_manager.cc b/device/bluetooth/floss/floss_socket_manager.cc
+index 80318fe14f..2923cb1020 100644
+--- a/device/bluetooth/floss/floss_socket_manager.cc
++++ b/device/bluetooth/floss/floss_socket_manager.cc
+@@ -6,6 +6,8 @@
+ #include "base/containers/contains.h"
+ #include "base/types/expected.h"
+ 
++#define HandleExported HandleExported_FSM
++
+ namespace floss {
+ namespace {
+ void HandleExported(const std::string& method_name,
+@@ -765,3 +767,5 @@ template void FlossDBusClient::DefaultResponseWithCallback(
+     dbus::ErrorResponse* error_response);
+ 
+ }  // namespace floss
++
++#undef HandleExported
+diff --git a/device/bluetooth/server_socket.cc b/device/bluetooth/server_socket.cc
+index 8e6302786f..9ecd2850a8 100644
+--- a/device/bluetooth/server_socket.cc
++++ b/device/bluetooth/server_socket.cc
+@@ -17,6 +17,8 @@
+ #include "mojo/public/cpp/bindings/self_owned_receiver.h"
+ #include "net/base/io_buffer.h"
+ 
++#define HoldReferenceUntilDisconnected HoldReferenceUntilDisconnected_DBSS
++
+ namespace bluetooth {
+ namespace {
+ // TODO(b/269348144) - BluetoothSocket is constructed in UI thread and must also
+@@ -106,3 +108,5 @@ void ServerSocket::OnAcceptError(AcceptCallback callback,
+ }
+ 
+ }  // namespace bluetooth
++
++#undef HoldReferenceUntilDisconnected
+diff --git a/device/bluetooth/socket.cc b/device/bluetooth/socket.cc
+index c62895726b..242b1213b3 100644
+--- a/device/bluetooth/socket.cc
++++ b/device/bluetooth/socket.cc
+@@ -24,6 +24,8 @@
+ #include "mojo/public/cpp/system/data_pipe.h"
+ #include "net/base/io_buffer.h"
+ 
++#define HoldReferenceUntilDisconnected HoldReferenceUntilDisconnected_DBS
++
+ namespace bluetooth {
+ namespace {
+ // TODO(b/269348144) - BluetoothSocket is constructed in UI thread and must also
+@@ -201,3 +203,5 @@ void Socket::OnBluetoothSocketSendError(const std::string& error_message) {
+ }
+ 
+ }  // namespace bluetooth
++
++#undef HoldReferenceUntilDisconnected
+diff --git a/device/fido/BUILD.gn b/device/fido/BUILD.gn
+index 4fac9c688d..5385b1eb2e 100644
+--- a/device/fido/BUILD.gn
++++ b/device/fido/BUILD.gn
+@@ -3,9 +3,10 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
+ 
+-component("fido") {
++jumbo_component("fido") {
+   # These source files represent the minimal subset of files used for passkey
+   # related authentication functions, with a limited amount of dependencies,
+   # making it possible to build these on any platform, including iOS.
+diff --git a/device/fido/get_assertion_request_handler.cc b/device/fido/get_assertion_request_handler.cc
+index 1fae025a87..3849bedf6a 100644
+--- a/device/fido/get_assertion_request_handler.cc
++++ b/device/fido/get_assertion_request_handler.cc
+@@ -50,6 +50,8 @@
+ #include "device/fido/cros/authenticator.h"
+ #endif
+ 
++#define AtLeastUVPreferred AtLeastUVPreferred_GARH
++
+ namespace device {
+ 
+ namespace {
+@@ -814,3 +816,5 @@ void GetAssertionRequestHandler::DispatchRequestWithToken(
+ }
+ 
+ }  // namespace device
++
++#undef AtLeastUVPreferred
+diff --git a/device/fido/make_credential_request_handler.cc b/device/fido/make_credential_request_handler.cc
+index e308129d83..722e5fc237 100644
+--- a/device/fido/make_credential_request_handler.cc
++++ b/device/fido/make_credential_request_handler.cc
+@@ -39,6 +39,8 @@
+ #include "device/fido/cros/authenticator.h"
+ #endif
+ 
++#define AtLeastUVPreferred AtLeastUVPreferred_MCRH
++
+ namespace device {
+ 
+ using PINUVDisposition = FidoAuthenticator::PINUVDisposition;
+@@ -1068,3 +1070,5 @@ void MakeCredentialRequestHandler::SpecializeRequestForAuthenticator(
+ }
+ 
+ }  // namespace device
++
++#undef AtLeastUVPreferred
+diff --git a/device/gamepad/BUILD.gn b/device/gamepad/BUILD.gn
+index 70f91bc926..53177e164d 100644
+--- a/device/gamepad/BUILD.gn
++++ b/device/gamepad/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ 
+ if (is_android) {
+   import("//build/config/android/config.gni")
+@@ -10,7 +11,7 @@ if (is_android) {
+   import("//third_party/jni_zero/jni_zero.gni")
+ }
+ 
+-component("gamepad") {
++jumbo_component("gamepad") {
+   output_name = "device_gamepad"
+ 
+   sources = [
+diff --git a/device/gamepad/dualshock4_controller.cc b/device/gamepad/dualshock4_controller.cc
+index 916eb8ed04..5afd93cf81 100644
+--- a/device/gamepad/dualshock4_controller.cc
++++ b/device/gamepad/dualshock4_controller.cc
+@@ -21,6 +21,9 @@
+ #include "device/gamepad/hid_writer.h"
+ #include "device/gamepad/public/cpp/gamepad_features.h"
+ 
++#define kRumbleMagnitudeMax kRumbleMagnitudeMax_DualShock4
++#define ControllerData      ControllerData_DualShock4
++
+ namespace device {
+ 
+ namespace {
+@@ -417,3 +420,6 @@ base::WeakPtr<AbstractHapticGamepad> Dualshock4Controller::GetWeakPtr() {
+ }
+ 
+ }  // namespace device
++
++#undef kRumbleMagnitudeMax
++#undef ControllerData
+diff --git a/device/gamepad/nintendo_controller.cc b/device/gamepad/nintendo_controller.cc
+index 4c22aac543..5675296bda 100644
+--- a/device/gamepad/nintendo_controller.cc
++++ b/device/gamepad/nintendo_controller.cc
+@@ -17,6 +17,8 @@
+ #include "device/gamepad/gamepad_data_fetcher.h"
+ #include "device/gamepad/gamepad_id_list.h"
+ 
++#define ControllerData ControllerData_Nintendo
++
+ namespace device {
+ namespace {
+ // Device IDs for the Switch Charging Grip, also used for composite devices.
+@@ -1775,3 +1777,5 @@ base::WeakPtr<AbstractHapticGamepad> NintendoController::GetWeakPtr() {
+ }
+ 
+ }  // namespace device
++
++#undef ControllerData
+diff --git a/device/gamepad/xbox_hid_controller.cc b/device/gamepad/xbox_hid_controller.cc
+index fb7be7be97..053d3cf4a0 100644
+--- a/device/gamepad/xbox_hid_controller.cc
++++ b/device/gamepad/xbox_hid_controller.cc
+@@ -7,6 +7,8 @@
+ #include "device/gamepad/gamepad_id_list.h"
+ #include "device/gamepad/hid_writer.h"
+ 
++#define kRumbleMagnitudeMax kRumbleMagnitudeMax_XboxHid
++
+ namespace device {
+ 
+ namespace {
+@@ -63,3 +65,5 @@ base::WeakPtr<AbstractHapticGamepad> XboxHidController::GetWeakPtr() {
+ }
+ 
+ }  // namespace device
++
++#undef kRumbleMagnitudeMax
+diff --git a/extensions/BUILD.gn b/extensions/BUILD.gn
+index 0ea291f16b..e75691ddfb 100644
+--- a/extensions/BUILD.gn
++++ b/extensions/BUILD.gn
+@@ -2,6 +2,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/chromeos/ui_mode.gni")
++import("//build/config/jumbo.gni")
+ import("//components/guest_view/buildflags/buildflags.gni")
+ import("//extensions/buildflags/buildflags.gni")
+ import("//testing/test.gni")
+@@ -78,7 +79,7 @@ grit("extensions_renderer_resources") {
+   ]
+ }
+ 
+-static_library("test_support") {
++jumbo_static_library("test_support") {
+   testonly = true
+   sources = [
+     "browser/api/declarative/test_rules_registry.cc",
+diff --git a/extensions/browser/BUILD.gn b/extensions/browser/BUILD.gn
+index 3147d51470..98a1cf0bd6 100644
+--- a/extensions/browser/BUILD.gn
++++ b/extensions/browser/BUILD.gn
+@@ -4,6 +4,7 @@
+ 
+ import("//build/config/chromeos/ui_mode.gni")
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//components/guest_view/buildflags/buildflags.gni")
+ import("//extensions/buildflags/buildflags.gni")
+ import("//pdf/features.gni")
+@@ -83,7 +84,7 @@ source_set("core_keyed_service_factories") {
+ # nodes" and could be easily toggled on-and-off through dependencies for
+ # different platforms).
+ # See also https://crbug.com/883570.
+-source_set("browser_sources") {
++jumbo_source_set("browser_sources") {
+   visibility = [ "./*" ]
+ 
+   sources = [
+diff --git a/extensions/browser/api/declarative/rules_registry_service.cc b/extensions/browser/api/declarative/rules_registry_service.cc
+index f715565933..e29e609ed9 100644
+--- a/extensions/browser/api/declarative/rules_registry_service.cc
++++ b/extensions/browser/api/declarative/rules_registry_service.cc
+@@ -26,6 +26,8 @@
+ #include "extensions/common/features/feature.h"
+ #include "extensions/common/features/feature_provider.h"
+ 
++#define g_factory g_factory_rules_registry_service
++
+ namespace extensions {
+ 
+ RulesRegistryService::RulesRegistryService(content::BrowserContext* context)
+@@ -261,3 +263,5 @@ void RulesRegistryService::OnExtensionUninstalled(
+ }
+ 
+ }  // namespace extensions
++
++#undef g_factory
+diff --git a/extensions/browser/api/declarative_webrequest/webrequest_condition_attribute.cc b/extensions/browser/api/declarative_webrequest/webrequest_condition_attribute.cc
+index d9706e0aac..2ecdb61db9 100644
+--- a/extensions/browser/api/declarative_webrequest/webrequest_condition_attribute.cc
++++ b/extensions/browser/api/declarative_webrequest/webrequest_condition_attribute.cc
+@@ -35,7 +35,8 @@ using base::CaseInsensitiveCompareASCII;
+ using base::Value;
+ 
+ namespace helpers = extension_web_request_api_helpers;
+-namespace keys = extensions::declarative_webrequest_constants;
++namespace keys_webrequest_condition_attribute = extensions::declarative_webrequest_constants;
++#define keys keys_webrequest_condition_attribute
+ 
+ namespace extensions {
+ 
+@@ -788,3 +789,5 @@ bool WebRequestConditionAttributeStages::Equals(
+ }
+ 
+ }  // namespace extensions
++
++#undef keys
+diff --git a/extensions/browser/api/hid/hid_connection_resource.cc b/extensions/browser/api/hid/hid_connection_resource.cc
+index 3105a0d20c..c323b6b748 100644
+--- a/extensions/browser/api/hid/hid_connection_resource.cc
++++ b/extensions/browser/api/hid/hid_connection_resource.cc
+@@ -10,6 +10,8 @@
+ #include "base/memory/ref_counted.h"
+ #include "extensions/browser/api/api_resource_manager.h"
+ 
++#define g_factory g_factory_hid_connection_resource
++
+ namespace extensions {
+ 
+ static base::LazyInstance<BrowserContextKeyedAPIFactory<
+@@ -36,3 +38,5 @@ bool HidConnectionResource::IsPersistent() const {
+ }
+ 
+ }  // namespace extensions
++
++#undef g_factory
+diff --git a/extensions/browser/api/hid/hid_device_manager.cc b/extensions/browser/api/hid/hid_device_manager.cc
+index d0a76a9fa5..c7d6c39518 100644
+--- a/extensions/browser/api/hid/hid_device_manager.cc
++++ b/extensions/browser/api/hid/hid_device_manager.cc
+@@ -40,6 +40,9 @@
+ 
+ namespace hid = extensions::api::hid;
+ 
++#define GetHidManagerBinderOverride GetHidManagerBinderOverride_HidDeviceManager
++#define WillDispatchDeviceEvent     WillDispatchDeviceEvent_HidDeviceManager
++
+ namespace extensions {
+ 
+ namespace {
+@@ -437,3 +440,6 @@ void HidDeviceManager::DispatchEvent(
+ }
+ 
+ }  // namespace extensions
++
++#undef GetHidManagerBinderOverride
++#undef WillDispatchDeviceEvent
+diff --git a/extensions/browser/api/usb/usb_device_manager.cc b/extensions/browser/api/usb/usb_device_manager.cc
+index 30d0e52ec4..e76b87b689 100644
+--- a/extensions/browser/api/usb/usb_device_manager.cc
++++ b/extensions/browser/api/usb/usb_device_manager.cc
+@@ -31,6 +31,9 @@ namespace usb = extensions::api::usb;
+ 
+ using content::BrowserThread;
+ 
++#define GetHidManagerBinderOverride GetHidManagerBinderOverride_UsbDeviceManager
++#define WillDispatchDeviceEvent     WillDispatchDeviceEvent_UsbDeviceManager
++
+ namespace extensions {
+ 
+ namespace {
+@@ -403,3 +406,6 @@ void BrowserContextKeyedAPIFactory<
+ }
+ 
+ }  // namespace extensions
++
++#undef GetHidManagerBinderOverride
++#undef WillDispatchDeviceEvent
+diff --git a/extensions/browser/api/usb/usb_device_resource.cc b/extensions/browser/api/usb/usb_device_resource.cc
+index 22b273b1a1..ba85ff21e1 100644
+--- a/extensions/browser/api/usb/usb_device_resource.cc
++++ b/extensions/browser/api/usb/usb_device_resource.cc
+@@ -15,6 +15,8 @@
+ 
+ using content::BrowserThread;
+ 
++#define g_factory g_factory_usb_device_resource
++
+ namespace extensions {
+ 
+ static base::LazyInstance<BrowserContextKeyedAPIFactory<
+@@ -48,3 +50,5 @@ void UsbDeviceResource::OnConnectionError() {
+ }
+ 
+ }  // namespace extensions
++
++#undef g_factory
+diff --git a/extensions/browser/api/web_request/extension_web_request_event_router.cc b/extensions/browser/api/web_request/extension_web_request_event_router.cc
+index a5e03a9853..9478c62fdc 100644
+--- a/extensions/browser/api/web_request/extension_web_request_event_router.cc
++++ b/extensions/browser/api/web_request/extension_web_request_event_router.cc
+@@ -65,7 +65,8 @@ namespace {
+ namespace activity_log = web_request_activity_log_constants;
+ namespace declarative_keys = declarative_webrequest_constants;
+ namespace helpers = extension_web_request_api_helpers;
+-namespace keys = extension_web_request_api_constants;
++namespace keys_extension_web_request_event_router = extension_web_request_api_constants;
++#define keys keys_extension_web_request_event_router
+ namespace web_request = api::web_request;
+ 
+ // Describes the action taken by the Web Request API for a given stage of a web
+@@ -2697,3 +2698,5 @@ void WebRequestEventRouter::ClearSignaled(
+ }
+ 
+ }  // namespace extensions
++
++#undef keys
+diff --git a/extensions/browser/api/web_request/upload_data_presenter.cc b/extensions/browser/api/web_request/upload_data_presenter.cc
+index b309b210c1..224441f199 100644
+--- a/extensions/browser/api/web_request/upload_data_presenter.cc
++++ b/extensions/browser/api/web_request/upload_data_presenter.cc
+@@ -16,7 +16,8 @@
+ #include "extensions/browser/api/web_request/web_request_api_constants.h"
+ #include "net/base/upload_file_element_reader.h"
+ 
+-namespace keys = extension_web_request_api_constants;
++namespace keys_upload_data_presenter = extension_web_request_api_constants;
++#define keys keys_upload_data_presenter
+ 
+ namespace {
+ 
+@@ -146,3 +147,5 @@ void ParsedDataPresenter::Abort() {
+ }
+ 
+ }  // namespace extensions
++
++#undef keys
+diff --git a/extensions/browser/api/web_request/web_request_api.cc b/extensions/browser/api/web_request/web_request_api.cc
+index 4a9b3aed67..7fc66bc342 100644
+--- a/extensions/browser/api/web_request/web_request_api.cc
++++ b/extensions/browser/api/web_request/web_request_api.cc
+@@ -81,10 +81,14 @@ using extension_web_request_api_helpers::ExtraInfoSpec;
+ using extensions::mojom::APIPermissionID;
+ 
+ namespace helpers = extension_web_request_api_helpers;
+-namespace keys = extension_web_request_api_constants;
++namespace keys_web_request_api = extension_web_request_api_constants;
++#define keys keys_web_request_api
+ using URLLoaderFactoryType =
+     content::ContentBrowserClient::URLLoaderFactoryType;
+ 
++#define WebRequestEventListenerFlag WebRequestEventListenerFlag_WebRequestAPI
++#define g_factory                   g_factory_web_request_api
++
+ namespace extensions {
+ 
+ namespace web_request = api::web_request;
+@@ -1144,3 +1148,7 @@ WebRequestHandlerBehaviorChangedFunction::Run() {
+ }
+ 
+ }  // namespace extensions
++
++#undef keys
++#undef WebRequestEventListenerFlag
++#undef g_factory
+diff --git a/extensions/browser/api/web_request/web_request_proxying_url_loader_factory.cc b/extensions/browser/api/web_request/web_request_proxying_url_loader_factory.cc
+index b54ffcb3e2..b9c1a7b376 100644
+--- a/extensions/browser/api/web_request/web_request_proxying_url_loader_factory.cc
++++ b/extensions/browser/api/web_request/web_request_proxying_url_loader_factory.cc
+@@ -71,6 +71,8 @@
+ #include "url/origin.h"
+ #include "url/url_constants.h"
+ 
++#define ShutdownNotifierFactory ShutdownNotifierFactory_WebRequestProxyingUrlLoaderFactory
++
+ namespace extensions {
+ namespace {
+ 
+@@ -1692,3 +1694,5 @@ void WebRequestProxyingURLLoaderFactory::EnsureAssociatedFactoryBuilt() {
+ }
+ 
+ }  // namespace extensions
++
++#undef ShutdownNotifierFactory
+diff --git a/extensions/browser/api/web_request/web_request_proxying_websocket.cc b/extensions/browser/api/web_request/web_request_proxying_websocket.cc
+index 8f536df1b7..a0cdce66fd 100644
+--- a/extensions/browser/api/web_request/web_request_proxying_websocket.cc
++++ b/extensions/browser/api/web_request/web_request_proxying_websocket.cc
+@@ -18,6 +18,8 @@
+ #include "net/cookies/site_for_cookies.h"
+ #include "net/http/http_util.h"
+ 
++#define ShutdownNotifierFactory ShutdownNotifierFactory_WebRequestProxyingWebsocket
++
+ namespace extensions {
+ namespace {
+ 
+@@ -565,3 +567,5 @@ void WebRequestProxyingWebSocket::EnsureAssociatedFactoryBuilt() {
+ }
+ 
+ }  // namespace extensions
++
++#undef ShutdownNotifierFactory
+diff --git a/extensions/browser/guest_view/app_view/app_view_guest.cc b/extensions/browser/guest_view/app_view/app_view_guest.cc
+index f8b00fec3f..3fd4546946 100644
+--- a/extensions/browser/guest_view/app_view/app_view_guest.cc
++++ b/extensions/browser/guest_view/app_view/app_view_guest.cc
+@@ -219,7 +219,7 @@ void AppViewGuest::CreateInnerPage(
+     scoped_refptr<content::SiteInstance> site_instance,
+     const base::Value::Dict& create_params,
+     GuestPageCreatedCallback callback) {
+-  const std::string* app_id = create_params.FindString(appview::kAppID);
++  const std::string* app_id = create_params.FindString(::appview::kAppID);
+   if (!app_id) {
+     RejectGuestCreation(std::move(owned_this), std::move(callback));
+     return;
+@@ -230,7 +230,7 @@ void AppViewGuest::CreateInnerPage(
+     return;
+   }
+ 
+-  const base::Value::Dict* data = create_params.FindDict(appview::kData);
++  const base::Value::Dict* data = create_params.FindDict(::appview::kData);
+   if (!data) {
+     RejectGuestCreation(std::move(owned_this), std::move(callback));
+     return;
+@@ -291,7 +291,7 @@ void AppViewGuest::MaybeRecreateGuestContents(
+ }
+ 
+ const char* AppViewGuest::GetAPINamespace() const {
+-  return appview::kEmbedderAPINamespace;
++  return ::appview::kEmbedderAPINamespace;
+ }
+ 
+ int AppViewGuest::GetTaskPrefix() const {
+@@ -359,9 +359,9 @@ void AppViewGuest::LaunchAppAndFireEvent(
+                                      std::move(callback))));
+ 
+   base::Value::Dict embed_request;
+-  embed_request.Set(appview::kGuestInstanceID, guest_instance_id());
+-  embed_request.Set(appview::kEmbedderID, owner_host());
+-  embed_request.Set(appview::kData, std::move(data));
++  embed_request.Set(::appview::kGuestInstanceID, guest_instance_id());
++  embed_request.Set(::appview::kEmbedderID, owner_host());
++  embed_request.Set(::appview::kData, std::move(data));
+   AppRuntimeEventRouter::DispatchOnEmbedRequestedEvent(
+       browser_context(), std::move(embed_request), extension);
+ }
+diff --git a/extensions/browser/message_tracker.cc b/extensions/browser/message_tracker.cc
+index 0bba776af6..a8a6f355ba 100644
+--- a/extensions/browser/message_tracker.cc
++++ b/extensions/browser/message_tracker.cc
+@@ -20,6 +20,8 @@
+ #include "extensions/browser/extensions_browser_client.h"
+ #include "extensions/common/mojom/message_port.mojom-shared.h"
+ 
++#define g_test_observer g_test_observer_message_tracker
++
+ namespace extensions {
+ 
+ namespace {
+@@ -190,3 +192,5 @@ void MessageTracker::OnMessageTimeoutElapsed(
+ }
+ 
+ }  // namespace extensions
++
++#undef g_test_observer
+diff --git a/extensions/browser/script_injection_tracker.cc b/extensions/browser/script_injection_tracker.cc
+index 8f590b9ebd..8aac10c3a1 100644
+--- a/extensions/browser/script_injection_tracker.cc
++++ b/extensions/browser/script_injection_tracker.cc
+@@ -44,6 +44,8 @@
+ 
+ using perfetto::protos::pbzero::ChromeTrackEvent;
+ 
++#define BoolToCrashKeyValue BoolToCrashKeyValue_ScriptInjectionTracker
++
+ namespace extensions {
+ 
+ namespace {
+@@ -1009,3 +1011,5 @@ ScopedScriptInjectionTrackerFailureCrashKeys::
+ 
+ }  // namespace debug
+ }  // namespace extensions
++
++#undef BoolToCrashKeyValue
+diff --git a/extensions/browser/service_worker/service_worker_task_queue.cc b/extensions/browser/service_worker/service_worker_task_queue.cc
+index 5228d60e65..8eb2f39c4e 100644
+--- a/extensions/browser/service_worker/service_worker_task_queue.cc
++++ b/extensions/browser/service_worker/service_worker_task_queue.cc
+@@ -51,6 +51,9 @@
+ 
+ using content::BrowserContext;
+ 
++#define g_test_observer                        g_test_observer_service_worker_task_queue
++#define g_allow_multiple_workers_per_extension g_allow_multiple_workers_per_extension_worker_task_queue
++
+ namespace extensions {
+ 
+ namespace {
+@@ -1193,3 +1196,6 @@ void ServiceWorkerTaskQueue::ActivateIncognitoSplitModeExtensions(
+ }
+ 
+ }  // namespace extensions
++
++#undef g_test_observer
++#undef g_allow_multiple_workers_per_extension
+diff --git a/extensions/browser/service_worker/worker_id_set.cc b/extensions/browser/service_worker/worker_id_set.cc
+index a1737fd343..6bdac552ab 100644
+--- a/extensions/browser/service_worker/worker_id_set.cc
++++ b/extensions/browser/service_worker/worker_id_set.cc
+@@ -24,6 +24,9 @@
+ #include "extensions/common/extension_id.h"
+ #include "third_party/blink/public/mojom/service_worker/service_worker_registration.mojom.h"
+ 
++#define g_allow_multiple_workers_per_extension g_allow_multiple_workers_per_extension_worker_id_set
++#define BoolToCrashKeyValue                    BoolToCrashKeyValue_WorkerIdSet
++
+ namespace extensions {
+ 
+ namespace {
+@@ -349,3 +352,6 @@ ScopedMultiWorkerCrashKeys::~ScopedMultiWorkerCrashKeys() = default;
+ }  // namespace debug
+ 
+ }  // namespace extensions
++
++#undef g_allow_multiple_workers_per_extension
++#undef BoolToCrashKeyValue
+diff --git a/extensions/common/BUILD.gn b/extensions/common/BUILD.gn
+index 70d03ec793..ef130f2800 100644
+--- a/extensions/common/BUILD.gn
++++ b/extensions/common/BUILD.gn
+@@ -4,6 +4,7 @@
+ 
+ import("//build/config/chromeos/ui_mode.gni")
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//components/guest_view/buildflags/buildflags.gni")
+ import("//components/nacl/features.gni")
+ import("//extensions/buildflags/buildflags.gni")
+@@ -230,7 +231,7 @@ mojom("mojom") {
+ # This must be a static library because extensions common depends on
+ # GetTrustedICAPublicKey in extensions/browser which isn't always linked
+ # in. TODO(brettw): This reverse dependency should be fixed.
+-static_library("common") {
++jumbo_static_library("common") {
+   sources = [
+     "alias.h",
+     "api/bluetooth/bluetooth_manifest_data.cc",
+@@ -515,6 +516,11 @@ static_library("common") {
+   # from mojom/permission_set_mojom_traits.cc.
+   allow_circular_includes_from = [ ":mojom" ]
+ 
++  jumbo_excluded_sources = [
++    "manifest_handlers/file_handler_info.cc",
++    "manifest_handlers/permissions_parser.cc",
++  ]
++
+   deps = [
+     "//base",
+     "//build:android_buildflags",
+diff --git a/extensions/common/manifest_handlers/icon_variants_handler.cc b/extensions/common/manifest_handlers/icon_variants_handler.cc
+index b65d00a03b..195113205f 100644
+--- a/extensions/common/manifest_handlers/icon_variants_handler.cc
++++ b/extensions/common/manifest_handlers/icon_variants_handler.cc
+@@ -17,6 +17,8 @@
+ #include "extensions/common/manifest_constants.h"
+ #include "ui/gfx/color_utils.h"
+ 
++#define g_empty_icon_set g_empty_icon_set_icon_variants_handler
++
+ namespace extensions {
+ 
+ namespace {
+@@ -36,7 +38,9 @@ using IconVariantsManifestKeys = extensions::api::icon_variants::ManifestKeys;
+ // extensions::diagnostics::
+ using Id = extensions::diagnostics::icon_variants::Id;
+ using Severity = extensions::diagnostics::icon_variants::Severity;
+-using Feature = extensions::diagnostics::icon_variants::Feature;
++using Feature_IconVariantsInfo = extensions::diagnostics::icon_variants::Feature;
++
++#define Feature Feature_IconVariantsInfo
+ 
+ namespace {
+ void AddInstallWarning(Extension& extension, const std::string& warning) {
+@@ -188,3 +192,6 @@ base::span<const char* const> IconVariantsHandler::Keys() const {
+ }
+ 
+ }  // namespace extensions
++
++#undef Feature
++#undef g_empty_icon_set
+diff --git a/extensions/common/manifest_handlers/icons_handler.cc b/extensions/common/manifest_handlers/icons_handler.cc
+index 54da5ee6ee..9c05fde782 100644
+--- a/extensions/common/manifest_handlers/icons_handler.cc
++++ b/extensions/common/manifest_handlers/icons_handler.cc
+@@ -21,6 +21,8 @@
+ #include "extensions/strings/grit/extensions_strings.h"
+ #include "ui/gfx/geometry/size.h"
+ 
++#define g_empty_icon_set g_empty_icon_set_icons_handler
++
+ namespace extensions {
+ 
+ namespace keys = manifest_keys;
+@@ -103,3 +105,5 @@ base::span<const char* const> IconsHandler::Keys() const {
+ }
+ 
+ }  // namespace extensions
++
++#undef g_empty_icon_set
+diff --git a/extensions/common/manifest_handlers/requirements_info.cc b/extensions/common/manifest_handlers/requirements_info.cc
+index 5325c1e24d..307242a56b 100644
+--- a/extensions/common/manifest_handlers/requirements_info.cc
++++ b/extensions/common/manifest_handlers/requirements_info.cc
+@@ -17,7 +17,8 @@ namespace extensions {
+ 
+ namespace errors = manifest_errors;
+ 
+-using ManifestKeys = api::requirements::ManifestKeys;
++using ManifestKeys_RequirementsInfo = api::requirements::ManifestKeys;
++#define ManifestKeys ManifestKeys_RequirementsInfo
+ 
+ RequirementsInfo::RequirementsInfo() = default;
+ RequirementsInfo::~RequirementsInfo() = default;
+@@ -86,3 +87,5 @@ bool RequirementsHandler::Parse(Extension* extension, std::u16string* error) {
+ }
+ 
+ }  // namespace extensions
++
++#undef ManifestKeys
+diff --git a/extensions/common/manifest_handlers/shared_module_info.cc b/extensions/common/manifest_handlers/shared_module_info.cc
+index 7df904a341..ea3c3c4a8f 100644
+--- a/extensions/common/manifest_handlers/shared_module_info.cc
++++ b/extensions/common/manifest_handlers/shared_module_info.cc
+@@ -37,7 +37,8 @@ namespace {
+ const char kSharedModule[] = "shared_module";
+ const char kAllowlist[] = "allowlist";
+ 
+-using ManifestKeys = api::shared_module::ManifestKeys;
++using ManifestKeys_SharedModuleInfo = api::shared_module::ManifestKeys;
++#define ManifestKeys ManifestKeys_SharedModuleInfo
+ 
+ static base::LazyInstance<SharedModuleInfo>::DestructorAtExit
+     g_empty_shared_module_info = LAZY_INSTANCE_INITIALIZER;
+@@ -247,3 +248,5 @@ base::span<const char* const> SharedModuleHandler::Keys() const {
+ }
+ 
+ }  // namespace extensions
++
++#undef ManifestKeys
+diff --git a/extensions/renderer/BUILD.gn b/extensions/renderer/BUILD.gn
+index e1ea9073d0..ab94316e9a 100644
+--- a/extensions/renderer/BUILD.gn
++++ b/extensions/renderer/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//components/guest_view/buildflags/buildflags.gni")
+ import("//extensions/buildflags/buildflags.gni")
+ import("//pdf/features.gni")
+@@ -12,7 +13,7 @@ assert(enable_extensions_core)
+ # If enable_extensions is true then enable_guest_view must also be true.
+ assert(!enable_extensions || enable_guest_view)
+ 
+-source_set("renderer") {
++jumbo_source_set("renderer") {
+   sources = [
+     "activity_log_converter_strategy.cc",
+     "activity_log_converter_strategy.h",
+@@ -315,7 +316,7 @@ source_set("renderer") {
+   }
+ }
+ 
+-static_library("unit_test_support") {
++jumbo_static_library("unit_test_support") {
+   # Sources that are shared between chrome-based renderer unit tests and
+   # top-level extensions renderer unit tests.
+   testonly = true
+diff --git a/extensions/renderer/extension_localization_throttle.cc b/extensions/renderer/extension_localization_throttle.cc
+index 9eb2b7f5e2..db7dc693d2 100644
+--- a/extensions/renderer/extension_localization_throttle.cc
++++ b/extensions/renderer/extension_localization_throttle.cc
+@@ -26,6 +26,8 @@
+ #include "third_party/blink/public/web/web_local_frame.h"
+ #include "url/gurl.h"
+ 
++#define kCancelReason kCancelReason_ExtensionLocalizationThrottle
++
+ namespace extensions {
+ 
+ namespace {
+@@ -298,3 +300,5 @@ void ExtensionLocalizationThrottle::DeferredCancelWithError(int error_code) {
+ }
+ 
+ }  // namespace extensions
++
++#undef kCancelReason
+diff --git a/extensions/renderer/extension_url_loader_throttle.cc b/extensions/renderer/extension_url_loader_throttle.cc
+index 1f61f2b45a..fdc5770b77 100644
+--- a/extensions/renderer/extension_url_loader_throttle.cc
++++ b/extensions/renderer/extension_url_loader_throttle.cc
+@@ -8,6 +8,8 @@
+ #include "net/base/net_errors.h"
+ #include "services/network/public/cpp/resource_request.h"
+ 
++#define kCancelReason kCancelReason_ExtensionURLLoaderThrottle
++
+ namespace extensions {
+ 
+ namespace {
+@@ -54,3 +56,5 @@ void ExtensionURLLoaderThrottle::WillProcessResponse(
+ void ExtensionURLLoaderThrottle::DetachFromCurrentSequence() {}
+ 
+ }  // namespace extensions
++
++#undef kCancelReason

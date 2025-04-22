@@ -1,6 +1,6 @@
 --- a/third_party/dawn/src/dawn/native/X11Functions.cpp
 +++ b/third_party/dawn/src/dawn/native/X11Functions.cpp
-@@ -17,12 +17,20 @@
+@@ -34,13 +34,21 @@
  namespace dawn::native {
  
  X11Functions::X11Functions() {
@@ -9,7 +9,8 @@
 +#else
      if (!mX11Lib.Open("libX11.so.6") || !mX11Lib.GetProc(&xSetErrorHandler, "XSetErrorHandler") ||
 +#endif
-         !mX11Lib.GetProc(&xGetWindowAttributes, "XGetWindowAttributes")) {
+         !mX11Lib.GetProc(&xGetWindowAttributes, "XGetWindowAttributes") ||
+         !mX11Lib.GetProc(&xSynchronize, "XSynchronize")) {
          mX11Lib.Close();
      }
  
