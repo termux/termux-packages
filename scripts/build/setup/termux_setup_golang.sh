@@ -1,5 +1,7 @@
 # Utility function for golang-using packages to setup a go toolchain.
 termux_setup_golang() {
+	export GOPATH="${TERMUX_COMMON_CACHEDIR}/go-path" GOCACHE="${TERMUX_COMMON_CACHEDIR}/go-build"
+	mkdir -p "$GOPATH" "$GOCACHE"
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		local TERMUX_GO_VERSION=go1.24.1
 		local TERMUX_GO_SHA256=cb2396bae64183cdccf81a9a6df0aea3bce9511fc21469fb89a0c00470088073
