@@ -1,0 +1,497 @@
+`atomic_ref` is not landed in NDK r27c
+
+--- a/base/__termux_header_only_atomic_ref_polyfill.h
++++ b/base/__termux_header_only_atomic_ref_polyfill.h
+@@ -0,0 +1,436 @@
++// Origin: https://github.com/avakar/atomic_ref
++// Origin Description: Header-only implementation of std::atomic_ref for C++14
++// Origin LICENSE: MIT
++// MIT License
++
++// Permission is hereby granted, free of charge, to any person obtaining a copy
++// of this software and associated documentation files (the "Software"), to deal
++// in the Software without restriction, including without limitation the rights
++// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++// copies of the Software, and to permit persons to whom the Software is
++// furnished to do so, subject to the following conditions:
++
++// The above copyright notice and this permission notice shall be included in all
++// copies or substantial portions of the Software.
++
++// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++// SOFTWARE.
++
++#ifndef TERMUX_HEADER_ONLY_ATOMIC_REF_POLYFILL_H
++#define TERMUX_HEADER_ONLY_ATOMIC_REF_POLYFILL_H
++
++// INCLUDE: https://github.com/avakar/atomic_ref/blob/bf1b16afbf3c98754d33fd601c3e53b892cd7cab/src/atomic_ref.gcc.h
++#include <atomic>
++#include <type_traits>
++
++namespace _avakar {
++namespace atomic_ref {
++
++template <typename T>
++struct is_always_lock_free
++	: std::integral_constant<bool, __atomic_always_lock_free(sizeof(T), 0)>
++{
++};
++
++template <typename T>
++struct is_always_wait_free
++	: std::false_type
++{
++};
++
++template <typename T>
++std::enable_if_t<std::is_enum<T>::value, T> load(T const & obj, std::memory_order order) noexcept
++{
++	return (T)__atomic_load_n((std::underlying_type_t<T> const *)&obj, (int)order);
++}
++
++template <typename T>
++std::enable_if_t<!std::is_enum<T>::value, T> load(T const & obj, std::memory_order order) noexcept
++{
++	return __atomic_load_n(&obj, (int)order);
++}
++
++template <typename T>
++void store(T & obj, T desired, std::memory_order order) noexcept
++{
++	__atomic_store(&obj, &desired, (int)order);
++}
++
++template <typename T>
++T exchange(T & obj, T desired, std::memory_order order) noexcept
++{
++	return __atomic_exchange_n(&obj, desired, (int)order);
++}
++
++template <typename T>
++bool compare_exchange_weak(T & obj, T & expected, T desired, std::memory_order success, std::memory_order failure) noexcept
++{
++	return __atomic_compare_exchange(&obj, &expected, &desired, true, (int)success, (int)failure);
++}
++
++template <typename T>
++bool compare_exchange_strong(T & obj, T & expected, T desired, std::memory_order success, std::memory_order failure) noexcept
++{
++	return __atomic_compare_exchange(&obj, &expected, &desired, false, (int)success, (int)failure);
++}
++
++template <typename T>
++T fetch_add(T & obj, T arg, std::memory_order order) noexcept
++{
++	return __atomic_fetch_add(&obj, arg, (int)order);
++}
++
++template <typename T>
++T fetch_sub(T & obj, T arg, std::memory_order order) noexcept
++{
++	return __atomic_fetch_sub(&obj, arg, (int)order);
++}
++
++template <typename T>
++T fetch_and(T & obj, T arg, std::memory_order order) noexcept
++{
++	return __atomic_fetch_and(&obj, arg, order);
++}
++
++template <typename T>
++T fetch_or(T & obj, T arg, std::memory_order order) noexcept
++{
++	return __atomic_fetch_or(&obj, arg, (int)order);
++}
++
++template <typename T>
++T fetch_xor(T & obj, T arg, std::memory_order order) noexcept
++{
++	return __atomic_fetch_xor(&obj, arg, (int)order);
++}
++
++template <typename T>
++auto fetch_add(T * & obj, std::ptrdiff_t arg, std::memory_order order) noexcept
++{
++	return __atomic_fetch_add(&obj, arg * sizeof(T), (int)order);
++}
++
++template <typename T>
++auto fetch_sub(T * & obj, std::ptrdiff_t arg, std::memory_order order) noexcept
++{
++	return __atomic_fetch_sub(&obj, arg * sizeof(T), (int)order);
++}
++
++}
++}
++
++// INCLUDE: https://github.com/avakar/atomic_ref/blob/bf1b16afbf3c98754d33fd601c3e53b892cd7cab/include/avakar/atomic_ref.h
++#include <atomic>
++#include <cstddef>
++
++namespace avakar {
++
++template <typename T, typename = void>
++struct _atomic_ref;
++
++template <typename T>
++using safe_atomic_ref = _atomic_ref<T>;
++
++template <typename T>
++struct atomic_ref
++	: _atomic_ref<T>
++{
++	using difference_type = typename _atomic_ref<T>::difference_type;
++
++	explicit atomic_ref(T & obj)
++		: _atomic_ref<T>(obj)
++	{
++	}
++
++	operator T() const noexcept
++	{
++		return this->load();
++	}
++
++	T operator=(T desired) const noexcept
++	{
++		this->store(desired);
++		return desired;
++	}
++
++	T operator++() const noexcept
++	{
++		return this->fetch_add(1) + T(1);
++	}
++
++	T operator++(int) const noexcept
++	{
++		return this->fetch_add(1);
++	}
++
++	T operator--() const noexcept
++	{
++		return this->fetch_sub(1) - T(1);
++	}
++
++	T operator--(int) const noexcept
++	{
++		return this->fetch_sub(1);
++	}
++
++	T operator+=(difference_type arg) const noexcept
++	{
++		return this->fetch_add(arg) + arg;
++	}
++
++	T operator-=(difference_type arg) const noexcept
++	{
++		return this->fetch_sub(arg) - arg;
++	}
++
++	T operator&=(T arg) const noexcept
++	{
++		return this->fetch_and(arg) & arg;
++	}
++
++	T operator|=(T arg) const noexcept
++	{
++		return this->fetch_or(arg) | arg;
++	}
++
++	T operator^=(T arg) const noexcept
++	{
++		return this->fetch_xor(arg) ^ arg;
++	}
++};
++
++
++template <typename T, typename>
++struct _atomic_ref
++{
++	static_assert(std::is_trivially_copyable<T>::value, "T must be TriviallyCopyable");
++
++	static constexpr bool is_always_lock_free = _avakar::atomic_ref::is_always_lock_free<T>::value;
++	static constexpr bool is_always_wait_free = _avakar::atomic_ref::is_always_wait_free<T>::value;
++	static constexpr std::size_t required_alignment = alignof(T);
++
++	using value_type = T;
++
++	explicit _atomic_ref(value_type & obj)
++		: _obj(obj)
++	{
++	}
++
++	value_type load(std::memory_order order = std::memory_order_seq_cst) const noexcept
++	{
++		return _avakar::atomic_ref::load(_obj, order);
++	}
++
++	void store(value_type desired, std::memory_order order = std::memory_order_seq_cst) noexcept
++	{
++		_avakar::atomic_ref::store(_obj, desired, order);
++	}
++
++	value_type exchange(value_type desired, std::memory_order order = std::memory_order_seq_cst) const noexcept
++	{
++		return _avakar::atomic_ref::exchange(_obj, desired, order);
++	}
++
++	bool compare_exchange_weak(value_type & expected, value_type desired, std::memory_order order = std::memory_order_seq_cst) const noexcept
++	{
++		return this->compare_exchange_weak(expected, desired, order, order);
++	}
++
++	bool compare_exchange_weak(
++		value_type & expected, value_type desired,
++		std::memory_order success,
++		std::memory_order failure) const noexcept
++	{
++		return _avakar::atomic_ref::compare_exchange_weak(_obj, expected, desired, success, failure);
++	}
++
++	bool compare_exchange_strong(value_type & expected, value_type desired, std::memory_order order = std::memory_order_seq_cst) const noexcept
++	{
++		return this->compare_exchange_strong(expected, desired, order, order);
++	}
++
++	bool compare_exchange_strong(
++		value_type & expected, value_type desired,
++		std::memory_order success,
++		std::memory_order failure) const noexcept
++	{
++		return _avakar::atomic_ref::compare_exchange_strong(_obj, expected, desired, success, failure);
++	}
++
++	_atomic_ref & operator=(_atomic_ref const &) = delete;
++
++private:
++	value_type & _obj;
++};
++
++template <typename T>
++struct _atomic_ref<T *>
++{
++	static_assert(std::is_trivially_copyable<T>::value, "T must be TriviallyCopyable");
++
++	static constexpr bool is_always_lock_free = _avakar::atomic_ref::is_always_lock_free<T>::value;
++	static constexpr bool is_always_wait_free = _avakar::atomic_ref::is_always_wait_free<T>::value;
++	static constexpr std::size_t required_alignment = alignof(T);
++
++	using value_type = T *;
++	using difference_type = std::ptrdiff_t;
++
++	explicit _atomic_ref(value_type & obj)
++		: _obj(obj)
++	{
++	}
++
++	value_type load(std::memory_order order = std::memory_order_seq_cst) const noexcept
++	{
++		return _avakar::atomic_ref::load(_obj, order);
++	}
++
++	void store(value_type desired, std::memory_order order = std::memory_order_seq_cst) noexcept
++	{
++		_avakar::atomic_ref::store(_obj, desired, order);
++	}
++
++	value_type exchange(value_type desired, std::memory_order order = std::memory_order_seq_cst) const noexcept
++	{
++		return _avakar::atomic_ref::exchange(_obj, desired, order);
++	}
++
++	bool compare_exchange_weak(value_type & expected, value_type desired, std::memory_order order = std::memory_order_seq_cst) const noexcept
++	{
++		return this->compare_exchange_weak(expected, desired, order, order);
++	}
++
++	bool compare_exchange_weak(
++		value_type & expected, value_type desired,
++		std::memory_order success,
++		std::memory_order failure) const noexcept
++	{
++		return _avakar::atomic_ref::compare_exchange_weak(_obj, expected, desired, success, failure);
++	}
++
++	bool compare_exchange_strong(value_type & expected, value_type desired, std::memory_order order = std::memory_order_seq_cst) const noexcept
++	{
++		return this->compare_exchange_strong(expected, desired, order, order);
++	}
++
++	bool compare_exchange_strong(
++		value_type & expected, value_type desired,
++		std::memory_order success,
++		std::memory_order failure) const noexcept
++	{
++		return _avakar::atomic_ref::compare_exchange_strong(_obj, expected, desired, success, failure);
++	}
++
++	value_type fetch_add(difference_type arg, std::memory_order order = std::memory_order_seq_cst) const noexcept
++	{
++		return _avakar::atomic_ref::fetch_add(_obj, arg, order);
++	}
++
++	value_type fetch_sub(difference_type arg, std::memory_order order = std::memory_order_seq_cst) const noexcept
++	{
++		return _avakar::atomic_ref::fetch_sub(_obj, arg, order);
++	}
++
++	_atomic_ref & operator=(_atomic_ref const &) = delete;
++
++private:
++	value_type & _obj;
++};
++
++template <typename T>
++struct _atomic_ref<T, std::enable_if_t<std::is_integral<T>::value>>
++{
++	static_assert(std::is_trivially_copyable<T>::value, "T must be TriviallyCopyable");
++
++	static constexpr bool is_always_lock_free = _avakar::atomic_ref::is_always_lock_free<T>::value;
++	static constexpr bool is_always_wait_free = _avakar::atomic_ref::is_always_wait_free<T>::value;
++	static constexpr std::size_t required_alignment = alignof(T);
++
++	using value_type = T;
++	using difference_type = T;
++
++	explicit _atomic_ref(value_type & obj)
++		: _obj(obj)
++	{
++	}
++
++	value_type load(std::memory_order order = std::memory_order_seq_cst) const noexcept
++	{
++		return _avakar::atomic_ref::load(_obj, order);
++	}
++
++	void store(value_type desired, std::memory_order order = std::memory_order_seq_cst) noexcept
++	{
++		_avakar::atomic_ref::store(_obj, desired, order);
++	}
++
++	value_type exchange(value_type desired, std::memory_order order = std::memory_order_seq_cst) const noexcept
++	{
++		return _avakar::atomic_ref::exchange(_obj, desired, order);
++	}
++
++	bool compare_exchange_weak(value_type & expected, value_type desired, std::memory_order order = std::memory_order_seq_cst) const noexcept
++	{
++		return this->compare_exchange_weak(expected, desired, order, order);
++	}
++
++	bool compare_exchange_weak(
++		value_type & expected, value_type desired,
++		std::memory_order success,
++		std::memory_order failure) const noexcept
++	{
++		return _avakar::atomic_ref::compare_exchange_weak(_obj, expected, desired, success, failure);
++	}
++
++	bool compare_exchange_strong(value_type & expected, value_type desired, std::memory_order order = std::memory_order_seq_cst) const noexcept
++	{
++		return this->compare_exchange_strong(expected, desired, order, order);
++	}
++
++	bool compare_exchange_strong(
++		value_type & expected, value_type desired,
++		std::memory_order success,
++		std::memory_order failure) const noexcept
++	{
++		return _avakar::atomic_ref::compare_exchange_strong(_obj, expected, desired, success, failure);
++	}
++
++	value_type fetch_add(difference_type arg, std::memory_order order = std::memory_order_seq_cst) const noexcept
++	{
++		return _avakar::atomic_ref::fetch_add(_obj, arg, order);
++	}
++
++	value_type fetch_sub(difference_type arg, std::memory_order order = std::memory_order_seq_cst) const noexcept
++	{
++		return _avakar::atomic_ref::fetch_sub(_obj, arg, order);
++	}
++
++	value_type fetch_and(difference_type arg, std::memory_order order = std::memory_order_seq_cst) const noexcept
++	{
++		return _avakar::atomic_ref::fetch_and(_obj, arg, order);
++	}
++
++	value_type fetch_or(difference_type arg, std::memory_order order = std::memory_order_seq_cst) const noexcept
++	{
++		return _avakar::atomic_ref::fetch_or(_obj, arg, order);
++	}
++
++	value_type fetch_xor(difference_type arg, std::memory_order order = std::memory_order_seq_cst) const noexcept
++	{
++		return _avakar::atomic_ref::fetch_xor(_obj, arg, order);
++	}
++
++	_atomic_ref & operator=(_atomic_ref const &) = delete;
++
++private:
++	value_type & _obj;
++};
++
++}
++
++#endif // TERMUX_HEADER_ONLY_ATOMIC_REF_POLYFILL_H
+--- a/base/atomicops.cc
++++ b/base/atomicops.cc
+@@ -8,6 +8,15 @@
+ 
+ #include "base/memory/aligned_memory.h"
+ 
++#ifdef __TERMUX__
++#include "base/__termux_header_only_atomic_ref_polyfill.h"
++template <typename T>
++using __my_atomic_ref = avakar::safe_atomic_ref<T>;
++#else
++template <typename T>
++using __my_atomic_ref = std::atomic_ref<T>;
++#endif
++
+ namespace base::subtle {
+ 
+ void RelaxedAtomicWriteMemcpy(base::span<uint8_t> dst,
+@@ -17,16 +26,16 @@
+   uint8_t* dst_byte_ptr = dst.data();
+   const uint8_t* src_byte_ptr = src.data();
+   // Make sure that we can at least copy byte by byte with atomics.
+-  static_assert(std::atomic_ref<uint8_t>::required_alignment == 1);
++  static_assert(__my_atomic_ref<uint8_t>::required_alignment == 1);
+ 
+   // Alignment for uintmax_t atomics that we use in the happy case.
+   constexpr size_t kDesiredAlignment =
+-      std::atomic_ref<uintmax_t>::required_alignment;
++      __my_atomic_ref<uintmax_t>::required_alignment;
+ 
+   // Copy byte-by-byte until `dst_byte_ptr` is not properly aligned for
+   // the happy case.
+   while (bytes > 0 && !IsAligned(dst_byte_ptr, kDesiredAlignment)) {
+-    std::atomic_ref<uint8_t>(*dst_byte_ptr)
++    __my_atomic_ref<uint8_t>(*dst_byte_ptr)
+         .store(*src_byte_ptr, std::memory_order_relaxed);
+     // SAFETY: We check above that `dst_byte_ptr` and `src_byte_ptr` point
+     // to spans of sufficient size.
+@@ -39,7 +48,7 @@
+   // aligned and the largest possible atomic is used for copying.
+   if (IsAligned(src_byte_ptr, kDesiredAlignment)) {
+     while (bytes >= sizeof(uintmax_t)) {
+-      std::atomic_ref<uintmax_t>(*reinterpret_cast<uintmax_t*>(dst_byte_ptr))
++      __my_atomic_ref<uintmax_t>(*reinterpret_cast<uintmax_t*>(dst_byte_ptr))
+           .store(*reinterpret_cast<const uintmax_t*>(src_byte_ptr),
+                  std::memory_order_relaxed);
+       // SAFETY: We check above that `dst_byte_ptr` and `src_byte_ptr` point
+@@ -52,7 +61,7 @@
+ 
+   // Copy what's left after the happy-case byte-by-byte.
+   while (bytes > 0) {
+-    std::atomic_ref<uint8_t>(*dst_byte_ptr)
++    __my_atomic_ref<uint8_t>(*dst_byte_ptr)
+         .store(*src_byte_ptr, std::memory_order_relaxed);
+     // SAFETY: We check above that `dst_byte_ptr` and `src_byte_ptr` point
+     // to spans of sufficient size.
