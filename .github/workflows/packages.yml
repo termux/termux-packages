@@ -23,6 +23,12 @@ on:
 
 permissions: {} # none
 
+concurrency:
+  # if this is a PR event, group = "pr-<number>", otherwise group = run_id so it never collides with other runs
+  group: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.run_id }}
+  # only cancel in-progress when it’s a PR
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build:
     permissions:
