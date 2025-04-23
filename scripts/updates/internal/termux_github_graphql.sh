@@ -69,7 +69,7 @@ termux_github_graphql() {
 			// null)' <<< "$response")" # If neither exists return null
 
 		while IFS=$'\n' read -r idx; do
-			printf 'PKG|%s|%s\n' \
+			printf 'GIT|%s|%s\n' \
 				"${__GITHUB_PACKAGES[$BATCH * $BATCH_SIZE + $(( i++ ))]##*/}" \
 				"${idx}"
 		done <<< "$TAGS"

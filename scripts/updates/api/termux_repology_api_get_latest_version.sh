@@ -24,9 +24,6 @@ termux_repology_api_get_latest_version() {
    				echo "{}" > ${TERMUX_REPOLOGY_DATA_FILE}
 	fi
 
-	local PKG_NAME="$1"
-	local version
-	# Why `--arg`? See: https://stackoverflow.com/a/54674832/15086226
-	version="$(jq -r --arg packageName "$PKG_NAME" '.[$packageName]' <"${TERMUX_REPOLOGY_DATA_FILE}")"
-	echo "${version#v}"
+	# Why `--arg`? See: https://stackoverflow.com/a/54674832/15086226; `sub` strips the leading 'v'
+	jq -r --arg pkg "$1" '.[$pkg] // "null" | sub("^v";"")' "$TERMUX_REPOLOGY_DATA_FILE"
 }
