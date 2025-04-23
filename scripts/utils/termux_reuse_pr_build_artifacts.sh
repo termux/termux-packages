@@ -61,6 +61,7 @@ download_ci_artifacts() {
 		--output "${CI_ARTIFACT_ZIP}" \
 		|| { echo "Failed to download PR artifact." >&2; return 1; }
 
+	mkdir -p output
 	unzip -p "${CI_ARTIFACT_ZIP}" '*.tar' | tar xvf - --wildcards --strip-components=1 -C output 'debs/*.deb' \
 		|| { echo "Failed to unpack PR artifact." >&2; return 1; }
 }
