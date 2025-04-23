@@ -15,10 +15,6 @@ TERMUX_PKG_PROVIDES="unstable-repo, game-repo, science-repo"
 TERMUX_PKG_SUGGESTS="gnupg, less"
 TERMUX_PKG_ESSENTIAL=true
 
-TERMUX_PKG_CONFFILES="
-etc/apt/sources.list
-"
-
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DPERL_EXECUTABLE=$(command -v perl)
 -DCMAKE_INSTALL_FULL_LOCALSTATEDIR=$TERMUX_PREFIX
@@ -54,37 +50,63 @@ share/man/man1/apt-transport-mirror.1
 share/man/man8/apt-cdrom.8
 "
 
-termux_step_pre_configure() {
-	# Certain packages are not safe to build on device because their
-	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if $TERMUX_ON_DEVICE_BUILD; then
-		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
-	fi
+TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
+termux_step_pre_configure() {
 	# Fix i686 builds.
 	CXXFLAGS+=" -Wno-c++11-narrowing"
 	# Fix glob() on Android 7.
 	LDFLAGS+=" -Wl,--no-as-needed -landroid-glob"
 
 	# for manpage build
-	local docbook_xsl_version=$(. $TERMUX_SCRIPTDIR/packages/docbook-xsl/build.sh; echo $TERMUX_PKG_VERSION)
+	local docbook_xsl_version
+	docbook_xsl_version=$(. "$TERMUX_SCRIPTDIR/packages/docbook-xsl/build.sh"; echo "$TERMUX_PKG_VERSION")
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DDOCBOOK_XSL=$TERMUX_PREFIX/share/xml/docbook/xsl-stylesheets-$docbook_xsl_version-nons"
 }
 
 termux_step_post_make_install() {
-	{
-		echo "# The main termux repository, with cloudflare cache"
-		echo "deb https://packages-cf.termux.dev/apt/termux-main/ stable main"
-		echo "# The main termux repository, without cloudflare cache"
-		echo "# deb https://packages.termux.dev/apt/termux-main/ stable main"
-	} > "$TERMUX_PREFIX/etc/apt/sources.list"
+	mkdir -p "$TERMUX_PREFIX/etc/apt/sources.list.d"
+	{ # write deb822 source entries for the main repo
+	printf '%s\n' \
+		"# The main termux repository, with cloudflare cache" \
+		"Types: deb" \
+		"URIs: https://packages-cf.termux.dev/apt/termux-main/" \
+		"Suites: stable" \
+		"Components: main" \
+		"Signed-By: $TERMUX_PREFIX/etc/apt/trusted.gpg.d/grimler.gpg, $TERMUX_PREFIX/etc/apt/trusted.gpg.d/termux-autobuilds.gpg" \
+		"" \
+		"# The main termux repository, without cloudflare cache" \
+		"#Types: deb" \
+		"#URIs: https://packages-cf.termux.dev/apt/termux-main/" \
+		"#Suites: stable" \
+		"#Components: main" \
+		"#Signed-By: $TERMUX_PREFIX/etc/apt/trusted.gpg.d/grimler.gpg, $TERMUX_PREFIX/etc/apt/trusted.gpg.d/termux-autobuilds.gpg"
+	} > "$TERMUX_PREFIX/etc/apt/sources.list.d/main.sources"
 
 	# apt-transport-tor
-	ln -sfr "$TERMUX_PREFIX/lib/apt/methods/http" "$TERMUX_PREFIX/lib/apt/methods/tor"
-	ln -sfr "$TERMUX_PREFIX/lib/apt/methods/http" "$TERMUX_PREFIX/lib/apt/methods/tor+http"
+	ln -sfr "$TERMUX_PREFIX/lib/apt/methods/http"  "$TERMUX_PREFIX/lib/apt/methods/tor"
+	ln -sfr "$TERMUX_PREFIX/lib/apt/methods/http"  "$TERMUX_PREFIX/lib/apt/methods/tor+http"
 	ln -sfr "$TERMUX_PREFIX/lib/apt/methods/https" "$TERMUX_PREFIX/lib/apt/methods/tor+https"
 	# Workaround for "empty" subpackage:
-	local dir=$TERMUX_PREFIX/share/apt-transport-tor
+	local dir="$TERMUX_PREFIX/share/apt-transport-tor"
 	mkdir -p "$dir"
 	touch "$dir/.placeholder"
+}
+
+termux_step_create_debscripts() {
+	[[ "$TERMUX_PACKAGE_FORMAT" == 'pacman' ]] && return 0
+
+	local REPO="main"
+	local LEGACY_SOURCES="sources.list" # Note that this is not in sources.list.d/
+	sed -e "s|@LEGACY_SOURCES@|$LEGACY_SOURCES|g" \
+		-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
+		-e "s|@REPO@|$REPO|g" \
+		"$TERMUX_SCRIPTDIR/packages/apt/preinst.sh.in" > ./preinst
+
+	sed -e "s|@LEGACY_SOURCES@|$LEGACY_SOURCES|g" \
+		-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
+		-e "s|@REPO@|$REPO|g" \
+		"$TERMUX_SCRIPTDIR/packages/apt/postinst.sh.in" > ./postinst
+
+	chmod +x ./preinst ./postinst
 }
