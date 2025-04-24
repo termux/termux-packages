@@ -62,4 +62,4 @@ for entry in "${!failed[@]}"; do
 	echo "${failed["${entry}"]}" >> "${REPORT_PATH}"
 done
 
-(( ${#failed[*]} )) && exit 1
+exit $(( ${#failed[@]} > 0 ))
