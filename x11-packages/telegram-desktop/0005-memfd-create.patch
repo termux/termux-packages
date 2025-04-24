@@ -1,0 +1,19 @@
+--- a/Telegram/lib_webview/webview/webview_data_stream_memory.cpp
++++ b/Telegram/lib_webview/webview/webview_data_stream_memory.cpp
+@@ -7,9 +7,16 @@
+ #include "webview/webview_data_stream_memory.h"
+ 
+ #if !defined Q_OS_WIN && !defined Q_OS_MAC
++#include <unistd.h>
+ #include <sys/mman.h>
+ #endif // !Q_OS_WIN && !Q_OS_MAC
+ 
++#if defined(__ANDROID__) && __ANDROID_API__ < 30
++#include <linux/memfd.h>
++#include <sys/syscall.h>
++#define memfd_create(name,flags) syscall(SYS_memfd_create,name,flags)
++#endif
++
+ namespace Webview {
+ 
+ DataStreamFromMemory::DataStreamFromMemory(

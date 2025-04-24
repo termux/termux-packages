@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<dump>
+  <interface name="MutterIdleMonitorIdleMonitor" get-type="mutter_idle_monitor_idle_monitor_get_type">
+    <signal name="handle-get-idletime" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-add-idle-watch" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="guint64"/>
+    </signal>
+    <signal name="handle-add-user-active-watch" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-remove-watch" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="watch-fired" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+  </interface>
+  <class name="MutterIdleMonitorIdleMonitorProxy" get-type="mutter_idle_monitor_idle_monitor_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="MutterIdleMonitorIdleMonitor"/>
+  </class>
+  <class name="MutterIdleMonitorIdleMonitorSkeleton" get-type="mutter_idle_monitor_idle_monitor_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="MutterIdleMonitorIdleMonitor"/>
+  </class>
+  <interface name="MutterIdleMonitorObject" get-type="mutter_idle_monitor_object_get_type">
+    <prerequisite name="GDBusObject"/>
+    <property name="idle-monitor" type="MutterIdleMonitorIdleMonitor" flags="227"/>
+  </interface>
+  <class name="MutterIdleMonitorObjectProxy" get-type="mutter_idle_monitor_object_proxy_get_type" parents="GDBusObjectProxy,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="MutterIdleMonitorObject"/>
+  </class>
+  <class name="MutterIdleMonitorObjectSkeleton" get-type="mutter_idle_monitor_object_skeleton_get_type" parents="GDBusObjectSkeleton,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="MutterIdleMonitorObject"/>
+  </class>
+  <class name="MutterIdleMonitorObjectManagerClient" get-type="mutter_idle_monitor_object_manager_client_get_type" parents="GDBusObjectManagerClient,GObject">
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GDBusObjectManager"/>
+  </class>
+</dump>

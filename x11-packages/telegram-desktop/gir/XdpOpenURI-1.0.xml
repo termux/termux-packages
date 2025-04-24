@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<dump>
+  <interface name="XdpOpenURIOpenURI" get-type="xdp_open_uri_open_uri_get_type">
+    <property name="version" type="guint" flags="227" default-value="0"/>
+    <signal name="handle-open-uri" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+    </signal>
+    <signal name="handle-open-file" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="GUnixFDList"/>
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+      <param type="GVariant"/>
+    </signal>
+    <signal name="handle-open-directory" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="GUnixFDList"/>
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+      <param type="GVariant"/>
+    </signal>
+  </interface>
+  <class name="XdpOpenURIOpenURIProxy" get-type="xdp_open_uri_open_uri_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="XdpOpenURIOpenURI"/>
+  </class>
+  <class name="XdpOpenURIOpenURISkeleton" get-type="xdp_open_uri_open_uri_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="XdpOpenURIOpenURI"/>
+  </class>
+  <interface name="XdpOpenURIObject" get-type="xdp_open_uri_object_get_type">
+    <prerequisite name="GDBusObject"/>
+    <property name="open-uri" type="XdpOpenURIOpenURI" flags="227"/>
+  </interface>
+  <class name="XdpOpenURIObjectProxy" get-type="xdp_open_uri_object_proxy_get_type" parents="GDBusObjectProxy,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="XdpOpenURIObject"/>
+  </class>
+  <class name="XdpOpenURIObjectSkeleton" get-type="xdp_open_uri_object_skeleton_get_type" parents="GDBusObjectSkeleton,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="XdpOpenURIObject"/>
+  </class>
+  <class name="XdpOpenURIObjectManagerClient" get-type="xdp_open_uri_object_manager_client_get_type" parents="GDBusObjectManagerClient,GObject">
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GDBusObjectManager"/>
+  </class>
+</dump>

@@ -1,0 +1,203 @@
+diff -uNr a/Telegram/ThirdParty/libtgvoip/VoIPController.cpp b/Telegram/ThirdParty/libtgvoip/VoIPController.cpp
+--- a/Telegram/ThirdParty/libtgvoip/VoIPController.cpp
++++ b/Telegram/ThirdParty/libtgvoip/VoIPController.cpp
+@@ -60,7 +60,7 @@
+ bool VoIPController::didInitWin32TimeScale = false;
+ #endif
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #include "os/android/JNIUtilities.h"
+ #include "os/android/AudioInputAndroid.h"
+ extern jclass jniUtilitiesClass;
+@@ -611,7 +611,7 @@
+ 			network["mnc"]=carrier.mnc;
+ 		}
+ 	}else if(networkType==NET_TYPE_WIFI){
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 		jni::DoWithJNI([&](JNIEnv* env){
+ 			jmethodID getWifiInfoMethod=env->GetStaticMethodID(jniUtilitiesClass, "getWifiInfo", "()[I");
+ 			jintArray res=static_cast<jintArray>(env->CallStaticObjectMethod(jniUtilitiesClass, getWifiInfoMethod));
+@@ -988,7 +988,7 @@
+ CellularCarrierInfo VoIPController::GetCarrierInfo(){
+ #if defined(__APPLE__) && TARGET_OS_IOS
+ 	return DarwinSpecific::GetCarrierInfo();
+-#elif defined(__ANDROID__)
++#elif defined(__ANDROID__) && !defined(__TERMUX__)
+ 	CellularCarrierInfo carrier;
+ 	jni::DoWithJNI([&carrier](JNIEnv* env){
+ 		jmethodID getCarrierInfoMethod=env->GetStaticMethodID(jniUtilitiesClass, "getCarrierInfo", "()[Ljava/lang/String;");
+@@ -1122,7 +1122,7 @@
+     }
+ 	audioInput=audioIO->GetInput();
+ 	audioOutput=audioIO->GetOutput();
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 	audio::AudioInputAndroid* androidInput=dynamic_cast<audio::AudioInputAndroid*>(audioInput);
+ 	if(androidInput){
+ 		unsigned int effects=androidInput->GetEnabledEffects();
+diff -uNr a/Telegram/ThirdParty/libtgvoip/audio/AudioIO.cpp b/Telegram/ThirdParty/libtgvoip/audio/AudioIO.cpp
+--- a/Telegram/ThirdParty/libtgvoip/audio/AudioIO.cpp
++++ b/Telegram/ThirdParty/libtgvoip/audio/AudioIO.cpp
+@@ -14,7 +14,7 @@
+ 
+ #if defined(TGVOIP_USE_CALLBACK_AUDIO_IO)
+ #include "AudioIOCallback.h"
+-#elif defined(__ANDROID__)
++#elif defined(__ANDROID__) && !defined(__TERMUX__)
+ #include "../os/android/AudioInputAndroid.h"
+ #include "../os/android/AudioOutputAndroid.h"
+ #elif defined(__APPLE__)
+@@ -50,7 +50,7 @@
+ AudioIO* AudioIO::Create(std::string inputDevice, std::string outputDevice){
+ #if defined(TGVOIP_USE_CALLBACK_AUDIO_IO)
+ 	return new AudioIOCallback();
+-#elif defined(__ANDROID__)
++#elif defined(__ANDROID__) && !defined(__TERMUX__)
+ 	return new ContextlessAudioIO<AudioInputAndroid, AudioOutputAndroid>();
+ #elif defined(__APPLE__)
+ #if TARGET_OS_OSX
+diff -uNr a/Telegram/ThirdParty/libtgvoip/audio/AudioInput.cpp b/Telegram/ThirdParty/libtgvoip/audio/AudioInput.cpp
+--- a/Telegram/ThirdParty/libtgvoip/audio/AudioInput.cpp
++++ b/Telegram/ThirdParty/libtgvoip/audio/AudioInput.cpp
+@@ -13,7 +13,7 @@
+ 
+ #if defined(TGVOIP_USE_CALLBACK_AUDIO_IO)
+ // nothing
+-#elif defined(__ANDROID__)
++#elif defined(__ANDROID__) && !defined(__TERMUX__)
+ #include "../os/android/AudioInputAndroid.h"
+ #elif defined(__APPLE__)
+ #include <TargetConditionals.h>
+@@ -72,7 +72,7 @@
+ 	}
+ #endif
+ 	AudioInputWASAPI::EnumerateDevices(devs);
+-#elif (defined(__linux__) && !defined(__ANDROID__)) || defined(__FreeBSD__) || defined(__OpenBSD__)
++#elif (defined(__linux__) && !defined(__ANDROID__)) || defined(__TERMUX__) || defined(__FreeBSD__) || defined(__OpenBSD__)
+ #if !defined(WITHOUT_PULSE) && !defined(WITHOUT_ALSA)
+ 	if(!AudioInputPulse::EnumerateDevices(devs))
+ 		AudioInputALSA::EnumerateDevices(devs);
+diff -uNr a/Telegram/ThirdParty/libtgvoip/audio/AudioOutput.cpp b/Telegram/ThirdParty/libtgvoip/audio/AudioOutput.cpp
+--- a/Telegram/ThirdParty/libtgvoip/audio/AudioOutput.cpp
++++ b/Telegram/ThirdParty/libtgvoip/audio/AudioOutput.cpp
+@@ -14,7 +14,7 @@
+ 
+ #if defined(TGVOIP_USE_CALLBACK_AUDIO_IO)
+ // nothing
+-#elif defined(__ANDROID__)
++#elif defined(__ANDROID__) && !defined(__TERMUX__)
+ #include "../os/android/AudioOutputOpenSLES.h"
+ #include "../os/android/AudioOutputAndroid.h"
+ #include <sys/system_properties.h>
+@@ -60,7 +60,7 @@
+ 
+ 
+ int32_t AudioOutput::GetEstimatedDelay(){
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 	char sdkNum[PROP_VALUE_MAX];
+ 	__system_property_get("ro.build.version.sdk", sdkNum);
+ 	int systemVersion=atoi(sdkNum);
+@@ -83,7 +83,7 @@
+ 	}
+ #endif
+ 	AudioOutputWASAPI::EnumerateDevices(devs);
+-#elif (defined(__linux__) && !defined(__ANDROID__)) || defined(__FreeBSD__) || defined(__OpenBSD__)
++#elif (defined(__linux__) && !defined(__ANDROID__)) || defined(__TERMUX__) || defined(__FreeBSD__) || defined(__OpenBSD__)
+ #if !defined(WITHOUT_PULSE) && !defined(WITHOUT_ALSA)
+ 	if(!AudioOutputPulse::EnumerateDevices(devs))
+ 		AudioOutputALSA::EnumerateDevices(devs);
+diff -uNr a/Telegram/ThirdParty/libtgvoip/video/VideoRenderer.cpp b/Telegram/ThirdParty/libtgvoip/video/VideoRenderer.cpp
+--- a/Telegram/ThirdParty/libtgvoip/video/VideoRenderer.cpp
++++ b/Telegram/ThirdParty/libtgvoip/video/VideoRenderer.cpp
+@@ -4,14 +4,14 @@
+ 
+ #include "VideoRenderer.h"
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #include "../os/android/VideoRendererAndroid.h"
+ #elif defined(__APPLE__) && !defined(TARGET_OSX)
+ #include "../os/darwin/SampleBufferDisplayLayerRenderer.h"
+ #endif
+ 
+ std::vector<uint32_t> tgvoip::video::VideoRenderer::GetAvailableDecoders(){
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 	return VideoRendererAndroid::availableDecoders;
+ #elif defined(__APPLE__) && !defined(TARGET_OSX)
+ 	return SampleBufferDisplayLayerRenderer::GetAvailableDecoders();
+@@ -20,7 +20,7 @@
+ }
+ 
+ int tgvoip::video::VideoRenderer::GetMaximumResolution(){
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 	return VideoRendererAndroid::maxResolution;
+ #elif defined(__APPLE__) && !defined(TARGET_OSX)
+ 	return SampleBufferDisplayLayerRenderer::GetMaximumResolution();
+diff -uNr a/Telegram/ThirdParty/libtgvoip/video/VideoSource.cpp b/Telegram/ThirdParty/libtgvoip/video/VideoSource.cpp
+--- a/Telegram/ThirdParty/libtgvoip/video/VideoSource.cpp
++++ b/Telegram/ThirdParty/libtgvoip/video/VideoSource.cpp
+@@ -4,7 +4,7 @@
+ 
+ #include "VideoSource.h"
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #include "../os/android/VideoSourceAndroid.h"
+ #elif defined(__APPLE__) && !defined(TARGET_OSX)
+ #include "../os/darwin/VideoToolboxEncoderSource.h"
+@@ -14,7 +14,7 @@
+ using namespace tgvoip::video;
+ 
+ std::shared_ptr<VideoSource> VideoSource::Create(){
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 	//return std::make_shared<VideoSourceAndroid>();
+ 	return nullptr;
+ #endif
+@@ -35,7 +35,7 @@
+ }
+ 
+ std::vector<uint32_t> VideoSource::GetAvailableEncoders(){
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 	return VideoSourceAndroid::availableEncoders;
+ #elif defined(__APPLE__) && !defined(TARGET_OSX)
+ 	return VideoToolboxEncoderSource::GetAvailableEncoders();
+diff -uNr a/Telegram/ThirdParty/libtgvoip/os/posix/NetworkSocketPosix.cpp b/Telegram/ThirdParty/libtgvoip/os/posix/NetworkSocketPosix.cpp
+--- a/Telegram/ThirdParty/libtgvoip/os/posix/NetworkSocketPosix.cpp
++++ b/Telegram/ThirdParty/libtgvoip/os/posix/NetworkSocketPosix.cpp
+@@ -18,7 +18,7 @@
+ #include "../../VoIPController.h"
+ #include "../../Buffers.h"
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #include <jni.h>
+ #include <sys/system_properties.h>
+ extern JavaVM* sharedJVM;
+@@ -365,7 +365,7 @@
+ std::string NetworkSocketPosix::GetLocalInterfaceInfo(IPv4Address *v4addr, IPv6Address *v6addr){
+ 	std::string name="";
+ 	// Android doesn't support ifaddrs
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 	JNIEnv *env=NULL;
+ 	bool didAttach=false;
+ 	sharedJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+diff -uNr a/Telegram/ThirdParty/libtgvoip/logging.h b/Telegram/ThirdParty/libtgvoip/logging.h
+--- a/Telegram/ThirdParty/libtgvoip/logging.h
++++ b/Telegram/ThirdParty/libtgvoip/logging.h
+@@ -18,7 +18,7 @@
+ void tgvoip_log_file_printf(char level, const char* msg, ...);
+ void tgvoip_log_file_write_header(FILE* file);
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 
+ #include <android/log.h>
+ 
