@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="10.0p2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/openssh/openssh-portable/archive/refs/tags/V_$(sed 's/\./_/g; s/p/_P/g' <<< $TERMUX_PKG_VERSION).tar.gz
 TERMUX_PKG_SHA256=a25b32645dc6b474064b9deb07afc9d8e37b127d026a1170b54feb929145140c
 TERMUX_PKG_AUTO_UPDATE=true
@@ -78,6 +78,11 @@ termux_step_post_configure() {
 }
 
 termux_step_post_make_install() {
+	install -Dm700 "$TERMUX_PKG_BUILDER_DIR/source-ssh-agent.sh" "$TERMUX_PREFIX/bin/source-ssh-agent"
+	install -Dm700 "$TERMUX_PKG_BUILDER_DIR/ssh-with-agent.sh"   "$TERMUX_PREFIX/bin/ssha"
+	install -Dm700 "$TERMUX_PKG_BUILDER_DIR/sftp-with-agent.sh"  "$TERMUX_PREFIX/bin/sftpa"
+	install -Dm700 "$TERMUX_PKG_BUILDER_DIR/scp-with-agent.sh"   "$TERMUX_PREFIX/bin/scpa"
+
 	mkdir -p "$TERMUX_PREFIX/var/run"
 	echo "OpenSSH needs this directory to put sshd.pid in" > "$TERMUX_PREFIX/var/run/README.openssh"
 	# Install ssh-copy-id:
