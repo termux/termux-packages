@@ -1,0 +1,89 @@
+From fd3959cef01a7c64aa467f15f5525af5a57ebfe3 Mon Sep 17 00:00:00 2001
+From: Shadichy <shadichy@blisslabs.org>
+Date: Thu, 24 Apr 2025 14:33:42 +0700
+Subject: [PATCH 2/3] btrfs-progs: rescue-chunk-recover: Added `atomic` patch
+
+This patch is from termux/termux-packages
+
+Signed-off-by: Shadichy <shadichy@blisslabs.org>
+---
+ cmds/rescue-chunk-recover.c | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
+
+diff --git a/cmds/rescue-chunk-recover.c b/cmds/rescue-chunk-recover.c
+index d00ecfd3..b9b53bef 100644
+--- a/cmds/rescue-chunk-recover.c
++++ b/cmds/rescue-chunk-recover.c
+@@ -26,6 +26,9 @@
+ #include <errno.h>
+ #include <stddef.h>
+ #include <string.h>
++#ifdef __ANDROID__
++#include <stdatomic.h>
++#endif
+ #include "kernel-lib/list.h"
+ #include "kernel-shared/accessors.h"
+ #include "kernel-shared/extent-io-tree.h"
+@@ -82,6 +85,9 @@ struct device_scan {
+ 	struct btrfs_device *dev;
+ 	int fd;
+ 	u64 bytenr;
++#ifdef __ANDROID__
++	atomic_flag thread_running;
++#endif
+ };
+ 
+ static struct extent_record *btrfs_new_extent_record(struct extent_buffer *eb)
+@@ -761,8 +767,12 @@ static int scan_one_device(void *dev_scan_struct)
+ 		return 1;
+ 
+ 	buf = malloc(sizeof(*buf) + rc->nodesize);
+-	if (!buf)
++	if (!buf) {
++#ifdef __ANDROID__
++		atomic_flag_clear(&dev_scan->thread_running);
++#endif
+ 		return -ENOMEM;
++	}
+ 	buf->len = rc->nodesize;
+ 
+ 	bytenr = 0;
+@@ -823,6 +833,9 @@ next_node:
+ out:
+ 	close(fd);
+ 	free(buf);
++#ifdef __ANDROID__
++	atomic_flag_clear(&dev_scan->thread_running);
++#endif
+ 	return ret;
+ }
+ 
+@@ -869,6 +882,9 @@ static int scan_devices(struct recover_control *rc)
+ 		dev_scans[devidx].dev = dev;
+ 		dev_scans[devidx].fd = fd;
+ 		dev_scans[devidx].bytenr = -1;
++#ifdef __ANDROID__
++		atomic_flag_test_and_set(&dev_scans[devidx].thread_running);
++#endif
+ 		devidx++;
+ 	}
+ 
+@@ -887,8 +903,15 @@ static int scan_devices(struct recover_control *rc)
+ 		for (i = 0; i < devidx; i++) {
+ 			if (dev_scans[i].bytenr == -1)
+ 				continue;
++#ifdef __ANDROID__
++			if (atomic_flag_test_and_set(&dev_scans[i].thread_running))
++				ret = EBUSY;
++			else
++				ret = pthread_join(t_scans[i], (void **)&t_rets[i]);
++#else
+ 			ret = pthread_tryjoin_np(t_scans[i],
+ 						 (void **)&t_rets[i]);
++#endif
+ 			if (ret == EBUSY) {
+ 				all_done = false;
+ 				continue;
+-- 
+2.49.0
+
