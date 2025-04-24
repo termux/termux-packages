@@ -1,0 +1,99 @@
+I do not have time to deal with this for now.
+
+But should be important if we want to make sure that our builds are reproducible.
+
+I will continue to ignore snapshot reproduciblity until this API is marked as experimental.If you have more idea of what's wrong feel free to open an issue/PR to fix it
+
+Also due to large number of inconsistencies in snapshot generation, the diff is large enough to cause an OOM on Android.
+
+An equivalent bash version of this script boils down to:
+NODE_DEBUG_NATIVE=SNAPSHOT_SERDES ./path/to/node --random_seed=42 --predictable --build-snapshot node:generate_default_snapshot | grep -E '^0x'
+mv snapshot.blob 1.blob
+xxd 1.blob > 1.blob.xxd
+NODE_DEBUG_NATIVE=SNAPSHOT_SERDES ./path/to/node --random_seed=42 --predictable --build-snapshot node:generate_default_snapshot | grep -E '^0x'
+mv snapshot.blob 2.blob
+xxd 2.blob > 2.blob.xxd
+diff -uNr 1.blob.xxd 2.blob.xxd > snapshot.diff
+
+And unlike this test, this doesn't OOM even for large diff
+
+and unlike the below script, it doesn't crash
+
+Some references for me/anyone else when I actually think of going after this:
+https://joyeecheung.github.io/blog/2024/03/17/memory-leak-testing-v8-node-js-1/
+https://joyeecheung.github.io/blog/2024/09/28/reproducible-nodejs-builtin-snapshots-2/
+https://joyeecheung.github.io/blog/2024/09/28/reproducible-nodejs-builtin-snapshots-3/
+https://github.com/danbev/learning-v8/blob/master/notes/snapshots.md (this repository also contains other resources about v8 internals and api)
+--- ./test/parallel/test-snapshot-reproducible.js	2025-03-15 15:40:54.141339594 +0530
++++ /dev/null	2025-03-15 11:33:07.028148560 +0530
+@@ -1,70 +0,0 @@
+-'use strict';
+-
+-require('../common');
+-const { spawnSyncAndAssert } = require('../common/child_process');
+-const tmpdir = require('../common/tmpdir');
+-const fs = require('fs');
+-const assert = require('assert');
+-
+-// When the test fails this helper can be modified to write outputs
+-// differently and aid debugging.
+-function log(line) {
+-  console.log(line);
+-}
+-
+-function generateSnapshot() {
+-  tmpdir.refresh();
+-
+-  spawnSyncAndAssert(
+-    process.execPath,
+-    [
+-      '--random_seed=42',
+-      '--predictable',
+-      '--build-snapshot',
+-      'node:generate_default_snapshot',
+-    ],
+-    {
+-      env: { ...process.env, NODE_DEBUG_NATIVE: 'SNAPSHOT_SERDES' },
+-      cwd: tmpdir.path
+-    },
+-    {
+-      stderr(output) {
+-        const lines = output.split('\n');
+-        for (const line of lines) {
+-          if (line.startsWith('0x')) {
+-            log(line);
+-          }
+-        }
+-      },
+-    }
+-  );
+-  const blobPath = tmpdir.resolve('snapshot.blob');
+-  return fs.readFileSync(blobPath);
+-}
+-
+-const buf1 = generateSnapshot();
+-const buf2 = generateSnapshot();
+-
+-const diff = [];
+-let offset = 0;
+-const step = 16;
+-do {
+-  const length = Math.min(buf1.length - offset, step);
+-  const slice1 = buf1.slice(offset, offset + length).toString('hex');
+-  const slice2 = buf2.slice(offset, offset + length).toString('hex');
+-  if (slice1 !== slice2) {
+-    diff.push({ offset: '0x' + (offset).toString(16), slice1, slice2 });
+-  }
+-  offset += length;
+-} while (offset < buf1.length);
+-
+-assert.strictEqual(offset, buf1.length);
+-if (offset < buf2.length) {
+-  const length = Math.min(buf2.length - offset, step);
+-  const slice2 = buf2.slice(offset, offset + length).toString('hex');
+-  diff.push({ offset, slice1: '', slice2 });
+-  offset += length;
+-} while (offset < buf2.length);
+-
+-assert.deepStrictEqual(diff, []);
+-assert.strictEqual(buf1.length, buf2.length);

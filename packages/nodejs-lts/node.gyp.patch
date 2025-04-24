@@ -1,6 +1,6 @@
---- ./node.gyp.orig	2025-02-11 11:15:10.000000000 +0530
-+++ ./node.gyp	2025-02-26 15:33:18.490476416 +0530
-@@ -559,7 +559,8 @@
+--- ./node.gyp.orig	2025-04-23 02:40:29.000000000 +0530
++++ ./node.gyp	2025-04-23 23:17:43.094140915 +0530
+@@ -538,7 +538,8 @@
        ],
  
        'sources': [
@@ -10,7 +10,7 @@
        ],
  
        'dependencies': [
-@@ -1039,293 +1040,6 @@
+@@ -1019,302 +1020,6 @@
          },
        ],
      }, # node_lib_target_name
@@ -186,17 +186,26 @@
 -          'dependencies': [
 -            'deps/ncrypto/ncrypto.gyp:ncrypto',
 -          ],
--          'sources': [ '<@(node_cctest_openssl_sources)' ],
+-        }, {
+-          'sources!': [ '<@(node_cctest_openssl_sources)' ],
 -        }],
 -        ['v8_enable_inspector==1', {
 -          'defines': [
 -            'HAVE_INSPECTOR=1',
 -          ],
--          'sources': [ '<@(node_cctest_inspector_sources)' ],
+-          'include_dirs': [
+-            # TODO(legendecas): make node_inspector.gypi a dependable target.
+-            '<(SHARED_INTERMEDIATE_DIR)', # for inspector
+-            '<(SHARED_INTERMEDIATE_DIR)/src', # for inspector
+-          ],
+-          'dependencies': [
+-            'deps/inspector_protocol/inspector_protocol.gyp:crdtp',
+-          ],
 -        }, {
 -           'defines': [
 -             'HAVE_INSPECTOR=0',
--           ]
+-           ],
+-           'sources!': [ '<@(node_cctest_inspector_sources)' ],
 -        }],
 -        ['OS=="solaris"', {
 -          'ldflags': [ '-I<(SHARED_INTERMEDIATE_DIR)' ]
@@ -304,7 +313,7 @@
      {
        'target_name': 'node_js2c',
        'type': 'executable',
-@@ -1362,70 +1076,6 @@
+@@ -1351,70 +1056,6 @@
          }],
        ]
      },
