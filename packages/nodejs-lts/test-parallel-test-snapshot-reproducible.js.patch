@@ -24,16 +24,18 @@ https://joyeecheung.github.io/blog/2024/03/17/memory-leak-testing-v8-node-js-1/
 https://joyeecheung.github.io/blog/2024/09/28/reproducible-nodejs-builtin-snapshots-2/
 https://joyeecheung.github.io/blog/2024/09/28/reproducible-nodejs-builtin-snapshots-3/
 https://github.com/danbev/learning-v8/blob/master/notes/snapshots.md (this repository also contains other resources about v8 internals and api)
---- ./test/parallel/test-snapshot-reproducible.js	2025-03-15 15:40:54.141339594 +0530
-+++ /dev/null	2025-03-15 11:33:07.028148560 +0530
-@@ -1,70 +0,0 @@
+--- ./test/parallel/test-snapshot-reproducible.js	2025-04-23 02:40:30.000000000 +0530
++++ /dev/null	2025-04-24 21:59:39.250829051 +0530
+@@ -1,72 +0,0 @@
 -'use strict';
 -
--require('../common');
+-const common = require('../common');
 -const { spawnSyncAndAssert } = require('../common/child_process');
 -const tmpdir = require('../common/tmpdir');
 -const fs = require('fs');
 -const assert = require('assert');
+-
+-common.skipIf32Bits();
 -
 -// When the test fails this helper can be modified to write outputs
 -// differently and aid debugging.
