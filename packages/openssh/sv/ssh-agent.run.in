@@ -6,4 +6,15 @@
 # After that you can add your key to the agent with `ssh-add`, and
 # then make use of the credentials across all terminal sessions
 
-exec ssh-agent -D -a "$PREFIX"/var/run/ssh-agent.socket 2>&1
+service_agent() {
+	exec ssh-agent -D -a "$1" 2>&1
+}
+
+# Allow overriding the service_agent function easily.
+if [ -r "${TERMUX__PREFIX:-"${PREFIX}"}"/etc/ssh/start_agent.sh ]; then
+	. "${TERMUX__PREFIX:-"${PREFIX}"}"/etc/ssh/start_agent.sh
+fi
+
+export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR:-"${TERMUX__PREFIX:-"${PREFIX}"}/var/run"}"/ssh-agent.socket
+
+service_agent "${SSH_AUTH_SOCK}"
