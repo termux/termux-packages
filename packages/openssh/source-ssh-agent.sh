@@ -22,3 +22,10 @@ if [ "$MESSAGE" = 'Could not open a connection to your authentication agent.' -o
 elif [ "$MESSAGE" = "The agent has no identities." ]; then
 	ssh-add
 fi
+
+# may be used by wrapper scripts:
+# . /path/to/source-ssh-agent.sh
+# "${wrapped_cmd}" "$@"
+_arg_zero="${0##*/}"
+wrapped_cmd="${_arg_zero%a}"
+unset -v _arg_zero
