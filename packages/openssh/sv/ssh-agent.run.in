@@ -6,8 +6,6 @@
 # After that you can add your key to the agent with `ssh-add`, and
 # then make use of the credentials across all terminal sessions
 
-SSH_AUTH_SOCK="${PREFIX}/var/run/ssh-agent.socket"
-
 service_agent() {
 	exec ssh-agent -D -a "$1" 2>&1
 }
@@ -16,5 +14,7 @@ service_agent() {
 if [ -r "${PREFIX}/etc/ssh/start_agent.sh" ]; then
 	. "${PREFIX}/etc/ssh/start_agent.sh"
 fi
+
+export SSH_AUTH_SOCK="${PREFIX}/var/run/ssh-agent.socket"
 
 service_agent "${SSH_AUTH_SOCK}"
