@@ -11,10 +11,10 @@ service_agent() {
 }
 
 # Allow overriding the service_agent function easily.
-if [ -r "${PREFIX}/etc/ssh/start_agent.sh" ]; then
-	. "${PREFIX}/etc/ssh/start_agent.sh"
+if [ -r "${TERMUX__PREFIX:-"${PREFIX}"}"/etc/ssh/start_agent.sh ]; then
+	. "${TERMUX__PREFIX:-"${PREFIX}"}"/etc/ssh/start_agent.sh
 fi
 
-export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR:-${TERMUX__PREFIX:-${PREFIX}}"/var/run/ssh-agent.socket
+export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR:-"${TERMUX__PREFIX:-"${PREFIX}"}"}"/var/run/ssh-agent.socket
 
 service_agent "${SSH_AUTH_SOCK}"
