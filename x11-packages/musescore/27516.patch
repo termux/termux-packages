@@ -1,0 +1,139 @@
+From 05056ed19520060c3912a09a3adfa0927057f956 Mon Sep 17 00:00:00 2001
+From: Casper Jeukendrup <48658420+cbjeukendrup@users.noreply.github.com>
+Date: Wed, 2 Apr 2025 22:34:40 +0200
+Subject: [PATCH 1/2] Fix probable bug in BWW lexer
+
+Was trying to intialise the `QString value` member with `NONE`, which is an enum case / integer. Initialising a QString with an integer has become more and more difficult over the Qt versions, and when updating to Qt 6.2, we fixed it by casting to QChar first. But with Qt 6.9, even that causes compile errors, so I took another look at it. That revealed that it is much more likely that the intention was to initialise not `QString value`, but `Symbol type`.
+---
+ src/importexport/bww/internal/bww/lexer.cpp |  4 +---
+ src/importexport/bww/internal/bww/lexer.h   | 12 ++++--------
+ src/importexport/bww/internal/bww/symbols.h | 12 ++++--------
+ 3 files changed, 9 insertions(+), 19 deletions(-)
+
+diff --git a/src/importexport/bww/internal/bww/lexer.cpp b/src/importexport/bww/internal/bww/lexer.cpp
+index 84bc924b7e3d9..26fe66472625b 100644
+--- a/src/importexport/bww/internal/bww/lexer.cpp
++++ b/src/importexport/bww/internal/bww/lexer.cpp
+@@ -40,9 +40,7 @@ namespace Bww {
+    */
+ 
+ Lexer::Lexer(QIODevice* inDevice)
+-    : in(inDevice),
+-    lineNumber(-1),
+-    value(QChar(NONE))
++    : in(inDevice)
+ {
+     LOGD() << "Lexer::Lexer() begin";
+ 
+diff --git a/src/importexport/bww/internal/bww/lexer.h b/src/importexport/bww/internal/bww/lexer.h
+index 8e1a54c4efe13..598c0841c57ec 100644
+--- a/src/importexport/bww/internal/bww/lexer.h
++++ b/src/importexport/bww/internal/bww/lexer.h
+@@ -19,9 +19,7 @@
+  * You should have received a copy of the GNU General Public License
+  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  */
+-
+-#ifndef LEXER_H
+-#define LEXER_H
++#pragma once
+ 
+ /**
+  \file
+@@ -54,12 +52,10 @@ class Lexer
+     void categorizeWord(QString word);
+     QTextStream in;                     ///< Input stream
+     QString line;                       ///< The current line
+-    int lineNumber;                     ///< The current line number (zero-based)
++    int lineNumber = -1;                ///< The current line number (zero-based)
+     QStringList list;                   ///< Unprocessed words
+-    Symbol type;                        ///< Last symbol type
++    Symbol type = NONE;                 ///< Last symbol type
+     QString value;                      ///< Last symbol value
+     QMap<QString, QString> graceMap;    ///< Map bww embellishments to separate grace notes
+ };
+-} // namespace Bww
+-
+-#endif // LEXER_H
++}
+diff --git a/src/importexport/bww/internal/bww/symbols.h b/src/importexport/bww/internal/bww/symbols.h
+index 90ea6937370fc..8b13b7c4a15cf 100644
+--- a/src/importexport/bww/internal/bww/symbols.h
++++ b/src/importexport/bww/internal/bww/symbols.h
+@@ -19,9 +19,7 @@
+  * You should have received a copy of the GNU General Public License
+  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  */
+-
+-#ifndef SYMBOLS_H
+-#define SYMBOLS_H
++#pragma once
+ 
+ /**
+  \file
+@@ -29,7 +27,7 @@
+  */
+ 
+ namespace Bww {
+-enum Symbol
++enum Symbol : unsigned char
+ {
+     COMMENT,
+     HEADER,
+@@ -49,7 +47,7 @@ enum Symbol
+     NONE
+ };
+ 
+-enum class StartStop
++enum class StartStop : unsigned char
+ {
+     ST_NONE,
+     ST_START,
+@@ -58,6 +56,4 @@ enum class StartStop
+ };
+ 
+ extern QString symbolToString(Symbol s);
+-} // namespace Bww
+-
+-#endif // SYMBOLS_H
++}
+
+From 036d7317b7d95d68701374b03246f967505f4d19 Mon Sep 17 00:00:00 2001
+From: Casper Jeukendrup <48658420+cbjeukendrup@users.noreply.github.com>
+Date: Thu, 3 Apr 2025 22:46:34 +0200
+Subject: [PATCH 2/2] Fix compiler warning
+
+---
+ src/importexport/bww/internal/bww/symbols.cpp | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
+
+diff --git a/src/importexport/bww/internal/bww/symbols.cpp b/src/importexport/bww/internal/bww/symbols.cpp
+index 366b94d66dcf8..54eb58a4d3b57 100644
+--- a/src/importexport/bww/internal/bww/symbols.cpp
++++ b/src/importexport/bww/internal/bww/symbols.cpp
+@@ -29,7 +29,7 @@
+ #include "symbols.h"
+ 
+ namespace Bww {
+-static const char* symTable[] =
++static constexpr const char* symTable[] =
+ {
+     "COMMENT",
+     "HEADER",
+@@ -51,13 +51,10 @@ static const char* symTable[] =
+ 
+ QString symbolToString(Symbol s)
+ {
+-    if (s < 0) {
++    if (static_cast<size_t>(s) >= sizeof symTable) {
+         return "INVALID";
+     }
+-    if (static_cast<unsigned>(s) > sizeof symTable) {
+-        return "INVALID";
+-    } else {
+-        return symTable[s];
+-    }
++
++    return symTable[s];
+ }
+ } // namespace Bww
