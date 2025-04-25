@@ -78,11 +78,11 @@ termux_step_post_configure() {
 }
 
 termux_step_post_make_install() {
-	install -Dm700 "$TERMUX_PKG_BUILDER_DIR/source-ssh-agent.sh" "$TERMUX_PREFIX/bin/source-ssh-agent"
-	install -Dm700 "$TERMUX_PKG_BUILDER_DIR/wrap-ssh-agent.sh"   "$TERMUX_PREFIX/bin/wrap-ssh-agent.sh"
-	ln -s -f -T 'wrap-ssh-agent.sh'                              "$TERMUX_PREFIX/bin/ssha"
-	ln -s -f -T 'wrap-ssh-agent.sh'                              "$TERMUX_PREFIX/bin/sftpa"
-	ln -s -f -T 'wrap-ssh-agent.sh'                              "$TERMUX_PREFIX/bin/scpa"
+	install -Dm700 "$TERMUX_PKG_BUILDER_DIR/source-ssh-agent.sh" "$TERMUX_PREFIX/libexec/source-ssh-agent.sh"
+	install -Dm700 "$TERMUX_PKG_BUILDER_DIR/wrap-ssh-agent.sh"   "$TERMUX_PREFIX/libexec/wrap-ssh-agent.sh"
+	ln -s -f -T '../libexec/wrap-ssh-agent.sh'                   "$TERMUX_PREFIX/bin/ssha"
+	ln -s -f -T '../libexec/wrap-ssh-agent.sh'                   "$TERMUX_PREFIX/bin/sftpa"
+	ln -s -f -T '../libexec/wrap-ssh-agent.sh'                   "$TERMUX_PREFIX/bin/scpa"
 
 	mkdir -p "$TERMUX_PREFIX/var/run"
 	echo "OpenSSH needs this directory to put sshd.pid in" > "$TERMUX_PREFIX/var/run/README.openssh"
