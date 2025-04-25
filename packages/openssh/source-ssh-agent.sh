@@ -24,7 +24,7 @@ elif [ "$MESSAGE" = "The agent has no identities." ]; then
 fi
 
 # may be used by wrapper scripts:
-# . source-ssh-agent
+# . /path/to/source-ssh-agent.sh
 # "${wrapped_cmd}" "$@"
 _arg_zero="${0##*/}"
 wrapped_cmd="${_arg_zero%a}"
