@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.wolfssl.com/
 TERMUX_PKG_DESCRIPTION="A small, fast, portable implementation of TLS/SSL for embedded devices to the cloud"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="5.7.6"
+TERMUX_PKG_VERSION="5.8.0"
 TERMUX_PKG_SRCURL=https://github.com/wolfSSL/wolfssl/archive/refs/tags/v${TERMUX_PKG_VERSION}-stable.tar.gz
-TERMUX_PKG_SHA256=52b1e439e30d1ed8162a16308a8525a862183b67aa30373b11166ecbab000d63
+TERMUX_PKG_SHA256=f90f18c7f12913a0b351b1f4305e768697ea1380794df1f2984b9452ab0aeeaf
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 
