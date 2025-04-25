@@ -1,4 +1,4 @@
 #!/bin/sh
 
-. source-ssh-agent
+. "${TERMUX__PREFIX:-${PREFIX}}"/libexec/source-ssh-agent.sh
 "${wrapped_cmd}" "$@"
