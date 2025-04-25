@@ -13,6 +13,7 @@ termux_step_pre_configure() {
 	export TERMUX_PKG_CACHEDIR
 	termux_setup_nodejs
 
+	echo pwned
 	termux_download https://github.com/termux/termux-packages/raw/master/repo.json \
 		$TERMUX_PKG_CACHEDIR/repo.json SKIP_CHECKSUM
 }
