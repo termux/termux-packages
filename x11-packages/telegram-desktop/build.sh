@@ -5,10 +5,11 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LEGAL"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.13.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/telegramdesktop/tdesktop/releases/download/v$TERMUX_PKG_VERSION/tdesktop-$TERMUX_PKG_VERSION-full.tar.gz
 TERMUX_PKG_SHA256=caa37bbf7d9fcdfecdb5f596f02a44becbe468ea5c6af7f3c670b61952744a80
-TERMUX_PKG_DEPENDS="abseil-cpp, boost, ffmpeg, glib, hicolor-icon-theme, hunspell, kf6-kcoreaddons, libandroid-shmem, libdispatch, libdrm, liblz4, libminizip, libprotobuf, librnnoise, libsigc++-3.0, libx11, libxcomposite, libxdamage, libxrandr, libxtst, openal-soft, opengl, openh264, openssl, pipewire, pulseaudio, qt6-qtbase, qt6-qtimageformats, qt6-qtsvg, xxhash"
-TERMUX_PKG_BUILD_DEPENDS="ada, boost-headers, glib-cross, protobuf-static, qt6-qtbase-cross-tools"
+TERMUX_PKG_DEPENDS="abseil-cpp, boost, ffmpeg, glib, hicolor-icon-theme, hunspell, kf6-kcoreaddons, libandroid-shmem, libdispatch, libdrm, liblz4, libminizip, protobuf, librnnoise, libsigc++-3.0, libx11, libxcomposite, libxdamage, libxrandr, libxtst, openal-soft, opengl, openh264, openssl, pipewire, pulseaudio, qt6-qtbase, qt6-qtimageformats, qt6-qtsvg, xxhash"
+TERMUX_PKG_BUILD_DEPENDS="ada, boost-headers, glib-cross, qt6-qtbase-cross-tools"
 TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_AUTO_UPDATE=true
 
@@ -191,18 +192,12 @@ termux_step_configure() {
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DPROTOBUF_PROTOC_EXECUTABLE=$(command -v protoc)"
 
 		mkdir -p "$TERMUX_PKG_TMPDIR/bin"
-		cat <<- EOF > "$TERMUX_PKG_TMPDIR/bin/$(basename ${CC})"
-			#!/bin/bash
-			set -- "\${@/-lprotobuf/-l:libprotobuf.a}"
-			exec $TERMUX_STANDALONE_TOOLCHAIN/bin/$(basename ${CC}) "\$@"
-		EOF
 		local _type
 		for _type in emoji lang style; do
 			ln -sf \
 				"$TERMUX_PKG_HOSTBUILD_DIR/codegen-host-build/out/Telegram/codegen/codegen/$_type/Release/codegen_$_type" \
 				"$TERMUX_PKG_TMPDIR/bin/codegen_$_type"
 		done
-		chmod +x "$TERMUX_PKG_TMPDIR/bin/$(basename ${CC})"
 		export PATH="$TERMUX_PKG_TMPDIR/bin:$PATH"
 	else
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_CROSSCOMPILING=FALSE"
