@@ -1,0 +1,175 @@
+From 936e3d529a6fc17d552f4b6544ba8e51646069df Mon Sep 17 00:00:00 2001
+From: Nick Wellnhofer <wellnhofer@aevum.de>
+Date: Sun, 20 Apr 2025 19:25:04 +0200
+Subject: [PATCH] save: Fix xmlSave with NULL encoding
+
+Regressed with cc45f618.
+---
+ testparser.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ xmlsave.c    | 48 ++++++++++++++++++++++++++----------------------
+ 2 files changed, 71 insertions(+), 22 deletions(-)
+
+diff --git a/testparser.c b/testparser.c
+index 85fee9b4c..a9a85a60b 100644
+--- a/testparser.c
++++ b/testparser.c
+@@ -288,6 +288,50 @@ testNoBlanks(void) {
+ 
+     return err;
+ }
++
++static int
++testSaveNullEncDoc(const char *xml, const char *expect) {
++    xmlDocPtr doc;
++    xmlBufferPtr buffer;
++    xmlSaveCtxtPtr save;
++    const xmlChar *result;
++    int err = 0;
++
++    doc = xmlReadDoc(BAD_CAST xml, NULL, NULL, 0);
++
++    buffer = xmlBufferCreate();
++    save = xmlSaveToBuffer(buffer, NULL, 0);
++    xmlSaveDoc(save, doc);
++    xmlSaveClose(save);
++
++    result = xmlBufferContent(buffer);
++    if (strcmp((char *) result, expect) != 0) {
++        fprintf(stderr, "xmlSave with NULL encod铆ng failed\n");
++        err = 1;
++    }
++
++    xmlBufferFree(buffer);
++    xmlFreeDoc(doc);
++
++    return err;
++}
++
++static int
++testSaveNullEnc(void) {
++    int err = 0;
++
++    err |= testSaveNullEncDoc(
++        "<?xml version=\"1.0\"?><doc>\xC3\x98</doc>",
++        "<?xml version=\"1.0\"?>\n<doc>&#xD8;</doc>\n");
++    err |= testSaveNullEncDoc(
++        "<?xml version=\"1.0\" encoding=\"utf-8\"?><doc>\xC3\x98</doc>",
++        "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<doc>\xC3\x98</doc>\n");
++    err |= testSaveNullEncDoc(
++        "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?><doc>\xD8</doc>",
++        "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n<doc>\xD8</doc>\n");
++
++    return err;
++}
+ #endif /* LIBXML_OUTPUT_ENABLED */
+ 
+ #ifdef LIBXML_SAX1_ENABLED
+@@ -1157,6 +1201,7 @@ main(void) {
+ #ifdef LIBXML_OUTPUT_ENABLED
+     err |= testCtxtParseContent();
+     err |= testNoBlanks();
++    err |= testSaveNullEnc();
+ #endif
+ #ifdef LIBXML_SAX1_ENABLED
+     err |= testBalancedChunk();
+diff --git a/xmlsave.c b/xmlsave.c
+index 38ccdbfd7..6d3e6cac2 100644
+--- a/xmlsave.c
++++ b/xmlsave.c
+@@ -778,13 +778,19 @@ static int xmlSaveSwitchEncoding(xmlSaveCtxtPtr ctxt, const char *encoding) {
+             xmlSaveErr(buf, res, NULL, encoding);
+             return(-1);
+         }
+-	buf->conv = xmlBufCreate(4000 /* MINLEN */);
+-	if (buf->conv == NULL) {
+-	    xmlCharEncCloseFunc(handler);
+-            xmlSaveErrMemory(buf);
+-	    return(-1);
+-	}
+-        buf->encoder = handler;
++
++        if (handler != NULL) {
++            buf->conv = xmlBufCreate(4000 /* MINLEN */);
++            if (buf->conv == NULL) {
++                xmlCharEncCloseFunc(handler);
++                xmlSaveErrMemory(buf);
++                return(-1);
++            }
++            buf->encoder = handler;
++        }
++
++        ctxt->encoding = (const xmlChar *) encoding;
++
+ 	/*
+ 	 * initialize the state, e.g. if outputting a BOM
+ 	 */
+@@ -795,11 +801,15 @@ static int xmlSaveSwitchEncoding(xmlSaveCtxtPtr ctxt, const char *encoding) {
+ 
+ static int xmlSaveClearEncoding(xmlSaveCtxtPtr ctxt) {
+     xmlOutputBufferPtr buf = ctxt->buf;
++
+     xmlOutputBufferFlush(buf);
+     xmlCharEncCloseFunc(buf->encoder);
+     xmlBufFree(buf->conv);
+     buf->encoder = NULL;
+     buf->conv = NULL;
++
++    ctxt->encoding = NULL;
++
+     return(0);
+ }
+ 
+@@ -1342,7 +1352,6 @@ xmlDocContentDumpOutput(xmlSaveCtxtPtr ctxt, xmlDocPtr cur) {
+     const xmlChar *oldctxtenc = ctxt->encoding;
+     const xmlChar *encoding = ctxt->encoding;
+     xmlOutputBufferPtr buf = ctxt->buf;
+-    xmlCharEncoding enc;
+     int switched_encoding = 0;
+ 
+     xmlInitParser();
+@@ -1370,6 +1379,7 @@ xmlDocContentDumpOutput(xmlSaveCtxtPtr ctxt, xmlDocPtr cur) {
+ 	    if (xmlSaveSwitchEncoding(ctxt, (const char*) encoding) < 0) {
+ 		return(-1);
+ 	    }
++            switched_encoding = 1;
+ 	}
+         if (ctxt->options & XML_SAVE_FORMAT)
+ 	    htmlDocContentDumpFormatOutput(buf, cur,
+@@ -1377,29 +1387,23 @@ xmlDocContentDumpOutput(xmlSaveCtxtPtr ctxt, xmlDocPtr cur) {
+ 	else
+ 	    htmlDocContentDumpFormatOutput(buf, cur,
+ 	                                   (const char *)encoding, 0);
+-	return(0);
+ #else
+         return(-1);
+ #endif
+     } else if ((cur->type == XML_DOCUMENT_NODE) ||
+                (ctxt->options & XML_SAVE_AS_XML) ||
+                (ctxt->options & XML_SAVE_XHTML)) {
+-	enc = xmlParseCharEncoding((const char*) encoding);
+ 	if ((encoding != NULL) && (oldctxtenc == NULL) &&
+ 	    (buf->encoder == NULL) && (buf->conv == NULL) &&
+ 	    ((ctxt->options & XML_SAVE_NO_DECL) == 0)) {
+-	    if ((enc != XML_CHAR_ENCODING_UTF8) &&
+-		(enc != XML_CHAR_ENCODING_NONE) &&
+-		(enc != XML_CHAR_ENCODING_ASCII)) {
+-		/*
+-		 * we need to switch to this encoding but just for this
+-		 * document since we output the XMLDecl the conversion
+-		 * must be done to not generate not well formed documents.
+-		 */
+-		if (xmlSaveSwitchEncoding(ctxt, (const char*) encoding) < 0)
+-		    return(-1);
+-		switched_encoding = 1;
+-	    }
++            /*
++             * we need to switch to this encoding but just for this
++             * document since we output the XMLDecl the conversion
++             * must be done to not generate not well formed documents.
++             */
++            if (xmlSaveSwitchEncoding(ctxt, (const char *) encoding) < 0)
++                return(-1);
++            switched_encoding = 1;
+ 	}
+ 
+ 
