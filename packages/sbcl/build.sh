@@ -18,6 +18,7 @@ TERMUX_PKG_BUILD_DEPENDS="aosp-libs, bash, coreutils, strace"
 # incompatibilties, like the lack of support for a fully position-independent runtime executable.
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+.\d+.\d+"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 
