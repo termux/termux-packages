@@ -1,0 +1,392 @@
+From 3b15eccb5471710beee952586aeb5b9743f59506 Mon Sep 17 00:00:00 2001
+From: Maarten Bent <MaartenBent@users.noreply.github.com>
+Date: Sat, 22 Mar 2025 01:41:42 +0100
+Subject: [PATCH] Update wxwebview file list
+
+See https://github.com/wxWidgets/wxWidgets/pull/25264
+
+---
+ Makefile.in                            | 46 +++++++-------
+ build/bakefiles/files.bkl              | 84 +++++++++++++++-----------
+ build/cmake/files.cmake                | 56 +++++++----------
+ build/cmake/lib/webview/CMakeLists.txt |  7 +--
+ build/files                            | 30 ++++-----
+ 5 files changed, 109 insertions(+), 114 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 18cbbca057e5..bab61f5e5e53 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -1746,7 +1746,7 @@
+ 	-DWXUSINGDLL -DWXMAKINGDLL_WEBVIEW $(PIC_FLAG) $(CPPFLAGS) $(OBJCXXFLAGS)
+ WEBVIEWDLL_OBJECTS =  \
+ 	$(__webviewdll___win32rc) \
+-	$(__WEBVIEW_SRC_PLATFORM_OBJECTS_2) \
++	$(__WEBVIEW_PLATFORM_SRC_OBJECTS_2) \
+ 	webviewdll_webview.o \
+ 	webviewdll_webviewarchivehandler.o \
+ 	webviewdll_webviewfshandler.o
+@@ -1766,7 +1766,7 @@
+ 	$(__webview_additional_include_wrl_p) $(__webview_additional_include_p) \
+ 	$(CPPFLAGS) $(OBJCXXFLAGS)
+ WEBVIEWLIB_OBJECTS =  \
+-	$(__WEBVIEW_SRC_PLATFORM_OBJECTS_3) \
++	$(__WEBVIEW_PLATFORM_SRC_OBJECTS_3) \
+ 	webviewlib_webview.o \
+ 	webviewlib_webviewarchivehandler.o \
+ 	webviewlib_webviewfshandler.o
+@@ -2345,17 +2345,15 @@
+ 	wx/msw/taskbar.h
+ @COND_PLATFORM_WIN32_1@GTK_PLATFORM_HDR = $(COND_PLATFORM_WIN32_1_GTK_PLATFORM_HDR)
+ @COND_TOOLKIT_MSW@MSW_HTML_HDR = wx/msw/helpbest.h
+-@COND_PLATFORM_MACOSX_1@WEBVIEW_HDR_PLATFORM = \
++@COND_PLATFORM_MACOSX_1@WEBVIEW_PLATFORM_HDR = \
+ @COND_PLATFORM_MACOSX_1@	wx/osx/webviewhistoryitem_webkit.h \
+ @COND_PLATFORM_MACOSX_1@	wx/osx/webview_webkit.h
+-@COND_TOOLKIT_GTK@WEBVIEW_HDR_PLATFORM = \
++@COND_TOOLKIT_GTK@WEBVIEW_PLATFORM_HDR = \
+ @COND_TOOLKIT_GTK@	wx/gtk/webviewhistoryitem_webkit.h \
+ @COND_TOOLKIT_GTK@	wx/gtk/webview_webkit.h
+-COND_TOOLKIT_MSW_WEBVIEW_HDR_PLATFORM =  \
+-	wx/msw/webviewhistoryitem_ie.h \
+-	wx/msw/webview_ie.h \
+-	wx/msw/webview_edge.h
+-@COND_TOOLKIT_MSW@WEBVIEW_HDR_PLATFORM = $(COND_TOOLKIT_MSW_WEBVIEW_HDR_PLATFORM)
++@COND_TOOLKIT_MSW@WEBVIEW_PLATFORM_HDR = \
++@COND_TOOLKIT_MSW@	wx/msw/webviewhistoryitem_ie.h wx/msw/webview_ie.h \
++@COND_TOOLKIT_MSW@	wx/msw/webview_edge.h
+ @COND_TOOLKIT_COCOA@OPENGL_HDR_PLATFORM = wx/cocoa/glcanvas.h
+ @COND_TOOLKIT_GTK_TOOLKIT_VERSION_@OPENGL_HDR_PLATFORM \
+ @COND_TOOLKIT_GTK_TOOLKIT_VERSION_@	= wx/gtk1/glcanvas.h wx/unix/glx11.h
+@@ -4217,7 +4215,7 @@
+ 	wx/xrc/xh_richtext.h \
+ 	wx/stc/stc.h \
+ 	wx/xrc/xh_styledtextctrl.h \
+-	$(WEBVIEW_HDR_PLATFORM) \
++	$(WEBVIEW_PLATFORM_HDR) \
+ 	wx/webview.h \
+ 	wx/webviewarchivehandler.h \
+ 	wx/webviewfshandler.h
+@@ -4405,7 +4403,7 @@
+ 	monodll_styleparams.o \
+ 	monodll_winpars.o \
+ 	monodll_htmllbox.o \
+-	$(__WEBVIEW_SRC_PLATFORM_OBJECTS) \
++	$(__WEBVIEW_PLATFORM_SRC_OBJECTS) \
+ 	monodll_webview.o \
+ 	monodll_webviewarchivehandler.o \
+ 	monodll_webviewfshandler.o \
+@@ -6263,11 +6261,11 @@
+ @COND_PLATFORM_UNIX_1@__HTML_SRC_PLATFORM_OBJECTS = monodll_chm.o
+ @COND_TOOLKIT_MSW@__HTML_SRC_PLATFORM_OBJECTS = \
+ @COND_TOOLKIT_MSW@	monodll_helpbest.o monodll_chm.o
+-@COND_PLATFORM_MACOSX_1@__WEBVIEW_SRC_PLATFORM_OBJECTS \
++@COND_PLATFORM_MACOSX_1@__WEBVIEW_PLATFORM_SRC_OBJECTS \
+ @COND_PLATFORM_MACOSX_1@	= monodll_osx_webview_webkit.o
+-@COND_TOOLKIT_GTK@__WEBVIEW_SRC_PLATFORM_OBJECTS = \
++@COND_TOOLKIT_GTK@__WEBVIEW_PLATFORM_SRC_OBJECTS = \
+ @COND_TOOLKIT_GTK@	monodll_gtk_webview_webkit.o monodll_webview_webkit2.o
+-@COND_TOOLKIT_MSW@__WEBVIEW_SRC_PLATFORM_OBJECTS = \
++@COND_TOOLKIT_MSW@__WEBVIEW_PLATFORM_SRC_OBJECTS = \
+ @COND_TOOLKIT_MSW@	monodll_webview_ie.o monodll_webview_edge.o
+ @COND_TOOLKIT_GTK_TOOLKIT_VERSION_2@__AUI_GTK_SRC_OBJECTS \
+ @COND_TOOLKIT_GTK_TOOLKIT_VERSION_2@	= monodll_tabartgtk.o
+@@ -6416,7 +6414,7 @@
+ 	monolib_styleparams.o \
+ 	monolib_winpars.o \
+ 	monolib_htmllbox.o \
+-	$(__WEBVIEW_SRC_PLATFORM_OBJECTS_1) \
++	$(__WEBVIEW_PLATFORM_SRC_OBJECTS_1) \
+ 	monolib_webview.o \
+ 	monolib_webviewarchivehandler.o \
+ 	monolib_webviewfshandler.o \
+@@ -8274,11 +8272,11 @@
+ @COND_PLATFORM_UNIX_1@__HTML_SRC_PLATFORM_OBJECTS_1 = monolib_chm.o
+ @COND_TOOLKIT_MSW@__HTML_SRC_PLATFORM_OBJECTS_1 = \
+ @COND_TOOLKIT_MSW@	monolib_helpbest.o monolib_chm.o
+-@COND_PLATFORM_MACOSX_1@__WEBVIEW_SRC_PLATFORM_OBJECTS_1 \
++@COND_PLATFORM_MACOSX_1@__WEBVIEW_PLATFORM_SRC_OBJECTS_1 \
+ @COND_PLATFORM_MACOSX_1@	= monolib_osx_webview_webkit.o
+-@COND_TOOLKIT_GTK@__WEBVIEW_SRC_PLATFORM_OBJECTS_1 = \
++@COND_TOOLKIT_GTK@__WEBVIEW_PLATFORM_SRC_OBJECTS_1 = \
+ @COND_TOOLKIT_GTK@	monolib_gtk_webview_webkit.o monolib_webview_webkit2.o
+-@COND_TOOLKIT_MSW@__WEBVIEW_SRC_PLATFORM_OBJECTS_1 = \
++@COND_TOOLKIT_MSW@__WEBVIEW_PLATFORM_SRC_OBJECTS_1 = \
+ @COND_TOOLKIT_MSW@	monolib_webview_ie.o monolib_webview_edge.o
+ @COND_TOOLKIT_GTK_TOOLKIT_VERSION_2@__AUI_GTK_SRC_OBJECTS_1 \
+ @COND_TOOLKIT_GTK_TOOLKIT_VERSION_2@	= monolib_tabartgtk.o
+@@ -12526,12 +12524,12 @@
+ 	$(LIBPREFIX)wx_$(PORTNAME)$(WXUNIVNAME)$(WXUNICODEFLAG)$(WXDEBUGFLAG)$(WX_LIB_FLAVOUR)_webview-$(WX_RELEASE)$(HOST_SUFFIX).$(DLLIMP_SUFFIX)
+ @COND_USE_SOVERSOLARIS_1@__webviewdll___so_symlinks_uninst_cmd = $(COND_USE_SOVERSOLARIS_1___webviewdll___so_symlinks_uninst_cmd)
+ @COND_PLATFORM_WIN32_1@__webviewdll___win32rc = webviewdll_version_rc.o
+-@COND_PLATFORM_MACOSX_1@__WEBVIEW_SRC_PLATFORM_OBJECTS_2 \
++@COND_PLATFORM_MACOSX_1@__WEBVIEW_PLATFORM_SRC_OBJECTS_2 \
+ @COND_PLATFORM_MACOSX_1@	= webviewdll_osx_webview_webkit.o
+-@COND_TOOLKIT_GTK@__WEBVIEW_SRC_PLATFORM_OBJECTS_2 = \
++@COND_TOOLKIT_GTK@__WEBVIEW_PLATFORM_SRC_OBJECTS_2 = \
+ @COND_TOOLKIT_GTK@	webviewdll_gtk_webview_webkit.o \
+ @COND_TOOLKIT_GTK@	webviewdll_webview_webkit2.o
+-@COND_TOOLKIT_MSW@__WEBVIEW_SRC_PLATFORM_OBJECTS_2 = \
++@COND_TOOLKIT_GTK@__WEBVIEW_PLATFORM_SRC_OBJECTS_3 = \
+ @COND_TOOLKIT_MSW@	webviewdll_webview_ie.o webviewdll_webview_edge.o
+ COND_MONOLITHIC_0_SHARED_0_USE_GUI_1_USE_WEBVIEW_1___webviewlib___depname = \
+ 	$(LIBDIRNAME)/$(LIBPREFIX)wx_$(PORTNAME)$(WXUNIVNAME)$(WXUNICODEFLAG)$(WXDEBUGFLAG)$(WX_LIB_FLAVOUR)_webview-$(WX_RELEASE)$(HOST_SUFFIX)$(LIBEXT)
+@@ -12546,12 +12544,12 @@
+ @COND_ICC_PCH_1@	./.pch/wxprec_webviewlib/wx/wxprec.h.gch
+ @COND_USE_PCH_1@_____pch_wxprec_webviewlib_wx_wxprec_h_gch___depname \
+ @COND_USE_PCH_1@	= ./.pch/wxprec_webviewlib/wx/wxprec.h.gch
+-@COND_PLATFORM_MACOSX_1@__WEBVIEW_SRC_PLATFORM_OBJECTS_3 \
++@COND_PLATFORM_MACOSX_1@__WEBVIEW_PLATFORM_SRC_OBJECTS_3 \
+ @COND_PLATFORM_MACOSX_1@	= webviewlib_osx_webview_webkit.o
+-@COND_TOOLKIT_GTK@__WEBVIEW_SRC_PLATFORM_OBJECTS_3 = \
++@COND_TOOLKIT_GTK@__WEBVIEW_PLATFORM_SRC_OBJECTS_3 = \
+ @COND_TOOLKIT_GTK@	webviewlib_gtk_webview_webkit.o \
+ @COND_TOOLKIT_GTK@	webviewlib_webview_webkit2.o
+-@COND_TOOLKIT_MSW@__WEBVIEW_SRC_PLATFORM_OBJECTS_3 = \
++@COND_TOOLKIT_MSW@__WEBVIEW_PLATFORM_SRC_OBJECTS_3 = \
+ @COND_TOOLKIT_MSW@	webviewlib_webview_ie.o webviewlib_webview_edge.o
+ @COND_SHARED_1@____wxwebview_namedll_DEP = $(__webviewdll___depname)
+ @COND_SHARED_0@____wxwebview_namelib_DEP = $(__webviewlib___depname)
+diff --git a/build/bakefiles/files.bkl b/build/bakefiles/files.bkl
+index 26f34675be92..dca722e656a2 100644
+--- a/build/bakefiles/files.bkl
++++ b/build/bakefiles/files.bkl
+@@ -2990,49 +2990,67 @@
+ <!--                                wxWEBVIEW                               -->
+ <!-- ====================================================================== -->
+ 
+-<set var="WEBVIEW_SRC_PLATFORM">
+-    <if cond="TOOLKIT=='MSW'">
+-        src/msw/webview_ie.cpp
+-        src/msw/webview_edge.cpp
+-    </if>
+-    <if cond="TOOLKIT=='GTK'">
+-        src/gtk/webview_webkit.cpp
+-        src/gtk/webview_webkit2.cpp
+-    </if>
+-    <if cond="PLATFORM_MACOSX=='1'">src/osx/webview_webkit.mm</if>
+-</set>
+ <set var="WEBVIEW_CMN_SRC" hints="files">
+     src/common/webview.cpp
+     src/common/webviewarchivehandler.cpp
+     src/common/webviewfshandler.cpp
+ </set>
+-<set var="WEBVIEW_SRC" hints="files">
+-    $(WEBVIEW_SRC_PLATFORM)
+-    $(WEBVIEW_CMN_SRC)
+-</set>
+-
+-<set var="WEBVIEW_HDR_PLATFORM" hints="files">
+-    <if cond="TOOLKIT=='MSW'">
+-        wx/msw/webviewhistoryitem_ie.h
+-        wx/msw/webview_ie.h
+-        wx/msw/webview_edge.h
+-    </if>
+-    <if cond="TOOLKIT=='GTK'">
+-        wx/gtk/webviewhistoryitem_webkit.h
+-        wx/gtk/webview_webkit.h
+-    </if>
+-    <if cond="PLATFORM_MACOSX=='1'">
+-        wx/osx/webviewhistoryitem_webkit.h
+-        wx/osx/webview_webkit.h
+-    </if>
+-</set>
+ <set var="WEBVIEW_CMN_HDR" hints="files">
+     wx/webview.h
+     wx/webviewarchivehandler.h
+     wx/webviewfshandler.h
+ </set>
++
++<set var="WEBVIEW_MSW_SRC" hints="files">
++    src/msw/webview_ie.cpp
++    src/msw/webview_edge.cpp
++</set>
++
++<set var="WEBVIEW_MSW_HDR" hints="files">
++    wx/msw/webviewhistoryitem_ie.h
++    wx/msw/webview_ie.h
++    wx/msw/webview_edge.h
++</set>
++
++<set var="WEBVIEW_OSX_SHARED_SRC" hints="files">
++    src/osx/webview_chromium.mm
++    src/osx/webview_webkit.mm
++</set>
++
++<set var="WEBVIEW_OSX_SHARED_HDR" hints="files">
++    wx/osx/webviewhistoryitem_webkit.h
++    wx/osx/webview_webkit.h
++</set>
++
++<set var="WEBVIEW_GTK_SRC" hints="files">
++    src/gtk/webview_webkit.cpp
++    src/gtk/webview_webkit2.cpp
++</set>
++
++<set var="WEBVIEW_GTK_HDR" hints="files">
++    wx/gtk/webviewhistoryitem_webkit.h
++    wx/gtk/webview_webkit.h
++</set>
++
++<set var="WEBVIEW_PLATFORM_SRC" hints="files">
++    <if cond="TOOLKIT=='MSW'">$(WEBVIEW_MSW_SRC)</if>
++    <if cond="TOOLKIT=='GTK'">$(WEBVIEW_GTK_SRC)</if>
++    <if cond="PLATFORM_MACOSX=='1'">$(WEBVIEW_OSX_SHARED_SRC)</if>
++</set>
++
++<set var="WEBVIEW_SRC" hints="files">
++    $(WEBVIEW_PLATFORM_SRC)
++    $(WEBVIEW_CMN_SRC)
++</set>
++
++<set var="WEBVIEW_PLATFORM_HDR" hints="files">
++    <if cond="TOOLKIT=='MSW'">$(WEBVIEW_MSW_HDR)</if>
++    <if cond="TOOLKIT=='GTK'">$(WEBVIEW_GTK_HDR)</if>
++    <if cond="PLATFORM_MACOSX=='1'">$(WEBVIEW_OSX_SHARED_HDR)</if>
++</set>
++
+ <set var="WEBVIEW_HDR" hints="files">
+-    $(WEBVIEW_HDR_PLATFORM)
++    $(WEBVIEW_PLATFORM_HDR)
+     $(WEBVIEW_CMN_HDR)
+ </set>
+ 
+diff --git a/build/cmake/files.cmake b/build/cmake/files.cmake
+index e8bf6f436c32..9425a5066ac5 100644
+--- a/build/cmake/files.cmake
++++ b/build/cmake/files.cmake
+@@ -2835,11 +2835,6 @@ set(HTML_CMN_HDR
+     wx/htmllbox.h
+ )
+ 
+-set(WEBVIEW_MSW_SRC
+-    src/msw/webview_ie.cpp
+-    src/msw/webview_edge.cpp
+-)
+-
+ set(WEBVIEW_CMN_SRC
+     src/common/webview.cpp
+     src/common/webviewarchivehandler.cpp
+@@ -2858,25 +2853,33 @@ set(WEBVIEW_CMN_HDR
+     wx/webviewfshandler.h
+ )
+ 
+-set(WEBVIEW_OSX_SHARED_HDR
+-    wx/osx/webviewhistoryitem_webkit.h
+-    wx/osx/webview_webkit.h
++
++set(WEBVIEW_MSW_SRC
++    src/msw/webview_edge.cpp
++    src/msw/webview_ie.cpp
++)
++
++set(WEBVIEW_MSW_HDR
++    wx/msw/webview_ie.h
++    wx/msw/webview_edge.h
++    wx/msw/webviewhistoryitem_ie.h
+ )
+ 
+ set(WEBVIEW_OSX_SHARED_SRC
+     src/osx/webview_webkit.mm
+ )
+ 
++set(WEBVIEW_OSX_SHARED_HDR
++    wx/osx/webviewhistoryitem_webkit.h
++    wx/osx/webview_webkit.h
++)
++
+ set(WEBVIEW_GTK_HDR
+-    wx/gtk/webviewhistoryitem_webkit.h
+     wx/gtk/webview_webkit.h
++    wx/gtk/webviewhistoryitem_webkit.h
+ )
+ 
+ set(WEBVIEW_GTK_SRC
+-    src/gtk/webview_webkit.cpp
+-)
+-
+-set(WEBVIEW2_GTK_SRC
+     src/gtk/webview_webkit2.cpp
+ )
+ 
+diff --git a/build/cmake/lib/webview/CMakeLists.txt b/build/cmake/lib/webview/CMakeLists.txt
+index 4d9800c46cc1..f3525b2d8af3 100644
+--- a/build/cmake/lib/webview/CMakeLists.txt
++++ b/build/cmake/lib/webview/CMakeLists.txt
+@@ -26,15 +26,10 @@ endfunction()
+ 
+ 
+ wx_append_sources(WEBVIEW_FILES WEBVIEW_CMN)
+-
+ if(WXMSW)
+     wx_append_sources(WEBVIEW_FILES WEBVIEW_MSW)
+ elseif(WXGTK)
+-    if(wxUSE_WEBVIEW_WEBKIT2)
+-        wx_append_sources(WEBVIEW_FILES WEBVIEW2_GTK)
+-    elseif(wxUSE_WEBVIEW_WEBKIT)
+-        wx_append_sources(WEBVIEW_FILES WEBVIEW_GTK)
+-    endif()
++    wx_append_sources(WEBVIEW_FILES WEBVIEW_GTK)
+ elseif(APPLE)
+     wx_append_sources(WEBVIEW_FILES WEBVIEW_OSX_SHARED)
+ endif()
+diff --git a/build/files b/build/files
+index be2cc1cf49a5..818228c46761 100644
+--- a/build/files
++++ b/build/files
+@@ -2788,40 +2788,40 @@
+ 
+ # wxWEBVIEW
+ 
+-WEBVIEW_MSW_SRC =
+-    src/msw/webview_ie.cpp
+-    src/msw/webview_edge.cpp
+ WEBVIEW_CMN_SRC =
+     src/common/webview.cpp
+     src/common/webviewarchivehandler.cpp
+     src/common/webviewfshandler.cpp
+ 
+-WEBVIEW_MSW_HDR =
+-    wx/msw/webviewhistoryitem_ie.h
+-    wx/msw/webview_ie.h
+-    wx/msw/webview_edge.h
+ WEBVIEW_CMN_HDR =
+     wx/webview.h
+     wx/webviewarchivehandler.h
+     wx/webviewfshandler.h
+ 
+-WEBVIEW_OSX_SHARED_HDR =
+-    wx/osx/webviewhistoryitem_webkit.h
+-    wx/osx/webview_webkit.h
++WEBVIEW_MSW_SRC =
++    src/msw/webview_ie.cpp
++    src/msw/webview_edge.cpp
++
++WEBVIEW_MSW_HDR =
++    wx/msw/webviewhistoryitem_ie.h
++    wx/msw/webview_ie.h
++    wx/msw/webview_edge.h
+ 
+ WEBVIEW_OSX_SHARED_SRC =
+     src/osx/webview_webkit.mm
+ 
+-WEBVIEW_GTK_HDR =
+-    wx/gtk/webviewhistoryitem_webkit.h
+-    wx/gtk/webview_webkit.h
++WEBVIEW_OSX_SHARED_HDR =
++    wx/osx/webviewhistoryitem_webkit.h
++    wx/osx/webview_webkit.h
+ 
+ WEBVIEW_GTK_SRC =
+     src/gtk/webview_webkit.cpp
+-
+-WEBVIEW2_GTK_SRC =
+     src/gtk/webview_webkit2.cpp
+ 
++WEBVIEW_GTK_HDR =
++    wx/gtk/webviewhistoryitem_webkit.h
++    wx/gtk/webview_webkit.h
++
+ WEBVIEW_WEBKIT2_EXTENSION_SRC =
+     src/gtk/webview_webkit2_extension.cpp
+ 
