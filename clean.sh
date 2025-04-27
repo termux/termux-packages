@@ -61,7 +61,7 @@ fi
 		# only delete `TERMUX__PREFIX` since its parent directories could
 		# be a critical directory in `TERMUX_REGEX__INVALID_TERMUX_PREFIX_PATHS`.
 		# This should not be an issue as package files are only packed
-		# from `TERMUX_PREFIX_CLASSICAL` via `termux_step_extract_into_massagedir()`.
+		# from `TERMUX_PREFIX_CLASSICAL` via `termux_step_copy_into_massagedir()`.
 		if [[ "$TERMUX__PREFIX" == "$TERMUX_APP__DATA_DIR" ]] || \
 			[[ "$TERMUX__PREFIX" == "$TERMUX_APP__DATA_DIR/"* ]]; then
 			deletion_dir="$TERMUX_APP__DATA_DIR"
