@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="9.4.0"
 TERMUX_PKG_REVISION=1
+TERMUX_PKG_ALIGN_VERSION_WITH=octave
 TERMUX_PKG_SRCURL=https://ftpmirror.gnu.org/octave/octave-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=fff911909ef79f95ba244dab5b8c1cb8c693a6c447d31deabb53994f17cb7b3d
 TERMUX_PKG_DEPENDS="arpack-ng, clang, fftw, fltk, fontconfig, freetype, glpk, glu, graphicsmagick, libandroid-complex-math, libbz2, libc++, libcurl, libhdf5, libiconv, libopenblas, libsndfile, libx11, libxcursor, libxext, libxfixes, libxft, libxinerama, libxrender, make, opengl, openssl, pcre2, portaudio, qhull, qrupdate-ng, qt6-qt5compat, qt6-qtbase, qt6-qttools, readline, suitesparse, sundials, zlib"
@@ -37,15 +38,6 @@ ac_cv_func_setpwent=no
 ac_cv_func_setpwuid=no
 "
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
-
-termux_step_post_get_source() {
-	# Version guard
-	local ver_e=${TERMUX_PKG_VERSION#*:}
-	local ver_x=$(. $TERMUX_SCRIPTDIR/packages/octave/build.sh; echo ${TERMUX_PKG_VERSION#*:})
-	if [ "${ver_e}" != "${ver_x}" ]; then
-		termux_error_exit "Version mismatch between octave and octave-x."
-	fi
-}
 
 termux_step_pre_configure() {
 	termux_setup_flang

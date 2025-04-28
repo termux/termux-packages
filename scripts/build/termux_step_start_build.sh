@@ -4,6 +4,25 @@ termux_step_start_build() {
 	# Path to hostbuild marker, for use if package has hostbuild step
 	TERMUX_HOSTBUILD_MARKER="$TERMUX_PKG_HOSTBUILD_DIR/TERMUX_BUILT_FOR_$TERMUX_PKG_VERSION"
 
+	# Check if versions are aligned between linked packages.
+	# Also check if there are other packages wanting to keep version aligned with this package.
+	readarray -t PACKAGES_WANTING_VERSIONS_ALIGNED < <(grep -R -l \
+		-E "TERMUX_PKG_ALIGN_VERSION_WITH=['\"]?$TERMUX_PKG_NAME['\"]?" \
+		--include="build.sh" ${TERMUX_PACKAGES_DIRECTORIES} || :)
+	if [ -n "${TERMUX_PKG_ALIGN_VERSION_WITH}" ]; then
+		local _filename="$(find ${TERMUX_PACKAGES_DIRECTORIES} -mindepth 2 -maxdepth 2 -type f -path "*/${TERMUX_PKG_ALIGN_VERSION_WITH}/build.sh")"
+		[ -z "${_filename}" ] && termux_error_exit "Can not verify version aligning, package ${TERMUX_PKG_ALIGN_VERSION_WITH} is not found"
+		PACKAGES_WANTING_VERSIONS_ALIGNED+=("${_filename}")
+	fi
+
+	# Perform version aligning check
+	for _build_sh in "${PACKAGES_WANTING_VERSIONS_ALIGNED[@]}"; do
+		local version="$(set +e +u; . "${_build_sh}" &>/dev/null; echo ${TERMUX_PKG_VERSION#*:})"
+		if [ "${version#*:}" != "${TERMUX_PKG_VERSION#*:}" ]; then
+			termux_error_exit "Version mismatch between ${TERMUX_PKG_NAME} and $(basename $(dirname "$_build_sh"))."
+		fi
+	done
+
 	if [ "$TERMUX_PKG_METAPACKAGE" = "true" ]; then
 		# Metapackage has no sources and therefore platform-independent.
 		TERMUX_PKG_SKIP_SRC_EXTRACT=true

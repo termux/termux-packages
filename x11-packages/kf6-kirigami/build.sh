@@ -8,6 +8,8 @@ TERMUX_PKG_SHA256=dd5aa1b5b8fbc4eb731227851af7ca9caa1dcaac0dc99421dbd3d0d58d9883
 TERMUX_PKG_DEPENDS="libc++, qt6-qtbase, qt6-qtdeclarative"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION}), qt6-shadertools, qt6-qtsvg, qt6-qttools"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_AUTO_UPDATE_GROUP=x11/kframeworks6
+TERMUX_PKG_ALIGN_VERSION_WITH=kf6-kconfig
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_SYSTEM_NAME=Linux
 -DKDE_INSTALL_QMLDIR=lib/qt6/qml

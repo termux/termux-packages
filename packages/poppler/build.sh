@@ -32,10 +32,6 @@ termux_step_pre_configure() {
 	if ! test "${_POPPLER_SOVERSION}"; then
 		termux_error_exit "Please set _POPPLER_SOVERSION variable."
 	fi
-	local sover_x11=$(. $TERMUX_SCRIPTDIR/x11-packages/poppler-qt/build.sh; echo $_POPPLER_SOVERSION)
-	if [ "${sover_x11}" != "${_POPPLER_SOVERSION}" ]; then
-		termux_error_exit "SOVERSION mismatch with \"poppler-qt\" package."
-	fi
 	local sover_cmake=$(sed -En 's/^set\(POPPLER_SOVERSION_NUMBER "([0-9]+)"\)$/\1/p' CMakeLists.txt)
 	if [ "${sover_cmake}" != "${_POPPLER_SOVERSION}" ]; then
 		termux_error_exit "SOVERSION guard check failed (CMakeLists.txt: \"${sover_cmake}\")."

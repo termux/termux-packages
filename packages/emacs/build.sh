@@ -91,13 +91,6 @@ termux_step_post_get_source() {
 		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
 	fi
 
-	# Version guard
-	local ver_e=${TERMUX_PKG_VERSION#*:}
-	local ver_x=$(. $TERMUX_SCRIPTDIR/x11-packages/emacs-x/build.sh; echo ${TERMUX_PKG_VERSION#*:})
-	if [ "${ver_e}" != "${ver_x}" ]; then
-		termux_error_exit "Version mismatch between emacs and emacs-x."
-	fi
-
 	# XXX: We have to start with new host build each time
 	#      to avoid build error when cross compiling.
 	rm -Rf $TERMUX_PKG_HOSTBUILD_DIR

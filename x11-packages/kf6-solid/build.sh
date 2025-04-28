@@ -9,6 +9,8 @@ TERMUX_PKG_DEPENDS="libimobiledevice, libplist, qt6-qtbase, libc++, util-linux"
 # media-player-info, systemd-libs, udisks2, upower can be added to TERMUX_PKG_DEPENDS when available
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION}), qt6-qtdeclarative, qt6-qttools"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_AUTO_UPDATE_GROUP=x11/kframeworks6
+TERMUX_PKG_ALIGN_VERSION_WITH=kf6-kconfig
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DKDE_INSTALL_QMLDIR=lib/qt6/qml
 -DKDE_INSTALL_QTPLUGINDIR=lib/qt6/plugins
