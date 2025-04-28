@@ -1,8 +1,8 @@
 TERMUX_SUBPKG_DESCRIPTION="Test files for PyPy 3"
 TERMUX_SUBPKG_INCLUDE="
-opt/pypy3/lib/pypy$_MAJOR_VERSION/test
-opt/pypy3/lib/pypy$_MAJOR_VERSION/*/test
-opt/pypy3/lib/pypy$_MAJOR_VERSION/*/tests
+opt/$TERMUX_PKG_NAME/lib/pypy$_MAJOR_VERSION/test
+opt/$TERMUX_PKG_NAME/lib/pypy$_MAJOR_VERSION/*/test
+opt/$TERMUX_PKG_NAME/lib/pypy$_MAJOR_VERSION/*/tests
 "
 
 termux_step_create_subpkg_debscripts() {
@@ -10,12 +10,12 @@ termux_step_create_subpkg_debscripts() {
 	cat <<- PRERM_EOF > ./prerm
 	#!$TERMUX_PREFIX/bin/sh
 
-	if [ "$TERMUX_PACKAGE_FORMAT" != "pacman" ] && [ "\$1" != "remove" ]; then
+	if [ "$TERMUX_PACKAGE_FORMAT" = "debian" ] && [ "\$1" != "remove" ]; then
 	    exit 0
 	fi
 
 	echo "Deleting *.pyc..."
-	find $TERMUX_PREFIX/opt/pypy3/lib-python | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf
+	find $TERMUX_PREFIX/opt/$TERMUX_PKG_NAME/lib-python | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf
 
 	exit 0
 	PRERM_EOF
