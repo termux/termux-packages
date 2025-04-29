@@ -60,27 +60,42 @@ termux_step_massage() {
 		fi
 	fi
 
-	local pattern=""
-	for file in ${TERMUX_PKG_NO_SHEBANG_FIX_FILES}; do
-		if [[ -z "${pattern}" ]]; then
-			pattern="${file}"
-			continue
-		fi
-		pattern+='|'"${file}"
-	done
-	if [[ -n "${pattern}" ]]; then
-		pattern='(|./)('"${pattern}"')$'
-	fi
-
 	if [ "$TERMUX_PKG_NO_SHEBANG_FIX" != "true" ]; then
-		# Fix shebang paths:
-		while IFS= read -r -d '' file; do
-			if [[ -n "${pattern}" ]] && [[ -n "$(echo "${file}" | grep -E "${pattern}")" ]]; then
-				echo "INFO: Skip shebang fix for ${file}"
-				continue
+		local no_shebang_replace_full_regex="" no_shebang_replace_regex
+		# Assume files are a regex list and special characters in paths in each regex are already escaped.
+		if [[ -n "$TERMUX_PKG_NO_SHEBANG_FIX_FILES" ]]; then
+			while IFS= read -r no_shebang_replace_regex; do
+				[[ -n "$no_shebang_replace_full_regex" ]] && no_shebang_replace_full_regex+='|'
+				no_shebang_replace_full_regex+="($no_shebang_replace_regex)"
+			done < <(printf "%s\n" "$TERMUX_PKG_NO_SHEBANG_FIX_FILES")
+			if [[ -n "$no_shebang_replace_full_regex" ]]; then
+				no_shebang_replace_full_regex='(|./)('"$no_shebang_replace_full_regex"')$'
 			fi
-			if head -c 100 "$file" | head -n 1 | grep -E "^#!.*/bin/.*" | grep -q -E -v -e "^#! ?/system" -e "^#! ?$TERMUX_PREFIX_CLASSICAL"; then
-				sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" "$file"
+		fi
+
+		local prefix_escaped shebang_already_valid_regex header_line shebang_match
+		local shebang_regex='^#!.*/bin/.*'
+
+		# Escape '\$[](){}|^.?+*' with backslashes.
+		prefix_escaped="$(printf "%s" "$TERMUX_PREFIX_CLASSICAL" | sed -zE -e 's/[][\.|$(){}?+*^]/\\&/g')"
+		shebang_already_valid_regex='^#! ?((/system/)|('"$prefix_escaped"'/))'
+
+		# Fix shebang paths:
+		while IFS= read -rd '' file; do
+			read -rn$(( ${#TERMUX_PREFIX_CLASSICAL} + 4 )) header_line < "$file"
+			if [[ "${header_line:0:2}" == "#!" && "${#header_line}" -ge 3 && "$header_line" =~ $shebang_regex ]]; then
+				shebang_match="${BASH_REMATCH[0]}"
+				if [[ -n "$shebang_match" ]]; then
+					if [[ "$shebang_match" =~ $shebang_already_valid_regex ]]; then
+						echo "INFO: Skip shebang fix for '$file' as shebang '$shebang_match' already valid"
+						continue
+					fi
+					if [[ -n "$no_shebang_replace_full_regex" ]] && [[ "$file" =~ $no_shebang_replace_full_regex ]]; then
+						echo "INFO: Skip shebang fix for '$file' as its excluded"
+						continue
+					fi
+					sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" "$file"
+				fi
 			fi
 		done < <(find -L . -type f -print0)
 	fi
@@ -205,7 +220,13 @@ termux_step_massage() {
 		local nproc=$(nproc)
 		echo "INFO: Identifying files with nproc=${nproc}"
 		local t0=$(get_epoch)
-		local files=$(find . -type f)
+		local files; files="$(IFS=; find . -type f -print0 | \
+			while read -r -d '' f; do
+				# Find files with ELF or static library signature in the first 4 bytes bytes
+				read -rN4 hdr <"$f"
+				[[ $hdr == $'\x7fELF' || $hdr == '!<ar' ]] && printf '%s\n' "$f"
+			done
+		)"
 		# use bash to see if llvm-readelf crash
 		# https://github.com/llvm/llvm-project/issues/89534
 		local valid=$(echo "${files}" | xargs -P"${nproc}" -i bash -c 'if ${READELF} -h "{}" &>/dev/null; then echo "{}"; fi')
@@ -239,10 +260,10 @@ termux_step_massage() {
 			local e=0
 			local c=0
 			local valid_s=$(echo "${valid}" | sort)
-			local f excluded_f
-			while IFS= read -r f; do
+			local file excluded_f
+			while IFS= read -r file; do
 				# exclude object, static files
-				case "${f}" in
+				case "${file}" in
 				*.a) (( e &= ~1 )) || : ;;
 				*.dll) (( e &= ~1 )) || : ;;
 				*.o) (( e &= ~1 )) || : ;;
@@ -252,20 +273,20 @@ termux_step_massage() {
 				*) (( e |= 1 )) || : ;;
 				esac
 				while IFS= read -r excluded_f; do
-					[[ "${f}" == ${excluded_f} ]] && (( e &= ~1 )) && break
+					[[ "${file}" == ${excluded_f} ]] && (( e &= ~1 )) && break
 				done < <(echo "${TERMUX_PKG_UNDEF_SYMBOLS_FILES}")
 				[[ "${TERMUX_PKG_UNDEF_SYMBOLS_FILES}" == "error" ]] && (( e |= 1 )) || :
-				[[ $(( e & 1 )) == 0 ]] && echo "SKIP: ${f}" && continue
-				local undef_sym=$(${READELF} -s "${f}" | grep -Ef "${pattern_file_undef}")
+				[[ $(( e & 1 )) == 0 ]] && echo "SKIP: ${file}" && continue
+				local undef_sym=$(${READELF} -s "${file}" | grep -Ef "${pattern_file_undef}")
 				if [[ -n "${undef_sym}" ]]; then
 					((c++)) || :
 					if [[ $(( e & 1 )) != 0 ]]; then
-						echo -e "ERROR: ${f} contains undefined symbols:\n${undef_sym}" >&2
+						echo -e "ERROR: ${file} contains undefined symbols:\n${undef_sym}" >&2
 						(( e |= 2 )) || :
 					else
 						local undef_symu=$(echo "${undef_sym}" | awk '{ print $8 }' | sort | uniq)
 						local undef_symu_len=$(echo ${undef_symu} | wc -w)
-						echo "SKIP: ${f} contains undefined symbols: ${undef_symu_len}" >&2
+						echo "SKIP: ${file} contains undefined symbols: ${undef_symu_len}" >&2
 					fi
 				fi
 			done < <(echo "${valid_s}")
@@ -287,7 +308,7 @@ termux_step_massage() {
 			local f
 			while IFS= read -r f; do
 				# exclude object, static files
-				case "${f}" in
+				case "${file}" in
 				*.a) (( e &= ~1 )) || : ;;
 				*.dll) (( e &= ~1 )) || : ;;
 				*.o) (( e &= ~1 )) || : ;;
@@ -296,11 +317,11 @@ termux_step_massage() {
 				*.syso) (( e &= ~1 )) || : ;;
 				*) (( e |= 1 )) || : ;;
 				esac
-				[[ $(( e & 1 )) == 0 ]] && echo "SKIP: ${f}" && continue
-				local openmp_sym=$(${READELF} -s "${f}" | grep -Ef "${pattern_file_openmp}")
+				[[ $(( e & 1 )) == 0 ]] && echo "SKIP: ${file}" && continue
+				local openmp_sym=$(${READELF} -s "${file}" | grep -Ef "${pattern_file_openmp}")
 				if [[ -n "${openmp_sym}" ]]; then
 					((c++)) || :
-					echo -e "INFO: ${f} contains OpenMP symbols: $(echo "${openmp_sym}" | wc -l)" >&2
+					echo -e "INFO: ${file} contains OpenMP symbols: $(echo "${openmp_sym}" | wc -l)" >&2
 				fi
 			done < <(echo "${valid_s}")
 			local t1=$(get_epoch)
@@ -316,8 +337,8 @@ termux_step_massage() {
 			{
 				local f
 				while IFS= read -r f; do
-					local f_needed=$(${READELF} -d "${f}" 2>/dev/null | sed -ne "s|.*NEEDED.*\[\(.*\)\].*|\1|p" | sort | uniq | tr "\n" " " | sed -e "s/ /, /g")
-					echo "ERROR: ${f}: ${f_needed%, }"
+					local f_needed=$(${READELF} -d "${file}" 2>/dev/null | sed -ne "s|.*NEEDED.*\[\(.*\)\].*|\1|p" | sort | uniq | tr "\n" " " | sed -e "s/ /, /g")
+					echo "ERROR: ${file}: ${f_needed%, }"
 				done < <(echo "${valid_s}")
 			} | grep libomp.so >&2
 			local t1=$(get_epoch)
