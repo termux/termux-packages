@@ -39,73 +39,46 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Gather build summary
         run: |
-          BASE_COMMIT=$(jq --raw-output .pull_request.base.sha "$GITHUB_EVENT_PATH")
-          OLD_COMMIT=$(jq --raw-output .commits[0].id "$GITHUB_EVENT_PATH")
-          HEAD_COMMIT=$(jq --raw-output .commits[-1].id "$GITHUB_EVENT_PATH")
-          if [ "$BASE_COMMIT" = "null" ]; then
-            if [ "$OLD_COMMIT" = "$HEAD_COMMIT" ]; then
-              # Single-commit push.
-              echo "Processing commit: ${HEAD_COMMIT}"
-              CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${HEAD_COMMIT}")
-            else
-              # Multi-commit push.
-              OLD_COMMIT="${OLD_COMMIT}~1"
-              echo "Processing commit range: ${OLD_COMMIT}..${HEAD_COMMIT}"
-              CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${OLD_COMMIT}" "${HEAD_COMMIT}")
+          BASE_REF="${{ github.event.pull_request.base.ref }}"
+          git fetch origin "${BASE_REF:-master}" 2>/dev/null
+          BASE_COMMIT="$(git merge-base "origin/${BASE_REF:-master}" "HEAD")"
+          # We are intentionally not using .commits[0].id and .commits[-1].id as github seems to
+          # only send 20 commits in the payload for github action runs instead of the 2048 documented
+          # limit. Perhaps 2048 is the limit just for webhooks, where they haven't documented
+          # properly that the limit for github actions is only 20:
+          #
+          # https://docs.github.com/en/webhooks/webhook-events-and-payloads#push
+          OLD_COMMIT="${{ github.event.before }}"
+          HEAD_COMMIT="${{ github.event.after }}"
+          if [ -z "${{ github.event.pull_request.base.sha }}" ]; then
+            if ! git log "$OLD_COMMIT" > /dev/null; then
+              if [ "$(git branch --show-current)" = "master" ]; then
+                echo "Force push detected on master branch. Unable to proceed."
+                exit 1
+              else
+                OLD_COMMIT=$(git fetch origin master >&2; git merge-base origin/master $HEAD_COMMIT)
+              fi
             fi
+            echo "Processing commit range: ${OLD_COMMIT}..${HEAD_COMMIT}"
+            CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${OLD_COMMIT}" "${HEAD_COMMIT}")
           else
             # Pull requests.
-            echo "Processing pull request #$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH"): ${BASE_COMMIT}..HEAD"
+            echo "Processing pull request #${{ github.event.pull_request.number }}: ${BASE_COMMIT}..HEAD"
             CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${BASE_COMMIT}" "HEAD")
           fi
           for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
             repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
-            # Parse changed files and identify new packages and deleted packages.
-            # Create lists of those packages that will be passed to upload job for
+            # Parse changed files and identify new packages and modified packages.
+            # Create lists of those packages that will be passed for
             # further processing.
             while read -r file; do
-              if ! [[ $file == ${repo_path}/* ]]; then
-                # This file does not belong to a package, so ignore it
-                continue
+              if [[ "$file" == ${repo_path}/* && "$file" =~ ^${repo_path}/([.a-z0-9+-]*)/.*$ ]] \
+                    && pkg=${BASH_REMATCH[1]} && [[ -d "${repo_path}/${pkg}" ]]; then
+                  echo "$pkg"
               fi
-              if [[ $file =~ ^${repo_path}/([.a-z0-9+-]*)/([.a-z0-9+-]*).subpackage.sh$ ]]; then
-                # A subpackage was modified, check if it was deleted or just updated
-                pkg=${BASH_REMATCH[1]}
-                subpkg=${BASH_REMATCH[2]}
-                if [ ! -f "${repo_path}/${pkg}/${subpkg}.subpackage.sh" ]; then
-                  echo "$subpkg" >> ./deleted_${repo}_packages.txt
-                fi
-              elif [[ $file =~ ^${repo_path}/([.a-z0-9+-]*)/.*$ ]]; then
-                # package, check if it was deleted or updated
-                pkg=${BASH_REMATCH[1]}
-                if [ -d "${repo_path}/${pkg}" ]; then
-                  echo "$pkg" >> ./built_${repo}_packages.txt
-                  # If there are subpackages we want to create a list of those
-                  # as well
-                  for file in $(find "${repo_path}/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
-                    echo "$(basename "${file%%.subpackage.sh}")" >> ./built_${repo}_subpackages.txt
-                  done
-                else
-                  echo "$pkg" >> ./deleted_${repo}_packages
-                fi
-              fi
-            done<<<${CHANGED_FILES}
-          done
-          for repo in $(jq --raw-output 'del(.pkg_format) | .[].name' repo.json); do
-            # Fix so that lists do not contain duplicates
-            if [ -f ./built_${repo}_packages.txt ]; then
-              sort ./built_${repo}_packages.txt | uniq > ./built_${repo}_packages.txt.tmp
-              mv ./built_${repo}_packages.txt.tmp ./built_${repo}_packages.txt
-            fi
-            if [ -f ./built_${repo}_subpackages.txt ]; then
-              sort ./built_${repo}_subpackages.txt | uniq > ./built_${repo}_subpackages.txt.tmp
-              mv ./built_${repo}_subpackages.txt.tmp ./built_${repo}_subpackages.txt
-            fi
-            if [ -f ./deleted_${repo}_packages.txt ]; then
-              sort ./deleted_${repo}_packages.txt | uniq > ./deleted_${repo}_packages.txt.tmp
-              mv ./deleted_${repo}_packages.txt.tmp ./deleted_${repo}_packages.txt
-            fi
-          done
+            done <<< ${CHANGED_FILES}
+          # Fix so that lists do not contain duplicates and dump to file for processing in the next step
+          done | sort -u > ./built-packages.txt
       - name: Process package updates
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -114,15 +87,9 @@ jobs:
           GIT_COMMIT_PACKAGES: "false"
           GIT_PUSH_PACKAGES: "false"
         run: |
-          declare -a packages=()
-          for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
-            repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
-            if [ -f "./built_${repo}_packages.txt" ]; then
-              packages+=($(cat "./built_${repo}_packages.txt"))
-            fi
-          done
-          if [ -n "$packages" ]; then
-            ./scripts/bin/update-packages $packages
+          readarray -t packages < ./built-packages.txt
+          if [ -n "${packages[*]}" ]; then
+            ./scripts/bin/update-packages "${packages[@]}"
           fi
 
   update-packages:
