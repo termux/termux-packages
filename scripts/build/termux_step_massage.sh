@@ -82,7 +82,7 @@ termux_step_massage() {
 
 		# Fix shebang paths:
 		while IFS= read -rd '' file; do
-			read -rn$(( ${#TERMUX_PREFIX_CLASSICAL} + 4 )) header_line < "$file"
+			read -rn$(( ${#TERMUX_PREFIX_CLASSICAL} + 4 )) header_line < "$file" || continue
 			if [[ "${header_line:0:2}" == "#!" && "${#header_line}" -ge 3 && "$header_line" =~ $shebang_regex ]]; then
 				shebang_match="${BASH_REMATCH[0]}"
 				if [[ -n "$shebang_match" ]]; then
@@ -97,7 +97,7 @@ termux_step_massage() {
 					sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" "$file"
 				fi
 			fi
-		done < <(find -L . -type f -print0)
+		done < <(find . -type f -print0)
 	fi
 
 	# Delete the info directory file.
