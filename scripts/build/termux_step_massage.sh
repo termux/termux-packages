@@ -223,8 +223,8 @@ termux_step_massage() {
 		local files; files="$(IFS=; find . -type f -print0 | \
 			while read -r -d '' f; do
 				# Find files with ELF or static library signature in the first 4 bytes bytes
-				read -rN4 hdr <"$f"
-				[[ $hdr == $'\x7fELF' || $hdr == '!<ar' ]] && printf '%s\n' "$f"
+				read -rN4 hdr < "$f" || continue
+				[[ $hdr == $'\x7fELF' || $hdr == '!<ar' ]] && printf '%s\n' "$f" || :
 			done
 		)"
 		# use bash to see if llvm-readelf crash
