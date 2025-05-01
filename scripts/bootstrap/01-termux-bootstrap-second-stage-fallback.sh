@@ -17,10 +17,10 @@
 	# as then second stage will run again when new shell is started
 	# which may affect already configured packages.
 	# The shell should still load if second stage run below fails.
-	if [ ! -L "@TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR@/termux-bootstrap-second-stage.sh.lock" ]; then
+	if [ ! -L "@TERMUX_BOOTSTRAP__BOOTSTRAP_SECOND_STAGE_DIR@/@TERMUX_BOOTSTRAP__BOOTSTRAP_SECOND_STAGE_ENTRY_POINT_SUBFILE@.lock" ]; then
 		echo "Starting fallback run of termux bootstrap second stage"
-		chmod +x "@TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR@/termux-bootstrap-second-stage.sh" || exit $?
-		"@TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR@/termux-bootstrap-second-stage.sh" || exit $?
+		chmod +x "@TERMUX_BOOTSTRAP__BOOTSTRAP_SECOND_STAGE_DIR@/@TERMUX_BOOTSTRAP__BOOTSTRAP_SECOND_STAGE_ENTRY_POINT_SUBFILE@" || exit $?
+		"@TERMUX_BOOTSTRAP__BOOTSTRAP_SECOND_STAGE_DIR@/@TERMUX_BOOTSTRAP__BOOTSTRAP_SECOND_STAGE_ENTRY_POINT_SUBFILE@" || exit $?
 	fi
 
 	# Delete script itself so that it is never run again
