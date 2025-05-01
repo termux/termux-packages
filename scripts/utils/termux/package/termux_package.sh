@@ -47,7 +47,8 @@ termux_package__is_package_on_device_build_supported() {
 ##
 termux_package__is_package_version_built() {
 
-    [ -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/$1" ] && [ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/$1")" = "$2" ]
+    # bash builtins only, a bit faster than [ -e $file ] && [ "$(cat $file)" == "smth" ]
+    [[ -f "$TERMUX_BUILT_PACKAGES_DIRECTORY/$1" ]] && [[ "$(< "$TERMUX_BUILT_PACKAGES_DIRECTORY/$1")" == "$2" ]]
     return $?
 
 }
