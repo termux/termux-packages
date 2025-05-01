@@ -74,11 +74,11 @@ contains some code from https://bugs.launchpad.net/sbcl/+bug/1956852
  ;;; race conditions and (at least on Linux) does not make use of any shell environment variables
  ;;; to determine a directory - in fact it doesn't make a directory entry at all.
  (defun sb-unix:unix-tmpfile ()
--  (make-stdio-file (alien-funcall (extern-alien "tmpfile" (function system-area-pointer)))))
-+  (make-stdio-file (alien-funcall (extern-alien "termux_tmpfile" (function system-area-pointer)))))
- 
- (defun sb-unix:unix-fclose (file)
-   (alien-funcall (extern-alien "fclose" (function int system-area-pointer))
+-  (let ((sap (alien-funcall (extern-alien "tmpfile" (function system-area-pointer)))))
++  (let ((sap (alien-funcall (extern-alien "termux_tmpfile" (function system-area-pointer)))))
+     (if (zerop (sap-int sap))
+         (error "Error calling tmpfile(): ~a" (strerror))
+         (make-stdio-file sap))))
 --- a/src/runtime/linux-os.c
 +++ b/src/runtime/linux-os.c
 @@ -416,3 +416,8 @@ char *os_get_runtime_executable_path()
