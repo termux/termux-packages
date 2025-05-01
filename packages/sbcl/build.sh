@@ -3,9 +3,16 @@ TERMUX_PKG_DESCRIPTION="A high performance Common Lisp compiler"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.5.3"
-TERMUX_PKG_SRCURL="https://github.com/sbcl/sbcl/archive/refs/tags/sbcl-${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=f3b923778f7d1f151f2bdc08a0e92ec4f5a3db5efca5f46ea2ac439dda06cc35
+TERMUX_PKG_VERSION="2.5.4"
+# sourceforge archive is a precompiled SBCL release for GNU/Linux to use as host Lisp for bootstrapping
+TERMUX_PKG_SRCURL=(
+	https://github.com/sbcl/sbcl/archive/refs/tags/sbcl-${TERMUX_PKG_VERSION}.tar.gz
+	https://sourceforge.net/projects/sbcl/files/sbcl/${TERMUX_PKG_VERSION}/sbcl-${TERMUX_PKG_VERSION}-x86-64-linux-binary.tar.bz2
+)
+TERMUX_PKG_SHA256=(
+	fa6120bd438387636d928b0306b189d142214010e2dacf5f67136c481ce84111
+	d71adcaf3e8db6702a3b04e310513294db898e8c11e20ae0ac6bccbb97b3e955
+)
 TERMUX_PKG_DEPENDS="zstd"
 # TERMUX_ON_DEVICE_BUILD=true  build dependencies: ecl, strace
 # TERMUX_ON_DEVICE_BUILD=false build dependencies: aosp-libs, bash, coreutils, strace
@@ -27,16 +34,8 @@ termux_step_host_build() {
 		return
 	fi
 
-	# precompiled SBCL release for GNU/Linux to use as host Lisp for bootstrapping
-	SBCL_BINURL="https://sourceforge.net/projects/sbcl/files/sbcl/${TERMUX_PKG_VERSION}/sbcl-${TERMUX_PKG_VERSION}-x86-64-linux-binary.tar.bz2"
-	SBCL_BINARCHIVE="${TERMUX_PKG_CACHEDIR}/sbcl-${TERMUX_PKG_VERSION}-x86-64-linux-binary.tar.bz2"
-	SBCL_BINSHA256=e207fa6e851631dee0a467cea4f15276d31d4192c949a2b1d3d0daadbf70d443
-	SBCL_WORKDIR="${TERMUX_PKG_TMPDIR}/sbcl"
-	mkdir -p "$SBCL_WORKDIR"
-	termux_download "$SBCL_BINURL" "$SBCL_BINARCHIVE" "$SBCL_BINSHA256"
-	tar -xf "$SBCL_BINARCHIVE" --strip-components=1 -C "$SBCL_WORKDIR"
+	cd "${TERMUX_PKG_SRCDIR}/sbcl-${TERMUX_PKG_VERSION}-x86-64-linux"
 	export INSTALL_ROOT="$TERMUX_PKG_HOSTBUILD_DIR"
-	cd "$SBCL_WORKDIR"
 	sh install.sh
 }
 
