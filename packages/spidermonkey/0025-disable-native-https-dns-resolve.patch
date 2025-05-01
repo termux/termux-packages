@@ -1,0 +1,32 @@
+It uses `android_res_nquery`, but this function only got added in API level 29
+
+--- a/netwerk/dns/nsHostResolver.cpp
++++ b/netwerk/dns/nsHostResolver.cpp
+@@ -237,6 +237,8 @@
+   // native HTTPS records on Win 11 for now.
+   sNativeHTTPSSupported = StaticPrefs::network_dns_native_https_query_win10() ||
+                           mozilla::IsWin11OrLater();
++#elif defined(__TERMUX__)
++  sNativeHTTPSSupported = false;
+ #elif defined(MOZ_WIDGET_ANDROID)
+   // android_res_nquery only got added in API level 29
+   sNativeHTTPSSupported = jni::GetAPIVersion() >= 29;
+--- a/netwerk/dns/moz.build
++++ b/netwerk/dns/moz.build
+@@ -59,15 +59,7 @@
+     "nsEffectiveTLDService.cpp",  # Excluded from UNIFIED_SOURCES due to special build flags.
+ ]
+ 
+-if CONFIG["MOZ_WIDGET_TOOLKIT"] == "windows":
+-    SOURCES += ["PlatformDNSWin.cpp"]
+-elif CONFIG["OS_TARGET"] == "Linux" or CONFIG["MOZ_WIDGET_TOOLKIT"] == "cocoa":
+-    SOURCES += ["PlatformDNSUnix.cpp"]
+-    OS_LIBS += ["resolv"]
+-elif CONFIG["MOZ_WIDGET_TOOLKIT"] == "android":
+-    SOURCES += ["PlatformDNSAndroid.cpp"]
+-else:
+-    DEFINES["MOZ_NO_HTTPS_IMPL"] = 1
++DEFINES["MOZ_NO_HTTPS_IMPL"] = 1
+ 
+ UNIFIED_SOURCES += [
+     "ChildDNSService.cpp",
