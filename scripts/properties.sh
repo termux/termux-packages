@@ -1070,15 +1070,38 @@ TERMUX_CACHE_DIR="$TERMUX__CACHE_DIR" # Deprecated alternative variable for `TER
 
 
 ####
-# Variables for the Termux bootstraps.
+# Variables for the Termux bootstrap.
 ####
 
 ##
-# Termux bootstrap config directory path under `TERMUX__PREFIX__TERMUX_DATA_ETC_DIR`.
+# Termux bootstrap system config directory path under `TERMUX__PROJECT_SYSTEM_CONFIG_DIR`.
 #
-# Default value: `/data/data/com.termux/files/usr/etc/termux/bootstrap`
+# Default value: `/data/data/com.termux/files/usr/etc/termux/termux-bootstrap`
 ##
-TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR="$TERMUX__PREFIX__TERMUX_DATA_ETC_DIR/bootstrap"
+TERMUX_BOOTSTRAP__BOOTSTRAP_SYSTEM_CONFIG_DIR="$TERMUX__PROJECT_SYSTEM_CONFIG_DIR/termux-bootstrap"
+
+
+##
+# Termux subdirectory path for `TERMUX_BOOTSTRAP__BOOTSTRAP_SECOND_STAGE_DIR`.
+#
+# Constant value: `second-stage`
+##
+TERMUX_BOOTSTRAP__BOOTSTRAP_SECOND_STAGE_SUBDIR="second-stage"
+
+##
+# Termux bootstrap second stage directory path under `TERMUX_BOOTSTRAP__BOOTSTRAP_SYSTEM_CONFIG_DIR`.
+#
+# Default value: `/data/data/com.termux/files/usr/etc/termux/termux-bootstrap/second-stage`
+##
+TERMUX_BOOTSTRAP__BOOTSTRAP_SECOND_STAGE_DIR="$TERMUX_BOOTSTRAP__BOOTSTRAP_SYSTEM_CONFIG_DIR/$TERMUX_BOOTSTRAP__BOOTSTRAP_SECOND_STAGE_SUBDIR"
+
+
+##
+# Termux bootstrap second stage entry point subfile path path under `TERMUX_BOOTSTRAP__BOOTSTRAP_SECOND_STAGE_DIR`.
+#
+# Default value: `termux-bootstrap-second-stage.sh`
+##
+TERMUX_BOOTSTRAP__BOOTSTRAP_SECOND_STAGE_ENTRY_POINT_SUBFILE="termux-bootstrap-second-stage.sh"
 
 
 
