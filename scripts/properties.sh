@@ -281,8 +281,9 @@ TERMUX__REPOS_HOST_ORG_URL="https://github.com/$TERMUX__REPOS_HOST_ORG_NAME"
 # https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#file-path-limits
 # for why.
 #
-# See also `TERMUX_APP__NAMESPACE`.
-#
+# **See Also:**
+# - `TERMUX_APP__NAMESPACE`.
+# - https://developer.android.com/build/configure-app-module#set-application-id
 # - https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#termux-private-app-data-directory
 #
 # Default value: `com.termux`
@@ -1472,10 +1473,10 @@ TERMUX_APP__REPO_URL="$TERMUX__REPOS_HOST_ORG_URL/$TERMUX_APP__REPO_NAME"
 # classes exists used for `TERMUX_APP__*_CLASS__*` and
 # `TERMUX_APP__*_(ACTIVITY|BROADCASTRECEIVER|SERVICE)__*`variables.
 #
-# - https://github.com/termux/termux-app/tree/master/app/src/main/java/com/termux
+# **See Also:**
+# - `TERMUX_APP__PACKAGE_NAME`.
 # - https://developer.android.com/build/configure-app-module#set-namespace
-#
-# See also `TERMUX_APP__PACKAGE_NAME`.
+# - https://github.com/termux/termux-app/tree/master/app/src/main/java/com/termux
 #
 # Default value: `com.termux`
 ##
@@ -1611,7 +1612,10 @@ __termux_build_props__add_variables_validator_actions "TERMUX_APP__AM_SOCKET__SE
 # Termux:API app package name used for
 # `TERMUX_API_APP__*_(ACTIVITY|BROADCASTRECEIVER|SERVICE)__*` variables.
 #
-# See also `TERMUX_API_APP__NAMESPACE`.
+# **See Also:**
+# - `TERMUX_API_APP__NAMESPACE`.
+# - https://developer.android.com/build/configure-app-module#set-application-id
+# - https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#termux-private-app-data-directory
 #
 # Default value: `com.termux.api`
 ##
@@ -1660,10 +1664,10 @@ TERMUX_API_APP__REPO_URL="$TERMUX__REPOS_HOST_ORG_URL/$TERMUX_API_APP__REPO_NAME
 # Termux:API classes exists used for `TERMUX_API_APP__*_CLASS__*` and
 # `TERMUX_API_APP__*_(ACTIVITY|BROADCASTRECEIVER|SERVICE)__*`variables.
 #
-# - https://github.com/termux/termux-api/tree/master/app/src/main/java/com/termux/api
+# **See Also:**
+# - `TERMUX_API_APP__PACKAGE_NAME`.
 # - https://developer.android.com/build/configure-app-module#set-namespace
-#
-# See also `TERMUX_API_APP__PACKAGE_NAME`.
+# - https://github.com/termux/termux-api/tree/master/app/src/main/java/com/termux/api
 #
 # Default value: `com.termux.api`
 ##
@@ -1783,8 +1787,9 @@ TERMUX_AM_PKG__REPO_URL="$TERMUX__REPOS_HOST_ORG_URL/$TERMUX_AM_PKG__REPO_NAME"
 # This must not be changed unless the classes in the `TermuxAm` repo
 # are moved to a different Java package name (in forks).
 #
-# - https://github.com/termux/TermuxAm/tree/master/app/src/main/java/com/termux/termuxam
+# **See Also:**
 # - https://developer.android.com/build/configure-app-module#set-namespace
+# - https://github.com/termux/TermuxAm/tree/master/app/src/main/java/com/termux/termuxam
 #
 # Constant value: `com.termux.termuxam`
 ##
