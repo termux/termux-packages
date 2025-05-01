@@ -1,5 +1,5 @@
 termux_step_elf_cleaner() {
-	termux_step_elf_cleaner__from_paths . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" -o -path "./opt/*" \)
+	termux_step_elf_cleaner__from_paths . \( -path "./bin/*" -o -path "./lib/*" -o -path "./lib32/*" -o -path "./libexec/*" -o -path "./opt/*" \)
 }
 
 termux_step_elf_cleaner__from_paths() {

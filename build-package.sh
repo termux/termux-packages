@@ -437,6 +437,36 @@ termux_check_package_in_building_packages_list() {
 	return $?
 }
 
+# Configure variables (TERMUX_ARCH, TERMUX__PREFIX__INCLUDE_DIR, TERMUX__PREFIX__LIB_DIR) for multilib-compilation
+termux_conf_multilib_vars() {
+	# Change the 64-bit architecture type to its 32-bit counterpart in the `TERMUX_ARCH` variable
+	case $TERMUX_ARCH in
+		"aarch64") TERMUX_ARCH="arm";;
+		"x86_64") TERMUX_ARCH="i686";;
+		*) termux_error_exit "It is impossible to set multilib arch for ${TERMUX_ARCH} arch."
+	esac
+	TERMUX__PREFIX__INCLUDE_DIR="$TERMUX__PREFIX__MULTI_INCLUDE_DIR"
+	TERMUX__PREFIX__LIB_DIR="$TERMUX__PREFIX__MULTI_LIB_DIR"
+}
+
+# Run functions for normal compilation and multilib-compilation
+termux_run_base_and_multilib_build_step() {
+	case "${1}" in
+		termux_step_configure|termux_step_make|termux_step_make_install) local func="${1}";;
+		*) termux_error_exit "Unsupported function '${1}'."
+	esac
+	cd "$TERMUX_PKG_BUILDDIR"
+	if [ "$TERMUX_PKG_BUILD_ONLY_MULTILIB" = "false" ]; then
+		"${func}"
+	fi
+	if [ "$TERMUX_PKG_BUILD_MULTILIB" = "true" ]; then
+		(
+			termux_step_setup_multilib_environment
+			"${func}_multilib"
+		)
+	fi
+}
+
 # Special hook to prevent use of "sudo" inside package build scripts.
 # build-package.sh shouldn't perform any privileged operations.
 sudo() {
@@ -700,17 +730,14 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 
 		# Even on continued build we might need to setup paths
 		# to tools so need to run part of configure step
-		cd "$TERMUX_PKG_BUILDDIR"
-		termux_step_configure
+		termux_run_base_and_multilib_build_step termux_step_configure
 
 		if [ "$TERMUX_CONTINUE_BUILD" == "false" ]; then
 			cd "$TERMUX_PKG_BUILDDIR"
 			termux_step_post_configure
 		fi
-		cd "$TERMUX_PKG_BUILDDIR"
-		termux_step_make
-		cd "$TERMUX_PKG_BUILDDIR"
-		termux_step_make_install
+		termux_run_base_and_multilib_build_step termux_step_make
+		termux_run_base_and_multilib_build_step termux_step_make_install
 		cd "$TERMUX_PKG_BUILDDIR"
 		termux_step_post_make_install
 		termux_step_install_pacman_hooks

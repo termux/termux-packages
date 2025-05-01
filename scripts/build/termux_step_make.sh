@@ -25,3 +25,7 @@ termux_step_make() {
 			${TERMUX_PKG_EXTRA_CONFIGURE_ARGS:+ $TERMUX_PKG_EXTRA_CONFIGURE_ARGS}
 	fi
 }
+
+termux_step_make_multilib() {
+	termux_step_make
+}
