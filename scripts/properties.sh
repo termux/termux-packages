@@ -1042,7 +1042,7 @@ TERMUX__CACHE_SUBDIR="cache"
 #
 # Default value: `cache/termux/rootfs/0`
 ##
-#TERMUX__CACHE_SUBDIR="cache/termux/rootfs/$TERMUX__ROOTFS_ID"
+#TERMUX__CACHE_SUBDIR="cache/$TERMUX__INTERNAL_NAME/rootfs/$TERMUX__ROOTFS_ID"
 ###########
 
 ##
