@@ -684,11 +684,11 @@ __termux_build_props__add_variables_validator_actions "TERMUX__HOME" "safe_absol
 TERMUX_ANDROID_HOME="$TERMUX__HOME" # Deprecated alternative variable for `TERMUX__HOME`
 
 ##
-# Termux data directory path under `TERMUX__HOME`.
+# Termux legacy project user config directory path under `TERMUX__HOME`.
 #
 # Default value: `/data/data/com.termux/files/home/.termux`
 ##
-TERMUX__DATA_HOME="$TERMUX__HOME/.termux"
+TERMUX__LEGACY_PROJECT_USER_CONFIG_DIR="$TERMUX__HOME/.termux"
 
 
 
@@ -1008,11 +1008,11 @@ TERMUX__PREFIX__PROFILE_D_DIR="$TERMUX__PREFIX__ETC_DIR/profile.d"
 
 
 ##
-# Termux data directory path under `TERMUX__PREFIX__ETC_DIR`.
+# Termux project system config directory path under `TERMUX__PREFIX__ETC_DIR`.
 #
 # Default value: `/data/data/com.termux/files/usr/etc/termux`
 ##
-TERMUX__PREFIX__TERMUX_DATA_ETC_DIR="$TERMUX__PREFIX__ETC_DIR/termux"
+TERMUX__PROJECT_SYSTEM_CONFIG_DIR="$TERMUX__PREFIX__ETC_DIR/$TERMUX__INTERNAL_NAME"
 
 
 
