@@ -197,15 +197,15 @@ fi
 # - `TERMUX_APP__NAME` and `TERMUX_APP__LNAME`.
 # - `TERMUX_APP__APP_IDENTIFIER`.
 # - `TERMUX_APP__NAMESPACE`.
-# - `TERMUX_APP__SHELL_ACTIVITY__*`.
-# - `TERMUX_APP__SHELL_SERVICE__*`.
-# - `TERMUX_APP__RUN_COMMAND_SERVICE__*`.
-# - `TERMUX_APP__DATA_SENDER_BROADCASTRECEIVER__*`.
+# - `TERMUX_APP__SHELL_API__SHELL_API_ACTIVITY__*`.
+# - `TERMUX_APP__SHELL_API__SHELL_API_SERVICE__*`.
+# - `TERMUX_APP__RUN_COMMAND_API__RUN_COMMAND_API_SERVICE__*`.
+# - `TERMUX_APP__DATA_SENDER_API__DATA_SENDER_API_RECEIVER__*`.
 # - `TERMUX_API_APP__PACKAGE_NAME`.
 # - `TERMUX_API_APP__NAME`.
 # - `TERMUX_API_APP__APP_IDENTIFIER`.
 # - `TERMUX_API_APP__NAMESPACE`.
-# - `TERMUX_API_APP__API_RECEIVER_BROADCASTRECEIVER__*`.
+# - `TERMUX_API_APP__ANDROID_API__ANDROID_API_RECEIVER__*`.
 # - `TERMUX_AM_APP__NAMESPACE`.
 ###
 
@@ -292,7 +292,7 @@ TERMUX__REPOS_HOST_ORG_URL="https://github.com/$TERMUX__REPOS_HOST_ORG_NAME"
 
 ##
 # Termux app package name used for `TERMUX_APP__DATA_DIR` and
-# `TERMUX_APP__*_(ACTIVITY|BROADCASTRECEIVER|SERVICE)__*` variables.
+# `TERMUX_APP__*_(ACTIVITY|RECEIVER|SERVICE)__*` variables.
 #
 # Ideally package name should be `<= 21` characters and max `33`
 # characters. If package name has not yet been chosen, then it would
@@ -1505,7 +1505,7 @@ TERMUX_APP__REPO_URL="$TERMUX__REPOS_HOST_ORG_URL/$TERMUX_APP__REPO_NAME"
 ##
 # Termux app namespace, i.e the Java package name under which Termux
 # classes exists used for `TERMUX_APP__*_CLASS__*` and
-# `TERMUX_APP__*_(ACTIVITY|BROADCASTRECEIVER|SERVICE)__*`variables.
+# `TERMUX_APP__*_(ACTIVITY|RECEIVER|SERVICE)__*` variables.
 #
 # **See Also:**
 # - `TERMUX_APP__PACKAGE_NAME`.
@@ -1531,78 +1531,57 @@ __termux_build_props__add_variables_validator_actions "TERMUX_APP__APP_DIR" "saf
 
 
 ##
-# Termux app shell `Activity` class name that hosts the shell/terminal views.
+# Termux app shell API `Activity` class name that hosts the
+# shell/terminal views.
 #
+# **See Also:**
 # - https://github.com/termux/termux-app/blob/master/app/src/main/java/com/termux/app/TermuxActivity.java
 #
 # Default value: `com.termux.app.TermuxActivity`
 ##
-TERMUX_APP__SHELL_ACTIVITY__CLASS_NAME="$TERMUX_APP__NAMESPACE.app.TermuxActivity"
+TERMUX_APP__SHELL_API__SHELL_API_ACTIVITY__CLASS_NAME="$TERMUX_APP__NAMESPACE.app.TermuxActivity"
+
+
 
 ##
-# Termux app shell `Activity` component name for `TERMUX_APP__SHELL_ACTIVITY__CLASS_NAME`.
+# Termux app shell API `Service` class name that hosts the
+# shell/terminal sessions.
 #
-# Default value: `com.termux/com.termux.app.TermuxActivity`
-##
-TERMUX_APP__SHELL_ACTIVITY__COMPONENT_NAME="$TERMUX_APP__PACKAGE_NAME/$TERMUX_APP__SHELL_ACTIVITY__CLASS_NAME"
-
-
-
-##
-# Termux app shell `Service` class name that manages the shells.
-#
+# **See Also:**
 # - https://github.com/termux/termux-app/blob/master/app/src/main/java/com/termux/app/TermuxService.java
 #
 # Default value: `com.termux.app.TermuxService`
 ##
-TERMUX_APP__SHELL_SERVICE__CLASS_NAME="$TERMUX_APP__NAMESPACE.app.TermuxService"
+TERMUX_APP__SHELL_API__SHELL_API_SERVICE__CLASS_NAME="$TERMUX_APP__NAMESPACE.app.TermuxService"
+
+
 
 ##
-# Termux app shell `Service` component name for `TERMUX_APP__SHELL_SERVICE__CLASS_NAME`.
+# Termux app `RUN_COMMAND` API `Service` class name that receives
+# commands sent by 3rd party apps via intents.
 #
-# Default value: `com.termux/com.termux.app.TermuxService`
-##
-TERMUX_APP__SHELL_SERVICE__COMPONENT_NAME="$TERMUX_APP__PACKAGE_NAME/$TERMUX_APP__SHELL_SERVICE__CLASS_NAME"
-
-
-
-##
-# Termux app RUN_COMMAND `Service` class name that receives commands via intents.
-#
+# **See Also:**
 # - https://github.com/termux/termux-app/blob/master/app/src/main/java/com/termux/app/RunCommandService.java
 # - https://github.com/termux/termux-app/wiki/RUN_COMMAND-Intent
 #
 # Default value: `com.termux.app.RunCommandService`
 ##
-TERMUX_APP__RUN_COMMAND_SERVICE__CLASS_NAME="$TERMUX_APP__NAMESPACE.app.RunCommandService"
+TERMUX_APP__RUN_COMMAND_API__RUN_COMMAND_API_SERVICE__CLASS_NAME="$TERMUX_APP__NAMESPACE.app.RunCommandService"
+
+
 
 ##
-# Termux app shell `Service` component name for `TERMUX_APP__RUN_COMMAND_SERVICE__CLASS_NAME`.
+# Termux app data sender API `BroadcastReceiver` class name that
+# receives data view broadcasts and sends the data with `ACTION_SEND`
+# and `ACTION_VIEW` intents to other apps, like by `termux-open`.
 #
-# Default value: `com.termux/com.termux.app.RunCommandService`
-##
-TERMUX_APP__RUN_COMMAND_SERVICE__COMPONENT_NAME="$TERMUX_APP__PACKAGE_NAME/$TERMUX_APP__RUN_COMMAND_SERVICE__CLASS_NAME"
-
-
-
-##
-# Termux app data sender `BroadcastReceiver` class name that receives
-# data view broadcasts and sends the data with `ACTION_SEND` and
-# `ACTION_VIEW` intents to other apps, like by `termux-open`.
-#
+# **See Also:**
 # - https://github.com/termux/termux-app/blob/master/app/src/main/java/com/termux/app/TermuxOpenReceiver.java
 # - https://github.com/termux/termux-tools/blob/master/scripts/termux-open.in
 #
 # Default value: `com.termux.app.TermuxOpenReceiver`
 ##
-TERMUX_APP__DATA_SENDER_BROADCASTRECEIVER__CLASS_NAME="$TERMUX_APP__NAMESPACE.app.TermuxOpenReceiver"
-
-##
-# Termux app data sender `BroadcastReceiver` component name for `TERMUX_APP__DATA_SENDER_BROADCASTRECEIVER__CLASS_NAME`.
-#
-# Default value: `com.termux/com.termux.app.TermuxOpenReceiver`
-##
-TERMUX_APP__DATA_SENDER_BROADCASTRECEIVER__COMPONENT_NAME="$TERMUX_APP__PACKAGE_NAME/$TERMUX_APP__DATA_SENDER_BROADCASTRECEIVER__CLASS_NAME"
+TERMUX_APP__DATA_SENDER_API__DATA_SENDER_API_RECEIVER__CLASS_NAME="$TERMUX_APP__NAMESPACE.app.TermuxOpenReceiver"
 
 
 
@@ -1644,7 +1623,7 @@ __termux_build_props__add_variables_validator_actions "TERMUX_APP__AM_SOCKET__SE
 
 ##
 # Termux:API app package name used for
-# `TERMUX_API_APP__*_(ACTIVITY|BROADCASTRECEIVER|SERVICE)__*` variables.
+# `TERMUX_API_APP__*_(ACTIVITY|RECEIVER|SERVICE)__*` variables.
 #
 # **See Also:**
 # - `TERMUX_API_APP__NAMESPACE`.
@@ -1696,7 +1675,7 @@ TERMUX_API_APP__REPO_URL="$TERMUX__REPOS_HOST_ORG_URL/$TERMUX_API_APP__REPO_NAME
 ##
 # Termux:API app namespace, i.e the Java package name under which
 # Termux:API classes exists used for `TERMUX_API_APP__*_CLASS__*` and
-# `TERMUX_API_APP__*_(ACTIVITY|BROADCASTRECEIVER|SERVICE)__*`variables.
+# `TERMUX_API_APP__*_(ACTIVITY|RECEIVER|SERVICE)__*` variables.
 #
 # **See Also:**
 # - `TERMUX_API_APP__PACKAGE_NAME`.
@@ -1722,23 +1701,17 @@ __termux_build_props__add_variables_validator_actions "TERMUX_API_APP__APP_DIR" 
 
 
 ##
-# Termux:API app API `BroadcastReceiver` class name that receives
-# and processes API requests from command line via `termux-api` native
-# library.
+# Termux:API app Android API `BroadcastReceiver` class name that
+# receives and processes API requests from command line via `termux-api`
+# native exec entry point.
 #
+# **See Also:**
 # - https://github.com/termux/termux-api/blob/master/app/src/main/java/com/termux/api/TermuxApiReceiver.java
 # - https://github.com/termux/termux-api-package/blob/master/termux-api.c
 #
 # Default value: `com.termux.api.TermuxApiReceiver`
 ##
-TERMUX_API_APP__API_RECEIVER_BROADCASTRECEIVER__CLASS_NAME="$TERMUX_API_APP__NAMESPACE.TermuxApiReceiver"
-
-##
-# Termux:API app API `BroadcastReceiver` component name for `TERMUX_API_APP__API_RECEIVER_BROADCASTRECEIVER__CLASS_NAME`.
-#
-# Default value: `com.termux.api/com.termux.api.TermuxApiReceiver`
-##
-TERMUX_API_APP__API_RECEIVER_BROADCASTRECEIVER__COMPONENT_NAME="$TERMUX_API_APP__PACKAGE_NAME/$TERMUX_API_APP__API_RECEIVER_BROADCASTRECEIVER__CLASS_NAME"
+TERMUX_API_APP__ANDROID_API__ANDROID_API_RECEIVER__CLASS_NAME="$TERMUX_API_APP__NAMESPACE.TermuxApiReceiver"
 
 
 
