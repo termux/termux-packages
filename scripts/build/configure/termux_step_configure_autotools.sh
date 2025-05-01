@@ -32,7 +32,7 @@ termux_step_configure_autotools() {
 		QUIET_BUILD="--enable-silent-rules --silent --quiet"
 	fi
 
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && [ ! -d "$TERMUX_PKG_TMPDIR/config-scripts" ]; then
 		# Some packages provides a $PKG-config script which some configure scripts pickup instead of pkg-config:
 		mkdir "$TERMUX_PKG_TMPDIR/config-scripts"
 		for f in $TERMUX_PREFIX/bin/*config; do
@@ -103,9 +103,10 @@ termux_step_configure_autotools() {
 	# shellcheck disable=SC2086
 	env $AVOID_GNULIB "$TERMUX_PKG_SRCDIR/configure" \
 		--disable-dependency-tracking \
-		--prefix=$TERMUX_PREFIX \
-		--libdir=$TERMUX_PREFIX/lib \
-		--sbindir=$TERMUX_PREFIX/bin \
+		--prefix="$TERMUX_PREFIX" \
+		--libdir="$TERMUX__PREFIX__LIB_DIR" \
+		--includedir="$TERMUX__PREFIX__INCLUDE_DIR" \
+		--sbindir="$TERMUX_PREFIX/bin" \
 		--disable-rpath --disable-rpath-hack \
 		$HOST_FLAG \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS \

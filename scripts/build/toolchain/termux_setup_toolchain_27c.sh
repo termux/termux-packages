@@ -1,7 +1,7 @@
 termux_setup_toolchain_27c() {
 	export CFLAGS=""
 	export CPPFLAGS=""
-	export LDFLAGS="-L${TERMUX_PREFIX}/lib"
+	export LDFLAGS="-L${TERMUX__PREFIX__LIB_DIR}"
 
 	export AS=$TERMUX_HOST_PLATFORM-clang
 	export CC=$TERMUX_HOST_PLATFORM-clang
@@ -31,7 +31,7 @@ termux_setup_toolchain_27c() {
 		if [ $TERMUX_ARCH = arm ]; then
 			CCTERMUX_HOST_PLATFORM=armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL
 		fi
-		LDFLAGS+=" -Wl,-rpath=$TERMUX_PREFIX/lib"
+		LDFLAGS+=" -Wl,-rpath=$TERMUX__PREFIX__LIB_DIR"
 	else
 		export CC_FOR_BUILD=$CC
 		# Some build scripts use environment variable 'PKG_CONFIG', so
@@ -83,8 +83,11 @@ termux_setup_toolchain_27c() {
 
 	export CXXFLAGS="$CFLAGS"
 	# set the proper header include order - first package includes, then prefix includes
-	# -isystem${TERMUX_PREFIX}/include/c++/v1 is needed here for on-device building to work correctly
-	export CPPFLAGS+=" -isystem${TERMUX_PREFIX}/include/c++/v1 -isystem${TERMUX_PREFIX}/include"
+	# -isystem${TERMUX__PREFIX__BASE_INCLUDE_DIR}/c++/v1 is needed here for on-device building to work correctly
+	export CPPFLAGS+=" -isystem${TERMUX__PREFIX__BASE_INCLUDE_DIR}/c++/v1 -isystem${TERMUX__PREFIX__INCLUDE_DIR}"
+	if [ "$TERMUX_ARCH" != "$TERMUX_REAL_ARCH" ]; then
+		export CPPFLAGS+=" -isystem${TERMUX__PREFIX__BASE_INCLUDE_DIR}"
+	fi
 
 	# If libandroid-support is declared as a dependency, link to it explicitly:
 	if [ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/libandroid-support/}" ]; then
@@ -95,7 +98,10 @@ termux_setup_toolchain_27c() {
 	export CGO_ENABLED=1
 	export GO_LDFLAGS="-extldflags=-pie"
 	export CGO_LDFLAGS="${LDFLAGS/ -Wl,-z,relro,-z,now/}"
-	export CGO_CFLAGS="-isystem$TERMUX_PREFIX/include"
+	export CGO_CFLAGS="-isystem${TERMUX__PREFIX__INCLUDE_DIR}"
+	if [ "$TERMUX_ARCH" != "$TERMUX_REAL_ARCH" ]; then
+		export CGO_CFLAGS+=" -isystem${TERMUX__PREFIX__BASE_INCLUDE_DIR}"
+	fi
 
 	export CARGO_TARGET_NAME="${TERMUX_ARCH}-linux-android"
 	if [[ "${TERMUX_ARCH}" == "arm" ]]; then
@@ -103,7 +109,7 @@ termux_setup_toolchain_27c() {
 	fi
 	local env_host="${CARGO_TARGET_NAME//-/_}"
 	export CARGO_TARGET_${env_host@U}_LINKER="${CC}"
-	export CARGO_TARGET_${env_host@U}_RUSTFLAGS="-L${TERMUX_PREFIX}/lib -C link-arg=-Wl,-rpath=${TERMUX_PREFIX}/lib -C link-arg=-Wl,--enable-new-dtags"
+	export CARGO_TARGET_${env_host@U}_RUSTFLAGS="-L${TERMUX__PREFIX__LIB_DIR} -C link-arg=-Wl,-rpath=${TERMUX__PREFIX__LIB_DIR} -C link-arg=-Wl,--enable-new-dtags"
 	export CFLAGS_${env_host}="${CPPFLAGS} ${CFLAGS}"
 	export CC_x86_64_unknown_linux_gnu="gcc"
 	export CFLAGS_x86_64_unknown_linux_gnu="-O2"

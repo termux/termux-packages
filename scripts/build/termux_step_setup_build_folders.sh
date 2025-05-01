@@ -3,6 +3,7 @@ termux_step_setup_build_folders() {
 	# permissions which makes them undeletable. We need to fix
 	# that.
 	[ -d "$TERMUX_PKG_BUILDDIR" ] && chmod +w -R "$TERMUX_PKG_BUILDDIR" || true
+	[ -d "$TERMUX_PKG_MULTILIB_BUILDDIR" ] && chmod +w -R "$TERMUX_PKG_MULTILIB_BUILDDIR" || true
 	[ -d "$TERMUX_PKG_SRCDIR" ] && chmod +w -R "$TERMUX_PKG_SRCDIR" || true
 	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && \
 		   [ "$TERMUX_INSTALL_DEPS" = true ] && \
@@ -17,6 +18,7 @@ termux_step_setup_build_folders() {
 
 	# Cleanup old build state:
 	rm -Rf "$TERMUX_PKG_BUILDDIR" \
+		"$TERMUX_PKG_MULTILIB_BUILDDIR" \
 		"$TERMUX_PKG_SRCDIR"
 
 	# Cleanup old packaging state:
@@ -48,6 +50,9 @@ termux_step_setup_build_folders() {
 		 "$TERMUX_PKG_TMPDIR" \
 		 "$TERMUX_PKG_CACHEDIR" \
 		 "$TERMUX_PKG_MASSAGEDIR"
+	if [ "$TERMUX_PKG_BUILD_MULTILIB" = "true" ] && [ "$TERMUX_PKG_BUILD_ONLY_MULTILIB" = "false" ]; then
+		mkdir -p "$TERMUX_PKG_MULTILIB_BUILDDIR"
+	fi
 	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
 		mkdir -p $TERMUX_PREFIX/{bin,etc,lib,libexec,share,share/LICENSES,tmp,include}
 	elif [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then

@@ -34,3 +34,7 @@ termux_step_make_install() {
 			$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 	fi
 }
+
+termux_step_make_install_multilib() {
+	termux_step_make_install
+}

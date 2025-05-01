@@ -182,6 +182,37 @@ termux_step_massage() {
 		fi
 	fi
 
+	# Remove duplicate headers from `include32/` directory
+	if [[ -d ./${ADDING_PREFIX}/include32 && -d ${TERMUX__PREFIX__BASE_INCLUDE_DIR} ]]; then
+		local hpath
+		for hpath in $(find ./${ADDING_PREFIX}/include32 -type f); do
+			local h=$(sed "s|./${ADDING_PREFIX}/include32/||g" <<< "$hpath")
+			if [[ -f "${TERMUX__PREFIX__BASE_INCLUDE_DIR}/${h}" && \
+				"$(md5sum < "${hpath}")" = "$(md5sum < "${TERMUX__PREFIX__BASE_INCLUDE_DIR}/${h}")" ]]; then
+				rm "${hpath}"
+			fi
+		done
+	fi
+
+	# Configure pkgconfig files for proper multilib-compilation
+	if [[ -d ./${ADDING_PREFIX}/lib32/pkgconfig ]]; then
+		local pc
+		for pc in $(grep -s -r -l "^includedir=.*/include32" ./${ADDING_PREFIX}/lib32/pkgconfig); do
+			local pc_cflags="$(grep '^Cflags:' "${pc}" | awk -F ':' '{printf $2 "\n"}')"
+			if ! grep -q ' -I' <<< "${pc_cflags}"; then
+				continue
+			fi
+			local pc_multilib_path="$(grep '^includedir=' "${pc}" | sed "s|${TERMUX_PREFIX}|\${prefix}|g" | awk -F '{prefix}/include' '{printf $2}')"
+			local pc_edit_cflags="$(sed "s|\${includedir}|\${includedir}${pc_multilib_path}|g" <<< "${pc_cflags}")"
+			local pc_new_cflags="$(tr ' ' '\n' <<< "${pc_edit_cflags}" | sed 's|\({includedir}\)32|\1|gp; s|\(/include\)32|\1|gp; d' | tr '\n' ' ')"
+			sed -i -e "s|\(^includedir=.*/\)include32\(.*\)|\1include|g" \
+				-e "s|^Cflags:${pc_cflags}$|Cflags:${pc_edit_cflags} ${pc_new_cflags::-1}|g" \
+				"${pc}"
+			# Apply the modified pkgconfig to the system for proper multilib-compilation work
+			cp -r "${pc}" "${TERMUX__PREFIX__MULTI_LIB_DIR}/pkgconfig"
+		done
+	fi
+
 	# Check for directory "$PREFIX/man" which indicates packaging error.
 	if [ -d "./${ADDING_PREFIX}man" ]; then
 		termux_error_exit "Package contains directory \"\$PREFIX/man\" ($TERMUX_PREFIX/man). Use \"\$PREFIX/share/man\" ($TERMUX_PREFIX/share/man) instead."

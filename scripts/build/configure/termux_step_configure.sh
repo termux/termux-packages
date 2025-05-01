@@ -32,3 +32,7 @@ termux_step_configure() {
 		termux_step_configure_meson
 	fi
 }
+
+termux_step_configure_multilib() {
+	termux_step_configure
+}
