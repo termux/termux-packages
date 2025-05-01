@@ -195,7 +195,7 @@ fi
 # - `TERMUX__PREFIX` and alternates.
 # - `TERMUX_ANDROID_HOME` and alternates.
 # - `TERMUX_APP__NAME` and `TERMUX_APP__LNAME`.
-# - `TERMUX_APP__IDENTIFIER`.
+# - `TERMUX_APP__APP_IDENTIFIER`.
 # - `TERMUX_APP__NAMESPACE`.
 # - `TERMUX_APP__SHELL_ACTIVITY__*`.
 # - `TERMUX_APP__SHELL_SERVICE__*`.
@@ -203,7 +203,7 @@ fi
 # - `TERMUX_APP__DATA_SENDER_BROADCASTRECEIVER__*`.
 # - `TERMUX_API_APP__PACKAGE_NAME`.
 # - `TERMUX_API_APP__NAME`.
-# - `TERMUX_API_APP__IDENTIFIER`.
+# - `TERMUX_API_APP__APP_IDENTIFIER`.
 # - `TERMUX_API_APP__NAMESPACE`.
 # - `TERMUX_API_APP__API_RECEIVER_BROADCASTRECEIVER__*`.
 # - `TERMUX_AM_APP__NAMESPACE`.
@@ -410,9 +410,9 @@ __termux_build_props__add_variables_validator_actions "TERMUX__CORE_DIR" "safe_a
 ##
 # Termux subdirectory path for `TERMUX__APPS_DIR`.
 #
-# Constant value: `apps`
+# Constant value: `app`
 ##
-TERMUX__APPS_SUBDIR="apps"
+TERMUX__APPS_SUBDIR="app"
 
 ##
 # Termux apps directory path under `TERMUX__PROJECT_DIR`.
@@ -424,7 +424,7 @@ TERMUX__APPS_SUBDIR="apps"
 #
 # - https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#termux-apps-directory
 #
-# Default value: `/data/data/com.termux/termux/apps`
+# Default value: `/data/data/com.termux/termux/app`
 ##
 TERMUX__APPS_DIR="$TERMUX__PROJECT_DIR/$TERMUX__APPS_SUBDIR"
 __termux_build_props__add_variables_validator_actions "TERMUX__APPS_DIR" "safe_absolute_path"
@@ -463,7 +463,7 @@ TERMUX__APPS_DIR_BY_IDENTIFIER_SUBDIR="i"
 ##
 # Termux apps directory path by app identifier under `TERMUX__APPS_DIR`.
 #
-# Default value: `/data/data/com.termux/termux/apps/i`
+# Default value: `/data/data/com.termux/termux/app/i`
 ##
 TERMUX__APPS_DIR_BY_IDENTIFIER="$TERMUX__APPS_DIR/$TERMUX__APPS_DIR_BY_IDENTIFIER_SUBDIR"
 
@@ -474,7 +474,7 @@ TERMUX__APPS_DIR_BY_IDENTIFIER="$TERMUX__APPS_DIR/$TERMUX__APPS_DIR_BY_IDENTIFIE
 #
 # The app identifier must only contain characters in the range
 # `[a-zA-Z0-9]` as segments, with `[._-]` as separators between
-# segments, and with the first segment containing at least 3
+# segments, and with the first segment containing at least `3`
 # characters. The max length `10` as per
 # `TERMUX__APPS_APP_IDENTIFIER___MAX_LEN` is not checked by this regex
 # and must be checked separately.
@@ -510,7 +510,7 @@ TERMUX__APPS_DIR_BY_UID_SUBDIR="u"
 # Termux apps directory path by app uid (user_id + app_id) under
 # `TERMUX__APPS_DIR`.
 #
-# Default value: `/data/data/com.termux/termux/apps/u`
+# Default value: `/data/data/com.termux/termux/app/u`
 ##
 TERMUX__APPS_DIR_BY_UID="$TERMUX__APPS_DIR/$TERMUX__APPS_DIR_BY_UID_SUBDIR"
 
@@ -1472,7 +1472,7 @@ TERMUX_APP__LNAME="${TERMUX_APP__NAME,,}"
 # Validation regex: `TERMUX__APPS_APP_IDENTIFIER_REGEX`
 # Max length: `TERMUX__APPS_APP_IDENTIFIER___MAX_LEN`
 ##
-TERMUX_APP__IDENTIFIER="termux"
+TERMUX_APP__APP_IDENTIFIER="termux"
 
 
 
@@ -1513,10 +1513,10 @@ __termux_build_props__add_variables_validator_actions "TERMUX_APP__NAMESPACE" "a
 ##
 # Termux app apps directory path under `TERMUX__APPS_DIR_BY_IDENTIFIER`.
 #
-# Default value: `/data/data/com.termux/termux/apps/i/termux`
+# Default value: `/data/data/com.termux/termux/app/i/termux`
 ##
-TERMUX_APP__APPS_DIR="$TERMUX__APPS_DIR_BY_IDENTIFIER/$TERMUX_APP__IDENTIFIER"
-__termux_build_props__add_variables_validator_actions "TERMUX_APP__APPS_DIR" "safe_absolute_path"
+TERMUX_APP__APP_DIR="$TERMUX__APPS_DIR_BY_IDENTIFIER/$TERMUX_APP__APP_IDENTIFIER"
+__termux_build_props__add_variables_validator_actions "TERMUX_APP__APP_DIR" "safe_absolute_path"
 
 
 
@@ -1599,27 +1599,27 @@ TERMUX_APP__DATA_SENDER_BROADCASTRECEIVER__COMPONENT_NAME="$TERMUX_APP__PACKAGE_
 
 
 ##
-# Termux apps info environment file path for the Termux app under `TERMUX_APP__APPS_DIR`.
+# Termux apps info environment file path for the Termux app under `TERMUX_APP__APP_DIR`.
 #
-# Default value: `/data/data/com.termux/termux/apps/i/termux/termux-apps-info.env`
+# Default value: `/data/data/com.termux/termux/app/i/termux/termux-apps-info.env`
 ##
-TERMUX_APP__CORE__APPS_INFO_ENV_FILE="$TERMUX_APP__APPS_DIR/$TERMUX_CORE__APPS_INFO_ENV_SUBFILE"
+TERMUX_APP__CORE__APPS_INFO_ENV_FILE="$TERMUX_APP__APP_DIR/$TERMUX_CORE__APPS_INFO_ENV_SUBFILE"
 __termux_build_props__add_variables_validator_actions "TERMUX_APP__CORE__APPS_INFO_ENV_FILE" "safe_absolute_path"
 
 ##
-# Termux apps info json file path for the Termux app under `TERMUX_APP__APPS_DIR`.
+# Termux apps info json file path for the Termux app under `TERMUX_APP__APP_DIR`.
 #
-# Default value: `/data/data/com.termux/termux/apps/i/termux/termux-apps-info.json`
+# Default value: `/data/data/com.termux/termux/app/i/termux/termux-apps-info.json`
 ##
-TERMUX_APP__CORE__APPS_INFO_JSON_FILE="$TERMUX_APP__APPS_DIR/$TERMUX_CORE__APPS_INFO_JSON_SUBFILE"
+TERMUX_APP__CORE__APPS_INFO_JSON_FILE="$TERMUX_APP__APP_DIR/$TERMUX_CORE__APPS_INFO_JSON_SUBFILE"
 __termux_build_props__add_variables_validator_actions "TERMUX_APP__CORE__APPS_INFO_JSON_FILE" "safe_absolute_path"
 
 ##
-# `termux-am-socket` server file path for the Termux app under `TERMUX_APP__APPS_DIR`.
+# `termux-am-socket` server file path for the Termux app under `TERMUX_APP__APP_DIR`.
 #
-# Default value: `/data/data/com.termux/termux/apps/i/termux/termux-am`
+# Default value: `/data/data/com.termux/termux/app/i/termux/termux-am`
 ##
-TERMUX_APP__AM_SOCKET__SERVER_SOCKET_FILE="$TERMUX_APP__APPS_DIR/$TERMUX_AM_SOCKET__SERVER_SOCKET_SUBFILE"
+TERMUX_APP__AM_SOCKET__SERVER_SOCKET_FILE="$TERMUX_APP__APP_DIR/$TERMUX_AM_SOCKET__SERVER_SOCKET_SUBFILE"
 __termux_build_props__add_variables_validator_actions "TERMUX_APP__AM_SOCKET__SERVER_SOCKET_FILE" "safe_absolute_path unix_path_max"
 
 
@@ -1660,7 +1660,7 @@ TERMUX_API_APP__NAME="$TERMUX__NAME:API"
 # Validation regex: `TERMUX__APPS_APP_IDENTIFIER_REGEX`
 # Max length: `TERMUX__APPS_APP_IDENTIFIER___MAX_LEN`
 ##
-TERMUX_API_APP__IDENTIFIER="termuxapi"
+TERMUX_API_APP__APP_IDENTIFIER="termuxapi"
 
 
 
@@ -1701,10 +1701,10 @@ __termux_build_props__add_variables_validator_actions "TERMUX_API_APP__NAMESPACE
 ##
 # Termux:API app apps directory path under `TERMUX__APPS_DIR_BY_IDENTIFIER`.
 #
-# Default value: `/data/data/com.termux/termux/apps/i/termuxapi`
+# Default value: `/data/data/com.termux/termux/app/i/termuxapi`
 ##
-TERMUX_API_APP__APPS_DIR="$TERMUX__APPS_DIR_BY_IDENTIFIER/$TERMUX_API_APP__IDENTIFIER"
-__termux_build_props__add_variables_validator_actions "TERMUX_API_APP__APPS_DIR" "safe_absolute_path"
+TERMUX_API_APP__APP_DIR="$TERMUX__APPS_DIR_BY_IDENTIFIER/$TERMUX_API_APP__APP_IDENTIFIER"
+__termux_build_props__add_variables_validator_actions "TERMUX_API_APP__APP_DIR" "safe_absolute_path"
 
 
 
@@ -2016,7 +2016,7 @@ TERMUX_REGEX__APP_DATA_DIR_PATH='^(((/data/data)|(/data/user/[0-9]+)|(/mnt/expan
 TERMUX_REPO_APP__PACKAGE_NAME="com.termux"
 TERMUX_REPO_APP__DATA_DIR="/data/data/com.termux"
 TERMUX_REPO__CORE_DIR="/data/data/com.termux/termux/core"
-TERMUX_REPO__APPS_DIR="/data/data/com.termux/termux/apps"
+TERMUX_REPO__APPS_DIR="/data/data/com.termux/termux/app"
 TERMUX_REPO__ROOTFS="/data/data/com.termux/files"
 TERMUX_REPO__HOME="/data/data/com.termux/files/home"
 TERMUX_REPO__PREFIX="/data/data/com.termux/files/usr"
@@ -2291,16 +2291,16 @@ including the null \`\0\` terminator." 1>&2
     fi
 
 
-    if [[ ! "$TERMUX_APP__IDENTIFIER" =~ ${TERMUX__APPS_APP_IDENTIFIER_REGEX:?} ]]; then
-        echo "The TERMUX_APP__IDENTIFIER '$TERMUX_APP__IDENTIFIER' with length ${#TERMUX_APP__IDENTIFIER} is invalid." 1>&2
+    if [[ ! "$TERMUX_APP__APP_IDENTIFIER" =~ ${TERMUX__APPS_APP_IDENTIFIER_REGEX:?} ]]; then
+        echo "The TERMUX_APP__APP_IDENTIFIER '$TERMUX_APP__APP_IDENTIFIER' with length ${#TERMUX_APP__APP_IDENTIFIER} is invalid." 1>&2
         echo "Check 'TERMUX__APPS_APP_IDENTIFIER_REGEX' variable docs for info on what is a valid app identifier." 1>&2
         return 1
     fi
 
     if [[ "$__TERMUX_BUILD_PROPS__VALIDATE_PATHS_MAX_LEN" == "true" ]] && \
-            [ "${#TERMUX_APP__IDENTIFIER}" -gt ${TERMUX__APPS_APP_IDENTIFIER___MAX_LEN:?} ]; then
-        echo "The TERMUX_APP__IDENTIFIER '$TERMUX_APP__IDENTIFIER' with length ${#TERMUX_APP__IDENTIFIER} is invalid." 1>&2
-        echo "The TERMUX_APP__IDENTIFIER must have max length \
+            [ "${#TERMUX_APP__APP_IDENTIFIER}" -gt ${TERMUX__APPS_APP_IDENTIFIER___MAX_LEN:?} ]; then
+        echo "The TERMUX_APP__APP_IDENTIFIER '$TERMUX_APP__APP_IDENTIFIER' with length ${#TERMUX_APP__APP_IDENTIFIER} is invalid." 1>&2
+        echo "The TERMUX_APP__APP_IDENTIFIER must have max length \
 \`<= TERMUX__APPS_APP_IDENTIFIER___MAX_LEN ($TERMUX__APPS_APP_IDENTIFIER___MAX_LEN)\`." 1>&2
         return 1
     fi
