@@ -576,11 +576,20 @@ __termux_build_props__add_variables_validator_actions "TERMUX__ROOTFS_SUBDIR" "a
 # design. Make sure to update `TERMUX__CACHE_SUBDIR` above as well.
 
 ##
+# Termux subdirectory path for parent directory of all Termux rootfses
+# including `TERMUX__ROOTFS`.
+#
+# Default value: `termux/rootfs`
+##
+#TERMUX__ROOTFSES_SUBDIR="$TERMUX__PROJECT_SUBDIR/rootfs"
+###########
+
+##
 # Termux subdirectory path for `TERMUX__ROOTFS`.
 #
 # Default value: `termux/rootfs/0`
 ##
-#TERMUX__ROOTFS_SUBDIR="$TERMUX__PROJECT_SUBDIR/rootfs/$TERMUX__ROOTFS_ID"
+#TERMUX__ROOTFS_SUBDIR="$TERMUX__ROOTFSES_SUBDIR/$TERMUX__ROOTFS_ID"
 ###########
 
 
