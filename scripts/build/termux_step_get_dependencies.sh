@@ -1,85 +1,81 @@
 termux_step_get_dependencies() {
-	if [ "$TERMUX_SKIP_DEPCHECK" = true ] || [ "$TERMUX_PKG_METAPACKAGE" = true ]; then
+	if [[ "$TERMUX_SKIP_DEPCHECK" == "true" || "$TERMUX_PKG_METAPACKAGE" == "true" ]]; then
 		return 0
 	fi
 
-	if [ "$TERMUX_INSTALL_DEPS" = true ]; then
+	if [[ "$TERMUX_INSTALL_DEPS" == "true" ]]; then
 		# Download repo files
 		termux_download_repo_file
 	fi
 
 	while read PKG PKG_DIR; do
 		# Checking for duplicate dependencies
-		local cyclic_dependence=false
+		local cyclic_dependence="false"
 		if termux_check_package_in_building_packages_list "$PKG_DIR"; then
 			echo "A circular dependency was found on '$PKG', the old version of the package will be installed to resolve the conflict"
-			cyclic_dependence=true
-			if [ "$TERMUX_INSTALL_DEPS" = false ]; then
+			cyclic_dependence="true"
+			if [[ "$TERMUX_INSTALL_DEPS" == "false" ]]; then
 				termux_download_repo_file
 			fi
 		fi
 
-		if [ "$TERMUX_INSTALL_DEPS" = true ] || [ "$cyclic_dependence" = true ]; then
-			if [ -z $PKG ]; then
+		if [[ "$TERMUX_INSTALL_DEPS" == "true" || "$cyclic_dependence" = "true" ]]; then
+			if [[ -z "$PKG" ]]; then
 				continue
-			elif [ "$PKG" = "ERROR" ]; then
+			elif [[ "$PKG" == "ERROR" ]]; then
 				termux_error_exit "Obtaining buildorder failed"
 			fi
 			# llvm doesn't build if ndk-sysroot is installed:
-			if [ "$PKG" = "ndk-sysroot" ]; then continue; fi
+			if [[ "$PKG" == "ndk-sysroot" ]]; then continue; fi
 			read DEP_ARCH DEP_VERSION DEP_VERSION_PAC <<< $(termux_extract_dep_info $PKG "${PKG_DIR}")
-			if [ "$cyclic_dependence" = false ]; then
-				[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "Downloading dependency $PKG$(test ${TERMUX_WITHOUT_DEPVERSION_BINDING} = false && echo "@$DEP_VERSION") if necessary..."
+			local pkg_versioned="$PKG"
+			[[ "${TERMUX_WITHOUT_DEPVERSION_BINDING}" == "false" ]] && pkg_versioned+="@$DEP_VERSION"
+			if [[ "$cyclic_dependence" == "false" ]]; then
+				[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo "Downloading dependency $pkg_versioned if necessary..."
 				local force_build_dependency="$TERMUX_FORCE_BUILD_DEPENDENCIES"
-				if [ "$TERMUX_FORCE_BUILD_DEPENDENCIES" = "true" ] && [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && ! termux_package__is_package_on_device_build_supported "$PKG_DIR"; then
+				if [[ "$TERMUX_FORCE_BUILD_DEPENDENCIES" == "true" && "$TERMUX_ON_DEVICE_BUILD" == "true" ]] && ! termux_package__is_package_on_device_build_supported "$PKG_DIR"; then
 					echo "Building dependency $PKG on device is not supported. It will be downloaded..."
 					force_build_dependency="false"
 				fi
 			else
-				local force_build_dependency=false
+				local force_build_dependency="false"
 			fi
-			local build_dependency=false
-			if [ "$force_build_dependency" = "true" ]; then
-				[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "Force building dependency $PKG instead of downloading due to -I flag..."
+			local build_dependency="false"
+			if [[ "$force_build_dependency" = "true" ]]; then
+				[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo "Force building dependency $PKG instead of downloading due to -I flag..."
 				termux_force_check_package_dependency && continue
 				build_dependency=true
 			else
 				if termux_package__is_package_version_built "$PKG" "$DEP_VERSION"; then
-					[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "Skipping already built dependency $PKG$(test ${TERMUX_WITHOUT_DEPVERSION_BINDING} = false && echo "@$DEP_VERSION")"
+					[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo "Skipping already built dependency $pkg_versioned"
 					continue
 				fi
-				if ! TERMUX_WITHOUT_DEPVERSION_BINDING=$(test "${cyclic_dependence}" = "true" && echo "true" || echo "${TERMUX_WITHOUT_DEPVERSION_BINDING}") termux_download_deb_pac $PKG $DEP_ARCH $DEP_VERSION $DEP_VERSION_PAC; then
-					if [ "$cyclic_dependence" = "true" ] || ([ "$TERMUX_FORCE_BUILD_DEPENDENCIES" = "true" ] && [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]); then
-						echo "Download of $PKG$(test ${TERMUX_WITHOUT_DEPVERSION_BINDING} = false && test ${cyclic_dependence} = false && echo "@$DEP_VERSION") from $TERMUX_REPO_URL failed"
+				if ! TERMUX_WITHOUT_DEPVERSION_BINDING="$([[ "${cyclic_dependence}" == "true" ]] && echo "true" || echo "${TERMUX_WITHOUT_DEPVERSION_BINDING}")" termux_download_deb_pac $PKG $DEP_ARCH $DEP_VERSION $DEP_VERSION_PAC; then
+					if [[ "$cyclic_dependence" == "true" || ( "$TERMUX_FORCE_BUILD_DEPENDENCIES" == "true" && "$TERMUX_ON_DEVICE_BUILD" == "true" ) ]]; then
+						echo "Download of $PKG$([[ "${TERMUX_WITHOUT_DEPVERSION_BINDING}" == "false" && "${cyclic_dependence}" == "false" ]] && echo "@$DEP_VERSION") from $TERMUX_REPO_URL failed"
 						return 1
 					else
-						echo "Download of $PKG$(test ${TERMUX_WITHOUT_DEPVERSION_BINDING} = false && echo "@$DEP_VERSION") from $TERMUX_REPO_URL failed, building instead"
+						echo "Download of $pkg_versioned from $TERMUX_REPO_URL failed, building instead"
 						build_dependency=true
 					fi
 				fi
 			fi
-			if [ "$cyclic_dependence" = false ]; then
+			if [[ "$cyclic_dependence" == "false" ]]; then
 				if $build_dependency; then
 					termux_run_build-package
 					continue
 				fi
 				termux_add_package_to_built_packages_list "$PKG"
 			fi
-			if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-				[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "extracting $PKG to $TERMUX_COMMON_CACHEDIR-$DEP_ARCH..."
+			if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
+				[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo "extracting $PKG to $TERMUX_COMMON_CACHEDIR-$DEP_ARCH..."
 				(
 					cd $TERMUX_COMMON_CACHEDIR-$DEP_ARCH
-					if [ "$TERMUX_REPO_PKG_FORMAT" = "debian" ]; then
-						ar x ${PKG}_${DEP_VERSION}_${DEP_ARCH}.deb data.tar.xz
-						if tar -tf data.tar.xz|grep "^./$">/dev/null; then
-							# Strip prefixed ./, to avoid possible
-							# permission errors from tar
-							tar -xf data.tar.xz --strip-components=1 \
-								--no-overwrite-dir -C /
-						else
-							tar -xf data.tar.xz --no-overwrite-dir -C /
-						fi
-					elif [ "$TERMUX_REPO_PKG_FORMAT" = "pacman" ]; then
+					if [[ "$TERMUX_REPO_PKG_FORMAT" == "debian" ]]; then
+						# Ignore topdir `.`, to avoid possible  permission errors from tar
+						ar p ${PKG}_${DEP_VERSION}_${DEP_ARCH}.deb data.tar.xz | \
+							tar xJ --no-overwrite-dir --transform='s#^.$#data#' -C /
+					elif [[ "$TERMUX_REPO_PKG_FORMAT" == "pacman" ]]; then
 						tar -xJf "${PKG}-${DEP_VERSION_PAC}-${DEP_ARCH}.pkg.tar.xz" \
 							--anchored --exclude=.{BUILDINFO,PKGINFO,MTREE,INSTALL} \
 							--force-local --no-overwrite-dir -C /
@@ -87,36 +83,36 @@ termux_step_get_dependencies() {
 				)
 			fi
 			mkdir -p $TERMUX_BUILT_PACKAGES_DIRECTORY
-			if [ "$cyclic_dependence" = "false" ] && ([ "$TERMUX_WITHOUT_DEPVERSION_BINDING" = "false" ] || [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]); then
+			if [[ "$cyclic_dependence" == "false" && ( "$TERMUX_WITHOUT_DEPVERSION_BINDING" == "false" || "$TERMUX_ON_DEVICE_BUILD" == "false" ) ]]; then
 				echo "$DEP_VERSION" > "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG"
 			fi
 		else
 		# Build dependencies
-			if [ -z $PKG ]; then
+			if [[ -z "$PKG" ]]; then
 				continue
-			elif [ "$PKG" = "ERROR" ]; then
+			elif [[ "$PKG" == "ERROR" ]]; then
 				termux_error_exit "Obtaining buildorder failed"
 			fi
 			# Built dependencies are put in the default TERMUX_OUTPUT_DIR instead of the specified one
-			if [ "$TERMUX_FORCE_BUILD_DEPENDENCIES" = "true" ]; then
-				[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "Force building dependency $PKG..."
-				if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && ! termux_package__is_package_on_device_build_supported "$PKG_DIR"; then
+			if [[ "$TERMUX_FORCE_BUILD_DEPENDENCIES" == "true" ]]; then
+				[[ "$TERMUX_QUIET_BUILD" != true ]] && echo "Force building dependency $PKG..."
+				if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]] && ! termux_package__is_package_on_device_build_supported "$PKG_DIR"; then
 					echo "Building $PKG on device is not supported. Consider passing -I flag to download it instead"
 					return 1
 				fi
-				read DEP_ARCH DEP_VERSION DEP_VERSION_PAC <<< $(termux_extract_dep_info $PKG "${PKG_DIR}")
+				read DEP_ARCH DEP_VERSION DEP_VERSION_PAC < <(termux_extract_dep_info $PKG "${PKG_DIR}")
 				termux_force_check_package_dependency && continue
 			else
-				[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "Building dependency $PKG if necessary..."
+				[[ "$TERMUX_QUIET_BUILD" != true ]] && echo "Building dependency $PKG if necessary..."
 			fi
 			termux_run_build-package
 		fi
-	done<<<$(./scripts/buildorder.py $(test "${TERMUX_INSTALL_DEPS}" = "true" && echo "-i") "$TERMUX_PKG_BUILDER_DIR" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
+	done < <(./scripts/buildorder.py $([[ "${TERMUX_INSTALL_DEPS}" == "true" ]] && echo "-i") "$TERMUX_PKG_BUILDER_DIR" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
 }
 
 termux_force_check_package_dependency() {
 	if termux_check_package_in_built_packages_list "$PKG" && termux_package__is_package_version_built "$PKG" "$DEP_VERSION"; then
-		[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "Skipping already built dependency $PKG$(test ${TERMUX_WITHOUT_DEPVERSION_BINDING} = false && echo "@$DEP_VERSION")"
+		[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo "Skipping already built dependency $PKG$([[ "${TERMUX_WITHOUT_DEPVERSION_BINDING}" == "false" ]] && echo "@$DEP_VERSION")"
 		return 0
 	fi
 	return 1
@@ -133,10 +129,10 @@ termux_run_build-package() {
 		fi
 	fi
 	TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh \
- 		$(test "${TERMUX_INSTALL_DEPS}" = "true" && echo "-I" || echo "-s") \
- 		$({ test "${TERMUX_FORCE_BUILD}" = "true" && test "${TERMUX_FORCE_BUILD_DEPENDENCIES}" = "true"; } && echo "-F") \
- 		$(test "${TERMUX_PKGS__BUILD__RM_ALL_PKG_BUILD_DEPENDENT_DIRS}" = "true" && echo "-r") \
-   		$(test "${TERMUX_WITHOUT_DEPVERSION_BINDING}" = "true" && echo "-w") \
+ 		$([[ "${TERMUX_INSTALL_DEPS}" == "true" ]] && echo "-I" || echo "-s") \
+ 		$([[ "${TERMUX_FORCE_BUILD}" == "true" && "${TERMUX_FORCE_BUILD_DEPENDENCIES}" == "true" ]] && echo "-F") \
+ 		$([[ "${TERMUX_PKGS__BUILD__RM_ALL_PKG_BUILD_DEPENDENT_DIRS}" == "true" ]] && echo "-r") \
+   		$([[ "${TERMUX_WITHOUT_DEPVERSION_BINDING}" = "true" ]] && echo "-w") \
      		--format $TERMUX_PACKAGE_FORMAT --library $set_library "${PKG_DIR}"
 }
 
