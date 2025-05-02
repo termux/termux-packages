@@ -4,11 +4,10 @@ TERMUX_PKG_DESCRIPTION="Telegram Desktop Client"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LEGAL"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=5.13.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=5.14.1
 TERMUX_PKG_SRCURL=https://github.com/telegramdesktop/tdesktop/releases/download/v$TERMUX_PKG_VERSION/tdesktop-$TERMUX_PKG_VERSION-full.tar.gz
-TERMUX_PKG_SHA256=caa37bbf7d9fcdfecdb5f596f02a44becbe468ea5c6af7f3c670b61952744a80
-TERMUX_PKG_DEPENDS="abseil-cpp, boost, ffmpeg, glib, hicolor-icon-theme, hunspell, kf6-kcoreaddons, libandroid-shmem, libdispatch, libdrm, liblz4, libminizip, protobuf, librnnoise, libsigc++-3.0, libx11, libxcomposite, libxdamage, libxrandr, libxtst, openal-soft, opengl, openh264, openssl, pipewire, pulseaudio, qt6-qtbase, qt6-qtimageformats, qt6-qtsvg, xxhash"
+TERMUX_PKG_SHA256=42d3130292b21928f04e39539f4e7358206bde913ea6e5171b0ffdeb38b9872e
+TERMUX_PKG_DEPENDS="abseil-cpp, boost, ffmpeg, glib, hicolor-icon-theme, hunspell, kf6-kcoreaddons, libandroid-shmem, libc++, libdispatch, libdrm, liblz4, libminizip, protobuf, librnnoise, libsigc++-3.0, libx11, libxcomposite, libxdamage, libxrandr, libxtst, openal-soft, opengl, openh264, openssl, pipewire, pulseaudio, qt6-qtbase, qt6-qtimageformats, qt6-qtsvg, xxhash, zlib"
 TERMUX_PKG_BUILD_DEPENDS="ada, boost-headers, glib-cross, qt6-qtbase-cross-tools"
 TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_AUTO_UPDATE=true
@@ -28,6 +27,64 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLIBTGVOIP_DISABLE_PULSEAUDIO=OFF
 "
 
+__tg_owt_fetch_source() {
+	local _commit=$(TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR bash $TERMUX_PKG_BUILDER_DIR/get_tg_owt_commit.sh)
+	if [ ! -d "$TERMUX_PKG_CACHEDIR/tg_owt-$_commit" ]; then
+		pushd $TERMUX_PKG_CACHEDIR
+		rm -rf tg_owt-tmp
+		git init tg_owt-tmp
+		pushd tg_owt-tmp
+		git remote add origin https://github.com/desktop-app/tg_owt.git
+		git fetch --depth=1 origin $_commit
+		git reset --hard FETCH_HEAD
+		git submodule update --init --recursive --depth=1
+		rm -rf .git
+		popd # tg_owt
+		mv tg_owt-tmp tg_owt-$_commit
+		popd # $TERMUX_PKG_CACHEDIR
+
+	fi
+	rm -rf $TERMUX_PKG_SRCDIR/tg_owt
+	mkdir -p $TERMUX_PKG_SRCDIR/tg_owt
+	cp -Rf $TERMUX_PKG_CACHEDIR/tg_owt-$_commit/* $TERMUX_PKG_SRCDIR/tg_owt/
+}
+
+__libtd_fetch_source() {
+	local _commit=$(TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR bash $TERMUX_PKG_BUILDER_DIR/get_libtd_commit.sh)
+	if [ ! -d "$TERMUX_PKG_CACHEDIR/libtd-$_commit" ]; then
+		pushd $TERMUX_PKG_CACHEDIR
+		rm -rf libtd-tmp
+		git init libtd-tmp
+		pushd libtd-tmp
+		git remote add origin https://github.com/tdlib/td.git
+		git fetch --depth=1 origin $_commit
+		git reset --hard FETCH_HEAD
+		git submodule update --init --recursive --depth=1
+		rm -rf .git
+		popd # libtd
+		mv libtd-tmp libtd-$_commit
+		popd # $TERMUX_PKG_CACHEDIR
+
+	fi
+	rm -rf $TERMUX_PKG_SRCDIR/libtd
+	mkdir -p $TERMUX_PKG_SRCDIR/libtd
+	cp -Rf $TERMUX_PKG_CACHEDIR/libtd-$_commit/* $TERMUX_PKG_SRCDIR/libtd/
+}
+
+termux_step_post_get_source() {
+	__tg_owt_fetch_source
+	__libtd_fetch_source
+
+	# Dummy some files to make sure that the usage of code path of Linux rather than Android
+	mv Telegram/ThirdParty/libtgvoip/os/android Telegram/ThirdParty/libtgvoip/os/android.unused
+	mkdir -p Telegram/ThirdParty/libtgvoip/os/android
+	local _file
+	for _file in Telegram/ThirdParty/libtgvoip/os/android.unused/*.h; do
+		local _name=$(basename $_file)
+		echo "#error \"DO NOT INCLUDE THIS FILE\"" > Telegram/ThirdParty/libtgvoip/os/android/"$_name"
+	done
+}
+
 __cppgir_build() {
 	termux_setup_cmake
 
@@ -41,6 +98,20 @@ __cppgir_build() {
 		$TERMUX_PKG_SRCDIR/cmake/external/glib/cppgir
 	make -j $TERMUX_PKG_MAKE_PROCESSES cppgir
 	make install
+	popd # cppgir-host-build
+	popd # $TERMUX_PKG_HOSTBUILD_DIR
+}
+
+__libtd_host_build() {
+	termux_setup_cmake
+
+	pushd $TERMUX_PKG_HOSTBUILD_DIR
+	mkdir -p libtd-host-build
+	pushd libtd-host-build
+	cmake \
+		-DCMAKE_BUILD_TYPE=Release \
+		$TERMUX_PKG_SRCDIR/libtd
+	make -j $TERMUX_PKG_MAKE_PROCESSES prepare_cross_compiling
 	popd # cppgir-host-build
 	popd # $TERMUX_PKG_HOSTBUILD_DIR
 }
@@ -68,6 +139,12 @@ __tg_codegen_build() {
 		--workdir=/usr/src/tdesktop/Telegram \
 		--volume=$PWD:/usr/src/tdesktop \
 		tg-container \
+			bash $TERMUX_PKG_BUILDER_DIR/maybe-compile-libtd-for-host.sh
+	udocker run \
+		--bindhome \
+		--workdir=/usr/src/tdesktop/Telegram \
+		--volume=$PWD:/usr/src/tdesktop \
+		tg-container \
 			bash /usr/src/tdesktop/Telegram/configure.sh \
 				-DTDESKTOP_API_TEST=ON \
 				-DDESKTOP_APP_DISABLE_JEMALLOC=ON
@@ -90,6 +167,9 @@ termux_step_host_build() {
 	# Compile cppgir
 	__cppgir_build
 
+	# Prepare cross-compiling for libtd
+	__libtd_host_build
+
 	if [ "$TERMUX_ON_DEVICE_BUILD" = true ]; then
 		return
 	fi
@@ -98,33 +178,12 @@ termux_step_host_build() {
 	__tg_codegen_build
 }
 
-__tg_owt_fetch_source() {
-	local _commit=$(TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR bash $TERMUX_PKG_BUILDER_DIR/get_tg_owt_commit.sh)
-	if [ ! -d "$TERMUX_PKG_CACHEDIR/tg_owt-$_commit" ]; then
-		pushd $TERMUX_PKG_CACHEDIR
-		rm -rf tg_owt-tmp
-		git init tg_owt-tmp
-		pushd tg_owt-tmp
-		git remote add origin https://github.com/desktop-app/tg_owt.git
-		git fetch --depth=1 origin $_commit
-		git reset --hard FETCH_HEAD
-		git submodule update --init --recursive --depth=1
-		rm -rf .git
-		popd # tg_owt
-		mv tg_owt-tmp tg_owt-$_commit
-		popd # $TERMUX_PKG_CACHEDIR
-
-	fi
-	rm -rf $TERMUX_PKG_SRCDIR/tg_owt
-	mkdir -p $TERMUX_PKG_SRCDIR/tg_owt
-	cp -Rf $TERMUX_PKG_CACHEDIR/tg_owt-$_commit/* $TERMUX_PKG_SRCDIR/tg_owt/
-}
-
 __tg_owt_build() {
 	local _TG_OWT_BUILD_DIR="$TERMUX_PKG_BUILDDIR"/tg_owt-build
 	if [ -f "$_TG_OWT_BUILD_DIR"/.tg_owt-built ]; then
-		cd "$TERMUX_PKG_BUILDDIR"
+		cd "$_TG_OWT_BUILD_DIR"
 		ninja -j $TERMUX_PKG_MAKE_PROCESSES install
+		cd "$TERMUX_PKG_BUILDDIR"
 		return
 	fi
 
@@ -164,21 +223,54 @@ __tg_owt_build() {
 	touch -f "$_TG_OWT_BUILD_DIR"/.tg_owt-built
 }
 
-termux_step_post_get_source() {
-	__tg_owt_fetch_source
+__libtd_build() {
+	local _LIBTD_BUILD_DIR="$TERMUX_PKG_BUILDDIR"/libtd-build
+	if [ -f "$_LIBTD_BUILD_DIR"/.libtd-built ]; then
+		cd "$_LIBTD_BUILD_DIR"
+		ninja -j $TERMUX_PKG_MAKE_PROCESSES install
+		cd "$TERMUX_PKG_BUILDDIR"
+		return
+	fi
 
-	# Dummy some files to make sure that the usage of code path of Linux rather than Android
-	mv Telegram/ThirdParty/libtgvoip/os/android Telegram/ThirdParty/libtgvoip/os/android.unused
-	mkdir -p Telegram/ThirdParty/libtgvoip/os/android
-	local _file
-	for _file in Telegram/ThirdParty/libtgvoip/os/android.unused/*.h; do
-		local _name=$(basename $_file)
-		echo "#error \"DO NOT INCLUDE THIS FILE\"" > Telegram/ThirdParty/libtgvoip/os/android/"$_name"
-	done
+	termux_setup_cmake
+	termux_setup_ninja
+
+	# Backup vars
+	local __old_srcdir="$TERMUX_PKG_SRCDIR"
+	local __old_builddir="$TERMUX_PKG_BUILDDIR"
+	local __old_conf_args="$TERMUX_PKG_EXTRA_CONFIGURE_ARGS"
+	TERMUX_PKG_SRCDIR="$TERMUX_PKG_SRCDIR"/libtd
+	TERMUX_PKG_BUILDDIR="$_LIBTD_BUILD_DIR"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_SYSTEM_NAME=Linux
+-DBUILD_SHARED_LIBS=OFF
+-DBUILD_STATIC_LIBS=ON
+-DTD_INSTALL_SHARED_LIBRARIES=OFF
+-DTD_INSTALL_STATIC_LIBRARIES=ON
+"
+
+	# Configure
+	mkdir -p "$TERMUX_PKG_BUILDDIR"
+	cd "$TERMUX_PKG_BUILDDIR"
+	termux_step_configure_cmake
+
+	# Cross-compile & install
+	cd "$TERMUX_PKG_BUILDDIR"
+	ninja -j $TERMUX_PKG_MAKE_PROCESSES install
+
+	# Recover vars
+	TERMUX_PKG_SRCDIR="$__old_srcdir"
+	TERMUX_PKG_BUILDDIR="$__old_builddir"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS="$__old_conf_args"
+
+	# Mark as built
+	mkdir -p "$_LIBTD_BUILD_DIR"
+	touch -f "$_LIBTD_BUILD_DIR"/.libtd-built
 }
 
 termux_step_configure() {
 	__tg_owt_build
+	__libtd_build
 
 	termux_setup_cmake
 	termux_setup_ninja
