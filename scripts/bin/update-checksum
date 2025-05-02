@@ -54,27 +54,52 @@ for package in "${@}"; do
 		continue
 	fi
 
-	# Command substitution create a subshell, we want to do this
-	# to not effect the main scope's variables by sourcing the build script
-	new_checksum=($(
-		source "${buildsh_path}" 2>/dev/null
-		for url in "${TERMUX_PKG_SRCURL[@]}"; do
-			echo "Downloading ${url}" >&2
-			dl_tmpdir=$(mktemp -d "${TMPDIR-/tmp}/termux.src.dl.XXXXXXXX")
+	(
+		function get_sha256() {
+			local dl_tmpdir
+			for url in "$@"; do
+				echo "Downloading ${url}" >&2
+				dl_tmpdir="$(mktemp -d "${TMPDIR-/tmp}/termux.src.dl.XXXXXXXX")"
 
-			if [[ -d "${dl_tmpdir}" ]]; then
-				if ! curl --fail --location --retry 3 --output "${dl_tmpdir}/source-bundle" "$url"; then
+				if [[ -d "${dl_tmpdir}" ]]; then
+					if ! curl --fail --location --retry 3 --output "${dl_tmpdir}/source-bundle" "$url"; then
+						rm -rf "${dl_tmpdir}"
+					fi
+
+					if [[ -f "${dl_tmpdir}/source-bundle" ]]; then
+						sha256sum "${dl_tmpdir}/source-bundle" | awk '{ print $1 }'
+					fi
+
 					rm -rf "${dl_tmpdir}"
 				fi
+			done
+		}
 
-				if [[ -f "${dl_tmpdir}/source-bundle" ]]; then
-					sha256sum "${dl_tmpdir}/source-bundle" | awk '{ print $1 }'
-				fi
+		# shellcheck source=/dev/null
+		source "${buildsh_path}" 2>/dev/null
+		source "$REPO_ROOT/scripts/updates/utils/termux_pkg_patch_value.sh"
 
-				rm -rf "${dl_tmpdir}"
-			fi
-		done
-	))
+		old_checksum=''
+		new_checksum=''
+		case "${TERMUX_PKG_SRCURL@a}" in
+			'a') {
+					for (( i = 0; i < ${#TERMUX_PKG_SRCURL[*]}; i++ )); do
+						old_checksum="${TERMUX_PKG_SHA256[$i]}"
+						new_checksum="$(get_sha256 "${TERMUX_PKG_SRCURL[$i]}")"
+						termux_pkg_patch_value 'TERMUX_PKG_SHA256' \
+							"$old_checksum" "$new_checksum" "$buildsh_path"
+					done
+				} > "${TMPDIR-/tmp}/${package}.auto.patch"
+			;;
+			'') {
+					old_checksum="${TERMUX_PKG_SHA256}"
+					new_checksum="$(get_sha256 "${TERMUX_PKG_SRCURL}")"
+					termux_pkg_patch_value 'TERMUX_PKG_SHA256' \
+						"$old_checksum" "$new_checksum" "$buildsh_path"
+				} > "${TMPDIR-/tmp}/${package}.auto.patch"
+			;;
+		esac
+	)
 
 	if (( ${#new_checksum[@]} )); then
 		# Replace old SHA-256.
