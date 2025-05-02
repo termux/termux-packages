@@ -110,6 +110,160 @@ __termux_build_props__add_variables_validator_actions() {
 
 
 
+####
+# Variables for validating Termux variables.
+####
+
+##
+# Regex that matches an absolute path that starts with a `/` with at
+# least one characters under rootfs `/`. Duplicate or trailing path
+# separators `/` are not allowed.
+##
+TERMUX_REGEX__ABSOLUTE_PATH='^(/[^/]+)+$'
+
+##
+# Regex that matches a relative path that does not start with a `/`.
+# Duplicate or trailing path separators `/` are not allowed.
+##
+TERMUX_REGEX__RELATIVE_PATH='^[^/]+(/[^/]+)*$'
+
+##
+# Regex that matches (rootfs `/`) or (an absolute path that starts
+# with a `/`). Duplicate or trailing path separators `/` are not
+# allowed.
+##
+TERMUX_REGEX__ROOTFS_OR_ABSOLUTE_PATH='^((/)|((/[^/]+)+))$'
+
+
+##
+# Regex that matches a safe absolute path that starts with a `/` with
+# at least one characters under rootfs `/`. Duplicate or trailing path
+# separators `/` are not allowed. The path component characters must
+# be in the range `[a-zA-Z0-9+,.=_-]`.
+#
+# The path must also be validated against
+# `TERMUX_REGEX__SINGLE_OR_DOUBLE_DOT_CONTAINING_PATH`.
+##
+TERMUX_REGEX__SAFE_ABSOLUTE_PATH='^(/[a-zA-Z0-9+,.=_-]+)+$'
+
+##
+# Regex that matches a safe relative path that does not start with a
+# `/`. Duplicate or trailing path separators `/` are not allowed. The
+# path component characters must be in the range `[a-zA-Z0-9+,.=_-]`.
+#
+# The path must also be validated against
+# `TERMUX_REGEX__SINGLE_OR_DOUBLE_DOT_CONTAINING_PATH`.
+##
+TERMUX_REGEX__SAFE_RELATIVE_PATH='^[a-zA-Z0-9+,.=_-]+(/[a-zA-Z0-9+,.=_-]+)*$'
+
+##
+# Regex that matches (rootfs `/`) or (a safe absolute path that starts
+# with a `/`). Duplicate or trailing path separators `/` are not
+# allowed. The path component characters must be in the range
+# `[a-zA-Z0-9+,.=_-]`.
+#
+# The path must also be validated against
+# `TERMUX_REGEX__SINGLE_OR_DOUBLE_DOT_CONTAINING_PATH`.
+##
+TERMUX_REGEX__SAFE_ROOTFS_OR_ABSOLUTE_PATH='^((/)|((/[a-zA-Z0-9+,.=_-]+)+))$'
+
+
+##
+# Regex that matches a path containing single `/./` or double `/../` dot components.
+##
+TERMUX_REGEX__SINGLE_OR_DOUBLE_DOT_CONTAINING_PATH='((^\./)|(^\.\./)|(/\.$)|(/\.\.$)|(/\./)|(/\.\./))'
+
+
+##
+# Regex that matches invalid Termux rootfs paths.
+#
+# The Termux rootfs or prefix paths must not be equal to or be under
+# specific Filesystem Hierarchy Standard paths or paths used by Termux
+# docker image/host OS for its own files, as Termux packages files
+# must be kept separate from the build host. The Termux app data/prefix
+# directories are also wiped by `clean.sh` when not running on-device,
+# which wouldn't be possible if Termux and host directories are shared.
+#
+# The invalid paths list does not include the `/data` and `/mnt/expand`
+# paths under which private app data directories are assigned to
+# Android apps, or the `/data/local/tmp` directory assigned to `adb`
+# `shell` user, or the `/system` directory for the Android system.
+#
+# - https://refspecs.linuxfoundation.org/FHS_3.0/fhs-3.0.html
+# - https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard
+# - https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#termux-private-app-data-directory
+##
+TERMUX_REGEX__INVALID_TERMUX_ROOTFS_PATHS='^((/bin(/.*)?)|(/boot(/.*)?)|(/dev(/.*)?)|(/etc(/.*)?)|(/home)|(/lib(/.*)?)|(/lib[^/]+(/.*)?)|(/media)|(/mnt)|(/opt)|(/proc(/.*)?)|(/root)|(/run(/.*)?)|(/sbin(/.*)?)|(/srv(/.*)?)|(/sys(/.*)?)|(/tmp(/.*)?)|(/usr)|(/usr/local)|(((/usr/)|(/usr/local/))((bin)|(games)|(include)|(lib)|(libexec)|(lib[^/]+)|(sbin)|(share)|(src)|(X11R6))(/.*)?)|(/var(/.*)?)|(/bin.usr-is-merged)|(/lib.usr-is-merged)|(/sbin.usr-is-merged)|(/.dockerinit)|(/.dockerenv))$'
+
+##
+# Regex that matches invalid Termux home paths.
+#
+# Same reasoning as `TERMUX_REGEX__INVALID_TERMUX_ROOTFS_PATHS`,
+# and invalid paths are the same as well except that `/home` is
+# allowed, and `/` and all paths under `/usr` are not allowed.
+#
+# `/home` is allowed as package data files are not packaged from there.
+##
+TERMUX_REGEX__INVALID_TERMUX_HOME_PATHS='^((/)|(/bin(/.*)?)|(/boot(/.*)?)|(/dev(/.*)?)|(/etc(/.*)?)|(/lib(/.*)?)|(/lib[^/]+(/.*)?)|(/media)|(/mnt)|(/opt)|(/proc(/.*)?)|(/root)|(/run(/.*)?)|(/sbin(/.*)?)|(/srv(/.*)?)|(/sys(/.*)?)|(/tmp(/.*)?)|(/usr(/.*)?)|(/var(/.*)?)|(/bin.usr-is-merged)|(/lib.usr-is-merged)|(/sbin.usr-is-merged)|(/.dockerinit)|(/.dockerenv))$'
+
+##
+# Regex that matches invalid Termux prefix paths.
+#
+# Same reasoning as `TERMUX_REGEX__INVALID_TERMUX_ROOTFS_PATHS`,
+# and invalid paths are the same as well except that `/` is not
+# allowed.
+##
+TERMUX_REGEX__INVALID_TERMUX_PREFIX_PATHS='^((/)|(/bin(/.*)?)|(/boot(/.*)?)|(/dev(/.*)?)|(/etc(/.*)?)|(/home)|(/lib(/.*)?)|(/lib[^/]+(/.*)?)|(/media)|(/mnt)|(/opt)|(/proc(/.*)?)|(/root)|(/run(/.*)?)|(/sbin(/.*)?)|(/srv(/.*)?)|(/sys(/.*)?)|(/tmp(/.*)?)|(/usr)|(/usr/local)|(((/usr/)|(/usr/local/))((bin)|(games)|(include)|(lib)|(libexec)|(lib[^/]+)|(sbin)|(share)|(src)|(X11R6))(/.*)?)|(/var(/.*)?)|(/bin.usr-is-merged)|(/lib.usr-is-merged)|(/sbin.usr-is-merged)|(/.dockerinit)|(/.dockerenv))$'
+
+
+##
+# Regex that matches an unsigned integer `>= 0`.
+##
+TERMUX_REGEX__UNSIGNED_INT='^[0-9]+$'
+
+
+##
+# Regex to match an android app package name.
+#
+# The package name must have at least two segments separated by a dot
+# `.`, where each segment must start with at least one character in
+# the range `[a-zA-Z]`, followed by zero or more characters in the
+# range `[a-zA-Z0-9_]`. The package name length must also be
+# `<= 255` (`NAME_MAX` for ext4 partitions). The length is not checked
+# by this regex and it must be checked with `TERMUX__NAME_MAX`, as
+# `bash` `=~` regex conditional does not support lookaround.
+#
+# Unlike Android, the Termux app package name max length is not `255`
+# as its limited by `TERMUX__APPS_DIR___MAX_LEN` and `TERMUX__ROOTFS_DIR___MAX_LEN`.
+#
+# - https://developer.android.com/build/configure-app-module#set-application-id
+# - https://cs.android.com/android/platform/superproject/+/android-14.0.0_r1:frameworks/base/core/java/android/content/pm/parsing/ApkLiteParseUtils.java;l=669-677
+# - https://cs.android.com/android/platform/superproject/+/android-14.0.0_r1:frameworks/base/core/java/android/content/pm/parsing/FrameworkParsingPackageUtils.java;l=63-103
+# - https://cs.android.com/android/platform/superproject/+/android-14.0.0_r1:frameworks/base/core/java/android/os/FileUtils.java;l=954-994
+# - https://cs.android.com/android/platform/superproject/+/android-14.0.0_r1:frameworks/base/core/java/android/content/pm/PackageManager.java;l=2147-2155
+##
+TERMUX_REGEX__APP_PACKAGE_NAME="^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z][a-zA-Z0-9_]*)+$"
+
+##
+# Regex to match an android app data path.
+#
+# The supported formats are:
+# - `/data/data/<package_name>` (for primary user `0`) if app is to be
+#   installed on internal sd.
+# - `/data/user/<user_id>/<package_name>` (for all users) if app is to
+#   be installed on internal sd.
+# `/mnt/expand/<volume_uuid>/user/<user_id>/<package_name>` if app is
+#  to be installed on a removable/portable volume/sd card being used as
+#  adoptable storage.
+#
+# - https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#termux-private-app-data-directory
+##
+TERMUX_REGEX__APP_DATA_DIR_PATH='^(((/data/data)|(/data/user/[0-9]+)|(/mnt/expand/[^/]+/user/[0-9]+))/[^/]+)$'
+
+
+
+
+
 ###
 # Variables for the Termux build tools.
 ###
@@ -1845,160 +1999,6 @@ __termux_build_props__add_variables_validator_actions "TERMUX_AM_APP__NAMESPACE"
 # Default value: `com.termux.termuxam.Am`
 ##
 TERMUX_AM_APP__AM_CLASS__CLASS_NAME="$TERMUX_AM_APP__NAMESPACE.Am"
-
-
-
-
-
-####
-# Variables for validating Termux variables.
-####
-
-##
-# Regex that matches an absolute path that starts with a `/` with at
-# least one characters under rootfs `/`. Duplicate or trailing path
-# separators `/` are not allowed.
-##
-TERMUX_REGEX__ABSOLUTE_PATH='^(/[^/]+)+$'
-
-##
-# Regex that matches a relative path that does not start with a `/`.
-# Duplicate or trailing path separators `/` are not allowed.
-##
-TERMUX_REGEX__RELATIVE_PATH='^[^/]+(/[^/]+)*$'
-
-##
-# Regex that matches (rootfs `/`) or (an absolute path that starts
-# with a `/`). Duplicate or trailing path separators `/` are not
-# allowed.
-##
-TERMUX_REGEX__ROOTFS_OR_ABSOLUTE_PATH='^((/)|((/[^/]+)+))$'
-
-
-##
-# Regex that matches a safe absolute path that starts with a `/` with
-# at least one characters under rootfs `/`. Duplicate or trailing path
-# separators `/` are not allowed. The path component characters must
-# be in the range `[a-zA-Z0-9+,.=_-]`.
-#
-# The path must also be validated against
-# `TERMUX_REGEX__SINGLE_OR_DOUBLE_DOT_CONTAINING_PATH`.
-##
-TERMUX_REGEX__SAFE_ABSOLUTE_PATH='^(/[a-zA-Z0-9+,.=_-]+)+$'
-
-##
-# Regex that matches a safe relative path that does not start with a
-# `/`. Duplicate or trailing path separators `/` are not allowed. The
-# path component characters must be in the range `[a-zA-Z0-9+,.=_-]`.
-#
-# The path must also be validated against
-# `TERMUX_REGEX__SINGLE_OR_DOUBLE_DOT_CONTAINING_PATH`.
-##
-TERMUX_REGEX__SAFE_RELATIVE_PATH='^[a-zA-Z0-9+,.=_-]+(/[a-zA-Z0-9+,.=_-]+)*$'
-
-##
-# Regex that matches (rootfs `/`) or (a safe absolute path that starts
-# with a `/`). Duplicate or trailing path separators `/` are not
-# allowed. The path component characters must be in the range
-# `[a-zA-Z0-9+,.=_-]`.
-#
-# The path must also be validated against
-# `TERMUX_REGEX__SINGLE_OR_DOUBLE_DOT_CONTAINING_PATH`.
-##
-TERMUX_REGEX__SAFE_ROOTFS_OR_ABSOLUTE_PATH='^((/)|((/[a-zA-Z0-9+,.=_-]+)+))$'
-
-
-##
-# Regex that matches a path containing single `/./` or double `/../` dot components.
-##
-TERMUX_REGEX__SINGLE_OR_DOUBLE_DOT_CONTAINING_PATH='((^\./)|(^\.\./)|(/\.$)|(/\.\.$)|(/\./)|(/\.\./))'
-
-
-##
-# Regex that matches invalid Termux rootfs paths.
-#
-# The Termux rootfs or prefix paths must not be equal to or be under
-# specific Filesystem Hierarchy Standard paths or paths used by Termux
-# docker image/host OS for its own files, as Termux packages files
-# must be kept separate from the build host. The Termux app data/prefix
-# directories are also wiped by `clean.sh` when not running on-device,
-# which wouldn't be possible if Termux and host directories are shared.
-#
-# The invalid paths list does not include the `/data` and `/mnt/expand`
-# paths under which private app data directories are assigned to
-# Android apps, or the `/data/local/tmp` directory assigned to `adb`
-# `shell` user, or the `/system` directory for the Android system.
-#
-# - https://refspecs.linuxfoundation.org/FHS_3.0/fhs-3.0.html
-# - https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard
-# - https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#termux-private-app-data-directory
-##
-TERMUX_REGEX__INVALID_TERMUX_ROOTFS_PATHS='^((/bin(/.*)?)|(/boot(/.*)?)|(/dev(/.*)?)|(/etc(/.*)?)|(/home)|(/lib(/.*)?)|(/lib[^/]+(/.*)?)|(/media)|(/mnt)|(/opt)|(/proc(/.*)?)|(/root)|(/run(/.*)?)|(/sbin(/.*)?)|(/srv(/.*)?)|(/sys(/.*)?)|(/tmp(/.*)?)|(/usr)|(/usr/local)|(((/usr/)|(/usr/local/))((bin)|(games)|(include)|(lib)|(libexec)|(lib[^/]+)|(sbin)|(share)|(src)|(X11R6))(/.*)?)|(/var(/.*)?)|(/bin.usr-is-merged)|(/lib.usr-is-merged)|(/sbin.usr-is-merged)|(/.dockerinit)|(/.dockerenv))$'
-
-##
-# Regex that matches invalid Termux home paths.
-#
-# Same reasoning as `TERMUX_REGEX__INVALID_TERMUX_ROOTFS_PATHS`,
-# and invalid paths are the same as well except that `/home` is
-# allowed, and `/` and all paths under `/usr` are not allowed.
-#
-# `/home` is allowed as package data files are not packaged from there.
-##
-TERMUX_REGEX__INVALID_TERMUX_HOME_PATHS='^((/)|(/bin(/.*)?)|(/boot(/.*)?)|(/dev(/.*)?)|(/etc(/.*)?)|(/lib(/.*)?)|(/lib[^/]+(/.*)?)|(/media)|(/mnt)|(/opt)|(/proc(/.*)?)|(/root)|(/run(/.*)?)|(/sbin(/.*)?)|(/srv(/.*)?)|(/sys(/.*)?)|(/tmp(/.*)?)|(/usr(/.*)?)|(/var(/.*)?)|(/bin.usr-is-merged)|(/lib.usr-is-merged)|(/sbin.usr-is-merged)|(/.dockerinit)|(/.dockerenv))$'
-
-##
-# Regex that matches invalid Termux prefix paths.
-#
-# Same reasoning as `TERMUX_REGEX__INVALID_TERMUX_ROOTFS_PATHS`,
-# and invalid paths are the same as well except that `/` is not
-# allowed.
-##
-TERMUX_REGEX__INVALID_TERMUX_PREFIX_PATHS='^((/)|(/bin(/.*)?)|(/boot(/.*)?)|(/dev(/.*)?)|(/etc(/.*)?)|(/home)|(/lib(/.*)?)|(/lib[^/]+(/.*)?)|(/media)|(/mnt)|(/opt)|(/proc(/.*)?)|(/root)|(/run(/.*)?)|(/sbin(/.*)?)|(/srv(/.*)?)|(/sys(/.*)?)|(/tmp(/.*)?)|(/usr)|(/usr/local)|(((/usr/)|(/usr/local/))((bin)|(games)|(include)|(lib)|(libexec)|(lib[^/]+)|(sbin)|(share)|(src)|(X11R6))(/.*)?)|(/var(/.*)?)|(/bin.usr-is-merged)|(/lib.usr-is-merged)|(/sbin.usr-is-merged)|(/.dockerinit)|(/.dockerenv))$'
-
-
-##
-# Regex that matches an unsigned integer `>= 0`.
-##
-TERMUX_REGEX__UNSIGNED_INT='^[0-9]+$'
-
-
-##
-# Regex to match an android app package name.
-#
-# The package name must have at least two segments separated by a dot
-# `.`, where each segment must start with at least one character in
-# the range `[a-zA-Z]`, followed by zero or more characters in the
-# range `[a-zA-Z0-9_]`. The package name length must also be
-# `<= 255` (`NAME_MAX` for ext4 partitions). The length is not checked
-# by this regex and it must be checked with `TERMUX__NAME_MAX`, as
-# `bash` `=~` regex conditional does not support lookaround.
-#
-# Unlike Android, the Termux app package name max length is not `255`
-# as its limited by `TERMUX__APPS_DIR___MAX_LEN` and `TERMUX__ROOTFS_DIR___MAX_LEN`.
-#
-# - https://developer.android.com/build/configure-app-module#set-application-id
-# - https://cs.android.com/android/platform/superproject/+/android-14.0.0_r1:frameworks/base/core/java/android/content/pm/parsing/ApkLiteParseUtils.java;l=669-677
-# - https://cs.android.com/android/platform/superproject/+/android-14.0.0_r1:frameworks/base/core/java/android/content/pm/parsing/FrameworkParsingPackageUtils.java;l=63-103
-# - https://cs.android.com/android/platform/superproject/+/android-14.0.0_r1:frameworks/base/core/java/android/os/FileUtils.java;l=954-994
-# - https://cs.android.com/android/platform/superproject/+/android-14.0.0_r1:frameworks/base/core/java/android/content/pm/PackageManager.java;l=2147-2155
-##
-TERMUX_REGEX__APP_PACKAGE_NAME="^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z][a-zA-Z0-9_]*)+$"
-
-##
-# Regex to match an android app data path.
-#
-# The supported formats are:
-# - `/data/data/<package_name>` (for primary user `0`) if app is to be
-#   installed on internal sd.
-# - `/data/user/<user_id>/<package_name>` (for all users) if app is to
-#   be installed on internal sd.
-# `/mnt/expand/<volume_uuid>/user/<user_id>/<package_name>` if app is
-#  to be installed on a removable/portable volume/sd card being used as
-#  adoptable storage.
-#
-# - https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#termux-private-app-data-directory
-##
-TERMUX_REGEX__APP_DATA_DIR_PATH='^(((/data/data)|(/data/user/[0-9]+)|(/mnt/expand/[^/]+/user/[0-9]+))/[^/]+)$'
 
 
 
