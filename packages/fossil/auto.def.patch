@@ -31,27 +31,27 @@ diff -uNr fossil-2.11/auto.def fossil-2.11.mod/auto.def
  
  }
  
-@@ -479,23 +445,6 @@
-             cc-with [list -cflags $cflags -libs $libs] {
-                 if {$tclstubs} {
-                     if {[cc-check-functions Tcl_InitStubs]} {
--                        set foundtcl 1
--                    }
--                } else {
--                    if {[cc-check-functions Tcl_CreateInterp]} {
--                        set foundtcl 1
--                    }
--                }
--            }
+@@ -701,23 +701,6 @@
+         }
+       }
+     }
+-    if {!$foundtcl && ![string match *-lpthread* $libs]} {
+-      # On some systems, TCL_LIB_SPEC appears to be missing
+-      # "-lpthread".  Try adding it.
+-      msg-result "Adding \"-lpthread\" and retrying for Tcl..."
+-      set libs "$libs -lpthread"
+-      cc-with [list -cflags $cflags -libs $libs] {
+-        if {$tclstubs} {
+-          if {[cc-check-functions Tcl_InitStubs]} {
+-            set foundtcl 1
+-          }
+-        } else {
+-          if {[cc-check-functions Tcl_CreateInterp]} {
+-            set foundtcl 1
+-          }
 -        }
--        if {!$foundtcl && ![string match *-lpthread* $libs]} {
--            # On some systems, TCL_LIB_SPEC appears to be missing
--            # "-lpthread".  Try adding it.
--            msg-result "Adding \"-lpthread\" and retrying for Tcl..."
--            set libs "$libs -lpthread"
--            cc-with [list -cflags $cflags -libs $libs] {
--                if {$tclstubs} {
--                    if {[cc-check-functions Tcl_InitStubs]} {
-                         set foundtcl 1
-                     }
-                 } else {
+-      }
+-    }
+     if {!$foundtcl} {
+       if {$tclstubs} {
+         user-error "Cannot find a usable Tcl stubs library $msg"
