@@ -1,0 +1,20 @@
+--- ../fileio.c.orig	2020-07-11 20:22:17.937310671 +0200
++++ ./src/fileio.c	2020-07-11 20:22:44.147310684 +0200
+@@ -2617,7 +2617,7 @@
+   encoded_file = ENCODE_FILE (file);
+   encoded_newname = ENCODE_FILE (newname);
+ 
+-  if (link (SSDATA (encoded_file), SSDATA (encoded_newname)) == 0)
++  if (symlink (SSDATA (encoded_file), SSDATA (encoded_newname)) == 0)
+     return Qnil;
+ 
+   if (errno == EEXIST)
+@@ -2627,7 +2627,7 @@
+ 	barf_or_query_if_file_exists (newname, true, "make it a new name",
+ 				      FIXNUMP (ok_if_already_exists), false);
+       unlink (SSDATA (newname));
+-      if (link (SSDATA (encoded_file), SSDATA (encoded_newname)) == 0)
++      if (symlink (SSDATA (encoded_file), SSDATA (encoded_newname)) == 0)
+ 	return Qnil;
+     }
+ 
