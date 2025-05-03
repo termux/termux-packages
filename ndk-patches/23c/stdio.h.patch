@@ -1,10 +1,12 @@
 --- ./usr/include/stdio.h.orig	2021-08-16 11:48:44.308954400 +0200
 +++ ./usr/include/stdio.h	2021-08-16 11:50:00.438924014 +0200
-@@ -44,6 +44,9 @@
+@@ -44,6 +44,11 @@
  #include <stdarg.h>
  #include <stddef.h>
  
++#if !defined(__swift__)
 +#include <string.h>            /* For strcpy(3) used by ctermid() */
++#endif
 +#include <asm/fcntl.h>         /* For O_RDWR and other O_* constants */
 +
  #include <bits/seek_constants.h>
@@ -12,38 +14,40 @@
  #if __ANDROID_API__ < 24
 @@ -165,7 +166,7 @@
      __printflike(2, 0) __warnattr_strict("vsprintf is often misused; please use vsnprintf");
- char* tmpnam(char* __s)
+ char* _Nullable tmpnam(char* _Nullable __s)
      __warnattr("tmpnam is unsafe, use mkstemp or tmpfile instead");
 -#define P_tmpdir "/tmp/" /* deprecated */
 +#define P_tmpdir "@TERMUX_PREFIX@/tmp/" /* deprecated */
- char* tempnam(const char* __dir, const char* __prefix)
+ char* _Nullable tempnam(const char* _Nullable __dir, const char* _Nullable __prefix)
      __warnattr("tempnam is unsafe, use mkstemp or tmpfile instead");
  
 @@ -289,8 +290,6 @@
- FILE* freopen64(const char* __path, const char* __mode, FILE* __fp) __INTRODUCED_IN(24);
+ FILE* _Nullable freopen64(const char* _Nullable __path, const char* _Nonnull __mode, FILE* _Nonnull __fp) __INTRODUCED_IN(24);
  #endif /* __ANDROID_API__ >= 24 */
  
--FILE* tmpfile(void);
+-FILE* _Nullable tmpfile(void);
 -
  #if __ANDROID_API__ >= 24
- FILE* tmpfile64(void) __INTRODUCED_IN(24);
+ FILE* _Nullable tmpfile64(void) __INTRODUCED_IN(24);
  #endif /* __ANDROID_API__ >= 24 */
-@@ -304,10 +303,15 @@
+@@ -304,10 +303,17 @@
  
  #define L_ctermid 1024 /* size for ctermid() */
  
 -#if __ANDROID_API__ >= 26
--char* ctermid(char* __buf) __INTRODUCED_IN(26);
+-char* _Nonnull ctermid(char* _Nullable __buf) __INTRODUCED_IN(26);
 -#endif /* __ANDROID_API__ >= 26 */
 +/* Needed by gnulibs freading(). */
 +#define __sferror(p)    (((p)->_flags & __SERR) != 0)
  
 +/* Used by perl, fish, and others. */
-+static __inline__ char* ctermid(char* s) {
++#if !defined(__swift__)
++static __inline__ char* _Nonnull ctermid(char* _Nullable s) {
 +	if (s == 0) return (char*) "/dev/tty";
 +	strcpy(s, "/dev/tty");
 +	return s;
 +}
++#endif
  
  FILE* fdopen(int __fd, const char* __mode);
  int fileno(FILE* __fp);
@@ -56,7 +60,7 @@
 +extern int unlink(const char*);
 +void free(void* p);
 +uint32_t arc4random(void);
-+static __inline__ FILE* tmpfile() {
++static __inline__ FILE* _Nullable tmpfile() {
 +	int p = getpid();
 +	char* path;
 +	int i;
