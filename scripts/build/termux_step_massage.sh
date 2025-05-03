@@ -82,7 +82,15 @@ termux_step_massage() {
 
 		# Fix shebang paths:
 		while IFS= read -rd '' file; do
-			read -rn$(( ${#TERMUX_PREFIX_CLASSICAL} + 4 )) header_line < "$file" || continue
+			# Ideally the shebang length should be limited to `BINPRM_BUF_SIZE = 256` for Linux kernel `>= 5.1`,
+			# but Termux increases the limit to `TERMUX__FILE_HEADER__BUFFER_SIZE = 340` with `termux-exec` to
+			# accommodate for longer `TERMUX__ROOTFS` as per `TERMUX__ROOTFS_DIR___MAX_LEN = 86` (check `ExecIntercept.h`).
+			# However, a package may use the build directory path for dynamically setting the shebang at build time,
+			# so use `PATH_MAX = 4096` as length limit instead, as a shorter limit like `256`/`340` may prevent reading the
+			# entire header line if build directory path is longer and `shebang_regex` will fail to match and skip shebang
+			# replacement. For example, `pip` from `python-pip` package is set with the following shebang at build time:
+			#`#!/home/builder/.termux-build/python3.12-crossenv-prefix-bionic-x86_64/cross/bin/python3.12`
+			read -r -n 4096 header_line < "$file" || continue
 			if [[ "${header_line:0:2}" == "#!" && "${#header_line}" -ge 3 && "$header_line" =~ $shebang_regex ]]; then
 				shebang_match="${BASH_REMATCH[0]}"
 				if [[ -n "$shebang_match" ]]; then
