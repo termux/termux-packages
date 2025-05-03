@@ -88,11 +88,15 @@ termux_step_massage() {
 			# However, a package may use the build directory path for dynamically setting the shebang at build time,
 			# so use `PATH_MAX = 4096` as length limit instead, as a shorter limit like `256`/`340` may prevent reading the
 			# entire header line if build directory path is longer and `shebang_regex` will fail to match and skip shebang
-			# replacement. `4096 + 2` is used as `#!` needs to be read from start of line before the actual path.
+			# replacement. Additionally, we first read first `2` characters and see if they match `#!`, before reading
+			# rest of the header line to avoid wasting time reading `4096` characters for non-shebang files.
+			# `|| :` is used for second `read` to include files with just a shebang line as `read` will exit with `1` for those due to EOF.
 			# For example, `pip` from `python-pip` package is set with the following shebang at build time:
 			# `#!/home/builder/.termux-build/python3.12-crossenv-prefix-bionic-x86_64/cross/bin/python3.12`
-			read -r -n 4098 header_line < "$file" || continue
-			if [[ "${header_line:0:2}" == "#!" && "${#header_line}" -ge 3 && "$header_line" =~ $shebang_regex ]]; then
+			header_line=""
+			{ { read -r -n 2 header_line && [[ "$header_line" == "#!" ]]; } || continue; read -r -n 4096 header_line || :; } < "$file"
+			header_line="#!${header_line}"
+			if [[ "${#header_line}" -ge 3 && "$header_line" =~ $shebang_regex ]]; then
 				shebang_match="${BASH_REMATCH[0]}"
 				if [[ -n "$shebang_match" ]]; then
 					if [[ "$shebang_match" =~ $shebang_already_valid_regex ]]; then
