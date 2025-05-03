@@ -38,7 +38,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  18 files changed, 94 insertions(+), 11 deletions(-)
 
 diff --git a/crypto/BUILD.gn b/crypto/BUILD.gn
-index 060f43ace6..3c45041594 100644
+index 9f76eb9cc0..f98bc22479 100644
 --- a/crypto/BUILD.gn
 +++ b/crypto/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -97,7 +97,7 @@ index 279a7a1431..668fd49c77 100644
 +
 +#undef g_mock_provider
 diff --git a/dbus/BUILD.gn b/dbus/BUILD.gn
-index 236016e617..85aa652594 100644
+index 5cca90ac7c..105d4c4ce0 100644
 --- a/dbus/BUILD.gn
 +++ b/dbus/BUILD.gn
 @@ -3,13 +3,14 @@
@@ -158,7 +158,7 @@ index 5bd5ed3a93..10777d497a 100644
      scoped_refptr<base::SingleThreadTaskRunner> task_runner,
      scoped_refptr<base::SingleThreadTaskRunner> user_visible_task_runner,
 diff --git a/google_apis/BUILD.gn b/google_apis/BUILD.gn
-index 6bbadacee8..27873a0ace 100644
+index 64d9c9bbf5..f894a4efe9 100644
 --- a/google_apis/BUILD.gn
 +++ b/google_apis/BUILD.gn
 @@ -5,6 +5,7 @@
@@ -179,10 +179,10 @@ index 6bbadacee8..27873a0ace 100644
      "api_key_cache.cc",
      "api_key_cache.h",
 diff --git a/google_apis/gaia/oauth2_access_token_fetcher_impl.cc b/google_apis/gaia/oauth2_access_token_fetcher_impl.cc
-index dec2b90d57..b6dac3182a 100644
+index 11d498455e..caed44a8d7 100644
 --- a/google_apis/gaia/oauth2_access_token_fetcher_impl.cc
 +++ b/google_apis/gaia/oauth2_access_token_fetcher_impl.cc
-@@ -25,6 +25,9 @@
+@@ -26,6 +26,9 @@
  #include "services/network/public/cpp/simple_url_loader.h"
  #include "services/network/public/mojom/url_response_head.mojom.h"
  
@@ -192,7 +192,7 @@ index dec2b90d57..b6dac3182a 100644
  namespace {
  
  constexpr char kGetAccessTokenBodyFormat[] =
-@@ -451,3 +454,6 @@ bool OAuth2AccessTokenFetcherImpl::ParseGetAccessTokenFailureResponse(
+@@ -471,3 +474,6 @@ bool OAuth2AccessTokenFetcherImpl::ParseGetAccessTokenFailureResponse(
  
    return true;
  }
@@ -200,10 +200,10 @@ index dec2b90d57..b6dac3182a 100644
 +#undef kAccessTokenKey
 +#undef kExpiresInKey
 diff --git a/google_apis/gaia/oauth2_mint_token_flow.cc b/google_apis/gaia/oauth2_mint_token_flow.cc
-index a58ff7f205..6259cc50b9 100644
+index 6361e728cb..efad3f97bc 100644
 --- a/google_apis/gaia/oauth2_mint_token_flow.cc
 +++ b/google_apis/gaia/oauth2_mint_token_flow.cc
-@@ -36,6 +36,9 @@
+@@ -38,6 +38,9 @@
  #include "net/http/http_status_code.h"
  #include "services/network/public/mojom/url_response_head.mojom.h"
  
@@ -212,8 +212,8 @@ index a58ff7f205..6259cc50b9 100644
 +
  namespace {
  
- const char kValueFalse[] = "false";
-@@ -544,3 +547,6 @@ OAuth2MintTokenFlow::GetNetworkTrafficAnnotationTag() {
+ constexpr char kValueFalse[] = "false";
+@@ -686,3 +689,6 @@ OAuth2MintTokenFlow::GetNetworkTrafficAnnotationTag() {
          }
        })");
  }
@@ -308,7 +308,7 @@ index c9a605d451..26c759fcad 100644
 +#undef kDeviceRegistrationError
 +#undef GetStatusFromError
 diff --git a/headless/BUILD.gn b/headless/BUILD.gn
-index 798bb2246d..3433b939e0 100644
+index 18636003d3..bd123b47c1 100644
 --- a/headless/BUILD.gn
 +++ b/headless/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -428,7 +428,7 @@ index 24fa142672..145a9691b0 100644
      "database.cc",
      "database.h",
 diff --git a/url/BUILD.gn b/url/BUILD.gn
-index f22b73bc29..24e81c3f5b 100644
+index 3051d7b4b4..e5f423f96c 100644
 --- a/url/BUILD.gn
 +++ b/url/BUILD.gn
 @@ -3,6 +3,7 @@

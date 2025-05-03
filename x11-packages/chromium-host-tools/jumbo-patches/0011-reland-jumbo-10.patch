@@ -57,17 +57,18 @@ Enable jumbo build for the following component(s)/source_set(s):
  .../service_worker/service_worker_task_queue.cc    |  6 ++++++
  extensions/browser/service_worker/worker_id_set.cc |  6 ++++++
  extensions/common/BUILD.gn                         |  8 +++++++-
- .../manifest_handlers/icon_variants_handler.cc     |  9 ++++++++-
+ .../common/api/extension_action/action_info.cc     |  6 +++++-
+ .../manifest_handlers/icon_variants_handler.cc     |  6 +++++-
  .../common/manifest_handlers/icons_handler.cc      |  4 ++++
  .../common/manifest_handlers/requirements_info.cc  |  5 ++++-
  .../common/manifest_handlers/shared_module_info.cc |  5 ++++-
  extensions/renderer/BUILD.gn                       |  5 +++--
  .../renderer/extension_localization_throttle.cc    |  4 ++++
  .../renderer/extension_url_loader_throttle.cc      |  4 ++++
- 50 files changed, 234 insertions(+), 32 deletions(-)
+ 51 files changed, 236 insertions(+), 33 deletions(-)
 
 diff --git a/device/bluetooth/BUILD.gn b/device/bluetooth/BUILD.gn
-index d27d7140cc..a5a49039c0 100644
+index 16407ea475..09ec8a1f7f 100644
 --- a/device/bluetooth/BUILD.gn
 +++ b/device/bluetooth/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -121,7 +122,7 @@ index d27d7140cc..a5a49039c0 100644
  
    defines = [ "DEVICE_BLUETOOTH_IMPLEMENTATION" ]
  
-@@ -580,6 +586,10 @@ component("bluetooth") {
+@@ -584,6 +590,10 @@ component("bluetooth") {
          "floss/floss_version.h",
          "floss/test_helpers.h",
        ]
@@ -248,7 +249,7 @@ index 5a59853bb9..70d038edd1 100644
 +#undef kErrorPropertyReadOnly
 +#undef kErrorFailed
 diff --git a/device/bluetooth/dbus/bluetooth_gatt_descriptor_service_provider_impl.cc b/device/bluetooth/dbus/bluetooth_gatt_descriptor_service_provider_impl.cc
-index 803e448e86..8cd39815d0 100644
+index 6fbb539e02..2f08f7b634 100644
 --- a/device/bluetooth/dbus/bluetooth_gatt_descriptor_service_provider_impl.cc
 +++ b/device/bluetooth/dbus/bluetooth_gatt_descriptor_service_provider_impl.cc
 @@ -19,6 +19,10 @@
@@ -262,7 +263,7 @@ index 803e448e86..8cd39815d0 100644
  namespace bluez {
  
  namespace {
-@@ -426,3 +430,7 @@ BluetoothGattDescriptorServiceProviderImpl::object_path() const {
+@@ -422,3 +426,7 @@ BluetoothGattDescriptorServiceProviderImpl::object_path() const {
  }
  
  }  // namespace bluez
@@ -292,7 +293,7 @@ index c390d83057..7a7f3b3b54 100644
 +#undef kErrorInvalidArgs
 +#undef kErrorPropertyReadOnly
 diff --git a/device/bluetooth/dbus/bluetooth_le_advertisement_service_provider.cc b/device/bluetooth/dbus/bluetooth_le_advertisement_service_provider.cc
-index ab82ed0b35..ff1d56e0c1 100644
+index 26fefad8ac..34b69fcab2 100644
 --- a/device/bluetooth/dbus/bluetooth_le_advertisement_service_provider.cc
 +++ b/device/bluetooth/dbus/bluetooth_le_advertisement_service_provider.cc
 @@ -19,6 +19,8 @@
@@ -304,7 +305,7 @@ index ab82ed0b35..ff1d56e0c1 100644
  namespace bluez {
  
  namespace {
-@@ -529,3 +531,5 @@ BluetoothLEAdvertisementServiceProvider::Create(
+@@ -530,3 +532,5 @@ BluetoothLEAdvertisementServiceProvider::Create(
  }
  
  }  // namespace bluez
@@ -429,7 +430,7 @@ index b078f43b4a..ba8e1309c4 100644
      std::move(error_callback).Run();
      return;
 diff --git a/device/bluetooth/floss/floss_adapter_client.cc b/device/bluetooth/floss/floss_adapter_client.cc
-index 2f62e1a7b6..5a78d7cd6b 100644
+index 8d6318fd2a..648313cec5 100644
 --- a/device/bluetooth/floss/floss_adapter_client.cc
 +++ b/device/bluetooth/floss/floss_adapter_client.cc
 @@ -17,6 +17,8 @@
@@ -441,7 +442,7 @@ index 2f62e1a7b6..5a78d7cd6b 100644
  namespace floss {
  
  namespace {
-@@ -910,3 +912,5 @@ template void FlossAdapterClient::CallAdapterMethod(
+@@ -914,3 +916,5 @@ template void FlossAdapterClient::CallAdapterMethod(
      const std::string& arg2);
  
  }  // namespace floss
@@ -521,7 +522,7 @@ index 4fac9c688d..5385b1eb2e 100644
    # related authentication functions, with a limited amount of dependencies,
    # making it possible to build these on any platform, including iOS.
 diff --git a/device/fido/get_assertion_request_handler.cc b/device/fido/get_assertion_request_handler.cc
-index 1fae025a87..3849bedf6a 100644
+index 9c20f8e628..bf09c68a14 100644
 --- a/device/fido/get_assertion_request_handler.cc
 +++ b/device/fido/get_assertion_request_handler.cc
 @@ -50,6 +50,8 @@
@@ -533,7 +534,7 @@ index 1fae025a87..3849bedf6a 100644
  namespace device {
  
  namespace {
-@@ -814,3 +816,5 @@ void GetAssertionRequestHandler::DispatchRequestWithToken(
+@@ -815,3 +817,5 @@ void GetAssertionRequestHandler::DispatchRequestWithToken(
  }
  
  }  // namespace device
@@ -660,7 +661,7 @@ index 0ea291f16b..e75691ddfb 100644
    sources = [
      "browser/api/declarative/test_rules_registry.cc",
 diff --git a/extensions/browser/BUILD.gn b/extensions/browser/BUILD.gn
-index 3147d51470..98a1cf0bd6 100644
+index 482fda27ea..c722271df6 100644
 --- a/extensions/browser/BUILD.gn
 +++ b/extensions/browser/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -800,7 +801,7 @@ index 22b273b1a1..ba85ff21e1 100644
 +
 +#undef g_factory
 diff --git a/extensions/browser/api/web_request/extension_web_request_event_router.cc b/extensions/browser/api/web_request/extension_web_request_event_router.cc
-index a5e03a9853..9478c62fdc 100644
+index 58df0d2adf..a25f659545 100644
 --- a/extensions/browser/api/web_request/extension_web_request_event_router.cc
 +++ b/extensions/browser/api/web_request/extension_web_request_event_router.cc
 @@ -65,7 +65,8 @@ namespace {
@@ -813,7 +814,7 @@ index a5e03a9853..9478c62fdc 100644
  namespace web_request = api::web_request;
  
  // Describes the action taken by the Web Request API for a given stage of a web
-@@ -2697,3 +2698,5 @@ void WebRequestEventRouter::ClearSignaled(
+@@ -2692,3 +2693,5 @@ void WebRequestEventRouter::ClearSignaled(
  }
  
  }  // namespace extensions
@@ -1030,7 +1031,7 @@ index a1737fd343..6bdac552ab 100644
 +#undef g_allow_multiple_workers_per_extension
 +#undef BoolToCrashKeyValue
 diff --git a/extensions/common/BUILD.gn b/extensions/common/BUILD.gn
-index 70d03ec793..ef130f2800 100644
+index 15dcbd6049..2fccb12077 100644
 --- a/extensions/common/BUILD.gn
 +++ b/extensions/common/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -1041,7 +1042,7 @@ index 70d03ec793..ef130f2800 100644
  import("//components/guest_view/buildflags/buildflags.gni")
  import("//components/nacl/features.gni")
  import("//extensions/buildflags/buildflags.gni")
-@@ -230,7 +231,7 @@ mojom("mojom") {
+@@ -248,7 +249,7 @@ mojom("mojom") {
  # This must be a static library because extensions common depends on
  # GetTrustedICAPublicKey in extensions/browser which isn't always linked
  # in. TODO(brettw): This reverse dependency should be fixed.
@@ -1050,7 +1051,7 @@ index 70d03ec793..ef130f2800 100644
    sources = [
      "alias.h",
      "api/bluetooth/bluetooth_manifest_data.cc",
-@@ -515,6 +516,11 @@ static_library("common") {
+@@ -537,6 +538,11 @@ static_library("common") {
    # from mojom/permission_set_mojom_traits.cc.
    allow_circular_includes_from = [ ":mojom" ]
  
@@ -1062,39 +1063,53 @@ index 70d03ec793..ef130f2800 100644
    deps = [
      "//base",
      "//build:android_buildflags",
-diff --git a/extensions/common/manifest_handlers/icon_variants_handler.cc b/extensions/common/manifest_handlers/icon_variants_handler.cc
-index b65d00a03b..195113205f 100644
---- a/extensions/common/manifest_handlers/icon_variants_handler.cc
-+++ b/extensions/common/manifest_handlers/icon_variants_handler.cc
-@@ -17,6 +17,8 @@
- #include "extensions/common/manifest_constants.h"
- #include "ui/gfx/color_utils.h"
+diff --git a/extensions/common/api/extension_action/action_info.cc b/extensions/common/api/extension_action/action_info.cc
+index 50eb9e016a..c351697fb3 100644
+--- a/extensions/common/api/extension_action/action_info.cc
++++ b/extensions/common/api/extension_action/action_info.cc
+@@ -41,10 +41,12 @@ ActionInfoData::ActionInfoData(std::unique_ptr<ActionInfo> info)
  
-+#define g_empty_icon_set g_empty_icon_set_icon_variants_handler
+ ActionInfoData::~ActionInfoData() = default;
+ 
+-using extensions::diagnostics::icon_variants::Feature;
++using Feature_IconInfo = extensions::diagnostics::icon_variants::Feature;
+ using extensions::diagnostics::icon_variants::Id;
+ using extensions::diagnostics::icon_variants::Severity;
+ 
++#define Feature Feature_IconInfo
 +
- namespace extensions {
- 
- namespace {
-@@ -36,7 +38,9 @@ using IconVariantsManifestKeys = extensions::api::icon_variants::ManifestKeys;
- // extensions::diagnostics::
- using Id = extensions::diagnostics::icon_variants::Id;
- using Severity = extensions::diagnostics::icon_variants::Severity;
--using Feature = extensions::diagnostics::icon_variants::Feature;
-+using Feature_IconVariantsInfo = extensions::diagnostics::icon_variants::Feature;
-+
-+#define Feature Feature_IconVariantsInfo
- 
- namespace {
- void AddInstallWarning(Extension& extension, const std::string& warning) {
-@@ -188,3 +192,6 @@ base::span<const char* const> IconVariantsHandler::Keys() const {
+ // Returns the icon variants parsed from the `extension` manifest.
+ // Populates `error` if there are no icon variants.
+ ExtensionIconVariants GetIconVariants(const base::Value* value) {
+@@ -261,3 +263,5 @@ const char* ActionInfo::GetManifestKeyForActionType(ActionInfo::Type type) {
  }
  
  }  // namespace extensions
 +
 +#undef Feature
-+#undef g_empty_icon_set
+diff --git a/extensions/common/manifest_handlers/icon_variants_handler.cc b/extensions/common/manifest_handlers/icon_variants_handler.cc
+index e907385862..45f55c7fb5 100644
+--- a/extensions/common/manifest_handlers/icon_variants_handler.cc
++++ b/extensions/common/manifest_handlers/icon_variants_handler.cc
+@@ -35,7 +35,9 @@ IconVariantsHandler::~IconVariantsHandler() = default;
+ using extensions::api::icon_variants::ManifestKeys;
+ using extensions::diagnostics::icon_variants::Id;
+ using extensions::diagnostics::icon_variants::Severity;
+-using extensions::diagnostics::icon_variants::Feature;
++using Feature_IconVariantsHandler = extensions::diagnostics::icon_variants::Feature;
++
++#define Feature Feature_IconVariantsHandler
+ 
+ namespace {
+ void AddInstallWarning(Extension& extension, const std::string& warning) {
+@@ -207,3 +209,5 @@ base::span<const char* const> IconVariantsHandler::Keys() const {
+ }
+ 
+ }  // namespace extensions
++
++#undef Feature
 diff --git a/extensions/common/manifest_handlers/icons_handler.cc b/extensions/common/manifest_handlers/icons_handler.cc
-index 54da5ee6ee..9c05fde782 100644
+index 00a3539a08..b8a71ba347 100644
 --- a/extensions/common/manifest_handlers/icons_handler.cc
 +++ b/extensions/common/manifest_handlers/icons_handler.cc
 @@ -21,6 +21,8 @@
@@ -1106,7 +1121,7 @@ index 54da5ee6ee..9c05fde782 100644
  namespace extensions {
  
  namespace keys = manifest_keys;
-@@ -103,3 +105,5 @@ base::span<const char* const> IconsHandler::Keys() const {
+@@ -101,3 +103,5 @@ base::span<const char* const> IconsHandler::Keys() const {
  }
  
  }  // namespace extensions
@@ -1133,7 +1148,7 @@ index 5325c1e24d..307242a56b 100644
 +
 +#undef ManifestKeys
 diff --git a/extensions/common/manifest_handlers/shared_module_info.cc b/extensions/common/manifest_handlers/shared_module_info.cc
-index 7df904a341..ea3c3c4a8f 100644
+index a906aa872b..2a8d103015 100644
 --- a/extensions/common/manifest_handlers/shared_module_info.cc
 +++ b/extensions/common/manifest_handlers/shared_module_info.cc
 @@ -37,7 +37,8 @@ namespace {
@@ -1146,7 +1161,7 @@ index 7df904a341..ea3c3c4a8f 100644
  
  static base::LazyInstance<SharedModuleInfo>::DestructorAtExit
      g_empty_shared_module_info = LAZY_INSTANCE_INITIALIZER;
-@@ -247,3 +248,5 @@ base::span<const char* const> SharedModuleHandler::Keys() const {
+@@ -249,3 +250,5 @@ base::span<const char* const> SharedModuleHandler::Keys() const {
  }
  
  }  // namespace extensions

@@ -26,11 +26,12 @@ Enable jumbo build for the following template(s):
  .../service/display/overlay_candidate_factory.cc  |  4 ++++
  components/viz/service/display/skia_renderer.cc   |  4 ++++
  .../viz/service/display/software_renderer.cc      |  4 ++++
+ .../service/frame_sinks/frame_sink_manager_impl.h |  3 +++
  components/viz/viz.gni                            |  7 ++++---
- 11 files changed, 60 insertions(+), 9 deletions(-)
+ 12 files changed, 63 insertions(+), 9 deletions(-)
 
 diff --git a/base/BUILD.gn b/base/BUILD.gn
-index da6b76717d..eaba64b171 100644
+index 57a6af0061..fd69197bea 100644
 --- a/base/BUILD.gn
 +++ b/base/BUILD.gn
 @@ -28,6 +28,7 @@ import("//build/config/cast.gni")
@@ -41,7 +42,7 @@ index da6b76717d..eaba64b171 100644
  import("//build/config/logging.gni")
  import("//build/config/nacl/config.gni")
  import("//build/config/profiling/profiling.gni")
-@@ -163,7 +164,7 @@ use_epoll = is_linux || is_chromeos || is_android
+@@ -173,7 +174,7 @@ use_epoll = is_linux || is_chromeos || is_android
  # base compilation units to be linked in where they wouldn't have otherwise.
  # This does not include test code (test support and anything in the test
  # directory) which should use source_set as is recommended for GN targets).
@@ -50,7 +51,7 @@ index da6b76717d..eaba64b171 100644
    sources = [
      "allocator/allocator_check.cc",
      "allocator/allocator_check.h",
-@@ -970,6 +971,10 @@ component("base") {
+@@ -980,6 +981,10 @@ component("base") {
      ]
    }
  
@@ -61,7 +62,7 @@ index da6b76717d..eaba64b171 100644
    if (is_linux || is_chromeos) {
      sources += [
        "debug/proc_maps_linux.cc",
-@@ -988,6 +993,7 @@ component("base") {
+@@ -998,6 +1003,7 @@ component("base") {
        "threading/thread_type_delegate.cc",
        "threading/thread_type_delegate.h",
      ]
@@ -69,7 +70,7 @@ index da6b76717d..eaba64b171 100644
    }
  
    if (is_chromeos) {
-@@ -1953,6 +1959,11 @@ component("base") {
+@@ -1963,6 +1969,11 @@ component("base") {
        "win/wrapped_window_proc.h",
      ]
  
@@ -81,7 +82,7 @@ index da6b76717d..eaba64b171 100644
      deps += [ "//base/win:base_win_buildflags" ]
  
      if (com_init_check_hook_disabled) {
-@@ -2766,7 +2777,7 @@ static_library("base_static") {
+@@ -2807,7 +2818,7 @@ static_library("base_static") {
    }
  }
  
@@ -91,7 +92,7 @@ index da6b76717d..eaba64b171 100644
    sources = [
      "i18n/base_i18n_export.h",
 diff --git a/base/sampling_heap_profiler/poisson_allocation_sampler.cc b/base/sampling_heap_profiler/poisson_allocation_sampler.cc
-index 2637da2ee8..b420041b3d 100644
+index 7cb929647f..fdf96e9d5b 100644
 --- a/base/sampling_heap_profiler/poisson_allocation_sampler.cc
 +++ b/base/sampling_heap_profiler/poisson_allocation_sampler.cc
 @@ -19,6 +19,8 @@
@@ -121,7 +122,7 @@ index 2637da2ee8..b420041b3d 100644
  PoissonAllocationSamplerStats::PoissonAllocationSamplerStats(
      size_t address_cache_hits,
      size_t address_cache_misses,
-@@ -492,3 +496,6 @@ void PoissonAllocationSampler::RemoveSamplesObserver(
+@@ -498,3 +502,6 @@ void PoissonAllocationSampler::RemoveSamplesObserver(
  }
  
  }  // namespace base
@@ -129,7 +130,7 @@ index 2637da2ee8..b420041b3d 100644
 +#undef ThreadLocalData
 +#undef GetThreadLocalData
 diff --git a/base/sampling_heap_profiler/sampling_heap_profiler.cc b/base/sampling_heap_profiler/sampling_heap_profiler.cc
-index 8bbf941a16..70ed59f04e 100644
+index 60e96b0081..de29c802f6 100644
 --- a/base/sampling_heap_profiler/sampling_heap_profiler.cc
 +++ b/base/sampling_heap_profiler/sampling_heap_profiler.cc
 @@ -35,6 +35,8 @@
@@ -159,7 +160,7 @@ index 8bbf941a16..70ed59f04e 100644
  using StackUnwinder = SamplingHeapProfiler::StackUnwinder;
  using base::allocator::dispatcher::AllocationSubsystem;
  
-@@ -333,3 +337,6 @@ SamplingHeapProfiler::MuteHookedSamplesForTesting() {
+@@ -334,3 +338,6 @@ SamplingHeapProfiler::MuteHookedSamplesForTesting() {
  }
  
  }  // namespace base
@@ -254,10 +255,10 @@ index f1683759c5..d0c279961b 100644
 +
 +#undef kEpsilon
 diff --git a/components/viz/service/display/overlay_candidate_factory.cc b/components/viz/service/display/overlay_candidate_factory.cc
-index 15ef667875..4c74d07daa 100644
+index a85234ab61..86c3a05767 100644
 --- a/components/viz/service/display/overlay_candidate_factory.cc
 +++ b/components/viz/service/display/overlay_candidate_factory.cc
-@@ -93,6 +93,8 @@ gfx::OverlayTransform GetOverlayTransform(const gfx::Transform& quad_transform,
+@@ -95,6 +95,8 @@ gfx::OverlayTransform GetOverlayTransform(const gfx::Transform& quad_transform,
    }
  }
  
@@ -266,17 +267,17 @@ index 15ef667875..4c74d07daa 100644
  constexpr double kEpsilon = 0.0001;
  
  // Determine why the transformation isn't axis aligned. A transform with z
-@@ -839,3 +841,5 @@ gfx::RectF OverlayCandidateFactory::GetDamageRect(const DrawQuad* quad) const {
+@@ -837,3 +839,5 @@ gfx::RectF OverlayCandidateFactory::GetDamageRect(const DrawQuad* quad) const {
  }
  
  }  // namespace viz
 +
 +#undef kEpsilon
 diff --git a/components/viz/service/display/skia_renderer.cc b/components/viz/service/display/skia_renderer.cc
-index 342def6841..4ab2aacab0 100644
+index cd99df43f8..5a62f57170 100644
 --- a/components/viz/service/display/skia_renderer.cc
 +++ b/components/viz/service/display/skia_renderer.cc
-@@ -106,6 +106,8 @@
+@@ -108,6 +108,8 @@
  #include "components/viz/service/display/overlay_processor_surface_control.h"
  #endif
  
@@ -285,14 +286,14 @@ index 342def6841..4ab2aacab0 100644
  namespace viz {
  
  namespace {
-@@ -4473,3 +4475,5 @@ bool SkiaRenderer::OverlayLockKeyEqual::operator()(
+@@ -4517,3 +4519,5 @@ bool SkiaRenderer::OverlayLockKeyEqual::operator()(
  #endif
  
  }  // namespace viz
 +
 +#undef MakeOpacityFilter
 diff --git a/components/viz/service/display/software_renderer.cc b/components/viz/service/display/software_renderer.cc
-index b3b562b9de..b14f0310f3 100644
+index f935227bf9..8b41007c0f 100644
 --- a/components/viz/service/display/software_renderer.cc
 +++ b/components/viz/service/display/software_renderer.cc
 @@ -54,6 +54,8 @@
@@ -310,6 +311,20 @@ index b3b562b9de..b14f0310f3 100644
  }  // namespace viz
 +
 +#undef MakeOpacityFilter
+diff --git a/components/viz/service/frame_sinks/frame_sink_manager_impl.h b/components/viz/service/frame_sinks/frame_sink_manager_impl.h
+index 8abd5ef50a..4201fb4838 100644
+--- a/components/viz/service/frame_sinks/frame_sink_manager_impl.h
++++ b/components/viz/service/frame_sinks/frame_sink_manager_impl.h
+@@ -5,6 +5,9 @@
+ #ifndef COMPONENTS_VIZ_SERVICE_FRAME_SINKS_FRAME_SINK_MANAGER_IMPL_H_
+ #define COMPONENTS_VIZ_SERVICE_FRAME_SINKS_FRAME_SINK_MANAGER_IMPL_H_
+ 
++// Macro 'Status' from X11/Xlib.h will cause confliction
++#undef Status
++
+ #include <stdint.h>
+ 
+ #include <list>
 diff --git a/components/viz/viz.gni b/components/viz/viz.gni
 index 191ddca368..a4008193b5 100644
 --- a/components/viz/viz.gni

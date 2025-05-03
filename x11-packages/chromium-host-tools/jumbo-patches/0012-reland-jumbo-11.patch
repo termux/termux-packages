@@ -52,9 +52,11 @@ Enable jumbo build for the following component(s)/source_set(s):
  .../shared_image/egl_image_backing_factory.cc |  4 ++++
  .../gl_texture_image_backing_factory.cc       |  4 ++++
  .../ozone_image_backing_factory.cc            |  4 ++++
+ .../shared_image_representation.cc            |  3 +++
  .../wrapped_graphite_texture_backing.cc       |  6 ++++++
  .../wrapped_sk_image_backing_factory.cc       |  4 ++++
  gpu/config/BUILD.gn                           |  3 ++-
+ gpu/config/webgpu_blocklist_impl.h            |  3 +++
  gpu/ipc/service/BUILD.gn                      |  3 ++-
  media/audio/BUILD.gn                          |  3 ++-
  media/audio/fake_audio_manager.cc             |  6 ++++++
@@ -93,10 +95,10 @@ Enable jumbo build for the following component(s)/source_set(s):
  services/network/url_loader.cc                |  4 ++++
  .../web_bundle_url_loader_factory.cc          |  4 ++++
  storage/browser/BUILD.gn                      |  5 +++--
- 52 files changed, 257 insertions(+), 44 deletions(-)
+ 54 files changed, 263 insertions(+), 44 deletions(-)
 
 diff --git a/gpu/BUILD.gn b/gpu/BUILD.gn
-index b111de8db5..d6f64434aa 100644
+index eb7443ed96..55af48dac4 100644
 --- a/gpu/BUILD.gn
 +++ b/gpu/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -195,7 +197,7 @@ index 22dc13cad2..a7ad96ca1b 100644
  
    sources = [
 diff --git a/gpu/command_buffer/service/BUILD.gn b/gpu/command_buffer/service/BUILD.gn
-index ddaa2d76af..89ebd4fcbd 100644
+index ef544da41f..bee25a31ac 100644
 --- a/gpu/command_buffer/service/BUILD.gn
 +++ b/gpu/command_buffer/service/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -218,7 +220,7 @@ index ddaa2d76af..89ebd4fcbd 100644
  }
  target(link_target_type, "service_sources") {
    # External code should depend on this via //gpu/command_buffer/service above
-@@ -640,7 +641,7 @@ proto_library("disk_cache_proto") {
+@@ -642,7 +643,7 @@ proto_library("disk_cache_proto") {
  }
  
  if (is_android) {
@@ -248,7 +250,7 @@ index 502016b20c..c6bf7bbc19 100644
 +#undef ReadPixelsContext
 +#undef OnReadPixelsDone
 diff --git a/gpu/command_buffer/service/shared_image/angle_vulkan_image_backing_factory.cc b/gpu/command_buffer/service/shared_image/angle_vulkan_image_backing_factory.cc
-index 59cee1e9c1..61b36b2589 100644
+index a1a43c9b34..9146a39148 100644
 --- a/gpu/command_buffer/service/shared_image/angle_vulkan_image_backing_factory.cc
 +++ b/gpu/command_buffer/service/shared_image/angle_vulkan_image_backing_factory.cc
 @@ -14,6 +14,8 @@
@@ -260,7 +262,7 @@ index 59cee1e9c1..61b36b2589 100644
  namespace gpu {
  namespace {
  
-@@ -178,3 +180,5 @@ SharedImageBackingType AngleVulkanImageBackingFactory::GetBackingType() {
+@@ -181,3 +183,5 @@ SharedImageBackingType AngleVulkanImageBackingFactory::GetBackingType() {
  }
  
  }  // namespace gpu
@@ -343,7 +345,7 @@ index 546b9c0e11..740d89d506 100644
 +
 +#undef kSupportedUsage
 diff --git a/gpu/command_buffer/service/shared_image/ozone_image_backing_factory.cc b/gpu/command_buffer/service/shared_image/ozone_image_backing_factory.cc
-index 3926ef164b..f5113ab244 100644
+index ec0975a5c7..793b8e7192 100644
 --- a/gpu/command_buffer/service/shared_image/ozone_image_backing_factory.cc
 +++ b/gpu/command_buffer/service/shared_image/ozone_image_backing_factory.cc
 @@ -35,6 +35,8 @@
@@ -355,12 +357,26 @@ index 3926ef164b..f5113ab244 100644
  namespace gpu {
  namespace {
  
-@@ -410,3 +412,5 @@ SharedImageBackingType OzoneImageBackingFactory::GetBackingType() {
+@@ -412,3 +414,5 @@ SharedImageBackingType OzoneImageBackingFactory::GetBackingType() {
  }
  
  }  // namespace gpu
 +
 +#undef kSupportedUsage
+diff --git a/gpu/command_buffer/service/shared_image/shared_image_representation.cc b/gpu/command_buffer/service/shared_image/shared_image_representation.cc
+index 7435a88843..b465bb6a19 100644
+--- a/gpu/command_buffer/service/shared_image/shared_image_representation.cc
++++ b/gpu/command_buffer/service/shared_image/shared_image_representation.cc
+@@ -27,6 +27,9 @@
+ #include "gpu/vulkan/vulkan_fence_helper.h"
+ #endif
+ 
++// Macro 'None' from X11/X.h will cause confliction
++#undef None
++
+ namespace gpu {
+ 
+ namespace {
 diff --git a/gpu/command_buffer/service/shared_image/wrapped_graphite_texture_backing.cc b/gpu/command_buffer/service/shared_image/wrapped_graphite_texture_backing.cc
 index f6b3462696..a01592e1a7 100644
 --- a/gpu/command_buffer/service/shared_image/wrapped_graphite_texture_backing.cc
@@ -383,7 +399,7 @@ index f6b3462696..a01592e1a7 100644
 +#undef ReadPixelsContext
 +#undef OnReadPixelsDone
 diff --git a/gpu/command_buffer/service/shared_image/wrapped_sk_image_backing_factory.cc b/gpu/command_buffer/service/shared_image/wrapped_sk_image_backing_factory.cc
-index 159c56c5d0..49aff97338 100644
+index 8922ae6e96..d84a805c2d 100644
 --- a/gpu/command_buffer/service/shared_image/wrapped_sk_image_backing_factory.cc
 +++ b/gpu/command_buffer/service/shared_image/wrapped_sk_image_backing_factory.cc
 @@ -25,6 +25,8 @@
@@ -395,7 +411,7 @@ index 159c56c5d0..49aff97338 100644
  namespace gpu {
  namespace {
  // NOTE: WrappedSkImage cannot be used with raster-over-GLES2 as it doesn't
-@@ -259,3 +261,5 @@ SharedImageBackingType WrappedSkImageBackingFactory::GetBackingType() {
+@@ -260,3 +262,5 @@ SharedImageBackingType WrappedSkImageBackingFactory::GetBackingType() {
  }
  
  }  // namespace gpu
@@ -422,6 +438,20 @@ index 4d0a06cd9c..24e3692c83 100644
    # External code should depend on this via //gpu/config above rather than
    # depending on this directly or the component build will break.
    visibility = [ "//gpu/*" ]
+diff --git a/gpu/config/webgpu_blocklist_impl.h b/gpu/config/webgpu_blocklist_impl.h
+index 870bf84ac0..a78a41f79a 100644
+--- a/gpu/config/webgpu_blocklist_impl.h
++++ b/gpu/config/webgpu_blocklist_impl.h
+@@ -5,6 +5,9 @@
+ #ifndef GPU_CONFIG_WEBGPU_BLOCKLIST_IMPL_H_
+ #define GPU_CONFIG_WEBGPU_BLOCKLIST_IMPL_H_
+ 
++// Macro 'None' from X11/X.h will cause confliction
++#undef None
++
+ #include <cstdint>
+ #include <string>
+ 
 diff --git a/gpu/ipc/service/BUILD.gn b/gpu/ipc/service/BUILD.gn
 index 973cd337f2..e37d5ed99a 100644
 --- a/gpu/ipc/service/BUILD.gn
@@ -444,7 +474,7 @@ index 973cd337f2..e37d5ed99a 100644
    sources = [
      "command_buffer_stub.cc",
 diff --git a/media/audio/BUILD.gn b/media/audio/BUILD.gn
-index 87126a3672..c4a29b44c7 100644
+index 8bcbb66371..4e4c7a643d 100644
 --- a/media/audio/BUILD.gn
 +++ b/media/audio/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -507,7 +537,7 @@ index 3ca6e59781..a81337b2ab 100644
 +#undef kDefaultSampleRate
 +#undef kDefaultInputBufferSize
 diff --git a/media/base/BUILD.gn b/media/base/BUILD.gn
-index 3503f274e3..19dfb69cd2 100644
+index b1aaecd895..8ebe8ffeff 100644
 --- a/media/base/BUILD.gn
 +++ b/media/base/BUILD.gn
 @@ -5,6 +5,7 @@
@@ -527,7 +557,7 @@ index 3503f274e3..19dfb69cd2 100644
    # Do not expand the visibility here without double-checking with OWNERS, this
    # is a roll-up target which is part of the //media component. Most other DEPs
    # should be using //media and not directly DEP this roll-up target.
-@@ -447,6 +448,8 @@ source_set("base") {
+@@ -449,6 +450,8 @@ source_set("base") {
        "libaom_thread_wrapper.cc",
        "libaom_thread_wrapper.h",
      ]
@@ -537,7 +567,7 @@ index 3503f274e3..19dfb69cd2 100644
    }
  
 diff --git a/media/base/android/BUILD.gn b/media/base/android/BUILD.gn
-index 995fe7a7e0..f426fafe4a 100644
+index 08b18e6800..acc5baa3a1 100644
 --- a/media/base/android/BUILD.gn
 +++ b/media/base/android/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -612,18 +642,18 @@ index 076e3ef667..5571e2d985 100644
      "dxgi_device_manager.cc",
      "dxgi_device_manager.h",
 diff --git a/media/capture/BUILD.gn b/media/capture/BUILD.gn
-index b0343249c6..215c41fb85 100644
+index e7b2421f03..1cd74e651b 100644
 --- a/media/capture/BUILD.gn
 +++ b/media/capture/BUILD.gn
-@@ -3,6 +3,7 @@
- # found in the LICENSE file.
+@@ -4,6 +4,7 @@
  
+ import("//build/config/apple/mobile_config.gni")
  import("//build/config/features.gni")
 +import("//build/config/jumbo.gni")
  import("//build/config/ui.gni")
  import("//media/media_options.gni")
  import("//services/video_effects/args.gni")
-@@ -33,7 +34,7 @@ component("capture_switches") {
+@@ -34,7 +35,7 @@ component("capture_switches") {
  }
  
  # Things needed by //media/capture/mojom/video_capture_types.mojom.
@@ -632,7 +662,7 @@ index b0343249c6..215c41fb85 100644
    defines = [ "CAPTURE_IMPLEMENTATION" ]
    sources = [
      "capture_export.h",
-@@ -56,7 +57,7 @@ component("capture_base") {
+@@ -57,7 +58,7 @@ component("capture_base") {
  }
  
  # Target which allows breakout of Android BUILD.gn files.
@@ -641,7 +671,7 @@ index b0343249c6..215c41fb85 100644
    visibility = [
      ":capture_lib",
      "//media/capture/video/android",
-@@ -117,7 +118,7 @@ source_set("capture_device_specific") {
+@@ -118,7 +119,7 @@ source_set("capture_device_specific") {
    ]
  }
  
@@ -651,7 +681,7 @@ index b0343249c6..215c41fb85 100644
    sources = [
      "video/create_video_capture_device_factory.cc",
 diff --git a/media/cast/BUILD.gn b/media/cast/BUILD.gn
-index 0fca432cc3..19d1cdf6a1 100644
+index c7d8da0768..b727e291fb 100644
 --- a/media/cast/BUILD.gn
 +++ b/media/cast/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -671,7 +701,7 @@ index 0fca432cc3..19d1cdf6a1 100644
    sources = [
      "cast_callbacks.h",
      "cast_config.cc",
-@@ -62,7 +63,7 @@ source_set("common") {
+@@ -67,7 +68,7 @@ source_set("common") {
    ]
  }
  
@@ -680,7 +710,7 @@ index 0fca432cc3..19d1cdf6a1 100644
    sources = [
      "encoding/audio_encoder.cc",
      "encoding/audio_encoder.h",
-@@ -121,7 +122,7 @@ source_set("encoding") {
+@@ -131,7 +132,7 @@ source_set("encoding") {
    }
  }
  
@@ -839,7 +869,7 @@ index 10731337ee..aff6135a64 100644
    # is a roll-up target which is part of the //media component. Most other DEPs
    # should be using //media and not directly DEP this roll-up target.
 diff --git a/media/filters/h264_to_annex_b_bitstream_converter.cc b/media/filters/h264_to_annex_b_bitstream_converter.cc
-index cafa590539..84a8075089 100644
+index d3d843b080..618f25b022 100644
 --- a/media/filters/h264_to_annex_b_bitstream_converter.cc
 +++ b/media/filters/h264_to_annex_b_bitstream_converter.cc
 @@ -15,6 +15,10 @@
@@ -935,7 +965,7 @@ index 34fe6f57e4..14ba63c188 100644
  declare_args() {
    # Enables runtime selection of PulseAudio library.
 diff --git a/media/mojo/clients/BUILD.gn b/media/mojo/clients/BUILD.gn
-index b57ad94752..e7d96a3f62 100644
+index 1fce9bb072..abc833fe25 100644
 --- a/media/mojo/clients/BUILD.gn
 +++ b/media/mojo/clients/BUILD.gn
 @@ -4,8 +4,10 @@
@@ -951,7 +981,7 @@ index b57ad94752..e7d96a3f62 100644
      ":test_support",
      "//chromecast/*",
 diff --git a/media/mojo/common/BUILD.gn b/media/mojo/common/BUILD.gn
-index c42b874e05..29a54b7277 100644
+index 938e729435..ef6f59d320 100644
 --- a/media/mojo/common/BUILD.gn
 +++ b/media/mojo/common/BUILD.gn
 @@ -2,7 +2,9 @@
@@ -966,7 +996,7 @@ index c42b874e05..29a54b7277 100644
      "audio_data_s16_converter.cc",
      "audio_data_s16_converter.h",
 diff --git a/media/mojo/services/BUILD.gn b/media/mojo/services/BUILD.gn
-index 954773b7e6..218d3c5b09 100644
+index ad83889994..722a30e6d1 100644
 --- a/media/mojo/services/BUILD.gn
 +++ b/media/mojo/services/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1122,7 +1152,7 @@ index ffc6bdc4ab..28ab85355d 100644
      "cert_net_fetcher_url_loader.cc",
      "cert_net_fetcher_url_loader.h",
 diff --git a/services/network/BUILD.gn b/services/network/BUILD.gn
-index 95e7ccedca..ecf6d4932b 100644
+index 78cf92800d..6880dc02dd 100644
 --- a/services/network/BUILD.gn
 +++ b/services/network/BUILD.gn
 @@ -3,12 +3,13 @@
@@ -1140,7 +1170,7 @@ index 95e7ccedca..ecf6d4932b 100644
    sources = [
      "ad_heuristic_cookie_overrides.cc",
      "ad_heuristic_cookie_overrides.h",
-@@ -598,7 +599,7 @@ source_set("tests") {
+@@ -605,7 +606,7 @@ source_set("tests") {
    }
  }
  
@@ -1188,7 +1218,7 @@ index 188783cc42..7918267eee 100644
 +
 +#undef kPrefPath
 diff --git a/services/network/public/cpp/BUILD.gn b/services/network/public/cpp/BUILD.gn
-index 0a575c10bb..4639ccd304 100644
+index 78331806e6..7296c91bc6 100644
 --- a/services/network/public/cpp/BUILD.gn
 +++ b/services/network/public/cpp/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1217,7 +1247,7 @@ index 0a575c10bb..4639ccd304 100644
    output_name = "network_cpp"
  
    sources = [
-@@ -433,7 +434,7 @@ component("schemeful_site_mojom_support") {
+@@ -481,7 +482,7 @@ component("schemeful_site_mojom_support") {
  
  # This component is separate from cpp_base as it is a dependency of
  # //services/network/public/mojom:cookies_mojom.
@@ -1226,7 +1256,7 @@ index 0a575c10bb..4639ccd304 100644
    sources = [
      "first_party_sets_mojom_traits.cc",
      "first_party_sets_mojom_traits.h",
-@@ -463,7 +464,7 @@ component("storage_access_api_mojom_support") {
+@@ -511,7 +512,7 @@ component("storage_access_api_mojom_support") {
    defines = [ "IS_STORAGE_ACCESS_API_MOJOM_TRAITS_IMPL" ]
  }
  
@@ -1235,7 +1265,7 @@ index 0a575c10bb..4639ccd304 100644
    output_name = "network_cpp_base"
  
    sources = [
-@@ -519,6 +520,7 @@ component("cpp_base") {
+@@ -569,6 +570,7 @@ component("cpp_base") {
      "web_transport_error_mojom_traits.cc",
      "web_transport_error_mojom_traits.h",
    ]
@@ -1243,7 +1273,7 @@ index 0a575c10bb..4639ccd304 100644
  
    configs += [ "//build/config/compiler:wexit_time_destructors" ]
  
-@@ -561,6 +563,9 @@ component("cpp_base") {
+@@ -612,6 +614,9 @@ component("cpp_base") {
        "p2p_param_traits.h",
        "p2p_socket_type.h",
      ]
@@ -1300,10 +1330,10 @@ index b32b864b80..3407788fbe 100644
 +#undef kReportOnlyHeaderName
 +#undef Parse
 diff --git a/services/network/url_loader.cc b/services/network/url_loader.cc
-index 4e8781ad6a..0a20f67cae 100644
+index 01ddddb7f8..dfb0fb108e 100644
 --- a/services/network/url_loader.cc
 +++ b/services/network/url_loader.cc
-@@ -119,6 +119,8 @@
+@@ -126,6 +126,8 @@
  #include "third_party/abseil-cpp/absl/container/inlined_vector.h"
  #include "url/origin.h"
  
@@ -1312,7 +1342,7 @@ index 4e8781ad6a..0a20f67cae 100644
  namespace network {
  
  namespace {
-@@ -3478,3 +3480,5 @@ void URLLoader::RecordRequestMetrics() {
+@@ -3748,3 +3750,5 @@ void URLLoader::RecordRequestMetrics() {
  }
  
  }  // namespace network

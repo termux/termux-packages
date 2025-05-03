@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.chromium.org/Home
 TERMUX_PKG_DESCRIPTION="Chromium web browser (Host tools)"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
-TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION=135.0.7049.114
+TERMUX_PKG_MAINTAINER="Chongyun Lee <uchkks@protonmail.com>"
+TERMUX_PKG_VERSION=136.0.7103.59
 TERMUX_PKG_SRCURL=https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=aa85ce2bf36ed71261109fd7e700fac596a28b7be035a40a518c6a6fcf973c22
+TERMUX_PKG_SHA256=3ce1ef863767b3a72058a0f0ceb150cc7b8a9ba8bc24e19c98d25f8b395a8cfe
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libdrm, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libffi-static"
 # TODO: Split chromium-common and chromium-headless
@@ -60,6 +60,7 @@ termux_step_configure() {
 		touch "$TERMUX_PKG_CACHEDIR/.depot_tools-fetched"
 	fi
 	export PATH="$TERMUX_PKG_CACHEDIR/depot_tools:$PATH"
+	$TERMUX_PKG_CACHEDIR/depot_tools/ensure_bootstrap
 
 	# Remove termux's dummy pkg-config
 	local _target_pkg_config=$(command -v pkg-config)
