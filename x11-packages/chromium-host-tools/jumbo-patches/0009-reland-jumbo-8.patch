@@ -103,7 +103,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  ui/base/x/x11_display_manager.cc                  |  4 ++++
  ui/base/x/x11_drag_context.cc                     | 12 ++++++++++++
  ui/base/x/x11_drag_drop_client.cc                 | 12 ++++++++++++
- ui/color/BUILD.gn                                 |  9 +++++----
+ ui/color/BUILD.gn                                 |  7 ++++---
  ui/compositor/BUILD.gn                            |  5 +++--
  ui/display/BUILD.gn                               |  5 +++--
  ui/display/manager/BUILD.gn                       |  3 ++-
@@ -139,7 +139,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  ui/latency/BUILD.gn                               |  5 +++--
  ui/message_center/BUILD.gn                        |  3 ++-
  ui/message_center/public/cpp/BUILD.gn             |  3 ++-
- ui/native_theme/BUILD.gn                          |  9 +++++----
+ ui/native_theme/BUILD.gn                          |  7 ++++---
  ui/ozone/BUILD.gn                                 | 11 ++++++-----
  ui/platform_window/stub/BUILD.gn                  |  4 +++-
  ui/platform_window/win/BUILD.gn                   |  4 +++-
@@ -160,10 +160,10 @@ Enable jumbo build for the following component(s)/source_set(s):
  ui/web_dialogs/BUILD.gn                           |  6 ++++--
  ui/wm/BUILD.gn                                    |  5 +++--
  ui/wm/public/BUILD.gn                             |  3 ++-
- 75 files changed, 280 insertions(+), 109 deletions(-)
+ 75 files changed, 278 insertions(+), 107 deletions(-)
 
 diff --git a/ui/accessibility/BUILD.gn b/ui/accessibility/BUILD.gn
-index 9ab7694d9a..a9729d339e 100644
+index 3bae763179..e44eaee6b3 100644
 --- a/ui/accessibility/BUILD.gn
 +++ b/ui/accessibility/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -183,7 +183,7 @@ index 9ab7694d9a..a9729d339e 100644
    defines = [ "AX_BASE_IMPLEMENTATION" ]
  
    sources = [
-@@ -153,7 +154,7 @@ group("accessibility") {
+@@ -158,7 +159,7 @@ group("accessibility") {
    ]
  }
  
@@ -193,7 +193,7 @@ index 9ab7694d9a..a9729d339e 100644
  
    sources = [
 diff --git a/ui/accessibility/platform/BUILD.gn b/ui/accessibility/platform/BUILD.gn
-index 2f7f2a8f81..03a778827c 100644
+index 6207f49418..1abb2acbfd 100644
 --- a/ui/accessibility/platform/BUILD.gn
 +++ b/ui/accessibility/platform/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -240,7 +240,7 @@ index 763ac3abdc..da50001093 100644
    sources = [
      "test/aura_test_base.cc",
 diff --git a/ui/base/BUILD.gn b/ui/base/BUILD.gn
-index 04702a2c6f..d35d2a64ee 100644
+index a89628087c..79270eaca1 100644
 --- a/ui/base/BUILD.gn
 +++ b/ui/base/BUILD.gn
 @@ -6,6 +6,7 @@ import("//build/buildflag_header.gni")
@@ -251,7 +251,7 @@ index 04702a2c6f..d35d2a64ee 100644
  import("//build/config/linux/gtk/gtk.gni")
  import("//build/config/linux/pangocairo/pangocairo.gni")
  import("//build/config/locales.gni")
-@@ -111,7 +112,7 @@ source_set("types") {
+@@ -113,7 +114,7 @@ source_set("types") {
    }
  }
  
@@ -260,7 +260,7 @@ index 04702a2c6f..d35d2a64ee 100644
    output_name = "ui_base"
  
    sources = [
-@@ -227,6 +228,10 @@ component("base") {
+@@ -229,6 +230,10 @@ component("base") {
  
    libs = []
  
@@ -271,7 +271,7 @@ index 04702a2c6f..d35d2a64ee 100644
    if (is_android) {
      sources += [
        "device_form_factor_android.cc",
-@@ -711,7 +716,7 @@ component("features") {
+@@ -713,7 +718,7 @@ component("features") {
  }
  
  if (is_win || is_mac || is_linux || is_chromeos) {
@@ -280,7 +280,7 @@ index 04702a2c6f..d35d2a64ee 100644
      testonly = true
      sources = [
        "test/skia_gold_matching_algorithm.cc",
-@@ -753,7 +758,7 @@ if (use_blink) {
+@@ -755,7 +760,7 @@ if (use_blink) {
    }
  }
  
@@ -290,7 +290,7 @@ index 04702a2c6f..d35d2a64ee 100644
    sources = [
      "data_transfer_policy/mock_data_transfer_policy_controller.cc",
 diff --git a/ui/base/clipboard/BUILD.gn b/ui/base/clipboard/BUILD.gn
-index 2a86f8bae0..2b46554dc1 100644
+index 9d28e68316..a88bb8b0d1 100644
 --- a/ui/base/clipboard/BUILD.gn
 +++ b/ui/base/clipboard/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -328,7 +328,7 @@ index 2a86f8bae0..2b46554dc1 100644
    output_name = "ui_base_clipboard"
  
    sources = [
-@@ -197,7 +198,7 @@ component("clipboard") {
+@@ -199,7 +200,7 @@ component("clipboard") {
    }
  }
  
@@ -617,10 +617,10 @@ index 408e901a9c..bc63c9c411 100644
 +#undef kXdndActionLink
 +#undef kXdndActionList
 diff --git a/ui/color/BUILD.gn b/ui/color/BUILD.gn
-index 026b757a1f..90f9e82936 100644
+index 7d9a7d263c..e7daed6aa9 100644
 --- a/ui/color/BUILD.gn
 +++ b/ui/color/BUILD.gn
-@@ -3,13 +3,14 @@
+@@ -3,6 +3,7 @@
  # found in the LICENSE file.
  
  import("//build/buildflag_header.gni")
@@ -628,15 +628,7 @@ index 026b757a1f..90f9e82936 100644
  import("//mojo/public/tools/bindings/mojom.gni")
  import("//testing/test.gni")
  import("//ui/base/ui_features.gni")
- 
- assert(use_blink, "Not supported without use_blink")
- 
--source_set("color_headers") {
-+jumbo_source_set("color_headers") {
-   sources = [
-     "color_id.h",
-     "color_id_macros.inc",
-@@ -33,7 +34,7 @@ source_set("color_headers") {
+@@ -31,7 +32,7 @@ source_set("color_headers") {
  }
  
  # Keep the deps on this target to a minimum so that chromeos/crosapi can depend on it.
@@ -645,7 +637,7 @@ index 026b757a1f..90f9e82936 100644
    sources = [
      "color_provider_key.cc",
      "color_provider_key.h",
-@@ -49,7 +50,7 @@ component("color_provider_key") {
+@@ -47,7 +48,7 @@ component("color_provider_key") {
    ]
  }
  
@@ -654,7 +646,7 @@ index 026b757a1f..90f9e82936 100644
    sources = [
      "color_metrics.cc",
      "color_mixer.cc",
-@@ -143,7 +144,7 @@ if (is_win) {
+@@ -141,7 +142,7 @@ if (is_win) {
    }
  }
  
@@ -664,7 +656,7 @@ index 026b757a1f..90f9e82936 100644
      "color_mixers.cc",
      "color_mixers.h",
 diff --git a/ui/compositor/BUILD.gn b/ui/compositor/BUILD.gn
-index e7e2f4b4c5..ceeac2657d 100644
+index 27afd8eef3..4fb478d97a 100644
 --- a/ui/compositor/BUILD.gn
 +++ b/ui/compositor/BUILD.gn
 @@ -2,10 +2,11 @@
@@ -690,7 +682,7 @@ index e7e2f4b4c5..ceeac2657d 100644
    sources = [
      "test/begin_main_frame_waiter.cc",
 diff --git a/ui/display/BUILD.gn b/ui/display/BUILD.gn
-index eea9eb92fa..180c1a92c8 100644
+index e598004da5..949e5753b1 100644
 --- a/ui/display/BUILD.gn
 +++ b/ui/display/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -710,7 +702,7 @@ index eea9eb92fa..180c1a92c8 100644
    sources = [
      "display.cc",
      "display.h",
-@@ -173,7 +174,7 @@ if (is_chromeos) {
+@@ -178,7 +179,7 @@ if (is_chromeos) {
    }
  }
  
@@ -770,7 +762,7 @@ index cfb992fb9e..fb41100de8 100644
    sources = [
      "display_util.cc",
 diff --git a/ui/events/BUILD.gn b/ui/events/BUILD.gn
-index 3323d1fdff..8e3b944d8f 100644
+index 446cd3554c..9fad52990c 100644
 --- a/ui/events/BUILD.gn
 +++ b/ui/events/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -799,7 +791,7 @@ index 3323d1fdff..8e3b944d8f 100644
    sources = [
      "base_event_utils.cc",
      "base_event_utils.h",
-@@ -191,7 +192,7 @@ component("events_base") {
+@@ -198,7 +199,7 @@ component("events_base") {
    }
  }
  
@@ -808,7 +800,7 @@ index 3323d1fdff..8e3b944d8f 100644
    public = [
      "cocoa/cocoa_event_utils.h",
      "event.h",
-@@ -399,7 +400,7 @@ component("events") {
+@@ -406,7 +407,7 @@ component("events") {
    }
  }
  
@@ -817,7 +809,7 @@ index 3323d1fdff..8e3b944d8f 100644
    public = [ "keyboard_hook.h" ]
  
    defines = [ "IS_KEYBOARD_HOOK_IMPL" ]
-@@ -453,7 +454,7 @@ component("keyboard_hook") {
+@@ -460,7 +461,7 @@ component("keyboard_hook") {
    }
  }
  
@@ -826,7 +818,7 @@ index 3323d1fdff..8e3b944d8f 100644
    sources = [
      "gesture_detection/filtered_gesture_provider.cc",
      "gesture_detection/filtered_gesture_provider.h",
-@@ -511,7 +512,7 @@ component("gesture_detection") {
+@@ -518,7 +519,7 @@ component("gesture_detection") {
    }
  }
  
@@ -835,7 +827,7 @@ index 3323d1fdff..8e3b944d8f 100644
    sources = [
      "velocity_tracker/bitset_32.h",
      "velocity_tracker/motion_event.cc",
-@@ -534,7 +535,7 @@ component("velocity_tracker") {
+@@ -541,7 +542,7 @@ component("velocity_tracker") {
    ]
  }
  
@@ -987,7 +979,7 @@ index c8abb820bd..7028f735b4 100644
  
    sources = [
 diff --git a/ui/gfx/BUILD.gn b/ui/gfx/BUILD.gn
-index cb507971be..2c06f02fcb 100644
+index 428ba0136f..cf2617ded9 100644
 --- a/ui/gfx/BUILD.gn
 +++ b/ui/gfx/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1025,7 +1017,7 @@ index cb507971be..2c06f02fcb 100644
    sources = [
      "break_list.h",
      "color_analysis.cc",
-@@ -448,7 +449,7 @@ component("gfx") {
+@@ -449,7 +450,7 @@ component("gfx") {
    }
  }
  
@@ -1034,7 +1026,7 @@ index cb507971be..2c06f02fcb 100644
    sources = [
      "color_conversion_sk_filter_cache.cc",
      "color_conversion_sk_filter_cache.h",
-@@ -588,7 +589,7 @@ group("memory_buffer") {
+@@ -591,7 +592,7 @@ group("memory_buffer") {
  }
  
  # Cannot be a static_library in component builds due to exported functions
@@ -1043,7 +1035,7 @@ index cb507971be..2c06f02fcb 100644
    visibility = [ ":*" ]  # Depend on through ":memory_buffer".
  
    # TODO(brettw) refactor this so these sources are in a coherent directory
-@@ -688,7 +689,7 @@ source_set("memory_buffer_sources") {
+@@ -691,7 +692,7 @@ source_set("memory_buffer_sources") {
  }
  
  # TODO(ccameron): This can be moved into a separate source_set.
@@ -1052,7 +1044,7 @@ index cb507971be..2c06f02fcb 100644
    sources = [
      "switches.cc",
      "switches.h",
-@@ -700,7 +701,7 @@ component("gfx_switches") {
+@@ -703,7 +704,7 @@ component("gfx_switches") {
    deps = [ "//base" ]
  }
  
@@ -1100,10 +1092,10 @@ index 327eb6d2d0..def3b7850b 100644
      "codec_export.h",
      "jpeg_codec.cc",
 diff --git a/ui/gfx/codec/jpeg_codec.cc b/ui/gfx/codec/jpeg_codec.cc
-index 3959c651bc..8294b6941b 100644
+index 6b233181ea..ef823b815d 100644
 --- a/ui/gfx/codec/jpeg_codec.cc
 +++ b/ui/gfx/codec/jpeg_codec.cc
-@@ -16,6 +16,8 @@
+@@ -15,6 +15,8 @@
  #include "third_party/skia/include/encode/SkJpegEncoder.h"
  #include "ui/gfx/codec/vector_wstream.h"
  
@@ -1112,17 +1104,17 @@ index 3959c651bc..8294b6941b 100644
  namespace gfx {
  
  // Encoder ---------------------------------------------------------------------
-@@ -167,3 +169,5 @@ SkBitmap JPEGCodec::Decode(base::span<const uint8_t> input) {
+@@ -166,3 +168,5 @@ SkBitmap JPEGCodec::Decode(base::span<const uint8_t> input) {
  }
  
  }  // namespace gfx
 +
 +#undef PreparationOutput
 diff --git a/ui/gfx/codec/png_codec.cc b/ui/gfx/codec/png_codec.cc
-index 35c3bdc7c0..2fc93cb723 100644
+index aea66652b6..0f0876b22f 100644
 --- a/ui/gfx/codec/png_codec.cc
 +++ b/ui/gfx/codec/png_codec.cc
-@@ -27,6 +27,8 @@
+@@ -28,6 +28,8 @@
  #include "third_party/skia/experimental/rust_png/decoder/SkPngRustDecoder.h"
  #endif
  
@@ -1131,7 +1123,7 @@ index 35c3bdc7c0..2fc93cb723 100644
  namespace gfx {
  
  PNGCodec::DecodeOutput::DecodeOutput() = default;
-@@ -318,3 +320,5 @@ PNGCodec::Comment::Comment(const std::string& k, const std::string& t)
+@@ -319,3 +321,5 @@ PNGCodec::Comment::Comment(const std::string& k, const std::string& t)
  PNGCodec::Comment::~Comment() = default;
  
  }  // namespace gfx
@@ -1312,7 +1304,7 @@ index 51db6c7cfc..3424804225 100644
 +#undef kDisabledCrtc
 +#undef PixelsToMillimeters
 diff --git a/ui/gl/BUILD.gn b/ui/gl/BUILD.gn
-index 5d471a4e08..8d3393bf9a 100644
+index ce4fc17377..54ae856716 100644
 --- a/ui/gl/BUILD.gn
 +++ b/ui/gl/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -1332,7 +1324,7 @@ index 5d471a4e08..8d3393bf9a 100644
    output_name = "gl_wrapper"  # Avoid colliding with OS X"s libGL.dylib.
  
    sources = [
-@@ -335,6 +336,10 @@ component("gl") {
+@@ -340,6 +341,10 @@ component("gl") {
      defines += [ "GL_SILENCE_DEPRECATION" ]
    }
  
@@ -1343,7 +1335,7 @@ index 5d471a4e08..8d3393bf9a 100644
    if (is_android) {
      sources += [
        "android/egl_fence_utils.cc",
-@@ -414,11 +419,15 @@ if (is_mac) {
+@@ -419,11 +424,15 @@ if (is_mac) {
          "//third_party/swiftshader/src/Vulkan:icd_file",
          "//third_party/swiftshader/src/Vulkan:swiftshader_libvulkan",
        ]
@@ -1360,7 +1352,7 @@ index 5d471a4e08..8d3393bf9a 100644
    testonly = true
    sources = [
      "egl_bindings_autogen_mock.cc",
-@@ -443,7 +452,7 @@ static_library("gl_unittest_utils") {
+@@ -448,7 +457,7 @@ static_library("gl_unittest_utils") {
    ]
  }
  
@@ -1518,10 +1510,10 @@ index e15d9b3c19..5b5cdee474 100644
  
    sources = [
 diff --git a/ui/native_theme/BUILD.gn b/ui/native_theme/BUILD.gn
-index 2c969935ed..b3234bea00 100644
+index 2c6223daf0..628198c597 100644
 --- a/ui/native_theme/BUILD.gn
 +++ b/ui/native_theme/BUILD.gn
-@@ -2,6 +2,7 @@
+@@ -2,10 +2,11 @@
  # Use of this source code is governed by a BSD-style license that can be
  # found in the LICENSE file.
  
@@ -1529,25 +1521,12 @@ index 2c969935ed..b3234bea00 100644
  import("//build/config/ui.gni")
  import("//testing/test.gni")
  
-@@ -19,7 +20,7 @@ component("features") {
-   deps = [ "//base" ]
- }
- 
 -component("native_theme") {
 +jumbo_component("native_theme") {
    sources = [
      "caption_style.cc",
      "caption_style.h",
-@@ -104,7 +105,7 @@ component("native_theme") {
- }
- 
- if (is_win) {
--  component("native_theme_browser") {
-+  jumbo_component("native_theme_browser") {
-     defines = [ "NATIVE_THEME_IMPLEMENTATION" ]
- 
-     # These files cannot work in the renderer on Windows.
-@@ -126,11 +127,11 @@ if (is_win) {
+@@ -112,11 +113,11 @@ if (is_win) {
      libs = [ "uxtheme.lib" ]
    }
  } else {
@@ -1562,7 +1541,7 @@ index 2c969935ed..b3234bea00 100644
  
    deps = [
 diff --git a/ui/ozone/BUILD.gn b/ui/ozone/BUILD.gn
-index f327437c85..847036ab0a 100644
+index a1c589b979..398d84e913 100644
 --- a/ui/ozone/BUILD.gn
 +++ b/ui/ozone/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1582,7 +1561,7 @@ index f327437c85..847036ab0a 100644
    sources = [
      "public/gl_ozone.h",
      "public/gpu_platform_support_host.cc",
-@@ -252,7 +253,7 @@ source_set("ozone_switches") {
+@@ -253,7 +254,7 @@ source_set("ozone_switches") {
    ]
  }
  
@@ -1591,7 +1570,7 @@ index f327437c85..847036ab0a 100644
    visibility = []
    visibility = [ "*" ]
    public_deps = [ ":platform" ]
-@@ -269,7 +270,7 @@ source_set("drm_modifiers_filter") {
+@@ -270,7 +271,7 @@ source_set("drm_modifiers_filter") {
    visibility += [ "//gpu/vulkan" ]
  }
  
@@ -1600,7 +1579,7 @@ index f327437c85..847036ab0a 100644
    testonly = true
  
    sources = [
-@@ -292,7 +293,7 @@ source_set("test_support_internal") {
+@@ -293,7 +294,7 @@ source_set("test_support_internal") {
    public_deps = [ "//base/test:test_support" ]
  }
  
@@ -1609,7 +1588,7 @@ index f327437c85..847036ab0a 100644
    visibility = []
    visibility = [ "//ui/views:test_support" ]
  
-@@ -328,7 +329,7 @@ source_set("ozone_interactive_ui_tests") {
+@@ -329,7 +330,7 @@ source_set("ozone_interactive_ui_tests") {
    deps = ozone_platform_interactive_ui_tests_sources
  }
  
@@ -1661,7 +1640,7 @@ index 5430e0711c..afedf73faa 100644
  import("//tools/grit/repack.gni")
  
 diff --git a/ui/shell_dialogs/BUILD.gn b/ui/shell_dialogs/BUILD.gn
-index c03a005764..abd8babff1 100644
+index ae1226d99f..38be27e388 100644
 --- a/ui/shell_dialogs/BUILD.gn
 +++ b/ui/shell_dialogs/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1672,8 +1651,8 @@ index c03a005764..abd8babff1 100644
  import("//build/config/ui.gni")
  import("//testing/test.gni")
  
-@@ -13,7 +14,7 @@ if (is_mac) {
-   import("//build/config/mac/rules.gni")
+@@ -16,7 +17,7 @@ if (is_ios) {
+   import("//build/config/apple/mobile_config.gni")  # For `target_platform`
  }
  
 -component("shell_dialogs") {
@@ -1724,7 +1703,7 @@ index dace1de6c0..e7f68805e9 100644
      "surface_export.h",
      "transport_dib.cc",
 diff --git a/ui/touch_selection/BUILD.gn b/ui/touch_selection/BUILD.gn
-index 2239bbe7da..7c7076ebe4 100644
+index ce5ee873dc..7adf1eb56c 100644
 --- a/ui/touch_selection/BUILD.gn
 +++ b/ui/touch_selection/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -1745,7 +1724,7 @@ index 2239bbe7da..7c7076ebe4 100644
  
    sources = [
 diff --git a/ui/views/BUILD.gn b/ui/views/BUILD.gn
-index 0f9f25edf6..9dd7ebf2dd 100644
+index f24cdf1484..0d49b7c754 100644
 --- a/ui/views/BUILD.gn
 +++ b/ui/views/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -1765,7 +1744,7 @@ index 0f9f25edf6..9dd7ebf2dd 100644
    all_dependent_configs = [ ":flags" ]
  
    public = [
-@@ -976,7 +977,7 @@ component("views") {
+@@ -982,7 +983,7 @@ component("views") {
  }
  
  if (is_win || is_mac || is_linux || is_chromeos) {
@@ -1774,7 +1753,7 @@ index 0f9f25edf6..9dd7ebf2dd 100644
      testonly = true
      sources = [
        "test/view_skia_gold_pixel_diff.cc",
-@@ -995,7 +996,7 @@ if (is_win || is_mac || is_linux || is_chromeos) {
+@@ -1001,7 +1002,7 @@ if (is_win || is_mac || is_linux || is_chromeos) {
    }
  }
  
@@ -1805,10 +1784,10 @@ index c33e817520..9fa720f76b 100644
 +#undef kFeaturePromoPulseDuration
 +#undef kFeaturePromoPulseInsetDip
 diff --git a/ui/views/animation/pulsing_path_ink_drop_mask.cc b/ui/views/animation/pulsing_path_ink_drop_mask.cc
-index 472b37a2ec..f7b191257b 100644
+index 0e39d27276..3ca1c18cb9 100644
 --- a/ui/views/animation/pulsing_path_ink_drop_mask.cc
 +++ b/ui/views/animation/pulsing_path_ink_drop_mask.cc
-@@ -9,6 +9,9 @@
+@@ -11,6 +11,9 @@
  #include "ui/gfx/geometry/skia_conversions.h"
  #include "ui/views/view_class_properties.h"
  
@@ -1816,9 +1795,9 @@ index 472b37a2ec..f7b191257b 100644
 +#define kFeaturePromoPulseInsetDip kFeaturePromoPulseInsetDip_PulsingPathInkDropMask
 +
  namespace {
+ 
  // Cycle duration of ink drop pulsing animation used for in-product help.
- constexpr base::TimeDelta kFeaturePromoPulseDuration = base::Milliseconds(800);
-@@ -81,3 +84,6 @@ void PulsingPathInkDropMask::AnimationProgressed(
+@@ -106,3 +109,6 @@ void PulsingPathInkDropMask::AnimationProgressed(
    layer_container_->SchedulePaint();
  }
  }  // namespace views
@@ -1826,7 +1805,7 @@ index 472b37a2ec..f7b191257b 100644
 +#undef kFeaturePromoPulseDuration
 +#undef kFeaturePromoPulseInsetDip
 diff --git a/ui/views/bubble/bubble_frame_view.cc b/ui/views/bubble/bubble_frame_view.cc
-index 01b977aa79..e732964e64 100644
+index fc9f11c272..c4d903712d 100644
 --- a/ui/views/bubble/bubble_frame_view.cc
 +++ b/ui/views/bubble/bubble_frame_view.cc
 @@ -155,7 +155,7 @@ std::unique_ptr<Label> BubbleFrameView::CreateDefaultTitleLabel(
@@ -1895,10 +1874,10 @@ index 006ed289a3..4bcb81f515 100644
        }
      }
 diff --git a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
-index e19eb0360e..248ae36471 100644
+index 649cff570e..fd48cad1c1 100644
 --- a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
 +++ b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
-@@ -331,7 +331,7 @@ void DesktopWindowTreeHostPlatform::OnActiveWindowChanged(bool active) {
+@@ -337,7 +337,7 @@ void DesktopWindowTreeHostPlatform::OnActiveWindowChanged(bool active) {
    // active, we enter this condition where `active && !is_active_` because
    // subwindows do not get active state from the OS on some platforms (E.g.
    // Wayland). So we need to ensure Activate is conveyed to the platform_window.
@@ -1907,7 +1886,7 @@ index e19eb0360e..248ae36471 100644
        active && !is_active_ && !window_children_.empty()) {
      Activate();
    }
-@@ -771,7 +771,7 @@ void DesktopWindowTreeHostPlatform::SetFullscreen(bool fullscreen,
+@@ -777,7 +777,7 @@ void DesktopWindowTreeHostPlatform::SetFullscreen(bool fullscreen,
      return;
    }
  

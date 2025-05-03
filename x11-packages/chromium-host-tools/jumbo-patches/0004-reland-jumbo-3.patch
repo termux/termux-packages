@@ -40,7 +40,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  28 files changed, 162 insertions(+), 8 deletions(-)
 
 diff --git a/net/BUILD.gn b/net/BUILD.gn
-index c86b77ce4d..dc2cbba2d2 100644
+index 9b70beae26..313a82fd52 100644
 --- a/net/BUILD.gn
 +++ b/net/BUILD.gn
 @@ -7,6 +7,7 @@ import("//build/config/cast.gni")
@@ -60,7 +60,7 @@ index c86b77ce4d..dc2cbba2d2 100644
    sources = [
      "base/address_family.cc",
      "base/address_family.h",
-@@ -1101,6 +1102,9 @@ component("net") {
+@@ -1109,6 +1110,9 @@ component("net") {
      "url_request/websocket_handshake_userdata_key.cc",
      "url_request/websocket_handshake_userdata_key.h",
    ]
@@ -70,7 +70,7 @@ index c86b77ce4d..dc2cbba2d2 100644
  
    if (is_posix || is_fuchsia) {
      sources += [ "base/net_errors_posix.cc" ]
-@@ -1303,6 +1307,10 @@ component("net") {
+@@ -1311,6 +1315,10 @@ component("net") {
        "base/network_interfaces_linux.h",
        "base/platform_mime_util_linux.cc",
      ]
@@ -140,7 +140,7 @@ index 543b8ae16c..f95737faaf 100644
    visibility = [
      "//net",
 diff --git a/net/dns/dns_response.cc b/net/dns/dns_response.cc
-index b6b9cdbe12..13835c7485 100644
+index bf9faa08bb..f73e0de94c 100644
 --- a/net/dns/dns_response.cc
 +++ b/net/dns/dns_response.cc
 @@ -31,6 +31,8 @@
@@ -152,18 +152,18 @@ index b6b9cdbe12..13835c7485 100644
  namespace net {
  
  namespace {
-@@ -629,3 +631,5 @@ bool DnsResponse::WriteAnswer(base::SpanWriter<uint8_t>* writer,
+@@ -626,3 +628,5 @@ bool DnsResponse::WriteAnswer(base::SpanWriter<uint8_t>* writer,
  }
  
  }  // namespace net
 +
 +#undef kHeaderSize
 diff --git a/net/dns/host_cache.cc b/net/dns/host_cache.cc
-index 040c1a789d..e8a7edcbd1 100644
+index b2ef120926..98e1b9f974 100644
 --- a/net/dns/host_cache.cc
 +++ b/net/dns/host_cache.cc
 @@ -44,6 +44,10 @@
- #include "third_party/abseil-cpp/absl/types/variant.h"
+ #include "net/log/net_log.h"
  #include "url/scheme_host_port.h"
  
 +#define kSecureKey                    kSecureKey_HostCache
@@ -173,7 +173,7 @@ index 040c1a789d..e8a7edcbd1 100644
  namespace net {
  
  namespace {
-@@ -1331,3 +1335,7 @@ std::ostream& operator<<(std::ostream& out,
+@@ -1332,3 +1336,7 @@ std::ostream& operator<<(std::ostream& out,
    return out << "EntryStaleness{" << s.expired_by << ", " << s.network_changes
               << ", " << s.stale_hits << "}";
  }
@@ -201,19 +201,19 @@ index 93032e14bb..a8e8ce6f22 100644
 +
 +#undef kSecureKey
 diff --git a/net/dns/host_resolver_dns_task.cc b/net/dns/host_resolver_dns_task.cc
-index 4d27b54802..15f6db924b 100644
+index 11191c8cb3..567e95bc85 100644
 --- a/net/dns/host_resolver_dns_task.cc
 +++ b/net/dns/host_resolver_dns_task.cc
 @@ -25,6 +25,8 @@
+ #include "net/dns/host_resolver_internal_result.h"
  #include "net/dns/public/util.h"
- #include "third_party/abseil-cpp/absl/types/variant.h"
  
 +#define NetLogResults NetLogResults_HostResolverDnsTask
 +
  namespace net {
  
  namespace {
-@@ -1160,3 +1162,5 @@ bool HostResolverDnsTask::ShouldTriggerHttpToHttpsUpgrade(
+@@ -1161,3 +1163,5 @@ bool HostResolverDnsTask::ShouldTriggerHttpToHttpsUpgrade(
  }
  
  }  // namespace net
@@ -241,7 +241,7 @@ index b8fbaee25c..426f3edaee 100644
 +#undef EndpointMetadataPairToValue
 +#undef EndpointMetadataPairFromValue
 diff --git a/net/dns/host_resolver_manager.cc b/net/dns/host_resolver_manager.cc
-index db5b04abd7..f6856ce714 100644
+index ee86b756e7..9dd65e8db6 100644
 --- a/net/dns/host_resolver_manager.cc
 +++ b/net/dns/host_resolver_manager.cc
 @@ -140,6 +140,8 @@
@@ -253,7 +253,7 @@ index db5b04abd7..f6856ce714 100644
  namespace net {
  
  namespace {
-@@ -1822,3 +1824,5 @@ std::unique_ptr<DnsProbeRunner> HostResolverManager::CreateDohProbeRunner(
+@@ -1832,3 +1834,5 @@ std::unique_ptr<DnsProbeRunner> HostResolverManager::CreateDohProbeRunner(
  }
  
  }  // namespace net
@@ -611,7 +611,7 @@ index 2a7d1ba8d5..f13761272c 100644
 +#undef kOpCodeMask
 +#undef kMaskBit
 diff --git a/net/websockets/websocket_channel.cc b/net/websockets/websocket_channel.cc
-index 53aeedc79b..94a4980029 100644
+index defb320b2b..de17bf39d4 100644
 --- a/net/websockets/websocket_channel.cc
 +++ b/net/websockets/websocket_channel.cc
 @@ -43,6 +43,8 @@
@@ -623,7 +623,7 @@ index 53aeedc79b..94a4980029 100644
  namespace net {
  class AuthChallengeInfo;
  class AuthCredentials;
-@@ -988,3 +990,5 @@ void WebSocketChannel::CloseTimeout() {
+@@ -987,3 +989,5 @@ void WebSocketChannel::CloseTimeout() {
  }
  
  }  // namespace net
