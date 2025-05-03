@@ -63,7 +63,7 @@ termux_step_configure() {
 		touch "$TERMUX_PKG_CACHEDIR/.depot_tools-fetched"
 	fi
 	export PATH="$TERMUX_PKG_CACHEDIR/depot_tools:$PATH"
-	TERMUX_PKG_CACHEDIR/depot_tools/ensure_bootstrap
+	$TERMUX_PKG_CACHEDIR/depot_tools/ensure_bootstrap
 
 	# Remove termux's dummy pkg-config
 	local _target_pkg_config=$(command -v pkg-config)
