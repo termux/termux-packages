@@ -1,0 +1,11 @@
+--- a/meson.build
++++ b/meson.build
+@@ -171,7 +171,7 @@
+ cdata.set('HAVE_MALLINFO2', cc.has_function('mallinfo2'))
+ cdata.set('HAVE_SYS_RESOURCE_H', cc.has_header('sys/resource.h'))
+ cdata.set('HAVE_EXE_INTROSPECTION',
+-  cc.has_header('elf.h') and cc.has_header('link.h'))
++  cc.has_header('elf.h') and cc.has_header('link.h') and host_machine.system() != 'android')
+ cdata.set('HAVE__NL_TIME_FIRST_WEEKDAY',
+   cc.has_header_symbol('langinfo.h', '_NL_TIME_FIRST_WEEKDAY')
+ )
