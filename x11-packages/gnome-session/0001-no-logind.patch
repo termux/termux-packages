@@ -1,0 +1,148 @@
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -4,3 +4,4 @@
+ option('docbook', type: 'boolean', value: true, description: 'build documentation')
+ option('man', type: 'boolean', value: true, description: 'build documentation (requires xmlto)')
+ option('x11', type: 'boolean', value: true, description: 'enable x11 session support')
++option('systemd', type: 'boolean', value: true, description: 'Use systemd')
+--- a/meson.build
++++ b/meson.build
+@@ -125,7 +125,12 @@
+                                                  pkgconfig_define: ['prefix', session_prefix])
+ endif
+ 
++if not get_option('systemd')
++libsystemd_dep = dependency('', required : false)
++else
+ libsystemd_dep = dependency('libsystemd', version: '>= 209', required: true)
++config_h.set(HAVE_SYSTEMD, true)
++endif
+ session_bin_deps += libsystemd_dep
+ 
+ configure_file(
+--- a/gnome-session/gsm-autostart-app.c
++++ b/gnome-session/gsm-autostart-app.c
+@@ -31,8 +31,10 @@
+ #define GNOME_DESKTOP_USE_UNSTABLE_API
+ #include <libgnome-desktop/gnome-systemd.h>
+ 
++#ifdef HAVE_SYSTEMD
+ #include <systemd/sd-journal.h>
+ #include <systemd/sd-daemon.h>
++#endif
+ 
+ #include "gsm-autostart-app.h"
+ #include "gsm-util.h"
+@@ -966,12 +968,16 @@ on_child_setup (GsmAutostartApp *app)
+         /* The FALSE means programs aren't expected to prefix each
+          * line with <n> prefix to specify priority.
+          */
++#ifdef HAVE_SYSTEMD
+         standard_output = sd_journal_stream_fd (priv->desktop_id,
+                                                 LOG_INFO,
+                                                 FALSE);
+         standard_error = sd_journal_stream_fd (priv->desktop_id,
+                                                LOG_WARNING,
+                                                FALSE);
++#else
++        standard_output = standard_error = -1;
++#endif
+ 
+         if (standard_output >= 0) {
+                 dup2 (standard_output, STDOUT_FILENO);
+@@ -1033,10 +1040,12 @@ autostart_app_start_spawn (GsmAutostartApp *app,
+                 g_app_launch_context_setenv (ctx, "DESKTOP_AUTOSTART_ID", startup_id);
+         }
+ 
++#ifdef HAVE_SYSTEMD
+         if (sd_booted () > 0) {
+                 child_setup_func = (GSpawnChildSetupFunc) on_child_setup;
+                 child_setup_data = app;
+         }
++#endif
+ 
+         handler = g_signal_connect (ctx, "launched", G_CALLBACK (app_launched), app);
+         success = g_desktop_app_info_launch_uris_as_manager (priv->app_info,
+--- a/gnome-session/gsm-manager.c
++++ b/gnome-session/gsm-manager.c
+@@ -40,9 +40,15 @@
+ #include "gsm-manager.h"
+ #include "org.gnome.SessionManager.h"
+ 
++#ifdef HAVE_SYSTEMD
+ #include <systemd/sd-journal.h>
+ 
+ #include <systemd/sd-daemon.h>
++#else
++#define sd_notify(...)
++#define sd_notifyf(...)
++#define sd_journal_send(...)
++#endif
+ 
+ #include "gsm-store.h"
+ #include "gsm-inhibitor.h"
+--- a/gnome-session/gsm-systemd.c
++++ b/gnome-session/gsm-systemd.c
+@@ -28,6 +28,7 @@
+ #include <sys/types.h>
+ #include <pwd.h>
+ 
++#ifdef HAVE_SYSTEMD
+ #include <systemd/sd-login.h>
+ 
+ #include <glib.h>
+@@ -1194,4 +1195,10 @@ sd_proxy_signal_cb (GDBusProxy  *proxy,
+         }
+ }
+ 
+-
++#else
++GsmSystemd *
++gsm_systemd_new (void)
++{
++        return NULL;
++}
++#endif
+--- a/gnome-session/main.c
++++ b/gnome-session/main.c
+@@ -43,7 +43,9 @@
+ #include "gsm-system.h"
+ #include "gsm-fail-whale.h"
+ 
++#ifdef HAVE_SYSTEMD
+ #include <systemd/sd-journal.h>
++#endif
+ 
+ #define GSM_DBUS_NAME "org.gnome.SessionManager"
+ 
+@@ -558,6 +560,7 @@ main (int argc, char **argv)
+          * journald picks ups the nicer "gnome-session" as the program
+          * name instead of whatever shell script GDM happened to use.
+          */
++#ifdef HAVE_SYSTEMD
+         if (!debug) {
+                 int journalfd;
+ 
+@@ -567,6 +570,7 @@ main (int argc, char **argv)
+                         dup2(journalfd, 2);
+                 }
+         }
++#endif
+ 
+         gdm_log_init ();
+         gdm_log_set_debug (debug);
+--- a/tools/gnome-session-ctl.c
++++ b/tools/gnome-session-ctl.c
+@@ -28,7 +28,12 @@
+ #include <errno.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
++#ifdef HAVE_SYSTEMD
+ #include <systemd/sd-daemon.h>
++#else
++#define sd_notify(...)
++#define sd_notifyf(...)
++#endif
+ 
+ #include <glib.h>
+ #include <glib-unix.h>
