@@ -1,0 +1,21 @@
+--- a/src/ibusshare.c
++++ b/src/ibusshare.c
+@@ -46,15 +46,15 @@
+ 
+     if (machine_id == NULL) {
+         GError *error = NULL;
+-        if (!g_file_get_contents ("/var/lib/dbus/machine-id",
++        if (!g_file_get_contents ("@TERMUX_PREFIX@/var/lib/dbus/machine-id",
+                                   &machine_id,
+                                   NULL,
+                                   &error) &&
+-            !g_file_get_contents ("/etc/machine-id",
++            !g_file_get_contents ("@TERMUX_PREFIX@/etc/machine-id",
+                                   &machine_id,
+                                   NULL,
+                                   NULL)) {
+-            g_warning ("Unable to load /var/lib/dbus/machine-id: %s", error->message);
++            g_warning ("Unable to load @TERMUX_PREFIX@/var/lib/dbus/machine-id: %s", error->message);
+             machine_id = "machine-id";
+         }
+         else {

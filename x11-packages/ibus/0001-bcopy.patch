@@ -1,0 +1,14 @@
+--- a/util/IMdkit/FrameMgr.c
++++ b/util/IMdkit/FrameMgr.c
+@@ -31,6 +31,11 @@
+ #include <stdlib.h>
+ #include "FrameMgr.h"
+ 
++#ifdef __ANDROID__
++#include <string.h>
++#define bcopy(src,dest,n) memmove(dest,src,n)
++#endif
++
+ /* Convenient macro */
+ 
+ #define _UNIT(n)   ((int)(n) & 0xFF)
