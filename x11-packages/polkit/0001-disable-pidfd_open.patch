@@ -1,0 +1,11 @@
+--- a/meson.build
++++ b/meson.build
+@@ -207,7 +207,7 @@
+ endif
+ config_data.set('HAVE_LIBSYSTEMD', enable_logind)
+ 
+-config_data.set('HAVE_PIDFD_OPEN', cc.get_define('SYS_pidfd_open', prefix: '#include <sys/syscall.h>') != '')
++config_data.set('HAVE_PIDFD_OPEN', cc.get_define('SYS_pidfd_open', prefix: '#include <sys/syscall.h>') != '' and host_machine.system() != 'android')
+ 
+ # systemd unit / sysuser / tmpfiles.d file installation directories
+ systemdsystemunitdir = get_option('systemdsystemunitdir')

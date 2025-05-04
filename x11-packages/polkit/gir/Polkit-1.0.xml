@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<dump>
+  <flags name="PolkitAuthorityFeatures" get-type="polkit_authority_features_get_type">
+    <member name="POLKIT_AUTHORITY_FEATURES_NONE" nick="none" value="0"/>
+    <member name="POLKIT_AUTHORITY_FEATURES_TEMPORARY_AUTHORIZATION" nick="temporary-authorization" value="1"/>
+  </flags>
+  <flags name="PolkitCheckAuthorizationFlags" get-type="polkit_check_authorization_flags_get_type">
+    <member name="POLKIT_CHECK_AUTHORIZATION_FLAGS_NONE" nick="none" value="0"/>
+    <member name="POLKIT_CHECK_AUTHORIZATION_FLAGS_ALLOW_USER_INTERACTION" nick="allow-user-interaction" value="1"/>
+    <member name="POLKIT_CHECK_AUTHORIZATION_FLAGS_ALWAYS_CHECK" nick="always-check" value="2"/>
+  </flags>
+  <enum name="PolkitError" get-type="polkit_error_get_type">
+    <member name="POLKIT_ERROR_FAILED" nick="failed" value="0"/>
+    <member name="POLKIT_ERROR_CANCELLED" nick="cancelled" value="1"/>
+    <member name="POLKIT_ERROR_NOT_SUPPORTED" nick="not-supported" value="2"/>
+    <member name="POLKIT_ERROR_NOT_AUTHORIZED" nick="not-authorized" value="3"/>
+  </enum>  <enum name="PolkitImplicitAuthorization" get-type="polkit_implicit_authorization_get_type">
+    <member name="POLKIT_IMPLICIT_AUTHORIZATION_UNKNOWN" nick="unknown" value="-1"/>
+    <member name="POLKIT_IMPLICIT_AUTHORIZATION_NOT_AUTHORIZED" nick="not-authorized" value="0"/>
+    <member name="POLKIT_IMPLICIT_AUTHORIZATION_AUTHENTICATION_REQUIRED" nick="authentication-required" value="1"/>
+    <member name="POLKIT_IMPLICIT_AUTHORIZATION_ADMINISTRATOR_AUTHENTICATION_REQUIRED" nick="administrator-authentication-required" value="2"/>
+    <member name="POLKIT_IMPLICIT_AUTHORIZATION_AUTHENTICATION_REQUIRED_RETAINED" nick="authentication-required-retained" value="3"/>
+    <member name="POLKIT_IMPLICIT_AUTHORIZATION_ADMINISTRATOR_AUTHENTICATION_REQUIRED_RETAINED" nick="administrator-authentication-required-retained" value="4"/>
+    <member name="POLKIT_IMPLICIT_AUTHORIZATION_AUTHORIZED" nick="authorized" value="5"/>
+  </enum>  <class name="PolkitActionDescription" get-type="polkit_action_description_get_type" parents="GObject">
+  </class>
+  <class name="PolkitAuthority" get-type="polkit_authority_get_type" parents="GObject">
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <property name="owner" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="backend-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="backend-version" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="backend-features" type="PolkitAuthorityFeatures" flags="225" default-value="POLKIT_AUTHORITY_FEATURES_NONE"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+    <signal name="sessions-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="PolkitAuthorizationResult" get-type="polkit_authorization_result_get_type" parents="GObject">
+  </class>
+  <class name="PolkitDetails" get-type="polkit_details_get_type" parents="GObject">
+  </class>
+  <interface name="PolkitIdentity" get-type="polkit_identity_get_type">
+  </interface>
+  <class name="PolkitUnixUser" get-type="polkit_unix_user_get_type" parents="GObject">
+    <implements name="PolkitIdentity"/>
+    <property name="uid" type="gint" flags="231" default-value="-1"/>
+  </class>
+  <class name="PolkitUnixGroup" get-type="polkit_unix_group_get_type" parents="GObject">
+    <implements name="PolkitIdentity"/>
+    <property name="gid" type="gint" flags="231" default-value="-1"/>
+  </class>
+  <class name="PolkitUnixNetgroup" get-type="polkit_unix_netgroup_get_type" parents="GObject">
+    <implements name="PolkitIdentity"/>
+    <property name="name" type="gchararray" flags="231" default-value="NULL"/>
+  </class>
+  <interface name="PolkitSubject" get-type="polkit_subject_get_type">
+  </interface>
+  <class name="PolkitUnixProcess" get-type="polkit_unix_process_get_type" parents="GObject">
+    <implements name="PolkitSubject"/>
+    <property name="pid" type="gint" flags="231" default-value="0"/>
+    <property name="start-time" type="guint64" flags="231" default-value="0"/>
+    <property name="uid" type="gint" flags="231" default-value="-1"/>
+    <property name="pidfd" type="gint" flags="231" default-value="-1"/>
+    <property name="pidfd-is-safe" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="gids" type="GArray" flags="231"/>
+  </class>
+  <class name="PolkitUnixSession" get-type="polkit_unix_session_get_type" parents="GObject">
+    <implements name="PolkitSubject"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <property name="session-id" type="gchararray" flags="231" default-value="NULL"/>
+    <property name="pid" type="gint" flags="234" default-value="0"/>
+  </class>
+  <class name="PolkitSystemBusName" get-type="polkit_system_bus_name_get_type" parents="GObject">
+    <implements name="PolkitSubject"/>
+    <property name="name" type="gchararray" flags="231" default-value="NULL"/>
+  </class>
+  <class name="PolkitTemporaryAuthorization" get-type="polkit_temporary_authorization_get_type" parents="GObject">
+  </class>
+  <class name="PolkitPermission" get-type="polkit_permission_get_type" parents="GPermission,GObject">
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <property name="action-id" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="subject" type="PolkitSubject" flags="235"/>
+  </class>
+  <error-quark function="polkit_error_quark" domain="polkit-error-quark"/>
+</dump>
