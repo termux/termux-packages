@@ -207,7 +207,8 @@ _fetch_and_cache_tags() {
 		# LOCAL is for obtaining current package version, to be compared with version obtained with GraphQL
 
 		termux_github_api_get_tag() {
-			echo "LOCAL|${TERMUX_PKG_NAME}|${TERMUX_PKG_VERSION#*:}"
+			local ver="${TERMUX_PKG_VERSION#*:}"
+			echo "LOCAL|${TERMUX_PKG_NAME}|${ver#v}"
 			exit 0
 		}
 		termux_pkg_upgrade_version() {
@@ -251,8 +252,8 @@ _fetch_and_cache_tags() {
 			continue
 		fi
 		_LATEST_TAGS["${pkg:-_}"]="$version"
-		if [[ "${type}" == "SKIP" ]] || [[ "${type}" == "GIT" && "${__GITHUB_CURRENT_TAGS["${pkg:-}"]:-}" == "${version#v}" ]]; then
-			echo "INFO: Skipping ${pkg}: already at version ${version#v}"
+		if [[ "${type}" == "SKIP" ]] || [[ "${type}" == "GIT" && "${__GITHUB_CURRENT_TAGS["${pkg:-}"]:-}" == "${version}" ]]; then
+			echo "INFO: Skipping ${pkg}: already at version ${version}"
 			_ALREADY_SEEN+=("${pkg}")
 		fi
 	done < <(printf '%s\n' "$LATEST_TAGS" "$LATEST_TAGS_GITHUB")

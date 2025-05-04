@@ -59,14 +59,15 @@ termux_github_graphql() {
 
 
 		unset QUERY
-		local TAGS idx i=0
+		local TAGS idx i=0 ver
 		TAGS="$(jq -r '.data            # From the data: table
 			| del(.ratelimit)           # Remove the ratelimit: table
 			| to_entries[]              # convert the remaining entries to an array
 			| .value                    # For each .value
 			| (.latestRelease?.tagName  # Print out the tag name of the latest release
 			// .refs.nodes[]?.name      # or of the latest tag
-			// null)' <<< "$response")" # If neither exists return null
+			// empty)                   # If neither exists print nothing
+			| sub("^v"; "")' <<< "$response")" # strip leading `v` from tag names
 
 		while IFS=$'\n' read -r idx; do
 			printf 'GIT|%s|%s\n' \
