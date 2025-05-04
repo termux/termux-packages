@@ -1,6 +1,7 @@
 # Takes in a list of GraphQL query snippets
 termux_github_graphql() {
 	local -a GITHUB_GRAPHQL_QUERIES=( "$@" )
+	local pkg_json; pkg_json="$(jq -c -n '$ARGS.positional' --args "${__GITHUB_PACKAGES[@]}")"
 
 	# Batch size for fetching tags, 100 seems to work consistently.
 	local BATCH BATCH_SIZE=100
@@ -57,22 +58,21 @@ termux_github_graphql() {
 			https://api.github.com/graphql 2>&1
 		)" || termux_error_exit "ERR - termux_github_graphql: $response"
 
-
 		unset QUERY
-		local TAGS idx i=0 ver
-		TAGS="$(jq -r '.data            # From the data: table
-			| del(.ratelimit)           # Remove the ratelimit: table
-			| to_entries[]              # convert the remaining entries to an array
-			| .value                    # For each .value
-			| (.latestRelease?.tagName  # Print out the tag name of the latest release
-			// .refs.nodes[]?.name      # or of the latest tag
-			// empty)                   # If neither exists print nothing
-			| sub("^v"; "")' <<< "$response")" # strip leading `v` from tag names
-
-		while IFS=$'\n' read -r idx; do
-			printf 'GIT|%s|%s\n' \
-				"${__GITHUB_PACKAGES[$BATCH * $BATCH_SIZE + $(( i++ ))]##*/}" \
-				"${idx}"
-		done <<< "$TAGS"
+		jq -r --argjson pkgs "$pkg_json" '
+			.data                                                 # From the data: table
+			| del(.ratelimit)                                     # Remove the ratelimit: table
+			| to_entries[]                                        # Convert the remaining entries to an array
+			| .key as $alias                                      # Save key to variable
+			| ($alias | ltrimstr("_") | tonumber) as $idx         # Extract iterator from bash array
+			| .value | (                                          # For each .value
+				.latestRelease?.tagName                           # Print out the tag name of the latest release
+				// .refs.nodes[0]?.name                           # or of the latest tag
+				// empty                                          # If neither exists print nothing
+			) | sub("^v"; "")   as $tag                           # Strip leading `v` from tag name
+			| select($tag != "")                                  # Filter out empty strings
+			| ($pkgs[$idx] | split("/")[-1]) as $pkgName          # Get package name from bash array
+			| "GIT|\($pkgName)|\($tag)"                           # Print results
+		' <<<"$response"
 	done
 }
