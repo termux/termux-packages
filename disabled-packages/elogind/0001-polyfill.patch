@@ -1,0 +1,237 @@
+Bionic libc doesn't have the following symbols:
+- `secure_getenv`
+- `program_invocation[_short]_name`
+- `get_current_dir_name`
+- `RLIMIT_NLIMITS`
+- `sigisemptyset`
+- `malloc_trim`
+- `semctl`/`msgctl`
+- `exp10`
+- `fputs_unlocked`/`fputc_unlocked` (Available from API 28)
+- `syncfs` (Available from API 28)
+- `pthread_setaffinity_np`
+
+--- a/src/basic/musl_missing.h
++++ b/src/basic/musl_missing.h
+@@ -16,6 +16,10 @@
+  *
+  ****************************************************************/
+ 
++#if HAVE_PROGRAM_INVOCATION_NAME == 0
++extern char *program_invocation_name;
++extern char *program_invocation_short_name;
++#endif
+ 
+ void elogind_set_program_name(const char* pcall);
+ 
+@@ -30,7 +30,9 @@
+ #include <unistd.h>
+ #include <pthread.h> /* for pthread_atfork */
+ 
++#ifndef __ANDROID__
+ #define strerror_r(e, m, k) (strerror_r(e, m, k) < 0 ? strdup("strerror_r() failed") : m);
++#endif
+ 
+ /*
+  * Possibly TODO according to http://man7.org/linux/man-pages/man3/getenv.3.html
+@@ -37,12 +37,18 @@
+  * + test if the effective capability bit was set on the executable file
+  * + test if the process has a nonempty permitted capability set
+  */
++#ifndef __ANDROID__
+ #if ! HAVE_SECURE_GETENV && ! HAVE___SECURE_GETENV
+ #  define secure_getenv(name) \
+         (issetugid() ? NULL : getenv(name))
+ #  undef HAVE_SECURE_GETENV
+ #  define HAVE_SECURE_GETENV 1
+ #endif // HAVE_[__]SECURE_GETENV
++#else
++#define secure_getenv(name) getenv(name)
++#undef  HAVE_SECURE_GETENV
++#define HAVE_SECURE_GETENV 1
++#endif
+ 
+ #if ! HAVE_BASENAME
+ /* Poor man's basename */
+--- a/src/basic/macro.h
++++ b/src/basic/macro.h
+@@ -390,3 +390,4 @@
+              _current_++)
+ 
+ #include "log.h"
++#include "musl_missing.h"
+--- a/src/basic/path-util.c
++++ b/src/basic/path-util.c
+@@ -55,6 +55,17 @@
+         return path_join(prefix, p);
+ }
+ 
++#ifdef __ANDROID__
++static char *get_current_dir_name(void) {
++        char pwd[PATH_MAX];
++        char *ret = getcwd(pwd, sizeof(pwd));
++        if (ret == NULL) {
++                return NULL;
++        }
++        return strdup(pwd);
++}
++#endif
++
+ int safe_getcwd(char **ret) {
+         _cleanup_free_ char *cwd = NULL;
+ 
+--- a/src/basic/process-util.c
++++ b/src/basic/process-util.c
+@@ -5,7 +5,7 @@
+ //#include <limits.h>
+ //#include <linux/oom.h>
+ #include <pthread.h>
+-#include <spawn.h>
++// #include <spawn.h>
+ #include <stdbool.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+--- a/src/basic/missing_resource.h
++++ b/src/basic/missing_resource.h
+@@ -7,5 +7,9 @@
+ #define RLIMIT_RTTIME 15
+ #endif
+ 
++#ifndef RLIMIT_NLIMITS
++#define RLIMIT_NLIMITS RLIMIT_RTTIME
++#endif
++
+ /* If RLIMIT_RTTIME is not defined, then we cannot use RLIMIT_NLIMITS as is */
+ #define _RLIMIT_MAX (RLIMIT_RTTIME+1 > RLIMIT_NLIMITS ? RLIMIT_RTTIME+1 : RLIMIT_NLIMITS)
+--- a/src/libelogind/sd-journal/journal-file.h
++++ b/src/libelogind/sd-journal/journal-file.h
+@@ -4,6 +4,7 @@
+ #include <fcntl.h>
+ #include <inttypes.h>
+ //#include <sys/uio.h>
++#include <sys/stat.h>
+ 
+ #if HAVE_GCRYPT
+ #  include <gcrypt.h>
+--- a/src/libelogind/sd-event/sd-event.c
++++ b/src/libelogind/sd-event/sd-event.c
+@@ -790,6 +790,14 @@
+         return r;
+ }
+ 
++#ifdef __ANDROID__
++static int sigisemptyset(sigset_t* __set) {
++        struct sigaction sact;
++        sigemptyset(&sact.sa_mask);
++        return memcmp(__set, &sact.sa_mask, sizeof(sigset_t));
++}
++#endif
++
+ static void event_unmask_signal_data(sd_event *e, struct signal_data *d, int sig) {
+         assert(e);
+         assert(d);
+@@ -1873,6 +1881,10 @@
+         return 0;
+ }
+ 
++#ifdef __ANDROID__
++#define malloc_trim(pad) (0)
++#endif
++
+ _public_ int sd_event_trim_memory(void) {
+         int r;
+ 
+--- a/src/shared/clean-ipc.c
++++ b/src/shared/clean-ipc.c
+@@ -8,8 +8,14 @@
+ #include <stdio.h>
+ #include <sys/ipc.h>
+ #include <sys/msg.h>
+-#include <sys/sem.h>
+-#include <sys/shm.h>
++// #include <sys/sem.h>
++// #include <sys/shm.h>
++#ifdef __ANDROID__
++// Doesn't work on Android, so just stub them.
++#define shmctl(...) (-1)
++#define semctl(...) (-1)
++#define msgctl(...) (-1)
++#endif
+ #include <sys/stat.h>
+ #include <unistd.h>
+ 
+--- a/src/shared/json.c
++++ b/src/shared/json.c
+@@ -2712,6 +2712,10 @@
+ 
+         *p = c;
+ 
++#ifdef __ANDROID__
++#define exp10(x) (pow(10.0, x))
++#endif
++
+         if (is_real) {
+                 ret->real = ((negative ? -1.0 : 1.0) * (x + (y / shift))) * exp10((exponent_negative ? -1.0 : 1.0) * exponent);
+                 return JSON_TOKEN_REAL;
+--- a/src/basic/string-table.h
++++ b/src/basic/string-table.h
+@@ -102,6 +102,11 @@
+ #define DEFINE_PRIVATE_STRING_TABLE_LOOKUP_FROM_STRING_FALLBACK(name,type,max) \
+         _DEFINE_STRING_TABLE_LOOKUP_FROM_STRING_FALLBACK(name,type,max,static)
+ 
++#if defined(__ANDROID__) && __ANDROID_API__ < 28
++#define fputs_unlocked(c, f) (fputs(c, f))
++#define fputc_unlocked(c, f) (fputc(c, f))
++#endif
++
+ #define DUMP_STRING_TABLE(name,type,max)                                \
+         do {                                                            \
+                 flockfile(stdout);                                      \
+--- a/src/shared/rm-rf.c
++++ b/src/shared/rm-rf.c
+@@ -6,6 +6,11 @@
+ #include <stddef.h>
+ #include <unistd.h>
+ 
++#if defined __ANDROID__ && __ANDROID_API__ < 28
++#include <sys/syscall.h>
++#define syncfs(fd) (syscall(SYS_syncfs, fd))
++#endif
++
+ #include "alloc-util.h"
+ #include "btrfs-util.h"
+ #include "cgroup-util.h"
+@@ -20,6 +25,7 @@
+ #include "stat-util.h"
+ #include "string-util.h"
+ 
++
+ /* We treat tmpfs/ramfs + cgroupfs as non-physical file systems. cgroupfs is similar to tmpfs in a way
+  * after all: we can create arbitrary directory hierarchies in it, and hence can also use rm_rf() on it
+  * to remove those again. */
+--- a/src/libelogind/sd-bus/test-bus-benchmark.c
++++ b/src/libelogind/sd-bus/test-bus-benchmark.c
+@@ -290,7 +290,11 @@
+         if (pid == 0) {
+                 CPU_ZERO(&cpuset);
+                 CPU_SET(0, &cpuset);
++#ifndef __ANDROID__
+                 pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
++#else
++                sched_setaffinity(pthread_gettid_np(pthread_self()), sizeof(cpu_set_t), &cpuset);
++#endif
+ 
+                 safe_close(bus_ref);
+                 sd_bus_unref(b);
+@@ -310,7 +314,11 @@
+ 
+         CPU_ZERO(&cpuset);
+         CPU_SET(1, &cpuset);
++#ifndef __ANDROID__
+         pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
++#else
++        sched_setaffinity(pthread_gettid_np(pthread_self()), sizeof(cpu_set_t), &cpuset);
++#endif
+ 
+         server(b, &result);
+ 
