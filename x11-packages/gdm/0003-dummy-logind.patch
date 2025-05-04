@@ -1,0 +1,187 @@
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -13,7 +13,7 @@
+ option('ipv6', type: 'boolean', value: false, description: 'Enables compilation of IPv6 code.')
+ option('lang-file', type: 'string', value: '', description: 'File containing default language settings.')
+ option('libaudit', type: 'feature', value: 'auto', description: 'Add Linux audit support.')
+-option('logind-provider', type: 'combo', choices: ['systemd', 'elogind'], value: 'systemd', description: 'Which logind library to use.')
++option('logind-provider', type: 'combo', choices: ['systemd', 'elogind', 'dummy'], value: 'systemd', description: 'Which logind library to use.')
+ option('log-dir', type: 'string', value: '/var/log/gdm', description: 'Log directory.')
+ option('pam', type: 'feature', value: 'auto', description: 'Add PAM support.')
+ option('pam-mod-dir', type: 'string', value: '', description: 'Directory to install PAM modules in.')
+--- a/meson.build
++++ b/meson.build
+@@ -138,6 +138,9 @@
+       '/usr/lib/systemd',
+     ])
+   systemd_x_server = systemd_multiseat_x.found()? systemd_multiseat_x.path() : '/lib/systemd/systemd-multi-seat-x'
++elif logind_provider == 'dummy'
++  logind_dep = dependency('', required: false)
++  systemd_x_server = 'disabled'
+ else
+   elogind_dep = dependency('libelogind')
+   logind_dep = elogind_dep
+@@ -311,6 +311,7 @@
+ conf.set('HAVE_UT_UT_SYSLEN', utmp_has_syslen_field)
+ conf.set('ENABLE_IPV6', get_option('ipv6'))
+ conf.set('HAVE_SYS_SOCKIO_H', cc.has_header('sys/sockio.h'))
++conf.set('WITH_DUMMY_LOGIND', get_option('logind-provider') == 'dummy')
+ configure_file(output: 'config.h', configuration: conf)
+ 
+ # Subdirs
+--- a/common/gdm-log.c
++++ b/common/gdm-log.c
+@@ -30,7 +30,9 @@
+ #include <unistd.h>
+ 
+ #include <syslog.h>
++#ifdef ENABLE_SYSTEMD_JOURNAL
+ #include <systemd/sd-daemon.h>
++#endif
+ 
+ #include <glib.h>
+ #include <glib/gstdio.h>
+--- a/daemon/gdm-server.c
++++ b/daemon/gdm-server.c
+@@ -43,9 +43,8 @@
+ #include <linux/vt.h>
+ #endif
+ 
+-#include <systemd/sd-daemon.h>
+-
+ #ifdef ENABLE_SYSTEMD_JOURNAL
++#include <systemd/sd-daemon.h>
+ #include <systemd/sd-journal.h>
+ #endif
+ 
+--- a/daemon/gdm-session-worker-job.c
++++ b/daemon/gdm-session-worker-job.c
+@@ -36,9 +36,8 @@
+ #include <sys/prctl.h>
+ #endif
+ 
+-#include <systemd/sd-daemon.h>
+-
+ #ifdef ENABLE_SYSTEMD_JOURNAL
++#include <systemd/sd-daemon.h>
+ #include <systemd/sd-journal.h>
+ #endif
+ 
+--- a/daemon/gdm-session-worker.c
++++ b/daemon/gdm-session-worker.c
+@@ -70,10 +70,10 @@
+ #include <X11/Xauth.h>
+ #endif
+ 
+-#include <systemd/sd-daemon.h>
+ #include <systemd/sd-login.h>
+ 
+ #ifdef ENABLE_SYSTEMD_JOURNAL
++#include <systemd/sd-daemon.h>
+ #include <systemd/sd-journal.h>
+ #endif
+ 
+--- a/common/gdm-common.c
++++ b/common/gdm-common.c
+@@ -36,7 +36,19 @@
+ 
+ #include "gdm-common.h"
+ 
++#ifndef WITH_DUMMY_LOGIND
+ #include <systemd/sd-login.h>
++#else
++#define sd_seat_get_sessions(...)   (-1)
++#define sd_uid_get_sessions(...)    (-1)
++#define sd_pid_get_session(...)     (-1)
++#define sd_session_get_class(...)   (-1)
++#define sd_session_get_state(...)   (-1)
++#define sd_session_get_service(...) (-1)
++#define sd_session_get_seat(...)    (-1)
++#define sd_session_get_type(...)    (-1)
++#define sd_session_get_state(...)   (-1)
++#endif
+ 
+ #define GDM_DBUS_NAME                            "org.gnome.DisplayManager"
+ #define GDM_DBUS_LOCAL_DISPLAY_FACTORY_PATH      "/org/gnome/DisplayManager/LocalDisplayFactory"
+--- a/daemon/gdm-local-display-factory.c
++++ b/daemon/gdm-local-display-factory.c
+@@ -32,7 +32,14 @@
+ #include <gudev/gudev.h>
+ #endif
+ 
++#ifndef WITH_DUMMY_LOGIND
+ #include <systemd/sd-login.h>
++#else
++#define sd_seat_get_active(...)    (-1)
++#define sd_session_get_tty(...)    (-1)
++#define sd_session_get_vt(...)     (-1)
++#define sd_seat_can_graphical(...) (-1)
++#endif
+ 
+ #include "gdm-common.h"
+ #include "gdm-manager.h"
+--- a/daemon/gdm-manager.c
++++ b/daemon/gdm-manager.c
+@@ -36,7 +36,16 @@
+ 
+ #include <act/act-user-manager.h>
+ 
++#ifndef WITH_DUMMY_LOGIND
+ #include <systemd/sd-login.h>
++#else
++#define sd_pid_get_session(...)   (-1)
++#define sd_session_get_uid(...)   (-1)
++#define sd_session_get_class(...) (-1)
++#define sd_session_is_remote(...) (-1)
++#define sd_session_get_seat(...)  (-1)
++#define sd_session_get_tty(...)   (-1)
++#endif
+ 
+ #include "gdm-common.h"
+ 
+--- a/daemon/gdm-session-worker.c
++++ b/daemon/gdm-session-worker.c
+@@ -108,7 +108,12 @@ struct pam_conv {
+ #include <X11/Xauth.h>
+ #endif
+ 
++#ifndef WITH_DUMMY_LOGIND
+ #include <systemd/sd-login.h>
++#else
++#define sd_pid_get_cgroup(...) (-1)
++#define sd_seat_can_tty(...)   (FALSE)
++#endif
+ 
+ #ifdef ENABLE_SYSTEMD_JOURNAL
+ #include <systemd/sd-daemon.h>
+--- a/daemon/gdm-session.c
++++ b/daemon/gdm-session.c
+@@ -45,7 +45,11 @@
+ 
+ #include <json-glib/json-glib.h>
+ 
++#ifndef WITH_DUMMY_LOGIND
+ #include <systemd/sd-login.h>
++#else
++#define sd_pid_get_cgroup(...) (-1)
++#endif
+ 
+ #include "gdm-session.h"
+ #include "gdm-session-glue.h"
+--- a/libgdm/gdm-sessions.c
++++ b/libgdm/gdm-sessions.c
+@@ -35,7 +35,14 @@
+ #include <glib/gi18n.h>
+ #include <glib/gstdio.h>
+ 
++#ifndef WITH_DUMMY_LOGIND
+ #include <systemd/sd-login.h>
++#else
++#define sd_pid_get_user_unit(...) (-1)
++#define sd_uid_get_display(...)   (-1)
++#define sd_pid_get_session(...)   (-1)
++#define sd_session_get_seat(...)  (-1)
++#endif
+ 
+ #include "gdm-sessions.h"
+ 

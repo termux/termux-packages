@@ -1,0 +1,118 @@
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -15,6 +15,7 @@
+ option('libaudit', type: 'feature', value: 'auto', description: 'Add Linux audit support.')
+ option('logind-provider', type: 'combo', choices: ['systemd', 'elogind'], value: 'systemd', description: 'Which logind library to use.')
+ option('log-dir', type: 'string', value: '/var/log/gdm', description: 'Log directory.')
++option('dummy-pam', type: 'boolean', value: false, description: 'Use PAM stubs.')
+ option('pam-mod-dir', type: 'string', value: '', description: 'Directory to install PAM modules in.')
+ option('pam-prefix', type: 'string', value: '', description: 'Specify where PAM files go.')
+ option('pid-file', type: 'string', value: '', description: 'Pid file.')
+--- a/meson.build
++++ b/meson.build
+@@ -52,7 +52,7 @@
+ gudev_dep = dependency('gudev-1.0', version: '>= 232', required: false)
+ 
+ # PAM
+-libpam_dep = cc.find_library('pam')
++libpam_dep = cc.find_library('pam', required: not get_option('dummy-pam'))
+ pam_extensions_supported = cc.has_header_symbol(
+   'security/pam_appl.h', 'PAM_BINARY_PROMPT',
+   dependencies: libpam_dep)
+@@ -276,6 +276,7 @@ conf.set('HAVE_UPDWTMPX', cc.has_function('updwtmpx'))
+ conf.set('HAVE_LOGIN', cc.has_function('login', args: '-lutil'))
+ conf.set('HAVE_LOGOUT', cc.has_function('logout', args: '-lutil'))
+ conf.set('HAVE_LOGWTMP', cc.has_function('logwtmp', args: '-lutil'))
++conf.set('WITH_DUMMY_PAM', get_option('dummy-pam'))
+ conf.set('HAVE_PAM_SYSLOG', have_pam_syslog)
+ conf.set('HAVE_KEYUTILS', keyutils_dep.found())
+ conf.set('SUPPORTS_PAM_EXTENSIONS', pam_extensions_supported)
+@@ -319,7 +321,9 @@
+ subdir('daemon')
+ subdir('libgdm')
+ subdir('utils')
++if not get_option('dummy-pam')
+ subdir('pam_gdm')
++endif
+ subdir('po')
+ if libcheck_dep.found()
+   subdir('tests')
+--- a/daemon/gdm-session-worker.c
++++ b/daemon/gdm-session-worker.c
+@@ -37,7 +37,60 @@
+ #include <grp.h>
+ #include <pwd.h>
+ 
++#ifndef WITH_DUMMY_PAM
+ #include <security/pam_appl.h>
++#else
++typedef int pam_handle_t;
++struct pam_message {
++  char *msg;
++  int   msg_style;
++};
++struct pam_response {
++  char *resp;
++  int   resp_retcode;
++};
++struct pam_conv {
++  void *conv;
++  void *appdata_ptr;
++};
++#define pam_get_item(...)      (-1)
++#define pam_strerror(...)      ("")
++#define pam_start(...)         (-1)
++#define pam_set_item(...)      (-1)
++#define pam_authenticate(...)  (-1)
++#define pam_acct_mgmt(...)     (-1)
++#define pam_chauthtok(...)     (-1)
++#define pam_putenv(...)        (-1)
++#define pam_setcred(...)       (-1)
++#define pam_open_session(...)  (-1)
++#define pam_getenv(...)        (NULL)
++#define pam_getenvlist(...)    (NULL)
++#define pam_close_session(...)
++#define pam_end(...)
++#define PAM_PROMPT_ECHO_ON         1
++#define PAM_PROMPT_ECHO_OFF        2
++#define PAM_TEXT_INFO              3
++#define PAM_ERROR_MSG              4
++#define PAM_SUCCESS                5
++#define PAM_IGNORE                 6
++#define PAM_ACCT_EXPIRED           7
++#define PAM_AUTHTOK_EXPIRED        8
++#define PAM_MAXTRIES               9
++#define PAM_CONV_ERR               10
++#define PAM_MAX_RESP_SIZE          11
++#define PAM_TTY                    12
++#define PAM_DISALLOW_NULL_AUTHTOK  13
++#define PAM_AUTHINFO_UNAVAIL       14
++#define PAM_USER_UNKNOWN           15
++#define PAM_AUTH_ERR               16
++#define PAM_NEW_AUTHTOK_REQD       17
++#define PAM_CHANGE_EXPIRED_AUTHTOK 18
++#define PAM_SYSTEM_ERR             19
++#define PAM_ABORT                  20
++#define PAM_SILENT                 21
++#define PAM_ESTABLISH_CRED         22
++#define PAM_REINITIALIZE_CRED      23
++#endif
+ 
+ #ifdef HAVE_LOGINCAP
+ #include <login_cap.h>
+@@ -3039,6 +3092,7 @@ filter_extensions (const char * const *extensions)
+ 
+         array = g_ptr_array_new_with_free_func (g_free);
+ 
++#ifdef SUPPORTS_PAM_EXTENSIONS
+         for (i = 0; extensions[i] != NULL; i++) {
+                 for (j = 0; gdm_supported_pam_extensions[j] != NULL; j++) {
+                         if (g_strcmp0 (extensions[i], gdm_supported_pam_extensions[j]) == 0) {
+@@ -3047,6 +3101,7 @@ filter_extensions (const char * const *extensions)
+                         }
+                 }
+         }
++#endif
+         g_ptr_array_add (array, NULL);
+ 
+         filtered_extensions = g_strdupv ((char **) array->pdata);

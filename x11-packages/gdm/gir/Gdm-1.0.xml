@@ -1,0 +1,291 @@
+<?xml version="1.0"?>
+<dump>
+  <interface name="GdmWorkerManager" get-type="gdm_worker_manager_get_type">
+    <signal name="handle-hello" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-info-query" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-secret-info-query" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-info" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-problem" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-choice-list-query" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+    </signal>
+    <signal name="handle-custom-json-request" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="guint"/>
+      <param type="gchararray"/>
+    </signal>
+  </interface>
+  <class name="GdmWorkerManagerProxy" get-type="gdm_worker_manager_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GdmWorkerManager"/>
+  </class>
+  <class name="GdmWorkerManagerSkeleton" get-type="gdm_worker_manager_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GdmWorkerManager"/>
+  </class>
+  <interface name="GdmUserVerifier" get-type="gdm_user_verifier_get_type">
+    <signal name="handle-enable-extensions" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="GStrv"/>
+    </signal>
+    <signal name="handle-begin-verification" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-begin-verification-for-user" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-answer-query" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-cancel" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="conversation-started" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="conversation-stopped" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="reauthentication-started" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+    <signal name="info" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="problem" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="info-query" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="secret-info-query" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="reset" return="void" when="last">
+    </signal>
+    <signal name="service-unavailable" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="verification-failed" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="verification-complete" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+  </interface>
+  <class name="GdmUserVerifierProxy" get-type="gdm_user_verifier_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GdmUserVerifier"/>
+  </class>
+  <class name="GdmUserVerifierSkeleton" get-type="gdm_user_verifier_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GdmUserVerifier"/>
+  </class>
+  <interface name="GdmUserVerifierChoiceList" get-type="gdm_user_verifier_choice_list_get_type">
+    <signal name="handle-select-choice" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="choice-query" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+    </signal>
+  </interface>
+  <class name="GdmUserVerifierChoiceListProxy" get-type="gdm_user_verifier_choice_list_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GdmUserVerifierChoiceList"/>
+  </class>
+  <class name="GdmUserVerifierChoiceListSkeleton" get-type="gdm_user_verifier_choice_list_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GdmUserVerifierChoiceList"/>
+  </class>
+  <interface name="GdmUserVerifierCustomJSON" get-type="gdm_user_verifier_custom_json_get_type">
+    <signal name="handle-reply" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-report-error" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="request" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="guint"/>
+      <param type="gchararray"/>
+    </signal>
+  </interface>
+  <class name="GdmUserVerifierCustomJSONProxy" get-type="gdm_user_verifier_custom_json_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GdmUserVerifierCustomJSON"/>
+  </class>
+  <class name="GdmUserVerifierCustomJSONSkeleton" get-type="gdm_user_verifier_custom_json_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GdmUserVerifierCustomJSON"/>
+  </class>
+  <interface name="GdmGreeter" get-type="gdm_greeter_get_type">
+    <signal name="handle-select-session" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-select-user" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-begin-auto-login" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-get-timed-login-details" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-start-session-when-ready" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="handle-stop-conflicting-session" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="selected-user-changed" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="default-language-name-changed" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="default-session-name-changed" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="timed-login-requested" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="session-opened" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="reauthenticated" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+  </interface>
+  <class name="GdmGreeterProxy" get-type="gdm_greeter_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GdmGreeter"/>
+  </class>
+  <class name="GdmGreeterSkeleton" get-type="gdm_greeter_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GdmGreeter"/>
+  </class>
+  <interface name="GdmRemoteGreeter" get-type="gdm_remote_greeter_get_type">
+    <signal name="handle-disconnect" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+  </interface>
+  <class name="GdmRemoteGreeterProxy" get-type="gdm_remote_greeter_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GdmRemoteGreeter"/>
+  </class>
+  <class name="GdmRemoteGreeterSkeleton" get-type="gdm_remote_greeter_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GdmRemoteGreeter"/>
+  </class>
+  <interface name="GdmChooser" get-type="gdm_chooser_get_type">
+    <signal name="handle-disconnect" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-select-hostname" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+    </signal>
+  </interface>
+  <class name="GdmChooserProxy" get-type="gdm_chooser_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GdmChooser"/>
+  </class>
+  <class name="GdmChooserSkeleton" get-type="gdm_chooser_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GdmChooser"/>
+  </class>
+  <class name="GdmClient" get-type="gdm_client_get_type" parents="GObject">
+  </class>
+  <interface name="GdmManager" get-type="gdm_manager_get_type">
+    <property name="version" type="gchararray" flags="227" default-value="NULL"/>
+    <signal name="handle-register-display" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="GVariant"/>
+    </signal>
+    <signal name="handle-register-session" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="GVariant"/>
+    </signal>
+    <signal name="handle-open-session" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-open-reauthentication-channel" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+    </signal>
+  </interface>
+  <class name="GdmManagerProxy" get-type="gdm_manager_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GdmManager"/>
+  </class>
+  <class name="GdmManagerSkeleton" get-type="gdm_manager_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GdmManager"/>
+  </class>
+  <error-quark function="gdm_client_error_quark" domain="gdm-client"/>
+</dump>
