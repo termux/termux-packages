@@ -302,6 +302,9 @@ PACKAGES+=" libexpat1:i386"
 # Required by wine-stable
 PACKAGES+=" libfreetype-dev:i386"
 
+# Required by ibus
+PACKAGES+=" dconf-cli"
+
 # Required by CGCT
 PACKAGES+=" libdebuginfod-dev"
 
