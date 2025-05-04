@@ -11,7 +11,7 @@ termux_pkg_is_update_needed() {
 
 	# Compare versions.
 	# shellcheck disable=SC2091
-	dpkg --compare-versions "${CURRENT_VERSION}" lt "${LATEST_VERSION}" 2> >(sed -e "s/^/${CI:+"::warning::"}/" >&2)
+	dpkg --compare-versions "${CURRENT_VERSION}" lt "${LATEST_VERSION}" 2> >(sed -e "s/^/${CI:+"::warning::${TERMUX_PKG_NAME:-}: "}/" >&2)
 	DPKG_EXIT_CODE=$?
 	if [ "$DPKG_EXIT_CODE" = 0 ]; then
 		return 0 # true. Update needed.
