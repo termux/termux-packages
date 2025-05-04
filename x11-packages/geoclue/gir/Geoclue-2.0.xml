@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<dump>
+  <enum name="GClueAccuracyLevel" get-type="gclue_accuracy_level_get_type">
+    <member name="GCLUE_ACCURACY_LEVEL_NONE" nick="none" value="0"/>
+    <member name="GCLUE_ACCURACY_LEVEL_COUNTRY" nick="country" value="1"/>
+    <member name="GCLUE_ACCURACY_LEVEL_CITY" nick="city" value="4"/>
+    <member name="GCLUE_ACCURACY_LEVEL_NEIGHBORHOOD" nick="neighborhood" value="5"/>
+    <member name="GCLUE_ACCURACY_LEVEL_STREET" nick="street" value="6"/>
+    <member name="GCLUE_ACCURACY_LEVEL_EXACT" nick="exact" value="8"/>
+  </enum>  <flags name="GClueClientProxyCreateFlags" get-type="gclue_client_proxy_create_flags_get_type">
+    <member name="GCLUE_CLIENT_PROXY_CREATE_NONE" nick="none" value="0"/>
+    <member name="GCLUE_CLIENT_PROXY_CREATE_AUTO_DELETE" nick="auto-delete" value="1"/>
+  </flags>
+  <interface name="GClueClient" get-type="gclue_client_get_type">
+    <property name="active" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="desktop-id" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="distance-threshold" type="guint" flags="227" default-value="0"/>
+    <property name="location" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="requested-accuracy-level" type="guint" flags="227" default-value="0"/>
+    <property name="time-threshold" type="guint" flags="227" default-value="0"/>
+    <signal name="handle-start" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-stop" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="location-updated" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+  </interface>
+  <class name="GClueClientProxy" get-type="gclue_client_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GClueClient"/>
+  </class>
+  <class name="GClueClientSkeleton" get-type="gclue_client_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GClueClient"/>
+  </class>
+  <interface name="GClueLocation" get-type="gclue_location_get_type">
+    <property name="accuracy" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="altitude" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="description" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="heading" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="latitude" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="longitude" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="speed" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="timestamp" type="GVariant" flags="227"/>
+  </interface>
+  <class name="GClueLocationProxy" get-type="gclue_location_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GClueLocation"/>
+  </class>
+  <class name="GClueLocationSkeleton" get-type="gclue_location_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GClueLocation"/>
+  </class>
+  <interface name="GClueManager" get-type="gclue_manager_get_type">
+    <property name="available-accuracy-level" type="guint" flags="227" default-value="0"/>
+    <property name="in-use" type="gboolean" flags="227" default-value="FALSE"/>
+    <signal name="handle-get-client" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-create-client" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-delete-client" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="handle-add-agent" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+    </signal>
+  </interface>
+  <class name="GClueManagerProxy" get-type="gclue_manager_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GClueManager"/>
+  </class>
+  <class name="GClueManagerSkeleton" get-type="gclue_manager_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GClueManager"/>
+  </class>
+  <class name="GClueSimple" get-type="gclue_simple_get_type" parents="GObject">
+    <implements name="GAsyncInitable"/>
+    <property name="desktop-id" type="gchararray" flags="10" default-value="NULL"/>
+    <property name="accuracy-level" type="GClueAccuracyLevel" flags="10" default-value="GCLUE_ACCURACY_LEVEL_NONE"/>
+    <property name="client" type="GClueClientProxy" flags="1"/>
+    <property name="location" type="GClueLocationProxy" flags="1"/>
+    <property name="distance-threshold" type="guint" flags="235" default-value="0"/>
+    <property name="time-threshold" type="guint" flags="235" default-value="0"/>
+  </class>
+</dump>
