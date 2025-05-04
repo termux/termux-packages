@@ -1,0 +1,14 @@
+--- a/src/ck-session.c
++++ b/src/ck-session.c
+@@ -1591,9 +1591,11 @@
+                         g_warning ("failed to return control of vt handling");
+                 }
+ 
++#if defined(KDSETMODE) && defined(KD_TEXT)
+                 if (ioctl (session->priv->tty_fd, KDSETMODE, KD_TEXT) < 0) {
+                         g_warning ("failed to return to text mode for the VT");
+                 }
++#endif
+ 
+                 g_source_remove (session->priv->sig_watch_s1);
+                 session->priv->sig_watch_s1 = 0;
