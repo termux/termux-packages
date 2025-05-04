@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="ActUser" get-type="act_user_get_type" parents="GObject">
+    <property name="uid" type="gint" flags="225" default-value="0"/>
+    <property name="user-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="real-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="account-type" type="gint" flags="225" default-value="0"/>
+    <property name="password-mode" type="gint" flags="225" default-value="0"/>
+    <property name="password-hint" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="home-directory" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="shell" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="email" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="location" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="locked" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="automatic-login" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="system-account" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="nonexistent" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="local-account" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="login-frequency" type="gint" flags="225" default-value="0"/>
+    <property name="login-time" type="gint64" flags="225" default-value="0"/>
+    <property name="login-history" type="GVariant" flags="225"/>
+    <property name="icon-file" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="language" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="x-session" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="is-loaded" type="gboolean" flags="225" default-value="FALSE"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+    <signal name="sessions-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="ActUserManager" get-type="act_user_manager_get_type" parents="GObject">
+    <property name="include-usernames-list" type="gpointer" flags="227"/>
+    <property name="exclude-usernames-list" type="gpointer" flags="227"/>
+    <property name="is-loaded" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="has-multiple-users" type="gboolean" flags="227" default-value="FALSE"/>
+    <signal name="user-added" return="void" when="last">
+      <param type="ActUser"/>
+    </signal>
+    <signal name="user-removed" return="void" when="last">
+      <param type="ActUser"/>
+    </signal>
+    <signal name="user-is-logged-in-changed" return="void" when="last">
+      <param type="ActUser"/>
+    </signal>
+    <signal name="user-changed" return="void" when="last">
+      <param type="ActUser"/>
+    </signal>
+  </class>
+  <enum name="ActUserManagerError" get-type="act_user_manager_error_get_type">
+    <member name="ACT_USER_MANAGER_ERROR_FAILED" nick="failed" value="0"/>
+    <member name="ACT_USER_MANAGER_ERROR_USER_EXISTS" nick="user-exists" value="1"/>
+    <member name="ACT_USER_MANAGER_ERROR_USER_DOES_NOT_EXIST" nick="user-does-not-exist" value="2"/>
+    <member name="ACT_USER_MANAGER_ERROR_PERMISSION_DENIED" nick="permission-denied" value="3"/>
+    <member name="ACT_USER_MANAGER_ERROR_NOT_SUPPORTED" nick="not-supported" value="4"/>
+  </enum>  <enum name="ActUserAccountType" get-type="act_user_account_type_get_type">
+    <member name="ACT_USER_ACCOUNT_TYPE_STANDARD" nick="standard" value="0"/>
+    <member name="ACT_USER_ACCOUNT_TYPE_ADMINISTRATOR" nick="administrator" value="1"/>
+  </enum>  <enum name="ActUserPasswordMode" get-type="act_user_password_mode_get_type">
+    <member name="ACT_USER_PASSWORD_MODE_REGULAR" nick="regular" value="0"/>
+    <member name="ACT_USER_PASSWORD_MODE_SET_AT_LOGIN" nick="set-at-login" value="1"/>
+    <member name="ACT_USER_PASSWORD_MODE_NONE" nick="none" value="2"/>
+  </enum>  <error-quark function="act_user_manager_error_quark" domain="act_user_manager_error"/>
+</dump>

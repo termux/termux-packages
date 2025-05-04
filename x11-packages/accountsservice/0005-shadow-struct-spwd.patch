@@ -1,0 +1,110 @@
+--- a/src/user.h
++++ b/src/user.h
+@@ -23,6 +23,8 @@
+ #include <pwd.h>
+ #ifdef HAVE_SHADOW_H
+ #include <shadow.h>
++#else
++struct spwd {};
+ #endif
+ 
+ #include <glib.h>
+--- a/src/user.c
++++ b/src/user.c
+@@ -468,8 +468,10 @@
+         accounts_user_set_shell (ACCOUNTS_USER (user), pwent->pw_shell);
+ 
+         passwd = NULL;
++#ifdef HAVE_SHADOW_H
+         if (spent)
+                 passwd = spent->sp_pwdp;
++#endif
+ 
+         if (passwd && passwd[0] == '!') {
+                 locked = TRUE;
+@@ -485,6 +487,7 @@
+                 mode = PASSWORD_MODE_NONE;
+         }
+ 
++#ifdef HAVE_SHADOW_H
+         if (spent) {
+                 if (spent->sp_lstchg == 0) {
+                         mode = PASSWORD_MODE_SET_AT_LOGIN;
+@@ -504,6 +507,7 @@
+                 user->days_after_expiration_until_lock = spent->sp_inact;
+                 user->account_expiration_policy_known = TRUE;
+         }
++#endif
+ 
+         accounts_user_set_password_mode (ACCOUNTS_USER (user), mode);
+         is_system_account = !user_classify_is_human (accounts_user_get_uid (ACCOUNTS_USER (user)),
+--- a/src/daemon.c
++++ b/src/daemon.c
+@@ -262,11 +262,15 @@
+ 
+                         shadow_entry_buffers = g_malloc0 (sizeof(*shadow_entry_buffers));
+ 
++#ifdef HAVE_SHADOW_H
+                         ret = fgetspent_r (fp, &shadow_entry_buffers->spbuf, shadow_entry_buffers->buf, sizeof(shadow_entry_buffers->buf), &shadow_entry);
+                         if (ret == 0) {
+                                 g_hash_table_insert (shadow_users, g_strdup (shadow_entry->sp_namp), shadow_entry_buffers);
+                                 g_hash_table_add (local_users, g_strdup (shadow_entry->sp_namp));
+                         } else {
++#else
++                        if (1) {
++#endif
+                                 g_free (shadow_entry_buffers);
+ 
+                                 if (errno != EINTR) {
+@@ -376,7 +380,9 @@
+                         errno = 0;
+                         pwent = getpwnam (name);
+                         if (pwent != NULL) {
++#ifdef HAVE_SHADOW_H
+                                 *shadow_entry = getspnam (pwent->pw_name);
++#endif
+ 
+                                 return pwent;
+                         } else if (errno == 0) {
+@@ -447,7 +453,9 @@
+                                 if (pwent == NULL) {
+                                         g_debug ("user '%s' requested previously but not present on system", name);
+                                 } else {
++#ifdef HAVE_SHADOW_H
+                                         *shadow_entry = getspnam (pwent->pw_name);
++#endif
+ 
+                                         return pwent;
+                                 }
+@@ -1012,6 +1020,7 @@
+ 
+         user = g_hash_table_lookup (priv->users, pwent->pw_name);
+ 
++#ifdef HAVE_SHADOW_H
+         if (user == NULL) {
+                 struct spwd *spent;
+                 spent = getspnam (pwent->pw_name);
+@@ -1020,6 +1029,7 @@
+                 priv->explicitly_requested_users = g_list_append (priv->explicitly_requested_users,
+                                                                   g_strdup (pwent->pw_name));
+         }
++#endif
+ 
+         return user;
+ }
+@@ -1040,6 +1050,7 @@
+ 
+         user = g_hash_table_lookup (priv->users, pwent->pw_name);
+ 
++#ifdef HAVE_SHADOW_H
+         if (user == NULL) {
+                 struct spwd *spent;
+                 spent = getspnam (pwent->pw_name);
+@@ -1048,6 +1059,7 @@
+                 priv->explicitly_requested_users = g_list_append (priv->explicitly_requested_users,
+                                                                   g_strdup (pwent->pw_name));
+         }
++#endif
+ 
+         return user;
+ }

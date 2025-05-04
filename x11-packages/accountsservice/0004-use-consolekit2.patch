@@ -1,0 +1,66 @@
+https://gitlab.freedesktop.org/arrowd/accountsservice/-/commit/ead069eb165f88d24426d9ec33fa5248ca4e4e4b
+
+--- a/meson.build
++++ b/meson.build
+@@ -216,8 +216,11 @@ config_h.set_quoted('PATH_LIGHTDM_CONF', lightdm_conf_file)
+ 
+ if get_option('elogind')
+   logind_dep = dependency('libelogind', version: '>= 229.4')
++elif get_option('consolekit')
++  logind_dep = dependency('libconsolekit', version: '>= 1.2.0')
++  config_h.set('CONSOLEKIT', 1)
+ else
+-  logind_dep = dependency('libsystemd', version: '>= 186')
++  logind_dep = dependency('libsystemd', version: '>= 186', required: false)
+ endif
+ 
+ subdir('data')
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -6,7 +6,8 @@ option('admin_group', type: 'string', value: '', description: 'Set group for adm
+ option('extra_admin_groups', type: 'array', value: [], description: 'Comma-separated list of extra groups that administrator users are part of')
+ option('minimum_uid', type: 'integer', value: 1000, description: 'Set minimum uid for human users')
+ 
+-option('elogind', type: 'boolean', value: false, description: 'Use elogind')
++option('elogind', type: 'boolean', value: false, description: 'Use elogind as login manager')
++option('consolekit', type: 'boolean', value: false, description: 'Use consolekit as login manager')
+ 
+ option('introspection', type: 'boolean', value: true, description: 'Enable introspection for this build')
+ option('vapi', type: 'boolean', value: true, description : 'Enable Vala bindings for this build')
+--- a/src/libaccountsservice/act-user-manager.c
++++ b/src/libaccountsservice/act-user-manager.c
+@@ -40,7 +40,21 @@
+ #include <glib-object.h>
+ #include <gio/gio.h>
+ #include <gio/gunixinputstream.h>
++
++#ifndef CONSOLEKIT
+ #include <systemd/sd-login.h>
++#define LOGIN_SERVICE "org.freedesktop.login1"
++#define LOGIN_OBJECT "/org/freedesktop/login1"
++#define LOGIN_IFACE "org.freedesktop.login1.Manager"
++#else
++#include <sd-login.h>
++#define LOGIN_SERVICE "org.freedesktop.ConsoleKit"
++#define LOGIN_OBJECT "/org/freedesktop/ConsoleKit/Manager"
++#define LOGIN_IFACE "org.freedesktop.ConsoleKit.Manager"
++#ifndef ENODATA
++#define ENODATA 9919
++#endif
++#endif
+ 
+ #include "act-user-manager.h"
+ #include "act-user-private.h"
+@@ -276,9 +290,9 @@ activate_systemd_session_id (ActUserManager *manager,
+         }
+ 
+         reply = g_dbus_connection_call_sync (connection,
+-                                             "org.freedesktop.login1",
+-                                             "/org/freedesktop/login1",
+-                                             "org.freedesktop.login1.Manager",
++                                             LOGIN_SERVICE,
++                                             LOGIN_OBJECT,
++                                             LOGIN_IFACE,
+                                              "ActivateSessionOnSeat",
+                                              g_variant_new ("(ss)",
+                                                             seat_id,

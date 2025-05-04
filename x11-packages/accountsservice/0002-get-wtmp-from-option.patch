@@ -1,0 +1,47 @@
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -15,3 +15,5 @@
+ option('gtk_doc', type: 'boolean', value: false, description: 'use gtk-doc to build documentation')
+ 
+ option('tests', type: 'boolean', value: true, description: 'Enable tests')
++
++option('path_wtmp', type: 'string', value: '', description: 'The path to watch for wtmp changes')
+--- a/meson.build
++++ b/meson.build
+@@ -63,7 +63,9 @@
+ ]
+ 
+ foreach header: check_headers
++  if host_machine.system() != 'android'
+   config_h.set('HAVE_' + header.underscorify().to_upper(), cc.has_header(header))
++  endif
+ endforeach
+ 
+ # functions
+@@ -77,7 +77,10 @@
+   config_h.set('HAVE_' + func.underscorify().to_upper(), cc.has_function(func))
+ endforeach
+ 
+-if cc.has_header_symbol('utmpx.h', 'WTMPX_FILENAME', prefix: '#define _GNU_SOURCE')
++path_wtmp = get_option('path_wtmp')
++if path_wtmp != ''
++  config_h.set_quoted('PATH_WTMP', path_wtmp)
++elif cc.has_header_symbol('utmpx.h', 'WTMPX_FILENAME', prefix: '#define _GNU_SOURCE')
+   code = '''#define _GNU_SOURCE
+   #include <stdio.h>
+   #include <utmpx.h>
+--- a/src/wtmp-helper.c
++++ b/src/wtmp-helper.c
+@@ -215,6 +215,12 @@
+ 
+ #else /* HAVE_UTMPX_H */
+ 
++void
++wtmp_helper_update_login_frequencies (GHashTable *users)
++{
++        // Stub it
++}
++
+ const gchar *
+ wtmp_helper_get_path_for_monitor (void)
+ {
