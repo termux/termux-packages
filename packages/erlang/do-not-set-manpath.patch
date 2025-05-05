@@ -1,0 +1,17 @@
+For some reason, if this line is enabled while the command "erl -man erl"
+is run, then MANPATH is set to $TERMUX_PREFIX/lib/erlang/man/
+and erl searches a whole bunch of paths under that path for man pages,
+but somehow none of the paths it searches are the actual correct path,
+$TERMUX_PREFIX/lib/erlang/man/cat1/erl.1.
+If this line is deleted, then the command "erl -man erl" works.
+
+--- a/erts/etc/common/erlexec.c
++++ b/erts/etc/common/erlexec.c
+@@ -759,7 +759,6 @@ int main(int argc, char **argv)
+                             }
+                         }
+ 			erts_snprintf(tmpStr, sizeof(tmpStr), "%s/man", rootdir);
+-			set_env("MANPATH", tmpStr);
+ 			execvp("man", argv+i);
+ 			error("Could not execute the 'man' command.");
+ #endif
