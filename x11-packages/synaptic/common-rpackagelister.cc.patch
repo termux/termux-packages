@@ -1,6 +1,8 @@
+diff --git a/common/rpackagelister.cc b/common/rpackagelister.cc
+index 9fdfb1a0..12bc9799 100644
 --- a/common/rpackagelister.cc
 +++ b/common/rpackagelister.cc
-@@ -118,7 +118,7 @@
+@@ -118,7 +118,7 @@ RPackageLister::RPackageLister()
     cleanCommitLog();
  #if 0
     string Recommends = _config->Find("Synaptic::RecommendsFile",
@@ -9,7 +11,7 @@
     if (FileExists(Recommends))
        _actors.push_back(new RCacheActorRecommends(this, Recommends));
  #endif
-@@ -309,8 +309,6 @@
+@@ -309,8 +309,6 @@ bool RPackageLister::openCache()
  
     // only lock if we run as root
     bool lock = true;
@@ -18,7 +20,7 @@
  
     if (!_cache->open(_progMeter,lock)) {
        _progMeter->Done();
-@@ -444,7 +442,7 @@
+@@ -444,7 +442,7 @@ bool RPackageLister::xapianIndexNeedsUpdate()
        std::cerr << "xapainIndexNeedsUpdate()" << std::endl;
  
     // check the xapian index
@@ -27,3 +29,19 @@
        (!_xapianDatabase )) {
        if(_config->FindB("Debug::Synaptic::Xapian",false))
  	 std::cerr << "xapain index not build yet" << std::endl;
+@@ -924,11 +922,11 @@ void RPackageLister::getSummary(int &held, int &kept, int &essential,
+ 
+ 
+ 
+-struct bla:public binary_function<RPackage *, RPackage *, bool> {
+-   bool operator() (RPackage *a, RPackage *b) {
++auto bla() {
++   return [](RPackage* a, RPackage* b) -> bool {
+       return strcmp(a->name(), b->name()) < 0;
+-   }
+-};
++   };
++}
+ 
+ void RPackageLister::saveUndoState(pkgState &state)
+ {
