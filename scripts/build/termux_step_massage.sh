@@ -1,6 +1,8 @@
 termux_step_massage() {
 	[ "$TERMUX_PKG_METAPACKAGE" = "true" ] && return
 
+	local file
+
 	cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL"
 
 	local ADDING_PREFIX=""
@@ -234,10 +236,10 @@ termux_step_massage() {
 		echo "INFO: Identifying files with nproc=${nproc}"
 		local t0=$(get_epoch)
 		local files; files="$(IFS=; find . -type f -print0 | \
-			while read -r -d '' f; do
+			while read -r -d '' file; do
 				# Find files with ELF or static library signature in the first 4 bytes bytes
-				read -rN4 hdr < "$f" || continue
-				[[ $hdr == $'\x7fELF' || $hdr == '!<ar' ]] && printf '%s\n' "$f" || :
+				read -rN4 hdr < "$file" || continue
+				[[ $hdr == $'\x7fELF' || $hdr == '!<ar' ]] && printf '%s\n' "$file" || :
 			done
 		)"
 		# use bash to see if llvm-readelf crash
@@ -273,7 +275,7 @@ termux_step_massage() {
 			local e=0
 			local c=0
 			local valid_s=$(echo "${valid}" | sort)
-			local file excluded_f
+			local excluded_file
 			while IFS= read -r file; do
 				# exclude object, static files
 				case "${file}" in
@@ -285,8 +287,8 @@ termux_step_massage() {
 				*.syso) (( e &= ~1 )) || : ;;
 				*) (( e |= 1 )) || : ;;
 				esac
-				while IFS= read -r excluded_f; do
-					[[ "${file}" == ${excluded_f} ]] && (( e &= ~1 )) && break
+				while IFS= read -r excluded_file; do
+					[[ "${file}" == ${excluded_file} ]] && (( e &= ~1 )) && break
 				done < <(echo "${TERMUX_PKG_UNDEF_SYMBOLS_FILES}")
 				[[ "${TERMUX_PKG_UNDEF_SYMBOLS_FILES}" == "error" ]] && (( e |= 1 )) || :
 				[[ $(( e & 1 )) == 0 ]] && echo "SKIP: ${file}" && continue
@@ -318,8 +320,7 @@ termux_step_massage() {
 			local e=0
 			local c=0
 			local valid_s=$(echo "${valid}" | sort)
-			local f
-			while IFS= read -r f; do
+			while IFS= read -r file; do
 				# exclude object, static files
 				case "${file}" in
 				*.a) (( e &= ~1 )) || : ;;
@@ -348,10 +349,9 @@ termux_step_massage() {
 			local t0=$(get_epoch)
 			local valid_s=$(echo "${valid}" | sort)
 			{
-				local f
-				while IFS= read -r f; do
-					local f_needed=$(${READELF} -d "${file}" 2>/dev/null | sed -ne "s|.*NEEDED.*\[\(.*\)\].*|\1|p" | sort | uniq | tr "\n" " " | sed -e "s/ /, /g")
-					echo "ERROR: ${file}: ${f_needed%, }"
+				while IFS= read -r file; do
+					local needed_file=$(${READELF} -d "${file}" 2>/dev/null | sed -ne "s|.*NEEDED.*\[\(.*\)\].*|\1|p" | sort | uniq | tr "\n" " " | sed -e "s/ /, /g")
+					echo "ERROR: ${file}: ${needed_file%, }"
 				done < <(echo "${valid_s}")
 			} | grep libomp.so >&2
 			local t1=$(get_epoch)
