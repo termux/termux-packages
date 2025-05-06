@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/KhronosGroup/Vulkan-Loader
 TERMUX_PKG_DESCRIPTION="Vulkan Loader"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.4.313"
+TERMUX_PKG_VERSION="1.4.314"
 TERMUX_PKG_SRCURL=https://github.com/KhronosGroup/Vulkan-Loader/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=5e1917fe5681fa405e63b70d4a27f48aa9c37e3ed820649d998f3d6ee12f4f2c
+TERMUX_PKG_SHA256=0ab4147003b881df01eec1cceabe3a2e1491dd45bf90bb50113f791af6b8d86c
 TERMUX_PKG_BUILD_DEPENDS="vulkan-headers (=${TERMUX_PKG_VERSION}), libx11, libxcb, libxrandr"
 TERMUX_PKG_CONFLICTS="vulkan-loader-android"
 TERMUX_PKG_PROVIDES="vulkan-loader-android"
