@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/KhronosGroup/Vulkan-Utility-Libraries
 TERMUX_PKG_DESCRIPTION="Utility Libraries for Vulkan"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.4.313"
+TERMUX_PKG_VERSION="1.4.314"
 TERMUX_PKG_SRCURL=https://github.com/KhronosGroup/Vulkan-Utility-Libraries/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=c6422e4b7940ffb71475a3490fef5d2bf24d1206dbcc1486fe8c7151a537d268
+TERMUX_PKG_SHA256=aad807bfe8fe5b1a442204c9daf935be9e3b9973004b05e5df98ca94ea9f0882
 TERMUX_PKG_BUILD_DEPENDS="libc++, vulkan-headers (=${TERMUX_PKG_VERSION})"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_AUTO_UPDATE=true
