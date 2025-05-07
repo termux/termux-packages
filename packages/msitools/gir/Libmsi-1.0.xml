@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="LibmsiDatabase" get-type="libmsi_database_get_type" parents="GObject">
+    <property name="path" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="flags" type="LibmsiDbFlags" flags="235" default-value="0"/>
+    <property name="outpath" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <class name="LibmsiQuery" get-type="libmsi_query_get_type" parents="GObject">
+    <property name="database" type="LibmsiDatabase" flags="235"/>
+    <property name="query" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <class name="LibmsiRecord" get-type="libmsi_record_get_type" parents="GObject">
+    <property name="count" type="guint" flags="235" default-value="0"/>
+  </class>
+  <class name="LibmsiSummaryInfo" get-type="libmsi_summary_info_get_type" parents="GObject">
+    <property name="database" type="LibmsiDatabase" flags="235"/>
+    <property name="update-count" type="guint" flags="235" default-value="0"/>
+  </class>
+  <enum name="LibmsiResultError" get-type="libmsi_result_error_get_type">
+    <member name="LIBMSI_RESULT_SUCCESS" nick="success" value="0"/>
+    <member name="LIBMSI_RESULT_ACCESS_DENIED" nick="access-denied" value="1"/>
+    <member name="LIBMSI_RESULT_INVALID_HANDLE" nick="invalid-handle" value="2"/>
+    <member name="LIBMSI_RESULT_NOT_ENOUGH_MEMORY" nick="not-enough-memory" value="3"/>
+    <member name="LIBMSI_RESULT_INVALID_DATA" nick="invalid-data" value="4"/>
+    <member name="LIBMSI_RESULT_OUTOFMEMORY" nick="outofmemory" value="5"/>
+    <member name="LIBMSI_RESULT_INVALID_PARAMETER" nick="invalid-parameter" value="6"/>
+    <member name="LIBMSI_RESULT_OPEN_FAILED" nick="open-failed" value="7"/>
+    <member name="LIBMSI_RESULT_CALL_NOT_IMPLEMENTED" nick="call-not-implemented" value="8"/>
+    <member name="LIBMSI_RESULT_MORE_DATA" nick="more-data" value="9"/>
+    <member name="LIBMSI_RESULT_NOT_FOUND" nick="not-found" value="10"/>
+    <member name="LIBMSI_RESULT_CONTINUE" nick="continue" value="11"/>
+    <member name="LIBMSI_RESULT_UNKNOWN_PROPERTY" nick="unknown-property" value="12"/>
+    <member name="LIBMSI_RESULT_BAD_QUERY_SYNTAX" nick="bad-query-syntax" value="13"/>
+    <member name="LIBMSI_RESULT_INVALID_FIELD" nick="invalid-field" value="14"/>
+    <member name="LIBMSI_RESULT_FUNCTION_FAILED" nick="function-failed" value="15"/>
+    <member name="LIBMSI_RESULT_INVALID_TABLE" nick="invalid-table" value="16"/>
+    <member name="LIBMSI_RESULT_DATATYPE_MISMATCH" nick="datatype-mismatch" value="17"/>
+    <member name="LIBMSI_RESULT_INVALID_DATATYPE" nick="invalid-datatype" value="18"/>
+  </enum>  <enum name="LibmsiPropertyType" get-type="libmsi_property_type_get_type">
+    <member name="LIBMSI_PROPERTY_TYPE_EMPTY" nick="empty" value="0"/>
+    <member name="LIBMSI_PROPERTY_TYPE_INT" nick="int" value="1"/>
+    <member name="LIBMSI_PROPERTY_TYPE_STRING" nick="string" value="2"/>
+    <member name="LIBMSI_PROPERTY_TYPE_FILETIME" nick="filetime" value="3"/>
+  </enum>  <enum name="LibmsiColInfo" get-type="libmsi_col_info_get_type">
+    <member name="LIBMSI_COL_INFO_NAMES" nick="names" value="0"/>
+    <member name="LIBMSI_COL_INFO_TYPES" nick="types" value="1"/>
+  </enum>  <flags name="LibmsiDbFlags" get-type="libmsi_db_flags_get_type">
+    <member name="LIBMSI_DB_FLAGS_READONLY" nick="readonly" value="1"/>
+    <member name="LIBMSI_DB_FLAGS_CREATE" nick="create" value="2"/>
+    <member name="LIBMSI_DB_FLAGS_TRANSACT" nick="transact" value="4"/>
+    <member name="LIBMSI_DB_FLAGS_PATCH" nick="patch" value="8"/>
+  </flags>
+  <enum name="LibmsiDBError" get-type="libmsi_db_error_get_type">
+    <member name="LIBMSI_DB_ERROR_SUCCESS" nick="success" value="0"/>
+    <member name="LIBMSI_DB_ERROR_INVALIDARG" nick="invalidarg" value="1"/>
+    <member name="LIBMSI_DB_ERROR_MOREDATA" nick="moredata" value="2"/>
+    <member name="LIBMSI_DB_ERROR_FUNCTIONERROR" nick="functionerror" value="3"/>
+    <member name="LIBMSI_DB_ERROR_DUPLICATEKEY" nick="duplicatekey" value="4"/>
+    <member name="LIBMSI_DB_ERROR_REQUIRED" nick="required" value="5"/>
+    <member name="LIBMSI_DB_ERROR_BADLINK" nick="badlink" value="6"/>
+    <member name="LIBMSI_DB_ERROR_OVERFLOW" nick="overflow" value="7"/>
+    <member name="LIBMSI_DB_ERROR_UNDERFLOW" nick="underflow" value="8"/>
+    <member name="LIBMSI_DB_ERROR_NOTINSET" nick="notinset" value="9"/>
+    <member name="LIBMSI_DB_ERROR_BADVERSION" nick="badversion" value="10"/>
+    <member name="LIBMSI_DB_ERROR_BADCASE" nick="badcase" value="11"/>
+    <member name="LIBMSI_DB_ERROR_BADGUID" nick="badguid" value="12"/>
+    <member name="LIBMSI_DB_ERROR_BADWILDCARD" nick="badwildcard" value="13"/>
+    <member name="LIBMSI_DB_ERROR_BADIDENTIFIER" nick="badidentifier" value="14"/>
+    <member name="LIBMSI_DB_ERROR_BADLANGUAGE" nick="badlanguage" value="15"/>
+    <member name="LIBMSI_DB_ERROR_BADFILENAME" nick="badfilename" value="16"/>
+    <member name="LIBMSI_DB_ERROR_BADPATH" nick="badpath" value="17"/>
+    <member name="LIBMSI_DB_ERROR_BADCONDITION" nick="badcondition" value="18"/>
+    <member name="LIBMSI_DB_ERROR_BADFORMATTED" nick="badformatted" value="19"/>
+    <member name="LIBMSI_DB_ERROR_BADTEMPLATE" nick="badtemplate" value="20"/>
+    <member name="LIBMSI_DB_ERROR_BADDEFAULTDIR" nick="baddefaultdir" value="21"/>
+    <member name="LIBMSI_DB_ERROR_BADREGPATH" nick="badregpath" value="22"/>
+    <member name="LIBMSI_DB_ERROR_BADCUSTOMSOURCE" nick="badcustomsource" value="23"/>
+    <member name="LIBMSI_DB_ERROR_BADPROPERTY" nick="badproperty" value="24"/>
+    <member name="LIBMSI_DB_ERROR_MISSINGDATA" nick="missingdata" value="25"/>
+    <member name="LIBMSI_DB_ERROR_BADCATEGORY" nick="badcategory" value="26"/>
+    <member name="LIBMSI_DB_ERROR_BADKEYTABLE" nick="badkeytable" value="27"/>
+    <member name="LIBMSI_DB_ERROR_BADMAXMINVALUES" nick="badmaxminvalues" value="28"/>
+    <member name="LIBMSI_DB_ERROR_BADCABINET" nick="badcabinet" value="29"/>
+    <member name="LIBMSI_DB_ERROR_BADSHORTCUT" nick="badshortcut" value="30"/>
+    <member name="LIBMSI_DB_ERROR_STRINGOVERFLOW" nick="stringoverflow" value="31"/>
+    <member name="LIBMSI_DB_ERROR_BADLOCALIZEATTRIB" nick="badlocalizeattrib" value="32"/>
+  </enum>  <enum name="LibmsiProperty" get-type="libmsi_property_get_type">
+    <member name="LIBMSI_PROPERTY_DICTIONARY" nick="dictionary" value="0"/>
+    <member name="LIBMSI_PROPERTY_CODEPAGE" nick="codepage" value="1"/>
+    <member name="LIBMSI_PROPERTY_TITLE" nick="title" value="2"/>
+    <member name="LIBMSI_PROPERTY_SUBJECT" nick="subject" value="3"/>
+    <member name="LIBMSI_PROPERTY_AUTHOR" nick="author" value="4"/>
+    <member name="LIBMSI_PROPERTY_KEYWORDS" nick="keywords" value="5"/>
+    <member name="LIBMSI_PROPERTY_COMMENTS" nick="comments" value="6"/>
+    <member name="LIBMSI_PROPERTY_TEMPLATE" nick="template" value="7"/>
+    <member name="LIBMSI_PROPERTY_LASTAUTHOR" nick="lastauthor" value="8"/>
+    <member name="LIBMSI_PROPERTY_UUID" nick="uuid" value="9"/>
+    <member name="LIBMSI_PROPERTY_EDITTIME" nick="edittime" value="10"/>
+    <member name="LIBMSI_PROPERTY_LASTPRINTED" nick="lastprinted" value="11"/>
+    <member name="LIBMSI_PROPERTY_CREATED_TM" nick="created-tm" value="12"/>
+    <member name="LIBMSI_PROPERTY_LASTSAVED_TM" nick="lastsaved-tm" value="13"/>
+    <member name="LIBMSI_PROPERTY_VERSION" nick="version" value="14"/>
+    <member name="LIBMSI_PROPERTY_SOURCE" nick="source" value="15"/>
+    <member name="LIBMSI_PROPERTY_RESTRICT" nick="restrict" value="16"/>
+    <member name="LIBMSI_PROPERTY_THUMBNAIL" nick="thumbnail" value="17"/>
+    <member name="LIBMSI_PROPERTY_APPNAME" nick="appname" value="18"/>
+    <member name="LIBMSI_PROPERTY_SECURITY" nick="security" value="19"/>
+  </enum>  <error-quark function="libmsi_result_error_quark" domain="libmsi-result-error-quark"/>
+  <error-quark function="libmsi_db_error_quark" domain="libmsi-db-error-quark"/>
+</dump>
