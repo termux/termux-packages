@@ -7,6 +7,9 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/google/brotli/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=e720a6ca29428b803f4ad165371771f5398faba397edf6778837a18599ea13ff
 TERMUX_PKG_AUTO_UPDATE=true
+# [termux_setup_python_pip]: Applying python-crossenv-PYTHONPATH.patch
+# ERROR: /data/data/com.termux/files/usr/bin/python3.12 does not exist
+TERMUX_PKG_BUILD_DEPENDS="python"
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel"
 TERMUX_PKG_BREAKS="brotli-dev"
 TERMUX_PKG_REPLACES="brotli-dev"

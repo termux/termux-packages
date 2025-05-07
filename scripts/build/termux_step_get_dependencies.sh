@@ -8,7 +8,16 @@ termux_step_get_dependencies() {
 		termux_download_repo_file
 	fi
 
-	while read PKG PKG_DIR; do
+	local command_arg="READ_ERROR"
+	local return_value=0
+	while read PKG PKG_DIR; return_value=$?; [[ $return_value -eq 0 ]]; do
+		# If package has no dependencies
+		if [ -z "$PKG" ] || [ -z "$PKG_DIR" ]; then
+			continue
+		fi
+
+		echo $'\n\n'"[*] Processing dependency '$PKG ($PKG_DIR)' of package '$TERMUX_PKG_NAME'..."
+
 		# Checking for duplicate dependencies
 		local cyclic_dependence=false
 		if termux_check_package_in_building_packages_list "$PKG_DIR"; then
@@ -107,11 +116,17 @@ termux_step_get_dependencies() {
 				read DEP_ARCH DEP_VERSION DEP_VERSION_PAC <<< $(termux_extract_dep_info $PKG "${PKG_DIR}")
 				termux_force_check_package_dependency && continue
 			else
-				[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "Building dependency $PKG if necessary..."
+				[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "Building dependency '$PKG' if necessary..."
 			fi
 			termux_run_build-package
 		fi
-	done<<<$(./scripts/buildorder.py $(test "${TERMUX_INSTALL_DEPS}" = "true" && echo "-i") "$TERMUX_PKG_BUILDER_DIR" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
+	done < <(./scripts/buildorder.py $(test "${TERMUX_INSTALL_DEPS}" = "true" && echo "-i") "$TERMUX_PKG_BUILDER_DIR" $TERMUX_PACKAGES_DIRECTORIES || echo -n "CMD_ERROR")
+	if [[ -n "${PKG:-}" ]] || [ $return_value -ne 1 ]; then
+		echo "Failed to get build order." 1>&2
+		[[ -n "${PKG:-}" ]] && echo "Error type: '$PKG'" 1>&2
+		return 1
+	fi
+
 }
 
 termux_force_check_package_dependency() {
@@ -133,11 +148,12 @@ termux_run_build-package() {
 		fi
 	fi
 	TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh \
- 		$(test "${TERMUX_INSTALL_DEPS}" = "true" && echo "-I" || echo "-s") \
- 		$({ test "${TERMUX_FORCE_BUILD}" = "true" && test "${TERMUX_FORCE_BUILD_DEPENDENCIES}" = "true"; } && echo "-F") \
- 		$(test "${TERMUX_PKGS__BUILD__RM_ALL_PKG_BUILD_DEPENDENT_DIRS}" = "true" && echo "-r") \
-   		$(test "${TERMUX_WITHOUT_DEPVERSION_BINDING}" = "true" && echo "-w") \
-     		--format $TERMUX_PACKAGE_FORMAT --library $set_library "${PKG_DIR}"
+		$(test "${TERMUX_INSTALL_DEPS}" = "true" && echo "-I" || echo "-s") \
+		$({ test "${TERMUX_FORCE_BUILD}" = "true" && test "${TERMUX_FORCE_BUILD_DEPENDENCIES}" = "true"; } && echo "-F") \
+		$(test "${TERMUX_PKGS__BUILD__RM_ALL_PKG_BUILD_DEPENDENT_DIRS}" = "true" && echo "-r") \
+		$(test "${TERMUX_PKGS__BUILD__NO_BUILD_UNNEEDED_SUBPACKAGES:-}" = "true" && echo "--no-build-unneeded-subpackages") \
+		$(test "${TERMUX_WITHOUT_DEPVERSION_BINDING}" = "true" && echo "-w") \
+			--format $TERMUX_PACKAGE_FORMAT --library $set_library "${PKG_DIR}"
 }
 
 termux_download_repo_file() {
