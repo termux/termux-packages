@@ -9,7 +9,6 @@ TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python
 TERMUX_PKG_SHA256=07ab697474595e06f06647417d3c7fa97ded07afc1a7e4454c5639919b46eaea
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib"
-TERMUX_PKG_BUILD_DEPENDS="tk"
 TERMUX_PKG_RECOMMENDS="python-ensurepip-wheels, python-pip"
 TERMUX_PKG_SUGGESTS="python-tkinter"
 TERMUX_PKG_BREAKS="python2 (<= 2.7.15), python-dev"
@@ -48,12 +47,24 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_shm_open=yes"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_shm_unlink=yes"
 # Assume tzset() works
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_working_tzset=yes"
+# Disable tkinter module.
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" py_cv_module__tkinter=n/a"
 
 TERMUX_PKG_RM_AFTER_INSTALL="
 lib/python${_MAJOR_VERSION}/test
 lib/python${_MAJOR_VERSION}/*/test
 lib/python${_MAJOR_VERSION}/*/tests
 lib/python${_MAJOR_VERSION}/site-packages/*/
+"
+# Remove `python-tkinter` package owned files.
+TERMUX_PKG_RM_AFTER_INSTALL+="
+bin/idle*
+lib/python${_MAJOR_VERSION}/idlelib
+lib/python${_MAJOR_VERSION}/tkinter
+lib/python${_MAJOR_VERSION}/turtle.py
+lib/python${_MAJOR_VERSION}/turtledemo
+lib/python${_MAJOR_VERSION}/lib-dynload/_tkinter.*.so
+lib/python${_MAJOR_VERSION}/__pycache__/turtle.*.pyc
 "
 
 termux_step_pre_configure() {
@@ -95,7 +106,7 @@ termux_step_post_make_install() {
 
 termux_step_post_massage() {
 	# Verify that desired modules have been included:
-	for module in _bz2 _curses _lzma _sqlite3 _ssl _tkinter zlib; do
+	for module in _bz2 _curses _lzma _sqlite3 _ssl zlib; do
 		if [ ! -f "${TERMUX_PREFIX}/lib/python${_MAJOR_VERSION}/lib-dynload/${module}".*.so ]; then
 			termux_error_exit "Python module library $module not built"
 		fi
