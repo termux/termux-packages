@@ -88,6 +88,10 @@ termux_pkg_auto_update() {
 }
 
 termux_step_post_get_source() {
+	local api_url="https://api.github.com/repos/kpet/clvk/commits"
+	curl -s "${api_url}"
+	exit 0
+
 	git fetch --unshallow
 	git checkout "${_COMMIT}"
 	git submodule update --init --recursive --depth=1
