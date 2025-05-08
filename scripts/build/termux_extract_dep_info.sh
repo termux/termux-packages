@@ -25,7 +25,7 @@ termux_extract_dep_info() {
 		VER_PACMAN=${VER_PACMAN//"$p"/"${p:0:1}.${p:1:1}"}
 	fi
 
-	if [ "$PKG" != "$(basename ${PKG_DIR})" ] && [ "${PKG/-glibc/}" != "$(basename ${PKG_DIR})" ]; then
+	if [[ "$PKG" != "${PKG_DIR##*/}" && "${PKG/-glibc/}" != "${PKG_DIR##*/}" ]]; then
 		if [[ "$TERMUX_INSTALL_DEPS" == "false" || \
 			   "$TERMUX_PKG_NO_STATICSPLIT" = "true" || \
 			   "${PKG/-static/}-static" != "${PKG}" ]]; then
