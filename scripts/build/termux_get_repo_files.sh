@@ -7,6 +7,8 @@ termux_get_repo_files() {
 		return
 	fi
 
+	[[ "${CI-false}" == "true" ]] && echo "::group::INFO: Fetching repo metadata"
+
 	for idx in "${!TERMUX_REPO_URL[@]}"; do
 		local TERMUX_REPO_NAME="${TERMUX_REPO_URL[$idx]#https://}"
 		TERMUX_REPO_NAME="${TERMUX_REPO_NAME#http://}"
@@ -79,4 +81,5 @@ termux_get_repo_files() {
 			exit 1
 		fi
 	done
+	[[ "${CI-false}" == "true" ]] && echo "::endgroup::"
 }
