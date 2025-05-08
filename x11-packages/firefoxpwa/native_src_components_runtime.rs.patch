@@ -1,0 +1,78 @@
+diff --git a/native/src/components/runtime.rs b/native/src/components/runtime.rs
+index 4973cd5..4bed01a 100644
+--- a/native/src/components/runtime.rs
++++ b/native/src/components/runtime.rs
+@@ -14,10 +14,17 @@ use crate::components::site::Site;
+ use crate::directories::ProjectDirs;
+ 
+ // TODO: Remove this constant and implement variable firefox path into user documentation
+-pub const FFOX: &str = "/usr/lib/firefox/";
++pub const FFOX: &str = {
++    cfg_if! {
++    if #[cfg(platform_termux)] {
++        "@TERMUX_PREFIX@/lib/firefox/"
++    } else {
++    "/usr/lib/firefox/"
++    }}
++};
+ 
+ cfg_if! {
+-    if #[cfg(any(platform_linux, platform_bsd))] {
++    if #[cfg(any(platform_linux, platform_bsd, platform_termux))] {
+         use std::fs::{set_permissions, DirEntry};
+         use std::os::unix::fs::PermissionsExt;
+ 
+@@ -187,7 +205,7 @@ impl Runtime {
+             cfg_if! {
+                 if #[cfg(platform_windows)] {
+                     directory.join("firefox.exe")
+-                } else if #[cfg(any(platform_linux, platform_bsd))] {
++                } else if #[cfg(any(platform_linux, platform_bsd, platform_termux))] {
+                     directory.join("firefox")
+                 } else if #[cfg(platform_macos)] {
+                     directory.join("Firefox.app/Contents/MacOS/firefox")
+@@ -199,7 +217,7 @@ impl Runtime {
+ 
+         let config = {
+             cfg_if! {
+-                if #[cfg(any(platform_windows, platform_linux, platform_bsd))] {
++                if #[cfg(any(platform_windows, platform_linux, platform_bsd, platform_termux))] {
+                     directory.join("application.ini")
+                 } else if #[cfg(platform_macos)] {
+                     directory.join("Firefox.app/Contents/Resources/application.ini")
+@@ -242,7 +260,7 @@ impl Runtime {
+         const COPY_ERROR: &str = "Failed to copy the runtime";
+         const CLEANUP_ERROR: &str = "Failed to clean up the runtime";
+ 
+-        #[cfg(platform_linux)]
++        #[cfg(any(platform_linux, platform_termux))]
+         {
+             use crate::storage::Storage;
+ 
+@@ -293,7 +311,7 @@ impl Runtime {
+ 
+                 source.push("core");
+ 
+-            } else if #[cfg(platform_linux)] {
++            } else if #[cfg(any(platform_linux, platform_termux))] {
+                 use anyhow::bail;
+                 use std::fs::File;
+                 use std::io::Read;
+@@ -354,7 +372,7 @@ impl Runtime {
+         Ok(())
+     }
+ 
+-    #[cfg(all(platform_linux, not(feature = "immutable-runtime")))]
++    #[cfg(all(any(platform_linux, platform_termux), not(feature = "immutable-runtime")))]
+     pub fn link(&self) -> Result<()> {
+         use std::fs::{copy, create_dir_all};
+         use std::os::unix::fs::symlink;
+@@ -435,7 +453,7 @@ impl Runtime {
+         copy(&source, &target, &options).context("Failed to patch the runtime")?;
+ 
+         cfg_if! {
+-            if #[cfg(any(platform_linux, platform_bsd))] {
++            if #[cfg(any(platform_linux, platform_bsd, platform_termux))] {
+                 visit_dirs(&source, &source, target, &make_writable)?;
+             }
+         }
