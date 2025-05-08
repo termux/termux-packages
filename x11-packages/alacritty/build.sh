@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A fast, cross-platform, OpenGL terminal emulator"
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="0.15.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/alacritty/alacritty/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=b814e30c6271ae23158c66e0e2377c3600bb24041fa382a36e81be564eeb2e36
 TERMUX_PKG_DEPENDS="fontconfig, freetype, libxi, libxcursor, libxrandr"
@@ -85,6 +86,9 @@ termux_step_make_install() {
 	install -Dm644 extra/completions/_alacritty     "$TERMUX_PREFIX/share/zsh/site-functions/_alacritty"
 	install -Dm644 extra/completions/alacritty.bash "$TERMUX_PREFIX/share/bash-completion/completions/alacritty.bash"
 	install -Dm644 extra/completions/alacritty.fish "$TERMUX_PREFIX/share/fish/vendor_completions.d/alacritty.fish"
+
+	# .desktop
+	install -Dm644 extra/linux/Alacritty.desktop "$TERMUX_PREFIX/share/applications/Alacritty.desktop"
 }
 
 termux_step_post_massage() {
