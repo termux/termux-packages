@@ -1,0 +1,22 @@
+diff --git a/native/src/console/runtime.rs b/native/src/console/runtime.rs
+index 3c3f0fd..15fad8c 100644
+--- a/native/src/console/runtime.rs
++++ b/native/src/console/runtime.rs
+@@ -26,14 +26,14 @@ impl Run for RuntimeInstallCommand {
+         let dirs = ProjectDirs::new()?;
+         let runtime = Runtime::new(&dirs)?;
+ 
+-        #[cfg(platform_linux)]
++        #[cfg(any(platform_linux, platform_termux))]
+         if self.link {
+-            runtime.link().context("Failed to link runtime")?
++            runtime.link().context("Failed to link runtime")?;
+         } else {
+             runtime.install().context("Failed to install runtime")?;
+         }
+ 
+-        #[cfg(not(platform_linux))]
++        #[cfg(not(any(platform_linux, platform_termux)))]
+         runtime.install().context("Failed to install runtime")?;
+ 
+         let runtime = Runtime::new(&dirs)?;

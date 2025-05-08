@@ -1,0 +1,13 @@
+diff --git a/native/src/console/app.rs b/native/src/console/app.rs
+index 83a6b67..318a9a9 100644
+--- a/native/src/console/app.rs
++++ b/native/src/console/app.rs
+@@ -277,7 +277,7 @@ pub enum RuntimeCommand {
+ #[derive(Parser, Debug, Eq, PartialEq, Clone)]
+ pub struct RuntimeInstallCommand {
+     /// Experimental: Use a linked runtime instead of downloading from Mozilla
+-    #[cfg(target_os = "linux")]
++    #[cfg(any(target_os = "linux", target_os = "android"))]
+     #[clap(long)]
+     pub link: bool,
+ }

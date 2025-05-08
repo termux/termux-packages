@@ -1,0 +1,31 @@
+diff --git a/native/src/directories.rs b/native/src/directories.rs
+index 7dbe2f0..77b8019 100644
+--- a/native/src/directories.rs
++++ b/native/src/directories.rs
+@@ -157,6 +157,8 @@ impl ProjectDirs {
+                     PathBuf::from("/usr/bin")
+                 } else if #[cfg(any(platform_macos, platform_bsd))] {
+                     PathBuf::from("/usr/local/bin")
++                } else if #[cfg(platform_termux)] {
++                    PathBuf::from("@TERMUX_PREFIX@/bin")
+                 } else {
+                     compile_error!("Unknown operating system")
+                 }
+@@ -173,6 +175,8 @@ impl ProjectDirs {
+                     PathBuf::from("/usr/share/firefoxpwa")
+                 } else if #[cfg(any(platform_macos, platform_bsd))] {
+                     PathBuf::from("/usr/local/share/firefoxpwa")
++                } else if #[cfg(platform_termux)] {
++                    PathBuf::from("@TERMUX_PREFIX@/share/firefoxpwa")
+                 } else {
+                     compile_error!("Unknown operating system")
+                 }
+@@ -187,7 +191,7 @@ impl ProjectDirs {
+                     base.data_dir().join("FirefoxPWA")
+                 } else if #[cfg(all(platform_windows, feature = "portable"))] {
+                     data
+-                } else if #[cfg(any(platform_linux, platform_macos, platform_bsd))] {
++                } else if #[cfg(any(platform_linux, platform_macos, platform_bsd, platform_termux))] {
+                     base.data_dir().join("firefoxpwa")
+                 } else {
+                     compile_error!("Unknown operating system")

@@ -1,0 +1,31 @@
+diff --git a/native/src/integrations/implementation/mod.rs b/native/src/integrations/implementation/mod.rs
+index cd6e935..467311a 100644
+--- a/native/src/integrations/implementation/mod.rs
++++ b/native/src/integrations/implementation/mod.rs
+@@ -10,7 +10,7 @@ use crate::integrations::{IntegrationInstallArgs, IntegrationUninstallArgs};
+ #[cfg(all(platform_windows, not(feature = "portable")))]
+ mod windows;
+ 
+-#[cfg(any(platform_linux, platform_bsd))]
++#[cfg(any(platform_linux, platform_bsd, platform_termux))]
+ mod linux;
+ 
+ #[cfg(platform_macos)]
+@@ -26,7 +26,7 @@ pub fn install(args: &IntegrationInstallArgs) -> Result<()> {
+             windows::install(args)
+         } else if #[cfg(all(platform_windows, feature = "portable"))] {
+             portableapps::install(args)
+-        } else if #[cfg(any(platform_linux, platform_bsd))] {
++        } else if #[cfg(any(platform_linux, platform_bsd, platform_termux))] {
+             linux::install(args)
+         } else if #[cfg(platform_macos)] {
+             macos::install(args)
+@@ -43,7 +43,7 @@ pub fn uninstall(args: &IntegrationUninstallArgs) -> Result<()> {
+             windows::uninstall(args)
+         } else if #[cfg(all(platform_windows, feature = "portable"))] {
+             portableapps::uninstall(args)
+-       } else if #[cfg(any(platform_linux, platform_bsd))] {
++       } else if #[cfg(any(platform_linux, platform_bsd, platform_termux))] {
+             linux::uninstall(args)
+         } else if #[cfg(platform_macos)] {
+             macos::uninstall(args)
