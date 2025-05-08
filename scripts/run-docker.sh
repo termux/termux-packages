@@ -14,6 +14,12 @@ else
 	SEC_OPT=" --security-opt seccomp=$REPOROOT/scripts/profile.json"
 fi
 
+if [ "${CI:-}" = "true" ]; then
+	CI_OPT="--env CI=true"
+else
+	CI_OPT=""
+fi
+
 # Required for Linux with SELinux and btrfs to avoid permission issues, eg: Fedora
 # To reset, use "restorecon -Fr ."
 # To check, use "ls -Z ."
@@ -71,4 +77,4 @@ if [ "$#" -eq "0" ]; then
 	set -- bash
 fi
 
-$SUDO docker exec --env "DOCKER_EXEC_PID_FILE_PATH=$DOCKER_EXEC_PID_FILE_PATH" --interactive $DOCKER_TTY $CONTAINER_NAME "$@"
+$SUDO docker exec $CI_OPT --env "DOCKER_EXEC_PID_FILE_PATH=$DOCKER_EXEC_PID_FILE_PATH" --interactive $DOCKER_TTY $CONTAINER_NAME "$@"

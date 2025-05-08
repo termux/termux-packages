@@ -10,7 +10,7 @@ unset PR WORKFLOW_ID
 
 infoexit() {
 	echo "$@"
-	[[ -n "${PR}" && -n "${CI}" ]] && echo "::error ::Failed to reuse PR #${PR} ${WORKFLOW_ID:+"(workflow run ${WORKFLOW_ID})"} build artifacts, see \`Gathering build summary\` step logs."
+	[[ -n "${PR}" && "${CI-false}" == "true" ]] && echo "::error ::Failed to reuse PR #${PR} ${WORKFLOW_ID:+"(workflow run ${WORKFLOW_ID})"} build artifacts, see \`Gathering build summary\` step logs."
 	exit 1
 } >&2
 
