@@ -231,11 +231,11 @@ _fetch_and_cache_tags() {
 		termux_pkg_auto_update
 	}
 
-	echo "$([[ "${CI-false}" == "true" ]] && echo "::group::")INFO: Fetching GitHub packages via GraphQL API"
+	echo "$([[ "${CI-false}" == "true" ]] && echo "::group::" || :)INFO: Fetching GitHub packages via GraphQL API"
 	LATEST_TAGS_GITHUB="$(
 		termux_github_graphql "${GITHUB_GRAPHQL_QUERIES[@]}"
 	)"
-	[[ "${CI-false}" == "true" ]] && echo "::endgroup::"
+	[[ "${CI-false}" == "true" ]] && echo "::endgroup::" || :
 
 	echo "INFO: Fetching non-GitHub packages"
 	local LATEST_TAGS=''
@@ -247,7 +247,7 @@ _fetch_and_cache_tags() {
 	unset -f __main__
 
 	declare -A __GITHUB_CURRENT_TAGS=()
-	[[ "${CI-false}" == "true" ]] && echo "::group::INFO: Skipping the following up-to-date packages"
+	[[ "${CI-false}" == "true" ]] && echo "::group::INFO: Skipping the following up-to-date packages" || :
 	while IFS='|' read -r type pkg version; do
 		if [[ "${type}" == "LOCAL" ]]; then # Current git-originated package version
 			__GITHUB_CURRENT_TAGS["${pkg:-_}"]="$version"
@@ -259,7 +259,7 @@ _fetch_and_cache_tags() {
 			_ALREADY_SEEN+=("${pkg}")
 		fi
 	done < <(printf '%s\n' "$LATEST_TAGS" "$LATEST_TAGS_GITHUB")
-	[[ "${CI-false}" == "true" ]] && echo "::endgroup::"
+	[[ "${CI-false}" == "true" ]] && echo "::endgroup::" || :
 	unset __GITHUB_CURRENT_TAGS
 }
 
