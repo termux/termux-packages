@@ -1,16 +1,17 @@
 #!/usr/bin/bash
 
 termux_extract_dep_info() {
-	( # Do everything in a subshell do avoid variable hell outside the function
-	PKG=$1
-	PKG_DIR=$2
+	( # Do everything in a subshell to avoid variable hell outside the function
+	PKG="$1"
+	PKG_DIR="$2"
 
 	# set TERMUX_SUBPKG_PLATFORM_INDEPENDENT to
 	# parent package's value and override if
 	# needed
-	TERMUX_PKG_PLATFORM_INDEPENDENT=false
+	TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED="false"
+	TERMUX_PKG_PLATFORM_INDEPENDENT="false"
 	TERMUX_PKG_REVISION="0"
-	source ${PKG_DIR}/build.sh
+	source "${PKG_DIR}/build.sh"
 
 	# debian version
 	VER_DEBIAN="$TERMUX_PKG_VERSION"
@@ -27,12 +28,13 @@ termux_extract_dep_info() {
 
 	if [[ "$PKG" != "${PKG_DIR##*/}" && "${PKG/-glibc/}" != "${PKG_DIR##*/}" ]]; then
 		if [[ "$TERMUX_INSTALL_DEPS" == "false" || \
-			   "$TERMUX_PKG_NO_STATICSPLIT" = "true" || \
-			   "${PKG/-static/}-static" != "${PKG}" ]]; then
+				"$TERMUX_PKG_NO_STATICSPLIT" = "true" || \
+				"${PKG/-static/}-static" != "${PKG}" ]]; then
+			# shellcheck source=/dev/null
 			if [[ -f "${PKG_DIR}/${PKG}.subpackage.sh" ]]; then
-				source ${PKG_DIR}/${PKG}.subpackage.sh
+				source "${PKG_DIR}/${PKG}.subpackage.sh"
 			else
-				source ${PKG_DIR}/${PKG/-glibc/}.subpackage.sh
+				source "${PKG_DIR}/${PKG/-glibc/}.subpackage.sh"
 			fi
 		fi
 	fi
@@ -40,7 +42,7 @@ termux_extract_dep_info() {
 		TERMUX_ARCH=all
 	fi
 
-	echo "${TERMUX_ARCH} ${VER_DEBIAN} ${VER_PACMAN}-${TERMUX_PKG_REVISION}"
+	echo "${TERMUX_ARCH} ${VER_DEBIAN} ${VER_PACMAN}-${TERMUX_PKG_REVISION} ${TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED}"
 	)
 }
 
