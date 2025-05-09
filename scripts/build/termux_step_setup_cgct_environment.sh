@@ -33,7 +33,7 @@ termux_step_setup_cgct_environment() {
 			termux_error_exit "Could not find '${PKG_DIR_SPLIT[-3]}' repo"
 		fi
 
-		read DEP_ARCH DEP_VERSION DEP_VERSION_PAC <<< $(termux_extract_dep_info $PKG "${PKG_DIR/'/build.sh'/}")
+		read -r DEP_ARCH DEP_VERSION DEP_VERSION_PAC _ < <(termux_extract_dep_info $PKG "${PKG_DIR/'/build.sh'/}")
 
 		if ! termux_package__is_package_version_built "$PKG" "$DEP_VERSION" && [ ! -f "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG-for-cgct" ]; then
 			[ ! "$TERMUX_QUIET_BUILD" = "true" ] && echo "Installing '${PKG}' for the CGCT tool environment."
