@@ -19,7 +19,7 @@ termux_setup_python_pip() {
 		mkdir -p "$_VENV_DIR"
 		python${TERMUX_PYTHON_VERSION} -m venv --system-site-packages "$_VENV_DIR"
 		. "$_VENV_DIR/bin/activate"
-		
+
 		pip install 'setuptools==78.1.0' 'wheel==0.46.1'
 	else
 		local _CROSSENV_VERSION=1.4.0
