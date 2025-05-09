@@ -14,9 +14,9 @@ LICENSE/LICENSE_SOLARIZED
 LICENSE/LICENSE_STIX
 LICENSE/LICENSE_YORICK"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.10.1"
+TERMUX_PKG_VERSION="3.10.3"
 TERMUX_PKG_SRCURL=https://github.com/matplotlib/matplotlib/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=c3d78b5c4fedd8338323d24e040faf797e153a0d448fd641deee6eb3a3d6420b
+TERMUX_PKG_SHA256=d581d3cec14478a0347631f93d534c2acf11bf554670eedd0a200f56ec979d12
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="freetype, libc++, patchelf, ninja, python, python-contourpy, python-numpy, python-pillow, python-pip"
 _NUMPY_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python-numpy/build.sh; echo $TERMUX_PKG_VERSION)
