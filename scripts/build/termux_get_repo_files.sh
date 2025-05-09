@@ -67,7 +67,7 @@ termux_get_repo_files() {
 				done
 
 				# prevent output garbling by using stdout as a lock file
-				[[ "${#buffer[@]}" -ge 1 ]] && flock --no-fork 1 printf "%s\n" "${buffer[@]}"
+				[[ "${#buffer[@]}" -ge 1 ]] && flock --no-fork . printf "%s\n" "${buffer[@]}"
 				[[ $rc == 1 ]] && break # exit on EOF
 			done
 		) &
