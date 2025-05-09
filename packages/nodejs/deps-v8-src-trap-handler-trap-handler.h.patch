@@ -1,18 +1,17 @@
-diff -u -r ../node-v22.2.0/deps/v8/src/trap-handler/trap-handler.h ./deps/v8/src/trap-handler/trap-handler.h
---- ../node-v22.2.0/deps/v8/src/trap-handler/trap-handler.h	2024-05-15 12:35:03.000000000 +0000
-+++ ./deps/v8/src/trap-handler/trap-handler.h	2024-05-30 20:41:54.491637576 +0000
-@@ -17,45 +17,7 @@
- namespace internal {
- namespace trap_handler {
+--- ./deps/v8/src/trap-handler/trap-handler.h.orig	2025-05-08 13:56:19.000000000 +0530
++++ ./deps/v8/src/trap-handler/trap-handler.h	2025-05-09 19:48:23.129472068 +0530
+@@ -15,45 +15,7 @@
+ 
+ namespace v8::internal::trap_handler {
  
 -// X64 on Linux, Windows, MacOS, FreeBSD.
 -#if V8_HOST_ARCH_X64 && V8_TARGET_ARCH_X64 &&                        \
 -    ((V8_OS_LINUX && !V8_OS_ANDROID) || V8_OS_WIN || V8_OS_DARWIN || \
 -     V8_OS_FREEBSD)
 -#define V8_TRAP_HANDLER_SUPPORTED true
--// Arm64 (non-simulator) on Mac and Linux.
+-// Arm64 (non-simulator) on Linux, Windows, MacOS.
 -#elif V8_TARGET_ARCH_ARM64 && V8_HOST_ARCH_ARM64 && \
--    (V8_OS_DARWIN || (V8_OS_LINUX && !V8_OS_ANDROID))
+-    ((V8_OS_LINUX && !V8_OS_ANDROID) || V8_OS_WIN || V8_OS_DARWIN)
 -#define V8_TRAP_HANDLER_SUPPORTED true
 -// Arm64 simulator on x64 on Linux, Mac, or Windows.
 -//
@@ -33,7 +32,8 @@ diff -u -r ../node-v22.2.0/deps/v8/src/trap-handler/trap-handler.h ./deps/v8/src
 -#define V8_TRAP_HANDLER_VIA_SIMULATOR
 -#define V8_TRAP_HANDLER_SUPPORTED true
 -// RISCV64 (non-simulator) on Linux.
--#elif V8_TARGET_ARCH_RISCV64 && V8_HOST_ARCH_RISCV64 && V8_OS_LINUX
+-#elif V8_TARGET_ARCH_RISCV64 && V8_HOST_ARCH_RISCV64 && V8_OS_LINUX && \
+-    !V8_OS_ANDROID
 -#define V8_TRAP_HANDLER_SUPPORTED true
 -// RISCV64 simulator on x64 on Linux
 -#elif V8_TARGET_ARCH_RISCV64 && V8_HOST_ARCH_X64 && V8_OS_LINUX
@@ -43,7 +43,6 @@ diff -u -r ../node-v22.2.0/deps/v8/src/trap-handler/trap-handler.h ./deps/v8/src
 -#else
  #define V8_TRAP_HANDLER_SUPPORTED false
 -#endif
--
+ 
  #if V8_OS_ANDROID && V8_TRAP_HANDLER_SUPPORTED
  // It would require some careful security review before the trap handler
- // can be enabled on Android.  Android may do unexpected things with signal
