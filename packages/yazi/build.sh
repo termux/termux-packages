@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Blazing fast terminal file manager written in Rust, base
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="25.4.8"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/sxyazi/yazi/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=b001df58df5276587eecb89ed90e8ea7a2bf738819ccb1afc722355fa2c56eae
 TERMUX_PKG_AUTO_UPDATE=true
@@ -22,12 +23,24 @@ termux_step_make_install() {
 	install -Dm700 -t "$TERMUX_PREFIX/bin" "target/${CARGO_TARGET_NAME}/release/yazi"
 	install -Dm700 -t "$TERMUX_PREFIX/bin" "target/${CARGO_TARGET_NAME}/release/ya"
 
-	cd yazi-boot/completions
-	install -Dm644 "${TERMUX_PKG_NAME}.bash" "${TERMUX_PREFIX}/share/bash-completion/completions/${TERMUX_PKG_NAME}.bash"
-	install -Dm644 "${TERMUX_PKG_NAME}.elv"  "${TERMUX_PREFIX}/share/elvish/lib/${TERMUX_PKG_NAME}.elv"
-	install -Dm644 "${TERMUX_PKG_NAME}.fish" "${TERMUX_PREFIX}/share/fish/vendor_completions.d/${TERMUX_PKG_NAME}.fish"
-	install -Dm644 "${TERMUX_PKG_NAME}.nu"   "${TERMUX_PREFIX}/share/nushell/vendor/autoload/${TERMUX_PKG_NAME}.nu"
-	install -Dm644 "_${TERMUX_PKG_NAME}"     "${TERMUX_PREFIX}/share/zsh/site-functions/_${TERMUX_PKG_NAME}"
+	# shell completions
+	install -Dm644 yazi-boot/completions/yazi.bash "$TERMUX_PREFIX/share/bash-completion/completions/yazi.bash"
+	install -Dm644 yazi-boot/completions/yazi.elv  "$TERMUX_PREFIX/share/elvish/lib/yazi.elv"
+	install -Dm644 yazi-boot/completions/yazi.fish "$TERMUX_PREFIX/share/fish/vendor_completions.d/yazi.fish"
+	install -Dm644 yazi-boot/completions/yazi.nu   "$TERMUX_PREFIX/share/nushell/vendor/autoload/yazi.nu"
+	install -Dm644 yazi-boot/completions/_yazi     "$TERMUX_PREFIX/share/zsh/site-functions/_yazi"
+
+	# desktop entry
+	install -Dm644 assets/yazi.desktop "$TERMUX_PREFIX/share/applications/yazi.desktop"
+
+	# application icons
+	local res
+	for res in 16 24 32 48 64 128 256; do
+		install -dm755 "${TERMUX_PREFIX}/share/icons/hicolor/${res}x${res}/apps"
+		# `convert` is consolidated into the `magick` command on ImageMagick 7.0.0.0+
+		# Ubuntu 24.04 ships version 6.9.12.98, we'll have to deal with this later.
+		convert assets/logo.png -resize "${res}x${res}" "${TERMUX_PREFIX}/share/icons/hicolor/${res}x${res}/apps/yazi.png"
+	done
 }
 
 termux_step_create_debscripts() {
