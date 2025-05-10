@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Simple DirectMedia Layer (SDL) sdl2-compat"
 TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.32.56"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/libsdl-org/sdl2-compat/releases/download/release-${TERMUX_PKG_VERSION}/sdl2-compat-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=27e845b1b7dc0a91a85f1a1f18892ed205adb38caf767741eb258008d8264de0
 TERMUX_PKG_DEPENDS="sdl3"
@@ -27,11 +28,8 @@ termux_step_pre_configure() {
 	diff -uNr "${TERMUX_PKG_TMPDIR}"/{a,b} --color || :
 }
 
-termux_step_post_massage() {
+termux_step_post_make_install() {
 	# ld(1)ing with `-lSDL2` won't work without this:
 	# https://github.com/termux/x11-packages/issues/633
-	cd ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib || exit 1
-	if [ ! -e "./libSDL2.so" ]; then
-		ln -sf libSDL2-2.0.so libSDL2.so
-	fi
+	ln -sf libSDL2-2.0.so ${TERMUX_PREFIX}/lib/libSDL2.so
 }

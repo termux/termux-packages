@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library providing core building blocks for libraries and
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.84.1"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/glib/${TERMUX_PKG_VERSION%.*}/glib-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=2b4bc2ec49611a5fc35f86aca855f2ed0196e69e53092bab6bb73396bf30789a
 TERMUX_PKG_AUTO_UPDATE=true
@@ -65,6 +65,10 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
+	# always remove this marker because glib-cross' files are installed during termux_step_host_build(),
+	# so the command scripts/run-docker.sh ./build-package.sh -a all gtk3 (without -I, with -a all)
+	# would otherwise have .../files/usr/bin/glib-compile-resources: Exec format error
+	rm -rf $TERMUX_HOSTBUILD_MARKER
 	# glib checks for __BIONIC__ instead of __ANDROID__:
 	CFLAGS+=" -D__BIONIC__=1"
 	_PREFIX="$TERMUX_PKG_TMPDIR/prefix"

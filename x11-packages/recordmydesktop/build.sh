@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Produces a OGG encapsulated Theora/Vorbis recording of y
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.4.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/Enselic/recordmydesktop/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=69602d32c1be82cd92083152c7c44c0206ca0d6419d76a6144ffcfe07b157a72
 TERMUX_PKG_DEPENDS="libandroid-shmem, libice, libogg, libpopt, libsm, libtheora, libvorbis, libx11, libxdamage, libxext, libxfixes, zlib"
