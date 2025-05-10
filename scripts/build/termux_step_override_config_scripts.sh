@@ -1,15 +1,11 @@
 termux_step_override_config_scripts() {
-	if [ "$TERMUX_ON_DEVICE_BUILD" = true ]; then
+	if [ "$TERMUX_ON_DEVICE_BUILD" = true ] || [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
 		return
 	fi
 
 	# Make $TERMUX_PREFIX/bin/sh executable on the builder, so that build
 	# scripts can assume that it works on both builder and host later on:
 	ln -sf /bin/sh "$TERMUX_PREFIX/bin/sh"
-
-	if [ "$TERMUX_INSTALL_DEPS" = false ] || [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
-		return
-	fi
 
 	if [ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/libllvm/}" ] ||
 		[ "$TERMUX_PKG_BUILD_DEPENDS" != "${TERMUX_PKG_BUILD_DEPENDS/libllvm/}" ]; then
