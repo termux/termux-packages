@@ -930,6 +930,15 @@ __termux_build_props__add_variables_validator_actions "TERMUX__PREFIX_SUBDIR" "a
 # on-device, so make sure a safe path is set if running `clean.sh` in
 # Termux docker or host OS build environment.
 #
+# At runtime, `TERMUX__PREFIX` may be overridden and set to
+# `TERMUX__PREFIX_GLIBC` when compiling `glibc` packages by calling
+# `termux_build_props__set_termux_prefix_dir_and_sub_variables` in
+# `termux_step_setup_variables` if `TERMUX_PACKAGE_LIBRARY` equals `glibc`.
+# However, `TERMUX__PREFIX_CLASSICAL` retains the original value
+# set below for `TERMUX__PREFIX`.
+# - https://github.com/termux/termux-packages/pull/16901
+# - https://github.com/termux/termux-packages/pull/20864
+#
 # Default value: `/data/data/com.termux/files/usr`
 ##
 [[ "$TERMUX__ROOTFS" != "/" ]] && TERMUX__PREFIX="$TERMUX__ROOTFS${TERMUX__PREFIX_SUBDIR:+"/$TERMUX__PREFIX_SUBDIR"}" || \
@@ -942,13 +951,43 @@ else
     __termux_build_props__add_variables_validator_actions "TERMUX__PREFIX" " path_under_termux_rootfs"
 fi
 
-TERMUX__PREFIX_CLASSICAL="$TERMUX__PREFIX"
-
-# The `glibc` modifies `TERMUX_PREFIX` during compilation to append
-# `/glibc` in `termux_step_setup_variables()`.
-# - https://github.com/termux/termux-packages/pull/16901
 TERMUX_PREFIX="$TERMUX__PREFIX" # Deprecated alternative variable for `TERMUX__PREFIX`
+
+
+
+##
+# The original value for `TERMUX__PREFIX` set above, as `TERMUX__PREFIX`
+# can be overridden at runtime, like when compiling `glibc` packages.
+# Checks variable docs of `TERMUX__PREFIX` for more info.
+#
+# Default value: `/data/data/com.termux/files/usr`
+##
+TERMUX__PREFIX_CLASSICAL="$TERMUX__PREFIX"
 TERMUX_PREFIX_CLASSICAL="$TERMUX__PREFIX" # Deprecated alternative variable for `TERMUX__PREFIX_CLASSICAL`
+
+
+
+##
+# Termux subdirectory path for `TERMUX__PREFIX_GLIBC`.
+#
+# Default value: `glibc`
+##
+TERMUX__PREFIX_GLIBC_SUBDIR="glibc"
+
+##
+# Termux `glibc` prefix directory path under `TERMUX__PREFIX`
+# where all Termux `glibc` packages data is installed.
+#
+# **See Also:**
+# - https://github.com/termux-pacman/glibc-packages
+# - https://github.com/termux/glibc-packages (mirror)
+#
+# Default value: `/data/data/com.termux/files/usr/glibc`
+##
+TERMUX__PREFIX_GLIBC="$TERMUX__PREFIX/$TERMUX__PREFIX_GLIBC_SUBDIR"
+__termux_build_props__add_variables_validator_actions "TERMUX__PREFIX_GLIBC" "safe_absolute_path invalid_termux_prefix_paths path_under_termux_rootfs"
+
+
 
 ##
 # The max length for the `TERMUX__PREFIX` including the null '\0'
@@ -960,24 +999,6 @@ TERMUX_PREFIX_CLASSICAL="$TERMUX__PREFIX" # Deprecated alternative variable for 
 # Constant value: `90`
 ##
 TERMUX__PREFIX_DIR___MAX_LEN="$((TERMUX__ROOTFS_DIR___MAX_LEN + 1 + 3))" # "/usr" (90)
-
-
-
-##
-# Termux subdirectory path for `TERMUX__PREFIX__BIN_DIR`.
-#
-# Constant value: `bin`
-##
-TERMUX__PREFIX__BIN_SUBDIR="bin"
-
-##
-# Termux bin directory path under `TERMUX__PREFIX`.
-#
-# - https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#termux-bin-directory
-#
-# Default value: `/data/data/com.termux/files/usr/bin`
-##
-TERMUX__PREFIX__BIN_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__BIN_SUBDIR"
 
 
 ##
@@ -1019,6 +1040,59 @@ TERMUX__FILE_HEADER__BUFFER_SIZE="340"
 
 
 
+
+##
+# `termux_build_props__set_termux_prefix_dir_and_sub_variables` `<termux__prefix>` [`<skip_validation>`]
+##
+termux_build_props__set_termux_prefix_dir_and_sub_variables() {
+
+local termux__prefix="${1:-}"
+local skip_validation="${2:-}"
+
+if [[ "$skip_validation" != "true" ]]; then
+    if [[ ! "$termux__prefix" =~ ${TERMUX_REGEX__SAFE_ABSOLUTE_PATH:?} ]] || \
+            [[ "$termux__prefix" =~ ${TERMUX_REGEX__SINGLE_OR_DOUBLE_DOT_CONTAINING_PATH:?} ]]; then
+        echo "The termux__prefix '$termux__prefix' passed to 'termux_build_props__set_termux_prefix_dir_and_sub_variables' with length ${#termux__prefix} is invalid." 1>&2
+        echo "The termux__prefix must match a safe absolute path that starts with a \`/\` with at least one \
+characters under rootfs \`/\`. Duplicate or trailing path separators \`/\` are not allowed. \
+The path component characters must be in the range \`[a-zA-Z0-9+,.=_-]\`. The path must not contain single \`/./\` or \
+double \`/../\` dot components." 1>&2
+        return 1
+    fi
+
+    if [[ "$termux__prefix" =~ ${TERMUX_REGEX__INVALID_TERMUX_PREFIX_PATHS:?} ]]; then
+        echo "The termux__prefix '$termux__prefix' passed to 'termux_build_props__set_termux_prefix_dir_and_sub_variables' with length ${#termux__prefix} is invalid." 1>&2
+        echo "The termux__prefix must not match one of the invalid paths \
+in TERMUX_REGEX__INVALID_TERMUX_PREFIX_PATHS \`$TERMUX_REGEX__INVALID_TERMUX_PREFIX_PATHS\`." 1>&2
+        return 1
+    fi
+fi
+
+
+# Override `TERMUX__PREFIX`, but keep original value in `TERMUX__PREFIX_CLASSICAL`.
+TERMUX__PREFIX="$termux__prefix"
+TERMUX_PREFIX="$termux__prefix"
+
+
+
+##
+# Termux subdirectory path for `TERMUX__PREFIX__BIN_DIR`.
+#
+# Constant value: `bin`
+##
+TERMUX__PREFIX__BIN_SUBDIR="bin"
+
+##
+# Termux bin directory path under `TERMUX__PREFIX`.
+#
+# - https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#termux-bin-directory
+#
+# Default value: `/data/data/com.termux/files/usr/bin`
+##
+TERMUX__PREFIX__BIN_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__BIN_SUBDIR"
+
+
+
 ##
 # Termux subdirectory path for `TERMUX__PREFIX__ETC_DIR`.
 #
@@ -1034,36 +1108,85 @@ TERMUX__PREFIX__ETC_SUBDIR="etc"
 TERMUX__PREFIX__ETC_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__ETC_SUBDIR"
 
 
+
 ##
-# Termux subdirectory path for `TERMUX__PREFIX__INCLUDE_DIR`.
+# Termux subdirectory path for `TERMUX__PREFIX__BASE_INCLUDE_DIR`.
 #
 # Constant value: `include`
 ##
-TERMUX__PREFIX__INCLUDE_SUBDIR="include"
+TERMUX__PREFIX__BASE_INCLUDE_SUBDIR="include"
+
+##
+# Termux base include directory path under `TERMUX__PREFIX`.
+#
+# Default value: `/data/data/com.termux/files/usr/include`
+##
+TERMUX__PREFIX__BASE_INCLUDE_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__BASE_INCLUDE_SUBDIR"
+
+
+##
+# Termux subdirectory path for `TERMUX__PREFIX__MULTI_INCLUDE_DIR`.
+#
+# Constant value: `include32`
+##
+TERMUX__PREFIX__MULTI_INCLUDE_SUBDIR="include32"
+
+##
+# Termux multi include directory path under `TERMUX__PREFIX`.
+#
+# Default value: `/data/data/com.termux/files/usr/include32`
+##
+TERMUX__PREFIX__MULTI_INCLUDE_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__MULTI_INCLUDE_SUBDIR"
+
 
 ##
 # Termux include directory path under `TERMUX__PREFIX`.
 #
-# Default value: `/data/data/com.termux/files/usr/include`
+# Default value: `/data/data/com.termux/files/usr/include` (`$TERMUX__PREFIX__BASE_INCLUDE_DIR`)
 ##
-TERMUX__PREFIX__INCLUDE_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__INCLUDE_SUBDIR"
+TERMUX__PREFIX__INCLUDE_DIR="$TERMUX__PREFIX__BASE_INCLUDE_DIR"
 
 
+
 ##
-# Termux subdirectory path for `TERMUX__PREFIX__LIB_DIR`.
+# Termux subdirectory path for `TERMUX__PREFIX__BASE_LIB_DIR`.
 #
 # Constant value: `lib`
 ##
-TERMUX__PREFIX__LIB_SUBDIR="lib"
+TERMUX__PREFIX__BASE_LIB_SUBDIR="lib"
+
+##
+# Termux base lib directory path under `TERMUX__PREFIX`.
+#
+# Default value: `/data/data/com.termux/files/usr/lib`
+##
+TERMUX__PREFIX__BASE_LIB_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__BASE_LIB_SUBDIR"
+
+
+##
+# Termux subdirectory path for `TERMUX__PREFIX__MULTI_LIB_DIR`.
+#
+# Constant value: `lib32`
+##
+TERMUX__PREFIX__MULTI_LIB_SUBDIR="lib32"
+
+##
+# Termux multi lib directory path under `TERMUX__PREFIX`.
+#
+# Default value: `/data/data/com.termux/files/usr/lib32`
+##
+TERMUX__PREFIX__MULTI_LIB_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__MULTI_LIB_SUBDIR"
+
 
 ##
 # Termux lib directory path under `TERMUX__PREFIX`.
 #
 # - https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#termux-lib-directory
 #
-# Default value: `/data/data/com.termux/files/usr/lib`
+# Default value: `/data/data/com.termux/files/usr/lib` (`$TERMUX__PREFIX__BASE_LIB_DIR`)
 ##
-TERMUX__PREFIX__LIB_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__LIB_SUBDIR"
+TERMUX__PREFIX__LIB_DIR="$TERMUX__PREFIX__BASE_LIB_DIR"
+
 
 
 ##
@@ -1081,6 +1204,7 @@ TERMUX__PREFIX__LIBEXEC_SUBDIR="libexec"
 TERMUX__PREFIX__LIBEXEC_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__LIBEXEC_SUBDIR"
 
 
+
 ##
 # Termux subdirectory path for `TERMUX__PREFIX__OPT_DIR`.
 #
@@ -1094,6 +1218,7 @@ TERMUX__PREFIX__OPT_SUBDIR="opt"
 # Default value: `/data/data/com.termux/files/usr/opt`
 ##
 TERMUX__PREFIX__OPT_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__OPT_SUBDIR"
+
 
 
 ##
@@ -1110,6 +1235,36 @@ TERMUX__PREFIX__SHARE_SUBDIR="share"
 ##
 TERMUX__PREFIX__SHARE_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__SHARE_SUBDIR"
 
+
+
+##
+# Termux subdirectory path for `TERMUX__PREFIX__VAR_DIR`.
+#
+# Constant value: `var`
+##
+TERMUX__PREFIX__VAR_SUBDIR="var"
+
+##
+# Termux var directory path under `TERMUX__PREFIX`.
+#
+# Default value: `/data/data/com.termux/files/usr/var`
+##
+TERMUX__PREFIX__VAR_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__VAR_SUBDIR"
+
+}
+
+# Set Termux prefix sub variables to be under the original value of
+# `TERMUX__PREFIX` set in `TERMUX__PREFIX_CLASSICAL` by default,
+# which is set earlier in this file.
+# Skip validation as it will be done below by `__termux_build_props__validate_variables`.
+termux_build_props__set_termux_prefix_dir_and_sub_variables "$TERMUX__PREFIX" "true" || exit $?
+
+
+
+
+
+# The following variables must always be under the original value of
+# `TERMUX__PREFIX` set in `TERMUX__PREFIX_CLASSICAL` by default.
 
 ##
 # Termux subdirectory path for `TERMUX__PREFIX__TMP_DIR`.
@@ -1135,21 +1290,6 @@ TERMUX__PREFIX__TMP_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__TMP_SUBDIR"
 # Constant value: `94`
 ##
 TERMUX__PREFIX__TMP_DIR___MAX_LEN=94
-
-
-##
-# Termux subdirectory path for `TERMUX__PREFIX__VAR_DIR`.
-#
-# Constant value: `var`
-##
-TERMUX__PREFIX__VAR_SUBDIR="var"
-
-##
-# Termux var directory path under `TERMUX__PREFIX`.
-#
-# Default value: `/data/data/com.termux/files/usr/var`
-##
-TERMUX__PREFIX__VAR_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__VAR_SUBDIR"
 
 
 
@@ -2376,6 +2516,24 @@ including the null \`\0\` terminator." 1>&2
     if [[ "$TERMUX__PREFIX" != "$TERMUX_PREFIX_CLASSICAL" ]]; then
         echo "The TERMUX__PREFIX '$TERMUX__PREFIX' or TERMUX_PREFIX_CLASSICAL '$TERMUX_PREFIX_CLASSICAL' is invalid." 1>&2
         echo "The TERMUX__PREFIX must be equal to TERMUX_PREFIX_CLASSICAL." 1>&2
+        return 1
+    fi
+
+    if [[ "$TERMUX__PREFIX" == "$TERMUX__PREFIX_GLIBC" ]]; then
+        echo "The TERMUX__PREFIX '$TERMUX__PREFIX' or TERMUX__PREFIX_GLIBC '$TERMUX__PREFIX_GLIBC' is invalid." 1>&2
+        echo "The TERMUX__PREFIX must not be equal to TERMUX__PREFIX_GLIBC." 1>&2
+        return 1
+    fi
+
+    if [[ "$TERMUX__PREFIX__BASE_LIB_DIR" == "$TERMUX__PREFIX__MULTI_LIB_DIR" ]]; then
+        echo "The TERMUX__PREFIX__BASE_LIB_DIR '$TERMUX__PREFIX__BASE_LIB_DIR' or TERMUX__PREFIX__MULTI_LIB_DIR '$TERMUX__PREFIX__MULTI_LIB_DIR' is invalid." 1>&2
+        echo "The TERMUX__PREFIX__BASE_LIB_DIR must not be equal to TERMUX__PREFIX__MULTI_LIB_DIR." 1>&2
+        return 1
+    fi
+
+    if [[ "$TERMUX__PREFIX__BASE_INCLUDE_DIR" == "$TERMUX__PREFIX__MULTI_INCLUDE_DIR" ]]; then
+        echo "The TERMUX__PREFIX__BASE_INCLUDE_DIR '$TERMUX__PREFIX__BASE_INCLUDE_DIR' or TERMUX__PREFIX__MULTI_INCLUDE_DIR '$TERMUX__PREFIX__MULTI_INCLUDE_DIR' is invalid." 1>&2
+        echo "The TERMUX__PREFIX__BASE_INCLUDE_DIR must not be equal to TERMUX__PREFIX__MULTI_INCLUDE_DIR." 1>&2
         return 1
     fi
 
