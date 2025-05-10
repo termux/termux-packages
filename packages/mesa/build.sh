@@ -9,7 +9,7 @@ _LLVM_MAJOR_VERSION_NEXT=$((_LLVM_MAJOR_VERSION + 1))
 TERMUX_PKG_SRCURL=https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=c0d245dea0aa4b49f74b3d474b16542e4a8799791cd33d676c69f650ad4378d0
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libglvnd, libllvm (<< ${_LLVM_MAJOR_VERSION_NEXT}), libwayland, libx11, libxext, libxfixes, libxshmfence, libxxf86vm, ncurses, vulkan-loader, zlib, zstd"
+TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libglvnd, libllvm (<< ${_LLVM_MAJOR_VERSION_NEXT}), libwayland, libx11, libxext, libxfixes, libxshmfence, libxxf86vm, ncurses, spirv-llvm-translator, vulkan-loader, zlib, zstd"
 TERMUX_PKG_SUGGESTS="mesa-dev"
 TERMUX_PKG_BUILD_DEPENDS="libwayland-protocols, libxrandr, llvm, llvm-tools, mlir, xorgproto"
 TERMUX_PKG_CONFLICTS="libmesa, ndk-sysroot (<= 25b)"
@@ -29,7 +29,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dllvm=enabled
 -Dshared-llvm=enabled
 -Dplatforms=x11,wayland
--Dgallium-drivers=swrast,virgl,zink
+-Dgallium-drivers=panfrost,swrast,virgl,zink
 -Dosmesa=true
 -Dglvnd=enabled
 -Dxmlconfig=disabled
