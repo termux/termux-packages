@@ -1,0 +1,18 @@
+diff -u -r /home/builder/lib/android-ndk-r28b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/fcntl.h ./usr/include/fcntl.h
+--- /home/builder/lib/android-ndk-r28b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/fcntl.h	2024-11-14 00:52:25.000000000 +0000
++++ ./usr/include/fcntl.h	2025-05-10 08:31:55.666234328 +0000
+@@ -93,12 +93,14 @@
+ /** Flag for splice(). */
+ #define SPLICE_F_GIFT 8
+ 
++#if __ANDROID_API__ >= 26
+ /** Flag for sync_file_range(). */
+ #define SYNC_FILE_RANGE_WAIT_BEFORE 1
+ /** Flag for sync_file_range(). */
+ #define SYNC_FILE_RANGE_WRITE 2
+ /** Flag for sync_file_range(). */
+ #define SYNC_FILE_RANGE_WAIT_AFTER 4
++#endif
+ 
+ /**
+  * [creat(2)](https://man7.org/linux/man-pages/man2/creat.2.html)
