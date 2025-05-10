@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE='https://community.kde.org/Frameworks'
 TERMUX_PKG_DESCRIPTION='Classes to read and interact with KColorScheme'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.13.0"
+TERMUX_PKG_VERSION="6.14.0"
 TERMUX_PKG_SRCURL=https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kcolorscheme-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=8ab8a567bdb8b83f64824ad3d449077ecb92f73024314f55eeab7777d9129edf
+TERMUX_PKG_SHA256=601b304dd5cc2fb065d8e658bdb0b87e1e37021000cf6a6f5b2ee8a5bfbaf5c9
 TERMUX_PKG_DEPENDS="kf6-kconfig (>= ${TERMUX_PKG_VERSION}), kf6-kguiaddons (>= ${TERMUX_PKG_VERSION}), kf6-ki18n (>= ${TERMUX_PKG_VERSION}), libc++, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION}), qt6-qttools"
 TERMUX_PKG_AUTO_UPDATE=true

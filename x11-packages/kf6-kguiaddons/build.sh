@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.kde.org/
 TERMUX_PKG_DESCRIPTION="The KDE GUI Add-ons"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.13.0"
+TERMUX_PKG_VERSION="6.14.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kguiaddons-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=9280a0f04f29b8e4ffabe3c942621e2c6092bdc0037a3ab9e0b99e5ea56884bf
+TERMUX_PKG_SHA256=3f3cc7e3748bd74d476a4a3616654786e7d861f7b391e8499aebc7c410f21ec5
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, libwayland, libx11, qt6-qtbase, qt6-qtwayland"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION}), plasma-wayland-protocols, qt6-qttools"
