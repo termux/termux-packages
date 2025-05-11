@@ -1,16 +1,58 @@
---- ../cache/tmp-checkout/shell/tsu.sh	2024-06-17 17:38:19.114615657 +0000
-+++ ./shell/tsu.sh	2024-06-17 17:40:57.729881388 +0000
-@@ -288,42 +288,24 @@
- 
+--- a/shell/tsu.sh
++++ b/shell/tsu.sh
+@@ -248,14 +248,10 @@ if [[ "$_TSU_AS_SUDO" == true ]]; then
+ 	CMD_ARGS=$(printf '%q ' "$@")
+ 	log_DEBUG ENVIRONMENT_PRESERVE
+ 	[[ -n "$ENVIRONMENT_PRESERVE" ]] || env_path_helper
+-
+-	STARTUP_SCRIPT="$CMD_ARGS"
+ else
+
+ 	root_shell_helper
+ 	env_path_helper
+-
+-	STARTUP_SCRIPT="$ROOT_SHELL"
+ fi
+
+ SU_BINARY_SEARCH=("/system/xbin/su" "/system/bin/su" "/su/bin/su")
+@@ -263,8 +259,10 @@ SU_BINARY_SEARCH=("/system/xbin/su" "/system/bin/su" "/su/bin/su")
+ # On some systems with other root methods `/sbin` is inacessible.
+ if [[ -x "/sbin" ]]; then
+ 	SU_BINARY_SEARCH+=("/sbin/su" "/sbin/bin/su")
+-else
+-	SKIP_SBIN=1
++fi
++
++if [[ -x "/debug_ramdisk" ]]; then
++	SU_BINARY_SEARCH+=("/debug_ramdisk/su")
+ fi
+
+ # Unset all Termux LD_* enviroment variables to prevent symbols missing , dlopen()ing of wrong libs.
+@@ -279,51 +277,40 @@ unset LD_PRELOAD
+
+ ## Build the environment
+ [[ -z "$_TSU_DEBUG" ]] || set +x
+-ENV_BUILT=""
++ENV_BUILT=()
+
+ for key in "${!EXP_ENV[@]}"; do
+-	ENV_BUILT="$ENV_BUILT $key=${EXP_ENV[$key]} "
++	ENV_BUILT+=("$key=${EXP_ENV[$key]}")
+ done
+ [[ -z "$_TSU_DEBUG" ]] || set -x
+
  ### TODO: Implement this cleanly.
- 
+
 -### ----- MAGISKSU
 -# shellcheck disable=SC2117
 -if [[ -z "$SKIP_SBIN" && "$(/sbin/su -v)" == *"MAGISKSU" ]]; then
 -	# We are on Magisk su
 -	su_args=("/sbin/su")
 -	[[ -z "$SWITCH_USER" ]] || su_args+=("$SWITCH_USER")
--
++##### ----- OTHERS SU
++for SU_BINARY in "${SU_BINARY_SEARCH[@]}"; do
++	if [[ -x "$SU_BINARY" ]]; then
+
 -	if [[ -n "$ENVIRONMENT_PRESERVE" ]]; then
 -		su_args+=("--preserve-environment")
 -		su_cmdline="PATH=$BB_MAGISK:$PATH $ENV_BUILT $STARTUP_SCRIPT"
@@ -24,7 +66,10 @@
 -	##### ----- OTHERS SU
 -	for SU_BINARY in "${SU_BINARY_SEARCH[@]}"; do
 -		if [[ -x "$SU_BINARY" ]]; then
--
++		su_args=("$SU_BINARY")
++		env_args=("env")
++		[[ -z "$SWITCH_USER" ]] || su_args+=("$SWITCH_USER")
+
 -			su_args=("$SU_BINARY")
 -			[[ -z "$SWITCH_USER" ]] || su_args+=("$SWITCH_USER")
 -
@@ -37,26 +82,25 @@
 -			fi
 -			su_args+=("-c")
 -			exec "${su_args[@]}" "${su_cmdline}"
-+##### ----- OTHERS SU
-+for SU_BINARY in "${SU_BINARY_SEARCH[@]}"; do
-+	if [[ -x "$SU_BINARY" ]]; then
-+
-+		su_args=("$SU_BINARY")
-+		[[ -z "$SWITCH_USER" ]] || su_args+=("$SWITCH_USER")
-+
 +		# Let's use the system toybox/toolbox for now
 +		if [[ -n "$ENVIRONMENT_PRESERVE" ]]; then
-+			su_args+=("--preserve-environment")
-+			su_cmdline="PATH=$ANDROID_SYSPATHS:$PATH $ENV_BUILT $STARTUP_SCRIPT "
++			env_args+=("PATH=$ANDROID_SYSPATHS:$PATH" "${ENV_BUILT[@]}")
 +		else
-+			su_cmdline="PATH=$ANDROID_SYSPATHS env -i $ENV_BUILT $STARTUP_SCRIPT"
++			env_args+=("-i" "PATH=$ANDROID_SYSPATHS" "${ENV_BUILT[@]}")
  		fi
 -	done
 -fi
-+		su_args+=("-c")
-+		exec "${su_args[@]}" "${su_cmdline}"
++		if [[ "$_TSU_AS_SUDO" == true ]]; then
++			su_args+=("-pc")
++			su_cmdline="$CMD_ARGS"
++		else
++			su_args+=("-ps")
++			su_cmdline="$ROOT_SHELL"
++		fi
++
++		exec "${env_args[@]}" "${su_args[@]}" "${su_cmdline}"
 +	fi
 +done
  ##### ----- END OTHERS SU
- 
+
  # We didnt find any su binary
