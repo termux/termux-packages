@@ -54,7 +54,7 @@ termux_step_get_dependencies() {
 					cd "$TERMUX_COMMON_CACHEDIR-$DEP_ARCH"
 					if [[ "$TERMUX_REPO_PKG_FORMAT" == "debian" ]]; then
 						# Ignore topdir `.`, to avoid possible  permission errors from tar
-						ar p "${PKG}_${DEP_VERSION}_${DEP_ARCH}.deb data.tar.xz" | \
+						ar p "${PKG}_${DEP_VERSION}_${DEP_ARCH}.deb" "data.tar.xz" | \
 							tar xJ --no-overwrite-dir --transform='s#^.$#data#' -C /
 					elif [[ "$TERMUX_REPO_PKG_FORMAT" == "pacman" ]]; then
 						tar -xJf "${PKG}-${DEP_VERSION_PAC}-${DEP_ARCH}.pkg.tar.xz" \
