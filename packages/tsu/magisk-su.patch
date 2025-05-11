@@ -1,5 +1,14 @@
 --- a/shell/tsu.sh
 +++ b/shell/tsu.sh
+@@ -76,7 +76,7 @@ BB_MAGISK="/sbin/.magisk/busybox"
+ log_DEBUG TSU_AS_SUDO
+ if [[ "$_TSU_AS_SUDO" == true ]]; then
+ 	# Handle cases where people do `sudo su`
+-	if [[ "$1" == "su" ]]; then
++	if [[ "$1" == "su" ]] || [[ "$1" == "-s" ]]; then
+ 		unset _TSU_AS_SUDO
+ 	fi
+
 @@ -248,14 +248,10 @@ if [[ "$_TSU_AS_SUDO" == true ]]; then
  	CMD_ARGS=$(printf '%q ' "$@")
  	log_DEBUG ENVIRONMENT_PRESERVE
