@@ -296,7 +296,7 @@ termux_step_configure() {
 		done
 		cat <<-EOF > $TERMUX_PKG_TMPDIR/bin/clang-scan-deps
 			#!$(command -v sh)
-			exec $TERMUX_STANDALONE_TOOLCHAIN/bin/clang-scan-deps "\$@" --sysroot=$TERMUX_STANDALONE_TOOLCHAIN/sysroot 
+			exec $TERMUX_STANDALONE_TOOLCHAIN/bin/clang-scan-deps "\$@" --sysroot=$TERMUX_STANDALONE_TOOLCHAIN/sysroot
 		EOF
 		chmod +x $TERMUX_PKG_TMPDIR/bin/clang-scan-deps
 		export PATH="$TERMUX_PKG_TMPDIR/bin:$PATH"
