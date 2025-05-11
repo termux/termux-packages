@@ -84,8 +84,8 @@ termux_pkg_upgrade_version() {
 
 	echo "INFO: package being updated to ${LATEST_VERSION}."
 
-	sed \
-		-e "s/^\(TERMUX_PKG_VERSION=\)\(.*\)\$/\1\"${EPOCH}${LATEST_VERSION}\"/g" \
+	sed -r \
+		-e "s/^(TERMUX_PKG_VERSION=\(?)(.*)\$/\1\"${EPOCH}${LATEST_VERSION}\"/g" \
 		-e "/TERMUX_PKG_REVISION=/d" \
 		-i "${TERMUX_PKG_BUILDER_DIR}/build.sh"
 
