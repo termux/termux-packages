@@ -64,7 +64,10 @@ PACKAGES+=" txt2man"
 PACKAGES+=" xmlto"
 PACKAGES+=" xmltoman"
 
-# Needed by python modules (e.g. asciinema) and some build systems.
+# Used to resize application icon files
+PACKAGES+=" imagemagick"
+
+# Needed by python modules and some build systems(e.g. meson).
 PACKAGES+=" python3-pip"
 PACKAGES+=" python3-setuptools"
 PACKAGES+=" python-wheel-common"
