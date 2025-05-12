@@ -39,7 +39,7 @@ termux_setup_proot() {
 	cat <<-EOF >"$TERMUX_PROOT_BIN/$TERMUX_PROOT_BIN_NAME"
 		#!/bin/bash
 		env -i \
-			PATH=$TERMUX_PREFIX/bin:$PATH \
+			PATH="$TERMUX_PREFIX/bin:$PATH" \
 			ANDROID_DATA=/data \
 			ANDROID_ROOT=/system \
 			HOME=$TERMUX_ANDROID_HOME \
