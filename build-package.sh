@@ -504,6 +504,7 @@ _show_usage() {
 	echo "  -o Specify directory where to put built packages. Default: output/."
 	echo "  --format Specify package output format (debian, pacman)."
 	echo "  --library Specify library of package (bionic, glibc)."
+	echo "  --disable-dependency-download-parallelizing disable dependency downloading parallelizing"
 	exit 1
 }
 
@@ -535,6 +536,9 @@ while (($# >= 1)); do
 			else
 				termux_error_exit "./build-package.sh: option '--library' requires an argument"
 			fi
+			;;
+		--disable-dependency-download-parallelizing)
+			TERMUX_DEPENDENCY_DOWNLOAD_PARALLELIZING="false"
 			;;
 		-a)
 			if [ $# -ge 2 ]; then
@@ -662,6 +666,7 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 					 $(test "${TERMUX_WITHOUT_DEPVERSION_BINDING:-}" = "true" && echo "-w") \
 					 $(test -n "${TERMUX_PACKAGE_FORMAT:-}" && echo "--format $TERMUX_PACKAGE_FORMAT") \
 					 $(test -n "${TERMUX_PACKAGE_LIBRARY:-}" && echo "--library $TERMUX_PACKAGE_LIBRARY") \
+					 $(test "${TERMUX_DEPENDENCY_DOWNLOAD_PARALLELIZING-true}" = "false" ]] && echo "--disable-dependency-download-parallelizing") \
 					"${PACKAGE_LIST[i]}"
 			done
 			exit
