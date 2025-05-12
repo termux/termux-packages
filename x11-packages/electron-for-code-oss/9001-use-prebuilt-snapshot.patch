@@ -1,0 +1,52 @@
+--- a/tools/v8_context_snapshot/BUILD.gn
++++ b/tools/v8_context_snapshot/BUILD.gn
+@@ -35,7 +35,7 @@
+   ]
+ }
+
+-if (use_v8_context_snapshot) {
++if (use_v8_context_snapshot && false) {
+   if (v8_snapshot_toolchain == current_toolchain) {
+     action("generate_v8_context_snapshot") {
+       script = "//build/gn_run_binary.py"
+@@ -113,3 +113,20 @@
+     }
+   }
+ }
++
++if (use_v8_context_snapshot) {
++  if (v8_snapshot_toolchain == current_toolchain) {
++    action("generate_v8_context_snapshot") {
++      script = "//v8/tools/run.py"
++      output_file = "$root_build_dir/$v8_context_snapshot_filename"
++      output_path = rebase_path(output_file, root_build_dir)
++      args = [
++        "bash", "-c", 
++        "cp -f" + " " +
++        "@TERMUX_PREFIX@/opt/electron-host-tools-for-code-oss/$output_path" + " " +
++        "$output_path",
++      ]
++      outputs = [ output_file ]
++    }
++  }
++}
+--- a/electron/BUILD.gn
++++ b/electron/BUILD.gn
+@@ -1460,6 +1460,8 @@
+   outputs = [ "$root_build_dir/chromedriver.zip" ]
+ }
+ 
++if (false) {
++
+ mksnapshot_deps = [
+   ":licenses",
+   "//v8:mksnapshot($v8_snapshot_toolchain)",
+@@ -1479,6 +1481,8 @@
+   outputs = [ "$root_build_dir/mksnapshot.zip" ]
+ }
+ 
++}
++
+ copy("hunspell_dictionaries") {
+   sources = hunspell_dictionaries + hunspell_licenses
+   outputs = [ "$target_gen_dir/electron_hunspell/{{source_file_part}}" ]
