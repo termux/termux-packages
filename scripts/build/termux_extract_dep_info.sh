@@ -30,6 +30,9 @@ termux_extract_dep_info() {
 		if [[ "$TERMUX_INSTALL_DEPS" == "false" || \
 				"$TERMUX_PKG_NO_STATICSPLIT" = "true" || \
 				"${PKG/-static/}-static" != "${PKG}" ]]; then
+			# Allow commands like `cat ${TERMUX_PKG_TMPDIR}` to fail inside subpackages buildscripts
+			# Usually it does not directly affect target packages
+			set +e
 			# shellcheck source=/dev/null
 			if [[ -f "${PKG_DIR}/${PKG}.subpackage.sh" ]]; then
 				source "${PKG_DIR}/${PKG}.subpackage.sh"
