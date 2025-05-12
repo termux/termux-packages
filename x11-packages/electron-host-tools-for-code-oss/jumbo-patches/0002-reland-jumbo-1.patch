@@ -1,0 +1,548 @@
+From 67b57d4c4b5024175094b97ea27d277a2c96f46d Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <licy183@termux.dev>
+Date: Wed, 16 Apr 2025 01:49:52 +0800
+Subject: [PATCH] reland jumbo 1
+
+Enable jumbo build for the following component(s)/source_set(s):
+
+- //base:base
+- //base:i18n
+
+Enable jumbo build for the following template(s):
+
+- //cc/cc.gni -> template("cc_component")
+- //components/viz/viz.gni -> template("viz_component")
+- //components/viz/viz.gni -> template("viz_static_library")
+- //components/viz/viz.gni -> template("viz_source_set")
+
+---
+ base/BUILD.gn                                     | 15 +++++++++++++--
+ .../poisson_allocation_sampler.cc                 |  9 ++++++++-
+ .../sampling_heap_profiler.cc                     |  9 ++++++++-
+ base/task/sequenced_task_runner.cc                |  4 ++++
+ base/task/single_thread_task_runner.cc            |  4 ++++
+ cc/cc.gni                                         |  5 +++--
+ .../viz/service/display/occlusion_culler.cc       |  4 ++++
+ .../service/display/overlay_candidate_factory.cc  |  4 ++++
+ components/viz/service/display/skia_renderer.cc   |  4 ++++
+ .../viz/service/display/software_renderer.cc      |  4 ++++
+ .../service/frame_sinks/frame_sink_manager_impl.h |  3 +++
+ components/viz/viz.gni                            |  7 ++++---
+ 12 files changed, 63 insertions(+), 9 deletions(-)
+
+diff --git a/base/BUILD.gn b/base/BUILD.gn
+index 3f00dabee0..36101bdd0d 100644
+--- a/base/BUILD.gn
++++ b/base/BUILD.gn
+@@ -30,6 +30,7 @@ import("//build/config/compiler/compiler.gni")
+ import("//build/config/cronet/config.gni")
+ import("//build/config/dcheck_always_on.gni")
+ import("//build/config/ios/config.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/logging.gni")
+ import("//build/config/nacl/config.gni")
+ import("//build/config/profiling/profiling.gni")
+@@ -195,7 +196,7 @@ buildflag_header("message_pump_buildflags") {
+ # base compilation units to be linked in where they wouldn't have otherwise.
+ # This does not include test code (test support and anything in the test
+ # directory) which should use source_set as is recommended for GN targets).
+-component("base") {
++jumbo_component("base") {
+   sources = [
+     "allocator/allocator_check.cc",
+     "allocator/allocator_check.h",
+@@ -997,6 +998,10 @@ component("base") {
+     ]
+   }
+ 
++  jumbo_excluded_sources = [
++      "logging.cc",
++  ]
++
+   if (is_linux || is_chromeos) {
+     sources += [
+       "debug/proc_maps_linux.cc",
+@@ -1015,6 +1020,7 @@ component("base") {
+       "threading/thread_type_delegate.cc",
+       "threading/thread_type_delegate.h",
+     ]
++    jumbo_excluded_sources += [ "process/memory_linux.cc" ]
+   }
+ 
+   if (is_chromeos) {
+@@ -1945,6 +1951,11 @@ component("base") {
+       "win/wrapped_window_proc.h",
+     ]
+ 
++    # winternl.h and NTSecAPI.h have different definitions of UNICODE_STRING.
++    # There's only one client of NTSecAPI.h in base but several of winternl.h,
++    # so exclude the NTSecAPI.h one.
++    jumbo_excluded_sources += [ "rand_util_win.cc" ]
++
+     deps += [ "//base/win:base_win_buildflags" ]
+ 
+     if (com_init_check_hook_disabled) {
+@@ -2724,7 +2735,7 @@ static_library("base_static") {
+   }
+ }
+ 
+-component("i18n") {
++jumbo_component("i18n") {
+   output_name = "base_i18n"
+   sources = [
+     "i18n/base_i18n_export.h",
+diff --git a/base/sampling_heap_profiler/poisson_allocation_sampler.cc b/base/sampling_heap_profiler/poisson_allocation_sampler.cc
+index e91aaace87..83dc2924de 100644
+--- a/base/sampling_heap_profiler/poisson_allocation_sampler.cc
++++ b/base/sampling_heap_profiler/poisson_allocation_sampler.cc
+@@ -19,6 +19,8 @@
+ #include "build/build_config.h"
+ #include "third_party/abseil-cpp/absl/base/attributes.h"
+ 
++#define ThreadLocalData ThreadLocalData_PoissonAllocationSampler
++
+ namespace base {
+ 
+ namespace {
+@@ -59,7 +61,7 @@ struct ThreadLocalData {
+   bool sampling_interval_initialized = false;
+ };
+ 
+-ThreadLocalData* GetThreadLocalData() {
++ThreadLocalData* GetThreadLocalData_PoissonAllocationSampler() {
+ #if USE_LOCAL_TLS_EMULATION()
+   // If available, use ThreadLocalStorage to bypass dependencies introduced by
+   // Clang's implementation of thread_local.
+@@ -95,6 +97,8 @@ ThreadLocalData* GetThreadLocalData() {
+ 
+ }  // namespace
+ 
++#define GetThreadLocalData GetThreadLocalData_PoissonAllocationSampler
++
+ PoissonAllocationSampler::ScopedMuteThreadSamples::ScopedMuteThreadSamples() {
+   ThreadLocalData* const thread_local_data = GetThreadLocalData();
+ 
+@@ -446,3 +450,6 @@ void PoissonAllocationSampler::RemoveSamplesObserver(
+ }
+ 
+ }  // namespace base
++
++#undef ThreadLocalData
++#undef GetThreadLocalData
+diff --git a/base/sampling_heap_profiler/sampling_heap_profiler.cc b/base/sampling_heap_profiler/sampling_heap_profiler.cc
+index 4136d33af1..e0e2cdb983 100644
+--- a/base/sampling_heap_profiler/sampling_heap_profiler.cc
++++ b/base/sampling_heap_profiler/sampling_heap_profiler.cc
+@@ -38,6 +38,8 @@
+ #include <sys/prctl.h>
+ #endif
+ 
++#define ThreadLocalData ThreadLocalData_SamplingHeapProfiler
++
+ namespace base {
+ 
+ constexpr uint32_t kMaxStackEntries = 256;
+@@ -48,7 +50,7 @@ struct ThreadLocalData {
+   const char* thread_name = nullptr;
+ };
+ 
+-ThreadLocalData* GetThreadLocalData() {
++ThreadLocalData* ThreadLocalData_GetThreadLocalData() {
+ #if USE_LOCAL_TLS_EMULATION()
+   static base::NoDestructor<
+       base::allocator::dispatcher::ThreadLocalStorage<ThreadLocalData>>
+@@ -66,6 +68,8 @@ BASE_FEATURE(kAvoidFramePointers,
+              base::FEATURE_DISABLED_BY_DEFAULT);
+ #endif
+ 
++#define GetThreadLocalData ThreadLocalData_GetThreadLocalData
++
+ using StackUnwinder = SamplingHeapProfiler::StackUnwinder;
+ using base::allocator::dispatcher::AllocationSubsystem;
+ 
+@@ -349,3 +353,6 @@ SamplingHeapProfiler::MuteHookedSamplesForTesting() {
+ }
+ 
+ }  // namespace base
++
++#undef ThreadLocalData
++#undef GetThreadLocalData
+diff --git a/base/task/sequenced_task_runner.cc b/base/task/sequenced_task_runner.cc
+index 53a86189e7..3d91154f99 100644
+--- a/base/task/sequenced_task_runner.cc
++++ b/base/task/sequenced_task_runner.cc
+@@ -11,6 +11,8 @@
+ #include "base/time/time.h"
+ #include "third_party/abseil-cpp/absl/base/attributes.h"
+ 
++#define current_default_handle current_default_handle_sequenced_task_runner
++
+ namespace base {
+ 
+ namespace {
+@@ -140,3 +142,5 @@ OnTaskRunnerDeleter& OnTaskRunnerDeleter::operator=(
+     OnTaskRunnerDeleter&&) = default;
+ 
+ }  // namespace base
++
++#undef current_default_handle
+diff --git a/base/task/single_thread_task_runner.cc b/base/task/single_thread_task_runner.cc
+index 3eba23f647..906352a766 100644
+--- a/base/task/single_thread_task_runner.cc
++++ b/base/task/single_thread_task_runner.cc
+@@ -16,6 +16,8 @@
+ #include "base/run_loop.h"
+ #include "third_party/abseil-cpp/absl/base/attributes.h"
+ 
++#define current_default_handle current_default_handle_single_thread_task_runner
++
+ namespace base {
+ 
+ namespace {
+@@ -101,3 +103,5 @@ SingleThreadTaskRunner::CurrentHandleOverrideForTesting::
+     ~CurrentHandleOverrideForTesting() = default;
+ 
+ }  // namespace base
++
++#undef current_default_handle
+diff --git a/cc/cc.gni b/cc/cc.gni
+index 090420c902..6b0e76bf21 100644
+--- a/cc/cc.gni
++++ b/cc/cc.gni
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//testing/test.gni")
+ 
+ cc_remove_configs = []
+@@ -16,7 +17,7 @@ if (!is_debug) {
+ }
+ 
+ template("cc_component") {
+-  component(target_name) {
++  jumbo_component(target_name) {
+     forward_variables_from(invoker, "*", [ "configs" ])
+     if (defined(invoker.configs)) {
+       configs += invoker.configs
+@@ -27,7 +28,7 @@ template("cc_component") {
+ }
+ 
+ template("cc_test_static_library") {
+-  static_library(target_name) {
++  jumbo_static_library(target_name) {
+     forward_variables_from(invoker, "*", [ "configs" ])
+     if (defined(invoker.configs)) {
+       configs += invoker.configs
+diff --git a/components/viz/service/display/occlusion_culler.cc b/components/viz/service/display/occlusion_culler.cc
+index 23cef530d0..4c216e8dcd 100644
+--- a/components/viz/service/display/occlusion_culler.cc
++++ b/components/viz/service/display/occlusion_culler.cc
+@@ -13,6 +13,8 @@
+ #include "components/viz/service/display/overlay_processor_interface.h"
+ #include "ui/gfx/geometry/rect_conversions.h"
+ 
++#define kEpsilon kEpsilon_OcclusionCuller
++
+ namespace viz {
+ namespace {
+ 
+@@ -383,3 +385,5 @@ void OcclusionCuller::RemoveOverdrawQuads(AggregatedFrame* frame,
+ }
+ 
+ }  // namespace viz
++
++#undef kEpsilon
+diff --git a/components/viz/service/display/overlay_candidate_factory.cc b/components/viz/service/display/overlay_candidate_factory.cc
+index 1da07f40d2..00d6d179eb 100644
+--- a/components/viz/service/display/overlay_candidate_factory.cc
++++ b/components/viz/service/display/overlay_candidate_factory.cc
+@@ -94,6 +94,8 @@ gfx::OverlayTransform GetOverlayTransform(const gfx::Transform& quad_transform,
+   }
+ }
+ 
++#define kEpsilon kEpsilon_OverlayCandidate
++
+ constexpr double kEpsilon = 0.0001;
+ 
+ // Determine why the transformation isn't axis aligned. A transform with z
+@@ -837,3 +839,5 @@ gfx::RectF OverlayCandidateFactory::GetDamageRect(const DrawQuad* quad) const {
+ }
+ 
+ }  // namespace viz
++
++#undef kEpsilon
+diff --git a/components/viz/service/display/skia_renderer.cc b/components/viz/service/display/skia_renderer.cc
+index b85cdde5a6..abf1671f2e 100644
+--- a/components/viz/service/display/skia_renderer.cc
++++ b/components/viz/service/display/skia_renderer.cc
+@@ -105,6 +105,8 @@
+ #include "components/viz/service/display/overlay_processor_surface_control.h"
+ #endif
+ 
++#define MakeOpacityFilter MakeOpacityFilter_SkiaRenderer
++
+ namespace viz {
+ 
+ namespace {
+@@ -4521,3 +4523,5 @@ bool SkiaRenderer::OverlayLockKeyEqual::operator()(
+ #endif
+ 
+ }  // namespace viz
++
++#undef MakeOpacityFilter
+diff --git a/components/viz/service/display/software_renderer.cc b/components/viz/service/display/software_renderer.cc
+index f239b4b5a5..6c3fb69e8e 100644
+--- a/components/viz/service/display/software_renderer.cc
++++ b/components/viz/service/display/software_renderer.cc
+@@ -53,6 +53,8 @@
+ #include "ui/gfx/geometry/skia_conversions.h"
+ #include "ui/gfx/geometry/transform.h"
+ 
++#define MakeOpacityFilter MakeOpacityFilter_SoftwareRenderer
++
+ namespace viz {
+ namespace {
+ class AnimatedImagesProvider : public cc::ImageProvider {
+@@ -1082,3 +1084,5 @@ gfx::Rect SoftwareRenderer::GetRenderPassBackingDrawnRect(
+ }
+ 
+ }  // namespace viz
++
++#undef MakeOpacityFilter
+diff --git a/components/viz/service/frame_sinks/frame_sink_manager_impl.h b/components/viz/service/frame_sinks/frame_sink_manager_impl.h
+index 086d64827a..cc5c943827 100644
+--- a/components/viz/service/frame_sinks/frame_sink_manager_impl.h
++++ b/components/viz/service/frame_sinks/frame_sink_manager_impl.h
+@@ -5,6 +5,9 @@
+ #ifndef COMPONENTS_VIZ_SERVICE_FRAME_SINKS_FRAME_SINK_MANAGER_IMPL_H_
+ #define COMPONENTS_VIZ_SERVICE_FRAME_SINKS_FRAME_SINK_MANAGER_IMPL_H_
+ 
++// Macro 'Status' from X11/Xlib.h will cause confliction
++#undef Status
++
+ #include <stdint.h>
+ 
+ #include <memory>
+diff --git a/components/viz/viz.gni b/components/viz/viz.gni
+index 2fa812d085..cbf771b194 100644
+--- a/components/viz/viz.gni
++++ b/components/viz/viz.gni
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//gpu/vulkan/features.gni")
+ import("//skia/features.gni")
+ import("//testing/test.gni")
+@@ -32,7 +33,7 @@ if (!is_debug) {
+ }
+ 
+ template("viz_source_set") {
+-  source_set(target_name) {
++  jumbo_source_set(target_name) {
+     forward_variables_from(invoker, "*", [ "configs" ])
+     if (defined(invoker.configs)) {
+       configs += invoker.configs
+@@ -43,7 +44,7 @@ template("viz_source_set") {
+ }
+ 
+ template("viz_component") {
+-  component(target_name) {
++  jumbo_component(target_name) {
+     forward_variables_from(invoker, "*", [ "configs" ])
+     if (defined(invoker.configs)) {
+       configs += invoker.configs
+@@ -54,7 +55,7 @@ template("viz_component") {
+ }
+ 
+ template("viz_static_library") {
+-  static_library(target_name) {
++  jumbo_static_library(target_name) {
+     forward_variables_from(invoker, "*", [ "configs" ])
+     if (defined(invoker.configs)) {
+       configs += invoker.configs
+--- a/base/metrics/persistent_sample_map.cc
++++ b/base/metrics/persistent_sample_map.cc
+@@ -18,6 +18,10 @@
+ typedef HistogramBase::Count Count;
+ typedef HistogramBase::Sample Sample;
+ 
++#define IteratorTemplate            IteratorTemplate_PersistentSampleMap
++#define SampleToCountMap            SampleToCountMap_PersistentSampleMap
++#define ExtractingSampleMapIterator ExtractingSampleMapIterator_PersistentSampleMap
++
+ namespace {
+ 
+ // An iterator for going through a PersistentSampleMap. The logic here is
+@@ -346,3 +350,7 @@
+ }
+ 
+ }  // namespace base
++
++#undef IteratorTemplate
++#undef SampleToCountMap
++#undef ExtractingSampleMapIterator
+--- a/base/metrics/sample_map.cc
++++ a/base/metrics/sample_map.cc
+@@ -14,6 +14,10 @@
+ typedef HistogramBase::Count Count;
+ typedef HistogramBase::Sample Sample;
+ 
++#define IteratorTemplate            IteratorTemplate_SampleMap
++#define SampleToCountMap            SampleToCountMap_SampleMap
++#define ExtractingSampleMapIterator ExtractingSampleMapIterator_SampleMap
++
+ namespace {
+ 
+ // An iterator for going through a SampleMap. The logic here is identical
+@@ -178,3 +182,7 @@
+ }
+ 
+ }  // namespace base
++
++#undef IteratorTemplate
++#undef SampleToCountMap
++#undef ExtractingSampleMapIterator
+--- a/base/task/thread_pool/thread_group.cc
++++ b/base/task/thread_pool/thread_group.cc
+@@ -22,6 +22,8 @@
+ #include "base/win/scoped_winrt_initializer.h"
+ #endif
+ 
++#define kMaxNumberOfWorkers kMaxNumberOfWorkers_ThreadGroup
++
+ namespace base {
+ namespace internal {
+ 
+@@ -744,3 +746,5 @@
+ 
+ }  // namespace internal
+ }  // namespace base
++
++#undef kMaxNumberOfWorkers
+--- a/base/task/thread_pool/thread_group_impl.cc
++++ a/base/task/thread_pool/thread_group_impl.cc
+@@ -20,6 +20,8 @@
+ #include "base/trace_event/base_tracing.h"
+ #include "third_party/abseil-cpp/absl/container/inlined_vector.h"
+ 
++#define kMaxNumberOfWorkers kMaxNumberOfWorkers_ThreadGroupImpl
++
+ namespace base {
+ namespace internal {
+ 
+@@ -546,3 +548,5 @@
+ 
+ }  // namespace internal
+ }  // namespace base
++
++#undef kMaxNumberOfWorkers
+--- a/base/task/thread_pool/thread_group_semaphore.cc
++++ a/base/task/thread_pool/thread_group_semaphore.cc
+@@ -19,6 +19,8 @@
+ #include "base/time/time_override.h"
+ #include "base/trace_event/base_tracing.h"
+ 
++#define kMaxNumberOfWorkers kMaxNumberOfWorkers_ThreadGroupSemaphore
++
+ namespace base {
+ namespace internal {
+ 
+@@ -510,3 +512,5 @@
+ 
+ }  // namespace internal
+ }  // namespace base
++
++#undef kMaxNumberOfWorkers
+--- a/base/trace_event/trace_arguments.cc
++++ b/base/trace_event/trace_arguments.cc
+@@ -27,6 +27,8 @@
+ #include "base/strings/stringprintf.h"
+ #include "base/strings/utf_string_conversions.h"
+ 
++#define PerfettoProtoAppender PerfettoProtoAppender_TraceArguments
++
+ namespace base {
+ namespace trace_event {
+ 
+@@ -335,3 +337,5 @@
+ 
+ }  // namespace trace_event
+ }  // namespace base
++
++#undef PerfettoProtoAppender
+--- a/base/trace_event/trace_log.cc
++++ b/base/trace_event/trace_log.cc
+@@ -78,6 +78,8 @@
+ extern char __executable_start;
+ #endif
+ 
++#define PerfettoProtoAppender PerfettoProtoAppender_TraceLog
++
+ namespace base {
+ namespace trace_event {
+ 
+@@ -2172,3 +2174,5 @@
+ }
+ 
+ }  // namespace trace_event_internal
++
++#undef PerfettoProtoAppender
+--- a/cc/metrics/compositor_frame_reporting_controller.cc
++++ b/cc/metrics/compositor_frame_reporting_controller.cc
+@@ -21,6 +21,10 @@
+ #include "services/metrics/public/cpp/ukm_recorder.h"
+ #include "services/tracing/public/cpp/perfetto/macros.h"
+ 
++#define kTraceCategory         kTraceCategory_Controller
++#define kNumDispatchStages     kNumDispatchStages_Controller
++#define kNumOfCompositorStages kNumOfCompositorStages_Controller
++
+ namespace cc {
+ namespace {
+ using SmoothThread = CompositorFrameReporter::SmoothThread;
+@@ -970,3 +974,7 @@
+ }
+ 
+ }  // namespace cc
++
++#undef kTraceCategory
++#undef kNumDispatchStages
++#undef kNumOfCompositorStages
+--- a/cc/metrics/lcd_text_metrics_reporter.cc
++++ b/cc/metrics/lcd_text_metrics_reporter.cc
+@@ -16,6 +16,8 @@
+ #include "cc/trees/layer_tree_host_impl.h"
+ #include "cc/trees/layer_tree_impl.h"
+ 
++#define kTraceCategory kTraceCategory_LCD
++
+ namespace cc {
+ 
+ namespace {
+@@ -130,3 +132,5 @@
+ }
+ 
+ }  // namespace cc
++
++#undef kTraceCategory
+--- a/cc/metrics/event_latency_tracing_recorder.cc
++++ b/cc/metrics/event_latency_tracing_recorder.cc
+@@ -15,6 +15,8 @@
+ #include "cc/metrics/event_metrics.h"
+ #include "third_party/perfetto/include/perfetto/tracing/track.h"
+ 
++#define IsTracingEnabled IsTracingEnabled_EventLatencyTracingRecorder
++
+ namespace cc {
+ namespace {
+ 
+@@ -430,3 +432,5 @@
+ }
+ 
+ }  // namespace cc
++
++#undef IsTracingEnabled

@@ -1,0 +1,1996 @@
+From b0672f17cc84794dac9399bf69d371756a7d94d7 Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <licy183@termux.dev>
+Date: Fri, 18 Apr 2025 20:35:28 +0800
+Subject: [PATCH] reland jumbo 8
+
+Enable jumbo build for the following component(s)/source_set(s):
+
+- //ui/accessibility:ax_base
+- //ui/accessibility:accessibility_internal
+- //ui/accessibility/platform:platform
+- //ui/aura:aura
+- //ui/base:base
+- //ui/base/clipboard:clipboard_types
+- //ui/base/clipboard:url_file_parser
+- //ui/base/clipboard:clipboard
+- //ui/base/ime:ime_types
+- //ui/base/ime:ime
+- //ui/base/ime/init:init
+- //ui/base/ime/linux:linux
+- //ui/base/prediction:prediction
+- //ui/base/x:x
+- //ui/color:color_headers
+- //ui/color:color_provider_key
+- //ui/color:color
+- //ui/color:mixers
+- //ui/compositor:compositor
+- //ui/display:display
+- //ui/display/manager:manager
+- //ui/display/types:types
+- //ui/display/util:util
+- //ui/events:dom_keycode_converter
+- //ui/events:events_base
+- //ui/events:events
+- //ui/events:keyboard_hook
+- //ui/events:gesture_detection
+- //ui/events:velocity_tracker
+- //ui/events/blink:blink_features
+- //ui/events/blink:blink
+- //ui/events/devices:devices
+- //ui/events/devices/x11:x11
+- //ui/events/ipc:ipc
+- //ui/events/keycodes:xkb
+- //ui/events/keycodes:x11
+- //ui/events/platform:platform
+- //ui/events/platform/x11:x11
+- //ui/gfx:color_utils
+- //ui/gfx:gfx_skia
+- //ui/gfx:gfx
+- //ui/gfx:color_space
+- //ui/gfx:memory_buffer_sources
+- //ui/gfx:gfx_switches
+- //ui/gfx/animation:animation
+- //ui/gfx/codec:codec
+- //ui/gfx/geometry:geometry
+- //ui/gfx/ipc:ipc
+- //ui/gfx/ipc/buffer_types:buffer_types
+- //ui/gfx/ipc/color:color
+- //ui/gfx/ipc/geometry:geometry
+- //ui/gfx/ipc/skia:skia
+- //ui/gfx/range:range
+- //ui/gfx/x:x
+- //ui/gl:gl
+- //ui/gl/init:init
+- //ui/gtk:gtk
+- //ui/latency:latency
+- //ui/message_center:message_center
+- //ui/message_center/public/cpp:cpp
+- //ui/native_theme:native_theme
+- //ui/native_theme:native_theme_browser
+- //ui/ozone:ozone_base
+- //ui/ozone:ozone
+- //ui/platform_window/stub:stub
+- //ui/platform_window/win:win
+# - //ui/resources:?
+- //ui/shell_dialogs:shell_dialogs
+- //ui/snapshot:snapshot
+- //ui/snapshot:snapshot_export
+- //ui/surface:surface
+- //ui/touch_selection:touch_selection
+- //ui/views:views
+- //ui/views/controls/webview:webview
+- //ui/views_content_client:views_content_client
+- //ui/web_dialogs:web_dialogs
+- //ui/wm:wm
+- //ui/wm/public:public
+
+---
+ ui/accessibility/BUILD.gn                         |  5 +++--
+ ui/accessibility/platform/BUILD.gn                |  3 ++-
+ ui/aura/BUILD.gn                                  |  5 +++--
+ ui/base/BUILD.gn                                  | 11 ++++++++---
+ ui/base/clipboard/BUILD.gn                        |  9 +++++----
+ ui/base/ime/BUILD.gn                              |  5 +++--
+ ui/base/ime/ash/BUILD.gn                          |  3 ++-
+ ui/base/ime/fuchsia/BUILD.gn                      |  4 +++-
+ ui/base/ime/init/BUILD.gn                         |  3 ++-
+ ui/base/ime/linux/BUILD.gn                        |  3 ++-
+ ui/base/ime/mac/BUILD.gn                          |  4 +++-
+ ui/base/ime/win/BUILD.gn                          |  5 ++++-
+ ui/base/prediction/BUILD.gn                       |  4 +++-
+ ui/base/x/BUILD.gn                                |  3 ++-
+ ui/base/x/selection_owner.cc                      |  6 +++++-
+ ui/base/x/x11_display_manager.cc                  |  4 ++++
+ ui/base/x/x11_drag_context.cc                     | 12 ++++++++++++
+ ui/base/x/x11_drag_drop_client.cc                 | 12 ++++++++++++
+ ui/color/BUILD.gn                                 |  7 ++++---
+ ui/compositor/BUILD.gn                            |  5 +++--
+ ui/display/BUILD.gn                               |  5 +++--
+ ui/display/manager/BUILD.gn                       |  3 ++-
+ ui/display/types/BUILD.gn                         |  4 +++-
+ ui/display/util/BUILD.gn                          |  3 ++-
+ ui/events/BUILD.gn                                | 15 ++++++++-------
+ ui/events/blink/BUILD.gn                          |  5 +++--
+ ui/events/devices/BUILD.gn                        |  4 +++-
+ ui/events/devices/x11/BUILD.gn                    |  3 ++-
+ ui/events/ipc/BUILD.gn                            |  4 +++-
+ ui/events/keycodes/BUILD.gn                       |  5 +++--
+ ui/events/platform/BUILD.gn                       |  3 ++-
+ ui/events/platform/x11/BUILD.gn                   |  3 ++-
+ ui/gfx/BUILD.gn                                   | 15 ++++++++-------
+ ui/gfx/animation/BUILD.gn                         |  3 ++-
+ ui/gfx/codec/BUILD.gn                             |  3 ++-
+ ui/gfx/codec/jpeg_codec.cc                        |  4 ++++
+ ui/gfx/codec/png_codec.cc                         |  4 ++++
+ ui/gfx/geometry/BUILD.gn                          |  4 +++-
+ ui/gfx/ipc/BUILD.gn                               |  4 +++-
+ ui/gfx/ipc/buffer_types/BUILD.gn                  |  4 +++-
+ ui/gfx/ipc/color/BUILD.gn                         |  4 +++-
+ ui/gfx/ipc/geometry/BUILD.gn                      |  4 +++-
+ ui/gfx/ipc/skia/BUILD.gn                          |  4 +++-
+ ui/gfx/range/BUILD.gn                             |  4 +++-
+ ui/gfx/x/BUILD.gn                                 |  3 ++-
+ ui/gl/BUILD.gn                                    | 15 ++++++++++++---
+ ui/gl/gl_display_egl_util.cc                      |  4 ++++
+ ui/gl/init/BUILD.gn                               |  3 ++-
+ ui/gtk/BUILD.gn                                   | 10 ++++++++--
+ ui/latency/BUILD.gn                               |  5 +++--
+ ui/message_center/BUILD.gn                        |  3 ++-
+ ui/message_center/public/cpp/BUILD.gn             |  3 ++-
+ ui/native_theme/BUILD.gn                          |  7 ++++---
+ ui/ozone/BUILD.gn                                 | 11 ++++++-----
+ ui/platform_window/stub/BUILD.gn                  |  4 +++-
+ ui/platform_window/win/BUILD.gn                   |  4 +++-
+ ui/resources/BUILD.gn                             |  1 +
+ ui/shell_dialogs/BUILD.gn                         |  3 ++-
+ ui/snapshot/BUILD.gn                              |  5 +++--
+ ui/surface/BUILD.gn                               |  3 ++-
+ ui/touch_selection/BUILD.gn                       |  3 ++-
+ ui/views/BUILD.gn                                 |  7 ++++---
+ ui/views/animation/pulsing_ink_drop_mask.cc       |  6 ++++++
+ ui/views/bubble/bubble_frame_view.cc              |  2 +-
+ ui/views/controls/webview/BUILD.gn                |  3 ++-
+ ui/views/examples/BUILD.gn                        |  5 +++--
+ .../desktop_aura/desktop_native_widget_aura.cc    |  2 +-
+ .../desktop_window_tree_host_platform.cc          |  4 ++--
+ ui/views_content_client/BUILD.gn                  |  3 ++-
+ ui/web_dialogs/BUILD.gn                           |  6 ++++--
+ ui/wm/BUILD.gn                                    |  5 +++--
+ ui/wm/public/BUILD.gn                             |  3 ++-
+ 72 files changed, 253 insertions(+), 107 deletions(-)
+
+diff --git a/ui/accessibility/BUILD.gn b/ui/accessibility/BUILD.gn
+index 0f4d0789fc..c4b229d6fb 100644
+--- a/ui/accessibility/BUILD.gn
++++ b/ui/accessibility/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/linux/pkg_config.gni")
+ import("//build/config/ui.gni")
+ import("//extensions/buildflags/buildflags.gni")
+@@ -44,7 +45,7 @@ mojom_component("ax_features_mojo") {
+ # included by Blink. The rule of thumb (for now) is that it's
+ # anything platform-neutral (no platform/ directory) that
+ # relates to data structs (actions, nodes, trees, etc) and interfaces. No heavy weight logic yet.
+-component("ax_base") {
++jumbo_component("ax_base") {
+   defines = [ "AX_BASE_IMPLEMENTATION" ]
+ 
+   sources = [
+@@ -151,7 +152,7 @@ group("accessibility") {
+   ]
+ }
+ 
+-component("accessibility_internal") {
++jumbo_component("accessibility_internal") {
+   defines = [ "AX_IMPLEMENTATION" ]
+ 
+   sources = [
+diff --git a/ui/accessibility/platform/BUILD.gn b/ui/accessibility/platform/BUILD.gn
+index 96b8b4976a..39e72f9da8 100644
+--- a/ui/accessibility/platform/BUILD.gn
++++ b/ui/accessibility/platform/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/linux/pkg_config.gni")
+ import("//build/config/ui.gni")
+ import("//extensions/buildflags/buildflags.gni")
+@@ -26,7 +27,7 @@ if (is_android) {
+   import("//build/config/android/rules.gni")
+ }
+ 
+-component("platform") {
++jumbo_component("platform") {
+   output_name = "accessibility_platform"
+ 
+   defines = [ "IS_AX_PLATFORM_IMPL" ]
+diff --git a/ui/aura/BUILD.gn b/ui/aura/BUILD.gn
+index 139c9aae50..4778b7cbd2 100644
+--- a/ui/aura/BUILD.gn
++++ b/ui/aura/BUILD.gn
+@@ -2,10 +2,11 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//testing/test.gni")
+ 
+-component("aura") {
++jumbo_component("aura") {
+   public = [
+     "client/aura_constants.h",
+     "client/capture_client.h",
+@@ -177,7 +178,7 @@ component("aura") {
+   }
+ }
+ 
+-static_library("test_support") {
++jumbo_static_library("test_support") {
+   testonly = true
+   sources = [
+     "test/aura_test_base.cc",
+diff --git a/ui/base/BUILD.gn b/ui/base/BUILD.gn
+index 08438eb0ed..7d389ed904 100644
+--- a/ui/base/BUILD.gn
++++ b/ui/base/BUILD.gn
+@@ -7,6 +7,7 @@ import("//build/config/chromeos/ui_mode.gni")
+ import("//build/config/compiler/compiler.gni")
+ import("//build/config/dcheck_always_on.gni")
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/linux/gtk/gtk.gni")
+ import("//build/config/linux/pangocairo/pangocairo.gni")
+ import("//build/config/locales.gni")
+@@ -126,7 +127,7 @@ source_set("types") {
+   deps = [ "//build:chromeos_buildflags" ]
+ }
+ 
+-component("base") {
++jumbo_component("base") {
+   output_name = "ui_base"
+ 
+   sources = [
+@@ -236,6 +237,10 @@ component("base") {
+ 
+   libs = []
+ 
++  jumbo_excluded_sources = [
++    "resource/resource_bundle.cc",
++  ]
++
+   if (is_android) {
+     sources += [
+       "device_form_factor_android.cc",
+@@ -740,7 +745,7 @@ component("features") {
+ }
+ 
+ if (is_win || is_mac || is_linux || is_chromeos) {
+-  static_library("pixel_diff_test_support") {
++  jumbo_static_library("pixel_diff_test_support") {
+     testonly = true
+     sources = [
+       "test/skia_gold_matching_algorithm.cc",
+@@ -783,7 +788,7 @@ if (use_blink) {
+   }
+ }
+ 
+-static_library("test_support") {
++jumbo_static_library("test_support") {
+   testonly = true
+   sources = [
+     "data_transfer_policy/mock_data_transfer_policy_controller.cc",
+diff --git a/ui/base/clipboard/BUILD.gn b/ui/base/clipboard/BUILD.gn
+index cff38e81f2..88347f3364 100644
+--- a/ui/base/clipboard/BUILD.gn
++++ b/ui/base/clipboard/BUILD.gn
+@@ -5,10 +5,11 @@
+ import("///build/config/ozone.gni")
+ import("//build/config/chromeos/ui_mode.gni")
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
+ 
+-component("clipboard_types") {
++jumbo_component("clipboard_types") {
+   output_name = "ui_base_clipboard_types"
+   sources = [
+     "clipboard_buffer.h",
+@@ -75,7 +76,7 @@ component("file_info") {
+ 
+ # This is a source set because it needs to be included only on the Mac for the
+ # final executable, but needs to be included on any platform for the fuzzer.
+-source_set("url_file_parser") {
++jumbo_source_set("url_file_parser") {
+   sources = [
+     "url_file_parser.cc",
+     "url_file_parser.h",
+@@ -84,7 +85,7 @@ source_set("url_file_parser") {
+   deps = [ "//base" ]
+ }
+ 
+-component("clipboard") {
++jumbo_component("clipboard") {
+   output_name = "ui_base_clipboard"
+ 
+   sources = [
+@@ -193,7 +194,7 @@ component("clipboard") {
+   }
+ }
+ 
+-source_set("clipboard_test_support") {
++jumbo_source_set("clipboard_test_support") {
+   testonly = true
+ 
+   if (use_blink) {
+diff --git a/ui/base/ime/BUILD.gn b/ui/base/ime/BUILD.gn
+index a6656b5dcb..12ca79d4be 100644
+--- a/ui/base/ime/BUILD.gn
++++ b/ui/base/ime/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/chromeos/ui_mode.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ 
+ source_set("text_input_types") {
+@@ -14,7 +15,7 @@ source_set("text_input_types") {
+   ]
+ }
+ 
+-component("ime_types") {
++jumbo_component("ime_types") {
+   output_name = "ui_base_ime_types"
+   sources = [
+     "autocorrect_info.h",
+@@ -58,7 +59,7 @@ component("ime_types") {
+   }
+ }
+ 
+-component("ime") {
++jumbo_component("ime") {
+   output_name = "ui_base_ime"
+   sources = [
+     "constants.cc",
+diff --git a/ui/base/ime/ash/BUILD.gn b/ui/base/ime/ash/BUILD.gn
+index 71be05152e..cf64a74adf 100644
+--- a/ui/base/ime/ash/BUILD.gn
++++ b/ui/base/ime/ash/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/chromeos/ui_mode.gni")
++import("//build/config/jumbo.gni")
+ 
+ assert(is_chromeos_ash)
+ 
+@@ -22,7 +23,7 @@ source_set("typing_session_manager") {
+   ]
+ }
+ 
+-component("ash") {
++jumbo_component("ash") {
+   output_name = "ui_base_ime_ash"
+ 
+   sources = [
+diff --git a/ui/base/ime/fuchsia/BUILD.gn b/ui/base/ime/fuchsia/BUILD.gn
+index f610fcc894..bb444074d6 100644
+--- a/ui/base/ime/fuchsia/BUILD.gn
++++ b/ui/base/ime/fuchsia/BUILD.gn
+@@ -2,9 +2,11 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
++
+ assert(is_fuchsia)
+ 
+-component("fuchsia") {
++jumbo_component("fuchsia") {
+   output_name = "ui_base_ime_fuchsia"
+ 
+   sources = [
+diff --git a/ui/base/ime/init/BUILD.gn b/ui/base/ime/init/BUILD.gn
+index 1ff77334f0..9a56d96eb4 100644
+--- a/ui/base/ime/init/BUILD.gn
++++ b/ui/base/ime/init/BUILD.gn
+@@ -3,9 +3,10 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/chromeos/ui_mode.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ 
+-component("init") {
++jumbo_component("init") {
+   output_name = "ui_base_ime_init"
+ 
+   sources = [
+diff --git a/ui/base/ime/linux/BUILD.gn b/ui/base/ime/linux/BUILD.gn
+index b476a9f43b..2a01a4e60f 100644
+--- a/ui/base/ime/linux/BUILD.gn
++++ b/ui/base/ime/linux/BUILD.gn
+@@ -3,11 +3,12 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/chromeos/ui_mode.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/linux/pangocairo/pangocairo.gni")
+ 
+ assert(is_linux || is_chromeos_lacros)
+ 
+-component("linux") {
++jumbo_component("linux") {
+   output_name = "ui_base_ime_linux"
+   sources = [
+     "fake_input_method_context.cc",
+diff --git a/ui/base/ime/mac/BUILD.gn b/ui/base/ime/mac/BUILD.gn
+index fc5cb85b07..8e50ead627 100644
+--- a/ui/base/ime/mac/BUILD.gn
++++ b/ui/base/ime/mac/BUILD.gn
+@@ -2,9 +2,11 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
++
+ assert(is_mac)
+ 
+-component("mac") {
++jumbo_component("mac") {
+   output_name = "ui_base_ime_mac"
+ 
+   sources = [
+diff --git a/ui/base/ime/win/BUILD.gn b/ui/base/ime/win/BUILD.gn
+index 61d1e9b662..18db932eea 100644
+--- a/ui/base/ime/win/BUILD.gn
++++ b/ui/base/ime/win/BUILD.gn
+@@ -2,9 +2,11 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
++
+ assert(is_win)
+ 
+-component("win") {
++jumbo_component("win") {
+   output_name = "ui_base_ime_win"
+   sources = [
+     "input_method_win_base.cc",
+@@ -28,6 +30,7 @@ component("win") {
+     "virtual_keyboard_debounce_timer.cc",
+     "virtual_keyboard_debounce_timer.h",
+   ]
++  jumbo_excluded_sources = [ "tsf_text_store.cc" ]
+ 
+   defines = [ "IS_UI_BASE_IME_WIN_IMPL" ]
+ 
+diff --git a/ui/base/prediction/BUILD.gn b/ui/base/prediction/BUILD.gn
+index 2e653b3df7..dae3070134 100644
+--- a/ui/base/prediction/BUILD.gn
++++ b/ui/base/prediction/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-component("prediction") {
++import("//build/config/jumbo.gni")
++
++jumbo_component("prediction") {
+   sources = [
+     "empty_filter.cc",
+     "empty_filter.h",
+diff --git a/ui/base/x/BUILD.gn b/ui/base/x/BUILD.gn
+index 5f88f00d2d..5f9af7e3cc 100644
+--- a/ui/base/x/BUILD.gn
++++ b/ui/base/x/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/linux/gtk/gtk.gni")
+ import("//build/config/ozone.gni")
+ import("//build/config/ui.gni")
+@@ -9,7 +10,7 @@ import("//testing/libfuzzer/fuzzer_test.gni")
+ 
+ assert(ozone_platform_x11)
+ 
+-component("x") {
++jumbo_component("x") {
+   output_name = "ui_base_x"
+ 
+   sources = [
+diff --git a/ui/base/x/selection_owner.cc b/ui/base/x/selection_owner.cc
+index df07e7ccb4..92c50ba207 100644
+--- a/ui/base/x/selection_owner.cc
++++ b/ui/base/x/selection_owner.cc
+@@ -67,11 +67,13 @@ bool GetAtomPairArrayProperty(
+   return true;
+ }
+ 
+-x11::Window GetSelectionOwner(x11::Atom selection) {
++x11::Window GetSelectionOwner_SelectionOwner(x11::Atom selection) {
+   auto response = x11::Connection::Get()->GetSelectionOwner({selection}).Sync();
+   return response ? response->owner : x11::Window::None;
+ }
+ 
++#define GetSelectionOwner GetSelectionOwner_SelectionOwner
++
+ void SetSelectionOwner(x11::Window window,
+                        x11::Atom selection,
+                        x11::Time time = x11::Time::CurrentTime) {
+@@ -341,3 +343,5 @@ SelectionOwner::IncrementalTransfer::operator=(IncrementalTransfer&&) = default;
+ SelectionOwner::IncrementalTransfer::~IncrementalTransfer() = default;
+ 
+ }  // namespace ui
++
++#undef GetSelectionOwner
+diff --git a/ui/base/x/x11_display_manager.cc b/ui/base/x/x11_display_manager.cc
+index 65af54df3d..9d05d2a71b 100644
+--- a/ui/base/x/x11_display_manager.cc
++++ b/ui/base/x/x11_display_manager.cc
+@@ -20,6 +20,8 @@
+ #include "ui/linux/linux_ui.h"
+ #endif
+ 
++#define kMinXrandrVersion kMinXrandrVersion_X11DisplayManager
++
+ namespace ui {
+ 
+ namespace {
+@@ -139,3 +141,5 @@ std::string XDisplayManager::GetCurrentWorkspace() {
+ }
+ 
+ }  // namespace ui
++
++#undef kMinXrandrVersion
+diff --git a/ui/base/x/x11_drag_context.cc b/ui/base/x/x11_drag_context.cc
+index 1ef1fcf743..844464732e 100644
+--- a/ui/base/x/x11_drag_context.cc
++++ b/ui/base/x/x11_drag_context.cc
+@@ -14,6 +14,12 @@
+ #include "ui/gfx/x/connection.h"
+ #include "ui/gfx/x/xproto.h"
+ 
++#define kXdndTypeList   kXdndTypeList_DragContext
++#define kXdndActionCopy kXdndActionCopy_DragContext
++#define kXdndActionMove kXdndActionMove_DragContext
++#define kXdndActionLink kXdndActionLink_DragContext
++#define kXdndActionList kXdndActionList_DragContext
++
+ namespace ui {
+ 
+ namespace {
+@@ -213,3 +219,9 @@ bool XDragContext::DispatchPropertyNotifyEvent(
+ }
+ 
+ }  // namespace ui
++
++#undef kXdndTypeList
++#undef kXdndActionCopy
++#undef kXdndActionMove
++#undef kXdndActionLink
++#undef kXdndActionList
+diff --git a/ui/base/x/x11_drag_drop_client.cc b/ui/base/x/x11_drag_drop_client.cc
+index 93130a7063..95358090d5 100644
+--- a/ui/base/x/x11_drag_drop_client.cc
++++ b/ui/base/x/x11_drag_drop_client.cc
+@@ -31,6 +31,12 @@
+ //
+ // All the readings are freely available online.
+ 
++#define kXdndTypeList   kXdndTypeList_DragDropClient
++#define kXdndActionCopy kXdndActionCopy_DragDropClient
++#define kXdndActionMove kXdndActionMove_DragDropClient
++#define kXdndActionLink kXdndActionLink_DragDropClient
++#define kXdndActionList kXdndActionList_DragDropClient
++
+ namespace ui {
+ 
+ // Window property on the source window and message used by the XDS protocol.
+@@ -731,3 +737,9 @@ void XDragDropClient::EndMoveLoop() {
+ }
+ 
+ }  // namespace ui
++
++#undef kXdndTypeList
++#undef kXdndActionCopy
++#undef kXdndActionMove
++#undef kXdndActionLink
++#undef kXdndActionList
+diff --git a/ui/color/BUILD.gn b/ui/color/BUILD.gn
+index 01a987da95..438e05d158 100644
+--- a/ui/color/BUILD.gn
++++ b/ui/color/BUILD.gn
+@@ -4,6 +4,7 @@
+ 
+ import("//build/buildflag_header.gni")
+ import("//build/config/chromeos/ui_mode.gni")
++import("//build/config/jumbo.gni")
+ import("//mojo/public/tools/bindings/mojom.gni")
+ import("//testing/test.gni")
+ import("//ui/base/ui_features.gni")
+@@ -32,7 +33,7 @@ source_set("color_headers") {
+ }
+ 
+ # Keep the deps on this target to a minimum so that chromeos/crosapi can depend on it.
+-component("color_provider_key") {
++jumbo_component("color_provider_key") {
+   sources = [
+     "color_provider_key.cc",
+     "color_provider_key.h",
+@@ -48,7 +49,7 @@ component("color_provider_key") {
+   ]
+ }
+ 
+-component("color") {
++jumbo_component("color") {
+   sources = [
+     "color_metrics.cc",
+     "color_mixer.cc",
+@@ -139,7 +140,7 @@ if (is_win) {
+   }
+ }
+ 
+-component("mixers") {
++jumbo_component("mixers") {
+   sources = [
+     "color_mixers.cc",
+     "color_mixers.h",
+diff --git a/ui/compositor/BUILD.gn b/ui/compositor/BUILD.gn
+index d3f493ed31..4c1ea943eb 100644
+--- a/ui/compositor/BUILD.gn
++++ b/ui/compositor/BUILD.gn
+@@ -2,10 +2,11 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//testing/test.gni")
+ 
+-component("compositor") {
++jumbo_component("compositor") {
+   sources = [
+     "animation_throughput_reporter.cc",
+     "animation_throughput_reporter.h",
+@@ -123,7 +124,7 @@ component("compositor") {
+   }
+ }
+ 
+-static_library("test_support") {
++jumbo_static_library("test_support") {
+   testonly = true
+   sources = [
+     "test/animation_throughput_reporter_test_base.cc",
+diff --git a/ui/display/BUILD.gn b/ui/display/BUILD.gn
+index 5b7592d7f7..2bf07d992c 100644
+--- a/ui/display/BUILD.gn
++++ b/ui/display/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/chromeos/ui_mode.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//remoting/remoting_enable.gni")
+ import("//testing/test.gni")
+@@ -21,7 +22,7 @@ component("display_features") {
+   ]
+ }
+ 
+-component("display") {
++jumbo_component("display") {
+   sources = [
+     "display.cc",
+     "display.h",
+@@ -211,7 +212,7 @@ if (is_chromeos_ash) {
+   }
+ }
+ 
+-static_library("test_support") {
++jumbo_static_library("test_support") {
+   testonly = true
+   sources = [
+     "test/display_matchers.cc",
+diff --git a/ui/display/manager/BUILD.gn b/ui/display/manager/BUILD.gn
+index 805c7e44f0..a010f62cda 100644
+--- a/ui/display/manager/BUILD.gn
++++ b/ui/display/manager/BUILD.gn
+@@ -3,11 +3,12 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/chromeos/ui_mode.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ 
+ assert(is_chromeos_ash)
+ 
+-component("manager") {
++jumbo_component("manager") {
+   sources = [
+     "apply_content_protection_task.cc",
+     "apply_content_protection_task.h",
+diff --git a/ui/display/types/BUILD.gn b/ui/display/types/BUILD.gn
+index 3ca5f98c0b..ebbc58be10 100644
+--- a/ui/display/types/BUILD.gn
++++ b/ui/display/types/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-component("types") {
++import("//build/config/jumbo.gni")
++
++jumbo_component("types") {
+   output_name = "display_types"
+   sources = [
+     "display_color_management.cc",
+diff --git a/ui/display/util/BUILD.gn b/ui/display/util/BUILD.gn
+index 61227c26fe..3da28ffa33 100644
+--- a/ui/display/util/BUILD.gn
++++ b/ui/display/util/BUILD.gn
+@@ -3,10 +3,11 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/chromeos/ui_mode.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
+ 
+-component("util") {
++jumbo_component("util") {
+   output_name = "display_util"
+   sources = [
+     "display_util.cc",
+diff --git a/ui/events/BUILD.gn b/ui/events/BUILD.gn
+index 74394a3164..fe35bb11d3 100644
+--- a/ui/events/BUILD.gn
++++ b/ui/events/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ozone.gni")
+ import("//build/config/ui.gni")
+ import("//testing/test.gni")
+@@ -17,7 +18,7 @@ if (is_ios) {
+   import("//ios/build/config.gni")
+ }
+ 
+-static_library("dom_keycode_converter") {
++jumbo_static_library("dom_keycode_converter") {
+   public = [
+     "keycodes/dom/dom_code.h",
+     "keycodes/dom/dom_codes_array.h",
+@@ -95,7 +96,7 @@ source_set("platform_event") {
+   public_deps = [ "//base" ]
+ }
+ 
+-component("events_base") {
++jumbo_component("events_base") {
+   sources = [
+     "base_event_utils.cc",
+     "base_event_utils.h",
+@@ -194,7 +195,7 @@ component("events_base") {
+   }
+ }
+ 
+-component("events") {
++jumbo_component("events") {
+   public = [
+     "cocoa/cocoa_event_utils.h",
+     "event.h",
+@@ -392,7 +393,7 @@ component("events") {
+   }
+ }
+ 
+-component("keyboard_hook") {
++jumbo_component("keyboard_hook") {
+   public = [ "keyboard_hook.h" ]
+ 
+   defines = [ "IS_KEYBOARD_HOOK_IMPL" ]
+@@ -446,7 +447,7 @@ component("keyboard_hook") {
+   }
+ }
+ 
+-component("gesture_detection") {
++jumbo_component("gesture_detection") {
+   sources = [
+     "gesture_detection/filtered_gesture_provider.cc",
+     "gesture_detection/filtered_gesture_provider.h",
+@@ -505,7 +506,7 @@ component("gesture_detection") {
+   }
+ }
+ 
+-component("velocity_tracker") {
++jumbo_component("velocity_tracker") {
+   sources = [
+     "velocity_tracker/bitset_32.h",
+     "velocity_tracker/motion_event.cc",
+@@ -530,7 +531,7 @@ component("velocity_tracker") {
+   ]
+ }
+ 
+-static_library("test_support") {
++jumbo_static_library("test_support") {
+   sources = [
+     "test/event_generator.cc",
+     "test/event_generator.h",
+diff --git a/ui/events/blink/BUILD.gn b/ui/events/blink/BUILD.gn
+index d707bb6e0c..8b4d97f467 100644
+--- a/ui/events/blink/BUILD.gn
++++ b/ui/events/blink/BUILD.gn
+@@ -2,9 +2,10 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ 
+-component("blink_features") {
++jumbo_component("blink_features") {
+   defines = [ "IS_BLINK_FEATURES_IMPL" ]
+ 
+   sources = [
+@@ -15,7 +16,7 @@ component("blink_features") {
+   deps = [ "//base" ]
+ }
+ 
+-source_set("blink") {
++jumbo_source_set("blink") {
+   sources = [
+     "blink_event_util.cc",
+     "blink_event_util.h",
+diff --git a/ui/events/devices/BUILD.gn b/ui/events/devices/BUILD.gn
+index 4494f52f8a..228f76ea18 100644
+--- a/ui/events/devices/BUILD.gn
++++ b/ui/events/devices/BUILD.gn
+@@ -2,13 +2,15 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
++
+ if (is_android) {
+   import("//build/config/android/config.gni")
+   import("//build/config/android/rules.gni")
+   import("//third_party/jni_zero/jni_zero.gni")
+ }
+ 
+-component("devices") {
++jumbo_component("devices") {
+   sources = [
+     "device_data_manager.cc",
+     "device_data_manager.h",
+diff --git a/ui/events/devices/x11/BUILD.gn b/ui/events/devices/x11/BUILD.gn
+index a317291720..ca170029a4 100644
+--- a/ui/events/devices/x11/BUILD.gn
++++ b/ui/events/devices/x11/BUILD.gn
+@@ -2,12 +2,13 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/ozone.gni")
+ import("//build/config/ui.gni")
+ 
+ assert(ozone_platform_x11)
+ 
+-component("x11") {
++jumbo_component("x11") {
+   output_name = "events_devices_x11"
+ 
+   sources = [
+diff --git a/ui/events/ipc/BUILD.gn b/ui/events/ipc/BUILD.gn
+index 5e2744b86c..ff529c38eb 100644
+--- a/ui/events/ipc/BUILD.gn
++++ b/ui/events/ipc/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-component("ipc") {
++import("//build/config/jumbo.gni")
++
++jumbo_component("ipc") {
+   output_name = "ui_events_ipc"
+ 
+   sources = [
+diff --git a/ui/events/keycodes/BUILD.gn b/ui/events/keycodes/BUILD.gn
+index 9cdd599f0d..5760020969 100644
+--- a/ui/events/keycodes/BUILD.gn
++++ b/ui/events/keycodes/BUILD.gn
+@@ -2,11 +2,12 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/ozone.gni")
+ import("//build/config/ui.gni")
+ import("//ui/base/ui_features.gni")
+ 
+-source_set("xkb") {
++jumbo_source_set("xkb") {
+   sources = [
+     "keyboard_code_conversion_xkb.cc",
+     "keyboard_code_conversion_xkb.h",
+@@ -27,7 +28,7 @@ source_set("xkb") {
+ }
+ 
+ if (ozone_platform_x11) {
+-  component("x11") {
++  jumbo_component("x11") {
+     output_name = "keycodes_x11"
+ 
+     sources = [
+diff --git a/ui/events/platform/BUILD.gn b/ui/events/platform/BUILD.gn
+index 1b54f4b46f..1b6b162b06 100644
+--- a/ui/events/platform/BUILD.gn
++++ b/ui/events/platform/BUILD.gn
+@@ -2,9 +2,10 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ 
+-component("platform") {
++jumbo_component("platform") {
+   sources = [
+     # Allow this target to include events_export.h without depending on the
+     # events target (which would be circular).
+diff --git a/ui/events/platform/x11/BUILD.gn b/ui/events/platform/x11/BUILD.gn
+index 630c207d54..c3338effbe 100644
+--- a/ui/events/platform/x11/BUILD.gn
++++ b/ui/events/platform/x11/BUILD.gn
+@@ -3,12 +3,13 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/chromeos/ui_mode.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ozone.gni")
+ import("//build/config/ui.gni")
+ 
+ assert(ozone_platform_x11)
+ 
+-component("x11") {
++jumbo_component("x11") {
+   output_name = "x11_events_platform"
+ 
+   sources = [
+diff --git a/ui/gfx/BUILD.gn b/ui/gfx/BUILD.gn
+index 0a28b28324..686ed50148 100644
+--- a/ui/gfx/BUILD.gn
++++ b/ui/gfx/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ozone.gni")
+ import("//build/config/ui.gni")
+ import("//device/vr/buildflags/buildflags.gni")
+@@ -29,7 +30,7 @@ source_set("gfx_export") {
+ }
+ 
+ # Used for color generation at build time without importing all the gfx.
+-component("color_utils") {
++jumbo_component("color_utils") {
+   sources = [
+     "color_palette.h",
+     "color_utils.cc",
+@@ -44,7 +45,7 @@ component("color_utils") {
+   ]
+ }
+ 
+-component("gfx_skia") {
++jumbo_component("gfx_skia") {
+   sources = [
+     "gfx_skia_export.h",
+     "skia_util.cc",
+@@ -69,7 +70,7 @@ if (is_win) {
+   }
+ }
+ 
+-component("gfx") {
++jumbo_component("gfx") {
+   sources = [
+     "break_list.h",
+     "color_analysis.cc",
+@@ -448,7 +449,7 @@ component("gfx") {
+   }
+ }
+ 
+-component("color_space") {
++jumbo_component("color_space") {
+   sources = [
+     "color_conversion_sk_filter_cache.cc",
+     "color_conversion_sk_filter_cache.h",
+@@ -594,7 +595,7 @@ group("memory_buffer") {
+ }
+ 
+ # Cannot be a static_library in component builds due to exported functions
+-source_set("memory_buffer_sources") {
++jumbo_source_set("memory_buffer_sources") {
+   visibility = [ ":*" ]  # Depend on through ":memory_buffer".
+ 
+   # TODO(brettw) refactor this so these sources are in a coherent directory
+@@ -695,7 +696,7 @@ source_set("memory_buffer_sources") {
+ }
+ 
+ # TODO(ccameron): This can be moved into a separate source_set.
+-component("gfx_switches") {
++jumbo_component("gfx_switches") {
+   sources = [
+     "switches.cc",
+     "switches.h",
+@@ -707,7 +708,7 @@ component("gfx_switches") {
+   deps = [ "//base" ]
+ }
+ 
+-static_library("test_support") {
++jumbo_static_library("test_support") {
+   testonly = true
+   sources = [
+     "animation/animation_test_api.cc",
+diff --git a/ui/gfx/animation/BUILD.gn b/ui/gfx/animation/BUILD.gn
+index fbe6f7f32b..c216940ecf 100644
+--- a/ui/gfx/animation/BUILD.gn
++++ b/ui/gfx/animation/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/chromeos/ui_mode.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ 
+ if (is_android) {
+@@ -10,7 +11,7 @@ if (is_android) {
+   import("//build/config/android/rules.gni")
+ }
+ 
+-component("animation") {
++jumbo_component("animation") {
+   sources = [
+     "animation.cc",
+     "animation.h",
+diff --git a/ui/gfx/codec/BUILD.gn b/ui/gfx/codec/BUILD.gn
+index 542c5bc5e7..c394a2334c 100644
+--- a/ui/gfx/codec/BUILD.gn
++++ b/ui/gfx/codec/BUILD.gn
+@@ -3,10 +3,11 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
+ 
+-component("codec") {
++jumbo_component("codec") {
+   sources = [
+     "codec_export.h",
+     "jpeg_codec.cc",
+diff --git a/ui/gfx/codec/jpeg_codec.cc b/ui/gfx/codec/jpeg_codec.cc
+index 7a867dff03..389a6c56ff 100644
+--- a/ui/gfx/codec/jpeg_codec.cc
++++ b/ui/gfx/codec/jpeg_codec.cc
+@@ -15,6 +15,8 @@
+ #include "third_party/skia/include/encode/SkJpegEncoder.h"
+ #include "ui/gfx/codec/vector_wstream.h"
+ 
++#define PreparationOutput PreparationOutput_JPEGCodec
++
+ namespace gfx {
+ 
+ // Encoder ---------------------------------------------------------------------
+@@ -151,3 +153,5 @@ std::unique_ptr<SkBitmap> JPEGCodec::Decode(const unsigned char* input,
+ }
+ 
+ }  // namespace gfx
++
++#undef PreparationOutput
+diff --git a/ui/gfx/codec/png_codec.cc b/ui/gfx/codec/png_codec.cc
+index 3ac59e84f2..fdc0d24f6a 100644
+--- a/ui/gfx/codec/png_codec.cc
++++ b/ui/gfx/codec/png_codec.cc
+@@ -19,6 +19,8 @@
+ #include "ui/gfx/codec/vector_wstream.h"
+ #include "ui/gfx/geometry/size.h"
+ 
++#define PreparationOutput PreparationOutput_PNGCodec
++
+ namespace gfx {
+ 
+ // Decoder --------------------------------------------------------------------
+@@ -284,3 +286,5 @@ PNGCodec::Comment::Comment(const std::string& k, const std::string& t)
+ PNGCodec::Comment::~Comment() = default;
+ 
+ }  // namespace gfx
++
++#undef PreparationOutput
+diff --git a/ui/gfx/geometry/BUILD.gn b/ui/gfx/geometry/BUILD.gn
+index 8ca2437bd7..58b7ed76d5 100644
+--- a/ui/gfx/geometry/BUILD.gn
++++ b/ui/gfx/geometry/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-component("geometry") {
++import("//build/config/jumbo.gni")
++
++jumbo_component("geometry") {
+   sources = [
+     "../gfx_export.h",
+     "axis_transform2d.cc",
+diff --git a/ui/gfx/ipc/BUILD.gn b/ui/gfx/ipc/BUILD.gn
+index 83f5cd0b14..44f4ad493c 100644
+--- a/ui/gfx/ipc/BUILD.gn
++++ b/ui/gfx/ipc/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-component("ipc") {
++import("//build/config/jumbo.gni")
++
++jumbo_component("ipc") {
+   output_name = "gfx_ipc"
+ 
+   sources = [
+diff --git a/ui/gfx/ipc/buffer_types/BUILD.gn b/ui/gfx/ipc/buffer_types/BUILD.gn
+index 550b4f0ed6..957f9d9e66 100644
+--- a/ui/gfx/ipc/buffer_types/BUILD.gn
++++ b/ui/gfx/ipc/buffer_types/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-component("buffer_types") {
++import("//build/config/jumbo.gni")
++
++jumbo_component("buffer_types") {
+   output_name = "gfx_ipc_buffer_types"
+ 
+   sources = [
+diff --git a/ui/gfx/ipc/color/BUILD.gn b/ui/gfx/ipc/color/BUILD.gn
+index 38a069456f..9bbf354122 100644
+--- a/ui/gfx/ipc/color/BUILD.gn
++++ b/ui/gfx/ipc/color/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-component("color") {
++import("//build/config/jumbo.gni")
++
++jumbo_component("color") {
+   output_name = "gfx_ipc_color"
+ 
+   sources = [
+diff --git a/ui/gfx/ipc/geometry/BUILD.gn b/ui/gfx/ipc/geometry/BUILD.gn
+index 4d0a150406..bd24a217e1 100644
+--- a/ui/gfx/ipc/geometry/BUILD.gn
++++ b/ui/gfx/ipc/geometry/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-component("geometry") {
++import("//build/config/jumbo.gni")
++
++jumbo_component("geometry") {
+   output_name = "gfx_ipc_geometry"
+ 
+   sources = [
+diff --git a/ui/gfx/ipc/skia/BUILD.gn b/ui/gfx/ipc/skia/BUILD.gn
+index b96b1c7548..d6178dcba4 100644
+--- a/ui/gfx/ipc/skia/BUILD.gn
++++ b/ui/gfx/ipc/skia/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-component("skia") {
++import("//build/config/jumbo.gni")
++
++jumbo_component("skia") {
+   output_name = "gfx_ipc_skia"
+ 
+   sources = [
+diff --git a/ui/gfx/range/BUILD.gn b/ui/gfx/range/BUILD.gn
+index aa17a97454..e1c9b52f1e 100644
+--- a/ui/gfx/range/BUILD.gn
++++ b/ui/gfx/range/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-component("range") {
++import("//build/config/jumbo.gni")
++
++jumbo_component("range") {
+   sources = [
+     "gfx_range_export.h",
+     "range.cc",
+diff --git a/ui/gfx/x/BUILD.gn b/ui/gfx/x/BUILD.gn
+index 19a858a8fd..8e62fd4989 100644
+--- a/ui/gfx/x/BUILD.gn
++++ b/ui/gfx/x/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/ozone.gni")
+ import("//build/config/ui.gni")
+ import("//tools/generate_library_loader/generate_library_loader.gni")
+@@ -150,7 +151,7 @@ source_set("build_xprotos") {
+   ]
+ }
+ 
+-component("x") {
++jumbo_component("x") {
+   output_name = "gfx_x11"
+ 
+   sources = [
+diff --git a/ui/gl/BUILD.gn b/ui/gl/BUILD.gn
+index 89d11ec975..014a6a17de 100644
+--- a/ui/gl/BUILD.gn
++++ b/ui/gl/BUILD.gn
+@@ -5,6 +5,7 @@
+ import("//build/buildflag_header.gni")
+ import("//build/config/chrome_build.gni")
+ import("//build/config/chromeos/ui_mode.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/linux/pkg_config.gni")
+ import("//build/config/ozone.gni")
+ import("//build/config/ui.gni")
+@@ -38,7 +39,7 @@ buildflag_header("buildflags") {
+   ]
+ }
+ 
+-component("gl") {
++jumbo_component("gl") {
+   output_name = "gl_wrapper"  # Avoid colliding with OS X"s libGL.dylib.
+ 
+   sources = [
+@@ -325,6 +326,10 @@ component("gl") {
+     defines += [ "GL_SILENCE_DEPRECATION" ]
+   }
+ 
++  jumbo_excluded_sources = [
++    "presenter.cc",
++  ]
++
+   if (is_android) {
+     sources += [
+       "android/egl_fence_utils.cc",
+@@ -401,11 +406,15 @@ if (is_mac) {
+         "//third_party/swiftshader/src/Vulkan:icd_file",
+         "//third_party/swiftshader/src/Vulkan:swiftshader_libvulkan",
+       ]
++
++      jumbo_excluded_sources += [
++        "gl_angle_util_vulkan.cc",
++      ]
+     }
+   }
+ }
+ 
+-static_library("gl_unittest_utils") {
++jumbo_static_library("gl_unittest_utils") {
+   testonly = true
+   sources = [
+     "egl_bindings_autogen_mock.cc",
+@@ -431,7 +440,7 @@ static_library("gl_unittest_utils") {
+   ]
+ }
+ 
+-static_library("test_support") {
++jumbo_static_library("test_support") {
+   testonly = true
+   sources = [
+     "test/gl_surface_test_support.cc",
+diff --git a/ui/gl/gl_display_egl_util.cc b/ui/gl/gl_display_egl_util.cc
+index 7ffc2c859f..9dedc9269e 100644
+--- a/ui/gl/gl_display_egl_util.cc
++++ b/ui/gl/gl_display_egl_util.cc
+@@ -9,6 +9,8 @@
+ #include "base/no_destructor.h"
+ #include "base/scoped_environment_variable_override.h"
+ 
++#define g_instance g_instance_gl_display_egl_util
++
+ namespace gl {
+ 
+ namespace {
+@@ -57,3 +59,5 @@ void GLDisplayEglUtil::SetInstance(GLDisplayEglUtil* gl_display_util) {
+ }
+ 
+ }  // namespace gl
++
++#undef g_instance
+diff --git a/ui/gl/init/BUILD.gn b/ui/gl/init/BUILD.gn
+index 33d87dacc5..f8fd6c7171 100644
+--- a/ui/gl/init/BUILD.gn
++++ b/ui/gl/init/BUILD.gn
+@@ -2,10 +2,11 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//ui/gl/features.gni")
+ 
+-component("init") {
++jumbo_component("init") {
+   output_name = "gl_init"
+ 
+   public = [
+diff --git a/ui/gtk/BUILD.gn b/ui/gtk/BUILD.gn
+index 24f3289316..d855bd5c3d 100644
+--- a/ui/gtk/BUILD.gn
++++ b/ui/gtk/BUILD.gn
+@@ -4,6 +4,7 @@
+ 
+ import("//build/config/chromeos/ui_mode.gni")
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/linux/gtk/gtk.gni")
+ import("//build/config/linux/pkg_config.gni")
+ import("//build/config/ozone.gni")
+@@ -68,10 +69,9 @@ generate_stubs("gtk_stubs") {
+   logging_include = "ui/gtk/log_noop.h"
+ }
+ 
+-component("gtk") {
++jumbo_component("gtk") {
+   visibility = [ "//ui/linux:linux_ui_factory" ]
+   public = [ "gtk_ui_factory.h" ]
+-
+   sources = [
+     "gtk_color_mixers.cc",
+     "gtk_color_mixers.h",
+@@ -105,6 +105,7 @@ component("gtk") {
+     "window_frame_provider_gtk.cc",
+     "window_frame_provider_gtk.h",
+   ]
++  jumbo_excluded_sources = []
+   defines = [ "IS_GTK_IMPL" ]
+   configs += [
+     "//build/config/linux/pangocairo",
+@@ -159,6 +160,11 @@ component("gtk") {
+       "x/gtk_ui_platform_x11.cc",
+       "x/gtk_ui_platform_x11.h",
+     ]
++    jumbo_excluded_sources += [
++      # invalid operands to binary expression ('x11::EventMask' and 'x11::EventMask')
++      "x/gtk_event_loop_x11.cc",
++      "x/gtk_ui_platform_x11.cc",
++    ]
+     deps += [
+       "//ui/base/x",
+       "//ui/events/platform/x11",
+diff --git a/ui/latency/BUILD.gn b/ui/latency/BUILD.gn
+index 4690e49781..44d8a67de8 100644
+--- a/ui/latency/BUILD.gn
++++ b/ui/latency/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/buildflag_header.gni")
++import("//build/config/jumbo.gni")
+ import("//testing/test.gni")
+ 
+ declare_args() {
+@@ -16,7 +17,7 @@ buildflag_header("jank_tracker_for_experiments_buildflags") {
+   flags = [ "JANK_TRACKER_FOR_EXPERIMENTS=$use_jank_tracker_for_experiments" ]
+ }
+ 
+-source_set("latency") {
++jumbo_source_set("latency") {
+   sources = [
+     "latency_info.cc",
+     "latency_info.h",
+@@ -41,7 +42,7 @@ source_set("latency") {
+   ]
+ }
+ 
+-source_set("test_support") {
++jumbo_source_set("test_support") {
+   testonly = true
+   sources = [ "latency_info_test_support.cc" ]
+ 
+diff --git a/ui/message_center/BUILD.gn b/ui/message_center/BUILD.gn
+index 46980b3734..45c2c35cdc 100644
+--- a/ui/message_center/BUILD.gn
++++ b/ui/message_center/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//components/vector_icons/vector_icons.gni")
+ import("//testing/test.gni")
+@@ -23,7 +24,7 @@ aggregate_vector_icons("message_center_vector_icons") {
+ }
+ 
+ # TODO(msw|mukai|dewittj): Move ash-specific files: crbug.com/585175
+-component("message_center") {
++jumbo_component("message_center") {
+   deps = [
+     "//base",
+     "//build:chromeos_buildflags",
+diff --git a/ui/message_center/public/cpp/BUILD.gn b/ui/message_center/public/cpp/BUILD.gn
+index 61e93a1b0a..564933dd30 100644
+--- a/ui/message_center/public/cpp/BUILD.gn
++++ b/ui/message_center/public/cpp/BUILD.gn
+@@ -2,10 +2,11 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ 
+ # C++ headers and sources that can be used outside message_center.
+-component("cpp") {
++jumbo_component("cpp") {
+   output_name = "ui_message_center_cpp"
+ 
+   sources = [
+diff --git a/ui/native_theme/BUILD.gn b/ui/native_theme/BUILD.gn
+index 389d3e2402..614966eaaf 100644
+--- a/ui/native_theme/BUILD.gn
++++ b/ui/native_theme/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//testing/test.gni")
+ 
+@@ -22,7 +23,7 @@ component("features") {
+   ]
+ }
+ 
+-component("native_theme") {
++jumbo_component("native_theme") {
+   sources = [
+     "caption_style.cc",
+     "caption_style.h",
+@@ -129,11 +130,11 @@ if (is_win) {
+     libs = [ "uxtheme.lib" ]
+   }
+ } else {
+-  source_set("native_theme_browser") {
++  jumbo_source_set("native_theme_browser") {
+   }
+ }
+ 
+-source_set("test_support") {
++jumbo_source_set("test_support") {
+   testonly = true
+ 
+   deps = [
+diff --git a/ui/ozone/BUILD.gn b/ui/ozone/BUILD.gn
+index 19915d2c10..6c7195ebd4 100644
+--- a/ui/ozone/BUILD.gn
++++ b/ui/ozone/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/buildflag_header.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ozone.gni")
+ import("//build/config/python.gni")
+ import("//build/config/ui.gni")
+@@ -78,7 +79,7 @@ constructor_list_cc_file = "$target_gen_dir/constructor_list.cc"
+ 
+ test_constructor_list_cc_file = "$target_gen_dir/test_constructor_list.cc"
+ 
+-component("ozone_base") {
++jumbo_component("ozone_base") {
+   sources = [
+     "public/gl_ozone.h",
+     "public/gpu_platform_support_host.cc",
+@@ -253,7 +254,7 @@ source_set("ozone_switches") {
+   ]
+ }
+ 
+-component("ozone") {
++jumbo_component("ozone") {
+   visibility = []
+   visibility = [ "*" ]
+   public_deps = [ ":platform" ]
+@@ -270,7 +271,7 @@ source_set("drm_modifiers_filter") {
+   visibility += [ "//gpu/vulkan" ]
+ }
+ 
+-source_set("test_support_internal") {
++jumbo_source_set("test_support_internal") {
+   testonly = true
+ 
+   sources = [
+@@ -293,7 +294,7 @@ source_set("test_support_internal") {
+   public_deps = [ "//base/test:test_support" ]
+ }
+ 
+-static_library("ui_test_support") {
++jumbo_static_library("ui_test_support") {
+   visibility = []
+   visibility = [ "//ui/views:test_support" ]
+ 
+@@ -329,7 +330,7 @@ source_set("ozone_interactive_ui_tests") {
+   deps = ozone_platform_interactive_ui_tests_sources
+ }
+ 
+-static_library("test_support") {
++jumbo_static_library("test_support") {
+   visibility = []
+   visibility = [
+     ":*",
+diff --git a/ui/platform_window/stub/BUILD.gn b/ui/platform_window/stub/BUILD.gn
+index 5f41949321..1d64d126b9 100644
+--- a/ui/platform_window/stub/BUILD.gn
++++ b/ui/platform_window/stub/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-component("stub") {
++import("//build/config/jumbo.gni")
++
++jumbo_component("stub") {
+   output_name = "stub_window"
+ 
+   deps = [
+diff --git a/ui/platform_window/win/BUILD.gn b/ui/platform_window/win/BUILD.gn
+index e172d7b2b4..f57d6db0d7 100644
+--- a/ui/platform_window/win/BUILD.gn
++++ b/ui/platform_window/win/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-component("win") {
++import("//build/config/jumbo.gni")
++
++jumbo_component("win") {
+   output_name = "win_window"
+ 
+   deps = [
+diff --git a/ui/resources/BUILD.gn b/ui/resources/BUILD.gn
+index 67a0edca7b..c86b02b1cb 100644
+--- a/ui/resources/BUILD.gn
++++ b/ui/resources/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/chromeos/ui_mode.gni")
++import("//build/config/jumbo.gni")
+ import("//tools/grit/grit_rule.gni")
+ import("//tools/grit/repack.gni")
+ import("//ui/webui/webui_features.gni")
+diff --git a/ui/shell_dialogs/BUILD.gn b/ui/shell_dialogs/BUILD.gn
+index 9a3c87bd9d..42b9f49d19 100644
+--- a/ui/shell_dialogs/BUILD.gn
++++ b/ui/shell_dialogs/BUILD.gn
+@@ -4,6 +4,7 @@
+ 
+ import("//build/config/chromeos/ui_mode.gni")
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//testing/test.gni")
+ 
+@@ -14,7 +15,7 @@ if (is_mac) {
+   import("//build/config/mac/rules.gni")
+ }
+ 
+-component("shell_dialogs") {
++jumbo_component("shell_dialogs") {
+   sources = [
+     "base_shell_dialog.cc",
+     "base_shell_dialog.h",
+diff --git a/ui/snapshot/BUILD.gn b/ui/snapshot/BUILD.gn
+index e9dbc8b20e..fbfa37b342 100644
+--- a/ui/snapshot/BUILD.gn
++++ b/ui/snapshot/BUILD.gn
+@@ -2,10 +2,11 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//testing/test.gni")
+ 
+-component("snapshot") {
++jumbo_component("snapshot") {
+   sources = [
+     "screenshot_grabber.cc",
+     "screenshot_grabber.h",
+@@ -80,7 +81,7 @@ component("snapshot") {
+   }
+ }
+ 
+-source_set("snapshot_export") {
++jumbo_source_set("snapshot_export") {
+   sources = [ "snapshot_export.h" ]
+   visibility = [ ":*" ]
+ }
+diff --git a/ui/surface/BUILD.gn b/ui/surface/BUILD.gn
+index 01421a93ac..d1a69a2550 100644
+--- a/ui/surface/BUILD.gn
++++ b/ui/surface/BUILD.gn
+@@ -2,9 +2,10 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ 
+-component("surface") {
++jumbo_component("surface") {
+   sources = [
+     "surface_export.h",
+     "transport_dib.cc",
+diff --git a/ui/touch_selection/BUILD.gn b/ui/touch_selection/BUILD.gn
+index c72c37286b..92c8ad090f 100644
+--- a/ui/touch_selection/BUILD.gn
++++ b/ui/touch_selection/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//testing/test.gni")
+ 
+@@ -9,7 +10,7 @@ if (is_android) {
+   import("//build/config/android/rules.gni")
+ }
+ 
+-component("touch_selection") {
++jumbo_component("touch_selection") {
+   output_name = "ui_touch_selection"
+ 
+   sources = [
+diff --git a/ui/views/BUILD.gn b/ui/views/BUILD.gn
+index b162795219..9f843d58f9 100644
+--- a/ui/views/BUILD.gn
++++ b/ui/views/BUILD.gn
+@@ -5,6 +5,7 @@
+ import("//build/buildflag_header.gni")
+ import("//build/config/chromeos/ui_mode.gni")
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ozone.gni")
+ import("//build/config/ui.gni")
+ import("//build/nocompile.gni")
+@@ -74,7 +75,7 @@ buildflag_header("buildflags") {
+   ]
+ }
+ 
+-component("views") {
++jumbo_component("views") {
+   all_dependent_configs = [ ":flags" ]
+ 
+   public = [
+@@ -984,7 +985,7 @@ component("views") {
+ }
+ 
+ if (is_win || is_mac || is_linux || is_chromeos) {
+-  static_library("view_pixel_diff_test_support") {
++  jumbo_static_library("view_pixel_diff_test_support") {
+     testonly = true
+     sources = [
+       "test/view_skia_gold_pixel_diff.cc",
+@@ -1003,7 +1004,7 @@ if (is_win || is_mac || is_linux || is_chromeos) {
+   }
+ }
+ 
+-source_set("test_support") {
++jumbo_source_set("test_support") {
+   testonly = true
+   sources = [
+     "animation/test/flood_fill_ink_drop_ripple_test_api.cc",
+diff --git a/ui/views/animation/pulsing_ink_drop_mask.cc b/ui/views/animation/pulsing_ink_drop_mask.cc
+index c33e817520..9fa720f76b 100644
+--- a/ui/views/animation/pulsing_ink_drop_mask.cc
++++ b/ui/views/animation/pulsing_ink_drop_mask.cc
+@@ -8,6 +8,9 @@
+ #include "ui/compositor/paint_recorder.h"
+ #include "ui/views/view_class_properties.h"
+ 
++#define kFeaturePromoPulseDuration kFeaturePromoPulseDuration_PulsingInkDropMask
++#define kFeaturePromoPulseInsetDip kFeaturePromoPulseInsetDip_PulsingInkDropMask
++
+ namespace {
+ // Cycle duration of ink drop pulsing animation used for in-product help.
+ constexpr base::TimeDelta kFeaturePromoPulseDuration = base::Milliseconds(800);
+@@ -67,3 +70,6 @@ void PulsingInkDropMask::AnimationProgressed(const gfx::Animation* animation) {
+   layer_container_->SchedulePaint();
+ }
+ }  // namespace views
++
++#undef kFeaturePromoPulseDuration
++#undef kFeaturePromoPulseInsetDip
+diff --git a/ui/views/bubble/bubble_frame_view.cc b/ui/views/bubble/bubble_frame_view.cc
+index 2804318617..6eddbe39fe 100644
+--- a/ui/views/bubble/bubble_frame_view.cc
++++ b/ui/views/bubble/bubble_frame_view.cc
+@@ -145,7 +145,7 @@ std::unique_ptr<Label> BubbleFrameView::CreateDefaultTitleLabel(
+     const std::u16string& title_text) {
+   std::unique_ptr<Label> label = CreateLabelWithContextAndStyle(
+       title_text, style::CONTEXT_DIALOG_TITLE, style::STYLE_PRIMARY);
+-  if (base::FeatureList::IsEnabled(features::kBubbleFrameViewTitleIsHeading)) {
++  if (base::FeatureList::IsEnabled(::features::kBubbleFrameViewTitleIsHeading)) {
+     label->GetViewAccessibility().SetRole(ax::mojom::Role::kHeading);
+     label->GetViewAccessibility().SetHierarchicalLevel(1);
+   }
+diff --git a/ui/views/controls/webview/BUILD.gn b/ui/views/controls/webview/BUILD.gn
+index 45601d06f8..ed9128f17f 100644
+--- a/ui/views/controls/webview/BUILD.gn
++++ b/ui/views/controls/webview/BUILD.gn
+@@ -2,9 +2,10 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/ozone.gni")
+ 
+-component("webview") {
++jumbo_component("webview") {
+   sources = [
+     "unhandled_keyboard_event_handler.cc",
+     "unhandled_keyboard_event_handler.h",
+diff --git a/ui/views/examples/BUILD.gn b/ui/views/examples/BUILD.gn
+index 08cae411d9..56065dfd03 100644
+--- a/ui/views/examples/BUILD.gn
++++ b/ui/views/examples/BUILD.gn
+@@ -3,11 +3,12 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/chromeos/ui_mode.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//testing/test.gni")
+ import("//tools/grit/grit_rule.gni")
+ 
+-component("views_examples_lib") {
++jumbo_component("views_examples_lib") {
+   testonly = true
+ 
+   sources = [
+@@ -236,7 +237,7 @@ executable("views_examples") {
+   }
+ }
+ 
+-component("views_examples_with_content_lib") {
++jumbo_component("views_examples_with_content_lib") {
+   testonly = true
+   sources = [
+     "examples_window_with_content.cc",
+diff --git a/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc b/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc
+index ffe0a457be..e92f8cde51 100644
+--- a/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc
++++ b/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc
+@@ -618,7 +618,7 @@ void DesktopNativeWidgetAura::InitNativeWidget(Widget::InitParams params) {
+       cursor_manager_->SetDisplay(
+           display::Screen::GetScreen()->GetDisplayNearestWindow(
+               host_->window()));
+-      if (features::IsSystemCursorSizeSupported()) {
++      if (::features::IsSystemCursorSizeSupported()) {
+         native_cursor_manager_->InitCursorSizeObserver(cursor_manager_);
+       }
+     }
+diff --git a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
+index 6eb1cf9451..26a5bd3fb8 100644
+--- a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
++++ b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
+@@ -338,7 +338,7 @@ void DesktopWindowTreeHostPlatform::OnActiveWindowChanged(bool active) {
+   // active, we enter this condition where `active && !is_active_` because
+   // subwindows do not get active state from the OS on some platforms (E.g.
+   // Wayland). So we need to ensure Activate is conveyed to the platform_window.
+-  if (base::FeatureList::IsEnabled(features::kOzoneBubblesUsePlatformWidgets) &&
++  if (base::FeatureList::IsEnabled(::features::kOzoneBubblesUsePlatformWidgets) &&
+       active && !is_active_ && !window_children_.empty()) {
+     Activate();
+   }
+@@ -763,7 +763,7 @@ void DesktopWindowTreeHostPlatform::SetFullscreen(bool fullscreen,
+   if (!weak_ptr)
+     return;
+ 
+-  if (!base::FeatureList::IsEnabled(features::kAsyncFullscreenWindowState)) {
++  if (!base::FeatureList::IsEnabled(::features::kAsyncFullscreenWindowState)) {
+     // The state must change synchronously to let media react on fullscreen
+     // changes.
+     DCHECK_EQ(fullscreen, IsFullscreen());
+diff --git a/ui/views_content_client/BUILD.gn b/ui/views_content_client/BUILD.gn
+index e01d44b0cc..11684632b6 100644
+--- a/ui/views_content_client/BUILD.gn
++++ b/ui/views_content_client/BUILD.gn
+@@ -3,9 +3,10 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/chromeos/ui_mode.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ 
+-component("views_content_client") {
++jumbo_component("views_content_client") {
+   testonly = true
+   sources = [
+     "views_content_browser_client.cc",
+diff --git a/ui/web_dialogs/BUILD.gn b/ui/web_dialogs/BUILD.gn
+index 53620cb10e..eaf516f983 100644
+--- a/ui/web_dialogs/BUILD.gn
++++ b/ui/web_dialogs/BUILD.gn
+@@ -4,7 +4,9 @@
+ 
+ assert(!is_android)
+ 
+-component("web_dialogs") {
++import("//build/config/jumbo.gni")
++
++jumbo_component("web_dialogs") {
+   sources = [
+     "web_dialog_delegate.cc",
+     "web_dialog_delegate.h",
+@@ -32,7 +34,7 @@ component("web_dialogs") {
+   }
+ }
+ 
+-static_library("test_support") {
++jumbo_static_library("test_support") {
+   sources = [
+     "test/test_web_contents_handler.cc",
+     "test/test_web_contents_handler.h",
+diff --git a/ui/wm/BUILD.gn b/ui/wm/BUILD.gn
+index 82a73c8f4f..8deced4533 100644
+--- a/ui/wm/BUILD.gn
++++ b/ui/wm/BUILD.gn
+@@ -3,13 +3,14 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/chromeos/ui_mode.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//testing/test.gni")
+ import("//ui/base/ui_features.gni")
+ 
+ assert(use_aura)
+ 
+-component("wm") {
++jumbo_component("wm") {
+   output_name = "ui_wm"
+   sources = [
+     "core/accelerator_delegate.h",
+@@ -108,7 +109,7 @@ component("wm") {
+   }
+ }
+ 
+-static_library("test_support") {
++jumbo_static_library("test_support") {
+   testonly = true
+   sources = [
+     "test/testing_cursor_client_observer.cc",
+diff --git a/ui/wm/public/BUILD.gn b/ui/wm/public/BUILD.gn
+index e27ef11fd4..15b7e911c9 100644
+--- a/ui/wm/public/BUILD.gn
++++ b/ui/wm/public/BUILD.gn
+@@ -2,11 +2,12 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ 
+ assert(use_aura)
+ 
+-component("public") {
++jumbo_component("public") {
+   output_name = "wm_public"
+ 
+   public = [
+--- a/ui/gl/BUILD.gn
++++ b/ui/gl/BUILD.gn
+@@ -143,6 +143,7 @@
+     "trace_util.cc",
+     "trace_util.h",
+   ]
++  jumbo_excluded_sources = []
+ 
+   configs += [ "//build/config:precompiled_headers" ]
+   defines = [ "GL_IMPLEMENTATION" ]
+@@ -185,6 +186,9 @@
+       "gl_angle_util_vulkan.cc",
+       "gl_angle_util_vulkan.h",
+     ]
++    jumbo_excluded_sources += [
++      "gl_angle_util_vulkan.cc",
++    ]
+   }
+ 
+   if (use_ozone) {
+@@ -326,7 +330,7 @@
+     defines += [ "GL_SILENCE_DEPRECATION" ]
+   }
+ 
+-  jumbo_excluded_sources = [
++  jumbo_excluded_sources += [
+     "presenter.cc",
+   ]
+ 
+--- a/ui/views/accessibility/accessibility_paint_checks.cc
++++ b/ui/views/accessibility/accessibility_paint_checks.cc
+@@ -12,6 +12,7 @@
+ #include "ui/base/class_property.h"
+ #include "ui/views/accessibility/view_accessibility.h"
+ #include "ui/views/view.h"
++#include "ui/views/view_class_properties.h"
+ #include "ui/views/view_utils.h"
+ #include "ui/views/widget/widget.h"
+ 
+--- a/ui/views/BUILD.gn
++++ b/ui/views/BUILD.gn
+@@ -531,6 +531,11 @@
+     "windows_stationarity_monitor.cc",
+   ]
+ 
++  jumbo_excluded_sources = [
++    # explicit specialization of 'GetProperty<CLASS *>' after instantiation
++    "view_class_properties.cc",
++  ]
++
+   # Other targets in this file (e.g. tests) get access to the internal headers.
+   friend = [ ":*" ]
+ 
+--- a/ui/views/accessibility/ax_window_obj_wrapper.cc
++++ b/ui/views/accessibility/ax_window_obj_wrapper.cc
+@@ -23,6 +23,7 @@
+ #include "ui/base/ime/text_input_client.h"
+ #include "ui/compositor/layer.h"
+ #include "ui/views/accessibility/ax_aura_obj_cache.h"
++#include "ui/views/view_class_properties.h"
+ #include "ui/views/widget/widget.h"
+ 
+ #if BUILDFLAG(IS_CHROMEOS_LACROS)
+--- a/ui/shell_dialogs/BUILD.gn
++++ b/ui/shell_dialogs/BUILD.gn
+@@ -30,6 +30,8 @@
+     "shell_dialogs_export.h",
+   ]
+ 
++  jumbo_excluded_sources = []
++
+   defines = [ "SHELL_DIALOGS_IMPLEMENTATION" ]
+ 
+   deps = [
+@@ -55,6 +57,10 @@
+       "shell_dialog_linux.cc",
+       "shell_dialog_linux.h",
+     ]
++    jumbo_excluded_sources += [
++      # kUnknown is ambiguous
++      "shell_dialog_linux.cc",
++    ]
+     deps += [
+       "//components/dbus/thread_linux",
+       "//ui/linux:linux_ui",

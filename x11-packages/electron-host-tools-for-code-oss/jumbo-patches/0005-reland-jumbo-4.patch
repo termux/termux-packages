@@ -1,0 +1,1514 @@
+From 2d8121323286f062413f3dce1540665b95740d45 Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <licy183@termux.dev>
+Date: Thu, 17 Apr 2025 03:03:03 +0800
+Subject: [PATCH] reland jumbo 4
+
+Enable jumbo build for the following template(s):
+
+- //v8/gni/v8.gni -> template("v8_source_set")
+- //v8/gni/v8.gni -> template("v8_header_set")
+
+---
+ BUILD.gn                                      | 86 +++++++++++++++++++
+ gni/v8.gni                                    |  7 +-
+ src/baseline/arm/baseline-compiler-arm-inl.h  |  2 +
+ src/baseline/baseline-compiler.cc             |  4 +
+ src/compiler/backend/instruction.h            |  4 +-
+ .../wasm-load-elimination-reducer.h           |  1 +
+ src/compiler/wasm-compiler.cc                 | 36 ++++----
+ src/diagnostics/perf-jit.cc                   |  2 +
+ src/handles/global-handles.cc                 |  4 +-
+ src/heap/code-range.cc                        | 10 +--
+ src/heap/cppgc/concurrent-marker.cc           |  4 +
+ src/heap/cppgc/marker.cc                      |  4 +
+ src/heap/minor-mark-sweep.cc                  |  6 +-
+ src/inspector/BUILD.gn                        |  1 +
+ src/inspector/value-mirror.cc                 | 10 +--
+ .../default-thread-isolated-allocator.cc      |  2 +
+ src/maglev/arm/maglev-ir-arm.cc               |  2 +
+ src/maglev/maglev-assembler-inl.h             |  4 +-
+ src/maglev/maglev-assembler.cc                |  2 +
+ src/maglev/maglev-code-generator.cc           |  4 +-
+ src/maglev/maglev-ir.cc                       |  2 +
+ src/objects/js-atomics-synchronization.h      |  8 +-
+ src/objects/js-collator.cc                    |  4 +
+ src/objects/js-duration-format.cc             |  4 +-
+ src/objects/js-list-format.cc                 |  4 +-
+ src/objects/js-plural-rules.cc                |  4 +
+ .../experimental/experimental-compiler.cc     |  4 +-
+ src/regexp/regexp-compiler-tonode.cc          | 16 ++--
+ src/sandbox/testing.cc                        |  1 +
+ src/snapshot/read-only-deserializer.cc        |  4 +-
+ src/torque/csa-generator.cc                   |  8 +-
+ src/utils/sha-256.cc                          |  3 +
+ src/wasm/wasm-external-refs.cc                |  3 +
+ src/wasm/wrappers.cc                          |  2 +
+ 34 files changed, 196 insertions(+), 66 deletions(-)
+
+diff --git a/BUILD.gn b/BUILD.gn
+index 92e85419..cded6cc8 100644
+--- a/v8/BUILD.gn
++++ b/v8/BUILD.gn
+@@ -7,6 +7,7 @@ import("//build/config/arm.gni")
+ import("//build/config/coverage/coverage.gni")
+ import("//build/config/dcheck_always_on.gni")
+ import("//build/config/host_byteorder.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/mips.gni")
+ import("//build/config/riscv.gni")
+ import("//build/config/sanitizers/sanitizers.gni")
+@@ -2962,26 +2963,54 @@ v8_source_set("v8_initializers") {
+     ]
+   }
+ 
++  jumbo_excluded_sources = [
++    # TODO(mostynb@vewd.com): don't exclude these http://crbug.com/752428
++    "src/builtins/builtins-async-iterator-gen.cc",
++    "src/builtins/builtins-async-generator-gen.cc",
++
++    # These source files take an unusually large amount of time to
++    # compile.  Build them separately to avoid bottlenecks.
++    "src/builtins/builtins-regexp-gen.cc",
++    "src/codegen/code-stub-assembler.cc",
++
++    # FIXME: Too many errors
++    "src/ic/binary-op-assembler.cc",
++    "src/ic/unary-op-assembler.cc",
++    "src/interpreter/interpreter-generator.cc",
++  ]
++
+   if (v8_current_cpu == "x86") {
+     sources += [
+       ### gcmole(ia32) ###
+       "src/builtins/ia32/builtins-ia32.cc",
+     ]
++    jumbo_excluded_sources += [
++      "src/builtins/ia32/builtins-ia32.cc",
++    ]
+   } else if (v8_current_cpu == "x64") {
+     sources += [
+       ### gcmole(x64) ###
+       "src/builtins/x64/builtins-x64.cc",
+     ]
++    jumbo_excluded_sources += [
++      "src/builtins/x64/builtins-x64.cc",
++    ]
+   } else if (v8_current_cpu == "arm") {
+     sources += [
+       ### gcmole(arm) ###
+       "src/builtins/arm/builtins-arm.cc",
+     ]
++    jumbo_excluded_sources += [
++      "src/builtins/arm/builtins-arm.cc",
++    ]
+   } else if (v8_current_cpu == "arm64") {
+     sources += [
+       ### gcmole(arm64) ###
+       "src/builtins/arm64/builtins-arm64.cc",
+     ]
++    jumbo_excluded_sources += [
++      "src/builtins/arm64/builtins-arm64.cc",
++    ]
+   } else if (v8_current_cpu == "mips64" || v8_current_cpu == "mips64el") {
+     sources += [
+       ### gcmole(mips64el) ###
+@@ -4965,6 +4994,9 @@ v8_compiler_sources = [
+   "src/compiler/verifier.cc",
+   "src/compiler/zone-stats.cc",
+ ]
++v8_compiler_sources_jumbo_excluded = [
++  "src/compiler/bytecode-analysis.cc",
++]
+ 
+ if (v8_current_cpu == "x86") {
+   v8_compiler_sources += [
+@@ -4973,6 +5005,11 @@ if (v8_current_cpu == "x86") {
+     "src/compiler/backend/ia32/instruction-scheduler-ia32.cc",
+     "src/compiler/backend/ia32/instruction-selector-ia32.cc",
+   ]
++  v8_compiler_sources_jumbo_excluded += [
++    # `using namespace turboshaft` causes `Type` ambiguous
++    "src/compiler/backend/ia32/instruction-selector-ia32.cc",
++  ]
++
+ } else if (v8_current_cpu == "x64") {
+   v8_compiler_sources += [
+     ### gcmole(x64) ###
+@@ -4981,6 +5018,9 @@ if (v8_current_cpu == "x86") {
+     "src/compiler/backend/x64/instruction-selector-x64.cc",
+     "src/compiler/backend/x64/unwinding-info-writer-x64.cc",
+   ]
++  v8_compiler_sources_jumbo_excluded += [
++    "src/compiler/backend/x64/instruction-selector-x64.cc", # Ditto
++  ]
+ } else if (v8_current_cpu == "arm") {
+   v8_compiler_sources += [
+     ### gcmole(arm) ###
+@@ -4989,6 +5029,9 @@ if (v8_current_cpu == "x86") {
+     "src/compiler/backend/arm/instruction-selector-arm.cc",
+     "src/compiler/backend/arm/unwinding-info-writer-arm.cc",
+   ]
++  v8_compiler_sources_jumbo_excluded += [
++    "src/compiler/backend/arm/instruction-selector-arm.cc", # Ditto
++  ]
+ } else if (v8_current_cpu == "arm64") {
+   v8_compiler_sources += [
+     ### gcmole(arm64) ###
+@@ -4997,6 +5040,9 @@ if (v8_current_cpu == "x86") {
+     "src/compiler/backend/arm64/instruction-selector-arm64.cc",
+     "src/compiler/backend/arm64/unwinding-info-writer-arm64.cc",
+   ]
++  v8_compiler_sources_jumbo_excluded += [
++    "src/compiler/backend/arm64/instruction-selector-arm64.cc", # Ditto
++  ]
+ } else if (v8_current_cpu == "mips64" || v8_current_cpu == "mips64el") {
+   v8_compiler_sources += [
+     ### gcmole(mips64el) ###
+@@ -5095,6 +5141,7 @@ v8_source_set("v8_compiler_for_mksnapshot_source_set") {
+   visibility = [ ":*" ]  # Only targets in this file can depend on this.
+ 
+   sources = v8_compiler_sources
++  jumbo_excluded_sources = v8_compiler_sources_jumbo_excluded
+ 
+   public_deps = [
+     ":generate_bytecode_builtins_list",
+@@ -5129,6 +5176,7 @@ v8_source_set("v8_compiler") {
+ 
+   if (v8_enable_turbofan) {
+     sources = v8_compiler_sources
++    jumbo_excluded_sources = v8_compiler_sources_jumbo_excluded
+   } else {
+     # With Turbofan disabled, we only include the stubbed-out API.
+     sources = [ "src/compiler/turbofan-disabled.cc" ]
+@@ -5749,6 +5797,8 @@ v8_source_set("v8_base_without_compiler") {
+     ]
+   }
+ 
++  jumbo_excluded_sources = []
++
+   if (v8_enable_maglev) {
+     sources += [
+       "src/maglev/maglev-assembler.cc",
+@@ -5781,6 +5831,10 @@ v8_source_set("v8_base_without_compiler") {
+         "src/maglev/x64/maglev-assembler-x64.cc",
+         "src/maglev/x64/maglev-ir-x64.cc",
+       ]
++      jumbo_excluded_sources += [
++        "src/maglev/x64/maglev-assembler-x64.cc",
++        "src/maglev/x64/maglev-ir-x64.cc",
++      ]
+     } else if (v8_current_cpu == "s390x") {
+       sources += [
+         "src/maglev/s390/maglev-assembler-s390.cc",
+@@ -5795,6 +5849,13 @@ v8_source_set("v8_base_without_compiler") {
+       "src/tracing/perfetto-logger.cc",
+       "src/tracing/perfetto-utils.cc",
+     ]
++    jumbo_excluded_sources += [
++      "src/asmjs/asm-js.cc",
++      "src/asmjs/asm-parser.cc",
++      "src/asmjs/asm-scanner.cc",
++      "src/wasm/turboshaft-graph-interface.cc",
++      "src/wasm/wasm-module.cc",
++    ]
+   }
+ 
+   if (v8_enable_webassembly) {
+@@ -5890,6 +5951,26 @@ v8_source_set("v8_base_without_compiler") {
+     sources += [ "src/heap/reference-summarizer.cc" ]
+   }
+ 
++  jumbo_excluded_sources += [
++    "src/execution/clobber-registers.cc", # Host asm vs target asm includes
++    # TODO(mostynb@vewd.com): don't exclude these http://crbug.com/752428
++    "src/profiler/heap-snapshot-generator.cc",  # Macro clash in mman-linux.h
++    "src/heap/local-heap.cc",
++    "src/heap/safepoint.cc",
++    "src/objects/js-display-names.cc",
++    "src/objects/js-relative-time-format.cc",
++    "src/objects/js-temporal-objects.cc",
++    "src/utils/ostreams.cc",
++
++    # These source files take an unusually large amount of time to
++    # compile.  Build them separately to avoid bottlenecks.
++    "src/api/api.cc",
++    "src/heap/heap.cc",
++    "src/objects/elements.cc",
++    "src/objects/objects.cc",
++    "src/parsing/parser.cc",
++  ]
++
+   if (v8_current_cpu == "x86") {
+     sources += [
+       ### gcmole(ia32) ###
+@@ -5997,6 +6078,11 @@ v8_source_set("v8_base_without_compiler") {
+     if (is_win) {
+       sources += [ "src/diagnostics/unwinding-info-win64.cc" ]
+     }
++    jumbo_excluded_sources += [
++      # TODO(mostynb@vewd.com): fix this code so it doesn't need
++      # to be excluded, see the comments inside.
++      "src/codegen/arm64/instructions-arm64-constants.cc",
++    ]
+   } else if (v8_current_cpu == "mips64" || v8_current_cpu == "mips64el") {
+     sources += [
+       ### gcmole(mips64el) ###
+diff --git a/gni/v8.gni b/gni/v8.gni
+index 9ee57a49..5aa1b49b 100644
+--- a/v8/gni/v8.gni
++++ b/v8/gni/v8.gni
+@@ -4,6 +4,7 @@
+ 
+ import("//build/config/chrome_build.gni")
+ import("//build/config/compiler/pgo/pgo.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/gclient_args.gni")
+ import("//build/config/ios/config.gni")
+ import("//build/config/ios/ios_sdk_overrides.gni")
+@@ -299,9 +300,9 @@ template("v8_source_set") {
+       defined(v8_static_library) && v8_static_library && is_win) {
+     link_target_type = "split_static_library"
+   } else if (defined(v8_static_library) && v8_static_library) {
+-    link_target_type = "static_library"
++    link_target_type = "jumbo_static_library"
+   } else {
+-    link_target_type = "source_set"
++    link_target_type = "jumbo_source_set"
+   }
+   target(link_target_type, target_name) {
+     forward_variables_from(invoker,
+@@ -320,7 +321,7 @@ template("v8_source_set") {
+ }
+ 
+ template("v8_header_set") {
+-  source_set(target_name) {
++  jumbo_source_set(target_name) {
+     forward_variables_from(invoker, "*", [ "configs" ])
+     configs -= v8_remove_configs
+     configs += v8_add_configs
+diff --git a/src/baseline/arm/baseline-compiler-arm-inl.h b/src/baseline/arm/baseline-compiler-arm-inl.h
+index 6d99dbe5..d6805a0a 100644
+--- a/v8/src/baseline/arm/baseline-compiler-arm-inl.h
++++ b/v8/src/baseline/arm/baseline-compiler-arm-inl.h
+@@ -95,6 +95,8 @@ void BaselineCompiler::VerifyFrameSize() {
+   __ masm()->Assert(eq, AbortReason::kUnexpectedStackPointer);
+ }
+ 
++#undef __
++
+ }  // namespace baseline
+ }  // namespace internal
+ }  // namespace v8
+diff --git a/src/baseline/baseline-compiler.cc b/src/baseline/baseline-compiler.cc
+index 37a0dfbb..31f3e3da 100644
+--- a/v8/src/baseline/baseline-compiler.cc
++++ b/v8/src/baseline/baseline-compiler.cc
+@@ -2412,6 +2412,10 @@ SaveAccumulatorScope::~SaveAccumulatorScope() {
+   assembler_->Pop(kInterpreterAccumulatorRegister);
+ }
+ 
++#undef  __
++
++#undef  __
++
+ }  // namespace baseline
+ }  // namespace internal
+ }  // namespace v8
+diff --git a/src/compiler/backend/instruction.h b/src/compiler/backend/instruction.h
+index 93778525..34a9f41b 100644
+--- a/v8/src/compiler/backend/instruction.h
++++ b/v8/src/compiler/backend/instruction.h
+@@ -519,9 +519,9 @@ class LocationOperand : public InstructionOperand {
+     return static_cast<int64_t>(value_) >> IndexField::kShift;
+   }
+ 
+-  Register GetRegister() const {
++  v8::internal::Register GetRegister() const {
+     DCHECK(IsRegister());
+-    return Register::from_code(register_code());
++    return v8::internal::Register::from_code(register_code());
+   }
+ 
+   FloatRegister GetFloatRegister() const {
+diff --git a/src/compiler/turboshaft/wasm-load-elimination-reducer.h b/src/compiler/turboshaft/wasm-load-elimination-reducer.h
+index ee5aa71f..6c4cc1af 100644
+--- a/v8/src/compiler/turboshaft/wasm-load-elimination-reducer.h
++++ b/v8/src/compiler/turboshaft/wasm-load-elimination-reducer.h
+@@ -530,6 +530,7 @@ class WasmLoadEliminationReducer : public Next {
+   EMIT_OP(StringAsWtf16)
+   EMIT_OP(StringPrepareForGetCodeUnit)
+   EMIT_OP(AnyConvertExtern)
++#undef EMIT_OP
+ 
+   OpIndex REDUCE_INPUT_GRAPH(StructSet)(OpIndex ig_index,
+                                         const StructSetOp& op) {
+diff --git a/src/compiler/wasm-compiler.cc b/src/compiler/wasm-compiler.cc
+index 232eb796..184a4f92 100644
+--- a/v8/src/compiler/wasm-compiler.cc
++++ b/v8/src/compiler/wasm-compiler.cc
+@@ -117,7 +117,7 @@ MachineType assert_size(int expected_size, MachineType type) {
+ 
+ // Use MachineType::Pointer() over Tagged() to load root pointers because they
+ // do not get compressed.
+-#define LOAD_ROOT(RootName, factory_name)                         \
++#define LOAD_ROOT_IN_WASM_COMPILER(RootName, factory_name)                         \
+   (isolate_ ? graph()->NewNode(mcgraph()->common()->HeapConstant( \
+                   isolate_->factory()->factory_name()))           \
+             : gasm_->LoadImmutable(                               \
+@@ -402,8 +402,8 @@ Node* WasmGraphBuilder::RefNull(wasm::ValueType type) {
+   return parameter_mode_ == kInstanceParameterMode ? gasm_->Null(type)
+          : (type == wasm::kWasmExternRef || type == wasm::kWasmNullExternRef ||
+             type == wasm::kWasmExnRef || type == wasm::kWasmNullExnRef)
+-             ? LOAD_ROOT(NullValue, null_value)
+-             : LOAD_ROOT(WasmNull, wasm_null);
++             ? LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value)
++             : LOAD_ROOT_IN_WASM_COMPILER(WasmNull, wasm_null);
+ }
+ 
+ Node* WasmGraphBuilder::RefFunc(uint32_t function_index) {
+@@ -453,7 +453,7 @@ Node* WasmGraphBuilder::Int64Constant(int64_t value) {
+ }
+ 
+ Node* WasmGraphBuilder::UndefinedValue() {
+-  return LOAD_ROOT(UndefinedValue, undefined_value);
++  return LOAD_ROOT_IN_WASM_COMPILER(UndefinedValue, undefined_value);
+ }
+ 
+ void WasmGraphBuilder::StackCheck(
+@@ -2409,7 +2409,7 @@ Node* WasmGraphBuilder::LoadTagFromTable(uint32_t tag_index) {
+ Node* WasmGraphBuilder::GetExceptionTag(Node* except_obj) {
+   return gasm_->CallBuiltin(
+       Builtin::kWasmGetOwnProperty, Operator::kEliminatable, except_obj,
+-      LOAD_ROOT(wasm_exception_tag_symbol, wasm_exception_tag_symbol),
++      LOAD_ROOT_IN_WASM_COMPILER(wasm_exception_tag_symbol, wasm_exception_tag_symbol),
+       LOAD_INSTANCE_FIELD(NativeContext, MachineType::TaggedPointer()));
+ }
+ 
+@@ -2418,7 +2418,7 @@ Node* WasmGraphBuilder::GetExceptionValues(Node* except_obj,
+                                            base::Vector<Node*> values) {
+   Node* values_array = gasm_->CallBuiltin(
+       Builtin::kWasmGetOwnProperty, Operator::kEliminatable, except_obj,
+-      LOAD_ROOT(wasm_exception_values_symbol, wasm_exception_values_symbol),
++      LOAD_ROOT_IN_WASM_COMPILER(wasm_exception_values_symbol, wasm_exception_values_symbol),
+       LOAD_INSTANCE_FIELD(NativeContext, MachineType::TaggedPointer()));
+   uint32_t index = 0;
+   const wasm::WasmTagSig* sig = tag->sig;
+@@ -5406,7 +5406,7 @@ void WasmGraphBuilder::ElemDrop(uint32_t elem_segment_index,
+       LOAD_INSTANCE_FIELD(ElementSegments, MachineType::TaggedPointer());
+   gasm_->StoreFixedArrayElement(
+       elem_segments, elem_segment_index,
+-      LOAD_ROOT(EmptyFixedArray, empty_fixed_array),
++      LOAD_ROOT_IN_WASM_COMPILER(EmptyFixedArray, empty_fixed_array),
+       ObjectAccess(MachineType::TaggedPointer(), kFullWriteBarrier));
+ }
+ 
+@@ -5517,7 +5517,7 @@ Node* WasmGraphBuilder::StructNew(uint32_t struct_index,
+   gasm_->InitializeImmutableInObject(
+       ObjectAccess(MachineType::TaggedPointer(), kNoWriteBarrier), s,
+       wasm::ObjectAccess::ToTagged(JSReceiver::kPropertiesOrHashOffset),
+-      LOAD_ROOT(EmptyFixedArray, empty_fixed_array));
++      LOAD_ROOT_IN_WASM_COMPILER(EmptyFixedArray, empty_fixed_array));
+   for (uint32_t i = 0; i < type->field_count(); i++) {
+     gasm_->StructSet(s, fields[i], type, i, kWithoutNullCheck);
+   }
+@@ -5556,7 +5556,7 @@ Node* WasmGraphBuilder::ArrayNew(uint32_t array_index,
+   gasm_->InitializeImmutableInObject(
+       ObjectAccess(MachineType::TaggedPointer(), kNoWriteBarrier), a,
+       wasm::ObjectAccess::ToTagged(JSReceiver::kPropertiesOrHashOffset),
+-      LOAD_ROOT(EmptyFixedArray, empty_fixed_array));
++      LOAD_ROOT_IN_WASM_COMPILER(EmptyFixedArray, empty_fixed_array));
+   gasm_->ArrayInitializeLength(a, length);
+ 
+   ArrayFillImpl(a, gasm_->Int32Constant(0),
+@@ -5580,7 +5580,7 @@ Node* WasmGraphBuilder::ArrayNewFixed(const wasm::ArrayType* type, Node* rtt,
+   gasm_->InitializeImmutableInObject(
+       ObjectAccess(MachineType::TaggedPointer(), kNoWriteBarrier), array,
+       wasm::ObjectAccess::ToTagged(JSReceiver::kPropertiesOrHashOffset),
+-      LOAD_ROOT(EmptyFixedArray, empty_fixed_array));
++      LOAD_ROOT_IN_WASM_COMPILER(EmptyFixedArray, empty_fixed_array));
+   gasm_->ArrayInitializeLength(
+       array, SetType(Int32Constant(static_cast<int>(elements.size())),
+                      wasm::kWasmI32));
+@@ -6802,7 +6802,7 @@ Node* WasmGraphBuilder::WellKnown_StringIndexOf(
+         gasm_->MakeLabel(MachineRepresentation::kTaggedPointer);
+     gasm_->GotoIfNot(IsNull(search, wasm::kWasmStringRef), &search_not_null,
+                      search);
+-    Node* null_string = LOAD_ROOT(null_string, null_string);
++    Node* null_string = LOAD_ROOT_IN_WASM_COMPILER(null_string, null_string);
+     gasm_->Goto(&search_not_null, null_string);
+     gasm_->Bind(&search_not_null);
+     search = search_not_null.PhiAt(0);
+@@ -7263,7 +7263,7 @@ class WasmWrapperGraphBuilder : public WasmGraphBuilder {
+             return node;
+           case wasm::HeapType::kNone:
+           case wasm::HeapType::kNoFunc:
+-            return LOAD_ROOT(NullValue, null_value);
++            return LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value);
+           case wasm::HeapType::kEq:
+           case wasm::HeapType::kStruct:
+           case wasm::HeapType::kArray:
+@@ -7272,7 +7272,7 @@ class WasmWrapperGraphBuilder : public WasmGraphBuilder {
+           case wasm::HeapType::kAny: {
+             auto done = gasm_->MakeLabel(MachineRepresentation::kTaggedPointer);
+             gasm_->GotoIfNot(IsNull(node, type), &done, node);
+-            gasm_->Goto(&done, LOAD_ROOT(NullValue, null_value));
++            gasm_->Goto(&done, LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value));
+             gasm_->Bind(&done);
+             return done.PhiAt(0);
+           }
+@@ -7303,14 +7303,14 @@ class WasmWrapperGraphBuilder : public WasmGraphBuilder {
+                   Operator::kNoProperties, internal, context);
+               gasm_->Goto(&done, from_builtin);
+               gasm_->Bind(&null_label);
+-              gasm_->Goto(&done, LOAD_ROOT(NullValue, null_value));
++              gasm_->Goto(&done, LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value));
+               gasm_->Bind(&done);
+               return done.PhiAt(0);
+             } else {
+               auto done =
+                   gasm_->MakeLabel(MachineRepresentation::kTaggedPointer);
+               gasm_->GotoIfNot(IsNull(node, type), &done, node);
+-              gasm_->Goto(&done, LOAD_ROOT(NullValue, null_value));
++              gasm_->Goto(&done, LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value));
+               gasm_->Bind(&done);
+               return done.PhiAt(0);
+             }
+@@ -7354,7 +7354,7 @@ class WasmWrapperGraphBuilder : public WasmGraphBuilder {
+     if (type.is_nullable()) {
+       auto not_null = gasm_->MakeLabel();
+       gasm_->GotoIfNot(IsNull(input, wasm::kWasmExternRef), &not_null);
+-      gasm_->Goto(&done, LOAD_ROOT(WasmNull, wasm_null));
++      gasm_->Goto(&done, LOAD_ROOT_IN_WASM_COMPILER(WasmNull, wasm_null));
+       gasm_->Bind(&not_null);
+     }
+     Node* map = gasm_->LoadMap(input);
+@@ -7664,7 +7664,7 @@ class WasmWrapperGraphBuilder : public WasmGraphBuilder {
+         auto done = gasm_->MakeLabel();
+         gasm_->GotoIf(IsSmi(input), &done);
+         Node* map = gasm_->LoadMap(input);
+-        Node* heap_number_map = LOAD_ROOT(HeapNumberMap, heap_number_map);
++        Node* heap_number_map = LOAD_ROOT_IN_WASM_COMPILER(HeapNumberMap, heap_number_map);
+ #if V8_MAP_PACKING
+         Node* is_heap_number = gasm_->WordEqual(heap_number_map, map);
+ #else
+@@ -9226,7 +9226,7 @@ AssemblerOptions WasmStubAssemblerOptions() {
+ #undef WASM_INSTANCE_OBJECT_SIZE
+ #undef LOAD_INSTANCE_FIELD
+ #undef LOAD_MUTABLE_INSTANCE_FIELD
+-#undef LOAD_ROOT
++#undef LOAD_ROOT_IN_WASM_COMPILER
+ #undef LOAD_MUTABLE_ROOT
+ 
+ }  // namespace compiler
+diff --git a/src/diagnostics/perf-jit.cc b/src/diagnostics/perf-jit.cc
+index 2423c8a9..661c5a2d 100644
+--- a/v8/src/diagnostics/perf-jit.cc
++++ b/v8/src/diagnostics/perf-jit.cc
+@@ -37,6 +37,8 @@
+ #include <sys/mman.h>
+ #include <unistd.h>
+ 
++#undef MAP_TYPE
++
+ #include <memory>
+ 
+ #include "src/base/platform/wrappers.h"
+diff --git a/src/handles/global-handles.cc b/src/handles/global-handles.cc
+index 1d046648..e135f1c3 100644
+--- a/v8/src/handles/global-handles.cc
++++ b/v8/src/handles/global-handles.cc
+@@ -756,7 +756,7 @@ void GlobalHandles::InvokeSecondPassPhantomCallbacks() {
+   if (scope.CheckReenter()) {
+     TRACE_EVENT0("v8", "V8.GCPhantomHandleProcessingCallback");
+     isolate()->heap()->CallGCPrologueCallbacks(
+-        GCType::kGCTypeProcessWeakCallbacks, kNoGCCallbackFlags,
++        v8::GCType::kGCTypeProcessWeakCallbacks, kNoGCCallbackFlags,
+         GCTracer::Scope::HEAP_EXTERNAL_PROLOGUE);
+     {
+       TRACE_GC(isolate_->heap()->tracer(),
+@@ -768,7 +768,7 @@ void GlobalHandles::InvokeSecondPassPhantomCallbacks() {
+       }
+     }
+     isolate()->heap()->CallGCEpilogueCallbacks(
+-        GCType::kGCTypeProcessWeakCallbacks, kNoGCCallbackFlags,
++        v8::GCType::kGCTypeProcessWeakCallbacks, kNoGCCallbackFlags,
+         GCTracer::Scope::HEAP_EXTERNAL_EPILOGUE);
+   }
+ }
+diff --git a/src/heap/code-range.cc b/src/heap/code-range.cc
+index ce03e353..f2fd6623 100644
+--- a/v8/src/heap/code-range.cc
++++ b/v8/src/heap/code-range.cc
+@@ -92,7 +92,7 @@ size_t CodeRange::GetWritableReservedAreaSize() {
+   return kReservedCodeRangePages * MemoryAllocator::GetCommitPageSize();
+ }
+ 
+-#define TRACE(...) \
++#define TRACE_IN_CODE_RANGE(...) \
+   if (v8_flags.trace_code_range_allocation) PrintF(__VA_ARGS__)
+ 
+ bool CodeRange::InitReservation(v8::PageAllocator* page_allocator,
+@@ -141,7 +141,7 @@ bool CodeRange::InitReservation(v8::PageAllocator* page_allocator,
+       kMaxPCRelativeCodeRangeInMB > 1024 ? kMaxPCRelativeCodeRangeInMB : 4096;
+   auto preferred_region = GetPreferredRegion(kRadiusInMB, kPageSize);
+ 
+-  TRACE("=== Preferred region: [%p, %p)\n",
++  TRACE_IN_CODE_RANGE("=== Preferred region: [%p, %p)\n",
+         reinterpret_cast<void*>(preferred_region.begin()),
+         reinterpret_cast<void*>(preferred_region.end()));
+ 
+@@ -170,10 +170,10 @@ bool CodeRange::InitReservation(v8::PageAllocator* page_allocator,
+     Address step =
+         RoundDown(preferred_region.size() / kAllocationTries, kPageSize);
+     for (int i = 0; i < kAllocationTries; i++) {
+-      TRACE("=== Attempt #%d, hint=%p\n", i,
++      TRACE_IN_CODE_RANGE("=== Attempt #%d, hint=%p\n", i,
+             reinterpret_cast<void*>(params.requested_start_hint));
+       if (candidate_cage.InitReservation(params)) {
+-        TRACE("=== Attempt #%d (%p): [%p, %p)\n", i,
++        TRACE_IN_CODE_RANGE("=== Attempt #%d (%p): [%p, %p)\n", i,
+               reinterpret_cast<void*>(params.requested_start_hint),
+               reinterpret_cast<void*>(candidate_cage.region().begin()),
+               reinterpret_cast<void*>(candidate_cage.region().end()));
+@@ -201,7 +201,7 @@ bool CodeRange::InitReservation(v8::PageAllocator* page_allocator,
+       params.requested_start_hint = kNullAddress;
+       if (!VirtualMemoryCage::InitReservation(params)) return false;
+     };
+-    TRACE("=== Fallback attempt, hint=%p: [%p, %p)\n",
++    TRACE_IN_CODE_RANGE("=== Fallback attempt, hint=%p: [%p, %p)\n",
+           reinterpret_cast<void*>(params.requested_start_hint),
+           reinterpret_cast<void*>(region().begin()),
+           reinterpret_cast<void*>(region().end()));
+diff --git a/src/heap/cppgc/concurrent-marker.cc b/src/heap/cppgc/concurrent-marker.cc
+index 2c9401b6..5b1e1862 100644
+--- a/v8/src/heap/cppgc/concurrent-marker.cc
++++ b/v8/src/heap/cppgc/concurrent-marker.cc
+@@ -19,6 +19,8 @@ namespace {
+ static constexpr double kMarkingScheduleRatioBeforeConcurrentPriorityIncrease =
+     0.5;
+ 
++#define kDefaultDeadlineCheckInterval kDefaultDeadlineCheckInterval_ConcurrentMarker
++
+ static constexpr size_t kDefaultDeadlineCheckInterval = 750u;
+ 
+ template <size_t kDeadlineCheckInterval = kDefaultDeadlineCheckInterval,
+@@ -266,3 +268,5 @@ std::unique_ptr<Visitor> ConcurrentMarker::CreateConcurrentMarkingVisitor(
+ 
+ }  // namespace internal
+ }  // namespace cppgc
++
++#undef kDefaultDeadlineCheckInterval
+diff --git a/src/heap/cppgc/marker.cc b/src/heap/cppgc/marker.cc
+index 369f852b..ef36b477 100644
+--- a/v8/src/heap/cppgc/marker.cc
++++ b/v8/src/heap/cppgc/marker.cc
+@@ -57,6 +57,8 @@ bool ExitIncrementalMarkingIfNeeded(MarkingConfig config, HeapBase& heap) {
+   return false;
+ }
+ 
++#define kDefaultDeadlineCheckInterval kDefaultDeadlineCheckInterval_Marker
++
+ static constexpr size_t kDefaultDeadlineCheckInterval = 150u;
+ 
+ template <size_t kDeadlineCheckInterval = kDefaultDeadlineCheckInterval,
+@@ -796,3 +798,5 @@ Marker::Marker(HeapBase& heap, cppgc::Platform* platform, MarkingConfig config)
+ 
+ }  // namespace internal
+ }  // namespace cppgc
++
++#undef kDefaultDeadlineCheckInterval
+diff --git a/src/heap/minor-mark-sweep.cc b/src/heap/minor-mark-sweep.cc
+index bcf1e0fa..6cabdca6 100644
+--- a/v8/src/heap/minor-mark-sweep.cc
++++ b/v8/src/heap/minor-mark-sweep.cc
+@@ -838,7 +838,7 @@ namespace {
+ 
+ // NewSpacePages with more live bytes than this threshold qualify for fast
+ // evacuation.
+-intptr_t NewSpacePageEvacuationThreshold() {
++intptr_t NewSpacePageEvacuationThreshold2() {
+   return v8_flags.minor_ms_page_promotion_threshold *
+          MemoryChunkLayout::AllocatableMemoryInDataPage() / 100;
+ }
+@@ -850,7 +850,7 @@ bool ShouldMovePage(PageMetadata* p, intptr_t live_bytes,
+   Heap* heap = p->heap();
+   DCHECK(!p->Chunk()->NeverEvacuate());
+   const bool should_move_page =
+-      ((live_bytes + wasted_bytes) > NewSpacePageEvacuationThreshold() ||
++      ((live_bytes + wasted_bytes) > NewSpacePageEvacuationThreshold2() ||
+        (p->AllocatedLabSize() == 0)) &&
+       (heap->new_space()->IsPromotionCandidate(p)) &&
+       heap->CanExpandOldGeneration(live_bytes);
+@@ -861,7 +861,7 @@ bool ShouldMovePage(PageMetadata* p, intptr_t live_bytes,
+         ", live bytes = %zu, wasted bytes = %zu, promotion threshold = %zu"
+         ", allocated labs size = %zu\n",
+         p, should_move_page, live_bytes, wasted_bytes,
+-        NewSpacePageEvacuationThreshold(), p->AllocatedLabSize());
++        NewSpacePageEvacuationThreshold2(), p->AllocatedLabSize());
+   }
+   if (!should_move_page &&
+       (p->AgeInNewSpace() == v8_flags.minor_ms_max_page_age)) {
+diff --git a/src/inspector/BUILD.gn b/src/inspector/BUILD.gn
+index 9a863232..422ea603 100644
+--- a/v8/src/inspector/BUILD.gn
++++ b/v8/src/inspector/BUILD.gn
+@@ -171,6 +171,7 @@ v8_source_set("inspector") {
+     "value-mirror.cc",
+     "value-mirror.h",
+   ]
++  jumbo_excluded_sources = [ "value-mirror.cc" ]
+ }
+ 
+ #Target to generate all .cc files.
+diff --git a/src/inspector/value-mirror.cc b/src/inspector/value-mirror.cc
+index 5cecb472..25e1c63d 100644
+--- a/v8/src/inspector/value-mirror.cc
++++ b/v8/src/inspector/value-mirror.cc
+@@ -200,7 +200,7 @@ String16 abbreviateString(const String16& value, AbbreviateMode mode) {
+   return String16::concat(value.substring(0, maxLength - 1), ellipsis);
+ }
+ 
+-String16 descriptionForSymbol(v8::Local<v8::Context> context,
++String16 descriptionForSymbol2(v8::Local<v8::Context> context,
+                               v8::Local<v8::Symbol> symbol) {
+   v8::Isolate* isolate = context->GetIsolate();
+   return String16::concat(
+@@ -711,7 +711,7 @@ class SymbolMirror final : public ValueMirrorBase {
+         v8Value(context->GetIsolate()).As<v8::Symbol>();
+     *result = RemoteObject::create()
+                   .setType(RemoteObject::TypeEnum::Symbol)
+-                  .setDescription(descriptionForSymbol(context, value))
++                  .setDescription(descriptionForSymbol2(context, value))
+                   .build();
+     return Response::Success();
+   }
+@@ -726,7 +726,7 @@ class SymbolMirror final : public ValueMirrorBase {
+                    .setName(name)
+                    .setType(RemoteObject::TypeEnum::Symbol)
+                    .setValue(abbreviateString(
+-                       descriptionForSymbol(context, value), kEnd))
++                       descriptionForSymbol2(context, value), kEnd))
+                    .build();
+   }
+ 
+@@ -738,7 +738,7 @@ class SymbolMirror final : public ValueMirrorBase {
+     *preview =
+         ObjectPreview::create()
+             .setType(RemoteObject::TypeEnum::Symbol)
+-            .setDescription(descriptionForSymbol(context, value))
++            .setDescription(descriptionForSymbol2(context, value))
+             .setOverflow(false)
+             .setProperties(std::make_unique<protocol::Array<PropertyPreview>>())
+             .build();
+@@ -1531,7 +1531,7 @@ bool ValueMirror::getProperties(v8::Local<v8::Context> context,
+       name = toProtocolString(isolate, v8Name.As<v8::String>());
+     } else {
+       v8::Local<v8::Symbol> symbol = v8Name.As<v8::Symbol>();
+-      name = descriptionForSymbol(context, symbol);
++      name = descriptionForSymbol2(context, symbol);
+       symbolMirror = ValueMirror::create(context, symbol);
+     }
+ 
+diff --git a/src/libplatform/default-thread-isolated-allocator.cc b/src/libplatform/default-thread-isolated-allocator.cc
+index bda0e43c..36a365b2 100644
+--- a/v8/src/libplatform/default-thread-isolated-allocator.cc
++++ b/v8/src/libplatform/default-thread-isolated-allocator.cc
+@@ -16,6 +16,8 @@
+ #include <unistd.h>
+ #endif
+ 
++#undef MAP_TYPE
++
+ #if V8_HAS_PKU_JIT_WRITE_PROTECT
+ 
+ extern int pkey_alloc(unsigned int flags, unsigned int access_rights) V8_WEAK;
+diff --git a/src/maglev/arm/maglev-ir-arm.cc b/src/maglev/arm/maglev-ir-arm.cc
+index 9a49fec0..35dcef48 100644
+--- a/v8/src/maglev/arm/maglev-ir-arm.cc
++++ b/v8/src/maglev/arm/maglev-ir-arm.cc
+@@ -900,6 +900,8 @@ void Return::GenerateCode(MaglevAssembler* masm, const ProcessingState& state) {
+   __ Ret();
+ }
+ 
++#undef __
++
+ }  // namespace maglev
+ }  // namespace internal
+ }  // namespace v8
+diff --git a/src/maglev/maglev-assembler-inl.h b/src/maglev/maglev-assembler-inl.h
+index fb0229a9..74242adb 100644
+--- a/v8/src/maglev/maglev-assembler-inl.h
++++ b/v8/src/maglev/maglev-assembler-inl.h
+@@ -510,11 +510,11 @@ void CheckArgs(Args&&... args) {}
+ 
+ #endif  // DEBUG
+ 
+-template <typename Descriptor, typename... Args>
++template <typename Descriptor2, typename... Args>
+ void PushArgumentsForBuiltin(MaglevAssembler* masm, std::tuple<Args...> args) {
+   std::apply(
+       [&](auto&&... stack_args) {
+-        if (Descriptor::kStackArgumentOrder == StackArgumentOrder::kDefault) {
++        if (Descriptor2::kStackArgumentOrder == StackArgumentOrder::kDefault) {
+           masm->Push(std::forward<decltype(stack_args)>(stack_args)...);
+         } else {
+           masm->PushReverse(std::forward<decltype(stack_args)>(stack_args)...);
+diff --git a/src/maglev/maglev-assembler.cc b/src/maglev/maglev-assembler.cc
+index c21d2046..13d7f807 100644
+--- a/v8/src/maglev/maglev-assembler.cc
++++ b/v8/src/maglev/maglev-assembler.cc
+@@ -605,6 +605,8 @@ void MaglevAssembler::TryMigrateInstance(Register object,
+   CompareTaggedAndJumpIf(return_val, Smi::zero(), kEqual, fail);
+ }
+ 
++#undef __
++
+ }  // namespace maglev
+ }  // namespace internal
+ }  // namespace v8
+diff --git a/src/maglev/maglev-code-generator.cc b/src/maglev/maglev-code-generator.cc
+index 744d93a5..319a7668 100644
+--- a/v8/src/maglev/maglev-code-generator.cc
++++ b/v8/src/maglev/maglev-code-generator.cc
+@@ -426,7 +426,6 @@ class ParallelMoveResolver {
+       // but otherwise this code cannot be compiled by compilers not yet
+       // implementing CWG2518.
+       static_assert(DecompressIfNeeded && COMPRESS_POINTERS_BOOL);
+-
+       if (targets.needs_decompression == kNeedsDecompression) {
+         __ DecompressTagged(source_reg, source_reg);
+       }
+@@ -473,7 +472,6 @@ class ParallelMoveResolver {
+       // but otherwise this code cannot be compiled by compilers not yet
+       // implementing CWG2518.
+       static_assert(DecompressIfNeeded && COMPRESS_POINTERS_BOOL);
+-
+       if (targets.needs_decompression == kNeedsDecompression) {
+         __ DecompressTagged(register_with_slot_value, register_with_slot_value);
+         targets.needs_decompression = kDoesNotNeedDecompression;
+@@ -2052,6 +2050,8 @@ Handle<DeoptimizationData> MaglevCodeGenerator::GenerateDeoptimizationData(
+   return data;
+ }
+ 
++#undef __
++
+ }  // namespace maglev
+ }  // namespace internal
+ }  // namespace v8
+diff --git a/src/maglev/maglev-ir.cc b/src/maglev/maglev-ir.cc
+index b8b2ad1d..dcb67ada 100644
+--- a/v8/src/maglev/maglev-ir.cc
++++ b/v8/src/maglev/maglev-ir.cc
+@@ -7333,6 +7333,8 @@ void MigrateMapIfNeeded::ClearUnstableNodeAspects(
+   // themselves, so cached values are still valid.
+ }
+ 
++#undef __
++
+ }  // namespace maglev
+ }  // namespace internal
+ }  // namespace v8
+diff --git a/src/objects/js-atomics-synchronization.h b/src/objects/js-atomics-synchronization.h
+index 2950abed..a304ae3b 100644
+--- a/v8/src/objects/js-atomics-synchronization.h
++++ b/v8/src/objects/js-atomics-synchronization.h
+@@ -29,11 +29,11 @@ template <typename T>
+ class AsyncWaiterQueueNode;
+ }  // namespace detail
+ 
+-using detail::WaiterQueueLockGuard;
+-using detail::WaiterQueueNode;
+-using LockAsyncWaiterQueueNode = detail::AsyncWaiterQueueNode<JSAtomicsMutex>;
++using internal::detail::WaiterQueueLockGuard;
++using internal::detail::WaiterQueueNode;
++using LockAsyncWaiterQueueNode = internal::detail::AsyncWaiterQueueNode<JSAtomicsMutex>;
+ using WaitAsyncWaiterQueueNode =
+-    detail::AsyncWaiterQueueNode<JSAtomicsCondition>;
++    internal::detail::AsyncWaiterQueueNode<JSAtomicsCondition>;
+ 
+ // JSSynchronizationPrimitive is the base class for JSAtomicsMutex and
+ // JSAtomicsCondition. It contains a 32-bit state field and a pointer to a
+diff --git a/src/objects/js-collator.cc b/src/objects/js-collator.cc
+index 7d92c39a..0613cc64 100644
+--- a/v8/src/objects/js-collator.cc
++++ b/v8/src/objects/js-collator.cc
+@@ -51,6 +51,8 @@ Maybe<CaseFirst> GetCaseFirst(Isolate* isolate, Handle<JSReceiver> options,
+       CaseFirst::kUndefined);
+ }
+ 
++#define CreateDataPropertyForOptions CreateDataPropertyForOptions_JSCollator
++
+ // TODO(gsathya): Consider internalizing the value strings.
+ void CreateDataPropertyForOptions(Isolate* isolate, Handle<JSObject> options,
+                                   Handle<String> key, const char* value) {
+@@ -590,3 +592,5 @@ const std::set<std::string>& JSCollator::GetAvailableLocales() {
+ 
+ }  // namespace internal
+ }  // namespace v8
++
++#undef CreateDataPropertyForOptions
+diff --git a/src/objects/js-duration-format.cc b/src/objects/js-duration-format.cc
+index 80816570..97d73ebb 100644
+--- a/v8/src/objects/js-duration-format.cc
++++ b/v8/src/objects/js-duration-format.cc
+@@ -1050,7 +1050,7 @@ MaybeHandle<String> FormattedToString(
+   return Intl::FormattedToString(isolate, formatted);
+ }
+ 
+-MaybeHandle<JSArray> FormattedListToJSArray(
++MaybeHandle<JSArray> FormattedListToJSArray_JSDurationFormat(
+     Isolate* isolate, const icu::FormattedValue& formatted,
+     const std::vector<std::vector<Part>>* parts,
+     JSDurationFormat::Separator separator) {
+@@ -1112,7 +1112,7 @@ MaybeHandle<String> JSDurationFormat::Format(Isolate* isolate,
+ MaybeHandle<JSArray> JSDurationFormat::FormatToParts(
+     Isolate* isolate, Handle<JSDurationFormat> df, Handle<Object> duration) {
+   const char* method_name = "Intl.DurationFormat.prototype.formatToParts";
+-  return FormatCommon<JSArray, true, FormattedListToJSArray>(
++  return FormatCommon<JSArray, true, FormattedListToJSArray_JSDurationFormat>(
+       isolate, df, duration, method_name);
+ }
+ 
+diff --git a/src/objects/js-list-format.cc b/src/objects/js-list-format.cc
+index 0f6b6090..6a80857b 100644
+--- a/v8/src/objects/js-list-format.cc
++++ b/v8/src/objects/js-list-format.cc
+@@ -247,7 +247,7 @@ Handle<String> IcuFieldIdToType(Isolate* isolate, int32_t field_id) {
+ 
+ // A helper function to convert the FormattedList to a
+ // MaybeHandle<JSArray> for the implementation of formatToParts.
+-MaybeHandle<JSArray> FormattedListToJSArray(
++MaybeHandle<JSArray> FormattedListToJSArray_JSListFormat(
+     Isolate* isolate, const icu::FormattedValue& formatted) {
+   Handle<JSArray> array = isolate->factory()->NewJSArray(0);
+   icu::ConstrainedFieldPosition cfpos;
+@@ -285,7 +285,7 @@ MaybeHandle<JSArray> JSListFormat::FormatListToParts(
+     Isolate* isolate, DirectHandle<JSListFormat> format,
+     DirectHandle<FixedArray> list) {
+   return FormatListCommon<JSArray>(isolate, format, list,
+-                                   FormattedListToJSArray);
++                                   FormattedListToJSArray_JSListFormat);
+ }
+ 
+ namespace {
+diff --git a/src/objects/js-plural-rules.cc b/src/objects/js-plural-rules.cc
+index a2e0610a..ffb98b73 100644
+--- a/v8/src/objects/js-plural-rules.cc
++++ b/v8/src/objects/js-plural-rules.cc
+@@ -221,6 +221,8 @@ MaybeHandle<String> JSPluralRules::ResolvePluralRange(
+   return Intl::ToString(isolate, result);
+ }
+ 
++#define CreateDataPropertyForOptions CreateDataPropertyForOptions_JSPluralRules
++
+ namespace {
+ 
+ void CreateDataPropertyForOptions(Isolate* isolate, Handle<JSObject> options,
+@@ -370,3 +372,5 @@ const std::set<std::string>& JSPluralRules::GetAvailableLocales() {
+ 
+ }  // namespace internal
+ }  // namespace v8
++
++#undef CreateDataPropertyForOptions
+diff --git a/src/regexp/experimental/experimental-compiler.cc b/src/regexp/experimental/experimental-compiler.cc
+index f33e9fb8..0bf07b12 100644
+--- a/v8/src/regexp/experimental/experimental-compiler.cc
++++ b/v8/src/regexp/experimental/experimental-compiler.cc
+@@ -233,7 +233,7 @@ bool ExperimentalRegExpCompiler::CanBeHandled(RegExpTree* tree,
+   return CanBeHandledVisitor::Check(tree, flags, capture_count);
+ }
+ 
+-namespace {
++namespace experimental {
+ 
+ // A label in bytecode which starts with no known address. The address *must*
+ // be bound with `Bind` before the label goes out of scope.
+@@ -1094,7 +1094,7 @@ class CompileVisitor : private RegExpVisitor {
+ 
+ ZoneList<RegExpInstruction> ExperimentalRegExpCompiler::Compile(
+     RegExpTree* tree, RegExpFlags flags, Zone* zone) {
+-  return CompileVisitor::Compile(tree, flags, zone);
++  return experimental::CompileVisitor::Compile(tree, flags, zone);
+ }
+ 
+ }  // namespace internal
+diff --git a/src/regexp/regexp-compiler-tonode.cc b/src/regexp/regexp-compiler-tonode.cc
+index f7da936a..dd057f32 100644
+--- a/v8/src/regexp/regexp-compiler-tonode.cc
++++ b/v8/src/regexp/regexp-compiler-tonode.cc
+@@ -23,7 +23,7 @@ namespace internal {
+ 
+ using namespace regexp_compiler_constants;  // NOLINT(build/namespaces)
+ 
+-constexpr base::uc32 kMaxCodePoint = 0x10ffff;
++constexpr base::uc32 kMaxCodePoint2 = 0x10ffff;
+ constexpr int kMaxUtf16CodeUnit = 0xffff;
+ constexpr uint32_t kMaxUtf16CodeUnitU = 0xffff;
+ constexpr int32_t kMaxOneByteCharCode = unibrow::Latin1::kMaxChar;
+@@ -72,7 +72,7 @@ bool CompareInverseRanges(ZoneList<CharacterRange>* ranges,
+     }
+   }
+ 
+-  return range.to() == kMaxCodePoint;
++  return range.to() == kMaxCodePoint2;
+ }
+ 
+ bool CompareRanges(ZoneList<CharacterRange>* ranges, const int* special_class,
+@@ -480,7 +480,7 @@ RegExpNode* RegExpClassRanges::ToNode(RegExpCompiler* compiler,
+     // internally created for an empty set.
+     DCHECK_IMPLIES(
+         IsUnicodeSets(compiler->flags()),
+-        ranges->length() == 1 && ranges->first().IsEverything(kMaxCodePoint));
++        ranges->length() == 1 && ranges->first().IsEverything(kMaxCodePoint2));
+     ZoneList<CharacterRange>* negated =
+         zone->New<ZoneList<CharacterRange>>(2, zone);
+     CharacterRange::Negate(ranges, negated, zone);
+@@ -1375,7 +1375,7 @@ void AddClassNegated(const int* elmv, int elmc,
+   elmc--;
+   DCHECK_EQ(kRangeEndMarker, elmv[elmc]);
+   DCHECK_NE(0x0000, elmv[0]);
+-  DCHECK_NE(kMaxCodePoint, elmv[elmc - 1]);
++  DCHECK_NE(kMaxCodePoint2, elmv[elmc - 1]);
+   base::uc16 last = 0x0000;
+   for (int i = 0; i < elmc; i += 2) {
+     DCHECK(last <= elmv[i] - 1);
+@@ -1383,7 +1383,7 @@ void AddClassNegated(const int* elmv, int elmc,
+     ranges->Add(CharacterRange::Range(last, elmv[i] - 1), zone);
+     last = elmv[i + 1];
+   }
+-  ranges->Add(CharacterRange::Range(last, kMaxCodePoint), zone);
++  ranges->Add(CharacterRange::Range(last, kMaxCodePoint2), zone);
+ }
+ 
+ }  // namespace
+@@ -1727,8 +1727,8 @@ void CharacterRange::Negate(const ZoneList<CharacterRange>* ranges,
+     from = range.to() + 1;
+     i++;
+   }
+-  if (from < kMaxCodePoint) {
+-    negated_ranges->Add(CharacterRange::Range(from, kMaxCodePoint), zone);
++  if (from < kMaxCodePoint2) {
++    negated_ranges->Add(CharacterRange::Range(from, kMaxCodePoint2), zone);
+   }
+ }
+ 
+@@ -1779,7 +1779,7 @@ void SafeAdvanceRange(const ZoneList<CharacterRange>* range, int* index,
+     *from = range->at(*index).from();
+     *to = range->at(*index).to();
+   } else {
+-    *from = kMaxCodePoint + 1;
++    *from = kMaxCodePoint2 + 1;
+   }
+ }
+ 
+diff --git a/src/sandbox/testing.cc b/src/sandbox/testing.cc
+index fe18387b..1a6d1a65 100644
+--- a/v8/src/sandbox/testing.cc
++++ b/v8/src/sandbox/testing.cc
+@@ -18,6 +18,7 @@
+ #include <signal.h>
+ #include <sys/mman.h>
+ #include <unistd.h>
++#undef MAP_TYPE
+ #endif  // V8_OS_LINUX
+ 
+ #ifdef V8_USE_ADDRESS_SANITIZER
+diff --git a/src/snapshot/read-only-deserializer.cc b/src/snapshot/read-only-deserializer.cc
+index 99bcad5f..bc3426da 100644
+--- a/v8/src/snapshot/read-only-deserializer.cc
++++ b/v8/src/snapshot/read-only-deserializer.cc
+@@ -187,7 +187,7 @@ void ReadOnlyDeserializer::DeserializeIntoIsolate() {
+   }
+ }
+ 
+-void NoExternalReferencesCallback() {
++void NoExternalReferencesCallback2() {
+   // The following check will trigger if a function or object template with
+   // references to native functions have been deserialized from snapshot, but
+   // no actual external references were provided when the isolate was created.
+@@ -238,7 +238,7 @@ class ObjectPostProcessor final {
+       const intptr_t* refs = isolate_->api_external_references();
+       Address address =
+           refs == nullptr
+-              ? reinterpret_cast<Address>(NoExternalReferencesCallback)
++              ? reinterpret_cast<Address>(NoExternalReferencesCallback2)
+               : static_cast<Address>(refs[index]);
+       DCHECK_NE(address, kNullAddress);
+       return address;
+diff --git a/src/torque/csa-generator.cc b/src/torque/csa-generator.cc
+index ec9eaccf..0fdaa4de 100644
+--- a/v8/src/torque/csa-generator.cc
++++ b/v8/src/torque/csa-generator.cc
+@@ -924,8 +924,8 @@ void CSAGenerator::EmitInstruction(const StoreReferenceInstruction& instruction,
+ }
+ 
+ namespace {
+-std::string GetBitFieldSpecialization(const Type* container,
+-                                      const BitField& field) {
++std::string GetBitFieldSpecialization2(const Type* container,
++                                       const BitField& field) {
+   auto smi_tagged_type =
+       Type::MatchUnaryGeneric(container, TypeOracle::GetSmiTaggedGeneric());
+   std::string container_type = smi_tagged_type
+@@ -978,7 +978,7 @@ void CSAGenerator::EmitInstruction(const LoadBitFieldInstruction& instruction,
+   out() << "    " << result_name << " = ca_.UncheckedCast<"
+         << field_type->GetGeneratedTNodeTypeName()
+         << ">(CodeStubAssembler(state_)." << decoder << "<"
+-        << GetBitFieldSpecialization(struct_type, instruction.bit_field)
++        << GetBitFieldSpecialization2(struct_type, instruction.bit_field)
+         << ">(ca_.UncheckedCast<" << struct_word_type << ">("
+         << bit_field_struct << ")));\n";
+ }
+@@ -1020,7 +1020,7 @@ void CSAGenerator::EmitInstruction(const StoreBitFieldInstruction& instruction,
+ 
+   std::string result_expression =
+       "CodeStubAssembler(state_)." + encoder + "<" +
+-      GetBitFieldSpecialization(struct_type, instruction.bit_field) +
++      GetBitFieldSpecialization2(struct_type, instruction.bit_field) +
+       ">(ca_.UncheckedCast<" + struct_word_type + ">(" + bit_field_struct +
+       "), ca_.UncheckedCast<" + field_word_type + ">(" + value + ")" +
+       (instruction.starts_as_zero ? ", true" : "") + ")";
+diff --git a/src/utils/sha-256.cc b/src/utils/sha-256.cc
+index 4b1d2bd4..f55c0b4a 100644
+--- a/v8/src/utils/sha-256.cc
++++ b/v8/src/utils/sha-256.cc
+@@ -174,3 +174,6 @@ const uint8_t* SHA256_hash(const void* data, size_t len, uint8_t* digest) {
+ 
+ }  // namespace internal
+ }  // namespace v8
++
++#undef ror
++#undef shr
+diff --git a/src/wasm/wasm-external-refs.cc b/src/wasm/wasm-external-refs.cc
+index d0ff8432..c8a06119 100644
+--- a/v8/src/wasm/wasm-external-refs.cc
++++ b/v8/src/wasm/wasm-external-refs.cc
+@@ -454,6 +454,8 @@ V ReadAndIncrementOffset(Address data, size_t* offset) {
+   return result;
+ }
+ 
++#define kSuccess kSuccess_WASMExternalRefs
++
+ constexpr int32_t kSuccess = 1;
+ constexpr int32_t kOutOfBounds = 0;
+ }  // namespace
+@@ -748,3 +750,4 @@ void switch_from_the_central_stack_for_js(Isolate* isolate,
+ 
+ #undef V8_WITH_SANITIZER
+ #undef RESET_THREAD_IN_WASM_FLAG_FOR_ASAN_ON_WINDOWS
++#undef kSuccess
+diff --git a/src/wasm/wrappers.cc b/src/wasm/wrappers.cc
+index fd1ab9a3..fd1fece6 100644
+--- a/v8/src/wasm/wrappers.cc
++++ b/v8/src/wasm/wrappers.cc
+@@ -1366,4 +1366,6 @@ void BuildWasmWrapper(compiler::turboshaft::PipelineData* data,
+   }
+ }
+ 
++#include "src/compiler/turboshaft/undef-assembler-macros.inc"
++
+ }  // namespace v8::internal::wasm
+--- a/v8/src/compiler/wasm-compiler.cc
++++ b/v8/src/compiler/wasm-compiler.cc
+@@ -93,18 +93,18 @@
+       assert_size(WASM_INSTANCE_OBJECT_SIZE(name), type), GetInstanceData(), \
+       wasm::ObjectAccess::ToTagged(WasmTrustedInstanceData::k##name##Offset))
+ 
+-#define LOAD_INSTANCE_FIELD(name, type)                                      \
++#define LOAD_INSTANCE_FIELD_(name, type)                                      \
+   gasm_->LoadImmutable(                                                      \
+       assert_size(WASM_INSTANCE_OBJECT_SIZE(name), type), GetInstanceData(), \
+       wasm::ObjectAccess::ToTagged(WasmTrustedInstanceData::k##name##Offset))
+ 
+-#define LOAD_PROTECTED_INSTANCE_FIELD(name) \
++#define LOAD_PROTECTED_INSTANCE_FIELD_(name) \
+   gasm_->LoadProtectedPointerFromObject(    \
+       GetInstanceData(),                    \
+       wasm::ObjectAccess::ToTagged(         \
+           WasmTrustedInstanceData::kProtected##name##Offset));
+ 
+-#define LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD(name) \
++#define LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD_(name) \
+   gasm_->LoadImmutableProtectedPointerFromObject(     \
+       GetInstanceData(),                              \
+       wasm::ObjectAccess::ToTagged(                   \
+@@ -407,7 +407,7 @@
+ }
+ 
+ Node* WasmGraphBuilder::RefFunc(uint32_t function_index) {
+-  Node* func_refs = LOAD_INSTANCE_FIELD(FuncRefs, MachineType::TaggedPointer());
++  Node* func_refs = LOAD_INSTANCE_FIELD_(FuncRefs, MachineType::TaggedPointer());
+   Node* maybe_function =
+       gasm_->LoadFixedArrayElementPtr(func_refs, function_index);
+   auto done = gasm_->MakeLabel(MachineRepresentation::kTaggedPointer);
+@@ -2386,7 +2386,7 @@
+ 
+ Node* WasmGraphBuilder::LoadJSTag() {
+   Node* context =
+-      LOAD_INSTANCE_FIELD(NativeContext, MachineType::TaggedPointer());
++      LOAD_INSTANCE_FIELD_(NativeContext, MachineType::TaggedPointer());
+   Node* tag_obj =
+       gasm_->Load(MachineType::TaggedPointer(), context,
+                   NativeContext::SlotOffset(Context::WASM_JS_TAG_INDEX));
+@@ -2401,7 +2401,7 @@
+ 
+ Node* WasmGraphBuilder::LoadTagFromTable(uint32_t tag_index) {
+   Node* tags_table =
+-      LOAD_INSTANCE_FIELD(TagsTable, MachineType::TaggedPointer());
++      LOAD_INSTANCE_FIELD_(TagsTable, MachineType::TaggedPointer());
+   Node* tag = gasm_->LoadFixedArrayElementPtr(tags_table, tag_index);
+   return tag;
+ }
+@@ -2410,7 +2410,7 @@
+   return gasm_->CallBuiltin(
+       Builtin::kWasmGetOwnProperty, Operator::kEliminatable, except_obj,
+       LOAD_ROOT_IN_WASM_COMPILER(wasm_exception_tag_symbol, wasm_exception_tag_symbol),
+-      LOAD_INSTANCE_FIELD(NativeContext, MachineType::TaggedPointer()));
++      LOAD_INSTANCE_FIELD_(NativeContext, MachineType::TaggedPointer()));
+ }
+ 
+ Node* WasmGraphBuilder::GetExceptionValues(Node* except_obj,
+@@ -2419,7 +2419,7 @@
+   Node* values_array = gasm_->CallBuiltin(
+       Builtin::kWasmGetOwnProperty, Operator::kEliminatable, except_obj,
+       LOAD_ROOT_IN_WASM_COMPILER(wasm_exception_values_symbol, wasm_exception_values_symbol),
+-      LOAD_INSTANCE_FIELD(NativeContext, MachineType::TaggedPointer()));
++      LOAD_INSTANCE_FIELD_(NativeContext, MachineType::TaggedPointer()));
+   uint32_t index = 0;
+   const wasm::WasmTagSig* sig = tag->sig;
+   DCHECK_EQ(sig->parameter_count(), values.size());
+@@ -2879,7 +2879,7 @@
+     IsReturnCall continuation, Node* frame_state) {
+   // Load the imported function refs array from the instance.
+   Node* dispatch_table =
+-      LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD(DispatchTableForImports);
++      LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD_(DispatchTableForImports);
+   // Access fixed array at {header_size - tag + func_index * kTaggedSize}.
+   Node* func_index_intptr = gasm_->BuildChangeUint32ToUintPtr(func_index);
+   Node* dispatch_table_entry_offset = gasm_->IntMul(
+@@ -2948,10 +2948,10 @@
+   // Load the dispatch table.
+   Node* dispatch_table;
+   if (table_index == 0) {
+-    dispatch_table = LOAD_PROTECTED_INSTANCE_FIELD(DispatchTable0);
++    dispatch_table = LOAD_PROTECTED_INSTANCE_FIELD_(DispatchTable0);
+   } else {
+     Node* dispatch_tables =
+-        LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD(DispatchTables);
++        LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD_(DispatchTables);
+     dispatch_table = gasm_->LoadProtectedPointerFromObject(
+         dispatch_tables,
+         wasm::ObjectAccess::ToTagged(
+@@ -3384,7 +3384,7 @@
+                                               MachineType::Pointer());
+   }
+   Node* memory_bases_and_sizes =
+-      LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD(MemoryBasesAndSizes);
++      LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD_(MemoryBasesAndSizes);
+   // Use {LoadByteArrayElement} even though it's a trusted array; their layout
+   // is the same.
+   static_assert(FixedAddressArray::OffsetOfElementAt(0) ==
+@@ -3404,7 +3404,7 @@
+         mem_type);
+   }
+   Node* memory_bases_and_sizes =
+-      LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD(MemoryBasesAndSizes);
++      LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD_(MemoryBasesAndSizes);
+   // Use {LoadByteArrayElement} even though it's a trusted array; their layout
+   // is the same.
+   static_assert(FixedAddressArray::OffsetOfElementAt(0) ==
+@@ -3484,14 +3484,14 @@
+ void WasmGraphBuilder::GetGlobalBaseAndOffset(const wasm::WasmGlobal& global,
+                                               Node** base, Node** offset) {
+   if (global.mutability && global.imported) {
+-    Node* imported_mutable_globals = LOAD_INSTANCE_FIELD(
++    Node* imported_mutable_globals = LOAD_INSTANCE_FIELD_(
+         ImportedMutableGlobals, MachineType::TaggedPointer());
+     Node* field_offset = Int32Constant(
+         wasm::ObjectAccess::ElementOffsetInTaggedFixedAddressArray(
+             global.index));
+     if (global.type.is_reference()) {
+       // Load the base from the ImportedMutableGlobalsBuffer of the instance.
+-      Node* buffers = LOAD_INSTANCE_FIELD(ImportedMutableGlobalsBuffers,
++      Node* buffers = LOAD_INSTANCE_FIELD_(ImportedMutableGlobalsBuffers,
+                                           MachineType::TaggedPointer());
+       *base = gasm_->LoadFixedArrayElementAny(buffers, global.index);
+ 
+@@ -3511,11 +3511,11 @@
+     }
+   } else if (global.type.is_reference()) {
+     *base =
+-        LOAD_INSTANCE_FIELD(TaggedGlobalsBuffer, MachineType::TaggedPointer());
++        LOAD_INSTANCE_FIELD_(TaggedGlobalsBuffer, MachineType::TaggedPointer());
+     *offset = gasm_->IntPtrConstant(
+         wasm::ObjectAccess::ElementOffsetInTaggedFixedArray(global.offset));
+   } else {
+-    *base = LOAD_INSTANCE_FIELD(GlobalsStart, MachineType::Pointer());
++    *base = LOAD_INSTANCE_FIELD_(GlobalsStart, MachineType::Pointer());
+     *offset = gasm_->IntPtrConstant(global.offset);
+   }
+ }
+@@ -5271,7 +5271,7 @@
+   DCHECK_LT(data_segment_index, env_->module->num_declared_data_segments);
+ 
+   Node* seg_size_array =
+-      LOAD_INSTANCE_FIELD(DataSegmentSizes, MachineType::TaggedPointer());
++      LOAD_INSTANCE_FIELD_(DataSegmentSizes, MachineType::TaggedPointer());
+   static_assert(wasm::kV8MaxWasmDataSegments <= kMaxUInt32 >> 2);
+   auto access = ObjectAccess(MachineType::Int32(), kNoWriteBarrier);
+   gasm_->StoreToObject(
+@@ -5403,7 +5403,7 @@
+   DCHECK_LT(elem_segment_index, env_->module->elem_segments.size());
+ 
+   Node* elem_segments =
+-      LOAD_INSTANCE_FIELD(ElementSegments, MachineType::TaggedPointer());
++      LOAD_INSTANCE_FIELD_(ElementSegments, MachineType::TaggedPointer());
+   gasm_->StoreFixedArrayElement(
+       elem_segments, elem_segment_index,
+       LOAD_ROOT_IN_WASM_COMPILER(EmptyFixedArray, empty_fixed_array),
+@@ -5459,7 +5459,7 @@
+ }
+ 
+ Node* WasmGraphBuilder::TableSize(uint32_t table_index) {
+-  Node* tables = LOAD_INSTANCE_FIELD(Tables, MachineType::TaggedPointer());
++  Node* tables = LOAD_INSTANCE_FIELD_(Tables, MachineType::TaggedPointer());
+   Node* table = gasm_->LoadFixedArrayElementAny(tables, table_index);
+ 
+   int length_field_size = WasmTableObject::kCurrentLengthOffsetEnd -
+@@ -6385,7 +6385,7 @@
+   return gasm_->CallBuiltin(
+       Builtin::kStringAdd_CheckNone, Operator::kNoDeopt | Operator::kNoThrow,
+       head, tail,
+-      LOAD_INSTANCE_FIELD(NativeContext, MachineType::TaggedPointer()));
++      LOAD_INSTANCE_FIELD_(NativeContext, MachineType::TaggedPointer()));
+ }
+ 
+ Node* WasmGraphBuilder::StringEqual(Node* a, wasm::ValueType a_type, Node* b,
+@@ -6845,7 +6845,7 @@
+       zone_, false, param_count, CallDescriptor::kCanUseRoots,
+       Operator::kNoDeopt | Operator::kNoWrite);
+   Node* callees_array =
+-      LOAD_INSTANCE_FIELD(WellKnownImports, MachineType::TaggedPointer());
++      LOAD_INSTANCE_FIELD_(WellKnownImports, MachineType::TaggedPointer());
+   Node* callee = gasm_->LoadFixedArrayElementPtr(callees_array, func_index);
+   Node* context = gasm_->LoadContextFromJSFunction(callee);
+   BuildModifyThreadInWasmFlag(false);
+@@ -9224,8 +9224,10 @@
+ 
+ #undef FATAL_UNSUPPORTED_OPCODE
+ #undef WASM_INSTANCE_OBJECT_SIZE
+-#undef LOAD_INSTANCE_FIELD
++#undef LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD_
++#undef LOAD_INSTANCE_FIELD_
+ #undef LOAD_MUTABLE_INSTANCE_FIELD
++#undef LOAD_PROTECTED_INSTANCE_FIELD_
+ #undef LOAD_ROOT_IN_WASM_COMPILER
+ #undef LOAD_MUTABLE_ROOT
+ 
+--- a/v8/src/heap/cppgc/sweeper.cc
++++ b/v8/src/heap/cppgc/sweeper.cc
+@@ -30,6 +30,8 @@
+ #include "src/heap/cppgc/stats-collector.h"
+ #include "src/heap/cppgc/task-handle.h"
+ 
++#define StickyBits StickyBits_Sweeper
++
+ namespace cppgc::internal {
+ 
+ namespace {
+@@ -1580,3 +1582,5 @@
+ }
+ 
+ }  // namespace cppgc::internal
++
++#undef StickyBits
+--- a/v8/src/heap/cppgc/compactor.cc
++++ b/v8/src/heap/cppgc/compactor.cc
+@@ -20,6 +20,8 @@
+ #include "src/heap/cppgc/raw-heap.h"
+ #include "src/heap/cppgc/stats-collector.h"
+ 
++#define StickyBits StickyBits_Compactor
++
+ namespace cppgc {
+ namespace internal {
+ 
+@@ -543,3 +545,5 @@
+ 
+ }  // namespace internal
+ }  // namespace cppgc
++
++#undef StickyBits
+--- a/v8/src/heap/traced-handles-marking-visitor.h
++++ b/v8/src/heap/traced-handles-marking-visitor.h
+@@ -34,7 +34,7 @@
+   const TracedHandles::MarkMode mark_mode_;
+ };
+ 
+-#endif  // V8_HEAP_TRACED_HANDLES_MARKING_VISITOR_H_
+-
+ }  // namespace internal
+ }  // namespace v8
++
++#endif  // V8_HEAP_TRACED_HANDLES_MARKING_VISITOR_H_
+--- a/v8/src/heap/scavenger.cc
++++ b/v8/src/heap/scavenger.cc
+@@ -676,7 +676,7 @@
+           promotion_list->large_object_promotion_list_) {}
+ 
+ namespace {
+-MainAllocator* CreateSharedOldAllocator(Heap* heap) {
++MainAllocator* CreateSharedOldAllocator2(Heap* heap) {
+   if (v8_flags.shared_string_table && heap->isolate()->has_shared_space()) {
+     return new MainAllocator(heap, heap->shared_allocation_space(),
+                              MainAllocator::kInGC);
+@@ -700,7 +700,7 @@
+       pretenuring_handler_(heap_->pretenuring_handler()),
+       local_pretenuring_feedback_(PretenuringHandler::kInitialFeedbackCapacity),
+       allocator_(heap, CompactionSpaceKind::kCompactionSpaceForScavenge),
+-      shared_old_allocator_(CreateSharedOldAllocator(heap_)),
++      shared_old_allocator_(CreateSharedOldAllocator2(heap_)),
+       is_logging_(is_logging),
+       is_incremental_marking_(heap->incremental_marking()->IsMarking()),
+       is_compacting_(heap->incremental_marking()->IsCompacting()),
+--- a/v8/src/maglev/maglev-graph-builder.cc
++++ b/v8/src/maglev/maglev-graph-builder.cc
+@@ -12793,3 +12793,5 @@
+ void MaglevGraphBuilder::VisitIllegal() { UNREACHABLE(); }
+ 
+ }  // namespace v8::internal::maglev
++
++#undef TRACE
+--- a/v8/src/wasm/compilation-environment-inl.h
++++ b/v8/src/wasm/compilation-environment-inl.h
+@@ -2,6 +2,9 @@
+ // Use of this source code is governed by a BSD-style license that can be
+ // found in the LICENSE file.
+ 
++#ifndef V8_WASM_COMPILATION_ENVIRONMENT_INL_H_
++#define V8_WASM_COMPILATION_ENVIRONMENT_INL_H_
++
+ #if !V8_ENABLE_WEBASSEMBLY
+ #error This header should only be included if WebAssembly is enabled.
+ #endif  // !V8_ENABLE_WEBASSEMBLY
+@@ -26,6 +29,4 @@
+ 
+ }  // namespace v8::internal::wasm
+ 
+-#ifndef V8_WASM_COMPILATION_ENVIRONMENT_INL_H_
+-#define V8_WASM_COMPILATION_ENVIRONMENT_INL_H_
+ #endif  // V8_WASM_COMPILATION_ENVIRONMENT_INL_H_
+--- a/v8/src/compiler/decompression-optimizer.cc
++++ b/v8/src/compiler/decompression-optimizer.cc
+@@ -8,6 +8,8 @@
+ #include "src/compiler/node-matchers.h"
+ #include "src/compiler/node-properties.h"
+ 
++#define Replace Replace_DecomporessionOptimizer
++
+ namespace v8 {
+ namespace internal {
+ namespace compiler {
+@@ -406,3 +408,5 @@
+ }  // namespace compiler
+ }  // namespace internal
+ }  // namespace v8
++
++#undef Replace
+--- a/v8/src/compiler/backend/bitcast-elider.cc
++++ b/v8/src/compiler/backend/bitcast-elider.cc
+@@ -6,6 +6,8 @@
+ 
+ #include "src/compiler/graph.h"
+ 
++#define Replace Replace_BitcastElider
++
+ namespace v8 {
+ namespace internal {
+ namespace compiler {
+@@ -99,3 +101,5 @@
+ }  // namespace compiler
+ }  // namespace internal
+ }  // namespace v8
++
++#undef Replace
+--- a/v8/src/compiler/turboshaft/graph-builder.cc
++++ b/v8/src/compiler/turboshaft/graph-builder.cc
+@@ -42,6 +42,8 @@
+ #include "src/objects/map.h"
+ #include "src/zone/zone-containers.h"
+ 
++#define GraphBuilder GraphBuilder_GraphBuilder
++
+ namespace v8::internal::compiler::turboshaft {
+ 
+ #include "src/compiler/turboshaft/define-assembler-macros.inc"
+@@ -2427,3 +2429,5 @@
+ #include "src/compiler/turboshaft/undef-assembler-macros.inc"
+ 
+ }  // namespace v8::internal::compiler::turboshaft
++
++#undef GraphBuilder
+--- a/v8/BUILD.gn
++++ b/v8/BUILD.gn
+@@ -2977,6 +2977,9 @@
+     "src/ic/binary-op-assembler.cc",
+     "src/ic/unary-op-assembler.cc",
+     "src/interpreter/interpreter-generator.cc",
++
++    # Macro `BIND()` conflict
++    "src/builtins/builtins-string-tsa.cc",
+   ]
+ 
+   if (v8_current_cpu == "x86") {
+@@ -5786,6 +5789,11 @@
+     "src/zone/zone.cc",
+   ]
+ 
++  jumbo_excluded_sources = [
++    # 'GetSlotThreadSafe' is a protected member of 'v8::TracedReferenceBase'
++    "src/heap/cppgc-js/unified-heap-marking-verifier.cc",
++  ]
++
+   if (v8_enable_snapshot_compression) {
+     sources += [ "src/snapshot/snapshot-compression.cc" ]
+   }
+@@ -5797,8 +5805,6 @@
+     ]
+   }
+ 
+-  jumbo_excluded_sources = []
+-
+   if (v8_enable_maglev) {
+     sources += [
+       "src/maglev/maglev-assembler.cc",
+@@ -5826,6 +5832,10 @@
+         "src/maglev/arm64/maglev-assembler-arm64.cc",
+         "src/maglev/arm64/maglev-ir-arm64.cc",
+       ]
++      jumbo_excluded_sources += [
++        "src/maglev/arm64/maglev-assembler-arm64.cc",
++        "src/maglev/arm64/maglev-ir-arm64.cc",
++      ]
+     } else if (v8_current_cpu == "x64") {
+       sources += [
+         "src/maglev/x64/maglev-assembler-x64.cc",
+--- a/v8/src/wasm/baseline/liftoff-compiler.cc
++++ b/v8/src/wasm/baseline/liftoff-compiler.cc
+@@ -38,6 +38,9 @@
+ #include "src/wasm/wasm-objects.h"
+ #include "src/wasm/wasm-opcodes-inl.h"
+ 
++#undef __
++#undef TRACE
++
+ namespace v8::internal::wasm {
+ 
+ using VarState = LiftoffAssembler::VarState;
+@@ -9271,3 +9274,6 @@
+ }
+ 
+ }  // namespace v8::internal::wasm
++
++#undef __
++#undef TRACE

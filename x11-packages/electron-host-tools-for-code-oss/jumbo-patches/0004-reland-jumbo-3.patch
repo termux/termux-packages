@@ -1,0 +1,700 @@
+From 1b7193abe207808e7c2bff7c47a0ef4c6484a3fd Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <licy183@termux.dev>
+Date: Sun Apr 20 23:55:52 2025 +0800
+Subject: [PATCH] reland jumbo 3
+
+Enable jumbo build for the following component(s)/source_set(s):
+
+- //net:net
+- //net/dns:dns
+
+---
+ net/BUILD.gn                                     | 10 +++++++++-
+ net/base/host_port_pair.cc                       |  4 ++++
+ net/base/ip_endpoint.cc                          |  4 ++++
+ net/dns/BUILD.gn                                 |  3 ++-
+ net/dns/dns_response.cc                          |  4 ++++
+ net/dns/host_cache.cc                            |  8 ++++++++
+ net/dns/host_resolver_cache.cc                   |  4 ++++
+ net/dns/host_resolver_dns_task.cc                |  4 ++++
+ net/dns/host_resolver_internal_result.cc         |  6 ++++++
+ net/dns/host_resolver_manager.cc                 |  4 ++++
+ net/filter/filter_source_stream.cc               |  5 ++++-
+ net/filter/gzip_source_stream.cc                 |  4 +++-
+ net/http/http_server_properties_manager.cc       |  4 ++++
+ net/http/transport_security_persister.cc         |  6 ++++++
+ .../network_error_logging_service.cc             | 10 ++++++++++
+ .../configured_proxy_resolution_service.cc       | 10 +++++++++-
+ net/proxy_resolution/proxy_config_service.cc     | 10 +++++++---
+ net/quic/bidirectional_stream_quic_impl.cc       |  4 ++++
+ net/quic/dedicated_web_transport_http3_client.cc |  4 ++++
+ net/quic/quic_chromium_client_stream.cc          |  4 ++++
+ net/quic/quic_session_pool.cc                    |  4 ++++
+ net/reporting/reporting_header_parser.cc         |  6 ++++++
+ net/reporting/reporting_service.cc               |  6 ++++++
+ net/server/web_socket_encoder.cc                 | 14 ++++++++++++++
+ net/websockets/websocket_channel.cc              |  4 ++++
+ net/websockets/websocket_frame.cc                | 16 ++++++++++++++++
+ .../websocket_http2_handshake_stream.cc          |  4 ++++
+ .../websocket_http3_handshake_stream.cc          |  4 ++++
+ 28 files changed, 162 insertions(+), 8 deletions(-)
+
+diff --git a/net/BUILD.gn b/net/BUILD.gn
+index a4d7b3e37a..1af9d5ef8e 100644
+--- a/net/BUILD.gn
++++ b/net/BUILD.gn
+@@ -8,6 +8,7 @@ import("//build/config/chromeos/ui_mode.gni")
+ import("//build/config/compiler/compiler.gni")
+ import("//build/config/cronet/config.gni")
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//crypto/features.gni")
+ import("//net/features.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
+@@ -138,7 +139,7 @@ buildflag_header("cronet_buildflags") {
+   flags = [ "CRONET_BUILD=$is_cronet_build" ]
+ }
+ 
+-component("net") {
++jumbo_component("net") {
+   sources = [
+     "base/address_family.cc",
+     "base/address_family.h",
+@@ -1058,6 +1059,9 @@ component("net") {
+     "url_request/websocket_handshake_userdata_key.cc",
+     "url_request/websocket_handshake_userdata_key.h",
+   ]
++  jumbo_excluded_sources = [
++    "spdy/spdy_stream.cc", # Fail to compile due to function name confliction
++  ]
+ 
+   if (is_posix || is_fuchsia) {
+     sources += [ "base/net_errors_posix.cc" ]
+@@ -1237,6 +1241,10 @@ component("net") {
+       "base/network_interfaces_linux.h",
+       "base/platform_mime_util_linux.cc",
+     ]
++    jumbo_excluded_sources += [
++      "base/address_tracker_linux.cc",     # Fail to compile due to the confliction between `linux/if.h` and `net/if.h`
++      "base/network_interfaces_linux.cc",  # Ditto
++    ]
+   }
+ 
+   if (is_linux) {
+diff --git a/net/base/host_port_pair.cc b/net/base/host_port_pair.cc
+index 14a3e506a4..91b856035b 100644
+--- a/net/base/host_port_pair.cc
++++ b/net/base/host_port_pair.cc
+@@ -20,6 +20,8 @@
+ #include "url/gurl.h"
+ #include "url/scheme_host_port.h"
+ 
++#define kValuePortKey kValuePortKey_HostPortPair
++
+ namespace net {
+ 
+ namespace {
+@@ -139,3 +141,5 @@ base::Value HostPortPair::ToValue() const {
+ }
+ 
+ }  // namespace net
++
++#undef kValuePortKey
+diff --git a/net/base/ip_endpoint.cc b/net/base/ip_endpoint.cc
+index 5506bcf233..5b4e39ba41 100644
+--- a/net/base/ip_endpoint.cc
++++ b/net/base/ip_endpoint.cc
+@@ -31,6 +31,8 @@
+ #include "net/base/winsock_util.h"  // For kBluetoothAddressSize
+ #endif
+ 
++#define kValuePortKey kValuePortKey_IPEndPoint
++
+ namespace net {
+ 
+ namespace {
+@@ -236,3 +238,5 @@ std::ostream& operator<<(std::ostream& os, const IPEndPoint& ip_endpoint) {
+ }
+ 
+ }  // namespace net
++
++#undef kValuePortKey
+diff --git a/net/dns/BUILD.gn b/net/dns/BUILD.gn
+index 6a542c8f0d..8ffcfa235d 100644
+--- a/net/dns/BUILD.gn
++++ b/net/dns/BUILD.gn
+@@ -2,13 +2,14 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//net/features.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
+ import("//third_party/protobuf/proto_library.gni")
+ 
+ enable_built_in_dns = use_blink
+ 
+-source_set("dns") {
++jumbo_source_set("dns") {
+   # Due to circular dependencies, should only be depended on through //net.
+   visibility = [
+     "//net",
+diff --git a/net/dns/dns_response.cc b/net/dns/dns_response.cc
+index 7a4f3b5cf9..74aec3e8f1 100644
+--- a/net/dns/dns_response.cc
++++ b/net/dns/dns_response.cc
+@@ -36,6 +36,8 @@
+ #include "net/dns/public/dns_protocol.h"
+ #include "net/dns/record_rdata.h"
+ 
++#define kHeaderSize kHeaderSize_DnsResponse
++
+ namespace net {
+ 
+ namespace {
+@@ -648,3 +650,5 @@ bool DnsResponse::WriteAnswer(base::SpanWriter<uint8_t>* writer,
+ }
+ 
+ }  // namespace net
++
++#undef kHeaderSize
+diff --git a/net/dns/host_cache.cc b/net/dns/host_cache.cc
+index b52e943402..d81c1059b0 100644
+--- a/net/dns/host_cache.cc
++++ b/net/dns/host_cache.cc
+@@ -42,6 +42,10 @@
+ #include "third_party/abseil-cpp/absl/types/variant.h"
+ #include "url/scheme_host_port.h"
+ 
++#define kSecureKey                    kSecureKey_HostCache
++#define EndpointMetadataPairToValue   EndpointMetadataPairToValue_HostCache
++#define EndpointMetadataPairFromValue EndpointMetadataPairFromValue_HostCache
++
+ namespace net {
+ 
+ namespace {
+@@ -1221,3 +1225,7 @@ std::ostream& operator<<(std::ostream& out,
+   return out << "EntryStaleness{" << s.expired_by << ", " << s.network_changes
+              << ", " << s.stale_hits << "}";
+ }
++
++#undef kSecureKey
++#undef EndpointMetadataPairToValue
++#undef EndpointMetadataPairFromValue
+diff --git a/net/dns/host_resolver_cache.cc b/net/dns/host_resolver_cache.cc
+index 93032e14bb..a8e8ce6f22 100644
+--- a/net/dns/host_resolver_cache.cc
++++ b/net/dns/host_resolver_cache.cc
+@@ -24,6 +24,8 @@
+ #include "url/url_canon.h"
+ #include "url/url_canon_stdstring.h"
+ 
++#define kSecureKey kSecureKey_HostResolverCache
++
+ namespace net {
+ 
+ namespace {
+@@ -453,3 +455,5 @@ base::Value HostResolverCache::SerializeEntries(
+ }
+ 
+ }  // namespace net
++
++#undef kSecureKey
+diff --git a/net/dns/host_resolver_dns_task.cc b/net/dns/host_resolver_dns_task.cc
+index b35132f8d0..e65707a327 100644
+--- a/net/dns/host_resolver_dns_task.cc
++++ b/net/dns/host_resolver_dns_task.cc
+@@ -24,6 +24,8 @@
+ #include "net/dns/public/util.h"
+ #include "third_party/abseil-cpp/absl/types/variant.h"
+ 
++#define NetLogResults NetLogResults_HostResolverDnsTask
++
+ namespace net {
+ 
+ namespace {
+@@ -1047,3 +1049,5 @@ bool HostResolverDnsTask::ShouldTriggerHttpToHttpsUpgrade(
+ }
+ 
+ }  // namespace net
++
++#undef NetLogResults
+diff --git a/net/dns/host_resolver_internal_result.cc b/net/dns/host_resolver_internal_result.cc
+index 56e988cf92..e073f19277 100644
+--- a/net/dns/host_resolver_internal_result.cc
++++ b/net/dns/host_resolver_internal_result.cc
+@@ -27,6 +27,9 @@
+ #include "url/url_canon.h"
+ #include "url/url_canon_stdstring.h"
+ 
++#define EndpointMetadataPairToValue   EndpointMetadataPairToValue_HostResolverInternalResult
++#define EndpointMetadataPairFromValue EndpointMetadataPairFromValue_HostResolverInternalResult
++
+ namespace net {
+ 
+ namespace {
+@@ -635,3 +638,6 @@ HostResolverInternalAliasResult::HostResolverInternalAliasResult(
+       alias_target_(MaybeCanonicalizeName(std::move(alias_target))) {}
+ 
+ }  // namespace net
++
++#undef EndpointMetadataPairToValue
++#undef EndpointMetadataPairFromValue
+diff --git a/net/dns/host_resolver_manager.cc b/net/dns/host_resolver_manager.cc
+index 904b2daf93..676501062d 100644
+--- a/net/dns/host_resolver_manager.cc
++++ b/net/dns/host_resolver_manager.cc
+@@ -140,6 +140,8 @@
+ #endif  // BUILDFLAG(IS_ANDROID)
+ #endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+ 
++#define NetLogResults NetLogResults_HostResolverManager
++
+ namespace net {
+ 
+ namespace {
+@@ -1776,3 +1778,5 @@ std::unique_ptr<DnsProbeRunner> HostResolverManager::CreateDohProbeRunner(
+ }
+ 
+ }  // namespace net
++
++#undef NetLogResults
+diff --git a/net/filter/filter_source_stream.cc b/net/filter/filter_source_stream.cc
+index e1006eb6d0..726c9ab51c 100644
+--- a/net/filter/filter_source_stream.cc
++++ b/net/filter/filter_source_stream.cc
+@@ -20,7 +20,7 @@
+ 
+ namespace net {
+ 
+-namespace {
++namespace filter_source_stream {
+ 
+ constexpr char kDeflate[] = "deflate";
+ constexpr char kGZip[] = "gzip";
+@@ -50,6 +50,7 @@ FilterSourceStream::~FilterSourceStream() = default;
+ int FilterSourceStream::Read(IOBuffer* read_buffer,
+                              int read_buffer_size,
+                              CompletionOnceCallback callback) {
++  using namespace filter_source_stream;
+   DCHECK_EQ(STATE_NONE, next_state_);
+   DCHECK(read_buffer);
+   DCHECK_LT(0, read_buffer_size);
+@@ -88,6 +89,7 @@ bool FilterSourceStream::MayHaveMoreBytes() const {
+ 
+ FilterSourceStream::SourceType FilterSourceStream::ParseEncodingType(
+     const std::string& encoding) {
++  using namespace filter_source_stream;
+   std::string lower_encoding = base::ToLowerASCII(encoding);
+   static constexpr auto kEncodingMap =
+       base::MakeFixedFlatMap<std::string_view, SourceType>({
+@@ -133,6 +135,7 @@ int FilterSourceStream::DoLoop(int result) {
+ }
+ 
+ int FilterSourceStream::DoReadData() {
++  using namespace filter_source_stream;
+   // Read more data means subclasses have consumed all input or this is the
+   // first read in which case the |drainable_input_buffer_| is not initialized.
+   DCHECK(drainable_input_buffer_ == nullptr ||
+diff --git a/net/filter/gzip_source_stream.cc b/net/filter/gzip_source_stream.cc
+index 3858d36964..9c8cd92296 100644
+--- a/net/filter/gzip_source_stream.cc
++++ b/net/filter/gzip_source_stream.cc
+@@ -24,7 +24,7 @@
+ 
+ namespace net {
+ 
+-namespace {
++namespace gzip_source_stream {
+ 
+ const char kDeflate[] = "DEFLATE";
+ const char kGzip[] = "GZIP";
+@@ -77,6 +77,7 @@ bool GzipSourceStream::Init() {
+ }
+ 
+ std::string GzipSourceStream::GetTypeAsString() const {
++  using namespace gzip_source_stream;
+   switch (type()) {
+     case TYPE_GZIP:
+       return kGzip;
+@@ -95,6 +96,7 @@ base::expected<size_t, Error> GzipSourceStream::FilterData(
+     size_t input_buffer_size,
+     size_t* consumed_bytes,
+     bool upstream_end_reached) {
++  using namespace gzip_source_stream;
+   *consumed_bytes = 0;
+   char* input_data = input_buffer->data();
+   size_t input_data_size = input_buffer_size;
+diff --git a/net/http/http_server_properties_manager.cc b/net/http/http_server_properties_manager.cc
+index 9833d9c626..9de9fb4294 100644
+--- a/net/http/http_server_properties_manager.cc
++++ b/net/http/http_server_properties_manager.cc
+@@ -27,6 +27,8 @@
+ #include "url/gurl.h"
+ #include "url/scheme_host_port.h"
+ 
++#define kVersionKey kVersionKey_HTTPServerPropertiesManager
++
+ namespace net {
+ 
+ namespace {
+@@ -958,3 +960,5 @@ void HttpServerPropertiesManager::OnHttpServerPropertiesLoaded() {
+ }
+ 
+ }  // namespace net
++
++#undef kVersionKey
+diff --git a/net/http/transport_security_persister.cc b/net/http/transport_security_persister.cc
+index 223eb29f45..a8f727a4f8 100644
+--- a/net/http/transport_security_persister.cc
++++ b/net/http/transport_security_persister.cc
+@@ -30,6 +30,9 @@
+ #include "net/cert/x509_certificate.h"
+ #include "net/http/transport_security_state.h"
+ 
++#define kVersionKey kVersionKey_TransportSecurityPersister
++#define LoadState   LoadState_TransportSecurityPersister
++
+ namespace net {
+ 
+ BASE_FEATURE(kTransportSecurityFileWriterSchedule,
+@@ -329,3 +332,6 @@ void TransportSecurityPersister::CompleteLoad(const std::string& state) {
+ }
+ 
+ }  // namespace net
++
++#undef kVersionKey
++#undef LoadState
+diff --git a/net/network_error_logging/network_error_logging_service.cc b/net/network_error_logging/network_error_logging_service.cc
+index 4bcc417213..0ecaa4f674 100644
+--- a/net/network_error_logging/network_error_logging_service.cc
++++ b/net/network_error_logging/network_error_logging_service.cc
+@@ -34,6 +34,11 @@
+ #include "url/gurl.h"
+ #include "url/origin.h"
+ 
++#define kIncludeSubdomainsKey kIncludeSubdomainsKey_NetworkErrorLoggingService
++#define kMaxAgeKey            kMaxAgeKey_NetworkErrorLoggingService
++#define kMaxJsonSize          kMaxJsonSize_NetworkErrorLoggingService
++#define kMaxJsonDepth         kMaxJsonDepth_NetworkErrorLoggingService
++
+ namespace net {
+ 
+ namespace {
+@@ -1048,3 +1053,8 @@ NetworkErrorLoggingService::NetworkErrorLoggingService()
+     : clock_(base::DefaultClock::GetInstance()) {}
+ 
+ }  // namespace net
++
++#undef kIncludeSubdomainsKey
++#undef kMaxAgeKey
++#undef kMaxJsonSize
++#undef kMaxJsonDepth
+diff --git a/net/proxy_resolution/configured_proxy_resolution_service.cc b/net/proxy_resolution/configured_proxy_resolution_service.cc
+index 15caf805c0..4efba7c3b0 100644
+--- a/net/proxy_resolution/configured_proxy_resolution_service.cc
++++ b/net/proxy_resolution/configured_proxy_resolution_service.cc
+@@ -162,6 +162,10 @@ class DefaultPollPolicy
+   }
+ };
+ 
++}  // namespace
++
++namespace configured_proxy_resolution_service {
++
+ // Config getter that always returns direct settings.
+ class ProxyConfigServiceDirect : public ProxyConfigService {
+  public:
+@@ -175,6 +179,10 @@ class ProxyConfigServiceDirect : public ProxyConfigService {
+   }
+ };
+ 
++}  // namespace configured_proxy_resolution_service
++
++namespace {
++
+ // Proxy resolver that fails every time.
+ class ProxyResolverNull : public ProxyResolver {
+  public:
+@@ -899,7 +907,7 @@ std::unique_ptr<ConfiguredProxyResolutionService>
+ ConfiguredProxyResolutionService::CreateDirect() {
+   // Use direct connections.
+   return std::make_unique<ConfiguredProxyResolutionService>(
+-      std::make_unique<ProxyConfigServiceDirect>(),
++      std::make_unique<configured_proxy_resolution_service::ProxyConfigServiceDirect>(),
+       std::make_unique<ProxyResolverFactoryForNullResolver>(), nullptr,
+       /*quick_check_enabled=*/true);
+ }
+diff --git a/net/proxy_resolution/proxy_config_service.cc b/net/proxy_resolution/proxy_config_service.cc
+index 4235120dba..927571d7d1 100644
+--- a/net/proxy_resolution/proxy_config_service.cc
++++ b/net/proxy_resolution/proxy_config_service.cc
+@@ -75,6 +75,10 @@ class UnsetProxyConfigService : public ProxyConfigService {
+ };
+ #endif
+ 
++}  // namespace
++
++namespace proxy_config_service {
++
+ // Config getter that always returns direct settings.
+ class ProxyConfigServiceDirect : public ProxyConfigService {
+  public:
+@@ -88,7 +92,7 @@ class ProxyConfigServiceDirect : public ProxyConfigService {
+   }
+ };
+ 
+-}  // namespace
++}  // namespace proxy_config_service
+ 
+ // static
+ std::unique_ptr<ProxyConfigService>
+@@ -133,11 +137,11 @@ ProxyConfigService::CreateSystemProxyConfigService(
+       base::SingleThreadTaskRunner::GetCurrentDefault());
+ #elif BUILDFLAG(IS_FUCHSIA)
+   // TODO(crbug.com/42050626): Implement a system proxy service for Fuchsia.
+-  return std::make_unique<ProxyConfigServiceDirect>();
++  return std::make_unique<proxy_config_service::ProxyConfigServiceDirect>();
+ #else
+   LOG(WARNING) << "Failed to choose a system proxy settings fetcher "
+                   "for this platform.";
+-  return std::make_unique<ProxyConfigServiceDirect>();
++  return std::make_unique<proxy_config_service::ProxyConfigServiceDirect>();
+ #endif
+ }
+ 
+diff --git a/net/quic/bidirectional_stream_quic_impl.cc b/net/quic/bidirectional_stream_quic_impl.cc
+index a93fdde411..ebd69a7ff9 100644
+--- a/net/quic/bidirectional_stream_quic_impl.cc
++++ b/net/quic/bidirectional_stream_quic_impl.cc
+@@ -19,6 +19,8 @@
+ #include "net/third_party/quiche/src/quiche/quic/core/quic_connection.h"
+ #include "quic_http_stream.h"
+ 
++#define ScopedBoolSaver ScopedBoolSaver_BidirectionalStreamQuicImpl
++
+ namespace net {
+ namespace {
+ // Sets a boolean to a value, and restores it to the previous value once
+@@ -408,3 +410,5 @@ void BidirectionalStreamQuicImpl::ResetStream() {
+ }
+ 
+ }  // namespace net
++
++#undef ScopedBoolSaver
+diff --git a/net/quic/dedicated_web_transport_http3_client.cc b/net/quic/dedicated_web_transport_http3_client.cc
+index 80c9151188..4fd91932f4 100644
+--- a/net/quic/dedicated_web_transport_http3_client.cc
++++ b/net/quic/dedicated_web_transport_http3_client.cc
+@@ -31,6 +31,8 @@
+ #include "net/url_request/url_request_context.h"
+ #include "url/scheme_host_port.h"
+ 
++#define HostsFromOrigins HostsFromOrigins_DedicatedWebTransportHTTP3Client
++
+ namespace net {
+ 
+ namespace {
+@@ -978,3 +980,5 @@ void DedicatedWebTransportHttp3Client::OnDatagramProcessed(
+ }
+ 
+ }  // namespace net
++
++#undef HostsFromOrigins
+diff --git a/net/quic/quic_chromium_client_stream.cc b/net/quic/quic_chromium_client_stream.cc
+index 0b9bb4abe9..f75911f4f3 100644
+--- a/net/quic/quic_chromium_client_stream.cc
++++ b/net/quic/quic_chromium_client_stream.cc
+@@ -29,6 +29,8 @@
+ #include "net/third_party/quiche/src/quiche/quic/core/quic_utils.h"
+ #include "net/third_party/quiche/src/quiche/quic/core/quic_write_blocked_list.h"
+ 
++#define ScopedBoolSaver ScopedBoolSaver_QuicChromiumClientStream
++
+ namespace net {
+ namespace {
+ // Sets a boolean to a value, and restores it to the previous value once
+@@ -930,3 +932,5 @@ bool QuicChromiumClientStream::IsFirstStream() {
+ }
+ 
+ }  // namespace net
++
++#undef ScopedBoolSaver
+diff --git a/net/quic/quic_session_pool.cc b/net/quic/quic_session_pool.cc
+index 23aa9c90f2..0cd9cf551f 100644
+--- a/net/quic/quic_session_pool.cc
++++ b/net/quic/quic_session_pool.cc
+@@ -84,6 +84,8 @@
+ #include "url/scheme_host_port.h"
+ #include "url/url_constants.h"
+ 
++#define HostsFromOrigins HostsFromOrigins_QuicSessionPool
++
+ namespace net {
+ 
+ namespace {
+@@ -2030,3 +2032,5 @@ bool QuicSessionPool::CryptoConfigCacheIsEmptyForTesting(
+ }
+ 
+ }  // namespace net
++
++#undef HostsFromOrigins
+diff --git a/net/reporting/reporting_header_parser.cc b/net/reporting/reporting_header_parser.cc
+index 4dd58a017e..b028d925f1 100644
+--- a/net/reporting/reporting_header_parser.cc
++++ b/net/reporting/reporting_header_parser.cc
+@@ -26,6 +26,9 @@
+ #include "net/reporting/reporting_endpoint.h"
+ #include "net/reporting/reporting_target_type.h"
+ 
++#define kIncludeSubdomainsKey kIncludeSubdomainsKey_ReportingHeaderParser
++#define kMaxAgeKey            kMaxAgeKey_ReportingHeaderParser
++
+ namespace net {
+ 
+ namespace {
+@@ -358,3 +361,6 @@ void ReportingHeaderParser::ProcessParsedReportingEndpointsHeader(
+ }
+ 
+ }  // namespace net
++
++#undef kIncludeSubdomainsKey
++#undef kMaxAgeKey
+diff --git a/net/reporting/reporting_service.cc b/net/reporting/reporting_service.cc
+index b552cb5e19..88f5cb68dc 100644
+--- a/net/reporting/reporting_service.cc
++++ b/net/reporting/reporting_service.cc
+@@ -29,6 +29,9 @@
+ #include "url/gurl.h"
+ #include "url/origin.h"
+ 
++#define kMaxJsonSize  kMaxJsonSize_ReportingService
++#define kMaxJsonDepth kMaxJsonDepth_ReportingService
++
+ namespace net {
+ 
+ namespace {
+@@ -350,3 +353,6 @@ base::Value ReportingService::StatusAsValue() const {
+ }
+ 
+ }  // namespace net
++
++#undef kMaxJsonSize
++#undef kMaxJsonDepth
+diff --git a/net/server/web_socket_encoder.cc b/net/server/web_socket_encoder.cc
+index 8595552baa..5f843e31ea 100644
+--- a/net/server/web_socket_encoder.cc
++++ b/net/server/web_socket_encoder.cc
+@@ -23,6 +23,13 @@
+ #include "net/websockets/websocket_extension_parser.h"
+ #include "net/websockets/websocket_frame.h"
+ 
++#define kFinalBit     kFinalBit_WebSocketEncoder
++#define kReserved1Bit kReserved1Bit_WebSocketEncoder
++#define kReserved2Bit kReserved2Bit_WebSocketEncoder
++#define kReserved3Bit kReserved3Bit_WebSocketEncoder
++#define kOpCodeMask   kOpCodeMask_WebSocketEncoder
++#define kMaskBit      kMaskBit_WebSocketEncoder
++
+ namespace net {
+ 
+ const char WebSocketEncoder::kClientExtensions[] =
+@@ -400,3 +407,10 @@ bool WebSocketEncoder::Deflate(std::string_view message, std::string* output) {
+ }
+ 
+ }  // namespace net
++
++#undef kFinalBit
++#undef kReserved1Bit
++#undef kReserved2Bit
++#undef kReserved3Bit
++#undef kOpCodeMask
++#undef kMaskBit
+diff --git a/net/websockets/websocket_channel.cc b/net/websockets/websocket_channel.cc
+index ddae9d9e15..d3b3fccbb0 100644
+--- a/net/websockets/websocket_channel.cc
++++ b/net/websockets/websocket_channel.cc
+@@ -47,6 +47,8 @@
+ #include "net/websockets/websocket_handshake_response_info.h"
+ #include "net/websockets/websocket_stream.h"
+ 
++#define kWebSocketCloseCodeLength kWebSocketCloseCodeLength_WebSocketChannel
++
+ namespace net {
+ class AuthChallengeInfo;
+ class AuthCredentials;
+@@ -1050,3 +1052,5 @@ void WebSocketChannel::CloseTimeout() {
+ }
+ 
+ }  // namespace net
++
++#undef kWebSocketCloseCodeLength
+diff --git a/net/websockets/websocket_frame.cc b/net/websockets/websocket_frame.cc
+index 0256cdd070..e489305328 100644
+--- a/net/websockets/websocket_frame.cc
++++ b/net/websockets/websocket_frame.cc
+@@ -24,6 +24,14 @@
+ #include "build/build_config.h"
+ #include "net/base/net_errors.h"
+ 
++#define kWebSocketCloseCodeLength kWebSocketCloseCodeLength_WebSocketFrame
++#define kFinalBit                 kFinalBit_WebSocketFrame
++#define kReserved1Bit             kReserved1Bit_WebSocketFrame
++#define kReserved2Bit             kReserved2Bit_WebSocketFrame
++#define kReserved3Bit             kReserved3Bit_WebSocketFrame
++#define kOpCodeMask               kOpCodeMask_WebSocketFrame
++#define kMaskBit                  kMaskBit_WebSocketFrame
++
+ namespace net {
+ 
+ namespace {
+@@ -263,3 +271,11 @@ void MaskWebSocketFramePayload(const WebSocketMaskingKey& masking_key,
+ }
+ 
+ }  // namespace net
++
++#undef kWebSocketCloseCodeLength
++#undef kFinalBit
++#undef kReserved1Bit
++#undef kReserved2Bit
++#undef kReserved3Bit
++#undef kOpCodeMask
++#undef kMaskBit
+diff --git a/net/websockets/websocket_http2_handshake_stream.cc b/net/websockets/websocket_http2_handshake_stream.cc
+index cc324b7e01..fd34d009d0 100644
+--- a/net/websockets/websocket_http2_handshake_stream.cc
++++ b/net/websockets/websocket_http2_handshake_stream.cc
+@@ -33,6 +33,8 @@
+ #include "net/websockets/websocket_handshake_constants.h"
+ #include "net/websockets/websocket_handshake_request_info.h"
+ 
++#define ValidateStatus ValidateStatus_WebSocketHttp2HandshakeStream
++
+ namespace net {
+ 
+ namespace {
+@@ -396,3 +398,5 @@ void WebSocketHttp2HandshakeStream::OnFailure(
+ }
+ 
+ }  // namespace net
++
++#undef ValidateStatus
+diff --git a/net/websockets/websocket_http3_handshake_stream.cc b/net/websockets/websocket_http3_handshake_stream.cc
+index 1d8db45d3f..eb2ee93787 100644
+--- a/net/websockets/websocket_http3_handshake_stream.cc
++++ b/net/websockets/websocket_http3_handshake_stream.cc
+@@ -29,6 +29,8 @@
+ #include "net/websockets/websocket_handshake_constants.h"
+ #include "net/websockets/websocket_handshake_request_info.h"
+ 
++#define ValidateStatus ValidateStatus_WebSocketHttp3HandshakeStream
++
+ namespace net {
+ struct AlternativeService;
+ 
+@@ -387,3 +389,5 @@ void WebSocketHttp3HandshakeStream::OnFailure(
+ }
+ 
+ }  // namespace net
++
++#undef ValidateStatus

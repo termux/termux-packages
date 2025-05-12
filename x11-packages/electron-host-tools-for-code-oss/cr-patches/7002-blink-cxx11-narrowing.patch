@@ -1,0 +1,14 @@
+--- a/chrome/browser/performance_manager/user_tuning/cpu_health_tracker.cc
++++ b/chrome/browser/performance_manager/user_tuning/cpu_health_tracker.cc
+@@ -222,8 +222,9 @@
+     return;
+   }
+ 
+-  const CpuPercent total_system_cpu_usage{cpu_sample.value().cpu_utilization *
+-                                          100};
++  const CpuPercent total_system_cpu_usage{
++    static_cast<int>(cpu_sample.value().cpu_utilization * 100)};
++
+   if (GetHealthLevelForMeasurement(total_system_cpu_usage) !=
+       HealthLevel::kHealthy) {
+     // Query for tab CPU usage to determine actionability

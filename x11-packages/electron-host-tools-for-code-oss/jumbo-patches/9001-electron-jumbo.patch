@@ -1,0 +1,1458 @@
+From ba646fbe7bebb0debfb6bb271573352d20ccccc4 Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <licy183@termux.dev>
+Date: Sat, 10 May 2025 02:42:36 +0800
+Subject: [PATCH] jumbo
+
+---
+ BUILD.gn                                      | 27 ++++++++++++++++++-
+ shell/browser/api/electron_api_app.cc         |  6 +++--
+ .../browser/api/electron_api_auto_updater.cc  |  6 +++--
+ shell/browser/api/electron_api_base_window.cc |  6 +++--
+ .../api/electron_api_browser_window.cc        |  6 +++--
+ .../api/electron_api_content_tracing.cc       |  6 +++--
+ .../api/electron_api_crash_reporter.cc        |  6 +++--
+ .../api/electron_api_desktop_capturer.cc      |  6 +++--
+ shell/browser/api/electron_api_dialog.cc      |  6 +++--
+ .../browser/api/electron_api_download_item.cc |  8 +++---
+ .../browser/api/electron_api_event_emitter.cc |  7 +++--
+ .../api/electron_api_global_shortcut.cc       |  6 +++--
+ .../api/electron_api_in_app_purchase.cc       |  6 +++--
+ shell/browser/api/electron_api_menu.cc        |  6 +++--
+ .../browser/api/electron_api_native_theme.cc  |  6 +++--
+ .../browser/api/electron_api_notification.cc  |  6 +++--
+ .../browser/api/electron_api_power_monitor.cc |  6 +++--
+ .../api/electron_api_power_save_blocker.cc    |  6 +++--
+ shell/browser/api/electron_api_printing.cc    |  6 +++--
+ shell/browser/api/electron_api_protocol.cc    |  6 +++--
+ .../api/electron_api_push_notifications.cc    |  6 +++--
+ .../browser/api/electron_api_safe_storage.cc  | 10 ++++---
+ shell/browser/api/electron_api_screen.cc      |  6 +++--
+ shell/browser/api/electron_api_session.cc     | 14 +++++-----
+ .../api/electron_api_system_preferences.cc    |  6 +++--
+ shell/browser/api/electron_api_tray.cc        |  6 +++--
+ .../api/electron_api_utility_process.cc       |  6 +++--
+ shell/browser/api/electron_api_view.cc        |  6 +++--
+ .../browser/api/electron_api_web_contents.cc  |  6 +++--
+ .../api/electron_api_web_contents_view.cc     |  6 +++--
+ .../api/electron_api_web_frame_main.cc        |  6 +++--
+ .../api/electron_api_web_view_manager.cc      |  6 +++--
+ shell/browser/api/message_port.cc             |  6 +++--
+ .../api/views/electron_api_image_view.cc      |  6 +++--
+ shell/browser/electron_browser_main_parts.cc  |  4 +--
+ .../electron_browser_main_parts_linux.cc      |  6 ++---
+ .../extension_action/extension_action_api.cc  |  2 --
+ .../electron_extension_host_delegate.cc       |  2 +-
+ .../electron_extensions_api_client.cc         |  8 +++---
+ .../extensions/electron_messaging_delegate.cc |  4 +--
+ shell/browser/ui/devtools_manager_delegate.cc |  4 +--
+ .../ui/devtools_ui_theme_data_source.cc       |  8 +++---
+ .../ui/views/client_frame_view_linux.cc       |  4 +--
+ shell/common/api/crashpad_support.cc          |  6 +++--
+ shell/common/api/electron_api_asar.cc         |  6 +++--
+ shell/common/api/electron_api_clipboard.cc    |  6 +++--
+ shell/common/api/electron_api_command_line.cc |  6 +++--
+ shell/common/api/electron_api_environment.cc  |  6 +++--
+ shell/common/api/electron_api_native_image.cc |  6 +++--
+ shell/common/api/electron_api_net.cc          |  6 +++--
+ shell/common/api/electron_api_shell.cc        |  6 +++--
+ shell/common/api/electron_api_testing.cc      |  6 +++--
+ shell/common/api/electron_api_v8_util.cc      |  6 +++--
+ shell/common/api/features.cc                  |  6 +++--
+ shell/common/process_util.cc                  |  8 +++---
+ .../api/electron_api_context_bridge.cc        |  6 +++--
+ .../electron_api_crash_reporter_renderer.cc   |  6 +++--
+ .../renderer/api/electron_api_ipc_renderer.cc |  6 +++--
+ shell/renderer/api/electron_api_web_frame.cc  |  6 +++--
+ shell/renderer/api/electron_api_web_utils.cc  |  6 +++--
+ 61 files changed, 254 insertions(+), 134 deletions(-)
+
+diff --git a/BUILD.gn b/BUILD.gn
+index f27aafb..8923fa4 100644
+--- a/electron/BUILD.gn
++++ b/electron/BUILD.gn
+@@ -1,4 +1,5 @@
+ import("//build/config/locales.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//build/config/win/manifest.gni")
+ import("//components/os_crypt/sync/features.gni")
+@@ -405,7 +406,7 @@ action("electron_generate_node_defines") {
+   args = [ rebase_path(target_gen_dir) ] + rebase_path(inputs)
+ }
+ 
+-source_set("electron_lib") {
++jumbo_source_set("electron_lib") {
+   configs += [
+     "//v8:external_startup_data",
+     "//third_party/electron_node:node_internals",
+@@ -534,6 +535,22 @@ source_set("electron_lib") {
+   configs += [ "//electron/build/config:mas_build" ]
+ 
+   sources = filenames.lib_sources
++  jumbo_excluded_sources = [
++    # call to deleted constructor of 'base::OnceCallback<void (bool, const u16string &)>'
++    "shell/app/electron_main_delegate.cc",
++
++    # invalid operands to binary expression ('x11::EventMask' and 'x11::EventMask')
++    "shell/browser/api/electron_api_desktop_capturer.cc",
++
++    # redefinition of 'Converter<mojo::StructPtr<device::mojom::SerialPortInfo>>'
++    "shell/browser/serial/serial_chooser_controller.cc",
++
++    # no member named 'ToV8' in 'gin::Converter<std::vector<std::pair<std::string, std::vector<std::string>>>>'
++    "shell/common/gin_converters/file_dialog_converter.cc",
++
++    # invalid application of 'sizeof' to a function type
++    "shell/utility/electron_content_utility_client.cc",
++  ]
+   if (is_win) {
+     sources += filenames.lib_sources_win
+   }
+@@ -548,6 +565,10 @@ source_set("electron_lib") {
+   }
+   if (!is_mac) {
+     sources += filenames.lib_sources_views
++    jumbo_excluded_sources += [
++      # invalid operands to binary expression ('x11::EventMask' and 'x11::EventMask')
++      "shell/browser/native_window_views.cc",
++    ]
+   }
+ 
+   if (is_component_build) {
+@@ -641,6 +662,10 @@ source_set("electron_lib") {
+         "//ui/base/x",
+         "//ui/ozone/platform/x11",
+       ]
++      jumbo_excluded_sources += [
++        # invalid operands to binary expression ('x11::EventMask' and 'x11::EventMask')
++        "shell/browser/ui/x/x_window_utils.cc",
++      ]
+     }
+     configs += [ ":gio_unix" ]
+     defines += [
+diff --git a/shell/browser/api/electron_api_app.cc b/shell/browser/api/electron_api_app.cc
+index eb3d774..ddee4da 100644
+--- a/electron/shell/browser/api/electron_api_app.cc
++++ b/electron/shell/browser/api/electron_api_app.cc
+@@ -1818,7 +1818,7 @@ const char* App::GetTypeName() {
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_app {
+ 
+ void Initialize(v8::Local<v8::Object> exports,
+                 v8::Local<v8::Value> unused,
+@@ -1831,4 +1831,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_app, Initialize)
++#define _module _module_electron_browser_app
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_app, a_electron_browser_app::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_auto_updater.cc b/shell/browser/api/electron_api_auto_updater.cc
+index 18d2b40..61282a5 100644
+--- a/electron/shell/browser/api/electron_api_auto_updater.cc
++++ b/electron/shell/browser/api/electron_api_auto_updater.cc
+@@ -147,7 +147,7 @@ const char* AutoUpdater::GetTypeName() {
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_auto_updater {
+ 
+ using electron::api::AutoUpdater;
+ 
+@@ -162,4 +162,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_auto_updater, Initialize)
++#define _module _module_electron_browser_auto_updater
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_auto_updater, a_electron_browser_auto_updater::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_base_window.cc b/shell/browser/api/electron_api_base_window.cc
+index ab2214b..66b77c2 100644
+--- a/electron/shell/browser/api/electron_api_base_window.cc
++++ b/electron/shell/browser/api/electron_api_base_window.cc
+@@ -1308,7 +1308,7 @@ void BaseWindow::BuildPrototype(v8::Isolate* isolate,
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_base_window {
+ 
+ using electron::api::BaseWindow;
+ 
+@@ -1332,4 +1332,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_base_window, Initialize)
++#define _module _module_electron_browser_base_window 
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_base_window, a_electron_browser_base_window::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_browser_window.cc b/shell/browser/api/electron_api_browser_window.cc
+index 256fa03..4d6cbab 100644
+--- a/electron/shell/browser/api/electron_api_browser_window.cc
++++ b/electron/shell/browser/api/electron_api_browser_window.cc
+@@ -370,7 +370,7 @@ v8::Local<v8::Value> BrowserWindow::From(v8::Isolate* isolate,
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_window {
+ 
+ using electron::api::BrowserWindow;
+ 
+@@ -387,4 +387,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_window, Initialize)
++#define _module _module_electron_browser_window
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_window, a_electron_browser_window::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_content_tracing.cc b/shell/browser/api/electron_api_content_tracing.cc
+index 384a16e..3b7b24e 100644
+--- a/electron/shell/browser/api/electron_api_content_tracing.cc
++++ b/electron/shell/browser/api/electron_api_content_tracing.cc
+@@ -54,7 +54,7 @@ struct Converter<base::trace_event::TraceConfig> {
+ 
+ }  // namespace gin
+ 
+-namespace {
++namespace a_electron_browser_content_tracing {
+ 
+ using CompletionCallback = base::OnceCallback<void(const base::FilePath&)>;
+ 
+@@ -182,4 +182,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_content_tracing, Initialize)
++#define _module _module_electron_browser_content_tracing
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_content_tracing, a_electron_browser_content_tracing::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_crash_reporter.cc b/shell/browser/api/electron_api_crash_reporter.cc
+index 88b1260..451a1ab 100644
+--- a/electron/shell/browser/api/electron_api_crash_reporter.cc
++++ b/electron/shell/browser/api/electron_api_crash_reporter.cc
+@@ -180,7 +180,7 @@ void Start(const std::string& submit_url,
+ 
+ }  // namespace electron::api::crash_reporter
+ 
+-namespace {
++namespace a_electron_browser_crash_reporter {
+ 
+ #if IS_MAS_BUILD()
+ void GetUploadedReports(
+@@ -279,4 +279,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_crash_reporter, Initialize)
++#define _module _module_electron_browser_crash_reporter
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_crash_reporter, a_electron_browser_crash_reporter::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_desktop_capturer.cc b/shell/browser/api/electron_api_desktop_capturer.cc
+index 82de0b9..e196e27 100644
+--- a/electron/shell/browser/api/electron_api_desktop_capturer.cc
++++ b/electron/shell/browser/api/electron_api_desktop_capturer.cc
+@@ -521,7 +521,7 @@ const char* DesktopCapturer::GetTypeName() {
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_desktop_capturer {
+ 
+ void Initialize(v8::Local<v8::Object> exports,
+                 v8::Local<v8::Value> unused,
+@@ -537,4 +537,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_desktop_capturer, Initialize)
++#define _module _module_electron_browser_desktop_capturer
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_desktop_capturer, a_electron_browser_desktop_capturer::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_dialog.cc b/shell/browser/api/electron_api_dialog.cc
+index 4ce5edc..cf83426 100644
+--- a/electron/shell/browser/api/electron_api_dialog.cc
++++ b/electron/shell/browser/api/electron_api_dialog.cc
+@@ -18,7 +18,7 @@
+ #include "shell/common/gin_helper/promise.h"
+ #include "shell/common/node_includes.h"
+ 
+-namespace {
++namespace a_electron_browser_dialog {
+ 
+ int ShowMessageBoxSync(const electron::MessageBoxSettings& settings) {
+   return electron::ShowMessageBoxSync(settings);
+@@ -105,4 +105,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_dialog, Initialize)
++#define _module _module_electron_browser_dialog
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_dialog, a_electron_browser_dialog::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_download_item.cc b/shell/browser/api/electron_api_download_item.cc
+index 1e526af..cee9d49 100644
+--- a/electron/shell/browser/api/electron_api_download_item.cc
++++ b/electron/shell/browser/api/electron_api_download_item.cc
+@@ -57,8 +57,8 @@ namespace {
+ // V8. So this makes a weak link. The lifetimes of download::DownloadItem and
+ // api::DownloadItem are fully independent, and either one may be destroyed
+ // before the other.
+-struct UserDataLink : base::SupportsUserData::Data {
+-  explicit UserDataLink(base::WeakPtr<DownloadItem> item)
++struct UserDataLink2 : base::SupportsUserData::Data {
++  explicit UserDataLink2(base::WeakPtr<DownloadItem> item)
+       : download_item(item) {}
+ 
+   base::WeakPtr<DownloadItem> download_item;
+@@ -73,7 +73,7 @@ gin::WrapperInfo DownloadItem::kWrapperInfo = {gin::kEmbedderNativeGin};
+ // static
+ DownloadItem* DownloadItem::FromDownloadItem(download::DownloadItem* item) {
+   // ^- say that 7 times fast in a row
+-  auto* data = static_cast<UserDataLink*>(
++  auto* data = static_cast<UserDataLink2*>(
+       item->GetUserData(kElectronApiDownloadItemKey));
+   return data ? data->download_item.get() : nullptr;
+ }
+@@ -83,7 +83,7 @@ DownloadItem::DownloadItem(v8::Isolate* isolate, download::DownloadItem* item)
+   download_item_->AddObserver(this);
+   download_item_->SetUserData(
+       kElectronApiDownloadItemKey,
+-      std::make_unique<UserDataLink>(weak_factory_.GetWeakPtr()));
++      std::make_unique<UserDataLink2>(weak_factory_.GetWeakPtr()));
+ }
+ 
+ DownloadItem::~DownloadItem() {
+diff --git a/shell/browser/api/electron_api_event_emitter.cc b/shell/browser/api/electron_api_event_emitter.cc
+index 2606293..8d382d5 100644
+--- a/electron/shell/browser/api/electron_api_event_emitter.cc
++++ b/electron/shell/browser/api/electron_api_event_emitter.cc
+@@ -12,7 +12,7 @@
+ #include "shell/common/node_includes.h"
+ #include "v8/include/v8.h"
+ 
+-namespace {
++namespace a_electron_browser_event_emitter {
+ 
+ v8::Global<v8::Object>* GetEventEmitterPrototypeReference() {
+   static base::NoDestructor<v8::Global<v8::Object>> event_emitter_prototype;
+@@ -40,10 +40,13 @@ void Initialize(v8::Local<v8::Object> exports,
+ namespace electron {
+ 
+ v8::Local<v8::Object> GetEventEmitterPrototype(v8::Isolate* isolate) {
++  using namespace a_electron_browser_event_emitter;
+   CHECK(!GetEventEmitterPrototypeReference()->IsEmpty());
+   return GetEventEmitterPrototypeReference()->Get(isolate);
+ }
+ 
+ }  // namespace electron
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_event_emitter, Initialize)
++#define _module _module_electron_browser_event_emitter
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_event_emitter, a_electron_browser_event_emitter::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_global_shortcut.cc b/shell/browser/api/electron_api_global_shortcut.cc
+index da14282..93c3ef5 100644
+--- a/electron/shell/browser/api/electron_api_global_shortcut.cc
++++ b/electron/shell/browser/api/electron_api_global_shortcut.cc
+@@ -174,7 +174,7 @@ const char* GlobalShortcut::GetTypeName() {
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_global_shortcut {
+ 
+ void Initialize(v8::Local<v8::Object> exports,
+                 v8::Local<v8::Value> unused,
+@@ -187,4 +187,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_global_shortcut, Initialize)
++#define _module _module_electron_browser_global_shortcut
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_global_shortcut, a_electron_browser_global_shortcut::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_in_app_purchase.cc b/shell/browser/api/electron_api_in_app_purchase.cc
+index ac78a07..16d1b62 100644
+--- a/electron/shell/browser/api/electron_api_in_app_purchase.cc
++++ b/electron/shell/browser/api/electron_api_in_app_purchase.cc
+@@ -205,7 +205,7 @@ void InAppPurchase::OnTransactionsUpdated(
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_in_app_purchase {
+ 
+ using electron::api::InAppPurchase;
+ 
+@@ -222,4 +222,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_in_app_purchase, Initialize)
++#define _module _module_electron_browser_in_app_purchase
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_in_app_purchase, a_electron_browser_in_app_purchase::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_menu.cc b/shell/browser/api/electron_api_menu.cc
+index 257013e..d6a964b 100644
+--- a/electron/shell/browser/api/electron_api_menu.cc
++++ b/electron/shell/browser/api/electron_api_menu.cc
+@@ -305,7 +305,7 @@ const char* Menu::GetTypeName() {
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_menu {
+ 
+ using electron::api::Menu;
+ 
+@@ -326,4 +326,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_menu, Initialize)
++#define _module _module_electron_browser_menu
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_menu, a_electron_browser_menu::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_native_theme.cc b/shell/browser/api/electron_api_native_theme.cc
+index 32958bf..2ff5815 100644
+--- a/electron/shell/browser/api/electron_api_native_theme.cc
++++ b/electron/shell/browser/api/electron_api_native_theme.cc
+@@ -123,7 +123,7 @@ const char* NativeTheme::GetTypeName() {
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_native_theme {
+ 
+ using electron::api::NativeTheme;
+ 
+@@ -176,4 +176,6 @@ bool Converter<ui::NativeTheme::ThemeSource>::FromV8(
+ 
+ }  // namespace gin
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_native_theme, Initialize)
++#define _module _module_electron_browser_native_theme
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_native_theme, a_electron_browser_native_theme::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_notification.cc b/shell/browser/api/electron_api_notification.cc
+index 69ab934..bafa4ec 100644
+--- a/electron/shell/browser/api/electron_api_notification.cc
++++ b/electron/shell/browser/api/electron_api_notification.cc
+@@ -238,7 +238,7 @@ const char* Notification::GetTypeName() {
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_notification {
+ 
+ using electron::api::Notification;
+ 
+@@ -254,4 +254,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_notification, Initialize)
++#define _module _module_electron_browser_notification
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_notification, a_electron_browser_notification::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_power_monitor.cc b/shell/browser/api/electron_api_power_monitor.cc
+index 93e63c3..311c500 100644
+--- a/electron/shell/browser/api/electron_api_power_monitor.cc
++++ b/electron/shell/browser/api/electron_api_power_monitor.cc
+@@ -156,7 +156,7 @@ const char* PowerMonitor::GetTypeName() {
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_power_monitor {
+ 
+ using electron::api::PowerMonitor;
+ 
+@@ -200,4 +200,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_power_monitor, Initialize)
++#define _module _module_electron_browser_power_monitor
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_power_monitor, a_electron_browser_power_monitor::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_power_save_blocker.cc b/shell/browser/api/electron_api_power_save_blocker.cc
+index c34ffe9..75bb1c3 100644
+--- a/electron/shell/browser/api/electron_api_power_save_blocker.cc
++++ b/electron/shell/browser/api/electron_api_power_save_blocker.cc
+@@ -130,7 +130,7 @@ const char* PowerSaveBlocker::GetTypeName() {
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_power_save_blocker {
+ 
+ void Initialize(v8::Local<v8::Object> exports,
+                 v8::Local<v8::Value> unused,
+@@ -144,5 +144,7 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
++#define _module _module_electron_browser_power_save_blocker
+ NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_power_save_blocker,
+-                                  Initialize)
++                                  a_electron_browser_power_save_blocker::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_printing.cc b/shell/browser/api/electron_api_printing.cc
+index 3d58422..8441d85 100644
+--- a/electron/shell/browser/api/electron_api_printing.cc
++++ b/electron/shell/browser/api/electron_api_printing.cc
+@@ -70,7 +70,7 @@ v8::Local<v8::Promise> GetPrinterListAsync(v8::Isolate* isolate) {
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_printing {
+ 
+ #if BUILDFLAG(ENABLE_PRINTING)
+ using electron::api::GetPrinterListAsync;
+@@ -90,4 +90,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_printing, Initialize)
++#define _module _module_electron_browser_printing
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_printing, a_electron_browser_printing::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_protocol.cc b/shell/browser/api/electron_api_protocol.cc
+index c4d055e..f4d81e4 100644
+--- a/electron/shell/browser/api/electron_api_protocol.cc
++++ b/electron/shell/browser/api/electron_api_protocol.cc
+@@ -349,7 +349,7 @@ const char* Protocol::GetTypeName() {
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_protocol {
+ 
+ void RegisterSchemesAsPrivileged(gin_helper::ErrorThrower thrower,
+                                  v8::Local<v8::Value> val) {
+@@ -376,4 +376,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_protocol, Initialize)
++#define _module _module_electron_browser_protocol
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_protocol, a_electron_browser_protocol::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_push_notifications.cc b/shell/browser/api/electron_api_push_notifications.cc
+index 797b1c8..91e0371 100644
+--- a/electron/shell/browser/api/electron_api_push_notifications.cc
++++ b/electron/shell/browser/api/electron_api_push_notifications.cc
+@@ -53,7 +53,7 @@ const char* PushNotifications::GetTypeName() {
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_push_notifications {
+ 
+ void Initialize(v8::Local<v8::Object> exports,
+                 v8::Local<v8::Value> unused,
+@@ -67,5 +67,7 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
++#define _module _module_electron_browser_push_notifications
+ NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_push_notifications,
+-                                  Initialize)
++                                  a_electron_browser_push_notifications::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_safe_storage.cc b/shell/browser/api/electron_api_safe_storage.cc
+index 3109fc9..1d57d60 100644
+--- a/electron/shell/browser/api/electron_api_safe_storage.cc
++++ b/electron/shell/browser/api/electron_api_safe_storage.cc
+@@ -13,7 +13,7 @@
+ #include "shell/common/node_includes.h"
+ #include "shell/common/platform_util.h"
+ 
+-namespace {
++namespace a_electron_browser_safe_storage {
+ 
+ const char* kEncryptionVersionPrefixV10 = "v10";
+ const char* kEncryptionVersionPrefixV11 = "v11";
+@@ -126,8 +126,6 @@ std::string DecryptString(v8::Isolate* isolate, v8::Local<v8::Value> buffer) {
+   return plaintext;
+ }
+ 
+-}  // namespace
+-
+ void Initialize(v8::Local<v8::Object> exports,
+                 v8::Local<v8::Value> unused,
+                 v8::Local<v8::Context> context,
+@@ -143,4 +141,8 @@ void Initialize(v8::Local<v8::Object> exports,
+   dict.SetMethod("setUsePlainTextEncryption", &SetUsePasswordV10);
+ }
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_safe_storage, Initialize)
++}  // namespace
++
++#define _module _module_electron_browser_safe_storage
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_safe_storage, a_electron_browser_safe_storage::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_screen.cc b/shell/browser/api/electron_api_screen.cc
+index c008edd..096a9f8 100644
+--- a/electron/shell/browser/api/electron_api_screen.cc
++++ b/electron/shell/browser/api/electron_api_screen.cc
+@@ -168,7 +168,7 @@ const char* Screen::GetTypeName() {
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_screen {
+ 
+ using electron::api::Screen;
+ 
+@@ -183,4 +183,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_screen, Initialize)
++#define _module _module_electron_browser_screen
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_screen, a_electron_browser_screen::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_session.cc b/shell/browser/api/electron_api_session.cc
+index 75f6218..dc3da52 100644
+--- a/electron/shell/browser/api/electron_api_session.cc
++++ b/electron/shell/browser/api/electron_api_session.cc
+@@ -530,8 +530,8 @@ class DictionaryObserver final : public SpellcheckCustomDictionary::Observer {
+ };
+ #endif  // BUILDFLAG(ENABLE_BUILTIN_SPELLCHECKER)
+ 
+-struct UserDataLink : base::SupportsUserData::Data {
+-  explicit UserDataLink(base::WeakPtr<Session> session_in)
++struct UserDataLink3 : base::SupportsUserData::Data {
++  explicit UserDataLink3(base::WeakPtr<Session> session_in)
+       : session{std::move(session_in)} {}
+ 
+   base::WeakPtr<Session> session;
+@@ -556,7 +556,7 @@ Session::Session(v8::Isolate* isolate, ElectronBrowserContext* browser_context)
+ 
+   browser_context->SetUserData(
+       kElectronApiSessionKey,
+-      std::make_unique<UserDataLink>(weak_factory_.GetWeakPtr()));
++      std::make_unique<UserDataLink3>(weak_factory_.GetWeakPtr()));
+ 
+ #if BUILDFLAG(ENABLE_BUILTIN_SPELLCHECKER)
+   SpellcheckService* service =
+@@ -1514,7 +1514,7 @@ bool Session::IsSpellCheckerEnabled() const {
+ // static
+ Session* Session::FromBrowserContext(content::BrowserContext* context) {
+   auto* data =
+-      static_cast<UserDataLink*>(context->GetUserData(kElectronApiSessionKey));
++      static_cast<UserDataLink3*>(context->GetUserData(kElectronApiSessionKey));
+   return data ? data->session.get() : nullptr;
+ }
+ 
+@@ -1674,7 +1674,7 @@ const char* Session::GetTypeName() {
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_session {
+ 
+ using electron::api::Session;
+ 
+@@ -1720,4 +1720,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_session, Initialize)
++#define _module _module_electron_browser_session
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_session, a_electron_browser_session::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_system_preferences.cc b/shell/browser/api/electron_api_system_preferences.cc
+index 14594d9..5e1942a 100644
+--- a/electron/shell/browser/api/electron_api_system_preferences.cc
++++ b/electron/shell/browser/api/electron_api_system_preferences.cc
+@@ -109,7 +109,7 @@ const char* SystemPreferences::GetTypeName() {
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_system_preferences {
+ 
+ using electron::api::SystemPreferences;
+ 
+@@ -124,5 +124,7 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
++#define _module _module_electron_browser_system_preferences
+ NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_system_preferences,
+-                                  Initialize)
++                                  a_electron_browser_system_preferences::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_tray.cc b/shell/browser/api/electron_api_tray.cc
+index eaadc4b..eafe943 100644
+--- a/electron/shell/browser/api/electron_api_tray.cc
++++ b/electron/shell/browser/api/electron_api_tray.cc
+@@ -433,7 +433,7 @@ const char* Tray::GetTypeName() {
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_tray {
+ 
+ using electron::api::Tray;
+ 
+@@ -449,4 +449,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_tray, Initialize)
++#define _module _module_electron_browser_tray
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_tray, a_electron_browser_tray::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_utility_process.cc b/shell/browser/api/electron_api_utility_process.cc
+index c3ae054..9803157 100644
+--- a/electron/shell/browser/api/electron_api_utility_process.cc
++++ b/electron/shell/browser/api/electron_api_utility_process.cc
+@@ -482,7 +482,7 @@ const char* UtilityProcessWrapper::GetTypeName() {
+ 
+ }  // namespace electron
+ 
+-namespace {
++namespace a_electron_browser_utility_process {
+ 
+ void Initialize(v8::Local<v8::Object> exports,
+                 v8::Local<v8::Value> unused,
+@@ -495,4 +495,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_utility_process, Initialize)
++#define _module _module_electron_browser_utility_process
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_utility_process, a_electron_browser_utility_process::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_view.cc b/shell/browser/api/electron_api_view.cc
+index 037f2f3..cf4381d 100644
+--- a/electron/shell/browser/api/electron_api_view.cc
++++ b/electron/shell/browser/api/electron_api_view.cc
+@@ -413,7 +413,7 @@ void View::BuildPrototype(v8::Isolate* isolate,
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_view {
+ 
+ using electron::api::View;
+ 
+@@ -429,4 +429,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_view, Initialize)
++#define _module _module_electron_browser_view
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_view, a_electron_browser_view::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_web_contents.cc b/shell/browser/api/electron_api_web_contents.cc
+index f890907..bc595c7 100644
+--- a/electron/shell/browser/api/electron_api_web_contents.cc
++++ b/electron/shell/browser/api/electron_api_web_contents.cc
+@@ -4523,7 +4523,7 @@ gin::WrapperInfo WebContents::kWrapperInfo = {gin::kEmbedderNativeGin};
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_web_contents {
+ 
+ using electron::api::GetAllWebContents;
+ using electron::api::WebContents;
+@@ -4579,4 +4579,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_web_contents, Initialize)
++#define _module _module_electron_browser_web_contents
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_web_contents, a_electron_browser_web_contents::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_web_contents_view.cc b/shell/browser/api/electron_api_web_contents_view.cc
+index 8d6ce05..b4752db 100644
+--- a/electron/shell/browser/api/electron_api_web_contents_view.cc
++++ b/electron/shell/browser/api/electron_api_web_contents_view.cc
+@@ -218,7 +218,7 @@ void WebContentsView::BuildPrototype(
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_web_contents_view {
+ 
+ using electron::api::WebContentsView;
+ 
+@@ -233,5 +233,7 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
++#define _module _module_electron_browser_web_contents_view
+ NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_web_contents_view,
+-                                  Initialize)
++                                  a_electron_browser_web_contents_view::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_web_frame_main.cc b/shell/browser/api/electron_api_web_frame_main.cc
+index ace25fd..6eed225 100644
+--- a/electron/shell/browser/api/electron_api_web_frame_main.cc
++++ b/electron/shell/browser/api/electron_api_web_frame_main.cc
+@@ -426,7 +426,7 @@ const char* WebFrameMain::GetTypeName() {
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_web_frame_main {
+ 
+ using electron::api::WebFrameMain;
+ 
+@@ -471,4 +471,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_web_frame_main, Initialize)
++#define _module _module_electron_browser_web_frame_main
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_web_frame_main, a_electron_browser_web_frame_main::Initialize)
++#undef _module
+diff --git a/shell/browser/api/electron_api_web_view_manager.cc b/shell/browser/api/electron_api_web_view_manager.cc
+index 55b86d1..efd7dc9 100644
+--- a/electron/shell/browser/api/electron_api_web_view_manager.cc
++++ b/electron/shell/browser/api/electron_api_web_view_manager.cc
+@@ -13,7 +13,7 @@
+ 
+ using electron::WebContentsPreferences;
+ 
+-namespace {
++namespace a_electron_browser_web_view_manager {
+ 
+ void AddGuest(int guest_instance_id,
+               content::WebContents* embedder,
+@@ -47,4 +47,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_web_view_manager, Initialize)
++#define _module _module_electron_browser_web_view_manager
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_web_view_manager, a_electron_browser_web_view_manager::Initialize)
++#undef _module
+diff --git a/shell/browser/api/message_port.cc b/shell/browser/api/message_port.cc
+index 04b5290..434cde0 100644
+--- a/electron/shell/browser/api/message_port.cc
++++ b/electron/shell/browser/api/message_port.cc
+@@ -301,7 +301,7 @@ const char* MessagePort::GetTypeName() {
+ 
+ }  // namespace electron
+ 
+-namespace {
++namespace a_electron_browser_message_port {
+ 
+ using electron::MessagePort;
+ 
+@@ -328,4 +328,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_message_port, Initialize)
++#define _module _module_electron_browser_message_port
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_message_port, a_electron_browser_message_port::Initialize)
++#undef _module
+diff --git a/shell/browser/api/views/electron_api_image_view.cc b/shell/browser/api/views/electron_api_image_view.cc
+index 0455252..0629199 100644
+--- a/electron/shell/browser/api/views/electron_api_image_view.cc
++++ b/electron/shell/browser/api/views/electron_api_image_view.cc
+@@ -40,7 +40,7 @@ void ImageView::BuildPrototype(v8::Isolate* isolate,
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_browser_image_view {
+ 
+ using electron::api::ImageView;
+ 
+@@ -56,4 +56,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_image_view, Initialize)
++#define _module _module_electron_browser_image_view
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_image_view, a_electron_browser_image_view::Initialize)
++#undef _module
+diff --git a/shell/browser/electron_browser_main_parts.cc b/shell/browser/electron_browser_main_parts.cc
+index 66390a4..df36ef4 100644
+--- a/electron/shell/browser/electron_browser_main_parts.cc
++++ b/electron/shell/browser/electron_browser_main_parts.cc
+@@ -456,7 +456,7 @@ int ElectronBrowserMainParts::PreMainMessageLoopRun() {
+       ElectronWebUIControllerFactory::GetInstance());
+ 
+   auto* command_line = base::CommandLine::ForCurrentProcess();
+-  if (command_line->HasSwitch(switches::kRemoteDebuggingPipe)) {
++  if (command_line->HasSwitch(::switches::kRemoteDebuggingPipe)) {
+     // --remote-debugging-pipe
+     auto on_disconnect = base::BindOnce([]() {
+       content::GetUIThreadTaskRunner({})->PostTask(
+@@ -464,7 +464,7 @@ int ElectronBrowserMainParts::PreMainMessageLoopRun() {
+     });
+     content::DevToolsAgentHost::StartRemoteDebuggingPipeHandler(
+         std::move(on_disconnect));
+-  } else if (command_line->HasSwitch(switches::kRemoteDebuggingPort)) {
++  } else if (command_line->HasSwitch(::switches::kRemoteDebuggingPort)) {
+     // --remote-debugging-port
+     DevToolsManagerDelegate::StartHttpHandler();
+   }
+diff --git a/shell/browser/electron_browser_main_parts_linux.cc b/shell/browser/electron_browser_main_parts_linux.cc
+index 85d1ad9..711326a 100644
+--- a/electron/shell/browser/electron_browser_main_parts_linux.cc
++++ b/electron/shell/browser/electron_browser_main_parts_linux.cc
+@@ -123,15 +123,15 @@ std::string MaybeFixPlatformName(const std::string& ozone_platform_hint) {
+ void ElectronBrowserMainParts::DetectOzonePlatform() {
+   auto const env = base::Environment::Create();
+   auto* const command_line = base::CommandLine::ForCurrentProcess();
+-  if (!command_line->HasSwitch(switches::kOzonePlatform)) {
++  if (!command_line->HasSwitch(::switches::kOzonePlatform)) {
+     auto ozone_platform_hint =
+-        command_line->GetSwitchValueASCII(switches::kOzonePlatformHint);
++        command_line->GetSwitchValueASCII(::switches::kOzonePlatformHint);
+     if (ozone_platform_hint.empty()) {
+       env->GetVar(kElectronOzonePlatformHint, &ozone_platform_hint);
+     }
+     if (!ozone_platform_hint.empty()) {
+       command_line->AppendSwitchASCII(
+-          switches::kOzonePlatform, MaybeFixPlatformName(ozone_platform_hint));
++          ::switches::kOzonePlatform, MaybeFixPlatformName(ozone_platform_hint));
+     }
+   }
+ 
+diff --git a/shell/browser/extensions/api/extension_action/extension_action_api.cc b/shell/browser/extensions/api/extension_action/extension_action_api.cc
+index 6d75dd7..bd4cb65 100644
+--- a/electron/shell/browser/extensions/api/extension_action/extension_action_api.cc
++++ b/electron/shell/browser/extensions/api/extension_action/extension_action_api.cc
+@@ -17,8 +17,6 @@
+ #include "extensions/browser/extension_util.h"
+ #include "extensions/common/mojom/view_type.mojom.h"
+ 
+-using content::WebContents;
+-
+ namespace extensions {
+ 
+ //
+diff --git a/shell/browser/extensions/electron_extension_host_delegate.cc b/shell/browser/extensions/electron_extension_host_delegate.cc
+index 02695d6..f88076e 100644
+--- a/electron/shell/browser/extensions/electron_extension_host_delegate.cc
++++ b/electron/shell/browser/extensions/electron_extension_host_delegate.cc
+@@ -25,7 +25,7 @@ void ElectronExtensionHostDelegate::OnExtensionHostCreated(
+   ElectronExtensionWebContentsObserver::CreateForWebContents(web_contents);
+   v8::Isolate* isolate = v8::Isolate::GetCurrent();
+   v8::HandleScope scope(isolate);
+-  electron::api::WebContents::FromOrCreate(isolate, web_contents);
++  ::electron::api::WebContents::FromOrCreate(isolate, web_contents);
+ }
+ 
+ void ElectronExtensionHostDelegate::OnMainFrameCreatedForBackgroundPage(
+diff --git a/shell/browser/extensions/electron_extensions_api_client.cc b/shell/browser/extensions/electron_extensions_api_client.cc
+index 1831a1e..190d643 100644
+--- a/electron/shell/browser/extensions/electron_extensions_api_client.cc
++++ b/electron/shell/browser/extensions/electron_extensions_api_client.cc
+@@ -45,7 +45,7 @@ class ElectronGuestViewManagerDelegate
+   void OnGuestAdded(content::WebContents* guest_web_contents) const override {
+     v8::Isolate* isolate = v8::Isolate::GetCurrent();
+     v8::HandleScope scope(isolate);
+-    electron::api::WebContents::FromOrCreate(isolate, guest_web_contents);
++    ::electron::api::WebContents::FromOrCreate(isolate, guest_web_contents);
+   }
+ };
+ 
+@@ -69,8 +69,8 @@ class ElectronMimeHandlerViewGuestDelegate
+     if (!web_contents)
+       return true;
+ 
+-    electron::api::WebContents* api_web_contents =
+-        electron::api::WebContents::From(
++    ::electron::api::WebContents* api_web_contents =
++        ::electron::api::WebContents::From(
+             web_contents->GetOutermostWebContents());
+     if (api_web_contents)
+       api_web_contents->HandleContextMenu(render_frame_host, params);
+@@ -94,7 +94,7 @@ MessagingDelegate* ElectronExtensionsAPIClient::GetMessagingDelegate() {
+ void ElectronExtensionsAPIClient::AttachWebContentsHelpers(
+     content::WebContents* web_contents) const {
+ #if BUILDFLAG(ENABLE_PRINTING)
+-  electron::PrintViewManagerElectron::CreateForWebContents(web_contents);
++  ::electron::PrintViewManagerElectron::CreateForWebContents(web_contents);
+ #endif
+ 
+   extensions::ElectronExtensionWebContentsObserver::CreateForWebContents(
+diff --git a/shell/browser/extensions/electron_messaging_delegate.cc b/shell/browser/extensions/electron_messaging_delegate.cc
+index 487515f..c0c8dac 100644
+--- a/electron/shell/browser/extensions/electron_messaging_delegate.cc
++++ b/electron/shell/browser/extensions/electron_messaging_delegate.cc
+@@ -44,7 +44,7 @@ ElectronMessagingDelegate::IsNativeMessagingHostAllowed(
+ std::optional<base::Value::Dict> ElectronMessagingDelegate::MaybeGetTabInfo(
+     content::WebContents* web_contents) {
+   if (web_contents) {
+-    auto* api_contents = electron::api::WebContents::From(web_contents);
++    auto* api_contents = ::electron::api::WebContents::From(web_contents);
+     if (api_contents) {
+       api::tabs::Tab tab;
+       tab.id = api_contents->ID();
+@@ -60,7 +60,7 @@ std::optional<base::Value::Dict> ElectronMessagingDelegate::MaybeGetTabInfo(
+ content::WebContents* ElectronMessagingDelegate::GetWebContentsByTabId(
+     content::BrowserContext* browser_context,
+     int tab_id) {
+-  auto* contents = electron::api::WebContents::FromID(tab_id);
++  auto* contents = ::electron::api::WebContents::FromID(tab_id);
+   if (!contents) {
+     return nullptr;
+   }
+diff --git a/shell/browser/ui/devtools_manager_delegate.cc b/shell/browser/ui/devtools_manager_delegate.cc
+index 89711a7..af9a32b 100644
+--- a/electron/shell/browser/ui/devtools_manager_delegate.cc
++++ b/electron/shell/browser/ui/devtools_manager_delegate.cc
+@@ -70,10 +70,10 @@ std::unique_ptr<content::DevToolsSocketFactory> CreateSocketFactory() {
+   // See if the user specified a port on the command line (useful for
+   // automation). If not, use an ephemeral port by specifying 0.
+   int port = 0;
+-  if (command_line.HasSwitch(switches::kRemoteDebuggingPort)) {
++  if (command_line.HasSwitch(::switches::kRemoteDebuggingPort)) {
+     int temp_port;
+     std::string port_str =
+-        command_line.GetSwitchValueASCII(switches::kRemoteDebuggingPort);
++        command_line.GetSwitchValueASCII(::switches::kRemoteDebuggingPort);
+     if (base::StringToInt(port_str, &temp_port) && temp_port >= 0 &&
+         temp_port < 65535) {
+       port = temp_port;
+diff --git a/shell/browser/ui/devtools_ui_theme_data_source.cc b/shell/browser/ui/devtools_ui_theme_data_source.cc
+index ac4e82b..4e43749 100644
+--- a/electron/shell/browser/ui/devtools_ui_theme_data_source.cc
++++ b/electron/shell/browser/ui/devtools_ui_theme_data_source.cc
+@@ -35,13 +35,13 @@ GURL GetThemeUrl(const std::string& path) {
+               std::string(chrome::kChromeUIThemeHost) + "/" + path);
+ }
+ 
+-scoped_refptr<base::RefCountedMemory> CreateNotFoundResponse() {
++scoped_refptr<base::RefCountedMemory> CreateNotFoundResponse2() {
+   const char kHttpNotFound[] = "HTTP/1.1 404 Not Found\n\n";
+   return base::MakeRefCounted<base::RefCountedStaticMemory>(
+       base::byte_span_from_cstring(kHttpNotFound));
+ }
+ 
+-std::string GetMimeTypeForUrl(const GURL& url) {
++std::string GetMimeTypeForUrl2(const GURL& url) {
+   std::string filename = url.ExtractFileName();
+   if (base::EndsWith(filename, ".html", base::CompareCase::INSENSITIVE_ASCII)) {
+     return "text/html";
+@@ -103,11 +103,11 @@ void ThemeDataSource::StartDataRequest(
+     return;
+   }
+ 
+-  std::move(callback).Run(CreateNotFoundResponse());
++  std::move(callback).Run(CreateNotFoundResponse2());
+ }
+ 
+ std::string ThemeDataSource::GetMimeType(const GURL& url) {
+-  return GetMimeTypeForUrl(url);
++  return GetMimeTypeForUrl2(url);
+ }
+ 
+ void ThemeDataSource::SendColorsCss(
+diff --git a/shell/browser/ui/views/client_frame_view_linux.cc b/shell/browser/ui/views/client_frame_view_linux.cc
+index 7e5f1e8..c142ceb 100644
+--- a/electron/shell/browser/ui/views/client_frame_view_linux.cc
++++ b/electron/shell/browser/ui/views/client_frame_view_linux.cc
+@@ -41,7 +41,7 @@ namespace {
+ 
+ // These values should be the same as Chromium uses.
+ constexpr int kResizeOutsideBorderSize = 10;
+-constexpr int kResizeInsideBoundsSize = 5;
++constexpr int kResizeInsideBoundsSize2 = 5;
+ 
+ ui::NavButtonProvider::ButtonState ButtonStateToNavButtonProviderState(
+     views::Button::ButtonState state) {
+@@ -197,7 +197,7 @@ void ClientFrameViewLinux::OnWindowButtonOrderingChange() {
+ int ClientFrameViewLinux::ResizingBorderHitTest(const gfx::Point& point) {
+   return ResizingBorderHitTestImpl(
+       point,
+-      GetBorderDecorationInsets() + gfx::Insets(kResizeInsideBoundsSize));
++      GetBorderDecorationInsets() + gfx::Insets(kResizeInsideBoundsSize2));
+ }
+ 
+ gfx::Rect ClientFrameViewLinux::GetBoundsForClientView() const {
+diff --git a/shell/common/api/crashpad_support.cc b/shell/common/api/crashpad_support.cc
+index 6106304..fe4f531 100644
+--- a/electron/shell/common/api/crashpad_support.cc
++++ b/electron/shell/common/api/crashpad_support.cc
+@@ -9,7 +9,7 @@
+ #include "components/crash/core/app/crashpad.h"  // nogncheck
+ #endif
+ 
+-namespace {
++namespace a_electron_common_crashpad_support {
+ 
+ #if BUILDFLAG(IS_LINUX)
+ int GetCrashdumpSignalFD() {
+@@ -36,4 +36,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_crashpad_support, Initialize)
++#define _module _module_electron_common_crashpad_support
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_crashpad_support, a_electron_common_crashpad_support::Initialize)
++#undef _module
+diff --git a/shell/common/api/electron_api_asar.cc b/shell/common/api/electron_api_asar.cc
+index 2661292..c3f6c45 100644
+--- a/electron/shell/common/api/electron_api_asar.cc
++++ b/electron/shell/common/api/electron_api_asar.cc
+@@ -11,7 +11,7 @@
+ #include "shell/common/gin_helper/dictionary.h"
+ #include "shell/common/node_includes.h"
+ 
+-namespace {
++namespace a_electron_common_asar {
+ 
+ class Archive : public node::ObjectWrap {
+  public:
+@@ -228,4 +228,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_asar, Initialize)
++#define _module _module_electron_common_asar
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_asar, a_electron_common_asar::Initialize)
++#undef _module
+diff --git a/shell/common/api/electron_api_clipboard.cc b/shell/common/api/electron_api_clipboard.cc
+index 49da6a1..d4dd7e2 100644
+--- a/electron/shell/common/api/electron_api_clipboard.cc
++++ b/electron/shell/common/api/electron_api_clipboard.cc
+@@ -290,7 +290,7 @@ void Clipboard::WriteFilesForTesting(const std::vector<base::FilePath>& files) {
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_common_clipboard {
+ 
+ void Initialize(v8::Local<v8::Object> exports,
+                 v8::Local<v8::Value> unused,
+@@ -323,4 +323,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_clipboard, Initialize)
++#define _module _module_electron_common_clipboard
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_clipboard, a_electron_common_clipboard::Initialize)
++#undef _module
+diff --git a/shell/common/api/electron_api_command_line.cc b/shell/common/api/electron_api_command_line.cc
+index 5dcd03a..2eefd7d 100644
+--- a/electron/shell/common/api/electron_api_command_line.cc
++++ b/electron/shell/common/api/electron_api_command_line.cc
+@@ -11,7 +11,7 @@
+ #include "shell/common/gin_helper/dictionary.h"
+ #include "shell/common/node_includes.h"
+ 
+-namespace {
++namespace a_electron_common_command_line {
+ 
+ bool HasSwitch(const std::string& name) {
+   return base::CommandLine::ForCurrentProcess()->HasSwitch(name);
+@@ -66,4 +66,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_command_line, Initialize)
++#define _module _module_electron_common_command_line
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_command_line, a_electron_common_command_line::Initialize)
++#undef _module
+diff --git a/shell/common/api/electron_api_environment.cc b/shell/common/api/electron_api_environment.cc
+index f785c08..62bfc9e 100644
+--- a/electron/shell/common/api/electron_api_environment.cc
++++ b/electron/shell/common/api/electron_api_environment.cc
+@@ -6,7 +6,7 @@
+ #include "shell/common/gin_helper/dictionary.h"
+ #include "shell/common/node_includes.h"
+ 
+-namespace {
++namespace a_electron_common_environment {
+ 
+ v8::Local<v8::Value> GetVar(v8::Isolate* isolate, const std::string& name) {
+   std::string value;
+@@ -37,4 +37,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_environment, Initialize)
++#define _module _module_electron_common_environment
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_environment, a_electron_common_environment::Initialize)
++#undef _module
+diff --git a/shell/common/api/electron_api_native_image.cc b/shell/common/api/electron_api_native_image.cc
+index a822186..dffa473 100644
+--- a/electron/shell/common/api/electron_api_native_image.cc
++++ b/electron/shell/common/api/electron_api_native_image.cc
+@@ -620,7 +620,7 @@ gin::WrapperInfo NativeImage::kWrapperInfo = {gin::kEmbedderNativeGin};
+ 
+ }  // namespace electron::api
+ 
+-namespace {
++namespace a_electron_common_native_image {
+ 
+ using electron::api::NativeImage;
+ 
+@@ -648,4 +648,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_native_image, Initialize)
++#define _module _module_electron_common_native_image
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_native_image, a_electron_common_native_image::Initialize)
++#undef _module
+diff --git a/shell/common/api/electron_api_net.cc b/shell/common/api/electron_api_net.cc
+index 78a3b0a..1a47cd2 100644
+--- a/electron/shell/common/api/electron_api_net.cc
++++ b/electron/shell/common/api/electron_api_net.cc
+@@ -21,7 +21,7 @@
+ #include "shell/common/gin_helper/promise.h"
+ #include "shell/common/node_includes.h"
+ 
+-namespace {
++namespace a_electron_common_net {
+ 
+ bool IsOnline() {
+   return !net::NetworkChangeNotifier::IsOffline();
+@@ -93,4 +93,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_net, Initialize)
++#define _module _module_electron_common_net
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_net, a_electron_common_net::Initialize)
++#undef _module
+diff --git a/shell/common/api/electron_api_shell.cc b/shell/common/api/electron_api_shell.cc
+index e1348bd..4550b07 100644
+--- a/electron/shell/common/api/electron_api_shell.cc
++++ b/electron/shell/common/api/electron_api_shell.cc
+@@ -44,7 +44,7 @@ struct Converter<base::win::ShortcutOperation> {
+ }  // namespace gin
+ #endif
+ 
+-namespace {
++namespace a_electron_common_shell {
+ 
+ void OnOpenFinished(gin_helper::Promise<void> promise,
+                     const std::string& error) {
+@@ -185,4 +185,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_shell, Initialize)
++#define _module _module_electron_common_shell
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_shell, a_electron_common_shell::Initialize)
++#undef _module
+diff --git a/shell/common/api/electron_api_testing.cc b/shell/common/api/electron_api_testing.cc
+index 8d88fca..2333f40 100644
+--- a/electron/shell/common/api/electron_api_testing.cc
++++ b/electron/shell/common/api/electron_api_testing.cc
+@@ -9,7 +9,7 @@
+ #include "v8/include/v8.h"
+ 
+ #if DCHECK_IS_ON()
+-namespace {
++namespace a_electron_common_testing {
+ 
+ void Log(int severity, std::string text) {
+   switch (severity) {
+@@ -44,5 +44,7 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_testing, Initialize)
++#define _module _module_electron_common_testing
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_testing, a_electron_common_testing::Initialize)
++#undef _module
+ #endif
+diff --git a/shell/common/api/electron_api_v8_util.cc b/shell/common/api/electron_api_v8_util.cc
+index c02e334..1897979 100644
+--- a/electron/shell/common/api/electron_api_v8_util.cc
++++ b/electron/shell/common/api/electron_api_v8_util.cc
+@@ -39,7 +39,7 @@ struct Converter<std::pair<Type1, Type2>> {
+ 
+ }  // namespace gin
+ 
+-namespace {
++namespace a_electron_common_v8_util {
+ 
+ v8::Local<v8::Value> GetHiddenValue(v8::Isolate* isolate,
+                                     v8::Local<v8::Object> object,
+@@ -112,4 +112,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_v8_util, Initialize)
++#define _module _module_electron_common_v8_util
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_v8_util, a_electron_common_v8_util::Initialize)
++#undef _module
+diff --git a/shell/common/api/features.cc b/shell/common/api/features.cc
+index af5d530..8f52c07 100644
+--- a/electron/shell/common/api/features.cc
++++ b/electron/shell/common/api/features.cc
+@@ -7,7 +7,7 @@
+ #include "shell/common/gin_helper/dictionary.h"
+ #include "shell/common/node_includes.h"
+ 
+-namespace {
++namespace a_electron_common_features {
+ 
+ bool IsBuiltinSpellCheckerEnabled() {
+   return BUILDFLAG(ENABLE_BUILTIN_SPELLCHECKER);
+@@ -53,4 +53,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_features, Initialize)
++#define _module _module_electron_common_features
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_common_features, a_electron_common_features::Initialize)
++#undef _module
+diff --git a/shell/common/process_util.cc b/shell/common/process_util.cc
+index d54dc15..5adcc7f 100644
+--- a/electron/shell/common/process_util.cc
++++ b/electron/shell/common/process_util.cc
+@@ -29,7 +29,7 @@ void EmitWarning(node::Environment* env,
+ 
+ std::string GetProcessType() {
+   auto* command_line = base::CommandLine::ForCurrentProcess();
+-  return command_line->GetSwitchValueASCII(switches::kProcessType);
++  return command_line->GetSwitchValueASCII(::switches::kProcessType);
+ }
+ 
+ bool IsBrowserProcess() {
+@@ -38,17 +38,17 @@ bool IsBrowserProcess() {
+ }
+ 
+ bool IsRendererProcess() {
+-  static bool result = GetProcessType() == switches::kRendererProcess;
++  static bool result = GetProcessType() == ::switches::kRendererProcess;
+   return result;
+ }
+ 
+ bool IsUtilityProcess() {
+-  static bool result = GetProcessType() == switches::kUtilityProcess;
++  static bool result = GetProcessType() == ::switches::kUtilityProcess;
+   return result;
+ }
+ 
+ bool IsZygoteProcess() {
+-  static bool result = GetProcessType() == switches::kZygoteProcess;
++  static bool result = GetProcessType() == ::switches::kZygoteProcess;
+   return result;
+ }
+ 
+diff --git a/shell/renderer/api/electron_api_context_bridge.cc b/shell/renderer/api/electron_api_context_bridge.cc
+index f7c85c6..7cc34ba 100644
+--- a/electron/shell/renderer/api/electron_api_context_bridge.cc
++++ b/electron/shell/renderer/api/electron_api_context_bridge.cc
+@@ -824,7 +824,7 @@ bool IsCalledFromMainWorld(v8::Isolate* isolate) {
+ 
+ }  // namespace electron
+ 
+-namespace {
++namespace a_electron_renderer_context_bridge {
+ 
+ void Initialize(v8::Local<v8::Object> exports,
+                 v8::Local<v8::Value> unused,
+@@ -846,4 +846,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_renderer_context_bridge, Initialize)
++#define _module _module_electron_renderer_context_bridge
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_renderer_context_bridge, a_electron_renderer_context_bridge::Initialize)
++#undef _module
+diff --git a/shell/renderer/api/electron_api_crash_reporter_renderer.cc b/shell/renderer/api/electron_api_crash_reporter_renderer.cc
+index 3d9d9ad..2db5db0 100644
+--- a/electron/shell/renderer/api/electron_api_crash_reporter_renderer.cc
++++ b/electron/shell/renderer/api/electron_api_crash_reporter_renderer.cc
+@@ -10,7 +10,7 @@
+ #include "shell/common/crash_keys.h"
+ #endif
+ 
+-namespace {
++namespace a_electron_renderer_crash_reporter {
+ 
+ v8::Local<v8::Value> GetParameters(v8::Isolate* isolate) {
+   std::map<std::string, std::string> keys;
+@@ -42,4 +42,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_renderer_crash_reporter, Initialize)
++#define _module _module_electron_renderer_crash_reporter
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_renderer_crash_reporter, a_electron_renderer_crash_reporter::Initialize)
++#undef _module
+diff --git a/shell/renderer/api/electron_api_ipc_renderer.cc b/shell/renderer/api/electron_api_ipc_renderer.cc
+index 6aa766a..460ff5d 100644
+--- a/electron/shell/renderer/api/electron_api_ipc_renderer.cc
++++ b/electron/shell/renderer/api/electron_api_ipc_renderer.cc
+@@ -28,7 +28,7 @@
+ using blink::WebLocalFrame;
+ using content::RenderFrame;
+ 
+-namespace {
++namespace a_electron_renderer_ipc {
+ 
+ const char kIPCMethodCalledAfterContextReleasedError[] =
+     "IPC method called after context was released";
+@@ -219,4 +219,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_renderer_ipc, Initialize)
++#define _module _module_electron_renderer_ipc
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_renderer_ipc, a_electron_renderer_ipc::Initialize)
++#undef _module
+diff --git a/shell/renderer/api/electron_api_web_frame.cc b/shell/renderer/api/electron_api_web_frame.cc
+index 35861aa..8aa10a7 100644
+--- a/electron/shell/renderer/api/electron_api_web_frame.cc
++++ b/electron/shell/renderer/api/electron_api_web_frame.cc
+@@ -910,7 +910,7 @@ std::set<SpellCheckerHolder*> SpellCheckerHolder::instances_;
+ 
+ }  // namespace electron
+ 
+-namespace {
++namespace a_electron_renderer_web_frame {
+ 
+ void Initialize(v8::Local<v8::Object> exports,
+                 v8::Local<v8::Value> unused,
+@@ -926,4 +926,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_renderer_web_frame, Initialize)
++#define _module _module_electron_renderer_web_frame
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_renderer_web_frame, a_electron_renderer_web_frame::Initialize)
++#undef _module
+diff --git a/shell/renderer/api/electron_api_web_utils.cc b/shell/renderer/api/electron_api_web_utils.cc
+index c1c399f..16596a6 100644
+--- a/electron/shell/renderer/api/electron_api_web_utils.cc
++++ b/electron/shell/renderer/api/electron_api_web_utils.cc
+@@ -24,7 +24,7 @@ std::string GetPathForFile(v8::Isolate* isolate, v8::Local<v8::Value> file) {
+ 
+ }  // namespace electron::api::web_utils
+ 
+-namespace {
++namespace a_electron_renderer_web_utils {
+ 
+ void Initialize(v8::Local<v8::Object> exports,
+                 v8::Local<v8::Value> unused,
+@@ -37,4 +37,6 @@ void Initialize(v8::Local<v8::Object> exports,
+ 
+ }  // namespace
+ 
+-NODE_LINKED_BINDING_CONTEXT_AWARE(electron_renderer_web_utils, Initialize)
++#define _module _module_electron_renderer_web_utils
++NODE_LINKED_BINDING_CONTEXT_AWARE(electron_renderer_web_utils, a_electron_renderer_web_utils::Initialize)
++#undef _module
