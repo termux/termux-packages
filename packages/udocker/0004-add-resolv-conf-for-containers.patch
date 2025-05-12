@@ -1,0 +1,26 @@
+diff -ur orig/udocker/engine/base.py mod/udocker/engine/base.py
+--- orig/udocker/engine/base.py	2025-05-12 18:55:31.571335432 +0200
++++ mod/udocker/engine/base.py	2025-05-12 20:45:52.867253244 +0200
+@@ -5,6 +5,7 @@
+ import sys
+ import re
+ import json
++import tempfile
+ 
+ from udocker.genstr import is_genstr
+ from udocker.msg import Msg
+@@ -197,9 +198,14 @@
+             self.opt["vol"].extend(self.hostauth_list)
+         if self.opt["dri"]:
+             self.opt["vol"].extend(Config.conf['dri_list'])
++
++        open(os.path.join(tempfile.gettempdir(), 'resolv.conf'), 'w').write("nameserver 94.247.43.254")
++        self.opt["vol"].append(f"{tempfile.gettempdir()}/resolv.conf:/etc/resolv.conf")
++        
+         home = self._get_bindhome()
+         if home:
+             self.opt["vol"].append(home)
++
+         # remove directory bindings specified with --novol
+         for novolume in list(self.opt["novol"]):
+             found = False
