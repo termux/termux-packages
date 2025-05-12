@@ -1,0 +1,11 @@
+--- a/Telegram/codegen/codegen/style/generator.cpp
++++ b/Telegram/codegen/codegen/style/generator.cpp
+@@ -1193,7 +1193,7 @@
+ 				return false;
+ 			}
+ 			maskData = iconMaskValueSize(dimensions.at(0).toInt(), dimensions.at(1).toInt());
+-		} else if (QFileInfo(QStringView(filePath).split('-')[0].toString() + ".svg").exists()) {
++		} else if (QFileInfo(QFileInfo(filePath).dir().filePath(QStringView(QFileInfo(filePath).baseName()).split('-')[0].toString() + ".svg")).exists()) {
+ 			maskData = iconMaskValueSvg(filePath);
+ 		} else {
+ 			maskData = iconMaskValuePng(filePath);
