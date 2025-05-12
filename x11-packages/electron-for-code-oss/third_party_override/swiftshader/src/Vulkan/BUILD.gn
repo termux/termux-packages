@@ -1,0 +1,27 @@
+import("vulkan.gni")
+
+action("swiftshader_libvulkan") {
+  _lib_name = "libvk_swiftshader.so"
+  output_file = "${root_build_dir}/${_lib_name}"
+  script = "//v8/tools/run.py"
+  args = [
+    "bash", "-c", 
+    "cp -f" + " " +
+    "/data/data/com.termux/files/usr/opt/electron-host-tools-for-code-oss/$_lib_name" + " " +
+    "$output_file",
+  ]
+  outputs = [ output_file ]
+}
+
+action("icd_file") {
+  _icd_file_name = "vk_swiftshader_icd.json"
+  output_icd_file = "${root_out_dir}/${_icd_file_name}"
+  script = "//v8/tools/run.py"
+  args = [
+    "bash", "-c", 
+    "cp -f" + " " +
+    "/data/data/com.termux/files/usr/opt/electron-host-tools-for-code-oss/$_icd_file_name" + " " +
+    "$output_icd_file",
+  ]
+  outputs = [ output_icd_file ]
+}
