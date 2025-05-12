@@ -1,0 +1,36 @@
+Origin: https://gitlab.com/kalilinux/packages/code-oss/-/raw/20dba6c293bb4a6a7dca54acf08b0d52d3dd50d3/debian/patches/Remove-more-telemetry.patch
+From: Sophie Brun <sophie@offensive-security.com>
+Date: Wed, 8 Mar 2023 16:36:34 +0100
+Subject: Remove more telemetry
+
+---
+ src/vs/workbench/contrib/preferences/common/preferencesContribution.ts | 2 +-
+ src/vs/workbench/electron-sandbox/desktop.contribution.ts              | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/vs/workbench/contrib/preferences/common/preferencesContribution.ts b/src/vs/workbench/contrib/preferences/common/preferencesContribution.ts
+index 896ddc2..4b15027 100644
+--- a/src/vs/workbench/contrib/preferences/common/preferencesContribution.ts
++++ b/src/vs/workbench/contrib/preferences/common/preferencesContribution.ts
+@@ -144,7 +144,7 @@ registry.registerConfiguration({
+ 		'workbench.settings.enableNaturalLanguageSearch': {
+ 			'type': 'boolean',
+ 			'description': nls.localize('enableNaturalLanguageSettingsSearch', "Controls whether to enable the natural language search mode for settings. The natural language search is provided by a Microsoft online service."),
+-			'default': true,
++			'default': false,
+ 			'scope': ConfigurationScope.WINDOW,
+ 			'tags': ['usesOnlineServices']
+ 		},
+diff --git a/src/vs/workbench/electron-sandbox/desktop.contribution.ts b/src/vs/workbench/electron-sandbox/desktop.contribution.ts
+index 7ae5494..8e86929 100644
+--- a/src/vs/workbench/electron-sandbox/desktop.contribution.ts
++++ b/src/vs/workbench/electron-sandbox/desktop.contribution.ts
+@@ -269,7 +269,7 @@ import { applicationConfigurationNodeBase } from 'vs/workbench/common/configurat
+ 			'telemetry.enableCrashReporter': {
+ 				'type': 'boolean',
+ 				'description': localize('telemetry.enableCrashReporting', "Enable crash reports to be collected. This helps us improve stability. \nThis option requires restart to take effect."),
+-				'default': true,
++				'default': false,
+ 				'tags': ['usesOnlineServices', 'telemetry'],
+ 				'markdownDeprecationMessage': localize('enableCrashReporterDeprecated', "If this setting is false, no telemetry will be sent regardless of the new setting's value. Deprecated due to being combined into the {0} setting.", `\`#${TELEMETRY_SETTING_ID}#\``),
+ 			}
