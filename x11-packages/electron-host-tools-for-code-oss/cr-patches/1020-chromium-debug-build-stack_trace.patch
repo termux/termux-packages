@@ -1,0 +1,19 @@
+--- a/base/debug/stack_trace_posix.cc
++++ b/base/debug/stack_trace_posix.cc
+@@ -1062,14 +1062,14 @@
+ #endif
+ }
+ 
+-#if defined(HAVE_BACKTRACE)
+ void StackTrace::OutputToStreamWithPrefixImpl(
+     std::ostream* os,
+     cstring_view prefix_string) const {
++#if defined(HAVE_BACKTRACE)
+   StreamBacktraceOutputHandler handler(os);
+   ProcessBacktrace(trace_, count_, prefix_string, &handler);
+-}
+ #endif
++}
+ 
+ namespace internal {
+ 

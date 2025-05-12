@@ -1,0 +1,16 @@
+--- a/electron/shell/browser/extensions/api/extension_action/extension_action_api.cc
++++ b/electron/shell/browser/extensions/api/extension_action/extension_action_api.cc
+@@ -154,6 +154,13 @@
+ }
+ 
+ ExtensionFunction::ResponseAction
++ExtensionActionOpenPopupFunction::RunExtensionAction() {
++  LOG(INFO) << "chrome.action.openPopup is not supported in Electron";
++
++  return RespondNow(NoArguments());
++}
++
++ExtensionFunction::ResponseAction
+ ExtensionActionGetBadgeTextFunction::RunExtensionAction() {
+   LOG(INFO) << "chrome.action.getBadgeText is not supported in Electron";
+ 

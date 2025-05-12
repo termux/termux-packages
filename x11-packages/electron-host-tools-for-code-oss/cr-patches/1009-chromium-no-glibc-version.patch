@@ -1,0 +1,15 @@
+--- a/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc
++++ b/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc
+@@ -61,8 +61,10 @@
+
+ // TODO(crbug.com/1052397): Revisit the macro expression once build flag switch
+ // of lacros-chrome is complete.
+-#if defined(__GLIBC__) && (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS_LACROS))
++#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS_LACROS)
++#ifdef __GLIBC__
+ #include <gnu/libc-version.h>
++#endif
+
+ #include "base/linux_util.h"
+ #include "base/strings/string_split.h"
+

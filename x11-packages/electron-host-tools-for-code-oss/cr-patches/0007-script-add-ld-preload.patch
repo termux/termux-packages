@@ -1,0 +1,23 @@
+--- a/build/gn_run_binary.py
++++ b/build/gn_run_binary.py
+@@ -23,7 +23,19 @@
+ # The rest of the arguments are passed directly to the executable.
+ args = [path] + sys.argv[2:]
+ 
+-ret = subprocess.call(args)
++# Modified by Termux: When building for termux, this wrapper will
++# be used to run the binary which is built for host machine, using
++# the rootfs provided by Google. We need to set LD_PRELOAD with
++# libffi.so.7 as the host machine (Ubuntu 24.04) doesn't provide it.
++envs = os.environ.copy()
++if "./clang_x86_v8_arm/" in path or "./clang_x86/" in path:
++  base_sysroot = os.path.join(os.path.dirname(__file__), "linux", "debian_bullseye_i386-sysroot")
++  envs["LD_PRELOAD"] = base_sysroot + "/usr/lib/i386-linux-gnu/libffi.so.7"
++elif "./host/" in path or "./clang_x64_v8_arm64/" in path or "./clang_x64/" in path:
++  base_sysroot = os.path.join(os.path.dirname(__file__), "linux", "debian_bullseye_amd64-sysroot")
++  envs["LD_PRELOAD"] = base_sysroot + "/usr/lib/x86_64-linux-gnu/libffi.so.7"
++
++ret = subprocess.call(args, env=envs)
+ if ret != 0:
+   if ret <= -100:
+     # Windows error codes such as 0xC0000005 and 0xC0000409 are much easier to

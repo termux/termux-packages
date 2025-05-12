@@ -1,0 +1,11 @@
+--- a/third_party/dawn/src/dawn/common/AlignedAlloc.cpp
++++ b/third_party/dawn/src/dawn/common/AlignedAlloc.cpp
+@@ -42,7 +42,7 @@
+ #if DAWN_PLATFORM_IS(WINDOWS)
+     return _aligned_malloc(size, alignment);
+ 
+-#elif DAWN_PLATFORM_IS(ANDROID)
++#elif DAWN_PLATFORM_IS(ANDROID) || defined(__TERMUX__)
+     // Currently std::aligned_alloc() is not supported on the Android build of Chromium. Luckily,
+     // memalign() on Android returns pointers which can safely be used with free(), so we can use it
+     // instead.

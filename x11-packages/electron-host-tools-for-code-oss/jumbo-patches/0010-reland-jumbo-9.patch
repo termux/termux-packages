@@ -1,0 +1,1933 @@
+From 943a8c834c77219426620b196603d993d4c984c1 Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <licy183@termux.dev>
+Date: Fri, 18 Apr 2025 23:54:01 +0800
+Subject: [PATCH] reland jumbo 9
+
+Enable jumbo build for the following component(s)/source_set(s):
+
+- //content:browser
+- //content:devtools_protocol
+- //content/child:child
+- //content/common:common
+- //content/gpu:gpu_sources
+- //content/public/browser:browser_sources
+- //content/public/child:child_sources
+- //content/public/common:common_sources
+- //content/public/renderer:renderer_sources
+- //content/renderer:renderer
+- //content/services/auction_worklet:auction_worklet
+- //content/utility:utility
+
+---
+ content/browser/BUILD.gn                      | 176 +++++++++++-------
+ .../aggregation_service_storage_sql.cc        |   4 +
+ .../attribution_storage_sql.cc                |   6 +
+ content/browser/devtools/BUILD.gn             |   2 +-
+ .../devtools/protocol/fedcm_handler.cc        |   2 +-
+ .../render_frame_devtools_agent_host.cc       |   4 +
+ .../web_contents_devtools_agent_host.cc       |   4 +
+ .../direct_sockets_service_impl.cc            |   4 +
+ .../file_system_access_change_source.cc       |   4 +
+ .../file_system_access_watcher_manager.cc     |   4 +
+ .../gpu/gpu_data_manager_impl_private.cc      |   4 +-
+ content/browser/hid/hid_service.cc            |   4 +
+ .../bidding_and_auction_response.cc           |   4 +
+ .../bidding_and_auction_serializer.cc         |   4 +
+ .../interest_group_manager_impl.cc            |   4 +
+ .../interest_group_permissions_checker.cc     |   4 +
+ .../interest_group_update_manager.cc          |   4 +
+ .../interest_group/trusted_signals_fetcher.cc |   4 +
+ content/browser/media/cdm_storage_common.cc   |   4 +
+ content/browser/media/cdm_storage_database.cc |   4 +
+ .../preloading/prefetch/prefetch_service.cc   |   4 +
+ .../prefetch_url_loader_interceptor.cc        |   4 +
+ .../prerender_commit_deferring_condition.cc   |   4 +
+ ..._vary_search_commit_deferring_condition.cc |   4 +
+ .../media/media_devices_manager.cc            |   6 +
+ .../media/media_stream_manager.cc             |   6 +
+ ...render_frame_audio_input_stream_factory.cc |   4 +
+ .../private_network_access_util.cc            |  18 +-
+ .../renderer_host/render_frame_host_impl.cc   |  36 ++--
+ .../render_frame_host_manager.cc              |  52 +++---
+ .../renderer_host/render_frame_proxy_host.cc  |   6 +-
+ .../renderer_host/render_message_filter.cc    |   2 +-
+ .../renderer_host/render_process_host_impl.cc |   2 +-
+ .../render_widget_host_view_aura.cc           |   2 +-
+ .../cross_origin_opener_policy_reporter.cc    |   4 +
+ content/child/BUILD.gn                        |   5 +-
+ content/common/BUILD.gn                       |   6 +-
+ content/gpu/BUILD.gn                          |   5 +-
+ content/public/browser/BUILD.gn               |   3 +-
+ content/public/child/BUILD.gn                 |   3 +-
+ content/public/common/BUILD.gn                |   3 +-
+ content/public/renderer/BUILD.gn              |   5 +-
+ content/renderer/BUILD.gn                     |   5 +-
+ .../service_worker_subresource_loader.cc      |   4 +
+ .../web_service_worker_provider_impl.cc       |   4 +
+ content/services/auction_worklet/BUILD.gn     |   7 +-
+ content/test/BUILD.gn                         |   5 +-
+ content/utility/BUILD.gn                      |   3 +-
+ 53 files changed, 410 insertions(+), 143 deletions(-)
+
+diff --git a/content/browser/BUILD.gn b/content/browser/BUILD.gn
+index ba14efc42e..1de54da7fd 100644
+--- a/content/browser/BUILD.gn
++++ b/content/browser/BUILD.gn
+@@ -8,6 +8,7 @@ import("//build/config/chromeos/ui_mode.gni")
+ import("//build/config/chromeos/ui_mode.gni")
+ import("//build/config/compiler/pgo/pgo.gni")
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/linux/pangocairo/pangocairo.gni")
+ import("//build/config/ozone.gni")
+ import("//build/config/ui.gni")
+@@ -48,7 +49,104 @@ if (is_android) {
+   }
+ }
+ 
+-source_set("browser") {
++jumbo_static_library("devtools_protocol") {
++  configs += [
++    "//build/config:precompiled_headers",
++    "//content:content_implementation",
++  ]
++
++  deps = [
++    "//base",
++    "//content/browser/devtools:devtools_background_services_proto",
++    "//content/browser/devtools:protocol_sources",
++    "//content/common:buildflags",
++    "//services/viz/privileged/mojom",
++    "//third_party/blink/public/mojom:mojom_platform",
++    "//third_party/inspector_protocol:crdtp",
++  ]
++
++  sources = [
++    "$target_gen_dir/devtools/protocol/audits.cc",
++    "$target_gen_dir/devtools/protocol/audits.h",
++    "$target_gen_dir/devtools/protocol/background_service.cc",
++    "$target_gen_dir/devtools/protocol/background_service.h",
++    "$target_gen_dir/devtools/protocol/browser.cc",
++    "$target_gen_dir/devtools/protocol/browser.h",
++    "$target_gen_dir/devtools/protocol/device_access.cc",
++    "$target_gen_dir/devtools/protocol/device_access.h",
++    "$target_gen_dir/devtools/protocol/device_orientation.cc",
++    "$target_gen_dir/devtools/protocol/device_orientation.h",
++    "$target_gen_dir/devtools/protocol/dom.cc",
++    "$target_gen_dir/devtools/protocol/dom.h",
++    "$target_gen_dir/devtools/protocol/emulation.cc",
++    "$target_gen_dir/devtools/protocol/emulation.h",
++    "$target_gen_dir/devtools/protocol/fed_cm.cc",
++    "$target_gen_dir/devtools/protocol/fed_cm.h",
++    "$target_gen_dir/devtools/protocol/fetch.cc",
++    "$target_gen_dir/devtools/protocol/fetch.h",
++    "$target_gen_dir/devtools/protocol/forward.h",
++    "$target_gen_dir/devtools/protocol/input.cc",
++    "$target_gen_dir/devtools/protocol/input.h",
++    "$target_gen_dir/devtools/protocol/inspector.cc",
++    "$target_gen_dir/devtools/protocol/inspector.h",
++    "$target_gen_dir/devtools/protocol/io.cc",
++    "$target_gen_dir/devtools/protocol/io.h",
++    "$target_gen_dir/devtools/protocol/log.cc",
++    "$target_gen_dir/devtools/protocol/log.h",
++    "$target_gen_dir/devtools/protocol/memory.cc",
++    "$target_gen_dir/devtools/protocol/memory.h",
++    "$target_gen_dir/devtools/protocol/network.cc",
++    "$target_gen_dir/devtools/protocol/network.h",
++    "$target_gen_dir/devtools/protocol/overlay.cc",
++    "$target_gen_dir/devtools/protocol/overlay.h",
++    "$target_gen_dir/devtools/protocol/page.cc",
++    "$target_gen_dir/devtools/protocol/page.h",
++    "$target_gen_dir/devtools/protocol/preload.cc",
++    "$target_gen_dir/devtools/protocol/preload.h",
++    "$target_gen_dir/devtools/protocol/protocol.h",
++    "$target_gen_dir/devtools/protocol/runtime.cc",
++    "$target_gen_dir/devtools/protocol/runtime.h",
++    "$target_gen_dir/devtools/protocol/schema.cc",
++    "$target_gen_dir/devtools/protocol/schema.h",
++    "$target_gen_dir/devtools/protocol/security.cc",
++    "$target_gen_dir/devtools/protocol/security.h",
++    "$target_gen_dir/devtools/protocol/service_worker.cc",
++    "$target_gen_dir/devtools/protocol/service_worker.h",
++    "$target_gen_dir/devtools/protocol/storage.cc",
++    "$target_gen_dir/devtools/protocol/storage.h",
++    "$target_gen_dir/devtools/protocol/system_info.cc",
++    "$target_gen_dir/devtools/protocol/system_info.h",
++    "$target_gen_dir/devtools/protocol/target.cc",
++    "$target_gen_dir/devtools/protocol/target.h",
++    "$target_gen_dir/devtools/protocol/tethering.cc",
++    "$target_gen_dir/devtools/protocol/tethering.h",
++    "$target_gen_dir/devtools/protocol/tracing.cc",
++    "$target_gen_dir/devtools/protocol/tracing.h",
++  ]
++  if (!is_android) {
++    # The WebAuthn devtools protocol API is not supported in Android yet.
++    sources += [
++      "$target_gen_dir/devtools/protocol/web_authn.cc",
++      "$target_gen_dir/devtools/protocol/web_authn.h",
++    ]
++  }
++
++  if (use_viz_debugger) {
++    sources += [
++      "$target_gen_dir/devtools/protocol/visual_debugger.cc",
++      "$target_gen_dir/devtools/protocol/visual_debugger.h",
++    ]
++  }
++
++  if (use_clang_profiling_inside_sandbox && chrome_pgo_phase == 1) {
++    sources += [
++      "$target_gen_dir/devtools/protocol/native_profiling.cc",
++      "$target_gen_dir/devtools/protocol/native_profiling.h",
++    ]
++  }
++}
++
++jumbo_source_set("browser") {
+   # Only the public target should depend on this. All other targets (even
+   # internal content ones) should depend on the public one.
+   visibility = [
+@@ -144,8 +242,6 @@ source_set("browser") {
+     "//content/browser/cache_storage:cache_storage_proto",
+     "//content/browser/content_index:content_index_proto",
+     "//content/browser/cookie_store:cookie_store_proto",
+-    "//content/browser/devtools:devtools_background_services_proto",
+-    "//content/browser/devtools:protocol_sources",
+     "//content/browser/download:proto",
+     "//content/browser/file_system_access:proto",
+     "//content/browser/indexed_db:internals_mojo_bindings",
+@@ -314,6 +410,7 @@ source_set("browser") {
+     "//ui/strings:ax_strings",
+     "//ui/touch_selection",
+     "//v8:v8_version",
++    ":devtools_protocol",
+   ]
+ 
+   public_deps = [
+@@ -330,62 +427,6 @@ source_set("browser") {
+   ]
+ 
+   sources = [
+-    "$target_gen_dir/devtools/protocol/audits.cc",
+-    "$target_gen_dir/devtools/protocol/audits.h",
+-    "$target_gen_dir/devtools/protocol/background_service.cc",
+-    "$target_gen_dir/devtools/protocol/background_service.h",
+-    "$target_gen_dir/devtools/protocol/browser.cc",
+-    "$target_gen_dir/devtools/protocol/browser.h",
+-    "$target_gen_dir/devtools/protocol/device_access.cc",
+-    "$target_gen_dir/devtools/protocol/device_access.h",
+-    "$target_gen_dir/devtools/protocol/device_orientation.cc",
+-    "$target_gen_dir/devtools/protocol/device_orientation.h",
+-    "$target_gen_dir/devtools/protocol/dom.cc",
+-    "$target_gen_dir/devtools/protocol/dom.h",
+-    "$target_gen_dir/devtools/protocol/emulation.cc",
+-    "$target_gen_dir/devtools/protocol/emulation.h",
+-    "$target_gen_dir/devtools/protocol/fed_cm.cc",
+-    "$target_gen_dir/devtools/protocol/fed_cm.h",
+-    "$target_gen_dir/devtools/protocol/fetch.cc",
+-    "$target_gen_dir/devtools/protocol/fetch.h",
+-    "$target_gen_dir/devtools/protocol/forward.h",
+-    "$target_gen_dir/devtools/protocol/input.cc",
+-    "$target_gen_dir/devtools/protocol/input.h",
+-    "$target_gen_dir/devtools/protocol/inspector.cc",
+-    "$target_gen_dir/devtools/protocol/inspector.h",
+-    "$target_gen_dir/devtools/protocol/io.cc",
+-    "$target_gen_dir/devtools/protocol/io.h",
+-    "$target_gen_dir/devtools/protocol/log.cc",
+-    "$target_gen_dir/devtools/protocol/log.h",
+-    "$target_gen_dir/devtools/protocol/memory.cc",
+-    "$target_gen_dir/devtools/protocol/memory.h",
+-    "$target_gen_dir/devtools/protocol/network.cc",
+-    "$target_gen_dir/devtools/protocol/network.h",
+-    "$target_gen_dir/devtools/protocol/overlay.cc",
+-    "$target_gen_dir/devtools/protocol/overlay.h",
+-    "$target_gen_dir/devtools/protocol/page.cc",
+-    "$target_gen_dir/devtools/protocol/page.h",
+-    "$target_gen_dir/devtools/protocol/preload.cc",
+-    "$target_gen_dir/devtools/protocol/preload.h",
+-    "$target_gen_dir/devtools/protocol/protocol.h",
+-    "$target_gen_dir/devtools/protocol/runtime.cc",
+-    "$target_gen_dir/devtools/protocol/runtime.h",
+-    "$target_gen_dir/devtools/protocol/schema.cc",
+-    "$target_gen_dir/devtools/protocol/schema.h",
+-    "$target_gen_dir/devtools/protocol/security.cc",
+-    "$target_gen_dir/devtools/protocol/security.h",
+-    "$target_gen_dir/devtools/protocol/service_worker.cc",
+-    "$target_gen_dir/devtools/protocol/service_worker.h",
+-    "$target_gen_dir/devtools/protocol/storage.cc",
+-    "$target_gen_dir/devtools/protocol/storage.h",
+-    "$target_gen_dir/devtools/protocol/system_info.cc",
+-    "$target_gen_dir/devtools/protocol/system_info.h",
+-    "$target_gen_dir/devtools/protocol/target.cc",
+-    "$target_gen_dir/devtools/protocol/target.h",
+-    "$target_gen_dir/devtools/protocol/tethering.cc",
+-    "$target_gen_dir/devtools/protocol/tethering.h",
+-    "$target_gen_dir/devtools/protocol/tracing.cc",
+-    "$target_gen_dir/devtools/protocol/tracing.h",
+     "about_url_loader_factory.cc",
+     "about_url_loader_factory.h",
+     "accessibility/accessibility_tree_formatter_blink.cc",
+@@ -2377,11 +2418,10 @@ source_set("browser") {
+     "permissions/permission_util.cc",
+     "permissions/permission_util.h",
+   ]
++  jumbo_excluded_sources = []
+ 
+   if (use_viz_debugger) {
+     sources += [
+-      "$target_gen_dir/devtools/protocol/visual_debugger.cc",
+-      "$target_gen_dir/devtools/protocol/visual_debugger.h",
+       "devtools/protocol/visual_debugger_handler.cc",
+       "devtools/protocol/visual_debugger_handler.h",
+     ]
+@@ -2751,6 +2791,9 @@ source_set("browser") {
+       ]
+       public_deps += [ "//ui/base/cursor" ]
+       deps += [ "//third_party/webrtc_overrides:webrtc_component" ]
++      jumbo_excluded_sources += [
++        "media/capture/desktop_capture_device.cc",
++      ]
+     }
+     if (use_aura) {
+       sources += [
+@@ -3247,6 +3290,12 @@ source_set("browser") {
+       "web_contents/web_contents_view_android.h",
+     ]
+ 
++    jumbo_excluded_sources += [
++      # Files with kJavaLangClass and similar constants:
++      # Bug https://crbug.com/787557.
++      "android/java/java_method.cc",  # and in gin_java_bound_object.cc.
++    ]
++
+     deps += [
+       ":fontations_name_table_ffi",
+       ":reflection_jni_headers",
+@@ -3279,9 +3328,6 @@ source_set("browser") {
+   } else {
+     # Not Android.
+     sources += [
+-      # The WebAuthn devtools protocol API is not supported in Android yet.
+-      "$target_gen_dir/devtools/protocol/web_authn.cc",
+-      "$target_gen_dir/devtools/protocol/web_authn.h",
+       "devtools/protocol/webauthn_handler.cc",
+       "devtools/protocol/webauthn_handler.h",
+       "media/session/audio_focus_delegate_default.cc",
+@@ -3518,8 +3564,6 @@ source_set("browser") {
+ 
+   if (use_clang_profiling_inside_sandbox && chrome_pgo_phase == 1) {
+     sources += [
+-      "$target_gen_dir/devtools/protocol/native_profiling.cc",
+-      "$target_gen_dir/devtools/protocol/native_profiling.h",
+       "devtools/protocol/native_profiling_handler.cc",
+       "devtools/protocol/native_profiling_handler.h",
+       "profiling_utils.cc",
+diff --git a/content/browser/aggregation_service/aggregation_service_storage_sql.cc b/content/browser/aggregation_service/aggregation_service_storage_sql.cc
+index 218f64a169..c5e5dacc52 100644
+--- a/content/browser/aggregation_service/aggregation_service_storage_sql.cc
++++ b/content/browser/aggregation_service/aggregation_service_storage_sql.cc
+@@ -45,6 +45,8 @@
+ #include "url/gurl.h"
+ #include "url/origin.h"
+ 
++#define kDatabasePath kDatabasePath_AggregationServiceStorageSql
++
+ namespace content {
+ 
+ // Version number of the database.
+@@ -1097,3 +1099,5 @@ void AggregationServiceStorageSql::DatabaseErrorCallback(int extended_error,
+ }
+ 
+ }  // namespace content
++
++#undef kDatabasePath
+diff --git a/content/browser/attribution_reporting/attribution_storage_sql.cc b/content/browser/attribution_reporting/attribution_storage_sql.cc
+index 2119251574..d08da66414 100644
+--- a/content/browser/attribution_reporting/attribution_storage_sql.cc
++++ b/content/browser/attribution_reporting/attribution_storage_sql.cc
+@@ -93,6 +93,9 @@
+ #include "third_party/blink/public/mojom/aggregation_service/aggregatable_report.mojom.h"
+ #include "url/origin.h"
+ 
++#define kDatabasePath  kDatabasePath_AttributionStorageSQL
++#define kUnsetRecordId kUnsetRecordId_AttributionStorageSQL
++
+ namespace content {
+ 
+ namespace {
+@@ -3301,3 +3304,6 @@ AttributionStorageSql::GetSourcesToDeactivateForDestinationLimit(
+ }
+ 
+ }  // namespace content
++
++#undef kDatabasePath
++#undef kUnsetRecordId
+diff --git a/content/browser/devtools/BUILD.gn b/content/browser/devtools/BUILD.gn
+index cb78e031bf..682a14f3f3 100644
+--- a/content/browser/devtools/BUILD.gn
++++ b/content/browser/devtools/BUILD.gn
+@@ -82,7 +82,7 @@ action("concatenate_protocols") {
+ }
+ 
+ inspector_protocol_generate("protocol_sources") {
+-  visibility = [ "//content/browser" ]
++  visibility = [ "//content/browser:*" ]
+   deps = [ ":concatenate_protocols" ]
+   inspector_protocol_dir = "//third_party/inspector_protocol"
+   out_dir = target_gen_dir
+diff --git a/content/browser/devtools/protocol/fedcm_handler.cc b/content/browser/devtools/protocol/fedcm_handler.cc
+index 776fc59d04..2c6baf2bd2 100644
+--- a/content/browser/devtools/protocol/fedcm_handler.cc
++++ b/content/browser/devtools/protocol/fedcm_handler.cc
+@@ -367,7 +367,7 @@ FederatedAuthRequestPageData* FedCmHandler::GetPageData() {
+   if (!frame_host_) {
+     return nullptr;
+   }
+-  Page& page = frame_host_->GetPage();
++  content::Page& page = frame_host_->GetPage();
+   return PageUserData<FederatedAuthRequestPageData>::GetOrCreateForPage(page);
+ }
+ 
+diff --git a/content/browser/devtools/render_frame_devtools_agent_host.cc b/content/browser/devtools/render_frame_devtools_agent_host.cc
+index c99085d128..86f455cb30 100644
+--- a/content/browser/devtools/render_frame_devtools_agent_host.cc
++++ b/content/browser/devtools/render_frame_devtools_agent_host.cc
+@@ -87,6 +87,8 @@
+ #include "content/browser/devtools/protocol/visual_debugger_handler.h"
+ #endif
+ 
++#define g_agent_host_instances g_agent_host_instances_render_frame_devtools_agent_host
++
+ namespace content {
+ 
+ namespace {
+@@ -1061,3 +1063,5 @@ bool RenderFrameDevToolsAgentHost::HasSessionsWithoutTabTargetSupport() const {
+ }
+ 
+ }  // namespace content
++
++#undef g_agent_host_instances
+diff --git a/content/browser/devtools/web_contents_devtools_agent_host.cc b/content/browser/devtools/web_contents_devtools_agent_host.cc
+index 4897195ac9..8b1af46120 100644
+--- a/content/browser/devtools/web_contents_devtools_agent_host.cc
++++ b/content/browser/devtools/web_contents_devtools_agent_host.cc
+@@ -14,6 +14,8 @@
+ #include "content/browser/renderer_host/frame_tree_node.h"
+ #include "content/browser/web_contents/web_contents_impl.h"
+ 
++#define g_agent_host_instances g_agent_host_instances_web_contents_devtools_agent_host
++
+ namespace content {
+ 
+ namespace {
+@@ -413,3 +415,5 @@ WebContentsDevToolsAgentHost::RevalidateSessionAccess() {
+ }
+ 
+ }  // namespace content
++
++#undef g_agent_host_instances
+diff --git a/content/browser/direct_sockets/direct_sockets_service_impl.cc b/content/browser/direct_sockets/direct_sockets_service_impl.cc
+index a87f6c2981..e394119ae3 100644
+--- a/content/browser/direct_sockets/direct_sockets_service_impl.cc
++++ b/content/browser/direct_sockets/direct_sockets_service_impl.cc
+@@ -46,6 +46,8 @@
+ #include "services/network/public/mojom/socket_connection_tracker.mojom.h"
+ #endif  // BUILDFLAG(IS_CHROMEOS)
+ 
++#define DocumentHelper DocumentHelper_DirectSocketsServiceImpl
++
+ namespace content {
+ 
+ namespace {
+@@ -520,3 +522,5 @@ void DirectSocketsServiceImpl::OnResolveCompleteForUDPSocket(
+ }
+ 
+ }  // namespace content
++
++#undef DocumentHelper
+diff --git a/content/browser/file_system_access/file_system_access_change_source.cc b/content/browser/file_system_access/file_system_access_change_source.cc
+index 4a01f99c33..4600e93a09 100644
+--- a/content/browser/file_system_access/file_system_access_change_source.cc
++++ b/content/browser/file_system_access/file_system_access_change_source.cc
+@@ -6,6 +6,8 @@
+ 
+ #include "base/functional/callback.h"
+ 
++#define ToFileSystemURL ToFileSystemURL_FileSystemAccessChangeSource
++
+ namespace content {
+ 
+ namespace {
+@@ -119,3 +121,5 @@ void FileSystemAccessChangeSource::NotifyOfChange(
+ }
+ 
+ }  // namespace content
++
++#undef ToFileSystemURL
+diff --git a/content/browser/file_system_access/file_system_access_watcher_manager.cc b/content/browser/file_system_access/file_system_access_watcher_manager.cc
+index 23ee223127..abf377b0fd 100644
+--- a/content/browser/file_system_access/file_system_access_watcher_manager.cc
++++ b/content/browser/file_system_access/file_system_access_watcher_manager.cc
+@@ -36,6 +36,8 @@
+ #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS) &&
+         // !BUILDFLAG(IS_FUCHSIA)
+ 
++#define ToFileSystemURL ToFileSystemURL_FileSystemAccessWatcherManager
++
+ namespace content {
+ 
+ namespace {
+@@ -408,3 +410,5 @@ FileSystemAccessWatcherManager::CreateOwnedSourceForScope(
+ }
+ 
+ }  // namespace content
++
++#undef ToFileSystemURL
+diff --git a/content/browser/gpu/gpu_data_manager_impl_private.cc b/content/browser/gpu/gpu_data_manager_impl_private.cc
+index 6f89c1c7c5..919a91bf5f 100644
+--- a/content/browser/gpu/gpu_data_manager_impl_private.cc
++++ b/content/browser/gpu/gpu_data_manager_impl_private.cc
+@@ -546,7 +546,7 @@ void GpuDataManagerImplPrivate::InitializeGpuModes() {
+     BUILDFLAG(IS_CHROMEOS_ASH)
+     CHECK(false) << "GPU acceleration is required on certain platforms!";
+ #endif
+-  } else if (features::IsSkiaGraphiteEnabled(command_line)) {
++  } else if (::features::IsSkiaGraphiteEnabled(command_line)) {
+     // If Graphite is enabled, fall back to Ganesh/GL on platforms that do not
+     // support software compositing or sometimes fail dawn initialization.
+     // TODO(b/323953910): Eliminate this fallback on each platform once Graphite
+@@ -562,7 +562,7 @@ void GpuDataManagerImplPrivate::InitializeGpuModes() {
+ #else
+     fallback_modes_.push_back(gpu::GpuMode::HARDWARE_GL);
+     // Prefer Vulkan over GL if enabled.
+-    if (features::IsUsingVulkan()) {
++    if (::features::IsUsingVulkan()) {
+       fallback_modes_.push_back(gpu::GpuMode::HARDWARE_VULKAN);
+     }
+ #endif  // BUILDFLAG(IS_FUCHSIA)
+diff --git a/content/browser/hid/hid_service.cc b/content/browser/hid/hid_service.cc
+index d7bdc419e1..0b83ee3287 100644
+--- a/content/browser/hid/hid_service.cc
++++ b/content/browser/hid/hid_service.cc
+@@ -25,6 +25,8 @@
+ #include "mojo/public/cpp/bindings/self_owned_receiver.h"
+ #include "third_party/blink/public/mojom/permissions_policy/permissions_policy.mojom.h"
+ 
++#define DocumentHelper DocumentHelper_HidService
++
+ namespace content {
+ 
+ // Deletes the HidService when the connected document is destroyed.
+@@ -568,3 +570,5 @@ BrowserContext* HidService::GetBrowserContext() {
+ }
+ 
+ }  // namespace content
++
++#undef DocumentHelper
+diff --git a/content/browser/interest_group/bidding_and_auction_response.cc b/content/browser/interest_group/bidding_and_auction_response.cc
+index 567564d252..cd5cfd6656 100644
+--- a/content/browser/interest_group/bidding_and_auction_response.cc
++++ b/content/browser/interest_group/bidding_and_auction_response.cc
+@@ -6,6 +6,8 @@
+ 
+ #include "services/network/public/cpp/is_potentially_trustworthy.h"
+ 
++#define kFramingHeaderSize kFramingHeaderSize_BiddingAndAuctionResponse
++
+ namespace content {
+ 
+ namespace {
+@@ -253,3 +255,5 @@ BiddingAndAuctionResponse::ReportingURLs::TryParse(
+ }
+ 
+ }  // namespace content
++
++#undef kFramingHeaderSize
+diff --git a/content/browser/interest_group/bidding_and_auction_serializer.cc b/content/browser/interest_group/bidding_and_auction_serializer.cc
+index 2152bff335..051302ee7c 100644
+--- a/content/browser/interest_group/bidding_and_auction_serializer.cc
++++ b/content/browser/interest_group/bidding_and_auction_serializer.cc
+@@ -31,6 +31,8 @@
+ #include "third_party/blink/public/mojom/interest_group/interest_group_types.mojom.h"
+ #include "third_party/zlib/google/compression_utils.h"
+ 
++#define kFramingHeaderSize kFramingHeaderSize_BiddingAndAuctionSerializer
++
+ namespace content {
+ 
+ namespace {
+@@ -1015,3 +1017,5 @@ BiddingAndAuctionData BiddingAndAuctionSerializer::Build() {
+ }
+ 
+ }  // namespace content
++
++#undef kFramingHeaderSize
+diff --git a/content/browser/interest_group/interest_group_manager_impl.cc b/content/browser/interest_group/interest_group_manager_impl.cc
+index d54926cf11..b1f0e85e41 100644
+--- a/content/browser/interest_group/interest_group_manager_impl.cc
++++ b/content/browser/interest_group/interest_group_manager_impl.cc
+@@ -49,6 +49,8 @@
+ #include "url/gurl.h"
+ #include "url/origin.h"
+ 
++#define kTrafficAnnotation kTrafficAnnotation_InterestGroupManagerImpl
++
+ namespace content {
+ 
+ namespace {
+@@ -1071,3 +1073,5 @@ InterestGroupManagerImpl::CreateNotifyInterestGroupAccessedCallback(
+ }
+ 
+ }  // namespace content
++
++#undef kTrafficAnnotation
+diff --git a/content/browser/interest_group/interest_group_permissions_checker.cc b/content/browser/interest_group/interest_group_permissions_checker.cc
+index 5029bdfa18..62e8f2dfe9 100644
+--- a/content/browser/interest_group/interest_group_permissions_checker.cc
++++ b/content/browser/interest_group/interest_group_permissions_checker.cc
+@@ -24,6 +24,8 @@
+ #include "url/origin.h"
+ #include "url/url_constants.h"
+ 
++#define kTrafficAnnotation kTrafficAnnotation_InterestGroupPermissionsChecker
++
+ namespace content {
+ 
+ namespace {
+@@ -228,3 +230,5 @@ bool InterestGroupPermissionsChecker::AllowsOperation(Permissions permissions,
+ }
+ 
+ }  // namespace content
++
++#undef kTrafficAnnotation
+diff --git a/content/browser/interest_group/interest_group_update_manager.cc b/content/browser/interest_group/interest_group_update_manager.cc
+index 6e14fd8cee..f2947cccd9 100644
+--- a/content/browser/interest_group/interest_group_update_manager.cc
++++ b/content/browser/interest_group/interest_group_update_manager.cc
+@@ -52,6 +52,8 @@
+ #include "url/gurl.h"
+ #include "url/origin.h"
+ 
++#define kTrafficAnnotation kTrafficAnnotation_InterestGroupUpdateManager
++
+ namespace content {
+ 
+ namespace {
+@@ -1183,3 +1185,5 @@ void InterestGroupUpdateManager::ReportUpdateFailed(
+ }
+ 
+ }  // namespace content
++
++#undef kTrafficAnnotation
+diff --git a/content/browser/interest_group/trusted_signals_fetcher.cc b/content/browser/interest_group/trusted_signals_fetcher.cc
+index 8c96d241ac..79d32aeeb2 100644
+--- a/content/browser/interest_group/trusted_signals_fetcher.cc
++++ b/content/browser/interest_group/trusted_signals_fetcher.cc
+@@ -20,6 +20,8 @@
+ #include "url/gurl.h"
+ #include "url/origin.h"
+ 
++#define kOhttpHeaderSize kOhttpHeaderSize_TrustedSignalsFetcher
++
+ namespace content {
+ 
+ TrustedSignalsFetcher::BiddingPartition::BiddingPartition() = default;
+@@ -55,3 +57,5 @@ void TrustedSignalsFetcher::FetchBiddingSignals(
+     Callback callback) {}
+ 
+ }  // namespace content
++
++#undef kOhttpHeaderSize
+diff --git a/content/browser/media/cdm_storage_common.cc b/content/browser/media/cdm_storage_common.cc
+index d539641297..45557d57b3 100644
+--- a/content/browser/media/cdm_storage_common.cc
++++ b/content/browser/media/cdm_storage_common.cc
+@@ -6,6 +6,8 @@
+ 
+ #include "content/public/common/content_features.h"
+ 
++#define kUmaPrefix kUmaPrefix_CdmStorageCommon
++
+ namespace content {
+ 
+ namespace {
+@@ -52,3 +54,5 @@ std::string GetCdmStorageManagerHistogramName(const std::string& operation,
+ }
+ 
+ }  // namespace content
++
++#undef kUmaPrefix
+diff --git a/content/browser/media/cdm_storage_database.cc b/content/browser/media/cdm_storage_database.cc
+index c16c0b7c91..ed281c46e1 100644
+--- a/content/browser/media/cdm_storage_database.cc
++++ b/content/browser/media/cdm_storage_database.cc
+@@ -12,6 +12,8 @@
+ #include "base/metrics/histogram_functions.h"
+ #include "sql/statement.h"
+ 
++#define kUmaPrefix kUmaPrefix_CdmStorageDatabase
++
+ namespace content {
+ 
+ namespace {
+@@ -658,3 +660,5 @@ void CdmStorageDatabase::OnDatabaseError(int error, sql::Statement* stmt) {
+ }
+ 
+ }  // namespace content
++
++#undef kUmaPrefix
+diff --git a/content/browser/preloading/prefetch/prefetch_service.cc b/content/browser/preloading/prefetch/prefetch_service.cc
+index a7faf6f9a5..99d373b490 100644
+--- a/content/browser/preloading/prefetch/prefetch_service.cc
++++ b/content/browser/preloading/prefetch/prefetch_service.cc
+@@ -72,6 +72,8 @@
+ #include "url/origin.h"
+ #include "url/url_constants.h"
+ 
++#define BrowserContextFromFrameTreeNodeId BrowserContextFromFrameTreeNodeId_PrefetchService
++
+ namespace content {
+ 
+ namespace {
+@@ -1847,3 +1849,5 @@ void PrefetchService::RecordExistingPrefetchWithMatchingURL(
+ }
+ 
+ }  // namespace content
++
++#undef BrowserContextFromFrameTreeNodeId
+diff --git a/content/browser/preloading/prefetch/prefetch_url_loader_interceptor.cc b/content/browser/preloading/prefetch/prefetch_url_loader_interceptor.cc
+index f342f38dc1..24250d7194 100644
+--- a/content/browser/preloading/prefetch/prefetch_url_loader_interceptor.cc
++++ b/content/browser/preloading/prefetch/prefetch_url_loader_interceptor.cc
+@@ -23,6 +23,8 @@
+ #include "services/network/public/cpp/resource_request.h"
+ #include "services/network/public/cpp/single_request_url_loader_factory.h"
+ 
++#define BrowserContextFromFrameTreeNodeId BrowserContextFromFrameTreeNodeId_PrefetchURLLoaderInterceptor
++
+ namespace content {
+ namespace {
+ 
+@@ -242,3 +244,5 @@ void PrefetchURLLoaderInterceptor::OnGetPrefetchComplete(
+ }
+ 
+ }  // namespace content
++
++#undef BrowserContextFromFrameTreeNodeId
+diff --git a/content/browser/preloading/prerender/prerender_commit_deferring_condition.cc b/content/browser/preloading/prerender/prerender_commit_deferring_condition.cc
+index 9c6f112c7f..b6cd7b68c7 100644
+--- a/content/browser/preloading/prerender/prerender_commit_deferring_condition.cc
++++ b/content/browser/preloading/prerender/prerender_commit_deferring_condition.cc
+@@ -13,6 +13,8 @@
+ #include "content/browser/renderer_host/navigation_request.h"
+ #include "content/public/browser/render_frame_host.h"
+ 
++#define GetRootPrerenderFrameTreeNode GetRootPrerenderFrameTreeNode_PrerenderCommitDeferringCondition
++
+ namespace content {
+ 
+ namespace {
+@@ -136,3 +138,5 @@ void PrerenderCommitDeferringCondition::DidFinishNavigation(
+ }
+ 
+ }  // namespace content
++
++#undef GetRootPrerenderFrameTreeNode
+diff --git a/content/browser/preloading/prerender/prerender_no_vary_search_commit_deferring_condition.cc b/content/browser/preloading/prerender/prerender_no_vary_search_commit_deferring_condition.cc
+index 613cf13416..170ae853da 100644
+--- a/content/browser/preloading/prerender/prerender_no_vary_search_commit_deferring_condition.cc
++++ b/content/browser/preloading/prerender/prerender_no_vary_search_commit_deferring_condition.cc
+@@ -12,6 +12,8 @@
+ #include "content/public/browser/render_frame_host.h"
+ #include "third_party/blink/public/common/features.h"
+ 
++#define GetRootPrerenderFrameTreeNode GetRootPrerenderFrameTreeNode_PrerenderNoVarySearchCommitDeferringCondition
++
+ namespace content {
+ 
+ namespace {
+@@ -115,3 +117,5 @@ PrerenderNoVarySearchCommitDeferringCondition::WillCommitNavigation(
+ }
+ 
+ }  // namespace content
++
++#undef GetRootPrerenderFrameTreeNode
+diff --git a/content/browser/renderer_host/media/media_devices_manager.cc b/content/browser/renderer_host/media/media_devices_manager.cc
+index d8984ee1aa..64e33fb435 100644
+--- a/content/browser/renderer_host/media/media_devices_manager.cc
++++ b/content/browser/renderer_host/media/media_devices_manager.cc
+@@ -54,6 +54,9 @@
+ #include "media/device_monitors/device_monitor_mac.h"
+ #endif
+ 
++#define DeviceTypeToString DeviceTypeToString_MediaDevicesManager
++#define SendLogMessage     SendLogMessage_MediaDevicesManager
++
+ namespace content {
+ 
+ namespace {
+@@ -1390,3 +1393,6 @@ MediaDevicesManager::EnumerationState& MediaDevicesManager::EnumerationState::
+ operator=(EnumerationState&& other) = default;
+ 
+ }  // namespace content
++
++#undef DeviceTypeToString
++#undef SendLogMessage
+diff --git a/content/browser/renderer_host/media/media_stream_manager.cc b/content/browser/renderer_host/media/media_stream_manager.cc
+index fbf604dd1a..fbdbb0d29e 100644
+--- a/content/browser/renderer_host/media/media_stream_manager.cc
++++ b/content/browser/renderer_host/media/media_stream_manager.cc
+@@ -112,6 +112,9 @@
+ 
+ using ::blink::mojom::MediaDeviceType;
+ 
++#define DeviceTypeToString DeviceTypeToString_MediaStreamManager
++#define SendLogMessage     SendLogMessage_MediaStreamManager
++
+ namespace content {
+ 
+ ABSL_CONST_INIT thread_local MediaStreamManager* media_stream_manager = nullptr;
+@@ -4585,3 +4588,6 @@ std::unique_ptr<MediaStreamUIProxy> MediaStreamManager::MakeFakeUIProxy(
+ }
+ 
+ }  // namespace content
++
++#undef DeviceTypeToString
++#undef SendLogMessage
+diff --git a/content/browser/renderer_host/media/render_frame_audio_input_stream_factory.cc b/content/browser/renderer_host/media/render_frame_audio_input_stream_factory.cc
+index 587a9eeb2f..552fc57e1d 100644
+--- a/content/browser/renderer_host/media/render_frame_audio_input_stream_factory.cc
++++ b/content/browser/renderer_host/media/render_frame_audio_input_stream_factory.cc
+@@ -41,6 +41,8 @@
+ 
+ using blink::mojom::MediaDeviceType;
+ 
++#define GotSaltAndOrigin GotSaltAndOrigin_RenderFrameAudioInputStreamFactory
++
+ namespace content {
+ 
+ namespace {
+@@ -363,3 +365,5 @@ void RenderFrameAudioInputStreamFactory::Core::
+ }
+ 
+ }  // namespace content
++
++#undef GotSaltAndOrigin
+diff --git a/content/browser/renderer_host/private_network_access_util.cc b/content/browser/renderer_host/private_network_access_util.cc
+index 888d8be426..42693f4faf 100644
+--- a/content/browser/renderer_host/private_network_access_util.cc
++++ b/content/browser/renderer_host/private_network_access_util.cc
+@@ -39,24 +39,24 @@ FeatureState FeatureStateForContext(RequestContext request_context) {
+       return FeatureState::kEnabled;
+     case RequestContext::kWorker:
+       if (!base::FeatureList::IsEnabled(
+-              features::kPrivateNetworkAccessForWorkers)) {
++              ::features::kPrivateNetworkAccessForWorkers)) {
+         return FeatureState::kDisabled;
+       }
+ 
+       if (base::FeatureList::IsEnabled(
+-              features::kPrivateNetworkAccessForWorkersWarningOnly)) {
++              ::features::kPrivateNetworkAccessForWorkersWarningOnly)) {
+         return FeatureState::kWarningOnly;
+       }
+ 
+       return FeatureState::kEnabled;
+     case RequestContext::kNavigation:
+       if (!base::FeatureList::IsEnabled(
+-              features::kPrivateNetworkAccessForNavigations)) {
++              ::features::kPrivateNetworkAccessForNavigations)) {
+         return FeatureState::kDisabled;
+       }
+ 
+       if (base::FeatureList::IsEnabled(
+-              features::kPrivateNetworkAccessForNavigationsWarningOnly)) {
++              ::features::kPrivateNetworkAccessForNavigationsWarningOnly)) {
+         return FeatureState::kWarningOnly;
+       }
+ 
+@@ -81,7 +81,7 @@ Policy DerivePolicyForNonSecureContext(AddressSpace ip_address_space) {
+       // because it is unclear why they happen in the first place. The goal is
+       // to reduce instances of this happening before enabling this feature.
+       return base::FeatureList::IsEnabled(
+-                 features::kBlockInsecurePrivateNetworkRequestsFromUnknown)
++                 ::features::kBlockInsecurePrivateNetworkRequestsFromUnknown)
+                  ? Policy::kBlock
+                  : Policy::kAllow;
+     case AddressSpace::kPrivate:
+@@ -90,7 +90,7 @@ Policy DerivePolicyForNonSecureContext(AddressSpace ip_address_space) {
+       // This is controlled separately because private network websites face
+       // additional hurdles compared to public websites. See crbug.com/1234044.
+       return base::FeatureList::IsEnabled(
+-                 features::kBlockInsecurePrivateNetworkRequestsFromPrivate)
++                 ::features::kBlockInsecurePrivateNetworkRequestsFromPrivate)
+                  ? Policy::kBlock
+                  : Policy::kWarn;
+     case AddressSpace::kPublic:
+@@ -103,7 +103,7 @@ Policy DerivePolicyForNonSecureContext(AddressSpace ip_address_space) {
+       // are never considered private network requests - they cannot target
+       // more-private address spaces.
+       return base::FeatureList::IsEnabled(
+-                 features::kBlockInsecurePrivateNetworkRequests)
++                 ::features::kBlockInsecurePrivateNetworkRequests)
+                  ? Policy::kBlock
+                  : Policy::kWarn;
+   }
+@@ -117,12 +117,12 @@ Policy DerivePolicyForSecureContext(AddressSpace ip_address_space) {
+   }
+ 
+   if (base::FeatureList::IsEnabled(
+-          features::kPrivateNetworkAccessRespectPreflightResults)) {
++          ::features::kPrivateNetworkAccessRespectPreflightResults)) {
+     return Policy::kPreflightBlock;
+   }
+ 
+   if (base::FeatureList::IsEnabled(
+-          features::kPrivateNetworkAccessSendPreflights)) {
++          ::features::kPrivateNetworkAccessSendPreflights)) {
+     return Policy::kPreflightWarn;
+   }
+ 
+diff --git a/content/browser/renderer_host/render_frame_host_impl.cc b/content/browser/renderer_host/render_frame_host_impl.cc
+index 32539fbbca..480226fc0c 100644
+--- a/content/browser/renderer_host/render_frame_host_impl.cc
++++ b/content/browser/renderer_host/render_frame_host_impl.cc
+@@ -441,10 +441,10 @@ typedef std::unordered_set<GlobalRenderFrameHostId,
+ base::LazyInstance<RoutingIDIsolatableSandboxedIframesSet>::DestructorAtExit
+     g_routing_id_isolatable_sandboxed_iframes_set = LAZY_INSTANCE_INITIALIZER;
+ 
+-using TokenFrameMap = std::unordered_map<blink::LocalFrameToken,
++using TokenFrameMap_RenderFrameHostImpl = std::unordered_map<blink::LocalFrameToken,
+                                          RenderFrameHostImpl*,
+                                          blink::LocalFrameToken::Hasher>;
+-base::LazyInstance<TokenFrameMap>::Leaky g_token_frame_map =
++base::LazyInstance<TokenFrameMap_RenderFrameHostImpl>::Leaky g_token_frame_map =
+     LAZY_INSTANCE_INITIALIZER;
+ 
+ BackForwardCacheMetrics::NotRestoredReason
+@@ -3711,7 +3711,7 @@ bool RenderFrameHostImpl::CreateRenderFrame(
+        (navigation_request->commit_params()
+             .is_cross_site_cross_browsing_context_group &&
+         base::FeatureList::IsEnabled(
+-            features::kClearCrossSiteCrossBrowsingContextGroupWindowName)));
++            ::features::kClearCrossSiteCrossBrowsingContextGroupWindowName)));
+ 
+   if (should_clear_browsing_instance_name) {
+     params->replication_state->name = "";
+@@ -5136,7 +5136,7 @@ bool RenderFrameHostImpl::VerifyFencedFrameFocusChange(
+   // TODO(crbug.com/40274134): We will later badmessage the renderer, but, for
+   // now, we will dump without crashing to monitor if any legitimate cases are
+   // reaching this point.
+-  if (base::FeatureList::IsEnabled(features::kFencedFramesEnforceFocus)) {
++  if (base::FeatureList::IsEnabled(::features::kFencedFramesEnforceFocus)) {
+     bad_message::ReceivedBadMessage(
+         GetProcess(), bad_message::RFH_FOCUS_ACROSS_FENCED_BOUNDARY);
+   } else {
+@@ -7701,14 +7701,14 @@ bool RenderFrameHostImpl::IsInactiveAndDisallowActivation(uint64_t reason) {
+       // back/forward cache, because |HandleAXevents()| will continue to process
+       // accessibility events without evicting unless the kEvictOnAXEvents flag
+       // is on.
+-      if (!base::FeatureList::IsEnabled(features::kEvictOnAXEvents))
++      if (!base::FeatureList::IsEnabled(::features::kEvictOnAXEvents))
+         CHECK_NE(reason, kAXEvent);
+       // This function should not be called with kAXLocationChange when the
+       // page is in back/forward cache, because `HandleAXLocationChange()` will
+       // continue to process accessibility location changes unless
+       // kDoNotEvictOnAXLocationChange is off.
+       if (base::FeatureList::IsEnabled(
+-              features::kDoNotEvictOnAXLocationChange)) {
++              ::features::kDoNotEvictOnAXLocationChange)) {
+         CHECK_NE(reason, kAXLocationChange);
+       }
+       BackForwardCacheCanStoreDocumentResult can_store_flat;
+@@ -7746,7 +7746,7 @@ bool RenderFrameHostImpl::IsInactiveAndDisallowActivation(uint64_t reason) {
+ 
+ bool RenderFrameHostImpl::IsInactiveAndDisallowActivationForAXEvents(
+     const std::vector<ui::AXEvent>& events) {
+-  DCHECK(base::FeatureList::IsEnabled(features::kEvictOnAXEvents));
++  DCHECK(base::FeatureList::IsEnabled(::features::kEvictOnAXEvents));
+   if (lifecycle_state_ != LifecycleStateImpl::kInBackForwardCache) {
+     return IsInactiveAndDisallowActivation(
+         DisallowActivationReasonId::kAXEvent);
+@@ -8154,7 +8154,7 @@ void RenderFrameHostImpl::MaybeIsolateForUserActivation() {
+     // the isolation eligibility checks, such as having the corresponding
+     // feature enabled or satisfying memory requirements.
+     DCHECK(base::FeatureList::IsEnabled(
+-        features::kSiteIsolationForCrossOriginOpenerPolicy));
++        ::features::kSiteIsolationForCrossOriginOpenerPolicy));
+ 
+     bool is_same_origin_activation =
+         GetParent() ? GetMainFrame()->GetLastCommittedOrigin().IsSameOriginWith(
+@@ -10244,7 +10244,7 @@ void RenderFrameHostImpl::HandleAXEvents(
+   // TODO(accessibility): we should probably consolidate these two params.
+   updates_and_events.ax_tree_id = tree_id;
+ 
+-  if (base::FeatureList::IsEnabled(features::kEvictOnAXEvents)) {
++  if (base::FeatureList::IsEnabled(::features::kEvictOnAXEvents)) {
+     // If the flag is on, evict the bfcache entry now that AX events are
+     // received.
+     if (IsInactiveAndDisallowActivationForAXEvents(updates_and_events.events)) {
+@@ -10334,7 +10334,7 @@ void RenderFrameHostImpl::HandleAXLocationChanges(
+     return;
+   }
+ 
+-  if (!base::FeatureList::IsEnabled(features::kDoNotEvictOnAXLocationChange)) {
++  if (!base::FeatureList::IsEnabled(::features::kDoNotEvictOnAXLocationChange)) {
+     // If the flag is off, we should evict the back/forward cache entry.
+     if (IsInactiveAndDisallowActivation(
+             DisallowActivationReasonId::kAXLocationChange)) {
+@@ -12536,7 +12536,7 @@ void RenderFrameHostImpl::CreatePaymentCredential(
+ 
+ void RenderFrameHostImpl::CreateWebUsbService(
+     mojo::PendingReceiver<blink::mojom::WebUsbService> receiver) {
+-  if (!base::FeatureList::IsEnabled(features::kWebUsb)) {
++  if (!base::FeatureList::IsEnabled(::features::kWebUsb)) {
+     return;
+   }
+   if (!IsFeatureEnabled(blink::mojom::PermissionsPolicyFeature::kUsb)) {
+@@ -14778,7 +14778,7 @@ void RenderFrameHostImpl::SendCommitNavigation(
+   // TODO(crbug.com/40205612): Remove the kill switch for this check.
+   bool should_block_storage_access_for_pdf =
+       GetSiteInstance()->GetSiteInfo().is_pdf() &&
+-      base::FeatureList::IsEnabled(features::kPdfEnforcements);
++      base::FeatureList::IsEnabled(::features::kPdfEnforcements);
+ 
+   // Make sure the origin of the isolation info and origin to commit match,
+   // otherwise the cookie manager will crash. Sending the cookie manager here
+@@ -15714,7 +15714,7 @@ bool ShouldVerify(const std::string& param) {
+   // For other params, default to disable checking the param. However, it's
+   // possible to force-enable checking the param via the VerifyDidCommitParams
+   // flag's param.
+-  return GetFieldTrialParamByFeatureAsBool(features::kVerifyDidCommitParams,
++  return GetFieldTrialParamByFeatureAsBool(::features::kVerifyDidCommitParams,
+                                            param, false);
+ #endif
+ }
+@@ -15763,7 +15763,7 @@ void RenderFrameHostImpl::
+ #if !DCHECK_IS_ON()
+   // Only check for the flag if DCHECK is not enabled, so that we will always
+   // verify the params for tests.
+-  if (!base::FeatureList::IsEnabled(features::kVerifyDidCommitParams))
++  if (!base::FeatureList::IsEnabled(::features::kVerifyDidCommitParams))
+     return;
+ #endif
+   // Check if these values from DidCommitProvisionalLoadParams sent by the
+@@ -16939,14 +16939,14 @@ void RenderFrameHostImpl::SetFrameTreeNode(FrameTreeNode& frame_tree_node) {
+   // the new functionality for swapping BrowsingContext on cross
+   // BrowsingInstance navigations, the BrowsingContextState is the only field
+   // that will need to be swapped.
+-  switch (features::GetBrowsingContextMode()) {
+-    case (features::BrowsingContextStateImplementationType::
++  switch (::features::GetBrowsingContextMode()) {
++    case (::features::BrowsingContextStateImplementationType::
+               kLegacyOneToOneWithFrameTreeNode):
+       browsing_context_state_ = frame_tree_node_->render_manager()
+                                     ->current_frame_host()
+                                     ->browsing_context_state();
+       break;
+-    case (features::BrowsingContextStateImplementationType::
++    case (::features::BrowsingContextStateImplementationType::
+               kSwapForCrossBrowsingInstanceNavigations):
+       // TODO(crbug.com/40205442): implement functionality for swapping on cross
+       // browsing instance navigations as needed. This will likely be removed
+@@ -17186,7 +17186,7 @@ bool RenderFrameHostImpl::ShouldReuseCompositing(
+     return false;
+   }
+ 
+-  if (!base::FeatureList::IsEnabled(features::kRenderDocumentCompositorReuse)) {
++  if (!base::FeatureList::IsEnabled(::features::kRenderDocumentCompositorReuse)) {
+     return false;
+   }
+ 
+diff --git a/content/browser/renderer_host/render_frame_host_manager.cc b/content/browser/renderer_host/render_frame_host_manager.cc
+index aa958aec47..6c7d3e964b 100644
+--- a/content/browser/renderer_host/render_frame_host_manager.cc
++++ b/content/browser/renderer_host/render_frame_host_manager.cc
+@@ -383,18 +383,18 @@ void UpdateProcessReusePolicyForProcessPerSiteWithMainFrameThreshold(
+     return;
+   }
+   if (!base::FeatureList::IsEnabled(
+-          features::kProcessPerSiteUpToMainFrameThreshold)) {
++          ::features::kProcessPerSiteUpToMainFrameThreshold)) {
+     return;
+   }
+   if (!frame_tree_node->IsOutermostMainFrame()) {
+     return;
+   }
+-  if (base::FeatureList::IsEnabled(features::kDisableProcessReuse)) {
++  if (base::FeatureList::IsEnabled(::features::kDisableProcessReuse)) {
+     RecordProcessPerSiteWithMainFrameThresholdBlockReason(
+         ProcessPerSiteWithMainFrameThresholdBlockReason::kDisableProcessResuse);
+     return;
+   }
+-  if (!features::kProcessPerSiteMainFrameAllowDevToolsAttached.Get() &&
++  if (!::features::kProcessPerSiteMainFrameAllowDevToolsAttached.Get() &&
+       RenderFrameDevToolsAgentHost::WasEverAttachedToAnyFrame()) {
+     RecordProcessPerSiteWithMainFrameThresholdBlockReason(
+         ProcessPerSiteWithMainFrameThresholdBlockReason::
+@@ -415,7 +415,7 @@ void UpdateProcessReusePolicyForProcessPerSiteWithMainFrameThreshold(
+   // for process reuse to work around the problem, unless a field parameter
+   // explicitly allows it.
+   const GURL& site_url = site_instance->GetSiteURL();
+-  if (!features::kProcessPerSiteMainFrameAllowIPAndLocalhost.Get() &&
++  if (!::features::kProcessPerSiteMainFrameAllowIPAndLocalhost.Get() &&
+       (site_url.HostIsIPAddress() || net::IsLocalHostname(site_url.host()))) {
+     RecordProcessPerSiteWithMainFrameThresholdBlockReason(
+         ProcessPerSiteWithMainFrameThresholdBlockReason::
+@@ -574,8 +574,8 @@ void RenderFrameHostManager::InitRoot(
+     const std::string& name,
+     const base::UnguessableToken& devtools_frame_token) {
+   bool is_legacy_browsing_context_state_mode =
+-      features::GetBrowsingContextMode() ==
+-      features::BrowsingContextStateImplementationType::
++      ::features::GetBrowsingContextMode() ==
++      ::features::BrowsingContextStateImplementationType::
+           kLegacyOneToOneWithFrameTreeNode;
+   scoped_refptr<BrowsingContextState> browsing_context_state =
+       base::MakeRefCounted<BrowsingContextState>(
+@@ -624,8 +624,8 @@ void RenderFrameHostManager::InitChild(
+     std::string frame_name,
+     std::string frame_unique_name) {
+   bool is_legacy_browsing_context_state_mode =
+-      features::GetBrowsingContextMode() ==
+-      features::BrowsingContextStateImplementationType::
++      ::features::GetBrowsingContextMode() ==
++      ::features::BrowsingContextStateImplementationType::
+           kLegacyOneToOneWithFrameTreeNode;
+   scoped_refptr<BrowsingContextState> browsing_context_state =
+       base::MakeRefCounted<BrowsingContextState>(
+@@ -977,14 +977,14 @@ void RenderFrameHostManager::PrepareForCollectingPage(
+   // in FrameTree (which, for example, is shared between the new page and
+   // the page entering BFCache), so they have to be collected explicitly above.
+   // Since proxies are not collected, we can return early here.
+-  if (features::GetBrowsingContextMode() ==
+-      features::BrowsingContextStateImplementationType::
++  if (::features::GetBrowsingContextMode() ==
++      ::features::BrowsingContextStateImplementationType::
+           kSwapForCrossBrowsingInstanceNavigations) {
+     return;
+   }
+ 
+-  DCHECK_EQ(features::GetBrowsingContextMode(),
+-            features::BrowsingContextStateImplementationType::
++  DCHECK_EQ(::features::GetBrowsingContextMode(),
++            ::features::BrowsingContextStateImplementationType::
+                 kLegacyOneToOneWithFrameTreeNode);
+ 
+   // Prepare the proxies.
+@@ -2505,8 +2505,8 @@ RenderFrameHostManager::ShouldSwapBrowsingInstancesForNavigation(
+             current_instance->GetRelatedActiveContentsCount()),
+         51);
+     if (base::FeatureList::IsEnabled(
+-            features::kPrefetchStateContaminationMitigation) &&
+-        features::kPrefetchStateContaminationSwapsBrowsingContextGroup.Get()) {
++            ::features::kPrefetchStateContaminationMitigation) &&
++        ::features::kPrefetchStateContaminationSwapsBrowsingContextGroup.Get()) {
+       return BrowsingContextGroupSwap::CreateSecuritySwap();
+     }
+   }
+@@ -2843,7 +2843,7 @@ RenderFrameHostManager::GetSiteInstanceForNavigation(
+     // this decision. Certain frames have different enough workloads so that
+     // it's better to avoid placing a subframe into an existing process for
+     // better performance isolation.  See https://crbug.com/899418.
+-    if (!base::FeatureList::IsEnabled(features::kDisableProcessReuse) &&
++    if (!base::FeatureList::IsEnabled(::features::kDisableProcessReuse) &&
+         GetContentClient()
+             ->browser()
+             ->ShouldEmbeddedFramesTryToReuseExistingProcess(
+@@ -2948,7 +2948,7 @@ RenderFrameHostManager::GetSiteInstanceForNavigation(
+                current_instance->GetRelatedActiveContentsCount() == 1) {
+       process_to_reuse = current_instance->GetProcess();
+     } else if (base::FeatureList::IsEnabled(
+-                   features::kProcessReuseOnPrerenderCOOPSwap) &&
++                   ::features::kProcessReuseOnPrerenderCOOPSwap) &&
+                frame_tree_node_->frame_tree().is_prerendering()) {
+       process_to_reuse = current_instance->GetProcess();
+     }
+@@ -3885,8 +3885,8 @@ RenderFrameHostManager::CreateRenderFrameHost(
+   if (!render_view_host) {
+     render_view_host = frame_tree.CreateRenderViewHost(
+         site_instance->group(), frame_routing_id, renderer_initiated_creation,
+-        features::GetBrowsingContextMode() ==
+-                features::BrowsingContextStateImplementationType::
++        ::features::GetBrowsingContextMode() ==
++                ::features::BrowsingContextStateImplementationType::
+                     kSwapForCrossBrowsingInstanceNavigations
+             ? browsing_context_state
+             : nullptr,
+@@ -3946,8 +3946,8 @@ bool RenderFrameHostManager::CreateSpeculativeRenderFrameHost(
+     return false;
+ 
+   scoped_refptr<BrowsingContextState> browsing_context_state;
+-  if (features::GetBrowsingContextMode() ==
+-      features::BrowsingContextStateImplementationType::
++  if (::features::GetBrowsingContextMode() ==
++      ::features::BrowsingContextStateImplementationType::
+           kLegacyOneToOneWithFrameTreeNode) {
+     browsing_context_state = render_frame_host_->browsing_context_state();
+   } else {
+@@ -4185,8 +4185,8 @@ void RenderFrameHostManager::CreateRenderFrameProxy(
+       render_view_host = frame_tree_node_->frame_tree().CreateRenderViewHost(
+           group, /*main_frame_routing_id=*/MSG_ROUTING_NONE,
+           /*renderer_initiated_creation=*/false,
+-          features::GetBrowsingContextMode() ==
+-                  features::BrowsingContextStateImplementationType::
++          ::features::GetBrowsingContextMode() ==
++                  ::features::BrowsingContextStateImplementationType::
+                       kSwapForCrossBrowsingInstanceNavigations
+               ? render_frame_host_->browsing_context_state()
+               : nullptr,
+@@ -4631,8 +4631,8 @@ RenderFrameHostManager::GetFrameTokenForSiteInstanceGroup(
+   // instance after a browsing instance swap, and we want to ensure that this
+   // doesn't break anything, so we tie it to the GetBrowsingContextMode which
+   // needs it and is disabled-by-default)
+-  if (features::GetBrowsingContextMode() ==
+-          features::BrowsingContextStateImplementationType::
++  if (::features::GetBrowsingContextMode() ==
++          ::features::BrowsingContextStateImplementationType::
+               kSwapForCrossBrowsingInstanceNavigations &&
+       !render_frame_host_->GetSiteInstance()
+            ->group()
+@@ -4780,8 +4780,8 @@ void RenderFrameHostManager::CommitPending(
+     // because in the new implementation, proxies will be swapped/restored
+     // whenever the RenderFrameHost (and internal BrowsingContextState) is
+     // restored.
+-    if (features::GetBrowsingContextMode() ==
+-        features::BrowsingContextStateImplementationType::
++    if (::features::GetBrowsingContextMode() ==
++        ::features::BrowsingContextStateImplementationType::
+             kLegacyOneToOneWithFrameTreeNode) {
+       BrowsingContextState::RenderFrameProxyHostMap proxy_hosts_to_restore =
+           pending_stored_page->TakeProxyHosts();
+diff --git a/content/browser/renderer_host/render_frame_proxy_host.cc b/content/browser/renderer_host/render_frame_proxy_host.cc
+index 4e2c8008f4..a27f095b4d 100644
+--- a/content/browser/renderer_host/render_frame_proxy_host.cc
++++ b/content/browser/renderer_host/render_frame_proxy_host.cc
+@@ -52,6 +52,8 @@
+ #include "third_party/blink/public/mojom/scroll/scroll_into_view_params.mojom.h"
+ #include "ui/gfx/geometry/rect_f.h"
+ 
++#define TokenFrameMap TokenFrameMap_RenderFrameProxyHost
++
+ namespace content {
+ 
+ namespace {
+@@ -586,7 +588,7 @@ void RenderFrameProxyHost::RouteMessageEvent(
+   // origins once rollout is complete.
+   bool should_verify_source_origin =
+       base::FeatureList::IsEnabled(
+-          features::kAdditionalOpaqueOriginEnforcements) ||
++          ::features::kAdditionalOpaqueOriginEnforcements) ||
+       source_origin_string != u"null";
+   if (should_verify_source_origin) {
+     auto* policy = ChildProcessSecurityPolicyImpl::GetInstance();
+@@ -952,3 +954,5 @@ base::SafeRef<RenderFrameProxyHost> RenderFrameProxyHost::GetSafeRef() {
+ }
+ 
+ }  // namespace content
++
++#undef TokenFrameMap
+diff --git a/content/browser/renderer_host/render_message_filter.cc b/content/browser/renderer_host/render_message_filter.cc
+index 7517bdd84c..ca2d78e5b8 100644
+--- a/content/browser/renderer_host/render_message_filter.cc
++++ b/content/browser/renderer_host/render_message_filter.cc
+@@ -18,7 +18,7 @@ RenderMessageFilter::RenderMessageFilter(
+     RenderWidgetHelper* render_widget_helper)
+     : render_widget_helper_(render_widget_helper),
+       render_process_id_(render_process_id),
+-      cache_response_size_(features::kFrameRoutingCacheResponseSize.Get()) {
++      cache_response_size_(::features::kFrameRoutingCacheResponseSize.Get()) {
+   if (render_widget_helper) {
+     render_widget_helper_->Init(render_process_id_);
+   }
+diff --git a/content/browser/renderer_host/render_process_host_impl.cc b/content/browser/renderer_host/render_process_host_impl.cc
+index b5c905d347..6529f5d750 100644
+--- a/content/browser/renderer_host/render_process_host_impl.cc
++++ b/content/browser/renderer_host/render_process_host_impl.cc
+@@ -3108,7 +3108,7 @@ void RenderProcessHostImpl::AppendRendererCommandLine(
+     }
+   }
+ 
+-  if (features::IsTouchTextEditingRedesignEnabled()) {
++  if (::features::IsTouchTextEditingRedesignEnabled()) {
+     command_line->AppendSwitchASCII(
+         blink::switches::kTouchTextSelectionStrategy,
+         blink::switches::kTouchTextSelectionStrategy_Direction);
+diff --git a/content/browser/renderer_host/render_widget_host_view_aura.cc b/content/browser/renderer_host/render_widget_host_view_aura.cc
+index e145cfde35..4eeb2dd792 100644
+--- a/content/browser/renderer_host/render_widget_host_view_aura.cc
++++ b/content/browser/renderer_host/render_widget_host_view_aura.cc
+@@ -2780,7 +2780,7 @@ void RenderWidgetHostViewAura::CreateSelectionController() {
+   tsc_config.tap_slop = ui::GestureConfiguration::GetInstance()
+                             ->max_touch_move_in_pixels_for_click();
+   tsc_config.enable_longpress_drag_selection =
+-      features::IsTouchTextEditingRedesignEnabled();
++      ::features::IsTouchTextEditingRedesignEnabled();
+   selection_controller_ = std::make_unique<ui::TouchSelectionController>(
+       selection_controller_client_.get(), tsc_config);
+ }
+diff --git a/content/browser/security/coop/cross_origin_opener_policy_reporter.cc b/content/browser/security/coop/cross_origin_opener_policy_reporter.cc
+index 334f15a6bc..9f650fdecf 100644
+--- a/content/browser/security/coop/cross_origin_opener_policy_reporter.cc
++++ b/content/browser/security/coop/cross_origin_opener_policy_reporter.cc
+@@ -19,6 +19,8 @@
+ #include "services/network/public/mojom/source_location.mojom.h"
+ #include "url/origin.h"
+ 
++#define kType kType_CrossOriginOpenerPolicyReporter
++
+ namespace content {
+ 
+ namespace {
+@@ -298,3 +300,5 @@ void CrossOriginOpenerPolicyReporter::QueueNavigationReport(
+ }
+ 
+ }  // namespace content
++
++#undef kType
+diff --git a/content/child/BUILD.gn b/content/child/BUILD.gn
+index e40717e1ed..ef24c4fb0d 100644
+--- a/content/child/BUILD.gn
++++ b/content/child/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//device/vr/buildflags/buildflags.gni")
+ import("//ppapi/buildflags/buildflags.gni")
+@@ -12,9 +13,9 @@ if (is_android) {
+ }
+ 
+ if (is_component_build) {
+-  link_target_type = "source_set"
++  link_target_type = "jumbo_source_set"
+ } else {
+-  link_target_type = "static_library"
++  link_target_type = "jumbo_static_library"
+ }
+ target(link_target_type, "child") {
+   # Targets external to content should always link to the public API.
+diff --git a/content/common/BUILD.gn b/content/common/BUILD.gn
+index 8b8aab0ed9..780d85e951 100644
+--- a/content/common/BUILD.gn
++++ b/content/common/BUILD.gn
+@@ -61,7 +61,7 @@ if (is_linux || is_chromeos) {
+   }
+ }
+ 
+-source_set("common") {
++jumbo_source_set("common") {
+   # Targets external to content should always link to the public API.
+   # In addition, targets outside of the content component (shell and tests)
+   # must not link to this because it will duplicate the code in the component
+@@ -195,6 +195,10 @@ source_set("common") {
+     "webid/identity_url_loader_throttle.cc",
+     "webid/identity_url_loader_throttle.h",
+   ]
++  jumbo_excluded_sources = [
++    "common_param_traits.cc",
++    "content_param_traits.cc",
++  ]
+ 
+   configs += [
+     "//content:content_implementation",
+diff --git a/content/gpu/BUILD.gn b/content/gpu/BUILD.gn
+index 098082510e..397d13d227 100644
+--- a/content/gpu/BUILD.gn
++++ b/content/gpu/BUILD.gn
+@@ -4,6 +4,7 @@
+ 
+ import("//build/config/cast.gni")
+ import("//build/config/chromeos/ui_mode.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//gpu/vulkan/features.gni")
+ import("//media/media_options.gni")
+@@ -20,9 +21,9 @@ group("gpu") {
+ }
+ 
+ if (is_component_build) {
+-  link_target_type = "source_set"
++  link_target_type = "jumbo_source_set"
+ } else {
+-  link_target_type = "static_library"
++  link_target_type = "jumbo_static_library"
+ }
+ 
+ target(link_target_type, "gpu_sources") {
+diff --git a/content/public/browser/BUILD.gn b/content/public/browser/BUILD.gn
+index 5f1d3e825e..5d49b6e3c3 100644
+--- a/content/public/browser/BUILD.gn
++++ b/content/public/browser/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/chromeos/ui_mode.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//content/common/features.gni")
+ import("//device/vr/buildflags/buildflags.gni")
+@@ -24,7 +25,7 @@ group("browser") {
+   }
+ }
+ 
+-source_set("browser_sources") {
++jumbo_source_set("browser_sources") {
+   # External code should depend on via ":browser" above.
+   visibility = [ "//content/*" ]
+   sources = [
+diff --git a/content/public/child/BUILD.gn b/content/public/child/BUILD.gn
+index 73fce2d993..2f298f5cda 100644
+--- a/content/public/child/BUILD.gn
++++ b/content/public/child/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//ppapi/buildflags/buildflags.gni")
+ 
+ # See //content/BUILD.gn for how this works.
+@@ -19,7 +20,7 @@ group("child") {
+   }
+ }
+ 
+-source_set("child_sources") {
++jumbo_source_set("child_sources") {
+   # External code should depend in via ":child" above.
+   visibility = [ "//content/*" ]
+ 
+diff --git a/content/public/common/BUILD.gn b/content/public/common/BUILD.gn
+index 0b7e43edf9..c22bd4d21e 100644
+--- a/content/public/common/BUILD.gn
++++ b/content/public/common/BUILD.gn
+@@ -5,6 +5,7 @@
+ import("//build/buildflag_header.gni")
+ import("//build/config/chromeos/ui_mode.gni")
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//content/public/common/zygote/features.gni")
+ import("//media/media_options.gni")
+@@ -149,7 +150,7 @@ component("main_function_params") {
+   configs += [ "//content:content_implementation" ]
+ }
+ 
+-source_set("common_sources") {
++jumbo_source_set("common_sources") {
+   # External code should depend on via ":common" above.
+   visibility = [ "//content/*" ]
+ 
+diff --git a/content/public/renderer/BUILD.gn b/content/public/renderer/BUILD.gn
+index 4ad8f27ca3..592dfcd256 100644
+--- a/content/public/renderer/BUILD.gn
++++ b/content/public/renderer/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//media/media_options.gni")
+ import("//ppapi/buildflags/buildflags.gni")
+ 
+@@ -16,9 +17,9 @@ group("renderer") {
+ }
+ 
+ if (is_component_build) {
+-  link_target_type = "source_set"
++  link_target_type = "jumbo_source_set"
+ } else {
+-  link_target_type = "static_library"
++  link_target_type = "jumbo_static_library"
+ }
+ target(link_target_type, "renderer_sources") {
+   # External code should depend on via ":renderer" above.
+diff --git a/content/renderer/BUILD.gn b/content/renderer/BUILD.gn
+index e1123d0006..6b055b27fd 100644
+--- a/content/renderer/BUILD.gn
++++ b/content/renderer/BUILD.gn
+@@ -5,6 +5,7 @@
+ import("//build/config/cast.gni")
+ import("//build/config/chromeos/ui_mode.gni")
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//content/common/features.gni")
+ import("//media/media_options.gni")
+@@ -16,9 +17,9 @@ import("//third_party/webrtc/webrtc.gni")
+ import("//tools/ipc_fuzzer/ipc_fuzzer.gni")
+ 
+ if (is_component_build) {
+-  link_target_type = "source_set"
++  link_target_type = "jumbo_source_set"
+ } else {
+-  link_target_type = "static_library"
++  link_target_type = "jumbo_static_library"
+ }
+ 
+ target(link_target_type, "renderer") {
+diff --git a/content/renderer/service_worker/service_worker_subresource_loader.cc b/content/renderer/service_worker/service_worker_subresource_loader.cc
+index ad3eb64c97..02910dbe61 100644
+--- a/content/renderer/service_worker/service_worker_subresource_loader.cc
++++ b/content/renderer/service_worker/service_worker_subresource_loader.cc
+@@ -44,6 +44,8 @@
+ #include "third_party/blink/public/mojom/service_worker/service_worker_stream_handle.mojom.h"
+ #include "third_party/blink/public/platform/web_url_response.h"
+ 
++#define MojoEnumToString MojoEnumToString_ServiceWorkerSubresourceLoader
++
+ namespace content {
+ 
+ namespace {
+@@ -1557,3 +1559,5 @@ void ServiceWorkerSubresourceLoader::DidCacheStorageMatch(
+ }
+ 
+ }  // namespace content
++
++#undef MojoEnumToString
+diff --git a/content/renderer/service_worker/web_service_worker_provider_impl.cc b/content/renderer/service_worker/web_service_worker_provider_impl.cc
+index 11d4e235f6..7fffbaa46d 100644
+--- a/content/renderer/service_worker/web_service_worker_provider_impl.cc
++++ b/content/renderer/service_worker/web_service_worker_provider_impl.cc
+@@ -24,6 +24,8 @@
+ 
+ using blink::WebURL;
+ 
++#define MojoEnumToString MojoEnumToString_WebServiceWorkerProviderImpl
++
+ namespace content {
+ 
+ namespace {
+@@ -336,3 +338,5 @@ void WebServiceWorkerProviderImpl::OnDidGetRegistrationForReady(
+ }
+ 
+ }  // namespace content
++
++#undef MojoEnumToString
+diff --git a/content/services/auction_worklet/BUILD.gn b/content/services/auction_worklet/BUILD.gn
+index 35ed4fbb7f..724388bae3 100644
+--- a/content/services/auction_worklet/BUILD.gn
++++ b/content/services/auction_worklet/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//third_party/inspector_protocol/inspector_protocol.gni")
+ import("//v8/gni/v8.gni")
+ 
+@@ -30,7 +31,7 @@ inspector_protocol_generate("protocol_sources") {
+   ]
+ }
+ 
+-source_set("auction_worklet") {
++jumbo_source_set("auction_worklet") {
+   sources = [
+     "auction_v8_devtools_agent.cc",
+     "auction_v8_devtools_agent.h",
+@@ -100,6 +101,10 @@ source_set("auction_worklet") {
+ 
+   sources += get_target_outputs(":protocol_sources")
+ 
++  jumbo_excluded_sources = [
++    "seller_worklet.cc",
++  ]
++
+   configs += [
+     "//build/config/compiler:wexit_time_destructors",
+     "//v8:external_startup_data",
+diff --git a/content/test/BUILD.gn b/content/test/BUILD.gn
+index e0698a2ba0..f0e2a76dfe 100644
+--- a/content/test/BUILD.gn
++++ b/content/test/BUILD.gn
+@@ -7,6 +7,7 @@ import("//build/config/chrome_build.gni")
+ import("//build/config/chromeos/ui_mode.gni")
+ import("//build/config/compiler/compiler.gni")
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//build/nocompile.gni")
+ import("//components/viz/common/debugger/viz_debugger.gni")
+@@ -40,7 +41,7 @@ if (is_ios) {
+ 
+ # Use a static library here because many test binaries depend on this but don't
+ # require many files from it. This makes linking more efficient.
+-static_library("test_support") {
++jumbo_static_library("test_support") {
+   testonly = true
+ 
+   # See comment at the top of //content/BUILD.gn for why this is disabled in
+@@ -1009,7 +1010,7 @@ source_set("default_content_test_launcher") {
+ 
+ # browsertest_support can be used by targets that run content_shell based
+ # browser tests.
+-static_library("browsertest_support") {
++jumbo_static_library("browsertest_support") {
+   testonly = true
+ 
+   # See comment at the top of //content/BUILD.gn for why this is disabled in
+diff --git a/content/utility/BUILD.gn b/content/utility/BUILD.gn
+index d97ae2c03e..a149b8dcea 100644
+--- a/content/utility/BUILD.gn
++++ b/content/utility/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/chromeos/ui_mode.gni")
++import("//build/config/jumbo.gni")
+ import("//chromeos/ash/components/assistant/assistant.gni")
+ import("//device/vr/buildflags/buildflags.gni")
+ import("//media/gpu/args.gni")
+@@ -13,7 +14,7 @@ import("//services/accessibility/buildflags.gni")
+ import("//services/screen_ai/buildflags/features.gni")
+ import("//services/video_effects/args.gni")
+ 
+-source_set("utility") {
++jumbo_source_set("utility") {
+   # Only the public target should depend on this. All other targets (even
+   # internal content ones other than test) should depend on the public one.
+   visibility = [
+--- a/content/browser/attribution_reporting/aggregatable_debug_report.cc
++++ b/content/browser/attribution_reporting/aggregatable_debug_report.cc
+@@ -187,7 +187,7 @@
+   return contributions;
+ }
+ 
+-bool IsAggregatableFilteringIdsEnabled() {
++bool IsAggregatableFilteringIdsEnabled2() {
+   return base::FeatureList::IsEnabled(
+              attribution_reporting::features::
+                  kAttributionReportingAggregatableFilteringIds) &&
+@@ -360,7 +360,7 @@
+   CHECK(report_id_.is_valid());
+ 
+   std::optional<size_t> filtering_id_max_bytes;
+-  if (IsAggregatableFilteringIdsEnabled()) {
++  if (IsAggregatableFilteringIdsEnabled2()) {
+     filtering_id_max_bytes =
+         attribution_reporting::AggregatableFilteringIdsMaxBytes().value();
+   }
+--- a/content/browser/devtools/protocol/page_handler.cc
++++ b/content/browser/devtools/protocol/page_handler.cc
+@@ -95,7 +95,7 @@
+ constexpr const char* kMhtml = "mhtml";
+ constexpr int kDefaultScreenshotQuality = 80;
+ constexpr int kMaxScreencastFramesInFlight = 2;
+-constexpr char kCommandIsOnlyAvailableAtTopTarget[] =
++constexpr char kCommandIsOnlyAvailableAtTopTarget2[] =
+     "Command can only be executed on top-level targets";
+ constexpr char kErrorNotAttached[] = "Not attached to a page";
+ constexpr char kErrorInactivePage[] = "Not attached to an active page";
+@@ -2218,7 +2218,7 @@
+     return Response::ServerError(kErrorNotAttached);
+ 
+   if (host_->GetParentOrOuterDocument())
+-    return Response::ServerError(kCommandIsOnlyAvailableAtTopTarget);
++    return Response::ServerError(kCommandIsOnlyAvailableAtTopTarget2);
+ 
+   if (!host_->IsActive())
+     return Response::ServerError(kErrorInactivePage);
+diff --git a/content/browser/gpu/compositor_util.cc b/content/browser/gpu/compositor_util.cc
+index 81b989ef31..063433b59f 100644
+--- a/content/browser/gpu/compositor_util.cc
++++ b/content/browser/gpu/compositor_util.cc
+@@ -209,9 +209,9 @@ std::vector<GpuFeatureData> GetGpuFeatureData(
+           "WebGL2 has been disabled via blocklist or the command line."),
+       false);
+   features.emplace_back("raw_draw",
+-                        GetFakeFeatureStatus(features::IsUsingRawDraw()));
++                        GetFakeFeatureStatus(::features::IsUsingRawDraw()));
+   features.emplace_back("direct_rendering_display_compositor",
+-                        GetFakeFeatureStatus(features::IsDrDcEnabled()));
++                        GetFakeFeatureStatus(::features::IsDrDcEnabled()));
+   features.emplace_back(
+       "webgpu",
+       SafeGetFeatureStatus(
+@@ -453,7 +453,7 @@ bool IsZeroCopyUploadEnabled() {
+ 
+ bool IsPartialRasterEnabled() {
+   // Partial raster is not supported with RawDraw.
+-  if (features::IsUsingRawDraw()) {
++  if (::features::IsUsingRawDraw()) {
+     return false;
+   }
+   const auto& command_line = *base::CommandLine::ForCurrentProcess();
+@@ -463,7 +463,7 @@ bool IsPartialRasterEnabled() {
+ bool IsGpuMemoryBufferCompositorResourcesEnabled() {
+   // To use Raw Draw, the Raw Draw shared image backing should be used, so
+   // not use GPU memory buffer shared image backings for compositor resources.
+-  if (features::IsUsingRawDraw()) {
++  if (::features::IsUsingRawDraw()) {
+     return false;
+   }
+   const base::CommandLine& command_line =
+diff --git a/content/browser/gpu/gpu_process_host.cc b/content/browser/gpu/gpu_process_host.cc
+index 74b923602d..13f68773ed 100644
+--- a/content/browser/gpu/gpu_process_host.cc
++++ b/content/browser/gpu/gpu_process_host.cc
+@@ -768,7 +768,7 @@ GpuProcessHost::GpuProcessHost(int host_id, GpuProcessKind kind)
+ #if !BUILDFLAG(IS_ANDROID)
+   if (!in_process_ && kind != GPU_PROCESS_KIND_INFO_COLLECTION &&
+       base::FeatureList::IsEnabled(
+-          features::kForwardMemoryPressureEventsToGpuProcess)) {
++          ::features::kForwardMemoryPressureEventsToGpuProcess)) {
+     memory_pressure_listener_ = std::make_unique<base::MemoryPressureListener>(
+         FROM_HERE, base::BindRepeating(&GpuProcessHost::OnMemoryPressure,
+                                        base::Unretained(this)));
+@@ -988,7 +988,7 @@ void GpuProcessHost::OnProcessLaunched() {
+     gpu_host_->SetProcessId(process_id_);
+ 
+ #if BUILDFLAG(IS_MAC)
+-    if (base::FeatureList::IsEnabled(features::kAdjustGpuProcessPriority)) {
++    if (base::FeatureList::IsEnabled(::features::kAdjustGpuProcessPriority)) {
+       browser_child_process_backgrounded_bridge_ =
+           std::make_unique<BrowserChildProcessBackgroundedBridge>(
+               process_.get());
+@@ -1300,7 +1300,7 @@ bool GpuProcessHost::LaunchGpuProcess() {
+ #if BUILDFLAG(IS_WIN)
+   if (kind_ == GPU_PROCESS_KIND_INFO_COLLECTION &&
+       base::FeatureList::IsEnabled(
+-          features::kGpuInfoCollectionSeparatePrefetch)) {
++          ::features::kGpuInfoCollectionSeparatePrefetch)) {
+     cmd_line->AppendArgNative(app_launch_prefetch::GetPrefetchSwitch(
+         app_launch_prefetch::SubprocessType::kGPUInfo));
+   } else {
+diff --git a/content/browser/installedapp/installed_app_provider_impl.cc b/content/browser/installedapp/installed_app_provider_impl.cc
+index d678deb574..8f5847c96b 100644
+--- a/content/browser/installedapp/installed_app_provider_impl.cc
++++ b/content/browser/installedapp/installed_app_provider_impl.cc
+@@ -59,7 +59,7 @@ void InstalledAppProviderImpl::FilterInstalledApps(
+     const GURL& manifest_url,
+     FilterInstalledAppsCallback callback) {
+   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+-  if (!base::FeatureList::IsEnabled(features::kInstalledAppProvider)) {
++  if (!base::FeatureList::IsEnabled(::features::kInstalledAppProvider)) {
+     base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
+         FROM_HERE,
+         base::BindOnce(std::move(callback),
+@@ -70,7 +70,7 @@ void InstalledAppProviderImpl::FilterInstalledApps(
+   base::ConcurrentCallbacks<FetchRelatedAppsTaskResult> concurrent;
+ 
+ #if BUILDFLAG(IS_WIN)
+-  if (base::FeatureList::IsEnabled(features::kFilterInstalledAppsWinMatching)) {
++  if (base::FeatureList::IsEnabled(::features::kFilterInstalledAppsWinMatching)) {
+     StartTask(std::make_unique<FetchRelatedWinAppsTask>(
+                   native_win_app_fetcher_factory_.Run()),
+               related_apps, concurrent.CreateCallback());
+@@ -79,7 +79,7 @@ void InstalledAppProviderImpl::FilterInstalledApps(
+ 
+ #if !BUILDFLAG(IS_ANDROID)
+   if (base::FeatureList::IsEnabled(
+-          features::kFilterInstalledAppsWebAppMatching)) {
++          ::features::kFilterInstalledAppsWebAppMatching)) {
+     StartTask(std::make_unique<FetchRelatedWebAppsTask>(
+                   render_frame_host().GetBrowserContext()),
+               related_apps, concurrent.CreateCallback());
+diff --git a/content/browser/interest_group/ad_auction_headers_util.cc b/content/browser/interest_group/ad_auction_headers_util.cc
+index 4cbc43fbbd..320c39302b 100644
+--- a/content/browser/interest_group/ad_auction_headers_util.cc
++++ b/content/browser/interest_group/ad_auction_headers_util.cc
+@@ -123,7 +123,7 @@ bool IsAdAuctionHeadersEligible(
+ bool IsAdAuctionHeadersEligibleForNavigation(
+     const FrameTreeNode& frame,
+     const url::Origin& navigation_request_origin) {
+-  if (!base::FeatureList::IsEnabled(features::kEnableIFrameAdAuctionHeaders)) {
++  if (!base::FeatureList::IsEnabled(::features::kEnableIFrameAdAuctionHeaders)) {
+     return false;
+   }
+ 
+diff --git a/content/browser/interest_group/ad_auction_result_metrics.cc b/content/browser/interest_group/ad_auction_result_metrics.cc
+index a1e4e1498a..60614f2d72 100644
+--- a/content/browser/interest_group/ad_auction_result_metrics.cc
++++ b/content/browser/interest_group/ad_auction_result_metrics.cc
+@@ -48,9 +48,9 @@ AdAuctionResultMetrics::~AdAuctionResultMetrics() {
+ 
+ bool AdAuctionResultMetrics::ShouldRunAuction() {
+   num_requested_auctions_++;
+-  if (!base::FeatureList::IsEnabled(features::kFledgeLimitNumAuctions))
++  if (!base::FeatureList::IsEnabled(::features::kFledgeLimitNumAuctions))
+     return true;
+-  if (num_requested_auctions_ > features::kFledgeLimitNumAuctionsParam.Get()) {
++  if (num_requested_auctions_ > ::features::kFledgeLimitNumAuctionsParam.Get()) {
+     num_auctions_not_run_due_to_auction_limit_++;
+     return false;
+   }
+diff --git a/content/browser/interest_group/ad_auction_service_impl.cc b/content/browser/interest_group/ad_auction_service_impl.cc
+index a71a14cfbd..3abf9c9fbf 100644
+--- a/content/browser/interest_group/ad_auction_service_impl.cc
++++ b/content/browser/interest_group/ad_auction_service_impl.cc
+@@ -435,7 +435,7 @@ void AdAuctionServiceImpl::RunAdAuction(
+   // been invalidated or the current frame's `PageImpl` has changed to a
+   // different one, abort the auction.
+   // See crbug.com/1422301.
+-  if (base::FeatureList::IsEnabled(features::kDetectInconsistentPageImpl) &&
++  if (base::FeatureList::IsEnabled(::features::kDetectInconsistentPageImpl) &&
+       (!GetFrame()->auction_initiator_page() ||
+        GetFrame()->auction_initiator_page().get() !=
+            &(GetFrame()->GetPage()))) {
+@@ -763,7 +763,7 @@ AdAuctionServiceImpl::GetClientSecurityState() {
+ 
+ std::optional<std::string> AdAuctionServiceImpl::GetCookieDeprecationLabel() {
+   if (!base::FeatureList::IsEnabled(
+-          features::kFledgeFacilitatedTestingSignalsHeaders)) {
++          ::features::kFledgeFacilitatedTestingSignalsHeaders)) {
+     return std::nullopt;
+   }
+ 
+@@ -919,7 +919,7 @@ void AdAuctionServiceImpl::OnAuctionComplete(
+   // been invalidated or the current frame's `PageImpl` has changed to a
+   // different one, abort the auction.
+   // See crbug.com/1422301.
+-  if (base::FeatureList::IsEnabled(features::kDetectInconsistentPageImpl) &&
++  if (base::FeatureList::IsEnabled(::features::kDetectInconsistentPageImpl) &&
+       (!GetFrame()->auction_initiator_page() ||
+        GetFrame()->auction_initiator_page().get() !=
+            &(GetFrame()->GetPage()))) {
+@@ -1258,7 +1258,7 @@ AdAuctionPageData* AdAuctionServiceImpl::GetAdAuctionPageData() {
+   // been invalidated or the current frame's `PageImpl` has changed to a
+   // different one, signal that state is no longer available.
+   // See crbug.com/1422301.
+-  if (base::FeatureList::IsEnabled(features::kDetectInconsistentPageImpl) &&
++  if (base::FeatureList::IsEnabled(::features::kDetectInconsistentPageImpl) &&
+       (!GetFrame()->auction_initiator_page() ||
+        GetFrame()->auction_initiator_page().get() !=
+            &(GetFrame()->GetPage()))) {
+diff --git a/content/browser/interest_group/auction_runner.cc b/content/browser/interest_group/auction_runner.cc
+index 6c3534706e..97005542ff 100644
+--- a/content/browser/interest_group/auction_runner.cc
++++ b/content/browser/interest_group/auction_runner.cc
+@@ -44,7 +44,7 @@ namespace {
+ auction_worklet::mojom::KAnonymityBidMode DetermineKAnonMode() {
+   // K-anonymity enforcement is always disabled for the testing population.
+   if (base::FeatureList::IsEnabled(
+-          features::kCookieDeprecationFacilitatedTesting)) {
++          ::features::kCookieDeprecationFacilitatedTesting)) {
+     return auction_worklet::mojom::KAnonymityBidMode::kNone;
+   }
+   if (base::FeatureList::IsEnabled(
+@@ -710,7 +710,7 @@ void AuctionRunner::UpdateInterestGroupsPostAuction() {
+   });
+ 
+   if (base::FeatureList::IsEnabled(
+-          features::kFledgeDelayPostAuctionInterestGroupUpdate)) {
++          ::features::kFledgeDelayPostAuctionInterestGroupUpdate)) {
+     interest_group_manager_->UpdateInterestGroupsOfOwnersWithDelay(
+         std::move(update_owners), client_security_state_.Clone(),
+         std::move(attestation_callback_), kPostAuctionInterestGroupUpdateDelay);
+diff --git a/content/browser/interest_group/auction_worklet_manager.cc b/content/browser/interest_group/auction_worklet_manager.cc
+index 2c4d14bd95..b233b4c680 100644
+--- a/content/browser/interest_group/auction_worklet_manager.cc
++++ b/content/browser/interest_group/auction_worklet_manager.cc
+@@ -448,7 +448,7 @@ void AuctionWorkletManager::WorkletOwner::OnProcessAssigned(
+ 
+       for (size_t i = 0;
+            i < static_cast<size_t>(
+-                   features::kFledgeSellerWorkletThreadPoolSize.Get());
++                   ::features::kFledgeSellerWorkletThreadPoolSize.Get());
+            ++i) {
+         worklet_debugs_.emplace_back(new DebuggableAuctionWorklet(
+             delegate->GetFrame(), process_handle_, worklet_info_.script_url,
+diff --git a/content/browser/media/cdm_storage_database.cc b/content/browser/media/cdm_storage_database.cc
+index ed281c46e1..db51b723b3 100644
+--- a/content/browser/media/cdm_storage_database.cc
++++ b/content/browser/media/cdm_storage_database.cc
+@@ -12,7 +12,8 @@
+ #include "base/metrics/histogram_functions.h"
+ #include "sql/statement.h"
+ 
+-#define kUmaPrefix kUmaPrefix_CdmStorageDatabase
++#define kUmaPrefix     kUmaPrefix_CdmStorageDatabase
++#define kVersionNumber kVersionNumber_CdmStorageDatabase
+ 
+ namespace content {
+ 
+@@ -662,3 +663,4 @@ void CdmStorageDatabase::OnDatabaseError(int error, sql::Statement* stmt) {
+ }  // namespace content
+ 
+ #undef kUmaPrefix
++#undef kVersionNumber
+diff --git a/content/browser/media/cdm_storage_manager.cc b/content/browser/media/cdm_storage_manager.cc
+index 8029aca291..f19ece80b4 100644
+--- a/content/browser/media/cdm_storage_manager.cc
++++ b/content/browser/media/cdm_storage_manager.cc
+@@ -13,6 +13,9 @@
+ #include "media/cdm/cdm_type.h"
+ #include "media/mojo/mojom/cdm_storage.mojom.h"
+ 
++#define kUmaPrefix               kUmaPrefix_CdmStorageManager
++#define CreateDatabaseTaskRunner CreateDatabaseTaskRunner_CdmStorageManager
++
+ namespace content {
+ 
+ namespace {
+@@ -291,3 +294,6 @@ void CdmStorageManager::ReportDatabaseOpenError(CdmStorageOpenError error) {
+ }
+ 
+ }  // namespace content
++
++#undef kUmaPrefix
++#undef CreateDatabaseTaskRunner
+diff --git a/content/browser/media/media_license_database.cc b/content/browser/media/media_license_database.cc
+index faf90f2eb7..ba213f1fc7 100644
+--- a/content/browser/media/media_license_database.cc
++++ b/content/browser/media/media_license_database.cc
+@@ -12,6 +12,9 @@
+ #include "sql/sqlite_result_code_values.h"
+ #include "sql/statement.h"
+ 
++#define kUmaPrefix     kUmaPrefix_MediaLicenseDatabase
++#define kVersionNumber kVersionNumber_MediaLicenseDatabase
++
+ namespace content {
+ 
+ using MediaLicenseStorageHostOpenError =
+@@ -295,3 +298,6 @@ void MediaLicenseDatabase::OnDatabaseError(int error, sql::Statement* stmt) {
+ }
+ 
+ }  // namespace content
++
++#undef kUmaPrefix
++#undef kVersionNumber
+diff --git a/content/browser/media/media_license_manager.cc b/content/browser/media/media_license_manager.cc
+index 1d7a258715..6ad559c806 100644
+--- a/content/browser/media/media_license_manager.cc
++++ b/content/browser/media/media_license_manager.cc
+@@ -33,6 +33,8 @@
+ #include "third_party/blink/public/mojom/quota/quota_types.mojom-shared.h"
+ #include "url/origin.h"
+ 
++#define CreateDatabaseTaskRunner CreateDatabaseTaskRunner_MediaLicenseManager
++
+ namespace content {
+ 
+ using MediaLicenseStorageHostOpenError =
+@@ -229,3 +231,5 @@ void MediaLicenseManager::OnHostReceiverDisconnect(
+ }
+ 
+ }  // namespace content
++
++#undef CreateDatabaseTaskRunner
+diff --git a/content/browser/renderer_host/pepper/pepper_internal_file_ref_backend.cc b/content/browser/renderer_host/pepper/pepper_internal_file_ref_backend.cc
+index 292641a8d1..a5fa1392cd 100644
+--- a/content/browser/renderer_host/pepper/pepper_internal_file_ref_backend.cc
++++ b/content/browser/renderer_host/pepper/pepper_internal_file_ref_backend.cc
+@@ -81,7 +81,7 @@ void CallRemove(scoped_refptr<storage::FileSystemContext> file_system_context,
+                                                   std::move(callback));
+ }
+ 
+-void CallTouchFile(
++void CallTouchFile2(
+     scoped_refptr<storage::FileSystemContext> file_system_context,
+     const storage::FileSystemURL& url,
+     const base::Time& last_access_time,
+@@ -247,7 +247,7 @@ int32_t PepperInternalFileRefBackend::Touch(
+   GetIOThreadTaskRunner({})->PostTask(
+       FROM_HERE,
+       base::BindOnce(
+-          CallTouchFile, GetFileSystemContext(), GetFileSystemURL(),
++          CallTouchFile2, GetFileSystemContext(), GetFileSystemURL(),
+           last_access_time, last_modified_time,
+           base::BindOnce(&PepperInternalFileRefBackend::DidFinishOnIOThread,
+                          weak_factory_.GetWeakPtr(), reply_context,
