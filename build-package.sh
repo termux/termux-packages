@@ -545,6 +545,7 @@ _show_usage() {
 	echo "  -o Specify directory where to put built packages. Default: output/"
 	echo "  --format Specify package output format (debian, pacman)."
 	echo "  --library Specify library of package (bionic, glibc)."
+	echo "  --disable-dependency-download-parallelizing disable dependency downloading parallelizing"
 	exit 1
 }
 
@@ -569,6 +570,9 @@ while (( $# )); do
 			shift 1
 			export TERMUX_PACKAGE_LIBRARY="$1"
 		;;
+		--disable-dependency-download-parallelizing)
+			TERMUX_DEPENDENCY_DOWNLOAD_PARALLELIZING="false"
+			;;
 		-a)
 			if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
 				termux_error_exit "./build-package.sh: option '-a' is not available for on-device builds"
@@ -701,6 +705,7 @@ for (( i=0; i < ${#PACKAGE_LIST[@]}; i++ )); do
 			[[ "${TERMUX_WITHOUT_DEPVERSION_BINDING:-}" == "true" ]] && _SELF_ARGS+=("-w")
 			[[ -n "${TERMUX_PACKAGE_FORMAT:-}" ]] && _SELF_ARGS+=("--format" "$TERMUX_PACKAGE_FORMAT")
 			[[ -n "${TERMUX_PACKAGE_LIBRARY:-}" ]] && _SELF_ARGS+=("--library" "$TERMUX_PACKAGE_LIBRARY")
+			[[ "${TERMUX_DEPENDENCY_DOWNLOAD_PARALLELIZING-true}" == "false" ]] && _SELF_ARGS+=("--disable-dependency-download-parallelizing")
 
 			for arch in 'aarch64' 'arm' 'i686' 'x86_64'; do
 				env TERMUX_ARCH="$arch" TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh \
