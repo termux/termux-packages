@@ -1,0 +1,130 @@
+From 49473441c17006856268f37249e62a99a7901741 Mon Sep 17 00:00:00 2001
+From: Matthias Gerstner <matthias.gerstner@suse.de>
+Date: Wed, 7 May 2025 11:25:25 +0200
+Subject: [PATCH 5/6] Avoid file existence test information leaks to fix
+ CVE-2025-46804
+
+In setuid-root context the current error messages give away whether
+certain paths not accessible by the real user exist and what type they
+have. To prevent this only output generic error messages in setuid-root
+context.
+
+In some situations, when an error is pertaining a directory and the
+directory is owner by the real user then we can still output more
+detailed diagnostics.
+
+This change can lead to less helpful error messages when Screen is
+install setuid-root. More complex changes would be needed to avoid this
+(e.g.  only open the `SocketPath` with raised privileges when
+multi-attach is requested).
+
+There might still be lingering some code paths that allow such
+information leaks, since `SocketPath` is a global variable that is used
+across the code base. The majority of issues should be caught with this
+fix, however.
+---
+ screen.c | 54 ++++++++++++++++++++++++++++++++++++++++++------------
+ socket.c |  9 +++++++--
+ 2 files changed, 49 insertions(+), 14 deletions(-)
+
+diff --git a/screen.c b/screen.c
+index fb61c7f..eabbdc2 100644
+--- a/screen.c
++++ b/screen.c
+@@ -862,22 +862,47 @@ int main(int argc, char **argv)
+ #endif
+ 	}
+ 
+-	if (stat(SocketPath, &st) == -1)
+-		Panic(errno, "Cannot access %s", SocketPath);
+-	else if (!S_ISDIR(st.st_mode))
+-		Panic(0, "%s is not a directory.", SocketPath);
++	if (stat(SocketPath, &st) == -1) {
++		if (eff_uid == real_uid) {
++			Panic(errno, "Cannot access %s", SocketPath);
++		} else {
++			Panic(0, "Error accessing %s", SocketPath);
++		}
++	}
++	else if (!S_ISDIR(st.st_mode)) {
++		if (eff_uid == real_uid || st.st_uid == real_uid) {
++			Panic(0, "%s is not a directory.", SocketPath);
++		} else {
++			Panic(0, "Error accessing %s", SocketPath);
++		}
++	}
+ 	if (multi) {
+-		if (st.st_uid != multi_uid)
+-			Panic(0, "%s is not the owner of %s.", multi, SocketPath);
++		if (st.st_uid != multi_uid) {
++			if (eff_uid == real_uid || st.st_uid == real_uid) {
++				Panic(0, "%s is not the owner of %s.", multi, SocketPath);
++			} else {
++				Panic(0, "Error accessing %s", SocketPath);
++			}
++		}
+ 	} else {
+ #ifdef SOCKET_DIR	/* if SOCKETDIR is not defined, the socket is in $HOME.
+ 			   in that case it does not make sense to compare uids. */
+-		if (st.st_uid != real_uid)
+-			Panic(0, "You are not the owner of %s.", SocketPath);
++		if (st.st_uid != real_uid) {
++			if (eff_uid == real_uid) {
++				Panic(0, "You are not the owner of %s.", SocketPath);
++			} else {
++				Panic(0, "Error accessing %s", SocketPath);
++			}
++		}
+ #endif
+ 	}
+-	if ((st.st_mode & 0777) != 0700)
+-		Panic(0, "Directory %s must have mode 700.", SocketPath);
++	if ((st.st_mode & 0777) != 0700) {
++		if (eff_uid == real_uid || st.st_uid == real_uid) {
++			Panic(0, "Directory %s must have mode 700.", SocketPath);
++		} else {
++			Panic(0, "Error accessing %s", SocketPath);
++		}
++	}
+ 	if (SocketMatch && strchr(SocketMatch, '/'))
+ 		Panic(0, "Bad session name '%s'", SocketMatch);
+ 	SocketName = SocketPath + strlen(SocketPath) + 1;
+@@ -902,8 +927,13 @@ int main(int argc, char **argv)
+ 			else
+ 				exit(9 + (fo || oth ? 1 : 0) + fo);
+ 		}
+-		if (fo == 0)
+-			Panic(0, "No Sockets found in %s.\n", SocketPath);
++		if (fo == 0) {
++			if (eff_uid == real_uid || st.st_uid == real_uid) {
++				Panic(0, "No Sockets found in %s.\n", SocketPath);
++			} else {
++				Panic(0, "Error accessing %s", SocketPath);
++			}
++		}
+ 		Msg(0, "%d Socket%s in %s.", fo, fo > 1 ? "s" : "", SocketPath);
+ 		eexit(0);
+ 	}
+diff --git a/socket.c b/socket.c
+index 5709a24..d0b361a 100644
+--- a/socket.c
++++ b/socket.c
+@@ -148,8 +148,13 @@ int FindSocket(int *fdp, int *nfoundp, int *notherp, char *match)
+ 	xseteuid(real_uid);
+ 	xsetegid(real_gid);
+ 
+-	if ((dirp = opendir(SocketPath)) == NULL)
+-		Panic(errno, "Cannot opendir %s", SocketPath);
++	if ((dirp = opendir(SocketPath)) == NULL) {
++		if (eff_uid == real_uid) {
++			Panic(errno, "Cannot opendir %s", SocketPath);
++		} else {
++			Panic(0, "Error accessing %s", SocketPath);
++		}
++	}
+ 
+ 	slist = NULL;
+ 	slisttail = &slist;
+-- 
+2.49.0
+

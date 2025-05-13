@@ -1,0 +1,49 @@
+From 4f1c9e41bae1547077a524241952c244b969645f Mon Sep 17 00:00:00 2001
+From: Alex Naumov <alexander_naumov@opensuse.org>
+Date: Wed, 7 May 2025 10:45:30 +0200
+Subject: [PATCH 2/6] default PTY mode: apply safe default mode of 0620 to fix
+ CVE-2025-46803
+
+During refactoring of configure.ac the default PTY mode was changed from
+0620 to 0622 without documenting this change. Packagers that don't pass
+an explicit `--with-pty-mode=0620` will end up with world-writable PTYs.
+Revert the default back of 0620 to provide a safe default again.
+
+Committed-By: Matthias Gerstner <matthias.gerstner@suse.de>
+---
+ configure.ac | 4 ++--
+ process.c    | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 976b1e0..34caf99 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -117,9 +117,9 @@ AC_ARG_WITH(system_screenrc, AS_HELP_STRING([--with-system_screenrc],
+ 	    [with_system_screenrc=$withval],
+ 	    [with_system_screenrc=/etc/screenrc])
+ AC_ARG_WITH(pty-mode, AS_HELP_STRING([--with-pty-mode],
+-	    [set pty mode (default: 0622)]),
++	    [set pty mode (default: 0620)]),
+ 	    [with_pty_mode=$withval],
+-	    [with_pty_mode=0622])
++	    [with_pty_mode=0620])
+ AC_ARG_WITH(pty-group, AS_HELP_STRING([--with-pty-group],
+ 	    [set pty group (default: 5)]),
+ 	    [with_pty_group=$withval],
+diff --git a/process.c b/process.c
+index 470e70a..3912803 100644
+--- a/process.c
++++ b/process.c
+@@ -117,7 +117,7 @@ char NullStr[] = "";
+ struct plop plop_tab[MAX_PLOP_DEFS];
+ 
+ #ifndef PTY_MODE
+-#define PTY_MODE 0622
++#define PTY_MODE 0620
+ #endif
+ 
+ int TtyMode = PTY_MODE;
+-- 
+2.49.0
+

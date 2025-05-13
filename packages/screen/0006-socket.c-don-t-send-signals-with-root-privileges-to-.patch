@@ -1,0 +1,115 @@
+From d993aacb892ee7aa83c0e21174c8b65b191802d5 Mon Sep 17 00:00:00 2001
+From: Matthias Gerstner <matthias.gerstner@suse.de>
+Date: Wed, 7 May 2025 12:30:39 +0200
+Subject: [PATCH 6/6] socket.c: don't send signals with root privileges to fix
+ CVE-2025-46805
+
+The CheckPid() function was introduced to address CVE-2023-24626, to
+prevent sending SIGCONT and SIGHUP to arbitrary PIDs in the system. This
+fix still suffers from a TOCTOU race condition. The client can replace
+itself by a privileged process, or try to cycle PIDs until a privileged
+process receives the original PID.
+
+To prevent this, always send signals using the real privileges. Keep
+CheckPid() for error diagnostics. If sending the actual signal fails
+later on then there will be no more error reporting.
+
+It seems the original bugfix already introduced a regression when
+attaching to another's user session that is not owned by root. In this
+case the target sessions runs with real uid X, while for sending a
+signal to the `pid` provided by the client real uid Y (or root
+privileges) are required.
+
+This is hard to properly fix without this regression. On Linux pidfds
+could be used to allow safely sending signals to other PIDs as root
+without involving race conditions. In this case the client PID should
+also be obtained via the UNIX domain socket's SO_PEERCRED option,
+though.
+---
+ socket.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
+
+diff --git a/socket.c b/socket.c
+index d0b361a..c715519 100644
+--- a/socket.c
++++ b/socket.c
+@@ -91,6 +91,11 @@ static void AskPassword(Message *);
+ static bool CheckPassword(const char *password);
+ static void PasswordProcessInput(char *, size_t);
+ 
++static void KillUnpriv(pid_t pid, int sig) {
++	UserContext();
++	UserReturn(kill(pid, sig));
++}
++
+ #define SOCKMODE (S_IWRITE | S_IREAD | (displays ? S_IEXEC : 0) | (multi ? 1 : 0))
+ 
+ /*
+@@ -611,7 +616,7 @@ static int CreateTempDisplay(Message *m, int recvfd, Window *win)
+ 				Msg(errno, "Could not perform necessary sanity "
+ 					   "checks on pts device.");
+ 				close(i);
+-				Kill(pid, SIG_BYE);
++				KillUnpriv(pid, SIG_BYE);
+ 				return -1;
+ 			}
+ 			if (strcmp(ttyname_in_ns, m->m_tty)) {
+@@ -620,7 +625,7 @@ static int CreateTempDisplay(Message *m, int recvfd, Window *win)
+ 				    ttyname_in_ns,
+ 				    m->m_tty[0] != '\0' ? m->m_tty : "(null)");
+ 				close(i);
+-				Kill(pid, SIG_BYE);
++				KillUnpriv(pid, SIG_BYE);
+ 				return -1;
+ 			}
+ 			/* m->m_tty so far contains the actual name of the pts
+@@ -638,24 +643,24 @@ static int CreateTempDisplay(Message *m, int recvfd, Window *win)
+ 			    "Attach: passed fd does not match tty: %s - %s!",
+ 			    m->m_tty, myttyname ? myttyname : "NULL");
+ 			close(i);
+-			Kill(pid, SIG_BYE);
++			KillUnpriv(pid, SIG_BYE);
+ 			return -1;
+ 		}
+ 	} else if ((i = secopen(m->m_tty, O_RDWR | O_NONBLOCK, 0)) < 0) {
+ 		Msg(errno, "Attach: Could not open %s!", m->m_tty);
+-		Kill(pid, SIG_BYE);
++		KillUnpriv(pid, SIG_BYE);
+ 		return -1;
+ 	}
+ 
+ 	if (attach)
+-		Kill(pid, SIGCONT);
++		KillUnpriv(pid, SIGCONT);
+ 
+ 	if (attach) {
+ 		if (display || win) {
+ 			int unused_result = write(i, "Attaching from inside of screen?\n", 33);
+ 			(void)unused_result; /* unused */
+ 			close(i);
+-			Kill(pid, SIG_BYE);
++			KillUnpriv(pid, SIG_BYE);
+ 			Msg(0, "Attach msg ignored: coming from inside.");
+ 			return -1;
+ 		}
+@@ -678,7 +683,7 @@ static int CreateTempDisplay(Message *m, int recvfd, Window *win)
+ 		(void)unused_result; /* unused */
+ 		close(i);
+ 		Msg(0, "Attach: could not make display for user %s", user);
+-		Kill(pid, SIG_BYE);
++		KillUnpriv(pid, SIG_BYE);
+ 		return -1;
+ 	}
+ 	if (attach) {
+@@ -884,7 +889,7 @@ void ReceiveMsg(void)
+ 				Msg(0, "Query attempt with bad pid(%d)!", m.m.command.apid);
+ 			}
+ 			else {
+-				Kill(m.m.command.apid, (queryflag >= 0) ? SIGCONT : SIG_BYE);	/* Send SIG_BYE if an error happened */
++				KillUnpriv(m.m.command.apid, (queryflag >= 0) ? SIGCONT : SIG_BYE);	/* Send SIG_BYE if an error happened */
+ 				queryflag = -1;
+ 			}
+ 		}
+-- 
+2.49.0
+

@@ -1,0 +1,113 @@
+From 5a5383b312b2422689ca0220ac1557885b6ce67d Mon Sep 17 00:00:00 2001
+From: Matthias Gerstner <matthias.gerstner@suse.de>
+Date: Wed, 7 May 2025 10:56:17 +0200
+Subject: [PATCH 4/6] attacher.c: prevent temporary 0666 mode on PTYs to fix
+ CVE-2025-46802
+
+This temporary chmod of the PTY to mode 0666 is most likely a remnant of
+past times, before the PTY file descriptor was passed to the target
+session via the UNIX domain socket.
+
+This chmod() causes a race condition during which any other user in the
+system can open the PTY for reading and writing, and thus allows PTY
+hijacking.
+
+Simply remove this logic completely.
+---
+ attacher.c | 14 --------------
+ screen.c   | 12 ------------
+ screen.h   |  2 --
+ 3 files changed, 28 deletions(-)
+
+diff --git a/attacher.c b/attacher.c
+index 4e1a77e..e5a48b0 100644
+--- a/attacher.c
++++ b/attacher.c
+@@ -127,9 +127,6 @@ int Attach(int how)
+ 		xseteuid(multi_uid);
+ 		xseteuid(own_uid);
+ #endif
+-		if (chmod(attach_tty, 0666))
+-			Panic(errno, "chmod %s", attach_tty);
+-		tty_oldmode = tty_mode;
+ 	}
+ 
+ 	memset((char *)&m, 0, sizeof(Message));
+@@ -279,12 +276,6 @@ int Attach(int how)
+ 			pause();	/* wait for SIGCONT */
+ 		xsignal(SIGCONT, SIG_DFL);
+ 		ContinuePlease = false;
+-		xseteuid(own_uid);
+-		if (tty_oldmode >= 0)
+-			if (chmod(attach_tty, tty_oldmode))
+-				Panic(errno, "chmod %s", attach_tty);
+-		tty_oldmode = -1;
+-		xseteuid(real_uid);
+ 	}
+ 	rflag = 0;
+ 	return 1;
+@@ -334,11 +325,6 @@ void AttacherFinit(int sigsig)
+ 			close(s);
+ 		}
+ 	}
+-	if (tty_oldmode >= 0) {
+-		if (setuid(own_uid))
+-			Panic(errno, "setuid");
+-		chmod(attach_tty, tty_oldmode);
+-	}
+ 	exit(0);
+ }
+ 
+diff --git a/screen.c b/screen.c
+index 728e717..fb61c7f 100644
+--- a/screen.c
++++ b/screen.c
+@@ -145,8 +145,6 @@ bool      hastruecolor = false;
+ 
+ char     *multi;
+ int       multiattach;
+-int       tty_mode;
+-int       tty_oldmode = -1;
+ 
+ char      HostName[MAXSTR];
+ pid_t     MasterPid;
+@@ -766,7 +764,6 @@ int main(int argc, char **argv)
+ 
+ 		/* ttyname implies isatty */
+ 		SetTtyname(true, &st);
+-		tty_mode = (int)st.st_mode & 0777;
+ 
+ 		fl = fcntl(0, F_GETFL, 0);
+ 		if (fl != -1 && (fl & (O_RDWR | O_RDONLY | O_WRONLY)) == O_RDWR)
+@@ -1570,15 +1567,6 @@ void Panic(int err, const char *fmt, ...)
+ 			if (D_userpid)
+ 				Kill(D_userpid, SIG_BYE);
+ 		}
+-	if (tty_oldmode >= 0) {
+-#if defined(HAVE_SETEUID)
+-		if (setuid(own_uid))
+-			xseteuid(own_uid);	/* may be a loop. sigh. */
+-#else
+-		setuid(own_uid);
+-#endif
+-		chmod(attach_tty, tty_oldmode);
+-	}
+ 	eexit(1);
+ }
+ 
+diff --git a/screen.h b/screen.h
+index 308c365..410b4f4 100644
+--- a/screen.h
++++ b/screen.h
+@@ -291,8 +291,6 @@ extern int nversion;
+ extern uid_t own_uid;
+ extern int queryflag;
+ extern int rflag;
+-extern int tty_mode;
+-extern int tty_oldmode;
+ extern pid_t MasterPid;
+ extern int MsgMinWait;
+ extern int MsgWait;
+-- 
+2.49.0
+
