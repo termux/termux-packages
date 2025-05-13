@@ -18,6 +18,11 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-colors256
 "
 
+termux_pkg_auto_update() {
+	read -r latest < <(curl -fsSL "https://mirrors.kernel.org/gnu/screen" | sed -rn 's/.*screen-([0-9]+(\.[0-9]+)*).*/\1/p' | sort -Vr);
+	termux_pkg_upgrade_version "${latest}"
+}
+
 termux_step_pre_configure() {
 	# Run autoreconf since we have patched configure.ac
 	autoreconf -fi
