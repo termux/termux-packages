@@ -1,8 +1,8 @@
 diff --git a/sshd.c b/sshd.c
-index df76dc78c..c6041cfae 100644
+index 4a93e29e4..8e389f7c6 100644
 --- a/sshd.c
 +++ b/sshd.c
-@@ -1215,7 +1215,8 @@ main(int ac, char **av)
+@@ -1324,7 +1324,8 @@ main(int ac, char **av)
  	saved_argc = ac;
  	rexec_argc = ac;
  	saved_argv = xcalloc(ac + 1, sizeof(*saved_argv));
@@ -12,7 +12,7 @@ index df76dc78c..c6041cfae 100644
  		saved_argv[i] = xstrdup(av[i]);
  	saved_argv[i] = NULL;
  
-@@ -1224,10 +1225,10 @@ main(int ac, char **av)
+@@ -1333,10 +1334,10 @@ main(int ac, char **av)
  	compat_init_setproctitle(ac, av);
  	av = saved_argv;
  #endif
@@ -25,7 +25,7 @@ index df76dc78c..c6041cfae 100644
  	/* Ensure that fds 0, 1 and 2 are open or directed to /dev/null */
  	sanitise_stdfd();
  
-@@ -1348,9 +1349,10 @@ main(int ac, char **av)
+@@ -1458,9 +1459,10 @@ main(int ac, char **av)
  			break;
  		}
  	}
@@ -37,7 +37,7 @@ index df76dc78c..c6041cfae 100644
  	closefrom(STDERR_FILENO + 1);
  
  	/* Reserve fds we'll need later for reexec things */
-@@ -1609,12 +1611,13 @@ main(int ac, char **av)
+@@ -1727,17 +1729,19 @@ main(int ac, char **av)
  	/* Ensure privsep directory is correctly configured. */
  	need_chroot = ((getuid() == 0 || geteuid() == 0) ||
  	    options.kerberos_authentication);
@@ -52,7 +52,21 @@ index df76dc78c..c6041cfae 100644
  	if (need_chroot) {
  		if ((stat(_PATH_PRIVSEP_CHROOT_DIR, &sb) == -1) ||
  		    (S_ISDIR(sb.st_mode) == 0))
-@@ -1645,9 +1648,10 @@ main(int ac, char **av)
+ 			fatal("Missing privilege separation directory: %s",
+ 			    _PATH_PRIVSEP_CHROOT_DIR);
++#ifndef __ANDROID__
+ #ifdef HAVE_CYGWIN
+ 		if (check_ntsec(_PATH_PRIVSEP_CHROOT_DIR) &&
+ 		    (sb.st_uid != getuid () ||
+@@ -1747,6 +1751,7 @@ main(int ac, char **av)
+ #endif
+ 			fatal("%s must be owned by root and not group or "
+ 			    "world-writable.", _PATH_PRIVSEP_CHROOT_DIR);
++#endif
+ 	}
+ 
+ 	if (test_flag > 1)
+@@ -1763,9 +1768,10 @@ main(int ac, char **av)
  	 * to create a file, and we can't control the code in every
  	 * module which might be used).
  	 */
@@ -64,7 +78,7 @@ index df76dc78c..c6041cfae 100644
  	/* Prepare arguments for sshd-session */
  	if (rexec_argc < 0)
  		fatal("rexec_argc %d < 0", rexec_argc);
-@@ -1686,7 +1690,7 @@ main(int ac, char **av)
+@@ -1811,7 +1817,7 @@ main(int ac, char **av)
  	already_daemon = daemonized();
  	if (!(debug_flag || inetd_flag || no_daemon_flag || already_daemon)) {
  
@@ -73,7 +87,7 @@ index df76dc78c..c6041cfae 100644
  			fatal("daemon() failed: %.200s", strerror(errno));
  
  		disconnect_controlling_tty();
-@@ -1698,9 +1702,10 @@ main(int ac, char **av)
+@@ -1823,9 +1829,10 @@ main(int ac, char **av)
  	 * Chdir to the root directory so that the current disk can be
  	 * unmounted if desired.
  	 */
