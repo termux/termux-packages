@@ -1,0 +1,38 @@
+--- a/build/gulpfile.vscode.js
++++ b/build/gulpfile.vscode.js
+@@ -36,6 +36,8 @@
+ const glob = promisify(require('glob'));
+ const rcedit = promisify(require('rcedit'));
+ 
++const buildRoot = path.join(root, "package-build-root");
++
+ // Build
+ const vscodeEntryPoints = [
+ 	buildfile.workerEditor,
+@@ -223,7 +225,7 @@
+ function packageTask(platform, arch, sourceFolderName, destinationFolderName, opts) {
+ 	opts = opts || {};
+ 
+-	const destination = path.join(path.dirname(root), destinationFolderName);
++	const destination = path.join(buildRoot, destinationFolderName);
+ 	platform = platform || process.platform;
+ 
+ 	return () => {
+@@ -437,7 +439,7 @@
+ }
+ 
+ function patchWin32DependenciesTask(destinationFolderName) {
+-	const cwd = path.join(path.dirname(root), destinationFolderName);
++	const cwd = path.join(buildRoot, destinationFolderName);
+ 
+ 	return async () => {
+ 		const deps = await glob('**/*.node', { cwd, ignore: 'extensions/node_modules/@parcel/watcher/**' });
+@@ -465,8 +467,6 @@
+ 	};
+ }
+ 
+-const buildRoot = path.dirname(root);
+-
+ const BUILD_TARGETS = [
+ 	{ platform: 'win32', arch: 'x64' },
+ 	{ platform: 'win32', arch: 'arm64' },
