@@ -1,0 +1,20 @@
+In Android, RTLD_LOCAL is 0x0 and RTLD_GLOBAL is 0x100, just like GNU/Linux
+https://android.googlesource.com/platform/bionic/+/refs/heads/main/libc/include/dlfcn.h#181
+
+--- a/weaklink/src/loading.rs
++++ b/weaklink/src/loading.rs
+@@ -27,12 +27,12 @@ pub mod unix {
+     pub const RTLD_LAZY: c_int = 0x0001;
+     pub const RTLD_NOW: c_int = 0x0002;
+ 
+-    #[cfg(target_os = "linux")]
++    #[cfg(any(target_os = "linux", target_os = "android"))]
+     pub const RTLD_LOCAL: c_int = 0x0000;
+     #[cfg(target_os = "macos")]
+     pub const RTLD_LOCAL: c_int = 0x0004;
+ 
+-    #[cfg(target_os = "linux")]
++    #[cfg(any(target_os = "linux", target_os = "android"))]
+     pub const RTLD_GLOBAL: c_int = 0x0100;
+     #[cfg(target_os = "macos")]
+     pub const RTLD_GLOBAL: c_int = 0x0008;
