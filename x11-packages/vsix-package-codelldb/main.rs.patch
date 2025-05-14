@@ -1,0 +1,11 @@
+--- a/adapter/codelldb/bin/main.rs
++++ b/adapter/codelldb/bin/main.rs
+@@ -31,7 +31,7 @@ fn main() -> Result<(), Error> {
+         #[cfg(windows)]
+         pub const DYLIB_SUBDIR: &str = "bin";
+ 
+-        #[cfg(target_os = "linux")]
++        #[cfg(any(target_os = "linux", target_os = "android"))]
+         pub const DYLIB_EXTENSION: &str = "so";
+         #[cfg(target_os = "macos")]
+         pub const DYLIB_EXTENSION: &str = "dylib";
