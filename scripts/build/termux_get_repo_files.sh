@@ -1,5 +1,7 @@
 termux_get_repo_files() {
 
+	local return_value
+
 	# If already downloaded, then just return.
 	if [[ "${TERMUX_REPO__REPO_METADATA_FILES_DOWNLOADED:-}" == "true" ]]; then
 		return 0
@@ -9,86 +11,38 @@ termux_get_repo_files() {
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 		# Ensure that package manager packages metadata caches are up-to-date.
 		case "$TERMUX_APP_PACKAGE_MANAGER" in
-			"apt") apt update || return $?;;
-			"pacman") pacman -Sy || return $?;;
+			"apt") apt update || return_value=74;; # EX__IOERR (download failure)
+			"pacman") pacman -Sy || return_value=74;; # EX__IOERR (download failure)
 		esac
-		TERMUX_REPO__REPO_METADATA_FILES_DOWNLOADED="true"
-		return
+	else
+		unset TERMUX_REPO__CHANNEL_SIGNING_KEY_NAMES_AND_FINGERPRINTS
+		declare -A TERMUX_REPO__CHANNEL_SIGNING_KEY_NAMES_AND_FINGERPRINTS=()
+		# Import signing keys for each repo channel in repo.json file
+		# for verifying signature of repo metadata files to be downloaded.
+		termux_repository__import_repo_signing_keys_to_keystore "$TERMUX_SCRIPTDIR" \
+			"$TERMUX_SCRIPTDIR/repo.json" || return $?
+
+		# Download repo metadata files.
+		return_value=0
+		termux_repository__download_repo_metadata_files "$TERMUX_SCRIPTDIR" "$TERMUX_COMMON_CACHEDIR" \
+			"$TERMUX_ARCH" || return_value=$?
 	fi
 
-	local i
-	local TERMUX_REPO_DIR
-	local TERMUX_REPO_URL
-	local TERMUX_REPO_URL_ID
-	for i in "${!TERMUX_REPO__CHANNEL_URLS[@]}"; do
-		TERMUX_REPO_DIR="${TERMUX_REPO__CHANNEL_DIRS["$i"]}"
-		TERMUX_REPO_URL="${TERMUX_REPO__CHANNEL_URLS["$i"]}"
-		if [ -z "$TERMUX_REPO_URL" ]; then
-			echo "Ignoring to download '${TERMUX_REPO__CHANNEL_NAMES["$i"]}' repo files as its url is not set"
-			continue
+	if [ $return_value -ne 0 ]; then
+		logger__log_errors "Failed to downloading repo metadata files"
+		if [ $return_value -eq 74 ]; then # EX__IOERR (download failure)
+			logger__log_errors "Try to build without -i/-I option."
+			# Failing to download repo metadata files should be
+			# considered a critical errors by callers and so override
+			# the exit code. However, failing to download a specific
+			# package is not considered a critical error as package
+			# could be built locally if possible as package or its
+			# required version may not have been uploaded to repo.
+			return_value=1
 		fi
-
-		if [ -z "${TERMUX_REPO__CHANNEL_SIGNING_KEY_NAMES_AND_FINGERPRINTS["$TERMUX_REPO_DIR"]:-}" ]; then
-			termux_error_exit "The signing key names and fingerprints not set for the '$TERMUX_REPO_DIR' repo channel directory"
-		fi
-
-		TERMUX_REPO_URL_ID=$(echo "$TERMUX_REPO_URL" | sed -e 's%https://%%g' -e 's%http://%%g' -e 's%/%-%g')
-		if [ "$TERMUX_REPO__PKG_FORMAT" = "debian" ]; then
-			local RELEASE_FILE=${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_URL_ID}-${TERMUX_REPO__CHANNEL_DISTRIBUTIONS["$i"]}-Release
-			local repo_base="${TERMUX_REPO__CHANNEL_URLS["$i"]}/dists/${TERMUX_REPO__CHANNEL_DISTRIBUTIONS["$i"]}"
-			local dl_prefix="${TERMUX_REPO_URL_ID}-${TERMUX_REPO__CHANNEL_DISTRIBUTIONS["$i"]}-${TERMUX_REPO__CHANNEL_COMPONENTS["$i"]}"
-		elif [ "$TERMUX_REPO__PKG_FORMAT" = "pacman" ]; then
-			local JSON_FILE="${TERMUX_COMMON_CACHEDIR}-${TERMUX_ARCH}/${TERMUX_REPO_URL_ID}-json"
-			local repo_base="${TERMUX_REPO__CHANNEL_URLS["$i"]}/${TERMUX_ARCH}"
-		fi
-
-		local download_attempts=6
-		while ((download_attempts > 0)); do
-			if [ "$TERMUX_REPO__PKG_FORMAT" = "debian" ]; then
-				if termux_download "${repo_base}/Release" "$RELEASE_FILE" SKIP_CHECKSUM && \
-						termux_download "${repo_base}/Release.gpg" "${RELEASE_FILE}.gpg" SKIP_CHECKSUM; then
-					termux_repository__verify_repo_gpg_signing_key "'${TERMUX_REPO__CHANNEL_NAMES["$i"]}' repo" \
-						"${TERMUX_REPO__CHANNEL_SIGNING_KEY_NAMES_AND_FINGERPRINTS["$TERMUX_REPO_DIR"]}" "${RELEASE_FILE}.gpg" "$RELEASE_FILE"
-
-					local failed=false
-					for arch in all $TERMUX_ARCH; do
-						local PACKAGES_HASH=$(./scripts/get_hash_from_file.py ${RELEASE_FILE} $arch ${TERMUX_REPO__CHANNEL_COMPONENTS["$i"]})
-
-						# If packages_hash = "" then the repo probably doesn't contain debs for $arch
-						if [ -n "$PACKAGES_HASH" ]; then
-							if ! termux_download "${repo_base}/${TERMUX_REPO__CHANNEL_COMPONENTS["$i"]}/binary-$arch/Packages" \
-								"${TERMUX_COMMON_CACHEDIR}-$arch/${dl_prefix}-Packages" \
-								$PACKAGES_HASH; then
-								failed=true
-								break
-							fi
-						fi
-					done
-
-					if ! $failed; then
-						break
-					fi
-				fi
-			elif [ "$TERMUX_REPO__PKG_FORMAT" = "pacman" ]; then
-				if termux_download "${repo_base}/${TERMUX_REPO__CHANNEL_DISTRIBUTIONS["$i"]}.json" "$JSON_FILE" SKIP_CHECKSUM && \
-						termux_download "${repo_base}/${TERMUX_REPO__CHANNEL_DISTRIBUTIONS["$i"]}.json.sig" "${JSON_FILE}.sig" SKIP_CHECKSUM; then
-					termux_repository__verify_repo_gpg_signing_key "'${TERMUX_REPO__CHANNEL_NAMES["$i"]}' repo" \
-						"${TERMUX_REPO__CHANNEL_SIGNING_KEY_NAMES_AND_FINGERPRINTS["$TERMUX_REPO_DIR"]}" "${JSON_FILE}.sig" "$JSON_FILE"
-
-					break
-				fi
-			fi
-
-			download_attempts=$((download_attempts - 1))
-			if ((download_attempts < 1)); then
-				termux_error_exit "Failed to download package repository metadata. Try to build without -i/-I option."
-			fi
-
-			echo "Retrying download in 30 seconds (${download_attempts} attempts left)..." >&2
-			sleep 30
-		done
-
-	done
+		return $return_value
+	fi
 
 	TERMUX_REPO__REPO_METADATA_FILES_DOWNLOADED="true"
+
 }

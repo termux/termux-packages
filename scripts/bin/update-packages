@@ -24,9 +24,6 @@ TERMUX_REPOLOGY_DATA_FILE="$(mktemp -t termux-repology.XXXXXX)" # File to store 
 export TERMUX_SCRIPTDIR
 TERMUX_SCRIPTDIR=$(realpath "$(dirname "$0")/../..") # Root of repository.
 
-export TERMUX_PACKAGES_DIRECTORIES
-TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}"/repo.json)
-
 # Define few more variables used by scripts.
 # shellcheck source=scripts/properties.sh
 . "${TERMUX_SCRIPTDIR}/scripts/properties.sh"
@@ -151,7 +148,7 @@ _fetch_and_cache_tags() {
 	quiet termux_repology_api_get_latest_version ' '
 
     local __PACKAGES=()
-	for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
+	for repo_dir in "${TERMUX_REPO__CHANNEL_DIRS[@]}"; do
 		for pkg_dir in "${repo_dir}"/*; do
 			! quiet _should_update "${pkg_dir}" && continue # Skip if not needed.
 			grep -q '^termux_pkg_auto_update' "${pkg_dir}/build.sh" && continue # Skip if package has custom auto-update
@@ -295,7 +292,7 @@ _update_dependencies() {
 		"${pkg_dir}"/+(build|*.subpackage).sh; then
 		return 0
 	fi
-	# shellcheck disable=SC2086 # Allow splitting of TERMUX_PACKAGES_DIRECTORIES.
+
 	while read -r dep dep_dir; do
 		if [[ -z $dep ]]; then
 			continue
@@ -303,14 +300,14 @@ _update_dependencies() {
 			termux_error_exit "ERROR: Obtaining update order failed for $(basename "${pkg_dir}")"
 		fi
 		_should_update "${dep_dir}"  && ! _check_updated "${dep_dir}" && _run_update "${dep_dir}"
-	done <<<"$("${TERMUX_SCRIPTDIR}"/scripts/buildorder.py "${pkg_dir}" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")"
+	done <<<"$("${TERMUX_SCRIPTDIR}"/scripts/buildorder.py "${pkg_dir}" "${TERMUX_REPO__CHANNEL_DIRS[@]}" || echo "ERROR")"
 }
 
 echo "INFO: Running update for: $*"
 
 if [[ "$1" == "@all" ]]; then
 	_fetch_and_cache_tags
-	for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
+	for repo_dir in "${TERMUX_REPO__CHANNEL_DIRS[@]}"; do
 		for pkg_dir in "${repo_dir}"/*; do
 			_unix_millis=$(date +%s%N | cut -b1-13)
 			! _should_update "${pkg_dir}" && continue # Skip if not needed.
@@ -330,7 +327,7 @@ if [[ "$1" == "@all" ]]; then
 else
 	for pkg in "$@"; do
 		if [ ! -d "${pkg}" ]; then # If only package name is given, try to find it's directory.
-			for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
+			for repo_dir in "${TERMUX_REPO__CHANNEL_DIRS[@]}"; do
 				if [ -d "${repo_dir}/${pkg}" ]; then
 					pkg="${repo_dir}/${pkg}"
 					break

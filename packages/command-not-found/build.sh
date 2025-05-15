@@ -14,5 +14,5 @@ termux_step_pre_configure() {
 	termux_setup_nodejs
 
 	termux_download https://github.com/termux/termux-packages/raw/master/repo.json \
-		$TERMUX_PKG_CACHEDIR/repo.json SKIP_CHECKSUM
+		"$TERMUX_PKG_CACHEDIR/repo.json" SKIP_CHECKSUM
 }

@@ -222,6 +222,7 @@ def read_packages_from_directories(directories, fast_build_mode, full_buildmode)
         # Ignore directories and get all folders from repo.json file
         with open ('repo.json') as f:
             data = json.load(f)
+        # FIXME:
         directories = []
         for d in data.keys():
             if d != "pkg_format":

@@ -73,50 +73,50 @@ jobs:
             exit 0
           fi
 
-          for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
-            repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
+          for repo_dir in $(jq --raw-output ".channels | keys_unsorted | .[]" repo.json); do
+            repo_name=$(jq --raw-output ".channels[\"$repo_dir\"].name" repo.json)
             # Parse changed files and identify new packages and deleted packages.
             # Create lists of those packages that will be passed to upload job for
             # further processing.
             while read -r file; do
-              if ! [[ $file == ${repo_path}/* ]]; then
+              if ! [[ $file == ${repo_dir}/* ]]; then
                 # This file does not belong to a package, so ignore it
                 continue
               fi
-              if [[ $file =~ ^${repo_path}/([.a-z0-9+-]*)/([.a-z0-9+-]*).subpackage.sh$ ]]; then
+              if [[ $file =~ ^${repo_dir}/([.a-z0-9+-]*)/([.a-z0-9+-]*).subpackage.sh$ ]]; then
                 # A subpackage was modified, check if it was deleted or just updated
                 pkg=${BASH_REMATCH[1]}
                 subpkg=${BASH_REMATCH[2]}
-                if [ ! -f "${repo_path}/${pkg}/${subpkg}.subpackage.sh" ]; then
-                  echo "$subpkg" >> ./deleted_${repo}_packages.txt
+                if [ ! -f "${repo_dir}/${pkg}/${subpkg}.subpackage.sh" ]; then
+                  echo "$subpkg" >> "./deleted_${repo_name}_packages.txt"
                 fi
-              elif [[ $file =~ ^${repo_path}/([.a-z0-9+-]*)/.*$ ]]; then
+              elif [[ $file =~ ^${repo_dir}/([.a-z0-9+-]*)/.*$ ]]; then
                 # package, check if it was deleted or updated
                 pkg=${BASH_REMATCH[1]}
-                if [ -d "${repo_path}/${pkg}" ]; then
-                  echo "$pkg" >> ./built_${repo}_packages.txt
+                if [ -d "${repo_dir}/${pkg}" ]; then
+                  echo "$pkg" >> "./built_${repo_name}_packages.txt"
                   # If there are subpackages we want to create a list of those
                   # as well
-                  for file in $(find "${repo_path}/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
-                    echo "$(basename "${file%%.subpackage.sh}")" >> ./built_${repo}_subpackages.txt
+                  for file in $(find "${repo_dir}/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
+                    echo "$(basename "${file%%.subpackage.sh}")" >> "./built_${repo_name}_subpackages.txt"
                   done
                 else
-                  echo "$pkg" >> ./deleted_${repo}_packages
+                  echo "$pkg" >> "./deleted_${repo_name}_packages"
                 fi
               fi
-            done<<<${CHANGED_FILES}
+            done <<< "${CHANGED_FILES}"
           done
         else
           for pkg in ${{ github.event.inputs.packages }}; do
-            repo_paths=$(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json)
+            repo_dirs=$(jq --raw-output ".channels | keys_unsorted | .[]" repo.json)
             found=false
-            for repo_path in $repo_paths; do
-              repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
-              if [ -d "${repo_path}/${pkg}" ]; then
+            for repo_dir in $repo_dirs; do
+              repo_name=$(jq --raw-output ".channels[\"$repo_dir\"].name" repo.json)
+              if [ -d "${repo_dir}/${pkg}" ]; then
                 found=true
-                echo "$pkg" >> ./built_${repo}_packages.txt
-                for subpkg in $(find "${repo_path}/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
-                  echo "$(basename "${subpkg%%.subpackage.sh}")" >> ./built_${repo}_subpackages.txt
+                echo "$pkg" >> "./built_${repo_name}_packages.txt"
+                for subpkg in $(find "${repo_dir}/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
+                  echo "$(basename "${subpkg%%.subpackage.sh}")" >> "./built_${repo_name}_subpackages.txt"
                 done
               fi
             done
@@ -127,27 +127,28 @@ jobs:
           done
         fi
 
-        for repo in $(jq --raw-output 'del(.pkg_format) | .[].name' repo.json); do
+        for repo_name in $(jq --raw-output ".channels | .[].name" repo.json); do
           # Fix so that lists do not contain duplicates
-          if [ -f ./built_${repo}_packages.txt ]; then
-            sort ./built_${repo}_packages.txt | uniq > ./built_${repo}_packages.txt.tmp
-            mv ./built_${repo}_packages.txt.tmp ./built_${repo}_packages.txt
+          if [ -f "./built_${repo_name}_packages.txt" ]; then
+            sort "./built_${repo_name}_packages.txt" | uniq > "./built_${repo_name}_packages.txt.tmp"
+            mv "./built_${repo_name}_packages.txt.tmp" "./built_${repo_name}_packages.txt"
           fi
-          if [ -f ./built_${repo}_subpackages.txt ]; then
-            sort ./built_${repo}_subpackages.txt | uniq > ./built_${repo}_subpackages.txt.tmp
-            mv ./built_${repo}_subpackages.txt.tmp ./built_${repo}_subpackages.txt
+          if [ -f "./built_${repo_name}_subpackages.txt" ]; then
+            sort "./built_${repo_name}_subpackages.txt" | uniq > "./built_${repo_name}_subpackages.txt.tmp"
+            mv "./built_${repo_name}_subpackages.txt.tmp" "./built_${repo_name}_subpackages.txt"
           fi
-          if [ -f ./deleted_${repo}_packages.txt ]; then
-            sort ./deleted_${repo}_packages.txt | uniq > ./deleted_${repo}_packages.txt.tmp
-            mv ./deleted_${repo}_packages.txt.tmp ./deleted_${repo}_packages.txt
+          if [ -f "./deleted_${repo_name}_packages.txt" ]; then
+            sort "./deleted_${repo_name}_packages.txt" | uniq > "./deleted_${repo_name}_packages.txt.tmp"
+            mv "./deleted_${repo_name}_packages.txt.tmp" "./deleted_${repo_name}_packages.txt"
           fi
         done
 
         declare -a packages
-        for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
-          repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
-          if [ -f ./built_${repo}_packages.txt ]; then
-            packages="$packages $(cat ./built_${repo}_packages.txt | tr '\n' ' ')"
+        for repo_dir in $(jq --raw-output ".channels | keys_unsorted | .[]" repo.json); do
+          repo_name=$(jq --raw-output ".channels[\"$repo_dir\"].name" repo.json)
+          if [ -f "./built_${repo_name}_packages.txt" ]; then
+            # FIXME:
+            packages="$packages $(cat "./built_${repo_name}_packages.txt" | tr '\n' ' ')"
           fi
         done
 
@@ -155,7 +156,7 @@ jobs:
         [ -n "$packages" ] && if grep -qP "(^|\\s)${packages// /($|\\s)|(^|\\s)}($|\\s)" ./scripts/big-pkgs.list; then
           docker='false'
         fi
-        echo "docker-build=$docker" >> $GITHUB_OUTPUT
+        echo "docker-build=$docker" >> "$GITHUB_OUTPUT"
         if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
           # Build local Docker image if setup scripts were changed.
           # Useful for pull requests submitting changes for both build environment and packages.
@@ -174,10 +175,10 @@ jobs:
     - name: Lint packages
       run: |
         declare -a package_recipes
-        for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
-          repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
-          if [ -f ./built_${repo}_packages.txt ]; then
-            package_recipes="$package_recipes $(cat ./built_${repo}_packages.txt | repo_path=${repo_path} awk '{print ENVIRON["repo_path"]"/"$1"/build.sh"}')"
+        for repo_dir in $(jq --raw-output ".channels | keys_unsorted | .[]" repo.json); do
+          repo_name=$(jq --raw-output ".channels[\"$repo_dir\"].name" repo.json)
+          if [ -f "./built_${repo_name}_packages.txt" ]; then
+            package_recipes="$package_recipes $(cat "./built_${repo}_packages.txt" | repo_dir=${repo_dir} awk '{print ENVIRON["repo_dir"]"/"$1"/build.sh"}')"
           fi
         done
 
@@ -188,10 +189,10 @@ jobs:
     - name: Free additional disk space (if needed)
       run: |
         declare -a packages
-        for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
-          repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
-          if [ -f ./built_${repo}_packages.txt ]; then
-            packages="$packages $(cat ./built_${repo}_packages.txt | tr '\n' ' ')"
+        for repo_dir in $(jq --raw-output ".channels | keys_unsorted | .[]" repo.json); do
+          repo_name=$(jq --raw-output ".channels[\"$repo_dir\"].name" repo.json)
+          if [ -f "./built_${repo_name}_packages.txt" ]; then
+            packages="$packages $(cat "./built_${repo_name}_packages.txt" | tr '\n' ' ')"
           fi
         done
 
@@ -208,10 +209,10 @@ jobs:
     - name: Build packages
       run: |
         declare -a packages
-        for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
-          repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
-          if [ -f ./built_${repo}_packages.txt ]; then
-            packages="$packages $(cat ./built_${repo}_packages.txt | tr '\n' ' ')"
+        for repo_dir in $(jq --raw-output ".channels | keys_unsorted | .[]" repo.json); do
+          repo_name=$(jq --raw-output ".channels[\"$repo_dir\"].name" repo.json)
+          if [ -f "./built_${repo_name}_packages.txt" ]; then
+            packages="$packages $(cat "./built_${repo_name}_packages.txt" | tr '\n' ' ')"
           fi
         done
 
@@ -226,20 +227,20 @@ jobs:
       run: |
         test -d termux-packages/output && mv termux-packages/output/* ./output/
 
-        for repo in $(jq --raw-output 'del(.pkg_format) | .[].name' repo.json); do
+        for repo_name in $(jq --raw-output ".channels | .[].name" repo.json); do
           # Put package lists into directory with *.deb files so they will be transferred to
           # upload job.
-          test -f ./built_${repo}_packages.txt && mv ./built_${repo}_packages.txt ./debs/
-          test -f ./built_${repo}_subpackages.txt && cat ./built_${repo}_subpackages.txt >> ./debs/built_${repo}_packages.txt \
-            && rm ./built_${repo}_subpackages.txt
-          test -f ./deleted_${repo}_packages.txt && mv ./deleted_${repo}_packages.txt ./debs/
+          test -f "./built_${repo_name}_packages.txt" && mv "./built_${repo_name}_packages.txt" ./debs/
+          test -f "./built_${repo_name}_subpackages.txt" && cat "./built_${repo_name}_subpackages.txt" >> "./debs/built_${repo_name}_packages.txt" \
+            && rm "./built_${repo_name}_subpackages.txt"
+          test -f "./deleted_${repo_name}_packages.txt" && mv "./deleted_${repo_name}_packages.txt" ./debs/
 
           # Move only debs from built_packages into debs/ folder before
           # creating an archive.
           while read -r pkg; do
             # Match both $pkg.deb and $pkg-static.deb.
             find output \( -name "$pkg_*.deb" -o -name "$pkg-static_*.deb" \) -type f -print0 | xargs -0r mv -t debs/
-          done < <(cat ./debs/built_${repo}_packages.txt)
+          done < <(cat "./debs/built_${repo_name}_packages.txt")
         done
 
         # Files containing certain symbols (e.g. ":") will cause failure in actions/upload-artifact.
@@ -290,9 +291,9 @@ jobs:
           tar xf "$archive"
         done
 
-        for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
-          export REPOSITORY_NAME=$(jq --raw-output '.["'$repo'"].name' repo.json)
-          export REPOSITORY_DISTRIBUTION=$(jq --raw-output '.["'$repo'"].distribution' repo.json)
+        for repo_dir in $(jq --raw-output ".channels | keys_unsorted | .[]" repo.json); do
+          export REPOSITORY_NAME=$(jq --raw-output ".channels[\"$repo_dir\"].name" repo.json)
+          export REPOSITORY_DISTRIBUTION=$(jq --raw-output ".channels[\"$repo_dir\"].distribution" repo.json)
 
           # Upload file to temporary directory.
           uploaded_files=false

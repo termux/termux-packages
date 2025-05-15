@@ -84,14 +84,16 @@ termux_pkg_upgrade_version() {
 
 		echo "INFO: Trying to build package."
 
-		for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' ${TERMUX_SCRIPTDIR}/repo.json); do
-			_buildsh_path="${TERMUX_SCRIPTDIR}/${repo_path}/${TERMUX_PKG_NAME}/build.sh"
-			repo=$(jq --raw-output ".\"${repo_path}\".name" ${TERMUX_SCRIPTDIR}/repo.json)
-			repo=${repo#"termux-"}
+		local i
+		for i in "${!TERMUX_REPO__CHANNEL_DIRS[@]}"; do
+			repo_dir="${TERMUX_REPO__CHANNEL_DIRS["$i"]}"
+			repo_name="${TERMUX_REPO__CHANNEL_NAMES["$i"]}"
+			repo_name=${repo_name#"termux-"}
 
+			_buildsh_path="${TERMUX_SCRIPTDIR}/${repo_dir}/${TERMUX_PKG_NAME}/build.sh"
 			if [ -f "${_buildsh_path}" ]; then
-				echo "INFO: Package ${TERMUX_PKG_NAME} exists in ${repo} repo."
-				unset _buildsh_path repo_path
+				echo "INFO: Package ${TERMUX_PKG_NAME} exists in ${repo_name} repo."
+				unset _buildsh_path repo_dir
 				break
 			fi
 		done
@@ -101,7 +103,7 @@ termux_pkg_upgrade_version() {
 				echo "INFO: Committing package."
 				stderr="$(
 					git add "${TERMUX_PKG_BUILDER_DIR}" 2>&1 >/dev/null
-					git commit -m "bump(${repo}/${TERMUX_PKG_NAME}): ${LATEST_VERSION}" \
+					git commit -m "bump(${repo_name}/${TERMUX_PKG_NAME}): ${LATEST_VERSION}" \
 						-m "This commit has been automatically submitted by Github Actions." 2>&1 >/dev/null
 				)" || {
 					termux_error_exit <<-EndOfError

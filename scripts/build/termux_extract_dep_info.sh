@@ -38,6 +38,8 @@ termux_extract_dep_info() {
 			fi
 		)
 	fi
+	echo -n "${TERMUX_ARCH}"
+
 	(
 		# debian version
 		TERMUX_PKG_REVISION="0"
@@ -46,8 +48,9 @@ termux_extract_dep_info() {
 			   [ "$TERMUX_PKG_VERSION" != "${TERMUX_PKG_VERSION/-/}" ]; then
 			TERMUX_PKG_VERSION+="-$TERMUX_PKG_REVISION"
 		fi
-		echo -n "${TERMUX_ARCH} ${TERMUX_PKG_VERSION} "
+		echo -n " ${TERMUX_PKG_VERSION} "
 	)
+
 	(
 		# pacman version
 		TERMUX_PKG_REVISION="0"
@@ -57,7 +60,7 @@ termux_extract_dep_info() {
 		if [ -n "$INCORRECT_SYMBOLS" ]; then
 			TERMUX_PKG_VERSION_EDITED=${TERMUX_PKG_VERSION_EDITED//${INCORRECT_SYMBOLS:0:1}${INCORRECT_SYMBOLS:1:1}/${INCORRECT_SYMBOLS:0:1}.${INCORRECT_SYMBOLS:1:1}}
 		fi
-		echo "${TERMUX_PKG_VERSION_EDITED}-${TERMUX_PKG_REVISION}"
+		echo -n " ${TERMUX_PKG_VERSION_EDITED}-${TERMUX_PKG_REVISION}"
 	)
 }
 

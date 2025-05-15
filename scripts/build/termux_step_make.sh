@@ -1,6 +1,7 @@
 termux_step_make() {
 	[ "$TERMUX_PKG_METAPACKAGE" = "true" ] && return
 
+	# FIXME: Use logger to quiet builds
 	local QUIET_BUILD=
 	if [ "$TERMUX_QUIET_BUILD" = true ]; then
 		QUIET_BUILD="-s"

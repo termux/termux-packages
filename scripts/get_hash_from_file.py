@@ -10,7 +10,7 @@ def get_pkg_hash_from_Packages(Packages_file, package, version, hash_type="SHA25
             for line in pkg.split('\n'):
                 # Assuming Filename: comes before Version:
                 if line.startswith('Filename:'):
-                    print(line.split(" ")[1] + " ")
+                    print(line.split(" ")[1])
                 elif line.startswith('Version:'):
                     if os.getenv('TERMUX_WITHOUT_DEPVERSION_BINDING') != 'true' and line != 'Version: '+version:
                         # Seems the repo contains the wrong version, or several versions

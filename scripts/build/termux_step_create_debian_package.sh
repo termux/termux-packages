@@ -1,6 +1,7 @@
 termux_step_create_debian_package() {
 	if [ "$TERMUX_PKG_METAPACKAGE" = "true" ]; then
 		# Metapackage doesn't have data inside.
+		# FIXME:
 		rm -rf data
 	fi
 	tar --sort=name \

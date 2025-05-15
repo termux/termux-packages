@@ -1,33 +1,45 @@
 {
-  "pkg_format": "debian",
-  "packages": {
-    "name": "termux-main",
-    "distribution": "stable",
-    "component": "main",
-    "url": "https://packages-cf.termux.dev/apt/termux-main",
-    "signing_keys": [
-      { "key_file": "packages/termux-keyring/termux-autobuilds.gpg" },
-      { "key_file": "packages/termux-keyring/grimler.gpg" }
-    ]
-  },
-  "root-packages": {
-    "name": "termux-root",
-    "distribution": "root",
-    "component": "stable",
-    "url": "https://packages-cf.termux.dev/apt/termux-root",
-    "signing_keys": [
-      { "key_file": "packages/termux-keyring/termux-autobuilds.gpg" },
-      { "key_file": "packages/termux-keyring/grimler.gpg" }
-    ]
-  },
-  "x11-packages": {
-    "name": "termux-x11",
-    "distribution": "x11",
-    "component": "main",
-    "url": "https://packages-cf.termux.dev/apt/termux-x11",
-    "signing_keys": [
-      { "key_file": "packages/termux-keyring/termux-autobuilds.gpg" },
-      { "key_file": "packages/termux-keyring/grimler.gpg" }
-    ]
-  }
+    "repo__package_manager": "apt",
+    "channels": {
+        "packages": {
+            "name": "termux-main",
+            "distribution": "stable",
+            "component": "main",
+            "signing_key_names": [ "termux-autobuilds.gpg", "grimler.gpg" ]
+        },
+        "root-packages": {
+            "name": "termux-root",
+            "distribution": "root",
+            "component": "stable",
+            "signing_key_names": [ "termux-autobuilds.gpg", "grimler.gpg" ]
+        },
+        "x11-packages": {
+            "name": "termux-x11",
+            "distribution": "x11",
+            "component": "main",
+            "signing_key_names": [ "termux-autobuilds.gpg", "grimler.gpg" ]
+        },
+        "disabled-packages": {
+            "is_disabled": "true",
+            "name": "termux-disabled"
+        }
+    },
+    "signing_keys": {
+        "termux-autobuilds.gpg": {
+            "key_file": "packages/termux-keyring/termux-autobuilds.gpg"
+        },
+        "grimler.gpg": {
+            "key_file": "packages/termux-keyring/grimler.gpg"
+        }
+    },
+    "package_build_variables": {
+        "TERMUX_APP__PACKAGE_NAME": "com.termux",
+        "TERMUX_APP__DATA_DIR": "/data/data/com.termux",
+        "TERMUX__PROJECT_DIR": "/data/data/com.termux/termux",
+        "TERMUX__CORE_DIR": "/data/data/com.termux/termux/core",
+        "TERMUX__APPS_DIR": "/data/data/com.termux/termux/app",
+        "TERMUX__ROOTFS": "/data/data/com.termux/files",
+        "TERMUX__HOME": "/data/data/com.termux/files/home",
+        "TERMUX__PREFIX": "/data/data/com.termux/files/usr"
+    }
 }

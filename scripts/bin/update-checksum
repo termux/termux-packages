@@ -34,18 +34,21 @@ fi
 
 for package in "${@}"; do
 	buildsh_path=
-	repo=
+	repo_name=
 	if [ -d "${package}" ] && [ -f "${package}/build.sh" ]; then
 		buildsh_path="${package}/build.sh"
-		package=$(basename ${package})
+		package=$(basename "${package}")
 	else
-		for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' $REPO_ROOT/repo.json); do
-			if [ -d "${repo_path}/${package}" ] && [ -f "${repo_path}/${package}/build.sh" ]; then
-				repo=$(jq --raw-output '.["'$repo_path'"].name' $REPO_ROOT/repo.json)
-				repo=${repo#"termux-"}
-				repo="${repo#"termux-"}/"
-				buildsh_path="${repo_path}/${package}/build.sh"
-				package=$(basename ${package})
+		# FIXME: source repo.sh
+		for i in "${!TERMUX_REPO__CHANNEL_DIRS[@]}"; do
+			repo_dir="${TERMUX_REPO__CHANNEL_DIRS["$i"]}"
+			repo_name="${TERMUX_REPO__CHANNEL_NAMES["$i"]}"
+			repo_name="${repo_name#"termux-"}/"
+
+			if [ -d "${repo_dir}/${package}" ] && [ -f "${repo_dir}/${package}/build.sh" ]; then
+				buildsh_path="${repo_dir}/${package}/build.sh"
+				package=$(basename "${package}")
+				break
 			fi
 		done
 	fi
@@ -102,13 +105,13 @@ for package in "${@}"; do
 			git --no-pager diff --patch "${buildsh_path}"
 			echo "--------------------"
 			echo
-			echo "bump(${repo}${package}): $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
+			echo "bump(${repo_name}${package}): $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
 			echo
 			read -re -p "Do you want to commit changes ? (y/n) " CHOICE
 			echo
 			if [[ ${CHOICE} =~ (Y|y) ]]; then
 				git add "${buildsh_path}"
-				git commit -m "bump(${repo}${package}): $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
+				git commit -m "bump(${repo_name}${package}): $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
 			else
 				echo "Not committing to Git!"
 			fi

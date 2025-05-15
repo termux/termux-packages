@@ -78,8 +78,8 @@ mkdir -p "$TERMUX_PKG_TMPDIR"
 rm -rf "${TERMUX_PKG_TMPDIR}"
 
 # Package sources.
-for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' $TERMUX_SCRIPTDIR/repo.json); do
-	for p in "$TERMUX_SCRIPTDIR"/$repo_path/*; do
+for repo_dir in "${TERMUX_REPO__CHANNEL_DIRS[@]}"; do
+	for package_dir in "$TERMUX_SCRIPTDIR/$repo_dir/"*; do
 		(
 			. "$TERMUX_SCRIPTDIR"/scripts/build/get_source/termux_step_get_source.sh
 			. "$TERMUX_SCRIPTDIR"/scripts/build/get_source/termux_git_clone_src.sh
@@ -91,9 +91,9 @@ for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' $TERMUX_SCRIP
 				:
 			}
 
-			TERMUX_PKG_NAME=$(basename "$p")
-			TERMUX_PKG_BUILDER_DIR="${p}"
-			TERMUX_PKG_CACHEDIR="${p}/cache"
+			TERMUX_PKG_NAME=$(basename "$package_dir")
+			TERMUX_PKG_BUILDER_DIR="$package_dir"
+			TERMUX_PKG_CACHEDIR="$package_dir/cache"
 			TERMUX_PKG_METAPACKAGE=false
 
 			# Set some variables to dummy values to avoid errors.
@@ -108,7 +108,7 @@ for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' $TERMUX_SCRIP
 			mkdir -p "$TERMUX_PKG_CACHEDIR" "$TERMUX_PKG_TMPDIR" "$TERMUX_PKG_SRCDIR"
 			cd "$TERMUX_PKG_CACHEDIR"
 
-			. "${p}"/build.sh || true
+			. "$package_dir/build.sh" || true
 			if ! ${TERMUX_PKG_METAPACKAGE}; then
 				echo "Downloading sources for '$TERMUX_PKG_NAME'..."
 				termux_step_get_source

@@ -24,14 +24,17 @@ cd "$(realpath "$(dirname "$0")")"
 TERMUX_SCRIPTDIR=$(pwd)
 export TERMUX_SCRIPTDIR
 
+# FIXME: `lib/`
+# FIXME: `termux/shell/rootfs/{package,packaging}` `termux_rootfs_package__` `termux_rootfs_packaging__`
+# Source the utils library.
+# shellcheck source=scripts/utils/utils.sh
+source "$TERMUX_SCRIPTDIR/scripts/utils/utils.sh" || exit $?
+
+# Set all utils library default variables
+utils__set_all_default_variables || exit $?
+
 # Store pid of current process in a file for docker__run_docker_exec_trap
 source "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"; docker__create_docker_exec_pid_file
-
-# Source the `termux_package` library.
-source "$TERMUX_SCRIPTDIR/scripts/utils/termux/package/termux_package.sh"
-
-# Source the repository library.
-source "$TERMUX_SCRIPTDIR/scripts/utils/termux/repository/repository.sh"
 
 export SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH:-$(git -c log.showSignature=false log -1 --pretty=%ct 2>/dev/null || date "+%s")}
 
@@ -60,8 +63,6 @@ TERMUX_BUILD_LOCK_FILE="${TMPDIR}/.termux-build.lck"
 if [ ! -e "$TERMUX_BUILD_LOCK_FILE" ]; then
 	touch "$TERMUX_BUILD_LOCK_FILE"
 fi
-
-export TERMUX_REPO_PKG_FORMAT=$(jq --raw-output '.pkg_format // "debian"' ${TERMUX_SCRIPTDIR}/repo.json)
 
 # Special variable for internal use. It forces script to ignore
 # lock file.
@@ -372,6 +373,7 @@ if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 
 	# For on device builds cross compiling is not supported.
 	# Target architecture must be same as for environment used currently.
+	# FIXME: -a overrides
 	case "$TERMUX_APP_PACKAGE_MANAGER" in
 		"apt") TERMUX_ARCH=$(dpkg --print-architecture);;
 		"pacman") TERMUX_ARCH=$(pacman-conf Architecture);;
@@ -550,11 +552,6 @@ if [ -n "${TERMUX_PACKAGE_LIBRARY-}" ]; then
 	esac
 fi
 
-if [ "${TERMUX_INSTALL_DEPS-false}" = "true" ] || [ "${TERMUX_PACKAGE_LIBRARY-bionic}" = "glibc" ]; then
-	# Setup PGP keys for each repo channel in repo.json file for verifying integrity of dependencies.
-	termux_repository__add_repo_signing_keys_to_keystore "$TERMUX_SCRIPTDIR/repo.json" "$TERMUX_SCRIPTDIR"
-fi
-
 for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 	# Following commands must be executed under lock to prevent running
 	# multiple instances of "./build-package.sh".
@@ -582,35 +579,34 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 					 $(test "${TERMUX_WITHOUT_DEPVERSION_BINDING:-}" = "true" && echo "-w") \
 					 $(test -n "${TERMUX_PACKAGE_FORMAT:-}" && echo "--format $TERMUX_PACKAGE_FORMAT") \
 					 $(test -n "${TERMUX_PACKAGE_LIBRARY:-}" && echo "--library $TERMUX_PACKAGE_LIBRARY") \
-					"${PACKAGE_LIST[i]}"
+					"${PACKAGE_LIST["$i"]}"
 			done
 			exit
 		fi
 
-		# Check the package to build:
-		TERMUX_PKG_NAME=$(basename "${PACKAGE_LIST[i]}")
-		export TERMUX_PKG_BUILDER_DIR=
-		if [[ ${PACKAGE_LIST[i]} == *"/"* ]]; then
-			# Path to directory which may be outside this repo:
-			if [ ! -d "${PACKAGE_LIST[i]}" ]; then termux_error_exit "'${PACKAGE_LIST[i]}' seems to be a path but is not a directory"; fi
-			export TERMUX_PKG_BUILDER_DIR=$(realpath "${PACKAGE_LIST[i]}")
+		# Get package directory and type for the package to build:
+		termux_package__set_package_build_file_variables \
+			TERMUX_ORIG_PKG_NAME TERMUX_PKG_NAME TERMUX_PKG_BUILDER_DIR \
+			TERMUX_PKG_REPO_CHANNEL_DIR subpackage_name is_subpackage is_virtual \
+			"${PACKAGE_LIST["$i"]}" "$TERMUX_SCRIPTDIR" "${TERMUX_IS_DISABLED:-}"
+
+		# FIXME: Use logger__
+		if [ "$i" -ge 1 ]; then echo $'\n\n\n'; fi
+		if [ "$is_subpackage" != "true" ]; then
+			echo "[*] Building package '$TERMUX_PKG_REPO_CHANNEL_DIR/$TERMUX_PKG_NAME'..."
 		else
-			# Package name:
-			for package_directory in $TERMUX_PACKAGES_DIRECTORIES; do
-				if [ -d "${TERMUX_SCRIPTDIR}/${package_directory}/${TERMUX_PKG_NAME}" ]; then
-					export TERMUX_PKG_BUILDER_DIR=${TERMUX_SCRIPTDIR}/$package_directory/$TERMUX_PKG_NAME
-					break
-				elif [ -n "${TERMUX_IS_DISABLED=""}" ] && [ -d "${TERMUX_SCRIPTDIR}/disabled-packages/${TERMUX_PKG_NAME}" ]; then
-					export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/disabled-packages/$TERMUX_PKG_NAME
-					break
-				fi
-			done
-			if [ -z "${TERMUX_PKG_BUILDER_DIR}" ]; then
-				termux_error_exit "No package $TERMUX_PKG_NAME found in any of the enabled repositories. Are you trying to set up a custom repository?"
+			if [ "$is_virtual" = "true" ]; then
+				echo "[*] Building package '$TERMUX_PKG_NAME' for virtual subpackage '$TERMUX_PKG_REPO_CHANNEL_DIR/$subpackage_name'..."
+			else
+				echo "[*] Building package '$TERMUX_PKG_NAME' for subpackage '$TERMUX_PKG_REPO_CHANNEL_DIR/$subpackage_name'..."
 			fi
 		fi
+		unset subpackage_name is_subpackage is_virtual
+
+		export TERMUX_ORIG_PKG_NAME
+		export TERMUX_PKG_BUILDER_DIR
 		TERMUX_PKG_BUILDER_SCRIPT=$TERMUX_PKG_BUILDER_DIR/build.sh
-		if test ! -f "$TERMUX_PKG_BUILDER_SCRIPT"; then
+		if [ ! -f "$TERMUX_PKG_BUILDER_SCRIPT" ]; then
 			termux_error_exit "No build.sh script at package dir $TERMUX_PKG_BUILDER_DIR!"
 		fi
 
