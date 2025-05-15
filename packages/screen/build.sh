@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/screen/
 TERMUX_PKG_DESCRIPTION="Terminal multiplexer with VT100/ANSI terminal emulation"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="5.0.0"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION="5.0.1"
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/screen/screen-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=f04a39d00a0e5c7c86a55338808903082ad5df4d73df1a2fd3425976aed94971
+TERMUX_PKG_SHA256=bca9b5b9022ca7b8c1a61b503e53ace7dd7cb61eac14e39e7ccbc0b139495d49
 # libandroid-support is necessary as screen uses `wcwidth`, see #22688
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, termux-auth"
 TERMUX_PKG_BUILD_DEPENDS="libcrypt"
