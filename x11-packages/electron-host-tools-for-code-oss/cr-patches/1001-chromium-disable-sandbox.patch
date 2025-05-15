@@ -1,6 +1,6 @@
 --- a/content/shell/app/shell_main_delegate.cc
 +++ b/content/shell/app/shell_main_delegate.cc
-@@ -90,6 +90,10 @@
+@@ -92,6 +92,10 @@
  #include "content/shell/app/ios/shell_application_ios.h"
  #endif
  
@@ -10,11 +10,11 @@
 +
  namespace {
  
- #if !BUILDFLAG(IS_FUCHSIA)
-@@ -210,6 +214,15 @@
-   base::CPU cpu_info;
- #endif
+ enum class LoggingDest {
+@@ -256,6 +260,15 @@
+ }
  
+ void ShellMainDelegate::PreSandboxStartup() {
 +// Disable sandbox on Termux.
 +#ifdef __TERMUX__
 +  if (!base::CommandLine::ForCurrentProcess()->HasSwitch(
@@ -26,7 +26,7 @@
 +
  // Disable platform crash handling and initialize the crash reporter, if
  // requested.
- // TODO(crbug.com/1226159): Implement crash reporter integration for Fuchsia.
+ // TODO(crbug.com/40188745): Implement crash reporter integration for Fuchsia.
 --- a/chrome/browser/ui/startup/bad_flags_prompt.cc
 +++ b/chrome/browser/ui/startup/bad_flags_prompt.cc
 @@ -60,10 +60,12 @@

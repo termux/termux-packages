@@ -2,8 +2,8 @@ TERMUX_PKG_HOMEPAGE=https://github.com/electron/electron
 TERMUX_PKG_DESCRIPTION="Build cross-platform desktop apps with JavaScript, HTML, and CSS (Used by Code-OSS, Host Tools)"
 TERMUX_PKG_LICENSE="MIT, BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
-_CHROMIUM_VERSION=128.0.6613.186
-TERMUX_PKG_VERSION=32.2.6
+_CHROMIUM_VERSION=132.0.6834.210
+TERMUX_PKG_VERSION=34.5.1
 TERMUX_PKG_SRCURL=git+https://github.com/electron/electron
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libdrm, libevdev, libxkbcommon, libminizip, libnss, libwayland, libx11, mesa, openssl, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libnotify, libffi-static"
@@ -213,8 +213,8 @@ treat_warnings_as_errors = false
 # Use system libraries as little as possible
 use_bundled_fontconfig = false
 use_system_freetype = false
-use_system_libdrm = true
-use_system_libffi = false
+# use_system_libdrm = true
+# use_system_libffi = false
 use_custom_libcxx = false
 use_custom_libcxx_for_host = true
 use_allocator_shim = false
@@ -255,7 +255,7 @@ use_jumbo_build = true
 # Compile pdfium as a static library
 pdf_is_complete_lib = true
 # Use prebuilt js2c
-prebuilt_js2c_binary = \"$TERMUX_PREFIX/opt/electron-jumbo-host-tools/$_v8_toolchain_name/node_js2c\"
+# prebuilt_js2c_binary = \"$TERMUX_PREFIX/opt/electron-jumbo-host-tools/$_v8_toolchain_name/node_js2c\"
 " >> $_common_args_file
 
 	if [ "$TERMUX_ARCH" = "arm" ]; then

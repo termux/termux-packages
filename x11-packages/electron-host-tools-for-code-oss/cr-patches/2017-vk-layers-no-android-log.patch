@@ -11,7 +11,7 @@
  [[maybe_unused]] static const char *kForceDefaultCallbackKey = "debug.vvl.forcelayerlog";
 --- a/third_party/vulkan-validation-layers/src/layers/vk_layer_config.cpp
 +++ b/third_party/vulkan-validation-layers/src/layers/vk_layer_config.cpp
-@@ -74,7 +74,7 @@
+@@ -52,7 +52,7 @@
  #endif
  
  std::string GetEnvironment(const char *variable) {
@@ -20,6 +20,15 @@
      const char *output = getenv(variable);
      return output == NULL ? "" : output;
  #elif defined(_WIN32)
+@@ -90,7 +90,7 @@
+ }
+ 
+ void SetEnvironment(const char *variable, const char *value) {
+-#if !defined(__ANDROID__) && !defined(_WIN32)
++#if (!defined(__ANDROID__) && !defined(_WIN32)) || defined(__TERMUX__)
+     setenv(variable, value, 1);
+ #elif defined(_WIN32)
+     SetEnvironmentVariable(variable, value);
 --- a/third_party/vulkan-validation-layers/src/layers/utils/android_ndk_types.h
 +++ b/third_party/vulkan-validation-layers/src/layers/utils/android_ndk_types.h
 @@ -29,7 +29,9 @@
@@ -41,10 +50,10 @@
  
 -#if defined(__ANDROID__)
 +#if defined(__ANDROID__) && !defined(__TERMUX__)
- static std::string GetAndroidProperty(const char *name) {
-     std::string output;
-     const prop_info *pi = __system_property_find(name);
-@@ -51,7 +51,7 @@
+ /*
+  * Use the __system_property_read_callback API that appeared in
+  * Android API level 26. If not avaible use the old __system_property_get function.
+@@ -68,7 +68,7 @@
  #endif
  
  static std::string GetEnvironment(const char *variable) {
@@ -53,7 +62,7 @@
      std::string result = GetAndroidProperty(variable);
      // Workaround for screenshot layer backward compatibility
      if (result.empty() && std::string(variable) == "debug.vulkan.screenshot.frames") {
-@@ -199,7 +199,7 @@
+@@ -214,7 +214,7 @@
      }
  #endif
  

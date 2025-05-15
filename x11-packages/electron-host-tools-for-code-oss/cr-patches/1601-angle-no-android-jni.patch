@@ -4,8 +4,8 @@
  #elif defined(__APPLE__)
  #    define ANGLE_PLATFORM_APPLE 1
  #    define ANGLE_PLATFORM_POSIX 1
--#elif defined(ANDROID)
-+#elif (defined(ANDROID) && !defined(__TERMUX__))
+-#elif defined(ANDROID) && !defined(ANGLE_ANDROID_DMA_BUF)
++#elif (defined(ANDROID) && !defined(ANGLE_ANDROID_DMA_BUF) && !defined(__TERMUX__))
  #    define ANGLE_PLATFORM_ANDROID 1
  #    define ANGLE_PLATFORM_POSIX 1
  #elif defined(__ggp__)

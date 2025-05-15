@@ -44,8 +44,9 @@ Enable jumbo build for the following component(s)/source_set(s):
  gpu/BUILD.gn                                  |  3 ++-
  gpu/command_buffer/client/BUILD.gn            |  9 ++++----
  gpu/command_buffer/common/BUILD.gn            |  5 +++--
- gpu/command_buffer/service/BUILD.gn           |  7 ++++---
+ gpu/command_buffer/service/BUILD.gn           | 12 ++++++++---
  gpu/command_buffer/service/graphite_utils.cc  |  5 +++++
+ gpu/command_buffer/service/scheduler.cc       |  4 ++++
  .../angle_vulkan_image_backing_factory.cc     |  4 ++++
  .../dawn_egl_image_representation.cc          |  4 ++++
  .../dawn_gl_texture_representation.cc         |  4 ++++
@@ -94,10 +95,12 @@ Enable jumbo build for the following component(s)/source_set(s):
  services/network/url_loader.cc                |  4 ++++
  .../web_bundle_url_loader_factory.cc          |  4 ++++
  storage/browser/BUILD.gn                      |  5 +++--
- 53 files changed, 259 insertions(+), 44 deletions(-)
+ storage/browser/blob/blob_url_registry.cc     |  4 ++++
+ storage/browser/quota/quota_settings.cc       |  4 ++++
+ 56 files changed, 276 insertions(+), 44 deletions(-)
 
 diff --git a/gpu/BUILD.gn b/gpu/BUILD.gn
-index 3aebe01643..dbf13473c9 100644
+index b15101df3d..065227d0e5 100644
 --- a/gpu/BUILD.gn
 +++ b/gpu/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -118,7 +121,7 @@ index 3aebe01643..dbf13473c9 100644
    sources = [
      "command_buffer/client/client_test_helper.cc",
 diff --git a/gpu/command_buffer/client/BUILD.gn b/gpu/command_buffer/client/BUILD.gn
-index 345e3cb7e9..21220e7906 100644
+index 7fd901cdce..982c8841c7 100644
 --- a/gpu/command_buffer/client/BUILD.gn
 +++ b/gpu/command_buffer/client/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -138,7 +141,7 @@ index 345e3cb7e9..21220e7906 100644
    # External code should depend on this via //gpu/client above rather than
    # depending on this directly or the component build will break.
    visibility = [ "//gpu/*" ]
-@@ -253,7 +254,7 @@ source_set("webgpu_interface") {
+@@ -258,7 +259,7 @@ source_set("webgpu_interface") {
  }
  
  # Library emulates GLES2 using command_buffers.
@@ -147,7 +150,7 @@ index 345e3cb7e9..21220e7906 100644
    sources = gles2_implementation_source_files
  
    defines = [ "GLES2_IMPL_IMPLEMENTATION" ]
-@@ -356,7 +357,7 @@ source_set("webgpu_sources") {
+@@ -361,7 +362,7 @@ source_set("webgpu_sources") {
  }
  
  # Library emulates GLES2 using command_buffers.
@@ -156,7 +159,7 @@ index 345e3cb7e9..21220e7906 100644
    sources = gles2_implementation_source_files
  
    defines = [ "GLES2_IMPL_IMPLEMENTATION" ]
-@@ -386,7 +387,7 @@ component("gles2_implementation_no_check") {
+@@ -391,7 +392,7 @@ component("gles2_implementation_no_check") {
    }
  }
  
@@ -166,7 +169,7 @@ index 345e3cb7e9..21220e7906 100644
    defines = [ "GLES2_C_LIB_IMPLEMENTATION" ]
  
 diff --git a/gpu/command_buffer/common/BUILD.gn b/gpu/command_buffer/common/BUILD.gn
-index d55b1443fd..d5cab8ee39 100644
+index d928bf36c8..b41ac67791 100644
 --- a/gpu/command_buffer/common/BUILD.gn
 +++ b/gpu/command_buffer/common/BUILD.gn
 @@ -7,6 +7,7 @@
@@ -196,7 +199,7 @@ index d55b1443fd..d5cab8ee39 100644
  
    sources = [
 diff --git a/gpu/command_buffer/service/BUILD.gn b/gpu/command_buffer/service/BUILD.gn
-index 37716a9675..0129a0f547 100644
+index 740b754b10..cabac86ca5 100644
 --- a/gpu/command_buffer/service/BUILD.gn
 +++ b/gpu/command_buffer/service/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -219,7 +222,19 @@ index 37716a9675..0129a0f547 100644
  }
  target(link_target_type, "service_sources") {
    # External code should depend on this via //gpu/command_buffer/service above
-@@ -642,7 +643,7 @@ proto_library("disk_cache_proto") {
+@@ -314,6 +315,11 @@ target(link_target_type, "gles2_sources") {
+     "webgpu_decoder.h",
+   ]
+ 
++  jumbo_excluded_sources = [
++    # GL header conflicts
++    "shared_image/shared_image_format_service_utils.cc",
++  ]
++
+   if (is_android) {
+     sources += [
+       "abstract_texture_android.cc",
+@@ -637,7 +643,7 @@ proto_library("disk_cache_proto") {
  }
  
  if (is_android) {
@@ -248,6 +263,25 @@ index 502016b20c..c6bf7bbc19 100644
 +
 +#undef ReadPixelsContext
 +#undef OnReadPixelsDone
+diff --git a/gpu/command_buffer/service/scheduler.cc b/gpu/command_buffer/service/scheduler.cc
+index ade35d3a19..ea03b47dcb 100644
+--- a/gpu/command_buffer/service/scheduler.cc
++++ b/gpu/command_buffer/service/scheduler.cc
+@@ -21,6 +21,8 @@
+ #include "gpu/config/gpu_preferences.h"
+ #include "third_party/perfetto/include/perfetto/tracing/traced_value.h"
+ 
++#define GetTaskFlowId GetTaskFlowId_Scheduler
++
+ namespace gpu {
+ namespace {
+ uint64_t GetTaskFlowId(uint32_t sequence_id, uint32_t order_num) {
+@@ -695,3 +697,5 @@ void Scheduler::ExecuteSequence(const SequenceId sequence_id) {
+ }
+ 
+ }  // namespace gpu
++
++#undef GetTaskFlowId
 diff --git a/gpu/command_buffer/service/shared_image/angle_vulkan_image_backing_factory.cc b/gpu/command_buffer/service/shared_image/angle_vulkan_image_backing_factory.cc
 index 59cee1e9c1..61b36b2589 100644
 --- a/gpu/command_buffer/service/shared_image/angle_vulkan_image_backing_factory.cc
@@ -268,7 +302,7 @@ index 59cee1e9c1..61b36b2589 100644
 +
 +#undef kSupportedUsage
 diff --git a/gpu/command_buffer/service/shared_image/dawn_egl_image_representation.cc b/gpu/command_buffer/service/shared_image/dawn_egl_image_representation.cc
-index 68c3304f87..e8a041da4f 100644
+index 5c74a473eb..01e28e9c27 100644
 --- a/gpu/command_buffer/service/shared_image/dawn_egl_image_representation.cc
 +++ b/gpu/command_buffer/service/shared_image/dawn_egl_image_representation.cc
 @@ -10,6 +10,8 @@
@@ -280,14 +314,14 @@ index 68c3304f87..e8a041da4f 100644
  namespace {
  GLenum ToSharedImageAccessGLMode(wgpu::TextureUsage usage) {
    if (usage &
-@@ -101,3 +103,5 @@ void DawnEGLImageRepresentation::EndAccess() {
+@@ -107,3 +109,5 @@ void DawnEGLImageRepresentation::EndAccess() {
  }
  
  }  // namespace gpu
 +
 +#undef ToSharedImageAccessGLMode
 diff --git a/gpu/command_buffer/service/shared_image/dawn_gl_texture_representation.cc b/gpu/command_buffer/service/shared_image/dawn_gl_texture_representation.cc
-index 99e6f880b5..2b54c4fa77 100644
+index 1bd77ff1e1..af9d74bf32 100644
 --- a/gpu/command_buffer/service/shared_image/dawn_gl_texture_representation.cc
 +++ b/gpu/command_buffer/service/shared_image/dawn_gl_texture_representation.cc
 @@ -11,6 +11,8 @@
@@ -299,14 +333,14 @@ index 99e6f880b5..2b54c4fa77 100644
  namespace {
  GLenum ToSharedImageAccessGLMode(wgpu::TextureUsage usage) {
    if (usage &
-@@ -106,3 +108,5 @@ void DawnGLTextureRepresentation::EndAccess() {
+@@ -100,3 +102,5 @@ void DawnGLTextureRepresentation::EndAccess() {
  }
  
  }  // namespace gpu
 +
 +#undef ToSharedImageAccessGLMode
 diff --git a/gpu/command_buffer/service/shared_image/egl_image_backing_factory.cc b/gpu/command_buffer/service/shared_image/egl_image_backing_factory.cc
-index da38484e8e..4ca545e804 100644
+index 40c4ffbc0d..ceafc60394 100644
 --- a/gpu/command_buffer/service/shared_image/egl_image_backing_factory.cc
 +++ b/gpu/command_buffer/service/shared_image/egl_image_backing_factory.cc
 @@ -19,6 +19,8 @@
@@ -325,10 +359,10 @@ index da38484e8e..4ca545e804 100644
 +
 +#undef kSupportedUsage
 diff --git a/gpu/command_buffer/service/shared_image/gl_texture_image_backing_factory.cc b/gpu/command_buffer/service/shared_image/gl_texture_image_backing_factory.cc
-index ba935cc16d..eef1456618 100644
+index ffe1e587be..674ca4a15b 100644
 --- a/gpu/command_buffer/service/shared_image/gl_texture_image_backing_factory.cc
 +++ b/gpu/command_buffer/service/shared_image/gl_texture_image_backing_factory.cc
-@@ -16,6 +16,8 @@
+@@ -17,6 +17,8 @@
  #include "ui/gl/gl_implementation.h"
  #include "ui/gl/progress_reporter.h"
  
@@ -337,17 +371,17 @@ index ba935cc16d..eef1456618 100644
  namespace gpu {
  namespace {
  
-@@ -256,3 +258,5 @@ SharedImageBackingType GLTextureImageBackingFactory::GetBackingType() {
+@@ -318,3 +320,5 @@ SharedImageBackingType GLTextureImageBackingFactory::GetBackingType() {
  }
  
  }  // namespace gpu
 +
 +#undef kSupportedUsage
 diff --git a/gpu/command_buffer/service/shared_image/ozone_image_backing_factory.cc b/gpu/command_buffer/service/shared_image/ozone_image_backing_factory.cc
-index f0299f357b..5b6fb77d34 100644
+index d039572451..db349c2321 100644
 --- a/gpu/command_buffer/service/shared_image/ozone_image_backing_factory.cc
 +++ b/gpu/command_buffer/service/shared_image/ozone_image_backing_factory.cc
-@@ -37,6 +37,8 @@
+@@ -36,6 +36,8 @@
  #include "gpu/vulkan/vulkan_device_queue.h"
  #endif  // BUILDFLAG(ENABLE_VULKAN)
  
@@ -356,14 +390,14 @@ index f0299f357b..5b6fb77d34 100644
  namespace gpu {
  namespace {
  
-@@ -405,3 +407,5 @@ SharedImageBackingType OzoneImageBackingFactory::GetBackingType() {
+@@ -404,3 +406,5 @@ SharedImageBackingType OzoneImageBackingFactory::GetBackingType() {
  }
  
  }  // namespace gpu
 +
 +#undef kSupportedUsage
 diff --git a/gpu/command_buffer/service/shared_image/shared_image_representation.cc b/gpu/command_buffer/service/shared_image/shared_image_representation.cc
-index 2aff5a9efd..2b524281de 100644
+index dc624cc958..2dec586a95 100644
 --- a/gpu/command_buffer/service/shared_image/shared_image_representation.cc
 +++ b/gpu/command_buffer/service/shared_image/shared_image_representation.cc
 @@ -25,6 +25,9 @@
@@ -377,7 +411,7 @@ index 2aff5a9efd..2b524281de 100644
  
  ///////////////////////////////////////////////////////////////////////////////
 diff --git a/gpu/command_buffer/service/shared_image/wrapped_graphite_texture_backing.cc b/gpu/command_buffer/service/shared_image/wrapped_graphite_texture_backing.cc
-index dc423421ec..3bf8ffdce6 100644
+index 98acf00f42..23708353a4 100644
 --- a/gpu/command_buffer/service/shared_image/wrapped_graphite_texture_backing.cc
 +++ b/gpu/command_buffer/service/shared_image/wrapped_graphite_texture_backing.cc
 @@ -30,6 +30,9 @@
@@ -390,7 +424,7 @@ index dc423421ec..3bf8ffdce6 100644
  namespace gpu {
  namespace {
  struct ReadPixelsContext {
-@@ -400,3 +403,6 @@ WrappedGraphiteTextureBacking::ProduceDawn(
+@@ -411,3 +414,6 @@ WrappedGraphiteTextureBacking::ProduceDawn(
  #endif  // BUILDFLAG(SKIA_USE_DAWN)
  
  }  // namespace gpu
@@ -398,12 +432,12 @@ index dc423421ec..3bf8ffdce6 100644
 +#undef ReadPixelsContext
 +#undef OnReadPixelsDone
 diff --git a/gpu/command_buffer/service/shared_image/wrapped_sk_image_backing_factory.cc b/gpu/command_buffer/service/shared_image/wrapped_sk_image_backing_factory.cc
-index fe9062b71b..e3331266b6 100644
+index 050fe396b1..a6e86976eb 100644
 --- a/gpu/command_buffer/service/shared_image/wrapped_sk_image_backing_factory.cc
 +++ b/gpu/command_buffer/service/shared_image/wrapped_sk_image_backing_factory.cc
 @@ -25,6 +25,8 @@
- #include "third_party/skia/include/gpu/GrDirectContext.h"
- #include "third_party/skia/include/gpu/GrTypes.h"
+ #include "third_party/skia/include/gpu/ganesh/GrDirectContext.h"
+ #include "third_party/skia/include/gpu/ganesh/GrTypes.h"
  
 +#define kSupportedUsage kSupportedUsage_WrappedSKImageBackingFactory
 +
@@ -452,7 +486,7 @@ index 7dca9433d6..c021b7c741 100644
  #include <string>
  
 diff --git a/gpu/ipc/service/BUILD.gn b/gpu/ipc/service/BUILD.gn
-index f93f0b5bf8..cb4e900a5b 100644
+index 90658a3361..222ccb6b68 100644
 --- a/gpu/ipc/service/BUILD.gn
 +++ b/gpu/ipc/service/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -473,7 +507,7 @@ index f93f0b5bf8..cb4e900a5b 100644
    sources = [
      "command_buffer_stub.cc",
 diff --git a/media/audio/BUILD.gn b/media/audio/BUILD.gn
-index 6027134a4d..8a84ff6bc1 100644
+index e5de2b90a4..238c063c1a 100644
 --- a/media/audio/BUILD.gn
 +++ b/media/audio/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -515,10 +549,10 @@ index 878cef8e3b..a5de8e6ad0 100644
 +#undef kDefaultSampleRate
 +#undef kDefaultInputBufferSize
 diff --git a/media/audio/pulse/audio_manager_pulse.cc b/media/audio/pulse/audio_manager_pulse.cc
-index 743e374c56..98f2983494 100644
+index a113644ff4..6d212b3917 100644
 --- a/media/audio/pulse/audio_manager_pulse.cc
 +++ b/media/audio/pulse/audio_manager_pulse.cc
-@@ -20,6 +20,9 @@
+@@ -25,6 +25,9 @@
  #include "media/base/audio_parameters.h"
  #include "media/base/channel_layout.h"
  
@@ -528,7 +562,7 @@ index 743e374c56..98f2983494 100644
  namespace media {
  
  using pulse::AutoPulseLock;
-@@ -368,3 +371,6 @@ void AudioManagerPulse::DefaultSourceInfoCallback(pa_context* context,
+@@ -374,3 +377,6 @@ void AudioManagerPulse::DefaultSourceInfoCallback(pa_context* context,
  }
  
  }  // namespace media
@@ -536,7 +570,7 @@ index 743e374c56..98f2983494 100644
 +#undef kDefaultSampleRate
 +#undef kDefaultInputBufferSize
 diff --git a/media/base/BUILD.gn b/media/base/BUILD.gn
-index a530e6629d..6114f2a72b 100644
+index 11133e1b06..d638ffc7b8 100644
 --- a/media/base/BUILD.gn
 +++ b/media/base/BUILD.gn
 @@ -5,6 +5,7 @@
@@ -556,7 +590,7 @@ index a530e6629d..6114f2a72b 100644
    # Do not expand the visibility here without double-checking with OWNERS, this
    # is a roll-up target which is part of the //media component. Most other DEPs
    # should be using //media and not directly DEP this roll-up target.
-@@ -442,6 +443,8 @@ source_set("base") {
+@@ -448,6 +449,8 @@ source_set("base") {
        "libaom_thread_wrapper.cc",
        "libaom_thread_wrapper.h",
      ]
@@ -641,7 +675,7 @@ index 002aabb2cd..339d8f0a1a 100644
      "dxgi_device_manager.cc",
      "dxgi_device_manager.h",
 diff --git a/media/capture/BUILD.gn b/media/capture/BUILD.gn
-index 4f7969886f..df57ab1585 100644
+index 9139fbbfc5..3e2841a5b6 100644
 --- a/media/capture/BUILD.gn
 +++ b/media/capture/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -680,7 +714,7 @@ index 4f7969886f..df57ab1585 100644
    sources = [
      "video/create_video_capture_device_factory.cc",
 diff --git a/media/cast/BUILD.gn b/media/cast/BUILD.gn
-index 8cec71aafe..671fad087f 100644
+index 6c30c5eaf5..67ca683b4f 100644
 --- a/media/cast/BUILD.gn
 +++ b/media/cast/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -700,7 +734,7 @@ index 8cec71aafe..671fad087f 100644
    sources = [
      "cast_callbacks.h",
      "cast_config.cc",
-@@ -68,7 +69,7 @@ source_set("common") {
+@@ -67,7 +68,7 @@ source_set("common") {
    ]
  }
  
@@ -709,7 +743,7 @@ index 8cec71aafe..671fad087f 100644
    sources = [
      "encoding/audio_encoder.cc",
      "encoding/audio_encoder.h",
-@@ -126,7 +127,7 @@ source_set("encoding") {
+@@ -125,7 +126,7 @@ source_set("encoding") {
    }
  }
  
@@ -719,12 +753,12 @@ index 8cec71aafe..671fad087f 100644
      "sender/audio_sender.cc",
      "sender/audio_sender.h",
 diff --git a/media/cast/encoding/av1_encoder.cc b/media/cast/encoding/av1_encoder.cc
-index 3520f833a0..b3d2c30bba 100644
+index 41650d55b7..54d0e51b5a 100644
 --- a/media/cast/encoding/av1_encoder.cc
 +++ b/media/cast/encoding/av1_encoder.cc
-@@ -15,6 +15,16 @@
+@@ -20,6 +20,16 @@
  #include "third_party/libaom/source/libaom/aom/aomcx.h"
- #include "third_party/openscreen/src/cast/streaming/encoded_frame.h"
+ #include "third_party/openscreen/src/cast/streaming/public/encoded_frame.h"
  
 +#define HasSufficientFeedback                  HasSufficientFeedback_AV1
 +#define kRestartFramePeriods                   kRestartFramePeriods_AV1
@@ -739,7 +773,7 @@ index 3520f833a0..b3d2c30bba 100644
  namespace media {
  namespace cast {
  
-@@ -405,3 +415,13 @@ void Av1Encoder::GenerateKeyFrame() {
+@@ -411,3 +421,13 @@ void Av1Encoder::GenerateKeyFrame() {
  
  }  // namespace cast
  }  // namespace media
@@ -754,10 +788,10 @@ index 3520f833a0..b3d2c30bba 100644
 +#undef kHighestEncodingSpeed
 +#undef kLowestEncodingSpeed
 diff --git a/media/cast/encoding/vpx_encoder.cc b/media/cast/encoding/vpx_encoder.cc
-index 358547c410..95e9663d11 100644
+index c8a038ca16..c3d16db490 100644
 --- a/media/cast/encoding/vpx_encoder.cc
 +++ b/media/cast/encoding/vpx_encoder.cc
-@@ -19,6 +19,16 @@
+@@ -24,6 +24,16 @@
  
  using Dependency = openscreen::cast::EncodedFrame::Dependency;
  
@@ -774,7 +808,7 @@ index 358547c410..95e9663d11 100644
  namespace media {
  namespace cast {
  
-@@ -465,3 +475,14 @@ void VpxEncoder::GenerateKeyFrame() {
+@@ -468,3 +478,14 @@ void VpxEncoder::GenerateKeyFrame() {
  
  }  // namespace cast
  }  // namespace media
@@ -790,12 +824,12 @@ index 358547c410..95e9663d11 100644
 +#undef kHighestEncodingSpeed
 +#undef kLowestEncodingSpeed
 diff --git a/media/cast/sender/audio_sender.cc b/media/cast/sender/audio_sender.cc
-index e0be9e5350..46c7c0e04b 100644
+index 240e1a5c4b..ec7a2595f4 100644
 --- a/media/cast/sender/audio_sender.cc
 +++ b/media/cast/sender/audio_sender.cc
 @@ -17,6 +17,9 @@
  #include "media/cast/sender/frame_sender.h"
- #include "third_party/openscreen/src/cast/streaming/sender.h"
+ #include "third_party/openscreen/src/cast/streaming/public/sender.h"
  
 +#define kHistogramDroppedFrames kHistogramDroppedFrames_AS
 +#define kHistogramFrameDropped  kHistogramFrameDropped_AS
@@ -811,31 +845,31 @@ index e0be9e5350..46c7c0e04b 100644
 +#undef kHistogramDroppedFrames
 +#undef kHistogramFrameDropped
 diff --git a/media/cast/sender/openscreen_frame_sender.cc b/media/cast/sender/openscreen_frame_sender.cc
-index 510bee2b31..16f0b7de6a 100644
+index 7d26815f71..efe5b69268 100644
 --- a/media/cast/sender/openscreen_frame_sender.cc
 +++ b/media/cast/sender/openscreen_frame_sender.cc
-@@ -21,6 +21,8 @@
+@@ -26,6 +26,8 @@
  #include "media/cast/constants.h"
- #include "third_party/openscreen/src/cast/streaming/encoded_frame.h"
+ #include "third_party/openscreen/src/cast/streaming/public/encoded_frame.h"
  
 +#define kMaxFrameBurst kMaxFrameBurst_OFS
 +
  namespace media::cast {
  namespace {
  
-@@ -347,3 +349,5 @@ void OpenscreenFrameSender::RecordShouldDropNextFrame(bool should_drop) {
+@@ -352,3 +354,5 @@ void OpenscreenFrameSender::RecordShouldDropNextFrame(bool should_drop) {
    }
  }
  }  // namespace media::cast
 +
 +#undef kMaxFrameBurst
 diff --git a/media/cast/sender/video_sender.cc b/media/cast/sender/video_sender.cc
-index 66488b982f..fbdbc12552 100644
+index 1d06e8d28f..66401eb1b6 100644
 --- a/media/cast/sender/video_sender.cc
 +++ b/media/cast/sender/video_sender.cc
-@@ -25,6 +25,9 @@
- #include "third_party/openscreen/src/cast/streaming/encoded_frame.h"
- #include "third_party/openscreen/src/cast/streaming/sender.h"
+@@ -26,6 +26,9 @@
+ #include "third_party/openscreen/src/cast/streaming/public/encoded_frame.h"
+ #include "third_party/openscreen/src/cast/streaming/public/sender.h"
  
 +#define kHistogramDroppedFrames kHistogramDroppedFrames_VS
 +#define kHistogramFrameDropped  kHistogramFrameDropped_VS
@@ -843,7 +877,7 @@ index 66488b982f..fbdbc12552 100644
  namespace media::cast {
  
  namespace {
-@@ -388,3 +391,6 @@ void VideoSender::OnEncodedVideoFrame(
+@@ -385,3 +388,6 @@ void VideoSender::OnEncodedVideoFrame(
  }
  
  }  // namespace media::cast
@@ -868,10 +902,10 @@ index 264a479a9b..60aaa65fce 100644
    # is a roll-up target which is part of the //media component. Most other DEPs
    # should be using //media and not directly DEP this roll-up target.
 diff --git a/media/filters/h264_to_annex_b_bitstream_converter.cc b/media/filters/h264_to_annex_b_bitstream_converter.cc
-index 74f5520552..e66c5d48ba 100644
+index 01069114fa..4592949e2f 100644
 --- a/media/filters/h264_to_annex_b_bitstream_converter.cc
 +++ b/media/filters/h264_to_annex_b_bitstream_converter.cc
-@@ -10,6 +10,10 @@
+@@ -15,6 +15,10 @@
  #include "media/formats/mp4/box_definitions.h"
  #include "media/parsers/h264_parser.h"
  
@@ -882,7 +916,7 @@ index 74f5520552..e66c5d48ba 100644
  namespace media {
  
  static const uint8_t kStartCodePrefix[3] = {0, 0, 1};
-@@ -297,3 +301,7 @@ bool H264ToAnnexBBitstreamConverter::WriteParamSet(
+@@ -302,3 +306,7 @@ bool H264ToAnnexBBitstreamConverter::WriteParamSet(
  }
  
  }  // namespace media
@@ -891,10 +925,10 @@ index 74f5520552..e66c5d48ba 100644
 +#undef kParamSetStartCodeSize
 +#undef IsAccessUnitBoundaryNal
 diff --git a/media/filters/h265_to_annex_b_bitstream_converter.cc b/media/filters/h265_to_annex_b_bitstream_converter.cc
-index dd1048628f..1618414b2f 100644
+index 6bd4c8e642..c0082e8276 100644
 --- a/media/filters/h265_to_annex_b_bitstream_converter.cc
 +++ b/media/filters/h265_to_annex_b_bitstream_converter.cc
-@@ -11,6 +11,10 @@
+@@ -16,6 +16,10 @@
  #include "media/formats/mp4/hevc.h"
  #include "media/parsers/h265_nalu_parser.h"
  
@@ -905,7 +939,7 @@ index dd1048628f..1618414b2f 100644
  namespace media {
  namespace {
  
-@@ -293,3 +297,7 @@ bool H265ToAnnexBBitstreamConverter::WriteParamSet(
+@@ -291,3 +295,7 @@ bool H265ToAnnexBBitstreamConverter::WriteParamSet(
  }
  
  }  // namespace media
@@ -914,10 +948,10 @@ index dd1048628f..1618414b2f 100644
 +#undef kParamSetStartCodeSize
 +#undef IsAccessUnitBoundaryNal
 diff --git a/media/filters/media_file_checker.cc b/media/filters/media_file_checker.cc
-index 5b81bfc343..9f00ddd659 100644
+index 952a07b46e..09669fe370 100644
 --- a/media/filters/media_file_checker.cc
 +++ b/media/filters/media_file_checker.cc
-@@ -20,6 +20,8 @@
+@@ -25,6 +25,8 @@
  #include "media/filters/ffmpeg_glue.h"
  #include "media/filters/file_data_source.h"
  
@@ -926,14 +960,14 @@ index 5b81bfc343..9f00ddd659 100644
  namespace media {
  
  namespace {
-@@ -109,3 +111,5 @@ bool MediaFileChecker::Start(base::TimeDelta check_time) {
+@@ -114,3 +116,5 @@ bool MediaFileChecker::Start(base::TimeDelta check_time) {
  }
  
  }  // namespace media
 +
 +#undef Decoder
 diff --git a/media/media_options.gni b/media/media_options.gni
-index 7590af7c8e..25700f074f 100644
+index e235287ebb..cffc86fcb9 100644
 --- a/media/media_options.gni
 +++ b/media/media_options.gni
 @@ -7,6 +7,7 @@ import("//build/config/chrome_build.gni")
@@ -953,7 +987,7 @@ index 7590af7c8e..25700f074f 100644
  
    enable_dav1d_decoder = use_blink
  
-@@ -182,6 +183,9 @@ assert(!enable_hevc_parser_and_hw_decoder || enable_platform_hevc,
+@@ -189,6 +190,9 @@ assert(!enable_hevc_parser_and_hw_decoder || enable_platform_hevc,
  assert(!enable_platform_dolby_vision || enable_platform_hevc,
         "enable_platform_hevc required for enable_platform_dolby_vision")
  
@@ -995,7 +1029,7 @@ index c42b874e05..29a54b7277 100644
      "audio_data_s16_converter.cc",
      "audio_data_s16_converter.h",
 diff --git a/media/mojo/services/BUILD.gn b/media/mojo/services/BUILD.gn
-index f7eea73bf9..b0dc095fd0 100644
+index 3e2dac7991..bd028aa5ab 100644
 --- a/media/mojo/services/BUILD.gn
 +++ b/media/mojo/services/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -1151,7 +1185,7 @@ index ffc6bdc4ab..28ab85355d 100644
      "cert_net_fetcher_url_loader.cc",
      "cert_net_fetcher_url_loader.h",
 diff --git a/services/network/BUILD.gn b/services/network/BUILD.gn
-index 7429c35dfc..5f5e5bf5da 100644
+index b426a7a7ce..993f03d058 100644
 --- a/services/network/BUILD.gn
 +++ b/services/network/BUILD.gn
 @@ -4,12 +4,13 @@
@@ -1169,7 +1203,7 @@ index 7429c35dfc..5f5e5bf5da 100644
    sources = [
      "ad_heuristic_cookie_overrides.cc",
      "ad_heuristic_cookie_overrides.h",
-@@ -613,7 +614,7 @@ source_set("tests") {
+@@ -600,7 +601,7 @@ source_set("tests") {
    }
  }
  
@@ -1198,7 +1232,7 @@ index 83541ae136..d70fbf6c78 100644
 +
 +#undef kPrefPath
 diff --git a/services/network/public/cpp/BUILD.gn b/services/network/public/cpp/BUILD.gn
-index f2142b3835..bb0b2df6eb 100644
+index a44cc305f6..3c7897a499 100644
 --- a/services/network/public/cpp/BUILD.gn
 +++ b/services/network/public/cpp/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1227,7 +1261,7 @@ index f2142b3835..bb0b2df6eb 100644
    output_name = "network_cpp"
  
    sources = [
-@@ -364,7 +365,7 @@ component("schemeful_site_mojom_support") {
+@@ -370,7 +371,7 @@ component("schemeful_site_mojom_support") {
  
  # This component is separate from cpp_base as it is a dependency of
  # //services/network/public/mojom:cookies_mojom.
@@ -1236,7 +1270,7 @@ index f2142b3835..bb0b2df6eb 100644
    sources = [
      "first_party_sets_mojom_traits.cc",
      "first_party_sets_mojom_traits.h",
-@@ -394,7 +395,7 @@ component("storage_access_api_mojom_support") {
+@@ -400,7 +401,7 @@ component("storage_access_api_mojom_support") {
    defines = [ "IS_STORAGE_ACCESS_API_MOJOM_TRAITS_IMPL" ]
  }
  
@@ -1245,7 +1279,7 @@ index f2142b3835..bb0b2df6eb 100644
    output_name = "network_cpp_base"
  
    sources = [
-@@ -448,6 +449,7 @@ component("cpp_base") {
+@@ -454,6 +455,7 @@ component("cpp_base") {
      "web_transport_error_mojom_traits.cc",
      "web_transport_error_mojom_traits.h",
    ]
@@ -1253,7 +1287,7 @@ index f2142b3835..bb0b2df6eb 100644
  
    configs += [ "//build/config/compiler:wexit_time_destructors" ]
  
-@@ -488,6 +490,9 @@ component("cpp_base") {
+@@ -495,6 +497,9 @@ component("cpp_base") {
        "p2p_param_traits.h",
        "p2p_socket_type.h",
      ]
@@ -1264,7 +1298,7 @@ index f2142b3835..bb0b2df6eb 100644
      deps += [ "//services/network/public/mojom:mojom_shared" ]
      public_deps += [ "//third_party/webrtc_overrides:webrtc_component" ]
 diff --git a/services/network/public/cpp/cross_origin_embedder_policy_parser.cc b/services/network/public/cpp/cross_origin_embedder_policy_parser.cc
-index d6b22c980e..57b1eb2fc6 100644
+index bf9d5f41d4..8aaaf8036d 100644
 --- a/services/network/public/cpp/cross_origin_embedder_policy_parser.cc
 +++ b/services/network/public/cpp/cross_origin_embedder_policy_parser.cc
 @@ -13,6 +13,10 @@
@@ -1278,7 +1312,7 @@ index d6b22c980e..57b1eb2fc6 100644
  namespace network {
  
  namespace {
-@@ -75,3 +79,7 @@ CrossOriginEmbedderPolicy ParseCrossOriginEmbedderPolicy(
+@@ -76,3 +80,7 @@ CrossOriginEmbedderPolicy ParseCrossOriginEmbedderPolicy(
  }
  
  }  // namespace network
@@ -1287,7 +1321,7 @@ index d6b22c980e..57b1eb2fc6 100644
 +#undef kReportOnlyHeaderName
 +#undef Parse
 diff --git a/services/network/public/cpp/document_isolation_policy_parser.cc b/services/network/public/cpp/document_isolation_policy_parser.cc
-index bc1b3a4b87..813e1490da 100644
+index b32b864b80..3407788fbe 100644
 --- a/services/network/public/cpp/document_isolation_policy_parser.cc
 +++ b/services/network/public/cpp/document_isolation_policy_parser.cc
 @@ -13,6 +13,10 @@
@@ -1301,7 +1335,7 @@ index bc1b3a4b87..813e1490da 100644
  namespace network {
  
  namespace {
-@@ -75,3 +79,7 @@ DocumentIsolationPolicy ParseDocumentIsolationPolicy(
+@@ -76,3 +80,7 @@ DocumentIsolationPolicy ParseDocumentIsolationPolicy(
  }
  
  }  // namespace network
@@ -1310,11 +1344,11 @@ index bc1b3a4b87..813e1490da 100644
 +#undef kReportOnlyHeaderName
 +#undef Parse
 diff --git a/services/network/url_loader.cc b/services/network/url_loader.cc
-index 9334a3ccc9..5e5ad392b6 100644
+index beb3fe75a6..8db22bf946 100644
 --- a/services/network/url_loader.cc
 +++ b/services/network/url_loader.cc
-@@ -111,6 +111,8 @@
- #include "services/network/url_loader_factory.h"
+@@ -114,6 +114,8 @@
+ #include "third_party/abseil-cpp/absl/container/inlined_vector.h"
  #include "url/origin.h"
  
 +#define kBlockedBodyAllocationSize kBlockedBodyAllocationSize_URLLoader
@@ -1322,14 +1356,14 @@ index 9334a3ccc9..5e5ad392b6 100644
  namespace network {
  
  namespace {
-@@ -3005,3 +3007,5 @@ bool URLLoader::ShouldSendTransferSizeUpdated() const {
+@@ -3284,3 +3286,5 @@ void URLLoader::RecordRequestMetrics() {
  }
  
  }  // namespace network
 +
 +#undef kBlockedBodyAllocationSize
 diff --git a/services/network/web_bundle/web_bundle_url_loader_factory.cc b/services/network/web_bundle/web_bundle_url_loader_factory.cc
-index ec4990ab23..43f7b7ee52 100644
+index 3b43bea203..4028a395e3 100644
 --- a/services/network/web_bundle/web_bundle_url_loader_factory.cc
 +++ b/services/network/web_bundle/web_bundle_url_loader_factory.cc
 @@ -32,6 +32,8 @@
@@ -1341,14 +1375,14 @@ index ec4990ab23..43f7b7ee52 100644
  namespace network {
  
  namespace {
-@@ -979,3 +981,5 @@ void WebBundleURLLoaderFactory::OnWebBundleFetchFailed() {
+@@ -983,3 +985,5 @@ void WebBundleURLLoaderFactory::OnWebBundleFetchFailed() {
  }
  
  }  // namespace network
 +
 +#undef kBlockedBodyAllocationSize
 diff --git a/storage/browser/BUILD.gn b/storage/browser/BUILD.gn
-index b52c014f46..22b33d6ed1 100644
+index fb0c66e45a..b7b8330434 100644
 --- a/storage/browser/BUILD.gn
 +++ b/storage/browser/BUILD.gn
 @@ -1,10 +1,11 @@
@@ -1364,7 +1398,7 @@ index b52c014f46..22b33d6ed1 100644
    output_name = "storage_browser"
    sources = [
      "blob/blob_builder_from_stream.cc",
-@@ -361,7 +362,7 @@ source_set("unittests") {
+@@ -363,7 +364,7 @@ source_set("unittests") {
    ]
  }
  
@@ -1373,54 +1407,8 @@ index b52c014f46..22b33d6ed1 100644
    testonly = true
  
    sources = [
---- a/gpu/command_buffer/service/scheduler.cc
-+++ b/gpu/command_buffer/service/scheduler.cc
-@@ -25,6 +25,8 @@
- #include "gpu/config/gpu_preferences.h"
- #include "third_party/perfetto/include/perfetto/tracing/traced_value.h"
- 
-+#define GetTaskFlowId GetTaskFlowId_Scheduler
-+
- namespace gpu {
- 
- namespace {
-@@ -826,3 +828,5 @@
- }
- 
- }  // namespace gpu
-+
-+#undef GetTaskFlowId
---- a/gpu/command_buffer/service/scheduler_dfs.cc
-+++ b/gpu/command_buffer/service/scheduler_dfs.cc
-@@ -22,6 +22,8 @@
- #include "gpu/config/gpu_preferences.h"
- #include "third_party/perfetto/include/perfetto/tracing/traced_value.h"
- 
-+#define GetTaskFlowId GetTaskFlowId_SchedulerDFS
-+
- namespace gpu {
- namespace {
- using Task = ::gpu::Scheduler::Task;
-@@ -623,3 +625,5 @@
- }
- 
- }  // namespace gpu
-+
-+#undef GetTaskFlowId
---- a/gpu/command_buffer/service/BUILD.gn
-+++ b/gpu/command_buffer/service/BUILD.gn
-@@ -315,6 +315,11 @@
-     "webgpu_decoder.h",
-   ]
- 
-+  jumbo_excluded_sources = [
-+    # GL header conflicts
-+    "shared_image/shared_image_format_service_utils.cc",
-+  ]
-+
-   if (is_android) {
-     sources += [
-       "abstract_texture_android.cc",
+diff --git a/storage/browser/blob/blob_url_registry.cc b/storage/browser/blob/blob_url_registry.cc
+index 7135cd4b32..e111684fc3 100644
 --- a/storage/browser/blob/blob_url_registry.cc
 +++ b/storage/browser/blob/blob_url_registry.cc
 @@ -12,6 +12,8 @@
@@ -1432,12 +1420,14 @@ index b52c014f46..22b33d6ed1 100644
  namespace storage {
  
  namespace {
-@@ -173,3 +175,5 @@
+@@ -218,3 +220,5 @@ void BlobUrlRegistry::SetURLStoreCreationHookForTesting(
  }
  
  }  // namespace storage
 +
 +#undef g_url_store_creation_hook
+diff --git a/storage/browser/quota/quota_settings.cc b/storage/browser/quota/quota_settings.cc
+index e53053151f..b4b67288d9 100644
 --- a/storage/browser/quota/quota_settings.cc
 +++ b/storage/browser/quota/quota_settings.cc
 @@ -20,6 +20,8 @@
@@ -1449,7 +1439,7 @@ index b52c014f46..22b33d6ed1 100644
  namespace storage {
  
  namespace {
-@@ -179,3 +181,5 @@
+@@ -179,3 +181,5 @@ double GetIncognitoQuotaRatioUpperBound_ForTesting() {
  }
  
  }  // namespace storage
