@@ -1,19 +1,19 @@
 --- a/v8/BUILD.gn
 +++ b/v8/BUILD.gn
-@@ -2127,7 +2127,9 @@
+@@ -2232,7 +2232,9 @@
        "tools/gcmole/:*",
      ]
-
+ 
 +if (false) {
      deps = [ ":torque($toolchain)" ]
 +}
-
+ 
      script = "tools/run.py"
-
-@@ -2169,8 +2171,14 @@
+ 
+@@ -2274,8 +2276,14 @@
        ]
      }
-
+ 
 +if (false) {
 +    arg0_prefix = "./"
 +} else {
@@ -26,7 +26,7 @@
                get_label_info(":torque($toolchain)", "root_out_dir") + "/torque",
                root_build_dir),
        "-o",
-@@ -2325,9 +2334,18 @@
+@@ -2436,9 +2444,18 @@
  action("generate_bytecode_builtins_list") {
    script = "tools/run.py"
    outputs = [ "$target_gen_dir/builtins-generated/bytecodes-builtins-list.h" ]
@@ -46,44 +46,61 @@
              get_label_info(
                      ":bytecode_builtins_list_generator($v8_generator_toolchain)",
                      "root_out_dir") + "/bytecode_builtins_list_generator",
-@@ -2355,7 +2373,9 @@
+@@ -2466,12 +2483,16 @@
      suffix = "_$name"
    }
    action("run_mksnapshot_" + name) {
 +if (false) {
      deps = [ ":mksnapshot($v8_snapshot_toolchain)" ]
+     if (v8_verify_deterministic_mksnapshot) {
+       # We archive the snapshot executable when verifying snapshot
+       # determinism to ease debugging.
+       data_deps = [ ":mksnapshot($v8_snapshot_toolchain)" ]
+     }
++} else {
++    deps = []
 +}
-
+ 
      script = "tools/run.py"
-
-@@ -2365,8 +2385,14 @@
-
-     data = []
-
+ 
+@@ -2498,6 +2519,7 @@
+ 
+     args = []
+ 
++if (false) {
+     if (v8_verify_deterministic_mksnapshot) {
+       # Output redirection must be the first argument to run.py. We capture
+       # output when verifying snapshot determinism for debugging.
+@@ -2508,9 +2530,16 @@
+       ]
+       data += [ "$root_out_dir/mksnapshot_output${suffix}.log" ]
+     }
++}
++
 +if (false) {
 +    arg0_prefix = "./"
 +} else {
 +    arg0_prefix = "@TERMUX_PREFIX@/opt/electron-host-tools-for-code-oss/"
 +}
-+
-     args = [
+ 
+     args += [
 -      "./" + rebase_path(get_label_info(":mksnapshot($v8_snapshot_toolchain)",
 +      arg0_prefix + rebase_path(get_label_info(":mksnapshot($v8_snapshot_toolchain)",
                                          "root_out_dir") + "/mksnapshot",
                           root_build_dir),
        "--turbo_instruction_scheduling",
-@@ -7187,14 +7213,22 @@
-
+@@ -7540,14 +7569,22 @@
+ 
      script = "tools/run.py"
-
+ 
 +if (false) {
      deps = [ ":gen-regexp-special-case($v8_generator_toolchain)" ]
 +}
-
+ 
      output_file = "$target_gen_dir/src/regexp/special-case.cc"
-
+ 
      outputs = [ output_file ]
-
+ 
 +if (false) {
 +    arg0_prefix = "./"
 +} else {
