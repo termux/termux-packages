@@ -263,7 +263,7 @@ diff --git a/net/filter/filter_source_stream.cc b/net/filter/filter_source_strea
 index e1006eb6d0..726c9ab51c 100644
 --- a/net/filter/filter_source_stream.cc
 +++ b/net/filter/filter_source_stream.cc
-@@ -20,7 +20,7 @@
+@@ -19,7 +19,7 @@
  
  namespace net {
  
@@ -272,7 +272,7 @@ index e1006eb6d0..726c9ab51c 100644
  
  constexpr char kDeflate[] = "deflate";
  constexpr char kGZip[] = "gzip";
-@@ -50,6 +50,7 @@ FilterSourceStream::~FilterSourceStream() = default;
+@@ -42,6 +42,7 @@
  int FilterSourceStream::Read(IOBuffer* read_buffer,
                               int read_buffer_size,
                               CompletionOnceCallback callback) {
@@ -280,15 +280,15 @@ index e1006eb6d0..726c9ab51c 100644
    DCHECK_EQ(STATE_NONE, next_state_);
    DCHECK(read_buffer);
    DCHECK_LT(0, read_buffer_size);
-@@ -88,6 +89,7 @@ bool FilterSourceStream::MayHaveMoreBytes() const {
+@@ -79,6 +80,7 @@
  
  FilterSourceStream::SourceType FilterSourceStream::ParseEncodingType(
-     const std::string& encoding) {
+     std::string_view encoding) {
 +  using namespace filter_source_stream;
    std::string lower_encoding = base::ToLowerASCII(encoding);
    static constexpr auto kEncodingMap =
        base::MakeFixedFlatMap<std::string_view, SourceType>({
-@@ -133,6 +135,7 @@ int FilterSourceStream::DoLoop(int result) {
+@@ -122,6 +124,7 @@
  }
  
  int FilterSourceStream::DoReadData() {

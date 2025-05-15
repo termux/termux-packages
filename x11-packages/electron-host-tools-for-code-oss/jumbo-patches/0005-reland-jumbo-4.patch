@@ -342,164 +342,6 @@ index ee5aa71f..6c4cc1af 100644
  
    OpIndex REDUCE_INPUT_GRAPH(StructSet)(OpIndex ig_index,
                                          const StructSetOp& op) {
-diff --git a/src/compiler/wasm-compiler.cc b/src/compiler/wasm-compiler.cc
-index 232eb796..184a4f92 100644
---- a/v8/src/compiler/wasm-compiler.cc
-+++ b/v8/src/compiler/wasm-compiler.cc
-@@ -117,7 +117,7 @@ MachineType assert_size(int expected_size, MachineType type) {
- 
- // Use MachineType::Pointer() over Tagged() to load root pointers because they
- // do not get compressed.
--#define LOAD_ROOT(RootName, factory_name)                         \
-+#define LOAD_ROOT_IN_WASM_COMPILER(RootName, factory_name)                         \
-   (isolate_ ? graph()->NewNode(mcgraph()->common()->HeapConstant( \
-                   isolate_->factory()->factory_name()))           \
-             : gasm_->LoadImmutable(                               \
-@@ -402,8 +402,8 @@ Node* WasmGraphBuilder::RefNull(wasm::ValueType type) {
-   return parameter_mode_ == kInstanceParameterMode ? gasm_->Null(type)
-          : (type == wasm::kWasmExternRef || type == wasm::kWasmNullExternRef ||
-             type == wasm::kWasmExnRef || type == wasm::kWasmNullExnRef)
--             ? LOAD_ROOT(NullValue, null_value)
--             : LOAD_ROOT(WasmNull, wasm_null);
-+             ? LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value)
-+             : LOAD_ROOT_IN_WASM_COMPILER(WasmNull, wasm_null);
- }
- 
- Node* WasmGraphBuilder::RefFunc(uint32_t function_index) {
-@@ -453,7 +453,7 @@ Node* WasmGraphBuilder::Int64Constant(int64_t value) {
- }
- 
- Node* WasmGraphBuilder::UndefinedValue() {
--  return LOAD_ROOT(UndefinedValue, undefined_value);
-+  return LOAD_ROOT_IN_WASM_COMPILER(UndefinedValue, undefined_value);
- }
- 
- void WasmGraphBuilder::StackCheck(
-@@ -2409,7 +2409,7 @@ Node* WasmGraphBuilder::LoadTagFromTable(uint32_t tag_index) {
- Node* WasmGraphBuilder::GetExceptionTag(Node* except_obj) {
-   return gasm_->CallBuiltin(
-       Builtin::kWasmGetOwnProperty, Operator::kEliminatable, except_obj,
--      LOAD_ROOT(wasm_exception_tag_symbol, wasm_exception_tag_symbol),
-+      LOAD_ROOT_IN_WASM_COMPILER(wasm_exception_tag_symbol, wasm_exception_tag_symbol),
-       LOAD_INSTANCE_FIELD(NativeContext, MachineType::TaggedPointer()));
- }
- 
-@@ -2418,7 +2418,7 @@ Node* WasmGraphBuilder::GetExceptionValues(Node* except_obj,
-                                            base::Vector<Node*> values) {
-   Node* values_array = gasm_->CallBuiltin(
-       Builtin::kWasmGetOwnProperty, Operator::kEliminatable, except_obj,
--      LOAD_ROOT(wasm_exception_values_symbol, wasm_exception_values_symbol),
-+      LOAD_ROOT_IN_WASM_COMPILER(wasm_exception_values_symbol, wasm_exception_values_symbol),
-       LOAD_INSTANCE_FIELD(NativeContext, MachineType::TaggedPointer()));
-   uint32_t index = 0;
-   const wasm::WasmTagSig* sig = tag->sig;
-@@ -5406,7 +5406,7 @@ void WasmGraphBuilder::ElemDrop(uint32_t elem_segment_index,
-       LOAD_INSTANCE_FIELD(ElementSegments, MachineType::TaggedPointer());
-   gasm_->StoreFixedArrayElement(
-       elem_segments, elem_segment_index,
--      LOAD_ROOT(EmptyFixedArray, empty_fixed_array),
-+      LOAD_ROOT_IN_WASM_COMPILER(EmptyFixedArray, empty_fixed_array),
-       ObjectAccess(MachineType::TaggedPointer(), kFullWriteBarrier));
- }
- 
-@@ -5517,7 +5517,7 @@ Node* WasmGraphBuilder::StructNew(uint32_t struct_index,
-   gasm_->InitializeImmutableInObject(
-       ObjectAccess(MachineType::TaggedPointer(), kNoWriteBarrier), s,
-       wasm::ObjectAccess::ToTagged(JSReceiver::kPropertiesOrHashOffset),
--      LOAD_ROOT(EmptyFixedArray, empty_fixed_array));
-+      LOAD_ROOT_IN_WASM_COMPILER(EmptyFixedArray, empty_fixed_array));
-   for (uint32_t i = 0; i < type->field_count(); i++) {
-     gasm_->StructSet(s, fields[i], type, i, kWithoutNullCheck);
-   }
-@@ -5556,7 +5556,7 @@ Node* WasmGraphBuilder::ArrayNew(uint32_t array_index,
-   gasm_->InitializeImmutableInObject(
-       ObjectAccess(MachineType::TaggedPointer(), kNoWriteBarrier), a,
-       wasm::ObjectAccess::ToTagged(JSReceiver::kPropertiesOrHashOffset),
--      LOAD_ROOT(EmptyFixedArray, empty_fixed_array));
-+      LOAD_ROOT_IN_WASM_COMPILER(EmptyFixedArray, empty_fixed_array));
-   gasm_->ArrayInitializeLength(a, length);
- 
-   ArrayFillImpl(a, gasm_->Int32Constant(0),
-@@ -5580,7 +5580,7 @@ Node* WasmGraphBuilder::ArrayNewFixed(const wasm::ArrayType* type, Node* rtt,
-   gasm_->InitializeImmutableInObject(
-       ObjectAccess(MachineType::TaggedPointer(), kNoWriteBarrier), array,
-       wasm::ObjectAccess::ToTagged(JSReceiver::kPropertiesOrHashOffset),
--      LOAD_ROOT(EmptyFixedArray, empty_fixed_array));
-+      LOAD_ROOT_IN_WASM_COMPILER(EmptyFixedArray, empty_fixed_array));
-   gasm_->ArrayInitializeLength(
-       array, SetType(Int32Constant(static_cast<int>(elements.size())),
-                      wasm::kWasmI32));
-@@ -6802,7 +6802,7 @@ Node* WasmGraphBuilder::WellKnown_StringIndexOf(
-         gasm_->MakeLabel(MachineRepresentation::kTaggedPointer);
-     gasm_->GotoIfNot(IsNull(search, wasm::kWasmStringRef), &search_not_null,
-                      search);
--    Node* null_string = LOAD_ROOT(null_string, null_string);
-+    Node* null_string = LOAD_ROOT_IN_WASM_COMPILER(null_string, null_string);
-     gasm_->Goto(&search_not_null, null_string);
-     gasm_->Bind(&search_not_null);
-     search = search_not_null.PhiAt(0);
-@@ -7263,7 +7263,7 @@ class WasmWrapperGraphBuilder : public WasmGraphBuilder {
-             return node;
-           case wasm::HeapType::kNone:
-           case wasm::HeapType::kNoFunc:
--            return LOAD_ROOT(NullValue, null_value);
-+            return LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value);
-           case wasm::HeapType::kEq:
-           case wasm::HeapType::kStruct:
-           case wasm::HeapType::kArray:
-@@ -7272,7 +7272,7 @@ class WasmWrapperGraphBuilder : public WasmGraphBuilder {
-           case wasm::HeapType::kAny: {
-             auto done = gasm_->MakeLabel(MachineRepresentation::kTaggedPointer);
-             gasm_->GotoIfNot(IsNull(node, type), &done, node);
--            gasm_->Goto(&done, LOAD_ROOT(NullValue, null_value));
-+            gasm_->Goto(&done, LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value));
-             gasm_->Bind(&done);
-             return done.PhiAt(0);
-           }
-@@ -7303,14 +7303,14 @@ class WasmWrapperGraphBuilder : public WasmGraphBuilder {
-                   Operator::kNoProperties, internal, context);
-               gasm_->Goto(&done, from_builtin);
-               gasm_->Bind(&null_label);
--              gasm_->Goto(&done, LOAD_ROOT(NullValue, null_value));
-+              gasm_->Goto(&done, LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value));
-               gasm_->Bind(&done);
-               return done.PhiAt(0);
-             } else {
-               auto done =
-                   gasm_->MakeLabel(MachineRepresentation::kTaggedPointer);
-               gasm_->GotoIfNot(IsNull(node, type), &done, node);
--              gasm_->Goto(&done, LOAD_ROOT(NullValue, null_value));
-+              gasm_->Goto(&done, LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value));
-               gasm_->Bind(&done);
-               return done.PhiAt(0);
-             }
-@@ -7354,7 +7354,7 @@ class WasmWrapperGraphBuilder : public WasmGraphBuilder {
-     if (type.is_nullable()) {
-       auto not_null = gasm_->MakeLabel();
-       gasm_->GotoIfNot(IsNull(input, wasm::kWasmExternRef), &not_null);
--      gasm_->Goto(&done, LOAD_ROOT(WasmNull, wasm_null));
-+      gasm_->Goto(&done, LOAD_ROOT_IN_WASM_COMPILER(WasmNull, wasm_null));
-       gasm_->Bind(&not_null);
-     }
-     Node* map = gasm_->LoadMap(input);
-@@ -7664,7 +7664,7 @@ class WasmWrapperGraphBuilder : public WasmGraphBuilder {
-         auto done = gasm_->MakeLabel();
-         gasm_->GotoIf(IsSmi(input), &done);
-         Node* map = gasm_->LoadMap(input);
--        Node* heap_number_map = LOAD_ROOT(HeapNumberMap, heap_number_map);
-+        Node* heap_number_map = LOAD_ROOT_IN_WASM_COMPILER(HeapNumberMap, heap_number_map);
- #if V8_MAP_PACKING
-         Node* is_heap_number = gasm_->WordEqual(heap_number_map, map);
- #else
-@@ -9226,7 +9226,7 @@ AssemblerOptions WasmStubAssemblerOptions() {
- #undef WASM_INSTANCE_OBJECT_SIZE
- #undef LOAD_INSTANCE_FIELD
- #undef LOAD_MUTABLE_INSTANCE_FIELD
--#undef LOAD_ROOT
-+#undef LOAD_ROOT_IN_WASM_COMPILER
- #undef LOAD_MUTABLE_ROOT
- 
- }  // namespace compiler
 diff --git a/src/diagnostics/perf-jit.cc b/src/diagnostics/perf-jit.cc
 index 2423c8a9..661c5a2d 100644
 --- a/v8/src/diagnostics/perf-jit.cc
@@ -539,7 +381,7 @@ diff --git a/src/heap/code-range.cc b/src/heap/code-range.cc
 index ce03e353..f2fd6623 100644
 --- a/v8/src/heap/code-range.cc
 +++ b/v8/src/heap/code-range.cc
-@@ -92,7 +92,7 @@ size_t CodeRange::GetWritableReservedAreaSize() {
+@@ -97,7 +97,7 @@
    return kReservedCodeRangePages * MemoryAllocator::GetCommitPageSize();
  }
  
@@ -548,7 +390,7 @@ index ce03e353..f2fd6623 100644
    if (v8_flags.trace_code_range_allocation) PrintF(__VA_ARGS__)
  
  bool CodeRange::InitReservation(v8::PageAllocator* page_allocator,
-@@ -141,7 +141,7 @@ bool CodeRange::InitReservation(v8::PageAllocator* page_allocator,
+@@ -146,7 +146,7 @@
        kMaxPCRelativeCodeRangeInMB > 1024 ? kMaxPCRelativeCodeRangeInMB : 4096;
    auto preferred_region = GetPreferredRegion(kRadiusInMB, kPageSize);
  
@@ -557,7 +399,7 @@ index ce03e353..f2fd6623 100644
          reinterpret_cast<void*>(preferred_region.begin()),
          reinterpret_cast<void*>(preferred_region.end()));
  
-@@ -170,10 +170,10 @@ bool CodeRange::InitReservation(v8::PageAllocator* page_allocator,
+@@ -175,10 +175,10 @@
      Address step =
          RoundDown(preferred_region.size() / kAllocationTries, kPageSize);
      for (int i = 0; i < kAllocationTries; i++) {
@@ -570,10 +412,10 @@ index ce03e353..f2fd6623 100644
                reinterpret_cast<void*>(params.requested_start_hint),
                reinterpret_cast<void*>(candidate_cage.region().begin()),
                reinterpret_cast<void*>(candidate_cage.region().end()));
-@@ -201,7 +201,7 @@ bool CodeRange::InitReservation(v8::PageAllocator* page_allocator,
+@@ -206,7 +206,7 @@
        params.requested_start_hint = kNullAddress;
        if (!VirtualMemoryCage::InitReservation(params)) return false;
-     };
+     }
 -    TRACE("=== Fallback attempt, hint=%p: [%p, %p)\n",
 +    TRACE_IN_CODE_RANGE("=== Fallback attempt, hint=%p: [%p, %p)\n",
            reinterpret_cast<void*>(params.requested_start_hint),
@@ -1110,7 +952,7 @@ index fd1ab9a3..fd1fece6 100644
  }  // namespace v8::internal::wasm
 --- a/v8/src/compiler/wasm-compiler.cc
 +++ b/v8/src/compiler/wasm-compiler.cc
-@@ -93,18 +93,18 @@
+@@ -91,18 +91,18 @@
        assert_size(WASM_INSTANCE_OBJECT_SIZE(name), type), GetInstanceData(), \
        wasm::ObjectAccess::ToTagged(WasmTrustedInstanceData::k##name##Offset))
  
@@ -1132,7 +974,16 @@ index fd1ab9a3..fd1fece6 100644
    gasm_->LoadImmutableProtectedPointerFromObject(     \
        GetInstanceData(),                              \
        wasm::ObjectAccess::ToTagged(                   \
-@@ -407,7 +407,7 @@
+@@ -115,7 +115,7 @@
+ 
+ // Use MachineType::Pointer() over Tagged() to load root pointers because they
+ // do not get compressed.
+-#define LOAD_ROOT(RootName, factory_name)                         \
++#define LOAD_ROOT_IN_WASM_COMPILER(RootName, factory_name)                         \
+   (isolate_ ? graph()->NewNode(mcgraph()->common()->HeapConstant( \
+                   isolate_->factory()->factory_name()))           \
+             : gasm_->LoadImmutable(                               \
+@@ -410,7 +410,7 @@
  }
  
  Node* WasmGraphBuilder::RefFunc(uint32_t function_index) {
@@ -1141,7 +992,16 @@ index fd1ab9a3..fd1fece6 100644
    Node* maybe_function =
        gasm_->LoadFixedArrayElementPtr(func_refs, function_index);
    auto done = gasm_->MakeLabel(MachineRepresentation::kTaggedPointer);
-@@ -2386,7 +2386,7 @@
+@@ -456,7 +456,7 @@
+ }
+ 
+ Node* WasmGraphBuilder::UndefinedValue() {
+-  return LOAD_ROOT(UndefinedValue, undefined_value);
++  return LOAD_ROOT_IN_WASM_COMPILER(UndefinedValue, undefined_value);
+ }
+ 
+ void WasmGraphBuilder::StackCheck(
+@@ -2398,7 +2398,7 @@
  
  Node* WasmGraphBuilder::LoadJSTag() {
    Node* context =
@@ -1150,7 +1010,7 @@ index fd1ab9a3..fd1fece6 100644
    Node* tag_obj =
        gasm_->Load(MachineType::TaggedPointer(), context,
                    NativeContext::SlotOffset(Context::WASM_JS_TAG_INDEX));
-@@ -2401,7 +2401,7 @@
+@@ -2413,7 +2413,7 @@
  
  Node* WasmGraphBuilder::LoadTagFromTable(uint32_t tag_index) {
    Node* tags_table =
@@ -1159,25 +1019,29 @@ index fd1ab9a3..fd1fece6 100644
    Node* tag = gasm_->LoadFixedArrayElementPtr(tags_table, tag_index);
    return tag;
  }
-@@ -2410,7 +2410,7 @@
+@@ -2421,8 +2421,8 @@
+ Node* WasmGraphBuilder::GetExceptionTag(Node* except_obj) {
    return gasm_->CallBuiltin(
        Builtin::kWasmGetOwnProperty, Operator::kEliminatable, except_obj,
-       LOAD_ROOT_IN_WASM_COMPILER(wasm_exception_tag_symbol, wasm_exception_tag_symbol),
+-      LOAD_ROOT(wasm_exception_tag_symbol, wasm_exception_tag_symbol),
 -      LOAD_INSTANCE_FIELD(NativeContext, MachineType::TaggedPointer()));
++      LOAD_ROOT_IN_WASM_COMPILER(wasm_exception_tag_symbol, wasm_exception_tag_symbol),
 +      LOAD_INSTANCE_FIELD_(NativeContext, MachineType::TaggedPointer()));
  }
  
  Node* WasmGraphBuilder::GetExceptionValues(Node* except_obj,
-@@ -2419,7 +2419,7 @@
+@@ -2430,8 +2430,8 @@
+                                            base::Vector<Node*> values) {
    Node* values_array = gasm_->CallBuiltin(
        Builtin::kWasmGetOwnProperty, Operator::kEliminatable, except_obj,
-       LOAD_ROOT_IN_WASM_COMPILER(wasm_exception_values_symbol, wasm_exception_values_symbol),
+-      LOAD_ROOT(wasm_exception_values_symbol, wasm_exception_values_symbol),
 -      LOAD_INSTANCE_FIELD(NativeContext, MachineType::TaggedPointer()));
++      LOAD_ROOT_IN_WASM_COMPILER(wasm_exception_values_symbol, wasm_exception_values_symbol),
 +      LOAD_INSTANCE_FIELD_(NativeContext, MachineType::TaggedPointer()));
    uint32_t index = 0;
    const wasm::WasmTagSig* sig = tag->sig;
    DCHECK_EQ(sig->parameter_count(), values.size());
-@@ -2879,7 +2879,7 @@
+@@ -2897,7 +2897,7 @@
      IsReturnCall continuation, Node* frame_state) {
    // Load the imported function refs array from the instance.
    Node* dispatch_table =
@@ -1186,7 +1050,7 @@ index fd1ab9a3..fd1fece6 100644
    // Access fixed array at {header_size - tag + func_index * kTaggedSize}.
    Node* func_index_intptr = gasm_->BuildChangeUint32ToUintPtr(func_index);
    Node* dispatch_table_entry_offset = gasm_->IntMul(
-@@ -2948,10 +2948,10 @@
+@@ -2968,10 +2968,10 @@
    // Load the dispatch table.
    Node* dispatch_table;
    if (table_index == 0) {
@@ -1199,7 +1063,7 @@ index fd1ab9a3..fd1fece6 100644
      dispatch_table = gasm_->LoadProtectedPointerFromObject(
          dispatch_tables,
          wasm::ObjectAccess::ToTagged(
-@@ -3384,7 +3384,7 @@
+@@ -3405,7 +3405,7 @@
                                                MachineType::Pointer());
    }
    Node* memory_bases_and_sizes =
@@ -1208,7 +1072,7 @@ index fd1ab9a3..fd1fece6 100644
    // Use {LoadByteArrayElement} even though it's a trusted array; their layout
    // is the same.
    static_assert(FixedAddressArray::OffsetOfElementAt(0) ==
-@@ -3404,7 +3404,7 @@
+@@ -3425,7 +3425,7 @@
          mem_type);
    }
    Node* memory_bases_and_sizes =
@@ -1217,7 +1081,7 @@ index fd1ab9a3..fd1fece6 100644
    // Use {LoadByteArrayElement} even though it's a trusted array; their layout
    // is the same.
    static_assert(FixedAddressArray::OffsetOfElementAt(0) ==
-@@ -3484,14 +3484,14 @@
+@@ -3504,14 +3504,14 @@
  void WasmGraphBuilder::GetGlobalBaseAndOffset(const wasm::WasmGlobal& global,
                                                Node** base, Node** offset) {
    if (global.mutability && global.imported) {
@@ -1234,7 +1098,7 @@ index fd1ab9a3..fd1fece6 100644
                                            MachineType::TaggedPointer());
        *base = gasm_->LoadFixedArrayElementAny(buffers, global.index);
  
-@@ -3511,11 +3511,11 @@
+@@ -3531,11 +3531,11 @@
      }
    } else if (global.type.is_reference()) {
      *base =
@@ -1248,7 +1112,7 @@ index fd1ab9a3..fd1fece6 100644
      *offset = gasm_->IntPtrConstant(global.offset);
    }
  }
-@@ -5271,7 +5271,7 @@
+@@ -5293,7 +5293,7 @@
    DCHECK_LT(data_segment_index, env_->module->num_declared_data_segments);
  
    Node* seg_size_array =
@@ -1257,25 +1121,56 @@ index fd1ab9a3..fd1fece6 100644
    static_assert(wasm::kV8MaxWasmDataSegments <= kMaxUInt32 >> 2);
    auto access = ObjectAccess(MachineType::Int32(), kNoWriteBarrier);
    gasm_->StoreToObject(
-@@ -5403,7 +5403,7 @@
+@@ -5428,10 +5428,10 @@
    DCHECK_LT(elem_segment_index, env_->module->elem_segments.size());
- 
+
    Node* elem_segments =
 -      LOAD_INSTANCE_FIELD(ElementSegments, MachineType::TaggedPointer());
 +      LOAD_INSTANCE_FIELD_(ElementSegments, MachineType::TaggedPointer());
    gasm_->StoreFixedArrayElement(
        elem_segments, elem_segment_index,
-       LOAD_ROOT_IN_WASM_COMPILER(EmptyFixedArray, empty_fixed_array),
-@@ -5459,7 +5459,7 @@
+-      LOAD_ROOT(EmptyFixedArray, empty_fixed_array),
++      LOAD_ROOT_IN_WASM_COMPILER(EmptyFixedArray, empty_fixed_array),
+       ObjectAccess(MachineType::TaggedPointer(), kFullWriteBarrier));
+ }
+ 
+@@ -5487,7 +5487,7 @@
  }
  
  Node* WasmGraphBuilder::TableSize(uint32_t table_index) {
 -  Node* tables = LOAD_INSTANCE_FIELD(Tables, MachineType::TaggedPointer());
 +  Node* tables = LOAD_INSTANCE_FIELD_(Tables, MachineType::TaggedPointer());
    Node* table = gasm_->LoadFixedArrayElementAny(tables, table_index);
- 
+
    int length_field_size = WasmTableObject::kCurrentLengthOffsetEnd -
-@@ -6385,7 +6385,7 @@
+@@ -5546,7 +5546,7 @@
+   gasm_->InitializeImmutableInObject(
+       ObjectAccess(MachineType::TaggedPointer(), kNoWriteBarrier), s,
+       wasm::ObjectAccess::ToTagged(JSReceiver::kPropertiesOrHashOffset),
+-      LOAD_ROOT(EmptyFixedArray, empty_fixed_array));
++      LOAD_ROOT_IN_WASM_COMPILER(EmptyFixedArray, empty_fixed_array));
+   for (uint32_t i = 0; i < type->field_count(); i++) {
+     gasm_->StructSet(s, fields[i], type, i, kWithoutNullCheck);
+   }
+@@ -5585,7 +5585,7 @@
+   gasm_->InitializeImmutableInObject(
+       ObjectAccess(MachineType::TaggedPointer(), kNoWriteBarrier), a,
+       wasm::ObjectAccess::ToTagged(JSReceiver::kPropertiesOrHashOffset),
+-      LOAD_ROOT(EmptyFixedArray, empty_fixed_array));
++      LOAD_ROOT_IN_WASM_COMPILER(EmptyFixedArray, empty_fixed_array));
+   gasm_->ArrayInitializeLength(a, length);
+ 
+   ArrayFillImpl(a, gasm_->Int32Constant(0),
+@@ -5609,7 +5609,7 @@
+   gasm_->InitializeImmutableInObject(
+       ObjectAccess(MachineType::TaggedPointer(), kNoWriteBarrier), array,
+       wasm::ObjectAccess::ToTagged(JSReceiver::kPropertiesOrHashOffset),
+-      LOAD_ROOT(EmptyFixedArray, empty_fixed_array));
++      LOAD_ROOT_IN_WASM_COMPILER(EmptyFixedArray, empty_fixed_array));
+   gasm_->ArrayInitializeLength(
+       array, SetType(Int32Constant(static_cast<int>(elements.size())),
+                      wasm::kWasmI32));
+@@ -6416,7 +6416,7 @@
    return gasm_->CallBuiltin(
        Builtin::kStringAdd_CheckNone, Operator::kNoDeopt | Operator::kNoThrow,
        head, tail,
@@ -1284,7 +1179,16 @@ index fd1ab9a3..fd1fece6 100644
  }
  
  Node* WasmGraphBuilder::StringEqual(Node* a, wasm::ValueType a_type, Node* b,
-@@ -6845,7 +6845,7 @@
+@@ -6833,7 +6833,7 @@
+         gasm_->MakeLabel(MachineRepresentation::kTaggedPointer);
+     gasm_->GotoIfNot(IsNull(search, wasm::kWasmStringRef), &search_not_null,
+                      search);
+-    Node* null_string = LOAD_ROOT(null_string, null_string);
++    Node* null_string = LOAD_ROOT_IN_WASM_COMPILER(null_string, null_string);
+     gasm_->Goto(&search_not_null, null_string);
+     gasm_->Bind(&search_not_null);
+     search = search_not_null.PhiAt(0);
+@@ -6876,7 +6876,7 @@
        zone_, false, param_count, CallDescriptor::kCanUseRoots,
        Operator::kNoDeopt | Operator::kNoWrite);
    Node* callees_array =
@@ -1293,7 +1197,80 @@ index fd1ab9a3..fd1fece6 100644
    Node* callee = gasm_->LoadFixedArrayElementPtr(callees_array, func_index);
    Node* context = gasm_->LoadContextFromJSFunction(callee);
    BuildModifyThreadInWasmFlag(false);
-@@ -9224,8 +9224,10 @@
+@@ -7086,8 +7086,8 @@
+   Node* IsNull(Node* object, wasm::CanonicalValueType type) {
+     // We immediately lower null in wrappers, as they do not go through a
+     // lowering phase.
+-    Node* null = type.use_wasm_null() ? LOAD_ROOT(WasmNull, wasm_null)
+-                                      : LOAD_ROOT(NullValue, null_value);
++    Node* null = type.use_wasm_null() ? LOAD_ROOT_IN_WASM_COMPILER(WasmNull, wasm_null)
++                                      : LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value);
+     return gasm_->TaggedEqual(object, null);
+   }
+ 
+@@ -7300,7 +7300,7 @@
+             return node;
+           case wasm::HeapType::kNone:
+           case wasm::HeapType::kNoFunc:
+-            return LOAD_ROOT(NullValue, null_value);
++            return LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value);
+           case wasm::HeapType::kEq:
+           case wasm::HeapType::kStruct:
+           case wasm::HeapType::kArray:
+@@ -7309,7 +7309,7 @@
+           case wasm::HeapType::kAny: {
+             auto done = gasm_->MakeLabel(MachineRepresentation::kTaggedPointer);
+             gasm_->GotoIfNot(IsNull(node, type), &done, node);
+-            gasm_->Goto(&done, LOAD_ROOT(NullValue, null_value));
++            gasm_->Goto(&done, LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value));
+             gasm_->Bind(&done);
+             return done.PhiAt(0);
+           }
+@@ -7341,14 +7341,14 @@
+                   Operator::kNoProperties, internal, context);
+               gasm_->Goto(&done, from_builtin);
+               gasm_->Bind(&null_label);
+-              gasm_->Goto(&done, LOAD_ROOT(NullValue, null_value));
++              gasm_->Goto(&done, LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value));
+               gasm_->Bind(&done);
+               return done.PhiAt(0);
+             } else {
+               auto done =
+                   gasm_->MakeLabel(MachineRepresentation::kTaggedPointer);
+               gasm_->GotoIfNot(IsNull(node, type), &done, node);
+-              gasm_->Goto(&done, LOAD_ROOT(NullValue, null_value));
++              gasm_->Goto(&done, LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value));
+               gasm_->Bind(&done);
+               return done.PhiAt(0);
+             }
+@@ -7394,7 +7394,7 @@
+     if (type.is_nullable()) {
+       auto not_null = gasm_->MakeLabel();
+       gasm_->GotoIfNot(IsNull(input, wasm::kCanonicalExternRef), &not_null);
+-      gasm_->Goto(&done, LOAD_ROOT(WasmNull, wasm_null));
++      gasm_->Goto(&done, LOAD_ROOT_IN_WASM_COMPILER(WasmNull, wasm_null));
+       gasm_->Bind(&not_null);
+     }
+     Node* map = gasm_->LoadMap(input);
+@@ -7699,7 +7699,7 @@
+         auto done = gasm_->MakeLabel();
+         gasm_->GotoIf(IsSmi(input), &done);
+         Node* map = gasm_->LoadMap(input);
+-        Node* heap_number_map = LOAD_ROOT(HeapNumberMap, heap_number_map);
++        Node* heap_number_map = LOAD_ROOT_IN_WASM_COMPILER(HeapNumberMap, heap_number_map);
+ #if V8_MAP_PACKING
+         Node* is_heap_number = gasm_->WordEqual(heap_number_map, map);
+ #else
+@@ -7902,7 +7902,7 @@
+                   &bad_suspender, BranchHint::kFalse);
+
+     if (v8_flags.stress_wasm_stack_switching) {
+-      Node* undefined = LOAD_ROOT(UndefinedValue, undefined_value);
++      Node* undefined = LOAD_ROOT_IN_WASM_COMPILER(UndefinedValue, undefined_value);
+       Node* for_stress_testing = gasm_->TaggedEqual(
+           gasm_->Load(
+               MachineType::TaggedPointer(), suspender,
+@@ -9022,9 +9022,11 @@
  
  #undef FATAL_UNSUPPORTED_OPCODE
  #undef WASM_INSTANCE_OBJECT_SIZE
@@ -1301,76 +1278,12 @@ index fd1ab9a3..fd1fece6 100644
 +#undef LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD_
 +#undef LOAD_INSTANCE_FIELD_
  #undef LOAD_MUTABLE_INSTANCE_FIELD
+-#undef LOAD_ROOT
 +#undef LOAD_PROTECTED_INSTANCE_FIELD_
- #undef LOAD_ROOT_IN_WASM_COMPILER
++#undef LOAD_ROOT_IN_WASM_COMPILER
  #undef LOAD_MUTABLE_ROOT
  
---- a/v8/src/heap/cppgc/sweeper.cc
-+++ b/v8/src/heap/cppgc/sweeper.cc
-@@ -30,6 +30,8 @@
- #include "src/heap/cppgc/stats-collector.h"
- #include "src/heap/cppgc/task-handle.h"
- 
-+#define StickyBits StickyBits_Sweeper
-+
- namespace cppgc::internal {
- 
- namespace {
-@@ -1580,3 +1582,5 @@
- }
- 
- }  // namespace cppgc::internal
-+
-+#undef StickyBits
---- a/v8/src/heap/cppgc/compactor.cc
-+++ b/v8/src/heap/cppgc/compactor.cc
-@@ -20,6 +20,8 @@
- #include "src/heap/cppgc/raw-heap.h"
- #include "src/heap/cppgc/stats-collector.h"
- 
-+#define StickyBits StickyBits_Compactor
-+
- namespace cppgc {
- namespace internal {
- 
-@@ -543,3 +545,5 @@
- 
- }  // namespace internal
- }  // namespace cppgc
-+
-+#undef StickyBits
---- a/v8/src/heap/traced-handles-marking-visitor.h
-+++ b/v8/src/heap/traced-handles-marking-visitor.h
-@@ -34,7 +34,7 @@
-   const TracedHandles::MarkMode mark_mode_;
- };
- 
--#endif  // V8_HEAP_TRACED_HANDLES_MARKING_VISITOR_H_
--
- }  // namespace internal
- }  // namespace v8
-+
-+#endif  // V8_HEAP_TRACED_HANDLES_MARKING_VISITOR_H_
---- a/v8/src/heap/scavenger.cc
-+++ b/v8/src/heap/scavenger.cc
-@@ -676,7 +676,7 @@
-           promotion_list->large_object_promotion_list_) {}
- 
- namespace {
--MainAllocator* CreateSharedOldAllocator(Heap* heap) {
-+MainAllocator* CreateSharedOldAllocator2(Heap* heap) {
-   if (v8_flags.shared_string_table && heap->isolate()->has_shared_space()) {
-     return new MainAllocator(heap, heap->shared_allocation_space(),
-                              MainAllocator::kInGC);
-@@ -700,7 +700,7 @@
-       pretenuring_handler_(heap_->pretenuring_handler()),
-       local_pretenuring_feedback_(PretenuringHandler::kInitialFeedbackCapacity),
-       allocator_(heap, CompactionSpaceKind::kCompactionSpaceForScavenge),
--      shared_old_allocator_(CreateSharedOldAllocator(heap_)),
-+      shared_old_allocator_(CreateSharedOldAllocator2(heap_)),
-       is_logging_(is_logging),
-       is_incremental_marking_(heap->incremental_marking()->IsMarking()),
-       is_compacting_(heap->incremental_marking()->IsCompacting()),
+ }  // namespace v8::internal::compiler
 --- a/v8/src/maglev/maglev-graph-builder.cc
 +++ b/v8/src/maglev/maglev-graph-builder.cc
 @@ -12793,3 +12793,5 @@
@@ -1512,3 +1425,11 @@ index fd1ab9a3..fd1fece6 100644
 +
 +#undef __
 +#undef TRACE
+--- a/v8/src/maglev/arm64/maglev-ir-arm64.cc
++++ b/v8/src/maglev/arm64/maglev-ir-arm64.cc
+@@ -834,3 +834,5 @@
+ }  // namespace maglev
+ }  // namespace internal
+ }  // namespace v8
++
++#undef __
