@@ -1,3 +1,4 @@
+# Contributor: @ian4hu
 TERMUX_PKG_HOMEPAGE=https://re2c.org/
 TERMUX_PKG_DESCRIPTION="Lexer generator for C, C++ and Go."
 TERMUX_PKG_LICENSE="Public Domain"

@@ -1,3 +1,4 @@
+# Contributor: @DLC01
 TERMUX_PKG_HOMEPAGE=https://github.com/mstorsjo/fdk-aac
 TERMUX_PKG_DESCRIPTION="Fraunhofer FDK AAC Codec Library"
 TERMUX_PKG_LICENSE="custom"

@@ -1,3 +1,4 @@
+# Contributor: @Neo-Oli
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/ed/
 TERMUX_PKG_DESCRIPTION="Classic UNIX line editor"
 TERMUX_PKG_LICENSE="GPL-2.0"

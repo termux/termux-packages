@@ -1,3 +1,4 @@
+# Contributor: @Neo-Oli
 TERMUX_PKG_HOMEPAGE=https://github.com/Parchive/par2cmdline
 TERMUX_PKG_DESCRIPTION="par2cmdline is a PAR 2.0 compatible file verification and repair tool"
 TERMUX_PKG_LICENSE="GPL-2.0"

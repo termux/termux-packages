@@ -1,3 +1,4 @@
+# Contributor: @Neo-Oli
 TERMUX_PKG_HOMEPAGE=https://www.colordiff.org/
 TERMUX_PKG_DESCRIPTION="Tool to colorize 'diff' output"
 TERMUX_PKG_LICENSE="GPL-2.0"

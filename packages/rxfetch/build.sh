@@ -1,3 +1,4 @@
+# Contributor: @PeroSar
 TERMUX_PKG_HOMEPAGE=https://github.com/Mangeshrex/rxfetch
 TERMUX_PKG_DESCRIPTION="A custom system info fetching tool"
 TERMUX_PKG_LICENSE="MIT"

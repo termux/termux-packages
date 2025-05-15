@@ -1,3 +1,4 @@
+# Contributor: @s00se
 TERMUX_PKG_HOMEPAGE="https://github.com/RfidResearchGroup/proxmark3"
 TERMUX_PKG_DESCRIPTION="The Swiss Army Knife of RFID Research - RRG/Iceman repo"
 TERMUX_PKG_LICENSE="GPL-3.0"

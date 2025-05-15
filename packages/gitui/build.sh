@@ -1,3 +1,4 @@
+# Contributor: @PeroSar
 TERMUX_PKG_HOMEPAGE=https://github.com/extrawurst/gitui
 TERMUX_PKG_DESCRIPTION="Blazing fast terminal-ui for git written in rust"
 TERMUX_PKG_LICENSE="MIT"

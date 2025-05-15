@@ -1,3 +1,4 @@
+# Contributor: @Neo-Oli
 TERMUX_PKG_HOMEPAGE=https://github.com/xorg62/tty-clock
 TERMUX_PKG_DESCRIPTION="Simple terminal clock"
 TERMUX_PKG_LICENSE="BSD 3-Clause"

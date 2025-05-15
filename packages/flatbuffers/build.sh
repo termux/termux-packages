@@ -1,3 +1,4 @@
+# Contributor: @librehat
 TERMUX_PKG_HOMEPAGE=https://github.com/google/flatbuffers
 TERMUX_PKG_DESCRIPTION="Memory Efficient Serialization Library"
 TERMUX_PKG_LICENSE="Apache-2.0"

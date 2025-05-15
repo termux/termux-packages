@@ -1,3 +1,4 @@
+# Contributor: @ravener
 TERMUX_PKG_HOMEPAGE=https://github.com/matsuyoshi30/germanium
 TERMUX_PKG_DESCRIPTION="Generate image from source code"
 TERMUX_PKG_LICENSE="MIT"

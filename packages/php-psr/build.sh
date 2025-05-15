@@ -1,3 +1,4 @@
+# Contributor: @ian4hu
 TERMUX_PKG_HOMEPAGE=https://github.com/jbboehr/php-psr
 TERMUX_PKG_DESCRIPTION="PHP extension providing the accepted PSR interfaces"
 TERMUX_PKG_LICENSE="BSD Simplified"

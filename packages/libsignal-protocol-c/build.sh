@@ -1,3 +1,4 @@
+# Contributor: @Neo-Oli
 TERMUX_PKG_HOMEPAGE=https://github.com/signalapp/libsignal-protocol-c
 TERMUX_PKG_DESCRIPTION="Signal Protocol C Library"
 TERMUX_PKG_LICENSE="GPL-3.0"

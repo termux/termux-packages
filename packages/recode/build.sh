@@ -1,3 +1,4 @@
+# Contributor: @s00se
 TERMUX_PKG_HOMEPAGE="https://github.com/pinard/Recode"
 TERMUX_PKG_DESCRIPTION="Charset converter tool and library"
 TERMUX_PKG_LICENSE="GPL-3.0"

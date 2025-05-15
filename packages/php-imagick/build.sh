@@ -1,3 +1,4 @@
+# Contributor: @ian4hu
 TERMUX_PKG_HOMEPAGE=https://github.com/Imagick/imagick
 TERMUX_PKG_DESCRIPTION="The Imagick PHP extension"
 TERMUX_PKG_LICENSE="PHP-3.01"
