@@ -2,11 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://github.com/microsoft/vscode
 TERMUX_PKG_DESCRIPTION="Visual Studio Code - OSS"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux-user-repository"
-TERMUX_PKG_VERSION="1.96.0"
+TERMUX_PKG_VERSION="1.100.0"
 TERMUX_PKG_SRCURL=git+https://github.com/microsoft/vscode
 TERMUX_PKG_GIT_BRANCH="$TERMUX_PKG_VERSION"
 TERMUX_PKG_DEPENDS="electron-for-code-oss, libx11, libxkbfile, libsecret, ripgrep"
 TERMUX_PKG_BUILD_DEPENDS="electron-headers-for-code-oss"
+TERMUX_PKG_ANTI_BUILD_DEPENDS="electron-for-code-oss"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
@@ -17,7 +18,7 @@ TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
 _setup_nodejs_20() {
-	local NODEJS_VERSION=20.18.0
+	local NODEJS_VERSION=20.19.1
 	local NODEJS_FOLDER=${TERMUX_PKG_CACHEDIR}/build-tools/nodejs-${NODEJS_VERSION}
 
 	if [ ! -x "$NODEJS_FOLDER/bin/node" ]; then
@@ -25,7 +26,7 @@ _setup_nodejs_20() {
 		local NODEJS_TAR_FILE=$TERMUX_PKG_TMPDIR/nodejs-$NODEJS_VERSION.tar.xz
 		termux_download https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.xz \
 			"$NODEJS_TAR_FILE" \
-			4543670b589593f8fa5f106111fd5139081da42bb165a9239f05195e405f240a
+			b6c4cedfc81fc544b9993bc8a3628b5c0aa7a169fbaa293460abc0418d0fabb6
 		tar -xf "$NODEJS_TAR_FILE" -C "$NODEJS_FOLDER" --strip-components=1
 	fi
 	export PATH="$NODEJS_FOLDER/bin:$PATH"
@@ -40,7 +41,7 @@ termux_step_post_get_source() {
 
 	# Check whether the prebuilt electron version matches the electron version from package.json
 	local _electron_verion="$(jq -r '.devDependencies.electron' $TERMUX_PKG_SRCDIR/package.json)"
-	local _header_version="$(. $TERMUX_SCRIPTDIR/x11-packages/electron-for-code-oss/build.sh; echo $TERMUX_PKG_VERSION)"
+	local _header_version="$(. $TERMUX_SCRIPTDIR/x11-packages/electron-host-tools-for-code-oss/build.sh; echo $TERMUX_PKG_VERSION)"
 	if [ "$_electron_verion" != "$_header_version" ]; then
 		termux_error_exit "Version mismatch: version in package.json is $_electron_verion, prebuilt electron version $_header_version."
 	fi
