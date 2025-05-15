@@ -1,3 +1,4 @@
+# Contributor: @Neo-Oli
 TERMUX_PKG_HOMEPAGE=http://nyancat.dakko.us
 TERMUX_PKG_DESCRIPTION="Nyancat in your terminal, rendered through ANSI escape sequences."
 TERMUX_PKG_LICENSE="NCSA"

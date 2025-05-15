@@ -1,3 +1,4 @@
+# Contributor: @rafaelmartins
 TERMUX_PKG_HOMEPAGE=https://blogc.rgm.io/
 TERMUX_PKG_DESCRIPTION="A blog compiler"
 TERMUX_PKG_LICENSE="BSD 3-Clause"

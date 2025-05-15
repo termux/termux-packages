@@ -1,3 +1,4 @@
+# Contributor: @s00se
 TERMUX_PKG_HOMEPAGE="https://github.com/alex-sector/dns2tcp"
 TERMUX_PKG_DESCRIPTION="dns2tcp is a tool for relaying TCP connections over DNS"
 TERMUX_PKG_LICENSE="GPL-2.0"

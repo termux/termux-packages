@@ -1,3 +1,4 @@
+# Contributor: @Neo-Oli
 TERMUX_PKG_HOMEPAGE=https://otr.cypherpunks.ca
 TERMUX_PKG_DESCRIPTION="Off-the-Record (OTR) Messaging allows you to have private conversations over instant messaging by providing: Encryption, Authentication, Deniability, Perfect forward secrecy"
 TERMUX_PKG_LICENSE="LGPL-2.0"

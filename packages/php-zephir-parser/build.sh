@@ -1,3 +1,4 @@
+# Contributor: @ian4hu
 TERMUX_PKG_HOMEPAGE=https://github.com/phalcon/php-zephir-parser
 TERMUX_PKG_DESCRIPTION="The Zephir Parser delivered as a C extension for the PHP language"
 TERMUX_PKG_LICENSE="MIT"

@@ -1,3 +1,4 @@
+# Contributor: @librehat
 TERMUX_PKG_HOMEPAGE=https://www.codesink.org/mimetic_mime_library.html
 TERMUX_PKG_DESCRIPTION="A C++ Email library (MIME)"
 TERMUX_PKG_LICENSE="MIT"

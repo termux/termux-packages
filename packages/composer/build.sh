@@ -1,3 +1,4 @@
+# Contributor: @PuneetGopinath
 TERMUX_PKG_HOMEPAGE=https://getcomposer.org/
 TERMUX_PKG_DESCRIPTION="Dependency Manager for PHP"
 TERMUX_PKG_LICENSE="MIT"

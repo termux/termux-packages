@@ -1,3 +1,4 @@
+# Contributor: @ian4hu
 TERMUX_PKG_HOMEPAGE=http://php.net/apcu
 TERMUX_PKG_DESCRIPTION="APCu - APC User Cache"
 TERMUX_PKG_LICENSE="PHP-3.01"

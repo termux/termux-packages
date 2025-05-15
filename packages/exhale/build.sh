@@ -1,3 +1,4 @@
+# Contributor: @DLC01
 TERMUX_PKG_HOMEPAGE=https://gitlab.com/ecodis/exhale
 TERMUX_PKG_DESCRIPTION="Open source xHE-AAC encoder"
 TERMUX_PKG_LICENSE="custom"

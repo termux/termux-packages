@@ -1,3 +1,4 @@
+# Contributor: @DLC01
 TERMUX_PKG_HOMEPAGE=https://github.com/nu774/fdkaac
 TERMUX_PKG_DESCRIPTION="command line encoder frontend for libfdk-aac"
 TERMUX_PKG_LICENSE="ZLIB"

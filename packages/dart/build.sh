@@ -1,3 +1,4 @@
+# Contributor: @samujjal-gogoi
 TERMUX_PKG_HOMEPAGE=https://dart.dev/
 TERMUX_PKG_DESCRIPTION="Dart is a general-purpose programming language"
 TERMUX_PKG_LICENSE="BSD"

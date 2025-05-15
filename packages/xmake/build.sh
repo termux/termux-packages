@@ -1,3 +1,4 @@
+# Contributor: @waruqi
 TERMUX_PKG_HOMEPAGE=https://xmake.io/
 TERMUX_PKG_DESCRIPTION="A cross-platform build utility based on Lua"
 TERMUX_PKG_LICENSE="Apache-2.0"

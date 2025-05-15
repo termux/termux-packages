@@ -1,3 +1,4 @@
+# Contributor: @michalbednarski
 TERMUX_PKG_HOMEPAGE=https://github.com/termux/TermuxAm
 TERMUX_PKG_DESCRIPTION="Android Oreo-compatible am command reimplementation"
 TERMUX_PKG_LICENSE="Apache-2.0"

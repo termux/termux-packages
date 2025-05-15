@@ -1,3 +1,4 @@
+# Contributor: @medzikuser
 TERMUX_PKG_HOMEPAGE=https://github.com/xxxserxxx/gotop
 TERMUX_PKG_DESCRIPTION="A terminal based graphical activity monitor inspired by gtop and vtop"
 TERMUX_PKG_LICENSE="MIT"
