@@ -1,13 +1,49 @@
 #!/usr/bin/env python3
 "Script to generate a build order respecting package dependencies."
 
-import json, os, re, sys
+import json, os, re, sys, traceback
 
+from graphlib import CycleError
+from graphlib import TopologicalSorter
 from itertools import filterfalse
 
 termux_arch = os.getenv('TERMUX_ARCH') or 'aarch64'
 termux_global_library = os.getenv('TERMUX_GLOBAL_LIBRARY') or 'false'
 termux_pkg_library = os.getenv('TERMUX_PACKAGE_LIBRARY') or 'bionic'
+
+
+MAX_LOG_LEVEL = 5 # Default: `5` (VVVERBOSE=5)
+LOG_LEVEL = 1 # Default: `1` (OFF=0, NORMAL=1, DEBUG=2, VERBOSE=3, VVERBOSE=4 and VVVERBOSE=5)
+try:
+    log_level = os.getenv('TERMUX_PKGS__BUILD_ORDER__LOG_LEVEL')
+    if log_level:
+        log_level = int(log_level)
+        if log_level >= 0 and log_level <= MAX_LOG_LEVEL:
+            LOG_LEVEL = log_level
+except ValueError:
+    pass
+
+def log_error(string):
+    if LOG_LEVEL >= 1:
+        print(string, file=sys.stderr)
+
+def log_error_debug(string):
+    if LOG_LEVEL >= 2:
+        print(string, file=sys.stderr)
+
+def log_error_verbose(string):
+    if LOG_LEVEL >= 3:
+        print(string, file=sys.stderr)
+
+def log_error_vverbose(string):
+    if LOG_LEVEL >= 4:
+        print(string, file=sys.stderr)
+
+def log_error_vvverbose(string):
+    if LOG_LEVEL >= 5:
+        print(string, file=sys.stderr)
+
+
 
 def unique_everseen(iterable, key=None):
     """List unique elements, preserving order. Remember all elements ever seen.
@@ -30,7 +66,8 @@ def unique_everseen(iterable, key=None):
 
 def die(msg):
     "Exit the process with an error message."
-    sys.exit('ERROR: ' + msg)
+    print(msg, file=sys.stderr)
+    sys.exit(1)
 
 def parse_build_file_dependencies_with_vars(path, vars):
     "Extract the dependencies specified in the given variables of a build.sh or *.subpackage.sh file."
@@ -60,7 +97,8 @@ def parse_build_file_dependencies_with_vars(path, vars):
 
 def parse_build_file_dependencies(path):
     "Extract the dependencies of a build.sh or *.subpackage.sh file."
-    return parse_build_file_dependencies_with_vars(path, ('TERMUX_PKG_DEPENDS', 'TERMUX_PKG_BUILD_DEPENDS', 'TERMUX_SUBPKG_DEPENDS', 'TERMUX_PKG_DEVPACKAGE_DEPENDS'))
+    # - https://github.com/termux/termux-packages/commit/6e70277f
+    return parse_build_file_dependencies_with_vars(path, ('TERMUX_PKG_DEPENDS', 'TERMUX_PKG_BUILD_DEPENDS', 'TERMUX_SUBPKG_DEPENDS'))
 
 def parse_build_file_antidependencies(path):
     "Extract the antidependencies of a build.sh file."
@@ -105,7 +143,6 @@ class TermuxPackage(object):
         self.dir = dir_path
         self.fast_build_mode = fast_build_mode
         self.name = os.path.basename(self.dir)
-        self.pkgs_cache = []
         if "gpkg" in self.dir.split("/")[-2].split("-") and not has_prefix_glibc(self.name):
             self.name = add_prefix_glibc_to_pkgname(self.name)
 
@@ -115,6 +152,7 @@ class TermuxPackage(object):
             raise Exception("build.sh not found for package '" + self.name + "'")
 
         self.deps = parse_build_file_dependencies(build_sh_path)
+        self.original_deps = self.deps.copy()
         self.antideps = parse_build_file_antidependencies(build_sh_path)
         self.excluded_arches = parse_build_file_excluded_arches(build_sh_path)
         self.only_installing = parse_build_file_variable_bool(build_sh_path, 'TERMUX_PKG_ONLY_INSTALLING')
@@ -147,34 +185,64 @@ class TermuxPackage(object):
     def __repr__(self):
         return "<{} '{}'>".format(self.__class__.__name__, self.name)
 
-    def recursive_dependencies(self, pkgs_map, dir_root=None):
+    def recursive_dependencies(self, pkgs_map, build_graph, recursed_pkgs, indent, dir_root=None):
         "All the dependencies of the package, both direct and indirect."
+        log_error_verbose("%sp_start(%s) deps: %s" % (' ' * indent, self.name, ','.join(sorted(self.deps))))
+
         result = []
-        is_root = dir_root == None
+        is_root = dir_root is None
         if is_root:
             dir_root = self.dir
         if is_root or not self.fast_build_mode or not self.separate_subdeps:
             for subpkg in self.subpkgs:
                 if f"{self.name}-static" != subpkg.name:
+                    if os.getenv('TERMUX_ORIG_PKG_NAME') != subpkg.name and \
+                        os.getenv('TERMUX_PKGS__BUILD__NO_BUILD_UNNEEDED_SUBPACKAGES') == "true" and \
+                        subpkg.name not in self.original_deps:
+                        if LOG_LEVEL >= 3:
+                            log_error_debug("%sNot adding subpackage \"%s\" of package \"%s\" since its not a dependency of parent package and TERMUX_PKGS__BUILD__NO_BUILD_UNNEEDED_SUBPACKAGES is enabled" % (' ' * indent, subpkg.name, self.name))
+                        else:
+                            log_error_debug("Not adding subpackage \"%s\" of package \"%s\" since its not a dependency of parent package and TERMUX_PKGS__BUILD__NO_BUILD_UNNEEDED_SUBPACKAGES is enabled" % (subpkg.name, self.name))
+                        continue
                     self.deps.add(subpkg.name)
                     self.deps |= subpkg.deps
             self.deps -= self.antideps
+
+            # Do not depend on itself.
             self.deps.discard(self.name)
+
+            # Do not depend on any sub package.
             if not self.fast_build_mode or self.dir == dir_root:
                 self.deps.difference_update([subpkg.name for subpkg in self.subpkgs])
+
+        log_error_vverbose("%sp_loop(%s) deps: %s" % (' ' * indent, self.name, ','.join(sorted(self.deps))))
         for dependency_name in sorted(self.deps):
             if termux_global_library == "true" and termux_pkg_library == "glibc" and not has_prefix_glibc(dependency_name):
                 mod_dependency_name = add_prefix_glibc_to_pkgname(dependency_name)
                 dependency_name = mod_dependency_name if mod_dependency_name in pkgs_map else dependency_name
-            if dependency_name not in self.pkgs_cache:
-                self.pkgs_cache.append(dependency_name)
-                dependency_package = pkgs_map[dependency_name]
+
+            dependency_package = pkgs_map[dependency_name]
+            if dependency_name not in recursed_pkgs:
+                recursed_pkgs.add(dependency_name)
                 if dependency_package.dir != dir_root and dependency_package.only_installing and not self.fast_build_mode:
                     continue
-                result += dependency_package.recursive_dependencies(pkgs_map, dir_root)
+
+                result += dependency_package.recursive_dependencies(pkgs_map, build_graph, recursed_pkgs, indent + 4, dir_root)
+
                 if dependency_package.accept_dep_scr or dependency_package.dir != dir_root:
                     result += [dependency_package]
-        return unique_everseen(result)
+                    dependency_edge = add_node_to_build_graph(build_graph, self, dependency_package)
+                    if dependency_edge:
+                        log_error_verbose("%sp_add(%s): dep: %s: %s" % (' ' * (indent + 4), self.name, dependency_name, dependency_edge))
+            else:
+                if dependency_package.accept_dep_scr or dependency_package.dir != dir_root:
+                    dependency_edge = add_node_to_build_graph(build_graph, self, dependency_package)
+                    if dependency_edge:
+                        log_error_verbose("%sp_readd(%s): dep: %s: %s" % (' ' * (indent + 4), self.name, dependency_name, dependency_edge))
+
+        result = list(unique_everseen(result))
+        log_error_verbose("%sp_end(%s) res: %s" % (' ' * indent, self.name, ','.join([p.name for p in result])))
+        return result
 
 class TermuxSubPackage:
     "A sub-package represented by a ${PACKAGE_NAME}.subpackage.sh file."
@@ -200,21 +268,52 @@ class TermuxSubPackage:
     def __repr__(self):
         return "<{} '{}' parent='{}'>".format(self.__class__.__name__, self.name, self.parent)
 
-    def recursive_dependencies(self, pkgs_map, dir_root=None):
+    def recursive_dependencies(self, pkgs_map, build_graph, recursed_pkgs, indent, dir_root=None):
         """All the dependencies of the subpackage, both direct and indirect.
         Only relevant when building in fast-build mode"""
+        log_error_verbose("%ss_start(%s) deps: %s" % (' ' * indent, self.name, ','.join(sorted(self.deps))))
+
         result = []
-        if dir_root == None:
+        if dir_root is None:
             dir_root = self.dir
+
+        log_error_vverbose("%ss_loop(%s) deps: %s" % (' ' * indent, self.name, ','.join(sorted(self.deps))))
         for dependency_name in sorted(self.deps):
+            # Do not depend parent on current subpackage.
             if dependency_name == self.parent.name:
                 self.parent.deps.discard(self.name)
+
             dependency_package = pkgs_map[dependency_name]
-            if dependency_package not in self.parent.subpkgs:
-                result += dependency_package.recursive_dependencies(pkgs_map, dir_root=dir_root)
-            if dependency_package.accept_dep_scr or dependency_package.dir != dir_root:
-                result += [dependency_package]
-        return unique_everseen(result)
+            if dependency_name not in recursed_pkgs:
+                recursed_pkgs.add(dependency_name)
+
+                if dependency_package not in self.parent.subpkgs:
+                    result += dependency_package.recursive_dependencies(pkgs_map, build_graph, recursed_pkgs, indent + 4, dir_root=dir_root)
+
+                if dependency_package.accept_dep_scr or dependency_package.dir != dir_root:
+                    result += [dependency_package]
+                    dependency_edge = add_node_to_build_graph(build_graph, self, dependency_package)
+                    if dependency_edge:
+                        log_error_verbose("%ss_add(%s): dep: %s: %s" % (' ' * (indent + 4), self.name, dependency_name, dependency_edge))
+            else:
+                if dependency_package.accept_dep_scr or dependency_package.dir != dir_root:
+                    dependency_edge = add_node_to_build_graph(build_graph, self, dependency_package)
+                    if dependency_edge:
+                        log_error_verbose("%ss_readd(%s): dep: %s: %s" % (' ' * (indent + 4), self.name, dependency_name, dependency_edge))
+
+        result = list(unique_everseen(result))
+        log_error_verbose("%ss_end(%s) res: %s" % (' ' * indent, self.name, ','.join([p.name for p in result])))
+        return result
+
+def add_node_to_build_graph(build_graph, package, dependency_package):
+    package_name = package.parent.name if isinstance(package, TermuxSubPackage) else package.name
+    dependency_package_name = dependency_package.parent.name if isinstance(dependency_package, TermuxSubPackage) else dependency_package.name
+
+    if package_name != dependency_package_name:
+        build_graph.add(package_name, dependency_package_name)
+        return "(%s -> %s)" % (dependency_package_name, package_name)
+    else:
+        return None
 
 def read_packages_from_directories(directories, fast_build_mode, full_buildmode):
     """Construct a map from package name to TermuxPackage.
@@ -310,10 +409,10 @@ def generate_full_buildorder(pkgs_map):
                 pkg_queue.append(other_pkg)  # should be processed
 
     if set(pkgs_map.values()) != set(build_order):
-        print("ERROR: Cycle exists. Remaining: ", file=sys.stderr)
+        log_error("ERROR: Cycle exists. Remaining: ")
         for name, pkg in pkgs_map.items():
             if pkg not in build_order:
-                print(name, remaining_deps[name], file=sys.stderr)
+                log_error("%s: " % (name, str(remaining_deps[name])))
 
         # Print cycles so we have some idea where to start fixing this.
         def find_cycles(deps, pkg, path):
@@ -331,7 +430,7 @@ def generate_full_buildorder(pkgs_map):
                 cycle_start = path_with_cycle.index(path_with_cycle[-1])
                 cycles.add(tuple(path_with_cycle[cycle_start:]))
         for cycle in sorted(cycles):
-            print(f"cycle: {' -> '.join(cycle)}", file=sys.stderr)
+            log_error(f"cycle: {' -> '.join(cycle)}")
 
         sys.exit(1)
 
@@ -342,14 +441,56 @@ def generate_target_buildorder(target_path, pkgs_map, fast_build_mode):
     if target_path.endswith('/'):
         target_path = target_path[:-1]
 
-    package_name = os.path.basename(target_path)
-    if "gpkg" in target_path.split("/")[-2].split("-") and not has_prefix_glibc(package_name):
-        package_name += "-glibc"
-    package = pkgs_map[package_name]
-    # Do not depend on any sub package
+    target_package_name = os.path.basename(target_path)
+    if "gpkg" in target_path.split("/")[-2].split("-") and "glibc" not in target_package_name.split("-"):
+        target_package_name += "-glibc"
+
+    target_package = pkgs_map[target_package_name]
+
+    # Do not depend on any sub package.
     if fast_build_mode:
-        package.deps.difference_update([subpkg.name for subpkg in package.subpkgs])
-    return package.recursive_dependencies(pkgs_map)
+        target_package.deps.difference_update([subpkg.name for subpkg in target_package.subpkgs])
+
+    recursed_pkgs = set()
+    build_graph = TopologicalSorter()
+    legacy_build_order = target_package.recursive_dependencies(pkgs_map, build_graph, recursed_pkgs, 0)
+
+    log_error_debug("\n\nlegacy_build_order(%s):" % target_package_name)
+    print_build_order(legacy_build_order, False, True)
+
+    try:
+        log_error_debug("\n\ntopological_build_order(%s):" % target_package_name)
+        topological_build_order = []
+        topological_build_order_package_names = [*build_graph.static_order()]
+        topological_build_order_len = len(topological_build_order_package_names)
+
+        for index, package_name in enumerate(topological_build_order_package_names):
+            if index == topological_build_order_len - 1 and package_name == target_package_name:
+                continue
+            topological_build_order.append(pkgs_map[package_name])
+
+        print_build_order(topological_build_order, False, True)
+
+        log_error("Returning topological_build_order(%s): %s" % (target_package_name, str([pkg.name for pkg in topological_build_order])))
+
+        return topological_build_order
+    except CycleError as e:
+        if os.getenv('TERMUX_PKGS__BUILD_ORDER__RETURN_LEGACY_TARGET_BUILD_ORDER_ON_CYCLE') == "true":
+            log_error("Failed to generate target build order as cycle found: " + str(e))
+            log_error("Returning legacy_build_order(%s): %s" % (target_package_name, str([pkg.name for pkg in legacy_build_order])))
+            return legacy_build_order
+
+        die("Failed to generate target build order as cycle found: " + str(e))
+
+def print_build_order(build_order, to_stdout=True, log=False):
+    for pkg in build_order:
+        pkg_name = pkg.name
+        if termux_global_library == "true" and termux_pkg_library == "glibc" and not has_prefix_glibc(pkg_name):
+            pkg_name = add_prefix_glibc_to_pkgname(pkg_name)
+        if to_stdout:
+            print("%-30s %s" % (pkg_name, pkg.dir))
+        if log:
+            log_error_debug("%-30s %s" % (pkg_name, pkg.dir))
 
 def main():
     "Generate the build order either for all packages or a specific one."
@@ -369,36 +510,38 @@ def main():
 
     if not package:
         full_buildorder = True
+        log_error_debug("Running full buildorder")
     else:
         full_buildorder = False
+        log_error_debug("Running buildorder for package: " + package)
 
     if fast_build_mode and full_buildorder:
         die('-i mode does not work when building all packages')
 
-    if not full_buildorder:
-        for path in packages_directories:
-            if not os.path.isdir(path):
-                die('Not a directory: ' + path)
+    try:
+        if not full_buildorder:
+            for path in packages_directories:
+                if not os.path.isdir(path):
+                    die('Not a directory: ' + path)
 
-    if package:
-        if package[-1] == "/":
-            package = package[:-1]
-        if not os.path.isdir(package):
-            die('Not a directory: ' + package)
-        if not os.path.relpath(os.path.dirname(package), '.') in packages_directories:
-            packages_directories.insert(0, os.path.dirname(package))
-    pkgs_map = read_packages_from_directories(packages_directories, fast_build_mode, full_buildorder)
+        if package:
+            if package[-1] == "/":
+                package = package[:-1]
+            if not os.path.isdir(package):
+                die('Not a directory: ' + package)
+            if not os.path.relpath(os.path.dirname(package), '.') in packages_directories:
+                packages_directories.insert(0, os.path.dirname(package))
+        pkgs_map = read_packages_from_directories(packages_directories, fast_build_mode, full_buildorder)
 
-    if full_buildorder:
-        build_order = generate_full_buildorder(pkgs_map)
-    else:
-        build_order = generate_target_buildorder(package, pkgs_map, fast_build_mode)
+        if full_buildorder:
+            build_order = generate_full_buildorder(pkgs_map)
+        else:
+            build_order = generate_target_buildorder(package, pkgs_map, fast_build_mode)
 
-    for pkg in build_order:
-        pkg_name = pkg.name
-        if termux_global_library == "true" and termux_pkg_library == "glibc" and not has_prefix_glibc(pkg_name):
-            pkg_name = add_prefix_glibc_to_pkgname(pkg_name)
-        print("%-30s %s" % (pkg_name, pkg.dir))
+        print_build_order(build_order)
+
+    except Exception:
+        die('Failed to generate build order:\n' + traceback.format_exc())
 
 if __name__ == '__main__':
     main()

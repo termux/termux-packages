@@ -17,10 +17,17 @@ BOOTSTRAP_ANDROID10_COMPATIBLE=false
 # By default, bootstrap archives will be built for all architectures
 # supported by Termux application.
 # Override with option '--architectures'.
-TERMUX_ARCHITECTURES=("aarch64" "arm" "i686" "x86_64")
+declare -A TERMUX_SUPPORTED_ARCHITECTURES_TO_ABIS_MAP=(
+	["aarch64"]="arm64-v8a"
+	["arm"]="armeabi-v7a"
+	["x86_64"]="x86_64"
+	["i686"]="x86"
+)
+
+TERMUX_ARCHITECTURES=("aarch64" "arm" "x86_64" "i686")
 
 # The supported termux package managers.
-TERMUX_PACKAGE_MANAGERS=("apt" "pacman")
+TERMUX_SUPPORTED_PACKAGE_MANAGERS=("apt" "pacman")
 
 # The repository base urls mapping for package managers.
 declare -A REPO_BASE_URLS=(
@@ -32,17 +39,22 @@ declare -A REPO_BASE_URLS=(
 # The default is 'apt'. Can be changed by using the '--pm' option.
 TERMUX_PACKAGE_MANAGER="apt"
 
+TERMUX_PACKAGES_REPO_ROOT_DIRECTORY="$TERMUX_SCRIPTDIR"
+TERMUX_BOOTSTRAP_OUTPUT_DIRECTORY="$TERMUX_PACKAGES_REPO_ROOT_DIRECTORY"
+
+NO_CLEAN_BEFORE_BUILD=false
+
 # The repository base url for package manager.
 # Can be changed by using the '--repository' option.
 REPO_BASE_URL="${REPO_BASE_URLS[${TERMUX_PACKAGE_MANAGER}]}"
 
 # A list of non-essential packages. By default it is empty, but can
 # be filled with option '--add'.
-declare -a ADDITIONAL_PACKAGES
+declare -a ADDITIONAL_PACKAGES_LIST
 
 # Check for some important utilities that may not be available for
 # some reason.
-for cmd in ar awk curl grep gzip find sed tar xargs xz zip jq; do
+for cmd in ar awk curl date grep gzip find sed tar xargs xz zip jq; do
 	if [ -z "$(command -v $cmd)" ]; then
 		echo "[!] Utility '$cmd' is not available in PATH."
 		exit 1
@@ -55,31 +67,34 @@ done
 # If repository has been created using "aptly", then architecture-independent
 # list is not available.
 read_package_list_deb() {
-	local architecture
-	for architecture in all "$1"; do
-		if [ ! -e "${BOOTSTRAP_TMPDIR}/packages.${architecture}" ]; then
-			echo "[*] Downloading package list for architecture '${architecture}'..."
+
+	local package_arch
+	local package_name
+	local prev_package_ver
+	local cur_package_ver
+
+	for package_arch in all "$1"; do
+		if [ ! -e "${BOOTSTRAP_TMPDIR}/packages.${package_arch}" ]; then
+			echo "[*] Downloading package list for arch '${package_arch}'..."
 			if ! curl --fail --location \
-				--output "${BOOTSTRAP_TMPDIR}/packages.${architecture}" \
-				"${REPO_BASE_URL}/dists/stable/main/binary-${architecture}/Packages"; then
-				if [ "$architecture" = "all" ]; then
-					echo "[!] Skipping architecture-independent package list as not available..."
+				--output "${BOOTSTRAP_TMPDIR}/packages.${package_arch}" \
+				"${REPO_BASE_URL}/dists/stable/main/binary-${package_arch}/Packages"; then
+				if [ "$package_arch" = "all" ]; then
+					echo "[!] Skipping arch-independent package list as not available..."
 					continue
 				fi
 			fi
-			echo >> "${BOOTSTRAP_TMPDIR}/packages.${architecture}"
+			echo >> "${BOOTSTRAP_TMPDIR}/packages.${package_arch}"
 		fi
 
-		echo "[*] Reading package list for '${architecture}'..."
+		echo "[*] Reading package list for '${package_arch}'..."
 		while read -r -d $'\xFF' package; do
 			if [ -n "$package" ]; then
-				local package_name
 				package_name=$(echo "$package" | grep -i "^Package:" | awk '{ print $2 }')
 
 				if [ -z "${PACKAGE_METADATA["$package_name"]}" ]; then
 					PACKAGE_METADATA["$package_name"]="$package"
 				else
-					local prev_package_ver cur_package_ver
 					cur_package_ver=$(echo "$package" | grep -i "^Version:" | awk '{ print $2 }')
 					prev_package_ver=$(echo "${PACKAGE_METADATA["$package_name"]}" | grep -i "^Version:" | awk '{ print $2 }')
 
@@ -90,43 +105,60 @@ read_package_list_deb() {
 					fi
 				fi
 			fi
-		done < <(sed -e "s/^$/\xFF/g" "${BOOTSTRAP_TMPDIR}/packages.${architecture}")
+		done < <(sed -e "s/^$/\xFF/g" "${BOOTSTRAP_TMPDIR}/packages.${package_arch}")
 	done
+
 }
 
 download_db_packages_pac() {
+
+	local package_arch="$1"
+
 	if [ ! -e "${PATH_DB_PACKAGES}" ]; then
-		echo "[*] Downloading package list for architecture '${package_arch}'..."
+		echo "[*] Downloading package list for arch '${package_arch}'..."
 		curl --fail --location \
 			--output "${PATH_DB_PACKAGES}" \
 			"${REPO_BASE_URL}/${package_arch}/main.json"
 	fi
+
 }
 
 read_db_packages_pac() {
+
 	jq -r '."'${package_name}'"."'${1}'" | if type == "array" then .[] else . end' "${PATH_DB_PACKAGES}"
+
 }
 
 print_desc_package_pac() {
+
 	echo -e "%${1}%\n${2}\n"
+
 }
 
 # Download specified package, its dependencies and then extract *.deb or *.pkg.tar.xz files to
 # the bootstrap root.
 pull_package() {
+
 	local package_name=$1
+
+	local package_dependencies
+	local package_dependency
+	local package_desc_keys
+	local package_dir_basename
+	local package_filename
+	local package_url
+
 	local package_tmpdir="${BOOTSTRAP_PKGDIR}/${package_name}"
+
 	mkdir -p "$package_tmpdir"
 
 	if [ ${TERMUX_PACKAGE_MANAGER} = "apt" ]; then
-		local package_url
 		package_url="$REPO_BASE_URL/$(echo "${PACKAGE_METADATA[${package_name}]}" | grep -i "^Filename:" | awk '{ print $2 }')"
 		if [ "${package_url}" = "$REPO_BASE_URL" ] || [ "${package_url}" = "${REPO_BASE_URL}/" ]; then
 			echo "[!] Failed to determine URL for package '$package_name'."
 			exit 1
 		fi
 
-		local package_dependencies
 		package_dependencies=$(
 			while read -r token; do
 				echo "$token" | cut -d'|' -f1 | sed -E 's@\(.*\)@@'
@@ -135,13 +167,11 @@ pull_package() {
 
 		# Recursively handle dependencies.
 		if [ -n "$package_dependencies" ]; then
-			local dep
-			for dep in $package_dependencies; do
-				if [ ! -e "${BOOTSTRAP_PKGDIR}/${dep}" ]; then
-					pull_package "$dep"
+			for package_dependency in $package_dependencies; do
+				if [ ! -e "${BOOTSTRAP_PKGDIR}/${package_dependency}" ]; then
+					pull_package "$package_dependency"
 				fi
 			done
-			unset dep
 		fi
 
 		if [ ! -e "$package_tmpdir/package.deb" ]; then
@@ -175,7 +205,7 @@ pull_package() {
 				# Extract files.
 				tar xf "$data_archive" -C "$BOOTSTRAP_ROOTFS"
 
-				if ! ${BOOTSTRAP_ANDROID10_COMPATIBLE}; then
+				if [[ "$BOOTSTRAP_ANDROID10_COMPATIBLE" == "false" ]]; then
 					# Register extracted files.
 					tar tf "$data_archive" | sed -E -e 's@^\./@/@' -e 's@^/$@/.@' -e 's@^([^./])@/\1@' > "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/info/${package_name}.list"
 
@@ -201,48 +231,47 @@ pull_package() {
 			)
 		fi
 	else
-		local package_dependencies=$(read_db_packages_pac "DEPENDS" | sed 's/<.*$//g; s/>.*$//g; s/=.*$//g')
+		package_dependencies=$(read_db_packages_pac "DEPENDS" | sed 's/<.*$//g; s/>.*$//g; s/=.*$//g')
 
 		if [ "$package_dependencies" != "null" ]; then
-			local dep
-			for dep in $package_dependencies; do
-				if [ ! -e "${BOOTSTRAP_PKGDIR}/${dep}" ]; then
-					pull_package "$dep"
+			for package_dependency in $package_dependencies; do
+				if [ ! -e "${BOOTSTRAP_PKGDIR}/${package_dependency}" ]; then
+					pull_package "$package_dependency"
 				fi
 			done
-			unset dep
 		fi
 
 		if [ ! -e "$package_tmpdir/package.pkg.tar.xz" ]; then
 			echo "[*] Downloading '$package_name'..."
-			local package_filename=$(read_db_packages_pac "FILENAME")
+			package_filename=$(read_db_packages_pac "FILENAME")
 			curl --fail --location --output "$package_tmpdir/package.pkg.tar.xz" "${REPO_BASE_URL}/${package_arch}/${package_filename}"
 
 			echo "[*] Extracting '$package_name'..."
 			(cd "$package_tmpdir"
-				local package_desc="${package_name}-$(read_db_packages_pac VERSION)"
-				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${package_desc}"
+				package_dir_basename="${package_name}-$(read_db_packages_pac VERSION)"
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${package_dir_basename}"
 				{
 					echo "%FILES%"
 					tar xvf package.pkg.tar.xz -C "$BOOTSTRAP_ROOTFS" .INSTALL .MTREE data 2> /dev/null | grep '^data/' || true
-				} >> "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${package_desc}/files"
-				mv "${BOOTSTRAP_ROOTFS}/.MTREE" "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${package_desc}/mtree"
+				} >> "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${package_dir_basename}/files"
+				mv "${BOOTSTRAP_ROOTFS}/.MTREE" "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${package_dir_basename}/mtree"
 				if [ -f "${BOOTSTRAP_ROOTFS}/.INSTALL" ]; then
-					mv "${BOOTSTRAP_ROOTFS}/.INSTALL" "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${package_desc}/install"
+					mv "${BOOTSTRAP_ROOTFS}/.INSTALL" "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${package_dir_basename}/install"
 				fi
 				{
-					local keys_desc="VERSION BASE DESC URL ARCH BUILDDATE PACKAGER ISIZE GROUPS LICENSE REPLACES DEPENDS OPTDEPENDS CONFLICTS PROVIDES"
+					package_desc_keys="VERSION BASE DESC URL ARCH BUILDDATE PACKAGER ISIZE GROUPS LICENSE REPLACES DEPENDS OPTDEPENDS CONFLICTS PROVIDES"
 					for i in "NAME ${package_name}" \
 						"INSTALLDATE $(date +%s)" \
 						"VALIDATION $(test $(read_db_packages_pac PGPSIG) != 'null' && echo 'pgp' || echo 'sha256')"; do
 						print_desc_package_pac ${i}
 					done
-					jq -r -j '."'${package_name}'" | to_entries | .[] | select(.key | contains('$(sed 's/^/"/; s/ /","/g; s/$/"/' <<< ${keys_desc})')) | "%",(if .key == "ISIZE" then "SIZE" else .key end),"%\n",.value,"\n\n" | if type == "array" then (.| join("\n")) else . end' \
+					jq -r -j '."'${package_name}'" | to_entries | .[] | select(.key | contains('$(sed 's/^/"/; s/ /","/g; s/$/"/' <<< ${package_desc_keys})')) | "%",(if .key == "ISIZE" then "SIZE" else .key end),"%\n",.value,"\n\n" | if type == "array" then (.| join("\n")) else . end' \
 						"${PATH_DB_PACKAGES}"
-				} >> "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${package_desc}/desc"
+				} >> "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${package_dir_basename}/desc"
 			)
 		fi
 	fi
+
 }
 
 # Add termux bootstrap second stage files
@@ -279,7 +308,15 @@ add_termux_bootstrap_second_stage_files() {
 # working directory.
 # Information about symlinks is stored in file SYMLINKS.txt.
 create_bootstrap_archive() {
-	echo "[*] Creating 'bootstrap-${1}.zip'..."
+
+	local bootstrap_arch="$1"
+
+	local bootstrap_filename="bootstrap-$bootstrap_arch.zip"
+
+	mkdir -p "$TERMUX_BOOTSTRAP_OUTPUT_DIRECTORY"
+	rm -f "$TERMUX_BOOTSTRAP_OUTPUT_DIRECTORY/$bootstrap_filename"
+
+	echo $'\n\n\n'"[*] Creating '$bootstrap_filename'..."
 	(cd "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}"
 		# Do not store symlinks in bootstrap archive.
 		# Instead, put all information to SYMLINKS.txt
@@ -288,14 +325,17 @@ create_bootstrap_archive() {
 			rm -f "$link"
 		done < <(find . -type l -print0)
 
-		zip -r9 "${BOOTSTRAP_TMPDIR}/bootstrap-${1}.zip" ./*
+		zip -r9 "${BOOTSTRAP_TMPDIR}/$bootstrap_filename" ./*
 	)
 
-	mv -f "${BOOTSTRAP_TMPDIR}/bootstrap-${1}.zip" ./
-	echo "[*] Finished successfully (${1})."
+	mv -f "${BOOTSTRAP_TMPDIR}/$bootstrap_filename" "$TERMUX_BOOTSTRAP_OUTPUT_DIRECTORY/"
+
+	echo "[*] Finished successfully ($bootstrap_filename)."
+
 }
 
 show_usage() {
+
 	echo
 	echo "Usage: generate-bootstraps.sh [options]"
 	echo
@@ -324,181 +364,226 @@ show_usage() {
 	echo " -r, --repository URL        Specify URL for APT repository from"
 	echo "                             which packages will be downloaded."
 	echo "                             This must be passed after '--pm' option."
-	echo
+  	echo " --no-clean                  Do not clean existing bootstrap files before building."
 	echo "Architectures: ${TERMUX_ARCHITECTURES[*]}"
 	echo "Repository Base Url: ${REPO_BASE_URL}"
 	echo "Prefix: ${TERMUX_PREFIX}"
-        echo "Package manager: ${TERMUX_PACKAGE_MANAGER}"
+		echo "Package manager: ${TERMUX_PACKAGE_MANAGER}"
 	echo
+
 }
 
-while (($# > 0)); do
-	case "$1" in
-		-h|--help)
-			show_usage
-			exit 0
-			;;
-		--android10)
-			BOOTSTRAP_ANDROID10_COMPATIBLE=true
-			;;
-		-a|--add)
-			if [ $# -gt 1 ] && [ -n "$2" ] && [[ $2 != -* ]]; then
-				for pkg in $(echo "$2" | tr ',' ' '); do
-					ADDITIONAL_PACKAGES+=("$pkg")
-				done
-				unset pkg
-				shift 1
-			else
-				echo "[!] Option '--add' requires an argument."
+main() {
+
+	local boostrap_build_start_time
+	local boostraps_build_start_time
+	local elapsed_seconds
+	local package_arch
+	local package_name
+
+	while (($# > 0)); do
+		case "$1" in
+			-h|--help)
+				show_usage
+				exit 0
+				;;
+			--android10)
+				BOOTSTRAP_ANDROID10_COMPATIBLE=true
+				;;
+			-a|--add)
+				if [ $# -gt 1 ] && [ -n "$2" ] && [[ $2 != -* ]]; then
+					for pkg in $(echo "$2" | tr ',' ' '); do
+						ADDITIONAL_PACKAGES_LIST+=("$pkg")
+					done
+					unset pkg
+					shift 1
+				else
+					echo "[!] Option '--add' requires an argument."
+					show_usage
+					exit 1
+				fi
+				;;
+			--pm)
+				if [ $# -gt 1 ] && [ -n "$2" ] && [[ $2 != -* ]]; then
+					TERMUX_PACKAGE_MANAGER="$2"
+					REPO_BASE_URL="${REPO_BASE_URLS[${TERMUX_PACKAGE_MANAGER}]}"
+					shift 1
+				else
+					echo "[!] Option '--pm' requires an argument." 1>&2
+					show_usage
+					exit 1
+				fi
+				;;
+			--architectures)
+				if [ $# -gt 1 ] && [ -n "$2" ] && [[ $2 != -* ]]; then
+					TERMUX_ARCHITECTURES=()
+					for arch in $(echo "$2" | tr ',' ' '); do
+						TERMUX_ARCHITECTURES+=("$arch")
+					done
+					unset arch
+					shift 1
+				else
+					echo "[!] Option '--architectures' requires an argument."
+					show_usage
+					exit 1
+				fi
+				;;
+			-r|--repository)
+				if [ $# -gt 1 ] && [ -n "$2" ] && [[ $2 != -* ]]; then
+					REPO_BASE_URL="$2"
+					shift 1
+				else
+					echo "[!] Option '--repository' requires an argument."
+					show_usage
+					exit 1
+				fi
+				;;
+			--no-clean)
+				NO_CLEAN_BEFORE_BUILD=true
+				;;
+			*)
+				echo "[!] Got unknown option '$1'"
 				show_usage
 				exit 1
-			fi
-			;;
-		--pm)
-			if [ $# -gt 1 ] && [ -n "$2" ] && [[ $2 != -* ]]; then
-				TERMUX_PACKAGE_MANAGER="$2"
-				REPO_BASE_URL="${REPO_BASE_URLS[${TERMUX_PACKAGE_MANAGER}]}"
-				shift 1
-			else
-				echo "[!] Option '--pm' requires an argument." 1>&2
-				show_usage
-				exit 1
-			fi
-			;;
-		--architectures)
-			if [ $# -gt 1 ] && [ -n "$2" ] && [[ $2 != -* ]]; then
-				TERMUX_ARCHITECTURES=()
-				for arch in $(echo "$2" | tr ',' ' '); do
-					TERMUX_ARCHITECTURES+=("$arch")
-				done
-				unset arch
-				shift 1
-			else
-				echo "[!] Option '--architectures' requires an argument."
-				show_usage
-				exit 1
-			fi
-			;;
-		-r|--repository)
-			if [ $# -gt 1 ] && [ -n "$2" ] && [[ $2 != -* ]]; then
-				REPO_BASE_URL="$2"
-				shift 1
-			else
-				echo "[!] Option '--repository' requires an argument."
-				show_usage
-				exit 1
-			fi
-			;;
-		*)
-			echo "[!] Got unknown option '$1'"
-			show_usage
-			exit 1
-			;;
-	esac
-	shift 1
-done
+				;;
+		esac
+		shift 1
+	done
 
-if [[ "$TERMUX_PACKAGE_MANAGER" == *" "* ]] || [[ " ${TERMUX_PACKAGE_MANAGERS[*]} " != *" $TERMUX_PACKAGE_MANAGER "* ]]; then
-	echo "[!] Invalid package manager '$TERMUX_PACKAGE_MANAGER'" 1>&2
-	echo "Supported package managers: '${TERMUX_PACKAGE_MANAGERS[*]}'" 1>&2
-	exit 1
-fi
+	if [[ "$TERMUX_PACKAGE_MANAGER" == *" "* ]] || [[ " ${TERMUX_SUPPORTED_PACKAGE_MANAGERS[*]} " != *" $TERMUX_PACKAGE_MANAGER "* ]]; then
+		echo "[!] Invalid package manager '$TERMUX_PACKAGE_MANAGER'" 1>&2
+		echo "Supported package managers: '${TERMUX_SUPPORTED_PACKAGE_MANAGERS[*]}'" 1>&2
+		exit 1
+	fi
 
-if [ -z "$REPO_BASE_URL" ]; then
-	echo "[!] The repository base url is not set." 1>&2
-	exit 1
-fi
+	if [ -z "$REPO_BASE_URL" ]; then
+		echo "[!] The repository base url is not set." 1>&2
+		exit 1
+	fi
 
-for package_arch in "${TERMUX_ARCHITECTURES[@]}"; do
-	PATH_DB_PACKAGES="$BOOTSTRAP_TMPDIR/main_${package_arch}.json"
-	BOOTSTRAP_ROOTFS="$BOOTSTRAP_TMPDIR/rootfs-${package_arch}"
-	BOOTSTRAP_PKGDIR="$BOOTSTRAP_TMPDIR/packages-${package_arch}"
+	for package_arch in "${TERMUX_ARCHITECTURES[@]}"; do
+		if [[ "$package_arch" == *" "* ]] || [[ " ${!TERMUX_SUPPORTED_ARCHITECTURES_TO_ABIS_MAP[*]} " != *" $package_arch "* ]]; then
+			echo "[!] Unsupported architecture '$package_arch' in architectures list: '${TERMUX_ARCHITECTURES[*]}'" 1>&2
+			echo "Supported architectures: '${!TERMUX_SUPPORTED_ARCHITECTURES_TO_ABIS_MAP[*]}'" 1>&2
+			return 1
+		fi
+	done
 
-	# Create initial directories for $TERMUX_PREFIX
-	if ! ${BOOTSTRAP_ANDROID10_COMPATIBLE}; then
-		if [ ${TERMUX_PACKAGE_MANAGER} = "apt" ]; then
-			mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/etc/apt/apt.conf.d"
-			mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/etc/apt/preferences.d"
-			mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/info"
-			mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/triggers"
-			mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/updates"
-			mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/log/apt"
-			touch "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/available"
-			touch "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/status"
-		else
-			mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/sync"
-			mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local"
-			echo "9" >> "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/ALPM_DB_VERSION"
-			mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/cache/pacman/pkg"
-			mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/log"
+
+	echo "[*] Generating bootstraps for archs: ${TERMUX_ARCHITECTURES[*]}"
+	boostraps_build_start_time="$(date +%s)"
+
+	if [[ $NO_CLEAN_BEFORE_BUILD != "true" ]]; then
+		# Delete any old bootstraps for all architectures.
+		if [ -d "$TERMUX_BOOTSTRAP_OUTPUT_DIRECTORY" ]; then
+			find "$TERMUX_BOOTSTRAP_OUTPUT_DIRECTORY" -maxdepth 1 -type f \
+				\( -name "bootstrap-aarch64.zip" -o -name "bootstrap-arm.zip" -o -name "bootstrap-x86_64.zip" -o -name "bootstrap-i686.zip" \) \
+				-delete
 		fi
 	fi
-	mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/tmp"
 
-	# Read package metadata.
-	unset PACKAGE_METADATA
-	declare -A PACKAGE_METADATA
-	if [ ${TERMUX_PACKAGE_MANAGER} = "apt" ]; then
-		read_package_list_deb "$package_arch"
-	else
-		download_db_packages_pac
-	fi
+	for package_arch in "${TERMUX_ARCHITECTURES[@]}"; do
+		echo $'\n\n\n\n\n'"[*] Starting to generate bootstrap for arch '$package_arch'..."
+		boostrap_build_start_time="$(date +%s)"
 
-	# Package manager.
-	if ! ${BOOTSTRAP_ANDROID10_COMPATIBLE}; then
-		pull_package ${TERMUX_PACKAGE_MANAGER}
-	fi
+		PATH_DB_PACKAGES="$BOOTSTRAP_TMPDIR/main_${package_arch}.json"
+		BOOTSTRAP_ROOTFS="$BOOTSTRAP_TMPDIR/rootfs-${package_arch}"
+		BOOTSTRAP_PKGDIR="$BOOTSTRAP_TMPDIR/packages-${package_arch}"
 
-	# Core utilities.
-	pull_package bash # Used by `termux-bootstrap-second-stage.sh`
-	pull_package bzip2
-	if ! ${BOOTSTRAP_ANDROID10_COMPATIBLE}; then
-		pull_package command-not-found
-	else
-		pull_package proot
-	fi
-	pull_package coreutils
-	pull_package curl
-	pull_package dash
-	pull_package diffutils
-	pull_package findutils
-	pull_package gawk
-	pull_package grep
-	pull_package gzip
-	pull_package less
-	pull_package procps
-	pull_package psmisc
-	pull_package sed
-	pull_package tar
-	pull_package termux-core
-	pull_package termux-exec
-	pull_package termux-keyring
-	pull_package termux-tools
-	pull_package util-linux
-	pull_package xz-utils
+		# Create initial directories for $TERMUX_PREFIX
+		if [[ "$BOOTSTRAP_ANDROID10_COMPATIBLE" == "false" ]]; then
+			if [ ${TERMUX_PACKAGE_MANAGER} = "apt" ]; then
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/etc/apt/apt.conf.d"
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/etc/apt/preferences.d"
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/info"
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/triggers"
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/updates"
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/log/apt"
+				touch "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/available"
+				touch "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/status"
+			else
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/sync"
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local"
+				echo "9" >> "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/ALPM_DB_VERSION"
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/cache/pacman/pkg"
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/log"
+			fi
+		fi
+		mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/tmp"
 
-	# Additional.
-	pull_package ed
-	if [ ${TERMUX_PACKAGE_MANAGER} = "apt" ]; then
-		pull_package debianutils
-	fi
-	pull_package dos2unix
-	pull_package inetutils
-	pull_package lsof
-	pull_package nano
-	pull_package net-tools
-	pull_package patch
-	pull_package unzip
+		# Read package metadata.
+		unset PACKAGE_METADATA
+		declare -A PACKAGE_METADATA
+		if [ ${TERMUX_PACKAGE_MANAGER} = "apt" ]; then
+			read_package_list_deb "$package_arch"
+		else
+			download_db_packages_pac "$package_arch"
+		fi
 
-	# Handle additional packages.
-	for add_pkg in "${ADDITIONAL_PACKAGES[@]}"; do
-		pull_package "$add_pkg"
+		# Package manager.
+		if [[ "$BOOTSTRAP_ANDROID10_COMPATIBLE" == "false" ]]; then
+			pull_package "${TERMUX_PACKAGE_MANAGER}"
+		fi
+
+		# Core utilities.
+		pull_package bash # Used by `termux-bootstrap-second-stage.sh`
+		pull_package bzip2
+		if [[ "$BOOTSTRAP_ANDROID10_COMPATIBLE" == "false" ]]; then
+			pull_package command-not-found
+		else
+			pull_package proot
+		fi
+		pull_package coreutils
+		pull_package curl
+		pull_package dash
+		pull_package diffutils
+		pull_package findutils
+		pull_package gawk
+		pull_package grep
+		pull_package gzip
+		pull_package less
+		pull_package procps
+		pull_package psmisc
+		pull_package sed
+		pull_package tar
+		pull_package termux-core
+		pull_package termux-exec
+		pull_package termux-keyring
+		pull_package termux-tools
+		pull_package util-linux
+		pull_package xz-utils
+
+		# Additional.
+		pull_package ed
+		if [ ${TERMUX_PACKAGE_MANAGER} = "apt" ]; then
+			pull_package debianutils
+		fi
+		pull_package dos2unix
+		pull_package inetutils
+		pull_package lsof
+		pull_package nano
+		pull_package net-tools
+		pull_package patch
+		pull_package unzip
+
+		# Handle additional packages.
+		for package_name in "${ADDITIONAL_PACKAGES_LIST[@]}"; do
+			pull_package "$package_name"
+		done
+
+		# Add termux bootstrap second stage files
+		add_termux_bootstrap_second_stage_files "$package_arch"
+
+		# Create bootstrap archive.
+		create_bootstrap_archive "$package_arch"
+
+		elapsed_seconds=$(($(date +%s) - boostrap_build_start_time))
+		echo "[*] Generating bootstrap for arch '$package_arch' completed in $((elapsed_seconds / 3600 )) hours $(((elapsed_seconds % 3600) / 60)) minutes $((elapsed_seconds % 60)) seconds"
 	done
-	unset add_pkg
 
-	# Add termux bootstrap second stage files
-	add_termux_bootstrap_second_stage_files "$package_arch"
+	elapsed_seconds=$(($(date +%s) - boostraps_build_start_time))
+	echo "[*] Generating bootstraps completed in $((elapsed_seconds / 3600 )) hours $(((elapsed_seconds % 3600) / 60)) minutes $((elapsed_seconds % 60)) seconds"
 
-	# Create bootstrap archive.
-	create_bootstrap_archive "$package_arch"
-done
+}
+
+main "$@"

@@ -4,43 +4,18 @@ termux_step_create_pacman_package() {
 		rm -rf data
 	fi
 
-	local TERMUX_PKG_INSTALLSIZE
+	local TERMUX_PKG_INSTALLSIZE TERMUX_PKG_FILE TERMUX_PKG_ARCH TERMUX_PACMAN_PACKAGE_COMPRESS_CMD
+
 	TERMUX_PKG_INSTALLSIZE=$(du -bs . | cut -f 1)
 
+	# Set TERMUX_PKG_FILE, TERMUX_PKG_ARCH and TERMUX_PACMAN_PACKAGE_COMPRESS_CMD
+	termux_set_package_file_variables "$TERMUX_PKG_NAME" "false"
+	shell__validate_variable_set TERMUX_PKG_FILE termux_step_create_pacman_package " for package \"$TERMUX_PKG_NAME\"" || exit $?
+	shell__validate_variable_set TERMUX_PKG_ARCH termux_step_create_pacman_package " for package \"$TERMUX_PKG_NAME\"" || exit $?
+	shell__validate_variable_set TERMUX_PACMAN_PACKAGE_COMPRESS_CMD termux_step_create_pacman_package " for package \"$TERMUX_PKG_NAME\"" || exit $?
+
 	# From here on TERMUX_ARCH is set to "all" if TERMUX_PKG_PLATFORM_INDEPENDENT is set by the package
-	[ "$TERMUX_PKG_PLATFORM_INDEPENDENT" = "true" ] && TERMUX_ARCH=any
-
-	# Configuring the selection of a copress for a batch.
-	local COMPRESS
-	local PKG_FORMAT
-	case $TERMUX_PACMAN_PACKAGE_COMPRESSION in
-		"gzip")
-			COMPRESS=(gzip -c -f -n)
-			PKG_FORMAT="gz";;
-		"bzip2")
-			COMPRESS=(bzip2 -c -f)
-			PKG_FORMAT="bz2";;
-		"zstd")
-			COMPRESS=(zstd -c -z -q -)
-			PKG_FORMAT="zst";;
-		"lrzip")
-			COMPRESS=(lrzip -q)
-			PKG_FORMAT="lrz";;
-		"lzop")
-			COMPRESS=(lzop -q)
-			PKG_FORMAT="lzop";;
-		"lz4")
-			COMPRESS=(lz4 -q)
-			PKG_FORMAT="lz4";;
-		"lzip")
-			COMPRESS=(lzip -c -f)
-			PKG_FORMAT="lz";;
-		"xz" | *)
-			COMPRESS=(xz -c -z -)
-			PKG_FORMAT="xz";;
-	esac
-
-	local PACMAN_FILE=$TERMUX_OUTPUT_DIR/${TERMUX_PKG_NAME}${DEBUG}-${TERMUX_PKG_FULLVERSION_FOR_PACMAN}-${TERMUX_ARCH}.pkg.tar.${PKG_FORMAT}
+	local TERMUX_ARCH="$TERMUX_PKG_ARCH"
 
 	if [ "$TERMUX_GLOBAL_LIBRARY" = "true" ] && [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
 		test ! -z "$TERMUX_PKG_DEPENDS" && TERMUX_PKG_DEPENDS=$(termux_package__add_prefix_glibc_to_package_list "$TERMUX_PKG_DEPENDS")
@@ -138,6 +113,6 @@ termux_step_create_pacman_package() {
 		gzip -c -f -n > .MTREE
 	touch -d @$SOURCE_DATE_EPOCH .MTREE
 	printf '%s\0' **/* | bsdtar --no-fflags -cnf - --null --files-from - | \
-		$COMPRESS > "$PACMAN_FILE"
+		"${TERMUX_PACMAN_PACKAGE_COMPRESS_CMD[@]}" > "$TERMUX_PKG_FILE"
 	shopt -u dotglob globstar
 }
