@@ -1,17 +1,26 @@
-diff --git a/compiler/rustc_driver_impl/src/lib.rs b/compiler/rustc_driver_impl/src/lib.rs
-index 2bcc33241df..a018e383536 100644
 --- a/compiler/rustc_driver_impl/src/lib.rs
 +++ b/compiler/rustc_driver_impl/src/lib.rs
-@@ -89,10 +89,10 @@
- #[macro_use]
- mod print;
- mod session_diagnostics;
+@@ -97,10 +97,10 @@
+ // Keep the OS parts of this `cfg` in sync with the `cfg` on the `libc`
+ // dependency in `compiler/rustc_driver/Cargo.toml`, to keep
+ // `-Wunused-crated-dependencies` satisfied.
 -#[cfg(all(not(miri), unix, any(target_env = "gnu", target_os = "macos")))]
-+#[cfg(all(not(miri), unix, any(target_env = "gnu", target_os = "macos"), not(target_os = "android")))]
++#[cfg(all(not(miri), unix, any(target_env = "gnu", target_os = "macos", target_os = "android")))]
  mod signal_handler;
  
 -#[cfg(not(all(not(miri), unix, any(target_env = "gnu", target_os = "macos"))))]
-+#[cfg(not(all(not(miri), unix, any(target_env = "gnu", target_os = "macos"), not(target_os = "android"))))]
++#[cfg(not(all(not(miri), unix, any(target_env = "gnu", target_os = "macos", target_os = "android"))))]
  mod signal_handler {
      /// On platforms which don't support our signal handler's requirements,
      /// simply use the default signal handler provided by std.
+--- a/compiler/rustc_driver_impl/Cargo.toml
++++ b/compiler/rustc_driver_impl/Cargo.toml
+@@ -54,7 +54,7 @@
+ tracing = { version = "0.1.35" }
+ # tidy-alphabetical-end
+ 
+-[target.'cfg(all(unix, any(target_env = "gnu", target_os = "macos")))'.dependencies]
++[target.'cfg(all(unix, any(target_env = "gnu", target_os = "macos", target_os = "android")))'.dependencies]
+ # tidy-alphabetical-start
+ libc = "0.2"
+ # tidy-alphabetical-end
