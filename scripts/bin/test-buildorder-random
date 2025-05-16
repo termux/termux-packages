@@ -7,7 +7,7 @@ TERMUX_SCRIPTDIR=$(realpath "$(dirname "$0")/../..") # Root of repository.
 cd "${TERMUX_SCRIPTDIR}" || exit 1
 
 no_of_total_packages=0
-no_of_filter_pacakges=0
+no_of_filter_packages=0
 
 total_packages=$(find packages -maxdepth 1 -type d | sort)
 filter_packages=$(find packages -maxdepth 2 -type f -name build.sh | xargs -P$(nproc) -i sh -c "if ! grep -E "^TERMUX_PKG_EXCLUDED_ARCHES=.*${TERMUX_ARCH}" {} >/dev/null; then dirname {}; fi" | sort)
