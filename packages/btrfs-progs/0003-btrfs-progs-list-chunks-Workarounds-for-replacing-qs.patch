@@ -1,0 +1,80 @@
+From ad58f7421e72d906c24f665adb59f84c9b860d98 Mon Sep 17 00:00:00 2001
+From: Shadichy <shadichy@blisslabs.org>
+Date: Thu, 24 Apr 2025 14:40:10 +0700
+Subject: [PATCH 3/3] btrfs-progs: list-chunks: Workarounds for replacing
+ `qsort_r` when targeting Android
+
+Android NDK does not support `qsort_r`, this workaround first add a list of `id` to struct `compare`, and then reverse the list, and finally do the sorting stuffs using `qsort`.
+This helps preserve the sorting order without `qsort_r`
+
+Signed-off-by: Shadichy <shadichy@blisslabs.org>
+---
+ cmds/inspect.c      | 20 +++++++++++++++++++-
+ common/sort-utils.c |  3 +++
+ common/sort-utils.h |  3 +++
+ 3 files changed, 25 insertions(+), 1 deletion(-)
+
+diff --git a/cmds/inspect.c b/cmds/inspect.c
+index d689e085..3e951b6c 100644
+--- a/cmds/inspect.c
++++ b/cmds/inspect.c
+@@ -878,9 +878,27 @@ static int print_list_chunks(struct list_chunks_ctx *ctx, const char *sortmode,
+ 	}
+ 
+ 	/* Skip additional sort if nothing defined by user. */
+-	if (comp.count > 0)
++	if (comp.count > 0) {
++#ifdef __ANDROID__
++		for (i = comp.count - 1; i >= 0; i--) {
++			if (comp.id[i] == CHUNK_SORT_PSTART) {
++				qsort(ctx->stats, ctx->length, sizeof(ctx->stats[0]), (sort_cmp_t)cmp_cse_pstart);
++			}
++			else if (comp.id[i] == CHUNK_SORT_LSTART) {
++				qsort(ctx->stats, ctx->length, sizeof(ctx->stats[0]), (sort_cmp_t)cmp_cse_lstart);
++			}
++			else if (comp.id[i] == CHUNK_SORT_USAGE) {
++				qsort(ctx->stats, ctx->length, sizeof(ctx->stats[0]), (sort_cmp_t)cmp_cse_usage);
++			}
++			else if (comp.id[i] == CHUNK_SORT_LENGTH) {
++				qsort(ctx->stats, ctx->length, sizeof(ctx->stats[0]), (sort_cmp_t)cmp_cse_length);
++			}
++		}
++#else
+ 		qsort_r(ctx->stats, ctx->length, sizeof(ctx->stats[0]),
+ 			(sort_r_cmp_t)compare_cmp_multi, &comp);
++#endif
++	}
+ 
+ 	col_count = 9;
+ 	/* Two rows for header and separator. */
+diff --git a/common/sort-utils.c b/common/sort-utils.c
+index 39c5d252..7ea75d51 100644
+--- a/common/sort-utils.c
++++ b/common/sort-utils.c
+@@ -78,6 +78,9 @@ int compare_add_sort_id(struct compare *comp, int id)
+ 		if (comp->sortdef[i].name == NULL)
+ 			return -1;
+ 		if (comp->sortdef[i].id == id) {
++#ifdef __ANDROID__
++			comp->id[comp->count] = id;
++#endif
+ 			comp->comp[comp->count] = comp->sortdef[i].comp;
+ 			comp->count++;
+ 			break;
+diff --git a/common/sort-utils.h b/common/sort-utils.h
+index 09be7b7d..4d5f6cc2 100644
+--- a/common/sort-utils.h
++++ b/common/sort-utils.h
+@@ -89,6 +89,9 @@ struct compare {
+ 	unsigned long invert_map;
+ 	int count;
+ 	const struct sortdef *sortdef;
++#ifdef __ANDROID__
++	int id[SORT_MAX_KEYS];
++#endif
+ };
+ 
+ int compare_init(struct compare *comp, const struct sortdef *sortdef);
+-- 
+2.49.0
+
