@@ -193,6 +193,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_extract_dep_info.sh"
 # shellcheck source=scripts/build/termux_download_deb_pac.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_download_deb_pac.sh"
 
+# Function that makes output of parallel jobs consistent and not garbled.
+# shellcheck source=scripts/build/termux_buffered_output.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_buffered_output.sh"
+
 # Script to download InRelease, verify it's signature and then download Packages.xz by hash
 # shellcheck source=scripts/build/termux_get_repo_files.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_get_repo_files.sh"
