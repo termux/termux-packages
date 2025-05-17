@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1, BSD 3-Clause, MIT, Public Domain"
 TERMUX_PKG_LICENSE_FILE="COPYING, COPYING.LIB, LICENSES"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.11.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=09120c9867ce7f2081d6aaa1775386b98c2f2f246135761aae47d81f58685b9c
 TERMUX_PKG_DEPENDS="libgpg-error"
@@ -38,6 +39,9 @@ termux_step_pre_configure() {
 		CFLAGS+=" -mno-unaligned-access"
 		# Avoid text relocations:
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" gcry_cv_gcc_inline_asm_neon=no"
+	elif [ "$TERMUX_ARCH" = aarch64 ]; then
+		# https://github.com/termux/termux-packages/issues/24463
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" gcry_cv_gcc_inline_asm_aarch64_sha3_sha512_sm3_sm4=no"
 	elif [ "$TERMUX_ARCH" = i686 ] || [ "$TERMUX_ARCH" = x86_64 ]; then
 		# Fix i686 android build, also in https://bugzilla.gnome.org/show_bug.cgi?id=724050
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-asm"
@@ -47,4 +51,15 @@ termux_step_pre_configure() {
 	# https://github.com/termux/termux-packages/issues/18761#issuecomment-1868896237
 	# https://github.com/termux/termux-packages/issues/18810
 	LDFLAGS+=" -Wl,--undefined-version"
+}
+
+termux_step_post_make_install() {
+	if [ "$TERMUX_ARCH" = aarch64 ]; then
+		if [ -z "$($OBJDUMP -D $TERMUX_PREFIX/lib/libgcrypt.so | grep sha256su0)" ]; then
+			termux_error_exit "sha256su0 is not present"
+		fi
+		if [ -n "$($OBJDUMP -D $TERMUX_PREFIX/lib/libgcrypt.so | grep sha512su0)" ]; then
+			termux_error_exit "sha512su0 is present"
+		fi
+	fi
 }
