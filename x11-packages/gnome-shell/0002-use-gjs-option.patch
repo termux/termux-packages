@@ -1,0 +1,37 @@
+--- a/meson.build
++++ b/meson.build
+@@ -145,7 +145,10 @@
+ 
+ mutter_typelibdir = mutter_dep.get_variable('typelibdir')
+ python = find_program('python3')
+-gjs = find_program('gjs')
++gjs_path = get_option('gjs_path')
++if gjs_path == ''
++  gjs_path = find_program('gjs').full_path()
++endif
+ generate_app_list = find_program('meson/generate-app-list.py')
+ 
+ cc = meson.get_compiler('c')
+--- a/meson.options
++++ b/meson.options
+@@ -51,3 +51,9 @@
+   value: true,
+   description: 'Enable systemd integration'
+ )
++
++option('gjs_path',
++  type: 'string',
++  value: '',
++  description: 'The path to gjs'
++)
+--- a/js/dbusServices/meson.build
++++ b/js/dbusServices/meson.build
+@@ -22,7 +22,7 @@
+ 
+   serviceconf = configuration_data()
+   serviceconf.set('service', service)
+-  serviceconf.set('gjs', gjs.full_path())
++  serviceconf.set('gjs', gjs_path)
+   serviceconf.set('pkgdatadir', pkgdatadir)
+ 
+   configure_file(
