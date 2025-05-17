@@ -1,0 +1,40 @@
+Android does not have an ldconfig command, so this avoids calling /sbin/ldconfig
+or /usr/bin/gcc and getting unwanted references to libc.so.6 or libraries linked to it
+when this python2 is being run inside of termux-proot-run.
+
+see pypy3/0008-fix-ctypes-find_library.patch for the pypy3 version of this.
+(pypy has a similar but slightly different implementation of ctypes)
+
+Important: unlike the implementation of a similar patch for pypy, this only adds in support for:
+
+- libraries in the internal builtin search paths of the C compiler, which in the case
+  of the official NDK's cross-compiler are limited to, for example, subdirs of
+  ~/.termux-build/_cache/android-r27c-api-24-v1/sysroot/usr/lib,
+  not libraries in LDFLAGS or LD_LIBRARY_PATH, so not, for example,
+  /data/data/com.termux/files/usr/lib
+- libraries that have a SONAME detectable through the 'objdump -p' command, so not
+  any libraries that for some reason don't have a SONAME detectable using 'objdump -p'
+
+however, for the purpose of building pypy3, these more conservative changes are
+currently sufficient.
+
+--- a/Lib/ctypes/util.py
++++ b/Lib/ctypes/util.py
+@@ -93,7 +93,7 @@ elif os.name == "posix":
+         # haven't supplied a proper program with main(), but that does not
+         # matter.
+         expr = r'[^\(\)\s]*lib%s\.[^\(\)\s]*' % re.escape(name)
+-        cmd = 'if type gcc >/dev/null 2>&1; then CC=gcc; elif type cc >/dev/null 2>&1; then CC=cc;else exit; fi;' \
++        cmd = 'CC=@CC@;' \
+               'LANG=C LC_ALL=C $CC -Wl,-t -o "$2" 2>&1 -l"$1"'
+ 
+         temp = tempfile.NamedTemporaryFile()
+@@ -271,7 +271,7 @@ elif os.name == "posix":
+             return res.group(1)
+ 
+         def find_library(name):
+-            return _findSoname_ldconfig(name) or _get_soname(_findLib_gcc(name))
++            return _get_soname(_findLib_gcc(name))
+ 
+ ################################################################
+ # test code
