@@ -1,6 +1,8 @@
+diff --git a/common/rconfiguration.cc b/common/rconfiguration.cc
+index 4b97a622..285f16e9 100644
 --- a/common/rconfiguration.cc
 +++ b/common/rconfiguration.cc
-@@ -88,24 +88,22 @@
+@@ -88,24 +88,22 @@ bool RWriteConfigFile(Configuration &Conf)
  
     // store option 'consider recommended packages as dependencies'
     // to config of apt if we run as root
@@ -39,25 +41,28 @@
     // and backup Install-Recommends to config of synaptic
     _config->Set("Synaptic::Install-Recommends",
                  _config->FindB("APT::Install-Recommends",
-@@ -137,14 +135,14 @@
-    struct stat stbuf;
-    struct passwd *pwd;
+@@ -141,16 +139,17 @@ static bool checkConfigDir(string &path)
+    string home_dir;
+    int l;
  
 -   pwd = getpwuid(getuid());
-+  /* pwd = getpwuid(getuid());
++   /* pwd = getpwuid(getuid());
     if (!pwd) {
        return _error->Errno("getpwuid",
                             _
                             ("ERROR: Could not get password entry for superuser"));
     }
--   path = string(pwd->pw_dir) + "/.synaptic";
--   //path = "/etc/synaptic";
-+   path = string(pwd->pw_dir) + "/.synaptic";*/
-+   path = "@TERMUX_PREFIX@/etc/synaptic";
  
-    if (stat(path.c_str(), &stbuf) < 0) {
-       if (mkdir(path.c_str(), 0700) < 0) {
-@@ -187,7 +185,7 @@
+-   home_dir = string(pwd->pw_dir);
++   home_dir = string(pwd->pw_dir);*/
++   home_dir = "@TERMUX_HOME@";
+    xdg_data_dir = home_dir + "/.config";
+-   old_path = home_dir + "/.synaptic";
++   old_path = "@TERMUX_PREFIX@/etc/synaptic";
+    buf = getenv("XDG_CONFIG_HOME");
+ 
+    if (buf) {
+@@ -229,7 +228,7 @@ string RStateDir()
  string RTmpDir()
  {
     struct stat stbuf;
@@ -66,7 +71,7 @@
     if (stat(tmpDir.c_str(), &stbuf) < 0) {
        if (mkdir(tmpDir.c_str(), 0700) < 0) {
  	 _error->Errno("mkdir",
-@@ -243,17 +241,10 @@
+@@ -285,17 +284,10 @@ bool RInitConfiguration(string confFileName)
  
     // read Install-Recommends, preferably from APT:: if we run as root
     // or from Synaptic:: otherwise
