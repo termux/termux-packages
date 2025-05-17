@@ -180,6 +180,8 @@ termux_step_setup_variables() {
 	TERMUX_PKG_CMAKE_CROSSCOMPILING=true
 	TERMUX_PROOT_EXTRA_ENV_VARS="" # Extra environvent variables for proot command in termux_setup_proot
 
+	export PYTHONPYCACHEPREFIX=$TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH
+
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 	unset TERMUX_MESON_ENABLE_SOVERSION # setenv to enable SOVERSION suffix for shared libs built with Meson
 }
