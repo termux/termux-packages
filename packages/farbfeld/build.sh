@@ -26,7 +26,8 @@ termux_step_configure() {
 	CC         = $CC
 	CPPFLAGS   = $CPPFLAGS -D_DEFAULT_SOURCE
 	CFLAGS     = $CFLAGS -std=c99 -pedantic -Wall -Wextra -Os
-	LDFLAGS    = $LDFLAGS -s
+	# We don't need -s: if we want it stripped, we will strip it ourselves.
+	LDFLAGS    = $LDFLAGS
 	PNG-LDLIBS = -lpng
 	JPG-LDLIBS = -ljpeg
 	EOF
