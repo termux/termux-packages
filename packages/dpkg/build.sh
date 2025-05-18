@@ -3,12 +3,12 @@ TERMUX_PKG_DESCRIPTION="Debian package management system"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.22.6"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 # old tarball are removed in https://mirrors.kernel.org/debian/pool/main/d/dpkg/dpkg_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SRCURL=git+https://salsa.debian.org/dpkg-team/dpkg.git
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"
 TERMUX_PKG_AUTO_UPDATE=false
-TERMUX_PKG_DEPENDS="bzip2, coreutils, diffutils, gzip, less, libbz2, liblzma, libmd, tar, xz-utils, zlib, zstd"
+TERMUX_PKG_DEPENDS="bzip2, coreutils, diffutils, gzip, less, liblzma, libmd, tar, xz-utils, zlib"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="clang"
 TERMUX_PKG_BREAKS="dpkg-dev"
 TERMUX_PKG_REPLACES="dpkg-dev"
