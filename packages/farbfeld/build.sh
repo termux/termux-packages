@@ -18,7 +18,16 @@ TERMUX_PKG_RECOMMENDS=imagemagick
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
-	# Need to pass these on command line to override settings in config.mk,
-	# but they aren't available before configure
-	TERMUX_PKG_EXTRA_MAKE_ARGS="PREFIX=${TERMUX_PREFIX} CC=${CC} LD=${LD}"
+	# Replace config.mk
+	cat <<-EOF > config.mk
+	VERSION    = $TERMUX_PKG_VERSION
+	PREFIX     = $PREFIX
+	MANPREFIX  = $PREFIX/share/man
+	CC         = $CC
+	CPPFLAGS   = $CPPFLAGS -D_DEFAULT_SOURCE
+	CFLAGS     = $CFLAGS -std=c99 -pedantic -Wall -Wextra -Os
+	LDFLAGS    = $LDFLAGS -s
+	PNG-LDLIBS = -lpng
+	JPG-LDLIBS = -ljpeg
+	EOF
 }
