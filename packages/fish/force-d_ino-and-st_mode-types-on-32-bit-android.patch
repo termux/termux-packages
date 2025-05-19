@@ -1,0 +1,131 @@
+This fixes https://github.com/termux/termux-packages/issues/24741
+
+To maintain:
+keep the conditionally-compiled implementations of DirEntry and stat_mode_to_entry_type()
+synchronized with their upstream counterparts that are developed for non-32-bit-Android platforms.
+keep the S_IFIFO, etc. definitions synchronized with this file:
+https://github.com/rust-lang/libc/blob/c1d2b8e055e29b239a308f10b38a6b6138711612/src/unix/linux_like/mod.rs#L563
+
+This patch was not created by an automatic tool - unfortunately, it was created by manually typing the
+syntax of the unified-diff format, in order to artifically extend the context of each hunk an
+abnormal number of lines after the changed lines (but not before the changed lines).
+The reason for this is so that if anything in the normal implementation of the blocks changes,
+this patch is explicitly forced to fail so that the maintainer is reminded to make an equivalent change
+in the implementation of the block for 32-bit Android. If another maintianer of this patch is not
+familiar with manually writing the unified-diff format, this documentation might be helpful to
+preserve this failsafe in future revisions of this patch:
+https://www.gnu.org/software/diffutils/manual/html_node/Detailed-Unified.html
+
+--- a/src/wildcard.rs
++++ b/src/wildcard.rs
+@@ -885,6 +885,9 @@ mod expander {
+             // Ensure we don't fall into a symlink loop.
+             // Ideally we would compare both devices and inodes, but devices require a stat call, so we
+             // use inodes exclusively.
++            #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++            let mut visited_inodes: HashSet<u64> = HashSet::new();
++            #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+             let mut visited_inodes: HashSet<libc::ino_t> = HashSet::new();
+ 
+             loop {
+--- a/src/wutil/dir_iter.rs
++++ b/src/wutil/dir_iter.rs
+@@ -26,26 +26,52 @@ pub enum DirEntryType {
+     whiteout, // whiteout (from BSD)
+ }
+ 
+-/// An entry returned by DirIter.
++/// An entry returned by DirIter on 32-bit Android.
++#[cfg(all(target_os = "android", target_pointer_width = "32"))]
++#[derive(Clone)]
++pub struct DirEntry {
++    /// File name of this entry.
++    pub name: WString,
++
++    /// inode of this entry.
++    pub inode: u64,
++
++    // Device, inode pair for this entry, or none if not yet computed.
++    dev_inode: Cell<Option<DevInode>>,
++
++    // The type of the entry. This is initially none; it may be populated eagerly via readdir()
++    // on some filesystems, or later via stat(). If stat() fails, the error is silently ignored
++    // and the type is left as none(). Note this is an unavoidable race.
++    typ: Cell<Option<DirEntryType>>,
++
++    // whether this could be a link, false if we know definitively it isn't.
++    possible_link: Option<bool>,
++
++    // fd of the DIR*, used for fstatat().
++    dirfd: Rc<DirFd>,
++}
++
++/// An entry returned by DirIter on everything except 32-bit Android.
++#[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+ #[derive(Clone)]
+ pub struct DirEntry {
+     /// File name of this entry.
+     pub name: WString,
+ 
+     /// inode of this entry.
+     pub inode: libc::ino_t,
+ 
+     // Device, inode pair for this entry, or none if not yet computed.
+     dev_inode: Cell<Option<DevInode>>,
+ 
+     // The type of the entry. This is initially none; it may be populated eagerly via readdir()
+     // on some filesystems, or later via stat(). If stat() fails, the error is silently ignored
+     // and the type is left as none(). Note this is an unavoidable race.
+     typ: Cell<Option<DirEntryType>>,
+ 
+     // whether this could be a link, false if we know definitively it isn't.
+     possible_link: Option<bool>,
+ 
+     // fd of the DIR*, used for fstatat().
+     dirfd: Rc<DirFd>,
+ }
+@@ -148,18 +174,44 @@ fn dirent_type_to_entry_type(dt: u8) -> Option<DirEntryType> {
+     }
+ }
+ 
++#[cfg(all(target_os = "android", target_pointer_width = "32"))]
++fn stat_mode_to_entry_type(m: u32) -> Option<DirEntryType> {
++    const S_IFIFO_32_bit_android: u32 = 0o1_0000;
++    const S_IFCHR_32_bit_android: u32 = 0o2_0000;
++    const S_IFBLK_32_bit_android: u32 = 0o6_0000;
++    const S_IFDIR_32_bit_android: u32 = 0o4_0000;
++    const S_IFREG_32_bit_android: u32 = 0o10_0000;
++    const S_IFLNK_32_bit_android: u32 = 0o12_0000;
++    const S_IFSOCK_32_bit_android: u32 = 0o14_0000;
++    const S_IFMT_32_bit_android: u32 = 0o17_0000;
++    match m & S_IFMT_32_bit_android {
++        S_IFIFO_32_bit_android => Some(DirEntryType::fifo),
++        S_IFCHR_32_bit_android => Some(DirEntryType::chr),
++        S_IFDIR_32_bit_android => Some(DirEntryType::dir),
++        S_IFBLK_32_bit_android => Some(DirEntryType::blk),
++        S_IFREG_32_bit_android => Some(DirEntryType::reg),
++        S_IFLNK_32_bit_android => Some(DirEntryType::lnk),
++        S_IFSOCK_32_bit_android => Some(DirEntryType::sock),
++        _ => {
++            // todo!("whiteout")
++            None
++        }
++    }
++}
++
++#[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+ fn stat_mode_to_entry_type(m: libc::mode_t) -> Option<DirEntryType> {
+     match m & S_IFMT {
+         S_IFIFO => Some(DirEntryType::fifo),
+         S_IFCHR => Some(DirEntryType::chr),
+         S_IFDIR => Some(DirEntryType::dir),
+         S_IFBLK => Some(DirEntryType::blk),
+         S_IFREG => Some(DirEntryType::reg),
+         S_IFLNK => Some(DirEntryType::lnk),
+         S_IFSOCK => Some(DirEntryType::sock),
+         _ => {
+             // todo!("whiteout")
+             None
+         }
+     }
+ }

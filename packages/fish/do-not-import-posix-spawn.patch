@@ -1,0 +1,59 @@
+Cherry-pick of https://github.com/fish-shell/fish-shell/commit/bbf678e7185fedce955587afbb23d83d37a87344
+
+From bbf678e7185fedce955587afbb23d83d37a87344 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=E7=8E=8B=E5=AE=87=E9=80=B8?= <Strawberry_Str@hotmail.com>
+Date: Sat, 8 Mar 2025 02:09:45 +0800
+Subject: [PATCH] Reduce warnings when posix_spawn disabled.
+
+---
+ src/exec.rs          | 8 ++++++--
+ src/fork_exec/mod.rs | 1 +
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/src/exec.rs b/src/exec.rs
+index 89b8b86f462b..ba961e456e5f 100644
+--- a/src/exec.rs
++++ b/src/exec.rs
+@@ -12,6 +12,7 @@ use crate::common::{
+     ScopeGuard,
+ };
+ use crate::env::{EnvMode, EnvStack, Environment, Statuses, READ_BYTE_LIMIT};
++#[cfg(FISH_USE_POSIX_SPAWN)]
+ use crate::env_dispatch::use_posix_spawn;
+ use crate::fds::make_fd_blocking;
+ use crate::fds::{make_autoclose_pipes, open_cloexec, PIPE_ERROR};
+@@ -34,10 +35,12 @@ use crate::null_terminated_array::{
+     null_terminated_array_length, AsNullTerminatedArray, OwningNullTerminatedArray,
+ };
+ use crate::parser::{Block, BlockId, BlockType, EvalRes, Parser};
++#[cfg(FISH_USE_POSIX_SPAWN)]
++use crate::proc::Pid;
+ use crate::proc::{
+     hup_jobs, is_interactive_session, jobs_requiring_warning_on_exit, no_exec,
+-    print_exit_warning_for_jobs, InternalProc, Job, JobGroupRef, Pid, ProcStatus, Process,
+-    ProcessType, TtyTransfer,
++    print_exit_warning_for_jobs, InternalProc, Job, JobGroupRef, ProcStatus, Process, ProcessType,
++    TtyTransfer,
+ };
+ use crate::reader::{reader_run_count, restore_term_mode};
+ use crate::redirection::{dup2_list_resolve_chain, Dup2List};
+@@ -447,6 +450,7 @@ fn launch_process_nofork(vars: &EnvStack, p: &Process) -> ! {
+ // To avoid the race between the caller calling tcsetpgrp() and the client checking the
+ // foreground process group, we don't use posix_spawn if we're going to foreground the process. (If
+ // we use fork(), we can call tcsetpgrp after the fork, before the exec, and avoid the race).
++#[cfg(FISH_USE_POSIX_SPAWN)]
+ fn can_use_posix_spawn_for_job(job: &Job, dup2s: &Dup2List) -> bool {
+     // Is it globally disabled?
+     if !use_posix_spawn() {
+diff --git a/src/fork_exec/mod.rs b/src/fork_exec/mod.rs
+index 2c10fccd5202..c0d0de46e2b9 100644
+--- a/src/fork_exec/mod.rs
++++ b/src/fork_exec/mod.rs
+@@ -4,6 +4,7 @@
+ 
+ pub mod flog_safe;
+ pub mod postfork;
++#[cfg(FISH_USE_POSIX_SPAWN)]
+ pub mod spawn;
+ use crate::proc::Job;
+ use libc::{SIGINT, SIGQUIT};
