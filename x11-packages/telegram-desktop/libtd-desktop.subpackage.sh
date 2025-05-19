@@ -4,7 +4,7 @@ TERMUX_SUBPKG_DEPENDS="libc++, readline, openssl (>= 1.1.1), zlib"
 TERMUX_SUBPKG_CONFLICTS="libtd, libtd-static"
 TERMUX_SUBPKG_INCLUDE="
 include/td/*
-lib/cmake/Td/*
+lib/cmake/tde2e/*
 lib/pkgconfig/td*.pc
 lib/libtd*.a
 "
