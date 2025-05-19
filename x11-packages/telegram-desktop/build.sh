@@ -4,10 +4,9 @@ TERMUX_PKG_DESCRIPTION="Telegram Desktop Client"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LEGAL"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=5.14.2
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=5.14.3
 TERMUX_PKG_SRCURL=https://github.com/telegramdesktop/tdesktop/releases/download/v$TERMUX_PKG_VERSION/tdesktop-$TERMUX_PKG_VERSION-full.tar.gz
-TERMUX_PKG_SHA256=8a3b2570475584317651c76407176ad884f073b1eacaf07333c9037806279f02
+TERMUX_PKG_SHA256=af15716f053403dc42233775e931a711759c8f0468a0aff5f3dfabdf98bf6861
 TERMUX_PKG_DEPENDS="abseil-cpp, boost, ffmpeg, glib, hicolor-icon-theme, hunspell, kf6-kcoreaddons, libandroid-shmem, libc++, libdispatch, libdrm, liblz4, libminizip, protobuf, librnnoise, libsigc++-3.0, libx11, libxcomposite, libxdamage, libxrandr, libxtst, openal-soft, opengl, openh264, openssl, pipewire, pulseaudio, qt6-qtbase, qt6-qtimageformats, qt6-qtsvg, xxhash, zlib"
 TERMUX_PKG_BUILD_DEPENDS="ada, aosp-libs, boost-headers, glib-cross, qt6-qtbase-cross-tools"
 TERMUX_PKG_VERSIONED_GIR=false
@@ -18,6 +17,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 # https://github.com/telegramdesktop/tdesktop/issues/17435
 # https://github.com/telegramdesktop/tdesktop/blob/8fab9167beb2407c1153930ed03a4badd0c2b59f/snap/snapcraft.yaml#L87-L88
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_CXX_SCAN_FOR_MODULES=OFF
 -DCMAKE_SYSTEM_NAME=Linux
 -DCMAKE_VERBOSE_MAKEFILE=ON
 -DDESKTOP_APP_DISABLE_JEMALLOC=ON
@@ -113,7 +113,7 @@ __libtd_host_build() {
 	rm -rf libtd-host-build
 	mkdir -p libtd-host-build
 	pushd libtd-host-build
-	(
+	(set +e +u
 	export PATH="$TERMUX_PKG_TMPDIR/host-pkg-config:$PATH"
 	unset PREFIX prefix CPPFLAGS CC CFLAGS CXX CXXFLAGS LD LDFLAGS PKGCONFIG PKG_CONFIG PKG_CONFIG_DIR PKG_CONFIG_LIBDIR
 	cmake \
@@ -203,6 +203,8 @@ __libtd_build() {
 -DBUILD_STATIC_LIBS=ON
 -DTD_INSTALL_SHARED_LIBRARIES=OFF
 -DTD_INSTALL_STATIC_LIBRARIES=ON
+-DTD_E2E_ONLY=ON
+-DTDE2E_INSTALL_INCLUDES=ON
 "
 
 	# Configure
@@ -250,13 +252,7 @@ termux_step_configure() {
 			EOF
 			chmod +x $TERMUX_PKG_TMPDIR/bin/codegen_$_type
 		done
-		cat <<-EOF > $TERMUX_PKG_TMPDIR/bin/clang-scan-deps
-			#!$(command -v sh)
-			exec $TERMUX_STANDALONE_TOOLCHAIN/bin/clang-scan-deps "\$@" --sysroot=$TERMUX_STANDALONE_TOOLCHAIN/sysroot
-		EOF
-		chmod +x $TERMUX_PKG_TMPDIR/bin/clang-scan-deps
 		export PATH="$TERMUX_PKG_TMPDIR/bin:$PATH"
-		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_CXX_COMPILER_CLANG_SCAN_DEPS=$TERMUX_PKG_TMPDIR/bin/clang-scan-deps"
 	else
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_CROSSCOMPILING=FALSE"
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_AUTOMOC_EXECUTABLE=$TERMUX_PREFIX/lib/qt6/moc"
