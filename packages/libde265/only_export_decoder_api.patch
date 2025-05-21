@@ -2,9 +2,11 @@ Description: Only export symbols defined in the decoder API.
  The encoder API is not final yet, so upstream exports all symbols to make
  development easier. For packaging we only want to expose the public API.
 Author: Joachim Bauch <bauch@struktur.de>
---- a/libde265/encoder/Makefile.am
-+++ b/libde265/encoder/Makefile.am
-@@ -12,6 +12,18 @@
+Index: libde265/libde265/encoder/Makefile.am
+===================================================================
+--- libde265.orig/libde265/encoder/Makefile.am
++++ libde265/libde265/encoder/Makefile.am
+@@ -12,6 +12,18 @@ libde265_encoder_la_SOURCES = \
    encpicbuf.h encpicbuf.cc \
    sop.h sop.cc
  
@@ -23,9 +25,11 @@ Author: Joachim Bauch <bauch@struktur.de>
  SUBDIRS=algo
  libde265_encoder_la_LIBADD = algo/libde265_encoder_algo.la
  
---- a/libde265/encoder/algo/Makefile.am
-+++ b/libde265/encoder/algo/Makefile.am
-@@ -17,5 +17,13 @@
+Index: libde265/libde265/encoder/algo/Makefile.am
+===================================================================
+--- libde265.orig/libde265/encoder/algo/Makefile.am
++++ libde265/libde265/encoder/algo/Makefile.am
+@@ -17,5 +17,13 @@ libde265_encoder_algo_la_SOURCES = \
    tb-rateestim.h tb-rateestim.cc \
    pb-mv.h pb-mv.cc
  
@@ -39,9 +43,11 @@ Author: Joachim Bauch <bauch@struktur.de>
 +
  EXTRA_DIST = \
    CMakeLists.txt
---- a/configure.ac
-+++ b/configure.ac
-@@ -56,9 +56,7 @@
+Index: libde265/configure.ac
+===================================================================
+--- libde265.orig/configure.ac
++++ libde265/configure.ac
+@@ -56,9 +56,7 @@ if test "x$GCC" = "xyes"; then
  fi
  changequote([,])dnl
  
@@ -52,9 +58,11 @@ Author: Joachim Bauch <bauch@struktur.de>
  AM_CONDITIONAL([HAVE_VISIBILITY], [test "x$HAVE_VISIBILITY" != "x0"])
  
  # Checks for header files.
---- a/libde265/image-io.cc
-+++ b/libde265/image-io.cc
-@@ -186,7 +186,7 @@
+Index: libde265/libde265/image-io.cc
+===================================================================
+--- libde265.orig/libde265/image-io.cc
++++ libde265/libde265/image-io.cc
+@@ -208,7 +208,7 @@ PacketSink_File::PacketSink_File()
  }
  
  
@@ -63,7 +71,7 @@ Author: Joachim Bauch <bauch@struktur.de>
  {
    if (mFH) {
      fclose(mFH);
-@@ -194,7 +194,7 @@
+@@ -216,7 +216,7 @@ LIBDE265_API PacketSink_File::~PacketSin
  }
  
  
@@ -72,7 +80,7 @@ Author: Joachim Bauch <bauch@struktur.de>
  {
    assert(mFH==NULL);
  
-@@ -202,7 +202,7 @@
+@@ -224,7 +224,7 @@ LIBDE265_API void PacketSink_File::set_f
  }
  
  
@@ -81,16 +89,18 @@ Author: Joachim Bauch <bauch@struktur.de>
  {
    uint8_t startCode[3];
    startCode[0] = 0;
---- a/libde265/image-io.h
-+++ b/libde265/image-io.h
+Index: libde265/libde265/image-io.h
+===================================================================
+--- libde265.orig/libde265/image-io.h
++++ libde265/libde265/image-io.h
 @@ -30,17 +30,17 @@
  class ImageSource
  {
   public:
 -  LIBDE265_API ImageSource();
--  virtual LIBDE265_API ~ImageSource() { }
+-  virtual LIBDE265_API ~ImageSource();
 +  ImageSource();
-+  virtual ~ImageSource() { }
++  virtual ~ImageSource();
  
    //enum ImageStatus { Available, Waiting, EndOfVideo };
  
@@ -107,7 +117,7 @@ Author: Joachim Bauch <bauch@struktur.de>
  };
  
  
-@@ -48,17 +48,17 @@
+@@ -48,17 +48,17 @@ class ImageSource
  class ImageSource_YUV : public ImageSource
  {
   public:
@@ -125,19 +135,19 @@ Author: Joachim Bauch <bauch@struktur.de>
 +  virtual de265_image* get_image(bool block=true);
 +  virtual void skip_frames(int n);
  
--  virtual LIBDE265_API int get_width() const { return width; }
--  virtual LIBDE265_API int get_height() const { return height; }
-+  virtual int get_width() const { return width; }
-+  virtual int get_height() const { return height; }
+-  virtual LIBDE265_API int get_width() const;
+-  virtual LIBDE265_API int get_height() const;
++  virtual int get_width() const;
++  virtual int get_height() const;
  
   private:
    FILE* mFH;
-@@ -74,20 +74,20 @@
+@@ -74,20 +74,20 @@ class ImageSource_YUV : public ImageSour
  class ImageSink
  {
   public:
--  virtual LIBDE265_API ~ImageSink() { }
-+  virtual ~ImageSink() { }
+-  virtual LIBDE265_API ~ImageSink();
++  virtual ~ImageSink();
  
 -  virtual LIBDE265_API void send_image(const de265_image* img) = 0;
 +  virtual void send_image(const de265_image* img) = 0;
@@ -146,9 +156,9 @@ Author: Joachim Bauch <bauch@struktur.de>
  class ImageSink_YUV : public ImageSink
  {
   public:
-- LIBDE265_API ImageSink_YUV() : mFH(NULL) { }
+-  LIBDE265_API ImageSink_YUV();
 -  LIBDE265_API ~ImageSink_YUV();
-+  ImageSink_YUV() : mFH(NULL) { }
++  ImageSink_YUV();
 +  ~ImageSink_YUV();
  
 -  bool LIBDE265_API set_filename(const char* filename);
@@ -159,12 +169,12 @@ Author: Joachim Bauch <bauch@struktur.de>
  
   private:
    FILE* mFH;
-@@ -98,21 +98,21 @@
+@@ -98,21 +98,21 @@ class ImageSink_YUV : public ImageSink
  class PacketSink
  {
   public:
--  virtual LIBDE265_API ~PacketSink() { }
-+  virtual ~PacketSink() { }
+-  virtual LIBDE265_API ~PacketSink();
++  virtual ~PacketSink();
  
 -  virtual LIBDE265_API void send_packet(const uint8_t* data, int n) = 0;
 +  virtual void send_packet(const uint8_t* data, int n) = 0;
@@ -187,9 +197,11 @@ Author: Joachim Bauch <bauch@struktur.de>
  
   private:
    FILE* mFH;
---- a/libde265/configparam.h
-+++ b/libde265/configparam.h
-@@ -95,7 +95,7 @@
+Index: libde265/libde265/configparam.h
+===================================================================
+--- libde265.orig/libde265/configparam.h
++++ libde265/libde265/configparam.h
+@@ -95,7 +95,7 @@ class option_base
    bool hasLongOption() const { return true; } //mLongOption!=NULL; }
    std::string getLongOption() const { return mLongOption ? std::string(mLongOption) : get_name(); }
  
@@ -198,7 +210,7 @@ Author: Joachim Bauch <bauch@struktur.de>
  
  
  
-@@ -132,7 +132,7 @@
+@@ -132,7 +132,7 @@ public:
    virtual std::string get_default_string() const { return default_value ? "true":"false"; }
  
    virtual std::string getTypeDescr() const { return "(boolean)"; }
@@ -207,7 +219,7 @@ Author: Joachim Bauch <bauch@struktur.de>
  
    bool set(bool v) { value_set=true; value=v; return true; }
  
-@@ -162,10 +162,10 @@
+@@ -162,10 +162,10 @@ public:
    virtual bool has_default() const { return default_set; }
  
    void set_default(std::string v) { default_value=v; default_set=true; }
@@ -221,7 +233,7 @@ Author: Joachim Bauch <bauch@struktur.de>
  
    bool set(std::string v) { value_set=true; value=v; return true; }
  
-@@ -201,10 +201,10 @@
+@@ -201,10 +201,10 @@ public:
    virtual bool has_default() const { return default_set; }
  
    void set_default(int v) { default_value=v; default_set=true; }
@@ -235,7 +247,7 @@ Author: Joachim Bauch <bauch@struktur.de>
  
    bool set(int v) {
      if (is_valid(v)) { value_set=true; value=v; return true; }
-@@ -239,7 +239,7 @@
+@@ -239,7 +239,7 @@ public:
    virtual std::vector<std::string> get_choice_names() const = 0;
  
    virtual std::string getTypeDescr() const;
@@ -244,7 +256,7 @@ Author: Joachim Bauch <bauch@struktur.de>
  
    const char** get_choices_string_table() const;
  
-@@ -368,10 +368,10 @@
+@@ -368,10 +368,10 @@ class config_parameters
   config_parameters() : param_string_table(NULL) { }
    ~config_parameters() { delete[] param_string_table; }
  
@@ -258,8 +270,10 @@ Author: Joachim Bauch <bauch@struktur.de>
                                   bool ignore_unknown_options=false);
  
  
---- a/libde265/quality.h
-+++ b/libde265/quality.h
+Index: libde265/libde265/quality.h
+===================================================================
+--- libde265.orig/libde265/quality.h
++++ libde265/libde265/quality.h
 @@ -26,11 +26,11 @@
  #include <libde265/image.h>
  
@@ -274,7 +288,7 @@ Author: Joachim Bauch <bauch@struktur.de>
                            const uint8_t* ref, int refStride,
                            int width, int height);
  
-@@ -41,7 +41,7 @@
+@@ -41,7 +41,7 @@ LIBDE265_API double MSE(const uint8_t* i
  LIBDE265_API double PSNR(double mse);
  
  
