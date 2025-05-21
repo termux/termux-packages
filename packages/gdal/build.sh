@@ -19,3 +19,11 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DGDAL_USE_GEOTIFF_INTERNAL=ON
 -DBUILD_PYTHON_BINDINGS=OFF
 "
+
+termux_step_pre_configure () {
+	if [ "${TERMUX_ARCH}" = "arm" ]; then
+		## -mfpu=neon causes build failure on ARM.
+		CFLAGS="${CFLAGS/-mfpu=neon/} -mfpu=vfp"
+		CXXFLAGS="${CXXFLAGS/-mfpu=neon/} -mfpu=vfp"
+	fi
+}
