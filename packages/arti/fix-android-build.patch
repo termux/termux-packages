@@ -1,0 +1,90 @@
+Taken from https://gitlab.torproject.org/tpo/core/arti/-/merge_requests/2824
+
+From 45b5d016835eaeb6786068692d7718a80beef3d4 Mon Sep 17 00:00:00 2001
+From: Yaksh Bariya <yakshbari4@gmail.com>
+Date: Mon, 3 Mar 2025 14:23:15 +0530
+Subject: [PATCH] fix builds for Android
+
+This does fix builds for both the arti binary and the tests. Most tests
+seem to be passing, some are failing. I will try to investigate them and
+send fixes/create issue to highlight them. Hopefully this helps arti in
+being production ready fast.
+---
+ crates/fs-mistrust/src/testing.rs      | 31 +++++++++++++++++++++++---
+ crates/fs-mistrust/src/walk.rs         |  1 +
+ crates/tor-general-addr/src/general.rs |  3 +++
+ 3 files changed, 32 insertions(+), 3 deletions(-)
+
+diff --git a/crates/fs-mistrust/src/testing.rs b/crates/fs-mistrust/src/testing.rs
+index 823276c0a..1e6f04615 100644
+--- a/crates/fs-mistrust/src/testing.rs
++++ b/crates/fs-mistrust/src/testing.rs
+@@ -187,11 +187,36 @@ pub(crate) fn mistrust_build(ops: &[MistrustOp]) -> Mistrust {
+                     return m;
+                 }
+ 
+-                #[cfg(target_family = "unix")]
+-                MistrustOp::TrustAdminOnly() => m.trust_admin_only(),
++                MistrustOp::TrustAdminOnly() => {
++                    #[cfg(all(
++                        target_family = "unix",
++                        not(target_os = "ios"),
++                        not(target_os = "android")
++                    ))]
++                    return m.trust_admin_only();
++                    #[cfg(not(all(
++                        target_family = "unix",
++                        not(target_os = "ios"),
++                        not(target_os = "android")
++                    )))]
++                    return m;
++                }
+ 
+                 #[cfg(target_family = "unix")]
+-                MistrustOp::TrustGroup(gid) => m.trust_group(*gid),
++                MistrustOp::TrustGroup(gid) => {
++                    #[cfg(all(
++                        target_family = "unix",
++                        not(target_os = "ios"),
++                        not(target_os = "android")
++                    ))]
++                    return m.trust_group(*gid);
++                    #[cfg(not(all(
++                        target_family = "unix",
++                        not(target_os = "ios"),
++                        not(target_os = "android")
++                    )))]
++                    return m;
++                }
+             }
+         })
+         .build()
+diff --git a/crates/fs-mistrust/src/walk.rs b/crates/fs-mistrust/src/walk.rs
+index d62cac3ff..99ce4a8be 100644
+--- a/crates/fs-mistrust/src/walk.rs
++++ b/crates/fs-mistrust/src/walk.rs
+@@ -676,6 +676,7 @@ mod test {
+             assert_eq!(m1, m2);
+         }
+ 
++        #[cfg(not(target_os = "android"))]
+         if pwd_grp::getuid() == 0 {
+             // We won't actually get a CouldNotInspect if we're running as root,
+             // since root can read directories that are mode 000.
+diff --git a/crates/tor-general-addr/src/general.rs b/crates/tor-general-addr/src/general.rs
+index 235e43246..981d7edbf 100644
+--- a/crates/tor-general-addr/src/general.rs
++++ b/crates/tor-general-addr/src/general.rs
+@@ -290,6 +290,9 @@ impl<'a> arbitrary::Arbitrary<'a> for SocketAddr {
+             }
+             #[cfg(any(target_os = "android", target_os = "linux"))]
+             Kind::UnixAbstract => {
++                #[cfg(target_os = "android")]
++                use std::os::android::net::SocketAddrExt as _;
++                #[cfg(target_os = "linux")]
+                 use std::os::linux::net::SocketAddrExt as _;
+                 let name: &[u8] = u.arbitrary()?;
+                 Ok(SocketAddr::Unix(
+-- 
+2.48.1
+
