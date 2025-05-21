@@ -39,6 +39,12 @@ termux_step_post_get_source() {
 	go mod download github.com/hashicorp/go-sockaddr@$sockaddr_version
 	cp -r "$(go env GOPATH)"/pkg/mod/github.com/hashicorp/go-sockaddr@$sockaddr_version go-sockaddr
 	chmod +w -R go-sockaddr
+
+	# patch for fixing https://github.com/dolthub/go-mysql-server/issues/2837
+	local go_mysql_server_version=v0.19.1-0.20250206012855-c216e59c21a7
+	go mod download github.com/dolthub/go-mysql-server@$go_mysql_server_version
+	cp -r "$(go env GOPATH)"/pkg/mod/github.com/dolthub/go-mysql-server@$go_mysql_server_version go-mysql-server
+	chmod +w -R go-mysql-server
 }
 
 termux_step_make() {
