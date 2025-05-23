@@ -86,6 +86,8 @@ termux_step_pre_configure() {
 termux_step_make() {
 	. $TERMUX_PKG_BUILDER_DIR/sources.sh
 
+	termux_setup_protobuf
+
 	local CORE_INCDIR=$TERMUX_PKG_SRCDIR/core/include
 	local LIBLOG_INCDIR=$TERMUX_PKG_SRCDIR/logging/liblog/include
 	local LIBBASE_SRCDIR=$TERMUX_PKG_SRCDIR/libbase
@@ -138,7 +140,7 @@ termux_step_make() {
 	# Build libziparchive:
 	cd $LIBZIPARCHIVE_SRCDIR
 	for f in $libziparchive_sources; do
-		$CXX $CXXFLAGS -std=c++20 $CPPFLAGS -I$INCFS_SUPPORT_INCDIR $f -c
+		$CXX $CXXFLAGS $CPPFLAGS -I$INCFS_SUPPORT_INCDIR $f -c
 	done
 	$CXX $CXXFLAGS *.o -shared $LDFLAGS \
 		-landroid-base \
@@ -163,6 +165,7 @@ termux_step_make() {
 		-landroid-cutils \
 		-landroid-utils \
 		-landroid-ziparchive \
+		-lpng \
 		-lz \
 		-o $_TMP_LIBDIR/libandroid-fw.so
 
@@ -195,6 +198,7 @@ termux_step_make() {
 		$CXX $CXXFLAGS $CPPFLAGS -I$LIBIDMAP2_POLICIES_INCDIR \
 			$f -c -o ${f%.*}.o
 	done
+
 	$CXX $CXXFLAGS $(find . -name '*.o') $LDFLAGS \
 		-landroid-base \
 		-landroid-fw \
