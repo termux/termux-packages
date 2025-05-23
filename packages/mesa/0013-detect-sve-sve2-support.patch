@@ -1,0 +1,59 @@
+https://github.com/llvm/llvm-project/issues/114987
+https://github.com/termux/termux-packages/issues/24544
+
+--- a/src/gallium/auxiliary/gallivm/lp_bld_misc.cpp
++++ b/src/gallium/auxiliary/gallivm/lp_bld_misc.cpp
+@@ -88,6 +88,23 @@
+ #include "lp_bld_misc.h"
+ #include "lp_bld_debug.h"
+ 
++#if __has_include(<sys/auxv.h>)
++#include <sys/auxv.h>
++#define HAVE_SYS_AUXV 1
++#ifndef AT_HWCAP
++#define AT_HWCAP    16
++#endif
++#ifndef AT_HWCAP2
++#define AT_HWCAP2   26
++#endif
++#ifndef HWCAP_SVE
++#define HWCAP_SVE   (1 << 22)
++#endif
++#ifndef HWCAP2_SVE2
++#define HWCAP2_SVE2 (1 << 1)
++#endif
++#endif
++
+ static void lp_run_atexit_for_destructors(void);
+ 
+ namespace {
+@@ -446,6 +463,29 @@
+    MAttrs.push_back("-lasx");
+ #endif
+ #endif
++
++#if DETECT_ARCH_AARCH64 && defined(HAVE_SYS_AUXV)
++   // Guess SVE/SVE2 support on ARM64
++   bool has_sve  = getauxval(AT_HWCAP)  & HWCAP_SVE;
++   bool has_sve2 = getauxval(AT_HWCAP2) & HWCAP2_SVE2;
++   MAttrs.push_back(has_sve  ? "+sve"  : "-sve");
++   MAttrs.push_back(has_sve2 ? "+sve2" : "-sve2");
++#endif
++
++   // Allow adding extra MAttrs through envs
++   char *env_extra_mattrs = getenv("GALLIVM_EXTRA_MATTRS");
++   if (env_extra_mattrs != NULL) {
++      char *dup = strdup(env_extra_mattrs);
++      if (dup != NULL) {
++         char *state;
++         char *token = strtok_r(dup, ",", &state);
++         while (token) {
++            MAttrs.push_back(token);
++            token = strtok_r(NULL, ",", &state);
++         }
++         free(dup);
++      }
++   }
+ }
+ 
+ void
