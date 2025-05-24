@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="General-purpose programming language and toolchain"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="zig/LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.14.0"
+TERMUX_PKG_VERSION="0.14.1"
 TERMUX_PKG_SRCURL=https://github.com/ziglang/zig/releases/download/${TERMUX_PKG_VERSION}/zig-bootstrap-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=bf3fcb22be0b83f4791748adb567d3304779d66d7bf9b1bd557ef6c2e0232807
+TERMUX_PKG_SHA256=89b2fce50bfbb1eee29c382193d22c6eb0c7da3a96b5ba6d05e0af2945b3ca3d
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
@@ -37,9 +37,10 @@ termux_step_make_install() {
 termux_step_post_massage() {
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "true" ]]; then return; fi
 	if [[ -z "$(find /proc/sys/fs/binfmt_misc -type f -name 'qemu-*')" ]]; then return; fi
-	# self test
-	pushd "${TERMUX_PKG_TMPDIR}"
-	"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL/bin/zig" version
-	"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL/bin/zig" init
-	popd
+
+	( # self test
+		cd "${TERMUX_PKG_TMPDIR}" || termux_error_exit "Failed to perform selftest for Zig $TERMUX_PKG_VERSION"
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL/bin/zig" version
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL/bin/zig" init
+	)
 }
