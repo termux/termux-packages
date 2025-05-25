@@ -34,11 +34,7 @@ termux_step_pre_configure() {
 
 termux_step_post_get_source() {
 	termux_setup_golang
-	#there is currently a bug in this version of go-sockaddr that prevents building. We download it here to patch it.
-	sockaddr_version=v1.0.6
-	go mod download github.com/hashicorp/go-sockaddr@$sockaddr_version
-	cp -r "$(go env GOPATH)"/pkg/mod/github.com/hashicorp/go-sockaddr@$sockaddr_version go-sockaddr
-	chmod +w -R go-sockaddr
+	go work vendor
 }
 
 termux_step_make() {
