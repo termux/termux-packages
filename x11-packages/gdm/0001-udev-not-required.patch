@@ -1,0 +1,30 @@
+--- a/meson.build
++++ b/meson.build
+@@ -48,8 +48,8 @@
+ endif
+ 
+ # Dependencies
+-udev_dep = dependency('udev')
+-gudev_dep = dependency('gudev-1.0', version: '>= 232')
++udev_dep = dependency('udev', required: false)
++gudev_dep = dependency('gudev-1.0', version: '>= 232', required: false)
+ 
+ # PAM
+ libpam_dep = cc.find_library('pam')
+
+--- a/daemon/gdm-local-display-factory.c
++++ b/daemon/gdm-local-display-factory.c
+@@ -1455,11 +1455,13 @@ gdm_local_display_factory_start_monitor (GdmLocalDisplayFactory *factory)
+ static void
+ gdm_local_display_factory_stop_monitor (GdmLocalDisplayFactory *factory)
+ {
++#ifdef HAVE_UDEV
+         if (factory->uevent_handler_id) {
+                 g_signal_handler_disconnect (factory->gudev_client, factory->uevent_handler_id);
+                 factory->uevent_handler_id = 0;
+         }
+         g_clear_object (&factory->gudev_client);
++#endif
+ 
+         if (factory->seat_new_id) {
+                 g_dbus_connection_signal_unsubscribe (factory->connection,
