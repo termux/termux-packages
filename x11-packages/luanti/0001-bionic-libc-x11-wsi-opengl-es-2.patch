@@ -35,7 +35,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
 
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -90,7 +90,7 @@ set(ENABLE_UPDATE_CHECKER (NOT ${DEVELOPMENT_BUILD}) CACHE BOOL
+@@ -93,7 +93,7 @@ set(ENABLE_UPDATE_CHECKER (NOT ${DEVELOPMENT_BUILD}) CACHE BOOL
  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
  
  # Load default options for Android
@@ -46,7 +46,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  endif()
 --- a/irr/src/CIrrDeviceSDL.cpp
 +++ b/irr/src/CIrrDeviceSDL.cpp
-@@ -254,7 +254,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters &param) :
+@@ -300,7 +300,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters &param) :
  		IsInBackground(false)
  {
  	if (++SDLDeviceInstances == 1) {
@@ -55,7 +55,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  		// Blocking on pause causes problems with multiplayer.
  		// see <https://github.com/luanti-org/luanti/issues/10842>
  		SDL_SetHint(SDL_HINT_ANDROID_BLOCK_ON_PAUSE, "0");
-@@ -743,7 +743,7 @@ bool CIrrDeviceSDL::run()
+@@ -792,7 +792,7 @@ bool CIrrDeviceSDL::run()
  #endif
  
  			auto button = SDL_event.button.button;
@@ -66,7 +66,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  			// vendor/device-specific.
 --- a/irr/src/CIrrDeviceSDL.h
 +++ b/irr/src/CIrrDeviceSDL.h
-@@ -164,7 +164,7 @@ class CIrrDeviceSDL : public CIrrDeviceStub
+@@ -170,7 +170,7 @@ class CIrrDeviceSDL : public CIrrDeviceStub
  		//! Sets the new position of the cursor.
  		void setPosition(s32 x, s32 y) override
  		{
@@ -77,7 +77,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  			SDL_WarpMouseInWindow(Device->Window,
 --- a/irr/src/CMakeLists.txt
 +++ b/irr/src/CMakeLists.txt
-@@ -59,7 +59,7 @@ if(WIN32)
+@@ -66,7 +66,7 @@ if(WIN32)
  elseif(APPLE)
  	add_compile_definitions(_IRR_OSX_PLATFORM_)
  	set(DEVICE "OSX")
@@ -86,16 +86,16 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  	add_compile_definitions(_IRR_ANDROID_PLATFORM_)
  	if(NOT USE_SDL2)
  		message(FATAL_ERROR "The Android build requires SDL2")
-@@ -220,7 +220,7 @@ if(ENABLE_OPENGL)
- 	find_package(OpenGL REQUIRED)
- endif()
- if(USE_SDL2)
+@@ -231,7 +231,7 @@ if(USE_SDL2)
+ 	if(NOT USE_SDL2_STATIC)
+ 		set(USE_SDL2_SHARED TRUE)
+ 	endif()
 -	if(NOT ANDROID)
 +	if(NOT DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK)
  		find_package(SDL2 REQUIRED)
  	else()
  		# provided by AndroidLibs.cmake
-@@ -267,7 +267,7 @@ endif()
+@@ -278,7 +278,7 @@ endif()
  
  # Platform-specific libs
  
@@ -104,7 +104,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  	enable_language(C)
  elseif(APPLE)
  	find_library(COCOA_LIB Cocoa REQUIRED)
-@@ -502,7 +502,6 @@ target_link_libraries(IrrlichtMt PRIVATE
+@@ -513,7 +513,6 @@ target_link_libraries(IrrlichtMt PRIVATE
  	${EGL_LIBRARY}
  
  	# incl. transitive SDL2 dependencies for static linking
@@ -112,9 +112,9 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  	${COCOA_LIB}
  	${IOKIT_LIB}
  	"$<$<PLATFORM_ID:Windows>:gdi32>"
-@@ -517,6 +516,6 @@ endif()
+@@ -528,6 +527,6 @@ endif()
  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
- 	target_compile_definitions(IrrlichtMt INTERFACE _DEBUG) # same
+ 	target_compile_definitions(IrrlichtMt INTERFACE _DEBUG)
  endif()
 -if(APPLE OR ANDROID OR EMSCRIPTEN)
 +if(APPLE OR DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK OR EMSCRIPTEN)
@@ -142,7 +142,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  		list(APPEND PLATFORM_LIBS android log)
  	endif()
  endif()
-@@ -482,7 +482,7 @@ set(common_SRCS
+@@ -485,7 +485,7 @@ set(common_SRCS
  	${server_network_SRCS}
  )
  
@@ -151,7 +151,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  	list(APPEND common_SRCS porting_android.cpp)
  endif()
  
-@@ -572,7 +572,6 @@ include_directories(SYSTEM
+@@ -575,7 +575,6 @@ include_directories(SYSTEM
  	${LUA_BIT_INCLUDE_DIR}
  	# on Android, Luanti depends on SDL2 directly
  	# on other platforms, only IrrlichtMt depends on SDL2
@@ -159,7 +159,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  )
  
  if(USE_GETTEXT)
-@@ -625,7 +624,7 @@ endif()
+@@ -631,7 +630,7 @@ endif()
  
  if(BUILD_CLIENT)
  	# client target
@@ -168,7 +168,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  		add_library(${PROJECT_NAME} SHARED)
  	else()
  		add_executable(${PROJECT_NAME})
-@@ -1065,7 +1064,7 @@ macro(CreateLegacyAlias _cmake_target _old_path _new_name)
+@@ -1071,7 +1070,7 @@ macro(CreateLegacyAlias _cmake_target _old_path _new_name)
  	install(PROGRAMS "${_old_path}" DESTINATION ${BINDIR})
  endmacro()
  
@@ -177,7 +177,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  	install(TARGETS ${PROJECT_NAME}
  		RUNTIME DESTINATION ${BINDIR}
  		LIBRARY DESTINATION ${BINDIR}
-@@ -1103,7 +1102,7 @@ if(BUILD_SERVER)
+@@ -1109,7 +1108,7 @@ if(BUILD_SERVER)
  	endif()
  endif()
  
@@ -188,7 +188,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  elseif (USE_GETTEXT)
 --- a/src/client/game.cpp
 +++ b/src/client/game.cpp
-@@ -631,7 +631,7 @@ class Game {
+@@ -703,7 +703,7 @@ class Game {
  		return input->wasKeyReleased(k);
  	}
  
@@ -197,25 +197,34 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  	void handleAndroidChatInput();
  #endif
  
-@@ -774,7 +774,7 @@ class Game {
- 	inline bool isTouchCrosshairDisabled() {
- 		return !m_touch_use_crosshair && camera->getCameraMode() == CAMERA_MODE_FIRST;
+@@ -850,7 +850,7 @@ class Game {
+ 		return g_touchcontrols && g_touchcontrols->isShootlineAvailable() &&
+ 				camera->getCameraMode() == CAMERA_MODE_FIRST;
  	}
 -#ifdef __ANDROID__
 +#ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
  	bool m_android_chat_open;
  #endif
  
-@@ -902,7 +902,7 @@ bool Game::startup(bool *kill,
- 	// In principle we could always enable relative mouse mode, but it causes weird
- 	// bugs on some setups (e.g. #14932), so we enable it only when it's required.
- 	// That is: on Wayland or Android, because it does not support mouse repositioning
+@@ -1018,7 +1018,7 @@ void Game::run()
+ 	const bool initial_window_maximized = !g_settings->getBool("fullscreen") &&
+ 			g_settings->getBool("window_maximized");
+ 
 -#ifdef __ANDROID__
 +#ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
- 	m_enable_relative_mode = true;
- #else
- 	m_enable_relative_mode = device->isUsingWayland();
-@@ -1827,7 +1827,7 @@ void Game::processUserInput(f32 dtime)
+ 	porting::setPlayingNowNotification(true);
+ #endif
+ 
+@@ -1104,7 +1104,7 @@ void Game::run()
+ 
+ 	framemarker.end();
+ 
+-#ifdef __ANDROID__
++#ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
+ 	porting::setPlayingNowNotification(false);
+ #endif
+ 
+@@ -1897,7 +1897,7 @@ void Game::processUserInput(f32 dtime)
  	// Input handler step() (used by the random input generator)
  	input->step(dtime);
  
@@ -224,7 +233,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  	if (!m_game_formspec.handleAndroidUIInput())
  		handleAndroidChatInput();
  #endif
-@@ -1855,7 +1855,7 @@ void Game::processKeyInput()
+@@ -1925,7 +1925,7 @@ void Game::processKeyInput()
  	} else if (wasKeyDown(KeyType::INVENTORY)) {
  		m_game_formspec.showPlayerInventory();
  	} else if (input->cancelPressed()) {
@@ -233,7 +242,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  		m_android_chat_open = false;
  #endif
  		if (!gui_chat_console->isOpenInhibited()) {
-@@ -2019,7 +2019,7 @@ void Game::openConsole(float scale, const wchar_t *line)
+@@ -2092,7 +2092,7 @@ void Game::openConsole(float scale, const wchar_t *line)
  {
  	assert(scale > 0.0f && scale <= 1.0f);
  
@@ -242,7 +251,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  	if (!porting::hasPhysicalKeyboardAndroid()) {
  		porting::showTextInputDialog("", "", 2);
  		m_android_chat_open = true;
-@@ -2032,12 +2032,12 @@ void Game::openConsole(float scale, const wchar_t *line)
+@@ -2105,12 +2105,12 @@ void Game::openConsole(float scale, const wchar_t *line)
  		gui_chat_console->setCloseOnEnter(true);
  		gui_chat_console->replaceAndAddToHistory(line);
  	}
@@ -259,7 +268,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  	// It has to be a text input
 --- a/src/client/game_formspec.cpp
 +++ b/src/client/game_formspec.cpp
-@@ -113,7 +113,7 @@ struct HardcodedPauseFormspecHandler : public TextDest
+@@ -112,7 +112,7 @@ struct HardcodedPauseFormspecHandler : public TextDest
  
  		if (fields.find("btn_exit_os") != fields.end()) {
  			g_gamecallback->exitToOS();
@@ -268,16 +277,16 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  			RenderingEngine::get_raw_device()->closeDevice();
  #endif
  			return;
-@@ -385,7 +385,7 @@ void GameFormSpec::showPauseMenu()
- 	os	<< "button_exit[4," << (ypos++) << ";3,0.5;btn_settings;"
+@@ -392,7 +392,7 @@ void GameFormSpec::showPauseMenu()
+ 	os	<< "button[4," << (ypos++) << ";3,0.5;btn_settings;"
  		<< strgettext("Settings") << "]";
  
 -#ifndef __ANDROID__
 +#ifndef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
  #if USE_SOUND
- 	os << "button_exit[4," << (ypos++) << ";3,0.5;btn_sound;"
+ 	os << "button[4," << (ypos++) << ";3,0.5;btn_sound;"
  		<< strgettext("Sound Volume") << "]";
-@@ -563,7 +563,7 @@ bool GameFormSpec::handleCallbacks()
+@@ -559,7 +559,7 @@ bool GameFormSpec::handleCallbacks()
  	return true;
  }
  
@@ -288,9 +297,9 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  	if (m_formspec) {
 --- a/src/client/game_formspec.h
 +++ b/src/client/game_formspec.h
-@@ -44,7 +44,7 @@ struct GameFormSpec
- 
+@@ -45,7 +45,7 @@ struct GameFormSpec
  	bool handleCallbacks();
+ 	void reset();
  
 -#ifdef __ANDROID__
 +#ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
@@ -299,7 +308,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  #endif
 --- a/src/client/hud.cpp
 +++ b/src/client/hud.cpp
-@@ -385,7 +385,7 @@ void Hud::drawLuaElements(const v3s16 &camera_offset)
+@@ -384,7 +384,7 @@ void Hud::drawLuaElements(const v3s16 &camera_offset)
  				if (e->size.X > 0)
  					font_size *= e->size.X;
  
@@ -339,7 +348,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  		dpi = 96.0f;
 --- a/src/defaultsettings.cpp
 +++ b/src/defaultsettings.cpp
-@@ -397,7 +397,7 @@ void set_default_settings()
+@@ -408,7 +408,7 @@ void set_default_settings()
  	settings->setDefault("contentdb_enable_updates_indicator", "true");
  	settings->setDefault("contentdb_max_concurrent_downloads", "3");
  
@@ -348,9 +357,9 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  	settings->setDefault("contentdb_flag_blacklist", "nonfree, android_default");
  #else
  	settings->setDefault("contentdb_flag_blacklist", "nonfree, desktop_default");
-@@ -548,9 +548,6 @@ void set_default_settings()
- 	settings->setDefault("touch_punch_gesture", "short_tap");
+@@ -555,9 +555,6 @@ void set_default_settings()
  	settings->setDefault("clickable_chat_weblinks", "true");
+ 
  	// Altered settings for Android
 -#ifdef __ANDROID__
 -	settings->setDefault("screen_w", "0");
@@ -358,9 +367,9 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  	settings->setDefault("performance_tradeoffs", "true");
  	settings->setDefault("max_simultaneous_block_sends_per_client", "10");
  	settings->setDefault("emergequeue_limit_diskonly", "16");
-@@ -569,6 +566,9 @@ void set_default_settings()
- 	settings->setDefault("debanding", "false");
+@@ -577,6 +574,9 @@ void set_default_settings()
  	settings->setDefault("post_processing_texture_bits", "8");
+ 	// We don't have working certificate verification...
  	settings->setDefault("curl_verify_cert", "false");
 +#ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
 +	settings->setDefault("screen_w", "0");
@@ -381,7 +390,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  	return DIR_DELIM "tmp";
 --- a/src/gui/guiEngine.cpp
 +++ b/src/gui/guiEngine.cpp
-@@ -376,7 +376,7 @@ void GUIEngine::run()
+@@ -381,7 +381,7 @@ void GUIEngine::run()
  		sound_volume_control(m_sound_manager.get(), device->isWindowActive());
  		m_sound_manager->step(dtime);
  
@@ -392,7 +401,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  	}
 --- a/src/gui/guiFormSpecMenu.cpp
 +++ b/src/gui/guiFormSpecMenu.cpp
-@@ -3326,7 +3326,7 @@ void GUIFormSpecMenu::legacySortElements(std::list<IGUIElement *>::iterator from
+@@ -3371,7 +3371,7 @@ void GUIFormSpecMenu::legacySortElements(std::list<IGUIElement *>::iterator from
  	reorderChildren(from, to, elements);
  }
  
@@ -403,7 +412,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  	porting::AndroidDialogState dialogState = getAndroidUIInputState();
 --- a/src/gui/guiFormSpecMenu.h
 +++ b/src/gui/guiFormSpecMenu.h
-@@ -277,7 +277,7 @@ class GUIFormSpecMenu : public GUIModalMenu
+@@ -281,7 +281,7 @@ class GUIFormSpecMenu : public GUIModalMenu
  	// This will only return a meaningful value if called after drawMenu().
  	core::rect<s32> getAbsoluteRect();
  
@@ -414,7 +423,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  
 --- a/src/gui/guiOpenURL.cpp
 +++ b/src/gui/guiOpenURL.cpp
-@@ -153,7 +153,7 @@ void GUIOpenURLMenu::drawMenu()
+@@ -165,7 +165,7 @@ void GUIOpenURLMenu::drawMenu()
  	driver->draw2DRectangle(bgcolor, AbsoluteRect, &AbsoluteClippingRect);
  
  	gui::IGUIElement::draw();
@@ -465,7 +474,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  		m_jni_field_name(""),
  #endif
  		m_menumgr(menumgr),
-@@ -242,7 +242,7 @@ void GUIModalMenu::leave()
+@@ -243,7 +243,7 @@ void GUIModalMenu::leave()
  
  bool GUIModalMenu::preprocessEvent(const SEvent &event)
  {
@@ -474,7 +483,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  	// display software keyboard when clicking edit boxes
  	if (event.EventType == EET_MOUSE_INPUT_EVENT &&
  			event.MouseInput.Event == EMIE_LMOUSE_PRESSED_DOWN &&
-@@ -369,7 +369,7 @@ bool GUIModalMenu::preprocessEvent(const SEvent &event)
+@@ -370,7 +370,7 @@ bool GUIModalMenu::preprocessEvent(const SEvent &event)
  	return false;
  }
  
@@ -656,7 +665,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  #elif defined(__APPLE__)
 --- a/src/porting.h
 +++ b/src/porting.h
-@@ -344,6 +344,6 @@ bool open_directory(const std::string &path);
+@@ -342,6 +342,6 @@ bool open_directory(const std::string &path);
  
  } // namespace porting
  
@@ -688,7 +697,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  
 --- a/src/script/lua_api/l_mainmenu.cpp
 +++ b/src/script/lua_api/l_mainmenu.cpp
-@@ -1004,7 +1004,7 @@ int ModApiMainMenu::l_share_file(lua_State *L)
+@@ -1007,7 +1007,7 @@ int ModApiMainMenu::l_share_file(lua_State *L)
  
  	CHECK_SECURE_PATH(L, path, false)
  
@@ -699,7 +708,7 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  #else
 --- a/src/server.cpp
 +++ b/src/server.cpp
-@@ -3114,7 +3114,7 @@ std::wstring Server::handleChat(const std::string &name,
+@@ -3163,7 +3163,7 @@ std::wstring Server::handleChat(const std::string &name,
  			Workaround for fixing chat on Android. Lua doesn't handle
  			the Cyrillic alphabet and some characters on older Android devices
  		*/
