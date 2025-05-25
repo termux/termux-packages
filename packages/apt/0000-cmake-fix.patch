@@ -1,19 +1,8 @@
-diff -uNr apt-2.1.13/apt-pkg/CMakeLists.txt apt-2.1.13.mod/apt-pkg/CMakeLists.txt
---- apt-2.1.13/apt-pkg/CMakeLists.txt	2020-12-10 16:40:27.000000000 +0200
-+++ apt-2.1.13.mod/apt-pkg/CMakeLists.txt	2020-12-11 18:10:24.236801758 +0200
-@@ -52,7 +52,7 @@
- )
- 
- target_link_libraries(apt-pkg
--                      PRIVATE -lutil ${CMAKE_DL_LIBS} ${RESOLV_LIBRARIES}
-+                      PRIVATE ${CMAKE_DL_LIBS} ${RESOLV_LIBRARIES}
-                              ${CMAKE_THREAD_LIBS_INIT}
-                              ${ZLIB_LIBRARIES}
-                              ${BZIP2_LIBRARIES}
-diff -uNr apt-2.2.0/CMakeLists.txt apt-2.2.0.mod/CMakeLists.txt
---- apt-2.2.0/CMakeLists.txt	2020-12-10 16:40:27.000000000 +0200
-+++ apt-2.2.0.mod/CMakeLists.txt	2020-12-11 18:10:24.236801758 +0200
-@@ -189,14 +189,6 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 19e61cd14..a4b9a8aa4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -193,14 +193,6 @@ if (NOT HAVE_SIGHANDLER_T)
    endif()
  endif()
  
@@ -28,18 +17,7 @@ diff -uNr apt-2.2.0/CMakeLists.txt apt-2.2.0.mod/CMakeLists.txt
  # Configure some variables like package, version and architecture.
  set(PACKAGE ${PROJECT_NAME})
  set(PACKAGE_MAIL "APT Development Team <deity@lists.debian.org>")
-@@ -209,10 +201,6 @@
-   message(STATUS "Found dpkg data dir: ${DPKG_DATADIR_CMD}")
-   set(DPKG_DATADIR "${DPKG_DATADIR_CMD}" CACHE PATH "dpkg data directory")
- endif()
--if (NOT DEFINED COMMON_ARCH)
--  execute_process(COMMAND dpkg-architecture -qDEB_HOST_ARCH
--                  OUTPUT_VARIABLE COMMON_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
--endif()
- if (NOT DEFINED ROOT_GROUP)
-   execute_process(COMMAND id -gn root
-                   OUTPUT_VARIABLE ROOT_GROUP OUTPUT_STRIP_TRAILING_WHITESPACE)
-@@ -243,7 +231,6 @@
+@@ -255,7 +247,6 @@ add_subdirectory(doc)
  add_subdirectory(dselect)
  add_subdirectory(ftparchive)
  add_subdirectory(methods)
@@ -47,37 +25,25 @@ diff -uNr apt-2.2.0/CMakeLists.txt apt-2.2.0.mod/CMakeLists.txt
  
  if (USE_NLS)
  add_subdirectory(po)
-diff -uNr apt-2.1.13/methods/CMakeLists.txt apt-2.1.13.mod/methods/CMakeLists.txt
---- apt-2.1.13/methods/CMakeLists.txt	2020-12-10 16:40:27.000000000 +0200
-+++ apt-2.1.13.mod/methods/CMakeLists.txt	2020-12-11 18:11:00.833144879 +0200
-@@ -11,7 +11,6 @@
- add_executable(cdrom cdrom.cc)
- add_executable(http http.cc basehttp.cc $<TARGET_OBJECTS:connectlib>)
- add_executable(mirror mirror.cc)
--add_executable(ftp ftp.cc $<TARGET_OBJECTS:connectlib>)
- add_executable(rred rred.cc)
- add_executable(rsh rsh.cc)
+diff --git a/apt-pkg/CMakeLists.txt b/apt-pkg/CMakeLists.txt
+index 7aaacd9d9..b577e4f12 100644
+--- a/apt-pkg/CMakeLists.txt
++++ b/apt-pkg/CMakeLists.txt
+@@ -61,7 +61,7 @@ target_include_directories(apt-pkg
+ )
  
-@@ -23,12 +22,11 @@
- 
- # Additional libraries to link against for networked stuff
- target_link_libraries(http $<$<BOOL:${GNUTLS_FOUND}>:${GNUTLS_LIBRARIES}> $<$<BOOL:${SYSTEMD_FOUND}>:${SYSTEMD_LIBRARIES}>)
--target_link_libraries(ftp $<$<BOOL:${GNUTLS_FOUND}>:${GNUTLS_LIBRARIES}>)
- 
- target_link_libraries(rred apt-private)
- 
- # Install the library
--install(TARGETS file copy store gpgv cdrom http ftp rred rsh mirror
-+install(TARGETS file copy store gpgv cdrom http rred rsh mirror
-         RUNTIME DESTINATION ${CMAKE_INSTALL_LIBEXECDIR}/apt/methods)
- 
- add_links(${CMAKE_INSTALL_LIBEXECDIR}/apt/methods mirror mirror+ftp mirror+http mirror+https mirror+file mirror+copy)
+ target_link_libraries(apt-pkg
+-                      PRIVATE -lutil ${CMAKE_DL_LIBS} ${RESOLV_LIBRARIES}
++                      PRIVATE ${CMAKE_DL_LIBS} ${RESOLV_LIBRARIES}
+                              ${CMAKE_THREAD_LIBS_INIT}
+                              ${ZLIB_LIBRARIES}
+                              ${BZIP2_LIBRARIES}
 diff --git a/doc/CMakeLists.txt b/doc/CMakeLists.txt
-index 3060949..3ce03b6 100644
+index 2df0ce721..25441d936 100644
 --- a/doc/CMakeLists.txt
 +++ b/doc/CMakeLists.txt
-@@ -1,15 +1,6 @@
- include(Documentation)
+@@ -3,15 +3,6 @@ include(Documentation)
+ endif()
  
  set(LINGUAS
 -    de
