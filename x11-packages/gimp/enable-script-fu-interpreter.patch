@@ -1,0 +1,44 @@
+--- a/plug-ins/script-fu/interpreter/meson.build
++++ b/plug-ins/script-fu/interpreter/meson.build
+@@ -8,7 +8,7 @@ plugin_sources = [
+   'script-fu-interpreter-plugin.c',
+ ]
+ 
+-if not meson.is_cross_build()
++if true
+   if platform_windows
+     plugin_sources += windows.compile_resources(
+       plugin_rc,
+--- a/plug-ins/script-fu/meson.build
++++ b/plug-ins/script-fu/meson.build
+@@ -31,7 +31,7 @@ plugin_sources = [
+   'script-fu.c',
+ ]
+ 
+-if not meson.is_cross_build()
++if true
+   if platform_windows
+     plugin_sources += windows.compile_resources(
+       plugin_rc,
+--- a/plug-ins/script-fu/server/meson.build
++++ b/plug-ins/script-fu/server/meson.build
+@@ -8,7 +8,7 @@ plugin_sources = [
+   'script-fu-server-plugin.c',
+ ]
+ 
+-if not meson.is_cross_build()
++if true
+   if platform_windows
+     plugin_sources += windows.compile_resources(
+       plugin_rc,
+--- a/meson.build
++++ b/meson.build
+@@ -1576,7 +1551,7 @@ endif
+ conf.set('NO_FD_SET',
+   not platform_windows
+   and not cc.compiles('''
+-    #include <sys/types.h>
++    #include <sys/select.h>
+     int main() { fd_set readMask, writeMask; return 0; }
+   ''')
+ )
