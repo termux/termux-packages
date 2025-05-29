@@ -27,6 +27,18 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DZSTD_HOME=$TERMUX_PREFIX
 "
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _EXPECTED_SOVERSION=2000
+
+	# From cpp/CMakeLists.txt: ARROW_SO_VERSION = "${ARROW_VERSION_MAJOR} * 100 + ${ARROW_VERSION_MINOR}"
+	local _ACTUAL_SOVERSION=$(echo "$TERMUX_PKG_VERSION" | awk -F'.' '{print $1 * 100 + $2}')
+	if [ ! "${_ACTUAL_SOVERSION}" ] || [ "${_EXPECTED_SOVERSION}" != "$(( "${_ACTUAL_SOVERSION}" ))" ]; then
+		termux_error_exit "SOVERSION changed: expected=$_EXPECTED_SOVERSION, actual=$_ACTUAL_SOVERSION"
+	fi
+}
+
 termux_step_pre_configure() {
 	termux_setup_protobuf
 
