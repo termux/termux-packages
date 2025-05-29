@@ -1235,3 +1235,94 @@ index 1f61f2b45a..fdc5770b77 100644
  }  // namespace extensions
 +
 +#undef kCancelReason
+diff --git a/extensions/browser/api/declarative_webrequest/webrequest_condition.cc b/extensions/browser/api/declarative_webrequest/webrequest_condition.cc
+index 676a3a6166..baa24d545a 100644
+--- a/extensions/browser/api/declarative_webrequest/webrequest_condition.cc
++++ b/extensions/browser/api/declarative_webrequest/webrequest_condition.cc
+@@ -18,8 +18,6 @@ using url_matcher::URLMatcherConditionFactory;
+ using url_matcher::URLMatcherConditionSet;
+ using url_matcher::URLMatcherFactory;
+ 
+-namespace keys = extensions::declarative_webrequest_constants;
+-
+ namespace {
+ static base::MatcherStringPattern::ID g_next_id = 0;
+ 
+@@ -38,8 +36,6 @@ const char kConditionCannotBeFulfilled[] = "A condition can never be "
+ 
+ namespace extensions {
+ 
+-namespace keys = declarative_webrequest_constants;
+-
+ //
+ // WebRequestData
+ //
+@@ -121,6 +117,7 @@ std::unique_ptr<WebRequestCondition> WebRequestCondition::Create(
+     URLMatcherConditionFactory* url_matcher_condition_factory,
+     const base::Value& condition,
+     std::string* error) {
++  namespace keys = declarative_webrequest_constants;
+   const base::Value::Dict* condition_dict = condition.GetIfDict();
+   if (!condition_dict) {
+     *error = kExpectedDictionary;
+diff --git a/extensions/browser/api/web_request/web_request_api_helpers.cc b/extensions/browser/api/web_request/web_request_api_helpers.cc
+index c35a0331b8..8f988bd403 100644
+--- a/extensions/browser/api/web_request/web_request_api_helpers.cc
++++ b/extensions/browser/api/web_request/web_request_api_helpers.cc
+@@ -59,7 +59,6 @@ using base::Time;
+ using net::cookie_util::ParsedRequestCookie;
+ using net::cookie_util::ParsedRequestCookies;
+ 
+-namespace keys = extension_web_request_api_constants;
+ namespace web_request = extensions::api::web_request;
+ using DNRRequestAction = extensions::declarative_net_request::RequestAction;
+ 
+@@ -1819,6 +1818,7 @@ void ClearCacheOnNavigation() {
+ // dictionary.
+ base::Value::Dict CreateHeaderDictionary(const std::string& name,
+                                          const std::string& value) {
++  namespace keys = extension_web_request_api_constants; 
+   base::Value::Dict header;
+   header.Set(keys::kHeaderNameKey, name);
+   if (base::IsStringUTF8(value)) {
+diff --git a/extensions/browser/api/web_request/web_request_event_details.cc b/extensions/browser/api/web_request/web_request_event_details.cc
+index cb1b59814c..f31b1dfba8 100644
+--- a/extensions/browser/api/web_request/web_request_event_details.cc
++++ b/extensions/browser/api/web_request/web_request_event_details.cc
+@@ -31,7 +31,8 @@
+ using extension_web_request_api_helpers::ExtraInfoSpec;
+ 
+ namespace helpers = extension_web_request_api_helpers;
+-namespace keys = extension_web_request_api_constants;
++namespace keys_web_request_event_details = extension_web_request_api_constants;
++#define keys keys_web_request_event_details
+ 
+ namespace extensions {
+ namespace {
+@@ -202,3 +203,5 @@ base::Value::Dict WebRequestEventDetails::GetAndClearDict() {
+ }
+ 
+ }  // namespace extensions
++
++#undef keys
+diff --git a/extensions/browser/api/web_request/web_request_info.cc b/extensions/browser/api/web_request/web_request_info.cc
+index f40aba6067..9a19e17dd8 100644
+--- a/extensions/browser/api/web_request/web_request_info.cc
++++ b/extensions/browser/api/web_request/web_request_info.cc
+@@ -39,8 +39,6 @@
+ #include "extensions/browser/guest_view/web_view/web_view_renderer_state.h"
+ #endif
+ 
+-namespace keys = extension_web_request_api_constants;
+-
+ namespace extensions {
+ 
+ namespace {
+@@ -127,6 +125,7 @@ std::optional<base::Value::Dict> CreateRequestBodyData(
+     const std::string& method,
+     const net::HttpRequestHeaders& request_headers,
+     const std::vector<std::unique_ptr<UploadDataSource>>& data_sources) {
++  namespace keys = extension_web_request_api_constants;
+   if (method != "POST" && method != "PUT") {
+     return std::nullopt;
+   }
