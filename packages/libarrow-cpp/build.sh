@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="20.0.0"
 TERMUX_PKG_SRCURL=https://github.com/apache/arrow/archive/refs/tags/apache-arrow-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=67e31a4f46528634b8c3cbb0dc60ac8f85859d906b400d83d0b6f732b0c5b0e3
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="abseil-cpp, apache-orc, libandroid-execinfo, libc++, liblz4, libprotobuf, libre2, libsnappy, thrift, utf8proc, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers, rapidjson"
 TERMUX_PKG_PYTHON_COMMON_DEPS="build, Cython, numpy, setuptools, setuptools-scm, wheel"
