@@ -7,7 +7,7 @@ _COMMIT=f09a19cebdaf04bddcd3101e9783207cb5cf3e13
 _COMMIT_POSISION=24923
 TERMUX_PKG_SRCURL=git+https://chromium.googlesource.com/angle/angle
 TERMUX_PKG_VERSION="2.1.$_COMMIT_POSISION-${_COMMIT:0:8}"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 
 TERMUX_PKG_HOSTBUILD=true
 
@@ -28,6 +28,7 @@ termux_step_get_source() {
 		touch "$TERMUX_PKG_CACHEDIR/.depot_tools-fetched"
 	fi
 	export PATH="$TERMUX_PKG_CACHEDIR/depot_tools:$PATH"
+	$TERMUX_PKG_CACHEDIR/depot_tools/ensure_bootstrap
 	export DEPOT_TOOLS_UPDATE=0
 
 	# Get source
