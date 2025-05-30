@@ -459,9 +459,9 @@ TERMUX__REPOS_HOST_ORG_URL="https://github.com/$TERMUX__REPOS_HOST_ORG_NAME"
 # - https://developer.android.com/build/configure-app-module#set-application-id
 # - https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#termux-private-app-data-directory
 #
-# Default value: `com.termux`
+# Default value: `com.reena.aamp`
 ##
-TERMUX_APP__PACKAGE_NAME="com.termux"
+TERMUX_APP__PACKAGE_NAME="com.reena.aamp"
 TERMUX_APP_PACKAGE="$TERMUX_APP__PACKAGE_NAME" # Deprecated alternative variable for `TERMUX_APP__PACKAGE_NAME`
 
 __termux_build_props__add_variables_validator_actions "TERMUX_APP__PACKAGE_NAME" "app_package_name"
@@ -480,7 +480,7 @@ __termux_build_props__add_variables_validator_actions "TERMUX_APP__PACKAGE_NAME"
 # sure a safe path is set if running `clean.sh` in Termux docker or
 # host OS build environment.
 #
-# Default value: `/data/data/com.termux`
+# Default value: `/data/data/com.reena.aamp`
 ##
 TERMUX_APP__DATA_DIR="/data/data/$TERMUX_APP__PACKAGE_NAME"
 __termux_build_props__add_variables_validator_actions "TERMUX_APP__DATA_DIR" "safe_absolute_path"
@@ -528,7 +528,7 @@ __termux_build_props__add_variables_validator_actions "TERMUX__PROJECT_SUBDIR" "
 #
 # - https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#termux-project-directory
 #
-# Default value: `/data/data/com.termux/termux`
+# Default value: `/data/data/com.reena.aamp/termux`
 ##
 TERMUX__PROJECT_DIR="$TERMUX_APP__DATA_DIR/$TERMUX__PROJECT_SUBDIR"
 __termux_build_props__add_variables_validator_actions "TERMUX__PROJECT_DIR" "safe_absolute_path"
@@ -552,7 +552,7 @@ TERMUX__CORE_SUBDIR="core"
 #
 # - https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#termux-core-directory
 #
-# Default value: `/data/data/com.termux/termux/core`
+# Default value: `/data/data/com.reena.aamp/termux/core`
 ##
 TERMUX__CORE_DIR="$TERMUX__PROJECT_DIR/$TERMUX__CORE_SUBDIR"
 __termux_build_props__add_variables_validator_actions "TERMUX__CORE_DIR" "safe_absolute_path"
@@ -579,7 +579,7 @@ TERMUX__APPS_SUBDIR="app"
 #
 # - https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#termux-apps-directory
 #
-# Default value: `/data/data/com.termux/termux/app`
+# Default value: `/data/data/com.reena.aamp/termux/app`
 ##
 TERMUX__APPS_DIR="$TERMUX__PROJECT_DIR/$TERMUX__APPS_SUBDIR"
 __termux_build_props__add_variables_validator_actions "TERMUX__APPS_DIR" "safe_absolute_path"
@@ -618,7 +618,7 @@ TERMUX__APPS_DIR_BY_IDENTIFIER_SUBDIR="i"
 ##
 # Termux apps directory path by app identifier under `TERMUX__APPS_DIR`.
 #
-# Default value: `/data/data/com.termux/termux/app/i`
+# Default value: `/data/data/com.reena.aamp/termux/app/i`
 ##
 TERMUX__APPS_DIR_BY_IDENTIFIER="$TERMUX__APPS_DIR/$TERMUX__APPS_DIR_BY_IDENTIFIER_SUBDIR"
 
@@ -665,7 +665,7 @@ TERMUX__APPS_DIR_BY_UID_SUBDIR="u"
 # Termux apps directory path by app uid (user_id + app_id) under
 # `TERMUX__APPS_DIR`.
 #
-# Default value: `/data/data/com.termux/termux/app/u`
+# Default value: `/data/data/com.reena.aamp/termux/app/u`
 ##
 TERMUX__APPS_DIR_BY_UID="$TERMUX__APPS_DIR/$TERMUX__APPS_DIR_BY_UID_SUBDIR"
 
@@ -778,7 +778,7 @@ __termux_build_props__add_variables_validator_actions "TERMUX__ROOTFS_SUBDIR" "a
 # the `TERMUX_APP__DATA_DIR` if compiling packages for the Android
 # system or `adb` `shell` user.
 #
-# Default value: `/data/data/com.termux/files`
+# Default value: `/data/data/com.reena.aamp/files`
 ##
 TERMUX__ROOTFS="$TERMUX_APP__DATA_DIR/$TERMUX__ROOTFS_SUBDIR"
 TERMUX_BASE_DIR="$TERMUX__ROOTFS" # Deprecated alternative variable for `TERMUX__ROOTFS`
@@ -829,7 +829,7 @@ __termux_build_props__add_variables_validator_actions "TERMUX__HOME_SUBDIR" "saf
 # The Termux home must not be set to Android/Linux rootfs `/` or any
 # other path in `TERMUX_REGEX__INVALID_TERMUX_HOME_PATHS`.
 #
-# Default value: `/data/data/com.termux/files/home`
+# Default value: `/data/data/com.reena.aamp/files/home`
 ##
 [[ "$TERMUX__ROOTFS" != "/" ]] && TERMUX__HOME="$TERMUX__ROOTFS/$TERMUX__HOME_SUBDIR" || \
     TERMUX__HOME="/$TERMUX__HOME_SUBDIR"
@@ -840,7 +840,7 @@ TERMUX_ANDROID_HOME="$TERMUX__HOME" # Deprecated alternative variable for `TERMU
 ##
 # Termux legacy project user config directory path under `TERMUX__HOME`.
 #
-# Default value: `/data/data/com.termux/files/home/.termux`
+# Default value: `/data/data/com.reena.aamp/files/home/.termux`
 ##
 TERMUX__LEGACY_PROJECT_USER_CONFIG_DIR="$TERMUX__HOME/.termux"
 
@@ -939,7 +939,7 @@ __termux_build_props__add_variables_validator_actions "TERMUX__PREFIX_SUBDIR" "a
 # - https://github.com/termux/termux-packages/pull/16901
 # - https://github.com/termux/termux-packages/pull/20864
 #
-# Default value: `/data/data/com.termux/files/usr`
+# Default value: `/data/data/com.reena.aamp/files/usr`
 ##
 [[ "$TERMUX__ROOTFS" != "/" ]] && TERMUX__PREFIX="$TERMUX__ROOTFS${TERMUX__PREFIX_SUBDIR:+"/$TERMUX__PREFIX_SUBDIR"}" || \
     TERMUX__PREFIX="/$TERMUX__PREFIX_SUBDIR"
@@ -960,7 +960,7 @@ TERMUX_PREFIX="$TERMUX__PREFIX" # Deprecated alternative variable for `TERMUX__P
 # can be overridden at runtime, like when compiling `glibc` packages.
 # Checks variable docs of `TERMUX__PREFIX` for more info.
 #
-# Default value: `/data/data/com.termux/files/usr`
+# Default value: `/data/data/com.reena.aamp/files/usr`
 ##
 TERMUX__PREFIX_CLASSICAL="$TERMUX__PREFIX"
 TERMUX_PREFIX_CLASSICAL="$TERMUX__PREFIX" # Deprecated alternative variable for `TERMUX__PREFIX_CLASSICAL`
@@ -982,7 +982,7 @@ TERMUX__PREFIX_GLIBC_SUBDIR="glibc"
 # - https://github.com/termux-pacman/glibc-packages
 # - https://github.com/termux/glibc-packages (mirror)
 #
-# Default value: `/data/data/com.termux/files/usr/glibc`
+# Default value: `/data/data/com.reena.aamp/files/usr/glibc`
 ##
 TERMUX__PREFIX_GLIBC="$TERMUX__PREFIX/$TERMUX__PREFIX_GLIBC_SUBDIR"
 __termux_build_props__add_variables_validator_actions "TERMUX__PREFIX_GLIBC" "safe_absolute_path invalid_termux_prefix_paths path_under_termux_rootfs"
@@ -1087,7 +1087,7 @@ TERMUX__PREFIX__BIN_SUBDIR="bin"
 #
 # - https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#termux-bin-directory
 #
-# Default value: `/data/data/com.termux/files/usr/bin`
+# Default value: `/data/data/com.reena.aamp/files/usr/bin`
 ##
 TERMUX__PREFIX__BIN_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__BIN_SUBDIR"
 
@@ -1103,7 +1103,7 @@ TERMUX__PREFIX__ETC_SUBDIR="etc"
 ##
 # Termux etc directory path under `TERMUX__PREFIX`.
 #
-# Default value: `/data/data/com.termux/files/usr/etc`
+# Default value: `/data/data/com.reena.aamp/files/usr/etc`
 ##
 TERMUX__PREFIX__ETC_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__ETC_SUBDIR"
 
@@ -1119,7 +1119,7 @@ TERMUX__PREFIX__BASE_INCLUDE_SUBDIR="include"
 ##
 # Termux base include directory path under `TERMUX__PREFIX`.
 #
-# Default value: `/data/data/com.termux/files/usr/include`
+# Default value: `/data/data/com.reena.aamp/files/usr/include`
 ##
 TERMUX__PREFIX__BASE_INCLUDE_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__BASE_INCLUDE_SUBDIR"
 
@@ -1134,7 +1134,7 @@ TERMUX__PREFIX__MULTI_INCLUDE_SUBDIR="include32"
 ##
 # Termux multi include directory path under `TERMUX__PREFIX`.
 #
-# Default value: `/data/data/com.termux/files/usr/include32`
+# Default value: `/data/data/com.reena.aamp/files/usr/include32`
 ##
 TERMUX__PREFIX__MULTI_INCLUDE_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__MULTI_INCLUDE_SUBDIR"
 
@@ -1142,7 +1142,7 @@ TERMUX__PREFIX__MULTI_INCLUDE_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__MULTI_INCLUD
 ##
 # Termux include directory path under `TERMUX__PREFIX`.
 #
-# Default value: `/data/data/com.termux/files/usr/include` (`$TERMUX__PREFIX__BASE_INCLUDE_DIR`)
+# Default value: `/data/data/com.reena.aamp/files/usr/include` (`$TERMUX__PREFIX__BASE_INCLUDE_DIR`)
 ##
 TERMUX__PREFIX__INCLUDE_DIR="$TERMUX__PREFIX__BASE_INCLUDE_DIR"
 
@@ -1158,7 +1158,7 @@ TERMUX__PREFIX__BASE_LIB_SUBDIR="lib"
 ##
 # Termux base lib directory path under `TERMUX__PREFIX`.
 #
-# Default value: `/data/data/com.termux/files/usr/lib`
+# Default value: `/data/data/com.reena.aamp/files/usr/lib`
 ##
 TERMUX__PREFIX__BASE_LIB_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__BASE_LIB_SUBDIR"
 
@@ -1173,7 +1173,7 @@ TERMUX__PREFIX__MULTI_LIB_SUBDIR="lib32"
 ##
 # Termux multi lib directory path under `TERMUX__PREFIX`.
 #
-# Default value: `/data/data/com.termux/files/usr/lib32`
+# Default value: `/data/data/com.reena.aamp/files/usr/lib32`
 ##
 TERMUX__PREFIX__MULTI_LIB_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__MULTI_LIB_SUBDIR"
 
@@ -1183,7 +1183,7 @@ TERMUX__PREFIX__MULTI_LIB_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__MULTI_LIB_SUBDIR
 #
 # - https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#termux-lib-directory
 #
-# Default value: `/data/data/com.termux/files/usr/lib` (`$TERMUX__PREFIX__BASE_LIB_DIR`)
+# Default value: `/data/data/com.reena.aamp/files/usr/lib` (`$TERMUX__PREFIX__BASE_LIB_DIR`)
 ##
 TERMUX__PREFIX__LIB_DIR="$TERMUX__PREFIX__BASE_LIB_DIR"
 
@@ -1199,7 +1199,7 @@ TERMUX__PREFIX__LIBEXEC_SUBDIR="libexec"
 ##
 # Termux libexec directory path under `TERMUX__PREFIX`.
 #
-# Default value: `/data/data/com.termux/files/usr/libexec`
+# Default value: `/data/data/com.reena.aamp/files/usr/libexec`
 ##
 TERMUX__PREFIX__LIBEXEC_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__LIBEXEC_SUBDIR"
 
@@ -1215,7 +1215,7 @@ TERMUX__PREFIX__OPT_SUBDIR="opt"
 ##
 # Termux opt directory path under `TERMUX__PREFIX`.
 #
-# Default value: `/data/data/com.termux/files/usr/opt`
+# Default value: `/data/data/com.reena.aamp/files/usr/opt`
 ##
 TERMUX__PREFIX__OPT_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__OPT_SUBDIR"
 
@@ -1231,7 +1231,7 @@ TERMUX__PREFIX__SHARE_SUBDIR="share"
 ##
 # Termux share directory path under `TERMUX__PREFIX`.
 #
-# Default value: `/data/data/com.termux/files/usr/share`
+# Default value: `/data/data/com.reena.aamp/files/usr/share`
 ##
 TERMUX__PREFIX__SHARE_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__SHARE_SUBDIR"
 
@@ -1247,7 +1247,7 @@ TERMUX__PREFIX__VAR_SUBDIR="var"
 ##
 # Termux var directory path under `TERMUX__PREFIX`.
 #
-# Default value: `/data/data/com.termux/files/usr/var`
+# Default value: `/data/data/com.reena.aamp/files/usr/var`
 ##
 TERMUX__PREFIX__VAR_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__VAR_SUBDIR"
 
@@ -1276,7 +1276,7 @@ TERMUX__PREFIX__TMP_SUBDIR="tmp"
 ##
 # Termux tmp directory path under `TERMUX__PREFIX`.
 #
-# Default value: `/data/data/com.termux/files/usr/tmp`
+# Default value: `/data/data/com.reena.aamp/files/usr/tmp`
 ##
 TERMUX__PREFIX__TMP_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__TMP_SUBDIR"
 
@@ -1296,7 +1296,7 @@ TERMUX__PREFIX__TMP_DIR___MAX_LEN=94
 ##
 # Termux `profile.d` directory path under `TERMUX__PREFIX__ETC_DIR`.
 #
-# Default value: `/data/data/com.termux/files/usr/etc/profile.d`
+# Default value: `/data/data/com.reena.aamp/files/usr/etc/profile.d`
 ##
 TERMUX__PREFIX__PROFILE_D_DIR="$TERMUX__PREFIX__ETC_DIR/profile.d"
 
@@ -1304,7 +1304,7 @@ TERMUX__PREFIX__PROFILE_D_DIR="$TERMUX__PREFIX__ETC_DIR/profile.d"
 ##
 # Termux project system config directory path under `TERMUX__PREFIX__ETC_DIR`.
 #
-# Default value: `/data/data/com.termux/files/usr/etc/termux`
+# Default value: `/data/data/com.reena.aamp/files/usr/etc/termux`
 ##
 TERMUX__PROJECT_SYSTEM_CONFIG_DIR="$TERMUX__PREFIX__ETC_DIR/$TERMUX__INTERNAL_NAME"
 
@@ -1352,7 +1352,7 @@ TERMUX__CACHE_SUBDIR="cache"
 #
 # - https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#termux-app-cache-directory
 #
-# Default value: `/data/data/com.termux/cache`
+# Default value: `/data/data/com.reena.aamp/cache`
 ##
 TERMUX__CACHE_DIR="$TERMUX_APP__DATA_DIR/$TERMUX__CACHE_SUBDIR"
 __termux_build_props__add_variables_validator_actions "TERMUX__CACHE_DIR" "safe_absolute_path"
@@ -1370,7 +1370,7 @@ TERMUX_CACHE_DIR="$TERMUX__CACHE_DIR" # Deprecated alternative variable for `TER
 ##
 # Termux bootstrap system config directory path under `TERMUX__PROJECT_SYSTEM_CONFIG_DIR`.
 #
-# Default value: `/data/data/com.termux/files/usr/etc/termux/termux-bootstrap`
+# Default value: `/data/data/com.reena.aamp/files/usr/etc/termux/termux-bootstrap`
 ##
 TERMUX_BOOTSTRAP__BOOTSTRAP_SYSTEM_CONFIG_DIR="$TERMUX__PROJECT_SYSTEM_CONFIG_DIR/termux-bootstrap"
 
@@ -1385,7 +1385,7 @@ TERMUX_BOOTSTRAP__BOOTSTRAP_SECOND_STAGE_SUBDIR="second-stage"
 ##
 # Termux bootstrap second stage directory path under `TERMUX_BOOTSTRAP__BOOTSTRAP_SYSTEM_CONFIG_DIR`.
 #
-# Default value: `/data/data/com.termux/files/usr/etc/termux/termux-bootstrap/second-stage`
+# Default value: `/data/data/com.reena.aamp/files/usr/etc/termux/termux-bootstrap/second-stage`
 ##
 TERMUX_BOOTSTRAP__BOOTSTRAP_SECOND_STAGE_DIR="$TERMUX_BOOTSTRAP__BOOTSTRAP_SYSTEM_CONFIG_DIR/$TERMUX_BOOTSTRAP__BOOTSTRAP_SECOND_STAGE_SUBDIR"
 
@@ -1829,9 +1829,9 @@ TERMUX_APP__REPO_URL="$TERMUX__REPOS_HOST_ORG_URL/$TERMUX_APP__REPO_NAME"
 # - https://developer.android.com/build/configure-app-module#set-namespace
 # - https://github.com/termux/termux-app/tree/master/app/src/main/java/com/termux
 #
-# Default value: `com.termux`
+# Default value: `com.reena.aamp`
 ##
-TERMUX_APP__NAMESPACE="com.termux"
+TERMUX_APP__NAMESPACE="com.reena.aamp"
 
 __termux_build_props__add_variables_validator_actions "TERMUX_APP__NAMESPACE" "app_package_name"
 
@@ -1840,7 +1840,7 @@ __termux_build_props__add_variables_validator_actions "TERMUX_APP__NAMESPACE" "a
 ##
 # Termux app apps directory path under `TERMUX__APPS_DIR_BY_IDENTIFIER`.
 #
-# Default value: `/data/data/com.termux/termux/app/i/termux`
+# Default value: `/data/data/com.reena.aamp/termux/app/i/termux`
 ##
 TERMUX_APP__APP_DIR="$TERMUX__APPS_DIR_BY_IDENTIFIER/$TERMUX_APP__APP_IDENTIFIER"
 __termux_build_props__add_variables_validator_actions "TERMUX_APP__APP_DIR" "safe_absolute_path"
@@ -1854,7 +1854,7 @@ __termux_build_props__add_variables_validator_actions "TERMUX_APP__APP_DIR" "saf
 # **See Also:**
 # - https://github.com/termux/termux-app/blob/master/app/src/main/java/com/termux/app/TermuxActivity.java
 #
-# Default value: `com.termux.app.TermuxActivity`
+# Default value: `com.reena.aamp.app.TermuxActivity`
 ##
 TERMUX_APP__SHELL_API__SHELL_API_ACTIVITY__CLASS_NAME="$TERMUX_APP__NAMESPACE.app.TermuxActivity"
 
@@ -1867,7 +1867,7 @@ TERMUX_APP__SHELL_API__SHELL_API_ACTIVITY__CLASS_NAME="$TERMUX_APP__NAMESPACE.ap
 # **See Also:**
 # - https://github.com/termux/termux-app/blob/master/app/src/main/java/com/termux/app/TermuxService.java
 #
-# Default value: `com.termux.app.TermuxService`
+# Default value: `com.reena.aamp.app.TermuxService`
 ##
 TERMUX_APP__SHELL_API__SHELL_API_SERVICE__CLASS_NAME="$TERMUX_APP__NAMESPACE.app.TermuxService"
 
@@ -1881,7 +1881,7 @@ TERMUX_APP__SHELL_API__SHELL_API_SERVICE__CLASS_NAME="$TERMUX_APP__NAMESPACE.app
 # - https://github.com/termux/termux-app/blob/master/app/src/main/java/com/termux/app/RunCommandService.java
 # - https://github.com/termux/termux-app/wiki/RUN_COMMAND-Intent
 #
-# Default value: `com.termux.app.RunCommandService`
+# Default value: `com.reena.aamp.app.RunCommandService`
 ##
 TERMUX_APP__RUN_COMMAND_API__RUN_COMMAND_API_SERVICE__CLASS_NAME="$TERMUX_APP__NAMESPACE.app.RunCommandService"
 
@@ -1896,7 +1896,7 @@ TERMUX_APP__RUN_COMMAND_API__RUN_COMMAND_API_SERVICE__CLASS_NAME="$TERMUX_APP__N
 # - https://github.com/termux/termux-app/blob/master/app/src/main/java/com/termux/app/TermuxOpenReceiver.java
 # - https://github.com/termux/termux-tools/blob/master/scripts/termux-open.in
 #
-# Default value: `com.termux.app.TermuxOpenReceiver`
+# Default value: `com.reena.aamp.app.TermuxOpenReceiver`
 ##
 TERMUX_APP__DATA_SENDER_API__DATA_SENDER_API_RECEIVER__CLASS_NAME="$TERMUX_APP__NAMESPACE.app.TermuxOpenReceiver"
 
@@ -1907,7 +1907,7 @@ TERMUX_APP__DATA_SENDER_API__DATA_SENDER_API_RECEIVER__CLASS_NAME="$TERMUX_APP__
 ##
 # Termux apps info environment file path for the Termux app under `TERMUX_APP__APP_DIR`.
 #
-# Default value: `/data/data/com.termux/termux/app/i/termux/termux-apps-info.env`
+# Default value: `/data/data/com.reena.aamp/termux/app/i/termux/termux-apps-info.env`
 ##
 TERMUX_APP__CORE__APPS_INFO_ENV_FILE="$TERMUX_APP__APP_DIR/$TERMUX_CORE__APPS_INFO_ENV_SUBFILE"
 __termux_build_props__add_variables_validator_actions "TERMUX_APP__CORE__APPS_INFO_ENV_FILE" "safe_absolute_path"
@@ -1915,7 +1915,7 @@ __termux_build_props__add_variables_validator_actions "TERMUX_APP__CORE__APPS_IN
 ##
 # Termux apps info json file path for the Termux app under `TERMUX_APP__APP_DIR`.
 #
-# Default value: `/data/data/com.termux/termux/app/i/termux/termux-apps-info.json`
+# Default value: `/data/data/com.reena.aamp/termux/app/i/termux/termux-apps-info.json`
 ##
 TERMUX_APP__CORE__APPS_INFO_JSON_FILE="$TERMUX_APP__APP_DIR/$TERMUX_CORE__APPS_INFO_JSON_SUBFILE"
 __termux_build_props__add_variables_validator_actions "TERMUX_APP__CORE__APPS_INFO_JSON_FILE" "safe_absolute_path"
@@ -1923,7 +1923,7 @@ __termux_build_props__add_variables_validator_actions "TERMUX_APP__CORE__APPS_IN
 ##
 # `termux-am-socket` server file path for the Termux app under `TERMUX_APP__APP_DIR`.
 #
-# Default value: `/data/data/com.termux/termux/app/i/termux/termux-am`
+# Default value: `/data/data/com.reena.aamp/termux/app/i/termux/termux-am`
 ##
 TERMUX_APP__AM_SOCKET__SERVER_SOCKET_FILE="$TERMUX_APP__APP_DIR/$TERMUX_AM_SOCKET__SERVER_SOCKET_SUBFILE"
 __termux_build_props__add_variables_validator_actions "TERMUX_APP__AM_SOCKET__SERVER_SOCKET_FILE" "safe_absolute_path unix_path_max"
@@ -1947,9 +1947,9 @@ __termux_build_props__add_variables_validator_actions "TERMUX_APP__AM_SOCKET__SE
 # - https://developer.android.com/build/configure-app-module#set-application-id
 # - https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#termux-private-app-data-directory
 #
-# Default value: `com.termux.api`
+# Default value: `com.reena.aamp.api`
 ##
-TERMUX_API_APP__PACKAGE_NAME="com.termux.api"
+TERMUX_API_APP__PACKAGE_NAME="com.reena.aamp.api"
 
 __termux_build_props__add_variables_validator_actions "TERMUX_API_APP__PACKAGE_NAME" "app_package_name"
 
@@ -1999,9 +1999,9 @@ TERMUX_API_APP__REPO_URL="$TERMUX__REPOS_HOST_ORG_URL/$TERMUX_API_APP__REPO_NAME
 # - https://developer.android.com/build/configure-app-module#set-namespace
 # - https://github.com/termux/termux-api/tree/master/app/src/main/java/com/termux/api
 #
-# Default value: `com.termux.api`
+# Default value: `com.reena.aamp.api`
 ##
-TERMUX_API_APP__NAMESPACE="com.termux.api"
+TERMUX_API_APP__NAMESPACE="com.reena.aamp.api"
 
 __termux_build_props__add_variables_validator_actions "TERMUX_API_APP__NAMESPACE" "app_package_name"
 
@@ -2010,7 +2010,7 @@ __termux_build_props__add_variables_validator_actions "TERMUX_API_APP__NAMESPACE
 ##
 # Termux:API app apps directory path under `TERMUX__APPS_DIR_BY_IDENTIFIER`.
 #
-# Default value: `/data/data/com.termux/termux/app/i/termuxapi`
+# Default value: `/data/data/com.reena.aamp/termux/app/i/termuxapi`
 ##
 TERMUX_API_APP__APP_DIR="$TERMUX__APPS_DIR_BY_IDENTIFIER/$TERMUX_API_APP__APP_IDENTIFIER"
 __termux_build_props__add_variables_validator_actions "TERMUX_API_APP__APP_DIR" "safe_absolute_path"
@@ -2026,7 +2026,7 @@ __termux_build_props__add_variables_validator_actions "TERMUX_API_APP__APP_DIR" 
 # - https://github.com/termux/termux-api/blob/master/app/src/main/java/com/termux/api/TermuxApiReceiver.java
 # - https://github.com/termux/termux-api-package/blob/master/termux-api.c
 #
-# Default value: `com.termux.api.TermuxApiReceiver`
+# Default value: `com.reena.aamp.api.TermuxApiReceiver`
 ##
 TERMUX_API_APP__ANDROID_API__ANDROID_API_RECEIVER__CLASS_NAME="$TERMUX_API_APP__NAMESPACE.TermuxApiReceiver"
 
@@ -2120,9 +2120,9 @@ TERMUX_AM_PKG__REPO_URL="$TERMUX__REPOS_HOST_ORG_URL/$TERMUX_AM_PKG__REPO_NAME"
 # - https://developer.android.com/build/configure-app-module#set-namespace
 # - https://github.com/termux/TermuxAm/tree/master/app/src/main/java/com/termux/termuxam
 #
-# Constant value: `com.termux.termuxam`
+# Constant value: `com.reena.aamp.termuxam`
 ##
-TERMUX_AM_APP__NAMESPACE="com.termux.termuxam"
+TERMUX_AM_APP__NAMESPACE="com.reena.aamp.termuxam"
 
 __termux_build_props__add_variables_validator_actions "TERMUX_AM_APP__NAMESPACE" "app_package_name"
 
@@ -2136,7 +2136,7 @@ __termux_build_props__add_variables_validator_actions "TERMUX_AM_APP__NAMESPACE"
 # - https://github.com/termux/TermuxAm/blob/v0.8.0/am-libexec-packaged#L30
 # - https://cs.android.com/android/platform/superproject/+/android-14.0.0_r1:frameworks/base/cmds/app_process/app_main.cpp;l=31
 #
-# Default value: `com.termux.termuxam.Am`
+# Default value: `com.reena.aamp.termuxam.Am`
 ##
 TERMUX_AM_APP__AM_CLASS__CLASS_NAME="$TERMUX_AM_APP__NAMESPACE.Am"
 
@@ -2163,13 +2163,13 @@ TERMUX_AM_APP__AM_CLASS__CLASS_NAME="$TERMUX_AM_APP__NAMESPACE.Am"
 # and are compiled locally.
 # FIXME: Checking for all variables will be added later in repo
 # changes pull, currently only `TERMUX_REPO_APP__PACKAGE_NAME` is checked.
-TERMUX_REPO_APP__PACKAGE_NAME="com.termux"
-TERMUX_REPO_APP__DATA_DIR="/data/data/com.termux"
-TERMUX_REPO__CORE_DIR="/data/data/com.termux/termux/core"
-TERMUX_REPO__APPS_DIR="/data/data/com.termux/termux/app"
-TERMUX_REPO__ROOTFS="/data/data/com.termux/files"
-TERMUX_REPO__HOME="/data/data/com.termux/files/home"
-TERMUX_REPO__PREFIX="/data/data/com.termux/files/usr"
+TERMUX_REPO_APP__PACKAGE_NAME="com.reena.aamp"
+TERMUX_REPO_APP__DATA_DIR="/data/data/com.reena.aamp"
+TERMUX_REPO__CORE_DIR="/data/data/com.reena.aamp/termux/core"
+TERMUX_REPO__APPS_DIR="/data/data/com.reena.aamp/termux/app"
+TERMUX_REPO__ROOTFS="/data/data/com.reena.aamp/files"
+TERMUX_REPO__HOME="/data/data/com.reena.aamp/files/home"
+TERMUX_REPO__PREFIX="/data/data/com.reena.aamp/files/usr"
 
 
 
@@ -2214,10 +2214,10 @@ TERMUX_CLEANUP_BUILT_PACKAGES_THRESHOLD="$(( 5 * 1024 ** 3 ))" # 5 GiB
 __termux_build_props__add_variables_validator_actions "TERMUX_CLEANUP_BUILT_PACKAGES_THRESHOLD" "unsigned_int"
 
 # Path to CGCT tools
-CGCT_DEFAULT_PREFIX="/data/data/com.termux/files/usr/glibc"
+CGCT_DEFAULT_PREFIX="/data/data/com.reena.aamp/files/usr/glibc"
 __termux_build_props__add_variables_validator_actions "CGCT_DEFAULT_PREFIX" "safe_absolute_path invalid_termux_prefix_paths"
 
-export CGCT_DIR="/data/data/com.termux/cgct"
+export CGCT_DIR="/data/data/com.reena.aamp/cgct"
 __termux_build_props__add_variables_validator_actions "CGCT_DIR" "safe_absolute_path invalid_termux_prefix_paths"
 
 # Allow to override setup.
