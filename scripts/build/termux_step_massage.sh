@@ -32,7 +32,8 @@ termux_step_massage() {
 	rm -Rf share/locale
 
 	# Remove ldconfig cache:
-	rm -f glibc/etc/ld.so.cache
+	rm -f glibc/etc/ld{,32}.so.cache
+	rm -rf glibc/var/cache/ldconfig{,32}
 
 	# `update-mime-database` updates NOT ONLY "$PREFIX/share/mime/mime.cache".
 	# Simply removing this specific file does not solve the issue.
