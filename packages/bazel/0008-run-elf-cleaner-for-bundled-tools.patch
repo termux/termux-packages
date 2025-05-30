@@ -1,0 +1,236 @@
+For a `cc_binary` target that will be packaged, replace its name (`@ORIGIN_NAME@`)
+with `@ORIGIN_NAME@_orig`, and add the following target after it.
+
+```
+genrule(
+    name = "@ORIGIN_NAME@_cleaner",
+    srcs = [
+        ":@ORIGIN_NAME@_orig",
+    ],
+    outs = ["@ORIGIN_NAME@"],
+    cmd = "\n".join([
+        "TEMP_FILE=\"$$(mktemp -t bazel.XXXXXXXX)\"",
+        "cp \"$(location :@ORIGIN_NAME@_orig)\" \"$${TEMP_FILE}\"",
+        "termux-elf-cleaner --api-level=24 \"$${TEMP_FILE}\"",
+        "cp \"$${TEMP_FILE}\" \"$@\"",
+        "rm \"$${TEMP_FILE}\"",
+    ]),
+)
+```
+# TODO: Figure out why `ijar` cannot be patched
+# --- a/third_party/ijar/BUILD
+# +++ b/third_party/ijar/BUILD
+# @@ -70,22 +70,66 @@
+#  )
+ 
+#  cc_binary(
+# -    name = "zipper",
+# +    name = "zipper_orig",
+#      srcs = ["zip_main.cc"],
+# -    visibility = ["//visibility:public"],
+# +    visibility = ["//visibility:private"],
+#      deps = [":zip"],
+#  )
+ 
+# +genrule(
+# +    name = "zipper_cleaner",
+# +    srcs = [
+# +        ":zipper_orig",
+# +    ],
+# +    outs = ["zipper_"],
+# +    cmd = "\n".join([
+# +        "TEMP_FILE=\"$$(mktemp -t bazel.XXXXXXXX)\"",
+# +        "cp \"$(location :zipper_orig)\" \"$${TEMP_FILE}\"",
+# +        "termux-elf-cleaner --api-level=24 \"$${TEMP_FILE}\"",
+# +        "cp \"$${TEMP_FILE}\" \"$@\"",
+# +        "rm \"$${TEMP_FILE}\"",
+# +    ]),
+# +    visibility = ["//visibility:private"],
+# +)
+# +
+# +alias(
+# +    name = "zipper",
+# +    actual = ":zipper_",
+# +    visibility = ["//visibility:public"],
+# +)
+# +
+#  cc_binary(
+# -    name = "ijar",
+# +    name = "ijar_orig",
+#      srcs = [
+#          "classfile.cc",
+#          "ijar.cc",
+#      ],
+# -    visibility = ["//visibility:public"],
+# +    visibility = ["//visibility:private"],
+#      deps = [":zip"],
+#  )
+ 
+# +genrule(
+# +    name = "ijar_cleaner",
+# +    srcs = [
+# +        ":ijar_orig",
+# +    ],
+# +    outs = ["ijar_"],
+# +    cmd = "\n".join([
+# +        "TEMP_FILE=\"$$(mktemp -t bazel.XXXXXXXX)\"",
+# +        "cp \"$(location :ijar_orig)\" \"$${TEMP_FILE}\"",
+# +        "termux-elf-cleaner --api-level=24 \"$${TEMP_FILE}\"",
+# +        "cp \"$${TEMP_FILE}\" \"$@\"",
+# +        "rm \"$${TEMP_FILE}\"",
+# +    ]),
+# +    visibility = ["//visibility:private"],
+# +)
+# +
+# +alias(
+# +    name = "ijar",
+# +    actual = ":ijar_",
+# +    visibility = ["//visibility:public"],
+# +)
+# +
+#  filegroup(
+#      name = "srcs",
+#      srcs = glob(["**"]) + ["//third_party/ijar/test:srcs"],
+--- a/src/main/cpp/BUILD
++++ b/src/main/cpp/BUILD
+@@ -88,7 +89,7 @@
+ )
+
+ cc_binary(
+-    name = "client",
++    name = "client_orig",
+     srcs = [
+         "blaze.cc",
+         "blaze.h",
+@@ -138,6 +139,21 @@
+     ],
+ )
+
++genrule(
++    name = "client_cleaner",
++    srcs = [
++        ":client_orig",
++    ],
++    outs = ["client"],
++    cmd = "\n".join([
++        "TEMP_FILE=\"$$(mktemp -t bazel.XXXXXXXX)\"",
++        "cp \"$(location :client_orig)\" \"$${TEMP_FILE}\"",
++        "termux-elf-cleaner --api-level=24 \"$${TEMP_FILE}\"",
++        "cp \"$${TEMP_FILE}\" \"$@\"",
++        "rm \"$${TEMP_FILE}\"",
++    ]),
++)
++
+ cc_library(
+     name = "option_processor",
+     srcs = ["option_processor.cc"],
+--- a/src/main/tools/BUILD
++++ b/src/main/tools/BUILD
+@@ -1,10 +1,25 @@
+ package(default_visibility = ["//src:__subpackages__"])
+ 
+ cc_binary(
+-    name = "daemonize",
++    name = "daemonize_orig",
+     srcs = ["daemonize.c"],
+ )
+ 
++genrule(
++    name = "daemonize_cleaner",
++    srcs = [
++        ":daemonize_orig",
++    ],
++    outs = ["daemonize"],
++    cmd = "\n".join([
++        "TEMP_FILE=\"$$(mktemp -t bazel.XXXXXXXX)\"",
++        "cp \"$(location :daemonize_orig)\" \"$${TEMP_FILE}\"",
++        "termux-elf-cleaner --api-level=24 \"$${TEMP_FILE}\"",
++        "cp \"$${TEMP_FILE}\" \"$@\"",
++        "rm \"$${TEMP_FILE}\"",
++    ]),
++)
++
+ cc_library(
+     name = "logging",
+     srcs = ["logging.cc"],
+@@ -26,7 +41,7 @@
+ )
+ 
+ cc_binary(
+-    name = "process-wrapper",
++    name = "process-wrapper_orig",
+     srcs = select({
+         "//src/conditions:windows": ["process-wrapper-windows.cc"],
+         "//conditions:default": [
+@@ -56,8 +71,23 @@
+     }),
+ )
+ 
++genrule(
++    name = "process-wrapper_cleaner",
++    srcs = [
++        ":process-wrapper_orig",
++    ],
++    outs = ["process-wrapper"],
++    cmd = "\n".join([
++        "TEMP_FILE=\"$$(mktemp -t bazel.XXXXXXXX)\"",
++        "cp \"$(location :process-wrapper_orig)\" \"$${TEMP_FILE}\"",
++        "termux-elf-cleaner --api-level=24 \"$${TEMP_FILE}\"",
++        "cp \"$${TEMP_FILE}\" \"$@\"",
++        "rm \"$${TEMP_FILE}\"",
++    ]),
++)
++
+ cc_binary(
+-    name = "build-runfiles",
++    name = "build-runfiles_orig",
+     srcs = select({
+         "//src/conditions:windows": ["build-runfiles-windows.cc"],
+         "//conditions:default": ["build-runfiles.cc"],
+@@ -68,8 +98,23 @@
+     }),
+ )
+ 
++genrule(
++    name = "build-runfiles_cleaner",
++    srcs = [
++        ":build-runfiles_orig",
++    ],
++    outs = ["build-runfiles"],
++    cmd = "\n".join([
++        "TEMP_FILE=\"$$(mktemp -t bazel.XXXXXXXX)\"",
++        "cp \"$(location :build-runfiles_orig)\" \"$${TEMP_FILE}\"",
++        "termux-elf-cleaner --api-level=24 \"$${TEMP_FILE}\"",
++        "cp \"$${TEMP_FILE}\" \"$@\"",
++        "rm \"$${TEMP_FILE}\"",
++    ]),
++)
++
+ cc_binary(
+-    name = "linux-sandbox",
++    name = "linux-sandbox_orig",
+     srcs = select({
+         "//src/conditions:darwin": ["dummy-sandbox.c"],
+         "//src/conditions:freebsd": ["dummy-sandbox.c"],
+@@ -108,6 +153,21 @@
+     }),
+ )
+ 
++genrule(
++    name = "linux-sandbox_cleaner",
++    srcs = [
++        ":linux-sandbox_orig",
++    ],
++    outs = ["linux-sandbox"],
++    cmd = "\n".join([
++        "TEMP_FILE=\"$$(mktemp -t bazel.XXXXXXXX)\"",
++        "cp \"$(location :linux-sandbox_orig)\" \"$${TEMP_FILE}\"",
++        "termux-elf-cleaner --api-level=24 \"$${TEMP_FILE}\"",
++        "cp \"$${TEMP_FILE}\" \"$@\"",
++        "rm \"$${TEMP_FILE}\"",
++    ]),
++)
++
+ exports_files([
+     "build_interface_so",
+ ])

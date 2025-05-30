@@ -1,0 +1,69 @@
+https://github.com/termux/termux-packages/tree/0a64a3ce5a61ac7b25ca937db82ec02f4e302689/packages/libgrpc
+
+--- a/src/core/lib/gpr/tmpfile_posix.cc
++++ b/src/core/lib/gpr/tmpfile_posix.cc
+@@ -39,7 +39,7 @@
+ 
+   if (tmp_filename != nullptr) *tmp_filename = nullptr;
+ 
+-  gpr_asprintf(&filename_template, "/tmp/%s_XXXXXX", prefix);
++  gpr_asprintf(&filename_template, "/data/data/com.termux/files/usr/tmp/%s_XXXXXX", prefix);
+   GPR_ASSERT(filename_template != nullptr);
+ 
+   fd = mkstemp(filename_template);
+--- a/src/core/lib/security/security_connector/load_system_roots_supported.cc
++++ b/src/core/lib/security/security_connector/load_system_roots_supported.cc
+@@ -52,12 +52,12 @@
+ 
+ #if defined(GPR_LINUX) || defined(GPR_ANDROID)
+ const char* kCertFiles[] = {
+-    "/etc/ssl/certs/ca-certificates.crt", "/etc/pki/tls/certs/ca-bundle.crt",
+-    "/etc/ssl/ca-bundle.pem", "/etc/pki/tls/cacert.pem",
+-    "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"};
++    "/data/data/com.termux/files/usr/etc/ssl/certs/ca-certificates.crt", "/data/data/com.termux/files/usr/etc/pki/tls/certs/ca-bundle.crt",
++    "/data/data/com.termux/files/usr/etc/ssl/ca-bundle.pem", "/data/data/com.termux/files/usr/etc/pki/tls/cacert.pem",
++    "/data/data/com.termux/files/usr/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"};
+ const char* kCertDirectories[] = {
+-    "/etc/ssl/certs", "/system/etc/security/cacerts", "/usr/local/share/certs",
+-    "/etc/pki/tls/certs", "/etc/openssl/certs"};
++    "/data/data/com.termux/files/usr/etc/ssl/certs", "/data/data/com.termux/files/usr/share/certs",
++    "/data/data/com.termux/files/usr/etc/pki/tls/certs", "/data/data/com.termux/files/usr/etc/openssl/certs"};
+ #elif defined(GPR_FREEBSD)  // endif GPR_LINUX || GPR_ANDROID
+ const char* kCertFiles[] = {"/etc/ssl/cert.pem",
+                             "/usr/local/share/certs/ca-root-nss.crt"};
+--- a/src/core/lib/security/security_connector/ssl_utils.cc
++++ b/src/core/lib/security/security_connector/ssl_utils.cc
+@@ -55,9 +55,9 @@
+ static const char* installed_roots_path = GRPC_ROOT_PEM_PATH;
+ #elif defined(INSTALL_PREFIX)
+ static const char* installed_roots_path =
+-    INSTALL_PREFIX "/usr/share/grpc/roots.pem";
++    INSTALL_PREFIX "/data/data/com.termux/files/usr/share/grpc/roots.pem";
+ #else
+-static const char* installed_roots_path = "/usr/share/grpc/roots.pem";
++static const char* installed_roots_path = "/data/data/com.termux/files/usr/share/grpc/roots.pem";
+ #endif
+ 
+ #ifndef TSI_OPENSSL_ALPN_SUPPORT
+--- a/src/core/lib/gpr/log_posix.cc
++++ b/src/core/lib/gpr/log_posix.cc
+@@ -18,7 +18,7 @@
+ 
+ #include <grpc/support/port_platform.h>
+ 
+-#ifdef GPR_POSIX_LOG
++#if defined(GPR_POSIX_LOG) || defined(__TERMUX__)
+ 
+ #include <inttypes.h>
+ #include <pthread.h>
+--- a/src/core/lib/gpr/log_android.cc
++++ b/src/core/lib/gpr/log_android.cc
+@@ -18,7 +18,7 @@
+ 
+ #include <grpc/support/port_platform.h>
+ 
+-#ifdef GPR_ANDROID
++#if defined(GPR_ANDROID) && !defined(__TERMUX__)
+ 
+ #include <android/log.h>
+ #include <stdarg.h>
