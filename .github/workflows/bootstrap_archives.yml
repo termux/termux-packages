@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install dependencies (optional, if needed)
-        run: sudo apt-get update && sudo apt-get install -y zip
+        run: sudo apt-get update && sudo apt-get install -y zip && chmod +x ./scripts/build-bootstraps.sh
 
       - name: Build bootstrap
         run: ./scripts/build-bootstraps.sh --architectures ${{ matrix.arch }}
