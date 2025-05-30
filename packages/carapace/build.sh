@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Multi-shell multi-command argument completer"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.3.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/carapace-sh/carapace-bin/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9c11dad96140430ed2b48495e5658c67680c3d78351e65c82aad455b1c62618f
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -19,11 +20,9 @@ termux_step_make() {
 	unset GOOS GOARCH CGO_LDFLAGS
 	unset CC CXX CFLAGS CXXFLAGS LDFLAGS
 
-	go generate ./cmd/...
+	go generate ./cmd/carapace/...
 	)
-	for subcommand in ./cmd/*; do
-		go build -v -ldflags="-X main.version=v${TERMUX_PKG_VERSION}" "$subcommand"
-	done
+	go build -v -ldflags="-X main.version=v${TERMUX_PKG_VERSION} -s -w" -tags release ./cmd/carapace
 }
 
 termux_step_make_install() {
