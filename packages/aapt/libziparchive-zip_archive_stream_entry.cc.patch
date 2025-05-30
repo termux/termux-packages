@@ -1,0 +1,11 @@
+--- a/libziparchive/zip_archive_stream_entry.cc
++++ b/libziparchive/zip_archive_stream_entry.cc
+@@ -236,7 +236,7 @@ const std::vector<uint8_t>* ZipArchiveStreamEntryCompressed::Read() {
+ 
+       compressed_length_ -= bytes;
+       offset_ += bytes;
+-      z_stream_.next_in = res;
++      z_stream_.next_in = const_cast<Bytef*>(res);
+       z_stream_.avail_in = bytes;
+     }
+ 
