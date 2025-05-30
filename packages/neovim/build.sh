@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility 
 TERMUX_PKG_LICENSE="Apache-2.0, VIM License"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
-TERMUX_PKG_VERSION="0.11.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="0.11.2"
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=ffe7f9a7633ed895ff6adb1039af7516cd6453715c8889ad844b6fa39c3df443
+TERMUX_PKG_SHA256=324759a1bcd1a80b32a7eae1516ee761ec3e566d08284a24c4c7ca59079aabfa
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="^\d+\.\d+\.\d+$"
 TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libvterm (>= 1:0.3-0), libluajit, libunibilium, libandroid-support, lua51-lpeg, tree-sitter, tree-sitter-parsers, utf8proc"
