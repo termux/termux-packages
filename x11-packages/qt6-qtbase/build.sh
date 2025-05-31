@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-3.0-only"
 TERMUX_PKG_LICENSE_FILE="LICENSES/GPL-3.0-only.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.9.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtbase-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=c1800c2ea835801af04a05d4a32321d79a93954ee3ae2172bbeacf13d1f0598c
 TERMUX_PKG_DEPENDS="brotli, double-conversion, freetype, glib, harfbuzz, libandroid-posix-semaphore, libandroid-shmem, libc++, libdrm, libice, libicu, libjpeg-turbo, libpng, libsm, libsqlite, libuuid, libx11, libxcb, libxi, libxkbcommon, libwayland, opengl, openssl, pcre2, vulkan-loader, xcb-util-cursor, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil, xcb-util-wm, zlib, zstd"
@@ -63,10 +64,6 @@ opt/qt6/cross/lib/qt6/qt-internal-configure-examples
 opt/qt6/cross/lib/qt6/qt-internal-configure-tests
 opt/qt6/cross/lib/qt6/qt-testrunner.py
 opt/qt6/cross/lib/qt6/sanitizer-testrunner.py
-"
-TERMUX_PKG_RM_AFTER_INSTALL="
-lib/objects-*
-opt/qt6/cross/lib/objects-*
 "
 
 termux_step_host_build() {
