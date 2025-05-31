@@ -46,6 +46,13 @@ termux_create_pacman_subpackages() {
 		# shellcheck source=/dev/null
 		source "$subpackage"
 
+		# Do not create subpackage for specific arches.
+		# Using TERMUX_ARCH instead of SUB_PKG_ARCH (defined below) is intentional.
+		if [[ " ${TERMUX_SUBPKG_EXCLUDED_ARCHES//,/ } " == *" ${TERMUX_ARCH} "* ]]; then
+			echo "Skipping creating subpackage '$SUB_PKG_NAME' for arch $TERMUX_ARCH"
+			continue
+		fi
+
 		# Allow globstar (i.e. './**/') patterns.
 		shopt -s globstar
 		for includeset in $TERMUX_SUBPKG_INCLUDE; do
@@ -60,13 +67,6 @@ termux_create_pacman_subpackages() {
 			fi
 		done
 		shopt -u globstar
-
-		# Do not create subpackage for specific arches.
-		# Using TERMUX_ARCH instead of SUB_PKG_ARCH (defined below) is intentional.
-		if [[ " ${TERMUX_SUBPKG_EXCLUDED_ARCHES//,/ } " == *" ${TERMUX_ARCH} "* ]]; then
-			echo "Skipping creating subpackage '$SUB_PKG_NAME' for arch $TERMUX_ARCH"
-			continue
-		fi
 
 		local SUB_PKG_ARCH=$TERMUX_ARCH
 		[[ "$TERMUX_SUBPKG_PLATFORM_INDEPENDENT" == "true" ]] && SUB_PKG_ARCH=any
