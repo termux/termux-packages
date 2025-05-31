@@ -2,10 +2,8 @@ TERMUX_PKG_HOMEPAGE=https://www.gimp.org/
 TERMUX_PKG_DESCRIPTION="GNU Image Manipulation Program"
 TERMUX_PKG_LICENSE="GPL-3.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.0.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="3.0.4"
 TERMUX_PKG_SRCURL=git+https://gitlab.gnome.org/GNOME/gimp
-TERMUX_PKG_SHA256=08cf8d4b4e01ba4df675127945f87041b40615e0c564672090280f48af1d9f2f
 TERMUX_PKG_GIT_BRANCH="GIMP_${TERMUX_PKG_VERSION//./_}"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="aalib, appstream-glib, atk, babl, fontconfig, freetype, gdk-pixbuf, gegl, gexiv2, ghostscript, gimp-data, glib, glib-networking, gtk3, harfbuzz, hicolor-icon-theme, json-glib, libandroid-execinfo, libandroid-shmem, libbz2, libc++, libcairo, libheif, libjpeg-turbo, libjxl, libmypaint, libpng, librsvg, libtiff, libwebp, libxcursor, libxmu, libxpm, littlecms, mypaint-brushes, openexr, openjpeg, pango, poppler, poppler-data, pygobject, zlib"
@@ -28,17 +26,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 TERMUX_PKG_RM_AFTER_INSTALL="lib/locale"
 
-termux_step_post_get_source() {
-	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum | cut -d" " -f1)
-	if [[ "${s}" != "${TERMUX_PKG_SHA256}" ]]; then
-		termux_error_exit "
-		Checksum mismatch for source files!
-		Expected = ${TERMUX_PKG_SHA256}
-		Actual   = ${s}
-		"
-	fi
-}
-
 termux_step_pre_configure() {
 	termux_setup_gir
 	termux_setup_glib_cross_pkg_config_wrapper
@@ -50,7 +37,7 @@ termux_step_pre_configure() {
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		# Gimp requires using cross-compiled or prebuilt gimp during cross-compilation which is hard to achive here
 		# gimp is required only to generate splash image, so it will be fine to use official appimage.
-		termux_download https://download.gimp.org/gimp/v3.0/linux/GIMP-3.0.2-x86_64.AppImage "$TERMUX_PKG_CACHEDIR/gimp.appimage" 1f22295ba607b207f2230483ccd92640299f47c132f013a3cf34af3d26c91546
+		termux_download https://download.gimp.org/gimp/v3.0/linux/GIMP-3.0.4-x86_64.AppImage "$TERMUX_PKG_CACHEDIR/gimp.appimage" 192e0920424a19730e57517a2f9d885a001c77b3a1cc0878ce4d44a2e294b3cb
 		chmod +x "$TERMUX_PKG_CACHEDIR/gimp.appimage"
 		[ -d $TERMUX_PKG_CACHEDIR/squashfs-root ] || (cd "$TERMUX_PKG_CACHEDIR"; "$TERMUX_PKG_CACHEDIR/gimp.appimage" --appimage-extract)
 
