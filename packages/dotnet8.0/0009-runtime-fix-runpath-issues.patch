@@ -1,0 +1,33 @@
+System.Security.Cryptography.Native needs libssl.so and libcrypto.so, both of which are provided by Termux
+System.Net.Security.Native needs libgssapi_krb5.so.2
+Mono CoreCLR needs to be able to find libraries in "$TERMUX_PREFIX/lib"
+This sets rpath to help the linker find them during runtime
+
+--- a/src/runtime/src/native/libs/System.Security.Cryptography.Native/CMakeLists.txt
++++ b/src/runtime/src/native/libs/System.Security.Cryptography.Native/CMakeLists.txt
+@@ -1,6 +1,7 @@
+ project(System.Security.Cryptography.Native C)
+
+ # These are happening inside of OpenSSL-defined macros out of our control
++add_link_options("-Wl,-rpath,@TERMUX_PREFIX@/lib")
+ add_compile_options(-Wno-cast-align)
+ add_compile_options(-Wno-reserved-id-macro)
+ add_compile_options(-Wno-documentation)
+--- a/src/runtime/src/native/libs/System.Net.Security.Native/CMakeLists.txt
++++ b/src/runtime/src/native/libs/System.Net.Security.Native/CMakeLists.txt
+@@ -1,6 +1,7 @@
+ project(System.Net.Security.Native C)
+ 
++add_link_options("-Wl,-rpath,@TERMUX_PREFIX@/lib")
+ add_compile_options(-Wno-incompatible-pointer-types-discards-qualifiers)
+ 
+ include(${CMAKE_CURRENT_LIST_DIR}/extra_libs.cmake)
+ 
+--- a/src/runtime/src/mono/mono/mini/CMakeLists.txt
++++ b/src/runtime/src/mono/mono/mini/CMakeLists.txt
+@@ -1,4 +1,5 @@
+ project(mini C)
++add_link_options("-Wl,-rpath,@TERMUX_PREFIX@/lib")
+ 
+ if(ENABLE_LLVM OR ENABLE_LLVM_RUNTIME OR HOST_BROWSER OR (HAVE_SYS_ICU AND NOT HOST_WASI))
+   enable_language(CXX)

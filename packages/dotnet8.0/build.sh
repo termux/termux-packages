@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION=".NET 8.0"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
 TERMUX_PKG_VERSION="8.0.16"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/dotnet/dotnet
 TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION}"
 TERMUX_PKG_BUILD_DEPENDS="krb5, libicu, openssl, zlib"
@@ -348,14 +349,17 @@ termux_step_post_make_install() {
 }
 
 termux_step_post_massage() {
-	local _rpath_check_readelf=$("$READELF" -d "${TERMUX_PREFIX}/lib/dotnet/shared/Microsoft.NETCore.App/${TERMUX_PKG_VERSION}/libSystem.Security.Cryptography.Native.OpenSsl.so")
-	local _rpath=$(echo "${_rpath_check_readelf}" | sed -ne "s|.*RUNPATH.*\[\(.*\)\].*|\1|p")
-	if [[ "${_rpath}" != "${TERMUX_PREFIX}/lib" ]]; then
-		termux_error_exit "
-		Excessive RUNPATH found. Check readelf output below:
-		${_rpath_check_readelf}
-		"
-	fi
+	local _rpath_check_file
+	for _rpath_check_file in libSystem.Security.Cryptography.Native.OpenSsl.so libcoreclr.so libSystem.Net.Security.Native.so; do
+		local _rpath_check_readelf=$("$READELF" -d "${TERMUX_PREFIX}/lib/dotnet/shared/Microsoft.NETCore.App/${TERMUX_PKG_VERSION}/${_rpath_check_file}")
+		local _rpath=$(echo "${_rpath_check_readelf}" | sed -ne "s|.*RUNPATH.*\[\(.*\)\].*|\1|p")
+		if [[ "${_rpath}" != "${TERMUX_PREFIX}/lib" ]]; then
+			termux_error_exit "
+			Excessive RUNPATH found. Check readelf output below:
+			${_rpath_check_readelf}
+			"
+		fi
+	done
 }
 
 # References:
