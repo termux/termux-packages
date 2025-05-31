@@ -1,0 +1,113 @@
+Patch-Source: https://github.com/tadfisher/pass-otp/pull/178.patch
+From 3735077495f709000d08bd1f4cd08227ef06cb53 Mon Sep 17 00:00:00 2001
+From: Remko Tronçon <remko@el-tramo.be>
+Date: Wed, 28 Dec 2022 20:27:53 +0100
+Subject: [PATCH] Support passage as backend
+
+---
+ otp.bash | 43 +++++++++++++++++++++++++++++++++----------
+ 1 file changed, 33 insertions(+), 10 deletions(-)
+
+diff --git a/otp.bash b/otp.bash
+index a0688d2..eb209b8 100755
+--- a/otp.bash
++++ b/otp.bash
+@@ -20,6 +20,12 @@ VERSION="1.1.2"
+ OATH=$(which oathtool)
+ OTPTOOL=$(which otptool)
+ 
++if [[ $PASSAGE == 1 ]]; then
++  EXT="age"
++else
++  EXT="gpg"
++fi
++
+ ## source:  https://gist.github.com/cdown/1163649
+ urlencode() {
+   local l=${#1}
+@@ -137,9 +143,13 @@ otp_insert() {
+   set_git "$passfile"
+ 
+   mkdir -p -v "$PREFIX/$(dirname "$path")"
+-  set_gpg_recipients "$(dirname "$path")"
+-
+-  echo "$contents" | $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$passfile" "${GPG_OPTS[@]}" || die "OTP secret encryption aborted."
++  if [[ $PASSAGE == 1 ]]; then
++    set_age_recipients "$(dirname "$path")"
++    echo "$contents" | $AGE -e "${AGE_RECIPIENT_ARGS[@]}" -o "$passfile" || die "OTP secret encryption aborted"
++  else
++    set_gpg_recipients "$(dirname "$path")"
++    echo "$contents" | $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$passfile" "${GPG_OPTS[@]}" || die "OTP secret encryption aborted."
++  fi
+ 
+   if [[ "$quiet" -eq 1 ]]; then
+     git_add_file "$passfile" "$message" 1>/dev/null
+@@ -243,7 +253,7 @@ cmd_otp_insert() {
+     yesno "Insert into $path?"
+   fi
+ 
+-  local passfile="$PREFIX/$path.gpg"
++  local passfile="$PREFIX/$path.$EXT"
+   [[ $force -eq 0 && -e $passfile ]] && yesno "An entry already exists for $path. Overwrite it?"
+ 
+   otp_insert "$path" "$passfile" "$otp_uri" "Add OTP secret for $path to store."
+@@ -268,16 +278,21 @@ cmd_otp_append() {
+   local uri
+   local path="${1%/}"
+   local prompt="$path"
+-  local passfile="$PREFIX/$path.gpg"
++  local passfile="$PREFIX/$path.$EXT"
+ 
+   [[ -f $passfile ]] || die "Passfile not found"
++  if [[ $PASSAGE == 1 ]]; then
++    old_contents=$($AGE -d -i "$IDENTITIES_FILE" "$passfile")
++  else
++    old_contents=$($GPG -d "${GPG_OPTS[@]}" "$passfile")
++  fi
+ 
+   local existing contents=""
+   while IFS= read -r line || [ -n "$line" ]; do
+     [[ -z "$existing" && "$line" == otpauth://* ]] && existing="$line"
+     [[ -n "$contents" ]] && contents+=$'\n'
+     contents+="$line"
+-  done < <($GPG -d "${GPG_OPTS[@]}" "$passfile")
++  done < <(echo "$old_contents")
+ 
+   [[ -n "$existing" ]] && yesno "An OTP secret already exists for $path. Overwrite it?"
+ 
+@@ -329,11 +344,15 @@ cmd_otp_code() {
+   [[ $err -ne 0 || $# -ne 1 ]] && die "Usage: $PROGRAM $COMMAND [--clip,-c] [--quiet,-q] pass-name"
+ 
+   local path="${1%/}"
+-  local passfile="$PREFIX/$path.gpg"
++  local passfile="$PREFIX/$path.$EXT"
+   check_sneaky_paths "$path"
+   [[ ! -f $passfile ]] && die "$path: passfile not found."
+ 
+-  contents=$($GPG -d "${GPG_OPTS[@]}" "$passfile")
++  if [[ $PASSAGE == 1 ]]; then
++    contents=$($AGE -d -i "$IDENTITIES_FILE" "$passfile")
++  else
++    contents=$($GPG -d "${GPG_OPTS[@]}" "$passfile")
++  fi
+   while read -r line; do
+     if [[ "$line" == otpauth://* ]]; then
+       local uri="$line"
+@@ -401,11 +420,15 @@ cmd_otp_uri() {
+   [[ $err -ne 0 || $# -ne 1 ]] && die "Usage: $PROGRAM $COMMAND uri [--clip,-c | --qrcode,-q] pass-name"
+ 
+   local path="$1"
+-  local passfile="$PREFIX/$path.gpg"
++  local passfile="$PREFIX/$path.$EXT"
+   check_sneaky_paths "$path"
+   [[ ! -f $passfile ]] && die "Passfile not found"
++  if [[ $PASSAGE == 1 ]]; then
++    contents=$($AGE -d -i "$IDENTITIES_FILE" "$passfile")
++  else
++    contents=$($GPG -d "${GPG_OPTS[@]}" "$passfile")
++  fi
+ 
+-  contents=$($GPG -d "${GPG_OPTS[@]}" "$passfile")
+   while read -r line; do
+     if [[ "$line" == otpauth://* ]]; then
+       otp_parse_uri "$line"
