@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Shared library for the Lua interpreter (v5.2.x)"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.2.4
-TERMUX_PKG_REVISION=8
+TERMUX_PKG_REVISION=9
 TERMUX_PKG_SRCURL=https://www.lua.org/ftp/lua-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=b9e2e4aad6789b3b63a056d442f7b39f0ecfca3ae0f1fc0ae4e9614401b69f4b
 TERMUX_PKG_BREAKS="liblua52-dev"
@@ -36,6 +36,8 @@ termux_step_make_install() {
 		INSTALL_MAN="$TERMUX_PREFIX/share/man/man1" \
 		install
 	install -Dm600 lua.pc "$TERMUX_PREFIX"/lib/pkgconfig/lua52.pc
+	ln -sf lua52.pc "$TERMUX_PREFIX"/lib/pkgconfig/lua5.2.pc
+	ln -sf lua52.pc "$TERMUX_PREFIX"/lib/pkgconfig/lua-5.2.pc
 
 	mv -f "$TERMUX_PREFIX"/share/man/man1/lua.1 "$TERMUX_PREFIX"/share/man/man1/lua5.2.1
 	mv -f "$TERMUX_PREFIX"/share/man/man1/luac.1 "$TERMUX_PREFIX"/share/man/man1/luac5.2.1
