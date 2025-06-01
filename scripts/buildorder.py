@@ -60,7 +60,17 @@ def parse_build_file_dependencies_with_vars(path, vars):
 
 def parse_build_file_dependencies(path):
     "Extract the dependencies of a build.sh or *.subpackage.sh file."
-    return parse_build_file_dependencies_with_vars(path, ('TERMUX_PKG_DEPENDS', 'TERMUX_PKG_BUILD_DEPENDS', 'TERMUX_SUBPKG_DEPENDS', 'TERMUX_PKG_DEVPACKAGE_DEPENDS'))
+    build_deps = parse_build_file_dependencies_with_vars(path, ('TERMUX_PKG_DEPENDS', 'TERMUX_PKG_BUILD_DEPENDS', 'TERMUX_SUBPKG_DEPENDS'))
+    # Add 'aosp-libs' and 'imagemagick' to the dependency list
+    # if we have icons to install as part of the build
+    with open(path, encoding="utf-8") as build_script:
+        for line in build_script:
+            if line.startswith('TERMUX_PKG_ICONS='):
+                build_deps.add('imagemagick')
+                if not os.getenv('TERMUX_ON_DEVICE_BUILD') == "true":
+                    build_deps.add('aosp-libs')
+                break
+    return set(build_deps)
 
 def parse_build_file_antidependencies(path):
     "Extract the antidependencies of a build.sh file."
