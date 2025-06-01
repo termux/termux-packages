@@ -1,7 +1,5 @@
-elfcore.test.sh is not passing on Android-x86,
-so it is disabled by this. Upstream also currently has 
-elf-sans-immobile.test.sh disabled.
-These tests also fail on ARM, but were
+elfcore.test.sh/elf-sans-immobile.test.sh is not passing on Android-x86,
+so it is disabled by this. These tests also fail on ARM, but are
 not enabled by upstream on any targets except 64-bit x86.
 The exact reason why the test fails, or what steps might be necessary
 to fix it, are not known, but one way of describing the probable
@@ -14,10 +12,10 @@ effects that this test failing implies would be:
  . ./subr.sh
  
  run_sbcl <<EOF
--;#+(and linux x86-64 sb-thread)
-+;#+(and linux x86-64 sb-thread (not android))
- ;(unless (member :immobile-space sb-impl:+internal-features+)
- ;  (exit :code 0)) ; proceed with test
+-#+(and linux x86-64 sb-thread)
++#+(and linux x86-64 sb-thread (not android))
+ (unless (member :immobile-space sb-impl:+internal-features+)
+   (exit :code 0)) ; proceed with test
  (exit :code 2) ; otherwise skip the test
 --- a/tests/elfcore.test.sh
 +++ b/tests/elfcore.test.sh
