@@ -2,14 +2,17 @@ TERMUX_PKG_HOMEPAGE=https://pandoc.org/
 TERMUX_PKG_DESCRIPTION="Universal markup converter"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.dev>"
-TERMUX_PKG_VERSION=3.7.0.1
+TERMUX_PKG_VERSION=3.7.0.2
 TERMUX_PKG_SRCURL="https://hackage.haskell.org/package/pandoc-cli-$TERMUX_PKG_VERSION/pandoc-cli-$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=62cfd812ed0e980bb7da2100983bc3842856625c006c3b393f186e297d181754
-TERMUX_PKG_DEPENDS="libffi, libiconv, libgmp, zlib"
+TERMUX_PKG_SHA256=ff4dcab86cfa5291ba11a14d14fef49ddf494c549bdd01b6752ed6a8043c3d3d
+TERMUX_PKG_DEPENDS="libffi, libiconv, libgmp, liblua54, zlib"
 TERMUX_PKG_BUILD_DEPENDS="aosp-libs"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--f-lua -f+server
+-f+lua -f+server
+-c lua+system-lua
+-c lua+pkg-config
+-c lua+cross-compile
 -c pandoc+embed_data_files
 "
 
