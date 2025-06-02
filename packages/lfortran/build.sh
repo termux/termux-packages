@@ -2,12 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://lfortran.org/
 TERMUX_PKG_DESCRIPTION="A modern open-source interactive Fortran compiler"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.45.0
-TERMUX_PKG_SRCURL=https://lfortran.github.io/tarballs/release/lfortran-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=41ebda8ca5e51ebd7d2e426f60981e1f5908cd7d64c97ec6f5a2157c4bfbe9ac
+TERMUX_PKG_VERSION=0.52.0
+TERMUX_PKG_SRCURL=https://github.com/lfortran/lfortran/releases/download/v$TERMUX_PKG_VERSION/lfortran-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=51fb60960cce602bf439ee3949e9e52fc8feb0b14794263f2654e692387f23a2
 TERMUX_PKG_DEPENDS="clang, libandroid-complex-math, libc++, ncurses, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="libkokkos, libllvm-static"
 TERMUX_PKG_SUGGESTS="libkokkos"
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_SHARED_LIBS=ON
 -DWITH_LLVM=yes
@@ -16,6 +17,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DWITH_RUNTIME_LIBRARY=yes
 -DWITH_BFD=no
 -DCMAKE_INSTALL_LIBDIR=lib/lfortran
+-DWITH_PREBUILT_FORTRAN=$TERMUX_PKG_HOSTBUILD_DIR/src/bin/lfortran
 "
 TERMUX_PKG_HOSTBUILD=true
 
@@ -37,11 +39,5 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
-	export PATH="$TERMUX_PKG_HOSTBUILD_DIR/src/bin:$PATH"
-	echo "Applying CMakeLists.txt.diff"
-	sed "s|@TERMUX_PKG_HOSTBUILD_DIR@|${TERMUX_PKG_HOSTBUILD_DIR}|g" \
-		$TERMUX_PKG_BUILDER_DIR/CMakeLists.txt.diff \
-		| patch --silent -p1
-
 	LDFLAGS+=" -landroid-complex-math -lm"
 }
