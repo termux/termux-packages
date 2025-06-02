@@ -25,13 +25,9 @@ termux_step_post_get_source() {
 }
 
 termux_step_host_build() {
-	# This is the same compiler that will be used for both host build of libicu
-	# and for building LLVM
-	export CC=/usr/bin/clang-18
-	export CXX=/usr/bin/clang++-18
-	export LD=/usr/bin/clang++-18
-
+	######
 	# Do host-build of ICU, which is required for nodejs
+	######
 	local ICU_VERSION=76.1
 	local ICU_TAR=icu4c-${ICU_VERSION//./_}-src.tgz
 	local ICU_DOWNLOAD=https://github.com/unicode-org/icu/releases/download/release-${ICU_VERSION//./-}/$ICU_TAR
@@ -41,9 +37,10 @@ termux_step_host_build() {
 		dfacb46bfe4747410472ce3e1144bf28a102feeaa4e3875bac9b4c6cf30f4f3e
 	tar xf $TERMUX_PKG_CACHEDIR/$ICU_TAR
 	cd icu/source
+	export CC=/usr/bin/clang-18
+	export CXX=/usr/bin/clang++-18
+	export LD=/usr/bin/clang++-18
 	if [ "$TERMUX_ARCH_BITS" = 32 ]; then
-		# We do not export CFLAGS/CXXFLAGS/LDFLAGS here, as we don't want it to be
-		# picked up during LLVM build
 		./configure --prefix $TERMUX_PKG_HOSTBUILD_DIR/icu-installed \
 			--disable-samples \
 			--disable-tests \
@@ -57,14 +54,15 @@ termux_step_host_build() {
 
 
 	######
-	# Do a host-build of the LLVM toolchain.
+	# Download LLVM toolchain used by the upstream v8 project.
 	# Upstream v8 uses LLVM tooling from the main branch of the LLVM project as
 	# the main branch often contains bug fixes which are not released quickly to
 	# stable releases. Also Ubuntu's LLVM toolchain is too old in comparison to
 	# what Google uses.
 	######
 
-	# The LLVM_COMMIT in use can be found in deps/v8/DEPS file,
+	# The LLVM_COMMIT, as well as the tarball of the LLVM build by Google in use
+	# can be found in deps/v8/DEPS file,
 	#
 	# For instance, if the deps/v8/DEPS file contains:
 	#
@@ -87,33 +85,17 @@ termux_step_host_build() {
 	# clarity. The full hash can be obtained by having a full checkout of the
 	# llvm-project locally and then running `git log --format=%H -n 1` in the
 	# llvm-project directory.
-	local LLVM_COMMIT=52cd27e60b2421feeee5afa9269c53fb0cb366a7
-	local LLVM_TAR="$TERMUX_PKG_CACHEDIR/llvm-project-${LLVM_COMMIT}.tar.gz"
-	local LLVM_TAR_HASH=7767c9a613e9ffa2fb9ee2a44bb41049420b6a8cc9592fa4565b8ed7339763b3
+	#
+	# Also the sha256sum is the hash of the tarball, which we can directly use
+	local LLVM_TAR="clang-llvmorg-21-init-5118-g52cd27e6-5.tar.xz"
+	local LLVM_TAR_HASH=790fcc5b04e96882e8227ba7994161ab945c0e096057fc165a0f71e32a7cb061
 	cd $TERMUX_PKG_HOSTBUILD_DIR
-	mkdir llvm-project
+	mkdir llvm-project-build
 	termux_download \
-			"https://github.com/llvm/llvm-project/archive/${LLVM_COMMIT}.tar.gz" \
-			"${LLVM_TAR}" \
+			"https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64/${LLVM_TAR}" \
+			"${TERMUX_PKG_CACHEDIR}/${LLVM_TAR}" \
 			"${LLVM_TAR_HASH}"
-	tar --extract -f "${LLVM_TAR}" --strip-components=1 --directory=llvm-project
-	cd "llvm-project"
-
-	termux_setup_cmake
-	termux_setup_ninja
-	cmake \
-		-G Ninja \
-		-S "llvm" \
-		-B build \
-		-DCMAKE_BUILD_TYPE=Release \
-		-DLLVM_ENABLE_PROJECTS=clang \
-		-DLLVM_INCLUDE_BENCHMARKS=OFF \
-		-DLLVM_INCLUDE_EXAMPLES=OFF \
-		-DLLVM_INCLUDE_TESTS=OFF \
-		-DLLVM_INCLUDE_UTILS=OFF
-	ninja \
-		-C build/ \
-		-j "${TERMUX_PKG_MAKE_PROCESSES}"
+	tar --extract -f "${TERMUX_PKG_CACHEDIR}/${LLVM_TAR}" --directory=llvm-project-build
 }
 
 termux_step_pre_configure() {
@@ -136,13 +118,13 @@ termux_step_configure() {
 
 	export GYP_DEFINES="host_os=linux"
 	if [ "$TERMUX_ARCH_BITS" = "64" ]; then
-		export CC_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project/build/bin/clang"
-		export CXX_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project/build/bin/clang++"
-		export LINK_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project/build/bin/clang++"
+		export CC_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project-build/bin/clang"
+		export CXX_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project-build/bin/clang++"
+		export LINK_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project-build/bin/clang++"
 	else
-		export CC_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project/build/bin/clang -m32"
-		export CXX_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project/build/bin/clang++ -m32"
-		export LINK_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project/build/bin/clang++ -m32"
+		export CC_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project-build/bin/clang -m32"
+		export CXX_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project-build/bin/clang++ -m32"
+		export LINK_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project-build/bin/clang++ -m32"
 	fi
 	LDFLAGS+=" -ldl"
 	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv.
