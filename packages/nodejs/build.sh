@@ -25,12 +25,16 @@ termux_step_post_get_source() {
 }
 
 termux_step_host_build() {
-	local ICU_VERSION=76.1
-	local ICU_TAR=icu4c-${ICU_VERSION//./_}-src.tgz
-	local ICU_DOWNLOAD=https://github.com/unicode-org/icu/releases/download/release-${ICU_VERSION//./-}/$ICU_TAR
+	# This is the same compiler that will be used for both host build of libicu
+	# and for building LLVM
 	export CC=/usr/bin/clang-18
 	export CXX=/usr/bin/clang++-18
 	export LD=/usr/bin/clang++-18
+
+	# Do host-build of ICU, which is required for nodejs
+	local ICU_VERSION=76.1
+	local ICU_TAR=icu4c-${ICU_VERSION//./_}-src.tgz
+	local ICU_DOWNLOAD=https://github.com/unicode-org/icu/releases/download/release-${ICU_VERSION//./-}/$ICU_TAR
 	termux_download \
 		$ICU_DOWNLOAD\
 		$TERMUX_PKG_CACHEDIR/$ICU_TAR \
@@ -38,6 +42,8 @@ termux_step_host_build() {
 	tar xf $TERMUX_PKG_CACHEDIR/$ICU_TAR
 	cd icu/source
 	if [ "$TERMUX_ARCH_BITS" = 32 ]; then
+		# We do not export CFLAGS/CXXFLAGS/LDFLAGS here, as we don't want it to be
+		# picked up during LLVM build
 		./configure --prefix $TERMUX_PKG_HOSTBUILD_DIR/icu-installed \
 			--disable-samples \
 			--disable-tests \
@@ -48,6 +54,66 @@ termux_step_host_build() {
 			--disable-tests
 	fi
 	make -j $TERMUX_PKG_MAKE_PROCESSES install
+
+
+	######
+	# Do a host-build of the LLVM toolchain.
+	# Upstream v8 uses LLVM tooling from the main branch of the LLVM project as
+	# the main branch often contains bug fixes which are not released quickly to
+	# stable releases. Also Ubuntu's LLVM toolchain is too old in comparison to
+	# what Google uses.
+	######
+
+	# The LLVM_COMMIT in use can be found in deps/v8/DEPS file,
+	#
+	# For instance, if the deps/v8/DEPS file contains:
+	#
+	#   'third_party/llvm-build/Release+Asserts': {
+	#  'dep_type': 'gcs',
+	#  'bucket': 'chromium-browser-clang',
+	#  'objects': [
+	#    {
+	#      'object_name': 'Linux_x64/clang-llvmorg-21-init-5118-g52cd27e6-5.tar.xz',
+	#      'sha256sum': '790fcc5b04e96882e8227ba7994161ab945c0e096057fc165a0f71e32a7cb061',
+	#      'size_bytes': 54517328,
+	#      'generation': 1742541959624765,
+	#      'condition': 'host_os == "linux"',
+	#    },
+	#
+	# then the LLVM_COMMIT is 52cd27e6. The g before the hash is not part of the
+	# hash, weird that they decided to include a 'g' for no reason, but 'g' isn't
+	# a part of the hexadecimal characters so anyways.. Also v8 project only
+	# stores the short-hash in the DEPS file, but we are using full hash here for
+	# clarity. The full hash can be obtained by having a full checkout of the
+	# llvm-project locally and then running `git log --format=%H -n 1` in the
+	# llvm-project directory.
+	local LLVM_COMMIT=52cd27e60b2421feeee5afa9269c53fb0cb366a7
+	local LLVM_TAR="$TERMUX_PKG_CACHEDIR/llvm-project-${LLVM_COMMIT}.tar.gz"
+	local LLVM_TAR_HASH=7767c9a613e9ffa2fb9ee2a44bb41049420b6a8cc9592fa4565b8ed7339763b3
+	cd $TERMUX_PKG_HOSTBUILD_DIR
+	mkdir llvm-project
+	termux_download \
+			"https://github.com/llvm/llvm-project/archive/${LLVM_COMMIT}.tar.gz" \
+			"${LLVM_TAR}" \
+			"${LLVM_TAR_HASH}"
+	tar --extract -f "${LLVM_TAR}" --strip-components=1 --directory=llvm-project
+	cd "llvm-project"
+
+	termux_setup_cmake
+	termux_setup_ninja
+	cmake \
+		-G Ninja \
+		-S "llvm" \
+		-B build \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DLLVM_ENABLE_PROJECTS=clang \
+		-DLLVM_INCLUDE_BENCHMARKS=OFF \
+		-DLLVM_INCLUDE_EXAMPLES=OFF \
+		-DLLVM_INCLUDE_TESTS=OFF \
+		-DLLVM_INCLUDE_UTILS=OFF
+	ninja \
+		-C build/ \
+		-j "${TERMUX_PKG_MAKE_PROCESSES}"
 }
 
 termux_step_pre_configure() {
@@ -69,10 +135,9 @@ termux_step_configure() {
 	fi
 
 	export GYP_DEFINES="host_os=linux"
-	export CC_host=/usr/bin/clang-18
-	export CXX_host=/usr/bin/clang++-18
-	export LINK_host=/usr/bin/clang++-18
-
+	export CC_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project/build/bin/clang"
+	export CXX_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project/build/bin/clang++"
+	export LINK_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project/build/bin/clang++"
 	LDFLAGS+=" -ldl"
 	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv.
 	# When building with ninja, build.ninja is generated for both Debug and Release builds.
