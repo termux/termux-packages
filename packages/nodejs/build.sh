@@ -135,9 +135,15 @@ termux_step_configure() {
 	fi
 
 	export GYP_DEFINES="host_os=linux"
-	export CC_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project/build/bin/clang"
-	export CXX_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project/build/bin/clang++"
-	export LINK_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project/build/bin/clang++"
+	if [ "$TERMUX_ARCH_BITS" = "64" ]; then
+		export CC_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project/build/bin/clang"
+		export CXX_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project/build/bin/clang++"
+		export LINK_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project/build/bin/clang++"
+	else
+		export CC_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project/build/bin/clang -m32"
+		export CXX_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project/build/bin/clang++ -m32"
+		export LINK_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project/build/bin/clang++ -m32"
+	fi
 	LDFLAGS+=" -ldl"
 	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv.
 	# When building with ninja, build.ninja is generated for both Debug and Release builds.
