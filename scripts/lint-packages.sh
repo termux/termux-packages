@@ -46,7 +46,7 @@ check_package_license() {
 		esac
 	done
 
-	if ! "$license_ok"; then
+	if [[ "$license_ok" == 'false' ]]; then
 		return 1
 	fi
 
@@ -119,6 +119,26 @@ check_indentation() {
 	return 0
 }
 
+# Check the latest commit that modified `$package`
+# It must either:
+# - Modify TERMUX_PKG_REVISION
+# - Modify TERMUX_PKG_VERSION
+# - Or specify one of the CI skip tags
+check_version_change() {
+	local base_commit commit_diff package="$1"
+	base_commit="$(git merge-base --fork-point origin/master)"
+	commit_diff="$(git log --patch "${base_commit}.." -- "$package")"
+
+	# If the diff is empty there's no commit modifying that package on this branch, which is a PASS.
+	[[ -z "$commit_diff" ]] && return
+
+	grep -q \
+		-e '^+TERMUX_PKG_REVISION=' \
+		-e '^+TERMUX_PKG_VERSION=' \
+		-e '\[no version check\]' <<< "$commit_diff" \
+	|| return 1
+}
+
 lint_package() {
 	local package_script
 	local package_name
@@ -139,7 +159,7 @@ lint_package() {
 			break
 		}
 	done
-	(( ! ${#in_dir}  )) && {
+	(( ! ${#in_dir} )) && {
 		echo "FAIL - '$package_script' is not a directory"
 		return 1
 	}
@@ -151,10 +171,10 @@ lint_package() {
 	echo "PASS"
 
 	check_package_name "$package_name" || return 1
-	local subpkg_script
-	for subpkg_script in $(dirname "$package_script")/*.subpackage.sh; do
-		test ! -f "$subpkg_script" && continue
-		local subpkg_name=$(basename "${subpkg_script%.subpackage.sh}")
+	local subpkg_script subpkg_name
+	for subpkg_script in "$(dirname "$package_script")"/*.subpackage.sh; do
+		[[ ! -f "$subpkg_script" ]] && continue
+		subpkg_name="$(basename "${subpkg_script%.subpackage.sh}")"
 		check_package_name "$subpkg_name" || return 1
 	done
 
@@ -185,8 +205,8 @@ lint_package() {
 
 	echo -n "Indentation check: "
 	local script
-	for script in "$package_script" $(dirname "$package_script")/*.subpackage.sh; do
-		test ! -f "$script" && continue
+	for script in "$package_script" "$(dirname "$package_script")"/*.subpackage.sh; do
+		[[ ! -f "$script" ]] && continue
 		check_indentation "$script" || return 1
 	done
 	echo "PASS"
@@ -211,6 +231,20 @@ lint_package() {
 		return 1
 	fi
 	echo "PASS"
+
+	echo -n "Version change check: "
+	if ! check_version_change "$package_script"; then
+		echo "FAILED"
+		echo
+		echo "Version of '$package_name' has not changed."
+		echo "Either 'TERMUX_PKG_REVISION' or 'TERMUX_PKG_VERSION'"
+		echo "need to be modified when changing a package build."
+		echo "Alternatively you can add '[no version check]'."
+		echo "To the commit message to skip this check."
+		echo
+		return 1
+	fi
+	echo "PASS"
 	echo
 
 	# Fields checking is done in subshell since we will source build.sh.
@@ -221,6 +255,7 @@ lint_package() {
 		# Using API 24 here.
 		TERMUX_PKG_API_LEVEL=24
 
+		# shellcheck source=/dev/null
 		. "$package_script"
 
 		pkg_lint_error=false
@@ -349,7 +384,7 @@ lint_package() {
 			done
 			unset url
 
-			if "$urls_ok"; then
+			if [[ "$urls_ok" == 'true' ]]; then
 				echo "PASS"
 			fi
 			unset urls_ok
@@ -505,7 +540,7 @@ lint_package() {
 			done <<< "$TERMUX_PKG_RM_AFTER_INSTALL"
 			unset file_path
 
-			if "$file_path_ok"; then
+			if [[ "$file_path_ok"  == 'true' ]]; then
 				echo "PASS"
 			fi
 			unset file_path_ok
@@ -527,7 +562,7 @@ lint_package() {
 			done <<< "$TERMUX_PKG_CONFFILES"
 			unset file_path
 
-			if "$file_path_ok"; then
+			if [[ "$file_path_ok" == 'true' ]]; then
 				echo "PASS"
 			fi
 			unset file_path_ok
@@ -544,7 +579,7 @@ lint_package() {
 			fi
 		fi
 
-		if "$pkg_lint_error"; then
+		if [[ "$pkg_lint_error" == 'true' ]]; then
 			exit 1
 		fi
 	exit 0
@@ -558,7 +593,6 @@ lint_package() {
 }
 
 linter_main() {
-	local package_counter=0
 	local problems_found=false
 	local package_script
 
@@ -568,18 +602,18 @@ linter_main() {
 			break
 		fi
 
-		(( package_counter++ ))
+		: $(( package_counter++ ))
 	done
 
-	if "$problems_found"; then
+	if [[ "$problems_found" == 'true' ]]; then
 		echo "================================================================"
 		echo
 		echo "A problem has been found in '$(realpath --relative-to="$TERMUX_SCRIPTDIR" "$package_script")'."
 		echo "Checked $package_counter packages before the first error was detected."
 		echo
 		echo "================================================================"
-
-		return 1
+		unset package_counter
+		exit 1
 	fi
 
 	echo "================================================================"
@@ -588,14 +622,16 @@ linter_main() {
 	echo "Everything seems ok."
 	echo
 	echo "================================================================"
-
-	return 0
+	return
 }
 
+package_counter=0
 if (( $# )); then
-	linter_main "$@" || exit 1
+	linter_main "$@"
+	unset package_counter
 else
-	for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' $TERMUX_SCRIPTDIR/repo.json); do
-		linter_main $repo_dir/*/build.sh
-	done || exit 1
+	for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "$TERMUX_SCRIPTDIR/repo.json"); do
+		linter_main "$repo_dir"/*/build.sh
+	done
+	unset package_counter
 fi
