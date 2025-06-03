@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Lightweight Ethereum Client"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.3.5"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/openethereum/openethereum/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e0e08f61b1c060d34c6a4dcec1eda3d4dae194fc9748e8051efbf12d1c884e14
 TERMUX_PKG_AUTO_UPDATE=true
@@ -64,34 +64,54 @@ termux_step_configure() {
 
 	export CMAKE=$TERMUX_PKG_BUILDER_DIR/cmake_mod.sh
 	export TERMUX_COMMON_CACHEDIR
+
+	cargo vendor
+	find ./vendor \
+		-mindepth 1 -maxdepth 1 -type d \
+		! -wholename ./vendor/num-bigint-0.1.44 \
+		! -wholename ./vendor/parity-rocksdb-sys \
+		! -wholename ./vendor/protobuf \
+		! -wholename ./vendor/rustc-serialize \
+		-exec rm -rf '{}' \;
+
+	patch --silent -p1 \
+		-d ./vendor/num-bigint-0.1.44 \
+		< "$TERMUX_PKG_BUILDER_DIR"/num-bigint-0.1.44.diff
+
+	patch --silent -p1 \
+		-d ./vendor/parity-rocksdb-sys/rocksdb \
+		< "$TERMUX_PKG_BUILDER_DIR"/parity-rocksdb-sys-0.5.6-mutex.diff
+	patch --silent -p1 \
+		-d ./vendor/parity-rocksdb-sys/rocksdb \
+		< "$TERMUX_PKG_BUILDER_DIR"/parity-rocksdb-sys-0.5.6-iterator.diff
+
+	patch --silent -p1 \
+		-d ./vendor/protobuf \
+		< "$TERMUX_PKG_BUILDER_DIR"/protobuf-2.16.2.diff
+
+	patch --silent -p1 \
+		-d ./vendor/rustc-serialize \
+		< "$TERMUX_PKG_BUILDER_DIR"/rustc-serialize-0.3.24.diff
+
+	echo "" >> Cargo.toml
+	echo '[patch.crates-io]' >> Cargo.toml
+	echo 'parity-rocksdb-sys = { path = "./vendor/parity-rocksdb-sys" }' >> Cargo.toml
+	echo 'protobuf = { path = "./vendor/protobuf" }' >> Cargo.toml
+	echo 'rustc-serialize = { path = "./vendor/rustc-serialize" }' >> Cargo.toml
+	echo 'num-bigint = { path = "./vendor/num-bigint-0.1.44", version = "0.1.44" }' >> Cargo.toml
 }
 
 termux_step_make() {
-	rm -rf $CARGO_HOME/registry/src/*/parity-rocksdb-sys-*
-	rm -rf $CARGO_HOME/registry/src/*/rustc-serialize-*
-	cargo fetch --target $CARGO_TARGET_NAME
-	patch --silent -p1 \
-		-d $CARGO_HOME/registry/src/*/parity-rocksdb-sys-0.5.6/rocksdb \
-		< $TERMUX_PKG_BUILDER_DIR/parity-rocksdb-sys-0.5.6-mutex.diff
-	patch --silent -p1 \
-		-d $CARGO_HOME/registry/src/*/parity-rocksdb-sys-0.5.6/rocksdb \
-		< $TERMUX_PKG_BUILDER_DIR/parity-rocksdb-sys-0.5.6-iterator.diff
-	patch --silent -p1 \
-		-d $CARGO_HOME/registry/src/*/rustc-serialize-0.3.24 \
-		< $TERMUX_PKG_BUILDER_DIR/rustc-serialize-0.3.24.diff
 	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release --features final
+	local applet
 	for applet in evmbin ethstore-cli ethkey-cli; do
 		cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release -p $applet
 	done
 }
 
 termux_step_make_install() {
+	local applet
 	for applet in openethereum openethereum-evm ethstore ethkey; do
 		install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/$applet
 	done
-}
-
-termux_step_post_massage() {
-	rm -rf $CARGO_HOME/registry/src/*/parity-rocksdb-sys-*
-	rm -rf $CARGO_HOME/registry/src/*/rustc-serialize-*
 }
