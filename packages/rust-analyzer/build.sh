@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE-APACHE, LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="20250602"
+TERMUX_PKG_REVISION=1
 _VERSION=${TERMUX_PKG_VERSION:0:4}-${TERMUX_PKG_VERSION:4:2}-${TERMUX_PKG_VERSION:6:2}
 TERMUX_PKG_SRCURL=https://github.com/rust-lang/rust-analyzer/archive/refs/tags/${_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c993bee4845acc400e6b6b499dadb50eafca02fab4e38001663fc6003ecec623
@@ -56,6 +57,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
+	export CFG_RELEASE=1
 	cargo build --jobs "${TERMUX_PKG_MAKE_PROCESSES}" --target "${CARGO_TARGET_NAME}" --release
 }
 
