@@ -12,10 +12,10 @@ termux_step_post_massage="Please add dinitctl shutdown to .bash_logout for prope
 
 termux_step_post_make_install() {
 	mkdir -p $(DESTDIR)$(PREFIX)/etc/profile.d/
- 	install $TERMUX_PKG_BUILDER_DIR/start-dinit.sh $(DESTDIR)$(PREFIX)/etc/profile.d
+	install $TERMUX_PKG_BUILDER_DIR/start-dinit.sh $(DESTDIR)$(PREFIX)/etc/profile.d
 	mkdir -p $(DESTDIR)$(PREFIX)/etc/dinit.d
- 	install $TERMUX_PKG_BUILDER_DIR/boot $(DESTDIR)$(PREFIX)/etc/dinit.d
+	install $TERMUX_PKG_BUILDER_DIR/boot $(DESTDIR)$(PREFIX)/etc/dinit.d
 	install $TERMUX_PKG_BUILDER_DIR/local.target $(DESTDIR)$(PREFIX)/etc/dinit.d
- 	install $TERMUX_PKG_BUILDER_DIR/network.target $(DESTDIR)$(PREFIX)/etc/dinit.d
+	install $TERMUX_PKG_BUILDER_DIR/network.target $(DESTDIR)$(PREFIX)/etc/dinit.d
 	mkdir -p $(DESTDIR)$(PREFIX)/etc/dinit.d/service.d
 }
