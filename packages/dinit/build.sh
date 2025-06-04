@@ -19,3 +19,14 @@ termux_step_post_make_install() {
 	install $TERMUX_PKG_BUILDER_DIR/network.target $(DESTDIR)$(PREFIX)/etc/dinit.d
 	mkdir -p $(DESTDIR)$(PREFIX)/etc/dinit.d/service.d
 }
+
+termux_step_create_debscripts() {
+	{
+	echo "#!$TERMUX_PREFIX/bin/sh"
+	echo "echo \"Add 'dinitctl shutdown' in .bash_logout\""
+	echo "echo \"to shutdown services properly\""
+ 	echo "echo \"dinitctl shutdown\" >> \"\$HOME/.ssh/authorized_keys\""
+	echo "exit 0"
+	} > postinst
+	chmod 0700 postinst
+}
