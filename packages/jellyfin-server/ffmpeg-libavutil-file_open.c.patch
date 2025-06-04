@@ -1,0 +1,20 @@
+--- a/jellyfin-ffmpeg-7.1.3-1/libavutil/file_open.c
++++ b/jellyfin-ffmpeg-7.1.3-1/libavutil/file_open.c
+@@ -113,7 +113,7 @@ int avpriv_tempfile(const char *prefix, char **filename, int log_offset, void *l
+     FileLogContext file_log_ctx = { &file_log_ctx_class, log_offset, log_ctx };
+     int fd = -1;
+ #if HAVE_MKSTEMP
+-    size_t len = strlen(prefix) + 12; /* room for "/tmp/" and "XXXXXX\0" */
++    size_t len = strlen(prefix) + strlen("@TERMUX_PREFIX@/tmp/") + 7; /* room for "@TERMUX_PREFIX@/tmp/" and "XXXXXX\0" */
+     *filename  = av_malloc(len);
+ #elif HAVE_TEMPNAM
+     void *ptr= tempnam(NULL, prefix);
+@@ -139,7 +139,7 @@ int avpriv_tempfile(const char *prefix, char **filename, int log_offset, void *l
+ #   endif
+     fd = open(*filename, O_RDWR | O_BINARY | O_CREAT | O_EXCL, 0600);
+ #else
+-    snprintf(*filename, len, "/tmp/%sXXXXXX", prefix);
++    snprintf(*filename, len, "@TERMUX_PREFIX@/tmp/%sXXXXXX", prefix);
+     fd = mkstemp(*filename);
+ #if defined(_WIN32) || defined (__ANDROID__) || defined(__DJGPP__)
+     if (fd < 0) {
