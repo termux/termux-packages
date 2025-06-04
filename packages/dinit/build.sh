@@ -8,3 +8,14 @@ TERMUX_PKG_GIT_BRANCH=r${TERMUX_PKG_VERSION}
 TERMUX_PKG_BUILD_DEPENDS="make, clang, m4, binutils-is-llvm, git"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-shutdown"
+termux_step_post_massage="Please add dinitctl shutdown to .bash_logout for proper shutdwon services." 
+
+termux_step_post_make_install() {
+	mkdir -p $(DESTDIR)$(PREFIX)/etc/profile.d/
+ 	install $TERMUX_PKG_BUILDER_DIR/start-dinit.sh $(DESTDIR)$(PREFIX)/etc/profile.d
+	mkdir -p $(DESTDIR)$(PREFIX)/etc/dinit.d
+ 	install $TERMUX_PKG_BUILDER_DIR/boot $(DESTDIR)$(PREFIX)/etc/dinit.d
+	install $TERMUX_PKG_BUILDER_DIR/local.target $(DESTDIR)$(PREFIX)/etc/dinit.d
+ 	install $TERMUX_PKG_BUILDER_DIR/network.target $(DESTDIR)$(PREFIX)/etc/dinit.d
+	mkdir -p $(DESTDIR)$(PREFIX)/etc/dinit.d/service.d
+}
