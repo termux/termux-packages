@@ -24,7 +24,7 @@ termux_step_create_debscripts() {
 	echo "#!$TERMUX_PREFIX/bin/sh"
 	echo "echo \"Add 'dinitctl shutdown' in .bash_logout\""
 	echo "echo \"to shutdown services properly\""
- 	echo "echo \"dinitctl shutdown\" >> \"\$HOME/.bash_logout\""
+	echo "echo \"dinitctl shutdown\" >> \"\$HOME/.bash_logout\""
 	echo "exit 0"
 	} > postinst
 	chmod 0700 postinst
