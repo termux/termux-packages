@@ -3,11 +3,13 @@ TERMUX_PKG_DESCRIPTION="Large set of desktop Qt widgets (KDE)"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.14.0"
-TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kwidgetsaddons-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_REVISION=1
+_KF6_MINOR_VERSION="${TERMUX_PKG_VERSION%.*}"
+TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${_KF6_MINOR_VERSION}/kwidgetsaddons-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=602720bc3e86cba2384f0f45e16c8524a1974796a3d5b7c5c1ed90e768cf121f
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, qt6-qtbase"
-TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION}), qt6-qttools"
+TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${_KF6_MINOR_VERSION}), qt6-qttools"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_SYSTEM_NAME=Linux
 -DKDE_INSTALL_QMLDIR=lib/qt6/qml
