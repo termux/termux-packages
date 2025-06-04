@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/davmac314/dinit
+TERMUX_PKG_DESCRIPTION="Service monitoring / "init" system"
+TERMUX_PKG_LICENSE="Apache-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=0.19.4
+TERMUX_PKG_SRCURL=git+https://github.com/davmac314/dinit.git
+TERMUX_PKG_GIT_BRANCH=r${TERMUX_PKG_VERSION}
+TERMUX_PKG_BUILD_DEPENDS="make, clang, m4, binutils-is-llvm, git"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-shutdown"
