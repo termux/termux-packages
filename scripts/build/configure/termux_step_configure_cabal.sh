@@ -2,14 +2,6 @@ termux_step_configure_cabal() {
 	termux_setup_ghc
 	termux_setup_cabal
 
-	local target="$TERMUX_HOST_PLATFORM"
-	[[ "$TERMUX_ARCH" == "arm" ]] && target="armv7a-linux-androideabi"
-
-	TARGET_FLAG="--target=$target"
-	if [[ ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--target=/}" ]]; then
-		TARGET_FLAG=""
-	fi
-
 	QUIET_BUILD=
 	if [[ ${TERMUX_QUIET_BUILD} == true ]]; then
 		QUIET_BUILD="-v0"
@@ -73,21 +65,8 @@ termux_step_configure_cabal() {
 
 	# NOTE: We do not want to quote AVOID_GNULIB as we want word expansion.
 	# shellcheck disable=SC2086
-	# shellcheck disable=SC2250,SC2154,SC2248,SC2312
-	env $AVOID_GNULIB cabal configure \
+	env $AVOID_GNULIB cabal --config="$TERMUX_CABAL_CONFIG" configure \
 		$TERMUX_GHC_OPTIMISATION \
-		--prefix="$TERMUX_PREFIX" \
-		--configure-option="$TARGET_FLAG" \
-		--with-compiler="$(command -v ghc)" \
-		--with-ghc-pkg="$(command -v ghc-pkg)" \
-		--with-hsc2hs="$(command -v hsc2hs)" \
-		"$([[ "$TERMUX_ON_DEVICE_BUILD" == false ]] && echo -n "--hsc2hs-option=--cross-compile")" \
-		--with-ld="$(command -v "$LD")" \
-		--with-ar="$(command -v "$AR")" \
-		--with-pkg-config="$(command -v "$PKG_CONFIG")" \
-		--with-happy="$(command -v happy)" \
-		--with-alex="$(command -v alex)" \
-		--disable-tests \
 		$QUIET_BUILD \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 }
