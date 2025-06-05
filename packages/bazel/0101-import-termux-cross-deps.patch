@@ -1,0 +1,32 @@
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -442,3 +442,29 @@
+ 
+ remote_android_extensions = use_extension("//tools/android:android_extensions.bzl", "remote_android_tools_extensions")
+ use_repo(remote_android_extensions, "android_gmaven_r8", "android_tools")
++
++new_local_repository_ = use_repo_rule("@bazel_tools//tools/build_defs/repo:local.bzl", "new_local_repository")
++
++new_local_repository_(
++    name = "termux-prefix",
++    path = "@TERMUX_PREFIX@",
++    build_file_content = """
++package(default_visibility = ["//visibility:public"])
++filegroup(
++    name = "prefix",
++    srcs = glob(["**"])
++)
++"""
++)
++
++new_local_repository_(
++    name = "termux-toolchain",
++    path = "@TERMUX_PREFIX@/tmp/custom-toolchain",
++    build_file_content = """
++package(default_visibility = ["//visibility:public"])
++filegroup(
++    name = "toolchain",
++    srcs = glob(["**"])
++)
++"""
++)
