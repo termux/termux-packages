@@ -31,8 +31,8 @@ termux_setup_gn() {
 				cat <<-EOF >./out/last_commit_position.h
 					#ifndef OUT_LAST_COMMIT_POSITION_H_
 					#define OUT_LAST_COMMIT_POSITION_H_
-					#define LAST_COMMIT_POSITION_NUM 1953
-					#define LAST_COMMIT_POSITION "2034 ${GN_COMMIT:0:8}"
+					#define LAST_COMMIT_POSITION_NUM 2245
+					#define LAST_COMMIT_POSITION "2245 ${GN_COMMIT:0:12}"
 					#endif  // OUT_LAST_COMMIT_POSITION_H_
 				EOF
 				ninja -C out/
