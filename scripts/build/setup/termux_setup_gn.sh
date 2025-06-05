@@ -1,6 +1,6 @@
 termux_setup_gn() {
 	termux_setup_ninja
-	local GN_COMMIT=e30a1fe26e5e72cb7cb9f27d9abe2330e4115ae5
+	local GN_COMMIT=3ef7da38dcfb63212d97a987d5c60374134e1007
 	local GN_TARFILE=$TERMUX_COMMON_CACHEDIR/gn_$GN_COMMIT.tar.gz
 	local GN_SOURCE=https://gn.googlesource.com/gn/+archive/$GN_COMMIT.tar.gz
 
