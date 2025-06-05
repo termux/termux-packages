@@ -4,13 +4,12 @@ TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="COPYRIGHT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.6.7"
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_VERSION="3.6.9"
 TERMUX_PKG_SRCURL="https://github.com/DCMTK/dcmtk/archive/refs/tags/DCMTK-$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=17705dcdb2047d1266bb4e92dbf4aa6d4967819e8e3e94f39b7df697661b4860
+TERMUX_PKG_SHA256=7f240eac06c45af5b17a6d2f7e41c54269274646aa348f44809e805ceef5d2e9
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="libc++, libiconv, libpng, libtiff, libxml2, openssl, zlib"
-# As of 3.6.7, libsndfile and openjpeg are detected but not linked against
+# As of 3.6.9, libsndfile and openjpeg are detected but not linked against
 TERMUX_PKG_BUILD_DEPENDS="libsndfile, openjpeg"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
