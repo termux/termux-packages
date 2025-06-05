@@ -1,0 +1,201 @@
+From 9d56f62f268fde4c6a421cf5b1b3c5ba587fdd60 Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <henrik@grimler.se>
+Date: Wed, 26 Feb 2025 00:43:59 +0100
+Subject: [PATCH] heimdall: use termux_usb functions instead of (some) libusb
+ ones
+
+The functions are provided by libtermux-usb, which is part of
+termux-api.
+---
+ heimdall/CMakeLists.txt           |  5 +-
+ heimdall/source/BridgeManager.cpp | 79 ++++++++++++++++++++-----------
+ 2 files changed, 55 insertions(+), 29 deletions(-)
+
+diff --git a/heimdall/CMakeLists.txt b/heimdall/CMakeLists.txt
+index 0cb0e2c0c42e..12c32dadb043 100644
+--- a/heimdall/CMakeLists.txt
++++ b/heimdall/CMakeLists.txt
+@@ -37,7 +37,8 @@ set(HEIMDALL_SOURCE_FILES
+     source/main.cpp
+     source/PrintPitAction.cpp
+     source/Utility.cpp
+-    source/VersionAction.cpp)
++    source/VersionAction.cpp
++)
+ 
+ include(CheckSymbolExists)
+ 
+@@ -74,7 +75,7 @@ add_executable(heimdall ${HEIMDALL_SOURCE_FILES})
+ target_compile_features(heimdall PRIVATE cxx_std_11)
+ 
+ target_link_libraries(heimdall PRIVATE pit)
+-target_link_libraries(heimdall PRIVATE ${LIBUSB_LIBRARIES})
++target_link_libraries(heimdall PRIVATE ${LIBUSB_LIBRARIES} termux-usb protobuf-c)
+ install (TARGETS heimdall
+     RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+diff --git a/heimdall/source/BridgeManager.cpp b/heimdall/source/BridgeManager.cpp
+index f2ceee9e2cbe..45cdff8fb3f2 100644
+--- a/heimdall/source/BridgeManager.cpp
++++ b/heimdall/source/BridgeManager.cpp
+@@ -25,6 +25,8 @@
+ // libusb
+ #include <libusb.h>
+ 
++#include "termux-usb.h"
++
+ // Heimdall
+ #include "BeginDumpPacket.h"
+ #include "BeginSessionPacket.h"
+@@ -83,50 +85,64 @@ int BridgeManager::FindDeviceInterface(void)
+ 	else
+ 		Interface::Print("Detecting device...\n");
+ 
+-	struct libusb_device **devices;
++	struct termux_usb_device **devices;
++	char heimdallDeviceAddress[PATH_MAX] = {'\0'};
+ 	unsigned int deviceCount, deviceIndex, i;
+-	libusb_device_descriptor descriptor;
+ 	while (true)
+ 	{
+-		deviceCount = libusb_get_device_list(libusbContext, &devices);
++		deviceCount = termux_usb_get_device_list(&devices);
+ 
+ 		for (deviceIndex = 0; deviceIndex < deviceCount; deviceIndex++)
+ 		{
+-			libusb_get_device_descriptor(devices[deviceIndex], &descriptor);
+-
+ 			for (i = 0; i < BridgeManager::kSupportedDeviceCount; i++)
+ 			{
+-				if (descriptor.idVendor == supportedDevices[i].vendorId &&
+-				    descriptor.idProduct == supportedDevices[i].productId)
++				if (devices[deviceIndex]->device_descriptor->idVendor == supportedDevices[i].vendorId &&
++				    devices[deviceIndex]->device_descriptor->idProduct == supportedDevices[i].productId)
+ 				{
+-					heimdallDevice = devices[deviceIndex];
+-					libusb_ref_device(heimdallDevice);
++					strncpy(heimdallDeviceAddress, devices[deviceIndex]->device_address, PATH_MAX-1);
++					heimdallDeviceAddress[PATH_MAX-1] = '\0';
++					Interface::Print("Found device\n");
+ 					break;
+ 				}
+ 			}
+ 		}
+-		if (heimdallDevice)
++		if (heimdallDeviceAddress[0] != '\0')
+ 			break;
+ 
+-		libusb_free_device_list(devices, deviceCount);
++		termux_usb_free_device_list(devices);
+ 		if (waitForDevice)
+ 			Sleep(1000);
+ 		else
+ 			break;
+ 	}
+ 
+-	if (!heimdallDevice)
++	if (heimdallDeviceAddress[0] == '\0')
+ 	{
+ 		Interface::PrintDeviceDetectionFailed();
+ 		return (BridgeManager::kInitialiseDeviceNotDetected);
+ 	}
+ 
+-	int result = libusb_open(heimdallDevice, &deviceHandle);
+-	if (result != LIBUSB_SUCCESS)
+-	{
+-		Interface::PrintError("Failed to access device. libusb error: %d\n", result);
++	intptr_t fd = termux_usb_open_address(heimdallDeviceAddress);
++	if (fd <= 0) {
++		Interface::PrintError("termux_usb_open failed\n");
+ 		return (BridgeManager::kInitialiseFailed);
+ 	}
++	int result = libusb_wrap_sys_device(libusbContext, fd, &deviceHandle);
++	if (result != LIBUSB_SUCCESS) {
++		Interface::PrintError("libusb_wrap_sys_device failed. libusb error: %d\n", result);
++		return (BridgeManager::kInitialiseFailed);
++	} else if (deviceHandle == NULL) {
++		Interface::PrintError("libusb_wrap_sys_device returned an invalid handle\n");
++		return (BridgeManager::kInitialiseFailed);
++	}
++	heimdallDevice = libusb_get_device(deviceHandle);
++	libusb_ref_device(heimdallDevice);
++
++	if (!heimdallDevice)
++	{
++		Interface::PrintDeviceDetectionFailed();
++		return (BridgeManager::kInitialiseDeviceNotDetected);
++	}
+ 
+ 	libusb_device_descriptor deviceDescriptor;
+ 	result = libusb_get_device_descriptor(heimdallDevice, &deviceDescriptor);
+@@ -418,7 +434,13 @@ BridgeManager::~BridgeManager()
+ bool BridgeManager::DetectDevice(void)
+ {
+ 	// Initialise libusb
+-	int result = libusb_init(&libusbContext);
++	int result;
++	result = libusb_set_option(libusbContext, LIBUSB_OPTION_WEAK_AUTHORITY, NULL);
++	if (result != LIBUSB_SUCCESS) {
++		Interface::PrintError("libusb_set_option failed: %d\n", result);
++		return (false);
++	}
++	result = libusb_init(&libusbContext);
+ 
+ 	if (result != LIBUSB_SUCCESS)
+ 	{
+@@ -432,23 +454,20 @@ bool BridgeManager::DetectDevice(void)
+ 	// Set libusb log level.
+ 	SetUsbLogLevel(usbLogLevel);
+ 
+-	struct libusb_device **devices;
++	struct termux_usb_device **devices;
+ 	unsigned int deviceCount, deviceIndex, i;
+-	libusb_device_descriptor descriptor;
+ 	while (true)
+ 	{
+-		deviceCount = libusb_get_device_list(libusbContext, &devices);
++		deviceCount = termux_usb_get_device_list(&devices);
+ 
+ 		for (deviceIndex = 0; deviceIndex < deviceCount; deviceIndex++)
+ 		{
+-			libusb_get_device_descriptor(devices[deviceIndex], &descriptor);
+-
+ 			for (i = 0; i < BridgeManager::kSupportedDeviceCount; i++)
+ 			{
+-				if (descriptor.idVendor == supportedDevices[i].vendorId &&
+-				    descriptor.idProduct == supportedDevices[i].productId)
++				if (devices[deviceIndex]->device_descriptor->idVendor == supportedDevices[i].vendorId &&
++				    devices[deviceIndex]->device_descriptor->idProduct == supportedDevices[i].productId)
+ 				{
+-					libusb_free_device_list(devices, deviceCount);
++					termux_usb_free_device_list(devices);
+ 
+ 					Interface::Print("Device detected\n");
+ 					return (true);
+@@ -456,7 +475,7 @@ bool BridgeManager::DetectDevice(void)
+ 			}
+ 		}
+ 
+-		libusb_free_device_list(devices, deviceCount);
++		termux_usb_free_device_list(devices);
+ 		if (waitForDevice)
+ 			Sleep(1000);
+ 		else
+@@ -471,7 +490,13 @@ int BridgeManager::Initialise(bool resume)
+ 	Interface::Print("Initialising connection...\n");
+ 
+ 	// Initialise libusb
+-	int result = libusb_init(&libusbContext);
++	int result;
++	result = libusb_set_option(libusbContext, LIBUSB_OPTION_WEAK_AUTHORITY, NULL);
++	if (result != LIBUSB_SUCCESS) {
++		Interface::PrintError("libusb_set_option failed: %d\n", result);
++		return (false);
++	}
++	result = libusb_init(&libusbContext);
+ 
+ 	if (result != LIBUSB_SUCCESS)
+ 	{
+-- 
+2.49.0
+
