@@ -15,8 +15,8 @@ https://github.com/termux/termux-packages/issues/4319
  */
  static inline ulonglong my_timer_cycles(void)
  {
--# if __has_builtin(__builtin_readcyclecounter) && !defined (__aarch64__)
-+# if __has_builtin(__builtin_readcyclecounter) && !defined (__aarch64__) && !defined(__ANDROID__)
+-# if __has_builtin(__builtin_readcyclecounter) && !defined (__aarch64__) && !(defined(__linux__) && defined(__riscv))
++# if __has_builtin(__builtin_readcyclecounter) && !defined (__aarch64__) && !(defined(__linux__) && defined(__riscv)) && !defined(__ANDROID__)
    #define MY_TIMER_ROUTINE_CYCLES MY_TIMER_ROUTINE_AARCH64
    return __builtin_readcyclecounter();
  # elif defined _M_IX86  || defined _M_X64  || defined __i386__ || defined __x86_64__
