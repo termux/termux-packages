@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Apache Portable Runtime Library"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.7.5"
-TERMUX_PKG_SRCURL=https://dlcdn.apache.org/apr/apr-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_SRCURL=https://archive.apache.org/dist/apr/apr-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=cd0f5d52b9ab1704c72160c5ee3ed5d3d4ca2df4a7f8ab564e3cb352b67232f2
 TERMUX_PKG_DEPENDS="libuuid"
 # libcrypt build-dependency is needed to build apache2.
