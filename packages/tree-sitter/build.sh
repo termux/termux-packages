@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="An incremental parsing system for programming tools"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="0.25.6"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ac6ed919c6d849e8553e246d5cd3fa22661f6c7b6497299264af433f3629957c
 TERMUX_PKG_BREAKS="libtreesitter"
@@ -20,6 +20,14 @@ termux_step_post_get_source() {
 	if [[ "$TERMUX_PKG_VERSION" != "${_SOVERSION}".* ]]; then
 		termux_error_exit "SOVERSION guard check failed."
 	fi
+
+	termux_download \
+	https://github.com/tree-sitter/tree-sitter/releases/download/v${TERMUX_PKG_VERSION}/tree-sitter-linux-x64.gz \
+	"$TERMUX_PKG_CACHEDIR"/tree-sitter-linux-x64.gz \
+	c300ea9f2ca368186ce1308793aaad650c3f6db78225257cbb5be961aeff4038
+	gunzip -k -v "$TERMUX_PKG_CACHEDIR"/tree-sitter-linux-x64.gz
+	mv -v "$TERMUX_PKG_CACHEDIR"/{tree-sitter-linux-x64,tree-sitter}
+	install -Dm700 -t "$TERMUX_PREFIX"/opt/tree-sitter/cross/bin "$TERMUX_PKG_CACHEDIR"/tree-sitter
 }
 
 termux_step_pre_configure() {
