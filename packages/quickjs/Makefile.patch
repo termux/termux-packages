@@ -9,15 +9,6 @@
    else
      ifdef CONFIG_LTO
        AR=$(CROSS_PREFIX)llvm-ar
-@@ -106,7 +106,7 @@ else
-     AR=$(CROSS_PREFIX)ar
-   endif
- endif
--STRIP=$(CROSS_PREFIX)strip
-+STRIP?=$(CROSS_PREFIX)strip
- CFLAGS+=-fwrapv # ensure that signed overflows behave as expected
- ifdef CONFIG_WERROR
- CFLAGS+=-Werror
 @@ -283,7 +283,7 @@ $(OBJDIR)/%.o: %.c | $(OBJDIR)
  	$(CC) $(CFLAGS_OPT) -c -o $@ $<
  
