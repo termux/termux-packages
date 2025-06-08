@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION="0.8.2"
 TERMUX_PKG_SRCURL=https://lib.openmpt.org/files/libopenmpt/src/libopenmpt-${TERMUX_PKG_VERSION}+release.autotools.tar.gz
 TERMUX_PKG_SHA256=844e4ff98dbd9942bbe4a1048226f91f8bc5b460b7bec6489e67cedb3e0aac37
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libc++, libflac, libogg, libsndfile, libvorbis, mpg123, pulseaudio, zlib"
+TERMUX_PKG_DEPENDS="libc++, libflac, libogg, libsndfile, libvorbis, libmpg123, pulseaudio, zlib"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-portaudio
