@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/chocolate-doom/chocolate-doom/archive/refs/
 TERMUX_PKG_SHA256=f2c64843dcec312032b180c3b2f34b4cb26c4dcdaa7375a1601a3b1df11ef84d
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_SED_REGEXP='s/.*-//'
-TERMUX_PKG_DEPENDS="sdl2 | sdl2-compat, sdl2-mixer, sdl2-net, mpg123"
+TERMUX_PKG_DEPENDS="sdl2 | sdl2-compat, sdl2-mixer, sdl2-net"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="sdl2-compat"
 
 termux_step_pre_configure(){
