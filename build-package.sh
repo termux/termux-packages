@@ -177,6 +177,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_cmake.sh"
 # shellcheck source=scripts/build/setup/termux_setup_protobuf.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_protobuf.sh"
 
+# Utility function to setup the current version of the tree-sitter CLI
+# shellcheck source=scripts/build/setup/termux_setup_treesitter.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_treesitter.sh"
+
 # Setup variables used by the build. Not to be overridden by packages.
 # shellcheck source=scripts/build/termux_step_setup_variables.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_setup_variables.sh"
