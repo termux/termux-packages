@@ -1,0 +1,310 @@
+From d9e682c2bec7651a6b36fc834480e2f4e8fc05b8 Mon Sep 17 00:00:00 2001
+From: Shadichy <shadichy@blisslabs.org>
+Date: Thu, 24 Apr 2025 14:31:09 +0700
+Subject: [PATCH 1/3] btrfs-progs: Add `pthread_cancel` implementation for
+ bionic
+
+Created `pthread/btrfs_pthread.h` and `pthread/btrfs_pthread.c` to allow Android and bionic libc emulating `pthread_setcanceltype`, `pthread_setcancelstate`, `pthread_cancel` and some other definitions.
+Since Android NDK does not support `pthread_cancel()`, this workaround method uses `pthread_kill()` instead.
+
+Signed-off-by: Shadichy <shadichy@blisslabs.org>
+---
+ Makefile                    |  4 +++-
+ cmds/rescue-chunk-recover.c |  2 +-
+ cmds/scrub.c                |  2 +-
+ cmds/send.c                 |  2 +-
+ common/task-utils.c         |  2 +-
+ common/task-utils.h         |  2 +-
+ convert/main.c              |  2 +-
+ convert/source-ext2.c       |  2 +-
+ convert/source-fs.h         |  2 +-
+ image/image-create.c        |  2 +-
+ image/image-restore.c       |  2 +-
+ image/metadump.h            |  2 +-
+ mkfs/main.c                 |  2 +-
+ pthread/btrfs_pthread.c     | 40 +++++++++++++++++++++++++++++++++++++
+ pthread/btrfs_pthread.h     | 24 ++++++++++++++++++++++
+ pthread/pthread.sym         |  8 ++++++++
+ 16 files changed, 87 insertions(+), 13 deletions(-)
+ create mode 100644 pthread/btrfs_pthread.c
+ create mode 100644 pthread/btrfs_pthread.h
+ create mode 100644 pthread/pthread.sym
+
+diff --git a/Makefile b/Makefile
+index 7e36aa42..6fbc27e1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -215,6 +215,7 @@ objects = \
+ 	kernel-shared/uuid-tree.o	\
+ 	kernel-shared/volumes.o	\
+ 	kernel-shared/zoned.o	\
++	pthread/btrfs_pthread.o	\
+ 	common/array.o		\
+ 	common/cpu-utils.o	\
+ 	common/device-scan.o	\
+@@ -292,7 +293,7 @@ tune_objects = tune/main.o tune/seeding.o tune/change-uuid.o tune/change-metadat
+ all_objects = $(objects) $(cmds_objects) $(libbtrfs_objects) $(convert_objects) \
+ 	      $(mkfs_objects) $(image_objects) $(tune_objects) $(libbtrfsutil_objects)
+ 
+-tags_files = $(addsuffix /*.[ch], . check cmds common convert crypto image include mkfs tune \
++tags_files = $(addsuffix /*.[ch], . check cmds common convert crypto image include mkfs pthread tune \
+ 	       kernel-lib kernel-shared kernel-shared/uapi \
+ 	       libbtrfs libbtrfsutil libbtrfsutil/python tests)
+ 
+@@ -928,6 +929,7 @@ clean: $(CLEANDIRS)
+ 		libbtrfs/*.o libbtrfs/.deps/*.o.d \
+ 		libbtrfsutil/*.o libbtrfsutil/.deps/*.o.d \
+ 		mkfs/*.o mkfs/.deps/*.o.d \
++		pthread/*.o pthread/.deps/*.o.d \
+ 		tune/*.o tune/.deps/*.o.d
+ 	$(Q)$(RM) -fd -- .deps */.deps */*/.deps
+ 	@echo "Cleaning test targets"
+diff --git a/cmds/rescue-chunk-recover.c b/cmds/rescue-chunk-recover.c
+index 60a70581..d00ecfd3 100644
+--- a/cmds/rescue-chunk-recover.c
++++ b/cmds/rescue-chunk-recover.c
+@@ -22,7 +22,7 @@
+ #include <stdlib.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+-#include <pthread.h>
++#include "pthread/btrfs_pthread.h"
+ #include <errno.h>
+ #include <stddef.h>
+ #include <string.h>
+diff --git a/cmds/scrub.c b/cmds/scrub.c
+index b1d2f731..d910b06e 100644
+--- a/cmds/scrub.c
++++ b/cmds/scrub.c
+@@ -27,7 +27,7 @@
+ #include <poll.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+-#include <pthread.h>
++#include "pthread/btrfs_pthread.h"
+ #include <ctype.h>
+ #include <signal.h>
+ #include <stdarg.h>
+diff --git a/cmds/send.c b/cmds/send.c
+index 4fc6f07d..16023215 100644
+--- a/cmds/send.c
++++ b/cmds/send.c
+@@ -21,7 +21,7 @@
+ #include <stdbool.h>
+ #include <unistd.h>
+ #include <fcntl.h>
+-#include <pthread.h>
++#include "pthread/btrfs_pthread.h"
+ #include <getopt.h>
+ #include <limits.h>
+ #include <errno.h>
+diff --git a/common/task-utils.c b/common/task-utils.c
+index 5bcbfb23..29423a44 100644
+--- a/common/task-utils.c
++++ b/common/task-utils.c
+@@ -15,7 +15,7 @@
+  */
+ 
+ #include <sys/timerfd.h>
+-#include <pthread.h>
++#include "pthread/btrfs_pthread.h"
+ #include <stdlib.h>
+ #include <unistd.h>
+ #include <time.h>
+diff --git a/common/task-utils.h b/common/task-utils.h
+index 624d0f94..96603720 100644
+--- a/common/task-utils.h
++++ b/common/task-utils.h
+@@ -19,7 +19,7 @@
+ 
+ #include "kerncompat.h"
+ #include <time.h>
+-#include <pthread.h>
++#include "pthread/btrfs_pthread.h"
+ 
+ struct periodic_info {
+ 	int timer_fd;
+diff --git a/convert/main.c b/convert/main.c
+index 0dc75c9e..4ee88176 100644
+--- a/convert/main.c
++++ b/convert/main.c
+@@ -88,7 +88,7 @@
+ #include <fcntl.h>
+ #include <unistd.h>
+ #include <getopt.h>
+-#include <pthread.h>
++#include "pthread/btrfs_pthread.h"
+ #include <stdbool.h>
+ #include <errno.h>
+ #include <limits.h>
+diff --git a/convert/source-ext2.c b/convert/source-ext2.c
+index fde3fff0..bc3fa93a 100644
+--- a/convert/source-ext2.c
++++ b/convert/source-ext2.c
+@@ -20,7 +20,7 @@
+ #include <sys/stat.h>
+ #include <linux/limits.h>
+ #include <errno.h>
+-#include <pthread.h>
++#include "pthread/btrfs_pthread.h"
+ #include <limits.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/convert/source-fs.h b/convert/source-fs.h
+index b26e1842..37e6ed93 100644
+--- a/convert/source-fs.h
++++ b/convert/source-fs.h
+@@ -19,7 +19,7 @@
+ 
+ #include "kerncompat.h"
+ #include <sys/types.h>
+-#include <pthread.h>
++#include "pthread/btrfs_pthread.h"
+ #include "kernel-shared/uapi/btrfs_tree.h"
+ #include "convert/common.h"
+ 
+diff --git a/image/image-create.c b/image/image-create.c
+index bfe6c93f..6d6c6853 100644
+--- a/image/image-create.c
++++ b/image/image-create.c
+@@ -23,7 +23,7 @@
+ #include <string.h>
+ #include <time.h>
+ #include <unistd.h>
+-#include <pthread.h>
++#include "pthread/btrfs_pthread.h"
+ #include <zlib.h>
+ #include "kernel-lib/list.h"
+ #include "kernel-lib/rbtree.h"
+diff --git a/image/image-restore.c b/image/image-restore.c
+index 667b9811..5655d24e 100644
+--- a/image/image-restore.c
++++ b/image/image-restore.c
+@@ -25,7 +25,7 @@
+ #include <string.h>
+ #include <time.h>
+ #include <unistd.h>
+-#include <pthread.h>
++#include "pthread/btrfs_pthread.h"
+ #include <zlib.h>
+ #include "kernel-lib/list.h"
+ #include "kernel-lib/rbtree.h"
+diff --git a/image/metadump.h b/image/metadump.h
+index a4c5d05e..17ec4afa 100644
+--- a/image/metadump.h
++++ b/image/metadump.h
+@@ -18,7 +18,7 @@
+ #define __BTRFS_IMAGE_METADUMP_H__
+ 
+ #include "kerncompat.h"
+-#include <pthread.h>
++#include "pthread/btrfs_pthread.h"
+ #include "kernel-lib/list.h"
+ #include "kernel-lib/sizes.h"
+ #include "kernel-shared/ctree.h"
+diff --git a/mkfs/main.c b/mkfs/main.c
+index 4c2ce98c..53429a87 100644
+--- a/mkfs/main.c
++++ b/mkfs/main.c
+@@ -26,7 +26,7 @@
+ #include <errno.h>
+ #include <stdbool.h>
+ #include <string.h>
+-#include <pthread.h>
++#include "pthread/btrfs_pthread.h"
+ #include <uuid/uuid.h>
+ #include <blkid/blkid.h>
+ #include "kernel-lib/list.h"
+diff --git a/pthread/btrfs_pthread.c b/pthread/btrfs_pthread.c
+new file mode 100644
+index 00000000..6d644d0b
+--- /dev/null
++++ b/pthread/btrfs_pthread.c
+@@ -0,0 +1,40 @@
++#include "include/config.h"
++
++#ifdef __ANDROID__
++
++/* Workaround for `pthread_cancel()` in Android, using `pthread_kill()` instead,
++ * as Android NDK does not support `pthread_cancel()`.
++ */
++
++#include <string.h>
++#include <signal.h>
++#include "btrfs_pthread.h"
++
++int pthread_setcanceltype(int type, int *oldtype) { return 0; }
++int pthread_setcancelstate(int state, int *oldstate) { return 0; }
++int pthread_cancel(pthread_t thread_id) {
++	int status;
++	if ((status = btrfs_set_thread_exit_handler()) == 0) {
++		status = pthread_kill(thread_id, SIGUSR1);
++	}
++	return status;
++}
++
++void btrfs_thread_exit_handler(int sig) {
++	pthread_exit(0);
++}
++
++int btrfs_set_thread_exit_handler() {
++	int rc;
++	struct sigaction actions;
++
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = btrfs_thread_exit_handler;
++
++	rc = sigaction(SIGUSR1, &actions, NULL);
++	return rc;
++}
++
++#endif
+diff --git a/pthread/btrfs_pthread.h b/pthread/btrfs_pthread.h
+new file mode 100644
+index 00000000..b177d79c
+--- /dev/null
++++ b/pthread/btrfs_pthread.h
+@@ -0,0 +1,24 @@
++#include "include/config.h"
++
++#include <pthread.h>
++
++#ifdef __ANDROID__
++
++/* Adding missing `pthread` related definitions in Android.
++ */
++
++#define PTHREAD_CANCELED ((void *) -1)
++
++#define PTHREAD_CANCEL_DEFERRED 0
++#define PTHREAD_CANCEL_ASYNCHRONOUS 0
++#define PTHREAD_CANCEL_ENABLE 0
++#define PTHREAD_CANCEL_DISABLE 0
++
++int pthread_setcanceltype(int type, int *oldtype);
++int pthread_setcancelstate(int state, int *oldstate);
++int pthread_cancel(pthread_t thread_id);
++
++int btrfs_set_thread_exit_handler();
++void btrfs_thread_exit_handler(int sig);
++
++#endif
+diff --git a/pthread/pthread.sym b/pthread/pthread.sym
+new file mode 100644
+index 00000000..f5142ae2
+--- /dev/null
++++ b/pthread/pthread.sym
+@@ -0,0 +1,8 @@
++PTHREAD_0.1 {
++global:
++	pthread_setcanceltype;			/* used */
++	pthread_setcancelstate;			/* used */
++	pthread_cancel;				/* used */
++local:
++	*;
++};
+-- 
+2.49.0
+
