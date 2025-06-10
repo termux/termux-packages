@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://emscripten.org
 TERMUX_PKG_DESCRIPTION="Emscripten: An LLVM-to-WebAssembly Compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.0.9"
+TERMUX_PKG_VERSION="4.0.10"
 TERMUX_PKG_SRCURL=git+https://github.com/emscripten-core/emscripten
 TERMUX_PKG_GIT_BRANCH=${TERMUX_PKG_VERSION}
 TERMUX_PKG_DEPENDS="nodejs-lts | nodejs, python"
@@ -37,14 +37,12 @@ opt/emscripten-llvm/bin/clang-sycl-linker
 opt/emscripten-llvm/bin/diagtool
 opt/emscripten-llvm/bin/git-clang-format
 opt/emscripten-llvm/bin/hmaptool
-opt/emscripten-llvm/bin/llvm-cov
 opt/emscripten-llvm/bin/llvm-dlltool
 opt/emscripten-llvm/bin/llvm-lib
 opt/emscripten-llvm/bin/llvm-link
 opt/emscripten-llvm/bin/llvm-mca
 opt/emscripten-llvm/bin/llvm-ml
 opt/emscripten-llvm/bin/llvm-pdbutil
-opt/emscripten-llvm/bin/llvm-profdata
 opt/emscripten-llvm/bin/llvm-profgen
 opt/emscripten-llvm/bin/llvm-rc
 opt/emscripten-llvm/bin/nvptx-arch
@@ -56,13 +54,13 @@ opt/emscripten/LICENSE
 
 # https://github.com/emscripten-core/emscripten/issues/11362
 # can switch to stable LLVM to save space once above is fixed
-_LLVM_COMMIT=ad3136689090f79b52afcb5a95ec87e893006877
-_LLVM_TGZ_SHA256=afce51e2823dc26863e665317955f08bd0c0375bb03f4ce62b7cc036a92cf386
+_LLVM_COMMIT=8f7e57485ee73205e108d74abb5565d5c63beaca
+_LLVM_TGZ_SHA256=ea3bdec770d19962bc678ec290d47feab1c88943acd26837a60caf5285768482
 
 # https://github.com/emscripten-core/emscripten/issues/12252
 # upstream says better bundle the right binaryen revision for now
-_BINARYEN_COMMIT=1217a95eb3b3b9a294788ab841ed7363ea8cf173
-_BINARYEN_TGZ_SHA256=6cb297e5f3948e99da4be56016b5fc3b23d11267e834873cd72db8122abdf73c
+_BINARYEN_COMMIT=8c82b6884483315011541e4519afdcb7fd46df68
+_BINARYEN_TGZ_SHA256=7ab7ffe0dabbefe121ab4234a11d2ab04ff45827df050a0ab8b1cdc66465cbaf
 
 # https://github.com/emscripten-core/emsdk/blob/main/emsdk.py
 # https://chromium.googlesource.com/emscripten-releases/+/refs/heads/main/src/build.py
@@ -158,12 +156,15 @@ termux_pkg_auto_update() {
 
 termux_step_post_get_source() {
 	# for comparing files in termux_step_post_massage
-	pushd "${TERMUX_PKG_CACHEDIR}"
-	rm -fr emsdk
-	git clone https://github.com/emscripten-core/emsdk --depth=1
-	cd emsdk
-	./emsdk install latest
-	popd
+	if [[ ! -f "${TERMUX_PKG_CACHEDIR}/emsdk-fetched" || $(cat "${TERMUX_PKG_CACHEDIR}/emsdk-fetched") != "$TERMUX_PKG_VERSION" ]]; then
+		pushd "${TERMUX_PKG_CACHEDIR}"
+		rm -fr emsdk
+		git clone https://github.com/emscripten-core/emsdk --depth=1
+		cd emsdk
+		./emsdk install latest
+		echo "$TERMUX_PKG_VERSION" > "${TERMUX_PKG_CACHEDIR}"/emsdk-fetched
+		popd
+	fi
 
 	termux_download \
 		"https://github.com/llvm/llvm-project/archive/${_LLVM_COMMIT}.tar.gz" \
