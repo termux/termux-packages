@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environment"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
-TERMUX_PKG_VERSION=24.1.0
+TERMUX_PKG_VERSION=24.2.0
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=c8171b2aeccb28c8c5347f273a25adae172fb2a65bc8c975bc22ec58949d0eaf
+TERMUX_PKG_SHA256=40143d43efbdeeb9537995f532126c494d63a31da332acb5022f76f00afc62ab
 # thunder-coding: don't try to autoupdate nodejs, that thing takes 2 whole hours to build for a single arch, and requires a lot of patch updates everytime. Also I run tests everytime I update it to ensure least bugs
 TERMUX_PKG_AUTO_UPDATE=false
 # Note that we do not use a shared libuv to avoid an issue with the Android
