@@ -67,18 +67,18 @@ termux_step_host_build() {
 	# version in nodejs:
 	#
 	# Look into the deps/v8/DEPS file, and look for the 'tools/clang' entry.
-  #  'tools/clang':
-  #    Var('chromium_url') + '/chromium/src/tools/clang.git' + '@' + '6c4f037a983abf14a4c8bf00e44db73cdf330a97',
+	#  'tools/clang':
+	#    Var('chromium_url') + '/chromium/src/tools/clang.git' + '@' + '6c4f037a983abf14a4c8bf00e44db73cdf330a97',
 	#
 	# You can now choose to either choose to do a full checkout of the v8 commit
 	# and do `gclient sync` to get the full tree, or just peek at
-  # https://chromium.googlesource.com/chromium/src/tools/clang.git/+/6c4f037a983abf14a4c8bf00e44db73cdf330a97/scripts/update.py
+	# https://chromium.googlesource.com/chromium/src/tools/clang.git/+/6c4f037a983abf14a4c8bf00e44db73cdf330a97/scripts/update.py
 	# Look at the CLANG_REVISION and CLANG_SUB_REVISION variable,
 	# LLVM_TAR="${CLANG_REVISION}-${CLANG_SUB_REVISION}.tar.xz"
 	#
 	# From scripts/update.py
 	# 39 | CLANG_REVISION = 'llvmorg-21-init-9266-g09006611'
-  # 40 | CLANG_SUB_REVISION = 1
+	# 40 | CLANG_SUB_REVISION = 1
 	#
 	# then the LLVM_COMMIT is 09006611.
 	# LLVM_TAR_HASH is not available in the DEPS file, so you need to do a
