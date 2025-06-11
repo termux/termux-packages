@@ -5,12 +5,14 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Latest release version 4.3 does not support Lua 5.4.
 _COMMIT=b54e50ad6cfdcd864a21970b31378f7c64adf3f4
 TERMUX_PKG_VERSION=2023.01.16
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/awesomeWM/awesome
 TERMUX_PKG_SHA256=ce0f4ef9105adf1ca04536d60b31dc3aa04cb45e3b1459a63043c34484842ace
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="dbus, gdk-pixbuf, glib, libcairo, liblua54, libx11, libxcb, libxdg-basedir, libxkbcommon, lua-lgi, pango, startup-notification, xcb-util, xcb-util-cursor, xcb-util-keysyms, xcb-util-wm, xcb-util-xrm"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLUA_MATH_LIBRARY=
+-DCMAKE_POLICY_VERSION_MINIMUM=3.5
 "
 TERMUX_PKG_HOSTBUILD=true
 
