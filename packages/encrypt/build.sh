@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/djunekz/encrypt
+TERMUX_PKG_DESCRIPTION="Simple Encryption an ELF Binary for python/python3 files with build deb package"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=1.0
+TERMUX_PKG_SRCURL=https://github.com/djunekz/encrypt/archive/${TERMUX_PKG_VERSION}/encrypt-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=e18449683841e7659b350998c9c210bb127169b8e691f6fc2933b65f2e32f4b2
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
