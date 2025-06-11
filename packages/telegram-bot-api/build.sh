@@ -6,11 +6,15 @@ TERMUX_PKG_SRCURL=git+https://github.com/tdlib/telegram-bot-api
 _COMMIT=6d1b62b51bdc543c10f854aae751e160e5b7b9c5
 _COMMIT_DATE=2024.10.31
 TERMUX_PKG_VERSION=${_COMMIT_DATE//./}
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=cf210ec318fbc40bf5febd74d942e0624997dc9a4dc1ff2dd78f76e693adf3e6
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_DEPENDS="libc++, openssl, zlib"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_POLICY_VERSION_MINIMUM=3.5
+"
 
 termux_step_get_source() {
 	rm -rf $TERMUX_PKG_SRCDIR
@@ -39,6 +43,7 @@ termux_step_post_get_source() {
 
 termux_step_host_build() {
 	termux_setup_cmake
-	cmake "-DCMAKE_BUILD_TYPE=Release" "$TERMUX_PKG_SRCDIR"
+	termux_setup_ninja
+	cmake "-DCMAKE_BUILD_TYPE=Release" $TERMUX_PKG_EXTRA_CONFIGURE_ARGS "$TERMUX_PKG_SRCDIR" -G Ninja
 	cmake --build . --target prepare_cross_compiling
 }
