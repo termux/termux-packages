@@ -1,0 +1,40 @@
+Upstream-status: Presented to guile-user@gnu.org.
+
+From cfdf36ee5dc2a854781cd2ba27a8ced776c7b313 Mon Sep 17 00:00:00 2001
+From: Janneke Nieuwenhuizen <janneke@gnu.org>
+Date: Sat, 2 Nov 2024 13:31:28 +0100
+Subject: [PATCH] build: Fix cross-building from i686-linux to i586-pc-gnu.
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+
+Fixes #111.
+
+* build-aux/guile.am (.scm.go)[CROSS_COMPILING]: Do not go through
+./env.
+---
+ build-aux/guile.am | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/build-aux/guile.am b/build-aux/guile.am
+index 5e94c96..db8ab72 100644
+--- a/build-aux/guile.am
++++ b/build-aux/guile.am
+@@ -22,7 +22,14 @@ CLEANFILES = $(GOBJECTS)
+ EXTRA_DIST = $(SOURCES) $(NOCOMP_SOURCES)
+ GUILE_WARNINGS = -Wunbound-variable -Warity-mismatch -Wformat
+ SUFFIXES = .scm .go
++if CROSS_COMPILING
++.scm.go:
++	$(AM_V_GEN) \
++	  $(GUILE_TOOLS) compile $(GUILE_TARGET) -L "$(abs_top_srcdir)"	\
++	  $(GUILE_WARNINGS) -o "$@" "$<"
++else
+ .scm.go:
+ 	$(AM_V_GEN) $(top_builddir)/env	\
+ 	  $(GUILE_TOOLS) compile $(GUILE_TARGET) -L "$(abs_top_srcdir)"	\
+ 	  $(GUILE_WARNINGS) -o "$@" "$<"
++endif
+-- 
+Janneke Nieuwenhuizen <janneke@gnu.org>  | GNU LilyPond https://LilyPond.org
+Freelance IT https://www.JoyOfSource.com | Avatar® https://AvatarAcademy.com
+
