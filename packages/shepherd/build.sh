@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.5
 TERMUX_PKG_SRCURL=https://codeberg.org/shepherd/shepherd/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f09f0dab1fd0cd11988e5069be96eb3601182e94db7fed8cf328f99de506306c
-TERMUX_PKG_DEPENDS="guile guile-fibers"
+TERMUX_PKG_DEPENDS="guile, guile-fibers"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-gzip=$TERMUX_PREFIX/bin/gzip --with-zstd=$TERMUX_PREFIX/bin/zstd"
 TERMUX_PKG_RM_AFTER_INSTALL="
