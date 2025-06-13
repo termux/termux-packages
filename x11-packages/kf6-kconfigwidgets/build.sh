@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE='https://community.kde.org/Frameworks'
 TERMUX_PKG_DESCRIPTION='Widgets for KConfig'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.14.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="6.15.0"
 _KF6_MINOR_VERSION="${TERMUX_PKG_VERSION%.*}"
 TERMUX_PKG_SRCURL=https://download.kde.org/stable/frameworks/${_KF6_MINOR_VERSION}/kconfigwidgets-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=02fee668592d52bb39294f999af67797d7977e3f1c61bb9c77c086730594319f
+TERMUX_PKG_SHA256=f006a2fcf68d24f7b72b768e05ee5b9a61f2c5ddeee87a6fc9a022c83ad3f0b2
 TERMUX_PKG_DEPENDS="kf6-kcodecs (>= ${_KF6_MINOR_VERSION}), kf6-kcolorscheme (>= ${_KF6_MINOR_VERSION}), kf6-kconfig (>= ${_KF6_MINOR_VERSION}), kf6-kcoreaddons (>= ${_KF6_MINOR_VERSION}), kf6-ki18n (>= ${_KF6_MINOR_VERSION}), kf6-kwidgetsaddons (>= ${_KF6_MINOR_VERSION}), libc++, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${_KF6_MINOR_VERSION}), qt6-qttools"
 TERMUX_PKG_AUTO_UPDATE=true
