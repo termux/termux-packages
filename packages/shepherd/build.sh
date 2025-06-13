@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://codeberg.org/shepherd/shepherd/archive/v${TERMUX_PKG_V
 TERMUX_PKG_SHA256=f09f0dab1fd0cd11988e5069be96eb3601182e94db7fed8cf328f99de506306c
 TERMUX_PKG_DEPENDS="guile, guile-fibers"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-gzip=$TERMUX_PREFIX/bin/gzip --with-zstd=$TERMUX_PREFIX/bin/zstd"
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/reboot
@@ -16,10 +17,21 @@ share/man/man8/halt.8
 share/man/man8/reboot.8
 "
 
+termux_step_host_build() {
+	mkdir dest
+	git clone https://github.com/wingo/fibers.git src
+	cd src
+	git checkout "tags/v1.3.1"
+	autoreconf -vif
+	./configure --prefix="$TERMUX_PKG_HOSTBUILD_DIR/dest"
+	GUILE_AUTO_COMPILE=0 make -j"${TERMUX_PKG_MAKE_PROCESSES}"
+	make install
+}
+
 termux_step_pre_configure() {
 	autoreconf -vif
 	export GUILE_AUTO_COMPILE=0
 	export GUILE_LOAD_COMPILED_PATH="$(realpath $TERMUX_PREFIX/lib/guile/*/site-ccache)"
 	export GUILE_LOAD_PATH="$(realpath $TERMUX_PREFIX/share/guile/site/*)"
-	export GUILE_EXTENSIONS_PATH="$(realpath $TERMUX_PREFIX/lib/guile/*/extensions)"
+	export GUILE_EXTENSIONS_PATH="$TERMUX_PKG_HOSTBUILD_DIR/dest/lib/guile/*/extensions"
 }
