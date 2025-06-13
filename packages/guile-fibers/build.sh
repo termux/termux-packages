@@ -10,5 +10,4 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	autoreconf -vif
-	export GUILE_AUTO_COMPILE=0
 }
