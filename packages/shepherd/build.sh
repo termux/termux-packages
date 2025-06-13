@@ -20,5 +20,6 @@ termux_step_pre_configure() {
 	autoreconf -vif
 	export GUILE_AUTO_COMPILE=0
 	export GUILE_LOAD_COMPILED_PATH="$(realpath $TERMUX_PREFIX/lib/guile/*/site-ccache)"
-	export GUILE_LOAD_PATH="$(realpath $TERMUX_PREFIX/share/guile/site/*/fibers)"
+	export GUILE_LOAD_PATH="$(realpath $TERMUX_PREFIX/share/guile/site/*)"
+	export GUILE_EXTENSIONS_PATH="$(realpath $TERMUX_PREFIX/lib/guile/*/extensions)"
 }
