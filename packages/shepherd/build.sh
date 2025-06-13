@@ -33,5 +33,5 @@ termux_step_pre_configure() {
 	export GUILE_AUTO_COMPILE=0
 	export GUILE_LOAD_COMPILED_PATH="$(realpath $TERMUX_PREFIX/lib/guile/*/site-ccache)"
 	export GUILE_LOAD_PATH="$(realpath $TERMUX_PREFIX/share/guile/site/*)"
-	export GUILE_EXTENSIONS_PATH="$TERMUX_PKG_HOSTBUILD_DIR/dest/lib/guile/*/extensions"
+	export GUILE_EXTENSIONS_PATH="$(realpath $TERMUX_PKG_HOSTBUILD_DIR/dest/lib/guile/*/extensions)"
 }
