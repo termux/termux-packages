@@ -1,0 +1,26 @@
+diff -u -r ../poppler-0.26.2/goo/gstrtod.cc ./goo/gstrtod.cc
+--- ../poppler-0.26.2/goo/gstrtod.cc	2014-04-26 17:37:22.000000000 +0200
++++ ./goo/gstrtod.cc	2014-06-26 08:44:42.000000000 +0200
+@@ -41,7 +41,9 @@
+ {
+     char *fail_pos;
+     double val;
++#ifndef __ANDROID__
+     struct lconv *locale_data;
++#endif
+     const char *decimal_point;
+     int decimal_point_len;
+     const char *p, *decimal_point_pos;
+@@ -50,8 +52,12 @@
+ 
+     fail_pos = nullptr;
+ 
++#ifdef __ANDROID__
++    decimal_point = ".";
++#else
+     locale_data = localeconv();
+     decimal_point = locale_data->decimal_point;
++#endif
+     decimal_point_len = strlen(decimal_point);
+ 
+     decimal_point_pos = nullptr;
