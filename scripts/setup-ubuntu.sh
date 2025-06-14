@@ -244,6 +244,9 @@ PACKAGES+=" bash-static"
 # Needed by apt.
 PACKAGES+=" triehash"
 
+# Needed by sequoia-sq (dependency of apt)
+PACKAGES+=" nettle-dev"
+
 # Needed by aspell dictionaries.
 PACKAGES+=" aspell"
 

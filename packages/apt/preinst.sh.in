@@ -1,0 +1,18 @@
+#!@TERMUX_PREFIX@/bin/sh
+
+if [ "$1" = "install" ] && [ "$#" -ge 2 ]; then
+	if [ -f "@TERMUX_PREFIX@/etc/apt/@LEGACY_SOURCES@" ]; then
+		echo
+		echo "================================"
+		echo "Legacy repo file found for '@REPO@' repository."
+		echo "The legacy '@LEGACY_SOURCES@' entry will be migrated"
+		echo "to 'sources.list.d/@REPO@.sources' as part of the update."
+		cp -vaf \
+			'@TERMUX_PREFIX@/etc/apt/@LEGACY_SOURCES@' \
+			'@TERMUX_PREFIX@/etc/apt/@LEGACY_SOURCES@.dpkg-old'
+		echo "A backup copy of the old '@LEGACY_SOURCES@' apt sources config file"
+		echo "has been saved to '@TERMUX_PREFIX@/etc/apt/@LEGACY_SOURCES@.dpkg-old'"
+		echo "================================"
+		echo
+	fi
+fi
