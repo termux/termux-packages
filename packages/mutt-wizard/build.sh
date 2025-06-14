@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://muttwizard.com/
+TERMUX_PKG_DESCRIPTION="Easily auto-configure neomutt and isync/mpop with safe passwords (IMAP/POP3/SMTP)"
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="3.3.1"
+TERMUX_PKG_SRCURL=https://github.com/LukeSmithxyz/mutt-wizard/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=4091fba053786d4143249e61dfddfd679c15f561ec34af17f130a3ca80c39b53
+TERMUX_PKG_DEPENDS="neomutt, curl, isync, msmtp, pass, ca-certificates, gettext"
+TERMUX_PKG_SUGGESTS="lynx, abook, cronie"
+TERMUX_PKG_BUILD_IN_SRC=true
