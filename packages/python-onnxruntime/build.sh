@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Cross-platform, high performance ML inferencing and trai
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.22.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/microsoft/onnxruntime
 TERMUX_PKG_DEPENDS="abseil-cpp, libc++, protobuf, libre2, python"
 TERMUX_PKG_BUILD_DEPENDS="python-numpy"
@@ -17,6 +18,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DPYBIND11_USE_CROSSCOMPILING=TRUE
 -Donnxruntime_USE_NNAPI_BUILTIN=ON
 -Donnxruntime_USE_XNNPACK=ON
+-DCMAKE_POLICY_VERSION_MINIMUM=3.5
 "
 
 termux_step_pre_configure() {
