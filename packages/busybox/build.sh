@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a singl
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.36.1
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=b8cc24c9574d809e7279c3be349795c5d5ceb6fdf19ca709f80cde50e47de314
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -45,4 +45,8 @@ termux_step_make_install() {
 
 	# Install busybox man page.
 	install -Dm600 -t $TERMUX_PREFIX/share/man/man1 $TERMUX_PKG_SRCDIR/docs/busybox.1
+
+	# Symlink ash -> busybox
+	ln -sfr $TERMUX_PREFIX/bin/{busybox,ash}
+	ln -sfr $TERMUX_PREFIX/share/man/man1/{busybox,ash}.1
 }
