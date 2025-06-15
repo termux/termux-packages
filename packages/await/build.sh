@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://await-cli.app/
+TERMUX_PKG_HOMEPAGE=https://web.archive.org/web/20240308152556/https://await-cli.app/#expand
 TERMUX_PKG_DESCRIPTION="Runs list of commands in parallel and waits for their termination"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
