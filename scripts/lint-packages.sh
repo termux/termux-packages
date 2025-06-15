@@ -126,7 +126,7 @@ check_indentation() {
 # - Or specify one of the CI skip tags
 check_version_change() {
 	local base_commit commit_diff package="$1"
-	base_commit="$(git merge-base --fork-point origin/master)"
+	base_commit="$(git merge-base 'master@{upstream}' 'HEAD')"
 	commit_diff="$(git log --patch "${base_commit}.." -- "$package")"
 
 	# If the diff is empty there's no commit modifying that package on this branch, which is a PASS.
