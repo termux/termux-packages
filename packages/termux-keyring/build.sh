@@ -2,8 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/termux
 TERMUX_PKG_DESCRIPTION="GPG public keys for the official Termux repositories"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.12
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=3.13
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -23,6 +22,7 @@ termux_step_make_install() {
 	install -Dm600 "$TERMUX_PKG_BUILDER_DIR/landfillbaby.gpg" "$GPG_SHARE_DIR"
 	install -Dm600 "$TERMUX_PKG_BUILDER_DIR/mradityaalok.gpg" "$GPG_SHARE_DIR"
 	install -Dm600 "$TERMUX_PKG_BUILDER_DIR/2096779623.gpg" "$GPG_SHARE_DIR"
+	install -Dm600 "$TERMUX_PKG_BUILDER_DIR/thunder-coding.gpg" "$GPG_SHARE_DIR"
 
 	# Key for automatic builds (via CI).
 	install -Dm600 "$TERMUX_PKG_BUILDER_DIR/termux-autobuilds.gpg" "$GPG_SHARE_DIR"
