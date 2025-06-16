@@ -1,0 +1,14 @@
+Direct the extension to search for LLDB in $TERMUX_PREFIX/bin and $TERMUX_PREFIX/lib instead
+of in the extension's own installation folder
+
+--- a/extension/main.ts
++++ b/extension/main.ts
+@@ -374,7 +374,7 @@ class Extension implements DebugConfigurationProvider, DebugAdapterDescriptorFac
+             if (liblldb) {
+                 liblldb = await adapter.findLibLLDB(liblldb)
+             } else {
+-                liblldb = await adapter.findLibLLDB(path.join(this.context.extensionPath, 'lldb'));
++                liblldb = await adapter.findLibLLDB('@TERMUX_PREFIX@');
+             }
+             this.adapterDylibsCache = [liblldb];
+         }
