@@ -3,6 +3,20 @@ set -e -u
 
 TERMUX_SCRIPTDIR=$(cd "$(realpath "$(dirname "$0")")"; cd ..; pwd)
 
+# If build-package-dry-run-simulation.sh returns a non-zero exit value, or if
+# $1 (the first argument passed to this script which runs docker) does not contain
+# $BUILDSCRIPT_NAME, this condition will evaluate false and this script which
+# runs docker will continue.
+BUILDSCRIPT_NAME="build-package.sh"
+case "${1:-}" in
+	*"/$BUILDSCRIPT_NAME")
+		if "$TERMUX_SCRIPTDIR/scripts/build-package-dry-run-simulation.sh" "$@" > /dev/null 2>&1; then
+			echo "$0: Exiting since $BUILDSCRIPT_NAME would not have built any packages"
+			exit 0
+		fi
+		;;
+esac
+
 CONTAINER_HOME_DIR=/home/builder
 UNAME=$(uname)
 if [ "$UNAME" = Darwin ]; then
