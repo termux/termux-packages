@@ -3,16 +3,15 @@ TERMUX_PKG_DESCRIPTION="A compatibility layer for running Windows programs (Hang
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.OLD, COPYING.LIB"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="10.6.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="10.10"
 _REAL_VERSION="${TERMUX_PKG_VERSION/\~/-}"
 TERMUX_PKG_SRCURL=(
 	https://github.com/AndreRH/wine/archive/refs/tags/hangover-$_REAL_VERSION.tar.gz
 	https://github.com/AndreRH/hangover/releases/download/hangover-$_REAL_VERSION/hangover_${_REAL_VERSION}_ubuntu2004_focal_arm64.tar
 )
 TERMUX_PKG_SHA256=(
-	0bb5700563dd62513f6fe402479e6f6599b294bc5cbde83baf397274cdce44ab
-	ffe43c278e371be38fe292c820db9903219196b38742744208f09519d6244da3
+	1a7d4825dbef5ef294a0824dc0c317945f832c9b016074cc1f43e9d12ca9ac9d
+	57eec61302cb2131902aae3740672ab8eac6950f3c8589367ce85eb985174f6b
 )
 TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, opengl, pulseaudio, sdl2, vulkan-loader, xorg-xrandr"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="vulkan-loader"
@@ -28,7 +27,9 @@ TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
 --disable-tests
 "
 
+# Disable userfaultfd syscall as it is missing on older Android, see #25015
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+ac_cv_header_linux_userfaultfd_h=no
 enable_wineandroid_drv=no
 enable_tools=yes
 --prefix=$TERMUX_PREFIX/opt/hangover-wine

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tree-sitter parser for Vim help files"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="4.0.0"
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/neovim/tree-sitter-vimdoc/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8096794c0f090b2d74b7bff94548ac1be3285b929ec74f839bd9b3ff4f4c6a0b
 TERMUX_PKG_AUTO_UPDATE=true
@@ -17,6 +18,7 @@ PARSER_URL=https://github.com/neovim/tree-sitter-vimdoc
 termux_step_pre_configure() {
 	# these need to be removed for this one, hell if I know why
 	rm setup.py pyproject.toml
+	termux_setup_treesitter
 }
 
 termux_step_post_make_install() {

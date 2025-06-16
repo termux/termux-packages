@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://maven.apache.org/
 TERMUX_PKG_DESCRIPTION="A Java software project management and comprehension tool"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.9.9"
+TERMUX_PKG_VERSION="3.9.10"
 TERMUX_PKG_SRCURL=https://dlcdn.apache.org/maven/maven-3/${TERMUX_PKG_VERSION}/binaries/apache-maven-${TERMUX_PKG_VERSION}-bin.tar.gz
-TERMUX_PKG_SHA256=7a9cdf674fc1703d6382f5f330b3d110ea1b512b51f1652846d9e4e8a588d766
+TERMUX_PKG_SHA256=e036059b0ac63cdcc934afffaa125c9bf3f4a4cd2d2b9995e1aee92190a0979c
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libjansi (>= 2.4.0-1), openjdk-17"
 TERMUX_PKG_BUILD_IN_SRC=true

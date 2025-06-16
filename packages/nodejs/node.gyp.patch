@@ -1,6 +1,6 @@
---- ./node.gyp.orig	2025-05-08 13:56:21.000000000 +0530
-+++ ./node.gyp	2025-05-09 19:47:04.157493775 +0530
-@@ -534,7 +534,8 @@
+--- ./node.gyp.orig	2025-06-10 09:31:14.066774171 +0530
++++ ./node.gyp	2025-06-10 14:33:02.935820287 +0530
+@@ -538,7 +538,8 @@
        ],
  
        'sources': [
@@ -10,7 +10,7 @@
        ],
  
        'dependencies': [
-@@ -1019,303 +1020,6 @@
+@@ -1035,303 +1036,7 @@
          },
        ],
      }, # node_lib_target_name
@@ -33,7 +33,7 @@
 -        'deps/uv/include',
 -        'test/cctest',
 -      ],
--
+ 
 -      'defines': [
 -        'NODE_ARCH="<(target_arch)"',
 -        'NODE_PLATFORM="<(OS)"',
@@ -44,11 +44,11 @@
 -        'test/fuzzers/fuzz_env.cc',
 -      ],
 -      'conditions': [
--        ['OS=="linux"', {
+-        ['OS=="linux" or OS=="openharmony"', {
 -          'ldflags': [ '-fsanitize=fuzzer' ]
 -        }],
 -        # Ensure that ossfuzz flag has been set and that we are on Linux
--        [ 'OS!="linux" or ossfuzz!="true"', {
+-        [ 'OS not in "linux openharmony" or ossfuzz!="true"', {
 -          'type': 'none',
 -        }],
 -        # Avoid excessive LTO
@@ -87,11 +87,11 @@
 -        'test/fuzzers/fuzz_ClientHelloParser.cc',
 -      ],
 -      'conditions': [
--        ['OS=="linux"', {
+-        ['OS=="linux" or OS=="openharmony"', {
 -          'ldflags': [ '-fsanitize=fuzzer' ]
 -        }],
 -        # Ensure that ossfuzz flag has been set and that we are on Linux
--        [ 'OS!="linux" or ossfuzz!="true"', {
+-        [ 'OS not in "linux openharmony" or ossfuzz!="true"', {
 -          'type': 'none',
 -        }],
 -        # Avoid excessive LTO
@@ -132,11 +132,11 @@
 -        'test/fuzzers/fuzz_strings.cc',
 -      ],
 -      'conditions': [
--        ['OS=="linux"', {
+-        ['OS=="linux" or OS=="openharmony"', {
 -          'ldflags': [ '-fsanitize=fuzzer' ]
 -        }],
 -        # Ensure that ossfuzz flag has been set and that we are on Linux
--        [ 'OS!="linux" or ossfuzz!="true"', {
+-        [ 'OS not in "linux openharmony" or ossfuzz!="true"', {
 -          'type': 'none',
 -        }],
 -        # Avoid excessive LTO
@@ -314,7 +314,7 @@
      {
        'target_name': 'node_js2c',
        'type': 'executable',
-@@ -1352,76 +1056,6 @@
+@@ -1368,76 +1073,6 @@
          }],
        ]
      },

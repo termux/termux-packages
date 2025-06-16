@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://mariadb.org
 TERMUX_PKG_DESCRIPTION="A drop-in replacement for mysql server"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2:11.8.0"
+TERMUX_PKG_VERSION="2:11.8.2"
 TERMUX_PKG_SRCURL=https://archive.mariadb.org/mariadb-${TERMUX_PKG_VERSION#*:}/source/mariadb-${TERMUX_PKG_VERSION#*:}.tar.gz
-TERMUX_PKG_SHA256=57456dbdd1d9ea6274c18d28500d27c95ea926ce6ba30a7ea81e1ddf4bef8515
+TERMUX_PKG_SHA256=b2162cdf5e9317d8a8621cbeda83999324fc0ac8944210e14abb5fe0a9fea3ef
 TERMUX_PKG_DEPENDS="libandroid-support, libc++, libcrypt, libedit, liblz4, liblzma, ncurses, openssl, pcre2, zlib, zstd"
 TERMUX_PKG_BREAKS="mariadb-dev"
 TERMUX_PKG_CONFLICTS="mysql"
@@ -87,6 +87,7 @@ termux_step_pre_configure() {
 	fi
 
 	CPPFLAGS+=" -Dushort=u_short"
+	CXXFLAGS+=" -Wno-register"
 
 	if [ $TERMUX_ARCH_BITS = 32 ]; then
 		CPPFLAGS+=" -D__off64_t_defined"
