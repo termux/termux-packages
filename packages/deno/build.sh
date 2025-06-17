@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://deno.land/
 TERMUX_PKG_DESCRIPTION="A modern runtime for JavaScript and TypeScript"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_MAINTAINER="@licy183"
 TERMUX_PKG_VERSION=2.2.13
 TERMUX_PKG_SRCURL=(
 	https://github.com/denoland/deno/releases/download/v$TERMUX_PKG_VERSION/deno_src.tar.gz
