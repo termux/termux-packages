@@ -14,8 +14,8 @@ TERMUX_PKG_SHA256=(
 	7d7c744396865ee0fcbf2d09a23c265a4a378d418f965eeafff659fb2dd2ae3a
 )
 TERMUX_PKG_DEPENDS="libffi, libsqlite, zlib"
-TERMUX_PKG_BUILD_DEPENDS="librusty-v8"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_NO_STATICSPLIT=true
 
 # See https://github.com/denoland/deno/issues/2295#issuecomment-2329248010
 TERMUX_PKG_EXCLUDED_ARCHES="i686, arm"
@@ -44,8 +44,6 @@ termux_step_get_source() {
 
 termux_step_pre_configure() {
 	termux_setup_rust
-	termux_setup_cmake
-	termux_setup_protobuf
 
 	: "${CARGO_HOME:=$HOME/.cargo}"
 	export CARGO_HOME
@@ -63,17 +61,94 @@ termux_step_pre_configure() {
 	echo "" >> Cargo.toml
 	echo "[patch.crates-io]" >> Cargo.toml
 	echo "v8 = { path = \"./vendor/v8\" }" >> Cargo.toml
+}
 
-	# Check v8 version
-	local cv=$(. $TERMUX_PKG_BUILDER_DIR/../librusty-v8/build.sh; echo $TERMUX_PKG_VERSION)
-	local ev=$(cargo info v8 | grep -e "^version:" | sed -n 's/^version:[[:space:]]*\([0-9.]*\).*/\1/p')
-	if [ "${ev}" != "${cv}" ]; then
-		termux_error_exit "The versions of librusty-v8 mismatch. Expected: $ev, current: $cv"
+__fetch_rusty_v8() {
+	pushd "$TERMUX_PKG_SRCDIR"
+	local v8_version=$(cargo info v8 | grep -e "^version:" | sed -n 's/^version:[[:space:]]*\([0-9.]*\).*/\1/p')
+	if [ ! -d "$TERMUX_PKG_SRCDIR"/librusty_v8 ]; then
+		rm -rf "$TERMUX_PKG_SRCDIR"/librusty_v8-tmp
+		git init librusty_v8-tmp
+		cd librusty_v8-tmp
+		git remote add origin https://github.com/denoland/rusty_v8.git
+		git fetch --depth=1 origin v"$v8_version"
+		git reset --hard FETCH_HEAD
+		git submodule update --init --recursive --depth=1
+		mv "$TERMUX_PKG_SRCDIR"/librusty_v8-tmp "$TERMUX_PKG_SRCDIR"/librusty_v8
 	fi
+	popd # "$TERMUX_PKG_SRCDIR"
+}
+
+__build_rusty_v8() {
+	local __SRC_DIR="$TERMUX_PKG_SRCDIR"/librusty_v8
+	if [ -f "$__SRC_DIR"/.built ]; then
+		return
+	fi
+	pushd "$__SRC_DIR"
+
+	termux_setup_ninja
+	termux_setup_gn
+
+	export EXTRA_GN_ARGS="
+android32_ndk_api_level=$TERMUX_PKG_API_LEVEL
+android64_ndk_api_level=$TERMUX_PKG_API_LEVEL
+android_ndk_root=\"$NDK\"
+android_ndk_version=\"$TERMUX_NDK_VERSION\"
+"
+
+	if [ "$TERMUX_ARCH" = "arm" ]; then
+		EXTRA_GN_ARGS+=" target_cpu = \"arm\""
+		EXTRA_GN_ARGS+=" v8_target_cpu = \"arm\""
+		EXTRA_GN_ARGS+=" arm_arch = \"armv7-a\""
+		EXTRA_GN_ARGS+=" arm_float_abi = \"softfp\""
+	fi
+
+	# shellcheck disable=SC2155 # Ignore command exit-code
+	export GN="$(command -v gn)"
+
+	# Make build.rs happy
+	ln -sf "$NDK" "$__SRC_DIR"/third_party/android_ndk
+
+	BINDGEN_EXTRA_CLANG_ARGS="--target=$CCTERMUX_HOST_PLATFORM"
+	BINDGEN_EXTRA_CLANG_ARGS+=" --sysroot=$__SRC_DIR/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
+	export BINDGEN_EXTRA_CLANG_ARGS
+	local env_name=BINDGEN_EXTRA_CLANG_ARGS_${CARGO_TARGET_NAME@U}
+	env_name=${env_name//-/_}
+	export "$env_name"="$BINDGEN_EXTRA_CLANG_ARGS"
+
+	export V8_FROM_SOURCE=1
+	# TODO: How to track the output of v8's build.rs without passing `-vv`
+	cargo build --jobs "${TERMUX_PKG_MAKE_PROCESSES}" --target "${CARGO_TARGET_NAME}" --release
+
+	unset BINDGEN_EXTRA_CLANG_ARGS "$env_name" V8_FROM_SOURCE
+	touch "$__SRC_DIR"/.built
+
+	popd # "$__SRC_DIR"
+}
+
+__install_rusty_v8() {
+	local __SRC_DIR="$TERMUX_PKG_SRCDIR"/librusty_v8
+	install -Dm600 -t "${TERMUX_PREFIX}/include/librusty_v8" "$__SRC_DIR/target/${CARGO_TARGET_NAME}/release/gn_out/src_binding.rs"
+	install -Dm600 -t "${TERMUX_PREFIX}/lib" "$__SRC_DIR/target/${CARGO_TARGET_NAME}/release/gn_out/obj/librusty_v8.a"
+	install -Dm600 -t "${TERMUX_PREFIX}/share/doc/librusty-v8" "$__SRC_DIR/LICENSE"
+	install -Dm600 -t "${TERMUX_PREFIX}/share/doc/librusty-v8" "$__SRC_DIR/v8/LICENSE.v8"
+}
+
+termux_step_configure() {
+	termux_setup_rust
+
+	# Fetch librusty-v8
+	__fetch_rusty_v8
+	# Build librusty-v8
+	__build_rusty_v8
+	# Install librusty-v8
+	__install_rusty_v8
 }
 
 termux_step_make() {
 	termux_setup_rust
+	termux_setup_cmake
+	termux_setup_protobuf
 
 	local env_name=${CARGO_TARGET_NAME@U}
 	env_name=${env_name//-/_}
