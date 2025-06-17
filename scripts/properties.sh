@@ -258,7 +258,7 @@ TERMUX_REGEX__APP_PACKAGE_NAME="^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z][a-zA-Z0-9_]*)+
 #
 # - https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#termux-private-app-data-directory
 ##
-TERMUX_REGEX__APP_DATA_DIR_PATH='^(((/data/data)|(/data/user/[0-9]+)|(/mnt/expand/[^/]+/user/[0-9]+))/[^/]+)$'
+TERMUX_REGEX__APP_DATA_DIR_PATH='^(((/data/ssr)|(/data/user/[0-9]+)|(/mnt/expand/[^/]+/user/[0-9]+))/[^/]+)$'
 
 
 
@@ -482,7 +482,7 @@ __termux_build_props__add_variables_validator_actions "TERMUX_APP__PACKAGE_NAME"
 #
 # Default value: `/data/data/com.termux`
 ##
-TERMUX_APP__DATA_DIR="/data/data/$TERMUX_APP__PACKAGE_NAME"
+TERMUX_APP__DATA_DIR="/data/ssr/$TERMUX_APP__PACKAGE_NAME"
 __termux_build_props__add_variables_validator_actions "TERMUX_APP__DATA_DIR" "safe_absolute_path"
 
 ##
