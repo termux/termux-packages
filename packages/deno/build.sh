@@ -80,6 +80,11 @@ __fetch_rusty_v8() {
 		git fetch --depth=1 origin v"$v8_version"
 		git reset --hard FETCH_HEAD
 		git submodule update --init --recursive --depth=1
+		local f
+		for f in $(find "$TERMUX_PKG_BUILDER_DIR/jumbo-patches" -maxdepth 1 -type f -name *.patch | sort); do
+			echo "Applying patch: $(basename $f)"
+			patch --silent -p1 < "$f"
+		done
 		mv "$TERMUX_PKG_SRCDIR"/librusty_v8-tmp "$TERMUX_PKG_SRCDIR"/librusty_v8
 	fi
 	popd # "$TERMUX_PKG_SRCDIR"
@@ -100,6 +105,7 @@ android32_ndk_api_level=$TERMUX_PKG_API_LEVEL
 android64_ndk_api_level=$TERMUX_PKG_API_LEVEL
 android_ndk_root=\"$NDK\"
 android_ndk_version=\"$TERMUX_NDK_VERSION\"
+use_jumbo_build=true
 "
 
 	if [ "$TERMUX_ARCH" = "arm" ]; then
