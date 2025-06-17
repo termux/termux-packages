@@ -1,0 +1,11 @@
+--- a/src/libunwind.rs
++++ b/src/libunwind.rs
+@@ -40,7 +40,7 @@
+     addr as usize - (_dyld_get_image_vmaddr_slide(0) + (&*cmd).vmaddr as usize)
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ unsafe fn dyn_slide(addr: u64) -> u64 {
+     use std::ffi::{c_int, c_void};
+ 

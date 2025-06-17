@@ -2,16 +2,16 @@ TERMUX_PKG_HOMEPAGE=https://deno.land/
 TERMUX_PKG_DESCRIPTION="A modern runtime for JavaScript and TypeScript"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.1.2
+TERMUX_PKG_VERSION=2.2.13
 TERMUX_PKG_SRCURL=(
 	https://github.com/denoland/deno/releases/download/v$TERMUX_PKG_VERSION/deno_src.tar.gz
 	https://github.com/licy183/deno-snapshot/releases/download/v$TERMUX_PKG_VERSION/deno-snapshot-aarch64-linux-android-$TERMUX_PKG_VERSION.tar.bz2
 	https://github.com/licy183/deno-snapshot/releases/download/v$TERMUX_PKG_VERSION/deno-snapshot-x86_64-linux-android-$TERMUX_PKG_VERSION.tar.bz2
 )
 TERMUX_PKG_SHA256=(
-	f892a4f2fd12964dd4a49f4f7e5639911611b202babb3ef523dcb01a4c76e9fb
-	bf4b49ea164280f81b8bd2a25a994ae95b68bf440de26e2e2fa5dbb3b2de323d
-	7d7c744396865ee0fcbf2d09a23c265a4a378d418f965eeafff659fb2dd2ae3a
+	ed6c40be562394aa72251c3bd77432374e328cf0024226daadaba1b3486c2a68
+	e39aa39e6d7d4816b6b75de0380cf272e4d9b1454f70d270eb88b17bae1143a8
+	210f7fb75039a2978d20d19a5ff05a601f4940626d019033dc29b7ca288c8040
 )
 TERMUX_PKG_DEPENDS="libffi, libsqlite, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -51,6 +51,7 @@ termux_step_pre_configure() {
 	cargo vendor
 	find ./vendor \
 		-mindepth 1 -maxdepth 1 -type d \
+		! -wholename ./vendor/deno_panic \
 		! -wholename ./vendor/v8 \
 		-exec rm -rf '{}' \;
 
@@ -58,9 +59,14 @@ termux_step_pre_configure() {
 		-d ./vendor/v8/ \
 		< "$TERMUX_PKG_BUILDER_DIR"/rusty-v8-search-files-with-target-suffix.diff
 
+	patch --silent -p1 \
+		-d ./vendor/deno_panic/ \
+		< "$TERMUX_PKG_BUILDER_DIR"/deno-panic-dyn_slide.diff
+
 	echo "" >> Cargo.toml
 	echo "[patch.crates-io]" >> Cargo.toml
 	echo "v8 = { path = \"./vendor/v8\" }" >> Cargo.toml
+	echo "deno_panic = { path = \"./vendor/deno_panic\" }" >> Cargo.toml
 }
 
 __fetch_rusty_v8() {
@@ -156,7 +162,6 @@ termux_step_make() {
 	export RUSTY_V8_SRC_BINDING_PATH_${env_name}="${TERMUX_PREFIX}/include/librusty_v8/src_binding.rs"
 	export DENO_SKIP_CROSS_BUILD_CHECK=1
 	export DENO_PREBUILT_CLI_SNAPSHOT="$TERMUX_PKG_SRCDIR/deno-snapshot-$CARGO_TARGET_NAME-$TERMUX_PKG_VERSION/CLI_SNAPSHOT.bin"
-	export DENO_PREBUILT_COMPILER_SNAPSHOT="$TERMUX_PKG_SRCDIR/deno-snapshot-$CARGO_TARGET_NAME-$TERMUX_PKG_VERSION/COMPILER_SNAPSHOT.bin"
 
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
 		export PKG_CONFIG_x86_64_unknown_linux_gnu=/usr/bin/pkg-config
