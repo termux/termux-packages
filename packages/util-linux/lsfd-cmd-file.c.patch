@@ -1,6 +1,7 @@
-diff -u -r ../util-linux-2.40.2/misc-utils/lsfd-file.c ./misc-utils/lsfd-file.c
---- ../util-linux-2.40.2/misc-utils/lsfd-file.c	2024-07-04 07:54:41.235242049 +0000
-+++ ./misc-utils/lsfd-file.c	2024-09-15 13:42:15.256736746 +0000
+diff --git a/lsfd-cmd/file.c b/lsfd-cmd/file.c
+index 32b08693d..c52f1a83d 100644
+--- a/lsfd-cmd/file.c
++++ b/lsfd-cmd/file.c
 @@ -32,11 +32,15 @@
  # endif
  #endif
@@ -17,17 +18,18 @@ diff -u -r ../util-linux-2.40.2/misc-utils/lsfd-file.c ./misc-utils/lsfd-file.c
  
  #include "buffer.h"
  #include "idcache.h"
-@@ -425,6 +429,9 @@
+@@ -604,6 +608,10 @@ static void file_free_content(struct file *file)
  
  static unsigned long get_minor_for_sysvipc(void)
  {
 +#ifdef __ANDROID__
 +	return 0;
 +#else
++
  	int id;
  	void *start;
  
-@@ -464,10 +471,14 @@
+@@ -641,10 +649,14 @@ static unsigned long get_minor_for_sysvipc(void)
  	shmdt(start);
  	shmctl(id, IPC_RMID, NULL);
  	return m;
@@ -36,13 +38,13 @@ diff -u -r ../util-linux-2.40.2/misc-utils/lsfd-file.c ./misc-utils/lsfd-file.c
  
  static unsigned long get_minor_for_mqueue(void)
  {
-+#ifdef __ANDROID__
-+	return 0;
-+#else
+++#ifdef __ANDROID__
+++	return 0;
+++#else
  	mqd_t mq;
  	char mq_name[BUFSIZ];
  	struct mq_attr attr = {
-@@ -492,6 +503,7 @@
+@@ -669,6 +681,7 @@ static unsigned long get_minor_for_mqueue(void)
  	mq_close(mq);
  	mq_unlink(mq_name);
  	return minor(sb.st_dev);
