@@ -1,0 +1,64 @@
+From 79768217bb6bcd18e6f0dd00973ceff0d839798b Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <grimler@termux.dev>
+Date: Sun, 16 Feb 2025 19:43:58 +0100
+Subject: [PATCH] setup.py: build only libusb backend even on linux
+
+On android we cannot use hidraw, only libusb, so build only that
+variant.
+---
+ setup.py | 18 +-----------------
+ 1 file changed, 1 insertion(+), 17 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 7c79a38c7b8c..6e302ee12fd8 100755
+--- a/setup.py
++++ b/setup.py
+@@ -137,7 +137,7 @@ def hid_from_embedded_hidapi():
+             HIDAPI_WITH_LIBUSB = to_bool(os.getenv("HIDAPI_WITH_LIBUSB"))
+ 
+         if HIDAPI_WITH_LIBUSB:
+-            hidraw_module = "hidraw"
++            hidraw_module = "hid"
+             modules.append(
+                 pkgconfig_configure_extension(
+                     Extension(
+@@ -152,15 +152,6 @@ def hid_from_embedded_hidapi():
+             hidraw_module = "hid"
+             check_deprecated_without_libusb()
+ 
+-        modules.append(
+-            Extension(
+-                hidraw_module,
+-                sources=["hidraw.pyx", hidapi_src("linux")],
+-                include_dirs=[embedded_hidapi_include],
+-                libraries=["udev"],
+-            )
+-        )
+-
+     else:
+         modules = [
+             pkgconfig_configure_extension(
+@@ -186,7 +177,6 @@ def hid_from_system_hidapi():
+             HIDAPI_WITH_LIBUSB = to_bool(os.getenv("HIDAPI_WITH_LIBUSB"))
+ 
+         if HIDAPI_WITH_LIBUSB:
+-            hidraw_module = "hidraw"
+             modules.append(
+                 pkgconfig_configure_extension(
+                     Extension("hid", sources=["hid.pyx"]), hidapi_libusb_pkgconfig
+@@ -196,12 +186,6 @@ def hid_from_system_hidapi():
+             hidraw_module = "hid"
+             check_deprecated_without_libusb()
+ 
+-        modules.append(
+-            pkgconfig_configure_extension(
+-                Extension(hidraw_module, sources=["hidraw.pyx"]),
+-                hidapi_hidraw_pkgconfig,
+-            )
+-        )
+     else:
+         modules = [
+             pkgconfig_configure_extension(
+-- 
+2.49.0
+
