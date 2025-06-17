@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.chromium.org/Home
 TERMUX_PKG_DESCRIPTION="Chromium web browser"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION=137.0.7151.68
+TERMUX_PKG_VERSION=137.0.7151.103
 TERMUX_PKG_SRCURL=https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=d9cabbfb902f8ac727cea424a1fa41c0d95efe40bbf385b50f76f8856aa63cd3
+TERMUX_PKG_SHA256=31083a39c661942a3617e272787a3927f9b7eeaf2a4e2de1ac3affc8a7f05ef3
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libdrm, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="chromium-host-tools, libffi-static"
 # TODO: Split chromium-common and chromium-headless
@@ -68,9 +68,7 @@ termux_step_configure() {
 	ln -s $_host_pkg_config $TERMUX_PKG_CACHEDIR/host-pkg-config-bin/pkg-config
 	export PATH="$TERMUX_PKG_CACHEDIR/host-pkg-config-bin:$PATH"
 
-	# Install amd64 rootfs and deps
-	env -i PATH="$PATH" sudo apt update
-	env -i PATH="$PATH" sudo apt install libfontconfig1 libcups2-dev -yq
+	# Install amd64 rootfs
 	build/linux/sysroot_scripts/install-sysroot.py --arch=amd64
 	local _amd64_sysroot_path="$(pwd)/build/linux/$(ls build/linux | grep 'amd64-sysroot')"
 
@@ -144,8 +142,7 @@ termux_step_configure() {
 		_v8_sysroot_path="$_amd64_sysroot_path"
 		_v8_toolchain_name="host"
 	elif [ "$TERMUX_ARCH" = "arm" ]; then
-		# Install i386 rootfs and deps
-		env -i PATH="$PATH" sudo apt install libfontconfig1:i386 libexpat1:i386 libglib2.0-0t64:i386 -yq
+		# Install i386 rootfs
 		build/linux/sysroot_scripts/install-sysroot.py --arch=i386
 		local _i386_sysroot_path="$(pwd)/build/linux/$(ls build/linux | grep 'i386-sysroot')"
 		_target_cpu="arm"
