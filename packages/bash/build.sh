@@ -85,7 +85,7 @@ termux_step_pre_configure() {
 			${PATCH_CHECKSUMS[$PATCH_NUM]}
 		patch -p0 -i $PATCHFILE
 	done
- 	unset PATCH_CHECKSUMS PATCHFILE PATCH_NUM
+	unset PATCH_CHECKSUMS PATCHFILE PATCH_NUM
 	LDFLAGS+=" -Wl,--no-as-needed,-landroid-support,--as-needed"
 }
 
