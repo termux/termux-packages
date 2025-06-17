@@ -1,0 +1,222 @@
+Index: src/autosetup/sqlite-config.tcl
+==================================================================
+--- src/autosetup/sqlite-config.tcl
++++ src/autosetup/sqlite-config.tcl
+@@ -225,24 +225,21 @@
+         tcl=1
+           => {Disable components which require TCL, including all tests.
+               This tree requires TCL for code generation but can use the in-tree
+               copy of autosetup/jimsh0.c for that. The SQLite TCL extension and the
+               test code require a canonical tclsh.}
+-      }
+-      {canonical} {
+         with-tcl:DIR
+           => {Directory containing tclConfig.sh or a directory one level up from
+               that, from which we can derive a directory containing tclConfig.sh.
+               A dir name of "prefix" is equivalent to the directory specified by
+               the --prefix flag.}
+         with-tclsh:PATH
+           => {Full pathname of tclsh to use.  It is used for (A) trying to find
+-              tclConfig.sh and (B) all TCL-based code generation.  Warning: if
+-              its containing dir has multiple tclsh versions, it may select the
++              tclConfig.sh and (B) all TCL-based code generation. Use --with-tcl
++              unless you have a specific need for this flag. Warning: if its
++              containing dir has multiple tclsh versions, it may select the
+               wrong tclConfig.sh!}
+-      }
+-      {canonical} {
+         static-tclsqlite3=0
+           => {Statically-link tclsqlite3. This only works if TCL support is
+               enabled and all requisite libraries are available in
+               static form. Note that glibc is unable to fully statically
+               link certain libraries required by tclsqlite3, so this won't
+
+Index: src/main.mk
+==================================================================
+--- src/main.mk
++++ src/main.mk
+@@ -1669,38 +1669,51 @@
+ # Build the SQLite TCL extension in a way that make it compatible
+ # with whatever version of TCL is running as $TCLSH_CMD, possibly defined
+ # by --with-tclsh=
+ #
+ tclextension: tclsqlite3.c
+-	$(TCLSH_CMD) $(TOP)/tool/buildtclext.tcl --build-only --cc "$(T.cc)" $(CFLAGS.tclextension)
++	$(TCLSH_CMD) $(TOP)/tool/buildtclext.tcl --build-only \
++		--tclConfig.sh $(TCL_CONFIG_SH) --cc "$(T.cc)" $(CFLAGS.tclextension)
+ 
+ #
+ # Install the SQLite TCL extension in a way that is appropriate for $TCLSH_CMD
+ # to find it.
+ #
+ tclextension-install: tclsqlite3.c
+-	$(TCLSH_CMD) $(TOP)/tool/buildtclext.tcl --destdir "$(DESTDIR)" --cc "$(T.cc)" $(CFLAGS.tclextension)
++	$(TCLSH_CMD) $(TOP)/tool/buildtclext.tcl --destdir "$(DESTDIR)" \
++		--tclConfig.sh $(TCL_CONFIG_SH) --cc "$(T.cc)" $(CFLAGS.tclextension)
+ 
+ #
+ # Uninstall the SQLite TCL extension that is used by $TCLSH_CMD.
+ #
+ tclextension-uninstall:
+-	$(TCLSH_CMD) $(TOP)/tool/buildtclext.tcl --uninstall
++	$(TCLSH_CMD) $(TOP)/tool/buildtclext.tcl --uninstall \
++		--tclConfig.sh $(TCL_CONFIG_SH)
+ 
+ #
+ # List all installed the SQLite TCL extensions that is are accessible
+ # by $TCLSH_CMD, including prior versions.
+ #
+ tclextension-list:
+-	@ $(TCLSH_CMD) $(TOP)/tool/buildtclext.tcl --info
++	@ $(TCLSH_CMD) $(TOP)/tool/buildtclext.tcl --info \
++		--tclConfig.sh $(TCL_CONFIG_SH)
+ 
+ # Verify that the SQLite TCL extension that is loaded by default
+ # in $(TCLSH_CMD) is the same as the version of SQLite for the
+ # current source tree
+ #
+ tclextension-verify: sqlite3.h
+-	@ $(TCLSH_CMD) $(TOP)/tool/buildtclext.tcl --version-check
++	@ $(TCLSH_CMD) $(TOP)/tool/buildtclext.tcl --version-check \
++		--tclConfig.sh $(TCL_CONFIG_SH)
++
++# Run all of the tclextension targets in order, ending with uninstall.
++tclextension-all:
++	$(MAKE) tclextension
++	$(MAKE) tclextension-install
++	$(MAKE) tclextension-list
++	$(MAKE) tclextension-verify
++	$(MAKE) tclextension-uninstall
+ 
+ #
+ # FTS5 things
+ #
+ FTS5_SRC = \
+
+Index: src/tool/buildtclext.tcl
+==================================================================
+--- src/tool/buildtclext.tcl
++++ src/tool/buildtclext.tcl
+@@ -15,10 +15,11 @@
+    --info               Show info on existing SQLite TCL extension installs
+    --install-only       Install an extension previously build
+    --uninstall          Uninstall the extension
+    --version-check      Check extension version against this source tree
+    --destdir DIR        Installation root (used by "make install DESTDIR=...")
++   --tclConfig.sh FILE  Use this tclConfig.sh instead of looking for one
+ 
+ Other options are retained and passed through into the compiler.}
+ 
+ 
+ set build 1
+@@ -27,10 +28,11 @@
+ set infoonly 0
+ set versioncheck 0
+ set CC {}
+ set OPTS {}
+ set DESTDIR ""; # --destdir "$(DESTDIR)"
++set tclConfigSh ""; # --tclConfig.sh FILE
+ for {set ii 0} {$ii<[llength $argv]} {incr ii} {
+   set a0 [lindex $argv $ii]
+   if {$a0=="--install-only"} {
+     set build 0
+   } elseif {$a0=="--build-only"} {
+@@ -54,10 +56,13 @@
+     incr ii
+     set CC [lindex $argv $ii]
+   } elseif {$a0=="--destdir" && $ii+1<[llength $argv]} {
+     incr ii
+     set DESTDIR [lindex $argv $ii]
++  } elseif {$a0=="--tclConfig.sh" && $ii+1<[llength $argv]} {
++    incr ii
++    set tclConfigSh [lindex $argv $ii]
+   } elseif {[string match -* $a0]} {
+     append OPTS " $a0"
+   } else {
+     puts stderr "Unknown option: \"$a0\"\n"
+     puts stderr $help
+@@ -86,43 +91,50 @@
+     puts "   \"nmake /f Makefile.msc pkgIndex.tcl tclsqlite3.dll"
+     exit 1
+   }
+   set OUT tclsqlite3.dll
+ } else {
+-  # Figure out the location of the tclConfig.sh file used by the
+-  # tclsh that is executing this script.
+-  #
+-  if {[catch {
+-    set LIBDIR [tcl::pkgconfig get libdir,install]
+-  }]} {
+-    puts stderr "$argv0: tclsh does not support tcl::pkgconfig."
+-    exit 1
+-  }
+-  if {![file exists $LIBDIR]} {
+-    puts stderr "$argv0: cannot find the tclConfig.sh file."
+-    puts stderr "$argv0: tclsh reported library directory \"$LIBDIR\"\
+-                 does not exist."
+-    exit 1
+-  }
+-  if {![file exists $LIBDIR/tclConfig.sh] 
+-      || [file size $LIBDIR/tclConfig.sh]<5000} {
+-    set n1 $LIBDIR/tcl$::tcl_version
+-    if {[file exists $n1/tclConfig.sh]
+-        && [file size $n1/tclConfig.sh]>5000} {
+-      set LIBDIR $n1
+-    } else {
+-      puts stderr "$argv0: cannot find tclConfig.sh in either $LIBDIR or $n1"
+-      exit 1
+-    }
+-  }
+-
+-  # Read the tclConfig.sh file into the $tclConfig variable
+-  #
+-  #puts "using $LIBDIR/tclConfig.sh"
+-  set fd [open $LIBDIR/tclConfig.sh rb]
+-  set tclConfig [read $fd]
+-  close $fd
++  # Read the tclConfig.sh file into the $tclConfig variable
++  #
++  if {"" eq $tclConfigSh} {
++    # Figure out the location of the tclConfig.sh file used by the
++    # tclsh that is executing this script.
++    #
++    if {[catch {
++      set LIBDIR [tcl::pkgconfig get libdir,install]
++    }]} {
++      puts stderr "$argv0: tclsh does not support tcl::pkgconfig."
++      exit 1
++    }
++    if {![file exists $LIBDIR]} {
++      puts stderr "$argv0: cannot find the tclConfig.sh file."
++      puts stderr "$argv0: tclsh reported library directory \"$LIBDIR\"\
++                 does not exist."
++      exit 1
++    }
++    if {![file exists $LIBDIR/tclConfig.sh]
++        || [file size $LIBDIR/tclConfig.sh]<5000} {
++      set n1 $LIBDIR/tcl$::tcl_version
++      if {[file exists $n1/tclConfig.sh]
++          && [file size $n1/tclConfig.sh]>5000} {
++        set LIBDIR $n1
++      } else {
++        puts stderr "$argv0: cannot find tclConfig.sh in either $LIBDIR or $n1"
++        exit 1
++      }
++    }
++    #puts "using $LIBDIR/tclConfig.sh"
++    set fd [open $LIBDIR/tclConfig.sh rb]
++    set tclConfig [read $fd]
++    close $fd
++  } else {
++    # User-provided tclConfig.sh
++    #
++    set fd [open $tclConfigSh rb]
++    set tclConfig [read $fd]
++    close $fd
++  }
+ 
+   # Extract parameter we will need from the tclConfig.sh file
+   #
+   set TCLMAJOR 8
+   regexp {TCL_MAJOR_VERSION='(\d)'} $tclConfig all TCLMAJOR
+
