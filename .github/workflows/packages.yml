@@ -249,9 +249,9 @@ jobs:
 
         if [[ "${#packages[@]}" -gt 0 ]]; then
           if [ "$DOCKER_BUILD" == 'false' ]; then
-            NDK="$ANDROID_NDK" ANDROID_HOME="$ANDROID_SDK_ROOT" ./build-package.sh -I -C -a "${{ matrix.target_arch }}" "${packages[@]}"
+            NDK="$ANDROID_NDK" ANDROID_HOME="$ANDROID_SDK_ROOT" ./build-package.sh -I -a "${{ matrix.target_arch }}" "${packages[@]}"
           else
-            ./scripts/run-docker.sh ./build-package.sh -I -C -a "${{ matrix.target_arch }}" "${packages[@]}"
+            ./scripts/run-docker.sh ./build-package.sh -I -a "${{ matrix.target_arch }}" "${packages[@]}"
           fi
         fi
 
