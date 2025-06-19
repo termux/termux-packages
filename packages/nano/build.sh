@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Small, free and friendly text editor"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="8.5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://nano-editor.org/dist/latest/nano-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=000b011d339c141af9646d43288f54325ff5c6e8d39d6e482b787bbc6654c26a
 TERMUX_PKG_AUTO_UPDATE=true
@@ -29,8 +30,10 @@ termux_step_create_debscripts() {
 	#!$TERMUX_PREFIX/bin/sh
 	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
 		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+			# nano is the default option for $TERMUX_PREFIX/bin/editor
+			# all other alternatives for 'editor' should have priority < 50
 			update-alternatives --install \
-				$TERMUX_PREFIX/bin/editor editor $TERMUX_PREFIX/bin/nano 20
+				$TERMUX_PREFIX/bin/editor editor $TERMUX_PREFIX/bin/nano 50
 		fi
 	fi
 	EOF
