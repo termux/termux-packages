@@ -1,0 +1,38 @@
+From b7f6519229a6002f944626ab3db216175dd0f142 Mon Sep 17 00:00:00 2001
+From: Arne Schwabe <arne@rfc2549.org>
+Date: Sat, 26 Apr 2025 20:21:28 +0200
+Subject: [PATCH] Fix aesv8 arm assembler code not working on 32 bit Android
+
+OpenSSL uses 'void' as perlasm for the 32 bit armeabi-arm target, which
+most notably lacks a 32 or 64 in its name. So while most code that is
+targeted for 32 uses !~ /64/ there is one instance that uses ~= /32/,
+introduced by commit 8e69c18 between 3.4.0 and 3.5.0. This leaves out
+that line on 32 bit android causing a segfault.
+
+This fixes the compilation issue by replacing the ~= /32/ with !~ /64/
+compilation taget (see 15-android.conf)
+
+Signed-off-by: Arne Schwabe <arne@rfc2549.org>
+
+Reviewed-by: Tom Cosgrove <tom.cosgrove@arm.com>
+Reviewed-by: Tomas Mraz <tomas@openssl.org>
+(Merged from https://github.com/openssl/openssl/pull/27510)
+
+(cherry picked from commit 77624f0c5bc7db67acb3134b28bc330533425ab6)
+---
+ crypto/aes/asm/aesv8-armx.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/crypto/aes/asm/aesv8-armx.pl b/crypto/aes/asm/aesv8-armx.pl
+index 4f503a31ca672..af501f8ff573b 100755
+--- a/crypto/aes/asm/aesv8-armx.pl
++++ b/crypto/aes/asm/aesv8-armx.pl
+@@ -152,7 +152,7 @@
+ 	adrp	$ptr,.Lrcon
+ 	add	$ptr,$ptr,:lo12:.Lrcon
+ ___
+-$code.=<<___	if ($flavour =~ /32/);
++$code.=<<___	if ($flavour !~ /64/);
+ 	adr	$ptr,.Lrcon
+ ___
+ $code.=<<___;
