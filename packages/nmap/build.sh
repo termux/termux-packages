@@ -11,6 +11,19 @@ TERMUX_PKG_RECOMMENDS="nmap-ncat"
 # --without-nmap-update to avoid linking against libsvn_client:
 # --without-zenmap to avoid python scripts for graphical gtk frontend:
 # --without-ndiff to avoid python2-using ndiff utility:
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_path_STRIP=llvm-strip --enable-static --with-liblua=$TERMUX_PREFIX --without-nmap-update --without-zenmap --without-ndiff"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--enable-static
+--with-liblua=$TERMUX_PREFIX
+--without-nmap-update
+--without-zenmap
+--without-ndiff
+"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_step_pre_configure() {
+	if [[ "$TERMUX_DEBUG_BUILD" == "true" ]]; then
+		STRIP="$(command -v true)"
+	fi
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_path_STRIP=$STRIP"
+}
