@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Basic file, shell and text manipulation utilities from t
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION=9.7
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/coreutils/coreutils-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=e8bb26ad0293f9b5a1fc43fb42ba970e312c66ce92c1b0b16713d7500db251bf
 TERMUX_PKG_DEPENDS="libandroid-selinux, libandroid-support, libgmp, libiconv"
@@ -35,4 +36,35 @@ termux_step_pre_configure() {
 
 	CPPFLAGS+=" -D__USE_FORTIFY_LEVEL=0"
 	LDFLAGS+=" -landroid-selinux"
+}
+
+termux_step_post_make_install() {
+	{ # Set up a wrapper script to be called by `update-alternatives`
+		echo "#!$TERMUX_PREFIX/bin/sh"
+		echo "exec \"$TERMUX_PREFIX/bin/cat\" \"\$@\""
+	} > "$TERMUX_PREFIX/libexec/coreutils/cat"
+	chmod 700 "$TERMUX_PREFIX/libexec/coreutils/cat"
+}
+
+termux_step_create_debscripts() {
+	cat <<- EOF > ./postinst
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
+		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+			# 'cat' can be a last resort alternative for 'pager'
+			update-alternatives \
+			--install "$TERMUX_PREFIX/bin/pager" pager "$TERMUX_PREFIX/libexec/coreutils/cat" 1 \
+			--slave "$TERMUX_PREFIX/share/man/man1/pager.1.gz" pager.1.gz "$TERMUX_PREFIX/share/man/man1/cat.1.gz"
+		fi
+	fi
+	EOF
+
+	cat <<- EOF > ./prerm
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" != "upgrade" ]; then
+		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+			update-alternatives --remove pager "$TERMUX_PREFIX/bin/cat"
+		fi
+	fi
+	EOF
 }

@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a singl
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.36.1
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=b8cc24c9574d809e7279c3be349795c5d5ceb6fdf19ca709f80cde50e47de314
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -49,7 +49,7 @@ termux_step_make_install() {
 	mkdir -p "$TERMUX_PREFIX/libexec/busybox"
 
 	local applet
-	for applet in 'nc' 'vi'; do
+	for applet in 'less' 'nc' 'vi'; do
 		{ # Set up a wrapper script to be called by `update-alternatives`
 			echo "#!$TERMUX_PREFIX/bin/sh"
 			echo "exec busybox $applet \"\$@\""
@@ -71,6 +71,10 @@ termux_step_create_debscripts() {
 			update-alternatives --install \
 				"$TERMUX_PREFIX/bin/editor" editor "$TERMUX_PREFIX/libexec/busybox/vi" 10
 
+			# 'busybox/less' is a candidate for providing 'pager'
+			update-alternatives --install \
+				"$TERMUX_PREFIX/bin/pager" editor "$TERMUX_PREFIX/libexec/busybox/less" 10
+
 			# 'busybox/nc' is also a weak candidate to provide 'nc'
 			update-alternatives \
 			--install "$TERMUX_PREFIX/bin/nc" nc "$TERMUX_PREFIX/libexec/busybox/nc" 10 \
@@ -85,6 +89,7 @@ termux_step_create_debscripts() {
 	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" != "upgrade" ]; then
 		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
 			update-alternatives --remove editor "$TERMUX_PREFIX/libexec/busybox/vi"
+			update-alternatives --remove pager "$TERMUX_PREFIX/libexec/busybox/less"
 			update-alternatives --remove vi "$TERMUX_PREFIX/libexec/busybox/vi"
 			update-alternatives --remove nc "$TERMUX_PREFIX/libexec/busybox/nc"
 		fi
