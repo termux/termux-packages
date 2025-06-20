@@ -30,3 +30,25 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-image=x11 --with-imagelib=imlib2"
 
 # For Makefile.in.patch:
 export TERMUX_PKG_BUILDER_DIR
+
+termux_step_create_debscripts() {
+	cat <<- EOF > ./postinst
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
+		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+			update-alternatives \
+			--install "$TERMUX_PREFIX/bin/pager" pager "$TERMUX_PREFIX/bin/w3m" 25 \
+			--slave "$TERMUX_PREFIX/share/man/man1/pager.1.gz" pager.1.gz "$TERMUX_PREFIX/share/man/man1/w3m.1.gz"
+		fi
+	fi
+	EOF
+
+	cat <<- EOF > ./prerm
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" != "upgrade" ]; then
+		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+			update-alternatives --remove pager "$TERMUX_PREFIX/bin/w3m"
+		fi
+	fi
+	EOF
+}
