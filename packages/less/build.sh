@@ -10,7 +10,10 @@ TERMUX_PKG_SHA256=2819f55564d86d542abbecafd82ff61e819a3eec967faa36cd3e68f1596a44
 TERMUX_PKG_DEPENDS="ncurses, pcre2"
 TERMUX_PKG_ESSENTIAL=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-regex=pcre2"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--with-regex=pcre2
+--with-editor=editor
+"
 # Official `less` release tags are marked with a `-rel` suffix
 TERMUX_PKG_UPDATE_VERSION_REGEXP='\d{3}-rel'
 
