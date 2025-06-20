@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A cat(1) clone with wings"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.25.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/sharkdp/bat/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4433403785ebb61d1e5d4940a8196d020019ce11a6f7d4553ea1d324331d8924
 TERMUX_PKG_AUTO_UPDATE=true
@@ -12,7 +12,7 @@ TERMUX_PKG_DEPENDS="less, libgit2"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
-	export CFLAGS_${CARGO_TARGET_NAME//-/_}+=" -Dindex=strchr"
+	export CFLAGS_"${CARGO_TARGET_NAME//-/_}"+=" -Dindex=strchr"
 
 	# See https://github.com/nagisa/rust_libloading/issues/54
 	export CC_x86_64_unknown_linux_gnu=gcc
@@ -26,7 +26,7 @@ termux_step_pre_configure() {
 	cargo fetch --target "${CARGO_TARGET_NAME}"
 
 	local f
-	for f in $CARGO_HOME/registry/src/*/libgit2-sys-*/build.rs; do
+	for f in "$CARGO_HOME"/registry/src/*/libgit2-sys-*/build.rs; do
 		sed -i -E 's/\.range_version\(([^)]*)\.\.[^)]*\)/.atleast_version(\1)/g' "${f}"
 	done
 }
@@ -36,4 +36,26 @@ termux_step_post_make_install() {
 	find . -name bat.bash -type f -exec install -Dm644 {} "$TERMUX_PREFIX/share/bash-completion/completions/bat" \;
 	find . -name bat.zsh -type f -exec install -Dm644 {} "$TERMUX_PREFIX/share/zsh/site-functions/_bat" \;
 	find . -name bat.fish -type f -exec install -Dm644 {} "$TERMUX_PREFIX/share/fish/vendor_completions.d/bat.fish" \;
+}
+
+termux_step_create_debscripts() {
+	cat <<- EOF > ./postinst
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
+		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+			update-alternatives \
+			--install "$TERMUX_PREFIX/bin/pager" pager "$TERMUX_PREFIX/bin/bat" 25 \
+			--slave "$TERMUX_PREFIX/share/man/man1/pager.1.gz" pager.1.gz "$TERMUX_PREFIX/share/man/man1/bat.1.gz"
+		fi
+	fi
+	EOF
+
+	cat <<- EOF > ./prerm
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" != "upgrade" ]; then
+		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+			update-alternatives --remove pager "$TERMUX_PREFIX/bin/bat"
+		fi
+	fi
+	EOF
 }
