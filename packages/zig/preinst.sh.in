@@ -1,0 +1,44 @@
+#!@TERMUX_PREFIX@/bin/sh
+# shellcheck shell=sh
+
+echo "Checking that your device meets the"
+echo "minimum kernel version for Zig @TERMUX_PKG_VERSION@"
+echo
+
+is_supported() {
+	_KERNEL_VERSION="$1"
+	_MINIMUM_VERSION="$2"
+	# shellcheck disable=SC2194 # We replace this in the build script
+	case "@TERMUX_PACKAGE_FORMAT@" in
+		apt)
+			if dpkg --compare-versions "$_KERNEL_VERSION" lt "$_MINIMUM_VERSION"; then
+				return 1
+			fi
+		;;
+		pacman)
+			if [ "$(vercmp "$_KERNEL_VERSION" "$_MINIMUM_VERSION")" != 1 ]; then
+				return 1
+			fi
+		;;
+	esac
+return 0
+}
+
+KERNEL_VERSION="$(uname -r)"
+if ! is_supported "$KERNEL_VERSION" "@ZIG_MINIMUM@"; then
+	echo "Your device's kernel version is too old for Zig @TERMUX_PKG_VERSION@"
+	if is_supported "$KERNEL_VERSION" "3.16.0"; then
+		echo "Your device does however support Zig 0.13.0 or earlier."
+		# uncomment these if/when we move old Zig versions to the TUR.
+		# echo "You can install it from the TUR."
+		# echo ""
+		# echo "pkg up"
+		# echo "pkg i tur-repo"
+		# echo "pkg i zig-0.13"
+	else
+		echo "Your device does not support any version of Zig"
+		echo "There's nothing we can do to make it supported."
+	fi
+	exit 1
+fi
+exit 0
