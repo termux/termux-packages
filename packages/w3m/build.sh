@@ -1,12 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://w3m.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Text based Web browser and pager"
-TERMUX_PKG_LICENSE="custom"
-TERMUX_PKG_LICENSE_FILE="LICENSE"
+TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=0.5.3
 _MINOR_VERSION=20230121
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 # The upstream w3m project is dead, but every linux distribution uses
 # this maintained fork in debian:
 TERMUX_PKG_SRCURL=https://github.com/tats/w3m/archive/v${_MAJOR_VERSION}+git${_MINOR_VERSION}.tar.gz
@@ -24,10 +23,32 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_setpgrp_void=yes ac_cv_func_bcopy=ye
 #Overwrite the default /usr/bin/firefox with termux-open-url as default external browser. That way, pressing "M" on a URL will open a link in Androids default Browser.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-browser=termux-open-url"
 #Overwrite the default editor to just vi, as the default was /usr/bin/vi.
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-editor=nano"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-editor=editor"
 # Build w3mimg with X11/imlib2.
 # w3mimgdisplay is in w3m-img subpackage.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-image=x11 --with-imagelib=imlib2"
 
 # For Makefile.in.patch:
 export TERMUX_PKG_BUILDER_DIR
+
+termux_step_create_debscripts() {
+	cat <<- EOF > ./postinst
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
+		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+			update-alternatives \
+			--install "$TERMUX_PREFIX/bin/pager" pager "$TERMUX_PREFIX/bin/w3m" 25 \
+			--slave "$TERMUX_PREFIX/share/man/man1/pager.1.gz" pager.1.gz "$TERMUX_PREFIX/share/man/man1/w3m.1.gz"
+		fi
+	fi
+	EOF
+
+	cat <<- EOF > ./prerm
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" != "upgrade" ]; then
+		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+			update-alternatives --remove pager "$TERMUX_PREFIX/bin/w3m"
+		fi
+	fi
+	EOF
+}

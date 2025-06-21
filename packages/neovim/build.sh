@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0, VIM License"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="0.11.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=324759a1bcd1a80b32a7eae1516ee761ec3e566d08284a24c4c7ca59079aabfa
 TERMUX_PKG_AUTO_UPDATE=true
@@ -98,8 +99,13 @@ termux_step_create_debscripts() {
 		#!$TERMUX_PREFIX/bin/sh
 		if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
 			if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+				# 'nvim' can be a 'editor' alternative
 				update-alternatives --install \
 					$TERMUX_PREFIX/bin/editor editor $TERMUX_PREFIX/bin/nvim 40
+				# 'nvim' can be a 'vim' alternative
+				update-alternatives --install \
+					$TERMUX_PREFIX/bin/vim vim $TERMUX_PREFIX/bin/nvim 10
+				# 'nvim' can be a 'vi' alternative
 				update-alternatives --install \
 					$TERMUX_PREFIX/bin/vi vi $TERMUX_PREFIX/bin/nvim 15
 			fi
@@ -111,6 +117,7 @@ termux_step_create_debscripts() {
 		if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" != "upgrade" ]; then
 			if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
 				update-alternatives --remove editor $TERMUX_PREFIX/bin/nvim
+				update-alternatives --remove vim $TERMUX_PREFIX/bin/nvim
 				update-alternatives --remove vi $TERMUX_PREFIX/bin/nvim
 			fi
 		fi

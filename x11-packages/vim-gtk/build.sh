@@ -10,6 +10,7 @@ TERMUX_PKG_CONFLICTS="vim"
 TERMUX_PKG_BREAKS="vim-python"
 TERMUX_PKG_REPLACES="vim-python"
 TERMUX_PKG_VERSION="9.1.1450"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=9d7da37891a07b089ecd0193883ca78898c41832036c10b83695071800e3a15f
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -133,7 +134,7 @@ termux_step_create_debscripts() {
 	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
 		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
 			update-alternatives --install \
-				$TERMUX_PREFIX/bin/editor editor $TERMUX_PREFIX/bin/vim 50
+				$TERMUX_PREFIX/bin/editor editor $TERMUX_PREFIX/bin/vim 40
 			update-alternatives --install \
 				$TERMUX_PREFIX/bin/vi vi $TERMUX_PREFIX/bin/vim 20
 		fi

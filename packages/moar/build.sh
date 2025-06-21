@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A pager designed to just do the right thing without any 
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.31.10"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/walles/moar/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e15c301e7ee2a30407dad6941166260da233475d1058b60e8c8d07c6e65de92b
 TERMUX_PKG_AUTO_UPDATE=true
@@ -16,4 +17,27 @@ termux_step_make() {
 termux_step_make_install() {
 	install -Dm700 -t "${TERMUX_PREFIX}/bin" moar
 	install -Dm600 -t "${TERMUX_PREFIX}/share/man/man1" moar.1
+}
+
+
+termux_step_create_debscripts() {
+	cat <<- EOF > ./postinst
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
+		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+			update-alternatives \
+			--install "$TERMUX_PREFIX/bin/pager" pager "$TERMUX_PREFIX/bin/moar" 25 \
+			--slave "$TERMUX_PREFIX/share/man/man1/pager.1.gz" pager.1.gz "$TERMUX_PREFIX/share/man/man1/moar.1.gz"
+		fi
+	fi
+	EOF
+
+	cat <<- EOF > ./prerm
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" != "upgrade" ]; then
+		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+			update-alternatives --remove pager "$TERMUX_PREFIX/bin/moar"
+		fi
+	fi
+	EOF
 }
