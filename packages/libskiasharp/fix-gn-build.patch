@@ -1,0 +1,103 @@
+Modifies the gn build to use correct NDK paths and compiler options
+Forces libjpeg and libskia to avoid system libjpeg
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -1261,15 +1261,7 @@ component("skia") {
+ 
+   if (is_android) {
+     deps += [ "//third_party/expat" ]
+-    if (defined(ndk) && ndk != "") {
+-      deps += [ "//third_party/cpu-features" ]
+-    }
+-    sources += [ "src/ports/SkDebug_android.cpp" ]
+-    libs += [
+-      "EGL",
+-      "GLESv2",
+-      "log",
+-    ]
++    sources += [ "src/ports/SkDebug_stdio.cpp" ]
+   }
+ 
+   if (is_linux || target_cpu == "wasm") {
+--- a/gn/BUILD.gn
++++ b/gn/BUILD.gn
+@@ -197,28 +197,19 @@ config("default") {
+   }
+ 
+   if (is_android) {
+-    asmflags += [ "--target=$ndk_target" ]
++    asmflags += [ "--target=$ndk_target$ndk_api" ]
+     cflags += [
+       "--sysroot=$ndk/sysroot",
+       "-isystem$ndk/sysroot/usr/include/$ndk_target",
+       "-D__ANDROID_API__=$ndk_api",
+-      "--target=$ndk_target",
+-    ]
+-    cflags_cc += [
+-      "-isystem$ndk/sources/cxx-stl/llvm-libc++/include",
+-      "-isystem$ndk/sources/cxx-stl/llvm-libc++abi/include",
+-      "-isystem$ndk/sources/android/support/include",
++      "--target=$ndk_target$ndk_api",
+     ]
+     ldflags += [
+-      "--sysroot=$ndk/platforms/$ndk_platform",
+-      "--target=$ndk_target",
+-      "-B$ndk/toolchains/$ndk_gccdir-4.9/prebuilt/$ndk_host/$ndk_target/bin",
++      "--sysroot=$ndk/sysroot",
++      "--target=$ndk_target$ndk_api",
+       "-static-libstdc++",
+     ]
+     lib_dirs = [
+-      "$ndk/sources/cxx-stl/llvm-libc++/libs/$ndk_stdlib",
+-      "$ndk/toolchains/$ndk_gccdir-4.9/prebuilt/$ndk_host/lib/gcc/$ndk_target/4.9.x",
+-      "$ndk/toolchains/llvm/prebuilt/$ndk_host/sysroot/usr/lib/$ndk_target/$ndk_api",
+     ]
+ 
+     libs += [
+--- a/gn/toolchain/BUILD.gn
++++ b/gn/toolchain/BUILD.gn
+@@ -13,9 +13,9 @@ declare_args() {
+       target_cc = "$ndk/toolchains/llvm/prebuilt/$ndk_host/bin/clang.exe"
+       target_cxx = "$ndk/toolchains/llvm/prebuilt/$ndk_host/bin/clang++.exe"
+     } else {
+-      target_ar = "$ndk/toolchains/$ndk_gccdir-4.9/prebuilt/$ndk_host/$ndk_target/bin/ar"
+-      target_cc = "$ndk/toolchains/llvm/prebuilt/$ndk_host/bin/clang"
+-      target_cxx = "$ndk/toolchains/llvm/prebuilt/$ndk_host/bin/clang++"
++      target_ar = ar
++      target_cc = cc
++      target_cxx = cxx
+     }
+   } else if (is_tizen) {
+     if (host_os == "win") {
+--- a/third_party/libjpeg-turbo/BUILD.gn
++++ b/third_party/libjpeg-turbo/BUILD.gn
+@@ -15,6 +15,9 @@ if (skia_use_system_libjpeg_turbo) {
+   }
+ } else {
+   third_party("libjpeg") {
++    include_dirs = [
++      "../externals/libjpeg-turbo",
++    ]
+     public_include_dirs = [
+       ".",
+       "../externals/libjpeg-turbo",
+@@ -100,7 +103,7 @@ if (skia_use_system_libjpeg_turbo) {
+         "../externals/libjpeg-turbo/simd/arm/jidctred-neon.c",
+         "../externals/libjpeg-turbo/simd/arm/jquanti-neon.c",
+       ]
+-      include_dirs = [ "../externals/libjpeg-turbo/simd/arm" ]
++      include_dirs += [ "../externals/libjpeg-turbo/simd/arm" ]
+       if (current_cpu == "arm") {
+         sources += [
+           "../externals/libjpeg-turbo/simd/arm/aarch32/jchuff-neon.c",
+--- a/third_party/third_party.gni
++++ b/third_party/third_party.gni
+@@ -11,7 +11,7 @@ template("third_party_config") {
+   enabled = !defined(invoker.enabled) || invoker.enabled
+   config(target_name) {
+     if (enabled) {
+-      forward_variables_from(invoker, "*", [ "include_dirs" ])
++      forward_variables_from(invoker, "*")
+       cflags = []
+       if (is_win) {
+         include_dirs = invoker.include_dirs
