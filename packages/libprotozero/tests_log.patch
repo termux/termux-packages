@@ -10,12 +10,12 @@ index c769123..79d4c87 100644
  
  add_test(NAME reader_tests COMMAND reader_tests)
  
-@@ -98,7 +99,7 @@ if(PROTOBUF_FOUND)
- 
+@@ -100,7 +100,7 @@ if(PROTOBUF_FOUND)
      add_executable(writer_tests writer_tests.cpp ${SOURCES} ${PROTO_SRCS} ${PROTO_HDRS})
  
--    target_link_libraries(writer_tests ${PROTOBUF_LITE_LIBRARY})
-+    target_link_libraries(writer_tests ${PROTOBUF_LITE_LIBRARY} log)
+     target_compile_features(writer_tests PUBLIC cxx_std_14)
+-    target_link_libraries(writer_tests PRIVATE protobuf::libprotobuf-lite)
++    target_link_libraries(writer_tests PRIVATE protobuf::libprotobuf-lite log)
  
      if(NOT MSVC)
          set_target_properties(writer_tests PROPERTIES COMPILE_FLAGS "-pthread")
