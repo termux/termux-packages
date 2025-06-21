@@ -1,17 +1,17 @@
 --- a/lxqt-transupdate
 +++ b/lxqt-transupdate
 @@ -41,10 +41,10 @@
-   SOURCEDIR=$(dirname $TRANSDIR)
+   SOURCEDIR=$(dirname "$TRANSDIR")
    # template-update
-   echo "== Template Update =="
--  echo "lupdate $SOURCEDIR -ts $i -locations absolute -no-obsolete\n"
+   printf "== Template Update =="
+-  printf "lupdate %s -ts %s -locations absolute -no-obsolete\n" "$SOURCEDIR" "$i"
 -  lupdate  $SOURCEDIR -ts $i -locations absolute -no-obsolete
-+  echo "@TERMUX_PREFIX@/lib/qt6/bin/lupdate $SOURCEDIR -ts $i -locations absolute -no-obsolete\n"
++  printf "@TERMUX_PREFIX@/lib/qt6/bin/lupdate %s -ts %s -locations absolute -no-obsolete\n" "$SOURCEDIR" "$i"
 +  @TERMUX_PREFIX@/lib/qt6/bin/lupdate  $SOURCEDIR -ts $i -locations absolute -no-obsolete
    echo
-   echo "== Language updates =="
--  echo "lupdate $SOURCEDIR -ts $TRANSDIR/*_*.ts -locations absolute -no-obsolete\n"
+   printf "== Language updates =="
+-  printf "lupdate %s -ts %s/*_*.ts -locations absolute -no-obsolete\n" "$SOURCEDIR" "$i"
 -  lupdate  $SOURCEDIR -ts $TRANSDIR/*_*.ts -locations absolute -no-obsolete
-+  echo "@TERMUX_PREFIX@/lib/qt6/bin/lupdate $SOURCEDIR -ts $TRANSDIR/*_*.ts -locations absolute -no-obsolete\n"
++  printf "@TERMUX_PREFIX@/lib/qt6/bin/lupdate %s -ts %s/*_*.ts -locations absolute -no-obsolete\n" "$SOURCEDIR" "$i"
 +  @TERMUX_PREFIX@/lib/qt6/bin/lupdate  $SOURCEDIR -ts $TRANSDIR/*_*.ts -locations absolute -no-obsolete
  done
