@@ -307,6 +307,9 @@ PACKAGES+=" libkrb5-dev"
 # Required by wine-stable
 PACKAGES+=" libfreetype-dev:i386"
 
+# Required by ibus
+PACKAGES+=" dconf-cli"
+
 # Required by CGCT
 PACKAGES+=" libdebuginfod-dev"
 
