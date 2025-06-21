@@ -1,0 +1,16 @@
+--- a/cli/snapshot/lib.rs
++++ b/cli/snapshot/lib.rs
+@@ -1,10 +1,9 @@
+ // Copyright 2018-2025 the Deno authors. MIT license.
+ 
+ #[cfg(not(feature = "disable"))]
+-pub static CLI_SNAPSHOT: Option<&[u8]> = Some(include_bytes!(concat!(
+-  env!("OUT_DIR"),
+-  "/CLI_SNAPSHOT.bin"
+-)));
++pub static CLI_SNAPSHOT: Option<&[u8]> = Some(include_bytes!(
++  env!("DENO_PREBUILT_CLI_SNAPSHOT")
++));
+ #[cfg(feature = "disable")]
+ pub static CLI_SNAPSHOT: Option<&[u8]> = None;
+ 
