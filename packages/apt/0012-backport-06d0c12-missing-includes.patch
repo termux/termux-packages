@@ -1,0 +1,68 @@
+From 06d0c12be00ee50c965830127f5812d2156681b1 Mon Sep 17 00:00:00 2001
+From: Biswapriyo Nath <nathbappai@gmail.com>
+Date: Wed, 18 Jun 2025 14:03:19 +0000
+Subject: [PATCH] Include standard headers to fix clang compiler error
+
+This commit fixes the following compiler errors.
+apt-pkg/acquire.cc:833:51: error: no template named 'function' in namespace 'std'
+apt-pkg/contrib/error.cc:198:59: error: no member named 'front_inserter' in namespace 'std'
+apt-pkg/solver3.h:44:22: error: no template named 'is_trivially_constructible_v' in namespace 'std'
+methods/http.cc:1029:24: error: no member named 'inserter' in namespace 'std'
+---
+ apt-pkg/acquire.cc       | 1 +
+ apt-pkg/contrib/error.cc | 1 +
+ apt-pkg/solver3.h        | 1 +
+ methods/http.cc          | 1 +
+ 4 files changed, 4 insertions(+)
+
+diff --git a/apt-pkg/acquire.cc b/apt-pkg/acquire.cc
+index 07f64cc69..41c3d9904 100644
+--- a/apt-pkg/acquire.cc
++++ b/apt-pkg/acquire.cc
+@@ -25,6 +25,7 @@
+ #include <algorithm>
+ #include <chrono>
+ #include <cmath>
++#include <functional>
+ #include <iomanip>
+ #include <iostream>
+ #include <memory>
+diff --git a/apt-pkg/contrib/error.cc b/apt-pkg/contrib/error.cc
+index d08d5e008..b60a25ac3 100644
+--- a/apt-pkg/contrib/error.cc
++++ b/apt-pkg/contrib/error.cc
+@@ -30,6 +30,7 @@
+ #include <cstdlib>
+ #include <cstring>
+ #include <iostream>
++#include <iterator>
+ #include <list>
+ #include <string>
+ #include <unistd.h>
+diff --git a/apt-pkg/solver3.h b/apt-pkg/solver3.h
+index 435c1c279..019a01b9f 100644
+--- a/apt-pkg/solver3.h
++++ b/apt-pkg/solver3.h
+@@ -11,6 +11,7 @@
+ #include <memory>
+ #include <optional>
+ #include <queue>
++#include <type_traits>
+ #include <vector>
+ 
+ #include <apt-pkg/configuration.h>
+diff --git a/methods/http.cc b/methods/http.cc
+index a6d7511fd..85350785e 100644
+--- a/methods/http.cc
++++ b/methods/http.cc
+@@ -33,6 +33,7 @@
+ #include <cstdlib>
+ #include <cstring>
+ #include <iostream>
++#include <iterator>
+ #include <sstream>
+ #include <arpa/inet.h>
+ #include <sys/select.h>
+-- 
+GitLab
+
