@@ -1,6 +1,6 @@
 --- ../cache/tmp-checkout/shell/tsu.sh	2024-06-17 17:38:19.114615657 +0000
 +++ ./shell/tsu.sh	2024-06-17 17:40:57.729881388 +0000
-@@ -288,42 +288,24 @@
+@@ -288,42 +288,26 @@
  
  ### TODO: Implement this cleanly.
  
@@ -38,6 +38,8 @@
 -			su_args+=("-c")
 -			exec "${su_args[@]}" "${su_cmdline}"
 +##### ----- OTHERS SU
++#### adding additional magisk su path in patch
++SU_BINARY_SEARCH+=("/debug_ramdisk/su" "/product/bin/su" "/magisk/.core/bin/su")
 +for SU_BINARY in "${SU_BINARY_SEARCH[@]}"; do
 +	if [[ -x "$SU_BINARY" ]]; then
 +
