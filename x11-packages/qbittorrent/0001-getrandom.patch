@@ -1,6 +1,6 @@
 --- a/src/base/utils/randomlayer_linux.cpp
 +++ b/src/base/utils/randomlayer_linux.cpp
-@@ -34,6 +34,9 @@
+@@ -35,6 +35,9 @@
  
  #include <QtLogging>
  
@@ -10,7 +10,19 @@
  namespace
  {
      class RandomLayer
-@@ -63,7 +66,11 @@ namespace
+@@ -45,7 +48,11 @@
+ 
+         RandomLayer()
+         {
++#if defined(__ANDROID__) && __ANDROID_API__ < 28
++            if (syscall(__NR_getrandom, nullptr, 0, 0) < 0)
++#else
+             if (::getrandom(nullptr, 0, 0) < 0)
++#endif
+             {
+                 if (errno == ENOSYS)
+                 {
+@@ -93,7 +100,11 @@
              for (int i = 0; i < RETRY_MAX; ++i)
              {
                  result_type buf = 0;
