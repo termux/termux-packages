@@ -1,0 +1,28 @@
+`setgroups` are only allowed when user is root, i.e. `getuid() == 0`
+
+https://github.com/denoland/deno/issues/19759#issuecomment-2914426954
+
+--- a/ext/process/lib.rs
++++ b/ext/process/lib.rs
+@@ -520,7 +520,9 @@
+           libc::close(src);
+         }
+       }
+-      libc::setgroups(0, std::ptr::null());
++      if libc::getuid() == 0 {
++        libc::setgroups(0, std::ptr::null());
++      }
+       Ok(())
+     });
+ 
+@@ -1068,7 +1070,9 @@
+     #[allow(clippy::undocumented_unsafe_blocks)]
+     unsafe {
+       c.pre_exec(|| {
+-        libc::setgroups(0, std::ptr::null());
++        if libc::getuid() == 0 {
++          libc::setgroups(0, std::ptr::null());
++        }
+         Ok(())
+       });
+     }
