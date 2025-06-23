@@ -1,0 +1,59 @@
+--- a/src/netxs/desktopio/system.hpp
++++ b/src/netxs/desktopio/system.hpp
+@@ -60,7 +60,9 @@
+         #endif
+         #include <linux/keyboard.h> // ::keyb_ioctl()
+         #include <linux/input.h>    // mouse button codes: BTN_LEFT ...
++        #if !defined(__ANDROID__)
+         #include <libinput.h>       // libinput API
++        #endif
+         #include <dlfcn.h>          // ::dlopen()
+     #endif
+ 
+@@ -4693,7 +4695,7 @@
+                 }
+             });
+         }
+-        #if defined(__linux__)
++        #if defined(__linux__) && !defined(__ANDROID__)
+         namespace libinput
+         {
+             struct libinput;
+@@ -5217,7 +5219,7 @@
+                 {
+                     log(prompt::tty, "Pseudoterminal ", tty_name);
+                 }
+-                #if defined(__linux__)
++                #if defined(__linux__) && !defined(__ANDROID__)
+                 else // Trying to get direct access to mouse devices.
+                 {
+                     log("%%Linux console %tty%", prompt::tty, tty_name);
+@@ -5802,7 +5804,7 @@
+                                   whlacc = fp2d{},
+                                   dev_map = std::unordered_map<arch, si32>{}]() mutable
+                 {
+-                    #if defined(__linux__)
++                    #if defined(__linux__) && !defined(__ANDROID__)
+                     while (true)
+                     {
+                         if (auto e = os::tty::libinput::next_event())
+@@ -5954,7 +5956,7 @@
+                                micefd,       m_proc,
+                                alarm,        f_proc);
+                 }
+-                #if defined(__linux__)
++                #if defined(__linux__)&& !defined(__ANDROID__)
+                 os::tty::libinput::uninitialize();
+                 #endif
+ 
+--- a/src/vtm.cpp
++++ b/src/vtm.cpp
+@@ -125,7 +125,7 @@
+                 break;
+             }
+         }
+-        #if defined(__linux__)
++        #if defined(__linux__) && !defined(__ANDROID__)
+         else if (getopt.match("--SetMouseAccess"))
+         {
+             os::dtvt::initialize();
