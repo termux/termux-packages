@@ -27,19 +27,25 @@
          return;
 --- a/src/plugins/clangformat/clangformatutils.cpp
 +++ b/src/plugins/clangformat/clangformatutils.cpp
-@@ -51,7 +51,10 @@
+@@ -51,7 +51,16 @@
      style.Language = FormatStyle::LK_Cpp;
      style.AccessModifierOffset = -4;
      style.AlignAfterOpenBracket = FormatStyle::BAS_Align;
 -#if LLVM_VERSION_MAJOR >= 12
-+#if LLVM_VERSION_MAJOR >= 15
++#if LLVM_VERSION_MAJOR >= 20
++    style.AlignConsecutiveAssignments = {false, false, false, false, false, false, false};
++    style.AlignConsecutiveDeclarations = {false, false, false, false, false, false, false};
++#elif LLVM_VERSION_MAJOR >= 18
++    style.AlignConsecutiveAssignments = {false, false, false, false, false, false};
++    style.AlignConsecutiveDeclarations = {false, false, false, false, false, false};
++#elif LLVM_VERSION_MAJOR >= 15
 +    style.AlignConsecutiveAssignments = {false, false, false, false, false};
 +    style.AlignConsecutiveDeclarations = {false, false, false, false, false};
 +#elif LLVM_VERSION_MAJOR >= 12
      style.AlignConsecutiveAssignments = FormatStyle::ACS_None;
      style.AlignConsecutiveDeclarations = FormatStyle::ACS_None;
  #else
-@@ -64,7 +67,11 @@
+@@ -64,7 +73,11 @@
  #else
      style.AlignOperands = true;
  #endif
@@ -51,7 +57,29 @@
      style.AllowAllParametersOfDeclarationOnNextLine = true;
  #if LLVM_VERSION_MAJOR >= 10
      style.AllowShortBlocksOnASingleLine = FormatStyle::SBS_Never;
-@@ -111,7 +118,11 @@
+@@ -79,11 +92,20 @@
+     style.AllowShortIfStatementsOnASingleLine = false;
+ #endif
+     style.AllowShortLoopsOnASingleLine = false;
+-    style.AlwaysBreakAfterReturnType = FormatStyle::RTBS_None;
+     style.AlwaysBreakBeforeMultilineStrings = false;
++#if LLVM_VERSION_MAJOR >= 19
++    style.BreakAfterReturnType = FormatStyle::RTBS_None;
++    style.BreakTemplateDeclarations = FormatStyle::BTDS_Yes;
++#else
++    style.AlwaysBreakAfterReturnType = FormatStyle::RTBS_None;
+     style.AlwaysBreakTemplateDeclarations = FormatStyle::BTDS_Yes;
++#endif
+     style.BinPackArguments = false;
++#if LLVM_VERSION_MAJOR >= 20
++    style.BinPackParameters = FormatStyle::BPPS_OnePerLine;
++#else
+     style.BinPackParameters = false;
++#endif
+     style.BraceWrapping.AfterClass = true;
+ #if LLVM_VERSION_MAJOR >= 10
+     style.BraceWrapping.AfterControlStatement = FormatStyle::BWACS_Never;
+@@ -111,7 +133,11 @@
      style.ColumnLimit = 100;
      style.CommentPragmas = "^ IWYU pragma:";
      style.CompactNamespaces = false;
@@ -63,10 +91,38 @@
      style.ConstructorInitializerIndentWidth = 4;
      style.ContinuationIndentWidth = 4;
      style.Cpp11BracedListStyle = true;
-@@ -145,18 +156,36 @@
+@@ -120,14 +146,22 @@
+     style.ExperimentalAutoDetectBinPacking = false;
+     style.FixNamespaceComments = true;
+     style.ForEachMacros = {"forever", "foreach", "Q_FOREACH", "BOOST_FOREACH"};
++#if LLVM_VERSION_MAJOR >= 12
++    style.IncludeStyle.IncludeCategories = {{"^<Q.*", 200, 200, true}};
++#else
+     style.IncludeStyle.IncludeCategories = {{"^<Q.*", 200, 200}};
++#endif
+     style.IncludeStyle.IncludeIsMainRegex = "(Test)?$";
+     style.IndentCaseLabels = false;
+     style.IndentWidth = 4;
+     style.IndentWrappedFunctionNames = false;
+     style.JavaScriptQuotes = FormatStyle::JSQS_Leave;
+     style.JavaScriptWrapImports = true;
++#if LLVM_VERSION_MAJOR >= 19
++    style.KeepEmptyLines = {false, false, false};
++#else
+     style.KeepEmptyLinesAtTheStartOfBlocks = false;
++#endif
+     // Do not add QT_BEGIN_NAMESPACE/QT_END_NAMESPACE as this will indent lines in between.
+     style.MacroBlockBegin = "";
+     style.MacroBlockEnd = "";
+@@ -144,19 +178,41 @@
+     style.PenaltyExcessCharacter = 50;
      style.PenaltyReturnTypeOnItsOwnLine = 300;
      style.PointerAlignment = FormatStyle::PAS_Right;
++#if LLVM_VERSION_MAJOR >= 20
++    style.ReflowComments = FormatStyle::RCS_Never;
++#else
      style.ReflowComments = false;
++#endif
 +#if LLVM_VERSION_MAJOR >= 13
 +    style.SortIncludes = FormatStyle::SI_CaseSensitive;
 +#else
