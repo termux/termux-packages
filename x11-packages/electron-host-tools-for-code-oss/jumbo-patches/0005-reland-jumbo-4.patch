@@ -9,44 +9,51 @@ Enable jumbo build for the following template(s):
 - //v8/gni/v8.gni -> template("v8_header_set")
 
 ---
- BUILD.gn                                      | 86 +++++++++++++++++++
- gni/v8.gni                                    |  7 +-
- src/baseline/arm/baseline-compiler-arm-inl.h  |  2 +
- src/baseline/baseline-compiler.cc             |  4 +
- src/compiler/backend/instruction.h            |  4 +-
- .../wasm-load-elimination-reducer.h           |  1 +
- src/compiler/wasm-compiler.cc                 | 36 ++++----
- src/diagnostics/perf-jit.cc                   |  2 +
- src/handles/global-handles.cc                 |  4 +-
- src/heap/code-range.cc                        | 10 +--
- src/heap/cppgc/concurrent-marker.cc           |  4 +
- src/heap/cppgc/marker.cc                      |  4 +
- src/heap/minor-mark-sweep.cc                  |  6 +-
- src/inspector/BUILD.gn                        |  1 +
- src/inspector/value-mirror.cc                 | 10 +--
- .../default-thread-isolated-allocator.cc      |  2 +
- src/maglev/arm/maglev-ir-arm.cc               |  2 +
- src/maglev/maglev-assembler-inl.h             |  4 +-
- src/maglev/maglev-assembler.cc                |  2 +
- src/maglev/maglev-code-generator.cc           |  4 +-
- src/maglev/maglev-ir.cc                       |  2 +
- src/objects/js-atomics-synchronization.h      |  8 +-
- src/objects/js-collator.cc                    |  4 +
- src/objects/js-duration-format.cc             |  4 +-
- src/objects/js-list-format.cc                 |  4 +-
- src/objects/js-plural-rules.cc                |  4 +
- .../experimental/experimental-compiler.cc     |  4 +-
- src/regexp/regexp-compiler-tonode.cc          | 16 ++--
- src/sandbox/testing.cc                        |  1 +
- src/snapshot/read-only-deserializer.cc        |  4 +-
- src/torque/csa-generator.cc                   |  8 +-
- src/utils/sha-256.cc                          |  3 +
- src/wasm/wasm-external-refs.cc                |  3 +
- src/wasm/wrappers.cc                          |  2 +
- 34 files changed, 196 insertions(+), 66 deletions(-)
+ v8/BUILD.gn                                   | 104 ++++++++++++++++++
+ v8/gni/v8.gni                                 |   7 +-
+ .../baseline/arm/baseline-compiler-arm-inl.h  |   2 +
+ v8/src/baseline/baseline-compiler.cc          |   2 +
+ v8/src/compiler/backend/instruction.h         |   4 +-
+ v8/src/compiler/decompression-optimizer.cc    |   4 +
+ v8/src/compiler/heap-refs.cc                  |   4 +
+ .../turboshaft/loop-unrolling-reducer.cc      |   6 +-
+ .../wasm-in-js-inlining-reducer-inl.h         |   2 +
+ .../wasm-load-elimination-reducer.h           |   1 +
+ v8/src/compiler/wasm-compiler.cc              |  20 ++--
+ v8/src/diagnostics/perf-jit.cc                |   2 +
+ v8/src/handles/global-handles.cc              |   4 +-
+ v8/src/heap/code-range.cc                     |  10 +-
+ v8/src/heap/cppgc/concurrent-marker.cc        |   4 +
+ v8/src/heap/cppgc/marker.cc                   |   4 +
+ v8/src/heap/minor-mark-sweep.cc               |   6 +-
+ v8/src/inspector/BUILD.gn                     |   1 +
+ v8/src/inspector/value-mirror.cc              |  10 +-
+ .../default-thread-isolated-allocator.cc      |   2 +
+ v8/src/maglev/arm/maglev-ir-arm.cc            |   2 +
+ v8/src/maglev/maglev-assembler-inl.h          |   4 +-
+ v8/src/maglev/maglev-assembler.cc             |   2 +
+ v8/src/maglev/maglev-code-generator.cc        |   4 +-
+ v8/src/maglev/maglev-graph-builder.cc         |   4 +-
+ v8/src/maglev/maglev-ir.cc                    |   2 +
+ v8/src/objects/js-atomics-synchronization.h   |   8 +-
+ v8/src/objects/js-collator.cc                 |   4 +
+ v8/src/objects/js-duration-format.cc          |   4 +-
+ v8/src/objects/js-list-format.cc              |   4 +-
+ v8/src/objects/js-plural-rules.cc             |   4 +
+ .../experimental/experimental-compiler.cc     |   4 +-
+ v8/src/regexp/regexp-compiler-tonode.cc       |  16 +--
+ v8/src/sandbox/testing.cc                     |   1 +
+ v8/src/snapshot/read-only-deserializer.cc     |   4 +-
+ v8/src/torque/csa-generator.cc                |   8 +-
+ v8/src/utils/sha-256.cc                       |   3 +
+ v8/src/wasm/compilation-environment-inl.h     |   5 +-
+ v8/src/wasm/wasm-external-refs.cc             |   3 +
+ v8/src/wasm/wasm-module-sourcemap.cc          |   4 +-
+ v8/src/wasm/wrappers.cc                       |   2 +
+ 41 files changed, 224 insertions(+), 67 deletions(-)
 
-diff --git a/BUILD.gn b/BUILD.gn
-index 92e85419..cded6cc8 100644
+diff --git a/v8/BUILD.gn b/v8/BUILD.gn
+index 001b079..6bda909 100644
 --- a/v8/BUILD.gn
 +++ b/v8/BUILD.gn
 @@ -7,6 +7,7 @@ import("//build/config/arm.gni")
@@ -57,8 +64,8 @@ index 92e85419..cded6cc8 100644
  import("//build/config/mips.gni")
  import("//build/config/riscv.gni")
  import("//build/config/sanitizers/sanitizers.gni")
-@@ -2962,26 +2963,54 @@ v8_source_set("v8_initializers") {
-     ]
+@@ -2983,26 +2984,54 @@ v8_source_set("v8_initializers") {
+     }
    }
  
 +  jumbo_excluded_sources = [
@@ -112,17 +119,27 @@ index 92e85419..cded6cc8 100644
    } else if (v8_current_cpu == "mips64" || v8_current_cpu == "mips64el") {
      sources += [
        ### gcmole(mips64el) ###
-@@ -4965,6 +4994,9 @@ v8_compiler_sources = [
-   "src/compiler/verifier.cc",
+@@ -5024,6 +5053,19 @@ v8_compiler_sources = [
    "src/compiler/zone-stats.cc",
  ]
+ 
 +v8_compiler_sources_jumbo_excluded = [
 +  "src/compiler/bytecode-analysis.cc",
++
++  # `using namespace compiler::turboshaft` causes `Type` ambiguous
++  "src/compiler/backend/instruction-selector.cc",
++
++  # FIXME:
++  # no type named 'kTurboshaft' in 'v8::internal::compiler::PhaseKind'
++  # no type named 'kThreadSpecific' in 'v8::internal::RuntimeCallStats'
++  "src/compiler/turboshaft/csa-optimize-phase.cc",
++  "src/compiler/turboshaft/pipelines.cc",
 +]
- 
- if (v8_current_cpu == "x86") {
++
+ if (!v8_enable_maglev) {
+   # When Maglev is not enabled, Turboshaft still needs Maglev's graph builder.
    v8_compiler_sources += [
-@@ -4973,6 +5005,11 @@ if (v8_current_cpu == "x86") {
+@@ -5044,6 +5086,11 @@ if (v8_current_cpu == "x86") {
      "src/compiler/backend/ia32/instruction-scheduler-ia32.cc",
      "src/compiler/backend/ia32/instruction-selector-ia32.cc",
    ]
@@ -134,7 +151,7 @@ index 92e85419..cded6cc8 100644
  } else if (v8_current_cpu == "x64") {
    v8_compiler_sources += [
      ### gcmole(x64) ###
-@@ -4981,6 +5018,9 @@ if (v8_current_cpu == "x86") {
+@@ -5052,6 +5099,9 @@ if (v8_current_cpu == "x86") {
      "src/compiler/backend/x64/instruction-selector-x64.cc",
      "src/compiler/backend/x64/unwinding-info-writer-x64.cc",
    ]
@@ -144,7 +161,7 @@ index 92e85419..cded6cc8 100644
  } else if (v8_current_cpu == "arm") {
    v8_compiler_sources += [
      ### gcmole(arm) ###
-@@ -4989,6 +5029,9 @@ if (v8_current_cpu == "x86") {
+@@ -5060,6 +5110,9 @@ if (v8_current_cpu == "x86") {
      "src/compiler/backend/arm/instruction-selector-arm.cc",
      "src/compiler/backend/arm/unwinding-info-writer-arm.cc",
    ]
@@ -154,7 +171,7 @@ index 92e85419..cded6cc8 100644
  } else if (v8_current_cpu == "arm64") {
    v8_compiler_sources += [
      ### gcmole(arm64) ###
-@@ -4997,6 +5040,9 @@ if (v8_current_cpu == "x86") {
+@@ -5068,6 +5121,9 @@ if (v8_current_cpu == "x86") {
      "src/compiler/backend/arm64/instruction-selector-arm64.cc",
      "src/compiler/backend/arm64/unwinding-info-writer-arm64.cc",
    ]
@@ -164,7 +181,7 @@ index 92e85419..cded6cc8 100644
  } else if (v8_current_cpu == "mips64" || v8_current_cpu == "mips64el") {
    v8_compiler_sources += [
      ### gcmole(mips64el) ###
-@@ -5095,6 +5141,7 @@ v8_source_set("v8_compiler_for_mksnapshot_source_set") {
+@@ -5156,6 +5212,7 @@ v8_source_set("v8_compiler_for_mksnapshot_source_set") {
    visibility = [ ":*" ]  # Only targets in this file can depend on this.
  
    sources = v8_compiler_sources
@@ -172,7 +189,7 @@ index 92e85419..cded6cc8 100644
  
    public_deps = [
      ":generate_bytecode_builtins_list",
-@@ -5129,6 +5176,7 @@ v8_source_set("v8_compiler") {
+@@ -5190,6 +5247,7 @@ v8_source_set("v8_compiler") {
  
    if (v8_enable_turbofan) {
      sources = v8_compiler_sources
@@ -180,7 +197,7 @@ index 92e85419..cded6cc8 100644
    } else {
      # With Turbofan disabled, we only include the stubbed-out API.
      sources = [ "src/compiler/turbofan-disabled.cc" ]
-@@ -5749,6 +5797,8 @@ v8_source_set("v8_base_without_compiler") {
+@@ -5737,6 +5795,8 @@ v8_source_set("v8_base_without_compiler") {
      ]
    }
  
@@ -189,7 +206,18 @@ index 92e85419..cded6cc8 100644
    if (v8_enable_maglev) {
      sources += [
        "src/maglev/maglev-assembler.cc",
-@@ -5781,6 +5831,10 @@ v8_source_set("v8_base_without_compiler") {
+@@ -5764,6 +5824,10 @@ v8_source_set("v8_base_without_compiler") {
+         "src/maglev/arm64/maglev-assembler-arm64.cc",
+         "src/maglev/arm64/maglev-ir-arm64.cc",
+       ]
++      jumbo_excluded_sources += [
++        "src/maglev/arm64/maglev-assembler-arm64.cc",
++        "src/maglev/arm64/maglev-ir-arm64.cc",
++      ]
+     } else if (v8_current_cpu == "riscv64") {
+       sources += [
+         "src/maglev/riscv/maglev-assembler-riscv.cc",
+@@ -5774,6 +5838,10 @@ v8_source_set("v8_base_without_compiler") {
          "src/maglev/x64/maglev-assembler-x64.cc",
          "src/maglev/x64/maglev-ir-x64.cc",
        ]
@@ -200,7 +228,7 @@ index 92e85419..cded6cc8 100644
      } else if (v8_current_cpu == "s390x") {
        sources += [
          "src/maglev/s390/maglev-assembler-s390.cc",
-@@ -5795,6 +5849,13 @@ v8_source_set("v8_base_without_compiler") {
+@@ -5788,6 +5856,13 @@ v8_source_set("v8_base_without_compiler") {
        "src/tracing/perfetto-logger.cc",
        "src/tracing/perfetto-utils.cc",
      ]
@@ -214,7 +242,18 @@ index 92e85419..cded6cc8 100644
    }
  
    if (v8_enable_webassembly) {
-@@ -5890,6 +5951,26 @@ v8_source_set("v8_base_without_compiler") {
+@@ -5847,6 +5922,10 @@ v8_source_set("v8_base_without_compiler") {
+       "src/wasm/well-known-imports.cc",
+       "src/wasm/wrappers.cc",
+     ]
++    jumbo_excluded_sources += [
++      # Too many marco conflictions
++      "src/wasm/baseline/liftoff-compiler.cc",
++    ]
+     if (v8_wasm_random_fuzzers) {
+       sources += [
+         ### gcmole(all) ###
+@@ -5881,6 +5960,26 @@ v8_source_set("v8_base_without_compiler") {
      sources += [ "src/heap/reference-summarizer.cc" ]
    }
  
@@ -241,7 +280,7 @@ index 92e85419..cded6cc8 100644
    if (v8_current_cpu == "x86") {
      sources += [
        ### gcmole(ia32) ###
-@@ -5997,6 +6078,11 @@ v8_source_set("v8_base_without_compiler") {
+@@ -5988,6 +6087,11 @@ v8_source_set("v8_base_without_compiler") {
      if (is_win) {
        sources += [ "src/diagnostics/unwinding-info-win64.cc" ]
      }
@@ -253,8 +292,8 @@ index 92e85419..cded6cc8 100644
    } else if (v8_current_cpu == "mips64" || v8_current_cpu == "mips64el") {
      sources += [
        ### gcmole(mips64el) ###
-diff --git a/gni/v8.gni b/gni/v8.gni
-index 9ee57a49..5aa1b49b 100644
+diff --git a/v8/gni/v8.gni b/v8/gni/v8.gni
+index 4efb4d6..4907e4a 100644
 --- a/v8/gni/v8.gni
 +++ b/v8/gni/v8.gni
 @@ -4,6 +4,7 @@
@@ -265,7 +304,7 @@ index 9ee57a49..5aa1b49b 100644
  import("//build/config/gclient_args.gni")
  import("//build/config/ios/config.gni")
  import("//build/config/ios/ios_sdk_overrides.gni")
-@@ -299,9 +300,9 @@ template("v8_source_set") {
+@@ -321,9 +322,9 @@ template("v8_source_set") {
        defined(v8_static_library) && v8_static_library && is_win) {
      link_target_type = "split_static_library"
    } else if (defined(v8_static_library) && v8_static_library) {
@@ -277,7 +316,7 @@ index 9ee57a49..5aa1b49b 100644
    }
    target(link_target_type, target_name) {
      forward_variables_from(invoker,
-@@ -320,7 +321,7 @@ template("v8_source_set") {
+@@ -342,7 +343,7 @@ template("v8_source_set") {
  }
  
  template("v8_header_set") {
@@ -286,8 +325,8 @@ index 9ee57a49..5aa1b49b 100644
      forward_variables_from(invoker, "*", [ "configs" ])
      configs -= v8_remove_configs
      configs += v8_add_configs
-diff --git a/src/baseline/arm/baseline-compiler-arm-inl.h b/src/baseline/arm/baseline-compiler-arm-inl.h
-index 6d99dbe5..d6805a0a 100644
+diff --git a/v8/src/baseline/arm/baseline-compiler-arm-inl.h b/v8/src/baseline/arm/baseline-compiler-arm-inl.h
+index 6d99dbe..d6805a0 100644
 --- a/v8/src/baseline/arm/baseline-compiler-arm-inl.h
 +++ b/v8/src/baseline/arm/baseline-compiler-arm-inl.h
 @@ -95,6 +95,8 @@ void BaselineCompiler::VerifyFrameSize() {
@@ -299,26 +338,24 @@ index 6d99dbe5..d6805a0a 100644
  }  // namespace baseline
  }  // namespace internal
  }  // namespace v8
-diff --git a/src/baseline/baseline-compiler.cc b/src/baseline/baseline-compiler.cc
-index 37a0dfbb..31f3e3da 100644
+diff --git a/v8/src/baseline/baseline-compiler.cc b/v8/src/baseline/baseline-compiler.cc
+index eaec6ca..7e846bb 100644
 --- a/v8/src/baseline/baseline-compiler.cc
 +++ b/v8/src/baseline/baseline-compiler.cc
-@@ -2412,6 +2412,10 @@ SaveAccumulatorScope::~SaveAccumulatorScope() {
-   assembler_->Pop(kInterpreterAccumulatorRegister);
- }
+@@ -2474,6 +2474,8 @@ SaveAccumulatorScope::~SaveAccumulatorScope() {
+ #undef RCS_BASELINE_SCOPE
+ #undef __
  
-+#undef  __
-+
 +#undef  __
 +
  }  // namespace baseline
  }  // namespace internal
  }  // namespace v8
-diff --git a/src/compiler/backend/instruction.h b/src/compiler/backend/instruction.h
-index 93778525..34a9f41b 100644
+diff --git a/v8/src/compiler/backend/instruction.h b/v8/src/compiler/backend/instruction.h
+index c42a4e5..8c1bb45 100644
 --- a/v8/src/compiler/backend/instruction.h
 +++ b/v8/src/compiler/backend/instruction.h
-@@ -519,9 +519,9 @@ class LocationOperand : public InstructionOperand {
+@@ -520,9 +520,9 @@ class LocationOperand : public InstructionOperand {
      return static_cast<int64_t>(value_) >> IndexField::kShift;
    }
  
@@ -330,11 +367,90 @@ index 93778525..34a9f41b 100644
    }
  
    FloatRegister GetFloatRegister() const {
-diff --git a/src/compiler/turboshaft/wasm-load-elimination-reducer.h b/src/compiler/turboshaft/wasm-load-elimination-reducer.h
-index ee5aa71f..6c4cc1af 100644
+diff --git a/v8/src/compiler/decompression-optimizer.cc b/v8/src/compiler/decompression-optimizer.cc
+index 9e493e6..909112a 100644
+--- a/v8/src/compiler/decompression-optimizer.cc
++++ b/v8/src/compiler/decompression-optimizer.cc
+@@ -8,6 +8,8 @@
+ #include "src/compiler/node-properties.h"
+ #include "src/compiler/turbofan-graph.h"
+ 
++#define Replace Replace_DecompressionOptimizer
++
+ namespace v8 {
+ namespace internal {
+ namespace compiler {
+@@ -406,3 +408,5 @@ void DecompressionOptimizer::Reduce() {
+ }  // namespace compiler
+ }  // namespace internal
+ }  // namespace v8
++
++#undef Replace
+diff --git a/v8/src/compiler/heap-refs.cc b/v8/src/compiler/heap-refs.cc
+index 81f0a42..2a8299b 100644
+--- a/v8/src/compiler/heap-refs.cc
++++ b/v8/src/compiler/heap-refs.cc
+@@ -26,6 +26,8 @@
+ #include "src/objects/property-cell.h"
+ #include "src/objects/template-objects-inl.h"
+ 
++#define Is64 Is64_HeapRefs
++
+ namespace v8 {
+ namespace internal {
+ namespace compiler {
+@@ -2510,3 +2512,5 @@ unsigned CodeRef::GetInlinedBytecodeSize() const {
+ }  // namespace compiler
+ }  // namespace internal
+ }  // namespace v8
++
++#undef Is64
+diff --git a/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc b/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc
+index ef7bb8e..c46db2f 100644
+--- a/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc
++++ b/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc
+@@ -11,12 +11,12 @@
+ #include "src/compiler/turboshaft/loop-finder.h"
+ 
+ #ifdef DEBUG
+-#define TRACE(x)                                                               \
++#define TRACE_IN_LOOP_UNROLLING_REDUCER(x)                                                               \
+   do {                                                                         \
+     if (v8_flags.turboshaft_trace_unrolling) StdoutStream() << x << std::endl; \
+   } while (false)
+ #else
+-#define TRACE(x)
++#define TRACE_IN_LOOP_UNROLLING_REDUCER(x)
+ #endif
+ 
+ namespace v8::internal::compiler::turboshaft {
+@@ -27,7 +27,7 @@ using BinOp = StaticCanonicalForLoopMatcher::BinOp;
+ void LoopUnrollingAnalyzer::DetectUnrollableLoops() {
+   for (const auto& [start, info] : loop_finder_.LoopHeaders()) {
+     IterationCount iter_count = GetLoopIterationCount(info);
+-    TRACE("LoopUnrollingAnalyzer: loop at "
++    TRACE_IN_LOOP_UNROLLING_REDUCER("LoopUnrollingAnalyzer: loop at "
+           << start->index() << " ==> iter_count=" << iter_count);
+     loop_iteration_count_.insert({start, iter_count});
+ 
+diff --git a/v8/src/compiler/turboshaft/wasm-in-js-inlining-reducer-inl.h b/v8/src/compiler/turboshaft/wasm-in-js-inlining-reducer-inl.h
+index e3e8922..37b9781 100644
+--- a/v8/src/compiler/turboshaft/wasm-in-js-inlining-reducer-inl.h
++++ b/v8/src/compiler/turboshaft/wasm-in-js-inlining-reducer-inl.h
+@@ -1233,6 +1233,8 @@ V<Any> WasmInJSInliningReducer<Next>::TryInlineWasmCall(
+   return emitting_decoder.interface().Result();
+ }
+ 
++#undef TRACE
++
+ }  // namespace v8::internal::compiler::turboshaft
+ 
+ #include "src/compiler/turboshaft/undef-assembler-macros.inc"
+diff --git a/v8/src/compiler/turboshaft/wasm-load-elimination-reducer.h b/v8/src/compiler/turboshaft/wasm-load-elimination-reducer.h
+index bc7c160..71e577c 100644
 --- a/v8/src/compiler/turboshaft/wasm-load-elimination-reducer.h
 +++ b/v8/src/compiler/turboshaft/wasm-load-elimination-reducer.h
-@@ -530,6 +530,7 @@ class WasmLoadEliminationReducer : public Next {
+@@ -533,6 +533,7 @@ class WasmLoadEliminationReducer : public Next {
    EMIT_OP(StringAsWtf16)
    EMIT_OP(StringPrepareForGetCodeUnit)
    EMIT_OP(AnyConvertExtern)
@@ -342,8 +458,93 @@ index ee5aa71f..6c4cc1af 100644
  
    OpIndex REDUCE_INPUT_GRAPH(StructSet)(OpIndex ig_index,
                                          const StructSetOp& op) {
-diff --git a/src/diagnostics/perf-jit.cc b/src/diagnostics/perf-jit.cc
-index 2423c8a9..661c5a2d 100644
+diff --git a/v8/src/compiler/wasm-compiler.cc b/v8/src/compiler/wasm-compiler.cc
+index 0d854a2..ca69941 100644
+--- a/v8/src/compiler/wasm-compiler.cc
++++ b/v8/src/compiler/wasm-compiler.cc
+@@ -70,7 +70,7 @@ namespace {
+ 
+ // Use MachineType::Pointer() over Tagged() to load root pointers because they
+ // do not get compressed.
+-#define LOAD_ROOT(RootName, factory_name)                         \
++#define LOAD_ROOT_IN_WASM_COMPILER(RootName, factory_name)                         \
+   (isolate_ ? graph()->NewNode(mcgraph()->common()->HeapConstant( \
+                   isolate_->factory()->factory_name()))           \
+             : gasm_->LoadImmutable(                               \
+@@ -277,7 +277,7 @@ Node* WasmGraphBuilder::Int32Constant(int32_t value) {
+ }
+ 
+ Node* WasmGraphBuilder::UndefinedValue() {
+-  return LOAD_ROOT(UndefinedValue, undefined_value);
++  return LOAD_ROOT_IN_WASM_COMPILER(UndefinedValue, undefined_value);
+ }
+ 
+ // TODO(ahaas): Merge TrapId with TrapReason.
+@@ -684,8 +684,8 @@ class WasmWrapperGraphBuilder : public WasmGraphBuilder {
+   Node* IsNull(Node* object, wasm::CanonicalValueType type) {
+     // We immediately lower null in wrappers, as they do not go through a
+     // lowering phase.
+-    Node* null = type.use_wasm_null() ? LOAD_ROOT(WasmNull, wasm_null)
+-                                      : LOAD_ROOT(NullValue, null_value);
++    Node* null = type.use_wasm_null() ? LOAD_ROOT_IN_WASM_COMPILER(WasmNull, wasm_null)
++                                      : LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value);
+     return gasm_->TaggedEqual(object, null);
+   }
+ 
+@@ -898,7 +898,7 @@ class WasmWrapperGraphBuilder : public WasmGraphBuilder {
+             return node;
+           case wasm::HeapType::kNone:
+           case wasm::HeapType::kNoFunc:
+-            return LOAD_ROOT(NullValue, null_value);
++            return LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value);
+           case wasm::HeapType::kEq:
+           case wasm::HeapType::kStruct:
+           case wasm::HeapType::kArray:
+@@ -907,7 +907,7 @@ class WasmWrapperGraphBuilder : public WasmGraphBuilder {
+           case wasm::HeapType::kAny: {
+             auto done = gasm_->MakeLabel(MachineRepresentation::kTaggedPointer);
+             gasm_->GotoIfNot(IsNull(node, type), &done, node);
+-            gasm_->Goto(&done, LOAD_ROOT(NullValue, null_value));
++            gasm_->Goto(&done, LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value));
+             gasm_->Bind(&done);
+             return done.PhiAt(0);
+           }
+@@ -939,14 +939,14 @@ class WasmWrapperGraphBuilder : public WasmGraphBuilder {
+                   Operator::kNoProperties, internal, context);
+               gasm_->Goto(&done, from_builtin);
+               gasm_->Bind(&null_label);
+-              gasm_->Goto(&done, LOAD_ROOT(NullValue, null_value));
++              gasm_->Goto(&done, LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value));
+               gasm_->Bind(&done);
+               return done.PhiAt(0);
+             } else {
+               auto done =
+                   gasm_->MakeLabel(MachineRepresentation::kTaggedPointer);
+               gasm_->GotoIfNot(IsNull(node, type), &done, node);
+-              gasm_->Goto(&done, LOAD_ROOT(NullValue, null_value));
++              gasm_->Goto(&done, LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value));
+               gasm_->Bind(&done);
+               return done.PhiAt(0);
+             }
+@@ -1263,7 +1263,7 @@ class WasmWrapperGraphBuilder : public WasmGraphBuilder {
+         auto done = gasm_->MakeLabel();
+         gasm_->GotoIf(IsSmi(input), &done);
+         Node* map = gasm_->LoadMap(input);
+-        Node* heap_number_map = LOAD_ROOT(HeapNumberMap, heap_number_map);
++        Node* heap_number_map = LOAD_ROOT_IN_WASM_COMPILER(HeapNumberMap, heap_number_map);
+ #if V8_MAP_PACKING
+         Node* is_heap_number = gasm_->WordEqual(heap_number_map, map);
+ #else
+@@ -1865,6 +1865,6 @@ AssemblerOptions WasmStubAssemblerOptions() {
+   };
+ }
+ 
+-#undef LOAD_ROOT
++#undef LOAD_ROOT_IN_WASM_COMPILER
+ 
+ }  // namespace v8::internal::compiler
+diff --git a/v8/src/diagnostics/perf-jit.cc b/v8/src/diagnostics/perf-jit.cc
+index d474acc..b79fc44 100644
 --- a/v8/src/diagnostics/perf-jit.cc
 +++ b/v8/src/diagnostics/perf-jit.cc
 @@ -37,6 +37,8 @@
@@ -355,8 +556,8 @@ index 2423c8a9..661c5a2d 100644
  #include <memory>
  
  #include "src/base/platform/wrappers.h"
-diff --git a/src/handles/global-handles.cc b/src/handles/global-handles.cc
-index 1d046648..e135f1c3 100644
+diff --git a/v8/src/handles/global-handles.cc b/v8/src/handles/global-handles.cc
+index df49d64..6892f4a 100644
 --- a/v8/src/handles/global-handles.cc
 +++ b/v8/src/handles/global-handles.cc
 @@ -756,7 +756,7 @@ void GlobalHandles::InvokeSecondPassPhantomCallbacks() {
@@ -377,11 +578,11 @@ index 1d046648..e135f1c3 100644
          GCTracer::Scope::HEAP_EXTERNAL_EPILOGUE);
    }
  }
-diff --git a/src/heap/code-range.cc b/src/heap/code-range.cc
-index ce03e353..f2fd6623 100644
+diff --git a/v8/src/heap/code-range.cc b/v8/src/heap/code-range.cc
+index 93f058b..f1a9999 100644
 --- a/v8/src/heap/code-range.cc
 +++ b/v8/src/heap/code-range.cc
-@@ -97,7 +97,7 @@
+@@ -97,7 +97,7 @@ size_t CodeRange::GetWritableReservedAreaSize() {
    return kReservedCodeRangePages * MemoryAllocator::GetCommitPageSize();
  }
  
@@ -390,7 +591,7 @@ index ce03e353..f2fd6623 100644
    if (v8_flags.trace_code_range_allocation) PrintF(__VA_ARGS__)
  
  bool CodeRange::InitReservation(v8::PageAllocator* page_allocator,
-@@ -146,7 +146,7 @@
+@@ -146,7 +146,7 @@ bool CodeRange::InitReservation(v8::PageAllocator* page_allocator,
        kMaxPCRelativeCodeRangeInMB > 1024 ? kMaxPCRelativeCodeRangeInMB : 4096;
    auto preferred_region = GetPreferredRegion(kRadiusInMB, kPageSize);
  
@@ -399,7 +600,7 @@ index ce03e353..f2fd6623 100644
          reinterpret_cast<void*>(preferred_region.begin()),
          reinterpret_cast<void*>(preferred_region.end()));
  
-@@ -175,10 +175,10 @@
+@@ -175,10 +175,10 @@ bool CodeRange::InitReservation(v8::PageAllocator* page_allocator,
      Address step =
          RoundDown(preferred_region.size() / kAllocationTries, kPageSize);
      for (int i = 0; i < kAllocationTries; i++) {
@@ -412,7 +613,7 @@ index ce03e353..f2fd6623 100644
                reinterpret_cast<void*>(params.requested_start_hint),
                reinterpret_cast<void*>(candidate_cage.region().begin()),
                reinterpret_cast<void*>(candidate_cage.region().end()));
-@@ -206,7 +206,7 @@
+@@ -206,7 +206,7 @@ bool CodeRange::InitReservation(v8::PageAllocator* page_allocator,
        params.requested_start_hint = kNullAddress;
        if (!VirtualMemoryCage::InitReservation(params)) return false;
      }
@@ -421,8 +622,8 @@ index ce03e353..f2fd6623 100644
            reinterpret_cast<void*>(params.requested_start_hint),
            reinterpret_cast<void*>(region().begin()),
            reinterpret_cast<void*>(region().end()));
-diff --git a/src/heap/cppgc/concurrent-marker.cc b/src/heap/cppgc/concurrent-marker.cc
-index 2c9401b6..5b1e1862 100644
+diff --git a/v8/src/heap/cppgc/concurrent-marker.cc b/v8/src/heap/cppgc/concurrent-marker.cc
+index cc87fe3..bdcb34f 100644
 --- a/v8/src/heap/cppgc/concurrent-marker.cc
 +++ b/v8/src/heap/cppgc/concurrent-marker.cc
 @@ -19,6 +19,8 @@ namespace {
@@ -433,15 +634,15 @@ index 2c9401b6..5b1e1862 100644
 +
  static constexpr size_t kDefaultDeadlineCheckInterval = 750u;
  
- template <size_t kDeadlineCheckInterval = kDefaultDeadlineCheckInterval,
-@@ -266,3 +268,5 @@ std::unique_ptr<Visitor> ConcurrentMarker::CreateConcurrentMarkingVisitor(
+ template <StatsCollector::ConcurrentScopeId scope_id,
+@@ -268,3 +270,5 @@ std::unique_ptr<Visitor> ConcurrentMarker::CreateConcurrentMarkingVisitor(
  
  }  // namespace internal
  }  // namespace cppgc
 +
 +#undef kDefaultDeadlineCheckInterval
-diff --git a/src/heap/cppgc/marker.cc b/src/heap/cppgc/marker.cc
-index 369f852b..ef36b477 100644
+diff --git a/v8/src/heap/cppgc/marker.cc b/v8/src/heap/cppgc/marker.cc
+index 6af8063..80b7018 100644
 --- a/v8/src/heap/cppgc/marker.cc
 +++ b/v8/src/heap/cppgc/marker.cc
 @@ -57,6 +57,8 @@ bool ExitIncrementalMarkingIfNeeded(MarkingConfig config, HeapBase& heap) {
@@ -452,18 +653,18 @@ index 369f852b..ef36b477 100644
 +
  static constexpr size_t kDefaultDeadlineCheckInterval = 150u;
  
- template <size_t kDeadlineCheckInterval = kDefaultDeadlineCheckInterval,
-@@ -796,3 +798,5 @@ Marker::Marker(HeapBase& heap, cppgc::Platform* platform, MarkingConfig config)
+ template <StatsCollector::ScopeId scope_id,
+@@ -769,3 +771,5 @@ Marker::Marker(HeapBase& heap, cppgc::Platform* platform, MarkingConfig config)
  
  }  // namespace internal
  }  // namespace cppgc
 +
 +#undef kDefaultDeadlineCheckInterval
-diff --git a/src/heap/minor-mark-sweep.cc b/src/heap/minor-mark-sweep.cc
-index bcf1e0fa..6cabdca6 100644
+diff --git a/v8/src/heap/minor-mark-sweep.cc b/v8/src/heap/minor-mark-sweep.cc
+index 77f3230..d635af3 100644
 --- a/v8/src/heap/minor-mark-sweep.cc
 +++ b/v8/src/heap/minor-mark-sweep.cc
-@@ -838,7 +838,7 @@ namespace {
+@@ -844,7 +844,7 @@ namespace {
  
  // NewSpacePages with more live bytes than this threshold qualify for fast
  // evacuation.
@@ -472,7 +673,7 @@ index bcf1e0fa..6cabdca6 100644
    return v8_flags.minor_ms_page_promotion_threshold *
           MemoryChunkLayout::AllocatableMemoryInDataPage() / 100;
  }
-@@ -850,7 +850,7 @@ bool ShouldMovePage(PageMetadata* p, intptr_t live_bytes,
+@@ -856,7 +856,7 @@ bool ShouldMovePage(PageMetadata* p, intptr_t live_bytes,
    Heap* heap = p->heap();
    DCHECK(!p->Chunk()->NeverEvacuate());
    const bool should_move_page =
@@ -481,7 +682,7 @@ index bcf1e0fa..6cabdca6 100644
         (p->AllocatedLabSize() == 0)) &&
        (heap->new_space()->IsPromotionCandidate(p)) &&
        heap->CanExpandOldGeneration(live_bytes);
-@@ -861,7 +861,7 @@ bool ShouldMovePage(PageMetadata* p, intptr_t live_bytes,
+@@ -867,7 +867,7 @@ bool ShouldMovePage(PageMetadata* p, intptr_t live_bytes,
          ", live bytes = %zu, wasted bytes = %zu, promotion threshold = %zu"
          ", allocated labs size = %zu\n",
          p, should_move_page, live_bytes, wasted_bytes,
@@ -490,8 +691,8 @@ index bcf1e0fa..6cabdca6 100644
    }
    if (!should_move_page &&
        (p->AgeInNewSpace() == v8_flags.minor_ms_max_page_age)) {
-diff --git a/src/inspector/BUILD.gn b/src/inspector/BUILD.gn
-index 9a863232..422ea603 100644
+diff --git a/v8/src/inspector/BUILD.gn b/v8/src/inspector/BUILD.gn
+index 9a86323..422ea60 100644
 --- a/v8/src/inspector/BUILD.gn
 +++ b/v8/src/inspector/BUILD.gn
 @@ -171,6 +171,7 @@ v8_source_set("inspector") {
@@ -502,8 +703,8 @@ index 9a863232..422ea603 100644
  }
  
  #Target to generate all .cc files.
-diff --git a/src/inspector/value-mirror.cc b/src/inspector/value-mirror.cc
-index 5cecb472..25e1c63d 100644
+diff --git a/v8/src/inspector/value-mirror.cc b/v8/src/inspector/value-mirror.cc
+index b02dc23..c804d2c 100644
 --- a/v8/src/inspector/value-mirror.cc
 +++ b/v8/src/inspector/value-mirror.cc
 @@ -200,7 +200,7 @@ String16 abbreviateString(const String16& value, AbbreviateMode mode) {
@@ -551,8 +752,8 @@ index 5cecb472..25e1c63d 100644
        symbolMirror = ValueMirror::create(context, symbol);
      }
  
-diff --git a/src/libplatform/default-thread-isolated-allocator.cc b/src/libplatform/default-thread-isolated-allocator.cc
-index bda0e43c..36a365b2 100644
+diff --git a/v8/src/libplatform/default-thread-isolated-allocator.cc b/v8/src/libplatform/default-thread-isolated-allocator.cc
+index bda0e43..36a365b 100644
 --- a/v8/src/libplatform/default-thread-isolated-allocator.cc
 +++ b/v8/src/libplatform/default-thread-isolated-allocator.cc
 @@ -16,6 +16,8 @@
@@ -564,11 +765,11 @@ index bda0e43c..36a365b2 100644
  #if V8_HAS_PKU_JIT_WRITE_PROTECT
  
  extern int pkey_alloc(unsigned int flags, unsigned int access_rights) V8_WEAK;
-diff --git a/src/maglev/arm/maglev-ir-arm.cc b/src/maglev/arm/maglev-ir-arm.cc
-index 9a49fec0..35dcef48 100644
+diff --git a/v8/src/maglev/arm/maglev-ir-arm.cc b/v8/src/maglev/arm/maglev-ir-arm.cc
+index 0b800de..1fdd575 100644
 --- a/v8/src/maglev/arm/maglev-ir-arm.cc
 +++ b/v8/src/maglev/arm/maglev-ir-arm.cc
-@@ -900,6 +900,8 @@ void Return::GenerateCode(MaglevAssembler* masm, const ProcessingState& state) {
+@@ -892,6 +892,8 @@ void Return::GenerateCode(MaglevAssembler* masm, const ProcessingState& state) {
    __ Ret();
  }
  
@@ -577,11 +778,11 @@ index 9a49fec0..35dcef48 100644
  }  // namespace maglev
  }  // namespace internal
  }  // namespace v8
-diff --git a/src/maglev/maglev-assembler-inl.h b/src/maglev/maglev-assembler-inl.h
-index fb0229a9..74242adb 100644
+diff --git a/v8/src/maglev/maglev-assembler-inl.h b/v8/src/maglev/maglev-assembler-inl.h
+index aea49fc..836cf70 100644
 --- a/v8/src/maglev/maglev-assembler-inl.h
 +++ b/v8/src/maglev/maglev-assembler-inl.h
-@@ -510,11 +510,11 @@ void CheckArgs(Args&&... args) {}
+@@ -572,11 +572,11 @@ void CheckArgs(Args&&... args) {}
  
  #endif  // DEBUG
  
@@ -595,12 +796,12 @@ index fb0229a9..74242adb 100644
            masm->Push(std::forward<decltype(stack_args)>(stack_args)...);
          } else {
            masm->PushReverse(std::forward<decltype(stack_args)>(stack_args)...);
-diff --git a/src/maglev/maglev-assembler.cc b/src/maglev/maglev-assembler.cc
-index c21d2046..13d7f807 100644
+diff --git a/v8/src/maglev/maglev-assembler.cc b/v8/src/maglev/maglev-assembler.cc
+index d7877e2..6cfcc65 100644
 --- a/v8/src/maglev/maglev-assembler.cc
 +++ b/v8/src/maglev/maglev-assembler.cc
-@@ -605,6 +605,8 @@ void MaglevAssembler::TryMigrateInstance(Register object,
-   CompareTaggedAndJumpIf(return_val, Smi::zero(), kEqual, fail);
+@@ -735,6 +735,8 @@ void MaglevAssembler::TryMigrateInstanceAndMarkMapAsMigrationTarget(
+   save_register_state.DefineSafepoint();
  }
  
 +#undef __
@@ -608,8 +809,8 @@ index c21d2046..13d7f807 100644
  }  // namespace maglev
  }  // namespace internal
  }  // namespace v8
-diff --git a/src/maglev/maglev-code-generator.cc b/src/maglev/maglev-code-generator.cc
-index 744d93a5..319a7668 100644
+diff --git a/v8/src/maglev/maglev-code-generator.cc b/v8/src/maglev/maglev-code-generator.cc
+index ca6c492..79aed82 100644
 --- a/v8/src/maglev/maglev-code-generator.cc
 +++ b/v8/src/maglev/maglev-code-generator.cc
 @@ -426,7 +426,6 @@ class ParallelMoveResolver {
@@ -628,7 +829,7 @@ index 744d93a5..319a7668 100644
        if (targets.needs_decompression == kNeedsDecompression) {
          __ DecompressTagged(register_with_slot_value, register_with_slot_value);
          targets.needs_decompression = kDoesNotNeedDecompression;
-@@ -2052,6 +2050,8 @@ Handle<DeoptimizationData> MaglevCodeGenerator::GenerateDeoptimizationData(
+@@ -2120,6 +2118,8 @@ Handle<DeoptimizationData> MaglevCodeGenerator::GenerateDeoptimizationData(
    return data;
  }
  
@@ -637,21 +838,41 @@ index 744d93a5..319a7668 100644
  }  // namespace maglev
  }  // namespace internal
  }  // namespace v8
-diff --git a/src/maglev/maglev-ir.cc b/src/maglev/maglev-ir.cc
-index b8b2ad1d..dcb67ada 100644
+diff --git a/v8/src/maglev/maglev-graph-builder.cc b/v8/src/maglev/maglev-graph-builder.cc
+index 1535afc..0b49c12 100644
+--- a/v8/src/maglev/maglev-graph-builder.cc
++++ b/v8/src/maglev/maglev-graph-builder.cc
+@@ -69,13 +69,13 @@
+ #include "src/objects/intl-objects.h"
+ #endif
+ 
+-#define TRACE(...)                            \
++#define TRACE_IN_MAGLEV_GRAPH_BUILDER(...)                            \
+   if (v8_flags.trace_maglev_graph_building) { \
+     std::cout << __VA_ARGS__ << std::endl;    \
+   }
+ 
+ #define FAIL(...)                                                         \
+-  TRACE("Failed " << __func__ << ":" << __LINE__ << ": " << __VA_ARGS__); \
++  TRACE_IN_MAGLEV_GRAPH_BUILDER("Failed " << __func__ << ":" << __LINE__ << ": " << __VA_ARGS__); \
+   return {};
+ 
+ namespace v8::internal::maglev {
+diff --git a/v8/src/maglev/maglev-ir.cc b/v8/src/maglev/maglev-ir.cc
+index 7d59b87..4694c9b 100644
 --- a/v8/src/maglev/maglev-ir.cc
 +++ b/v8/src/maglev/maglev-ir.cc
-@@ -7333,6 +7333,8 @@ void MigrateMapIfNeeded::ClearUnstableNodeAspects(
-   // themselves, so cached values are still valid.
- }
+@@ -8069,6 +8069,8 @@ template class CheckedNumberOrOddballToFloat64OrHoleyFloat64<
+ template class CheckedNumberOrOddballToFloat64OrHoleyFloat64<
+     CheckedNumberOrOddballToHoleyFloat64, ValueRepresentation::kHoleyFloat64>;
  
 +#undef __
 +
  }  // namespace maglev
  }  // namespace internal
  }  // namespace v8
-diff --git a/src/objects/js-atomics-synchronization.h b/src/objects/js-atomics-synchronization.h
-index 2950abed..a304ae3b 100644
+diff --git a/v8/src/objects/js-atomics-synchronization.h b/v8/src/objects/js-atomics-synchronization.h
+index 238c2de..b02bce5 100644
 --- a/v8/src/objects/js-atomics-synchronization.h
 +++ b/v8/src/objects/js-atomics-synchronization.h
 @@ -29,11 +29,11 @@ template <typename T>
@@ -670,61 +891,61 @@ index 2950abed..a304ae3b 100644
  
  // JSSynchronizationPrimitive is the base class for JSAtomicsMutex and
  // JSAtomicsCondition. It contains a 32-bit state field and a pointer to a
-diff --git a/src/objects/js-collator.cc b/src/objects/js-collator.cc
-index 7d92c39a..0613cc64 100644
+diff --git a/v8/src/objects/js-collator.cc b/v8/src/objects/js-collator.cc
+index 405cad1..3c5032b 100644
 --- a/v8/src/objects/js-collator.cc
 +++ b/v8/src/objects/js-collator.cc
-@@ -51,6 +51,8 @@ Maybe<CaseFirst> GetCaseFirst(Isolate* isolate, Handle<JSReceiver> options,
+@@ -52,6 +52,8 @@ Maybe<CaseFirst> GetCaseFirst(Isolate* isolate,
        CaseFirst::kUndefined);
  }
  
 +#define CreateDataPropertyForOptions CreateDataPropertyForOptions_JSCollator
 +
  // TODO(gsathya): Consider internalizing the value strings.
- void CreateDataPropertyForOptions(Isolate* isolate, Handle<JSObject> options,
-                                   Handle<String> key, const char* value) {
-@@ -590,3 +592,5 @@ const std::set<std::string>& JSCollator::GetAvailableLocales() {
+ void CreateDataPropertyForOptions(Isolate* isolate,
+                                   DirectHandle<JSObject> options,
+@@ -593,3 +595,5 @@ const std::set<std::string>& JSCollator::GetAvailableLocales() {
  
  }  // namespace internal
  }  // namespace v8
 +
 +#undef CreateDataPropertyForOptions
-diff --git a/src/objects/js-duration-format.cc b/src/objects/js-duration-format.cc
-index 80816570..97d73ebb 100644
+diff --git a/v8/src/objects/js-duration-format.cc b/v8/src/objects/js-duration-format.cc
+index 5a9414b..bf27c3b 100644
 --- a/v8/src/objects/js-duration-format.cc
 +++ b/v8/src/objects/js-duration-format.cc
-@@ -1050,7 +1050,7 @@ MaybeHandle<String> FormattedToString(
+@@ -1071,7 +1071,7 @@ MaybeDirectHandle<String> FormattedToString(
    return Intl::FormattedToString(isolate, formatted);
  }
  
--MaybeHandle<JSArray> FormattedListToJSArray(
-+MaybeHandle<JSArray> FormattedListToJSArray_JSDurationFormat(
+-MaybeDirectHandle<JSArray> FormattedListToJSArray(
++MaybeDirectHandle<JSArray> FormattedListToJSArray_JSDurationFormat(
      Isolate* isolate, const icu::FormattedValue& formatted,
      const std::vector<std::vector<Part>>* parts,
      JSDurationFormat::Separator separator) {
-@@ -1112,7 +1112,7 @@ MaybeHandle<String> JSDurationFormat::Format(Isolate* isolate,
- MaybeHandle<JSArray> JSDurationFormat::FormatToParts(
-     Isolate* isolate, Handle<JSDurationFormat> df, Handle<Object> duration) {
+@@ -1134,7 +1134,7 @@ MaybeDirectHandle<JSArray> JSDurationFormat::FormatToParts(
+     Isolate* isolate, DirectHandle<JSDurationFormat> df,
+     Handle<Object> duration) {
    const char* method_name = "Intl.DurationFormat.prototype.formatToParts";
 -  return FormatCommon<JSArray, true, FormattedListToJSArray>(
 +  return FormatCommon<JSArray, true, FormattedListToJSArray_JSDurationFormat>(
        isolate, df, duration, method_name);
  }
  
-diff --git a/src/objects/js-list-format.cc b/src/objects/js-list-format.cc
-index 0f6b6090..6a80857b 100644
+diff --git a/v8/src/objects/js-list-format.cc b/v8/src/objects/js-list-format.cc
+index d5dacda..baca118 100644
 --- a/v8/src/objects/js-list-format.cc
 +++ b/v8/src/objects/js-list-format.cc
-@@ -247,7 +247,7 @@ Handle<String> IcuFieldIdToType(Isolate* isolate, int32_t field_id) {
+@@ -247,7 +247,7 @@ DirectHandle<String> IcuFieldIdToType(Isolate* isolate, int32_t field_id) {
  
  // A helper function to convert the FormattedList to a
  // MaybeHandle<JSArray> for the implementation of formatToParts.
--MaybeHandle<JSArray> FormattedListToJSArray(
-+MaybeHandle<JSArray> FormattedListToJSArray_JSListFormat(
+-MaybeDirectHandle<JSArray> FormattedListToJSArray(
++MaybeDirectHandle<JSArray> FormattedListToJSArray_JSListFormat(
      Isolate* isolate, const icu::FormattedValue& formatted) {
-   Handle<JSArray> array = isolate->factory()->NewJSArray(0);
+   DirectHandle<JSArray> array = isolate->factory()->NewJSArray(0);
    icu::ConstrainedFieldPosition cfpos;
-@@ -285,7 +285,7 @@ MaybeHandle<JSArray> JSListFormat::FormatListToParts(
+@@ -285,7 +285,7 @@ MaybeDirectHandle<JSArray> JSListFormat::FormatListToParts(
      Isolate* isolate, DirectHandle<JSListFormat> format,
      DirectHandle<FixedArray> list) {
    return FormatListCommon<JSArray>(isolate, format, list,
@@ -733,11 +954,11 @@ index 0f6b6090..6a80857b 100644
  }
  
  namespace {
-diff --git a/src/objects/js-plural-rules.cc b/src/objects/js-plural-rules.cc
-index a2e0610a..ffb98b73 100644
+diff --git a/v8/src/objects/js-plural-rules.cc b/v8/src/objects/js-plural-rules.cc
+index 4606b75..ad3d618 100644
 --- a/v8/src/objects/js-plural-rules.cc
 +++ b/v8/src/objects/js-plural-rules.cc
-@@ -221,6 +221,8 @@ MaybeHandle<String> JSPluralRules::ResolvePluralRange(
+@@ -223,6 +223,8 @@ MaybeDirectHandle<String> JSPluralRules::ResolvePluralRange(
    return Intl::ToString(isolate, result);
  }
  
@@ -745,18 +966,18 @@ index a2e0610a..ffb98b73 100644
 +
  namespace {
  
- void CreateDataPropertyForOptions(Isolate* isolate, Handle<JSObject> options,
-@@ -370,3 +372,5 @@ const std::set<std::string>& JSPluralRules::GetAvailableLocales() {
+ void CreateDataPropertyForOptions(Isolate* isolate,
+@@ -387,3 +389,5 @@ const std::set<std::string>& JSPluralRules::GetAvailableLocales() {
  
  }  // namespace internal
  }  // namespace v8
 +
 +#undef CreateDataPropertyForOptions
-diff --git a/src/regexp/experimental/experimental-compiler.cc b/src/regexp/experimental/experimental-compiler.cc
-index f33e9fb8..0bf07b12 100644
+diff --git a/v8/src/regexp/experimental/experimental-compiler.cc b/v8/src/regexp/experimental/experimental-compiler.cc
+index 7bee9f1..391dac8 100644
 --- a/v8/src/regexp/experimental/experimental-compiler.cc
 +++ b/v8/src/regexp/experimental/experimental-compiler.cc
-@@ -233,7 +233,7 @@ bool ExperimentalRegExpCompiler::CanBeHandled(RegExpTree* tree,
+@@ -224,7 +224,7 @@ bool ExperimentalRegExpCompiler::CanBeHandled(RegExpTree* tree,
    return CanBeHandledVisitor::Check(tree, flags, capture_count);
  }
  
@@ -765,7 +986,7 @@ index f33e9fb8..0bf07b12 100644
  
  // A label in bytecode which starts with no known address. The address *must*
  // be bound with `Bind` before the label goes out of scope.
-@@ -1094,7 +1094,7 @@ class CompileVisitor : private RegExpVisitor {
+@@ -1226,7 +1226,7 @@ class CompileVisitor : private RegExpVisitor {
  
  ZoneList<RegExpInstruction> ExperimentalRegExpCompiler::Compile(
      RegExpTree* tree, RegExpFlags flags, Zone* zone) {
@@ -774,8 +995,8 @@ index f33e9fb8..0bf07b12 100644
  }
  
  }  // namespace internal
-diff --git a/src/regexp/regexp-compiler-tonode.cc b/src/regexp/regexp-compiler-tonode.cc
-index f7da936a..dd057f32 100644
+diff --git a/v8/src/regexp/regexp-compiler-tonode.cc b/v8/src/regexp/regexp-compiler-tonode.cc
+index a71b611..b7de236 100644
 --- a/v8/src/regexp/regexp-compiler-tonode.cc
 +++ b/v8/src/regexp/regexp-compiler-tonode.cc
 @@ -23,7 +23,7 @@ namespace internal {
@@ -786,8 +1007,8 @@ index f7da936a..dd057f32 100644
 +constexpr base::uc32 kMaxCodePoint2 = 0x10ffff;
  constexpr int kMaxUtf16CodeUnit = 0xffff;
  constexpr uint32_t kMaxUtf16CodeUnitU = 0xffff;
- constexpr int32_t kMaxOneByteCharCode = unibrow::Latin1::kMaxChar;
-@@ -72,7 +72,7 @@ bool CompareInverseRanges(ZoneList<CharacterRange>* ranges,
+ 
+@@ -71,7 +71,7 @@ bool CompareInverseRanges(ZoneList<CharacterRange>* ranges,
      }
    }
  
@@ -805,7 +1026,7 @@ index f7da936a..dd057f32 100644
      ZoneList<CharacterRange>* negated =
          zone->New<ZoneList<CharacterRange>>(2, zone);
      CharacterRange::Negate(ranges, negated, zone);
-@@ -1375,7 +1375,7 @@ void AddClassNegated(const int* elmv, int elmc,
+@@ -1377,7 +1377,7 @@ void AddClassNegated(const int* elmv, int elmc,
    elmc--;
    DCHECK_EQ(kRangeEndMarker, elmv[elmc]);
    DCHECK_NE(0x0000, elmv[0]);
@@ -814,7 +1035,7 @@ index f7da936a..dd057f32 100644
    base::uc16 last = 0x0000;
    for (int i = 0; i < elmc; i += 2) {
      DCHECK(last <= elmv[i] - 1);
-@@ -1383,7 +1383,7 @@ void AddClassNegated(const int* elmv, int elmc,
+@@ -1385,7 +1385,7 @@ void AddClassNegated(const int* elmv, int elmc,
      ranges->Add(CharacterRange::Range(last, elmv[i] - 1), zone);
      last = elmv[i + 1];
    }
@@ -823,7 +1044,7 @@ index f7da936a..dd057f32 100644
  }
  
  }  // namespace
-@@ -1727,8 +1727,8 @@ void CharacterRange::Negate(const ZoneList<CharacterRange>* ranges,
+@@ -1730,8 +1730,8 @@ void CharacterRange::Negate(const ZoneList<CharacterRange>* ranges,
      from = range.to() + 1;
      i++;
    }
@@ -834,7 +1055,7 @@ index f7da936a..dd057f32 100644
    }
  }
  
-@@ -1779,7 +1779,7 @@ void SafeAdvanceRange(const ZoneList<CharacterRange>* range, int* index,
+@@ -1782,7 +1782,7 @@ void SafeAdvanceRange(const ZoneList<CharacterRange>* range, int* index,
      *from = range->at(*index).from();
      *to = range->at(*index).to();
    } else {
@@ -843,8 +1064,8 @@ index f7da936a..dd057f32 100644
    }
  }
  
-diff --git a/src/sandbox/testing.cc b/src/sandbox/testing.cc
-index fe18387b..1a6d1a65 100644
+diff --git a/v8/src/sandbox/testing.cc b/v8/src/sandbox/testing.cc
+index eab9352..9a664e1 100644
 --- a/v8/src/sandbox/testing.cc
 +++ b/v8/src/sandbox/testing.cc
 @@ -18,6 +18,7 @@
@@ -855,8 +1076,8 @@ index fe18387b..1a6d1a65 100644
  #endif  // V8_OS_LINUX
  
  #ifdef V8_USE_ADDRESS_SANITIZER
-diff --git a/src/snapshot/read-only-deserializer.cc b/src/snapshot/read-only-deserializer.cc
-index 99bcad5f..bc3426da 100644
+diff --git a/v8/src/snapshot/read-only-deserializer.cc b/v8/src/snapshot/read-only-deserializer.cc
+index acc28b0..b29ad2b 100644
 --- a/v8/src/snapshot/read-only-deserializer.cc
 +++ b/v8/src/snapshot/read-only-deserializer.cc
 @@ -187,7 +187,7 @@ void ReadOnlyDeserializer::DeserializeIntoIsolate() {
@@ -868,7 +1089,7 @@ index 99bcad5f..bc3426da 100644
    // The following check will trigger if a function or object template with
    // references to native functions have been deserialized from snapshot, but
    // no actual external references were provided when the isolate was created.
-@@ -238,7 +238,7 @@ class ObjectPostProcessor final {
+@@ -237,7 +237,7 @@ class ObjectPostProcessor final {
        const intptr_t* refs = isolate_->api_external_references();
        Address address =
            refs == nullptr
@@ -877,11 +1098,11 @@ index 99bcad5f..bc3426da 100644
                : static_cast<Address>(refs[index]);
        DCHECK_NE(address, kNullAddress);
        return address;
-diff --git a/src/torque/csa-generator.cc b/src/torque/csa-generator.cc
-index ec9eaccf..0fdaa4de 100644
+diff --git a/v8/src/torque/csa-generator.cc b/v8/src/torque/csa-generator.cc
+index fb2dea9..2aacbb9 100644
 --- a/v8/src/torque/csa-generator.cc
 +++ b/v8/src/torque/csa-generator.cc
-@@ -924,8 +924,8 @@ void CSAGenerator::EmitInstruction(const StoreReferenceInstruction& instruction,
+@@ -946,8 +946,8 @@ void CSAGenerator::EmitInstruction(const StoreReferenceInstruction& instruction,
  }
  
  namespace {
@@ -892,7 +1113,7 @@ index ec9eaccf..0fdaa4de 100644
    auto smi_tagged_type =
        Type::MatchUnaryGeneric(container, TypeOracle::GetSmiTaggedGeneric());
    std::string container_type = smi_tagged_type
-@@ -978,7 +978,7 @@ void CSAGenerator::EmitInstruction(const LoadBitFieldInstruction& instruction,
+@@ -1000,7 +1000,7 @@ void CSAGenerator::EmitInstruction(const LoadBitFieldInstruction& instruction,
    out() << "    " << result_name << " = ca_.UncheckedCast<"
          << field_type->GetGeneratedTNodeTypeName()
          << ">(CodeStubAssembler(state_)." << decoder << "<"
@@ -901,7 +1122,7 @@ index ec9eaccf..0fdaa4de 100644
          << ">(ca_.UncheckedCast<" << struct_word_type << ">("
          << bit_field_struct << ")));\n";
  }
-@@ -1020,7 +1020,7 @@ void CSAGenerator::EmitInstruction(const StoreBitFieldInstruction& instruction,
+@@ -1042,7 +1042,7 @@ void CSAGenerator::EmitInstruction(const StoreBitFieldInstruction& instruction,
  
    std::string result_expression =
        "CodeStubAssembler(state_)." + encoder + "<" +
@@ -910,8 +1131,8 @@ index ec9eaccf..0fdaa4de 100644
        ">(ca_.UncheckedCast<" + struct_word_type + ">(" + bit_field_struct +
        "), ca_.UncheckedCast<" + field_word_type + ">(" + value + ")" +
        (instruction.starts_as_zero ? ", true" : "") + ")";
-diff --git a/src/utils/sha-256.cc b/src/utils/sha-256.cc
-index 4b1d2bd4..f55c0b4a 100644
+diff --git a/v8/src/utils/sha-256.cc b/v8/src/utils/sha-256.cc
+index 4b1d2bd..f55c0b4 100644
 --- a/v8/src/utils/sha-256.cc
 +++ b/v8/src/utils/sha-256.cc
 @@ -174,3 +174,6 @@ const uint8_t* SHA256_hash(const void* data, size_t len, uint8_t* digest) {
@@ -921,377 +1142,8 @@ index 4b1d2bd4..f55c0b4a 100644
 +
 +#undef ror
 +#undef shr
-diff --git a/src/wasm/wasm-external-refs.cc b/src/wasm/wasm-external-refs.cc
-index d0ff8432..c8a06119 100644
---- a/v8/src/wasm/wasm-external-refs.cc
-+++ b/v8/src/wasm/wasm-external-refs.cc
-@@ -454,6 +454,8 @@ V ReadAndIncrementOffset(Address data, size_t* offset) {
-   return result;
- }
- 
-+#define kSuccess kSuccess_WASMExternalRefs
-+
- constexpr int32_t kSuccess = 1;
- constexpr int32_t kOutOfBounds = 0;
- }  // namespace
-@@ -748,3 +750,4 @@ void switch_from_the_central_stack_for_js(Isolate* isolate,
- 
- #undef V8_WITH_SANITIZER
- #undef RESET_THREAD_IN_WASM_FLAG_FOR_ASAN_ON_WINDOWS
-+#undef kSuccess
-diff --git a/src/wasm/wrappers.cc b/src/wasm/wrappers.cc
-index fd1ab9a3..fd1fece6 100644
---- a/v8/src/wasm/wrappers.cc
-+++ b/v8/src/wasm/wrappers.cc
-@@ -1366,4 +1366,6 @@ void BuildWasmWrapper(compiler::turboshaft::PipelineData* data,
-   }
- }
- 
-+#include "src/compiler/turboshaft/undef-assembler-macros.inc"
-+
- }  // namespace v8::internal::wasm
---- a/v8/src/compiler/wasm-compiler.cc
-+++ b/v8/src/compiler/wasm-compiler.cc
-@@ -91,18 +91,18 @@
-       assert_size(WASM_INSTANCE_OBJECT_SIZE(name), type), GetInstanceData(), \
-       wasm::ObjectAccess::ToTagged(WasmTrustedInstanceData::k##name##Offset))
- 
--#define LOAD_INSTANCE_FIELD(name, type)                                      \
-+#define LOAD_INSTANCE_FIELD_(name, type)                                      \
-   gasm_->LoadImmutable(                                                      \
-       assert_size(WASM_INSTANCE_OBJECT_SIZE(name), type), GetInstanceData(), \
-       wasm::ObjectAccess::ToTagged(WasmTrustedInstanceData::k##name##Offset))
- 
--#define LOAD_PROTECTED_INSTANCE_FIELD(name) \
-+#define LOAD_PROTECTED_INSTANCE_FIELD_(name) \
-   gasm_->LoadProtectedPointerFromObject(    \
-       GetInstanceData(),                    \
-       wasm::ObjectAccess::ToTagged(         \
-           WasmTrustedInstanceData::kProtected##name##Offset));
- 
--#define LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD(name) \
-+#define LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD_(name) \
-   gasm_->LoadImmutableProtectedPointerFromObject(     \
-       GetInstanceData(),                              \
-       wasm::ObjectAccess::ToTagged(                   \
-@@ -115,7 +115,7 @@
- 
- // Use MachineType::Pointer() over Tagged() to load root pointers because they
- // do not get compressed.
--#define LOAD_ROOT(RootName, factory_name)                         \
-+#define LOAD_ROOT_IN_WASM_COMPILER(RootName, factory_name)                         \
-   (isolate_ ? graph()->NewNode(mcgraph()->common()->HeapConstant( \
-                   isolate_->factory()->factory_name()))           \
-             : gasm_->LoadImmutable(                               \
-@@ -410,7 +410,7 @@
- }
- 
- Node* WasmGraphBuilder::RefFunc(uint32_t function_index) {
--  Node* func_refs = LOAD_INSTANCE_FIELD(FuncRefs, MachineType::TaggedPointer());
-+  Node* func_refs = LOAD_INSTANCE_FIELD_(FuncRefs, MachineType::TaggedPointer());
-   Node* maybe_function =
-       gasm_->LoadFixedArrayElementPtr(func_refs, function_index);
-   auto done = gasm_->MakeLabel(MachineRepresentation::kTaggedPointer);
-@@ -456,7 +456,7 @@
- }
- 
- Node* WasmGraphBuilder::UndefinedValue() {
--  return LOAD_ROOT(UndefinedValue, undefined_value);
-+  return LOAD_ROOT_IN_WASM_COMPILER(UndefinedValue, undefined_value);
- }
- 
- void WasmGraphBuilder::StackCheck(
-@@ -2398,7 +2398,7 @@
- 
- Node* WasmGraphBuilder::LoadJSTag() {
-   Node* context =
--      LOAD_INSTANCE_FIELD(NativeContext, MachineType::TaggedPointer());
-+      LOAD_INSTANCE_FIELD_(NativeContext, MachineType::TaggedPointer());
-   Node* tag_obj =
-       gasm_->Load(MachineType::TaggedPointer(), context,
-                   NativeContext::SlotOffset(Context::WASM_JS_TAG_INDEX));
-@@ -2413,7 +2413,7 @@
- 
- Node* WasmGraphBuilder::LoadTagFromTable(uint32_t tag_index) {
-   Node* tags_table =
--      LOAD_INSTANCE_FIELD(TagsTable, MachineType::TaggedPointer());
-+      LOAD_INSTANCE_FIELD_(TagsTable, MachineType::TaggedPointer());
-   Node* tag = gasm_->LoadFixedArrayElementPtr(tags_table, tag_index);
-   return tag;
- }
-@@ -2421,8 +2421,8 @@
- Node* WasmGraphBuilder::GetExceptionTag(Node* except_obj) {
-   return gasm_->CallBuiltin(
-       Builtin::kWasmGetOwnProperty, Operator::kEliminatable, except_obj,
--      LOAD_ROOT(wasm_exception_tag_symbol, wasm_exception_tag_symbol),
--      LOAD_INSTANCE_FIELD(NativeContext, MachineType::TaggedPointer()));
-+      LOAD_ROOT_IN_WASM_COMPILER(wasm_exception_tag_symbol, wasm_exception_tag_symbol),
-+      LOAD_INSTANCE_FIELD_(NativeContext, MachineType::TaggedPointer()));
- }
- 
- Node* WasmGraphBuilder::GetExceptionValues(Node* except_obj,
-@@ -2430,8 +2430,8 @@
-                                            base::Vector<Node*> values) {
-   Node* values_array = gasm_->CallBuiltin(
-       Builtin::kWasmGetOwnProperty, Operator::kEliminatable, except_obj,
--      LOAD_ROOT(wasm_exception_values_symbol, wasm_exception_values_symbol),
--      LOAD_INSTANCE_FIELD(NativeContext, MachineType::TaggedPointer()));
-+      LOAD_ROOT_IN_WASM_COMPILER(wasm_exception_values_symbol, wasm_exception_values_symbol),
-+      LOAD_INSTANCE_FIELD_(NativeContext, MachineType::TaggedPointer()));
-   uint32_t index = 0;
-   const wasm::WasmTagSig* sig = tag->sig;
-   DCHECK_EQ(sig->parameter_count(), values.size());
-@@ -2897,7 +2897,7 @@
-     IsReturnCall continuation, Node* frame_state) {
-   // Load the imported function refs array from the instance.
-   Node* dispatch_table =
--      LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD(DispatchTableForImports);
-+      LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD_(DispatchTableForImports);
-   // Access fixed array at {header_size - tag + func_index * kTaggedSize}.
-   Node* func_index_intptr = gasm_->BuildChangeUint32ToUintPtr(func_index);
-   Node* dispatch_table_entry_offset = gasm_->IntMul(
-@@ -2968,10 +2968,10 @@
-   // Load the dispatch table.
-   Node* dispatch_table;
-   if (table_index == 0) {
--    dispatch_table = LOAD_PROTECTED_INSTANCE_FIELD(DispatchTable0);
-+    dispatch_table = LOAD_PROTECTED_INSTANCE_FIELD_(DispatchTable0);
-   } else {
-     Node* dispatch_tables =
--        LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD(DispatchTables);
-+        LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD_(DispatchTables);
-     dispatch_table = gasm_->LoadProtectedPointerFromObject(
-         dispatch_tables,
-         wasm::ObjectAccess::ToTagged(
-@@ -3405,7 +3405,7 @@
-                                               MachineType::Pointer());
-   }
-   Node* memory_bases_and_sizes =
--      LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD(MemoryBasesAndSizes);
-+      LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD_(MemoryBasesAndSizes);
-   // Use {LoadByteArrayElement} even though it's a trusted array; their layout
-   // is the same.
-   static_assert(FixedAddressArray::OffsetOfElementAt(0) ==
-@@ -3425,7 +3425,7 @@
-         mem_type);
-   }
-   Node* memory_bases_and_sizes =
--      LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD(MemoryBasesAndSizes);
-+      LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD_(MemoryBasesAndSizes);
-   // Use {LoadByteArrayElement} even though it's a trusted array; their layout
-   // is the same.
-   static_assert(FixedAddressArray::OffsetOfElementAt(0) ==
-@@ -3504,14 +3504,14 @@
- void WasmGraphBuilder::GetGlobalBaseAndOffset(const wasm::WasmGlobal& global,
-                                               Node** base, Node** offset) {
-   if (global.mutability && global.imported) {
--    Node* imported_mutable_globals = LOAD_INSTANCE_FIELD(
-+    Node* imported_mutable_globals = LOAD_INSTANCE_FIELD_(
-         ImportedMutableGlobals, MachineType::TaggedPointer());
-     Node* field_offset = Int32Constant(
-         wasm::ObjectAccess::ElementOffsetInTaggedFixedAddressArray(
-             global.index));
-     if (global.type.is_reference()) {
-       // Load the base from the ImportedMutableGlobalsBuffer of the instance.
--      Node* buffers = LOAD_INSTANCE_FIELD(ImportedMutableGlobalsBuffers,
-+      Node* buffers = LOAD_INSTANCE_FIELD_(ImportedMutableGlobalsBuffers,
-                                           MachineType::TaggedPointer());
-       *base = gasm_->LoadFixedArrayElementAny(buffers, global.index);
- 
-@@ -3531,11 +3531,11 @@
-     }
-   } else if (global.type.is_reference()) {
-     *base =
--        LOAD_INSTANCE_FIELD(TaggedGlobalsBuffer, MachineType::TaggedPointer());
-+        LOAD_INSTANCE_FIELD_(TaggedGlobalsBuffer, MachineType::TaggedPointer());
-     *offset = gasm_->IntPtrConstant(
-         wasm::ObjectAccess::ElementOffsetInTaggedFixedArray(global.offset));
-   } else {
--    *base = LOAD_INSTANCE_FIELD(GlobalsStart, MachineType::Pointer());
-+    *base = LOAD_INSTANCE_FIELD_(GlobalsStart, MachineType::Pointer());
-     *offset = gasm_->IntPtrConstant(global.offset);
-   }
- }
-@@ -5293,7 +5293,7 @@
-   DCHECK_LT(data_segment_index, env_->module->num_declared_data_segments);
- 
-   Node* seg_size_array =
--      LOAD_INSTANCE_FIELD(DataSegmentSizes, MachineType::TaggedPointer());
-+      LOAD_INSTANCE_FIELD_(DataSegmentSizes, MachineType::TaggedPointer());
-   static_assert(wasm::kV8MaxWasmDataSegments <= kMaxUInt32 >> 2);
-   auto access = ObjectAccess(MachineType::Int32(), kNoWriteBarrier);
-   gasm_->StoreToObject(
-@@ -5428,10 +5428,10 @@
-   DCHECK_LT(elem_segment_index, env_->module->elem_segments.size());
-
-   Node* elem_segments =
--      LOAD_INSTANCE_FIELD(ElementSegments, MachineType::TaggedPointer());
-+      LOAD_INSTANCE_FIELD_(ElementSegments, MachineType::TaggedPointer());
-   gasm_->StoreFixedArrayElement(
-       elem_segments, elem_segment_index,
--      LOAD_ROOT(EmptyFixedArray, empty_fixed_array),
-+      LOAD_ROOT_IN_WASM_COMPILER(EmptyFixedArray, empty_fixed_array),
-       ObjectAccess(MachineType::TaggedPointer(), kFullWriteBarrier));
- }
- 
-@@ -5487,7 +5487,7 @@
- }
- 
- Node* WasmGraphBuilder::TableSize(uint32_t table_index) {
--  Node* tables = LOAD_INSTANCE_FIELD(Tables, MachineType::TaggedPointer());
-+  Node* tables = LOAD_INSTANCE_FIELD_(Tables, MachineType::TaggedPointer());
-   Node* table = gasm_->LoadFixedArrayElementAny(tables, table_index);
-
-   int length_field_size = WasmTableObject::kCurrentLengthOffsetEnd -
-@@ -5546,7 +5546,7 @@
-   gasm_->InitializeImmutableInObject(
-       ObjectAccess(MachineType::TaggedPointer(), kNoWriteBarrier), s,
-       wasm::ObjectAccess::ToTagged(JSReceiver::kPropertiesOrHashOffset),
--      LOAD_ROOT(EmptyFixedArray, empty_fixed_array));
-+      LOAD_ROOT_IN_WASM_COMPILER(EmptyFixedArray, empty_fixed_array));
-   for (uint32_t i = 0; i < type->field_count(); i++) {
-     gasm_->StructSet(s, fields[i], type, i, kWithoutNullCheck);
-   }
-@@ -5585,7 +5585,7 @@
-   gasm_->InitializeImmutableInObject(
-       ObjectAccess(MachineType::TaggedPointer(), kNoWriteBarrier), a,
-       wasm::ObjectAccess::ToTagged(JSReceiver::kPropertiesOrHashOffset),
--      LOAD_ROOT(EmptyFixedArray, empty_fixed_array));
-+      LOAD_ROOT_IN_WASM_COMPILER(EmptyFixedArray, empty_fixed_array));
-   gasm_->ArrayInitializeLength(a, length);
- 
-   ArrayFillImpl(a, gasm_->Int32Constant(0),
-@@ -5609,7 +5609,7 @@
-   gasm_->InitializeImmutableInObject(
-       ObjectAccess(MachineType::TaggedPointer(), kNoWriteBarrier), array,
-       wasm::ObjectAccess::ToTagged(JSReceiver::kPropertiesOrHashOffset),
--      LOAD_ROOT(EmptyFixedArray, empty_fixed_array));
-+      LOAD_ROOT_IN_WASM_COMPILER(EmptyFixedArray, empty_fixed_array));
-   gasm_->ArrayInitializeLength(
-       array, SetType(Int32Constant(static_cast<int>(elements.size())),
-                      wasm::kWasmI32));
-@@ -6416,7 +6416,7 @@
-   return gasm_->CallBuiltin(
-       Builtin::kStringAdd_CheckNone, Operator::kNoDeopt | Operator::kNoThrow,
-       head, tail,
--      LOAD_INSTANCE_FIELD(NativeContext, MachineType::TaggedPointer()));
-+      LOAD_INSTANCE_FIELD_(NativeContext, MachineType::TaggedPointer()));
- }
- 
- Node* WasmGraphBuilder::StringEqual(Node* a, wasm::ValueType a_type, Node* b,
-@@ -6833,7 +6833,7 @@
-         gasm_->MakeLabel(MachineRepresentation::kTaggedPointer);
-     gasm_->GotoIfNot(IsNull(search, wasm::kWasmStringRef), &search_not_null,
-                      search);
--    Node* null_string = LOAD_ROOT(null_string, null_string);
-+    Node* null_string = LOAD_ROOT_IN_WASM_COMPILER(null_string, null_string);
-     gasm_->Goto(&search_not_null, null_string);
-     gasm_->Bind(&search_not_null);
-     search = search_not_null.PhiAt(0);
-@@ -6876,7 +6876,7 @@
-       zone_, false, param_count, CallDescriptor::kCanUseRoots,
-       Operator::kNoDeopt | Operator::kNoWrite);
-   Node* callees_array =
--      LOAD_INSTANCE_FIELD(WellKnownImports, MachineType::TaggedPointer());
-+      LOAD_INSTANCE_FIELD_(WellKnownImports, MachineType::TaggedPointer());
-   Node* callee = gasm_->LoadFixedArrayElementPtr(callees_array, func_index);
-   Node* context = gasm_->LoadContextFromJSFunction(callee);
-   BuildModifyThreadInWasmFlag(false);
-@@ -7086,8 +7086,8 @@
-   Node* IsNull(Node* object, wasm::CanonicalValueType type) {
-     // We immediately lower null in wrappers, as they do not go through a
-     // lowering phase.
--    Node* null = type.use_wasm_null() ? LOAD_ROOT(WasmNull, wasm_null)
--                                      : LOAD_ROOT(NullValue, null_value);
-+    Node* null = type.use_wasm_null() ? LOAD_ROOT_IN_WASM_COMPILER(WasmNull, wasm_null)
-+                                      : LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value);
-     return gasm_->TaggedEqual(object, null);
-   }
- 
-@@ -7300,7 +7300,7 @@
-             return node;
-           case wasm::HeapType::kNone:
-           case wasm::HeapType::kNoFunc:
--            return LOAD_ROOT(NullValue, null_value);
-+            return LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value);
-           case wasm::HeapType::kEq:
-           case wasm::HeapType::kStruct:
-           case wasm::HeapType::kArray:
-@@ -7309,7 +7309,7 @@
-           case wasm::HeapType::kAny: {
-             auto done = gasm_->MakeLabel(MachineRepresentation::kTaggedPointer);
-             gasm_->GotoIfNot(IsNull(node, type), &done, node);
--            gasm_->Goto(&done, LOAD_ROOT(NullValue, null_value));
-+            gasm_->Goto(&done, LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value));
-             gasm_->Bind(&done);
-             return done.PhiAt(0);
-           }
-@@ -7341,14 +7341,14 @@
-                   Operator::kNoProperties, internal, context);
-               gasm_->Goto(&done, from_builtin);
-               gasm_->Bind(&null_label);
--              gasm_->Goto(&done, LOAD_ROOT(NullValue, null_value));
-+              gasm_->Goto(&done, LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value));
-               gasm_->Bind(&done);
-               return done.PhiAt(0);
-             } else {
-               auto done =
-                   gasm_->MakeLabel(MachineRepresentation::kTaggedPointer);
-               gasm_->GotoIfNot(IsNull(node, type), &done, node);
--              gasm_->Goto(&done, LOAD_ROOT(NullValue, null_value));
-+              gasm_->Goto(&done, LOAD_ROOT_IN_WASM_COMPILER(NullValue, null_value));
-               gasm_->Bind(&done);
-               return done.PhiAt(0);
-             }
-@@ -7394,7 +7394,7 @@
-     if (type.is_nullable()) {
-       auto not_null = gasm_->MakeLabel();
-       gasm_->GotoIfNot(IsNull(input, wasm::kCanonicalExternRef), &not_null);
--      gasm_->Goto(&done, LOAD_ROOT(WasmNull, wasm_null));
-+      gasm_->Goto(&done, LOAD_ROOT_IN_WASM_COMPILER(WasmNull, wasm_null));
-       gasm_->Bind(&not_null);
-     }
-     Node* map = gasm_->LoadMap(input);
-@@ -7699,7 +7699,7 @@
-         auto done = gasm_->MakeLabel();
-         gasm_->GotoIf(IsSmi(input), &done);
-         Node* map = gasm_->LoadMap(input);
--        Node* heap_number_map = LOAD_ROOT(HeapNumberMap, heap_number_map);
-+        Node* heap_number_map = LOAD_ROOT_IN_WASM_COMPILER(HeapNumberMap, heap_number_map);
- #if V8_MAP_PACKING
-         Node* is_heap_number = gasm_->WordEqual(heap_number_map, map);
- #else
-@@ -7902,7 +7902,7 @@
-                   &bad_suspender, BranchHint::kFalse);
-
-     if (v8_flags.stress_wasm_stack_switching) {
--      Node* undefined = LOAD_ROOT(UndefinedValue, undefined_value);
-+      Node* undefined = LOAD_ROOT_IN_WASM_COMPILER(UndefinedValue, undefined_value);
-       Node* for_stress_testing = gasm_->TaggedEqual(
-           gasm_->Load(
-               MachineType::TaggedPointer(), suspender,
-@@ -9022,9 +9022,11 @@
- 
- #undef FATAL_UNSUPPORTED_OPCODE
- #undef WASM_INSTANCE_OBJECT_SIZE
--#undef LOAD_INSTANCE_FIELD
-+#undef LOAD_IMMUTABLE_PROTECTED_INSTANCE_FIELD_
-+#undef LOAD_INSTANCE_FIELD_
- #undef LOAD_MUTABLE_INSTANCE_FIELD
--#undef LOAD_ROOT
-+#undef LOAD_PROTECTED_INSTANCE_FIELD_
-+#undef LOAD_ROOT_IN_WASM_COMPILER
- #undef LOAD_MUTABLE_ROOT
- 
- }  // namespace v8::internal::compiler
---- a/v8/src/maglev/maglev-graph-builder.cc
-+++ b/v8/src/maglev/maglev-graph-builder.cc
-@@ -12793,3 +12793,5 @@
- void MaglevGraphBuilder::VisitIllegal() { UNREACHABLE(); }
- 
- }  // namespace v8::internal::maglev
-+
-+#undef TRACE
+diff --git a/v8/src/wasm/compilation-environment-inl.h b/v8/src/wasm/compilation-environment-inl.h
+index 91b7c24..dda13b7 100644
 --- a/v8/src/wasm/compilation-environment-inl.h
 +++ b/v8/src/wasm/compilation-environment-inl.h
 @@ -2,6 +2,9 @@
@@ -1304,132 +1156,61 @@ index fd1ab9a3..fd1fece6 100644
  #if !V8_ENABLE_WEBASSEMBLY
  #error This header should only be included if WebAssembly is enabled.
  #endif  // !V8_ENABLE_WEBASSEMBLY
-@@ -26,6 +29,4 @@
+@@ -26,6 +29,4 @@ constexpr CompilationEnv CompilationEnv::NoModuleAllFeaturesForTesting() {
  
  }  // namespace v8::internal::wasm
  
 -#ifndef V8_WASM_COMPILATION_ENVIRONMENT_INL_H_
 -#define V8_WASM_COMPILATION_ENVIRONMENT_INL_H_
  #endif  // V8_WASM_COMPILATION_ENVIRONMENT_INL_H_
---- a/v8/src/compiler/decompression-optimizer.cc
-+++ b/v8/src/compiler/decompression-optimizer.cc
-@@ -8,6 +8,8 @@
- #include "src/compiler/node-matchers.h"
- #include "src/compiler/node-properties.h"
- 
-+#define Replace Replace_DecomporessionOptimizer
-+
- namespace v8 {
- namespace internal {
- namespace compiler {
-@@ -406,3 +408,5 @@
- }  // namespace compiler
- }  // namespace internal
- }  // namespace v8
-+
-+#undef Replace
---- a/v8/src/compiler/backend/bitcast-elider.cc
-+++ b/v8/src/compiler/backend/bitcast-elider.cc
-@@ -6,6 +6,8 @@
- 
- #include "src/compiler/graph.h"
- 
-+#define Replace Replace_BitcastElider
-+
- namespace v8 {
- namespace internal {
- namespace compiler {
-@@ -99,3 +101,5 @@
- }  // namespace compiler
- }  // namespace internal
- }  // namespace v8
-+
-+#undef Replace
---- a/v8/src/compiler/turboshaft/graph-builder.cc
-+++ b/v8/src/compiler/turboshaft/graph-builder.cc
-@@ -42,6 +42,8 @@
- #include "src/objects/map.h"
- #include "src/zone/zone-containers.h"
- 
-+#define GraphBuilder GraphBuilder_GraphBuilder
-+
- namespace v8::internal::compiler::turboshaft {
- 
- #include "src/compiler/turboshaft/define-assembler-macros.inc"
-@@ -2427,3 +2429,5 @@
- #include "src/compiler/turboshaft/undef-assembler-macros.inc"
- 
- }  // namespace v8::internal::compiler::turboshaft
-+
-+#undef GraphBuilder
---- a/v8/BUILD.gn
-+++ b/v8/BUILD.gn
-@@ -2977,6 +2977,9 @@
-     "src/ic/binary-op-assembler.cc",
-     "src/ic/unary-op-assembler.cc",
-     "src/interpreter/interpreter-generator.cc",
-+
-+    # Macro `BIND()` conflict
-+    "src/builtins/builtins-string-tsa.cc",
-   ]
- 
-   if (v8_current_cpu == "x86") {
-@@ -5786,6 +5789,11 @@
-     "src/zone/zone.cc",
-   ]
- 
-+  jumbo_excluded_sources = [
-+    # 'GetSlotThreadSafe' is a protected member of 'v8::TracedReferenceBase'
-+    "src/heap/cppgc-js/unified-heap-marking-verifier.cc",
-+  ]
-+
-   if (v8_enable_snapshot_compression) {
-     sources += [ "src/snapshot/snapshot-compression.cc" ]
-   }
-@@ -5797,8 +5805,6 @@
-     ]
-   }
- 
--  jumbo_excluded_sources = []
--
-   if (v8_enable_maglev) {
-     sources += [
-       "src/maglev/maglev-assembler.cc",
-@@ -5826,6 +5832,10 @@
-         "src/maglev/arm64/maglev-assembler-arm64.cc",
-         "src/maglev/arm64/maglev-ir-arm64.cc",
-       ]
-+      jumbo_excluded_sources += [
-+        "src/maglev/arm64/maglev-assembler-arm64.cc",
-+        "src/maglev/arm64/maglev-ir-arm64.cc",
-+      ]
-     } else if (v8_current_cpu == "x64") {
-       sources += [
-         "src/maglev/x64/maglev-assembler-x64.cc",
---- a/v8/src/wasm/baseline/liftoff-compiler.cc
-+++ b/v8/src/wasm/baseline/liftoff-compiler.cc
-@@ -38,6 +38,9 @@
- #include "src/wasm/wasm-objects.h"
- #include "src/wasm/wasm-opcodes-inl.h"
- 
-+#undef __
-+#undef TRACE
-+
- namespace v8::internal::wasm {
- 
- using VarState = LiftoffAssembler::VarState;
-@@ -9271,3 +9274,6 @@
+diff --git a/v8/src/wasm/wasm-external-refs.cc b/v8/src/wasm/wasm-external-refs.cc
+index 333c796..0223e89 100644
+--- a/v8/src/wasm/wasm-external-refs.cc
++++ b/v8/src/wasm/wasm-external-refs.cc
+@@ -750,6 +750,8 @@ V ReadAndIncrementOffset(Address data, size_t* offset) {
+   return result;
  }
  
++#define kSuccess kSuccess_WASMExternalRefs
++
+ constexpr int32_t kSuccess = 1;
+ constexpr int32_t kOutOfBounds = 0;
+ }  // namespace
+@@ -1144,3 +1146,4 @@ Address load_old_fp(Isolate* isolate) {
+ 
+ #undef V8_WITH_SANITIZER
+ #undef RESET_THREAD_IN_WASM_FLAG_FOR_ASAN_ON_WINDOWS
++#undef kSuccess
+diff --git a/v8/src/wasm/wasm-module-sourcemap.cc b/v8/src/wasm/wasm-module-sourcemap.cc
+index f95107f..c653898 100644
+--- a/v8/src/wasm/wasm-module-sourcemap.cc
++++ b/v8/src/wasm/wasm-module-sourcemap.cc
+@@ -69,7 +69,7 @@ WasmModuleSourceMap::WasmModuleSourceMap(v8::Isolate* v8_isolate,
+     size_t file_name_sz = file_name->Utf8LengthV2(v8_isolate) + 1;
+     std::unique_ptr<char[]> file_name_buf(new char[file_name_sz]);
+     file_name->WriteUtf8V2(v8_isolate, file_name_buf.get(), file_name_sz,
+-                           String::WriteFlags::kNullTerminate);
++                           v8::String::WriteFlags::kNullTerminate);
+     filenames.emplace_back(file_name_buf.get());
+   }
+ 
+@@ -84,7 +84,7 @@ WasmModuleSourceMap::WasmModuleSourceMap(v8::Isolate* v8_isolate,
+   size_t mappings_sz = mappings->Utf8LengthV2(v8_isolate) + 1;
+   std::unique_ptr<char[]> mappings_buf(new char[mappings_sz]);
+   mappings->WriteUtf8V2(v8_isolate, mappings_buf.get(), mappings_sz,
+-                        String::WriteFlags::kNullTerminate);
++                        v8::String::WriteFlags::kNullTerminate);
+ 
+   valid_ = DecodeMapping(mappings_buf.get());
+ }
+diff --git a/v8/src/wasm/wrappers.cc b/v8/src/wasm/wrappers.cc
+index 1d61bf2b..9a65f99 100644
+--- a/v8/src/wasm/wrappers.cc
++++ b/v8/src/wasm/wrappers.cc
+@@ -1391,4 +1391,6 @@ void BuildWasmWrapper(compiler::turboshaft::PipelineData* data,
+   }
+ }
+ 
++#include "src/compiler/turboshaft/undef-assembler-macros.inc"
++
  }  // namespace v8::internal::wasm
-+
-+#undef __
-+#undef TRACE
---- a/v8/src/maglev/arm64/maglev-ir-arm64.cc
-+++ b/v8/src/maglev/arm64/maglev-ir-arm64.cc
-@@ -834,3 +834,5 @@
- }  // namespace maglev
- }  // namespace internal
- }  // namespace v8
-+
-+#undef __

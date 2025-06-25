@@ -38,7 +38,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  18 files changed, 94 insertions(+), 11 deletions(-)
 
 diff --git a/crypto/BUILD.gn b/crypto/BUILD.gn
-index 7012d90890..cccc702f1a 100644
+index 4f4c4509f4..d684ebed8a 100644
 --- a/crypto/BUILD.gn
 +++ b/crypto/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -78,7 +78,7 @@ index a199d5e9de..f318d5947f 100644
 +
 +#undef g_mock_provider
 diff --git a/crypto/user_verifying_key.cc b/crypto/user_verifying_key.cc
-index cf19160d55..9f660bbdc1 100644
+index 279a7a1431..668fd49c77 100644
 --- a/crypto/user_verifying_key.cc
 +++ b/crypto/user_verifying_key.cc
 @@ -6,6 +6,8 @@
@@ -90,14 +90,14 @@ index cf19160d55..9f660bbdc1 100644
  namespace crypto {
  
  namespace {
-@@ -89,3 +91,5 @@ void SetUserVerifyingKeyProviderForTesting(
+@@ -94,3 +96,5 @@ void SetUserVerifyingKeyProviderForTesting(
  }  // namespace internal
  
  }  // namespace crypto
 +
 +#undef g_mock_provider
 diff --git a/dbus/BUILD.gn b/dbus/BUILD.gn
-index 8f96d8d425..5cd4c1856f 100644
+index 236016e617..85aa652594 100644
 --- a/dbus/BUILD.gn
 +++ b/dbus/BUILD.gn
 @@ -3,13 +3,14 @@
@@ -117,7 +117,7 @@ index 8f96d8d425..5cd4c1856f 100644
      "bus.cc",
      "bus.h",
 diff --git a/gin/BUILD.gn b/gin/BUILD.gn
-index ed5d40bfb6..eb1f61ff83 100644
+index 3a5e7d1a05..57e6806e34 100644
 --- a/gin/BUILD.gn
 +++ b/gin/BUILD.gn
 @@ -6,11 +6,12 @@ if (is_android) {
@@ -145,7 +145,7 @@ index ed5d40bfb6..eb1f61ff83 100644
    if (use_partition_alloc) {
      sources += [
 diff --git a/gin/per_isolate_data.cc b/gin/per_isolate_data.cc
-index af2a28111e..aa81a09a6e 100644
+index 5bd5ed3a93..10777d497a 100644
 --- a/gin/per_isolate_data.cc
 +++ b/gin/per_isolate_data.cc
 @@ -41,7 +41,7 @@ namespace gin {
@@ -156,9 +156,9 @@ index af2a28111e..aa81a09a6e 100644
 +    v8::ArrayBuffer::Allocator* allocator,
      IsolateHolder::AccessMode access_mode,
      scoped_refptr<base::SingleThreadTaskRunner> task_runner,
-     scoped_refptr<base::SingleThreadTaskRunner> low_priority_task_runner)
+     scoped_refptr<base::SingleThreadTaskRunner> user_visible_task_runner,
 diff --git a/google_apis/BUILD.gn b/google_apis/BUILD.gn
-index bc1a4ec1c9..06f10b7b81 100644
+index 9f45639c66..872a5a798e 100644
 --- a/google_apis/BUILD.gn
 +++ b/google_apis/BUILD.gn
 @@ -6,6 +6,7 @@ import("//build/buildflag_header.gni")
@@ -176,10 +176,10 @@ index bc1a4ec1c9..06f10b7b81 100644
 -component("google_apis") {
 +jumbo_component("google_apis") {
    sources = [
-     "credentials_mode.cc",
-     "credentials_mode.h",
+     "api_key_cache.cc",
+     "api_key_cache.h",
 diff --git a/google_apis/gaia/oauth2_access_token_fetcher_impl.cc b/google_apis/gaia/oauth2_access_token_fetcher_impl.cc
-index 89c17c107e..bfc4e1f02e 100644
+index 79de7c9be6..5817c6d768 100644
 --- a/google_apis/gaia/oauth2_access_token_fetcher_impl.cc
 +++ b/google_apis/gaia/oauth2_access_token_fetcher_impl.cc
 @@ -25,6 +25,9 @@
@@ -192,7 +192,7 @@ index 89c17c107e..bfc4e1f02e 100644
  namespace {
  
  constexpr char kGetAccessTokenBodyFormat[] =
-@@ -441,3 +444,6 @@ bool OAuth2AccessTokenFetcherImpl::ParseGetAccessTokenFailureResponse(
+@@ -433,3 +436,6 @@ bool OAuth2AccessTokenFetcherImpl::ParseGetAccessTokenFailureResponse(
  
    return true;
  }
@@ -200,10 +200,10 @@ index 89c17c107e..bfc4e1f02e 100644
 +#undef kAccessTokenKey
 +#undef kExpiresInKey
 diff --git a/google_apis/gaia/oauth2_mint_token_flow.cc b/google_apis/gaia/oauth2_mint_token_flow.cc
-index 5fdeeeef51..7ff5b53922 100644
+index 44633e7cca..3207ad1027 100644
 --- a/google_apis/gaia/oauth2_mint_token_flow.cc
 +++ b/google_apis/gaia/oauth2_mint_token_flow.cc
-@@ -35,6 +35,9 @@
+@@ -36,6 +36,9 @@
  #include "net/http/http_status_code.h"
  #include "services/network/public/mojom/url_response_head.mojom.h"
  
@@ -213,7 +213,7 @@ index 5fdeeeef51..7ff5b53922 100644
  namespace {
  
  const char kValueFalse[] = "false";
-@@ -531,3 +534,6 @@ OAuth2MintTokenFlow::GetNetworkTrafficAnnotationTag() {
+@@ -544,3 +547,6 @@ OAuth2MintTokenFlow::GetNetworkTrafficAnnotationTag() {
          }
        })");
  }
@@ -267,7 +267,7 @@ index 787a63648d..a791ec85d8 100644
 +#undef kExtraScopeKey
 +#undef kTokenPrefix
 diff --git a/google_apis/gcm/engine/unregistration_request.cc b/google_apis/gcm/engine/unregistration_request.cc
-index fac62bcec2..f3702c20c8 100644
+index c9a605d451..26c759fcad 100644
 --- a/google_apis/gcm/engine/unregistration_request.cc
 +++ b/google_apis/gcm/engine/unregistration_request.cc
 @@ -25,6 +25,19 @@
@@ -290,7 +290,7 @@ index fac62bcec2..f3702c20c8 100644
  namespace gcm {
  
  namespace {
-@@ -295,3 +308,16 @@ void UnregistrationRequest::OnURLLoadComplete(
+@@ -294,3 +307,16 @@ void UnregistrationRequest::OnURLLoadComplete(
  }
  
  }  // namespace gcm
@@ -308,7 +308,7 @@ index fac62bcec2..f3702c20c8 100644
 +#undef kDeviceRegistrationError
 +#undef GetStatusFromError
 diff --git a/headless/BUILD.gn b/headless/BUILD.gn
-index b11c9ecc2f..9344b2e331 100644
+index f1736feee7..2daf8a81c1 100644
 --- a/headless/BUILD.gn
 +++ b/headless/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -319,7 +319,7 @@ index b11c9ecc2f..9344b2e331 100644
  import("//build/config/python.gni")
  import("//build/util/lastchange.gni")
  import("//build/util/process_version.gni")
-@@ -230,7 +231,7 @@ static_library("backend_cdp_bindings") {
+@@ -233,7 +234,7 @@ static_library("backend_cdp_bindings") {
  }
  
  # Code that is not needed in a renderer process.
@@ -328,7 +328,7 @@ index b11c9ecc2f..9344b2e331 100644
    sources = [
      "lib/browser/command_line_handler.cc",
      "lib/browser/command_line_handler.h",
-@@ -295,6 +296,9 @@ component("headless_non_renderer") {
+@@ -303,6 +304,9 @@ component("headless_non_renderer") {
      "public/util/user_agent.cc",
      "public/util/user_agent.h",
    ]
@@ -339,7 +339,7 @@ index b11c9ecc2f..9344b2e331 100644
    configs += [ "//build/config/compiler:wexit_time_destructors" ]
  
 diff --git a/ipc/BUILD.gn b/ipc/BUILD.gn
-index bd8c19385a..72b86a8119 100644
+index eef379f12b..2951557735 100644
 --- a/ipc/BUILD.gn
 +++ b/ipc/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -369,10 +369,10 @@ index bd8c19385a..72b86a8119 100644
      "ipc_message.cc",
      "ipc_message.h",
 diff --git a/ipc/ipc_sync_channel.cc b/ipc/ipc_sync_channel.cc
-index 8b85ac1472..2dfbe16a40 100644
+index fb8acffe22..de6a8a235d 100644
 --- a/ipc/ipc_sync_channel.cc
 +++ b/ipc/ipc_sync_channel.cc
-@@ -35,6 +35,8 @@
+@@ -34,6 +34,8 @@
  
  using base::WaitableEvent;
  
@@ -381,7 +381,7 @@ index 8b85ac1472..2dfbe16a40 100644
  namespace IPC {
  
  namespace {
-@@ -616,3 +618,5 @@ void SyncChannel::OnChannelInit() {
+@@ -615,3 +617,5 @@ void SyncChannel::OnChannelInit() {
  }
  
  }  // namespace IPC
@@ -407,15 +407,20 @@ index 15f66c849c..6114f78ca7 100644
 +
 +#undef OnEventReady
 diff --git a/sql/BUILD.gn b/sql/BUILD.gn
-index 9a43377b30..9df9839e96 100644
+index 24fa142672..145a9691b0 100644
 --- a/sql/BUILD.gn
 +++ b/sql/BUILD.gn
-@@ -2,9 +2,10 @@
+@@ -2,6 +2,7 @@
  # Use of this source code is governed by a BSD-style license that can be
  # found in the LICENSE file.
  
 +import("//build/config/jumbo.gni")
  import("//testing/test.gni")
+ import("//tools/metrics/generate_allowlist_from_histograms_file.gni")
+ 
+@@ -13,7 +14,7 @@ generate_allowlist_from_histograms_file("sql_name_variants") {
+   allow_list_name = "DatabaseTag"
+ }
  
 -component("sql") {
 +jumbo_component("sql") {

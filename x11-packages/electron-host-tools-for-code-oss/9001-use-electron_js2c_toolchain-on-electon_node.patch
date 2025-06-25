@@ -1,0 +1,30 @@
+--- a/third_party/electron_node/unofficial.gni
++++ b/third_party/electron_node/unofficial.gni
+@@ -2,6 +2,7 @@
+ # building official binaries.
+ # Please take a look at node.gyp if you are making changes to build system.
+ 
++import("//electron/js2c_toolchain.gni")
+ import("node.gni")
+ import("$node_v8_path/gni/snapshot_toolchain.gni")
+ import("$node_v8_path/gni/v8.gni")
+@@ -393,7 +394,7 @@
+     script = "//electron/build/run-in-dir.py"
+     deps = [
+       ":node_js2c_original_fs",
+-      ":node_js2c($host_toolchain)",
++      ":node_js2c($electron_js2c_toolchain)",
+       ":generate_config_gypi",
+     ]
+ 
+@@ -411,8 +412,8 @@
+       host_executable_suffix = ""
+     }
+     node_js2c_path =
+-        get_label_info(":node_js2c($host_toolchain)", "root_out_dir") + "/" +
+-        get_label_info(":node_js2c($host_toolchain)", "name") +
++        get_label_info(":node_js2c($electron_js2c_toolchain)", "root_out_dir") + "/" +
++        get_label_info(":node_js2c($electron_js2c_toolchain)", "name") +
+         host_executable_suffix
+ 
+     args = [ rebase_path("$target_gen_dir/js2c_inputs"),

@@ -11,38 +11,35 @@ Enable jumbo build for the following component(s)/source_set(s):
 - //net/third_party/quiche:quiche
 
 ---
- quiche/http2/core/spdy_framer.cc                            | 4 ++++
- quiche/http2/core/spdy_protocol.cc                          | 4 ++++
- quiche/quic/core/congestion_control/bbr2_sender.cc          | 4 ++++
- quiche/quic/core/congestion_control/bbr_sender.cc           | 4 ++++
+ net/third_party/quiche/BUILD.gn                             | 3 ++-
+ net/third_party/quiche/src/quiche/http2/core/spdy_framer.cc | 4 ++++
+ .../quiche/src/quiche/http2/core/spdy_protocol.cc           | 4 ++++
+ .../src/quiche/quic/core/congestion_control/bbr2_sender.cc  | 4 ++++
+ .../src/quiche/quic/core/congestion_control/bbr_sender.cc   | 4 ++++
  .../quic/core/congestion_control/tcp_cubic_sender_bytes.cc  | 4 ++++
- quiche/quic/core/crypto/aead_base_decrypter.cc              | 4 ++--
- quiche/quic/core/crypto/aead_base_encrypter.cc              | 4 ++--
- quiche/quic/core/crypto/aes_128_gcm_12_decrypter.cc         | 6 ++++++
- quiche/quic/core/crypto/aes_128_gcm_12_encrypter.cc         | 6 ++++++
- quiche/quic/core/crypto/aes_128_gcm_decrypter.cc            | 6 ++++++
- quiche/quic/core/crypto/aes_128_gcm_encrypter.cc            | 6 ++++++
- quiche/quic/core/crypto/aes_256_gcm_decrypter.cc            | 6 ++++++
- quiche/quic/core/crypto/aes_256_gcm_encrypter.cc            | 6 ++++++
- quiche/quic/core/crypto/chacha20_poly1305_decrypter.cc      | 6 ++++++
- quiche/quic/core/crypto/chacha20_poly1305_encrypter.cc      | 6 ++++++
- quiche/quic/core/crypto/chacha20_poly1305_tls_decrypter.cc  | 6 ++++++
- quiche/quic/core/crypto/chacha20_poly1305_tls_encrypter.cc  | 6 ++++++
- quiche/quic/core/crypto/crypto_secret_boxer.cc              | 4 ++++
- quiche/quic/core/http/web_transport_http3.cc                | 2 ++
- quiche/quic/core/quic_stream.cc                             | 2 ++
- quiche/quic/core/quic_stream_id_manager.cc                  | 2 ++
- quiche/quic/core/tls_handshaker.cc                          | 2 ++
- 22 files changed, 96 insertions(+), 4 deletions(-)
-
----
- net/third_party/quiche/BUILD.gn         | 3 ++-
- third_party/inspector_protocol/BUILD.gn | 4 +++-
- third_party/leveldatabase/BUILD.gn      | 3 ++-
- 3 files changed, 7 insertions(+), 3 deletions(-)
+ .../src/quiche/quic/core/crypto/aead_base_decrypter.cc      | 4 ++--
+ .../src/quiche/quic/core/crypto/aead_base_encrypter.cc      | 4 ++--
+ .../src/quiche/quic/core/crypto/aes_128_gcm_12_decrypter.cc | 6 ++++++
+ .../src/quiche/quic/core/crypto/aes_128_gcm_12_encrypter.cc | 6 ++++++
+ .../src/quiche/quic/core/crypto/aes_128_gcm_decrypter.cc    | 6 ++++++
+ .../src/quiche/quic/core/crypto/aes_128_gcm_encrypter.cc    | 6 ++++++
+ .../src/quiche/quic/core/crypto/aes_256_gcm_decrypter.cc    | 6 ++++++
+ .../src/quiche/quic/core/crypto/aes_256_gcm_encrypter.cc    | 6 ++++++
+ .../quiche/quic/core/crypto/chacha20_poly1305_decrypter.cc  | 6 ++++++
+ .../quiche/quic/core/crypto/chacha20_poly1305_encrypter.cc  | 6 ++++++
+ .../quic/core/crypto/chacha20_poly1305_tls_decrypter.cc     | 6 ++++++
+ .../quic/core/crypto/chacha20_poly1305_tls_encrypter.cc     | 6 ++++++
+ .../src/quiche/quic/core/crypto/crypto_secret_boxer.cc      | 4 ++++
+ .../quiche/src/quiche/quic/core/http/web_transport_http3.cc | 2 ++
+ net/third_party/quiche/src/quiche/quic/core/quic_stream.cc  | 2 ++
+ .../quiche/src/quiche/quic/core/quic_stream_id_manager.cc   | 2 ++
+ .../quiche/src/quiche/quic/core/tls_handshaker.cc           | 2 ++
+ third_party/inspector_protocol/BUILD.gn                     | 4 +++-
+ third_party/leveldatabase/BUILD.gn                          | 3 ++-
+ 25 files changed, 103 insertions(+), 7 deletions(-)
 
 diff --git a/net/third_party/quiche/BUILD.gn b/net/third_party/quiche/BUILD.gn
-index 93911f4559..72cc38fa78 100644
+index 2fbff748a8..245afdfb17 100644
 --- a/net/third_party/quiche/BUILD.gn
 +++ b/net/third_party/quiche/BUILD.gn
 @@ -25,6 +25,7 @@
@@ -59,11 +56,11 @@ index 93911f4559..72cc38fa78 100644
  
 -component("quiche") {
 +jumbo_component("quiche") {
-   # TODO(crbug.com/325102878): Remove once usage of the deprecated version of
-   # absl::HexStringToBytes have been removed.
-   cflags = [ "-Wno-deprecated-declarations" ]
-diff --git a/quiche/http2/core/spdy_framer.cc b/quiche/http2/core/spdy_framer.cc
-index 897e253..c32d2ae 100644
+   sources = [
+               "overrides/quiche_platform_impl/quiche_bug_tracker_impl.h",
+               "overrides/quiche_platform_impl/quiche_client_stats_impl.h",
+diff --git a/net/third_party/quiche/src/quiche/http2/core/spdy_framer.cc b/net/third_party/quiche/src/quiche/http2/core/spdy_framer.cc
+index c8a3a31ddf..5f9b949f5d 100644
 --- a/net/third_party/quiche/src/quiche/http2/core/spdy_framer.cc
 +++ b/net/third_party/quiche/src/quiche/http2/core/spdy_framer.cc
 @@ -41,6 +41,8 @@ uint32_t PackStreamDependencyValues(bool exclusive,
@@ -81,27 +78,27 @@ index 897e253..c32d2ae 100644
  }  // namespace spdy
 +
 +#undef kPadLengthFieldSize
-diff --git a/quiche/http2/core/spdy_protocol.cc b/quiche/http2/core/spdy_protocol.cc
-index ae3f662..b4254a1 100644
+diff --git a/net/third_party/quiche/src/quiche/http2/core/spdy_protocol.cc b/net/third_party/quiche/src/quiche/http2/core/spdy_protocol.cc
+index 018b8c9c55..d7ad72591d 100644
 --- a/net/third_party/quiche/src/quiche/http2/core/spdy_protocol.cc
 +++ b/net/third_party/quiche/src/quiche/http2/core/spdy_protocol.cc
 @@ -20,6 +20,8 @@
+ #include "quiche/common/platform/api/quiche_flag_utils.h"
  #include "quiche/common/platform/api/quiche_logging.h"
- #include "quiche/spdy/core/http2_header_block.h"
  
 +#define kPadLengthFieldSize kPadLengthFieldSize_SpdyProtocol
 +
  namespace spdy {
  
  const char* const kHttp2ConnectionHeaderPrefix =
-@@ -631,3 +633,5 @@ size_t GetPushPromiseFrameSizeSansBlock(
+@@ -612,3 +614,5 @@ size_t GetPushPromiseFrameSizeSansBlock(
  }
  
  }  // namespace spdy
 +
 +#undef kPadLengthFieldSize
-diff --git a/quiche/quic/core/congestion_control/bbr2_sender.cc b/quiche/quic/core/congestion_control/bbr2_sender.cc
-index be7f132..a6aa315 100644
+diff --git a/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr2_sender.cc b/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr2_sender.cc
+index 21134ac65e..1d357e6e4b 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr2_sender.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr2_sender.cc
 @@ -23,6 +23,8 @@
@@ -113,14 +110,14 @@ index be7f132..a6aa315 100644
  namespace quic {
  
  namespace {
-@@ -581,3 +583,5 @@ std::ostream& operator<<(std::ostream& os, const Bbr2Sender::DebugState& s) {
+@@ -584,3 +586,5 @@ std::ostream& operator<<(std::ostream& os, const Bbr2Sender::DebugState& s) {
  }
  
  }  // namespace quic
 +
 +#undef kDefaultMinimumCongestionWindow
-diff --git a/quiche/quic/core/congestion_control/bbr_sender.cc b/quiche/quic/core/congestion_control/bbr_sender.cc
-index 34bb068..01ca5ab 100644
+diff --git a/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr_sender.cc b/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr_sender.cc
+index 34bb0689a3..01ca5ab92f 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr_sender.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr_sender.cc
 @@ -19,6 +19,8 @@
@@ -138,8 +135,8 @@ index 34bb068..01ca5ab 100644
  }  // namespace quic
 +
 +#undef kDefaultMinimumCongestionWindow
-diff --git a/quiche/quic/core/congestion_control/tcp_cubic_sender_bytes.cc b/quiche/quic/core/congestion_control/tcp_cubic_sender_bytes.cc
-index 610bce7..6a0ad1c 100644
+diff --git a/net/third_party/quiche/src/quiche/quic/core/congestion_control/tcp_cubic_sender_bytes.cc b/net/third_party/quiche/src/quiche/quic/core/congestion_control/tcp_cubic_sender_bytes.cc
+index 610bce71cb..6a0ad1c616 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/congestion_control/tcp_cubic_sender_bytes.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/congestion_control/tcp_cubic_sender_bytes.cc
 @@ -16,6 +16,8 @@
@@ -157,8 +154,8 @@ index 610bce7..6a0ad1c 100644
  }  // namespace quic
 +
 +#undef kDefaultMinimumCongestionWindow
-diff --git a/quiche/quic/core/crypto/aead_base_decrypter.cc b/quiche/quic/core/crypto/aead_base_decrypter.cc
-index b6a3c4f..3535338 100644
+diff --git a/net/third_party/quiche/src/quiche/quic/core/crypto/aead_base_decrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/aead_base_decrypter.cc
+index b6a3c4f68c..3535338cbe 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/crypto/aead_base_decrypter.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/crypto/aead_base_decrypter.cc
 @@ -22,7 +22,7 @@ using ::quiche::ClearOpenSslErrors;
@@ -179,8 +176,8 @@ index b6a3c4f..3535338 100644
        key_size_(key_size),
        auth_tag_size_(auth_tag_size),
        nonce_size_(nonce_size),
-diff --git a/quiche/quic/core/crypto/aead_base_encrypter.cc b/quiche/quic/core/crypto/aead_base_encrypter.cc
-index 928343f..ffa3935 100644
+diff --git a/net/third_party/quiche/src/quiche/quic/core/crypto/aead_base_encrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/aead_base_encrypter.cc
+index 928343f89e..ffa393546f 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/crypto/aead_base_encrypter.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/crypto/aead_base_encrypter.cc
 @@ -20,7 +20,7 @@ namespace quic {
@@ -201,8 +198,8 @@ index 928343f..ffa3935 100644
        key_size_(key_size),
        auth_tag_size_(auth_tag_size),
        nonce_size_(nonce_size),
-diff --git a/quiche/quic/core/crypto/aes_128_gcm_12_decrypter.cc b/quiche/quic/core/crypto/aes_128_gcm_12_decrypter.cc
-index 66f2ad2..9b564c0 100644
+diff --git a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_12_decrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_12_decrypter.cc
+index 66f2ad2da0..9b564c037a 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_12_decrypter.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_12_decrypter.cc
 @@ -7,6 +7,9 @@
@@ -222,8 +219,8 @@ index 66f2ad2..9b564c0 100644
 +
 +#undef kKeySize
 +#undef kNonceSize
-diff --git a/quiche/quic/core/crypto/aes_128_gcm_12_encrypter.cc b/quiche/quic/core/crypto/aes_128_gcm_12_encrypter.cc
-index 5bbaeba..db6cb51 100644
+diff --git a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_12_encrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_12_encrypter.cc
+index 5bbaeba079..db6cb51d83 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_12_encrypter.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_12_encrypter.cc
 @@ -6,6 +6,9 @@
@@ -243,8 +240,8 @@ index 5bbaeba..db6cb51 100644
 +
 +#undef kKeySize
 +#undef kNonceSize
-diff --git a/quiche/quic/core/crypto/aes_128_gcm_decrypter.cc b/quiche/quic/core/crypto/aes_128_gcm_decrypter.cc
-index c43123b..d63d6ab 100644
+diff --git a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_decrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_decrypter.cc
+index c43123bb44..d63d6ab7ca 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_decrypter.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_decrypter.cc
 @@ -9,6 +9,9 @@
@@ -264,8 +261,8 @@ index c43123b..d63d6ab 100644
 +
 +#undef kKeySize
 +#undef kNonceSize
-diff --git a/quiche/quic/core/crypto/aes_128_gcm_encrypter.cc b/quiche/quic/core/crypto/aes_128_gcm_encrypter.cc
-index 22f9b2a..ccc4691 100644
+diff --git a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_encrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_encrypter.cc
+index 22f9b2a216..ccc4691eb9 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_encrypter.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_128_gcm_encrypter.cc
 @@ -6,6 +6,9 @@
@@ -285,8 +282,8 @@ index 22f9b2a..ccc4691 100644
 +
 +#undef kKeySize
 +#undef kNonceSize
-diff --git a/quiche/quic/core/crypto/aes_256_gcm_decrypter.cc b/quiche/quic/core/crypto/aes_256_gcm_decrypter.cc
-index 58d4e3c..37c62a1 100644
+diff --git a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_256_gcm_decrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_256_gcm_decrypter.cc
+index 58d4e3c2cf..37c62a10b0 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_256_gcm_decrypter.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_256_gcm_decrypter.cc
 @@ -9,6 +9,9 @@
@@ -306,8 +303,8 @@ index 58d4e3c..37c62a1 100644
 +
 +#undef kKeySize
 +#undef kNonceSize
-diff --git a/quiche/quic/core/crypto/aes_256_gcm_encrypter.cc b/quiche/quic/core/crypto/aes_256_gcm_encrypter.cc
-index 802ff99..08ec945 100644
+diff --git a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_256_gcm_encrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_256_gcm_encrypter.cc
+index 802ff992c9..08ec9453bf 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/crypto/aes_256_gcm_encrypter.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/crypto/aes_256_gcm_encrypter.cc
 @@ -6,6 +6,9 @@
@@ -327,8 +324,8 @@ index 802ff99..08ec945 100644
 +
 +#undef kKeySize
 +#undef kNonceSize
-diff --git a/quiche/quic/core/crypto/chacha20_poly1305_decrypter.cc b/quiche/quic/core/crypto/chacha20_poly1305_decrypter.cc
-index 31758b4..9454c45 100644
+diff --git a/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_decrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_decrypter.cc
+index 31758b4324..9454c4597d 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_decrypter.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_decrypter.cc
 @@ -7,6 +7,9 @@
@@ -348,8 +345,8 @@ index 31758b4..9454c45 100644
 +
 +#undef kKeySize
 +#undef kNonceSize
-diff --git a/quiche/quic/core/crypto/chacha20_poly1305_encrypter.cc b/quiche/quic/core/crypto/chacha20_poly1305_encrypter.cc
-index f259dea..80fea5d 100644
+diff --git a/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_encrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_encrypter.cc
+index f259deaf7c..80fea5db34 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_encrypter.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_encrypter.cc
 @@ -8,6 +8,9 @@
@@ -369,8 +366,8 @@ index f259dea..80fea5d 100644
 +
 +#undef kKeySize
 +#undef kNonceSize
-diff --git a/quiche/quic/core/crypto/chacha20_poly1305_tls_decrypter.cc b/quiche/quic/core/crypto/chacha20_poly1305_tls_decrypter.cc
-index 93b0993..887bf46 100644
+diff --git a/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_tls_decrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_tls_decrypter.cc
+index 93b099352c..887bf469ea 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_tls_decrypter.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_tls_decrypter.cc
 @@ -9,6 +9,9 @@
@@ -390,8 +387,8 @@ index 93b0993..887bf46 100644
 +
 +#undef kKeySize
 +#undef kNonceSize
-diff --git a/quiche/quic/core/crypto/chacha20_poly1305_tls_encrypter.cc b/quiche/quic/core/crypto/chacha20_poly1305_tls_encrypter.cc
-index 0d7c69b..5923d71 100644
+diff --git a/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_tls_encrypter.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_tls_encrypter.cc
+index 0d7c69b102..5923d7118c 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_tls_encrypter.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/crypto/chacha20_poly1305_tls_encrypter.cc
 @@ -8,6 +8,9 @@
@@ -411,11 +408,11 @@ index 0d7c69b..5923d71 100644
 +
 +#undef kKeySize
 +#undef kNonceSize
-diff --git a/quiche/quic/core/crypto/crypto_secret_boxer.cc b/quiche/quic/core/crypto/crypto_secret_boxer.cc
-index 6860bec..03a835c 100644
+diff --git a/net/third_party/quiche/src/quiche/quic/core/crypto/crypto_secret_boxer.cc b/net/third_party/quiche/src/quiche/quic/core/crypto/crypto_secret_boxer.cc
+index bdc87e0594..af6cb33b0b 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/crypto/crypto_secret_boxer.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/crypto/crypto_secret_boxer.cc
-@@ -16,6 +16,8 @@
+@@ -17,6 +17,8 @@
  #include "quiche/quic/core/crypto/quic_random.h"
  #include "quiche/quic/platform/api/quic_logging.h"
  
@@ -424,14 +421,14 @@ index 6860bec..03a835c 100644
  namespace quic {
  
  // kSIVNonceSize contains the number of bytes of nonce in each AES-GCM-SIV box.
-@@ -147,3 +149,5 @@ bool CryptoSecretBoxer::Unbox(absl::string_view in_ciphertext,
+@@ -146,3 +148,5 @@ bool CryptoSecretBoxer::Unbox(absl::string_view in_ciphertext,
  }
  
  }  // namespace quic
 +
 +#undef kAEAD
-diff --git a/quiche/quic/core/http/web_transport_http3.cc b/quiche/quic/core/http/web_transport_http3.cc
-index d0687ee..e348b85 100644
+diff --git a/net/third_party/quiche/src/quiche/quic/core/http/web_transport_http3.cc b/net/third_party/quiche/src/quiche/quic/core/http/web_transport_http3.cc
+index d0687ee7b1..e348b857c1 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/http/web_transport_http3.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/http/web_transport_http3.cc
 @@ -474,3 +474,5 @@ uint64_t WebTransportErrorToHttp3(
@@ -440,18 +437,18 @@ index d0687ee..e348b85 100644
  }  // namespace quic
 +
 +#undef ENDPOINT
-diff --git a/quiche/quic/core/quic_stream.cc b/quiche/quic/core/quic_stream.cc
-index e927ee2..87469a4 100644
+diff --git a/net/third_party/quiche/src/quiche/quic/core/quic_stream.cc b/net/third_party/quiche/src/quiche/quic/core/quic_stream.cc
+index e65e0d7194..abbbba83d7 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/quic_stream.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/quic_stream.cc
-@@ -1448,3 +1448,5 @@ QuicByteCount QuicStream::CalculateSendWindowSize() const {
+@@ -1644,3 +1644,5 @@ QuicByteCount QuicStream::CalculateSendWindowSize() const {
  }
  
  }  // namespace quic
 +
 +#undef ENDPOINT
-diff --git a/quiche/quic/core/quic_stream_id_manager.cc b/quiche/quic/core/quic_stream_id_manager.cc
-index 0129bea..e3f0d88 100644
+diff --git a/net/third_party/quiche/src/quiche/quic/core/quic_stream_id_manager.cc b/net/third_party/quiche/src/quiche/quic/core/quic_stream_id_manager.cc
+index 0129beaec4..e3f0d88d57 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/quic_stream_id_manager.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/quic_stream_id_manager.cc
 @@ -244,3 +244,5 @@ QuicStreamCount QuicStreamIdManager::available_incoming_streams() const {
@@ -460,18 +457,18 @@ index 0129bea..e3f0d88 100644
  }  // namespace quic
 +
 +#undef ENDPOINT
-diff --git a/quiche/quic/core/tls_handshaker.cc b/quiche/quic/core/tls_handshaker.cc
-index ff9bfe5..a3464aa 100644
+diff --git a/net/third_party/quiche/src/quiche/quic/core/tls_handshaker.cc b/net/third_party/quiche/src/quiche/quic/core/tls_handshaker.cc
+index 4c4fb1f3e5..fe69ad9675 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/tls_handshaker.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/tls_handshaker.cc
-@@ -423,3 +423,5 @@ void TlsHandshaker::MessageCallback(bool is_write, int /*version*/,
+@@ -439,3 +439,5 @@ void TlsHandshaker::MessageCallback(bool is_write, int /*version*/,
  }
  
  }  // namespace quic
 +
 +#undef ENDPOINT
 diff --git a/third_party/inspector_protocol/BUILD.gn b/third_party/inspector_protocol/BUILD.gn
-index 646e0cf929..6131bb2509 100644
+index 551df456f5..3b3039fbdb 100644
 --- a/third_party/inspector_protocol/BUILD.gn
 +++ b/third_party/inspector_protocol/BUILD.gn
 @@ -2,7 +2,9 @@
