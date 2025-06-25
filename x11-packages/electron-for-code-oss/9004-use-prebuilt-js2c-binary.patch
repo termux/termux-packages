@@ -1,0 +1,88 @@
+--- a/electron/js2c_toolchain.gni
++++ b/electron/js2c_toolchain.gni
+@@ -4,6 +4,8 @@
+ 
+ declare_args() {
+   electron_js2c_toolchain = ""
++
++  prebuilt_js2c_binary = ""
+ }
+ 
+ if (electron_js2c_toolchain == "") {
+--- a/electron/BUILD.gn
++++ b/electron/BUILD.gn
+@@ -231,8 +231,13 @@
+     ":electron_sandboxed_renderer_bundle",
+     ":electron_utility_bundle",
+     ":electron_worker_bundle",
++  ]
++
++if (prebuilt_js2c_binary == "") {
++  deps += [
+     "//third_party/electron_node:node_js2c($electron_js2c_toolchain)",
+   ]
++}
+ 
+   sources = [
+     "$target_gen_dir/js2c/browser_init.js",
+@@ -248,10 +253,14 @@
+   outputs = [ "$root_gen_dir/electron_natives.cc" ]
+ 
+   script = "build/js2c.py"
++  node_js2c_binary = prebuilt_js2c_binary
++if (node_js2c_binary == "") {
+   out_dir =
+       get_label_info(":anything($electron_js2c_toolchain)", "root_out_dir")
++  node_js2c_binary = rebase_path("$out_dir/node_js2c")
++}
+   args = [
+-           rebase_path("$out_dir/node_js2c"),
++           node_js2c_binary,
+            rebase_path("$root_gen_dir"),
+          ] + rebase_path(outputs, root_gen_dir) +
+          rebase_path(sources, root_gen_dir)
+--- a/third_party/electron_node/unofficial.gni
++++ b/third_party/electron_node/unofficial.gni
+@@ -2,6 +2,7 @@
+ # building official binaries.
+ # Please take a look at node.gyp if you are making changes to build system.
+ 
++import("//electron/js2c_toolchain.gni")
+ import("node.gni")
+ import("$node_v8_path/gni/snapshot_toolchain.gni")
+ import("$node_v8_path/gni/v8.gni")
+@@ -393,9 +394,11 @@
+     script = "//electron/build/run-in-dir.py"
+     deps = [
+       ":node_js2c_original_fs",
+-      ":node_js2c($host_toolchain)",
+       ":generate_config_gypi",
+     ]
++    if (prebuilt_js2c_binary == "") {
++      deps += [ ":node_js2c($electron_js2c_toolchain)", ]
++    }
+ 
+     config_gypi = [ "$target_gen_dir/config.gypi" ]
+     inputs = node_library_files +
+@@ -405,15 +408,19 @@
+     outputs = [ "$target_gen_dir/node_javascript.cc" ]
+ 
+     # Get the path to node_js2c executable of the host toolchain.
++    if (prebuilt_js2c_binary == "") {
+     if (host_os == "win") {
+       host_executable_suffix = ".exe"
+     } else {
+       host_executable_suffix = ""
+     }
+     node_js2c_path =
+-        get_label_info(":node_js2c($host_toolchain)", "root_out_dir") + "/" +
+-        get_label_info(":node_js2c($host_toolchain)", "name") +
++        get_label_info(":node_js2c($electron_js2c_toolchain)", "root_out_dir") + "/" +
++        get_label_info(":node_js2c($electron_js2c_toolchain)", "name") +
+         host_executable_suffix
++    } else {
++      node_js2c_path = prebuilt_js2c_binary
++    }
+ 
+     args = [ rebase_path("$target_gen_dir/js2c_inputs"),
+              rebase_path(node_js2c_path),
