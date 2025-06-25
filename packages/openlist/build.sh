@@ -2,15 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://oplist.org/
 TERMUX_PKG_DESCRIPTION="A file list program that supports multiple storage"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="2096779623 <admin@utermux.dev>"
-TERMUX_PKG_VERSION="4.0.2"
-_OPENLIST_WEB_VERSION="4.0.2"
+TERMUX_PKG_VERSION="4.0.3"
+_OPENLIST_WEB_VERSION="4.0.3"
 TERMUX_PKG_SRCURL=(
 	https://github.com/OpenListTeam/OpenList/archive/v${TERMUX_PKG_VERSION}.tar.gz
-	https://github.com/OpenListTeam/OpenList-Frontend/releases/download/${_OPENLIST_WEB_VERSION}/openlist-frontend-dist-v${_OPENLIST_WEB_VERSION}.tar.gz
+	https://github.com/OpenListTeam/OpenList-Frontend/releases/download/v${_OPENLIST_WEB_VERSION}/openlist-frontend-dist-v${_OPENLIST_WEB_VERSION}.tar.gz
 )
 TERMUX_PKG_SHA256=(
-	d6e7ca46748b1b1d21ff28850f5b25112930d3d2c211e8b9cec1041cbd3523d5
-	f28d15059918dbaf4a0da2f2d92b4a956b46019d321f567217ad4318076c2462
+	f5bf709937c8f060ba1a47e937dbdb3f12e7690644a813cc7693ae028cbbc043
+	26e30834fb36952b5383589a615bcdef6f2e34b29943fa7413351798b63a40e0
 )
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -41,7 +41,7 @@ termux_pkg_auto_update() {
 	local latest_web_version="$("${tmpdir}"/openlist version | grep "WebVersion:" | cut -d ' ' -f 2 | sed 's/^v//')"
 
 	curl -sLo "${tmpdir}/src" "https://github.com/OpenListTeam/OpenList/archive/v${latest_tag}.tar.gz"
-	curl -sLo "${tmpdir}/web" "https://github.com/OpenListTeam/OpenList-Frontend/releases/download/${latest_web_version}/openlist-frontend-dist-v${latest_web_version}.tar.gz"
+	curl -sLo "${tmpdir}/web" "https://github.com/OpenListTeam/OpenList-Frontend/releases/download/v${latest_web_version}/openlist-frontend-dist-v${latest_web_version}.tar.gz"
 	local -a sha=(
 		"$(sha256sum "${tmpdir}/src" | cut -d ' ' -f 1)"
 		"$(sha256sum "${tmpdir}/web" | cut -d ' ' -f 1)"
