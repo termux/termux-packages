@@ -2,13 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://github.com/electron/electron
 TERMUX_PKG_DESCRIPTION="Build cross-platform desktop apps with JavaScript, HTML, and CSS"
 TERMUX_PKG_LICENSE="MIT, BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
-_CHROMIUM_VERSION=132.0.6834.210
-TERMUX_PKG_VERSION=34.5.1
+_CHROMIUM_VERSION=134.0.6998.205
+TERMUX_PKG_VERSION=35.5.1
 TERMUX_PKG_SRCURL=git+https://github.com/electron/electron
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libdrm, libevdev, libxkbcommon, libminizip, libnss, libwayland, libx11, mesa, openssl, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="electron-host-tools-for-code-oss, libnotify, libffi-static"
 # Chromium doesn't support i686 on Linux.
 TERMUX_PKG_EXCLUDED_ARCHES="i686"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
 __tur_setup_depot_tools() {
 	export DEPOT_TOOLS_UPDATE=0
@@ -74,14 +76,6 @@ termux_step_post_get_source() {
 
 	# Install version file
 	echo "$TERMUX_PKG_VERSION" > $TERMUX_PKG_SRCDIR/electron/ELECTRON_VERSION
-}
-
-termux_step_pre_configure() {
-	# Certain packages are not safe to build on device because their
-	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if $TERMUX_ON_DEVICE_BUILD; then
-		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
-	fi
 }
 
 termux_step_configure() {
@@ -193,7 +187,7 @@ termux_step_configure() {
 	touch $_common_args_file
 
 	echo "
-import(\"$TERMUX_PKG_SRCDIR/electron/build/args/release.gn\")
+import(\"//electron/build/args/release.gn\")
 override_electron_version = \"$TERMUX_PKG_VERSION\"
 # Do not build with symbols
 symbol_level = 0
@@ -237,7 +231,8 @@ use_ozone = true
 ozone_auto_platforms = false
 ozone_platform = \"x11\"
 ozone_platform_x11 = true
-ozone_platform_wayland = false
+# FIXME: Remove this when chromium is bumped to cr-135
+ozone_platform_wayland = true
 ozone_platform_headless = true
 angle_enable_vulkan = true
 angle_enable_swiftshader = true
@@ -256,7 +251,7 @@ exclude_unwind_tables = false
 # Enable jumbo build (unified build)
 use_jumbo_build = true
 # Compile pdfium as a static library
-pdf_is_complete_lib = true
+# pdf_is_complete_lib = true
 # Use prebuilt js2c
 prebuilt_js2c_binary = \"$TERMUX_PREFIX/opt/electron-host-tools-for-code-oss/$_v8_toolchain_name/node_js2c\"
 " >> $_common_args_file
@@ -322,7 +317,7 @@ termux_step_make() {
 
 	# Build node_js2c
 	time ninja -C out/Release \
-						third_party/electron_node:node_js2c_exec
+						third_party/electron_node:run_node_js2c
 
 	# Build swiftshader
 	time ninja -C out/Release \
@@ -335,7 +330,8 @@ termux_step_make() {
 						third_party/pdfium:pdfium_public_headers
 
 	# Build node headers of electron
-	time ninja -C out/Release \
+	time env ELECTRON_OUT_DIR=Release \
+					ninja -C out/Release \
 						electron:node_headers
 
 	# Build electron binary
