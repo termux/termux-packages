@@ -1,3 +1,4 @@
+# Origin Repo: x11-packages
 TERMUX_PKG_HOMEPAGE=https://github.com/carlobaldassi/gimp-lqr-plugin
 TERMUX_PKG_DESCRIPTION="LiquidRescale plug-in for seam carving in GIMP"
 TERMUX_PKG_LICENSE="GPL-2.0"
