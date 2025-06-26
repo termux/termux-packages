@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/microsoft/vscode
 TERMUX_PKG_DESCRIPTION="Visual Studio Code - OSS"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux-user-repository"
-TERMUX_PKG_VERSION="1.100.3"
+TERMUX_PKG_VERSION="1.101.0"
 TERMUX_PKG_SRCURL=git+https://github.com/microsoft/vscode
 TERMUX_PKG_GIT_BRANCH="$TERMUX_PKG_VERSION"
 TERMUX_PKG_DEPENDS="electron-for-code-oss, libx11, libxkbfile, libsecret, ripgrep"
@@ -18,8 +18,8 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
-_setup_nodejs_20() {
-	local NODEJS_VERSION=20.19.1
+_setup_nodejs_22() {
+	local NODEJS_VERSION=22.17.0
 	local NODEJS_FOLDER=${TERMUX_PKG_CACHEDIR}/build-tools/nodejs-${NODEJS_VERSION}
 
 	if [ ! -x "$NODEJS_FOLDER/bin/node" ]; then
@@ -27,17 +27,17 @@ _setup_nodejs_20() {
 		local NODEJS_TAR_FILE=$TERMUX_PKG_TMPDIR/nodejs-$NODEJS_VERSION.tar.xz
 		termux_download https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.xz \
 			"$NODEJS_TAR_FILE" \
-			b6c4cedfc81fc544b9993bc8a3628b5c0aa7a169fbaa293460abc0418d0fabb6
+			325c0f1261e0c61bcae369a1274028e9cfb7ab7949c05512c5b1e630f7e80e12
 		tar -xf "$NODEJS_TAR_FILE" -C "$NODEJS_FOLDER" --strip-components=1
 	fi
 	export PATH="$NODEJS_FOLDER/bin:$PATH"
 }
 
 termux_step_post_get_source() {
-	# Ensure that code-oss supports node 20
+	# Ensure that code-oss supports node 22
 	local _node_version=$(cat .nvmrc | cut -d. -f1 -)
-	if [ "$_node_version" != 20 ]; then
-		termux_error_exit "Version mismatch: Expected 20, got $_node_version."
+	if [ "$_node_version" != 22 ]; then
+		termux_error_exit "Version mismatch: Expected 22, got $_node_version."
 	fi
 
 	# Check whether the prebuilt electron version matches the electron version from package.json
@@ -58,10 +58,13 @@ termux_step_post_get_source() {
 
 	# Replace package.json
 	jq ".dependencies.\"native-keymap\" = \"file:./node-native-keymap-src\"" package.json > package.json.tmp && mv package.json.tmp package.json
+
+	# Remove `--max-old-space-size=8192` from package.json
+	sed -i "s/--max-old-space-size=8192 / /g" package.json
 }
 
 termux_step_host_build() {
-	_setup_nodejs_20
+	_setup_nodejs_22
 	export DISABLE_V8_COMPILE_CACHE=1
 	(unset PREFIX prefix
 	npm install node-gyp)
@@ -69,7 +72,7 @@ termux_step_host_build() {
 }
 
 termux_step_configure() {
-	_setup_nodejs_20
+	_setup_nodejs_22
 	export PATH="$TERMUX_PKG_HOSTBUILD_DIR/node_modules/.bin:$PATH"
 }
 
