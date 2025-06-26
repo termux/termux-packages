@@ -50,7 +50,6 @@ else
 	sudo rm -rf /usr/local
 
 	# https://github.com/actions/runner-images/issues/709#issuecomment-612569242
-	sudo rm -rf "/usr/local/share/boost"
 	sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
 	# We shouldn't remove docker & it's images when running from `package_updates` workflow.
