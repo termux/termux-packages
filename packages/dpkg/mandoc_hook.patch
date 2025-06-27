@@ -1,0 +1,67 @@
+--- a/utils/update-alternatives.c
++++ b/utils/update-alternatives.c
+@@ -46,6 +46,8 @@
+ 
+ #include <dpkg/macros.h>
+ #include <dpkg/i18n.h>
++#include <dpkg/command.h>
++#include <dpkg/subproc.h>
+ 
+ /* Global variables: */
+ 
+@@ -2552,6 +2552,31 @@ alternative_install(struct alternative **aptr, struct alternative *inst_alt,
+ 	return new_choice;
+ }
+ 
++/* Update mandoc database after creating symbolic links */
++/* command launching logic copied from the extracthalf() function in src/deb/extract.c */
++static void
++alternative_update_mandoc(void) {
++	const char *cmd_string = "makewhatis";
++
++	if (!command_in_path(cmd_string)) {
++		warning("failed to detect '%s', not updating manpage database", cmd_string);
++		return;
++	}
++
++	log_msg("updating manpage database...");
++	pid_t current_process_is_parent = subproc_fork();
++
++	if (current_process_is_parent) {
++		subproc_reap(current_process_is_parent, cmd_string, 0);
++		return;
++	}
++
++	struct command cmd_struct;
++	command_init(&cmd_struct, cmd_string, cmd_string);
++	command_add_arg(&cmd_struct, cmd_string);
++	command_exec(&cmd_struct);
++}
++
+ static void
+ alternative_update(struct alternative *a,
+                    const char *current_choice, const char *new_choice)
+@@ -3215,8 +3215,12 @@ main(int argc, char **argv)
+ 	if (modifies_alt)
+ 		alternative_update(a, current_choice, new_choice);
+ 
+-	if (a)
++	if (a) {
++		if (a->modified) {
++			alternative_update_mandoc();
++		}
+ 		alternative_free(a);
++	}
+ 	free(new_choice);
+ 	free(log_file);
+ 	free(admdir);
+--- a/utils/Makefile.am
++++ b/utils/Makefile.am
+@@ -34,6 +34,7 @@ update_alternatives_SOURCES = \
+ 
+ update_alternatives_LDADD = \
+ 	../lib/compat/libcompat.la \
++	../lib/dpkg/libdpkg.la \
+ 	$(LIBINTL) \
+ 	# EOL
+ 
