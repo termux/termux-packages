@@ -2,84 +2,138 @@ TERMUX_PKG_HOMEPAGE=https://www.frida.re/
 TERMUX_PKG_DESCRIPTION="Dynamic instrumentation toolkit for developers, reverse-engineers, and security researchers"
 TERMUX_PKG_LICENSE="wxWindows"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-_MAJOR_VERSION=16
-_MINOR_VERSION=1
-_MICRO_VERSION=1
+_MAJOR_VERSION=17
+_MINOR_VERSION=2
+_MICRO_VERSION=11
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}.${_MICRO_VERSION}
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_SRCURL=git+https://github.com/frida/frida
 TERMUX_PKG_AUTO_UPDATE=false
-TERMUX_PKG_DEPENDS="libiconv"
-TERMUX_PKG_BUILD_DEPENDS="openssl"
-TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
-TERMUX_PKG_EXTRA_MAKE_ARGS="ANDROID_NDK_ROOT=$NDK"
 TERMUX_PKG_CONFFILES="var/service/frida-server/run var/service/frida-server/down"
 TERMUX_PKG_CONFLICTS="frida-tools (<< 15.1.24-1)"
 TERMUX_PKG_BREAKS="frida-server (<< 15.1.24)"
 TERMUX_PKG_REPLACES="frida-tools (<< 15.1.24-1), frida-server (<< 15.1.24)"
 TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--enable-server
+--enable-frida-python
+--enable-frida-tools
+"
 
 termux_step_host_build() {
 	termux_setup_nodejs
 
-	# make and save frida-resource-compiler in hostbuild step,
-	# otherwise the one that is compiled in termux_step_make
-	# segfaults (seem to be some tool in termux's toolchain bin
-	# dir that causes it, removing our bin/ dir from PATH fixes
-	# the issue)
-	cd $TERMUX_PKG_SRCDIR
-	make core-linux-x86_64 ${TERMUX_PKG_EXTRA_MAKE_ARGS}
-	cp build/tmp-linux-x86_64/frida-core/tools/frida-resource-compiler \
+	# make and save frida-resource-compiler and quickcompile in
+	# hostbuild step, otherwise the ones that are compiled in
+	# termux_step_make segfaults when compiled with ld.lld from
+	# termux's toolchain
+	cp -a $TERMUX_PKG_SRCDIR/subprojects/frida-core $TERMUX_PKG_HOSTBUILD_DIR/
+	make -C frida-core
+
+	cp frida-core/build/tools/frida-resource-compiler \
+		$TERMUX_PKG_HOSTBUILD_DIR/
+
+	cp frida-core/build/subprojects/frida-gum/bindings/gumjs/quickcompile \
 		$TERMUX_PKG_HOSTBUILD_DIR/
 }
 
-
-termux_step_pre_configure () {
+termux_step_pre_configure() {
+	termux_setup_meson
 	termux_setup_nodejs
+	export PATH="$TERMUX_PKG_HOSTBUILD_DIR":"$PATH"
+	export ANDROID_NDK_ROOT="${NDK}"
 
-	export TERMUX_PKG_EXTRA_MAKE_ARGS+=" PYTHON=/usr/bin/python${TERMUX_PYTHON_VERSION}"
-	sed -e "s%@TERMUX_PREFIX@%$TERMUX_PREFIX%g" \
-		-e "s%@PYTHON_VERSION@%$TERMUX_PYTHON_VERSION%g" \
-		$TERMUX_PKG_BUILDER_DIR/frida-python-version.diff | patch -Np1
-}
+	# Frida needs to get cflags and ldflags for our python, but we
+	# do not want it to pick up other dependencies as frida has
+	# its own fork of quite a few libraries, so hack around it by
+	# copying the python pc file to TMPDIR
+	ln -sf "$TERMUX_PREFIX"/lib/pkgconfig/python-"${TERMUX_PYTHON_VERSION}".pc \
+		"$TERMUX_PKG_TMPDIR/"
+	export PKG_CONFIG_PATH="$TERMUX_PKG_TMPDIR"
 
-termux_step_make () {
-	if [[ ${TERMUX_ARCH} == "aarch64" ]]; then
-		arch=arm64
-	elif [[ ${TERMUX_ARCH} == "i686" ]]; then
-		arch=x86
+	if [[ $TERMUX_ARCH == "aarch64" ]]; then
+		FRIDA_ARCH=arm64
+	elif [[ $TERMUX_ARCH == "i686" ]]; then
+		FRIDA_ARCH=x86
 	else
-		arch=${TERMUX_ARCH}
+		FRIDA_ARCH=${TERMUX_ARCH}
 	fi
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --host=android-${FRIDA_ARCH}"
 
-	export PATH=$TERMUX_PKG_HOSTBUILD_DIR:$PATH
-
-	CC=gcc CXX=g++ make python-android-${arch} ${TERMUX_PKG_EXTRA_MAKE_ARGS}
-	CC=gcc CXX=g++ make tools-android-${arch} ${TERMUX_PKG_EXTRA_MAKE_ARGS}
+	if [ "$TERMUX_DEBUG_BUILD" = true ]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-symbols"
+	fi
 }
 
-termux_step_make_install () {
-	install build/frida-android-${arch}/bin/frida \
-		build/frida-android-${arch}/bin/frida-apk \
-		build/frida-android-${arch}/bin/frida-create \
-		build/frida-android-${arch}/bin/frida-discover \
-		build/frida-android-${arch}/bin/frida-inject \
-		build/frida-android-${arch}/bin/frida-kill \
-		build/frida-android-${arch}/bin/frida-ls-devices \
-		build/frida-android-${arch}/bin/frida-portal \
-		build/frida-android-${arch}/bin/frida-ps \
-		build/frida-android-${arch}/bin/frida-server \
-		build/frida-android-${arch}/bin/frida-trace \
-		build/frida-android-${arch}/bin/gum-graft \
-		${TERMUX_PREFIX}/bin/
-	install build/frida-android-${arch}/lib/{*.so,*.a} ${TERMUX_PREFIX}/lib/
-	cp -r build/frida-android-${arch}/lib/{pkgconfig,python*} ${TERMUX_PREFIX}/lib/
-	cp -r build/frida-android-${arch}/include/frida-* ${TERMUX_PREFIX}/include/
-	cp -r build/frida-android-${arch}/share/vala ${TERMUX_PREFIX}/share/
+termux_step_configure() {
+	$TERMUX_PKG_SRCDIR/configure \
+		--prefix $TERMUX_PREFIX \
+		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
+}
+
+termux_step_post_configure() {
+	# frida's glib uses pidfd_open syscall, which will not work on
+	# android. To work around issue we build glib in
+	# post_configure and replace the library that was fetched as
+	# part of the sdk in the configure step.
+	local _FRIDA_GLIB_COMMIT=8f43c78bc4f6a510c610c7738fdf23ecf99c6be8
+	git clone https://github.com/frida/glib \
+		$TERMUX_PKG_SRCDIR/subprojects/glib
+	cd $TERMUX_PKG_SRCDIR/subprojects/glib
+	git checkout ${_FRIDA_GLIB_COMMIT}
+	patch -d $TERMUX_PKG_SRCDIR -Np1 \
+		-i $TERMUX_PKG_BUILDER_DIR/glib-no-pidfd_open-syscall.diff
+	cd $TERMUX_PKG_BUILDDIR
+
+	local _meson_buildtype="minsize"
+	local _meson_stripflag="--strip"
+	local _GLIB_EXTRA_CONFIGURE_ARGS="
+		-Dcocoa=disabled
+		-Dselinux=disabled
+		-Dxattr=false
+		-Dlibmount=disabled
+		-Dtests=false
+		--force-fallback-for=pcre
+		-Diconv=external
+		-Ddefault_library=static
+	"
+	if [ "$TERMUX_DEBUG_BUILD" = "true" ]; then
+		_meson_buildtype="debug"
+		_meson_stripflag=
+	else
+		_GLIB_EXTRA_CONFIGURE_ARGS+="
+			-Dglib_debug=disabled
+			-Dglib_assert=false
+			-Dglib_checks=false
+		"
+	fi
+	CC=gcc CXX=g++ CFLAGS= CXXFLAGS= CPPFLAGS= LDFLAGS= $TERMUX_MESON \
+		setup \
+		$TERMUX_PKG_SRCDIR/subprojects/glib \
+		$TERMUX_PKG_BUILDDIR/subprojects/glib \
+		--$(test "${TERMUX_PKG_MESON_NATIVE}" = "true" && echo "native-file" || echo "cross-file") $TERMUX_MESON_CROSSFILE \
+		--prefix $TERMUX_PREFIX \
+		--libdir $(test "${TERMUX_ARCH}" = "${TERMUX_REAL_ARCH}" && echo "lib" || echo "lib32") \
+		--includedir $(test "${TERMUX_ARCH}" = "${TERMUX_REAL_ARCH}" && echo "include" || echo "include32") \
+		--buildtype ${_meson_buildtype} \
+		${_meson_stripflag} \
+		$_GLIB_EXTRA_CONFIGURE_ARGS
+
+	ninja -C $TERMUX_PKG_BUILDDIR/subprojects/glib
+
+	ls -l $TERMUX_PKG_BUILDDIR/subprojects/glib/glib/libglib-2.0.a \
+		$TERMUX_PKG_SRCDIR/deps/sdk-android-${FRIDA_ARCH}/lib/libglib-2.0.a \
+		$TERMUX_PKG_SRCDIR/deps/sdk-linux-x86_64/lib/libglib-2.0.a
+	install $TERMUX_PKG_BUILDDIR/subprojects/glib/glib/libglib-2.0.a \
+		$TERMUX_PKG_SRCDIR/deps/sdk-android-${FRIDA_ARCH}/lib/libglib-2.0.a
 }
 
 termux_step_post_make_install () {
+	# Fixup installation location..
+	mv "$TERMUX_PREFIX"/lib/python3/dist-packages/frida* \
+		"$TERMUX_PREFIX"/lib/python"${TERMUX_PYTHON_VERSION}"/site-packages/
+
 	# Setup termux-services scripts
 	mkdir -p $TERMUX_PREFIX/var/service/frida-server/log
 	{

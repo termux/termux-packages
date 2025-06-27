@@ -1,0 +1,44 @@
+diff -ur ../frida-gum.orig/bindings/gumjs/generate-runtime.py ./frida-gum/bindings/gumjs/generate-runtime.py
+--- ../frida-gum.orig/bindings/gumjs/generate-runtime.py	2025-07-11 09:34:38.438694151 +0000
++++ ./subprojects/frida-gum/bindings/gumjs/generate-runtime.py	2025-07-11 17:51:08.710560958 +0000
+@@ -38,7 +38,7 @@
+             gum_dir,
+             capstone_incdir,
+             libtcc_incdir,
+-            quickcompile,
++            'quickcompile',
+             backends,
+             arch,
+             endian,
+@@ -83,7 +83,7 @@
+             priv_dir,
+             input_dir,
+             [s for s in js_sources if s.component is None or s.component == "quickjs"],
+-            quickcompile,
++            'quickcompile',
+             qcflags,
+         )
+ 
+diff -ur ../frida-gum.orig/bindings/gumjs/meson.build ./frida-gum/bindings/gumjs/meson.build
+--- ../frida-gum.orig/bindings/gumjs/meson.build	2025-07-11 09:34:38.447416154 +0000
++++ ./subprojects/frida-gum/bindings/gumjs/meson.build	2025-07-11 17:50:14.510559829 +0000
+@@ -57,10 +57,6 @@
+     gumjs_sources += 'gumquickdatabase.c'
+   endif
+ 
+-  quickcompile = executable('quickcompile', 'gumquickcompile.c',
+-    dependencies: [quickjs_dep_native, gio_dep_native],
+-    native: true,
+-  )
+ else
+   quickcompile = ''
+ endif
+@@ -241,7 +241,7 @@
+     meson.project_source_root() / 'gum',
+     capstone_dep.get_variable('includedir') / 'capstone',
+     libtcc_incdir,
+-    quickcompile,
++    'quickcompile',
+     ','.join(backends),
+     host_arch,
+     host_machine.endian(),

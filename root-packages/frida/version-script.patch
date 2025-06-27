@@ -1,0 +1,106 @@
+--- ../frida.orig/releng/deps.py	2025-07-12 10:41:47.737084598 +0000
++++ ./releng/deps.py	2025-07-12 12:54:32.741886432 +0000
+@@ -454,7 +454,7 @@
+                 symfile = envdir / "toolchain-executable.symbols"
+                 symfile.write_text("# No exported symbols.\n", encoding="utf-8")
+                 extra_ldflags += [f"-Wl,-exported_symbols_list,{symfile}"]
+-            elif self._host_machine.os != "windows":
++            elif self._host_machine.os == "freebsd":
+                 verfile = envdir / "toolchain-executable.version"
+                 verfile.write_text("\n".join([
+                                                  "{",
+@@ -466,6 +466,17 @@
+                                                  "  local:",
+                                                  "    *;",
+                                                  "};",
++                                                 ""
++                                             ]),
++                                   encoding="utf-8")
++                extra_ldflags += [f"-Wl,--version-script,{verfile}"]
++            elif self._host_machine.os != "windows":
++                verfile = envdir / "toolchain-executable.version"
++                verfile.write_text("\n".join([
++                                                 "{",
++                                                 "  local:",
++                                                 "    *;",
++                                                 "};",
+                                                  ""
+                                              ]),
+                                    encoding="utf-8")
+diff -ur ../frida.orig/subprojects/frida-core/inject/frida-inject.version ./subprojects/frida-core/inject/frida-inject.version
+--- ../frida.orig/subprojects/frida-core/inject/frida-inject.version	2025-07-12 10:41:48.264760086 +0000
++++ ./subprojects/frida-core/inject/frida-inject.version	2025-07-12 13:02:31.912844210 +0000
+@@ -1,9 +1,4 @@
+ {
+-  global:
+-    # FreeBSD needs these two:
+-    __progname;
+-    environ;
+-
+   local:
+     *;
+ };
+diff -ur ../frida.orig/subprojects/frida-core/portal/frida-portal.version ./subprojects/frida-core/portal/frida-portal.version
+--- ../frida.orig/subprojects/frida-core/portal/frida-portal.version	2025-07-12 10:41:48.268180979 +0000
++++ ./subprojects/frida-core/portal/frida-portal.version	2025-07-12 13:02:24.455844867 +0000
+@@ -1,9 +1,4 @@
+ {
+-  global:
+-    # FreeBSD needs these two:
+-    __progname;
+-    environ;
+-
+   local:
+     *;
+ };
+diff -ur ../frida.orig/subprojects/frida-core/server/frida-server.version ./subprojects/frida-core/server/frida-server.version
+--- ../frida.orig/subprojects/frida-core/server/frida-server.version	2025-07-12 10:41:48.542217252 +0000
++++ ./subprojects/frida-core/server/frida-server.version	2025-07-12 13:01:56.633847318 +0000
+@@ -1,8 +1,5 @@
+ {
+   global:
+-    # FreeBSD needs these two:
+-    __progname;
+-    environ;
+     # Allow users to load the server as a shared library with dlopen() and call main() directly
+     main;
+ 
+diff -ur ../frida.orig/subprojects/frida-core/tests/frida-tests.version ./subprojects/frida-core/tests/frida-tests.version
+--- ../frida.orig/subprojects/frida-core/tests/frida-tests.version	2025-07-12 10:41:48.554952610 +0000
++++ ./subprojects/frida-core/tests/frida-tests.version	2025-07-12 13:02:41.598843356 +0000
+@@ -1,9 +1,4 @@
+ {
+-  global:
+-    # FreeBSD needs these two:
+-    __progname;
+-    environ;
+-
+   local:
+     *;
+ };
+diff -ur ../frida.orig/subprojects/frida-core/tools/resource-compiler.version ./subprojects/frida-core/tools/resource-compiler.version
+--- ../frida.orig/subprojects/frida-core/tools/resource-compiler.version	2025-07-12 10:41:48.563426313 +0000
++++ ./subprojects/frida-core/tools/resource-compiler.version	2025-07-12 13:02:13.918845795 +0000
+@@ -1,9 +1,4 @@
+ {
+-  global:
+-    # FreeBSD needs these two:
+-    __progname;
+-    environ;
+-
+   local:
+     *;
+ };
+diff -ur ../frida.orig/subprojects/frida-gum/tests/gum-tests.version ./subprojects/frida-gum/tests/gum-tests.version
+--- ../frida.orig/subprojects/frida-gum/tests/gum-tests.version	2025-07-12 10:41:48.849302791 +0000
++++ ./subprojects/frida-gum/tests/gum-tests.version	2025-07-12 13:02:59.015841822 +0000
+@@ -1,9 +1,4 @@
+ {
+-  global:
+-    # FreeBSD needs these two:
+-    __progname;
+-    environ;
+-
+   local:
+     *;
+ };
