@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A session manager for XFCE environment"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.20.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/xfce/xfce4-session/${TERMUX_PKG_VERSION%.*}/xfce4-session-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=a0b80b7136515bc3c0c54fa859ad420365e29b715b6da0b58a2d2781bfbe73c3
 TERMUX_PKG_AUTO_UPDATE=true
@@ -21,25 +22,4 @@ ac_cv_path_ICEAUTH=${TERMUX_PREFIX}/bin/iceauth
 
 termux_step_pre_configure() {
 	termux_setup_glib_cross_pkg_config_wrapper
-}
-
-termux_step_create_debscripts() {
-	cat <<- EOF > ./postinst
-	#!$TERMUX_PREFIX/bin/sh
-	if [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
-		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
-			update-alternatives --install \
-				$TERMUX_PREFIX/bin/x-session-manager x-session-manager $TERMUX_PREFIX/bin/xfce4-session 50
-		fi
-	fi
-	EOF
-
-	cat <<- EOF > ./prerm
-	#!$TERMUX_PREFIX/bin/sh
-	if [ "\$1" != "upgrade" ]; then
-		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
-			update-alternatives --remove x-session-manager $TERMUX_PREFIX/bin/xfce4-session
-		fi
-	fi
-	EOF
 }
