@@ -145,9 +145,9 @@ PACKAGES+=" composer"
 
 # Needed by package rust.
 PACKAGES+=" libssl-dev" # Needed to build Rust
-PACKAGES+=" llvm-18-dev"
-PACKAGES+=" llvm-18-tools"
-PACKAGES+=" clang-18"
+PACKAGES+=" llvm-19-dev"
+PACKAGES+=" llvm-19-tools"
+PACKAGES+=" clang-19"
 
 # Needed by librusty-v8
 PACKAGES+=" libclang-rt-17-dev"
@@ -335,7 +335,7 @@ $SUDO dpkg --add-architecture i386
 $SUDO cp $(dirname "$(realpath "$0")")/llvm-snapshot.gpg.key /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 $SUDO chmod a+r /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 {
-	echo "deb [arch=amd64] http://apt.llvm.org/noble/ llvm-toolchain-noble-18 main"
+	echo "deb [arch=amd64] http://apt.llvm.org/noble/ llvm-toolchain-noble-19 main"
 } | $SUDO tee /etc/apt/sources.list.d/apt-llvm-org.list > /dev/null
 
 $SUDO apt-get -yq update
