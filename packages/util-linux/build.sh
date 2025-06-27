@@ -1,13 +1,14 @@
 TERMUX_PKG_HOMEPAGE=https://en.wikipedia.org/wiki/Util-linux
 TERMUX_PKG_DESCRIPTION="Miscellaneous system utilities"
 TERMUX_PKG_LICENSE="GPL-3.0-or-later, GPL-2.0-or-later, LGPL-2.1-or-later, BSD 3-Clause, BSD, ISC"
-TERMUX_PKG_LICENSE_FILE="\
-Documentation/licenses/COPYING.GPL-3.0-or-later
-Documentation/licenses/COPYING.GPL-2.0-or-later
-Documentation/licenses/COPYING.LGPL-2.1-or-later
-Documentation/licenses/COPYING.BSD-3-Clause
-Documentation/licenses/COPYING.BSD-4-Clause-UC
-Documentation/licenses/COPYING.ISC"
+TERMUX_PKG_LICENSE_FILE="
+	Documentation/licenses/COPYING.GPL-3.0-or-later
+	Documentation/licenses/COPYING.GPL-2.0-or-later
+	Documentation/licenses/COPYING.LGPL-2.1-or-later
+	Documentation/licenses/COPYING.BSD-3-Clause
+	Documentation/licenses/COPYING.BSD-4-Clause-UC
+	Documentation/licenses/COPYING.ISC
+"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.40.2"
 TERMUX_PKG_REVISION=3
@@ -58,10 +59,9 @@ ac_cv_type_struct_statx=no
 "
 
 termux_step_pre_configure() {
-	if [ $TERMUX_ARCH_BITS = 64 ]; then
+	case "$TERMUX_ARCH_BITS" in
 		#prlimit() is only available in 64-bit bionic.
-		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_prlimit=yes"
-	elif [ $TERMUX_ARCH_BITS = 32 ]; then
-		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-year2038"
-	fi
+		64) TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_prlimit=yes";;
+		32) TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-year2038";;
+	esac
 }
