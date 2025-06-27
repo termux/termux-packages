@@ -394,6 +394,11 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_debian_package.sh"
 # shellcheck source=scripts/build/termux_step_create_pacman_package.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_pacman_package.sh"
 
+# Process 'update-alternatives' entries from `.alternatives` files.
+# Not to be overridden by package scripts.
+# shellcheck source=scripts/build/termux_step_update_alternatives.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_update_alternatives.sh"
+
 # Finish the build. Not to be overridden by package scripts.
 # shellcheck source=scripts/build/termux_step_finish_build.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_finish_build.sh"
