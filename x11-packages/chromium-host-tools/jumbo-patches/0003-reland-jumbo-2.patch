@@ -38,7 +38,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  18 files changed, 94 insertions(+), 11 deletions(-)
 
 diff --git a/crypto/BUILD.gn b/crypto/BUILD.gn
-index 9f76eb9cc0..f98bc22479 100644
+index 5b2eda4c29..355216a937 100644
 --- a/crypto/BUILD.gn
 +++ b/crypto/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -49,7 +49,7 @@ index 9f76eb9cc0..f98bc22479 100644
  import("//components/nacl/toolchain.gni")
  import("//crypto/features.gni")
  import("//testing/test.gni")
-@@ -12,7 +13,7 @@ buildflag_header("buildflags") {
+@@ -16,7 +17,7 @@ buildflag_header("buildflags") {
    flags = [ "USE_NSS_CERTS=$use_nss_certs" ]
  }
  
@@ -179,10 +179,10 @@ index 64d9c9bbf5..f894a4efe9 100644
      "api_key_cache.cc",
      "api_key_cache.h",
 diff --git a/google_apis/gaia/oauth2_access_token_fetcher_impl.cc b/google_apis/gaia/oauth2_access_token_fetcher_impl.cc
-index 11d498455e..caed44a8d7 100644
+index c6f8f991d3..867044d39e 100644
 --- a/google_apis/gaia/oauth2_access_token_fetcher_impl.cc
 +++ b/google_apis/gaia/oauth2_access_token_fetcher_impl.cc
-@@ -26,6 +26,9 @@
+@@ -27,6 +27,9 @@
  #include "services/network/public/cpp/simple_url_loader.h"
  #include "services/network/public/mojom/url_response_head.mojom.h"
  
@@ -192,7 +192,7 @@ index 11d498455e..caed44a8d7 100644
  namespace {
  
  constexpr char kGetAccessTokenBodyFormat[] =
-@@ -471,3 +474,6 @@ bool OAuth2AccessTokenFetcherImpl::ParseGetAccessTokenFailureResponse(
+@@ -475,3 +478,6 @@ bool OAuth2AccessTokenFetcherImpl::ParseGetAccessTokenFailureResponse(
  
    return true;
  }
@@ -200,7 +200,7 @@ index 11d498455e..caed44a8d7 100644
 +#undef kAccessTokenKey
 +#undef kExpiresInKey
 diff --git a/google_apis/gaia/oauth2_mint_token_flow.cc b/google_apis/gaia/oauth2_mint_token_flow.cc
-index 6361e728cb..efad3f97bc 100644
+index 9a3d097a81..49f3ee1772 100644
 --- a/google_apis/gaia/oauth2_mint_token_flow.cc
 +++ b/google_apis/gaia/oauth2_mint_token_flow.cc
 @@ -38,6 +38,9 @@
@@ -213,7 +213,7 @@ index 6361e728cb..efad3f97bc 100644
  namespace {
  
  constexpr char kValueFalse[] = "false";
-@@ -686,3 +689,6 @@ OAuth2MintTokenFlow::GetNetworkTrafficAnnotationTag() {
+@@ -675,3 +678,6 @@ OAuth2MintTokenFlow::GetNetworkTrafficAnnotationTag() {
          }
        })");
  }
@@ -339,7 +339,7 @@ index 18636003d3..bd123b47c1 100644
    configs += [ "//build/config/compiler:wexit_time_destructors" ]
  
 diff --git a/ipc/BUILD.gn b/ipc/BUILD.gn
-index eef379f12b..2951557735 100644
+index 3cd4859e1e..83cec6dc4d 100644
 --- a/ipc/BUILD.gn
 +++ b/ipc/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -359,7 +359,7 @@ index eef379f12b..2951557735 100644
    sources = [
      # These are the param_traits sources needed by all platforms,
      # including ios. The rest are added in a conditional block below.
-@@ -107,7 +108,7 @@ component("ipc") {
+@@ -109,7 +110,7 @@ component("ipc") {
    }
  }
  
@@ -407,7 +407,7 @@ index 15f66c849c..6114f78ca7 100644
 +
 +#undef OnEventReady
 diff --git a/sql/BUILD.gn b/sql/BUILD.gn
-index 24fa142672..145a9691b0 100644
+index 14fbb47b25..8d52fd5c05 100644
 --- a/sql/BUILD.gn
 +++ b/sql/BUILD.gn
 @@ -2,6 +2,7 @@

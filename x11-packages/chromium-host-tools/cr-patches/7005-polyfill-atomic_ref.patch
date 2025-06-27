@@ -702,33 +702,60 @@
  #if SIMDUTF_FEATURE_BASE64
    // We include base64_tables once.
  /* begin file src/tables/base64_tables.h */
-@@ -18410,7 +18421,7 @@
-   #if SIMDUTF_ATOMIC_REF
- size_t atomic_binary_to_base64(const char *input, size_t length, char *output,
-                                base64_options options) noexcept {
--  static_assert(std::atomic_ref<char>::required_alignment == 1);
-+  static_assert(__my_atomic_ref<char>::required_alignment == 1);
-   size_t retval = 0;
-   // Arbitrary block sizes: 3KB for input, 4KB for output. Total is 7KB.
-   constexpr size_t input_block_size = 1024 * 3;
-@@ -18430,7 +18441,7 @@
-     // Under x64, we could use 16-byte aligned loads.
-     // Note that we warn users that the performance might be poor.
-     for (size_t j = 0; j < current_block_size; ++j) {
--      inbuf[j] = std::atomic_ref<char>(mutable_input[i + j])
-+      inbuf[j] = __my_atomic_ref<char>(mutable_input[i + j])
-                      .load(std::memory_order_relaxed);
+@@ -16160,7 +16171,7 @@
+ // This function is a memcpy that uses atomic operations to read from the
+ // source.
+ inline void memcpy_atomic_read(char *dst, const char *src, size_t len) {
+-  static_assert(std::atomic_ref<char>::required_alignment == sizeof(char),
++  static_assert(__my_atomic_ref<char>::required_alignment == sizeof(char),
+                 "std::atomic_ref requires the same alignment as char_type");
+   // We expect all 64-bit systems to be able to read 64-bit words from an
+   // aligned memory region atomically. You might be able to do better on
+@@ -16173,7 +16184,7 @@
+     char *mutable_src = const_cast<char *>(bytesrc);
+     for (size_t j = 0; j < bytelen; ++j) {
+       bytedst[j] =
+-          std::atomic_ref<char>(mutable_src[j]).load(std::memory_order_relaxed);
++          __my_atomic_ref<char>(mutable_src[j]).load(std::memory_order_relaxed);
      }
-     const size_t written = binary_to_base64(inbuf.data(), current_block_size,
-@@ -18438,7 +18449,7 @@
-     // This copy is inefficient.
-     // Under x64, we could use 16-byte aligned stores.
-     for (size_t j = 0; j < written; ++j) {
--      std::atomic_ref<char>(output[retval + j])
-+      __my_atomic_ref<char>(output[retval + j])
-           .store(outbuf[j], std::memory_order_relaxed);
+   };
+ 
+@@ -16191,7 +16202,7 @@
+   while (len >= alignment) {
+     auto *src_aligned = reinterpret_cast<uint64_t *>(const_cast<char *>(src));
+     const auto dst_value =
+-        std::atomic_ref<uint64_t>(*src_aligned).load(std::memory_order_relaxed);
++        __my_atomic_ref<uint64_t>(*src_aligned).load(std::memory_order_relaxed);
+     std::memcpy(dst, &dst_value, sizeof(uint64_t));
+     src += alignment;
+     dst += alignment;
+@@ -16207,7 +16218,7 @@
+ // This function is a memcpy that uses atomic operations to write to the
+ // destination.
+ inline void memcpy_atomic_write(char *dst, const char *src, size_t len) {
+-  static_assert(std::atomic_ref<char>::required_alignment == sizeof(char),
++  static_assert(__my_atomic_ref<char>::required_alignment == sizeof(char),
+                 "std::atomic_ref requires the same alignment as char");
+   // We expect all 64-bit systems to be able to write 64-bit words to an aligned
+   // memory region atomically.
+@@ -16219,7 +16230,7 @@
+   auto bbb_memcpy_atomic_write = [](char *bytedst, const char *bytesrc,
+                                     size_t bytelen) noexcept {
+     for (size_t j = 0; j < bytelen; ++j) {
+-      std::atomic_ref<char>(bytedst[j])
++      __my_atomic_ref<char>(bytedst[j])
+           .store(bytesrc[j], std::memory_order_relaxed);
      }
-     retval += written;
+   };
+@@ -16239,7 +16250,7 @@
+     auto *dst_aligned = reinterpret_cast<uint64_t *>(dst);
+     uint64_t src_val;
+     std::memcpy(&src_val, src, sizeof(uint64_t)); // Non-atomic read from src
+-    std::atomic_ref<uint64_t>(*dst_aligned)
++    __my_atomic_ref<uint64_t>(*dst_aligned)
+         .store(src_val, std::memory_order_relaxed);
+     dst += alignment;
+     src += alignment;
 --- a/v8/src/objects/simd.cc
 +++ b/v8/src/objects/simd.cc
 @@ -32,6 +32,15 @@
