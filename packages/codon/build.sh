@@ -3,18 +3,17 @@ TERMUX_PKG_DESCRIPTION="A high-performance, zero-overhead, extensible Python com
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-_LLVM_COMMIT=c5a1d86495d28ab045258f120a8e2c9f3ef67a3b
-TERMUX_PKG_VERSION="0.18.2"
-TERMUX_PKG_REVISION=1
+_LLVM_COMMIT=05ba68c2286e5b1972fb593f316987a07d81ebe1
+TERMUX_PKG_VERSION="0.19.0"
 TERMUX_PKG_SRCURL=(
 	https://github.com/exaloop/codon/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
 	https://github.com/exaloop/codon/releases/download/v$TERMUX_PKG_VERSION/codon-linux-x86_64.tar.gz
 	https://github.com/exaloop/llvm-project/archive/${_LLVM_COMMIT}.zip
 )
 TERMUX_PKG_SHA256=(
-	ca61e0aa9d0a1f52e2a4e23d1fc94dca56da38411312e6d0fd4aa327f80c3e4b
-	74b501e7037b45563daa4857ec132c989eca011515904d59e8bb02f4bd8f81d2
-	db37e218bb62b261f9debb4bb526a4abb37af8ac9a7973099c6d9a99a3e424c6
+	47c060b7ffacca4342970547c6e3befa0d2dcfc822449e7ffcc0daaec9e83a2f
+	428488aa86119b70b485da1707bec00fa664690c84392e708b2e97b662f2652d
+	3828457c3072419a5ee16c9c790cc021704931b7382ca435f8cff78cccb4f952
 )
 TERMUX_PKG_DEPENDS="libc++, libxml2, zlib, zstd"
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -33,18 +32,20 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_LINK_LLVM_DYLIB=on
 -DLLVM_NATIVE_TOOL_DIR=$TERMUX_PKG_HOSTBUILD_DIR/llvm-build/bin
 -DCROSS_TOOLCHAIN_FLAGS_LLVM_NATIVE=-DLLVM_NATIVE_TOOL_DIR=$TERMUX_PKG_HOSTBUILD_DIR/llvm-build/bin
--DLIBOMP_ENABLE_SHARED=FALSE
+-DLIBOMP_ENABLE_SHARED=ON
 -DLLVM_ENABLE_SPHINX=ON
 -DSPHINX_OUTPUT_MAN=ON
 -DSPHINX_WARNINGS_AS_ERRORS=OFF
 -DPERL_EXECUTABLE=$(command -v perl)
--DLLVM_TARGETS_TO_BUILD=all
 -DLLVM_INSTALL_UTILS=OFF
 -DLLVM_INCLUDE_TESTS=OFF
+-DLLVM_ENABLE_TERMINFO=OFF
 -DLLVM_ENABLE_FFI=ON
 -DLLVM_ENABLE_RTTI=ON
 -DLLVM_ENABLE_ZLIB=OFF
--DLLVM_ENABLE_TERMINFO=OFF
+-DLLVM_ENABLE_ZSTD=OFF
+-DLLVM_TARGETS_TO_BUILD=all
+-DLLVM_ENABLE_PROJECTS=clang;openmp
 "
 TERMUX_PKG_FORCE_CMAKE=true
 
@@ -63,9 +64,6 @@ termux_step_post_get_source() {
 		termux_error_exit "LLVM commit mismatch: current $_LLVM_COMMIT, expected $_llvm_commit."
 	fi
 	mv llvm-project-"$_llvm_commit" llvm-project
-
-	mkdir -p patches
-	cp -f "$TERMUX_PKG_BUILDER_DIR"/openmp.diff patches/openmp.diff
 }
 
 termux_step_host_build() {
@@ -75,9 +73,11 @@ termux_step_host_build() {
 	# Compile llvm host tools
 	mkdir -p llvm-build
 	cd llvm-build
-	cmake -G Ninja "-DCMAKE_BUILD_TYPE=Release" \
-					"$TERMUX_PKG_SRCDIR"/llvm-project/llvm
-	ninja -j $TERMUX_PKG_MAKE_PROCESSES llvm-tblgen llvm-min-tblgen
+	cmake -G Ninja \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DLLVM_ENABLE_PROJECTS=clang \
+		"$TERMUX_PKG_SRCDIR"/llvm-project/llvm
+	ninja -j $TERMUX_PKG_MAKE_PROCESSES llvm-tblgen llvm-min-tblgen clang-tblgen
 	cd -
 
 	# Compile peg2cpp
@@ -175,6 +175,6 @@ EOF
 }
 
 termux_step_post_massage() {
-	# Remove libfmt.a
-	rm -rf lib
+	# Remove some unrelated includes and libraries
+	rm -rf include lib
 }
