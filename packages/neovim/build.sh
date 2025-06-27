@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0, VIM License"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="0.11.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=324759a1bcd1a80b32a7eae1516ee761ec3e566d08284a24c4c7ca59079aabfa
 TERMUX_PKG_AUTO_UPDATE=true
@@ -86,33 +87,31 @@ termux_step_post_make_install() {
 	# Move the `nvim` binary to $PREFIX/libexec
 	# and replace it with our LD_PRELOAD shim.
 	# See: packages/neovim/nvim-shim.sh for details.
+	mkdir -p "$TERMUX_PREFIX/libexec/nvim"
 	mv "${TERMUX_PREFIX}"/bin/nvim "${TERMUX_PREFIX}"/libexec/nvim
 	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
 		"$TERMUX_PKG_BUILDER_DIR/nvim-shim.sh" \
 		> "${TERMUX_PREFIX}/bin/nvim"
-	chmod 755 "${TERMUX_PREFIX}/bin/nvim"
-}
+	chmod 700 "${TERMUX_PREFIX}/bin/nvim"
 
-termux_step_create_debscripts() {
-	cat <<-EOF >./postinst
-		#!$TERMUX_PREFIX/bin/sh
-		if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
-			if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
-				update-alternatives --install \
-					$TERMUX_PREFIX/bin/editor editor $TERMUX_PREFIX/bin/nvim 40
-				update-alternatives --install \
-					$TERMUX_PREFIX/bin/vi vi $TERMUX_PREFIX/bin/nvim 15
-			fi
-		fi
-	EOF
+	{ # Set up a wrapper script for `ex` to be called by `update-alternatives`
+		echo "#!$TERMUX_PREFIX/bin/sh"
+		echo "exec \"$TERMUX_PREFIX/bin/nvim\" -e \"\$@\""
+	} > "$TERMUX_PREFIX/libexec/nvim/ex"
 
-	cat <<-EOF >./prerm
-		#!$TERMUX_PREFIX/bin/sh
-		if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" != "upgrade" ]; then
-			if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
-				update-alternatives --remove editor $TERMUX_PREFIX/bin/nvim
-				update-alternatives --remove vi $TERMUX_PREFIX/bin/nvim
-			fi
-		fi
-	EOF
+	{ # Set up a wrapper script for `view` to be called by `update-alternatives`
+		echo "#!$TERMUX_PREFIX/bin/sh"
+		echo "exec \"$TERMUX_PREFIX/bin/nvim\" -R \"\$@\""
+	} > "$TERMUX_PREFIX/libexec/nvim/view"
+
+	{ # Set up a wrapper script for `vimdiff` to be called by `update-alternatives`
+		echo "#!$TERMUX_PREFIX/bin/sh"
+		echo "exec \"$TERMUX_PREFIX/bin/nvim\" -d \"\$@\""
+	} > "$TERMUX_PREFIX/libexec/nvim/vimdiff"
+
+	{ # Set up a wrapper script for `vimtutor` to be called by `update-alternatives`
+		echo "#!$TERMUX_PREFIX/bin/sh"
+		echo "exec \"$TERMUX_PREFIX/bin/nvim\" +Tutor \"\$@\""
+	} > "$TERMUX_PREFIX/libexec/nvim/vimtutor"
+	chmod 700 "$TERMUX_PREFIX/libexec/nvim/"{ex,view,vimdiff,vimtutor}
 }
