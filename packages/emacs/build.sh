@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Update both emacs and emacs-x to the same version in one PR.
 TERMUX_PKG_VERSION=30.1
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
 if [[ $TERMUX_PKG_VERSION == *-rc* ]]; then
 	TERMUX_PKG_SRCURL=https://alpha.gnu.org/gnu/emacs/pretest/emacs-${TERMUX_PKG_VERSION#*:}.tar.xz
@@ -68,13 +68,6 @@ TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/grep-changelog
 lib/systemd
-share/applications/emacs.desktop
-share/emacs/${TERMUX_PKG_VERSION}/etc/emacs.desktop
-share/emacs/${TERMUX_PKG_VERSION}/etc/emacs.icon
-share/emacs/${TERMUX_PKG_VERSION}/etc/images
-share/emacs/${TERMUX_PKG_VERSION}/etc/refcards
-share/emacs/${TERMUX_PKG_VERSION}/etc/tutorials/TUTORIAL.*
-share/icons
 share/man/man1/grep-changelog.1.gz
 "
 
@@ -83,81 +76,71 @@ share/man/man1/grep-changelog.1.gz
 # program still remain in the emacs package):
 TERMUX_PKG_RM_AFTER_INSTALL+=" bin/ctags share/man/man1/ctags.1 share/man/man1/ctags.1.gz"
 
-
+# Get shellcheck to shut up about "$TERMUX_PKG_VERSION"
+# getting reassigned in a subshell down below.
+# shellcheck disable=SC2031
 termux_step_post_get_source() {
 	# Certain packages are not safe to build on device because their
 	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if $TERMUX_ON_DEVICE_BUILD; then
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
 		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
 	fi
 
 	# Version guard
-	local ver_e=${TERMUX_PKG_VERSION#*:}
-	local ver_x=$(. $TERMUX_SCRIPTDIR/x11-packages/emacs-x/build.sh; echo ${TERMUX_PKG_VERSION#*:})
+	local ver_e ver_x
+	ver_e="${TERMUX_PKG_VERSION#*:}"
+	ver_x="$(. "$TERMUX_SCRIPTDIR/x11-packages/emacs-x/build.sh"; echo "${TERMUX_PKG_VERSION#*:}")"
 	if [ "${ver_e}" != "${ver_x}" ]; then
 		termux_error_exit "Version mismatch between emacs and emacs-x."
 	fi
 
 	# XXX: We have to start with new host build each time
 	#      to avoid build error when cross compiling.
-	rm -Rf $TERMUX_PKG_HOSTBUILD_DIR
+	rm -Rf "$TERMUX_PKG_HOSTBUILD_DIR"
 
 	# Termux only use info pages for emacs. Remove the info directory
 	# to get a clean Info directory file dir.
-	rm -Rf $TERMUX_PREFIX/share/info
+	rm -Rf "$TERMUX_PREFIX/share/info"
 }
 
+# shellcheck disable=SC2031
 termux_step_host_build() {
-	local _VERSION=$(echo ${TERMUX_PKG_VERSION#*:} | cut -d - -f 1)
+	local _VERSION="${TERMUX_PKG_VERSION#*:}"
 	# Build a bootstrap-emacs binary to be used in termux_step_post_configure.
 	local NATIVE_PREFIX=$TERMUX_PKG_TMPDIR/emacs-native
-	mkdir -p $NATIVE_PREFIX/share/emacs/${_VERSION}
-	ln -s $TERMUX_PKG_SRCDIR/lisp $NATIVE_PREFIX/share/emacs/${_VERSION}/lisp
-	( cd $TERMUX_PKG_SRCDIR; ./autogen.sh )
-	$TERMUX_PKG_SRCDIR/configure --prefix=$NATIVE_PREFIX --without-all --without-x
-	make -j $TERMUX_PKG_MAKE_PROCESSES
+	mkdir -p "$NATIVE_PREFIX/share/emacs/${_VERSION}"
+	ln -s "$TERMUX_PKG_SRCDIR/lisp" "$NATIVE_PREFIX/share/emacs/${_VERSION}/lisp"
+	( cd "$TERMUX_PKG_SRCDIR" && ./autogen.sh )
+	"$TERMUX_PKG_SRCDIR/configure" --prefix="$NATIVE_PREFIX" --without-all --without-x
+	make -j "$TERMUX_PKG_MAKE_PROCESSES"
 }
 
 termux_step_post_configure() {
-	cp $TERMUX_PKG_HOSTBUILD_DIR/src/bootstrap-emacs $TERMUX_PKG_BUILDDIR/src/bootstrap-emacs
-	cp $TERMUX_PKG_HOSTBUILD_DIR/lib-src/make-docfile $TERMUX_PKG_BUILDDIR/lib-src/make-docfile
-	cp $TERMUX_PKG_HOSTBUILD_DIR/lib-src/make-fingerprint $TERMUX_PKG_BUILDDIR/lib-src/make-fingerprint
-	cp -r $TERMUX_PKG_SRCDIR/lisp/* $TERMUX_PKG_BUILDDIR/lisp
-	cp -r $TERMUX_PKG_SRCDIR/etc $TERMUX_PKG_BUILDDIR
+	cp "$TERMUX_PKG_HOSTBUILD_DIR/src/bootstrap-emacs" "$TERMUX_PKG_BUILDDIR/src/bootstrap-emacs"
+	cp "$TERMUX_PKG_HOSTBUILD_DIR/lib-src/make-docfile" "$TERMUX_PKG_BUILDDIR/lib-src/make-docfile"
+	cp "$TERMUX_PKG_HOSTBUILD_DIR/lib-src/make-fingerprint" "$TERMUX_PKG_BUILDDIR/lib-src/make-fingerprint"
+	cp -r "$TERMUX_PKG_SRCDIR/lisp"/* "$TERMUX_PKG_BUILDDIR/lisp"
+	cp -r "$TERMUX_PKG_SRCDIR/etc" "$TERMUX_PKG_BUILDDIR"
 	# Update timestamps so that the binaries does not get rebuilt:
-	touch -d "next hour" $TERMUX_PKG_BUILDDIR/src/bootstrap-emacs \
-		$TERMUX_PKG_BUILDDIR/lib-src/make-docfile \
-		$TERMUX_PKG_BUILDDIR/lib-src/make-fingerprint
+	touch -d "next hour" "$TERMUX_PKG_BUILDDIR/src/bootstrap-emacs" \
+		"$TERMUX_PKG_BUILDDIR/lib-src/make-docfile" \
+		"$TERMUX_PKG_BUILDDIR/lib-src/make-fingerprint"
 }
 
+# shellcheck disable=SC2031
 termux_step_post_make_install() {
-	mkdir -p $TERMUX_PREFIX/share/emacs/${TERMUX_PKG_VERSION}/lisp/emacs-lisp/
-	install -Dm600 $TERMUX_PKG_BUILDER_DIR/site-start.el \
-		$TERMUX_PREFIX/share/emacs/site-lisp/site-start.el
+	mkdir -p "$TERMUX_PREFIX/share/emacs/${TERMUX_PKG_VERSION}/lisp/emacs-lisp/"
+	install -Dm600 "$TERMUX_PKG_BUILDER_DIR/site-start.el" \
+		"$TERMUX_PREFIX/share/emacs/site-lisp/site-start.el"
 }
 
+# shellcheck disable=SC2031
 termux_step_create_debscripts() {
-	local _VERSION=$(echo ${TERMUX_PKG_VERSION#*:} | cut -d - -f 1)
+	local _VERSION="${TERMUX_PKG_VERSION#*:}"
 	cat <<- EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
-	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
-		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
-			update-alternatives --install \
-				$TERMUX_PREFIX/bin/editor editor $TERMUX_PREFIX/bin/emacs 40
-		fi
-	fi
-
 	cd $TERMUX_PREFIX/share/emacs/${_VERSION}/lisp
 	LC_ALL=C $TERMUX_PREFIX/bin/emacs -batch -l loadup --temacs=pdump
 	mv $TERMUX_PREFIX/bin/emacs*.pdmp $TERMUX_PREFIX/libexec/emacs/${_VERSION}/${TERMUX_ARCH}-linux-android*/
-	EOF
-
-	cat <<- EOF > ./prerm
-	#!$TERMUX_PREFIX/bin/sh
-	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" != "upgrade" ]; then
-		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
-			update-alternatives --remove editor $TERMUX_PREFIX/bin/emacs
-		fi
-	fi
 	EOF
 }
