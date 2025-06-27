@@ -11,6 +11,7 @@ TERMUX_PKG_BREAKS="vim-python, vim-runtime"
 TERMUX_PKG_REPLACES="vim-python, vim-runtime"
 TERMUX_PKG_PROVIDES="vim-python"
 TERMUX_PKG_VERSION="9.1.1450"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=9d7da37891a07b089ecd0193883ca78898c41832036c10b83695071800e3a15f
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -48,11 +49,6 @@ vi_cv_var_python3_version=${TERMUX_PYTHON_VERSION}
 "
 
 TERMUX_PKG_RM_AFTER_INSTALL="
-bin/rview
-bin/rvim
-bin/ex
-share/man/man1/evim.1
-share/icons
 share/vim/vim91/spell/en.ascii*
 share/vim/vim91/print
 share/vim/vim91/tools
@@ -85,7 +81,8 @@ termux_step_pre_configure() {
 	make distclean
 
 	# Remove eventually existing symlinks from previous builds so that they get re-created.
-	for sym in 'rview' 'rvim' 'ex' 'view' 'vimdiff'; do
+	local -a VIM_BINARIES=('eview' 'evim' 'ex' 'rview' 'rvim' 'view' 'vimdiff')
+	for sym in "${VIM_BINARIES[@]}"; do
 		rm -f "${TERMUX_PREFIX}/bin/${sym}"
 		rm -f "$TERMUX_PREFIX/share/man/man1/${sym}.1"*
 	done
@@ -126,28 +123,6 @@ termux_step_post_make_install() {
 	rm -rf "$TERMUX_PREFIX/share/vim/vim91/tutor"/*
 	# Copy back what we saved earlier
 	cp -r "$TERMUX_PKG_TMPDIR"/vim-tutor/* "$TERMUX_PREFIX/share/vim/vim91/tutor/"
-}
-
-termux_step_create_debscripts() {
-	cat <<- EOF > ./postinst
-	#!$TERMUX_PREFIX/bin/sh
-	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
-		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
-			update-alternatives --install \
-				$TERMUX_PREFIX/bin/editor editor $TERMUX_PREFIX/bin/vim 50
-			update-alternatives --install \
-				$TERMUX_PREFIX/bin/vi vi $TERMUX_PREFIX/bin/vim 20
-		fi
-	fi
-	EOF
-
-	cat <<- EOF > ./prerm
-	#!$TERMUX_PREFIX/bin/sh
-	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" != "upgrade" ]; then
-		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
-			update-alternatives --remove editor $TERMUX_PREFIX/bin/vim
-			update-alternatives --remove vi $TERMUX_PREFIX/bin/vim
-		fi
-	fi
-	EOF
+	mkdir -p "$TERMUX_PREFIX/libexec/vim"
+	mv "${TERMUX_PREFIX}"/bin/{ex,view,vim{,diff,tutor}} "${TERMUX_PREFIX}"/libexec/vim
 }
