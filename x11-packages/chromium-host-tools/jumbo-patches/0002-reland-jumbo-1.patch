@@ -31,7 +31,7 @@ Enable jumbo build for the following template(s):
  12 files changed, 63 insertions(+), 9 deletions(-)
 
 diff --git a/base/BUILD.gn b/base/BUILD.gn
-index 57a6af0061..fd69197bea 100644
+index 5b41b3d805..0ad5a8724c 100644
 --- a/base/BUILD.gn
 +++ b/base/BUILD.gn
 @@ -28,6 +28,7 @@ import("//build/config/cast.gni")
@@ -42,7 +42,7 @@ index 57a6af0061..fd69197bea 100644
  import("//build/config/logging.gni")
  import("//build/config/nacl/config.gni")
  import("//build/config/profiling/profiling.gni")
-@@ -173,7 +174,7 @@ use_epoll = is_linux || is_chromeos || is_android
+@@ -177,7 +178,7 @@ use_epoll = is_linux || is_chromeos || is_android
  # base compilation units to be linked in where they wouldn't have otherwise.
  # This does not include test code (test support and anything in the test
  # directory) which should use source_set as is recommended for GN targets).
@@ -51,7 +51,7 @@ index 57a6af0061..fd69197bea 100644
    sources = [
      "allocator/allocator_check.cc",
      "allocator/allocator_check.h",
-@@ -980,6 +981,10 @@ component("base") {
+@@ -987,6 +988,10 @@ component("base") {
      ]
    }
  
@@ -62,7 +62,7 @@ index 57a6af0061..fd69197bea 100644
    if (is_linux || is_chromeos) {
      sources += [
        "debug/proc_maps_linux.cc",
-@@ -998,6 +1003,7 @@ component("base") {
+@@ -1005,6 +1010,7 @@ component("base") {
        "threading/thread_type_delegate.cc",
        "threading/thread_type_delegate.h",
      ]
@@ -70,7 +70,7 @@ index 57a6af0061..fd69197bea 100644
    }
  
    if (is_chromeos) {
-@@ -1963,6 +1969,11 @@ component("base") {
+@@ -1982,6 +1988,11 @@ component("base") {
        "win/wrapped_window_proc.h",
      ]
  
@@ -82,7 +82,7 @@ index 57a6af0061..fd69197bea 100644
      deps += [ "//base/win:base_win_buildflags" ]
  
      if (com_init_check_hook_disabled) {
-@@ -2807,7 +2818,7 @@ static_library("base_static") {
+@@ -2880,7 +2891,7 @@ if (enable_rust_translit) {
    }
  }
  
@@ -92,7 +92,7 @@ index 57a6af0061..fd69197bea 100644
    sources = [
      "i18n/base_i18n_export.h",
 diff --git a/base/sampling_heap_profiler/poisson_allocation_sampler.cc b/base/sampling_heap_profiler/poisson_allocation_sampler.cc
-index 7cb929647f..fdf96e9d5b 100644
+index 1bd644d7ab..473f84cb1a 100644
 --- a/base/sampling_heap_profiler/poisson_allocation_sampler.cc
 +++ b/base/sampling_heap_profiler/poisson_allocation_sampler.cc
 @@ -19,6 +19,8 @@
@@ -236,26 +236,26 @@ index 090420c902..6b0e76bf21 100644
      if (defined(invoker.configs)) {
        configs += invoker.configs
 diff --git a/components/viz/service/display/occlusion_culler.cc b/components/viz/service/display/occlusion_culler.cc
-index f1683759c5..d0c279961b 100644
+index 9174b4f92d..4409926784 100644
 --- a/components/viz/service/display/occlusion_culler.cc
 +++ b/components/viz/service/display/occlusion_culler.cc
-@@ -23,6 +23,8 @@
- #include "ui/gfx/geometry/rect.h"
+@@ -26,6 +26,8 @@
  #include "ui/gfx/geometry/rect_conversions.h"
+ #include "ui/gfx/geometry/rect_f.h"
  
 +#define kEpsilon kEpsilon_OcclusionCuller
 +
  namespace viz {
  namespace {
  
-@@ -457,3 +459,5 @@ bool OcclusionCuller::CanSplitDrawQuad(
+@@ -537,3 +539,5 @@ bool OcclusionCuller::CanSplitDrawQuad(
  }
  
  }  // namespace viz
 +
 +#undef kEpsilon
 diff --git a/components/viz/service/display/overlay_candidate_factory.cc b/components/viz/service/display/overlay_candidate_factory.cc
-index a85234ab61..86c3a05767 100644
+index 898652d4d8..696a784ff1 100644
 --- a/components/viz/service/display/overlay_candidate_factory.cc
 +++ b/components/viz/service/display/overlay_candidate_factory.cc
 @@ -95,6 +95,8 @@ gfx::OverlayTransform GetOverlayTransform(const gfx::Transform& quad_transform,
@@ -267,14 +267,14 @@ index a85234ab61..86c3a05767 100644
  constexpr double kEpsilon = 0.0001;
  
  // Determine why the transformation isn't axis aligned. A transform with z
-@@ -837,3 +839,5 @@ gfx::RectF OverlayCandidateFactory::GetDamageRect(const DrawQuad* quad) const {
+@@ -834,3 +836,5 @@ gfx::RectF OverlayCandidateFactory::GetDamageRect(const DrawQuad* quad) const {
  }
  
  }  // namespace viz
 +
 +#undef kEpsilon
 diff --git a/components/viz/service/display/skia_renderer.cc b/components/viz/service/display/skia_renderer.cc
-index cd99df43f8..5a62f57170 100644
+index 038e79c73b..2b43438c9b 100644
 --- a/components/viz/service/display/skia_renderer.cc
 +++ b/components/viz/service/display/skia_renderer.cc
 @@ -108,6 +108,8 @@
@@ -286,17 +286,17 @@ index cd99df43f8..5a62f57170 100644
  namespace viz {
  
  namespace {
-@@ -4517,3 +4519,5 @@ bool SkiaRenderer::OverlayLockKeyEqual::operator()(
+@@ -4500,3 +4502,5 @@ bool SkiaRenderer::OverlayLockKeyEqual::operator()(
  #endif
  
  }  // namespace viz
 +
 +#undef MakeOpacityFilter
 diff --git a/components/viz/service/display/software_renderer.cc b/components/viz/service/display/software_renderer.cc
-index f935227bf9..8b41007c0f 100644
+index 8740f6a0ce..0dee55b0a0 100644
 --- a/components/viz/service/display/software_renderer.cc
 +++ b/components/viz/service/display/software_renderer.cc
-@@ -54,6 +54,8 @@
+@@ -53,6 +53,8 @@
  #include "ui/gfx/geometry/skia_conversions.h"
  #include "ui/gfx/geometry/transform.h"
  
@@ -305,14 +305,14 @@ index f935227bf9..8b41007c0f 100644
  namespace viz {
  namespace {
  
-@@ -1106,3 +1108,5 @@ gfx::Rect SoftwareRenderer::GetRenderPassBackingDrawnRect(
+@@ -1087,3 +1089,5 @@ gfx::Rect SoftwareRenderer::GetRenderPassBackingDrawnRect(
  }
  
  }  // namespace viz
 +
 +#undef MakeOpacityFilter
 diff --git a/components/viz/service/frame_sinks/frame_sink_manager_impl.h b/components/viz/service/frame_sinks/frame_sink_manager_impl.h
-index 8abd5ef50a..4201fb4838 100644
+index 83ddb1856b..b6979f6f1f 100644
 --- a/components/viz/service/frame_sinks/frame_sink_manager_impl.h
 +++ b/components/viz/service/frame_sinks/frame_sink_manager_impl.h
 @@ -5,6 +5,9 @@

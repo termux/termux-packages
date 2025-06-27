@@ -72,7 +72,7 @@
    // web security by setting the kWebKitWebSecurityEnabled pref directly.
 --- a/content/shell/browser/shell_content_browser_client.cc
 +++ b/content/shell/browser/shell_content_browser_client.cc
-@@ -140,6 +140,10 @@
+@@ -141,6 +141,10 @@
  #include "media/mojo/services/media_foundation_preferences.h"
  #endif  // BUILDFLAG(IS_WIN)
  
@@ -83,13 +83,13 @@
  namespace content {
  
  namespace {
-@@ -448,6 +452,9 @@
-     // to shell_main.cc that it's a browser test.
-     switches::kBrowserTest,
+@@ -451,6 +455,9 @@
+       // to shell_main.cc that it's a browser test.
+       switches::kBrowserTest,
  #endif
 +#ifdef __TERMUX__
-+    sandbox::policy::switches::kNoSandbox
++      sandbox::policy::switches::kNoSandbox
 +#endif
-     switches::kCrashDumpsDir,
-     switches::kEnableCrashReporter,
-     switches::kExposeInternalsForTesting,
+       switches::kCrashDumpsDir,
+       switches::kEnableCrashReporter,
+       switches::kExposeInternalsForTesting,

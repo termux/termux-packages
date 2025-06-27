@@ -41,6 +41,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  extensions/BUILD.gn                                |  3 ++-
  extensions/browser/BUILD.gn                        |  3 ++-
  .../api/declarative/rules_registry_service.cc      |  4 ++++
+ .../declarative_webrequest/webrequest_condition.cc |  5 +----
  .../webrequest_condition_attribute.cc              |  5 ++++-
  .../browser/api/hid/hid_connection_resource.cc     |  4 ++++
  extensions/browser/api/hid/hid_device_manager.cc   |  6 ++++++
@@ -49,6 +50,9 @@ Enable jumbo build for the following component(s)/source_set(s):
  .../extension_web_request_event_router.cc          |  5 ++++-
  .../api/web_request/upload_data_presenter.cc       |  5 ++++-
  .../browser/api/web_request/web_request_api.cc     | 10 +++++++++-
+ .../api/web_request/web_request_api_helpers.cc     |  2 +-
+ .../api/web_request/web_request_event_details.cc   |  5 ++++-
+ .../browser/api/web_request/web_request_info.cc    |  3 +--
  .../web_request_proxying_url_loader_factory.cc     |  4 ++++
  .../web_request/web_request_proxying_websocket.cc  |  4 ++++
  .../browser/guest_view/app_view/app_view_guest.cc  | 12 ++++++------
@@ -65,10 +69,10 @@ Enable jumbo build for the following component(s)/source_set(s):
  extensions/renderer/BUILD.gn                       |  5 +++--
  .../renderer/extension_localization_throttle.cc    |  4 ++++
  .../renderer/extension_url_loader_throttle.cc      |  4 ++++
- 51 files changed, 236 insertions(+), 33 deletions(-)
+ 55 files changed, 243 insertions(+), 41 deletions(-)
 
 diff --git a/device/bluetooth/BUILD.gn b/device/bluetooth/BUILD.gn
-index 16407ea475..09ec8a1f7f 100644
+index e69ef178a0..51a328057b 100644
 --- a/device/bluetooth/BUILD.gn
 +++ b/device/bluetooth/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -122,7 +126,7 @@ index 16407ea475..09ec8a1f7f 100644
  
    defines = [ "DEVICE_BLUETOOTH_IMPLEMENTATION" ]
  
-@@ -584,6 +590,10 @@ component("bluetooth") {
+@@ -586,6 +592,10 @@ component("bluetooth") {
          "floss/floss_version.h",
          "floss/test_helpers.h",
        ]
@@ -506,7 +510,7 @@ index c62895726b..242b1213b3 100644
 +
 +#undef HoldReferenceUntilDisconnected
 diff --git a/device/fido/BUILD.gn b/device/fido/BUILD.gn
-index 4fac9c688d..5385b1eb2e 100644
+index e98293ea22..b02da75bc6 100644
 --- a/device/fido/BUILD.gn
 +++ b/device/fido/BUILD.gn
 @@ -3,9 +3,10 @@
@@ -522,7 +526,7 @@ index 4fac9c688d..5385b1eb2e 100644
    # related authentication functions, with a limited amount of dependencies,
    # making it possible to build these on any platform, including iOS.
 diff --git a/device/fido/get_assertion_request_handler.cc b/device/fido/get_assertion_request_handler.cc
-index 9c20f8e628..bf09c68a14 100644
+index e66e4ca678..fb079861c8 100644
 --- a/device/fido/get_assertion_request_handler.cc
 +++ b/device/fido/get_assertion_request_handler.cc
 @@ -50,6 +50,8 @@
@@ -541,7 +545,7 @@ index 9c20f8e628..bf09c68a14 100644
 +
 +#undef AtLeastUVPreferred
 diff --git a/device/fido/make_credential_request_handler.cc b/device/fido/make_credential_request_handler.cc
-index e308129d83..722e5fc237 100644
+index 96374c46fd..78af290a7f 100644
 --- a/device/fido/make_credential_request_handler.cc
 +++ b/device/fido/make_credential_request_handler.cc
 @@ -39,6 +39,8 @@
@@ -553,14 +557,14 @@ index e308129d83..722e5fc237 100644
  namespace device {
  
  using PINUVDisposition = FidoAuthenticator::PINUVDisposition;
-@@ -1068,3 +1070,5 @@ void MakeCredentialRequestHandler::SpecializeRequestForAuthenticator(
+@@ -1067,3 +1069,5 @@ void MakeCredentialRequestHandler::SpecializeRequestForAuthenticator(
  }
  
  }  // namespace device
 +
 +#undef AtLeastUVPreferred
 diff --git a/device/gamepad/BUILD.gn b/device/gamepad/BUILD.gn
-index 70f91bc926..53177e164d 100644
+index f23ad5e81d..4d7c8eff5c 100644
 --- a/device/gamepad/BUILD.gn
 +++ b/device/gamepad/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -581,7 +585,7 @@ index 70f91bc926..53177e164d 100644
  
    sources = [
 diff --git a/device/gamepad/dualshock4_controller.cc b/device/gamepad/dualshock4_controller.cc
-index 916eb8ed04..5afd93cf81 100644
+index 873c185d2c..dd77bb8cb6 100644
 --- a/device/gamepad/dualshock4_controller.cc
 +++ b/device/gamepad/dualshock4_controller.cc
 @@ -21,6 +21,9 @@
@@ -602,10 +606,10 @@ index 916eb8ed04..5afd93cf81 100644
 +#undef kRumbleMagnitudeMax
 +#undef ControllerData
 diff --git a/device/gamepad/nintendo_controller.cc b/device/gamepad/nintendo_controller.cc
-index 4c22aac543..5675296bda 100644
+index c3c7233aa2..fd715889cc 100644
 --- a/device/gamepad/nintendo_controller.cc
 +++ b/device/gamepad/nintendo_controller.cc
-@@ -17,6 +17,8 @@
+@@ -18,6 +18,8 @@
  #include "device/gamepad/gamepad_data_fetcher.h"
  #include "device/gamepad/gamepad_id_list.h"
  
@@ -614,14 +618,14 @@ index 4c22aac543..5675296bda 100644
  namespace device {
  namespace {
  // Device IDs for the Switch Charging Grip, also used for composite devices.
-@@ -1775,3 +1777,5 @@ base::WeakPtr<AbstractHapticGamepad> NintendoController::GetWeakPtr() {
+@@ -1780,3 +1782,5 @@ base::WeakPtr<AbstractHapticGamepad> NintendoController::GetWeakPtr() {
  }
  
  }  // namespace device
 +
 +#undef ControllerData
 diff --git a/device/gamepad/xbox_hid_controller.cc b/device/gamepad/xbox_hid_controller.cc
-index fb7be7be97..053d3cf4a0 100644
+index fc688b587f..ffdf8a82bb 100644
 --- a/device/gamepad/xbox_hid_controller.cc
 +++ b/device/gamepad/xbox_hid_controller.cc
 @@ -7,6 +7,8 @@
@@ -640,7 +644,7 @@ index fb7be7be97..053d3cf4a0 100644
 +
 +#undef kRumbleMagnitudeMax
 diff --git a/extensions/BUILD.gn b/extensions/BUILD.gn
-index 0ea291f16b..e75691ddfb 100644
+index 586fd7461e..6154388326 100644
 --- a/extensions/BUILD.gn
 +++ b/extensions/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -661,7 +665,7 @@ index 0ea291f16b..e75691ddfb 100644
    sources = [
      "browser/api/declarative/test_rules_registry.cc",
 diff --git a/extensions/browser/BUILD.gn b/extensions/browser/BUILD.gn
-index 482fda27ea..c722271df6 100644
+index 1280bc121f..bb80bec327 100644
 --- a/extensions/browser/BUILD.gn
 +++ b/extensions/browser/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -672,7 +676,7 @@ index 482fda27ea..c722271df6 100644
  import("//components/guest_view/buildflags/buildflags.gni")
  import("//extensions/buildflags/buildflags.gni")
  import("//pdf/features.gni")
-@@ -83,7 +84,7 @@ source_set("core_keyed_service_factories") {
+@@ -87,7 +88,7 @@ source_set("core_keyed_service_factories") {
  # nodes" and could be easily toggled on-and-off through dependencies for
  # different platforms).
  # See also https://crbug.com/883570.
@@ -682,7 +686,7 @@ index 482fda27ea..c722271df6 100644
  
    sources = [
 diff --git a/extensions/browser/api/declarative/rules_registry_service.cc b/extensions/browser/api/declarative/rules_registry_service.cc
-index f715565933..e29e609ed9 100644
+index df5dc12fb9..95aa60c678 100644
 --- a/extensions/browser/api/declarative/rules_registry_service.cc
 +++ b/extensions/browser/api/declarative/rules_registry_service.cc
 @@ -26,6 +26,8 @@
@@ -694,12 +698,42 @@ index f715565933..e29e609ed9 100644
  namespace extensions {
  
  RulesRegistryService::RulesRegistryService(content::BrowserContext* context)
-@@ -261,3 +263,5 @@ void RulesRegistryService::OnExtensionUninstalled(
+@@ -251,3 +253,5 @@ void RulesRegistryService::OnExtensionUninstalled(
  }
  
  }  // namespace extensions
 +
 +#undef g_factory
+diff --git a/extensions/browser/api/declarative_webrequest/webrequest_condition.cc b/extensions/browser/api/declarative_webrequest/webrequest_condition.cc
+index 676a3a6166..baa24d545a 100644
+--- a/extensions/browser/api/declarative_webrequest/webrequest_condition.cc
++++ b/extensions/browser/api/declarative_webrequest/webrequest_condition.cc
+@@ -18,8 +18,6 @@ using url_matcher::URLMatcherConditionFactory;
+ using url_matcher::URLMatcherConditionSet;
+ using url_matcher::URLMatcherFactory;
+ 
+-namespace keys = extensions::declarative_webrequest_constants;
+-
+ namespace {
+ static base::MatcherStringPattern::ID g_next_id = 0;
+ 
+@@ -38,8 +36,6 @@ const char kConditionCannotBeFulfilled[] = "A condition can never be "
+ 
+ namespace extensions {
+ 
+-namespace keys = declarative_webrequest_constants;
+-
+ //
+ // WebRequestData
+ //
+@@ -121,6 +117,7 @@ std::unique_ptr<WebRequestCondition> WebRequestCondition::Create(
+     URLMatcherConditionFactory* url_matcher_condition_factory,
+     const base::Value& condition,
+     std::string* error) {
++  namespace keys = declarative_webrequest_constants;
+   const base::Value::Dict* condition_dict = condition.GetIfDict();
+   if (!condition_dict) {
+     *error = kExpectedDictionary;
 diff --git a/extensions/browser/api/declarative_webrequest/webrequest_condition_attribute.cc b/extensions/browser/api/declarative_webrequest/webrequest_condition_attribute.cc
 index d9706e0aac..2ecdb61db9 100644
 --- a/extensions/browser/api/declarative_webrequest/webrequest_condition_attribute.cc
@@ -740,10 +774,10 @@ index 3105a0d20c..c323b6b748 100644
 +
 +#undef g_factory
 diff --git a/extensions/browser/api/hid/hid_device_manager.cc b/extensions/browser/api/hid/hid_device_manager.cc
-index d0a76a9fa5..c7d6c39518 100644
+index 1e035a6ee6..d69fe9bfff 100644
 --- a/extensions/browser/api/hid/hid_device_manager.cc
 +++ b/extensions/browser/api/hid/hid_device_manager.cc
-@@ -40,6 +40,9 @@
+@@ -39,6 +39,9 @@
  
  namespace hid = extensions::api::hid;
  
@@ -753,7 +787,7 @@ index d0a76a9fa5..c7d6c39518 100644
  namespace extensions {
  
  namespace {
-@@ -437,3 +440,6 @@ void HidDeviceManager::DispatchEvent(
+@@ -436,3 +439,6 @@ void HidDeviceManager::DispatchEvent(
  }
  
  }  // namespace extensions
@@ -841,10 +875,10 @@ index b309b210c1..224441f199 100644
 +
 +#undef keys
 diff --git a/extensions/browser/api/web_request/web_request_api.cc b/extensions/browser/api/web_request/web_request_api.cc
-index 4a9b3aed67..7fc66bc342 100644
+index e179815e58..8400c3c6d2 100644
 --- a/extensions/browser/api/web_request/web_request_api.cc
 +++ b/extensions/browser/api/web_request/web_request_api.cc
-@@ -81,10 +81,14 @@ using extension_web_request_api_helpers::ExtraInfoSpec;
+@@ -82,10 +82,14 @@ using extension_web_request_api_helpers::ExtraInfoSpec;
  using extensions::mojom::APIPermissionID;
  
  namespace helpers = extension_web_request_api_helpers;
@@ -860,7 +894,7 @@ index 4a9b3aed67..7fc66bc342 100644
  namespace extensions {
  
  namespace web_request = api::web_request;
-@@ -1144,3 +1148,7 @@ WebRequestHandlerBehaviorChangedFunction::Run() {
+@@ -1219,3 +1223,7 @@ WebRequestHandlerBehaviorChangedFunction::Run() {
  }
  
  }  // namespace extensions
@@ -868,11 +902,72 @@ index 4a9b3aed67..7fc66bc342 100644
 +#undef keys
 +#undef WebRequestEventListenerFlag
 +#undef g_factory
+diff --git a/extensions/browser/api/web_request/web_request_api_helpers.cc b/extensions/browser/api/web_request/web_request_api_helpers.cc
+index d1bafeda1f..1f8514d00e 100644
+--- a/extensions/browser/api/web_request/web_request_api_helpers.cc
++++ b/extensions/browser/api/web_request/web_request_api_helpers.cc
+@@ -58,7 +58,6 @@ using base::Time;
+ using net::cookie_util::ParsedRequestCookie;
+ using net::cookie_util::ParsedRequestCookies;
+ 
+-namespace keys = extension_web_request_api_constants;
+ namespace web_request = extensions::api::web_request;
+ using DNRRequestAction = extensions::declarative_net_request::RequestAction;
+ 
+@@ -1817,6 +1816,7 @@ void ClearCacheOnNavigation() {
+ // dictionary.
+ base::Value::Dict CreateHeaderDictionary(const std::string& name,
+                                          const std::string& value) {
++  namespace keys = extension_web_request_api_constants; 
+   base::Value::Dict header;
+   header.Set(keys::kHeaderNameKey, name);
+   if (base::IsStringUTF8(value)) {
+diff --git a/extensions/browser/api/web_request/web_request_event_details.cc b/extensions/browser/api/web_request/web_request_event_details.cc
+index cb1b59814c..f31b1dfba8 100644
+--- a/extensions/browser/api/web_request/web_request_event_details.cc
++++ b/extensions/browser/api/web_request/web_request_event_details.cc
+@@ -31,7 +31,8 @@
+ using extension_web_request_api_helpers::ExtraInfoSpec;
+ 
+ namespace helpers = extension_web_request_api_helpers;
+-namespace keys = extension_web_request_api_constants;
++namespace keys_web_request_event_details = extension_web_request_api_constants;
++#define keys keys_web_request_event_details
+ 
+ namespace extensions {
+ namespace {
+@@ -202,3 +203,5 @@ base::Value::Dict WebRequestEventDetails::GetAndClearDict() {
+ }
+ 
+ }  // namespace extensions
++
++#undef keys
+diff --git a/extensions/browser/api/web_request/web_request_info.cc b/extensions/browser/api/web_request/web_request_info.cc
+index f40aba6067..9a19e17dd8 100644
+--- a/extensions/browser/api/web_request/web_request_info.cc
++++ b/extensions/browser/api/web_request/web_request_info.cc
+@@ -39,8 +39,6 @@
+ #include "extensions/browser/guest_view/web_view/web_view_renderer_state.h"
+ #endif
+ 
+-namespace keys = extension_web_request_api_constants;
+-
+ namespace extensions {
+ 
+ namespace {
+@@ -127,6 +125,7 @@ std::optional<base::Value::Dict> CreateRequestBodyData(
+     const std::string& method,
+     const net::HttpRequestHeaders& request_headers,
+     const std::vector<std::unique_ptr<UploadDataSource>>& data_sources) {
++  namespace keys = extension_web_request_api_constants;
+   if (method != "POST" && method != "PUT") {
+     return std::nullopt;
+   }
 diff --git a/extensions/browser/api/web_request/web_request_proxying_url_loader_factory.cc b/extensions/browser/api/web_request/web_request_proxying_url_loader_factory.cc
-index b54ffcb3e2..b9c1a7b376 100644
+index 8f02078823..573725366f 100644
 --- a/extensions/browser/api/web_request/web_request_proxying_url_loader_factory.cc
 +++ b/extensions/browser/api/web_request/web_request_proxying_url_loader_factory.cc
-@@ -71,6 +71,8 @@
+@@ -70,6 +70,8 @@
  #include "url/origin.h"
  #include "url/url_constants.h"
  
@@ -881,7 +976,7 @@ index b54ffcb3e2..b9c1a7b376 100644
  namespace extensions {
  namespace {
  
-@@ -1692,3 +1694,5 @@ void WebRequestProxyingURLLoaderFactory::EnsureAssociatedFactoryBuilt() {
+@@ -1699,3 +1701,5 @@ void WebRequestProxyingURLLoaderFactory::EnsureAssociatedFactoryBuilt() {
  }
  
  }  // namespace extensions
@@ -907,10 +1002,10 @@ index 8f536df1b7..a0cdce66fd 100644
 +
 +#undef ShutdownNotifierFactory
 diff --git a/extensions/browser/guest_view/app_view/app_view_guest.cc b/extensions/browser/guest_view/app_view/app_view_guest.cc
-index f8b00fec3f..3fd4546946 100644
+index 0f2c21513e..228ded8563 100644
 --- a/extensions/browser/guest_view/app_view/app_view_guest.cc
 +++ b/extensions/browser/guest_view/app_view/app_view_guest.cc
-@@ -219,7 +219,7 @@ void AppViewGuest::CreateInnerPage(
+@@ -220,7 +220,7 @@ void AppViewGuest::CreateInnerPage(
      scoped_refptr<content::SiteInstance> site_instance,
      const base::Value::Dict& create_params,
      GuestPageCreatedCallback callback) {
@@ -919,7 +1014,7 @@ index f8b00fec3f..3fd4546946 100644
    if (!app_id) {
      RejectGuestCreation(std::move(owned_this), std::move(callback));
      return;
-@@ -230,7 +230,7 @@ void AppViewGuest::CreateInnerPage(
+@@ -231,7 +231,7 @@ void AppViewGuest::CreateInnerPage(
      return;
    }
  
@@ -928,7 +1023,7 @@ index f8b00fec3f..3fd4546946 100644
    if (!data) {
      RejectGuestCreation(std::move(owned_this), std::move(callback));
      return;
-@@ -291,7 +291,7 @@ void AppViewGuest::MaybeRecreateGuestContents(
+@@ -292,7 +292,7 @@ void AppViewGuest::MaybeRecreateGuestContents(
  }
  
  const char* AppViewGuest::GetAPINamespace() const {
@@ -937,7 +1032,7 @@ index f8b00fec3f..3fd4546946 100644
  }
  
  int AppViewGuest::GetTaskPrefix() const {
-@@ -359,9 +359,9 @@ void AppViewGuest::LaunchAppAndFireEvent(
+@@ -360,9 +360,9 @@ void AppViewGuest::LaunchAppAndFireEvent(
                                       std::move(callback))));
  
    base::Value::Dict embed_request;
@@ -989,10 +1084,10 @@ index 8f590b9ebd..8aac10c3a1 100644
 +
 +#undef BoolToCrashKeyValue
 diff --git a/extensions/browser/service_worker/service_worker_task_queue.cc b/extensions/browser/service_worker/service_worker_task_queue.cc
-index 5228d60e65..8eb2f39c4e 100644
+index a47efd7cf2..a68861ee59 100644
 --- a/extensions/browser/service_worker/service_worker_task_queue.cc
 +++ b/extensions/browser/service_worker/service_worker_task_queue.cc
-@@ -51,6 +51,9 @@
+@@ -52,6 +52,9 @@
  
  using content::BrowserContext;
  
@@ -1002,7 +1097,7 @@ index 5228d60e65..8eb2f39c4e 100644
  namespace extensions {
  
  namespace {
-@@ -1193,3 +1196,6 @@ void ServiceWorkerTaskQueue::ActivateIncognitoSplitModeExtensions(
+@@ -1174,3 +1177,6 @@ void ServiceWorkerTaskQueue::ActivateIncognitoSplitModeExtensions(
  }
  
  }  // namespace extensions
@@ -1031,7 +1126,7 @@ index a1737fd343..6bdac552ab 100644
 +#undef g_allow_multiple_workers_per_extension
 +#undef BoolToCrashKeyValue
 diff --git a/extensions/common/BUILD.gn b/extensions/common/BUILD.gn
-index 15dcbd6049..2fccb12077 100644
+index d16d8a63f5..bc5b19f627 100644
 --- a/extensions/common/BUILD.gn
 +++ b/extensions/common/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -1042,7 +1137,7 @@ index 15dcbd6049..2fccb12077 100644
  import("//components/guest_view/buildflags/buildflags.gni")
  import("//components/nacl/features.gni")
  import("//extensions/buildflags/buildflags.gni")
-@@ -248,7 +249,7 @@ mojom("mojom") {
+@@ -252,7 +253,7 @@ mojom("mojom") {
  # This must be a static library because extensions common depends on
  # GetTrustedICAPublicKey in extensions/browser which isn't always linked
  # in. TODO(brettw): This reverse dependency should be fixed.
@@ -1051,7 +1146,7 @@ index 15dcbd6049..2fccb12077 100644
    sources = [
      "alias.h",
      "api/bluetooth/bluetooth_manifest_data.cc",
-@@ -537,6 +538,11 @@ static_library("common") {
+@@ -541,6 +542,11 @@ static_library("common") {
    # from mojom/permission_set_mojom_traits.cc.
    allow_circular_includes_from = [ ":mojom" ]
  
@@ -1064,7 +1159,7 @@ index 15dcbd6049..2fccb12077 100644
      "//base",
      "//build:android_buildflags",
 diff --git a/extensions/common/api/extension_action/action_info.cc b/extensions/common/api/extension_action/action_info.cc
-index 50eb9e016a..c351697fb3 100644
+index 6f71f1effa..6a9bdcdb46 100644
 --- a/extensions/common/api/extension_action/action_info.cc
 +++ b/extensions/common/api/extension_action/action_info.cc
 @@ -41,10 +41,12 @@ ActionInfoData::ActionInfoData(std::unique_ptr<ActionInfo> info)
@@ -1081,7 +1176,7 @@ index 50eb9e016a..c351697fb3 100644
  // Returns the icon variants parsed from the `extension` manifest.
  // Populates `error` if there are no icon variants.
  ExtensionIconVariants GetIconVariants(const base::Value* value) {
-@@ -261,3 +263,5 @@ const char* ActionInfo::GetManifestKeyForActionType(ActionInfo::Type type) {
+@@ -272,3 +274,5 @@ const char* ActionInfo::GetManifestKeyForActionType(ActionInfo::Type type) {
  }
  
  }  // namespace extensions
@@ -1109,10 +1204,10 @@ index e907385862..45f55c7fb5 100644
 +
 +#undef Feature
 diff --git a/extensions/common/manifest_handlers/icons_handler.cc b/extensions/common/manifest_handlers/icons_handler.cc
-index 00a3539a08..b8a71ba347 100644
+index 0f3d15bb6b..ab3f7d60a2 100644
 --- a/extensions/common/manifest_handlers/icons_handler.cc
 +++ b/extensions/common/manifest_handlers/icons_handler.cc
-@@ -21,6 +21,8 @@
+@@ -22,6 +22,8 @@
  #include "extensions/strings/grit/extensions_strings.h"
  #include "ui/gfx/geometry/size.h"
  
@@ -1121,7 +1216,7 @@ index 00a3539a08..b8a71ba347 100644
  namespace extensions {
  
  namespace keys = manifest_keys;
-@@ -101,3 +103,5 @@ base::span<const char* const> IconsHandler::Keys() const {
+@@ -106,3 +108,5 @@ base::span<const char* const> IconsHandler::Keys() const {
  }
  
  }  // namespace extensions
@@ -1168,7 +1263,7 @@ index a906aa872b..2a8d103015 100644
 +
 +#undef ManifestKeys
 diff --git a/extensions/renderer/BUILD.gn b/extensions/renderer/BUILD.gn
-index e1ea9073d0..ab94316e9a 100644
+index bb00afe483..1cb6488268 100644
 --- a/extensions/renderer/BUILD.gn
 +++ b/extensions/renderer/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1188,7 +1283,7 @@ index e1ea9073d0..ab94316e9a 100644
    sources = [
      "activity_log_converter_strategy.cc",
      "activity_log_converter_strategy.h",
-@@ -315,7 +316,7 @@ source_set("renderer") {
+@@ -317,7 +318,7 @@ source_set("renderer") {
    }
  }
  
@@ -1217,7 +1312,7 @@ index 9eb2b7f5e2..db7dc693d2 100644
 +
 +#undef kCancelReason
 diff --git a/extensions/renderer/extension_url_loader_throttle.cc b/extensions/renderer/extension_url_loader_throttle.cc
-index 1f61f2b45a..fdc5770b77 100644
+index faa7895b72..cdb8aae6ea 100644
 --- a/extensions/renderer/extension_url_loader_throttle.cc
 +++ b/extensions/renderer/extension_url_loader_throttle.cc
 @@ -8,6 +8,8 @@
@@ -1235,94 +1330,3 @@ index 1f61f2b45a..fdc5770b77 100644
  }  // namespace extensions
 +
 +#undef kCancelReason
-diff --git a/extensions/browser/api/declarative_webrequest/webrequest_condition.cc b/extensions/browser/api/declarative_webrequest/webrequest_condition.cc
-index 676a3a6166..baa24d545a 100644
---- a/extensions/browser/api/declarative_webrequest/webrequest_condition.cc
-+++ b/extensions/browser/api/declarative_webrequest/webrequest_condition.cc
-@@ -18,8 +18,6 @@ using url_matcher::URLMatcherConditionFactory;
- using url_matcher::URLMatcherConditionSet;
- using url_matcher::URLMatcherFactory;
- 
--namespace keys = extensions::declarative_webrequest_constants;
--
- namespace {
- static base::MatcherStringPattern::ID g_next_id = 0;
- 
-@@ -38,8 +36,6 @@ const char kConditionCannotBeFulfilled[] = "A condition can never be "
- 
- namespace extensions {
- 
--namespace keys = declarative_webrequest_constants;
--
- //
- // WebRequestData
- //
-@@ -121,6 +117,7 @@ std::unique_ptr<WebRequestCondition> WebRequestCondition::Create(
-     URLMatcherConditionFactory* url_matcher_condition_factory,
-     const base::Value& condition,
-     std::string* error) {
-+  namespace keys = declarative_webrequest_constants;
-   const base::Value::Dict* condition_dict = condition.GetIfDict();
-   if (!condition_dict) {
-     *error = kExpectedDictionary;
-diff --git a/extensions/browser/api/web_request/web_request_api_helpers.cc b/extensions/browser/api/web_request/web_request_api_helpers.cc
-index c35a0331b8..8f988bd403 100644
---- a/extensions/browser/api/web_request/web_request_api_helpers.cc
-+++ b/extensions/browser/api/web_request/web_request_api_helpers.cc
-@@ -59,7 +59,6 @@ using base::Time;
- using net::cookie_util::ParsedRequestCookie;
- using net::cookie_util::ParsedRequestCookies;
- 
--namespace keys = extension_web_request_api_constants;
- namespace web_request = extensions::api::web_request;
- using DNRRequestAction = extensions::declarative_net_request::RequestAction;
- 
-@@ -1819,6 +1818,7 @@ void ClearCacheOnNavigation() {
- // dictionary.
- base::Value::Dict CreateHeaderDictionary(const std::string& name,
-                                          const std::string& value) {
-+  namespace keys = extension_web_request_api_constants; 
-   base::Value::Dict header;
-   header.Set(keys::kHeaderNameKey, name);
-   if (base::IsStringUTF8(value)) {
-diff --git a/extensions/browser/api/web_request/web_request_event_details.cc b/extensions/browser/api/web_request/web_request_event_details.cc
-index cb1b59814c..f31b1dfba8 100644
---- a/extensions/browser/api/web_request/web_request_event_details.cc
-+++ b/extensions/browser/api/web_request/web_request_event_details.cc
-@@ -31,7 +31,8 @@
- using extension_web_request_api_helpers::ExtraInfoSpec;
- 
- namespace helpers = extension_web_request_api_helpers;
--namespace keys = extension_web_request_api_constants;
-+namespace keys_web_request_event_details = extension_web_request_api_constants;
-+#define keys keys_web_request_event_details
- 
- namespace extensions {
- namespace {
-@@ -202,3 +203,5 @@ base::Value::Dict WebRequestEventDetails::GetAndClearDict() {
- }
- 
- }  // namespace extensions
-+
-+#undef keys
-diff --git a/extensions/browser/api/web_request/web_request_info.cc b/extensions/browser/api/web_request/web_request_info.cc
-index f40aba6067..9a19e17dd8 100644
---- a/extensions/browser/api/web_request/web_request_info.cc
-+++ b/extensions/browser/api/web_request/web_request_info.cc
-@@ -39,8 +39,6 @@
- #include "extensions/browser/guest_view/web_view/web_view_renderer_state.h"
- #endif
- 
--namespace keys = extension_web_request_api_constants;
--
- namespace extensions {
- 
- namespace {
-@@ -127,6 +125,7 @@ std::optional<base::Value::Dict> CreateRequestBodyData(
-     const std::string& method,
-     const net::HttpRequestHeaders& request_headers,
-     const std::vector<std::unique_ptr<UploadDataSource>>& data_sources) {
-+  namespace keys = extension_web_request_api_constants;
-   if (method != "POST" && method != "PUT") {
-     return std::nullopt;
-   }
