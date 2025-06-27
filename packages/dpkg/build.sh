@@ -23,7 +23,7 @@ dpkg_cv_c99_snprintf=yes
 HAVE_SETEXECFILECON_FALSE=#
 --host=${TERMUX_ARCH}-linux
 --without-selinux
-DPKG_PAGER=less
+DPKG_PAGER=pager
 "
 
 TERMUX_PKG_RM_AFTER_INSTALL="
