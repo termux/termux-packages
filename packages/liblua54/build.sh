@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Shared library for the Lua interpreter"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.4.8
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.lua.org/ftp/lua-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4f18ddae154e793e46eeab727c59ef1c0c0c2b744e7b94219710d76f530629ae
 TERMUX_PKG_EXTRA_MAKE_ARGS=linux-readline
@@ -39,8 +40,8 @@ termux_step_make_install() {
 }
 
 termux_step_post_make_install() {
-	cd "$TERMUX_PREFIX"/share/man/man1
-	mv -f lua.1 lua5.4.1
-	mv -f luac.1 luac5.4.1
+	mv -f "$TERMUX_PREFIX"/share/man/man1/lua.1 "$TERMUX_PREFIX"/share/man/man1/lua5.4.1
+	mv -f "$TERMUX_PREFIX"/share/man/man1/luac.1 "$TERMUX_PREFIX"/share/man/man1/luac5.4.1
+
 	export AR="$OLDAR"
 }
