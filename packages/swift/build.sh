@@ -118,10 +118,10 @@ termux_step_host_build() {
 
 		# The Ubuntu Docker image (sometimes used by CI but sometimes not)
 		# might not have clang/clang++ in its path, so explicitly set it
-		# to clang-18 if necessary.
+		# to the versioned system clang if necessary.
 		if [ -z "$CLANG" ]; then
-			CLANG=$(command -v clang-18)
-			CLANGXX=$(command -v clang++-18)
+			CLANG="$TERMUX_HOST_LLVM_BASE_DIR/bin/clang"
+			CLANGXX="$TERMUX_HOST_LLVM_BASE_DIR/bin/clang++"
 		fi
 
 		# Natively compile llvm-tblgen and some other files needed later.

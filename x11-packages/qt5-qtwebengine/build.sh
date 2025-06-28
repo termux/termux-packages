@@ -15,8 +15,8 @@ TERMUX_PKG_HOSTBUILD=true
 termux_step_host_build() {
 	# Generate ffmpeg headers for i686
 	mkdir -p fake-bin
-	ln -s $(command -v clang-18) fake-bin/clang
-	ln -s $(command -v clang++-18) fake-bin/clang++
+	ln -s "$TERMUX_HOST_LLVM_BASE_DIR/bin/clang" fake-bin/clang
+	ln -s "$TERMUX_HOST_LLVM_BASE_DIR/bin/clang++" fake-bin/clang++
 
 	# Remove python3 compatibility file preventing using newer python3 versions:
 	rm $TERMUX_PKG_SRCDIR/src/3rdparty/chromium/third_party/ffmpeg/chromium/scripts/enum.py

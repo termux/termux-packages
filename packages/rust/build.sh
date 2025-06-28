@@ -148,6 +148,7 @@ termux_step_configure() {
 	sed \
 		-e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
 		-e "s|@TERMUX_STANDALONE_TOOLCHAIN@|${TERMUX_STANDALONE_TOOLCHAIN}|g" \
+		-e "s|@TERMUX_HOST_LLVM_BASE_DIR@|${TERMUX_HOST_LLVM_BASE_DIR}|g" \
 		-e "s|@CARGO_TARGET_NAME@|${CARGO_TARGET_NAME}|g" \
 		-e "s|@RUSTC@|${RUSTC}|g" \
 		-e "s|@CARGO@|${CARGO}|g" \

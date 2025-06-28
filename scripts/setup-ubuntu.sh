@@ -144,10 +144,7 @@ PACKAGES+=" php-xml"
 PACKAGES+=" composer"
 
 # Needed by package rust.
-PACKAGES+=" libssl-dev" # Needed to build Rust
-PACKAGES+=" llvm-19-dev"
-PACKAGES+=" llvm-19-tools"
-PACKAGES+=" clang-19"
+PACKAGES+=" libssl-dev"
 
 # Needed by librusty-v8
 PACKAGES+=" libclang-rt-17-dev"
@@ -331,22 +328,35 @@ fi
 # Allow 32-bit packages.
 $SUDO dpkg --add-architecture i386
 
+$SUDO apt-get -yq update
+
+# Install jq first, then source properties.sh
+$SUDO env DEBIAN_FRONTEND=noninteractive \
+	apt-get install -yq --no-install-recommends $PACKAGES
+
+. $(dirname "$(realpath "$0")")/properties.sh
+
+LLVM_PACKAGES=""
+
+# Needed by rust and other packages.
+LLVM_PACKAGES+=" llvm-${TERMUX_HOST_LLVM_MAJOR_VERSION}-dev"
+LLVM_PACKAGES+=" llvm-${TERMUX_HOST_LLVM_MAJOR_VERSION}-tools"
+LLVM_PACKAGES+=" clang-${TERMUX_HOST_LLVM_MAJOR_VERSION}"
+
 # Add apt.llvm.org repo to get newer LLVM than Ubuntu provided
 $SUDO cp $(dirname "$(realpath "$0")")/llvm-snapshot.gpg.key /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 $SUDO chmod a+r /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 {
-	echo "deb [arch=amd64] http://apt.llvm.org/noble/ llvm-toolchain-noble-19 main"
+	echo "deb [arch=amd64] http://apt.llvm.org/noble/ llvm-toolchain-noble-${TERMUX_HOST_LLVM_MAJOR_VERSION} main"
 } | $SUDO tee /etc/apt/sources.list.d/apt-llvm-org.list > /dev/null
 
 $SUDO apt-get -yq update
 
 $SUDO env DEBIAN_FRONTEND=noninteractive \
-	apt-get install -yq --no-install-recommends $PACKAGES
+	apt-get install -yq --no-install-recommends $LLVM_PACKAGES
 
 $SUDO locale-gen --purge en_US.UTF-8
 echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' | $SUDO tee -a /etc/default/locale
-
-. $(dirname "$(realpath "$0")")/properties.sh
 
 # Ownership of `TERMUX__PREFIX` must be fixed before `TERMUX_APP__DATA_DIR`
 # if its under it, otherwise `TERMUX__ROOTFS` will not have its ownership fixed.

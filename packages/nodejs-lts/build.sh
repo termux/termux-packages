@@ -34,9 +34,9 @@ termux_step_host_build() {
 	local ICU_VERSION=76.1
 	local ICU_TAR=icu4c-${ICU_VERSION//./_}-src.tgz
 	local ICU_DOWNLOAD=https://github.com/unicode-org/icu/releases/download/release-${ICU_VERSION//./-}/$ICU_TAR
-	export CC=/usr/bin/clang-18
-	export CXX=/usr/bin/clang++-18
-	export LD=/usr/bin/clang++-18
+	export CC="$TERMUX_HOST_LLVM_BASE_DIR/bin/clang"
+	export CXX="$TERMUX_HOST_LLVM_BASE_DIR/bin/clang++"
+	export LD="$TERMUX_HOST_LLVM_BASE_DIR/bin/clang++"
 	termux_download \
 		$ICU_DOWNLOAD\
 		$TERMUX_PKG_CACHEDIR/$ICU_TAR \
