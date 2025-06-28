@@ -1,10 +1,13 @@
-diff -uNr util-linux-2.36.1/include/pathnames.h util-linux-2.36.1.mod/include/pathnames.h
---- util-linux-2.36.1/include/pathnames.h	2020-11-16 10:41:16.338846226 +0000
-+++ util-linux-2.36.1.mod/include/pathnames.h	2020-11-22 21:23:16.999470089 +0000
-@@ -206,4 +206,107 @@
- #define _PATH_DEV_RFKILL	"/dev/rfkill"
- #define _PATH_SYS_RFKILL	"/sys/class/rfkill"
+diff --git a/include/pathnames.h b/include/pathnames.h
+index 34ba11ca3..77d863c45 100644
+--- a/include/pathnames.h
++++ b/include/pathnames.h
+@@ -250,4 +250,107 @@
+ # define UL_VENDORDIR_PATH      NULL
+ #endif
  
+-#endif /* PATHNAMES_H */
+\ No newline at end of file
 +// On Android (Termux) paths are different.
 +#if defined(__ANDROID__)
 +# undef _PATH_DEFPATH
@@ -108,10 +111,11 @@ diff -uNr util-linux-2.36.1/include/pathnames.h util-linux-2.36.1.mod/include/pa
 +# define _PATH_ADJTIME         "@TERMUX_PREFIX@/etc/adjtime"
 +#endif
 +
- #endif /* PATHNAMES_H */
-diff -uNr util-linux-2.36.1/lib/exec_shell.c util-linux-2.36.1.mod/lib/exec_shell.c
---- util-linux-2.36.1/lib/exec_shell.c	2020-11-13 11:33:31.084801627 +0000
-+++ util-linux-2.36.1.mod/lib/exec_shell.c	2020-11-22 21:23:17.000470088 +0000
++#endif /* PATHNAMES_H */
+diff --git a/lib/exec_shell.c b/lib/exec_shell.c
+index 96d3e95a8..46840a53e 100644
+--- a/lib/exec_shell.c
++++ b/lib/exec_shell.c
 @@ -28,7 +28,7 @@
  
  #include "exec_shell.h"
@@ -121,10 +125,11 @@ diff -uNr util-linux-2.36.1/lib/exec_shell.c util-linux-2.36.1.mod/lib/exec_shel
  
  void __attribute__((__noreturn__)) exec_shell(void)
  {
-diff -uNr util-linux-2.36.1/lib/loopdev.c util-linux-2.36.1.mod/lib/loopdev.c
---- util-linux-2.36.1/lib/loopdev.c	2020-11-16 10:41:16.338846226 +0000
-+++ util-linux-2.36.1.mod/lib/loopdev.c	2020-11-22 21:23:17.000470088 +0000
-@@ -105,13 +105,13 @@
+diff --git a/lib/loopdev.c b/lib/loopdev.c
+index 699322c4a..342443d08 100644
+--- a/lib/loopdev.c
++++ b/lib/loopdev.c
+@@ -128,13 +128,13 @@ int loopcxt_set_device(struct loopdev_cxt *lc, const char *device)
  	/* set new */
  	if (device) {
  		if (*device != '/') {
@@ -138,13 +143,14 @@ diff -uNr util-linux-2.36.1/lib/loopdev.c util-linux-2.36.1.mod/lib/loopdev.c
  					return -1;
 -				device += 4;
 +				device += 10;
- 				dir = _PATH_DEV_LOOP "/";	/* _PATH_DEV uses tailing slash */
+ 				dir = _PATH_DEV_LOOP "/";	/* _PATH_DEV uses trailing slash */
  			}
  			snprintf(lc->device, sizeof(lc->device), "%s%s",
-diff -uNr util-linux-2.36.1/libblkid/src/blkidP.h util-linux-2.36.1.mod/libblkid/src/blkidP.h
---- util-linux-2.36.1/libblkid/src/blkidP.h	2020-11-16 10:41:16.339846221 +0000
-+++ util-linux-2.36.1.mod/libblkid/src/blkidP.h	2020-11-22 21:23:17.000470088 +0000
-@@ -287,7 +287,7 @@
+diff --git a/libblkid/src/blkidP.h b/libblkid/src/blkidP.h
+index fa2379c4d..f11996748 100644
+--- a/libblkid/src/blkidP.h
++++ b/libblkid/src/blkidP.h
+@@ -308,7 +308,7 @@ struct blkid_struct_cache
  #define BLKID_BIC_FL_CHANGED	0x0004	/* Cache has changed from disk */
  
  /* config file */
@@ -153,19 +159,20 @@ diff -uNr util-linux-2.36.1/libblkid/src/blkidP.h util-linux-2.36.1.mod/libblkid
  
  /* cache file on systemds with /run */
  #define BLKID_RUNTIME_TOPDIR	"/run"
-@@ -295,7 +295,7 @@
+@@ -316,7 +316,7 @@ struct blkid_struct_cache
  #define BLKID_CACHE_FILE	BLKID_RUNTIME_DIR "/blkid.tab"
  
  /* old systems */
 -#define BLKID_CACHE_FILE_OLD	"/etc/blkid.tab"
 +#define BLKID_CACHE_FILE_OLD	"@TERMUX_PREFIX@/etc/blkid.tab"
  
- #define BLKID_PROBE_OK	 0
- #define BLKID_PROBE_NONE 1
-diff -uNr util-linux-2.36.1/libblkid/src/topology/dm.c util-linux-2.36.1.mod/libblkid/src/topology/dm.c
---- util-linux-2.36.1/libblkid/src/topology/dm.c	2020-02-27 09:26:34.573141186 +0000
-+++ util-linux-2.36.1.mod/libblkid/src/topology/dm.c	2020-11-22 21:23:17.001470087 +0000
-@@ -30,9 +30,8 @@
+ #define BLKID_ERR_IO	 5
+ #define BLKID_ERR_SYSFS	 9
+diff --git a/libblkid/src/topology/dm.c b/libblkid/src/topology/dm.c
+index 612b5df33..af4adcd87 100644
+--- a/libblkid/src/topology/dm.c
++++ b/libblkid/src/topology/dm.c
+@@ -30,9 +30,8 @@ static int probe_dm_tp(blkid_probe pr,
  		const struct blkid_idmag *mag __attribute__((__unused__)))
  {
  	const char * const paths[] = {
@@ -177,10 +184,11 @@ diff -uNr util-linux-2.36.1/libblkid/src/topology/dm.c util-linux-2.36.1.mod/lib
  	};
  	int dmpipe[] = { -1, -1 }, stripes = 0, stripesize = 0;
  	const char *cmd = NULL;
-diff -uNr util-linux-2.36.1/libblkid/src/topology/lvm.c util-linux-2.36.1.mod/libblkid/src/topology/lvm.c
---- util-linux-2.36.1/libblkid/src/topology/lvm.c	2017-09-18 09:48:03.563891490 +0000
-+++ util-linux-2.36.1.mod/libblkid/src/topology/lvm.c	2020-11-22 21:23:17.001470087 +0000
-@@ -36,9 +36,8 @@
+diff --git a/libblkid/src/topology/lvm.c b/libblkid/src/topology/lvm.c
+index af1a61299..f8267d8bd 100644
+--- a/libblkid/src/topology/lvm.c
++++ b/libblkid/src/topology/lvm.c
+@@ -36,9 +36,8 @@ static int probe_lvm_tp(blkid_probe pr,
  		const struct blkid_idmag *mag __attribute__((__unused__)))
  {
  	const char * const paths[] = {
@@ -192,10 +200,11 @@ diff -uNr util-linux-2.36.1/libblkid/src/topology/lvm.c util-linux-2.36.1.mod/li
  	};
  	int lvpipe[] = { -1, -1 }, stripes = 0, stripesize = 0;
  	FILE *stream = NULL;
-diff -uNr util-linux-2.36.1/libmount/src/cache.c util-linux-2.36.1.mod/libmount/src/cache.c
---- util-linux-2.36.1/libmount/src/cache.c	2020-11-10 09:25:56.566810017 +0000
-+++ util-linux-2.36.1.mod/libmount/src/cache.c	2020-11-22 21:23:17.001470087 +0000
-@@ -633,7 +633,7 @@
+diff --git a/libmount/src/cache.c b/libmount/src/cache.c
+index b7956346f..ffe3dc103 100644
+--- a/libmount/src/cache.c
++++ b/libmount/src/cache.c
+@@ -654,7 +654,7 @@ char *mnt_pretty_path(const char *path, struct libmnt_cache *cache)
  	/* users assume backing file name rather than /dev/loopN in
  	 * output if the device has been initialized by mount(8).
  	 */
@@ -204,9 +213,11 @@ diff -uNr util-linux-2.36.1/libmount/src/cache.c util-linux-2.36.1.mod/libmount/
  		struct loopdev_cxt lc;
  
  		if (loopcxt_init(&lc, 0) || loopcxt_set_device(&lc, pretty))
+diff --git a/libmount/src/hook_loopdev.c b/libmount/src/hook_loopdev.c
+index 444d69d6f..54ca0ebf3 100644
 --- a/libmount/src/hook_loopdev.c
 +++ b/libmount/src/hook_loopdev.c
-@@ -129,7 +129,7 @@
+@@ -105,7 +105,7 @@ is_mounted_same_loopfile(struct libmnt_context *cxt,
  
  		rc = 0;
  
@@ -215,10 +226,11 @@ diff -uNr util-linux-2.36.1/libmount/src/cache.c util-linux-2.36.1.mod/libmount/
  			rc = loopdev_is_used((char *) src, bf, offset, 0, LOOPDEV_FL_OFFSET);
  
  		} else if (opts && (flags & MNT_MS_LOOP) &&
-diff -uNr util-linux-2.36.1/libmount/src/tab.c util-linux-2.36.1.mod/libmount/src/tab.c
---- util-linux-2.36.1/libmount/src/tab.c	2020-11-10 09:25:56.568810004 +0000
-+++ util-linux-2.36.1.mod/libmount/src/tab.c	2020-11-22 21:23:17.002470086 +0000
-@@ -1740,7 +1740,7 @@
+diff --git a/libmount/src/tab.c b/libmount/src/tab.c
+index 8508715ea..0b1298a34 100644
+--- a/libmount/src/tab.c
++++ b/libmount/src/tab.c
+@@ -1948,7 +1948,7 @@ int __mnt_table_is_fs_mounted(struct libmnt_table *tb, struct libmnt_fs *fstab_f
  			int flags = 0;
  
  			if (!mnt_fs_get_srcpath(fs) ||
@@ -227,9 +239,10 @@ diff -uNr util-linux-2.36.1/libmount/src/tab.c util-linux-2.36.1.mod/libmount/sr
  				continue;	/* does not look like loopdev */
  
  			if (mnt_fs_get_option(fstab_fs, "offset", &val, &len) == 0) {
-diff -uNr util-linux-2.36.1/libuuid/src/uuidd.h util-linux-2.36.1.mod/libuuid/src/uuidd.h
---- util-linux-2.36.1/libuuid/src/uuidd.h	2020-11-16 10:41:16.342846207 +0000
-+++ util-linux-2.36.1.mod/libuuid/src/uuidd.h	2020-11-22 21:23:17.003470085 +0000
+diff --git a/libuuid/src/uuidd.h b/libuuid/src/uuidd.h
+index f76acc8b2..14b1c2c12 100644
+--- a/libuuid/src/uuidd.h
++++ b/libuuid/src/uuidd.h
 @@ -38,7 +38,7 @@
  #define UUIDD_DIR		_PATH_RUNSTATEDIR "/uuidd"
  #define UUIDD_SOCKET_PATH	UUIDD_DIR "/request"
@@ -239,10 +252,11 @@ diff -uNr util-linux-2.36.1/libuuid/src/uuidd.h util-linux-2.36.1.mod/libuuid/sr
  
  #define UUIDD_OP_GETPID			0
  #define UUIDD_OP_GET_MAXOP		1
-diff -uNr util-linux-2.36.1/login-utils/su-common.c util-linux-2.36.1.mod/login-utils/su-common.c
---- util-linux-2.36.1/login-utils/su-common.c	2020-11-16 10:41:16.342846207 +0000
-+++ util-linux-2.36.1.mod/login-utils/su-common.c	2020-11-22 21:23:17.004470084 +0000
-@@ -101,7 +101,7 @@
+diff --git a/login-utils/su-common.c b/login-utils/su-common.c
+index 8a77cf2a8..d76fda302 100644
+--- a/login-utils/su-common.c
++++ b/login-utils/su-common.c
+@@ -107,7 +107,7 @@ UL_DEBUG_DEFINE_MASKNAMES(su) = UL_DEBUG_EMPTY_MASKNAMES;
  #define is_pam_failure(_rc)	((_rc) != PAM_SUCCESS)
  
  /* The shell to run if none is given in the user's passwd entry.  */
@@ -251,10 +265,11 @@ diff -uNr util-linux-2.36.1/login-utils/su-common.c util-linux-2.36.1.mod/login-
  
  /* The user to become if none is specified.  */
  #define DEFAULT_USER "root"
-diff -uNr util-linux-2.36.1/login-utils/sulogin.c util-linux-2.36.1.mod/login-utils/sulogin.c
---- util-linux-2.36.1/login-utils/sulogin.c	2020-11-13 11:33:31.084801627 +0000
-+++ util-linux-2.36.1.mod/login-utils/sulogin.c	2020-11-22 21:24:51.388374725 +0000
-@@ -743,7 +743,7 @@
+diff --git a/login-utils/sulogin.c b/login-utils/sulogin.c
+index aeaa3f11f..ba0e13d4b 100644
+--- a/login-utils/sulogin.c
++++ b/login-utils/sulogin.c
+@@ -893,7 +893,7 @@ static void sushell(struct passwd *pwd, struct console *con)
  		if (pwd->pw_shell[0])
  			su_shell = pwd->pw_shell;
  		else
@@ -263,7 +278,7 @@ diff -uNr util-linux-2.36.1/login-utils/sulogin.c util-linux-2.36.1.mod/login-ut
  	}
  	if ((p = strrchr(su_shell, '/')) == NULL)
  		p = su_shell;
-@@ -792,9 +792,9 @@
+@@ -942,9 +942,9 @@ static void sushell(struct passwd *pwd, struct console *con)
  	execl(su_shell, shell, (char *)NULL);
  	warn(_("failed to execute %s"), su_shell);
  
@@ -275,14 +290,15 @@ diff -uNr util-linux-2.36.1/login-utils/sulogin.c util-linux-2.36.1.mod/login-ut
 +	warn(_("failed to execute %s"), "@TERMUX_PREFIX@/bin/sh");
  }
  
- static void usage(void)
-diff -uNr util-linux-2.36.1/misc-utils/whereis.c util-linux-2.36.1.mod/misc-utils/whereis.c
---- util-linux-2.36.1/misc-utils/whereis.c	2020-11-16 10:41:16.343846201 +0000
-+++ util-linux-2.36.1.mod/misc-utils/whereis.c	2020-11-22 21:23:17.005470083 +0000
-@@ -97,84 +97,18 @@
+ #ifdef HAVE_LIBSELINUX
+diff --git a/misc-utils/whereis.c b/misc-utils/whereis.c
+index b575e57ae..40b2d34cc 100644
+--- a/misc-utils/whereis.c
++++ b/misc-utils/whereis.c
+@@ -101,84 +101,18 @@ struct wh_dirlist {
  };
  
- static const char *bindirs[] = {
+ static const char *const bindirs[] = {
 -	"/usr/bin",
 -	"/usr/sbin",
 -	"/bin",
@@ -344,7 +360,7 @@ diff -uNr util-linux-2.36.1/misc-utils/whereis.c util-linux-2.36.1.mod/misc-util
  	NULL
  };
  
- static const char *mandirs[] = {
+ static const char *const mandirs[] = {
 -	"/usr/man/*",
 -	"/usr/share/man/*",
 -	"/usr/X386/man/*",
@@ -357,7 +373,7 @@ diff -uNr util-linux-2.36.1/misc-utils/whereis.c util-linux-2.36.1.mod/misc-util
  	NULL
  };
  
- static const char *srcdirs[] = {
+ static const char *const srcdirs[] = {
 -	"/usr/src/*",
 -	"/usr/src/lib/libc/*",
 -	"/usr/src/lib/libc/net/*",
@@ -368,10 +384,11 @@ diff -uNr util-linux-2.36.1/misc-utils/whereis.c util-linux-2.36.1.mod/misc-util
  	NULL
  };
  
-diff -uNr util-linux-2.36.1/sys-utils/setarch.c util-linux-2.36.1.mod/sys-utils/setarch.c
---- util-linux-2.36.1/sys-utils/setarch.c	2020-11-13 11:33:31.084801627 +0000
-+++ util-linux-2.36.1.mod/sys-utils/setarch.c	2020-11-22 21:23:17.005470083 +0000
-@@ -349,7 +349,7 @@
+diff --git a/sys-utils/setarch.c b/sys-utils/setarch.c
+index 4bcb5e69e..a61db097d 100644
+--- a/sys-utils/setarch.c
++++ b/sys-utils/setarch.c
+@@ -482,7 +482,7 @@ int main(int argc, char *argv[])
  		/* Don't use ifdef sparc here, we get "Unrecognized architecture"
  		 * error message later if necessary */
  		if (strcmp(arch, "sparc32bash") == 0) {
@@ -380,7 +397,7 @@ diff -uNr util-linux-2.36.1/sys-utils/setarch.c util-linux-2.36.1.mod/sys-utils/
  			shell_arg = "";
  			goto set_arch;
  		}
-@@ -458,7 +458,7 @@
+@@ -605,7 +605,7 @@ set_arch:
  		verify_arch_domain(doms, target, arch);
  
  	if (!argc) {
@@ -389,10 +406,11 @@ diff -uNr util-linux-2.36.1/sys-utils/setarch.c util-linux-2.36.1.mod/sys-utils/
  		shell_arg = "-sh";
  	}
  	if (verbose) {
-diff -uNr util-linux-2.36.1/sys-utils/setpriv.c util-linux-2.36.1.mod/sys-utils/setpriv.c
---- util-linux-2.36.1/sys-utils/setpriv.c	2020-07-01 10:36:00.074753746 +0000
-+++ util-linux-2.36.1.mod/sys-utils/setpriv.c	2020-11-22 21:23:17.006470082 +0000
-@@ -52,7 +52,7 @@
+diff --git a/sys-utils/setpriv.c b/sys-utils/setpriv.c
+index daa3ab366..95d3c6a6c 100644
+--- a/sys-utils/setpriv.c
++++ b/sys-utils/setpriv.c
+@@ -56,7 +56,7 @@
  #define SETPRIV_EXIT_PRIVERR 127	/* how we exit when we fail to set privs */
  
  /* The shell to set SHELL env.variable if none is given in the user's passwd entry.  */
@@ -401,10 +419,11 @@ diff -uNr util-linux-2.36.1/sys-utils/setpriv.c util-linux-2.36.1.mod/sys-utils/
  
  static gid_t get_group(const char *s, const char *err);
  
-diff -uNr util-linux-2.36.1/text-utils/more.c util-linux-2.36.1.mod/text-utils/more.c
---- util-linux-2.36.1/text-utils/more.c	2020-11-10 09:25:56.658809468 +0000
-+++ util-linux-2.36.1.mod/text-utils/more.c	2020-11-22 21:23:17.007470081 +0000
-@@ -78,6 +78,7 @@
+diff --git a/text-utils/more.c b/text-utils/more.c
+index a035591af..0f67fde70 100644
+--- a/text-utils/more.c
++++ b/text-utils/more.c
+@@ -81,6 +81,7 @@
  # include <magic.h>
  #endif
  
@@ -412,10 +431,11 @@ diff -uNr util-linux-2.36.1/text-utils/more.c util-linux-2.36.1.mod/text-utils/m
  #include "strutils.h"
  #include "nls.h"
  #include "xalloc.h"
-diff -uNr util-linux-2.36.1/text-utils/pg.c util-linux-2.36.1.mod/text-utils/pg.c
---- util-linux-2.36.1/text-utils/pg.c	2020-11-13 11:33:31.084801627 +0000
-+++ util-linux-2.36.1.mod/text-utils/pg.c	2020-11-22 21:23:17.007470081 +0000
-@@ -1368,7 +1368,7 @@
+diff --git a/text-utils/pg.c b/text-utils/pg.c
+index 3623f3f78..6c68dc16e 100644
+--- a/text-utils/pg.c
++++ b/text-utils/pg.c
+@@ -1371,7 +1371,7 @@ static void pgfile(FILE *f, const char *name)
  					{
  						const char *sh = getenv("SHELL");
  						if (!sh)
