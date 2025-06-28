@@ -92,12 +92,12 @@ termux_step_configure() {
 		OBJDUMP="$OBJDUMP" \
 		STRIP="$STRIP" \
 		CXXFILT="llvm-cxxfilt" \
-		BUILD_CC="/usr/bin/clang-18" \
-		BUILD_CXX="/usr/bin/clang++-18" \
-		BUILD_NM="/usr/bin/llvm-nm-18" \
-		BUILD_AR="/usr/bin/llvm-ar-18" \
-		BUILD_OBJCOPY="/usr/bin/llvm-objcopy-18" \
-		BUILD_STRIP="/usr/bin/llvm-strip-18" \
+		BUILD_CC="$TERMUX_HOST_LLVM_BASE_DIR/bin/clang" \
+		BUILD_CXX="$TERMUX_HOST_LLVM_BASE_DIR/bin/clang++" \
+		BUILD_NM="$TERMUX_HOST_LLVM_BASE_DIR/bin/llvm-nm" \
+		BUILD_AR="$TERMUX_HOST_LLVM_BASE_DIR/bin/llvm-ar" \
+		BUILD_OBJCOPY="$TERMUX_HOST_LLVM_BASE_DIR/bin/llvm-objcopy" \
+		BUILD_STRIP="$TERMUX_HOST_LLVM_BASE_DIR/bin/llvm-strip" \
 		--with-jobs=$TERMUX_PKG_MAKE_PROCESSES
 }
 
