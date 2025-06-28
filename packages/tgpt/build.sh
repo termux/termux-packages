@@ -9,21 +9,21 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
-    termux_setup_golang
-    GOFLAGS="-mod=readonly" go mod vendor -v
+	termux_setup_golang
+	GOFLAGS="-mod=readonly" go mod vendor -v
 }
 
 termux_step_make() {
-    export CGO_CPPFLAGS="$CPPFLAGS"
-    export CGO_CFLAGS="$CFLAGS"
-    export CGO_CXXFLAGS="$CXXFLAGS"
-    export CGO_LDFLAGS="$LDFLAGS"
-    export GOFLAGS="-buildmode=pie -mod=vendor -modcacherw"
-    export GOPATH="$TERMUX_PKG_SRCDIR"
-    local ld_flags="-compressdwarf=false -linkmode=external"
-    go build -v -ldflags "$ld_flags"
+	export CGO_CPPFLAGS="$CPPFLAGS"
+	export CGO_CFLAGS="$CFLAGS"
+	export CGO_CXXFLAGS="$CXXFLAGS"
+	export CGO_LDFLAGS="$LDFLAGS"
+	export GOFLAGS="-buildmode=pie -mod=vendor -modcacherw"
+	export GOPATH="$TERMUX_PKG_SRCDIR"
+	local ld_flags="-compressdwarf=false -linkmode=external"
+	go build -v -ldflags "$ld_flags"
 }
 
 termux_step_make_install() {
-    install -Dm700 tgpt "$TERMUX_PREFIX"/bin/tgpt
+	install -Dm700 tgpt "$TERMUX_PREFIX"/bin/tgpt
 }
