@@ -15,6 +15,7 @@ TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dbuild-testsuite=false
 -Dintrospection=enabled
+-Dman-pages=true
 "
 
 termux_step_pre_configure() {
@@ -38,9 +39,4 @@ termux_step_post_massage() {
 	for f in "${_SOVERSION_GUARD_FILES[@]}"; do
 		[ -e "${f}" ] || termux_error_exit "SOVERSION guard check failed."
 	done
-}
-
-termux_step_post_make_install() {
-	install -Dm600 $TERMUX_PKG_BUILDER_DIR/pango-view.1 \
-		$TERMUX_PREFIX/share/man/man1/pango-view.1
 }
