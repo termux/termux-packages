@@ -1,0 +1,12 @@
+--- a/pango/meson.build
++++ b/pango/meson.build
+@@ -132,7 +132,8 @@
+ if build_gir
+   gir_args = [
+     '--quiet',
+-    '--doc-format=gi-docgen',
++    # TODO: Remove this after gobject-introspection 1.84.0 update in host system
++    # '--doc-format=gi-docgen',
+   ]
+   harfbuzz_gobject_dep = dependency('harfbuzz-gobject',
+                                     version: harfbuzz_req,
