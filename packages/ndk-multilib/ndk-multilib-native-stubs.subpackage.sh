@@ -5,6 +5,7 @@ TERMUX_SUBPKG_INCLUDE=
 case "$TERMUX_ARCH" in
 	aarch64 )
 		TERMUX_SUBPKG_INCLUDE+="
+			aarch64-linux-android/lib/libandroid.so
 			aarch64-linux-android/lib/libc.so
 			aarch64-linux-android/lib/libdl.so
 			aarch64-linux-android/lib/liblog.so
@@ -13,6 +14,7 @@ case "$TERMUX_ARCH" in
 		;& # fallthrough
 	arm )
 		TERMUX_SUBPKG_INCLUDE+="
+			arm-linux-android/lib/libandroid.so
 			arm-linux-androideabi/lib/libc.so
 			arm-linux-androideabi/lib/libdl.so
 			arm-linux-androideabi/lib/liblog.so
@@ -21,6 +23,7 @@ case "$TERMUX_ARCH" in
 		;;
 	x86_64 )
 		TERMUX_SUBPKG_INCLUDE+="
+			x86_64-linux-android/lib/libandroid.so
 			x86_64-linux-android/lib/libc.so
 			x86_64-linux-android/lib/libdl.so
 			x86_64-linux-android/lib/liblog.so
@@ -29,6 +32,7 @@ case "$TERMUX_ARCH" in
 		;& # fallthrough
 	i686 )
 		TERMUX_SUBPKG_INCLUDE+="
+			i686-linux-android/lib/libandroid.so
 			i686-linux-android/lib/libc.so
 			i686-linux-android/lib/libdl.so
 			i686-linux-android/lib/liblog.so

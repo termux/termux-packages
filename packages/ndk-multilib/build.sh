@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Version should be equal to TERMUX_NDK_{VERSION_NUM,REVISION} in
 # scripts/properties.sh
 TERMUX_PKG_VERSION=27c
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://dl.google.com/android/repository/android-ndk-r${TERMUX_PKG_VERSION}-linux.zip
 TERMUX_PKG_SHA256=59c2f6dc96743b5daf5d1626684640b20a6bd2b1d85b13156b90333741bad5cc
 TERMUX_PKG_AUTO_UPDATE=false
@@ -41,14 +42,14 @@ prepare_libs() {
 	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/opt/ndk-multilib/$SUFFIX/lib
 	local BASEDIR=toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SUFFIX/
 	cp $BASEDIR/${TERMUX_PKG_API_LEVEL}/*.o $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib
-	cp $BASEDIR/${TERMUX_PKG_API_LEVEL}/lib{c,dl,log,m}.so $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/opt/ndk-multilib/$SUFFIX/lib
+	cp $BASEDIR/${TERMUX_PKG_API_LEVEL}/lib{android,c,dl,log,m}.so $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/opt/ndk-multilib/$SUFFIX/lib
 	cp $BASEDIR/libc++_shared.so $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib
 	cp $BASEDIR/lib{c,dl,m}.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/opt/ndk-multilib/$SUFFIX/lib
 	cp $BASEDIR/lib{c++_static,c++abi}.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib
 	echo 'INPUT(-lc++_static -lc++abi)' > $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib/libc++_shared.a
 
 	local f
-	for f in lib{c,dl,log,m}.so lib{c,dl,m}.a; do
+	for f in lib{android,c,dl,log,m}.so lib{c,dl,m}.a; do
 		ln -sfT $TERMUX_PREFIX/opt/ndk-multilib/$SUFFIX/lib/${f} \
 			$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib/${f}
 	done
@@ -84,7 +85,7 @@ termux_step_make_install() {
 termux_step_post_massage() {
 	local triple f
 	for triple in aarch64-linux-android arm-linux-androideabi i686-linux-android x86_64-linux-android; do
-		for f in lib{c,dl,log,m}.so lib{c,dl,m}.a; do
+		for f in lib{android,c,dl,log,m}.so lib{c,dl,m}.a; do
 			rm -f ${triple}/lib/${f}
 		done
 	done
