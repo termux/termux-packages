@@ -1,29 +1,47 @@
 --- a/libbase/properties.cpp
 +++ b/libbase/properties.cpp
-@@ -16,7 +16,7 @@
+@@ -16,8 +16,10 @@
  
  #include "android-base/properties.h"
  
 -#if defined(__BIONIC__)
-+#if defined(__BIONIC__) && !defined(__TERMUX__)
++#if 1
++#define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
  #include <sys/system_properties.h>
++#include <sys/_system_properties.h>
  #endif
  
-@@ -31,7 +31,7 @@
+ #include <algorithm>
+@@ -31,7 +33,7 @@
  #include <android-base/strings.h>
  #include <android-base/thread_annotations.h>
  
 -#if !defined(__BIONIC__)
-+#if !defined(__BIONIC__) || defined(__TERMUX__)
++#if 0
  
  // Here lies a rudimentary implementation of system properties for non-Bionic
  // platforms. We are using weak symbols here because we want to allow
-@@ -178,7 +178,7 @@ bool SetProperty(const std::string& key, const std::string& value) {
+@@ -161,13 +163,6 @@ std::string GetProperty(const std::string& key, const std::string& default_value
+   const prop_info* pi = __system_property_find(key.c_str());
+   if (pi == nullptr) return default_value;
+ 
+-  __system_property_read_callback(
+-      pi,
+-      [](void* cookie, const char*, const char* value, unsigned) {
+-        auto property_value = reinterpret_cast<std::string*>(cookie);
+-        *property_value = value;
+-      },
+-      &property_value);
+   // If the property exists but is empty, also return the default value.
+   // Since we can't remove system properties, "empty" is traditionally
+   // the same as "missing" (this was true for cutils' property_get).
+@@ -178,7 +173,7 @@ bool SetProperty(const std::string& key, const std::string& value) {
    return (__system_property_set(key.c_str(), value.c_str()) == 0);
  }
  
 -#if defined(__BIONIC__)
-+#if defined(__BIONIC__) && !defined(__TERMUX__)
++#if 0
  
  struct WaitForPropertyData {
    bool done;
+
