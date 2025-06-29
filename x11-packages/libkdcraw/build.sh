@@ -1,0 +1,13 @@
+TERMUX_PKG_HOMEPAGE='https://www.kde.org/'
+TERMUX_PKG_DESCRIPTION='A C++ interface used to decode RAW picture'
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=24.08.1
+TERMUX_PKG_SRCURL=https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/libkdcraw-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=dceda2ebbf7479ba232e9108d1cf58d613df0fa76c990106ee59dbba8c9c32f6
+TERMUX_PKG_DEPENDS="libraw"
+TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, qt6-qt5compat, qt6-qtbase"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DQT_MAJOR_VERSION=6
+"
