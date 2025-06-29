@@ -48,8 +48,14 @@ prepare_libs() {
 	cp $BASEDIR/lib{c++_static,c++abi}.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib
 	echo 'INPUT(-lc++_static -lc++abi)' > $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib/libc++_shared.a
 
+	local libs="lib{android,c,dl,log,m}.so"
+	libs+=" lib{c,dl,m}.a"
+	# Those are all the *other* libs that are supported by android api 24.
+	libs+=" lib{camera2ndk,mediandk,jnigraphics}.so"
+	libs+=" lib{EGL,GLESv1_CM,GLESv2,GLESv3,vulkan}.so"
+	libs+=" lib{OpenMAXAL,OpenSLES}.so"
 	local f
-	for f in lib{android,c,dl,log,m}.so lib{c,dl,m}.a; do
+	for f in $libs; do
 		ln -sfT $TERMUX_PREFIX/opt/ndk-multilib/$SUFFIX/lib/${f} \
 			$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib/${f}
 	done
