@@ -6,6 +6,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Using unstable API version due to CVE-2021-33391.
 # Please revbump revdeps to rebuild when bumping version.
 TERMUX_PKG_VERSION=5.9.14-next
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/htacg/tidy-html5/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=83cc9d9cdfa59bfe400dc745dea14eb1e1be4ca088facfb911eac8b78e75f2b4
 TERMUX_PKG_AUTO_UPDATE=false
@@ -13,6 +14,9 @@ TERMUX_PKG_DEPENDS="libxslt"
 TERMUX_PKG_BREAKS="tidy-dev"
 TERMUX_PKG_REPLACES="tidy-dev"
 TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_POLICY_VERSION_MINIMUM=3.5
+"
 
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
@@ -33,7 +37,7 @@ termux_step_post_get_source() {
 termux_step_host_build() {
 	## Host build required to generate man pages.
 	termux_setup_cmake
-	cmake "$TERMUX_PKG_SRCDIR" && make
+	cmake $TERMUX_PKG_EXTRA_CONFIGURE_ARGS "$TERMUX_PKG_SRCDIR" && make
 }
 
 termux_step_post_make_install() {
