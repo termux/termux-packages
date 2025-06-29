@@ -201,7 +201,7 @@
     <member name="ATSPI_ROLE_PASSWORD_TEXT" nick="password-text" value="40"/>
     <member name="ATSPI_ROLE_POPUP_MENU" nick="popup-menu" value="41"/>
     <member name="ATSPI_ROLE_PROGRESS_BAR" nick="progress-bar" value="42"/>
-    <member name="ATSPI_ROLE_PUSH_BUTTON" nick="push-button" value="43"/>
+    <member name="ATSPI_ROLE_BUTTON" nick="button" value="43"/>
     <member name="ATSPI_ROLE_RADIO_BUTTON" nick="radio-button" value="44"/>
     <member name="ATSPI_ROLE_RADIO_MENU_ITEM" nick="radio-menu-item" value="45"/>
     <member name="ATSPI_ROLE_ROOT_PANE" nick="root-pane" value="46"/>
@@ -288,7 +288,9 @@
     <member name="ATSPI_ROLE_MARK" nick="mark" value="127"/>
     <member name="ATSPI_ROLE_SUGGESTION" nick="suggestion" value="128"/>
     <member name="ATSPI_ROLE_PUSH_BUTTON_MENU" nick="push-button-menu" value="129"/>
-    <member name="ATSPI_ROLE_LAST_DEFINED" nick="last-defined" value="130"/>
+    <member name="ATSPI_ROLE_SWITCH" nick="switch" value="130"/>
+    <member name="ATSPI_ROLE_LAST_DEFINED" nick="last-defined" value="131"/>
+    <member name="ATSPI_ROLE_PUSH_BUTTON" nick="push-button" value="43"/>
   </enum>  <flags name="AtspiCache" get-type="atspi_cache_get_type">
     <member name="ATSPI_CACHE_NONE" nick="none" value="0"/>
     <member name="ATSPI_CACHE_PARENT" nick="parent" value="1"/>
@@ -391,6 +393,11 @@
   <interface name="AtspiValue" get-type="atspi_value_get_type">
   </interface>
   <class name="AtspiDevice" get-type="atspi_device_get_type" parents="GObject">
+    <property name="app-id" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <class name="AtspiDeviceA11yManager" get-type="atspi_device_a11y_manager_get_type" parents="AtspiDevice,GObject">
+    <property name="session-bus" type="GDBusConnection" flags="235"/>
+    <property name="keyboard-monitor" type="GDBusProxy" flags="235"/>
   </class>
   <class name="AtspiDeviceLegacy" get-type="atspi_device_legacy_get_type" parents="AtspiDevice,GObject">
   </class>

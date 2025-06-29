@@ -16,6 +16,8 @@
     <property name="accessible-table-summary" type="AtkObject" flags="3"/>
     <property name="accessible-table-caption-object" type="AtkObject" flags="3"/>
     <property name="accessible-hypertext-nlinks" type="gint" flags="1" default-value="0"/>
+    <property name="accessible-id" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="accessible-help-text" type="gchararray" flags="3" default-value="NULL"/>
     <signal name="children-changed" return="void" when="last" detailed="1">
       <param type="guint"/>
       <param type="gpointer"/>
@@ -42,6 +44,10 @@
       <param type="gchararray"/>
       <param type="gint"/>
     </signal>
+    <signal name="attribute-changed" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
   </class>
   <interface name="AtkImplementorIface" get-type="atk_implementor_get_type">
   </interface>
@@ -64,6 +70,10 @@
     </signal>
     <signal name="page-changed" return="void" when="last">
       <param type="gint"/>
+    </signal>
+    <signal name="document-attribute-changed" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
     </signal>
   </interface>
   <boxed name="AtkTextRange" get-type="atk_text_range_get_type"/>
@@ -263,7 +273,7 @@
     <member name="ATK_ROLE_PASSWORD_TEXT" nick="password-text" value="39"/>
     <member name="ATK_ROLE_POPUP_MENU" nick="popup-menu" value="40"/>
     <member name="ATK_ROLE_PROGRESS_BAR" nick="progress-bar" value="41"/>
-    <member name="ATK_ROLE_PUSH_BUTTON" nick="push-button" value="42"/>
+    <member name="ATK_ROLE_BUTTON" nick="button" value="42"/>
     <member name="ATK_ROLE_RADIO_BUTTON" nick="radio-button" value="43"/>
     <member name="ATK_ROLE_RADIO_MENU_ITEM" nick="radio-menu-item" value="44"/>
     <member name="ATK_ROLE_ROOT_PANE" nick="root-pane" value="45"/>
@@ -349,7 +359,9 @@
     <member name="ATK_ROLE_MARK" nick="mark" value="125"/>
     <member name="ATK_ROLE_SUGGESTION" nick="suggestion" value="126"/>
     <member name="ATK_ROLE_PUSH_BUTTON_MENU" nick="push-button-menu" value="127"/>
-    <member name="ATK_ROLE_LAST_DEFINED" nick="last-defined" value="128"/>
+    <member name="ATK_ROLE_SWITCH" nick="switch" value="128"/>
+    <member name="ATK_ROLE_LAST_DEFINED" nick="last-defined" value="129"/>
+    <member name="ATK_ROLE_PUSH_BUTTON" nick="push-button" value="42"/>
   </enum>  <enum name="AtkLayer" get-type="atk_layer_get_type">
     <member name="ATK_LAYER_INVALID" nick="invalid" value="0"/>
     <member name="ATK_LAYER_BACKGROUND" nick="background" value="1"/>
