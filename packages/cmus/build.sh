@@ -3,8 +3,8 @@ TERMUX_PKG_DESCRIPTION="Small, fast and powerful console music player"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.12.0"
-TERMUX_PKG_REVISION="3"
-TERMUX_PKG_DEPENDS="ffmpeg, libandroid-support, libflac, libiconv, libmad, libmodplug, libvorbis, libwavpack, ncurses, opusfile, pulseaudio"
+TERMUX_PKG_REVISION="4"
+TERMUX_PKG_DEPENDS="ffmpeg, libandroid-support, libflac, libiconv, libmad, libmodplug, libvorbis, libwavpack, ncurses, opusfile, pulseaudio, alsa-lib"
 TERMUX_PKG_SRCURL=https://github.com/cmus/cmus/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=44b96cd5f84b0d84c33097c48454232d5e6a19cd33b9b6503ba9c13b6686bfc7
 TERMUX_PKG_AUTO_UPDATE=true
@@ -33,6 +33,7 @@ termux_step_pre_configure() {
 	LDFLAGS+=" -lm"
 	export CUE_LIBS=" -lm"
 	export CONFIG_OSS=n
+	export CONFIG_ALSA=y
 }
 
 termux_step_configure() {
