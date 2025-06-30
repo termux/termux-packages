@@ -55,7 +55,7 @@ termux_step_pre_configure() {
 
 termux_step_configure() {
 	local jdk_ldflags="-L${TERMUX_PREFIX}/lib \
-		-Wl,-rpath=$TERMUX_PREFIX/lib/jvm/java-21-openjdk/lib \
+		-Wl,-rpath=$TERMUX_PREFIX/lib/jvm/java-17-openjdk/lib \
 		-Wl,-rpath=${TERMUX_PREFIX}/lib -Wl,--enable-new-dtags"
 	bash ./configure \
 		--disable-precompiled-headers \
