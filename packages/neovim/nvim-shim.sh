@@ -10,4 +10,4 @@
 # See: https://github.com/termux/termux-packages/issues/23569
 #
 # Shim to properly expose LuaJIT runtime symbols to dynamically linked plugin modules
-LD_PRELOAD="$LD_PRELOAD:@TERMUX_PREFIX@/lib/libluajit.so" exec "@TERMUX_PREFIX@/libexec/nvim" "$@"
+LD_PRELOAD="$LD_PRELOAD:@TERMUX_PREFIX@/lib/libluajit.so" exec "@TERMUX_PREFIX@/libexec/nvim/nvim" "$@"
