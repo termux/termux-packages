@@ -1,6 +1,6 @@
---- ./node.gyp.orig	2025-04-23 02:40:29.000000000 +0530
-+++ ./node.gyp	2025-04-23 23:17:43.094140915 +0530
-@@ -538,7 +538,8 @@
+--- ./node.gyp.orig	2025-06-30 11:45:46.481731200 +0530
++++ ./node.gyp	2025-06-30 11:46:18.584529059 +0530
+@@ -543,7 +543,8 @@
        ],
  
        'sources': [
@@ -10,7 +10,7 @@
        ],
  
        'dependencies': [
-@@ -1019,302 +1020,6 @@
+@@ -1037,303 +1038,6 @@
          },
        ],
      }, # node_lib_target_name
@@ -44,11 +44,11 @@
 -        'test/fuzzers/fuzz_env.cc',
 -      ],
 -      'conditions': [
--        ['OS=="linux"', {
+-        ['OS=="linux" or OS=="openharmony"', {
 -          'ldflags': [ '-fsanitize=fuzzer' ]
 -        }],
 -        # Ensure that ossfuzz flag has been set and that we are on Linux
--        [ 'OS!="linux" or ossfuzz!="true"', {
+-        [ 'OS not in "linux openharmony" or ossfuzz!="true"', {
 -          'type': 'none',
 -        }],
 -        # Avoid excessive LTO
@@ -87,11 +87,11 @@
 -        'test/fuzzers/fuzz_ClientHelloParser.cc',
 -      ],
 -      'conditions': [
--        ['OS=="linux"', {
+-        ['OS=="linux" or OS=="openharmony"', {
 -          'ldflags': [ '-fsanitize=fuzzer' ]
 -        }],
 -        # Ensure that ossfuzz flag has been set and that we are on Linux
--        [ 'OS!="linux" or ossfuzz!="true"', {
+-        [ 'OS not in "linux openharmony" or ossfuzz!="true"', {
 -          'type': 'none',
 -        }],
 -        # Avoid excessive LTO
@@ -132,11 +132,11 @@
 -        'test/fuzzers/fuzz_strings.cc',
 -      ],
 -      'conditions': [
--        ['OS=="linux"', {
+-        ['OS=="linux" or OS=="openharmony"', {
 -          'ldflags': [ '-fsanitize=fuzzer' ]
 -        }],
 -        # Ensure that ossfuzz flag has been set and that we are on Linux
--        [ 'OS!="linux" or ossfuzz!="true"', {
+-        [ 'OS not in "linux openharmony" or ossfuzz!="true"', {
 -          'type': 'none',
 -        }],
 -        # Avoid excessive LTO
@@ -155,6 +155,7 @@
 -        'deps/googletest/googletest.gyp:gtest_main',
 -        'deps/histogram/histogram.gyp:histogram',
 -        'deps/nbytes/nbytes.gyp:nbytes',
+-        'tools/v8_gypfiles/abseil.gyp:abseil',
 -      ],
 -
 -      'includes': [
@@ -313,7 +314,7 @@
      {
        'target_name': 'node_js2c',
        'type': 'executable',
-@@ -1351,70 +1056,6 @@
+@@ -1370,70 +1074,6 @@
          }],
        ]
      },
