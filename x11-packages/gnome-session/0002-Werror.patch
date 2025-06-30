@@ -1,0 +1,13 @@
+--- a/meson.build
++++ b/meson.build
+@@ -76,6 +76,10 @@
+ 
+   compiler_flags += cc.get_supported_arguments(test_cflags)
+ endif
++compiler_flags += [
++  '-Wno-format-nonliteral', 
++  '-Wno-format-security'
++]
+ 
+ add_project_arguments(common_flags + compiler_flags, language: 'c')
+ 
