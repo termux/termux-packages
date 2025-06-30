@@ -1,0 +1,37 @@
+$PREFIX/lib/libsqlite3.so, and some other libs that could hypothetically also be searched for,
+do not have a SONAME entry inside them that objdump can detect,
+so use the filename instead of calling objdump to get the SONAME for it.
+(also Android does not have an ldconfig command, so this avoids calling /sbin/ldconfig
+and getting unwanted references to libc.so.6 or libraries linked to it)
+
+Fixes:
+OSError: ctypes.util.find_library() did not manage to locate a library called 'sqlite3'
+
+--- a/lib-python/3/ctypes/util.py
++++ b/lib-python/3/ctypes/util.py
+@@ -304,7 +304,7 @@ elif os.name == "posix":
+             # See issue #9998 for why this is needed
+             expr = r'[^\(\)\s]*lib%s\.[^\(\)\s]*' % re.escape(name)
+             cmd = ['ld', '-t']
+-            libpath = os.environ.get('LD_LIBRARY_PATH')
++            libpath = os.environ.get('PREFIX') + '/lib'
+             if libpath:
+                 for d in libpath.split(':'):
+                     cmd.extend(['-L', d])
+@@ -328,9 +328,13 @@ elif os.name == "posix":
+             return result
+ 
+         def find_library(name):
+-            # See issue #9998
+-            return _findSoname_ldconfig(name) or \
+-                   _get_soname(_findLib_gcc(name)) or _get_soname(_findLib_ld(name))
++            try:
++                return os.path.basename(_findLib_gcc(name))
++            except:
++                try:
++                    return os.path.basename(_findLib_ld(name))
++                except:
++                    return None
+ 
+ ################################################################
+ # test code
