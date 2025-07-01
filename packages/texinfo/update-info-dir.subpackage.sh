@@ -20,9 +20,6 @@ termux_step_create_subpkg_debscripts() {
 	fi
 	exit
 	EOF
-	if [[ "$TERMUX_PACKAGE_FORMAT" == "pacman" ]]; then
-		echo "post_install" > postupg
-	fi
 
 	cat <<- EOF > ./prerm
 	#!$TERMUX_PREFIX/bin/sh

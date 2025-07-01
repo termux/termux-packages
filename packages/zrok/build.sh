@@ -3,8 +3,9 @@ TERMUX_PKG_DESCRIPTION="An open source sharing solution built on OpenZiti."
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="1.0.6"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/openziti/zrok/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=9384e9355a7214b417a799f6f7c612bdf1f2a50dca6318be6aa26077b7f92bfb
+TERMUX_PKG_SHA256=a587217b0fcafe676ccd7bbcef3a17d045b0c263dff89cf280619a94322bef8f
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
@@ -56,8 +57,4 @@ termux_step_create_debscripts() {
 	POSTINST_EOF
 
 	chmod 0755 postinst
-
-	if [[ "$TERMUX_PACKAGE_FORMAT" == "pacman" ]]; then
-		echo "post_install" > postupg
-	fi
 }

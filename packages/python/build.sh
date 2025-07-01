@@ -5,6 +5,7 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.12.11"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=c30bb24b7f1e9a19b11b55a546434f74e739bb4c271a3e3a80ff4380d49f7adb
 TERMUX_PKG_AUTO_UPDATE=false
@@ -136,8 +137,4 @@ termux_step_create_debscripts() {
 	POSTINST_EOF
 
 	chmod 0755 postinst
-
-	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
-		echo "post_install" > postupg
-	fi
 }

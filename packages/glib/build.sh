@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library providing core building blocks for libraries and
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.84.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/glib/${TERMUX_PKG_VERSION%.*}/glib-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=aa4f87c3225bf57ca85f320888f7484901a17934ca37023c3bd8435a72db863e
 TERMUX_PKG_AUTO_UPDATE=true
@@ -172,8 +173,5 @@ termux_step_create_debscripts() {
 		chmod 755 ./${i}
 	done
 	unset i
-	if [[ "$TERMUX_PACKAGE_FORMAT" == "pacman" ]]; then
-		echo "post_install" > postupg
-	fi
 	chmod 644 ./triggers
 }

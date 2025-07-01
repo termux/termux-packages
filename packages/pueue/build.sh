@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT, Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE.MIT, LICENSE.APACHE"
 TERMUX_PKG_MAINTAINER="@stevenxxiu"
 TERMUX_PKG_VERSION="4.0.0-rc.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/Nukesor/pueue/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4005cdb038b0fe84cf25b46551920b14cedcbea265b6dac068b5ea4261ab4e2d
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -53,7 +53,4 @@ termux_step_create_debscripts() {
 		pueue completions nushell > ${TERMUX_PREFIX}/share/nushell/vendor/autoload/pueue.nu
 		pueue completions zsh > ${TERMUX_PREFIX}/share/zsh/site-functions/_pueue
 	EOF
-	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
-		echo "post_install" > postupg
-	fi
 }

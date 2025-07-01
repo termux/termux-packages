@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="17.0.15"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/openjdk/jdk17u/archive/refs/tags/jdk-${TERMUX_PKG_VERSION}-ga.tar.gz
 TERMUX_PKG_SHA256=ae623441d95d0563690f85edad765a12fc89bbb89ed1877ec5cf677a5ae4fbd7
 TERMUX_PKG_AUTO_UPDATE=true
@@ -135,8 +135,4 @@ termux_step_create_debscripts() {
 			"$TERMUX_PKG_BUILDER_DIR/hooks/$TERMUX_PACKAGE_FORMAT/$hook.in" > $hook
 		chmod 700 $hook
 	done
-
-	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
-		echo "post_install" > postupg
-	fi
 }
