@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.OLD, COPYING.LIB"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="10.11"
+TERMUX_PKG_REVISION=1
 _REAL_VERSION="${TERMUX_PKG_VERSION/\~/-}"
 TERMUX_PKG_SRCURL=(
 	https://github.com/AndreRH/wine/archive/refs/tags/hangover-$_REAL_VERSION.tar.gz
@@ -43,6 +44,7 @@ enable_tools=yes
 --without-coreaudio
 --without-cups
 --without-dbus
+--without-ffmpeg
 --with-fontconfig
 --with-freetype
 --without-gettext
@@ -59,6 +61,7 @@ enable_tools=yes
 --without-osmesa
 --without-oss
 --without-pcap
+--without-pcsclite
 --with-pthread
 --with-pulse
 --without-sane
@@ -152,10 +155,12 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
+	return
 	make -j $TERMUX_PKG_MAKE_PROCESSES
 }
 
 termux_step_make_install() {
+	return
 	make -j $TERMUX_PKG_MAKE_PROCESSES install
 
 	# Create hangover-wine script
@@ -170,15 +175,15 @@ EOF
 termux_step_post_make_install() {
 	# Install FEX-based dlls
 	local _type
-	for _type in wow64fex arm64ecfex; do
+	for _type in wowbox64 libwow64fex libarm64ecfex; do
 		mkdir -p $_type
 		cd $_type
-		ar -x "$TERMUX_PKG_SRCDIR"/hangover-lib${_type}_${_REAL_VERSION}_arm64.deb
+		ar -x "$TERMUX_PKG_SRCDIR"/hangover-${_type}_${_REAL_VERSION}_arm64.deb
 		tar xf data.tar.xz
-		install -Dm644 usr/lib/wine/aarch64-windows/lib$_type.dll \
-			"$TERMUX_PREFIX"/opt/hangover-wine/lib/wine/aarch64-windows/lib$_type.dll
-		install -Dm644 usr/share/doc/hangover-lib$_type/copyright \
-			"$TERMUX_PREFIX"/share/doc/hangover-lib$_type/copyright
+		install -Dm644 usr/lib/wine/aarch64-windows/$_type.dll \
+			"$TERMUX_PREFIX"/opt/hangover-wine/lib/wine/aarch64-windows/$_type.dll
+		install -Dm644 usr/share/doc/hangover-$_type/copyright \
+			"$TERMUX_PREFIX"/share/doc/hangover-$_type/copyright
 		cd -
 	done
 
