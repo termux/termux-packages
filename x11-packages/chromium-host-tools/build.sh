@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.chromium.org/Home
 TERMUX_PKG_DESCRIPTION="Chromium web browser (Host tools)"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION=138.0.7204.49
+TERMUX_PKG_VERSION=138.0.7204.92
 TERMUX_PKG_SRCURL=https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=98fbd9a4cff021ec90194bfca824ac6b52e63418b634b85b8ef1a92e9299380c
+TERMUX_PKG_SHA256=b7c4985e41e8c581355a577ab3f114d41433c94e655916d4c1cf4cf31c277964
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libdrm, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libffi-static"
 # TODO: Split chromium-common and chromium-headless
@@ -24,14 +24,14 @@ termux_step_post_get_source() {
 	local f
 	for f in $(find "$TERMUX_PKG_BUILDER_DIR/cr-patches" -maxdepth 1 -type f -name *.patch | sort); do
 		echo "Applying patch: $(basename $f)"
-		patch -p1 < "$f"
+		patch -p1 --silent < "$f"
 	done
 
 	# Apply patches for jumbo build
 	local f
 	for f in $(find "$TERMUX_PKG_BUILDER_DIR/jumbo-patches" -maxdepth 1 -type f -name *.patch | sort); do
 		echo "Applying patch: $(basename $f)"
-		patch -p1 < "$f"
+		patch -p1 --silent < "$f"
 	done
 
 	# Use some system libs
