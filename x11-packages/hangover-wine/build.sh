@@ -155,12 +155,10 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	return
 	make -j $TERMUX_PKG_MAKE_PROCESSES
 }
 
 termux_step_make_install() {
-	return
 	make -j $TERMUX_PKG_MAKE_PROCESSES install
 
 	# Create hangover-wine script
