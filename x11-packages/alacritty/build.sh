@@ -11,12 +11,13 @@ TERMUX_PKG_BUILD_DEPENDS="libxcb, libxkbcommon, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
-__cargo_fetch_dep_source_for_rust_windowing() {
-	local _name="$1"
+__cargo_fetch_dep_source_from_github() {
+	local _repo="$1"
+	local _name="$2"
 	local _version
 	_version=$(cargo metadata --format-version=1 --no-deps | jq -r ".packages[0].dependencies[] | select(.name==\"$_name\") | .req")
 	_version="${_version/^/}"
-	local _url="https://github.com/rust-windowing/$_name/archive/refs/tags/v$_version.tar.gz"
+	local _url="https://github.com/$_repo/$_name/archive/refs/tags/v$_version.tar.gz"
 	local _path="$TERMUX_PKG_CACHEDIR/$_name-v$_version.tar.gz"
 	termux_download "$_url" "$_path" SKIP_CHECKSUM
 	tar xf "$_path" -C "$TERMUX_PKG_SRCDIR"
@@ -30,14 +31,17 @@ termux_step_pre_configure() {
 	: "${CARGO_HOME:=$HOME/.cargo}"
 	export CARGO_HOME
 
-	__cargo_fetch_dep_source_for_rust_windowing "winit"
-	__cargo_fetch_dep_source_for_rust_windowing "glutin"
+	__cargo_fetch_dep_source_from_github "rust-windowing" "winit"
+	__cargo_fetch_dep_source_from_github "rust-windowing" "glutin"
+	__cargo_fetch_dep_source_from_github "alacritty" "copypasta"
 
 	patch="$TERMUX_PKG_BUILDER_DIR/patch-root-Cargo.diff"
 	patch -p1 -d "$TERMUX_PKG_SRCDIR" < "$patch"
 
-	cat "$TERMUX_PKG_BUILDER_DIR"/winit-*.diff | patch -p1 -d "$TERMUX_PKG_SRCDIR/winit-source"
-	cat "$TERMUX_PKG_BUILDER_DIR"/glutin-*.diff | patch -p1 -d "$TERMUX_PKG_SRCDIR/glutin-source"
+	for name in winit glutin copypasta; do
+		cat "$TERMUX_PKG_BUILDER_DIR"/${name}*.diff | \
+		patch -p1 -d "$TERMUX_PKG_SRCDIR/${name}-source"
+	done
 
 	cargo update
 
@@ -64,7 +68,8 @@ termux_step_pre_configure() {
 				cp "$dir"/src/backend/linux_raw/shm/* "$dir"/src/backend/libc/shm/
 			fi
 			echo "Applying patch for '$crate'"
-			patch -p1 -d "$dir" < "${patch}"
+			sed  -e "s|@TERMUX_PREFIX@|${TERMUX__PREFIX}|g" "${patch}" |\
+				patch -p1 -d "$dir"
 		done
 	done
 }
