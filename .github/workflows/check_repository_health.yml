@@ -1,0 +1,35 @@
+name: Check Repository Health
+
+on:
+  schedule:
+    - cron: "0 0 * * 0" # Runs at 12:00am UTC every Sunday
+  workflow_dispatch:
+
+permissions: {} # none
+
+jobs:
+  check-repository-health:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - id: generate-apt-packages-list
+        name: Generate list of packages
+        run: |
+          OUTPUT_DIR="$(mktemp -d)"
+          echo "OUTPUT_DIR=$OUTPUT_DIR" >> "$GITHUB_OUTPUT"
+          ./scripts/generate-apt-packages-list.sh "$OUTPUT_DIR"
+      - name: Check repository health
+        run: |
+          set -euo pipefail
+          ./scripts/check-repository-health.js "${{ steps.generate-apt-packages-list.outputs.OUTPUT_DIR }}" | tee repository-health.txt
+      - name: Create issue if health check fails
+        env:
+          GITHUB_TOKEN: ${{ secrets.TERMUXBOT2_TOKEN }}
+        if: failure()
+        run: |
+          ISSUE_TITLE="Repository Health Check Failed"
+          ISSUE_BODY=$(cat repository-health.txt)
+          gh issue create --title "$ISSUE_TITLE" --body "$ISSUE_BODY" --label "health-check" --assignee "thunder-coding"
