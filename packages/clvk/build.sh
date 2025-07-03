@@ -6,6 +6,7 @@ _COMMIT=81fa27ec487372044a54e118c3a6c25db30f4c38
 _COMMIT_DATE=20250616
 _COMMIT_TIME=080106
 TERMUX_PKG_VERSION="0.0.20250616.080106"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/kpet/clvk
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_BUILD_DEPENDS="vulkan-headers, vulkan-loader-android"
@@ -123,7 +124,7 @@ termux_step_host_build() {
 		-j "${TERMUX_PKG_MAKE_PROCESSES}" \
 		llvm-tblgen clang-tblgen
 
-	local _host_clang_base="/usr/lib/llvm-18"
+	local _host_clang_base="/usr/lib/llvm-19"
 	cmake \
 		-G Ninja \
 		-B "${TERMUX_PKG_HOSTBUILD_DIR}/libclc" \
