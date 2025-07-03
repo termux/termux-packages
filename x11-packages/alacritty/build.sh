@@ -7,7 +7,7 @@ TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/alacritty/alacritty/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=b814e30c6271ae23158c66e0e2377c3600bb24041fa382a36e81be564eeb2e36
 TERMUX_PKG_DEPENDS="fontconfig, freetype, libxi, libxcursor, libxrandr"
-TERMUX_PKG_BUILD_DEPENDS="libxcb, libxkbcommon, ncurses, scdoc"
+TERMUX_PKG_BUILD_DEPENDS="libxcb, libxkbcommon, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
