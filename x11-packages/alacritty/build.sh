@@ -48,14 +48,6 @@ termux_step_configure() {
 	if [ -n "$patch_lines" ]; then
 		printf "\n[patch.crates-io]\n$patch_lines" >> Cargo.toml
 	fi
-
-	mkdir -p .cargo
-	{
-		echo '[source.crates-io]'
-		echo 'replace-with = "vendored-sources"'
-		echo '[source.vendored-sources]'
-		echo 'directory = "vendor"'
-	} > .cargo/config.toml
 }
 
 termux_step_make() {
