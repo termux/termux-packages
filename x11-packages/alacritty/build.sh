@@ -20,10 +20,10 @@ termux_step_configure() {
 	for dir in ./vendor/rustix*; do
 		[ -d "$dir" ] || continue
 		if [ -d "$dir/src/backend/libc/shm" ] && \
-		   [ -d "$dir/src/backend/linux_raw/shm" ]; then
+			[ -d "$dir/src/backend/linux_raw/shm" ]; then
 			rm -rf "$dir/src/backend/libc/shm/"*
 			cp "$dir/src/backend/linux_raw/shm/"* \
-			   "$dir/src/backend/libc/shm/"
+				"$dir/src/backend/libc/shm/"
 		fi
 	done
 
