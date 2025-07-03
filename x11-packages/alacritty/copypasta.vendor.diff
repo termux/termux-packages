@@ -1,19 +1,7 @@
-diff --git a/Cargo.toml b/Cargo.toml
-index d00bbbf..8bd9775 100644
---- a/Cargo.toml
-+++ b/Cargo.toml
-@@ -34,6 +34,6 @@ objc2-app-kit = { version = "0.2.0", default-features = false, features = [
-     "NSPasteboard",
- ] }
-
--[target.'cfg(all(unix, not(any(target_os="macos", target_os="android", target_os="ios", target_os="emscripten"))))'.dependencies]
-+[target.'cfg(all(unix, not(any(target_os="macos", target_os="ios", target_os="emscripten"))))'.dependencies]
- x11-clipboard = { version = "0.9.1", optional = true }
- smithay-clipboard = { version = "0.7.0", default-features = false, optional = true }
-diff --git a/src/lib.rs b/src/lib.rs
-index 092a23c..e449535 100644
---- a/src/lib.rs
-+++ b/src/lib.rs
+diff --git b/src/lib.rs.orig a/src/lib.rs
+index 092a23c5..e4495354 100644
+--- b/src/lib.rs.orig
++++ a/src/lib.rs
 @@ -20,7 +20,6 @@ pub use crate::common::ClipboardProvider;
      unix,
      not(any(
@@ -54,3 +42,21 @@ index 092a23c..e449535 100644
      target_os = "ios",
      target_os = "emscripten"
  )))]
+diff --git b/Cargo.toml.orig a/Cargo.toml
+index 77d8d97bf1..e28dac9817 100644
+--- b/Cargo.toml.orig
++++ a/Cargo.toml
+@@ -31,11 +31,11 @@ default = [
+ wayland = ["smithay-clipboard"]
+ x11 = ["x11-clipboard"]
+ 
+-[target."cfg(all(unix, not(any(target_os=\"macos\", target_os=\"android\", target_os=\"ios\", target_os=\"emscripten\"))))".dependencies.smithay-clipboard]
++[target."cfg(all(unix, not(any(target_os=\"macos\", target_os=\"dummy\", target_os=\"ios\", target_os=\"emscripten\"))))".dependencies.smithay-clipboard]
+ version = "0.7.0"
+ optional = true
+ 
+-[target."cfg(all(unix, not(any(target_os=\"macos\", target_os=\"android\", target_os=\"ios\", target_os=\"emscripten\"))))".dependencies.x11-clipboard]
++[target."cfg(all(unix, not(any(target_os=\"macos\", target_os=\"dummy\", target_os=\"ios\", target_os=\"emscripten\"))))".dependencies.x11-clipboard]
+ version = "0.9.1"
+ optional = true
+ 

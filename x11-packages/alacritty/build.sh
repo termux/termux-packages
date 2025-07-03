@@ -3,103 +3,87 @@ TERMUX_PKG_DESCRIPTION="A fast, cross-platform, OpenGL terminal emulator"
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="0.15.1"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/alacritty/alacritty/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=b814e30c6271ae23158c66e0e2377c3600bb24041fa382a36e81be564eeb2e36
 TERMUX_PKG_DEPENDS="fontconfig, freetype, libxi, libxcursor, libxrandr"
-TERMUX_PKG_BUILD_DEPENDS="libxcb, libxkbcommon, ncurses"
+TERMUX_PKG_BUILD_DEPENDS="libxcb, libxkbcommon, ncurses, scdoc"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
-__cargo_fetch_dep_source_from_github() {
-	local _repo="$1"
-	local _name="$2"
-	local _version
-	_version=$(cargo metadata --format-version=1 --no-deps | jq -r ".packages[0].dependencies[] | select(.name==\"$_name\") | .req")
-	_version="${_version/^/}"
-	local _url="https://github.com/$_repo/$_name/archive/refs/tags/v$_version.tar.gz"
-	local _path="$TERMUX_PKG_CACHEDIR/$_name-v$_version.tar.gz"
-	termux_download "$_url" "$_path" SKIP_CHECKSUM
-	tar xf "$_path" -C "$TERMUX_PKG_SRCDIR"
-	mv "$_name-$_version" "$_name-source"
-}
+termux_step_configure() {
+    termux_setup_cmake
+    termux_setup_rust
+    cargo clean
+    cargo vendor
 
-termux_step_pre_configure() {
-	termux_setup_cmake
-	termux_setup_rust
+    for dir in ./vendor/rustix*; do
+        [ -d "$dir" ] || continue
+        if [ -d "$dir/src/backend/libc/shm" ] && \
+           [ -d "$dir/src/backend/linux_raw/shm" ]; then
+            rm -rf "$dir/src/backend/libc/shm/"*
+            cp "$dir/src/backend/linux_raw/shm/"* \
+               "$dir/src/backend/libc/shm/"
+        fi
+    done
 
-	: "${CARGO_HOME:=$HOME/.cargo}"
-	export CARGO_HOME
+    if grep -q '^\[patch\.crates-io\]' Cargo.toml; then
+        sed -i '/^\[patch.crates-io\]/,$d' Cargo.toml
+    fi
 
-	__cargo_fetch_dep_source_from_github "rust-windowing" "winit"
-	__cargo_fetch_dep_source_from_github "rust-windowing" "glutin"
-	__cargo_fetch_dep_source_from_github "alacritty" "copypasta"
+    patch_lines=""
+    for patchfile in "$TERMUX_PKG_BUILDER_DIR"/*.vendor.diff; do
+        [ -e "$patchfile" ] || break
+        crate=$(basename "$patchfile" .vendor.diff)
+        dir="./vendor/$crate"
+        if [ ! -d "$dir" ]; then
+            echo "No vendor dir for $crate"
+            exit 1
+        fi
+        sed "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" "$patchfile" | \
+            patch --fuzz=0 -p1 -d "$dir"
+        patch_lines="${patch_lines}${crate} = { path = \"$dir\" }\n"
+    done
 
-	patch="$TERMUX_PKG_BUILDER_DIR/patch-root-Cargo.diff"
-	patch -p1 -d "$TERMUX_PKG_SRCDIR" < "$patch"
+    if [ -n "$patch_lines" ]; then
+        printf "\n[patch.crates-io]\n$patch_lines" >> Cargo.toml
+    fi
 
-	for name in winit glutin copypasta; do
-		cat "$TERMUX_PKG_BUILDER_DIR"/${name}*.diff | \
-		patch -p1 -d "$TERMUX_PKG_SRCDIR/${name}-source"
-	done
-
-	cargo update
-
-	rm -rf "$CARGO_HOME"/registry/src/index.crates.io-*/expat-sys-*
-	rm -rf "$CARGO_HOME"/registry/src/index.crates.io-*/freetype-sys-*
-	rm -rf "$CARGO_HOME"/registry/src/index.crates.io-*/rustix-*
-	rm -rf "$CARGO_HOME"/registry/src/index.crates.io-*/servo-fontconfig-sys-*
-	rm -rf "$CARGO_HOME"/registry/src/index.crates.io-*/x11rb-protocol-*
-	cargo fetch --target "${CARGO_TARGET_NAME}"
-
-	local crate
-	for crate in {{expat,freetype,servo-fontconfig}-sys,rustix,x11rb-protocol}; do
-		local patch="$TERMUX_PKG_BUILDER_DIR/${crate}.diff"
-		local dir
-		for dir in "$CARGO_HOME"/registry/src/index.crates.io-*/"${crate}"-*; do
-			local _crate_name
-			_crate_name=$(basename "$dir")
-			# shellcheck disable=SC2295
-			if [[ ! "${_crate_name#$crate-}" =~ ^[0-9] ]]; then
-				continue
-			fi
-			if [[ "$crate" == 'rustix' ]]; then
-				rm -rf "$dir"/src/backend/libc/shm/*
-				cp "$dir"/src/backend/linux_raw/shm/* "$dir"/src/backend/libc/shm/
-			fi
-			echo "Applying patch for '$crate'"
-			sed  -e "s|@TERMUX_PREFIX@|${TERMUX__PREFIX}|g" "${patch}" |\
-				patch -p1 -d "$dir"
-		done
-	done
+    mkdir -p .cargo
+    {
+        echo '[source.crates-io]'
+        echo 'replace-with = "vendored-sources"'
+        echo '[source.vendored-sources]'
+        echo 'directory = "vendor"'
+    } > .cargo/config.toml
 }
 
 termux_step_make() {
-	cargo build --jobs "$TERMUX_PKG_MAKE_PROCESSES" --target "$CARGO_TARGET_NAME" --release
+    cargo build --jobs "$TERMUX_PKG_MAKE_PROCESSES" \
+        --target "$CARGO_TARGET_NAME" --release
 }
 
 termux_step_make_install() {
-	install -Dm755 -t "$TERMUX_PREFIX/bin" "target/$CARGO_TARGET_NAME/release/alacritty"
+    install -Dm755 -t "$TERMUX_PREFIX/bin" \
+        "target/$CARGO_TARGET_NAME/release/alacritty"
 
-	# man pages
-	scdoc < extra/man/alacritty.1.scd          | gzip -c > "$TERMUX_PREFIX/share/man/man1/alacritty.1.gz"
-	scdoc < extra/man/alacritty-msg.1.scd      | gzip -c > "$TERMUX_PREFIX/share/man/man1/alacritty-msg.1.gz"
-	scdoc < extra/man/alacritty.5.scd          | gzip -c > "$TERMUX_PREFIX/share/man/man5/alacritty.5.gz"
-	scdoc < extra/man/alacritty-bindings.5.scd | gzip -c > "$TERMUX_PREFIX/share/man/man5/alacritty-bindings.5.gz"
+    scdoc < extra/man/alacritty.1.scd | gzip -c \
+        > "$TERMUX_PREFIX/share/man/man1/alacritty.1.gz"
+    scdoc < extra/man/alacritty-msg.1.scd | gzip -c \
+        > "$TERMUX_PREFIX/share/man/man1/alacritty-msg.1.gz"
+    scdoc < extra/man/alacritty.5.scd | gzip -c \
+        > "$TERMUX_PREFIX/share/man/man5/alacritty.5.gz"
+    scdoc < extra/man/alacritty-bindings.5.scd | gzip -c \
+        > "$TERMUX_PREFIX/share/man/man5/alacritty-bindings.5.gz"
 
-	# shell completions
-	install -Dm644 extra/completions/_alacritty     "$TERMUX_PREFIX/share/zsh/site-functions/_alacritty"
-	install -Dm644 extra/completions/alacritty.bash "$TERMUX_PREFIX/share/bash-completion/completions/alacritty.bash"
-	install -Dm644 extra/completions/alacritty.fish "$TERMUX_PREFIX/share/fish/vendor_completions.d/alacritty.fish"
-
-	# .desktop
-	install -Dm644 extra/linux/Alacritty.desktop "$TERMUX_PREFIX/share/applications/Alacritty.desktop"
-}
-
-termux_step_post_massage() {
-	rm -rf "$CARGO_HOME"/registry/src/index.crates.io-*/expat-sys-*
-	rm -rf "$CARGO_HOME"/registry/src/index.crates.io-*/freetype-sys-*
-	rm -rf "$CARGO_HOME"/registry/src/index.crates.io-*/rustix-*
-	rm -rf "$CARGO_HOME"/registry/src/index.crates.io-*/servo-fontconfig-sys-*
-	rm -rf "$CARGO_HOME"/registry/src/index.crates.io-*/x11rb-protocol-*
+    install -Dm644 extra/completions/_alacritty \
+        "$TERMUX_PREFIX/share/zsh/site-functions/_alacritty"
+    install -Dm644 extra/completions/alacritty.bash \
+        "$TERMUX_PREFIX/share/bash-completion/completions/alacritty.bash"
+    install -Dm644 extra/completions/alacritty.fish \
+        "$TERMUX_PREFIX/share/fish/vendor_completions.d/alacritty.fish"
+    install -Dm644 extra/linux/Alacritty.desktop \
+        "$TERMUX_PREFIX/share/applications/Alacritty.desktop"
+    install -Dm644 extra/logo/alacritty-term.svg \
+        "$TERMUX_PREFIX/share/icons/hicolor/scalable/apps/Alacritty.svg"
 }
