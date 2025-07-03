@@ -123,7 +123,7 @@ termux_step_host_build() {
 		-j "${TERMUX_PKG_MAKE_PROCESSES}" \
 		llvm-tblgen clang-tblgen
 
-	local _host_clang_base="/usr/lib/llvm-19"
+	local _host_clang_base="$TERMUX_HOST_LLVM_BASE_DIR"
 	cmake \
 		-G Ninja \
 		-B "${TERMUX_PKG_HOSTBUILD_DIR}/libclc" \
