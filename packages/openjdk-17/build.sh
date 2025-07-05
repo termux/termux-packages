@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="17.0.15"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/openjdk/jdk17u/archive/refs/tags/jdk-${TERMUX_PKG_VERSION}-ga.tar.gz
 TERMUX_PKG_SHA256=ae623441d95d0563690f85edad765a12fc89bbb89ed1877ec5cf677a5ae4fbd7
 TERMUX_PKG_AUTO_UPDATE=true
@@ -55,7 +55,7 @@ termux_step_pre_configure() {
 
 termux_step_configure() {
 	local jdk_ldflags="-L${TERMUX_PREFIX}/lib \
-		-Wl,-rpath=$TERMUX_PREFIX/lib/jvm/java-21-openjdk/lib \
+		-Wl,-rpath=$TERMUX_PREFIX/lib/jvm/java-17-openjdk/lib \
 		-Wl,-rpath=${TERMUX_PREFIX}/lib -Wl,--enable-new-dtags"
 	bash ./configure \
 		--disable-precompiled-headers \
@@ -122,21 +122,102 @@ termux_step_post_make_install() {
 	for manpage in *.1; do
 		gzip "$manpage"
 	done
-}
 
-termux_step_create_debscripts() {
+	# Make sure that our alternatives file is up to date.
 	binaries="$(find $TERMUX_PREFIX/lib/jvm/java-17-openjdk/bin -executable -type f | xargs -I{} basename "{}" | xargs echo)"
 	manpages="$(find $TERMUX_PREFIX/lib/jvm/java-17-openjdk/man/man1 -name "*.1.gz" | xargs -I{} basename "{}" | xargs echo)"
 
-	for hook in postinst prerm; do
-		sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
-			-e "s|@binaries@|${binaries}|g" \
-			-e "s|@manpages@|${manpages}|g" \
-			"$TERMUX_PKG_BUILDER_DIR/hooks/$TERMUX_PACKAGE_FORMAT/$hook.in" > $hook
-		chmod 700 $hook
+	local failure=false
+	for binary in $binaries; do
+		grep -q "lib/jvm/java-17-openjdk/bin/${binary}$" "$TERMUX_PKG_BUILDER_DIR"/openjdk-17.alternatives || {
+			echo "ERROR: Missing entry for binary: $binary in openjdk-17.alternatives"
+			failure=true
+		}
 	done
-
-	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
-		echo "post_install" > postupg
+	for manpage in $manpages; do
+		grep -q "lib/jvm/java-17-openjdk/man/man1/${manpage}$" "$TERMUX_PKG_BUILDER_DIR"/openjdk-17.alternatives || {
+			echo "ERROR: Missing entry for manpage: $manpage in openjdk-17.alternatives"
+			failure=true
+		}
+	done
+	if [[ "$failure" = true ]]; then
+		termux_error_exit "ERROR: openjdk-17.alternatives is not up to date, please update it."
 	fi
+}
+
+termux_step_create_debscripts() {
+	# For older versions of openjdk-17 and openjdk-21, we used to provide different alternatives for each binary and manpage.
+	# This script removes those alternatives if the user is upgrading from an older version.
+	#
+	# Using slaves for all binaries and manpages makes it much easier to switch between different versions of openjdk.
+	local old_alternatives=(
+		java-profile
+		jar
+		jarsigner
+		java
+		javac
+		javadoc
+		javap
+		jcmd
+		jconsole
+		jdb
+		jdeprscan
+		jdeps
+		jfr
+		jhsdb
+		jimage
+		jinfo
+		jlink
+		jmap
+		jmod
+		jpackage
+		jps
+		jrunscript
+		jshell
+		jstack
+		jstat
+		jstatd
+		jwebserver
+		keytool
+		rmiregistry
+		serialver
+		jar.1.gz
+		jarsigner.1.gz
+		java.1.gz
+		javac.1.gz
+		javadoc.1.gz
+		javap.1.gz
+		jcmd.1.gz
+		jconsole.1.gz
+		jdb.1.gz
+		jdeprscan.1.gz
+		jdeps.1.gz
+		jfr.1.gz
+		jhsdb.1.gz
+		jinfo.1.gz
+		jlink.1.gz
+		jmap.1.gz
+		jmod.1.gz
+		jpackage.1.gz
+		jps.1.gz
+		jrunscript.1.gz
+		jshell.1.gz
+		jstack.1.gz
+		jstat.1.gz
+		jstatd.1.gz
+		jwebserver.1.gz
+		keytool.1.gz
+		rmiregistry.1.gz
+		serialver.1.gz
+	)
+	echo 'if [ "$#" = "3" ] && dpkg --compare-versions "$2" le "17.0.15-1"; then' > ./preinst
+	echo '  echo "Removing older alternatives for openjdk-21 and openjdk-17"' >> ./preinst
+	echo '  echo "This may take a while if mandoc package is installed, please wait..."' >> ./preinst
+	echo '  echo "Newer versions of openjdk-21 and openjdk-17 change how alternatives are handled."' >> ./preinst
+	echo '  echo "Instead of having different alternatives for each manpage and binary, now you can switch java versions much easily using \"update-alternatives --config java\""' >> ./preinst
+	echo '  echo "This should switch all java binaries, manpages, and bash profile for java in a single command instead of switching everything manually"' >> ./preinst
+	for alternative in "${old_alternatives[@]}"; do
+		echo "  update-alternatives --remove-all ${alternative} || :" >> ./preinst
+	done
+	echo 'fi' >> ./preinst
 }
