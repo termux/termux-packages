@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=1.43.2
 TERMUX_PKG_SRCURL=https://github.com/simonmichael/hledger/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=60b74c70ddfc6b84ca87debd2ac302aac754da3c0d9089821182e56796cb841e
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_BUILD_DEPENDS="aosp-libs, libffi, libiconv, libgmp, zlib"
+TERMUX_PKG_BUILD_DEPENDS="aosp-libs, libffi, libiconv, libgmp, zlib, ncurses"
 
 termux_step_pre_configure() {
 	termux_setup_ghc
