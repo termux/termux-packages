@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="The PyPA recommended tool for installing Python packages
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="25.1.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/pypa/pip/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=b25615caeef66bb5049a44e6df257ebae2fcc9dc774d5369a338db29b7f53f1c
 TERMUX_PKG_AUTO_UPDATE=true
@@ -53,9 +53,6 @@ termux_step_create_debscripts() {
 	pip config set --global global.disable-pip-version-check true
 	exit 0
 	POSTINST_EOF
-	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
-		echo "post_install" > postupg
-	fi
 
 	# deleting conf of pip while removing it
 	cat <<- PRERM_EOF > ./prerm
