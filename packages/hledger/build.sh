@@ -1,34 +1,11 @@
-# http(s) link to package home page.
 TERMUX_PKG_HOMEPAGE=https://hledger.org/
-
-# One-line, short package description.
 TERMUX_PKG_DESCRIPTION="Robust, friendly, fast plain text accounting software"
-
-# License.
-# Use SPDX identifier: https://spdx.org/licenses/
 TERMUX_PKG_LICENSE="GPL-3.0"
-
-# Who maintains the package.
-# Specify yourself (Github nick, or name + email) if you wish to maintain the
-# package, fix its bugs, etc. Otherwise specify "@termux".
-# Please note that unofficial repositories are not allowed to reference @termux
-# as their maintainer.
-# See also:
-# - https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-maintainer
-# - https://www.debian.org/doc/debian-policy/ch-binary.html#s-maintainer
 TERMUX_PKG_MAINTAINER="@erplsf"
-
-# Version.
 TERMUX_PKG_VERSION=1.43.2
-
-# URL to archive with source code.
 TERMUX_PKG_SRCURL=https://github.com/simonmichael/hledger/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-
-# SHA-256 checksum of the source code archive.
 TERMUX_PKG_SHA256=60b74c70ddfc6b84ca87debd2ac302aac754da3c0d9089821182e56796cb841e
-
 TERMUX_PKG_BUILD_IN_SRC=true
-
 TERMUX_PKG_BUILD_DEPENDS="aosp-libs, libffi, libiconv, libgmp, zlib"
 
 termux_step_pre_configure() {
