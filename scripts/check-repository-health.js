@@ -208,15 +208,27 @@ let hasErrors = false;
 
 for (let i = 0; i < archs.length; i++) {
   if (results[i].errors.length > 0) {
-    console.log(`Errors for ${archs[i]}:`);
+    console.log(`### Errors found for ${archs[i]}`);
+
+    console.log("<details>");
+    console.log("  <summary>Errors:</summary>");
+    console.log("");
     console.log("```");
     console.log(results[i].errors.join("\n"));
+    console.log("")
     console.log("```");
+    console.log("</details>");
+
     console.log("\n\n");
-    console.log(`Proposed fixes for ${archs[i]}:`);
+
+    console.log("<details>");
+    console.log("  <summary>Proposed fixes:</summary>");
+    console.log("");
     console.log("```sh");
     console.log(results[i].proposedFixes.join("\n"));
+    console.log("")
     console.log("```");
+    console.log("</details>");
     console.log("\n\n\n\n");
     hasErrors = true;
   }
