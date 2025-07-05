@@ -29,7 +29,7 @@ TERMUX_PKG_SHA256=60b74c70ddfc6b84ca87debd2ac302aac754da3c0d9089821182e56796cb84
 
 TERMUX_PKG_BUILD_IN_SRC=true
 
-TERMUX_PKG_BUILD_DEPENDS="aosp-libs, libffi, libiconv, libgmp"
+TERMUX_PKG_BUILD_DEPENDS="aosp-libs, libffi, libiconv, libgmp, zlib"
 
 termux_step_pre_configure() {
 	termux_setup_ghc
