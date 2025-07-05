@@ -36,7 +36,6 @@ termux_step_pre_configure() {
 	termux_setup_cabal
 }
 
-
 termux_step_post_configure() {
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == false ]]; then # We do not need iserv for on device builds.
 		termux_setup_ghc_iserv
@@ -50,9 +49,4 @@ termux_step_post_configure() {
 			    tag: aa5bb94be0d6a3e94584ac0714b2f50237d558db 
 		EOF
 	fi
-}
-
-termux_step_make() {
-	cabal build hledger
-	# cabal --config="$TERMUX_CABAL_CONFIG" build
 }
