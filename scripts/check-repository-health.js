@@ -4,6 +4,13 @@ import { gunzip } from "node:zlib";
 import { promisify } from "node:util";
 const gunzipAsync = promisify(gunzip);
 
+// TODO(@thunder-coding): once https://github.com/aptly-dev/aptly/issues/1468
+// is fixed, we can switch to using "aptly repo remove" instead of removing the
+// deb file manually from the disk
+//
+// Also the wildcard '*' is used to automatically select the directory name as
+// the directory name length varies depending on number of packages starting with the prefix
+
 const archs = ["aarch64", "arm", "i686", "x86_64"];
 
 const repos = JSON.parse(await readFile("repo.json"));
