@@ -54,4 +54,5 @@ termux_step_post_configure() {
 
 termux_step_make() {
 	cabal build hledger
+	# cabal --config="$TERMUX_CABAL_CONFIG" build
 }
