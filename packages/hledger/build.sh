@@ -22,6 +22,10 @@ termux_step_post_configure() {
 
 	cat <<-EOF >>cabal.project.local
 		packages: splitmix-0.1.3.1
+
+		package splitmix
+			benchmarks: False
+			tests: False
 	EOF
 
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == false ]]; then # We do not need iserv for on device builds.
