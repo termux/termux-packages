@@ -14,16 +14,21 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_configure() {
+	cabal get splitmix-0.1.3.1
+
+	for f in "$TERMUX_PKG_BUILDER_DIR"/splitmix-patches/*.patch; do
+		patch --silent -p1 -d splitmix-0.1.3.1 < "$f"
+	done
+
+	cat <<-EOF >>cabal.project.local
+		packages: splitmix-0.1.3.1
+	EOF
+
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == false ]]; then # We do not need iserv for on device builds.
 		termux_setup_ghc_iserv
 		cat <<-EOF >>cabal.project.local
 			package *
 			    ghc-options: -fexternal-interpreter -pgmi=$(command -v termux-ghc-iserv)
-
-			source-repository-package
-			    type: git
-			    location: https://github.com/erplsf/splitmix
-			    tag: aa5bb94be0d6a3e94584ac0714b2f50237d558db
 		EOF
 	fi
 }
