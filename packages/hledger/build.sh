@@ -19,11 +19,11 @@ termux_step_post_configure() {
 		cat <<-EOF >>cabal.project.local
 			package *
 			    ghc-options: -fexternal-interpreter -pgmi=$(command -v termux-ghc-iserv)
-                       
+
 			source-repository-package
 			    type: git
 			    location: https://github.com/erplsf/splitmix
-			    tag: aa5bb94be0d6a3e94584ac0714b2f50237d558db 
+			    tag: aa5bb94be0d6a3e94584ac0714b2f50237d558db
 		EOF
 	fi
 }
