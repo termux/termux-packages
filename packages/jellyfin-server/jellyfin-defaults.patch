@@ -1,0 +1,60 @@
+nonetchange is pretty much mandatory on Android, so we enable it by default
+We also make Jellyfin try to use jellyfin-ffmpeg by default, if available
+
+--- a/Emby.Server.Implementations/ConfigurationOptions.cs
++++ b/Emby.Server.Implementations/ConfigurationOptions.cs
+@@ -24 +24 @@ namespace Emby.Server.Implementations
+-            { DetectNetworkChangeKey, bool.TrueString }
++            { DetectNetworkChangeKey, bool.FalseString }
+--- a/Jellyfin.Server/StartupOptions.cs
++++ b/Jellyfin.Server/StartupOptions.cs
+@@ -71 +71 @@ namespace Jellyfin.Server
+-        /// Gets or sets a value indicating whether the server should not detect network status change.
++        /// Gets or sets a value indicating whether the server should detect network status change.
+@@ -73,2 +73,2 @@ namespace Jellyfin.Server
+-        [Option("nonetchange", Required = false, HelpText = "Indicates that the server should not detect network status change.")]
+-        public bool NoDetectNetworkChange { get; set; }
++        [Option("netchange", Required = false, HelpText = "Indicates that the server should detect network status change.")]
++        public bool DetectNetworkChange { get; set; }
+@@ -99 +99 @@ namespace Jellyfin.Server
+-            if (NoDetectNetworkChange)
++            if (DetectNetworkChange)
+@@ -101 +101 @@ namespace Jellyfin.Server
+-                config.Add(DetectNetworkChangeKey, bool.FalseString);
++                config.Add(DetectNetworkChangeKey, bool.TrueString);
+--- a/MediaBrowser.MediaEncoding/Encoder/EncoderValidator.cs
++++ b/MediaBrowser.MediaEncoding/Encoder/EncoderValidator.cs
+@@ -205 +205 @@ namespace MediaBrowser.MediaEncoding.Encoder
+-        public bool ValidateVersion()
++        public bool ValidateVersion(bool noerr = false)
+@@ -214 +214,3 @@ namespace MediaBrowser.MediaEncoding.Encoder
+-                _logger.LogError(ex, "Error validating encoder");
++                if (!noerr) {
++                        _logger.LogError(ex, "Error validating encoder");
++                }
+@@ -220 +222,3 @@ namespace MediaBrowser.MediaEncoding.Encoder
+-                _logger.LogError("FFmpeg validation: The process returned no result");
++                if (!noerr) {
++                        _logger.LogError("FFmpeg validation: The process returned no result");
++                }
+--- a/MediaBrowser.MediaEncoding/Encoder/MediaEncoder.cs
++++ b/MediaBrowser.MediaEncoding/Encoder/MediaEncoder.cs
+@@ -196 +196,4 @@ namespace MediaBrowser.MediaEncoding.Encoder
+-            if (!ValidatePath(ffmpegPath))
++            if (ffmpegPathSetMethodText == "system $PATH" && !ValidatePath("@TERMUX_PREFIX@/opt/jellyfin/bin/ffmpeg", true)) {
++                _ffmpegPath = null;
++            }
++            if (string.IsNullOrEmpty(_ffmpegPath) && !ValidatePath(ffmpegPath))
+@@ -274,0 +278 @@ namespace MediaBrowser.MediaEncoding.Encoder
++        /// <param name="noerr">If set to true, logger is not used</param>
+@@ -276 +280 @@ namespace MediaBrowser.MediaEncoding.Encoder
+-        private bool ValidatePath(string path)
++        private bool ValidatePath(string path, bool noerr = false)
+@@ -283 +287 @@ namespace MediaBrowser.MediaEncoding.Encoder
+-            bool rc = new EncoderValidator(_logger, path).ValidateVersion();
++            bool rc = new EncoderValidator(_logger, path).ValidateVersion(noerr);
+@@ -286 +290,3 @@ namespace MediaBrowser.MediaEncoding.Encoder
+-                _logger.LogError("FFmpeg: Failed version check: {Path}", path);
++                if (!noerr) {
++                        _logger.LogError("FFmpeg: Failed version check: {Path}", path);
++                }
