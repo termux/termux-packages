@@ -235,9 +235,17 @@ async function getErrorsForArch(arch) {
                 `"${pkgName}" ${pkgInfo.version}: static package should not exist as parent package "${basePkgName}" has TERMUX_PKG_NO_STATICSPLIT=true`,
               );
               proposedAutomatedFixes.push(
-                `rm aptly-root/public/${pkgInfo.repo}/pool/${getComponentByRepoName(pkgInfo.repo)}/*/${basePkgName}/${pkgName}_${pkgInfo.version}_${arch}.deb`,
+                `rm aptly-root/public/${pkgInfo.repo}/pool/${getComponentByRepoName(pkgInfo.repo)}/*/${pkgName}/${pkgName}_${pkgInfo.version}_${arch}.deb`,
               );
             } else {
+              if (termuxPackages.get(basePkgName).version != pkgInfo.version) {
+                errors.push(
+                  `"${pkgName}" "${pkgInfo.version}" != ${termuxPackages.get(basePkgName).version} as expected by parent package. The -static package probably stopped existing after an update.`
+                );
+                proposedAutomatedFixes.push(
+                  `rm aptly-root/public/${pkgInfo.repo}/pool/${getComponentByRepoName(pkgInfo.repo)}/*/${pkgName}/${pkgName}_${pkgInfo.version}_${arch}.deb`
+                );
+              }
               aptPackages.set(pkgName, pkgInfo);
             }
           } else {
@@ -246,7 +254,7 @@ async function getErrorsForArch(arch) {
               `"${pkgName}" ${pkgInfo.version}: static package has no parent package`,
             );
             proposedAutomatedFixes.push(
-              `rm aptly-root/public/${pkgInfo.repo}/pool/${getComponentByRepoName(pkgInfo.repo)}/*/${basePkgName}/${pkgName}_${pkgInfo.version}_${arch}.deb`,
+              `rm aptly-root/public/${pkgInfo.repo}/pool/${getComponentByRepoName(pkgInfo.repo)}/*/${pkgName}/${pkgName}_${pkgInfo.version}_${arch}.deb`,
             );
           }
         } else {
