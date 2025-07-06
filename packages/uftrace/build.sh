@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://uftrace.github.io/slide
 TERMUX_PKG_DESCRIPTION="Function (graph) tracer for user-space"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.17"
+TERMUX_PKG_VERSION="0.18"
 TERMUX_PKG_SRCURL=https://github.com/namhyung/uftrace/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=04d560011c7587eddedcc674677cbef9ddc0ace449601d4b355e78589b16134f
+TERMUX_PKG_SHA256=39b80c97697bbb77ef5455e3455d681de378637b2bae5c8384a76d47d7461eb5
 # Hardcoded libpython${TERMUX_PYTHON_VERSION}.so is dlopen(3)ed by uftrace.
 # Please revbump and rebuild when bumping TERMUX_PYTHON_VERSION.
 # libandroid-{execinfo,spawn} are dlopen(3)ed.
