@@ -33,3 +33,7 @@ termux_step_post_configure() {
 		EOF
 	fi
 }
+
+termux_step_make() {
+	cabal --config="$TERMUX_CABAL_CONFIG" build exe:hledger-cli
+}
