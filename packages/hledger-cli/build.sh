@@ -26,9 +26,11 @@ termux_step_post_configure() {
 
 		package entropy
 			flags: +donotgetentropy
-			benchmarks: False
-			tests: False
 	EOF
+
+	cabal get entropy
+	mv entropy{-*,}
+	sed -i -E 's|(build-type:\s*)Custom|\1Simple|' entropy/entropy.cabal
 
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == false ]]; then # We do not need iserv for on device builds.
 		termux_setup_ghc_iserv
