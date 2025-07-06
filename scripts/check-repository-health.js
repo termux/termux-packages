@@ -43,15 +43,6 @@ if (repos.pkg_format != "debian") {
   process.exit(1);
 }
 
-function getComponentByRepoName(name) {
-  for (const path in repos) {
-    if (repos[path].name == name) {
-      return repos[path].component;
-    }
-  }
-  throw new Error(`Repository with name "${name}" not found`);
-}
-
 async function getAptPackages(
   repo,
   arch,
@@ -80,6 +71,7 @@ async function getAptPackages(
   const aptPackages = new Map();
   let pkgName = undefined;
   let pkgVersion = undefined;
+  let pkgFilename = undefined;
   data
     .toString()
     .split("\n")
@@ -91,10 +83,12 @@ async function getAptPackages(
       // Version: <package-version>
       else if (line.startsWith("Version: ")) {
         pkgVersion = line.substring("Version: ".length);
+      } else if (line.startsWith("Filename: ")) {
+        pkgFilename = line.substring("Filename: ".length);
       }
       // New line indicates the end of a package entry
       else if (line == "") {
-        if (pkgName && pkgVersion) {
+        if (pkgName && pkgVersion && pkgFilename) {
           if (aptPackages.has(pkgName)) {
             errors.push(
               `Duplicate package: "${pkgName}" when parsing Packages file for "${repo.name}" for "${arch}"`,
@@ -115,18 +109,20 @@ async function getAptPackages(
             // Only add the package version.
             aptPackages.set(pkgName, {
               version: pkgVersion,
+              filename: pkgFilename,
               repo: repo.name,
             });
           }
         }
         pkgName = undefined;
+        pkgFilename = undefined;
         pkgVersion = undefined;
       }
     });
   // There should be extra newline at the end of the file, so this should
   // never be true, but just in case we check it to ensure we parsed the file
   // correctly.
-  if (pkgName || pkgVersion) {
+  if (pkgName || pkgVersion || pkgFilename) {
     console.error(`Incomplete package entry in ${url}`);
     process.exit(1);
   }
@@ -206,7 +202,7 @@ async function getErrorsForArch(arch) {
             `Package "${pkgName}" exists in "${pkgInfo.repo}" but should be in "${termuxPackages.get(pkgName).repo}"`,
           );
           proposedAutomatedFixes.push(
-            `rm aptly-root/public/${pkgInfo.repo}/pool/${getComponentByRepoName(pkgInfo.repo)}/*/${pkgName}/${pkgName}_${pkgInfo.version}_${arch}.deb`,
+            `rm aptly-root/public/${pkgInfo.repo}/${pkgInfo.filename}`,
           );
         } else {
           // If it's in the correct repo, make sure it is the same version as we have in termux-packages
@@ -235,15 +231,15 @@ async function getErrorsForArch(arch) {
                 `"${pkgName}" ${pkgInfo.version}: static package should not exist as parent package "${basePkgName}" has TERMUX_PKG_NO_STATICSPLIT=true`,
               );
               proposedAutomatedFixes.push(
-                `rm aptly-root/public/${pkgInfo.repo}/pool/${getComponentByRepoName(pkgInfo.repo)}/*/${pkgName}/${pkgName}_${pkgInfo.version}_${arch}.deb`,
+                `rm aptly-root/public/${pkgInfo.repo}/${pkgInfo.filename}`,
               );
             } else {
               if (termuxPackages.get(basePkgName).version != pkgInfo.version) {
                 errors.push(
-                  `"${pkgName}" "${pkgInfo.version}" != ${termuxPackages.get(basePkgName).version} as expected by parent package. The -static package probably stopped existing after an update.`
+                  `"${pkgName}" "${pkgInfo.version}" != ${termuxPackages.get(basePkgName).version} as expected by parent package. The -static package probably stopped existing after an update.`,
                 );
                 proposedAutomatedFixes.push(
-                  `rm aptly-root/public/${pkgInfo.repo}/pool/${getComponentByRepoName(pkgInfo.repo)}/*/${pkgName}/${pkgName}_${pkgInfo.version}_${arch}.deb`
+                  `rm aptly-root/public/${pkgInfo.repo}/${pkgInfo.filename}`,
                 );
               }
               aptPackages.set(pkgName, pkgInfo);
@@ -254,7 +250,7 @@ async function getErrorsForArch(arch) {
               `"${pkgName}" ${pkgInfo.version}: static package has no parent package`,
             );
             proposedAutomatedFixes.push(
-              `rm aptly-root/public/${pkgInfo.repo}/pool/${getComponentByRepoName(pkgInfo.repo)}/*/${pkgName}/${pkgName}_${pkgInfo.version}_${arch}.deb`,
+              `rm aptly-root/public/${pkgInfo.repo}/${pkgInfo.filename}`,
             );
           }
         } else {
@@ -263,7 +259,7 @@ async function getErrorsForArch(arch) {
             `"${pkgName}" "${pkgInfo.version}" does not exist in termux-packages`,
           );
           proposedAutomatedFixes.push(
-            `rm aptly-root/public/${pkgInfo.repo}/pool/${getComponentByRepoName(pkgInfo.repo)}/*/${pkgName}/${pkgName}_${pkgInfo.version}_${arch}.deb`,
+            `rm aptly-root/public/${pkgInfo.repo}/${pkgInfo.filename}`,
           );
         }
       }
