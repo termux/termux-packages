@@ -23,6 +23,9 @@ termux_step_post_configure() {
 		package splitmix
 			benchmarks: False
 			tests: False
+
+		package entropy
+			flags: +donotgetentropy
 	EOF
 
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == false ]]; then # We do not need iserv for on device builds.
