@@ -15,14 +15,15 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_configure() {
-	cabal get splitmix-0.1.3.1
+	cabal get splitmix
+	mv splitmix{-*,}
 
 	for f in "$TERMUX_PKG_BUILDER_DIR"/splitmix-patches/*.patch; do
-		patch --silent -p1 -d splitmix-0.1.3.1 < "$f"
+		patch --silent -p1 -d splitmix < "$f"
 	done
 
 	cat <<-EOF >>cabal.project.local
-		packages: splitmix-0.1.3.1
+		packages: splitmix
 
 		package splitmix
 			benchmarks: False
