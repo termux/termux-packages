@@ -1,6 +1,13 @@
 emulate sh -c '. @TERMUX_PREFIX@/etc/profile'
-command_not_found_handler() {
-	@TERMUX_PREFIX@/libexec/termux/command-not-found $1
-}
+
+# Handles nonexistent commands.
+# If user has entered command which invokes non-available
+# utility, command-not-found will give a package suggestions.
+if [ -x "@TERMUX_PREFIX@/libexec/termux/command-not-found" ]; then
+	command_not_found_handler() {
+		"@TERMUX_PREFIX@"/libexec/termux/command-not-found "$1"
+	}
+fi
+
 PS1='%# '
 # vim: set noet ft=zsh tw=4 sw=4 ff=unix
