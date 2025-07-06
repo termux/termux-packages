@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=https://hackage.haskell.org/package/hledger-${TERMUX_PKG_VERSI
 TERMUX_PKG_SHA256=211e424568acd3a68299958a3284212516be4eaa84f94fbb5c2e0956d5e06f10
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_BUILD_DEPENDS="aosp-libs"
-TERMUX_PKG_DEPENDS="libffi, libiconv, libgmp, zlib, ncurses, libcrypt"
+TERMUX_PKG_DEPENDS="libffi, libiconv, libgmp, zlib, ncurses"
 
 termux_step_post_configure() {
 	cabal get splitmix
