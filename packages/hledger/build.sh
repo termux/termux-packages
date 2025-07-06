@@ -9,11 +9,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_BUILD_DEPENDS="aosp-libs"
 TERMUX_PKG_DEPENDS="libffi, libiconv, libgmp, zlib, ncurses"
 
-termux_step_pre_configure() {
-	termux_setup_ghc
-	termux_setup_cabal
-}
-
 termux_step_post_configure() {
 	cabal get splitmix
 	mv splitmix{-*,}
