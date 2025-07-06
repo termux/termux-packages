@@ -39,7 +39,7 @@ termux_setup_cabal() {
 			configure-option: --host=$TERMUX_HOST_PLATFORM
 			tests: False
 			build-summary: $HOME/.cache/cabal/logs/build.log
-			verbose: 2
+			verbose: 3
 			remote-build-reporting: none
 			jobs: $TERMUX_PKG_MAKE_PROCESSES
 
