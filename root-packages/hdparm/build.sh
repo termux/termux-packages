@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/hdparm/
+TERMUX_PKG_DESCRIPTION="Utility to get/set SATA/IDE device parameters"
+TERMUX_PKG_LICENSE="hdparm"
+TERMUX_PKG_LICENSE_FILE="LICENSE.TXT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="9.65"
+TERMUX_PKG_SRCURL="https://downloads.sourceforge.net/sourceforge/hdparm/hdparm-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=d14929f910d060932e717e9382425d47c2e7144235a53713d55a94f7de535a4b
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_BUILD_IN_SRC=true
