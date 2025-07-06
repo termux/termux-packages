@@ -41,4 +41,6 @@ termux_step_post_configure() {
 
 termux_step_make() {
 	cabal --config="$TERMUX_CABAL_CONFIG" build exe:hledger
+	ls $HOME/.cache/cabal/logs/ghc-9.12.2/entropy-*
+	cat $HOME/.cache/cabal/logs/ghc-9.12.2/entropy-*
 }
