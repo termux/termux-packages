@@ -26,6 +26,7 @@ OUTPUT_DIR="$1"
 readarray -t repo_paths <<< "$(jq --raw-output 'del(.pkg_format) | keys | .[]' "$TERMUX_PACKAGES_DIR/repo.json")"
 
 for arch in "aarch64" "arm" "i686" "x86_64"; do
+	# Note that this is loop for generating the list of packages is being parallelized for each architecture
 	for repo_path in "${repo_paths[@]}"; do
 		repo_name="$(jq --raw-output ".\"$repo_path\".name" "$TERMUX_PACKAGES_DIR/repo.json")"
 		for pkg_path in "$TERMUX_PACKAGES_DIR/$repo_path"/*; do

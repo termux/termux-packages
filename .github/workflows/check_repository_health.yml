@@ -30,6 +30,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.TERMUXBOT2_TOKEN }}
         if: failure()
         run: |
-
+          ISSUE_TITLE="Repository Health Check Failed"
           ISSUE_BODY=$(cat repository-health.txt)
           gh issue create --title "$ISSUE_TITLE" --body "$ISSUE_BODY" --label "health-check" --assignee "thunder-coding"
