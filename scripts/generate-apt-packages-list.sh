@@ -65,26 +65,30 @@ for arch in "aarch64" "arm" "i686" "x86_64"; do
 					else
 						echo " true"
 					fi
-					for subpkg in "$pkg_path"/*.subpackage.sh; do
-						if [[ -f "$subpkg" ]]; then
-							(
-								set +euo pipefail
-								. "$subpkg" &> /dev/null || :
-								set -euo pipefail
-								IFS="," read -r -a SUBPKG_EXCLUDED_ARCHES <<< "${TERMUX_SUBPKG_EXCLUDED_ARCHES:-}"
-								excluded=false
-								for excluded_subpkg_arch in "${SUBPKG_EXCLUDED_ARCHES[@]}"; do
-									if [[ "$excluded_subpkg_arch" == *"$arch"* ]]; then
-										excluded=true
-									fi
-								done
-								if [[ "$excluded" != true ]]; then
-									echo "$(basename "$subpkg" .subpackage.sh) $repo_name $APT_VERSION false"
-								fi
-							)
-						fi
-					done
 				fi
+				for subpkg in "$pkg_path"/*.subpackage.sh; do
+					if [[ -f "$subpkg" ]]; then
+						(
+							set +euo pipefail
+							export TERMUX_SUBPKG_PLATFORM_INDEPENDENT=false
+							. "$subpkg" &> /dev/null || :
+							set -euo pipefail
+							IFS="," read -r -a SUBPKG_EXCLUDED_ARCHES <<< "${TERMUX_SUBPKG_EXCLUDED_ARCHES:-}"
+							subpkg_excluded=false
+							if [[ "${TERMUX_SUBPKG_PLATFORM_INDEPENDENT}" == "false" ]]; then
+								subpkg_excluded="$excluded"
+							fi
+							for excluded_subpkg_arch in "${SUBPKG_EXCLUDED_ARCHES[@]}"; do
+								if [[ "$excluded_subpkg_arch" == *"$arch"* ]]; then
+									subpkg_excluded=true
+								fi
+							done
+							if [[ "$subpkg_excluded" != true ]]; then
+								echo "$(basename "$subpkg" .subpackage.sh) $repo_name $APT_VERSION false"
+							fi
+						)
+					fi
+				done
 			)
 		done
 	done > "$OUTPUT_DIR/apt-packages-list-$arch.txt" & # Parallelize each architecture
