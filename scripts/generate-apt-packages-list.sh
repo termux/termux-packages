@@ -19,7 +19,11 @@ for arch in "aarch64" "arm" "i686" "x86_64"; do
 				. "$pkg_path/build.sh" &> /dev/null || :
 				# We are erraneously adding a revision for packages with version containing a dash when generating the apt packages in our build scripts.
 				# So reproduce the same bug here
-        # Source: scripts/build/termux_extract_dep_info.sh#18-20
+        # Source: scripts/build/termux_extract_dep_info.sh
+				#	if [[ "$TERMUX_PKG_REVISION" != "0" || "$TERMUX_PKG_VERSION" != "${TERMUX_PKG_VERSION/-/}" ]]; then
+				#		VER_DEBIAN+="-$TERMUX_PKG_REVISION"
+				# fi
+
 				if [[ "${TERMUX_PKG_VERSION/-/}" != "${TERMUX_PKG_VERSION}" ]] && [[ "$TERMUX_PKG_REVISION" == "" ]]; then
 					export TERMUX_PKG_REVISION=0
 				fi
