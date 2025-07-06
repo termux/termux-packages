@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://hledger.org/
-TERMUX_PKG_DESCRIPTION="Robust, friendly, fast plain text accounting software"
+TERMUX_PKG_DESCRIPTION="Robust, friendly, fast plain text accounting software. (CLI only)"
 TERMUX_PKG_LICENSE="GPL-3.0-or-later"
 TERMUX_PKG_MAINTAINER="@erplsf"
 TERMUX_PKG_VERSION=1.43.2
