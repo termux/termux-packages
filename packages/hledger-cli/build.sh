@@ -43,5 +43,13 @@ termux_step_post_configure() {
 }
 
 termux_step_make() {
-	cabal --config="$TERMUX_CABAL_CONFIG" build exe:hledger
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == false ]]; then
+		CONFIG="--config='$TERMUX_CABAL_CONFIG'"
+	else
+		CONFIG=""
+	fi
+
+	# NOTE: We do not want to quote CONFIG as we want word expansion.
+	# shellcheck disable=SC2086
+	cabal $CONFIG build exe:hledger
 }
