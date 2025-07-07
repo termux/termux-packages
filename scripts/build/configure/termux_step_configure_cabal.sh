@@ -64,7 +64,7 @@ termux_step_configure_cabal() {
 	AVOID_GNULIB+=" gl_cv_C_locale_sans_EILSEQ=yes"
 
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == false ]]; then
-		CONFIG="--config='$TERMUX_CABAL_CONFIG'"
+		CONFIG="--config=$TERMUX_CABAL_CONFIG"
 	else
 		CONFIG=""
 	fi

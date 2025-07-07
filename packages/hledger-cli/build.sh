@@ -44,7 +44,7 @@ termux_step_post_configure() {
 
 termux_step_make() {
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == false ]]; then
-		CONFIG="--config='$TERMUX_CABAL_CONFIG'"
+		CONFIG="--config=$TERMUX_CABAL_CONFIG"
 	else
 		CONFIG=""
 	fi

@@ -10,7 +10,7 @@ termux_step_make() {
 		ninja -j $TERMUX_PKG_MAKE_PROCESSES
 	elif ls ./*.cabal &>/dev/null || ls ./cabal.project &>/dev/null; then
 		if [[ "$TERMUX_ON_DEVICE_BUILD" == false ]]; then
-			CONFIG="--config='$TERMUX_CABAL_CONFIG'"
+			CONFIG="--config=$TERMUX_CABAL_CONFIG"
 		else
 			CONFIG=""
 		fi
