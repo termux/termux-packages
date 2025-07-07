@@ -65,6 +65,8 @@ termux_step_configure_cabal() {
 
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == false ]]; then
 		CONFIG="--config='$TERMUX_CABAL_CONFIG'"
+	else
+		CONFIG=""
 	fi
 
 	# NOTE: We do not want to quote AVOID_GNULIB as we want word expansion.
