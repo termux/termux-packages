@@ -1,0 +1,22 @@
+--- a/main.go
++++ b/main.go
+@@ -133,7 +133,7 @@ func main() {
+ 	// mount(1) unsets PATH. Since exec.Command does not handle this case, we set
+ 	// PATH to a default value if it's empty or unset.
+ 	if os.Getenv("PATH") == "" {
+-		os.Setenv("PATH", "/usr/sbin:/usr/bin:/sbin:/bin")
++		os.Setenv("PATH", "@TERMUX_PREFIX@/bin")
+ 	}
+ 	// Show microseconds in go-fuse debug output (-fusedebug)
+ 	log.SetFlags(log.Lmicroseconds)
+--- a/mount.go
++++ b/mount.go
+@@ -512,7 +512,7 @@ func initGoFuse(rootNode fs.InodeEmbedder, args *argContainer) *fuse.Server {
+ func haveFusermount2() bool {
+ 	path, err := exec.LookPath("fusermount")
+ 	if err != nil {
+-		path = "/bin/fusermount"
++		path = "@TERMUX_PREFIX@/bin/fusermount"
+ 	}
+ 	cmd := exec.Command(path, "-V")
+ 	var out bytes.Buffer
