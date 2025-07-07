@@ -63,9 +63,14 @@ termux_step_configure_cabal() {
 	AVOID_GNULIB+=" gl_cv_header_working_fcntl_h=yes"
 	AVOID_GNULIB+=" gl_cv_C_locale_sans_EILSEQ=yes"
 
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == false ]]; then
+		CONFIG="--config='$TERMUX_CABAL_CONFIG'"
+	fi
+
 	# NOTE: We do not want to quote AVOID_GNULIB as we want word expansion.
+	# NOTE: same applies for CONFIG variable.
 	# shellcheck disable=SC2086
-	env $AVOID_GNULIB cabal --config="$TERMUX_CABAL_CONFIG" configure \
+	env $AVOID_GNULIB cabal $CONFIG configure \
 		$TERMUX_GHC_OPTIMISATION \
 		$QUIET_BUILD \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
