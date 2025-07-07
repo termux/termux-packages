@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/mvdan/sh
 TERMUX_PKG_DESCRIPTION="A shell parser and formatter"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.11.0"
+TERMUX_PKG_VERSION="3.12.0"
 TERMUX_PKG_SRCURL=https://github.com/mvdan/sh/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=69aebb0dd4bf5e62842c186ad38b76f6ec2e781188cd71cea33cb4e729086e94
+TERMUX_PKG_SHA256=ac15f42feeba55af29bd07698a881deebed1cd07e937effe140d9300e79d5ceb
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make_install() {
