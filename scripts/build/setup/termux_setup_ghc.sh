@@ -52,8 +52,8 @@ termux_setup_ghc() {
 
 		rm -rf "$TERMUX_GHC_TAR" "$TERMUX_GHC_TEMP_FOLDER"
 	else
-		if [[ "$TERMUX_APP_PACKAGE_MANAGER" == "apt" ]] && "$(dpkg-query -W -f '${db:Status-Status}\n' ghc 2>/dev/null)" != "installed" ||
-			[[ "$TERMUX_APP_PACKAGE_MANAGER" == "pacman" ]] && ! "$(pacman -Q ghc 2>/dev/null)"; then
+		if [[ "$TERMUX_APP_PACKAGE_MANAGER" == "apt" ]] && [[ "$(dpkg-query -W -f '${db:Status-Status}\n' ghc 2>/dev/null)" != "installed" ]] ||
+			[[ "$TERMUX_APP_PACKAGE_MANAGER" == "pacman" ]] && ! pacman -Q ghc 2>/dev/null; then
 			echo "Package 'ghc' is not installed."
 			exit 1
 		fi
