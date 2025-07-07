@@ -8,6 +8,7 @@ TERMUX_PKG_SHA256=211e424568acd3a68299958a3284212516be4eaa84f94fbb5c2e0956d5e06f
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_BUILD_DEPENDS="aosp-libs"
 TERMUX_PKG_DEPENDS="libffi, libiconv, libgmp, zlib, ncurses"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686" # upstream doesn't support 32bit
 
 termux_step_post_configure() {
 	cabal get splitmix
@@ -42,7 +43,5 @@ termux_step_post_configure() {
 }
 
 termux_step_make() {
-	cabal --config="$TERMUX_CABAL_CONFIG" build exe:hledger || true
-	ls $HOME/.cache/cabal/logs/ghc-9.12.2/basement-*
-	cat $HOME/.cache/cabal/logs/ghc-9.12.2/basement-*
+	cabal --config="$TERMUX_CABAL_CONFIG" build exe:hledger
 }
