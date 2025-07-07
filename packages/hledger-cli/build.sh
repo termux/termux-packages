@@ -43,8 +43,6 @@ termux_step_post_configure() {
 
 termux_step_make() {
 	cabal --config="$TERMUX_CABAL_CONFIG" build exe:hledger || true
-	if [[ "$TERMUX_ARCH" =~ ^(arm|i686)$ ]]; then
-		ls $HOME/.cache/cabal/logs/ghc-9.12.2/basement-*
-		cat $HOME/.cache/cabal/logs/ghc-9.12.2/basement-*
-	fi
+	ls $HOME/.cache/cabal/logs/ghc-9.12.2/basement-*
+	cat $HOME/.cache/cabal/logs/ghc-9.12.2/basement-*
 }
