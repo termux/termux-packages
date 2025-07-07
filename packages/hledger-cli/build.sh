@@ -11,14 +11,14 @@ TERMUX_PKG_DEPENDS="libffi, libiconv, libgmp, zlib, ncurses"
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686" # upstream doesn't support 32bit
 
 termux_step_post_configure() {
-	cabal get splitmix
+	cabal get splitmix-0.1.3.1
 	mv splitmix{-*,}
 
 	for f in "$TERMUX_PKG_BUILDER_DIR"/splitmix-patches/*.patch; do
 		patch --silent -p1 -d splitmix < "$f"
 	done
 
-	cabal get entropy
+	cabal get entropy-0.4.1.11
 	mv entropy{-*,}
 	sed -i -E 's|(build-type:\s*)Custom|\1Simple|' entropy/entropy.cabal
 
