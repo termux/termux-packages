@@ -18,7 +18,7 @@ termux_step_post_configure() {
 	done
 
 	cat <<-EOF >>cabal.project.local
-		packages: splitmix
+		packages: splitmix entropy
 
 		package splitmix
 			benchmarks: False
