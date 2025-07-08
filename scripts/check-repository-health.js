@@ -17,13 +17,6 @@ import { execFile } from "node:child_process";
 const gunzipAsync = promisify(gunzip);
 const execFileAsync = promisify(execFile);
 
-// TODO(@thunder-coding): once https://github.com/aptly-dev/aptly/issues/1468
-// is fixed, we can switch to using "aptly repo remove" instead of removing the
-// deb file manually from the disk
-//
-// Also the wildcard '*' is used to automatically select the directory name as
-// the directory name length varies depending on number of packages starting with the prefix
-
 const archs = ["aarch64", "arm", "i686", "x86_64"];
 
 if (process.argv.length != 3) {
@@ -202,7 +195,7 @@ async function getErrorsForArch(arch) {
             `Package "${pkgName}" exists in "${pkgInfo.repo}" but should be in "${termuxPackages.get(pkgName).repo}"`,
           );
           proposedAutomatedFixes.push(
-            `rm aptly-root/public/${pkgInfo.repo}/${pkgInfo.filename}`,
+            `aptly repo remove "${pkgInfo.repo}" "${pkgName} (=${pkgInfo.version}) {${arch}}"`,
           );
         } else {
           // If it's in the correct repo, make sure it is the same version as we have in termux-packages
@@ -231,7 +224,7 @@ async function getErrorsForArch(arch) {
                 `"${pkgName}" ${pkgInfo.version}: static package should not exist as parent package "${basePkgName}" has TERMUX_PKG_NO_STATICSPLIT=true`,
               );
               proposedAutomatedFixes.push(
-                `rm aptly-root/public/${pkgInfo.repo}/${pkgInfo.filename}`,
+                `aptly repo remove "${pkgInfo.repo}" "${pkgName} (=${pkgInfo.version}) {${arch}}"`,
               );
             } else {
               if (termuxPackages.get(basePkgName).version != pkgInfo.version) {
@@ -239,7 +232,7 @@ async function getErrorsForArch(arch) {
                   `"${pkgName}" "${pkgInfo.version}" != ${termuxPackages.get(basePkgName).version} as expected by parent package. The -static package probably stopped existing after an update.`,
                 );
                 proposedAutomatedFixes.push(
-                  `rm aptly-root/public/${pkgInfo.repo}/${pkgInfo.filename}`,
+                  `aptly repo remove "${pkgInfo.repo}" "${pkgName} (=${pkgInfo.version}) {${arch}}"`,
                 );
               }
               aptPackages.set(pkgName, pkgInfo);
@@ -250,7 +243,7 @@ async function getErrorsForArch(arch) {
               `"${pkgName}" ${pkgInfo.version}: static package has no parent package`,
             );
             proposedAutomatedFixes.push(
-              `rm aptly-root/public/${pkgInfo.repo}/${pkgInfo.filename}`,
+              `aptly repo remove "${pkgInfo.repo}" "${pkgName} (=${pkgInfo.version}) {${arch}}"`,
             );
           }
         } else {
@@ -259,7 +252,7 @@ async function getErrorsForArch(arch) {
             `"${pkgName}" "${pkgInfo.version}" does not exist in termux-packages`,
           );
           proposedAutomatedFixes.push(
-            `rm aptly-root/public/${pkgInfo.repo}/${pkgInfo.filename}`,
+            `aptly repo remove "${pkgInfo.repo}" "${pkgName} (=${pkgInfo.version}) {${arch}}"`,
           );
         }
       }
