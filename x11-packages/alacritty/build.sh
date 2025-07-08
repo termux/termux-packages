@@ -18,12 +18,9 @@ termux_step_configure() {
 	cargo vendor
 
 	for dir in ./vendor/rustix*; do
-		[ -d "$dir" ] || continue
-		if [ -d "$dir/src/backend/libc/shm" ] && \
-			[ -d "$dir/src/backend/linux_raw/shm" ]; then
+		if [[ -d "$dir/src/backend/libc/shm" && -d "$dir/src/backend/linux_raw/shm" ]]; then
 			rm -rf "$dir/src/backend/libc/shm/"*
-			cp "$dir/src/backend/linux_raw/shm/"* \
-				"$dir/src/backend/libc/shm/"
+			cp "$dir/src/backend/linux_raw/shm/"* "$dir/src/backend/libc/shm/"
 		fi
 	done
 
