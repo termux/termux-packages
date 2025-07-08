@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/hrkfdn/ncspot
 TERMUX_PKG_DESCRIPTION="An ncurses Spotify client written in Rust (with MPRIS support)"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.2.2"
+TERMUX_PKG_VERSION="1.3.0"
 TERMUX_PKG_SRCURL=https://github.com/hrkfdn/ncspot/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=11555a61be381afa6196b0603d12ea34ee0c6e1660d7c586d13927f3e5ba802c
+TERMUX_PKG_SHA256=244f0b37b34a5b7f832c77e7fe102b0f66382156e26395cdf7e2dedfe0d71220
 TERMUX_PKG_DEPENDS="dbus, pulseaudio"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -24,6 +24,9 @@ termux_step_pre_configure() {
 
 	# bindgen-cli@0.71.0 is broken
 	cargo install --force --locked bindgen-cli@0.69.5
+
+	# TODO: Remove this after aws-lc-sys > 0.26.0 update in Crago.toml
+	export CMAKE_POLICY_VERSION_MINIMUM=3.5
 
 	export TARGET_CMAKE_GENERATOR="Ninja"
 
