@@ -104,3 +104,22 @@
              {
                  nwipe_log( NWIPE_LOG_WARNING, "modprobe command not found. Install kmod package (modprobe)) !" );
                  nwipe_log( NWIPE_LOG_WARNING, "Most temperature monitoring may be unavailable as module drivetemp" );
+--- a/src/conf.c
++++ b/src/conf.c
+@@ -38,11 +38,11 @@
+ config_t nwipe_cfg;
+ config_setting_t *nwipe_conf_setting, *group_organisation, *root, *group, *previous_group, *setting;
+ const char* nwipe_conf_str;
+-char nwipe_config_directory[] = "/etc/nwipe";
+-char nwipe_config_file[] = "/etc/nwipe/nwipe.conf";
+-char nwipe_customers_file[] = "/etc/nwipe/nwipe_customers.csv";
+-char nwipe_customers_file_backup[] = "/etc/nwipe/nwipe_customers.csv.backup";
+-char nwipe_customers_file_backup_tmp[] = "/etc/nwipe/nwipe_customers.csv.backup.tmp";
++char nwipe_config_directory[] = "@TERMUX_PREFIX@/etc/nwipe";
++char nwipe_config_file[] = "@TERMUX_PREFIX@/etc/nwipe/nwipe.conf";
++char nwipe_customers_file[] = "@TERMUX_PREFIX@/etc/nwipe/nwipe_customers.csv";
++char nwipe_customers_file_backup[] = "@TERMUX_PREFIX@/etc/nwipe/nwipe_customers.csv.backup";
++char nwipe_customers_file_backup_tmp[] = "@TERMUX_PREFIX@/etc/nwipe/nwipe_customers.csv.backup.tmp";
+ 
+ /*
+  * Checks for the existence of nwipe.conf and nwipe_customers.csv
