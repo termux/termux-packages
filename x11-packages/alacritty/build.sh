@@ -28,21 +28,21 @@ termux_step_configure() {
 		sed -i '/^\[patch.crates-io\]/,$d' Cargo.toml
 	fi
 
-	patch_lines=""
-	for patchfile in "$TERMUX_PKG_BUILDER_DIR"/*.vendor.diff; do
-		[ -e "$patchfile" ] || break
-		crate=$(basename "$patchfile" .vendor.diff)
+	local patch_lines="" patch_file crate dir
+	for patch_file in "$TERMUX_PKG_BUILDER_DIR"/*.vendor.diff; do
+		[[ -e "$patch_file" ]] || break
+		crate="$(basename "$patch_file" .vendor.diff)"
 		dir="./vendor/$crate"
-		if [ ! -d "$dir" ]; then
+		if [[ ! -d "$dir" ]]; then
 			echo "No vendor dir for $crate"
 			exit 1
 		fi
-		sed "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" "$patchfile" | \
+		sed "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" "$patch_file" | \
 			patch --fuzz=0 -p1 -d "$dir"
 		patch_lines="${patch_lines}${crate} = { path = \"$dir\" }\n"
 	done
 
-	if [ -n "$patch_lines" ]; then
+	if [[ -n "$patch_lines" ]]; then
 		printf "\n[patch.crates-io]\n$patch_lines" >> Cargo.toml
 	fi
 }
