@@ -2,12 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://go.dev/
 TERMUX_PKG_DESCRIPTION="Go programming language compiler"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3:1.24.4"
+TERMUX_PKG_VERSION="3:1.24.5"
 TERMUX_PKG_SRCURL=https://go.dev/dl/go${TERMUX_PKG_VERSION#*:}.src.tar.gz
-TERMUX_PKG_SHA256=5a86a83a31f9fa81490b8c5420ac384fd3d95a3e71fba665c7b3f95d1dfef2b4
+TERMUX_PKG_SHA256=74fdb09f2352e2b25b7943e56836c9b47363d28dec1c8b56c4a9570f30b8f59f
 TERMUX_PKG_DEPENDS="clang"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="clang"
 TERMUX_PKG_RECOMMENDS="resolv-conf"
+TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
 
 termux_step_post_get_source() {
@@ -21,9 +22,11 @@ termux_step_make_install() {
 	TERMUX_GOLANG_DIRNAME=${GOOS}_$GOARCH
 	TERMUX_GODIR=$TERMUX_PREFIX/lib/go
 	local LINKER=/system/bin/linker
-	if [ "${TERMUX_ARCH}" == "x86_64" ] || [ "${TERMUX_ARCH}" == "aarch64" ]; then
-		LINKER+=64
+	if (( TERMUX_ARCH_BITS == 64 )); then
+		LINKER+="64"
 	fi
+
+	(
 	cd $TERMUX_PKG_SRCDIR/src
 	# Unset PKG_CONFIG to avoid the path being hardcoded into src/cmd/cgo/zdefaultcc.go,
 	# see https://github.com/termux/termux-packages/issues/3505.
@@ -36,8 +39,8 @@ termux_step_make_install() {
 		GOROOT_FINAL=$TERMUX_GODIR \
 		PKG_CONFIG= \
 		./make.bash
+	)
 
-	cd ..
 	rm -Rf $TERMUX_GODIR
 	mkdir -p $TERMUX_GODIR/{bin,src,doc,lib,pkg/tool/$TERMUX_GOLANG_DIRNAME,pkg/include}
 	cp bin/$TERMUX_GOLANG_DIRNAME/{go,gofmt} $TERMUX_GODIR/bin/
