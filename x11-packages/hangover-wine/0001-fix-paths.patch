@@ -83,6 +83,14 @@ diff -uNr a/dlls/ntdll/unix/server.c b/dlls/ntdll/unix/server.c
  #endif
      return dir;
  }
+@@ -1332,6 +1332,7 @@
+     {
+         mkdir( "drive_c", 0777 );
+         symlink( "../drive_c", "dosdevices/c:" );
++        symlink( "@TERMUX_BASE_DIR@/", "dosdevices/y:" );
+         symlink( "/", "dosdevices/z:" );
+     }
+     else if (errno != EEXIST) fatal_perror( "cannot create %s/dosdevices", config_dir );
 diff -uNr a/programs/winebrowser/main.c b/programs/winebrowser/main.c
 --- a/programs/winebrowser/main.c
 +++ b/programs/winebrowser/main.c
@@ -132,5 +140,5 @@ diff -uNr a/server/request.c b/server/request.c
 +    if (asprintf( &base_dir, "@TERMUX_PREFIX@/tmp/.wine-%u", getuid() ) == -1)
          fatal_error( "out of memory\n" );
  #endif
-     create_dir( server_dir, &st2 );
+     create_dir( base_dir, &st2 );
  
