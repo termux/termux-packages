@@ -290,25 +290,6 @@ diff -uNr e2fsprogs-1.44.4/misc/fuse2fs.c e2fsprogs-1.44.4.mod/misc/fuse2fs.c
  #endif
  #else
  #define _(a) (a)
-@@ -118,14 +118,18 @@
- 
- typedef struct {
- 	u_int32_t	a_version;
-+#ifndef __ANDROID__
- #if __GNUC_PREREQ (4, 8)
- #pragma GCC diagnostic push
- #pragma GCC diagnostic ignored "-Wpedantic"
- #endif
-+#endif
- 	acl_ea_entry	a_entries[0];
-+#ifndef __ANDROID__
- #if __GNUC_PREREQ (4, 8)
- #pragma GCC diagnostic pop
- #endif
-+#endif
- } acl_ea_header;
- 
- static inline size_t acl_ea_size(int count)
 diff -uNr e2fsprogs-1.44.4/misc/ismounted.c e2fsprogs-1.44.4.mod/misc/ismounted.c
 --- e2fsprogs-1.44.4/misc/ismounted.c	2018-08-19 05:26:58.000000000 +0300
 +++ e2fsprogs-1.44.4.mod/misc/ismounted.c	2018-09-22 15:22:14.822584643 +0300
