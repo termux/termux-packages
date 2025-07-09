@@ -3,4 +3,5 @@ TERMUX_SUBPKG_INCLUDE="
 share/doc/hangover/copyright
 "
 TERMUX_SUBPKG_DEPENDS="hangover-libwow64fex, hangover-libarm64ecfex, hangover-wowbox64"
-TERMUX_SUBPKG_PLATFORM_INDEPENDENT=true
+# hangover : Depends: hangover-libwow64fex but it is not installable
+TERMUX_SUBPKG_PLATFORM_INDEPENDENT=false
