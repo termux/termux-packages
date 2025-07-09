@@ -33,7 +33,6 @@ export TERMUX_PYTHON_HOME=$TERMUX_PREFIX/lib/python${TERMUX_PYTHON_VERSION}
 export CC=gcc CXX=g++ LD=ld AR=ar STRIP=strip PKG_CONFIG=pkg-config
 export CPPFLAGS="" CFLAGS="" CXXFLAGS="" LDFLAGS=""
 export TERMUX_PACKAGE_LIBRARY=bionic
-export TERMUX_PKG_GO_USE_OLDER=false
 mkdir -p "$TERMUX_PKG_TMPDIR"
 
 # Build tools.

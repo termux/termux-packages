@@ -137,7 +137,6 @@ termux_step_setup_variables() {
 	TERMUX_PKG_EXTRA_UNDEF_SYMBOLS_TO_CHECK="" # space-separated undefined symbols to check in termux_step_massaging
 	TERMUX_PKG_FORCE_CMAKE=false # if the package has autotools as well as cmake, then set this to prefer cmake
 	TERMUX_PKG_GIT_BRANCH="" # branch defaults to 'v$TERMUX_PKG_VERSION' unless this variable is defined
-	TERMUX_PKG_GO_USE_OLDER=false # set to true to use the older supported release of Go.
 	TERMUX_PKG_HAS_DEBUG=true # set to false if debug build doesn't exist or doesn't work, for example for python based packages
 	TERMUX_PKG_HOMEPAGE=""
 	TERMUX_PKG_HOSTBUILD=false # Set if a host build should be done in TERMUX_PKG_HOSTBUILD_DIR:
@@ -184,7 +183,7 @@ termux_step_setup_variables() {
 	unset TERMUX_MESON_ENABLE_SOVERSION # setenv to enable SOVERSION suffix for shared libs built with Meson
 }
 
-# Setting architectural informations according to the `TERMUX_ARCH` variable
+# Setting architectural information according to the `TERMUX_ARCH` variable
 termux_step_setup_arch_variables() {
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
 		TERMUX_ARCH_BITS=64
