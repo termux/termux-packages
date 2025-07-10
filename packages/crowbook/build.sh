@@ -17,8 +17,3 @@ termux_step_make() {
 termux_step_make_install() {
 	install -Dm700 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/crowbook
 }
-
-termux_step_post_make_install() {
-	# Remove the vendor sources to save space
-	rm -rf "$TERMUX_PKG_SRCDIR"/vendor
-}
