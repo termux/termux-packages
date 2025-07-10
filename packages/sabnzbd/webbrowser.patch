@@ -5,13 +5,13 @@ index 6e4b61f72..017dc9407 100644
 @@ -24,10 +24,7 @@ import logging
  import tempfile
  import ctypes
-
+ 
 -try:
 -    import webbrowser
 -except ImportError:
 -    webbrowser = None
 +import subprocess
-
+ 
  import sabnzbd
  import sabnzbd.cfg as cfg
 @@ -240,10 +237,7 @@ def launch_a_browser(url, force=False):
@@ -23,7 +23,6 @@ index 6e4b61f72..017dc9407 100644
 -        else:
 -            logging.info("Not showing panic message in webbrowser, no support found")
 +        subprocess.call(["termux-open-url", url])
-     except:
+     except Exception:
          logging.warning(T("Cannot launch the browser, probably not found"))
          logging.info("Traceback: ", exc_info=True)
-
