@@ -5,11 +5,15 @@ TERMUX_PKG_LICENSE_FILE="license.md"
 TERMUX_PKG_MAINTAINER="@licy183"
 _CHROMIUM_VERSION=111.0.5563.146
 TERMUX_PKG_VERSION=0.0.3
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=(https://github.com/fathyb/carbonyl/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
-					https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$_CHROMIUM_VERSION.tar.xz)
-TERMUX_PKG_SHA256=(bf421b9498a084a7cf2238a574d37d31b498d3e271fdb3dcf466e7ed6c80013d
-					1e701fa31b55fa0633c307af8537b4dbf67e02d8cad1080c57d845ed8c48b5fe)
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SRCURL=(
+	https://github.com/fathyb/carbonyl/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
+	https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$_CHROMIUM_VERSION.tar.xz
+)
+TERMUX_PKG_SHA256=(
+	bf421b9498a084a7cf2238a574d37d31b498d3e271fdb3dcf466e7ed6c80013d
+	1e701fa31b55fa0633c307af8537b4dbf67e02d8cad1080c57d845ed8c48b5fe
+)
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libdrm, libevdev, libxkbcommon, libminizip, libnss, libwayland, libx11, mesa, openssl, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libnotify, libffi-static"
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
@@ -26,6 +30,7 @@ termux_step_post_get_source() {
 	# Move chromium source
 	mv chromium-$_CHROMIUM_VERSION chromium/src
 
+	local f
 	# Apply diffs
 	for f in $(find "$TERMUX_PKG_BUILDER_DIR/" -maxdepth 1 -type f -name *.diff | sort); do
 		echo "Applying patch: $(basename $f)"
@@ -244,6 +249,11 @@ use_jumbo_build = true
 }
 
 termux_step_make() {
+	# # Build libcarbonyl
+	# (cd $TERMUX_PKG_SRCDIR
+	# termux_setup_rust
+	# cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release)
+
 	cd $TERMUX_PKG_BUILDDIR
 	# Build v8 snapshot and tools
 	time ninja -C out/Release \
@@ -266,6 +276,9 @@ termux_step_make() {
 	time ninja -C out/Release \
 						third_party/swiftshader/src/Vulkan:icd_file \
 						third_party/swiftshader/src/Vulkan:swiftshader_libvulkan
+
+	# # Build headless shell
+	# time ninja -C $TERMUX_PKG_BUILDDIR/out/Release headless:headless_shell
 }
 
 termux_step_make_install() {

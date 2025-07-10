@@ -1,0 +1,87 @@
+https://github.com/termux/termux-packages/issues/25308
+
+--- a/chromium/src/third_party/perfetto/include/perfetto/tracing/internal/track_event_data_source.h
++++ b/chromium/src/third_party/perfetto/include/perfetto/tracing/internal/track_event_data_source.h
+@@ -251,13 +251,13 @@
+   }
+ 
+   static void Flush() {
+-    Base::template Trace([](typename Base::TraceContext ctx) { ctx.Flush(); });
++    Base::Trace([](typename Base::TraceContext ctx) { ctx.Flush(); });
+   }
+ 
+   // Determine if *any* tracing category is enabled.
+   static bool IsEnabled() {
+     bool enabled = false;
+-    Base::template CallIfEnabled(
++    Base::CallIfEnabled(
+         [&](uint32_t /*instances*/) { enabled = true; });
+     return enabled;
+   }
+@@ -272,7 +272,7 @@
+   static bool IsDynamicCategoryEnabled(
+       const DynamicCategory& dynamic_category) {
+     bool enabled = false;
+-    Base::template Trace([&](typename Base::TraceContext ctx) {
++    Base::Trace([&](typename Base::TraceContext ctx) {
+       enabled = IsDynamicCategoryEnabled(&ctx, dynamic_category);
+     });
+     return enabled;
+@@ -446,7 +446,7 @@
+                                  const protos::gen::TrackDescriptor& desc) {
+     PERFETTO_DCHECK(track.uuid == desc.uuid());
+     TrackRegistry::Get()->UpdateTrack(track, desc.SerializeAsString());
+-    Base::template Trace([&](typename Base::TraceContext ctx) {
++    Base::Trace([&](typename Base::TraceContext ctx) {
+       TrackEventInternal::WriteTrackDescriptor(
+           track, ctx.tls_inst_->trace_writer.get(), ctx.GetIncrementalState(),
+           *ctx.GetCustomTlsState(), TrackEventInternal::GetTraceTime());
+@@ -608,7 +608,7 @@
+                                  Lambda lambda) PERFETTO_ALWAYS_INLINE {
+     using CatTraits = CategoryTraits<CategoryType>;
+     if (CatTraits::kIsDynamic) {
+-      Base::template TraceWithInstances(instances, std::move(lambda));
++      Base::TraceWithInstances(instances, std::move(lambda));
+     } else {
+       Base::template TraceWithInstances<CategoryTracePointTraits>(
+           instances, std::move(lambda), {CatTraits::GetStaticIndex(category)});
+@@ -622,7 +622,7 @@
+       const TrackType& track,
+       std::function<void(protos::pbzero::TrackDescriptor*)> callback) {
+     TrackRegistry::Get()->UpdateTrack(track, std::move(callback));
+-    Base::template Trace([&](typename Base::TraceContext ctx) {
++    Base::Trace([&](typename Base::TraceContext ctx) {
+       TrackEventInternal::WriteTrackDescriptor(
+           track, ctx.tls_inst_->trace_writer.get(), ctx.GetIncrementalState(),
+           *ctx.GetCustomTlsState(), TrackEventInternal::GetTraceTime());
+--- a/chromium/src/third_party/blink/renderer/platform/wtf/hash_table.h
++++ b/chromium/src/third_party/blink/renderer/platform/wtf/hash_table.h
+@@ -1668,7 +1668,7 @@
+     }
+   }
+   table_ = temporary_table;
+-  Allocator::template BackingWriteBarrier(&table_);
++  Allocator::BackingWriteBarrier(&table_);
+ 
+   HashTableBucketInitializer<Traits, Allocator, Value>::InitializeTable(
+       original_table, new_table_size);
+@@ -1722,7 +1722,7 @@
+   // This swaps the newly allocated buffer with the current one. The store to
+   // the current table has to be atomic to prevent races with concurrent marker.
+   AsAtomicPtr(&table_)->store(new_hash_table.table_, std::memory_order_relaxed);
+-  Allocator::template BackingWriteBarrier(&table_);
++  Allocator::BackingWriteBarrier(&table_);
+   table_size_ = new_table_size;
+ 
+   new_hash_table.table_ = old_table;
+@@ -1874,8 +1874,8 @@
+   // on the mutator thread, which is also the only one that writes to them, so
+   // there is *no* risk of data races when reading.
+   AtomicWriteSwap(table_, other.table_);
+-  Allocator::template BackingWriteBarrier(&table_);
+-  Allocator::template BackingWriteBarrier(&other.table_);
++  Allocator::BackingWriteBarrier(&table_);
++  Allocator::BackingWriteBarrier(&other.table_);
+   if (IsWeak<ValueType>::value) {
+     // Weak processing is omitted when no backing store is present. In case such
+     // an empty table is later on used it needs to be strongified.
