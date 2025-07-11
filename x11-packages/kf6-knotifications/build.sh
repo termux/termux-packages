@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE='https://community.kde.org/Frameworks'
 TERMUX_PKG_DESCRIPTION='Abstraction for system notifications'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.15.0"
+TERMUX_PKG_VERSION="6.16.0"
 _KF6_MINOR_VERSION="${TERMUX_PKG_VERSION%.*}"
 TERMUX_PKG_SRCURL=https://download.kde.org/stable/frameworks/${_KF6_MINOR_VERSION}/knotifications-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=97bf87eb57883ab3ae483c4720688a1ca539770b99179b64610a802bb95aedee
+TERMUX_PKG_SHA256=423da41059657a496345e9d7528ab0e0dde53f678160f2fae2cbbc583ca93b9f
 TERMUX_PKG_DEPENDS="kf6-kconfig (>= ${_KF6_MINOR_VERSION}), libc++, libcanberra, qt6-qtbase, qt6-qtdeclarative"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${_KF6_MINOR_VERSION}), qt6-qttools"
 TERMUX_PKG_AUTO_UPDATE=true
