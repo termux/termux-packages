@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE='https://community.kde.org/Frameworks'
 TERMUX_PKG_DESCRIPTION='Widgets for tracking KJob instances'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.15.0"
+TERMUX_PKG_VERSION="6.16.0"
 _KF6_MINOR_VERSION="${TERMUX_PKG_VERSION%.*}"
 TERMUX_PKG_SRCURL=https://download.kde.org/stable/frameworks/${_KF6_MINOR_VERSION}/kjobwidgets-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=d5c7b68ea8829785a91fd6e4c7b3ac571d58bdee193777648e52098c49f054fe
+TERMUX_PKG_SHA256=517703f0188ec7dd759af38da2c0322ee2a7631225189853626af9aff0b94b2a
 TERMUX_PKG_DEPENDS="kf6-kcoreaddons (>= ${_KF6_MINOR_VERSION}), kf6-knotifications (>= ${_KF6_MINOR_VERSION}), kf6-kwidgetsaddons (>= ${_KF6_MINOR_VERSION}), libc++, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${_KF6_MINOR_VERSION}), qt6-qttools"
 TERMUX_PKG_AUTO_UPDATE=true
