@@ -1,10 +1,12 @@
 --- a/src/luarocks/core/sysdetect.lua
 +++ b/src/luarocks/core/sysdetect.lua
-@@ -226,6 +226,8 @@ local function read_elf_section_headers(fd, hdr)
+@@ -226,6 +226,10 @@ local function read_elf_section_headers(fd, hdr)
  end
  
  local function detect_elf_system(fd, hdr, sections)
-+   return "linux"
++   if true then
++      return "linux"
++   end
 +
     local system = e_osabi[hdr.osabi]
     local endian = endians[hdr.endian]
