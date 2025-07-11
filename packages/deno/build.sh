@@ -23,14 +23,14 @@ TERMUX_PKG_EXCLUDED_ARCHES="i686, arm"
 termux_step_get_source() {
 	# XXX: Add version to the name of deno src tarball
 	local _target_name=(
-		"deno_src-$TERMUX_PKG_VERSION.tar.gz"
-		"deno-snapshot-aarch64-linux-android-$TERMUX_PKG_VERSION.tar.bz2"
-		"deno-snapshot-x86_64-linux-android-$TERMUX_PKG_VERSION.tar.bz2"
+		"deno_src-${TERMUX_PKG_VERSION:2}.tar.gz"
+		"deno-snapshot-aarch64-linux-android-${TERMUX_PKG_VERSION:2}.tar.bz2"
+		"deno-snapshot-x86_64-linux-android-${TERMUX_PKG_VERSION:2}.tar.bz2"
 	)
 	local _target_path=(
 		"$TERMUX_PKG_SRCDIR"
-		"$TERMUX_PKG_SRCDIR/deno-snapshot-aarch64-linux-android-$TERMUX_PKG_VERSION"
-		"$TERMUX_PKG_SRCDIR/deno-snapshot-x86_64-linux-android-$TERMUX_PKG_VERSION"
+		"$TERMUX_PKG_SRCDIR/deno-snapshot-aarch64-linux-android-${TERMUX_PKG_VERSION:2}"
+		"$TERMUX_PKG_SRCDIR/deno-snapshot-x86_64-linux-android-${TERMUX_PKG_VERSION:2}"
 	)
 	local i=0
 	for i in $(seq 0 $(( ${#TERMUX_PKG_SRCURL[@]}-1 ))); do
@@ -167,7 +167,7 @@ termux_step_make() {
 	export RUSTY_V8_ARCHIVE_${env_name}="${TERMUX_PREFIX}/lib/librusty_v8.a"
 	export RUSTY_V8_SRC_BINDING_PATH_${env_name}="${TERMUX_PREFIX}/include/librusty_v8/src_binding.rs"
 	export DENO_SKIP_CROSS_BUILD_CHECK=1
-	export DENO_PREBUILT_CLI_SNAPSHOT="$TERMUX_PKG_SRCDIR/deno-snapshot-$CARGO_TARGET_NAME-$TERMUX_PKG_VERSION/CLI_SNAPSHOT.bin"
+	export DENO_PREBUILT_CLI_SNAPSHOT="$TERMUX_PKG_SRCDIR/deno-snapshot-$CARGO_TARGET_NAME-${TERMUX_PKG_VERSION:2}/CLI_SNAPSHOT.bin"
 
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
 		export PKG_CONFIG_x86_64_unknown_linux_gnu=/usr/bin/pkg-config
