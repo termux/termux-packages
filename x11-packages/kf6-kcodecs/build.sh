@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.kde.org/
 TERMUX_PKG_DESCRIPTION="Method collection to manipulate strings using various encodings (KDE)"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.15.0"
+TERMUX_PKG_VERSION="6.16.0"
 _KF6_MINOR_VERSION="${TERMUX_PKG_VERSION%.*}"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${_KF6_MINOR_VERSION}/kcodecs-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=bdf57733f2d641cb0cb749ced5f6f67e42c8e9d17db3f6c2e6a2054c86636ec1
+TERMUX_PKG_SHA256=d8d23cdc853aa832bf39886c6b673fee87279e258cf01abeb0acfea5f718e595
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${_KF6_MINOR_VERSION}), qt6-qttools"
