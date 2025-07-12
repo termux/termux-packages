@@ -4,16 +4,19 @@ TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1, MIT"
 TERMUX_PKG_LICENSE_FILE="COPYING, COPYING.LESSER, LICENSES"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.24.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/gpgme/gpgme-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=bfc17f5bd1b178c8649fdd918956d277080f33df006a2dc40acdecdce68c50dd
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="gnupg (>= 2.2.9-1), libassuan, libgpg-error"
+TERMUX_PKG_BUILD_DEPENDS="swig"
 TERMUX_PKG_BREAKS="gpgme-dev"
 TERMUX_PKG_REPLACES="gpgme-dev"
+TERMUX_PKG_PYTHON_COMMON_DEPS="Cython, hkp4py, pendulum, requests"
 # Use "--disable-gpg-test" to avoid "No rule to make target `../../src/libgpgme-pthread.la":
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-gpg-test
---enable-languages=cpp
+--enable-languages=cpp,python
 --with-gpg=$TERMUX_PREFIX/bin/gpg2
 --without-g13
 --without-gpgconf
