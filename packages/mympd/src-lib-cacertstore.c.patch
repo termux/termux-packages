@@ -1,0 +1,14 @@
+--- ./src/lib/cacertstore.c.orig	2025-07-12 16:58:46.773236505 +0000
++++ ./src/lib/cacertstore.c	2025-07-12 16:59:26.453201491 +0000
+@@ -18,10 +18,7 @@
+  * Paths to check for the ca cert store
+  */
+ const char *check_ca_cert_paths[] = {
+-    "/etc/ssl/certs/ca-certificates.crt",
+-    "/etc/ssl/certs/ca-bundle.crt",
+-    "/etc/pki/tls/certs/ca-bundle.crt",
+-    "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem",
++    "@TERMUX_PREFIX@/etc/tls/cert.pem",
+     NULL
+ };
+ 
