@@ -36,7 +36,6 @@ termux_setup_cabal() {
 			 url: https://$repo/
 
 			remote-repo-cache: $HOME/.cache/cabal/packages
-			executable-stripping: True
 			configure-option: --host=$TERMUX_HOST_PLATFORM
 			tests: False
 			build-summary: $HOME/.cache/cabal/logs/build.log
@@ -44,14 +43,15 @@ termux_setup_cabal() {
 			jobs: $TERMUX_PKG_MAKE_PROCESSES
 
 			program-locations
-			 strip-location: $(command -v "$STRIP")
+			 alex-location: $(command -v alex)
+			 happy-location: $(command -v happy)
 
 			program-default-options
 			 $([[ "$TERMUX_ON_DEVICE_BUILD" == false ]] && printf "%s" "hsc2hs-options: --cross-compile")
 		EOF
 	else
-		if [[ "${TERMUX_APP_PACKAGE_MANAGER}" == "apt" ]] && "$(dpkg-query -W -f '${db:Status-Status}\n' cabal-install 2>/dev/null)" != "installed" ||
-			[[ "${TERMUX_APP_PACKAGE_MANAGER}" == "pacman" ]] && ! "$(pacman -Q cabal-install 2>/dev/null)"; then
+		if [[ "${TERMUX_APP_PACKAGE_MANAGER}" == "apt" ]] && [[ "$(dpkg-query -W -f '${db:Status-Status}\n' cabal-install 2>/dev/null)" != "installed" ]] ||
+			[[ "${TERMUX_APP_PACKAGE_MANAGER}" == "pacman" ]] && ! pacman -Q cabal-install 2>/dev/null; then
 			echo "Package 'cabal-install' is not installed."
 			exit 1
 		fi

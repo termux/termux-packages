@@ -8,8 +8,16 @@ termux_step_make() {
 
 	if test -f build.ninja; then
 		ninja -j $TERMUX_PKG_MAKE_PROCESSES
-	elif ls ./*.cabal &>/dev/null; then
-		cabal --config="$TERMUX_CABAL_CONFIG" build
+	elif ls ./*.cabal &>/dev/null || ls ./cabal.project &>/dev/null; then
+		if [[ "$TERMUX_ON_DEVICE_BUILD" == false ]]; then
+			CONFIG="--config=$TERMUX_CABAL_CONFIG"
+		else
+			CONFIG=""
+		fi
+
+		# NOTE: We do not want to quote CONFIG as we want word expansion.
+		# shellcheck disable=SC2086
+		cabal $CONFIG build
 	elif ls ./*akefile &>/dev/null || [ ! -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 			make -j $TERMUX_PKG_MAKE_PROCESSES $QUIET_BUILD
