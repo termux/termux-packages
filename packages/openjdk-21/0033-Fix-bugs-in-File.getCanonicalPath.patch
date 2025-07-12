@@ -1,7 +1,7 @@
-From 9b8125e6a37d96cf96173e328416fc6a67831fb3 Mon Sep 17 00:00:00 2001
+From 9e7b89f76facd626c46e21b7dd526647d30995d9 Mon Sep 17 00:00:00 2001
 From: agnostic-apollo <agnosticapollo@gmail.com>
 Date: Thu, 28 Mar 2024 18:46:02 +0100
-Subject: [PATCH 33/37] Fix bugs in File.getCanonicalPath()
+Subject: [PATCH 33/41] Fix bugs in File.getCanonicalPath()
 
 1. If path length is `>= PATH_MAX` (4096) characters, return error.
 2. If any path component length is `> NAME_MAX` (255) characters, return
@@ -16,7 +16,7 @@ Subject: [PATCH 33/37] Fix bugs in File.getCanonicalPath()
  2 files changed, 86 insertions(+), 14 deletions(-)
 
 diff --git a/src/java.base/unix/native/libjava/canonicalize_md.c b/src/java.base/unix/native/libjava/canonicalize_md.c
-index 0585aa3bb..37d8be18a 100644
+index 0585aa3bbdf..37d8be18a6f 100644
 --- a/src/java.base/unix/native/libjava/canonicalize_md.c
 +++ b/src/java.base/unix/native/libjava/canonicalize_md.c
 @@ -53,7 +53,7 @@ JDK_Canonicalize(const char *orig, char *out, int len)
@@ -111,7 +111,7 @@ index 0585aa3bb..37d8be18a 100644
      }
  }
 diff --git a/src/java.base/unix/native/libjava/path_util.c b/src/java.base/unix/native/libjava/path_util.c
-index 1f2cdc46f..e2445ee30 100644
+index 1f2cdc46f0c..e2445ee30cd 100644
 --- a/src/java.base/unix/native/libjava/path_util.c
 +++ b/src/java.base/unix/native/libjava/path_util.c
 @@ -28,9 +28,41 @@
@@ -216,5 +216,5 @@ index 1f2cdc46f..e2445ee30 100644
          /* i will be incremented at the top of the loop */
      }
 -- 
-2.45.2
+2.50.0
 

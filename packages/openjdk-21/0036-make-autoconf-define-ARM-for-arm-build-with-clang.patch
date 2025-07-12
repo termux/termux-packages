@@ -1,7 +1,7 @@
-From 06429af2ea014a40696c2937196c6474966a78d5 Mon Sep 17 00:00:00 2001
+From b6dc3baac1b7232508563e582f1b0dc49aaa21b0 Mon Sep 17 00:00:00 2001
 From: Henrik Grimler <grimler@termux.dev>
 Date: Sun, 31 Mar 2024 12:02:51 +0200
-Subject: [PATCH 36/37] make: autoconf: define ARM for arm build with clang
+Subject: [PATCH 36/41] make: autoconf: define ARM for arm build with clang
 
 Fixes error like
 
@@ -15,10 +15,10 @@ gmake[2]: *** [make/Main.gmk:252: hotspot-server-libs] Error 2
  1 file changed, 6 insertions(+)
 
 diff --git a/make/autoconf/flags-cflags.m4 b/make/autoconf/flags-cflags.m4
-index 4cfc77586..ab4811036 100644
+index 3b35d00795a..1b966e2706e 100644
 --- a/make/autoconf/flags-cflags.m4
 +++ b/make/autoconf/flags-cflags.m4
-@@ -769,6 +769,12 @@ AC_DEFUN([FLAGS_SETUP_CFLAGS_CPU_DEP],
+@@ -839,6 +839,12 @@ AC_DEFUN([FLAGS_SETUP_CFLAGS_CPU_DEP],
        $1_CFLAGS_CPU="-mcpu=pwr8"
      fi
  
@@ -32,5 +32,5 @@ index 4cfc77586..ab4811036 100644
      if test "x$FLAGS_CPU" = xppc64; then
        $1_CFLAGS_CPU_JVM="-qarch=ppc64"
 -- 
-2.45.2
+2.50.0
 

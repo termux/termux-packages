@@ -1,7 +1,7 @@
-From d22c78d7799d85bd1ce40cac3adb2838eca8cf26 Mon Sep 17 00:00:00 2001
+From e7e46f41e4418979fd0d1b0aa6d25ff57015df82 Mon Sep 17 00:00:00 2001
 From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
 Date: Sat, 12 Jun 2021 17:03:05 +0700
-Subject: [PATCH 17/37] Libfontmanager: link against libawt to fix link error
+Subject: [PATCH 17/41] Libfontmanager: link against libawt to fix link error
 
 Partly based on commit from androidports:
 https://github.com/androidports/openjdk/commit/a3e4f0281154537f01c2e59286a6ceed9c827b11
@@ -10,10 +10,10 @@ https://github.com/androidports/openjdk/commit/a3e4f0281154537f01c2e59286a6ceed9
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/make/modules/java.desktop/lib/Awt2dLibraries.gmk b/make/modules/java.desktop/lib/Awt2dLibraries.gmk
-index 62b4477b8..abe1be54a 100644
+index f0c92ee094f..64942a85aa4 100644
 --- a/make/modules/java.desktop/lib/Awt2dLibraries.gmk
 +++ b/make/modules/java.desktop/lib/Awt2dLibraries.gmk
-@@ -542,13 +542,13 @@ $(eval $(call SetupJdkLibrary, BUILD_LIBFONTMANAGER, \
+@@ -563,13 +563,13 @@ $(eval $(call SetupJdkLibrary, BUILD_LIBFONTMANAGER, \
      LDFLAGS_unix := -L$(INSTALL_LIBRARIES_HERE), \
      LDFLAGS_aix := -Wl$(COMMA)-berok, \
      LIBS := $(BUILD_LIBFONTMANAGER_FONTLIB), \
@@ -30,5 +30,5 @@ index 62b4477b8..abe1be54a 100644
  ifeq ($(call isTargetOs, macosx), true)
    $(BUILD_LIBFONTMANAGER): $(call FindLib, $(MODULE), awt_lwawt)
 -- 
-2.45.2
+2.50.0
 

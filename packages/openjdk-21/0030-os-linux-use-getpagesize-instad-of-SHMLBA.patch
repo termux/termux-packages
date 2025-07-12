@@ -1,7 +1,7 @@
-From ea2a813e727738bb664bf5321097b5f7026feab5 Mon Sep 17 00:00:00 2001
+From a6de95f01103d528ad36ee56e35245e187856916 Mon Sep 17 00:00:00 2001
 From: Henrik Grimler <grimler@termux.dev>
 Date: Sun, 5 Feb 2023 09:21:57 +0100
-Subject: [PATCH 30/37] os: linux: use getpagesize() instad of SHMLBA
+Subject: [PATCH 30/41] os: linux: use getpagesize() instad of SHMLBA
 
 Since the latter is not defined on android.
 ---
@@ -9,10 +9,10 @@ Since the latter is not defined on android.
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/hotspot/os/linux/os_linux.cpp b/src/hotspot/os/linux/os_linux.cpp
-index d8a460519..c41d459c1 100644
+index 8c04f45c660..f41a83ebeba 100644
 --- a/src/hotspot/os/linux/os_linux.cpp
 +++ b/src/hotspot/os/linux/os_linux.cpp
-@@ -3952,7 +3952,7 @@ void os::large_page_init() {
+@@ -4063,7 +4063,7 @@ void os::large_page_init() {
  static char* shmat_with_alignment(int shmid, size_t bytes, size_t alignment) {
    assert(is_aligned(bytes, alignment), "Must be divisible by the alignment");
  
@@ -21,7 +21,7 @@ index d8a460519..c41d459c1 100644
      assert(false, "Code below assumes that alignment is at least SHMLBA aligned");
      return nullptr;
    }
-@@ -3988,7 +3988,7 @@ static char* shmat_with_alignment(int shmid, size_t bytes, size_t alignment) {
+@@ -4099,7 +4099,7 @@ static char* shmat_with_alignment(int shmid, size_t bytes, size_t alignment) {
  }
  
  static char* shmat_at_address(int shmid, char* req_addr) {
@@ -31,5 +31,5 @@ index d8a460519..c41d459c1 100644
      return nullptr;
    }
 -- 
-2.45.2
+2.50.0
 
