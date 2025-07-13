@@ -35,6 +35,22 @@ if (repos.pkg_format != "debian") {
   console.error(`Unsupported package format: ${repos.pkg_format}`);
   process.exit(1);
 }
+const repoPathMap = new Map();
+for (const path in repos) {
+  if (path == "pkg_format") continue;
+  const repo = repos[path];
+  if (repoPathMap.has(repo.name)) {
+    console.error("Multiple repository paths with same repository name.");
+    console.error(
+      "This should not be happening. repo.json file needs to be fixed",
+    );
+    console.error(
+      `Repository "${repo.name}" also exists for path "${path}" when it already existed for "${repoPathMap.get(path)}"`,
+    );
+    process.exit(1);
+  }
+  repoPathMap.set(repo.name, path);
+}
 
 async function getAptPackages(
   repo,
@@ -42,6 +58,7 @@ async function getAptPackages(
   errors,
   _proposedAutomatedFixes,
   proposedManualFixes,
+  termuxPackages,
 ) {
   // https://wiki.debian.org/DebianRepository/Format#A.22Packages.22_Indices
   // The Packages file is a gzipped file containing a list of packages names,
@@ -83,12 +100,20 @@ async function getAptPackages(
       else if (line == "") {
         if (pkgName && pkgVersion && pkgFilename) {
           if (aptPackages.has(pkgName)) {
-            errors.push(
-              `Duplicate package: "${pkgName}" when parsing Packages file for "${repo.name}" for "${arch}"`,
-            );
-            proposedManualFixes.push(
-              `Duplicate package "${pkgName}" will likely be removed automatically once the cron job responsible for cleaning older versions of packages kicks in on the aptly server.`,
-            );
+            const currentTime = Math.floor(new Date().getTime() / 1000);
+            let lastModified = currentTime;
+            if (termuxPackages.has(pkgName)) {
+              lastModified = termuxPackages.get(pkgName).lastModified;
+            }
+            // Only make this an error if the oldest deb with for the same package is older than 24 hours. The cron job on the server running aptly runs once every 6 hours, 24 hour is a bit more reasonable to make sure we don't fill errors that should not be there in case the cron job fails due to some reason
+            if (currentTime - lastModified >= 3600 * 24) {
+              errors.push(
+                `Duplicate package: "${pkgName}" when parsing Packages file for "${repo.name}" for "${arch}"`,
+              );
+              proposedManualFixes.push(
+                `Duplicate package "${pkgName}" will likely be removed automatically once the cron job responsible for cleaning older versions of packages kicks in on the aptly server.`,
+              );
+            }
             try {
               await execFileAsync("dpkg", [
                 "--compare-versions",
@@ -150,10 +175,18 @@ async function getTermuxPackages(
           `Duplicate package "${pkgName}" earlier found in "${termuxPackages.get(pkgName).repo}" also in "${pkgRepo}" needs to be removed from termux-packages`,
         );
       }
+      const { stdout } = execFileAsync("git", [
+        "log",
+        "-1",
+        "--format=%at",
+        `${repoPathMap.get(pkgRepo)}`,
+      ]);
+      const lastModified = Number.parseInt(stdout);
       termuxPackages.set(pkgName, {
         version: pkgVersion,
         repo: pkgRepo,
         mayHaveStaticSubpkg: pkgMayHaveStaticSubpkg === "true",
+        lastModified,
       });
     });
   return termuxPackages;
@@ -184,6 +217,7 @@ async function getErrorsForArch(arch) {
       errors,
       proposedAutomatedFixes,
       proposedManualFixes,
+      termuxPackages,
     );
     for (const [pkgName, pkgInfo] of currentAptRepoPackages) {
       // Check if the package should exist in this repository in the first place
