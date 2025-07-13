@@ -1,0 +1,60 @@
+From e7a27759f963356f2e22680b9000d1859bef2429 Mon Sep 17 00:00:00 2001
+From: Palo Kisa <palo.kisa@gmail.com>
+Date: Fri, 27 Jun 2025 14:46:47 +0200
+Subject: [PATCH] statusnotifier: Fix std::function<>::argument_type
+ deprecation/removal
+
+---
+ plugin-statusnotifier/sniasync.h | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
+
+diff --git a/plugin-statusnotifier/sniasync.h b/plugin-statusnotifier/sniasync.h
+index 3a4ce1269..f11803418 100644
+--- a/plugin-statusnotifier/sniasync.h
++++ b/plugin-statusnotifier/sniasync.h
+@@ -28,15 +28,14 @@
+ #if !defined(SNIASYNC_H)
+ #define SNIASYNC_H
+ 
+-#include <functional>
+ #include "statusnotifieriteminterface.h"
+ 
+ template<typename>
+-struct remove_class_type { using type = void; }; // bluff
++struct remove_class_type { using type = void; using arg_type = void; }; // bluff
+ template<typename C, typename R, typename... ArgTypes>
+-struct remove_class_type<R (C::*)(ArgTypes...)> { using type = R(ArgTypes...); };
++struct remove_class_type<R (C::*)(ArgTypes...)> { using type = R(ArgTypes...); using arg_type = std::tuple_element_t<0, std::tuple<ArgTypes...>>; };
+ template<typename C, typename R, typename... ArgTypes>
+-struct remove_class_type<R (C::*)(ArgTypes...) const> { using type = R(ArgTypes...); };
++struct remove_class_type<R (C::*)(ArgTypes...) const> { using type = R(ArgTypes...); using arg_type = std::tuple_element_t<0, std::tuple<ArgTypes...>>; };
+ 
+ template <typename L>
+ class call_sig_helper
+@@ -51,13 +50,13 @@ class call_sig_helper
+ template <typename L>
+ struct call_signature : public remove_class_type<typename call_sig_helper<L>::type> {};
+ template <typename R, typename... ArgTypes>
+-struct call_signature<R (ArgTypes...)> { using type = R (ArgTypes...); };
++struct call_signature<R (ArgTypes...)> { using type = R (ArgTypes...); using arg_type = std::tuple_element_t<0, std::tuple<ArgTypes...>>; };
+ template <typename R, typename... ArgTypes>
+-struct call_signature<R (*)(ArgTypes...)> { using type = R (ArgTypes...); };
++struct call_signature<R (*)(ArgTypes...)> { using type = R (ArgTypes...); using arg_type = std::tuple_element_t<0, std::tuple<ArgTypes...>>; };
+ template <typename C, typename R, typename... ArgTypes>
+-struct call_signature<R (C::*)(ArgTypes...)> { using type = R (ArgTypes...); };
++struct call_signature<R (C::*)(ArgTypes...)> { using type = R (ArgTypes...); using arg_type = std::tuple_element_t<0, std::tuple<ArgTypes...>>; };
+ template<typename C, typename R, typename... ArgTypes>
+-struct call_signature<R (C::*)(ArgTypes...) const> { using type = R(ArgTypes...); };
++struct call_signature<R (C::*)(ArgTypes...) const> { using type = R(ArgTypes...); using arg_type = std::tuple_element_t<0, std::tuple<ArgTypes...>>; };
+ 
+ template <typename> struct is_valid_signature : public std::false_type {};
+ template <typename Arg>
+@@ -87,7 +86,7 @@ class SniAsync : public QObject
+                     QDBusPendingReply<QVariant> reply = *call;
+                     if (reply.isError() && ignored_errors.cend() == std::find(ignored_errors.cbegin(), ignored_errors.cend(), reply.error().name()))
+                         qDebug().noquote().nospace() << "Error on DBus request(" << mSni.service() << ',' << mSni.path() << ',' << name << "): " << reply.error();
+-                    finished(qdbus_cast<typename std::function<typename call_signature<F>::type>::argument_type>(reply.value()));
++                    finished(qdbus_cast<typename call_signature<F>::arg_type>(reply.value()));
+                     call->deleteLater();
+                 }
+         );
