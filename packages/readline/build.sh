@@ -6,8 +6,8 @@ TERMUX_PKG_DEPENDS="libandroid-support, ncurses"
 TERMUX_PKG_BREAKS="bash (<< 5.0), readline-dev"
 TERMUX_PKG_REPLACES="readline-dev"
 _MAIN_VERSION=8.3
-_PATCH_VERSION=0
-TERMUX_PKG_VERSION=$_MAIN_VERSION # .$_PATCH_VERSION
+_PATCH_VERSION=1
+TERMUX_PKG_VERSION=$_MAIN_VERSION.$_PATCH_VERSION
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/readline/readline-${_MAIN_VERSION}.tar.gz
 TERMUX_PKG_SHA256=fe5383204467828cd495ee8d1d3c037a7eba1389c22bc6a041f627976f9061cc
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-curses --enable-multibyte bash_cv_wcwidth_broken=no"
@@ -19,7 +19,7 @@ termux_step_pre_configure() {
 	local PATCH_NUM PATCHFILE
 	local -A PATCH_CHECKSUMS=()
 
-	# PATCH_CHECKSUMS[001]=
+	PATCH_CHECKSUMS[001]=21f0a03106dbe697337cd25c70eb0edbaa2bdb6d595b45f83285cdd35bac84de
 
 	for PATCH_NUM in $(seq -f '%03g' ${_PATCH_VERSION}); do
 		PATCHFILE=$TERMUX_PKG_CACHEDIR/readline_patch_${PATCH_NUM}.patch
