@@ -1,0 +1,33 @@
+Workaround CS name conflict with usr/include/i686-linux-android/asm/ptrace-abi.h in NDK
+
+--- a/librz/arch/isa/hexagon/hexagon_il.h
++++ b/librz/arch/isa/hexagon/hexagon_il.h
+@@ -2088,7 +2088,7 @@
+ RzILOpEffect *hex_il_op_j2_endloop01(HexInsnPktBundle *bundle);
+ RzILOpEffect *hex_il_op_j2_endloop1(HexInsnPktBundle *bundle);
+ RzILOpEffect *hex_il_op_j2_endloop0(HexInsnPktBundle *bundle);
+-RZ_OWN RzILOpEffect *hex_fcirc_add(HexInsnPktBundle *bundle, const HexOp *RxV, RZ_BORROW RzILOpPure *offset, RZ_BORROW RzILOpPure *M, RZ_BORROW RzILOpPure *CS);
++RZ_OWN RzILOpEffect *hex_fcirc_add(HexInsnPktBundle *bundle, const HexOp *RxV, RZ_BORROW RzILOpPure *offset, RZ_BORROW RzILOpPure *M, RZ_BORROW RzILOpPure *CS_);
+ RZ_OWN RzILOpEffect *hex_trap(RZ_BORROW RzILOpPure *trap_type, RZ_BORROW RzILOpPure *imm);
+ RZ_OWN RzILOpEffect *hex_clz32(RZ_BORROW RzILOpPure *t);
+ RZ_OWN RzILOpEffect *hex_clz64(RZ_BORROW RzILOpPure *t);
+--- a/librz/arch/isa/hexagon/il_ops/hexagon_il_non_insn_ops.c
++++ b/librz/arch/isa/hexagon/il_ops/hexagon_il_non_insn_ops.c
+@@ -270,7 +270,7 @@
+ 	return instruction_sequence;
+ }
+ 
+-RZ_OWN RzILOpEffect *hex_fcirc_add(HexInsnPktBundle *bundle, const HexOp *RxV, RZ_BORROW RzILOpPure *offset, RZ_BORROW RzILOpPure *M, RZ_BORROW RzILOpPure *CS) {
++RZ_OWN RzILOpEffect *hex_fcirc_add(HexInsnPktBundle *bundle, const HexOp *RxV, RZ_BORROW RzILOpPure *offset, RZ_BORROW RzILOpPure *M, RZ_BORROW RzILOpPure *CS_) {
+ 	const HexInsn *hi = bundle->insn;
+ 	HexPkt *pkt = bundle->pkt;
+ 
+@@ -295,7 +295,7 @@
+ 	RzILOpEffect *op_ASSIGN_15 = SETL("new_ptr", CAST(32, IL_FALSE, op_ADD_13));
+ 
+ 	// start_addr = ((ut32) CS);
+-	RzILOpEffect *op_ASSIGN_27 = SETL("start_addr", CAST(32, IL_FALSE, CS));
++	RzILOpEffect *op_ASSIGN_27 = SETL("start_addr", CAST(32, IL_FALSE, CS_));
+ 
+ 	// end_addr = start_addr + length;
+ 	RzILOpPure *op_ADD_28 = ADD(VARL("start_addr"), VARL("length"));
