@@ -1,16 +1,17 @@
---- pueue-4.0.0-rc.1/pueue_lib/Cargo.toml	2024-12-01 22:55:03.000000000 +0530
-+++ pueue-4.0.0-rc.1.mod/pueue_lib/Cargo.toml	2025-01-08 15:28:47.151932396 +0530
-@@ -71,5 +71,5 @@
- libproc = "0.14.6"
+--- a/pueue/Cargo.toml
++++ b/pueue/Cargo.toml
+@@ -68,7 +68,7 @@ similar-asserts = "1"
+ # --- Platform specific dependencies ---
  
- # Linux only
+ # Linux
 -[target.'cfg(target_os = "linux")'.dependencies]
 +[target.'cfg(any(target_os = "linux", target_os = "android"))'.dependencies]
  procfs = { version = "0.17", default-features = false }
---- pueue-4.0.0-rc.1/pueue_lib/src/process_helper/mod.rs	2024-12-01 22:55:03.000000000 +0530
-+++ pueue-4.0.0-rc.1.mod/pueue_lib/src/process_helper/mod.rs	2025-01-08 15:25:25.329165013 +0530
-@@ -18,7 +18,7 @@
- use command_group::Signal;
+ 
+ # Linux + Mac OS
+--- a/pueue/src/process_helper/mod.rs
++++ b/pueue/src/process_helper/mod.rs
+@@ -21,6 +21,6 @@ pub use self::unix::*;
  
  // Platform specific process support
 -#[cfg_attr(target_os = "linux", path = "linux.rs")]
