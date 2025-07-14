@@ -3,7 +3,7 @@ termux_setup_toolchain_23c() {
 	export CPPFLAGS=""
 	export LDFLAGS="-L${TERMUX__PREFIX__LIB_DIR}"
 
-	export AS=$TERMUX_HOST_PLATFORM-clang
+	export AS="${TERMUX_HOST_PLATFORM}-clang -c"
 	export CC=$TERMUX_HOST_PLATFORM-clang
 	export CPP=$TERMUX_HOST_PLATFORM-cpp
 	export CXX=$TERMUX_HOST_PLATFORM-clang++
