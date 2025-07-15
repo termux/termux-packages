@@ -1,7 +1,7 @@
-From aba494431b806f8414a7139334a21348f227cec7 Mon Sep 17 00:00:00 2001
+From 8e6c4fb9a23949e9cb793a1b3134f2a90eb9e4f4 Mon Sep 17 00:00:00 2001
 From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
 Date: Fri, 25 Jun 2021 17:19:24 +0700
-Subject: [PATCH 18/37] Try to get libjvm.so path from /proc/self/maps on
+Subject: [PATCH 18/41] Try to get libjvm.so path from /proc/self/maps on
  android
 
 ---
@@ -9,10 +9,10 @@ Subject: [PATCH 18/37] Try to get libjvm.so path from /proc/self/maps on
  1 file changed, 44 insertions(+)
 
 diff --git a/src/hotspot/os/linux/os_linux.cpp b/src/hotspot/os/linux/os_linux.cpp
-index 93cdec6dd..c8fb1f10c 100644
+index 04bee9e5ff3..25ad8934d4e 100644
 --- a/src/hotspot/os/linux/os_linux.cpp
 +++ b/src/hotspot/os/linux/os_linux.cpp
-@@ -217,6 +217,8 @@ static int clock_tics_per_sec = 100;
+@@ -221,6 +221,8 @@ static int clock_tics_per_sec = 100;
  // avoid this
  static bool suppress_primordial_thread_resolution = false;
  
@@ -21,7 +21,7 @@ index 93cdec6dd..c8fb1f10c 100644
  // utility functions
  
  julong os::Linux::available_memory_in_container() {
-@@ -1498,6 +1500,34 @@ bool os::dll_address_to_library_name(address addr, char* buf,
+@@ -1534,6 +1536,34 @@ bool os::dll_address_to_library_name(address addr, char* buf,
    return false;
  }
  
@@ -56,7 +56,7 @@ index 93cdec6dd..c8fb1f10c 100644
  // Remember the stack's state. The Linux dynamic linker will change
  // the stack to 'executable' at most once, so we must safepoint only once.
  bool os::Linux::_stack_is_executable = false;
-@@ -2595,6 +2625,19 @@ void os::jvm_path(char *buf, jint buflen) {
+@@ -2664,6 +2694,19 @@ void os::jvm_path(char *buf, jint buflen) {
                                           CAST_FROM_FN_PTR(address, os::jvm_path),
                                           dli_fname, sizeof(dli_fname), nullptr);
    assert(ret, "cannot locate libjvm");
@@ -76,7 +76,7 @@ index 93cdec6dd..c8fb1f10c 100644
    char *rp = nullptr;
    if (ret && dli_fname[0] != '\0') {
      rp = os::Posix::realpath(dli_fname, buf, buflen);
-@@ -2660,6 +2703,7 @@ void os::jvm_path(char *buf, jint buflen) {
+@@ -2729,6 +2772,7 @@ void os::jvm_path(char *buf, jint buflen) {
        }
      }
    }
@@ -85,5 +85,5 @@ index 93cdec6dd..c8fb1f10c 100644
    strncpy(saved_jvm_path, buf, MAXPATHLEN);
    saved_jvm_path[MAXPATHLEN - 1] = '\0';
 -- 
-2.45.2
+2.50.0
 

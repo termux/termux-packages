@@ -1,17 +1,17 @@
-From 66538fbc0880ee4fe7121a426aeae6661df4e584 Mon Sep 17 00:00:00 2001
+From 9a7bc29704747ab3bc1223b41575da2d36f5aaa1 Mon Sep 17 00:00:00 2001
 From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
 Date: Mon, 7 Jun 2021 06:27:26 +0700
-Subject: [PATCH 03/37] Define sys gettid on arm and aarch64
+Subject: [PATCH 03/41] Define sys gettid on arm and aarch64
 
 ---
  src/hotspot/os/linux/os_linux.cpp | 6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/src/hotspot/os/linux/os_linux.cpp b/src/hotspot/os/linux/os_linux.cpp
-index c76b6f90a..93cdec6dd 100644
+index 77057c1d39c..04bee9e5ff3 100644
 --- a/src/hotspot/os/linux/os_linux.cpp
 +++ b/src/hotspot/os/linux/os_linux.cpp
-@@ -374,11 +374,11 @@ bool os::Linux::get_tick_information(CPUPerfTicks* pticks, int which_logical_cpu
+@@ -394,11 +394,11 @@ bool os::Linux::get_tick_information(CPUPerfTicks* pticks, int which_logical_cpu
  }
  
  #ifndef SYS_gettid
@@ -25,7 +25,7 @@ index c76b6f90a..93cdec6dd 100644
        #define SYS_gettid 224
      #else
        #ifdef __amd64__
-@@ -386,6 +386,8 @@ bool os::Linux::get_tick_information(CPUPerfTicks* pticks, int which_logical_cpu
+@@ -406,6 +406,8 @@ bool os::Linux::get_tick_information(CPUPerfTicks* pticks, int which_logical_cpu
        #else
          #ifdef __sparc__
            #define SYS_gettid 143
@@ -35,5 +35,5 @@ index c76b6f90a..93cdec6dd 100644
            #error define gettid for the arch
          #endif
 -- 
-2.45.2
+2.50.0
 

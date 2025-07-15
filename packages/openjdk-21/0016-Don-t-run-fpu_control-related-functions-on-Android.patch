@@ -1,7 +1,7 @@
-From a0a394b9d96eb54b205b49fc6c3fefb97711555f Mon Sep 17 00:00:00 2001
+From 72106d1e67c414d6632379e7f720ab6f65f6cc93 Mon Sep 17 00:00:00 2001
 From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
 Date: Sat, 12 Jun 2021 06:58:20 +0700
-Subject: [PATCH 16/37] Don't run fpu_control related functions on Android
+Subject: [PATCH 16/41] Don't run fpu_control related functions on Android
 
 ---
  src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp |  2 ++
@@ -9,7 +9,7 @@ Subject: [PATCH 16/37] Don't run fpu_control related functions on Android
  2 files changed, 7 insertions(+), 5 deletions(-)
 
 diff --git a/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp b/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp
-index 3bbe93fe7..fc63deb13 100644
+index 3726aca8a5d..046e5e3eca5 100644
 --- a/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp
 +++ b/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp
 @@ -72,7 +72,9 @@
@@ -23,7 +23,7 @@ index 3bbe93fe7..fc63deb13 100644
  
  #define SPELL_REG_SP  "sp"
 diff --git a/src/hotspot/os_cpu/linux_x86/os_linux_x86.cpp b/src/hotspot/os_cpu/linux_x86/os_linux_x86.cpp
-index 930cf3f26..bb320cf6d 100644
+index 30d546508e2..c912e8d122c 100644
 --- a/src/hotspot/os_cpu/linux_x86/os_linux_x86.cpp
 +++ b/src/hotspot/os_cpu/linux_x86/os_linux_x86.cpp
 @@ -74,7 +74,7 @@
@@ -61,7 +61,7 @@ index 930cf3f26..bb320cf6d 100644
    _FPU_SETCW(fpu_control);
  #endif // !AMD64
  }
-@@ -623,7 +623,7 @@ void os::print_register_info(outputStream *st, const void *context, int& continu
+@@ -621,7 +621,7 @@ void os::print_register_info(outputStream *st, const void *context, int& continu
  }
  
  void os::setup_fpu() {
@@ -71,5 +71,5 @@ index 930cf3f26..bb320cf6d 100644
    __asm__ volatile (  "fldcw (%0)" :
                        : "r" (fpu_cntrl) : "memory");
 -- 
-2.45.2
+2.50.0
 

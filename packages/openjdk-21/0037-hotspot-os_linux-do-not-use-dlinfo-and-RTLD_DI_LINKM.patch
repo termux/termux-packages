@@ -1,7 +1,7 @@
-From ac9a6de051aa1ffea5ea1ce843954cc2fbd67e69 Mon Sep 17 00:00:00 2001
+From 46c25f00aac4a8a474c492ae564ae5f85b8a1a91 Mon Sep 17 00:00:00 2001
 From: Henrik Grimler <grimler@termux.dev>
 Date: Sun, 31 Mar 2024 20:20:05 +0200
-Subject: [PATCH 37/37] hotspot: os_linux: do not use dlinfo and
+Subject: [PATCH 37/41] hotspot: os_linux: do not use dlinfo and
  RTLD_DI_LINKMAP on android
 
 As they are not available.
@@ -10,10 +10,10 @@ As they are not available.
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/src/hotspot/os/linux/os_linux.cpp b/src/hotspot/os/linux/os_linux.cpp
-index c41d459c1..7efca5710 100644
+index f41a83ebeba..190df2e87ab 100644
 --- a/src/hotspot/os/linux/os_linux.cpp
 +++ b/src/hotspot/os/linux/os_linux.cpp
-@@ -1870,11 +1870,12 @@ const char* os::Linux::dll_path(void* lib) {
+@@ -1935,11 +1935,12 @@ const char* os::Linux::dll_path(void* lib) {
    struct link_map *lmap;
    const char* l_path = nullptr;
    assert(lib != nullptr, "dll_path parameter must not be null");
@@ -28,5 +28,5 @@ index c41d459c1..7efca5710 100644
  }
  
 -- 
-2.45.2
+2.50.0
 
