@@ -1,14 +1,5 @@
 --- a/Makefile
 +++ b/Makefile
-@@ -10,7 +10,7 @@
- 
- # features (the more the better)
- ENABLE_TCL := 1
--ENABLE_ABC := 1
-+ENABLE_ABC := 0
- ENABLE_GLOB := 1
- ENABLE_PLUGINS := 1
- ENABLE_READLINE := 1
 @@ -222,7 +222,7 @@
  
  ifeq ($(CONFIG),clang)
@@ -18,3 +9,25 @@
  ifeq ($(ENABLE_LTO),1)
  LINKFLAGS += -fuse-ld=lld
  endif
+--- a/abc/Makefile
++++ b/abc/Makefile
+@@ -57,7 +57,7 @@ ARCHFLAGS := $(ARCHFLAGS)
+ 
+ OPTFLAGS  ?= -g -O
+ 
+-CFLAGS    += -Wall -Wno-unused-function -Wno-write-strings -Wno-sign-compare $(ARCHFLAGS)
++CFLAGS    += -Wall -Wno-unused-function -Wno-write-strings -Wno-sign-compare -Wno-c++11-narrowing $(ARCHFLAGS)
+ ifneq ($(findstring arm,$(shell uname -m)),)
+ 	CFLAGS += -DABC_MEMALIGN=4
+ endif
+@@ -76,8 +76,8 @@ ifndef ABC_USE_NO_CUDD
+   $(info $(MSG_PREFIX)Compiling with CUDD)
+ endif
+ 
+-ABC_READLINE_INCLUDES ?=
+-ABC_READLINE_LIBRARIES ?= -lreadline
++ABC_READLINE_INCLUDES ?= -I@TERMUX_PREFIX@/include -DNCURSES_WIDECHAR
++ABC_READLINE_LIBRARIES ?= -L@TERMUX_PREFIX@/lib -lreadline
+ 
+ # whether to use libreadline
+ ifndef ABC_USE_NO_READLINE
