@@ -3,11 +3,12 @@ TERMUX_PKG_DESCRIPTION="A framework for RTL synthesis tools"
 TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.55"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/YosysHQ/yosys
 TERMUX_PKG_GIT_BRANCH="v$TERMUX_PKG_VERSION"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+"
-TERMUX_PKG_DEPENDS="boost, graphviz, libandroid-glob, libandroid-spawn, libc++, libffi, readline, tcl, zlib, python"
+TERMUX_PKG_DEPENDS="boost, graphviz, libandroid-glob, libandroid-spawn, libc++, libffi, ncurses, readline, tcl, zlib, python"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="PREFIX=$TERMUX_PREFIX"
 
