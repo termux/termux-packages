@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://openjdk.java.net
 TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="21.0.7"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION="21.0.8"
 TERMUX_PKG_SRCURL=https://github.com/openjdk/jdk21u/archive/refs/tags/jdk-${TERMUX_PKG_VERSION}-ga.tar.gz
-TERMUX_PKG_SHA256=d8637e7d6fece0757b7fada49d32d0b3334a15a110445acef8cfea64b4672ca2
+TERMUX_PKG_SHA256=e0758d17991a51967931854523ca6e287eb4240f0b3e3bc231b2ddb0e77cf71b
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-shmem, libandroid-spawn, libiconv, libjpeg-turbo, zlib, littlecms"
 TERMUX_PKG_BUILD_DEPENDS="cups, fontconfig, libxrandr, libxt, xorgproto"
@@ -14,9 +13,8 @@ TERMUX_PKG_RECOMMENDS="ca-certificates-java, openjdk-21-x, resolv-conf"
 TERMUX_PKG_SUGGESTS="cups"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HAS_DEBUG=false
-# currently zgc and shenandoahgc would be auto enabled in server variant,
-# while these features is not supported on arm.
-# only leave lto here.
+# enable lto, but do not explicitly enable zgc or shenandoahgc because they
+# are automatically enabled for x86, but are not supported for arm.
 __jvm_features="link-time-opt"
 
 termux_pkg_auto_update() {
@@ -72,7 +70,7 @@ termux_step_configure() {
 		--with-toolchain-type=clang \
 		--with-extra-cflags="$CFLAGS $CPPFLAGS -DLE_STANDALONE -D__ANDROID__=1 -D__TERMUX__=1" \
 		--with-extra-cxxflags="$CXXFLAGS $CPPFLAGS -DLE_STANDALONE -D__ANDROID__=1 -D__TERMUX__=1" \
-		--with-extra-ldflags="${jdk_ldflags} -Wl,--as-needed -landroid-shmem -landroid-spawn" \
+		--with-extra-ldflags="${jdk_ldflags} -Wl,--as-needed -landroid-shmem -landroid-spawn -liconv" \
 		--with-cups-include="$TERMUX_PREFIX/include" \
 		--with-fontconfig-include="$TERMUX_PREFIX/include" \
 		--with-freetype-include="$TERMUX_PREFIX/include/freetype2" \
@@ -148,6 +146,10 @@ termux_step_post_make_install() {
 }
 
 termux_step_create_debscripts() {
+	# For older versions of openjdk-17 and openjdk-21, we used to provide different alternatives for each binary and manpage.
+	# This script removes those alternatives if the user is upgrading from an older version.
+	#
+	# Using slaves for all binaries and manpages makes it much easier to switch between different versions of openjdk.
 	local old_alternatives=(
 		java-profile
 		jar
