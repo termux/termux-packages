@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="17.0.16"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/openjdk/jdk17u/archive/refs/tags/jdk-${TERMUX_PKG_VERSION}-ga.tar.gz
 TERMUX_PKG_SHA256=bc339edfa44646fa3c80971237ba4681e43a28877912cda2839aa42a15f0c7e7
 TERMUX_PKG_AUTO_UPDATE=true
@@ -13,7 +14,8 @@ TERMUX_PKG_RECOMMENDS="ca-certificates-java, openjdk-17-x, resolv-conf"
 TERMUX_PKG_SUGGESTS="cups"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HAS_DEBUG=false
-# enable lto
+# enable lto, but do not explicitly enable zgc or shenandoahgc because they
+# are automatically enabled for x86, but are not supported for arm.
 __jvm_features="link-time-opt"
 
 termux_pkg_auto_update() {
@@ -69,7 +71,7 @@ termux_step_configure() {
 		--with-toolchain-type=clang \
 		--with-extra-cflags="$CFLAGS $CPPFLAGS -DLE_STANDALONE -D__ANDROID__=1 -D__TERMUX__=1" \
 		--with-extra-cxxflags="$CXXFLAGS $CPPFLAGS -DLE_STANDALONE -D__ANDROID__=1 -D__TERMUX__=1" \
-		--with-extra-ldflags="${jdk_ldflags} -Wl,--as-needed -landroid-shmem -landroid-spawn" \
+		--with-extra-ldflags="${jdk_ldflags} -Wl,--as-needed -landroid-shmem -landroid-spawn -liconv" \
 		--with-cups-include="$TERMUX_PREFIX/include" \
 		--with-fontconfig-include="$TERMUX_PREFIX/include" \
 		--with-freetype-include="$TERMUX_PREFIX/include/freetype2" \
@@ -209,6 +211,7 @@ termux_step_create_debscripts() {
 		rmiregistry.1.gz
 		serialver.1.gz
 	)
+	# For older versions
 	echo 'if [ "$#" = "3" ] && dpkg --compare-versions "$2" le "17.0.15-1"; then' > ./preinst
 	echo '  echo "Removing older alternatives for openjdk-21 and openjdk-17"' >> ./preinst
 	echo '  echo "This may take a while if mandoc package is installed, please wait..."' >> ./preinst
