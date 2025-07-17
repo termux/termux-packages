@@ -29,7 +29,7 @@ termux_parse_alternatives() {
 }
 
 termux_step_update_alternatives() {
-	printf '%s\n' "INFO: Processing 'update-alternatives' entries:" &> /dev/stderr
+	printf '%s\n' "INFO: Processing 'update-alternatives' entries:" 1>&2
 	for alternatives_file in "${TERMUX_PKG_BUILDER_DIR}"/*.alternatives; do
 		[[ -f "$alternatives_file" ]] || continue
 		local -a NAME=()
@@ -91,7 +91,7 @@ termux_step_update_alternatives() {
 		# Remove each group
 		for name in "${NAME[@]}"; do
 			# Log message for this alternative group
-			printf 'INFO: %s\n' "${name} -> ${ALTERNATIVE[$name]} (${PRIORITY[$name]})" &> /dev/stderr
+			printf 'INFO: %s\n' "${name} -> ${ALTERNATIVE[$name]} (${PRIORITY[$name]})" 1>&2
 			# Removal line
 			printf '%s\n' "    update-alternatives --remove \"${name}\" \"${TERMUX_PREFIX}/${ALTERNATIVE[$name]}\""
 		done
