@@ -1,13 +1,14 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/xyproto/o
+TERMUX_PKG_HOMEPAGE=https://roboticoverlords.org/orbiton/
 TERMUX_PKG_DESCRIPTION="Small, fast and limited text editor"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Alexander F. Rødseth <xyproto@archlinux.org>"
 TERMUX_PKG_VERSION="2.70.0"
-TERMUX_PKG_SRCURL=https://github.com/xyproto/o/archive/v$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://github.com/xyproto/orbiton/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=ab940369469a534311466621f8e65f712446aadc6a4016e9d912b68d420d5371
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_BREAKS="o"
-TERMUX_PKG_REPLACES="o"
+TERMUX_PKG_BREAKS="o, o-editor"
+TERMUX_PKG_REPLACES="o, o-editor"
 
 termux_step_make() {
 	termux_setup_golang
