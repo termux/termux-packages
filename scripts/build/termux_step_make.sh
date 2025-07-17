@@ -8,7 +8,7 @@ termux_step_make() {
 
 	if test -f build.ninja; then
 		ninja -j $TERMUX_PKG_MAKE_PROCESSES
-	elif ls ./*.cabal &>/dev/null; then
+	elif ls ./*.cabal &>/dev/null || ls ./cabal.project &>/dev/null; then
 		cabal --config="$TERMUX_CABAL_CONFIG" build
 	elif ls ./*akefile &>/dev/null || [ ! -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
