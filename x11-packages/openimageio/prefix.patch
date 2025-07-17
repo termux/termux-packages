@@ -1,0 +1,11 @@
+--- a/src/libOpenImageIO/imagebufalgo_draw.cpp
++++ b/src/libOpenImageIO/imagebufalgo_draw.cpp
+@@ -820,7 +820,7 @@ enumerate_fonts()
+                          + "/Library/Fonts");
+ #endif
+ #ifdef __linux__
+-    fontpath_add_one_dir("/usr/share/fonts", 1);
++    fontpath_add_one_dir("@TERMUX_PREFIX@/share/fonts", 1);
+     fontpath_add_one_dir("/usr/local/share/fonts", 1);
+     fontpath_add_one_dir(std::string(Sysutil::getenv("HOME")) + "/.fonts", 1);
+     fontpath_add_one_dir(std::string(Sysutil::getenv("HOME"))
