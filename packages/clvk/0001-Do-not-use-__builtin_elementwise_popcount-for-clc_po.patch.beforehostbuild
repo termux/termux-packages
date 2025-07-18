@@ -8,18 +8,16 @@ __builtin_elementwise_popcount is introduced in LLVM 20
 
 ---
  libclc/clc/lib/generic/SOURCES                |  1 -
- libclc/generic/include/integer/popcount.h     |  3 +++
- .../generic/include/integer/unary_intrin.inc  | 20 +++++++++++++++++++
- libclc/generic/lib/integer/popcount.cl        |  7 ++++---
- 4 files changed, 27 insertions(+), 4 deletions(-)
- create mode 100644 libclc/generic/include/integer/popcount.h
- create mode 100644 libclc/generic/include/integer/unary_intrin.inc
+ libclc/opencl/lib/generic/integer/popcount.cl | 26 ++++++++++++++++---
+ .../opencl/lib/generic/integer/popcount.inc   | 11 ++++++++
+ 3 files changed, 34 insertions(+), 4 deletions(-)
+ create mode 100644 libclc/opencl/lib/generic/integer/popcount.inc
 
 diff --git a/external/clspv/third_party/llvm/libclc/clc/lib/generic/SOURCES b/external/clspv/third_party/llvm/libclc/clc/lib/generic/SOURCES
-index f7688d044..b2ffcd18a 100644
+index d285bbba3..a116341ba 100644
 --- a/external/clspv/third_party/llvm/libclc/clc/lib/generic/SOURCES
 +++ b/external/clspv/third_party/llvm/libclc/clc/lib/generic/SOURCES
-@@ -12,7 +12,6 @@ integer/clc_mad24.cl
+@@ -22,7 +22,6 @@ integer/clc_mad24.cl
  integer/clc_mad_sat.cl
  integer/clc_mul24.cl
  integer/clc_mul_hi.cl
@@ -27,21 +25,21 @@ index f7688d044..b2ffcd18a 100644
  integer/clc_rhadd.cl
  integer/clc_rotate.cl
  integer/clc_sub_sat.cl
-diff --git a/external/clspv/third_party/llvm/libclc/generic/include/integer/popcount.h b/external/clspv/third_party/llvm/libclc/generic/include/integer/popcount.h
-new file mode 100644
-index 000000000..00c753753
---- /dev/null
-+++ b/external/clspv/third_party/llvm/libclc/generic/include/integer/popcount.h
-@@ -0,0 +1,3 @@
+diff --git a/external/clspv/third_party/llvm/libclc/opencl/lib/generic/integer/popcount.cl b/external/clspv/third_party/llvm/libclc/opencl/lib/generic/integer/popcount.cl
+index a349f4548..6559c1eda 100644
+--- a/external/clspv/third_party/llvm/libclc/opencl/lib/generic/integer/popcount.cl
++++ b/external/clspv/third_party/llvm/libclc/opencl/lib/generic/integer/popcount.cl
+@@ -6,10 +6,30 @@
+ //
+ //===----------------------------------------------------------------------===//
+ 
+-#include <clc/integer/clc_popcount.h>
+ #include <clc/opencl/clc.h>
+ 
+-#define FUNCTION popcount
+-#define __CLC_BODY <clc/shared/unary_def.inc>
 +#define __CLC_FUNCTION __clc_native_popcount
 +#define __CLC_INTRINSIC "llvm.ctpop"
-+#include <integer/unary_intrin.inc>
-diff --git a/external/clspv/third_party/llvm/libclc/generic/include/integer/unary_intrin.inc b/external/clspv/third_party/llvm/libclc/generic/include/integer/unary_intrin.inc
-new file mode 100644
-index 000000000..ee9862a4c
---- /dev/null
-+++ b/external/clspv/third_party/llvm/libclc/generic/include/integer/unary_intrin.inc
-@@ -0,0 +1,20 @@
 +#define __CLC_INTRINSIC_DEF(SCALAR_TYPE, BIT_SIZE) \
 +_CLC_OVERLOAD SCALAR_TYPE __CLC_FUNCTION(SCALAR_TYPE x) __asm(__CLC_INTRINSIC ".i" BIT_SIZE); \
 +_CLC_OVERLOAD SCALAR_TYPE##2 __CLC_FUNCTION(SCALAR_TYPE##2 x) __asm(__CLC_INTRINSIC ".v2i" BIT_SIZE); \
@@ -49,7 +47,7 @@ index 000000000..ee9862a4c
 +_CLC_OVERLOAD SCALAR_TYPE##4 __CLC_FUNCTION(SCALAR_TYPE##4 x) __asm(__CLC_INTRINSIC ".v4i" BIT_SIZE); \
 +_CLC_OVERLOAD SCALAR_TYPE##8 __CLC_FUNCTION(SCALAR_TYPE##8 x) __asm(__CLC_INTRINSIC ".v8i" BIT_SIZE); \
 +_CLC_OVERLOAD SCALAR_TYPE##16 __CLC_FUNCTION(SCALAR_TYPE##16 x) __asm(__CLC_INTRINSIC ".v16i" BIT_SIZE);
-+
+ 
 +__CLC_INTRINSIC_DEF(char, "8")
 +__CLC_INTRINSIC_DEF(uchar, "8")
 +__CLC_INTRINSIC_DEF(short, "16")
@@ -62,22 +60,26 @@ index 000000000..ee9862a4c
 +#undef __CLC_FUNCTION
 +#undef __CLC_INTRINSIC
 +#undef __CLC_INTRINSIC_DEF
-diff --git a/external/clspv/third_party/llvm/libclc/generic/lib/integer/popcount.cl b/external/clspv/third_party/llvm/libclc/generic/lib/integer/popcount.cl
-index 4e8a6ebab..ca83b1afa 100644
---- a/external/clspv/third_party/llvm/libclc/generic/lib/integer/popcount.cl
-+++ b/external/clspv/third_party/llvm/libclc/generic/lib/integer/popcount.cl
-@@ -1,7 +1,8 @@
- #include <clc/clc.h>
--#include <clc/integer/clc_popcount.h>
-+#include <integer/popcount.h>
- 
--#define FUNCTION popcount
--#define __CLC_BODY <clc/shared/unary_def.inc>
-+#define __CLC_FUNC popcount
-+#define __CLC_IMPL_FUNC __clc_native_popcount
- 
-+#define __CLC_BODY "../clc_unary.inc"
++
++#define __CLC_BODY <popcount.inc>
  #include <clc/integer/gentype.inc>
+diff --git a/external/clspv/third_party/llvm/libclc/opencl/lib/generic/integer/popcount.inc b/external/clspv/third_party/llvm/libclc/opencl/lib/generic/integer/popcount.inc
+new file mode 100644
+index 000000000..f16d01850
+--- /dev/null
++++ b/external/clspv/third_party/llvm/libclc/opencl/lib/generic/integer/popcount.inc
+@@ -0,0 +1,11 @@
++//===----------------------------------------------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++_CLC_OVERLOAD _CLC_DEF __CLC_GENTYPE popcount(__CLC_GENTYPE x) {
++  return __clc_native_popcount(x);
++}
 -- 
 2.43.0
 
