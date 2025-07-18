@@ -1,25 +1,25 @@
 --- a/src/netxs/desktopio/system.hpp
 +++ b/src/netxs/desktopio/system.hpp
-@@ -60,7 +60,9 @@
+@@ -59,7 +59,9 @@
+             #include <sys/kd.h>     // ::console_ioctl()
          #endif
          #include <linux/keyboard.h> // ::keyb_ioctl()
-         #include <linux/input.h>    // mouse button codes: BTN_LEFT ...
 +        #if !defined(__ANDROID__)
-         #include <libinput.h>       // libinput API
+         #include <linux/input.h>    // mouse button codes: BTN_LEFT ...
 +        #endif
-         #include <dlfcn.h>          // ::dlopen()
      #endif
  
-@@ -4718,7 +4720,7 @@
+     #if defined(__APPLE__)
+@@ -4699,7 +4701,7 @@
                  }
              });
          }
 -        #if defined(__linux__)
 +        #if defined(__linux__) && !defined(__ANDROID__)
-         namespace libinput
-         {
-             struct libinput;
-@@ -5254,7 +5256,7 @@
+     }
+ }
+         #include "lixx.hpp" // libinput++
+@@ -5188,7 +5190,7 @@
                      #endif
                      return state;
                  };
@@ -27,23 +27,23 @@
 +                #if defined(__linux__) && !defined(__ANDROID__)
                  if (dtvt::vtmode & ui::console::mouse) // Trying to get direct mouse access.
                  {
-                     if (auto li = os::tty::libinput::initialize())
-@@ -5829,7 +5831,7 @@
-                                   whlacc = fp2d{},
+                     if (auto li = lixx::initialize())
+@@ -5760,7 +5762,7 @@
+                                   timecod = time{},
                                    dev_map = std::unordered_map<arch, si32>{}]() mutable
                  {
 -                    #if defined(__linux__)
 +                    #if defined(__linux__) && !defined(__ANDROID__)
+                     using namespace netxs::lixx;
                      while (true)
                      {
-                         if (auto e = os::tty::libinput::next_event())
-@@ -5986,7 +5988,7 @@
+@@ -5911,7 +5913,7 @@
                                 micefd,       m_proc,
                                 alarm,        f_proc);
                  }
 -                #if defined(__linux__)
 +                #if defined(__linux__) && !defined(__ANDROID__)
-                 os::tty::libinput::uninitialize();
+                 lixx::uninitialize();
                  #endif
  
 --- a/src/vtm.cpp
@@ -54,16 +54,16 @@
          }
 -        #if defined(__linux__)
 +        #if defined(__linux__) && !defined(__ANDROID__)
-         else if (getopt.match("--SetMouseAccess"))
+         else if (getopt.match("-a", "--mouse"))
          {
-             os::dtvt::initialize();
-@@ -169,7 +169,7 @@
+             auto enabled = xml::take_or(getopt.next(), true);
+@@ -174,7 +174,7 @@
                  #if defined(WIN32)
                  "\n    -0, --session0       Use Session 0 to run Desktop Server in background."
                  #endif
 -                #if defined(__linux__)
 +                #if defined(__linux__) && !defined(__ANDROID__)
-                 "\n    --SetMouseAccess     Set mouse device access for all users in Linux. Elevated privileges required."
+                 "\n    -a, --mouse [mode]   Set/reset persistent access to mouse devices for all users."
+                 "\n                         Run 'sudo vtm --mouse 0' to reset access."
                  #endif
-                 "\n    -q, --quiet          Disable logging."
 
