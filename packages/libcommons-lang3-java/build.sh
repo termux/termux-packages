@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A host of helper utilities for the java.lang API"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.18.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://dlcdn.apache.org/commons/lang/source/commons-lang3-${TERMUX_PKG_VERSION}-src.tar.gz
 TERMUX_PKG_SHA256=4a94ddeb6a5819c5d0aa5678d16cf97a672b06398b93a0e4f90594032ca991f7
 TERMUX_PKG_AUTO_UPDATE=true
