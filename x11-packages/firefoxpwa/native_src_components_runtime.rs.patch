@@ -1,5 +1,3 @@
-diff --git a/native/src/components/runtime.rs b/native/src/components/runtime.rs
-index 4973cd5..4bed01a 100644
 --- a/native/src/components/runtime.rs
 +++ b/native/src/components/runtime.rs
 @@ -14,10 +14,17 @@ use crate::components::site::Site;
@@ -49,15 +47,15 @@ index 4973cd5..4bed01a 100644
          {
              use crate::storage::Storage;
  
-@@ -293,7 +311,7 @@ impl Runtime {
+@@ -302,7 +302,7 @@ impl Runtime {
  
                  source.push("core");
  
 -            } else if #[cfg(platform_linux)] {
 +            } else if #[cfg(any(platform_linux, platform_termux))] {
-                 use anyhow::bail;
                  use std::fs::File;
-                 use std::io::Read;
+                 use xz2::read::XzDecoder;
+                 use tar::Archive;
 @@ -354,7 +372,7 @@ impl Runtime {
          Ok(())
      }
@@ -67,6 +65,19 @@ index 4973cd5..4bed01a 100644
      pub fn link(&self) -> Result<()> {
          use std::fs::{copy, create_dir_all};
          use std::os::unix::fs::symlink;
+@@ -364,6 +364,12 @@ impl Runtime {
+ 
+         info!("Linking the runtime");
+ 
++        // Prevents 'No such file or directory (os error 2)' during 'firefoxpwa runtime install --link'
++        // by creating the '~/.local/share/firefoxpwa/runtime/' directory.
++        if !Path::new(&self.directory).exists() {
++            create_dir_all(&self.directory)?;
++        }
++
+         if Path::new(FFOX).exists() {
+             for entry in read_dir(FFOX)?.flatten() {
+                 let entry = entry.path();
 @@ -435,7 +453,7 @@ impl Runtime {
          copy(&source, &target, &options).context("Failed to patch the runtime")?;
  
