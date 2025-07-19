@@ -1,0 +1,542 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="IBusObject" get-type="ibus_object_get_type" parents="GInitiallyUnowned,GObject">
+    <signal name="destroy" return="void" when="last">
+    </signal>
+  </class>
+  <class name="IBusSerializable" get-type="ibus_serializable_get_type" parents="IBusObject,GInitiallyUnowned,GObject">
+  </class>
+  <class name="IBusAttribute" get-type="ibus_attribute_get_type" parents="IBusSerializable,IBusObject,GInitiallyUnowned,GObject">
+  </class>
+  <class name="IBusAttrList" get-type="ibus_attr_list_get_type" parents="IBusSerializable,IBusObject,GInitiallyUnowned,GObject">
+  </class>
+  <class name="IBusText" get-type="ibus_text_get_type" parents="IBusSerializable,IBusObject,GInitiallyUnowned,GObject">
+  </class>
+  <class name="IBusProxy" get-type="ibus_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <signal name="destroy" return="void" when="last">
+    </signal>
+  </class>
+  <class name="IBusService" get-type="ibus_service_get_type" parents="IBusObject,GInitiallyUnowned,GObject">
+    <property name="object-path" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="connection" type="GDBusConnection" flags="231"/>
+  </class>
+  <class name="IBusLookupTable" get-type="ibus_lookup_table_get_type" parents="IBusSerializable,IBusObject,GInitiallyUnowned,GObject">
+  </class>
+  <class name="IBusProperty" get-type="ibus_property_get_type" parents="IBusSerializable,IBusObject,GInitiallyUnowned,GObject">
+    <property name="key" type="gchararray" flags="11" default-value=""/>
+    <property name="icon" type="gchararray" flags="3" default-value=""/>
+    <property name="label" type="IBusText" flags="7"/>
+    <property name="symbol" type="IBusText" flags="7"/>
+    <property name="tooltip" type="IBusText" flags="3"/>
+    <property name="sensitive" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="visible" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="prop-type" type="IBusPropType" flags="11" default-value="PROP_TYPE_NORMAL"/>
+    <property name="state" type="IBusPropState" flags="3" default-value="PROP_STATE_UNCHECKED"/>
+    <property name="sub-props" type="IBusPropList" flags="3"/>
+  </class>
+  <class name="IBusPropList" get-type="ibus_prop_list_get_type" parents="IBusSerializable,IBusObject,GInitiallyUnowned,GObject">
+  </class>
+  <class name="IBusEngine" get-type="ibus_engine_get_type" parents="IBusService,IBusObject,GInitiallyUnowned,GObject">
+    <property name="engine-name" type="gchararray" flags="235" default-value="noname"/>
+    <property name="has-focus-id" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="active-surrounding-text" type="gboolean" flags="11" default-value="FALSE"/>
+    <signal name="process-key-event" return="gboolean" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="focus-in" return="void" when="last">
+    </signal>
+    <signal name="focus-in-id" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="focus-out" return="void" when="last">
+    </signal>
+    <signal name="focus-out-id" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="reset" return="void" when="last">
+    </signal>
+    <signal name="enable" return="void" when="last">
+    </signal>
+    <signal name="disable" return="void" when="last">
+    </signal>
+    <signal name="set-cursor-location" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="set-capabilities" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="page-up" return="void" when="last">
+    </signal>
+    <signal name="page-down" return="void" when="last">
+    </signal>
+    <signal name="cursor-up" return="void" when="last">
+    </signal>
+    <signal name="cursor-down" return="void" when="last">
+    </signal>
+    <signal name="candidate-clicked" return="void" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="property-activate" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="property-show" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="property-hide" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="process-hand-writing-event" return="void" when="last">
+      <param type="gpointer"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="cancel-hand-writing" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="set-surrounding-text" return="void" when="last">
+      <param type="GObject"/>
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="set-content-type" return="void" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+  </class>
+  <class name="IBusFactory" get-type="ibus_factory_get_type" parents="IBusService,IBusObject,GInitiallyUnowned,GObject">
+    <signal name="create-engine" return="IBusEngine" when="last">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="IBusEngineSimple" get-type="ibus_engine_simple_get_type" parents="IBusEngine,IBusService,IBusObject,GInitiallyUnowned,GObject">
+  </class>
+  <boxed name="IBusXML" get-type="ibus_xml_get_type"/>
+  <class name="IBusEngineDesc" get-type="ibus_engine_desc_get_type" parents="IBusSerializable,IBusObject,GInitiallyUnowned,GObject">
+    <property name="name" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="longname" type="gchararray" flags="11" default-value=""/>
+    <property name="description" type="gchararray" flags="11" default-value=""/>
+    <property name="language" type="gchararray" flags="11" default-value=""/>
+    <property name="license" type="gchararray" flags="11" default-value=""/>
+    <property name="author" type="gchararray" flags="11" default-value=""/>
+    <property name="icon" type="gchararray" flags="11" default-value="ibus-engine"/>
+    <property name="layout" type="gchararray" flags="11" default-value="us"/>
+    <property name="layout-variant" type="gchararray" flags="11" default-value=""/>
+    <property name="layout-option" type="gchararray" flags="11" default-value=""/>
+    <property name="rank" type="guint" flags="11" default-value="0"/>
+    <property name="hotkeys" type="gchararray" flags="11" default-value=""/>
+    <property name="symbol" type="gchararray" flags="11" default-value=""/>
+    <property name="setup" type="gchararray" flags="11" default-value=""/>
+    <property name="version" type="gchararray" flags="11" default-value=""/>
+    <property name="textdomain" type="gchararray" flags="11" default-value=""/>
+    <property name="icon-prop-key" type="gchararray" flags="11" default-value=""/>
+  </class>
+  <class name="IBusInputContext" get-type="ibus_input_context_get_type" parents="IBusProxy,GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <signal name="enabled" return="void" when="last">
+    </signal>
+    <signal name="disabled" return="void" when="last">
+    </signal>
+    <signal name="commit-text" return="void" when="last">
+      <param type="IBusText"/>
+    </signal>
+    <signal name="forward-key-event" return="void" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="delete-surrounding-text" return="void" when="last">
+      <param type="gint"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="update-preedit-text" return="void" when="last">
+      <param type="IBusText"/>
+      <param type="guint"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="update-preedit-text-with-mode" return="void" when="last">
+      <param type="IBusText"/>
+      <param type="guint"/>
+      <param type="gboolean"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="show-preedit-text" return="void" when="last">
+    </signal>
+    <signal name="hide-preedit-text" return="void" when="last">
+    </signal>
+    <signal name="update-auxiliary-text" return="void" when="last">
+      <param type="IBusText"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="show-auxiliary-text" return="void" when="last">
+    </signal>
+    <signal name="hide-auxiliary-text" return="void" when="last">
+    </signal>
+    <signal name="update-lookup-table" return="void" when="last">
+      <param type="IBusLookupTable"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="show-lookup-table" return="void" when="last">
+    </signal>
+    <signal name="hide-lookup-table" return="void" when="last">
+    </signal>
+    <signal name="page-up-lookup-table" return="void" when="last">
+    </signal>
+    <signal name="page-down-lookup-table" return="void" when="last">
+    </signal>
+    <signal name="cursor-up-lookup-table" return="void" when="last">
+    </signal>
+    <signal name="cursor-down-lookup-table" return="void" when="last">
+    </signal>
+    <signal name="register-properties" return="void" when="last">
+      <param type="IBusPropList"/>
+    </signal>
+    <signal name="update-property" return="void" when="last">
+      <param type="IBusProperty"/>
+    </signal>
+    <signal name="require-surrounding-text" return="void" when="last">
+    </signal>
+  </class>
+  <class name="IBusConfig" get-type="ibus_config_get_type" parents="IBusProxy,GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <signal name="value-changed" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+    </signal>
+  </class>
+  <class name="IBusObservedPath" get-type="ibus_observed_path_get_type" parents="IBusSerializable,IBusObject,GInitiallyUnowned,GObject">
+  </class>
+  <class name="IBusComponent" get-type="ibus_component_get_type" parents="IBusSerializable,IBusObject,GInitiallyUnowned,GObject">
+    <property name="name" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="description" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="version" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="license" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="author" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="homepage" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="command-line" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="textdomain" type="gchararray" flags="11" default-value="NULL"/>
+  </class>
+  <class name="IBusExtensionEvent" get-type="ibus_extension_event_get_type" parents="IBusSerializable,IBusObject,GInitiallyUnowned,GObject">
+    <property name="version" type="guint" flags="1" default-value="1"/>
+    <property name="name" type="gchararray" flags="11" default-value=""/>
+    <property name="is-enabled" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="is-extension" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="params" type="gchararray" flags="11" default-value=""/>
+  </class>
+  <class name="IBusXEvent" get-type="ibus_x_event_get_type" parents="IBusSerializable,IBusObject,GInitiallyUnowned,GObject">
+    <property name="version" type="guint" flags="1" default-value="1"/>
+    <property name="event-type" type="gint" flags="11" default-value="-1"/>
+    <property name="window" type="guint" flags="11" default-value="0"/>
+    <property name="send-event" type="gint" flags="11" default-value="0"/>
+    <property name="serial" type="gulong" flags="11" default-value="0"/>
+    <property name="time" type="guint" flags="11" default-value="0"/>
+    <property name="state" type="guint" flags="11" default-value="0"/>
+    <property name="keyval" type="guint" flags="11" default-value="0"/>
+    <property name="length" type="gint" flags="11" default-value="0"/>
+    <property name="string" type="gchararray" flags="11" default-value=""/>
+    <property name="hardware-keycode" type="guint" flags="11" default-value="0"/>
+    <property name="group" type="guint" flags="11" default-value="0"/>
+    <property name="is-modifier" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="root" type="guint" flags="11" default-value="0"/>
+    <property name="subwindow" type="guint" flags="11" default-value="0"/>
+    <property name="x" type="gint" flags="11" default-value="0"/>
+    <property name="y" type="gint" flags="11" default-value="0"/>
+    <property name="x-root" type="gint" flags="11" default-value="0"/>
+    <property name="y-root" type="gint" flags="11" default-value="0"/>
+    <property name="same-screen" type="gboolean" flags="11" default-value="TRUE"/>
+    <property name="purpose" type="gchararray" flags="11" default-value=""/>
+  </class>
+  <class name="IBusBus" get-type="ibus_bus_get_type" parents="IBusObject,GInitiallyUnowned,GObject">
+    <property name="connect-async" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="client-only" type="gboolean" flags="11" default-value="FALSE"/>
+    <signal name="connected" return="void" when="last">
+    </signal>
+    <signal name="disconnected" return="void" when="last">
+    </signal>
+    <signal name="global-engine-changed" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="name-owner-changed" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="global-shortcut-key-responded" return="void" when="last">
+      <param type="guchar"/>
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="gboolean"/>
+    </signal>
+  </class>
+  <class name="IBusKeymap" get-type="ibus_keymap_get_type" parents="IBusObject,GInitiallyUnowned,GObject">
+  </class>
+  <enum name="IBusAttrType" get-type="ibus_attr_type_get_type">
+    <member name="IBUS_ATTR_TYPE_UNDERLINE" nick="underline" value="1"/>
+    <member name="IBUS_ATTR_TYPE_FOREGROUND" nick="foreground" value="2"/>
+    <member name="IBUS_ATTR_TYPE_BACKGROUND" nick="background" value="3"/>
+  </enum>  <enum name="IBusAttrUnderline" get-type="ibus_attr_underline_get_type">
+    <member name="IBUS_ATTR_UNDERLINE_NONE" nick="none" value="0"/>
+    <member name="IBUS_ATTR_UNDERLINE_SINGLE" nick="single" value="1"/>
+    <member name="IBUS_ATTR_UNDERLINE_DOUBLE" nick="double" value="2"/>
+    <member name="IBUS_ATTR_UNDERLINE_LOW" nick="low" value="3"/>
+    <member name="IBUS_ATTR_UNDERLINE_ERROR" nick="error" value="4"/>
+  </enum>  <enum name="IBusAttrPreedit" get-type="ibus_attr_preedit_get_type">
+    <member name="IBUS_ATTR_PREEDIT_DEFAULT" nick="default" value="0"/>
+    <member name="IBUS_ATTR_PREEDIT_NONE" nick="none" value="1"/>
+    <member name="IBUS_ATTR_PREEDIT_WHOLE" nick="whole" value="2"/>
+    <member name="IBUS_ATTR_PREEDIT_SELECTION" nick="selection" value="3"/>
+    <member name="IBUS_ATTR_PREEDIT_PREDICTION" nick="prediction" value="4"/>
+    <member name="IBUS_ATTR_PREEDIT_PREFIX" nick="prefix" value="5"/>
+    <member name="IBUS_ATTR_PREEDIT_SUFFIX" nick="suffix" value="6"/>
+    <member name="IBUS_ATTR_PREEDIT_ERROR_SPELLING" nick="error-spelling" value="7"/>
+    <member name="IBUS_ATTR_PREEDIT_ERROR_COMPOSE" nick="error-compose" value="8"/>
+  </enum>  <enum name="IBusBusGlobalBindingType" get-type="ibus_bus_global_binding_type_get_type">
+    <member name="IBUS_BUS_GLOBAL_BINDING_TYPE_ANY" nick="any" value="0"/>
+    <member name="IBUS_BUS_GLOBAL_BINDING_TYPE_IME_SWITCHER" nick="ime-switcher" value="1"/>
+    <member name="IBUS_BUS_GLOBAL_BINDING_TYPE_EMOJI_TYPING" nick="emoji-typing" value="2"/>
+  </enum>  <flags name="IBusObjectFlags" get-type="ibus_object_flags_get_type">
+    <member name="IBUS_IN_DESTRUCTION" nick="in-destruction" value="1"/>
+    <member name="IBUS_DESTROYED" nick="destroyed" value="2"/>
+    <member name="IBUS_RESERVED_1" nick="reserved-1" value="4"/>
+    <member name="IBUS_RESERVED_2" nick="reserved-2" value="8"/>
+  </flags>
+  <enum name="IBusPropType" get-type="ibus_prop_type_get_type">
+    <member name="PROP_TYPE_NORMAL" nick="normal" value="0"/>
+    <member name="PROP_TYPE_TOGGLE" nick="toggle" value="1"/>
+    <member name="PROP_TYPE_RADIO" nick="radio" value="2"/>
+    <member name="PROP_TYPE_MENU" nick="menu" value="3"/>
+    <member name="PROP_TYPE_SEPARATOR" nick="separator" value="4"/>
+  </enum>  <enum name="IBusPropState" get-type="ibus_prop_state_get_type">
+    <member name="PROP_STATE_UNCHECKED" nick="unchecked" value="0"/>
+    <member name="PROP_STATE_CHECKED" nick="checked" value="1"/>
+    <member name="PROP_STATE_INCONSISTENT" nick="inconsistent" value="2"/>
+  </enum>  <flags name="IBusModifierType" get-type="ibus_modifier_type_get_type">
+    <member name="IBUS_SHIFT_MASK" nick="shift-mask" value="1"/>
+    <member name="IBUS_LOCK_MASK" nick="lock-mask" value="2"/>
+    <member name="IBUS_CONTROL_MASK" nick="control-mask" value="4"/>
+    <member name="IBUS_MOD1_MASK" nick="mod1-mask" value="8"/>
+    <member name="IBUS_MOD2_MASK" nick="mod2-mask" value="16"/>
+    <member name="IBUS_MOD3_MASK" nick="mod3-mask" value="32"/>
+    <member name="IBUS_MOD4_MASK" nick="mod4-mask" value="64"/>
+    <member name="IBUS_MOD5_MASK" nick="mod5-mask" value="128"/>
+    <member name="IBUS_BUTTON1_MASK" nick="button1-mask" value="256"/>
+    <member name="IBUS_BUTTON2_MASK" nick="button2-mask" value="512"/>
+    <member name="IBUS_BUTTON3_MASK" nick="button3-mask" value="1024"/>
+    <member name="IBUS_BUTTON4_MASK" nick="button4-mask" value="2048"/>
+    <member name="IBUS_BUTTON5_MASK" nick="button5-mask" value="4096"/>
+    <member name="IBUS_HANDLED_MASK" nick="handled-mask" value="16777216"/>
+    <member name="IBUS_FORWARD_MASK" nick="forward-mask" value="33554432"/>
+    <member name="IBUS_IGNORED_MASK" nick="ignored-mask" value="33554432"/>
+    <member name="IBUS_SUPER_MASK" nick="super-mask" value="67108864"/>
+    <member name="IBUS_HYPER_MASK" nick="hyper-mask" value="134217728"/>
+    <member name="IBUS_META_MASK" nick="meta-mask" value="268435456"/>
+    <member name="IBUS_RELEASE_MASK" nick="release-mask" value="1073741824"/>
+    <member name="IBUS_MODIFIER_MASK" nick="modifier-mask" value="1593843711"/>
+  </flags>
+  <flags name="IBusCapabilite" get-type="ibus_capabilite_get_type">
+    <member name="IBUS_CAP_PREEDIT_TEXT" nick="preedit-text" value="1"/>
+    <member name="IBUS_CAP_AUXILIARY_TEXT" nick="auxiliary-text" value="2"/>
+    <member name="IBUS_CAP_LOOKUP_TABLE" nick="lookup-table" value="4"/>
+    <member name="IBUS_CAP_FOCUS" nick="focus" value="8"/>
+    <member name="IBUS_CAP_PROPERTY" nick="property" value="16"/>
+    <member name="IBUS_CAP_SURROUNDING_TEXT" nick="surrounding-text" value="32"/>
+    <member name="IBUS_CAP_OSK" nick="osk" value="64"/>
+    <member name="IBUS_CAP_SYNC_PROCESS_KEY" nick="sync-process-key" value="128"/>
+    <member name="IBUS_CAP_SYNC_PROCESS_KEY_V2" nick="sync-process-key-v2" value="128"/>
+  </flags>
+  <enum name="IBusPreeditFocusMode" get-type="ibus_preedit_focus_mode_get_type">
+    <member name="IBUS_ENGINE_PREEDIT_CLEAR" nick="clear" value="0"/>
+    <member name="IBUS_ENGINE_PREEDIT_COMMIT" nick="commit" value="1"/>
+  </enum>  <enum name="IBusOrientation" get-type="ibus_orientation_get_type">
+    <member name="IBUS_ORIENTATION_HORIZONTAL" nick="horizontal" value="0"/>
+    <member name="IBUS_ORIENTATION_VERTICAL" nick="vertical" value="1"/>
+    <member name="IBUS_ORIENTATION_SYSTEM" nick="system" value="2"/>
+  </enum>  <flags name="IBusBusNameFlag" get-type="ibus_bus_name_flag_get_type">
+    <member name="IBUS_BUS_NAME_FLAG_ALLOW_REPLACEMENT" nick="allow-replacement" value="1"/>
+    <member name="IBUS_BUS_NAME_FLAG_REPLACE_EXISTING" nick="replace-existing" value="2"/>
+    <member name="IBUS_BUS_NAME_FLAG_DO_NOT_QUEUE" nick="do-not-queue" value="4"/>
+  </flags>
+  <enum name="IBusBusRequestNameReply" get-type="ibus_bus_request_name_reply_get_type">
+    <member name="IBUS_BUS_REQUEST_NAME_REPLY_PRIMARY_OWNER" nick="primary-owner" value="1"/>
+    <member name="IBUS_BUS_REQUEST_NAME_REPLY_IN_QUEUE" nick="in-queue" value="2"/>
+    <member name="IBUS_BUS_REQUEST_NAME_REPLY_EXISTS" nick="exists" value="3"/>
+    <member name="IBUS_BUS_REQUEST_NAME_REPLY_ALREADY_OWNER" nick="already-owner" value="4"/>
+  </enum>  <enum name="IBusBusStartServiceByNameReply" get-type="ibus_bus_start_service_by_name_reply_get_type">
+    <member name="IBUS_BUS_START_REPLY_SUCCESS" nick="success" value="1"/>
+    <member name="IBUS_BUS_START_REPLY_ALREADY_RUNNING" nick="already-running" value="2"/>
+  </enum>  <enum name="IBusError" get-type="ibus_error_get_type">
+    <member name="IBUS_ERROR_NO_ENGINE" nick="no-engine" value="0"/>
+    <member name="IBUS_ERROR_NO_CONFIG" nick="no-config" value="1"/>
+    <member name="IBUS_ERROR_FAILED" nick="failed" value="2"/>
+  </enum>  <enum name="IBusInputPurpose" get-type="ibus_input_purpose_get_type">
+    <member name="IBUS_INPUT_PURPOSE_FREE_FORM" nick="free-form" value="0"/>
+    <member name="IBUS_INPUT_PURPOSE_ALPHA" nick="alpha" value="1"/>
+    <member name="IBUS_INPUT_PURPOSE_DIGITS" nick="digits" value="2"/>
+    <member name="IBUS_INPUT_PURPOSE_NUMBER" nick="number" value="3"/>
+    <member name="IBUS_INPUT_PURPOSE_PHONE" nick="phone" value="4"/>
+    <member name="IBUS_INPUT_PURPOSE_URL" nick="url" value="5"/>
+    <member name="IBUS_INPUT_PURPOSE_EMAIL" nick="email" value="6"/>
+    <member name="IBUS_INPUT_PURPOSE_NAME" nick="name" value="7"/>
+    <member name="IBUS_INPUT_PURPOSE_PASSWORD" nick="password" value="8"/>
+    <member name="IBUS_INPUT_PURPOSE_PIN" nick="pin" value="9"/>
+    <member name="IBUS_INPUT_PURPOSE_TERMINAL" nick="terminal" value="10"/>
+  </enum>  <flags name="IBusInputHints" get-type="ibus_input_hints_get_type">
+    <member name="IBUS_INPUT_HINT_NONE" nick="none" value="0"/>
+    <member name="IBUS_INPUT_HINT_SPELLCHECK" nick="spellcheck" value="1"/>
+    <member name="IBUS_INPUT_HINT_NO_SPELLCHECK" nick="no-spellcheck" value="2"/>
+    <member name="IBUS_INPUT_HINT_WORD_COMPLETION" nick="word-completion" value="4"/>
+    <member name="IBUS_INPUT_HINT_LOWERCASE" nick="lowercase" value="8"/>
+    <member name="IBUS_INPUT_HINT_UPPERCASE_CHARS" nick="uppercase-chars" value="16"/>
+    <member name="IBUS_INPUT_HINT_UPPERCASE_WORDS" nick="uppercase-words" value="32"/>
+    <member name="IBUS_INPUT_HINT_UPPERCASE_SENTENCES" nick="uppercase-sentences" value="64"/>
+    <member name="IBUS_INPUT_HINT_INHIBIT_OSK" nick="inhibit-osk" value="128"/>
+    <member name="IBUS_INPUT_HINT_VERTICAL_WRITING" nick="vertical-writing" value="256"/>
+    <member name="IBUS_INPUT_HINT_EMOJI" nick="emoji" value="512"/>
+    <member name="IBUS_INPUT_HINT_NO_EMOJI" nick="no-emoji" value="1024"/>
+    <member name="IBUS_INPUT_HINT_PRIVATE" nick="private" value="2048"/>
+  </flags>
+  <enum name="IBusXEventType" get-type="ibus_xevent_type_get_type">
+    <member name="IBUS_X_EVENT_NOTHING" nick="nothing" value="-1"/>
+    <member name="IBUS_X_EVENT_KEY_PRESS" nick="key-press" value="0"/>
+    <member name="IBUS_X_EVENT_KEY_RELEASE" nick="key-release" value="1"/>
+    <member name="IBUS_X_EVENT_OTHER" nick="other" value="2"/>
+    <member name="IBUS_X_EVENT_EVENT_LAST" nick="event-last" value="3"/>
+  </enum>  <class name="IBusHotkeyProfile" get-type="ibus_hotkey_profile_get_type" parents="IBusSerializable,IBusObject,GInitiallyUnowned,GObject">
+    <signal name="trigger" return="void" when="last" detailed="1">
+      <param type="guint"/>
+      <param type="gpointer"/>
+    </signal>
+  </class>
+  <class name="IBusConfigService" get-type="ibus_config_service_get_type" parents="IBusService,IBusObject,GInitiallyUnowned,GObject">
+  </class>
+  <class name="IBusPanelService" get-type="ibus_panel_service_get_type" parents="IBusService,IBusObject,GInitiallyUnowned,GObject">
+    <signal name="process-key-event" return="gboolean" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="focus-in" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="focus-out" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="reset" return="void" when="last">
+    </signal>
+    <signal name="set-cursor-location" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="set-content-type" return="void" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="update-preedit-text" return="void" when="last">
+      <param type="IBusText"/>
+      <param type="guint"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="show-preedit-text" return="void" when="last">
+    </signal>
+    <signal name="hide-preedit-text" return="void" when="last">
+    </signal>
+    <signal name="update-auxiliary-text" return="void" when="last">
+      <param type="IBusText"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="show-auxiliary-text" return="void" when="last">
+    </signal>
+    <signal name="hide-auxiliary-text" return="void" when="last">
+    </signal>
+    <signal name="update-lookup-table" return="void" when="last">
+      <param type="IBusLookupTable"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="show-lookup-table" return="void" when="last">
+    </signal>
+    <signal name="hide-lookup-table" return="void" when="last">
+    </signal>
+    <signal name="page-up-lookup-table" return="void" when="last">
+    </signal>
+    <signal name="page-down-lookup-table" return="void" when="last">
+    </signal>
+    <signal name="cursor-up-lookup-table" return="void" when="last">
+    </signal>
+    <signal name="cursor-down-lookup-table" return="void" when="last">
+    </signal>
+    <signal name="register-properties" return="void" when="last">
+      <param type="IBusPropList"/>
+    </signal>
+    <signal name="update-property" return="void" when="last">
+      <param type="IBusProperty"/>
+    </signal>
+    <signal name="set-cursor-location-relative" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="hide-language-bar" return="void" when="last">
+    </signal>
+    <signal name="show-language-bar" return="void" when="last">
+    </signal>
+    <signal name="start-setup" return="void" when="last">
+    </signal>
+    <signal name="state-changed" return="void" when="last">
+    </signal>
+    <signal name="destroy-context" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="panel-extension-received" return="void" when="last">
+      <param type="IBusExtensionEvent"/>
+    </signal>
+    <signal name="commit-text-received" return="void" when="last">
+      <param type="IBusText"/>
+    </signal>
+    <signal name="candidate-clicked-lookup-table" return="void" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+  </class>
+  <class name="IBusRegistry" get-type="ibus_registry_get_type" parents="IBusSerializable,IBusObject,GInitiallyUnowned,GObject">
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="IBusEmojiData" get-type="ibus_emoji_data_get_type" parents="IBusSerializable,IBusObject,GInitiallyUnowned,GObject">
+    <property name="emoji" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="annotations" type="gpointer" flags="7"/>
+    <property name="description" type="gchararray" flags="7" default-value=""/>
+    <property name="category" type="gchararray" flags="11" default-value=""/>
+  </class>
+  <class name="IBusUnicodeData" get-type="ibus_unicode_data_get_type" parents="IBusSerializable,IBusObject,GInitiallyUnowned,GObject">
+    <property name="code" type="guint" flags="11" default-value="0"/>
+    <property name="name" type="gchararray" flags="7" default-value=""/>
+    <property name="alias" type="gchararray" flags="7" default-value=""/>
+    <property name="block-name" type="gchararray" flags="7" default-value=""/>
+  </class>
+  <class name="IBusUnicodeBlock" get-type="ibus_unicode_block_get_type" parents="IBusSerializable,IBusObject,GInitiallyUnowned,GObject">
+    <property name="name" type="gchararray" flags="7" default-value=""/>
+    <property name="start" type="guint" flags="11" default-value="0"/>
+    <property name="end" type="guint" flags="11" default-value="0"/>
+  </class>
+  <error-quark function="ibus_error_quark" domain="ibus-error-quark"/>
+</dump>

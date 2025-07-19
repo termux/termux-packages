@@ -1,0 +1,42 @@
+--- a/daemon/gdm-session-worker.c
++++ b/daemon/gdm-session-worker.c
+@@ -30,7 +30,9 @@
+ #include <sys/wait.h>
+ #include <sys/ioctl.h>
+ #include <sys/vt.h>
++#ifndef __ANDROID__
+ #include <sys/kd.h>
++#endif
+ #include <errno.h>
+ #include <grp.h>
+ #include <pwd.h>
+@@ -1037,6 +1039,7 @@
+                 goto out;
+         }
+ 
++#if defined(KDGETMODE) && defined(KD_TEXT)
+         if (ioctl (tty_fd, KDGETMODE, &kernel_display_mode) < 0) {
+                 g_debug ("GdmSessionWorker: couldn't query kernel display mode: %m");
+                 succeeded = FALSE;
+@@ -1045,6 +1048,7 @@
+         if (kernel_display_mode == KD_TEXT) {
+                 goto out;
+         }
++#endif
+ 
+         /* VT is in the anti-social state of VT_AUTO + KD_GRAPHICS,
+          * fix it.
+--- a/daemon/gdm-session-worker.c
++++ b/daemon/gdm-session-worker.c
+@@ -1090,9 +1122,11 @@ jump_to_vt (GdmSessionWorker  *worker,
+                 handle_terminal_vt_switches (worker, fd);
+ 
+                 g_debug ("GdmSessionWorker: first setting graphics mode to prevent flicker");
++#if defined(KDSETMODE) && defined(KD_GRAPHICS)
+                 if (ioctl (fd, KDSETMODE, KD_GRAPHICS) < 0) {
+                         g_debug ("GdmSessionWorker: couldn't set graphics mode: %m");
+                 }
++#endif
+         } else {
+                 fd = active_vt_tty_fd;
+         }
