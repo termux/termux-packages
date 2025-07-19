@@ -1,0 +1,47 @@
+AllowedDependencies is only used for the testsuite
+LLDB_PACKAGE is replaced with the absolute path to $TERMUX_PREFIX in lldb-paths.patch
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -19,8 +19,6 @@ message("Version ${VERSION}")
+ set(LLDB_PACKAGE $ENV{LLDB_PACKAGE} CACHE PATH "Zip archive containing LLDB files")
+ if (LLDB_PACKAGE)
+     message("Using LLDB_PACKAGE=${LLDB_PACKAGE}")
+-else()
+-    message(FATAL_ERROR "LLDB_PACKAGE not set." )
+ endif()
+ 
+ if (CMAKE_SYSROOT)
+@@ -34,7 +34,17 @@ set(WithEnv ${CMAKE_COMMAND} -E env)
+ set(UpdateFile ${CMAKE_COMMAND} -E copy_if_different)
+ 
+ # General OS-specific definitions
+-if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
++if (${CMAKE_SYSTEM_NAME} STREQUAL "Android")
++    set(Python python3)
++    set(LibPrefix lib)
++    set(LibSuffix .a)
++    set(DylibSuffix .so)
++    set(NPM npm)
++    set(PathSep ":")
++    set(DefaultTarget "${CARGO_TARGET_NAME}")
++    set(DefaultPlatformId "${VSIX_PLATFORM}")
++    set(AllowedDependencies "N/A")
++elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+     set(Python python3)
+     set(LibPrefix lib)
+     set(LibSuffix .a)
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -98,10 +108,9 @@ endif()
+ # Adapter
+ 
+ add_subdirectory(adapter)
+-add_subdirectory(lldb)
+ add_subdirectory(lang_support)
+ 
+-add_dependencies(adapter lldb lang_support)
++add_dependencies(adapter lang_support)
+ 
+ if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+     configure_file(cargo_config.windows.toml ${CMAKE_BINARY_DIR}/.cargo/config.toml)
