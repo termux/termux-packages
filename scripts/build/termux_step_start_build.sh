@@ -19,6 +19,24 @@ termux_step_start_build() {
 		# Enable python setting
 		TERMUX_PKG_SETUP_PYTHON=true
 	fi
+	if [ -z "$TERMUX_PKG_PYTHON_RUNTIME_DEPS" ]; then
+		TERMUX_PKG_PYTHON_RUNTIME_DEPS="$TERMUX_PKG_PYTHON_TARGET_DEPS"
+	fi
+	if [ "$TERMUX_PKG_PYTHON_RUNTIME_DEPS" = "false" ]; then
+		TERMUX_PKG_PYTHON_RUNTIME_DEPS=""
+	fi
+	# Add python-pip{-glibc} dependency if plan to install python modules
+	if [ -n "$TERMUX_PKG_PYTHON_RUNTIME_DEPS" ]; then
+		local TERMUX_PKG_NAME_PIP="python-pip"
+		if [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
+			TERMUX_PKG_NAME_PIP+="-glibc"
+		fi
+		if [ -n "$TERMUX_PKG_DEPENDS" ]; then
+			TERMUX_PKG_DEPENDS+=", $TERMUX_PKG_NAME_PIP"
+		else
+			TERMUX_PKG_DEPENDS="$TERMUX_PKG_NAME_PIP"
+		fi
+	fi
 
 	TERMUX_PKG_FULLVERSION=$TERMUX_PKG_VERSION
 	if [ "$TERMUX_PKG_REVISION" != "0" ] || [ "$TERMUX_PKG_FULLVERSION" != "${TERMUX_PKG_FULLVERSION/-/}" ]; then
