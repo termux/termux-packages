@@ -1,0 +1,19 @@
+https://github.com/termux/termux-packages/issues/25322
+
+--- a/codon/cir/llvm/llvisitor.cpp
++++ b/codon/cir/llvm/llvisitor.cpp
+@@ -402,9 +402,12 @@
+   if (optimize)
+     runLLVMPipeline();
+   auto fo = fopen(filename.c_str(), "w");
+-  llvm::raw_fd_ostream fout(fileno(fo), true);
++  {
++  llvm::raw_fd_ostream fout(fileno(fo), false);
+   fout << *M;
+-  fout.close();
++  fout.flush();
++  }
++  fclose(fo);
+ }
+ 
+ namespace {
