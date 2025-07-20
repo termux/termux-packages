@@ -109,10 +109,12 @@ termux_step_host_build() {
 		done
 
 		# Also we should import pkg-config configuration files from the packages we imported from ubuntu repos
-		export PKG_CONFIG_LIBDIR="/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig"
-		PKG_CONFIG_LIBDIR+=":$_PREFIX/usr/lib/x86_64-linux-gnu/pkgconfig"
+		_LIBDIR="$_PREFIX/usr/lib/x86_64-linux-gnu"
+		export PKG_CONFIG_LIBDIR="$_LIBDIR/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig"
 		export CFLAGS="-I$_PREFIX/usr/include"
-		export LDFLAGS="-Wl,-rpath,$_PREFIX/usr/lib/x86_64-linux-gnu"
+		export LDFLAGS="-Wl,-rpath,$_LIBDIR"
+		export CMAKE_INCLUDE_PATH="$_PREFIX/usr/include:$_LIBDIR/gtk-2.0/include"
+		export CMAKE_LIBRARY_PATH="$_LIBDIR"
 		cmake -GNinja -B "$TERMUX_PKG_HOSTBUILD_DIR" -S "$TERMUX_PKG_SRCDIR" -DCMAKE_BUILD_TYPE=Release
 		ninja -C "$TERMUX_PKG_HOSTBUILD_DIR" image-compiler
 	)
