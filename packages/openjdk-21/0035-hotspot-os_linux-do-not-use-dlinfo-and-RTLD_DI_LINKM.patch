@@ -1,4 +1,4 @@
-From e51f4b12c11505f48a783f91b6d3680f5215e1ad Mon Sep 17 00:00:00 2001
+From 90ce2d21d76393fb385d8823eb2473e112e20ed1 Mon Sep 17 00:00:00 2001
 From: Henrik Grimler <grimler@termux.dev>
 Date: Sun, 31 Mar 2024 20:20:05 +0200
 Subject: [PATCH 35/40] hotspot: os_linux: do not use dlinfo and
@@ -10,10 +10,10 @@ As they are not available.
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/src/hotspot/os/linux/os_linux.cpp b/src/hotspot/os/linux/os_linux.cpp
-index f41a83ebeba..190df2e87ab 100644
+index e1e82503e46..1f378c87c95 100644
 --- a/src/hotspot/os/linux/os_linux.cpp
 +++ b/src/hotspot/os/linux/os_linux.cpp
-@@ -1935,11 +1935,12 @@ const char* os::Linux::dll_path(void* lib) {
+@@ -1933,11 +1933,12 @@ const char* os::Linux::dll_path(void* lib) {
    struct link_map *lmap;
    const char* l_path = nullptr;
    assert(lib != nullptr, "dll_path parameter must not be null");
