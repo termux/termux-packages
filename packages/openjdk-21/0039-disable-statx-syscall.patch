@@ -1,8 +1,17 @@
-From f97ac55d7949045c6ec39195ade04cf2cba4d709 Mon Sep 17 00:00:00 2001
+From 914124d7ad97d2654932a8febc794bea7d6d4682 Mon Sep 17 00:00:00 2001
 From: Robert Kirkman <31490854+robertkirkman@users.noreply.github.com>
 Date: Fri, 11 Jul 2025 14:52:14 +0800
 Subject: [PATCH 39/40] disable statx syscall
 
+This turns off dynamically loading the statx() symbol, which has the
+same effect as reverting
+https://github.com/openjdk/jdk21u/commit/4cf572e3b99b675418e456e7815fb6fd79245e30
+,
+which was fixing https://bugs.openjdk.org/browse/JDK-8316304 ,
+because on some devices, for some reason it causes launching any JAR to
+crash the Java runtime.
+
+Fixes https://github.com/termux/termux-packages/issues/24651
 ---
  src/java.base/unix/native/libnio/fs/UnixNativeDispatcher.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

@@ -1,4 +1,4 @@
-From c5c06ff0ad56d3b6ec013f352e3a60c28dd43467 Mon Sep 17 00:00:00 2001
+From 88e6b658bd199afc082618a10c7b7dca50395021 Mon Sep 17 00:00:00 2001
 From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
 Date: Sun, 6 Jun 2021 20:11:11 +0700
 Subject: [PATCH 02/40] os_linux: add android checks and fixes
@@ -8,10 +8,10 @@ Subject: [PATCH 02/40] os_linux: add android checks and fixes
  1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/src/hotspot/os/linux/os_linux.cpp b/src/hotspot/os/linux/os_linux.cpp
-index 5ebd57fb300..77057c1d39c 100644
+index bfd55895ab8..f5f1f02c0c1 100644
 --- a/src/hotspot/os/linux/os_linux.cpp
 +++ b/src/hotspot/os/linux/os_linux.cpp
-@@ -143,7 +143,7 @@
+@@ -141,7 +141,7 @@
  // for timer info max values which include all bits
  #define ALL_64_BITS CONST64(0xFFFFFFFFFFFFFFFF)
  
@@ -20,7 +20,7 @@ index 5ebd57fb300..77057c1d39c 100644
  // dlvsym is not a part of POSIX
  // and musl libc doesn't implement it.
  static void *dlvsym(void *handle,
-@@ -582,6 +582,7 @@ void os::init_system_properties_values() {
+@@ -580,6 +580,7 @@ void os::init_system_properties_values() {
  // detecting pthread library
  
  void os::Linux::libpthread_init() {
@@ -28,7 +28,7 @@ index 5ebd57fb300..77057c1d39c 100644
    // Save glibc and pthread version strings.
  #if !defined(_CS_GNU_LIBC_VERSION) || \
      !defined(_CS_GNU_LIBPTHREAD_VERSION)
-@@ -606,6 +607,9 @@ void os::Linux::libpthread_init() {
+@@ -604,6 +605,9 @@ void os::Linux::libpthread_init() {
    confstr(_CS_GNU_LIBPTHREAD_VERSION, str, n);
    os::Linux::set_libpthread_version(str);
  #endif
