@@ -1,17 +1,17 @@
-From b04c40ca7b8a3c6cb29d9e0e965ec592148327a2 Mon Sep 17 00:00:00 2001
+From f253413671f4f2bb39b7909297ab7edae69fbd0c Mon Sep 17 00:00:00 2001
 From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
 Date: Mon, 7 Jun 2021 06:27:26 +0700
-Subject: [PATCH] Define sys gettid on arm and aarch64
+Subject: [PATCH 03/42] Define sys gettid on arm and aarch64
 
 ---
  src/hotspot/os/linux/os_linux.cpp | 6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/src/hotspot/os/linux/os_linux.cpp b/src/hotspot/os/linux/os_linux.cpp
-index e8e66887cd5a..08b27d2dbe22 100644
+index 0a96aef438f..2c0d3b78eee 100644
 --- a/src/hotspot/os/linux/os_linux.cpp
 +++ b/src/hotspot/os/linux/os_linux.cpp
-@@ -322,11 +322,11 @@ bool os::have_special_privileges() {
+@@ -319,11 +319,11 @@ bool os::have_special_privileges() {
  
  
  #ifndef SYS_gettid
@@ -25,7 +25,7 @@ index e8e66887cd5a..08b27d2dbe22 100644
        #define SYS_gettid 224
      #else
        #ifdef __amd64__
-@@ -334,6 +334,8 @@ bool os::have_special_privileges() {
+@@ -331,6 +331,8 @@ bool os::have_special_privileges() {
        #else
          #ifdef __sparc__
            #define SYS_gettid 143
@@ -35,5 +35,5 @@ index e8e66887cd5a..08b27d2dbe22 100644
            #error define gettid for the arch
          #endif
 -- 
-2.44.0
+2.50.1
 

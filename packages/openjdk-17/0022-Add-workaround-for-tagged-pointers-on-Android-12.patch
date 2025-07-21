@@ -1,7 +1,7 @@
-From e89d39d41e2f7094178aa856d57e5ea1b779d790 Mon Sep 17 00:00:00 2001
+From 3c98d873480cfdb6bdf554140600df0020b318ac Mon Sep 17 00:00:00 2001
 From: Tee KOBAYASHI <xtkoba@gmail.com>
 Date: Fri, 3 Feb 2023 11:32:40 +0100
-Subject: [PATCH] Add workaround for tagged pointers on Android 12
+Subject: [PATCH 22/42] Add workaround for tagged pointers on Android 12
 
 Co-authored-by: dev-bz <32380878+dev-bz@users.noreply.github.com>
 ---
@@ -9,10 +9,10 @@ Co-authored-by: dev-bz <32380878+dev-bz@users.noreply.github.com>
  1 file changed, 28 insertions(+)
 
 diff --git a/src/java.base/share/native/libjli/java.c b/src/java.base/share/native/libjli/java.c
-index e519686cb78b..095afa1159bb 100644
+index 18c515d8678..6919ff865bc 100644
 --- a/src/java.base/share/native/libjli/java.c
 +++ b/src/java.base/share/native/libjli/java.c
-@@ -54,6 +54,32 @@
+@@ -56,6 +56,32 @@
  #include "java.h"
  #include "jni.h"
  
@@ -45,7 +45,7 @@ index e519686cb78b..095afa1159bb 100644
  /*
   * A NOTE TO DEVELOPERS: For performance reasons it is important that
   * the program image remain relatively small until after SelectVersion
-@@ -252,6 +278,8 @@ JLI_Launch(int argc, char ** argv,              /* main argc, argv */
+@@ -253,6 +279,8 @@ JLI_Launch(int argc, char ** argv,              /* main argc, argv */
      _is_java_args = javaargs;
      _wc_enabled = cpwildcard;
  
@@ -55,5 +55,5 @@ index e519686cb78b..095afa1159bb 100644
      DumpState();
      if (JLI_IsTraceLauncher()) {
 -- 
-2.44.0
+2.50.1
 
