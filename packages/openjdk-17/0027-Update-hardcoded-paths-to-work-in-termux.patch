@@ -1,7 +1,7 @@
-From aa5840c43ce552624fed1b29c76364cb86ded2fe Mon Sep 17 00:00:00 2001
+From 6d264b31f90ce850e4ce58b48867699013a5e772 Mon Sep 17 00:00:00 2001
 From: Henrik Grimler <grimler@termux.dev>
 Date: Tue, 6 Jul 2021 18:29:24 +0700
-Subject: [PATCH] Update hardcoded paths to work in termux
+Subject: [PATCH 27/42] Update hardcoded paths to work in termux
 
 ---
  src/hotspot/os/linux/os_linux.cpp             | 10 +++++--
@@ -33,10 +33,10 @@ Subject: [PATCH] Update hardcoded paths to work in termux
  26 files changed, 74 insertions(+), 73 deletions(-)
 
 diff --git a/src/hotspot/os/linux/os_linux.cpp b/src/hotspot/os/linux/os_linux.cpp
-index 31fc882b0344..e815b0afd7c1 100644
+index 25016b72c5c..2637a1075d6 100644
 --- a/src/hotspot/os/linux/os_linux.cpp
 +++ b/src/hotspot/os/linux/os_linux.cpp
-@@ -1382,7 +1382,13 @@ const char* os::dll_file_extension() { return ".so"; }
+@@ -1445,7 +1445,13 @@ const char* os::dll_file_extension() { return ".so"; }
  
  // This must be hard coded because it's the system's temporary
  // directory not the java application's temp directory, ala java.io.tmpdir.
@@ -49,9 +49,9 @@ index 31fc882b0344..e815b0afd7c1 100644
 +#endif
 +}
  
- static bool file_exists(const char* filename) {
-   struct stat statbuf;
-@@ -2238,7 +2244,7 @@ void os::Linux::print_process_memory_info(outputStream* st) {
+ // check if addr is inside libjvm.so
+ bool os::address_is_in_vm(address addr) {
+@@ -2348,7 +2354,7 @@ void os::Linux::print_process_memory_info(outputStream* st) {
  }
  
  bool os::Linux::print_ld_preload_file(outputStream* st) {
@@ -61,7 +61,7 @@ index 31fc882b0344..e815b0afd7c1 100644
  
  void os::Linux::print_uptime_info(outputStream* st) {
 diff --git a/src/hotspot/share/utilities/virtualizationSupport.cpp b/src/hotspot/share/utilities/virtualizationSupport.cpp
-index 5a2e8651efaf..971f74af5605 100644
+index 5a2e8651efa..971f74af560 100644
 --- a/src/hotspot/share/utilities/virtualizationSupport.cpp
 +++ b/src/hotspot/share/utilities/virtualizationSupport.cpp
 @@ -52,7 +52,7 @@ void VirtualizationSupport::initialize() {
@@ -74,7 +74,7 @@ index 5a2e8651efaf..971f74af5605 100644
  #endif
    if (dlHandle == NULL) {
 diff --git a/src/java.base/linux/classes/sun/nio/fs/LinuxFileSystem.java b/src/java.base/linux/classes/sun/nio/fs/LinuxFileSystem.java
-index a3153b31329f..594a26c111ce 100644
+index a3153b31329..594a26c111c 100644
 --- a/src/java.base/linux/classes/sun/nio/fs/LinuxFileSystem.java
 +++ b/src/java.base/linux/classes/sun/nio/fs/LinuxFileSystem.java
 @@ -118,7 +118,7 @@ class LinuxFileSystem extends UnixFileSystem {
@@ -87,7 +87,7 @@ index a3153b31329f..594a26c111ce 100644
  
  
 diff --git a/src/java.base/linux/classes/sun/nio/fs/LinuxFileSystemProvider.java b/src/java.base/linux/classes/sun/nio/fs/LinuxFileSystemProvider.java
-index a1c2aed4bd24..23c7df39c31b 100644
+index a1c2aed4bd2..23c7df39c31 100644
 --- a/src/java.base/linux/classes/sun/nio/fs/LinuxFileSystemProvider.java
 +++ b/src/java.base/linux/classes/sun/nio/fs/LinuxFileSystemProvider.java
 @@ -104,7 +104,7 @@ class LinuxFileSystemProvider extends UnixFileSystemProvider {
@@ -100,7 +100,7 @@ index a1c2aed4bd24..23c7df39c31b 100644
          return chain(new MimeTypesFileTypeDetector(userMimeTypes),
                       new MimeTypesFileTypeDetector(etcMimeTypes));
 diff --git a/src/java.base/share/classes/sun/net/www/MimeTable.java b/src/java.base/share/classes/sun/net/www/MimeTable.java
-index b20566bdc8b9..8c3b8cfcd02c 100644
+index b20566bdc8b..8c3b8cfcd02 100644
 --- a/src/java.base/share/classes/sun/net/www/MimeTable.java
 +++ b/src/java.base/share/classes/sun/net/www/MimeTable.java
 @@ -57,9 +57,8 @@ public class MimeTable implements FileNameMap {
@@ -116,7 +116,7 @@ index b20566bdc8b9..8c3b8cfcd02c 100644
                  return null;
              }
 diff --git a/src/java.base/share/classes/sun/security/jca/ProviderConfig.java b/src/java.base/share/classes/sun/security/jca/ProviderConfig.java
-index 7a9022e8769c..9964dd4a6224 100644
+index 7a9022e8769..9964dd4a622 100644
 --- a/src/java.base/share/classes/sun/security/jca/ProviderConfig.java
 +++ b/src/java.base/share/classes/sun/security/jca/ProviderConfig.java
 @@ -98,7 +98,7 @@ final class ProviderConfig {
@@ -129,7 +129,7 @@ index 7a9022e8769c..9964dd4a6224 100644
                      return Boolean.FALSE;
                  }
 diff --git a/src/java.base/unix/classes/sun/net/dns/ResolverConfigurationImpl.java b/src/java.base/unix/classes/sun/net/dns/ResolverConfigurationImpl.java
-index d46138f23b74..4d626da8f2cc 100644
+index d46138f23b7..4d626da8f2c 100644
 --- a/src/java.base/unix/classes/sun/net/dns/ResolverConfigurationImpl.java
 +++ b/src/java.base/unix/classes/sun/net/dns/ResolverConfigurationImpl.java
 @@ -64,7 +64,7 @@ public class ResolverConfigurationImpl
@@ -142,7 +142,7 @@ index d46138f23b74..4d626da8f2cc 100644
              while ((line = in.readLine()) != null) {
                  int maxvalues = maxperkeyword;
 diff --git a/src/java.base/unix/native/libjava/ProcessImpl_md.c b/src/java.base/unix/native/libjava/ProcessImpl_md.c
-index 3854f36daf08..8d9cc64e178b 100644
+index d9a16dad422..532b3d8ffeb 100644
 --- a/src/java.base/unix/native/libjava/ProcessImpl_md.c
 +++ b/src/java.base/unix/native/libjava/ProcessImpl_md.c
 @@ -230,7 +230,7 @@ xmalloc(JNIEnv *env, size_t size)
@@ -155,7 +155,7 @@ index 3854f36daf08..8d9cc64e178b 100644
  
  static const char*
 diff --git a/src/java.base/unix/native/libjava/TimeZone_md.c b/src/java.base/unix/native/libjava/TimeZone_md.c
-index 94dfc207f965..0d0ffdab0ee9 100644
+index 5c40fc8b320..ed2f293f844 100644
 --- a/src/java.base/unix/native/libjava/TimeZone_md.c
 +++ b/src/java.base/unix/native/libjava/TimeZone_md.c
 @@ -60,9 +60,9 @@ static char *isFileIdentical(char* buf, size_t size, char *pathname);
@@ -172,10 +172,10 @@ index 94dfc207f965..0d0ffdab0ee9 100644
  static const char *SYS_INIT_FILE = "/etc/default/init";
  static const char *ZONEINFO_DIR = "/usr/share/lib/zoneinfo";
 diff --git a/src/java.desktop/share/classes/com/sun/java/swing/plaf/gtk/Metacity.java b/src/java.desktop/share/classes/com/sun/java/swing/plaf/gtk/Metacity.java
-index 042ca1878747..0be96292517a 100644
+index f3c3353180f..e8badd2b46f 100644
 --- a/src/java.desktop/share/classes/com/sun/java/swing/plaf/gtk/Metacity.java
 +++ b/src/java.desktop/share/classes/com/sun/java/swing/plaf/gtk/Metacity.java
-@@ -482,13 +482,10 @@ class Metacity implements SynthConstants {
+@@ -529,13 +529,10 @@ class Metacity implements SynthConstants {
                  String[] dirs = new String[] {
                      userHome + sep + ".themes",
                      System.getProperty("swing.metacitythemedir"),
@@ -194,10 +194,10 @@ index 042ca1878747..0be96292517a 100644
  
                  URL themeDir = null;
 diff --git a/src/java.desktop/share/classes/com/sun/media/sound/SoftSynthesizer.java b/src/java.desktop/share/classes/com/sun/media/sound/SoftSynthesizer.java
-index 70b8b622df9c..7dc6d97d452c 100644
+index ee37cb7198b..47a60e9178b 100644
 --- a/src/java.desktop/share/classes/com/sun/media/sound/SoftSynthesizer.java
 +++ b/src/java.desktop/share/classes/com/sun/media/sound/SoftSynthesizer.java
-@@ -685,11 +685,11 @@ public final class SoftSynthesizer implements AudioSynthesizer,
+@@ -684,11 +684,11 @@ public final class SoftSynthesizer implements AudioSynthesizer,
  
                          File[] systemSoundFontsDir = new File[] {
                              /* Arch, Fedora, Mageia */
@@ -214,7 +214,7 @@ index 70b8b622df9c..7dc6d97d452c 100644
  
                          /*
 diff --git a/src/java.desktop/share/classes/sun/font/SunFontManager.java b/src/java.desktop/share/classes/sun/font/SunFontManager.java
-index 870009612f77..824a07db37c4 100644
+index 870009612f7..824a07db37c 100644
 --- a/src/java.desktop/share/classes/sun/font/SunFontManager.java
 +++ b/src/java.desktop/share/classes/sun/font/SunFontManager.java
 @@ -3448,7 +3448,7 @@ public abstract class SunFontManager implements FontSupport, FontManagerForSGE {
@@ -227,10 +227,10 @@ index 870009612f77..824a07db37c4 100644
                                     false, false);
                  return null;
 diff --git a/src/java.desktop/share/classes/sun/print/PSPrinterJob.java b/src/java.desktop/share/classes/sun/print/PSPrinterJob.java
-index 4645aabd8615..2d3d6bfccc00 100644
+index 71c642a4b71..1073b52fa18 100644
 --- a/src/java.desktop/share/classes/sun/print/PSPrinterJob.java
 +++ b/src/java.desktop/share/classes/sun/print/PSPrinterJob.java
-@@ -1630,7 +1630,7 @@ public class PSPrinterJob extends RasterPrinterJob {
+@@ -1631,7 +1631,7 @@ public class PSPrinterJob extends RasterPrinterJob {
          String osname = System.getProperty("os.name");
          if (osname.equals("Linux") || osname.contains("OS X")) {
              execCmd = new String[ncomps];
@@ -239,7 +239,7 @@ index 4645aabd8615..2d3d6bfccc00 100644
              if ((pFlags & PRINTER) != 0) {
                  execCmd[n++] = "-P" + printer;
              }
-@@ -1652,7 +1652,7 @@ public class PSPrinterJob extends RasterPrinterJob {
+@@ -1653,7 +1653,7 @@ public class PSPrinterJob extends RasterPrinterJob {
          } else {
              ncomps+=1; //add 1 arg for lp
              execCmd = new String[ncomps];
@@ -249,7 +249,7 @@ index 4645aabd8615..2d3d6bfccc00 100644
              if ((pFlags & PRINTER) != 0) {
                  execCmd[n++] = "-d" + printer;
 diff --git a/src/java.desktop/unix/classes/sun/awt/X11/MotifColorUtilities.java b/src/java.desktop/unix/classes/sun/awt/X11/MotifColorUtilities.java
-index f42a180532e3..9acecdb14c4a 100644
+index f42a180532e..9acecdb14c4 100644
 --- a/src/java.desktop/unix/classes/sun/awt/X11/MotifColorUtilities.java
 +++ b/src/java.desktop/unix/classes/sun/awt/X11/MotifColorUtilities.java
 @@ -412,7 +412,7 @@ class MotifColorUtilities {
@@ -262,7 +262,7 @@ index f42a180532e3..9acecdb14c4a 100644
              if (!pFile.exists())
              {
 diff --git a/src/java.desktop/unix/classes/sun/print/PrintServiceLookupProvider.java b/src/java.desktop/unix/classes/sun/print/PrintServiceLookupProvider.java
-index 79fc2fd15eef..7fb0c803ccd1 100644
+index 876913553af..bfd2ff36f49 100644
 --- a/src/java.desktop/unix/classes/sun/print/PrintServiceLookupProvider.java
 +++ b/src/java.desktop/unix/classes/sun/print/PrintServiceLookupProvider.java
 @@ -81,10 +81,10 @@ public class PrintServiceLookupProvider extends PrintServiceLookup
@@ -307,7 +307,7 @@ index 79fc2fd15eef..7fb0c803ccd1 100644
          String[] names = execCmd(command);
  
          if ((names == null) || (names.length == 0)) {
-@@ -757,7 +757,7 @@ public class PrintServiceLookupProvider extends PrintServiceLookup
+@@ -765,7 +765,7 @@ public class PrintServiceLookupProvider extends PrintServiceLookup
        if (cmdIndex == UNINITIALIZED) {
          cmdIndex = getBSDCommandIndex();
        }
@@ -316,7 +316,7 @@ index 79fc2fd15eef..7fb0c803ccd1 100644
        String[] result = execCmd(command);
  
        if (result == null || !(result[0].equals(name))) {
-@@ -779,7 +779,7 @@ public class PrintServiceLookupProvider extends PrintServiceLookup
+@@ -787,7 +787,7 @@ public class PrintServiceLookupProvider extends PrintServiceLookup
  
      static String getDefaultPrinterNameSysV() {
          String defaultPrinter = "lp";
@@ -325,7 +325,7 @@ index 79fc2fd15eef..7fb0c803ccd1 100644
  
          String [] names = execCmd(command);
          if (names == null || names.length == 0) {
-@@ -801,7 +801,7 @@ public class PrintServiceLookupProvider extends PrintServiceLookup
+@@ -809,7 +809,7 @@ public class PrintServiceLookupProvider extends PrintServiceLookup
  
      private PrintService getNamedPrinterNameSysV(String name) {
  
@@ -334,7 +334,7 @@ index 79fc2fd15eef..7fb0c803ccd1 100644
          String []result = execCmd(command);
  
          if (result == null || result[0].indexOf("unknown printer") > 0) {
-@@ -813,7 +813,7 @@ public class PrintServiceLookupProvider extends PrintServiceLookup
+@@ -821,7 +821,7 @@ public class PrintServiceLookupProvider extends PrintServiceLookup
  
      private String[] getAllPrinterNamesSysV() {
          String defaultPrinter = "lp";
@@ -343,7 +343,7 @@ index 79fc2fd15eef..7fb0c803ccd1 100644
  
          String [] names = execCmd(command);
          ArrayList<String> printerNames = new ArrayList<>();
-@@ -870,7 +870,7 @@ public class PrintServiceLookupProvider extends PrintServiceLookup
+@@ -879,7 +879,7 @@ public class PrintServiceLookupProvider extends PrintServiceLookup
          try {
              final String[] cmd = new String[3];
              if (isAIX()) {
@@ -353,10 +353,10 @@ index 79fc2fd15eef..7fb0c803ccd1 100644
                  cmd[2] = "env LC_ALL=C " + command;
              } else {
 diff --git a/src/java.desktop/unix/classes/sun/print/UnixPrintJob.java b/src/java.desktop/unix/classes/sun/print/UnixPrintJob.java
-index 4f810d947d49..41ae71fb589d 100644
+index 89e76d20c57..f655014b79d 100644
 --- a/src/java.desktop/unix/classes/sun/print/UnixPrintJob.java
 +++ b/src/java.desktop/unix/classes/sun/print/UnixPrintJob.java
-@@ -882,7 +882,7 @@ public class UnixPrintJob implements CancelablePrintJob {
+@@ -883,7 +883,7 @@ public class UnixPrintJob implements CancelablePrintJob {
              ncomps+=1;
          }
          execCmd = new String[ncomps];
@@ -366,10 +366,10 @@ index 4f810d947d49..41ae71fb589d 100644
              execCmd[n++] = "-P" + printer;
          }
 diff --git a/src/java.desktop/unix/classes/sun/print/UnixPrintService.java b/src/java.desktop/unix/classes/sun/print/UnixPrintService.java
-index 2a11a6e2d058..d07da584dc7b 100644
+index bbd8c6c9c78..afc1c572f95 100644
 --- a/src/java.desktop/unix/classes/sun/print/UnixPrintService.java
 +++ b/src/java.desktop/unix/classes/sun/print/UnixPrintService.java
-@@ -231,7 +231,7 @@ public class UnixPrintService implements PrintService, AttributeUpdater,
+@@ -228,7 +228,7 @@ public class UnixPrintService implements PrintService, AttributeUpdater,
                  PrintServiceLookupProvider.getBSDCommandIndex();
          }
  
@@ -378,7 +378,7 @@ index 2a11a6e2d058..d07da584dc7b 100644
              + lpcStatusCom[PrintServiceLookupProvider.cmdIndex];
          String[] results= PrintServiceLookupProvider.execCmd(command);
  
-@@ -280,7 +280,7 @@ public class UnixPrintService implements PrintService, AttributeUpdater,
+@@ -277,7 +277,7 @@ public class UnixPrintService implements PrintService, AttributeUpdater,
  
      private PrinterIsAcceptingJobs getPrinterIsAcceptingJobsAIX() {
          // On AIX there should not be a blank after '-a'.
@@ -387,7 +387,7 @@ index 2a11a6e2d058..d07da584dc7b 100644
          String[] results= PrintServiceLookupProvider.execCmd(command);
  
          // Remove headers and bogus entries added by remote printers.
-@@ -336,7 +336,7 @@ public class UnixPrintService implements PrintService, AttributeUpdater,
+@@ -333,7 +333,7 @@ public class UnixPrintService implements PrintService, AttributeUpdater,
          }
  
          int qlen = 0;
@@ -396,7 +396,7 @@ index 2a11a6e2d058..d07da584dc7b 100644
              + lpcQueueCom[PrintServiceLookupProvider.cmdIndex];
          String[] results = PrintServiceLookupProvider.execCmd(command);
  
-@@ -365,7 +365,7 @@ public class UnixPrintService implements PrintService, AttributeUpdater,
+@@ -362,7 +362,7 @@ public class UnixPrintService implements PrintService, AttributeUpdater,
  
      private QueuedJobCount getQueuedJobCountAIX() {
          // On AIX there should not be a blank after '-a'.
@@ -406,7 +406,7 @@ index 2a11a6e2d058..d07da584dc7b 100644
  
          // Remove headers and bogus entries added by remote printers.
 diff --git a/src/java.desktop/unix/native/common/awt/fontpath.c b/src/java.desktop/unix/native/common/awt/fontpath.c
-index fa5fc982327e..222af29cef33 100644
+index df35e78e6e1..aeaab71d6a6 100644
 --- a/src/java.desktop/unix/native/common/awt/fontpath.c
 +++ b/src/java.desktop/unix/native/common/awt/fontpath.c
 @@ -66,19 +66,18 @@ extern Display *awt_display;
@@ -442,7 +442,7 @@ index fa5fc982327e..222af29cef33 100644
  };
  #elif defined(_AIX)
 diff --git a/src/java.prefs/unix/classes/java/util/prefs/FileSystemPreferences.java b/src/java.prefs/unix/classes/java/util/prefs/FileSystemPreferences.java
-index b30a23465c52..f92872239dfd 100644
+index b30a23465c5..f92872239df 100644
 --- a/src/java.prefs/unix/classes/java/util/prefs/FileSystemPreferences.java
 +++ b/src/java.prefs/unix/classes/java/util/prefs/FileSystemPreferences.java
 @@ -182,7 +182,7 @@ class FileSystemPreferences extends AbstractPreferences {
@@ -455,10 +455,10 @@ index b30a23465c52..f92872239dfd 100644
                       new File(systemPrefsDirName, ".systemPrefs");
                  // Attempt to create root dir if it does not yet exist.
 diff --git a/src/java.security.jgss/share/classes/sun/security/krb5/Config.java b/src/java.security.jgss/share/classes/sun/security/krb5/Config.java
-index fadb115245f5..b7c4b392d705 100644
+index 8219874b112..8c5624b6026 100644
 --- a/src/java.security.jgss/share/classes/sun/security/krb5/Config.java
 +++ b/src/java.security.jgss/share/classes/sun/security/krb5/Config.java
-@@ -930,7 +930,7 @@ public class Config {
+@@ -936,7 +936,7 @@ public class Config {
          } else if (osname.contains("OS X")) {
              name = findMacosConfigFile();
          } else {
@@ -468,7 +468,7 @@ index fadb115245f5..b7c4b392d705 100644
          if (DEBUG) {
              System.out.println("Native config name: " + name);
 diff --git a/src/java.security.jgss/share/classes/sun/security/krb5/internal/ccache/FileCredentialsCache.java b/src/java.security.jgss/share/classes/sun/security/krb5/internal/ccache/FileCredentialsCache.java
-index f0379c04e915..6b37c25f3250 100644
+index f0379c04e91..6b37c25f325 100644
 --- a/src/java.security.jgss/share/classes/sun/security/krb5/internal/ccache/FileCredentialsCache.java
 +++ b/src/java.security.jgss/share/classes/sun/security/krb5/internal/ccache/FileCredentialsCache.java
 @@ -600,7 +600,7 @@ public class FileCredentialsCache extends CredentialsCache
@@ -481,7 +481,7 @@ index f0379c04e915..6b37c25f3250 100644
                      if (s1.length() >= 11) {
                          if ((s1.substring(0, 11)).equalsIgnoreCase
 diff --git a/src/java.smartcardio/unix/classes/sun/security/smartcardio/PlatformPCSC.java b/src/java.smartcardio/unix/classes/sun/security/smartcardio/PlatformPCSC.java
-index 38fa3da9ea76..f7dc33afb91a 100644
+index 38fa3da9ea7..f7dc33afb91 100644
 --- a/src/java.smartcardio/unix/classes/sun/security/smartcardio/PlatformPCSC.java
 +++ b/src/java.smartcardio/unix/classes/sun/security/smartcardio/PlatformPCSC.java
 @@ -46,8 +46,8 @@ class PlatformPCSC {
@@ -496,7 +496,7 @@ index 38fa3da9ea76..f7dc33afb91a 100644
  
      PlatformPCSC() {
 diff --git a/src/jdk.hotspot.agent/linux/native/libsaproc/symtab.c b/src/jdk.hotspot.agent/linux/native/libsaproc/symtab.c
-index e147cdecaf9b..7a9b9d2706f7 100644
+index 753f5b5e087..f48737bdee7 100644
 --- a/src/jdk.hotspot.agent/linux/native/libsaproc/symtab.c
 +++ b/src/jdk.hotspot.agent/linux/native/libsaproc/symtab.c
 @@ -53,7 +53,7 @@ typedef struct symtab {
@@ -509,10 +509,10 @@ index e147cdecaf9b..7a9b9d2706f7 100644
  /* The CRC used in gnu_debuglink, retrieved from
     http://sourceware.org/gdb/current/onlinedocs/gdb/Separate-Debug-Files.html#Separate-Debug-Files. */
 diff --git a/src/jdk.jpackage/linux/classes/jdk/jpackage/internal/LinuxDebBundler.java b/src/jdk.jpackage/linux/classes/jdk/jpackage/internal/LinuxDebBundler.java
-index a4533b101c93..4aefbd7888c2 100644
+index 71e98a4b2ac..bbc424a033c 100644
 --- a/src/jdk.jpackage/linux/classes/jdk/jpackage/internal/LinuxDebBundler.java
 +++ b/src/jdk.jpackage/linux/classes/jdk/jpackage/internal/LinuxDebBundler.java
-@@ -414,7 +414,7 @@ public class LinuxDebBundler extends LinuxPackageBundler {
+@@ -432,7 +432,7 @@ public class LinuxDebBundler extends LinuxPackageBundler {
          final String installDir = LINUX_INSTALL_DIR.fetchFrom(params);
  
          if (!StandardBundlerParam.isRuntimeInstaller(params)
@@ -521,7 +521,7 @@ index a4533b101c93..4aefbd7888c2 100644
              debianFiles.add(new DebianFile(
                      getConfig_CopyrightFile(params),
                      "resource.copyright-file"));
-@@ -446,8 +446,8 @@ public class LinuxDebBundler extends LinuxPackageBundler {
+@@ -467,8 +467,8 @@ public class LinuxDebBundler extends LinuxPackageBundler {
          final String packageName = PACKAGE_NAME.fetchFrom(params);
  
          final Path installPath;
@@ -533,7 +533,7 @@ index a4533b101c93..4aefbd7888c2 100644
              installPath = Path.of(installDir, packageName, "share/doc/copyright");
          }
 diff --git a/src/jdk.jpackage/linux/classes/jdk/jpackage/internal/LinuxPackageBundler.java b/src/jdk.jpackage/linux/classes/jdk/jpackage/internal/LinuxPackageBundler.java
-index ce327cd2743c..624452b526e9 100644
+index ce327cd2743..624452b526e 100644
 --- a/src/jdk.jpackage/linux/classes/jdk/jpackage/internal/LinuxPackageBundler.java
 +++ b/src/jdk.jpackage/linux/classes/jdk/jpackage/internal/LinuxPackageBundler.java
 @@ -340,7 +340,7 @@ abstract class LinuxPackageBundler extends AbstractBundler {
@@ -555,7 +555,7 @@ index ce327cd2743c..624452b526e9 100644
              (s, p) -> s
      );
 diff --git a/src/jdk.jpackage/linux/classes/jdk/jpackage/internal/resources/utils.sh b/src/jdk.jpackage/linux/classes/jdk/jpackage/internal/resources/utils.sh
-index 1ed96076282c..7673dc0e9b48 100644
+index 1ed96076282..7673dc0e9b4 100644
 --- a/src/jdk.jpackage/linux/classes/jdk/jpackage/internal/resources/utils.sh
 +++ b/src/jdk.jpackage/linux/classes/jdk/jpackage/internal/resources/utils.sh
 @@ -92,7 +92,7 @@ _uninstall_default_mime_handler ()
@@ -568,5 +568,5 @@ index 1ed96076282c..7673dc0e9b48 100644
    done
  }
 -- 
-2.44.0
+2.50.1
 

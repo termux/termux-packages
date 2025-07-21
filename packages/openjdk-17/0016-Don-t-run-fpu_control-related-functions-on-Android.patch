@@ -1,7 +1,7 @@
-From f0a0b72c834c309f71b4b31ade351e14c67c1d59 Mon Sep 17 00:00:00 2001
+From 1bb822a4396d696f6e59e73a243f713d72afa6e0 Mon Sep 17 00:00:00 2001
 From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
 Date: Sat, 12 Jun 2021 06:58:20 +0700
-Subject: [PATCH] Don't run fpu_control related functions on Android
+Subject: [PATCH 16/42] Don't run fpu_control related functions on Android
 
 ---
  src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp |  2 ++
@@ -9,7 +9,7 @@ Subject: [PATCH] Don't run fpu_control related functions on Android
  2 files changed, 7 insertions(+), 5 deletions(-)
 
 diff --git a/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp b/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp
-index 6fc0c840642f..a9a3087419bd 100644
+index 785e767ef10..4812edd8314 100644
 --- a/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp
 +++ b/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp
 @@ -70,7 +70,9 @@
@@ -23,7 +23,7 @@ index 6fc0c840642f..a9a3087419bd 100644
  
  #define SPELL_REG_SP  "sp"
 diff --git a/src/hotspot/os_cpu/linux_x86/os_linux_x86.cpp b/src/hotspot/os_cpu/linux_x86/os_linux_x86.cpp
-index cc71b0d27801..be6ad9c00c37 100644
+index 34a02f74ded..8750b528c4b 100644
 --- a/src/hotspot/os_cpu/linux_x86/os_linux_x86.cpp
 +++ b/src/hotspot/os_cpu/linux_x86/os_linux_x86.cpp
 @@ -73,7 +73,7 @@
@@ -35,7 +35,7 @@ index cc71b0d27801..be6ad9c00c37 100644
  # include <fpu_control.h>
  #endif
  
-@@ -418,14 +418,14 @@ bool PosixSignals::pd_hotspot_signal_handler(int sig, siginfo_t* info,
+@@ -424,14 +424,14 @@ bool PosixSignals::pd_hotspot_signal_handler(int sig, siginfo_t* info,
  }
  
  void os::Linux::init_thread_fpu_state(void) {
@@ -52,7 +52,7 @@ index cc71b0d27801..be6ad9c00c37 100644
    return 0;
  #else
    int fpu_control;
-@@ -435,7 +435,7 @@ int os::Linux::get_fpu_control_word(void) {
+@@ -441,7 +441,7 @@ int os::Linux::get_fpu_control_word(void) {
  }
  
  void os::Linux::set_fpu_control_word(int fpu_control) {
@@ -61,7 +61,7 @@ index cc71b0d27801..be6ad9c00c37 100644
    _FPU_SETCW(fpu_control);
  #endif // !AMD64
  }
-@@ -614,7 +614,7 @@ void os::print_register_info(outputStream *st, const void *context) {
+@@ -657,7 +657,7 @@ void os::print_register_info(outputStream *st, const void *context) {
  }
  
  void os::setup_fpu() {
@@ -71,5 +71,5 @@ index cc71b0d27801..be6ad9c00c37 100644
    __asm__ volatile (  "fldcw (%0)" :
                        : "r" (fpu_cntrl) : "memory");
 -- 
-2.44.0
+2.50.1
 

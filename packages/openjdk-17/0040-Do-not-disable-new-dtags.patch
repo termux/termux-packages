@@ -1,7 +1,17 @@
-diff -u -r ../src/make/autoconf/flags-cflags.m4 ./make/autoconf/flags-cflags.m4
---- ../src/make/autoconf/flags-cflags.m4	2024-09-01 20:09:35.611261408 +0000
-+++ ./make/autoconf/flags-cflags.m4	2024-09-01 20:10:49.387795908 +0000
-@@ -66,9 +66,6 @@
+From 7b4056f187d3b6c00edbea564ccd97da279dab75 Mon Sep 17 00:00:00 2001
+From: Robert Kirkman <31490854+robertkirkman@users.noreply.github.com>
+Date: Mon, 5 May 2025 21:07:27 -0500
+Subject: [PATCH 40/42] Do not disable new dtags
+
+---
+ make/autoconf/flags-cflags.m4 | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/make/autoconf/flags-cflags.m4 b/make/autoconf/flags-cflags.m4
+index c170ce13b9b..a6419552a4e 100644
+--- a/make/autoconf/flags-cflags.m4
++++ b/make/autoconf/flags-cflags.m4
+@@ -58,9 +58,6 @@ AC_DEFUN([FLAGS_SETUP_SHARED_LIBS],
        # Default works for linux, might work on other platforms as well.
        SHARED_LIBRARY_FLAGS='-shared'
        SET_EXECUTABLE_ORIGIN='-Wl,-rpath,\$$ORIGIN[$]1'
@@ -11,3 +21,6 @@ diff -u -r ../src/make/autoconf/flags-cflags.m4 ./make/autoconf/flags-cflags.m4
        SET_SHARED_LIBRARY_NAME='-Wl,-soname=[$]1'
        SET_SHARED_LIBRARY_MAPFILE='-Wl,-version-script=[$]1'
  
+-- 
+2.50.1
+
