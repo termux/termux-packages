@@ -5,9 +5,12 @@ termux_step_start_build() {
 	TERMUX_HOSTBUILD_MARKER="$TERMUX_PKG_HOSTBUILD_DIR/TERMUX_BUILT_FOR_$TERMUX_PKG_VERSION"
 
 	if [ "$TERMUX_PKG_METAPACKAGE" = "true" ]; then
-		# Metapackage has no sources and therefore platform-independent.
+		# Metapackage has no sources
 		TERMUX_PKG_SKIP_SRC_EXTRACT=true
-		TERMUX_PKG_PLATFORM_INDEPENDENT=true
+		# Usually metapackages are also platform dependent but it is not always the
+		# right decision to mark them as such when they depend on packages which may
+		# not be available for all architectures
+		# TERMUX_PKG_PLATFORM_INDEPENDENT=true
 	fi
 
 	if [ -n "${TERMUX_PKG_EXCLUDED_ARCHES:=""}" ] && [ "$TERMUX_PKG_EXCLUDED_ARCHES" != "${TERMUX_PKG_EXCLUDED_ARCHES/$TERMUX_ARCH/}" ]; then
