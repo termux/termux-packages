@@ -11,6 +11,38 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 
+termux_pkg_auto_update() {
+	# based on `termux_github_api_get_tag.sh`
+	# fetch newest tags
+	local newest_tags newest_tag
+	newest_tags="$(curl -d "$(cat <<-EOF | tr '\n' ' '
+	{
+		"query": "query {
+			repository(owner: \"nvim-neorocks\", name: \"lux\") {
+				refs(refPrefix: \"refs/tags/\", first: 20, orderBy: {
+					field: TAG_COMMIT_DATE, direction: DESC
+				})
+				{ edges { node { name } } }
+			}
+		}"
+	}
+	EOF
+	)" \
+		-H "Authorization: token ${GITHUB_TOKEN}" \
+		-H "Accept: application/vnd.github.v3+json" \
+		--silent \
+		--location \
+		--retry 10 \
+		--retry-delay 1 \
+		https://api.github.com/graphql \
+		| jq '.data.repository.refs.edges[].node.name')"
+	# filter only tags having "v" at the start and extract only raw version.
+	read -r newest_tag < <(echo "$newest_tags" | grep -Po '(?<=^"v)\d+\.\d+\.\d+' | sort -Vr)
+
+	[[ -z "${newest_tag}" ]] && termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
+	termux_pkg_upgrade_version "${newest_tag}"
+}
+
 # Function to obtain the .deb URL
 obtain_deb_url() {
 	local url attempt retries wait PAGE deb_url
