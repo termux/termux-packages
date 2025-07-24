@@ -11,6 +11,7 @@ TERMUX_PKG_SRCURL=git+https://github.com/frida/frida
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_CONFFILES="var/service/frida-server/run var/service/frida-server/down"
+TERMUX_PKG_RM_AFTER_INSTALL="share/gir-1.0/G*"
 TERMUX_PKG_CONFLICTS="frida-tools (<< 15.1.24-1)"
 TERMUX_PKG_BREAKS="frida-server (<< 15.1.24)"
 TERMUX_PKG_REPLACES="frida-tools (<< 15.1.24-1), frida-server (<< 15.1.24)"
@@ -43,6 +44,13 @@ termux_step_pre_configure() {
 	termux_setup_nodejs
 	export PATH="$TERMUX_PKG_HOSTBUILD_DIR":"$PATH"
 	export ANDROID_NDK_ROOT="${NDK}"
+
+	# allows repeated builds of frida by removing some files of
+	# the previously-installed build of frida from $TERMUX_PREFIX
+	# Prevents the error:
+	# ...files/usr/lib/libfrida-gum-1.0.a(meson-generated_.._gumenumtypes.c.o)
+	# is incompatible with armelf_linux_eabi
+	rm -rf "$TERMUX_PREFIX"/lib/pkgconfig/frida*
 
 	# Frida needs to get cflags and ldflags for our python, but we
 	# do not want it to pick up other dependencies as frida has
@@ -131,6 +139,7 @@ termux_step_post_configure() {
 
 termux_step_post_make_install () {
 	# Fixup installation location..
+	rm -rf "$TERMUX_PREFIX"/lib/python"${TERMUX_PYTHON_VERSION}"/site-packages/frida*
 	mv "$TERMUX_PREFIX"/lib/python3/dist-packages/frida* \
 		"$TERMUX_PREFIX"/lib/python"${TERMUX_PYTHON_VERSION}"/site-packages/
 
