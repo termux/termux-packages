@@ -1,0 +1,41 @@
+Fixes this error when compiling the openat crate for 32-bit Android:
+error[E0308]: mismatched types
+   --> /home/builder/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/openat-0.1.21/src/dir.rs:472:17
+    |
+471 |             match stat.st_mode & libc::S_IFMT as u32 {
+    |                   ---------------------------------- this expression has type `u32`
+472 |                 libc::S_IFDIR => Ok(Dir(fd)),
+    |                 ^^^^^^^^^^^^^ expected `u32`, found `u16`
+
+--- a/src/dir.rs
++++ b/src/dir.rs
+@@ -462,10 +462,16 @@ impl Dir {
+         if res < 0 {
+             Err(io::Error::last_os_error())
+         } else {
++            #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+             match stat.st_mode & libc::S_IFMT {
+                 libc::S_IFDIR => Ok(Dir(fd)),
+                 _ => Err(io::Error::from_raw_os_error(libc::ENOTDIR))
+             }
++            #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++            match stat.st_mode as u16 & libc::S_IFMT {
++                libc::S_IFDIR => Ok(Dir(fd)),
++                _ => Err(io::Error::from_raw_os_error(libc::ENOTDIR))
++            }
+         }
+     }
+ 
+--- a/src/metadata.rs
++++ b/src/metadata.rs
+@@ -17,7 +17,10 @@ pub struct Metadata {
+ impl Metadata {
+     /// Returns simplified type of the directory entry
+     pub fn simple_type(&self) -> SimpleType {
++        #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+         let typ = self.stat.st_mode & libc::S_IFMT;
++        #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++        let typ = self.stat.st_mode as u16 & libc::S_IFMT;
+         match typ {
+             libc::S_IFREG => SimpleType::File,
+             libc::S_IFDIR => SimpleType::Dir,
