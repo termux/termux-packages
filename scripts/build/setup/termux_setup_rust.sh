@@ -36,6 +36,6 @@ termux_setup_rust() {
 	export PATH="${HOME}/.cargo/bin:${PATH}"
 
 	if [[ -n "${CARGO_TARGET_NAME-}" ]]; then
-		rustup target add "${CARGO_TARGET_NAME}"
+		rustup target add "${CARGO_TARGET_NAME}" --toolchain "${TERMUX_RUST_VERSION}"
 	fi
 }
