@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An easy-to-use, multi-track audio editor and recorder"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.7.4"
+TERMUX_PKG_REVISION=1
 _FFMPEG_VERSION=7.1.1
 TERMUX_PKG_SRCURL=(https://github.com/audacity/audacity/archive/Audacity-${TERMUX_PKG_VERSION}.tar.gz
                    https://www.ffmpeg.org/releases/ffmpeg-${_FFMPEG_VERSION}.tar.xz)
@@ -10,7 +11,7 @@ TERMUX_PKG_SHA256=(
 	76d0867bb852bbaa3dff834804b0abf8208a763461187f0ae2a0d5a3ddf31df7
 	733984395e0dbbe5c046abda2dc49a5544e7e0e1e2366bba849222ae9e3a03b1
 )
-TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libc++, libexpat, libflac, libid3tag, libogg, libopus, libsndfile, libsoundtouch, libsoxr, libuuid, libvorbis, libwavpack, mpg123, opusfile, portaudio, portmidi, wxwidgets"
+TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libc++, libexpat, libflac, libid3tag, libogg, libopus, libsndfile, libsoundtouch, libsoxr, libuuid, libvorbis, libwavpack, libmpg123, opusfile, portaudio, portmidi, wxwidgets"
 TERMUX_PKG_BUILD_DEPENDS="libjpeg-turbo, libjpeg-turbo-static, libmp3lame, libpng, rapidjson, zlib"
 # Support for FFmpeg 5.0 is not backported:
 # https://github.com/audacity/audacity/issues/2445
@@ -85,6 +86,7 @@ obtain_deb_url() {
 termux_step_host_build() {
 	termux_setup_cmake
 	termux_setup_ninja
+	( cd "$TERMUX_PKG_SRCDIR" && patch -p1 < "${TERMUX_SCRIPTDIR}/x11-packages/audacity/conan_portaudio_use_cmake35.patch.hostbuild" )
 
 	( # Running build in a subshell to avoid variable mess
 		# We must build the `image-compiler` for building.
@@ -109,10 +111,12 @@ termux_step_host_build() {
 		done
 
 		# Also we should import pkg-config configuration files from the packages we imported from ubuntu repos
-		export PKG_CONFIG_LIBDIR="/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig"
-		PKG_CONFIG_LIBDIR+=":$_PREFIX/usr/lib/x86_64-linux-gnu/pkgconfig"
+		_LIBDIR="$_PREFIX/usr/lib/x86_64-linux-gnu"
+		export PKG_CONFIG_LIBDIR="$_LIBDIR/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig"
 		export CFLAGS="-I$_PREFIX/usr/include"
-		export LDFLAGS="-Wl,-rpath,$_PREFIX/usr/lib/x86_64-linux-gnu"
+		export LDFLAGS="-Wl,-rpath,$_LIBDIR"
+		export CMAKE_INCLUDE_PATH="$_PREFIX/usr/include:$_LIBDIR/gtk-2.0/include"
+		export CMAKE_LIBRARY_PATH="$_LIBDIR"
 		cmake -GNinja -B "$TERMUX_PKG_HOSTBUILD_DIR" -S "$TERMUX_PKG_SRCDIR" -DCMAKE_BUILD_TYPE=Release
 		ninja -C "$TERMUX_PKG_HOSTBUILD_DIR" image-compiler
 	)
