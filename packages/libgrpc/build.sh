@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="High performance, open source, general RPC framework tha
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=git+https://github.com/grpc/grpc
-TERMUX_PKG_VERSION="1.73.1"
+TERMUX_PKG_VERSION="1.74.0"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 TERMUX_PKG_DEPENDS="abseil-cpp, c-ares, ca-certificates, libc++, libprotobuf, libre2, openssl, protobuf, zlib"
@@ -41,7 +41,10 @@ termux_step_host_build() {
 	# when building version 1.17.2:
 	CXXFLAGS="-Wno-error=class-memaccess" \
 		CFLAGS="-Wno-implicit-fallthrough" \
-		cmake -G Ninja "$TERMUX_PKG_SRCDIR"
+		cmake \
+		-DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+		-G Ninja \
+		"$TERMUX_PKG_SRCDIR"
 
 	ninja grpc_cpp_plugin
 }
