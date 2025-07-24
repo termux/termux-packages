@@ -1,15 +1,13 @@
 --- a/below/config/src/lib.rs
 +++ b/below/config/src/lib.rs
-@@ -22,9 +22,9 @@
+@@ -27,8 +27,8 @@
  #[cfg(test)]
  mod test;
  
 -pub const BELOW_DEFAULT_CONF: &str = "/etc/below/below.conf";
--const BELOW_DEFAULT_LOG: &str = "/var/log/below";
 -const BELOW_DEFAULT_STORE: &str = "/var/log/below/store";
 +pub const BELOW_DEFAULT_CONF: &str = "@TERMUX_PREFIX@/etc/below/below.conf";
-+const BELOW_DEFAULT_LOG: &str = "@TERMUX_PREFIX@/var/log/below";
 +const BELOW_DEFAULT_STORE: &str = "@TERMUX_PREFIX@/var/log/below/store";
  
  /// Global below config
- pub static BELOW_CONFIG: OnceCell<BelowConfig> = OnceCell::new();
+ pub static BELOW_CONFIG: OnceLock<BelowConfig> = OnceLock::new();
