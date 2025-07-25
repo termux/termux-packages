@@ -115,14 +115,6 @@ class TermuxPackage(object):
             raise Exception("build.sh not found for package '" + self.name + "'")
 
         self.deps = parse_build_file_dependencies(build_sh_path)
-        py_deps = parse_build_file_dependencies_with_vars(build_sh_path, 'TERMUX_PKG_PYTHON_RUNTIME_DEPS')
-        if not py_deps:
-            py_deps = parse_build_file_dependencies_with_vars(build_sh_path, 'TERMUX_PKG_PYTHON_TARGET_DEPS')
-        elif len(py_deps) == list(py_deps).count("false"):
-            py_deps = set()
-        if py_deps:
-            self.deps.add(f"python-pip{'-glibc' if termux_pkg_library == 'glibc' else ''}")
-
         self.antideps = parse_build_file_antidependencies(build_sh_path)
         self.excluded_arches = parse_build_file_excluded_arches(build_sh_path)
         self.only_installing = parse_build_file_variable_bool(build_sh_path, 'TERMUX_PKG_ONLY_INSTALLING')
@@ -200,8 +192,6 @@ class TermuxSubPackage:
         self.excluded_arches = set()
         if not virtual:
             self.deps |= parse_build_file_dependencies(subpackage_file_path)
-            if parse_build_file_dependencies_with_vars(subpackage_file_path, 'TERMUX_SUBPKG_PYTHON_RUNTIME_DEPS'):
-                self.deps.add(f"python-pip{'-glibc' if termux_pkg_library == 'glibc' else ''}")
             self.excluded_arches |= parse_build_file_excluded_arches(subpackage_file_path)
         self.dir = parent.dir
 
