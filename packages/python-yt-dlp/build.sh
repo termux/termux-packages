@@ -9,7 +9,6 @@ TERMUX_PKG_SHA256=1afacd10ec55e4d18dca1f6398823f8b642b5d1c524913a065985b482b8a73
 TERMUX_PKG_DEPENDS="libc++, libexpat, openssl, python, python-brotli, python-pycryptodomex"
 TERMUX_PKG_RECOMMENDS="ffmpeg"
 TERMUX_PKG_PYTHON_COMMON_DEPS="hatchling, wheel"
-TERMUX_PKG_PYTHON_TARGET_DEPS="mutagen, pycryptodomex, websockets, certifi, brotli, requests, urllib3"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_AUTO_UPDATE=true
