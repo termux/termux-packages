@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION="0.24.1"
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://github.com/pytorch/vision/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=071da2078600bfec4886efab77358c9329abfedcf1488b05879b556cb9b84ba7
-TERMUX_PKG_DEPENDS="libc++, ffmpeg, python, python-numpy, python-pillow, python-pip, python-torch, libjpeg-turbo, libpng, libwebp, zlib"
+TERMUX_PKG_DEPENDS="libc++, ffmpeg, python, python-numpy, python-pillow, python-torch, libjpeg-turbo, libpng, libwebp, zlib"
 TERMUX_PKG_SETUP_PYTHON=true
 TERMUX_PKG_AUTO_UPDATE=true
 

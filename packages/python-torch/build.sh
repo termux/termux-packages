@@ -10,7 +10,6 @@ TERMUX_PKG_DEPENDS="abseil-cpp, libc++, libopenblas, libprotobuf, python, python
 TERMUX_PKG_BUILD_DEPENDS="vulkan-headers, vulkan-loader-android"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, pyyaml, typing_extensions"
-TERMUX_PKG_PYTHON_RUNTIME_DEPS="torch"
 TERMUX_PKG_PYTHON_BUILD_DEPS="numpy"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
