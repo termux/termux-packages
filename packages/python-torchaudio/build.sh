@@ -18,8 +18,8 @@ TERMUX_PKG_SRCURL=(https://github.com/pytorch/audio/archive/refs/tags/v${TERMUX_
                    $_FFMPEG_SRCURL)
 TERMUX_PKG_SHA256=(3335d8fcf58c26acf3c628d751103b59226e01c91847ce56efb2a4e7ae8351ef
                    3b624649725ecdc565c903ca6643d41f33bd49239922e45c9b1442c63dca4e38)
-TERMUX_PKG_DEPENDS="libc++, python, python-pip, python-torch, torchaudio-ffmpeg"
-TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, setuptools"
+TERMUX_PKG_DEPENDS="libc++, python, python-torch, torchaudio-ffmpeg"
+TERMUX_PKG_SETUP_PYTHON=true
 TERMUX_PKG_RM_AFTER_INSTALL=$_FFMPEG_RM_AFTER_INSTALL
 
 _ffmpeg_configure_make_install() {
