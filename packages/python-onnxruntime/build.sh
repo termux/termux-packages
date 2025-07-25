@@ -9,7 +9,6 @@ TERMUX_PKG_DEPENDS="abseil-cpp, libc++, protobuf, libre2, python"
 TERMUX_PKG_BUILD_DEPENDS="python-numpy"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, build, packaging"
-TERMUX_PKG_PYTHON_RUNTIME_DEPS="onnxruntime"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 
