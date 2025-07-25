@@ -8,7 +8,6 @@ TERMUX_PKG_SRCURL=https://github.com/pytorch/vision/archive/refs/tags/v${TERMUX_
 TERMUX_PKG_SHA256=0a4a967bbb7f9810f792cd0289a07fb98c8fb5d1303fae8b63e3a6b05d720058
 TERMUX_PKG_DEPENDS="libc++, ffmpeg, python, python-numpy, python-pillow, python-torch, libjpeg-turbo, libpng, libwebp, zlib"
 TERMUX_PKG_SETUP_PYTHON=true
-TERMUX_PKG_PYTHON_RUNTIME_DEPS="torchvision"
 
 termux_step_pre_configure() {
 	CXXFLAGS+=" -I${TERMUX_PYTHON_HOME}/site-packages/torch/include"
