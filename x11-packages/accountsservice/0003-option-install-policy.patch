@@ -1,0 +1,26 @@
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -18,3 +18,5 @@
+ option('tests', type: 'boolean', value: true, description: 'Enable tests')
+ 
+ option('path_wtmp', type: 'string', value: '', description: 'The path to watch for wtmp changes')
++
++option('install_policy', type: 'boolean', value: true, description: 'Install policy file')
+--- a/data/meson.build
++++ b/data/meson.build
+@@ -32,6 +32,7 @@
+ 
+ policy = act_namespace.to_lower() + '.policy'
+ 
++if get_option('install_policy')
+ i18n.merge_file(
+   input: policy + '.in',
+   output: policy,
+@@ -39,6 +40,7 @@
+   install: true,
+   install_dir: policy_dir,
+ )
++endif
+ 
+ if install_systemd_unit_dir
+   service = 'accounts-daemon.service'
