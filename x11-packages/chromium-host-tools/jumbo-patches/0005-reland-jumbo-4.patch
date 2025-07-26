@@ -9,7 +9,7 @@ Enable jumbo build for the following template(s):
 - //v8/gni/v8.gni -> template("v8_header_set")
 
 ---
- v8/BUILD.gn                                   | 116 ++++++++++++++++++
+ v8/BUILD.gn                                   | 109 ++++++++++++++++++
  v8/gni/v8.gni                                 |   7 +-
  .../baseline/arm/baseline-compiler-arm-inl.h  |   2 +
  v8/src/baseline/baseline-compiler.cc          |   2 +
@@ -44,10 +44,10 @@ Enable jumbo build for the following template(s):
  v8/src/utils/sha-256.cc                       |   3 +
  v8/src/wasm/wasm-external-refs.cc             |   3 +
  v8/src/wasm/wrappers.cc                       |   2 +
- 35 files changed, 210 insertions(+), 34 deletions(-)
+ 35 files changed, 203 insertions(+), 34 deletions(-)
 
 diff --git a/v8/BUILD.gn b/v8/BUILD.gn
-index f2f72a02c6..4045513c07 100644
+index ea4eddb933..4e60ead59c 100644
 --- a/v8/BUILD.gn
 +++ b/v8/BUILD.gn
 @@ -7,6 +7,7 @@ import("//build/config/arm.gni")
@@ -58,8 +58,8 @@ index f2f72a02c6..4045513c07 100644
  import("//build/config/mips.gni")
  import("//build/config/riscv.gni")
  import("//build/config/rust.gni")
-@@ -3121,26 +3122,61 @@ v8_source_set("v8_initializers") {
-     sources += [ "src/builtins/builtins-temporal-gen.cc" ]
+@@ -3125,26 +3126,54 @@ v8_source_set("v8_initializers") {
+     }
    }
  
 +  jumbo_excluded_sources = [
@@ -77,13 +77,6 @@ index f2f72a02c6..4045513c07 100644
 +    "src/ic/unary-op-assembler.cc",
 +    "src/interpreter/interpreter-generator.cc",
 +  ]
-+
-+  if (v8_enable_temporal_support) {
-+    jumbo_excluded_sources += [
-+      # reference to 'Float32' is ambiguous
-+      "src/builtins/builtins-temporal-gen.cc"
-+    ]
-+  }
 +
    if (v8_current_cpu == "x86") {
      sources += [
@@ -120,7 +113,7 @@ index f2f72a02c6..4045513c07 100644
    } else if (v8_current_cpu == "mips64" || v8_current_cpu == "mips64el") {
      sources += [
        ### gcmole(mips64el) ###
-@@ -5202,6 +5238,24 @@ v8_compiler_sources = [
+@@ -5205,6 +5234,24 @@ v8_compiler_sources = [
    "src/compiler/zone-stats.cc",
  ]
  
@@ -145,7 +138,7 @@ index f2f72a02c6..4045513c07 100644
  if (!v8_enable_maglev) {
    # When Maglev is not enabled, Turboshaft still needs Maglev's graph builder.
    v8_compiler_sources += [
-@@ -5222,6 +5276,11 @@ if (v8_current_cpu == "x86") {
+@@ -5226,6 +5273,11 @@ if (v8_current_cpu == "x86") {
      "src/compiler/backend/ia32/instruction-scheduler-ia32.cc",
      "src/compiler/backend/ia32/instruction-selector-ia32.cc",
    ]
@@ -157,7 +150,7 @@ index f2f72a02c6..4045513c07 100644
  } else if (v8_current_cpu == "x64") {
    v8_compiler_sources += [
      ### gcmole(x64) ###
-@@ -5230,6 +5289,9 @@ if (v8_current_cpu == "x86") {
+@@ -5234,6 +5286,9 @@ if (v8_current_cpu == "x86") {
      "src/compiler/backend/x64/instruction-selector-x64.cc",
      "src/compiler/backend/x64/unwinding-info-writer-x64.cc",
    ]
@@ -167,7 +160,7 @@ index f2f72a02c6..4045513c07 100644
  } else if (v8_current_cpu == "arm") {
    v8_compiler_sources += [
      ### gcmole(arm) ###
-@@ -5238,6 +5300,9 @@ if (v8_current_cpu == "x86") {
+@@ -5242,6 +5297,9 @@ if (v8_current_cpu == "x86") {
      "src/compiler/backend/arm/instruction-selector-arm.cc",
      "src/compiler/backend/arm/unwinding-info-writer-arm.cc",
    ]
@@ -177,7 +170,7 @@ index f2f72a02c6..4045513c07 100644
  } else if (v8_current_cpu == "arm64") {
    v8_compiler_sources += [
      ### gcmole(arm64) ###
-@@ -5246,6 +5311,9 @@ if (v8_current_cpu == "x86") {
+@@ -5250,6 +5308,9 @@ if (v8_current_cpu == "x86") {
      "src/compiler/backend/arm64/instruction-selector-arm64.cc",
      "src/compiler/backend/arm64/unwinding-info-writer-arm64.cc",
    ]
@@ -187,7 +180,7 @@ index f2f72a02c6..4045513c07 100644
  } else if (v8_current_cpu == "mips64" || v8_current_cpu == "mips64el") {
    v8_compiler_sources += [
      ### gcmole(mips64el) ###
-@@ -5337,6 +5405,7 @@ v8_source_set("v8_compiler_for_mksnapshot_source_set") {
+@@ -5341,6 +5402,7 @@ v8_source_set("v8_compiler_for_mksnapshot_source_set") {
    visibility = [ ":*" ]  # Only targets in this file can depend on this.
  
    sources = v8_compiler_sources
@@ -195,7 +188,7 @@ index f2f72a02c6..4045513c07 100644
  
    public_deps = [
      ":generate_bytecode_builtins_list",
-@@ -5372,6 +5441,7 @@ v8_source_set("v8_compiler") {
+@@ -5376,6 +5438,7 @@ v8_source_set("v8_compiler") {
  
    if (v8_enable_turbofan) {
      sources = v8_compiler_sources
@@ -203,7 +196,7 @@ index f2f72a02c6..4045513c07 100644
    } else {
      # With Turbofan disabled, we only include the stubbed-out API.
      sources = [ "src/compiler/turbofan-disabled.cc" ]
-@@ -5930,6 +6000,8 @@ v8_source_set("v8_base_without_compiler") {
+@@ -5934,6 +5997,8 @@ v8_source_set("v8_base_without_compiler") {
      ]
    }
  
@@ -212,7 +205,7 @@ index f2f72a02c6..4045513c07 100644
    if (v8_enable_maglev) {
      sources += [
        "src/maglev/maglev-assembler.cc",
-@@ -5957,6 +6029,10 @@ v8_source_set("v8_base_without_compiler") {
+@@ -5962,6 +6027,10 @@ v8_source_set("v8_base_without_compiler") {
          "src/maglev/arm64/maglev-assembler-arm64.cc",
          "src/maglev/arm64/maglev-ir-arm64.cc",
        ]
@@ -223,7 +216,7 @@ index f2f72a02c6..4045513c07 100644
      } else if (v8_current_cpu == "riscv64") {
        sources += [
          "src/maglev/riscv/maglev-assembler-riscv.cc",
-@@ -5967,6 +6043,10 @@ v8_source_set("v8_base_without_compiler") {
+@@ -5972,6 +6041,10 @@ v8_source_set("v8_base_without_compiler") {
          "src/maglev/x64/maglev-assembler-x64.cc",
          "src/maglev/x64/maglev-ir-x64.cc",
        ]
@@ -234,7 +227,7 @@ index f2f72a02c6..4045513c07 100644
      } else if (v8_current_cpu == "s390x") {
        sources += [
          "src/maglev/s390/maglev-assembler-s390.cc",
-@@ -5981,6 +6061,13 @@ v8_source_set("v8_base_without_compiler") {
+@@ -5986,6 +6059,13 @@ v8_source_set("v8_base_without_compiler") {
        "src/tracing/perfetto-logger.cc",
        "src/tracing/perfetto-utils.cc",
      ]
@@ -248,7 +241,7 @@ index f2f72a02c6..4045513c07 100644
    }
  
    if (v8_enable_webassembly) {
-@@ -6042,6 +6129,10 @@ v8_source_set("v8_base_without_compiler") {
+@@ -6047,6 +6127,10 @@ v8_source_set("v8_base_without_compiler") {
        "src/wasm/well-known-imports.cc",
        "src/wasm/wrappers.cc",
      ]
@@ -259,7 +252,7 @@ index f2f72a02c6..4045513c07 100644
      if (v8_wasm_random_fuzzers) {
        sources += [
          ### gcmole(all) ###
-@@ -6076,6 +6167,26 @@ v8_source_set("v8_base_without_compiler") {
+@@ -6081,6 +6165,26 @@ v8_source_set("v8_base_without_compiler") {
      sources += [ "src/heap/reference-summarizer.cc" ]
    }
  
@@ -286,7 +279,7 @@ index f2f72a02c6..4045513c07 100644
    if (v8_current_cpu == "x86") {
      sources += [
        ### gcmole(ia32) ###
-@@ -6182,6 +6293,11 @@ v8_source_set("v8_base_without_compiler") {
+@@ -6187,6 +6291,11 @@ v8_source_set("v8_base_without_compiler") {
      if (is_win) {
        sources += [ "src/diagnostics/unwinding-info-win64.cc" ]
      }
@@ -299,7 +292,7 @@ index f2f72a02c6..4045513c07 100644
      sources += [
        ### gcmole(mips64el) ###
 diff --git a/v8/gni/v8.gni b/v8/gni/v8.gni
-index bcebe93384..317fbc100f 100644
+index 0213ba1d38..572d62151c 100644
 --- a/v8/gni/v8.gni
 +++ b/v8/gni/v8.gni
 @@ -4,6 +4,7 @@
@@ -310,7 +303,7 @@ index bcebe93384..317fbc100f 100644
  import("//build/config/gclient_args.gni")
  import("//build/config/ios/config.gni")
  import("//build/config/ios/ios_sdk_overrides.gni")
-@@ -347,9 +348,9 @@ template("v8_source_set") {
+@@ -345,9 +346,9 @@ template("v8_source_set") {
        defined(v8_static_library) && v8_static_library && is_win) {
      link_target_type = "split_static_library"
    } else if (defined(v8_static_library) && v8_static_library) {
@@ -322,7 +315,7 @@ index bcebe93384..317fbc100f 100644
    }
    target(link_target_type, target_name) {
      forward_variables_from(invoker,
-@@ -368,7 +369,7 @@ template("v8_source_set") {
+@@ -366,7 +367,7 @@ template("v8_source_set") {
  }
  
  template("v8_header_set") {
@@ -345,10 +338,10 @@ index 6d99dbe529..d6805a0a05 100644
  }  // namespace internal
  }  // namespace v8
 diff --git a/v8/src/baseline/baseline-compiler.cc b/v8/src/baseline/baseline-compiler.cc
-index bcad34f516..67ddf8f3b6 100644
+index 0a9fccefd6..abb4e3dc4e 100644
 --- a/v8/src/baseline/baseline-compiler.cc
 +++ b/v8/src/baseline/baseline-compiler.cc
-@@ -2492,6 +2492,8 @@ SaveAccumulatorScope::~SaveAccumulatorScope() {
+@@ -2510,6 +2510,8 @@ SaveAccumulatorScope::~SaveAccumulatorScope() {
  #undef RCS_BASELINE_SCOPE
  #undef __
  
@@ -402,10 +395,10 @@ index cc5b406f1b..9fac217286 100644
      loop_iteration_count_.insert({start, iter_count});
  
 diff --git a/v8/src/compiler/turboshaft/wasm-in-js-inlining-reducer-inl.h b/v8/src/compiler/turboshaft/wasm-in-js-inlining-reducer-inl.h
-index eefdbf25d4..4639a1340b 100644
+index 68f5f0d482..3a99255c4f 100644
 --- a/v8/src/compiler/turboshaft/wasm-in-js-inlining-reducer-inl.h
 +++ b/v8/src/compiler/turboshaft/wasm-in-js-inlining-reducer-inl.h
-@@ -1322,6 +1322,8 @@ V<Any> WasmInJSInliningReducer<Next>::TryInlineWasmCall(
+@@ -1341,6 +1341,8 @@ V<Any> WasmInJSInliningReducer<Next>::TryInlineWasmCall(
    return emitting_decoder.interface().Result();
  }
  
@@ -415,7 +408,7 @@ index eefdbf25d4..4639a1340b 100644
  
  #include "src/compiler/turboshaft/undef-assembler-macros.inc"
 diff --git a/v8/src/compiler/turboshaft/wasm-load-elimination-reducer.h b/v8/src/compiler/turboshaft/wasm-load-elimination-reducer.h
-index 2a33d3fa0f..b005cd284a 100644
+index c365c594b8..a66777d2cd 100644
 --- a/v8/src/compiler/turboshaft/wasm-load-elimination-reducer.h
 +++ b/v8/src/compiler/turboshaft/wasm-load-elimination-reducer.h
 @@ -544,6 +544,7 @@ class WasmLoadEliminationReducer : public Next {
@@ -427,7 +420,7 @@ index 2a33d3fa0f..b005cd284a 100644
    OpIndex REDUCE_INPUT_GRAPH(StructGet)(OpIndex ig_index,
                                          const StructGetOp& op) {
 diff --git a/v8/src/compiler/wasm-compiler.cc b/v8/src/compiler/wasm-compiler.cc
-index a5c13d2c33..cb38951b49 100644
+index 687bc33ead..c0b77d1be7 100644
 --- a/v8/src/compiler/wasm-compiler.cc
 +++ b/v8/src/compiler/wasm-compiler.cc
 @@ -70,7 +70,7 @@ namespace {
@@ -470,7 +463,7 @@ index c509e4220c..e9ccece0d4 100644
  
  #include "src/base/platform/wrappers.h"
 diff --git a/v8/src/handles/global-handles.cc b/v8/src/handles/global-handles.cc
-index 4a504500e4..fdb26addbb 100644
+index af448aa4f2..f9d1b5f3a6 100644
 --- a/v8/src/handles/global-handles.cc
 +++ b/v8/src/handles/global-handles.cc
 @@ -756,7 +756,7 @@ void GlobalHandles::InvokeSecondPassPhantomCallbacks() {
@@ -492,7 +485,7 @@ index 4a504500e4..fdb26addbb 100644
    }
  }
 diff --git a/v8/src/heap/code-range.cc b/v8/src/heap/code-range.cc
-index f46af5ff0e..cfcb60788d 100644
+index a339fd9c57..d3514e4d96 100644
 --- a/v8/src/heap/code-range.cc
 +++ b/v8/src/heap/code-range.cc
 @@ -64,7 +64,7 @@ size_t CodeRange::GetWritableReservedAreaSize() {
@@ -535,7 +528,7 @@ index f46af5ff0e..cfcb60788d 100644
            reinterpret_cast<void*>(params.requested_start_hint),
            reinterpret_cast<void*>(region().begin()),
            reinterpret_cast<void*>(region().end()));
-@@ -206,14 +206,14 @@ bool CodeRange::InitReservation(v8::PageAllocator* page_allocator,
+@@ -212,14 +212,14 @@ bool CodeRange::InitReservation(v8::PageAllocator* page_allocator,
      // the BoundedPageAllocator. Use it if it's big enough.
      const Address non_allocatable_size = page_allocator_->begin() - base();
  
@@ -638,10 +631,10 @@ index bda0e43cef..36a365b257 100644
  
  extern int pkey_alloc(unsigned int flags, unsigned int access_rights) V8_WEAK;
 diff --git a/v8/src/maglev/arm/maglev-ir-arm.cc b/v8/src/maglev/arm/maglev-ir-arm.cc
-index c481a34d69..37be0d7fff 100644
+index 9329819c93..9a01c1f7d1 100644
 --- a/v8/src/maglev/arm/maglev-ir-arm.cc
 +++ b/v8/src/maglev/arm/maglev-ir-arm.cc
-@@ -943,6 +943,8 @@ void Return::GenerateCode(MaglevAssembler* masm, const ProcessingState& state) {
+@@ -1068,6 +1068,8 @@ void Return::GenerateCode(MaglevAssembler* masm, const ProcessingState& state) {
    __ Ret();
  }
  
@@ -682,7 +675,7 @@ index 18addeed1a..ea3630caf0 100644
  }  // namespace internal
  }  // namespace v8
 diff --git a/v8/src/maglev/maglev-code-generator.cc b/v8/src/maglev/maglev-code-generator.cc
-index f2d6d4c64a..6b8ab1c890 100644
+index cc4f5d01d8..73c24d0d3d 100644
 --- a/v8/src/maglev/maglev-code-generator.cc
 +++ b/v8/src/maglev/maglev-code-generator.cc
 @@ -427,7 +427,6 @@ class ParallelMoveResolver {
@@ -701,7 +694,7 @@ index f2d6d4c64a..6b8ab1c890 100644
        if (targets.needs_decompression == kNeedsDecompression) {
          __ DecompressTagged(register_with_slot_value, register_with_slot_value);
          targets.needs_decompression = kDoesNotNeedDecompression;
-@@ -2109,6 +2107,8 @@ Handle<DeoptimizationData> MaglevCodeGenerator::GenerateDeoptimizationData(
+@@ -2111,6 +2109,8 @@ Handle<DeoptimizationData> MaglevCodeGenerator::GenerateDeoptimizationData(
    return data;
  }
  
@@ -711,10 +704,10 @@ index f2d6d4c64a..6b8ab1c890 100644
  }  // namespace internal
  }  // namespace v8
 diff --git a/v8/src/maglev/maglev-ir.cc b/v8/src/maglev/maglev-ir.cc
-index 63754f811d..ab433f65a4 100644
+index fa5e9348ef..b24f512f96 100644
 --- a/v8/src/maglev/maglev-ir.cc
 +++ b/v8/src/maglev/maglev-ir.cc
-@@ -8161,6 +8161,8 @@ std::optional<int32_t> NodeBase::TryGetInt32ConstantInput(int index) {
+@@ -8614,6 +8614,8 @@ std::optional<int32_t> NodeBase::TryGetInt32ConstantInput(int index) {
    return {};
  }
  
@@ -744,10 +737,10 @@ index 73a03828db..8b458f2fba 100644
  // JSSynchronizationPrimitive is the base class for JSAtomicsMutex and
  // JSAtomicsCondition. It contains a 32-bit state field and a pointer to a
 diff --git a/v8/src/objects/js-collator.cc b/v8/src/objects/js-collator.cc
-index 405cad1552..3c5032b750 100644
+index e443f8b7df..6853659dd5 100644
 --- a/v8/src/objects/js-collator.cc
 +++ b/v8/src/objects/js-collator.cc
-@@ -52,6 +52,8 @@ Maybe<CaseFirst> GetCaseFirst(Isolate* isolate,
+@@ -53,6 +53,8 @@ Maybe<CaseFirst> GetCaseFirst(Isolate* isolate,
        CaseFirst::kUndefined);
  }
  
@@ -756,17 +749,17 @@ index 405cad1552..3c5032b750 100644
  // TODO(gsathya): Consider internalizing the value strings.
  void CreateDataPropertyForOptions(Isolate* isolate,
                                    DirectHandle<JSObject> options,
-@@ -593,3 +595,5 @@ const std::set<std::string>& JSCollator::GetAvailableLocales() {
+@@ -596,3 +598,5 @@ const std::set<std::string>& JSCollator::GetAvailableLocales() {
  
  }  // namespace internal
  }  // namespace v8
 +
 +#undef CreateDataPropertyForOptions
 diff --git a/v8/src/objects/js-duration-format.cc b/v8/src/objects/js-duration-format.cc
-index 03c847d8dd..ce88b925fb 100644
+index aee9352dc2..b82701ba2b 100644
 --- a/v8/src/objects/js-duration-format.cc
 +++ b/v8/src/objects/js-duration-format.cc
-@@ -1071,7 +1071,7 @@ MaybeDirectHandle<String> FormattedToString(
+@@ -1073,7 +1073,7 @@ MaybeDirectHandle<String> FormattedToString(
    return Intl::FormattedToString(isolate, formatted);
  }
  
@@ -775,7 +768,7 @@ index 03c847d8dd..ce88b925fb 100644
      Isolate* isolate, const icu::FormattedValue& formatted,
      const std::vector<std::vector<Part>>* parts,
      JSDurationFormat::Separator separator) {
-@@ -1134,7 +1134,7 @@ MaybeDirectHandle<JSArray> JSDurationFormat::FormatToParts(
+@@ -1136,7 +1136,7 @@ MaybeDirectHandle<JSArray> JSDurationFormat::FormatToParts(
      Isolate* isolate, DirectHandle<JSDurationFormat> df,
      Handle<Object> duration) {
    const char* method_name = "Intl.DurationFormat.prototype.formatToParts";
@@ -785,10 +778,10 @@ index 03c847d8dd..ce88b925fb 100644
  }
  
 diff --git a/v8/src/objects/js-list-format.cc b/v8/src/objects/js-list-format.cc
-index 97a0f6a8f5..eb3b69f0a5 100644
+index ae7b3defaa..c5f5b27b76 100644
 --- a/v8/src/objects/js-list-format.cc
 +++ b/v8/src/objects/js-list-format.cc
-@@ -247,7 +247,7 @@ DirectHandle<String> IcuFieldIdToType(Isolate* isolate, int32_t field_id) {
+@@ -251,7 +251,7 @@ DirectHandle<String> IcuFieldIdToType(Isolate* isolate, int32_t field_id) {
  
  // A helper function to convert the FormattedList to a
  // MaybeHandle<JSArray> for the implementation of formatToParts.
@@ -797,7 +790,7 @@ index 97a0f6a8f5..eb3b69f0a5 100644
      Isolate* isolate, const icu::FormattedValue& formatted) {
    DirectHandle<JSArray> array = isolate->factory()->NewJSArray(0);
    icu::ConstrainedFieldPosition cfpos;
-@@ -285,7 +285,7 @@ MaybeDirectHandle<JSArray> JSListFormat::FormatListToParts(
+@@ -289,7 +289,7 @@ MaybeDirectHandle<JSArray> JSListFormat::FormatListToParts(
      Isolate* isolate, DirectHandle<JSListFormat> format,
      DirectHandle<FixedArray> list) {
    return FormatListCommon<JSArray>(isolate, format, list,
@@ -807,7 +800,7 @@ index 97a0f6a8f5..eb3b69f0a5 100644
  
  namespace {
 diff --git a/v8/src/objects/js-plural-rules.cc b/v8/src/objects/js-plural-rules.cc
-index 4606b75f42..ad3d618764 100644
+index 284a81a6b8..576b319d00 100644
 --- a/v8/src/objects/js-plural-rules.cc
 +++ b/v8/src/objects/js-plural-rules.cc
 @@ -223,6 +223,8 @@ MaybeDirectHandle<String> JSPluralRules::ResolvePluralRange(
@@ -848,7 +841,7 @@ index 7bee9f1179..391dac8cad 100644
  
  }  // namespace internal
 diff --git a/v8/src/regexp/regexp-compiler-tonode.cc b/v8/src/regexp/regexp-compiler-tonode.cc
-index d021885646..f777324990 100644
+index 1cae4c6657..51685922c8 100644
 --- a/v8/src/regexp/regexp-compiler-tonode.cc
 +++ b/v8/src/regexp/regexp-compiler-tonode.cc
 @@ -18,6 +18,8 @@
@@ -860,17 +853,17 @@ index d021885646..f777324990 100644
  namespace v8 {
  namespace internal {
  
-@@ -2071,3 +2073,5 @@ RegExpNode* RegExpQuantifier::ToNode(int min, int max, bool is_greedy,
+@@ -2108,3 +2110,5 @@ RegExpNode* RegExpQuantifier::ToNode(int min, int max, bool is_greedy,
  
  }  // namespace internal
  }  // namespace v8
 +
 +#undef kMaxCodePoint
 diff --git a/v8/src/sandbox/testing.cc b/v8/src/sandbox/testing.cc
-index 5fd8a5572d..a049f497a4 100644
+index 2938e0fc98..674967b568 100644
 --- a/v8/src/sandbox/testing.cc
 +++ b/v8/src/sandbox/testing.cc
-@@ -18,6 +18,7 @@
+@@ -19,6 +19,7 @@
  #include <signal.h>
  #include <sys/mman.h>
  #include <unistd.h>
@@ -879,7 +872,7 @@ index 5fd8a5572d..a049f497a4 100644
  
  #ifdef V8_USE_ADDRESS_SANITIZER
 diff --git a/v8/src/snapshot/read-only-deserializer.cc b/v8/src/snapshot/read-only-deserializer.cc
-index c6eb069415..a79565a75c 100644
+index 24e770f1ab..3568071acb 100644
 --- a/v8/src/snapshot/read-only-deserializer.cc
 +++ b/v8/src/snapshot/read-only-deserializer.cc
 @@ -14,6 +14,8 @@
@@ -891,7 +884,7 @@ index c6eb069415..a79565a75c 100644
  namespace v8 {
  namespace internal {
  
-@@ -387,3 +389,5 @@ void ReadOnlyDeserializer::PostProcessNewObjects() {
+@@ -428,3 +430,5 @@ void ReadOnlyDeserializer::PostProcessNewObjects() {
  
  }  // namespace internal
  }  // namespace v8
@@ -928,7 +921,7 @@ index 4b1d2bd42b..f55c0b4aec 100644
 +#undef ror
 +#undef shr
 diff --git a/v8/src/wasm/wasm-external-refs.cc b/v8/src/wasm/wasm-external-refs.cc
-index 8266e02e20..ad36a4c3ad 100644
+index 4c0819bad8..19a9c95061 100644
 --- a/v8/src/wasm/wasm-external-refs.cc
 +++ b/v8/src/wasm/wasm-external-refs.cc
 @@ -750,6 +750,8 @@ V ReadAndIncrementOffset(Address data, size_t* offset) {
@@ -940,16 +933,16 @@ index 8266e02e20..ad36a4c3ad 100644
  constexpr int32_t kSuccess = 1;
  constexpr int32_t kOutOfBounds = 0;
  }  // namespace
-@@ -1122,3 +1124,4 @@ Address load_old_fp(Isolate* isolate) {
+@@ -1136,3 +1138,4 @@ Address load_old_fp(Isolate* isolate) {
  
  #undef V8_WITH_SANITIZER
  #undef RESET_THREAD_IN_WASM_FLAG_FOR_ASAN_ON_WINDOWS
 +#undef kSuccess
 diff --git a/v8/src/wasm/wrappers.cc b/v8/src/wasm/wrappers.cc
-index 08a8d1dd46..4545fbf56e 100644
+index b1279b7553..e436c776b2 100644
 --- a/v8/src/wasm/wrappers.cc
 +++ b/v8/src/wasm/wrappers.cc
-@@ -1326,4 +1326,6 @@ void BuildWasmWrapper(compiler::turboshaft::PipelineData* data,
+@@ -1331,4 +1331,6 @@ void BuildWasmWrapper(compiler::turboshaft::PipelineData* data,
    }
  }
  
