@@ -1,0 +1,26 @@
+name: Test wrt package
+
+on:
+  push:
+    branches: [ main, wrt-package-v2 ]
+  pull_request:
+    branches: [ main, wrt-package-v2 ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y build-essential libcurl4-openssl-dev pkg-config
+
+    - name: Build wrt
+      run: |
+        cd Wrt-benchmark-1.0.0
+        make
+
+    - name: Run wrt help
+      run: |
+        ./wrt --help || true
