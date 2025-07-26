@@ -1,7 +1,11 @@
 --- a/lib_pypy/_resource_build.py
 +++ b/lib_pypy/_resource_build.py
-@@ -75,2 +75,4 @@
- 
+@@ -73,6 +73,8 @@ static int my_setrlimit(int resource, long long cur, long long max)
+     rl.rlim_max = max & RLIM_INFINITY;
+     return setrlimit(resource, &rl);
+ }
 +/* Termux addition: Add wait3() declaration used by busybox. Available in libc for 32-bit only. */
 +static pid_t wait3(int* status, int options, struct rusage* rusage) { return wait4(-1, status, options, rusage); }
- """.replace('$RLIMIT_CONSTS', ''.join(rlimit_consts)))
+ """.replace('$RLIMIT_CONSTS', ''.join(rlimit_consts))
+ 
+ 
