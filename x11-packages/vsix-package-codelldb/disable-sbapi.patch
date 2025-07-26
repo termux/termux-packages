@@ -1,0 +1,58 @@
+This entire structure is used to detect whether the LLDB being used
+has SBInstruction::GetControlFlowKind(), which LLDB versions 16 and newer have.
+Termux has had LLDB version 16 or newer since 2023.
+
+
+--- a/adapter/lldb-stub/build.rs
++++ b/adapter/lldb-stub/build.rs
+@@ -32,21 +32,6 @@ fn main() -> Result<(), Error> {
+ 
+     let mut wl_config = weaklink_build::Config::new("liblldb");
+ 
+-    // Generate optional api groups via SBAPI.toml
+-    let api_groups = get_api_groups("SBAPI.toml")?;
+-    for (version, imports) in api_groups {
+-        for imp in &imports {
+-            if !common_syms.remove(&imp.name) {
+-                println!(
+-                    "cargo:warning=Symbol \"{}\" is declared in {version}, but isn't used by codelldb.",
+-                    imp.name
+-                );
+-            }
+-        }
+-        let symbols: Vec<_> = imports.iter().map(|e| SymbolStub::new(&e.name)).collect();
+-        wl_config.add_symbol_group(version.as_str(), symbols)?;
+-    }
+-
+     // Emit the rest of common symbols as base group.
+     let symbols: Vec<_> = exports
+         .into_iter()
+--- a/adapter/codelldb/src/debug_session.rs
++++ b/adapter/codelldb/src/debug_session.rs
+@@ -613,7 +613,7 @@ impl DebugSession {
+             supports_read_memory_request: Some(true),
+             supports_restart_request: Some(true),
+             supports_set_variable: Some(true),
+-            supports_step_in_targets_request: Some(lldb_stub::v16.resolve().is_ok()),
++            supports_step_in_targets_request: Some(true),
+             supports_stepping_granularity: Some(true),
+             supports_write_memory_request: Some(true),
+             ..Default::default()
+--- a/adapter/codelldb/src/debug_session/step_in.rs
++++ b/adapter/codelldb/src/debug_session/step_in.rs
+@@ -34,7 +34,6 @@ impl super::DebugSession {
+         let Some(cu) = frame.compile_uint() else {
+             bail!("No compile unit for frame.");
+         };
+-        let _token = lldb_stub::v16.resolve()?;
+ 
+         // This is the typical case we aim to handle:
+         // ```
+--- a/adapter/lldb/src/lib.rs
++++ b/adapter/lldb/src/lib.rs
+@@ -26,5 +26,4 @@ fn test_init() {
+     use std::path::Path;
+     lldb_stub::liblldb.load_from(Path::new(env!("LLDB_DYLIB"))).unwrap();
+     lldb_stub::base.resolve().unwrap().mark_permanent();
+-    lldb_stub::v16.resolve().unwrap().mark_permanent();
+ }
