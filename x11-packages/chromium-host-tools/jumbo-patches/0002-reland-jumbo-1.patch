@@ -21,6 +21,7 @@ Enable jumbo build for the following template(s):
  .../sampling_heap_profiler.cc                     |  9 ++++++++-
  base/task/sequenced_task_runner.cc                |  4 ++++
  base/task/single_thread_task_runner.cc            |  4 ++++
+ base/threading/platform_thread_metrics_linux.cc   |  4 ++++
  cc/cc.gni                                         |  5 +++--
  .../viz/service/display/occlusion_culler.cc       |  4 ++++
  .../service/display/overlay_candidate_factory.cc  |  4 ++++
@@ -28,10 +29,10 @@ Enable jumbo build for the following template(s):
  .../viz/service/display/software_renderer.cc      |  4 ++++
  .../service/frame_sinks/frame_sink_manager_impl.h |  3 +++
  components/viz/viz.gni                            |  7 ++++---
- 12 files changed, 63 insertions(+), 9 deletions(-)
+ 13 files changed, 67 insertions(+), 9 deletions(-)
 
 diff --git a/base/BUILD.gn b/base/BUILD.gn
-index 5b41b3d805..0ad5a8724c 100644
+index f73ed42f84..f9e71f34c7 100644
 --- a/base/BUILD.gn
 +++ b/base/BUILD.gn
 @@ -28,6 +28,7 @@ import("//build/config/cast.gni")
@@ -40,9 +41,9 @@ index 5b41b3d805..0ad5a8724c 100644
  import("//build/config/dcheck_always_on.gni")
 +import("//build/config/jumbo.gni")
  import("//build/config/logging.gni")
- import("//build/config/nacl/config.gni")
  import("//build/config/profiling/profiling.gni")
-@@ -177,7 +178,7 @@ use_epoll = is_linux || is_chromeos || is_android
+ import("//build/config/rust.gni")
+@@ -173,7 +174,7 @@ use_epoll = is_linux || is_chromeos || is_android
  # base compilation units to be linked in where they wouldn't have otherwise.
  # This does not include test code (test support and anything in the test
  # directory) which should use source_set as is recommended for GN targets).
@@ -51,7 +52,7 @@ index 5b41b3d805..0ad5a8724c 100644
    sources = [
      "allocator/allocator_check.cc",
      "allocator/allocator_check.h",
-@@ -987,6 +988,10 @@ component("base") {
+@@ -985,6 +986,10 @@ component("base") {
      ]
    }
  
@@ -62,7 +63,7 @@ index 5b41b3d805..0ad5a8724c 100644
    if (is_linux || is_chromeos) {
      sources += [
        "debug/proc_maps_linux.cc",
-@@ -1005,6 +1010,7 @@ component("base") {
+@@ -1004,6 +1009,7 @@ component("base") {
        "threading/thread_type_delegate.cc",
        "threading/thread_type_delegate.h",
      ]
@@ -70,7 +71,7 @@ index 5b41b3d805..0ad5a8724c 100644
    }
  
    if (is_chromeos) {
-@@ -1982,6 +1988,11 @@ component("base") {
+@@ -1944,6 +1950,11 @@ component("base") {
        "win/wrapped_window_proc.h",
      ]
  
@@ -82,7 +83,7 @@ index 5b41b3d805..0ad5a8724c 100644
      deps += [ "//base/win:base_win_buildflags" ]
  
      if (com_init_check_hook_disabled) {
-@@ -2880,7 +2891,7 @@ if (enable_rust_translit) {
+@@ -2838,7 +2849,7 @@ if (enable_rust_translit) {
    }
  }
  
@@ -92,10 +93,10 @@ index 5b41b3d805..0ad5a8724c 100644
    sources = [
      "i18n/base_i18n_export.h",
 diff --git a/base/sampling_heap_profiler/poisson_allocation_sampler.cc b/base/sampling_heap_profiler/poisson_allocation_sampler.cc
-index 1bd644d7ab..473f84cb1a 100644
+index c093e98ee2..2f5a25fb44 100644
 --- a/base/sampling_heap_profiler/poisson_allocation_sampler.cc
 +++ b/base/sampling_heap_profiler/poisson_allocation_sampler.cc
-@@ -19,6 +19,8 @@
+@@ -20,6 +20,8 @@
  #include "base/rand_util.h"
  #include "build/build_config.h"
  
@@ -104,7 +105,7 @@ index 1bd644d7ab..473f84cb1a 100644
  namespace base {
  
  namespace {
-@@ -60,7 +62,7 @@ struct ThreadLocalData {
+@@ -65,7 +67,7 @@ struct ThreadLocalData {
  // Returns an object storing thread-local state. This does NOT use
  // base::ThreadLocalStorage, so it's safe to call from hooks in the
  // base::ThreadLocalStorage implementation.
@@ -113,7 +114,7 @@ index 1bd644d7ab..473f84cb1a 100644
  #if USE_LOCAL_TLS_EMULATION()
    // If available, use ThreadLocalStorage to bypass dependencies introduced by
    // Clang's implementation of thread_local.
-@@ -96,6 +98,8 @@ ThreadLocalData* GetThreadLocalData() {
+@@ -101,6 +103,8 @@ ThreadLocalData* GetThreadLocalData() {
  
  }  // namespace
  
@@ -122,7 +123,7 @@ index 1bd644d7ab..473f84cb1a 100644
  PoissonAllocationSamplerStats::PoissonAllocationSamplerStats(
      size_t address_cache_hits,
      size_t address_cache_misses,
-@@ -498,3 +502,6 @@ void PoissonAllocationSampler::RemoveSamplesObserver(
+@@ -505,3 +509,6 @@ void PoissonAllocationSampler::RemoveSamplesObserver(
  }
  
  }  // namespace base
@@ -168,11 +169,11 @@ index 60e96b0081..de29c802f6 100644
 +#undef ThreadLocalData
 +#undef GetThreadLocalData
 diff --git a/base/task/sequenced_task_runner.cc b/base/task/sequenced_task_runner.cc
-index 833b9c5dc6..d46ef2df9b 100644
+index 16bd753e47..d6c6178311 100644
 --- a/base/task/sequenced_task_runner.cc
 +++ b/base/task/sequenced_task_runner.cc
-@@ -10,6 +10,8 @@
- #include "base/task/default_delayed_task_handle_delegate.h"
+@@ -11,6 +11,8 @@
+ #include "base/task/thread_pool/thread_pool_instance.h"
  #include "base/time/time.h"
  
 +#define current_default_handle current_default_handle_sequenced_task_runner
@@ -180,7 +181,7 @@ index 833b9c5dc6..d46ef2df9b 100644
  namespace base {
  
  namespace {
-@@ -138,3 +140,5 @@ OnTaskRunnerDeleter& OnTaskRunnerDeleter::operator=(OnTaskRunnerDeleter&&) =
+@@ -144,3 +146,5 @@ OnTaskRunnerDeleter& OnTaskRunnerDeleter::operator=(OnTaskRunnerDeleter&&) =
      default;
  
  }  // namespace base
@@ -205,6 +206,25 @@ index 651267a81a..179bdf2010 100644
  }  // namespace base
 +
 +#undef current_default_handle
+diff --git a/base/threading/platform_thread_metrics_linux.cc b/base/threading/platform_thread_metrics_linux.cc
+index 13f0eb30a8..3935f876c5 100644
+--- a/base/threading/platform_thread_metrics_linux.cc
++++ b/base/threading/platform_thread_metrics_linux.cc
+@@ -18,6 +18,8 @@
+ #include "base/time/time.h"
+ #include "base/trace_event/trace_event.h"
+ 
++#define ParseTotalCPUTimeFromStats ParseTotalCPUTimeFromStats_PlatformThreadMetricsLinux
++
+ namespace base {
+ 
+ namespace {
+@@ -61,3 +63,5 @@ std::optional<TimeDelta> PlatformThreadMetrics::GetCumulativeCPUUsage() {
+ }
+ 
+ }  // namespace base
++
++#undef ParseTotalCPUTimeFromStats
 diff --git a/cc/cc.gni b/cc/cc.gni
 index 090420c902..6b0e76bf21 100644
 --- a/cc/cc.gni
@@ -236,7 +256,7 @@ index 090420c902..6b0e76bf21 100644
      if (defined(invoker.configs)) {
        configs += invoker.configs
 diff --git a/components/viz/service/display/occlusion_culler.cc b/components/viz/service/display/occlusion_culler.cc
-index 9174b4f92d..4409926784 100644
+index 10d1bba2ce..b895d3a63f 100644
 --- a/components/viz/service/display/occlusion_culler.cc
 +++ b/components/viz/service/display/occlusion_culler.cc
 @@ -26,6 +26,8 @@
@@ -248,7 +268,7 @@ index 9174b4f92d..4409926784 100644
  namespace viz {
  namespace {
  
-@@ -537,3 +539,5 @@ bool OcclusionCuller::CanSplitDrawQuad(
+@@ -536,3 +538,5 @@ bool OcclusionCuller::CanSplitDrawQuad(
  }
  
  }  // namespace viz
@@ -274,10 +294,10 @@ index 898652d4d8..696a784ff1 100644
 +
 +#undef kEpsilon
 diff --git a/components/viz/service/display/skia_renderer.cc b/components/viz/service/display/skia_renderer.cc
-index 038e79c73b..2b43438c9b 100644
+index 16de85a38b..2e699dd26e 100644
 --- a/components/viz/service/display/skia_renderer.cc
 +++ b/components/viz/service/display/skia_renderer.cc
-@@ -108,6 +108,8 @@
+@@ -110,6 +110,8 @@
  #include "components/viz/service/display/overlay_processor_surface_control.h"
  #endif
  
@@ -293,7 +313,7 @@ index 038e79c73b..2b43438c9b 100644
 +
 +#undef MakeOpacityFilter
 diff --git a/components/viz/service/display/software_renderer.cc b/components/viz/service/display/software_renderer.cc
-index 8740f6a0ce..0dee55b0a0 100644
+index 2d952f903f..fab2724532 100644
 --- a/components/viz/service/display/software_renderer.cc
 +++ b/components/viz/service/display/software_renderer.cc
 @@ -53,6 +53,8 @@
@@ -312,7 +332,7 @@ index 8740f6a0ce..0dee55b0a0 100644
 +
 +#undef MakeOpacityFilter
 diff --git a/components/viz/service/frame_sinks/frame_sink_manager_impl.h b/components/viz/service/frame_sinks/frame_sink_manager_impl.h
-index 83ddb1856b..b6979f6f1f 100644
+index 3ebefa4b63..1350f5c75f 100644
 --- a/components/viz/service/frame_sinks/frame_sink_manager_impl.h
 +++ b/components/viz/service/frame_sinks/frame_sink_manager_impl.h
 @@ -5,6 +5,9 @@
