@@ -1,0 +1,26 @@
+--- a/lib_pypy/_sqlite3_build.py
++++ b/lib_pypy/_sqlite3_build.py
+@@ -248,6 +248,7 @@
+ 
+ def _has_load_extension():
+     """Only available since 3.3.6"""
++    return @SQLITE_HAS_LOAD_EXTENSION@
+     unverified_ffi = _FFI()
+     unverified_ffi.cdef("""
+     typedef ... sqlite3;
+@@ -264,6 +265,7 @@
+ 
+ def _has_backup():
+     """Only available since 3.6.11"""
++    return @SQLITE_HAS_BACKUP@
+     unverified_ffi = _FFI()
+     unverified_ffi.cdef("""
+     typedef ... sqlite3;
+@@ -280,6 +282,7 @@
+     return hasattr(unverified_lib, 'sqlite3_backup_init')
+ 
+ def _get_version():
++    return @SQLITE_VERSION_NUMBER@
+     unverified_ffi = _FFI()
+     unverified_ffi.cdef("""
+     int sqlite3_libversion_number(void);
