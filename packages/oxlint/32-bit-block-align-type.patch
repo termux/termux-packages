@@ -1,0 +1,41 @@
+Fixes:
+error: literal out of range for `usize`
+ --> napi/oxlint2/src/generated/raw_transfer_constants.rs:8:32
+  |
+8 | pub const BLOCK_ALIGN: usize = 4294967296;
+when targeting 32-bit
+
+--- a/tasks/ast_tools/src/generators/raw_transfer.rs
++++ b/tasks/ast_tools/src/generators/raw_transfer.rs
+@@ -1066,7 +1066,7 @@ fn generate_constants(consts: Constants) -> (String, TokenStream) {
+ 
+         ///@@line_break
+         pub const BLOCK_SIZE: usize = #block_size;
+-        pub const BLOCK_ALIGN: usize = #block_align;
++        pub const BLOCK_ALIGN: u64 = #block_align;
+         pub const BUFFER_SIZE: usize = #buffer_size;
+         pub const RAW_METADATA_SIZE: usize = #raw_metadata_size;
+     };
+--- a/napi/oxlint2/src/generated/raw_transfer_constants.rs
++++ b/napi/oxlint2/src/generated/raw_transfer_constants.rs
+@@ -5,6 +5,6 @@
+ #![allow(dead_code)]
+ 
+ pub const BLOCK_SIZE: usize = 2147483632;
+-pub const BLOCK_ALIGN: usize = 4294967296;
++pub const BLOCK_ALIGN: u64 = 4294967296;
+ pub const BUFFER_SIZE: usize = 2147483616;
+ pub const RAW_METADATA_SIZE: usize = 16;
+diff --git a/napi/oxlint2/src/lib.rs b/napi/oxlint2/src/lib.rs
+index 4ce833a..83b228b 100644
+--- a/napi/oxlint2/src/lib.rs
++++ b/napi/oxlint2/src/lib.rs
+@@ -82,7 +82,7 @@ fn wrap_run(cb: JsRunCb) -> ExternalLinterCb {
+             // the backing allocation.
+             let chunk_ptr = unsafe {
+                 let ptr = metadata_ptr.cast::<u8>();
+-                let offset = ptr.as_ptr() as usize % BLOCK_ALIGN;
++                let offset = (ptr.as_ptr() as u64 % BLOCK_ALIGN) as usize;
+                 ptr.sub(offset)
+             };
+ 
