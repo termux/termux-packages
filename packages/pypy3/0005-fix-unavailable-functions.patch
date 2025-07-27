@@ -155,7 +155,7 @@
 
 --- a/rpython/rlib/rvmprof/cintf.py
 +++ b/rpython/rlib/rvmprof/cintf.py
-@@ -16,14 +16,14 @@
+@@ -18,16 +18,16 @@
  class VMProfPlatformUnsupported(Exception):
      pass
 
@@ -165,19 +165,22 @@
 -if sys.platform in ('darwin', 'linux', 'linux2') or sys.platform.startswith('freebsd'):
 -    try:
 -        proc = detect_cpu.autodetect()
--        IS_SUPPORTED = proc.startswith('x86') or proc == 'aarch64'
+-        IS_SUPPORTED = (proc.startswith('x86')
+-                        or proc == 'aarch64'
+-                        or proc == 'riscv64')
 -    except detect_cpu.ProcessorAutodetectError:
 -        print("PROCESSOR NOT DETECTED, SKIPPING VMPROF")
 +# if sys.platform in ('darwin', 'linux', 'linux2') or sys.platform.startswith('freebsd'):
 +#     try:
 +#         proc = detect_cpu.autodetect()
-+#         IS_SUPPORTED = proc.startswith('x86') or proc == 'aarch64'
++#         IS_SUPPORTED = (proc.startswith('x86')
++#                         or proc == 'aarch64'
++#                         or proc == 'riscv64')
 +#     except detect_cpu.ProcessorAutodetectError:
 +#         print("PROCESSOR NOT DETECTED, SKIPPING VMPROF")
 
  ROOT = py.path.local(rpythonroot).join('rpython', 'rlib', 'rvmprof')
  SRC = ROOT.join('src')
-
 --- a/pypy/module/posix/moduledef.py
 +++ b/pypy/module/posix/moduledef.py
 @@ -140,12 +140,12 @@

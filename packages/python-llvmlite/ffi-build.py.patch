@@ -1,0 +1,11 @@
+--- a/ffi/build.py
++++ b/ffi/build.py
+@@ -239,6 +239,8 @@
+ 
+ 
+ def main():
++    if os.environ.get("LLVMLITE_SKIP_BUILD_LIBRARY", "0") == "1":
++        return
+     if sys.platform == 'win32':
+         main_windows()
+     elif sys.platform.startswith(('linux', 'gnu')):

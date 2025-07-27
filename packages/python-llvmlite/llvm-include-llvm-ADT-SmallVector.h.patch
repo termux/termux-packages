@@ -1,0 +1,13 @@
+--- a/llvm-project/llvm/include/llvm/ADT/SmallVector.h
++++ b/llvm-project/llvm/include/llvm/ADT/SmallVector.h
+@@ -735,6 +735,10 @@
+     return(N);
+   }
+ 
++#ifdef CS
++#undef CS
++#endif
++
+   iterator erase(const_iterator CS, const_iterator CE) {
+     // Just cast away constness because this is a non-const member function.
+     iterator S = const_cast<iterator>(CS);
