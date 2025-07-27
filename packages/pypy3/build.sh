@@ -2,19 +2,32 @@ TERMUX_PKG_HOMEPAGE=https://pypy.org
 TERMUX_PKG_DESCRIPTION="A fast, compliant alternative implementation of Python 3"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
-_MAJOR_VERSION=3.9
-TERMUX_PKG_VERSION=7.3.15
-TERMUX_PKG_REVISION=4
+_MAJOR_VERSION=3.10
+TERMUX_PKG_VERSION=7.3.17
 TERMUX_PKG_SRCURL=https://downloads.python.org/pypy/pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION-src.tar.bz2
-TERMUX_PKG_SHA256=6bb9537d85aa7ad13c0aad2e41ff7fd55080bc9b4d1361b8f502df51db816e18
+TERMUX_PKG_SHA256=6ad74bc578e9c6d3a8a1c51503313058e3c58c35df86f7485453c4be6ab24bf7
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, zlib"
 TERMUX_PKG_BUILD_DEPENDS="aosp-libs, coreutils, clang, make, pkg-config, python2, tk, xorgproto"
 TERMUX_PKG_RECOMMENDS="clang, make, pkg-config"
 TERMUX_PKG_SUGGESTS="pypy3-tkinter"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
 termux_step_post_get_source() {
-	local p="$TERMUX_PKG_BUILDER_DIR/9998-link-against-pypy3-on-testcapi.diff"
+	local sqlite_version=$(. $TERMUX_SCRIPTDIR/packages/libsqlite/build.sh; echo $TERMUX_PKG_VERSION)
+	local sqlite_version_X=$(cut -d"." -f1 <<< "$sqlite_version")
+	local sqlite_version_Y=$(cut -d"." -f2 <<< "$sqlite_version")
+	local sqlite_version_Z=$(cut -d"." -f3 <<< "$sqlite_version")
+	local SQLITE_VERSION_NUMBER=$(bc <<< "($sqlite_version_X) * 1000000 + ($sqlite_version_Y) * 1000 + ($sqlite_version_Z)")
+	local p="$TERMUX_PKG_BUILDER_DIR/9997-do-not-cffi-dlopen-when-compiling-sqlite3.diff"
+	echo "Applying $(basename "${p}")"
+	sed \
+		's|@SQLITE_HAS_LOAD_EXTENSION@|True|g
+		s|@SQLITE_HAS_BACKUP@|True|g
+		s|@SQLITE_VERSION_NUMBER@|'"${SQLITE_VERSION_NUMBER}"'|g' \
+		"${p}" | patch --silent -p1
+
+	p="$TERMUX_PKG_BUILDER_DIR/9998-link-against-pypy3-on-testcapi.diff"
 	echo "Applying $(basename "${p}")"
 	sed 's|@TERMUX_PYPY_MAJOR_VERSION@|'"${_MAJOR_VERSION}"'|g' "${p}" \
 		| patch --silent -p1
@@ -27,12 +40,6 @@ termux_step_post_get_source() {
 	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
 		"$TERMUX_PKG_BUILDER_DIR"/termux.py.in > \
 		"$TERMUX_PKG_SRCDIR"/rpython/translator/platform/termux.py
-}
-
-termux_step_pre_configure() {
-	if $TERMUX_ON_DEVICE_BUILD; then
-		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
-	fi
 }
 
 __setup_proot() {
@@ -297,7 +304,7 @@ termux_step_make() {
 			--archive-name=pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION \
 			--targetdir=$TERMUX_PKG_SRCDIR \
 			--no-embedded-dependencies \
-			--no-keep-debug || bash
+			--no-keep-debug
 
 	rm -f "$TERMUX_PREFIX"/lib/libpypy$_MAJOR_VERSION-c.so
 }
@@ -315,7 +322,7 @@ termux_step_create_debscripts() {
 	cat <<- PRERM_EOF > ./prerm
 	#!$TERMUX_PREFIX/bin/sh
 
-	if [ "$TERMUX_PACKAGE_FORMAT" != "pacman" ] && [ "\$1" != "remove" ]; then
+	if [ "$TERMUX_PACKAGE_FORMAT" = "debian" ] && [ "\$1" != "remove" ]; then
 	    exit 0
 	fi
 
