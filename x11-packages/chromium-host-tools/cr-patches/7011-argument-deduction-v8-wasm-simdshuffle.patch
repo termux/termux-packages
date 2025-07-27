@@ -1,0 +1,11 @@
+--- a/v8/src/compiler/turboshaft/wasm-shuffle-reducer.cc
++++ b/v8/src/compiler/turboshaft/wasm-shuffle-reducer.cc
+@@ -335,7 +335,7 @@
+ 
+   if (!DemandedByteLanes(&shuffle)) {
+     // Full width shuffles.
+-    wasm::SimdShuffle::ShuffleArray shuffle_bytes;
++    wasm::SimdShuffle::ShuffleArray<> shuffle_bytes;
+     std::copy_n(shuffle.shuffle, kSimd128Size, shuffle_bytes.begin());
+     auto canonical = wasm::SimdShuffle::TryMatchCanonical(shuffle_bytes);
+     switch (canonical) {

@@ -27,11 +27,6 @@ Enable jumbo build for the following component(s)/source_set(s):
 - //media/mojo/clients:clients
 - //media/mojo/common:common
 - //media/mojo/services:services
-- //ppapi/cpp:cpp
-- //ppapi/cpp:objects
-- //ppapi/host:host
-- //ppapi/proxy:proxy
-- //ppapi/shared_impl:common
 - //services/cert_verifier/cert_net_url_loader:cert_net_url_loader
 - //services/network:network_service
 - //services/network/public/cpp:crash_keys
@@ -43,7 +38,7 @@ Enable jumbo build for the following component(s)/source_set(s):
 ---
  gpu/BUILD.gn                                  |  3 ++-
  gpu/command_buffer/client/BUILD.gn            |  9 ++++----
- gpu/command_buffer/common/BUILD.gn            |  5 +++--
+ gpu/command_buffer/common/BUILD.gn            |  3 ++-
  gpu/command_buffer/service/BUILD.gn           |  7 ++++---
  gpu/command_buffer/service/graphite_utils.cc  |  5 +++++
  .../angle_vulkan_image_backing_factory.cc     |  4 ++++
@@ -81,10 +76,6 @@ Enable jumbo build for the following component(s)/source_set(s):
  media/mojo/clients/BUILD.gn                   |  4 +++-
  media/mojo/common/BUILD.gn                    |  4 +++-
  media/mojo/services/BUILD.gn                  |  3 ++-
- ppapi/cpp/BUILD.gn                            |  5 +++--
- ppapi/host/BUILD.gn                           |  3 ++-
- ppapi/proxy/BUILD.gn                          | 11 ++++++++--
- ppapi/shared_impl/BUILD.gn                    |  9 +++++++-
  .../cert_net_url_loader/BUILD.gn              |  3 ++-
  services/network/BUILD.gn                     |  5 +++--
  .../http_server_properties_pref_delegate.cc   |  4 ++++
@@ -95,10 +86,10 @@ Enable jumbo build for the following component(s)/source_set(s):
  services/network/url_loader.cc                |  4 ++++
  .../web_bundle_url_loader_factory.cc          |  4 ++++
  storage/browser/BUILD.gn                      |  5 +++--
- 54 files changed, 263 insertions(+), 44 deletions(-)
+ 50 files changed, 240 insertions(+), 37 deletions(-)
 
 diff --git a/gpu/BUILD.gn b/gpu/BUILD.gn
-index b2717ed988..b6698232fd 100644
+index 869304bdbe..41c40b91b6 100644
 --- a/gpu/BUILD.gn
 +++ b/gpu/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -109,7 +100,7 @@ index b2717ed988..b6698232fd 100644
  import("//build/config/ui.gni")
  import("//gpu/vulkan/features.gni")
  import("//skia/features.gni")
-@@ -75,7 +76,7 @@ component("webgpu") {
+@@ -70,7 +71,7 @@ component("webgpu") {
    public_deps = [ "//gpu/command_buffer/client:webgpu_sources" ]
  }
  
@@ -119,7 +110,7 @@ index b2717ed988..b6698232fd 100644
    sources = [
      "command_buffer/client/client_test_helper.cc",
 diff --git a/gpu/command_buffer/client/BUILD.gn b/gpu/command_buffer/client/BUILD.gn
-index 7fd901cdce..982c8841c7 100644
+index 22c57a9715..90259e1be3 100644
 --- a/gpu/command_buffer/client/BUILD.gn
 +++ b/gpu/command_buffer/client/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -127,10 +118,10 @@ index 7fd901cdce..982c8841c7 100644
  # found in the LICENSE file.
  
 +import("//build/config/jumbo.gni")
- import("//components/nacl/toolchain.gni")
+ import("//build/config/ozone.gni")
+ import("//skia/features.gni")
  import("//ui/gl/features.gni")
- 
-@@ -53,7 +54,7 @@ group("webgpu") {
+@@ -47,7 +48,7 @@ group("webgpu") {
    }
  }
  
@@ -138,8 +129,8 @@ index 7fd901cdce..982c8841c7 100644
 +jumbo_source_set("client_sources") {
    # External code should depend on this via //gpu/client above rather than
    # depending on this directly or the component build will break.
-   visibility = [ "//gpu/*" ]
-@@ -258,7 +259,7 @@ source_set("webgpu_interface") {
+   visibility = [ ":client" ]
+@@ -227,7 +228,7 @@ source_set("webgpu_interface") {
  }
  
  # Library emulates GLES2 using command_buffers.
@@ -148,7 +139,7 @@ index 7fd901cdce..982c8841c7 100644
    sources = gles2_implementation_source_files
  
    defines = [ "GLES2_IMPL_IMPLEMENTATION" ]
-@@ -361,7 +362,7 @@ source_set("webgpu_sources") {
+@@ -324,7 +325,7 @@ source_set("webgpu_sources") {
  }
  
  # Library emulates GLES2 using command_buffers.
@@ -157,8 +148,8 @@ index 7fd901cdce..982c8841c7 100644
    sources = gles2_implementation_source_files
  
    defines = [ "GLES2_IMPL_IMPLEMENTATION" ]
-@@ -391,7 +392,7 @@ component("gles2_implementation_no_check") {
-   }
+@@ -348,7 +349,7 @@ component("gles2_implementation_no_check") {
+   ]
  }
  
 -component("gles2_c_lib") {
@@ -167,7 +158,7 @@ index 7fd901cdce..982c8841c7 100644
    defines = [ "GLES2_C_LIB_IMPLEMENTATION" ]
  
 diff --git a/gpu/command_buffer/common/BUILD.gn b/gpu/command_buffer/common/BUILD.gn
-index 22dc13cad2..a7ad96ca1b 100644
+index 9527a8a78a..a7e7a332c3 100644
 --- a/gpu/command_buffer/common/BUILD.gn
 +++ b/gpu/command_buffer/common/BUILD.gn
 @@ -7,6 +7,7 @@
@@ -177,27 +168,18 @@ index 22dc13cad2..a7ad96ca1b 100644
 +import("//build/config/jumbo.gni")
  import("//ui/gl/features.gni")
  
- group("common") {
-@@ -47,7 +48,7 @@ group("webgpu") {
- 
- # Minimal set of definitions which don't have GPU dependencies outside of this
- # directory.
--source_set("common_base_sources") {
-+jumbo_source_set("common_base_sources") {
-   visibility = [ "//gpu/*" ]
-   sources = [
-     "command_buffer_id.h",
-@@ -66,7 +67,7 @@ source_set("common_base_sources") {
-   configs += [ "//gpu:gpu_implementation" ]
+ config("implementation") {
+@@ -46,7 +47,7 @@ group("webgpu") {
+   public_deps = [ ":webgpu_sources" ]
  }
  
 -source_set("common_sources") {
 +jumbo_source_set("common_sources") {
-   visibility = [ "//gpu/*" ]
+   visibility = [ ":common" ]
  
    sources = [
 diff --git a/gpu/command_buffer/service/BUILD.gn b/gpu/command_buffer/service/BUILD.gn
-index 12c0273638..b4d84a18a8 100644
+index 95ed9d48f2..e3ebf2d507 100644
 --- a/gpu/command_buffer/service/BUILD.gn
 +++ b/gpu/command_buffer/service/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -208,7 +190,7 @@ index 12c0273638..b4d84a18a8 100644
  import("//build/config/ui.gni")
  import("//gpu/vulkan/features.gni")
  import("//skia/features.gni")
-@@ -26,9 +27,9 @@ group("gles2") {
+@@ -27,9 +28,9 @@ group("gles2") {
  }
  
  if (is_component_build) {
@@ -218,9 +200,9 @@ index 12c0273638..b4d84a18a8 100644
 -  link_target_type = "static_library"
 +  link_target_type = "jumbo_static_library"
  }
- target(link_target_type, "service_sources") {
+ source_set("service_sources") {
    # External code should depend on this via //gpu/command_buffer/service above
-@@ -644,7 +645,7 @@ proto_library("disk_cache_proto") {
+@@ -643,7 +644,7 @@ proto_library("disk_cache_proto") {
  }
  
  if (is_android) {
@@ -230,7 +212,7 @@ index 12c0273638..b4d84a18a8 100644
      sources = [
        "mock_texture_owner.cc",
 diff --git a/gpu/command_buffer/service/graphite_utils.cc b/gpu/command_buffer/service/graphite_utils.cc
-index 6e4f231866..f60731f55b 100644
+index f7518d6b59..05d4365d98 100644
 --- a/gpu/command_buffer/service/graphite_utils.cc
 +++ b/gpu/command_buffer/service/graphite_utils.cc
 @@ -13,6 +13,8 @@
@@ -242,7 +224,7 @@ index 6e4f231866..f60731f55b 100644
  namespace gpu {
  namespace {
  
-@@ -105,3 +107,6 @@ bool GraphiteReadPixelsSync(GraphiteSharedContext* context,
+@@ -104,3 +106,6 @@ bool GraphiteReadPixelsSync(GraphiteSharedContext* context,
  }
  
  }  // namespace gpu
@@ -345,7 +327,7 @@ index 546b9c0e11..740d89d506 100644
 +
 +#undef kSupportedUsage
 diff --git a/gpu/command_buffer/service/shared_image/ozone_image_backing_factory.cc b/gpu/command_buffer/service/shared_image/ozone_image_backing_factory.cc
-index 2b37b7c0d1..4c4b7135dc 100644
+index 16ce3e2a79..ed9a7109c9 100644
 --- a/gpu/command_buffer/service/shared_image/ozone_image_backing_factory.cc
 +++ b/gpu/command_buffer/service/shared_image/ozone_image_backing_factory.cc
 @@ -35,6 +35,8 @@
@@ -357,7 +339,7 @@ index 2b37b7c0d1..4c4b7135dc 100644
  namespace gpu {
  namespace {
  
-@@ -412,3 +414,5 @@ SharedImageBackingType OzoneImageBackingFactory::GetBackingType() {
+@@ -414,3 +416,5 @@ SharedImageBackingType OzoneImageBackingFactory::GetBackingType() {
  }
  
  }  // namespace gpu
@@ -378,10 +360,10 @@ index a2bf9cb7c0..f4180c44eb 100644
  
  namespace {
 diff --git a/gpu/command_buffer/service/shared_image/wrapped_graphite_texture_backing.cc b/gpu/command_buffer/service/shared_image/wrapped_graphite_texture_backing.cc
-index 1c90e06233..8d049c4bff 100644
+index d7f2efb51e..8b239d1571 100644
 --- a/gpu/command_buffer/service/shared_image/wrapped_graphite_texture_backing.cc
 +++ b/gpu/command_buffer/service/shared_image/wrapped_graphite_texture_backing.cc
-@@ -32,6 +32,9 @@
+@@ -33,6 +33,9 @@
  #include "gpu/command_buffer/service/shared_image/dawn_fallback_image_representation.h"
  #endif
  
@@ -399,7 +381,7 @@ index 1c90e06233..8d049c4bff 100644
 +#undef ReadPixelsContext
 +#undef OnReadPixelsDone
 diff --git a/gpu/command_buffer/service/shared_image/wrapped_sk_image_backing_factory.cc b/gpu/command_buffer/service/shared_image/wrapped_sk_image_backing_factory.cc
-index bab05ec057..435500c12f 100644
+index 49387f6995..d714e55f22 100644
 --- a/gpu/command_buffer/service/shared_image/wrapped_sk_image_backing_factory.cc
 +++ b/gpu/command_buffer/service/shared_image/wrapped_sk_image_backing_factory.cc
 @@ -25,6 +25,8 @@
@@ -411,14 +393,14 @@ index bab05ec057..435500c12f 100644
  namespace gpu {
  namespace {
  // NOTE: WrappedSkImage cannot be used with raster-over-GLES2 as it doesn't
-@@ -256,3 +258,5 @@ SharedImageBackingType WrappedSkImageBackingFactory::GetBackingType() {
+@@ -255,3 +257,5 @@ SharedImageBackingType WrappedSkImageBackingFactory::GetBackingType() {
  }
  
  }  // namespace gpu
 +
 +#undef kSupportedUsage
 diff --git a/gpu/config/BUILD.gn b/gpu/config/BUILD.gn
-index 4d0a06cd9c..24e3692c83 100644
+index f2a88f2e4e..abdfd3c38d 100644
 --- a/gpu/config/BUILD.gn
 +++ b/gpu/config/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -429,15 +411,15 @@ index 4d0a06cd9c..24e3692c83 100644
  import("//build/config/ui.gni")
  import("//gpu/vulkan/features.gni")
  import("//skia/features.gni")
-@@ -123,7 +124,7 @@ source_set("webgpu_blocklist_impl") {
+@@ -90,7 +91,7 @@ source_set("webgpu_blocklist_impl") {
    public_deps = [ "//third_party/dawn/include/dawn:cpp_headers" ]
  }
  
--source_set("config_sources") {
-+jumbo_source_set("config_sources") {
-   # External code should depend on this via //gpu/config above rather than
-   # depending on this directly or the component build will break.
-   visibility = [ "//gpu/*" ]
+-component("config") {
++jumbo_component("config") {
+   sources = [
+     "device_perf_info.cc",
+     "device_perf_info.h",
 diff --git a/gpu/config/webgpu_blocklist_impl.h b/gpu/config/webgpu_blocklist_impl.h
 index 870bf84ac0..a78a41f79a 100644
 --- a/gpu/config/webgpu_blocklist_impl.h
@@ -453,7 +435,7 @@ index 870bf84ac0..a78a41f79a 100644
  #include <string>
  
 diff --git a/gpu/ipc/service/BUILD.gn b/gpu/ipc/service/BUILD.gn
-index 237bff815a..e1465ee3ec 100644
+index 77b69bc2a6..8ee6337139 100644
 --- a/gpu/ipc/service/BUILD.gn
 +++ b/gpu/ipc/service/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -474,7 +456,7 @@ index 237bff815a..e1465ee3ec 100644
    sources = [
      "command_buffer_stub.cc",
 diff --git a/media/audio/BUILD.gn b/media/audio/BUILD.gn
-index 6192d8fdc4..f7109dad1b 100644
+index 5064c9e218..67465299fc 100644
 --- a/media/audio/BUILD.gn
 +++ b/media/audio/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -516,10 +498,10 @@ index e6a9a6e534..726687267b 100644
 +#undef kDefaultSampleRate
 +#undef kDefaultInputBufferSize
 diff --git a/media/audio/pulse/audio_manager_pulse.cc b/media/audio/pulse/audio_manager_pulse.cc
-index 0187af2a4d..d5cbc49c28 100644
+index 8937e42da6..22c457d6d6 100644
 --- a/media/audio/pulse/audio_manager_pulse.cc
 +++ b/media/audio/pulse/audio_manager_pulse.cc
-@@ -25,6 +25,9 @@
+@@ -21,6 +21,9 @@
  #include "media/base/audio_parameters.h"
  #include "media/base/channel_layout.h"
  
@@ -529,7 +511,7 @@ index 0187af2a4d..d5cbc49c28 100644
  namespace media {
  
  using pulse::AutoPulseLock;
-@@ -374,3 +377,6 @@ void AudioManagerPulse::DefaultSourceInfoCallback(pa_context* context,
+@@ -375,3 +378,6 @@ void AudioManagerPulse::DefaultSourceInfoCallback(pa_context* context,
  }
  
  }  // namespace media
@@ -537,7 +519,7 @@ index 0187af2a4d..d5cbc49c28 100644
 +#undef kDefaultSampleRate
 +#undef kDefaultInputBufferSize
 diff --git a/media/base/BUILD.gn b/media/base/BUILD.gn
-index 4e4188156f..2bf1ac2177 100644
+index 46cc3ff184..ee24edf725 100644
 --- a/media/base/BUILD.gn
 +++ b/media/base/BUILD.gn
 @@ -5,6 +5,7 @@
@@ -557,7 +539,7 @@ index 4e4188156f..2bf1ac2177 100644
    # Do not expand the visibility here without double-checking with OWNERS, this
    # is a roll-up target which is part of the //media component. Most other DEPs
    # should be using //media and not directly DEP this roll-up target.
-@@ -445,6 +446,8 @@ source_set("base") {
+@@ -461,6 +462,8 @@ source_set("base") {
        "libaom_thread_wrapper.cc",
        "libaom_thread_wrapper.h",
      ]
@@ -567,7 +549,7 @@ index 4e4188156f..2bf1ac2177 100644
    }
  
 diff --git a/media/base/android/BUILD.gn b/media/base/android/BUILD.gn
-index 3eb8ca5c90..52765e5c0a 100644
+index 830dcacb49..62aa572758 100644
 --- a/media/base/android/BUILD.gn
 +++ b/media/base/android/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -588,7 +570,7 @@ index 3eb8ca5c90..52765e5c0a 100644
        "//media",
        "//media/filters",
 diff --git a/media/base/ipc/BUILD.gn b/media/base/ipc/BUILD.gn
-index 6217873522..98da4b4751 100644
+index e887c85d63..1a5ee54f7f 100644
 --- a/media/base/ipc/BUILD.gn
 +++ b/media/base/ipc/BUILD.gn
 @@ -2,7 +2,9 @@
@@ -620,7 +602,7 @@ index 068aefecec..4c851aabf0 100644
    # build, if other component targets also depend on it, multiple copies of
    # the ObjC classes declared in the files below will cause warnings at
 diff --git a/media/base/win/BUILD.gn b/media/base/win/BUILD.gn
-index 076e3ef667..5571e2d985 100644
+index d0637863ef..803f51d16f 100644
 --- a/media/base/win/BUILD.gn
 +++ b/media/base/win/BUILD.gn
 @@ -2,6 +2,8 @@
@@ -642,7 +624,7 @@ index 076e3ef667..5571e2d985 100644
      "dxgi_device_manager.cc",
      "dxgi_device_manager.h",
 diff --git a/media/capture/BUILD.gn b/media/capture/BUILD.gn
-index d3047c61bd..27748d10ee 100644
+index 92eeda5495..32fe400042 100644
 --- a/media/capture/BUILD.gn
 +++ b/media/capture/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -662,7 +644,7 @@ index d3047c61bd..27748d10ee 100644
    defines = [ "CAPTURE_IMPLEMENTATION" ]
    sources = [
      "capture_export.h",
-@@ -57,7 +58,7 @@ component("capture_base") {
+@@ -56,7 +57,7 @@ component("capture_base") {
  }
  
  # Target which allows breakout of Android BUILD.gn files.
@@ -671,7 +653,7 @@ index d3047c61bd..27748d10ee 100644
    visibility = [
      ":capture_lib",
      "//media/capture/video/android",
-@@ -118,7 +119,7 @@ source_set("capture_device_specific") {
+@@ -117,7 +118,7 @@ source_set("capture_device_specific") {
    ]
  }
  
@@ -681,7 +663,7 @@ index d3047c61bd..27748d10ee 100644
    sources = [
      "video/create_video_capture_device_factory.cc",
 diff --git a/media/cast/BUILD.gn b/media/cast/BUILD.gn
-index da18ae42f1..25a1942a66 100644
+index 7fa20a0c14..69a6d7c618 100644
 --- a/media/cast/BUILD.gn
 +++ b/media/cast/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -852,16 +834,20 @@ index fa5282c0a0..26f4eba513 100644
 +#undef kHistogramDroppedFrames
 +#undef kHistogramFrameDropped
 diff --git a/media/filters/BUILD.gn b/media/filters/BUILD.gn
-index 10731337ee..aff6135a64 100644
+index a4a17348c7..b2a99d1032 100644
 --- a/media/filters/BUILD.gn
 +++ b/media/filters/BUILD.gn
-@@ -2,10 +2,11 @@
+@@ -2,6 +2,7 @@
  # Use of this source code is governed by a BSD-style license that can be
  # found in the LICENSE file.
  
 +import("//build/config/jumbo.gni")
  import("//media/gpu/args.gni")
  import("//media/media_options.gni")
+ 
+@@ -19,7 +20,7 @@ if (media_use_symphonia) {
+   }
+ }
  
 -source_set("filters") {
 +jumbo_source_set("filters") {
@@ -915,10 +901,10 @@ index 9f2b1befd4..d63f7a13d3 100644
 +#undef kParamSetStartCodeSize
 +#undef IsAccessUnitBoundaryNal
 diff --git a/media/filters/media_file_checker.cc b/media/filters/media_file_checker.cc
-index 57d6596f01..9b0cc36127 100644
+index 2e73f3b94e..52158ac426 100644
 --- a/media/filters/media_file_checker.cc
 +++ b/media/filters/media_file_checker.cc
-@@ -25,6 +25,8 @@
+@@ -22,6 +22,8 @@
  #include "media/filters/ffmpeg_glue.h"
  #include "media/filters/file_data_source.h"
  
@@ -927,14 +913,14 @@ index 57d6596f01..9b0cc36127 100644
  namespace media {
  
  namespace {
-@@ -115,3 +117,5 @@ bool MediaFileChecker::Start(base::TimeDelta check_time) {
+@@ -119,3 +121,5 @@ bool MediaFileChecker::Start(base::TimeDelta check_time) {
  }
  
  }  // namespace media
 +
 +#undef Decoder
 diff --git a/media/media_options.gni b/media/media_options.gni
-index ae57faa90b..1237ad197b 100644
+index 0fa73ede02..ff3ee111da 100644
 --- a/media/media_options.gni
 +++ b/media/media_options.gni
 @@ -6,6 +6,7 @@ import("//build/config/cast.gni")
@@ -945,7 +931,7 @@ index ae57faa90b..1237ad197b 100644
  import("//build/config/ui.gni")
  import("//media/gpu/args.gni")
  import("//testing/libfuzzer/fuzzer_test.gni")
-@@ -106,7 +107,7 @@ declare_args() {
+@@ -112,7 +113,7 @@ declare_args() {
    # Enable logging override, e.g. enable DVLOGs through level 2 at build time.
    # On Cast devices, these are logged as INFO.
    # When enabled on Fuchsia, these are logged as VLOGs.
@@ -954,7 +940,7 @@ index ae57faa90b..1237ad197b 100644
  
    enable_dav1d_decoder = use_blink
  
-@@ -192,6 +193,9 @@ assert(!enable_hevc_parser_and_hw_decoder || enable_platform_hevc,
+@@ -198,6 +199,9 @@ assert(!enable_hevc_parser_and_hw_decoder || enable_platform_hevc,
  assert(!enable_platform_dolby_vision || enable_platform_hevc,
         "enable_platform_hevc required for enable_platform_dolby_vision")
  
@@ -965,7 +951,7 @@ index ae57faa90b..1237ad197b 100644
  declare_args() {
    # Enables runtime selection of PulseAudio library.
 diff --git a/media/mojo/clients/BUILD.gn b/media/mojo/clients/BUILD.gn
-index 1fce9bb072..abc833fe25 100644
+index 26bd2b657c..1b6434dc77 100644
 --- a/media/mojo/clients/BUILD.gn
 +++ b/media/mojo/clients/BUILD.gn
 @@ -4,8 +4,10 @@
@@ -996,7 +982,7 @@ index 938e729435..ef6f59d320 100644
      "audio_data_s16_converter.cc",
      "audio_data_s16_converter.h",
 diff --git a/media/mojo/services/BUILD.gn b/media/mojo/services/BUILD.gn
-index 39c0e085c0..0cc91bca9b 100644
+index e439caf5fb..97b3188d6b 100644
 --- a/media/mojo/services/BUILD.gn
 +++ b/media/mojo/services/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1016,124 +1002,6 @@ index 39c0e085c0..0cc91bca9b 100644
    output_name = "media_mojo_services"
    sources = [
      "deferred_destroy_unique_receiver_set.h",
-diff --git a/ppapi/cpp/BUILD.gn b/ppapi/cpp/BUILD.gn
-index c916c3a5c3..0e03f92ded 100644
---- a/ppapi/cpp/BUILD.gn
-+++ b/ppapi/cpp/BUILD.gn
-@@ -2,6 +2,7 @@
- # Use of this source code is governed by a BSD-style license that can be
- # found in the LICENSE file.
- 
-+import("//build/config/jumbo.gni")
- import("//ppapi/buildflags/buildflags.gni")
- 
- if (is_nacl) {
-@@ -13,7 +14,7 @@ assert(enable_ppapi)
- if (is_nacl && is_nacl_glibc) {
-   cpp_target_type = "shared_library"
- } else {
--  cpp_target_type = "static_library"
-+  cpp_target_type = "jumbo_static_library"
- }
- 
- # Link to this target to get the PPAPI C++ wrapper objects and plugin startup
-@@ -54,7 +55,7 @@ target(cpp_target_type, "cpp") {
- # Link to this target to get only the PPAPI C++ wrapper objects but not the
- # plugin startup code. Some plugins need special startup code that they supply
- # themselves.
--source_set("objects") {
-+jumbo_source_set("objects") {
-   sources = [
-     "array_output.cc",
-     "array_output.h",
-diff --git a/ppapi/host/BUILD.gn b/ppapi/host/BUILD.gn
-index 46c0f01597..acf4d9f466 100644
---- a/ppapi/host/BUILD.gn
-+++ b/ppapi/host/BUILD.gn
-@@ -2,11 +2,12 @@
- # Use of this source code is governed by a BSD-style license that can be
- # found in the LICENSE file.
- 
-+import("//build/config/jumbo.gni")
- import("//ppapi/buildflags/buildflags.gni")
- 
- assert(enable_ppapi)
- 
--component("host") {
-+jumbo_component("host") {
-   output_name = "ppapi_host"
- 
-   sources = [
-diff --git a/ppapi/proxy/BUILD.gn b/ppapi/proxy/BUILD.gn
-index fc97758faa..1a40565110 100644
---- a/ppapi/proxy/BUILD.gn
-+++ b/ppapi/proxy/BUILD.gn
-@@ -2,6 +2,7 @@
- # Use of this source code is governed by a BSD-style license that can be
- # found in the LICENSE file.
- 
-+import("//build/config/jumbo.gni")
- import("//build/config/nacl/config.gni")
- import("//components/nacl/toolchain.gni")
- import("//ppapi/buildflags/buildflags.gni")
-@@ -12,9 +13,15 @@ config("proxy_implementation") {
-   defines = [ "PPAPI_PROXY_IMPLEMENTATION" ]
- }
- 
--component("proxy") {
-+jumbo_component("proxy") {
-   output_name = "ppapi_proxy"
- 
-+  if (is_nacl) {
-+    # The nacl toolchain has template related bugs that are triggered
-+    # in jumbo builds. https://crbug.com/912152
-+    never_build_jumbo = true
-+  }
-+
-   sources = [
-     # Take some standalone files from the C++ wrapper allowing us to more
-     # easily make async callbacks in the proxy. We can't depend on the
-@@ -326,7 +333,7 @@ source_set("ipc_sources") {
-   }
- }
- 
--static_library("test_support") {
-+jumbo_static_library("test_support") {
-   testonly = true
- 
-   sources = [
-diff --git a/ppapi/shared_impl/BUILD.gn b/ppapi/shared_impl/BUILD.gn
-index d6efdcc516..931da455d4 100644
---- a/ppapi/shared_impl/BUILD.gn
-+++ b/ppapi/shared_impl/BUILD.gn
-@@ -2,6 +2,7 @@
- # Use of this source code is governed by a BSD-style license that can be
- # found in the LICENSE file.
- 
-+import("//build/config/jumbo.gni")
- import("//build/config/nacl/config.gni")
- import("//components/nacl/toolchain.gni")
- import("//ppapi/buildflags/buildflags.gni")
-@@ -42,12 +43,18 @@ source_set("headers") {
- }
- 
- # This contains the things that //ppapi/thunk needs.
--source_set("common") {
-+jumbo_source_set("common") {
-   visibility = [
-     ":*",
-     "//ppapi/thunk:*",
-   ]
- 
-+  if (is_nacl) {
-+    # The nacl toolchain has template related bugs that are triggered
-+    # in jumbo builds. https://crbug.com/912152
-+    never_build_jumbo = true
-+  }
-+
-   sources = [
-     "array_var.cc",
-     "array_var.h",
 diff --git a/services/cert_verifier/cert_net_url_loader/BUILD.gn b/services/cert_verifier/cert_net_url_loader/BUILD.gn
 index ffc6bdc4ab..28ab85355d 100644
 --- a/services/cert_verifier/cert_net_url_loader/BUILD.gn
@@ -1152,7 +1020,7 @@ index ffc6bdc4ab..28ab85355d 100644
      "cert_net_fetcher_url_loader.cc",
      "cert_net_fetcher_url_loader.h",
 diff --git a/services/network/BUILD.gn b/services/network/BUILD.gn
-index 35a32bb950..16553f537e 100644
+index e9b6941608..d2e7a968fb 100644
 --- a/services/network/BUILD.gn
 +++ b/services/network/BUILD.gn
 @@ -3,12 +3,13 @@
@@ -1170,8 +1038,8 @@ index 35a32bb950..16553f537e 100644
    sources = [
      "accept_ch_frame_interceptor.cc",
      "accept_ch_frame_interceptor.h",
-@@ -624,7 +625,7 @@ source_set("tests") {
-   }
+@@ -635,7 +636,7 @@ source_set("tests") {
+   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
  }
  
 -source_set("test_support") {
@@ -1218,7 +1086,7 @@ index 188783cc42..7918267eee 100644
 +
 +#undef kPrefPath
 diff --git a/services/network/public/cpp/BUILD.gn b/services/network/public/cpp/BUILD.gn
-index 5b66798fda..c638a691c8 100644
+index 3fcd5fefad..9ebddf587c 100644
 --- a/services/network/public/cpp/BUILD.gn
 +++ b/services/network/public/cpp/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1229,7 +1097,7 @@ index 5b66798fda..c638a691c8 100644
  import("//mojo/public/tools/bindings/mojom.gni")
  import("//net/features.gni")
  import("//services/network/public/cpp/features.gni")
-@@ -42,7 +43,7 @@ blink_python_runner("make_generated_permissions_policy_features") {
+@@ -43,7 +44,7 @@ blink_python_runner("make_generated_permissions_policy_features") {
    ]
  }
  
@@ -1238,7 +1106,7 @@ index 5b66798fda..c638a691c8 100644
    sources = [
      "crash_keys.cc",
      "crash_keys.h",
-@@ -52,7 +53,7 @@ component("crash_keys") {
+@@ -53,7 +54,7 @@ component("crash_keys") {
    defines = [ "IS_NETWORK_CPP_CRASH_KEYS_IMPL" ]
  }
  
@@ -1247,7 +1115,7 @@ index 5b66798fda..c638a691c8 100644
    output_name = "network_cpp"
  
    sources = [
-@@ -512,7 +513,7 @@ component("schemeful_site_mojom_support") {
+@@ -540,7 +541,7 @@ component("schemeful_site_mojom_support") {
  
  # This component is separate from cpp_base as it is a dependency of
  # //services/network/public/mojom:cookies_mojom.
@@ -1256,7 +1124,7 @@ index 5b66798fda..c638a691c8 100644
    sources = [
      "first_party_sets_mojom_traits.cc",
      "first_party_sets_mojom_traits.h",
-@@ -542,7 +543,7 @@ component("storage_access_api_mojom_support") {
+@@ -570,7 +571,7 @@ component("storage_access_api_mojom_support") {
    defines = [ "IS_STORAGE_ACCESS_API_MOJOM_TRAITS_IMPL" ]
  }
  
@@ -1265,7 +1133,7 @@ index 5b66798fda..c638a691c8 100644
    output_name = "network_cpp_base"
  
    sources = [
-@@ -600,6 +601,7 @@ component("cpp_base") {
+@@ -628,6 +629,7 @@ component("cpp_base") {
      "web_transport_error_mojom_traits.cc",
      "web_transport_error_mojom_traits.h",
    ]
@@ -1273,7 +1141,7 @@ index 5b66798fda..c638a691c8 100644
  
    configs += [ "//build/config/compiler:wexit_time_destructors" ]
  
-@@ -645,6 +647,9 @@ component("cpp_base") {
+@@ -673,6 +675,9 @@ component("cpp_base") {
        "p2p_param_traits.h",
        "p2p_socket_type.h",
      ]
@@ -1330,10 +1198,10 @@ index b32b864b80..3407788fbe 100644
 +#undef kReportOnlyHeaderName
 +#undef Parse
 diff --git a/services/network/url_loader.cc b/services/network/url_loader.cc
-index b4e32dd34c..264b90b56c 100644
+index 6318bfabcf..e8ae4473f5 100644
 --- a/services/network/url_loader.cc
 +++ b/services/network/url_loader.cc
-@@ -129,6 +129,8 @@
+@@ -132,6 +132,8 @@
  #include "third_party/abseil-cpp/absl/container/inlined_vector.h"
  #include "url/origin.h"
  
@@ -1342,17 +1210,17 @@ index b4e32dd34c..264b90b56c 100644
  namespace network {
  
  namespace {
-@@ -2556,3 +2558,5 @@ const mojom::ClientSecurityState* URLLoader::GetClientSecurityState() {
+@@ -2587,3 +2589,5 @@ void URLLoader::ResetRawHeadersForRedirect() {
  }
  
  }  // namespace network
 +
 +#undef kBlockedBodyAllocationSize
 diff --git a/services/network/web_bundle/web_bundle_url_loader_factory.cc b/services/network/web_bundle/web_bundle_url_loader_factory.cc
-index f8309ec80c..8c1bfc273d 100644
+index 6d7f10645e..d8c8ddcd96 100644
 --- a/services/network/web_bundle/web_bundle_url_loader_factory.cc
 +++ b/services/network/web_bundle/web_bundle_url_loader_factory.cc
-@@ -32,6 +32,8 @@
+@@ -35,6 +35,8 @@
  #include "services/network/web_bundle/web_bundle_chunked_buffer.h"
  #include "services/network/web_bundle/web_bundle_memory_quota_consumer.h"
  
@@ -1361,14 +1229,14 @@ index f8309ec80c..8c1bfc273d 100644
  namespace network {
  
  namespace {
-@@ -980,3 +982,5 @@ void WebBundleURLLoaderFactory::OnWebBundleFetchFailed() {
+@@ -983,3 +985,5 @@ void WebBundleURLLoaderFactory::OnWebBundleFetchFailed() {
  }
  
  }  // namespace network
 +
 +#undef kBlockedBodyAllocationSize
 diff --git a/storage/browser/BUILD.gn b/storage/browser/BUILD.gn
-index bed170f3cf..fdb5d2edd9 100644
+index d073934ad4..727774d7be 100644
 --- a/storage/browser/BUILD.gn
 +++ b/storage/browser/BUILD.gn
 @@ -1,10 +1,11 @@
@@ -1384,8 +1252,8 @@ index bed170f3cf..fdb5d2edd9 100644
    output_name = "storage_browser"
    sources = [
      "blob/blob_builder_from_stream.cc",
-@@ -344,7 +345,7 @@ source_set("unittests") {
-   ]
+@@ -348,7 +349,7 @@ source_set("unittests") {
+   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
  }
  
 -static_library("test_support") {

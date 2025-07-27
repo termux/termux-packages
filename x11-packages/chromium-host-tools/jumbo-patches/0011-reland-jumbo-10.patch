@@ -32,6 +32,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  device/bluetooth/server_socket.cc                  |  4 ++++
  device/bluetooth/socket.cc                         |  4 ++++
  device/fido/BUILD.gn                               |  3 ++-
+ device/fido/enclave/enclave_authenticator.cc       |  8 ++++++++
  device/fido/get_assertion_request_handler.cc       |  4 ++++
  device/fido/make_credential_request_handler.cc     |  4 ++++
  device/gamepad/BUILD.gn                            |  3 ++-
@@ -69,7 +70,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  extensions/renderer/BUILD.gn                       |  5 +++--
  .../renderer/extension_localization_throttle.cc    |  4 ++++
  .../renderer/extension_url_loader_throttle.cc      |  4 ++++
- 55 files changed, 243 insertions(+), 41 deletions(-)
+ 56 files changed, 251 insertions(+), 41 deletions(-)
 
 diff --git a/device/bluetooth/BUILD.gn b/device/bluetooth/BUILD.gn
 index e69ef178a0..51a328057b 100644
@@ -316,10 +317,10 @@ index 26fefad8ac..34b69fcab2 100644
 +
 +#undef kErrorInvalidArgs
 diff --git a/device/bluetooth/dbus/fake_bluetooth_adapter_client.cc b/device/bluetooth/dbus/fake_bluetooth_adapter_client.cc
-index 598003e425..0e03e41532 100644
+index 3341a25a41..da39c5f310 100644
 --- a/device/bluetooth/dbus/fake_bluetooth_adapter_client.cc
 +++ b/device/bluetooth/dbus/fake_bluetooth_adapter_client.cc
-@@ -20,6 +20,8 @@
+@@ -21,6 +21,8 @@
  #include "device/bluetooth/dbus/fake_bluetooth_device_client.h"
  #include "third_party/cros_system_api/dbus/service_constants.h"
  
@@ -328,7 +329,7 @@ index 598003e425..0e03e41532 100644
  namespace bluez {
  
  namespace {
-@@ -382,3 +384,5 @@ void FakeBluetoothAdapterClient::PostDelayedTask(base::OnceClosure callback) {
+@@ -383,3 +385,5 @@ void FakeBluetoothAdapterClient::PostDelayedTask(base::OnceClosure callback) {
  }
  
  }  // namespace bluez
@@ -491,10 +492,10 @@ index 8e6302786f..9ecd2850a8 100644
 +
 +#undef HoldReferenceUntilDisconnected
 diff --git a/device/bluetooth/socket.cc b/device/bluetooth/socket.cc
-index c62895726b..242b1213b3 100644
+index 21cf46c0eb..a19efcd8d4 100644
 --- a/device/bluetooth/socket.cc
 +++ b/device/bluetooth/socket.cc
-@@ -24,6 +24,8 @@
+@@ -20,6 +20,8 @@
  #include "mojo/public/cpp/system/data_pipe.h"
  #include "net/base/io_buffer.h"
  
@@ -503,7 +504,7 @@ index c62895726b..242b1213b3 100644
  namespace bluetooth {
  namespace {
  // TODO(b/269348144) - BluetoothSocket is constructed in UI thread and must also
-@@ -201,3 +203,5 @@ void Socket::OnBluetoothSocketSendError(const std::string& error_message) {
+@@ -196,3 +198,5 @@ void Socket::OnBluetoothSocketSendError(const std::string& error_message) {
  }
  
  }  // namespace bluetooth
@@ -525,11 +526,34 @@ index e98293ea22..b02da75bc6 100644
    # These source files represent the minimal subset of files used for passkey
    # related authentication functions, with a limited amount of dependencies,
    # making it possible to build these on any platform, including iOS.
+diff --git a/device/fido/enclave/enclave_authenticator.cc b/device/fido/enclave/enclave_authenticator.cc
+index 09cf8e967b..8cfe2056e3 100644
+--- a/device/fido/enclave/enclave_authenticator.cc
++++ b/device/fido/enclave/enclave_authenticator.cc
+@@ -31,6 +31,10 @@
+ #include "device/fido/public_key_credential_descriptor.h"
+ #include "services/data_decoder/public/cpp/data_decoder.h"
+ 
++#define kLargeBlobKey      kLargeBlobKey_EnclaveAuthenticator
++#define kLargeBlobWriteKey kLargeBlobWriteKey_EnclaveAuthenticator
++#define kLargeBlobSizeKey  kLargeBlobSizeKey_EnclaveAuthenticator
++
+ namespace device::enclave {
+ 
+ namespace {
+@@ -677,3 +681,7 @@ base::WeakPtr<FidoAuthenticator> EnclaveAuthenticator::GetWeakPtr() {
+ }
+ 
+ }  // namespace device::enclave
++
++#undef kLargeBlobKey
++#undef kLargeBlobWriteKey
++#undef kLargeBlobSizeKey
 diff --git a/device/fido/get_assertion_request_handler.cc b/device/fido/get_assertion_request_handler.cc
-index e66e4ca678..fb079861c8 100644
+index 3b5657b5d4..4a5c915e35 100644
 --- a/device/fido/get_assertion_request_handler.cc
 +++ b/device/fido/get_assertion_request_handler.cc
-@@ -50,6 +50,8 @@
+@@ -49,6 +49,8 @@
  #include "device/fido/cros/authenticator.h"
  #endif
  
@@ -538,14 +562,14 @@ index e66e4ca678..fb079861c8 100644
  namespace device {
  
  namespace {
-@@ -815,3 +817,5 @@ void GetAssertionRequestHandler::DispatchRequestWithToken(
+@@ -784,3 +786,5 @@ void GetAssertionRequestHandler::DispatchRequestWithToken(
  }
  
  }  // namespace device
 +
 +#undef AtLeastUVPreferred
 diff --git a/device/fido/make_credential_request_handler.cc b/device/fido/make_credential_request_handler.cc
-index 96374c46fd..78af290a7f 100644
+index 2d40196322..8784158fea 100644
 --- a/device/fido/make_credential_request_handler.cc
 +++ b/device/fido/make_credential_request_handler.cc
 @@ -39,6 +39,8 @@
@@ -557,7 +581,7 @@ index 96374c46fd..78af290a7f 100644
  namespace device {
  
  using PINUVDisposition = FidoAuthenticator::PINUVDisposition;
-@@ -1067,3 +1069,5 @@ void MakeCredentialRequestHandler::SpecializeRequestForAuthenticator(
+@@ -1068,3 +1070,5 @@ void MakeCredentialRequestHandler::SpecializeRequestForAuthenticator(
  }
  
  }  // namespace device
@@ -644,7 +668,7 @@ index fc688b587f..ffdf8a82bb 100644
 +
 +#undef kRumbleMagnitudeMax
 diff --git a/extensions/BUILD.gn b/extensions/BUILD.gn
-index 586fd7461e..6154388326 100644
+index 8ecf02adac..64d5b70933 100644
 --- a/extensions/BUILD.gn
 +++ b/extensions/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -655,7 +679,7 @@ index 586fd7461e..6154388326 100644
  import("//components/guest_view/buildflags/buildflags.gni")
  import("//extensions/buildflags/buildflags.gni")
  import("//testing/test.gni")
-@@ -78,7 +79,7 @@ grit("extensions_renderer_resources") {
+@@ -79,7 +80,7 @@ grit("extensions_renderer_resources") {
    ]
  }
  
@@ -665,7 +689,7 @@ index 586fd7461e..6154388326 100644
    sources = [
      "browser/api/declarative/test_rules_registry.cc",
 diff --git a/extensions/browser/BUILD.gn b/extensions/browser/BUILD.gn
-index 1280bc121f..bb80bec327 100644
+index f17b14fffe..ce2855118b 100644
 --- a/extensions/browser/BUILD.gn
 +++ b/extensions/browser/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -835,10 +859,10 @@ index 22b273b1a1..ba85ff21e1 100644
 +
 +#undef g_factory
 diff --git a/extensions/browser/api/web_request/extension_web_request_event_router.cc b/extensions/browser/api/web_request/extension_web_request_event_router.cc
-index 58df0d2adf..a25f659545 100644
+index afbe4c6085..0e36709f03 100644
 --- a/extensions/browser/api/web_request/extension_web_request_event_router.cc
 +++ b/extensions/browser/api/web_request/extension_web_request_event_router.cc
-@@ -65,7 +65,8 @@ namespace {
+@@ -68,7 +68,8 @@ namespace {
  namespace activity_log = web_request_activity_log_constants;
  namespace declarative_keys = declarative_webrequest_constants;
  namespace helpers = extension_web_request_api_helpers;
@@ -848,7 +872,7 @@ index 58df0d2adf..a25f659545 100644
  namespace web_request = api::web_request;
  
  // Describes the action taken by the Web Request API for a given stage of a web
-@@ -2692,3 +2693,5 @@ void WebRequestEventRouter::ClearSignaled(
+@@ -2696,3 +2697,5 @@ void WebRequestEventRouter::ClearSignaled(
  }
  
  }  // namespace extensions
@@ -875,10 +899,10 @@ index b309b210c1..224441f199 100644
 +
 +#undef keys
 diff --git a/extensions/browser/api/web_request/web_request_api.cc b/extensions/browser/api/web_request/web_request_api.cc
-index e179815e58..8400c3c6d2 100644
+index 6ba6a4949f..40fd107de0 100644
 --- a/extensions/browser/api/web_request/web_request_api.cc
 +++ b/extensions/browser/api/web_request/web_request_api.cc
-@@ -82,10 +82,14 @@ using extension_web_request_api_helpers::ExtraInfoSpec;
+@@ -81,10 +81,14 @@ using extension_web_request_api_helpers::ExtraInfoSpec;
  using extensions::mojom::APIPermissionID;
  
  namespace helpers = extension_web_request_api_helpers;
@@ -894,7 +918,7 @@ index e179815e58..8400c3c6d2 100644
  namespace extensions {
  
  namespace web_request = api::web_request;
-@@ -1219,3 +1223,7 @@ WebRequestHandlerBehaviorChangedFunction::Run() {
+@@ -1163,3 +1167,7 @@ WebRequestHandlerBehaviorChangedFunction::Run() {
  }
  
  }  // namespace extensions
@@ -903,7 +927,7 @@ index e179815e58..8400c3c6d2 100644
 +#undef WebRequestEventListenerFlag
 +#undef g_factory
 diff --git a/extensions/browser/api/web_request/web_request_api_helpers.cc b/extensions/browser/api/web_request/web_request_api_helpers.cc
-index d1bafeda1f..1f8514d00e 100644
+index ace73c0bdb..de80567183 100644
 --- a/extensions/browser/api/web_request/web_request_api_helpers.cc
 +++ b/extensions/browser/api/web_request/web_request_api_helpers.cc
 @@ -58,7 +58,6 @@ using base::Time;
@@ -943,10 +967,10 @@ index cb1b59814c..f31b1dfba8 100644
 +
 +#undef keys
 diff --git a/extensions/browser/api/web_request/web_request_info.cc b/extensions/browser/api/web_request/web_request_info.cc
-index f40aba6067..9a19e17dd8 100644
+index 38eb1ccc01..8a0a37de3d 100644
 --- a/extensions/browser/api/web_request/web_request_info.cc
 +++ b/extensions/browser/api/web_request/web_request_info.cc
-@@ -39,8 +39,6 @@
+@@ -40,8 +40,6 @@
  #include "extensions/browser/guest_view/web_view/web_view_renderer_state.h"
  #endif
  
@@ -955,7 +979,7 @@ index f40aba6067..9a19e17dd8 100644
  namespace extensions {
  
  namespace {
-@@ -127,6 +125,7 @@ std::optional<base::Value::Dict> CreateRequestBodyData(
+@@ -128,6 +126,7 @@ std::optional<base::Value::Dict> CreateRequestBodyData(
      const std::string& method,
      const net::HttpRequestHeaders& request_headers,
      const std::vector<std::unique_ptr<UploadDataSource>>& data_sources) {
@@ -964,7 +988,7 @@ index f40aba6067..9a19e17dd8 100644
      return std::nullopt;
    }
 diff --git a/extensions/browser/api/web_request/web_request_proxying_url_loader_factory.cc b/extensions/browser/api/web_request/web_request_proxying_url_loader_factory.cc
-index 8f02078823..573725366f 100644
+index 6b820614d0..9b94c6f91c 100644
 --- a/extensions/browser/api/web_request/web_request_proxying_url_loader_factory.cc
 +++ b/extensions/browser/api/web_request/web_request_proxying_url_loader_factory.cc
 @@ -70,6 +70,8 @@
@@ -976,17 +1000,17 @@ index 8f02078823..573725366f 100644
  namespace extensions {
  namespace {
  
-@@ -1699,3 +1701,5 @@ void WebRequestProxyingURLLoaderFactory::EnsureAssociatedFactoryBuilt() {
+@@ -1720,3 +1722,5 @@ void WebRequestProxyingURLLoaderFactory::EnsureAssociatedFactoryBuilt() {
  }
  
  }  // namespace extensions
 +
 +#undef ShutdownNotifierFactory
 diff --git a/extensions/browser/api/web_request/web_request_proxying_websocket.cc b/extensions/browser/api/web_request/web_request_proxying_websocket.cc
-index 8f536df1b7..a0cdce66fd 100644
+index a9a95a3f5f..ddfc32fc35 100644
 --- a/extensions/browser/api/web_request/web_request_proxying_websocket.cc
 +++ b/extensions/browser/api/web_request/web_request_proxying_websocket.cc
-@@ -18,6 +18,8 @@
+@@ -19,6 +19,8 @@
  #include "net/cookies/site_for_cookies.h"
  #include "net/http/http_util.h"
  
@@ -995,17 +1019,17 @@ index 8f536df1b7..a0cdce66fd 100644
  namespace extensions {
  namespace {
  
-@@ -565,3 +567,5 @@ void WebRequestProxyingWebSocket::EnsureAssociatedFactoryBuilt() {
+@@ -566,3 +568,5 @@ void WebRequestProxyingWebSocket::EnsureAssociatedFactoryBuilt() {
  }
  
  }  // namespace extensions
 +
 +#undef ShutdownNotifierFactory
 diff --git a/extensions/browser/guest_view/app_view/app_view_guest.cc b/extensions/browser/guest_view/app_view/app_view_guest.cc
-index 0f2c21513e..228ded8563 100644
+index 3b1fe9ef59..e9a6851754 100644
 --- a/extensions/browser/guest_view/app_view/app_view_guest.cc
 +++ b/extensions/browser/guest_view/app_view/app_view_guest.cc
-@@ -220,7 +220,7 @@ void AppViewGuest::CreateInnerPage(
+@@ -219,7 +219,7 @@ void AppViewGuest::CreateInnerPage(
      scoped_refptr<content::SiteInstance> site_instance,
      const base::Value::Dict& create_params,
      GuestPageCreatedCallback callback) {
@@ -1014,7 +1038,7 @@ index 0f2c21513e..228ded8563 100644
    if (!app_id) {
      RejectGuestCreation(std::move(owned_this), std::move(callback));
      return;
-@@ -231,7 +231,7 @@ void AppViewGuest::CreateInnerPage(
+@@ -230,7 +230,7 @@ void AppViewGuest::CreateInnerPage(
      return;
    }
  
@@ -1023,7 +1047,7 @@ index 0f2c21513e..228ded8563 100644
    if (!data) {
      RejectGuestCreation(std::move(owned_this), std::move(callback));
      return;
-@@ -292,7 +292,7 @@ void AppViewGuest::MaybeRecreateGuestContents(
+@@ -291,7 +291,7 @@ void AppViewGuest::MaybeRecreateGuestContents(
  }
  
  const char* AppViewGuest::GetAPINamespace() const {
@@ -1032,7 +1056,7 @@ index 0f2c21513e..228ded8563 100644
  }
  
  int AppViewGuest::GetTaskPrefix() const {
-@@ -360,9 +360,9 @@ void AppViewGuest::LaunchAppAndFireEvent(
+@@ -359,9 +359,9 @@ void AppViewGuest::LaunchAppAndFireEvent(
                                       std::move(callback))));
  
    base::Value::Dict embed_request;
@@ -1065,10 +1089,10 @@ index 0bba776af6..a8a6f355ba 100644
 +
 +#undef g_test_observer
 diff --git a/extensions/browser/script_injection_tracker.cc b/extensions/browser/script_injection_tracker.cc
-index 8f590b9ebd..8aac10c3a1 100644
+index 09e5575f67..7e85c1005c 100644
 --- a/extensions/browser/script_injection_tracker.cc
 +++ b/extensions/browser/script_injection_tracker.cc
-@@ -44,6 +44,8 @@
+@@ -45,6 +45,8 @@
  
  using perfetto::protos::pbzero::ChromeTrackEvent;
  
@@ -1077,17 +1101,17 @@ index 8f590b9ebd..8aac10c3a1 100644
  namespace extensions {
  
  namespace {
-@@ -1009,3 +1011,5 @@ ScopedScriptInjectionTrackerFailureCrashKeys::
+@@ -1015,3 +1017,5 @@ ScopedScriptInjectionTrackerFailureCrashKeys::
  
  }  // namespace debug
  }  // namespace extensions
 +
 +#undef BoolToCrashKeyValue
 diff --git a/extensions/browser/service_worker/service_worker_task_queue.cc b/extensions/browser/service_worker/service_worker_task_queue.cc
-index a47efd7cf2..a68861ee59 100644
+index 1876bae6fc..88a30dafb7 100644
 --- a/extensions/browser/service_worker/service_worker_task_queue.cc
 +++ b/extensions/browser/service_worker/service_worker_task_queue.cc
-@@ -52,6 +52,9 @@
+@@ -53,6 +53,9 @@
  
  using content::BrowserContext;
  
@@ -1097,7 +1121,7 @@ index a47efd7cf2..a68861ee59 100644
  namespace extensions {
  
  namespace {
-@@ -1174,3 +1177,6 @@ void ServiceWorkerTaskQueue::ActivateIncognitoSplitModeExtensions(
+@@ -1065,3 +1068,6 @@ void ServiceWorkerTaskQueue::ActivateIncognitoSplitModeExtensions(
  }
  
  }  // namespace extensions
@@ -1126,7 +1150,7 @@ index a1737fd343..6bdac552ab 100644
 +#undef g_allow_multiple_workers_per_extension
 +#undef BoolToCrashKeyValue
 diff --git a/extensions/common/BUILD.gn b/extensions/common/BUILD.gn
-index d16d8a63f5..bc5b19f627 100644
+index 3b2bab7886..0b226aaa41 100644
 --- a/extensions/common/BUILD.gn
 +++ b/extensions/common/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -1135,9 +1159,9 @@ index d16d8a63f5..bc5b19f627 100644
  import("//build/config/features.gni")
 +import("//build/config/jumbo.gni")
  import("//components/guest_view/buildflags/buildflags.gni")
- import("//components/nacl/features.gni")
  import("//extensions/buildflags/buildflags.gni")
-@@ -252,7 +253,7 @@ mojom("mojom") {
+ import("//mojo/public/tools/bindings/mojom.gni")
+@@ -251,7 +252,7 @@ mojom("mojom") {
  # This must be a static library because extensions common depends on
  # GetTrustedICAPublicKey in extensions/browser which isn't always linked
  # in. TODO(brettw): This reverse dependency should be fixed.
@@ -1146,7 +1170,7 @@ index d16d8a63f5..bc5b19f627 100644
    sources = [
      "alias.h",
      "api/bluetooth/bluetooth_manifest_data.cc",
-@@ -541,6 +542,11 @@ static_library("common") {
+@@ -542,6 +543,11 @@ static_library("common") {
    # from mojom/permission_set_mojom_traits.cc.
    allow_circular_includes_from = [ ":mojom" ]
  
@@ -1159,7 +1183,7 @@ index d16d8a63f5..bc5b19f627 100644
      "//base",
      "//build:android_buildflags",
 diff --git a/extensions/common/api/extension_action/action_info.cc b/extensions/common/api/extension_action/action_info.cc
-index 6f71f1effa..6a9bdcdb46 100644
+index fc3d868e1e..f81fb1a3c3 100644
 --- a/extensions/common/api/extension_action/action_info.cc
 +++ b/extensions/common/api/extension_action/action_info.cc
 @@ -41,10 +41,12 @@ ActionInfoData::ActionInfoData(std::unique_ptr<ActionInfo> info)
@@ -1176,14 +1200,14 @@ index 6f71f1effa..6a9bdcdb46 100644
  // Returns the icon variants parsed from the `extension` manifest.
  // Populates `error` if there are no icon variants.
  ExtensionIconVariants GetIconVariants(const base::Value* value) {
-@@ -272,3 +274,5 @@ const char* ActionInfo::GetManifestKeyForActionType(ActionInfo::Type type) {
+@@ -281,3 +283,5 @@ const char* ActionInfo::GetManifestKeyForActionType(ActionInfo::Type type) {
  }
  
  }  // namespace extensions
 +
 +#undef Feature
 diff --git a/extensions/common/manifest_handlers/icon_variants_handler.cc b/extensions/common/manifest_handlers/icon_variants_handler.cc
-index e907385862..45f55c7fb5 100644
+index b1634e36c0..76c5dba169 100644
 --- a/extensions/common/manifest_handlers/icon_variants_handler.cc
 +++ b/extensions/common/manifest_handlers/icon_variants_handler.cc
 @@ -35,7 +35,9 @@ IconVariantsHandler::~IconVariantsHandler() = default;
@@ -1204,10 +1228,10 @@ index e907385862..45f55c7fb5 100644
 +
 +#undef Feature
 diff --git a/extensions/common/manifest_handlers/icons_handler.cc b/extensions/common/manifest_handlers/icons_handler.cc
-index 0f3d15bb6b..ab3f7d60a2 100644
+index 0d938d554f..04e1d6698e 100644
 --- a/extensions/common/manifest_handlers/icons_handler.cc
 +++ b/extensions/common/manifest_handlers/icons_handler.cc
-@@ -22,6 +22,8 @@
+@@ -23,6 +23,8 @@
  #include "extensions/strings/grit/extensions_strings.h"
  #include "ui/gfx/geometry/size.h"
  
@@ -1216,7 +1240,7 @@ index 0f3d15bb6b..ab3f7d60a2 100644
  namespace extensions {
  
  namespace keys = manifest_keys;
-@@ -106,3 +108,5 @@ base::span<const char* const> IconsHandler::Keys() const {
+@@ -109,3 +111,5 @@ base::span<const char* const> IconsHandler::Keys() const {
  }
  
  }  // namespace extensions
@@ -1243,7 +1267,7 @@ index 5325c1e24d..307242a56b 100644
 +
 +#undef ManifestKeys
 diff --git a/extensions/common/manifest_handlers/shared_module_info.cc b/extensions/common/manifest_handlers/shared_module_info.cc
-index a906aa872b..2a8d103015 100644
+index 91231ee29a..98362a843e 100644
 --- a/extensions/common/manifest_handlers/shared_module_info.cc
 +++ b/extensions/common/manifest_handlers/shared_module_info.cc
 @@ -37,7 +37,8 @@ namespace {
@@ -1263,7 +1287,7 @@ index a906aa872b..2a8d103015 100644
 +
 +#undef ManifestKeys
 diff --git a/extensions/renderer/BUILD.gn b/extensions/renderer/BUILD.gn
-index bb00afe483..1cb6488268 100644
+index 6bfc675a89..3837e55d3f 100644
 --- a/extensions/renderer/BUILD.gn
 +++ b/extensions/renderer/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1293,10 +1317,10 @@ index bb00afe483..1cb6488268 100644
    # top-level extensions renderer unit tests.
    testonly = true
 diff --git a/extensions/renderer/extension_localization_throttle.cc b/extensions/renderer/extension_localization_throttle.cc
-index 9eb2b7f5e2..db7dc693d2 100644
+index 74bef09ce7..d9e08f282f 100644
 --- a/extensions/renderer/extension_localization_throttle.cc
 +++ b/extensions/renderer/extension_localization_throttle.cc
-@@ -26,6 +26,8 @@
+@@ -27,6 +27,8 @@
  #include "third_party/blink/public/web/web_local_frame.h"
  #include "url/gurl.h"
  
@@ -1305,14 +1329,14 @@ index 9eb2b7f5e2..db7dc693d2 100644
  namespace extensions {
  
  namespace {
-@@ -298,3 +300,5 @@ void ExtensionLocalizationThrottle::DeferredCancelWithError(int error_code) {
+@@ -299,3 +301,5 @@ void ExtensionLocalizationThrottle::DeferredCancelWithError(int error_code) {
  }
  
  }  // namespace extensions
 +
 +#undef kCancelReason
 diff --git a/extensions/renderer/extension_url_loader_throttle.cc b/extensions/renderer/extension_url_loader_throttle.cc
-index faa7895b72..cdb8aae6ea 100644
+index bff851dd1f..28294148e9 100644
 --- a/extensions/renderer/extension_url_loader_throttle.cc
 +++ b/extensions/renderer/extension_url_loader_throttle.cc
 @@ -8,6 +8,8 @@
@@ -1324,7 +1348,7 @@ index faa7895b72..cdb8aae6ea 100644
  namespace extensions {
  
  namespace {
-@@ -54,3 +56,5 @@ void ExtensionURLLoaderThrottle::WillProcessResponse(
+@@ -75,3 +77,5 @@ void ExtensionURLLoaderThrottle::WillProcessResponse(
  void ExtensionURLLoaderThrottle::DetachFromCurrentSequence() {}
  
  }  // namespace extensions
