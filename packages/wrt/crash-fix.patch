@@ -1,0 +1,19 @@
+--- wrt.c.orig  2025-07-27 12:00:00.000000000 +0000
++++ wrt.c       2025-07-27 12:00:00.000000000 +0000
+@@ -50,7 +50,11 @@
+-int do_request(char *url) {
+-    char *response = NULL;
+-    // código que puede causar crash si response es NULL
+-    printf("%s\n", response);
+-    return 0;
+-}
++int do_request(char *url) {
++    char *response = NULL;
++    // chequeo para evitar crash
++    if (!response) {
++        fprintf(stderr, "Error: response es NULL\n");
++        return -1;
++    }
++    printf("%s\n", response);
++    return 0;
++}

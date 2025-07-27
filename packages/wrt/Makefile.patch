@@ -1,0 +1,12 @@
+--- Makefile.orig    2025-07-27 12:00:00.000000000 +0000
++++ Makefile         2025-07-27 12:00:00.000000000 +0000
+@@ -1,6 +1,10 @@
+-CFLAGS = -Wall -O2
+-LDFLAGS =
++CFLAGS = -Wall -O2 -pthread `pkg-config --cflags libcurl`
++LDFLAGS = `pkg-config --libs libcurl` -pthread
+ 
+-wrt: wrt.c
+-    $(CC) $(CFLAGS) -o wrt wrt.c $(LDFLAGS)
++wrt: wrt.c
++    $(CC) $(CFLAGS) -o wrt wrt.c $(LDFLAGS)
