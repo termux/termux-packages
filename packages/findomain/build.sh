@@ -2,12 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://findomain.app/
 TERMUX_PKG_DESCRIPTION="Findomain is the fastest subdomain enumerator and the only one written in Rust"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="9.0.4"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="10.0.0"
 TERMUX_PKG_SRCURL=https://github.com/Findomain/Findomain/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=98c142e2e6ed67726bdea7a1726a54fb6773a8d1ccaa262e008804432af29190
+TERMUX_PKG_SHA256=bb8d9cf6a89a779ee6903bc433247c7c1be7c2f311422240a531fc85d99267e7
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="resolv-conf"
+TERMUX_PKG_DEPENDS="resolv-conf, openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
@@ -27,25 +26,21 @@ termux_step_pre_configure() {
 	cargo vendor
 	find ./vendor \
 		-mindepth 1 -maxdepth 1 -type d \
-		! -wholename ./vendor/traitobject \
+		! -wholename ./vendor/hickory-resolver \
 		-exec rm -rf '{}' \;
 
 	patch --silent -p1 \
-		-d ./vendor/traitobject/ \
-		< "$TERMUX_PKG_BUILDER_DIR"/traitobject-rust-1.87.diff
+		-d ./vendor/hickory-resolver/ \
+		< "$TERMUX_PKG_BUILDER_DIR"/hickory-resolver.diff
 
-	git clone https://github.com/Findomain/trust-dns \
-		-b custombranch \
-		./vendor/trust-dns
+	cat <<- EOF >> Cargo.toml
 
-	patch --silent -p1 \
-		-d ./vendor/trust-dns/crates/resolver/ \
-		< "$TERMUX_PKG_BUILDER_DIR"/trust-dns-resolver.diff
+	[patch.crates-io]
+	hickory-resolver = { path = "./vendor/hickory-resolver" }
+	EOF
 
-	patch --silent -p1 \
-		-d "$TERMUX_PKG_SRCDIR" \
-		< "$TERMUX_PKG_BUILDER_DIR"/patch-root-Cargo.diff
-
-	# clash with rust host build
+	# clash with Rust host build
 	unset CFLAGS
+
+	export OPENSSL_NO_VENDOR=1
 }
