@@ -87,7 +87,7 @@ index b00aa3c3b7..5732390cbb 100644
    configs += [
      "//v8:external_startup_data",
      "//third_party/electron_node:node_external_config",
-@@ -553,6 +554,22 @@ source_set("electron_lib") {
+@@ -553,6 +554,25 @@ source_set("electron_lib") {
    deps += [ "//electron/build/config:generate_mas_config" ]
  
    sources = filenames.lib_sources
@@ -106,6 +106,9 @@ index b00aa3c3b7..5732390cbb 100644
 +
 +    # invalid application of 'sizeof' to a function type
 +    "shell/utility/electron_content_utility_client.cc",
++
++    # Conflicts with third_party/blink/renderer/platform:blink_platform
++    "shell/renderer/electron_smooth_round_rect.cc",
 +  ]
    if (is_win) {
      sources += filenames.lib_sources_win
@@ -1058,7 +1061,7 @@ diff --git a/electron/shell/browser/electron_browser_main_parts_linux.cc b/elect
 index 85d1ad9ba9..7c9f01f0b8 100644
 --- a/electron/shell/browser/electron_browser_main_parts_linux.cc
 +++ b/electron/shell/browser/electron_browser_main_parts_linux.cc
-@@ -123,15 +123,16 @@ std::string MaybeFixPlatformName(const std::string& ozone_platform_hint) {
+@@ -114,16 +114,16 @@
  void ElectronBrowserMainParts::DetectOzonePlatform() {
    auto const env = base::Environment::Create();
    auto* const command_line = base::CommandLine::ForCurrentProcess();
@@ -1068,13 +1071,13 @@ index 85d1ad9ba9..7c9f01f0b8 100644
 -        command_line->GetSwitchValueASCII(switches::kOzonePlatformHint);
 +        command_line->GetSwitchValueASCII(::switches::kOzonePlatformHint);
      if (ozone_platform_hint.empty()) {
-       env->GetVar(kElectronOzonePlatformHint, &ozone_platform_hint);
+       ozone_platform_hint =
+           env->GetVar(kElectronOzonePlatformHint).value_or("");
      }
      if (!ozone_platform_hint.empty()) {
        command_line->AppendSwitchASCII(
 -          switches::kOzonePlatform, MaybeFixPlatformName(ozone_platform_hint));
-+          ::switches::kOzonePlatform,
-+          MaybeFixPlatformName(ozone_platform_hint));
++          ::switches::kOzonePlatform, MaybeFixPlatformName(ozone_platform_hint));
      }
    }
  
@@ -1724,3 +1727,15 @@ index c1c399f89b..51b5b35f38 100644
 +NODE_LINKED_BINDING_CONTEXT_AWARE(electron_renderer_web_utils,
 +                                  a_electron_renderer_web_utils::Initialize)
 +#undef _module
+--- a/third_party/blink/renderer/platform/BUILD.gn
++++ b/third_party/blink/renderer/platform/BUILD.gn
+@@ -1700,6 +1700,9 @@
+ 
+     # FIXME(chongyun): scoped_refptr?
+     "graphics/canvas_resource_dispatcher.cc",
++
++    # Conflict with //electron:electron_lib
++    "//electron/shell/renderer/electron_smooth_round_rect.cc",
+   ]
+ 
+   if (is_mac) {

@@ -1,0 +1,20 @@
+--- a/third_party/pdfium/core/fxcrt/span.h
++++ b/third_party/pdfium/core/fxcrt/span.h
+@@ -791,7 +791,7 @@
+   template <typename OtherElementType,
+             size_t OtherExtent,
+             typename OtherInternalPtrType>
+-    requires((OtherExtent == dynamic_extent || extent == OtherExtent) &&
++    requires((OtherExtent == dynamic_extent || Extent == OtherExtent) &&
+              std::equality_comparable_with<const element_type,
+                                            const OtherElementType>)
+   friend constexpr bool operator==(
+@@ -826,7 +826,7 @@
+   template <typename OtherElementType,
+             size_t OtherExtent,
+             typename OtherInternalPtrType>
+-    requires((OtherExtent == dynamic_extent || extent == OtherExtent) &&
++    requires((OtherExtent == dynamic_extent || Extent == OtherExtent) &&
+              std::three_way_comparable_with<const element_type,
+                                             const OtherElementType>)
+   friend constexpr auto operator<=>(

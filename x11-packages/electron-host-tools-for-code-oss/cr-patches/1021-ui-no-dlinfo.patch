@@ -1,0 +1,24 @@
+diff --git a/ui/gtk/ime_compat_check.cc b/ui/gtk/ime_compat_check.cc
+index 3c33ab502b..349d787a6a 100644
+--- a/ui/gtk/ime_compat_check.cc
++++ b/ui/gtk/ime_compat_check.cc
+@@ -34,6 +34,7 @@ struct InputMethod {
+ };
+ 
+ std::vector<base::FilePath> GetLibrarySearchPaths() {
++#ifndef __TERMUX__
+   std::vector<base::FilePath> search_path;
+   void* handle = dlopen("libc.so.6", RTLD_GLOBAL | RTLD_LAZY | RTLD_NOLOAD);
+   if (!handle) {
+@@ -62,6 +63,11 @@ std::vector<base::FilePath> GetLibrarySearchPaths() {
+   }
+ 
+   return search_path;
++#else
++  return {
++    base::FilePath("/data/data/com.termux/files/usr/lib"),
++  };
++#endif
+ }
+ 
+ base::FilePath GetGtk3ImModulesCacheFile() {

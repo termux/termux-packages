@@ -9,7 +9,7 @@
  if (is_android) {
    import("//build/config/android/config.gni")
  }
-@@ -98,6 +100,8 @@
+@@ -95,6 +97,8 @@
    # a platform. Mostly applicable to Windows, where new versions can handle ANSI
    # escape sequences but it's not reliable in general.
    force_rustc_color_output = false
@@ -17,9 +17,9 @@
 +  custom_target_rust_abi_target = ""
  }
  
- # Use a separate declare_args so these variables' defaults can depend on the
-@@ -165,7 +169,7 @@
- # TODO(crbug.com/1278030): To build unit tests for Android we need to build
+ declare_args() {
+@@ -155,7 +159,7 @@
+ # TODO(crbug.com/40809974): To build unit tests for Android we need to build
  # them as a dylib and put them into an APK. We should reuse all the same logic
  # for gtests from the `//testing/test:test` template.
 -can_build_rust_unit_tests = toolchain_has_rust && !is_android
@@ -27,7 +27,7 @@
  
  # We want to store rust_sysroot as a source-relative variable for ninja
  # portability. In practice if an external toolchain was specified, it might
-@@ -280,6 +284,12 @@
+@@ -373,6 +377,12 @@
    }
  }
  
@@ -37,6 +37,6 @@
 +  }
 +}
 +
- assert(!toolchain_has_rust || rust_abi_target != "")
+ if (toolchain_has_rust) {
+   assert(rust_abi_target != "")
  
- # This variable is passed to the Rust libstd build.

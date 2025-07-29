@@ -1,14 +1,14 @@
 --- a/chrome/browser/ui/startup/infobar_utils.cc
 +++ b/chrome/browser/ui/startup/infobar_utils.cc
-@@ -154,7 +154,11 @@
-     infobars::ContentInfoBarManager* infobar_manager =
-         infobars::ContentInfoBarManager::FromWebContents(web_contents);
+@@ -171,7 +171,11 @@
+   infobars::ContentInfoBarManager* infobar_manager =
+       infobars::ContentInfoBarManager::FromWebContents(web_contents);
  
 +#ifdef __TERMUX__
 +    if (0) {
 +#else
-     if (!google_apis::HasAPIKeyConfigured()) {
+   if (!google_apis::HasAPIKeyConfigured()) {
 +#endif
-       GoogleApiKeysInfoBarDelegate::Create(infobar_manager);
-     }
+     GoogleApiKeysInfoBarDelegate::Create(infobar_manager);
+   }
  

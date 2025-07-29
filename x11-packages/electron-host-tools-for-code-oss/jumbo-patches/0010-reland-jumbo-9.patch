@@ -23,42 +23,29 @@ Enable jumbo build for the following component(s)/source_set(s):
  .../aggregation_service_storage_sql.cc        |   4 +
  .../attribution_resolver_impl.cc              |   6 +-
  .../attribution_storage_sql.cc                |   6 +
+ content/browser/btm/btm_database.h            |   2 +-
+ .../browser/btm/btm_page_visit_observer.cc    |   4 +
+ .../browser/btm/btm_short_visit_observer.cc   |   4 +
  content/browser/devtools/BUILD.gn             |   2 +-
  .../devtools/protocol/fedcm_handler.cc        |   2 +-
- .../browser/devtools/protocol/page_handler.cc |   4 +
  .../render_frame_devtools_agent_host.cc       |   4 +
  .../web_contents_devtools_agent_host.cc       |   4 +
- .../browser/dips/btm_short_visit_observer.cc  |   4 +
- content/browser/dips/dips_database.h          |   2 +-
  .../direct_sockets_service_impl.cc            |   4 +
  .../file_system_access_change_source.cc       |   4 +
  .../file_system_access_watcher_manager.cc     |   4 +
  content/browser/find_request_manager.cc       |   2 +-
  .../frame_sensor_provider_proxy.cc            |   2 +-
- .../gpu/gpu_data_manager_impl_private.cc      |   6 +-
+ .../gpu/gpu_data_manager_impl_private.cc      |  10 +-
  content/browser/guest_page_holder_impl.cc     |   2 +-
  content/browser/hid/hid_service.cc            |   4 +
- content/browser/host_zoom_map_impl.cc         |  10 +-
+ content/browser/host_zoom_map_impl.cc         |   2 +-
  .../in_memory_federated_permission_context.cc |   2 +-
- .../installed_app_provider_impl.cc            |   6 +-
- .../interest_group/ad_auction_headers_util.cc |   2 +-
- .../ad_auction_result_metrics.cc              |   4 +-
- .../interest_group/ad_auction_service_impl.cc |  12 +-
- .../interest_group/auction_process_manager.cc |   4 +-
- .../browser/interest_group/auction_runner.cc  |   4 +-
- .../auction_url_loader_factory_proxy.cc       |   2 +-
- .../interest_group/auction_worklet_manager.cc |   6 +-
- .../bidding_and_auction_response.cc           |  16 +-
- .../bidding_and_auction_serializer.cc         |   8 +-
- .../bidding_and_auction_server_key_fetcher.cc |   4 +-
- .../interest_group/interest_group_auction.cc  |   6 +-
- .../interest_group_auction_reporter.cc        |   2 +-
- .../interest_group_caching_storage.cc         |   4 +-
- .../interest_group_k_anonymity_manager.cc     |   2 +-
- .../interest_group_manager_impl.cc            |   8 +-
+ .../bidding_and_auction_response.cc           |   4 +
+ .../bidding_and_auction_serializer.cc         |   4 +
+ .../interest_group_manager_impl.cc            |   4 +
  .../interest_group_permissions_checker.cc     |   4 +
- .../interest_group/interest_group_storage.cc  |  14 +-
  .../interest_group_update_manager.cc          |   4 +
+ .../interest_group/trusted_signals_fetcher.cc |   4 +
  content/browser/media/cdm_storage_common.cc   |   4 +
  content/browser/media/cdm_storage_database.cc |   4 +
  .../preloading/prefetch/prefetch_service.cc   |   4 +
@@ -67,23 +54,22 @@ Enable jumbo build for the following component(s)/source_set(s):
  ..._vary_search_commit_deferring_condition.cc |   4 +
  .../media/media_devices_manager.cc            |   6 +
  .../media/media_stream_manager.cc             |   6 +
+ ...render_frame_audio_input_stream_factory.cc |   4 +
  .../partitioned_popins_navigation_throttle.cc |   2 +-
  .../private_network_access_util.cc            |  18 +-
- .../renderer_host/render_frame_host_impl.cc   |  42 ++--
- .../render_frame_host_manager.cc              |  58 +++---
+ .../randomized_confidence_utils.cc            |   2 +-
+ .../renderer_host/render_frame_host_impl.cc   |  52 ++---
+ .../render_frame_host_manager.cc              |  64 +++---
  .../renderer_host/render_frame_proxy_host.cc  |   6 +-
  .../renderer_host/render_message_filter.cc    |   2 +-
- .../renderer_host/render_process_host_impl.cc |  24 +--
+ .../renderer_host/render_process_host_impl.cc |  28 +--
  .../renderer_host/render_view_host_impl.cc    |   2 +-
+ .../renderer_host/render_widget_host_impl.cc  |   2 +-
  .../render_widget_host_view_aura.cc           |   2 +-
- .../spare_render_process_host_manager_impl.cc |  12 +-
+ .../spare_render_process_host_manager_impl.cc |  14 +-
  .../cross_origin_opener_policy_reporter.cc    |   4 +
  .../dip/document_isolation_policy_reporter.cc |   4 +
- .../browser/site_instance_group_manager.cc    |   4 +-
- content/browser/site_instance_impl.cc         |   4 +-
- content/browser/storage_partition_impl.cc     |   6 +-
- .../tracing/tracing_service_controller.cc     |   2 +-
- content/browser/video_capture_service_impl.cc |   2 +-
+ .../webid/federated_auth_request_impl.cc      |   4 +
  content/child/BUILD.gn                        |   5 +-
  content/common/BUILD.gn                       |   6 +-
  content/gpu/BUILD.gn                          |   5 +-
@@ -97,10 +83,10 @@ Enable jumbo build for the following component(s)/source_set(s):
  content/services/auction_worklet/BUILD.gn     |   7 +-
  content/test/BUILD.gn                         |   5 +-
  content/utility/BUILD.gn                      |   3 +-
- 78 files changed, 432 insertions(+), 236 deletions(-)
+ 64 files changed, 397 insertions(+), 195 deletions(-)
 
 diff --git a/content/browser/BUILD.gn b/content/browser/BUILD.gn
-index 2d374ea7c1..2749f71bc2 100644
+index 933abcca12..a32e41518a 100644
 --- a/content/browser/BUILD.gn
 +++ b/content/browser/BUILD.gn
 @@ -6,6 +6,7 @@ import("//base/allocator/partition_allocator/partition_alloc.gni")
@@ -111,8 +97,8 @@ index 2d374ea7c1..2749f71bc2 100644
  import("//build/config/linux/pangocairo/pangocairo.gni")
  import("//build/config/ozone.gni")
  import("//build/config/ui.gni")
-@@ -49,7 +50,116 @@ if (is_android) {
-   }
+@@ -55,7 +56,116 @@ if (is_ios) {
+   import("//build/config/apple/mobile_config.gni")  # For `target_platform`
  }
  
 -source_set("browser") {
@@ -229,7 +215,7 @@ index 2d374ea7c1..2749f71bc2 100644
    # Only the public target should depend on this. All other targets (even
    # internal content ones) should depend on the public one.
    visibility = [
-@@ -151,8 +261,6 @@ source_set("browser") {
+@@ -163,8 +273,6 @@ source_set("browser") {
      "//content/browser/cache_storage:cache_storage_proto",
      "//content/browser/content_index:content_index_proto",
      "//content/browser/cookie_store:cookie_store_proto",
@@ -239,14 +225,14 @@ index 2d374ea7c1..2749f71bc2 100644
      "//content/browser/file_system_access:proto",
      "//content/browser/indexed_db:internals_mojo_bindings",
 @@ -329,6 +437,7 @@ source_set("browser") {
-     "//ui/touch_selection",
      "//ui/webui/resources",
+     "//v8",
      "//v8:v8_version",
 +    ":devtools_protocol",
      "//electron/build/config:generate_mas_config",
    ]
  
-@@ -347,62 +456,6 @@ source_set("browser") {
+@@ -359,62 +468,6 @@ source_set("browser") {
    ]
  
    sources = [
@@ -309,7 +295,7 @@ index 2d374ea7c1..2749f71bc2 100644
      "about_url_loader_factory.cc",
      "about_url_loader_factory.h",
      "accessibility/accessibility_tree_formatter_blink.cc",
-@@ -2453,6 +2506,7 @@ source_set("browser") {
+@@ -2505,6 +2558,7 @@ source_set("browser") {
      "worker_host/worker_script_loader_factory.cc",
      "worker_host/worker_script_loader_factory.h",
    ]
@@ -317,7 +303,7 @@ index 2d374ea7c1..2749f71bc2 100644
  
    if (is_android) {
      sources += [
-@@ -2470,8 +2524,6 @@ source_set("browser") {
+@@ -2522,8 +2576,6 @@ source_set("browser") {
      ]
  
      sources += [
@@ -326,7 +312,7 @@ index 2d374ea7c1..2749f71bc2 100644
        "devtools/protocol/bluetooth_emulation_handler.cc",
        "devtools/protocol/bluetooth_emulation_handler.h",
      ]
-@@ -2507,8 +2559,6 @@ source_set("browser") {
+@@ -2561,8 +2613,6 @@ source_set("browser") {
  
    if (use_viz_debugger) {
      sources += [
@@ -335,7 +321,7 @@ index 2d374ea7c1..2749f71bc2 100644
        "devtools/protocol/visual_debugger_handler.cc",
        "devtools/protocol/visual_debugger_handler.h",
      ]
-@@ -2869,6 +2919,9 @@ source_set("browser") {
+@@ -2956,6 +3006,9 @@ source_set("browser") {
        ]
        public_deps += [ "//ui/base/cursor" ]
        deps += [ "//third_party/webrtc_overrides:webrtc_component" ]
@@ -345,7 +331,7 @@ index 2d374ea7c1..2749f71bc2 100644
      }
      if (use_aura) {
        sources += [
-@@ -3331,6 +3384,12 @@ source_set("browser") {
+@@ -3414,6 +3467,12 @@ source_set("browser") {
        "web_contents/web_contents_view_android.h",
      ]
  
@@ -358,7 +344,7 @@ index 2d374ea7c1..2749f71bc2 100644
      deps += [
        ":fontations_name_table_ffi",
        ":reflection_jni_headers",
-@@ -3363,9 +3422,6 @@ source_set("browser") {
+@@ -3446,9 +3505,6 @@ source_set("browser") {
    } else {
      # Not Android.
      sources += [
@@ -368,7 +354,7 @@ index 2d374ea7c1..2749f71bc2 100644
        "devtools/protocol/webauthn_handler.cc",
        "devtools/protocol/webauthn_handler.h",
        "media/session/audio_focus_delegate_default.cc",
-@@ -3611,8 +3667,6 @@ source_set("browser") {
+@@ -3695,8 +3751,6 @@ source_set("browser") {
  
    if (use_clang_profiling_inside_sandbox && chrome_pgo_phase == 1) {
      sources += [
@@ -378,7 +364,7 @@ index 2d374ea7c1..2749f71bc2 100644
        "devtools/protocol/native_profiling_handler.h",
        "profiling_utils.cc",
 diff --git a/content/browser/aggregation_service/aggregation_service_storage_sql.cc b/content/browser/aggregation_service/aggregation_service_storage_sql.cc
-index f03b5054c1..dc51c83d99 100644
+index 42604daf23..e06280aa5d 100644
 --- a/content/browser/aggregation_service/aggregation_service_storage_sql.cc
 +++ b/content/browser/aggregation_service/aggregation_service_storage_sql.cc
 @@ -45,6 +45,8 @@
@@ -390,14 +376,14 @@ index f03b5054c1..dc51c83d99 100644
  namespace content {
  
  // Version number of the database.
-@@ -1092,3 +1094,5 @@ void AggregationServiceStorageSql::DatabaseErrorCallback(int extended_error,
+@@ -1158,3 +1160,5 @@ void AggregationServiceStorageSql::DatabaseErrorCallback(int extended_error,
  }
  
  }  // namespace content
 +
 +#undef kDatabasePath
 diff --git a/content/browser/attribution_reporting/attribution_resolver_impl.cc b/content/browser/attribution_reporting/attribution_resolver_impl.cc
-index a0501505cc..648130fe94 100644
+index 6fad864eb7..366cd2e21f 100644
 --- a/content/browser/attribution_reporting/attribution_resolver_impl.cc
 +++ b/content/browser/attribution_reporting/attribution_resolver_impl.cc
 @@ -63,7 +63,7 @@ using AggregatableResult = AttributionTrigger::AggregatableResult;
@@ -409,7 +395,7 @@ index a0501505cc..648130fe94 100644
  
  // These values are persisted to logs. Entries should not be renumbered and
  // numeric values should never be reused.
-@@ -884,7 +884,7 @@ AttributionResolverImpl::MaybeCreateEventLevelReport(
+@@ -901,7 +901,7 @@ AttributionResolverImpl::MaybeCreateEventLevelReport(
  
    return CreateReportResult::EventLevelSuccess(
        AttributionReport(
@@ -417,8 +403,8 @@ index a0501505cc..648130fe94 100644
 +          attribution_info, AttributionReport::Id(kUnsetRecordId_AttributionResolverImpl), report_time,
            /*initial_report_time=*/report_time, delegate_->NewReportID(),
            /*failed_send_attempts=*/0,
-           AttributionReport::EventLevelData(trigger_data,
-@@ -966,7 +966,7 @@ AttributionResolverImpl::MaybeCreateAggregatableAttributionReport(
+           AttributionReport::EventLevelData(*trigger_data,
+@@ -983,7 +983,7 @@ AttributionResolverImpl::MaybeCreateAggregatableAttributionReport(
        GetAggregatableReportTime(trigger, attribution_info.time);
  
    return CreateReportResult::AggregatableSuccess(AttributionReport(
@@ -428,10 +414,10 @@ index a0501505cc..648130fe94 100644
        /*failed_send_attempts=*/0,
        AttributionReport::AggregatableData(
 diff --git a/content/browser/attribution_reporting/attribution_storage_sql.cc b/content/browser/attribution_reporting/attribution_storage_sql.cc
-index 5864c3b235..4d810aaf27 100644
+index c88ed1c92c..77d25f26a1 100644
 --- a/content/browser/attribution_reporting/attribution_storage_sql.cc
 +++ b/content/browser/attribution_reporting/attribution_storage_sql.cc
-@@ -98,6 +98,9 @@
+@@ -99,6 +99,9 @@
  #include "third_party/blink/public/mojom/aggregation_service/aggregatable_report.mojom.h"
  #include "url/origin.h"
  
@@ -441,15 +427,66 @@ index 5864c3b235..4d810aaf27 100644
  namespace content {
  
  namespace {
-@@ -3097,3 +3100,6 @@ int64_t AttributionStorageSql::CountUniqueReportingOriginsPerSiteForAttribution(
+@@ -3175,3 +3178,6 @@ int64_t AttributionStorageSql::CountUniqueReportingOriginsPerSiteForAttribution(
  }
  
  }  // namespace content
 +
 +#undef kDatabasePath
 +#undef kUnsetRecordId
+diff --git a/content/browser/btm/btm_database.h b/content/browser/btm/btm_database.h
+index dfad2d4940..ca7a9b8d6c 100644
+--- a/content/browser/btm/btm_database.h
++++ b/content/browser/btm/btm_database.h
+@@ -73,7 +73,7 @@ class CONTENT_EXPORT BtmDatabase {
+   // This is implicitly `inline`. Don't move its definition to the .cc file.
+   bool HasExpired(std::optional<base::Time> time) {
+     return time.has_value() &&
+-           (time.value() + features::kBtmInteractionTtl.Get()) < clock_->Now();
++           (time.value() + ::features::kBtmInteractionTtl.Get()) < clock_->Now();
+   }
+ 
+   std::optional<StateValue> Read(const std::string& site);
+diff --git a/content/browser/btm/btm_page_visit_observer.cc b/content/browser/btm/btm_page_visit_observer.cc
+index c651d2b866..69a844d1ab 100644
+--- a/content/browser/btm/btm_page_visit_observer.cc
++++ b/content/browser/btm/btm_page_visit_observer.cc
+@@ -53,6 +53,8 @@ BtmPageVisitObserver::~BtmPageVisitObserver() {
+   }
+ }
+ 
++#define NavigationState NavigationState_PageVisit
++
+ namespace {
+ 
+ inline bool IsWrite(BtmDataAccessType t) {
+@@ -385,3 +387,5 @@ void BtmPageVisitObserver::WebAuthnAssertionRequestSucceeded(
+ }
+ 
+ }  // namespace content
++
++#undef NavigationState
+diff --git a/content/browser/btm/btm_short_visit_observer.cc b/content/browser/btm/btm_short_visit_observer.cc
+index c01dd31b37..69b91160bd 100644
+--- a/content/browser/btm/btm_short_visit_observer.cc
++++ b/content/browser/btm/btm_short_visit_observer.cc
+@@ -32,6 +32,8 @@
+ #include "url/gurl.h"
+ #include "url/origin.h"
+ 
++#define NavigationState NavigationState_ShortVisit
++
+ namespace content {
+ 
+ namespace {
+@@ -401,3 +403,5 @@ void BtmShortVisitObserver::NotifyStorageAccessed(
+ }
+ 
+ }  // namespace content
++
++#undef NavigationState
 diff --git a/content/browser/devtools/BUILD.gn b/content/browser/devtools/BUILD.gn
-index 919acb49aa..d05ebfb8dd 100644
+index 4cecc088a0..5e5894fd4d 100644
 --- a/content/browser/devtools/BUILD.gn
 +++ b/content/browser/devtools/BUILD.gn
 @@ -83,7 +83,7 @@ action("concatenate_protocols") {
@@ -462,7 +499,7 @@ index 919acb49aa..d05ebfb8dd 100644
    inspector_protocol_dir = "//third_party/inspector_protocol"
    out_dir = target_gen_dir
 diff --git a/content/browser/devtools/protocol/fedcm_handler.cc b/content/browser/devtools/protocol/fedcm_handler.cc
-index a99cb968cb..104c4d470e 100644
+index cee5a2097d..a076779b16 100644
 --- a/content/browser/devtools/protocol/fedcm_handler.cc
 +++ b/content/browser/devtools/protocol/fedcm_handler.cc
 @@ -345,7 +345,7 @@ FederatedAuthRequestPageData* FedCmHandler::GetPageData() {
@@ -474,27 +511,8 @@ index a99cb968cb..104c4d470e 100644
    return PageUserData<FederatedAuthRequestPageData>::GetOrCreateForPage(page);
  }
  
-diff --git a/content/browser/devtools/protocol/page_handler.cc b/content/browser/devtools/protocol/page_handler.cc
-index 9f04c3b647..4a082ae481 100644
---- a/content/browser/devtools/protocol/page_handler.cc
-+++ b/content/browser/devtools/protocol/page_handler.cc
-@@ -86,6 +86,8 @@
- #include "content/browser/renderer_host/compositor_impl_android.h"
- #endif
- 
-+#define kCommandIsOnlyAvailableAtTopTarget kCommandIsOnlyAvailableAtTopTarget_PageHandler
-+
- namespace content {
- namespace protocol {
- 
-@@ -2348,3 +2350,5 @@ bool PageHandler::ShouldBypassCSP() {
- 
- }  // namespace protocol
- }  // namespace content
-+
-+#undef kCommandIsOnlyAvailableAtTopTarget
 diff --git a/content/browser/devtools/render_frame_devtools_agent_host.cc b/content/browser/devtools/render_frame_devtools_agent_host.cc
-index a6f0c9357f..c5ccfb70c0 100644
+index ce011f0b1e..be0d8548e8 100644
 --- a/content/browser/devtools/render_frame_devtools_agent_host.cc
 +++ b/content/browser/devtools/render_frame_devtools_agent_host.cc
 @@ -89,6 +89,8 @@
@@ -506,7 +524,7 @@ index a6f0c9357f..c5ccfb70c0 100644
  namespace content {
  
  namespace {
-@@ -1091,3 +1093,5 @@ bool RenderFrameDevToolsAgentHost::HasSessionsWithoutTabTargetSupport() const {
+@@ -1102,3 +1104,5 @@ bool RenderFrameDevToolsAgentHost::HasSessionsWithoutTabTargetSupport() const {
  }
  
  }  // namespace content
@@ -531,43 +549,11 @@ index 15e5a7cd36..c65712e78f 100644
  }  // namespace content
 +
 +#undef g_agent_host_instances
-diff --git a/content/browser/dips/btm_short_visit_observer.cc b/content/browser/dips/btm_short_visit_observer.cc
-index 0de292468d..ae93f97359 100644
---- a/content/browser/dips/btm_short_visit_observer.cc
-+++ b/content/browser/dips/btm_short_visit_observer.cc
-@@ -21,6 +21,8 @@
- #include "services/metrics/public/cpp/ukm_builders.h"
- #include "services/metrics/public/cpp/ukm_recorder.h"
- 
-+#define NavigationState NavigationState_BtmShortVisitObserver
-+
- namespace content {
- 
- namespace {
-@@ -181,3 +183,5 @@ void BtmShortVisitObserver::DidFinishNavigation(
- }
- 
- }  // namespace content
-+
-+#undef NavigationState
-diff --git a/content/browser/dips/dips_database.h b/content/browser/dips/dips_database.h
-index d04b472fef..26b5813e2d 100644
---- a/content/browser/dips/dips_database.h
-+++ b/content/browser/dips/dips_database.h
-@@ -73,7 +73,7 @@ class CONTENT_EXPORT BtmDatabase {
-   // This is implicitly `inline`. Don't move its definition to the .cc file.
-   bool HasExpired(std::optional<base::Time> time) {
-     return time.has_value() &&
--           (time.value() + features::kBtmInteractionTtl.Get()) < clock_->Now();
-+           (time.value() + ::features::kBtmInteractionTtl.Get()) < clock_->Now();
-   }
- 
-   std::optional<StateValue> Read(const std::string& site);
 diff --git a/content/browser/direct_sockets/direct_sockets_service_impl.cc b/content/browser/direct_sockets/direct_sockets_service_impl.cc
-index 28c7ac8cba..b6c8e1cc0b 100644
+index 7765e9be7e..96bb53d4ab 100644
 --- a/content/browser/direct_sockets/direct_sockets_service_impl.cc
 +++ b/content/browser/direct_sockets/direct_sockets_service_impl.cc
-@@ -49,6 +49,8 @@
+@@ -58,6 +58,8 @@
  #include "services/network/public/mojom/socket_connection_tracker.mojom.h"
  #endif  // BUILDFLAG(IS_CHROMEOS)
  
@@ -576,7 +562,7 @@ index 28c7ac8cba..b6c8e1cc0b 100644
  namespace content {
  
  namespace {
-@@ -675,3 +677,5 @@ void DirectSocketsServiceImpl::CreateRestrictedUDPSocketImpl(
+@@ -835,3 +837,5 @@ void DirectSocketsServiceImpl::CreateRestrictedUDPSocketImpl(
  }
  
  }  // namespace content
@@ -634,10 +620,10 @@ index affdc0cb28..b382bafcfb 100644
      return false;
    } else {
 diff --git a/content/browser/generic_sensor/frame_sensor_provider_proxy.cc b/content/browser/generic_sensor/frame_sensor_provider_proxy.cc
-index 5af2bdd0c7..b46dfddfd5 100644
+index 2836e5233c..e03335155b 100644
 --- a/content/browser/generic_sensor/frame_sensor_provider_proxy.cc
 +++ b/content/browser/generic_sensor/frame_sensor_provider_proxy.cc
-@@ -117,7 +117,7 @@ void FrameSensorProviderProxy::OnPermissionRequestCompleted(
+@@ -120,7 +120,7 @@ void FrameSensorProviderProxy::OnPermissionRequestCompleted(
        break;
      default:
        if (!base::FeatureList::IsEnabled(
@@ -647,19 +633,19 @@ index 5af2bdd0c7..b46dfddfd5 100644
              ->OnBackForwardCacheDisablingStickyFeatureUsed(
                  blink::scheduler::WebSchedulerTrackedFeature::
 diff --git a/content/browser/gpu/gpu_data_manager_impl_private.cc b/content/browser/gpu/gpu_data_manager_impl_private.cc
-index 003659857d..973e923e7e 100644
+index 9e30a243a9..5c6104b914 100644
 --- a/content/browser/gpu/gpu_data_manager_impl_private.cc
 +++ b/content/browser/gpu/gpu_data_manager_impl_private.cc
-@@ -401,7 +401,7 @@ bool SwiftShaderAllowed() {
+@@ -396,7 +396,7 @@ bool SoftwareGLAllowed() {
    const base::CommandLine* command_line =
        base::CommandLine::ForCurrentProcess();
    return !command_line->HasSwitch(switches::kDisableSoftwareRasterizer) &&
--         features::IsSwiftShaderAllowed(command_line);
-+         ::features::IsSwiftShaderAllowed(command_line);
+-         features::IsAnySoftwareGLAllowed(command_line);
++         ::features::IsAnySoftwareGLAllowed(command_line);
  }
  
  // These values are logged to UMA. Entries should not be renumbered and numeric
-@@ -530,7 +530,7 @@ void GpuDataManagerImplPrivate::InitializeGpuModes() {
+@@ -526,7 +526,7 @@ void GpuDataManagerImplPrivate::InitializeGpuModes() {
      BUILDFLAG(IS_CHROMEOS)
      NOTREACHED() << "GPU acceleration is required on certain platforms!";
  #endif
@@ -668,7 +654,7 @@ index 003659857d..973e923e7e 100644
      // If Graphite is enabled, fall back to Ganesh/GL on platforms that do not
      // support software compositing or sometimes fail dawn initialization.
      // TODO(b/323953910): Eliminate this fallback on each platform once Graphite
-@@ -546,7 +546,7 @@ void GpuDataManagerImplPrivate::InitializeGpuModes() {
+@@ -542,7 +542,7 @@ void GpuDataManagerImplPrivate::InitializeGpuModes() {
  #else
      fallback_modes_.push_back(gpu::GpuMode::HARDWARE_GL);
      // Prefer Vulkan over GL if enabled.
@@ -677,6 +663,24 @@ index 003659857d..973e923e7e 100644
        fallback_modes_.push_back(gpu::GpuMode::HARDWARE_VULKAN);
      }
  #endif  // BUILDFLAG(IS_FUCHSIA)
+@@ -1242,7 +1242,7 @@ void GpuDataManagerImplPrivate::UpdateGpuFeatureInfo(
+   }
+ 
+   is_gpu_rasterization_for_ui_enabled_ =
+-      features::IsUiGpuRasterizationEnabled() &&
++      ::features::IsUiGpuRasterizationEnabled() &&
+       gpu_feature_info_
+               .status_values[gpu::GPU_FEATURE_TYPE_GPU_TILE_RASTERIZATION] ==
+           gpu::kGpuFeatureStatusEnabled;
+@@ -1677,7 +1677,7 @@ void GpuDataManagerImplPrivate::FallBackToNextGpuModeDueToCrash() {
+   // If we fell back to sofware GL due to crashes and it is disabled with a
+   // feature. Fall back again.
+   if (gpu_mode_ == gpu::GpuMode::SOFTWARE_GL &&
+-      !features::IsSoftwareGLFallbackDueToCrashesAllowed(
++      !::features::IsSoftwareGLFallbackDueToCrashesAllowed(
+           base::CommandLine::ForCurrentProcess())) {
+     FallBackToNextGpuMode();
+     DCHECK_NE(gpu_mode_, gpu::GpuMode::SOFTWARE_GL);
 diff --git a/content/browser/guest_page_holder_impl.cc b/content/browser/guest_page_holder_impl.cc
 index 6c8c488087..fb301afbf5 100644
 --- a/content/browser/guest_page_holder_impl.cc
@@ -691,78 +695,42 @@ index 6c8c488087..fb301afbf5 100644
    if (render_frame_proxy_host->frame_tree_node() != frame_tree_.root()) {
      return false;
 diff --git a/content/browser/hid/hid_service.cc b/content/browser/hid/hid_service.cc
-index f8bac3d10c..6323c44f8e 100644
+index 5c153a6996..9091357b31 100644
 --- a/content/browser/hid/hid_service.cc
 +++ b/content/browser/hid/hid_service.cc
 @@ -26,6 +26,8 @@
  #include "services/device/public/cpp/device_features.h"
- #include "third_party/blink/public/mojom/permissions_policy/permissions_policy.mojom.h"
+ #include "services/network/public/mojom/permissions_policy/permissions_policy_feature.mojom.h"
  
 +#define DocumentHelper DocumentHelper_HidService
 +
  namespace content {
  
  // Deletes the HidService when the connected document is destroyed.
-@@ -582,3 +584,5 @@ BrowserContext* HidService::GetBrowserContext() {
+@@ -595,3 +597,5 @@ BrowserContext* HidService::GetBrowserContext() {
  }
  
  }  // namespace content
 +
 +#undef DocumentHelper
 diff --git a/content/browser/host_zoom_map_impl.cc b/content/browser/host_zoom_map_impl.cc
-index f3f57ee0f2..b3217d8967 100644
+index 5b75a5577d..bc3034362a 100644
 --- a/content/browser/host_zoom_map_impl.cc
 +++ b/content/browser/host_zoom_map_impl.cc
-@@ -372,7 +372,7 @@ void HostZoomMapImpl::SetDefaultZoomLevel(double level) {
+@@ -75,7 +75,7 @@ bool IsIndependentSubframeZoomEnabled() {
+   // only return true here if some feature that requires subframe zoom is also
+   // enabled.
+   return base::FeatureList::IsEnabled(kSubframeZoom) &&
+-         (base::FeatureList::IsEnabled(features::kGuestViewMPArch) ||
++         (base::FeatureList::IsEnabled(::features::kGuestViewMPArch) ||
+           GetContentClient()->browser()->ShouldEnableSubframeZoom());
+ }
  
-   // If kGuestViewMPArch is enabled, then update zoom levels for subframes that
-   // do not have an overriding entry.
--  if (!base::FeatureList::IsEnabled(features::kGuestViewMPArch)) {
-+  if (!base::FeatureList::IsEnabled(::features::kGuestViewMPArch)) {
-     return;
-   }
-   for (auto ftn_id : independent_zoom_frame_tree_nodes_) {
-@@ -417,7 +417,7 @@ double HostZoomMapImpl::GetZoomLevelForWebContents(
-   GURL url;
-   RenderFrameHostImpl* rfh = RenderFrameHostImpl::FromID(rfh_id);
-   NavigationEntry* entry =
--      base::FeatureList::IsEnabled(features::kGuestViewMPArch)
-+      base::FeatureList::IsEnabled(::features::kGuestViewMPArch)
-           ? rfh->GetController().GetLastCommittedEntry()
-           : web_contents_impl->GetController().GetLastCommittedEntry();
-   // It is possible for a WebContent's zoom level to be queried before
-@@ -446,7 +446,7 @@ void HostZoomMapImpl::SetZoomLevelForWebContents(
-   } else {
-     RenderFrameHostImpl* rfh = RenderFrameHostImpl::FromID(rfh_id);
-     NavigationEntry* entry =
--        base::FeatureList::IsEnabled(features::kGuestViewMPArch)
-+        base::FeatureList::IsEnabled(::features::kGuestViewMPArch)
-             ? rfh->GetController().GetLastCommittedEntry()
-             : web_contents_impl->GetController().GetLastCommittedEntry();
-     // Get the url from the navigation controller directly, as calling
-@@ -490,7 +490,7 @@ void HostZoomMapImpl::SetTemporaryZoomLevel(
-   DCHECK_CURRENTLY_ON(BrowserThread::UI);
- 
-   RenderFrameHostImpl* rfh = RenderFrameHostImpl::FromID(rfh_id);
--  if (base::FeatureList::IsEnabled(features::kGuestViewMPArch)) {
-+  if (base::FeatureList::IsEnabled(::features::kGuestViewMPArch)) {
-     CHECK(rfh->is_local_root());
-   } else {
-     DCHECK(rfh == rfh->GetOutermostMainFrame());
-@@ -556,7 +556,7 @@ void HostZoomMapImpl::SendZoomLevelChange(const std::string& scheme,
-   // Also loop over the independently-zoomed FTNs that aren't primary
-   // mainframes. If kGuestViewMPArch isn't enabled, then there will be no
-   // such frames, so early-out in that case.
--  if (!base::FeatureList::IsEnabled(features::kGuestViewMPArch)) {
-+  if (!base::FeatureList::IsEnabled(::features::kGuestViewMPArch)) {
-     return;
-   }
-   for (auto ftn_id : independent_zoom_frame_tree_nodes_) {
 diff --git a/content/browser/in_memory_federated_permission_context.cc b/content/browser/in_memory_federated_permission_context.cc
-index 105eface3a..1116a616d2 100644
+index fede9ac819..24fe22a7b7 100644
 --- a/content/browser/in_memory_federated_permission_context.cc
 +++ b/content/browser/in_memory_federated_permission_context.cc
-@@ -23,7 +23,7 @@ InMemoryFederatedPermissionContext::~InMemoryFederatedPermissionContext() =
+@@ -28,7 +28,7 @@ InMemoryFederatedPermissionContext::~InMemoryFederatedPermissionContext() =
  content::FederatedIdentityApiPermissionContextDelegate::PermissionStatus
  InMemoryFederatedPermissionContext::GetApiPermissionStatus(
      const url::Origin& relying_party_embedder) {
@@ -771,218 +739,12 @@ index 105eface3a..1116a616d2 100644
      return PermissionStatus::BLOCKED_VARIATIONS;
    }
  
-diff --git a/content/browser/installedapp/installed_app_provider_impl.cc b/content/browser/installedapp/installed_app_provider_impl.cc
-index bbaa278e17..a6580a8458 100644
---- a/content/browser/installedapp/installed_app_provider_impl.cc
-+++ b/content/browser/installedapp/installed_app_provider_impl.cc
-@@ -60,7 +60,7 @@ void InstalledAppProviderImpl::FilterInstalledApps(
-     const GURL& manifest_url,
-     FilterInstalledAppsCallback callback) {
-   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
--  if (!base::FeatureList::IsEnabled(features::kInstalledAppProvider)) {
-+  if (!base::FeatureList::IsEnabled(::features::kInstalledAppProvider)) {
-     base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
-         FROM_HERE,
-         base::BindOnce(std::move(callback),
-@@ -71,7 +71,7 @@ void InstalledAppProviderImpl::FilterInstalledApps(
-   base::ConcurrentCallbacks<FetchRelatedAppsTaskResult> concurrent;
- 
- #if BUILDFLAG(IS_WIN)
--  if (base::FeatureList::IsEnabled(features::kFilterInstalledAppsWinMatching)) {
-+  if (base::FeatureList::IsEnabled(::features::kFilterInstalledAppsWinMatching)) {
-     StartTask(std::make_unique<FetchRelatedWinAppsTask>(
-                   native_win_app_fetcher_factory_.Run()),
-               related_apps, concurrent.CreateCallback());
-@@ -80,7 +80,7 @@ void InstalledAppProviderImpl::FilterInstalledApps(
- 
- #if !BUILDFLAG(IS_ANDROID)
-   if (base::FeatureList::IsEnabled(
--          features::kFilterInstalledAppsWebAppMatching)) {
-+          ::features::kFilterInstalledAppsWebAppMatching)) {
-     StartTask(std::make_unique<FetchRelatedWebAppsTask>(
-                   render_frame_host().GetBrowserContext()),
-               related_apps, concurrent.CreateCallback());
-diff --git a/content/browser/interest_group/ad_auction_headers_util.cc b/content/browser/interest_group/ad_auction_headers_util.cc
-index 5b341d47f2..0f26b72d1c 100644
---- a/content/browser/interest_group/ad_auction_headers_util.cc
-+++ b/content/browser/interest_group/ad_auction_headers_util.cc
-@@ -341,7 +341,7 @@ void ProcessAdAuctionResponseHeaders(
-   // We intentionally leave the `Ad-Auction-Result` response header in place.
- 
-   if (base::FeatureList::IsEnabled(
--          features::kFledgeBiddingAndAuctionNonceSupport)) {
-+          ::features::kFledgeBiddingAndAuctionNonceSupport)) {
-     if (std::optional<std::string> ad_auction_results =
-             headers->GetNormalizedHeader(
-                 kAdAuctionResultNonceResponseHeaderKey)) {
-diff --git a/content/browser/interest_group/ad_auction_result_metrics.cc b/content/browser/interest_group/ad_auction_result_metrics.cc
-index 44c4114c36..5c2d479a4f 100644
---- a/content/browser/interest_group/ad_auction_result_metrics.cc
-+++ b/content/browser/interest_group/ad_auction_result_metrics.cc
-@@ -53,9 +53,9 @@ AdAuctionResultMetrics::~AdAuctionResultMetrics() {
- 
- bool AdAuctionResultMetrics::ShouldRunAuction() {
-   num_requested_auctions_++;
--  if (!base::FeatureList::IsEnabled(features::kFledgeLimitNumAuctions))
-+  if (!base::FeatureList::IsEnabled(::features::kFledgeLimitNumAuctions))
-     return true;
--  if (num_requested_auctions_ > features::kFledgeLimitNumAuctionsParam.Get()) {
-+  if (num_requested_auctions_ > ::features::kFledgeLimitNumAuctionsParam.Get()) {
-     num_auctions_not_run_due_to_auction_limit_++;
-     return false;
-   }
-diff --git a/content/browser/interest_group/ad_auction_service_impl.cc b/content/browser/interest_group/ad_auction_service_impl.cc
-index 6fb717e44a..3ed03cb6eb 100644
---- a/content/browser/interest_group/ad_auction_service_impl.cc
-+++ b/content/browser/interest_group/ad_auction_service_impl.cc
-@@ -180,7 +180,7 @@ void RecordBaDataConstructionResultMetric(size_t data_size,
- // Used to get a possible override to the user-agent string.
- std::optional<std::string> MaybeGetUserAgentOverride(
-     FrameTreeNode* frame_tree_node) {
--  if (base::FeatureList::IsEnabled(features::kFledgeEnableUserAgentOverrides)) {
-+  if (base::FeatureList::IsEnabled(::features::kFledgeEnableUserAgentOverrides)) {
-     if (frame_tree_node != nullptr) {
-       const bool override_user_agent =
-           frame_tree_node->navigator()
-@@ -452,7 +452,7 @@ void AdAuctionServiceImpl::RunAdAuction(
-   // been invalidated or the current frame's `PageImpl` has changed to a
-   // different one, abort the auction.
-   // See crbug.com/1422301.
--  if (base::FeatureList::IsEnabled(features::kDetectInconsistentPageImpl) &&
-+  if (base::FeatureList::IsEnabled(::features::kDetectInconsistentPageImpl) &&
-       (!GetFrame()->auction_initiator_page() ||
-        GetFrame()->auction_initiator_page().get() !=
-            &(GetFrame()->GetPage()))) {
-@@ -490,7 +490,7 @@ void AdAuctionServiceImpl::RunAdAuction(
- 
-   // Try to preconnect to owner and bidding signals origins if this is an
-   // on-device auction.
--  if (base::FeatureList::IsEnabled(features::kFledgeUsePreconnectCache) &&
-+  if (base::FeatureList::IsEnabled(::features::kFledgeUsePreconnectCache) &&
-       !config.server_response.has_value()) {
-     size_t n_owners_cached = PreconnectToBuyerOrigins(config);
-     for (const blink::AuctionConfig& component_config :
-@@ -787,7 +787,7 @@ AdAuctionServiceImpl::GetClientSecurityState() {
- 
- std::optional<std::string> AdAuctionServiceImpl::GetCookieDeprecationLabel() {
-   if (!base::FeatureList::IsEnabled(
--          features::kFledgeFacilitatedTestingSignalsHeaders)) {
-+          ::features::kFledgeFacilitatedTestingSignalsHeaders)) {
-     return std::nullopt;
-   }
- 
-@@ -963,7 +963,7 @@ void AdAuctionServiceImpl::OnAuctionComplete(
-   // been invalidated or the current frame's `PageImpl` has changed to a
-   // different one, abort the auction.
-   // See crbug.com/1422301.
--  if (base::FeatureList::IsEnabled(features::kDetectInconsistentPageImpl) &&
-+  if (base::FeatureList::IsEnabled(::features::kDetectInconsistentPageImpl) &&
-       (!GetFrame()->auction_initiator_page() ||
-        GetFrame()->auction_initiator_page().get() !=
-            &(GetFrame()->GetPage()))) {
-@@ -1341,7 +1341,7 @@ AdAuctionPageData* AdAuctionServiceImpl::GetAdAuctionPageData() {
-   // been invalidated or the current frame's `PageImpl` has changed to a
-   // different one, signal that state is no longer available.
-   // See crbug.com/1422301.
--  if (base::FeatureList::IsEnabled(features::kDetectInconsistentPageImpl) &&
-+  if (base::FeatureList::IsEnabled(::features::kDetectInconsistentPageImpl) &&
-       (!GetFrame()->auction_initiator_page() ||
-        GetFrame()->auction_initiator_page().get() !=
-            &(GetFrame()->GetPage()))) {
-diff --git a/content/browser/interest_group/auction_process_manager.cc b/content/browser/interest_group/auction_process_manager.cc
-index 337f17bb0e..b6cd909c0e 100644
---- a/content/browser/interest_group/auction_process_manager.cc
-+++ b/content/browser/interest_group/auction_process_manager.cc
-@@ -99,7 +99,7 @@ AuctionProcessManager::WorkletProcess::WorkletProcess(
-   if (is_idle_) {
-     remove_idle_process_from_manager_timer_.Start(
-         FROM_HERE,
--        features::kFledgeStartAnticipatoryProcessExpirationTime.Get(),
-+        ::features::kFledgeStartAnticipatoryProcessExpirationTime.Get(),
-         base::BindOnce(&RecordIdleProcessExpiredUma, true)
-             .Then(base::BindOnce(&WorkletProcess::RemoveFromProcessManager,
-                                  base::Unretained(this),
-@@ -393,7 +393,7 @@ void AuctionProcessManager::MaybeStartAnticipatoryProcess(
-     SiteInstance* frame_site_instance,
-     WorkletType worklet_type) {
-   if (!base::FeatureList::IsEnabled(
--          features::kFledgeStartAnticipatoryProcesses)) {
-+          ::features::kFledgeStartAnticipatoryProcesses)) {
-     return;
-   }
- 
-diff --git a/content/browser/interest_group/auction_runner.cc b/content/browser/interest_group/auction_runner.cc
-index aa6164cead..85ffd339d7 100644
---- a/content/browser/interest_group/auction_runner.cc
-+++ b/content/browser/interest_group/auction_runner.cc
-@@ -44,7 +44,7 @@ namespace {
- auction_worklet::mojom::KAnonymityBidMode DetermineKAnonMode() {
-   // K-anonymity enforcement is always disabled for the testing population.
-   if (base::FeatureList::IsEnabled(
--          features::kCookieDeprecationFacilitatedTesting)) {
-+          ::features::kCookieDeprecationFacilitatedTesting)) {
-     return auction_worklet::mojom::KAnonymityBidMode::kNone;
-   }
-   if (base::FeatureList::IsEnabled(
-@@ -710,7 +710,7 @@ void AuctionRunner::UpdateInterestGroupsPostAuction() {
-   });
- 
-   if (base::FeatureList::IsEnabled(
--          features::kFledgeDelayPostAuctionInterestGroupUpdate)) {
-+          ::features::kFledgeDelayPostAuctionInterestGroupUpdate)) {
-     interest_group_manager_->UpdateInterestGroupsOfOwnersWithDelay(
-         std::move(update_owners), client_security_state_.Clone(),
-         std::move(user_agent_override_), std::move(attestation_callback_),
-diff --git a/content/browser/interest_group/auction_url_loader_factory_proxy.cc b/content/browser/interest_group/auction_url_loader_factory_proxy.cc
-index a9a1497747..5f4c134099 100644
---- a/content/browser/interest_group/auction_url_loader_factory_proxy.cc
-+++ b/content/browser/interest_group/auction_url_loader_factory_proxy.cc
-@@ -319,7 +319,7 @@ void AuctionURLLoaderFactoryProxy::CreateLoaderAndStart(
-     new_request.throttling_profile_id =
-         owner_frame_tree_node->current_frame_host()->devtools_frame_token();
-     if (base::FeatureList::IsEnabled(
--            features::kFledgeEnableUserAgentOverrides) &&
-+            ::features::kFledgeEnableUserAgentOverrides) &&
-         owner_frame_tree_node != nullptr) {
-       const bool override_user_agent =
-           owner_frame_tree_node->navigator()
-diff --git a/content/browser/interest_group/auction_worklet_manager.cc b/content/browser/interest_group/auction_worklet_manager.cc
-index b436b83211..d0150158db 100644
---- a/content/browser/interest_group/auction_worklet_manager.cc
-+++ b/content/browser/interest_group/auction_worklet_manager.cc
-@@ -309,7 +309,7 @@ AuctionWorkletManager::WorkletOwner::WorkletOwner(
-     // When `kFledgeUseKVv2SignalsCache` is enabled, the TrustedSignalsCache
-     // manages KVv2 fetches in the browser process, so don't need get a key to
-     // pass to the worklet process.
--    if (!base::FeatureList::IsEnabled(features::kFledgeUseKVv2SignalsCache)) {
-+    if (!base::FeatureList::IsEnabled(::features::kFledgeUseKVv2SignalsCache)) {
-       waiting_on_trusted_signals_kvv2_public_key_ = true;
-       worklet_manager->delegate()->GetBiddingAndAuctionServerKey(
-           std::move(worklet_info_.trusted_signals_coordinator),
-@@ -645,7 +645,7 @@ void AuctionWorkletManager::WorkletOwner::LoadWorkletIfReady(
- 
-       for (size_t i = 0;
-            i < static_cast<size_t>(
--                   features::kFledgeSellerWorkletThreadPoolSize.Get());
-+                   ::features::kFledgeSellerWorkletThreadPoolSize.Get());
-            ++i) {
-         worklet_debugs_.emplace_back(new DebuggableAuctionWorklet(
-             delegate->GetFrame(), process_handle_, worklet_info_.script_url,
-@@ -679,7 +679,7 @@ void AuctionWorkletManager::WorkletOwner::LoadWorkletIfReady(
-           worklet_info_.trusted_signals_coordinator &&
-           base::FeatureList::IsEnabled(
-               blink::features::kFledgeTrustedSignalsKVv2Support) &&
--          base::FeatureList::IsEnabled(features::kFledgeUseKVv2SignalsCache)) {
-+          base::FeatureList::IsEnabled(::features::kFledgeUseKVv2SignalsCache)) {
-         if (url::Origin::Create(worklet_info_.script_url)
-                 .IsSameOriginWith(*worklet_info_.signals_url)) {
-           // If the script and signals URLs are same-origin, they may always be
 diff --git a/content/browser/interest_group/bidding_and_auction_response.cc b/content/browser/interest_group/bidding_and_auction_response.cc
-index 6e3fce93eb..7acb5bdd83 100644
+index 771736dea6..dbcbb60703 100644
 --- a/content/browser/interest_group/bidding_and_auction_response.cc
 +++ b/content/browser/interest_group/bidding_and_auction_response.cc
-@@ -20,6 +20,8 @@
- #include "third_party/blink/public/common/features.h"
+@@ -24,6 +24,8 @@
+ #include "third_party/blink/public/mojom/private_aggregation/private_aggregation_host.mojom.h"
  #include "url/origin.h"
  
 +#define kFramingHeaderSize kFramingHeaderSize_BiddingAndAuctionResponse
@@ -990,71 +752,17 @@ index 6e3fce93eb..7acb5bdd83 100644
  namespace content {
  
  namespace {
-@@ -107,7 +109,7 @@ std::optional<BiddingAndAuctionResponse> BiddingAndAuctionResponse::TryParse(
-   }
- 
-   if (base::FeatureList::IsEnabled(
--          features::kFledgeBiddingAndAuctionNonceSupport)) {
-+          ::features::kFledgeBiddingAndAuctionNonceSupport)) {
-     const std::string* nonce = input_dict->FindString("nonce");
-     if (nonce) {
-       base::Uuid nonce_uuid = base::Uuid::ParseCaseInsensitive(*nonce);
-@@ -281,7 +283,7 @@ std::optional<BiddingAndAuctionResponse> BiddingAndAuctionResponse::TryParse(
- 
-   if (base::FeatureList::IsEnabled(
-           blink::features::kFledgeAuctionDealSupport) &&
--      base::FeatureList::IsEnabled(features::kEnableBandADealSupport)) {
-+      base::FeatureList::IsEnabled(::features::kEnableBandADealSupport)) {
-     std::string* maybe_selected_buyer_and_seller_reporting_id =
-         input_dict->FindString("selectedBuyerAndSellerReportingId");
-     if (maybe_selected_buyer_and_seller_reporting_id) {
-@@ -290,7 +292,7 @@ std::optional<BiddingAndAuctionResponse> BiddingAndAuctionResponse::TryParse(
-     }
-   }
- 
--  if (base::FeatureList::IsEnabled(features::kEnableBandAKAnonEnforcement)) {
-+  if (base::FeatureList::IsEnabled(::features::kEnableBandAKAnonEnforcement)) {
-     base::Value::Dict* k_anon_winner_join_candidate =
-         input_dict->FindDict("kAnonWinnerJoinCandidates");
-     if (k_anon_winner_join_candidate) {
-@@ -308,7 +310,7 @@ std::optional<BiddingAndAuctionResponse> BiddingAndAuctionResponse::TryParse(
- 
-   if (base::FeatureList::IsEnabled(blink::features::kPrivateAggregationApi) &&
-       blink::features::kPrivateAggregationApiEnabledInProtectedAudience.Get() &&
--      base::FeatureList::IsEnabled(features::kEnableBandAPrivateAggregation)) {
-+      base::FeatureList::IsEnabled(::features::kEnableBandAPrivateAggregation)) {
-     const base::Value::List* pagg_response =
-         input_dict->FindList("paggResponse");
-     if (pagg_response) {
-@@ -317,7 +319,7 @@ std::optional<BiddingAndAuctionResponse> BiddingAndAuctionResponse::TryParse(
-     }
-   }
- 
--  if (base::FeatureList::IsEnabled(features::kEnableBandASampleDebugReports)) {
-+  if (base::FeatureList::IsEnabled(::features::kEnableBandASampleDebugReports)) {
-     base::Value::List* for_debugging_only_reports =
-         input_dict->FindList("debugReports");
-     if (for_debugging_only_reports) {
-@@ -326,7 +328,7 @@ std::optional<BiddingAndAuctionResponse> BiddingAndAuctionResponse::TryParse(
-   }
- 
-   base::Value::Dict* triggered_updates = input_dict->FindDict("updateGroups");
--  if (base::FeatureList::IsEnabled(features::kEnableBandATriggeredUpdates) &&
-+  if (base::FeatureList::IsEnabled(::features::kEnableBandATriggeredUpdates) &&
-       triggered_updates) {
-     for (const auto owner_groups : *triggered_updates) {
-       url::Origin owner = url::Origin::Create(GURL(owner_groups.first));
-@@ -949,3 +951,5 @@ BiddingAndAuctionResponse::ReportingURLs::TryParse(
+@@ -971,3 +973,5 @@ BiddingAndAuctionResponse::ReportingURLs::TryParse(
  }
  
  }  // namespace content
 +
 +#undef kFramingHeaderSize
 diff --git a/content/browser/interest_group/bidding_and_auction_serializer.cc b/content/browser/interest_group/bidding_and_auction_serializer.cc
-index 5ad25d83bf..657a774278 100644
+index f66cd503b4..5f02772233 100644
 --- a/content/browser/interest_group/bidding_and_auction_serializer.cc
 +++ b/content/browser/interest_group/bidding_and_auction_serializer.cc
-@@ -40,6 +40,8 @@
+@@ -41,6 +41,8 @@
  #include "third_party/blink/public/mojom/interest_group/interest_group_types.mojom.h"
  #include "third_party/zlib/google/compression_utils.h"
  
@@ -1063,130 +771,17 @@ index 5ad25d83bf..657a774278 100644
  namespace content {
  
  namespace {
-@@ -111,7 +113,7 @@ struct SerializedBiddersMap {
- bool KAnonIsEnabled() {
-   // K-anonymity enforcement is always disabled for the testing population.
-   if (base::FeatureList::IsEnabled(
--          features::kCookieDeprecationFacilitatedTesting)) {
-+          ::features::kCookieDeprecationFacilitatedTesting)) {
-     return false;
-   }
-   return base::FeatureList::IsEnabled(
-@@ -977,7 +979,7 @@ BiddingAndAuctionData BiddingAndAuctionSerializer::Build() {
-       TaggedStringLength(constexpr_strlen("requestTimestampMs")) +
-       TaggedSIntLength(timestamp);
- 
--  if (base::FeatureList::IsEnabled(features::kEnableBandAKAnonEnforcement) &&
-+  if (base::FeatureList::IsEnabled(::features::kEnableBandAKAnonEnforcement) &&
-       KAnonIsEnabled()) {
-     message_obj[cbor::Value("enforceKAnon")] = cbor::Value(true);
-     message_elements_size +=
-@@ -1090,3 +1092,5 @@ BiddingAndAuctionData BiddingAndAuctionSerializer::Build() {
+@@ -1218,3 +1220,5 @@ BiddingAndAuctionSerializer::BuildRequestFromMessage(const url::Origin& seller,
  }
  
  }  // namespace content
 +
 +#undef kFramingHeaderSize
-diff --git a/content/browser/interest_group/bidding_and_auction_server_key_fetcher.cc b/content/browser/interest_group/bidding_and_auction_server_key_fetcher.cc
-index 086e8f458c..24d8529970 100644
---- a/content/browser/interest_group/bidding_and_auction_server_key_fetcher.cc
-+++ b/content/browser/interest_group/bidding_and_auction_server_key_fetcher.cc
-@@ -200,7 +200,7 @@ void BiddingAndAuctionServerKeyFetcher::FetchKeys(
- 
-   state.keys.clear();
- 
--  if (base::FeatureList::IsEnabled(features::kFledgeStoreBandAKeysInDB)) {
-+  if (base::FeatureList::IsEnabled(::features::kFledgeStoreBandAKeysInDB)) {
-     manager_->GetBiddingAndAuctionServerKeys(
-         coordinator,
-         base::BindOnce(
-@@ -325,7 +325,7 @@ void BiddingAndAuctionServerKeyFetcher::OnParsedKeys(
- 
-   base::Time expiration = base::Time::Now() + kKeyRequestInterval;
-   CacheKeysAndRunAllCallbacks(coordinator, keys, expiration);
--  if (base::FeatureList::IsEnabled(features::kFledgeStoreBandAKeysInDB)) {
-+  if (base::FeatureList::IsEnabled(::features::kFledgeStoreBandAKeysInDB)) {
-     manager_->SetBiddingAndAuctionServerKeys(coordinator, std::move(keys),
-                                              expiration);
-   }
-diff --git a/content/browser/interest_group/interest_group_auction.cc b/content/browser/interest_group/interest_group_auction.cc
-index 3063cce16a..4420b68e1d 100644
---- a/content/browser/interest_group/interest_group_auction.cc
-+++ b/content/browser/interest_group/interest_group_auction.cc
-@@ -1544,7 +1544,7 @@ class InterestGroupAuction::BuyerHelper
-     size_t number_of_bidder_threads = 1;
-     if (num_outstanding_bids_ > 0) {
-       number_of_bidder_threads += static_cast<int>(
--          features::kFledgeBidderWorkletThreadPoolSizeLogarithmicScalingFactor
-+          ::features::kFledgeBidderWorkletThreadPoolSizeLogarithmicScalingFactor
-               .Get() *
-           std::log10(num_outstanding_bids_));
-     }
-@@ -5182,7 +5182,7 @@ void InterestGroupAuction::HandleUpdateIfOlderThan(
-     std::string_view name,
-     std::optional<base::TimeDelta> update_if_older_than) {
-   if (!base::FeatureList::IsEnabled(
--          features::kInterestGroupUpdateIfOlderThan)) {
-+          ::features::kInterestGroupUpdateIfOlderThan)) {
-     return;
-   }
-   if (!update_if_older_than) {
-@@ -6543,7 +6543,7 @@ void InterestGroupAuction::CreateBidFromServerResponse() {
-   bool enable_kanon =
-       server_supports_kanon &&
-       kanon_mode_ == auction_worklet::mojom::KAnonymityBidMode::kEnforce &&
--      base::FeatureList::IsEnabled(features::kEnableBandAKAnonEnforcement);
-+      base::FeatureList::IsEnabled(::features::kEnableBandAKAnonEnforcement);
- 
-   if (parent_) {
-     // Component auction.
-diff --git a/content/browser/interest_group/interest_group_auction_reporter.cc b/content/browser/interest_group/interest_group_auction_reporter.cc
-index d48bc59e82..8af6c5ae1f 100644
---- a/content/browser/interest_group/interest_group_auction_reporter.cc
-+++ b/content/browser/interest_group/interest_group_auction_reporter.cc
-@@ -75,7 +75,7 @@ bool IsKAnonForReporting(
-         selected_buyer_and_seller_reporting_id) {
-   // K-anonymity enforcement is always disabled for the testing population.
-   if (base::FeatureList::IsEnabled(
--          features::kCookieDeprecationFacilitatedTesting)) {
-+          ::features::kCookieDeprecationFacilitatedTesting)) {
-     return true;
-   }
-   if (!base::FeatureList::IsEnabled(
-diff --git a/content/browser/interest_group/interest_group_caching_storage.cc b/content/browser/interest_group/interest_group_caching_storage.cc
-index 9c67de7574..62b25b3518 100644
---- a/content/browser/interest_group/interest_group_caching_storage.cc
-+++ b/content/browser/interest_group/interest_group_caching_storage.cc
-@@ -197,9 +197,9 @@ bool InterestGroupCachingStorage::GetCachedOwnerAndSignalsOrigins(
- 
- void InterestGroupCachingStorage::UpdateCachedOriginsIfEnabled(
-     const url::Origin& owner) {
--  if (!base::FeatureList::IsEnabled(features::kFledgeUsePreconnectCache) &&
-+  if (!base::FeatureList::IsEnabled(::features::kFledgeUsePreconnectCache) &&
-       !base::FeatureList::IsEnabled(
--          features::kFledgeStartAnticipatoryProcesses)) {
-+          ::features::kFledgeStartAnticipatoryProcesses)) {
-     return;
-   }
- 
-diff --git a/content/browser/interest_group/interest_group_k_anonymity_manager.cc b/content/browser/interest_group/interest_group_k_anonymity_manager.cc
-index 4d36128f16..8be1213889 100644
---- a/content/browser/interest_group/interest_group_k_anonymity_manager.cc
-+++ b/content/browser/interest_group/interest_group_k_anonymity_manager.cc
-@@ -56,7 +56,7 @@ InterestGroupKAnonymityManager::InProgressQueryState::~InProgressQueryState() =
- void InterestGroupKAnonymityManager::QueryKAnonymityData(
-     const blink::InterestGroupKey& interest_group_key,
-     const InterestGroupKanonUpdateParameter& k_anon_data) {
--  if (!base::FeatureList::IsEnabled(features::kFledgeQueryKAnonymity)) {
-+  if (!base::FeatureList::IsEnabled(::features::kFledgeQueryKAnonymity)) {
-     return;
-   }
- 
 diff --git a/content/browser/interest_group/interest_group_manager_impl.cc b/content/browser/interest_group/interest_group_manager_impl.cc
-index 7a2a69f937..4f49ffea9a 100644
+index 12f64c3b28..c1c169c608 100644
 --- a/content/browser/interest_group/interest_group_manager_impl.cc
 +++ b/content/browser/interest_group/interest_group_manager_impl.cc
-@@ -55,6 +55,8 @@
+@@ -57,6 +57,8 @@
  #include "url/gurl.h"
  #include "url/origin.h"
  
@@ -1194,26 +789,8 @@ index 7a2a69f937..4f49ffea9a 100644
 +
  namespace content {
  
- namespace {
-@@ -278,7 +280,7 @@ InterestGroupManagerImpl::InterestGroupManagerImpl(
-           base::FeatureList::IsEnabled(
-               blink::features::kFledgeTrustedSignalsKVv2Support) &&
-                   base::FeatureList::IsEnabled(
--                      features::kFledgeUseKVv2SignalsCache)
-+                      ::features::kFledgeUseKVv2SignalsCache)
-               ? std::make_unique<TrustedSignalsCacheImpl>(
-                     url_loader_factory,
-                     base::BindRepeating(&InterestGroupManagerImpl::
-@@ -572,7 +574,7 @@ void InterestGroupManagerImpl::GetLastMaintenanceTimeForTesting(
- 
- std::optional<std::string> InterestGroupManagerImpl::MaybeGetUserAgentOverride(
-     const FrameTreeNodeId& frame_tree_node_id) {
--  if (base::FeatureList::IsEnabled(features::kFledgeEnableUserAgentOverrides)) {
-+  if (base::FeatureList::IsEnabled(::features::kFledgeEnableUserAgentOverrides)) {
-     FrameTreeNode* frame_tree_node =
-         FrameTreeNode::GloballyFindByID(frame_tree_node_id);
- 
-@@ -1181,3 +1183,5 @@ InterestGroupManagerImpl::CreateNotifyInterestGroupAccessedCallback(
+ class BrowserContext;
+@@ -1294,3 +1296,5 @@ InterestGroupManagerImpl::CreateNotifyInterestGroupAccessedCallback(
  }
  
  }  // namespace content
@@ -1238,57 +815,8 @@ index 7f240a09f9..83f5e81889 100644
  }  // namespace content
 +
 +#undef kTrafficAnnotation
-diff --git a/content/browser/interest_group/interest_group_storage.cc b/content/browser/interest_group/interest_group_storage.cc
-index 90894d0536..23a9cb7865 100644
---- a/content/browser/interest_group/interest_group_storage.cc
-+++ b/content/browser/interest_group/interest_group_storage.cc
-@@ -60,6 +60,9 @@
- #include "third_party/sqlite/sqlite3.h"
- #include "url/origin.h"
- 
-+#define kCurrentVersionNumber    kCurrentVersionNumber_InterestGroupStorage
-+#define kDeprecatedVersionNumber kDeprecatedVersionNumber_InterestGroupStorage
-+
- namespace content {
- 
- namespace {
-@@ -864,15 +867,15 @@ std::set<std::string> GetAllKanonKeys(
-         size_t num_selectable_kanon_keys =
-             ad.selectable_buyer_and_seller_reporting_ids->size();
-         if (base::FeatureList::IsEnabled(
--                features::
-+                ::features::
-                     kFledgeLimitSelectableBuyerAndSellerReportingIdsFetchedFromKAnon) &&
--            features::
-+            ::features::
-                     kFledgeSelectableBuyerAndSellerReportingIdsFetchedFromKAnonLimit
-                         .Get() >= 0) {
-           num_selectable_kanon_keys = std::min(
-               num_selectable_kanon_keys,
-               static_cast<size_t>(
--                  features::
-+                  ::features::
-                       kFledgeSelectableBuyerAndSellerReportingIdsFetchedFromKAnonLimit
-                           .Get()));
-         }
-@@ -5430,7 +5433,7 @@ base::FilePath DBPath(const base::FilePath& base) {
- 
- sql::DatabaseOptions GetDatabaseOptions() {
-   return sql::DatabaseOptions().set_wal_mode(base::FeatureList::IsEnabled(
--      features::kFledgeEnableWALForInterestGroupStorage));
-+      ::features::kFledgeEnableWALForInterestGroupStorage));
- }
- 
- void ReportCreateSchemaResult(
-@@ -6216,3 +6219,6 @@ void InterestGroupStorage::DatabaseErrorCallback(int extended_error,
- }
- 
- }  // namespace content
-+
-+#undef kCurrentVersionNumber
-+#undef kDeprecatedVersionNumber
 diff --git a/content/browser/interest_group/interest_group_update_manager.cc b/content/browser/interest_group/interest_group_update_manager.cc
-index adeca0892f..5159d623c1 100644
+index aa93392ed0..eed456c493 100644
 --- a/content/browser/interest_group/interest_group_update_manager.cc
 +++ b/content/browser/interest_group/interest_group_update_manager.cc
 @@ -53,6 +53,8 @@
@@ -1300,12 +828,31 @@ index adeca0892f..5159d623c1 100644
  namespace content {
  
  namespace {
-@@ -1311,3 +1313,5 @@ void InterestGroupUpdateManager::ReportUpdateFailed(
+@@ -1355,3 +1357,5 @@ void InterestGroupUpdateManager::ReportUpdateFailed(
  }
  
  }  // namespace content
 +
 +#undef kTrafficAnnotation
+diff --git a/content/browser/interest_group/trusted_signals_fetcher.cc b/content/browser/interest_group/trusted_signals_fetcher.cc
+index 4639e9ce9c..c75d1f9801 100644
+--- a/content/browser/interest_group/trusted_signals_fetcher.cc
++++ b/content/browser/interest_group/trusted_signals_fetcher.cc
+@@ -59,6 +59,8 @@
+ #include "url/gurl.h"
+ #include "url/origin.h"
+ 
++#define kOhttpHeaderSize kOhttpHeaderSize_TrustedSignalsFetcher
++
+ namespace content {
+ 
+ namespace {
+@@ -722,3 +724,5 @@ std::string TrustedSignalsFetcher::CreateError(
+ }
+ 
+ }  // namespace content
++
++#undef kOhttpHeaderSize
 diff --git a/content/browser/media/cdm_storage_common.cc b/content/browser/media/cdm_storage_common.cc
 index 342a066ec5..67937452f5 100644
 --- a/content/browser/media/cdm_storage_common.cc
@@ -1326,11 +873,11 @@ index 342a066ec5..67937452f5 100644
 +
 +#undef kUmaPrefix
 diff --git a/content/browser/media/cdm_storage_database.cc b/content/browser/media/cdm_storage_database.cc
-index a46cbe7dd5..3c88a9a0a0 100644
+index d3fac47497..24ac12eb77 100644
 --- a/content/browser/media/cdm_storage_database.cc
 +++ b/content/browser/media/cdm_storage_database.cc
-@@ -12,6 +12,8 @@
- #include "base/metrics/histogram_functions.h"
+@@ -13,6 +13,8 @@
+ #include "base/strings/string_number_conversions.h"
  #include "sql/statement.h"
  
 +#define kUmaPrefix kUmaPrefix_CdmStorageDatabase
@@ -1338,17 +885,17 @@ index a46cbe7dd5..3c88a9a0a0 100644
  namespace content {
  
  namespace {
-@@ -688,3 +690,5 @@ void CdmStorageDatabase::OnDatabaseError(int error, sql::Statement* stmt) {
+@@ -689,3 +691,5 @@ void CdmStorageDatabase::OnDatabaseError(int error, sql::Statement* stmt) {
  }
  
  }  // namespace content
 +
 +#undef kUmaPrefix
 diff --git a/content/browser/preloading/prefetch/prefetch_service.cc b/content/browser/preloading/prefetch/prefetch_service.cc
-index bbc9cc312c..020a40e04f 100644
+index 094f65438e..3e8057ba79 100644
 --- a/content/browser/preloading/prefetch/prefetch_service.cc
 +++ b/content/browser/preloading/prefetch/prefetch_service.cc
-@@ -72,6 +72,8 @@
+@@ -78,6 +78,8 @@
  #include "url/origin.h"
  #include "url/url_constants.h"
  
@@ -1357,17 +904,17 @@ index bbc9cc312c..020a40e04f 100644
  namespace content {
  
  namespace {
-@@ -1939,3 +1941,5 @@ void PrefetchService::RecordExistingPrefetchWithMatchingURL(
+@@ -2129,3 +2131,5 @@ void PrefetchService::EvictPrefetchesForBrowsingDataRemoval(
  }
  
  }  // namespace content
 +
 +#undef BrowserContextFromFrameTreeNodeId
 diff --git a/content/browser/preloading/prefetch/prefetch_url_loader_interceptor.cc b/content/browser/preloading/prefetch/prefetch_url_loader_interceptor.cc
-index 8e27d4ad0c..a782158515 100644
+index 7b5682d768..67cb8fdebe 100644
 --- a/content/browser/preloading/prefetch/prefetch_url_loader_interceptor.cc
 +++ b/content/browser/preloading/prefetch/prefetch_url_loader_interceptor.cc
-@@ -25,6 +25,8 @@
+@@ -28,6 +28,8 @@
  #include "services/network/public/cpp/resource_request.h"
  #include "services/network/public/cpp/single_request_url_loader_factory.h"
  
@@ -1376,7 +923,7 @@ index 8e27d4ad0c..a782158515 100644
  namespace content {
  namespace {
  
-@@ -280,3 +282,5 @@ void PrefetchURLLoaderInterceptor::OnGetPrefetchComplete(
+@@ -304,3 +306,5 @@ void PrefetchURLLoaderInterceptor::OnGetPrefetchComplete(
  }
  
  }  // namespace content
@@ -1402,29 +949,29 @@ index 279d46371c..31076b1ef4 100644
 +
 +#undef GetRootPrerenderFrameTreeNode
 diff --git a/content/browser/preloading/prerender/prerender_no_vary_search_commit_deferring_condition.cc b/content/browser/preloading/prerender/prerender_no_vary_search_commit_deferring_condition.cc
-index 959097a85c..5227a2ab44 100644
+index 2eef5a66d3..3e9fe2e2c9 100644
 --- a/content/browser/preloading/prerender/prerender_no_vary_search_commit_deferring_condition.cc
 +++ b/content/browser/preloading/prerender/prerender_no_vary_search_commit_deferring_condition.cc
-@@ -15,6 +15,8 @@
+@@ -14,6 +14,8 @@
+ #include "content/browser/renderer_host/navigation_request.h"
  #include "content/public/browser/render_frame_host.h"
- #include "third_party/blink/public/common/features.h"
  
 +#define GetRootPrerenderFrameTreeNode GetRootPrerenderFrameTreeNode_PrerenderNoVarySearchCommitDeferringCondition
 +
  namespace content {
  
  namespace {
-@@ -141,3 +143,5 @@ const char* PrerenderNoVarySearchCommitDeferringCondition::TraceEventName()
+@@ -134,3 +136,5 @@ const char* PrerenderNoVarySearchCommitDeferringCondition::TraceEventName()
  }
  
  }  // namespace content
 +
 +#undef GetRootPrerenderFrameTreeNode
 diff --git a/content/browser/renderer_host/media/media_devices_manager.cc b/content/browser/renderer_host/media/media_devices_manager.cc
-index ae41e42f1f..11429d1461 100644
+index 20ca4a9894..29eba26c2a 100644
 --- a/content/browser/renderer_host/media/media_devices_manager.cc
 +++ b/content/browser/renderer_host/media/media_devices_manager.cc
-@@ -53,6 +53,9 @@
+@@ -56,6 +56,9 @@
  #include "media/device_monitors/device_monitor_mac.h"
  #endif
  
@@ -1434,7 +981,7 @@ index ae41e42f1f..11429d1461 100644
  namespace content {
  
  // Release video source provider in VideoCaptureDevicesChangedObserver
-@@ -1514,3 +1517,6 @@ MediaDevicesManager::EnumerationState& MediaDevicesManager::EnumerationState::
+@@ -1730,3 +1733,6 @@ MediaDevicesManager::EnumerationState& MediaDevicesManager::EnumerationState::
  operator=(EnumerationState&& other) = default;
  
  }  // namespace content
@@ -1442,10 +989,10 @@ index ae41e42f1f..11429d1461 100644
 +#undef DeviceTypeToString
 +#undef SendLogMessage
 diff --git a/content/browser/renderer_host/media/media_stream_manager.cc b/content/browser/renderer_host/media/media_stream_manager.cc
-index cf13275298..8427cbb8f4 100644
+index 61454ad42f..dd14960568 100644
 --- a/content/browser/renderer_host/media/media_stream_manager.cc
 +++ b/content/browser/renderer_host/media/media_stream_manager.cc
-@@ -109,6 +109,9 @@
+@@ -106,6 +106,9 @@
  
  using ::blink::mojom::MediaDeviceType;
  
@@ -1455,13 +1002,32 @@ index cf13275298..8427cbb8f4 100644
  namespace content {
  
  constinit thread_local MediaStreamManager* media_stream_manager = nullptr;
-@@ -4632,3 +4635,6 @@ void MediaStreamManager::OnVideoCaptureHostConnectionError() {
+@@ -4659,3 +4662,6 @@ void MediaStreamManager::OnVideoCaptureHostConnectionError() {
  #endif
  
  }  // namespace content
 +
 +#undef DeviceTypeToString
 +#undef SendLogMessage
+diff --git a/content/browser/renderer_host/media/render_frame_audio_input_stream_factory.cc b/content/browser/renderer_host/media/render_frame_audio_input_stream_factory.cc
+index 9d68d830df..5fcd6376b2 100644
+--- a/content/browser/renderer_host/media/render_frame_audio_input_stream_factory.cc
++++ b/content/browser/renderer_host/media/render_frame_audio_input_stream_factory.cc
+@@ -42,6 +42,8 @@
+ 
+ using blink::mojom::MediaDeviceType;
+ 
++#define GotSaltAndOrigin GotSaltAndOrigin_RenderFrameAudioInputStreamFactory
++
+ namespace content {
+ 
+ namespace {
+@@ -378,3 +380,5 @@ void RenderFrameAudioInputStreamFactory::Core::
+ }
+ 
+ }  // namespace content
++
++#undef GotSaltAndOrigin
 diff --git a/content/browser/renderer_host/partitioned_popins/partitioned_popins_navigation_throttle.cc b/content/browser/renderer_host/partitioned_popins/partitioned_popins_navigation_throttle.cc
 index 5c35b86bdd..22a42d3716 100644
 --- a/content/browser/renderer_host/partitioned_popins/partitioned_popins_navigation_throttle.cc
@@ -1476,10 +1042,10 @@ index 5c35b86bdd..22a42d3716 100644
    }
    const net::HttpResponseHeaders* response_headers =
 diff --git a/content/browser/renderer_host/private_network_access_util.cc b/content/browser/renderer_host/private_network_access_util.cc
-index 8dc4130baa..81863cc74e 100644
+index 870e65eaf0..1c33481d7e 100644
 --- a/content/browser/renderer_host/private_network_access_util.cc
 +++ b/content/browser/renderer_host/private_network_access_util.cc
-@@ -38,24 +38,24 @@ FeatureState FeatureStateForContext(RequestContext request_context) {
+@@ -39,24 +39,24 @@ FeatureState FeatureStateForContext(RequestContext request_context) {
        return FeatureState::kEnabled;
      case RequestContext::kWorker:
        if (!base::FeatureList::IsEnabled(
@@ -1508,7 +1074,7 @@ index 8dc4130baa..81863cc74e 100644
          return FeatureState::kWarningOnly;
        }
  
-@@ -80,7 +80,7 @@ Policy DerivePolicyForNonSecureContext(AddressSpace ip_address_space) {
+@@ -88,7 +88,7 @@ Policy DerivePolicyForNonSecureContext(
        // because it is unclear why they happen in the first place. The goal is
        // to reduce instances of this happening before enabling this feature.
        return base::FeatureList::IsEnabled(
@@ -1517,7 +1083,7 @@ index 8dc4130baa..81863cc74e 100644
                   ? Policy::kBlock
                   : Policy::kAllow;
      case AddressSpace::kPrivate:
-@@ -89,7 +89,7 @@ Policy DerivePolicyForNonSecureContext(AddressSpace ip_address_space) {
+@@ -97,7 +97,7 @@ Policy DerivePolicyForNonSecureContext(
        // This is controlled separately because private network websites face
        // additional hurdles compared to public websites. See crbug.com/1234044.
        return base::FeatureList::IsEnabled(
@@ -1526,7 +1092,7 @@ index 8dc4130baa..81863cc74e 100644
                   ? Policy::kBlock
                   : Policy::kWarn;
      case AddressSpace::kPublic:
-@@ -102,7 +102,7 @@ Policy DerivePolicyForNonSecureContext(AddressSpace ip_address_space) {
+@@ -110,7 +110,7 @@ Policy DerivePolicyForNonSecureContext(
        // are never considered private network requests - they cannot target
        // more-private address spaces.
        return base::FeatureList::IsEnabled(
@@ -1535,7 +1101,7 @@ index 8dc4130baa..81863cc74e 100644
                   ? Policy::kBlock
                   : Policy::kWarn;
    }
-@@ -116,12 +116,12 @@ Policy DerivePolicyForSecureContext(AddressSpace ip_address_space) {
+@@ -133,12 +133,12 @@ Policy DerivePolicyForSecureContext(AddressSpace ip_address_space,
    }
  
    if (base::FeatureList::IsEnabled(
@@ -1550,24 +1116,59 @@ index 8dc4130baa..81863cc74e 100644
      return Policy::kPreflightWarn;
    }
  
+diff --git a/content/browser/renderer_host/randomized_confidence_utils.cc b/content/browser/renderer_host/randomized_confidence_utils.cc
+index 4297ff2a1a..a0a2f4bc1c 100644
+--- a/content/browser/renderer_host/randomized_confidence_utils.cc
++++ b/content/browser/renderer_host/randomized_confidence_utils.cc
+@@ -17,7 +17,7 @@ double GetConfidenceRandomizedTriggerRate() {
+   int32_t state_count = 1 + (int32_t)blink::mojom::ConfidenceLevel::kMaxValue;
+   double navigation_confidence_epsilon = std::max(
+       0.0, std::min(g_max_navigation_confidence_epsilon,
+-                    features::kNavigationConfidenceEpsilonValue.Get()));
++                    ::features::kNavigationConfidenceEpsilonValue.Get()));
+   double randomized_response_rate =
+       state_count /
+       ((state_count - 1) + std::exp(navigation_confidence_epsilon));
 diff --git a/content/browser/renderer_host/render_frame_host_impl.cc b/content/browser/renderer_host/render_frame_host_impl.cc
-index e03646b662..cad133e3cc 100644
+index 23cd457563..be5ab78534 100644
 --- a/content/browser/renderer_host/render_frame_host_impl.cc
 +++ b/content/browser/renderer_host/render_frame_host_impl.cc
-@@ -448,10 +448,10 @@ typedef std::unordered_set<GlobalRenderFrameHostId,
+@@ -460,9 +460,9 @@ using RoutingIDIsolatableSandboxedIframesSet =
  base::LazyInstance<RoutingIDIsolatableSandboxedIframesSet>::DestructorAtExit
      g_routing_id_isolatable_sandboxed_iframes_set = LAZY_INSTANCE_INITIALIZER;
  
--using TokenFrameMap = std::unordered_map<blink::LocalFrameToken,
-+using TokenFrameMap_RenderFrameHostImpl = std::unordered_map<blink::LocalFrameToken,
-                                          RenderFrameHostImpl*,
-                                          blink::LocalFrameToken::Hasher>;
+-using TokenFrameMap =
++using TokenFrameMap_RenderFrameHostImpl =
+     absl::flat_hash_map<blink::LocalFrameToken, RenderFrameHostImpl*>;
 -base::LazyInstance<TokenFrameMap>::Leaky g_token_frame_map =
 +base::LazyInstance<TokenFrameMap_RenderFrameHostImpl>::Leaky g_token_frame_map =
      LAZY_INSTANCE_INITIALIZER;
  
  BackForwardCacheMetrics::NotRestoredReason
-@@ -3741,7 +3741,7 @@ RenderFrameHostImpl::AccessibilityGetAcceleratedWidget() {
+@@ -891,7 +891,7 @@ GURL GetLastDocumentURL(
+ // Return true when `mode` is enabled for kAvoidUnnecessaryBeforeUnloadCheckSync
+ // feature (see: https://crbug.com/396998476).
+ bool IsAvoidUnnecessaryBeforeUnloadCheckSyncEnabledFor(
+-    features::AvoidUnnecessaryBeforeUnloadCheckSyncMode mode) {
++    ::features::AvoidUnnecessaryBeforeUnloadCheckSyncMode mode) {
+   if (!GetContentClient()
+            ->browser()
+            ->SupportsAvoidUnnecessaryBeforeUnloadCheckSync()) {
+@@ -899,11 +899,11 @@ bool IsAvoidUnnecessaryBeforeUnloadCheckSyncEnabledFor(
+   }
+ 
+   if (!base::FeatureList::IsEnabled(
+-          features::kAvoidUnnecessaryBeforeUnloadCheckSync)) {
++          ::features::kAvoidUnnecessaryBeforeUnloadCheckSync)) {
+     return false;
+   }
+ 
+-  return features::kAvoidUnnecessaryBeforeUnloadCheckSyncMode.Get() == mode;
++  return ::features::kAvoidUnnecessaryBeforeUnloadCheckSyncMode.Get() == mode;
+ }
+ 
+ // Returns true if `host` has the Window Management permission granted.
+@@ -3795,7 +3795,7 @@ RenderFrameHostImpl::AccessibilityGetAcceleratedWidget() {
  
  gfx::NativeViewAccessible
  RenderFrameHostImpl::AccessibilityGetNativeViewAccessible() {
@@ -1576,16 +1177,16 @@ index e03646b662..cad133e3cc 100644
        IsInactiveAndDisallowActivation(
            DisallowActivationReasonId::kAXGetNativeView)) {
      // |AccessibilityGetNativeViewAccessible()| should be only accessible when
-@@ -4197,7 +4197,7 @@ bool RenderFrameHostImpl::CreateRenderFrame(
+@@ -4247,7 +4247,7 @@ bool RenderFrameHostImpl::CreateRenderFrame(
         (navigation_request->commit_params()
              .is_cross_site_cross_browsing_context_group &&
          base::FeatureList::IsEnabled(
--            features::kClearCrossSiteCrossBrowsingContextGroupWindowName)));
-+            ::features::kClearCrossSiteCrossBrowsingContextGroupWindowName)));
- 
-   if (should_clear_browsing_instance_name) {
-     params->replication_state->name = "";
-@@ -5690,7 +5690,7 @@ bool RenderFrameHostImpl::VerifyFencedFrameFocusChange(
+-            features::kClearCrossSiteCrossBrowsingContextGroupWindowName) &&
++            ::features::kClearCrossSiteCrossBrowsingContextGroupWindowName) &&
+         GetContentClient()
+             ->browser()
+             ->IsClearWindowNameForNewBrowsingContextGroupAllowed(context)));
+@@ -5758,7 +5758,7 @@ bool RenderFrameHostImpl::VerifyFencedFrameFocusChange(
    // TODO(crbug.com/40274134): We will later badmessage the renderer, but, for
    // now, we will dump without crashing to monitor if any legitimate cases are
    // reaching this point.
@@ -1594,7 +1195,7 @@ index e03646b662..cad133e3cc 100644
      bad_message::ReceivedBadMessage(
          GetProcess(), bad_message::RFH_FOCUS_ACROSS_FENCED_BOUNDARY);
    } else {
-@@ -6398,7 +6398,7 @@ void RenderFrameHostImpl::SwapOuterDelegateFrame(
+@@ -6471,7 +6471,7 @@ void RenderFrameHostImpl::SwapOuterDelegateFrame(
    // `devtools_frame_token`) to indicate to DevTools clients that the guest has
    // been attached to this placeholder iframe.
    const bool should_swap_devtools_frame_token =
@@ -1603,7 +1204,7 @@ index e03646b662..cad133e3cc 100644
    GetMojomFrameInRenderer()->Unload(
        /*is_loading=*/false,
        browsing_context_state_->current_replication_state().Clone(),
-@@ -8434,14 +8434,14 @@ bool RenderFrameHostImpl::IsInactiveAndDisallowActivation(uint64_t reason) {
+@@ -8550,14 +8550,14 @@ bool RenderFrameHostImpl::IsInactiveAndDisallowActivation(uint64_t reason) {
        // back/forward cache, because |HandleAXevents()| will continue to process
        // accessibility events without evicting unless the kEvictOnAXEvents flag
        // is on.
@@ -1620,7 +1221,7 @@ index e03646b662..cad133e3cc 100644
          CHECK_NE(reason, kAXLocationChange);
        }
        BackForwardCacheCanStoreDocumentResult can_store_flat;
-@@ -8479,7 +8479,7 @@ bool RenderFrameHostImpl::IsInactiveAndDisallowActivation(uint64_t reason) {
+@@ -8595,7 +8595,7 @@ bool RenderFrameHostImpl::IsInactiveAndDisallowActivation(uint64_t reason) {
  
  bool RenderFrameHostImpl::IsInactiveAndDisallowActivationForAXEvents(
      const std::vector<ui::AXEvent>& events) {
@@ -1629,7 +1230,7 @@ index e03646b662..cad133e3cc 100644
    if (lifecycle_state_ != LifecycleStateImpl::kInBackForwardCache) {
      return IsInactiveAndDisallowActivation(
          DisallowActivationReasonId::kAXEvent);
-@@ -8892,7 +8892,7 @@ void RenderFrameHostImpl::MaybeIsolateForUserActivation() {
+@@ -8996,7 +8996,7 @@ void RenderFrameHostImpl::MaybeIsolateForUserActivation() {
      // the isolation eligibility checks, such as having the corresponding
      // feature enabled or satisfying memory requirements.
      DCHECK(base::FeatureList::IsEnabled(
@@ -1638,7 +1239,7 @@ index e03646b662..cad133e3cc 100644
  
      bool is_same_origin_activation =
          GetParent() ? GetMainFrame()->GetLastCommittedOrigin().IsSameOriginWith(
-@@ -11069,7 +11069,7 @@ void RenderFrameHostImpl::HandleAXEvents(
+@@ -11213,7 +11213,7 @@ void RenderFrameHostImpl::HandleAXEvents(
    // TODO(accessibility): we should probably consolidate these two params.
    updates_and_events.ax_tree_id = tree_id;
  
@@ -1647,7 +1248,7 @@ index e03646b662..cad133e3cc 100644
      // If the flag is on, evict the bfcache entry now that AX events are
      // received.
      if (IsInactiveAndDisallowActivationForAXEvents(updates_and_events.events)) {
-@@ -11173,7 +11173,7 @@ void RenderFrameHostImpl::HandleAXLocationChanges(
+@@ -11317,7 +11317,7 @@ void RenderFrameHostImpl::HandleAXLocationChanges(
      return;
    }
  
@@ -1656,7 +1257,16 @@ index e03646b662..cad133e3cc 100644
      // If the flag is off, we should evict the back/forward cache entry.
      if (IsInactiveAndDisallowActivation(
              DisallowActivationReasonId::kAXLocationChange)) {
-@@ -13500,7 +13500,7 @@ void RenderFrameHostImpl::CreateSecurePaymentConfirmationService(
+@@ -11714,7 +11714,7 @@ RenderFrameHostImpl::CheckOrDispatchBeforeUnloadForFrame(
+   const bool run_beforeunload_for_legacy_frame =
+       rfh == this && !rfh->has_before_unload_handler_ &&
+       !IsAvoidUnnecessaryBeforeUnloadCheckSyncEnabledFor(
+-          features::AvoidUnnecessaryBeforeUnloadCheckSyncMode::
++          ::features::AvoidUnnecessaryBeforeUnloadCheckSyncMode::
+               kWithoutSendBeforeUnload);
+   const bool should_run_beforeunload =
+       rfh->has_before_unload_handler_ || run_beforeunload_for_legacy_frame;
+@@ -13696,7 +13696,7 @@ void RenderFrameHostImpl::CreateSecurePaymentConfirmationService(
  
  void RenderFrameHostImpl::CreateWebUsbService(
      mojo::PendingReceiver<blink::mojom::WebUsbService> receiver) {
@@ -1665,16 +1275,7 @@ index e03646b662..cad133e3cc 100644
      return;
    }
    if (!IsFeatureEnabled(network::mojom::PermissionsPolicyFeature::kUsb)) {
-@@ -15767,7 +15767,7 @@ void RenderFrameHostImpl::SendCommitNavigation(
-   DCHECK_EQ(net::OK, navigation_request->GetNetErrorCode());
-   if (commit_params->origin_to_commit) {
-     DCHECK(
--        base::FeatureList::IsEnabled(features::kUseBrowserCalculatedOrigin) ||
-+        base::FeatureList::IsEnabled(::features::kUseBrowserCalculatedOrigin) ||
-         common_params->url.SchemeIs(url::kDataScheme));
-     CHECK_EQ(commit_params->origin_to_commit.value(),
-              navigation_request->browser_side_origin_to_commit_with_debug_info()
-@@ -15806,7 +15806,7 @@ void RenderFrameHostImpl::SendCommitNavigation(
+@@ -16016,7 +16016,7 @@ void RenderFrameHostImpl::SendCommitNavigation(
    // TODO(crbug.com/40205612): Remove the kill switch for this check.
    bool should_block_storage_access_for_pdf =
        GetSiteInstance()->GetSiteInfo().is_pdf() &&
@@ -1683,7 +1284,25 @@ index e03646b662..cad133e3cc 100644
  
    // Make sure the origin of the isolation info and origin to commit match,
    // otherwise the cookie manager will crash. Sending the cookie manager here
-@@ -16747,7 +16747,7 @@ bool ShouldVerify(const std::string& param) {
+@@ -16411,7 +16411,7 @@ void RenderFrameHostImpl::SendBeforeUnload(
+     const bool can_be_in_navigate_to_pending_entry =
+         is_eligible_for_avoid_unnecessary_beforeunload &&
+         IsAvoidUnnecessaryBeforeUnloadCheckSyncEnabledFor(
+-            features::AvoidUnnecessaryBeforeUnloadCheckSyncMode::
++            ::features::AvoidUnnecessaryBeforeUnloadCheckSyncMode::
+                 kDumpWithoutCrashing) &&
+         frame_tree()->controller().in_navigate_to_pending_entry();
+ 
+@@ -16419,7 +16419,7 @@ void RenderFrameHostImpl::SendBeforeUnload(
+ 
+     if (is_eligible_for_avoid_unnecessary_beforeunload &&
+         IsAvoidUnnecessaryBeforeUnloadCheckSyncEnabledFor(
+-            features::AvoidUnnecessaryBeforeUnloadCheckSyncMode::
++            ::features::AvoidUnnecessaryBeforeUnloadCheckSyncMode::
+                 kWithSendBeforeUnload)) {
+       std::move(before_unload_closure)
+           .Run(/*proceed=*/true, send_before_unload_start_time_,
+@@ -17014,7 +17014,7 @@ bool ShouldVerify(const std::string& param) {
    // For other params, default to disable checking the param. However, it's
    // possible to force-enable checking the param via the VerifyDidCommitParams
    // flag's param.
@@ -1692,7 +1311,7 @@ index e03646b662..cad133e3cc 100644
                                             param, false);
  #endif
  }
-@@ -16796,7 +16796,7 @@ void RenderFrameHostImpl::
+@@ -17063,7 +17063,7 @@ void RenderFrameHostImpl::
  #if !DCHECK_IS_ON()
    // Only check for the flag if DCHECK is not enabled, so that we will always
    // verify the params for tests.
@@ -1701,7 +1320,7 @@ index e03646b662..cad133e3cc 100644
      return;
  #endif
    // Check if these values from DidCommitProvisionalLoadParams sent by the
-@@ -18002,14 +18002,14 @@ void RenderFrameHostImpl::SetFrameTreeNode(FrameTreeNode& frame_tree_node) {
+@@ -18280,14 +18280,14 @@ void RenderFrameHostImpl::SetFrameTreeNode(FrameTreeNode& frame_tree_node) {
    // the new functionality for swapping BrowsingContext on cross
    // BrowsingInstance navigations, the BrowsingContextState is the only field
    // that will need to be swapped.
@@ -1719,7 +1338,7 @@ index e03646b662..cad133e3cc 100644
                kSwapForCrossBrowsingInstanceNavigations):
        // TODO(crbug.com/40205442): implement functionality for swapping on cross
        // browsing instance navigations as needed. This will likely be removed
-@@ -18258,7 +18258,7 @@ bool RenderFrameHostImpl::ShouldReuseCompositing(
+@@ -18582,7 +18582,7 @@ bool RenderFrameHostImpl::ShouldReuseCompositing(
      return false;
    }
  
@@ -1729,10 +1348,10 @@ index e03646b662..cad133e3cc 100644
    }
  
 diff --git a/content/browser/renderer_host/render_frame_host_manager.cc b/content/browser/renderer_host/render_frame_host_manager.cc
-index 4d846a6f3e..b4d637aa15 100644
+index a194fbb2be..1d9f294388 100644
 --- a/content/browser/renderer_host/render_frame_host_manager.cc
 +++ b/content/browser/renderer_host/render_frame_host_manager.cc
-@@ -387,18 +387,18 @@ void UpdateProcessReusePolicyForProcessPerSiteWithMainFrameThreshold(
+@@ -390,7 +390,7 @@ void UpdateProcessReusePolicyForProcessPerSiteWithMainFrameThreshold(
      return;
    }
    if (!base::FeatureList::IsEnabled(
@@ -1741,6 +1360,8 @@ index 4d846a6f3e..b4d637aa15 100644
      return;
    }
    if (!frame_tree_node->IsOutermostMainFrame()) {
+@@ -402,12 +402,12 @@ void UpdateProcessReusePolicyForProcessPerSiteWithMainFrameThreshold(
+   if (!is_new_site_instance) {
      return;
    }
 -  if (base::FeatureList::IsEnabled(features::kDisableProcessReuse)) {
@@ -1754,7 +1375,7 @@ index 4d846a6f3e..b4d637aa15 100644
        RenderFrameDevToolsAgentHost::WasEverAttachedToAnyFrame()) {
      RecordProcessPerSiteWithMainFrameThresholdBlockReason(
          ProcessPerSiteWithMainFrameThresholdBlockReason::
-@@ -419,7 +419,7 @@ void UpdateProcessReusePolicyForProcessPerSiteWithMainFrameThreshold(
+@@ -428,7 +428,7 @@ void UpdateProcessReusePolicyForProcessPerSiteWithMainFrameThreshold(
    // for process reuse to work around the problem, unless a field parameter
    // explicitly allows it.
    const GURL& site_url = site_instance->GetSiteURL();
@@ -1763,7 +1384,7 @@ index 4d846a6f3e..b4d637aa15 100644
        (site_url.HostIsIPAddress() || net::IsLocalHostname(site_url.host()))) {
      RecordProcessPerSiteWithMainFrameThresholdBlockReason(
          ProcessPerSiteWithMainFrameThresholdBlockReason::
-@@ -627,8 +627,8 @@ void RenderFrameHostManager::InitRoot(
+@@ -672,8 +672,8 @@ void RenderFrameHostManager::InitRoot(
      const std::string& name,
      const base::UnguessableToken& devtools_frame_token) {
    bool is_legacy_browsing_context_state_mode =
@@ -1774,7 +1395,7 @@ index 4d846a6f3e..b4d637aa15 100644
            kLegacyOneToOneWithFrameTreeNode;
    scoped_refptr<BrowsingContextState> browsing_context_state =
        base::MakeRefCounted<BrowsingContextState>(
-@@ -677,8 +677,8 @@ void RenderFrameHostManager::InitChild(
+@@ -726,8 +726,8 @@ void RenderFrameHostManager::InitChild(
      std::string frame_name,
      std::string frame_unique_name) {
    bool is_legacy_browsing_context_state_mode =
@@ -1785,7 +1406,7 @@ index 4d846a6f3e..b4d637aa15 100644
            kLegacyOneToOneWithFrameTreeNode;
    scoped_refptr<BrowsingContextState> browsing_context_state =
        base::MakeRefCounted<BrowsingContextState>(
-@@ -1049,14 +1049,14 @@ void RenderFrameHostManager::PrepareForCollectingPage(
+@@ -1098,14 +1098,14 @@ void RenderFrameHostManager::PrepareForCollectingPage(
    // in FrameTree (which, for example, is shared between the new page and
    // the page entering BFCache), so they have to be collected explicitly above.
    // Since proxies are not collected, we can return early here.
@@ -1804,24 +1425,55 @@ index 4d846a6f3e..b4d637aa15 100644
                  kLegacyOneToOneWithFrameTreeNode);
  
    // Prepare the proxies.
-@@ -1774,14 +1774,14 @@ RenderFrameHostManager::GetFrameHostForNavigation(
-         GetFrameHostForNavigationFailed::kBlockedByPendingCommit);
-   }
- 
--  if (base::FeatureList::IsEnabled(features::kDeferSpeculativeRFHCreation) &&
-+  if (base::FeatureList::IsEnabled(::features::kDeferSpeculativeRFHCreation) &&
-       !use_current_rfh) {
+@@ -1508,7 +1508,7 @@ void RenderFrameHostManager::DidCreateNavigationRequest(
+         frame_tree_node_->navigator().controller().GetBrowserContext();
      DeferSpeculativeRFHAction defer_action =
          DeferSpeculativeRFHAction::kNotDeferred;
-     if (CanIntentionallyDeferSpeculativeRFHForRequest(
-             request, current_site_instance->GetBrowserContext(),
-             frame_tree_node_)) {
+-    if (base::FeatureList::IsEnabled(features::kDeferSpeculativeRFHCreation) &&
++    if (base::FeatureList::IsEnabled(::features::kDeferSpeculativeRFHCreation) &&
+         CanIntentionallyDeferSpeculativeRFHForRequest(request, browser_context,
+                                                       frame_tree_node_)) {
+       // By skipping GetFrameHostForNavigation(), we are no longer calculating
+@@ -1517,7 +1517,7 @@ void RenderFrameHostManager::DidCreateNavigationRequest(
+       // on a very powerful workstation in a release build.
+       // The GetFrameHostForNavigation() function will be called in
+       // NavigationRequest::OnStartChecksComplete after staring the URL loader.
 -      if (features::kWarmupSpareProcessCreationWhenDeferRFH.Get() &&
 +      if (::features::kWarmupSpareProcessCreationWhenDeferRFH.Get() &&
-           !dest_site_instance->HasProcess()) {
-         SpareRenderProcessHostManagerImpl::Get().WarmupSpare(
-             dest_site_instance->GetBrowserContext());
-@@ -2660,8 +2660,8 @@ RenderFrameHostManager::ShouldSwapBrowsingInstancesForNavigation(
+           RenderProcessHostImpl::IsSpareProcessKeptAtAllTimes()) {
+         // Since Android does not create a spare renderer by default, we choose
+         // to check IsSpareProcessKeptAtAllTimes() before warming up a renderer.
+@@ -1529,9 +1529,9 @@ void RenderFrameHostManager::DidCreateNavigationRequest(
+         // TODO(crbug.com/394973143): Move the timeout logic to
+         // SpareRenderProcessHostManagerImpl
+         if (base::FeatureList::IsEnabled(
+-                features::kAndroidWarmUpSpareRendererWithTimeout)) {
++                ::features::kAndroidWarmUpSpareRendererWithTimeout)) {
+           timeout = base::Seconds(
+-              features::kAndroidSpareRendererTimeoutSeconds.Get());
++              ::features::kAndroidSpareRendererTimeoutSeconds.Get());
+         }
+         SpareRenderProcessHostManagerImpl::Get().WarmupSpare(browser_context,
+                                                              timeout);
+@@ -1778,7 +1778,7 @@ RenderFrameHostManager::GetFrameHostForNavigation(
+   IsSameSiteGetter is_same_site_getter(is_same_site);
+   std::string site_instance_reason;
+   std::string* reason_output =
+-      base::FeatureList::IsEnabled(features::kHoldbackDebugReasonStringRemoval)
++      base::FeatureList::IsEnabled(::features::kHoldbackDebugReasonStringRemoval)
+           ? &site_instance_reason
+           : reason;
+   scoped_refptr<SiteInstanceImpl> dest_site_instance =
+@@ -1786,7 +1786,7 @@ RenderFrameHostManager::GetFrameHostForNavigation(
+                                           browsing_context_group_swap,
+                                           reason_output);
+   if (reason && base::FeatureList::IsEnabled(
+-                    features::kHoldbackDebugReasonStringRemoval)) {
++                    ::features::kHoldbackDebugReasonStringRemoval)) {
+     reason->append(site_instance_reason);
+   }
+ 
+@@ -2755,8 +2755,8 @@ RenderFrameHostManager::ShouldSwapBrowsingInstancesForNavigation(
              current_instance->GetRelatedActiveContentsCount()),
          51);
      if (base::FeatureList::IsEnabled(
@@ -1832,7 +1484,7 @@ index 4d846a6f3e..b4d637aa15 100644
        return BrowsingContextGroupSwap::CreateSecuritySwap();
      }
    }
-@@ -3005,7 +3005,7 @@ RenderFrameHostManager::GetSiteInstanceForNavigation(
+@@ -3110,7 +3110,7 @@ RenderFrameHostManager::GetSiteInstanceForNavigation(
      // this decision. Certain frames have different enough workloads so that
      // it's better to avoid placing a subframe into an existing process for
      // better performance isolation.  See https://crbug.com/899418.
@@ -1841,25 +1493,16 @@ index 4d846a6f3e..b4d637aa15 100644
          GetContentClient()
              ->browser()
              ->ShouldEmbeddedFramesTryToReuseExistingProcess(
-@@ -3109,7 +3109,7 @@ RenderFrameHostManager::GetSiteInstanceForNavigation(
-                current_instance->GetRelatedActiveContentsCount() == 1) {
+@@ -3217,7 +3217,7 @@ RenderFrameHostManager::GetSiteInstanceForNavigation(
+           ProcessReuseOnCOOPType::kSameSiteNavigationInSingleWebContents;
        process_to_reuse = current_instance->GetProcess();
      } else if (base::FeatureList::IsEnabled(
 -                   features::kProcessReuseOnPrerenderCOOPSwap) &&
 +                   ::features::kProcessReuseOnPrerenderCOOPSwap) &&
                 frame_tree_node_->frame_tree().is_prerendering()) {
+       coop_process_reuse_type = ProcessReuseOnCOOPType::kPrerender;
        process_to_reuse = current_instance->GetProcess();
-     }
-@@ -3516,7 +3516,7 @@ RenderFrameHostManager::DetermineSiteInstanceForURL(
-   // subframe into the same SiteInstance as the parent. These separate
-   // SiteInstances can get assigned to the same process later.
-   if (!base::FeatureList::IsEnabled(
--          features::kProcessSharingWithStrictSiteInstances)) {
-+          ::features::kProcessSharingWithStrictSiteInstances)) {
-     if (!frame_tree_node_->IsMainFrame()) {
-       RenderFrameHostImpl* parent = frame_tree_node_->parent();
-       auto& parent_isolation_context =
-@@ -4086,8 +4086,8 @@ RenderFrameHostManager::CreateRenderFrameHost(
+@@ -4168,8 +4168,8 @@ RenderFrameHostManager::CreateRenderFrameHost(
    if (!render_view_host) {
      render_view_host = frame_tree.CreateRenderViewHost(
          site_instance->group(), frame_routing_id, renderer_initiated_creation,
@@ -1870,7 +1513,7 @@ index 4d846a6f3e..b4d637aa15 100644
                      kSwapForCrossBrowsingInstanceNavigations
              ? browsing_context_state
              : nullptr,
-@@ -4153,8 +4153,8 @@ bool RenderFrameHostManager::CreateSpeculativeRenderFrameHost(
+@@ -4237,8 +4237,8 @@ bool RenderFrameHostManager::CreateSpeculativeRenderFrameHost(
    }
  
    scoped_refptr<BrowsingContextState> browsing_context_state;
@@ -1881,7 +1524,7 @@ index 4d846a6f3e..b4d637aa15 100644
            kLegacyOneToOneWithFrameTreeNode) {
      browsing_context_state = render_frame_host_->browsing_context_state();
    } else {
-@@ -4406,8 +4406,8 @@ void RenderFrameHostManager::CreateRenderFrameProxy(
+@@ -4501,8 +4501,8 @@ void RenderFrameHostManager::CreateRenderFrameProxy(
        render_view_host = frame_tree_node_->frame_tree().CreateRenderViewHost(
            group, /*main_frame_routing_id=*/MSG_ROUTING_NONE,
            /*renderer_initiated_creation=*/false,
@@ -1892,7 +1535,7 @@ index 4d846a6f3e..b4d637aa15 100644
                        kSwapForCrossBrowsingInstanceNavigations
                ? render_frame_host_->browsing_context_state()
                : nullptr,
-@@ -4862,8 +4862,8 @@ RenderFrameHostManager::GetFrameTokenForSiteInstanceGroup(
+@@ -4934,8 +4934,8 @@ RenderFrameHostManager::GetFrameTokenForSiteInstanceGroup(
    // instance after a browsing instance swap, and we want to ensure that this
    // doesn't break anything, so we tie it to the GetBrowsingContextMode which
    // needs it and is disabled-by-default)
@@ -1903,7 +1546,7 @@ index 4d846a6f3e..b4d637aa15 100644
                kSwapForCrossBrowsingInstanceNavigations &&
        !render_frame_host_->GetSiteInstance()
             ->group()
-@@ -5011,8 +5011,8 @@ void RenderFrameHostManager::CommitPending(
+@@ -5083,8 +5083,8 @@ void RenderFrameHostManager::CommitPending(
      // because in the new implementation, proxies will be swapped/restored
      // whenever the RenderFrameHost (and internal BrowsingContextState) is
      // restored.
@@ -1915,10 +1558,10 @@ index 4d846a6f3e..b4d637aa15 100644
        BrowsingContextState::RenderFrameProxyHostMap proxy_hosts_to_restore =
            pending_stored_page->TakeProxyHosts();
 diff --git a/content/browser/renderer_host/render_frame_proxy_host.cc b/content/browser/renderer_host/render_frame_proxy_host.cc
-index 4d9a446824..8db2d37ae7 100644
+index 2c2e4c14b5..68a6199940 100644
 --- a/content/browser/renderer_host/render_frame_proxy_host.cc
 +++ b/content/browser/renderer_host/render_frame_proxy_host.cc
-@@ -54,6 +54,8 @@
+@@ -55,6 +55,8 @@
  #include "third_party/blink/public/mojom/scroll/scroll_into_view_params.mojom.h"
  #include "ui/gfx/geometry/rect_f.h"
  
@@ -1927,7 +1570,7 @@ index 4d9a446824..8db2d37ae7 100644
  namespace content {
  
  namespace {
-@@ -597,7 +599,7 @@ void RenderFrameProxyHost::RouteMessageEvent(
+@@ -591,7 +593,7 @@ void RenderFrameProxyHost::RouteMessageEvent(
    // origins once rollout is complete.
    bool should_verify_source_origin =
        base::FeatureList::IsEnabled(
@@ -1936,7 +1579,7 @@ index 4d9a446824..8db2d37ae7 100644
        source_origin_string != u"null";
    if (should_verify_source_origin) {
      auto* policy = ChildProcessSecurityPolicyImpl::GetInstance();
-@@ -1067,3 +1069,5 @@ base::SafeRef<RenderFrameProxyHost> RenderFrameProxyHost::GetSafeRef() {
+@@ -1062,3 +1064,5 @@ base::SafeRef<RenderFrameProxyHost> RenderFrameProxyHost::GetSafeRef() {
  }
  
  }  // namespace content
@@ -1956,10 +1599,10 @@ index 7517bdd84c..ca2d78e5b8 100644
      render_widget_helper_->Init(render_process_id_);
    }
 diff --git a/content/browser/renderer_host/render_process_host_impl.cc b/content/browser/renderer_host/render_process_host_impl.cc
-index f414b719c6..eb238f9559 100644
+index 67cdf0f30f..946a01d1b2 100644
 --- a/content/browser/renderer_host/render_process_host_impl.cc
 +++ b/content/browser/renderer_host/render_process_host_impl.cc
-@@ -516,10 +516,10 @@ bool HasEnoughMemoryForAnotherMainFrame(RenderProcessHost* host,
+@@ -517,10 +517,10 @@ bool HasEnoughMemoryForAnotherMainFrame(RenderProcessHost* host,
        private_memory_footprint /
        std::max(main_frame_count, static_cast<size_t>(1));
    uint64_t process_memory_limit = base::saturated_cast<uint64_t>(
@@ -1972,7 +1615,7 @@ index f414b719c6..eb238f9559 100644
    // Check that we have a factor of at least 1.
    if (frame_size_factor < 1.0f) {
      frame_size_factor = 1.0f;
-@@ -562,7 +562,7 @@ bool IsBelowReuseResourceThresholds(RenderProcessHost* host,
+@@ -563,7 +563,7 @@ bool IsBelowReuseResourceThresholds(RenderProcessHost* host,
    if (process_reuse_policy ==
            ProcessReusePolicy::REUSE_PENDING_OR_COMMITTED_SITE_SUBFRAME &&
        !base::FeatureList::IsEnabled(
@@ -1981,7 +1624,7 @@ index f414b719c6..eb238f9559 100644
      return true;
    }
  
-@@ -590,7 +590,7 @@ bool IsBelowReuseResourceThresholds(RenderProcessHost* host,
+@@ -591,7 +591,7 @@ bool IsBelowReuseResourceThresholds(RenderProcessHost* host,
      // If a threshold is specified, don't reuse `host` if it already hosts more
      // main frames (including BFCached and prerendered) than the threshold.
      size_t main_frame_threshold = base::checked_cast<size_t>(
@@ -1990,7 +1633,7 @@ index f414b719c6..eb238f9559 100644
      if (main_frame_count >= main_frame_threshold) {
        return false;
      }
-@@ -620,7 +620,7 @@ bool IsBelowReuseResourceThresholds(RenderProcessHost* host,
+@@ -621,7 +621,7 @@ bool IsBelowReuseResourceThresholds(RenderProcessHost* host,
    // would be necessarily added to `host` later if the current frame were
    // allowed to reuse it (e.g., as its subframes), etc.
    uint64_t process_memory_limit = base::saturated_cast<uint64_t>(
@@ -1999,7 +1642,16 @@ index f414b719c6..eb238f9559 100644
    if (host->GetPrivateMemoryFootprint() < process_memory_limit) {
      return true;
    }
-@@ -3099,19 +3099,19 @@ bool RenderProcessHostImpl::IsSpareProcessKeptAtAllTimes() {
+@@ -696,7 +696,7 @@ bool IsEmptyRendererProcessesReuseAllowed() {
+     return false;
+   }
+   return base::FeatureList::IsEnabled(
+-      features::kTrackEmptyRendererProcessesForReuse);
++      ::features::kTrackEmptyRendererProcessesForReuse);
+ }
+ 
+ class SiteProcessCountTracker : public base::SupportsUserData::Data,
+@@ -3187,19 +3187,19 @@ bool RenderProcessHostImpl::IsSpareProcessKeptAtAllTimes() {
    // ensure that devices with exactly 1GB of RAM won't get included because of
    // inaccuracies or off-by-one errors.
    if (base::SysInfo::AmountOfPhysicalMemoryMB() <=
@@ -2022,7 +1674,7 @@ index f414b719c6..eb238f9559 100644
        !android_spare_process_override) {
      return false;
    }
-@@ -3303,7 +3303,7 @@ void RenderProcessHostImpl::AppendRendererCommandLine(
+@@ -3401,7 +3401,7 @@ void RenderProcessHostImpl::AppendRendererCommandLine(
      command_line->AppendSwitch(switches::kDisallowV8FeatureFlagOverrides);
    }
  
@@ -2031,7 +1683,7 @@ index f414b719c6..eb238f9559 100644
      command_line->AppendSwitchASCII(
          blink::switches::kTouchTextSelectionStrategy,
          blink::switches::kTouchTextSelectionStrategy_Direction);
-@@ -4655,7 +4655,7 @@ bool RenderProcessHost::IsProcessLimitReached() {
+@@ -4755,7 +4755,7 @@ bool RenderProcessHost::IsProcessLimitReached() {
      // users, as the experiment is configured with "starts_active" set to false
      // (meaning it only collects data from users who reach this code).
  #if !BUILDFLAG(IS_ANDROID)
@@ -2040,7 +1692,7 @@ index f414b719c6..eb238f9559 100644
        // This is used for tests. To avoid changing test behaviors, don't
        // change the behavior when it is set.
        if (g_max_renderer_count_override) {
-@@ -4788,7 +4788,7 @@ RenderProcessHost* RenderProcessHostImpl::GetProcessHostForSiteInstance(
+@@ -4889,7 +4889,7 @@ RenderProcessHost* RenderProcessHostImpl::GetProcessHostForSiteInstance(
      case ProcessReusePolicy::
          REUSE_PENDING_OR_COMMITTED_SITE_WITH_MAIN_FRAME_THRESHOLD: {
        CHECK(base::FeatureList::IsEnabled(
@@ -2049,7 +1701,7 @@ index f414b719c6..eb238f9559 100644
        render_process_host = FindReusableProcessHostForSiteInstance(
            site_instance, process_reuse_policy);
        if (render_process_host) {
-@@ -4867,7 +4867,7 @@ RenderProcessHost* RenderProcessHostImpl::GetProcessHostForSiteInstance(
+@@ -4963,7 +4963,7 @@ RenderProcessHost* RenderProcessHostImpl::GetProcessHostForSiteInstance(
      base::UmaHistogramBoolean(
          "BrowserRenderProcessHost.ExistingRendererIsInitializedAndNotDead",
          render_process_host->IsInitializedAndNotDead());
@@ -2058,11 +1710,20 @@ index f414b719c6..eb238f9559 100644
        render_process_host->Init();
      }
    }
+@@ -5464,7 +5464,7 @@ void RenderProcessHostImpl::UpdateProcessPriority() {
+     }
+ #if BUILDFLAG(IS_MAC)
+     if (base::FeatureList::IsEnabled(
+-            features::kMacAllowBackgroundingRenderProcesses)) {
++            ::features::kMacAllowBackgroundingRenderProcesses)) {
+       child_process_launcher_->SetProcessPriority(process_priority);
+     }
+ #else   // !BUILDFLAG(IS_MAC)
 diff --git a/content/browser/renderer_host/render_view_host_impl.cc b/content/browser/renderer_host/render_view_host_impl.cc
-index 43c108bd6b..d0a23b2e15 100644
+index a0335fef25..a6547f7966 100644
 --- a/content/browser/renderer_host/render_view_host_impl.cc
 +++ b/content/browser/renderer_host/render_view_host_impl.cc
-@@ -544,7 +544,7 @@ bool RenderViewHostImpl::CreateRenderView(
+@@ -542,7 +542,7 @@ bool RenderViewHostImpl::CreateRenderView(
                    frame_tree_node->current_frame_host()->GetFrameToken()));
      } else if (frame_tree_->is_prerendering() &&
                 (!base::FeatureList::IsEnabled(
@@ -2071,11 +1732,24 @@ index 43c108bd6b..d0a23b2e15 100644
                  main_rfh->lifecycle_state() ==
                      RenderFrameHostImpl::LifecycleStateImpl::kSpeculative)) {
        // During prerender, the browser may need to create new speculative local
+diff --git a/content/browser/renderer_host/render_widget_host_impl.cc b/content/browser/renderer_host/render_widget_host_impl.cc
+index 52f772876a..ccd78a6c37 100644
+--- a/content/browser/renderer_host/render_widget_host_impl.cc
++++ b/content/browser/renderer_host/render_widget_host_impl.cc
+@@ -2150,7 +2150,7 @@ void RenderWidgetHostImpl::GetSnapshotFromBrowser(
+   if (from_surface) {
+     pending_surface_browser_snapshots_.insert(
+         std::make_pair(snapshot_id, std::move(callback)));
+-    if (base::FeatureList::IsEnabled(features::kCDPScreenshotNewSurface)) {
++    if (base::FeatureList::IsEnabled(::features::kCDPScreenshotNewSurface)) {
+       // 1. Force content redraw in the renderer.
+       blink_widget_->ForceRedraw(base::DoNothing());
+       // 2. Force a repaint to ensure that surface is updated.
 diff --git a/content/browser/renderer_host/render_widget_host_view_aura.cc b/content/browser/renderer_host/render_widget_host_view_aura.cc
-index 32302e3dae..5770b6733a 100644
+index e6235611a2..8f2d10dc75 100644
 --- a/content/browser/renderer_host/render_widget_host_view_aura.cc
 +++ b/content/browser/renderer_host/render_widget_host_view_aura.cc
-@@ -3059,7 +3059,7 @@ void RenderWidgetHostViewAura::CreateSelectionController() {
+@@ -3071,7 +3071,7 @@ void RenderWidgetHostViewAura::CreateSelectionController() {
    tsc_config.tap_slop = ui::GestureConfiguration::GetInstance()
                              ->max_touch_move_in_pixels_for_click();
    tsc_config.enable_longpress_drag_selection =
@@ -2085,10 +1759,10 @@ index 32302e3dae..5770b6733a 100644
        selection_controller_client_.get(), tsc_config);
  }
 diff --git a/content/browser/renderer_host/spare_render_process_host_manager_impl.cc b/content/browser/renderer_host/spare_render_process_host_manager_impl.cc
-index 0ddfac898e..7fb0cd767f 100644
+index debe95af98..a614ed6c5f 100644
 --- a/content/browser/renderer_host/spare_render_process_host_manager_impl.cc
 +++ b/content/browser/renderer_host/spare_render_process_host_manager_impl.cc
-@@ -111,7 +111,7 @@ size_t GetSpareRPHCount() {
+@@ -203,7 +203,7 @@ size_t GetSpareRPHCount() {
    if (available_ram < 4 * 1024) {
      return 1u;
    }
@@ -2096,8 +1770,8 @@ index 0ddfac898e..7fb0cd767f 100644
 +  return ::features::kMultipleSpareRPHsCount.Get();
  }
  
- }  // namespace
-@@ -508,17 +508,17 @@ void SpareRenderProcessHostManagerImpl::PrepareForFutureRequests(
+ void LogAllocationContext(const std::string& source_uma_name,
+@@ -705,17 +705,17 @@ void SpareRenderProcessHostManagerImpl::PrepareForFutureRequests(
    if (RenderProcessHostImpl::IsSpareProcessKeptAtAllTimes()) {
      std::optional<base::TimeDelta> timeout = std::nullopt;
      if (base::FeatureList::IsEnabled(
@@ -2120,8 +1794,17 @@ index 0ddfac898e..7fb0cd767f 100644
        }
      }
      // Always keep around a spare process for the most recently requested
+@@ -833,7 +833,7 @@ void SpareRenderProcessHostManagerImpl::RenderProcessReady(
+   UMA_HISTOGRAM_TIMES("BrowserRenderProcessHost.SpareProcessStartupTime",
+                       process_startup_timer_->Elapsed());
+ 
+-  if (base::FeatureList::IsEnabled(features::kSpareRendererProcessPriority)) {
++  if (base::FeatureList::IsEnabled(::features::kSpareRendererProcessPriority)) {
+     host->SetHasSpareRendererPriority(true);
+   }
+ 
 diff --git a/content/browser/security/coop/cross_origin_opener_policy_reporter.cc b/content/browser/security/coop/cross_origin_opener_policy_reporter.cc
-index 334f15a6bc..9f650fdecf 100644
+index 27af8106d6..150541127c 100644
 --- a/content/browser/security/coop/cross_origin_opener_policy_reporter.cc
 +++ b/content/browser/security/coop/cross_origin_opener_policy_reporter.cc
 @@ -19,6 +19,8 @@
@@ -2133,7 +1816,7 @@ index 334f15a6bc..9f650fdecf 100644
  namespace content {
  
  namespace {
-@@ -298,3 +300,5 @@ void CrossOriginOpenerPolicyReporter::QueueNavigationReport(
+@@ -293,3 +295,5 @@ void CrossOriginOpenerPolicyReporter::QueueNavigationReport(
  }
  
  }  // namespace content
@@ -2158,103 +1841,27 @@ index 464954acf9..696389fd45 100644
  }  // namespace content
 +
 +#undef kType
-diff --git a/content/browser/site_instance_group_manager.cc b/content/browser/site_instance_group_manager.cc
-index 5b4f513df9..befb739f2f 100644
---- a/content/browser/site_instance_group_manager.cc
-+++ b/content/browser/site_instance_group_manager.cc
-@@ -21,7 +21,7 @@ SiteInstanceGroupManager::~SiteInstanceGroupManager() {
- RenderProcessHost* SiteInstanceGroupManager::GetExistingGroupProcess(
-     SiteInstanceImpl* site_instance) {
-   if (!base::FeatureList::IsEnabled(
--          features::kProcessSharingWithStrictSiteInstances) ||
-+          ::features::kProcessSharingWithStrictSiteInstances) ||
-       !default_process_) {
-     return nullptr;
-   }
-@@ -58,7 +58,7 @@ void SiteInstanceGroupManager::OnProcessSet(SiteInstanceImpl* site_instance) {
- void SiteInstanceGroupManager::MaybeSetDefaultProcess(
-     SiteInstanceImpl* site_instance) {
-   if (!base::FeatureList::IsEnabled(
--          features::kProcessSharingWithStrictSiteInstances)) {
-+          ::features::kProcessSharingWithStrictSiteInstances)) {
-     return;
-   }
+diff --git a/content/browser/webid/federated_auth_request_impl.cc b/content/browser/webid/federated_auth_request_impl.cc
+index 5458912939..4362cd0a6f 100644
+--- a/content/browser/webid/federated_auth_request_impl.cc
++++ b/content/browser/webid/federated_auth_request_impl.cc
+@@ -82,6 +82,8 @@ using CompleteRequestWithErrorCallback =
+                             std::optional<content::FedCmRequestIdTokenStatus>,
+                             bool)>;
  
-diff --git a/content/browser/site_instance_impl.cc b/content/browser/site_instance_impl.cc
-index 8e7e8f1841..40224e2220 100644
---- a/content/browser/site_instance_impl.cc
-+++ b/content/browser/site_instance_impl.cc
-@@ -1421,7 +1421,7 @@ bool SiteInstanceImpl::CanBePlacedInDefaultSiteInstance(
-   // site to have its own SiteInstance object and logic elsewhere ensures
-   // that those SiteInstances share a process.
-   if (base::FeatureList::IsEnabled(
--          features::kProcessSharingWithStrictSiteInstances)) {
-+          ::features::kProcessSharingWithStrictSiteInstances)) {
-     return false;
-   }
++#define IsFrameActive IsFrameActive_FederatedAuthRequestImpl
++
+ namespace content {
  
-@@ -1669,7 +1669,7 @@ RenderProcessHost* SiteInstanceImpl::GetDefaultProcessForBrowsingInstance() {
-   }
-   if (browsing_instance_->site_instance_group_manager().default_process()) {
-     DCHECK(base::FeatureList::IsEnabled(
--        features::kProcessSharingWithStrictSiteInstances));
-+        ::features::kProcessSharingWithStrictSiteInstances));
-     return browsing_instance_->site_instance_group_manager().default_process();
-   }
-   return nullptr;
-diff --git a/content/browser/storage_partition_impl.cc b/content/browser/storage_partition_impl.cc
-index 29a3522bff..46da8c2ccf 100644
---- a/content/browser/storage_partition_impl.cc
-+++ b/content/browser/storage_partition_impl.cc
-@@ -1439,9 +1439,9 @@ void StoragePartitionImpl::Initialize(
-   // traffic labels should not be sent for off-the-record profiles, unless the
-   // "enable_otr_profiles" feature parameter is true.
-   if (base::FeatureList::IsEnabled(
--          features::kCookieDeprecationFacilitatedTesting) &&
-+          ::features::kCookieDeprecationFacilitatedTesting) &&
-       (!is_in_memory() ||
--       features::kCookieDeprecationFacilitatedTestingEnableOTRProfiles.Get())) {
-+       ::features::kCookieDeprecationFacilitatedTestingEnableOTRProfiles.Get())) {
-     cookie_deprecation_label_manager_ =
-         std::make_unique<CookieDeprecationLabelManagerImpl>(browser_context_);
-   }
-@@ -1963,7 +1963,7 @@ void StoragePartitionImpl::DeleteStaleSessionData() {
-   GetDOMStorageContext()->StartScavengingUnusedSessionStorage();
+ namespace {
+@@ -2730,3 +2732,5 @@ RelyingPartyData FederatedAuthRequestImpl::CreateRpData() const {
+ }
  
-   if (base::FeatureList::IsEnabled(
--          features::kDeleteStaleSessionCookiesOnStartup)) {
-+          ::features::kDeleteStaleSessionCookiesOnStartup)) {
-     // We need to delay deleting stale session cookies until after the cookie db
-     // has initialized, otherwise we will bypass lazy loading and block.
-     // See crbug.com/40285083 for more info.
-diff --git a/content/browser/tracing/tracing_service_controller.cc b/content/browser/tracing/tracing_service_controller.cc
-index 504ae7a8db..1a594e55f5 100644
---- a/content/browser/tracing/tracing_service_controller.cc
-+++ b/content/browser/tracing/tracing_service_controller.cc
-@@ -80,7 +80,7 @@ tracing::mojom::TracingService& TracingServiceController::GetService() {
- 
-   if (!service_) {
-     auto receiver = service_.BindNewPipeAndPassReceiver();
--    if (base::FeatureList::IsEnabled(features::kTracingServiceInProcess)) {
-+    if (base::FeatureList::IsEnabled(::features::kTracingServiceInProcess)) {
-       base::ThreadPool::CreateSequencedTaskRunner(
-           {base::MayBlock(), base::TaskShutdownBehavior::SKIP_ON_SHUTDOWN,
-            base::WithBaseSyncPrimitives(), base::TaskPriority::USER_BLOCKING})
-diff --git a/content/browser/video_capture_service_impl.cc b/content/browser/video_capture_service_impl.cc
-index 8d14685d7c..143311a24d 100644
---- a/content/browser/video_capture_service_impl.cc
-+++ b/content/browser/video_capture_service_impl.cc
-@@ -152,7 +152,7 @@ video_capture::mojom::VideoCaptureService& GetVideoCaptureService() {
-   auto& remote = GetUIThreadRemote();
-   if (!remote.is_bound()) {
-     auto receiver = remote.BindNewPipeAndPassReceiver();
--    if (features::IsVideoCaptureServiceEnabledForBrowserProcess()) {
-+    if (::features::IsVideoCaptureServiceEnabledForBrowserProcess()) {
-       auto dedicated_task_runner = CREATE_IN_PROCESS_TASK_RUNNER(
-           {base::MayBlock(), base::WithBaseSyncPrimitives(),
-            base::TaskPriority::BEST_EFFORT},
+ }  // namespace content
++
++#undef IsFrameActive
 diff --git a/content/child/BUILD.gn b/content/child/BUILD.gn
-index f89259d511..0a3467af88 100644
+index cecc5e382a..7ab8f08117 100644
 --- a/content/child/BUILD.gn
 +++ b/content/child/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -2278,7 +1885,7 @@ index f89259d511..0a3467af88 100644
  target(link_target_type, "child") {
    # Targets external to content should always link to the public API.
 diff --git a/content/common/BUILD.gn b/content/common/BUILD.gn
-index a3542c0a74..1689f93d07 100644
+index 9f40e65fa5..fe554377ab 100644
 --- a/content/common/BUILD.gn
 +++ b/content/common/BUILD.gn
 @@ -60,7 +60,7 @@ if (is_linux || is_chromeos) {
@@ -2290,7 +1897,7 @@ index a3542c0a74..1689f93d07 100644
    # Targets external to content should always link to the public API.
    # In addition, targets outside of the content component (shell and tests)
    # must not link to this because it will duplicate the code in the component
-@@ -192,6 +192,10 @@ source_set("common") {
+@@ -191,6 +191,10 @@ source_set("common") {
      "webid/identity_url_loader_throttle.cc",
      "webid/identity_url_loader_throttle.h",
    ]
@@ -2302,7 +1909,7 @@ index a3542c0a74..1689f93d07 100644
    configs += [
      "//content:content_implementation",
 diff --git a/content/gpu/BUILD.gn b/content/gpu/BUILD.gn
-index 5a5b7c3edf..fb143dd78a 100644
+index c6a90abae4..4c903cd958 100644
 --- a/content/gpu/BUILD.gn
 +++ b/content/gpu/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -2326,7 +1933,7 @@ index 5a5b7c3edf..fb143dd78a 100644
  
  target(link_target_type, "gpu_sources") {
 diff --git a/content/public/browser/BUILD.gn b/content/public/browser/BUILD.gn
-index f6e7f72966..1849a6e76b 100644
+index 2714f3b881..863f4d5d81 100644
 --- a/content/public/browser/BUILD.gn
 +++ b/content/public/browser/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -2368,7 +1975,7 @@ index 73fce2d993..2f298f5cda 100644
    visibility = [ "//content/*" ]
  
 diff --git a/content/public/common/BUILD.gn b/content/public/common/BUILD.gn
-index 8f6e733b1a..177a2c77fa 100644
+index 35fc76646e..6c640da094 100644
 --- a/content/public/common/BUILD.gn
 +++ b/content/public/common/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -2377,9 +1984,9 @@ index 8f6e733b1a..177a2c77fa 100644
  import("//build/config/features.gni")
 +import("//build/config/jumbo.gni")
  import("//build/config/ui.gni")
+ import("//content/browser/devtools/features.gni")
  import("//content/public/common/features.gni")
- import("//content/public/common/zygote/features.gni")
-@@ -158,7 +159,7 @@ component("main_function_params") {
+@@ -160,7 +161,7 @@ component("main_function_params") {
    configs += [ "//content:content_implementation" ]
  }
  
@@ -2413,7 +2020,7 @@ index 1708aa82d3..8b39b24ca7 100644
  target(link_target_type, "renderer_sources") {
    # External code should depend on via ":renderer" above.
 diff --git a/content/renderer/BUILD.gn b/content/renderer/BUILD.gn
-index 5f4362d3c7..1bc28be09a 100644
+index b8fd955057..b20ef5cdf5 100644
 --- a/content/renderer/BUILD.gn
 +++ b/content/renderer/BUILD.gn
 @@ -5,6 +5,7 @@
@@ -2437,7 +2044,7 @@ index 5f4362d3c7..1bc28be09a 100644
  
  target(link_target_type, "renderer") {
 diff --git a/content/renderer/service_worker/service_worker_subresource_loader.cc b/content/renderer/service_worker/service_worker_subresource_loader.cc
-index 48a7030c1d..525d425c91 100644
+index b9761791e1..2b5026b05a 100644
 --- a/content/renderer/service_worker/service_worker_subresource_loader.cc
 +++ b/content/renderer/service_worker/service_worker_subresource_loader.cc
 @@ -44,6 +44,8 @@
@@ -2449,7 +2056,7 @@ index 48a7030c1d..525d425c91 100644
  namespace content {
  
  namespace {
-@@ -1551,3 +1553,5 @@ void ServiceWorkerSubresourceLoader::DidCacheStorageMatch(
+@@ -1543,3 +1545,5 @@ void ServiceWorkerSubresourceLoader::DidCacheStorageMatch(
  }
  
  }  // namespace content
@@ -2475,7 +2082,7 @@ index 22c2752f46..f2c17c84b2 100644
 +
 +#undef MojoEnumToString
 diff --git a/content/services/auction_worklet/BUILD.gn b/content/services/auction_worklet/BUILD.gn
-index 34345aba77..5781f51443 100644
+index 8cfa702b80..8035501301 100644
 --- a/content/services/auction_worklet/BUILD.gn
 +++ b/content/services/auction_worklet/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -2495,7 +2102,7 @@ index 34345aba77..5781f51443 100644
    sources = [
      "auction_v8_devtools_agent.cc",
      "auction_v8_devtools_agent.h",
-@@ -108,6 +109,10 @@ source_set("auction_worklet") {
+@@ -114,6 +115,10 @@ source_set("auction_worklet") {
  
    sources += get_target_outputs(":protocol_sources")
  
@@ -2507,7 +2114,7 @@ index 34345aba77..5781f51443 100644
      "//build/config/compiler:wexit_time_destructors",
      "//v8:external_startup_data",
 diff --git a/content/test/BUILD.gn b/content/test/BUILD.gn
-index c0eaa67da8..f1d307db98 100644
+index d7cea6b7ef..53113e5fb6 100644
 --- a/content/test/BUILD.gn
 +++ b/content/test/BUILD.gn
 @@ -7,6 +7,7 @@ import("//build/config/chrome_build.gni")
@@ -2518,7 +2125,7 @@ index c0eaa67da8..f1d307db98 100644
  import("//build/config/ui.gni")
  import("//build/nocompile.gni")
  import("//components/viz/common/debugger/viz_debugger.gni")
-@@ -43,7 +44,7 @@ if (is_ios) {
+@@ -44,7 +45,7 @@ if (is_ios) {
  
  # Use a static library here because many test binaries depend on this but don't
  # require many files from it. This makes linking more efficient.
@@ -2527,7 +2134,7 @@ index c0eaa67da8..f1d307db98 100644
    testonly = true
  
    # See comment at the top of //content/BUILD.gn for why this is disabled in
-@@ -1019,7 +1020,7 @@ source_set("default_content_test_launcher") {
+@@ -1033,7 +1034,7 @@ source_set("default_content_test_launcher") {
  
  # browsertest_support can be used by targets that run content_shell based
  # browser tests.
@@ -2537,7 +2144,7 @@ index c0eaa67da8..f1d307db98 100644
  
    # See comment at the top of //content/BUILD.gn for why this is disabled in
 diff --git a/content/utility/BUILD.gn b/content/utility/BUILD.gn
-index 2221c3969c..aa5a301ba0 100644
+index 5ff547b646..c2bcf80199 100644
 --- a/content/utility/BUILD.gn
 +++ b/content/utility/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -2557,3 +2164,322 @@ index 2221c3969c..aa5a301ba0 100644
    # Only the public target should depend on this. All other targets (even
    # internal content ones other than test) should depend on the public one.
    visibility = [
+--- a/content/browser/devtools/protocol/page_handler.cc
++++ b/content/browser/devtools/protocol/page_handler.cc
+@@ -88,6 +88,8 @@
+ #include "content/browser/renderer_host/compositor_impl_android.h"
+ #endif
+ 
++#define kCommandIsOnlyAvailableAtTopTarget kCommandIsOnlyAvailableAtTopTarget_PageHandler
++
+ namespace content {
+ namespace protocol {
+ 
+@@ -2426,3 +2428,5 @@
+ 
+ }  // namespace protocol
+ }  // namespace content
++
++#undef kCommandIsOnlyAvailableAtTopTarget
+--- a/content/browser/installedapp/installed_app_provider_impl.cc
++++ b/content/browser/installedapp/installed_app_provider_impl.cc
+@@ -62,7 +62,7 @@
+     bool add_saved_related_applications,
+     FilterInstalledAppsCallback callback) {
+   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+-  if (!base::FeatureList::IsEnabled(features::kInstalledAppProvider)) {
++  if (!base::FeatureList::IsEnabled(::features::kInstalledAppProvider)) {
+     base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
+         FROM_HERE,
+         base::BindOnce(std::move(callback),
+@@ -92,7 +92,7 @@
+   base::ConcurrentCallbacks<FetchRelatedAppsTaskResult> concurrent;
+ 
+ #if BUILDFLAG(IS_WIN)
+-  if (base::FeatureList::IsEnabled(features::kFilterInstalledAppsWinMatching)) {
++  if (base::FeatureList::IsEnabled(::features::kFilterInstalledAppsWinMatching)) {
+     StartTask(std::make_unique<FetchRelatedWinAppsTask>(
+                   native_win_app_fetcher_factory_.Run()),
+               related_apps, concurrent.CreateCallback());
+@@ -101,7 +101,7 @@
+ 
+ #if !BUILDFLAG(IS_ANDROID)
+   if (base::FeatureList::IsEnabled(
+-          features::kFilterInstalledAppsWebAppMatching)) {
++          ::features::kFilterInstalledAppsWebAppMatching)) {
+     StartTask(std::make_unique<FetchRelatedWebAppsTask>(
+                   render_frame_host().GetBrowserContext()),
+               related_apps, concurrent.CreateCallback());
+--- a/content/browser/interest_group/ad_auction_service_impl.cc
++++ b/content/browser/interest_group/ad_auction_service_impl.cc
+@@ -427,7 +427,7 @@
+   // been invalidated or the current frame's `PageImpl` has changed to a
+   // different one, abort the auction.
+   // See crbug.com/1422301.
+-  if (base::FeatureList::IsEnabled(features::kDetectInconsistentPageImpl) &&
++  if (base::FeatureList::IsEnabled(::features::kDetectInconsistentPageImpl) &&
+       (!GetFrame()->auction_initiator_page() ||
+        GetFrame()->auction_initiator_page().get() !=
+            &(GetFrame()->GetPage()))) {
+@@ -465,7 +465,7 @@
+ 
+   // Try to preconnect to owner and bidding signals origins if this is an
+   // on-device auction.
+-  if (base::FeatureList::IsEnabled(features::kFledgeUsePreconnectCache) &&
++  if (base::FeatureList::IsEnabled(::features::kFledgeUsePreconnectCache) &&
+       !config.server_response.has_value()) {
+     size_t n_owners_cached = PreconnectToBuyerOrigins(config);
+     for (const blink::AuctionConfig& component_config :
+@@ -747,7 +747,7 @@
+ network::mojom::ClientSecurityStatePtr
+ AdAuctionServiceImpl::GetClientSecurityState() {
+   if (base::FeatureList::IsEnabled(
+-          features::kFledgeOnlyUseIpAddressSpaceInClientSecurityState)) {
++          ::features::kFledgeOnlyUseIpAddressSpaceInClientSecurityState)) {
+     PolicyContainerHost* policies = GetFrame()->policy_container_host();
+     // This matches what GetFrame()->BuildClientSecurityState() does, in the no
+     // PolicyContainer case. According to comments there, PolicyContainerHost
+@@ -769,7 +769,7 @@
+ 
+ std::optional<std::string> AdAuctionServiceImpl::GetCookieDeprecationLabel() {
+   if (!base::FeatureList::IsEnabled(
+-          features::kFledgeFacilitatedTestingSignalsHeaders)) {
++          ::features::kFledgeFacilitatedTestingSignalsHeaders)) {
+     return std::nullopt;
+   }
+ 
+@@ -891,7 +891,7 @@
+             kCrossOriginOwnerInterestGroupSubframeCheckFailed);
+ 
+     if (base::FeatureList::IsEnabled(
+-            features::kFledgeModifyInterestGroupPolicyCheckOnOwner)) {
++            ::features::kFledgeModifyInterestGroupPolicyCheckOnOwner)) {
+       return false;
+     }
+   }
+@@ -969,7 +969,7 @@
+   // been invalidated or the current frame's `PageImpl` has changed to a
+   // different one, abort the auction.
+   // See crbug.com/1422301.
+-  if (base::FeatureList::IsEnabled(features::kDetectInconsistentPageImpl) &&
++  if (base::FeatureList::IsEnabled(::features::kDetectInconsistentPageImpl) &&
+       (!GetFrame()->auction_initiator_page() ||
+        GetFrame()->auction_initiator_page().get() !=
+            &(GetFrame()->GetPage()))) {
+@@ -1390,7 +1390,7 @@
+   // been invalidated or the current frame's `PageImpl` has changed to a
+   // different one, signal that state is no longer available.
+   // See crbug.com/1422301.
+-  if (base::FeatureList::IsEnabled(features::kDetectInconsistentPageImpl) &&
++  if (base::FeatureList::IsEnabled(::features::kDetectInconsistentPageImpl) &&
+       (!GetFrame()->auction_initiator_page() ||
+        GetFrame()->auction_initiator_page().get() !=
+            &(GetFrame()->GetPage()))) {
+--- a/content/browser/interest_group/auction_process_manager.cc
++++ b/content/browser/interest_group/auction_process_manager.cc
+@@ -99,7 +99,7 @@
+   if (is_idle_) {
+     remove_idle_process_from_manager_timer_.Start(
+         FROM_HERE,
+-        features::kFledgeStartAnticipatoryProcessExpirationTime.Get(),
++        ::features::kFledgeStartAnticipatoryProcessExpirationTime.Get(),
+         base::BindOnce(&RecordIdleProcessExpiredUma, true)
+             .Then(base::BindOnce(&WorkletProcess::RemoveFromProcessManager,
+                                  base::Unretained(this),
+@@ -393,7 +393,7 @@
+     SiteInstance* frame_site_instance,
+     WorkletType worklet_type) {
+   if (!base::FeatureList::IsEnabled(
+-          features::kFledgeStartAnticipatoryProcesses)) {
++          ::features::kFledgeStartAnticipatoryProcesses)) {
+     return;
+   }
+ 
+--- a/content/browser/interest_group/auction_runner.cc
++++ b/content/browser/interest_group/auction_runner.cc
+@@ -45,7 +45,7 @@
+ auction_worklet::mojom::KAnonymityBidMode DetermineKAnonMode() {
+   // K-anonymity enforcement is always disabled for the testing population.
+   if (base::FeatureList::IsEnabled(
+-          features::kCookieDeprecationFacilitatedTesting)) {
++          ::features::kCookieDeprecationFacilitatedTesting)) {
+     return auction_worklet::mojom::KAnonymityBidMode::kNone;
+   }
+   if (base::FeatureList::IsEnabled(
+@@ -762,7 +762,7 @@
+   });
+ 
+   if (base::FeatureList::IsEnabled(
+-          features::kFledgeDelayPostAuctionInterestGroupUpdate)) {
++          ::features::kFledgeDelayPostAuctionInterestGroupUpdate)) {
+     interest_group_manager_->UpdateInterestGroupsOfOwnersWithDelay(
+         std::move(update_owners), client_security_state_.Clone(),
+         std::move(user_agent_override_), std::move(attestation_callback_),
+--- a/content/browser/interest_group/auction_url_loader_factory_proxy.cc
++++ b/content/browser/interest_group/auction_url_loader_factory_proxy.cc
+@@ -63,7 +63,7 @@
+     const url::Origin& top_frame_origin,
+     const url::Origin& seller_origin) {
+   if (base::FeatureList::IsEnabled(
+-          features::kFledgeUseNonTransientNIKForSeller)) {
++          ::features::kFledgeUseNonTransientNIKForSeller)) {
+     return net::IsolationInfo::Create(
+         net::IsolationInfo::RequestType::kOther, top_frame_origin,
+         seller_origin, net::SiteForCookies(), /*nonce=*/std::nullopt,
+--- a/content/browser/interest_group/auction_worklet_manager.cc
++++ b/content/browser/interest_group/auction_worklet_manager.cc
+@@ -338,7 +338,7 @@
+     // When `kFledgeUseKVv2SignalsCache` is enabled, the TrustedSignalsCache
+     // manages KVv2 fetches in the browser process, so don't need get a key to
+     // pass to the worklet process.
+-    if (!base::FeatureList::IsEnabled(features::kFledgeUseKVv2SignalsCache)) {
++    if (!base::FeatureList::IsEnabled(::features::kFledgeUseKVv2SignalsCache)) {
+       waiting_on_trusted_signals_kvv2_public_key_ = true;
+       worklet_manager_->delegate()->GetTrustedKeyValueServerKey(
+           url::Origin::Create(worklet_info_.signals_url.value_or(GURL())),
+@@ -689,7 +689,7 @@
+ 
+       for (size_t i = 0;
+            i < static_cast<size_t>(
+-                   features::kFledgeSellerWorkletThreadPoolSize.Get());
++                   ::features::kFledgeSellerWorkletThreadPoolSize.Get());
+            ++i) {
+         worklet_debugs_.emplace_back(new DebuggableAuctionWorklet(
+             delegate->GetFrame(), process_handle_, worklet_info_.script_url,
+@@ -723,7 +723,7 @@
+           worklet_info_.trusted_signals_coordinator &&
+           base::FeatureList::IsEnabled(
+               blink::features::kFledgeTrustedSignalsKVv2Support) &&
+-          base::FeatureList::IsEnabled(features::kFledgeUseKVv2SignalsCache)) {
++          base::FeatureList::IsEnabled(::features::kFledgeUseKVv2SignalsCache)) {
+         if (url::Origin::Create(worklet_info_.script_url)
+                 .IsSameOriginWith(*worklet_info_.signals_url)) {
+           // If the script and signals URLs are same-origin, they may always be
+--- a/content/browser/interest_group/ad_auction_headers_util.cc
++++ b/content/browser/interest_group/ad_auction_headers_util.cc
+@@ -344,7 +344,7 @@
+   // We intentionally leave the `Ad-Auction-Result` response header in place.
+ 
+   if (base::FeatureList::IsEnabled(
+-          features::kFledgeBiddingAndAuctionNonceSupport)) {
++          ::features::kFledgeBiddingAndAuctionNonceSupport)) {
+     if (std::optional<std::string> ad_auction_results =
+             headers->GetNormalizedHeader(
+                 kAdAuctionResultNonceResponseHeaderKey)) {
+--- a/content/browser/interest_group/ad_auction_result_metrics.cc
++++ b/content/browser/interest_group/ad_auction_result_metrics.cc
+@@ -53,9 +53,9 @@
+ 
+ bool AdAuctionResultMetrics::ShouldRunAuction() {
+   num_requested_auctions_++;
+-  if (!base::FeatureList::IsEnabled(features::kFledgeLimitNumAuctions))
++  if (!base::FeatureList::IsEnabled(::features::kFledgeLimitNumAuctions))
+     return true;
+-  if (num_requested_auctions_ > features::kFledgeLimitNumAuctionsParam.Get()) {
++  if (num_requested_auctions_ > ::features::kFledgeLimitNumAuctionsParam.Get()) {
+     num_auctions_not_run_due_to_auction_limit_++;
+     return false;
+   }
+--- a/content/browser/interest_group/bidding_and_auction_response.cc
++++ b/content/browser/interest_group/bidding_and_auction_response.cc
+@@ -113,7 +113,7 @@
+   }
+ 
+   if (base::FeatureList::IsEnabled(
+-          features::kFledgeBiddingAndAuctionNonceSupport)) {
++          ::features::kFledgeBiddingAndAuctionNonceSupport)) {
+     const std::string* nonce = input_dict->FindString("nonce");
+     if (nonce) {
+       base::Uuid nonce_uuid = base::Uuid::ParseCaseInsensitive(*nonce);
+@@ -313,7 +313,7 @@
+     }
+   }
+ 
+-  if (base::FeatureList::IsEnabled(features::kEnableBandAKAnonEnforcement)) {
++  if (base::FeatureList::IsEnabled(::features::kEnableBandAKAnonEnforcement)) {
+     base::Value::Dict* k_anon_winner_join_candidate =
+         input_dict->FindDict("kAnonWinnerJoinCandidates");
+     if (k_anon_winner_join_candidate) {
+@@ -331,7 +331,7 @@
+ 
+   if (base::FeatureList::IsEnabled(blink::features::kPrivateAggregationApi) &&
+       blink::features::kPrivateAggregationApiEnabledInProtectedAudience.Get() &&
+-      base::FeatureList::IsEnabled(features::kEnableBandAPrivateAggregation)) {
++      base::FeatureList::IsEnabled(::features::kEnableBandAPrivateAggregation)) {
+     const base::Value::List* pagg_response =
+         input_dict->FindList("paggResponse");
+     if (pagg_response) {
+@@ -340,7 +340,7 @@
+     }
+   }
+ 
+-  if (base::FeatureList::IsEnabled(features::kEnableBandASampleDebugReports)) {
++  if (base::FeatureList::IsEnabled(::features::kEnableBandASampleDebugReports)) {
+     base::Value::List* for_debugging_only_reports =
+         input_dict->FindList("debugReports");
+     if (for_debugging_only_reports) {
+@@ -349,7 +349,7 @@
+   }
+ 
+   base::Value::Dict* triggered_updates = input_dict->FindDict("updateGroups");
+-  if (base::FeatureList::IsEnabled(features::kEnableBandATriggeredUpdates) &&
++  if (base::FeatureList::IsEnabled(::features::kEnableBandATriggeredUpdates) &&
+       triggered_updates) {
+     for (const auto owner_groups : *triggered_updates) {
+       url::Origin owner = url::Origin::Create(GURL(owner_groups.first));
+--- a/content/browser/interest_group/bidding_and_auction_serializer.cc
++++ b/content/browser/interest_group/bidding_and_auction_serializer.cc
+@@ -114,7 +114,7 @@
+ bool KAnonIsEnabled() {
+   // K-anonymity enforcement is always disabled for the testing population.
+   if (base::FeatureList::IsEnabled(
+-          features::kCookieDeprecationFacilitatedTesting)) {
++          ::features::kCookieDeprecationFacilitatedTesting)) {
+     return false;
+   }
+   return base::FeatureList::IsEnabled(
+@@ -350,7 +350,7 @@
+       TaggedSIntLength(recency);
+ 
+   if (group->bidding_browser_signals->view_and_click_counts &&
+-      base::FeatureList::IsEnabled(features::kEnableBandAClickiness)) {
++      base::FeatureList::IsEnabled(::features::kEnableBandAClickiness)) {
+     if (group->bidding_browser_signals->view_and_click_counts->view_counts) {
+       std::pair<cbor::Value::ArrayValue, size_t> views = BuildClickinessArray(
+           *group->bidding_browser_signals->view_and_click_counts->view_counts);
+@@ -448,7 +448,7 @@
+       cbor::Value(std::move(browser_signals));
+ 
+   if (base::FeatureList::IsEnabled(
+-          features::kFledgeSendDebugReportCooldownsToBandA)) {
++          ::features::kFledgeSendDebugReportCooldownsToBandA)) {
+     group_elements_size +=
+         TaggedStringLength(constexpr_strlen("inCooldownOrLockout")) + 1;
+     group_obj[cbor::Value("inCooldownOrLockout")] =
+@@ -1034,7 +1034,7 @@
+       TaggedStringLength(constexpr_strlen("enableDebugReporting")) + 1;
+ 
+   if (base::FeatureList::IsEnabled(
+-          features::kFledgeSendDebugReportCooldownsToBandA)) {
++          ::features::kFledgeSendDebugReportCooldownsToBandA)) {
+     // Note: here this field's value is set false as a placeholder only, but it
+     // will be overwritten in
+     // `InterestGroupManagerImpl::OnAdAuctionDataLoadComplete` to its real
+@@ -1081,7 +1081,7 @@
+       TaggedStringLength(constexpr_strlen("requestTimestampMs")) +
+       TaggedSIntLength(timestamp);
+ 
+-  if (base::FeatureList::IsEnabled(features::kEnableBandAKAnonEnforcement) &&
++  if (base::FeatureList::IsEnabled(::features::kEnableBandAKAnonEnforcement) &&
+       KAnonIsEnabled()) {
+     message_obj[cbor::Value("enforceKAnon")] = cbor::Value(true);
+     message_elements_size +=
+@@ -1153,7 +1153,7 @@
+     NOTREACHED(base::NotFatalUntil::M138);
+   }
+   if (base::FeatureList::IsEnabled(
+-          features::kFledgeSendDebugReportCooldownsToBandA)) {
++          ::features::kFledgeSendDebugReportCooldownsToBandA)) {
+     bool debug_report_in_cooldown_or_lockout =
+         debug_report_in_lockout_ ||
+         IsInDebugReportCooldown(seller, debug_report_cooldown_map_, now);

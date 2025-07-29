@@ -38,18 +38,18 @@ Enable jumbo build for the following component(s)/source_set(s):
  18 files changed, 94 insertions(+), 11 deletions(-)
 
 diff --git a/crypto/BUILD.gn b/crypto/BUILD.gn
-index 4f4c4509f4..d684ebed8a 100644
+index 5b2eda4c29..355216a937 100644
 --- a/crypto/BUILD.gn
 +++ b/crypto/BUILD.gn
-@@ -4,6 +4,7 @@
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
  
  import("//build/buildflag_header.gni")
- import("//build/config/chromeos/ui_mode.gni")
 +import("//build/config/jumbo.gni")
  import("//components/nacl/toolchain.gni")
  import("//crypto/features.gni")
  import("//testing/test.gni")
-@@ -13,7 +14,7 @@ buildflag_header("buildflags") {
+@@ -16,7 +17,7 @@ buildflag_header("buildflags") {
    flags = [ "USE_NSS_CERTS=$use_nss_certs" ]
  }
  
@@ -59,7 +59,7 @@ index 4f4c4509f4..d684ebed8a 100644
    sources = [
      "aead.cc",
 diff --git a/crypto/unexportable_key.cc b/crypto/unexportable_key.cc
-index a199d5e9de..f318d5947f 100644
+index 88fba4f13e..cb0bd640e6 100644
 --- a/crypto/unexportable_key.cc
 +++ b/crypto/unexportable_key.cc
 @@ -7,6 +7,8 @@
@@ -71,7 +71,7 @@ index a199d5e9de..f318d5947f 100644
  namespace crypto {
  
  namespace {
-@@ -78,3 +80,5 @@ void SetUnexportableKeyProviderForTesting(
+@@ -92,3 +94,5 @@ void SetUnexportableKeyProviderForTesting(
  
  }  // namespace internal
  }  // namespace crypto
@@ -97,7 +97,7 @@ index 279a7a1431..668fd49c77 100644
 +
 +#undef g_mock_provider
 diff --git a/dbus/BUILD.gn b/dbus/BUILD.gn
-index 236016e617..85aa652594 100644
+index 5cca90ac7c..105d4c4ce0 100644
 --- a/dbus/BUILD.gn
 +++ b/dbus/BUILD.gn
 @@ -3,13 +3,14 @@
@@ -117,7 +117,7 @@ index 236016e617..85aa652594 100644
      "bus.cc",
      "bus.h",
 diff --git a/gin/BUILD.gn b/gin/BUILD.gn
-index 3a5e7d1a05..57e6806e34 100644
+index f01c47bd51..7f3f4cf7c7 100644
 --- a/gin/BUILD.gn
 +++ b/gin/BUILD.gn
 @@ -6,11 +6,12 @@ if (is_android) {
@@ -158,18 +158,18 @@ index 5bd5ed3a93..10777d497a 100644
      scoped_refptr<base::SingleThreadTaskRunner> task_runner,
      scoped_refptr<base::SingleThreadTaskRunner> user_visible_task_runner,
 diff --git a/google_apis/BUILD.gn b/google_apis/BUILD.gn
-index 9f45639c66..872a5a798e 100644
+index 64d9c9bbf5..f894a4efe9 100644
 --- a/google_apis/BUILD.gn
 +++ b/google_apis/BUILD.gn
-@@ -6,6 +6,7 @@ import("//build/buildflag_header.gni")
+@@ -5,6 +5,7 @@
+ import("//build/buildflag_header.gni")
  import("//build/config/chrome_build.gni")
- import("//build/config/chromeos/ui_mode.gni")
  import("//build/config/features.gni")
 +import("//build/config/jumbo.gni")
  import("//extensions/buildflags/buildflags.gni")
+ import("//google_apis/config.gni")
  import("//testing/test.gni")
- import("//third_party/protobuf/proto_library.gni")
-@@ -111,7 +112,7 @@ config("key_defines") {
+@@ -94,7 +95,7 @@ config("key_defines") {
    }
  }
  
@@ -179,10 +179,10 @@ index 9f45639c66..872a5a798e 100644
      "api_key_cache.cc",
      "api_key_cache.h",
 diff --git a/google_apis/gaia/oauth2_access_token_fetcher_impl.cc b/google_apis/gaia/oauth2_access_token_fetcher_impl.cc
-index 79de7c9be6..5817c6d768 100644
+index c6f8f991d3..867044d39e 100644
 --- a/google_apis/gaia/oauth2_access_token_fetcher_impl.cc
 +++ b/google_apis/gaia/oauth2_access_token_fetcher_impl.cc
-@@ -25,6 +25,9 @@
+@@ -27,6 +27,9 @@
  #include "services/network/public/cpp/simple_url_loader.h"
  #include "services/network/public/mojom/url_response_head.mojom.h"
  
@@ -192,7 +192,7 @@ index 79de7c9be6..5817c6d768 100644
  namespace {
  
  constexpr char kGetAccessTokenBodyFormat[] =
-@@ -433,3 +436,6 @@ bool OAuth2AccessTokenFetcherImpl::ParseGetAccessTokenFailureResponse(
+@@ -475,3 +478,6 @@ bool OAuth2AccessTokenFetcherImpl::ParseGetAccessTokenFailureResponse(
  
    return true;
  }
@@ -200,10 +200,10 @@ index 79de7c9be6..5817c6d768 100644
 +#undef kAccessTokenKey
 +#undef kExpiresInKey
 diff --git a/google_apis/gaia/oauth2_mint_token_flow.cc b/google_apis/gaia/oauth2_mint_token_flow.cc
-index 44633e7cca..3207ad1027 100644
+index 9a3d097a81..49f3ee1772 100644
 --- a/google_apis/gaia/oauth2_mint_token_flow.cc
 +++ b/google_apis/gaia/oauth2_mint_token_flow.cc
-@@ -36,6 +36,9 @@
+@@ -38,6 +38,9 @@
  #include "net/http/http_status_code.h"
  #include "services/network/public/mojom/url_response_head.mojom.h"
  
@@ -212,8 +212,8 @@ index 44633e7cca..3207ad1027 100644
 +
  namespace {
  
- const char kValueFalse[] = "false";
-@@ -544,3 +547,6 @@ OAuth2MintTokenFlow::GetNetworkTrafficAnnotationTag() {
+ constexpr char kValueFalse[] = "false";
+@@ -675,3 +678,6 @@ OAuth2MintTokenFlow::GetNetworkTrafficAnnotationTag() {
          }
        })");
  }
@@ -221,7 +221,7 @@ index 44633e7cca..3207ad1027 100644
 +#undef kAccessTokenKey
 +#undef kExpiresInKey
 diff --git a/google_apis/gcm/BUILD.gn b/google_apis/gcm/BUILD.gn
-index 4509132085..ff5c5142b8 100644
+index 9529e50d10..69d8ebffcc 100644
 --- a/google_apis/gcm/BUILD.gn
 +++ b/google_apis/gcm/BUILD.gn
 @@ -2,10 +2,11 @@
@@ -308,7 +308,7 @@ index c9a605d451..26c759fcad 100644
 +#undef kDeviceRegistrationError
 +#undef GetStatusFromError
 diff --git a/headless/BUILD.gn b/headless/BUILD.gn
-index f1736feee7..2daf8a81c1 100644
+index 18636003d3..bd123b47c1 100644
 --- a/headless/BUILD.gn
 +++ b/headless/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -328,9 +328,9 @@ index f1736feee7..2daf8a81c1 100644
    sources = [
      "lib/browser/command_line_handler.cc",
      "lib/browser/command_line_handler.h",
-@@ -303,6 +304,9 @@ component("headless_non_renderer") {
-     "public/util/user_agent.cc",
-     "public/util/user_agent.h",
+@@ -301,6 +302,9 @@ component("headless_non_renderer") {
+     "public/internal/value_conversions.h",
+     "public/switches.h",
    ]
 +  jumbo_excluded_sources = [
 +    "lib/utility/headless_content_utility_client.cc", # Conflict with //headless:headless_shell_lib
@@ -339,7 +339,7 @@ index f1736feee7..2daf8a81c1 100644
    configs += [ "//build/config/compiler:wexit_time_destructors" ]
  
 diff --git a/ipc/BUILD.gn b/ipc/BUILD.gn
-index eef379f12b..2951557735 100644
+index 3cd4859e1e..83cec6dc4d 100644
 --- a/ipc/BUILD.gn
 +++ b/ipc/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -359,7 +359,7 @@ index eef379f12b..2951557735 100644
    sources = [
      # These are the param_traits sources needed by all platforms,
      # including ios. The rest are added in a conditional block below.
-@@ -107,7 +108,7 @@ component("ipc") {
+@@ -109,7 +110,7 @@ component("ipc") {
    }
  }
  
@@ -407,7 +407,7 @@ index 15f66c849c..6114f78ca7 100644
 +
 +#undef OnEventReady
 diff --git a/sql/BUILD.gn b/sql/BUILD.gn
-index 24fa142672..145a9691b0 100644
+index 14fbb47b25..8d52fd5c05 100644
 --- a/sql/BUILD.gn
 +++ b/sql/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -428,7 +428,7 @@ index 24fa142672..145a9691b0 100644
      "database.cc",
      "database.h",
 diff --git a/url/BUILD.gn b/url/BUILD.gn
-index f22b73bc29..24e81c3f5b 100644
+index 3051d7b4b4..e5f423f96c 100644
 --- a/url/BUILD.gn
 +++ b/url/BUILD.gn
 @@ -3,6 +3,7 @@
