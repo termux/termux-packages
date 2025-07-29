@@ -36,6 +36,9 @@ termux_setup_rust() {
 	export PATH="${HOME}/.cargo/bin:${PATH}"
 
 	if [[ -n "${CARGO_TARGET_NAME-}" ]]; then
+		# Specific version toolchain
 		rustup target add "${CARGO_TARGET_NAME}" --toolchain "${TERMUX_RUST_VERSION}"
+		# Default / Stable / rust-toolchain.toml toolchain
+		rustup target add "${CARGO_TARGET_NAME}"
 	fi
 }
