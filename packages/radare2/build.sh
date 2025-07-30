@@ -1,10 +1,10 @@
-TERMUX_PKG_HOMEPAGE=https://rada.re
-TERMUX_PKG_DESCRIPTION="Advanced Hexadecimal Editor"
+TERMUX_PKG_HOMEPAGE=https://www.radare.org/
+TERMUX_PKG_DESCRIPTION="UNIX-like reverse engineering framework and command-line toolset"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="5.9.8"
-TERMUX_PKG_SRCURL=https://github.com/radare/radare2/archive/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=e45e4fd342f04b2e00363bc1b68cc375c1cf36041085d3d59caa7a3b7be43836
+TERMUX_PKG_VERSION="6.0.0"
+TERMUX_PKG_SRCURL=https://github.com/radareorg/radare2/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=023d75b0dca8770bbc9be5a569147599eb1a6d52017bba5ea22e5eca7c4e1075
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libuv"
 TERMUX_PKG_BREAKS="radare2-dev"
