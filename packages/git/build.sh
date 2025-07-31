@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Fast, scalable, distributed revision control system"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="2.50.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/pub/software/scm/git/git-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=7e3e6c36decbd8f1eedd14d42db6674be03671c2204864befa2a41756c5c8fc4
 TERMUX_PKG_AUTO_UPDATE=true
@@ -34,18 +35,6 @@ DEFAULT_PAGER=pager
 DEFAULT_EDITOR=editor
 "
 TERMUX_PKG_BUILD_IN_SRC=true
-
-# Things to remove to save space:
-#  bin/git-cvsserver - server emulating CVS
-#  bin/git-shell - restricted login shell for Git-only SSH access
-TERMUX_PKG_RM_AFTER_INSTALL="
-bin/git-cvsserver
-bin/git-shell
-libexec/git-core/git-shell
-libexec/git-core/git-cvsserver
-share/man/man1/git-cvsserver.1
-share/man/man1/git-shell.1
-"
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
