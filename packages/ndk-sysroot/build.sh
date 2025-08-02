@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_MAINTAINER="@termux"
 # Version should be equal to TERMUX_NDK_{VERSION_NUM,REVISION} in
 # scripts/properties.sh
-TERMUX_PKG_VERSION=27c
+TERMUX_PKG_VERSION=28c
 TERMUX_PKG_SRCURL=https://dl.google.com/android/repository/android-ndk-r${TERMUX_PKG_VERSION}-linux.zip
 TERMUX_PKG_SHA256=59c2f6dc96743b5daf5d1626684640b20a6bd2b1d85b13156b90333741bad5cc
 TERMUX_PKG_AUTO_UPDATE=false
@@ -90,9 +90,9 @@ termux_step_make_install() {
 	test $NDK_ARCH == 'i686' && NDK_ARCH='i386'
 
 	# clang 13 requires libunwind on Android.
-	cp toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/lib/linux/$NDK_ARCH/libatomic.a \
+	cp toolchains/llvm/prebuilt/linux-x86_64/lib/clang/19/lib/linux/$NDK_ARCH/libatomic.a \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
-	cp toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/lib/linux/$NDK_ARCH/libunwind.a \
+	cp toolchains/llvm/prebuilt/linux-x86_64/lib/clang/19/lib/linux/$NDK_ARCH/libunwind.a \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
 
 	# librt and libpthread are built into libc on android, so setup them as symlinks
