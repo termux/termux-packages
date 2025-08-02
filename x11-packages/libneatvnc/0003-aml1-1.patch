@@ -1,0 +1,192 @@
+From ffcf489bab49b46ef6adcf904fed798d0a070223 Mon Sep 17 00:00:00 2001
+From: Andri Yngvason <andri@yngvason.is>
+Date: Wed, 25 Dec 2024 15:56:26 +0000
+Subject: [PATCH] Upgrade zrle benchmark
+
+---
+ bench/meson.build  | 27 ++++++++++++++++++++++--
+ bench/zrle-bench.c | 52 +++++++++++++++++++++++++++++++---------------
+ 2 files changed, 60 insertions(+), 19 deletions(-)
+
+diff --git a/bench/meson.build b/bench/meson.build
+index 540cfb76..9011afa9 100644
+--- a/bench/meson.build
++++ b/bench/meson.build
+@@ -1,20 +1,43 @@
+ libpng = dependency('libpng', required: false)
+ 
+ if libpng.found()
++	configure_file(
++		output: 'config.h',
++		configuration: config,
++	)
++
+ 	executable(
+ 		'zrle-bench',
+ 		[
+ 			'zrle-bench.c',
+-			'../src/zrle.c',
++			'../src/enc/util.c',
++			'../src/enc/zrle.c',
++			'../src/enc/tight.c',
++			'../src/enc/raw.c',
++			'../src/enc/h264/open-h264.c',
++			'../src/enc/h264/encoder.c',
++			'../src/enc/h264/ffmpeg-impl.c',
++			'../src/enc/h264/v4l2m2m-impl.c',
++			'../src/enc/interface.c',
+ 			'../src/pngfb.c',
+ 			'../src/pixels.c',
+ 			'../src/vec.c',
++			'../src/rcbuf.c',
++			'../src/fb.c',
+ 		],
+ 		dependencies: [
+ 			neatvnc_dep,
+ 			pixman,
+ 			aml,
+ 			libpng,
+-		]
++			libm,
++			zlib,
++			libturbojpeg,
++			gbm,
++			libdrm,
++			libavutil,
++			libavcodec,
++			libavfilter,
++		],
+ 	)
+ endif
+diff --git a/bench/zrle-bench.c b/bench/zrle-bench.c
+index bd7c3ba7..9b96b9ed 100644
+--- a/bench/zrle-bench.c
++++ b/bench/zrle-bench.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2019 - 2021 Andri Yngvason
++ * Copyright (c) 2019 - 2024 Andri Yngvason
+  *
+  * Permission to use, copy, modify, and/or distribute this software for any
+  * purpose with or without fee is hereby granted, provided that the above
+@@ -14,12 +14,13 @@
+  * PERFORMANCE OF THIS SOFTWARE.
+  */
+ 
+-#include "zrle.h"
++#include "enc/encoder.h"
+ #include "rfb-proto.h"
+ #include "vec.h"
+ #include "neatvnc.h"
+ #include "pixels.h"
+ 
++#include <aml.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <libdrm/drm_fourcc.h>
+@@ -27,6 +28,8 @@
+ #include <time.h>
+ #include <inttypes.h>
+ 
++static struct encoded_frame* encoded_frame;
++
+ static uint64_t gettime_us(clockid_t clock)
+ {
+ 	struct timespec ts = { 0 };
+@@ -44,6 +47,13 @@ static void memcpy_unoptimized(void* dst, const void* src, size_t len)
+ 
+ struct nvnc_fb* read_png_file(const char *filename);
+ 
++static void on_encoding_done(struct encoder* enc, struct encoded_frame* frame)
++{
++	encoded_frame = frame;
++	encoded_frame_ref(frame);
++	aml_exit(aml_get_default());
++}
++
+ static int run_benchmark(const char *image)
+ {
+ 	int rc = -1;
+@@ -65,16 +75,13 @@ static int run_benchmark(const char *image)
+ 
+ 	pixman_region_union_rect(&region, &region, 0, 0, width, height);
+ 
+-	struct vec frame;
+-	vec_init(&frame, stride * height * 3 / 2);
+ 
+-	z_stream zs = { 0 };
++	struct encoder* enc = encoder_new(RFB_ENCODING_ZRLE, width, height);
++	assert(enc);
++
++	enc->on_done = on_encoding_done;
+ 
+-	deflateInit2(&zs, /* compression level: */ 1,
+-			/*            method: */ Z_DEFLATED,
+-			/*       window bits: */ 15,
+-			/*         mem level: */ 9,
+-			/*          strategy: */ Z_DEFAULT_STRATEGY);
++	encoder_set_output_format(enc, &pixfmt);
+ 
+ 	void *dummy = malloc(stride * height * 4);
+ 	if (!dummy)
+@@ -85,25 +92,29 @@ static int run_benchmark(const char *image)
+ 	memcpy_unoptimized(dummy, addr, stride * height * 4);
+ 
+ 	uint64_t end_time = gettime_us(CLOCK_PROCESS_CPUTIME_ID);
+-	printf("memcpy baseline for %s took %"PRIu64" micro seconds\n", image,
++	printf("memcpy baseline for %s took %"PRIu64" µs\n", image,
+ 			end_time - start_time);
+ 
+ 	free(dummy);
+ 
+ 	start_time = gettime_us(CLOCK_PROCESS_CPUTIME_ID);
+-	rc = zrle_encode_frame(&zs, &frame, &pixfmt, fb, &pixfmt, &region);
++	rc = encoder_encode(enc, fb, &region);
++
++	aml_run(aml_get_default());
++
++	assert(encoded_frame);
+ 
+ 	end_time = gettime_us(CLOCK_PROCESS_CPUTIME_ID);
+-	printf("Encoding %s took %"PRIu64" micro seconds\n", image,
++	printf("Encoding %s took %"PRIu64" µs\n", image,
+ 			end_time - start_time);
+ 
+ 	double orig_size = stride * height * 4;
+-	double compressed_size = frame.len;
++	double compressed_size = encoded_frame->buf.size;
+ 
+ 	double reduction = (orig_size - compressed_size) / orig_size;
+ 	printf("Size reduction: %.1f %%\n", reduction * 100.0);
+ 
+-	deflateEnd(&zs);
++	encoder_unref(enc);
+ 
+ 	if (rc < 0)
+ 		goto failure;
+@@ -111,7 +122,7 @@ static int run_benchmark(const char *image)
+ 	rc = 0;
+ failure:
+ 	pixman_region_fini(&region);
+-	vec_destroy(&frame);
++	encoded_frame_unref(encoded_frame);
+ 	nvnc_fb_unref(fb);
+ 	return 0;
+ }
+@@ -125,8 +136,15 @@ int main(int argc, char *argv[])
+ 	if (image)
+ 		return run_benchmark(image) < 0 ? 1 :0;
+ 
++	struct aml* aml = aml_new();
++	aml_set_default(aml);
++
++	aml_require_workers(aml, -1);
++
+ 	rc |= run_benchmark("test-images/tv-test-card.png") < 0 ? 1 : 0;
+-	rc |= run_benchmark("test-images/lena-soderberg.png") < 0 ? 1 : 0;
++	rc |= run_benchmark("test-images/mandrill.png") < 0 ? 1 : 0;
++
++	aml_unref(aml);
+ 
+ 	return rc;
+ }

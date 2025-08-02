@@ -1,0 +1,71 @@
+From f5452d6630cd1d82db5c914ad1a7a36aa3f3099c Mon Sep 17 00:00:00 2001
+From: Andri Yngvason <andri@yngvason.is>
+Date: Wed, 25 Dec 2024 17:24:21 +0000
+Subject: [PATCH] enc: zrle: Don't maintain checksum
+
+It doesn't get used, so let's not spend time calculating it.
+---
+ src/enc/zrle.c | 29 +++++++++++++++++++++++------
+ 1 file changed, 23 insertions(+), 6 deletions(-)
+
+diff --git a/src/enc/zrle.c b/src/enc/zrle.c
+index 503c738..49c6d04 100644
+--- a/src/enc/zrle.c
++++ b/src/enc/zrle.c
+@@ -49,6 +49,7 @@ struct zrle_encoder {
+ 	struct encoded_frame *current_result;
+ 	int n_rects;
+ 
++	uint16_t header;
+ 	z_stream zs;
+ 
+ 	struct aml_work* work;
+@@ -267,6 +268,11 @@ static int zrle_encode_box(struct zrle_encoder* self, struct vec* out,
+ 	size_t size_index = out->len;
+ 	vec_append_zero(out, 4);
+ 
++	if (self->header) {
++		vec_append(out, &self->header, sizeof(self->header));
++		self->header = 0;
++	}
++
+ 	int n_tiles = UDIV_UP(width, TILE_LENGTH) * UDIV_UP(height, TILE_LENGTH);
+ 
+ 	for (int i = 0; i < n_tiles; ++i) {
+@@ -398,6 +404,13 @@ static void zrle_encoder_on_done(void* obj)
+ 	encoder_unref(&self->encoder);
+ }
+ 
++static uint16_t make_header(void)
++{
++	uint16_t head = 0x7800;
++	head += 31 - (head % 31);
++	return htons(head);
++}
++
+ struct encoder* zrle_encoder_new(void)
+ {
+ 	struct zrle_encoder* self = calloc(1, sizeof(*self));
+@@ -406,12 +419,16 @@ struct encoder* zrle_encoder_new(void)
+ 
+ 	encoder_init(&self->encoder, &encoder_impl_zrle);
+ 
+-	int rc = deflateInit2(&self->zs,
+-			/* compression level: */ 1,
+-			/*            method: */ Z_DEFLATED,
+-			/*       window bits: */ 15,
+-			/*         mem level: */ 9,
+-			/*          strategy: */ Z_DEFAULT_STRATEGY);
++	int level = 1;
++	int method = Z_DEFLATED;
++	int window_bits = -15;
++	int mem_level = 9;
++	int strategy = Z_DEFAULT_STRATEGY;
++
++	self->header = make_header();
++
++	int rc = deflateInit2(&self->zs, level, method, window_bits, mem_level,
++			strategy);
+ 	if (rc != Z_OK)
+ 		goto deflate_failure;
+ 

@@ -1,0 +1,138 @@
+From 41b74848b8ba5023c9cb08141ce34b1df9bb98c6 Mon Sep 17 00:00:00 2001
+From: Andri Yngvason <andri@yngvason.is>
+Date: Sat, 28 Dec 2024 20:06:54 +0000
+Subject: [PATCH] bench: zrle: Measure both CPU and real time
+
+---
+ bench/zrle-bench.c | 54 ++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 40 insertions(+), 14 deletions(-)
+
+diff --git a/bench/zrle-bench.c b/bench/zrle-bench.c
+index df9598c..55a5875 100644
+--- a/bench/zrle-bench.c
++++ b/bench/zrle-bench.c
+@@ -39,6 +39,11 @@ struct pair_count {
+ 	uint32_t count;
+ };
+ 
++struct stopwatch {
++	uint64_t cpu;
++	uint64_t real;
++};
++
+ static struct encoded_frame* encoded_frame;
+ 
+ static uint64_t gettime_us(clockid_t clock)
+@@ -48,6 +53,23 @@ static uint64_t gettime_us(clockid_t clock)
+ 	return ts.tv_sec * 1000000ULL + ts.tv_nsec / 1000ULL;
+ }
+ 
++static void stopwatch_start(struct stopwatch* self)
++{
++	self->real = gettime_us(CLOCK_MONOTONIC);
++	self->cpu = gettime_us(CLOCK_PROCESS_CPUTIME_ID);
++}
++
++static void stopwatch_stop(const struct stopwatch* self, const char* report)
++{
++	uint64_t real_stop = gettime_us(CLOCK_MONOTONIC);
++	uint64_t cpu_stop = gettime_us(CLOCK_PROCESS_CPUTIME_ID);
++	uint64_t dt_real = real_stop - self->real;
++	uint64_t dt_cpu = cpu_stop - self->cpu;
++	double cpu_util = (double)dt_cpu / dt_real;
++	printf("\t%s took %"PRIu64" µs with %.0f%% CPU utilisation\n", report,
++			dt_real, round(cpu_util * 100.0));
++}
++
+ #pragma GCC push_options
+ #pragma GCC optimize ("-O0")
+ static void memcpy_unoptimized(void* dst, const void* src, size_t len)
+@@ -172,6 +194,10 @@ static int run_benchmark(const char *image)
+ 	if (!fb)
+ 		return -1;
+ 
++	printf("%s:\n", image);
++
++	struct stopwatch stopwatch;
++
+ 	void *addr = nvnc_fb_get_addr(fb);
+ 	int width = nvnc_fb_get_width(fb);
+ 	int height = nvnc_fb_get_height(fb);
+@@ -188,55 +214,55 @@ static int run_benchmark(const char *image)
+ 	struct encoder* enc = encoder_new(RFB_ENCODING_ZRLE, width, height);
+ 	assert(enc);
+ 
++	encoder_set_quality(enc, 10);
++
+ 	enc->on_done = on_encoding_done;
+ 
+ 	encoder_set_output_format(enc, &pixfmt);
+ 
+-	void *dummy = malloc(stride * height * 4);
++	void* dummy = malloc(stride * height * 4);
+ 	if (!dummy)
+ 		goto failure;
+ 
+-	uint64_t start_time = gettime_us(CLOCK_PROCESS_CPUTIME_ID);
++	stopwatch_start(&stopwatch);
+ 
+ 	memcpy_unoptimized(dummy, addr, stride * height * 4);
+ 
+-	uint64_t end_time = gettime_us(CLOCK_PROCESS_CPUTIME_ID);
+-	printf("memcpy baseline for %s took %"PRIu64" µs\n", image,
+-			end_time - start_time);
++	stopwatch_stop(&stopwatch, "memcpy baseline");
+ 
+ 	free(dummy);
+ 
+-	start_time = gettime_us(CLOCK_PROCESS_CPUTIME_ID);
++	stopwatch_start(&stopwatch);
+ 	rc = encoder_encode(enc, fb, &region);
+ 
+ 	aml_run(aml_get_default());
+ 
+ 	assert(encoded_frame);
+ 
+-	end_time = gettime_us(CLOCK_PROCESS_CPUTIME_ID);
+-	printf("Encoding %s took %"PRIu64" µs\n", image,
+-			end_time - start_time);
++	stopwatch_stop(&stopwatch, "Encoding");
+ 
+ 	double orig_size = stride * height * 4;
+ 	double compressed_size = encoded_frame->buf.size;
+ 
+ 	double reduction = (orig_size - compressed_size) / orig_size;
+-	printf("Size reduction: %.1f %%\n", reduction * 100.0);
++	printf("\tSize reduction: %.1f%%\n", reduction * 100.0);
+ 
+ 	int n_unique_colours;
+ 	double entropy = calc_first_order_entropy(addr, orig_size / 4,
+ 			&n_unique_colours);
+ 	double entropy_reduction = 1.0 - entropy / 32.0;
+-	printf("Theoretical first order entropy coding reduction: %.1f %%. (%.1f bits / 32)\n",
++	printf("\tTheoretical first order entropy coding reduction: %.1f%%. (%.1f bits / 32)\n",
+ 			entropy_reduction * 100.0, entropy);
+ 
+ 	double second_entropy = calc_second_order_entropy(addr, orig_size / 4);
+ 	// A symbol pair is 64 bits long
+ 	double second_reduction = 1.0 - second_entropy / 64.0;
+-	printf("Theoretical second order entropy coding reduction: %.1f %%. (%.1f bits / 64)\n",
++	printf("\tTheoretical second order entropy coding reduction: %.1f%%. (%.1f bits / 64)\n",
+ 			second_reduction * 100.0, second_entropy);
+ 
+-	printf("Number of unique colours: %d\n", n_unique_colours);
++	printf("\tNumber of unique colours: %d\n", n_unique_colours);
++
++	printf("\n");
+ 
+ 	encoder_unref(enc);
+ 
+@@ -258,7 +284,7 @@ int main(int argc, char *argv[])
+ 	char *image = argv[1];
+ 
+ 	if (image)
+-		return run_benchmark(image) < 0 ? 1 :0;
++		return run_benchmark(image) < 0 ? 1 : 0;
+ 
+ 	struct aml* aml = aml_new();
+ 	aml_set_default(aml);

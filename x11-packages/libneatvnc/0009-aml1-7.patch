@@ -1,0 +1,305 @@
+From a701040581706a2abf3483ea68d19142cbd68bcf Mon Sep 17 00:00:00 2001
+From: Andri Yngvason <andri@yngvason.is>
+Date: Sat, 23 Nov 2024 11:36:06 +0000
+Subject: [PATCH] Add method to listen on multiple fds
+
+---
+ examples/draw.c       |   2 +-
+ examples/png-server.c |   2 +-
+ include/common.h      |  15 ++++--
+ include/neatvnc.h     |  14 ++++-
+ src/server.c          | 122 ++++++++++++++++++++++++++++++------------
+ 5 files changed, 116 insertions(+), 39 deletions(-)
+
+diff --git a/examples/draw.c b/examples/draw.c
+index 7fb8fe6f..13d5d099 100644
+--- a/examples/draw.c
++++ b/examples/draw.c
+@@ -340,7 +340,7 @@ int main(int argc, char* argv[])
+ 
+ 	aml_run(aml);
+ 
+-	nvnc_close(server);
++	nvnc_del(server);
+ 	nvnc_display_unref(draw.display);
+ 	nvnc_fb_pool_unref(draw.fb_pool);
+ 	pixman_image_unref(draw.whiteboard);
+diff --git a/examples/png-server.c b/examples/png-server.c
+index b8cc0150..e35a6f1d 100644
+--- a/examples/png-server.c
++++ b/examples/png-server.c
+@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
+ 
+ 	aml_run(aml);
+ 
+-	nvnc_close(server);
++	nvnc_del(server);
+ 	nvnc_display_unref(display);
+ 	nvnc_fb_unref(fb);
+ 	aml_unref(aml);
+diff --git a/include/common.h b/include/common.h
+index e0b87c28..14c0ed9b 100644
+--- a/include/common.h
++++ b/include/common.h
+@@ -157,12 +157,21 @@ enum nvnc__socket_type {
+ 	NVNC__SOCKET_FROM_FD,
+ };
+ 
++struct nvnc__socket {
++	struct nvnc* parent;
++	enum nvnc_stream_type type;
++	bool is_external;
++	int fd;
++	struct aml_handler* poll_handle;
++	LIST_ENTRY(nvnc__socket) link;
++};
++
++LIST_HEAD(nvnc__socket_list, nvnc__socket);
++
+ struct nvnc {
+ 	struct nvnc_common common;
+ 	bool is_closing;
+-	int fd;
+-	enum nvnc__socket_type socket_type;
+-	struct aml_handler* poll_handle;
++	struct nvnc__socket_list sockets;
+ 	struct nvnc_client_list clients;
+ 	char name[256];
+ 	void* userdata;
+diff --git a/include/neatvnc.h b/include/neatvnc.h
+index 78d9f97b..c9303a8f 100644
+--- a/include/neatvnc.h
++++ b/include/neatvnc.h
+@@ -74,6 +74,11 @@ enum nvnc_fb_type {
+ 	NVNC_FB_GBM_BO,
+ };
+ 
++enum nvnc_stream_type {
++	NVNC_STREAM_NORMAL = 0,
++	NVNC_STREAM_WEBSOCKET,
++};
++
+ /* This is the same as wl_output_transform */
+ enum nvnc_transform {
+ 	NVNC_TRANSFORM_NORMAL = 0,
+@@ -135,11 +140,18 @@ typedef bool (*nvnc_desktop_layout_fn)(
+ 
+ extern const char nvnc_version[];
+ 
++struct nvnc* nvnc_new(void);
++void nvnc_del(struct nvnc* self);
++
++int nvnc_listen(struct nvnc* self, int fd, enum nvnc_stream_type type);
++
+ struct nvnc* nvnc_open(const char* addr, uint16_t port);
+ struct nvnc* nvnc_open_unix(const char *addr);
+ struct nvnc* nvnc_open_websocket(const char* addr, uint16_t port);
+ struct nvnc* nvnc_open_from_fd(int fd);
+-void nvnc_close(struct nvnc* self);
++
++void nvnc_close(struct nvnc* self)
++	__attribute__((deprecated("replaced with nvnc_del")));
+ 
+ void nvnc_add_display(struct nvnc*, struct nvnc_display*);
+ void nvnc_remove_display(struct nvnc*, struct nvnc_display*);
+diff --git a/src/server.c b/src/server.c
+index b94ed0d0..ded2dab6 100644
+--- a/src/server.c
++++ b/src/server.c
+@@ -1981,7 +1981,9 @@ static void on_client_event(struct stream* stream, enum stream_event event)
+ 
+ static void on_connection(void* obj)
+ {
+-	struct nvnc* server = aml_get_userdata(obj);
++	struct aml_handler* poll_handle = obj;
++	struct nvnc__socket* socket = aml_get_userdata(poll_handle);
++	struct nvnc* server = socket->parent;
+ 
+ 	struct nvnc_client* client = calloc(1, sizeof(*client));
+ 	if (!client)
+@@ -2002,7 +2004,7 @@ static void on_connection(void* obj)
+ 	client->ext_clipboard_max_unsolicited_text_size =
+ 		MAX_CLIENT_UNSOLICITED_TEXT_SIZE;
+ 
+-	int fd = accept(server->fd, NULL, 0);
++	int fd = accept(socket->fd, NULL, 0);
+ 	if (fd < 0) {
+ 		nvnc_log(NVNC_LOG_WARNING, "Failed to accept a connection");
+ 		goto accept_failure;
+@@ -2012,7 +2014,7 @@ static void on_connection(void* obj)
+ 	setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
+ 
+ #ifdef ENABLE_WEBSOCKET
+-	if (server->socket_type == NVNC__SOCKET_WEBSOCKET)
++	if (socket->type == NVNC_STREAM_WEBSOCKET)
+ 	{
+ 		client->net_stream = stream_ws_new(fd, on_client_event, client);
+ 	}
+@@ -2182,44 +2184,60 @@ static int bind_address(const char* name, uint16_t port,
+ 	return -1;
+ }
+ 
+-static struct nvnc* open_common(const char* address, uint16_t port,
+-		int fd, enum nvnc__socket_type type)
++static struct nvnc__socket* nvnc__listen(struct nvnc* self, int fd,
++		enum nvnc_stream_type type)
+ {
+-	nvnc__log_init();
++	struct nvnc__socket* socket = calloc(1, sizeof(*self));
++	if (!socket)
++		return NULL;
+ 
+-	aml_require_workers(aml_get_default(), -1);
++	if (listen(fd, 16) < 0)
++		goto failure;
+ 
+-	struct nvnc* self = calloc(1, sizeof(*self));
+-	if (!self)
+-		return NULL;
++	socket->parent = self;
++	socket->type = type;
++	socket->fd = fd;
++	socket->is_external = true;
+ 
+-	self->socket_type = type;
++	socket->poll_handle = aml_handler_new(fd, on_connection, socket, NULL);
++	if (!socket->poll_handle) {
++		goto failure;
++	}
+ 
+-	strcpy(self->name, DEFAULT_NAME);
++	aml_start(aml_get_default(), socket->poll_handle);
+ 
+-	LIST_INIT(&self->clients);
++	LIST_INSERT_HEAD(&self->sockets, socket, link);
++	return socket;
+ 
+-	self->fd = bind_address(address, port, fd, type);
+-	if (self->fd < 0)
++failure:
++	free(socket);
++	return NULL;
++}
++
++static struct nvnc* open_common(const char* address, uint16_t port,
++		int fd, enum nvnc__socket_type type)
++{
++	struct nvnc* self = nvnc_new();
++	if (!self)
++		return NULL;
++
++	int bound_fd = bind_address(address, port, fd, type);
++	if (bound_fd < 0)
+ 		goto bind_failure;
+ 
+-	if (listen(self->fd, 16) < 0)
+-		goto listen_failure;
++	enum nvnc_stream_type stream_type = type == NVNC__SOCKET_WEBSOCKET ?
++		NVNC_STREAM_WEBSOCKET : NVNC_STREAM_NORMAL;
+ 
+-	self->poll_handle = aml_handler_new(self->fd, on_connection, self, NULL);
+-	if (!self->poll_handle)
+-		goto handle_failure;
++	struct nvnc__socket* socket = nvnc__listen(self, bound_fd, stream_type);
++	if (!socket)
++		goto listen_failure;
+ 
+-	if (aml_start(aml_get_default(), self->poll_handle) < 0)
+-		goto poll_start_failure;
++	socket->is_external = type == NVNC__SOCKET_FROM_FD;
+ 
+ 	return self;
+ 
+-poll_start_failure:
+-	aml_unref(self->poll_handle);
+-handle_failure:
+ listen_failure:
+-	close(self->fd);
++	close(bound_fd);
+ 	if (type == NVNC__SOCKET_UNIX) {
+ 		unlink(address);
+ 	}
+@@ -2229,6 +2247,31 @@ static struct nvnc* open_common(const char* address, uint16_t port,
+ 	return NULL;
+ }
+ 
++EXPORT
++struct nvnc* nvnc_new(void)
++{
++	nvnc__log_init();
++	aml_require_workers(aml_get_default(), -1);
++
++	struct nvnc* self = calloc(1, sizeof(*self));
++	if (!self)
++		return NULL;
++
++	strcpy(self->name, DEFAULT_NAME);
++
++	LIST_INIT(&self->sockets);
++	LIST_INIT(&self->clients);
++
++	return self;
++}
++
++EXPORT
++int nvnc_listen(struct nvnc* self, int fd, enum nvnc_stream_type type)
++{
++	struct nvnc__socket* socket = nvnc__listen(self, fd, type);
++	return socket ? 0 : -1;
++}
++
+ EXPORT
+ struct nvnc* nvnc_open(const char* address, uint16_t port)
+ {
+@@ -2270,7 +2313,7 @@ static void unlink_fd_path(int fd)
+ }
+ 
+ EXPORT
+-void nvnc_close(struct nvnc* self)
++void nvnc_del(struct nvnc* self)
+ {
+ 	self->is_closing = true;
+ 
+@@ -2293,12 +2336,20 @@ void nvnc_close(struct nvnc* self)
+ 	while (!LIST_EMPTY(&self->clients))
+ 		client_close(LIST_FIRST(&self->clients));
+ 
+-	aml_stop(aml_get_default(), self->poll_handle);
+-	// Do not unlink an externally managed fd.
+-	if(self->socket_type != NVNC__SOCKET_FROM_FD) {
+-		unlink_fd_path(self->fd);
++	while (!LIST_EMPTY(&self->sockets)) {
++		struct nvnc__socket* socket = LIST_FIRST(&self->sockets);
++		LIST_REMOVE(socket, link);
++
++		aml_stop(aml_get_default(), socket->poll_handle);
++		aml_unref(socket->poll_handle);
++
++		if (!socket->is_external) {
++			unlink_fd_path(socket->fd);
++		}
++		close(socket->fd);
++
++		free(socket);
+ 	}
+-	close(self->fd);
+ 
+ #ifdef HAVE_CRYPTO
+ 	crypto_rsa_priv_key_del(self->rsa_priv);
+@@ -2314,10 +2365,15 @@ void nvnc_close(struct nvnc* self)
+ 
+ 	free(self->ext_clipboard_provide_msg.buffer);
+ 
+-	aml_unref(self->poll_handle);
+ 	free(self);
+ }
+ 
++EXPORT
++void nvnc_close(struct nvnc* self)
++{
++	nvnc_del(self);
++}
++
+ static void process_pending_fence(struct nvnc_client* client)
+ {
+ 	if (client->pending_fence.n_pending_requests == 0) {

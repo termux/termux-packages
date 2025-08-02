@@ -1,0 +1,293 @@
+From a4b238241f3f3016ef3ddcd260c1490a9c9e8168 Mon Sep 17 00:00:00 2001
+From: Andri Yngvason <andri@yngvason.is>
+Date: Sun, 23 Mar 2025 15:55:11 +0000
+Subject: [PATCH] Use aml v1
+
+---
+ meson.build                 |  2 +-
+ src/enc/h264/ffmpeg-impl.c  |  8 ++++----
+ src/enc/h264/v4l2m2m-impl.c |  4 ++--
+ src/enc/raw.c               |  8 ++++----
+ src/enc/tight.c             | 18 +++++++++---------
+ src/enc/zrle.c              |  8 ++++----
+ src/parallel-deflate.c      |  3 +--
+ src/resampler.c             |  7 ++-----
+ src/server.c                |  6 ++----
+ src/stream/gnutls.c         |  6 +++---
+ src/stream/tcp.c            |  6 +++---
+ 11 files changed, 35 insertions(+), 41 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 1017ffd7..e7318860 100644
+--- a/meson.build
++++ b/meson.build
+@@ -71,7 +71,7 @@ libavcodec = dependency('libavcodec', required: get_option('h264'))
+ libavfilter = dependency('libavfilter', required: get_option('h264'))
+ libavutil = dependency('libavutil', required: get_option('h264'))
+ 
+-aml_version = ['>=0.3.0', '<0.4.0']
++aml_version = ['>=1.0.0', '<2.0.0']
+ aml_project = subproject('aml', required: false, version: aml_version)
+ if aml_project.found()
+ 	aml = aml_project.get_variable('aml_dep')
+diff --git a/src/enc/h264/ffmpeg-impl.c b/src/enc/h264/ffmpeg-impl.c
+index 3bd584cf..148b1c35 100644
+--- a/src/enc/h264/ffmpeg-impl.c
++++ b/src/enc/h264/ffmpeg-impl.c
+@@ -415,9 +415,9 @@ static int h264_encoder__encode(struct h264_encoder_ffmpeg* self,
+ 	return rc == AVERROR(EAGAIN) ? 0 : rc;
+ }
+ 
+-static void h264_encoder__do_work(void* handle)
++static void h264_encoder__do_work(struct aml_work* work)
+ {
+-	struct h264_encoder_ffmpeg* self = aml_get_userdata(handle);
++	struct h264_encoder_ffmpeg* self = aml_get_userdata(work);
+ 
+ 	AVFrame* frame = fb_to_avframe(self->current_fb);
+ 	assert(frame); // TODO
+@@ -453,9 +453,9 @@ static void h264_encoder__do_work(void* handle)
+ 	av_frame_free(&frame);
+ }
+ 
+-static void h264_encoder__on_work_done(void* handle)
++static void h264_encoder__on_work_done(struct aml_work* work)
+ {
+-	struct h264_encoder_ffmpeg* self = aml_get_userdata(handle);
++	struct h264_encoder_ffmpeg* self = aml_get_userdata(work);
+ 
+ 	uint64_t pts = nvnc_fb_get_pts(self->current_fb);
+ 	nvnc_fb_release(self->current_fb);
+diff --git a/src/enc/h264/v4l2m2m-impl.c b/src/enc/h264/v4l2m2m-impl.c
+index b9d1236f..d2869322 100644
+--- a/src/enc/h264/v4l2m2m-impl.c
++++ b/src/enc/h264/v4l2m2m-impl.c
+@@ -511,9 +511,9 @@ static void encode_buffer(struct h264_encoder_v4l2m2m* self,
+ 	}
+ }
+ 
+-static void process_fd_events(void* handle)
++static void process_fd_events(struct aml_handler* handler)
+ {
+-	struct h264_encoder_v4l2m2m* self = aml_get_userdata(handle);
++	struct h264_encoder_v4l2m2m* self = aml_get_userdata(handler);
+ 	process_dst_bufs(self);
+ }
+ 
+diff --git a/src/enc/raw.c b/src/enc/raw.c
+index 806f0743..2bc83026 100644
+--- a/src/enc/raw.c
++++ b/src/enc/raw.c
+@@ -126,9 +126,9 @@ static int raw_encode_frame(struct raw_encoder_work* ctx, struct vec* dst,
+ 	return 0;
+ }
+ 
+-static void raw_encoder_do_work(void* obj)
++static void raw_encoder_do_work(struct aml_work* work)
+ {
+-	struct raw_encoder_work* ctx = aml_get_userdata(obj);
++	struct raw_encoder_work* ctx = aml_get_userdata(work);
+ 	int rc __attribute__((unused));
+ 
+ 	struct nvnc_fb* fb = ctx->fb;
+@@ -163,9 +163,9 @@ static void raw_encoder_do_work(void* obj)
+ 	assert(ctx->result);
+ }
+ 
+-static void raw_encoder_on_done(void* obj)
++static void raw_encoder_on_done(struct aml_work* work)
+ {
+-	struct raw_encoder_work* ctx = aml_get_userdata(obj);
++	struct raw_encoder_work* ctx = aml_get_userdata(work);
+ 	struct raw_encoder* self = ctx->parent;
+ 
+ 	assert(ctx->result);
+diff --git a/src/enc/tight.c b/src/enc/tight.c
+index a3619742..441df19d 100644
+--- a/src/enc/tight.c
++++ b/src/enc/tight.c
+@@ -106,8 +106,8 @@ struct tight_zs_worker_ctx {
+ 
+ struct encoder_impl encoder_impl_tight;
+ 
+-static void do_tight_zs_work(void*);
+-static void on_tight_zs_work_done(void*);
++static void do_tight_zs_work(struct aml_work*);
++static void on_tight_zs_work_done(struct aml_work*);
+ static int schedule_tight_finish(struct tight_encoder* self);
+ 
+ static inline struct tight_encoder* tight_encoder(struct encoder* encoder)
+@@ -428,9 +428,9 @@ static void tight_encode_tile(struct tight_encoder* self,
+ 	tile->state = TIGHT_TILE_ENCODED;
+ }
+ 
+-static void do_tight_zs_work(void* obj)
++static void do_tight_zs_work(struct aml_work* work)
+ {
+-	struct tight_zs_worker_ctx* ctx = aml_get_userdata(obj);
++	struct tight_zs_worker_ctx* ctx = aml_get_userdata(work);
+ 	struct tight_encoder* self = ctx->encoder;
+ 	int index = ctx->index;
+ 
+@@ -440,7 +440,7 @@ static void do_tight_zs_work(void* obj)
+ 				tight_encode_tile(self, x, y);
+ }
+ 
+-static void on_tight_zs_work_done(void* obj)
++static void on_tight_zs_work_done(struct aml_work* obj)
+ {
+ 	struct tight_zs_worker_ctx* ctx = aml_get_userdata(obj);
+ 	struct tight_encoder* self = ctx->encoder;
+@@ -509,15 +509,15 @@ static void tight_finish(struct tight_encoder* self)
+ 				tight_finish_tile(self, x, y);
+ }
+ 
+-static void do_tight_finish(void* obj)
++static void do_tight_finish(struct aml_work* work)
+ {
+-	struct tight_encoder* self = aml_get_userdata(obj);
++	struct tight_encoder* self = aml_get_userdata(work);
+ 	tight_finish(self);
+ }
+ 
+-static void on_tight_finished(void* obj)
++static void on_tight_finished(struct aml_work* work)
+ {
+-	struct tight_encoder* self = aml_get_userdata(obj);
++	struct tight_encoder* self = aml_get_userdata(work);
+ 
+ 	struct encoded_frame* result;
+ 	result = encoded_frame_new(self->dst.data, self->dst.len, self->n_rects,
+diff --git a/src/enc/zrle.c b/src/enc/zrle.c
+index 42044dc0..e775f34f 100644
+--- a/src/enc/zrle.c
++++ b/src/enc/zrle.c
+@@ -315,9 +315,9 @@ static int zrle_encode_frame(struct zrle_encoder* self,
+ 	return 0;
+ }
+ 
+-static void zrle_encoder_do_work(void* obj)
++static void zrle_encoder_do_work(struct aml_work* work)
+ {
+-	struct zrle_encoder* self = aml_get_userdata(obj);
++	struct zrle_encoder* self = aml_get_userdata(work);
+ 	int rc __attribute__((unused));
+ 
+ 	struct nvnc_fb* fb = self->current_fb;
+@@ -349,9 +349,9 @@ static void zrle_encoder_do_work(void* obj)
+ 	assert(self->current_result);
+ }
+ 
+-static void zrle_encoder_on_done(void* obj)
++static void zrle_encoder_on_done(struct aml_work* work)
+ {
+-	struct zrle_encoder* self = aml_get_userdata(obj);
++	struct zrle_encoder* self = aml_get_userdata(work);
+ 
+ 	assert(self->current_result);
+ 
+diff --git a/src/parallel-deflate.c b/src/parallel-deflate.c
+index dc20843a..419a6412 100644
+--- a/src/parallel-deflate.c
++++ b/src/parallel-deflate.c
+@@ -172,9 +172,8 @@ static bool consolidate_complete_chunk_segments(struct parallel_deflate* self,
+ 	return have_end_chunk;
+ }
+ 
+-static void do_work(void* obj)
++static void do_work(struct aml_work* work)
+ {
+-	struct aml_work* work = obj;
+ 	struct deflate_job* job = aml_get_userdata(work);
+ 	struct parallel_deflate* self = job->parent;
+ 
+diff --git a/src/resampler.c b/src/resampler.c
+index e24798b5..8f4cfa0e 100644
+--- a/src/resampler.c
++++ b/src/resampler.c
+@@ -147,9 +147,8 @@ void resample_now(struct nvnc_fb* dst, struct nvnc_fb* src,
+ 	pixman_image_unref(dstimg);
+ }
+ 
+-static void do_work(void* handle)
++static void do_work(struct aml_work* work)
+ {
+-	struct aml_work* work = handle;
+ 	struct resampler_work* ctx = aml_get_userdata(work);
+ 
+ 	struct nvnc_fb* src = ctx->src;
+@@ -159,11 +158,9 @@ static void do_work(void* handle)
+ 	resample_now(dst, src, &dst_side_data->buffer_damage);
+ }
+ 
+-static void on_work_done(void* handle)
++static void on_work_done(struct aml_work* work)
+ {
+-	struct aml_work* work = handle;
+ 	struct resampler_work* ctx = aml_get_userdata(work);
+-
+ 	ctx->on_done(ctx->dst, &ctx->frame_damage, ctx->userdata);
+ }
+ 
+diff --git a/src/server.c b/src/server.c
+index f1726584..61da4dda 100644
+--- a/src/server.c
++++ b/src/server.c
+@@ -210,9 +210,8 @@ static void client_close(struct nvnc_client* client)
+ 	free(client);
+ }
+ 
+-static void do_deferred_client_close(void* obj)
++static void do_deferred_client_close(struct aml_idle* idle)
+ {
+-	struct aml_idle* idle = obj;
+ 	struct nvnc_client* client = aml_get_userdata(idle);
+ 	client->close_task = NULL;
+ 	aml_stop(aml_get_default(), idle);
+@@ -2033,9 +2032,8 @@ static void on_client_event(struct stream* stream, enum stream_event event)
+ 	client->buffer_index = 0;
+ }
+ 
+-static void on_connection(void* obj)
++static void on_connection(struct aml_handler* poll_handle)
+ {
+-	struct aml_handler* poll_handle = obj;
+ 	struct nvnc__socket* socket = aml_get_userdata(poll_handle);
+ 	struct nvnc* server = socket->parent;
+ 
+diff --git a/src/stream/gnutls.c b/src/stream/gnutls.c
+index 14661e5c..00a7c13a 100644
+--- a/src/stream/gnutls.c
++++ b/src/stream/gnutls.c
+@@ -171,10 +171,10 @@ static void stream_gnutls__on_writable(struct stream* self)
+ 	}
+ }
+ 
+-static void stream_gnutls__on_event(void* obj)
++static void stream_gnutls__on_event(struct aml_handler* handler)
+ {
+-	struct stream* self = aml_get_userdata(obj);
+-	uint32_t events = aml_get_revents(obj);
++	struct stream* self = aml_get_userdata(handler);
++	uint32_t events = aml_get_revents(handler);
+ 
+ 	stream_ref(self);
+ 
+diff --git a/src/stream/tcp.c b/src/stream/tcp.c
+index 37f139ab..95f5aa86 100644
+--- a/src/stream/tcp.c
++++ b/src/stream/tcp.c
+@@ -191,10 +191,10 @@ static void stream_tcp__on_writable(struct stream* self)
+ 	}
+ }
+ 
+-static void stream_tcp__on_event(void* obj)
++static void stream_tcp__on_event(struct aml_handler* handler)
+ {
+-	struct stream* self = aml_get_userdata(obj);
+-	uint32_t events = aml_get_revents(obj);
++	struct stream* self = aml_get_userdata(handler);
++	uint32_t events = aml_get_revents(handler);
+ 
+ 	// We hold a reference here in case the stream gets destroyed inside
+ 	// callback.
