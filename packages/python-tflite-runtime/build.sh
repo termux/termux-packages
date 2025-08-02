@@ -3,20 +3,22 @@ TERMUX_PKG_DESCRIPTION="TensorFlow Lite Python bindings"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.19.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/tensorflow/tensorflow
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="python, python-numpy, python-pip"
+TERMUX_PKG_DEPENDS="python, python-numpy"
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 TERMUX_PKG_PYTHON_COMMON_DEPS="setuptools, wheel, pybind11"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_POLICY_VERSION_MINIMUM=3.5
 -DTFLITE_HOST_TOOLS_DIR=$TERMUX_PKG_HOSTBUILD_DIR
 "
 
 termux_step_host_build() {
 	termux_setup_cmake
 
-	cmake "$TERMUX_PKG_SRCDIR"/tensorflow/lite
+	cmake "$TERMUX_PKG_SRCDIR"/tensorflow/lite -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 	cmake --build . --verbose -j $TERMUX_PKG_MAKE_PROCESSES -t flatbuffers-flatc
 }
 
@@ -34,7 +36,7 @@ termux_step_pre_configure() {
 	local BUILD_DIR="$TFLITE_BUILD_DIR"
 	local PYTHON="$(command -v python)"
 	local PYBIND11_INCLUDE=$($PYTHON -c "import pybind11; print (pybind11.get_include())")
-	CPPFLAGS+=" -I$PYTHON_SITE_PKG/numpy/_core/include"
+	CPPFLAGS+=" -I$TERMUX_PYTHON_HOME/site-packages/numpy/_core/include"
 	CPPFLAGS+=" -I$PYBIND11_INCLUDE"
 	CPPFLAGS+=" -I$TERMUX_PREFIX/include/python$TERMUX_PYTHON_VERSION"
 
@@ -74,5 +76,5 @@ termux_step_make() {
 termux_step_make_install() {
 	local _pyver="${TERMUX_PYTHON_VERSION//./}"
 	local _wheel="tflite_runtime-${TERMUX_PKG_VERSION}-cp${_pyver}-cp${_pyver}-linux_${TERMUX_ARCH}.whl"
-	pip install --no-deps --prefix="$TERMUX_PREFIX" "$TFLITE_BUILD_DIR/dist/${_wheel}"
+	pip install --force-reinstall --no-deps --prefix="$TERMUX_PREFIX" "$TFLITE_BUILD_DIR/dist/${_wheel}"
 }
