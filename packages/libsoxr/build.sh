@@ -8,6 +8,9 @@ TERMUX_PKG_SRCURL=https://sourceforge.net/projects/soxr/files/soxr-$TERMUX_PKG_V
 TERMUX_PKG_SHA256=b111c15fdc8c029989330ff559184198c161100a59312f5dc19ddeb9b5a15889
 TERMUX_PKG_BREAKS="libsoxr-dev"
 TERMUX_PKG_REPLACES="libsoxr-dev"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_POLICY_VERSION_MINIMUM=3.5
+"
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -fopenmp -static-openmp"

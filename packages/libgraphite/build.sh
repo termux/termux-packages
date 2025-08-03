@@ -11,6 +11,9 @@ TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BREAKS="libgraphite-dev"
 TERMUX_PKG_REPLACES="libgraphite-dev"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/gr2fonttest"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_POLICY_VERSION_MINIMUM=3.5
+"
 
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
