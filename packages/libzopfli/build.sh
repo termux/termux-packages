@@ -11,7 +11,10 @@ TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BREAKS="libzopfli-dev"
 TERMUX_PKG_REPLACES="libzopfli-dev"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DZOPFLI_BUILD_SHARED=ON"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_POLICY_VERSION_MINIMUM=3.5
+-DZOPFLI_BUILD_SHARED=ON
+"
 
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
