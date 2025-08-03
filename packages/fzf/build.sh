@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://junegunn.github.io/fzf/
 TERMUX_PKG_DESCRIPTION="Command-line fuzzy finder"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.65.0"
+TERMUX_PKG_VERSION="0.65.1"
 TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=766e989220453f4b7753a4e99732da5e8550ae3184b3580ffd0c957cabd557b0
+TERMUX_PKG_SHA256=82fa35dc3ba5d716db26a507f90bb0e724f586123c28ad3fb376bd8384669abf
 TERMUX_PKG_AUTO_UPDATE=true
 
 # Depend on findutils as fzf uses the -fstype option, which busybox
