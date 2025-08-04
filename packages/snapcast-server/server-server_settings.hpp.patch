@@ -1,11 +1,20 @@
 --- a/server/server_settings.hpp
 +++ b/server/server_settings.hpp
-@@ -27,7 +27,7 @@
-     struct Server
-     {
+@@ -40,7 +40,7 @@
+         /// Number of worker threads
          int threads{-1};
+         /// PID file, if running as daemon
 -        std::string pid_file{"/var/run/snapserver/pid"};
 +        std::string pid_file{"@TERMUX_PREFIX@/var/run/snapserver/pid"};
+         /// User when running as deaemon
          std::string user{"snapserver"};
-         std::string group{""};
-         std::string data_dir{""};
+         /// Group when running as deaemon
+@@ -194,7 +194,7 @@
+         /// Audio streaming port
+         size_t port{1704};
+         /// Directory for stream plugins
+-        std::filesystem::path plugin_dir{"/usr/share/snapserver/plug-ins"};
++        std::filesystem::path plugin_dir{"@TERMUX_PREFIX@/share/snapserver/plug-ins"};
+         /// Stream sources
+         std::vector<std::string> sources;
+         /// Default codec
