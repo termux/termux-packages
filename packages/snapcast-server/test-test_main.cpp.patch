@@ -1,9 +1,9 @@
---- a/test/test_main.cpp	2022-04-15 02:22:36.962384329 +0530
-+++ b/test/test_main.cpp	2022-04-15 02:41:15.916963051 +0530
-@@ -41,9 +41,9 @@
+--- a/test/test_main.cpp
++++ b/test/test_main.cpp
+@@ -241,9 +241,9 @@
+ 
+ TEST_CASE("Uri")
  {
-     AixLog::Log::init<AixLog::SinkCout>(AixLog::Severity::debug);
-     using namespace streamreader;
 -    StreamUri uri("pipe:///tmp/snapfifo?name=default&codec=flac");
 +    StreamUri uri("pipe://@TERMUX_PREFIX@/tmp/snapfifo?name=default&codec=flac");
      REQUIRE(uri.scheme == "pipe");
@@ -11,4 +11,4 @@
 +    REQUIRE(uri.path == "@TERMUX_PREFIX@/tmp/snapfifo");
      REQUIRE(uri.host.empty());
  
-     // uri = StreamUri("scheme:[//host[:port]][/]path[?query=none][#fragment]");
+     uri = StreamUri("wss://user:pass@localhost:1788");
