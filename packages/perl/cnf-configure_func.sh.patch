@@ -1,9 +1,20 @@
 With unified headers "vprintf(NULL,0)" fails to compile with clang
 since the second argument should be a va_list.
 
+fdopendir hunk was found in NixOS:
+https://github.com/uninsane/nixpkgs/blob/08ec49176338642030bdb2ebcaa18d5057271246/pkgs/development/interpreters/perl/cross-fdopendir.patch
+
 diff -u -r ../src-orig/cnf/configure_func.sh ./cnf/configure_func.sh
 --- ../src-orig/cnf/configure_func.sh	2017-06-28 11:41:43.391383248 +0200
 +++ ./cnf/configure_func.sh	2017-06-28 11:42:10.055083970 +0200
+@@ -83,6 +83,7 @@ checkfunc d_fchmodat 'fchmodat' "0,NULL,0,0" 'unistd.h sys/stat.h'
+ checkfunc d_fchown 'fchown' "0,0,0" 'unistd.h'
+ checkfunc d_fcntl 'fcntl' "0,0" 'unistd.h fcntl.h'
+ checkfunc d_fdclose 'fdclose' "NULL,NULL" 'stdio.h'
++checkfunc d_fdopendir 'fdopendir' "0" 'dirent.h'
+ checkfunc d_ffs 'ffs' "0" 'strings.h'
+ checkfunc d_ffsl 'ffsl' "0" 'strings.h'
+ checkfunc d_fgetpos 'fgetpos' "NULL, 0" 'stdio.h'
 @@ -300,8 +300,8 @@
  checkfunc d_usleep 'usleep' '0' 'unistd.h'
  checkfunc d_ustat 'ustat' '0,NULL' 'sys/types.h unistd.h'
