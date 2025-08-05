@@ -13,8 +13,33 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 termux_step_pre_configure() {
+	termux_setup_cmake
+	termux_setup_ninja
 	termux_setup_rust
 	export OPENSSL_NO_VENDOR=1
+
+	export TARGET_CMAKE_GENERATOR="Ninja"
+
+	# Setup subsequent cmake running inside cargo
+	# Crate used to invoke cmake does not work fine with cross-compilation so we wrap cmake
+	_CMAKE="$TERMUX_PKG_TMPDIR/bin/cmake"
+	mkdir -p "$(dirname "$_CMAKE")"
+
+	echo "#!$(readlink /proc/$$/exe)" > "$_CMAKE"
+	echo "echo CMAKE \"\$@\"" >> "$_CMAKE"
+	echo "[[ \"\$@\" =~ \"--build\" ]] && exec $(command -v cmake) \"\$@\" || \
+	exec $(command -v cmake) \
+	-DCMAKE_ANDROID_STANDALONE_TOOLCHAIN=\"$TERMUX_STANDALONE_TOOLCHAIN\" \
+	-DCMAKE_SYSTEM_NAME=Android \
+	-DCMAKE_SYSTEM_VERSION=$TERMUX_PKG_API_LEVEL \
+	-DCMAKE_LINKER=\"$TERMUX_STANDALONE_TOOLCHAIN/bin/$LD\" \
+	-DCMAKE_MAKE_PROGRAM=\"$(command -v ninja)\" \"\$@\"" >> "$_CMAKE"
+	chmod +x "$_CMAKE"
+
+	export PATH="$(dirname "$_CMAKE"):$PATH"
+	CXXFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
+	CFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
+	LDFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
 }
 
 termux_step_make() {
