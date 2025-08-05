@@ -3,10 +3,11 @@ TERMUX_PKG_DESCRIPTION="Little git extras."
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="7.4.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/tj/git-extras/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=aaab3bab18709ec6825a875961e18a00e0c7d8214c39d6e3a63aeb99fa11c56e
 TERMUX_PKG_DEPENDS="bash, git, util-linux, gawk, findutils, ncurses-utils"
-TERMUX_PKG_RECOMENDS="curl, procps, rsync"
+TERMUX_PKG_RECOMMENDS="curl, procps, rsync"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
