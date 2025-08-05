@@ -1,0 +1,15 @@
+Fix `error: ignoring return value of function declared with 'warn_unused_result' attribute [-Werror,-Wunused-result]`
+---
+
+diff -uNr a/src/tclsqlite.c b/src/tclsqlite.c
+--- a/src/tclsqlite.c
++++ b/src/tclsqlite.c
+@@ -4114,7 +4114,7 @@
+       fprintf(stderr,
+           "attach debugger to process %d and press any key to continue.\n",
+           GETPID());
+-      fgetc(stdin);
++      (void)fgetc(stdin);
+     }else{
+ #if defined(_WIN32) || defined(WIN32)
+       DebugBreak();
