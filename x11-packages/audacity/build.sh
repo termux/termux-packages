@@ -2,13 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://www.audacityteam.org/
 TERMUX_PKG_DESCRIPTION="An easy-to-use, multi-track audio editor and recorder"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.7.4"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="3.7.5"
 _FFMPEG_VERSION=7.1.1
 TERMUX_PKG_SRCURL=(https://github.com/audacity/audacity/archive/Audacity-${TERMUX_PKG_VERSION}.tar.gz
                    https://www.ffmpeg.org/releases/ffmpeg-${_FFMPEG_VERSION}.tar.xz)
 TERMUX_PKG_SHA256=(
-	76d0867bb852bbaa3dff834804b0abf8208a763461187f0ae2a0d5a3ddf31df7
+	2520d9ff2e8f7d69d62e033b167eb6c53d1db89e89876689545769a2f8ef72ac
 	733984395e0dbbe5c046abda2dc49a5544e7e0e1e2366bba849222ae9e3a03b1
 )
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libc++, libexpat, libflac, libid3tag, libogg, libopus, libsndfile, libsoundtouch, libsoxr, libuuid, libvorbis, libwavpack, libmpg123, opusfile, portaudio, portmidi, wxwidgets"
