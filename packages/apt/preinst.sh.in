@@ -1,0 +1,27 @@
+#!@TERMUX_PREFIX@/bin/bash
+# shellcheck shell=bash
+
+if [[ "$1" == "install" || "$1" == "upgrade" && "$#" -ge 2 ]]; then
+	if [[ -f "@TERMUX_PREFIX@/etc/apt/@LEGACY_SOURCES@" ]]; then
+		echo
+		echo "================================"
+		echo "Legacy repo file found for '@REPO@' repository."
+		echo "The legacy '@LEGACY_SOURCES@' entry will be migrated"
+		echo "to 'sources.list.d/@REPO@.sources' as part of the update."
+		mv -vf \
+			'@TERMUX_PREFIX@/etc/apt/@LEGACY_SOURCES@' \
+			'@TERMUX_PREFIX@/etc/apt/@LEGACY_SOURCES@.bak'
+		echo "A backup copy of the old '@LEGACY_SOURCES@' apt sources config file"
+		echo "has been saved to '@TERMUX_PREFIX@/etc/apt/@LEGACY_SOURCES@.bak'"
+		echo "================================"
+		echo
+		echo "Press any key to acknowledge this."
+		echo "The update will proceed automatically in 10 seconds."
+		read -rt 10 -n 1 _ || : &> /dev/null
+		# Since be only read 1 byte above we need to flush
+		# the input to not accidentally auto-skip further reads
+		# e.g if a user presses the down arrow `^[[B` (3 bytes) to skip.
+		read -rt 0 _ || : &> /dev/null
+		echo
+	fi
+fi
