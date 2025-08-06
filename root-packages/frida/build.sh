@@ -6,6 +6,7 @@ _MAJOR_VERSION=17
 _MINOR_VERSION=2
 _MICRO_VERSION=14
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}.${_MICRO_VERSION}
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_SRCURL=git+https://github.com/frida/frida
 TERMUX_PKG_AUTO_UPDATE=false
@@ -44,6 +45,13 @@ termux_step_pre_configure() {
 	termux_setup_nodejs
 	export PATH="$TERMUX_PKG_HOSTBUILD_DIR":"$PATH"
 	export ANDROID_NDK_ROOT="${NDK}"
+
+	local patch="${TERMUX_PKG_BUILDER_DIR}/ndk-version-and-api-level.diff"
+	echo "Applying patch: $(basename $patch)"
+	test -f "$patch" && sed \
+		-e "s%\@TERMUX_PKG_API_LEVEL\@%${TERMUX_PKG_API_LEVEL}%g" \
+		-e "s%\@TERMUX_NDK_VERSION_NUM\@%${TERMUX_NDK_VERSION_NUM}%g" \
+		"$patch" | patch --silent -p1 -d "${TERMUX_PKG_SRCDIR}"
 
 	# allows repeated builds of frida by removing some files of
 	# the previously-installed build of frida from $TERMUX_PREFIX
