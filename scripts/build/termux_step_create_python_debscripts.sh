@@ -65,8 +65,20 @@ termux_step_create_python_debscripts() {
 	if [[ -n "${_package_python_deps}" ]]; then
 		local pip_package_name="python-pip" upgrade_flag="--upgrade"
 
+		# ensure that pip is added as a runtime-only dependency to all, and only to all
+		# packages that run the '$PREFIX/bin/pip' command.
 		if [[ "$TERMUX_PACKAGE_LIBRARY" == "glibc" ]]; then
 			pip_package_name+="-glibc"
+		fi
+		local pip_dependency_string="$pip_package_name"
+		if [[ -n "${SUB_PKG_NAME-}" && -n "${TERMUX_SUBPKG_DEPENDS}" ]] || \
+			[[ -z "${SUB_PKG_NAME-}" && -n "${TERMUX_PKG_DEPENDS}" ]]; then
+			pip_dependency_string=", $pip_dependency_string"
+		fi
+		if [[ -n "${SUB_PKG_NAME-}" ]]; then
+			TERMUX_SUBPKG_DEPENDS+="$pip_dependency_string"
+		else
+			TERMUX_PKG_DEPENDS+="$pip_dependency_string"
 		fi
 
 		# if the list of dependencies to install from PyPi has the name of
@@ -83,18 +95,6 @@ termux_step_create_python_debscripts() {
 			echo "Installing dependencies for ${_package_name} through pip..."
 			LD_PRELOAD='' LDFLAGS="-lpython$TERMUX_PYTHON_VERSION" MATHLIB="m" "${TERMUX_PREFIX}/bin/pip3" install ${upgrade_flag} ${_package_python_deps}
 		POSTINST_EOF
-
-		# ensure that pip is added as a runtime-only dependency to all, and only to all
-		# packages that run the '$PREFIX/bin/pip' command.
-		if [[ "$TERMUX_PACKAGE_FORMAT" == "debian" ]]; then
-			if grep -q 'Depends: ' control; then
-				sed -i "s|Depends: |Depends: $pip_package_name, |" control
-			else
-				echo "Depends: $pip_package_name" >>control
-			fi
-		elif [[ "$TERMUX_PACKAGE_FORMAT" == "pacman" ]]; then
-			echo "depend = $pip_package_name" >>.PKGINFO
-		fi
 	fi
 
 	# if the package does not contain any .py files in
