@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.mozilla.org/firefox
 TERMUX_PKG_DESCRIPTION="Mozilla Firefox web browser"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="141.0"
+TERMUX_PKG_VERSION="141.0.2"
 TERMUX_PKG_SRCURL=https://archive.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION}/source/firefox-${TERMUX_PKG_VERSION}.source.tar.xz
-TERMUX_PKG_SHA256=80982a84bb7ca41a67ac073321de96f74e0c25f296d19ca432b11fc2a33535c8
+TERMUX_PKG_SHA256=c33937fe2f6ad29af3de8f1a128c054afbd64821f702bf98d9f4079b97d37f3a
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
@@ -50,22 +50,6 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
-	# XXX: flang toolchain provides libclang.so
-	termux_setup_flang
-	local __fc_dir="$(dirname $(command -v $FC))"
-	local __flang_toolchain_folder="$(realpath "$__fc_dir"/..)"
-	if [ ! -d "$TERMUX_PKG_TMPDIR/firefox-toolchain" ]; then
-		rm -rf "$TERMUX_PKG_TMPDIR"/firefox-toolchain-tmp
-		mv "$__flang_toolchain_folder" "$TERMUX_PKG_TMPDIR"/firefox-toolchain-tmp
-
-		cp "$(command -v "$CC")" "$TERMUX_PKG_TMPDIR"/firefox-toolchain-tmp/bin/
-		cp "$(command -v "$CXX")" "$TERMUX_PKG_TMPDIR"/firefox-toolchain-tmp/bin/
-		cp "$(command -v "$CPP")" "$TERMUX_PKG_TMPDIR"/firefox-toolchain-tmp/bin/
-
-		mv "$TERMUX_PKG_TMPDIR"/firefox-toolchain-tmp "$TERMUX_PKG_TMPDIR"/firefox-toolchain
-	fi
-	export PATH="$TERMUX_PKG_TMPDIR/firefox-toolchain/bin:$PATH"
-
 	termux_setup_nodejs
 	termux_setup_rust
 
@@ -83,7 +67,7 @@ termux_step_pre_configure() {
 	export HOST_CC=$(command -v clang)
 	export HOST_CXX=$(command -v clang++)
 
-	export BINDGEN_CFLAGS="--target=$CCTERMUX_HOST_PLATFORM --sysroot=$TERMUX_PKG_TMPDIR/firefox-toolchain/sysroot"
+	export BINDGEN_CFLAGS="--target=$CCTERMUX_HOST_PLATFORM --sysroot=$TERMUX_STANDALONE_TOOLCHAIN/sysroot"
 	local env_name=BINDGEN_EXTRA_CLANG_ARGS_${CARGO_TARGET_NAME@U}
 	env_name=${env_name//-/_}
 	export $env_name="$BINDGEN_CFLAGS"
