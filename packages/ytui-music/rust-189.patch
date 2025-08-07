@@ -1,0 +1,33 @@
+The Rust 1.89 compiler directed to make this change:
+
+error: implicit autoref creates a reference to the dereference of a raw pointer
+   --> front-end/src/ui/mod.rs:218:40
+    |
+218 |                     music_state = &mut (*state_ptr).musicbar.1;
+    |                                        ^^---------^^^^^^^^^^
+    |                                          |
+    |                                          this raw pointer has type `*mut std::sync::MutexGuard<'_, State<'_>>`
+    |
+    = note: creating a reference requires the pointer target to be valid and imposes aliasing requirements
+    = note: references are created through calls to explicit `Deref(Mut)::deref(_mut)` implementations
+    = note: `#[deny(dangerous_implicit_autorefs)]` on by default
+help: try using a raw pointer method instead; or if this reference is intentional, make it explicit
+    |
+218 |                     music_state = &mut (&mut (*state_ptr)).musicbar.1;
+    |                                        +++++             +
+
+--- a/front-end/src/ui/mod.rs
++++ b/front-end/src/ui/mod.rs
+@@ -215,9 +215,9 @@ pub fn draw_ui(state: &mut Arc<Mutex<State>>, cvar: &mut Arc<Condvar>) {
+                 let state_ptr = &mut state_unlocked as *mut std::sync::MutexGuard<'_, State<'_>>;
+                 let (mut music_state, mut playlist_state, mut artist_state);
+                 unsafe {
+-                    music_state = &mut (*state_ptr).musicbar.1;
+-                    playlist_state = &mut (*state_ptr).playlistbar.1;
+-                    artist_state = &mut (*state_ptr).artistbar.1;
++                    music_state = &mut (&mut (*state_ptr)).musicbar.1;
++                    playlist_state = &mut (&mut (*state_ptr)).playlistbar.1;
++                    artist_state = &mut (&mut (*state_ptr)).artistbar.1;
+                 }
+ 
+                 let music_table = MiddleLayout::get_music_container(&mut state_unlocked);
