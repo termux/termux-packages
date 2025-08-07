@@ -56,7 +56,9 @@ PACKAGES+=" zip"
 
 PYTHON_PACKAGES=""
 
-PYTHON_PACKAGES+=" itstool" # necessary to build orca and some other packages
+PYTHON_PACKAGES+=" itstool"      # necessary to build orca and some other packages
+PYTHON_PACKAGES+=" mako"         # necessary to build mesa
+PYTHON_PACKAGES+=" pyyaml"       # necessary to build mesa
 # More 'system-wide' python packages should be added here if working towards the goal
 # of setup-termux.sh for on-device building having closer behavior
 # to setup-ubuntu.sh for cross-compilation. If adding packages here, please add a comment
@@ -84,4 +86,4 @@ fi
 # particular python packages are installed system-wide,
 # so should be installed Termux-wide for on-device building to be reasonably accurate
 # compared with the behavior of the Ubuntu cross-builder image.
-pip install $PYTHON_PACKAGES
+pip install --upgrade $PYTHON_PACKAGES
