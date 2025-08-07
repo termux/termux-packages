@@ -17,26 +17,6 @@ termux_step_pre_configure() {
 	TERMUX_PKG_BUILDDIR="$TERMUX_PKG_SRCDIR"
 
 	termux_setup_rust
-	: "${CARGO_HOME:=$HOME/.cargo}"
-	export CARGO_HOME
-
-	rm -rf "$CARGO_HOME"/registry/src/*/libmpv-*
-
-	cargo fetch --target $CARGO_TARGET_NAME
-
-	local p="$TERMUX_PKG_CACHEDIR/ytui-music-libmpv-rs-mpv-0.35.0.patch"
-	termux_download \
-		"https://github.com/ParadoxSpiral/libmpv-rs/commit/3e6c389b716f52a595cc5e8e3fa1f96cb76b3de7.patch" \
-		"${p}" \
-		a7cbd6674191c93ed82c87da7173366b7f56c5998a650b1054de4e4fa3974d69
-	echo "Applying $(dirname "${p}")"
-	local d
-	for d in $CARGO_HOME/registry/src/*/libmpv-sys-*; do
-		patch --silent -f -p2 -d ${d} < "${p}" || :
-	done
-	for d in $CARGO_HOME/registry/src/*/libmpv-[0-9]*; do
-		patch --silent -f -p1 -d ${d} < "${p}" || :
-	done
 }
 
 termux_step_make() {
