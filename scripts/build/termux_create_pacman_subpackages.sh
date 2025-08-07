@@ -106,6 +106,11 @@ termux_create_pacman_subpackages() {
 			[[ -n "$TERMUX_SUBPKG_SUGGESTS"   ]] && TERMUX_SUBPKG_SUGGESTS=$(termux_package__add_prefix_glibc_to_package_list "$TERMUX_SUBPKG_SUGGESTS")
 		}
 
+		# Write package installation hooks.
+		termux_step_create_subpkg_debscripts
+		termux_step_create_python_debscripts
+		termux_step_create_pacman_install_hook
+
 		# Package metadata.
 		{
 			echo "pkgname = $SUB_PKG_NAME"
@@ -165,11 +170,6 @@ termux_create_pacman_subpackages() {
 			echo "packager = $TERMUX_PKG_MAINTAINER"
 			echo "builddate = $SOURCE_DATE_EPOCH"
 		} > .BUILDINFO
-
-		# Write package installation hooks.
-		termux_step_create_subpkg_debscripts
-		termux_step_create_python_debscripts
-		termux_step_create_pacman_install_hook
 
 		# Configuring the selection of a copress for a batch.
 		local COMPRESS
