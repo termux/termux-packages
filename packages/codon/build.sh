@@ -3,18 +3,17 @@ TERMUX_PKG_DESCRIPTION="A high-performance, zero-overhead, extensible Python com
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-_LLVM_COMMIT=05ba68c2286e5b1972fb593f316987a07d81ebe1
-TERMUX_PKG_VERSION="0.19.1"
-TERMUX_PKG_REVISION=1
+_LLVM_VERSION=20.1.7
+TERMUX_PKG_VERSION="0.19.2"
 TERMUX_PKG_SRCURL=(
 	https://github.com/exaloop/codon/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
 	https://github.com/exaloop/codon/releases/download/v$TERMUX_PKG_VERSION/codon-linux-x86_64.tar.gz
-	https://github.com/exaloop/llvm-project/archive/${_LLVM_COMMIT}.zip
+	https://github.com/exaloop/llvm-project/archive/refs/tags/codon-$_LLVM_VERSION.tar.gz
 )
 TERMUX_PKG_SHA256=(
-	fe4a329e487fd7a0f939a4d6387bc2b84347a76c36d09322d5e4ff6d9f4467bf
-	403361f3cc017dca513a5a00064022817fbbb989a286e8fd6cff441292231e77
-	3828457c3072419a5ee16c9c790cc021704931b7382ca435f8cff78cccb4f952
+	f68492c25b028939e8bcf062aeccf18ecd332b7f28000cadcbdf141377af773e
+	0c1ffb9b1e37dda5155353e0e22c3df0cb68db5de827fb34379d2a95adf39984
+	d2b8fc9d7245839703a3cbf79c128b800dc1373a7404fbafa97463197f1feeb4
 )
 TERMUX_PKG_DEPENDS="libc++, libxml2, zlib, zstd"
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -59,12 +58,12 @@ TERMUX_PKG_NO_OPENMP_CHECK=true
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 termux_step_post_get_source() {
-	# Check llvm commit
-	local _llvm_commit="$(strings codon-deploy/bin/codon | grep 'llvm-project' | cut -d' ' -f5 | cut -d')' -f1)"
-	if [ "$_LLVM_COMMIT" != "$_llvm_commit" ]; then
-		termux_error_exit "LLVM commit mismatch: current $_LLVM_COMMIT, expected $_llvm_commit."
+	# Check llvm version
+	local _llvm_version="$(strings codon-deploy-linux-x86_64/bin/codon | grep 'clang version' | cut -d' ' -f3)"
+	if [ "$_LLVM_VERSION" != "$_llvm_version" ]; then
+		termux_error_exit "LLVM version mismatch: current $_LLVM_VERSION, expected $_llvm_version."
 	fi
-	mv llvm-project-"$_llvm_commit" llvm-project
+	mv llvm-project-codon-"$_llvm_version" llvm-project
 }
 
 termux_step_host_build() {
@@ -145,7 +144,6 @@ termux_step_configure() {
 
 	termux_setup_cmake
 	termux_setup_ninja
-	termux_setup_flang
 
 	export PATH="$TERMUX_PKG_HOSTBUILD_DIR/peg2cpp-build:$PATH"
 	local _RPATH_FLAG="-Wl,-rpath=$TERMUX_PREFIX/lib"
