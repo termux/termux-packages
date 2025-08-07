@@ -136,7 +136,6 @@ Enable jumbo build for the following component(s)/source_set(s):
  ui/gl/gl_display_egl_util.cc                      |  4 ++++
  ui/gl/init/BUILD.gn                               |  3 ++-
  ui/gtk/BUILD.gn                                   | 10 ++++++++--
- ui/gtk/ime_compat_check.cc                        |  6 ++++++
  ui/latency/BUILD.gn                               |  5 +++--
  ui/message_center/BUILD.gn                        |  3 ++-
  ui/message_center/public/cpp/BUILD.gn             |  3 ++-
@@ -161,10 +160,10 @@ Enable jumbo build for the following component(s)/source_set(s):
  ui/web_dialogs/BUILD.gn                           |  6 ++++--
  ui/wm/BUILD.gn                                    |  5 +++--
  ui/wm/public/BUILD.gn                             |  3 ++-
- 76 files changed, 283 insertions(+), 107 deletions(-)
+ 75 files changed, 277 insertions(+), 107 deletions(-)
 
 diff --git a/ui/accessibility/BUILD.gn b/ui/accessibility/BUILD.gn
-index c32f5a6380..99788856e9 100644
+index 620566275b..44c5c8a009 100644
 --- a/ui/accessibility/BUILD.gn
 +++ b/ui/accessibility/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -194,7 +193,7 @@ index c32f5a6380..99788856e9 100644
  
    sources = [
 diff --git a/ui/accessibility/platform/BUILD.gn b/ui/accessibility/platform/BUILD.gn
-index 09b5f1a016..0aae08b595 100644
+index 2d982e757d..8c54c71239 100644
 --- a/ui/accessibility/platform/BUILD.gn
 +++ b/ui/accessibility/platform/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -241,7 +240,7 @@ index ce631d038e..8fa4338b5b 100644
    sources = [
      "test/aura_test_base.cc",
 diff --git a/ui/base/BUILD.gn b/ui/base/BUILD.gn
-index eb8a8d2a27..a629c34956 100644
+index c92c357306..5bc2e11ecf 100644
 --- a/ui/base/BUILD.gn
 +++ b/ui/base/BUILD.gn
 @@ -6,6 +6,7 @@ import("//build/buildflag_header.gni")
@@ -261,7 +260,7 @@ index eb8a8d2a27..a629c34956 100644
    output_name = "ui_base"
  
    sources = [
-@@ -231,6 +232,10 @@ component("base") {
+@@ -234,6 +235,10 @@ component("base") {
  
    libs = []
  
@@ -272,7 +271,7 @@ index eb8a8d2a27..a629c34956 100644
    if (is_android) {
      sources += [
        "device_form_factor_android.cc",
-@@ -703,7 +708,7 @@ component("features") {
+@@ -706,7 +711,7 @@ component("features") {
  }
  
  if (is_win || is_mac || is_linux || is_chromeos) {
@@ -281,7 +280,7 @@ index eb8a8d2a27..a629c34956 100644
      testonly = true
      sources = [
        "test/skia_gold_matching_algorithm.cc",
-@@ -745,7 +750,7 @@ if (use_blink) {
+@@ -748,7 +753,7 @@ if (use_blink) {
    }
  }
  
@@ -980,7 +979,7 @@ index c8abb820bd..7028f735b4 100644
  
    sources = [
 diff --git a/ui/gfx/BUILD.gn b/ui/gfx/BUILD.gn
-index 66307a0b27..dd8cc31c4b 100644
+index 77d33ad95f..1b05bdc597 100644
 --- a/ui/gfx/BUILD.gn
 +++ b/ui/gfx/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -991,7 +990,7 @@ index 66307a0b27..dd8cc31c4b 100644
  import("//build/config/ozone.gni")
  import("//build/config/ui.gni")
  import("//device/vr/buildflags/buildflags.gni")
-@@ -21,7 +22,7 @@ if (is_android) {
+@@ -22,7 +23,7 @@ if (is_android) {
  }
  
  # Used for color generation at build time without importing all the gfx.
@@ -1000,7 +999,7 @@ index 66307a0b27..dd8cc31c4b 100644
    sources = [
      "color_palette.h",
      "color_utils.cc",
-@@ -35,7 +36,7 @@ component("color_utils") {
+@@ -36,7 +37,7 @@ component("color_utils") {
    ]
  }
  
@@ -1009,7 +1008,7 @@ index 66307a0b27..dd8cc31c4b 100644
    sources = [
      "gfx_skia_export.h",
      "skia_span_util.cc",
-@@ -69,7 +70,7 @@ config("gfx_impl_define") {
+@@ -70,7 +71,7 @@ config("gfx_impl_define") {
    defines = [ "IS_GFX_IMPL" ]
  }
  
@@ -1018,7 +1017,7 @@ index 66307a0b27..dd8cc31c4b 100644
    sources = [
      "break_list.h",
      "color_analysis.cc",
-@@ -451,7 +452,7 @@ component("gfx") {
+@@ -452,7 +453,7 @@ component("gfx") {
    }
  }
  
@@ -1027,7 +1026,7 @@ index 66307a0b27..dd8cc31c4b 100644
    sources = [
      "color_space.cc",
      "color_space.h",
-@@ -594,7 +595,7 @@ group("memory_buffer") {
+@@ -595,7 +596,7 @@ group("memory_buffer") {
  }
  
  # Cannot be a static_library in component builds due to exported functions
@@ -1036,7 +1035,7 @@ index 66307a0b27..dd8cc31c4b 100644
    visibility = [ ":*" ]  # Depend on through ":memory_buffer".
  
    # TODO(brettw) refactor this so these sources are in a coherent directory
-@@ -694,7 +695,7 @@ source_set("memory_buffer_sources") {
+@@ -697,7 +698,7 @@ source_set("memory_buffer_sources") {
  }
  
  # TODO(ccameron): This can be moved into a separate source_set.
@@ -1045,7 +1044,7 @@ index 66307a0b27..dd8cc31c4b 100644
    sources = [
      "switches.cc",
      "switches.h",
-@@ -706,7 +707,7 @@ component("gfx_switches") {
+@@ -709,7 +710,7 @@ component("gfx_switches") {
    deps = [ "//base" ]
  }
  
@@ -1131,7 +1130,7 @@ index aea66652b6..0f0876b22f 100644
 +
 +#undef PreparationOutput
 diff --git a/ui/gfx/geometry/BUILD.gn b/ui/gfx/geometry/BUILD.gn
-index 98aeed5091..03fe83f5bd 100644
+index a5e3e1be9f..31ed06e13b 100644
 --- a/ui/gfx/geometry/BUILD.gn
 +++ b/ui/gfx/geometry/BUILD.gn
 @@ -2,7 +2,9 @@
@@ -1257,7 +1256,7 @@ index 802404b7c8..d987b2bb2b 100644
  
    sources = [
 diff --git a/ui/gfx/x/randr_output_manager.cc b/ui/gfx/x/randr_output_manager.cc
-index f26bd4949a..682112d205 100644
+index bffe824a14..33ece7f22c 100644
 --- a/ui/gfx/x/randr_output_manager.cc
 +++ b/ui/gfx/x/randr_output_manager.cc
 @@ -51,6 +51,11 @@
@@ -1272,7 +1271,7 @@ index f26bd4949a..682112d205 100644
  namespace {
  
  constexpr auto kInvalidMode = static_cast<x11::RandR::Mode>(0);
-@@ -559,3 +564,8 @@ std::string RandROutputManager::GetModeNameForOutput(
+@@ -558,3 +563,8 @@ std::string RandROutputManager::GetModeNameForOutput(
  }
  
  }  // namespace x11
@@ -1305,7 +1304,7 @@ index 51db6c7cfc..3424804225 100644
 +#undef kDisabledCrtc
 +#undef PixelsToMillimeters
 diff --git a/ui/gl/BUILD.gn b/ui/gl/BUILD.gn
-index 9c8e7e1ca7..28b865c773 100644
+index 355efffd43..be7b11586a 100644
 --- a/ui/gl/BUILD.gn
 +++ b/ui/gl/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -1316,7 +1315,7 @@ index 9c8e7e1ca7..28b865c773 100644
  import("//build/config/linux/pkg_config.gni")
  import("//build/config/ozone.gni")
  import("//build/config/ui.gni")
-@@ -51,7 +52,7 @@ component("gl_enums") {
+@@ -55,7 +56,7 @@ source_set("gl_headers") {
    public_deps = [ "//third_party/angle:includes" ]
  }
  
@@ -1325,7 +1324,7 @@ index 9c8e7e1ca7..28b865c773 100644
    output_name = "gl_wrapper"  # Avoid colliding with OS X"s libGL.dylib.
  
    sources = [
-@@ -352,6 +353,10 @@ component("gl") {
+@@ -354,6 +355,10 @@ component("gl") {
      defines += [ "GL_SILENCE_DEPRECATION" ]
    }
  
@@ -1336,7 +1335,7 @@ index 9c8e7e1ca7..28b865c773 100644
    if (is_android) {
      sources += [
        "android/egl_fence_utils.cc",
-@@ -433,11 +438,15 @@ if (is_mac) {
+@@ -435,11 +440,15 @@ if (is_mac) {
          "//third_party/swiftshader/src/Vulkan:icd_file",
          "//third_party/swiftshader/src/Vulkan:swiftshader_libvulkan",
        ]
@@ -1353,7 +1352,7 @@ index 9c8e7e1ca7..28b865c773 100644
    testonly = true
    sources = [
      "egl_bindings_autogen_mock.cc",
-@@ -462,7 +471,7 @@ static_library("gl_unittest_utils") {
+@@ -464,7 +473,7 @@ static_library("gl_unittest_utils") {
    ]
  }
  
@@ -1399,7 +1398,7 @@ index 8ecd6bdc7e..377240cc6d 100644
  
    public = [
 diff --git a/ui/gtk/BUILD.gn b/ui/gtk/BUILD.gn
-index dc98ce8281..def91dbc0b 100644
+index 94d30cc6d3..6e456a597c 100644
 --- a/ui/gtk/BUILD.gn
 +++ b/ui/gtk/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1422,15 +1421,15 @@ index dc98ce8281..def91dbc0b 100644
    sources = [
      "gtk_color_mixers.cc",
      "gtk_color_mixers.h",
-@@ -104,6 +104,7 @@ component("gtk") {
+@@ -100,6 +100,7 @@ component("gtk") {
      "window_frame_provider_gtk.cc",
      "window_frame_provider_gtk.h",
    ]
 +  jumbo_excluded_sources = []
-   defines = [ "IS_GTK_IMPL" ]
-   configs += [
-     "//build/config/linux/pangocairo",
-@@ -159,6 +160,11 @@ component("gtk") {
+ 
+   if (enable_printing) {
+     sources += [
+@@ -165,6 +166,11 @@ component("gtk") {
        "x/gtk_ui_platform_x11.cc",
        "x/gtk_ui_platform_x11.h",
      ]
@@ -1725,7 +1724,7 @@ index ce5ee873dc..7adf1eb56c 100644
  
    sources = [
 diff --git a/ui/views/BUILD.gn b/ui/views/BUILD.gn
-index a8f20a6942..6c67c2b786 100644
+index a755b8c0ae..9000b92bc5 100644
 --- a/ui/views/BUILD.gn
 +++ b/ui/views/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -1762,7 +1761,7 @@ index a8f20a6942..6c67c2b786 100644
 +jumbo_source_set("test_support") {
    testonly = true
    sources = [
-     "animation/test/flood_fill_ink_drop_ripple_test_api.cc",
+     "accessibility/tree/widget_ax_manager_test_api.h",
 diff --git a/ui/views/animation/pulsing_ink_drop_mask.cc b/ui/views/animation/pulsing_ink_drop_mask.cc
 index c33e817520..9fa720f76b 100644
 --- a/ui/views/animation/pulsing_ink_drop_mask.cc
@@ -1806,10 +1805,10 @@ index 0e39d27276..3ca1c18cb9 100644
 +#undef kFeaturePromoPulseDuration
 +#undef kFeaturePromoPulseInsetDip
 diff --git a/ui/views/bubble/bubble_frame_view.cc b/ui/views/bubble/bubble_frame_view.cc
-index e9a2f4f54f..2279cd4bed 100644
+index e98d57870a..3249da6650 100644
 --- a/ui/views/bubble/bubble_frame_view.cc
 +++ b/ui/views/bubble/bubble_frame_view.cc
-@@ -156,7 +156,7 @@ std::unique_ptr<Label> BubbleFrameView::CreateDefaultTitleLabel(
+@@ -158,7 +158,7 @@ std::unique_ptr<Label> BubbleFrameView::CreateDefaultTitleLabel(
      const std::u16string& title_text) {
    std::unique_ptr<Label> label = CreateLabelWithContextAndStyle(
        title_text, style::CONTEXT_DIALOG_TITLE, style::STYLE_PRIMARY);
@@ -1862,7 +1861,7 @@ index a01a5840b9..3082e48f68 100644
    sources = [
      "examples_window_with_content.cc",
 diff --git a/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc b/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc
-index 5af3d8a010..c71b94b016 100644
+index 6163e47482..450b186fb4 100644
 --- a/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc
 +++ b/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc
 @@ -623,7 +623,7 @@ void DesktopNativeWidgetAura::InitNativeWidget(Widget::InitParams params) {
@@ -1875,10 +1874,10 @@ index 5af3d8a010..c71b94b016 100644
        }
      }
 diff --git a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
-index 2150c34407..7ad481d43a 100644
+index 3af6daa159..053fdd8fe5 100644
 --- a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
 +++ b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
-@@ -340,7 +340,7 @@ void DesktopWindowTreeHostPlatform::OnActiveWindowChanged(bool active) {
+@@ -342,7 +342,7 @@ void DesktopWindowTreeHostPlatform::OnActiveWindowChanged(bool active) {
    // active, we enter this condition where `active && !is_active_` because
    // subwindows do not get active state from the OS on some platforms (E.g.
    // Wayland). So we need to ensure Activate is conveyed to the platform_window.
@@ -1887,7 +1886,7 @@ index 2150c34407..7ad481d43a 100644
        active && !is_active_ && !window_children_.empty()) {
      Activate();
    }
-@@ -780,7 +780,7 @@ void DesktopWindowTreeHostPlatform::SetFullscreen(bool fullscreen,
+@@ -782,7 +782,7 @@ void DesktopWindowTreeHostPlatform::SetFullscreen(bool fullscreen,
      return;
    }
  
