@@ -49,23 +49,6 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
-	# XXX: flang toolchain provides libclang.so
-	termux_setup_flang
-	local __fc_dir __flang_toolchain_folder
-	__fc_dir="$(dirname "$(command -v "$FC")")"
-	__flang_toolchain_folder="$(realpath "$__fc_dir"/..)"
-	if [ ! -d "$TERMUX_PKG_TMPDIR/thunderbird-toolchain" ]; then
-		rm -rf "$TERMUX_PKG_TMPDIR"/thunderbird-toolchain-tmp
-		mv "$__flang_toolchain_folder" "$TERMUX_PKG_TMPDIR"/thunderbird-toolchain-tmp
-
-		cp "$(command -v "$CC")" "$TERMUX_PKG_TMPDIR"/thunderbird-toolchain-tmp/bin/
-		cp "$(command -v "$CXX")" "$TERMUX_PKG_TMPDIR"/thunderbird-toolchain-tmp/bin/
-		cp "$(command -v "$CPP")" "$TERMUX_PKG_TMPDIR"/thunderbird-toolchain-tmp/bin/
-
-		mv "$TERMUX_PKG_TMPDIR"/thunderbird-toolchain-tmp "$TERMUX_PKG_TMPDIR"/thunderbird-toolchain
-	fi
-	export PATH="$TERMUX_PKG_TMPDIR/thunderbird-toolchain/bin:$PATH"
-
 	termux_setup_nodejs
 	termux_setup_rust
 
@@ -81,7 +64,7 @@ termux_step_pre_configure() {
 	HOST_CXX="$(command -v clang++)"
 	export HOST_CC HOST_CXX
 
-	export BINDGEN_CFLAGS="--target=$CCTERMUX_HOST_PLATFORM --sysroot=$TERMUX_PKG_TMPDIR/thunderbird-toolchain/sysroot"
+	export BINDGEN_CFLAGS="--target=$CCTERMUX_HOST_PLATFORM --sysroot=$TERMUX_STANDALONE_TOOLCHAIN/sysroot"
 	local env_name=BINDGEN_EXTRA_CLANG_ARGS_${CARGO_TARGET_NAME@U}
 	env_name=${env_name//-/_}
 	export "$env_name"="$BINDGEN_CFLAGS"
