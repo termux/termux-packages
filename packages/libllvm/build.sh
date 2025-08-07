@@ -6,6 +6,7 @@ TERMUX_PKG_MAINTAINER="@finagolfin"
 # Keep flang version and revision in sync when updating (enforced by check in termux_step_pre_configure).
 LLVM_MAJOR_VERSION=20
 TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.1.8
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=6898f963c8e938981e6c4a302e83ec5beb4630147c7311183cf61069af16333d
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-${TERMUX_PKG_VERSION}.src.tar.xz
@@ -134,43 +135,34 @@ termux_step_post_make_install() {
 	cp tools/clang/docs/man/{clang,diagtool}.1 $TERMUX_PREFIX/share/man/man1
 	cd $TERMUX_PREFIX/bin
 
-	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{clang,clang++,gcc,g++,cpp}; do
+	for tool in clang clang++ cc c++ cpp gcc g++; do
 		ln -f -s clang-${LLVM_MAJOR_VERSION} $tool
 	done
 
 	ln -f -s clang++ clang++-${LLVM_MAJOR_VERSION}
 	ln -f -s ${LLVM_MAJOR_VERSION} $TERMUX_PREFIX/lib/clang/latest
 
-	if [ $TERMUX_ARCH == "arm" ]; then
-		# For arm we replace symlinks with the same type of
-		# wrapper as the ndk uses to choose correct target
-		for tool in ${TERMUX_HOST_PLATFORM}-{clang,gcc}; do
-			unlink $tool
-			cat <<- EOF > $tool
-			#!$TERMUX_PREFIX/bin/bash
-			if [ "\$1" != "-cc1" ]; then
-				\`dirname \$0\`/clang --target=armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL "\$@"
-			else
-				# Target is already an argument.
-				\`dirname \$0\`/clang "\$@"
-			fi
-			EOF
-			chmod u+x $tool
-		done
-		for tool in ${TERMUX_HOST_PLATFORM}-{clang++,g++}; do
-			unlink $tool
-			cat <<- EOF > $tool
-			#!$TERMUX_PREFIX/bin/bash
-			if [ "\$1" != "-cc1" ]; then
-				\`dirname \$0\`/clang++ --target=armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL "\$@"
-			else
-				# Target is already an argument.
-				\`dirname \$0\`/clang++ "\$@"
-			fi
-			EOF
-			chmod u+x $tool
-		done
+	# Instead of symlinks, for executables named after target triplets, create the same type of
+	# wrapper that the cross-compiling NDK uses to choose the correct target, including the API level
+	local target="$CCTERMUX_HOST_PLATFORM"
+	if [[ "$TERMUX_ARCH" == "arm" ]]; then
+		target="armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL"
 	fi
+
+	for tool in clang clang++ cpp gcc g++; do
+		local wrapper="${TERMUX_HOST_PLATFORM}-${tool}"
+		rm -f "$wrapper"
+		cat <<- EOF > "$wrapper"
+		#!$TERMUX_PREFIX/bin/bash
+		if [ "\$1" != "-cc1" ]; then
+			\`dirname \$0\`/$tool --target=$target "\$@"
+		else
+			# Target is already an argument.
+			\`dirname \$0\`/$tool "\$@"
+		fi
+		EOF
+		chmod u+x "$wrapper"
+	done
 }
 
 termux_step_pre_massage() {
