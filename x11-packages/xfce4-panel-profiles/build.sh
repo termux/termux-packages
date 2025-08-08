@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://docs.xfce.org/apps/xfce4-panel-profiles/start
 TERMUX_PKG_DESCRIPTION="A simple application to manage Xfce panel layouts."
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.1.1"
+TERMUX_PKG_VERSION="1.1.2"
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/apps/xfce4-panel-profiles/${TERMUX_PKG_VERSION%.*}/xfce4-panel-profiles-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=0126373a03778bb4894afa151de28d36bfc563ddab96d3bd7c63962350d34ba2
@@ -32,6 +32,7 @@ termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
 	echo "Installing dependencies through pip..."
-	pip install ${TERMUX_PKG_PYTHON_TARGET_DEPS//, / }
+	PYTHON_VERSION=\$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+	LDFLAGS="-lpython\$PYTHON_VERSION" pip3 install --no-build-isolation --no-cache-dir ${TERMUX_PKG_PYTHON_TARGET_DEPS//, / }
 	EOF
 }
