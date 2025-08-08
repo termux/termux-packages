@@ -2,10 +2,10 @@ diff --git a/runtime/autoload/tar.vim b/runtime/autoload/tar.vim
 index 436e24eb6..ff2d30ff3 100644
 --- a/runtime/autoload/tar.vim
 +++ b/runtime/autoload/tar.vim
-@@ -307,9 +307,6 @@ fun! tar#Read(fname,mode)
+@@ -295,9 +295,6 @@ fun! tar#Read(fname)
+   let b:curdir= curdir
    let tmpdir= tempname()
-   let b:curdir= tmpdir
-   let b:tmpdir= curdir
+   let b:tmpdir= tmpdir
 -  if tmpdir =~ '\.'
 -   let tmpdir= substitute(tmpdir,'\.[^.]*$','','e')
 -  endif
@@ -16,12 +16,12 @@ diff --git a/runtime/autoload/zip.vim b/runtime/autoload/zip.vim
 index 4a53fc5f2..e2bd35064 100644
 --- a/runtime/autoload/zip.vim
 +++ b/runtime/autoload/zip.vim
-@@ -249,9 +249,6 @@ fun! zip#Write(fname)
+@@ -248,9 +248,6 @@ fun! zip#Write(fname)
  
    let curdir= getcwd()
    let tmpdir= tempname()
 -  if tmpdir =~ '\.'
--   let tmpdir= substitute(tmpdir,'\.[^.]*$','','e')
+-    let tmpdir= substitute(tmpdir,'\.[^.]*$','','e')
 -  endif
    call mkdir(tmpdir,"p")
  
