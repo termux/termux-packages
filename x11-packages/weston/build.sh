@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Reference implementation of a wayland compositor"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="14.0.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gitlab.freedesktop.org/wayland/weston/-/archive/${TERMUX_PKG_VERSION}/weston-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=633f4e0f232ad150300c95ffcbc646fedf1349487bf389dbd2045fa69013d6e2
 TERMUX_PKG_DEPENDS="freerdp, libaml, libandroid-shmem, libcairo, libcairo, libevdev, libglvnd, libneatvnc, libseat, libwayland, libwebp, libxcb, libxcursor, libxkbcommon, littlecms, pango, xcb-util-cursor"
