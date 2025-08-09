@@ -1,0 +1,11 @@
+--- a/data/meson.build
++++ b/data/meson.build
+@@ -1,6 +1,8 @@
+ subdir('applications')
+ subdir('autostart')
++if dconf_dep.found()
+ subdir('dconf')
++endif
+ 
+ # XPath configs
+ foreach file : [ 'Init', 'PreSession', 'PostSession' ]
