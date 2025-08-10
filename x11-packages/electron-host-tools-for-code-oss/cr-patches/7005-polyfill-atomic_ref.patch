@@ -1,6 +1,8 @@
 `atomic_ref` is not landed in NDK r27c, and it is used in:
 
 - //base/atomicops.cc
+- //third_party/simdutf/simdutf.cpp
+- //v8/src/objects/simd.cc
 
 --- a/third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h
 +++ b/third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h
@@ -668,3 +670,125 @@
          .store(*src_byte_ptr, std::memory_order_relaxed);
      // SAFETY: We check above that `dst_byte_ptr` and `src_byte_ptr` point
      // to spans of sufficient size.
+
+--- a/third_party/simdutf/simdutf.h
++++ b/third_party/simdutf/simdutf.h
+@@ -82,7 +82,7 @@
+       !defined(SIMDUTF_SPAN_DISABLED)
+     #define SIMDUTF_SPAN 1
+   #endif // __cpp_concepts >= 201907L && __cpp_lib_span >= 202002L
+-  #if __cpp_lib_atomic_ref >= 201806L
++  #if __cpp_lib_atomic_ref >= 201806L || defined(__TERMUX__)
+     #define SIMDUTF_ATOMIC_REF 1
+   #endif // __cpp_lib_atomic_ref
+ #endif
+--- a/third_party/simdutf/simdutf.cpp
++++ b/third_party/simdutf/simdutf.cpp
+@@ -2,6 +2,17 @@
+ /* begin file src/simdutf.cpp */
+ #include "simdutf.h"
+ 
++#ifdef SIMDUTF_ATOMIC_REF
++#ifdef __TERMUX__
++#include "third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h"
++template <typename T>
++using __my_atomic_ref = Foo::atomic_ref<T>;
++#else
++template <typename T>
++using __my_atomic_ref = std::atomic_ref<T>;
++#endif
++#endif
++
+ #if SIMDUTF_FEATURE_BASE64
+   // We include base64_tables once.
+ /* begin file src/tables/base64_tables.h */
+@@ -16160,7 +16171,7 @@
+ // This function is a memcpy that uses atomic operations to read from the
+ // source.
+ inline void memcpy_atomic_read(char *dst, const char *src, size_t len) {
+-  static_assert(std::atomic_ref<char>::required_alignment == sizeof(char),
++  static_assert(__my_atomic_ref<char>::required_alignment == sizeof(char),
+                 "std::atomic_ref requires the same alignment as char_type");
+   // We expect all 64-bit systems to be able to read 64-bit words from an
+   // aligned memory region atomically. You might be able to do better on
+@@ -16173,7 +16184,7 @@
+     char *mutable_src = const_cast<char *>(bytesrc);
+     for (size_t j = 0; j < bytelen; ++j) {
+       bytedst[j] =
+-          std::atomic_ref<char>(mutable_src[j]).load(std::memory_order_relaxed);
++          __my_atomic_ref<char>(mutable_src[j]).load(std::memory_order_relaxed);
+     }
+   };
+ 
+@@ -16191,7 +16202,7 @@
+   while (len >= alignment) {
+     auto *src_aligned = reinterpret_cast<uint64_t *>(const_cast<char *>(src));
+     const auto dst_value =
+-        std::atomic_ref<uint64_t>(*src_aligned).load(std::memory_order_relaxed);
++        __my_atomic_ref<uint64_t>(*src_aligned).load(std::memory_order_relaxed);
+     std::memcpy(dst, &dst_value, sizeof(uint64_t));
+     src += alignment;
+     dst += alignment;
+@@ -16207,7 +16218,7 @@
+ // This function is a memcpy that uses atomic operations to write to the
+ // destination.
+ inline void memcpy_atomic_write(char *dst, const char *src, size_t len) {
+-  static_assert(std::atomic_ref<char>::required_alignment == sizeof(char),
++  static_assert(__my_atomic_ref<char>::required_alignment == sizeof(char),
+                 "std::atomic_ref requires the same alignment as char");
+   // We expect all 64-bit systems to be able to write 64-bit words to an aligned
+   // memory region atomically.
+@@ -16219,7 +16230,7 @@
+   auto bbb_memcpy_atomic_write = [](char *bytedst, const char *bytesrc,
+                                     size_t bytelen) noexcept {
+     for (size_t j = 0; j < bytelen; ++j) {
+-      std::atomic_ref<char>(bytedst[j])
++      __my_atomic_ref<char>(bytedst[j])
+           .store(bytesrc[j], std::memory_order_relaxed);
+     }
+   };
+@@ -16239,7 +16250,7 @@
+     auto *dst_aligned = reinterpret_cast<uint64_t *>(dst);
+     uint64_t src_val;
+     std::memcpy(&src_val, src, sizeof(uint64_t)); // Non-atomic read from src
+-    std::atomic_ref<uint64_t>(*dst_aligned)
++    __my_atomic_ref<uint64_t>(*dst_aligned)
+         .store(src_val, std::memory_order_relaxed);
+     dst += alignment;
+     src += alignment;
+--- a/v8/src/objects/simd.cc
++++ b/v8/src/objects/simd.cc
+@@ -32,6 +32,15 @@
+ #include <arm_neon.h>
+ #endif
+ 
++#ifdef __TERMUX__
++#include "third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h"
++template <typename T>
++using __my_atomic_ref = Foo::atomic_ref<T>;
++#else
++template <typename T>
++using __my_atomic_ref = std::atomic_ref<T>;
++#endif
++
+ namespace v8 {
+ namespace internal {
+ 
+@@ -487,7 +496,7 @@
+   char* mutable_bytes = const_cast<char*>(bytes);
+   for (size_t i = 0; i < length; i++) {
+     uint8_t byte =
+-        std::atomic_ref<char>(mutable_bytes[i]).load(std::memory_order_relaxed);
++        __my_atomic_ref<char>(mutable_bytes[i]).load(std::memory_order_relaxed);
+     PerformNibbleToHexAndWriteIntoStringOutPut(byte, index, string_output);
+     index += 2;
+   }
+@@ -1082,7 +1091,7 @@
+     result = HandleRemainingHexValues(input_vector, i);
+     if (result.has_value()) {
+       if (is_shared) {
+-        std::atomic_ref<uint8_t>(buffer[index++])
++        __my_atomic_ref<uint8_t>(buffer[index++])
+             .store(result.value(), std::memory_order_relaxed);
+       } else {
+         buffer[index++] = result.value();

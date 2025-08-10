@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://github.com/electron/electron
 TERMUX_PKG_DESCRIPTION="Build cross-platform desktop apps with JavaScript, HTML, and CSS (Used by Code-OSS, Host Tools)"
 TERMUX_PKG_LICENSE="MIT, BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
-_CHROMIUM_VERSION=134.0.6998.205
-TERMUX_PKG_VERSION=35.6.0
+_CHROMIUM_VERSION=138.0.7204.100
+TERMUX_PKG_VERSION=37.2.3
 TERMUX_PKG_SRCURL=git+https://github.com/electron/electron
-TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libdrm, libevdev, libxkbcommon, libminizip, libnss, libwayland, libx11, mesa, openssl, pango, pulseaudio, zlib"
+TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libnotify, libffi-static"
 TERMUX_PKG_BUILD_IN_SRC=true
 # Chromium doesn't support i686 on Linux.
@@ -204,8 +204,6 @@ treat_warnings_as_errors = false
 # Use system libraries as little as possible
 use_bundled_fontconfig = false
 use_system_freetype = false
-# use_system_libdrm = true
-# use_system_libffi = false
 use_custom_libcxx = false
 use_custom_libcxx_for_host = true
 use_allocator_shim = false
@@ -226,7 +224,7 @@ ozone_auto_platforms = false
 ozone_platform = \"x11\"
 ozone_platform_x11 = true
 # FIXME: Remove this when chromium is bumped to cr-135
-ozone_platform_wayland = true
+ozone_platform_wayland = false
 ozone_platform_headless = true
 angle_enable_vulkan = true
 angle_enable_swiftshader = true
@@ -238,6 +236,9 @@ enable_nacl = false
 is_cfi = false
 use_cfi_icall = false
 use_thin_lto = false
+# OpenCL doesn't work out of box in Termux, use NNAPI instead
+build_tflite_with_opencl = false
+build_tflite_with_nnapi = true
 # Enable rust
 custom_target_rust_abi_target = \"$CARGO_TARGET_NAME\"
 llvm_android_mainline = true
