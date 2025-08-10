@@ -1,0 +1,73 @@
+Moves the codelldb executable binary file and python scripts from inside the VSIX
+package file to outside of it.
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -214,15 +214,7 @@ set(PackagedFilesBootstrap
+ set(PackagedFilesFull
+     ${PackagedFilesBootstrap}
+     platform.ok
+-    adapter/codelldb
+-    adapter/codelldb.exe
+-    adapter/*.so
+-    adapter/*.dylib
+-    adapter/*.dll
+-    adapter/scripts/**/*.py
+-    lldb/bin/**/*
+-    lldb/lib/**/*
+-    lldb/DLLs/**/*
++    adapter/scripts/console.py
+     lang_support/**/*.py
+ )
+ 
+--- a/adapter/codelldb/bin/main.rs
++++ b/adapter/codelldb/bin/main.rs
+@@ -43,14 +43,7 @@ fn main() -> Result<(), Error> {
+         codelldb_dir.pop();
+         let liblldb_path = match matches.value_of("liblldb") {
+             Some(path) => PathBuf::from(path),
+-            None => {
+-                let mut liblldb_path = codelldb_dir.clone();
+-                liblldb_path.pop();
+-                liblldb_path.push("lldb");
+-                liblldb_path.push(DYLIB_SUBDIR);
+-                liblldb_path.push(format!("liblldb.{}", DYLIB_EXTENSION));
+-                liblldb_path
+-            }
++            None => PathBuf::from("@TERMUX_PREFIX@/lib/liblldb.so")
+         };
+ 
+         lldb_stub::liblldb.load_from(&liblldb_path).unwrap();
+--- a/adapter/codelldb/src/python.rs
++++ b/adapter/codelldb/src/python.rs
+@@ -92,8 +92,7 @@ pub fn initialize(debugger: &SBDebugger, adapter_dir: &Path) -> Result<Arc<Pytho
+     let interpreter = debugger.command_interpreter();
+     let mut command_result = SBCommandReturnObject::new();
+ 
+-    let script = adapter_dir.join("scripts/codelldb");
+-    let command = format!("command script import {}", lldb_quoted_string(script.to_str().unwrap()));
++    let command = format!("command script import {}", lldb_quoted_string("@TERMUX_PYTHON_HOME@/site-packages/codelldb"));
+     interpreter.handle_command(&command, &mut command_result, false);
+     if !command_result.succeeded() {
+         bail!(format!("{:?}", command_result));
+@@ -168,8 +167,7 @@ pub fn initialize(debugger: &SBDebugger, adapter_dir: &Path) -> Result<Arc<Pytho
+     mem::forget(interface.clone());
+ 
+     // Import legacy alias for the codelldb module
+-    let script = adapter_dir.join("scripts/debugger.py");
+-    let command = format!("command script import {}", lldb_quoted_string(script.to_str().unwrap()));
++    let command = format!("command script import {}", lldb_quoted_string("@TERMUX_PYTHON_HOME@/site-packages/codelldb/debugger.py"));
+     interpreter.handle_command(&command, &mut command_result, false);
+ 
+     Ok(interface)
+--- a/extension/novsc/adapter.ts
++++ b/extension/novsc/adapter.ts
+@@ -28,7 +28,7 @@ export async function getSpawnParams(
+     options: AdapterStartOptions
+ ): Promise<ProcessSpawnParams> {
+ 
+-    let executable = path.join(options.extensionRoot, 'adapter', 'codelldb');
++    let executable = '@TERMUX_PREFIX@/bin/codelldb';
+     let portAction = options.connect ? '--connect' : '--port';
+     let args = ['--liblldb', liblldb, portAction, options.port.toString()];
+     if (options.authToken) {

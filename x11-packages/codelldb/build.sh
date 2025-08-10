@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A native debugger extension for VSCode based on LLDB"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.11.5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/vadimcn/codelldb/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=87ff4a444dbd0c6c9bcf1ac5527485355a400e9bee2386d7b0d33c70eeca188e
 TERMUX_PKG_AUTO_UPDATE=true
@@ -25,6 +26,13 @@ termux_step_pre_configure() {
 	echo "Applying patch: $(basename "$patch")"
 	test -f "$patch" && sed \
 		-e "s%\@TERMUX_PKG_BUILDDIR\@%${TERMUX_PKG_BUILDDIR}%g" \
+		"$patch" | patch --silent -p1 -d"$TERMUX_PKG_SRCDIR"
+
+	patch="$TERMUX_PKG_BUILDER_DIR/move-adapter-outside-vsix.diff"
+	echo "Applying patch: $(basename "$patch")"
+	test -f "$patch" && sed \
+		-e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
+		-e "s%\@TERMUX_PYTHON_HOME\@%${TERMUX_PYTHON_HOME}%g" \
 		"$patch" | patch --silent -p1 -d"$TERMUX_PKG_SRCDIR"
 
 	case $TERMUX_ARCH in
@@ -53,10 +61,21 @@ termux_step_pre_configure() {
 }
 
 termux_step_make_install() {
+	# adapter binary for main package
+	install -Dm700 -t "$TERMUX_PREFIX/bin" "$TERMUX_PKG_BUILDDIR/adapter/codelldb"
+
+	# python module for main package
+	local codelldb_python_dest="$TERMUX_PYTHON_HOME/site-packages/codelldb/"
+	rm -rf "$codelldb_python_dest"
+	mkdir -p "$codelldb_python_dest"
+	cp -r "$TERMUX_PKG_BUILDDIR"/adapter/scripts/codelldb/* "$codelldb_python_dest"
+	install -Dm644 -t "$codelldb_python_dest" "$TERMUX_PKG_BUILDDIR/adapter/scripts/debugger.py"
+
+	# .vsix file for vsix-package-codelldb
 	install -DTm644 "$TERMUX_PKG_BUILDDIR/codelldb-full.vsix" \
 		"$TERMUX_PREFIX/opt/vsix-packages/codelldb-$TERMUX_PKG_FULLVERSION.vsix"
 
-	# subpackage file
+	# subpackage file for code-oss-extension-codelldb
 	install -DTm644 "$TERMUX_PKG_SRCDIR/LICENSE" \
 		"$TERMUX_PREFIX/share/doc/code-oss-extension-codelldb/copyright"
 }
