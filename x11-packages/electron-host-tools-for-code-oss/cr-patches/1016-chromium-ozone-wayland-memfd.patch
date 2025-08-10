@@ -1,14 +1,14 @@
---- a/ui/ozone/platform/wayland/host/zwp_text_input_wrapper_v1.cc
-+++ b/ui/ozone/platform/wayland/host/zwp_text_input_wrapper_v1.cc
-@@ -22,6 +22,11 @@
- #include "ui/ozone/platform/wayland/host/wayland_seat.h"
- #include "ui/ozone/platform/wayland/host/wayland_window.h"
+--- a/components/exo/wayland/zwp_text_input_manager.cc
++++ b/components/exo/wayland/zwp_text_input_manager.cc
+@@ -33,6 +33,11 @@
+ #include "ui/events/keycodes/dom/keycode_converter.h"
+ #include "ui/events/ozone/layout/xkb/xkb_modifier_converter.h"
  
-+#if defined __ANDROID__ && __ANDROID_API__ < 30
++#if defined(__ANDROID__) && __ANDROID_API__ < 30
 +#include <sys/syscall.h>
 +#define memfd_create(name,flags) syscall(SYS_memfd_create,name,flags)
 +#endif
 +
- namespace ui {
- namespace {
+ namespace exo {
+ namespace wayland {
  

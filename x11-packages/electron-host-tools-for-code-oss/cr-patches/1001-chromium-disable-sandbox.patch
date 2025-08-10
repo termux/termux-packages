@@ -29,9 +29,9 @@
  // TODO(crbug.com/40188745): Implement crash reporter integration for Fuchsia.
 --- a/chrome/browser/ui/startup/bad_flags_prompt.cc
 +++ b/chrome/browser/ui/startup/bad_flags_prompt.cc
-@@ -60,10 +60,12 @@
- static const char* kBadFlags[] = {
-     network::switches::kIgnoreCertificateErrorsSPKIList,
+@@ -67,10 +67,12 @@
+     switches::kHostRules,
+ 
      // These flags disable sandbox-related security.
 +#ifndef __TERMUX__
      sandbox::policy::switches::kDisableGpuSandbox,
@@ -44,9 +44,9 @@
  #endif
 --- a/chrome/app/chrome_main_delegate.cc
 +++ b/chrome/app/chrome_main_delegate.cc
-@@ -235,6 +235,10 @@
- #include "ui/gfx/switches.h"
- #endif
+@@ -226,6 +226,10 @@
+ #include "ui/ozone/public/ozone_platform.h"
+ #endif  // BUILDFLAG(IS_OZONE)
  
 +#ifdef __TERMUX__
 +#include "sandbox/policy/switches.h"
@@ -55,7 +55,7 @@
  base::LazyInstance<ChromeContentGpuClient>::DestructorAtExit
      g_chrome_content_gpu_client = LAZY_INSTANCE_INITIALIZER;
  base::LazyInstance<ChromeContentRendererClient>::DestructorAtExit
-@@ -1037,6 +1041,14 @@
+@@ -1061,6 +1065,14 @@
    const base::CommandLine& command_line =
        *base::CommandLine::ForCurrentProcess();
  
@@ -72,7 +72,7 @@
    // web security by setting the kWebKitWebSecurityEnabled pref directly.
 --- a/content/shell/browser/shell_content_browser_client.cc
 +++ b/content/shell/browser/shell_content_browser_client.cc
-@@ -131,6 +131,10 @@
+@@ -141,6 +141,10 @@
  #include "media/mojo/services/media_foundation_preferences.h"
  #endif  // BUILDFLAG(IS_WIN)
  
@@ -83,13 +83,13 @@
  namespace content {
  
  namespace {
-@@ -405,6 +409,9 @@
-     // to shell_main.cc that it's a browser test.
-     switches::kBrowserTest,
+@@ -451,6 +455,9 @@
+       // to shell_main.cc that it's a browser test.
+       switches::kBrowserTest,
  #endif
 +#ifdef __TERMUX__
-+    sandbox::policy::switches::kNoSandbox
++      sandbox::policy::switches::kNoSandbox
 +#endif
-     switches::kCrashDumpsDir,
-     switches::kEnableCrashReporter,
-     switches::kExposeInternalsForTesting,
+       switches::kCrashDumpsDir,
+       switches::kEnableCrashReporter,
+       switches::kExposeInternalsForTesting,
