@@ -1,12 +1,12 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/tadfisher/pass-otp
 TERMUX_PKG_DESCRIPTION="A pass/passage extension for managing one-time-password (OTP) tokens"
 TERMUX_PKG_LICENSE="GPL-3.0-or-later"
-_COMMIT=a364d2a71ad24158a009c266102ce0d91149de67
-_COMMIT_DATE=20221228
+_COMMIT=7bb50dbc4b6073f12f40be66a5ee371b9652a646
+_COMMIT_DATE=20250809
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=1.2.0-p${_COMMIT_DATE}
 TERMUX_PKG_SRCURL=https://github.com/tadfisher/pass-otp/archive/$_COMMIT.tar.gz
-TERMUX_PKG_SHA256=02c6fa59b30ee009c62807b763c41df44cc9e4da3e137f1b5774e995ee18e2f6
+TERMUX_PKG_SHA256=126b3685fa2ac8fe34aaf1b0036c5be8d480cd913a9709c1f90a5aba117ffa44
 TERMUX_PKG_DEPENDS="oathtool"
 TERMUX_PKG_SUGGESTS="pass | passage, libqrencode"
 TERMUX_PKG_BUILD_IN_SRC=true
