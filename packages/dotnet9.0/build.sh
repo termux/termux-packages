@@ -162,11 +162,6 @@ termux_step_configure() {
 termux_step_make() {
 	export CROSSCOMPILE=1
 	# --online needed to workaround restore issue
-	#
-	# https://github.com/advisories/GHSA-h4j7-5rxr-p4wc
-	# CVE-2025-26646
-	# TreatWarningsAsErrors=false to not error on NU1901
-	# until next fixed version
 	time ./build.sh \
 		--clean-while-building \
 		--use-mono-runtime \
@@ -175,8 +170,6 @@ termux_step_make() {
 		-m:${TERMUX_PKG_MAKE_PROCESSES} \
 		-- \
 		/p:Configuration=${CONFIG} \
-		/p:TreatWarningsAsErrors=false \
-		/p:MSBuildTreatWarningsAsErrors=false \
 		/p:TargetArchitecture=${arch} \
 		/p:TargetRid=linux-bionic-${arch}
 
