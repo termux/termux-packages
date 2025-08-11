@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 _MAJOR_VERSION=3.11
 TERMUX_PKG_VERSION=7.3.19
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.python.org/pypy/pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION-src.tar.bz2
 TERMUX_PKG_SHA256=4817c044bb469a3274e60aa3645770f81eb4f9166ea7fdc4e6c351345554c8d8
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, zlib"
@@ -38,6 +39,7 @@ termux_step_post_get_source() {
 		| patch --silent -p1
 
 	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+		-e "s|@TERMUX_PKG_API_LEVEL@|${TERMUX_PKG_API_LEVEL}|g" \
 		"$TERMUX_PKG_BUILDER_DIR"/termux.py.in > \
 		"$TERMUX_PKG_SRCDIR"/rpython/translator/platform/termux.py
 }
