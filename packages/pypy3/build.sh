@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 _MAJOR_VERSION=3.11
 TERMUX_PKG_VERSION=7.3.19
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.python.org/pypy/pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION-src.tar.bz2
 TERMUX_PKG_SHA256=4817c044bb469a3274e60aa3645770f81eb4f9166ea7fdc4e6c351345554c8d8
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, zlib"
@@ -38,6 +39,7 @@ termux_step_post_get_source() {
 		| patch --silent -p1
 
 	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+		-e "s|@TERMUX_PKG_API_LEVEL@|${TERMUX_PKG_API_LEVEL}|g" \
 		"$TERMUX_PKG_BUILDER_DIR"/termux.py.in > \
 		"$TERMUX_PKG_SRCDIR"/rpython/translator/platform/termux.py
 }
@@ -318,6 +320,17 @@ termux_step_make_install() {
 }
 
 termux_step_create_debscripts() {
+	# postinst script to clean up runtime-generated files of previous pypy3 versions that
+	# do not match the current $_MAJOR_VERSION
+	# (this one needs to have bash in the shebang, not sh, because of the use of a
+	# wildcard feature that does not work if the shebang is sh)
+	cat <<- POSTINST_EOF > ./postinst
+	#!$TERMUX_PREFIX/bin/bash
+	echo "Deleting files from other versions of $TERMUX_PKG_NAME..."
+	rm -Rf $TERMUX_PREFIX/opt/$TERMUX_PKG_NAME/lib/pypy*[^$_MAJOR_VERSION]
+	exit 0
+	POSTINST_EOF
+
 	# Pre-rm script to cleanup runtime-generated files.
 	cat <<- PRERM_EOF > ./prerm
 	#!$TERMUX_PREFIX/bin/sh
@@ -335,5 +348,5 @@ termux_step_create_debscripts() {
 	exit 0
 	PRERM_EOF
 
-	chmod 0755 prerm
+	chmod 0755 postinst prerm
 }
