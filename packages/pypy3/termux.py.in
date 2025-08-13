@@ -95,8 +95,11 @@ class BaseTermux(Linux):
     def get_multiarch(self):
         raise NotImplementedError("Needs to be overwritten")
 
+    def get_api_level(self):
+        return "@TERMUX_PKG_API_LEVEL@"
+
     def _get_cross_compiler(self):
-        return "clang" if self._is_same_platform_type() else ("clang --target=" + self.get_multiarch())
+        return "clang" if self._is_same_platform_type() else ("clang --target=" + self.get_multiarch() + self.get_api_level())
 
     def _get_build_platform_type(self):
         return "x86"
