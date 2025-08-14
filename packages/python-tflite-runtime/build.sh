@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.tensorflow.org/lite
 TERMUX_PKG_DESCRIPTION="TensorFlow Lite Python bindings"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.19.0"
+TERMUX_PKG_VERSION="2.20.0"
 TERMUX_PKG_SRCURL=git+https://github.com/tensorflow/tensorflow
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="python, python-numpy, python-pip"
@@ -28,7 +28,12 @@ termux_step_pre_configure() {
 	# Copied from tensorflow/lite/tools/pip_package/build_pip_package_with_cmake.sh
 	export TENSORFLOW_DIR="$TERMUX_PKG_SRCDIR"
 	local TENSORFLOW_LITE_DIR="$TENSORFLOW_DIR/tensorflow/lite"
-	local TENSORFLOW_VERSION=$(grep -E '^_VERSION.*$' "$TENSORFLOW_DIR/tensorflow/tools/pip_package/setup.py" | cut -d= -f2 | sed "s/[ '-]//g")
+	local TENSORFLOW_VERSION=$(grep "TF_VERSION = " "${TENSORFLOW_DIR}/tensorflow/tf_version.bzl" | cut -d= -f2 | sed 's/[ "-]//g')
+	IFS='.' read -r -a array <<< "$TENSORFLOW_VERSION"
+	local TF_MAJOR=${array[0]}
+	local TF_MINOR=${array[1]}
+	local TF_PATCH=${array[2]}
+	local TF_CXX_FLAGS="-DTF_MAJOR_VERSION=${TF_MAJOR} -DTF_MINOR_VERSION=${TF_MINOR} -DTF_PATCH_VERSION=${TF_PATCH} -DTF_VERSION_SUFFIX=''"
 	export PACKAGE_VERSION="$TENSORFLOW_VERSION"
 	export PROJECT_NAME="tflite_runtime"
 	TFLITE_BUILD_DIR="$TERMUX_PKG_BUILDDIR/build-wheel"
@@ -38,6 +43,7 @@ termux_step_pre_configure() {
 	CPPFLAGS+=" -I$PYTHON_SITE_PKG/numpy/_core/include"
 	CPPFLAGS+=" -I$PYBIND11_INCLUDE"
 	CPPFLAGS+=" -I$TERMUX_PREFIX/include/python$TERMUX_PYTHON_VERSION"
+	CPPFLAGS+=" $TF_CXX_FLAGS"
 
 	# Build source tree
 	rm -rf "$BUILD_DIR" && mkdir -p "$BUILD_DIR/tflite_runtime"
