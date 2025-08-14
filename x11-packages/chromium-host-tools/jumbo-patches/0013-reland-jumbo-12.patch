@@ -140,7 +140,7 @@ Enable jumbo build for the following template(s):
  .../lens/lens_overlay_languages_controller.cc   |  4 ++++
  .../ui/lens/lens_overlay_untrusted_ui.cc        |  2 +-
  .../browser/ui/lens/lens_overlay_url_builder.cc |  4 ++++
- .../lens_search_contextualization_controller.cc |  9 ++++++++-
+ .../lens_search_contextualization_controller.cc |  4 ++++
  chrome/browser/ui/safety_hub/BUILD.gn           |  3 ++-
  .../saved_tab_group_keyed_service.cc            |  4 ++++
  .../tab_group_sync_delegate_desktop.cc          |  6 ++++++
@@ -215,10 +215,10 @@ Enable jumbo build for the following template(s):
  chrome/utility/BUILD.gn                         |  3 ++-
  .../inspector_protocol/crdtp/protocol_core.h    |  2 +-
  tools/json_schema_compiler/json_schema_api.gni  | 10 +++++++++-
- 172 files changed, 725 insertions(+), 53 deletions(-)
+ 172 files changed, 721 insertions(+), 52 deletions(-)
 
 diff --git a/chrome/browser/BUILD.gn b/chrome/browser/BUILD.gn
-index 9f0203e9c6..0e49c63f4f 100644
+index 9114b723fc..46a66afb69 100644
 --- a/chrome/browser/BUILD.gn
 +++ b/chrome/browser/BUILD.gn
 @@ -9,6 +9,7 @@ import("//build/config/chrome_build.gni")
@@ -238,7 +238,7 @@ index 9f0203e9c6..0e49c63f4f 100644
    sources = [
      "about_flags.cc",
      "accessibility/accessibility_labels_service.cc",
-@@ -1756,6 +1757,7 @@ static_library("browser") {
+@@ -1762,6 +1763,7 @@ static_library("browser") {
      "webid/identity_provider_permission_request.cc",
      "webid/identity_provider_permission_request.h",
    ]
@@ -246,7 +246,7 @@ index 9f0203e9c6..0e49c63f4f 100644
  
    if (is_chromeos) {
      sources += [
-@@ -4371,6 +4373,10 @@ static_library("browser") {
+@@ -4379,6 +4381,10 @@ static_library("browser") {
        "webauthn/unexportable_key_utils.cc",
        "webauthn/unexportable_key_utils.h",
      ]
@@ -257,7 +257,7 @@ index 9f0203e9c6..0e49c63f4f 100644
  
      #!is_android
      public_deps += [ "//ui/base/mojom:ui_base_types" ]
-@@ -4581,6 +4587,11 @@ static_library("browser") {
+@@ -4589,6 +4595,11 @@ static_library("browser") {
        "//ui/webui/resources/cr_components/history_clusters:mojo_bindings",
        "//ui/webui/resources/cr_components/history_embeddings:mojo_bindings",
      ]
@@ -269,7 +269,7 @@ index 9f0203e9c6..0e49c63f4f 100644
  
      #!is_android
      # Any circular includes must depend on the target
-@@ -6701,6 +6712,10 @@ static_library("browser") {
+@@ -6709,6 +6720,10 @@ static_library("browser") {
        "//components/enterprise/watermarking",
        "//components/enterprise/watermarking/content",
      ]
@@ -973,11 +973,11 @@ index 7d55128c57..2cb18e4b0f 100644
    }
  
 diff --git a/chrome/browser/extensions/extension_view_host_factory.cc b/chrome/browser/extensions/extension_view_host_factory.cc
-index 56a2ef05a2..2b871c85a5 100644
+index 98b847282b..fe9e863f1a 100644
 --- a/chrome/browser/extensions/extension_view_host_factory.cc
 +++ b/chrome/browser/extensions/extension_view_host_factory.cc
-@@ -278,7 +278,7 @@ std::unique_ptr<ExtensionViewHost>
- ExtensionViewHostFactory::CreateSidePanelHost(
+@@ -293,7 +293,7 @@ ExtensionViewHostFactory::CreateSidePanelHost(
+     const Extension& extension,
      const GURL& url,
      BrowserWindowInterface* browser,
 -    tabs::TabInterface* tab_interface) {
@@ -986,11 +986,11 @@ index 56a2ef05a2..2b871c85a5 100644
  
    Profile* profile =
 diff --git a/chrome/browser/extensions/extension_view_host_factory.h b/chrome/browser/extensions/extension_view_host_factory.h
-index d0855c3912..b73c86164c 100644
+index 4c9da48c3d..3a588d163f 100644
 --- a/chrome/browser/extensions/extension_view_host_factory.h
 +++ b/chrome/browser/extensions/extension_view_host_factory.h
-@@ -48,7 +48,7 @@ class ExtensionViewHostFactory {
-   static std::unique_ptr<ExtensionViewHost> CreateSidePanelHost(
+@@ -50,7 +50,7 @@ class ExtensionViewHostFactory {
+       const Extension& extension,
        const GURL& url,
        BrowserWindowInterface* browser,
 -      tabs::TabInterface* tab_interface);
@@ -1788,7 +1788,7 @@ index 981366a453..ea9975fb78 100644
 +
 +#undef kServiceName
 diff --git a/chrome/browser/signin/bound_session_credentials/bound_session_refresh_cookie_debug_report_fetcher.cc b/chrome/browser/signin/bound_session_credentials/bound_session_refresh_cookie_debug_report_fetcher.cc
-index 82369d058a..84744af0ca 100644
+index 30343235f1..9cdf8acfaf 100644
 --- a/chrome/browser/signin/bound_session_credentials/bound_session_refresh_cookie_debug_report_fetcher.cc
 +++ b/chrome/browser/signin/bound_session_credentials/bound_session_refresh_cookie_debug_report_fetcher.cc
 @@ -23,6 +23,8 @@
@@ -1800,17 +1800,17 @@ index 82369d058a..84744af0ca 100644
  namespace {
  std::string UpdateDebugInfoAndSerializeToHeader(
      bound_session_credentials::RotationDebugInfo& debug_info) {
-@@ -118,3 +120,5 @@ void BoundSessionRefreshCookieDebugReportFetcher::OnURLLoaderComplete(
+@@ -123,3 +125,5 @@ void BoundSessionRefreshCookieDebugReportFetcher::OnURLLoaderComplete(
        headers ? headers->response_code() : net_error);
    std::move(callback_).Run(Result::kSuccess);
  }
 +
 +#undef UpdateDebugInfoAndSerializeToHeader
 diff --git a/chrome/browser/signin/bound_session_credentials/bound_session_refresh_cookie_fetcher_impl.cc b/chrome/browser/signin/bound_session_credentials/bound_session_refresh_cookie_fetcher_impl.cc
-index 69306e97de..e3b89a978a 100644
+index fbe648212e..d87fa21e6c 100644
 --- a/chrome/browser/signin/bound_session_credentials/bound_session_refresh_cookie_fetcher_impl.cc
 +++ b/chrome/browser/signin/bound_session_credentials/bound_session_refresh_cookie_fetcher_impl.cc
-@@ -36,6 +36,9 @@
+@@ -38,6 +38,9 @@
  #include "services/network/public/mojom/cookie_access_observer.mojom.h"
  #include "services/network/public/mojom/url_response_head.mojom.h"
  
@@ -1820,7 +1820,7 @@ index 69306e97de..e3b89a978a 100644
  namespace {
  constexpr char kChallengeItemKey[] = "challenge";
  constexpr char kSessionIdItemKey[] = "session_id";
-@@ -465,3 +468,6 @@ void BoundSessionRefreshCookieFetcherImpl::Clone(
+@@ -512,3 +515,6 @@ void BoundSessionRefreshCookieFetcherImpl::Clone(
      mojo::PendingReceiver<network::mojom::CookieAccessObserver> observer) {
    cookie_observers_.Add(this, std::move(observer));
  }
@@ -1869,7 +1869,7 @@ index 096f941945..051e5c7404 100644
        base::BindOnce(&SystemLogSourceDataCollectorAdaptor::OnPIIDetected,
                       weak_ptr_factory_.GetWeakPtr(),
 diff --git a/chrome/browser/sync/BUILD.gn b/chrome/browser/sync/BUILD.gn
-index 4ac473c716..51838d966a 100644
+index 890cf8f4b9..e9c930115a 100644
 --- a/chrome/browser/sync/BUILD.gn
 +++ b/chrome/browser/sync/BUILD.gn
 @@ -2,13 +2,14 @@
@@ -1971,7 +1971,7 @@ index 10a78726d1..c719a63c7b 100644
 +
 +#undef kTrialName
 diff --git a/chrome/browser/ui/BUILD.gn b/chrome/browser/ui/BUILD.gn
-index fa6f6060cf..b9a8f74fd2 100644
+index 28ca0a42ae..72f9028b16 100644
 --- a/chrome/browser/ui/BUILD.gn
 +++ b/chrome/browser/ui/BUILD.gn
 @@ -5,6 +5,7 @@
@@ -2010,7 +2010,7 @@ index fa6f6060cf..b9a8f74fd2 100644
      deps += [
        "//chrome/browser/lifetime:termination_notification",
        "//chrome/browser/search/background",
-@@ -3201,6 +3207,10 @@ static_library("ui") {
+@@ -3200,6 +3206,10 @@ static_library("ui") {
        "views/passwords/biometric_authentication_for_filling_bubble_view.cc",
        "views/passwords/biometric_authentication_for_filling_bubble_view.h",
      ]
@@ -2021,7 +2021,7 @@ index fa6f6060cf..b9a8f74fd2 100644
    }
  
    if (is_win || is_mac) {
-@@ -4872,6 +4882,11 @@ static_library("ui") {
+@@ -4871,6 +4881,11 @@ static_library("ui") {
        # needed for "friend" statements for use in tests.
        "translate/translate_bubble_test_utils.h",
      ]
@@ -2117,7 +2117,7 @@ index d88b9ed978..b64294977f 100644
 +
 +#undef GetWebContentsFromPresentationRequest
 diff --git a/chrome/browser/ui/lens/BUILD.gn b/chrome/browser/ui/lens/BUILD.gn
-index dfdfdb51ef..7f70f012ca 100644
+index 60051057ed..823562612c 100644
 --- a/chrome/browser/ui/lens/BUILD.gn
 +++ b/chrome/browser/ui/lens/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -2180,10 +2180,10 @@ index 53e1ab1608..77a16cf015 100644
 +
 +#undef kTrafficAnnotationTag
 diff --git a/chrome/browser/ui/lens/lens_overlay_untrusted_ui.cc b/chrome/browser/ui/lens/lens_overlay_untrusted_ui.cc
-index 1ede4f0c88..6777934c1f 100644
+index 375f255d6c..7d71a926ed 100644
 --- a/chrome/browser/ui/lens/lens_overlay_untrusted_ui.cc
 +++ b/chrome/browser/ui/lens/lens_overlay_untrusted_ui.cc
-@@ -330,7 +330,7 @@ LensOverlayUntrustedUI::LensOverlayUntrustedUI(content::WebUI* web_ui)
+@@ -332,7 +332,7 @@ LensOverlayUntrustedUI::LensOverlayUntrustedUI(content::WebUI* web_ui)
    // Determine if the cursor tooltip should appear.
    Profile* profile = Profile::FromWebUI(web_ui);
    int lens_overlay_start_count =
@@ -2193,7 +2193,7 @@ index 1ede4f0c88..6777934c1f 100644
        "canShowTooltipFromPrefs",
        lens_overlay_start_count <= kNumTimesToShowCursorTooltips);
 diff --git a/chrome/browser/ui/lens/lens_overlay_url_builder.cc b/chrome/browser/ui/lens/lens_overlay_url_builder.cc
-index 98dde1c826..4eee77c08c 100644
+index ebd2e61dfb..b4ae6d326a 100644
 --- a/chrome/browser/ui/lens/lens_overlay_url_builder.cc
 +++ b/chrome/browser/ui/lens/lens_overlay_url_builder.cc
 @@ -27,6 +27,8 @@
@@ -2212,10 +2212,10 @@ index 98dde1c826..4eee77c08c 100644
 +
 +#undef kVisualInputTypeQueryParameterKey
 diff --git a/chrome/browser/ui/lens/lens_search_contextualization_controller.cc b/chrome/browser/ui/lens/lens_search_contextualization_controller.cc
-index 62a3fdf3b4..e03036b3d4 100644
+index 9a0ab3ba7c..3d494ee0f5 100644
 --- a/chrome/browser/ui/lens/lens_search_contextualization_controller.cc
 +++ b/chrome/browser/ui/lens/lens_search_contextualization_controller.cc
-@@ -28,6 +28,8 @@
+@@ -29,6 +29,8 @@
  #include "pdf/mojom/pdf.mojom.h"
  #endif  // BUILDFLAG(ENABLE_PDF)
  
@@ -2224,31 +2224,12 @@ index 62a3fdf3b4..e03036b3d4 100644
  namespace {
  
  // The amount of change in bytes that is considered a significant change and
-@@ -129,7 +131,7 @@ double CalculateWordOverlapSimilarity(std::string dom_text,
-   return total_ocr_words == 0 ? 0.0 : overlap_count / total_ocr_words;
- }
- 
--bool IsPageContextEligible(
-+bool IsPageContextEligible_Controller(
-     const GURL& main_frame_url,
-     std::vector<optimization_guide::FrameMetadata> frame_metadata,
-     optimization_guide::PageContextEligibility* page_context_eligibility) {
-@@ -146,6 +148,8 @@ bool IsPageContextEligible(
- 
- }  // namespace
- 
-+#define IsPageContextEligible       IsPageContextEligible_Controller
-+
- namespace lens {
- 
- LensSearchContextualizationController::LensSearchContextualizationController(
-@@ -1011,3 +1015,6 @@ LensSearchContextualizationController::GetSearchboxController() {
+@@ -1127,3 +1129,5 @@ LensSearchContextualizationController::GetSearchboxController() {
  }
  
  }  // namespace lens
 +
 +#undef kByteChangeTolerancePercent
-+#undef IsPageContextEligible
 diff --git a/chrome/browser/ui/safety_hub/BUILD.gn b/chrome/browser/ui/safety_hub/BUILD.gn
 index 12d6168723..aaa8fcb42f 100644
 --- a/chrome/browser/ui/safety_hub/BUILD.gn
@@ -2732,7 +2713,7 @@ index 9cbc5fa1ff..e3b5f0caba 100644
 +
 +#undef kMaxBubbleWidth
 diff --git a/chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_content_view.cc b/chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_content_view.cc
-index cfb64739f7..7655224b84 100644
+index d8743518d3..edc2274684 100644
 --- a/chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_content_view.cc
 +++ b/chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_content_view.cc
 @@ -34,6 +34,8 @@
@@ -2744,7 +2725,7 @@ index cfb64739f7..7655224b84 100644
  namespace {
  
  using Util = ::content_settings::CookieControlsUtil;
-@@ -344,3 +346,5 @@ void CookieControlsContentView::NotifyFeedbackButtonPressedCallback() {
+@@ -347,3 +349,5 @@ void CookieControlsContentView::NotifyFeedbackButtonPressedCallback() {
  
  BEGIN_METADATA(CookieControlsContentView)
  END_METADATA
@@ -2928,7 +2909,7 @@ index 345cbf856e..3e25b76b39 100644
 +
 +#undef AddElementIdentifierToLabel
 diff --git a/chrome/browser/ui/views/profiles/first_run_flow_controller_dice.cc b/chrome/browser/ui/views/profiles/first_run_flow_controller_dice.cc
-index e185b5f155..edac83e68c 100644
+index 6c63b30431..dca775686b 100644
 --- a/chrome/browser/ui/views/profiles/first_run_flow_controller_dice.cc
 +++ b/chrome/browser/ui/views/profiles/first_run_flow_controller_dice.cc
 @@ -52,6 +52,8 @@
@@ -2940,14 +2921,14 @@ index e185b5f155..edac83e68c 100644
  namespace {
  
  constexpr base::TimeDelta kDefaultBrowserCheckTimeout = base::Seconds(2);
-@@ -639,3 +641,5 @@ FirstRunFlowControllerDice::RegisterPostIdentitySteps(
+@@ -636,3 +638,5 @@ FirstRunFlowControllerDice::RegisterPostIdentitySteps(
        ProfileManagementFlowController::Step::kFinishFlow);
    return post_identity_steps;
  }
 +
 +#undef kAccessPoint
 diff --git a/chrome/browser/ui/views/profiles/profile_picker_flow_controller.cc b/chrome/browser/ui/views/profiles/profile_picker_flow_controller.cc
-index a5404181aa..05c0aafa4a 100644
+index e88a975425..975f43cea0 100644
 --- a/chrome/browser/ui/views/profiles/profile_picker_flow_controller.cc
 +++ b/chrome/browser/ui/views/profiles/profile_picker_flow_controller.cc
 @@ -57,6 +57,8 @@
@@ -2959,7 +2940,7 @@ index a5404181aa..05c0aafa4a 100644
  namespace {
  
  const signin_metrics::AccessPoint kAccessPoint =
-@@ -794,3 +796,5 @@ ProfilePickerFlowController::RegisterPostIdentitySteps(
+@@ -802,3 +804,5 @@ ProfilePickerFlowController::RegisterPostIdentitySteps(
  
    return post_identity_steps;
  }
