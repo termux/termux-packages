@@ -17,7 +17,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_host_build() {
 	termux_setup_cmake
 
-	cmake "$TERMUX_PKG_SRCDIR"/tensorflow/lite
+	cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 "$TERMUX_PKG_SRCDIR"/tensorflow/lite
 	cmake --build . --verbose -j $TERMUX_PKG_MAKE_PROCESSES -t flatbuffers-flatc
 }
 
