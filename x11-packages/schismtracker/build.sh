@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A free and open-source reimplementation of Impulse Track
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="20250728"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/schismtracker/schismtracker/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=adbf92c2690e59e177868d88a823802891d47fffab496a0a726864a0363d2bb1
 TERMUX_PKG_AUTO_UPDATE=true
