@@ -9,7 +9,7 @@
  // (Which means you'll find a lot of "catch unreachable" sprinkled through the code,
  // they look scarier than they are)
  fn wrapAlloc(_: *anyopaque, len: usize, ptr_alignment: std.mem.Alignment, return_address: usize) ?[*]u8 {
-@@ -374,14 +374,14 @@
+@@ -376,14 +376,14 @@
  
  fn version() noreturn {
      const stdout = std.io.getStdOut();
@@ -26,13 +26,14 @@
      \\
      \\Mode selection:
      \\  -h, --help                 This help message
-@@ -426,11 +426,11 @@
+@@ -428,12 +428,12 @@
      \\  --sort COLUMN-(asc/desc)   disk-usage / name / apparent-size / itemcount / mtime
      \\  --enable-natsort           Use natural order when sorting by name
      \\  --group-directories-first  Sort directories before files
 -    \\  --confirm-quit             Ask confirmation before quitting ncdu
 +    \\  --confirm-quit             Ask confirmation before quitting ncdu2
      \\  --no-confirm-delete        Don't ask confirmation before deletion
+     \\  --delete-command CMD       Command to run for file deletion
      \\  --color SCHEME             off / dark / dark-bg
      \\
 -    \\Refer to `man ncdu` for more information.
@@ -40,7 +41,7 @@
      \\
      ) catch {};
      std.process.exit(0);
-@@ -576,7 +576,7 @@
+@@ -527,7 +527,7 @@
          while (args.next() catch unreachable) |opt| {
              if (!opt.opt) {
                  // XXX: ncdu 1.x doesn't error, it just silently ignores all but the last argument.
