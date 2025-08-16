@@ -1,6 +1,6 @@
 termux_setup_cmake() {
-	local TERMUX_CMAKE_VERSION=4.0.3
-	local TERMUX_CMAKE_SHA256=585ae9e013107bc8e7c7c9ce872cbdcbdff569e675b07ef57aacfb88c886faac
+	local TERMUX_CMAKE_VERSION=4.1.1
+	local TERMUX_CMAKE_SHA256=5a6c61cb62b38e153148a2c8d4af7b3d387f0c8c32b6dbceb5eb4af113efd65a
 	local TERMUX_CMAKE_MAJORVERSION="${TERMUX_CMAKE_VERSION%.*}"
 	local TERMUX_CMAKE_TARNAME="cmake-${TERMUX_CMAKE_VERSION}-linux-x86_64.tar.gz"
 	local TERMUX_CMAKE_URL="https://github.com/Kitware/CMake/releases/download/v${TERMUX_CMAKE_VERSION}/${TERMUX_CMAKE_TARNAME}"
