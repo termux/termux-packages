@@ -141,9 +141,14 @@ termux_pkg_upgrade_version() {
 	if [[ "${GIT_COMMIT_PACKAGES}" == "true" ]]; then
 		echo "INFO: Committing package."
 		stderr="$(
-			git add "${TERMUX_PKG_BUILDER_DIR}" 2>&1 >/dev/null
-			git commit -m "bump(${repo}/${TERMUX_PKG_NAME}): ${LATEST_VERSION}" \
-				-m "This commit has been automatically submitted by Github Actions." 2>&1 >/dev/null
+			git add \
+				"${TERMUX_PKG_BUILDER_DIR}" \
+				"${TERMUX_SCRIPTDIR}/scripts/build/setup/" \
+				2>&1 >/dev/null
+			git commit \
+				-m "bump(${repo}/${TERMUX_PKG_NAME}): ${LATEST_VERSION}" \
+				-m "This commit has been automatically submitted by Github Actions." \
+				2>&1 >/dev/null
 		)" || {
 			git reset HEAD --hard
 			termux_error_exit <<-EndOfError
