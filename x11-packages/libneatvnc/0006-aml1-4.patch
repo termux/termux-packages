@@ -1,0 +1,636 @@
+From 8c4584b43f6144164e435eb39d5bfe986da219fe Mon Sep 17 00:00:00 2001
+From: Andri Yngvason <andri@yngvason.is>
+Date: Sat, 28 Dec 2024 23:18:57 +0000
+Subject: [PATCH] Implement parallel deflate compression
+
+---
+ bench/meson.build              |  24 ++-
+ bench/parallel-deflate-bench.c | 227 +++++++++++++++++++++++++++
+ bench/zrle-bench.c             |  11 +-
+ include/parallel-deflate.h     |  30 ++++
+ src/parallel-deflate.c         | 279 +++++++++++++++++++++++++++++++++
+ 5 files changed, 562 insertions(+), 9 deletions(-)
+ create mode 100644 bench/parallel-deflate-bench.c
+ create mode 100644 include/parallel-deflate.h
+ create mode 100644 src/parallel-deflate.c
+
+diff --git a/bench/meson.build b/bench/meson.build
+index 9011afa..9fb696d 100644
+--- a/bench/meson.build
++++ b/bench/meson.build
+@@ -1,10 +1,11 @@
+ libpng = dependency('libpng', required: false)
+ 
++configure_file(
++	output: 'config.h',
++	configuration: config,
++)
++
+ if libpng.found()
+-	configure_file(
+-		output: 'config.h',
+-		configuration: config,
+-	)
+ 
+ 	executable(
+ 		'zrle-bench',
+@@ -41,3 +42,18 @@ if libpng.found()
+ 		],
+ 	)
+ endif
++
++executable(
++	'parallel-deflate',
++	[
++		'parallel-deflate-bench.c',
++		'../src/parallel-deflate.c',
++		'../src/vec.c',
++	],
++	dependencies: [
++		neatvnc_dep,
++		aml,
++		zlib,
++		libm,
++	],
++)
+diff --git a/bench/parallel-deflate-bench.c b/bench/parallel-deflate-bench.c
+new file mode 100644
+index 0000000..c895376
+--- /dev/null
++++ b/bench/parallel-deflate-bench.c
+@@ -0,0 +1,227 @@
++#include "parallel-deflate.h"
++#include "vec.h"
++
++#include <stdio.h>
++#include <aml.h>
++#include <unistd.h>
++#include <fcntl.h>
++#include <zlib.h>
++#include <assert.h>
++#include <string.h>
++#include <time.h>
++#include <inttypes.h>
++#include <math.h>
++
++static int level = 1;
++static int method = Z_DEFLATED;
++static int window_bits = 15;
++static int mem_level = 9;
++static int strategy = Z_DEFAULT_STRATEGY;
++
++struct stopwatch {
++	uint64_t cpu;
++	uint64_t real;
++};
++
++static uint64_t gettime_us(clockid_t clock)
++{
++	struct timespec ts = { 0 };
++	clock_gettime(clock, &ts);
++	return ts.tv_sec * 1000000ULL + ts.tv_nsec / 1000ULL;
++}
++
++static void stopwatch_start(struct stopwatch* self)
++{
++	self->real = gettime_us(CLOCK_MONOTONIC);
++	self->cpu = gettime_us(CLOCK_PROCESS_CPUTIME_ID);
++}
++
++static void stopwatch_stop(const struct stopwatch* self, const char* report)
++{
++	uint64_t real_stop = gettime_us(CLOCK_MONOTONIC);
++	uint64_t cpu_stop = gettime_us(CLOCK_PROCESS_CPUTIME_ID);
++	uint64_t dt_real = real_stop - self->real;
++	uint64_t dt_cpu = cpu_stop - self->cpu;
++	double cpu_util = (double)dt_cpu / dt_real;
++	printf("%s took %"PRIu64" µs with %.0f%% CPU utilisation\n", report,
++			dt_real, round(cpu_util * 100.0));
++}
++
++static int zlib_transform(int (*method)(z_stream*, int), struct vec* dst,
++		const struct vec* src, z_stream* zs)
++{
++	zs->next_in = src->data;
++	zs->avail_in = src->len;
++
++	do {
++		if (dst->len == dst->cap && vec_reserve(dst, dst->cap * 2) < 0)
++			return -1;
++
++		zs->next_out = ((Bytef*)dst->data) + dst->len;
++		zs->avail_out = dst->cap - dst->len;
++
++		int r = method(zs, Z_SYNC_FLUSH);
++		if (r == Z_STREAM_ERROR)
++			return -1;
++
++		dst->len = zs->next_out - (Bytef*)dst->data;
++	} while (zs->avail_out == 0);
++
++	assert(zs->avail_in == 0);
++
++	return 0;
++}
++
++static int deflate_vec(struct vec* dst, const struct vec* src, z_stream* zs)
++{
++	return zlib_transform(deflate, dst, src, zs);
++}
++
++static int inflate_vec(struct vec* dst, const struct vec* src, z_stream* zs)
++{
++	return zlib_transform(inflate, dst, src, zs);
++}
++
++static int read_file(struct vec* dst, const char* path)
++{
++	int fd = open(path, O_RDONLY);
++	if (fd < 0) {
++		perror("Failed open file");
++		return -1;
++	}
++
++	char buffer[4096];
++
++	for (;;) {
++		int n_read = read(fd, buffer, sizeof(buffer));
++		if (n_read <= 0)
++			break;
++
++		vec_append(dst, buffer, n_read);
++	}
++
++	close(fd);
++	return 0;
++}
++
++static void establish_baseline(const struct vec* raw_data)
++{
++	struct vec compressed, decompressed;
++	vec_init(&compressed, raw_data->len);
++	vec_init(&decompressed, raw_data->len);
++
++	z_stream deflate_zs = {};
++	int rc = deflateInit2(&deflate_zs, level, method, window_bits,
++			mem_level, strategy);
++	assert(rc == Z_OK);
++
++	z_stream inflate_zs = {};
++	rc = inflateInit(&inflate_zs);
++	assert(rc == Z_OK);
++
++	struct stopwatch stopwatch;
++
++	stopwatch_start(&stopwatch);
++	deflate_vec(&compressed, raw_data, &deflate_zs);
++	stopwatch_stop(&stopwatch, "Single threaded deflate");
++
++	stopwatch_start(&stopwatch);
++	inflate_vec(&decompressed, &compressed, &inflate_zs);
++	stopwatch_stop(&stopwatch, "Single threaded inflate");
++
++	assert(decompressed.len == raw_data->len);
++	assert(memcmp(decompressed.data, raw_data->data, decompressed.len) == 0);
++
++	printf("Single threaded compression: %.1f%%\n",
++			100.0 * (1.0 - (double)compressed.len /
++				(double)raw_data->len));
++
++	inflateEnd(&inflate_zs);
++	deflateEnd(&deflate_zs);
++
++	vec_destroy(&decompressed);
++	vec_destroy(&compressed);
++}
++
++static int run_benchmark(const char* file)
++{
++	struct vec raw_data;
++	struct vec deflate_result;
++
++	vec_init(&raw_data, 4096);
++	vec_init(&deflate_result, 4096);
++
++	if (read_file(&raw_data, file) < 0)
++		return 1;
++
++	establish_baseline(&raw_data);
++
++	struct parallel_deflate* pd = parallel_deflate_new(level, -window_bits,
++			mem_level, strategy);
++	assert(pd);
++
++	struct stopwatch stopwatch;
++	stopwatch_start(&stopwatch);
++
++	parallel_deflate_feed(pd, &deflate_result, raw_data.data, raw_data.len);
++	parallel_deflate_sync(pd, &deflate_result);
++
++	stopwatch_stop(&stopwatch, "Parallel deflate");
++
++	const uint8_t* compressed_data = deflate_result.data;
++	assert(deflate_result.len > 2 && compressed_data[0] == 0x78
++			&& compressed_data[1] == 1);
++
++	z_stream inflate_zs = {};
++	int rc = inflateInit(&inflate_zs);
++	assert(rc == Z_OK);
++
++	struct vec decompressed;
++	vec_init(&decompressed, raw_data.len);
++	rc = inflate_vec(&decompressed, &deflate_result, &inflate_zs);
++
++	assert(rc == 0);
++	assert(decompressed.len == raw_data.len);
++	assert(memcmp(decompressed.data, raw_data.data, decompressed.len) == 0);
++
++	vec_clear(&deflate_result);
++	parallel_deflate_feed(pd, &deflate_result, raw_data.data, raw_data.len);
++	parallel_deflate_sync(pd, &deflate_result);
++	vec_clear(&decompressed);
++	rc = inflate_vec(&decompressed, &deflate_result, &inflate_zs);
++
++	assert(rc == 0);
++	assert(decompressed.len == raw_data.len);
++	assert(memcmp(decompressed.data, raw_data.data, decompressed.len) == 0);
++
++	vec_destroy(&decompressed);
++
++	printf("Parallel compression: %.1f%%\n",
++			100.0 * (1.0 - (double)deflate_result.len /
++				(double)raw_data.len));
++
++	parallel_deflate_destroy(pd);
++	inflateEnd(&inflate_zs);
++	vec_destroy(&raw_data);
++	vec_destroy(&deflate_result);
++	return 0;
++}
++
++int main(int argc, char* argv[])
++{
++	const char* file = argv[1];
++	if (!file) {
++		fprintf(stderr, "Missing input file\n");
++		return 1;
++	}
++
++	struct aml* aml = aml_new();
++	aml_set_default(aml);
++
++	aml_require_workers(aml, -1);
++
++	int rc = run_benchmark(file);
++
++	aml_unref(aml);
++	return rc;
++}
+diff --git a/bench/zrle-bench.c b/bench/zrle-bench.c
+index 55a5875..2715844 100644
+--- a/bench/zrle-bench.c
++++ b/bench/zrle-bench.c
+@@ -283,16 +283,17 @@ int main(int argc, char *argv[])
+ 
+ 	char *image = argv[1];
+ 
+-	if (image)
+-		return run_benchmark(image) < 0 ? 1 : 0;
+-
+ 	struct aml* aml = aml_new();
+ 	aml_set_default(aml);
+ 
+ 	aml_require_workers(aml, -1);
+ 
+-	rc |= run_benchmark("test-images/tv-test-card.png") < 0 ? 1 : 0;
+-	rc |= run_benchmark("test-images/mandrill.png") < 0 ? 1 : 0;
++	if (image) {
++		rc = run_benchmark(image) < 0 ? 1 : 0;
++	} else {
++		rc |= run_benchmark("test-images/tv-test-card.png") < 0 ? 1 : 0;
++		rc |= run_benchmark("test-images/mandrill.png") < 0 ? 1 : 0;
++	}
+ 
+ 	aml_unref(aml);
+ 
+diff --git a/include/parallel-deflate.h b/include/parallel-deflate.h
+new file mode 100644
+index 0000000..9795690
+--- /dev/null
++++ b/include/parallel-deflate.h
+@@ -0,0 +1,30 @@
++/*
++ * Copyright (c) 2025 Andri Yngvason
++ *
++ * Permission to use, copy, modify, and/or distribute this software for any
++ * purpose with or without fee is hereby granted, provided that the above
++ * copyright notice and this permission notice appear in all copies.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
++ * REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
++ * AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
++ * INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
++ * LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
++ * OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
++ * PERFORMANCE OF THIS SOFTWARE.
++ */
++
++#pragma once
++
++#include <unistd.h>
++
++struct vec;
++struct parallel_deflate;
++
++struct parallel_deflate* parallel_deflate_new(int level, int window_bits,
++		int mem_level, int strategy);
++void parallel_deflate_destroy(struct parallel_deflate* self);
++
++void parallel_deflate_feed(struct parallel_deflate* self, struct vec* out,
++		const void* data, size_t len);
++void parallel_deflate_sync(struct parallel_deflate* self, struct vec* out);
+diff --git a/src/parallel-deflate.c b/src/parallel-deflate.c
+new file mode 100644
+index 0000000..dc20843
+--- /dev/null
++++ b/src/parallel-deflate.c
+@@ -0,0 +1,279 @@
++/*
++ * Copyright (c) 2025 Andri Yngvason
++ *
++ * Permission to use, copy, modify, and/or distribute this software for any
++ * purpose with or without fee is hereby granted, provided that the above
++ * copyright notice and this permission notice appear in all copies.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
++ * REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
++ * AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
++ * INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
++ * LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
++ * OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
++ * PERFORMANCE OF THIS SOFTWARE.
++ */
++
++#include "parallel-deflate.h"
++#include "vec.h"
++#include "sys/queue.h"
++
++#include <stdlib.h>
++#include <stdbool.h>
++#include <assert.h>
++#include <aml.h>
++#include <zlib.h>
++#include <string.h>
++#include <arpa/inet.h>
++#include <pthread.h>
++
++#define INPUT_BLOCK_SIZE (128 * 1024)
++
++#ifndef MIN
++#define MIN(a, b) ((a) < (b) ? (a) : (b))
++#endif
++
++struct output_chunk {
++	uint32_t seq;
++	void* data;
++	size_t len;
++	TAILQ_ENTRY(output_chunk) link;
++};
++
++TAILQ_HEAD(output_chunk_list, output_chunk);
++
++struct parallel_deflate {
++	int level, window_bits, mem_level, strategy;
++	uint32_t seq;
++	uint32_t start_seq;
++	bool is_at_start;
++	struct vec input;
++
++	struct output_chunk_list output_chunks;
++	pthread_mutex_t output_chunk_mutex;
++	pthread_cond_t output_chunk_cond;
++};
++
++struct deflate_job {
++	struct parallel_deflate* parent;
++	uint32_t seq;
++	z_stream zs;
++	struct vec input, output;
++};
++
++static void output_chunk_list_lock(struct parallel_deflate* self)
++{
++	pthread_mutex_lock(&self->output_chunk_mutex);
++}
++
++static void output_chunk_list_unlock(struct parallel_deflate* self)
++{
++	pthread_mutex_unlock(&self->output_chunk_mutex);
++}
++
++struct parallel_deflate* parallel_deflate_new(int level, int window_bits,
++		int mem_level, int strategy)
++{
++	struct parallel_deflate* self = calloc(1, sizeof(*self));
++	if (!self)
++		return NULL;
++
++	assert(window_bits < 0);
++
++	self->level = level;
++	self->window_bits = window_bits;
++	self->mem_level = mem_level;
++	self->strategy = strategy;
++	self->is_at_start = true;
++
++	TAILQ_INIT(&self->output_chunks);
++	pthread_mutex_init(&self->output_chunk_mutex, NULL);
++	pthread_cond_init(&self->output_chunk_cond, NULL);
++
++	vec_init(&self->input, INPUT_BLOCK_SIZE * 2);
++
++	return self;
++}
++
++static int deflate_vec(struct vec* dst, const struct vec* src, z_stream* zs)
++{
++	zs->next_in = src->data;
++	zs->avail_in = src->len;
++
++	do {
++		if (dst->len == dst->cap && vec_reserve(dst, dst->cap * 2) < 0)
++			return -1;
++
++		zs->next_out = ((Bytef*)dst->data) + dst->len;
++		zs->avail_out = dst->cap - dst->len;
++
++		int r = deflate(zs, Z_SYNC_FLUSH);
++		if (r == Z_STREAM_ERROR)
++			return -1;
++
++		dst->len = zs->next_out - (Bytef*)dst->data;
++	} while (zs->avail_out == 0);
++
++	assert(zs->avail_in == 0);
++
++	return 0;
++}
++
++static void insert_output_chunk(struct parallel_deflate* self,
++		struct output_chunk* chunk)
++{
++	struct output_chunk *end = TAILQ_LAST(&self->output_chunks,
++			output_chunk_list);
++	while (end && end->seq > chunk->seq)
++		end = TAILQ_PREV(end, output_chunk_list, link);
++
++	if (end) {
++		assert(end->seq != chunk->seq);
++		TAILQ_INSERT_AFTER(&self->output_chunks, end, chunk, link);
++	} else {
++		TAILQ_INSERT_HEAD(&self->output_chunks, chunk, link);
++	}
++
++	pthread_cond_signal(&self->output_chunk_cond);
++}
++
++static bool consolidate_complete_chunk_segments(struct parallel_deflate* self,
++		struct vec* out)
++{
++	bool have_end_chunk = false;
++
++	struct output_chunk* chunk;
++	while (!TAILQ_EMPTY(&self->output_chunks)) {
++		chunk = TAILQ_FIRST(&self->output_chunks);
++		if (chunk->seq != self->start_seq)
++			break;
++
++		self->start_seq++;
++
++		TAILQ_REMOVE(&self->output_chunks, chunk, link);
++
++		if (self->is_at_start) {
++			uint8_t header[] = { 0x78, 0x01 };
++			if (out)
++				vec_append(out, header, sizeof(header));
++			self->is_at_start = false;
++		}
++
++		if (out)
++			vec_append(out, chunk->data, chunk->len);
++
++		if (chunk->data == NULL)
++			have_end_chunk = true;
++
++		free(chunk->data);
++		free(chunk);
++	}
++
++	return have_end_chunk;
++}
++
++static void do_work(void* obj)
++{
++	struct aml_work* work = obj;
++	struct deflate_job* job = aml_get_userdata(work);
++	struct parallel_deflate* self = job->parent;
++
++	// TODO: Maintain 32K input window for dictionary
++	deflate_vec(&job->output, &job->input, &job->zs);
++
++	struct output_chunk* chunk = calloc(1, sizeof(*chunk));
++	assert(chunk);
++	chunk->seq = job->seq;
++	chunk->data = job->output.data;
++	chunk->len = job->output.len;
++	memset(&job->output, 0, sizeof(job->output));
++
++	output_chunk_list_lock(self);
++	insert_output_chunk(self, chunk);
++	output_chunk_list_unlock(self);
++}
++
++static void deflate_job_destroy(void* userdata)
++{
++	struct deflate_job* job = userdata;
++	deflateEnd(&job->zs);
++	vec_destroy(&job->output);
++	vec_destroy(&job->input);
++	free(job);
++}
++
++static void schedule_deflate_job(struct parallel_deflate* self,
++		const void* input, size_t len)
++{
++	struct deflate_job* job = calloc(1, sizeof(*job));
++	assert(job);
++
++	job->parent = self;
++	job->seq = self->seq++;
++	int rc = deflateInit2(&job->zs, self->level, Z_DEFLATED,
++			self->window_bits, self->mem_level, self->strategy);
++	assert(rc == Z_OK);
++
++	vec_init(&job->output, len);
++
++	vec_init(&job->input, len);
++	vec_append(&job->input, input, len);
++
++	struct aml_work* work = aml_work_new(do_work, NULL, job,
++			deflate_job_destroy);
++	aml_start(aml_get_default(), work);
++	aml_unref(work);
++}
++
++void parallel_deflate_feed(struct parallel_deflate* self, struct vec* out,
++		const void* data, size_t len)
++{
++	vec_append(&self->input, data, len);
++
++	size_t n_blocks = self->input.len / INPUT_BLOCK_SIZE;
++	uint8_t* bytes = self->input.data;
++
++	for (size_t i = 0; i < n_blocks; ++i)
++		schedule_deflate_job(self, bytes + INPUT_BLOCK_SIZE * i,
++				INPUT_BLOCK_SIZE);
++
++	size_t processed = n_blocks * INPUT_BLOCK_SIZE;
++	self->input.len -= processed;
++	memmove(bytes, bytes + processed, self->input.len);
++}
++
++static void parallel_deflate_flush(struct parallel_deflate* self,
++		struct vec* out)
++{
++	output_chunk_list_lock(self);
++
++	struct output_chunk* end_chunk = calloc(1, sizeof(*end_chunk));
++	assert(end_chunk);
++	end_chunk->seq = self->seq++;
++	insert_output_chunk(self, end_chunk);
++
++	while (!consolidate_complete_chunk_segments(self, out))
++		pthread_cond_wait(&self->output_chunk_cond,
++				&self->output_chunk_mutex);
++	output_chunk_list_unlock(self);
++}
++
++void parallel_deflate_sync(struct parallel_deflate* self, struct vec* out)
++{
++	if (self->input.len) {
++		assert(self->input.len < INPUT_BLOCK_SIZE);
++		schedule_deflate_job(self, self->input.data, self->input.len);
++		vec_clear(&self->input);
++	}
++
++	parallel_deflate_flush(self, out);
++}
++
++void parallel_deflate_destroy(struct parallel_deflate* self)
++{
++	parallel_deflate_flush(self, NULL);
++	vec_destroy(&self->input);
++	pthread_mutex_destroy(&self->output_chunk_mutex);
++	pthread_cond_destroy(&self->output_chunk_cond);
++	free(self);
++}
