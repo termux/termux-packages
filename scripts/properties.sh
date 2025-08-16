@@ -1143,6 +1143,13 @@ TERMUX__PREFIX__MULTI_INCLUDE_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__MULTI_INCLUD
 
 
 ##
+# Termux include subdirectory path under `TERMUX__PREFIX`.
+#
+# Default value: `include`
+##
+TERMUX__PREFIX__INCLUDE_SUBDIR="$TERMUX__PREFIX__BASE_INCLUDE_SUBDIR"
+
+##
 # Termux include directory path under `TERMUX__PREFIX`.
 #
 # Default value: `/data/data/com.termux/files/usr/include` (`$TERMUX__PREFIX__BASE_INCLUDE_DIR`)
@@ -1180,6 +1187,13 @@ TERMUX__PREFIX__MULTI_LIB_SUBDIR="lib32"
 ##
 TERMUX__PREFIX__MULTI_LIB_DIR="$TERMUX__PREFIX/$TERMUX__PREFIX__MULTI_LIB_SUBDIR"
 
+
+##
+# Termux lib subdirectory path under `TERMUX__PREFIX`.
+#
+# Default value: `lib`
+##
+TERMUX__PREFIX__LIB_SUBDIR="$TERMUX__PREFIX__BASE_LIB_SUBDIR"
 
 ##
 # Termux lib directory path under `TERMUX__PREFIX`.
