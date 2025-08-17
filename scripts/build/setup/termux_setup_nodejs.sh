@@ -1,4 +1,6 @@
 termux_setup_nodejs() {
+	export NODE_OPTIONS=""
+	NODE_OPTIONS+=" --network-family-autoselection-attempt-timeout=500"
 	# Use LTS version for now
 	local NODEJS_VERSION=22.18.0
 	local NODEJS_FOLDER
