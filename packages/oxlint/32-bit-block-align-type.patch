@@ -30,12 +30,12 @@ diff --git a/napi/oxlint2/src/lib.rs b/napi/oxlint2/src/lib.rs
 index 4ce833a..83b228b 100644
 --- a/napi/oxlint2/src/lib.rs
 +++ b/napi/oxlint2/src/lib.rs
-@@ -82,7 +82,7 @@ fn wrap_run(cb: JsRunCb) -> ExternalLinterCb {
-             // the backing allocation.
-             let chunk_ptr = unsafe {
-                 let ptr = metadata_ptr.cast::<u8>();
--                let offset = ptr.as_ptr() as usize % BLOCK_ALIGN;
-+                let offset = (ptr.as_ptr() as u64 % BLOCK_ALIGN) as usize;
-                 ptr.sub(offset)
-             };
+@@ -158,7 +158,7 @@ unsafe fn get_buffer(
+     // the backing allocation.
+     let chunk_ptr = unsafe {
+         let ptr = metadata_ptr.cast::<u8>();
+-        let offset = ptr.as_ptr() as usize % BLOCK_ALIGN;
++        let offset = (ptr.as_ptr() as u64 % BLOCK_ALIGN) as usize;
+         ptr.sub(offset)
+     };
  
