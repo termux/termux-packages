@@ -24,6 +24,7 @@ jobs:
       - name: Check repository health
         run: |
           set -euo pipefail
+          export NODE_OPTIONS="--network-family-autoselection-attempt-timeout=500"
           ./scripts/check-repository-health.js "${{ steps.generate-apt-packages-list.outputs.OUTPUT_DIR }}" | tee repository-health.txt
       - name: Create issue if health check fails
         env:
