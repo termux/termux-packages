@@ -6,7 +6,7 @@ TERMUX_PKG_MAINTAINER="@finagolfin"
 # Keep flang version and revision in sync when updating (enforced by check in termux_step_pre_configure).
 LLVM_MAJOR_VERSION=20
 TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.1.8
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SHA256=6898f963c8e938981e6c4a302e83ec5beb4630147c7311183cf61069af16333d
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-${TERMUX_PKG_VERSION}.src.tar.xz
@@ -25,10 +25,7 @@ TERMUX_PKG_CONFLICTS="gcc, clang (<< 3.9.1-3)"
 TERMUX_PKG_BREAKS="libclang, libclang-dev, libllvm-dev"
 TERMUX_PKG_REPLACES="gcc, libclang, libclang-dev, libllvm-dev"
 TERMUX_PKG_GROUPS="base-devel"
-LLVM_PROJECTS="clang;clang-tools-extra;compiler-rt;lld;mlir;openmp;polly"
-if [ $TERMUX_ARCH = "aarch64" ] || [ $TERMUX_ARCH = "x86_64" ]; then
-	LLVM_PROJECTS+=";lldb"
-fi
+LLVM_PROJECTS="clang;clang-tools-extra;compiler-rt;lld;lldb;mlir;openmp;polly"
 
 if [ "$TERMUX__PREFIX" = "$TERMUX__ROOTFS" ]; then
 	DEFAULT_SYSROOT=".."
