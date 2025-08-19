@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A package manager for Lua, similar to luarocks"
 TERMUX_PKG_LICENSE="LGPL-3.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.15.4"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/nvim-neorocks/lux/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=8a16a4a81da9057628bf584680ad381bc87989c858215cfd9755aa25618bf51d
 TERMUX_PKG_DEPENDS="bzip2, gpgme, libgit2, libgpg-error, lua54, openssl, xz-utils"
@@ -142,6 +143,12 @@ termux_step_pre_configure() {
 	find "$TERMUX_PKG_SRCDIR" -type f | \
 		xargs -n 1 sed -i \
 		-e 's|target_os = "linux"|target_os = "android"|g'
+
+	# ld.lld: error: undefined symbol: __atomic_load_8
+	if [[ "$TERMUX_ARCH" == "i686" ]]; then
+		local -u env_host="${CARGO_TARGET_NAME//-/_}"
+		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$(${CC} -print-libgcc-file-name)"
+	fi
 }
 
 termux_step_make() {
