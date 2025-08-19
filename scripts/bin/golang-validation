@@ -3,7 +3,6 @@ cd "$(realpath "$(dirname "$0")")/../.." || { echo "cd failed"; exit 1; }
 readarray -t TERMUX_PACKAGE_DIRECTORIES < <(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json)
 readarray -t PACKAGES < <(grep -rl termux_setup_golang --include=build.sh "${TERMUX_PACKAGE_DIRECTORIES[@]}" | cut -d/ -f2 | sort -u || :) || :
 ARCH="${1?"Usage: $0 [aarch64|arm|x86_64|i686]"}"
-REPORT_PATH="${TMPDIR:-/tmp}/golang-validation-report.txt"
 
 # Converts milliseconds to human-readable format.
 # Example: `ms_to_human_readable 123456789` => 34h 17m 36s 789ms
@@ -27,16 +26,15 @@ maybe_cleanup() {
 	rm -rf ./output/*
 }
 
-# Target of this script is pretty much simple:
-# 1. Obtain list of all go packages.
+# This script aims to:
+# 1. Obtain a list of all Golang packages.
 # 2. Build them.
-# 3. Create logfile containing only build logs of failed build attempts.
+# 3. Create a CI summary containing only build logs of failed build attempts.
 
-[[ -z "$CI" ]] && echo "INFO: Skipping all cleanup steps: not running in CI environment."
-echo "INFO: Report file path: ${REPORT_PATH}"
-echo "INFO: Rebuild list: ${PACKAGES[*]}" | tee "${REPORT_PATH}"
+[[ -z "$CI" ]] && echo "INFO: Not running in CI environment, cleanup will not be performed."
+echo "INFO: Rebuild list: ${PACKAGES[*]}" | tee "${GITHUB_STEP_SUMMARY}"
 
-output=
+output=""
 declare -A failed=()
 start_building_arch="$(date +%10s%3N)"
 for package in "${PACKAGES[@]}"; do
@@ -55,11 +53,23 @@ for package in "${PACKAGES[@]}"; do
 		exit "$status"
 	)" || failed["${package} ${ARCH}"]="${output}"
 done
-echo "INFO: Building all packages for ${ARCH} took $(ms_to_human_readable $(( $(date +%10s%3N) - start_building_arch )))" | tee -a "${REPORT_PATH}"
+echo "INFO: Building all packages for ${ARCH} took $(ms_to_human_readable $(( $(date +%10s%3N) - start_building_arch )))" | tee -a "${GITHUB_STEP_SUMMARY}"
 echo # newline
 
+if (( ${#failed[@]} > 0 )); then
+	echo "Writing output for failed packages to '$GITHUB_STEP_SUMMARY' to be logged in summary." >&2
+	echo "### The packages below failed to build for ${ARCH}." >> "$GITHUB_STEP_SUMMARY"
+fi
+
 for entry in "${!failed[@]}"; do
-	echo "${failed["${entry}"]}" >> "${REPORT_PATH}"
+	echo "${failed["${entry}"]}" >> "${GITHUB_STEP_SUMMARY}"
+	{
+	echo "<details><summary><code>${entry% *}</code></summary><p>"
+	echo ""
+	echo "${failed["${entry}"]}"
+	echo ""
+	echo "</p></details>"
+	} >> "$GITHUB_STEP_SUMMARY"
 done
 
 exit $(( ${#failed[@]} > 0 ))
