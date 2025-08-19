@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
 _POVRAY_VERSION_BASE=3.8
 TERMUX_PKG_VERSION=${_POVRAY_VERSION_BASE}.0-beta.2
-TERMUX_PKG_REVISION=13
+TERMUX_PKG_REVISION=14
 TERMUX_PKG_SRCURL=https://github.com/POV-Ray/povray/releases/download/v${TERMUX_PKG_VERSION}/povunix-v${TERMUX_PKG_VERSION}-src.tar.gz
 TERMUX_PKG_SHA256=4717c9bed114deec47cf04a8175cc4060dafc159f26e7896480a60f4411ca5ad
 TERMUX_PKG_DEPENDS="boost, imath, libc++, libjpeg-turbo, libpng, libtiff, openexr, povray-data, zlib"
@@ -31,10 +31,11 @@ COMPILED_BY=Termux
 "
 
 termux_step_pre_configure() {
-	# Fast is justice.
-	CFLAGS+=" -Ofast"
 	# Code uses std::auto_ptr removed in c++17:
-	CXXFLAGS+=" -Ofast -std=c++11"
+	CXXFLAGS+=" -std=c++14"
+	# Fix building with LLVM 19+ on libc++-based distros
+	CPPFLAGS+="	-D UCS2=\"char16_t\""
+	CPPFLAGS+="	-D UCS4=\"char32_t\""
 }
 
 termux_step_create_debscripts() {
@@ -43,7 +44,7 @@ termux_step_create_debscripts() {
 	echo "mkdir -p \$povconfuser/" >> postinst
 	echo "for f in povray.conf povray.ini; do" >> postinst
 	echo "    if [ ! -f \$povconfuser/\$f ]; then" >> postinst
-	echo "        cp \$TERMUX_PREFIX/etc/povray/${_POVRAY_VERSION_BASE}/\$f \$povconfuser/" >> postinst
+	echo "        cp $TERMUX_PREFIX/etc/povray/${_POVRAY_VERSION_BASE}/\$f \$povconfuser/" >> postinst
 	echo "    fi" >> postinst
 	echo "done" >> postinst
 	echo "exit 0" >> postinst
