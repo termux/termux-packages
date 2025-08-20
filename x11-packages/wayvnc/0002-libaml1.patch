@@ -1,0 +1,166 @@
+Adapted from https://github.com/any1/wayvnc/commit/0ef2ba31928afc2007194bebf1960fca7b4eb947
+
+--- a/meson.build
++++ b/meson.build
+@@ -56,7 +56,7 @@
+ wayland_client = dependency('wayland-client')
+ jansson = dependency('jansson')
+ 
+-aml_version = ['>=0.3.0', '<0.4.0']
++aml_version = ['>=1.0.0', '<2.0.0']
+ neatvnc_version = ['>=0.9', '<0.10.0']
+ 
+ neatvnc_project = subproject(
+--- a/src/ctl-server.c
++++ b/src/ctl-server.c
+@@ -700,10 +700,10 @@
+ 		client_enqueue_internal_error(client, details);
+ }
+ 
+-static void on_ready(void* obj)
++static void on_ready(struct aml_handler* handler)
+ {
+-	struct ctl_client* client = aml_get_userdata(obj);
+-	uint32_t events = aml_get_revents(obj);
++	struct ctl_client* client = aml_get_userdata(handler);
++	uint32_t events = aml_get_revents(handler);
+ 	nvnc_trace("Client %p ready: 0x%x", client, events);
+ 
+ 	if (events & AML_EVENT_WRITE)
+@@ -712,10 +712,10 @@
+ 		recv_ready(client);
+ }
+ 
+-static void on_connection(void* obj)
++static void on_connection(struct aml_handler* handler)
+ {
+ 	nvnc_log(NVNC_LOG_DEBUG, "New connection");
+-	struct ctl* server = aml_get_userdata(obj);
++	struct ctl* server = aml_get_userdata(handler);
+ 
+ 	struct ctl_client* client = calloc(1, sizeof(*client));
+ 	if (!client) {
+--- a/src/data-control.c
++++ b/src/data-control.c
+@@ -73,7 +73,7 @@
+ 	free(ctx);
+ }
+ 
+-static void on_receive(void* handler)
++static void on_receive(struct aml_handler* handler)
+ {
+ 	struct receive_context* ctx = aml_get_userdata(handler);
+ 	int fd = aml_get_fd(handler);
+@@ -101,7 +101,7 @@
+ 	destroy_receive_context(ctx);
+ }
+ 
+-static void on_send(void* handler)
++static void on_send(struct aml_handler* handler)
+ {
+ 	struct send_context* ctx = aml_get_userdata(handler);
+ 	int fd = aml_get_fd(handler);
+--- a/src/ext-image-copy-capture.c
++++ b/src/ext-image-copy-capture.c
+@@ -219,11 +219,10 @@
+ #endif
+ }
+ 
+-static void ext_image_copy_capture_schedule_from_timer(void* obj)
++static void ext_image_copy_capture_schedule_from_timer(struct aml_timer* timer)
+ {
+-	struct ext_image_copy_capture* self = aml_get_userdata(obj);
++	struct ext_image_copy_capture* self = aml_get_userdata(timer);
+ 	assert(self);
+-
+ 	ext_image_copy_capture_schedule_capture(self);
+ }
+ 
+@@ -703,8 +702,8 @@
+ 	self->wl_output = output;
+ 	self->render_cursors = render_cursor;
+ 
+-	self->timer = aml_timer_new(0, ext_image_copy_capture_schedule_from_timer, self,
+-			NULL);
++	self->timer = aml_timer_new(0,
++			ext_image_copy_capture_schedule_from_timer, self, NULL);
+ 	assert(self->timer);
+ 
+ 	self->pool = wv_buffer_pool_create(NULL);
+@@ -736,8 +735,8 @@
+ 	self->wl_output = output;
+ 	self->wl_seat = seat;
+ 
+-	self->timer = aml_timer_new(0, ext_image_copy_capture_schedule_from_timer, self,
+-			NULL);
++	self->timer = aml_timer_new(0,
++			ext_image_copy_capture_schedule_from_timer, self, NULL);
+ 	assert(self->timer);
+ 
+ 	self->pool = wv_buffer_pool_create(NULL);
+--- a/src/main.c
++++ b/src/main.c
+@@ -497,9 +497,9 @@
+ 	wayland_detach(self);
+ }
+ 
+-void on_wayland_event(void* obj)
++void on_wayland_event(struct aml_handler* handler)
+ {
+-	struct wayvnc* self = aml_get_userdata(obj);
++	struct wayvnc* self = aml_get_userdata(handler);
+ 
+ 	int rc MAYBE_UNUSED = wl_display_prepare_read(self->display);
+ 	assert(rc == 0);
+@@ -608,7 +608,7 @@
+ 	self->do_exit = true;
+ }
+ 
+-void on_signal(void* obj)
++void on_signal(struct aml_signal* obj)
+ {
+ 	nvnc_log(NVNC_LOG_INFO, "Received termination signal.");
+ 	struct wayvnc* self = aml_get_userdata(obj);
+@@ -1044,7 +1044,7 @@
+ 	return rc;
+ }
+ 
+-static void on_capture_restart_timer(void* obj)
++static void on_capture_restart_timer(struct aml_timer* obj)
+ {
+ 	struct wayvnc* self = aml_get_userdata(obj);
+ 	aml_unref(self->capture_retry_timer);
+@@ -1221,7 +1221,7 @@
+ 	return 0;
+ }
+ 
+-static void on_perf_tick(void* obj)
++static void on_perf_tick(struct aml_ticker* obj)
+ {
+ 	struct wayvnc* self = aml_get_userdata(obj);
+ 
+@@ -2098,9 +2098,6 @@
+ 		self.selected_seat = seat;
+ 	}
+ 
+-	if (aml_unstable_abi_version != AML_UNSTABLE_API)
+-		nvnc_log(NVNC_LOG_PANIC, "libaml is incompatible with this build of wayvnc!");
+-
+ 	enum socket_type socket_type = SOCKET_TYPE_TCP;
+ 	if (use_unix_socket)
+ 		socket_type = SOCKET_TYPE_UNIX;
+--- a/src/screencopy.c
++++ b/src/screencopy.c
+@@ -287,10 +287,9 @@
+ 	return 0;
+ }
+ 
+-static void screencopy__poll(void* obj)
++static void screencopy__poll(struct aml_timer* handler)
+ {
+-	struct wlr_screencopy* self = aml_get_userdata(obj);
+-
++	struct wlr_screencopy* self = aml_get_userdata(handler);
+ 	screencopy__start_capture(self);
+ }
+ 
