@@ -136,6 +136,14 @@ termux_step_pre_configure() {
 
 	termux_setup_rust
 
+	# ld: error: undefined symbol: __atomic_compare_exchange
+	# ld: error: undefined symbol: __atomic_load
+	# ld: error: undefined symbol: __atomic_is_lock_free
+	if [[ "${TERMUX_ARCH}" == "i686" ]]; then
+		local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
+		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$(${CC} -print-libgcc-file-name)"
+	fi
+
 	cargo fetch --locked --target "$CARGO_TARGET_NAME"
 
 	# software does not officially support android, so treat android as linux
