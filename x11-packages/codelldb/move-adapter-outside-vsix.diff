@@ -22,7 +22,7 @@ package file to outside of it.
  
 --- a/adapter/codelldb/bin/main.rs
 +++ b/adapter/codelldb/bin/main.rs
-@@ -43,14 +43,7 @@ fn main() -> Result<(), Error> {
+@@ -43,17 +43,13 @@ fn main() -> Result<(), Error> {
          codelldb_dir.pop();
          let liblldb_path = match matches.value_of("liblldb") {
              Some(path) => PathBuf::from(path),
@@ -37,7 +37,14 @@ package file to outside of it.
 +            None => PathBuf::from("@TERMUX_PREFIX@/lib/liblldb.so")
          };
  
-         lldb_stub::liblldb.load_from(&liblldb_path).unwrap();
+-        lldb_stub::liblldb.load_from(&liblldb_path).unwrap();
++        match lldb_stub::liblldb.load_from(&liblldb_path) {
++            Ok(result) => result,
++            Err(err) => lldb_stub::liblldb.load_from(&PathBuf::from("@TERMUX_PREFIX@/lib/liblldb.so")).unwrap()
++        };
+         match lldb_stub::base.resolve() {
+             Ok(token) => token.mark_permanent(),
+             Err(err) => {
 --- a/adapter/codelldb/src/python.rs
 +++ b/adapter/codelldb/src/python.rs
 @@ -92,8 +92,7 @@ pub fn initialize(debugger: &SBDebugger, adapter_dir: &Path) -> Result<Arc<Pytho
