@@ -4,10 +4,11 @@ TERMUX_PKG_LICENSE="ZLIB, GPL-2.0, LGPL-2.1, BSD 3-Clause, MIT"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.10.0"
-TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/deadbeef/deadbeef-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/deadbeef/travis/linux/${TERMUX_PKG_VERSION}/deadbeef-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=98d4247a76efb13bf65890aec9921f5c4733bfc1557906b8d6f209a66b28c363
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="atk, dbus, ffmpeg, gdk-pixbuf, glib, gtk3, harfbuzz, libblocksruntime, libc++, libcairo, libcurl, libdispatch, libflac, libiconv, libjansson, libmad, libogg, libsamplerate, libsndfile, libvorbis, libwavpack, libx11, libzip, mpg123, opusfile, pango, pulseaudio, zlib"
+TERMUX_PKG_DEPENDS="atk, dbus, ffmpeg, gdk-pixbuf, glib, gtk3, harfbuzz, libblocksruntime, libc++, libcairo, libcurl, libdispatch, libflac, libiconv, libjansson, libmad, libogg, libsamplerate, libsndfile, libvorbis, libwavpack, libx11, libzip, libmpg123, opusfile, pango, pulseaudio, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ax_cv_c_flags__msse2=no
 --disable-ffap

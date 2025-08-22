@@ -28,7 +28,7 @@ termux_step_pre_configure() {
 
 	export PATH="$bin:$PATH"
 
-	export NODE_OPTIONS=--max-old-space-size=6000
+	NODE_OPTIONS+=" --max-old-space-size=6000"
 	NODE_OPTIONS+=" --openssl-legacy-provider"
 }
 

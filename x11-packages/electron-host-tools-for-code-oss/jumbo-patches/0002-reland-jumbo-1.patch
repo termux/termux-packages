@@ -22,21 +22,19 @@ Enable jumbo build for the following template(s):
  base/task/sequenced_task_runner.cc                |  4 ++++
  base/task/single_thread_task_runner.cc            |  4 ++++
  cc/cc.gni                                         |  5 +++--
- .../compositor_frame_reporting_controller.cc      |  6 ++++++
- cc/metrics/event_latency_tracing_recorder.cc      |  4 ++++
- cc/metrics/lcd_text_metrics_reporter.cc           |  4 ++++
  .../viz/service/display/occlusion_culler.cc       |  4 ++++
  .../service/display/overlay_candidate_factory.cc  |  4 ++++
  components/viz/service/display/skia_renderer.cc   |  4 ++++
  .../viz/service/display/software_renderer.cc      |  4 ++++
+ .../service/frame_sinks/frame_sink_manager_impl.h |  3 +++
  components/viz/viz.gni                            |  7 ++++---
- 14 files changed, 74 insertions(+), 9 deletions(-)
+ 12 files changed, 63 insertions(+), 9 deletions(-)
 
 diff --git a/base/BUILD.gn b/base/BUILD.gn
-index e9443d83d3..14c9045fbd 100644
+index 5b41b3d805..0ad5a8724c 100644
 --- a/base/BUILD.gn
 +++ b/base/BUILD.gn
-@@ -29,6 +29,7 @@ import("//build/config/chromeos/ui_mode.gni")
+@@ -28,6 +28,7 @@ import("//build/config/cast.gni")
  import("//build/config/compiler/compiler.gni")
  import("//build/config/cronet/config.gni")
  import("//build/config/dcheck_always_on.gni")
@@ -44,7 +42,7 @@ index e9443d83d3..14c9045fbd 100644
  import("//build/config/logging.gni")
  import("//build/config/nacl/config.gni")
  import("//build/config/profiling/profiling.gni")
-@@ -164,7 +165,7 @@ use_epoll = is_linux || is_chromeos || is_android
+@@ -177,7 +178,7 @@ use_epoll = is_linux || is_chromeos || is_android
  # base compilation units to be linked in where they wouldn't have otherwise.
  # This does not include test code (test support and anything in the test
  # directory) which should use source_set as is recommended for GN targets).
@@ -53,7 +51,7 @@ index e9443d83d3..14c9045fbd 100644
    sources = [
      "allocator/allocator_check.cc",
      "allocator/allocator_check.h",
-@@ -967,6 +968,10 @@ component("base") {
+@@ -987,6 +988,10 @@ component("base") {
      ]
    }
  
@@ -64,7 +62,7 @@ index e9443d83d3..14c9045fbd 100644
    if (is_linux || is_chromeos) {
      sources += [
        "debug/proc_maps_linux.cc",
-@@ -985,6 +990,7 @@ component("base") {
+@@ -1005,6 +1010,7 @@ component("base") {
        "threading/thread_type_delegate.cc",
        "threading/thread_type_delegate.h",
      ]
@@ -72,7 +70,7 @@ index e9443d83d3..14c9045fbd 100644
    }
  
    if (is_chromeos) {
-@@ -1937,6 +1943,11 @@ component("base") {
+@@ -1982,6 +1988,11 @@ component("base") {
        "win/wrapped_window_proc.h",
      ]
  
@@ -84,7 +82,7 @@ index e9443d83d3..14c9045fbd 100644
      deps += [ "//base/win:base_win_buildflags" ]
  
      if (com_init_check_hook_disabled) {
-@@ -2738,7 +2749,7 @@ static_library("base_static") {
+@@ -2880,7 +2891,7 @@ if (enable_rust_translit) {
    }
  }
  
@@ -94,7 +92,7 @@ index e9443d83d3..14c9045fbd 100644
    sources = [
      "i18n/base_i18n_export.h",
 diff --git a/base/sampling_heap_profiler/poisson_allocation_sampler.cc b/base/sampling_heap_profiler/poisson_allocation_sampler.cc
-index 2637da2ee8..b420041b3d 100644
+index 1bd644d7ab..473f84cb1a 100644
 --- a/base/sampling_heap_profiler/poisson_allocation_sampler.cc
 +++ b/base/sampling_heap_profiler/poisson_allocation_sampler.cc
 @@ -19,6 +19,8 @@
@@ -124,7 +122,7 @@ index 2637da2ee8..b420041b3d 100644
  PoissonAllocationSamplerStats::PoissonAllocationSamplerStats(
      size_t address_cache_hits,
      size_t address_cache_misses,
-@@ -492,3 +496,6 @@ void PoissonAllocationSampler::RemoveSamplesObserver(
+@@ -498,3 +502,6 @@ void PoissonAllocationSampler::RemoveSamplesObserver(
  }
  
  }  // namespace base
@@ -132,10 +130,10 @@ index 2637da2ee8..b420041b3d 100644
 +#undef ThreadLocalData
 +#undef GetThreadLocalData
 diff --git a/base/sampling_heap_profiler/sampling_heap_profiler.cc b/base/sampling_heap_profiler/sampling_heap_profiler.cc
-index a7c4387024..c4a8e32702 100644
+index 60e96b0081..de29c802f6 100644
 --- a/base/sampling_heap_profiler/sampling_heap_profiler.cc
 +++ b/base/sampling_heap_profiler/sampling_heap_profiler.cc
-@@ -40,6 +40,8 @@
+@@ -35,6 +35,8 @@
  #include <sys/prctl.h>
  #endif
  
@@ -144,7 +142,7 @@ index a7c4387024..c4a8e32702 100644
  namespace base {
  
  constexpr uint32_t kMaxStackEntries = 256;
-@@ -50,7 +52,7 @@ struct ThreadLocalData {
+@@ -45,7 +47,7 @@ struct ThreadLocalData {
    const char* thread_name = nullptr;
  };
  
@@ -153,7 +151,7 @@ index a7c4387024..c4a8e32702 100644
  #if USE_LOCAL_TLS_EMULATION()
    static base::NoDestructor<
        base::allocator::dispatcher::ThreadLocalStorage<ThreadLocalData>>
-@@ -62,6 +64,8 @@ ThreadLocalData* GetThreadLocalData() {
+@@ -57,6 +59,8 @@ ThreadLocalData* GetThreadLocalData() {
  #endif
  }
  
@@ -162,7 +160,7 @@ index a7c4387024..c4a8e32702 100644
  using StackUnwinder = SamplingHeapProfiler::StackUnwinder;
  using base::allocator::dispatcher::AllocationSubsystem;
  
-@@ -338,3 +342,6 @@ SamplingHeapProfiler::MuteHookedSamplesForTesting() {
+@@ -334,3 +338,6 @@ SamplingHeapProfiler::MuteHookedSamplesForTesting() {
  }
  
  }  // namespace base
@@ -237,89 +235,30 @@ index 090420c902..6b0e76bf21 100644
      forward_variables_from(invoker, "*", [ "configs" ])
      if (defined(invoker.configs)) {
        configs += invoker.configs
-diff --git a/cc/metrics/compositor_frame_reporting_controller.cc b/cc/metrics/compositor_frame_reporting_controller.cc
-index 5dc01d1aa3..5cfab4e226 100644
---- a/cc/metrics/compositor_frame_reporting_controller.cc
-+++ b/cc/metrics/compositor_frame_reporting_controller.cc
-@@ -19,6 +19,9 @@
- #include "services/metrics/public/cpp/ukm_recorder.h"
- #include "services/tracing/public/cpp/perfetto/macros.h"
- 
-+#define kNumOfCompositorStages kNumOfCompositorStages_CompositorFrameReportingController
-+#define kNumDispatchStages     kNumDispatchStages_CompositorFrameReportingController
-+
- namespace cc {
- namespace {
- using SmoothThread = CompositorFrameReporter::SmoothThread;
-@@ -966,3 +969,6 @@ void CompositorFrameReportingController::SetDroppedFrameCounter(
- }
- 
- }  // namespace cc
-+
-+#undef kNumOfCompositorStages
-+#undef kNumDispatchStages
-diff --git a/cc/metrics/event_latency_tracing_recorder.cc b/cc/metrics/event_latency_tracing_recorder.cc
-index aed2c1ee8b..6b91baeab1 100644
---- a/cc/metrics/event_latency_tracing_recorder.cc
-+++ b/cc/metrics/event_latency_tracing_recorder.cc
-@@ -16,6 +16,8 @@
- #include "cc/metrics/event_metrics.h"
- #include "third_party/perfetto/include/perfetto/tracing/track.h"
- 
-+#define IsTracingEnabled IsTracingEnabled_EventLatencyTracingRecorder
-+
- namespace cc {
- namespace {
- 
-@@ -427,3 +429,5 @@ void EventLatencyTracingRecorder::RecordEventLatencyTraceEventInternal(
- }
- 
- }  // namespace cc
-+
-+#undef IsTracingEnabled
-diff --git a/cc/metrics/lcd_text_metrics_reporter.cc b/cc/metrics/lcd_text_metrics_reporter.cc
-index d13f7b1eaf..a67f0e9709 100644
---- a/cc/metrics/lcd_text_metrics_reporter.cc
-+++ b/cc/metrics/lcd_text_metrics_reporter.cc
-@@ -21,6 +21,8 @@
- #include "cc/trees/layer_tree_host_impl.h"
- #include "cc/trees/layer_tree_impl.h"
- 
-+#define kTraceCategory kTraceCategory_LCDTextMetricsReporter
-+
- namespace cc {
- 
- namespace {
-@@ -129,3 +131,5 @@ void LCDTextMetricsReporter::NotifyPauseFrameProduction() {
- }
- 
- }  // namespace cc
-+
-+#undef kTraceCategory
 diff --git a/components/viz/service/display/occlusion_culler.cc b/components/viz/service/display/occlusion_culler.cc
-index 606a892ecd..74a0aa1438 100644
+index 9174b4f92d..4409926784 100644
 --- a/components/viz/service/display/occlusion_culler.cc
 +++ b/components/viz/service/display/occlusion_culler.cc
-@@ -23,6 +23,8 @@
- #include "ui/gfx/geometry/rect.h"
+@@ -26,6 +26,8 @@
  #include "ui/gfx/geometry/rect_conversions.h"
+ #include "ui/gfx/geometry/rect_f.h"
  
 +#define kEpsilon kEpsilon_OcclusionCuller
 +
  namespace viz {
  namespace {
  
-@@ -469,3 +471,5 @@ bool OcclusionCuller::CanSplitDrawQuad(
+@@ -537,3 +539,5 @@ bool OcclusionCuller::CanSplitDrawQuad(
  }
  
  }  // namespace viz
 +
 +#undef kEpsilon
 diff --git a/components/viz/service/display/overlay_candidate_factory.cc b/components/viz/service/display/overlay_candidate_factory.cc
-index 983b88c8e8..a019821b70 100644
+index 898652d4d8..696a784ff1 100644
 --- a/components/viz/service/display/overlay_candidate_factory.cc
 +++ b/components/viz/service/display/overlay_candidate_factory.cc
-@@ -93,6 +93,8 @@ gfx::OverlayTransform GetOverlayTransform(const gfx::Transform& quad_transform,
+@@ -95,6 +95,8 @@ gfx::OverlayTransform GetOverlayTransform(const gfx::Transform& quad_transform,
    }
  }
  
@@ -328,17 +267,17 @@ index 983b88c8e8..a019821b70 100644
  constexpr double kEpsilon = 0.0001;
  
  // Determine why the transformation isn't axis aligned. A transform with z
-@@ -843,3 +845,5 @@ gfx::RectF OverlayCandidateFactory::GetDamageRect(const DrawQuad* quad) const {
+@@ -834,3 +836,5 @@ gfx::RectF OverlayCandidateFactory::GetDamageRect(const DrawQuad* quad) const {
  }
  
  }  // namespace viz
 +
 +#undef kEpsilon
 diff --git a/components/viz/service/display/skia_renderer.cc b/components/viz/service/display/skia_renderer.cc
-index 3049b93175..64cd639cea 100644
+index 038e79c73b..2b43438c9b 100644
 --- a/components/viz/service/display/skia_renderer.cc
 +++ b/components/viz/service/display/skia_renderer.cc
-@@ -106,6 +106,8 @@
+@@ -108,6 +108,8 @@
  #include "components/viz/service/display/overlay_processor_surface_control.h"
  #endif
  
@@ -347,17 +286,17 @@ index 3049b93175..64cd639cea 100644
  namespace viz {
  
  namespace {
-@@ -4466,3 +4468,5 @@ bool SkiaRenderer::OverlayLockKeyEqual::operator()(
+@@ -4500,3 +4502,5 @@ bool SkiaRenderer::OverlayLockKeyEqual::operator()(
  #endif
  
  }  // namespace viz
 +
 +#undef MakeOpacityFilter
 diff --git a/components/viz/service/display/software_renderer.cc b/components/viz/service/display/software_renderer.cc
-index b3b562b9de..b14f0310f3 100644
+index 8740f6a0ce..0dee55b0a0 100644
 --- a/components/viz/service/display/software_renderer.cc
 +++ b/components/viz/service/display/software_renderer.cc
-@@ -54,6 +54,8 @@
+@@ -53,6 +53,8 @@
  #include "ui/gfx/geometry/skia_conversions.h"
  #include "ui/gfx/geometry/transform.h"
  
@@ -366,12 +305,26 @@ index b3b562b9de..b14f0310f3 100644
  namespace viz {
  namespace {
  
-@@ -1106,3 +1108,5 @@ gfx::Rect SoftwareRenderer::GetRenderPassBackingDrawnRect(
+@@ -1087,3 +1089,5 @@ gfx::Rect SoftwareRenderer::GetRenderPassBackingDrawnRect(
  }
  
  }  // namespace viz
 +
 +#undef MakeOpacityFilter
+diff --git a/components/viz/service/frame_sinks/frame_sink_manager_impl.h b/components/viz/service/frame_sinks/frame_sink_manager_impl.h
+index 83ddb1856b..b6979f6f1f 100644
+--- a/components/viz/service/frame_sinks/frame_sink_manager_impl.h
++++ b/components/viz/service/frame_sinks/frame_sink_manager_impl.h
+@@ -5,6 +5,9 @@
+ #ifndef COMPONENTS_VIZ_SERVICE_FRAME_SINKS_FRAME_SINK_MANAGER_IMPL_H_
+ #define COMPONENTS_VIZ_SERVICE_FRAME_SINKS_FRAME_SINK_MANAGER_IMPL_H_
+ 
++// Macro 'Status' from X11/Xlib.h will cause confliction
++#undef Status
++
+ #include <stdint.h>
+ 
+ #include <list>
 diff --git a/components/viz/viz.gni b/components/viz/viz.gni
 index 191ddca368..a4008193b5 100644
 --- a/components/viz/viz.gni

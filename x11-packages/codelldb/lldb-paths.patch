@@ -1,0 +1,25 @@
+Direct the extension to search for LLDB in $TERMUX_PREFIX/bin and $TERMUX_PREFIX/lib instead
+of in the extension's own installation folder
+
+--- a/extension/main.ts
++++ b/extension/main.ts
+@@ -374,7 +374,7 @@ class Extension implements DebugConfigurationProvider, DebugAdapterDescriptorFac
+             if (liblldb) {
+                 liblldb = await adapter.findLibLLDB(liblldb)
+             } else {
+-                liblldb = await adapter.findLibLLDB(path.join(this.context.extensionPath, 'lldb'));
++                liblldb = await adapter.findLibLLDB('@TERMUX_PREFIX@');
+             }
+             this.adapterDylibsCache = [liblldb];
+         }
+--- a/cargo_config.unix.toml
++++ b/cargo_config.unix.toml
+@@ -10,6 +10,6 @@ CXX_${LLVM_TRIPLE} = "${CMAKE_CXX_COMPILER}"
+ CFLAGS_${LLVM_TRIPLE} = "${CMAKE_C_FLAGS}"
+ CXXFLAGS_${LLVM_TRIPLE} = "${CMAKE_CXX_FLAGS}"
+ 
+-LLDB_INCLUDE = "${LLDB_INCLUDE}"
+-LLDB_DYLIB = "${CMAKE_BINARY_DIR}/lldb/lib/liblldb${DylibSuffix}"
++LLDB_INCLUDE = "@TERMUX_PREFIX@/include"
++LLDB_DYLIB = "@TERMUX_PREFIX@/lib/liblldb.so"
+ ADAPTER_SOURCE_DIR = "${CMAKE_SOURCE_DIR}/adapter"

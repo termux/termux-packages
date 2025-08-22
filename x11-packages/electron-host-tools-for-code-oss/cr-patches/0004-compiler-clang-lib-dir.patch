@@ -21,11 +21,10 @@
  if (is_ios) {
    import("//build/config/ios/config.gni")  # For `target_environment`
  }
-@@ -186,6 +186,21 @@
+@@ -236,6 +236,20 @@
+         assert(false)  # Unhandled target platform
        }
  
-       _clang_lib_dir = "$clang_base_path/lib/clang/$clang_version/lib"
-+
 +      if (is_a_target_toolchain && current_toolchain != v8_snapshot_toolchain) {
 +        _dir = "linux"
 +        _clang_lib_dir = "$custom_toolchain_clang_base_path/lib/clang/$custom_toolchain_clang_version/lib"
@@ -42,4 +41,4 @@
 +
        _lib_file = "${_prefix}clang_rt.${_libname}${_suffix}.${_ext}"
        libs = [ "$_clang_lib_dir/$_dir/$_lib_file" ]
-     }
+ 

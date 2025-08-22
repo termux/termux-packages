@@ -2,7 +2,7 @@ name: Check Repository Health
 
 on:
   schedule:
-    - cron: "0 0 * * 0" # Runs at 12:00am UTC every Sunday
+    - cron: "0 5 * * 0" # Runs at 05:00am UTC every Sunday
   workflow_dispatch:
 
 permissions: {} # none
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
       - id: generate-apt-packages-list
@@ -24,6 +24,7 @@ jobs:
       - name: Check repository health
         run: |
           set -euo pipefail
+          export NODE_OPTIONS="--network-family-autoselection-attempt-timeout=500"
           ./scripts/check-repository-health.js "${{ steps.generate-apt-packages-list.outputs.OUTPUT_DIR }}" | tee repository-health.txt
       - name: Create issue if health check fails
         env:

@@ -1,0 +1,34 @@
+diff -u -r /home/builder/lib/android-ndk-r28b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/stdlib.h ./usr/include/stdlib.h
+--- /home/builder/lib/android-ndk-r28b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/stdlib.h	2024-11-14 00:52:25.000000000 +0000
++++ ./usr/include/stdlib.h	2025-05-28 17:41:34.420388013 +0000
+@@ -35,6 +35,9 @@
+ #include <bits/wait.h>
+ #include <malloc.h>
+ #include <stddef.h>
++#if !defined(__swift__)
++#include <stdint.h>
++#endif
+ #include <xlocale.h>
+ 
+ __BEGIN_DECLS
+@@ -217,9 +220,7 @@
+ void setprogname(const char* _Nonnull __name);
+ 
+ 
+-#if __BIONIC_AVAILABILITY_GUARD(26)
+-int mblen(const char* _Nullable __s, size_t __n) __INTRODUCED_IN(26);
++int mblen(const char* _Nullable __s, size_t __n);
+-#endif /* __BIONIC_AVAILABILITY_GUARD(26) */
+ 
+ size_t mbstowcs(wchar_t* _Nullable __dst, const char* _Nullable __src, size_t __n);
+ int mbtowc(wchar_t* _Nullable __wc_ptr, const char*  _Nullable __s, size_t __n);
+@@ -227,8 +228,7 @@
+ 
+ size_t wcstombs(char* _Nullable __dst, const wchar_t* _Nullable __src, size_t __n);
+ 
+-size_t __ctype_get_mb_cur_max(void);
+-#define MB_CUR_MAX __ctype_get_mb_cur_max()
++#define MB_CUR_MAX 4
+ 
+ #if defined(__BIONIC_INCLUDE_FORTIFY_HEADERS)
+ #include <bits/fortify/stdlib.h>

@@ -61,21 +61,20 @@ https://github.com/HandBrake/HandBrake/blob/master/contrib/ffmpeg/A15-Expose-the
      hb_rational_t   vrate;
 --- a/libhb/sync.c
 +++ b/libhb/sync.c
-@@ -389,24 +389,6 @@ static hb_buffer_t * CreateBlackBuf( sync_stream_t * stream,
-             buf->f.color_matrix = stream->common->job->title->color_matrix;
-             buf->f.color_range = stream->common->job->color_range;
-             buf->f.chroma_location = stream->common->job->chroma_location;
--
+@@ -391,23 +391,6 @@ static hb_buffer_t * CreateBlackBuf( sync_stream_t * stream,
+             buf->f.color_range     = job->color_range;
+             buf->f.chroma_location = job->chroma_location;
+ 
 -            // Dolby Vision requires a RPU on every buffer, attach the first
 -            // found during scan in the absence of something better
--            if (stream->common->job->title->initial_rpu)
+-            if (job->title->initial_rpu)
 -            {
--                hb_data_t *rpu = stream->common->job->title->initial_rpu;
+-                hb_data_t *rpu = job->title->initial_rpu;
 -                AVBufferRef *ref = av_buffer_alloc(rpu->size);
 -                memcpy(ref->data, rpu->bytes, rpu->size);
 -
 -                AVFrameSideData *sd_dst = NULL;
--                sd_dst = hb_buffer_new_side_data_from_buf(buf, stream->common->job->title->initial_rpu_type, ref);
+-                sd_dst = hb_buffer_new_side_data_from_buf(buf, job->title->initial_rpu_type, ref);
 -
 -                if (!sd_dst)
 -                {
@@ -83,15 +82,15 @@ https://github.com/HandBrake/HandBrake/blob/master/contrib/ffmpeg/A15-Expose-the
 -                }
 -            }
 -
- #if HB_PROJECT_FEATURE_QSV
-             if (hb_qsv_get_memory_type(stream->common->job) == MFX_IOPATTERN_OUT_VIDEO_MEMORY)
+             if (job->hw_pix_fmt != AV_PIX_FMT_NONE)
              {
+                 AVBufferRef *hw_frames_ctx = hb_hwaccel_init_hw_frames_ctx(job->hw_device_ctx,
 --- a/libhb/encsvtav1.c
 +++ b/libhb/encsvtav1.c
 @@ -502,7 +502,7 @@ static int send(hb_work_object_t *w, hb_buffer_t *in)
                  av_freep(&payload);
              }
-             else if (job->passthru_dynamic_hdr_metadata & DOVI &&
+             else if (job->passthru_dynamic_hdr_metadata & HB_HDR_DYNAMIC_METADATA_DOVI &&
 -                     side_data->type == AV_FRAME_DATA_DOVI_RPU_BUFFER_T35)
 +                     side_data->type == AV_FRAME_DATA_DOVI_RPU_BUFFER)
              {

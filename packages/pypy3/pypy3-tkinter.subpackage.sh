@@ -9,7 +9,7 @@ termux_step_create_subpkg_debscripts() {
 	cat <<- PRERM_EOF > ./prerm
 	#!$TERMUX_PREFIX/bin/sh
 
-	if [ "$TERMUX_PACKAGE_FORMAT" != "pacman" ] && [ "\$1" != "remove" ]; then
+	if [ "$TERMUX_PACKAGE_FORMAT" = "debian" ] && [ "\$1" != "remove" ]; then
 	    exit 0
 	fi
 

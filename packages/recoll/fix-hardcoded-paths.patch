@@ -1,11 +1,11 @@
 --- a/common/rclconfig.cpp
 +++ b/common/rclconfig.cpp
-@@ -1417,7 +1417,7 @@
+@@ -1817,7 +1817,7 @@
              // being used by recollindex instances. So explicitely test for /run/user/$uid, still
              // leaving open the remote possibility that XDG_RUNTIME_DIR would be set to something
              // else...
--            rundir = path_cat("/run/user", lltodecstr(getuid()));
-+            rundir = path_cat("@TERMUX_PREFIX@/var/run/user", lltodecstr(getuid()));
+-            rundir = path_cat("/run/user", std::to_string(getuid()));
++            rundir = path_cat("@TERMUX_PREFIX@/var/run/user", std::to_string(getuid()));
              if (path_isdir(rundir)) {
                  p = rundir.c_str();
              }

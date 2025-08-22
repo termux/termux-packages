@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.chromium.org/Home
 TERMUX_PKG_DESCRIPTION="Chromium web browser"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION=138.0.7204.168
+TERMUX_PKG_VERSION=139.0.7258.127
 TERMUX_PKG_SRCURL=https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=5aaa7070ae6378abffe781ad895a8faca34d768acc3f4a5f14015e72c67df882
-TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libdrm, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pulseaudio, zlib"
+TERMUX_PKG_SHA256=c9a3cf7edb8030245cc378f9949130600610e3a41578c9d02a3b45747790f181
+TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="chromium-host-tools, libffi-static"
 # TODO: Split chromium-common and chromium-headless
 # TERMUX_PKG_DEPENDS+=", chromium-common"
@@ -182,8 +182,6 @@ chrome_pgo_phase = 0
 treat_warnings_as_errors = false
 # Use system libraries as little as possible
 use_system_freetype = false
-# use_system_libdrm = true
-# use_system_libffi = false
 use_custom_libcxx = false
 use_custom_libcxx_for_host = true
 use_allocator_shim = false
@@ -217,8 +215,6 @@ use_alsa = false
 use_pulseaudio = true
 rtc_use_pipewire = false
 use_vaapi = false
-# See comments below
-enable_nacl = false
 # Host compiler (clang-13) doesn't support LTO well
 is_cfi = false
 use_cfi_icall = false
@@ -425,14 +421,6 @@ termux_step_post_make_install() {
 # Name in Chromium | libdrm fontconfig
 # Name in Termux   | libdrm fontconfig
 #
-# #############################################################################
-
-# ######################### About Native Client ###############################
-# When set `enable_nacl = true`, the following error occurs.
-# ninja: error: 'native_client/toolchain/linux_x86/pnacl_newlib/bin/arm-nacl-objcopy', needed by 'nacl_irt_arm.nexe', missing and no known rule to make it.
-# If we want to enable NaCi, maybe we should build the toolchain of NaCl too.
-# But I don't think this is necessary. NaCl existing or not will take little
-# influence on Chromium. So I'd like to disable NaCl.
 # #############################################################################
 
 # ############################ About Sandbox ##################################

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Centralized version control system characterized by its 
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.14.5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.apache.org/subversion/subversion-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=e78a29e7766b8b7b354497d08f71a55641abc53675ce1875584781aae35644a1
 TERMUX_PKG_AUTO_UPDATE=true

@@ -1,0 +1,52 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 34a0c5be..00d6e17b 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -161,7 +161,9 @@ strip-ansi-escapes = "0.2.1"
+ strum = "0.26"
+ strum_macros = "0.26"
+ syn = "2.0"
+-sysinfo = "0.36"
++# Starting from 0.36, the `user` feature uses `getpwent`, etc.
++# These were added to Android in API 26, but termux currently targets API 24.
++sysinfo = { version = "0.36", default-features = false, features = ["component", "disk", "network", "system"] }
+ tabled = { version = "0.20", default-features = false }
+ tempfile = "3.20"
+ thiserror = "2.0.12"
+diff --git a/crates/nu-command/src/system/sys/users.rs b/crates/nu-command/src/system/sys/users.rs
+index ffc84f05..985ea1f1 100644
+--- a/crates/nu-command/src/system/sys/users.rs
++++ b/crates/nu-command/src/system/sys/users.rs
+@@ -1,6 +1,4 @@
+-use super::trim_cstyle_null;
+ use nu_engine::command_prelude::*;
+-use sysinfo::Users;
+ 
+ #[derive(Clone)]
+ pub struct SysUsers;
+@@ -40,23 +38,6 @@ impl Command for SysUsers {
+ }
+ 
+ fn users(span: Span) -> Value {
+-    let users = Users::new_with_refreshed_list()
+-        .iter()
+-        .map(|user| {
+-            let groups = user
+-                .groups()
+-                .iter()
+-                .map(|group| Value::string(trim_cstyle_null(group.name()), span))
+-                .collect();
+-
+-            let record = record! {
+-                "name" => Value::string(trim_cstyle_null(user.name()), span),
+-                "groups" => Value::list(groups, span),
+-            };
+-
+-            Value::record(record, span)
+-        })
+-        .collect();
+-
+-    Value::list(users, span)
++    // `sysinfo:Users` feature is disabled.
++    Value::list(Vec::new(), span)
+ }

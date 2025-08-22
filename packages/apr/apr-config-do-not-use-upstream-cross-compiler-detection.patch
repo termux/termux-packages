@@ -1,0 +1,18 @@
+Causes
+/home/builder/.termux-build/subversion/tmp/config-scripts/apr-1-config --includes
+to print
+ -I/data/data/com.termux/files/usr/include/apr-1
+instead of
+ -I/home/builder/.termux-build/subversion/tmp/config-scripts/apr-1-config//data/data/com.termux/files/usr/include/apr-1
+
+--- a/apr-config.in
++++ b/apr-config.in
+@@ -50,7 +50,7 @@ location=@APR_CONFIG_LOCATION@
+ 
+ cross_compiling=@APR_CROSS_COMPILING@
+ 
+-if test "$cross_compiling" != "no"; then
++if false; then
+ 
+     # Normalize $0 and bindir by removing consecutive '/' as the comparison
+     # and the suffix removal below might fail for semantic equal pathes.

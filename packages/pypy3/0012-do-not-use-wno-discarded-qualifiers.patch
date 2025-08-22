@@ -1,0 +1,14 @@
+Prevents the repetitive warning
+warning: unknown warning option '-Wno-discarded-qualifiers'
+from filling the build log and impacting readability.
+
+--- a/rpython/translator/platform/linux.py
++++ b/rpython/translator/platform/linux.py
+@@ -15,7 +15,6 @@ class Linux(BasePosix):
+     cflags = tuple(
+              ['-O3', '-pthread', '-fomit-frame-pointer',
+               '-Wall', '-Wno-unused', '-Wno-address',
+-              '-Wno-discarded-qualifiers',  # RPyField does not know about const
+               # The parser turns 'const char *const *includes' into 'const const char **includes'
+               '-Wno-duplicate-decl-specifier',
+               # These make older gcc  behave like gcc-14

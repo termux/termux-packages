@@ -75,17 +75,21 @@ Enable jumbo build for the following component(s)/source_set(s):
  components/autofill/content/browser/BUILD.gn       |  3 ++-
  components/autofill/content/renderer/BUILD.gn      | 10 ++++++++--
  .../autofill/content/renderer/form_tracker.cc      |  4 ++++
+ .../content/renderer/password_autofill_agent.cc    |  4 ++++
  components/autofill/core/browser/BUILD.gn          |  7 ++++---
- .../data_model/autofill_structured_address_name.cc |  3 ++-
- .../geo/alternative_state_name_map_updater.cc      |  4 ++++
+ .../addresses/autofill_structured_address_name.cc  |  3 ++-
+ ...iple_request_payments_network_interface_base.cc |  8 ++++++++
  .../payments/payments_network_interface_base.cc    |  8 ++++++++
  .../payments/payments_suggestion_generator.cc      |  6 ++++++
- .../webdata/addresses/address_autofill_table.cc    |  6 ++++++
+ .../core/browser/ui/autofill_resource_utils.cc     |  4 ++++
+ .../webdata/addresses/address_autofill_table.cc    | 14 ++++++++++++++
  .../addresses/autofill_profile_sync_util.cc        |  6 ++++++
  .../webdata/addresses/contact_info_sync_util.cc    |  6 ++++++
  .../webdata/autocomplete/autocomplete_table.cc     |  6 ++++++
+ .../browser/webdata/autofill_ai/entity_table.cc    |  4 ++++
  .../webdata/autofill_sync_metadata_table.cc        |  6 ++++++
- .../webdata/payments/payments_autofill_table.cc    | 12 ++++++++++++
+ .../webdata/valuables/valuable_sync_bridge.cc      |  4 ++++
+ .../browser/webdata/valuables/valuables_table.cc   |  6 ++++++
  components/autofill/core/common/BUILD.gn           |  4 ++--
  components/cdm/browser/BUILD.gn                    |  5 +++--
  components/cdm/common/BUILD.gn                     |  3 ++-
@@ -113,6 +117,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  components/metrics/install_date_provider.cc        |  6 ++++++
  components/metrics/metrics_log.cc                  |  4 ++--
  components/omnibox/browser/BUILD.gn                |  5 +++--
+ .../omnibox/browser/autocomplete_grouper_groups.cc |  4 ++++
  .../browser/autocomplete_grouper_sections.cc       |  4 ++++
  components/omnibox/browser/autocomplete_match.cc   |  4 ++++
  components/omnibox/browser/autocomplete_result.cc  |  6 ++++++
@@ -133,6 +138,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  .../decorators/page_live_state_decorator.cc        |  4 ++++
  .../decorators/page_load_tracker_decorator.cc      |  4 ++++
  .../decorators/process_priority_aggregator.cc      |  4 ++++
+ .../decorators/site_data_recorder.cc               |  4 ++++
  .../decorators/tab_page_decorator.cc               |  2 +-
  .../frame_audible_voter.cc                         |  6 ++++++
  .../frame_capturing_media_stream_voter.cc          |  6 ++++++
@@ -145,7 +151,6 @@ Enable jumbo build for the following component(s)/source_set(s):
  .../graph/process_node_impl_describer.cc           |  4 ++++
  .../graph/worker_node_impl_describer.cc            |  4 ++++
  .../performance_manager_registry_impl.cc           |  4 ++++
- .../performance_manager_tab_helper.cc              |  2 +-
  .../site_data/site_data_cache_factory.cc           |  4 ++++
  .../cpu_measurement_monitor.cc                     |  4 ++++
  .../memory_measurement_provider.cc                 |  4 ++++
@@ -159,7 +164,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  .../policy/core/common/policy_proto_decoders.cc    |  4 ++++
  components/prefs/BUILD.gn                          |  4 +++-
  components/printing/browser/BUILD.gn               |  4 +++-
- components/safe_browsing/content/browser/BUILD.gn  |  7 ++++---
+ components/safe_browsing/content/browser/BUILD.gn  |  3 ++-
  components/safe_browsing/core/browser/BUILD.gn     |  3 ++-
  components/security_state/content/BUILD.gn         |  4 +++-
  components/security_state/core/BUILD.gn            |  6 ++++--
@@ -169,6 +174,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  components/sync/protocol/BUILD.gn                  |  3 ++-
  components/sync/service/BUILD.gn                   |  3 ++-
  ...tory_sync_session_durations_metrics_recorder.cc |  6 ++++++
+ components/sync/service/sync_service_impl.cc       |  4 ++--
  .../sync_session_durations_metrics_recorder.cc     |  6 ++++++
  components/sync_device_info/BUILD.gn               |  3 ++-
  components/sync_user_events/BUILD.gn               |  4 +++-
@@ -179,10 +185,10 @@ Enable jumbo build for the following component(s)/source_set(s):
  components/variations/variations_ids_provider.cc   |  4 ++++
  components/webauthn/content/browser/BUILD.gn       |  4 +++-
  components/wifi/BUILD.gn                           |  6 ++++--
- 108 files changed, 430 insertions(+), 100 deletions(-)
+ 113 files changed, 457 insertions(+), 97 deletions(-)
 
 diff --git a/components/affiliations/core/browser/BUILD.gn b/components/affiliations/core/browser/BUILD.gn
-index e065e0ec4e..e75aab357f 100644
+index e6556a7300..e8f9cb027d 100644
 --- a/components/affiliations/core/browser/BUILD.gn
 +++ b/components/affiliations/core/browser/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -203,7 +209,7 @@ index e065e0ec4e..e75aab357f 100644
      "affiliation_backend.cc",
      "affiliation_backend.h",
 diff --git a/components/autofill/content/browser/BUILD.gn b/components/autofill/content/browser/BUILD.gn
-index 79e9909bf8..40b9d16463 100644
+index 903cad0821..e054941146 100644
 --- a/components/autofill/content/browser/BUILD.gn
 +++ b/components/autofill/content/browser/BUILD.gn
 @@ -2,13 +2,14 @@
@@ -223,7 +229,7 @@ index 79e9909bf8..40b9d16463 100644
      "autofill_log_router_factory.cc",
      "autofill_log_router_factory.h",
 diff --git a/components/autofill/content/renderer/BUILD.gn b/components/autofill/content/renderer/BUILD.gn
-index 4177407b76..de2f4466c6 100644
+index 1e51b2a0c1..ddc10f47d4 100644
 --- a/components/autofill/content/renderer/BUILD.gn
 +++ b/components/autofill/content/renderer/BUILD.gn
 @@ -2,7 +2,9 @@
@@ -248,7 +254,7 @@ index 4177407b76..de2f4466c6 100644
    deps = [
      "//base",
      "//base:i18n",
-@@ -65,7 +71,7 @@ static_library("renderer") {
+@@ -67,7 +73,7 @@ static_library("renderer") {
    configs += [ "//build/config/compiler:wexit_time_destructors" ]
  }
  
@@ -258,10 +264,10 @@ index 4177407b76..de2f4466c6 100644
    sources = [
      "autofill_agent_test_api.h",
 diff --git a/components/autofill/content/renderer/form_tracker.cc b/components/autofill/content/renderer/form_tracker.cc
-index 271e954609..a42c1a123d 100644
+index 26fde50223..c0774c5d5b 100644
 --- a/components/autofill/content/renderer/form_tracker.cc
 +++ b/components/autofill/content/renderer/form_tracker.cc
-@@ -34,6 +34,8 @@ using blink::WebFormControlElement;
+@@ -35,6 +35,8 @@ using blink::WebFormControlElement;
  using blink::WebFormElement;
  using blink::WebInputElement;
  
@@ -270,14 +276,33 @@ index 271e954609..a42c1a123d 100644
  namespace autofill {
  
  namespace {
-@@ -484,3 +486,5 @@ void FormTracker::ElementWasHiddenOrRemoved(mojom::SubmissionSource source) {
+@@ -534,3 +536,5 @@ void FormTracker::ElementWasHiddenOrRemoved(mojom::SubmissionSource source) {
+ }
+ 
+ }  // namespace autofill
++
++#undef kSubmissionSourceHistogram
+diff --git a/components/autofill/content/renderer/password_autofill_agent.cc b/components/autofill/content/renderer/password_autofill_agent.cc
+index dbbb6ebd13..4f5ad40103 100644
+--- a/components/autofill/content/renderer/password_autofill_agent.cc
++++ b/components/autofill/content/renderer/password_autofill_agent.cc
+@@ -99,6 +99,8 @@ using blink::WebView;
+ 
+ using password_manager::util::IsRendererRecognizedCredentialForm;
+ 
++#define kSubmissionSourceHistogram kSubmissionSourceHistogram_PasswordAutofillAgent
++
+ namespace autofill {
+ 
+ namespace {
+@@ -2437,3 +2439,5 @@ void PasswordAutofillAgent::MaybeTriggerSuggestionsOnFocusedElement(
  }
  
  }  // namespace autofill
 +
 +#undef kSubmissionSourceHistogram
 diff --git a/components/autofill/core/browser/BUILD.gn b/components/autofill/core/browser/BUILD.gn
-index 07c83a385a..d94cc12847 100644
+index b637152c86..f475869e02 100644
 --- a/components/autofill/core/browser/BUILD.gn
 +++ b/components/autofill/core/browser/BUILD.gn
 @@ -5,6 +5,7 @@
@@ -285,10 +310,10 @@ index 07c83a385a..d94cc12847 100644
  import("//build/config/chrome_build.gni")
  import("//build/config/features.gni")
 +import("//build/config/jumbo.gni")
- import("//chrome/version.gni")
  import("//components/optimization_guide/features.gni")
  import("//testing/libfuzzer/fuzzer_test.gni")
-@@ -77,7 +78,7 @@ proto_library("amount_extraction_heuristic_regexes_proto") {
+ import("//third_party/protobuf/proto_library.gni")
+@@ -74,7 +75,7 @@ proto_library("amount_extraction_heuristic_regexes_proto") {
    sources = [ "payments/amount_extraction_heuristic_regexes.proto" ]
  }
  
@@ -297,7 +322,7 @@ index 07c83a385a..d94cc12847 100644
    sources = [
      "autofill_browser_util.cc",
      "autofill_browser_util.h",
-@@ -887,7 +888,7 @@ static_library("browser") {
+@@ -941,7 +942,7 @@ static_library("browser") {
    }
  }
  
@@ -306,7 +331,7 @@ index 07c83a385a..d94cc12847 100644
    sources = [
      "payments/legal_message_line.cc",
      "payments/legal_message_line.h",
-@@ -901,7 +902,7 @@ static_library("legal_message_line") {
+@@ -955,7 +956,7 @@ static_library("legal_message_line") {
    configs += [ "//build/config/compiler:wexit_time_destructors" ]
  }
  
@@ -315,42 +340,46 @@ index 07c83a385a..d94cc12847 100644
    testonly = true
    sources = [
      "crowdsourcing/autofill_crowdsourcing_manager_test_api.h",
-diff --git a/components/autofill/core/browser/data_model/autofill_structured_address_name.cc b/components/autofill/core/browser/data_model/autofill_structured_address_name.cc
-index db8dfd67e3..7dc39353ad 100644
---- a/components/autofill/core/browser/data_model/autofill_structured_address_name.cc
-+++ b/components/autofill/core/browser/data_model/autofill_structured_address_name.cc
+diff --git a/components/autofill/core/browser/data_model/addresses/autofill_structured_address_name.cc b/components/autofill/core/browser/data_model/addresses/autofill_structured_address_name.cc
+index abd103ab01..23d7455a25 100644
+--- a/components/autofill/core/browser/data_model/addresses/autofill_structured_address_name.cc
++++ b/components/autofill/core/browser/data_model/addresses/autofill_structured_address_name.cc
 @@ -30,8 +30,9 @@ std::u16string ReduceToInitials(const std::u16string& value) {
      return std::u16string();
    }
  
-+  const char *name_separators = kNameSeparators;
++  const char *name_seperators = kNameSeparators;
    std::vector<std::u16string> middle_name_tokens =
 -      base::SplitString(value, base::ASCIIToUTF16(kNameSeparators),
-+      base::SplitString(value, base::ASCIIToUTF16(name_separators),
++      base::SplitString(value, base::ASCIIToUTF16(name_seperators),
                          base::WhitespaceHandling::TRIM_WHITESPACE,
                          base::SplitResult::SPLIT_WANT_NONEMPTY);
  
-diff --git a/components/autofill/core/browser/geo/alternative_state_name_map_updater.cc b/components/autofill/core/browser/geo/alternative_state_name_map_updater.cc
-index e997b8e7bd..0591013d9f 100644
---- a/components/autofill/core/browser/geo/alternative_state_name_map_updater.cc
-+++ b/components/autofill/core/browser/geo/alternative_state_name_map_updater.cc
-@@ -27,6 +27,8 @@
- #include "components/autofill/core/common/autofill_prefs.h"
- #include "components/prefs/pref_service.h"
+diff --git a/components/autofill/core/browser/payments/multiple_request_payments_network_interface_base.cc b/components/autofill/core/browser/payments/multiple_request_payments_network_interface_base.cc
+index 804fa48434..a8debd868e 100644
+--- a/components/autofill/core/browser/payments/multiple_request_payments_network_interface_base.cc
++++ b/components/autofill/core/browser/payments/multiple_request_payments_network_interface_base.cc
+@@ -29,6 +29,10 @@
+ #include "services/network/public/cpp/simple_url_loader.h"
+ #include "services/network/public/mojom/url_response_head.mojom.h"
  
-+#define LoadDataFromFile LoadDataFromFile_AlternativeStateNameMapUpdater
++#define kTokenFetchId        kTokenFetchId_MultipleRequestPaymentsNetworkInterfaceBase
++#define kPaymentsOAuth2Scope kPaymentsOAuth2Scope_MultipleRequestPaymentsNetworkInterfaceBase
++#define GetRequestUrl        GetRequestUrl_MultipleRequestPaymentsNetworkInterfaceBase
 +
- namespace autofill {
+ namespace autofill::payments {
  
  namespace {
-@@ -275,3 +277,5 @@ AlternativeStateNameMapUpdater::GetTaskRunner() {
+@@ -381,3 +385,7 @@ void MultipleRequestPaymentsNetworkInterfaceBase::OnRequestFinished(
  }
  
- }  // namespace autofill
+ }  // namespace autofill::payments
 +
-+#undef LoadDataFromFile
++#undef kTokenFetchId
++#undef kPaymentsOAuth2Scope
++#undef GetRequestUrl
 diff --git a/components/autofill/core/browser/payments/payments_network_interface_base.cc b/components/autofill/core/browser/payments/payments_network_interface_base.cc
-index d7d6703093..621c43582f 100644
+index f9e56051af..5f64dc51c5 100644
 --- a/components/autofill/core/browser/payments/payments_network_interface_base.cc
 +++ b/components/autofill/core/browser/payments/payments_network_interface_base.cc
 @@ -23,6 +23,10 @@
@@ -373,12 +402,12 @@ index d7d6703093..621c43582f 100644
 +#undef kPaymentsOAuth2Scope
 +#undef GetRequestUrl
 diff --git a/components/autofill/core/browser/suggestions/payments/payments_suggestion_generator.cc b/components/autofill/core/browser/suggestions/payments/payments_suggestion_generator.cc
-index cc90e6508a..c2a19f8bff 100644
+index 7c3b745dbb..e0d25a19dc 100644
 --- a/components/autofill/core/browser/suggestions/payments/payments_suggestion_generator.cc
 +++ b/components/autofill/core/browser/suggestions/payments/payments_suggestion_generator.cc
-@@ -60,6 +60,9 @@
- #include "ui/native_theme/native_theme.h"  // nogncheck
- #endif
+@@ -58,6 +58,9 @@
+ #include "ui/base/l10n/l10n_util.h"
+ #include "ui/base/resource/resource_bundle.h"
  
 +#define CreateSeparator                 CreateSeparator_Payments
 +#define CreateUndoOrClearFormSuggestion CreateUndoOrClearFormSuggestion_Payments
@@ -386,36 +415,63 @@ index cc90e6508a..c2a19f8bff 100644
  namespace autofill {
  
  namespace {
-@@ -1660,3 +1663,6 @@ void FilterCardsToSuggestForCvcFields(
+@@ -1728,3 +1731,6 @@ void FilterCardsToSuggestForCvcFields(
+   }
  }
- 
  }  // namespace autofill
 +
 +#undef CreateSeparator
 +#undef CreateUndoOrClearFormSuggestion
+diff --git a/components/autofill/core/browser/ui/autofill_resource_utils.cc b/components/autofill/core/browser/ui/autofill_resource_utils.cc
+index db548c5cac..86ddfdc48b 100644
+--- a/components/autofill/core/browser/ui/autofill_resource_utils.cc
++++ b/components/autofill/core/browser/ui/autofill_resource_utils.cc
+@@ -16,6 +16,8 @@
+ #include "components/resources/android/theme_resources.h"
+ #endif  // BUILDFLAG(IS_ANDROID)
+ 
++#define ShouldUseNewFopDisplay ShouldUseNewFopDisplay_AutoFillResouceUtils
++
+ namespace autofill {
+ 
+ namespace {
+@@ -104,3 +106,5 @@ int GetIconResourceID(Suggestion::Icon resource_name) {
+ }
+ 
+ }  // namespace autofill
++
++#undef ShouldUseNewFopDisplay
 diff --git a/components/autofill/core/browser/webdata/addresses/address_autofill_table.cc b/components/autofill/core/browser/webdata/addresses/address_autofill_table.cc
-index ab35ef7875..0f69a1a15b 100644
+index ff5fd522ed..581aeb73cf 100644
 --- a/components/autofill/core/browser/webdata/addresses/address_autofill_table.cc
 +++ b/components/autofill/core/browser/webdata/addresses/address_autofill_table.cc
-@@ -29,6 +29,9 @@
+@@ -30,6 +30,13 @@
  #include "sql/statement.h"
  #include "sql/transaction.h"
  
 +#define kValue kValue_AddressAutofillTable
 +#define GetKey GetKey_AddressAutofillTable
++#define kGuid         kGuid_AddressAutofillTable
++#define kUseCount     kUseCount_AddressAutofillTable
++#define kUseDate      kUseDate_AddressAutofillTable
++#define kDateModified kDateModified_AddressAutofillTable
 +
  namespace autofill {
  
  namespace {
-@@ -1206,3 +1209,6 @@ bool AddressAutofillTable::Dropper::MigrateToVersion(
+@@ -1207,3 +1214,10 @@ bool AddressAutofillTable::Dropper::MigrateToVersion(
  }
  
  }  // namespace autofill
 +
 +#undef kValue
 +#undef GetKey
++#undef kGuid
++#undef kUseCount
++#undef kUseDate
++#undef kDateModified
 diff --git a/components/autofill/core/browser/webdata/addresses/autofill_profile_sync_util.cc b/components/autofill/core/browser/webdata/addresses/autofill_profile_sync_util.cc
-index e1bc97a715..4b78c72c17 100644
+index db2912f379..307ffdd5ef 100644
 --- a/components/autofill/core/browser/webdata/addresses/autofill_profile_sync_util.cc
 +++ b/components/autofill/core/browser/webdata/addresses/autofill_profile_sync_util.cc
 @@ -20,6 +20,9 @@
@@ -428,7 +484,7 @@ index e1bc97a715..4b78c72c17 100644
  namespace autofill {
  
  namespace {
-@@ -635,3 +638,6 @@ std::string GetStorageKeyFromAutofillProfileSpecifics(
+@@ -672,3 +675,6 @@ std::string GetStorageKeyFromAutofillProfileSpecifics(
  }
  
  }  // namespace autofill
@@ -436,7 +492,7 @@ index e1bc97a715..4b78c72c17 100644
 +#undef ConvertSpecificsToProfileVerificationStatus
 +#undef ConvertProfileToSpecificsVerificationStatus
 diff --git a/components/autofill/core/browser/webdata/addresses/contact_info_sync_util.cc b/components/autofill/core/browser/webdata/addresses/contact_info_sync_util.cc
-index 8c88c32b5c..8095cb055d 100644
+index d1156aeb91..63464bcc28 100644
 --- a/components/autofill/core/browser/webdata/addresses/contact_info_sync_util.cc
 +++ b/components/autofill/core/browser/webdata/addresses/contact_info_sync_util.cc
 @@ -15,6 +15,9 @@
@@ -449,7 +505,7 @@ index 8c88c32b5c..8095cb055d 100644
  namespace autofill {
  
  namespace {
-@@ -582,3 +585,6 @@ sync_pb::ContactInfoSpecifics TrimContactInfoSpecificsDataForCaching(
+@@ -598,3 +601,6 @@ sync_pb::ContactInfoSpecifics TrimContactInfoSpecificsDataForCaching(
  }
  
  }  // namespace autofill
@@ -457,10 +513,10 @@ index 8c88c32b5c..8095cb055d 100644
 +#undef ConvertSpecificsToProfileVerificationStatus
 +#undef ConvertProfileToSpecificsVerificationStatus
 diff --git a/components/autofill/core/browser/webdata/autocomplete/autocomplete_table.cc b/components/autofill/core/browser/webdata/autocomplete/autocomplete_table.cc
-index c99645ff65..b0d77fc27b 100644
+index a6e3eea465..d06df2b791 100644
 --- a/components/autofill/core/browser/webdata/autocomplete/autocomplete_table.cc
 +++ b/components/autofill/core/browser/webdata/autocomplete/autocomplete_table.cc
-@@ -24,6 +24,9 @@
+@@ -25,6 +25,9 @@
  #include "sql/transaction.h"
  #include "ui/base/l10n/l10n_util.h"
  
@@ -470,18 +526,37 @@ index c99645ff65..b0d77fc27b 100644
  namespace autofill {
  
  namespace {
-@@ -466,3 +469,6 @@ bool AutocompleteTable::Dropper::MigrateToVersion(
+@@ -467,3 +470,6 @@ bool AutocompleteTable::Dropper::MigrateToVersion(
  }
  
  }  // namespace autofill
 +
 +#undef kValue
 +#undef GetKey
+diff --git a/components/autofill/core/browser/webdata/autofill_ai/entity_table.cc b/components/autofill/core/browser/webdata/autofill_ai/entity_table.cc
+index 99effb8602..a01d068ab6 100644
+--- a/components/autofill/core/browser/webdata/autofill_ai/entity_table.cc
++++ b/components/autofill/core/browser/webdata/autofill_ai/entity_table.cc
+@@ -30,6 +30,8 @@
+ #include "sql/statement.h"
+ #include "sql/transaction.h"
+ 
++#define GetKey GetKey_EntityTable
++
+ namespace autofill {
+ 
+ namespace {
+@@ -475,3 +477,5 @@ std::optional<EntityInstance> EntityTable::ValidateInstance(
+ }
+ 
+ }  // namespace autofill
++
++#undef GetKey
 diff --git a/components/autofill/core/browser/webdata/autofill_sync_metadata_table.cc b/components/autofill/core/browser/webdata/autofill_sync_metadata_table.cc
-index 3ef4237150..ee017c4168 100644
+index 0e5e713651..2b226ef7b0 100644
 --- a/components/autofill/core/browser/webdata/autofill_sync_metadata_table.cc
 +++ b/components/autofill/core/browser/webdata/autofill_sync_metadata_table.cc
-@@ -12,6 +12,9 @@
+@@ -13,6 +13,9 @@
  #include "components/webdata/common/web_database.h"
  #include "sql/statement.h"
  
@@ -491,42 +566,55 @@ index 3ef4237150..ee017c4168 100644
  namespace autofill {
  
  namespace {
-@@ -230,3 +233,6 @@ bool AutofillSyncMetadataTable::InitDataTypeStateTable() {
+@@ -232,3 +235,6 @@ bool AutofillSyncMetadataTable::InitDataTypeStateTable() {
  }
  
  }  // namespace autofill
 +
 +#undef kValue
 +#undef GetKey
-diff --git a/components/autofill/core/browser/webdata/payments/payments_autofill_table.cc b/components/autofill/core/browser/webdata/payments/payments_autofill_table.cc
-index ae35bad1de..b594de281e 100644
---- a/components/autofill/core/browser/webdata/payments/payments_autofill_table.cc
-+++ b/components/autofill/core/browser/webdata/payments/payments_autofill_table.cc
-@@ -62,6 +62,12 @@
- #include "url/gurl.h"
- #include "url/origin.h"
+diff --git a/components/autofill/core/browser/webdata/valuables/valuable_sync_bridge.cc b/components/autofill/core/browser/webdata/valuables/valuable_sync_bridge.cc
+index 715acb8a3c..22af907f1b 100644
+--- a/components/autofill/core/browser/webdata/valuables/valuable_sync_bridge.cc
++++ b/components/autofill/core/browser/webdata/valuables/valuable_sync_bridge.cc
+@@ -21,6 +21,8 @@
+ #include "components/sync/protocol/entity_data.h"
+ #include "components/webdata/common/web_database.h"
  
-+#define kGuid         kGuid_PaymentsAutofillTable
-+#define kUseCount     kUseCount_PaymentsAutofillTable
-+#define kUseDate      kUseDate_PaymentsAutofillTable
-+#define kDateModified kDateModified_PaymentsAutofillTable
-+#define GetKey        GetKey_PaymentsAutofillTable
++#define AreAnyItemsDifferent AreAnyItemsDifferent_ValuableSyncBridge
 +
  namespace autofill {
- 
  namespace {
-@@ -2438,3 +2444,9 @@ bool PaymentsAutofillTable::Dropper::MigrateToVersion(
+ 
+@@ -298,3 +300,5 @@ ValuablesTable* ValuableSyncBridge::GetValuablesTable() {
  }
  
  }  // namespace autofill
 +
-+#undef kGuid
-+#undef kUseCount
-+#undef kUseDate
-+#undef kDateModified
++#undef AreAnyItemsDifferent
+diff --git a/components/autofill/core/browser/webdata/valuables/valuables_table.cc b/components/autofill/core/browser/webdata/valuables/valuables_table.cc
+index 981b6e83af..db7d6060c9 100644
+--- a/components/autofill/core/browser/webdata/valuables/valuables_table.cc
++++ b/components/autofill/core/browser/webdata/valuables/valuables_table.cc
+@@ -17,6 +17,9 @@
+ #include "sql/statement.h"
+ #include "sql/transaction.h"
+ 
++#define GetKey GetKey_WebDatabaseTable
++#define kMerchantDomain kMerchantDomain_WebDatabaseTable
++
+ namespace autofill {
+ 
+ namespace {
+@@ -225,3 +228,6 @@ bool ValuablesTable::RemoveLoyaltyCard(ValuableId loyalty_card_id) {
+ }
+ 
+ }  // namespace autofill
++
 +#undef GetKey
++#undef kMerchantDomain
 diff --git a/components/autofill/core/common/BUILD.gn b/components/autofill/core/common/BUILD.gn
-index f3a253bbf1..2b1820c50e 100644
+index 92f4398d3a..d493608d3e 100644
 --- a/components/autofill/core/common/BUILD.gn
 +++ b/components/autofill/core/common/BUILD.gn
 @@ -1,10 +1,10 @@
@@ -569,16 +657,20 @@ index 1d6b8c906a..a742782297 100644
      sources = [ "media_drm_storage_impl_unittest.cc" ]
      deps = [
 diff --git a/components/cdm/common/BUILD.gn b/components/cdm/common/BUILD.gn
-index 91e5b10de7..60735d8662 100644
+index 687d501791..1c4885d5f3 100644
 --- a/components/cdm/common/BUILD.gn
 +++ b/components/cdm/common/BUILD.gn
-@@ -1,10 +1,11 @@
- # Copyright 2014 The Chromium Authors
- # Use of this source code is governed by a BSD-style license that can be
+@@ -3,6 +3,7 @@
  # found in the LICENSE file.
-+import("//build/config/jumbo.gni")
  
+ import("//build/buildflag_header.gni")
++import("//build/config/jumbo.gni")
+ import("//components/cdm/common/playready.gni")
  import("//third_party/widevine/cdm/widevine.gni")
+ 
+@@ -11,7 +12,7 @@ buildflag_header("buildflags") {
+   flags = [ "ENABLE_PLAYREADY=$enable_playready" ]
+ }
  
 -static_library("common") {
 +jumbo_static_library("common") {
@@ -586,14 +678,15 @@ index 91e5b10de7..60735d8662 100644
  
    # See //components/cdm/README.md
 diff --git a/components/cdm/renderer/BUILD.gn b/components/cdm/renderer/BUILD.gn
-index b3d270e5ba..176d435cf1 100644
+index fbe2ec2264..db4c48eb25 100644
 --- a/components/cdm/renderer/BUILD.gn
 +++ b/components/cdm/renderer/BUILD.gn
-@@ -2,9 +2,10 @@
+@@ -2,10 +2,11 @@
  # Use of this source code is governed by a BSD-style license that can be
  # found in the LICENSE file.
  
 +import("//build/config/jumbo.gni")
+ import("//components/cdm/common/playready.gni")
  import("//third_party/widevine/cdm/widevine.gni")
  
 -static_library("renderer") {
@@ -602,7 +695,7 @@ index b3d270e5ba..176d435cf1 100644
    visibility = [
      "//android_webview/*",
 diff --git a/components/content_settings/core/browser/BUILD.gn b/components/content_settings/core/browser/BUILD.gn
-index 6c6fdcc82a..db92d6d77d 100644
+index f594e7c9e0..a383c4f6fe 100644
 --- a/components/content_settings/core/browser/BUILD.gn
 +++ b/components/content_settings/core/browser/BUILD.gn
 @@ -3,9 +3,10 @@
@@ -617,7 +710,7 @@ index 6c6fdcc82a..db92d6d77d 100644
    sources = [
      "content_settings_default_provider.cc",
      "content_settings_default_provider.h",
-@@ -118,7 +119,7 @@ source_set("cookie_settings") {
+@@ -111,7 +112,7 @@ source_set("cookie_settings") {
    ]
  }
  
@@ -627,10 +720,10 @@ index 6c6fdcc82a..db92d6d77d 100644
    sources = [
      "content_settings_partitioned_origin_value_map_unittest.cc",
 diff --git a/components/content_settings/core/browser/content_settings_default_provider.cc b/components/content_settings/core/browser/content_settings_default_provider.cc
-index 8cc77db04a..6234817bc4 100644
+index 4d550b6b82..ec8b472e61 100644
 --- a/components/content_settings/core/browser/content_settings_default_provider.cc
 +++ b/components/content_settings/core/browser/content_settings_default_provider.cc
-@@ -31,6 +31,8 @@
+@@ -32,6 +32,8 @@
  #include "components/prefs/scoped_user_pref_update.h"
  #include "url/gurl.h"
  
@@ -639,17 +732,17 @@ index 8cc77db04a..6234817bc4 100644
  namespace content_settings {
  
  namespace {
-@@ -529,3 +531,5 @@ void DefaultProvider::RecordHistogramMetrics() {
+@@ -496,3 +498,5 @@ void DefaultProvider::RecordHistogramMetrics() {
  }
  
  }  // namespace content_settings
 +
 +#undef kBug364820109AlreadyWorkedAroundPref
 diff --git a/components/content_settings/core/browser/content_settings_pref_provider.cc b/components/content_settings/core/browser/content_settings_pref_provider.cc
-index 58d8b0db8f..42eb91e33a 100644
+index c7aeb13ca4..0374277c77 100644
 --- a/components/content_settings/core/browser/content_settings_pref_provider.cc
 +++ b/components/content_settings/core/browser/content_settings_pref_provider.cc
-@@ -39,6 +39,8 @@
+@@ -38,6 +38,8 @@
  #include "services/tracing/public/cpp/perfetto/macros.h"
  #include "third_party/perfetto/protos/perfetto/trace/track_event/chrome_content_settings_event_info.pbzero.h"
  
@@ -658,14 +751,14 @@ index 58d8b0db8f..42eb91e33a 100644
  namespace content_settings {
  
  namespace {
-@@ -461,3 +463,5 @@ void PrefProvider::SetClockForTesting(const base::Clock* clock) {
+@@ -456,3 +458,5 @@ void PrefProvider::SetClockForTesting(const base::Clock* clock) {
  }
  
  }  // namespace content_settings
 +
 +#undef kBug364820109AlreadyWorkedAroundPref
 diff --git a/components/content_settings/core/common/BUILD.gn b/components/content_settings/core/common/BUILD.gn
-index 65ca53bc60..7995712259 100644
+index 9220f260f9..f9e08f9f38 100644
 --- a/components/content_settings/core/common/BUILD.gn
 +++ b/components/content_settings/core/common/BUILD.gn
 @@ -3,10 +3,11 @@
@@ -681,7 +774,7 @@ index 65ca53bc60..7995712259 100644
    sources = [
      "content_settings.cc",
      "content_settings.h",
-@@ -58,7 +59,7 @@ static_library("common") {
+@@ -59,7 +60,7 @@ static_library("common") {
    ]
  }
  
@@ -758,7 +851,7 @@ index 3d5f34cb0b..36a4a07973 100644
      ":for_tests",
      "//components/download/public/common:public",
 diff --git a/components/download/public/common/BUILD.gn b/components/download/public/common/BUILD.gn
-index 646ca7383a..afcdf700f0 100644
+index 62e2c75bea..e860ede5d3 100644
 --- a/components/download/public/common/BUILD.gn
 +++ b/components/download/public/common/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -824,7 +917,7 @@ index eb975dc8f5..9421d1719a 100644
  
    visibility = [ "//components/feature_engagement/internal:unit_tests" ]
 diff --git a/components/feature_engagement/public/BUILD.gn b/components/feature_engagement/public/BUILD.gn
-index 3578ad7853..f03c361590 100644
+index 1c3746c2c9..c53a09b659 100644
 --- a/components/feature_engagement/public/BUILD.gn
 +++ b/components/feature_engagement/public/BUILD.gn
 @@ -2,6 +2,8 @@
@@ -870,7 +963,7 @@ index 85b88c042d..8f096f3832 100644
      "public/constants.h",
      "public/format_duration.h",
 diff --git a/components/global_media_controls/public/views/media_item_ui_updated_view.cc b/components/global_media_controls/public/views/media_item_ui_updated_view.cc
-index ec52a8c443..c51a73c285 100644
+index 5a73feb9a3..67b435b6cd 100644
 --- a/components/global_media_controls/public/views/media_item_ui_updated_view.cc
 +++ b/components/global_media_controls/public/views/media_item_ui_updated_view.cc
 @@ -23,6 +23,13 @@
@@ -887,7 +980,7 @@ index ec52a8c443..c51a73c285 100644
  namespace global_media_controls {
  
  using media_session::mojom::MediaSessionAction;
-@@ -819,3 +826,10 @@ BEGIN_METADATA(MediaItemUIUpdatedView)
+@@ -818,3 +825,10 @@ BEGIN_METADATA(MediaItemUIUpdatedView)
  END_METADATA
  
  }  // namespace global_media_controls
@@ -970,7 +1063,7 @@ index e5e1fb41c3..1f27b267ff 100644
 +#undef UpdateEntriesFromTaskRunner
 +#undef UpdateEntriesWithRemoveFilterFromTaskRunner
 diff --git a/components/lookalikes/core/BUILD.gn b/components/lookalikes/core/BUILD.gn
-index e5db19da6f..0a0d27c5cd 100644
+index f94ade81ca..b59e9d626a 100644
 --- a/components/lookalikes/core/BUILD.gn
 +++ b/components/lookalikes/core/BUILD.gn
 @@ -2,10 +2,11 @@
@@ -986,7 +1079,7 @@ index e5db19da6f..0a0d27c5cd 100644
    sources = [
      "lookalike_url_ui_util.cc",
      "lookalike_url_ui_util.h",
-@@ -33,7 +34,7 @@ static_library("core") {
+@@ -37,7 +38,7 @@ static_library("core") {
    ]
  }
  
@@ -995,7 +1088,7 @@ index e5db19da6f..0a0d27c5cd 100644
    sources = [
      "safety_tip_test_utils.cc",
      "safety_tip_test_utils.h",
-@@ -49,7 +50,7 @@ static_library("safety_tips") {
+@@ -57,7 +58,7 @@ static_library("safety_tips") {
    ]
  }
  
@@ -1056,7 +1149,7 @@ index 02ca68bf87..c97e32a113 100644
    sources = [
      "cast_cert_validator_unittest.cc",
 diff --git a/components/metrics/BUILD.gn b/components/metrics/BUILD.gn
-index 1498acc1ba..096dbf905d 100644
+index 21f19c3e2c..a80bc8b9a2 100644
 --- a/components/metrics/BUILD.gn
 +++ b/components/metrics/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -1067,16 +1160,16 @@ index 1498acc1ba..096dbf905d 100644
  import("//testing/test.gni")
  import("//tools/grit/grit_rule.gni")
  
-@@ -128,7 +129,7 @@ if (!is_cronet_build || is_ios) {
+@@ -148,7 +149,7 @@ if (!is_cronet_build || is_ios) {
      }
    }
  
 -  static_library("metrics") {
 +  jumbo_static_library("metrics") {
      sources = [
-       "android_metrics_helper.cc",
-       "android_metrics_helper.h",
-@@ -343,7 +344,7 @@ if (!is_cronet_build || is_ios) {
+       "call_stacks/call_stack_profile_metrics_provider.cc",
+       "call_stacks/call_stack_profile_metrics_provider.h",
+@@ -345,7 +346,7 @@ if (!is_cronet_build || is_ios) {
      }
    }
  
@@ -1084,7 +1177,7 @@ index 1498acc1ba..096dbf905d 100644
 +  jumbo_static_library("test_support") {
      testonly = true
      sources = [
-       "test/test_enabled_state_provider.cc",
+       "test/scoped_metrics_id_provider.cc",
 diff --git a/components/metrics/install_date_provider.cc b/components/metrics/install_date_provider.cc
 index 925da2a15e..56d3e83490 100644
 --- a/components/metrics/install_date_provider.cc
@@ -1122,7 +1215,7 @@ index f04294ce6d..67121dad5e 100644
  
    for (const char* filter_switch : kSwitchesToFilter)
 diff --git a/components/omnibox/browser/BUILD.gn b/components/omnibox/browser/BUILD.gn
-index 64313114f8..4b7269d451 100644
+index 1746099de0..bc9c1cb8ee 100644
 --- a/components/omnibox/browser/BUILD.gn
 +++ b/components/omnibox/browser/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -1133,16 +1226,16 @@ index 64313114f8..4b7269d451 100644
  import("//build/config/ui.gni")
  import("//components/optimization_guide/features.gni")
  import("//components/vector_icons/vector_icons.gni")
-@@ -130,7 +131,7 @@ static_library("vector_icons") {
+@@ -132,7 +133,7 @@ static_library("vector_icons") {
    ]
  }
  
 -static_library("browser") {
 +jumbo_static_library("browser") {
    sources = [
-     "actions/omnibox_action.cc",
-     "actions/omnibox_action.h",
-@@ -690,7 +691,7 @@ if (is_android) {
+     "actions/contextual_search_action.cc",
+     "actions/contextual_search_action.h",
+@@ -714,7 +715,7 @@ if (is_android) {
    }
  }
  
@@ -1151,11 +1244,30 @@ index 64313114f8..4b7269d451 100644
    testonly = true
    sources = [
      "autocomplete_match_test_util.cc",
+diff --git a/components/omnibox/browser/autocomplete_grouper_groups.cc b/components/omnibox/browser/autocomplete_grouper_groups.cc
+index ac3ab6bb6c..1e4ce67663 100644
+--- a/components/omnibox/browser/autocomplete_grouper_groups.cc
++++ b/components/omnibox/browser/autocomplete_grouper_groups.cc
+@@ -12,6 +12,8 @@
+ #include "components/omnibox/browser/autocomplete_match.h"
+ #include "third_party/omnibox_proto/groups.pb.h"
+ 
++#define is_android is_android_autocomplete_grouper_groups
++
+ namespace {
+ constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
+ }  // namespace
+@@ -85,3 +87,5 @@ void Group::GroupMatchesByGroupId() {
+                group_id_position[rhs->suggestion_group_id.value()];
+       });
+ }
++
++#undef is_android
 diff --git a/components/omnibox/browser/autocomplete_grouper_sections.cc b/components/omnibox/browser/autocomplete_grouper_sections.cc
-index a85a01978e..45ffc994aa 100644
+index 8d3742b3c8..085bf47601 100644
 --- a/components/omnibox/browser/autocomplete_grouper_sections.cc
 +++ b/components/omnibox/browser/autocomplete_grouper_sections.cc
-@@ -16,6 +16,8 @@
+@@ -21,6 +21,8 @@
  #include "components/omnibox/common/omnibox_feature_configs.h"
  #include "third_party/omnibox_proto/groups.pb.h"
  
@@ -1164,17 +1276,17 @@ index a85a01978e..45ffc994aa 100644
  namespace {
  constexpr size_t kMobileMostVisitedTilesLimit = 10;
  constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
-@@ -487,3 +489,5 @@ IOSIpadWebZpsSection::IOSIpadWebZpsSection(
-               {total_count, omnibox::GROUP_PERSONALIZED_ZERO_SUGGEST},
+@@ -890,3 +892,5 @@ IOSIpadWebZpsSection::IOSIpadWebZpsSection(
+                     }),
            },
            group_configs) {}
 +
 +#undef is_android
 diff --git a/components/omnibox/browser/autocomplete_match.cc b/components/omnibox/browser/autocomplete_match.cc
-index 0d2ca5c160..8e5ed79f07 100644
+index ad535382f8..12da9fed8c 100644
 --- a/components/omnibox/browser/autocomplete_match.cc
 +++ b/components/omnibox/browser/autocomplete_match.cc
-@@ -63,6 +63,8 @@
+@@ -69,6 +69,8 @@
  #include "components/vector_icons/vector_icons.h"     // nogncheck
  #endif
  
@@ -1183,17 +1295,17 @@ index 0d2ca5c160..8e5ed79f07 100644
  constexpr bool kIsDesktop = !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS);
  constexpr bool kIsAndroid = BUILDFLAG(IS_ANDROID);
  
-@@ -2374,3 +2376,5 @@ void AutocompleteMatch::ValidateClassifications(
+@@ -2406,3 +2408,5 @@ void AutocompleteMatch::ValidateClassifications(
    }
  #endif  // DCHECK_IS_ON()
  }
 +
 +#undef kIsDesktop
 diff --git a/components/omnibox/browser/autocomplete_result.cc b/components/omnibox/browser/autocomplete_result.cc
-index e6445aee1f..63f3c9c34d 100644
+index d1026d8f7e..cc612f6940 100644
 --- a/components/omnibox/browser/autocomplete_result.cc
 +++ b/components/omnibox/browser/autocomplete_result.cc
-@@ -62,6 +62,9 @@ using metrics::OmniboxEventProto;
+@@ -69,6 +69,9 @@ using metrics::OmniboxEventProto;
  
  typedef AutocompleteMatchType ACMatchType;
  
@@ -1203,15 +1315,15 @@ index e6445aee1f..63f3c9c34d 100644
  namespace {
  
  constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
-@@ -1593,3 +1596,6 @@ void AutocompleteResult::GroupSuggestionsBySearchVsURL(iterator begin,
-   std::ranges::stable_sort(begin, end, {},
-                            [](const auto& m) { return m.GetSortingOrder(); });
+@@ -1661,3 +1664,6 @@ std::ostream& operator<<(std::ostream& os, const AutocompleteResult& result) {
+   os << "}" << std::endl;
+   return os;
  }
 +
 +#undef is_android
 +#undef is_ios
 diff --git a/components/omnibox/browser/base_search_provider.cc b/components/omnibox/browser/base_search_provider.cc
-index 0c09350575..ee290d8b57 100644
+index 9be3080c78..cefecbd46f 100644
 --- a/components/omnibox/browser/base_search_provider.cc
 +++ b/components/omnibox/browser/base_search_provider.cc
 @@ -44,6 +44,9 @@
@@ -1224,7 +1336,7 @@ index 0c09350575..ee290d8b57 100644
  namespace {
  constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
  constexpr bool is_ios = !!BUILDFLAG(IS_IOS);
-@@ -770,3 +773,6 @@ void BaseSearchProvider::OnDeletionComplete(
+@@ -789,3 +792,6 @@ void BaseSearchProvider::OnDeletionComplete(
          return loader.get() == source;
        });
  }
@@ -1232,7 +1344,7 @@ index 0c09350575..ee290d8b57 100644
 +#undef is_android
 +#undef is_ios
 diff --git a/components/omnibox/browser/history_url_provider.cc b/components/omnibox/browser/history_url_provider.cc
-index 91ecd78a50..d1b87aa214 100644
+index d50b0815d2..df2633dbca 100644
 --- a/components/omnibox/browser/history_url_provider.cc
 +++ b/components/omnibox/browser/history_url_provider.cc
 @@ -57,7 +57,8 @@
@@ -1245,14 +1357,14 @@ index 91ecd78a50..d1b87aa214 100644
  
  // Acts like the > operator for URLInfo classes.
  bool CompareHistoryMatch(const history::HistoryMatch& a,
-@@ -1206,3 +1207,5 @@ AutocompleteMatch HistoryURLProvider::HistoryMatchToACMatch(
+@@ -1202,3 +1203,5 @@ AutocompleteMatch HistoryURLProvider::HistoryMatchToACMatch(
  
    return match;
  }
 +
 +#undef ScoringSignals
 diff --git a/components/omnibox/browser/omnibox_popup_selection.cc b/components/omnibox/browser/omnibox_popup_selection.cc
-index c96f848d29..4dc528aab7 100644
+index 960505110b..f0a276faaa 100644
 --- a/components/omnibox/browser/omnibox_popup_selection.cc
 +++ b/components/omnibox/browser/omnibox_popup_selection.cc
 @@ -12,6 +12,8 @@
@@ -1263,18 +1375,18 @@ index c96f848d29..4dc528aab7 100644
 +
  constexpr bool kIsDesktop = !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS);
  
- const size_t OmniboxPopupSelection::kNoMatch = static_cast<size_t>(-1);
-@@ -259,3 +261,5 @@ OmniboxPopupSelection::GetAllAvailableSelectionsSorted(
+ constexpr size_t OmniboxPopupSelection::kNoMatch = static_cast<size_t>(-1);
+@@ -210,3 +212,5 @@ OmniboxPopupSelection::GetAllAvailableSelectionsSorted(
        << "This algorithm depends on a sorted list of available selections.";
    return available_selections;
  }
 +
 +#undef kIsDesktop
 diff --git a/components/omnibox/browser/open_tab_provider.cc b/components/omnibox/browser/open_tab_provider.cc
-index a2eea59860..c9a79ac056 100644
+index 0c28a4951f..539f7c82ef 100644
 --- a/components/omnibox/browser/open_tab_provider.cc
 +++ b/components/omnibox/browser/open_tab_provider.cc
-@@ -31,6 +31,8 @@
+@@ -32,6 +32,8 @@
  #include "ui/base/l10n/l10n_util.h"
  #include "url/gurl.h"
  
@@ -1290,7 +1402,7 @@ index a2eea59860..c9a79ac056 100644
 +
 +#undef is_android
 diff --git a/components/password_manager/content/browser/BUILD.gn b/components/password_manager/content/browser/BUILD.gn
-index cd9c91240b..3bbc33b019 100644
+index ee92615a2b..2f63f890e5 100644
 --- a/components/password_manager/content/browser/BUILD.gn
 +++ b/components/password_manager/content/browser/BUILD.gn
 @@ -2,7 +2,9 @@
@@ -1305,7 +1417,7 @@ index cd9c91240b..3bbc33b019 100644
      "bad_message.cc",
      "bad_message.h",
 diff --git a/components/password_manager/core/browser/BUILD.gn b/components/password_manager/core/browser/BUILD.gn
-index 073de993c6..4a9bfec404 100644
+index 4d343194b0..8fefd65872 100644
 --- a/components/password_manager/core/browser/BUILD.gn
 +++ b/components/password_manager/core/browser/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -1323,9 +1435,9 @@ index 073de993c6..4a9bfec404 100644
 -static_library("browser") {
 +jumbo_static_library("browser") {
    sources = [
-     "browser_save_password_progress_logger.cc",
-     "browser_save_password_progress_logger.h",
-@@ -343,7 +344,7 @@ if (is_android) {
+     "browser_credential_manager_factory.cc",
+     "browser_credential_manager_factory.h",
+@@ -348,7 +349,7 @@ if (is_android) {
    }
  }
  
@@ -1334,7 +1446,7 @@ index 073de993c6..4a9bfec404 100644
    sources = [
      "password_hash_data.cc",
      "password_hash_data.h",
-@@ -372,7 +373,7 @@ static_library("hash_password_manager") {
+@@ -377,7 +378,7 @@ static_library("hash_password_manager") {
    configs += [ "//build/config/compiler:wexit_time_destructors" ]
  }
  
@@ -1344,7 +1456,7 @@ index 073de993c6..4a9bfec404 100644
    sources = [
      "fake_form_fetcher.cc",
 diff --git a/components/password_manager/core/browser/leak_detection/BUILD.gn b/components/password_manager/core/browser/leak_detection/BUILD.gn
-index 46e4034c41..671eb1f8c9 100644
+index 707013621e..94bd9a1c82 100644
 --- a/components/password_manager/core/browser/leak_detection/BUILD.gn
 +++ b/components/password_manager/core/browser/leak_detection/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -1364,7 +1476,7 @@ index 46e4034c41..671eb1f8c9 100644
    sources = [
      "bulk_leak_check_impl.cc",
      "bulk_leak_check_impl.h",
-@@ -73,7 +74,7 @@ source_set("leak_detection") {
+@@ -74,7 +75,7 @@ source_set("leak_detection") {
    configs += [ "//build/config/compiler:wexit_time_destructors" ]
  }
  
@@ -1373,7 +1485,7 @@ index 46e4034c41..671eb1f8c9 100644
    testonly = true
    sources = [
      "mock_bulk_leak_check_service.cc",
-@@ -94,7 +95,7 @@ source_set("test_support") {
+@@ -95,7 +96,7 @@ source_set("test_support") {
    ]
  }
  
@@ -1383,10 +1495,10 @@ index 46e4034c41..671eb1f8c9 100644
    sources = [
      "bulk_leak_check_impl_unittest.cc",
 diff --git a/components/password_manager/core/browser/sync_credentials_filter.cc b/components/password_manager/core/browser/sync_credentials_filter.cc
-index 651641ef6c..ce97c077d5 100644
+index 10303e9673..e6c387a93b 100644
 --- a/components/password_manager/core/browser/sync_credentials_filter.cc
 +++ b/components/password_manager/core/browser/sync_credentials_filter.cc
-@@ -63,7 +63,7 @@ bool SyncCredentialsFilter::ShouldSave(const PasswordForm& form) const {
+@@ -62,7 +62,7 @@ bool SyncCredentialsFilter::ShouldSave(const PasswordForm& form) const {
  #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
    // On desktop, this normally leads to immediate browser sign-in, in which case
    // we shouldn't offer saving. One exception is if browser sign-in is disabled.
@@ -1411,7 +1523,7 @@ index 9c94ec1b89..529c2c7ec4 100644
      "credential_manager_types.cc",
      "credential_manager_types.h",
 diff --git a/components/payments/content/BUILD.gn b/components/payments/content/BUILD.gn
-index bfbe892334..c9e401c685 100644
+index 569cee8d02..cd0b333e83 100644
 --- a/components/payments/content/BUILD.gn
 +++ b/components/payments/content/BUILD.gn
 @@ -2,7 +2,9 @@
@@ -1425,7 +1537,7 @@ index bfbe892334..c9e401c685 100644
    sources = [
      "android_app_communication.cc",
      "android_app_communication.h",
-@@ -131,7 +133,7 @@ static_library("content") {
+@@ -133,7 +135,7 @@ static_library("content") {
  }
  
  # Files used by content and utility.
@@ -1434,7 +1546,7 @@ index bfbe892334..c9e401c685 100644
    sources = [
      "web_app_manifest.cc",
      "web_app_manifest.h",
-@@ -143,7 +145,7 @@ static_library("content_common") {
+@@ -145,7 +147,7 @@ static_library("content_common") {
    ]
  }
  
@@ -1443,7 +1555,7 @@ index bfbe892334..c9e401c685 100644
    sources = [
      "developer_console_logger.cc",
      "developer_console_logger.h",
-@@ -190,7 +192,7 @@ static_library("utils") {
+@@ -193,7 +195,7 @@ static_library("utils") {
    ]
  }
  
@@ -1468,7 +1580,7 @@ index 517b3dd3da..a9b2aba727 100644
      "icon_size.cc",
      "icon_size.h",
 diff --git a/components/payments/core/BUILD.gn b/components/payments/core/BUILD.gn
-index 6066a79092..e148a2d79f 100644
+index 37941d57d2..bf108681d9 100644
 --- a/components/payments/core/BUILD.gn
 +++ b/components/payments/core/BUILD.gn
 @@ -3,8 +3,9 @@
@@ -1482,8 +1594,8 @@ index 6066a79092..e148a2d79f 100644
    sources = [
      "android_app_description.cc",
      "android_app_description.h",
-@@ -112,7 +113,7 @@ static_library("core") {
-   ]
+@@ -118,7 +119,7 @@ static_library("currency_formatter") {
+   public_deps = [ "//third_party/icu:icu" ]
  }
  
 -static_library("error_strings") {
@@ -1491,7 +1603,7 @@ index 6066a79092..e148a2d79f 100644
    sources = [
      "error_strings.cc",
      "error_strings.h",
-@@ -128,14 +129,14 @@ static_library("error_strings") {
+@@ -134,14 +135,14 @@ static_library("error_strings") {
    }
  }
  
@@ -1508,7 +1620,7 @@ index 6066a79092..e148a2d79f 100644
    testonly = true
    sources = [
      "const_csp_checker.cc",
-@@ -163,7 +164,7 @@ static_library("test_support") {
+@@ -169,7 +170,7 @@ static_library("test_support") {
    ]
  }
  
@@ -1518,7 +1630,7 @@ index 6066a79092..e148a2d79f 100644
    sources = [
      "android_app_description_tools_unittest.cc",
 diff --git a/components/performance_manager/BUILD.gn b/components/performance_manager/BUILD.gn
-index 1dfc06e29a..9cd58cd521 100644
+index ac60dfaadf..dffa35d2f4 100644
 --- a/components/performance_manager/BUILD.gn
 +++ b/components/performance_manager/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -1538,7 +1650,7 @@ index 1dfc06e29a..9cd58cd521 100644
    sources = [
      "binders.cc",
      "browser_child_process_host_proxy.cc",
-@@ -267,6 +268,10 @@ static_library("performance_manager") {
+@@ -299,6 +300,10 @@ static_library("performance_manager") {
      "worker_watcher.cc",
      "worker_watcher.h",
    ]
@@ -1549,14 +1661,14 @@ index 1dfc06e29a..9cd58cd521 100644
  
    deps = [
      "//components/content_settings/core/common",
-@@ -327,6 +332,7 @@ static_library("performance_manager") {
-       "public/persistence/site_data/feature_usage.h",
-       "public/persistence/site_data/site_data_reader.h",
+@@ -342,6 +347,7 @@ static_library("performance_manager") {
+       "//chromeos/dbus/power",
+       "//chromeos/dbus/power:power_manager_proto",
      ]
 +    jumbo_excluded_sources += [ "decorators/site_data_recorder.cc" ]
  
-     public_deps += [
-       ":site_data_proto",
+     sources += [
+       "power/battery_level_provider_chromeos.cc",
 diff --git a/components/performance_manager/decorators/page_aggregator.cc b/components/performance_manager/decorators/page_aggregator.cc
 index d4e426619c..1e1d2b195c 100644
 --- a/components/performance_manager/decorators/page_aggregator.cc
@@ -1577,10 +1689,10 @@ index d4e426619c..1e1d2b195c 100644
 +
 +#undef kDescriberName
 diff --git a/components/performance_manager/decorators/page_live_state_decorator.cc b/components/performance_manager/decorators/page_live_state_decorator.cc
-index ca4c55ba24..e835284a86 100644
+index 8938c3aea7..9747f7be7f 100644
 --- a/components/performance_manager/decorators/page_live_state_decorator.cc
 +++ b/components/performance_manager/decorators/page_live_state_decorator.cc
-@@ -20,6 +20,8 @@
+@@ -23,6 +23,8 @@
  #include "content/public/browser/browser_thread.h"
  #include "content/public/browser/web_contents.h"
  
@@ -1589,8 +1701,8 @@ index ca4c55ba24..e835284a86 100644
  namespace performance_manager {
  
  namespace {
-@@ -507,3 +509,5 @@ PageLiveStateObserverDefaultImpl::PageLiveStateObserverDefaultImpl() = default;
- PageLiveStateObserverDefaultImpl::~PageLiveStateObserverDefaultImpl() = default;
+@@ -688,3 +690,5 @@ PageLiveStateObserver::PageLiveStateObserver() = default;
+ PageLiveStateObserver::~PageLiveStateObserver() = default;
  
  }  // namespace performance_manager
 +
@@ -1633,6 +1745,25 @@ index 7cac469094..215802e16f 100644
  }  // namespace performance_manager
 +
 +#undef kDescriberName
+diff --git a/components/performance_manager/decorators/site_data_recorder.cc b/components/performance_manager/decorators/site_data_recorder.cc
+index 64ae5fb9ca..2c67830b0e 100644
+--- a/components/performance_manager/decorators/site_data_recorder.cc
++++ b/components/performance_manager/decorators/site_data_recorder.cc
+@@ -23,6 +23,8 @@
+ #include "components/performance_manager/public/graph/graph.h"
+ #include "components/performance_manager/public/persistence/site_data/site_data_reader.h"
+ 
++#define GetPageNodeVisibility GetPageNodeVisibility_SiteDataRecorder
++
+ namespace performance_manager {
+ 
+ namespace {
+@@ -356,3 +358,5 @@ void WaitForSiteDataReader(
+ }
+ 
+ }  // namespace performance_manager
++
++#undef GetPageNodeVisibility
 diff --git a/components/performance_manager/decorators/tab_page_decorator.cc b/components/performance_manager/decorators/tab_page_decorator.cc
 index 9b3d86f632..302b02cde7 100644
 --- a/components/performance_manager/decorators/tab_page_decorator.cc
@@ -1708,10 +1839,10 @@ index 39ecc3b0c4..423ee399dd 100644
 +
 +#undef GetExecutionContext
 diff --git a/components/performance_manager/execution_context_priority/inherit_client_priority_voter.cc b/components/performance_manager/execution_context_priority/inherit_client_priority_voter.cc
-index bd30b4df88..c63c0e7d2d 100644
+index 5fe654ffa6..82832f8d52 100644
 --- a/components/performance_manager/execution_context_priority/inherit_client_priority_voter.cc
 +++ b/components/performance_manager/execution_context_priority/inherit_client_priority_voter.cc
-@@ -13,6 +13,8 @@
+@@ -12,6 +12,8 @@
  #include "components/performance_manager/public/execution_context/execution_context_registry.h"
  #include "components/performance_manager/public/graph/graph.h"
  
@@ -1720,7 +1851,7 @@ index bd30b4df88..c63c0e7d2d 100644
  namespace performance_manager {
  namespace execution_context_priority {
  
-@@ -228,3 +230,5 @@ void InheritClientPriorityVoter::OnPriorityAndReasonChanged(
+@@ -227,3 +229,5 @@ void InheritClientPriorityVoter::OnPriorityAndReasonChanged(
  
  }  // namespace execution_context_priority
  }  // namespace performance_manager
@@ -1786,7 +1917,7 @@ index 49ff1c11c2..5074638b1b 100644
 +
 +#undef kDescriberName
 diff --git a/components/performance_manager/graph/frame_node_impl_describer.cc b/components/performance_manager/graph/frame_node_impl_describer.cc
-index dd9044f3d2..83493347fa 100644
+index ee2a27b953..867d51fac7 100644
 --- a/components/performance_manager/graph/frame_node_impl_describer.cc
 +++ b/components/performance_manager/graph/frame_node_impl_describer.cc
 @@ -14,6 +14,8 @@
@@ -1843,10 +1974,10 @@ index 5ec53278b8..5b9894d540 100644
 +
 +#undef kDescriberName
 diff --git a/components/performance_manager/performance_manager_registry_impl.cc b/components/performance_manager/performance_manager_registry_impl.cc
-index 2e3f3a6b9a..feb6e3bbcb 100644
+index eed994a76e..afeb993d17 100644
 --- a/components/performance_manager/performance_manager_registry_impl.cc
 +++ b/components/performance_manager/performance_manager_registry_impl.cc
-@@ -21,6 +21,8 @@
+@@ -20,6 +20,8 @@
  #include "content/public/browser/render_process_host.h"
  #include "content/public/browser/storage_partition.h"
  
@@ -1855,25 +1986,12 @@ index 2e3f3a6b9a..feb6e3bbcb 100644
  namespace performance_manager {
  
  namespace {
-@@ -286,3 +288,5 @@ void PerformanceManagerRegistryImpl::OnRenderProcessHostCreated(
+@@ -277,3 +279,5 @@ void PerformanceManagerRegistryImpl::OnRenderProcessHostCreated(
  }
  
  }  // namespace performance_manager
 +
 +#undef g_instance
-diff --git a/components/performance_manager/performance_manager_tab_helper.cc b/components/performance_manager/performance_manager_tab_helper.cc
-index ee960f6a47..966e452357 100644
---- a/components/performance_manager/performance_manager_tab_helper.cc
-+++ b/components/performance_manager/performance_manager_tab_helper.cc
-@@ -196,7 +196,7 @@ void PerformanceManagerTabHelper::RenderFrameCreated(
- #if BUILDFLAG(ENABLE_GUEST_VIEW)
-   else if (auto* guest = guest_view::GuestViewBase::FromRenderFrameHost(
-                render_frame_host)) {
--    if (base::FeatureList::IsEnabled(features::kGuestViewMPArch)) {
-+    if (base::FeatureList::IsEnabled(::features::kGuestViewMPArch)) {
-       content::RenderFrameHost* outer_document = guest->owner_rfh();
-       CHECK(outer_document);
-       outer_document_for_inner_frame_root =
 diff --git a/components/performance_manager/persistence/site_data/site_data_cache_factory.cc b/components/performance_manager/persistence/site_data/site_data_cache_factory.cc
 index 3813e46e04..3dd851f91c 100644
 --- a/components/performance_manager/persistence/site_data/site_data_cache_factory.cc
@@ -1894,7 +2012,7 @@ index 3813e46e04..3dd851f91c 100644
 +
 +#undef g_instance
 diff --git a/components/performance_manager/resource_attribution/cpu_measurement_monitor.cc b/components/performance_manager/resource_attribution/cpu_measurement_monitor.cc
-index 3799775e71..4374c92618 100644
+index fd30d8effb..1fe8ad8e90 100644
 --- a/components/performance_manager/resource_attribution/cpu_measurement_monitor.cc
 +++ b/components/performance_manager/resource_attribution/cpu_measurement_monitor.cc
 @@ -50,6 +50,8 @@
@@ -1906,7 +2024,7 @@ index 3799775e71..4374c92618 100644
  namespace resource_attribution {
  
  namespace {
-@@ -1112,3 +1114,5 @@ size_t ScopedCPUTimeResult::EstimateMemoryUsage() const {
+@@ -1116,3 +1118,5 @@ size_t ScopedCPUTimeResult::EstimateMemoryUsage() const {
  }
  
  }  // namespace resource_attribution
@@ -1932,7 +2050,7 @@ index 61f7cbccdd..98392874b1 100644
 +
 +#undef OriginInBrowsingInstanceContextForNode
 diff --git a/components/policy/content/BUILD.gn b/components/policy/content/BUILD.gn
-index 4eac501946..7112414b1d 100644
+index 257e9ff47b..9ce4764d8f 100644
 --- a/components/policy/content/BUILD.gn
 +++ b/components/policy/content/BUILD.gn
 @@ -3,11 +3,12 @@
@@ -1947,9 +2065,9 @@ index 4eac501946..7112414b1d 100644
 -source_set("safe_sites_navigation_throttle") {
 +jumbo_source_set("safe_sites_navigation_throttle") {
    sources = [
-     "policy_blocklist_metrics.cc",
-     "policy_blocklist_metrics.h",
-@@ -31,7 +32,7 @@ source_set("safe_sites_navigation_throttle") {
+     "proceed_until_response_navigation_throttle.cc",
+     "proceed_until_response_navigation_throttle.h",
+@@ -29,7 +30,7 @@ source_set("safe_sites_navigation_throttle") {
    ]
  }
  
@@ -1959,7 +2077,7 @@ index 4eac501946..7112414b1d 100644
      "policy_blocklist_navigation_throttle.cc",
      "policy_blocklist_navigation_throttle.h",
 diff --git a/components/policy/core/browser/BUILD.gn b/components/policy/core/browser/BUILD.gn
-index a807f61f31..615489694e 100644
+index e1f356347f..b8dc6c6124 100644
 --- a/components/policy/core/browser/BUILD.gn
 +++ b/components/policy/core/browser/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -2027,7 +2145,7 @@ index 96abca8595..f1c4927588 100644
 +
 +#undef ValidateHost
 diff --git a/components/policy/core/common/BUILD.gn b/components/policy/core/common/BUILD.gn
-index f7d4c591fa..0aabcd7bcb 100644
+index dba951de34..280f76fb5a 100644
 --- a/components/policy/core/common/BUILD.gn
 +++ b/components/policy/core/common/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -2056,16 +2174,16 @@ index f7d4c591fa..0aabcd7bcb 100644
    sources = [
      "cloud/cloud_policy_util.cc",
      "cloud/cloud_policy_util.h",
-@@ -53,7 +54,7 @@ source_set("util") {
+@@ -56,7 +57,7 @@ source_set("util") {
    }
  }
  
 -source_set("internal") {
 +jumbo_source_set("internal") {
-   visibility = [ "//components/policy/*" ]
- 
-   configs += [ "//components/policy:component_implementation" ]
-@@ -377,7 +378,7 @@ source_set("internal") {
+   visibility = [
+     "//components/policy/*",
+     "//components/privacy_sandbox/*",
+@@ -386,7 +387,7 @@ source_set("internal") {
    }
  }
  
@@ -2162,7 +2280,7 @@ index 478121da0b..681c13411c 100644
      "print_composite_client.cc",
      "print_composite_client.h",
 diff --git a/components/safe_browsing/content/browser/BUILD.gn b/components/safe_browsing/content/browser/BUILD.gn
-index 11541e7350..f2a45529b7 100644
+index 1fc1f8d683..3b6f8076cf 100644
 --- a/components/safe_browsing/content/browser/BUILD.gn
 +++ b/components/safe_browsing/content/browser/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -2182,26 +2300,8 @@ index 11541e7350..f2a45529b7 100644
    sources = [
      "async_check_tracker.cc",
      "async_check_tracker.h",
-@@ -229,7 +230,7 @@ source_set("unit_tests") {
-   ]
- }
- 
--source_set("client_side_detection_images_cache") {
-+jumbo_source_set("client_side_detection_images_cache") {
-   sources = [
-     "client_side_detection_feature_cache.cc",
-     "client_side_detection_feature_cache.h",
-@@ -243,7 +244,7 @@ source_set("client_side_detection_images_cache") {
-   ]
- }
- 
--source_set("client_side_detection_service") {
-+jumbo_source_set("client_side_detection_service") {
-   sources = [
-     "client_side_detection_service.cc",
-     "client_side_detection_service.h",
 diff --git a/components/safe_browsing/core/browser/BUILD.gn b/components/safe_browsing/core/browser/BUILD.gn
-index f3f080f039..da53702656 100644
+index 9e6f073dc0..054d08a2ae 100644
 --- a/components/safe_browsing/core/browser/BUILD.gn
 +++ b/components/safe_browsing/core/browser/BUILD.gn
 @@ -3,8 +3,9 @@
@@ -2260,7 +2360,7 @@ index 497dcf5126..1f69e4ad02 100644
    sources = [ "security_state_unittest.cc" ]
  
 diff --git a/components/storage_monitor/BUILD.gn b/components/storage_monitor/BUILD.gn
-index 3cce5f2946..23e51f9eef 100644
+index 2c5c06c4cf..dce03c6f25 100644
 --- a/components/storage_monitor/BUILD.gn
 +++ b/components/storage_monitor/BUILD.gn
 @@ -3,8 +3,9 @@
@@ -2269,13 +2369,13 @@ index 3cce5f2946..23e51f9eef 100644
  import("//build/config/features.gni")
 +import("//build/config/jumbo.gni")
  
--static_library("storage_monitor") {
-+jumbo_static_library("storage_monitor") {
+-component("storage_monitor") {
++jumbo_component("storage_monitor") {
    sources = [
      "media_storage_util.cc",
      "media_storage_util.h",
 diff --git a/components/sync/BUILD.gn b/components/sync/BUILD.gn
-index 16669b33b0..644b78ec08 100644
+index 11f1385c64..57a61894b4 100644
 --- a/components/sync/BUILD.gn
 +++ b/components/sync/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -2287,19 +2387,19 @@ index 16669b33b0..644b78ec08 100644
  
  group("sync") {
 diff --git a/components/sync/base/BUILD.gn b/components/sync/base/BUILD.gn
-index 147146237e..4237925864 100644
+index 6277a377e0..f01a841f4f 100644
 --- a/components/sync/base/BUILD.gn
 +++ b/components/sync/base/BUILD.gn
-@@ -4,6 +4,7 @@
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
  
- import("//build/buildflag_header.gni")
  import("//build/config/features.gni")
 +import("//build/config/jumbo.gni")
- import("//components/sync/base/features.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
  
  declare_args() {
-@@ -30,7 +31,7 @@ source_set("features") {
-   }
+@@ -18,7 +19,7 @@ source_set("features") {
+   deps = [ "//base" ]
  }
  
 -static_library("base") {
@@ -2329,7 +2429,7 @@ index 5f71ba85f0..2bc9860ca6 100644
      "collaboration_metadata.cc",
      "collaboration_metadata.h",
 diff --git a/components/sync/service/BUILD.gn b/components/sync/service/BUILD.gn
-index ac93f64122..4a41a34b61 100644
+index 618c38fc54..52ae610818 100644
 --- a/components/sync/service/BUILD.gn
 +++ b/components/sync/service/BUILD.gn
 @@ -3,8 +3,9 @@
@@ -2344,7 +2444,7 @@ index ac93f64122..4a41a34b61 100644
      "active_devices_provider.h",
      "backend_migrator.cc",
 diff --git a/components/sync/service/history_sync_session_durations_metrics_recorder.cc b/components/sync/service/history_sync_session_durations_metrics_recorder.cc
-index 73c32820fe..575f945355 100644
+index 98fa0a3162..e18ed0d8e3 100644
 --- a/components/sync/service/history_sync_session_durations_metrics_recorder.cc
 +++ b/components/sync/service/history_sync_session_durations_metrics_recorder.cc
 @@ -14,6 +14,9 @@
@@ -2357,15 +2457,31 @@ index 73c32820fe..575f945355 100644
  namespace syncer {
  
  namespace {
-@@ -127,3 +130,6 @@ void HistorySyncSessionDurationsMetricsRecorder::LogHistorySyncDuration(
+@@ -145,3 +148,6 @@ void HistorySyncSessionDurationsMetricsRecorder::LogHistorySyncDuration(
  }
  
  }  // namespace syncer
 +
 +#undef SubtractInactiveTime
 +#undef LogDuration
+diff --git a/components/sync/service/sync_service_impl.cc b/components/sync/service/sync_service_impl.cc
+index 7452cf8460..50c6984efa 100644
+--- a/components/sync/service/sync_service_impl.cc
++++ b/components/sync/service/sync_service_impl.cc
+@@ -2256,9 +2256,9 @@ SyncServiceImpl::DeterminePreviouslySyncingGaiaIdInfoForMetrics() const {
+   // SyncServiceImpl.
+   const GaiaId previously_syncing_gaia_id = GaiaId(
+       HasSyncConsent() ? sync_client_->GetPrefService()->GetString(
+-                             prefs::kGoogleServicesSecondLastSyncingGaiaId)
++                             ::prefs::kGoogleServicesSecondLastSyncingGaiaId)
+                        : sync_client_->GetPrefService()->GetString(
+-                             prefs::kGoogleServicesLastSyncingGaiaId));
++                             ::prefs::kGoogleServicesLastSyncingGaiaId));
+ 
+   if (previously_syncing_gaia_id.empty()) {
+     // It is known that no previous gaia ID existed that turned sync on.
 diff --git a/components/sync/service/sync_session_durations_metrics_recorder.cc b/components/sync/service/sync_session_durations_metrics_recorder.cc
-index 100bbda21d..d19033982f 100644
+index 4b2021d817..62a3d49d56 100644
 --- a/components/sync/service/sync_session_durations_metrics_recorder.cc
 +++ b/components/sync/service/sync_session_durations_metrics_recorder.cc
 @@ -11,6 +11,9 @@
@@ -2378,7 +2494,7 @@ index 100bbda21d..d19033982f 100644
  namespace syncer {
  
  namespace {
-@@ -346,3 +349,6 @@ SyncSessionDurationsMetricsRecorder::DetermineSyncStatus() const {
+@@ -352,3 +355,6 @@ SyncSessionDurationsMetricsRecorder::DetermineSyncStatus() const {
  }
  
  }  // namespace syncer
@@ -2441,7 +2557,7 @@ index 55ffddee33..2fcce25bab 100644
    sources += [
      "agent_util.cc",
 diff --git a/components/url_formatter/BUILD.gn b/components/url_formatter/BUILD.gn
-index e4f508f7db..c48c0cbd18 100644
+index 7670c903db..44384ade48 100644
 --- a/components/url_formatter/BUILD.gn
 +++ b/components/url_formatter/BUILD.gn
 @@ -2,13 +2,14 @@
@@ -2469,7 +2585,7 @@ index e4f508f7db..c48c0cbd18 100644
    sources = [
      "elide_url.cc",
      "elide_url.h",
-@@ -67,7 +68,7 @@ if (is_android) {
+@@ -66,7 +67,7 @@ if (is_android) {
    }
  }
  
@@ -2479,7 +2595,7 @@ index e4f508f7db..c48c0cbd18 100644
    sources = [
      "elide_url_unittest.cc",
 diff --git a/components/variations/BUILD.gn b/components/variations/BUILD.gn
-index 6e23d913a1..6b4d9f7d7c 100644
+index 32ce3e7daf..251b0eee33 100644
 --- a/components/variations/BUILD.gn
 +++ b/components/variations/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -2519,19 +2635,19 @@ index 2e09785c24..3709503f4d 100644
 +
 +#undef g_instance
 diff --git a/components/variations/variations_ids_provider.cc b/components/variations/variations_ids_provider.cc
-index 20bfffd358..49fb15859b 100644
+index 384ad77ec8..57e87e6a45 100644
 --- a/components/variations/variations_ids_provider.cc
 +++ b/components/variations/variations_ids_provider.cc
-@@ -27,6 +27,8 @@ BASE_FEATURE(kSendLowEntropySourceVariationIDInAnyContext,
-              "SendLowEntropySourceVariationIDInAnyContext",
-              base::FEATURE_ENABLED_BY_DEFAULT);
+@@ -22,6 +22,8 @@
+ #include "components/variations/variations_client.h"
+ #include "components/variations/variations_features.h"
  
 +#define g_instance g_instance_variations_ids_provider
 +
  namespace variations {
  namespace {
  
-@@ -597,3 +599,5 @@ bool VariationsIdsProvider::IsDuplicateId(VariationID id) {
+@@ -587,3 +589,5 @@ bool VariationsIdsProvider::IsDuplicateId(VariationID id) {
  }
  
  }  // namespace variations
@@ -2576,4 +2692,20 @@ index c05f146af7..61361ec6f7 100644
    sources = [
      "fake_wifi_service.cc",
      "fake_wifi_service.h",
-
+--- a/components/autofill/core/browser/manual_testing_import.cc.orig	2025-07-29 14:24:46.826102408 +0000
++++ b/components/autofill/core/browser/manual_testing_import.cc	2025-07-29 14:25:30.361625348 +0000
+@@ -25,6 +25,8 @@
+ #include "components/autofill/core/browser/field_type_utils.h"
+ #include "components/autofill/core/browser/field_types.h"
+ 
++#define LoadDataFromFile LoadDataFromFile_ManualTestingImport
++
+ namespace autofill {
+ 
+ namespace {
+@@ -297,3 +299,5 @@
+ }
+ 
+ }  // namespace autofill
++
++#undef LoadDataFromFile

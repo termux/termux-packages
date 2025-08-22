@@ -11,7 +11,7 @@ TERMUX_PKG_LICENSE_FILE="
 "
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.40.2"
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/utils/util-linux/v${TERMUX_PKG_VERSION:0:4}/util-linux-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=d78b37a66f5922d70edf3bdfb01a6b33d34ed3c3cafd6628203b2a2b67c8e8b3
 # libcrypt is required for only newgrp and sulogin, which are not built anyways

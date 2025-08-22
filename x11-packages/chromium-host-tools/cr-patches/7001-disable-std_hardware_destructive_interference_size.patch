@@ -1,0 +1,24 @@
+This reverts https://github.com/chromium/chromium/commit/fc838e8cc887adbe95110045d146b9d5885bf2a9.
+
+--- a/components/media_router/common/providers/cast/channel/enum_table.h
++++ b/components/media_router/common/providers/cast/channel/enum_table.h
+@@ -368,7 +368,7 @@
+ 
+  private:
+ #ifdef ARCH_CPU_64_BITS
+-  alignas(std::hardware_destructive_interference_size)
++  alignas(64)
+ #endif
+       std::initializer_list<Entry> data_;
+   bool is_sorted_;
+--- a/base/sampling_heap_profiler/lock_free_address_hash_set.h
++++ b/base/sampling_heap_profiler/lock_free_address_hash_set.h
+@@ -158,7 +158,7 @@
+   class KeyArrayNode : public Node {
+    public:
+     static constexpr bool kFitsInCacheLine =
+-        sizeof(KeyArrayNode) <= std::hardware_constructive_interference_size;
++        sizeof(KeyArrayNode) <= 64;
+ 
+     ALWAYS_INLINE KeyArrayNode(void* k, Node* next) : Node(next) {
+       keys.front().store(k, std::memory_order_relaxed);

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Apache Portable Runtime Library"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.7.6"
+TERMUX_PKG_REVISION=1
 # old tarballs are removed in https://dlcdn.apache.org/apr/apr-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SRCURL=https://archive.apache.org/dist/apr/apr-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=49030d92d2575da735791b496dc322f3ce5cff9494779ba8cc28c7f46c5deb32
