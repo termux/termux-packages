@@ -19,7 +19,7 @@ termux_step_make() {
 	local _ldflags="-s -w -X github.com/iyear/tdl/pkg/consts.Version=${TERMUX_PKG_VERSION}"
 	_ldflags+=" -X github.com/iyear/tdl/pkg/consts.Commit=${commit_hash}"
 	_ldflags+=" -X github.com/iyear/tdl/pkg/consts.CommitDate=${commit_date}"
-	go build --ldflags="$_ldflags" 
+	go build --ldflags="$_ldflags"
 }
 
 termux_step_make_install() {
