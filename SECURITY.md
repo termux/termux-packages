@@ -36,6 +36,3 @@ When the security team receives a security bug report, it will be assigned to a 
 
 Roughly 30 days after the fixes have been made available the issue will be disclosed on github and [https://termux.dev](https://termux.dev/en/posts/index.html).
 
-# Comments on this Policy
-
-If you have suggestions on how this process or document could be improved please submit a pull request!
