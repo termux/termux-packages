@@ -16,10 +16,10 @@ termux_step_make() {
 		curl -s "https://api.github.com/repos/iyear/tdl/commits/v${TERMUX_PKG_VERSION}" \
 			| jq -r '[.sha, .commit.committer.date] | "\(.[0][0:7]) \(.[1])"'
 	)"
-	export LDFLAGS="-s -w -X github.com/iyear/tdl/pkg/consts.Version=${TERMUX_PKG_VERSION}"
-	LDFLAGS+=" -X github.com/iyear/tdl/pkg/consts.Commit=${commit_hash}"
-	LDFLAGS+=" -X github.com/iyear/tdl/pkg/consts.CommitDate=${commit_date}"
-	go build
+	local _ldflags="-s -w -X github.com/iyear/tdl/pkg/consts.Version=${TERMUX_PKG_VERSION}"
+	_ldflags+=" -X github.com/iyear/tdl/pkg/consts.Commit=${commit_hash}"
+	_ldflags+=" -X github.com/iyear/tdl/pkg/consts.CommitDate=${commit_date}"
+	go build --ldflags="$_ldflags" 
 }
 
 termux_step_make_install() {
