@@ -5,6 +5,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.9.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/libgit2/libgit2/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=14cab3014b2b7ad75970ff4548e83615f74d719afe00aa479b4a889c1e13fc00
 TERMUX_PKG_AUTO_UPDATE=true
@@ -27,9 +28,4 @@ termux_step_post_get_source() {
 	if [ "${v}" != "${_SOVERSION}" ]; then
 		termux_error_exit "SOVERSION guard check failed."
 	fi
-}
-
-termux_step_pre_configure() {
-	find "$TERMUX_PKG_SRCDIR" -name CMakeLists.txt | xargs -n 1 \
-		sed -i 's/\( PROPERTIES C_STANDARD\) 90/\1 99/g'
 }
