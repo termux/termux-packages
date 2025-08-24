@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library implementing the Assuan IPC protocol used betwee
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.0.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/libassuan/libassuan-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=d2931cdad266e633510f9970e1a2f346055e351bb19f9b78912475b8074c36f6
 TERMUX_PKG_DEPENDS="libgpg-error"
