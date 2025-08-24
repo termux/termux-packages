@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Small library that defines common error values for all G
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.55"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=95b178148863f07d45df0cea67e880a79b9ef71f5d230baddc0071128516ef78
 TERMUX_PKG_BREAKS="libgpg-error-dev"
