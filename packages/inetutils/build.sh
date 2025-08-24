@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Collection of common network programs"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.6"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/inetutils/inetutils-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=68bedbfeaf73f7d86be2a7d99bcfbd4093d829f52770893919ae174c0b2357ca
 TERMUX_PKG_DEPENDS="readline"
