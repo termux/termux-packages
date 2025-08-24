@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE="https://www.qt.io/"
 TERMUX_PKG_DESCRIPTION="Provides access to Bluetooth hardware"
-TERMUX_PKG_LICENSE="GPL-3.0-only, LGPL-3.0-only, LicenseRef-Qt-Commercial, Qt-GPL-exception-1.0"
+TERMUX_PKG_LICENSE="GPL-3.0-only, LGPL-3.0-only"
 TERMUX_PKG_LICENSE_FILE="
 LICENSES/GPL-3.0-only.txt
 LICENSES/LGPL-3.0-only.txt
