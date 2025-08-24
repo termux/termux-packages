@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="NetCDF is a set of software libraries and self-describin
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION="4.9.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/Unidata/netcdf-c/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=990f46d49525d6ab5dc4249f8684c6deeaf54de6fec63a187e9fb382cc0ffdff
 TERMUX_PKG_DEPENDS="libandroid-execinfo, libcurl, zlib"
