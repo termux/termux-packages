@@ -13,7 +13,7 @@ TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERS
 TERMUX_PKG_SHA256="4988e50112104d5ad85e5b3cef66036ca445f18c22cf375d3dac9dcca95e0a17"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, libpcsclite, qt6-qtbase"
-TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules"
+TERMUX_PKG_BUILD_DEPENDS="cmake, git, ninja"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_SYSTEM_NAME=Linux
 "
