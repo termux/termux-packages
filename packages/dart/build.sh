@@ -11,11 +11,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXCLUDED_ARCHES=i686
 
-# Dart uses tar and gzip to extract downloaded packages.
-# Busybox-based versions of such utilities cause issues so
-# complete ones should be used.
-TERMUX_PKG_DEPENDS="gzip, tar"
-
 termux_pkg_auto_update() {
 	curl -fLSso VERSION https://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION
 	local version=$(jq -r .version VERSION)
