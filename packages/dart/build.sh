@@ -17,17 +17,14 @@ TERMUX_PKG_DEPENDS="gzip, tar"
 
 termux_pkg_auto_update() {
 	curl -fLSso VERSION https://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION
-	local latest_version=$(jq -r .version VERSION)
+	local version=$(jq -r .version VERSION)
 	rm -f VERSION
-	if [[ ${latest_version} = "null" ]]; then
-		echo "ERROR: Failed to get latest version."
-		exit 1
-	fi
-	if [[ ${latest_version} = ${TERMUX_PKG_VERSION} ]]; then
-		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
-		return
-	fi
-	termux_pkg_upgrade_version ${latest_version}
+
+	case ${version} in
+		null) termux_error_exit "Failed to get latest version." ;;
+		${TERMUX_PKG_VERSION}) echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'." ;;
+		*) termux_pkg_upgrade_version ${version} ;;
+	esac
 }
 
 termux_step_get_source() {
@@ -48,28 +45,19 @@ termux_step_get_source() {
 }
 
 termux_step_make_install() {
-	cd sdk
-	case "$TERMUX_ARCH" in
-		arm)
-			./tools/build.py --no-rbe -m release -a arm --os android create_sdk
-			mv ./out/ReleaseAndroidARM/dart-sdk "${TERMUX_PREFIX}/lib"
-		;;
-		i686)
-			./tools/build.py --no-rbe -m release -a ia32 --os android create_sdk
-			mv ./out/ReleaseAndroidIA32/dart-sdk "${TERMUX_PREFIX}/lib"
-		;;
-		aarch64)
-			./tools/build.py --no-rbe -m release -a arm64c --os android create_sdk
-			mv ./out/ReleaseAndroidARM64C/dart-sdk "${TERMUX_PREFIX}/lib"
-		;;
-		x86_64)
-			./tools/build.py --no-rbe -m release -a x64c --os android create_sdk
-			mv ./out/ReleaseAndroidX64C/dart-sdk "${TERMUX_PREFIX}/lib"
-		;;
-		*)
-			termux_error_exit "Unsupported arch '${TERMUX_ARCH}'"
-		;;
+	local arch
+	case ${TERMUX_ARCH} in
+		arm) arch=arm ;;
+		aarch64) arch=arm64 ;;
+		x86_64) arch=x64 ;;
+		i686) arch=ia32 ;;
+		*) termux_error_exit "Unsupported arch '${TERMUX_ARCH}'" ;;
 	esac
+
+	cd sdk
+	./tools/build.py --no-rbe --arch ${arch} --mode release --os android create_sdk
+	mv ./out/ReleaseAndroid${arch^^}/dart-sdk ${TERMUX_PREFIX}/lib
+
 	for file in ${TERMUX_PREFIX}/lib/dart-sdk/bin/*; do
 		if [[ -f ${file} && -x ${file} ]]; then
 			echo -e "#!${TERMUX_PREFIX}/bin/sh\nexec ${file} \"\$@\"" > "${TERMUX_PREFIX}/bin/$(basename "${file}")"
