@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Chromium web browser"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
 TERMUX_PKG_VERSION=139.0.7258.138
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=86db7326987a280380e35cf1e961df8d08fb1f8eb3b0ae9ee8250b5dff65e1ea
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pulseaudio, zlib"
@@ -273,6 +274,7 @@ pdf_is_complete_lib = true
 
 termux_step_make() {
 	cd $TERMUX_PKG_BUILDDIR
+
 	# Build v8 snapshot in another action
 	time ninja -C out/Release \
 						v8_context_snapshot \

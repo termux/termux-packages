@@ -1,0 +1,19 @@
+diff --git a/components/viz/service/BUILD.gn b/components/viz/service/BUILD.gn
+index 9f18a00af5..870c7dbae4 100644
+--- a/components/viz/service/BUILD.gn
++++ b/components/viz/service/BUILD.gn
+@@ -273,6 +273,14 @@ viz_component("service") {
+     "transitions/transferable_resource_tracker.cc",
+     "transitions/transferable_resource_tracker.h",
+   ]
++  jumbo_excluded_sources = [
++    # `gpu/GLES2/gl2chromium_autogen.h` and `gpu/GLES2/gl2chromium.h` has macro confliction,
++    #  and it is included by `layers/layer_context_impl.cc`
++    # - components/viz/client/client_resource_provider.h
++    # - third_party/khronos/GLES2/gl2.h
++    # - gpu/GLES2/gl2chromium.h
++    "layers/layer_context_impl.cc"
++  ]
+ 
+   defines = [ "VIZ_SERVICE_IMPLEMENTATION" ]
+ 
