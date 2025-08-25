@@ -73,4 +73,3 @@ termux_step_post_make_install() {
 		${TERMUX_PKG_BUILDER_DIR}/dart-pub-bin.sh \
 		${TERMUX_PREFIX}/etc/profile.d/dart-pub-bin.sh
 }
-
