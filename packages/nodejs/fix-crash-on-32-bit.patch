@@ -1,0 +1,52 @@
+Source PR https://github.com/nodejs/node/pull/59623
+commit 9d77c4191030576fd502faa04148b52fa6dbcb43
+Author: Yaksh Bariya <yakshbari4@gmail.com>
+Date:   Mon Aug 25 14:19:59 2025 +0530
+
+    src: correctly report memory changes to V8
+    
+    Call `V8::ExternalMemoryAccounter::Update` instead of
+    `V8::ExternalMemoryAccounter::Increase` to report memory difference to
+    V8
+    
+    Calling `V8::ExternalMemoryAccounter::Increase` with a signed integer on
+    32-bit platforms causes instances where GC inside GC takes place leading
+    to a crash in certain cases.
+    
+    During GC, native objects are destructed. In destructor for
+    `CompressionStream` class used by zlib, memory release information is
+    passed onto `V8::ExternalMemoryAccounter::Increase()` instead of
+    `V8::ExternalMemoryAccounter::Decrease()` which triggers V8's memory
+    limits, thus triggering GC inside GC which leads to crash.
+    
+    Bug initially introduced in commit
+    1d5d7b6eedb2274c9ad48b5f378598a10479e4a7
+    
+    For full report see https://hackerone.com/reports/3302484
+
+diff --git a/src/node_mem-inl.h b/src/node_mem-inl.h
+index 06871d031d3..70d28dd524b 100644
+--- a/src/node_mem-inl.h
++++ b/src/node_mem-inl.h
+@@ -59,7 +59,7 @@ void* NgLibMemoryManager<Class, T>::ReallocImpl(void* ptr,
+     // Environment*/Isolate* parameter and call the V8 method transparently.
+     const int64_t new_size = size - previous_size;
+     manager->IncreaseAllocatedSize(new_size);
+-    manager->env()->external_memory_accounter()->Increase(
++    manager->env()->external_memory_accounter()->Update(
+         manager->env()->isolate(), new_size);
+     *reinterpret_cast<size_t*>(mem) = size;
+     mem += sizeof(size_t);
+diff --git a/src/node_zlib.cc b/src/node_zlib.cc
+index c088c547539..b8617093bdf 100644
+--- a/src/node_zlib.cc
++++ b/src/node_zlib.cc
+@@ -644,7 +644,7 @@ class CompressionStream : public AsyncWrap, public ThreadPoolWork {
+     if (report == 0) return;
+     CHECK_IMPLIES(report < 0, zlib_memory_ >= static_cast<size_t>(-report));
+     zlib_memory_ += report;
+-    AsyncWrap::env()->external_memory_accounter()->Increase(
++    AsyncWrap::env()->external_memory_accounter()->Update(
+         AsyncWrap::env()->isolate(), report);
+   }
+ 
