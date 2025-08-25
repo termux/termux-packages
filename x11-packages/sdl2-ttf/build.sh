@@ -7,7 +7,8 @@ TERMUX_PKG_VERSION="2.24.0"
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/libsdl-org/SDL_ttf/releases/download/release-${TERMUX_PKG_VERSION}/SDL2_ttf-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=0b2bf1e7b6568adbdbc9bb924643f79d9dedafe061fa1ed687d1d9ac4e453bfd
-TERMUX_PKG_AUTO_UPDATE=true
+# Prevent updating to 3.x.x version
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_UPDATE_VERSION_SED_REGEXP='s/.*-//'
 TERMUX_PKG_DEPENDS="freetype, opengl, sdl2 | sdl2-compat"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="sdl2-compat"
