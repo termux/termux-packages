@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A widely used XML scheme for writing documentation and h
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BREAKS="docbook-xsl (<= 1.79.2-1)"
 TERMUX_PKG_DEPENDS="libxml2-utils"
