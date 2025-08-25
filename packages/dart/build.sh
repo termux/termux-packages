@@ -9,6 +9,7 @@ TERMUX_PKG_SRCURL=https://github.com/dart-lang/sdk/archive/refs/tags/${TERMUX_PK
 TERMUX_PKG_SHA256=29dd0a9be41eb696f8c45ac9bde7c1f0f2884b4e454ab06a137c7f145b58c1f1
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_EXCLUDED_ARCHES=i686
 
 # Dart uses tar and gzip to extract downloaded packages.
 # Busybox-based versions of such utilities cause issues so
@@ -50,7 +51,6 @@ termux_step_make_install() {
 		arm) arch=arm ;;
 		aarch64) arch=arm64 ;;
 		x86_64) arch=x64 ;;
-		i686) arch=ia32 ;;
 		*) termux_error_exit "Unsupported arch '${TERMUX_ARCH}'" ;;
 	esac
 
