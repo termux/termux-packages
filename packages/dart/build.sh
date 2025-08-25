@@ -35,12 +35,16 @@ termux_step_get_source() {
 	cd ${TERMUX_PKG_SRCDIR}
 	git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
 	export PATH="${PWD}/depot_tools:${PATH}"
-	fetch --no-history --no-hooks dart
-	cd sdk
-	git fetch --depth 1 origin tag ${TERMUX_PKG_VERSION}
-	git checkout ${TERMUX_PKG_VERSION}
-	echo 'target_os = ["android"]' >> ../.gclient
-	gclient sync -DRf
+
+	local src_url=https://dart.googlesource.com/sdk.git
+	git clone --branch ${TERMUX_PKG_VERSION} --depth 1 --no-tags ${src_url}
+	gclient config \
+		--name sdk \
+		--custom-var download_android_deps=True \
+		--unmanaged \
+		${src_url}
+
+	gclient sync
 }
 
 termux_step_make_install() {
@@ -75,5 +79,10 @@ termux_step_make_install() {
 }
 
 termux_step_post_make_install() {
+	local dart_internal=${TERMUX_PREFIX}/lib/dart-sdk/lib/_internal
+	rm --force ${dart_internal}/vm_platform_strong.dill
+	ln --symbolic ${dart_internal}/vm_platform.dill ${dart_internal}/vm_platform_strong.dill
+
 	install -Dm 600 ${TERMUX_PKG_BUILDER_DIR}/dart-pub-bin.sh ${TERMUX_PREFIX}/etc/profile.d/dart-pub-bin.sh
 }
+
