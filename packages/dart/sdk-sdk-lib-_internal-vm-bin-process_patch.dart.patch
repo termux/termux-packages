@@ -1,11 +1,11 @@
 --- ./sdk/sdk/lib/_internal/vm/bin/process_patch.dart
 +++ ./sdk/sdk/lib/_internal/vm/bin/process_patch.dart
-@@ -313,7 +313,7 @@ base class _ProcessImpl extends _ProcessImplNativeWrapper implements _Process {
-     if (Platform.isWindows) {
+@@ -328,7 +328,7 @@ base class _ProcessImpl extends _ProcessImplNativeWrapper implements _Process {
        return 'cmd.exe';
      }
--    return '/bin/sh';
-+    return '@TERMUX_PREFIX@/bin/sh';
+     if (Platform.isAndroid) {
+-      return '/system/bin/sh';
++      return '@TERMUX_PREFIX@/bin/sh';
+     }
+     return '/bin/sh';
    }
- 
-   static List<String> _getShellArguments(
