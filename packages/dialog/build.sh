@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses"
 TERMUX_PKG_VERSION=1.3-20240307
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://invisible-island.net/archives/dialog/dialog-${TERMUX_PKG_VERSION}.tgz
 TERMUX_PKG_SHA256=339d311c6abb240213426b99ad63565cbcb3e8641ef1989c033e945b754d34ef
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-ncursesw --enable-widec --with-pkg-config"
