@@ -14,7 +14,7 @@ TERMUX_PKG_EXCLUDED_ARCHES=i686
 termux_pkg_auto_update() {
 	curl --fail --location --show-error --silent --output VERSION \
 		https://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION
-	local version=$(jq -r .version VERSION)
+	local version=$(jq --raw-output .version VERSION)
 	rm --force VERSION
 
 	case ${version} in
@@ -54,16 +54,17 @@ termux_step_make_install() {
 	cd sdk
 	./tools/build.py --no-rbe --arch ${arch} --mode release --os android create_sdk
 	mv ./out/ReleaseAndroid${arch^^}/dart-sdk ${TERMUX_PREFIX}/lib
-
-	for file in ${TERMUX_PREFIX}/lib/dart-sdk/bin/*; do
-		if [[ -f ${file} && -x ${file} ]]; then
-			echo -e "#!${TERMUX_PREFIX}/bin/sh\nexec ${file} \"\$@\"" > "${TERMUX_PREFIX}/bin/$(basename "${file}")"
-			chmod +x "${TERMUX_PREFIX}/bin/$(basename "${file}")"
-		fi
-	done
 }
 
 termux_step_post_make_install() {
+	for file in ${TERMUX_PREFIX}/lib/dart-sdk/bin/*; do
+		if [[ -f ${file} && -x ${file} ]]; then
+			local wrapper_exe=${TERMUX_PREFIX}/bin/$(basename ${file})
+			printf '#!%s/bin/sh\nexec %s "$@"\n' ${TERMUX_PREFIX} ${file} > ${wrapper_exe}
+			chmod +x ${wrapper_exe}
+		fi
+	done
+
 	local dart_internal=${TERMUX_PREFIX}/lib/dart-sdk/lib/_internal
 	rm --force ${dart_internal}/vm_platform_strong.dill
 	ln --symbolic ${dart_internal}/vm_platform.dill ${dart_internal}/vm_platform_strong.dill
@@ -72,3 +73,4 @@ termux_step_post_make_install() {
 		${TERMUX_PKG_BUILDER_DIR}/dart-pub-bin.sh \
 		${TERMUX_PREFIX}/etc/profile.d/dart-pub-bin.sh
 }
+
