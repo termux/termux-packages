@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library providing a portable, high level programming int
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.4.7"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/libffi/libffi/releases/download/v${TERMUX_PKG_VERSION}/libffi-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=138607dee268bdecf374adf9144c00e839e38541f75f24a1fcf18b78fda48b2d
 TERMUX_PKG_BREAKS="libffi-dev"
