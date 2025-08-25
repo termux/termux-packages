@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An implementation of iconv()"
 TERMUX_PKG_LICENSE="LGPL-2.1, GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.18"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/pub/gnu/libiconv/libiconv-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=3b08f5f4f9b4eb82f151a7040bfd6fe6c6fb922efe4b1659c66ea933276965e8
 TERMUX_PKG_BREAKS="libandroid-support (<= 24), libiconv-dev, libandroid-support-dev"
