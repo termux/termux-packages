@@ -1,10 +1,10 @@
-# Contributor: @samujjal-gogoi
+# Contributor: @0x1ACA663
 TERMUX_PKG_HOMEPAGE=https://dart.dev/
 TERMUX_PKG_DESCRIPTION="Dart is a general-purpose programming language"
-TERMUX_PKG_LICENSE="BSD"
-TERMUX_PKG_LICENSE_FILE="sdk/LICENSE"
-TERMUX_PKG_MAINTAINER="@samujjal-gogoi"
-TERMUX_PKG_VERSION="3.8.3"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_LICENSE_FILE=sdk/LICENSE
+TERMUX_PKG_MAINTAINER=@0x1ACA663
+TERMUX_PKG_VERSION=3.8.3
 TERMUX_PKG_SRCURL=https://github.com/dart-lang/sdk/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=29dd0a9be41eb696f8c45ac9bde7c1f0f2884b4e454ab06a137c7f145b58c1f1
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -12,9 +12,10 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXCLUDED_ARCHES=i686
 
 termux_pkg_auto_update() {
-	curl -fLSso VERSION https://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION
+	curl --fail --location --show-error --silent --output VERSION \
+		https://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION
 	local version=$(jq -r .version VERSION)
-	rm -f VERSION
+	rm --force VERSION
 
 	case ${version} in
 		null) termux_error_exit "Failed to get latest version." ;;
@@ -24,8 +25,9 @@ termux_pkg_auto_update() {
 }
 
 termux_step_get_source() {
-	mkdir -p ${TERMUX_PKG_SRCDIR}
+	mkdir --parents ${TERMUX_PKG_SRCDIR}
 	cd ${TERMUX_PKG_SRCDIR}
+
 	git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
 	export PATH="${PWD}/depot_tools:${PATH}"
 
@@ -66,6 +68,7 @@ termux_step_post_make_install() {
 	rm --force ${dart_internal}/vm_platform_strong.dill
 	ln --symbolic ${dart_internal}/vm_platform.dill ${dart_internal}/vm_platform_strong.dill
 
-	install -Dm 600 ${TERMUX_PKG_BUILDER_DIR}/dart-pub-bin.sh ${TERMUX_PREFIX}/etc/profile.d/dart-pub-bin.sh
+	install -D --mode 600 \
+		${TERMUX_PKG_BUILDER_DIR}/dart-pub-bin.sh \
+		${TERMUX_PREFIX}/etc/profile.d/dart-pub-bin.sh
 }
-
