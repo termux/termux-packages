@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Cargo C-ABI helpers"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.10.15"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/lu-zero/cargo-c/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=59fe45092141f59b4d34948423a8e535ea8a2f0802a7436fb31e6c6663afa46a
 TERMUX_PKG_AUTO_UPDATE=true
@@ -25,27 +26,6 @@ termux_step_pre_configure() {
 
 	termux_setup_rust
 
-	: "${CARGO_HOME:=$HOME/.cargo}"
-	export CARGO_HOME
-
-	cargo fetch --target "${CARGO_TARGET_NAME}"
-
-	local f
-	for f in $CARGO_HOME/registry/src/*/libgit2-sys-*/build.rs; do
-		sed -i -E 's/\.range_version\(([^)]*)\.\.[^)]*\)/.atleast_version(\1)/g' "${f}"
-	done
-
-	local _CARGO_TARGET_LIBDIR="target/${CARGO_TARGET_NAME}/release/deps"
-	mkdir -p $_CARGO_TARGET_LIBDIR
-
-	mv $TERMUX_PREFIX/lib/libz.so.1{,.tmp}
-	mv $TERMUX_PREFIX/lib/libz.so{,.tmp}
-
-	ln -sfT $(readlink -f $TERMUX_PREFIX/lib/libz.so.1.tmp) \
-		$_CARGO_TARGET_LIBDIR/libz.so.1
-	ln -sfT $(readlink -f $TERMUX_PREFIX/lib/libz.so.tmp) \
-		$_CARGO_TARGET_LIBDIR/libz.so
-
 	if [[ "${TERMUX_ARCH}" == "x86_64" ]]; then
 		local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
 		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name)"
@@ -53,14 +33,4 @@ termux_step_pre_configure() {
 
 	# clash with rust host build
 	unset CFLAGS
-}
-
-termux_step_post_make_install() {
-	mv $TERMUX_PREFIX/lib/libz.so.1{.tmp,}
-	mv $TERMUX_PREFIX/lib/libz.so{.tmp,}
-}
-
-termux_step_post_massage() {
-	rm -f lib/libz.so.1
-	rm -f lib/libz.so
 }

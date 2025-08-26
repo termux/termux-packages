@@ -4,6 +4,7 @@ TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed an
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.89.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-${TERMUX_PKG_VERSION}-src.tar.xz
 TERMUX_PKG_SHA256=0b9d55610d8270e06c44f459d1e2b7918a5e673809c592abed9b9c600e33d95a
 _LLVM_MAJOR_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $LLVM_MAJOR_VERSION)
@@ -20,12 +21,6 @@ bin/llc
 bin/llvm-*
 bin/opt
 bin/sh
-lib/liblzma.a
-lib/liblzma.so
-lib/liblzma.so.${_LZMA_VERSION}
-lib/libtinfo.so.6
-lib/libz.so
-lib/libz.so.1
 share/wasi-sysroot
 "
 
