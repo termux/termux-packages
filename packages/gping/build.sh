@@ -15,6 +15,9 @@ termux_step_pre_configure() {
 
 	mv $TERMUX_PREFIX/lib/libz.so.1{,.tmp}
 	mv $TERMUX_PREFIX/lib/libz.so{,.tmp}
+
+	# conflicts with rust host build
+	unset CFLAGS
 }
 
 termux_step_make() {
