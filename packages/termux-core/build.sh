@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Utils and libraries for Termux core"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.4.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/termux/termux-core-package/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=af6299f341292ca98d1748a06e342fe29fbc9eb485a7c1ba5c9f91ba72b4f44a
 TERMUX_PKG_ESSENTIAL=true
