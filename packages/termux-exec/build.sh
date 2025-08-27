@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Utils and libraries for Termux exec including a LD_PRELO
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1:2.4.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/termux/termux-exec-package/archive/refs/tags/v${TERMUX_PKG_VERSION:2}.tar.gz
 TERMUX_PKG_SHA256=ed82c94592a4fc18845d5d45b6f2f36f78ad5910e5ffdccaaa10dbd9279e3682
 TERMUX_PKG_BUILD_DEPENDS="termux-core-static"
