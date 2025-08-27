@@ -6,10 +6,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=30.1
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
-if [[ $TERMUX_PKG_VERSION == *-rc* ]]; then
-	TERMUX_PKG_SRCURL=https://alpha.gnu.org/gnu/emacs/pretest/emacs-${TERMUX_PKG_VERSION#*:}.tar.xz
-fi
-TERMUX_PKG_SHA256=6ccac1ae76e6af93c6de1df175e8eb406767c23da3dd2a16aa67e3124a6f138f
+TERMUX_PKG_SHA256=b3f36f18a6dd2715713370166257de2fae01f9d38cfe878ced9b1e6ded5befd9
 TERMUX_PKG_DEPENDS="fontconfig, freetype, gdk-pixbuf, giflib, glib, harfbuzz, libgmp, libgnutls, libice, libjpeg-turbo, libpng, librsvg, libsm, libsqlite, libtiff, libx11, libxaw, libxcb, libxext, libxfixes, libxft, libxinerama, libxml2, libxmu, libxpm, libxrandr, libxrender, libxt, littlecms, ncurses, tree-sitter, zlib"
 TERMUX_PKG_CONFLICTS="emacs"
 TERMUX_PKG_REPLACES="emacs"
@@ -34,7 +31,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-tree-sitter
 "
 
-if $TERMUX_DEBUG_BUILD; then
+if [[ "$TERMUX_DEBUG_BUILD" == "true" ]]; then
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 	--enable-checking=yes,glyphs
 	--enable-check-lisp-object-type
@@ -55,7 +52,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_lib_elf_elf_begin=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" gl_cv_func_dup2_works=no"
 # disable setrlimit function to make termux-am work from within emacs
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_setrlimit=no"
-if [ "$TERMUX_ARCH" == "arm" ] || [ "$TERMUX_ARCH" == "i686" ]; then
+if [[ "$TERMUX_ARCH_BITS" == "32" ]]; then
 	# setjmp does not work properly on 32bit android:
 	# https://github.com/termux/termux-packages/issues/2599
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_func__setjmp=no"
