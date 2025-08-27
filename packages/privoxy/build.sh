@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="Non-caching web proxy with advanced filtering capabiliti
 TERMUX_PKG_LICENSE="GPL-2.0-or-later"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.GPLv3"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.0.34
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=4.0.0
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/ijbswa/Sources/$TERMUX_PKG_VERSION%20%28stable%29/privoxy-$TERMUX_PKG_VERSION-stable-src.tar.gz
-TERMUX_PKG_SHA256=e6ccbca1656f4e616b4657f8514e33a70f6697e9d7294356577839322a3c5d2c
+TERMUX_PKG_SHA256=c08e2ba0049307017bf9d8a63dd2a0dfb96aa0cdeb34ae007776e63eba62a26f
 # Termux-services adds the run scripts to TERMUX_PKG_CONFFILES. Those ones can
 # not be copied in termux_step_post_massage so setup special variable for that
 DEFAULT_CONFFILES="\
