@@ -16,14 +16,6 @@ TERMUX_PKG_BREAKS="libboost-python (<= 1.65.1-2), boost-dev"
 TERMUX_PKG_REPLACES="libboost-python (<= 1.65.1-2), boost-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_pre_configure() {
-	# Certain packages are not safe to build on device because their
-	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if $TERMUX_ON_DEVICE_BUILD; then
-		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
-	fi
-}
-
 termux_step_make_install() {
 	CXXFLAGS+=" -std=c++14"
 
