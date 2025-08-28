@@ -100,8 +100,8 @@ met these conditions:
 
 - **Not installable through language-specific package managers**
 
-  These packages should be installed through language-specifc package managers,
-  eg:
+  These packages should be installed through language-specific package managers,
+  e.g:
 
   - `cargo`
   - `cpan`
