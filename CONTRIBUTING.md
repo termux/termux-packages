@@ -98,13 +98,20 @@ met these conditions:
   Software which is either closed-source, contain binary-only components or
   is distributed under End User License Agreement is not accepted.
 
-- **Not installable through cpan, gem, npm, pip or cargo**
+- **Not installable through language-specific package managers**
 
-  These packages should be installed through `cpan`, `gem`, `npm`, `pip`, `cargo` and
-  so on.
+  These packages should be installed through language-specific package managers,
+  e.g:
 
-  Packaging modules for Perl, Ruby, Node.js, is problematic, especially
-  when it comes to cross-compiling native extensions.
+  - `cargo`
+  - `cpan`
+  - `dotnet tool`
+  - `gem`
+  - `npm`
+  - `pip`
+
+  Packaging modules for Node.js, Perl, Ruby, is problematic, especially when it
+  comes to cross-compiling native extensions.
 
 - **Not taking too much disk space**
 
