@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A free and open source spell checker designed to replace
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.60.8.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/aspell/aspell-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=d6da12b34d42d457fa604e435ad484a74b2effcd120ff40acd6bb3fb2887d21b
 TERMUX_PKG_AUTO_UPDATE=true
