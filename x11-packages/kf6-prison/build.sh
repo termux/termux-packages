@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="https://community.kde.org/Frameworks"
+TERMUX_PKG_HOMEPAGE="https://invent.kde.org/frameworks/prison"
 TERMUX_PKG_DESCRIPTION="A barcode API to produce QRCode barcodes and DataMatrix barcodes"
 TERMUX_PKG_LICENSE="BSD 3-Clause, CC0-1.0, MIT"
 TERMUX_PKG_LICENSE_FILE="
