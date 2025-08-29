@@ -10,8 +10,13 @@ TERMUX_PKG_DEPENDS="libc++, kf6-kconfig, kf6-kconfigwidgets, kf6-kcoreaddons, kf
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, plasma-wayland-protocols"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_SYSTEM_NAME=Linux
--DKF6_HOST_TOOLING=$TERMUX_PREFIX/opt/kf6/cross/lib/cmake/
--DCMAKE_CXX_FLAGS="-I$TERMUX_PREFIX/include/opencv4" \
+-DCMAKE_CXX_FLAGS=-I$TERMUX_PREFIX/include/opencv4
 -DKDE_INSTALL_QMLDIR=lib/qt6/qml
 -DKDE_INSTALL_QTPLUGINDIR=lib/qt6/plugins
 "
+
+termux_step_pre_configure() {
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DKF6_HOST_TOOLING=$TERMUX_PREFIX/opt/kf6/cross/lib/cmake/"
+	fi
+}
