@@ -9,5 +9,5 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, libdrm, libx11, libxext, libxfixes, libwayland"
 TERMUX_PKG_BUILD_DEPENDS="libglvnd, mesa, mesa-dev"
 termux_step_pre_configure() {
-termux_setup_wayland_cross_pkg_config_wrapper
+	termux_setup_wayland_cross_pkg_config_wrapper
 }
