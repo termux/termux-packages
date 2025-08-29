@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="https://community.kde.org/Frameworks"
+TERMUX_PKG_HOMEPAGE="https://invent.kde.org/frameworks/kstatusnotifieritem"
 TERMUX_PKG_DESCRIPTION="Implementation of Status Notifier Items"
 TERMUX_PKG_LICENSE="LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
