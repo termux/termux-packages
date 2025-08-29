@@ -1,0 +1,53 @@
+diff --git a/js/ui/main.js b/js/ui/main.js
+index 1b1069e..d640b53 100644
+--- a/js/ui/main.js
++++ b/js/ui/main.js
+@@ -97,7 +97,7 @@ var AppletManager = imports.ui.appletManager;
+ const SearchProviderManager = imports.ui.searchProviderManager;
+ const DeskletManager = imports.ui.deskletManager;
+ const ExtensionSystem = imports.ui.extensionSystem;
+-const VirtualKeyboard = imports.ui.virtualKeyboard;
++// const VirtualKeyboard = imports.ui.virtualKeyboard;
+ const MessageTray = imports.ui.messageTray;
+ const OsdWindow = imports.ui.osdWindow;
+ const Overview = imports.ui.overview;
+@@ -171,7 +171,7 @@ var magnifier = null;
+ var locatePointer = null;
+ var xdndHandler = null;
+ var statusIconDispatcher = null;
+-var virtualKeyboard = null;
++// var virtualKeyboard = null;
+ var layoutManager = null;
+ var networkAgent = null;
+ var monitorLabeler = null;
+@@ -428,7 +428,7 @@ function start() {
+ 
+     wm = new imports.ui.windowManager.WindowManager();
+     messageTray = new MessageTray.MessageTray();
+-    virtualKeyboard = new VirtualKeyboard.Keyboard();
++    // virtualKeyboard = new VirtualKeyboard.Keyboard();
+     notificationDaemon = new NotificationDaemon.NotificationDaemon();
+     windowAttentionHandler = new WindowAttentionHandler.WindowAttentionHandler();
+     placesManager = new PlacesManager.PlacesManager();
+@@ -468,7 +468,7 @@ function start() {
+     locatePointer = new LocatePointer.locatePointer();
+ 
+     layoutManager.init();
+-    virtualKeyboard.init();
++    // virtualKeyboard.init();
+     overview.init();
+     expo.init();
+ 
+diff --git a/js/ui/popupMenu.js b/js/ui/popupMenu.js
+index a12bcbb..1262d6d 100644
+--- a/js/ui/popupMenu.js
++++ b/js/ui/popupMenu.js
+@@ -3654,7 +3654,7 @@ var PopupMenuManager = class PopupMenuManager {
+         if (!this.grabbed)
+             return false;
+ 
+-        if (Main.virtualKeyboard.shouldTakeEvent(event))
++        if (Main.virtualKeyboard && Main.virtualKeyboard.shouldTakeEvent(event))
+             return Clutter.EVENT_PROPAGATE;
+ 
+         if (this._owner.menuEventFilter &&
