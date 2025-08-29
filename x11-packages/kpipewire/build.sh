@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="https://kde.org/plasma-desktop/"
+TERMUX_PKG_HOMEPAGE="https://invent.kde.org/plasma/kpipewire"
 TERMUX_PKG_DESCRIPTION="Components relating to pipewire use in Plasma"
 TERMUX_PKG_LICENSE="LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
