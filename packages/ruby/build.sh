@@ -6,7 +6,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # - asciidoctor
 # - weechat
 TERMUX_PKG_VERSION="3.4.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://cache.ruby-lang.org/pub/ruby/$(echo $TERMUX_PKG_VERSION | cut -d . -f 1-2)/ruby-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=018d59ffb52be3c0a6d847e22d3fd7a2c52d0ddfee249d3517a0c8c6dbfa70af
 # libbffi is used by the fiddle extension module:
