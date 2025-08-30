@@ -1,0 +1,85 @@
+From 1d0cf4e7686f394b9bc50f77a0ae8db63aefc9ef Mon Sep 17 00:00:00 2001
+From: Md Arif <111168803+sabamdarif@users.noreply.github.com>
+Date: Sun, 20 Jul 2025 22:45:24 +0530
+Subject: [PATCH] bypass year_modifier checks
+
+---
+ meson.build | 59 +++++++++++++++++++++++++++++------------------------
+ 1 file changed, 32 insertions(+), 27 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 1ad31a3..eb34371 100644
+--- a/meson.build
++++ b/meson.build
+@@ -148,36 +148,41 @@ sqlite3_has_builtin_fts5 = true
+ ##################################################################
+ # Get an appropriate 4-digit year modifier for strftime
+ ##################################################################
+-result = cc.run('''
+-  #define _TIME_BITS 64
+-  #define _GNU_SOURCE
+-  #include <stdio.h>
+-  #include <string.h>
+-  #include <time.h>
+-
+-  int main (int argc, char *argv[]) {
+-    char *modifiers[] = { "%Y", "%C%y", "%4Y", "%2C%y", NULL };
+-    time_t timestamp = -58979923200; /* 0101-01-01T01:01:01Z */
+-    char buf[100];
+-    struct tm tm;
+-    int i;
+-    gmtime_r (&timestamp, &tm);
+-    for (i = 0; modifiers[i]; i++) {
+-      strftime (buf, sizeof buf, modifiers[i], &tm);
+-      if (strcmp (buf, "0101") == 0) {
+-        printf ("%s", modifiers[i]);
+-        return 0;
++if meson.is_cross_build() and not meson.can_run_host_binaries()
++  # Hardcoded fallback for cross builds
++  year_modifier = '%Y'
++else
++  result = cc.run('''
++    #define _TIME_BITS 64
++    #define _GNU_SOURCE
++    #include <stdio.h>
++    #include <string.h>
++    #include <time.h>
++
++    int main (int argc, char *argv[]) {
++      char *modifiers[] = { "%Y", "%C%y", "%4Y", "%2C%y", NULL };
++      time_t timestamp = -58979923200; /* 0101-01-01T01:01:01Z */
++      char buf[100];
++      struct tm tm;
++      int i;
++      gmtime_r (&timestamp, &tm);
++      for (i = 0; modifiers[i]; i++) {
++        strftime (buf, sizeof buf, modifiers[i], &tm);
++        if (strcmp (buf, "0101") == 0) {
++          printf ("%s", modifiers[i]);
++          return 0;
++        }
+       }
++      return -1;
+     }
+-    return -1;
+-  }
+-  ''',
+-  name: 'strftime 4-digit year modifier')
++    ''',
++    name: 'strftime 4-digit year modifier')
+ 
+-if not result.compiled() or result.returncode() != 0
+-  error('Libc implementation has broken 4-digit years implementation.')
+-else
+-  year_modifier = result.stdout()
++  if not result.compiled() or result.returncode() != 0
++    error('Libc implementation has broken 4-digit years implementation.')
++  else
++    year_modifier = result.stdout()
++  endif
+ endif
+ 
+ ##################################################################
+-- 
+2.48.1
+

@@ -1,0 +1,59 @@
+diff --git a/libnemo-private/nemo-file.c b/libnemo-private/nemo-file.c
+index ab55743..749472d 100644
+--- a/libnemo-private/nemo-file.c
++++ b/libnemo-private/nemo-file.c
+@@ -9211,7 +9211,7 @@ nemo_self_check_file (void)
+ 
+         EEL_CHECK_INTEGER_RESULT (nemo_directory_number_outstanding (), 0);
+ 
+-	file_1 = nemo_file_get_by_uri ("file:///home/");
++	file_1 = nemo_file_get_by_uri ("file://@TERMUX_HOME@/");
+ 
+ 	EEL_CHECK_INTEGER_RESULT (G_OBJECT (file_1)->ref_count, 1);
+ 	EEL_CHECK_INTEGER_RESULT (G_OBJECT (file_1->details->directory)->ref_count, 1);
+@@ -9221,8 +9221,8 @@ nemo_self_check_file (void)
+ 
+         EEL_CHECK_INTEGER_RESULT (nemo_directory_number_outstanding (), 0);
+ 
+-	file_1 = nemo_file_get_by_uri ("file:///etc");
+-	file_2 = nemo_file_get_by_uri ("file:///usr");
++	file_1 = nemo_file_get_by_uri ("file://@TERMUX_PREFIX@/etc");
++	file_2 = nemo_file_get_by_uri ("file://@TERMUX_PREFIX@");
+ 
+         list = NULL;
+         list = g_list_prepend (list, file_1);
+@@ -9244,19 +9244,19 @@ nemo_self_check_file (void)
+ 
+ 
+         /* name checks */
+-	file_1 = nemo_file_get_by_uri ("file:///home/");
++	file_1 = nemo_file_get_by_uri ("file://@TERMUX_HOME@/");
+ 
+ 	EEL_CHECK_STRING_RESULT (nemo_file_get_name (file_1), "home");
+ 
+-	EEL_CHECK_BOOLEAN_RESULT (nemo_file_get_by_uri ("file:///home/") == file_1, TRUE);
++	EEL_CHECK_BOOLEAN_RESULT (nemo_file_get_by_uri ("file://@TERMUX_HOME@/") == file_1, TRUE);
+ 	nemo_file_unref (file_1);
+ 
+-	EEL_CHECK_BOOLEAN_RESULT (nemo_file_get_by_uri ("file:///home") == file_1, TRUE);
++	EEL_CHECK_BOOLEAN_RESULT (nemo_file_get_by_uri ("file://@TERMUX_HOME@") == file_1, TRUE);
+ 	nemo_file_unref (file_1);
+ 
+ 	nemo_file_unref (file_1);
+ 
+-	file_1 = nemo_file_get_by_uri ("file:///home");
++	file_1 = nemo_file_get_by_uri ("file://@TERMUX_HOME@");
+ 	EEL_CHECK_STRING_RESULT (nemo_file_get_name (file_1), "home");
+ 	nemo_file_unref (file_1);
+ 
+@@ -9275,8 +9275,8 @@ nemo_self_check_file (void)
+ 	nemo_file_unref (file_1);
+ 
+ 	/* sorting */
+-	file_1 = nemo_file_get_by_uri ("file:///etc");
+-	file_2 = nemo_file_get_by_uri ("file:///usr");
++	file_1 = nemo_file_get_by_uri ("file://@TERMUX_PREFIX@/etc");
++	file_2 = nemo_file_get_by_uri ("file://@TERMUX_PREFIX@");
+ 
+ 	EEL_CHECK_INTEGER_RESULT (G_OBJECT (file_1)->ref_count, 1);
+ 	EEL_CHECK_INTEGER_RESULT (G_OBJECT (file_2)->ref_count, 1);

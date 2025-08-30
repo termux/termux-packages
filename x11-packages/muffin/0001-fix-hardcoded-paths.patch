@@ -1,0 +1,44 @@
+diff --git a/src/wayland/meta-xwayland.c b/src/wayland/meta-xwayland.c
+index 2917912..61e9844 100644
+--- a/src/wayland/meta-xwayland.c
++++ b/src/wayland/meta-xwayland.c
+@@ -126,7 +126,7 @@ try_display (int    display,
+   char *filename;
+   int fd;
+ 
+-  filename = g_strdup_printf ("/tmp/.X%d-lock", display);
++  filename = g_strdup_printf ("@TERMUX_PREFIX@/tmp/.X%d-lock", display);
+ 
+  again:
+   fd = open (filename, O_WRONLY | O_CLOEXEC | O_CREAT | O_EXCL, 0444);
+@@ -253,7 +253,7 @@ bind_to_abstract_socket (int       display,
+ 
+   addr.sun_family = AF_LOCAL;
+   name_size = snprintf (addr.sun_path, sizeof addr.sun_path,
+-                        "%c/tmp/.X11-unix/X%d", 0, display);
++                        "%c@TERMUX_PREFIX@/tmp/.X11-unix/X%d", 0, display);
+   size = offsetof (struct sockaddr_un, sun_path) + name_size;
+   if (bind (fd, (struct sockaddr *) &addr, size) < 0)
+     {
+@@ -288,7 +288,7 @@ bind_to_unix_socket (int display)
+ 
+   addr.sun_family = AF_LOCAL;
+   name_size = snprintf (addr.sun_path, sizeof addr.sun_path,
+-                        "/tmp/.X11-unix/X%d", display) + 1;
++                        "@TERMUX_PREFIX@/tmp/.X11-unix/X%d", display) + 1;
+   size = offsetof (struct sockaddr_un, sun_path) + name_size;
+   unlink (addr.sun_path);
+   if (bind (fd, (struct sockaddr *) &addr, size) < 0)
+@@ -834,10 +834,10 @@ meta_xwayland_shutdown (MetaXWaylandManager *manager)
+ 
+   g_cancellable_cancel (manager->xserver_died_cancellable);
+ 
+-  snprintf (path, sizeof path, "/tmp/.X11-unix/X%d", manager->public_connection.display_index);
++  snprintf (path, sizeof path, "@TERMUX_PREFIX@/tmp/.X11-unix/X%d", manager->public_connection.display_index);
+   unlink (path);
+ 
+-  snprintf (path, sizeof path, "/tmp/.X11-unix/X%d", manager->private_connection.display_index);
++  snprintf (path, sizeof path, "@TERMUX_PREFIX@/tmp/.X11-unix/X%d", manager->private_connection.display_index);
+   unlink (path);
+ 
+   g_clear_pointer (&manager->public_connection.name, g_free);

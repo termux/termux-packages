@@ -1,0 +1,27 @@
+diff --git a/meson.build b/meson.build
+index 13e77d0..8fe2aea 100644
+--- a/meson.build
++++ b/meson.build
+@@ -394,7 +394,7 @@ if have_wayland
+     cdata.set('HAVE_SYS_RANDOM', 1)
+   elif cc.has_header_symbol('linux/random.h', 'getrandom')
+     cdata.set('HAVE_LINUX_RANDOM', 1)
+-  else
++  elif host_machine.system() != 'android'
+     error('Required function getrandom not found')
+   endif
+ 
+diff --git a/src/wayland/meta-xwayland.c b/src/wayland/meta-xwayland.c
+index 61e9844..bc5ff5e 100644
+--- a/src/wayland/meta-xwayland.c
++++ b/src/wayland/meta-xwayland.c
+@@ -35,6 +35,9 @@
+ #include <sys/random.h>
+ #elif defined(HAVE_LINUX_RANDOM)
+ #include <linux/random.h>
++#elif defined(__ANDROID__)
++#include <syscall.h>
++#define getrandom(buf,buflen,flags) syscall(SYS_getrandom,buf,buflen,flags)
+ #endif
+ #include <unistd.h>
+ #include <X11/Xauth.h>

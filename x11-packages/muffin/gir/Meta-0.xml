@@ -1,0 +1,871 @@
+<?xml version="1.0"?>
+<dump>
+  <flags name="MetaBarrierDirection" get-type="meta_barrier_direction_get_type">
+    <member name="META_BARRIER_DIRECTION_POSITIVE_X" nick="positive-x" value="1"/>
+    <member name="META_BARRIER_DIRECTION_POSITIVE_Y" nick="positive-y" value="2"/>
+    <member name="META_BARRIER_DIRECTION_NEGATIVE_X" nick="negative-x" value="4"/>
+    <member name="META_BARRIER_DIRECTION_NEGATIVE_Y" nick="negative-y" value="8"/>
+  </flags>
+  <enum name="MetaEdgeType" get-type="meta_edge_type_get_type">
+    <member name="META_EDGE_WINDOW" nick="window" value="0"/>
+    <member name="META_EDGE_MONITOR" nick="monitor" value="1"/>
+    <member name="META_EDGE_SCREEN" nick="screen" value="2"/>
+  </enum>  <flags name="MetaFrameFlags" get-type="meta_frame_flags_get_type">
+    <member name="META_FRAME_ALLOWS_DELETE" nick="allows-delete" value="1"/>
+    <member name="META_FRAME_ALLOWS_MENU" nick="allows-menu" value="2"/>
+    <member name="META_FRAME_ALLOWS_MINIMIZE" nick="allows-minimize" value="4"/>
+    <member name="META_FRAME_ALLOWS_MAXIMIZE" nick="allows-maximize" value="8"/>
+    <member name="META_FRAME_ALLOWS_VERTICAL_RESIZE" nick="allows-vertical-resize" value="16"/>
+    <member name="META_FRAME_ALLOWS_HORIZONTAL_RESIZE" nick="allows-horizontal-resize" value="32"/>
+    <member name="META_FRAME_HAS_FOCUS" nick="has-focus" value="64"/>
+    <member name="META_FRAME_SHADED" nick="shaded" value="128"/>
+    <member name="META_FRAME_STUCK" nick="stuck" value="256"/>
+    <member name="META_FRAME_MAXIMIZED" nick="maximized" value="512"/>
+    <member name="META_FRAME_ALLOWS_SHADE" nick="allows-shade" value="1024"/>
+    <member name="META_FRAME_ALLOWS_MOVE" nick="allows-move" value="2048"/>
+    <member name="META_FRAME_FULLSCREEN" nick="fullscreen" value="4096"/>
+    <member name="META_FRAME_ABOVE" nick="above" value="8192"/>
+    <member name="META_FRAME_TILED_LEFT" nick="tiled-left" value="16384"/>
+    <member name="META_FRAME_TILED_RIGHT" nick="tiled-right" value="32768"/>
+    <member name="META_FRAME_TILED_TOP" nick="tiled-top" value="65536"/>
+    <member name="META_FRAME_TILED_BOTTOM" nick="tiled-bottom" value="131072"/>
+    <member name="META_FRAME_TILED_ULC" nick="tiled-ulc" value="262144"/>
+    <member name="META_FRAME_TILED_URC" nick="tiled-urc" value="524288"/>
+    <member name="META_FRAME_TILED_LRC" nick="tiled-lrc" value="1048576"/>
+    <member name="META_FRAME_TILED_LLC" nick="tiled-llc" value="2097152"/>
+  </flags>
+  <enum name="MetaGrabOp" get-type="meta_grab_op_get_type">
+    <member name="META_GRAB_OP_NONE" nick="none" value="0"/>
+    <member name="META_GRAB_OP_WINDOW_BASE" nick="window-base" value="1"/>
+    <member name="META_GRAB_OP_COMPOSITOR" nick="compositor" value="2"/>
+    <member name="META_GRAB_OP_WAYLAND_POPUP" nick="wayland-popup" value="3"/>
+    <member name="META_GRAB_OP_FRAME_BUTTON" nick="frame-button" value="4"/>
+    <member name="META_GRAB_OP_MOVING" nick="moving" value="1"/>
+    <member name="META_GRAB_OP_RESIZING_NW" nick="resizing-nw" value="36865"/>
+    <member name="META_GRAB_OP_RESIZING_N" nick="resizing-n" value="32769"/>
+    <member name="META_GRAB_OP_RESIZING_NE" nick="resizing-ne" value="40961"/>
+    <member name="META_GRAB_OP_RESIZING_E" nick="resizing-e" value="8193"/>
+    <member name="META_GRAB_OP_RESIZING_SW" nick="resizing-sw" value="20481"/>
+    <member name="META_GRAB_OP_RESIZING_S" nick="resizing-s" value="16385"/>
+    <member name="META_GRAB_OP_RESIZING_SE" nick="resizing-se" value="24577"/>
+    <member name="META_GRAB_OP_RESIZING_W" nick="resizing-w" value="4097"/>
+    <member name="META_GRAB_OP_KEYBOARD_MOVING" nick="keyboard-moving" value="257"/>
+    <member name="META_GRAB_OP_KEYBOARD_RESIZING_UNKNOWN" nick="keyboard-resizing-unknown" value="769"/>
+    <member name="META_GRAB_OP_KEYBOARD_RESIZING_NW" nick="keyboard-resizing-nw" value="37121"/>
+    <member name="META_GRAB_OP_KEYBOARD_RESIZING_N" nick="keyboard-resizing-n" value="33025"/>
+    <member name="META_GRAB_OP_KEYBOARD_RESIZING_NE" nick="keyboard-resizing-ne" value="41217"/>
+    <member name="META_GRAB_OP_KEYBOARD_RESIZING_E" nick="keyboard-resizing-e" value="8449"/>
+    <member name="META_GRAB_OP_KEYBOARD_RESIZING_SW" nick="keyboard-resizing-sw" value="20737"/>
+    <member name="META_GRAB_OP_KEYBOARD_RESIZING_S" nick="keyboard-resizing-s" value="16641"/>
+    <member name="META_GRAB_OP_KEYBOARD_RESIZING_SE" nick="keyboard-resizing-se" value="24833"/>
+    <member name="META_GRAB_OP_KEYBOARD_RESIZING_W" nick="keyboard-resizing-w" value="4353"/>
+  </enum>  <enum name="MetaCursor" get-type="meta_cursor_get_type">
+    <member name="META_CURSOR_NONE" nick="none" value="0"/>
+    <member name="META_CURSOR_DEFAULT" nick="default" value="1"/>
+    <member name="META_CURSOR_NORTH_RESIZE" nick="north-resize" value="2"/>
+    <member name="META_CURSOR_SOUTH_RESIZE" nick="south-resize" value="3"/>
+    <member name="META_CURSOR_WEST_RESIZE" nick="west-resize" value="4"/>
+    <member name="META_CURSOR_EAST_RESIZE" nick="east-resize" value="5"/>
+    <member name="META_CURSOR_SE_RESIZE" nick="se-resize" value="6"/>
+    <member name="META_CURSOR_SW_RESIZE" nick="sw-resize" value="7"/>
+    <member name="META_CURSOR_NE_RESIZE" nick="ne-resize" value="8"/>
+    <member name="META_CURSOR_NW_RESIZE" nick="nw-resize" value="9"/>
+    <member name="META_CURSOR_MOVE_OR_RESIZE_WINDOW" nick="move-or-resize-window" value="10"/>
+    <member name="META_CURSOR_BUSY" nick="busy" value="11"/>
+    <member name="META_CURSOR_DND_IN_DRAG" nick="dnd-in-drag" value="12"/>
+    <member name="META_CURSOR_DND_MOVE" nick="dnd-move" value="13"/>
+    <member name="META_CURSOR_DND_COPY" nick="dnd-copy" value="14"/>
+    <member name="META_CURSOR_DND_UNSUPPORTED_TARGET" nick="dnd-unsupported-target" value="15"/>
+    <member name="META_CURSOR_POINTING_HAND" nick="pointing-hand" value="16"/>
+    <member name="META_CURSOR_CROSSHAIR" nick="crosshair" value="17"/>
+    <member name="META_CURSOR_IBEAM" nick="ibeam" value="18"/>
+    <member name="META_CURSOR_LAST" nick="last" value="19"/>
+  </enum>  <enum name="MetaFrameType" get-type="meta_frame_type_get_type">
+    <member name="META_FRAME_TYPE_NORMAL" nick="normal" value="0"/>
+    <member name="META_FRAME_TYPE_DIALOG" nick="dialog" value="1"/>
+    <member name="META_FRAME_TYPE_MODAL_DIALOG" nick="modal-dialog" value="2"/>
+    <member name="META_FRAME_TYPE_UTILITY" nick="utility" value="3"/>
+    <member name="META_FRAME_TYPE_MENU" nick="menu" value="4"/>
+    <member name="META_FRAME_TYPE_BORDER" nick="border" value="5"/>
+    <member name="META_FRAME_TYPE_ATTACHED" nick="attached" value="6"/>
+    <member name="META_FRAME_TYPE_LAST" nick="last" value="7"/>
+  </enum>  <flags name="MetaVirtualModifier" get-type="meta_virtual_modifier_get_type">
+    <member name="META_VIRTUAL_SHIFT_MASK" nick="shift-mask" value="32"/>
+    <member name="META_VIRTUAL_CONTROL_MASK" nick="control-mask" value="64"/>
+    <member name="META_VIRTUAL_ALT_MASK" nick="alt-mask" value="128"/>
+    <member name="META_VIRTUAL_META_MASK" nick="meta-mask" value="256"/>
+    <member name="META_VIRTUAL_SUPER_MASK" nick="super-mask" value="512"/>
+    <member name="META_VIRTUAL_HYPER_MASK" nick="hyper-mask" value="1024"/>
+    <member name="META_VIRTUAL_MOD2_MASK" nick="mod2-mask" value="2048"/>
+    <member name="META_VIRTUAL_MOD3_MASK" nick="mod3-mask" value="4096"/>
+    <member name="META_VIRTUAL_MOD4_MASK" nick="mod4-mask" value="8192"/>
+    <member name="META_VIRTUAL_MOD5_MASK" nick="mod5-mask" value="16384"/>
+  </flags>
+  <flags name="MetaDirection" get-type="meta_direction_get_type">
+    <member name="META_DIRECTION_LEFT" nick="left" value="1"/>
+    <member name="META_DIRECTION_RIGHT" nick="right" value="2"/>
+    <member name="META_DIRECTION_TOP" nick="top" value="4"/>
+    <member name="META_DIRECTION_BOTTOM" nick="bottom" value="8"/>
+    <member name="META_DIRECTION_UP" nick="up" value="4"/>
+    <member name="META_DIRECTION_DOWN" nick="down" value="8"/>
+    <member name="META_DIRECTION_HORIZONTAL" nick="horizontal" value="3"/>
+    <member name="META_DIRECTION_VERTICAL" nick="vertical" value="12"/>
+  </flags>
+  <enum name="MetaMotionDirection" get-type="meta_motion_direction_get_type">
+    <member name="META_MOTION_UP" nick="up" value="-1"/>
+    <member name="META_MOTION_DOWN" nick="down" value="-2"/>
+    <member name="META_MOTION_LEFT" nick="left" value="-3"/>
+    <member name="META_MOTION_RIGHT" nick="right" value="-4"/>
+    <member name="META_MOTION_UP_LEFT" nick="up-left" value="-5"/>
+    <member name="META_MOTION_UP_RIGHT" nick="up-right" value="-6"/>
+    <member name="META_MOTION_DOWN_LEFT" nick="down-left" value="-7"/>
+    <member name="META_MOTION_DOWN_RIGHT" nick="down-right" value="-8"/>
+  </enum>  <enum name="MetaSide" get-type="meta_side_get_type">
+    <member name="META_SIDE_LEFT" nick="left" value="1"/>
+    <member name="META_SIDE_RIGHT" nick="right" value="2"/>
+    <member name="META_SIDE_TOP" nick="top" value="4"/>
+    <member name="META_SIDE_BOTTOM" nick="bottom" value="8"/>
+  </enum>  <enum name="MetaButtonFunction" get-type="meta_button_function_get_type">
+    <member name="META_BUTTON_FUNCTION_MENU" nick="menu" value="0"/>
+    <member name="META_BUTTON_FUNCTION_MINIMIZE" nick="minimize" value="1"/>
+    <member name="META_BUTTON_FUNCTION_MAXIMIZE" nick="maximize" value="2"/>
+    <member name="META_BUTTON_FUNCTION_CLOSE" nick="close" value="3"/>
+    <member name="META_BUTTON_FUNCTION_LAST" nick="last" value="4"/>
+  </enum>  <enum name="MetaWindowMenuType" get-type="meta_window_menu_type_get_type">
+    <member name="META_WINDOW_MENU_WM" nick="wm" value="0"/>
+    <member name="META_WINDOW_MENU_APP" nick="app" value="1"/>
+  </enum>  <enum name="MetaStackLayer" get-type="meta_stack_layer_get_type">
+    <member name="META_LAYER_DESKTOP" nick="desktop" value="0"/>
+    <member name="META_LAYER_BOTTOM" nick="bottom" value="1"/>
+    <member name="META_LAYER_NORMAL" nick="normal" value="2"/>
+    <member name="META_LAYER_TOP" nick="top" value="4"/>
+    <member name="META_LAYER_DOCK" nick="dock" value="4"/>
+    <member name="META_LAYER_OVERRIDE_REDIRECT" nick="override-redirect" value="7"/>
+    <member name="META_LAYER_LAST" nick="last" value="8"/>
+  </enum>  <enum name="MetaPlacementMode" get-type="meta_placement_mode_get_type">
+    <member name="META_PLACEMENT_MODE_AUTOMATIC" nick="automatic" value="0"/>
+    <member name="META_PLACEMENT_MODE_POINTER" nick="pointer" value="1"/>
+    <member name="META_PLACEMENT_MODE_MANUAL" nick="manual" value="2"/>
+    <member name="META_PLACEMENT_MODE_CENTER" nick="center" value="3"/>
+  </enum>  <enum name="MetaGravity" get-type="meta_gravity_get_type">
+    <member name="META_GRAVITY_NONE" nick="none" value="0"/>
+    <member name="META_GRAVITY_NORTH_WEST" nick="north-west" value="1"/>
+    <member name="META_GRAVITY_NORTH" nick="north" value="2"/>
+    <member name="META_GRAVITY_NORTH_EAST" nick="north-east" value="3"/>
+    <member name="META_GRAVITY_WEST" nick="west" value="4"/>
+    <member name="META_GRAVITY_CENTER" nick="center" value="5"/>
+    <member name="META_GRAVITY_EAST" nick="east" value="6"/>
+    <member name="META_GRAVITY_SOUTH_WEST" nick="south-west" value="7"/>
+    <member name="META_GRAVITY_SOUTH" nick="south" value="8"/>
+    <member name="META_GRAVITY_SOUTH_EAST" nick="south-east" value="9"/>
+    <member name="META_GRAVITY_STATIC" nick="static" value="10"/>
+  </enum>  <enum name="MetaX11BackgroundTransition" get-type="meta_x11_background_transition_get_type">
+    <member name="META_X11_BACKGROUND_TRANSITION_NONE" nick="none" value="0"/>
+    <member name="META_X11_BACKGROUND_TRANSITION_FADEIN" nick="fadein" value="1"/>
+    <member name="META_X11_BACKGROUND_TRANSITION_BLEND" nick="blend" value="2"/>
+  </enum>  <enum name="MetaCompEffect" get-type="meta_comp_effect_get_type">
+    <member name="META_COMP_EFFECT_CREATE" nick="create" value="0"/>
+    <member name="META_COMP_EFFECT_UNMINIMIZE" nick="unminimize" value="1"/>
+    <member name="META_COMP_EFFECT_DESTROY" nick="destroy" value="2"/>
+    <member name="META_COMP_EFFECT_MINIMIZE" nick="minimize" value="3"/>
+    <member name="META_COMP_EFFECT_NONE" nick="none" value="4"/>
+  </enum>  <enum name="MetaSizeChange" get-type="meta_size_change_get_type">
+    <member name="META_SIZE_CHANGE_MAXIMIZE" nick="maximize" value="0"/>
+    <member name="META_SIZE_CHANGE_UNMAXIMIZE" nick="unmaximize" value="1"/>
+    <member name="META_SIZE_CHANGE_FULLSCREEN" nick="fullscreen" value="2"/>
+    <member name="META_SIZE_CHANGE_UNFULLSCREEN" nick="unfullscreen" value="3"/>
+    <member name="META_SIZE_CHANGE_TILE" nick="tile" value="4"/>
+  </enum>  <enum name="MetaTabList" get-type="meta_tab_list_get_type">
+    <member name="META_TAB_LIST_NORMAL" nick="normal" value="0"/>
+    <member name="META_TAB_LIST_DOCKS" nick="docks" value="1"/>
+    <member name="META_TAB_LIST_GROUP" nick="group" value="2"/>
+    <member name="META_TAB_LIST_NORMAL_ALL" nick="normal-all" value="3"/>
+  </enum>  <enum name="MetaTabShowType" get-type="meta_tab_show_type_get_type">
+    <member name="META_TAB_SHOW_ICON" nick="icon" value="0"/>
+    <member name="META_TAB_SHOW_INSTANTLY" nick="instantly" value="1"/>
+  </enum>  <enum name="MetaPadActionType" get-type="meta_pad_action_type_get_type">
+    <member name="META_PAD_ACTION_BUTTON" nick="button" value="0"/>
+    <member name="META_PAD_ACTION_RING" nick="ring" value="1"/>
+    <member name="META_PAD_ACTION_STRIP" nick="strip" value="2"/>
+  </enum>  <enum name="MetaTileMode" get-type="meta_tile_mode_get_type">
+    <member name="META_TILE_NONE" nick="none" value="0"/>
+    <member name="META_TILE_LEFT" nick="left" value="1"/>
+    <member name="META_TILE_RIGHT" nick="right" value="2"/>
+    <member name="META_TILE_ULC" nick="ulc" value="3"/>
+    <member name="META_TILE_LLC" nick="llc" value="4"/>
+    <member name="META_TILE_URC" nick="urc" value="5"/>
+    <member name="META_TILE_LRC" nick="lrc" value="6"/>
+    <member name="META_TILE_TOP" nick="top" value="7"/>
+    <member name="META_TILE_BOTTOM" nick="bottom" value="8"/>
+    <member name="META_TILE_MAXIMIZED" nick="maximized" value="9"/>
+  </enum>  <enum name="MetaDisplayDirection" get-type="meta_display_direction_get_type">
+    <member name="META_DISPLAY_UP" nick="up" value="0"/>
+    <member name="META_DISPLAY_DOWN" nick="down" value="1"/>
+    <member name="META_DISPLAY_LEFT" nick="left" value="2"/>
+    <member name="META_DISPLAY_RIGHT" nick="right" value="3"/>
+  </enum>  <enum name="MetaDisplayCorner" get-type="meta_display_corner_get_type">
+    <member name="META_DISPLAY_TOPLEFT" nick="topleft" value="0"/>
+    <member name="META_DISPLAY_TOPRIGHT" nick="topright" value="1"/>
+    <member name="META_DISPLAY_BOTTOMLEFT" nick="bottomleft" value="2"/>
+    <member name="META_DISPLAY_BOTTOMRIGHT" nick="bottomright" value="3"/>
+  </enum>  <flags name="MetaListWindowsFlags" get-type="meta_list_windows_flags_get_type">
+    <member name="META_LIST_DEFAULT" nick="default" value="0"/>
+    <member name="META_LIST_INCLUDE_OVERRIDE_REDIRECT" nick="include-override-redirect" value="1"/>
+    <member name="META_LIST_SORTED" nick="sorted" value="2"/>
+  </flags>
+  <enum name="MetaExitCode" get-type="meta_exit_code_get_type">
+    <member name="META_EXIT_SUCCESS" nick="success" value="0"/>
+    <member name="META_EXIT_ERROR" nick="error" value="1"/>
+  </enum>  <enum name="MetaCloseDialogResponse" get-type="meta_close_dialog_response_get_type">
+    <member name="META_CLOSE_DIALOG_RESPONSE_WAIT" nick="wait" value="0"/>
+    <member name="META_CLOSE_DIALOG_RESPONSE_FORCE_CLOSE" nick="force-close" value="1"/>
+  </enum>  <enum name="MetaInhibitShortcutsDialogResponse" get-type="meta_inhibit_shortcuts_dialog_response_get_type">
+    <member name="META_INHIBIT_SHORTCUTS_DIALOG_RESPONSE_ALLOW" nick="allow" value="0"/>
+    <member name="META_INHIBIT_SHORTCUTS_DIALOG_RESPONSE_DENY" nick="deny" value="1"/>
+  </enum>  <enum name="MetaMonitorSwitchConfigType" get-type="meta_monitor_switch_config_type_get_type">
+    <member name="META_MONITOR_SWITCH_CONFIG_ALL_MIRROR" nick="all-mirror" value="0"/>
+    <member name="META_MONITOR_SWITCH_CONFIG_ALL_LINEAR" nick="all-linear" value="1"/>
+    <member name="META_MONITOR_SWITCH_CONFIG_EXTERNAL" nick="external" value="2"/>
+    <member name="META_MONITOR_SWITCH_CONFIG_BUILTIN" nick="builtin" value="3"/>
+    <member name="META_MONITOR_SWITCH_CONFIG_UNKNOWN" nick="unknown" value="4"/>
+  </enum>  <enum name="MetaXrandrRotation" get-type="meta_xrandr_rotation_get_type">
+    <member name="META_XRANDR_ROTATION_NORMAL" nick="normal" value="0"/>
+    <member name="META_XRANDR_ROTATION_LEFT" nick="left" value="1"/>
+    <member name="META_XRANDR_ROTATION_FLIPPED" nick="flipped" value="2"/>
+    <member name="META_XRANDR_ROTATION_RIGHT" nick="right" value="3"/>
+  </enum>  <flags name="MetaModalOptions" get-type="meta_modal_options_get_type">
+    <member name="META_MODAL_POINTER_ALREADY_GRABBED" nick="pointer-already-grabbed" value="1"/>
+    <member name="META_MODAL_KEYBOARD_ALREADY_GRABBED" nick="keyboard-already-grabbed" value="2"/>
+  </flags>
+  <enum name="MetaSelectionType" get-type="meta_selection_type_get_type">
+    <member name="META_SELECTION_PRIMARY" nick="selection-primary" value="0"/>
+    <member name="META_SELECTION_CLIPBOARD" nick="selection-clipboard" value="1"/>
+    <member name="META_SELECTION_DND" nick="selection-dnd" value="2"/>
+    <member name="META_N_SELECTION_TYPES" nick="n-selection-types" value="3"/>
+  </enum>  <enum name="MetaShadowMode" get-type="meta_shadow_mode_get_type">
+    <member name="META_SHADOW_MODE_AUTO" nick="auto" value="0"/>
+    <member name="META_SHADOW_MODE_FORCED_OFF" nick="forced-off" value="1"/>
+    <member name="META_SHADOW_MODE_FORCED_ON" nick="forced-on" value="2"/>
+  </enum>  <enum name="MetaPreference" get-type="meta_preference_get_type">
+    <member name="META_PREF_MOUSE_BUTTON_MODS" nick="mouse-button-mods" value="0"/>
+    <member name="META_PREF_MOUSE_BUTTON_ZOOM_MODS" nick="mouse-button-zoom-mods" value="1"/>
+    <member name="META_PREF_FOCUS_MODE" nick="focus-mode" value="2"/>
+    <member name="META_PREF_FOCUS_NEW_WINDOWS" nick="focus-new-windows" value="3"/>
+    <member name="META_PREF_ATTACH_MODAL_DIALOGS" nick="attach-modal-dialogs" value="4"/>
+    <member name="META_PREF_RAISE_ON_CLICK" nick="raise-on-click" value="5"/>
+    <member name="META_PREF_ACTION_DOUBLE_CLICK_TITLEBAR" nick="action-double-click-titlebar" value="6"/>
+    <member name="META_PREF_ACTION_MIDDLE_CLICK_TITLEBAR" nick="action-middle-click-titlebar" value="7"/>
+    <member name="META_PREF_ACTION_RIGHT_CLICK_TITLEBAR" nick="action-right-click-titlebar" value="8"/>
+    <member name="META_PREF_ACTION_SCROLL_WHEEL_TITLEBAR" nick="action-scroll-wheel-titlebar" value="9"/>
+    <member name="META_PREF_AUTO_RAISE" nick="auto-raise" value="10"/>
+    <member name="META_PREF_AUTO_RAISE_DELAY" nick="auto-raise-delay" value="11"/>
+    <member name="META_PREF_FOCUS_CHANGE_ON_POINTER_REST" nick="focus-change-on-pointer-rest" value="12"/>
+    <member name="META_PREF_TITLEBAR_FONT" nick="titlebar-font" value="13"/>
+    <member name="META_PREF_NUM_WORKSPACES" nick="num-workspaces" value="14"/>
+    <member name="META_PREF_DYNAMIC_WORKSPACES" nick="dynamic-workspaces" value="15"/>
+    <member name="META_PREF_KEYBINDINGS" nick="keybindings" value="16"/>
+    <member name="META_PREF_DISABLE_WORKAROUNDS" nick="disable-workarounds" value="17"/>
+    <member name="META_PREF_BUTTON_LAYOUT" nick="button-layout" value="18"/>
+    <member name="META_PREF_WORKSPACE_NAMES" nick="workspace-names" value="19"/>
+    <member name="META_PREF_VISUAL_BELL" nick="visual-bell" value="20"/>
+    <member name="META_PREF_AUDIBLE_BELL" nick="audible-bell" value="21"/>
+    <member name="META_PREF_VISUAL_BELL_TYPE" nick="visual-bell-type" value="22"/>
+    <member name="META_PREF_GNOME_ACCESSIBILITY" nick="gnome-accessibility" value="23"/>
+    <member name="META_PREF_GNOME_ANIMATIONS" nick="gnome-animations" value="24"/>
+    <member name="META_PREF_CURSOR_THEME" nick="cursor-theme" value="25"/>
+    <member name="META_PREF_CURSOR_SIZE" nick="cursor-size" value="26"/>
+    <member name="META_PREF_RESIZE_WITH_RIGHT_BUTTON" nick="resize-with-right-button" value="27"/>
+    <member name="META_PREF_EDGE_TILING" nick="edge-tiling" value="28"/>
+    <member name="META_PREF_FORCE_FULLSCREEN" nick="force-fullscreen" value="29"/>
+    <member name="META_PREF_WORKSPACES_ONLY_ON_PRIMARY" nick="workspaces-only-on-primary" value="30"/>
+    <member name="META_PREF_DRAGGABLE_BORDER_WIDTH" nick="draggable-border-width" value="31"/>
+    <member name="META_PREF_AUTO_MAXIMIZE" nick="auto-maximize" value="32"/>
+    <member name="META_PREF_NEW_WINDOW_PLACEMENT_MODE" nick="new-window-placement-mode" value="33"/>
+    <member name="META_PREF_DRAG_THRESHOLD" nick="drag-threshold" value="34"/>
+    <member name="META_PREF_LOCATE_POINTER" nick="locate-pointer" value="35"/>
+    <member name="META_PREF_CHECK_ALIVE_TIMEOUT" nick="check-alive-timeout" value="36"/>
+    <member name="META_PREF_BACKGROUND_TRANSITION" nick="background-transition" value="37"/>
+    <member name="META_PREF_UNREDIRECT_FULLSCREEN_WINDOWS" nick="unredirect-fullscreen-windows" value="38"/>
+    <member name="META_PREF_WORKSPACE_CYCLE" nick="workspace-cycle" value="39"/>
+    <member name="META_PREF_MIN_WIN_OPACITY" nick="min-win-opacity" value="40"/>
+    <member name="META_PREF_MOUSE_ZOOM_ENABLED" nick="mouse-zoom-enabled" value="41"/>
+    <member name="META_PREF_TILE_MAXIMIZE" nick="tile-maximize" value="42"/>
+    <member name="META_PREF_GTK_THEME" nick="gtk-theme" value="43"/>
+    <member name="META_PREF_BELL_SOUND" nick="bell-sound" value="44"/>
+    <member name="META_PREF_BRING_WINDOWS_TO_CURRENT_WORKSPACE" nick="bring-windows-to-current-workspace" value="45"/>
+    <member name="META_PREF_INVERT_WORKSPACE_FLIP_DIRECTION" nick="invert-workspace-flip-direction" value="46"/>
+  </enum>  <enum name="MetaKeyBindingAction" get-type="meta_key_binding_action_get_type">
+    <member name="META_KEYBINDING_ACTION_NONE" nick="none" value="0"/>
+    <member name="META_KEYBINDING_ACTION_WORKSPACE_1" nick="workspace-1" value="1"/>
+    <member name="META_KEYBINDING_ACTION_WORKSPACE_2" nick="workspace-2" value="2"/>
+    <member name="META_KEYBINDING_ACTION_WORKSPACE_3" nick="workspace-3" value="3"/>
+    <member name="META_KEYBINDING_ACTION_WORKSPACE_4" nick="workspace-4" value="4"/>
+    <member name="META_KEYBINDING_ACTION_WORKSPACE_5" nick="workspace-5" value="5"/>
+    <member name="META_KEYBINDING_ACTION_WORKSPACE_6" nick="workspace-6" value="6"/>
+    <member name="META_KEYBINDING_ACTION_WORKSPACE_7" nick="workspace-7" value="7"/>
+    <member name="META_KEYBINDING_ACTION_WORKSPACE_8" nick="workspace-8" value="8"/>
+    <member name="META_KEYBINDING_ACTION_WORKSPACE_9" nick="workspace-9" value="9"/>
+    <member name="META_KEYBINDING_ACTION_WORKSPACE_10" nick="workspace-10" value="10"/>
+    <member name="META_KEYBINDING_ACTION_WORKSPACE_11" nick="workspace-11" value="11"/>
+    <member name="META_KEYBINDING_ACTION_WORKSPACE_12" nick="workspace-12" value="12"/>
+    <member name="META_KEYBINDING_ACTION_WORKSPACE_LEFT" nick="workspace-left" value="13"/>
+    <member name="META_KEYBINDING_ACTION_WORKSPACE_RIGHT" nick="workspace-right" value="14"/>
+    <member name="META_KEYBINDING_ACTION_WORKSPACE_UP" nick="workspace-up" value="15"/>
+    <member name="META_KEYBINDING_ACTION_WORKSPACE_DOWN" nick="workspace-down" value="16"/>
+    <member name="META_KEYBINDING_ACTION_WORKSPACE_LAST" nick="workspace-last" value="17"/>
+    <member name="META_KEYBINDING_ACTION_SWITCH_APPLICATIONS" nick="switch-applications" value="18"/>
+    <member name="META_KEYBINDING_ACTION_SWITCH_APPLICATIONS_BACKWARD" nick="switch-applications-backward" value="19"/>
+    <member name="META_KEYBINDING_ACTION_SWITCH_GROUP" nick="switch-group" value="20"/>
+    <member name="META_KEYBINDING_ACTION_SWITCH_GROUP_BACKWARD" nick="switch-group-backward" value="21"/>
+    <member name="META_KEYBINDING_ACTION_SWITCH_WINDOWS" nick="switch-windows" value="22"/>
+    <member name="META_KEYBINDING_ACTION_SWITCH_WINDOWS_BACKWARD" nick="switch-windows-backward" value="23"/>
+    <member name="META_KEYBINDING_ACTION_SWITCH_PANELS" nick="switch-panels" value="24"/>
+    <member name="META_KEYBINDING_ACTION_SWITCH_PANELS_BACKWARD" nick="switch-panels-backward" value="25"/>
+    <member name="META_KEYBINDING_ACTION_CYCLE_GROUP" nick="cycle-group" value="26"/>
+    <member name="META_KEYBINDING_ACTION_CYCLE_GROUP_BACKWARD" nick="cycle-group-backward" value="27"/>
+    <member name="META_KEYBINDING_ACTION_CYCLE_WINDOWS" nick="cycle-windows" value="28"/>
+    <member name="META_KEYBINDING_ACTION_CYCLE_WINDOWS_BACKWARD" nick="cycle-windows-backward" value="29"/>
+    <member name="META_KEYBINDING_ACTION_CYCLE_PANELS" nick="cycle-panels" value="30"/>
+    <member name="META_KEYBINDING_ACTION_CYCLE_PANELS_BACKWARD" nick="cycle-panels-backward" value="31"/>
+    <member name="META_KEYBINDING_ACTION_SHOW_DESKTOP" nick="show-desktop" value="32"/>
+    <member name="META_KEYBINDING_ACTION_PANEL_MAIN_MENU" nick="panel-main-menu" value="33"/>
+    <member name="META_KEYBINDING_ACTION_PANEL_RUN_DIALOG" nick="panel-run-dialog" value="34"/>
+    <member name="META_KEYBINDING_ACTION_TOGGLE_RECORDING" nick="toggle-recording" value="35"/>
+    <member name="META_KEYBINDING_ACTION_SET_SPEW_MARK" nick="set-spew-mark" value="36"/>
+    <member name="META_KEYBINDING_ACTION_ACTIVATE_WINDOW_MENU" nick="activate-window-menu" value="37"/>
+    <member name="META_KEYBINDING_ACTION_TOGGLE_FULLSCREEN" nick="toggle-fullscreen" value="38"/>
+    <member name="META_KEYBINDING_ACTION_TOGGLE_MAXIMIZED" nick="toggle-maximized" value="39"/>
+    <member name="META_KEYBINDING_ACTION_PUSH_TILE_LEFT" nick="push-tile-left" value="40"/>
+    <member name="META_KEYBINDING_ACTION_PUSH_TILE_RIGHT" nick="push-tile-right" value="41"/>
+    <member name="META_KEYBINDING_ACTION_PUSH_TILE_UP" nick="push-tile-up" value="42"/>
+    <member name="META_KEYBINDING_ACTION_PUSH_TILE_DOWN" nick="push-tile-down" value="43"/>
+    <member name="META_KEYBINDING_ACTION_TOGGLE_ABOVE" nick="toggle-above" value="44"/>
+    <member name="META_KEYBINDING_ACTION_MAXIMIZE" nick="maximize" value="45"/>
+    <member name="META_KEYBINDING_ACTION_UNMAXIMIZE" nick="unmaximize" value="46"/>
+    <member name="META_KEYBINDING_ACTION_TOGGLE_SHADED" nick="toggle-shaded" value="47"/>
+    <member name="META_KEYBINDING_ACTION_MINIMIZE" nick="minimize" value="48"/>
+    <member name="META_KEYBINDING_ACTION_CLOSE" nick="close" value="49"/>
+    <member name="META_KEYBINDING_ACTION_BEGIN_MOVE" nick="begin-move" value="50"/>
+    <member name="META_KEYBINDING_ACTION_BEGIN_RESIZE" nick="begin-resize" value="51"/>
+    <member name="META_KEYBINDING_ACTION_TOGGLE_ON_ALL_WORKSPACES" nick="toggle-on-all-workspaces" value="52"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_WORKSPACE_1" nick="move-to-workspace-1" value="53"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_WORKSPACE_2" nick="move-to-workspace-2" value="54"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_WORKSPACE_3" nick="move-to-workspace-3" value="55"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_WORKSPACE_4" nick="move-to-workspace-4" value="56"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_WORKSPACE_5" nick="move-to-workspace-5" value="57"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_WORKSPACE_6" nick="move-to-workspace-6" value="58"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_WORKSPACE_7" nick="move-to-workspace-7" value="59"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_WORKSPACE_8" nick="move-to-workspace-8" value="60"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_WORKSPACE_9" nick="move-to-workspace-9" value="61"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_WORKSPACE_10" nick="move-to-workspace-10" value="62"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_WORKSPACE_11" nick="move-to-workspace-11" value="63"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_WORKSPACE_12" nick="move-to-workspace-12" value="64"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_WORKSPACE_LEFT" nick="move-to-workspace-left" value="65"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_WORKSPACE_RIGHT" nick="move-to-workspace-right" value="66"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_WORKSPACE_UP" nick="move-to-workspace-up" value="67"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_WORKSPACE_DOWN" nick="move-to-workspace-down" value="68"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_WORKSPACE_LAST" nick="move-to-workspace-last" value="69"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_MONITOR_LEFT" nick="move-to-monitor-left" value="70"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_MONITOR_RIGHT" nick="move-to-monitor-right" value="71"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_MONITOR_UP" nick="move-to-monitor-up" value="72"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_MONITOR_DOWN" nick="move-to-monitor-down" value="73"/>
+    <member name="META_KEYBINDING_ACTION_RAISE_OR_LOWER" nick="raise-or-lower" value="74"/>
+    <member name="META_KEYBINDING_ACTION_RAISE" nick="raise" value="75"/>
+    <member name="META_KEYBINDING_ACTION_LOWER" nick="lower" value="76"/>
+    <member name="META_KEYBINDING_ACTION_MAXIMIZE_VERTICALLY" nick="maximize-vertically" value="77"/>
+    <member name="META_KEYBINDING_ACTION_MAXIMIZE_HORIZONTALLY" nick="maximize-horizontally" value="78"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_CORNER_NW" nick="move-to-corner-nw" value="79"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_CORNER_NE" nick="move-to-corner-ne" value="80"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_CORNER_SW" nick="move-to-corner-sw" value="81"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_CORNER_SE" nick="move-to-corner-se" value="82"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_SIDE_N" nick="move-to-side-n" value="83"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_SIDE_S" nick="move-to-side-s" value="84"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_SIDE_E" nick="move-to-side-e" value="85"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_SIDE_W" nick="move-to-side-w" value="86"/>
+    <member name="META_KEYBINDING_ACTION_MOVE_TO_CENTER" nick="move-to-center" value="87"/>
+    <member name="META_KEYBINDING_ACTION_INCREASE_OPACITY" nick="increase-opacity" value="88"/>
+    <member name="META_KEYBINDING_ACTION_DECREASE_OPACITY" nick="decrease-opacity" value="89"/>
+    <member name="META_KEYBINDING_ACTION_OVERLAY_KEY" nick="overlay-key" value="90"/>
+    <member name="META_KEYBINDING_ACTION_LOCATE_POINTER_KEY" nick="locate-pointer-key" value="91"/>
+    <member name="META_KEYBINDING_ACTION_ISO_NEXT_GROUP" nick="iso-next-group" value="92"/>
+    <member name="META_KEYBINDING_ACTION_ALWAYS_ON_TOP" nick="always-on-top" value="93"/>
+    <member name="META_KEYBINDING_ACTION_SWITCH_MONITOR" nick="switch-monitor" value="94"/>
+    <member name="META_KEYBINDING_ACTION_ROTATE_MONITOR" nick="rotate-monitor" value="95"/>
+    <member name="META_KEYBINDING_ACTION_LAST" nick="last" value="96"/>
+  </enum>  <flags name="MetaKeyBindingFlags" get-type="meta_key_binding_flags_get_type">
+    <member name="META_KEY_BINDING_NONE" nick="none" value="0"/>
+    <member name="META_KEY_BINDING_PER_WINDOW" nick="per-window" value="1"/>
+    <member name="META_KEY_BINDING_BUILTIN" nick="builtin" value="2"/>
+    <member name="META_KEY_BINDING_IS_REVERSED" nick="is-reversed" value="4"/>
+    <member name="META_KEY_BINDING_NON_MASKABLE" nick="non-maskable" value="8"/>
+    <member name="META_KEY_BINDING_IGNORE_AUTOREPEAT" nick="ignore-autorepeat" value="16"/>
+    <member name="META_KEY_BINDING_NO_AUTO_GRAB" nick="no-auto-grab" value="32"/>
+  </flags>
+  <flags name="MetaDebugTopic" get-type="meta_debug_topic_get_type">
+    <member name="META_DEBUG_VERBOSE" nick="verbose" value="4294967295"/>
+    <member name="META_DEBUG_FOCUS" nick="focus" value="1"/>
+    <member name="META_DEBUG_WORKAREA" nick="workarea" value="2"/>
+    <member name="META_DEBUG_STACK" nick="stack" value="4"/>
+    <member name="META_DEBUG_THEMES" nick="themes" value="8"/>
+    <member name="META_DEBUG_SM" nick="sm" value="16"/>
+    <member name="META_DEBUG_EVENTS" nick="events" value="32"/>
+    <member name="META_DEBUG_WINDOW_STATE" nick="window-state" value="64"/>
+    <member name="META_DEBUG_WINDOW_OPS" nick="window-ops" value="128"/>
+    <member name="META_DEBUG_GEOMETRY" nick="geometry" value="256"/>
+    <member name="META_DEBUG_PLACEMENT" nick="placement" value="512"/>
+    <member name="META_DEBUG_PING" nick="ping" value="1024"/>
+    <member name="META_DEBUG_XINERAMA" nick="xinerama" value="2048"/>
+    <member name="META_DEBUG_KEYBINDINGS" nick="keybindings" value="4096"/>
+    <member name="META_DEBUG_SYNC" nick="sync" value="8192"/>
+    <member name="META_DEBUG_ERRORS" nick="errors" value="16384"/>
+    <member name="META_DEBUG_STARTUP" nick="startup" value="32768"/>
+    <member name="META_DEBUG_PREFS" nick="prefs" value="65536"/>
+    <member name="META_DEBUG_GROUPS" nick="groups" value="131072"/>
+    <member name="META_DEBUG_RESIZING" nick="resizing" value="262144"/>
+    <member name="META_DEBUG_SHAPES" nick="shapes" value="524288"/>
+    <member name="META_DEBUG_COMPOSITOR" nick="compositor" value="1048576"/>
+    <member name="META_DEBUG_EDGE_RESISTANCE" nick="edge-resistance" value="2097152"/>
+    <member name="META_DEBUG_DBUS" nick="dbus" value="4194304"/>
+    <member name="META_DEBUG_INPUT" nick="input" value="8388608"/>
+  </flags>
+  <enum name="MetaLaterType" get-type="meta_later_type_get_type">
+    <member name="META_LATER_RESIZE" nick="resize" value="0"/>
+    <member name="META_LATER_CALC_SHOWING" nick="calc-showing" value="1"/>
+    <member name="META_LATER_CHECK_FULLSCREEN" nick="check-fullscreen" value="2"/>
+    <member name="META_LATER_SYNC_STACK" nick="sync-stack" value="3"/>
+    <member name="META_LATER_BEFORE_REDRAW" nick="before-redraw" value="4"/>
+    <member name="META_LATER_IDLE" nick="idle" value="5"/>
+  </enum>  <enum name="MetaLocaleDirection" get-type="meta_locale_direction_get_type">
+    <member name="META_LOCALE_DIRECTION_LTR" nick="ltr" value="0"/>
+    <member name="META_LOCALE_DIRECTION_RTL" nick="rtl" value="1"/>
+  </enum>  <enum name="MetaWindowType" get-type="meta_window_type_get_type">
+    <member name="META_WINDOW_NORMAL" nick="normal" value="0"/>
+    <member name="META_WINDOW_DESKTOP" nick="desktop" value="1"/>
+    <member name="META_WINDOW_DOCK" nick="dock" value="2"/>
+    <member name="META_WINDOW_DIALOG" nick="dialog" value="3"/>
+    <member name="META_WINDOW_MODAL_DIALOG" nick="modal-dialog" value="4"/>
+    <member name="META_WINDOW_TOOLBAR" nick="toolbar" value="5"/>
+    <member name="META_WINDOW_MENU" nick="menu" value="6"/>
+    <member name="META_WINDOW_UTILITY" nick="utility" value="7"/>
+    <member name="META_WINDOW_SPLASHSCREEN" nick="splashscreen" value="8"/>
+    <member name="META_WINDOW_DROPDOWN_MENU" nick="dropdown-menu" value="9"/>
+    <member name="META_WINDOW_POPUP_MENU" nick="popup-menu" value="10"/>
+    <member name="META_WINDOW_TOOLTIP" nick="tooltip" value="11"/>
+    <member name="META_WINDOW_NOTIFICATION" nick="notification" value="12"/>
+    <member name="META_WINDOW_COMBO" nick="combo" value="13"/>
+    <member name="META_WINDOW_DND" nick="dnd" value="14"/>
+    <member name="META_WINDOW_OVERRIDE_OTHER" nick="override-other" value="15"/>
+  </enum>  <flags name="MetaMaximizeFlags" get-type="meta_maximize_flags_get_type">
+    <member name="META_MAXIMIZE_HORIZONTAL" nick="horizontal" value="1"/>
+    <member name="META_MAXIMIZE_VERTICAL" nick="vertical" value="2"/>
+    <member name="META_MAXIMIZE_BOTH" nick="both" value="3"/>
+  </flags>
+  <enum name="MetaWindowClientType" get-type="meta_window_client_type_get_type">
+    <member name="META_WINDOW_CLIENT_TYPE_WAYLAND" nick="wayland" value="0"/>
+    <member name="META_WINDOW_CLIENT_TYPE_X11" nick="x11" value="1"/>
+  </enum>  <boxed name="MetaKeyBinding" get-type="meta_key_binding_get_type"/>
+  <boxed name="MetaRectangle" get-type="meta_rectangle_get_type"/>
+  <class name="MetaWorkspace" get-type="meta_workspace_get_type" parents="GObject">
+    <property name="n-windows" type="guint" flags="225" default-value="0"/>
+    <property name="workspace-index" type="guint" flags="225" default-value="0"/>
+    <signal name="window-added" return="void" when="last">
+      <param type="MetaWindow"/>
+    </signal>
+    <signal name="window-removed" return="void" when="last">
+      <param type="MetaWindow"/>
+    </signal>
+  </class>
+  <class name="MetaSoundPlayer" get-type="meta_sound_player_get_type" parents="GObject">
+  </class>
+  <class name="MetaLaunchContext" get-type="meta_launch_context_get_type" parents="GAppLaunchContext,GObject">
+    <property name="display" type="MetaDisplay" flags="11"/>
+    <property name="workspace" type="MetaWorkspace" flags="3"/>
+    <property name="timestamp" type="guint" flags="3" default-value="0"/>
+  </class>
+  <class name="MetaStartupNotification" get-type="meta_startup_notification_get_type" parents="GObject">
+    <property name="display" type="MetaDisplay" flags="235"/>
+    <signal name="changed" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+  </class>
+  <class name="MetaStartupSequence" get-type="meta_startup_sequence_get_type" parents="GObject">
+    <property name="id" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="timestamp" type="guint64" flags="11" default-value="0"/>
+    <property name="icon-name" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="application-id" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="wmclass" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="workspace" type="gint" flags="11" default-value="-1"/>
+    <property name="name" type="gchararray" flags="11" default-value="NULL"/>
+    <signal name="complete" return="void" when="last">
+    </signal>
+  </class>
+  <class name="MetaDisplay" get-type="meta_display_get_type" parents="GObject">
+    <property name="focus-window" type="MetaWindow" flags="1"/>
+    <signal name="cursor-updated" return="void" when="last">
+    </signal>
+    <signal name="x11-display-setup" return="void" when="last">
+    </signal>
+    <signal name="x11-display-opened" return="void" when="last">
+    </signal>
+    <signal name="x11-display-closing" return="void" when="last">
+    </signal>
+    <signal name="overlay-key" return="void" when="last">
+    </signal>
+    <signal name="accelerator-activated" return="void" when="last">
+      <param type="guint"/>
+      <param type="ClutterInputDevice"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="modifiers-accelerator-activated" return="gboolean" when="last">
+    </signal>
+    <signal name="window-created" return="void" when="last">
+      <param type="MetaWindow"/>
+    </signal>
+    <signal name="window-demands-attention" return="void" when="last">
+      <param type="MetaWindow"/>
+    </signal>
+    <signal name="window-marked-urgent" return="void" when="last">
+      <param type="MetaWindow"/>
+    </signal>
+    <signal name="grab-op-begin" return="void" when="last">
+      <param type="MetaDisplay"/>
+      <param type="MetaWindow"/>
+      <param type="MetaGrabOp"/>
+    </signal>
+    <signal name="grab-op-end" return="void" when="last">
+      <param type="MetaDisplay"/>
+      <param type="MetaWindow"/>
+      <param type="MetaGrabOp"/>
+    </signal>
+    <signal name="show-restart-message" return="gboolean" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="restart" return="gboolean" when="last">
+    </signal>
+    <signal name="show-resize-popup" return="gboolean" when="last">
+      <param type="gboolean"/>
+      <param type="MetaRectangle"/>
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="gl-video-memory-purged" return="void" when="last">
+    </signal>
+    <signal name="show-pad-osd" return="ClutterActor" when="last">
+      <param type="ClutterInputDevice"/>
+      <param type="GSettings"/>
+      <param type="gchararray"/>
+      <param type="gboolean"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="show-osd" return="void" when="last">
+      <param type="gint"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="pad-mode-switch" return="void" when="last">
+      <param type="ClutterInputDevice"/>
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="window-entered-monitor" return="void" when="last">
+      <param type="gint"/>
+      <param type="MetaWindow"/>
+    </signal>
+    <signal name="window-left-monitor" return="void" when="last">
+      <param type="gint"/>
+      <param type="MetaWindow"/>
+    </signal>
+    <signal name="window-monitor-changed" return="void" when="last">
+      <param type="MetaWindow"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="window-workspace-changed" return="void" when="last">
+      <param type="MetaWindow"/>
+      <param type="MetaWorkspace"/>
+    </signal>
+    <signal name="window-skip-taskbar-changed" return="void" when="last">
+      <param type="MetaWindow"/>
+    </signal>
+    <signal name="in-fullscreen-changed" return="void" when="last">
+    </signal>
+    <signal name="showing-desktop-changed" return="void" when="last">
+    </signal>
+    <signal name="restacked" return="void" when="last">
+    </signal>
+    <signal name="workareas-changed" return="void" when="last">
+    </signal>
+    <signal name="closing" return="void" when="last">
+    </signal>
+    <signal name="init-xserver" return="gboolean" when="last">
+      <param type="GTask"/>
+    </signal>
+    <signal name="zoom-scroll-in" return="void" when="last">
+    </signal>
+    <signal name="zoom-scroll-out" return="void" when="last">
+    </signal>
+  </class>
+  <class name="MetaBarrier" get-type="meta_barrier_get_type" parents="GObject">
+    <property name="display" type="MetaDisplay" flags="235"/>
+    <property name="x1" type="gint" flags="235" default-value="0"/>
+    <property name="y1" type="gint" flags="235" default-value="0"/>
+    <property name="x2" type="gint" flags="235" default-value="32767"/>
+    <property name="y2" type="gint" flags="235" default-value="32767"/>
+    <property name="directions" type="MetaBarrierDirection" flags="235" default-value="0"/>
+    <signal name="hit" return="void" when="first">
+      <param type="MetaBarrierEvent"/>
+    </signal>
+    <signal name="left" return="void" when="first">
+      <param type="MetaBarrierEvent"/>
+    </signal>
+  </class>
+  <boxed name="MetaBarrierEvent" get-type="meta_barrier_event_get_type"/>
+  <class name="MetaWindow" get-type="meta_window_get_type" parents="GObject" abstract="1">
+    <property name="title" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="icon" type="gpointer" flags="225"/>
+    <property name="mini-icon" type="gpointer" flags="225"/>
+    <property name="decorated" type="gboolean" flags="225" default-value="TRUE"/>
+    <property name="fullscreen" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="maximized-horizontally" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="maximized-vertically" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="minimized" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="window-type" type="MetaWindowType" flags="225" default-value="META_WINDOW_NORMAL"/>
+    <property name="user-time" type="guint" flags="225" default-value="0"/>
+    <property name="demands-attention" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="urgent" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="skip-taskbar" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="mutter-hints" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="appears-focused" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="resizeable" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="above" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="wm-class" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="gtk-application-id" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="gtk-unique-bus-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="gtk-application-object-path" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="gtk-window-object-path" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="gtk-app-menu-object-path" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="gtk-menubar-object-path" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="on-all-workspaces" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="progress" type="guint" flags="225" default-value="0"/>
+    <property name="progress-pulse" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="tile-mode" type="MetaTileMode" flags="225" default-value="META_TILE_NONE"/>
+    <property name="opacity" type="guint" flags="225" default-value="255"/>
+    <signal name="workspace-changed" return="void" when="last">
+    </signal>
+    <signal name="focus" return="void" when="last">
+    </signal>
+    <signal name="raised" return="void" when="last">
+    </signal>
+    <signal name="unmanaging" return="void" when="last">
+    </signal>
+    <signal name="unmanaged" return="void" when="last">
+    </signal>
+    <signal name="position-changed" return="void" when="last">
+    </signal>
+    <signal name="monitor-changed" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+    <signal name="shown" return="void" when="last">
+    </signal>
+    <signal name="size-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="MetaCompositor" get-type="meta_compositor_get_type" parents="GObject" abstract="1">
+    <property name="display" type="MetaDisplay" flags="235"/>
+  </class>
+  <class name="MetaShapedTexture" get-type="meta_shaped_texture_get_type" parents="GObject">
+    <implements name="ClutterContent"/>
+    <signal name="size-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="MetaWindowActor" get-type="meta_window_actor_get_type" parents="ClutterActor,GInitiallyUnowned,GObject" abstract="1">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <implements name="MetaCullable"/>
+    <implements name="MetaScreenCastWindow"/>
+    <property name="meta-window" type="MetaWindow" flags="11"/>
+    <signal name="first-frame" return="void" when="last">
+    </signal>
+    <signal name="effects-completed" return="void" when="last">
+    </signal>
+    <signal name="damaged" return="void" when="last">
+    </signal>
+    <signal name="thawed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="MetaDnd" get-type="meta_dnd_get_type" parents="GObject">
+    <signal name="dnd-enter" return="void" when="last">
+    </signal>
+    <signal name="dnd-position-change" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="dnd-leave" return="void" when="last">
+    </signal>
+  </class>
+  <class name="MetaRemoteAccessHandle" get-type="meta_remote_access_handle_get_type" parents="GObject">
+    <signal name="stopped" return="void" when="last">
+    </signal>
+  </class>
+  <class name="MetaRemoteAccessController" get-type="meta_remote_access_controller_get_type" parents="GObject">
+    <signal name="new-handle" return="void" when="last">
+      <param type="MetaRemoteAccessHandle"/>
+    </signal>
+  </class>
+  <class name="MetaBackend" get-type="meta_backend_get_type" parents="GObject" abstract="1">
+    <implements name="GInitable"/>
+    <signal name="keymap-changed" return="void" when="last">
+    </signal>
+    <signal name="keymap-layout-group-changed" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="last-device-changed" return="void" when="last">
+      <param type="ClutterInputDevice"/>
+    </signal>
+    <signal name="lid-is-closed-changed" return="void" when="last">
+      <param type="gboolean"/>
+    </signal>
+    <signal name="gpu-added" return="void" when="last">
+      <param type="MetaGpu"/>
+    </signal>
+  </class>
+  <class name="MetaBackground" get-type="meta_background_get_type" parents="GObject">
+    <property name="meta-display" type="MetaDisplay" flags="11"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="MetaBackgroundActor" get-type="meta_background_actor_get_type" parents="ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <implements name="MetaCullable"/>
+    <property name="meta-display" type="MetaDisplay" flags="11"/>
+    <property name="monitor" type="gint" flags="11" default-value="0"/>
+    <property name="background" type="MetaBackground" flags="3"/>
+    <property name="gradient" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="gradient-height" type="gint" flags="3" default-value="0"/>
+    <property name="gradient-max-darkness" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="vignette" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="vignette-sharpness" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="brightness" type="gdouble" flags="3" default-value="1.000000"/>
+  </class>
+  <class name="MetaBackgroundGroup" get-type="meta_background_group_get_type" parents="ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <implements name="MetaCullable"/>
+  </class>
+  <class name="MetaBackgroundImage" get-type="meta_background_image_get_type" parents="GObject">
+    <signal name="loaded" return="void" when="last">
+    </signal>
+  </class>
+  <class name="MetaBackgroundImageCache" get-type="meta_background_image_cache_get_type" parents="GObject">
+  </class>
+  <interface name="MetaCloseDialog" get-type="meta_close_dialog_get_type">
+    <property name="window" type="MetaWindow" flags="11"/>
+    <signal name="response" return="void" when="last" action="1">
+      <param type="MetaCloseDialogResponse"/>
+    </signal>
+  </interface>
+  <class name="MetaCursorTracker" get-type="meta_cursor_tracker_get_type" parents="GObject">
+    <signal name="cursor-changed" return="void" when="last">
+    </signal>
+    <signal name="cursor-moved" return="void" when="last">
+      <param type="gfloat"/>
+      <param type="gfloat"/>
+    </signal>
+    <signal name="visibility-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="MetaIdleMonitor" get-type="meta_idle_monitor_get_type" parents="GObject">
+    <property name="device" type="ClutterInputDevice" flags="235"/>
+  </class>
+  <interface name="MetaInhibitShortcutsDialog" get-type="meta_inhibit_shortcuts_dialog_get_type">
+    <property name="window" type="MetaWindow" flags="235"/>
+    <signal name="response" return="void" when="last" action="1">
+      <param type="MetaInhibitShortcutsDialogResponse"/>
+    </signal>
+  </interface>
+  <class name="MetaMonitorManager" get-type="meta_monitor_manager_get_type" parents="GObject">
+    <property name="backend" type="MetaBackend" flags="235"/>
+    <signal name="monitors-changed" return="void" when="last">
+    </signal>
+    <signal name="monitors-changed-internal" return="void" when="last">
+    </signal>
+    <signal name="power-save-mode-changed" return="void" when="last">
+    </signal>
+    <signal name="confirm-display-change" return="void" when="last">
+    </signal>
+  </class>
+  <class name="MetaPlugin" get-type="meta_plugin_get_type" parents="GObject" abstract="1">
+  </class>
+  <class name="MetaSelectionSource" get-type="meta_selection_source_get_type" parents="GObject">
+    <signal name="activated" return="void" when="last" action="1">
+    </signal>
+    <signal name="deactivated" return="void" when="last" action="1">
+    </signal>
+  </class>
+  <class name="MetaSelection" get-type="meta_selection_get_type" parents="GObject">
+    <signal name="owner-changed" return="void" when="last">
+      <param type="guint"/>
+      <param type="MetaSelectionSource"/>
+    </signal>
+  </class>
+  <class name="MetaSelectionSourceMemory" get-type="meta_selection_source_memory_get_type" parents="MetaSelectionSource,GObject">
+  </class>
+  <boxed name="MetaWindowShape" get-type="meta_window_shape_get_type"/>
+  <boxed name="MetaShadow" get-type="meta_shadow_get_type"/>
+  <class name="MetaShadowFactory" get-type="meta_shadow_factory_get_type" parents="GObject">
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="MetaStage" get-type="meta_stage_get_type" parents="ClutterStage,ClutterGroup,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <signal name="actors-painted" return="void" when="last">
+    </signal>
+  </class>
+  <class name="MetaWindowGroup" get-type="meta_window_group_get_type" parents="ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <implements name="MetaCullable"/>
+  </class>
+  <class name="MetaWorkspaceManager" get-type="meta_workspace_manager_get_type" parents="GObject">
+    <property name="layout-columns" type="gint" flags="225" default-value="1"/>
+    <property name="layout-rows" type="gint" flags="225" default-value="-1"/>
+    <property name="n-workspaces" type="gint" flags="1" default-value="1"/>
+    <signal name="showing-desktop-changed" return="void" when="last">
+    </signal>
+    <signal name="workspace-added" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+    <signal name="workspace-removed" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+    <signal name="workspace-switched" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="MetaMotionDirection"/>
+    </signal>
+    <signal name="workspaces-reordered" return="void" when="last">
+    </signal>
+    <signal name="active-workspace-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="MetaX11BackgroundActor" get-type="meta_x11_background_actor_get_type" parents="ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="dim-factor" type="gfloat" flags="3" default-value="1.000000"/>
+  </class>
+  <class name="MetaX11Display" get-type="meta_x11_display_get_type" parents="GObject">
+  </class>
+</dump>
