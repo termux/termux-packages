@@ -1,0 +1,21 @@
+diff --git a/external_libraries/boost/boost/interprocess/detail/shared_dir_helpers.hpp b/external_libraries/boost/boost/interprocess/detail/shared_dir_helpers.hpp
+index 8d9d36f2d..744d9b370 100644
+--- a/external_libraries/boost/boost/interprocess/detail/shared_dir_helpers.hpp
++++ b/external_libraries/boost/boost/interprocess/detail/shared_dir_helpers.hpp
+@@ -24,6 +24,7 @@
+ #include <boost/interprocess/detail/os_file_functions.hpp>
+ #include <boost/interprocess/errors.hpp>
+ #include <boost/interprocess/exceptions.hpp>
++#include <filesystem>
+ #include <string>
+ 
+ #if defined(BOOST_INTERPROCESS_HAS_KERNEL_BOOTTIME) && defined(BOOST_INTERPROCESS_WINDOWS)
+@@ -133,7 +134,7 @@ inline void get_shared_dir_root(std::basic_string<CharT> &dir_path)
+    #if defined (BOOST_INTERPROCESS_WINDOWS)
+       winapi::get_shared_documents_folder(dir_path);
+    #else               
+-      dir_path = "/tmp";
++      dir_path = std::filesystem::temp_directory_path().string();
+    #endif
+ 
+    //We always need this path, so throw on error
