@@ -1,8 +1,8 @@
---- a/src/userinfo.c	2021-02-15 04:35:51.000000000 +0100
-+++ b/src/userinfo.c	2021-12-18 10:33:46.323685173 +0100
+--- a/src/userinfo.c
++++ b/src/userinfo.c
 @@ -100,6 +100,11 @@
  
- static int rebuild_uid_cache()
+ static int rebuild_uid_cache(void)
  {
 +#ifdef __ANDROID__
 +    /* Not supported on Android. */
@@ -19,4 +19,4 @@
 +#endif /* __ANDROID__ */
  }
  
- static int rebuild_gid_cache()
+ static int rebuild_gid_cache(void)
