@@ -67,12 +67,15 @@
   </fundamental>
   <fundamental name="GskSubsurfaceNode" get-type="gsk_subsurface_node_get_type" instantiatable="1" parents="GskRenderNode">
   </fundamental>
+  <fundamental name="GskComponentTransferNode" get-type="gsk_component_transfer_node_get_type" instantiatable="1" parents="GskRenderNode">
+  </fundamental>
   <class name="GskRenderer" get-type="gsk_renderer_get_type" parents="GObject" abstract="1">
     <property name="realized" type="gboolean" flags="1073742049" default-value="FALSE"/>
     <property name="surface" type="GdkSurface" flags="1073742049"/>
   </class>
   <class name="GskCairoRenderer" get-type="gsk_cairo_renderer_get_type" parents="GskRenderer,GObject">
   </class>
+  <boxed name="GskComponentTransfer" get-type="gsk_component_transfer_get_type"/>
   <boxed name="GskPath" get-type="gsk_path_get_type"/>
   <boxed name="GskPathBuilder" get-type="gsk_path_builder_get_type"/>
   <boxed name="GskPathPoint" get-type="gsk_path_point_get_type"/>
@@ -119,6 +122,7 @@
     <member name="GSK_FILL_NODE" nick="fill-node" value="28"/>
     <member name="GSK_STROKE_NODE" nick="stroke-node" value="29"/>
     <member name="GSK_SUBSURFACE_NODE" nick="subsurface-node" value="30"/>
+    <member name="GSK_COMPONENT_TRANSFER_NODE" nick="component-transfer-node" value="31"/>
   </enum>  <enum name="GskScalingFilter" get-type="gsk_scaling_filter_get_type">
     <member name="GSK_SCALING_FILTER_LINEAR" nick="linear" value="0"/>
     <member name="GSK_SCALING_FILTER_NEAREST" nick="nearest" value="1"/>
@@ -200,5 +204,10 @@
     <member name="GSK_PATH_FOREACH_ALLOW_CUBIC" nick="cubic" value="2"/>
     <member name="GSK_PATH_FOREACH_ALLOW_CONIC" nick="conic" value="4"/>
   </flags>
-  <error-quark function="gsk_serialization_error_quark" domain="gsk-serialization-error-quark"/>
+  <enum name="GskPathIntersection" get-type="gsk_path_intersection_get_type">
+    <member name="GSK_PATH_INTERSECTION_NONE" nick="none" value="0"/>
+    <member name="GSK_PATH_INTERSECTION_NORMAL" nick="normal" value="1"/>
+    <member name="GSK_PATH_INTERSECTION_START" nick="start" value="2"/>
+    <member name="GSK_PATH_INTERSECTION_END" nick="end" value="3"/>
+  </enum>  <error-quark function="gsk_serialization_error_quark" domain="gsk-serialization-error-quark"/>
 </dump>

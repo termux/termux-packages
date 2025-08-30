@@ -81,8 +81,8 @@
     <property name="device" type="GdkDevice" flags="1073742059"/>
     <property name="display" type="GdkDisplay" flags="1073742049"/>
     <property name="formats" type="GdkContentFormats" flags="1073742059"/>
-    <property name="selected-action" type="GdkDragAction" flags="1073742051" default-value="0"/>
-    <property name="actions" type="GdkDragAction" flags="1073742051" default-value="0"/>
+    <property name="selected-action" type="GdkDragAction" flags="1073742051" default-value="GDK_ACTION_NONE"/>
+    <property name="actions" type="GdkDragAction" flags="1073742051" default-value="GDK_ACTION_NONE"/>
     <property name="surface" type="GdkSurface" flags="1073742059"/>
     <signal name="cancel" return="void" when="last">
       <param type="GdkDragCancelReason"/>
@@ -367,12 +367,17 @@
     <member name="GDK_AXIS_FLAG_SLIDER" nick="slider" value="2048"/>
   </flags>
   <flags name="GdkDragAction" get-type="gdk_drag_action_get_type">
+    <member name="GDK_ACTION_NONE" nick="none" value="0"/>
     <member name="GDK_ACTION_COPY" nick="copy" value="1"/>
     <member name="GDK_ACTION_MOVE" nick="move" value="2"/>
     <member name="GDK_ACTION_LINK" nick="link" value="4"/>
     <member name="GDK_ACTION_ASK" nick="ask" value="8"/>
   </flags>
-  <enum name="GdkMemoryFormat" get-type="gdk_memory_format_get_type">
+  <enum name="GdkScrollRelativeDirection" get-type="gdk_scroll_relative_direction_get_type">
+    <member name="GDK_SCROLL_RELATIVE_DIRECTION_IDENTICAL" nick="identical" value="0"/>
+    <member name="GDK_SCROLL_RELATIVE_DIRECTION_INVERTED" nick="inverted" value="1"/>
+    <member name="GDK_SCROLL_RELATIVE_DIRECTION_UNKNOWN" nick="unknown" value="2"/>
+  </enum>  <enum name="GdkMemoryFormat" get-type="gdk_memory_format_get_type">
     <member name="GDK_MEMORY_B8G8R8A8_PREMULTIPLIED" nick="b8g8r8a8-premultiplied" value="0"/>
     <member name="GDK_MEMORY_A8R8G8B8_PREMULTIPLIED" nick="a8r8g8b8-premultiplied" value="1"/>
     <member name="GDK_MEMORY_R8G8B8A8_PREMULTIPLIED" nick="r8g8b8a8-premultiplied" value="2"/>
@@ -406,7 +411,39 @@
     <member name="GDK_MEMORY_X8R8G8B8" nick="x8r8g8b8" value="30"/>
     <member name="GDK_MEMORY_R8G8B8X8" nick="r8g8b8x8" value="31"/>
     <member name="GDK_MEMORY_X8B8G8R8" nick="x8b8g8r8" value="32"/>
-    <member name="GDK_MEMORY_N_FORMATS" nick="n-formats" value="33"/>
+    <member name="GDK_MEMORY_G8_B8R8_420" nick="g8-b8r8-420" value="33"/>
+    <member name="GDK_MEMORY_G8_R8B8_420" nick="g8-r8b8-420" value="34"/>
+    <member name="GDK_MEMORY_G8_B8R8_422" nick="g8-b8r8-422" value="35"/>
+    <member name="GDK_MEMORY_G8_R8B8_422" nick="g8-r8b8-422" value="36"/>
+    <member name="GDK_MEMORY_G8_B8R8_444" nick="g8-b8r8-444" value="37"/>
+    <member name="GDK_MEMORY_G8_R8B8_444" nick="g8-r8b8-444" value="38"/>
+    <member name="GDK_MEMORY_G10X6_B10X6R10X6_420" nick="g10x6-b10x6r10x6-420" value="39"/>
+    <member name="GDK_MEMORY_G12X4_B12X4R12X4_420" nick="g12x4-b12x4r12x4-420" value="40"/>
+    <member name="GDK_MEMORY_G16_B16R16_420" nick="g16-b16r16-420" value="41"/>
+    <member name="GDK_MEMORY_G8_B8_R8_410" nick="g8-b8-r8-410" value="42"/>
+    <member name="GDK_MEMORY_G8_R8_B8_410" nick="g8-r8-b8-410" value="43"/>
+    <member name="GDK_MEMORY_G8_B8_R8_411" nick="g8-b8-r8-411" value="44"/>
+    <member name="GDK_MEMORY_G8_R8_B8_411" nick="g8-r8-b8-411" value="45"/>
+    <member name="GDK_MEMORY_G8_B8_R8_420" nick="g8-b8-r8-420" value="46"/>
+    <member name="GDK_MEMORY_G8_R8_B8_420" nick="g8-r8-b8-420" value="47"/>
+    <member name="GDK_MEMORY_G8_B8_R8_422" nick="g8-b8-r8-422" value="48"/>
+    <member name="GDK_MEMORY_G8_R8_B8_422" nick="g8-r8-b8-422" value="49"/>
+    <member name="GDK_MEMORY_G8_B8_R8_444" nick="g8-b8-r8-444" value="50"/>
+    <member name="GDK_MEMORY_G8_R8_B8_444" nick="g8-r8-b8-444" value="51"/>
+    <member name="GDK_MEMORY_G8B8G8R8_422" nick="g8b8g8r8-422" value="52"/>
+    <member name="GDK_MEMORY_G8R8G8B8_422" nick="g8r8g8b8-422" value="53"/>
+    <member name="GDK_MEMORY_R8G8B8G8_422" nick="r8g8b8g8-422" value="54"/>
+    <member name="GDK_MEMORY_B8G8R8G8_422" nick="b8g8r8g8-422" value="55"/>
+    <member name="GDK_MEMORY_X6G10_X6B10_X6R10_420" nick="x6g10-x6b10-x6r10-420" value="56"/>
+    <member name="GDK_MEMORY_X6G10_X6B10_X6R10_422" nick="x6g10-x6b10-x6r10-422" value="57"/>
+    <member name="GDK_MEMORY_X6G10_X6B10_X6R10_444" nick="x6g10-x6b10-x6r10-444" value="58"/>
+    <member name="GDK_MEMORY_X4G12_X4B12_X4R12_420" nick="x4g12-x4b12-x4r12-420" value="59"/>
+    <member name="GDK_MEMORY_X4G12_X4B12_X4R12_422" nick="x4g12-x4b12-x4r12-422" value="60"/>
+    <member name="GDK_MEMORY_X4G12_X4B12_X4R12_444" nick="x4g12-x4b12-x4r12-444" value="61"/>
+    <member name="GDK_MEMORY_G16_B16_R16_420" nick="g16-b16-r16-420" value="62"/>
+    <member name="GDK_MEMORY_G16_B16_R16_422" nick="g16-b16-r16-422" value="63"/>
+    <member name="GDK_MEMORY_G16_B16_R16_444" nick="g16-b16-r16-444" value="64"/>
+    <member name="GDK_MEMORY_N_FORMATS" nick="n-formats" value="65"/>
   </enum>  <enum name="GdkEventType" get-type="gdk_event_type_get_type">
     <member name="GDK_DELETE" nick="delete" value="0"/>
     <member name="GDK_MOTION_NOTIFY" nick="motion-notify" value="1"/>
@@ -437,7 +474,8 @@
     <member name="GDK_PAD_STRIP" nick="pad-strip" value="26"/>
     <member name="GDK_PAD_GROUP_MODE" nick="pad-group-mode" value="27"/>
     <member name="GDK_TOUCHPAD_HOLD" nick="touchpad-hold" value="28"/>
-    <member name="GDK_EVENT_LAST" nick="event-last" value="29"/>
+    <member name="GDK_PAD_DIAL" nick="pad-dial" value="29"/>
+    <member name="GDK_EVENT_LAST" nick="event-last" value="30"/>
   </enum>  <enum name="GdkTouchpadGesturePhase" get-type="gdk_touchpad_gesture_phase_get_type">
     <member name="GDK_TOUCHPAD_GESTURE_PHASE_BEGIN" nick="begin" value="0"/>
     <member name="GDK_TOUCHPAD_GESTURE_PHASE_UPDATE" nick="update" value="1"/>
@@ -555,7 +593,17 @@
     <member name="GDK_TITLEBAR_GESTURE_DOUBLE_CLICK" nick="double-click" value="1"/>
     <member name="GDK_TITLEBAR_GESTURE_RIGHT_CLICK" nick="right-click" value="2"/>
     <member name="GDK_TITLEBAR_GESTURE_MIDDLE_CLICK" nick="middle-click" value="3"/>
-  </enum>  <class name="GdkGLContext" get-type="gdk_gl_context_get_type" parents="GdkDrawContext,GObject" abstract="1">
+  </enum>  <flags name="GdkToplevelCapabilities" get-type="gdk_toplevel_capabilities_get_type">
+    <member name="GDK_TOPLEVEL_CAPABILITIES_EDGE_CONSTRAINTS" nick="edge-constraints" value="1"/>
+    <member name="GDK_TOPLEVEL_CAPABILITIES_INHIBIT_SHORTCUTS" nick="inhibit-shortcuts" value="2"/>
+    <member name="GDK_TOPLEVEL_CAPABILITIES_TITLEBAR_GESTURES" nick="titlebar-gestures" value="4"/>
+    <member name="GDK_TOPLEVEL_CAPABILITIES_WINDOW_MENU" nick="window-menu" value="8"/>
+    <member name="GDK_TOPLEVEL_CAPABILITIES_MAXIMIZE" nick="maximize" value="16"/>
+    <member name="GDK_TOPLEVEL_CAPABILITIES_FULLSCREEN" nick="fullscreen" value="32"/>
+    <member name="GDK_TOPLEVEL_CAPABILITIES_MINIMIZE" nick="minimize" value="64"/>
+    <member name="GDK_TOPLEVEL_CAPABILITIES_LOWER" nick="lower" value="128"/>
+  </flags>
+  <class name="GdkGLContext" get-type="gdk_gl_context_get_type" parents="GdkDrawContext,GObject" abstract="1">
     <property name="allowed-apis" type="GdkGLAPI" flags="1073742051" default-value="GDK_GL_API_GL | GDK_GL_API_GLES"/>
     <property name="api" type="GdkGLAPI" flags="1073742049" default-value="0"/>
     <property name="shared-context" type="GdkGLContext" flags="-2147483413"/>
@@ -611,9 +659,11 @@
   <boxed name="GdkToplevelLayout" get-type="gdk_toplevel_layout_get_type"/>
   <interface name="GdkToplevel" get-type="gdk_toplevel_get_type">
     <prerequisite name="GdkSurface"/>
+    <property name="capabilities" type="GdkToplevelCapabilities" flags="1073741825" default-value="0"/>
     <property name="decorated" type="gboolean" flags="1073741827" default-value="FALSE"/>
     <property name="deletable" type="gboolean" flags="1073741827" default-value="FALSE"/>
     <property name="fullscreen-mode" type="GdkFullscreenMode" flags="1073741827" default-value="GDK_FULLSCREEN_ON_CURRENT_MONITOR"/>
+    <property name="gravity" type="GdkGravity" flags="1073741827" default-value="GDK_GRAVITY_NORTH_EAST"/>
     <property name="icon-list" type="gpointer" flags="1073741827"/>
     <property name="modal" type="gboolean" flags="1073741827" default-value="FALSE"/>
     <property name="shortcuts-inhibited" type="gboolean" flags="1073741825" default-value="FALSE"/>
@@ -626,7 +676,6 @@
     </signal>
   </interface>
   <class name="GdkVulkanContext" get-type="gdk_vulkan_context_get_type" parents="GdkDrawContext,GObject" abstract="1">
-    <implements name="GInitable"/>
     <signal name="images-updated" return="void" when="last">
     </signal>
   </class>

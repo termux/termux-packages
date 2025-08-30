@@ -1,8 +1,8 @@
---- a/gdk/wayland/gdkdisplay-wayland.c
-+++ b/gdk/wayland/gdkdisplay-wayland.c
-@@ -89,6 +89,65 @@
- #define XDG_ACTIVATION_VERSION   1
- #endif
+--- a/gdk/wayland/gdkshm.c
++++ b/gdk/wayland/gdkshm.c
+@@ -31,6 +31,65 @@
+ 
+ /* {{{ Shm buffer handling */
  
 +static int shm_open(const char *name, int oflag, mode_t mode) {
 +    size_t namelen;
@@ -63,6 +63,6 @@
 +    return unlink(fname);
 +}
 +
- static void _gdk_wayland_display_load_cursor_theme (GdkWaylandDisplay *display_wayland);
+ static const cairo_user_data_key_t gdk_wayland_shm_surface_cairo_key;
  
- G_DEFINE_TYPE (GdkWaylandDisplay, gdk_wayland_display, GDK_TYPE_DISPLAY)
+ typedef struct _GdkWaylandCairoSurfaceData {
