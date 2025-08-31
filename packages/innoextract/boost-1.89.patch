@@ -1,0 +1,33 @@
+From 882796e0e9b134b02deeaae4bbfe92920adb6fe2 Mon Sep 17 00:00:00 2001
+From: Michael Cho <michael@michaelcho.dev>
+Date: Mon, 11 Aug 2025 12:06:17 -0400
+Subject: [PATCH] CMake: Fix build with Boost 1.89.0
+
+---
+ CMakeLists.txt | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 69956105..dbbe0d34 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -173,13 +173,17 @@ else()
+ 	set(INNOEXTRACT_HAVE_LZMA 0)
+ endif()
+ 
+-find_package(Boost REQUIRED COMPONENTS
++set(BOOST_REQUIRED_COMPONENTS
+ 	iostreams
+ 	filesystem
+ 	date_time
+-	system
+ 	program_options
+ )
++find_package(Boost REQUIRED COMPONENTS ${BOOST_REQUIRED_COMPONENTS})
++if(Boost_MAJOR_VERSION EQUAL 1 AND Boost_MINOR_VERSION LESS 69)
++	list(APPEND BOOST_REQUIRED_COMPONENTS system)
++	find_package(Boost REQUIRED COMPONENTS ${BOOST_REQUIRED_COMPONENTS})
++endif()
+ list(APPEND LIBRARIES ${Boost_LIBRARIES})
+ link_directories(${Boost_LIBRARY_DIRS})
+ include_directories(SYSTEM ${Boost_INCLUDE_DIR})

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Useful C++ classes and routines such as argument parser,
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.30.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/Martchus/cpp-utilities/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9d594108109de7cd2dbb399451e69f68851a7f983e2671a0a4766211c380d1b4
 TERMUX_PKG_AUTO_UPDATE=true
