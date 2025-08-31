@@ -4,11 +4,10 @@ TERMUX_PKG_LICENSE="BSL-1.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Never forget to always bump revision of reverse dependencies and rebuild them
 # when bumping version.
-TERMUX_PKG_VERSION="1:1.87.0"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="1:1.89.0"
 _VERSION="${TERMUX_PKG_VERSION:2}"
 TERMUX_PKG_SRCURL="https://archives.boost.io/release/${_VERSION}/source/boost_${_VERSION//./_}.tar.bz2"
-TERMUX_PKG_SHA256=af57be25cb4c4f4b413ed692fe378affb4352ea50fbe294a11ef548f4d527d89
+TERMUX_PKG_SHA256=85a33fa22621b4f314f8e85e1a5e2a9363d22e4f4992925d4bb3bc631b5a0c7a
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="libc++, libbz2, libiconv, liblzma, zlib, libandroid-wordexp"
 TERMUX_PKG_BUILD_DEPENDS="python"

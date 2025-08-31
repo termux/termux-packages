@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 # This specific package is for libbotan-3.
 TERMUX_PKG_VERSION="3.7.1"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://botan.randombit.net/releases/Botan-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=fc0620463461caaea8e60f06711d7e437a3ad1eebd6de4ac29c14bbd901ccd1b
 TERMUX_PKG_DEPENDS="libbz2, libc++, liblzma, libsqlite, zlib"

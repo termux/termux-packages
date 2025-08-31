@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A multiroom client-server audio player (server)"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.32.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/badaix/snapcast/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e53a62872d03521c7ce261378792f203d4073d769b362116ab02c98aa7c64008
 TERMUX_PKG_DEPENDS="libc++, libexpat, libflac, libogg, libopus, libsoxr, libvorbis, openssl"

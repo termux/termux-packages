@@ -1,0 +1,20 @@
+From 8d858deba503689567459200aa0539c2eb3cf397 Mon Sep 17 00:00:00 2001
+From: Michael Cho <michael@michaelcho.dev>
+Date: Sun, 10 Aug 2025 23:22:26 -0400
+Subject: [PATCH 1/2] Fix build with Boost 1.89.0
+
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -90,7 +90,7 @@ endif()
+ 
+ # Set BOOST_ROOT to help CMake to find the right Boost version
+ find_package(Boost 1.49.0
+-  REQUIRED date_time filesystem system iostreams regex unit_test_framework
++  REQUIRED date_time filesystem iostreams regex unit_test_framework
+   ${BOOST_PYTHON} OPTIONAL_COMPONENTS nowide)
+ 
+ # enable Boost::nowide library (for UTF8 command line args on Windows)
