@@ -1,0 +1,131 @@
+diff --git a/libcinnamon-desktop/gnome-pnp-ids.c b/libcinnamon-desktop/gnome-pnp-ids.c
+index 622bcf9..ceadf05 100644
+--- a/libcinnamon-desktop/gnome-pnp-ids.c
++++ b/libcinnamon-desktop/gnome-pnp-ids.c
+@@ -21,15 +21,25 @@
+ 
+ #include <glib-object.h>
+ #include <libcinnamon-desktop/gnome-pnp-ids.h>
++#ifdef HAVE_UDEV
+ #include <libudev.h>
++#endif
+ 
+ static void     gnome_pnp_ids_finalize     (GObject     *object);
+ 
++#ifdef HAVE_UDEV
+ struct _GnomePnpIdsPrivate
+ {
+         struct udev *udev;
+         struct udev_hwdb *hwdb;
+ };
++#else
++struct _GnomePnpIdsPrivate
++{
++        /* Empty struct when udev is not available */
++        int dummy;
++};
++#endif
+ 
+ G_DEFINE_TYPE_WITH_PRIVATE (GnomePnpIds, gnome_pnp_ids, G_TYPE_OBJECT)
+ 
+@@ -46,11 +56,15 @@ G_DEFINE_TYPE_WITH_PRIVATE (GnomePnpIds, gnome_pnp_ids, G_TYPE_OBJECT)
+ gchar *
+ gnome_pnp_ids_get_pnp_id (GnomePnpIds *pnp_ids, const gchar *pnp_id)
+ {
++#ifdef HAVE_UDEV
+         GnomePnpIdsPrivate *priv = pnp_ids->priv;
+         struct udev_list_entry *list_entry, *l;
+         char *modalias;
+         char *ret = NULL;
+-
++        
++        if (priv->hwdb == NULL)
++                return NULL;
++        
+         modalias = g_strdup_printf ("acpi:%s:", pnp_id);
+         list_entry = udev_hwdb_get_properties_list_entry(priv->hwdb, modalias, 0);
+         g_free (modalias);
+@@ -68,6 +82,10 @@ gnome_pnp_ids_get_pnp_id (GnomePnpIds *pnp_ids, const gchar *pnp_id)
+         ret = g_strdup (udev_list_entry_get_value (l));
+ 
+         return ret;
++#else
++        /* Return NULL when udev is not available */
++        return NULL;
++#endif
+ }
+ 
+ static void
+@@ -81,8 +99,12 @@ static void
+ gnome_pnp_ids_init (GnomePnpIds *pnp_ids)
+ {
+         pnp_ids->priv = gnome_pnp_ids_get_instance_private (pnp_ids);
++#ifdef HAVE_UDEV
+         pnp_ids->priv->udev = udev_new();
+         pnp_ids->priv->hwdb = udev_hwdb_new (pnp_ids->priv->udev);
++#else
++        pnp_ids->priv->dummy = 0;
++#endif
+ }
+ 
+ static void
+@@ -91,9 +113,12 @@ gnome_pnp_ids_finalize (GObject *object)
+         GnomePnpIds *pnp_ids = GNOME_PNP_IDS (object);
+         GnomePnpIdsPrivate *priv = pnp_ids->priv;
+ 
++#ifdef HAVE_UDEV
+         g_clear_pointer (&priv->udev, udev_unref);
+         g_clear_pointer (&priv->hwdb, udev_hwdb_unref);
+ 
++#endif
++        
+         G_OBJECT_CLASS (gnome_pnp_ids_parent_class)->finalize (object);
+ }
+ 
+diff --git a/meson.build b/meson.build
+index 8243a5d..b345acd 100644
+--- a/meson.build
++++ b/meson.build
+@@ -41,7 +41,7 @@ xkbconf = dependency('xkeyboard-config')
+ xkbfile = dependency('xkbfile')
+ xrandr  = dependency('xrandr',          version: '>=1.3')
+ iso_codes = dependency('iso-codes')
+-udev    = dependency('libudev')
++udev    = dependency('libudev',         required: false)
+ 
+ cinnamon_deps = [
+   gdk_pixb,
+@@ -50,7 +50,6 @@ cinnamon_deps = [
+   gtk,
+   math,
+   systemd,
+-  udev,
+   x11,
+   xext,
+   xkbconf,
+@@ -58,6 +57,10 @@ cinnamon_deps = [
+   xrandr,
+ ]
+ 
++if udev.found()
++  cinnamon_deps += udev
++endif
++
+ use_alsa = get_option('alsa')
+ 
+ xkb_base = xkbconf.get_variable(pkgconfig: 'xkb_base')
+@@ -96,6 +99,7 @@ conf.set('HAVE_GETTEXT',        true)
+ conf.set('HAVE_INTROSPECTION',  true)
+ conf.set('HAVE_SYSTEMD',        systemd.found())
+ conf.set('HAVE_TIMERFD',        cc.has_function('timerfd_create'))
++conf.set('HAVE_UDEV',           udev.found())
+ conf.set('HAVE_XLOCALE',        cc.has_header('xlocale.h'))
+ conf.set('HAVE_USELOCALE',      cc.has_function('uselocale'))
+ ################################################################################
+@@ -136,5 +140,6 @@ message('\n'.join([
+   '        Use PNP files:                ' + pnp_message,
+   '        Use ALSA:                     ' + '@0@'.format(use_alsa),
+   '        systemd:                      @0@'.format(systemd.found()),
++  '        udev:                         @0@'.format(udev.found()),
+   '',
+ ]))
