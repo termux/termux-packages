@@ -1,0 +1,91 @@
+diff --git a/src/eggshell.cc b/src/eggshell.cc
+index b0926eb..83881ed 100644
+--- a/src/eggshell.cc
++++ b/src/eggshell.cc
+@@ -58,14 +58,14 @@ egg_shell (const char *shell)
+ #ifndef G_OS_WIN32
+ 	struct passwd *pw;
+ 	int i;
+-	static const char shells [][14] = {
++	static const char shells [][64] = {
+ 		/* Note that on some systems shells can also
+ 		 * be installed in /usr/bin */
+-		"/bin/bash", "/usr/bin/bash",
+-		"/bin/zsh", "/usr/bin/zsh",
+-		"/bin/tcsh", "/usr/bin/tcsh",
+-		"/bin/ksh", "/usr/bin/ksh",
+-		"/bin/csh", "/bin/sh"
++		"@TERMUX_PREFIX@/bin/bash",
++		"@TERMUX_PREFIX@/bin/zsh",
++		"@TERMUX_PREFIX@/bin/tcsh",
++		"@TERMUX_PREFIX@/bin/ksh",
++		"@TERMUX_PREFIX@/bin/sh"
+ 	};
+ 
+ 	if (geteuid () == getuid () &&
+diff --git a/src/terminal-default.cc b/src/terminal-default.cc
+index 3788d54..ecdd46e 100644
+--- a/src/terminal-default.cc
++++ b/src/terminal-default.cc
+@@ -156,7 +156,7 @@ xte_data_check(char const* name,
+     if (xte_data_check_one(path, full))
+       return true;
+   }
+-  if (!g_str_equal(TERM_PREFIX, "/usr/local")) {
++  if (!g_str_equal(TERM_PREFIX, "@TERMUX_PREFIX@/local")) {
+     gs_free auto path = g_build_filename(TERM_PREFIX,
+                                          "local",
+                                          "share",
+@@ -203,15 +203,15 @@ xte_data_check(char const* name,
+     if (xte_data_check_one(path, full))
+       return true;
+   }
+-  if (!g_str_equal(TERM_PREFIX, "/usr")) {
+-    gs_free auto path = g_build_filename("/usr", "share",
++  if (!g_str_equal(TERM_PREFIX, "@TERMUX_PREFIX@")) {
++    gs_free auto path = g_build_filename("@TERMUX_PREFIX@", "share",
+                                          XTE_CONFIG_DIRNAME,
+                                          name,
+                                          nullptr);
+     if (xte_data_check_one(path, full))
+       return true;
+ 
+-    gs_free auto path2 = g_build_filename("/usr",
++    gs_free auto path2 = g_build_filename("@TERMUX_PREFIX@",
+                                           "share",
+                                           "applications",
+                                           name,
+@@ -432,9 +432,9 @@ xte_config_get_default(char const* native_name)
+   auto const user_dir = g_get_user_config_dir();
+   if (auto term = xte_config_get_default_for_path_and_desktops(user_dir, desktops, native_name))
+     return term;
+-  if (auto term = xte_config_get_default_for_path_and_desktops("/etc/xdg", desktops, native_name))
++  if (auto term = xte_config_get_default_for_path_and_desktops("@TERMUX_PREFIX@/etc/xdg", desktops, native_name))
+     return term;
+-  if (auto term = xte_config_get_default_for_path_and_desktops("/usr/etc/xdg", desktops, native_name))
++  if (auto term = xte_config_get_default_for_path_and_desktops("@TERMUX_PREFIX@/etc/xdg", desktops, native_name))
+     return term;
+ 
+   return nullptr;
+diff --git a/src/terminal-util.cc b/src/terminal-util.cc
+index 8ea4ef6..65d2cff 100644
+--- a/src/terminal-util.cc
++++ b/src/terminal-util.cc
+@@ -708,7 +708,7 @@ terminal_util_get_etc_shells (void)
+   char *str, *nl, *end;
+   GPtrArray *arr;
+ 
+-  if (!g_file_get_contents ("/etc/shells", &contents, &len, &err) || len == 0) {
++  if (!g_file_get_contents ("@TERMUX_PREFIX@/etc/shells", &contents, &len, &err) || len == 0) {
+     /* Defaults as per man:getusershell(3) */
+     char *default_shells[3] = {
+       (char*) "/bin/sh",
+@@ -1507,7 +1507,7 @@ terminal_util_find_program_in_path (const char *path,
+        * what to search if PATH is unset. POSIX may, dunno.
+        */
+ 
+-      path = "/bin:/usr/bin:.";
++      path = "@TERMUX_PREFIX@/bin:.";
+     }
+ 
+   len = strlen (program) + 1;
