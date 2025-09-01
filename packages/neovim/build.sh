@@ -73,6 +73,19 @@ termux_step_host_build() {
 
 termux_step_pre_configure() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLUA_MATH_LIBRARY=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libm.so"
+
+	# neovim has a weird CMake file that attempts to preprocess generated headers
+	# using the NDK Clang, but without ever adding the necessary --target argument
+	# to its commands for cross-preprocessing, so that must be done manually
+	local target="$CCTERMUX_HOST_PLATFORM"
+	if [[ "$TERMUX_ARCH" == "arm" ]]; then
+		target="armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL"
+	fi
+	patch="$TERMUX_PKG_BUILDER_DIR/add-target-to-gen-preprocessing.diff"
+	echo "Applying patch: $(basename "$patch")"
+	test -f "$patch" && sed \
+		-e "s%\@TARGET\@%${target}%g" \
+		"$patch" | patch --silent -p1
 }
 
 termux_step_post_make_install() {
