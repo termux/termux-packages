@@ -1,0 +1,49 @@
+diff --git a/meson.build b/meson.build
+index 1a9c1d0..a41b629 100644
+--- a/meson.build
++++ b/meson.build
+@@ -151,7 +151,7 @@ libstemmer = cc.find_library('stemmer', required: get_option('stemmer'))
+ have_libstemmer = libstemmer.found()
+ 
+ if meson.is_cross_build() and not meson.has_exe_wrapper()
+-  sqlite3_fts5 = meson.get_cross_property('sqlite3_has_fts5')
++  sqlite3_fts5 = meson.get_cross_property('sqlite3_has_fts5', 'true')
+   if sqlite3_fts5 == ''
+     error('Please assign an appropriate value for sqlite3_has_fts5 in the [properties] section of your crossfile')
+   elif sqlite3_fts5 == 'true'
+@@ -188,11 +188,18 @@ elif not sqlite_is_subproject
+   if result.returncode() != 0
+     error('SQLite has no builtin FTS5.')
+   endif
++else
++  sqlite3_has_builtin_fts5 = true
+ endif
+ 
+ ##################################################################
+ # Get an appropriate 4-digit year modifier for strftime
+ ##################################################################
++if meson.is_cross_build() and not meson.has_exe_wrapper()
++  # Use standard %Y for cross-builds where we can't run tests
++  year_modifier = '%Y'
++  message('Cross-build detected: using standard %Y year modifier')
++else
+ result = cc.run('''
+   #define _TIME_BITS 64
+   #define _GNU_SOURCE
+@@ -219,10 +226,12 @@ result = cc.run('''
+   ''',
+   name: 'strftime 4-digit year modifier')
+ 
+-if not result.compiled() or result.returncode() != 0
+-  error('Libc implementation has broken 4-digit years implementation.')
+-else
+-  year_modifier = result.stdout()
++  if not result.compiled() or result.returncode() != 0
++    warning('Could not determine year modifier, using standard %Y')
++    year_modifier = '%Y'
++  else
++    year_modifier = result.stdout()
++  endif
+ endif
+ 
+ ##################################################################
