@@ -1,0 +1,178 @@
+diff --git a/meson.build b/meson.build
+index a0e558c..ce88137 100644
+--- a/meson.build
++++ b/meson.build
+@@ -28,7 +28,6 @@ cinn_menu   = dependency('libcinnamon-menu-3.0')
+ gtk         = dependency('gtk+-3.0',        version: '>=3.16.0')
+ glib        = dependency('glib-2.0',        version: '>=2.44.0')
+ gio_unix    = dependency('gio-unix-2.0',    version: '>=2.44.0')
+-gudev_dep   = dependency('gudev-1.0',       version: '>= 232')
+ libgnomekbd = dependency('libgnomekbd',     version: '>=3.0.0')
+ libgnomekbdui=dependency('libgnomekbdui',   version: '>=3.0.0')
+ libnotify   = dependency('libnotify',       version: '>=0.7.3')
+@@ -43,6 +42,14 @@ else
+ endif
+ config.set10('HAVE_POLKIT', have_polkit)
+ 
++have_udev = get_option('udev')
++if have_udev
++  gudev_dep = dependency('gudev-1.0', version: '>= 232')
++else
++  gudev_dep = dependency('', required: false)
++endif
++config.set('HAVE_UDEV', have_udev) 
++
+ config.set('HAVE_X11_EXTENSIONS_XKB_H', cc.has_header('X11/extensions/XKB.h'))
+ 
+ ###############################################################################
+@@ -187,6 +194,7 @@ final_message = [ '',
+   '** Colord support (Color management panel)         : @0@'.format(colord.found()),
+   '** Wacom support (Wacom panel)                     : @0@'.format(libwacom.found()),
+   '** Polkit support                                  : @0@'.format(have_polkit),
++  '** Udev support                                    : @0@'.format(have_udev),
+   '** Wayland support                                 : @0@'.format(cc.has_header('gdk/gdkwayland.h', dependencies: gtk)),
+   '',
+ ]
+diff --git a/meson_options.txt b/meson_options.txt
+index 89ecaeb..3bd86c3 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -6,3 +6,4 @@ option('wacom',         type: 'boolean', value: 'true', description: 'Wacom Mana
+ option('deprecated_warnings', type : 'boolean', value : false,
+        description: 'Show compiler warnings about deprecated features')
+ option('polkit',        type: 'boolean', value: true,   description: 'Enable polkit support')
++option('udev',          type: 'boolean', value: 'true',   description: 'Enable polkit support')
+diff --git a/panels/common/csd-device-manager.c b/panels/common/csd-device-manager.c
+index d10645a..08ba7e2 100644
+--- a/panels/common/csd-device-manager.c
++++ b/panels/common/csd-device-manager.c
+@@ -22,7 +22,9 @@
+ #include "config.h"
+ 
+ #include <string.h>
++#ifdef HAVE_UDEV
+ #include <gudev/gudev.h>
++#endif
+ 
+ #include "csd-device-manager.h"
+ #include "csd-common-enums.h"
+@@ -52,7 +54,9 @@ typedef struct
+ {
+         GObject parent_instance;
+ 	GHashTable *devices;
++    #ifdef HAVE_UDEV
+ 	GUdevClient *udev_client;
++    #endif
+ } CsdDeviceManagerPrivate;
+ 
+ enum {
+@@ -73,6 +77,7 @@ enum {
+ };
+ 
+ /* Index matches CsdDeviceType */
++#ifdef HAVE_UDEV
+ const gchar *udev_ids[] = {
+ 	"ID_INPUT_MOUSE",
+ 	"ID_INPUT_KEYBOARD",
+@@ -81,6 +86,7 @@ const gchar *udev_ids[] = {
+ 	"ID_INPUT_TOUCHSCREEN",
+ 	"ID_INPUT_TABLET_PAD",
+ };
++#endif
+ 
+ static guint signals[N_SIGNALS] = { 0 };
+ 
+@@ -254,9 +260,10 @@ csd_device_manager_finalize (GObject *object)
+ {
+ 	CsdDeviceManager *manager = CSD_DEVICE_MANAGER (object);
+         CsdDeviceManagerPrivate *priv = csd_device_manager_get_instance_private (manager);
+-
+-	g_hash_table_destroy (priv->devices);
++    #ifdef HAVE_UDEV
++	g_hash_table_destroy (priv->devices); 
+ 	g_object_unref (priv->udev_client);
++    #endif
+ 
+ 	G_OBJECT_CLASS (csd_device_manager_parent_class)->finalize (object);
+ }
+@@ -265,6 +272,7 @@ static GList *
+ csd_device_manager_real_list_devices (CsdDeviceManager *manager,
+ 				      CsdDeviceType	type)
+ {
++#ifdef HAVE_UDEV
+         CsdDeviceManagerPrivate *priv = csd_device_manager_get_instance_private (manager);
+ 	CsdDeviceType device_type;
+ 	GList *devices = NULL;
+@@ -281,12 +289,16 @@ csd_device_manager_real_list_devices (CsdDeviceManager *manager,
+ 	}
+ 
+ 	return devices;
++#else
++	return NULL;
++#endif
+ }
+ 
+ static CsdDevice *
+ csd_device_manager_real_lookup_device (CsdDeviceManager *manager,
+                                        GdkDevice	*gdk_device)
+ {
++#ifdef HAVE_UDEV
+ 	CsdDeviceManagerPrivate *priv = csd_device_manager_get_instance_private (manager);
+ 	GdkDisplay *display = gdk_device_get_display (gdk_device);
+ 	const gchar *node_path = NULL;
+@@ -314,6 +326,9 @@ csd_device_manager_real_lookup_device (CsdDeviceManager *manager,
+ 	}
+ 
+ 	return NULL;
++#else
++	return NULL;
++#endif
+ }
+ 
+ static void
+@@ -354,6 +369,7 @@ csd_device_manager_class_init (CsdDeviceManagerClass *klass)
+ 			      CSD_TYPE_DEVICE | G_SIGNAL_TYPE_STATIC_SCOPE);
+ }
+ 
++#ifdef HAVE_UDEV
+ static CsdDeviceType
+ udev_device_get_device_type (GUdevDevice *device)
+ {
+@@ -469,10 +485,12 @@ udev_event_cb (GUdevClient	*client,
+ 		remove_device (manager, device);
+ 	}
+ }
++#endif
+ 
+ static void
+ csd_device_manager_init (CsdDeviceManager *manager)
+ {
++#ifdef HAVE_UDEV
+         CsdDeviceManagerPrivate *priv = csd_device_manager_get_instance_private (manager);
+ 	const gchar *subsystems[] = { "input", NULL };
+ 	g_autoptr(GList) devices = NULL;
+@@ -495,6 +513,7 @@ csd_device_manager_init (CsdDeviceManager *manager)
+ 		if (device_is_evdev (device))
+ 			add_device (manager, device);
+ 	}
++#endif
+ }
+ 
+ CsdDeviceManager *
+diff --git a/panels/common/meson.build b/panels/common/meson.build
+index 0cf7b69..c95d332 100644
+--- a/panels/common/meson.build
++++ b/panels/common/meson.build
+@@ -60,7 +60,11 @@ csd_sources = [
+ 
+ sources = common_sources + files(csd_sources)
+ 
+-deps = [ gudev_dep, glib, gio_unix, gtk, cinn_desktop ]
++deps = [ glib, gio_unix, gtk, cinn_desktop ]
++
++if have_udev
++  deps += gudev_dep
++endif
+ 
+ libdevice = static_library(
+   'device',
