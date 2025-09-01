@@ -1,0 +1,13 @@
+diff --git a/clutter/clutter/cally/cally-text.c b/clutter/clutter/cally/cally-text.c
+index 2b34f09..bdf849f 100644
+--- a/clutter/clutter/cally/cally-text.c
++++ b/clutter/clutter/cally/cally-text.c
+@@ -1866,7 +1866,7 @@ static gint
+ _cally_atk_attribute_lookup_func (gconstpointer data,
+                                   gconstpointer user_data)
+ {
+-    AtkTextAttribute attr = (AtkTextAttribute) user_data;
++    AtkTextAttribute attr = (AtkTextAttribute)(intptr_t) user_data;
+     AtkAttribute *at = (AtkAttribute *) data;
+     if (!g_strcmp0 (at->name, atk_text_attribute_get_name (attr)))
+         return 0;
