@@ -1,0 +1,101 @@
+diff --git a/meson.build b/meson.build
+index 992b5a3..a0e558c 100644
+--- a/meson.build
++++ b/meson.build
+@@ -33,9 +33,15 @@ libgnomekbd = dependency('libgnomekbd',     version: '>=3.0.0')
+ libgnomekbdui=dependency('libgnomekbdui',   version: '>=3.0.0')
+ libnotify   = dependency('libnotify',       version: '>=0.7.3')
+ libx11      = dependency('x11')
+-polkit_gobj = dependency('polkit-gobject-1',version: '>=0.103')
+ libxklavier = dependency('libxklavier',     version: '>=5.1')
+ upower_glib_dep = dependency('upower-glib', version: '>= 0.99.8')
++have_polkit = get_option('polkit')
++if have_polkit
++  polkit_gobj = dependency('polkit-gobject-1', version: '>=0.103')
++else
++  polkit_gobj = dependency('', required: false)
++endif
++config.set10('HAVE_POLKIT', have_polkit)
+ 
+ config.set('HAVE_X11_EXTENSIONS_XKB_H', cc.has_header('X11/extensions/XKB.h'))
+ 
+@@ -180,6 +186,7 @@ final_message = [ '',
+   '** ModemManager support                            : @0@'.format(modemmanager.found()),
+   '** Colord support (Color management panel)         : @0@'.format(colord.found()),
+   '** Wacom support (Wacom panel)                     : @0@'.format(libwacom.found()),
++  '** Polkit support                                  : @0@'.format(have_polkit),
+   '** Wayland support                                 : @0@'.format(cc.has_header('gdk/gdkwayland.h', dependencies: gtk)),
+   '',
+ ]
+diff --git a/meson_options.txt b/meson_options.txt
+index f437836..89ecaeb 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -4,4 +4,5 @@ option('networkmanager',type: 'boolean', value: 'true', description: 'NetworkMan
+ option('onlineaccounts',type: 'boolean', value: 'true', description: 'Online Accounts support')
+ option('wacom',         type: 'boolean', value: 'true', description: 'Wacom Management support')
+ option('deprecated_warnings', type : 'boolean', value : false,
+-       description: 'Show compiler warnings about deprecated features')
+\ No newline at end of file
++       description: 'Show compiler warnings about deprecated features')
++option('polkit',        type: 'boolean', value: true,   description: 'Enable polkit support')
+diff --git a/panels/network/meson.build b/panels/network/meson.build
+index 37de3bb..01a655a 100644
+--- a/panels/network/meson.build
++++ b/panels/network/meson.build
+@@ -24,6 +24,17 @@ if modemmanager.found()
+   panel_network_sources += 'net-device-mobile.c'
+ endif
+ 
++panel_network_deps = [
++  glib,
++  gtk,
++  libnm,
++  libnma,
++  modemmanager,
++]
++
++if have_polkit
++  panel_network_deps += polkit_gobj
++endif
+ 
+ panel_network = shared_library('network',
+   panel_network_sources,
+@@ -34,15 +45,7 @@ panel_network = shared_library('network',
+   link_with: [
+     libcinnamon_control_center,
+   ],
+-  dependencies: [
+-    glib,
+-    gtk,
+-    libnm,
+-    libnma,
+-    modemmanager,
+-    polkit_gobj,
+-  ],
+-
++  dependencies: panel_network_deps,
+   install: true,
+   install_dir: panels_dir
+ )
+@@ -55,4 +58,4 @@ install_data('network.ui',
+ install_data(
+   'cinnamon-network-panel.desktop',
+   install_dir: desktop_dir
+-)
+\ No newline at end of file
++)
+diff --git a/panels/network/net-device-wifi.c b/panels/network/net-device-wifi.c
+index af567ae..270081a 100644
+--- a/panels/network/net-device-wifi.c
++++ b/panels/network/net-device-wifi.c
+@@ -27,7 +27,9 @@
+ #include <netinet/ether.h>
+ 
+ #include <NetworkManager.h>
++#ifdef HAVE_POLKIT
+ #include <polkit/polkit.h>
++#endif
+ 
+ #include "shell/list-box-helper.h"
+ #include "shell/hostname-helper.h"
