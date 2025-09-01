@@ -1,0 +1,54 @@
+diff --git a/debian/rules b/debian/rules
+index 6849c55..8970359 100755
+--- a/debian/rules
++++ b/debian/rules
+@@ -8,7 +8,7 @@ export DPKG_GENSYMBOLS_CHECK_LEVEL = 2
+ 
+ override_dh_auto_configure:
+ 	dh_auto_configure -- \
+-		--libexecdir=/usr/libexec \
++		--libexecdir=@TERMUX_PREFIX@/libexec \
+ 		-D docs=true \
+ 		-D deprecated_warnings=false \
+ 		-D debian_derivative=true \
+diff --git a/libxapp/xapp-icon-chooser-dialog.c b/libxapp/xapp-icon-chooser-dialog.c
+index 13257e0..2de280f 100644
+--- a/libxapp/xapp-icon-chooser-dialog.c
++++ b/libxapp/xapp-icon-chooser-dialog.c
+@@ -1951,7 +1951,7 @@ on_browse_button_clicked (GtkButton *button,
+     }
+     else
+     {
+-        gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (file_dialog), "/usr/share/icons/");
++        gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (file_dialog), "@TERMUX_PREFIX@/share/icons/");
+     }
+ 
+     file_filter = gtk_file_filter_new ();
+diff --git a/scripts/pastebin b/scripts/pastebin
+index 1225df3..00803e4 100755
+--- a/scripts/pastebin
++++ b/scripts/pastebin
+@@ -22,8 +22,8 @@ else:
+         content = str_args
+ 
+ if content != "":
+-    if os.path.exists('/usr/bin/fpaste'):
+-        p = subprocess.Popen(['/usr/bin/fpaste'], stdin=subprocess.PIPE)
++    if os.path.exists('@TERMUX_PREFIX@/bin/fpaste'):
++        p = subprocess.Popen(['@TERMUX_PREFIX@/bin/fpaste'], stdin=subprocess.PIPE)
+         p.communicate(content.encode("UTF-8"))
+     else:
+         p = subprocess.Popen(['nc', 'termbin.com', '9999'], stdin=subprocess.PIPE)
+diff --git a/scripts/upload-system-info b/scripts/upload-system-info
+index cdb4ae3..c5514d1 100755
+--- a/scripts/upload-system-info
++++ b/scripts/upload-system-info
+@@ -4,7 +4,7 @@ import subprocess, os
+ 
+ try:
+     inxi = subprocess.Popen(['inxi', '-Fxxrzc0'], stdout=subprocess.PIPE)
+-    pastebin = subprocess.Popen(['/usr/bin/pastebin'], stdin=inxi.stdout, stdout=subprocess.PIPE)
++    pastebin = subprocess.Popen(['@TERMUX_PREFIX@/bin/pastebin'], stdin=inxi.stdout, stdout=subprocess.PIPE)
+     inxi.stdout.close()
+     output = pastebin.communicate()[0]
+     output = output.split()[0] # if we have more than one URL, only use the first one
