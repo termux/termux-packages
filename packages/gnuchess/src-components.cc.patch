@@ -1,6 +1,6 @@
---- a/src/components.cc
-+++ b/src/components.cc
-@@ -74,6 +74,37 @@ int pipefd_e2a[2];
+--- ./src/components.cc.orig	2025-05-17 10:43:35.000000000 +0000
++++ ./src/components.cc	2025-09-01 07:23:26.417318926 +0000
+@@ -75,6 +75,37 @@
    return 0;
  }*/
  
@@ -38,7 +38,7 @@
  /*
   * Starts the input on a separate thread.
   */
-@@ -87,7 +118,17 @@ void InitInputThread()
+@@ -88,7 +119,17 @@
    }
  
    /* Start input thread */
@@ -56,14 +56,35 @@
  }
  
  /*
-@@ -171,6 +212,10 @@ void TerminateAdapterEngine()
+@@ -161,10 +202,18 @@
  
+ void TerminateAdapterEngine()
+ {
+-  pthread_cancel( engine_thread );
++#ifndef __ANDROID__
++    pthread_cancel( engine_thread );
++#else
++    pthread_kill( engine_thread, SIGUSR2 );
++#endif
+   pthread_join( engine_thread, NULL );
+   if ( ! (flags & UCI ) ) {
++#ifndef __ANDROID__
+     pthread_cancel( adapter_thread );
++#else
++    pthread_kill( adapter_thread, SIGUSR2 );
++#endif
+     pthread_join( adapter_thread, NULL );
+   }
+ }
+@@ -172,7 +221,11 @@
  void TerminateInput()
  {
+   if ( ! (flags & UCI ) ) {
 +#ifndef __ANDROID__
-   pthread_cancel( input_thread );
+     pthread_cancel( input_thread );
 +#else
-+  pthread_kill( input_thread, SIGUSR2 );
++    pthread_kill( input_thread, SIGUSR2 );
 +#endif
-   pthread_join( input_thread, NULL );
+     pthread_join( input_thread, NULL );
+   }
  }
