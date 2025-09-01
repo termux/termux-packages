@@ -1,0 +1,17 @@
+diff --git a/install-scripts/add_symlink.py b/install-scripts/add_symlink.py
+index 1f03dea..6f8518c 100644
+--- a/install-scripts/add_symlink.py
++++ b/install-scripts/add_symlink.py
+@@ -9,10 +9,11 @@ dest = os.environ.get('DESTDIR')
+ if dest:
+     link_path = os.path.join(dest, link_path)
+ else:
+-    link_path = os.path.join('/', link_path)
++    link_path = os.path.join('@TERMUX_PREFIX@', link_path)
+ 
+ if os.path.lexists(link_path):
+     print('%s already exists, skipping symlink creation' % link_path)
+ else:
+     print('adding symlink %s...' % link_path)
++    os.makedirs(os.path.dirname(link_path), exist_ok=True)
+     subprocess.call(['ln', '-s', 'applications-merged', link_path])

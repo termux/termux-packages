@@ -1,0 +1,86 @@
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_calendar.py b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_calendar.py
+index 2557d07..5254441 100755
+--- a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_calendar.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_calendar.py
+@@ -7,8 +7,15 @@ import pytz
+ import gi
+ import datetime
+ import os
+-gi.require_version('TimezoneMap', '1.0')
+-from gi.repository import TimezoneMap
++
++try:
++    gi.require_version('TimezoneMap', '1.0')
++    from gi.repository import TimezoneMap
++    HAS_TIMEZONEMAP = True
++except (ValueError, ImportError):
++    print("TimezoneMap not available, disabling map widget")
++    HAS_TIMEZONEMAP = False
++    TimezoneMap = None
+ 
+ class Module:
+     name = "calendar"
+@@ -27,11 +34,13 @@ class Module:
+             self.sidePage.add_widget(page)
+ 
+             settings = page.add_section(_("Date and Time"))
+-            widget = SettingsWidget()
+-            self.tz_map = TimezoneMap.TimezoneMap.new()
+-            self.tz_map.set_size_request(-1, 205)
+-            widget.pack_start(self.tz_map, True, True, 0)
+-            settings.add_row(widget)
++
++            if HAS_TIMEZONEMAP:
++                widget = SettingsWidget()
++                self.tz_map = TimezoneMap.TimezoneMap.new()
++                self.tz_map.set_size_request(-1, 205)
++                widget.pack_start(self.tz_map, True, True, 0)
++                settings.add_row(widget)
+ 
+             self.tz_selector = TimeZoneSelector()
+             settings.add_row(self.tz_selector)
+@@ -57,7 +66,7 @@ class Module:
+             days = [[7, _("Use locale default")], [0, _("Sunday")], [1, _("Monday")]]
+             settings.add_row(GSettingsComboBox(_("First day of week"), "org.cinnamon.desktop.interface", "first-day-of-week", days, valtype=int))
+ 
+-            if os.path.exists('/usr/sbin/ntpd'):
++            if os.path.exists('@TERMUX_PREFIX@/sbin/ntpd'):
+                 print('using csd backend')
+                 self.proxy_handler = CsdDBusProxyHandler(self._on_proxy_ready)
+             else:
+@@ -69,11 +78,13 @@ class Module:
+     def _on_proxy_ready(self):
+         self.zone = self.proxy_handler.get_timezone()
+         if self.zone is None:
+-            self.tz_map.set_sensitive(False)
++            if HAS_TIMEZONEMAP:
++                self.tz_map.set_sensitive(False)
+             self.tz_selector.set_sensitive(False)
+         else:
+-            self.tz_map.set_timezone(self.zone)
+-            self.tz_map.connect('location-changed', self.on_map_location_changed)
++            if HAS_TIMEZONEMAP:
++                self.tz_map.set_timezone(self.zone)
++                self.tz_map.connect('location-changed', self.on_map_location_changed)
+             self.tz_selector.set_timezone(self.zone)
+             self.tz_selector.connect('timezone-changed', self.on_selector_location_changed)
+         can_use_ntp, is_using_ntp = self.proxy_handler.get_ntp()
+@@ -99,6 +110,8 @@ class Module:
+             self.gnome_settings.set_string("clock-format", "12h")
+ 
+     def on_map_location_changed(self, *args):
++        if not HAS_TIMEZONEMAP:
++            return
+         zone = self.tz_map.get_location().props.zone
+         if zone == self.zone:
+             return
+@@ -112,7 +125,8 @@ class Module:
+             return
+ 
+         self.set_timezone(zone)
+-        self.tz_map.set_timezone(zone)
++        if HAS_TIMEZONEMAP:
++            self.tz_map.set_timezone(zone)
+ 
+     def set_timezone(self, zone):
+         self.zone = zone
