@@ -61,9 +61,15 @@ termux_pkg_upgrade_version() {
 		unset OLD_LATEST_VERSION
 	fi
 
-	# Translate "_" into ".": some packages use underscores to seperate
+	# Translate "_" into ".": some packages use underscores to separate
 	# version numbers, but we require them to be separated by dots.
 	LATEST_VERSION="${LATEST_VERSION//_/.}"
+
+	# Translate "-suffix" into "~suffix": "X.Y.Z-suffix" is considered later
+	# than X.Y.Z. for it to be considered earlier use "X.Y.Z~suffix".
+	LATEST_VERSION="${LATEST_VERSION//-rc/~rc}"
+	LATEST_VERSION="${LATEST_VERSION//-alpha/~alpha}"
+	LATEST_VERSION="${LATEST_VERSION//-beta/~beta}"
 
 	if [[ "${SKIP_VERSION_CHECK}" != "--skip-version-check" ]]; then
 		if ! termux_pkg_is_update_needed \
