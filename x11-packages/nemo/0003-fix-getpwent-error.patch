@@ -1,0 +1,44 @@
+diff --git a/libnemo-private/nemo-file.c b/libnemo-private/nemo-file.c
+index 749472d..c00b42f 100644
+--- a/libnemo-private/nemo-file.c
++++ b/libnemo-private/nemo-file.c
+@@ -6076,7 +6076,30 @@ nemo_get_user_names (void)
+ 	struct passwd *user;
+ 
+ 	list = NULL;
++#ifdef __ANDROID__
++	/* Android/Termux doesn't have setpwent/getpwent functions.
++	 * Just return the current user */
+ 
++	uid_t current_uid = getuid();
++	user = getpwuid(current_uid);
++
++	if (user != NULL) {
++		real_name = get_real_name (user->pw_name, user->pw_gecos);
++		if (real_name != NULL) {
++			name = g_strconcat (user->pw_name, "\n", real_name, NULL);
++		} else {
++			name = g_strdup (user->pw_name);
++		}
++		g_free (real_name);
++		list = g_list_prepend (list, name);
++	}
++
++	if (list == NULL) {
++		name = g_strdup ("termux");
++		list = g_list_prepend (list, name);
++	}
++
++#else
+ 	setpwent ();
+ 
+ 	while ((user = getpwent ()) != NULL) {
+@@ -6091,7 +6114,7 @@ nemo_get_user_names (void)
+ 	}
+ 
+ 	endpwent ();
+-
++#endif
+ 	return g_list_sort (list, (GCompareFunc) g_utf8_collate);
+ }
+ 
