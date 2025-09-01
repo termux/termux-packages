@@ -1,0 +1,151 @@
+diff --git a/js/ui/main.js b/js/ui/main.js
+index b487c16..c64dab0 100644
+--- a/js/ui/main.js
++++ b/js/ui/main.js
+@@ -104,7 +104,10 @@ const Overview = imports.ui.overview;
+ const Expo = imports.ui.expo;
+ const Panel = imports.ui.panel;
+ const PlacesManager = imports.ui.placesManager;
+-const PolkitAuthenticationAgent = imports.ui.polkitAuthenticationAgent;
++let PolkitAuthenticationAgent = null;
++if (Config.HAVE_POLKIT) {
++    PolkitAuthenticationAgent = imports.ui.polkitAuthenticationAgent;
++}
+ const KeyringPrompt = imports.ui.keyringPrompt;
+ const RunDialog = imports.ui.runDialog;
+ const Layout = imports.ui.layout;
+@@ -438,12 +441,16 @@ function start() {
+     }
+ 
+     // Polkit Agent
+-    if (global.settings.get_boolean("enable-polkit-agent")) {
++    if (Config.HAVE_POLKIT && global.settings.get_boolean("enable-polkit-agent")) {
+         PolkitAuthenticationAgent.init();
+         global.log('Polkit agent: enabled')
+     }
+     else {
+-        global.log('Polkit agent: disabled')
++        if (Config.HAVE_POLKIT) {
++            global.log('Polkit agent: disabled (user setting)')
++        } else {
++            global.log('Polkit agent: disabled (not compiled in)')
++        }
+     }
+ 
+     // SSH Agent
+diff --git a/meson.build b/meson.build
+index 1bdeaec..111d639 100644
+--- a/meson.build
++++ b/meson.build
+@@ -31,7 +31,11 @@ dbus = dependency('dbus-1')
+ gcr = dependency('gcr-base-3', version:'>=3.7.5')
+ gdkx11 = dependency('gdk-x11-3.0')
+ gi = dependency('gobject-introspection-1.0', version: '>= 0.9.2')
+-polkit = dependency('polkit-agent-1', version: '>= 0.100')
++if get_option('polkit')
++    polkit = dependency('polkit-agent-1', version: '>= 0.100')
++else
++    polkit = dependency('', required : false)
++endif
+ atk = dependency('atk-bridge-2.0')
+ gio = dependency('gio-2.0', version: '>= 2.36.0')
+ gio_unix = dependency('gio-unix-2.0')
+@@ -73,6 +77,7 @@ cinnamon_conf = configuration_data()
+ cinnamon_conf.set_quoted('VERSION', version)
+ cinnamon_conf.set_quoted('GETTEXT_PACKAGE', meson.project_name().to_lower())
+ cinnamon_conf.set('HAVE_NETWORKMANAGER', have_networkmanager)
++cinnamon_conf.set10('HAVE_POLKIT', get_option('polkit'))
+ 
+ have_mallinfo = cc.has_function('mallinfo', prefix: '#include <malloc.h>')
+ if have_mallinfo
+@@ -105,10 +110,14 @@ config_h = declare_dependency(
+ # includes
+ include_root = include_directories('.')
+ 
+-if polkit.version()[0] == '0'  # older versions '0.105' ...
+-    pkv = 1
++if get_option('polkit')
++    if polkit.version()[0] == '0'  # older versions '0.105' ...
++        pkv = 1
++    else
++        pkv = polkit.version().to_int()
++    endif
+ else
+-    pkv = polkit.version().to_int()
++    pkv = 0  # Set to 0 when polkit is disabled
+ endif
+ 
+ # compiler flags
+diff --git a/meson_options.txt b/meson_options.txt
+index 321192d..0477b2a 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -28,4 +28,8 @@ option('wayland',
+     value : true,
+     description: 'Enable wayland support'
+ )
+-
++option('polkit',
++  type: 'boolean',
++  value: true,
++  description: 'Enable polkit support'
++)
+diff --git a/src/meson.build b/src/meson.build
+index 75a9447..4e0e445 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -54,8 +54,6 @@ cinnamon_sources = [
+     'cinnamon-keyring-prompt.c',
+     'cinnamon-keyring-prompt.h',
+     'cinnamon-perf-log.c',
+-    'cinnamon-polkit-authentication-agent.c',
+-    'cinnamon-polkit-authentication-agent.h',
+     'cinnamon-screen.c',
+     'cinnamon-screenshot.c',
+     'cinnamon-secure-text-buffer.c',
+@@ -72,6 +70,13 @@ cinnamon_sources = [
+     calendar_generated
+ ]
+ 
++if get_option('polkit')
++    cinnamon_sources += [
++        'cinnamon-polkit-authentication-agent.c',
++        'cinnamon-polkit-authentication-agent.h',
++    ]
++endif
++
+ cinnamon_enum_types = gnome.mkenums_simple(
+     'cinnamon-enum-types',
+     sources: cinnamon_headers,
+@@ -107,12 +112,15 @@ libcinnamon_deps = [
+     gtk,
+     muffin,
+     pango,
+-    polkit,
+     st_dep,
+     xapp,
+     xml,
+ ]
+ 
++if get_option('polkit')
++    libcinnamon_deps += [polkit]
++endif
++
+ libcinnamon_deps += nm_deps
+ 
+ if have_networkmanager
+@@ -206,10 +214,13 @@ cinnamon_gir_includes = [
+     'Meta-0',
+     'CMenu-3.0',
+     'Gcr-3',
+-    'PolkitAgent-1.0',
+     st_gir[0],
+ ]
+ 
++if get_option('polkit')
++    cinnamon_gir_includes += ['PolkitAgent-1.0']
++endif
++
+ if have_networkmanager
+     cinnamon_gir_includes += ['NM-1.0']
+ endif
