@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An open video codec developed by the Xiph.org"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.2.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.xiph.org/releases/theora/libtheora-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=279327339903b544c28a92aeada7d0dcfd0397b59c2f368cc698ac56f515906e
 TERMUX_PKG_DEPENDS="libogg, libvorbis"
