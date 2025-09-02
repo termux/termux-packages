@@ -7,4 +7,4 @@ TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/archive/individual/lib/xcb-util-c
 TERMUX_PKG_SHA256=eae38b2dfc5c529a886e507ef576b12d2a20aa1f149608e4853af760f31be60b
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libxcb, xcb-util-image, xcb-util-renderutil"
-TERMUX_PKG_BUILD_DEPS="automake"
+TERMUX_PKG_BUILD_DEPENDS="automake"
