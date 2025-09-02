@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Please align the version with `poppler` package.
 TERMUX_PKG_VERSION="24.05.0"
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 # Do not forget to bump revision of reverse dependencies and rebuild them
 # when SOVERSION is changed.
 _POPPLER_SOVERSION=137

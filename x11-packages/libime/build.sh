@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A library to support generic input method implementation
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.1.11"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/fcitx/libime
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"
 TERMUX_PKG_DEPENDS="boost, fcitx5, libc++, libime-data, zstd"
