@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="WYSIWYM (What You See Is What You Mean) Document Process
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.4.4"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://ftp.lip6.fr/pub/lyx/stable/${TERMUX_PKG_VERSION:0:3}.x/lyx-${TERMUX_PKG_VERSION/p/-}.tar.xz"
 TERMUX_PKG_SHA256=ffacd37480f320f3f3f8f30445fe40897e9df44c94ee87ba0413e364086f4b90
 TERMUX_PKG_AUTO_UPDATE=true
@@ -21,5 +22,7 @@ termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-execinfo"
 
 	# This is to allow the build script find the `moc` on cross-build host
-	export PATH="${TERMUX_PREFIX}/opt/qt/cross/bin:${PATH}"
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
+		export PATH="${TERMUX_PREFIX}/opt/qt/cross/bin:${PATH}"
+	fi
 }

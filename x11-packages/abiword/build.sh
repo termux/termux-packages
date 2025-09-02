@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A free word processing program"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.0.7"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gitlab.gnome.org/World/AbiWord/-/archive/release-${TERMUX_PKG_VERSION}/AbiWord-release-${TERMUX_PKG_VERSION}.tar.gz
 #TERMUX_PKG_SRCURL=https://dev.alpinelinux.org/archive/abiword/abiword-${TERMUX_PKG_VERSION}.tar.gz
 #TERMUX_PKG_SRCURL=https://ftp-osl.osuosl.org/pub/gentoo/distfiles/abiword-${TERMUX_PKG_VERSION}.tar.gz

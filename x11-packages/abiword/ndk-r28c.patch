@@ -1,0 +1,79 @@
+This is https://github.com/freebsd/freebsd-ports/commit/e6daa211c609bde6ed3fe00fd5ce675714371805
+
+--- a/plugins/kword/xp/ie_imp_KWord_1.cpp
++++ b/plugins/kword/xp/ie_imp_KWord_1.cpp
+@@ -180,7 +180,7 @@ void IE_Imp_KWord_1::charData(const gchar *s, int len)
+ 	  m_charDataSeen[m_lenCharDataSeen++] = currentChar;
+ 	  if (m_lenCharDataSeen == m_lenCharDataExpected)
+ 	    {
+-	      buf += g_utf8_get_char(m_charDataSeen);
++	      buf += static_cast<UT_UCS4Char>(g_utf8_get_char(m_charDataSeen));
+ 	      m_lenCharDataSeen = 0;
+ 	    }
+ 	}
+--- a/src/af/ev/gtk/ev_UnixKeyboard.cpp
++++ b/src/af/ev/gtk/ev_UnixKeyboard.cpp
+@@ -130,7 +130,7 @@ bool ev_UnixKeyboard::keyPressEvent(AV_View* pView, GdkEventKey* e)
+ 	  {
+ 	    // TODO: is this necessary?
+ 	    charData = gdk_keyval_to_unicode (charData);
+-	    UT_UTF8String utf8 (static_cast<const UT_UCS4Char *>(&charData), 1);
++	    UT_UTF8String utf8 (reinterpret_cast<const UT_UCS4Char *>(&charData), 1);
+ 	    return charDataEvent (pView, state, utf8.utf8_str(), utf8.byteLength());
+ 	  }
+ 
+--- a/src/af/gr/xp/gr_CairoGraphics.cpp
++++ b/src/af/gr/xp/gr_CairoGraphics.cpp
+@@ -535,7 +535,7 @@ bool GR_CairoGraphics::endPrint(void)
+ 
+ void GR_CairoGraphics::drawGlyph(UT_uint32 Char, UT_sint32 xoff, UT_sint32 yoff)
+ {
+-	drawChars(&Char, 0, 1, xoff, yoff, NULL);
++	drawChars(reinterpret_cast<const UT_UCSChar*>(&Char), 0, 1, xoff, yoff, NULL);
+ }
+ 
+ void GR_CairoGraphics::setColorSpace(GR_Graphics::ColorSpace /* c */)
+--- a/src/af/util/xp/ut_types.h
++++ b/src/af/util/xp/ut_types.h
+@@ -40,7 +40,7 @@
+ 
+ typedef guint8		UT_Byte;
+ 
+-typedef gunichar        UT_UCS4Char;
++typedef char32_t        UT_UCS4Char;
+ typedef guint16      UT_UCS2Char;
+ typedef gint32          UT_GrowBufElement;
+ 
+--- a/src/text/fmt/xp/fv_View_protected.cpp
++++ b/src/text/fmt/xp/fv_View_protected.cpp
+@@ -5752,7 +5752,7 @@ UT_UCSChar * FV_View::_lookupSuggestion(fl_BlockLayout* pBL,
+ 		UT_uint32 len = iLength;
+ 		for (UT_uint32 ldex=0; ldex < len && ldex < INPUTWORDLEN; ldex++)
+ 		{
+-			stMisspelledWord += *pWord == UCS_RQUOTE ? '\'' : *pWord;
++			stMisspelledWord += *pWord == UCS_RQUOTE ? U'\'' : *pWord;
+ 			++pWord;
+ 		}
+ 
+--- a/src/wp/ap/gtk/ap_UnixDialog_Options.cpp
++++ b/src/wp/ap/gtk/ap_UnixDialog_Options.cpp
+@@ -959,7 +959,7 @@ void AP_UnixDialog_Options::_setupSmartQuotesCombos(  GtkWidget *optionmenu  )
+ 		wszDisplayString[1] = (gunichar)'O';
+ 		wszDisplayString[2] = XAP_EncodingManager::smartQuoteStyles[i].rightQuote;
+ 		wszDisplayString[3] = (gunichar)0;
+-        gchar* szDisplayStringUTF8 = g_ucs4_to_utf8 ( wszDisplayString, -1, NULL, NULL, NULL );
++        gchar* szDisplayStringUTF8 = g_ucs4_to_utf8 ( reinterpret_cast<const gunichar*>(wszDisplayString), -1, NULL, NULL, NULL );
+ 		XAP_appendComboBoxTextAndInt(combo, szDisplayStringUTF8, i);
+         g_free ( szDisplayStringUTF8 );
+ 	}
+--- a/src/wp/ap/xp/ap_Menu_Functions.cpp
++++ b/src/wp/ap/xp/ap_Menu_Functions.cpp
+@@ -744,7 +744,7 @@ Defun_EV_GetMenuItemComputedLabel_Fn(ap_GetLabel_Suggest)
+ 	UT_UCSChar *p = pView->getContextSuggest(ndx);
+ 	gchar * c = NULL;
+ 	if (p && *p) {
+-		c = g_ucs4_to_utf8(p, -1, NULL, NULL, NULL);
++		c = g_ucs4_to_utf8(reinterpret_cast<const gunichar *>(p), -1, NULL, NULL, NULL);
+ 	}
+ 	else if (ndx == 1)
+ 	{

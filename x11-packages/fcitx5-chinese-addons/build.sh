@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Addons related to Chinese, including IME previous bundle
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.1.9"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/fcitx/fcitx5-chinese-addons/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=2b2b5418c4a670be1b824c0ee6e5cae48e5115402fe3b2a407aceb19f122339b
 TERMUX_PKG_DEPENDS="boost, fcitx5, fcitx5-qt, libc++, libcurl, libime, libopencc, qt6-qtbase"
