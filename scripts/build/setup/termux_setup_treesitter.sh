@@ -2,7 +2,7 @@ termux_setup_treesitter() {
 	local TERMUX_TREE_SITTER_VERSION
 	TERMUX_TREE_SITTER_VERSION="$(. "$TERMUX_SCRIPTDIR/packages/tree-sitter/build.sh"; echo "$TERMUX_PKG_VERSION")"
 	TERMUX_TREE_SITTER_URL="https://github.com/tree-sitter/tree-sitter/releases/download/v${TERMUX_TREE_SITTER_VERSION}/tree-sitter-linux-x64.gz"
-	local TERMUX_TREE_SITTER_SHA256=c300ea9f2ca368186ce1308793aaad650c3f6db78225257cbb5be961aeff4038
+	local TERMUX_TREE_SITTER_SHA256=c9d46697e3e5ae6900a39ad4483667d2ba14c8ffb12c3f863bcf82a9564ee19f
 
 	local TERMUX_TREE_SITTER_GZNAME="tree-sitter-linux-x64.gz"
 	local TERMUX_TREE_SITTER_URL="https://github.com/tree-sitter/tree-sitter/releases/download/v${TERMUX_TREE_SITTER_VERSION}/${TERMUX_TREE_SITTER_GZNAME}"
