@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.webmproject.org
 TERMUX_PKG_DESCRIPTION="VP8 & VP9 Codec SDK"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1:1.15.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1:1.15.2"
 TERMUX_PKG_SRCURL=https://github.com/webmproject/libvpx/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
-TERMUX_PKG_SHA256=e935eded7d81631a538bfae703fd1e293aad1c7fd3407ba00440c95105d2011e
+TERMUX_PKG_SHA256=26fcd3db88045dee380e581862a6ef106f49b74b6396ee95c2993a260b4636aa
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BREAKS="libvpx-dev"
 TERMUX_PKG_REPLACES="libvpx-dev"
@@ -29,7 +28,7 @@ termux_step_post_get_source() {
 	# Check whether it is ABI compatible with previous version
 	# Should revbump ffmpeg if ABI is changed
 	local abi=9
-	local encabi=36
+	local encabi=37
 	local decabi=12
 
 	mkdir -p termux-abi-test && cd termux-abi-test
@@ -93,7 +92,7 @@ termux_step_configure() {
 termux_step_post_massage() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	local _SOVERSION_GUARD_FILES="lib/libvpx.so.9"
+	local _SOVERSION_GUARD_FILES="lib/libvpx.so.11"
 	local f
 	for f in ${_SOVERSION_GUARD_FILES}; do
 		if [ ! -e "${f}" ]; then
