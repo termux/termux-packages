@@ -1,0 +1,269 @@
+Hide the Ubuntu guild and guile from the build system
+so that the wrappers will be detected and used instead
+
+also disable testsuite because it does not currently pass inside the
+termux-proot-run minimal Android pseudocontainer
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -311,8 +311,6 @@ if (GUILE3_FOUND) # found guile-3.0
+   set(GUILE_EFFECTIVE_VERSION 3.0)
+   set(GUILE_INCLUDE_DIRS ${GUILE3_INCLUDE_DIRS})
+   set(GUILE_LDFLAGS ${GUILE3_LDFLAGS})
+-  pkg_get_variable (GUILD_EXECUTABLE guile-3.0 guild)
+-  pkg_get_variable (GUILE_EXECUTABLE guile-3.0 guile)
+   if (NOT GUILD_EXECUTABLE)
+     find_program (GUILD_EXECUTABLE NAMES guild3.0 guild)
+   endif()
+@@ -866,7 +866,6 @@ if (WITH_GNUCASH)
+   add_subdirectory (gnucash)
+ endif()
+ add_subdirectory (bindings)
+-add_subdirectory (test-templates)
+ add_subdirectory (util)
+ 
+ # This cmake subdir must be the last add_subdirectory() call because
+diff --git a/common/CMakeLists.txt b/common/CMakeLists.txt
+index b06b7d8..bf2a675 100644
+--- a/common/CMakeLists.txt
++++ b/common/CMakeLists.txt
+@@ -3,7 +3,6 @@
+ # The subdirectories
+ add_subdirectory (cmake_modules)
+ add_subdirectory (debug)
+-add_subdirectory (test-core)
+ 
+ set(common_EXTRA_DIST
+         base-typemaps.i
+diff --git a/gnucash/report/reports/CMakeLists.txt b/gnucash/report/reports/CMakeLists.txt
+index acb34d8..f021f36 100644
+--- a/gnucash/report/reports/CMakeLists.txt
++++ b/gnucash/report/reports/CMakeLists.txt
+@@ -94,7 +94,6 @@ set(scm_rpt_example_GUILE_DEPENDS
+ 
+ set(scm_rpt_locale_specific_GUILE_DEPENDS
+   ${scm_rpts_GUILE_DEPENDS}
+-  scm-test-core
+   scm-locale-tax
+   )
+ 
+diff --git a/bindings/guile/CMakeLists.txt b/bindings/guile/CMakeLists.txt
+index cd130ca..ef12273 100644
+--- a/bindings/guile/CMakeLists.txt
++++ b/bindings/guile/CMakeLists.txt
+@@ -1,4 +1,3 @@
+-add_subdirectory(test)
+ 
+ # Generate the swig-core-utils-guile.c wrapper file
+ gnc_swig_extract_header_files (gnc-core-utils CORE_UTILS_HEADERS)
+diff --git a/bindings/python/CMakeLists.txt b/bindings/python/CMakeLists.txt
+index d37d047..721f289 100644
+--- a/bindings/python/CMakeLists.txt
++++ b/bindings/python/CMakeLists.txt
+@@ -1,5 +1,4 @@
+ add_subdirectory(example_scripts)
+-add_subdirectory(tests)
+ 
+ set(PYEXEC_FILES  __init__.py function_class.py gnucash_business.py gnucash_core.py app_utils.py deprecation.py)
+ 
+diff --git a/gnucash/gnome-utils/CMakeLists.txt b/gnucash/gnome-utils/CMakeLists.txt
+index fb7e53c..3baabbb 100644
+--- a/gnucash/gnome-utils/CMakeLists.txt
++++ b/gnucash/gnome-utils/CMakeLists.txt
+@@ -1,6 +1,5 @@
+ # Note that gnucash/gnome-utils CANNOT depend on gnucash/gnome!
+ 
+-add_subdirectory(test)
+ 
+ # Command to generate the swig-gnome-utils.c wrapper file
+ gnc_add_swig_guile_command (swig-gnome-utils-c
+diff --git a/gnucash/gnome/CMakeLists.txt b/gnucash/gnome/CMakeLists.txt
+index 115a886..4b641fe 100644
+--- a/gnucash/gnome/CMakeLists.txt
++++ b/gnucash/gnome/CMakeLists.txt
+@@ -1,5 +1,4 @@
+ 
+-add_subdirectory(test)
+ 
+ set (gnc_gnome_noinst_HEADERS
+   assistant-acct-period.h
+diff --git a/gnucash/import-export/CMakeLists.txt b/gnucash/import-export/CMakeLists.txt
+index 3765468..9590251 100644
+--- a/gnucash/import-export/CMakeLists.txt
++++ b/gnucash/import-export/CMakeLists.txt
+@@ -1,6 +1,5 @@
+ # CMakeLists.txt for gnucash/import-export
+ 
+-add_subdirectory(test)
+ 
+ # ############################################################
+ add_subdirectory(aqb)
+diff --git a/gnucash/import-export/aqb/CMakeLists.txt b/gnucash/import-export/aqb/CMakeLists.txt
+index 662638a..875b9ff 100644
+--- a/gnucash/import-export/aqb/CMakeLists.txt
++++ b/gnucash/import-export/aqb/CMakeLists.txt
+@@ -1,7 +1,6 @@
+ # CMakeLists.txt for gnucash/import-export/aqbanking
+ 
+ add_subdirectory(gschemas)
+-add_subdirectory(test)
+ 
+ set (aqbanking_SOURCES
+   dialog-ab-trans.c
+diff --git a/gnucash/import-export/csv-exp/CMakeLists.txt b/gnucash/import-export/csv-exp/CMakeLists.txt
+index 5ff2838..6b225ae 100644
+--- a/gnucash/import-export/csv-exp/CMakeLists.txt
++++ b/gnucash/import-export/csv-exp/CMakeLists.txt
+@@ -1,5 +1,4 @@
+ 
+-add_subdirectory(test)
+ 
+ set(csv_export_SOURCES
+   gnc-plugin-csv-export.c
+diff --git a/gnucash/import-export/csv-imp/CMakeLists.txt b/gnucash/import-export/csv-imp/CMakeLists.txt
+index 67add00..040b79d 100644
+--- a/gnucash/import-export/csv-imp/CMakeLists.txt
++++ b/gnucash/import-export/csv-imp/CMakeLists.txt
+@@ -1,4 +1,3 @@
+-add_subdirectory(test)
+ 
+ set(csv_import_remote_SOURCES
+   ${CMAKE_SOURCE_DIR}/borrowed/goffice/go-charmap-sel.c
+diff --git a/gnucash/import-export/ofx/CMakeLists.txt b/gnucash/import-export/ofx/CMakeLists.txt
+index f5dace3..b6cf766 100644
+--- a/gnucash/import-export/ofx/CMakeLists.txt
++++ b/gnucash/import-export/ofx/CMakeLists.txt
+@@ -1,5 +1,4 @@
+ add_subdirectory(gschemas)
+-add_subdirectory(test)
+ 
+ set(ofx_SOURCES
+   gnc-ofx-import.cpp
+diff --git a/gnucash/import-export/qif-imp/CMakeLists.txt b/gnucash/import-export/qif-imp/CMakeLists.txt
+index ec4a6fa..a5a77da 100644
+--- a/gnucash/import-export/qif-imp/CMakeLists.txt
++++ b/gnucash/import-export/qif-imp/CMakeLists.txt
+@@ -1,6 +1,5 @@
+ # CMakeLists.txt for gnucash/import_export/qif-imp
+ 
+-add_subdirectory(test)
+ 
+ set (qif_import_SOURCES
+     dialog-account-picker.c
+diff --git a/gnucash/register/ledger-core/CMakeLists.txt b/gnucash/register/ledger-core/CMakeLists.txt
+index 7155e3e..64a6e07 100644
+--- a/gnucash/register/ledger-core/CMakeLists.txt
++++ b/gnucash/register/ledger-core/CMakeLists.txt
+@@ -1,5 +1,4 @@
+ 
+-add_subdirectory(test)
+ 
+ set (ledger_core_SOURCES
+   gnc-ledger-display.c
+diff --git a/gnucash/report/CMakeLists.txt b/gnucash/report/CMakeLists.txt
+index c70e13c..2f09085 100644
+--- a/gnucash/report/CMakeLists.txt
++++ b/gnucash/report/CMakeLists.txt
+@@ -1,7 +1,6 @@
+ 
+ add_subdirectory(reports)
+ add_subdirectory(stylesheets)
+-add_subdirectory(test)
+ 
+ set (report_HEADERS
+   gnc-report.h
+diff --git a/gnucash/report/reports/CMakeLists.txt b/gnucash/report/reports/CMakeLists.txt
+index f021f36..5bd1d77 100644
+--- a/gnucash/report/reports/CMakeLists.txt
++++ b/gnucash/report/reports/CMakeLists.txt
+@@ -1,5 +1,4 @@
+ 
+-add_subdirectory(standard/test)
+ add_subdirectory(support)
+ 
+ #These provide some functions used by more than one report.
+diff --git a/libgnucash/app-utils/CMakeLists.txt b/libgnucash/app-utils/CMakeLists.txt
+index 45b2bf5..fcef3b1 100644
+--- a/libgnucash/app-utils/CMakeLists.txt
++++ b/libgnucash/app-utils/CMakeLists.txt
+@@ -1,5 +1,4 @@
+ # NB: Unit tests which require GSchemas should be made conditional on COMPILE_GSCHEMAS.
+-add_subdirectory(test)
+ add_subdirectory(mocks)
+ 
+ include (GncFindLibm)
+diff --git a/libgnucash/backend/dbi/CMakeLists.txt b/libgnucash/backend/dbi/CMakeLists.txt
+index ac6fe70..6435528 100644
+--- a/libgnucash/backend/dbi/CMakeLists.txt
++++ b/libgnucash/backend/dbi/CMakeLists.txt
+@@ -1,6 +1,5 @@
+ # CMakeLists.txt for libgnucash/backend/dbi
+ 
+-add_subdirectory(test)
+ 
+ set (backend_dbi_SOURCES
+   gnc-backend-dbi.cpp
+diff --git a/libgnucash/backend/sql/CMakeLists.txt b/libgnucash/backend/sql/CMakeLists.txt
+index b197c39..05364ad 100644
+--- a/libgnucash/backend/sql/CMakeLists.txt
++++ b/libgnucash/backend/sql/CMakeLists.txt
+@@ -1,6 +1,5 @@
+ # CMakeLists.txt for libgnucash/backend/dbi
+ 
+-add_subdirectory(test)
+ 
+ set (backend_sql_SOURCES
+   gnc-account-sql.cpp
+diff --git a/libgnucash/backend/xml/CMakeLists.txt b/libgnucash/backend/xml/CMakeLists.txt
+index 69d38af..1280a40 100644
+--- a/libgnucash/backend/xml/CMakeLists.txt
++++ b/libgnucash/backend/xml/CMakeLists.txt
+@@ -1,7 +1,6 @@
+ # CMakeLists.txt for libgnucash/backend/xml
+ 
+ add_subdirectory(DTD)
+-add_subdirectory(test)
+ 
+ set (backend_xml_utils_noinst_HEADERS
+   gnc-backend-xml.h
+diff --git a/libgnucash/core-utils/CMakeLists.txt b/libgnucash/core-utils/CMakeLists.txt
+index 4cd6d97..bf91c12 100644
+--- a/libgnucash/core-utils/CMakeLists.txt
++++ b/libgnucash/core-utils/CMakeLists.txt
+@@ -1,6 +1,5 @@
+ # CMakeLists.txt for libgnucash/core-utils
+ 
+-add_subdirectory(test)
+ 
+ 
+ ### libgnc-core-utils
+diff --git a/libgnucash/engine/CMakeLists.txt b/libgnucash/engine/CMakeLists.txt
+index 4797652..aa75820 100644
+--- a/libgnucash/engine/CMakeLists.txt
++++ b/libgnucash/engine/CMakeLists.txt
+@@ -1,7 +1,5 @@
+ # CMakeLists.txt for libgnucash/engine
+ 
+-add_subdirectory(test-core)
+-add_subdirectory(test)
+ add_subdirectory(mocks)
+ 
+ set(engine_noinst_HEADERS
+diff --git a/libgnucash/gnc-module/CMakeLists.txt b/libgnucash/gnc-module/CMakeLists.txt
+index b8e2e08..85acf30 100644
+--- a/libgnucash/gnc-module/CMakeLists.txt
++++ b/libgnucash/gnc-module/CMakeLists.txt
+@@ -1,5 +1,4 @@
+ # CMakeLists.txt for libgnucash/gnc-module
+-add_subdirectory(test)
+ add_subdirectory(example)
+ 
+ set (gnc_module_SOURCES gnc-module.c)
+diff --git a/libgnucash/tax/CMakeLists.txt b/libgnucash/tax/CMakeLists.txt
+index fef9682..6709ee6 100644
+--- a/libgnucash/tax/CMakeLists.txt
++++ b/libgnucash/tax/CMakeLists.txt
+@@ -1,4 +1,3 @@
+-add_subdirectory(test)
+ 
+ set(locale_tax_SOURCES gnc-locale-tax.c gnc-locale-tax.h)
+ 
