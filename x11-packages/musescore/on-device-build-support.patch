@@ -1,0 +1,13 @@
+musescore is a pure treat-android-as-linux package,
+so setting OS_IS_LIN true is correct.
+--- a/buildscripts/cmake/GetPlatformInfo.cmake
++++ b/buildscripts/cmake/GetPlatformInfo.cmake
+@@ -28,6 +28,8 @@ elseif(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
+     set(OS_IS_WIN 1)
+ elseif(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
+     set(OS_IS_LIN 1)
++elseif(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Android")
++    set(OS_IS_LIN 1)
+ elseif(${CMAKE_HOST_SYSTEM_NAME} MATCHES "FreeBSD")
+     set(OS_IS_FBSD 1)
+ elseif(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
