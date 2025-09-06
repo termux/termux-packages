@@ -6,7 +6,6 @@ Subject: [PATCH] reland jumbo 14
 Enable jumbo build for the following component(s)/source_set(s):
 
 - //third_party/perfetto/src/shared_lib:shared_lib
-- //third_party/perfetto/src/trace_processor/db/column:column
 - //third_party/perfetto/src/trace_processor/importers/common:common
 - //third_party/perfetto/src/trace_processor/importers/memory_tracker:graph_processor
 - //third_party/perfetto/src/trace_processor/importers/proto:minimal
@@ -25,13 +24,12 @@ Enable jumbo build for the following template(s):
  third_party/abseil-cpp/absl/time/time.cc               |  4 ++++
  third_party/perfetto/gn/perfetto_component.gni         | 10 +++++++++-
  third_party/perfetto/src/shared_lib/BUILD.gn           |  3 ++-
- .../perfetto/src/trace_processor/db/column/BUILD.gn    |  3 ++-
  .../src/trace_processor/importers/common/BUILD.gn      |  3 ++-
  .../trace_processor/importers/memory_tracker/BUILD.gn  |  3 ++-
  .../src/trace_processor/importers/proto/BUILD.gn       |  3 ++-
  third_party/perfetto/src/tracing/BUILD.gn              |  3 ++-
  third_party/perfetto/src/tracing/service/BUILD.gn      |  3 ++-
- 12 files changed, 36 insertions(+), 9 deletions(-)
+ 11 files changed, 34 insertions(+), 8 deletions(-)
 
 diff --git a/third_party/abseil-cpp/absl.gni b/third_party/abseil-cpp/absl.gni
 index 48e1ce7838..1ae51fc0f5 100644
@@ -162,24 +160,8 @@ index ee0aa497d0..2be9d78a9e 100644
    deps = [
      ":intern_map",
      "../../gn:default_deps",
-diff --git a/third_party/perfetto/src/trace_processor/db/column/BUILD.gn b/third_party/perfetto/src/trace_processor/db/column/BUILD.gn
-index e92189fa54..7846495045 100644
---- a/third_party/perfetto/src/trace_processor/db/column/BUILD.gn
-+++ b/third_party/perfetto/src/trace_processor/db/column/BUILD.gn
-@@ -12,9 +12,10 @@
- # See the License for the specific language governing permissions and
- # limitations under the License.
- 
-+import("//build/config/jumbo.gni")
- import("../../../../gn/test.gni")
- 
--source_set("column") {
-+jumbo_source_set("column") {
-   sources = [
-     "arrangement_overlay.cc",
-     "arrangement_overlay.h",
 diff --git a/third_party/perfetto/src/trace_processor/importers/common/BUILD.gn b/third_party/perfetto/src/trace_processor/importers/common/BUILD.gn
-index 3be2a5d292..be9ca2a672 100644
+index e681db573c..898b5d3420 100644
 --- a/third_party/perfetto/src/trace_processor/importers/common/BUILD.gn
 +++ b/third_party/perfetto/src/trace_processor/importers/common/BUILD.gn
 @@ -12,9 +12,10 @@
@@ -212,7 +194,7 @@ index 0fc30b806f..9e4922399d 100644
    public_deps = [
      "../../../../include/perfetto/base",
 diff --git a/third_party/perfetto/src/trace_processor/importers/proto/BUILD.gn b/third_party/perfetto/src/trace_processor/importers/proto/BUILD.gn
-index ed254e5a67..215ac02e98 100644
+index 6c193e9627..894070fe71 100644
 --- a/third_party/perfetto/src/trace_processor/importers/proto/BUILD.gn
 +++ b/third_party/perfetto/src/trace_processor/importers/proto/BUILD.gn
 @@ -12,9 +12,10 @@

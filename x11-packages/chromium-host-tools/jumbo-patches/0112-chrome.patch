@@ -77,6 +77,7 @@ Enable jumbo build for the following template(s):
  .../api/image_writer_private/zip_extractor.cc   |  4 ++++
  .../extensions/api/tabs/tabs_event_router.cc    |  6 +++---
  .../extensions/api/tabs/tabs_event_router.h     |  2 +-
+ .../browser_extension_window_controller.cc      |  2 +-
  .../browser/extensions/extension_management.cc  |  2 +-
  .../extensions/extension_view_host_factory.cc   |  2 +-
  .../extensions/extension_view_host_factory.h    |  2 +-
@@ -85,7 +86,7 @@ Enable jumbo build for the following template(s):
  .../k_anonymity_service_client.cc               |  6 ++++++
  .../k_anonymity_trust_token_getter.cc           |  6 ++++++
  chrome/browser/media/router/BUILD.gn            |  3 ++-
- chrome/browser/media/router/discovery/BUILD.gn  |  4 +++-
+ chrome/browser/media/router/discovery/BUILD.gn  |  3 ++-
  .../dial/dial_media_sink_service_impl.cc        |  4 ++++
  .../discovery/mdns/cast_media_sink_service.cc   |  4 ++++
  .../mdns/cast_media_sink_service_impl.cc        |  4 ++++
@@ -100,11 +101,14 @@ Enable jumbo build for the following template(s):
  .../modules/file_suggestion/drive_service.cc    |  6 ++++++
  .../v2/calendar/google_calendar_page_handler.cc |  6 ++++++
  .../notifications/scheduler/internal/BUILD.gn   |  4 +++-
+ .../notifications/system_notification_helper.cc |  3 +++
  .../gws_hp_page_load_metrics_observer.cc        |  2 ++
  ...path_predictor_page_load_metrics_observer.cc |  5 +++++
  ...ie_deprecation_page_load_metrics_observer.cc |  4 ++++
+ .../chrome_password_manager_client.cc           |  4 ++++
  ...e_password_form_filling_submission_helper.cc |  6 ++++++
  .../password_change_submission_verifier.cc      |  4 ++++
+ .../profile_password_store_factory.cc           |  4 ++++
  .../metrics/metrics_provider_common.cc          |  2 +-
  .../policies/background_tab_loading_policy.cc   |  4 ++++
  .../policies/working_set_trimmer_policy.cc      |  4 ++++
@@ -156,7 +160,6 @@ Enable jumbo build for the following template(s):
  .../share_this_tab_dialog_views.cc              |  6 ++++++
  chrome/browser/ui/views/download/BUILD.gn       |  4 +++-
  .../bubble/download_bubble_security_view.cc     |  6 ++++++
- .../ui/views/download/download_shelf_view.cc    |  6 ++++++
  .../file_system_access_icon_view.cc             |  4 ++++
  .../ui/views/frame/contents_container_view.cc   |  4 ++++
  .../frame/multi_contents_drop_target_view.cc    |  4 ++++
@@ -167,7 +170,6 @@ Enable jumbo build for the following template(s):
  .../cookie_controls_bubble_view_impl.cc         |  4 ++++
  .../cookie_controls_content_view.cc             |  4 ++++
  .../media_router/cast_browser_controller.cc     |  4 ++++
- .../views/media_router/cast_toolbar_button.cc   |  4 ++++
  .../ui/views/overlay/back_to_tab_button.cc      |  4 ++++
  .../views/overlay/back_to_tab_label_button.cc   |  4 ++++
  .../about_this_site_side_panel_coordinator.cc   |  6 ++++++
@@ -175,7 +177,6 @@ Enable jumbo build for the following template(s):
  .../password_generation_popup_view_views.cc     |  4 ++++
  .../embedded_permission_prompt_base_view.cc     |  6 ++++++
  .../exclusive_access_permission_prompt_view.cc  |  4 ++++
- .../profiles/first_run_flow_controller_dice.cc  |  4 ++++
  .../profiles/profile_picker_flow_controller.cc  |  4 ++++
  chrome/browser/ui/views/side_panel/BUILD.gn     |  3 ++-
  .../ui/views/site_data/related_app_row_view.cc  |  4 ++++
@@ -197,6 +198,7 @@ Enable jumbo build for the following template(s):
  .../authenticator_gpm_arbitrary_pin_view.cc     |  4 ++++
  .../webauthn/authenticator_gpm_pin_view.cc      |  4 ++++
  ...icator_hybrid_and_security_key_sheet_view.cc |  4 ++++
+ .../ui/views/webauthn/ring_progress_bar.cc      |  4 ++++
  .../ui/webauthn/account_hover_list_model.cc     |  4 ++++
  .../platform_cert_sources.cc                    |  6 ++++++
  .../certificate_manager/user_cert_sources.cc    |  6 ++++++
@@ -215,10 +217,10 @@ Enable jumbo build for the following template(s):
  chrome/utility/BUILD.gn                         |  3 ++-
  .../inspector_protocol/crdtp/protocol_core.h    |  2 +-
  tools/json_schema_compiler/json_schema_api.gni  | 10 +++++++++-
- 172 files changed, 721 insertions(+), 52 deletions(-)
+ 174 files changed, 722 insertions(+), 53 deletions(-)
 
 diff --git a/chrome/browser/BUILD.gn b/chrome/browser/BUILD.gn
-index 9114b723fc..46a66afb69 100644
+index 4229220019..07bd79638a 100644
 --- a/chrome/browser/BUILD.gn
 +++ b/chrome/browser/BUILD.gn
 @@ -9,6 +9,7 @@ import("//build/config/chrome_build.gni")
@@ -229,7 +231,7 @@ index 9114b723fc..46a66afb69 100644
  import("//build/config/python.gni")
  import("//build/config/ui.gni")
  import("//chrome/browser/buildflags.gni")
-@@ -189,7 +190,7 @@ source_set("shell_integration") {
+@@ -186,7 +187,7 @@ source_set("shell_integration") {
  
  # Use a static library here because many test binaries depend on this but don't
  # require many files from it. This makes linking more efficient.
@@ -238,15 +240,15 @@ index 9114b723fc..46a66afb69 100644
    sources = [
      "about_flags.cc",
      "accessibility/accessibility_labels_service.cc",
-@@ -1762,6 +1763,7 @@ static_library("browser") {
+@@ -1723,6 +1724,7 @@ static_library("browser") {
+     "webid/federated_identity_permission_context_factory.h",
      "webid/identity_provider_permission_request.cc",
-     "webid/identity_provider_permission_request.h",
    ]
 +  jumbo_excluded_sources = []
  
    if (is_chromeos) {
      sources += [
-@@ -4379,6 +4381,10 @@ static_library("browser") {
+@@ -4321,6 +4323,10 @@ static_library("browser") {
        "webauthn/unexportable_key_utils.cc",
        "webauthn/unexportable_key_utils.h",
      ]
@@ -255,9 +257,9 @@ index 9114b723fc..46a66afb69 100644
 +      "new_tab_page/modules/file_suggestion/microsoft_files_page_handler.cc",
 +    ]
  
-     #!is_android
-     public_deps += [ "//ui/base/mojom:ui_base_types" ]
-@@ -4589,6 +4595,11 @@ static_library("browser") {
+     if (use_aura) {
+       sources += [
+@@ -4552,6 +4558,11 @@ static_library("browser") {
        "//ui/webui/resources/cr_components/history_clusters:mojo_bindings",
        "//ui/webui/resources/cr_components/history_embeddings:mojo_bindings",
      ]
@@ -269,7 +271,7 @@ index 9114b723fc..46a66afb69 100644
  
      #!is_android
      # Any circular includes must depend on the target
-@@ -6709,6 +6720,10 @@ static_library("browser") {
+@@ -6678,6 +6689,10 @@ static_library("browser") {
        "//components/enterprise/watermarking",
        "//components/enterprise/watermarking/content",
      ]
@@ -281,7 +283,7 @@ index 9114b723fc..46a66afb69 100644
  
    if (enterprise_data_controls) {
 diff --git a/chrome/browser/ai/BUILD.gn b/chrome/browser/ai/BUILD.gn
-index 6937ef3532..dd2058ad0c 100644
+index 9d6a06dba9..a2b3c5b06b 100644
 --- a/chrome/browser/ai/BUILD.gn
 +++ b/chrome/browser/ai/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -302,7 +304,7 @@ index 6937ef3532..dd2058ad0c 100644
      "ai_context_bound_object.cc",
      "ai_context_bound_object_set.cc",
 diff --git a/chrome/browser/apps/app_service/BUILD.gn b/chrome/browser/apps/app_service/BUILD.gn
-index 171f261d5d..300e5dd4a7 100644
+index 83cb6d2be5..5fb8957ead 100644
 --- a/chrome/browser/apps/app_service/BUILD.gn
 +++ b/chrome/browser/apps/app_service/BUILD.gn
 @@ -2,11 +2,12 @@
@@ -320,7 +322,7 @@ index 171f261d5d..300e5dd4a7 100644
      "app_icon_source.cc",
      "app_icon_source.h",
 diff --git a/chrome/browser/autofill/BUILD.gn b/chrome/browser/autofill/BUILD.gn
-index d03f3137a9..1c0428b8de 100644
+index 763fb5befe..a6ac867fad 100644
 --- a/chrome/browser/autofill/BUILD.gn
 +++ b/chrome/browser/autofill/BUILD.gn
 @@ -3,13 +3,14 @@
@@ -340,7 +342,7 @@ index d03f3137a9..1c0428b8de 100644
      "address_normalizer_factory.cc",
      "address_normalizer_factory.h",
 diff --git a/chrome/browser/devtools/BUILD.gn b/chrome/browser/devtools/BUILD.gn
-index c7f9609827..8340ba3fe7 100644
+index a9adc29b17..6f17f0adb9 100644
 --- a/chrome/browser/devtools/BUILD.gn
 +++ b/chrome/browser/devtools/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -382,10 +384,10 @@ index bb1a890e1d..5d582ecced 100644
 +#undef kHostTransportCommand
 +#undef RunCommand
 diff --git a/chrome/browser/devtools/device/android_device_manager.cc b/chrome/browser/devtools/device/android_device_manager.cc
-index 3df8092553..bb4d4e3dfa 100644
+index 83417c9c7e..9798c63c06 100644
 --- a/chrome/browser/devtools/device/android_device_manager.cc
 +++ b/chrome/browser/devtools/device/android_device_manager.cc
-@@ -41,6 +41,8 @@
+@@ -37,6 +37,8 @@
  
  using content::BrowserThread;
  
@@ -394,7 +396,7 @@ index 3df8092553..bb4d4e3dfa 100644
  namespace {
  
  const char kDevToolsAdbBridgeThreadName[] = "Chrome_DevToolsADBThread";
-@@ -626,3 +628,5 @@ void AndroidDeviceManager::UpdateDevices(
+@@ -622,3 +624,5 @@ void AndroidDeviceManager::UpdateDevices(
    devices_.swap(new_devices);
    std::move(callback).Run(response);
  }
@@ -439,7 +441,7 @@ index 047a5a4a54..d6ccf8a65a 100644
 +
 +#undef kWebViewSocketPrefix
 diff --git a/chrome/browser/devtools/device/port_forwarding_controller.cc b/chrome/browser/devtools/device/port_forwarding_controller.cc
-index 9733f7b6b8..84351cad32 100644
+index f148f8d527..6bf36cb029 100644
 --- a/chrome/browser/devtools/device/port_forwarding_controller.cc
 +++ b/chrome/browser/devtools/device/port_forwarding_controller.cc
 @@ -45,6 +45,8 @@
@@ -451,17 +453,17 @@ index 9733f7b6b8..84351cad32 100644
  namespace {
  
  const int kBufferSize = 16 * 1024;
-@@ -677,3 +679,5 @@ void PortForwardingController::UpdateConnections() {
+@@ -676,3 +678,5 @@ void PortForwardingController::UpdateConnections() {
    for (auto it = registry_.begin(); it != registry_.end(); ++it)
      it->second->UpdateForwardingMap(forwarding_map_);
  }
 +
 +#undef kBufferSize
 diff --git a/chrome/browser/devtools/device/usb/android_usb_socket.cc b/chrome/browser/devtools/device/usb/android_usb_socket.cc
-index a7b903e93f..e34fffe6db 100644
+index 920d3465d3..5e5c32cee7 100644
 --- a/chrome/browser/devtools/device/usb/android_usb_socket.cc
 +++ b/chrome/browser/devtools/device/usb/android_usb_socket.cc
-@@ -19,6 +19,8 @@
+@@ -15,6 +15,8 @@
  #include "net/base/net_errors.h"
  #include "net/traffic_annotation/network_traffic_annotation.h"
  
@@ -470,17 +472,17 @@ index a7b903e93f..e34fffe6db 100644
  namespace {
  
  const int kMaxPayload = 4096;
-@@ -253,3 +255,5 @@ void AndroidUsbSocket::RespondToWriter(int result) {
+@@ -250,3 +252,5 @@ void AndroidUsbSocket::RespondToWriter(int result) {
    if (!write_callback_.is_null())
      std::move(write_callback_).Run(result);
  }
 +
 +#undef kMaxPayload
 diff --git a/chrome/browser/devtools/device/usb/usb_device_provider.cc b/chrome/browser/devtools/device/usb/usb_device_provider.cc
-index c6ab4cf392..83f6ef7aad 100644
+index e440b392b7..d25e9d9642 100644
 --- a/chrome/browser/devtools/device/usb/usb_device_provider.cc
 +++ b/chrome/browser/devtools/device/usb/usb_device_provider.cc
-@@ -19,6 +19,9 @@
+@@ -18,6 +18,9 @@
  #include "net/base/net_errors.h"
  #include "net/socket/stream_socket.h"
  
@@ -490,7 +492,7 @@ index c6ab4cf392..83f6ef7aad 100644
  namespace {
  
  const char kLocalAbstractCommand[] = "localabstract:%s";
-@@ -153,3 +156,6 @@ void UsbDeviceProvider::EnumeratedDevices(SerialsCallback callback,
+@@ -151,3 +154,6 @@ void UsbDeviceProvider::EnumeratedDevices(SerialsCallback callback,
    }
    std::move(callback).Run(std::move(result));
  }
@@ -498,10 +500,10 @@ index c6ab4cf392..83f6ef7aad 100644
 +#undef kLocalAbstractCommand
 +#undef kBufferSize
 diff --git a/chrome/browser/devtools/devtools_file_system_indexer.cc b/chrome/browser/devtools/devtools_file_system_indexer.cc
-index 8e82362cd9..03b34a2c42 100644
+index 7e58c7011e..7d9bf50233 100644
 --- a/chrome/browser/devtools/devtools_file_system_indexer.cc
 +++ b/chrome/browser/devtools/devtools_file_system_indexer.cc
-@@ -39,6 +39,8 @@ using std::map;
+@@ -35,6 +35,8 @@ using std::map;
  using std::string;
  using std::vector;
  
@@ -510,7 +512,7 @@ index 8e82362cd9..03b34a2c42 100644
  namespace {
  
  using std::set;
-@@ -522,3 +524,5 @@ void DevToolsFileSystemIndexer::SearchInPathOnImplSequence(
+@@ -521,3 +523,5 @@ void DevToolsFileSystemIndexer::SearchInPathOnImplSequence(
    content::GetUIThreadTaskRunner({})->PostTask(
        FROM_HERE, BindOnce(std::move(callback), std::move(result)));
  }
@@ -579,7 +581,7 @@ index 37360abc40..6d86dd2617 100644
 +#undef kSideImageSize
 +#undef kSideImageInsets
 diff --git a/chrome/browser/enterprise/connectors/analysis/files_request_handler.cc b/chrome/browser/enterprise/connectors/analysis/files_request_handler.cc
-index 084794a16d..8f54201bee 100644
+index b4a86cbbe2..871d25babc 100644
 --- a/chrome/browser/enterprise/connectors/analysis/files_request_handler.cc
 +++ b/chrome/browser/enterprise/connectors/analysis/files_request_handler.cc
 @@ -24,6 +24,8 @@
@@ -598,11 +600,11 @@ index 084794a16d..8f54201bee 100644
 +
 +#undef GetFactoryStorage
 diff --git a/chrome/browser/enterprise/connectors/analysis/page_print_request_handler.cc b/chrome/browser/enterprise/connectors/analysis/page_print_request_handler.cc
-index 659b854ca9..eade5705c7 100644
+index 54491e3cd2..1dfaec52f2 100644
 --- a/chrome/browser/enterprise/connectors/analysis/page_print_request_handler.cc
 +++ b/chrome/browser/enterprise/connectors/analysis/page_print_request_handler.cc
 @@ -16,6 +16,8 @@
- #include "components/enterprise/connectors/core/analysis_settings.h"
+ #include "components/enterprise/connectors/core/reporting_constants.h"
  #include "components/safe_browsing/content/browser/web_ui/safe_browsing_ui.h"
  
 +#define TestFactoryStorage TestFactoryStorage_PagePrintRequestHandler
@@ -610,14 +612,14 @@ index 659b854ca9..eade5705c7 100644
  namespace enterprise_connectors {
  
  namespace {
-@@ -216,3 +218,5 @@ void PagePrintRequestHandler::FinishLargeDataRequestEarly(
+@@ -212,3 +214,5 @@ void PagePrintRequestHandler::FinishLargeDataRequestEarly(
  }
  
  }  // namespace enterprise_connectors
 +
 +#undef TestFactoryStorage
 diff --git a/chrome/browser/enterprise/connectors/device_trust/signals/decorators/browser/browser_signals_decorator.cc b/chrome/browser/enterprise/connectors/device_trust/signals/decorators/browser/browser_signals_decorator.cc
-index d87449be47..f52f4955d0 100644
+index 4bc46636d6..355ea4ca89 100644
 --- a/chrome/browser/enterprise/connectors/device_trust/signals/decorators/browser/browser_signals_decorator.cc
 +++ b/chrome/browser/enterprise/connectors/device_trust/signals/decorators/browser/browser_signals_decorator.cc
 @@ -30,6 +30,8 @@
@@ -629,7 +631,7 @@ index d87449be47..f52f4955d0 100644
  namespace enterprise_connectors {
  
  namespace {
-@@ -179,3 +181,5 @@ void BrowserSignalsDecorator::OnAllSignalsReceived(
+@@ -181,3 +183,5 @@ void BrowserSignalsDecorator::OnAllSignalsReceived(
  }
  
  }  // namespace enterprise_connectors
@@ -731,7 +733,7 @@ index 35f419011c..14ea7a5fda 100644
 +
 +#undef kKeyVersion
 diff --git a/chrome/browser/enterprise/connectors/reporting/extension_install_event_router.cc b/chrome/browser/enterprise/connectors/reporting/extension_install_event_router.cc
-index dac22e5538..37a506b258 100644
+index 7baf192b5e..2e7b9a97b5 100644
 --- a/chrome/browser/enterprise/connectors/reporting/extension_install_event_router.cc
 +++ b/chrome/browser/enterprise/connectors/reporting/extension_install_event_router.cc
 @@ -22,6 +22,8 @@
@@ -815,7 +817,7 @@ index cde7321e65..98bd721175 100644
  
  }  // namespace enterprise
 diff --git a/chrome/browser/extensions/BUILD.gn b/chrome/browser/extensions/BUILD.gn
-index a66766c31c..27c29cb049 100644
+index ec4a050057..74786939ed 100644
 --- a/chrome/browser/extensions/BUILD.gn
 +++ b/chrome/browser/extensions/BUILD.gn
 @@ -5,6 +5,7 @@
@@ -826,7 +828,7 @@ index a66766c31c..27c29cb049 100644
  import("//build/config/ozone.gni")
  import("//build/config/ui.gni")
  import("//chrome/common/features.gni")
-@@ -23,7 +24,7 @@ assert(enable_extensions_core)
+@@ -24,7 +25,7 @@ assert(enable_extensions_core)
  assert(enable_supervised_users)
  assert(!is_fuchsia, "Fuchsia shouldn't use anything in //chrome")
  
@@ -835,7 +837,7 @@ index a66766c31c..27c29cb049 100644
    # TODO(https://crbug.com/356905053): When files support being built on
    # desktop android, move them here, outside the if (enable_extensions) block.
    sources = [
-@@ -478,6 +479,7 @@ source_set("extensions") {
+@@ -496,6 +497,7 @@ source_set("extensions") {
      "window_controller_list.h",
      "window_controller_list_observer.h",
    ]
@@ -843,7 +845,7 @@ index a66766c31c..27c29cb049 100644
    configs += [
      "//build/config:precompiled_headers",
      "//build/config/compiler:wexit_time_destructors",
-@@ -793,6 +795,10 @@ source_set("extensions") {
+@@ -815,6 +817,10 @@ source_set("extensions") {
        "webstore_install_with_prompt.cc",
        "webstore_install_with_prompt.h",
      ]
@@ -897,10 +899,10 @@ index e7f2532dee..da1f54abf3 100644
 +#undef kExtractedBinFileName
 +#undef kExpectedMagic
 diff --git a/chrome/browser/extensions/api/image_writer_private/zip_extractor.cc b/chrome/browser/extensions/api/image_writer_private/zip_extractor.cc
-index 3e624ada36..c8f280a7be 100644
+index fe6ce17753..06b5caea9d 100644
 --- a/chrome/browser/extensions/api/image_writer_private/zip_extractor.cc
 +++ b/chrome/browser/extensions/api/image_writer_private/zip_extractor.cc
-@@ -13,6 +13,8 @@
+@@ -14,6 +14,8 @@
  #include "base/task/thread_pool.h"
  #include "chrome/browser/extensions/api/image_writer_private/error_constants.h"
  
@@ -909,14 +911,14 @@ index 3e624ada36..c8f280a7be 100644
  namespace extensions {
  namespace image_writer {
  
-@@ -105,3 +107,5 @@ void ZipExtractor::OnComplete() {
+@@ -106,3 +108,5 @@ void ZipExtractor::OnComplete() {
  
  }  // namespace image_writer
  }  // namespace extensions
 +
 +#undef kExpectedMagic
 diff --git a/chrome/browser/extensions/api/tabs/tabs_event_router.cc b/chrome/browser/extensions/api/tabs/tabs_event_router.cc
-index d234cab2e4..81e7622107 100644
+index ca5bb784fc..6e2b062572 100644
 --- a/chrome/browser/extensions/api/tabs/tabs_event_router.cc
 +++ b/chrome/browser/extensions/api/tabs/tabs_event_router.cc
 @@ -304,7 +304,7 @@ void TabsEventRouter::OnTabGroupChanged(const TabGroupChange& change) {
@@ -937,7 +939,7 @@ index d234cab2e4..81e7622107 100644
        std::set<std::string> changed_property_names;
        changed_property_names.insert(kGroupIdKey);
        DispatchTabUpdatedEvent(tab->GetContents(),
-@@ -328,7 +328,7 @@ void TabsEventRouter::TabGroupedStateChanged(
+@@ -353,7 +353,7 @@ void TabsEventRouter::TabGroupedStateChanged(
      TabStripModel* tab_strip_model,
      std::optional<tab_groups::TabGroupId> old_group,
      std::optional<tab_groups::TabGroupId> new_group,
@@ -947,7 +949,7 @@ index d234cab2e4..81e7622107 100644
    std::set<std::string> changed_property_names;
    changed_property_names.insert(kGroupIdKey);
 diff --git a/chrome/browser/extensions/api/tabs/tabs_event_router.h b/chrome/browser/extensions/api/tabs/tabs_event_router.h
-index 68ffb2c9ef..ce1e92b1d8 100644
+index 59694ff4ee..28963e4c18 100644
 --- a/chrome/browser/extensions/api/tabs/tabs_event_router.h
 +++ b/chrome/browser/extensions/api/tabs/tabs_event_router.h
 @@ -75,7 +75,7 @@ class TabsEventRouter : public TabStripModelObserver,
@@ -958,7 +960,20 @@ index 68ffb2c9ef..ce1e92b1d8 100644
 +                              ::tabs::TabInterface* tab,
                                int index) override;
    void OnTabGroupChanged(const TabGroupChange& change) override;
- 
+   void OnSplitTabChanged(const SplitTabChange& change) override;
+diff --git a/chrome/browser/extensions/browser_extension_window_controller.cc b/chrome/browser/extensions/browser_extension_window_controller.cc
+index dfea23bf3f..a479fa0146 100644
+--- a/chrome/browser/extensions/browser_extension_window_controller.cc
++++ b/chrome/browser/extensions/browser_extension_window_controller.cc
+@@ -165,7 +165,7 @@ content::WebContents* BrowserExtensionWindowController::GetActiveTab() const {
+   return nullptr;
+ #else
+   // In some situations, especially tests, there may not be an active tab.
+-  tabs::TabInterface* active_tab = tab_list_->GetActiveTab();
++  ::tabs::TabInterface* active_tab = tab_list_->GetActiveTab();
+   return active_tab ? active_tab->GetContents() : nullptr;
+ #endif
+ }
 diff --git a/chrome/browser/extensions/extension_management.cc b/chrome/browser/extensions/extension_management.cc
 index 7d55128c57..2cb18e4b0f 100644
 --- a/chrome/browser/extensions/extension_management.cc
@@ -973,10 +988,10 @@ index 7d55128c57..2cb18e4b0f 100644
    }
  
 diff --git a/chrome/browser/extensions/extension_view_host_factory.cc b/chrome/browser/extensions/extension_view_host_factory.cc
-index 98b847282b..fe9e863f1a 100644
+index 107f75833f..fee72365ae 100644
 --- a/chrome/browser/extensions/extension_view_host_factory.cc
 +++ b/chrome/browser/extensions/extension_view_host_factory.cc
-@@ -293,7 +293,7 @@ ExtensionViewHostFactory::CreateSidePanelHost(
+@@ -289,7 +289,7 @@ ExtensionViewHostFactory::CreateSidePanelHost(
      const Extension& extension,
      const GURL& url,
      BrowserWindowInterface* browser,
@@ -999,7 +1014,7 @@ index 4c9da48c3d..3a588d163f 100644
  };
  
 diff --git a/chrome/browser/feedback/BUILD.gn b/chrome/browser/feedback/BUILD.gn
-index 53fca30afe..4b79231b61 100644
+index 4afddd6ead..3035451b4b 100644
 --- a/chrome/browser/feedback/BUILD.gn
 +++ b/chrome/browser/feedback/BUILD.gn
 @@ -5,6 +5,7 @@
@@ -1010,7 +1025,7 @@ index 53fca30afe..4b79231b61 100644
  
  source_set("feedback_enum") {
    sources = [ "public/feedback_source.h" ]
-@@ -57,7 +58,7 @@ source_set("feedback") {
+@@ -58,7 +59,7 @@ source_set("feedback") {
    }
  }
  
@@ -1020,10 +1035,10 @@ index 53fca30afe..4b79231b61 100644
    deps = [ ":feedback" ]
    public_deps = [ "//components/feedback" ]
 diff --git a/chrome/browser/glic/BUILD.gn b/chrome/browser/glic/BUILD.gn
-index 0c8ed92db2..0feb5e5b07 100644
+index c2a0dacb06..33bf12b01a 100644
 --- a/chrome/browser/glic/BUILD.gn
 +++ b/chrome/browser/glic/BUILD.gn
-@@ -3,13 +3,14 @@
+@@ -3,6 +3,7 @@
  # found in the LICENSE file.
  
  import("//build/config/gclient_args.gni")
@@ -1031,9 +1046,10 @@ index 0c8ed92db2..0feb5e5b07 100644
  import("//build/config/ozone.gni")
  import("//chrome/common/features.gni")
  import("//mojo/public/tools/bindings/mojom.gni")
- 
- assert(enable_glic)
- 
+@@ -14,7 +15,7 @@ assert(enable_glic)
+ # then list resources only needed internally for the implementation. In the
+ # meantime, prefer adding new sources or dependencies only needed internally to
+ # the "impl" target.
 -source_set("glic") {
 +jumbo_source_set("glic") {
    sources = [
@@ -1082,7 +1098,7 @@ index c05910e56f..26ef586a28 100644
 +#undef kRequestMargin
 +#undef kRequestTimeout
 diff --git a/chrome/browser/media/router/BUILD.gn b/chrome/browser/media/router/BUILD.gn
-index 71847852da..be568b9f63 100644
+index 2cda09a444..c5ebc86e75 100644
 --- a/chrome/browser/media/router/BUILD.gn
 +++ b/chrome/browser/media/router/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -1093,7 +1109,7 @@ index 71847852da..be568b9f63 100644
  import("//extensions/buildflags/buildflags.gni")
  import("//testing/libfuzzer/fuzzer_test.gni")
  import("//testing/test.gni")
-@@ -65,7 +66,7 @@ static_library("media_router_feature") {
+@@ -68,7 +69,7 @@ static_library("media_router_feature") {
    }
  }
  
@@ -1103,16 +1119,16 @@ index 71847852da..be568b9f63 100644
      "chrome_media_router_factory.cc",
      "chrome_media_router_factory.h",
 diff --git a/chrome/browser/media/router/discovery/BUILD.gn b/chrome/browser/media/router/discovery/BUILD.gn
-index d4c4da05ee..e945cee8c1 100644
+index 4d439e6a82..95d6d3b4f1 100644
 --- a/chrome/browser/media/router/discovery/BUILD.gn
 +++ b/chrome/browser/media/router/discovery/BUILD.gn
-@@ -2,10 +2,12 @@
- # Use of this source code is governed by a BSD-style license that can be
+@@ -3,11 +3,12 @@
  # found in the LICENSE file.
  
+ import("//build/config/chrome_build.gni")
 +import("//build/config/jumbo.gni")
-+
- assert(!is_android)
+ 
+ assert(!is_android || is_desktop_android, "Not supported on mobile")
  assert(!is_fuchsia, "Fuchsia shouldn't use anything in //chrome")
  
 -static_library("discovery") {
@@ -1273,7 +1289,7 @@ index c33e4780c3..106573b565 100644
 +
 +#undef kLoggerComponent
 diff --git a/chrome/browser/media/webrtc/BUILD.gn b/chrome/browser/media/webrtc/BUILD.gn
-index 5039eccf86..c3dc749939 100644
+index 86a14c2541..38aa0e9d4b 100644
 --- a/chrome/browser/media/webrtc/BUILD.gn
 +++ b/chrome/browser/media/webrtc/BUILD.gn
 @@ -4,13 +4,14 @@
@@ -1293,10 +1309,10 @@ index 5039eccf86..c3dc749939 100644
      "audio_debug_recordings_handler.cc",
      "audio_debug_recordings_handler.h",
 diff --git a/chrome/browser/media/webrtc/tab_desktop_media_list.cc b/chrome/browser/media/webrtc/tab_desktop_media_list.cc
-index fa393d8461..ca74e8e060 100644
+index 8e04328c9b..f571428d93 100644
 --- a/chrome/browser/media/webrtc/tab_desktop_media_list.cc
 +++ b/chrome/browser/media/webrtc/tab_desktop_media_list.cc
-@@ -42,6 +42,8 @@ using content::BrowserThread;
+@@ -38,6 +38,8 @@ using content::BrowserThread;
  using content::DesktopMediaID;
  using content::WebContents;
  
@@ -1305,17 +1321,17 @@ index fa393d8461..ca74e8e060 100644
  namespace {
  
  gfx::ImageSkia CreateEnclosedFaviconImage(gfx::Size size,
-@@ -393,3 +395,5 @@ TabDesktopMediaList::RefreshCompleter::~RefreshCompleter() {
+@@ -389,3 +391,5 @@ TabDesktopMediaList::RefreshCompleter::~RefreshCompleter() {
      list_->CompleteRefreshAfterThumbnailProcessing();
    }
  }
 +
 +#undef HandleCapturedBitmap
 diff --git a/chrome/browser/metrics/tab_stats/tab_stats_tracker.cc b/chrome/browser/metrics/tab_stats/tab_stats_tracker.cc
-index d2f7e955e9..e840cdb641 100644
+index 078d546861..fbdd689a53 100644
 --- a/chrome/browser/metrics/tab_stats/tab_stats_tracker.cc
 +++ b/chrome/browser/metrics/tab_stats/tab_stats_tracker.cc
-@@ -841,7 +841,7 @@ void TabStatsTracker::UmaStatsReportingDelegate::ReportHeartbeatMetrics(
+@@ -843,7 +843,7 @@ void TabStatsTracker::UmaStatsReportingDelegate::ReportHeartbeatMetrics(
                                                   tab_stats.total_tab_count);
    UmaHistogramCounts10000WithBatteryStateVariant(kWindowCountHistogramName,
                                                   tab_stats.window_count);
@@ -1367,7 +1383,7 @@ index 70673983e7..b26b599ea7 100644
 +#undef kTrafficAnnotation
 +#undef kMaxResponseSize
 diff --git a/chrome/browser/notifications/scheduler/internal/BUILD.gn b/chrome/browser/notifications/scheduler/internal/BUILD.gn
-index 8bcd51f336..b9b3bd726e 100644
+index 19f349ee14..c3325bea31 100644
 --- a/chrome/browser/notifications/scheduler/internal/BUILD.gn
 +++ b/chrome/browser/notifications/scheduler/internal/BUILD.gn
 @@ -2,8 +2,10 @@
@@ -1382,6 +1398,24 @@ index 8bcd51f336..b9b3bd726e 100644
    visibility = [
      ":unit_tests",
      "//chrome/browser/notifications/scheduler",
+diff --git a/chrome/browser/notifications/system_notification_helper.cc b/chrome/browser/notifications/system_notification_helper.cc
+index 3c32326a59..84d92d56e6 100644
+--- a/chrome/browser/notifications/system_notification_helper.cc
++++ b/chrome/browser/notifications/system_notification_helper.cc
+@@ -6,6 +6,8 @@
+ 
+ #include "chrome/browser/notifications/notification_display_service_impl.h"
+ 
++#define g_instance g_instance_system_notification_helper
++
+ namespace {
+ 
+ SystemNotificationHelper* g_instance = nullptr;
+@@ -52,3 +54,4 @@ NotificationDisplayService* SystemNotificationHelper::GetSystemService() {
+   return system_service_.get();
+ }
+ 
++#undef g_instance
 diff --git a/chrome/browser/page_load_metrics/observers/gws_hp_page_load_metrics_observer.cc b/chrome/browser/page_load_metrics/observers/gws_hp_page_load_metrics_observer.cc
 index 5489039966..dd38184af4 100644
 --- a/chrome/browser/page_load_metrics/observers/gws_hp_page_load_metrics_observer.cc
@@ -1431,11 +1465,30 @@ index 528272b33b..829f11034b 100644
  }
 +
 +#undef IsSameSite
+diff --git a/chrome/browser/password_manager/chrome_password_manager_client.cc b/chrome/browser/password_manager/chrome_password_manager_client.cc
+index 2cb76a01c7..3198606dc8 100644
+--- a/chrome/browser/password_manager/chrome_password_manager_client.cc
++++ b/chrome/browser/password_manager/chrome_password_manager_client.cc
+@@ -210,6 +210,8 @@ using password_manager::PasswordStoreBackendError;
+ using password_manager::metrics_util::PasswordType;
+ using sessions::SerializedNavigationEntry;
+ 
++#define Logger SavePasswordProgressLogger
++
+ // Shorten the name to spare line breaks. The code provides enough context
+ // already.
+ using Logger = autofill::SavePasswordProgressLogger;
+@@ -2258,3 +2260,5 @@ void ChromePasswordManagerClient::ResetErrorMessageDelegate() {
+ #endif
+ 
+ WEB_CONTENTS_USER_DATA_KEY_IMPL(ChromePasswordManagerClient);
++
++#undef Logger
 diff --git a/chrome/browser/password_manager/password_change/change_password_form_filling_submission_helper.cc b/chrome/browser/password_manager/password_change/change_password_form_filling_submission_helper.cc
-index 0b904512fc..d87adbb5c4 100644
+index 1f98f5b6c4..8e7fc54c26 100644
 --- a/chrome/browser/password_manager/password_change/change_password_form_filling_submission_helper.cc
 +++ b/chrome/browser/password_manager/password_change/change_password_form_filling_submission_helper.cc
-@@ -21,6 +21,9 @@
+@@ -24,6 +24,9 @@
  #include "content/public/browser/web_contents.h"
  #include "third_party/abseil-cpp/absl/cleanup/cleanup.h"
  
@@ -1445,32 +1498,51 @@ index 0b904512fc..d87adbb5c4 100644
  namespace {
  
  using Logger = password_manager::BrowserSavePasswordProgressLogger;
-@@ -334,3 +337,6 @@ void ChangePasswordFormFillingSubmissionHelper::
- 
-   submission_verifier_->CheckSubmissionOutcome(std::move(callback_));
+@@ -405,3 +408,6 @@ void ChangePasswordFormFillingSubmissionHelper::OnChangePasswordFormFound(
+   TriggerFilling(*form_manager->GetParsedObservedForm(),
+                  form_manager->GetDriver());
  }
 +
 +#undef GetAIPageContentOptions
 +#undef GetLoggerIfAvailable
 diff --git a/chrome/browser/password_manager/password_change/password_change_submission_verifier.cc b/chrome/browser/password_manager/password_change/password_change_submission_verifier.cc
-index 5f682a031c..a9f360f8c1 100644
+index 43ee25fb35..441867c2b2 100644
 --- a/chrome/browser/password_manager/password_change/password_change_submission_verifier.cc
 +++ b/chrome/browser/password_manager/password_change/password_change_submission_verifier.cc
-@@ -26,6 +26,8 @@
+@@ -27,6 +27,8 @@
+ #include "services/metrics/public/cpp/ukm_source_id.h"
  #include "third_party/abseil-cpp/absl/cleanup/cleanup.h"
- #include "ui/accessibility/ax_tree_update.h"
  
 +#define GetAIPageContentOptions GetAIPageContentOptions_PasswordChangeSubmissionVerifier
 +
  namespace {
  
  using PasswordChangeOutcome = optimization_guide::proto ::
-@@ -256,3 +258,5 @@ void PasswordChangeSubmissionVerifier::OnExecutionResponseCallback(
+@@ -221,3 +223,5 @@ void PasswordChangeSubmissionVerifier::OnExecutionResponseCallback(
    // Password change was successfully completed.
    std::move(callback_).Run(true);
  }
 +
 +#undef GetAIPageContentOptions
+diff --git a/chrome/browser/password_manager/profile_password_store_factory.cc b/chrome/browser/password_manager/profile_password_store_factory.cc
+index 5f46c69304..446c1ee2b5 100644
+--- a/chrome/browser/password_manager/profile_password_store_factory.cc
++++ b/chrome/browser/password_manager/profile_password_store_factory.cc
+@@ -38,6 +38,8 @@ using password_manager::AffiliatedMatchHelper;
+ using password_manager::PasswordStore;
+ using password_manager::PasswordStoreInterface;
+ 
++#define BuildPasswordStore BuildPasswordStore_ProfilePasswordStoreFactory
++
+ namespace {
+ 
+ scoped_refptr<RefcountedKeyedService> BuildPasswordStore(
+@@ -170,3 +172,5 @@ ProfilePasswordStoreFactory::BuildServiceInstanceFor(
+ bool ProfilePasswordStoreFactory::ServiceIsNULLWhileTesting() const {
+   return true;
+ }
++
++#undef BuildPasswordStore
 diff --git a/chrome/browser/performance_manager/metrics/metrics_provider_common.cc b/chrome/browser/performance_manager/metrics/metrics_provider_common.cc
 index fa64a10cd8..a9a491cbcf 100644
 --- a/chrome/browser/performance_manager/metrics/metrics_provider_common.cc
@@ -1523,7 +1595,7 @@ index 230d5de6f9..d47bf42307 100644
 +
 +#undef kDescriberName
 diff --git a/chrome/browser/permissions/BUILD.gn b/chrome/browser/permissions/BUILD.gn
-index ef621cb8b2..8978f48f53 100644
+index 081ef9124e..8dbf1ad63a 100644
 --- a/chrome/browser/permissions/BUILD.gn
 +++ b/chrome/browser/permissions/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -1543,22 +1615,22 @@ index ef621cb8b2..8978f48f53 100644
    sources = [
      "chrome_permissions_client.cc",
      "chrome_permissions_client.h",
-@@ -55,6 +56,10 @@ source_set("permissions") {
+@@ -59,6 +60,10 @@ source_set("permissions") {
      "quiet_notification_permission_ui_state.cc",
      "quiet_notification_permission_ui_state.h",
    ]
 +  jumbo_excluded_sources = [
 +    # FIXME: Too many conflicts, reference to 'PermissionUmaUtil' is ambiguous
-+    "prediction_based_permission_ui_selector.cc",
++    "prediction_service/prediction_based_permission_ui_selector.cc",
 +  ]
  
    public_deps = [
      "//chrome/browser:browser_public_dependencies",
 diff --git a/chrome/browser/policy/cloud/user_cloud_policy_invalidator.cc b/chrome/browser/policy/cloud/user_cloud_policy_invalidator.cc
-index 5165461c56..bf7b9f4a93 100644
+index 9f64e20d97..5dd1ac0929 100644
 --- a/chrome/browser/policy/cloud/user_cloud_policy_invalidator.cc
 +++ b/chrome/browser/policy/cloud/user_cloud_policy_invalidator.cc
-@@ -16,6 +16,8 @@
+@@ -17,6 +17,8 @@
  #include "components/invalidation/profile_invalidation_provider.h"
  #include "components/policy/core/common/cloud/cloud_policy_manager.h"
  
@@ -1567,17 +1639,17 @@ index 5165461c56..bf7b9f4a93 100644
  namespace {
  
  invalidation::ProfileInvalidationProvider* GetInvalidationProvider(
-@@ -74,3 +76,5 @@ void UserCloudPolicyInvalidator::OnProfileInitializationComplete(
+@@ -77,3 +79,5 @@ void UserCloudPolicyInvalidator::OnProfileInitializationComplete(
  }
  
  }  // namespace policy
 +
 +#undef GetInvalidationProvider
 diff --git a/chrome/browser/policy/cloud/user_fm_registration_token_uploader.cc b/chrome/browser/policy/cloud/user_fm_registration_token_uploader.cc
-index 911f37bf84..a406b8e64e 100644
+index 8a7d32b737..d18b0632b2 100644
 --- a/chrome/browser/policy/cloud/user_fm_registration_token_uploader.cc
 +++ b/chrome/browser/policy/cloud/user_fm_registration_token_uploader.cc
-@@ -24,6 +24,8 @@
+@@ -22,6 +22,8 @@
  #include "chrome/browser/ash/cert_provisioning/cert_provisioning_common.h"
  #endif
  
@@ -1586,14 +1658,14 @@ index 911f37bf84..a406b8e64e 100644
  namespace {
  
  // Returns a set of all project numbers that will be used by user.
-@@ -101,3 +103,5 @@ void UserFmRegistrationTokenUploader::OnProfileInitializationComplete(
+@@ -89,3 +91,5 @@ void UserFmRegistrationTokenUploader::OnProfileInitializationComplete(
  }
  
  }  // namespace policy
 +
 +#undef GetInvalidationProvider
 diff --git a/chrome/browser/predictors/lcp_critical_path_predictor/lcp_critical_path_predictor_util.cc b/chrome/browser/predictors/lcp_critical_path_predictor/lcp_critical_path_predictor_util.cc
-index 9cd183d802..c7be091f37 100644
+index fada27a211..3e78c18c3f 100644
 --- a/chrome/browser/predictors/lcp_critical_path_predictor/lcp_critical_path_predictor_util.cc
 +++ b/chrome/browser/predictors/lcp_critical_path_predictor/lcp_critical_path_predictor_util.cc
 @@ -21,6 +21,8 @@
@@ -1631,7 +1703,7 @@ index fe2501a1f9..128ef131d6 100644
 +
 +#undef IsSameSite
 diff --git a/chrome/browser/preloading/bookmarkbar_preload/bookmarkbar_preload_pipeline.cc b/chrome/browser/preloading/bookmarkbar_preload/bookmarkbar_preload_pipeline.cc
-index f4acd6cfe2..abfc3174af 100644
+index d6848c15a0..533ae584a4 100644
 --- a/chrome/browser/preloading/bookmarkbar_preload/bookmarkbar_preload_pipeline.cc
 +++ b/chrome/browser/preloading/bookmarkbar_preload/bookmarkbar_preload_pipeline.cc
 @@ -17,6 +17,8 @@
@@ -1643,8 +1715,8 @@ index f4acd6cfe2..abfc3174af 100644
  namespace {
  
  const char kHistogramPrerenderBookmarkBarIsPrerenderingSrpUrl[] =
-@@ -104,3 +106,5 @@ bool BookmarkBarPreloadPipeline::StartPrerender(
-       std::move(prerender_navigation_handle_callback));
+@@ -105,3 +107,5 @@ bool BookmarkBarPreloadPipeline::StartPrerender(
+       /*allow_reuse=*/false);
    return prerender_handle_ != nullptr;
  }
 +
@@ -1690,7 +1762,7 @@ index 4a85002201..6d5dc1e6c7 100644
 +#undef kPrefValueSeparator
 +#undef MakePrefValue
 diff --git a/chrome/browser/safe_browsing/BUILD.gn b/chrome/browser/safe_browsing/BUILD.gn
-index 4404910c2b..0ace4e2e46 100644
+index a82341061c..0bbfd9503c 100644
 --- a/chrome/browser/safe_browsing/BUILD.gn
 +++ b/chrome/browser/safe_browsing/BUILD.gn
 @@ -2,11 +2,12 @@
@@ -1869,7 +1941,7 @@ index 096f941945..051e5c7404 100644
        base::BindOnce(&SystemLogSourceDataCollectorAdaptor::OnPIIDetected,
                       weak_ptr_factory_.GetWeakPtr(),
 diff --git a/chrome/browser/sync/BUILD.gn b/chrome/browser/sync/BUILD.gn
-index 890cf8f4b9..e9c930115a 100644
+index 7fef2385ed..cd774869d1 100644
 --- a/chrome/browser/sync/BUILD.gn
 +++ b/chrome/browser/sync/BUILD.gn
 @@ -2,13 +2,14 @@
@@ -1889,7 +1961,7 @@ index 890cf8f4b9..e9c930115a 100644
      "account_bookmark_sync_service_factory.cc",
      "account_bookmark_sync_service_factory.h",
 diff --git a/chrome/browser/task_manager/BUILD.gn b/chrome/browser/task_manager/BUILD.gn
-index f95a108c2f..33691863bc 100644
+index 413f14915a..d970335aa7 100644
 --- a/chrome/browser/task_manager/BUILD.gn
 +++ b/chrome/browser/task_manager/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -1899,8 +1971,8 @@ index f95a108c2f..33691863bc 100644
 +import("//build/config/jumbo.gni")
  import("//chrome/common/features.gni")
  import("//components/guest_view/buildflags/buildflags.gni")
- import("//components/nacl/features.gni")
-@@ -120,7 +121,7 @@ source_set("task_manager") {
+ import("//extensions/buildflags/buildflags.gni")
+@@ -118,7 +119,7 @@ source_set("task_manager") {
  # The implementation must be linked into the same binary as the public
  # interface. This does have circular dependencies with //chrome/browser and
  # //chrome/browser/ui.
@@ -1971,7 +2043,7 @@ index 10a78726d1..c719a63c7b 100644
 +
 +#undef kTrialName
 diff --git a/chrome/browser/ui/BUILD.gn b/chrome/browser/ui/BUILD.gn
-index 28ca0a42ae..72f9028b16 100644
+index 08ed584f52..002e664148 100644
 --- a/chrome/browser/ui/BUILD.gn
 +++ b/chrome/browser/ui/BUILD.gn
 @@ -5,6 +5,7 @@
@@ -1982,7 +2054,7 @@ index 28ca0a42ae..72f9028b16 100644
  import("//build/config/ozone.gni")
  import("//build/config/ui.gni")
  import("//chrome/browser/buildflags.gni")
-@@ -47,7 +48,7 @@ generate_allowlist_from_histograms_file("webui_name_variants") {
+@@ -46,7 +47,7 @@ generate_allowlist_from_histograms_file("webui_name_variants") {
  # modularized, this target should be folded in with //chrome/browser:browser.
  # The two are already semantically a part of the same target as they allow
  # circular includes from each other.
@@ -1991,7 +2063,7 @@ index 28ca0a42ae..72f9028b16 100644
    sources = [
      "accelerator_utils.h",
      "bluetooth/bluetooth_dialogs.h",
-@@ -253,6 +254,7 @@ static_library("ui") {
+@@ -228,6 +229,7 @@ static_library("ui") {
      "webui/webui_load_timer.cc",
      "webui/webui_load_timer.h",
    ]
@@ -1999,7 +2071,7 @@ index 28ca0a42ae..72f9028b16 100644
  
    if (enable_session_service) {
      sources += [
-@@ -2963,6 +2965,10 @@ static_library("ui") {
+@@ -2886,6 +2888,10 @@ static_library("ui") {
        "views/profiles/signin_view_controller_delegate_views.cc",
        "views/profiles/signin_view_controller_delegate_views.h",
      ]
@@ -2010,7 +2082,7 @@ index 28ca0a42ae..72f9028b16 100644
      deps += [
        "//chrome/browser/lifetime:termination_notification",
        "//chrome/browser/search/background",
-@@ -3200,6 +3206,10 @@ static_library("ui") {
+@@ -3098,6 +3104,10 @@ static_library("ui") {
        "views/passwords/biometric_authentication_for_filling_bubble_view.cc",
        "views/passwords/biometric_authentication_for_filling_bubble_view.h",
      ]
@@ -2021,9 +2093,9 @@ index 28ca0a42ae..72f9028b16 100644
    }
  
    if (is_win || is_mac) {
-@@ -4871,6 +4881,11 @@ static_library("ui") {
-       # needed for "friend" statements for use in tests.
-       "translate/translate_bubble_test_utils.h",
+@@ -4746,6 +4756,11 @@ static_library("ui") {
+       "//chrome/browser/upgrade_detector",
+       "//ui/base/mojom:ui_base_types",
      ]
 +    jumbo_excluded_sources += [
 +      # DISTANCE_BUTTON_VERTICAL both exists in
@@ -2031,10 +2103,10 @@ index 28ca0a42ae..72f9028b16 100644
 +      "views/file_system_access/file_system_access_restore_permission_bubble_view.cc",
 +    ]
  
-     sources += get_target_outputs(":webui_name_variants")
- 
+     deps += [
+       "//base",
 diff --git a/chrome/browser/ui/autofill/BUILD.gn b/chrome/browser/ui/autofill/BUILD.gn
-index f7bf85cbce..1f16ed9c92 100644
+index e4bbfdcee5..d51d446f91 100644
 --- a/chrome/browser/ui/autofill/BUILD.gn
 +++ b/chrome/browser/ui/autofill/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -2045,7 +2117,7 @@ index f7bf85cbce..1f16ed9c92 100644
  import("//build/config/ui.gni")
  import("//components/signin/features.gni")
  
-@@ -108,7 +109,7 @@ source_set("autofill") {
+@@ -109,7 +110,7 @@ source_set("autofill") {
    allow_circular_includes_from = [ "//chrome/browser/ui/autofill/payments" ]
  }
  
@@ -2055,7 +2127,7 @@ index f7bf85cbce..1f16ed9c92 100644
      "autofill_bubble_controller_base.cc",
      "autofill_client_provider.cc",
 diff --git a/chrome/browser/ui/autofill/payments/BUILD.gn b/chrome/browser/ui/autofill/payments/BUILD.gn
-index 9d89d15f56..c0dfaec18c 100644
+index 5f92ad6c2b..a1a8ebb019 100644
 --- a/chrome/browser/ui/autofill/payments/BUILD.gn
 +++ b/chrome/browser/ui/autofill/payments/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -2066,7 +2138,7 @@ index 9d89d15f56..c0dfaec18c 100644
  import("//build/config/ui.gni")
  
  assert(is_win || is_mac || is_linux || is_chromeos || is_android)
-@@ -77,7 +78,7 @@ source_set("payments") {
+@@ -80,7 +81,7 @@ source_set("payments") {
    }
  }
  
@@ -2076,7 +2148,7 @@ index 9d89d15f56..c0dfaec18c 100644
      "autofill_dialog_models.cc",
      "chrome_payments_autofill_client.cc",
 diff --git a/chrome/browser/ui/global_media_controls/BUILD.gn b/chrome/browser/ui/global_media_controls/BUILD.gn
-index 682e1dabfe..d06561cb8c 100644
+index a893fc00db..41110e21bf 100644
 --- a/chrome/browser/ui/global_media_controls/BUILD.gn
 +++ b/chrome/browser/ui/global_media_controls/BUILD.gn
 @@ -2,6 +2,8 @@
@@ -2088,8 +2160,8 @@ index 682e1dabfe..d06561cb8c 100644
  assert(is_win || is_mac || is_linux || is_chromeos)
  
  source_set("global_media_controls") {
-@@ -49,7 +51,7 @@ source_set("global_media_controls") {
-   ]
+@@ -51,7 +53,7 @@ source_set("global_media_controls") {
+   }
  }
  
 -source_set("impl") {
@@ -2117,7 +2189,7 @@ index d88b9ed978..b64294977f 100644
 +
 +#undef GetWebContentsFromPresentationRequest
 diff --git a/chrome/browser/ui/lens/BUILD.gn b/chrome/browser/ui/lens/BUILD.gn
-index 60051057ed..823562612c 100644
+index 3b53b7954c..3352b8e844 100644
 --- a/chrome/browser/ui/lens/BUILD.gn
 +++ b/chrome/browser/ui/lens/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -2128,15 +2200,15 @@ index 60051057ed..823562612c 100644
  import("//pdf/features.gni")
  
  # Contained Lens dependencies are currently for desktop platforms only
-@@ -78,7 +79,7 @@ source_set("lens") {
+@@ -83,7 +84,7 @@ source_set("lens") {
    }
  }
  
 -source_set("impl") {
 +jumbo_source_set("impl") {
    sources = [
-     "lens_help_menu_utils.cc",
-     "lens_overlay_blur_layer_delegate.cc",
+     "lens_composebox_controller.cc",
+     "lens_composebox_handler.cc",
 diff --git a/chrome/browser/ui/lens/lens_overlay_gen204_controller.cc b/chrome/browser/ui/lens/lens_overlay_gen204_controller.cc
 index cb11e962cc..7caf5f321f 100644
 --- a/chrome/browser/ui/lens/lens_overlay_gen204_controller.cc
@@ -2180,10 +2252,10 @@ index 53e1ab1608..77a16cf015 100644
 +
 +#undef kTrafficAnnotationTag
 diff --git a/chrome/browser/ui/lens/lens_overlay_untrusted_ui.cc b/chrome/browser/ui/lens/lens_overlay_untrusted_ui.cc
-index 375f255d6c..7d71a926ed 100644
+index ad157ee3a5..05e392102f 100644
 --- a/chrome/browser/ui/lens/lens_overlay_untrusted_ui.cc
 +++ b/chrome/browser/ui/lens/lens_overlay_untrusted_ui.cc
-@@ -332,7 +332,7 @@ LensOverlayUntrustedUI::LensOverlayUntrustedUI(content::WebUI* web_ui)
+@@ -335,7 +335,7 @@ LensOverlayUntrustedUI::LensOverlayUntrustedUI(content::WebUI* web_ui)
    // Determine if the cursor tooltip should appear.
    Profile* profile = Profile::FromWebUI(web_ui);
    int lens_overlay_start_count =
@@ -2193,7 +2265,7 @@ index 375f255d6c..7d71a926ed 100644
        "canShowTooltipFromPrefs",
        lens_overlay_start_count <= kNumTimesToShowCursorTooltips);
 diff --git a/chrome/browser/ui/lens/lens_overlay_url_builder.cc b/chrome/browser/ui/lens/lens_overlay_url_builder.cc
-index ebd2e61dfb..b4ae6d326a 100644
+index 629030c3e6..e6a82a64d3 100644
 --- a/chrome/browser/ui/lens/lens_overlay_url_builder.cc
 +++ b/chrome/browser/ui/lens/lens_overlay_url_builder.cc
 @@ -27,6 +27,8 @@
@@ -2205,14 +2277,14 @@ index ebd2e61dfb..b4ae6d326a 100644
  namespace lens {
  namespace {
  // Query parameter for the search text query.
-@@ -584,3 +586,5 @@ GURL AddPDFScrollToParametersToUrl(
+@@ -577,3 +579,5 @@ std::map<std::string, std::string> GetParametersMapWithoutQuery(
  }
  
  }  // namespace lens
 +
 +#undef kVisualInputTypeQueryParameterKey
 diff --git a/chrome/browser/ui/lens/lens_search_contextualization_controller.cc b/chrome/browser/ui/lens/lens_search_contextualization_controller.cc
-index 9a0ab3ba7c..3d494ee0f5 100644
+index ed111ffac6..bed6507734 100644
 --- a/chrome/browser/ui/lens/lens_search_contextualization_controller.cc
 +++ b/chrome/browser/ui/lens/lens_search_contextualization_controller.cc
 @@ -29,6 +29,8 @@
@@ -2224,14 +2296,14 @@ index 9a0ab3ba7c..3d494ee0f5 100644
  namespace {
  
  // The amount of change in bytes that is considered a significant change and
-@@ -1127,3 +1129,5 @@ LensSearchContextualizationController::GetSearchboxController() {
+@@ -1068,3 +1070,5 @@ LensSearchContextualizationController::GetSearchboxController() {
  }
  
  }  // namespace lens
 +
 +#undef kByteChangeTolerancePercent
 diff --git a/chrome/browser/ui/safety_hub/BUILD.gn b/chrome/browser/ui/safety_hub/BUILD.gn
-index 12d6168723..aaa8fcb42f 100644
+index 154fa6b476..a8cc5ff762 100644
 --- a/chrome/browser/ui/safety_hub/BUILD.gn
 +++ b/chrome/browser/ui/safety_hub/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -2242,7 +2314,7 @@ index 12d6168723..aaa8fcb42f 100644
  import("//extensions/buildflags/buildflags.gni")
  
  assert(is_win || is_mac || is_linux || is_chromeos || is_android)
-@@ -66,7 +67,7 @@ source_set("safety_hub") {
+@@ -68,7 +69,7 @@ source_set("safety_hub") {
    }
  }
  
@@ -2292,10 +2364,10 @@ index 87f6c79bf6..fdab7deb36 100644
 +#undef ScopedLocalObservationPauserImpl
 +#undef kDelayBeforeMetricsLogged
 diff --git a/chrome/browser/ui/views/autofill/save_address_profile_view.cc b/chrome/browser/ui/views/autofill/save_address_profile_view.cc
-index d9a944b1a7..547fd68699 100644
+index 33c26228ca..6982b479bd 100644
 --- a/chrome/browser/ui/views/autofill/save_address_profile_view.cc
 +++ b/chrome/browser/ui/views/autofill/save_address_profile_view.cc
-@@ -51,6 +51,8 @@
+@@ -52,6 +52,8 @@
  #include "ui/views/style/typography_provider.h"
  #include "ui/views/view_class_properties.h"
  
@@ -2304,14 +2376,14 @@ index d9a944b1a7..547fd68699 100644
  namespace autofill {
  
  namespace {
-@@ -326,3 +328,5 @@ DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(SaveAddressProfileView,
+@@ -334,3 +336,5 @@ DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(SaveAddressProfileView,
                                        kEditButtonViewId);
  
  }  // namespace autofill
 +
 +#undef kIconSize
 diff --git a/chrome/browser/ui/views/autofill/update_address_profile_view.cc b/chrome/browser/ui/views/autofill/update_address_profile_view.cc
-index 3958179fc1..e532fd9769 100644
+index 1a0060e5d3..92767ff18a 100644
 --- a/chrome/browser/ui/views/autofill/update_address_profile_view.cc
 +++ b/chrome/browser/ui/views/autofill/update_address_profile_view.cc
 @@ -29,6 +29,8 @@
@@ -2323,7 +2395,7 @@ index 3958179fc1..e532fd9769 100644
  namespace autofill {
  
  namespace {
-@@ -329,3 +331,5 @@ DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(UpdateAddressProfileView,
+@@ -338,3 +340,5 @@ DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(UpdateAddressProfileView,
                                        kEditButtonViewId);
  
  }  // namespace autofill
@@ -2425,7 +2497,7 @@ index 55e19f4bf1..ab904b3ee5 100644
 +
 +#undef CreateLabelWrapper
 diff --git a/chrome/browser/ui/views/desktop_capture/desktop_media_list_controller.cc b/chrome/browser/ui/views/desktop_capture/desktop_media_list_controller.cc
-index 823e1f3aef..d10b316a0f 100644
+index 7c5e6d2b39..4f7e29d07f 100644
 --- a/chrome/browser/ui/views/desktop_capture/desktop_media_list_controller.cc
 +++ b/chrome/browser/ui/views/desktop_capture/desktop_media_list_controller.cc
 @@ -18,6 +18,8 @@
@@ -2437,17 +2509,17 @@ index 823e1f3aef..d10b316a0f 100644
  namespace {
  
  bool ShouldAutoAcceptThisTabCapture() {
-@@ -332,3 +334,5 @@ bool DesktopMediaListController::ShouldAutoReject(
+@@ -337,3 +339,5 @@ bool DesktopMediaListController::ShouldAutoReject(
    }
    return auto_reject_capture_;
  }
 +
 +#undef ShouldAutoAcceptThisTabCapture
 diff --git a/chrome/browser/ui/views/desktop_capture/desktop_media_picker_views.cc b/chrome/browser/ui/views/desktop_capture/desktop_media_picker_views.cc
-index de6235a498..ffb520da1d 100644
+index b916762618..5eb46ae7cf 100644
 --- a/chrome/browser/ui/views/desktop_capture/desktop_media_picker_views.cc
 +++ b/chrome/browser/ui/views/desktop_capture/desktop_media_picker_views.cc
-@@ -98,6 +98,8 @@ const DesktopMediaSourceViewStyle& GetSingleScreenStyle() {
+@@ -94,6 +94,8 @@ const DesktopMediaSourceViewStyle& GetSingleScreenStyle() {
    return style;
  }
  
@@ -2456,14 +2528,14 @@ index de6235a498..ffb520da1d 100644
  namespace {
  
  // These values are persisted to logs. Entries should not be renumbered and
-@@ -1193,3 +1195,5 @@ std::unique_ptr<DesktopMediaPicker> DesktopMediaPicker::Create(
+@@ -1239,3 +1241,5 @@ std::unique_ptr<DesktopMediaPicker> DesktopMediaPicker::Create(
      return std::make_unique<DesktopMediaPickerImpl>();
    }
  }
 +
 +#undef RecordUmaCancellation
 diff --git a/chrome/browser/ui/views/desktop_capture/share_this_tab_dialog_views.cc b/chrome/browser/ui/views/desktop_capture/share_this_tab_dialog_views.cc
-index ae400d31f6..84243841d7 100644
+index 8ed77506ee..bc31d58c10 100644
 --- a/chrome/browser/ui/views/desktop_capture/share_this_tab_dialog_views.cc
 +++ b/chrome/browser/ui/views/desktop_capture/share_this_tab_dialog_views.cc
 @@ -53,6 +53,9 @@
@@ -2484,7 +2556,7 @@ index ae400d31f6..84243841d7 100644
 +#undef RecordUmaCancellation
 +#undef ShouldAutoAcceptThisTabCapture
 diff --git a/chrome/browser/ui/views/download/BUILD.gn b/chrome/browser/ui/views/download/BUILD.gn
-index bee3f7ebf8..a75a9afb4c 100644
+index fb3ed1f2ec..47f3c45794 100644
 --- a/chrome/browser/ui/views/download/BUILD.gn
 +++ b/chrome/browser/ui/views/download/BUILD.gn
 @@ -2,9 +2,11 @@
@@ -2498,10 +2570,10 @@ index bee3f7ebf8..a75a9afb4c 100644
 -source_set("download") {
 +jumbo_source_set("download") {
    sources = [
-     "bubble/download_bubble_contents_view.cc",
-     "bubble/download_bubble_contents_view.h",
+     "download_danger_prompt_views.cc",
+     "download_in_progress_dialog_view.cc",
 diff --git a/chrome/browser/ui/views/download/bubble/download_bubble_security_view.cc b/chrome/browser/ui/views/download/bubble/download_bubble_security_view.cc
-index 47769eff7d..197d451b86 100644
+index 60ac1f5fd5..150a339dca 100644
 --- a/chrome/browser/ui/views/download/bubble/download_bubble_security_view.cc
 +++ b/chrome/browser/ui/views/download/bubble/download_bubble_security_view.cc
 @@ -47,6 +47,9 @@
@@ -2514,7 +2586,7 @@ index 47769eff7d..197d451b86 100644
  namespace {
  using offline_items_collection::ContentId;
  
-@@ -836,5 +839,8 @@ void DownloadBubbleSecurityView::OnContentIdChanged() {
+@@ -815,5 +818,8 @@ void DownloadBubbleSecurityView::OnContentIdChanged() {
                                  DownloadBubbleSubpageAction::kShown);
  }
  
@@ -2522,29 +2594,6 @@ index 47769eff7d..197d451b86 100644
 +#undef kNumColumns
 +
  BEGIN_METADATA(DownloadBubbleSecurityView)
- END_METADATA
-diff --git a/chrome/browser/ui/views/download/download_shelf_view.cc b/chrome/browser/ui/views/download/download_shelf_view.cc
-index f1e6c6e3e5..60ec2084b2 100644
---- a/chrome/browser/ui/views/download/download_shelf_view.cc
-+++ b/chrome/browser/ui/views/download/download_shelf_view.cc
-@@ -46,6 +46,9 @@
- #include "ui/views/view.h"
- #include "ui/views/widget/widget.h"
- 
-+#define kStartPadding kStartPadding_ShelfView
-+#define kEndPadding   kEndPadding_ShelfView
-+
- namespace {
- 
- // TODO(pkasting): Replace these with LayoutProvider constants
-@@ -359,5 +362,8 @@ DownloadItemView* DownloadShelfView::GetViewOfLastDownloadItemForTesting() {
-   return download_views_.empty() ? nullptr : download_views_.back();
- }
- 
-+#undef kStartPadding
-+#undef kEndPadding
-+
- BEGIN_METADATA(DownloadShelfView)
  END_METADATA
 diff --git a/chrome/browser/ui/views/file_system_access/file_system_access_icon_view.cc b/chrome/browser/ui/views/file_system_access/file_system_access_icon_view.cc
 index 191d28ef8a..39f0d5a0e8 100644
@@ -2566,26 +2615,26 @@ index 191d28ef8a..39f0d5a0e8 100644
 +
 +#undef GetPaths
 diff --git a/chrome/browser/ui/views/frame/contents_container_view.cc b/chrome/browser/ui/views/frame/contents_container_view.cc
-index 7a0861cfc5..7ec8b10aea 100644
+index 3689ca42f1..0ae15aa250 100644
 --- a/chrome/browser/ui/views/frame/contents_container_view.cc
 +++ b/chrome/browser/ui/views/frame/contents_container_view.cc
-@@ -21,6 +21,8 @@
- #include "ui/views/layout/delegating_layout_manager.h"
- #include "ui/views/layout/proposed_layout.h"
+@@ -35,6 +35,8 @@
+ #include "chrome/browser/glic/glic_enabling.h"
+ #endif
  
 +#define kContentOutlineThickness kContentOutlineThickness_ContentsContainerView
 +
  namespace {
- 
- constexpr int kContentCornerRadius = 6;
-@@ -114,3 +116,5 @@ views::ProposedLayout ContentsContainerView::CalculateProposedLayout(
+ constexpr float kContentCornerRadius = 6;
+ constexpr gfx::RoundedCornersF kContentRoundedCorners{kContentCornerRadius};
+@@ -269,3 +271,5 @@ views::ProposedLayout ContentsContainerView::CalculateProposedLayout(
  
  BEGIN_METADATA(ContentsContainerView)
  END_METADATA
 +
 +#undef kContentOutlineThickness
 diff --git a/chrome/browser/ui/views/frame/multi_contents_drop_target_view.cc b/chrome/browser/ui/views/frame/multi_contents_drop_target_view.cc
-index 7dcdade7ed..4aa5fcb060 100644
+index 9cbfa70c61..6e18a5f3c1 100644
 --- a/chrome/browser/ui/views/frame/multi_contents_drop_target_view.cc
 +++ b/chrome/browser/ui/views/frame/multi_contents_drop_target_view.cc
 @@ -33,6 +33,8 @@
@@ -2597,7 +2646,7 @@ index 7dcdade7ed..4aa5fcb060 100644
  namespace {
  
  constexpr float kInnerCornerRadius = 6;
-@@ -211,3 +213,5 @@ void MultiContentsDropTargetView::DoDrop(
+@@ -235,3 +237,5 @@ void MultiContentsDropTargetView::HandleTabDrop(
  
  BEGIN_METADATA(MultiContentsDropTargetView)
  END_METADATA
@@ -2694,10 +2743,10 @@ index b4edc8b5dc..ec261cf433 100644
 +
 +#undef kDeviceIconSize
 diff --git a/chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_bubble_view_impl.cc b/chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_bubble_view_impl.cc
-index 9cbc5fa1ff..e3b5f0caba 100644
+index 0281243892..1f64036940 100644
 --- a/chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_bubble_view_impl.cc
 +++ b/chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_bubble_view_impl.cc
-@@ -20,6 +20,8 @@
+@@ -22,6 +22,8 @@
  #include "ui/views/view_class_properties.h"
  #include "ui/views/view_utils.h"
  
@@ -2706,14 +2755,14 @@ index 9cbc5fa1ff..e3b5f0caba 100644
  namespace {
  
  constexpr int kMaxBubbleWidth = 1000;
-@@ -151,3 +153,5 @@ bool CookieControlsBubbleViewImpl::OnCloseRequested(
+@@ -159,3 +161,5 @@ bool CookieControlsBubbleViewImpl::OnCloseRequested(
  
  BEGIN_METADATA(CookieControlsBubbleViewImpl)
  END_METADATA
 +
 +#undef kMaxBubbleWidth
 diff --git a/chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_content_view.cc b/chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_content_view.cc
-index d8743518d3..edc2274684 100644
+index 4ef6bd81da..3abe57740b 100644
 --- a/chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_content_view.cc
 +++ b/chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_content_view.cc
 @@ -34,6 +34,8 @@
@@ -2725,17 +2774,17 @@ index d8743518d3..edc2274684 100644
  namespace {
  
  using Util = ::content_settings::CookieControlsUtil;
-@@ -347,3 +349,5 @@ void CookieControlsContentView::NotifyFeedbackButtonPressedCallback() {
+@@ -385,3 +387,5 @@ void CookieControlsContentView::NotifyFeedbackButtonPressedCallback() {
  
  BEGIN_METADATA(CookieControlsContentView)
  END_METADATA
 +
 +#undef kMaxBubbleWidth
 diff --git a/chrome/browser/ui/views/media_router/cast_browser_controller.cc b/chrome/browser/ui/views/media_router/cast_browser_controller.cc
-index 8fd5daf9bb..ab55396d45 100644
+index 7f7b3b456d..ef44f9c607 100644
 --- a/chrome/browser/ui/views/media_router/cast_browser_controller.cc
 +++ b/chrome/browser/ui/views/media_router/cast_browser_controller.cc
-@@ -19,6 +19,8 @@
+@@ -18,6 +18,8 @@
  #include "components/vector_icons/vector_icons.h"
  #include "ui/base/models/image_model.h"
  
@@ -2744,27 +2793,8 @@ index 8fd5daf9bb..ab55396d45 100644
  namespace media_router {
  
  namespace {
-@@ -200,3 +202,5 @@ void CastBrowserController::StopObservingMirroringMediaControllerHosts() {
+@@ -196,3 +198,5 @@ void CastBrowserController::StopObservingMirroringMediaControllerHosts() {
  }
- 
- }  // namespace media_router
-+
-+#undef kLoggerComponent
-diff --git a/chrome/browser/ui/views/media_router/cast_toolbar_button.cc b/chrome/browser/ui/views/media_router/cast_toolbar_button.cc
-index d1a40a5644..18c07a8bb1 100644
---- a/chrome/browser/ui/views/media_router/cast_toolbar_button.cc
-+++ b/chrome/browser/ui/views/media_router/cast_toolbar_button.cc
-@@ -33,6 +33,8 @@
- #include "ui/views/animation/ink_drop.h"
- #include "ui/views/controls/button/button_controller.h"
- 
-+#define kLoggerComponent kLoggerComponent_CastToolbarButton
-+
- namespace media_router {
- 
- namespace {
-@@ -292,3 +294,5 @@ BEGIN_METADATA(CastToolbarButton)
- END_METADATA
  
  }  // namespace media_router
 +
@@ -2808,7 +2838,7 @@ index aca63df648..5d5fb5d574 100644
 +
 +#undef kBackToTabButtonSize
 diff --git a/chrome/browser/ui/views/page_info/about_this_site_side_panel_coordinator.cc b/chrome/browser/ui/views/page_info/about_this_site_side_panel_coordinator.cc
-index 186abbdd2d..79af0c6c95 100644
+index 1bc1487841..528b81c770 100644
 --- a/chrome/browser/ui/views/page_info/about_this_site_side_panel_coordinator.cc
 +++ b/chrome/browser/ui/views/page_info/about_this_site_side_panel_coordinator.cc
 @@ -27,6 +27,9 @@
@@ -2829,7 +2859,7 @@ index 186abbdd2d..79af0c6c95 100644
 +#undef kStaticLoadingScreenURL
 +#undef CreateOpenUrlParams
 diff --git a/chrome/browser/ui/views/page_info/merchant_trust_side_panel_coordinator.cc b/chrome/browser/ui/views/page_info/merchant_trust_side_panel_coordinator.cc
-index 9ea118c908..449d6b7c56 100644
+index 26ad6c7a50..b624653fd2 100644
 --- a/chrome/browser/ui/views/page_info/merchant_trust_side_panel_coordinator.cc
 +++ b/chrome/browser/ui/views/page_info/merchant_trust_side_panel_coordinator.cc
 @@ -30,6 +30,9 @@
@@ -2908,46 +2938,27 @@ index 345cbf856e..3e25b76b39 100644
  END_METADATA
 +
 +#undef AddElementIdentifierToLabel
-diff --git a/chrome/browser/ui/views/profiles/first_run_flow_controller_dice.cc b/chrome/browser/ui/views/profiles/first_run_flow_controller_dice.cc
-index 6c63b30431..dca775686b 100644
---- a/chrome/browser/ui/views/profiles/first_run_flow_controller_dice.cc
-+++ b/chrome/browser/ui/views/profiles/first_run_flow_controller_dice.cc
-@@ -52,6 +52,8 @@
- #include "chrome/installer/util/shell_util.h"
- #endif
- 
-+#define kAccessPoint kAccessPoint_FirstRunFlowControllerDice
-+
- namespace {
- 
- constexpr base::TimeDelta kDefaultBrowserCheckTimeout = base::Seconds(2);
-@@ -636,3 +638,5 @@ FirstRunFlowControllerDice::RegisterPostIdentitySteps(
-       ProfileManagementFlowController::Step::kFinishFlow);
-   return post_identity_steps;
- }
-+
-+#undef kAccessPoint
 diff --git a/chrome/browser/ui/views/profiles/profile_picker_flow_controller.cc b/chrome/browser/ui/views/profiles/profile_picker_flow_controller.cc
-index e88a975425..975f43cea0 100644
+index 9ac1ee8f36..f7d83fecb4 100644
 --- a/chrome/browser/ui/views/profiles/profile_picker_flow_controller.cc
 +++ b/chrome/browser/ui/views/profiles/profile_picker_flow_controller.cc
-@@ -57,6 +57,8 @@
- #include "chrome/browser/ui/views/profiles/profile_picker_dice_sign_in_provider.h"
- #endif
+@@ -55,6 +55,8 @@
+ #include "ui/base/l10n/l10n_util.h"
+ #include "ui/base/mojom/themes.mojom.h"
  
 +#define kAccessPoint kAccessPoint_ProfilePickerFlowController
 +
  namespace {
  
  const signin_metrics::AccessPoint kAccessPoint =
-@@ -802,3 +804,5 @@ ProfilePickerFlowController::RegisterPostIdentitySteps(
+@@ -812,3 +814,5 @@ ProfilePickerFlowController::RegisterPostIdentitySteps(
  
    return post_identity_steps;
  }
 +
 +#undef kAccessPoint
 diff --git a/chrome/browser/ui/views/side_panel/BUILD.gn b/chrome/browser/ui/views/side_panel/BUILD.gn
-index d8f35173e8..9e3c7afc34 100644
+index 4ffe08b3bd..a5cb18753b 100644
 --- a/chrome/browser/ui/views/side_panel/BUILD.gn
 +++ b/chrome/browser/ui/views/side_panel/BUILD.gn
 @@ -4,13 +4,14 @@
@@ -2986,7 +2997,7 @@ index 55b85e0ed5..dc518bba22 100644
 +
 +#undef SetupTableLayout
 diff --git a/chrome/browser/ui/views/site_data/site_data_row_view.cc b/chrome/browser/ui/views/site_data/site_data_row_view.cc
-index 30927c9dcf..baddbfbf58 100644
+index a99a82081e..0e30c31d4f 100644
 --- a/chrome/browser/ui/views/site_data/site_data_row_view.cc
 +++ b/chrome/browser/ui/views/site_data/site_data_row_view.cc
 @@ -39,6 +39,9 @@ DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(SiteDataRowView, kClearOnExitMenuItem);
@@ -2999,7 +3010,7 @@ index 30927c9dcf..baddbfbf58 100644
  namespace {
  
  constexpr int kIconSize = 16;
-@@ -317,3 +320,6 @@ void SiteDataRowView::SetContentSettingException(ContentSetting setting) {
+@@ -316,3 +319,6 @@ void SiteDataRowView::SetContentSettingException(ContentSetting setting) {
  
  BEGIN_METADATA(SiteDataRowView)
  END_METADATA
@@ -3102,7 +3113,7 @@ index d4e1e8a817..a92d452bff 100644
 +
 +#undef GetControlInsets
 diff --git a/chrome/browser/ui/views/toolbar/BUILD.gn b/chrome/browser/ui/views/toolbar/BUILD.gn
-index e29f8cabe0..4a3c83dfce 100644
+index 1818896a7a..c1476c3336 100644
 --- a/chrome/browser/ui/views/toolbar/BUILD.gn
 +++ b/chrome/browser/ui/views/toolbar/BUILD.gn
 @@ -4,10 +4,11 @@
@@ -3119,10 +3130,10 @@ index e29f8cabe0..4a3c83dfce 100644
      "app_menu.cc",
      "app_menu.h",
 diff --git a/chrome/browser/ui/views/toolbar/split_tabs_button.cc b/chrome/browser/ui/views/toolbar/split_tabs_button.cc
-index 45f59e1823..51e6cbbb46 100644
+index c5e456d9b3..a848d5f36c 100644
 --- a/chrome/browser/ui/views/toolbar/split_tabs_button.cc
 +++ b/chrome/browser/ui/views/toolbar/split_tabs_button.cc
-@@ -40,6 +40,10 @@
+@@ -41,6 +41,10 @@
  #include "ui/views/controls/menu/menu_runner.h"
  #include "ui/views/view_class_properties.h"
  
@@ -3133,7 +3144,7 @@ index 45f59e1823..51e6cbbb46 100644
  namespace {
  // Width of the status indicator shown across the button.
  constexpr int kStatusIndicatorWidth = 14;
-@@ -216,3 +220,7 @@ void SplitTabsToolbarButton::UpdateAccessibilityRole(bool has_menu) {
+@@ -218,3 +222,7 @@ void SplitTabsToolbarButton::UpdateAccessibilityRole(bool has_menu) {
  
  BEGIN_METADATA(SplitTabsToolbarButton)
  END_METADATA
@@ -3319,10 +3330,10 @@ index 31962acfce..b6e8500e66 100644
 +
 +#undef kBetweenChildSpacing
 diff --git a/chrome/browser/ui/views/webauthn/authenticator_hybrid_and_security_key_sheet_view.cc b/chrome/browser/ui/views/webauthn/authenticator_hybrid_and_security_key_sheet_view.cc
-index f23d57bb00..67317ed29a 100644
+index bced423ba3..fcabf5fb20 100644
 --- a/chrome/browser/ui/views/webauthn/authenticator_hybrid_and_security_key_sheet_view.cc
 +++ b/chrome/browser/ui/views/webauthn/authenticator_hybrid_and_security_key_sheet_view.cc
-@@ -34,6 +34,8 @@
+@@ -35,6 +35,8 @@
  #include "ui/views/style/typography.h"
  #include "ui/views/view.h"
  
@@ -3331,12 +3342,31 @@ index f23d57bb00..67317ed29a 100644
  namespace {
  
  constexpr int kIconSize = 20;
-@@ -140,3 +142,5 @@ AuthenticatorHybridAndSecurityKeySheetView::BuildStepSpecificContent() {
+@@ -148,3 +150,5 @@ AuthenticatorHybridAndSecurityKeySheetView::BuildStepSpecificContent() {
  
  BEGIN_METADATA(AuthenticatorHybridAndSecurityKeySheetView)
  END_METADATA
 +
 +#undef kIconSize
+diff --git a/chrome/browser/ui/views/webauthn/ring_progress_bar.cc b/chrome/browser/ui/views/webauthn/ring_progress_bar.cc
+index ab6ec05645..e70d2f6ecc 100644
+--- a/chrome/browser/ui/views/webauthn/ring_progress_bar.cc
++++ b/chrome/browser/ui/views/webauthn/ring_progress_bar.cc
+@@ -20,6 +20,8 @@
+ #include "ui/views/accessibility/view_accessibility.h"
+ #include "ui/views/controls/progress_ring_utils.h"
+ 
++#define kStrokeWidth kStrokeWidth_RingProgressBar
++
+ namespace {
+ constexpr float kStrokeWidth = 4;
+ constexpr base::TimeDelta kAnimationDuration = base::Milliseconds(200);
+@@ -66,3 +68,5 @@ void RingProgressBar::AnimationProgressed(const gfx::Animation* animation) {
+ 
+ BEGIN_METADATA(RingProgressBar)
+ END_METADATA
++
++#undef kStrokeWidth
 diff --git a/chrome/browser/ui/webauthn/account_hover_list_model.cc b/chrome/browser/ui/webauthn/account_hover_list_model.cc
 index f02dd0dcd1..57a1c44372 100644
 --- a/chrome/browser/ui/webauthn/account_hover_list_model.cc
@@ -3418,7 +3448,7 @@ index 77177f2d14..56b10118df 100644
 +
 +#undef kTrafficAnnotation
 diff --git a/chrome/browser/web_applications/BUILD.gn b/chrome/browser/web_applications/BUILD.gn
-index 3c5f23518c..1a864d7ea8 100644
+index a623e94359..fa3860541e 100644
 --- a/chrome/browser/web_applications/BUILD.gn
 +++ b/chrome/browser/web_applications/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -3458,12 +3488,12 @@ index 864df9e489..e99be740e7 100644
 +
 +#undef kInstallSource
 diff --git a/chrome/browser/web_applications/isolated_web_apps/isolated_web_app_update_discovery_task.cc b/chrome/browser/web_applications/isolated_web_apps/isolated_web_app_update_discovery_task.cc
-index 3c6f4ca464..9aeb68dba4 100644
+index 65701b8e35..b26db7afa1 100644
 --- a/chrome/browser/web_applications/isolated_web_apps/isolated_web_app_update_discovery_task.cc
 +++ b/chrome/browser/web_applications/isolated_web_apps/isolated_web_app_update_discovery_task.cc
-@@ -47,6 +47,9 @@
- #include "content/public/browser/web_contents.h"
+@@ -48,6 +48,9 @@
  #include "net/base/net_errors.h"
+ #include "services/network/public/cpp/shared_url_loader_factory.h"
  
 +#define kUpdateManifestFetchTrafficAnnotation kUpdateManifestFetchTrafficAnnotation_IsolatedWebAppUpdateDiscoveryTask
 +#define kWebBundleDownloadTrafficAnnotation   kWebBundleDownloadTrafficAnnotation_IsolatedWebAppUpdateDiscoveryTask
@@ -3471,7 +3501,7 @@ index 3c6f4ca464..9aeb68dba4 100644
  namespace web_app {
  
  namespace {
-@@ -461,3 +464,6 @@ std::ostream& operator<<(
+@@ -498,3 +501,6 @@ std::ostream& operator<<(
  }
  
  }  // namespace web_app
@@ -3498,7 +3528,7 @@ index a815d5350a..b38e803b1c 100644
 +
 +#undef kTrafficAnnotation
 diff --git a/chrome/browser/webauthn/enclave_manager.cc b/chrome/browser/webauthn/enclave_manager.cc
-index dd39b53193..aff40b50fe 100644
+index 921e68dfba..1a1eeb9ae9 100644
 --- a/chrome/browser/webauthn/enclave_manager.cc
 +++ b/chrome/browser/webauthn/enclave_manager.cc
 @@ -148,6 +148,8 @@ struct EnclaveManager::PendingAction {
@@ -3510,14 +3540,14 @@ index dd39b53193..aff40b50fe 100644
  namespace {
  
  // Used so the EnclaveManager can be forced into invalid states for testing.
-@@ -4086,3 +4088,5 @@ void EnclaveManager::OnOsCryptReady(os_crypt_async::Encryptor encryptor) {
+@@ -4121,3 +4123,5 @@ void EnclaveManager::OnOsCryptReady(os_crypt_async::Encryptor encryptor) {
  base::WeakPtr<EnclaveManager> EnclaveManager::GetWeakPtr() {
    return weak_ptr_factory_.GetWeakPtr();
  }
 +
 +#undef kTrafficAnnotation
 diff --git a/chrome/common/BUILD.gn b/chrome/common/BUILD.gn
-index 03c5ca7e59..60aad543fc 100644
+index 45f0ff0b9b..767016adf0 100644
 --- a/chrome/common/BUILD.gn
 +++ b/chrome/common/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -3528,7 +3558,7 @@ index 03c5ca7e59..60aad543fc 100644
  import("//build/util/process_version.gni")
  import("//chrome/browser/downgrade/buildflags.gni")
  import("//chrome/common/features.gni")
-@@ -122,7 +123,7 @@ source_set("request_code_constants") {
+@@ -121,7 +122,7 @@ source_set("request_code_constants") {
  
  # Use a static library here because many test binaries depend on this but don't
  # require many files from it. This makes linking more efficient.
@@ -3538,7 +3568,7 @@ index 03c5ca7e59..60aad543fc 100644
      ":*",
      "//chrome/common/win:eventlog_messages",
 diff --git a/chrome/common/extensions/BUILD.gn b/chrome/common/extensions/BUILD.gn
-index 94ff938a84..21cde688d0 100644
+index 4fda3241ba..f6ca4c02ca 100644
 --- a/chrome/common/extensions/BUILD.gn
 +++ b/chrome/common/extensions/BUILD.gn
 @@ -3,12 +3,13 @@
@@ -3570,7 +3600,7 @@ index 4b630fe5d2..8000c8aab7 100644
              chrome_extensions_types_only_schema_sources +
              chrome_extensions_manifest_only_schema_sources
 diff --git a/chrome/renderer/BUILD.gn b/chrome/renderer/BUILD.gn
-index e4537f6dcd..667f0e20f8 100644
+index c823717d6e..d0fbfde2b8 100644
 --- a/chrome/renderer/BUILD.gn
 +++ b/chrome/renderer/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -3580,8 +3610,8 @@ index e4537f6dcd..667f0e20f8 100644
 +import("//build/config/jumbo.gni")
  import("//chrome/common/features.gni")
  import("//chrome/common/request_header_integrity/buildflags.gni")
- import("//components/nacl/features.gni")
-@@ -63,7 +64,7 @@ static_library("process_state") {
+ import("//components/offline_pages/buildflags/features.gni")
+@@ -59,7 +60,7 @@ static_library("process_state") {
    ]
  }
  
@@ -3591,7 +3621,7 @@ index e4537f6dcd..667f0e20f8 100644
      "benchmarking_extension.cc",
      "benchmarking_extension.h",
 diff --git a/chrome/test/chromedriver/BUILD.gn b/chrome/test/chromedriver/BUILD.gn
-index 749fde11cc..fef644ed03 100644
+index c1662d388d..9b5bdb783c 100644
 --- a/chrome/test/chromedriver/BUILD.gn
 +++ b/chrome/test/chromedriver/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -3611,8 +3641,8 @@ index 749fde11cc..fef644ed03 100644
    testonly = true
    sources = [
      "chrome/adb.h",
-@@ -296,7 +297,7 @@ source_set("automation_client_lib") {
-   ]
+@@ -300,7 +301,7 @@ source_set("automation_client_lib") {
+   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
  }
  
 -source_set("lib") {
@@ -3621,10 +3651,10 @@ index 749fde11cc..fef644ed03 100644
    sources = [
      "alert_commands.cc",
 diff --git a/chrome/test/chromedriver/chrome/navigation_tracker.cc b/chrome/test/chromedriver/chrome/navigation_tracker.cc
-index 2529af8e01..669251a388 100644
+index 106858be45..9886ee103e 100644
 --- a/chrome/test/chromedriver/chrome/navigation_tracker.cc
 +++ b/chrome/test/chromedriver/chrome/navigation_tracker.cc
-@@ -19,6 +19,8 @@
+@@ -14,6 +14,8 @@
  #include "chrome/test/chromedriver/chrome/status.h"
  #include "chrome/test/chromedriver/net/timeout.h"
  
@@ -3633,14 +3663,14 @@ index 2529af8e01..669251a388 100644
  namespace {
  
  // Match to content/browser/devtools/devTools_session const of same name
-@@ -452,3 +454,5 @@ void NavigationTracker::ClearFrameStates() {
+@@ -447,3 +449,5 @@ void NavigationTracker::ClearFrameStates() {
    SetCurrentFrameInvalid();
    frame_to_state_map_.clear();
  }
 +
 +#undef ObjectGroup
 diff --git a/chrome/utility/BUILD.gn b/chrome/utility/BUILD.gn
-index 82dae6be5f..390cb7c4f7 100644
+index edd0995475..dadbcd883e 100644
 --- a/chrome/utility/BUILD.gn
 +++ b/chrome/utility/BUILD.gn
 @@ -3,6 +3,7 @@
