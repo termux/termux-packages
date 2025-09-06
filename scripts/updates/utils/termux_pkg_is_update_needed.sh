@@ -9,20 +9,19 @@ termux_pkg_is_update_needed() {
 	local CURRENT_VERSION="$1"
 	local LATEST_VERSION="$2"
 
+	# Is this even a validly formatted version number?
+	if ! dpkg --validate-version "${LATEST_VERSION}" &> /dev/null; then
+		termux_error_exit "::warning::${TERMUX_PKG_NAME:-}: $(dpkg --validate-version "${LATEST_VERSION}" &> /dev/stdout)"
+	fi
+
 	# Compare versions.
-	# shellcheck disable=SC2091
-	dpkg --compare-versions "${CURRENT_VERSION}" lt "${LATEST_VERSION}" 2> >(sed -e "s/^/$([[ "${CI-false}" == "true" ]] && echo "::warning::${TERMUX_PKG_NAME:-}: ")/" >&2)
+	dpkg --compare-versions "${CURRENT_VERSION}" lt "${LATEST_VERSION}"
 	DPKG_EXIT_CODE=$?
 	case "$DPKG_EXIT_CODE" in
-	0) ;;          # true.  Update needed but we need to do additional checking.
-	1) return 1 ;; # false. Update not needed.
-	*) termux_error_exit "Bad 'dpkg --compare-versions' exit code: $DPKG_EXIT_CODE - bad version numbers?" ;;
+		0) ;;          # true.  Update needed.
+		1) return 1 ;; # false. Update not needed.
+		*) termux_error_exit "Bad 'dpkg --compare-versions' exit code: $DPKG_EXIT_CODE - bad version numbers?" ;;
 	esac
-
-	# Additional checking dpkg warns but not errors
-	if ! grep -E "^[0-9]" <<< "${LATEST_VERSION}"; then
-		termux_error_exit "${TERMUX_PKG_NAME} latest version '${LATEST_VERSION}' does not start with digit"
-	fi
 }
 
 # Make it also usable as command line tool. `scripts/bin/apt-compare-versions` is symlinked to this file.
