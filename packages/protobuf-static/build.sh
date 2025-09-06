@@ -9,7 +9,7 @@ third_party/utf8_range/LICENSE
 TERMUX_PKG_MAINTAINER="@termux"
 # Please align the version and revision with `libprotobuf` package.
 TERMUX_PKG_VERSION=30.0
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/protocolbuffers/protobuf/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9df0e9e8ebe39f4fbbb9cf7db3d811287fe3616b2f191eb2bf5eaa12539c881f
 TERMUX_PKG_AUTO_UPDATE=false
