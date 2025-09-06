@@ -1,0 +1,54 @@
+diff --git a/glutin/build.rs b/glutin/build.rs
+index b5f3435..10809d4 100644
+--- a/build.rs
++++ b/build.rs
+@@ -4,7 +4,7 @@ fn main() {
+     // Setup alias to reduce `cfg` boilerplate.
+     cfg_aliases! {
+         // Systems.
+-        android_platform: { target_os = "android" },
++        android_platform: { target_os = "dummy" },
+         ohos_platform: { target_env = "ohos" },
+         wasm_platform: { target_family = "wasm" },
+         macos_platform: { target_os = "macos" },
+diff --git a/Cargo.toml.orig b/Cargo.toml
+index 196cfd68fe..1ae35e27ad 100644
+--- a/Cargo.toml.orig
++++ b/Cargo.toml
+@@ -94,15 +94,15 @@ wgl = [
+ ]
+ x11 = ["x11-dl"]
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies.glutin_egl_sys]
++[target.'cfg(any(target_os = "android", target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies.glutin_egl_sys]
+ version = "0.7.1"
+ optional = true
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies.glutin_glx_sys]
++[target.'cfg(any(target_os = "android", target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies.glutin_glx_sys]
+ version = "0.6.1"
+ optional = true
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies.wayland-sys]
++[target.'cfg(any(target_os = "android", target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies.wayland-sys]
+ version = "0.31.1"
+ features = [
+     "egl",
+@@ -112,7 +112,7 @@ features = [
+ optional = true
+ default-features = false
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies.x11-dl]
++[target.'cfg(any(target_os = "android", target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies.x11-dl]
+ version = "2.20.0"
+ optional = true
+ 
+@@ -147,7 +147,7 @@ features = [
+     "NSThread",
+ ]
+ 
+-[target.'cfg(target_os = "android")'.dependencies.glutin_egl_sys]
++[target.'cfg(target_os = "dummy")'.dependencies.glutin_egl_sys]
+ version = "0.7.1"
+ 
+ [target."cfg(windows)".dependencies.glutin_egl_sys]
