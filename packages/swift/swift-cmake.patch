@@ -1,3 +1,17 @@
+diff --git a/llbuild/tests/CMakeLists.txt b/llbuild/tests/CMakeLists.txt
+index ba0866b4..0f95a6b3 100644
+--- a/llbuild/tests/CMakeLists.txt
++++ b/llbuild/tests/CMakeLists.txt
+@@ -46,9 +46,6 @@ if(Python_Interpreter_FOUND AND LIT_FOUND AND FILECHECK_FOUND)
+   add_dependencies(test-llbuild ${test_target_dependencies})
+ 
+   # Add a target for running all tests.
+-  if(POLICY CMP0037)
+-    cmake_policy(SET CMP0037 OLD)
+-  endif(POLICY CMP0037)
+   add_custom_target(test)
+   add_dependencies(test test-llbuild)
+   set_target_properties(test PROPERTIES FOLDER "Tests")
 diff --git a/llvm-project/clang/runtime/CMakeLists.txt b/llvm-project/clang/runtime/CMakeLists.txt
 index 61b1c60bf590..5b0d10a67699 100644
 --- a/llvm-project/clang/runtime/CMakeLists.txt
@@ -151,6 +165,17 @@ index 07a3585a66c..461a98b6856 100644
    PATTERN "*.strings"
  )
 +endif()
+--- a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
++++ b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
+@@ -557,7 +557,7 @@
+     if(NOT CMAKE_HOST_SYSTEM MATCHES Windows)
+       # The Android resource dir is specified from build.ps1 on windows.
+       if(NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
+-        if("${SWIFT_ANDROID_NDK_PATH}" MATCHES "r26|r27")
++        if("${SWIFT_ANDROID_NDK_PATH}" MATCHES "r26|r27|r28")
+           file(GLOB RESOURCE_DIR ${SWIFT_SDK_ANDROID_ARCH_${LFLAGS_ARCH}_PATH}/../lib/clang/*)
+         else()
+           file(GLOB RESOURCE_DIR ${SWIFT_SDK_ANDROID_ARCH_${LFLAGS_ARCH}_PATH}/../lib64/clang/*)
 diff --git a/swift/stdlib/public/Concurrency/CMakeLists.txt b/swift/stdlib/public/Concurrency/CMakeLists.txt
 index 3313f56c8a6..59804ff6228 100644
 --- a/swift/stdlib/public/Concurrency/CMakeLists.txt
