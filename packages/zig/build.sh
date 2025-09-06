@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="zig/LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.14.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/ziglang/zig/releases/download/${TERMUX_PKG_VERSION}/zig-bootstrap-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=89b2fce50bfbb1eee29c382193d22c6eb0c7da3a96b5ba6d05e0af2945b3ca3d
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -43,4 +44,18 @@ termux_step_post_massage() {
 		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL/bin/zig" version
 		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL/bin/zig" init
 	)
+}
+
+termux_step_create_debscripts() {
+	# Minimum supported kernel version for this version of Zig.
+	# Zig pegs this to the oldest supported Debian LTS build
+	# https://github.com/ziglang/zig/blob/0.14.1/lib/std/Target.zig#L454-L469
+	# https://github.com/ziglang/zig/commit/0d4d8dfc1583138a59147f1aab5eec803a23adb1
+	# https://github.com/ziglang/zig/issues/20423
+	local ZIG_MINIMUM="4.19.0"
+
+	sed -e "s|@ZIG_MINIMUM@|$ZIG_MINIMUM|g" \
+		-e "s|@TERMUX_PKG_VERSION@|$TERMUX_PKG_VERSION|g" \
+		-e "s|@TERMUX_PACKAGE_FORMAT@|$TERMUX_PACKAGE_FORMAT|g" \
+		"$TERMUX_PKG_BUILDER_DIR/preinst.sh.in" > ./preinst
 }
