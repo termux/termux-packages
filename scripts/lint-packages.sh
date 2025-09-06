@@ -56,13 +56,15 @@ check_package_license() {
 check_package_name() {
 	local pkg_name="$1"
 	echo -n "Package name '${pkg_name}': "
+	# 1 character package names are technically permitted by `dpkg`
+	# but we do not want to allow single letter packages.
 	if (( ${#pkg_name} < 2 )); then
 		echo "INVALID (less than two characters long)"
 		return 1
 	fi
 
-	if ! grep -qP '^[0-9a-z][0-9a-z+\-\.]+$' <<< "${pkg_name}"; then
-		echo "INVALID (contains characters that are not allowed)"
+	if ! dpkg --validate-pkgname "${pkg_name}" &> /dev/null; then
+		echo "INVALID ($(dpkg --validate-pkgname "${pkg_name}"))"
 		return 1
 	fi
 
@@ -331,7 +333,7 @@ lint_package() {
 
 		echo -n "TERMUX_PKG_VERSION: "
 		if (( ${#TERMUX_PKG_VERSION} )); then
-			if grep -qiP '^([0-9]+\:)?[0-9][0-9a-z+\-\.\~]*$' <<< "${TERMUX_PKG_VERSION}"; then
+			if dpkg --validate-version "${TERMUX_PKG_VERSION}"; then
 				echo "PASS"
 			else
 				echo "INVALID (contains characters that are not allowed)"
