@@ -2,15 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://oplist.org/
 TERMUX_PKG_DESCRIPTION="A file list program that supports multiple storage"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="2096779623 <admin@utermux.dev>"
-TERMUX_PKG_VERSION="4.1.1"
-_OPENLIST_WEB_VERSION="4.1.1"
+TERMUX_PKG_VERSION="4.1.2"
+_OPENLIST_WEB_VERSION="4.1.2"
 TERMUX_PKG_SRCURL=(
 	https://github.com/OpenListTeam/OpenList/archive/v${TERMUX_PKG_VERSION}.tar.gz
 	https://github.com/OpenListTeam/OpenList-Frontend/releases/download/v${_OPENLIST_WEB_VERSION}/openlist-frontend-dist-v${_OPENLIST_WEB_VERSION}.tar.gz
 )
 TERMUX_PKG_SHA256=(
-	19233fbe67d848e1212b8c23e8af145b1c23533a2c09fd66c141d2de05b9b15c
-	4f114ef60c95c9fa5ffc808485fd322305460891476b3248188dc75e0b7a6a6a
+	4de94e32f4b05d86654f97cd1551b8cfbbed6b2c38b2ac400fde3e7622013614
+	aa9a5ad478debf98a2744cfd0d494be1bd9e6d55ce57ca71093d5c35052c5f4b
 )
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
