@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0,MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE-APACHE,LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="10.3.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/sharkdp/fd/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=2edbc917a533053855d5b635dff368d65756ce6f82ddefd57b6c202622d791e9
 TERMUX_PKG_AUTO_UPDATE=true
@@ -26,8 +27,11 @@ termux_step_make_install() {
 	mkdir -p "${TERMUX_PREFIX}/share/bash-completion/completions"
 	mkdir -p "${TERMUX_PREFIX}/share/fish/vendor_completions.d"
 	mkdir -p "${TERMUX_PREFIX}/share/elvish/lib"
-	cargo run -- --gen-completions     zsh > "${TERMUX_PREFIX}/share/zsh/site-functions/_${TERMUX_PKG_NAME}"
-	cargo run -- --gen-completions    bash > "${TERMUX_PREFIX}/share/bash-completion/completions/${TERMUX_PKG_NAME}"
-	cargo run -- --gen-completions    fish > "${TERMUX_PREFIX}/share/fish/vendor_completions.d/${TERMUX_PKG_NAME}.fish"
-	cargo run -- --gen-completions  elvish > "${TERMUX_PREFIX}/share/elvish/lib/${TERMUX_PKG_NAME}.elv"
+	(
+		unset CC CXX CFLAGS CXXFLAGS CPPFLAGS LDFLAGS AR AS CPP LD RANLIB READELF STRIP
+		cargo run -- --gen-completions     zsh > "${TERMUX_PREFIX}/share/zsh/site-functions/_${TERMUX_PKG_NAME}"
+		cargo run -- --gen-completions    bash > "${TERMUX_PREFIX}/share/bash-completion/completions/${TERMUX_PKG_NAME}"
+		cargo run -- --gen-completions    fish > "${TERMUX_PREFIX}/share/fish/vendor_completions.d/${TERMUX_PKG_NAME}.fish"
+		cargo run -- --gen-completions  elvish > "${TERMUX_PREFIX}/share/elvish/lib/${TERMUX_PKG_NAME}.elv"
+	)
 }
