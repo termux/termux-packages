@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/saghul/txiki.js
 TERMUX_PKG_DESCRIPTION="A small and powerful JavaScript runtime"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1:22.11.1
+TERMUX_PKG_VERSION=1:24.12.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/saghul/txiki.js
 TERMUX_PKG_DEPENDS="libcurl, libffi"
@@ -12,6 +12,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DUSE_EXTERNAL_FFI=ON
 -DFFI_INCLUDE_DIR=$TERMUX_PREFIX/include
 -DFFI_LIB=$TERMUX_PREFIX/lib/libffi.so
+-DCMAKE_POLICY_VERSION_MINIMUM=3.5 
 "
 TERMUX_PKG_HOSTBUILD=true
 
@@ -29,7 +30,7 @@ termux_step_host_build() {
 
 	termux_setup_cmake
 
-	cmake .
+	cmake . -DCMAKE_POLICY_VERSION_MINIMUM=3.5 
 	make -j $TERMUX_PKG_MAKE_PROCESSES
 }
 
