@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="General-purpose programming language and toolchain"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="zig/LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.14.1"
+TERMUX_PKG_VERSION="0.15.1"
 TERMUX_PKG_SRCURL=https://github.com/ziglang/zig/releases/download/${TERMUX_PKG_VERSION}/zig-bootstrap-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=89b2fce50bfbb1eee29c382193d22c6eb0c7da3a96b5ba6d05e0af2945b3ca3d
+TERMUX_PKG_SHA256=4c0cfbcf12da144955761ca43f89e3c74956bce978694fc1d0a63555f5c0a199
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
@@ -20,8 +20,14 @@ termux_step_pre_configure() {
 	export TERMUX_PKG_MAKE_PROCESSES
 
 	# zig 0.11.0+ uses 3 stages bootstrapping build system
-	# which NDK cant be used anymore
-	unset AS CC CFLAGS CPP CPPFLAGS CXX CXXFLAGS LD LDFLAGS
+	# for which NDK can't be used anymore
+	unset AS CC CFLAGS CPP CPPFLAGS CXX CXXFLAGS LD LDFLAGS \
+		PKGCONFIG PKG_CONFIG PKG_CONFIG_LIBDIR
+
+	# todo: if zig ever builds on-device, implement whatever would work there as an else block
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
+		export PKG_CONFIG="/usr/bin/pkg-config"
+	fi
 }
 
 termux_step_make() {
