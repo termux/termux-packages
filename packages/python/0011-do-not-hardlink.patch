@@ -1,0 +1,20 @@
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -817,7 +817,7 @@ $(LIBRARY): $(LIBRARY_OBJS)
+ libpython$(LDVERSION).so: $(LIBRARY_OBJS) $(DTRACE_OBJS)
+ 	if test $(INSTSONAME) != $(LDLIBRARY); then \
+ 		$(BLDSHARED) -Wl,-h$(INSTSONAME) -o $(INSTSONAME) $(LIBRARY_OBJS) $(MODLIBS) $(SHLIBS) $(LIBC) $(LIBM); \
+-		$(LN) -f $(INSTSONAME) $@; \
++		$(LN) -sf $(INSTSONAME) $@; \
+ 	else \
+ 		$(BLDSHARED) -o $@ $(LIBRARY_OBJS) $(MODLIBS) $(SHLIBS) $(LIBC) $(LIBM); \
+ 	fi
+@@ -1971,7 +1971,7 @@ altbininstall: $(BUILDPYTHON) @FRAMEWORKPYTHONW@
+ 		if test -f $(DESTDIR)$(BINDIR)/python$(VERSION)$(EXE) -o -h $(DESTDIR)$(BINDIR)/python$(VERSION)$(EXE); \
+ 		then rm -f $(DESTDIR)$(BINDIR)/python$(VERSION)$(EXE); \
+ 		fi; \
+-		(cd $(DESTDIR)$(BINDIR); $(LN) python$(LDVERSION)$(EXE) python$(VERSION)$(EXE)); \
++		(cd $(DESTDIR)$(BINDIR); $(LN) -s python$(LDVERSION)$(EXE) python$(VERSION)$(EXE)); \
+ 	fi
+ 	@if test "$(PY_ENABLE_SHARED)" = 1 -o "$(STATIC_LIBPYTHON)" = 1; then \
+ 		if test -f $(LDLIBRARY) && test "$(PYTHONFRAMEWORKDIR)" = "no-framework" ; then \
