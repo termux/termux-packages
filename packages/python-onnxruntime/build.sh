@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Cross-platform, high performance ML inferencing and trai
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.22.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/microsoft/onnxruntime
 TERMUX_PKG_DEPENDS="abseil-cpp, libc++, protobuf, libre2, python"
 TERMUX_PKG_BUILD_DEPENDS="python-numpy"
@@ -21,6 +22,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
+	# Fix build with abseil 20250814; see https://github.com/microsoft/onnxruntime/issues/25815
+	sed -i '/^absl::low_level_hash$/d' cmake/external/abseil-cpp.cmake
+
 	CPPFLAGS+=" -Wno-unused-variable"
 
 	termux_setup_cmake
