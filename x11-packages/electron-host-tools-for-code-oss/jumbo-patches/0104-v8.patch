@@ -975,3 +975,34 @@ index 08a8d1dd46..4545fbf56e 100644
 +#include "src/compiler/turboshaft/undef-assembler-macros.inc"
 +
  }  // namespace v8::internal::wasm
+diff --git a/v8/src/maglev/maglev-graph-builder.cc b/v8/src/maglev/maglev-graph-builder.cc
+index 7f4a2a1bbf..7de4c08bd8 100644
+--- a/v8/src/maglev/maglev-graph-builder.cc
++++ b/v8/src/maglev/maglev-graph-builder.cc
+@@ -15605,3 +15605,6 @@ DEBUG_BREAK_BYTECODE_LIST(DEBUG_BREAK)
+ ReduceResult MaglevGraphBuilder::VisitIllegal() { UNREACHABLE(); }
+ 
+ }  // namespace v8::internal::maglev
++
++#undef TRACE
++#undef FAIL
+diff --git a/v8/src/compiler/revectorizer.cc b/v8/src/compiler/revectorizer.cc
+index 1d332c42ae..dc9e3906b6 100644
+--- a/v8/src/compiler/revectorizer.cc
++++ b/v8/src/compiler/revectorizer.cc
+@@ -1459,3 +1459,5 @@ void Revectorizer::PrintStores(ZoneMap<Node*, StoreNodeSet>* store_chains) {
+ }  // namespace compiler
+ }  // namespace internal
+ }  // namespace v8
++
++#undef TRACE
+diff --git a/v8/src/compiler/turboshaft/wasm-revec-reducer.cc b/v8/src/compiler/turboshaft/wasm-revec-reducer.cc
+index ddf3b81c7a..f6548579c7 100644
+--- a/v8/src/compiler/turboshaft/wasm-revec-reducer.cc
++++ b/v8/src/compiler/turboshaft/wasm-revec-reducer.cc
+@@ -1620,3 +1620,5 @@ void WasmRevecAnalyzer::Print(const char* info) {
+ }
+ 
+ }  // namespace v8::internal::compiler::turboshaft
++
++#undef TRACE
