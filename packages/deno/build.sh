@@ -2,21 +2,21 @@ TERMUX_PKG_HOMEPAGE=https://deno.land/
 TERMUX_PKG_DESCRIPTION="A modern runtime for JavaScript and TypeScript"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION=1:2.2.13
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=1:2.4.5
 TERMUX_PKG_SRCURL=(
 	https://github.com/denoland/deno/releases/download/v${TERMUX_PKG_VERSION:2}/deno_src.tar.gz
-	https://github.com/licy183/deno-snapshot/releases/download/v${TERMUX_PKG_VERSION:2}/deno-snapshot-aarch64-linux-android-${TERMUX_PKG_VERSION:2}.tar.bz2
-	https://github.com/licy183/deno-snapshot/releases/download/v${TERMUX_PKG_VERSION:2}/deno-snapshot-x86_64-linux-android-${TERMUX_PKG_VERSION:2}.tar.bz2
+	https://github.com/termux/deno-snapshot/releases/download/v${TERMUX_PKG_VERSION:2}/deno-snapshot-aarch64-linux-android-${TERMUX_PKG_VERSION:2}.tar.bz2
+	https://github.com/termux/deno-snapshot/releases/download/v${TERMUX_PKG_VERSION:2}/deno-snapshot-x86_64-linux-android-${TERMUX_PKG_VERSION:2}.tar.bz2
 )
 TERMUX_PKG_SHA256=(
-	ed6c40be562394aa72251c3bd77432374e328cf0024226daadaba1b3486c2a68
-	e39aa39e6d7d4816b6b75de0380cf272e4d9b1454f70d270eb88b17bae1143a8
-	210f7fb75039a2978d20d19a5ff05a601f4940626d019033dc29b7ca288c8040
+	a6bba626d08813c114bfcc862e69fd7202eecda97df9f349abf6cc4e38fe4e40
+	fc72ed6b6669a1f8ded531c00994a61e88046c41679237a8520963ee23787409
+	43b0ba6654b7a4d212c6690c56564578a07c01a17085852f2f635d73df663ba7
 )
 TERMUX_PKG_DEPENDS="libandroid-stub, libffi, libsqlite, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
+TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
 # See https://github.com/denoland/deno/issues/2295#issuecomment-2329248010
 TERMUX_PKG_EXCLUDED_ARCHES="i686, arm"
@@ -54,6 +54,7 @@ termux_step_pre_configure() {
 		-mindepth 1 -maxdepth 1 -type d \
 		! -wholename ./vendor/deno_panic \
 		! -wholename ./vendor/v8 \
+		! -wholename ./vendor/cmake \
 		-exec rm -rf '{}' \;
 
 	patch --silent -p1 \
@@ -64,10 +65,15 @@ termux_step_pre_configure() {
 		-d ./vendor/deno_panic/ \
 		< "$TERMUX_PKG_BUILDER_DIR"/deno-panic-dyn_slide.diff
 
+	patch --silent -p1 \
+		-d ./vendor/cmake/ \
+		< "$TERMUX_PKG_BUILDER_DIR"/cmake-pass-cmake-policy-version-minimum.diff
+
 	echo "" >> Cargo.toml
 	echo "[patch.crates-io]" >> Cargo.toml
 	echo "v8 = { path = \"./vendor/v8\" }" >> Cargo.toml
 	echo "deno_panic = { path = \"./vendor/deno_panic\" }" >> Cargo.toml
+	echo "cmake = { path = \"./vendor/cmake\" }" >> Cargo.toml
 }
 
 __fetch_rusty_v8() {
@@ -161,7 +167,44 @@ termux_step_configure() {
 termux_step_make() {
 	termux_setup_rust
 	termux_setup_cmake
+	termux_setup_ninja
 	termux_setup_protobuf
+
+	export CMAKE_POLICY_VERSION_MINIMUM=3.5
+	export TARGET_CMAKE_TOOLCHAIN_FILE="$TERMUX_PKG_TMPDIR/android.toolchain.cmake"
+	cat <<- EOL > "$TARGET_CMAKE_TOOLCHAIN_FILE"
+	set(CMAKE_ASM_FLAGS "\${CMAKE_ASM_FLAGS} --target=${CCTERMUX_HOST_PLATFORM}")
+	set(CMAKE_C_FLAGS "\${CMAKE_C_FLAGS} --target=${CCTERMUX_HOST_PLATFORM} ${CFLAGS}")
+	set(CMAKE_CXX_FLAGS "\${CMAKE_CXX_FLAGS} --target=${CCTERMUX_HOST_PLATFORM} ${CXXFLAGS}")
+	set(CMAKE_C_COMPILER "${TERMUX_STANDALONE_TOOLCHAIN}/bin/${CC}")
+	set(CMAKE_CXX_COMPILER "${TERMUX_STANDALONE_TOOLCHAIN}/bin/${CXX}")
+	set(CMAKE_AR "$(command -v ${AR})")
+	set(CMAKE_RANLIB "$(command -v ${RANLIB})")
+	set(CMAKE_STRIP "$(command -v ${STRIP})")
+	set(CMAKE_FIND_ROOT_PATH "${TERMUX_PREFIX}")
+	set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM "NEVER")
+	set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE "ONLY")
+	set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY "ONLY")
+	set(CMAKE_SKIP_INSTALL_RPATH "ON")
+	set(CMAKE_USE_SYSTEM_LIBRARIES "True")
+	set(CMAKE_CROSSCOMPILING "True")
+	set(CMAKE_LINKER "${TERMUX_STANDALONE_TOOLCHAIN}/bin/${LD} ${LDFLAGS}")
+	set(CMAKE_SYSTEM_NAME "Android")
+	set(CMAKE_SYSTEM_VERSION "${TERMUX_PKG_API_LEVEL}")
+	set(CMAKE_SYSTEM_PROCESSOR "${TERMUX_ARCH}")
+	set(CMAKE_ANDROID_STANDALONE_TOOLCHAIN "${TERMUX_STANDALONE_TOOLCHAIN}")
+	EOL
+
+	cargo install --force --locked bindgen-cli
+	BINDGEN_EXTRA_CLANG_ARGS="--target=$CCTERMUX_HOST_PLATFORM"
+	BINDGEN_EXTRA_CLANG_ARGS+=" --sysroot=${TERMUX_STANDALONE_TOOLCHAIN}/sysroot"
+	BINDGEN_EXTRA_CLANG_ARGS+=" -I$TERMUX_PREFIX/include"
+	BINDGEN_EXTRA_CLANG_ARGS+=" -isystem ${TERMUX_STANDALONE_TOOLCHAIN}/include/c++/v1"
+	BINDGEN_EXTRA_CLANG_ARGS+=" -isystem ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot/usr/include/${TERMUX_ARCH}-linux-android"
+	export BINDGEN_EXTRA_CLANG_ARGS
+	local env_name=BINDGEN_EXTRA_CLANG_ARGS_${CARGO_TARGET_NAME@U}
+	env_name=${env_name//-/_}
+	export "$env_name"="$BINDGEN_EXTRA_CLANG_ARGS"
 
 	local env_name=${CARGO_TARGET_NAME@U}
 	env_name=${env_name//-/_}
@@ -180,9 +223,17 @@ termux_step_make() {
 		export CARGO_TARGET_${env_name}_RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name)"
 	fi
 
-	cargo build --jobs "${TERMUX_PKG_MAKE_PROCESSES}" --target "${CARGO_TARGET_NAME}" --release
+	local _release_opt="--release"
+	if [ "$TERMUX_DEBUG_BUILD" = "true" ]; then
+		_release_opt=
+	fi
+	cargo build --jobs "${TERMUX_PKG_MAKE_PROCESSES}" --target "${CARGO_TARGET_NAME}" ${_release_opt}
 }
 
 termux_step_make_install() {
-	install -Dm700 -t "${TERMUX_PREFIX}/bin" "target/${CARGO_TARGET_NAME}/release/deno"
+	local _folder="release"
+	if [ "$TERMUX_DEBUG_BUILD" = "true" ]; then
+		_folder="debug"
+	fi
+	install -Dm700 -t "${TERMUX_PREFIX}/bin" "target/${CARGO_TARGET_NAME}/${_folder}/deno"
 }
