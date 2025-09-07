@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tensors and Dynamic neural networks in Python"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.6.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/pytorch/pytorch
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 TERMUX_PKG_DEPENDS="libc++, libopenblas, libprotobuf, python, python-numpy, python-pip"
@@ -12,6 +13,7 @@ TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, pyyaml, typing_extensions"
 TERMUX_PKG_PYTHON_BUILD_DEPS="numpy"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_POLICY_VERSION_MINIMUM=3.5
 -DANDROID_NO_TERMUX=OFF
 -DBUILD_CUSTOM_PROTOBUF=OFF
 -DBUILD_PYTHON=ON
