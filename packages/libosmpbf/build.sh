@@ -13,4 +13,13 @@ termux_step_pre_configure() {
 	termux_setup_protobuf
 
 	CPPFLAGS+=" -DPROTOBUF_USE_DLLS"
+
+	# the error for 32-bit targets if this is not used looks like this:
+	# ld.lld: error: undefined symbol: char const*
+	# absl::lts_20250127::log_internal::MakeCheckOpString<long
+	# long, long long>(long long, long long, char const*)
+	# >>> referenced by osmformat.pb.cc
+	# >>>               osmformat.pb.cc.o:(google::protobuf::RepeatedField<int>::GrowNoAnnotate(bool,
+	# int, int)) in archive osmpbf/libosmpbf.a
+	LDFLAGS+=" $($TERMUX_SCRIPTDIR/packages/libprotobuf/interface_link_libraries.sh)"
 }
