@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Simple, expressive & portable programming language for e
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Komo @mbekkomo"
 TERMUX_PKG_VERSION=0.9.83
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/arturo-lang/arturo/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=0bb3632f21a1556167fdcb82170c29665350beb44f15b4666b4e22a23c2063cf
 TERMUX_PKG_DEPENDS="libgmp, libmpfr, libandroid-glob, libsqlite"
