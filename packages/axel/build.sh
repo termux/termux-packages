@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="light command line download accelerator"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.17.14"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/axel-download-accelerator/axel/releases/download/v${TERMUX_PKG_VERSION}/axel-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=575f73f640ee836a95d27b54aeed216c45bc1e914cad92da6f00b907d1c94925
 TERMUX_PKG_AUTO_UPDATE=true
