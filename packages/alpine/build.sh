@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Fast, easy to use email client"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.26
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/alpine-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=c0779c2be6c47d30554854a3e14ef5e36539502b331068851329275898a9baba
 TERMUX_PKG_DEPENDS="coreutils, libcrypt, ncurses, openssl, openssl-tool"
