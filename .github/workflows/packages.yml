@@ -229,6 +229,8 @@ jobs:
       if: ${{ steps.build-info.outputs.docker-build == 'false' && steps.build-info.outputs.skip-building != 'true' }}
       run: |
         ./scripts/setup-ubuntu.sh
+        # need to unset these for setup-android-sdk.sh.
+        unset NDK ANDROID_HOME
         ./scripts/setup-android-sdk.sh
         rm -f ${HOME}/lib/ndk-*.zip ${HOME}/lib/sdk-*.zip
         sudo apt install ninja-build
@@ -252,6 +254,11 @@ jobs:
 
         if [[ "${#packages[@]}" -gt 0 ]]; then
           if [ "$DOCKER_BUILD" == 'false' ]; then
+            # these need to be unset a second time again for ./build-package.sh
+            # when it is run outside of Docker, because GitHub Actions does not
+            # support permanently unsetting variables at time of writing.
+            # https://github.com/actions/runner/issues/1126
+            unset NDK ANDROID_HOME
             ./build-package.sh -I -C -a "${{ matrix.target_arch }}" "${packages[@]}"
           else
             ./scripts/run-docker.sh ./build-package.sh -I -C -a "${{ matrix.target_arch }}" "${packages[@]}"
