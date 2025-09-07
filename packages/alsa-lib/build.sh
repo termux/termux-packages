@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The Advanced Linux Sound Architecture (ALSA) - library"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.2.14"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/alsa-project/alsa-lib/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=a7bc6c09f0e5a622ebc8afb63a194aa1396145b5c6433d3445363201d96c23c4
 TERMUX_PKG_DEPENDS="libandroid-sysv-semaphore, libandroid-shmem"
