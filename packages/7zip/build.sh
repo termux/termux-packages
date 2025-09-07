@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="LGPL-2.1, BSD 3-Clause, BSD 2-Clause"
 TERMUX_PKG_LICENSE_FILE="DOC/License.txt, DOC/copying.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="25.01"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
 	"https://www.7-zip.org/a/7z${TERMUX_PKG_VERSION//./}-src.tar.xz"
 	"https://www.7-zip.org/a/7z${TERMUX_PKG_VERSION//./}-linux-arm.tar.xz" # for manual, arm is smallest
