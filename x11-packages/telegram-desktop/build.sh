@@ -82,9 +82,15 @@ __cppgir_build() {
 	git clone https://github.com/scipy/boost-headers-only
 	mkdir -p cppgir-host-build
 	pushd cppgir-host-build
+	local _extra_args=""
+	if [ "$TERMUX_ON_DEVICE_BUILD" = true ]; then
+		_extra_args+=" -DGI_DEFAULT_GIRPATH=$TERMUX_PREFIX/share"
+		_extra_args+=" -DGI_DEF_DIR=$TERMUX_PREFIX/share/gir-1.0"
+	fi
 	cmake \
 		-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR/cppgir-host-build/prefix \
 		-DBoost_INCLUDE_DIR=$TERMUX_PKG_HOSTBUILD_DIR/boost-headers-only \
+		$_extra_args \
 		$TERMUX_PKG_SRCDIR/cmake/external/glib/cppgir
 	make -j $TERMUX_PKG_MAKE_PROCESSES cppgir
 	make install
