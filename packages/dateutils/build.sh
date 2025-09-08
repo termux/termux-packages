@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Command line date and time utilities"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.4.11"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/hroptatyr/dateutils/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9041b220b8cdb0e4e12292d8f71e7ad65fffd67873e96a3e52bfd226240deaec
 TERMUX_PKG_AUTO_UPDATE=true

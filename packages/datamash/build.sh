@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Program performing numeric, textual and statistical oper
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.9"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/datamash/datamash-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f382ebda03650dd679161f758f9c0a6cc9293213438d4a77a8eda325aacb87d2
 TERMUX_PKG_AUTO_UPDATE=true
