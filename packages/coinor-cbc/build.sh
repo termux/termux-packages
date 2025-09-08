@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An open-source mixed integer linear programming solver"
 TERMUX_PKG_LICENSE="EPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.10.12"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/coin-or/Cbc/archive/refs/tags/releases/${TERMUX_PKG_VERSION#*:}.tar.gz
 TERMUX_PKG_SHA256=9ed71e4b61668462fc3794c102e26b4bb01a047efbbbcbd69ae7bde1f04f46a8
 TERMUX_PKG_AUTO_UPDATE=true
