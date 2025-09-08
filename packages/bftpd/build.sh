@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Small, easy-to-configure FTP server"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/sourceforge/bftpd/bftpd-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=7fb5d9092ac6c2642ac9fe42e31b49e3a4384831f16ebd79ac3cdc00ad4fbc1e
 TERMUX_PKG_AUTO_UPDATE=true
