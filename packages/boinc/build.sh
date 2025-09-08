@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=8
 _MINOR_VERSION=2
 TERMUX_PKG_VERSION="8.2.5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/BOINC/boinc/archive/refs/tags/client_release/${_MAJOR_VERSION}.${_MINOR_VERSION}/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=7e5814742bf9db40ae6409027e3e68568121a5e4d5f3f7aab1ca611fc70fe79f
 TERMUX_PKG_DEPENDS="libandroid-execinfo, libandroid-shmem, libc++, libcurl, openssl, zlib"
