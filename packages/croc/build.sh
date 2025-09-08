@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Easily and securely send things from one computer to ano
 TERMUX_PKG_LICENSE=MIT
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1:10.2.4"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/schollz/croc/archive/refs/tags/v${TERMUX_PKG_VERSION:2}.tar.gz
 TERMUX_PKG_SHA256=c259c07b9da3ea39726b0c5e3f78ae66e858e1379bdb11bef93d31298e68f5fe
 TERMUX_PKG_AUTO_UPDATE=true
