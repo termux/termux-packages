@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Fast and statically typed, compiled language with Ruby-l
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@HertzDevil"
 TERMUX_PKG_VERSION="1.17.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_SRCURL=git+https://github.com/crystal-lang/crystal
 TERMUX_PKG_AUTO_UPDATE=true
