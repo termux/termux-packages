@@ -4,10 +4,9 @@ TERMUX_PKG_DESCRIPTION="Telegram Desktop Client"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LEGAL"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=5.15.4
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=6.1.2
 TERMUX_PKG_SRCURL=https://github.com/telegramdesktop/tdesktop/releases/download/v$TERMUX_PKG_VERSION/tdesktop-$TERMUX_PKG_VERSION-full.tar.gz
-TERMUX_PKG_SHA256=3705dc2ecf51e9290a565b7a06dcdfc5ecbac13ec536afe582f3411653ad50d9
+TERMUX_PKG_SHA256=efb92b09d7531ca7e29f27adef472e5207fe2b66e18499fa74d1b693211cfcce
 TERMUX_PKG_DEPENDS="abseil-cpp, boost, ffmpeg, glib, hicolor-icon-theme, hunspell, kf6-kcoreaddons, libandroid-shmem, libc++, libdispatch, libdrm, libjxl, liblz4, libminizip, protobuf, librnnoise, libsigc++-3.0, libx11, libxcomposite, libxdamage, libxrandr, libxtst, openal-soft, opengl, openh264, openssl, pipewire, pulseaudio, qt6-qtbase, qt6-qtimageformats, qt6-qtsvg, xxhash, zlib"
 TERMUX_PKG_BUILD_DEPENDS="ada, aosp-libs, boost-headers, glib-cross, qt6-qtbase-cross-tools"
 TERMUX_PKG_VERSIONED_GIR=false
@@ -25,8 +24,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DDESKTOP_APP_DISABLE_AUTOUPDATE=ON
 -DTDESKTOP_API_ID=611335
 -DTDESKTOP_API_HASH=d524b414d21f4d37f08684c1df41ac9c
--DLIBTGVOIP_DISABLE_ALSA=ON
--DLIBTGVOIP_DISABLE_PULSEAUDIO=OFF
 "
 
 __tg_owt_fetch_source() {
@@ -76,15 +73,6 @@ __libtd_fetch_source() {
 termux_step_post_get_source() {
 	__tg_owt_fetch_source
 	__libtd_fetch_source
-
-	# Dummy some files to make sure that the usage of code path of Linux rather than Android
-	mv Telegram/ThirdParty/libtgvoip/os/android Telegram/ThirdParty/libtgvoip/os/android.unused
-	mkdir -p Telegram/ThirdParty/libtgvoip/os/android
-	local _file
-	for _file in Telegram/ThirdParty/libtgvoip/os/android.unused/*.h; do
-		local _name=$(basename $_file)
-		echo "#error \"DO NOT INCLUDE THIS FILE\"" > Telegram/ThirdParty/libtgvoip/os/android/"$_name"
-	done
 }
 
 __cppgir_build() {
@@ -190,7 +178,9 @@ __libtd_build() {
 	fi
 
 	# Prepare cross-compiling for libtd
-	__libtd_host_build
+	if [ "$TERMUX_ON_DEVICE_BUILD" = false ]; then
+		__libtd_host_build
+	fi
 
 	# Backup vars
 	local __old_srcdir="$TERMUX_PKG_SRCDIR"
@@ -207,6 +197,10 @@ __libtd_build() {
 -DTD_E2E_ONLY=ON
 -DTDE2E_INSTALL_INCLUDES=ON
 "
+
+	if [ "$TERMUX_ON_DEVICE_BUILD" = true ]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_CROSSCOMPILING=FALSE"
+	fi
 
 	# Configure
 	mkdir -p "$TERMUX_PKG_BUILDDIR"

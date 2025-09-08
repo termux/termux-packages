@@ -30,12 +30,9 @@
       <param type="gboolean"/>
       <param type="gboolean"/>
     </signal>
-    <signal name="handle-data-request" return="gboolean" when="last">
-      <param type="GDBusMethodInvocation"/>
-      <param type="guint64"/>
+    <signal name="data-server-started" return="void" when="last">
+      <param type="guint"/>
       <param type="gchararray"/>
-      <param type="gint64"/>
-      <param type="gint64"/>
     </signal>
   </interface>
   <class name="WebviewMasterProxy" get-type="webview_master_proxy_get_type" parents="GDBusProxy,GObject">
@@ -56,7 +53,6 @@
       <param type="gint"/>
       <param type="gint"/>
       <param type="gint"/>
-      <param type="gchararray"/>
       <param type="gchararray"/>
     </signal>
     <signal name="handle-reload" return="gboolean" when="last">
@@ -86,17 +82,6 @@
     </signal>
     <signal name="handle-get-win-id" return="gboolean" when="last">
       <param type="GDBusMethodInvocation"/>
-    </signal>
-    <signal name="handle-data-response" return="gboolean" when="last">
-      <param type="GDBusMethodInvocation"/>
-      <param type="GUnixFDList"/>
-      <param type="guint64"/>
-      <param type="GVariant"/>
-      <param type="gint64"/>
-      <param type="gint64"/>
-      <param type="gint64"/>
-      <param type="gint64"/>
-      <param type="gchararray"/>
     </signal>
     <signal name="started" return="void" when="last">
     </signal>
