@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # frotz does not depend on dialog or curl, but the zgames script we bundle below in termux_step_make_install() do.
 TERMUX_PKG_VERSION="2.55"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gitlab.com/DavidGriffith/frotz/-/archive/${TERMUX_PKG_VERSION}/frotz-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=766d6ee97692e93d04bed755494292ff625fb53d165982c60dbbc7275cbbc6e0
 TERMUX_PKG_DEPENDS="ncurses, dialog, curl"
