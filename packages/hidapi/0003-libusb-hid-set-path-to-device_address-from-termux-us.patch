@@ -1,0 +1,48 @@
+From 36024a130df8bdbf64b7cb7f9c21dce4f8fe5530 Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <henrik@grimler.se>
+Date: Tue, 25 Mar 2025 14:16:01 +0100
+Subject: [PATCH] libusb: hid: set path to device_address from termux-usb
+
+The path normally comes from make_path/get_path, and is a string with
+information about where/how device is connected and what configuration
+and interface it uses. The information comes from
+libusb_get_port_numbers, but that function does not seem to work on
+android. Instead we can use the usbfs path to distinguish different
+devices.
+
+This will likely break if a device has multiple configurations and
+interfaces, and a program is suppose to use a specific one, but works
+for simple devices and use-cases..
+---
+ libusb/hid.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/libusb/hid.c b/libusb/hid.c
+index 8e866f32de41..3f8d6a138448 100644
+--- a/libusb/hid.c
++++ b/libusb/hid.c
+@@ -671,8 +671,6 @@ static struct hid_device_info * create_device_info_for_device(libusb_device *dev
+ 
+ 	cur_dev->bus_type = HID_API_BUS_USB;
+ 
+-	cur_dev->path = make_path(device, config_number, interface_num);
+-
+ 	if (!handle) {
+ 		return cur_dev;
+ 	}
+@@ -804,6 +802,12 @@ struct hid_device_info  HID_API_EXPORT *hid_enumerate(unsigned short vendor_id,
+ #endif
+ 
+ 					tmp = create_device_info_for_device(dev, handle, &desc, conf_desc->bConfigurationValue, intf_desc->bInterfaceNumber);
++					/* path is suppose to come from make_path, but libusb_get_port_numbers
++					   there does not seem to work on android. Instead pass and
++					   distinguish devices based on the usbfs (/dev/bus/usb/001/001)
++					   path. This likely has some drawbacks for devices with many
++					   different configurations&interfaces.. */
++					tmp->path = strdup(device->device_address);
+ 					if (tmp) {
+ #ifdef INVASIVE_GET_USAGE
+ 						/* TODO: have a runtime check for this section. */
+-- 
+2.49.0
+

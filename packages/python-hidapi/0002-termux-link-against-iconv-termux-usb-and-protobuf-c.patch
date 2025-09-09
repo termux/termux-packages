@@ -1,0 +1,28 @@
+From 8390a9c52212a7df20987f4e39d05e7e44b638ef Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <grimler@termux.dev>
+Date: Sat, 8 Mar 2025 02:42:05 +0100
+Subject: [PATCH] termux: link against iconv, termux-usb and protobuf-c
+
+So that we can use termux-usb and termux-api's usb functions instead of (some of)
+libusb's variants.
+---
+ setup.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 6e302ee12fd8..ab6cf190ff41 100755
+--- a/setup.py
++++ b/setup.py
+@@ -143,7 +143,8 @@ def hid_from_embedded_hidapi():
+                     Extension(
+                         "hid",
+                         sources=["hid.pyx", hidapi_src("libusb")],
+-                        include_dirs=[embedded_hidapi_include],
++                        include_dirs=[embedded_hidapi_include, "/data/data/com.termux/files/usr/include", "/data/data/com.termux/files/usr/include/libusb-1.0/"],
++                        libraries=["iconv", "termux-usb", "protobuf-c"],
+                     ),
+                     libusb_pkgconfig,
+                 )
+-- 
+2.49.0
+

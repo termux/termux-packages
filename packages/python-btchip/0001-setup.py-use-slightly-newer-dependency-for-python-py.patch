@@ -1,0 +1,31 @@
+From f1c4274af869265d07a520d527cce33a82e1a3b9 Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <henrik@grimler.se>
+Date: Sun, 16 Feb 2025 16:13:42 +0100
+Subject: [PATCH] setup.py: use (slightly) newer dependency for python-pyscard
+
+1.6.12-4build1 is not a valid version string, and gives an error in
+modern python versions:
+
+    error in btchip-python setup command: 'extras_require' must be a dictionary whose values are strings or lists of strings containing valid project/version requirement specifiers.
+
+Use the next available python-pyscard as min version.
+---
+ setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index accfe2485778..5be3c9ebc45b 100644
+--- a/setup.py
++++ b/setup.py
+@@ -17,7 +17,7 @@ setup(
+     packages=find_packages(),
+     install_requires=['hidapi>=0.7.99', 'ecdsa>=0.9'],
+     extras_require = {
+-	'smartcard': [ 'python-pyscard>=1.6.12-4build1' ]
++	'smartcard': [ 'python-pyscard>=1.6.14' ]
+     },
+     include_package_data=True,
+     zip_safe=False,
+-- 
+2.48.1
+
