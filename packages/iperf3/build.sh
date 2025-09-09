@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="TCP, UDP, and SCTP network bandwidth measurement tool"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.19.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/esnet/iperf/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=85e480d7fffdcb1368888aaee9d76bcfc211e17c2a6dcb2060b281498f82c97b
 TERMUX_PKG_UPDATE_VERSION_REGEXP="^\d+\.\d+[^ABRabr]*$"
