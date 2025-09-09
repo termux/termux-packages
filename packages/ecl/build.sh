@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="ECL (Embeddable Common Lisp) is an interpreter of the Co
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="24.5.10"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://common-lisp.net/project/ecl/static/files/release/ecl-${TERMUX_PKG_VERSION}.tgz
 TERMUX_PKG_SHA256=e4ea65bb1861e0e495386bfa8bc673bd014e96d3cf9d91e9038f91435cbe622b
 TERMUX_PKG_DEPENDS="libandroid-support, libgmp, libgc, libffi"
