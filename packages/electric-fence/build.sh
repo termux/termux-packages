@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Electric Fence (eFence) malloc memory debugger"
 TERMUX_PKG_LICENSE=GPL-2.0
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.2.7"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://deb.debian.org/debian/pool/main/e/electric-fence/electric-fence_${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9544dd4212ed1c34dc6de06c83324e1a8dc866a1949b8c69b7ba5bedcea373aa
 TERMUX_PKG_AUTO_UPDATE=true
