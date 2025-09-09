@@ -8,6 +8,7 @@ TERMUX_PKG_VERSION=(
 	"0.2.1"   # lunacolors (Lua dependency)
 	"0.1.0"   # succulent (Lua dependency)
 )
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_REPOLOGY_METADATA_VERSION="${TERMUX_PKG_VERSION[0]:2}"
 TERMUX_PKG_SRCURL=(
 	"https://github.com/Rosettea/Hilbish/archive/refs/tags/v${TERMUX_PKG_VERSION[0]:2}.tar.gz"
