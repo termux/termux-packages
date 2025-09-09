@@ -3,9 +3,11 @@ TERMUX_PKG_DESCRIPTION="Cinnamon shell"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.4.11"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/linuxmint/cinnamon/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=b89c38434364344c85fa5216da78c1ca2661ce97a32c65aaf8c0f5b7ddc24be6
-TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_DEPENDS="glib, gobject-introspection, cjs, muffin, cinnamon-menus, cinnamon-session, dbus, gcr, gdk-pixbuf, atk, opengl, gtk3, pango, xapp, libx11, libxml2, sassc, cogl, clutter, clutter-gtk, gnome-backgrounds, cinnamon-control-center, python-pillow, python-xapp, gettext, libadapta, mint-y-icon-theme, mint-themes, cinnamon-settings-daemon, gsound"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross, intltool, python-libsass"
 TERMUX_PKG_SUGGESTS="gnome-terminal, gnome-screenshot"
@@ -19,6 +21,21 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dwayland=false
 -Dpolkit=false
 "
+
+termux_pkg_auto_update() {
+	local latest_release
+	latest_release="$(git ls-remote --tags "$TERMUX_PKG_HOMEPAGE.git" \
+		| grep -oP "refs/tags/\K${TERMUX_PKG_UPDATE_VERSION_REGEXP}$" \
+		| sort -V \
+		| tail -n1)"
+
+	if [[ "${latest_release}" == "${TERMUX_PKG_VERSION}" ]]; then
+		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+		return
+	fi
+
+	termux_pkg_upgrade_version "${latest_release}"
+}
 
 termux_step_pre_configure() {
 	termux_setup_gir

@@ -1,8 +1,9 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/GNOME/gnome-backgrounds
+TERMUX_PKG_HOMEPAGE=https://gitlab.gnome.org/GNOME/gnome-backgrounds
 TERMUX_PKG_DESCRIPTION="A collection of GNOME desktop wallpapers"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="48.2.1"
-TERMUX_PKG_SRCURL=https://github.com/GNOME/gnome-backgrounds/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=5884527d0b455a636edc64c9c5b35887a35ed07412c52569cda237482a2e8db4
-TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL="https://download.gnome.org/sources/gnome-backgrounds/${TERMUX_PKG_VERSION%%.*}/gnome-backgrounds-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SHA256=6a1c5b7b2e0d8f5ce977926d55f9c2d65dd180822cdea5e59150dcfb5abd1ed9
+TERMUX_PKG_AUTO_UPDATE=true

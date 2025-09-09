@@ -3,9 +3,11 @@ TERMUX_PKG_DESCRIPTION="The Cinnamon session manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.4.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/linuxmint/cinnamon-session/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=b5ad4f70698a56cad3f0fcb75493d21b633073e80b82a51796339b9bbff85a1b
-TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_DEPENDS="glib, libcanberra, gtk3, pango, libx11, libsm, libice, libxext, libxau, libxcomposite, cinnamon-desktop, opengl, dbus-python, keybinder, xapp"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross"
 TERMUX_PKG_VERSIONED_GIR=false
@@ -14,6 +16,21 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dxtrans=false
 -Dfake-consolekit=true
 "
+
+termux_pkg_auto_update() {
+	local latest_release
+	latest_release="$(git ls-remote --tags "$TERMUX_PKG_HOMEPAGE.git" \
+		| grep -oP "refs/tags/\K${TERMUX_PKG_UPDATE_VERSION_REGEXP}$" \
+		| sort -V \
+		| tail -n1)"
+
+	if [[ "${latest_release}" == "${TERMUX_PKG_VERSION}" ]]; then
+		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+		return
+	fi
+
+	termux_pkg_upgrade_version "${latest_release}"
+}
 
 termux_step_pre_configure() {
 	termux_setup_gir
