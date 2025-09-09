@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="It allows you to download a World Wide Web site from the
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.49.6"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.debian.org/debian/pool/main/h/httrack/httrack_${TERMUX_PKG_VERSION}.orig.tar.gz
 TERMUX_PKG_SHA256=2d2ddfe8d1264024862abe801819e177ecbb1eb417dcf4650a054c671f3b7ff9
 TERMUX_PKG_AUTO_UPDATE=true
