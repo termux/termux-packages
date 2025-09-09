@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A documentation system for C++, C, Java, IDL and PHP"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.14.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/doxygen/doxygen/archive/Release_${TERMUX_PKG_VERSION//./_}.tar.gz
 TERMUX_PKG_SHA256=5663bf33e979381f470c2f4055c3b162e0abe41bdd6c5dccefd8d8775780bcc3
 TERMUX_PKG_DEPENDS="libc++, libiconv"
