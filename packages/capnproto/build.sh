@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Data interchange format and capability-based RPC system"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.2.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/capnproto/capnproto/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=763ecaa78e900101bc40c1c3397991413ff26996415b891ca9c310987fbdf3fb
 TERMUX_PKG_UPDATE_TAG_TYPE=newest-tag
