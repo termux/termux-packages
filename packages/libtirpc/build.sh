@@ -3,10 +3,14 @@ TERMUX_PKG_DESCRIPTION="Transport Independent RPC library"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.3.7"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/sourceforge/libtirpc/libtirpc-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=b47d3ac19d3549e54a05d0019a6c400674da716123858cfdb6d3bdd70a66c702
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-gssapi"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--disable-gssapi
+--enable-rpcdb
+"
 
 termux_step_post_get_source() {
 	sed -i "s/AC_INIT(libtirpc, [^)]*)/AC_INIT(libtirpc, ${TERMUX_PKG_VERSION##*:})/" configure.ac
