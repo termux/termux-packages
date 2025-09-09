@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Use eSpeak NG as the original eSpeak project is dead.
 TERMUX_PKG_VERSION="1.52.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/espeak-ng/espeak-ng/archive/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=bb4338102ff3b49a81423da8a1a158b420124b055b60fa76cfb4b18677130a23
 TERMUX_PKG_AUTO_UPDATE=true
