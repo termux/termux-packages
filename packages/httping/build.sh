@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="ping-like program for http-requests"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.4.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/folkertvanheusden/HTTPing/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=87fa2da5ac83c4a0edf4086161815a632df38e1cc230e1e8a24a8114c09da8fd
 TERMUX_PKG_AUTO_UPDATE=true
