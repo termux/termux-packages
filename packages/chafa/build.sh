@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Image-to-text converter supporting a wide range of symbo
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.16.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/hpjansson/chafa/releases/download/${TERMUX_PKG_VERSION}/chafa-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=657898dd9a89b45130a44c1efe1fc03e2c7bd00c2f543ed7111613cb9e7861df
 TERMUX_PKG_DEPENDS="freetype, glib, libcairo, libjpeg-turbo, libjxl, librsvg, libtiff, libwebp"
