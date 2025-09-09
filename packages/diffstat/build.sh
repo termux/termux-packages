@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Displays a histogram of changes to a file"
 TERMUX_PKG_LICENSE="HPND"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.68"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/ThomasDickey/diffstat-snapshots/archive/refs/tags/v${TERMUX_PKG_VERSION/./_}.tar.gz
 # invisible-mirror.net is not suitable for CI due to bad responsiveness.
 #TERMUX_PKG_SRCURL=https://invisible-mirror.net/archives/diffstat/diffstat-${TERMUX_PKG_VERSION}.tgz
