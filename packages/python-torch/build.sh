@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION="2.6.0"
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/pytorch/pytorch
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
-TERMUX_PKG_DEPENDS="libc++, libopenblas, libprotobuf, python, python-numpy, python-pip"
+TERMUX_PKG_DEPENDS="abseil-cpp, libc++, libopenblas, libprotobuf, python, python-numpy, python-pip"
 TERMUX_PKG_BUILD_DEPENDS="vulkan-headers, vulkan-loader-android"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, pyyaml, typing_extensions"
@@ -44,6 +44,7 @@ TERMUX_PKG_RM_AFTER_INSTALL="
 lib/pkgconfig
 lib/cmake/fmt
 lib/libfmt.a
+include/fmt
 "
 
 termux_step_host_build() {
@@ -81,7 +82,7 @@ termux_step_make_install() {
 	export PYTORCH_BUILD_VERSION=${TERMUX_PKG_VERSION}
 	export PYTORCH_BUILD_NUMBER=0
 	pip -v install --no-deps --no-build-isolation --prefix $TERMUX_PREFIX "$TERMUX_PKG_SRCDIR"
-	ln -sr ${TERMUX_PYTHON_HOME}/site-packages/torch/lib/*.so ${TERMUX_PREFIX}/lib
+	ln -sfr ${TERMUX_PYTHON_HOME}/site-packages/torch/lib/*.so ${TERMUX_PREFIX}/lib
 }
 
 termux_step_create_debscripts() {
