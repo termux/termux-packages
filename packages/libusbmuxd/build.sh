@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A client library for applications to handle usbmux proto
 TERMUX_PKG_LICENSE="LGPL-2.1, GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.1.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/libimobiledevice/libusbmuxd/releases/download/${TERMUX_PKG_VERSION}/libusbmuxd-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=5546f1aba1c3d1812c2b47d976312d00547d1044b84b6a461323c621f396efce
 TERMUX_PKG_AUTO_UPDATE=true
