@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Compiles finite state machines from regular languages in
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=7.0.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.colm.net/files/ragel/ragel-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=84b1493efe967e85070c69e78b04dc55edc5c5718f9d6b77929762cb2abed278
 TERMUX_PKG_DEPENDS="colm, libc++"
