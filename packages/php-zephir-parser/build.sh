@@ -4,6 +4,7 @@ TERMUX_PKG_DESCRIPTION="The Zephir Parser delivered as a C extension for the PHP
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="ian4hu <hu2008yinxiang@163.com>"
 TERMUX_PKG_VERSION="1.7.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/zephir-lang/php-zephir-parser/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=b947b267b8020a9390e1f7071a66c5a475fcde466c1aa28361e0f59120abe61c
 TERMUX_PKG_AUTO_UPDATE=true
