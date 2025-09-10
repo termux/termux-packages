@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A project in-between luv and luvit"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Komo @mbekkomo"
 TERMUX_PKG_VERSION=1:2.15.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/luvit/luvi
 TERMUX_PKG_DEPENDS="libluajit, lua51-lpeg, luv, openssl, pcre2, zlib"
 TERMUX_PKG_SUGGESTS="lit, luvit"
