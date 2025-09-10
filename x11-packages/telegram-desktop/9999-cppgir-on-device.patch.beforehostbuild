@@ -1,0 +1,21 @@
+--- a/cmake/external/glib/cppgir/CMakeLists.txt
++++ b/cmake/external/glib/cppgir/CMakeLists.txt
+@@ -98,14 +98,19 @@
+ target_link_libraries(cppgir Boost::boost)
+ if (UNIX)
+     # add fixed fallback search places
++    if (NOT DEFINED GI_DEFAULT_GIRPATH)
+     set(GI_DEFAULT_GIRPATH "/usr/${CMAKE_INSTALL_DATADIR}:/usr/local/${CMAKE_INSTALL_DATADIR}")
++    endif()
++    if (NOT DEFINED GI_DEF_DIR)
++    set(GI_DEF_DIR "/usr/share/gir-1.0")
++    endif()
+     target_compile_definitions(cppgir PRIVATE
+         -DDEFAULT_GIRPATH=${GI_DEFAULT_GIRPATH}
+         -DGI_GIR_DIR=${GIR_DIR}
+         -DGI_DATA_DIR=${CMAKE_INSTALL_FULL_DATADIR}/gir-1.0
+-        -DGI_DEF_DIR=/usr/share/gir-1.0
++        -DGI_DEF_DIR=${GI_DEF_DIR}
+     )
+ endif ()
+ if (BUILD_EMBED_IGNORE)
