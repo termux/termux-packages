@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Small dumper for media content streamed over the RTMP pr
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.6
+TERMUX_PKG_REVISION=1
 # Releases are not tagged.
 _COMMIT=6f6bb1353fc84f4cc37138baa99f586750028a01
 TERMUX_PKG_SRCURL=git+https://git.ffmpeg.org/rtmpdump
