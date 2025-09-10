@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A spelling and grammar checker, hyphenator and collectio
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.3.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.puimula.org/voikko-sources/libvoikko/libvoikko-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=d1162965c61de44f72162fd87ec1394bd4f90f87bc8152d13fe4ae692fdc73fa
 TERMUX_PKG_DEPENDS="libc++"
