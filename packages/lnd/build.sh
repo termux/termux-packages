@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Lightning Network Daemon"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.17.0-beta"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(https://github.com/lightningnetwork/lnd/archive/v${TERMUX_PKG_VERSION}.tar.gz
                    https://github.com/lightningnetwork/lnd/releases/download/v${TERMUX_PKG_VERSION}/vendor.tar.gz)
 TERMUX_PKG_SHA256=(9aeb1e37e7ffb8726ac8f34c546455305f50fa1a011669462e567740bde26cec
