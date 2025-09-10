@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Data manipulation and transformation for audio signal pr
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.6.0
+TERMUX_PKG_REVISION=1
 # FFmpeg 7 is not yet supported. The subpackage should be removed when FFmpeg 7
 # is supported by an upstream release.
 # https://github.com/pytorch/audio/issues/3857
