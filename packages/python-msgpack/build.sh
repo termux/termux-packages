@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="MessagePack serializer implementation for Python"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.1.1"
+TERMUX_PKG_REVISION=1
 # _cmsgpack.c is absent in https://github.com/msgpack/msgpack-python/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SRCURL=https://pypi.org/packages/source/m/msgpack/msgpack-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=77b79ce34a2bdab2594f490c8e80dd62a02d650b91a75159a63ec413b8d104cd
