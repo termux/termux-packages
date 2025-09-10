@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Command and library to inspect, tweak, edit and validate
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.1.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.xiph.org/releases/liboggz/liboggz-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=2466d03b67ef0bcba0e10fb352d1a9ffd9f96911657abce3cbb6ba429c656e2f
 TERMUX_PKG_AUTO_UPDATE=true
