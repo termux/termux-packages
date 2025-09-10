@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_LICENSE_FILE="LICENSE.md"
 TERMUX_PKG_MAINTAINER="@flosnvjx"
 TERMUX_PKG_VERSION="2.0.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://kristaps.bsd.lv/lowdown/snapshots/lowdown-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=d59f2ad82f981a63051bb61d8d04c02c8c49428ac29c435dff03a92e210b0004
 #TERMUX_PKG_BUILD_DEPENDS="libseccomp" ## it is merely a checkdepends for now and we dont run check during build
