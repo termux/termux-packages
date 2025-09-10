@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A color management framework for visual effects and anim
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.4.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/AcademySoftwareFoundation/OpenColorIO/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=2d8f2c47c40476d6e8cea9d878f6601d04f6d5642b47018eaafa9e9f833f3690
 TERMUX_PKG_AUTO_UPDATE=true
