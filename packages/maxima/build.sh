@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=()
 TERMUX_PKG_VERSION+=(5.47.0)
 TERMUX_PKG_VERSION+=(24.5.10) # ECL version
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=(https://downloads.sourceforge.net/sourceforge/maxima/Maxima-source/$TERMUX_PKG_VERSION-source/maxima-$TERMUX_PKG_VERSION.tar.gz
                    https://common-lisp.net/project/ecl/static/files/release/ecl-${TERMUX_PKG_VERSION[1]}.tgz)
 TERMUX_PKG_SHA256=(9104021b24fd53e8c03a983509cb42e937a925e8c0c85c335d7709a14fd40f7a
