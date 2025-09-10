@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="BSD 2-Clause, BSD 3-Clause, ZLIB, MPL-2.0, MIT, Public Domai
 TERMUX_PKG_LICENSE_FILE="License.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.2.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/jmcnamara/libxlsxwriter/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=63f070c19c97ce4d5dfcbc1fa8cc5237d4c9decf39341a31188dbdceef93b542
 TERMUX_PKG_AUTO_UPDATE=true
