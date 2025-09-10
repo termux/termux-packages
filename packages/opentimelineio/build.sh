@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Open Source API and interchange format for editorial tim
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.17.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="git+https://github.com/AcademySoftwareFoundation/OpenTimelineIO"
 TERMUX_PKG_SHA256=235cb5c259aa3c87baca0b899aa88dbba204a93615c0fa50adfa4d382ec7dd6e
 TERMUX_PKG_DEPENDS="libc++"
