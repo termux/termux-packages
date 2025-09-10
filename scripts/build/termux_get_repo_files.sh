@@ -32,12 +32,16 @@ termux_get_repo_files() {
 		esac
 
 		(
-			for retry in {1..3}; do
+			local attempt delay=5
+			if [[ "${CI-false}" == "true" ]]; then
+				delay=30
+			fi
+			for attempt in {1..6}; do
 				if termux_download "${RELEASE_FILE_URL}" "${RELEASE_FILE}" SKIP_CHECKSUM \
 						&& termux_download "${RELEASE_FILE_SIG_URL}" "${RELEASE_FILE}.gpg" SKIP_CHECKSUM; then
 					if ! gpg --verify "${RELEASE_FILE}.gpg" "${RELEASE_FILE}"; then
-						echo "GPG verification failed, probably we downloaded corrupted metadata. Retrying in 5 seconds."
-						sleep 5
+						echo "GPG verification failed, probably we downloaded corrupted metadata. Retrying in $delay seconds."
+						sleep "$delay"
 						continue
 					fi
 
