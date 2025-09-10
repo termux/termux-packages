@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Python library for calculating contours in 2D quadrilate
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.3.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/contourpy/contourpy
 TERMUX_PKG_DEPENDS="python, python-numpy"
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, meson-python, build"
