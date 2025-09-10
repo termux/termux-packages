@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="System V shared memory emulation on Android using ashmem
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.5
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/termux/libandroid-shmem/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=d41e0b1def94a671152e7f7c91d2839129d845f1c58998b2e22d603bac1cd14a
 TERMUX_PKG_BREAKS="libandroid-shmem-dev"
