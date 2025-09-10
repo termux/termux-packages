@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A library to support hangul input method logic"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.2.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/libhangul/libhangul/releases/download/libhangul-${TERMUX_PKG_VERSION}/libhangul-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ea04e6a0cf4840a2a3b5641c1761068c78691036db839d0838f4e7a6553a5120
 TERMUX_PKG_AUTO_UPDATE=true
