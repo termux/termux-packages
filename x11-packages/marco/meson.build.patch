@@ -1,0 +1,13 @@
+# Workaround: meson tries to find zenity in host system but it is already in dependency
+
+--- a/meson.build
++++ b/meson.build
+@@ -294,7 +294,7 @@
+ endif
+ 
+ gdk_pixbuf_csource = find_program('gdk-pixbuf-csource')
+-zenity = find_program('zenity')
++zenity = find_program('zenity', required: false)
+ 
+ libxext = cc.find_library('Xext', required: false)
+ if build_xsync
