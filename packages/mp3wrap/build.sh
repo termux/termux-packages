@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A command-line utility that wraps quickly two or more mp
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.5
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/mp3wrap/mp3wrap-${TERMUX_PKG_VERSION}-src.tar.gz
 TERMUX_PKG_SHA256=1b4644f6b7099dcab88b08521d59d6f730fa211b5faf1f88bd03bf61fedc04e7
 
