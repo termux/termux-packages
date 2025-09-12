@@ -6,7 +6,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="7.1.1"
 TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=733984395e0dbbe5c046abda2dc49a5544e7e0e1e2366bba849222ae9e3a03b1
-TERMUX_PKG_DEPENDS="libandroid-glob"
+TERMUX_PKG_DEPENDS="libandroid-glob, libopus, libdav1d"
 TERMUX_PKG_NO_STATICSPLIT="true"
 
 termux_step_configure() {
@@ -43,6 +43,14 @@ termux_step_configure() {
 		--cross-prefix="${TERMUX_HOST_PLATFORM}-" \
 		--disable-everything \
 		--enable-cross-compile \
+		--enable-protocol=file \
+		--enable-demuxer="matroska,webm" \
+		--enable-muxer="mp4" \
+		--enable-muxer="ogg" \
+		--enable-libdav1d \
+		--enable-decoder=libdav1d \
+		--enable-libopus \
+		--enable-decoder=libopus \
 		--prefix="$TERMUX_PREFIX/opt/ffmpeg-minimal" \
 		--target-os=android \
 		--extra-libs="-landroid-glob" \
