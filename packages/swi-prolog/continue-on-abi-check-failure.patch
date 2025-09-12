@@ -14,7 +14,7 @@ https://github.com/termux/termux-packages/issues/22737
 -      return match_abi_version(abi_version(), abi_string);
 +    if ( build_time_abi_string )
 +    { remove_trailing_whitespace(build_time_abi_string);
-+      char *run_time_abi_string = abi_version();
++      const char *run_time_abi_string = abi_version();
 +      if (match_abi_version(run_time_abi_string, build_time_abi_string) == 1)
 +      { return true;
 +      } else
