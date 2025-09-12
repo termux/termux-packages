@@ -1,0 +1,18 @@
+For some unknown reason, these files are not having .qlf files generated for them during cross-compilation,
+so they need to be excluded here otherwise errors like "chr.qlf: No such file or directory" will happen.
+
+--- a/cmake/InstallSource.cmake
++++ b/cmake/InstallSource.cmake
+@@ -185,6 +185,12 @@ set(noqlf_pattern
+     "home/library/ext/ltx2htm/sty_.*[.]pl")
+ 
+ set(noqlf_file
++    packages/chr//chr.pl
++    packages/chr//chr_translate.pl
++    packages/chr//chr_translate_bootstrap1.pl
++    packages/chr//chr_translate_bootstrap2.pl
++    packages/chr//guard_entailment.pl
++    packages/http/jquery.pl
+     home/library/tabling.pl
+     home/library/prolog_qlfmake.pl
+     home/library/win_menu.pl
