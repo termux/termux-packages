@@ -63,8 +63,8 @@ termux_step_pre_configure() {
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
 		export BINDGEN_EXTRA_CLANG_ARGS="--sysroot ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot"
 		case "${TERMUX_ARCH}" in
-		arm) BINDGEN_EXTRA_CLANG_ARGS+=" --target=arm-linux-androideabi${TERMUX_PKG_API_LEVEL} -isystem ${TERMUX_STANDALONE_TOOLCHAIN}/include/c++/v1 -isystem ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot/usr/include/arm-linux-androideabi" ;;
-		*) BINDGEN_EXTRA_CLANG_ARGS+=" --target=${TERMUX_ARCH}-linux-android${TERMUX_PKG_API_LEVEL} -isystem ${TERMUX_STANDALONE_TOOLCHAIN}/include/c++/v1 -isystem ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot/usr/include/${TERMUX_ARCH}-linux-android" ;;
+		arm) BINDGEN_EXTRA_CLANG_ARGS+=" --target=arm-linux-androideabi${TERMUX_PKG_API_LEVEL}" ;;
+		*) BINDGEN_EXTRA_CLANG_ARGS+=" --target=${TERMUX_ARCH}-linux-android${TERMUX_PKG_API_LEVEL}" ;;
 		esac
 	fi
 
