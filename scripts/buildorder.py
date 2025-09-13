@@ -39,7 +39,7 @@ def parse_build_file_dependencies_with_vars(path, vars):
     with open(path, encoding="utf-8") as build_script:
         for line in build_script:
             if line.startswith(vars):
-                dependencies_string = line.split('DEPENDS=')[1]
+                dependencies_string = line.split('DEPS=' if 'DEPS=' in line else 'DEPENDS=')[1]
                 for char in "\"'\n":
                     dependencies_string = dependencies_string.replace(char, '')
 

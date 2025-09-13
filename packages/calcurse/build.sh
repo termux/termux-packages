@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="calcurse is a calendar and scheduling application for th
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.8.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://calcurse.org/files/calcurse-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=849ba852c7f37b6772365cb0c42a94cde0fe75efba91363e96a0e7ef797ba565
 TERMUX_PKG_AUTO_UPDATE=true
