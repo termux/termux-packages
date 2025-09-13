@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE='https://community.kde.org/Frameworks'
 TERMUX_PKG_DESCRIPTION='Framework for providing abstractions to get the developers purposes fulfilled'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.17.0"
+TERMUX_PKG_VERSION="6.18.0"
 _KF6_MINOR_VERSION="${TERMUX_PKG_VERSION%.*}"
 TERMUX_PKG_SRCURL=https://download.kde.org/stable/frameworks/${_KF6_MINOR_VERSION}/purpose-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=689565d5eb0999e1ccd92e8f841fc8241ab02489ca6c339f48d541b5ba93764a
+TERMUX_PKG_SHA256=a428e4f495658240899e02f15b7a9230e3c33069723b43e1734c21fa1a23b825
 TERMUX_PKG_DEPENDS="kf6-kconfig (>= ${_KF6_MINOR_VERSION}), kf6-kcoreaddons (>= ${_KF6_MINOR_VERSION}), kf6-ki18n (>= ${_KF6_MINOR_VERSION}), kf6-kio (>= ${_KF6_MINOR_VERSION}), kf6-knotifications (>= ${_KF6_MINOR_VERSION}), kf6-kservice (>= ${_KF6_MINOR_VERSION}), libc++, qt6-qtbase, qt6-qtdeclarative"
 # kaccounts-integration, libaccounts-qt, accounts-qml-module, kcmutils can be added to TERMUX_PKG_DEPENDS when available
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${_KF6_MINOR_VERSION}), kf6-kirigami (>= ${_KF6_MINOR_VERSION}), intltool"
