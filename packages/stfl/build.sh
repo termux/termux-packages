@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Structured Terminal Forms Language/Library"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.24
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_REVISION=7
 # Using newsboat patched fork:
 # https://github.com/newsboat/stfl
 # Awaiting newsboat switching away from stfl, after which this package can be dropped:
