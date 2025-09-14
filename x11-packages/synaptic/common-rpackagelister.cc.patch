@@ -27,3 +27,19 @@
        (!_xapianDatabase )) {
        if(_config->FindB("Debug::Synaptic::Xapian",false))
  	 std::cerr << "xapain index not build yet" << std::endl;
+@@ -924,11 +922,11 @@ void RPackageLister::getSummary(int &held, int &kept, int &essential,
+ 
+ 
+ 
+-struct bla:public binary_function<RPackage *, RPackage *, bool> {
+-   bool operator() (RPackage *a, RPackage *b) {
++auto bla() {
++   return [](RPackage* a, RPackage* b) -> bool {
+       return strcmp(a->name(), b->name()) < 0;
+-   }
+-};
++   };
++}
+ 
+ void RPackageLister::saveUndoState(pkgState &state)
+ {

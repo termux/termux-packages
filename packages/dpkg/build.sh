@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://packages.debian.org/dpkg
 TERMUX_PKG_DESCRIPTION="Debian package management system"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.22.6"
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_VERSION="1.22.21"
 # old tarball are removed in https://mirrors.kernel.org/debian/pool/main/d/dpkg/dpkg_${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SRCURL=git+https://salsa.debian.org/dpkg-team/dpkg.git
-TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"
+TERMUX_PKG_SRCURL=https://salsa.debian.org/dpkg-team/dpkg/-/archive/${TERMUX_PKG_VERSION}/dpkg-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=81fb9aff0e6e790f5c5d327643b1dea34e89900b0a8e10f48b7ee5fe7c07dd8d
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="bzip2, coreutils, diffutils, gzip, less, libbz2, liblzma, libmd, tar, xz-utils, zlib, zstd"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="clang"
@@ -72,13 +71,21 @@ share/polkit-1
 "
 
 termux_step_pre_configure() {
-	(
-		cd "${TERMUX_PKG_SRCDIR}" && \
-		./autogen && \
+	# `dpkg`'s configure script expects the `.dist-version` file to contain the package version.
+	# This is missing in the tarballs from salsa.debian.org/dpkg-team/dpkg
+	echo "$TERMUX_PKG_VERSION" > "$TERMUX_PKG_SRCDIR/.dist-version"
+
+	# `.dist-vcs-id` isn't strictly required, but configure complains if its missing.
+	git ls-remote https://salsa.debian.org/dpkg-team/dpkg.git \
+	| grep -F "refs/tags/$TERMUX_PKG_VERSION^{}" \
+	| cut -f1 > "$TERMUX_PKG_SRCDIR/.dist-vcs-id"
+
+	( # Do this in a subshell so we don't have to `cd` back
+		cd "${TERMUX_PKG_SRCDIR}" && ./autogen
 		patch -p1 -i "${TERMUX_PKG_BUILDER_DIR}"/configure.diff
 	)
 	export TAR=tar # To make sure dpkg tries to use "tar" instead of e.g. "gnutar" (which happens when building on OS X)
-	perl -p -i -e "s/TERMUX_ARCH/$TERMUX_ARCH/" $TERMUX_PKG_SRCDIR/configure
+	sed -i "s/@TERMUX_ARCH@/$TERMUX_ARCH/" "$TERMUX_PKG_SRCDIR/configure"
 	sed -i 's/$req_vars = \$arch_vars.$varname./if ($varname eq "DEB_HOST_ARCH_CPU" or $varname eq "DEB_HOST_ARCH"){ print("'$TERMUX_ARCH'");exit; }; $req_vars = $arch_vars{$varname}/' scripts/dpkg-architecture.pl
 }
 
