@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="SUite of Nonlinear and DIfferential/ALgebraic equation S
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux-user-repository"
 TERMUX_PKG_VERSION="7.4.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/LLNL/sundials/releases/download/v${TERMUX_PKG_VERSION}/sundials-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=679ddacdd77610110e613164e8297d6d0cd35bae8e9c3afc8e8ff6f99a1c2a7b
 TERMUX_PKG_AUTO_UPDATE=true
