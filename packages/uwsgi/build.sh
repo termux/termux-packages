@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="uWSGI application server container"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.0.30"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/unbit/uwsgi/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c3374cd064ce7e11d364cd869230737fe4f54373098e634c319cea6973cc7a61
 TERMUX_PKG_DEPENDS="libandroid-glob, libandroid-sysv-semaphore, libandroid-utimes, libcap, libcrypt, libjansson, libuuid, libxml2, openssl, pcre2, python"
