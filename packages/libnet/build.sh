@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A library which provides API for commonly used low-level
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/libnet/libnet/releases/download/v$TERMUX_PKG_VERSION/libnet-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=ad1e2dd9b500c58ee462acd839d0a0ea9a2b9248a1287840bc601e774fb6b28f
 TERMUX_PKG_AUTO_UPDATE=true

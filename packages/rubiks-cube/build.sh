@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A rubik's cube that runs in your terminal"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/been-jamming/rubiks_cube
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true

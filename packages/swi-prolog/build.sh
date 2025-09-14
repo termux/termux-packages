@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Most popular and complete prolog implementation"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="9.3.22"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.swi-prolog.org/download/devel/src/swipl-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=1b1bfee1ed6026c1eedfa9b03494ed1f03a02578d630b430e59742e196edd048
 TERMUX_PKG_DEPENDS="libandroid-execinfo, libarchive, libcrypt, libgmp, libyaml, ncurses, openssl, ossp-uuid, readline, zlib, pcre2"

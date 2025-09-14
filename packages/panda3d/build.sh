@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A framework for 3D rendering and game development for Py
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.10.15"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/panda3d/panda3d/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=dfe93123a73570377ef77c2a1b6ecff46c9b507750d8bedde07f9244cc1e741e
 TERMUX_PKG_AUTO_UPDATE=true

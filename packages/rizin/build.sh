@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="UNIX-like reverse engineering framework and command-line
 TERMUX_PKG_LICENSE="GPL-3.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.8.1"
+TERMUX_PKG_REVISION=1
 # Use source tarball from release assets to get all bundled projects
 TERMUX_PKG_SRCURL=https://github.com/rizinorg/rizin/releases/download/v${TERMUX_PKG_VERSION}/rizin-src-v${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="capstone, file, libandroid-execinfo, liblz4, liblzma, libzip, openssl, tree-sitter, xxhash, zlib, zstd"

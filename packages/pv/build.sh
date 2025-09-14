@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Terminal-based tool for monitoring the progress of data 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.9.34"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.ivarch.com/programs/sources/pv-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c0626bed6cbef5006b53d3281e8e3ae4b2838729462b21eccf28140eefef6bb1
 TERMUX_PKG_AUTO_UPDATE=true

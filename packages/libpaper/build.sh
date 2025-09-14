@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library for handling paper characteristics (by @rrthomas
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.2.6"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/rrthomas/libpaper/releases/download/v${TERMUX_PKG_VERSION}/libpaper-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=500d39dc58768ee09688738c8b5bfe07640ba2fd6c25a6dc78810eb69c719e93
 TERMUX_PKG_AUTO_UPDATE=true

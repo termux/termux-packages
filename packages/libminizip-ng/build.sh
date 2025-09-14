@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A zip manipulation library written in C"
 TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.0.10"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/zlib-ng/minizip-ng/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c362e35ee973fa7be58cc5e38a4a6c23cc8f7e652555daf4f115a9eb2d3a6be7
 TERMUX_PKG_AUTO_UPDATE=true

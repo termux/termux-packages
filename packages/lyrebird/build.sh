@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="BSD 2-Clause, BSD 3-Clause, GPL-3.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE-GPL3.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.6.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/lyrebird/-/archive/lyrebird-$TERMUX_PKG_VERSION/lyrebird-lyrebird-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=387f3ea59024523b698ec6d714a6c7e259561d5fb85e9bde466d40b671b3af71
 TERMUX_PKG_AUTO_UPDATE=true

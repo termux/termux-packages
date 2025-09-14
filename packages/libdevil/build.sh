@@ -3,10 +3,13 @@ TERMUX_PKG_DESCRIPTION="A cross-platform image library utilizing a simple syntax
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.8.0
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=https://github.com/DentonW/DevIL/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=52129f247b26fcb5554643c9e6bbee75c4b9717735fdbf3c6ebff08cee38ad37
 TERMUX_PKG_DEPENDS="libc++, libjasper, libjpeg-turbo, libpng, libtiff, littlecms"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_POLICY_VERSION_MINIMUM=3.5
+"
 
 termux_step_pre_configure() {
 	CXXFLAGS+=" -Wno-error=register"

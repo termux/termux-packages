@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library with common code used by the libraries and tools
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.3.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SRCURL=https://github.com/libimobiledevice/libimobiledevice-glue/releases/download/${TERMUX_PKG_VERSION}/libimobiledevice-glue-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=6489a3411b874ecd81c87815d863603f518b264a976319725e0ed59935546774

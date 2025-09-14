@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Collection of tools, libraries, and tests for Vulkan sha
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2025.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/google/shaderc/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a8e4a25e5c2686fd36981e527ed05e451fcfc226bddf350f4e76181371190937
 TERMUX_PKG_DEPENDS="libc++"

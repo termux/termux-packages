@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A syntax-aware linter for prose built with speed and ext
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.12.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/errata-ai/vale/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=26b4c02024c441929e7fd2d79a9b1f94489f85d2e87cd25f9efa2057d10a65f3
 TERMUX_PKG_AUTO_UPDATE=true

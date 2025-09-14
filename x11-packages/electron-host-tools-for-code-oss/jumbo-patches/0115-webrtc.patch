@@ -1,0 +1,900 @@
+From a70d36bc8930357ae55ca5e0932888833d0db9f4 Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <licy183@termux.dev>
+Date: Sat, 23 Aug 2025 23:52:42 +0800
+Subject: [PATCH] reland jumbo 15
+
+Enable jumbo build for the following template(s):
+
+- //third_party/webrtc/webrtc.gni -> template("rtc_source_set")
+- //third_party/webrtc/webrtc.gni -> template("rtc_static_library")
+
+---
+ .../audio_encoder_multi_channel_opus_config.cc |  4 ++++
+ .../opus/audio_encoder_opus_config.cc          |  4 ++++
+ third_party/webrtc/api/video/i010_buffer.cc    |  6 ++++++
+ third_party/webrtc/api/video/i210_buffer.cc    |  6 ++++++
+ third_party/webrtc/api/video/i410_buffer.cc    |  6 ++++++
+ third_party/webrtc/api/video/i420_buffer.cc    |  4 ++++
+ third_party/webrtc/api/video/i422_buffer.cc    |  4 ++++
+ .../api/video_codecs/h264_profile_level_id.cc  |  6 ++++++
+ .../video_codecs/h265_profile_tier_level.cc    |  6 ++++++
+ third_party/webrtc/common_audio/BUILD.gn       |  4 ++++
+ .../common_video/h265/h265_bitstream_parser.cc |  6 ++++++
+ .../common_video/h265/h265_pps_parser.cc       |  6 ++++++
+ .../webrtc/media/engine/webrtc_video_engine.cc |  4 ++++
+ .../webrtc/media/engine/webrtc_voice_engine.cc |  4 ++++
+ .../audio_coding/neteq/reorder_optimizer.cc    |  6 ++++++
+ .../audio_coding/neteq/underrun_optimizer.cc   |  6 ++++++
+ .../remote_bitrate_estimator_abs_send_time.cc  |  6 ++++++
+ .../remote_bitrate_estimator_single_stream.cc  |  6 ++++++
+ ...flexfec_03_header_reader_writer_unittest.cc | 18 ++++++++++++++++++
+ .../source/flexfec_header_reader_writer.cc     | 18 ++++++++++++++++++
+ .../rtp_rtcp/source/flexfec_receiver.cc        |  4 ++++
+ .../modules/rtp_rtcp/source/flexfec_sender.cc  |  4 ++++
+ .../rtp_rtcp/source/packet_sequencer.cc        |  6 ++++++
+ .../modules/rtp_rtcp/source/rtcp_receiver.cc   |  6 ++++++
+ .../modules/rtp_rtcp/source/rtcp_sender.cc     |  6 ++++++
+ .../modules/rtp_rtcp/source/rtp_packet.cc      |  4 ++++
+ .../rtp_rtcp/source/rtp_sender_egress.cc       |  4 ++++
+ .../rtp_rtcp/source/rtp_sender_video.cc        |  4 ++++
+ .../webrtc/modules/rtp_rtcp/source/rtp_util.cc |  4 ++++
+ .../codecs/vp8/screenshare_layers.cc           | 18 ++++++++++++++----
+ .../scalability_structure_l2t2_key_shift.cc    |  4 ++++
+ .../svc/scalability_structure_simulcast.cc     |  4 ++++
+ .../webrtc/pc/jsep_session_description.cc      |  6 ++++++
+ third_party/webrtc/pc/webrtc_sdp.cc            |  6 ++++++
+ third_party/webrtc/webrtc.gni                  |  9 +++++----
+ 35 files changed, 211 insertions(+), 8 deletions(-)
+
+diff --git a/third_party/webrtc/api/audio_codecs/opus/audio_encoder_multi_channel_opus_config.cc b/third_party/webrtc/api/audio_codecs/opus/audio_encoder_multi_channel_opus_config.cc
+index a8123cb17a..662c99eae9 100644
+--- a/third_party/webrtc/api/audio_codecs/opus/audio_encoder_multi_channel_opus_config.cc
++++ b/third_party/webrtc/api/audio_codecs/opus/audio_encoder_multi_channel_opus_config.cc
+@@ -15,6 +15,8 @@
+ 
+ #include "api/audio_codecs/audio_encoder.h"
+ 
++#define kDefaultComplexity kDefaultComplexity_AudioEncoderMultiChannelOpusConfig
++
+ namespace webrtc {
+ 
+ namespace {
+@@ -110,3 +112,5 @@ bool AudioEncoderMultiChannelOpusConfig::IsOk() const {
+ }
+ 
+ }  // namespace webrtc
++
++#undef kDefaultComplexity
+diff --git a/third_party/webrtc/api/audio_codecs/opus/audio_encoder_opus_config.cc b/third_party/webrtc/api/audio_codecs/opus/audio_encoder_opus_config.cc
+index 92ee7bd66c..18f5529732 100644
+--- a/third_party/webrtc/api/audio_codecs/opus/audio_encoder_opus_config.cc
++++ b/third_party/webrtc/api/audio_codecs/opus/audio_encoder_opus_config.cc
+@@ -12,6 +12,8 @@
+ 
+ #include "api/audio_codecs/audio_encoder.h"
+ 
++#define kDefaultComplexity kDefaultComplexity_AudioEncoderOpusConfig
++
+ namespace webrtc {
+ 
+ namespace {
+@@ -75,3 +77,5 @@ bool AudioEncoderOpusConfig::IsOk() const {
+   return true;
+ }
+ }  // namespace webrtc
++
++#undef kDefaultComplexity
+diff --git a/third_party/webrtc/api/video/i010_buffer.cc b/third_party/webrtc/api/video/i010_buffer.cc
+index 59da7fb114..b1266e0453 100644
+--- a/third_party/webrtc/api/video/i010_buffer.cc
++++ b/third_party/webrtc/api/video/i010_buffer.cc
+@@ -25,6 +25,9 @@
+ #include "third_party/libyuv/include/libyuv/rotate.h"
+ #include "third_party/libyuv/include/libyuv/scale.h"
+ 
++#define kBufferAlignment kBufferAlignment_I010Buffer
++#define kBytesPerPixel   kBytesPerPixel_I010Buffer
++
+ // Aligning pointer to 64 bytes for improved performance, e.g. use SIMD.
+ static const int kBufferAlignment = 64;
+ static const int kBytesPerPixel = 2;
+@@ -215,3 +218,6 @@ void I010Buffer::ScaleFrom(const I010BufferInterface& src) {
+ }
+ 
+ }  // namespace webrtc
++
++#undef kBufferAlignment
++#undef kBytesPerPixel
+diff --git a/third_party/webrtc/api/video/i210_buffer.cc b/third_party/webrtc/api/video/i210_buffer.cc
+index 1f7919e3b4..41f087d7a9 100644
+--- a/third_party/webrtc/api/video/i210_buffer.cc
++++ b/third_party/webrtc/api/video/i210_buffer.cc
+@@ -26,6 +26,9 @@
+ #include "third_party/libyuv/include/libyuv/rotate.h"
+ #include "third_party/libyuv/include/libyuv/scale.h"
+ 
++#define kBufferAlignment kBufferAlignment_I210Buffer
++#define kBytesPerPixel   kBytesPerPixel_I210Buffer
++
+ // Aligning pointer to 64 bytes for improved performance, e.g. use SIMD.
+ static const int kBufferAlignment = 64;
+ static const int kBytesPerPixel = 2;
+@@ -214,3 +217,6 @@ void I210Buffer::ScaleFrom(const I210BufferInterface& src) {
+ }
+ 
+ }  // namespace webrtc
++
++#undef kBufferAlignment
++#undef kBytesPerPixel
+diff --git a/third_party/webrtc/api/video/i410_buffer.cc b/third_party/webrtc/api/video/i410_buffer.cc
+index 37564b9f3a..d500f56dfa 100644
+--- a/third_party/webrtc/api/video/i410_buffer.cc
++++ b/third_party/webrtc/api/video/i410_buffer.cc
+@@ -28,6 +28,9 @@
+ #include "third_party/libyuv/include/libyuv/rotate.h"
+ #include "third_party/libyuv/include/libyuv/scale.h"
+ 
++#define kBufferAlignment kBufferAlignment_I410Buffer
++#define kBytesPerPixel   kBytesPerPixel_I410Buffer
++
+ // Aligning pointer to 64 bytes for improved performance, e.g. use SIMD.
+ static const int kBufferAlignment = 64;
+ static const int kBytesPerPixel = 2;
+@@ -224,3 +227,6 @@ void I410Buffer::ScaleFrom(const I410BufferInterface& src) {
+ }
+ 
+ }  // namespace webrtc
++
++#undef kBufferAlignment
++#undef kBytesPerPixel
+diff --git a/third_party/webrtc/api/video/i420_buffer.cc b/third_party/webrtc/api/video/i420_buffer.cc
+index 33b2ea666e..28a1fcad3e 100644
+--- a/third_party/webrtc/api/video/i420_buffer.cc
++++ b/third_party/webrtc/api/video/i420_buffer.cc
+@@ -27,6 +27,8 @@
+ #include "third_party/libyuv/include/libyuv/rotate.h"
+ #include "third_party/libyuv/include/libyuv/scale.h"
+ 
++#define kBufferAlignment kBufferAlignment_i420
++
+ // Aligning pointer to 64 bytes for improved performance, e.g. use SIMD.
+ static const int kBufferAlignment = 64;
+ 
+@@ -239,3 +241,5 @@ void I420Buffer::ScaleFrom(const I420BufferInterface& src) {
+ }
+ 
+ }  // namespace webrtc
++
++#undef kBufferAlignment
+diff --git a/third_party/webrtc/api/video/i422_buffer.cc b/third_party/webrtc/api/video/i422_buffer.cc
+index 25814a88d9..b6016311c2 100644
+--- a/third_party/webrtc/api/video/i422_buffer.cc
++++ b/third_party/webrtc/api/video/i422_buffer.cc
+@@ -29,6 +29,8 @@
+ #include "third_party/libyuv/include/libyuv/rotate.h"
+ #include "third_party/libyuv/include/libyuv/scale.h"
+ 
++#define kBufferAlignment kBufferAlignment_i422
++
+ // Aligning pointer to 64 bytes for improved performance, e.g. use SIMD.
+ static const int kBufferAlignment = 64;
+ 
+@@ -241,3 +243,5 @@ void I422Buffer::CropAndScaleFrom(const I422BufferInterface& src,
+ }
+ 
+ }  // namespace webrtc
++
++#undef kBufferAlignment
+diff --git a/third_party/webrtc/api/video_codecs/h264_profile_level_id.cc b/third_party/webrtc/api/video_codecs/h264_profile_level_id.cc
+index e410fc22f2..433fcc5800 100644
+--- a/third_party/webrtc/api/video_codecs/h264_profile_level_id.cc
++++ b/third_party/webrtc/api/video_codecs/h264_profile_level_id.cc
+@@ -19,6 +19,9 @@
+ 
+ #include "api/rtp_parameters.h"
+ 
++#define LevelConstraint   LevelConstraint_H264ProfileLevelId
++#define kLevelConstraints kLevelConstraints_H264ProfileLevelId
++
+ namespace webrtc {
+ 
+ namespace {
+@@ -269,3 +272,6 @@ bool H264IsSameProfileAndLevel(const CodecParameterMap& params1,
+ }
+ 
+ }  // namespace webrtc
++
++#undef LevelConstraint
++#undef kLevelConstraints
+diff --git a/third_party/webrtc/api/video_codecs/h265_profile_tier_level.cc b/third_party/webrtc/api/video_codecs/h265_profile_tier_level.cc
+index 4ec1c8070f..427f404c06 100644
+--- a/third_party/webrtc/api/video_codecs/h265_profile_tier_level.cc
++++ b/third_party/webrtc/api/video_codecs/h265_profile_tier_level.cc
+@@ -17,6 +17,9 @@
+ #include "api/video/resolution.h"
+ #include "rtc_base/string_to_number.h"
+ 
++#define LevelConstraint   LevelConstraint_H265ProfileTierLevel
++#define kLevelConstraints kLevelConstraints_H265ProfileTierLevel
++
+ namespace webrtc {
+ 
+ namespace {
+@@ -324,3 +327,6 @@ std::optional<H265Level> GetSupportedH265Level(const Resolution& resolution,
+ }
+ 
+ }  // namespace webrtc
++
++#undef LevelConstraint
++#undef kLevelConstraints
+diff --git a/third_party/webrtc/common_audio/BUILD.gn b/third_party/webrtc/common_audio/BUILD.gn
+index c5459b21bb..b39d9d2761 100644
+--- a/third_party/webrtc/common_audio/BUILD.gn
++++ b/third_party/webrtc/common_audio/BUILD.gn
+@@ -41,6 +41,10 @@ rtc_library("common_audio") {
+     "window_generator.cc",
+     "window_generator.h",
+   ]
++  jumbo_excluded_sources = [
++    # Use `#pragma pack`
++    "wav_header.cc",
++  ]
+ 
+   deps = [
+     ":common_audio_c",
+diff --git a/third_party/webrtc/common_video/h265/h265_bitstream_parser.cc b/third_party/webrtc/common_video/h265/h265_bitstream_parser.cc
+index b3f9793a2a..30d27cd3de 100644
+--- a/third_party/webrtc/common_video/h265/h265_bitstream_parser.cc
++++ b/third_party/webrtc/common_video/h265/h265_bitstream_parser.cc
+@@ -25,6 +25,8 @@
+ #include "rtc_base/bitstream_reader.h"
+ #include "rtc_base/logging.h"
+ 
++#define kMaxRefIdxActive kMaxRefIdxActive_H265BitstreamParser
++
+ #define IN_RANGE_OR_RETURN(val, min, max)                                     \
+   do {                                                                        \
+     if (!slice_reader.Ok() || (val) < (min) || (val) > (max)) {               \
+@@ -668,3 +670,7 @@ std::optional<uint32_t> H265BitstreamParser::GetLastSlicePpsId() const {
+ }
+ 
+ }  // namespace webrtc
++
++#undef kMaxRefIdxActive
++#undef IN_RANGE_OR_RETURN_NULL
++#undef TRUE_OR_RETURN
+diff --git a/third_party/webrtc/common_video/h265/h265_pps_parser.cc b/third_party/webrtc/common_video/h265/h265_pps_parser.cc
+index c94e362ec9..ee22d80b1c 100644
+--- a/third_party/webrtc/common_video/h265/h265_pps_parser.cc
++++ b/third_party/webrtc/common_video/h265/h265_pps_parser.cc
+@@ -21,6 +21,8 @@
+ #include "rtc_base/checks.h"
+ #include "rtc_base/logging.h"
+ 
++#define kMaxRefIdxActive kMaxRefIdxActive_H265PpsParser
++
+ #define IN_RANGE_OR_RETURN_NULL(val, min, max)                                \
+   do {                                                                        \
+     if (!reader.Ok() || (val) < (min) || (val) > (max)) {                     \
+@@ -249,3 +251,7 @@ bool H265PpsParser::ParsePpsIdsInternal(BitstreamReader& reader,
+ }
+ 
+ }  // namespace webrtc
++
++#undef kMaxRefIdxActive
++#undef IN_RANGE_OR_RETURN_NULL
++#undef TRUE_OR_RETURN
+diff --git a/third_party/webrtc/media/engine/webrtc_video_engine.cc b/third_party/webrtc/media/engine/webrtc_video_engine.cc
+index 9b71d020df..c9eb8bd027 100644
+--- a/third_party/webrtc/media/engine/webrtc_video_engine.cc
++++ b/third_party/webrtc/media/engine/webrtc_video_engine.cc
+@@ -101,6 +101,8 @@
+ #include "rtc_base/trace_event.h"
+ #include "video/config/video_encoder_config.h"
+ 
++#define ValidateStreamParams ValidateStreamParams_WebRTCVideoEngine
++
+ namespace webrtc {
+ 
+ namespace {
+@@ -4095,3 +4097,5 @@ bool VideoCodecSettings::operator!=(const VideoCodecSettings& other) const {
+ }
+ 
+ }  // namespace webrtc
++
++#undef ValidateStreamParams
+diff --git a/third_party/webrtc/media/engine/webrtc_voice_engine.cc b/third_party/webrtc/media/engine/webrtc_voice_engine.cc
+index 3690ffb255..d3364705fd 100644
+--- a/third_party/webrtc/media/engine/webrtc_voice_engine.cc
++++ b/third_party/webrtc/media/engine/webrtc_voice_engine.cc
+@@ -116,6 +116,8 @@
+ #include "api/audio/create_audio_device_module.h"
+ #endif
+ 
++#define ValidateStreamParams ValidateStreamParams_WebRTCVoiceEngine
++
+ namespace webrtc {
+ namespace {
+ 
+@@ -2808,3 +2810,5 @@ bool WebRtcVoiceReceiveChannel::MaybeDeregisterUnsignaledRecvStream(
+   return false;
+ }
+ }  // namespace webrtc
++
++#undef ValidateStreamParams
+diff --git a/third_party/webrtc/modules/audio_coding/neteq/reorder_optimizer.cc b/third_party/webrtc/modules/audio_coding/neteq/reorder_optimizer.cc
+index 98dbedfaa4..466ac1c308 100644
+--- a/third_party/webrtc/modules/audio_coding/neteq/reorder_optimizer.cc
++++ b/third_party/webrtc/modules/audio_coding/neteq/reorder_optimizer.cc
+@@ -17,6 +17,9 @@
+ #include <optional>
+ #include <vector>
+ 
++#define kDelayBuckets kDelayBuckets_ReorderOptimizer
++#define kBucketSizeMs kBucketSizeMs_ReorderOptimizer
++
+ namespace webrtc {
+ 
+ namespace {
+@@ -76,3 +79,6 @@ int ReorderOptimizer::MinimizeCostFunction(int base_delay_ms) const {
+ }
+ 
+ }  // namespace webrtc
++
++#undef kDelayBuckets
++#undef kBucketSizeMs
+diff --git a/third_party/webrtc/modules/audio_coding/neteq/underrun_optimizer.cc b/third_party/webrtc/modules/audio_coding/neteq/underrun_optimizer.cc
+index dcee8e19fe..045d5137e4 100644
+--- a/third_party/webrtc/modules/audio_coding/neteq/underrun_optimizer.cc
++++ b/third_party/webrtc/modules/audio_coding/neteq/underrun_optimizer.cc
+@@ -15,6 +15,9 @@
+ 
+ #include "api/neteq/tick_timer.h"
+ 
++#define kDelayBuckets kDelayBuckets_UnderrunOptimizer
++#define kBucketSizeMs kBucketSizeMs_UnderrunOptimizer
++
+ namespace webrtc {
+ 
+ namespace {
+@@ -72,3 +75,6 @@ void UnderrunOptimizer::Reset() {
+ }
+ 
+ }  // namespace webrtc
++
++#undef kDelayBuckets
++#undef kBucketSizeMs
+diff --git a/third_party/webrtc/modules/remote_bitrate_estimator/remote_bitrate_estimator_abs_send_time.cc b/third_party/webrtc/modules/remote_bitrate_estimator/remote_bitrate_estimator_abs_send_time.cc
+index 5847b088b9..0c0209394c 100644
+--- a/third_party/webrtc/modules/remote_bitrate_estimator/remote_bitrate_estimator_abs_send_time.cc
++++ b/third_party/webrtc/modules/remote_bitrate_estimator/remote_bitrate_estimator_abs_send_time.cc
+@@ -38,6 +38,9 @@
+ #include "rtc_base/logging.h"
+ #include "system_wrappers/include/metrics.h"
+ 
++#define kTimestampGroupLengthMs kTimestampGroupLengthMs_RemoteBitrateEstimatorAbsSendTime
++#define kTimestampToMs          kTimestampToMs_RemoteBitrateEstimatorAbsSendTime
++
+ namespace webrtc {
+ namespace {
+ 
+@@ -376,3 +379,6 @@ DataRate RemoteBitrateEstimatorAbsSendTime::LatestEstimate() const {
+ }
+ 
+ }  // namespace webrtc
++
++#undef kTimestampGroupLengthMs
++#undef kTimestampToMs
+diff --git a/third_party/webrtc/modules/remote_bitrate_estimator/remote_bitrate_estimator_single_stream.cc b/third_party/webrtc/modules/remote_bitrate_estimator/remote_bitrate_estimator_single_stream.cc
+index b05610d4e9..7ce25c3a2a 100644
+--- a/third_party/webrtc/modules/remote_bitrate_estimator/remote_bitrate_estimator_single_stream.cc
++++ b/third_party/webrtc/modules/remote_bitrate_estimator/remote_bitrate_estimator_single_stream.cc
+@@ -34,6 +34,9 @@
+ #include "system_wrappers/include/clock.h"
+ #include "system_wrappers/include/metrics.h"
+ 
++#define kTimestampGroupLengthMs kTimestampGroupLengthMs_RemoteBitrateEstimatorSingleStream
++#define kTimestampToMs          kTimestampToMs_RemoteBitrateEstimatorSingleStream
++
+ namespace webrtc {
+ namespace {
+ 
+@@ -195,3 +198,6 @@ std::vector<uint32_t> RemoteBitrateEstimatorSingleStream::GetSsrcs() const {
+ }
+ 
+ }  // namespace webrtc
++
++#undef kTimestampGroupLengthMs
++#undef kTimestampToMs
+diff --git a/third_party/webrtc/modules/rtp_rtcp/source/flexfec_03_header_reader_writer_unittest.cc b/third_party/webrtc/modules/rtp_rtcp/source/flexfec_03_header_reader_writer_unittest.cc
+index 80b4ba3373..a0e9b2e39a 100644
+--- a/third_party/webrtc/modules/rtp_rtcp/source/flexfec_03_header_reader_writer_unittest.cc
++++ b/third_party/webrtc/modules/rtp_rtcp/source/flexfec_03_header_reader_writer_unittest.cc
+@@ -24,6 +24,15 @@
+ #include "test/gmock.h"
+ #include "test/gtest.h"
+ 
++#define kMaxMediaPackets          kMaxMediaPackets_Flexfec03HeaderReaderWriter
++#define kMaxTrackedMediaPackets   kMaxTrackedMediaPackets_Flexfec03HeaderReaderWriter
++#define kMaxFecPackets            kMaxFecPackets_Flexfec03HeaderReaderWriter
++#define kFlexfecPacketMaskSizes   kFlexfecPacketMaskSizes_Flexfec03HeaderReaderWriter
++#define kBaseHeaderSize           kBaseHeaderSize_Flexfec03HeaderReaderWriter
++#define kStreamSpecificHeaderSize kStreamSpecificHeaderSize_Flexfec03HeaderReaderWriter
++#define kHeaderSizes              kHeaderSizes_Flexfec03HeaderReaderWriter
++#define FlexfecHeaderSize         FlexfecHeaderSize_Flexfec03HeaderReaderWriter
++
+ namespace webrtc {
+ 
+ namespace {
+@@ -575,3 +584,12 @@ TEST(Flexfec03HeaderReaderWriterTest,
+ }
+ 
+ }  // namespace webrtc
++
++#undef kMaxMediaPackets
++#undef kMaxTrackedMediaPackets
++#undef kMaxFecPackets
++#undef kFlexfecPacketMaskSizes
++#undef kBaseHeaderSize
++#undef kStreamSpecificHeaderSize
++#undef kHeaderSizes
++#undef FlexfecHeaderSize
+diff --git a/third_party/webrtc/modules/rtp_rtcp/source/flexfec_header_reader_writer.cc b/third_party/webrtc/modules/rtp_rtcp/source/flexfec_header_reader_writer.cc
+index d1e0b99d3b..f5480b89b0 100644
+--- a/third_party/webrtc/modules/rtp_rtcp/source/flexfec_header_reader_writer.cc
++++ b/third_party/webrtc/modules/rtp_rtcp/source/flexfec_header_reader_writer.cc
+@@ -22,6 +22,15 @@
+ #include "rtc_base/checks.h"
+ #include "rtc_base/logging.h"
+ 
++#define kMaxMediaPackets          kMaxMediaPackets_FlexfecHeaderReaderWriter
++#define kMaxTrackedMediaPackets   kMaxTrackedMediaPackets_FlexfecHeaderReaderWriter
++#define kMaxFecPackets            kMaxFecPackets_FlexfecHeaderReaderWriter
++#define kFlexfecPacketMaskSizes   kFlexfecPacketMaskSizes_FlexfecHeaderReaderWriter
++#define kBaseHeaderSize           kBaseHeaderSize_FlexfecHeaderReaderWriter
++#define kStreamSpecificHeaderSize kStreamSpecificHeaderSize_FlexfecHeaderReaderWriter
++#define kHeaderSizes              kHeaderSizes_FlexfecHeaderReaderWriter
++#define FlexfecHeaderSize         FlexfecHeaderSize_FlexfecHeaderReaderWriter
++
+ namespace webrtc {
+ 
+ namespace {
+@@ -330,3 +339,12 @@ void FlexfecHeaderWriter::FinalizeFecHeader(
+ }
+ 
+ }  // namespace webrtc
++
++#undef kMaxMediaPackets
++#undef kMaxTrackedMediaPackets
++#undef kMaxFecPackets
++#undef kFlexfecPacketMaskSizes
++#undef kBaseHeaderSize
++#undef kStreamSpecificHeaderSize
++#undef kHeaderSizes
++#undef FlexfecHeaderSize
+diff --git a/third_party/webrtc/modules/rtp_rtcp/source/flexfec_receiver.cc b/third_party/webrtc/modules/rtp_rtcp/source/flexfec_receiver.cc
+index c6465fbccf..c6936b9a31 100644
+--- a/third_party/webrtc/modules/rtp_rtcp/source/flexfec_receiver.cc
++++ b/third_party/webrtc/modules/rtp_rtcp/source/flexfec_receiver.cc
+@@ -27,6 +27,8 @@
+ #include "rtc_base/checks.h"
+ #include "rtc_base/logging.h"
+ 
++#define kPacketLogInterval kPacketLogInterval_FlexfecReceiver
++
+ namespace webrtc {
+ 
+ namespace {
+@@ -207,3 +209,5 @@ void FlexfecReceiver::ProcessReceivedPacket(
+ }
+ 
+ }  // namespace webrtc
++
++#undef kPacketLogInterval
+diff --git a/third_party/webrtc/modules/rtp_rtcp/source/flexfec_sender.cc b/third_party/webrtc/modules/rtp_rtcp/source/flexfec_sender.cc
+index 9b5ceac577..53f10604a8 100644
+--- a/third_party/webrtc/modules/rtp_rtcp/source/flexfec_sender.cc
++++ b/third_party/webrtc/modules/rtp_rtcp/source/flexfec_sender.cc
+@@ -38,6 +38,8 @@
+ #include "rtc_base/race_checker.h"
+ #include "rtc_base/synchronization/mutex.h"
+ 
++#define kPacketLogInterval kPacketLogInterval_FlexfecSender
++
+ namespace webrtc {
+ 
+ namespace {
+@@ -216,3 +218,5 @@ std::optional<RtpState> FlexfecSender::GetRtpState() {
+ }
+ 
+ }  // namespace webrtc
++
++#undef kPacketLogInterval
+diff --git a/third_party/webrtc/modules/rtp_rtcp/source/packet_sequencer.cc b/third_party/webrtc/modules/rtp_rtcp/source/packet_sequencer.cc
+index 930ace9d38..b31eae4d3b 100644
+--- a/third_party/webrtc/modules/rtp_rtcp/source/packet_sequencer.cc
++++ b/third_party/webrtc/modules/rtp_rtcp/source/packet_sequencer.cc
+@@ -22,6 +22,9 @@
+ #include "rtc_base/random.h"
+ #include "system_wrappers/include/clock.h"
+ 
++#define kTimestampTicksPerMs   kTimestampTicksPerMs_PacketSequencer
++#define kRedForFecHeaderLength kRedForFecHeaderLength_PacketSequencer
++
+ namespace webrtc {
+ 
+ namespace {
+@@ -159,3 +162,6 @@ bool PacketSequencer::CanSendPaddingOnMediaSsrc() const {
+ }
+ 
+ }  // namespace webrtc
++
++#undef kTimestampTicksPerMs
++#undef kRedForFecHeaderLength
+diff --git a/third_party/webrtc/modules/rtp_rtcp/source/rtcp_receiver.cc b/third_party/webrtc/modules/rtp_rtcp/source/rtcp_receiver.cc
+index cf9975e764..82ad96c6f0 100644
+--- a/third_party/webrtc/modules/rtp_rtcp/source/rtcp_receiver.cc
++++ b/third_party/webrtc/modules/rtp_rtcp/source/rtcp_receiver.cc
+@@ -71,6 +71,9 @@
+ #include "system_wrappers/include/clock.h"
+ #include "system_wrappers/include/ntp_time.h"
+ 
++#define kDefaultVideoReportInterval kDefaultVideoReportInterval_RTCPReceiver
++#define kDefaultAudioReportInterval kDefaultAudioReportInterval_RTCPReceiver
++
+ namespace webrtc {
+ namespace {
+ 
+@@ -1252,3 +1255,6 @@ bool RTCPReceiver::RtcpRrSequenceNumberTimeoutLocked(Timestamp now) {
+ }
+ 
+ }  // namespace webrtc
++
++#undef kDefaultVideoReportInterval
++#undef kDefaultAudioReportInterval
+diff --git a/third_party/webrtc/modules/rtp_rtcp/source/rtcp_sender.cc b/third_party/webrtc/modules/rtp_rtcp/source/rtcp_sender.cc
+index e06698e0db..f944bc11e1 100644
+--- a/third_party/webrtc/modules/rtp_rtcp/source/rtcp_sender.cc
++++ b/third_party/webrtc/modules/rtp_rtcp/source/rtcp_sender.cc
+@@ -62,6 +62,9 @@
+ #include "rtc_base/synchronization/mutex.h"
+ #include "rtc_base/trace_event.h"
+ 
++#define kDefaultVideoReportInterval kDefaultVideoReportInterval_RTCPSender
++#define kDefaultAudioReportInterval kDefaultAudioReportInterval_RTCPSender
++
+ namespace webrtc {
+ 
+ namespace {
+@@ -908,3 +911,6 @@ void RTCPSender::SetNextRtcpSendEvaluationDuration(TimeDelta duration) {
+ }
+ 
+ }  // namespace webrtc
++
++#undef kDefaultVideoReportInterval
++#undef kDefaultAudioReportInterval
+diff --git a/third_party/webrtc/modules/rtp_rtcp/source/rtp_packet.cc b/third_party/webrtc/modules/rtp_rtcp/source/rtp_packet.cc
+index fe9d3a7d95..445206bfc1 100644
+--- a/third_party/webrtc/modules/rtp_rtcp/source/rtp_packet.cc
++++ b/third_party/webrtc/modules/rtp_rtcp/source/rtp_packet.cc
+@@ -27,6 +27,8 @@
+ #include "rtc_base/numerics/safe_conversions.h"
+ #include "rtc_base/strings/string_builder.h"
+ 
++#define kRtpVersion kRtpVersion_RtpPacket
++
+ namespace webrtc {
+ namespace {
+ constexpr size_t kFixedHeaderSize = 12;
+@@ -702,3 +704,5 @@ std::string RtpPacket::ToString() const {
+ }
+ 
+ }  // namespace webrtc
++
++#undef kRtpVersion
+diff --git a/third_party/webrtc/modules/rtp_rtcp/source/rtp_sender_egress.cc b/third_party/webrtc/modules/rtp_rtcp/source/rtp_sender_egress.cc
+index 57758ad538..2b108603d9 100644
+--- a/third_party/webrtc/modules/rtp_rtcp/source/rtp_sender_egress.cc
++++ b/third_party/webrtc/modules/rtp_rtcp/source/rtp_sender_egress.cc
+@@ -44,6 +44,8 @@
+ #include "rtc_base/logging.h"
+ #include "rtc_base/task_utils/repeating_task.h"
+ 
++#define kTimestampTicksPerMs kTimestampTicksPerMs_RtpSenderEgress
++
+ namespace webrtc {
+ namespace {
+ constexpr uint32_t kTimestampTicksPerMs = 90;
+@@ -515,3 +517,5 @@ void RtpSenderEgress::PeriodicUpdate() {
+       send_rates[RtpPacketMediaType::kRetransmission].bps(), ssrc_);
+ }
+ }  // namespace webrtc
++
++#undef kTimestampTicksPerMs
+diff --git a/third_party/webrtc/modules/rtp_rtcp/source/rtp_sender_video.cc b/third_party/webrtc/modules/rtp_rtcp/source/rtp_sender_video.cc
+index 8503b0db75..8806b6779d 100644
+--- a/third_party/webrtc/modules/rtp_rtcp/source/rtp_sender_video.cc
++++ b/third_party/webrtc/modules/rtp_rtcp/source/rtp_sender_video.cc
+@@ -69,6 +69,8 @@
+ #include "rtc_base/synchronization/mutex.h"
+ #include "system_wrappers/include/ntp_time.h"
+ 
++#define kRedForFecHeaderLength kRedForFecHeaderLength_RtpSenderVideo
++
+ namespace webrtc {
+ 
+ namespace {
+@@ -924,3 +926,5 @@ void RTPSenderVideo::MaybeUpdateCurrentPlayoutDelay(
+ }
+ 
+ }  // namespace webrtc
++
++#undef kRedForFecHeaderLength
+diff --git a/third_party/webrtc/modules/rtp_rtcp/source/rtp_util.cc b/third_party/webrtc/modules/rtp_rtcp/source/rtp_util.cc
+index 4d802b6308..310542f1ef 100644
+--- a/third_party/webrtc/modules/rtp_rtcp/source/rtp_util.cc
++++ b/third_party/webrtc/modules/rtp_rtcp/source/rtp_util.cc
+@@ -17,6 +17,8 @@
+ #include "modules/rtp_rtcp/source/byte_io.h"
+ #include "rtc_base/checks.h"
+ 
++#define kRtpVersion kRtpVersion_RtpUtil
++
+ namespace webrtc {
+ namespace {
+ 
+@@ -61,3 +63,5 @@ uint32_t ParseRtpSsrc(ArrayView<const uint8_t> rtp_packet) {
+ }
+ 
+ }  // namespace webrtc
++
++#undef kRtpVersion
+diff --git a/third_party/webrtc/modules/video_coding/codecs/vp8/screenshare_layers.cc b/third_party/webrtc/modules/video_coding/codecs/vp8/screenshare_layers.cc
+index 885d44bdf0..0dfbeafe94 100644
+--- a/third_party/webrtc/modules/video_coding/codecs/vp8/screenshare_layers.cc
++++ b/third_party/webrtc/modules/video_coding/codecs/vp8/screenshare_layers.cc
+@@ -35,12 +35,17 @@ namespace webrtc {
+ namespace {
+ using BufferFlags = Vp8FrameConfig::BufferFlags;
+ 
+-constexpr BufferFlags kNone = Vp8FrameConfig::BufferFlags::kNone;
+-constexpr BufferFlags kReference = Vp8FrameConfig::BufferFlags::kReference;
+-constexpr BufferFlags kUpdate = Vp8FrameConfig::BufferFlags::kUpdate;
+-constexpr BufferFlags kReferenceAndUpdate =
++constexpr BufferFlags kNone_ScreenshareLayers = Vp8FrameConfig::BufferFlags::kNone;
++constexpr BufferFlags kReference_ScreenshareLayers = Vp8FrameConfig::BufferFlags::kReference;
++constexpr BufferFlags kUpdate_ScreenshareLayers = Vp8FrameConfig::BufferFlags::kUpdate;
++constexpr BufferFlags kReferenceAndUpdate_ScreenshareLayers =
+     Vp8FrameConfig::BufferFlags::kReferenceAndUpdate;
+ 
++#define kNone               kNone_ScreenshareLayers
++#define kReference          kReference_ScreenshareLayers
++#define kUpdate             kUpdate_ScreenshareLayers
++#define kReferenceAndUpdate kUpdate_ScreenshareLayers
++
+ constexpr int kOneSecond90Khz = 90000;
+ constexpr int kMinTimeBetweenSyncs = kOneSecond90Khz * 2;
+ constexpr int kMaxTimeBetweenSyncs = kOneSecond90Khz * 4;
+@@ -631,3 +636,8 @@ void ScreenshareLayers::UpdateHistograms() {
+   }
+ }
+ }  // namespace webrtc
++
++#undef kNone
++#undef kReference
++#undef kUpdate
++#undef kReferenceAndUpdate
+diff --git a/third_party/webrtc/modules/video_coding/svc/scalability_structure_l2t2_key_shift.cc b/third_party/webrtc/modules/video_coding/svc/scalability_structure_l2t2_key_shift.cc
+index b39b953767..f2510c5769 100644
+--- a/third_party/webrtc/modules/video_coding/svc/scalability_structure_l2t2_key_shift.cc
++++ b/third_party/webrtc/modules/video_coding/svc/scalability_structure_l2t2_key_shift.cc
+@@ -17,6 +17,8 @@
+ #include "modules/video_coding/svc/scalable_video_controller.h"
+ #include "rtc_base/checks.h"
+ 
++#define Dti Dti_ScalabilityStructureL2T2KeyShift
++
+ namespace webrtc {
+ namespace {
+ 
+@@ -175,3 +177,5 @@ void ScalabilityStructureL2T2KeyShift::OnRatesUpdated(
+ }
+ 
+ }  // namespace webrtc
++
++#undef Dti
+diff --git a/third_party/webrtc/modules/video_coding/svc/scalability_structure_simulcast.cc b/third_party/webrtc/modules/video_coding/svc/scalability_structure_simulcast.cc
+index 71eae32794..7d39c7f2ee 100644
+--- a/third_party/webrtc/modules/video_coding/svc/scalability_structure_simulcast.cc
++++ b/third_party/webrtc/modules/video_coding/svc/scalability_structure_simulcast.cc
+@@ -18,6 +18,8 @@
+ #include "modules/video_coding/svc/scalable_video_controller.h"
+ #include "rtc_base/checks.h"
+ 
++#define Dti Dti_ScalabilityStructureSimulcast
++
+ namespace webrtc {
+ namespace {
+ 
+@@ -352,3 +354,5 @@ FrameDependencyStructure ScalabilityStructureS3T3::DependencyStructure() const {
+ }
+ 
+ }  // namespace webrtc
++
++#undef Dti
+diff --git a/third_party/webrtc/pc/jsep_session_description.cc b/third_party/webrtc/pc/jsep_session_description.cc
+index bbeb4c3c07..fb57d6e32c 100644
+--- a/third_party/webrtc/pc/jsep_session_description.cc
++++ b/third_party/webrtc/pc/jsep_session_description.cc
+@@ -36,6 +36,9 @@
+ using webrtc::Candidate;
+ using ::webrtc::SessionDescription;
+ 
++#define kDummyAddress kDummyAddress_JsepSessionDescription
++#define kDummyPort    kDummyPort_JsepSessionDescription
++
+ namespace webrtc {
+ namespace {
+ 
+@@ -364,3 +367,6 @@ int JsepSessionDescription::GetMediasectionIndex(const Candidate& candidate) {
+ }
+ 
+ }  // namespace webrtc
++
++#undef kDummyAddress
++#undef kDummyPort
+diff --git a/third_party/webrtc/pc/webrtc_sdp.cc b/third_party/webrtc/pc/webrtc_sdp.cc
+index 6e434676f9..464aa79184 100644
+--- a/third_party/webrtc/pc/webrtc_sdp.cc
++++ b/third_party/webrtc/pc/webrtc_sdp.cc
+@@ -69,6 +69,9 @@
+ #include "rtc_base/string_encode.h"
+ #include "rtc_base/strings/string_builder.h"
+ 
++#define kDummyAddress kDummyAddress_WebRTCSDP
++#define kDummyPort    kDummyPort_WebRTCSDP
++
+ // TODO(deadbeef): Switch to using anonymous namespace rather than declaring
+ // everything "static".
+ namespace webrtc {
+@@ -3761,3 +3764,6 @@
+ }
+ 
+ }  // namespace webrtc
++
++#undef kDummyAddress
++#undef kDummyPort
+diff --git a/third_party/webrtc/webrtc.gni b/third_party/webrtc/webrtc.gni
+index 103983dec4..58bbffea9c 100644
+--- a/third_party/webrtc/webrtc.gni
++++ b/third_party/webrtc/webrtc.gni
+@@ -7,6 +7,7 @@
+ # be found in the AUTHORS file in the root of the source tree.
+ import("//build/config/arm.gni")
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/mips.gni")
+ import("//build/config/ozone.gni")
+ import("//build/config/sanitizers/sanitizers.gni")
+@@ -587,7 +588,7 @@ template("rtc_test") {
+ }
+ 
+ template("rtc_source_set") {
+-  source_set(target_name) {
++  jumbo_source_set(target_name) {
+     forward_variables_from(invoker,
+                            "*",
+                            [
+@@ -700,7 +701,7 @@ template("rtc_source_set") {
+ }
+ 
+ template("rtc_static_library") {
+-  static_library(target_name) {
++  jumbo_static_library(target_name) {
+     forward_variables_from(invoker,
+                            "*",
+                            [
+@@ -823,9 +824,9 @@ template("rtc_library") {
+   # source files will cause issues with macOS libtool.
+   if (header_only || is_component_build ||
+       (defined(invoker.testonly) && invoker.testonly)) {
+-    target_type = "source_set"
++    target_type = "jumbo_source_set"
+   } else {
+-    target_type = "static_library"
++    target_type = "jumbo_static_library"
+   }
+   target(target_type, target_name) {
+     forward_variables_from(invoker,
+diff --git a/third_party/webrtc/modules/audio_processing/aec3/fullband_erle_estimator.cc b/third_party/webrtc/modules/audio_processing/aec3/fullband_erle_estimator.cc
+index 498c21b568..b375d805ba 100644
+--- a/third_party/webrtc/modules/audio_processing/aec3/fullband_erle_estimator.cc
++++ b/third_party/webrtc/modules/audio_processing/aec3/fullband_erle_estimator.cc
+@@ -21,6 +21,10 @@
+ #include "rtc_base/checks.h"
+ #include "rtc_base/numerics/safe_minmax.h"
+ 
++#define kX2BandEnergyThreshold kX2BandEnergyThreshold_FullBandErleEstimator
++#define kPointsToAccumulate    kPointsToAccumulate_FullBandErleEstimator
++#define kBlocksToHoldErle      kBlocksToHoldErle_FullBandErleEstimator
++
+ namespace webrtc {
+ 
+ namespace {
+@@ -189,3 +193,7 @@ void FullBandErleEstimator::ErleInstantaneous::UpdateQualityEstimate() {
+ }
+ 
+ }  // namespace webrtc
++
++#undef kX2BandEnergyThreshold
++#undef kPointsToAccumulate
++#undef kBlocksToHoldErle
+diff --git a/third_party/webrtc/modules/audio_processing/aec3/subband_erle_estimator.cc b/third_party/webrtc/modules/audio_processing/aec3/subband_erle_estimator.cc
+index 6208d26388..906e9a4dfc 100644
+--- a/third_party/webrtc/modules/audio_processing/aec3/subband_erle_estimator.cc
++++ b/third_party/webrtc/modules/audio_processing/aec3/subband_erle_estimator.cc
+@@ -18,6 +18,10 @@
+ #include "rtc_base/checks.h"
+ #include "rtc_base/numerics/safe_minmax.h"
+ 
++#define kX2BandEnergyThreshold kX2BandEnergyThreshold_SubbandErleEstimator
++#define kPointsToAccumulate    kPointsToAccumulate_SubbandErleEstimator
++#define kBlocksToHoldErle      kBlocksToHoldErle_SubbandErleEstimator
++
+ namespace webrtc {
+ 
+ namespace {
+@@ -251,3 +255,7 @@ void SubbandErleEstimator::UpdateAccumulatedSpectra(
+ }
+ 
+ }  // namespace webrtc
++
++#undef kX2BandEnergyThreshold
++#undef kPointsToAccumulate
++#undef kBlocksToHoldErle
+diff --git a/third_party/webrtc/modules/rtp_rtcp/source/rtp_packetizer_av1.cc b/third_party/webrtc/modules/rtp_rtcp/source/rtp_packetizer_av1.cc
+index e5293a90e2..3bd33d102a 100644
+--- a/third_party/webrtc/modules/rtp_rtcp/source/rtp_packetizer_av1.cc
++++ b/third_party/webrtc/modules/rtp_rtcp/source/rtp_packetizer_av1.cc
+@@ -25,6 +25,10 @@
+ #include "rtc_base/checks.h"
+ #include "rtc_base/logging.h"
+ 
++#define ObuHasExtension    ObuHasExtension_RTPPacketizerAV1
++#define ObuHasSize         ObuHasSize_RTPPacketizerAV1
++#define kObuSizePresentBit kObuSizePresentBit_RTPPacketizerAV1
++
+ namespace webrtc {
+ namespace {
+ constexpr int kAggregationHeaderSize = 1;
+@@ -456,3 +460,7 @@ bool RtpPacketizerAv1::NextPacket(RtpPacketToSend* packet) {
+ }
+ 
+ }  // namespace webrtc
++
++#undef ObuHasExtension
++#undef ObuHasSize
++#undef kObuSizePresentBit
+diff --git a/third_party/webrtc/modules/rtp_rtcp/source/video_rtp_depacketizer_av1.cc b/third_party/webrtc/modules/rtp_rtcp/source/video_rtp_depacketizer_av1.cc
+index fd8d647045..3695dad955 100644
+--- a/third_party/webrtc/modules/rtp_rtcp/source/video_rtp_depacketizer_av1.cc
++++ b/third_party/webrtc/modules/rtp_rtcp/source/video_rtp_depacketizer_av1.cc
+@@ -34,6 +34,10 @@
+ #include "rtc_base/logging.h"
+ #include "rtc_base/numerics/safe_conversions.h"
+ 
++#define ObuHasExtension    ObuHasExtension_VideoRTPDepacketizerAV1
++#define ObuHasSize         ObuHasSize_VideoRTPDepacketizerAV1
++#define kObuSizePresentBit kObuSizePresentBit_VideoRTPDepacketizerAV1
++
+ namespace webrtc {
+ namespace {
+ // AV1 format:
+@@ -404,3 +408,7 @@ VideoRtpDepacketizerAv1::Parse(CopyOnWriteBuffer rtp_payload) {
+ }
+ 
+ }  // namespace webrtc
++
++#undef ObuHasExtension
++#undef ObuHasSize
++#undef kObuSizePresentBit

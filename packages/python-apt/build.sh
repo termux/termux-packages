@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Python bindings for APT"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.0.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.debian.org/debian/pool/main/p/python-apt/python-apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=1963720a75b6916bf59c71e75ac4577b9dd51666030f11990f2f56cb31af115f
 TERMUX_PKG_DEPENDS="apt, libandroid-support, libc++, python"

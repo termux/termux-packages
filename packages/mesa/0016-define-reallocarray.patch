@@ -5,7 +5,7 @@
  #define REALLOCARRAY_H
  
 -#if !defined(HAVE_REALLOCARRAY)
-+#if !defined(HAVE_REALLOCARRAY) || defined(__TERMUX__)
++#if !defined(HAVE_REALLOCARRAY) || (defined(__TERMUX__) && __ANDROID_API__ < 29)
  
  #include <stdlib.h> // size_t
  #include <errno.h>

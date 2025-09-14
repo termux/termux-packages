@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A module dedicated to file loading and saving"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.3.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gitlab.gnome.org/World/gedit/libgedit-gfls/-/archive/${TERMUX_PKG_VERSION}/libgedit-gfls-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=fe408efc98d3ff86bcaa36d7c10d5859bf3cd4e868700d08796cfcb4d5389017
 TERMUX_PKG_AUTO_UPDATE=true

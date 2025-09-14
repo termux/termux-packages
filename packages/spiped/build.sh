@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="a utility for creating symmetrically encrypted and authe
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.6.4"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/Tarsnap/spiped/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=e094d8a3408e0689936be00743d1a9818b5d7a9faf6a34fcb44388a40c92bf05
 TERMUX_PKG_DEPENDS="openssl"

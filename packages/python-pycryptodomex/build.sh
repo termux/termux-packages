@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="BSD 2-Clause, Public Domain"
 TERMUX_PKG_LICENSE_FILE="LICENSE.rst"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.23.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/Legrandin/pycryptodome/archive/refs/tags/v${TERMUX_PKG_VERSION}x.tar.gz"
 TERMUX_PKG_SHA256=d3e12d349f62a8c3bd2e7056e2eea925abcfcdd9e2b07bff091bcc05837ac869
 TERMUX_PKG_DEPENDS="python, python-pip"

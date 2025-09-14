@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A free library for decoding ATSC A/52 streams"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.8.0"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 # FIXME: GitHub Action got banned by distfiles.adelielinux.org, see #24930.
 # FIXME: Use one mirror in https://www.adelielinux.org/mirrors/ instead.
 # TERMUX_PKG_SRCURL=https://distfiles.adelielinux.org/source/a52dec/a52dec-${TERMUX_PKG_VERSION}.tar.gz

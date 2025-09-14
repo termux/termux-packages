@@ -1,0 +1,11 @@
+--- a/mono/eglib/goutput.c
++++ b/mono/eglib/goutput.c
+@@ -234,7 +234,7 @@
+ 	g_assertion_message ("* Assertion: should not be reached at %s:%d\n", file, line);
+ }
+ 
+-#if HOST_ANDROID
++#if HOST_ANDROID && !defined(__TERMUX__)
+ #include <android/log.h>
+ 
+ static android_LogPriority
