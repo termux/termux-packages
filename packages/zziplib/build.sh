@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Provides read access to zipped files in a zip-archive, u
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.13.80"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/gdraheim/zziplib/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=21f40d111c0f7a398cfee3b0a30b20c5d92124b08ea4290055fbfe7bdd53a22c
 TERMUX_PKG_AUTO_UPDATE=true
