@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Counts physical the lines of code, blank lines, comment 
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.5.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/boyter/scc/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=161f5d9bb359c6440114b7d2e0f98d588c02aa66fbe474d7660b244687fefb70
 TERMUX_PKG_AUTO_UPDATE=true
