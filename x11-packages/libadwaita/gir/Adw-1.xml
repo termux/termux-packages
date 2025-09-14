@@ -799,6 +799,31 @@
     <property name="search-enabled" type="gboolean" flags="1073742051" default-value="TRUE"/>
     <property name="can-navigate-back" type="gboolean" flags="-1073741597" default-value="FALSE"/>
   </class>
+  <class name="AdwShortcutLabel" get-type="adw_shortcut_label_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="accelerator" type="gchararray" flags="1073742051" default-value=""/>
+    <property name="disabled-text" type="gchararray" flags="1073742051" default-value=""/>
+  </class>
+  <class name="AdwShortcutsItem" get-type="adw_shortcuts_item_get_type" parents="GObject" final="1">
+    <property name="title" type="gchararray" flags="1073742051" default-value=""/>
+    <property name="subtitle" type="gchararray" flags="1073742051" default-value=""/>
+    <property name="accelerator" type="gchararray" flags="1073742051" default-value=""/>
+    <property name="action-name" type="gchararray" flags="1073742051" default-value=""/>
+    <property name="direction" type="GtkTextDirection" flags="1073742051" default-value="GTK_TEXT_DIR_NONE"/>
+  </class>
+  <class name="AdwShortcutsSection" get-type="adw_shortcuts_section_get_type" parents="GObject" final="1">
+    <implements name="GtkBuildable"/>
+    <implements name="GListModel"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="AdwShortcutsDialog" get-type="adw_shortcuts_dialog_get_type" parents="AdwDialog,GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkShortcutManager"/>
+  </class>
   <class name="AdwSpinRow" get-type="adw_spin_row_get_type" parents="AdwActionRow,AdwPreferencesRow,GtkListBoxRow,GtkWidget,GInitiallyUnowned,GObject" final="1">
     <implements name="GtkAccessible"/>
     <implements name="GtkBuildable"/>
@@ -992,7 +1017,7 @@
     <property name="inverted" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="is-overflowing" type="gboolean" flags="225" default-value="FALSE"/>
     <property name="extra-drag-preload" type="gboolean" flags="1073742051" default-value="FALSE"/>
-    <property name="extra-drag-preferred-action" type="GdkDragAction" flags="1073742049" default-value="0"/>
+    <property name="extra-drag-preferred-action" type="GdkDragAction" flags="1073742049" default-value="GDK_ACTION_NONE"/>
     <signal name="extra-drag-drop" return="gboolean" when="last">
       <param type="AdwTabPage"/>
       <param type="GValue"/>
@@ -1027,7 +1052,7 @@
     <property name="secondary-menu" type="GMenuModel" flags="1073742051"/>
     <property name="show-start-title-buttons" type="gboolean" flags="1073742051" default-value="TRUE"/>
     <property name="show-end-title-buttons" type="gboolean" flags="1073742051" default-value="TRUE"/>
-    <property name="extra-drag-preferred-action" type="GdkDragAction" flags="1073742049" default-value="0"/>
+    <property name="extra-drag-preferred-action" type="GdkDragAction" flags="1073742049" default-value="GDK_ACTION_NONE"/>
     <property name="extra-drag-preload" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <signal name="extra-drag-drop" return="gboolean" when="last">
       <param type="AdwTabPage"/>
