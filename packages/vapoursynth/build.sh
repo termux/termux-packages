@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Video processing framework with simplicity in mind"
 TERMUX_PKG_LICENSE="LGPL-2.1-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="72"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/vapoursynth/vapoursynth/archive/refs/tags/R${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=650f77feebfd08842b521273f59e0c88f7ba9d7cb5f151d89b79b8dfdd4ce633
 TERMUX_PKG_DEPENDS="libzimg, python"
