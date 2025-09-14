@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="trurl is a command line tool that parses and manipulates
 TERMUX_PKG_LICENSE="curl"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.16.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/curl/trurl/releases/download/trurl-${TERMUX_PKG_VERSION}/trurl-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=aac947d4fb421a58abc19a3771e87942cd4721b8f855c433478c94c11a8203ba
 TERMUX_PKG_DEPENDS="libcurl"
