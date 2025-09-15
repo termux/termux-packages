@@ -1,0 +1,12 @@
+--- a/gtksourceview/meson.build
++++ b/gtksourceview/meson.build
+@@ -293,7 +293,8 @@
+     '--warn-all'
+   ]
+   gir_dep = dependency('gobject-introspection-1.0')
+-  if gir_dep.version().version_compare('>=1.83.2')
++  # TODO: Remove this after gobject-introspection 1.84.0 update in host system
++  if false and gir_dep.version().version_compare('>=1.83.2')
+     gir_args += [
+      '--doc-format=gi-docgen',
+     ]
