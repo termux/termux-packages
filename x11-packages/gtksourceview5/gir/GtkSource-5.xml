@@ -1,5 +1,19 @@
 <?xml version="1.0"?>
 <dump>
+  <class name="GtkSourceAnnotation" get-type="gtk_source_annotation_get_type" parents="GObject">
+    <property name="style" type="GtkSourceAnnotationStyle" flags="225" default-value="GTK_SOURCE_ANNOTATION_STYLE_NONE"/>
+    <property name="description" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="icon" type="GIcon" flags="225"/>
+    <property name="line" type="guint" flags="225" default-value="1"/>
+  </class>
+  <class name="GtkSourceAnnotations" get-type="gtk_source_annotations_get_type" parents="GObject">
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GtkSourceAnnotationProvider" get-type="gtk_source_annotation_provider_get_type" parents="GObject">
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
   <class name="GtkSourceBuffer" get-type="gtk_source_buffer_get_type" parents="GtkTextBuffer,GObject">
     <property name="highlight-matching-brackets" type="gboolean" flags="227" default-value="TRUE"/>
     <property name="highlight-syntax" type="gboolean" flags="227" default-value="TRUE"/>
@@ -184,6 +198,7 @@
     <property name="smart-backspace" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="smart-home-end" type="GtkSourceSmartHomeEndType" flags="1073742051" default-value="GTK_SOURCE_SMART_HOME_END_DISABLED"/>
     <property name="space-drawer" type="GtkSourceSpaceDrawer" flags="225"/>
+    <property name="annotations" type="GtkSourceAnnotations" flags="225"/>
     <property name="tab-width" type="guint" flags="1073742051" default-value="8"/>
     <signal name="smart-home-end" return="void" when="last">
       <param type="GtkTextIter"/>
@@ -384,7 +399,12 @@
       <param type="gchararray"/>
     </signal>
   </class>
-  <enum name="GtkSourceBracketMatchType" get-type="gtk_source_bracket_match_type_get_type">
+  <enum name="GtkSourceAnnotationStyle" get-type="gtk_source_annotation_style_get_type">
+    <member name="GTK_SOURCE_ANNOTATION_STYLE_NONE" nick="none" value="0"/>
+    <member name="GTK_SOURCE_ANNOTATION_STYLE_WARNING" nick="warning" value="1"/>
+    <member name="GTK_SOURCE_ANNOTATION_STYLE_ERROR" nick="error" value="2"/>
+    <member name="GTK_SOURCE_ANNOTATION_STYLE_ACCENT" nick="accent" value="3"/>
+  </enum>  <enum name="GtkSourceBracketMatchType" get-type="gtk_source_bracket_match_type_get_type">
     <member name="GTK_SOURCE_BRACKET_MATCH_NONE" nick="none" value="0"/>
     <member name="GTK_SOURCE_BRACKET_MATCH_OUT_OF_RANGE" nick="out-of-range" value="1"/>
     <member name="GTK_SOURCE_BRACKET_MATCH_NOT_FOUND" nick="not-found" value="2"/>
