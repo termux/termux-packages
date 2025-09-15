@@ -1,0 +1,23 @@
+#!@TERMUX_PREFIX@/bin/bash
+
+set -e
+
+sws=()
+export _PS_RUN_IN_ALPM_HOOKS=true
+
+while read -r i; do
+	sws+=("$(basename "${i//.sw/}")")
+done
+
+if [[ "${1}" = "update" || "${1}" = "disable" ]]; then
+	sws=($(pacman-switch -Qs ${sws[@]}))
+	if [ -z "${sws}" ]; then
+		exit 0
+	fi
+fi
+
+case "${1}" in
+	"enable") pacman-switch -Ea ${sws[@]};;
+	"update") pacman-switch -Su ${sws[@]};;
+	"disable") pacman-switch -Da ${sws[@]};;
+esac
