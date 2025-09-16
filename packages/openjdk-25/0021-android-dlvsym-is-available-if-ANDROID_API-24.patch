@@ -1,0 +1,25 @@
+From 8d37569e6fb7419ce5736754b9f9968d14b7e087 Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <grimler@termux.dev>
+Date: Fri, 3 Feb 2023 11:50:57 +0100
+Subject: [PATCH 25/37] android: dlvsym is available if ANDROID_API >= 24
+
+---
+ src/hotspot/os/linux/os_linux.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/hotspot/os/linux/os_linux.cpp b/src/hotspot/os/linux/os_linux.cpp
+index fdc7aad3d..05e258c87 100644
+--- a/src/hotspot/os/linux/os_linux.cpp
++++ b/src/hotspot/os/linux/os_linux.cpp
+@@ -138,7 +138,7 @@
+ // for timer info max values which include all bits
+ #define ALL_64_BITS CONST64(0xFFFFFFFFFFFFFFFF)
+ 
+-#if defined(MUSL_LIBC) || defined(__ANDROID__)
++#if defined(MUSL_LIBC) || (defined(__ANDROID__) && __ANDROID_API__ < 24)
+ // dlvsym is not a part of POSIX
+ // and musl libc doesn't implement it.
+ static void *dlvsym(void *handle,
+-- 
+2.45.2
+

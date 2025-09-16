@@ -1,0 +1,26 @@
+From 85913fabd90c355e9e5887ab01d026539e0d1e4e Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <grimler@termux.dev>
+Date: Sun, 31 Mar 2024 16:31:48 +0200
+Subject: [PATCH 01/37] libinet: include netinet/in.h for android builds
+
+---
+ src/java.base/unix/native/libnet/net_util_md.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/java.base/unix/native/libnet/net_util_md.h b/src/java.base/unix/native/libnet/net_util_md.h
+index 902cf9673..e74b6265b 100644
+--- a/src/java.base/unix/native/libnet/net_util_md.h
++++ b/src/java.base/unix/native/libnet/net_util_md.h
+@@ -26,6 +26,9 @@
+ #ifndef NET_UTILS_MD_H
+ #define NET_UTILS_MD_H
+ 
++#ifdef __ANDROID__
++#include <netinet/in.h>
++#endif
+ #include <netdb.h>
+ #include <poll.h>
+ #include <sys/socket.h>
+-- 
+2.45.2
+
