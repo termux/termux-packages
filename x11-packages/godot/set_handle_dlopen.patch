@@ -50,19 +50,6 @@ index 86aacbc..2fc009e 100644
    if (!handle) {
      if (verbose) {
        fprintf(stderr, "%s\n", dlerror());
-diff --git a/platform/linuxbsd/libudev-so_wrap.c b/platform/linuxbsd/libudev-so_wrap.c
-index 5455c1a..cc4c942 100644
---- a/platform/linuxbsd/libudev-so_wrap.c
-+++ b/platform/linuxbsd/libudev-so_wrap.c
-@@ -281,7 +281,7 @@ int (*udev_util_encode_string_dylibloader_wrapper_libudev)(const char*, char*, s
- int initialize_libudev(int verbose) {
-   void *handle;
-   char *error;
--  handle = dlopen("libudev.so.1", RTLD_LAZY);
-+  handle = dlopen("libudev.so", RTLD_LAZY);
-   if (!handle) {
-     if (verbose) {
-       fprintf(stderr, "%s\n", dlerror());
 diff --git a/platform/linuxbsd/speechd-so_wrap.c b/platform/linuxbsd/speechd-so_wrap.c
 index 1dc5f08..15d878a 100644
 --- a/platform/linuxbsd/speechd-so_wrap.c
