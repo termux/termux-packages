@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Cross-platform Git credential storage for multiple hosti
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.6.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://github.com/git-ecosystem/git-credential-manager/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=aba0b06b59daa1cd8a16bd9e1ca31a6d9da73e524fe8c045f3acbd0000be1b5e
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -27,9 +27,11 @@ termux_step_make() {
 	-p:InformationalVersion="${TERMUX_PKG_VERSION}" \
 	-p:Version="${TERMUX_PKG_VERSION}"
 	dotnet build-server shutdown
+	termux_dotnet_kill
 }
 
 termux_step_make_install() {
+	rm -fr "${TERMUX_PREFIX}/lib/${TERMUX_PKG_NAME}"
 	mkdir -p "${TERMUX_PREFIX}/lib/${TERMUX_PKG_NAME}"
 	cp -r "out/shared/Git-Credential-Manager/bin/Release/net${TERMUX_DOTNET_VERSION}/${DOTNET_TARGET_NAME}/publish"/* "${TERMUX_PREFIX}/lib/${TERMUX_PKG_NAME}"
 	ln -sf "${TERMUX_PREFIX}/lib/${TERMUX_PKG_NAME}/git-credential-manager" "$TERMUX_PREFIX/bin"
