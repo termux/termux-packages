@@ -1,0 +1,31 @@
+From e87e1978d2463dfdd4b123e62dafabe94fad9767 Mon Sep 17 00:00:00 2001
+From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
+Date: Thu, 10 Jun 2021 19:23:03 +0700
+Subject: [PATCH 12/37] Add CXXFLAGS_JDKLIB to CXXFLAGS
+
+For modules jdk.jdwp.agent and java.instrument.
+---
+ make/modules/java.instrument/Lib.gmk | 1 +
+ make/modules/jdk.jdwp.agent/Lib.gmk  | 1 +
+ 2 files changed, 2 insertions(+)
+
+--- a/make/modules/java.instrument/Lib.gmk
++++ b/make/modules/java.instrument/Lib.gmk
+@@ -39,6 +39,7 @@ $(eval $(call SetupJdkLibrary, BUILD_LIBINSTRUMENT, \
+     CFLAGS_windows := -Dstrcasecmp=stricmp, \
+     CFLAGS_debug := -DJPLIS_LOGGING, \
+     CFLAGS_release := -DNO_JPLIS_LOGGING, \
++    CXXFLAGS := $(CXXFLAGS_JDKLIB), \
+     LDFLAGS := $(ICONV_LDFLAGS), \
+     JDK_LIBS := java.base:libjava java.base:libjli java.base:libjvm, \
+     LIBS := $(ICONV_LIBS), \
+--- a/make/modules/jdk.jdwp.agent/Lib.gmk
++++ b/make/modules/jdk.jdwp.agent/Lib.gmk
+@@ -69,6 +69,7 @@ $(eval $(call SetupJdkLibrary, BUILD_LIBJDWP, \
+         unused-variable, \
+     DISABLED_WARNINGS_clang_utf_util.c := unused-but-set-variable, \
+     DISABLED_WARNINGS_microsoft_debugInit.c := 5287, \
++    CXXFLAGS := $(CXXFLAGS_JDKLIB), \
+     LDFLAGS := $(ICONV_LDFLAGS), \
+     EXTRA_HEADER_DIRS := \
+         include \

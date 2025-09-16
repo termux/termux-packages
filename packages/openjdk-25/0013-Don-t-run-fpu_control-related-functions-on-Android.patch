@@ -1,0 +1,75 @@
+From a0a394b9d96eb54b205b49fc6c3fefb97711555f Mon Sep 17 00:00:00 2001
+From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
+Date: Sat, 12 Jun 2021 06:58:20 +0700
+Subject: [PATCH 16/37] Don't run fpu_control related functions on Android
+
+---
+ src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp |  2 ++
+ src/hotspot/os_cpu/linux_x86/os_linux_x86.cpp | 10 +++++-----
+ 2 files changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp b/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp
+index 3bbe93fe7..fc63deb13 100644
+--- a/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp
++++ b/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp
+@@ -72,7 +72,9 @@
+ # include <pwd.h>
+ # include <poll.h>
+ # include <ucontext.h>
++#ifndef __ANDROID__
+ # include <fpu_control.h>
++#endif
+ # include <asm/ptrace.h>
+ 
+ #define SPELL_REG_SP  "sp"
+diff --git a/src/hotspot/os_cpu/linux_x86/os_linux_x86.cpp b/src/hotspot/os_cpu/linux_x86/os_linux_x86.cpp
+index 930cf3f26..bb320cf6d 100644
+--- a/src/hotspot/os_cpu/linux_x86/os_linux_x86.cpp
++++ b/src/hotspot/os_cpu/linux_x86/os_linux_x86.cpp
+@@ -74,7 +74,7 @@
+ # include <pwd.h>
+ # include <poll.h>
+ # include <ucontext.h>
+-#ifndef AMD64
++#if !defined(AMD64) && !defined(__ANDROID__)
+ # include <fpu_control.h>
+ #endif
+ 
+@@ -421,14 +421,14 @@ bool PosixSignals::pd_hotspot_signal_handler(int sig, siginfo_t* info,
+ }
+ 
+ void os::Linux::init_thread_fpu_state(void) {
+-#ifndef AMD64
++#if !defined(AMD64) && !defined(__ANDROID__)
+   // set fpu to 53 bit precision
+   set_fpu_control_word(0x27f);
+ #endif // !AMD64
+ }
+ 
+ int os::Linux::get_fpu_control_word(void) {
+-#ifdef AMD64
++#if defined(AMD64) || defined(__ANDROID__)
+   return 0;
+ #else
+   int fpu_control;
+@@ -438,7 +438,7 @@ int os::Linux::get_fpu_control_word(void) {
+ }
+ 
+ void os::Linux::set_fpu_control_word(int fpu_control) {
+-#ifndef AMD64
++#if !defined(AMD64) && !defined(__ANDROID__)
+   _FPU_SETCW(fpu_control);
+ #endif // !AMD64
+ }
+@@ -623,7 +623,7 @@ void os::print_register_info(outputStream *st, const void *context, int& continu
+ }
+ 
+ void os::setup_fpu() {
+-#ifndef AMD64
++#if !defined(AMD64) && !defined(__ANDROID__)
+   address fpu_cntrl = StubRoutines::x86::addr_fpu_cntrl_wrd_std();
+   __asm__ volatile (  "fldcw (%0)" :
+                       : "r" (fpu_cntrl) : "memory");
+-- 
+2.45.2
+

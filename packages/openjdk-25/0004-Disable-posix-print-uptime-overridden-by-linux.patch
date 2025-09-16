@@ -1,0 +1,42 @@
+From 80861cb4a8a3a8a705d6d4b76aca6406e0cc54f7 Mon Sep 17 00:00:00 2001
+From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
+Date: Mon, 7 Jun 2021 08:05:09 +0700
+Subject: [PATCH 04/37] Disable posix print uptime (overridden by linux!)
+
+---
+ src/hotspot/os/posix/os_posix.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/hotspot/os/posix/os_posix.cpp b/src/hotspot/os/posix/os_posix.cpp
+index 893ca3a7b..7d42555c3 100644
+--- a/src/hotspot/os/posix/os_posix.cpp
++++ b/src/hotspot/os/posix/os_posix.cpp
+@@ -74,7 +74,9 @@
+ #include <sys/wait.h>
+ #include <time.h>
+ #include <unistd.h>
++#ifndef __ANDROID__
+ #include <utmpx.h>
++#endif
+ 
+ #ifdef __APPLE__
+   #include <crt_externs.h>
+@@ -453,6 +455,7 @@ void os::Posix::print_load_average(outputStream* st) {
+ // unfortunately it does not work on macOS and Linux because the utx chain has no entry
+ // for reboot at least on my test machines
+ void os::Posix::print_uptime_info(outputStream* st) {
++#ifndef __ANDROID__
+   int bootsec = -1;
+   int currsec = time(nullptr);
+   struct utmpx* ent;
+@@ -467,6 +470,7 @@ void os::Posix::print_uptime_info(outputStream* st) {
+   if (bootsec != -1) {
+     os::print_dhm(st, "OS uptime:", (long) (currsec-bootsec));
+   }
++#endif
+ }
+ 
+ static void print_rlimit(outputStream* st, const char* msg,
+-- 
+2.45.2
+
