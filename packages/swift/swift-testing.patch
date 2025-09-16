@@ -1,16 +1,3 @@
-diff --git a/swift/utils/swift_build_support/swift_build_support/products/swift_testing.py b/swift/utils/swift_build_support/swift_build_support/products/swift_testing.py
-index b6bfa5760ef..324d1a77eea 100644
---- a/swift/utils/swift_build_support/swift_build_support/products/swift_testing.py
-+++ b/swift/utils/swift_build_support/swift_build_support/products/swift_testing.py
-@@ -51,7 +51,7 @@ class SwiftTesting(product.Product):
-         return False
- 
-     def should_install(self, host_target):
--        return self.args.install_swift_testing_macros
-+        return self.args.install_swift_testing
- 
-     def _cmake_product(self, host_target):
-         build_root = os.path.dirname(self.build_dir)
 diff --git a/swift-testing/Sources/Testing/SourceAttribution/Backtrace.swift b/swift-testing/Sources/Testing/SourceAttribution/Backtrace.swift
 index 78227e3..e0db2e9 100644
 --- a/swift-testing/Sources/Testing/SourceAttribution/Backtrace.swift
@@ -24,8 +11,8 @@ index 78227e3..e0db2e9 100644
        initializedCount = addresses.withMemoryRebound(to: UnsafeMutableRawPointer.self) { addresses in
          .init(clamping: backtrace(addresses.baseAddress!, .init(clamping: addresses.count)))
        }
--#elseif os(Linux) || os(FreeBSD)
-+#elseif os(Linux) || os(FreeBSD) || os(Android)
+-#elseif os(Linux) || os(FreeBSD) || os(OpenBSD)
++#elseif os(Linux) || os(FreeBSD) || os(OpenBSD) || os(Android)
        initializedCount = .init(clamping: backtrace(addresses.baseAddress!, .init(clamping: addresses.count)))
  #elseif os(Windows)
        initializedCount = Int(clamping: RtlCaptureStackBackTrace(0, ULONG(clamping: addresses.count), addresses.baseAddress!, nil))

@@ -5,11 +5,11 @@ index 7ebcdc070c1..5a6ed88182e 100644
 @@ -158,6 +158,7 @@ class AndroidPlatform(Platform):
  
          flags += '-sdk %s/sysroot ' % (android_toolchain_path)
-         flags += '-tools-directory %s/bin' % (android_toolchain_path)
-+        flags += ' -Xlinker -rpath -Xlinker @TERMUX_PREFIX@/lib'
+         flags += '-tools-directory %s/bin ' % (android_toolchain_path)
++        flags += '-Xlinker -rpath -Xlinker @TERMUX_PREFIX@/lib '
+         flags += '-Xclang-linker -Wl,-z,max-page-size=16384'
          return flags
  
-     def cmake_options(self, args):
 @@ -167,12 +168,11 @@ class AndroidPlatform(Platform):
          options.define('CMAKE_SYSTEM_PROCESSOR', args.android_arch if not
                         args.android_arch == 'armv7'

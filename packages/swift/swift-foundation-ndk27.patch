@@ -14,17 +14,6 @@ diff --git a/swift-corelibs-foundation/Sources/Foundation/Process.swift b/swift-
 index 758dd1df..02970992 100644
 --- a/swift-corelibs-foundation/Sources/Foundation/Process.swift
 +++ b/swift-corelibs-foundation/Sources/Foundation/Process.swift
-@@ -929,8 +929,8 @@ open class Process: NSObject, @unchecked Sendable {
-         }
-         let useFallbackChdir: Bool
-         if let dir = currentDirectoryURL?.path {
--            let chdirResult = _CFPosixSpawnFileActionsChdir(fileActions, dir)
--            useFallbackChdir = chdirResult == ENOSYS
-+            let chdirResult = ENOSYS
-+            useFallbackChdir = true
-             if !useFallbackChdir {
-                 try _throwIfPosixError(chdirResult)
-             }
 @@ -944,7 +944,7 @@ open class Process: NSObject, @unchecked Sendable {
          var spawnAttrs: posix_spawnattr_t = posix_spawnattr_t()
  #endif
