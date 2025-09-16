@@ -1,0 +1,27 @@
+From 244e732a47c8f77eeb3e4f08d8e1965739245980 Mon Sep 17 00:00:00 2001
+From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
+Date: Sat, 12 Jun 2021 17:03:05 +0700
+Subject: [PATCH 16/40] Libfontmanager: link against libawt to fix link error
+
+Partly based on commit from androidports:
+https://github.com/androidports/openjdk/commit/a3e4f0281154537f01c2e59286a6ceed9c827b11
+
+Note by robertkirkman: the error this fixes does not occur at build-time.
+It can be reproduced by running the JavaSoundDemo,
+https://www.oracle.com/java/technologies/java-sound-demo.html ,
+and the error looks like this:
+Exception in thread "main" java.lang.UnsatisfiedLinkError:
+/data/data/com.termux/files/usr/lib/jvm/java-25-openjdk/lib/libfontmanager.so:
+dlopen failed: cannot locate symbol "AWTFreeFont"
+
+--- a/make/modules/java.desktop/lib/ClientLibraries.gmk
++++ b/make/modules/java.desktop/lib/ClientLibraries.gmk
+@@ -411,7 +411,7 @@ $(eval $(call SetupJdkLibrary, BUILD_LIBFONTMANAGER, \
+     JDK_LIBS_macosx := libawt_lwawt, \
+     JDK_LIBS_unix := java.base:libjvm, \
+     LIBS := $(LIBFONTMANAGER_LIBS), \
+-    LIBS_unix := $(LIBM), \
++    LIBS_unix := -lawt_xawt $(LIBM), \
+     LIBS_macosx := \
+         -framework CoreFoundation \
+         -framework CoreGraphics \

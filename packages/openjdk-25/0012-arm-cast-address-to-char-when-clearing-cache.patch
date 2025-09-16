@@ -1,0 +1,25 @@
+From 8f05a76a76877f4c4e30807e1325f837b5e15a36 Mon Sep 17 00:00:00 2001
+From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
+Date: Sat, 12 Jun 2021 06:55:18 +0700
+Subject: [PATCH 15/37] arm: cast address to char when clearing cache
+
+---
+ src/hotspot/cpu/arm/icache_arm.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/hotspot/cpu/arm/icache_arm.cpp b/src/hotspot/cpu/arm/icache_arm.cpp
+index 61fcb8a35..93d2ad4f4 100644
+--- a/src/hotspot/cpu/arm/icache_arm.cpp
++++ b/src/hotspot/cpu/arm/icache_arm.cpp
+@@ -31,7 +31,7 @@
+ 
+ 
+ static int icache_flush(address addr, int lines, int magic) {
+-  __builtin___clear_cache(addr, addr + (lines << ICache::log2_line_size));
++  __builtin___clear_cache((char*) addr, (char*) (addr + (lines << ICache::log2_line_size)));
+   return magic;
+ }
+ 
+-- 
+2.45.2
+
