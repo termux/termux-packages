@@ -12,6 +12,15 @@ index b11313fab87..fe2e8982300 100644
  
  
  class CMark(cmake_product.CMakeProduct):
+@@ -54,7 +54,7 @@ class CMark(cmake_product.CMakeProduct):
+ 
+         self.cmake_options.define('CMARK_THREADING', 'ON')
+ 
+-        host_toolchain = self.generate_toolchain_file_for_darwin_or_linux(host_target)
++        host_toolchain = False # self.generate_toolchain_file_for_darwin_or_linux(host_target)
+ 
+         (platform, _) = host_target.split('-')
+         if not host_toolchain and platform == "openbsd":
 @@ -68,6 +70,13 @@ class CMark(cmake_product.CMakeProduct):
              toolchain_file = self.generate_linux_toolchain_file(platform, arch)
              self.cmake_options.define('CMAKE_TOOLCHAIN_FILE:PATH', toolchain_file)
@@ -43,6 +52,26 @@ index 744dca10fca..7b5932882f2 100644
  
          host_config = HostSpecificConfiguration(host_target, self.args)
  
+diff --git a/swift/utils/swift_build_support/swift_build_support/products/product.py b/swift/utils/swift_build_support/swift_build_support/products/product.py
+index 6bd94c3cad8..743f6ed3637 100644
+--- a/swift/utils/swift_build_support/swift_build_support/products/product.py
++++ b/swift/utils/swift_build_support/swift_build_support/products/product.py
+@@ -480,11 +480,12 @@ class Product(object):
+             # compile on Android does not use the NDK and its CMake config.
+             cross_compile = platform == "linux" or \
+                 self.is_cross_compile_target(host_target)
+-            toolchain_file = self.generate_linux_toolchain_file(platform, arch,
++            if platform == "android":
++                if not cross_compile:
++                    toolchain_file = self.generate_linux_toolchain_file(platform, arch,
+                                                                 cross_compile)
+-            self.cmake_options.define('CMAKE_TOOLCHAIN_FILE:PATH', toolchain_file)
++                    self.cmake_options.define('CMAKE_TOOLCHAIN_FILE:PATH', toolchain_file)
+ 
+-            if cross_compile and platform == "android":
+                 resource_dir = None
+                 # build-script-impl products build before the install and use
+                 # the Swift stdlib from the compiler build directory instead,
 diff --git a/swift/utils/swift_build_support/swift_build_support/products/swift_testing.py b/swift/utils/swift_build_support/swift_build_support/products/swift_testing.py
 index 324d1a77eea..bd5f9c79353 100644
 --- a/swift/utils/swift_build_support/swift_build_support/products/swift_testing.py
@@ -57,23 +86,16 @@ index 324d1a77eea..bd5f9c79353 100644
  
  from . import cmake_product
  from . import product
-@@ -115,6 +117,22 @@ class SwiftTestingCMakeShim(cmake_product.CMakeProduct):
+@@ -115,6 +117,15 @@ class SwiftTestingCMakeShim(cmake_product.CMakeProduct):
          # FIXME: If we build macros for the builder, specify the path.
          self.cmake_options.define('SwiftTesting_MACRO', 'NO')
  
 +        if host_target.startswith('android') and self.is_cross_compile_target(host_target):
 +            host_config = HostSpecificConfiguration(host_target, self.args)
 +            self.cmake_options.extend(host_config.cmake_options)
-+            flags = '-target %s-unknown-linux-android%s ' % (self.args.android_arch,
++            target = '%s-unknown-linux-android%s' % (self.args.android_arch,
 +                                                             self.args.android_api_level)
-+
-+            flags += '-resource-dir %s/lib/swift ' % (
-+                     self.host_install_destdir(host_target) + self.args.install_prefix)
-+
-+            ndk_path = StdlibDeploymentTarget.get_target_for_name(host_target).platform.ndk_toolchain_path(self.args)
-+            flags += '-sdk %s/sysroot ' % (ndk_path)
-+            flags += '-tools-directory %s/bin' % (ndk_path)
-+            self.cmake_options.define('CMAKE_Swift_FLAGS', flags)
++            self.cmake_options.define('CMAKE_Swift_COMPILER_TARGET', target)
 +            self.cmake_options.define('CMAKE_CXX_COMPILER_WORKS', 'True')
 +            self.cmake_options.define('CMAKE_FIND_ROOT_PATH', self.args.cross_compile_deps_path)
 +
