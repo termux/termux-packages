@@ -109,3 +109,16 @@ termux_setup_dotnet() {
 	find ./packs -mindepth 1 -maxdepth 3 -type l | sort
 	popd
 }
+
+termux_dotnet_kill() {
+	# when "dotnet build-server shutdown" is not enough
+	local dotnet_process=$(pgrep dotnet)
+	if [[ -n "$dotnet_process" ]]; then
+		echo "WARN: Dangling process, forcibly killing"
+		local pid
+		for pid in ${dotnet_process}; do
+			echo "${pid}: $(cat /proc/${pid}/cmdline | tr '\0' ' ')"
+			kill "${pid}"
+		done
+	fi
+}
