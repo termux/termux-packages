@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://ohmyposh.dev
 TERMUX_PKG_DESCRIPTION="A prompt theme engine for any shell."
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="26.23.6"
+TERMUX_PKG_VERSION="26.23.7"
 TERMUX_PKG_SRCURL=https://github.com/JanDeDobbeleer/oh-my-posh/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=fd6ccb9628e573f07d3aedd7f2eb2597f7bcf247174ed72c857bc1e460e494bc
+TERMUX_PKG_SHA256=8cb1770aa115ea59453727c38f1918647347ce9fd61dfe6b594ed6ca346f0361
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_pre_configure() {
