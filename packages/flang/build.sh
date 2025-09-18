@@ -3,11 +3,16 @@ TERMUX_PKG_DESCRIPTION="LLVM's Fortran frontend"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="flang/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@termux"
-LLVM_MAJOR_VERSION=20
-TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.1.8
-TERMUX_PKG_REVISION=3
-TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-$TERMUX_PKG_VERSION.src.tar.xz
-TERMUX_PKG_SHA256=6898f963c8e938981e6c4a302e83ec5beb4630147c7311183cf61069af16333d
+LLVM_MAJOR_VERSION=21
+TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.1.3
+TERMUX_PKG_SRCURL=(
+	https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-$TERMUX_PKG_VERSION.src.tar.xz
+	https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/LLVM-$TERMUX_PKG_VERSION-Linux-X64.tar.xz
+)
+TERMUX_PKG_SHA256=(
+	9c9db50d8046f668156d83f6b594631b4ca79a0d96e4f19bed9dc019b022e58f
+	52866dc560a4c00c12fed63a006d629108117e2282fd37875887961dd7b5f6f8
+)
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_HOSTBUILD=true
 # `flang-new` should be rebuilt when libllvm bumps version.
@@ -18,6 +23,7 @@ TERMUX_PKG_BUILD_DEPENDS="libllvm-static"
 
 # Upstream doesn't support 32-bit arches well. See https://github.com/llvm/llvm-project/issues/57621.
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
+TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
 # See http://llvm.org/docs/CMake.html:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -29,7 +35,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_ENABLE_FFI=ON
 -DFLANG_DEFAULT_LINKER=lld
 -DMLIR_INSTALL_AGGREGATE_OBJECTS=OFF
--DFLANG_ENABLE_WERROR=On
 -DFLANG_INCLUDE_TESTS=OFF
 -DLLVM_ENABLE_ASSERTIONS=On
 -DLLVM_LIT_ARGS=-v
@@ -60,24 +65,88 @@ termux_step_host_build() {
 	ninja -j $TERMUX_PKG_MAKE_PROCESSES clang-tblgen mlir-tblgen
 }
 
-termux_step_pre_configure() {
-	export PATH="$TERMUX_PKG_HOSTBUILD_DIR/bin:$PATH"
+__flang_build_runtime() {
+	if [ -f "$TERMUX_PKG_BUILDDIR"/.flang-rt-built ]; then
+		return
+	fi
+
+	termux_setup_cmake
+	termux_setup_ninja
+
+	# Add target to flang
+	mkdir -p "$TERMUX_PKG_TMPDIR/flang-bin"
+	cat <<- EOF > "$TERMUX_PKG_TMPDIR"/flang-bin/${TERMUX_HOST_PLATFORM}-flang-new
+	#!/usr/bin/env bash
+	if [ "\$1" != "-cpp" ] && [ "\$1" != "-fc1" ]; then
+		$TERMUX_PKG_SRCDIR/LLVM-$TERMUX_PKG_VERSION-Linux-X64/bin/flang-new --target=${TERMUX_HOST_PLATFORM}${TERMUX_PKG_API_LEVEL} -D__ANDROID_API__=$TERMUX_PKG_API_LEVEL "\$@"
+	else
+		# Target is already an argument.
+		$TERMUX_PKG_SRCDIR/LLVM-$TERMUX_PKG_VERSION-Linux-X64/bin/flang-new "\$@"
+	fi
+	EOF
+	chmod u+x "$TERMUX_PKG_TMPDIR"/flang-bin/${TERMUX_HOST_PLATFORM}-flang-new
+
+	# Backup variables
+	local __old_srcdir="$TERMUX_PKG_SRCDIR"
+	local __old_builddir="$TERMUX_PKG_BUILDDIR"
+	local __old_extra_configure_args="$TERMUX_PKG_EXTRA_CONFIGURE_ARGS"
+	local __old_path="$PATH"
+	TERMUX_PKG_SRCDIR="$TERMUX_PKG_SRCDIR/runtimes"
+	TERMUX_PKG_BUILDDIR="$TERMUX_PKG_BUILDDIR"/flang-rt-build
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCLANG_VERSION_MAJOR=$LLVM_MAJOR_VERSION"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_ENABLE_RUNTIMES=flang-rt"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_Fortran_COMPILER=$TERMUX_PKG_TMPDIR/flang-bin/${TERMUX_HOST_PLATFORM}-flang-new"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_Fortran_COMPILER_WORKS=yes"
+
+	# Configure
+	mkdir -p "$TERMUX_PKG_BUILDDIR"
+	cd "$TERMUX_PKG_BUILDDIR"
+	termux_step_configure_cmake
+
+	# Cross-compile Flang runtime
+	cd "$TERMUX_PKG_BUILDDIR"
+	ninja -j $TERMUX_PKG_MAKE_PROCESSES
+
+	# Recover variables
+	TERMUX_PKG_SRCDIR="$__old_srcdir"
+	TERMUX_PKG_BUILDDIR="$__old_builddir"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS="$__old_extra_configure_args"
+	PATH="$__old_path"
+
+	# Mark as built
+	mkdir -p "$TERMUX_PKG_BUILDDIR"
+	touch -f "$TERMUX_PKG_BUILDDIR"/.flang-rt-built
+}
+
+termux_step_configure() {
 	# Add unknown vendor, otherwise it screws with the default LLVM triple detection.
 	export LLVM_DEFAULT_TARGET_TRIPLE=${CCTERMUX_HOST_PLATFORM/-/-unknown-}
+
+	# Compile flang-rt
+	__flang_build_runtime
+
+	termux_setup_cmake
+	termux_setup_ninja
+
+	export PATH="$TERMUX_PKG_HOSTBUILD_DIR/bin:$PATH"
 	# see CMakeLists.txt and tools/clang/CMakeLists.txt
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_HOST_TRIPLE=$LLVM_DEFAULT_TARGET_TRIPLE"
-	TERMUX_SRCDIR_SAVE=$TERMUX_PKG_SRCDIR
-	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/flang
+
+	local __old_srcdir="$TERMUX_PKG_SRCDIR"
+	TERMUX_PKG_SRCDIR="$TERMUX_PKG_SRCDIR/flang"
+	cd "$TERMUX_PKG_BUILDDIR"
+	termux_step_configure_cmake
+	TERMUX_PKG_SRCDIR="$__old_srcdir"
+
 	# Avoid the possible OOM
 	TERMUX_PKG_MAKE_PROCESSES=1
 }
 
-termux_step_post_configure() {
-	TERMUX_PKG_SRCDIR=$TERMUX_SRCDIR_SAVE
-	unset TERMUX_SRCDIR_SAVE
-}
-
 termux_step_post_make_install() {
+	# Install flang-rt
+	cp -f "$TERMUX_PKG_BUILDDIR"/flang-rt-build/flang-rt/lib/libflang_rt.runtime.a \
+		"$TERMUX_PREFIX"/lib/libflang_rt.runtime.a
+
 	# Copy module source files
 	mkdir -p $TERMUX_PREFIX/opt/flang/{include,module}
 	cp -f $TERMUX_PKG_SRCDIR/flang/module/* $TERMUX_PREFIX/opt/flang/module/
