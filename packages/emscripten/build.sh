@@ -42,6 +42,7 @@ opt/emscripten-llvm/bin/llvm-lib
 opt/emscripten-llvm/bin/llvm-link
 opt/emscripten-llvm/bin/llvm-mca
 opt/emscripten-llvm/bin/llvm-ml
+opt/emscripten-llvm/bin/llvm-ml64
 opt/emscripten-llvm/bin/llvm-pdbutil
 opt/emscripten-llvm/bin/llvm-profgen
 opt/emscripten-llvm/bin/llvm-rc
