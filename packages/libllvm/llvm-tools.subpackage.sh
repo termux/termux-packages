@@ -5,11 +5,13 @@ bin/count
 bin/lli-child-target
 bin/llvm-PerfectShuffle
 bin/llvm-jitlink-executor
+bin/llvm-test-mustache-spec
 bin/not
 bin/obj2yaml
 bin/yaml-bench
 bin/yaml2obj
 share/man/man1/FileCheck.1.gz
+share/man/man1/llvm-test-mustache-spec.1.gz
 "
 TERMUX_SUBPKG_DESCRIPTION="LLVM Development Tools"
 TERMUX_SUBPKG_DEPEND_ON_PARENT=false
