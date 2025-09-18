@@ -16,6 +16,6 @@ diff -u -r ../orig-src/llvm/lib/Support/Unix/Path.inc ./llvm/lib/Support/Unix/Pa
 +  // Fall back to the classical detection.
 +  char exe_path[PATH_MAX];
 +  if (getprogpath(exe_path, argv0)) return exe_path;
- #elif defined(__linux__) || defined(__CYGWIN__) || defined(__gnu_hurd__)
+ #elif defined(__linux__) || defined(__CYGWIN__) || defined(__gnu_hurd__) ||    \
+     defined(__managarm__)
    char exe_path[PATH_MAX];
-   const char *aPath = "/proc/self/exe";

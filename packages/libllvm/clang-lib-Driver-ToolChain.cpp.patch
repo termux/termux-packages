@@ -1,4 +1,14 @@
 diff --git a/clang/lib/Driver/ToolChain.cpp b/clang/lib/Driver/ToolChain.cpp
+@@ -840,6 +840,9 @@ void ToolChain::addFortranRuntimeLibs(const ArgList &Args,
+       if (AsNeeded)
+         addAsNeededOption(*this, Args, CmdArgs, /*as_needed=*/false);
+     }
++    if (getTriple().isAndroid()) {
++      CmdArgs.push_back("-l:libandroid-complex-math.a");
++    }
+     addFlangRTLibPath(Args, CmdArgs);
+ 
+     // needs libexecinfo for backtrace functions
 @@ -1060,7 +1060,10 @@
  
    switch (Type) {

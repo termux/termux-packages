@@ -3,7 +3,7 @@ bin/bugpoint
 bin/dsymutil
 bin/llc
 bin/lli
-bin/llvm!(-jitlink-executor|-PerfectShuffle)
+bin/llvm!(-jitlink-executor|-PerfectShuffle|-test-mustache-spec)
 bin/opt
 bin/reduce-chunk-list
 bin/sancov
@@ -14,7 +14,7 @@ share/man/man1/bugpoint.1.gz
 share/man/man1/dsymutil.1.gz
 share/man/man1/llc.1.gz
 share/man/man1/lli.1.gz
-share/man/man1/llvm*
+share/man/man1/llvm!(-test-mustache-spec)
 share/man/man1/opt.1.gz
 share/man/man1/*tblgen.1.gz
 share/opt-viewer
