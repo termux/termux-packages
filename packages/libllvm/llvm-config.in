@@ -56,9 +56,10 @@ armdesc armdisassembler arminfo armutils asmparser asmprinter avr avrasmparser \
 avrcodegen avrdesc avrdisassembler avrinfo binaryformat bitreader bitstreamreader \
 bitwriter bpf bpfasmparser bpfcodegen bpfdesc bpfdisassembler bpfinfo cfguard cgdata codegen \
 codegentypes core coroutines coverage csky cskyasmparser cskycodegen cskydesc cskydisassembler \
-cskyinfo debuginfobtf debuginfocodeview debuginfodwarf debuginfogsym debuginfologicalview \
-debuginfomsf debuginfopdb demangle dlltooldriver dwarflinker dwarflinkerclassic dwarflinkerparallel \
-dwp engine executionengine extensions filecheck frontendatomic frontenddriver frontendhlsl \
+cskyinfo debuginfobtf debuginfocodeview debuginfodwarf debuginfodwarflowlevel \
+debuginfogsym debuginfologicalview debuginfomsf debuginfopdb demangle dlltooldriver \
+dwarfcfichecker dwarflinker dwarflinkerclassic dwarflinkerparallel dwp engine \
+executionengine extensions filecheck frontendatomic frontenddirective frontenddriver frontendhlsl \
 frontendoffloading frontendopenacc frontendopenmp fuzzercli fuzzmutate globalisel hexagon \
 hexagonasmparser hexagoncodegen hexagondesc hexagondisassembler hexagoninfo hipstdpar instcombine \
 instrumentation interfacestub interpreter ipo irprinter irreader jitlink lanai lanaiasmparser \
@@ -110,16 +111,16 @@ static_libs="-lLLVMWindowsManifest -lLLVMXRay -lLLVMLibDriver -lLLVMDlltoolDrive
 -lLLVMAArch64Info -lLLVMOrcDebugging -lLLVMOrcJIT -lLLVMWindowsDriver -lLLVMMCJIT -lLLVMJITLink -lLLVMInterpreter \
 -lLLVMExecutionEngine -lLLVMRuntimeDyld -lLLVMOrcTargetProcess -lLLVMOrcShared -lLLVMDWP \
 -lLLVMDebugInfoLogicalView -lLLVMDebugInfoGSYM -lLLVMOption -lLLVMObjectYAML -lLLVMObjCopy \
--lLLVMMCA -lLLVMMCDisassembler -lLLVMLTO -lLLVMCFGuard -lLLVMFrontendAtomic -lLLVMFrontendDriver \
--lLLVMFrontendOffloading -lLLVMFrontendOpenACC -lLLVMFrontendHLSL -lLLVMExtensions -lPolly -lPollyISL \
--lLLVMPasses -lLLVMCoroutines -lLLVMipo -lLLVMInstrumentation -lLLVMVectorize -lLLVMLinker \
--lLLVMFrontendOpenMP -lLLVMDWARFLinkerClassic -lLLVMDWARFLinkerParallel -lLLVMDWARFLinker \
+-lLLVMMCA -lLLVMMCDisassembler -lLLVMLTO -lLLVMCFGuard -lLLVMFrontendAtomic -lLLVMFrontendDirective \
+-lLLVMFrontendDriver -lLLVMFrontendOffloading -lLLVMFrontendOpenACC -lLLVMFrontendHLSL -lLLVMExtensions \
+-lPolly -lPollyISL -lLLVMPasses -lLLVMCoroutines -lLLVMipo -lLLVMInstrumentation -lLLVMVectorize -lLLVMLinker \
+-lLLVMFrontendOpenMP -lLLVMDWARFCFIChecker -lLLVMDWARFLinkerClassic -lLLVMDWARFLinkerParallel -lLLVMDWARFLinker \
 -lLLVMGlobalISel -lLLVMMIRParser -lLLVMAsmPrinter -lLLVMSelectionDAG -lLLVMCodeGen -lLLVMCodeGenTypes \
 -lLLVMObjCARCOpts -lLLVMIRPrinter -lLLVMInterfaceStub -lLLVMFileCheck -lLLVMFuzzMutate \
 -lLLVMTarget -lLLVMSandboxIR -lLLVMScalarOpts -lLLVMInstCombine -lLLVMAggressiveInstCombine -lLLVMTransformUtils \
 -lLLVMBitWriter -lLLVMAnalysis -lLLVMProfileData -lLLVMSymbolize -lLLVMDebugInfoBTF -lLLVMDebugInfoPDB \
--lLLVMDebugInfoMSF -lLLVMDebugInfoDWARF -lLLVMObject -lLLVMTelemetry -lLLVMTextAPI -lLLVMTextAPIBinaryReader \
--lLLVMMCParser -lLLVMIRReader -lLLVMAsmParser -lLLVMMC -lLLVMDebugInfoCodeView -lLLVMBitReader \
+-lLLVMDebugInfoMSF -lLLVMDebugInfoDWARF -lLLVMDebugInfoDWARFLowLevel -lLLVMObject -lLLVMTelemetry -lLLVMTextAPI \
+-lLLVMTextAPIBinaryReader -lLLVMMCParser -lLLVMIRReader -lLLVMAsmParser -lLLVMMC -lLLVMDebugInfoCodeView -lLLVMBitReader \
 -lLLVMFuzzerCLI -lLLVMCore -lLLVMRemarks -lLLVMBitstreamReader -lLLVMBinaryFormat \
 -lLLVMTargetParser -lLLVMTableGen -lLLVMSupport -lLLVMDemangle"
 shared_libs="-lLLVM-${version/.*/}"
