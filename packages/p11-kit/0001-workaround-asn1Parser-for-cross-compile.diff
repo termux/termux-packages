@@ -1,0 +1,38 @@
+--- a/common/meson.build
++++ b/common/meson.build
+@@ -88,21 +88,21 @@
+     'basic.asn.h',
+     output: 'basic.asn.h',
+     input: 'basic.asn',
+-    command: [asn1Parser, '-o', '@OUTPUT@', '@INPUT@'],
++    command: ['termux-proot-run', asn1Parser, '-o', '@OUTPUT@', '@INPUT@'],
+   )
+
+   pkix_asn_h = custom_target(
+     'pkix.asn.h',
+     output: 'pkix.asn.h',
+     input: 'pkix.asn',
+-    command: [asn1Parser, '-o', '@OUTPUT@', '@INPUT@'],
++    command: ['termux-proot-run', asn1Parser, '-o', '@OUTPUT@', '@INPUT@'],
+   )
+
+   openssl_asn_h = custom_target(
+     'openssl.asn.h',
+     output: 'openssl.asn.h',
+     input: 'openssl.asn',
+-    command: [asn1Parser, '-o', '@OUTPUT@', '@INPUT@'],
++    command: ['termux-proot-run', asn1Parser, '-o', '@OUTPUT@', '@INPUT@'],
+   )
+
+   asn_h_dep = declare_dependency(
+--- a/meson.build
++++ b/meson.build
+@@ -440,7 +440,7 @@
+ libtasn1 = dependency('libtasn1', version: '>= 2.3',
+                       required: get_option('trust_module'))
+ if libtasn1.found()
+-  asn1Parser = find_program('asn1Parser', required: get_option('trust_module'))
++  asn1Parser = find_program('asn1Parser', '@TERMUX_PREFIX@/bin/asn1Parser', required: get_option('trust_module'))
+   if asn1Parser.found()
+     conf.set('WITH_ASN1', 1)
+     libtasn1_deps += libtasn1
