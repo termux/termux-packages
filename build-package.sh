@@ -210,8 +210,8 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_download_deb_pac.sh"
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_get_repo_files.sh"
 
 # Download or build dependencies. Not to be overridden by packages.
-# shellcheck source=scripts/build/termux_step_get_dependencies.sh
-source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_get_dependencies.sh"
+# shellcheck source=scripts/build/new_termux_step_get_dependencies.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/new_termux_step_get_dependencies.sh"
 
 # Download python dependency modules for compilation.
 # shellcheck source=scripts/build/termux_step_get_dependencies_python.sh

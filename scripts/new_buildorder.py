@@ -12,8 +12,6 @@ from typing import Dict, List, Set, Tuple, TypeAlias
 
 logger = logging.getLogger(__name__)
 
-logging.basicConfig(format="%(levelname)s: %(message)s", filename="order.log", filemode="w", level=logging.DEBUG)
-
 DEPENDENCY_VARS = ("TERMUX_PKG_DEPENDS", "TERMUX_PKG_BUILD_DEPENDS", "TERMUX_SUBPKG_DEPENDS")
 
 PackageName: TypeAlias = str
@@ -56,6 +54,11 @@ class Package:
 
 
 PackageMap: TypeAlias = Dict[PackageName, Package]
+
+
+def die(msg: str) -> None:
+    print("ERROR:", msg)
+    exit(1)
 
 
 class BuildOrder:
@@ -109,6 +112,8 @@ class BuildOrder:
         package_map: Dict[PackageName, Package] = {}
 
         for repo in self.repos:
+            if not repo.exists():
+                die("'%s' does not exist" % repo.as_posix())
             for package_path in repo.iterdir():
                 if self.__parse_build_file_variable_bool(package_path, "TERMUX_PKG_METAPACKAGE"):
                     package_map[package_path.name] = Package(
@@ -118,34 +123,37 @@ class BuildOrder:
                         type=PackageType.VIRTUAL,
                     )
                     continue
-                # Note for self: See page 6 of your notebook.
+
                 dependencies = self.__parse_dependencies(package_path / "build.sh")
-                subpackages = []
+                # Note for self: See page 6 of your notebook.
+                if self.build_mode == BuildMode.OFFLINE:
+                    subpackages = []
 
-                for subpackage_path in package_path.glob("*.subpackage.sh"):
-                    subpackage_name = subpackage_path.name.removesuffix(".subpackage.sh")
-                    subpackage_dependencies: Set[Dependency | AlternativeDependency] = {package_path.name}
-                    subpackage_type: PackageType = PackageType.VIRTUAL
+                    for subpackage_path in package_path.glob("*.subpackage.sh"):
+                        subpackage_name = subpackage_path.name.removesuffix(".subpackage.sh")
 
-                    if self.build_mode == BuildMode.OFFLINE:
                         dependencies.update(self.__parse_dependencies(subpackage_path))
                         subpackages.append(subpackage_name)
 
-                    if self.build_mode == BuildMode.ONLINE:
-                        subpackage_dependencies = self.__parse_dependencies(subpackage_path)
-                        subpackage_type = PackageType.REAL
+                        package_map[subpackage_name] = Package(
+                            name=subpackage_name,
+                            path=package_path,
+                            dependencies={package_path.name},
+                            type=PackageType.VIRTUAL,
+                        )
 
-                    package_map[subpackage_name] = Package(
-                        name=subpackage_name,
-                        path=package_path,
-                        dependencies=subpackage_dependencies,
-                        type=subpackage_type,
-                    )
-
-                if self.build_mode == BuildMode.OFFLINE:
                     # Remove all the subpackages (of this parent) that might be in dependency set.
                     dependencies.difference_update(subpackages)  # Note for self: See page 7 of your notebook.
                     dependencies.discard(package_path.name)  # Some subpackages might have dependency on parent too.
+                else:
+                    for subpackage_path in package_path.glob("*.subpackage.sh"):
+                        subpackage_name = subpackage_path.name.removesuffix(".subpackage.sh")
+                        package_map[subpackage_name] = Package(
+                            name=subpackage_name,
+                            path=package_path,
+                            dependencies=self.__parse_dependencies(subpackage_path),
+                            type=PackageType.REAL,
+                        )
 
                 package_map[package_path.name] = Package(
                     name=package_path.name, path=package_path, dependencies=dependencies, type=PackageType.REAL
@@ -248,27 +256,93 @@ class BuildOrder:
 
         logger.debug("Total in build_order: %d", len(build_order))
 
+        build_order.pop()  # Remove self.root_pkg from list.
         return build_order
 
 
-repos = [
-    repo
-    for repo in (
-        Path.cwd() / "../termux-packages" / "packages",
-        Path.cwd() / "../termux-packages" / "root-packages",
-        Path.cwd() / "../termux-packages" / "x11-packages",
+def main() -> None:
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Generate order in which to build dependencies of a package.",
+        epilog="Crafted with <3 by @MrAdityaAlok",
     )
-]
+    parser.add_argument(
+        "-i",
+        default=False,
+        action="store_true",
+        help="Generate build order in ONLINE mode. This includes subpackages in output since they can be downloaded. [Not compatible with ONLINE mode]",
+    )
+    parser.add_argument(
+        "package",
+        nargs="?",
+        default=None,
+        help="Package to generate build order for. [Can be skipped to generate full buildorder]",
+    )
+    parser.add_argument(
+        "package_dirs",
+        nargs="*",
+        type=Path,
+        help="Directories with packages. [Defaults to those specified in repo.json]",
+    )
+    args = parser.parse_args()
+
+    online_build_mode: bool = args.i
+    package: str = args.package
+    package_directories: List[Path] = args.package_dirs
+
+    log_dir = Path("./log")
+    log_dir.mkdir(exist_ok=True)
+
+    logging.basicConfig(
+        format="%(levelname)s: %(message)s",
+        filename=log_dir / f"{package or 'full'}-buildorder.log",
+        filemode="w",
+        level=logging.DEBUG,
+    )
+
+    logger.debug(f"""Called with following info:
+    package: {package},
+    package_directories: {package_directories}
+    online_build_mode: {online_build_mode}
+    """)
+
+    full_buildorder = True if not package else False
+
+    if online_build_mode and full_buildorder:
+        die("-i (ONLINE) mode has no meaning when building all packages")
+
+    if not package_directories:
+        import json
+
+        try:
+            with open("./repo.json") as f:
+                package_directories = []
+                for d in json.load(f).keys():
+                    if d != "pkg_format":
+                        package_directories.append(Path(Path.cwd() / d))
+        except FileNotFoundError:
+            die("'repo.json' file not found at %s. Check script location." % Path.cwd())
+
+    for order in BuildOrder(
+        root_pkg=package,
+        build_mode=BuildMode.ONLINE if online_build_mode else BuildMode.OFFLINE,
+        repos=package_directories,
+    ).get():
+        logger.debug("%-40s %s" % (order.name, f"{order.path.parent.name}/{order.path.name}"))
+        print("%-40s %s" % (order.name, f"{order.path.parent.name}/{order.path.name}"))
+
 
 start_time = time.perf_counter()
 
-for order in BuildOrder(None, repos, BuildMode.OFFLINE).get():
-    print("%-40s %s" % (order.name, f"{order.path.parent.name}/{order.path.name}"))
+if __name__ == "__main__":
+    main()
 
 end_time = time.perf_counter()
 
 logger.debug("Elapsed time [total]: %f" % (end_time - start_time))
 
+# TODO: Add support for glibc
 
 # INFO:
 # - Two build modes: (OFFLINE: completely offline, ONLINE: completely online)
