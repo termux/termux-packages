@@ -6,14 +6,18 @@ sws=()
 export _PS_RUN_IN_ALPM_HOOKS=true
 
 while read -r i; do
-	sws+=("$(basename "${i//.sw/}")")
+	sw="$(basename "${i//.sw/}")"
+	if [[ -n "${sw}" && "${sw}" != "*" ]]; then
+		sws+=("${sw}")
+	fi
 done
 
-if [[ "${1}" = "update" || "${1}" = "disable" ]]; then
+if [[ -n "${sws}" && ("${1}" = "update" || "${1}" = "disable") ]]; then
 	sws=($(pacman-switch -Qs ${sws[@]}))
-	if [ -z "${sws}" ]; then
-		exit 0
-	fi
+fi
+
+if [ -z "${sws}" ]; then
+	exit 0
 fi
 
 case "${1}" in

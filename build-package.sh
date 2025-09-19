@@ -30,6 +30,9 @@ source "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"; docker__create_docker
 # Source the `termux_package` library.
 source "$TERMUX_SCRIPTDIR/scripts/utils/termux/package/termux_package.sh"
 
+# Source the `termux_alternatives` library.
+source "$TERMUX_SCRIPTDIR/scripts/utils/termux/alternatives/termux_alternatives.sh"
+
 export SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH:-$(git -c log.showSignature=false log -1 --pretty=%ct 2>/dev/null || date "+%s")}
 
 if [ "$(uname -o)" = "Android" ] || [ -e "/system/bin/app_process" ]; then
@@ -331,6 +334,10 @@ termux_step_post_make_install() {
 # shellcheck source=scripts/build/termux_step_install_pacman_hooks.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_install_pacman_hooks.sh"
 
+# Install switcher files that will provide alternatives for pacman package
+# shellcheck source=scripts/build/termux_step_install_switcher_files.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_install_switcher_files.sh"
+
 # Add service scripts from array TERMUX_PKG_SERVICE_SCRIPT, if it is set
 # shellcheck source=scripts/build/termux_step_install_service_scripts.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_install_service_scripts.sh"
@@ -396,8 +403,8 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_pacman_package.sh"
 
 # Process 'update-alternatives' entries from `.alternatives` files.
 # Not to be overridden by package scripts.
-# shellcheck source=scripts/build/termux_step_setup_alternatives.sh
-source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_setup_alternatives.sh"
+# shellcheck source=scripts/build/termux_step_update_alternatives.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_update_alternatives.sh"
 
 # Finish the build. Not to be overridden by package scripts.
 # shellcheck source=scripts/build/termux_step_finish_build.sh
@@ -751,7 +758,10 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		termux_run_base_and_multilib_build_step termux_step_make_install
 		cd "$TERMUX_PKG_BUILDDIR"
 		termux_step_post_make_install
-		termux_step_install_pacman_hooks
+		if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
+			termux_step_install_pacman_hooks
+			termux_step_install_switcher_files
+		fi
 		termux_step_install_service_scripts
 		termux_step_install_license
 		cd "$TERMUX_PKG_MASSAGEDIR"

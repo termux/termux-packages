@@ -7,7 +7,7 @@ TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=(https://gitlab.archlinux.org/pacman/pacman/-/releases/v${TERMUX_PKG_VERSION}/downloads/pacman-${TERMUX_PKG_VERSION}.tar.xz
 		https://github.com/termux-pacman/pacman-switch/archive/refs/heads/main.zip)
 TERMUX_PKG_SHA256=(61cbd445d1381b4b184bc7c4e2791f07a79f0f2807b7c600399d0d08e8cd28cf
-		707669cd9700916254890ce0bf0bd2a0c93e53610bf3540b06dd0e99110178f9)
+		04aa9eea156f830c286695b4b4820f609c5b15d88c32c5b75413317145bec48d)
 TERMUX_PKG_DEPENDS="bash, curl, gpgme, libandroid-glob, libarchive, libcurl, openssl, termux-licenses, termux-keyring"
 TERMUX_PKG_BUILD_DEPENDS="doxygen, asciidoc, nettle"
 TERMUX_PKG_GROUPS="base-devel"
@@ -38,12 +38,10 @@ termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/etc/pacman.d
 	install -m644 $TERMUX_PKG_BUILDER_DIR/serverlist $TERMUX_PREFIX/etc/pacman.d/serverlist
 	install -m755 $TERMUX_PKG_SRCDIR/pacman-switch-main/pacman-switch.sh $TERMUX_PREFIX/bin/pacman-switch
-}
 
-termux_step_post_massage() {
-	mkdir -p ./var/lib/pacman/sync
-	mkdir -p ./var/lib/pacman/local
-	mkdir -p ./var/cache/pacman/pkg
-	mkdir -p ./share/pacman-switch
-	mkdir -p ./var/lib/pacman/switch
+	for dir in var/lib/pacman/{sync,local,switch} var/cache/pacman/pkg share/pacman-switch; do
+		dir="${TERMUX_PREFIX}/${dir}"
+		mkdir -p ${dir}
+		touch ${dir}/.placeholder
+	done
 }
