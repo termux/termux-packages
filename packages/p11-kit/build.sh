@@ -2,12 +2,24 @@ TERMUX_PKG_HOMEPAGE="https://p11-glue.github.io/p11-glue/p11-kit.html"
 TERMUX_PKG_DESCRIPTION="Provides a way to load and enumerate PKCS#11 modules"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.25.8"
+TERMUX_PKG_VERSION="0.25.9"
 TERMUX_PKG_SRCURL="https://github.com/p11-glue/p11-kit/releases/download/$TERMUX_PKG_VERSION/p11-kit-$TERMUX_PKG_VERSION.tar.xz"
-TERMUX_PKG_SHA256=2fd4073ee2a47edafaae2c8affa2bcca64e0697f8881f68f580801ef43cab0ce
+TERMUX_PKG_SHA256=f6512a10b2dcf2651cfd57dd767a36c6e44494ab37724c10d4304fe9f0a36497
 TERMUX_PKG_DEPENDS="libffi, libtasn1"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-trust-paths --disable-static"
+TERMUX_PKG_BUILD_DEPENDS="aosp-libs, bash-completion"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-Dtrust_module=enabled
+"
 TERMUX_PKG_AUTO_UPDATE=true
+
+termux_step_pre_configure() {
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
+		termux_setup_proot
+		sed \
+		-e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
+		"$TERMUX_PKG_BUILDER_DIR"/0001-workaround-asn1Parser-for-cross-compile.diff | patch -p1
+	fi
+}
 
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
@@ -23,8 +35,4 @@ termux_step_post_get_source() {
 	if [ ! "${_LT_CURRENT}" ] || [ "${v}" != "${_SOVERSION}" ]; then
 		termux_error_exit "SOVERSION guard check failed."
 	fi
-}
-
-termux_step_pre_configure() {
-	autoreconf -fi
 }
