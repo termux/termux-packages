@@ -1,0 +1,71 @@
+Created by, or sourced from, K11MCH1
+https://github.com/K11MCH1/freedreno_turnip-CI/commit/db9f6d0b31bbabe3fef22e3682015764cd73eb5e
+Adreno 710-only variant also discovered in KreitinnSoftware's repo here:
+https://github.com/KreitinnSoftware/MiceWine-RootFS-Generator/commit/6e9d54ab5d280821922c1e8a7a02d84ba1621cbc
+Upstream issue:
+https://gitlab.freedesktop.org/mesa/mesa/-/issues/13036
+
+--- a/src/freedreno/common/freedreno_devices.py
++++ b/src/freedreno/common/freedreno_devices.py
+@@ -1065,6 +1065,42 @@ add_gpus([
+         raw_magic_regs = a730_raw_magic_regs,
+     ))
+ 
++add_gpus([
++        GPUId(chip_id=0x07010000, name="FD710"), # KGSL, no speedbin data
++        GPUId(chip_id=0xffff07010000, name="FD710"), # Default no-speedbin fallback
++    ], A6xxGPUInfo(
++        CHIP.A7XX,
++        [a7xx_base, a7xx_gen1],
++        num_ccu = 4,
++        tile_align_w = 64,
++        tile_align_h = 32,
++        num_vsc_pipes = 32,
++        cs_shared_mem_size = 32 * 1024,
++        wave_granularity = 2,
++        fibers_per_sp = 128 * 2 * 16,
++        highest_bank_bit = 16,
++        magic_regs = a730_magic_regs,
++        raw_magic_regs = a730_raw_magic_regs,
++    ))
++
++add_gpus([
++        GPUId(chip_id=0x43020000, name="FD720"), # KGSL, no speedbin data
++        GPUId(chip_id=0xffff043020000, name="FD720"), # Default no-speedbin fallback
++    ], A6xxGPUInfo(
++        CHIP.A7XX,
++        [a7xx_base, a7xx_gen1],
++        num_ccu = 4,
++        tile_align_w = 64,
++        tile_align_h = 32,
++        num_vsc_pipes = 32,
++        cs_shared_mem_size = 32 * 1024,
++        wave_granularity = 2,
++        fibers_per_sp = 128 * 2 * 16,
++        highest_bank_bit = 16,
++        magic_regs = a730_magic_regs,
++        raw_magic_regs = a730_raw_magic_regs,
++    ))
++
+ add_gpus([
+         GPUId(chip_id=0x07030001, name="FD730"), # KGSL, no speedbin data
+         GPUId(chip_id=0xffff07030001, name="FD730"), # Default no-speedbin fallback
+--- a/src/freedreno/drm-shim/freedreno_noop.c
++++ b/src/freedreno/drm-shim/freedreno_noop.c
+@@ -237,6 +237,16 @@ static const struct msm_device_info device_infos[] = {
+       .chip_id = CHIPID(6, 6, 0, 0xff),
+       .gmem_size = 1024 * 1024 + 512 * 1024,
+    },
++   {
++      .gpu_id = 710
++      .chip_id = 0x07010000,
++      .gmem_size = 2 * 1024 * 1024,
++   },
++   {
++      .gpu_id = 720
++      .chip_id = 0x43020000,
++      .gmem_size = 2 * 1024 * 1024,
++   },
+    {
+       .gpu_id = 730,
+       .chip_id = 0x07030001,

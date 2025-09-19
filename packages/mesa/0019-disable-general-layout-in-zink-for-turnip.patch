@@ -1,0 +1,22 @@
+Partially reverts https://gitlab.freedesktop.org/mesa/mesa/-/commit/622612f67ea72298c3d85dfe53c5d54ee9f98527
+because that commit causes severe artifacts in Webrender in Firefox in Termux:X11 with GLX enabled and EGL
+force-disabled in Zink in Turnip on Adreno devices, while using the about:config settings
+gfx.webrender.all=true and gfx.x11-egl.force-disabled=true,
+and doing this prevents the artifacts from occurring.
+
+--- a/src/gallium/drivers/zink/zink_screen.c
++++ b/src/gallium/drivers/zink/zink_screen.c
+@@ -3044,10 +3044,12 @@ init_driver_workarounds(struct zink_screen *screen)
+    case VK_DRIVER_ID_MESA_LLVMPIPE:
+    case VK_DRIVER_ID_MESA_NVK:
+    case VK_DRIVER_ID_NVIDIA_PROPRIETARY:
+-   case VK_DRIVER_ID_MESA_TURNIP:
+    case VK_DRIVER_ID_QUALCOMM_PROPRIETARY:
+       screen->driver_workarounds.general_layout = true;
+       break;
++   case VK_DRIVER_ID_MESA_TURNIP:
++      screen->driver_workarounds.general_layout = false;
++      break;
+    default:
+       screen->driver_workarounds.general_layout = screen->info.have_KHR_unified_image_layouts;
+       break;
