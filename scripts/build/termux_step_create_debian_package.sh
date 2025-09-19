@@ -53,7 +53,7 @@ termux_step_create_debian_package() {
 	termux_step_create_debscripts
 	# Process `update-alternatives` entries from `.alternatives` files
 	# These need to be merged into the `.postinst` and `.prerm` files, so after those are created.
-	termux_step_setup_alternatives
+	termux_step_update_alternatives
 
 	# Create control.tar.xz
 	tar --sort=name \
