@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/docker/compose
 TERMUX_PKG_DESCRIPTION="Compose is a tool for defining and running multi-container Docker applications."
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.39.3"
+TERMUX_PKG_VERSION="2.39.4"
 TERMUX_PKG_SRCURL="https://github.com/docker/compose/archive/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=3888259a6a212ebbdfd8762f394ae5beafb98cc383142cce46eb27cbc36a5d9f
+TERMUX_PKG_SHA256=8f3db575b2533dfc0b04e233050593f0d9a435a117cc8b8653b4e89f0813857c
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS=docker
 
