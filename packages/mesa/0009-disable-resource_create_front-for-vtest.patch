@@ -5,10 +5,10 @@ It breaks `glxinfo` with `virglrenderer-android`.
 
 --- a/src/gallium/winsys/virgl/vtest/virgl_vtest_winsys.c
 +++ b/src/gallium/winsys/virgl/vtest/virgl_vtest_winsys.c
-@@ -304,7 +304,11 @@
+@@ -369,7 +369,11 @@ virgl_vtest_winsys_resource_create(struct virgl_winsys *vws,
     }
  
-    res->res_handle = handle;
+    res->res_handle = new_handle;
 +#ifndef __TERMUX__
     if (map_front_private && res->ptr && res->dt) {
 +#else
