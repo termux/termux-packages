@@ -23,22 +23,11 @@ termux_step_start_build() {
 		TERMUX_PKG_SETUP_PYTHON=true
 	fi
 
-	TERMUX_PKG_FULLVERSION=$TERMUX_PKG_VERSION
-	if [ "$TERMUX_PKG_REVISION" != "0" ] || [ "$TERMUX_PKG_FULLVERSION" != "${TERMUX_PKG_FULLVERSION/-/}" ]; then
-		# "0" is the default revision, so only include it if the upstream versions contains "-" itself
-		TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_REVISION"
-	fi
-	# full format version for pacman
-	local TERMUX_PKG_VERSION_EDITED=${TERMUX_PKG_VERSION//-/.}
-	local INCORRECT_SYMBOLS=$(echo $TERMUX_PKG_VERSION_EDITED | grep -o '[0-9][a-z]')
-	if [ -n "$INCORRECT_SYMBOLS" ]; then
-		local TERMUX_PKG_VERSION_EDITED=${TERMUX_PKG_VERSION_EDITED//${INCORRECT_SYMBOLS:0:1}${INCORRECT_SYMBOLS:1:1}/${INCORRECT_SYMBOLS:0:1}.${INCORRECT_SYMBOLS:1:1}}
-	fi
-	TERMUX_PKG_FULLVERSION_FOR_PACMAN="${TERMUX_PKG_VERSION_EDITED}"
-	if [ -n "$TERMUX_PKG_REVISION" ]; then
-		TERMUX_PKG_FULLVERSION_FOR_PACMAN+="-${TERMUX_PKG_REVISION}"
-	else
-		TERMUX_PKG_FULLVERSION_FOR_PACMAN+="-0"
+	# Set TERMUX_PKG_FULLVERSION and TERMUX_PKG_FULLVERSION_FOR_PACMAN
+	termux_set_package_version_variables
+	shell__validate_variable_set TERMUX_PKG_FULLVERSION termux_step_start_build " for package \"$TERMUX_PKG_NAME\"" || exit $?
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
+		shell__validate_variable_set TERMUX_PKG_FULLVERSION_FOR_PACMAN termux_step_start_build " for package \"$TERMUX_PKG_NAME\"" || exit $?
 	fi
 
 	if [ "$TERMUX_DEBUG_BUILD" = "true" ]; then
@@ -55,11 +44,17 @@ termux_step_start_build() {
 	if [ "$TERMUX_DEBUG_BUILD" = "false" ] && [ "$TERMUX_FORCE_BUILD" = "false" ]; then
 		if [ -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME" ] &&
 			[ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME")" = "$TERMUX_PKG_FULLVERSION" ]; then
-			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION built - skipping (rm $TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME to force rebuild)"
-			exit 0
+
+			if ! termux_validate_built_packages; then
+				echo "Force rebuilding $TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION since some of its built package files not found"
+			else
+				echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION built - skipping (rm $TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME to force rebuild)"
+				exit 0
+			fi
+
 		elif [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] &&
-			([[ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" && "$(dpkg-query -W -f '${db:Status-Status} ${Version}\n' "$TERMUX_PKG_NAME" 2>/dev/null)" = "installed $TERMUX_PKG_FULLVERSION" ]] ||
-			 [[ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" && "$(pacman -Q $TERMUX_PKG_NAME 2>/dev/null)" = "$TERMUX_PKG_NAME $TERMUX_PKG_FULLVERSION_FOR_PACMAN" ]]); then
+			{ [[ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" && "$(dpkg-query -W -f '${db:Status-Status} ${Version}\n' "$TERMUX_PKG_NAME" 2>/dev/null)" = "installed $TERMUX_PKG_FULLVERSION" ]] ||
+			 [[ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" && "$(pacman -Q $TERMUX_PKG_NAME 2>/dev/null)" = "$TERMUX_PKG_NAME $TERMUX_PKG_FULLVERSION_FOR_PACMAN" ]]; }; then
 			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION installed - skipping"
 			exit 0
 		fi
