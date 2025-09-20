@@ -1,0 +1,23 @@
+Causes supercollider to not use the statc stub of libdl,
+to work around https://github.com/termux/termux-packages/issues/26478
+
+--- a/server/scsynth/CMakeLists.txt
++++ b/server/scsynth/CMakeLists.txt
+@@ -176,7 +176,6 @@ target_compile_definitions(libscsynth PUBLIC  SC_MEMORY_ALIGNMENT=32)
+ 
+ target_link_libraries(libscsynth tlsf Boost::sync)
+ 
+-find_library(DL NAMES dl)
+ if(DL)
+     target_link_libraries(libscsynth ${DL})
+ endif()
+--- a/server/supernova/CMakeLists.txt
++++ b/server/supernova/CMakeLists.txt
+@@ -115,7 +115,6 @@ endif()
+ if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD|DragonFly|OpenBSD|NetBSD")
+     target_compile_definitions(libsupernova PUBLIC DLOPEN)
+ else()
+-  find_library(DL NAMES dl)
+   if(DL)
+       target_compile_definitions(libsupernova PUBLIC DLOPEN)
+       target_link_libraries(libsupernova ${DL})
