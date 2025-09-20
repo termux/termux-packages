@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="ELF object file access library"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.193"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://sourceware.org/elfutils/ftp/${TERMUX_PKG_VERSION}/elfutils-${TERMUX_PKG_VERSION}.tar.bz2"
 TERMUX_PKG_SHA256=7857f44b624f4d8d421df851aaae7b1402cfe6bcdd2d8049f15fc07d3dde7635
 # libandroid-support for langinfo.
