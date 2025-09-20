@@ -1,0 +1,45 @@
+--- a/Makefile
++++ b/Makefile
+@@ -1,8 +1,7 @@
+ all: bchunk
+ 
+ # For systems with GCC (Linux, and others with GCC installed):
+-CC = gcc
+-LD = gcc
++CC ?= gcc
+ CFLAGS = -Wall -Wstrict-prototypes -O2
+ 
+ # For systems with a legacy CC:
+@@ -11,10 +10,10 @@ CFLAGS = -Wall -Wstrict-prototypes -O2
+ #CFLAGS = -O
+ 
+ # For BSD install: Which install to use and where to put the files
+-INSTALL = install
+-PREFIX  = /usr/local
+-BIN_DIR = $(PREFIX)/bin
+-MAN_DIR = $(PREFIX)/man
++INSTALL ?= install
++PREFIX  ?= /usr/local
++BIN_DIR ?= $(PREFIX)/bin
++MAN_DIR ?= $(PREFIX)/man
+ 
+ .c.o:
+ 	$(CC) $(CFLAGS) -c $<
+@@ -26,14 +25,14 @@ distclean: clean
+ 
+ install: installbin installman
+ installbin:
+-	$(INSTALL) -m 755 -s -o root -g root bchunk		$(BIN_DIR)
++	$(INSTALL) -Dm 755 bchunk   -t $(BIN_DIR)
+ installman:
+-	$(INSTALL) -m 644 -o bin -g bin bchunk.1	 	$(MAN_DIR)/man1
++	$(INSTALL) -Dm 644 bchunk.1	-t $(MAN_DIR)/man1
+ 
+ BITS = bchunk.o
+ 
+ bchunk: $(BITS)
+-	$(LD) $(LDFLAGS) -o bchunk $(BITS)
++	$(CC) $(LDFLAGS) -o bchunk $(BITS)
+ 
+ bchunk.o:	bchunk.c
+ 
