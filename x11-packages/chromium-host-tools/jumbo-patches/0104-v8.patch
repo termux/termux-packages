@@ -9,16 +9,14 @@ Enable jumbo build for the following template(s):
 - //v8/gni/v8.gni -> template("v8_header_set")
 
 ---
- v8/BUILD.gn                                   | 109 ++++++++++++++++++
+ v8/BUILD.gn                                   | 111 ++++++++++++++++++
  v8/gni/v8.gni                                 |   7 +-
  .../baseline/arm/baseline-compiler-arm-inl.h  |   2 +
  v8/src/baseline/baseline-compiler.cc          |   2 +
  v8/src/compiler/backend/instruction.h         |   4 +-
- v8/src/compiler/revectorizer.cc               |   2 +
  .../turboshaft/loop-unrolling-reducer.cc      |   6 +-
  .../wasm-in-js-inlining-reducer-inl.h         |   2 +
  .../wasm-load-elimination-reducer.h           |   1 +
- .../compiler/turboshaft/wasm-revec-reducer.cc |   2 +
  v8/src/compiler/wasm-compiler.cc              |   6 +-
  v8/src/diagnostics/perf-jit.cc                |   2 +
  v8/src/handles/global-handles.cc              |   4 +-
@@ -32,8 +30,6 @@ Enable jumbo build for the following template(s):
  v8/src/maglev/maglev-assembler-inl.h          |   4 +-
  v8/src/maglev/maglev-assembler.cc             |   2 +
  v8/src/maglev/maglev-code-generator.cc        |   4 +-
- v8/src/maglev/maglev-graph-builder.cc         |   3 +
- v8/src/maglev/maglev-inlining.cc              |   2 +
  v8/src/maglev/maglev-ir.cc                    |   2 +
  v8/src/objects/js-atomics-synchronization.h   |   8 +-
  v8/src/objects/js-collator.cc                 |   4 +
@@ -48,10 +44,10 @@ Enable jumbo build for the following template(s):
  v8/src/utils/sha-256.cc                       |   3 +
  v8/src/wasm/wasm-external-refs.cc             |   3 +
  v8/src/wasm/wrappers.cc                       |   2 +
- 39 files changed, 212 insertions(+), 34 deletions(-)
+ 35 files changed, 205 insertions(+), 34 deletions(-)
 
 diff --git a/v8/BUILD.gn b/v8/BUILD.gn
-index 8dda88f8ad..ed40644494 100644
+index 05490a65a0..b759021b2a 100644
 --- a/v8/BUILD.gn
 +++ b/v8/BUILD.gn
 @@ -7,6 +7,7 @@ import("//build/config/arm.gni")
@@ -62,7 +58,7 @@ index 8dda88f8ad..ed40644494 100644
  import("//build/config/mips.gni")
  import("//build/config/riscv.gni")
  import("//build/config/rust.gni")
-@@ -3093,26 +3094,54 @@ v8_source_set("v8_initializers") {
+@@ -3101,26 +3102,54 @@ v8_source_set("v8_initializers") {
      }
    }
  
@@ -117,7 +113,7 @@ index 8dda88f8ad..ed40644494 100644
    } else if (v8_current_cpu == "mips64" || v8_current_cpu == "mips64el") {
      sources += [
        ### gcmole(mips64el) ###
-@@ -5193,6 +5222,24 @@ v8_compiler_sources = [
+@@ -5200,6 +5229,24 @@ v8_compiler_sources = [
    "src/compiler/zone-stats.cc",
  ]
  
@@ -142,7 +138,7 @@ index 8dda88f8ad..ed40644494 100644
  if (!v8_enable_maglev) {
    # When Maglev is not enabled, Turboshaft still needs Maglev's graph builder.
    v8_compiler_sources += [
-@@ -5218,6 +5265,11 @@ if (v8_current_cpu == "x86") {
+@@ -5225,6 +5272,11 @@ if (v8_current_cpu == "x86") {
      "src/compiler/backend/ia32/instruction-scheduler-ia32.cc",
      "src/compiler/backend/ia32/instruction-selector-ia32.cc",
    ]
@@ -154,7 +150,7 @@ index 8dda88f8ad..ed40644494 100644
  } else if (v8_current_cpu == "x64") {
    v8_compiler_sources += [
      ### gcmole(x64) ###
-@@ -5226,6 +5278,9 @@ if (v8_current_cpu == "x86") {
+@@ -5233,6 +5285,9 @@ if (v8_current_cpu == "x86") {
      "src/compiler/backend/x64/instruction-selector-x64.cc",
      "src/compiler/backend/x64/unwinding-info-writer-x64.cc",
    ]
@@ -164,7 +160,7 @@ index 8dda88f8ad..ed40644494 100644
  } else if (v8_current_cpu == "arm") {
    v8_compiler_sources += [
      ### gcmole(arm) ###
-@@ -5234,6 +5289,9 @@ if (v8_current_cpu == "x86") {
+@@ -5241,6 +5296,9 @@ if (v8_current_cpu == "x86") {
      "src/compiler/backend/arm/instruction-selector-arm.cc",
      "src/compiler/backend/arm/unwinding-info-writer-arm.cc",
    ]
@@ -174,7 +170,7 @@ index 8dda88f8ad..ed40644494 100644
  } else if (v8_current_cpu == "arm64") {
    v8_compiler_sources += [
      ### gcmole(arm64) ###
-@@ -5242,6 +5300,9 @@ if (v8_current_cpu == "x86") {
+@@ -5249,6 +5307,9 @@ if (v8_current_cpu == "x86") {
      "src/compiler/backend/arm64/instruction-selector-arm64.cc",
      "src/compiler/backend/arm64/unwinding-info-writer-arm64.cc",
    ]
@@ -184,7 +180,18 @@ index 8dda88f8ad..ed40644494 100644
  } else if (v8_current_cpu == "mips64" || v8_current_cpu == "mips64el") {
    v8_compiler_sources += [
      ### gcmole(mips64el) ###
-@@ -5333,6 +5394,7 @@ v8_source_set("v8_compiler_for_mksnapshot_source_set") {
+@@ -5322,6 +5383,10 @@ if (v8_enable_webassembly) {
+     "src/wasm/turboshaft-graph-interface.cc",
+     "src/wasm/wrappers.cc",
+   ]
++  v8_compiler_sources_jumbo_excluded += [
++    "src/wasm/turboshaft-graph-interface.cc",
++    "src/wasm/wrappers.cc",
++  ]
+ }
+ 
+ if (v8_enable_wasm_simd256_revec) {
+@@ -5342,6 +5407,7 @@ v8_source_set("v8_compiler_for_mksnapshot_source_set") {
    visibility = [ ":*" ]  # Only targets in this file can depend on this.
  
    sources = v8_compiler_sources
@@ -192,7 +199,7 @@ index 8dda88f8ad..ed40644494 100644
  
    public_deps = [
      ":generate_bytecode_builtins_list",
-@@ -5368,6 +5430,7 @@ v8_source_set("v8_compiler") {
+@@ -5377,6 +5443,7 @@ v8_source_set("v8_compiler") {
  
    if (v8_enable_turbofan) {
      sources = v8_compiler_sources
@@ -200,7 +207,7 @@ index 8dda88f8ad..ed40644494 100644
    } else {
      # With Turbofan disabled, we only include the stubbed-out API.
      sources = [ "src/compiler/turbofan-disabled.cc" ]
-@@ -5925,6 +5988,8 @@ v8_source_set("v8_base_without_compiler") {
+@@ -5935,6 +6002,8 @@ v8_source_set("v8_base_without_compiler") {
      ]
    }
  
@@ -209,7 +216,7 @@ index 8dda88f8ad..ed40644494 100644
    if (v8_enable_maglev) {
      sources += [
        "src/maglev/maglev-assembler.cc",
-@@ -5957,6 +6022,10 @@ v8_source_set("v8_base_without_compiler") {
+@@ -5967,6 +6036,10 @@ v8_source_set("v8_base_without_compiler") {
          "src/maglev/arm64/maglev-assembler-arm64.cc",
          "src/maglev/arm64/maglev-ir-arm64.cc",
        ]
@@ -220,7 +227,7 @@ index 8dda88f8ad..ed40644494 100644
      } else if (v8_current_cpu == "riscv64") {
        sources += [
          "src/maglev/riscv/maglev-assembler-riscv.cc",
-@@ -5967,6 +6036,10 @@ v8_source_set("v8_base_without_compiler") {
+@@ -5977,6 +6050,10 @@ v8_source_set("v8_base_without_compiler") {
          "src/maglev/x64/maglev-assembler-x64.cc",
          "src/maglev/x64/maglev-ir-x64.cc",
        ]
@@ -231,32 +238,23 @@ index 8dda88f8ad..ed40644494 100644
      } else if (v8_current_cpu == "s390x") {
        sources += [
          "src/maglev/s390/maglev-assembler-s390.cc",
-@@ -5986,6 +6059,13 @@ v8_source_set("v8_base_without_compiler") {
-       "src/tracing/perfetto-logger.cc",
-       "src/tracing/perfetto-utils.cc",
+@@ -6055,6 +6132,15 @@ v8_source_set("v8_base_without_compiler") {
+       "src/wasm/wasm-subtyping.cc",
+       "src/wasm/well-known-imports.cc",
      ]
 +    jumbo_excluded_sources += [
 +      "src/asmjs/asm-js.cc",
 +      "src/asmjs/asm-parser.cc",
 +      "src/asmjs/asm-scanner.cc",
-+      "src/wasm/turboshaft-graph-interface.cc",
 +      "src/wasm/wasm-module.cc",
-+    ]
-   }
- 
-   if (v8_enable_webassembly) {
-@@ -6047,6 +6127,10 @@ v8_source_set("v8_base_without_compiler") {
-       "src/wasm/well-known-imports.cc",
-       "src/wasm/wrappers.cc",
-     ]
-+    jumbo_excluded_sources += [
++
 +      # Too many marco conflictions
 +      "src/wasm/baseline/liftoff-compiler.cc",
 +    ]
      if (v8_wasm_random_fuzzers) {
        sources += [
          ### gcmole(all) ###
-@@ -6081,6 +6165,26 @@ v8_source_set("v8_base_without_compiler") {
+@@ -6089,6 +6175,26 @@ v8_source_set("v8_base_without_compiler") {
      sources += [ "src/heap/reference-summarizer.cc" ]
    }
  
@@ -283,7 +281,7 @@ index 8dda88f8ad..ed40644494 100644
    if (v8_current_cpu == "x86") {
      sources += [
        ### gcmole(ia32) ###
-@@ -6187,6 +6291,11 @@ v8_source_set("v8_base_without_compiler") {
+@@ -6195,6 +6301,11 @@ v8_source_set("v8_base_without_compiler") {
      if (is_win) {
        sources += [ "src/diagnostics/unwinding-info-win64.cc" ]
      }
@@ -296,7 +294,7 @@ index 8dda88f8ad..ed40644494 100644
      sources += [
        ### gcmole(mips64el) ###
 diff --git a/v8/gni/v8.gni b/v8/gni/v8.gni
-index b940d52c4a..c66eada22c 100644
+index 0ddd653e0e..5d5c7e4083 100644
 --- a/v8/gni/v8.gni
 +++ b/v8/gni/v8.gni
 @@ -8,6 +8,7 @@ import("//build/config/features.gni")
@@ -307,7 +305,7 @@ index b940d52c4a..c66eada22c 100644
  import("//build/config/sanitizers/sanitizers.gni")
  import("//build/config/v8_target_cpu.gni")
  import("//build_overrides/build.gni")
-@@ -381,9 +382,9 @@ template("v8_source_set") {
+@@ -389,9 +390,9 @@ template("v8_source_set") {
        defined(v8_static_library) && v8_static_library && is_win) {
      link_target_type = "split_static_library"
    } else if (defined(v8_static_library) && v8_static_library) {
@@ -319,7 +317,7 @@ index b940d52c4a..c66eada22c 100644
    }
    target(link_target_type, target_name) {
      forward_variables_from(invoker,
-@@ -402,7 +403,7 @@ template("v8_source_set") {
+@@ -410,7 +411,7 @@ template("v8_source_set") {
  }
  
  template("v8_header_set") {
@@ -355,7 +353,7 @@ index 45a624a7da..e2073c4aab 100644
  }  // namespace internal
  }  // namespace v8
 diff --git a/v8/src/compiler/backend/instruction.h b/v8/src/compiler/backend/instruction.h
-index 8a41ae8355..45b84b8bcd 100644
+index bb743f3552..c4e4cb0348 100644
 --- a/v8/src/compiler/backend/instruction.h
 +++ b/v8/src/compiler/backend/instruction.h
 @@ -524,9 +524,9 @@ class LocationOperand : public InstructionOperand {
@@ -370,19 +368,6 @@ index 8a41ae8355..45b84b8bcd 100644
    }
  
    FloatRegister GetFloatRegister() const {
-diff --git a/v8/src/compiler/revectorizer.cc b/v8/src/compiler/revectorizer.cc
-index 1d332c42ae..2f47c7d4d7 100644
---- a/v8/src/compiler/revectorizer.cc
-+++ b/v8/src/compiler/revectorizer.cc
-@@ -1456,6 +1456,8 @@ void Revectorizer::PrintStores(ZoneMap<Node*, StoreNodeSet>* store_chains) {
-   }
- }
- 
-+#undef TRACE
-+
- }  // namespace compiler
- }  // namespace internal
- }  // namespace v8
 diff --git a/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc b/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc
 index cc5b406f1b..9fac217286 100644
 --- a/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc
@@ -436,16 +421,6 @@ index 569d4438b2..d5022dfe4f 100644
  
    OpIndex REDUCE_INPUT_GRAPH(StructGet)(OpIndex ig_index,
                                          const StructGetOp& op) {
-diff --git a/v8/src/compiler/turboshaft/wasm-revec-reducer.cc b/v8/src/compiler/turboshaft/wasm-revec-reducer.cc
-index dc8d5da878..c80dfb39d8 100644
---- a/v8/src/compiler/turboshaft/wasm-revec-reducer.cc
-+++ b/v8/src/compiler/turboshaft/wasm-revec-reducer.cc
-@@ -1628,3 +1628,5 @@ void WasmRevecAnalyzer::Print(const char* info) {
- }
- 
- }  // namespace v8::internal::compiler::turboshaft
-+
-+#undef TRACE
 diff --git a/v8/src/compiler/wasm-compiler.cc b/v8/src/compiler/wasm-compiler.cc
 index b92154e46f..fa1b452c2f 100644
 --- a/v8/src/compiler/wasm-compiler.cc
@@ -730,28 +705,6 @@ index 4207c84b70..4d612125e9 100644
  }  // namespace maglev
  }  // namespace internal
  }  // namespace v8
-diff --git a/v8/src/maglev/maglev-graph-builder.cc b/v8/src/maglev/maglev-graph-builder.cc
-index b376c39919..68876f96f8 100644
---- a/v8/src/maglev/maglev-graph-builder.cc
-+++ b/v8/src/maglev/maglev-graph-builder.cc
-@@ -16467,3 +16467,6 @@ ValueNode* MaglevGraphBuilder::BuildSmiUntag(ValueNode* node) {
- }
- 
- }  // namespace v8::internal::maglev
-+
-+#undef TRACE
-+#undef FAIL
-diff --git a/v8/src/maglev/maglev-inlining.cc b/v8/src/maglev/maglev-inlining.cc
-index ab3a61d035..cb1fcd3596 100644
---- a/v8/src/maglev/maglev-inlining.cc
-+++ b/v8/src/maglev/maglev-inlining.cc
-@@ -421,4 +421,6 @@ ProcessResult ReturnedValueRepresentationSelector::Process(
-   return ProcessResult::kContinue;
- }
- 
-+#undef TRACE
-+
- }  // namespace v8::internal::maglev
 diff --git a/v8/src/maglev/maglev-ir.cc b/v8/src/maglev/maglev-ir.cc
 index 3f46599fbb..67e7cec3db 100644
 --- a/v8/src/maglev/maglev-ir.cc
@@ -987,14 +940,41 @@ index 2be79a9db1..faa205ef32 100644
  #undef V8_WITH_SANITIZER
  #undef RESET_THREAD_IN_WASM_FLAG_FOR_ASAN_ON_WINDOWS
 +#undef kSuccess
-diff --git a/v8/src/wasm/wrappers.cc b/v8/src/wasm/wrappers.cc
-index f6185c3fd2..98f7156231 100644
---- a/v8/src/wasm/wrappers.cc
-+++ b/v8/src/wasm/wrappers.cc
-@@ -1283,4 +1283,6 @@ void BuildWasmWrapper(compiler::turboshaft::PipelineData* data,
-   }
+diff --git a/v8/src/compiler/revectorizer.cc b/v8/src/compiler/revectorizer.cc
+index 1d332c42ae..dc9e3906b6 100644
+--- a/v8/src/compiler/revectorizer.cc
++++ b/v8/src/compiler/revectorizer.cc
+@@ -1459,3 +1459,5 @@ void Revectorizer::PrintStores(ZoneMap<Node*, StoreNodeSet>* store_chains) {
+ }  // namespace compiler
+ }  // namespace internal
+ }  // namespace v8
++
++#undef TRACE
+diff --git a/v8/src/compiler/turboshaft/wasm-revec-reducer.cc b/v8/src/compiler/turboshaft/wasm-revec-reducer.cc
+index ddf3b81c7a..f6548579c7 100644
+--- a/v8/src/compiler/turboshaft/wasm-revec-reducer.cc
++++ b/v8/src/compiler/turboshaft/wasm-revec-reducer.cc
+@@ -1620,3 +1620,5 @@ void WasmRevecAnalyzer::Print(const char* info) {
  }
  
-+#include "src/compiler/turboshaft/undef-assembler-macros.inc"
+ }  // namespace v8::internal::compiler::turboshaft
 +
- }  // namespace v8::internal::wasm
++#undef TRACE
+--- a/v8/src/maglev/maglev-graph-builder.cc
++++ b/v8/src/maglev/maglev-graph-builder.cc
+@@ -16509,3 +16509,6 @@
+ }
+ 
+ }  // namespace v8::internal::maglev
++
++#undef TRACE
++#undef FAIL
+--- a/v8/src/maglev/maglev-inlining.cc
++++ b/v8/src/maglev/maglev-inlining.cc
+@@ -411,4 +411,6 @@
+   return ProcessResult::kContinue;
+ }
+ 
++#undef TRACE
++
+ }  // namespace v8::internal::maglev

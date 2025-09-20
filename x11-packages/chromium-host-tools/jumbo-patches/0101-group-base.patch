@@ -23,17 +23,16 @@ Enable jumbo build for the following template(s):
  base/task/single_thread_task_runner.cc            |  4 ++++
  base/threading/platform_thread_metrics_linux.cc   |  4 ++++
  cc/cc.gni                                         |  5 +++--
- components/viz/service/BUILD.gn                   |  8 ++++++++
  .../viz/service/display/occlusion_culler.cc       |  4 ++++
  .../service/display/overlay_candidate_factory.cc  |  4 ++++
  components/viz/service/display/skia_renderer.cc   |  4 ++++
  .../viz/service/display/software_renderer.cc      |  4 ++++
  .../service/frame_sinks/frame_sink_manager_impl.h |  3 +++
  components/viz/viz.gni                            |  7 ++++---
- 14 files changed, 75 insertions(+), 9 deletions(-)
+ 13 files changed, 67 insertions(+), 9 deletions(-)
 
 diff --git a/base/BUILD.gn b/base/BUILD.gn
-index 2f5d46db2e..f40d502a76 100644
+index f73ed42f84..f9e71f34c7 100644
 --- a/base/BUILD.gn
 +++ b/base/BUILD.gn
 @@ -28,6 +28,7 @@ import("//build/config/cast.gni")
@@ -53,7 +52,7 @@ index 2f5d46db2e..f40d502a76 100644
    sources = [
      "allocator/allocator_check.cc",
      "allocator/allocator_check.h",
-@@ -993,6 +994,10 @@ component("base") {
+@@ -985,6 +986,10 @@ component("base") {
      ]
    }
  
@@ -64,7 +63,7 @@ index 2f5d46db2e..f40d502a76 100644
    if (is_linux || is_chromeos) {
      sources += [
        "debug/proc_maps_linux.cc",
-@@ -1012,6 +1017,7 @@ component("base") {
+@@ -1004,6 +1009,7 @@ component("base") {
        "threading/thread_type_delegate.cc",
        "threading/thread_type_delegate.h",
      ]
@@ -72,7 +71,7 @@ index 2f5d46db2e..f40d502a76 100644
    }
  
    if (is_chromeos) {
-@@ -1950,6 +1956,11 @@ component("base") {
+@@ -1944,6 +1950,11 @@ component("base") {
        "win/wrapped_window_proc.h",
      ]
  
@@ -84,7 +83,7 @@ index 2f5d46db2e..f40d502a76 100644
      deps += [ "//base/win:base_win_buildflags" ]
  
      if (com_init_check_hook_disabled) {
-@@ -2867,7 +2878,7 @@ if (enable_rust_translit) {
+@@ -2838,7 +2849,7 @@ if (enable_rust_translit) {
    }
  }
  
@@ -227,7 +226,7 @@ index 13f0eb30a8..3935f876c5 100644
 +
 +#undef ParseTotalCPUTimeFromStats
 diff --git a/cc/cc.gni b/cc/cc.gni
-index 4ba9871f4a..2aaa530b47 100644
+index 090420c902..6b0e76bf21 100644
 --- a/cc/cc.gni
 +++ b/cc/cc.gni
 @@ -2,6 +2,7 @@
@@ -256,27 +255,8 @@ index 4ba9871f4a..2aaa530b47 100644
      forward_variables_from(invoker, "*", [ "configs" ])
      if (defined(invoker.configs)) {
        configs += invoker.configs
-diff --git a/components/viz/service/BUILD.gn b/components/viz/service/BUILD.gn
-index 4017fef63c..9731037329 100644
---- a/components/viz/service/BUILD.gn
-+++ b/components/viz/service/BUILD.gn
-@@ -273,6 +273,14 @@ viz_component("service") {
-     "transitions/transferable_resource_tracker.cc",
-     "transitions/transferable_resource_tracker.h",
-   ]
-+  jumbo_excluded_sources = [
-+    # `gpu/GLES2/gl2chromium_autogen.h` and `gpu/GLES2/gl2chromium.h` has macro confliction,
-+    #  and it is included by `layers/layer_context_impl.cc`
-+    # - components/viz/client/client_resource_provider.h
-+    # - third_party/khronos/GLES2/gl2.h
-+    # - gpu/GLES2/gl2chromium.h
-+    "layers/layer_context_impl.cc"
-+  ]
- 
-   defines = [ "VIZ_SERVICE_IMPLEMENTATION" ]
- 
 diff --git a/components/viz/service/display/occlusion_culler.cc b/components/viz/service/display/occlusion_culler.cc
-index e5c5ff2dc5..b59e0dff34 100644
+index 10d1bba2ce..b895d3a63f 100644
 --- a/components/viz/service/display/occlusion_culler.cc
 +++ b/components/viz/service/display/occlusion_culler.cc
 @@ -26,6 +26,8 @@
@@ -288,7 +268,7 @@ index e5c5ff2dc5..b59e0dff34 100644
  namespace viz {
  namespace {
  
-@@ -554,3 +556,5 @@ bool OcclusionCuller::CanSplitDrawQuad(
+@@ -536,3 +538,5 @@ bool OcclusionCuller::CanSplitDrawQuad(
  }
  
  }  // namespace viz
@@ -314,7 +294,7 @@ index 898652d4d8..696a784ff1 100644
 +
 +#undef kEpsilon
 diff --git a/components/viz/service/display/skia_renderer.cc b/components/viz/service/display/skia_renderer.cc
-index b1b8148ec5..7fa94567f2 100644
+index 16de85a38b..2e699dd26e 100644
 --- a/components/viz/service/display/skia_renderer.cc
 +++ b/components/viz/service/display/skia_renderer.cc
 @@ -110,6 +110,8 @@
@@ -326,17 +306,17 @@ index b1b8148ec5..7fa94567f2 100644
  namespace viz {
  
  namespace {
-@@ -4503,3 +4505,5 @@ bool SkiaRenderer::OverlayLockKeyEqual::operator()(
+@@ -4500,3 +4502,5 @@ bool SkiaRenderer::OverlayLockKeyEqual::operator()(
  #endif
  
  }  // namespace viz
 +
 +#undef MakeOpacityFilter
 diff --git a/components/viz/service/display/software_renderer.cc b/components/viz/service/display/software_renderer.cc
-index d477b64c5e..e100dcc393 100644
+index 2d952f903f..fab2724532 100644
 --- a/components/viz/service/display/software_renderer.cc
 +++ b/components/viz/service/display/software_renderer.cc
-@@ -54,6 +54,8 @@
+@@ -53,6 +53,8 @@
  #include "ui/gfx/geometry/skia_conversions.h"
  #include "ui/gfx/geometry/transform.h"
  
@@ -366,7 +346,7 @@ index 3ebefa4b63..1350f5c75f 100644
  
  #include <list>
 diff --git a/components/viz/viz.gni b/components/viz/viz.gni
-index 38764bf6c4..970db42556 100644
+index 191ddca368..a4008193b5 100644
 --- a/components/viz/viz.gni
 +++ b/components/viz/viz.gni
 @@ -2,6 +2,7 @@
@@ -386,7 +366,7 @@ index 38764bf6c4..970db42556 100644
      forward_variables_from(invoker, "*", [ "configs" ])
      if (defined(invoker.configs)) {
        configs += invoker.configs
-@@ -48,7 +49,7 @@ template("viz_source_set") {
+@@ -44,7 +45,7 @@ template("viz_source_set") {
  }
  
  template("viz_component") {
@@ -395,7 +375,7 @@ index 38764bf6c4..970db42556 100644
      forward_variables_from(invoker, "*", [ "configs" ])
      if (defined(invoker.configs)) {
        configs += invoker.configs
-@@ -59,7 +60,7 @@ template("viz_component") {
+@@ -55,7 +56,7 @@ template("viz_component") {
  }
  
  template("viz_static_library") {
@@ -404,3 +384,22 @@ index 38764bf6c4..970db42556 100644
      forward_variables_from(invoker, "*", [ "configs" ])
      if (defined(invoker.configs)) {
        configs += invoker.configs
+diff --git a/components/viz/service/BUILD.gn b/components/viz/service/BUILD.gn
+index 9f18a00af5..870c7dbae4 100644
+--- a/components/viz/service/BUILD.gn
++++ b/components/viz/service/BUILD.gn
+@@ -273,6 +273,14 @@ viz_component("service") {
+     "transitions/transferable_resource_tracker.cc",
+     "transitions/transferable_resource_tracker.h",
+   ]
++  jumbo_excluded_sources = [
++    # `gpu/GLES2/gl2chromium_autogen.h` and `gpu/GLES2/gl2chromium.h` has macro confliction,
++    #  and it is included by `layers/layer_context_impl.cc`
++    # - components/viz/client/client_resource_provider.h
++    # - third_party/khronos/GLES2/gl2.h
++    # - gpu/GLES2/gl2chromium.h
++    "layers/layer_context_impl.cc"
++  ]
+ 
+   defines = [ "VIZ_SERVICE_IMPLEMENTATION" ]
+ 

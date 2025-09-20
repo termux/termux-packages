@@ -37,7 +37,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  17 files changed, 90 insertions(+), 11 deletions(-)
 
 diff --git a/crypto/BUILD.gn b/crypto/BUILD.gn
-index fc0fec6413..f04943a602 100644
+index 57db821..b3ff801 100644
 --- a/crypto/BUILD.gn
 +++ b/crypto/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -58,7 +58,7 @@ index fc0fec6413..f04943a602 100644
    sources = [
      "aead.cc",
 diff --git a/crypto/unexportable_key.cc b/crypto/unexportable_key.cc
-index 88fba4f13e..cb0bd640e6 100644
+index 88fba4f..cb0bd64 100644
 --- a/crypto/unexportable_key.cc
 +++ b/crypto/unexportable_key.cc
 @@ -7,6 +7,8 @@
@@ -77,7 +77,7 @@ index 88fba4f13e..cb0bd640e6 100644
 +
 +#undef g_mock_provider
 diff --git a/crypto/user_verifying_key.cc b/crypto/user_verifying_key.cc
-index 279a7a1431..668fd49c77 100644
+index 279a7a1..668fd49 100644
 --- a/crypto/user_verifying_key.cc
 +++ b/crypto/user_verifying_key.cc
 @@ -6,6 +6,8 @@
@@ -96,7 +96,7 @@ index 279a7a1431..668fd49c77 100644
 +
 +#undef g_mock_provider
 diff --git a/dbus/BUILD.gn b/dbus/BUILD.gn
-index 5cca90ac7c..105d4c4ce0 100644
+index 5cca90a..105d4c4 100644
 --- a/dbus/BUILD.gn
 +++ b/dbus/BUILD.gn
 @@ -3,13 +3,14 @@
@@ -116,7 +116,7 @@ index 5cca90ac7c..105d4c4ce0 100644
      "bus.cc",
      "bus.h",
 diff --git a/gin/BUILD.gn b/gin/BUILD.gn
-index 56db2cc80e..87caf78852 100644
+index 44f8c84..ef288ce 100644
 --- a/gin/BUILD.gn
 +++ b/gin/BUILD.gn
 @@ -6,11 +6,12 @@ if (is_android) {
@@ -133,7 +133,7 @@ index 56db2cc80e..87caf78852 100644
    sources = [
      "arguments.cc",
      "arguments.h",
-@@ -79,6 +80,9 @@ component("gin") {
+@@ -81,6 +82,9 @@ component("gin") {
      "wrappable.h",
      "wrapper_info.cc",
    ]
@@ -144,7 +144,7 @@ index 56db2cc80e..87caf78852 100644
    if (use_partition_alloc) {
      sources += [
 diff --git a/gin/per_isolate_data.cc b/gin/per_isolate_data.cc
-index 9670f9f904..9b61b4b6e0 100644
+index 9670f9f..9b61b4b 100644
 --- a/gin/per_isolate_data.cc
 +++ b/gin/per_isolate_data.cc
 @@ -41,7 +41,7 @@ namespace gin {
@@ -157,7 +157,7 @@ index 9670f9f904..9b61b4b6e0 100644
      scoped_refptr<base::SingleThreadTaskRunner> task_runner,
      scoped_refptr<base::SingleThreadTaskRunner> user_visible_task_runner,
 diff --git a/google_apis/BUILD.gn b/google_apis/BUILD.gn
-index 6ae1463300..603f8218f5 100644
+index 6ae1463..603f821 100644
 --- a/google_apis/BUILD.gn
 +++ b/google_apis/BUILD.gn
 @@ -5,6 +5,7 @@
@@ -178,7 +178,7 @@ index 6ae1463300..603f8218f5 100644
      "api_key_cache.cc",
      "api_key_cache.h",
 diff --git a/google_apis/gaia/oauth2_access_token_fetcher_impl.cc b/google_apis/gaia/oauth2_access_token_fetcher_impl.cc
-index c6f8f991d3..867044d39e 100644
+index c6f8f99..867044d 100644
 --- a/google_apis/gaia/oauth2_access_token_fetcher_impl.cc
 +++ b/google_apis/gaia/oauth2_access_token_fetcher_impl.cc
 @@ -27,6 +27,9 @@
@@ -199,7 +199,7 @@ index c6f8f991d3..867044d39e 100644
 +#undef kAccessTokenKey
 +#undef kExpiresInKey
 diff --git a/google_apis/gaia/oauth2_mint_token_flow.cc b/google_apis/gaia/oauth2_mint_token_flow.cc
-index 8c84c359a0..fbf4796882 100644
+index 8c84c35..fbf4796 100644
 --- a/google_apis/gaia/oauth2_mint_token_flow.cc
 +++ b/google_apis/gaia/oauth2_mint_token_flow.cc
 @@ -38,6 +38,9 @@
@@ -220,7 +220,7 @@ index 8c84c359a0..fbf4796882 100644
 +#undef kAccessTokenKey
 +#undef kExpiresInKey
 diff --git a/google_apis/gcm/BUILD.gn b/google_apis/gcm/BUILD.gn
-index b207dd6ac4..457389d1ec 100644
+index b207dd6..457389d 100644
 --- a/google_apis/gcm/BUILD.gn
 +++ b/google_apis/gcm/BUILD.gn
 @@ -2,10 +2,11 @@
@@ -237,7 +237,7 @@ index b207dd6ac4..457389d1ec 100644
      "base/gcm_constants.cc",
      "base/gcm_constants.h",
 diff --git a/google_apis/gcm/engine/instance_id_delete_token_request_handler.cc b/google_apis/gcm/engine/instance_id_delete_token_request_handler.cc
-index 787a63648d..a791ec85d8 100644
+index 787a636..a791ec8 100644
 --- a/google_apis/gcm/engine/instance_id_delete_token_request_handler.cc
 +++ b/google_apis/gcm/engine/instance_id_delete_token_request_handler.cc
 @@ -10,6 +10,13 @@
@@ -266,7 +266,7 @@ index 787a63648d..a791ec85d8 100644
 +#undef kExtraScopeKey
 +#undef kTokenPrefix
 diff --git a/google_apis/gcm/engine/unregistration_request.cc b/google_apis/gcm/engine/unregistration_request.cc
-index c9a605d451..26c759fcad 100644
+index c9a605d..26c759f 100644
 --- a/google_apis/gcm/engine/unregistration_request.cc
 +++ b/google_apis/gcm/engine/unregistration_request.cc
 @@ -25,6 +25,19 @@
@@ -307,7 +307,7 @@ index c9a605d451..26c759fcad 100644
 +#undef kDeviceRegistrationError
 +#undef GetStatusFromError
 diff --git a/headless/BUILD.gn b/headless/BUILD.gn
-index 99ce5ed901..1cba43f52d 100644
+index 58810cc..601d03e 100644
 --- a/headless/BUILD.gn
 +++ b/headless/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -338,7 +338,7 @@ index 99ce5ed901..1cba43f52d 100644
    configs += [ "//build/config/compiler:wexit_time_destructors" ]
  
 diff --git a/ipc/BUILD.gn b/ipc/BUILD.gn
-index 1182e91c01..987cf574d0 100644
+index ee8324d..a1b6fc3 100644
 --- a/ipc/BUILD.gn
 +++ b/ipc/BUILD.gn
 @@ -4,13 +4,14 @@
@@ -367,7 +367,7 @@ index 1182e91c01..987cf574d0 100644
      "ipc_message.cc",
      "ipc_message.h",
 diff --git a/ipc/ipc_sync_channel.cc b/ipc/ipc_sync_channel.cc
-index 5fc172df36..264a8b71df 100644
+index 5fc172d..264a8b7 100644
 --- a/ipc/ipc_sync_channel.cc
 +++ b/ipc/ipc_sync_channel.cc
 @@ -30,6 +30,8 @@
@@ -386,7 +386,7 @@ index 5fc172df36..264a8b71df 100644
 +
 +#undef OnEventReady
 diff --git a/sql/BUILD.gn b/sql/BUILD.gn
-index 4684b58a0f..b822b1830d 100644
+index 4684b58..b822b18 100644
 --- a/sql/BUILD.gn
 +++ b/sql/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -407,7 +407,7 @@ index 4684b58a0f..b822b1830d 100644
      "database.cc",
      "database.h",
 diff --git a/url/BUILD.gn b/url/BUILD.gn
-index 2ab7a8e963..abdcee8730 100644
+index 2ab7a8e..abdcee8 100644
 --- a/url/BUILD.gn
 +++ b/url/BUILD.gn
 @@ -3,6 +3,7 @@

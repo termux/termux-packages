@@ -3,8 +3,11 @@
 - //base/atomicops.cc
 - //third_party/simdutf/simdutf.cpp
 - //v8/src/objects/simd.cc
-- //media/audio/audio_input_device.cc
+- //media/audio/audio_input_device.c
 - //services/audio/input_sync_writer.cc
+- //cc/metrics/shared_metrics_buffer.h
+- //services/device/public/cpp/generic_sensor/sensor_reading_shared_buffer_reader.cc
+- //services/device/generic_sensor/platform_sensor.cc
 
 --- a/third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h
 +++ b/third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h
@@ -821,9 +824,11 @@
      has_unread_data.store(0, std::memory_order_release);
    }
  
+diff --git a/services/audio/input_sync_writer.cc b/services/audio/input_sync_writer.cc
+index 6f39e15f88..6cb29b4f02 100644
 --- a/services/audio/input_sync_writer.cc
 +++ b/services/audio/input_sync_writer.cc
-@@ -26,6 +26,15 @@
+@@ -22,6 +22,15 @@
  #include "media/base/media_switches.h"
  #include "services/audio/input_glitch_counter.h"
  
@@ -839,7 +844,7 @@
  namespace audio {
  
  namespace {
-@@ -272,7 +281,7 @@
+@@ -268,7 +277,7 @@ void InputSyncWriter::ReceiveReadConfirmationsFromConsumer() {
        // The next buffer we expect to read a confirmation from.
        media::AudioInputBuffer* buffer =
            GetSharedInputBuffer(next_read_buffer_index_ % audio_buses_.size());
@@ -848,7 +853,7 @@
        // If this buffer has been read by the consumer side, it will have set the
        // `has_unread_data` flag to 0.
        if (has_unread_data.load(std::memory_order_relaxed)) {
-@@ -382,7 +391,7 @@ bool InputSyncWriter::WriteDataToCurrentSegment(
+@@ -378,7 +387,7 @@ bool InputSyncWriter::WriteDataToCurrentSegment(
      // Part of the experimental synchronization mechanism. We will not write
      // more data to this buffer until the consumer side has set this flag back
      // to 0.
@@ -857,3 +862,93 @@
      has_unread_data.store(1, std::memory_order_relaxed);
    }
  
+--- a/cc/metrics/shared_metrics_buffer.h
++++ b/cc/metrics/shared_metrics_buffer.h
+@@ -9,6 +9,15 @@
+ 
+ #include "device/base/synchronization/one_writer_seqlock.h"
+ 
++#ifdef __TERMUX__
++#include "third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h"
++template <typename T>
++using __my_atomic_ref = Foo::atomic_ref<T>;
++#else
++template <typename T>
++using __my_atomic_ref = std::atomic_ref<T>;
++#endif
++
+ namespace cc {
+ // The struct written in shared memory to transport metrics across
+ // processes. |data| is protected by the sequence-lock |seq_lock|.
+@@ -35,7 +44,7 @@
+       // TODO(https://github.com/llvm/llvm-project/issues/118378): Remove
+       // const_cast.
+       out =
+-          std::atomic_ref(const_cast<T&>(data)).load(std::memory_order_relaxed);
++          __my_atomic_ref(const_cast<T&>(data)).load(std::memory_order_relaxed);
+     } while (seq_lock.ReadRetry(version) && ++retries < kMaxRetries);
+ 
+     // Consider the number of retries less than kMaxRetries as success.
+@@ -44,7 +53,7 @@
+ 
+   void Write(const T& in) {
+     seq_lock.WriteBegin();
+-    std::atomic_ref(data).store(in, std::memory_order_relaxed);
++    __my_atomic_ref(data).store(in, std::memory_order_relaxed);
+     seq_lock.WriteEnd();
+   }
+ };
+--- a/services/device/public/cpp/generic_sensor/sensor_reading_shared_buffer_reader.cc
++++ b/services/device/public/cpp/generic_sensor/sensor_reading_shared_buffer_reader.cc
+@@ -12,6 +12,15 @@
+ #include "services/device/public/cpp/generic_sensor/sensor_reading.h"
+ #include "services/device/public/cpp/generic_sensor/sensor_reading_shared_buffer.h"
+ 
++#ifdef __TERMUX__
++#include "third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h"
++template <typename T>
++using __my_atomic_ref = Foo::atomic_ref<T>;
++#else
++template <typename T>
++using __my_atomic_ref = std::atomic_ref<T>;
++#endif
++
+ namespace {
+ 
+ constexpr int kMaxReadAttemptsCount = 10;
+@@ -61,7 +70,7 @@
+     version = buffer->seqlock.value().ReadBegin();
+     // TODO(https://github.com/llvm/llvm-project/issues/118378): Remove
+     // const_cast.
+-    *result = std::atomic_ref(const_cast<SensorReading&>(buffer->reading))
++    *result = __my_atomic_ref(const_cast<SensorReading&>(buffer->reading))
+                   .load(std::memory_order_relaxed);
+   } while (buffer->seqlock.value().ReadRetry(version) &&
+            ++retries < kMaxReadAttemptsCount);
+--- a/services/device/generic_sensor/platform_sensor.cc
++++ b/services/device/generic_sensor/platform_sensor.cc
+@@ -19,6 +19,15 @@
+ #include "services/device/public/cpp/generic_sensor/sensor_reading_shared_buffer.h"
+ #include "services/device/public/cpp/generic_sensor/sensor_reading_shared_buffer_reader.h"
+ 
++#ifdef __TERMUX__
++#include "third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h"
++template <typename T>
++using __my_atomic_ref = Foo::atomic_ref<T>;
++#else
++template <typename T>
++using __my_atomic_ref = std::atomic_ref<T>;
++#endif
++
+ namespace device {
+ 
+ PlatformSensor::PlatformSensor(mojom::SensorType type,
+@@ -184,7 +193,7 @@
+ void PlatformSensor::WriteToSharedBuffer(const SensorReading& reading) {
+   CHECK(is_active_);
+   reading_buffer_->seqlock.value().WriteBegin();
+-  std::atomic_ref(reading_buffer_->reading)
++  __my_atomic_ref(reading_buffer_->reading)
+       .store(reading, std::memory_order_relaxed);
+   reading_buffer_->seqlock.value().WriteEnd();
+ }

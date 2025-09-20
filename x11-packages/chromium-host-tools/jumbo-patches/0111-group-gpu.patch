@@ -158,7 +158,7 @@ index 796e20d541..743052bf16 100644
    defines = [ "GLES2_C_LIB_IMPLEMENTATION" ]
  
 diff --git a/gpu/command_buffer/common/BUILD.gn b/gpu/command_buffer/common/BUILD.gn
-index b9cd79b50b..76cf71a59d 100644
+index bf9b43d7f1..0514195413 100644
 --- a/gpu/command_buffer/common/BUILD.gn
 +++ b/gpu/command_buffer/common/BUILD.gn
 @@ -7,6 +7,7 @@
@@ -179,7 +179,7 @@ index b9cd79b50b..76cf71a59d 100644
  
    sources = [
 diff --git a/gpu/command_buffer/service/BUILD.gn b/gpu/command_buffer/service/BUILD.gn
-index b1e985fae5..19fcca7244 100644
+index 589ccc525e..bd873d8a5b 100644
 --- a/gpu/command_buffer/service/BUILD.gn
 +++ b/gpu/command_buffer/service/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -202,7 +202,7 @@ index b1e985fae5..19fcca7244 100644
  }
  source_set("service_sources") {
    # External code should depend on this via //gpu/command_buffer/service above
-@@ -652,7 +653,7 @@ proto_library("disk_cache_proto") {
+@@ -653,7 +654,7 @@ proto_library("disk_cache_proto") {
  }
  
  if (is_android) {
@@ -346,7 +346,7 @@ index 16ce3e2a79..ed9a7109c9 100644
 +
 +#undef kSupportedUsage
 diff --git a/gpu/command_buffer/service/shared_image/shared_image_representation.cc b/gpu/command_buffer/service/shared_image/shared_image_representation.cc
-index 112a17f9d5..ad62147e80 100644
+index 2f2ebfd570..8191e0b938 100644
 --- a/gpu/command_buffer/service/shared_image/shared_image_representation.cc
 +++ b/gpu/command_buffer/service/shared_image/shared_image_representation.cc
 @@ -28,6 +28,9 @@
@@ -400,7 +400,7 @@ index 49387f6995..d714e55f22 100644
 +
 +#undef kSupportedUsage
 diff --git a/gpu/config/BUILD.gn b/gpu/config/BUILD.gn
-index f2a88f2e4e..abdfd3c38d 100644
+index f2a88f2e4e..ccdf665e20 100644
 --- a/gpu/config/BUILD.gn
 +++ b/gpu/config/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -416,7 +416,7 @@ index f2a88f2e4e..abdfd3c38d 100644
  }
  
 -component("config") {
-+jumbo_component("config") {
++jumbo_source_set("config") {
    sources = [
      "device_perf_info.cc",
      "device_perf_info.h",
@@ -456,7 +456,7 @@ index 1e35afb74f..6a8f08236d 100644
    sources = [
      "command_buffer_stub.cc",
 diff --git a/media/audio/BUILD.gn b/media/audio/BUILD.gn
-index adb7e043e9..9ec9ad83a5 100644
+index 90e73686eb..c97d55cfbe 100644
 --- a/media/audio/BUILD.gn
 +++ b/media/audio/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -549,7 +549,7 @@ index 5ba5a2e214..442f6c8333 100644
    }
  
 diff --git a/media/base/android/BUILD.gn b/media/base/android/BUILD.gn
-index be3e134e37..92c0abf38f 100644
+index 6926031766..ced6de18a5 100644
 --- a/media/base/android/BUILD.gn
 +++ b/media/base/android/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -702,10 +702,10 @@ index 06cba8e764..143357fdbf 100644
      "sender/audio_sender.cc",
      "sender/audio_sender.h",
 diff --git a/media/cast/encoding/av1_encoder.cc b/media/cast/encoding/av1_encoder.cc
-index ebdfabce7e..d2367957fb 100644
+index ff08a9c0f3..7c327e3fc2 100644
 --- a/media/cast/encoding/av1_encoder.cc
 +++ b/media/cast/encoding/av1_encoder.cc
-@@ -20,6 +20,16 @@
+@@ -16,6 +16,16 @@
  #include "third_party/libaom/source/libaom/aom/aomcx.h"
  #include "third_party/openscreen/src/cast/streaming/public/encoded_frame.h"
  
@@ -722,7 +722,7 @@ index ebdfabce7e..d2367957fb 100644
  namespace media {
  namespace cast {
  
-@@ -412,3 +422,13 @@ void Av1Encoder::GenerateKeyFrame() {
+@@ -408,3 +418,13 @@ void Av1Encoder::GenerateKeyFrame() {
  
  }  // namespace cast
  }  // namespace media
@@ -737,10 +737,10 @@ index ebdfabce7e..d2367957fb 100644
 +#undef kHighestEncodingSpeed
 +#undef kLowestEncodingSpeed
 diff --git a/media/cast/encoding/vpx_encoder.cc b/media/cast/encoding/vpx_encoder.cc
-index 53b7e1601b..d55896f5f4 100644
+index 7226784f07..a8339ecfb0 100644
 --- a/media/cast/encoding/vpx_encoder.cc
 +++ b/media/cast/encoding/vpx_encoder.cc
-@@ -22,6 +22,16 @@
+@@ -18,6 +18,16 @@
  #include "third_party/libvpx/source/libvpx/vpx/vp8cx.h"
  #include "third_party/openscreen/src/cast/streaming/public/encoded_frame.h"
  
@@ -757,7 +757,7 @@ index 53b7e1601b..d55896f5f4 100644
  namespace media {
  namespace cast {
  
-@@ -468,3 +478,14 @@ void VpxEncoder::GenerateKeyFrame() {
+@@ -466,3 +476,14 @@ void VpxEncoder::GenerateKeyFrame() {
  
  }  // namespace cast
  }  // namespace media
@@ -1261,3 +1261,22 @@ index 880d4b22f5..489e8783ce 100644
    testonly = true
  
    sources = [
+diff --git a/services/viz/public/cpp/compositing/frame_timing_details_mojom_traits.cc b/services/viz/public/cpp/compositing/frame_timing_details_mojom_traits.cc
+index 15a70d5faa..b152d66874 100644
+--- a/services/viz/public/cpp/compositing/frame_timing_details_mojom_traits.cc
++++ b/services/viz/public/cpp/compositing/frame_timing_details_mojom_traits.cc
+@@ -8,6 +8,8 @@
+ #include "ui/gfx/mojom/presentation_feedback_mojom_traits.h"
+ #include "ui/gfx/mojom/swap_timings_mojom_traits.h"
+ 
++#define Traits Traits_FrameTimingDetailsMojomTraits
++
+ namespace mojo {
+ 
+ using Traits = StructTraits<viz::mojom::FrameTimingDetailsDataView,
+@@ -28,3 +30,5 @@ bool Traits::Read(viz::mojom::FrameTimingDetailsDataView data,
+ }
+ 
+ }  // namespace mojo
++
++#undef Traits
