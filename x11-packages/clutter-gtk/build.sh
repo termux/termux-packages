@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=1.8
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/clutter-gtk/${_MAJOR_VERSION}/clutter-gtk-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=521493ec038973c77edcb8bc5eac23eed41645117894aaee7300b2487cb42b06
 TERMUX_PKG_DEPENDS="atk, clutter, cogl, fontconfig, freetype, gdk-pixbuf, glib, gtk3, harfbuzz, json-glib, libcairo, libx11, libxcomposite, libxdamage, libxext, libxfixes, libxi, libxrandr, pango"
