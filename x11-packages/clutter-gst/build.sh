@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=3.0
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.27
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/clutter-gst/${_MAJOR_VERSION}/clutter-gst-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=fe69bd6c659d24ab30da3f091eb91cd1970026d431179b0724f13791e8ad9f9d
 TERMUX_PKG_DEPENDS="atk, clutter, cogl, fontconfig, freetype, gdk-pixbuf, glib, gst-plugins-base, gstreamer, gtk3, harfbuzz, json-glib, libcairo, libx11, libxcomposite, libxdamage, libxext, libxfixes, libxi, libxrandr, pango"
