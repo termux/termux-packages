@@ -50,7 +50,7 @@ termux_step_get_dependencies() {
 	fi
 
 	local dep dep_dir
-
+	# shellcheck disable=SC2046
 	while read -r dep dep_dir; do
 		[[ -z "$dep" ]] && continue
 		[[ "$dep" == "ERROR" ]] && termux_error_exit "Obtaining buildorder failed"
@@ -133,5 +133,5 @@ termux_step_get_dependencies() {
 				echo "$dep_version" >"$TERMUX_BUILT_PACKAGES_DIRECTORY/$dep"
 			fi
 		fi
-	done < <(./scripts/new_buildorder.py "$([[ "${TERMUX_INSTALL_DEPS}" == "true" ]] && echo "-i")" "$TERMUX_PKG_NAME" || echo "ERROR")
+	done < <(./scripts/new_buildorder.py $([[ "${TERMUX_INSTALL_DEPS}" == "true" ]] && echo "-i") "$TERMUX_PKG_NAME" || echo "ERROR")
 }
