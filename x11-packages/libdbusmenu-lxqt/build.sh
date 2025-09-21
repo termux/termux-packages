@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A library that provides a Qt implementation of the DBusM
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.3.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/lxqt/libdbusmenu-lxqt/releases/download/${TERMUX_PKG_VERSION}/libdbusmenu-lxqt-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=ada0d14d3a4d9fb0ba344bf078d351046dfd226da1096f866d78167a79243ff9
 TERMUX_PKG_DEPENDS="libc++, qt6-qtbase"
