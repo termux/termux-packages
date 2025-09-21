@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The core library of LXQt"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.2.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/lxqt/liblxqt/releases/download/${TERMUX_PKG_VERSION}/liblxqt-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=4a898b1bf059fb73102011bca79bb96d33c49c95f6d56135ef13a8e91d0a09c8
 TERMUX_PKG_DEPENDS="kf6-kwindowsystem, libc++, libqtxdg, libx11, libxss, qt6-qtbase"
