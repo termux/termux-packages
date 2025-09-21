@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Joe's Window Manager is a light-weight X11 window manage
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="2.4.6"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/joewing/jwm/releases/download/v${TERMUX_PKG_VERSION}/jwm-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=b5871ec28317594b3fa22b83ed5524cc911d498c455eaab3ae68def195dd802d
 TERMUX_PKG_DEPENDS="libcairo, libjpeg-turbo, libpng, librsvg, libxext, libxinerama, libxmu, libxpm, libxrender, pango"
