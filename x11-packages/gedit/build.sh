@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="GNOME Text Editor"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="48.2"
+TERMUX_PKG_REVISION=1
 # for submodules https://gitlab.gnome.org/World/gedit/gedit/-/issues/611
 TERMUX_PKG_SRCURL="git+https://gitlab.gnome.org/World/gedit/gedit"
 TERMUX_PKG_SHA256=fb13faeda36b2c79dff47e5ebcb84981b7f08fbbef866123a64f63b2ead8bb33
