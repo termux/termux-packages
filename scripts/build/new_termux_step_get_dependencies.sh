@@ -38,7 +38,16 @@ __run_build_package() {
 
 termux_step_get_dependencies() {
 	[[ "$TERMUX_SKIP_DEPCHECK" == "true" || "$TERMUX_PKG_METAPACKAGE" == "true" ]] && return 0
-	[[ "$TERMUX_INSTALL_DEPS" == "true" ]] && __download_repo_file
+
+	# This is used to prevent unnecessary refreshing of repos while building under same call:
+	local repo_refresh_lock_file="$TERMUX_COMMON_CACHEDIR/repo_refresh.lock"
+	if [[ "$TERMUX_INSTALL_DEPS" == "true" && ! -f "$repo_refresh_lock_file" ]]; then
+		# Set a trap to release refresh lock when this script exits:
+		# shellcheck disable=SC2064
+		trap "rm -f $repo_refresh_lock_file" EXIT
+		__download_repo_file
+		touch "$repo_refresh_lock_file"
+	fi
 
 	local dep dep_dir
 
