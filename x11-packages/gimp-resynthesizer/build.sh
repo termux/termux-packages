@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Suite of gimp plugins for texture synthesis"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.0.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/bootchk/resynthesizer/archive/refs/tags/v${TERMUX_PKG_VERSION%.*}.tar.gz
 TERMUX_PKG_SHA256=d0f459e551d428e3cd3fec4c3ebfe448e6e2947d9b24553373308d6d41ddd580
 TERMUX_PKG_DEPENDS="gimp, python"
