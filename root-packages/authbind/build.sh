@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Bind sockets to privileged ports without root"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.2.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://deb.debian.org/debian/pool/main/a/authbind/authbind_${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8d265ee08e66fbda2e6c2b348624cd4552ff2c8fe72247d8904b06500c476adf
 TERMUX_PKG_BUILD_IN_SRC=true
