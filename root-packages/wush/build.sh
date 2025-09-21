@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="simplest & fastest way to transfer files between compute
 TERMUX_PKG_LICENSE="CC0-1.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.4.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/coder/wush/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=77d5a912465d1e8ec478252a9a69a04d39af75a126ac9ed94823f33a60b3d8f9
 TERMUX_PKG_AUTO_UPDATE=true

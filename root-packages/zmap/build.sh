@@ -4,12 +4,14 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(1:4.3.2
                     1.0.5)
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(https://github.com/zmap/zmap/archive/refs/tags/v${TERMUX_PKG_VERSION[0]#*:}.tar.gz
                    http://downloads.sourceforge.net/sourceforge/judy/Judy-${TERMUX_PKG_VERSION[1]}.tar.gz)
 TERMUX_PKG_SHA256=(2f1e031d07d9c7040bf75aa58e258c311985e2b32dbb9a375e0d1c31bcedbf0a
                    d2704089f85fdb6f2cd7e77be21170ced4b4375c03ef1ad4cf1075bd414a63eb)
 TERMUX_PKG_DEPENDS="json-c, libgmp, libpcap, libunistring"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_POLICY_VERSION_MINIMUM=3.5
 -DRESPECT_INSTALL_PREFIX_CONFIG=ON
 "
 
