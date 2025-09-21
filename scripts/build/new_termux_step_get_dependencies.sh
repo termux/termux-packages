@@ -15,15 +15,6 @@ __download_repo_file() {
 	fi
 }
 
-__is_already_built() {
-	local pkg="$1" pkg_version="$2"
-	if termux_check_package_in_built_packages_list "$pkg" && termux_package__is_package_version_built "$pkg" "$pkg_version"; then
-		__log "Skipping already built dependency $pkg$([[ "${TERMUX_WITHOUT_DEPVERSION_BINDING}" == "false" ]] && echo "@$pkg_version")"
-		return 0
-	fi
-	return 1
-}
-
 __run_build_package() {
 	local set_library pkg="$1" pkg_dir="$2"
 
@@ -58,9 +49,17 @@ termux_step_get_dependencies() {
 		local dep_arch dep_version dep_version_pac dep_on_device_not_supported
 		read -r dep_arch dep_version dep_version_pac dep_on_device_not_supported < <(termux_extract_dep_info "$dep" "$dep_dir")
 
+		local dep_versioned="$dep"
+		[[ "$TERMUX_WITHOUT_DEPVERSION_BINDING" == "false" ]] && dep_versioned="${dep}@${dep_version}"
+
 		local build_dependency="false"
 
 		if [[ "$TERMUX_INSTALL_DEPS" == "false" || "$TERMUX_FORCE_BUILD_DEPENDENCIES" == "true" ]]; then
+			if termux_check_package_in_built_packages_list "$dep" && termux_package__is_package_version_built "$dep" "$dep_version"; then
+				__log "Skipping already built dependency $dep_versioned"
+				continue
+			fi
+
 			build_dependency="true"
 			if [[ "$TERMUX_FORCE_BUILD_DEPENDENCIES" == "true" ]]; then
 				__log "Force building dependency $dep [due to -F flag] if necessary..."
@@ -81,8 +80,10 @@ termux_step_get_dependencies() {
 			# llvm doesn't build if ndk-sysroot is installed:
 			[[ "$dep" == "ndk-sysroot" ]] && continue
 
-			local dep_versioned="$dep"
-			[[ "$TERMUX_WITHOUT_DEPVERSION_BINDING" == "false" ]] && dep_versioned="${dep}@${dep_version}"
+			if termux_package__is_package_version_built "$dep" "$dep_version"; then
+				__log "Skipping already downloaded dependency $dep_versioned"
+				continue
+			fi
 
 			__log "Downloading dependency $dep_versioned if necessary..."
 
@@ -91,7 +92,7 @@ termux_step_get_dependencies() {
 			if ! TERMUX_WITHOUT_DEPVERSION_BINDING="$TERMUX_WITHOUT_DEPVERSION_BINDING" \
 				termux_download_deb_pac "$dep" "$dep_arch" "$dep_version" "$dep_version_pac"; then
 				# Exit if failed to download and we cannot build this dependency on device:
-				if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" && "$dep_on_device_not_supported" = "true" ]]; then
+				if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" && "$dep_on_device_not_supported" == "true" ]]; then
 					termux_error_exit "Download of $dep_versioned from $TERMUX_REPO_URL failed"
 				fi
 				__log "Download of $dep_versioned from $TERMUX_REPO_URL failed, building instead"
@@ -100,7 +101,6 @@ termux_step_get_dependencies() {
 		fi
 
 		if [[ "$build_dependency" == "true" ]]; then
-			__is_already_built "$dep" "$dep_version" && continue # Skip if already built.
 			__run_build_package "$dep" "$dep_dir"
 		else
 			if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
