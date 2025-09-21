@@ -213,6 +213,6 @@ termux_create_pacman_subpackages() {
 		shopt -u dotglob globstar
 
 		# Go back to main package:
-		cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL"
+		cd "$TERMUX_PKG_MASSAGEDIR_BASE"
 	done
 }

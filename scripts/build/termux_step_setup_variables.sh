@@ -8,7 +8,11 @@ termux_step_setup_variables() {
 	: "${TERMUX_PKG_MAKE_PROCESSES:="$(nproc)"}"
 	: "${TERMUX_NO_CLEAN:="false"}"
 	: "${TERMUX_PKG_API_LEVEL:="24"}"
+	: "${TERMUX_SAFE_BUILD:="false"}"
+	: "${TERMUX_PKG_MAKE_INSTALL_TARGET:="install"}"
+	: "${TERMUX_FAST_BUILD:="false"}"
 	: "${TERMUX_CONTINUE_BUILD:="false"}"
+	: "${TERMUX_CONTINUE_MASSAGE:="false"}"
 	: "${TERMUX_QUIET_BUILD:="false"}"
 	: "${TERMUX_WITHOUT_DEPVERSION_BINDING:="false"}"
 	: "${TERMUX_SKIP_DEPCHECK:="false"}"
@@ -36,16 +40,90 @@ termux_step_setup_variables() {
 	fi
 
 	if [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
-		export TERMUX_PREFIX="$TERMUX_PREFIX/glibc"
-		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && [ "$TERMUX_PREFIX" != "$CGCT_DEFAULT_PREFIX" ]; then
-			export CGCT_APP_PREFIX="$TERMUX_PREFIX"
-		fi
 		if ! termux_package__is_package_name_have_glibc_prefix "$TERMUX_PKG_NAME"; then
 			TERMUX_PKG_NAME="$(termux_package__add_prefix_glibc_to_package_name "${TERMUX_PKG_NAME}")"
 		fi
 	fi
 
+	# -glibc suffix is considered for  removal from dependency tree in favour of search path order "gpkg packages". prefer these to ease transition  
+	TERMUX_PKG_NAME_DEPENDENCY=$TERMUX_PKG_NAME
+	TERMUX_PKG_NAME_PATH=$TERMUX_PKG_NAME
+
+	if $TERMUX_PKG_PROOT; then
+		TERMUX_PACKAGE_LIBRARY="glibc"
+		# TERMUX_PKG_NAME=$TERMUX_PKG_NAME-proot
+		TERMUX_PKG_NAME=proot/$TERMUX_PKG_NAME
+		if [[ $TERMUX_OUTPUT_DIR = *output ]]; then
+			TERMUX_OUTPUT_DIR="${TERMUX_SCRIPTDIR}/proot"
+		fi
+	fi
+
+	if [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
+		export TERMUX_PREFIX="$TERMUX_PREFIX/glibc"
+		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && [ "$TERMUX_PREFIX" != "$CGCT_DEFAULT_PREFIX" ]; then
+			export CGCT_APP_PREFIX="$TERMUX_PREFIX"
+		fi
+	fi
+
+	# TERMUX_PREFIX and TERMUX_PREFIX_CLASSICAL is deprecated in favour of the following 
+	TERMUX_PREFIX_BASE=$TERMUX_PREFIX
+	TERMUX_PREFIX_BASE_CLASSICAL=$TERMUX_PREFIX_CLASSICAL
+	TERMUX_PREFIX_BUILD=$TERMUX_PREFIX
+	TERMUX_PREFIX_BUILD_CLASSICAL=$TERMUX_PREFIX
+	TERMUX_PREFIX_CLASSICAL_UNSAFE=$TERMUX_PREFIX_CLASSICAL
+	TERMUX_PREFIX_INSTALL=$TERMUX_PREFIX
+	TERMUX_PREFIX_INSTALL_CLASSICAL=$TERMUX_PREFIX_CLASSICAL
+	TERMUX_PREFIX_RUN=$TERMUX_PREFIX
+	TERMUX_PREFIX_RUN_CLASSICAL=$TERMUX_PREFIX_CLASSICAL
+	TERMUX_PREFIX_UNSAFE=$TERMUX_PREFIX
+
+	TERMUX_PKG_MASSAGEDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/massage
+	# TERMUX_PKG_MASSAGEDIR_BASE="$TERMUX_PKG_MASSAGEDIR$TERMUX_PREFIX_CLASSICAL"
+	TERMUX_PKG_MASSAGEDIR_BASE="$TERMUX_PKG_MASSAGEDIR$TERMUX_PREFIX_BASE"
+	TERMUX_PKG_MASSAGEDIR_PAK="$TERMUX_PKG_MASSAGEDIR"
+
+	if $TERMUX_PKG_PROOT; then
+		TERMUX_SAFE_BUILD=true
+		TERMUX_PACKAGE_LIBRARY="glibc"
+		# TERMUX_PREFIX=/usr
+		# TERMUX_PREFIX="$TERMUX_PREFIX/glibc"
+		# CGCT_APP_PREFIX="$TERMUX_PREFIX"
+		TERMUX_PREFIX_BASE=
+		TERMUX_PREFIX_BASE_CLASSICAL=
+		TERMUX_PREFIX_RUN=/usr
+		TERMUX_PREFIX_RUN_CLASSICAL=/usr
+		# TERMUX_PKG_MASSAGEDIR_BASE="$TERMUX_PKG_MASSAGEDIR$TERMUX_PREFIX"
+		# TERMUX_PKG_MASSAGEDIR_BASE="$TERMUX_PKG_MASSAGEDIR"
+		# TERMUX_PKG_MASSAGEDIR_PAK="$TERMUX_PKG_MASSAGEDIR$TERMUX_PREFIX"
+		# TERMUX_PKG_MASSAGEDIR_PAK="$TERMUX_PKG_MASSAGEDIR"
+		# TERMUX_PKG_MAKE_INSTALL_TARGET="install DESTDIR=$TERMUX_PKG_MASSAGEDIR"
+	fi
+
+	if $TERMUX_FAST_BUILD; then
+		# TERMUX_SAFE_BUILD=true
+		if ! $TERMUX_ON_DEVICE_BUILD; then
+			echo "--fast is only on device "
+			exit
+		fi
+	fi
+
+	if $TERMUX_SAFE_BUILD; then
+		TERMUX_PKG_MASSAGEDIR_BASE="$TERMUX_PKG_MASSAGEDIR$TERMUX_PREFIX_BASE"
+		# TERMUX_PKG_MASSAGEDIR_PAK="$TERMUX_PKG_MASSAGEDIR$TERMUX_PREFIX_BASE"
+		TERMUX_PKG_MASSAGEDIR_PAK="$TERMUX_PKG_MASSAGEDIR"
+		TERMUX_PREFIX_INSTALL=$TERMUX_PKG_MASSAGEDIR$TERMUX_PREFIX_BASE
+		# TERMUX_PREFIX_INSTALL=$TERMUX_PKG_MASSAGEDIR
+		TERMUX_PREFIX_INSTALL_CLASSICAL=$TERMUX_PKG_MASSAGEDIR$TERMUX_PREFIX_BASE_CLASSICAL
+		# TERMUX_PKG_MAKE_INSTALL_TARGET="install DESTDIR=$TERMUX_PREFIX_INSTALL"
+		TERMUX_PKG_MAKE_INSTALL_TARGET="install DESTDIR=$TERMUX_PKG_MASSAGEDIR"
+		# TERMUX_PREFIX=$TERMUX_PREFIX_INSTALL
+		# echo "safe prefix $TERMUX_PREFIX -> $TERMUX_PREFIX_INSTALL"
+	fi
+
+	# exit
+
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+		TERMUX_PKG_MAKE_PROCESSES=$(($(nproc)/2))
 		# For on-device builds cross-compiling is not supported so we can
 		# store information about built packages under $TERMUX_TOPDIR.
 		TERMUX_BUILT_PACKAGES_DIRECTORY="$TERMUX_TOPDIR/.built-packages"
@@ -55,7 +133,7 @@ termux_step_setup_variables() {
 			# On-device builds without termux-exec are unsupported.
 			if ! grep -q "${TERMUX_PREFIX}/lib/libtermux-exec.so" <<< "${LD_PRELOAD-x}"; then
 				# termux_error_exit "On-device builds without termux-exec are not supported."
-				echo "warning LD_PRELOAD is unset nested scripts might fail "
+				echo "warning LD_PRELOAD is unset scripts need /bin/env on first line  "
 			fi
 		fi
 	else
@@ -154,7 +232,6 @@ termux_step_setup_variables() {
 	TERMUX_PKG_HOSTBUILD=false # Set if a host build should be done in TERMUX_PKG_HOSTBUILD_DIR:
 	TERMUX_PKG_HOSTBUILD_DIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/host-build
 	TERMUX_PKG_LICENSE_FILE="" # Relative path from $TERMUX_PKG_SRCDIR to LICENSE file. It is installed to $TERMUX_PREFIX/share/$TERMUX_PKG_NAME.
-	TERMUX_PKG_MASSAGEDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/massage
 	TERMUX_PKG_METAPACKAGE=false
 	TERMUX_PKG_NO_ELF_CLEANER=false # set this to true to disable running of termux-elf-cleaner on built binaries
 	TERMUX_PKG_NO_REPLACE_GUESS_SCRIPTS=false # if true, do not find and replace config.guess and config.sub in source directory
@@ -189,6 +266,7 @@ termux_step_setup_variables() {
 	TERMUX_PYTHON_HOME=$TERMUX_PREFIX/lib/python${TERMUX_PYTHON_VERSION} # location of python libraries
 	TERMUX_PKG_MESON_NATIVE=false
 	TERMUX_PKG_CMAKE_CROSSCOMPILING=true
+	TERMUX_PKG_NAME=$TERMUX_PKG_NAME_DEPENDENCY
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 	unset TERMUX_MESON_ENABLE_SOVERSION # setenv to enable SOVERSION suffix for shared libs built with Meson

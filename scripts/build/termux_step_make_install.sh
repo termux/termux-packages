@@ -3,18 +3,17 @@ termux_step_make_install() {
 	[ "$TERMUX_PKG_METAPACKAGE" = "true" ] && return
 
 	if test -f build.ninja; then
-		ninja -j $TERMUX_PKG_MAKE_PROCESSES install
+		ninja -j $TERMUX_PKG_MAKE_PROCESSES $TERMUX_PKG_MAKE_INSTALL_TARGET 
 	elif test -f setup.py || test -f pyproject.toml || test -f setup.cfg; then
-		pip install --no-deps . --prefix $TERMUX_PREFIX
+		pip install --no-deps . --prefix $TERMUX_PREFIX_BASE
 	elif ls ./*.cabal &>/dev/null; then
 		# Workaround until `cabal install` is fixed.
 		while read -r bin; do
 			[[ -f "$bin" ]] || termux_error_exit "'$bin', no such file. Has build completed?"
 			echo "INFO: Installing '$bin' component..."
-			cp "$bin" "$TERMUX_PREFIX/bin"
+			cp "$bin" "$TERMUX_PREFIX_RUN/bin"
 		done< <(cat ./dist-newstyle/cache/plan.json | jq -r '."install-plan"[]|select(."component-name"? and (."component-name"|test("exe:.*")) and (.style == "local") )|."bin-file"')
 	elif ls ./*akefile &>/dev/null || [ -n "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
-		: "${TERMUX_PKG_MAKE_INSTALL_TARGET:="install"}"
 		# Some packages have problem with parallell install, and it does not buy much, so use -j 1.
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 			make -j 1 ${TERMUX_PKG_MAKE_INSTALL_TARGET}
@@ -30,7 +29,7 @@ termux_step_make_install() {
 			--locked \
 			--no-track \
 			--target $CARGO_TARGET_NAME \
-			--root $TERMUX_PREFIX \
+			--root $TERMUX_PREFIX_BASE \
 			$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 	fi
 }

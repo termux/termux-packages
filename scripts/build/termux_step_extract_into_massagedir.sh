@@ -1,4 +1,5 @@
 termux_step_extract_into_massagedir() {
+	echo running tar -N on system. use --safe to skip ... 
 	local TARBALL_ORIG=$TERMUX_PKG_PACKAGEDIR/${TERMUX_PKG_NAME}_orig.tar.gz
 
 	# Build diff tar with what has changed during the build:

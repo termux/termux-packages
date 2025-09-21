@@ -19,7 +19,7 @@ termux_setup_ninja() {
 			chmod 755 $NINJA_FOLDER/ninja
 		fi
 		export PATH=$NINJA_FOLDER:$PATH
-	else
+	elif ! $TERMUX_FORCE_BUILD; then
 		local NINJA_PKG_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/ninja/build.sh; echo \$TERMUX_PKG_VERSION")
 		if ([ ! -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/ninja" ] ||
 		    [ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/ninja")" != "$NINJA_PKG_VERSION" ]) &&

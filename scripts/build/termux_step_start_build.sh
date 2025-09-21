@@ -62,7 +62,7 @@ termux_step_start_build() {
 		fi
 	fi
 
-	echo "termux - building $TERMUX_PKG_NAME for arch $TERMUX_ARCH..."
+	echo "termux - building $TERMUX_PKG_NAME for $TERMUX_PACKAGE_LIBRARY $($TERMUX_PKG_PROOT && echo "proot ")$TERMUX_ARCH from $TERMUX_PKG_BUILDER_SCRIPT ..."
 	test -t 1 && printf "\033]0;%s...\007" "$TERMUX_PKG_NAME"
 
 	# Avoid exporting PKG_CONFIG_LIBDIR until after termux_step_host_build.
@@ -88,7 +88,7 @@ termux_step_start_build() {
 		termux_error_exit "Package '$TERMUX_PKG_NAME' is not available for on-device builds."
 	fi
 
-	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
+	if ! $TERMUX_PKG_NO_ELF_CLEANER && [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
 		if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 			case "$TERMUX_APP_PACKAGE_MANAGER" in
 				"apt") apt install -y termux-elf-cleaner;;

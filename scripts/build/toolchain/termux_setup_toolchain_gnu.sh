@@ -1,5 +1,5 @@
 termux_setup_toolchain_gnu() {
-	export CFLAGS="-O2 -pipe -fno-plt -fexceptions -Wp,-D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fstack-clash-protection"
+	export CFLAGS="-O2 -pipe -fno-plt -fexceptions -Wp,-D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fstack-clash-protection -D__ANDROID__"
 	export CPPFLAGS=""
 	export LDFLAGS=""
 
@@ -20,10 +20,10 @@ termux_setup_toolchain_gnu() {
 		export CXXFILT=$TERMUX_HOST_PLATFORM-c++filt
 	fi
 
-	if [ ! -d "$TERMUX_PREFIX/lib/" ]; then
+	if [ ! -d "$TERMUX_PREFIX_BUILD/lib/" ]; then
 		termux_error_exit "glibc library directory was not found ('$TERMUX_PREFIX/lib/')"
 	fi
-	if [ ! -d "$TERMUX_PREFIX/include/" ]; then
+	if [ ! -d "$TERMUX_PREFIX_BUILD/include/" ]; then
 		termux_error_exit "glibc header directory was not found ('$TERMUX_PREFIX/include/')"
 	fi
 
@@ -40,9 +40,9 @@ termux_setup_toolchain_gnu() {
 		CFLAGS+=" -march=i686"
 		export DYNAMIC_LINKER="ld-linux.so.2"
 	fi
-	export PATH_DYNAMIC_LINKER="$TERMUX_PREFIX/lib/$DYNAMIC_LINKER"
+	export PATH_DYNAMIC_LINKER="$TERMUX_PREFIX_RUN/lib/$DYNAMIC_LINKER"
 
-	if [ ! -f "$PATH_DYNAMIC_LINKER" ]; then
+	if ! $TERMUX_PKG_PROOT && [ ! -f "$PATH_DYNAMIC_LINKER" ]; then
 		termux_error_exit "glibc dynamic linker was not found ('$PATH_DYNAMIC_LINKER')"
 	fi
 

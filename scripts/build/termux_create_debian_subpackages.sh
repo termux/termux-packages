@@ -151,6 +151,6 @@ termux_create_debian_subpackages() {
 				   "$SUB_PKG_PACKAGE_DIR/data.tar.xz"
 
 		# Go back to main package:
-		cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL"
+		cd "$TERMUX_PKG_MASSAGEDIR_BASE"
 	done
 }

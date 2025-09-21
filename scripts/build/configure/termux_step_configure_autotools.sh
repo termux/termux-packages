@@ -22,7 +22,7 @@ termux_step_configure_autotools() {
 		HOST_FLAG=""
 	fi
 
-	local LIBEXEC_FLAG="--libexecdir=$TERMUX_PREFIX/libexec"
+	local LIBEXEC_FLAG="--libexecdir=$TERMUX_PREFIX_BASE/libexec"
 	if [ "$TERMUX_PKG_EXTRA_CONFIGURE_ARGS" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--libexecdir=/}" ]; then
 		LIBEXEC_FLAG=""
 	fi
@@ -103,9 +103,9 @@ termux_step_configure_autotools() {
 	# shellcheck disable=SC2086
 	env $AVOID_GNULIB "$TERMUX_PKG_SRCDIR/configure" \
 		--disable-dependency-tracking \
-		--prefix=$TERMUX_PREFIX \
-		--libdir=$TERMUX_PREFIX/lib \
-		--sbindir=$TERMUX_PREFIX/bin \
+		--prefix=$TERMUX_PREFIX_BASE \
+		--libdir=$TERMUX_PREFIX_BASE/lib \
+		--sbindir=$TERMUX_PREFIX_BASE/usr/bin \
 		--disable-rpath --disable-rpath-hack \
 		$HOST_FLAG \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS \

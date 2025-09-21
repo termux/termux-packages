@@ -1,12 +1,16 @@
 termux_step_massage() {
+
+	# $TERMUX_FAST_BUILD && return || true
+
 	[ "$TERMUX_PKG_METAPACKAGE" = "true" ] && return
 
-	cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL"
+	# cd "$TERMUX_PKG_MASSAGEDIR_BASE"
 
+	# to-do remove we never operate under glibc folder  it is always empty  . it is just an empty shell that should be replaced with dpkg --instdir=prefix 
 	local ADDING_PREFIX=""
-	if [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
-		ADDING_PREFIX="glibc/"
-	fi
+	# if ! $TERMUX_PKG_PROOT && [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
+	# 	ADDING_PREFIX="glibc/"
+	# fi
 
 	# Remove lib/charset.alias which is installed by gettext-using packages:
 	rm -f lib/charset.alias
@@ -30,7 +34,7 @@ termux_step_massage() {
 	rm -Rf share/locale
 
 	# Remove ldconfig cache:
-	rm -f glibc/etc/ld.so.cache
+	rm -f etc/ld.so.cache
 
 	# `update-mime-database` updates NOT ONLY "$PREFIX/share/mime/mime.cache".
 	# Simply removing this specific file does not solve the issue.
@@ -43,9 +47,6 @@ termux_step_massage() {
 
 	# Move over sbin to bin:
 	for file in sbin/*; do if test -f "$file"; then mv "$file" bin/; fi; done
-	if [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
-		for file in glibc/sbin/*; do if test -f "$file"; then mv "$file" glibc/bin/; fi; done
-	fi
 
 	# Remove world permissions and make sure that user still have read-write permissions.
 	chmod -Rf u+rw,g-rwx,o-rwx . || true
@@ -87,7 +88,8 @@ termux_step_massage() {
 				continue
 			fi
 			if head -c 100 "$file" | head -n 1 | grep -E "^#!.*/bin/.*" | grep -q -E -v -e "^#! ?/system" -e "^#! ?$TERMUX_PREFIX_CLASSICAL"; then
-				sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" "$file"
+				# sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" "$file"
+				sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!/bin/env \2@" "$file"
 			fi
 		done < <(find -L . -type f -print0)
 	fi
@@ -107,9 +109,10 @@ termux_step_massage() {
 		find ./${ADDING_PREFIX}share/man -mindepth 1 -maxdepth 1 -type d ! -name man\* | xargs -r rm -rf
 
 		# Compress man pages with gzip:
-		find ./${ADDING_PREFIX}share/man -type f ! -iname \*.gz -print0 | xargs -r -0 gzip -9 -n
+		find ./${ADDING_PREFIX}share/man -type f ! -iname \*.gz -print0 | xargs -r -0 gzip -9 -n || true
 
 		# Update man page symlinks, e.g. unzstd.1 -> zstd.1:
+		echo -e "\n update man page symlink"
 		while IFS= read -r -d '' file; do
 			local _link_value
 			_link_value=$(readlink $file)
@@ -131,7 +134,9 @@ termux_step_massage() {
 		if [ -f "$TERMUX_PKG_SRCDIR"/configure.ac -o -f "$TERMUX_PKG_SRCDIR"/configure.in ]; then
 			termux_error_exit "No files in package. Maybe you need to run autoreconf -fi before configuring."
 		else
-			termux_error_exit "No files in package."
+			echo "error massage folder empty "
+			$TERMUX_SAFE_BUILD && echo "disable --safe or add TERMUX_PREFIX_INSTALL in scripts/configure"
+			exit
 		fi
 	fi
 
@@ -153,7 +158,7 @@ termux_step_massage() {
 						root_file="$j"
 						continue
 					fi
-					ln -sf "${TERMUX_PREFIX_CLASSICAL}/${root_file:2}" "${j}"
+					ln -sf "${TERMUX_PREFIX_RUN_CLASSICAL}/${root_file:2}" "${j}"
 				done
 			done
 		fi
@@ -179,7 +184,7 @@ termux_step_massage() {
 	# Check so that package is not affected by
 	# https://github.com/android/ndk/issues/1614, or
 	# https://github.com/termux/termux-packages/issues/9944
-	if [[ "${TERMUX_PACKAGE_LIBRARY}" == "bionic" ]]; then
+	if ! $TERMUX_FAST_BUILD && [[ "${TERMUX_PACKAGE_LIBRARY}" == "bionic" ]]; then
 		echo "INFO: READELF=${READELF} ... $(command -v ${READELF})"
 		export pattern_file_undef=$(mktemp)
 		echo "INFO: Generating undefined symbols regex to ${pattern_file_undef}"
@@ -347,8 +352,43 @@ termux_step_massage() {
 		test -f ./${ADDING_PREFIX}lib/ghc-*/settings && rm -rf ./${ADDING_PREFIX}lib/ghc-*/settings
 	fi
 
+	if $TERMUX_SAFE_BUILD; then
+		termux_replace_prefix $TERMUX_PREFIX_INSTALL "$TERMUX_PREFIX_BASE"
+	fi
+
+	if $TERMUX_PKG_PROOT; then
+		termux_replace_prefix $TERMUX_PREFIX_UNSAFE "$TERMUX_PREFIX_BASE"
+		termux_replace_prefix $TERMUX_PREFIX_CLASSICAL_UNSAFE "$TERMUX_PREFIX_BASE"
+		# exit
+	fi
+
+	if $TERMUX_PKG_PROOT; then
+		set +e
+		mkdir usr
+		for d in bin include lib sbin share ; do
+			mkdir usr/$d
+			mv $d/* usr/$d/ -v
+		done
+
+		for d in usr/etc usr/var; do
+			mv $d . -v 
+		done
+		# tree
+		# exit
+		set -e
+	fi
+
 	# .. remove empty directories (NOTE: keep this last):
 	find . -type d -empty -delete
+
+	if $TERMUX_PKG_PROOT; then
+		for d in bin include lib sbin share usr/etc usr/var; do
+			if test -d $d; then
+				echo $d folder not allowed. ignore with -f -c
+				$TERMUX_FORCE_BUILD || exit
+			fi
+		done
+	fi
 }
 
 # Local function called by termux_step_massage
@@ -377,3 +417,4 @@ get_epoch() {
 	[[ -n "$(command -v date)" ]] && date +%s && return
 	echo 0
 }
+
