@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Dnsmasq provides network infrastructure for small networ
 TERMUX_PKG_LICENSE="GPL-2.0-only, GPL-3.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.91"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.thekelleys.org.uk/dnsmasq/dnsmasq-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=f622682848b33677adb2b6ad08264618a2ae0a01da486a93fd8cd91186b3d153
 TERMUX_PKG_AUTO_UPDATE=true
