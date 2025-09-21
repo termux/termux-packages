@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Client library of the daemon for managing color devices"
 TERMUX_PKG_LICENSE="GPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.4.7"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/hughsie/colord/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=09a2c35c2cf6afd28b9a107dd48090ee7a376c20008a7fd7b2eb576a46ee057e
 TERMUX_PKG_DEPENDS="glib, gobject-introspection, hwdata, libsqlite, littlecms"
