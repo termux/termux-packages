@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Lightweight Qt Notes-Manager for Linux"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.3.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/tsujan/FeatherNotes/archive/refs/tags/V${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c6cbbbd8003cbc3a1e0c3728094d68f0d50d930b3401d1c1ce39a3d9d1be53f8
 TERMUX_PKG_DEPENDS="hunspell, libc++, libx11, qt6-qtbase, qt6-qtsvg"
