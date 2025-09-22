@@ -56,16 +56,56 @@ class Package:
 PackageMap: TypeAlias = Dict[PackageName, Package]
 
 
-def die(msg: str) -> None:
-    print("ERROR:", msg)
-    exit(1)
+class BuildScriptParser:
+    def __init__(self, script_path: Path) -> None:
+        with open(script_path, encoding="utf-8") as build_script:
+            self.content = build_script.read()
+
+    def __parse_bool_variable(self, var: str) -> bool:
+        value = "false"
+
+        m = re.search(r'^%s="?(true|false)"?$' % var, self.content, re.MULTILINE)
+        if m:
+            value = m.group(1)
+
+        return value == "true"
+
+    def is_metapackage(self) -> bool:
+        return self.__parse_bool_variable("TERMUX_PKG_METAPACKAGE")
+
+    def is_static_splitting_allowed(self) -> bool:
+        return not self.__parse_bool_variable("TERMUX_PKG_NO_STATICSPLIT")
+
+    def subpackage_relation_with_parent(self) -> str:
+        m = re.search(r'^TERMUX_SUBPKG_DEPEND_ON_PARENT="?(true|false)"?$', self.content, re.MULTILINE)
+        if m:
+            return m.group(1)
+        return "true"  # Default to having dependence on parent.
+
+    def get_dependencies(self) -> Set[Dependency | AlternativeDependency]:
+        dependencies = []
+
+        for m in re.findall(r'^(%s)[+]?="(.*?)"$' % "|".join(DEPENDENCY_VARS), self.content, re.DOTALL | re.MULTILINE):
+            _, ds = m  # m: (DEPENDENCY_VAR, dependency string)
+
+            arch = os.getenv("TERMUX_ARCH") or "aarch64"
+            if arch == "x86_64":
+                arch = "x86-64"
+
+            ds = re.sub(r"\${TERMUX_ARCH/_/-}", arch, ds)
+            ds = re.sub(r"\(.*\)", "", ds)
+
+            for d in ds.split(","):
+                if "|" in d:
+                    dependencies.append(AlternativeDependency(options=tuple(re.findall(r"[\w+.-]+", d))))
+                else:
+                    dependencies.append(d.strip())
+
+        return set(dependencies)
 
 
 class BuildOrder:
     def __init__(self, root_pkg: PackageName | None, repos: List[Path], build_mode: BuildMode) -> None:
-        if root_pkg is None and build_mode == BuildMode.ONLINE:
-            raise Exception("Cannot generate full build order in online mode.")
-
         self.root_pkg = root_pkg
         self.repos = repos
         self.build_mode = build_mode
@@ -73,101 +113,75 @@ class BuildOrder:
     def get(self) -> List[Package]:
         return self.__generate_order()
 
-    def __parse_build_file_variable_bool(self, pkg_path: Path, var: str) -> bool:
-        value = "false"
-
-        with open(pkg_path / "build.sh", encoding="utf-8") as build_script:
-            for line in build_script:
-                if line.startswith(var):
-                    value = line.split("=")[-1].replace("\n", "")
-                    break
-
-        return value == "true"
-
-    def __parse_dependencies(self, path) -> Set[Dependency | AlternativeDependency]:
-        dependencies = []
-
-        with open(path, encoding="utf-8") as build_script:
-            for m in re.findall(
-                r'^(%s)[+]?="(.*?)"$' % "|".join(DEPENDENCY_VARS), build_script.read(), re.DOTALL | re.MULTILINE
-            ):
-                _, ds = m  # m: (DEPENDENCY_VAR, dependency string)
-
-                arch = os.getenv("TERMUX_ARCH") or "aarch64"
-                if arch == "x86_64":
-                    arch = "x86-64"
-
-                ds = re.sub(r"\${TERMUX_ARCH/_/-}", arch, ds)
-                ds = re.sub(r"\(.*\)", "", ds)
-
-                for d in ds.split(","):
-                    if "|" in d:
-                        dependencies.append(AlternativeDependency(options=tuple(re.findall(r"[\w+.-]+", d))))
-                    else:
-                        dependencies.append(d.strip())
-
-        return set(dependencies)
-
     def __generate_package_map(self) -> PackageMap:
         package_map: Dict[PackageName, Package] = {}
 
         for repo in self.repos:
-            if not repo.exists():
-                die("'%s' does not exist" % repo.as_posix())
             for package_path in repo.iterdir():
-                if self.__parse_build_file_variable_bool(package_path, "TERMUX_PKG_METAPACKAGE"):
-                    package_map[package_path.name] = Package(
-                        name=package_path.name,
-                        path=package_path,
-                        dependencies=self.__parse_dependencies(package_path / "build.sh"),
-                        type=PackageType.VIRTUAL,
+                package_info = BuildScriptParser(package_path / "build.sh")
+
+                package_name = package_path.name
+                dependencies = package_info.get_dependencies()
+
+                if package_info.is_metapackage():
+                    package_map[package_name] = Package(
+                        name=package_name, path=package_path, dependencies=dependencies, type=PackageType.VIRTUAL
                     )
                     continue
 
-                dependencies = self.__parse_dependencies(package_path / "build.sh")
                 # Note for self: See page 6 of your notebook.
-                if self.build_mode == BuildMode.OFFLINE:
+                # For root package we are always in OFFLINE mode as we are building it.
+                if self.build_mode == BuildMode.OFFLINE or package_name == self.root_pkg:
                     subpackages = []
+
+                    # NOTE: When package_name == self.root_pkg, we do not need to add subpackges as
+                    # no one should depend upon them (will cause circular dependency otherwise), but we
+                    # add them to catch circular dependencies later in __generate_order.
 
                     for subpackage_path in package_path.glob("*.subpackage.sh"):
                         subpackage_name = subpackage_path.name.removesuffix(".subpackage.sh")
 
-                        dependencies.update(self.__parse_dependencies(subpackage_path))
+                        dependencies.update(BuildScriptParser(subpackage_path).get_dependencies())
                         subpackages.append(subpackage_name)
 
                         package_map[subpackage_name] = Package(
                             name=subpackage_name,
                             path=package_path,
-                            dependencies={package_path.name},
+                            dependencies={package_name},
                             type=PackageType.VIRTUAL,
                         )
 
-                    # Remove all the subpackages (of this parent) that might be in dependency set.
+                    # Remove all the subpackages (of this parent) that might be in it's dependency set.
                     dependencies.difference_update(subpackages)  # Note for self: See page 7 of your notebook.
-                    dependencies.discard(package_path.name)  # Some subpackages might have dependency on parent too.
+                    dependencies.discard(package_name)  # Some subpackages might have dependency on parent too.
                 else:
                     for subpackage_path in package_path.glob("*.subpackage.sh"):
                         subpackage_name = subpackage_path.name.removesuffix(".subpackage.sh")
+                        subpackage_info = BuildScriptParser(subpackage_path)
+                        subpackage_dependencies = subpackage_info.get_dependencies()
+
+                        match subpackage_info.subpackage_relation_with_parent():
+                            case "true" | "unversioned":
+                                subpackage_dependencies.add(package_name)
+                            case "deps":
+                                subpackage_dependencies.update(dependencies)
+
                         package_map[subpackage_name] = Package(
                             name=subpackage_name,
                             path=package_path,
-                            dependencies=self.__parse_dependencies(subpackage_path),
+                            dependencies=subpackage_dependencies,
                             type=PackageType.REAL,
                         )
 
-                package_map[package_path.name] = Package(
-                    name=package_path.name, path=package_path, dependencies=dependencies, type=PackageType.REAL
+                package_map[package_name] = Package(
+                    name=package_name, path=package_path, dependencies=dependencies, type=PackageType.REAL
                 )
 
-                static_package = package_path.name + "-static"
-                if static_package not in package_map:
-                    if not self.__parse_build_file_variable_bool(package_path, "TERMUX_PKG_NO_STATICSPLIT"):
-                        package_map[static_package] = Package(
-                            name=static_package,
-                            dependencies={package_path.name},
-                            type=PackageType.VIRTUAL,
-                            path=package_path,
-                        )
+                static_package = package_name + "-static"
+                if static_package not in package_map and package_info.is_static_splitting_allowed():
+                    package_map[static_package] = Package(
+                        name=static_package, dependencies={package_name}, type=PackageType.VIRTUAL, path=package_path
+                    )
 
         sanitized_map: PackageMap = {}
 
@@ -258,6 +272,11 @@ class BuildOrder:
 
         build_order.pop()  # Remove self.root_pkg from list.
         return build_order
+
+
+def die(msg: str) -> None:
+    print("ERROR:", msg)
+    exit(1)
 
 
 def main() -> None:
