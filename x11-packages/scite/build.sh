@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="HPND"
 TERMUX_PKG_LICENSE_FILE="scite/License.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.5.7"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.scintilla.org/scite${TERMUX_PKG_VERSION//./}.tgz
 TERMUX_PKG_SHA256=2ff51c7871858056f350fbdcd9505e8575c9366c32c8fc017e0c6fbafdd5c6ef
 TERMUX_PKG_DEPENDS="at-spi2-core, gdk-pixbuf, glib, gtk3, libc++, libcairo, pango"
