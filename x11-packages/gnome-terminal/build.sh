@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://wiki.gnome.org/Apps/Terminal
 TERMUX_PKG_DESCRIPTION="Terminal emulator for GNOME"
 TERMUX_PKG_LICENSE="GPL-3.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.56.2"
-TERMUX_PKG_SRCURL="https://download.gnome.org/sources/gnome-terminal/${TERMUX_PKG_VERSION%.*}/gnome-terminal-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=235bc09dfa34cc5f1e95122e9bf60203a84daf861cfacf7e4496c5f548239978
+TERMUX_PKG_VERSION="3.58.0"
+# "https://download.gnome.org/sources/gnome-terminal/${TERMUX_PKG_VERSION%.*}/gnome-terminal-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SRCURL="https://gitlab.gnome.org/GNOME/gnome-terminal/-/archive/${TERMUX_PKG_VERSION}/gnome-terminal-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=098ebd149b17e77218fd66f69d1c613dc644d27b6b7239b18ac72ac85db7b742
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="glib, gtk3, libx11, dbus, gsettings-desktop-schemas, libhandy, libvte "
 TERMUX_PKG_BUILD_DEPENDS="glib-cross, dconf, pcre2, gettext, libxslt"

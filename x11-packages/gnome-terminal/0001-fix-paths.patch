@@ -27,7 +27,7 @@ diff --git a/src/terminal-default.cc b/src/terminal-default.cc
 index 3788d54..ecdd46e 100644
 --- a/src/terminal-default.cc
 +++ b/src/terminal-default.cc
-@@ -156,7 +156,7 @@ xte_data_check(char const* name,
+@@ -162,7 +162,7 @@ xte_data_check(char const* name,
      if (xte_data_check_one(path, full))
        return true;
    }
@@ -36,7 +36,7 @@ index 3788d54..ecdd46e 100644
      gs_free auto path = g_build_filename(TERM_PREFIX,
                                           "local",
                                           "share",
-@@ -203,15 +203,15 @@ xte_data_check(char const* name,
+@@ -209,15 +209,15 @@ xte_data_check(char const* name,
      if (xte_data_check_one(path, full))
        return true;
    }
@@ -45,7 +45,7 @@ index 3788d54..ecdd46e 100644
 +  if (!g_str_equal(TERM_PREFIX, "@TERMUX_PREFIX@")) {
 +    gs_free auto path = g_build_filename("@TERMUX_PREFIX@", "share",
                                           XTE_CONFIG_DIRNAME,
-                                          name,
+                                          desktop_id,
                                           nullptr);
      if (xte_data_check_one(path, full))
        return true;
@@ -54,8 +54,8 @@ index 3788d54..ecdd46e 100644
 +    gs_free auto path2 = g_build_filename("@TERMUX_PREFIX@",
                                            "share",
                                            "applications",
-                                           name,
-@@ -432,9 +432,9 @@ xte_config_get_default(char const* native_name)
+                                           desktop_id,
+@@ -442,9 +442,9 @@ xte_config_get_default(char const* native_name)
    auto const user_dir = g_get_user_config_dir();
    if (auto term = xte_config_get_default_for_path_and_desktops(user_dir, desktops, native_name))
      return term;
@@ -66,7 +66,7 @@ index 3788d54..ecdd46e 100644
 +  if (auto term = xte_config_get_default_for_path_and_desktops("@TERMUX_PREFIX@/etc/xdg", desktops, native_name))
      return term;
  
-   return nullptr;
+   auto data_dirs = g_get_system_data_dirs();
 diff --git a/src/terminal-util.cc b/src/terminal-util.cc
 index 8ea4ef6..65d2cff 100644
 --- a/src/terminal-util.cc
