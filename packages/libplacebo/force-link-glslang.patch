@@ -1,0 +1,11 @@
+https://gitlab.archlinux.org/archlinux/packaging/packages/libplacebo/-/blob/9e8d4b1bacbe7efa6d6313bcb33da340e5d9c51c/fix_glslang_linking.patch
+
+--- a/src/glsl/meson.build
++++ b/src/glsl/meson.build
+@@ -17,6 +17,7 @@ if glslang_req.auto() and shaderc.found()
+ elif not glslang_req.disabled()
+ 
+   glslang_deps = [
++    cxx.find_library('glslang', required: false),
+     cxx.find_library('glslang-default-resource-limits', required: false)
+   ]

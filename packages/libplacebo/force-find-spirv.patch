@@ -1,0 +1,13 @@
+diff --git a/src/glsl/meson.build b/src/glsl/meson.build
+index 8fb5e69..7b6d696 100644
+--- a/src/glsl/meson.build
++++ b/src/glsl/meson.build
+@@ -31,7 +31,7 @@ elif not glslang_req.disabled()
+     static   = arg[0]
+     required = arg[1]
+ 
+-    spirv = cxx.find_library('SPIRV', required: required, static: static)
++    spirv = cxx.find_library('SPIRV', required: required, static: static, dirs: '@TERMUX_PREFIX@/lib')
+ 
+     if not spirv.found()
+       continue
