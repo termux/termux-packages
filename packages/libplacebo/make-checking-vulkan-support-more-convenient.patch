@@ -1,0 +1,62 @@
+Prints the vulkan device info scanning and selection process at all times,
+making troubleshooting Vulkan problems in libplacebo on Termux more accessible.
+
+--- a/src/vulkan/context.c
++++ b/src/vulkan/context.c
+@@ -937,7 +937,7 @@ VkPhysicalDevice pl_vulkan_choose_device(pl_log log,
+ {
+     // Hack for the VK macro's logging to work
+     struct { pl_log log; } *vk = (void *) &log;
+-    PL_INFO(vk, "Probing for vulkan devices:");
++    PL_WARN(vk, "Probing for vulkan devices:");
+ 
+     pl_assert(params->instance);
+     VkInstance inst = params->instance;
+@@ -984,13 +984,13 @@ VkPhysicalDevice pl_vulkan_choose_device(pl_log log,
+         GetPhysicalDeviceProperties2(devices[i], &prop);
+         VkPhysicalDeviceType t = prop.properties.deviceType;
+         const char *dtype = t < PL_ARRAY_SIZE(types) ? types[t].name : "unknown?";
+-        PL_INFO(vk, "    GPU %d: %s v%d.%d.%d (%s)", i, prop.properties.deviceName,
++        PL_WARN(vk, "    GPU %d: %s v%d.%d.%d (%s)", i, prop.properties.deviceName,
+                 PRINTF_VER(prop.properties.apiVersion), dtype);
+-        PL_INFO(vk, "           uuid: %s", PRINT_UUID(id_props.deviceUUID));
++        PL_WARN(vk, "           uuid: %s", PRINT_UUID(id_props.deviceUUID));
+ 
+         if (params->surface) {
+             if (!supports_surf(log, inst, get_addr, devices[i], params->surface)) {
+-                PL_DEBUG(vk, "      -> excluding due to lack of surface support");
++                PL_WARN(vk, "      -> excluding due to lack of surface support");
+                 continue;
+             }
+         }
+@@ -1000,7 +1000,7 @@ VkPhysicalDevice pl_vulkan_choose_device(pl_log log,
+                 dev = devices[i];
+                 continue;
+             } else {
+-                PL_DEBUG(vk, "     -> excluding due to UUID mismatch");
++                PL_WARN(vk, "     -> excluding due to UUID mismatch");
+                 continue;
+             }
+         } else if (params->device_name && params->device_name[0] != '\0') {
+@@ -1008,18 +1008,18 @@ VkPhysicalDevice pl_vulkan_choose_device(pl_log log,
+                 dev = devices[i];
+                 continue;
+             } else {
+-                PL_DEBUG(vk, "      -> excluding due to name mismatch");
++                PL_WARN(vk, "      -> excluding due to name mismatch");
+                 continue;
+             }
+         }
+ 
+         if (!params->allow_software && t == VK_PHYSICAL_DEVICE_TYPE_CPU) {
+-            PL_DEBUG(vk, "      -> excluding due to !params->allow_software");
++            PL_WARN(vk, "      -> excluding due to !params->allow_software");
+             continue;
+         }
+ 
+         if (prop.properties.apiVersion < PL_VK_MIN_VERSION) {
+-            PL_DEBUG(vk, "      -> excluding due to too low API version");
++            PL_WARN(vk, "      -> excluding due to too low API version");
+             continue;
+         }
+ 

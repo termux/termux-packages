@@ -1,0 +1,17 @@
+Termux allows dynamically enabling or disabling the entire Software vulkan ICDs at once
+via 'pkg install/remove mesa-vulkan-icd-swrast/swiftshader', and when they are uninstalled,
+they become invisible to libplacebo, so it will just be more convenient and less confusing for Termux
+users if libplacebo is forced to use (and report that it's using) software rendering anytime it's
+available.
+
+--- a/src/vulkan/context.c
++++ b/src/vulkan/context.c
+@@ -1463,7 +1463,7 @@ pl_vulkan pl_vulkan_create(pl_log log, const struct pl_vulkan_params *params)
+             .get_proc_addr  = params->get_proc_addr,
+             .surface        = params->surface,
+             .device_name    = params->device_name,
+-            .allow_software = params->allow_software,
++            .allow_software = true,
+         };
+         memcpy(dparams.device_uuid, params->device_uuid, VK_UUID_SIZE);
+ 
