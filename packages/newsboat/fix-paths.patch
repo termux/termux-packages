@@ -1,15 +1,15 @@
 diff -uNr newsboat-2.19/src/controller.cpp newsboat-2.19.mod/src/controller.cpp
 --- newsboat-2.19/src/controller.cpp	2020-03-22 20:54:24.000000000 +0200
 +++ newsboat-2.19.mod/src/controller.cpp	2020-03-29 22:59:00.640650862 +0300
-@@ -917,7 +917,7 @@
+@@ -923,7 +923,7 @@
+ 		filename_template = Filepath::from_locale_string(tmpdir);
+ 		filename_template.push("newsboat-article.XXXXXX"_path);
  	} else {
- 		snprintf(filename,
- 			sizeof(filename),
--			"/tmp/newsboat-article.XXXXXX");
-+			"@TERMUX_PREFIX@/tmp/newsboat-article.XXXXXX");
+-		filename_template = "/tmp/newsboat-article.XXXXXX"_path;
++		filename_template = "@TERMUX_PREFIX@/tmp/newsboat-article.XXXXXX"_path;
  	}
- 	int fd = mkstemp(filename);
- 	if (fd != -1) {
+ 
+ 	auto template_string = filename_template.to_locale_string();
 diff -uNr newsboat-2.19/src/formaction.cpp newsboat-2.19.mod/src/formaction.cpp
 --- newsboat-2.19/src/formaction.cpp	2020-03-22 20:54:24.000000000 +0200
 +++ newsboat-2.19.mod/src/formaction.cpp	2020-03-29 22:59:57.654933862 +0300
