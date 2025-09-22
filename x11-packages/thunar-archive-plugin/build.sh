@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="This plugin allows one to extract and create archive fro
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@Yisus7u7"
 TERMUX_PKG_VERSION="0.6.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/thunar-plugins/thunar-archive-plugin/${TERMUX_PKG_VERSION%.*}/thunar-archive-plugin-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=692708cd047c7a552f2f85fe2ee32f19c7d5be5bf695d0288e8cadf50289db06
 TERMUX_PKG_AUTO_UPDATE=true
