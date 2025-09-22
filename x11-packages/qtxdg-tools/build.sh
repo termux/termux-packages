@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="CLI tools for libqtxdg."
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.2.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/lxqt/qtxdg-tools/releases/download/${TERMUX_PKG_VERSION}/qtxdg-tools-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=503a6e37792709340dddd642821eca13ef8d789cd26a06983cb7c5e06b8d63af
 TERMUX_PKG_DEPENDS="libc++, libqtxdg, qt6-qtbase"
