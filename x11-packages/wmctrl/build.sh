@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A UNIX/Linux command line tool to interact with an EWMH/
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.07
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 # Origiginal source is unavailable so I am replacing it with debian's dump to make sure it will be rebuilt fine
 #TERMUX_PKG_SRCURL=https://sites.google.com/site/tstyblo/wmctrl/wmctrl-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SRCURL=http://deb.debian.org/debian/pool/main/w/wmctrl/wmctrl_1.07.orig.tar.gz
