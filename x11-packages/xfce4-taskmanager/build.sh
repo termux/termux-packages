@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Easy to use task manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.6.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/apps/xfce4-taskmanager/${TERMUX_PKG_VERSION%.*}/xfce4-taskmanager-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=29bdc7840ab8b9025f6c0e456a83a31090d1c9fd9e26b359baa4a4010cfb0b90
 TERMUX_PKG_DEPENDS="glib, gtk3, libcairo, libwnck, libx11, libxfce4ui, libxfce4util, libxmu, xfconf"
