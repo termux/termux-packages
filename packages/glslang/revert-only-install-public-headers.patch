@@ -1,25 +1,11 @@
 --- a/SPIRV/CMakeLists.txt
 +++ b/SPIRV/CMakeLists.txt
-@@ -66,13 +66,6 @@ set(SPIRV_HEADERS
-     ${CMAKE_CURRENT_SOURCE_DIR}/NonSemanticShaderDebugInfo100.h
-     PARENT_SCOPE)
- 
--set(PUBLIC_HEADERS
--    GlslangToSpv.h
--    disassemble.h
--    Logger.h
--    spirv.hpp11
--    SpvTools.h)
--
- add_library(SPIRV ${LIB_TYPE} ${CMAKE_CURRENT_SOURCE_DIR}/../glslang/stub.cpp)
- add_library(glslang::SPIRV ALIAS SPIRV)
- set_target_properties(SPIRV PROPERTIES
 @@ -104,5 +97,5 @@ endif()
  if(GLSLANG_ENABLE_INSTALL)
      install(TARGETS SPIRV EXPORT glslang-targets)
  
 -    install(FILES ${PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/glslang/SPIRV/)
-+    install(FILES ${HEADERS} ${SPIRV_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/glslang/SPIRV/)
++    install(FILES ${PUBLIC_HEADERS} ${HEADERS} ${SPIRV_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/glslang/SPIRV/)
  endif()
 --- a/glslang/CMakeLists.txt
 +++ b/glslang/CMakeLists.txt
