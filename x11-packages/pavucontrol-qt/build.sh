@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Qt port of volume control of sound server PulseAudio"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.2.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/lxqt/pavucontrol-qt/releases/download/${TERMUX_PKG_VERSION}/pavucontrol-qt-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=f1d213426ac1033d23a8239732dc7f5fdeb393b064f11c9582e01b0c8310aee9
 TERMUX_PKG_DEPENDS="glib, libc++, pulseaudio, pulseaudio-glib, qt6-qtbase"
