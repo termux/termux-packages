@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 # Update both mpv and mpv-x to the same version in one PR.
 TERMUX_PKG_VERSION="0.40.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=10a0f4654f62140a6dd4d380dcf0bbdbdcf6e697556863dc499c296182f081a3
 TERMUX_PKG_AUTO_UPDATE=false
