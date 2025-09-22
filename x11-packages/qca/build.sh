@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION='Qt Cryptographic Architecture'
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.3.10"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.kde.org/stable/qca/${TERMUX_PKG_VERSION}/qca-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=1c5b722da93d559365719226bb121c726ec3c0dc4c67dea34f1e50e4e0d14a02
 TERMUX_PKG_DEPENDS="botan3, ca-certificates, libc++, libnss, libsasl, openssl, qt6-qt5compat, qt6-qtbase"
