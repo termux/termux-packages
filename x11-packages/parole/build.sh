@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Parole is a media player for the Xfce desktop environmen
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.20.0"
+TERMUX_PKG_REVISION=1
 
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/apps/parole/${TERMUX_PKG_VERSION%.*}/parole-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=5cf753e670d6518701133eb860d8bceb3a08a496af6a2b7cc67b93320230c983
