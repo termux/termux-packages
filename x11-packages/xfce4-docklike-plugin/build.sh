@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A modern, docklike, minimalist taskbar for XFCE"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.5.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/panel-plugins/xfce4-docklike-plugin/${TERMUX_PKG_VERSION%.*}/xfce4-docklike-plugin-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=418aa01f51f6528d95ceeb3b19d52bdc0ac554447bdb7afa9975cca5234f244b
 # exo is for bin/exo-desktop-item-edit.
