@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Extremely fast and lightweight file manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.4.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/lxde/pcmanfm/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=cda4f5ad7e049dcdf3b051b9de4c779adcd55bd720e9c96c45275389aa84264e
 TERMUX_PKG_AUTO_UPDATE=true
