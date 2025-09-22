@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A simple and easy-to-use library to enjoy videogames pro
 TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.5
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/raysan5/raylib/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=aea98ecf5bc5c5e0b789a76de0083a21a70457050ea4cc2aec7566935f5e258e
 TERMUX_PKG_DEPENDS="glfw"
