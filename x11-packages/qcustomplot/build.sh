@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A Qt C++ widget for plotting and data visualization"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.1.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(https://www.qcustomplot.com/release/${TERMUX_PKG_VERSION}/QCustomPlot-source.tar.gz
                    https://www.qcustomplot.com/release/${TERMUX_PKG_VERSION}/QCustomPlot-sharedlib.tar.gz)
 TERMUX_PKG_SHA256=(5e2d22dec779db8f01f357cbdb25e54fbcf971adaee75eae8d7ad2444487182f
