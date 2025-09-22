@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Clipman is a clipboard manager for Xfce"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.7.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/panel-plugins/xfce4-clipman-plugin/${TERMUX_PKG_VERSION%.*}/xfce4-clipman-plugin-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=903302c3070a951d44ee17a84fa3cf21d36c6787678af8fbfc79e469fd00cb46
 TERMUX_PKG_AUTO_UPDATE=true
