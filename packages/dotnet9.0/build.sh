@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://dotnet.microsoft.com/en-us/
 TERMUX_PKG_DESCRIPTION=".NET 9.0"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
-TERMUX_PKG_VERSION="9.0.7"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="9.0.9"
+_DOTNET_SDK_VERSION="9.0.110"
 TERMUX_PKG_SRCURL=git+https://github.com/dotnet/dotnet
-TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION}"
+TERMUX_PKG_GIT_BRANCH="v${_DOTNET_SDK_VERSION}"
 TERMUX_PKG_BUILD_DEPENDS="krb5, libicu, openssl, zlib"
 TERMUX_PKG_SUGGESTS="dotnet-sdk-9.0"
 TERMUX_PKG_CONFLICTS="dotnet8.0"
@@ -30,6 +30,10 @@ termux_pkg_auto_update() {
 		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
 		return
 	fi
+
+	sed \
+		-e "s|^_DOTNET_SDK_VERSION=.*|_DOTNET_SDK_VERSION=\"9.0.$((100 + ${latest_version##*.}))\"|" \
+		-i "${TERMUX_PKG_BUILDER_DIR}/build.sh"
 
 	termux_pkg_upgrade_version "${latest_version}"
 }
