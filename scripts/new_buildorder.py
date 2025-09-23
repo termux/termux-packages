@@ -362,19 +362,3 @@ end_time = time.perf_counter()
 logger.debug("Elapsed time [total]: %f" % (end_time - start_time))
 
 # TODO: Add support for glibc
-
-# INFO:
-# - Two build modes: (OFFLINE: completely offline, ONLINE: completely online)
-# ------------------------------------------------------------------------------------------------------
-# [x] when in offline mode:
-#   I do not need to consider subpackages, but since the way current packaging model
-#   distributes some dependencies of the main package among the subpackages, we
-#   need to add dependencies in `TERMUX_SUBPKG_DEPENDS` (of all subpackages) to the deps list of main package.
-#   This ensures that we will be able to completely build the main package.
-# ------------------------------------------------------------------------------------------------------
-# [x] when in online mode:
-#   I need to take care of subpackages as they can be downloaded too. Essentially, we need to consider subpackges
-#   as independent packages (with dependecy on  main package: see 1st point).
-#   Assumption:
-#   `TERMUX_PKG_DEPENDS` lists all the packages that will be needed at runtime of this package. If not true then
-#   defination of `TERMUX_PKG_DEPENDS` is contradictory.
