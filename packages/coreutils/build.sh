@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/coreutils/
 TERMUX_PKG_DESCRIPTION="Basic file, shell and text manipulation utilities from the GNU project"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=9.7
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION=9.8
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/coreutils/coreutils-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=e8bb26ad0293f9b5a1fc43fb42ba970e312c66ce92c1b0b16713d7500db251bf
+TERMUX_PKG_SHA256=e6d4fd2d852c9141a1c2a18a13d146a0cd7e45195f72293a4e4c044ec6ccca15
 TERMUX_PKG_DEPENDS="libandroid-selinux, libandroid-support, libgmp, libiconv, openssl (>= 1:3.5.0-1)"
 TERMUX_PKG_BREAKS="chroot, busybox (<< 1.30.1-4)"
 TERMUX_PKG_REPLACES="chroot, busybox (<< 1.30.1-4)"
@@ -16,7 +15,6 @@ TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
 # pinky has no usage on Android.
 # df does not work either, let system binary prevail.
-# $PREFIX/bin/env is provided by busybox for shebangs to work directly.
 # users and who doesn't work and does not make much sense for Termux.
 # uptime is provided by procps.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
