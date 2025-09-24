@@ -725,6 +725,8 @@
     <property name="is-mc-node-local" type="gboolean" flags="225" default-value="FALSE"/>
     <property name="is-mc-org-local" type="gboolean" flags="225" default-value="FALSE"/>
     <property name="is-mc-site-local" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="flowinfo" type="guint" flags="235" default-value="0"/>
+    <property name="scope-id" type="guint" flags="235" default-value="0"/>
   </class>
   <class name="GInetAddressMask" get-type="g_inet_address_mask_get_type" parents="GObject">
     <implements name="GInitable"/>
@@ -1454,6 +1456,7 @@
     <property name="format" type="GZlibCompressorFormat" flags="235" default-value="G_ZLIB_COMPRESSOR_FORMAT_ZLIB"/>
     <property name="level" type="gint" flags="235" default-value="-1"/>
     <property name="file-info" type="GFileInfo" flags="227"/>
+    <property name="os" type="gint" flags="1073742051" default-value="-1"/>
   </class>
   <class name="GZlibDecompressor" get-type="g_zlib_decompressor_get_type" parents="GObject">
     <implements name="GConverter"/>
@@ -1464,37 +1467,6 @@
   </class>
   <class name="GThreadedResolver" get-type="g_threaded_resolver_get_type" parents="GResolver,GObject">
   </class>
-  <interface name="GFileDescriptorBased" get-type="g_file_descriptor_based_get_type">
-  </interface>
-  <boxed name="GUnixMountEntry" get-type="g_unix_mount_entry_get_type"/>
-  <boxed name="GUnixMountPoint" get-type="g_unix_mount_point_get_type"/>
-  <class name="GUnixMountMonitor" get-type="g_unix_mount_monitor_get_type" parents="GObject">
-    <signal name="mounts-changed" return="void" when="last">
-    </signal>
-    <signal name="mountpoints-changed" return="void" when="last">
-    </signal>
-  </class>
-  <class name="GUnixFDMessage" get-type="g_unix_fd_message_get_type" parents="GSocketControlMessage,GObject">
-    <property name="fd-list" type="GUnixFDList" flags="235"/>
-  </class>
-  <class name="GUnixInputStream" get-type="g_unix_input_stream_get_type" parents="GInputStream,GObject">
-    <implements name="GPollableInputStream"/>
-    <implements name="GFileDescriptorBased"/>
-    <property name="fd" type="gint" flags="235" default-value="-1"/>
-    <property name="close-fd" type="gboolean" flags="227" default-value="TRUE"/>
-  </class>
-  <class name="GUnixOutputStream" get-type="g_unix_output_stream_get_type" parents="GOutputStream,GObject">
-    <implements name="GPollableOutputStream"/>
-    <implements name="GFileDescriptorBased"/>
-    <property name="fd" type="gint" flags="235" default-value="-1"/>
-    <property name="close-fd" type="gboolean" flags="227" default-value="TRUE"/>
-  </class>
-  <class name="GDesktopAppInfo" get-type="g_desktop_app_info_get_type" parents="GObject">
-    <implements name="GAppInfo"/>
-    <property name="filename" type="gchararray" flags="11" default-value="NULL"/>
-  </class>
-  <interface name="GDesktopAppInfoLookup" get-type="g_desktop_app_info_lookup_get_type">
-  </interface>
   <error-quark function="g_io_error_quark" domain="g-io-error-quark"/>
   <error-quark function="g_dbus_error_quark" domain="g-dbus-error-quark"/>
   <error-quark function="g_resolver_error_quark" domain="g-resolver-error-quark"/>
