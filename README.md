@@ -28,3 +28,12 @@ Read [CONTRIBUTING.md](/CONTRIBUTING.md) and [Developer's Wiki](https://github.c
 The Termux Community docs are available [here](https://github.com/termux/termux-community/blob/site/site/pages/en/index.md).
 
 **All our community members must follow the rules that are defined [here](https://github.com/termux/termux-community/blob/site/site/pages/en/rules/index.md) and any [Content Not Allowed](https://github.com/termux/termux-community/blob/site/site/pages/en/rules/index.md#8-content-not-allowed) must not be posted.**
+##
+
+
+
+## Sponsors and Funders
+
+[<img alt="GitHub Accelerator" width="25%" src="site/assets/sponsors/github.png" />](https://github.com)  
+*[GitHub Accelerator](https://github.com/accelerator) ([1](https://github.blog/2023-04-12-github-accelerator-our-first-cohort-and-whats-next))*
+
