@@ -45,7 +45,7 @@ termux_pkg_auto_update() {
 	NEW_TS_SHA256=$(sha256sum "$TS_TMPFILE" | cut -d' ' -f1)
 
 	sed \
-		-e "s|\(^\s*\)local TERMUX_TREE_SITTER_SHA256=[0-9a-f]*|\1local TS_GZ_SHA256=${NEW_TS_SHA256}|" \
+		-e "s|\(^\s*\)local TERMUX_TREE_SITTER_SHA256=[0-9a-f]*|\1local TERMUX_TREE_SITTER_SHA256=${NEW_TS_SHA256}|" \
 		-i "${TERMUX_SCRIPTDIR}/scripts/build/setup/termux_setup_treesitter.sh"
 
 	termux_pkg_upgrade_version "${latest_release}"
