@@ -1,13 +1,15 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/tree-sitter/tree-sitter
+TERMUX_PKG_HOMEPAGE=https://tree-sitter.github.io/
 TERMUX_PKG_DESCRIPTION="An incremental parsing system for programming tools"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="0.25.10"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ad5040537537012b16ef6e1210a572b927c7cdc2b99d1ee88d44a7dcdc3ff44c
 TERMUX_PKG_BREAKS="libtreesitter"
 TERMUX_PKG_REPLACES="libtreesitter"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="^\d+\.\d+\.\d+$"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_pkg_auto_update() {
@@ -20,12 +22,18 @@ termux_pkg_auto_update() {
 		return
 	fi
 
+	if ! grep -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<< "${latest_release}"; then
+		echo "INFO: Tag '${latest_release}' does not look like a stable version."
+		return
+	fi
+
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
 	local _SOVERSION=0.25
 
 	# This blocks auto-updates to an incompatible SO version.
 	if [[ "${latest_release}" != "${_SOVERSION}".* ]]; then
+		echo "Latest release is '${latest_release}'" >&2
 		termux_error_exit "SOVERSION guard check failed."
 	fi
 
