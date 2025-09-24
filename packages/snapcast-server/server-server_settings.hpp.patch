@@ -9,12 +9,15 @@
          /// User when running as deaemon
          std::string user{"snapserver"};
          /// Group when running as deaemon
-@@ -194,7 +194,7 @@
-         /// Audio streaming port
-         size_t port{1704};
+@@ -213,9 +213,9 @@
+     struct Stream
+     {
          /// Directory for stream plugins
 -        std::filesystem::path plugin_dir{"/usr/share/snapserver/plug-ins"};
 +        std::filesystem::path plugin_dir{"@TERMUX_PREFIX@/share/snapserver/plug-ins"};
+         /// Directory for executable process stream sources
+-        std::filesystem::path sandbox_dir{"/usr/share/snapserver/sandbox"};
++        std::filesystem::path sandbox_dir{"@TERMUX_PREFIX@/share/snapserver/sandbox"};
          /// Stream sources
          std::vector<std::string> sources;
          /// Default codec
