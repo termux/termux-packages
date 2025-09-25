@@ -1,6 +1,5 @@
-diff -uNr rclone-v1.67.0/backend/hdfs/fs.go rclone-v1.67.0.mod/backend/hdfs/fs.go
---- rclone-v1.67.0/backend/hdfs/fs.go	2024-06-14 23:04:51.000000000 +0800
-+++ rclone-v1.67.0.mod/backend/hdfs/fs.go	2024-06-15 11:36:29.543678242 +0800
+--- a/backend/hdfs/fs.go
++++ b/backend/hdfs/fs.go
 @@ -44,7 +44,7 @@
  func getKerberosClient() (*krb.Client, error) {
  	configPath := os.Getenv("KRB5_CONFIG")
@@ -10,20 +9,19 @@ diff -uNr rclone-v1.67.0/backend/hdfs/fs.go rclone-v1.67.0.mod/backend/hdfs/fs.g
  	}
  
  	cfg, err := config.Load(configPath)
-diff -uNr rclone-v1.67.0/cmd/genautocomplete/genautocomplete_bash.go rclone-v1.67.0.mod/cmd/genautocomplete/genautocomplete_bash.go
---- rclone-v1.67.0/cmd/genautocomplete/genautocomplete_bash.go	2024-06-14 23:04:51.000000000 +0800
-+++ rclone-v1.67.0.mod/cmd/genautocomplete/genautocomplete_bash.go	2024-06-15 11:37:51.239678211 +0800
-@@ -24,7 +24,7 @@
- 
+--- a/cmd/genautocomplete/genautocomplete_bash.go
++++ b/cmd/genautocomplete/genautocomplete_bash.go
+@@ -27,7 +27,7 @@
  the generated script will be written to
  
--    /etc/bash_completion.d/rclone
-+    @TERMUX_PREFIX@/etc/bash_completion.d/rclone
+ ` + "```sh" + `
+-/etc/bash_completion.d/rclone
++@TERMUX_PREFIX@/etc/bash_completion.d/rclone
+ ` + "```" + `
  
  and so rclone will probably need to be run as root, or with sudo.
- 
-@@ -46,7 +46,7 @@
- `,
+@@ -51,7 +51,7 @@
+ current shell.`,
  	Run: func(command *cobra.Command, args []string) {
  		cmd.CheckArgs(0, 1, command, args)
 -		out := "/etc/bash_completion.d/rclone"
@@ -31,29 +29,28 @@ diff -uNr rclone-v1.67.0/cmd/genautocomplete/genautocomplete_bash.go rclone-v1.6
  		if len(args) > 0 {
  			if args[0] == "-" {
  				err := cmd.Root.GenBashCompletionV2(os.Stdout, false)
-diff -uNr rclone-v1.67.0/cmd/genautocomplete/genautocomplete_fish.go rclone-v1.67.0.mod/cmd/genautocomplete/genautocomplete_fish.go
---- rclone-v1.67.0/cmd/genautocomplete/genautocomplete_fish.go	2024-06-14 23:04:51.000000000 +0800
-+++ rclone-v1.67.0.mod/cmd/genautocomplete/genautocomplete_fish.go	2024-06-15 11:38:57.435678185 +0800
+--- a/cmd/genautocomplete/genautocomplete_fish.go
++++ b/cmd/genautocomplete/genautocomplete_fish.go
 @@ -18,7 +18,7 @@
- 	Long: `
- Generates a fish autocompletion script for rclone.
+ 	Short: `Output fish completion script for rclone.`,
+ 	Long: `Generates a fish autocompletion script for rclone.
  
 -This writes to /etc/fish/completions/rclone.fish by default so will
 +This writes to @TERMUX_PREFIX@/etc/fish/completions/rclone.fish by default so will
  probably need to be run with sudo or as root, e.g.
  
-     sudo rclone genautocomplete fish
-@@ -26,7 +26,7 @@
- Logout and login again to use the autocompletion scripts, or source
+ ` + "```sh" + `
+@@ -29,7 +29,7 @@
  them directly
  
--    . /etc/fish/completions/rclone.fish
-+    . @TERMUX_PREFIX@/etc/fish/completions/rclone.fish
+ ` + "```sh" + `
+-. /etc/fish/completions/rclone.fish
++. @TERMUX_PREFIX@/etc/fish/completions/rclone.fish
+ ` + "```" + `
  
  If you supply a command line argument the script will be written
- there.
-@@ -35,7 +35,7 @@
- `,
+@@ -38,7 +38,7 @@
+ If output_file is "-", then the output will be written to stdout.`,
  	Run: func(command *cobra.Command, args []string) {
  		cmd.CheckArgs(0, 1, command, args)
 -		out := "/etc/fish/completions/rclone.fish"
@@ -61,20 +58,19 @@ diff -uNr rclone-v1.67.0/cmd/genautocomplete/genautocomplete_fish.go rclone-v1.6
  		if len(args) > 0 {
  			if args[0] == "-" {
  				err := cmd.Root.GenFishCompletion(os.Stdout, true)
-diff -uNr rclone-v1.67.0/cmd/genautocomplete/genautocomplete_zsh.go rclone-v1.67.0.mod/cmd/genautocomplete/genautocomplete_zsh.go
---- rclone-v1.67.0/cmd/genautocomplete/genautocomplete_zsh.go	2024-06-14 23:04:51.000000000 +0800
-+++ rclone-v1.67.0.mod/cmd/genautocomplete/genautocomplete_zsh.go	2024-06-15 11:39:33.603678172 +0800
+--- a/cmd/genautocomplete/genautocomplete_zsh.go
++++ b/cmd/genautocomplete/genautocomplete_zsh.go
 @@ -18,7 +18,7 @@
- 	Long: `
- Generates a zsh autocompletion script for rclone.
+ 	Short: `Output zsh completion script for rclone.`,
+ 	Long: `Generates a zsh autocompletion script for rclone.
  
 -This writes to /usr/share/zsh/vendor-completions/_rclone by default so will
 +This writes to @TERMUX_PREFIX@/share/zsh/vendor-completions/_rclone by default so will
  probably need to be run with sudo or as root, e.g.
  
-     sudo rclone genautocomplete zsh
-@@ -35,7 +35,7 @@
- `,
+ ` + "```sh" + `
+@@ -38,7 +38,7 @@
+ If output_file is "-", then the output will be written to stdout.`,
  	Run: func(command *cobra.Command, args []string) {
  		cmd.CheckArgs(0, 1, command, args)
 -		out := "/usr/share/zsh/vendor-completions/_rclone"
