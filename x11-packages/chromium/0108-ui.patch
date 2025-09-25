@@ -16,3 +16,14 @@ index 00c2c5dc9e..08ac87ba7c 100644
  
  #define CHECK_ATSPI_ERROR_NULLPTR(error) \
    if (error) {                           \
+--- a/ui/views/accessibility/view_ax_platform_node_delegate.cc
++++ b/ui/views/accessibility/view_ax_platform_node_delegate.cc
+@@ -713,7 +713,7 @@
+   // Search child widgets first, since they're on top in the z-order.
+   for (Widget* child_widget : GetChildWidgets().child_widgets) {
+     View* child_root_view = child_widget->GetRootView();
+-    if (features::IsAccessibilityHitTestPointCopyEnabled()) {
++    if (::features::IsAccessibilityHitTestPointCopyEnabled()) {
+       // Use a per-iteration copy; don't mutate `point` so later iterations and
+       // the view() hit test use the original ScreenToDIPPoint result.
+       gfx::Point point_for_child = point;
