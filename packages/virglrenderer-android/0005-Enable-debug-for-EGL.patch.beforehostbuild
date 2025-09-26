@@ -1,7 +1,7 @@
-diff --git a/src/vrend_winsys_egl.c b/src/vrend_winsys_egl.c
---- a/src/vrend_winsys_egl.c
-+++ b/src/vrend_winsys_egl.c
-@@ -391,14 +391,12 @@
+diff -ur orig/src/vrend/vrend_winsys_egl.c mod/src/vrend/vrend_winsys_egl.c
+--- orig/src/vrend/vrend_winsys_egl.c	2025-09-08 13:49:31.000000000 +0200
++++ mod/src/vrend/vrend_winsys_egl.c	2025-09-10 22:11:18.828553294 +0200
+@@ -391,14 +391,11 @@
        goto fail;
  
     extensions = eglQueryString(egl->egl_display, EGL_EXTENSIONS);
@@ -16,11 +16,10 @@ diff --git a/src/vrend_winsys_egl.c b/src/vrend_winsys_egl.c
             eglQueryString(egl->egl_display, EGL_VENDOR));
 -   virgl_debug("EGL extensions: %s\n", extensions);
 -#endif
-+   virgl_info("EGL extensions: %s\n", extensions);
  
     if (!virgl_egl_add_extensions(egl, extensions))
        goto fail;
-@@ -591,13 +589,11 @@
+@@ -591,13 +588,11 @@
        goto fail;
  
     extensions = eglQueryString(egl->egl_display, EGL_EXTENSIONS);
