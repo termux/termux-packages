@@ -71,122 +71,119 @@ Enable jumbo build for the following component(s)/source_set(s):
 - //components/wifi:wifi
 
 ---
- components/affiliations/core/browser/BUILD.gn |  3 ++-
- components/autofill/content/browser/BUILD.gn  |  3 ++-
- components/autofill/content/renderer/BUILD.gn | 10 +++++++--
- .../autofill/content/renderer/form_tracker.cc |  4 ++++
- .../renderer/password_autofill_agent.cc       |  4 ++++
- components/autofill/core/browser/BUILD.gn     |  7 +++---
- .../autofill_structured_address_name.cc       |  3 ++-
- ...request_payments_network_interface_base.cc |  8 +++++++
- .../payments_network_interface_base.cc        |  8 +++++++
- .../payments/payments_suggestion_generator.cc |  6 +++++
- .../valuable_suggestion_generator.cc          |  4 ++++
- .../browser/ui/autofill_resource_utils.cc     |  4 ++++
- .../addresses/address_autofill_table.cc       | 14 ++++++++++++
- .../addresses/autofill_profile_sync_util.cc   |  6 +++++
- .../addresses/contact_info_sync_util.cc       |  6 +++++
- .../autocomplete/autocomplete_table.cc        |  6 +++++
- .../autocomplete_table_label_sensitive.cc     | 22 +++++++++++++++++++
- .../webdata/autofill_ai/entity_table.cc       |  4 ++++
- .../webdata/autofill_sync_metadata_table.cc   |  6 +++++
- .../webdata/valuables/valuable_sync_bridge.cc |  4 ++++
- .../webdata/valuables/valuables_table.cc      |  6 +++++
- components/autofill/core/common/BUILD.gn      |  4 ++--
- components/cdm/browser/BUILD.gn               |  5 +++--
- components/cdm/common/BUILD.gn                |  3 ++-
- components/cdm/renderer/BUILD.gn              |  3 ++-
- .../content_settings/core/browser/BUILD.gn    |  5 +++--
- .../content_settings_default_provider.cc      |  4 ++++
- .../browser/content_settings_pref_provider.cc |  4 ++++
- .../browser/permission_settings_registry.cc   |  4 ++++
- .../content_settings/core/common/BUILD.gn     |  5 +++--
- .../content_settings/core/test/BUILD.gn       |  4 +++-
- components/domain_reliability/BUILD.gn        |  6 +++--
- components/download/internal/common/BUILD.gn  |  3 ++-
- components/download/public/common/BUILD.gn    |  3 ++-
- .../feature_engagement/internal/BUILD.gn      |  6 +++--
- .../feature_engagement/internal/test/BUILD.gn |  4 +++-
- components/feature_engagement/public/BUILD.gn |  6 +++--
- components/global_media_controls/BUILD.gn     |  4 +++-
- .../views/media_item_ui_updated_view.cc       | 14 ++++++++++++
- components/guest_view/browser/BUILD.gn        |  4 +++-
- components/guest_view/renderer/BUILD.gn       |  4 +++-
- components/leveldb_proto/BUILD.gn             |  3 ++-
- .../internal/proto_leveldb_wrapper.cc         |  6 +++++
- components/lookalikes/core/BUILD.gn           |  7 +++---
- .../providers/cast/certificate/BUILD.gn       | 12 +++++-----
- components/metrics/BUILD.gn                   |  5 +++--
- components/metrics/install_date_provider.cc   |  6 +++++
- components/omnibox/browser/BUILD.gn           |  5 +++--
- .../browser/autocomplete_grouper_groups.cc    |  4 ++++
- .../browser/autocomplete_grouper_sections.cc  |  4 ++++
- .../omnibox/browser/autocomplete_match.cc     |  4 ++++
- .../omnibox/browser/autocomplete_result.cc    |  6 +++++
- .../omnibox/browser/base_search_provider.cc   |  6 +++++
- .../omnibox/browser/history_url_provider.cc   |  5 ++++-
- .../browser/omnibox_popup_selection.cc        |  4 ++++
- .../omnibox/browser/open_tab_provider.cc      |  4 ++++
- .../password_manager/content/browser/BUILD.gn |  4 +++-
- .../password_manager/core/browser/BUILD.gn    |  7 +++---
- .../core/browser/leak_detection/BUILD.gn      |  7 +++---
- .../core/browser/sync_credentials_filter.cc   |  2 +-
- .../password_manager/core/common/BUILD.gn     |  3 ++-
- components/payments/content/BUILD.gn          | 10 +++++----
- components/payments/content/icon/BUILD.gn     |  4 +++-
- components/payments/core/BUILD.gn             | 11 +++++-----
- components/performance_manager/BUILD.gn       |  8 ++++++-
- .../decorators/page_aggregator.cc             |  4 ++++
- .../decorators/page_live_state_decorator.cc   |  4 ++++
- .../decorators/page_load_tracker_decorator.cc |  4 ++++
- .../decorators/process_priority_aggregator.cc |  4 ++++
- .../decorators/site_data_recorder.cc          |  4 ++++
- .../decorators/tab_page_decorator.cc          |  2 +-
- .../frame_audible_voter.cc                    |  6 +++++
- .../frame_capturing_media_stream_voter.cc     |  6 +++++
- .../frame_visibility_voter.cc                 |  4 ++++
- .../inherit_client_priority_voter.cc          |  4 ++++
- .../inherit_parent_priority_voter.cc          |  6 +++++
- .../loading_page_voter.cc                     |  4 ++++
- .../freezing/frozen_frame_aggregator.cc       |  4 ++++
- .../graph/frame_node_impl_describer.cc        |  4 ++++
- .../graph/process_node_impl_describer.cc      |  4 ++++
- .../graph/worker_node_impl_describer.cc       |  4 ++++
- .../performance_manager_registry_impl.cc      |  4 ++++
- .../site_data/site_data_cache_factory.cc      |  4 ++++
- .../cpu_measurement_monitor.cc                |  4 ++++
- .../memory_measurement_provider.cc            |  4 ++++
- components/policy/content/BUILD.gn            |  5 +++--
- components/policy/core/browser/BUILD.gn       |  5 +++--
- .../browser/url_allowlist_policy_handler.cc   |  4 ++++
- .../browser/url_blocklist_policy_handler.cc   |  4 ++++
- components/policy/core/common/BUILD.gn        |  9 ++++----
- .../cloud/profile_cloud_policy_manager.cc     |  4 ++++
- .../cloud/profile_cloud_policy_store.cc       |  4 ++++
- .../core/common/policy_proto_decoders.cc      |  4 ++++
- components/prefs/BUILD.gn                     |  4 +++-
- components/printing/browser/BUILD.gn          |  4 +++-
- .../safe_browsing/content/browser/BUILD.gn    |  3 ++-
- .../safe_browsing/core/browser/BUILD.gn       |  3 ++-
- components/security_state/content/BUILD.gn    |  4 +++-
- components/security_state/core/BUILD.gn       |  6 +++--
- components/storage_monitor/BUILD.gn           |  3 ++-
- components/sync/BUILD.gn                      |  1 +
- components/sync/base/BUILD.gn                 |  3 ++-
- components/sync/protocol/BUILD.gn             |  3 ++-
- components/sync/service/BUILD.gn              |  3 ++-
- ...sync_session_durations_metrics_recorder.cc |  6 +++++
- ...sync_session_durations_metrics_recorder.cc |  6 +++++
- components/sync_device_info/BUILD.gn          |  3 ++-
- components/sync_user_events/BUILD.gn          |  4 +++-
- components/ui_devtools/BUILD.gn               |  3 ++-
- components/url_formatter/BUILD.gn             |  7 +++---
- components/variations/BUILD.gn                |  3 ++-
- .../child_process_field_trial_syncer.cc       |  4 ++++
- .../variations/variations_ids_provider.cc     |  4 ++++
- components/webauthn/content/browser/BUILD.gn  |  4 +++-
- components/wifi/BUILD.gn                      |  6 +++--
- 115 files changed, 485 insertions(+), 95 deletions(-)
+ components/affiliations/core/browser/BUILD.gn      |  3 ++-
+ components/autofill/content/browser/BUILD.gn       |  3 ++-
+ components/autofill/content/renderer/BUILD.gn      | 10 ++++++++--
+ .../autofill/content/renderer/form_tracker.cc      |  4 ++++
+ .../content/renderer/password_autofill_agent.cc    |  4 ++++
+ components/autofill/core/browser/BUILD.gn          |  7 ++++---
+ .../addresses/autofill_structured_address_name.cc  |  3 ++-
+ ...iple_request_payments_network_interface_base.cc |  8 ++++++++
+ .../payments/payments_network_interface_base.cc    |  8 ++++++++
+ .../payments/payments_suggestion_generator.cc      |  6 ++++++
+ .../core/browser/ui/autofill_resource_utils.cc     |  4 ++++
+ .../webdata/addresses/address_autofill_table.cc    | 14 ++++++++++++++
+ .../addresses/autofill_profile_sync_util.cc        |  6 ++++++
+ .../webdata/addresses/contact_info_sync_util.cc    |  6 ++++++
+ .../webdata/autocomplete/autocomplete_table.cc     |  6 ++++++
+ .../browser/webdata/autofill_ai/entity_table.cc    |  4 ++++
+ .../webdata/autofill_sync_metadata_table.cc        |  6 ++++++
+ .../webdata/valuables/valuable_sync_bridge.cc      |  4 ++++
+ .../browser/webdata/valuables/valuables_table.cc   |  6 ++++++
+ components/autofill/core/common/BUILD.gn           |  4 ++--
+ components/cdm/browser/BUILD.gn                    |  5 +++--
+ components/cdm/common/BUILD.gn                     |  3 ++-
+ components/cdm/renderer/BUILD.gn                   |  3 ++-
+ components/content_settings/core/browser/BUILD.gn  |  5 +++--
+ .../browser/content_settings_default_provider.cc   |  4 ++++
+ .../core/browser/content_settings_pref_provider.cc |  4 ++++
+ components/content_settings/core/common/BUILD.gn   |  5 +++--
+ components/content_settings/core/test/BUILD.gn     |  4 +++-
+ components/domain_reliability/BUILD.gn             |  6 ++++--
+ components/download/internal/common/BUILD.gn       |  3 ++-
+ components/download/public/common/BUILD.gn         |  3 ++-
+ components/feature_engagement/internal/BUILD.gn    |  6 ++++--
+ .../feature_engagement/internal/test/BUILD.gn      |  4 +++-
+ components/feature_engagement/public/BUILD.gn      |  6 ++++--
+ components/global_media_controls/BUILD.gn          |  4 +++-
+ .../public/views/media_item_ui_updated_view.cc     | 14 ++++++++++++++
+ components/guest_view/browser/BUILD.gn             |  4 +++-
+ components/guest_view/renderer/BUILD.gn            |  4 +++-
+ components/leveldb_proto/BUILD.gn                  |  3 ++-
+ .../internal/proto_leveldb_wrapper.cc              |  6 ++++++
+ components/lookalikes/core/BUILD.gn                |  7 ++++---
+ .../common/providers/cast/certificate/BUILD.gn     | 12 +++++++-----
+ components/metrics/BUILD.gn                        |  5 +++--
+ components/metrics/install_date_provider.cc        |  6 ++++++
+ components/omnibox/browser/BUILD.gn                |  5 +++--
+ .../omnibox/browser/autocomplete_grouper_groups.cc |  4 ++++
+ .../browser/autocomplete_grouper_sections.cc       |  4 ++++
+ components/omnibox/browser/autocomplete_match.cc   |  4 ++++
+ components/omnibox/browser/autocomplete_result.cc  |  6 ++++++
+ components/omnibox/browser/base_search_provider.cc |  6 ++++++
+ components/omnibox/browser/history_url_provider.cc |  5 ++++-
+ .../omnibox/browser/omnibox_popup_selection.cc     |  4 ++++
+ components/omnibox/browser/open_tab_provider.cc    |  4 ++++
+ .../password_manager/content/browser/BUILD.gn      |  4 +++-
+ components/password_manager/core/browser/BUILD.gn  |  7 ++++---
+ .../core/browser/leak_detection/BUILD.gn           |  7 ++++---
+ .../core/browser/sync_credentials_filter.cc        |  2 +-
+ components/password_manager/core/common/BUILD.gn   |  3 ++-
+ components/payments/content/BUILD.gn               | 10 ++++++----
+ components/payments/content/icon/BUILD.gn          |  4 +++-
+ components/payments/core/BUILD.gn                  | 11 ++++++-----
+ components/performance_manager/BUILD.gn            |  8 +++++++-
+ .../decorators/page_aggregator.cc                  |  4 ++++
+ .../decorators/page_live_state_decorator.cc        |  4 ++++
+ .../decorators/page_load_tracker_decorator.cc      |  4 ++++
+ .../decorators/process_priority_aggregator.cc      |  4 ++++
+ .../decorators/site_data_recorder.cc               |  4 ++++
+ .../decorators/tab_page_decorator.cc               |  2 +-
+ .../frame_audible_voter.cc                         |  6 ++++++
+ .../frame_capturing_media_stream_voter.cc          |  6 ++++++
+ .../frame_visibility_voter.cc                      |  4 ++++
+ .../inherit_client_priority_voter.cc               |  4 ++++
+ .../inherit_parent_priority_voter.cc               |  6 ++++++
+ .../loading_page_voter.cc                          |  4 ++++
+ .../freezing/frozen_frame_aggregator.cc            |  4 ++++
+ .../graph/frame_node_impl_describer.cc             |  4 ++++
+ .../graph/process_node_impl_describer.cc           |  4 ++++
+ .../graph/worker_node_impl_describer.cc            |  4 ++++
+ .../performance_manager_registry_impl.cc           |  4 ++++
+ .../site_data/site_data_cache_factory.cc           |  4 ++++
+ .../cpu_measurement_monitor.cc                     |  4 ++++
+ .../memory_measurement_provider.cc                 |  4 ++++
+ components/policy/content/BUILD.gn                 |  5 +++--
+ components/policy/core/browser/BUILD.gn            |  5 +++--
+ .../core/browser/url_allowlist_policy_handler.cc   |  4 ++++
+ .../core/browser/url_blocklist_policy_handler.cc   |  4 ++++
+ components/policy/core/common/BUILD.gn             |  9 +++++----
+ .../common/cloud/profile_cloud_policy_manager.cc   |  4 ++++
+ .../common/cloud/profile_cloud_policy_store.cc     |  4 ++++
+ .../policy/core/common/policy_proto_decoders.cc    |  4 ++++
+ components/prefs/BUILD.gn                          |  4 +++-
+ components/printing/browser/BUILD.gn               |  4 +++-
+ components/safe_browsing/content/browser/BUILD.gn  |  3 ++-
+ components/safe_browsing/core/browser/BUILD.gn     |  3 ++-
+ components/security_state/content/BUILD.gn         |  4 +++-
+ components/security_state/core/BUILD.gn            |  6 ++++--
+ components/storage_monitor/BUILD.gn                |  3 ++-
+ components/sync/BUILD.gn                           |  1 +
+ components/sync/base/BUILD.gn                      |  3 ++-
+ components/sync/protocol/BUILD.gn                  |  3 ++-
+ components/sync/service/BUILD.gn                   |  3 ++-
+ ...tory_sync_session_durations_metrics_recorder.cc |  6 ++++++
+ .../sync_session_durations_metrics_recorder.cc     |  6 ++++++
+ components/sync_device_info/BUILD.gn               |  3 ++-
+ components/sync_user_events/BUILD.gn               |  4 +++-
+ components/ui_devtools/BUILD.gn                    |  3 ++-
+ components/url_formatter/BUILD.gn                  |  7 ++++---
+ components/variations/BUILD.gn                     |  3 ++-
+ .../variations/child_process_field_trial_syncer.cc |  4 ++++
+ components/variations/variations_ids_provider.cc   |  4 ++++
+ components/webauthn/content/browser/BUILD.gn       |  4 +++-
+ components/wifi/BUILD.gn                           |  6 ++++--
+ 112 files changed, 455 insertions(+), 95 deletions(-)
 
 diff --git a/components/affiliations/core/browser/BUILD.gn b/components/affiliations/core/browser/BUILD.gn
 index 90df14a320..7739e8f601 100644
@@ -284,7 +281,7 @@ index b69a454941..9d06a6d029 100644
 +
 +#undef kSubmissionSourceHistogram
 diff --git a/components/autofill/content/renderer/password_autofill_agent.cc b/components/autofill/content/renderer/password_autofill_agent.cc
-index a83f9ca75e..bd64bc738f 100644
+index a2c29470ca..5a2794d113 100644
 --- a/components/autofill/content/renderer/password_autofill_agent.cc
 +++ b/components/autofill/content/renderer/password_autofill_agent.cc
 @@ -98,6 +98,8 @@ using blink::WebView;
@@ -296,14 +293,14 @@ index a83f9ca75e..bd64bc738f 100644
  namespace autofill {
  
  namespace {
-@@ -2445,3 +2447,5 @@ void PasswordAutofillAgent::MaybeTriggerSuggestionsOnFocusedElement(
+@@ -2434,3 +2436,5 @@ void PasswordAutofillAgent::MaybeTriggerSuggestionsOnFocusedElement(
  }
  
  }  // namespace autofill
 +
 +#undef kSubmissionSourceHistogram
 diff --git a/components/autofill/core/browser/BUILD.gn b/components/autofill/core/browser/BUILD.gn
-index 7c5fa4f3dd..c2b28dd008 100644
+index 8f6570dfa0..e31521883a 100644
 --- a/components/autofill/core/browser/BUILD.gn
 +++ b/components/autofill/core/browser/BUILD.gn
 @@ -6,6 +6,7 @@ import("//build/buildflag_header.gni")
@@ -314,7 +311,7 @@ index 7c5fa4f3dd..c2b28dd008 100644
  import("//components/optimization_guide/features.gni")
  import("//testing/libfuzzer/fuzzer_test.gni")
  import("//third_party/protobuf/proto_library.gni")
-@@ -107,7 +108,7 @@ proto_library("amount_extraction_heuristic_regexes_proto") {
+@@ -105,7 +106,7 @@ proto_library("amount_extraction_heuristic_regexes_proto") {
    sources = [ "payments/amount_extraction_heuristic_regexes.proto" ]
  }
  
@@ -323,7 +320,7 @@ index 7c5fa4f3dd..c2b28dd008 100644
    sources = [
      "autofill_ai_form_rationalization.cc",
      "autofill_ai_form_rationalization.h",
-@@ -1025,7 +1026,7 @@ static_library("browser") {
+@@ -1038,7 +1039,7 @@ static_library("browser") {
    }
  }
  
@@ -332,7 +329,7 @@ index 7c5fa4f3dd..c2b28dd008 100644
    sources = [
      "payments/legal_message_line.cc",
      "payments/legal_message_line.h",
-@@ -1039,7 +1040,7 @@ static_library("legal_message_line") {
+@@ -1052,7 +1053,7 @@ static_library("legal_message_line") {
    configs += [ "//build/config/compiler:wexit_time_destructors" ]
  }
  
@@ -422,25 +419,6 @@ index c2a5ad1c9d..d0a80e9aea 100644
  }  // namespace autofill
 +
 +#undef CreateSeparator
-+#undef CreateUndoOrClearFormSuggestion
-diff --git a/components/autofill/core/browser/suggestions/valuables/valuable_suggestion_generator.cc b/components/autofill/core/browser/suggestions/valuables/valuable_suggestion_generator.cc
-index 92b82c79a4..b18a9a7267 100644
---- a/components/autofill/core/browser/suggestions/valuables/valuable_suggestion_generator.cc
-+++ b/components/autofill/core/browser/suggestions/valuables/valuable_suggestion_generator.cc
-@@ -19,6 +19,8 @@
- #include "ui/gfx/image/image.h"
- #include "url/gurl.h"
- 
-+#define CreateUndoOrClearFormSuggestion CreateUndoOrClearFormSuggestion_ValuableSuggestionGenerator
-+
- namespace autofill {
- namespace {
- 
-@@ -252,3 +254,5 @@ void ExtendEmailSuggestionsWithLoyaltyCardSuggestions(
- }
- 
- }  // namespace autofill
-+
 +#undef CreateUndoOrClearFormSuggestion
 diff --git a/components/autofill/core/browser/ui/autofill_resource_utils.cc b/components/autofill/core/browser/ui/autofill_resource_utils.cc
 index 2a8745c28a..aa867cfbb1 100644
@@ -553,45 +531,8 @@ index a6e3eea465..d06df2b791 100644
 +
 +#undef kValue
 +#undef GetKey
-diff --git a/components/autofill/core/browser/webdata/autocomplete/autocomplete_table_label_sensitive.cc b/components/autofill/core/browser/webdata/autocomplete/autocomplete_table_label_sensitive.cc
-index 9c983b2ffd..63e671c582 100644
---- a/components/autofill/core/browser/webdata/autocomplete/autocomplete_table_label_sensitive.cc
-+++ b/components/autofill/core/browser/webdata/autocomplete/autocomplete_table_label_sensitive.cc
-@@ -28,6 +28,17 @@
- #include "third_party/abseil-cpp/absl/container/flat_hash_set.h"
- #include "ui/base/l10n/l10n_util.h"
- 
-+#define kName              kName_AutocompleteTableLabelSensitive
-+#define kLabel             kLabel_AutocompleteTableLabelSensitive
-+#define kValue             kValue_AutocompleteTableLabelSensitive
-+#define kValueLower        kValueLower_AutocompleteTableLabelSensitive
-+#define kDateCreated       kDateCreated_AutocompleteTableLabelSensitive
-+#define kDateLastUsed      kDateLastUsed_AutocompleteTableLabelSensitive
-+#define kCount             kCount_AutocompleteTableLabelSensitive
-+#define AutocompleteUpdate AutocompleteUpdate_AutocompleteTableLabelSensitive
-+#define GetEndTime         SensitiveGetEndTime_AutocompleteTableLabel
-+#define GetKey             GetKey_AutocompleteTableLabelSensitive
-+
- namespace autofill {
- 
- namespace {
-@@ -477,3 +488,14 @@ bool AutocompleteTableLabelSensitive::InitMainTable() {
- }
- 
- }  // namespace autofill
-+
-+#undef kName
-+#undef kLabel
-+#undef kValue
-+#undef kValueLower
-+#undef kDateCreated
-+#undef kDateLastUsed
-+#undef kCount
-+#undef AutocompleteUpdate
-+#undef GetEndTime
-+#undef GetKey
 diff --git a/components/autofill/core/browser/webdata/autofill_ai/entity_table.cc b/components/autofill/core/browser/webdata/autofill_ai/entity_table.cc
-index 233072e5df..4a01a6de6f 100644
+index 43b73c532b..ddae702096 100644
 --- a/components/autofill/core/browser/webdata/autofill_ai/entity_table.cc
 +++ b/components/autofill/core/browser/webdata/autofill_ai/entity_table.cc
 @@ -32,6 +32,8 @@
@@ -631,10 +572,10 @@ index 0e5e713651..2b226ef7b0 100644
 +#undef kValue
 +#undef GetKey
 diff --git a/components/autofill/core/browser/webdata/valuables/valuable_sync_bridge.cc b/components/autofill/core/browser/webdata/valuables/valuable_sync_bridge.cc
-index 8bf3181c71..891ee5ff2c 100644
+index 364794dcd6..9e6af46d81 100644
 --- a/components/autofill/core/browser/webdata/valuables/valuable_sync_bridge.cc
 +++ b/components/autofill/core/browser/webdata/valuables/valuable_sync_bridge.cc
-@@ -21,6 +21,8 @@
+@@ -18,6 +18,8 @@
  #include "components/sync/protocol/entity_data.h"
  #include "components/webdata/common/web_database.h"
  
@@ -643,7 +584,7 @@ index 8bf3181c71..891ee5ff2c 100644
  namespace autofill {
  namespace {
  
-@@ -303,3 +305,5 @@ ValuablesTable* ValuableSyncBridge::GetValuablesTable() {
+@@ -317,3 +319,5 @@ ValuablesTable* ValuableSyncBridge::GetValuablesTable() {
  }
  
  }  // namespace autofill
@@ -814,25 +755,6 @@ index 89695a6fc9..6bd7c66017 100644
  }  // namespace content_settings
 +
 +#undef kBug364820109AlreadyWorkedAroundPref
-diff --git a/components/content_settings/core/browser/permission_settings_registry.cc b/components/content_settings/core/browser/permission_settings_registry.cc
-index 5d4cd56991..c842138be5 100644
---- a/components/content_settings/core/browser/permission_settings_registry.cc
-+++ b/components/content_settings/core/browser/permission_settings_registry.cc
-@@ -15,6 +15,8 @@
- #include "components/content_settings/core/browser/website_settings_registry.h"
- #include "components/content_settings/core/common/content_settings.h"
- 
-+#define g_content_settings_registry_instance g_content_settings_registry_instance_permission_settings_registry
-+
- namespace content_settings {
- 
- namespace {
-@@ -123,3 +125,5 @@ const PermissionSettingsInfo* PermissionSettingsRegistry::Register(
- }
- 
- }  // namespace content_settings
-+
-+#undef g_content_settings_registry_instance
 diff --git a/components/content_settings/core/common/BUILD.gn b/components/content_settings/core/common/BUILD.gn
 index 3628c17fdf..2d1c1e3e56 100644
 --- a/components/content_settings/core/common/BUILD.gn
@@ -1225,7 +1147,7 @@ index 2927e047c8..e1edefe105 100644
    sources = [
      "cast_cert_validator_unittest.cc",
 diff --git a/components/metrics/BUILD.gn b/components/metrics/BUILD.gn
-index 5a84e9a96b..ef5f78fe6f 100644
+index 49c341978e..0626519cc3 100644
 --- a/components/metrics/BUILD.gn
 +++ b/components/metrics/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -1236,7 +1158,7 @@ index 5a84e9a96b..ef5f78fe6f 100644
  import("//testing/test.gni")
  import("//tools/grit/grit_rule.gni")
  
-@@ -146,7 +147,7 @@ if (!is_cronet_build || is_ios) {
+@@ -143,7 +144,7 @@ if (!is_cronet_build || is_ios) {
      }
    }
  
@@ -1245,7 +1167,7 @@ index 5a84e9a96b..ef5f78fe6f 100644
      sources = [
        "call_stacks/call_stack_profile_metrics_provider.cc",
        "call_stacks/call_stack_profile_metrics_provider.h",
-@@ -345,7 +346,7 @@ if (!is_cronet_build || is_ios) {
+@@ -335,7 +336,7 @@ if (!is_cronet_build || is_ios) {
      }
    }
  
@@ -1276,7 +1198,7 @@ index 925da2a15e..56d3e83490 100644
 +#undef ReadInstallDate
 +#undef RoundSecondsToHour
 diff --git a/components/omnibox/browser/BUILD.gn b/components/omnibox/browser/BUILD.gn
-index ce7b759072..32d27e7101 100644
+index 8bd795ab94..696b840861 100644
 --- a/components/omnibox/browser/BUILD.gn
 +++ b/components/omnibox/browser/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -1296,7 +1218,7 @@ index ce7b759072..32d27e7101 100644
    sources = [
      "actions/contextual_search_action.cc",
      "actions/contextual_search_action.h",
-@@ -718,7 +719,7 @@ if (is_android) {
+@@ -714,7 +715,7 @@ if (is_android) {
    }
  }
  
@@ -1363,10 +1285,10 @@ index 5750f28aa2..fb95e39633 100644
 +
 +#undef kIsDesktop
 diff --git a/components/omnibox/browser/autocomplete_result.cc b/components/omnibox/browser/autocomplete_result.cc
-index 64178231a5..0dd65a92ae 100644
+index e31af7ec6d..3da5b924a9 100644
 --- a/components/omnibox/browser/autocomplete_result.cc
 +++ b/components/omnibox/browser/autocomplete_result.cc
-@@ -71,6 +71,9 @@ using metrics::OmniboxEventProto;
+@@ -70,6 +70,9 @@ using metrics::OmniboxEventProto;
  
  typedef AutocompleteMatchType ACMatchType;
  
@@ -1376,7 +1298,7 @@ index 64178231a5..0dd65a92ae 100644
  namespace {
  
  constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
-@@ -1689,3 +1692,6 @@ std::ostream& operator<<(std::ostream& os, const AutocompleteResult& result) {
+@@ -1687,3 +1690,6 @@ std::ostream& operator<<(std::ostream& os, const AutocompleteResult& result) {
    os << "}" << std::endl;
    return os;
  }
@@ -1425,10 +1347,10 @@ index d50b0815d2..df2633dbca 100644
 +
 +#undef ScoringSignals
 diff --git a/components/omnibox/browser/omnibox_popup_selection.cc b/components/omnibox/browser/omnibox_popup_selection.cc
-index 3cbb301423..71654c6088 100644
+index 5b9e438f67..d1d3d2cc7c 100644
 --- a/components/omnibox/browser/omnibox_popup_selection.cc
 +++ b/components/omnibox/browser/omnibox_popup_selection.cc
-@@ -14,6 +14,8 @@
+@@ -13,6 +13,8 @@
  #include "components/omnibox/common/omnibox_features.h"
  #include "components/search_engines/template_url_service.h"
  
@@ -1437,7 +1359,7 @@ index 3cbb301423..71654c6088 100644
  constexpr bool kIsDesktop = !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS);
  
  constexpr size_t OmniboxPopupSelection::kNoMatch = static_cast<size_t>(-1);
-@@ -238,3 +240,5 @@ OmniboxPopupSelection::GetAllAvailableSelectionsSorted(
+@@ -234,3 +236,5 @@ OmniboxPopupSelection::GetAllAvailableSelectionsSorted(
        << "This algorithm depends on a sorted list of available selections.";
    return available_selections;
  }
@@ -1478,7 +1400,7 @@ index 6b58d489e6..a145f24d34 100644
      "bad_message.cc",
      "bad_message.h",
 diff --git a/components/password_manager/core/browser/BUILD.gn b/components/password_manager/core/browser/BUILD.gn
-index 227a042762..199f8ac7ce 100644
+index 970c629167..abb7478b5b 100644
 --- a/components/password_manager/core/browser/BUILD.gn
 +++ b/components/password_manager/core/browser/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -1498,7 +1420,7 @@ index 227a042762..199f8ac7ce 100644
    sources = [
      "browser_save_password_progress_logger.cc",
      "browser_save_password_progress_logger.h",
-@@ -351,7 +352,7 @@ if (is_android) {
+@@ -364,7 +365,7 @@ if (is_android) {
    }
  }
  
@@ -1507,7 +1429,7 @@ index 227a042762..199f8ac7ce 100644
    sources = [
      "password_hash_data.cc",
      "password_hash_data.h",
-@@ -380,7 +381,7 @@ static_library("hash_password_manager") {
+@@ -393,7 +394,7 @@ static_library("hash_password_manager") {
    configs += [ "//build/config/compiler:wexit_time_destructors" ]
  }
  
@@ -1517,7 +1439,7 @@ index 227a042762..199f8ac7ce 100644
    sources = [
      "fake_form_fetcher.cc",
 diff --git a/components/password_manager/core/browser/leak_detection/BUILD.gn b/components/password_manager/core/browser/leak_detection/BUILD.gn
-index 707013621e..94bd9a1c82 100644
+index 830ba7ddb5..52057ad326 100644
 --- a/components/password_manager/core/browser/leak_detection/BUILD.gn
 +++ b/components/password_manager/core/browser/leak_detection/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -1528,16 +1450,16 @@ index 707013621e..94bd9a1c82 100644
  import("//third_party/libprotobuf-mutator/fuzzable_proto_library.gni")
  
  fuzzable_proto_library("proto") {
-@@ -25,7 +26,7 @@ source_set("leak_detection_interface_headers") {
+@@ -29,7 +30,7 @@ source_set("leak_detection_interface_headers") {
    configs += [ "//build/config/compiler:wexit_time_destructors" ]
  }
  
 -source_set("leak_detection") {
 +jumbo_source_set("leak_detection") {
    sources = [
-     "bulk_leak_check_impl.cc",
-     "bulk_leak_check_impl.h",
-@@ -74,7 +75,7 @@ source_set("leak_detection") {
+     "encryption_utils.cc",
+     "encryption_utils.h",
+@@ -82,7 +83,7 @@ source_set("leak_detection") {
    configs += [ "//build/config/compiler:wexit_time_destructors" ]
  }
  
@@ -1545,8 +1467,8 @@ index 707013621e..94bd9a1c82 100644
 +jumbo_source_set("test_support") {
    testonly = true
    sources = [
-     "mock_bulk_leak_check_service.cc",
-@@ -95,7 +96,7 @@ source_set("test_support") {
+     "mock_leak_detection_check_factory.cc",
+@@ -107,7 +108,7 @@ source_set("test_support") {
    ]
  }
  
@@ -1554,7 +1476,7 @@ index 707013621e..94bd9a1c82 100644
 +jumbo_source_set("unit_tests") {
    testonly = true
    sources = [
-     "bulk_leak_check_impl_unittest.cc",
+     "encryption_utils_unittest.cc",
 diff --git a/components/password_manager/core/browser/sync_credentials_filter.cc b/components/password_manager/core/browser/sync_credentials_filter.cc
 index 10303e9673..e6c387a93b 100644
 --- a/components/password_manager/core/browser/sync_credentials_filter.cc
@@ -2490,7 +2412,7 @@ index 50219aea28..25ea991339 100644
      "collaboration_metadata.cc",
      "collaboration_metadata.h",
 diff --git a/components/sync/service/BUILD.gn b/components/sync/service/BUILD.gn
-index b6123c7a71..1e56416c91 100644
+index 02596f1727..35cc097f6a 100644
 --- a/components/sync/service/BUILD.gn
 +++ b/components/sync/service/BUILD.gn
 @@ -3,8 +3,9 @@
@@ -2526,10 +2448,10 @@ index 98fa0a3162..e18ed0d8e3 100644
 +#undef SubtractInactiveTime
 +#undef LogDuration
 diff --git a/components/sync/service/sync_session_durations_metrics_recorder.cc b/components/sync/service/sync_session_durations_metrics_recorder.cc
-index 4b2021d817..62a3d49d56 100644
+index 64b1e75e2f..170d80c957 100644
 --- a/components/sync/service/sync_session_durations_metrics_recorder.cc
 +++ b/components/sync/service/sync_session_durations_metrics_recorder.cc
-@@ -11,6 +11,9 @@
+@@ -12,6 +12,9 @@
  #include "base/time/time.h"
  #include "components/signin/public/identity_manager/accounts_in_cookie_jar_info.h"
  
@@ -2539,7 +2461,7 @@ index 4b2021d817..62a3d49d56 100644
  namespace syncer {
  
  namespace {
-@@ -352,3 +355,6 @@ SyncSessionDurationsMetricsRecorder::DetermineSyncStatus() const {
+@@ -353,3 +356,6 @@ SyncSessionDurationsMetricsRecorder::DetermineSyncStatus() const {
  }
  
  }  // namespace syncer
@@ -2640,7 +2562,7 @@ index 2d5ec9d086..d932f3b2e5 100644
    sources = [
      "elide_url_unittest.cc",
 diff --git a/components/variations/BUILD.gn b/components/variations/BUILD.gn
-index a927581364..326d26ebef 100644
+index 4a1690345c..c38fcf2013 100644
 --- a/components/variations/BUILD.gn
 +++ b/components/variations/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -2737,3 +2659,117 @@ index c05f146af7..61361ec6f7 100644
    sources = [
      "fake_wifi_service.cc",
      "fake_wifi_service.h",
+diff --git a/components/autofill/core/browser/suggestions/addresses/address_suggestion_generator.cc b/components/autofill/core/browser/suggestions/addresses/address_suggestion_generator.cc
+index c7c318a4e3..a045ddeda7 100644
+--- a/components/autofill/core/browser/suggestions/addresses/address_suggestion_generator.cc
++++ b/components/autofill/core/browser/suggestions/addresses/address_suggestion_generator.cc
+@@ -57,6 +57,8 @@
+ #include "ui/native_theme/native_theme.h"  // nogncheck
+ #endif
+ 
++#define CreateUndoOrClearFormSuggestion CreateUndoOrClearFormSuggestion_AddressSuggestionGenerator
++
+ namespace autofill {
+ 
+ namespace {
+@@ -789,3 +791,5 @@ std::vector<Suggestion> CreateSuggestionsFromProfilesForTest(
+ }
+ 
+ }  // namespace autofill
++
++#undef CreateUndoOrClearFormSuggestion
+diff --git a/components/autofill/core/browser/suggestions/valuables/valuable_suggestion_generator.cc b/components/autofill/core/browser/suggestions/valuables/valuable_suggestion_generator.cc
+index 3cfea3dcde..3fcacdf484 100644
+--- a/components/autofill/core/browser/suggestions/valuables/valuable_suggestion_generator.cc
++++ b/components/autofill/core/browser/suggestions/valuables/valuable_suggestion_generator.cc
+@@ -20,6 +20,8 @@
+ #include "ui/gfx/image/image.h"
+ #include "url/gurl.h"
+ 
++#define CreateUndoOrClearFormSuggestion CreateUndoOrClearFormSuggestion_ValuableSuggestionGenerator
++
+ namespace autofill {
+ namespace {
+ 
+@@ -370,3 +372,5 @@ void LoyaltyCardSuggestionGenerator::GenerateSuggestions(
+ }
+ 
+ }  // namespace autofill
++
++#undef CreateUndoOrClearFormSuggestion
+diff --git a/components/autofill/core/browser/webdata/autocomplete/autocomplete_table_label_sensitive.cc b/components/autofill/core/browser/webdata/autocomplete/autocomplete_table_label_sensitive.cc
+index 9c983b2ffd..f4f8f6b3a0 100644
+--- a/components/autofill/core/browser/webdata/autocomplete/autocomplete_table_label_sensitive.cc
++++ b/components/autofill/core/browser/webdata/autocomplete/autocomplete_table_label_sensitive.cc
+@@ -28,6 +28,17 @@
+ #include "third_party/abseil-cpp/absl/container/flat_hash_set.h"
+ #include "ui/base/l10n/l10n_util.h"
+ 
++#define kName              kName_AutocompleteTableLabelSensitive
++#define kLabel             kLabel_AutocompleteTableLabelSensitive
++#define kValue             kValue_AutocompleteTableLabelSensitive
++#define kValueLower        kValueLower_AutocompleteTableLabelSensitive
++#define kDateCreated       kDateCreated_AutocompleteTableLabelSensitive
++#define kDateLastUsed      kDateLastUsed_AutocompleteTableLabelSensitive
++#define kCount             kCount_AutocompleteTableLabelSensitive
++#define AutocompleteUpdate AutocompleteUpdate_AutocompleteTableLabelSensitive
++#define GetEndTime         GetEndTime_AutocompleteTableLabelSensitive
++#define GetKey             GetKey_AutocompleteTableLabelSensitive
++
+ namespace autofill {
+ 
+ namespace {
+@@ -477,3 +488,14 @@ bool AutocompleteTableLabelSensitive::InitMainTable() {
+ }
+ 
+ }  // namespace autofill
++
++#undef kName
++#undef kLabel
++#undef kValue
++#undef kValueLower
++#undef kDateCreated
++#undef kDateLastUsed
++#undef kCount
++#undef AutocompleteUpdate
++#undef GetEndTime
++#undef GetKey
+diff --git a/components/content_settings/core/browser/permission_settings_registry.cc b/components/content_settings/core/browser/permission_settings_registry.cc
+index 5d4cd56991..019aea1d25 100644
+--- a/components/content_settings/core/browser/permission_settings_registry.cc
++++ b/components/content_settings/core/browser/permission_settings_registry.cc
+@@ -20,13 +20,13 @@ namespace content_settings {
+ namespace {
+ 
+ base::LazyInstance<PermissionSettingsRegistry>::DestructorAtExit
+-    g_content_settings_registry_instance = LAZY_INSTANCE_INITIALIZER;
++    g_permission_settings_registry_instance = LAZY_INSTANCE_INITIALIZER;
+ 
+ }  // namespace
+ 
+ // static
+ PermissionSettingsRegistry* PermissionSettingsRegistry::GetInstance() {
+-  return g_content_settings_registry_instance.Pointer();
++  return g_permission_settings_registry_instance.Pointer();
+ }
+ 
+ PermissionSettingsRegistry::PermissionSettingsRegistry()
+diff --git a/components/autofill/core/browser/data_model/addresses/autofill_profile_comparator.cc b/components/autofill/core/browser/data_model/addresses/autofill_profile_comparator.cc
+index 37a31e4563..2eef25f09d 100644
+--- a/components/autofill/core/browser/data_model/addresses/autofill_profile_comparator.cc
++++ b/components/autofill/core/browser/data_model/addresses/autofill_profile_comparator.cc
+@@ -33,6 +33,8 @@
+ 
+ using i18n::phonenumbers::PhoneNumberUtil;
+ 
++#define kSpace kSpace_AutofillProfileComparator
++
+ namespace autofill {
+ namespace {
+ 
+@@ -583,3 +585,5 @@ bool AutofillProfileComparator::HaveMergeableAddresses(
+ }
+ 
+ }  // namespace autofill
++
++#undef kSpace
