@@ -1,0 +1,14 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -335,7 +335,11 @@
+ # db_load checking, it's optional
+ # ******************************
+ 
++if(ENABLE_TESTS)
+ find_program(DB_LOAD NAMES db_load db4_load db_load-4 db5_load db_load-5)
++else()
++set(DB_LOAD 0)
++endif()
+ if(DB_LOAD)
+ 	set(HAVE_DB_LOAD ON)
+ else(DB_LOAD)
