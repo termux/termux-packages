@@ -3,9 +3,11 @@ TERMUX_PKG_DESCRIPTION="A library-based package manager with dependency support"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@Maxython <mixython@gmail.com>"
 TERMUX_PKG_VERSION=7.0.0
-TERMUX_PKG_REVISION=4
-TERMUX_PKG_SRCURL=https://gitlab.archlinux.org/pacman/pacman/-/releases/v${TERMUX_PKG_VERSION}/downloads/pacman-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=61cbd445d1381b4b184bc7c4e2791f07a79f0f2807b7c600399d0d08e8cd28cf
+TERMUX_PKG_REVISION=5
+TERMUX_PKG_SRCURL=(https://gitlab.archlinux.org/pacman/pacman/-/releases/v${TERMUX_PKG_VERSION}/downloads/pacman-${TERMUX_PKG_VERSION}.tar.xz
+		https://github.com/termux-pacman/pacman-switch/archive/refs/heads/main.zip)
+TERMUX_PKG_SHA256=(61cbd445d1381b4b184bc7c4e2791f07a79f0f2807b7c600399d0d08e8cd28cf
+		04aa9eea156f830c286695b4b4820f609c5b15d88c32c5b75413317145bec48d)
 TERMUX_PKG_DEPENDS="bash, curl, gpgme, libandroid-glob, libarchive, libcurl, openssl, termux-licenses, termux-keyring"
 TERMUX_PKG_BUILD_DEPENDS="doxygen, asciidoc, nettle"
 TERMUX_PKG_GROUPS="base-devel"
@@ -25,6 +27,7 @@ termux_step_pre_configure() {
 	rm -f ./scripts/libmakepkg/executable/fakeroot.sh.in
 
 	sed -i "s/@TERMUX_ARCH@/${TERMUX_ARCH}/" ./etc/{pacman,makepkg}.conf.in
+	sed -i "s|_ps_prefix=.*|_ps_prefix=\"${TERMUX_PREFIX}\"|" ./pacman-switch-main/pacman-switch.sh
 }
 
 termux_step_post_configure() {
@@ -34,12 +37,11 @@ termux_step_post_configure() {
 termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/etc/pacman.d
 	install -m644 $TERMUX_PKG_BUILDER_DIR/serverlist $TERMUX_PREFIX/etc/pacman.d/serverlist
-}
+	install -m755 $TERMUX_PKG_SRCDIR/pacman-switch-main/pacman-switch.sh $TERMUX_PREFIX/bin/pacman-switch
 
-termux_step_create_debscripts() {
-	echo "#!$TERMUX_PREFIX/bin/bash" > postinst
-	echo "mkdir -p $TERMUX_PREFIX/var/lib/pacman/sync" >> postinst
-	echo "mkdir -p $TERMUX_PREFIX/var/lib/pacman/local" >> postinst
-	echo "mkdir -p $TERMUX_PREFIX/var/cache/pacman/pkg" >> postinst
-	chmod 755 postinst
+	for dir in var/lib/pacman/{sync,local,switch} var/cache/pacman/pkg share/pacman-switch; do
+		dir="${TERMUX_PREFIX}/${dir}"
+		mkdir -p ${dir}
+		touch ${dir}/.placeholder
+	done
 }
