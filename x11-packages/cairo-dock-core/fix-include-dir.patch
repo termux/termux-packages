@@ -1,0 +1,14 @@
+Prevents:
+ERROR: Package contains directory "$PREFIX/$PREFIX" (/data/data/com.termux/files/usr/data/data/com.termux/files/usr)
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -79,7 +79,7 @@ else()
+ 	set (libdir "${prefix}/${CMAKE_INSTALL_LIBDIR}")  # (...)/lib or (...)/lib64 or custom ## GNU Install dir
+ endif()
+ 
+-set (includedir "${prefix}/${CMAKE_INSTALL_INCLUDEDIR}")  # (...)/include
++set (includedir "${CMAKE_INSTALL_INCLUDEDIR}")  # (...)/include
+ set (bindir "${prefix}/${CMAKE_INSTALL_BINDIR}")  # (...)/bin
+ 
+ set (pluginsdir "${libdir}/cairo-dock")
