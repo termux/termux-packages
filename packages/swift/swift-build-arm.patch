@@ -1,0 +1,167 @@
+From 434d3a1ee5e666eec1437615ad328497662aa363
+From: Allan Shortlidge <shortlidge@apple.com>
+Date: Thu, 25 Sep 2025 22:34:25 -0700
+Subject: [PATCH] AST: Give `CustomAvailabilityDomain` 8 byte alignment.
+
+`AvailabilityDomain` is a pointer union over `CustomAvailabilityDomain` and an
+opaque pointer-like 24-bit value, which means the number of spare bits in an
+`AvailabilityDomain` representation is one fewer than a
+`CustomAvailabilityDomain` pointer. Other structures in the compiler rely on
+there being at least 2 spare bits in `AvailabilityDomain`, though, which was
+not the case when building for a 32 bit architecture. To ensure there are
+enough spare bits, always align `CustomAvailabilityDomain` to 8 bytes, the same
+as many AST data structures.
+
+diff --git a/swift/include/swift/AST/AvailabilityDomain.h b/swift/include/swift/AST/AvailabilityDomain.h
+index 7d5ecac7df03c..3c28bf0ba757e 100644
+--- a/swift/include/swift/AST/AvailabilityDomain.h
++++ b/swift/include/swift/AST/AvailabilityDomain.h
+@@ -22,6 +22,7 @@
+ #include "swift/AST/AvailabilityRange.h"
+ #include "swift/AST/Identifier.h"
+ #include "swift/AST/PlatformKind.h"
++#include "swift/AST/TypeAlignments.h"
+ #include "swift/Basic/Assertions.h"
+ #include "swift/Basic/LLVM.h"
+ #include "swift/Basic/SourceLoc.h"
+@@ -334,7 +335,8 @@ struct StableAvailabilityDomainComparator {
+ };
+ 
+ /// Represents an availability domain that has been defined in a module.
+-class CustomAvailabilityDomain : public llvm::FoldingSetNode {
++class alignas(1 << CustomAvailabilityDomainAlignInBits) CustomAvailabilityDomain
++    : public llvm::FoldingSetNode {
+ public:
+   enum class Kind {
+     /// A domain that is known to be enabled at compile time.
+diff --git a/swift/include/swift/AST/TypeAlignments.h b/swift/include/swift/AST/TypeAlignments.h
+index b4eb926d6a1e9..c9b5d49b8f78a 100644
+--- a/swift/include/swift/AST/TypeAlignments.h
++++ b/swift/include/swift/AST/TypeAlignments.h
+@@ -34,6 +34,7 @@ namespace swift {
+   class AttributeBase;
+   class BraceStmt;
+   class CaptureListExpr;
++  class CustomAvailabilityDomain;
+   class Decl;
+   class DeclContext;
+   class DifferentiableAttr;
+@@ -80,6 +81,7 @@ namespace swift {
+   constexpr size_t ASTContextAlignInBits = 2;
+   constexpr size_t TypeVariableAlignInBits = 4;
+   constexpr size_t StoredDefaultArgumentAlignInBits = 3;
++  constexpr size_t CustomAvailabilityDomainAlignInBits = 3;
+ 
+   // Well, this is the *minimum* pointer alignment; it's going to be 3 on
+   // 64-bit targets, but that doesn't matter.
+@@ -165,6 +167,9 @@ LLVM_DECLARE_TYPE_ALIGNMENT(swift::CaseLabelItem, swift::PatternAlignInBits)
+ LLVM_DECLARE_TYPE_ALIGNMENT(swift::StmtConditionElement,
+                             swift::PatternAlignInBits)
+ 
++LLVM_DECLARE_TYPE_ALIGNMENT(swift::CustomAvailabilityDomain,
++                            swift::CustomAvailabilityDomainAlignInBits)
++
+ static_assert(alignof(void*) >= 2, "pointer alignment is too small");
+ 
+ #endif
+diff --git a/swift/include/swift/Basic/Feature.h b/swift/include/swift/Basic/Feature.h
+index b05080bbf3a..ebec19d9e53 100644
+--- a/swift/include/swift/Basic/Feature.h
++++ b/swift/include/swift/Basic/Feature.h
+@@ -35,7 +35,9 @@ struct Feature {
+   constexpr Feature(unsigned inputKind) : kind(InnerKind(inputKind)) {}
+ 
+   constexpr operator InnerKind() const { return kind; }
++#if !defined(__arm__)
+   constexpr explicit operator unsigned() const { return unsigned(kind); }
++#endif
+   constexpr explicit operator size_t() const { return size_t(kind); }
+ 
+   static constexpr unsigned getNumFeatures() {
+diff --git a/swift-build/Sources/SWBUtil/FSProxy.swift b/swift-build/Sources/SWBUtil/FSProxy.swift
+index b446d21..f88f3c3 100644
+--- a/swift-build/Sources/SWBUtil/FSProxy.swift
++++ b/swift-build/Sources/SWBUtil/FSProxy.swift
+@@ -49,7 +49,7 @@ public struct FileInfo: Equatable, Sendable {
+         #if os(Windows)
+         return (statBuf.st_mode & UInt16(ucrt.S_IFREG)) != 0
+         #else
+-        return (statBuf.st_mode & S_IFREG) != 0
++        return (mode_t(statBuf.st_mode) & S_IFREG) != 0
+         #endif
+     }
+ 
+@@ -57,7 +57,7 @@ public struct FileInfo: Equatable, Sendable {
+         #if os(Windows)
+         return (statBuf.st_mode & UInt16(ucrt.S_IFDIR)) != 0
+         #else
+-        return (statBuf.st_mode & S_IFDIR) != 0
++        return (mode_t(statBuf.st_mode) & S_IFDIR) != 0
+         #endif
+     }
+ 
+@@ -65,7 +65,7 @@ public struct FileInfo: Equatable, Sendable {
+         #if os(Windows)
+         return (statBuf.st_mode & UInt16(S_IFLNK)) == S_IFLNK
+         #else
+-        return (statBuf.st_mode & S_IFMT) == S_IFLNK
++        return (mode_t(statBuf.st_mode) & S_IFMT) == S_IFLNK
+         #endif
+     }
+ 
+@@ -75,7 +75,7 @@ public struct FileInfo: Equatable, Sendable {
+         // Don't use FileManager.isExecutableFile due to https://github.com/swiftlang/swift-foundation/issues/860
+         return (statBuf.st_mode & UInt16(_S_IEXEC)) != 0
+         #else
+-        return (statBuf.st_mode & S_IXUSR) != 0
++        return (mode_t(statBuf.st_mode) & S_IXUSR) != 0
+         #endif
+     }
+ 
+@@ -1395,9 +1395,9 @@ public class PseudoFS: FSProxy, @unchecked Sendable {
+                 #else
+                 info.st_mtimespec = timespec(tv_sec: time_t(node.timestamp), tv_nsec: 0)
+                 #endif
+-                info.st_size = off_t(contents.bytes.count)
+-                info.st_dev = node.device
+-                info.st_ino = node.inode
++                info.st_size = numericCast(contents.bytes.count)
++                info.st_dev = numericCast(node.device)
++                info.st_ino = numericCast(node.inode)
+                 return createFileInfo(info)
+             case .directory(let dir):
+                 var info = stat()
+@@ -1405,12 +1405,12 @@ public class PseudoFS: FSProxy, @unchecked Sendable {
+                 info.st_mode = UInt16(ucrt.S_IFDIR)
+                 info.st_mtimespec = timespec(tv_sec: Int64(node.timestamp), tv_nsec: 0)
+                 #else
+-                info.st_mode = S_IFDIR
++                info.st_mode = numericCast(S_IFDIR)
+                 info.st_mtimespec = timespec(tv_sec: time_t(node.timestamp), tv_nsec: 0)
+                 #endif
+-                info.st_size = off_t(dir.contents.count)
+-                info.st_dev = node.device
+-                info.st_ino = node.inode
++                info.st_size = numericCast(dir.contents.count)
++                info.st_dev = numericCast(node.device)
++                info.st_ino = numericCast(node.inode)
+                 return createFileInfo(info)
+             case .symlink(_):
+                 var info = stat()
+@@ -1418,12 +1418,12 @@ public class PseudoFS: FSProxy, @unchecked Sendable {
+                 info.st_mode = UInt16(S_IFLNK)
+                 info.st_mtimespec = timespec(tv_sec: Int64(node.timestamp), tv_nsec: 0)
+                 #else
+-                info.st_mode = S_IFLNK
++                info.st_mode = numericCast(S_IFLNK)
+                 info.st_mtimespec = timespec(tv_sec: time_t(node.timestamp), tv_nsec: 0)
+                 #endif
+-                info.st_size = off_t(0)
+-                info.st_dev = node.device
+-                info.st_ino = node.inode
++                info.st_size = numericCast(0)
++                info.st_dev = numericCast(node.device)
++                info.st_ino = numericCast(node.inode)
+                 return createFileInfo(info)
+             }
+         }

@@ -8,9 +8,9 @@ index bd31bec..737c8c3 100755
              '-Xlinker', '-landroid-spawn',
 -            '-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/android',
 +            #'-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/android',
-             # SwiftPM will otherwise try to compile against GNU strerror_r on
-             # Android and fail.
-             '-Xswiftc', '-Xcc', '-Xswiftc', '-U_GNU_SOURCE',
+         ]
+     elif not build_os.startswith('macosx'):
+         # Library rpath for swift, dispatch, Foundation, etc. when installing
 diff --git a/swift/cmake/modules/AddPureSwift.cmake b/swift/cmake/modules/AddPureSwift.cmake
 index ee668f96903..61397d3910e 100644
 --- a/swift/cmake/modules/AddPureSwift.cmake
@@ -54,16 +54,14 @@ diff --git a/swift-corelibs-foundation/Sources/plutil/CMakeLists.txt b/swift-cor
 index b1c84350..35413f0b 100644
 --- a/swift-corelibs-foundation/Sources/plutil/CMakeLists.txt
 +++ b/swift-corelibs-foundation/Sources/plutil/CMakeLists.txt
-@@ -27,9 +27,9 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "Darwin|Windows")
+@@ -27,8 +27,8 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "Darwin|Windows")
  target_link_libraries(plutil PRIVATE
  	Foundation)
  
 -set_target_properties(plutil PROPERTIES
--	INSTALL_RPATH "$ORIGIN/../lib/swift/${SWIFT_SYSTEM_NAME}"
--    INSTALL_REMOVE_ENVIRONMENT_RPATH ON)
+-	INSTALL_RPATH "$ORIGIN/../lib/swift/${SWIFT_SYSTEM_NAME}")
 +# set_target_properties(plutil PROPERTIES
-+#	INSTALL_RPATH "$ORIGIN/../lib/swift/${SWIFT_SYSTEM_NAME}"
-+#    INSTALL_REMOVE_ENVIRONMENT_RPATH ON)
++#	INSTALL_RPATH "$ORIGIN/../lib/swift/${SWIFT_SYSTEM_NAME}")
  
  set_property(GLOBAL APPEND PROPERTY Foundation_EXPORTS plutil)
  install(TARGETS plutil
@@ -77,9 +75,9 @@ index ce6523d5..e8d63bdd 100755
          '-Xlinker', '-landroid-spawn',
 -        '-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/android',
 +        #'-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/android',
-         # SwiftPM will otherwise try to compile against GNU strerror_r on
-         # Android and fail.
-         '-Xswiftc', '-Xcc', '-Xswiftc', '-U_GNU_SOURCE',
+       ]
+     else:
+       # Library rpath for swift, dispatch, Foundation, etc. when installing
 diff --git a/swiftpm/Utilities/bootstrap b/swiftpm/Utilities/bootstrap
 index 92c368a86..e9d43b599 100755
 --- a/swiftpm/Utilities/bootstrap
