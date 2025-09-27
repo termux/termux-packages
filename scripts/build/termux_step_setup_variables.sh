@@ -178,6 +178,9 @@ termux_step_setup_variables() {
 	TERMUX_PKG_MESON_NATIVE=false
 	TERMUX_PKG_CMAKE_CROSSCOMPILING=true
 	TERMUX_PROOT_EXTRA_ENV_VARS="" # Extra environvent variables for proot command in termux_setup_proot
+	TERMUX_PKG_ICONS="" # Icon file(s) for this package (relative to the $TERMUX_PKG_SRCDIR)
+	TERMUX_PKG_ICON_NAMES="" # Icon names for this package
+	TERMUX_PKG_ICON_SIZES="16, 24, 32, 48, 64, 128, 256" # Default sizes to generate application icons for
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 	unset TERMUX_MESON_ENABLE_SOVERSION # setenv to enable SOVERSION suffix for shared libs built with Meson
