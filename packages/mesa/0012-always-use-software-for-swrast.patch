@@ -2,17 +2,17 @@ Fix assertion error when running `eglinfo -B`.
 
 --- a/src/egl/drivers/dri2/platform_x11.c
 +++ b/src/egl/drivers/dri2/platform_x11.c
-@@ -1859,7 +1859,11 @@
+@@ -1163,7 +1163,11 @@ platform_x11_finalize(_EGLDisplay *disp, bool force_zink)
     if (!dri2_create_screen(disp))
-       goto cleanup;
+       return false;
  
 +#ifdef __ANDROID__
 +   if (!dri2_setup_device(disp, true)) {
 +#else
-    if (!dri2_setup_device(disp, disp->Options.ForceSoftware || dri2_dpy->kopper_without_modifiers)) {
+    if (!dri2_setup_device(disp, disp->Options.ForceSoftware || force_zink)) {
 +#endif
        _eglError(EGL_NOT_INITIALIZED, "DRI2: failed to setup EGLDevice");
-       goto cleanup;
+       return false;
     }
 --- a/src/egl/drivers/dri2/platform_wayland.c
 +++ b/src/egl/drivers/dri2/platform_wayland.c
