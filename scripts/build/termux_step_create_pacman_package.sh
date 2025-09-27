@@ -52,6 +52,14 @@ termux_step_create_pacman_package() {
 		test ! -z "$TERMUX_PKG_SUGGESTS" && TERMUX_PKG_SUGGESTS=$(termux_package__add_prefix_glibc_to_package_list "$TERMUX_PKG_SUGGESTS")
 	fi
 
+	# Write installation hooks.
+	termux_step_create_debscripts
+	# Process `update-alternatives` entries from `.alternatives` files
+	# These need to be merged into the `.postinst` and `.prerm` files, so after those are created.
+	termux_step_update_alternatives
+	termux_step_create_python_debscripts
+	termux_step_create_pacman_install_hook
+
 	# Package metadata.
 	{
 		echo "pkgname = $TERMUX_PKG_NAME"
@@ -119,13 +127,6 @@ termux_step_create_pacman_package() {
 		echo "packager = $TERMUX_PKG_MAINTAINER"
 		echo "builddate = $SOURCE_DATE_EPOCH"
 	} > .BUILDINFO
-
-	# Write installation hooks.
-	termux_step_create_debscripts
-	# Process `update-alternatives` entries from `.alternatives` files
-	# These need to be merged into the `.postinst` and `.prerm` files, so after those are created.
-	termux_step_update_alternatives
-	termux_step_create_pacman_install_hook
 
 	# ensure all elements of the package have the same mtime
 	find . -exec touch -h -d @$SOURCE_DATE_EPOCH {} +
