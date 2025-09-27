@@ -1,18 +1,19 @@
 #!/bin/python3
 
-from functools import cache
 import logging
 import os
 import re
 import time
 from dataclasses import dataclass, field
 from enum import Enum
+from functools import cache
 from pathlib import Path
 from typing import Dict, List, Set, Tuple, TypeAlias
 
 logger = logging.getLogger(__name__)
 
-DEPENDENCY_VARS = ("TERMUX_PKG_DEPENDS", "TERMUX_PKG_BUILD_DEPENDS", "TERMUX_SUBPKG_DEPENDS")
+
+TERMUX_ARCH = (os.getenv("TERMUX_ARCH") or "aarch64").replace("x86_64", "x86-64")
 
 PackageName: TypeAlias = str
 Dependency: TypeAlias = PackageName
@@ -77,22 +78,24 @@ class BuildScriptParser:
         return not self.__parse_bool_variable("TERMUX_PKG_NO_STATICSPLIT")
 
     def subpackage_relation_with_parent(self) -> str:
-        m = re.search(r'^TERMUX_SUBPKG_DEPEND_ON_PARENT="?(true|false)"?$', self.content, re.MULTILINE)
+        m = re.search(r'^TERMUX_SUBPKG_DEPEND_ON_PARENT="?(true|false|deps|unversioned)"?$', self.content, re.MULTILINE)
         if m:
             return m.group(1)
         return "true"  # Default to having dependence on parent.
 
-    def get_dependencies(self) -> Set[Dependency | AlternativeDependency]:
+    def get_dependencies(self, build_mode: BuildMode) -> Set[Dependency | AlternativeDependency]:
         dependencies = []
 
-        for m in re.findall(r'^(%s)[+]?="(.*?)"$' % "|".join(DEPENDENCY_VARS), self.content, re.DOTALL | re.MULTILINE):
+        for m in re.findall(
+            # TERMUX_PKG_BUILD_DEPENDS should only list dependencies required at build time.
+            r'^(TERMUX_PKG_DEPENDS|TERMUX_SUBPKG_DEPENDS%s)[+]?="(.*?)"$'
+            % ("|TERMUX_PKG_BUILD_DEPENDS" if build_mode == BuildMode.OFFLINE else ""),
+            self.content,
+            re.DOTALL | re.MULTILINE,
+        ):
             _, ds = m  # m: (DEPENDENCY_VAR, dependency string)
 
-            arch = os.getenv("TERMUX_ARCH") or "aarch64"
-            if arch == "x86_64":
-                arch = "x86-64"
-
-            ds = re.sub(r"\${TERMUX_ARCH/_/-}", arch, ds)
+            ds = re.sub(r"\${TERMUX_ARCH/_/-}", TERMUX_ARCH, ds)
             ds = re.sub(r"\(.*\)", "", ds)
 
             for d in ds.split(","):
@@ -121,7 +124,10 @@ class BuildOrder:
                 package_info = BuildScriptParser(package_path / "build.sh")
 
                 package_name = package_path.name
-                dependencies = package_info.get_dependencies()
+                # For root package we are in OFFLINE mode as we are building it:
+                build_mode = BuildMode.OFFLINE if package_name == self.root_pkg else self.build_mode
+
+                dependencies = package_info.get_dependencies(build_mode)
 
                 if package_info.is_metapackage():
                     package_map[package_name] = Package(
@@ -130,8 +136,7 @@ class BuildOrder:
                     continue
 
                 # Note for self: See page 6 of your notebook.
-                # For root package we are always in OFFLINE mode as we are building it.
-                if self.build_mode == BuildMode.OFFLINE or package_name == self.root_pkg:
+                if build_mode == BuildMode.OFFLINE:
                     subpackages = []
 
                     # NOTE: When package_name == self.root_pkg, we do not need to add subpackges as
@@ -141,7 +146,7 @@ class BuildOrder:
                     for subpackage_path in package_path.glob("*.subpackage.sh"):
                         subpackage_name = subpackage_path.name.removesuffix(".subpackage.sh")
 
-                        dependencies.update(BuildScriptParser(subpackage_path).get_dependencies())
+                        dependencies.update(BuildScriptParser(subpackage_path).get_dependencies(build_mode))
                         subpackages.append(subpackage_name)
 
                         package_map[subpackage_name] = Package(
@@ -153,15 +158,17 @@ class BuildOrder:
 
                     # Remove all the subpackages (of this parent) that might be in it's dependency set.
                     dependencies.difference_update(subpackages)  # Note for self: See page 7 of your notebook.
-                    dependencies.discard(package_name)  # Some subpackages might have dependency on parent too.
+                    dependencies.discard(package_name)  # Some subpackages might explicitly list dependence on parent.
                 else:
                     for subpackage_path in package_path.glob("*.subpackage.sh"):
                         subpackage_name = subpackage_path.name.removesuffix(".subpackage.sh")
                         subpackage_info = BuildScriptParser(subpackage_path)
-                        subpackage_dependencies = subpackage_info.get_dependencies()
+                        subpackage_dependencies = subpackage_info.get_dependencies(build_mode)
 
+                        # See the following link to understand this behaviour:
+                        # https://github.com/termux/termux-packages/blob/abdfb2a00f7d2f2bdd6de42a1a085948c68c050c/scripts/build/termux_create_debian_subpackages.sh#L104
                         match subpackage_info.subpackage_relation_with_parent():
-                            case "true" | "unversioned":
+                            case "true" | "unversioned" if subpackage_name not in dependencies:
                                 subpackage_dependencies.add(package_name)
                             case "deps":
                                 subpackage_dependencies.update(dependencies)
@@ -211,6 +218,7 @@ class BuildOrder:
                     # resolved: dotnet8.0 -> dotnet8.0 | dotnet9.0
                     # Since, dotnet8.0 is in resolved AlternativeDependency, dotnet-host is built "out of" dotnet8.0.
                     # Hence, we skip.
+                    logger.debug("Resloving '%s' ==> %s", dep, resolve(dep))
                     sanitized_deps.extend(
                         d
                         for d in resolve(dep)
@@ -250,7 +258,7 @@ class BuildOrder:
 
                 stack.append((node, True))  # Backtracking.
                 path.append(node)
-
+                logger.debug("'%s' depends upon: %s", package.name, package.dependencies)
                 for dep in package.dependencies:
                     if isinstance(dep, AlternativeDependency):
                         dep = next(iter(visited.intersection(dep.options)), dep.default)
