@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://fishshell.com/
 TERMUX_PKG_DESCRIPTION="The user-friendly command line shell"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.0.8"
+TERMUX_PKG_VERSION="4.1.0"
 TERMUX_PKG_SRCURL=https://github.com/fish-shell/fish-shell/releases/download/$TERMUX_PKG_VERSION/fish-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=7f779d13aa55d2fa3afc17364c61ab9edc16faa1eac5851badeffb4e73692240
+TERMUX_PKG_SHA256=07a76c67e161b9edc772e6f1d66ebead85d7056e86631d61577f9f9a529c4d9c
 TERMUX_PKG_AUTO_UPDATE=true
 # fish calls 'tput' from ncurses-utils, at least when cancelling (Ctrl+C) a command line.
 # man is needed since fish calls apropos during command completion.
@@ -25,6 +25,8 @@ termux_step_pre_configure() {
 	# FindRust.cmake auto pick thumbv7neon-linux-androideabi
 	[[ "${TERMUX_ARCH}" == "arm" ]] && TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_ANDROID_ARM_MODE=ON"
 
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DRust_CARGO_TARGET=$CARGO_TARGET_NAME"
+
 	# older than Android 8 dont have ctermid
 	"${CC}" ${CPPFLAGS} ${CFLAGS} -c ${TERMUX_PKG_BUILDER_DIR}/ctermid.c
 	"${AR}" cru libctermid.a ctermid.o
@@ -41,8 +43,5 @@ termux_step_post_make_install() {
 	function __fish_command_not_found_handler --on-event fish_command_not_found
 		$TERMUX_PREFIX/libexec/termux/command-not-found \$argv[1]
 	end
-
-	# TODO: remove when https://github.com/termux/termux-app/pull/4417 gets released
-	status test-feature keyboard-protocols && set -U fish_features no-keyboard-protocols
 	EOF
 }
