@@ -116,6 +116,15 @@ termux_step_configure() {
 		termux_error_exit "Unsupported arch '$TERMUX_ARCH'"
 	fi
 
+	# V8 uses a lot of inlining for optimization results.
+	# Although those optimizations are very much desired, during debugging it can
+	# cause problems as it prevents debuggers from hooking in properly at all code
+	# paths
+	if [ "${TERMUX_DEBUG_BUILD}" = "true" ]; then
+		CFLAGS+=" -fno-inline"
+		CXXFLAGS+=" -fno-inline"
+	fi
+
 	export GYP_DEFINES="host_os=linux"
 	if [ "$TERMUX_ARCH_BITS" = "64" ]; then
 		export CC_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project-build/bin/clang"
