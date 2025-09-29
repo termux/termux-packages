@@ -1,6 +1,17 @@
 --- a/scripts/make-config.sh
 +++ b/scripts/make-config.sh
-@@ -601,7 +601,7 @@
+@@ -475,7 +475,9 @@
+ [[ -z $GCC ]] && GCC=gcc
+ 
+ # The strip command tries to remove global symbols on macOS.
+-[[ -n $MACOS ]] && STRIP="strip -x" || STRIP="strip"
++if [[ -z $STRIP ]]; then
++    [[ -n $MACOS ]] && STRIP="strip -x" || STRIP="strip"
++fi
+ 
+ # Define compilation flags for 32-bit cross-compilation.
+ if [[ -n $M32 ]]; then
+@@ -602,7 +604,7 @@
  [[ -z $MACOS ]] && LDFLAGS_PTHREAD="-pthread"
  
  # External libraries
