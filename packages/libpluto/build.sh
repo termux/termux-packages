@@ -2,15 +2,30 @@ TERMUX_PKG_HOMEPAGE=https://plutolang.github.io/
 TERMUX_PKG_DESCRIPTION="Shared library for the Pluto interpreter"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Komo @mbekkomo"
-TERMUX_PKG_VERSION="0.11.3"
-TERMUX_PKG_SRCURL=https://github.com/PlutoLang/Pluto/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=daf8be6d757c4512410e290a2a9a6fddeeeb9613e6cfa657a9c17171c2349d5e
+TERMUX_PKG_VERSION="0.12.1"
+TERMUX_PKG_SRCURL="https://github.com/PlutoLang/Pluto/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=fd122cb51d87cf00c8b5a02662fa886c42bac52a64513d357d4164f36084eeec
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++"
-TERMUX_PKG_BUILD_DEPENDS="readline"
+TERMUX_PKG_BUILD_DEPENDS="dos2unix, readline"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_BREAKS="plutolang (<< 0.9.4-1)"
 TERMUX_PKG_REPLACES="plutolang (<< 0.9.4-1)"
+
+termux_step_post_get_source() {
+	# robertkirkman: CRLF drives me absolutely up the wall, sorry I can't work with it.
+	# if another libpluto maintainer prefers CRLF, please feel free to redo everything I do in CRLF instead.
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
+		DOS2UNIX="$TERMUX_PKG_TMPDIR/dos2unix"
+		(. "$TERMUX_SCRIPTDIR/packages/dos2unix/build.sh"; TERMUX_PKG_SRCDIR="$DOS2UNIX" termux_step_get_source)
+		pushd "$DOS2UNIX"
+		make dos2unix
+		popd # DOS2UNIX
+		export PATH="$DOS2UNIX:$PATH"
+	fi
+
+	find "$TERMUX_PKG_SRCDIR" -type f -print0 | xargs -0 dos2unix
+}
 
 termux_step_configure() {
 	# can't use php version from termux repo, there's no build for the latest version on the pre-built binaries
