@@ -1,0 +1,13 @@
+# Fix include directory with $PREFIX/$PREFIX paths
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -83,7 +83,7 @@
+ 	set (libdir "${prefix}/${CMAKE_INSTALL_LIBDIR}")  # (...)/lib or (...)/lib64 or custom ## GNU Install dir
+ endif()
+ 
+-set (includedir "${prefix}/${CMAKE_INSTALL_INCLUDEDIR}")  # (...)/include
++set (includedir "${CMAKE_INSTALL_INCLUDEDIR}")  # (...)/include
+ set (bindir "${prefix}/${CMAKE_INSTALL_BINDIR}")  # (...)/bin
+ 
+ if (NOT DEFINED plugins-prefix)
