@@ -2,20 +2,22 @@ TERMUX_PKG_HOMEPAGE=https://deno.land/
 TERMUX_PKG_DESCRIPTION="A modern runtime for JavaScript and TypeScript"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION=1:2.4.5
+TERMUX_PKG_VERSION=1:2.5.2
 TERMUX_PKG_SRCURL=(
 	https://github.com/denoland/deno/releases/download/v${TERMUX_PKG_VERSION:2}/deno_src.tar.gz
 	https://github.com/termux/deno-snapshot/releases/download/v${TERMUX_PKG_VERSION:2}/deno-snapshot-aarch64-linux-android-${TERMUX_PKG_VERSION:2}.tar.bz2
 	https://github.com/termux/deno-snapshot/releases/download/v${TERMUX_PKG_VERSION:2}/deno-snapshot-x86_64-linux-android-${TERMUX_PKG_VERSION:2}.tar.bz2
 )
 TERMUX_PKG_SHA256=(
-	a6bba626d08813c114bfcc862e69fd7202eecda97df9f349abf6cc4e38fe4e40
-	fc72ed6b6669a1f8ded531c00994a61e88046c41679237a8520963ee23787409
-	43b0ba6654b7a4d212c6690c56564578a07c01a17085852f2f635d73df663ba7
+	44e9db8c52da72fed0ef8f990ab7ba3435562942752b5eafe845ff31bb643438
+	974d4b62b69cfb8afa4c272def434db0ecb5c1b418d39b6210fa80235f24dd6d
+	5e9be33412947b80cf6bd35ab49476ba75fc6f40dd0eec037e65f7f0da8040bc
 )
 TERMUX_PKG_DEPENDS="libandroid-stub, libffi, libsqlite, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
 # See https://github.com/denoland/deno/issues/2295#issuecomment-2329248010
@@ -88,7 +90,7 @@ __fetch_rusty_v8() {
 		git reset --hard FETCH_HEAD
 		git submodule update --init --recursive --depth=1
 		local f
-		for f in $(find "$TERMUX_PKG_BUILDER_DIR/jumbo-patches" -maxdepth 1 -type f -name *.patch | sort); do
+		for f in $(find "$TERMUX_PKG_BUILDER_DIR/v8-patches" -maxdepth 1 -type f -name *.patch | sort); do
 			echo "Applying patch: $(basename $f)"
 			patch --silent -p1 < "$f"
 		done
@@ -108,8 +110,7 @@ __build_rusty_v8() {
 	termux_setup_gn
 
 	export EXTRA_GN_ARGS="
-android32_ndk_api_level=$TERMUX_PKG_API_LEVEL
-android64_ndk_api_level=$TERMUX_PKG_API_LEVEL
+android_ndk_api_level=$TERMUX_PKG_API_LEVEL
 android_ndk_root=\"$NDK\"
 android_ndk_version=\"$TERMUX_NDK_VERSION\"
 use_jumbo_build=true
@@ -137,7 +138,7 @@ use_jumbo_build=true
 
 	export V8_FROM_SOURCE=1
 	# TODO: How to track the output of v8's build.rs without passing `-vv`
-	cargo build --jobs "${TERMUX_PKG_MAKE_PROCESSES}" --target "${CARGO_TARGET_NAME}" --release
+	cargo build --jobs "${TERMUX_PKG_MAKE_PROCESSES}" --target "${CARGO_TARGET_NAME}" --release -vv
 
 	unset BINDGEN_EXTRA_CLANG_ARGS "$env_name" V8_FROM_SOURCE
 	touch "$__SRC_DIR"/.built
