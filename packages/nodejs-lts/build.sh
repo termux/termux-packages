@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environme
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
 # Also update version in termux_setup_nodejs.sh when updating this package
-TERMUX_PKG_VERSION=22.19.0
+TERMUX_PKG_VERSION=22.20.0
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=0272acfce50ce9ad060288321b1092719a7f19966f81419835410c59c09daa46
+TERMUX_PKG_SHA256=ff7a6a6e8a1312af5875e40058351c4f890d28ab64c32f12b2cc199afa22002d
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.

@@ -1,5 +1,5 @@
---- ./node.gyp.orig	2025-06-30 11:45:46.481731200 +0530
-+++ ./node.gyp	2025-06-30 11:46:18.584529059 +0530
+--- ./node.gyp.orig	2025-09-24 09:42:13.000000000 +0530
++++ ./node.gyp	2025-10-03 01:23:56.943768812 +0530
 @@ -543,7 +543,8 @@
        ],
  
@@ -10,7 +10,7 @@
        ],
  
        'dependencies': [
-@@ -1037,303 +1038,6 @@
+@@ -1037,314 +1038,6 @@
          },
        ],
      }, # node_lib_target_name
@@ -63,7 +63,6 @@
 -      'dependencies': [
 -        '<(node_lib_target_name)',
 -        'deps/histogram/histogram.gyp:histogram',
--        'deps/uvwasi/uvwasi.gyp:uvwasi',
 -      ],
 -      'includes': [
 -        'node.gypi'
@@ -74,7 +73,6 @@
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
--        'deps/uvwasi/include',
 -        'test/cctest',
 -      ],
 -      'defines': [
@@ -87,6 +85,10 @@
 -        'test/fuzzers/fuzz_ClientHelloParser.cc',
 -      ],
 -      'conditions': [
+-        [ 'node_shared_uvwasi=="false"', {
+-          'dependencies': [ 'deps/uvwasi/uvwasi.gyp:uvwasi' ],
+-          'include_dirs': [ 'deps/uvwasi/include' ],
+-        }],
 -        ['OS=="linux" or OS=="openharmony"', {
 -          'ldflags': [ '-fsanitize=fuzzer' ]
 -        }],
@@ -107,7 +109,6 @@
 -        '<(node_lib_target_name)',
 -        'deps/googletest/googletest.gyp:gtest_prod',
 -        'deps/histogram/histogram.gyp:histogram',
--        'deps/uvwasi/uvwasi.gyp:uvwasi',
 -        'deps/nbytes/nbytes.gyp:nbytes',
 -      ],
 -      'includes': [
@@ -119,7 +120,6 @@
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
--        'deps/uvwasi/include',
 -        'test/cctest',
 -      ],
 -      'defines': [
@@ -132,6 +132,10 @@
 -        'test/fuzzers/fuzz_strings.cc',
 -      ],
 -      'conditions': [
+-        [ 'node_shared_uvwasi=="false"', {
+-          'dependencies': [ 'deps/uvwasi/uvwasi.gyp:uvwasi' ],
+-          'include_dirs': [ 'deps/uvwasi/include' ],
+-        }],
 -        ['OS=="linux" or OS=="openharmony"', {
 -          'ldflags': [ '-fsanitize=fuzzer' ]
 -        }],
@@ -311,10 +315,17 @@
 -        }],
 -      ]
 -    }, # overlapped-checker
+-    {
+-      'target_name': 'nop',
+-      'type': 'executable',
+-      'sources': [
+-        'test/nop/nop.c',
+-      ]
+-    }, # nop
      {
        'target_name': 'node_js2c',
        'type': 'executable',
-@@ -1370,70 +1074,6 @@
+@@ -1381,70 +1074,6 @@
          }],
        ]
      },
