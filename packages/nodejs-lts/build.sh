@@ -113,14 +113,18 @@ termux_step_configure() {
 		termux_error_exit "Unsupported arch '$TERMUX_ARCH'"
 	fi
 
+	# Do not enable by default as it has severe performance degradations.
+	# Causes upto 10x performance degradations
+	#
 	# V8 uses a lot of inlining for optimization results.
 	# Although those optimizations are very much desired, during debugging it can
 	# cause problems as it prevents debuggers from hooking in properly at all code
 	# paths
-	if [ "${TERMUX_DEBUG_BUILD}" = "true" ]; then
-		CFLAGS+=" -fno-inline"
-		CXXFLAGS+=" -fno-inline"
-	fi
+	#
+	# if [ "${TERMUX_DEBUG_BUILD}" = "true" ]; then
+	# 	CFLAGS+=" -fno-inline"
+	# 	CXXFLAGS+=" -fno-inline"
+	# fi
 
 	export GYP_DEFINES="host_os=linux"
 	if [ "$TERMUX_ARCH_BITS" = "64" ]; then
