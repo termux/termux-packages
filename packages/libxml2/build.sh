@@ -1,27 +1,48 @@
-TERMUX_PKG_HOMEPAGE=http://www.xmlsoft.org
+TERMUX_PKG_HOMEPAGE=https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
 TERMUX_PKG_DESCRIPTION="Library for parsing XML documents"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.14.6"
+TERMUX_PKG_VERSION="2.15.0"
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/libxml2/${TERMUX_PKG_VERSION%.*}/libxml2-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=7ce458a0affeb83f0b55f1f4f9e0e55735dbfc1a9de124ee86fb4a66b597203a
+TERMUX_PKG_SHA256=5abc766497c5b1d6d99231f662e30c99402a90d03b06c67b62d6c1179dedd561
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SETUP_PYTHON=true
+# disabled due to compiler warnings
+#	-Dthread-alloc=enabled
+#	-Dtls=enabled
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
---with-http
---with-legacy
---with-python
+	-Ddocs=enabled
+	-Dhttp=enabled
+	-Dicu=enabled
+	-Dlegacy=enabled
 "
-TERMUX_PKG_RM_AFTER_INSTALL="share/gtk-doc"
-TERMUX_PKG_DEPENDS="libiconv, liblzma, zlib"
-TERMUX_PKG_BUILD_DEPENDS="python"
+# Python bindings
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
+	-Dpython=enabled
+"
+# `xmllint` history support
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
+	-Dhistory=enabled
+	-Dreadline=enabled
+"
+TERMUX_PKG_RM_AFTER_INSTALL="
+share/doc/libxml2/html
+share/doc/libxml2/xmlcatalog.html
+share/doc/libxml2/xmllint.html
+"
+TERMUX_PKG_DEPENDS="libiconv, libicu, zlib"
+TERMUX_PKG_BUILD_DEPENDS="python, readline"
 TERMUX_PKG_BREAKS="libxml2-dev"
 TERMUX_PKG_REPLACES="libxml2-dev"
 
-termux_step_pre_configure() {
-	# SOVERSION suffix is needed for SONAME of shared libs to avoid conflict
-	# with system ones (in /system/lib64 or /system/lib):
-	sed -i 's/^\(linux\*android\)\*)/\1-notermux)/' configure
+termux_step_configure() {
+	# This directory is usually made by doxygen
+	# and python/generator.py expects it to be there.
+	mkdir -p "$TERMUX_PKG_BUILDDIR/python/doc/xml"
+	# # SOVERSION suffix is needed for SONAME of shared libs to avoid conflict
+	# # with system ones (in /system/lib64 or /system/lib):
+	export TERMUX_MESON_ENABLE_SOVERSION=1
+	termux_step_configure_meson
 }
 
 termux_step_post_massage() {
@@ -30,6 +51,8 @@ termux_step_post_massage() {
 		termux_error_exit "SONAME for libxml2.so is not properly set."
 	fi
 
+	# If this has been bumped, remember to rebuild all reverse dependencies of libxml2!
+	# `./scripts/bin/revbump --dependencies libxml2` can find them for you.
 	local _SOVERSION=16
 	if [[ ! -e "lib/libxml2.so.${_SOVERSION}" ]]; then
 		echo "ERROR - Expected: lib/libxml2.so.${_SOVERSION}" >&2

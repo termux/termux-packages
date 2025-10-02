@@ -1,0 +1,28 @@
+From dc307e31fd1343934a66fabe3ba4b42f34ac63c0 Mon Sep 17 00:00:00 2001
+From: Nick Wellnhofer <wellnhofer@aevum.de>
+Date: Wed, 17 Sep 2025 11:10:51 +0200
+Subject: [PATCH] meson: Fix install dir of man pages
+
+Regressed when reworking documentation in 2.15.
+
+Fixes #985.
+---
+ doc/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/doc/meson.build b/doc/meson.build
+index 018b7d037..8cde254a9 100644
+--- a/doc/meson.build
++++ b/doc/meson.build
+@@ -31,7 +31,7 @@ if want_docs
+ 
+     xsltproc = find_program('xsltproc')
+     types = [
+-        [ 'manpages', '.1',    dir_man ],
++        [ 'manpages', '.1',    dir_man / 'man1' ],
+         [ 'html',     '.html', dir_doc ],
+     ]
+     programs = [ 'xmllint' ]
+-- 
+GitLab
+
