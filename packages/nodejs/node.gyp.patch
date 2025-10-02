@@ -1,6 +1,6 @@
---- ./node.gyp.orig	2025-06-10 09:31:14.066774171 +0530
-+++ ./node.gyp	2025-06-10 14:33:02.935820287 +0530
-@@ -538,7 +538,8 @@
+--- ./node.gyp.orig	2025-09-25 20:13:15.000000000 +0530
++++ ./node.gyp	2025-09-29 10:45:45.364950564 +0530
+@@ -548,7 +548,8 @@
        ],
  
        'sources': [
@@ -10,7 +10,7 @@
        ],
  
        'dependencies': [
-@@ -1035,303 +1036,7 @@
+@@ -1045,314 +1046,6 @@
          },
        ],
      }, # node_lib_target_name
@@ -33,7 +33,7 @@
 -        'deps/uv/include',
 -        'test/cctest',
 -      ],
- 
+-
 -      'defines': [
 -        'NODE_ARCH="<(target_arch)"',
 -        'NODE_PLATFORM="<(OS)"',
@@ -63,7 +63,6 @@
 -      'dependencies': [
 -        '<(node_lib_target_name)',
 -        'deps/histogram/histogram.gyp:histogram',
--        'deps/uvwasi/uvwasi.gyp:uvwasi',
 -      ],
 -      'includes': [
 -        'node.gypi'
@@ -74,7 +73,6 @@
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
--        'deps/uvwasi/include',
 -        'test/cctest',
 -      ],
 -      'defines': [
@@ -87,6 +85,10 @@
 -        'test/fuzzers/fuzz_ClientHelloParser.cc',
 -      ],
 -      'conditions': [
+-        [ 'node_shared_uvwasi=="false"', {
+-          'dependencies': [ 'deps/uvwasi/uvwasi.gyp:uvwasi' ],
+-          'include_dirs': [ 'deps/uvwasi/include' ],
+-        }],
 -        ['OS=="linux" or OS=="openharmony"', {
 -          'ldflags': [ '-fsanitize=fuzzer' ]
 -        }],
@@ -107,7 +109,6 @@
 -        '<(node_lib_target_name)',
 -        'deps/googletest/googletest.gyp:gtest_prod',
 -        'deps/histogram/histogram.gyp:histogram',
--        'deps/uvwasi/uvwasi.gyp:uvwasi',
 -        'deps/nbytes/nbytes.gyp:nbytes',
 -      ],
 -      'includes': [
@@ -119,7 +120,6 @@
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
--        'deps/uvwasi/include',
 -        'test/cctest',
 -      ],
 -      'defines': [
@@ -132,6 +132,10 @@
 -        'test/fuzzers/fuzz_strings.cc',
 -      ],
 -      'conditions': [
+-        [ 'node_shared_uvwasi=="false"', {
+-          'dependencies': [ 'deps/uvwasi/uvwasi.gyp:uvwasi' ],
+-          'include_dirs': [ 'deps/uvwasi/include' ],
+-        }],
 -        ['OS=="linux" or OS=="openharmony"', {
 -          'ldflags': [ '-fsanitize=fuzzer' ]
 -        }],
@@ -311,10 +315,17 @@
 -        }],
 -      ]
 -    }, # overlapped-checker
+-    {
+-      'target_name': 'nop',
+-      'type': 'executable',
+-      'sources': [
+-        'test/nop/nop.c',
+-      ]
+-    }, # nop
      {
        'target_name': 'node_js2c',
        'type': 'executable',
-@@ -1368,76 +1073,6 @@
+@@ -1389,76 +1082,6 @@
          }],
        ]
      },
