@@ -1,0 +1,21 @@
+diff --git a/doc/meson.build b/doc/meson.build
+index 018b7d03..327aab3e 100644
+--- a/doc/meson.build
++++ b/doc/meson.build
+@@ -1,6 +1,6 @@
+ # Doxygen
+ 
+-doxygen = find_program('doxygen')
++doxygen = find_program('true')
+ 
+ # TODO: To make the xml directory work as dependency of the
+ # Python target, we must make sure that its timestamp changes
+@@ -18,7 +18,7 @@ doxygen_docs = custom_target(
+         'SOURCE_ROOT': meson.project_source_root() + '/',
+         'BUILD_ROOT':  meson.project_build_root()  + '/',
+     },
+-    install: true,
++    install: false,
+     install_dir: [ want_docs ? dir_doc : false, false ],
+ )
+ 
