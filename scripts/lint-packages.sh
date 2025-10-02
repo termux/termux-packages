@@ -127,9 +127,19 @@ check_indentation() {
 # - Modify TERMUX_PKG_VERSION
 # - Or specify one of the CI skip tags
 check_version_change() {
-	local base_commit commit_diff package="$1"
-	base_commit="$(git merge-base 'master@{upstream}' 'HEAD')"
-	commit_diff="$(git log --patch "${base_commit}.." -- "$package")"
+	local base_commit commit_diff package_dir="${1%/*}"
+	base_commit="$(< "$TERMUX_SCRIPTDIR/.git/refs/remotes/origin/master")"
+
+	[[ -z "$base_commit" ]] && {
+		echo
+		echo
+		echo "Couldn't determine base commit of branch."
+		echo "This shouldn't be able to happen..."
+		ls -AR "$TERMUX_SCRIPTDIR/.git/refs"
+		exit 1
+	} >&2
+
+	commit_diff="$(git log --patch "${base_commit}.." -- "$package_dir")"
 
 	# If the diff is empty there's no commit modifying that package on this branch, which is a PASS.
 	[[ -z "$commit_diff" ]] && return
@@ -240,7 +250,7 @@ lint_package() {
 		echo
 		echo "Version of '$package_name' has not changed."
 		echo "Either 'TERMUX_PKG_REVISION' or 'TERMUX_PKG_VERSION'"
-		echo "need to be modified when changing a package build."
+		echo "need to be modified in the build.sh when changing a package build."
 		echo "Alternatively you can add '[no version check]'."
 		echo "To the commit message to skip this check."
 		echo
