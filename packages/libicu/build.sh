@@ -30,6 +30,6 @@ termux_step_post_get_source() {
 termux_step_post_massage() {
 	local _GUARD_FILE="lib/libicuuc.so.77"
 	if [ ! -e "${_GUARD_FILE}" ]; then
-		termux_error_exit "Error: file ${_GUARD_FILE} not found."
+		termux_error_exit "file ${_GUARD_FILE} not found."
 	fi
 }

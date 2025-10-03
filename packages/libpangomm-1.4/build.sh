@@ -11,6 +11,6 @@ TERMUX_PKG_DEPENDS="glib, libc++, libcairomm-1.0, libglibmm-2.4, libsigc++-2.0, 
 termux_step_post_massage() {
 	local _GUARD_FILE="lib/${TERMUX_PKG_NAME}.so"
 	if [ ! -e "${_GUARD_FILE}" ]; then
-		termux_error_exit "Error: file ${_GUARD_FILE} not found."
+		termux_error_exit "file ${_GUARD_FILE} not found."
 	fi
 }

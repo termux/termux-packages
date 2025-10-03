@@ -68,7 +68,7 @@ termux_gitlab_api_get_tag() {
 		if jq --exit-status --raw-output "${jq_filter}" <<<"${response}" >/dev/null; then
 			tag_name="$(jq --exit-status --raw-output "${jq_filter}" <<<"${response}")"
 		else
-			termux_error_exit "ERROR: Failed to parse tag name from: '${response}'"
+			termux_error_exit "Failed to parse tag name from: '${response}'"
 		fi
 	elif [[ "${http_code}" == "404" ]]; then
 		if jq --exit-status "has(\"message\") and .message == \"Not Found\"" <<<"${response}"; then

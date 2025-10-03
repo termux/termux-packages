@@ -29,6 +29,6 @@ termux_step_post_massage() {
 	# after SOVERSION is changed.
 	local _GUARD_FILE="lib/libgedit-gfls-1.so.0"
 	if [ ! -e "${_GUARD_FILE}" ]; then
-		termux_error_exit "Error: file ${_GUARD_FILE} not found."
+		termux_error_exit "file ${_GUARD_FILE} not found."
 	fi
 }

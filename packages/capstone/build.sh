@@ -15,7 +15,7 @@ termux_pkg_auto_update() {
 	latest_version="$(termux_github_api_get_tag "$TERMUX_PKG_SRCURL")"
 
 	if [[ -z "$latest_version" ]]; then
-		termux_error_exit "ERROR: Failed to get latest version."
+		termux_error_exit "Failed to get latest version."
 	fi
 
 	if [[ "$latest_version" =~ ^[0-9]+(\.[0-9]+)+$ ]]; then

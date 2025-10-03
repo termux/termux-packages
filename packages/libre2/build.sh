@@ -17,6 +17,6 @@ termux_step_post_get_source() {
 
 	local v=$(sed -E -n 's/^SONAME=([0-9]+)$/\1/p' Makefile)
 	if [ "${_SOVERSION}" != "${v}" ]; then
-		termux_error_exit "Error: SOVERSION guard check failed."
+		termux_error_exit "SOVERSION guard check failed."
 	fi
 }

@@ -26,7 +26,7 @@ termux_step_post_massage() {
 	local f
 	for f in ${_GUARD_FILES}; do
 		if [ ! -e "${f}" ]; then
-			termux_error_exit "Error: file ${f} not found."
+			termux_error_exit "file ${f} not found."
 		fi
 	done
 }

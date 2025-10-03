@@ -9,7 +9,7 @@ termux_github_api_get_tag() {
 
 	if [[ -z "${GITHUB_TOKEN:-}" ]]; then
 		# Needed to use graphql API.
-		termux_error_exit "ERROR: GITHUB_TOKEN environment variable not set."
+		termux_error_exit "GITHUB_TOKEN environment variable not set."
 	fi
 
 	local PKG_SRCURL="$1"
@@ -106,16 +106,16 @@ termux_github_api_get_tag() {
 				tag_name="$(jq --exit-status --raw-output "${jq_filter}" <<<"${response}" \
 					| sed 's/^v//' | grep -P "${FILTER_REGEX}" | head -n 1)"
 				if [[ -z "${tag_name}" ]]; then
-					termux_error_exit "ERROR: No tags matched regex '${FILTER_REGEX}' in '${response}'"
+					termux_error_exit "No tags matched regex '${FILTER_REGEX}' in '${response}'"
 				fi
 			else
-				termux_error_exit "ERROR: Failed to parse tag name from: '${response}'"
+				termux_error_exit "Failed to parse tag name from: '${response}'"
 			fi
 		else
 			if jq --exit-status --raw-output "${jq_filter}" <<<"${response}" >/dev/null; then
 				tag_name="$(jq --exit-status --raw-output "${jq_filter}" <<<"${response}")"
 			else
-				termux_error_exit "ERROR: Failed to parse tag name from: '${response}'"
+				termux_error_exit "Failed to parse tag name from: '${response}'"
 			fi
 		fi
 	elif [[ "${http_code}" == "404" ]]; then
