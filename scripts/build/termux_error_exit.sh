@@ -1,4 +1,9 @@
+# shellcheck shell=bash
 termux_error_exit() {
-	echo -e "ERROR: $*" 1>&2
+	if (( $# )); then
+		printf 'ERROR: %s\n' "$*"
+	else # Read from stdin.
+		printf '%s\n' "$(cat -)"
+	fi
 	exit 1
-}
+} >&2

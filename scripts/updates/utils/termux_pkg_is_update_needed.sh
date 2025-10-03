@@ -26,8 +26,9 @@ termux_pkg_is_update_needed() {
 
 # Make it also usable as command line tool. `scripts/bin/apt-compare-versions` is symlinked to this file.
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+	# shellcheck source=scripts/build/termux_error_exit.sh
 	declare -f termux_error_exit >/dev/null ||
-		. "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/termux_error_exit.sh" # realpath is used to resolve symlinks.
+		. "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/../../build/termux_error_exit.sh" # realpath is used to resolve symlinks.
 
 	if [[ "${1}" == "--help" ]]; then
 		cat <<-EOF
