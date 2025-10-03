@@ -7,7 +7,7 @@ termux_gitlab_auto_update() {
 			"${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE}" "${TERMUX_GITLAB_API_HOST}"
 	)"
 	if [[ -z "${latest_tag}" ]]; then
-		termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
+		termux_error_exit "Unable to get tag from ${TERMUX_PKG_SRCURL}"
 	fi
 	termux_pkg_upgrade_version "${latest_tag}"
 }

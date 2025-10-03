@@ -28,6 +28,6 @@ termux_step_pre_configure() {
 termux_step_post_massage() {
 	local _GUARD_FILE="lib/libgtksourceview-5.so"
 	if [ ! -e "${_GUARD_FILE}" ]; then
-		termux_error_exit "Error: file ${_GUARD_FILE} not found."
+		termux_error_exit "file ${_GUARD_FILE} not found."
 	fi
 }

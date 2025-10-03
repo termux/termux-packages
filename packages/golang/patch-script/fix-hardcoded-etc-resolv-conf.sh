@@ -1,6 +1,6 @@
 for f in src/net/conf_android.go src/net/dnsclient_android.go; do
 	if [ -e "${f}" ]; then
-		termux_error_exit "Error: file ${f} already exists."
+		termux_error_exit "file ${f} already exists."
 	fi
 done
 

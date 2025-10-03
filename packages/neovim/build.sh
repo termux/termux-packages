@@ -51,13 +51,13 @@ termux_step_host_build() {
 	export TERMUX_ORIGINAL_CMAKE="$TERMUX_ORIGINAL_CMAKE.orig"
 
 	mkdir -p "$TERMUX_PKG_HOSTBUILD_DIR/deps"
-	cd "$TERMUX_PKG_HOSTBUILD_DIR/deps" || termux_error_exit "Error: failed to perform host build for nvim"
+	cd "$TERMUX_PKG_HOSTBUILD_DIR/deps" || termux_error_exit "failed to perform host build for nvim"
 	cmake "$TERMUX_PKG_SRCDIR/cmake.deps"
 
 	make -j 1 \
 		|| (_patch_luv "$TERMUX_PKG_HOSTBUILD_DIR/deps" && make -j 1)
 
-	cd "$TERMUX_PKG_SRCDIR" || termux_error_exit "Error: failed to perform host build for nvim"
+	cd "$TERMUX_PKG_SRCDIR" || termux_error_exit "failed to perform host build for nvim"
 
 	make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install ||
 		(_patch_luv "$TERMUX_PKG_SRCDIR/.deps" && make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install)
@@ -69,7 +69,7 @@ termux_step_host_build() {
 	make distclean
 	rm -Rf build/
 
-	cd "$TERMUX_PKG_HOSTBUILD_DIR" || termux_error_exit "Error: failed to perform host build for nvim"
+	cd "$TERMUX_PKG_HOSTBUILD_DIR" || termux_error_exit "failed to perform host build for nvim"
 }
 
 termux_step_pre_configure() {

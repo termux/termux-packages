@@ -34,7 +34,7 @@ termux_pkg_auto_update() {
 
 	local latest_commit_date_tz=$(curl -s "https://api.github.com/repos/ptitSeb/box86/commits/${latest_commit}" | jq .commit.committer.date | sed -e 's|\"||g')
 	if [[ -z "${latest_commit_date_tz}" ]]; then
-		termux_error_exit "ERROR: Unable to get latest commit date info"
+		termux_error_exit "Unable to get latest commit date info"
 	fi
 
 	local latest_commit_date=$(echo "${latest_commit_date_tz}" | sed -e 's|\(.*\)T\(.*\)Z|\1|' -e 's|\-||g')
@@ -54,14 +54,14 @@ termux_pkg_auto_update() {
 	fi
 
 	if ! dpkg --compare-versions "${latest_version}" gt "${TERMUX_PKG_VERSION}"; then
-		termux_error_exit "ERROR: Resulting latest version is not counted as update to the current version (${latest_version} < ${TERMUX_PKG_VERSION})"
+		termux_error_exit "Resulting latest version is not counted as update to the current version (${latest_version} < ${TERMUX_PKG_VERSION})"
 	fi
 
 	# unlikely to happen
 	if [[ "${latest_commit_date}" -lt "${_COMMIT_DATE}" ]]; then
-		termux_error_exit "ERROR: Upstream is older than current package version. Please report to upstream."
+		termux_error_exit "Upstream is older than current package version. Please report to upstream."
 	elif [[ "${latest_commit_date}" -eq "${_COMMIT_DATE}" ]] && [[ "${latest_commit_time}" -lt "${_COMMIT_TIME}" ]]; then
-		termux_error_exit "ERROR: Upstream is older than current package version. Please report to upstream."
+		termux_error_exit "Upstream is older than current package version. Please report to upstream."
 	fi
 
 	sed -i "${TERMUX_PKG_BUILDER_DIR}/build.sh" \

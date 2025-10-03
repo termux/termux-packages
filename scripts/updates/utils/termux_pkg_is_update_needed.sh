@@ -48,7 +48,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 		first_version="$(grep -oP "${version_regexp}" <<<"${first_version}")"
 		second_version="$(grep -oP "${version_regexp}" <<<"${second_version}")"
 		if [[ -z "${first_version}" ]] || [[ -z "${second_version}" ]]; then
-			termux_error_exit "ERROR: Unable to parse version numbers using regexp '${version_regexp}'"
+			termux_error_exit "Unable to parse version numbers using regexp '${version_regexp}'"
 		fi
 	fi
 	if [[ "${first_version}" == "${second_version}" ]]; then
