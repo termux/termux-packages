@@ -320,6 +320,9 @@ PACKAGES+=" libzstd-dev"
 # Needed by wlroots
 PACKAGES+=" glslang-tools"
 
+# Needed by libxml2
+PACKAGES+=" doxygen"
+
 # Do not require sudo if already running as root.
 SUDO="sudo"
 if [ "$(id -u)" = "0" ]; then
