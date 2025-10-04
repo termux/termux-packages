@@ -1,0 +1,32 @@
+From ac9a6de051aa1ffea5ea1ce843954cc2fbd67e69 Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <grimler@termux.dev>
+Date: Sun, 31 Mar 2024 20:20:05 +0200
+Subject: [PATCH 37/37] hotspot: os_linux: do not use dlinfo and
+ RTLD_DI_LINKMAP on android
+
+As they are not available.
+---
+ src/hotspot/os/linux/os_linux.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/hotspot/os/linux/os_linux.cpp b/src/hotspot/os/linux/os_linux.cpp
+index c41d459c1..7efca5710 100644
+--- a/src/hotspot/os/linux/os_linux.cpp
++++ b/src/hotspot/os/linux/os_linux.cpp
+@@ -1870,11 +1870,12 @@ const char* os::Linux::dll_path(void* lib) {
+   struct link_map *lmap;
+   const char* l_path = nullptr;
+   assert(lib != nullptr, "dll_path parameter must not be null");
+-
++#ifndef __ANDROID__
+   int res_dli = ::dlinfo(lib, RTLD_DI_LINKMAP, &lmap);
+   if (res_dli == 0) {
+     l_path = lmap->l_name;
+   }
++#endif
+   return l_path;
+ }
+ 
+-- 
+2.45.2
+
