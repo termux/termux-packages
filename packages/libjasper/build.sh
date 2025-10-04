@@ -25,6 +25,6 @@ termux_step_post_get_source() {
 	local v="$(sed -En 's/^.*set\(JAS_SO_VERSION ([0-9]+).*$/\1/p' \
 			CMakeLists.txt)"
 	if [ "${_SOVERSION}" != "${v}" ]; then
-		termux_error_exit "Error: SOVERSION guard check failed."
+		termux_error_exit "SOVERSION guard check failed."
 	fi
 }

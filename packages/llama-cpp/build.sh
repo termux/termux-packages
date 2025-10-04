@@ -31,7 +31,7 @@ termux_pkg_auto_update() {
 	)"
 
 	if [[ -z "${latest_tag}" ]]; then
-		termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
+		termux_error_exit "Unable to get tag from ${TERMUX_PKG_SRCURL}"
 	fi
 	termux_pkg_upgrade_version "0.0.0-${latest_tag}"
 }

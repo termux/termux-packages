@@ -46,7 +46,7 @@ termux_pkg_auto_update() {
 	# filter only tags having "-ga" and extract only raw version.
 	read -r newest_tag < <(echo "$newest_tags" | grep -Po '21\.\d+\.\d+(?=-ga)' | sort -Vr)
 
-	[[ -z "${newest_tag}" ]] && termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
+	[[ -z "${newest_tag}" ]] && termux_error_exit "Unable to get tag from ${TERMUX_PKG_SRCURL}"
 	termux_pkg_upgrade_version "${newest_tag}"
 }
 
@@ -145,7 +145,7 @@ termux_step_post_make_install() {
 		}
 	done
 	if [[ "$failure" = true ]]; then
-		termux_error_exit "ERROR: openjdk-21.alternatives is not up to date, please update it."
+		termux_error_exit "openjdk-21.alternatives is not up to date, please update it."
 	fi
 }
 

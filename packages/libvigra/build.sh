@@ -17,6 +17,6 @@ TERMUX_PKG_RM_AFTER_INSTALL="doc"
 
 termux_pkg_auto_update() {
 	local latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}")"
-	[[ -z "${latest_tag}" ]] && termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
+	[[ -z "${latest_tag}" ]] && termux_error_exit "Unable to get tag from ${TERMUX_PKG_SRCURL}"
 	termux_pkg_upgrade_version "$(sed 's/Version-\([0-9]\+\)-\([0-9]\+\)-\([0-9]\+\)/\1.\2.\3/' <<< ${latest_tag})"
 }

@@ -23,7 +23,7 @@ termux_step_get_source() {
 	local PKG_SHA256=(${TERMUX_PKG_SHA256[@]})
 
 	if [ ${#PKG_SRCURL[@]} != ${#PKG_SHA256[@]} ]; then
-		termux_error_exit "Error: length of TERMUX_PKG_SRCURL isn't equal to length of TERMUX_PKG_SHA256."
+		termux_error_exit "length of TERMUX_PKG_SRCURL isn't equal to length of TERMUX_PKG_SHA256."
 	fi
 
 	# download and extract packages into its own folder inside $TERMUX_PKG_SRCDIR

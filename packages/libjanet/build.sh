@@ -11,7 +11,7 @@ TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_host_build() {
-	cd "${TERMUX_PKG_SRCDIR}" || termux_error_exit "Error: failed to perform host-build for janet"
+	cd "${TERMUX_PKG_SRCDIR}" || termux_error_exit "failed to perform host-build for janet"
 
 	cat >> config.mk <<-EOF
 	HOSTCC=$(command -v gcc)

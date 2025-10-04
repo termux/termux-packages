@@ -111,7 +111,8 @@ _check() {
 		set -euo pipefail
 		# shellcheck source=/dev/null
 		. "${TERMUX_SCRIPTDIR}/scripts/updates/api/termux_${from_where}_api_get_tag.sh"
-		. "${TERMUX_SCRIPTDIR}/scripts/updates/utils/termux_error_exit.sh"
+		# shellcheck source=scripts/build/termux_error_exit.sh
+		. "${TERMUX_SCRIPTDIR}/scripts/build/termux_error_exit.sh"
 		termux_"${from_where}"_api_get_tag "$@" 2>&1 >/dev/null
 	)" || _check_stderr "${stderr}"
 }

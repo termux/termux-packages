@@ -39,7 +39,7 @@ termux_pkg_auto_update() {
 
 	local latest_commit_date_tz=$(curl -s "${api_url}/${latest_commit}" | jq .commit.committer.date | sed -e 's|\"||g')
 	if [[ -z "${latest_commit_date_tz}" ]]; then
-		termux_error_exit "ERROR: Unable to get latest commit date info"
+		termux_error_exit "Unable to get latest commit date info"
 	fi
 
 	local latest_commit_date=$(echo "${latest_commit_date_tz}" | sed -e 's|\(.*\)T\(.*\)Z|\1|' -e 's|\-||g')
