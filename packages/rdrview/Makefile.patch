@@ -1,11 +1,6 @@
 --- a/Makefile
 +++ b/Makefile
-@@ -2,14 +2,14 @@
- ifeq ($(SYSTEM), OpenBSD)
- 	CC := egcc
- else
--	CC := gcc
-+	CC ?= gcc
+@@ -6,10 +6,10 @@
  endif
  GIT_COMMIT = $(shell git rev-parse --short HEAD)
  
@@ -19,12 +14,3 @@
  ifeq ($(SYSTEM), Linux)
  	LDLIBS += -lseccomp
  else ifeq ($(SYSTEM), FreeBSD)
-@@ -20,7 +20,7 @@
- 	LDLIBS += -liconv
- endif
- 
--PREFIX = /usr/local
-+PREFIX = @TERMUX_PREFIX@
- BINDIR = $(DESTDIR)$(PREFIX)/bin
- MANDIR = $(DESTDIR)$(PREFIX)/share/man/man1
- 
