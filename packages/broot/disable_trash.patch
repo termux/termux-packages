@@ -1,0 +1,38 @@
+diff -uNr broot-1.50.0/src/browser/browser_state.rs broot-1.50.0.mod/src/browser/browser_state.rs
+--- broot-1.50.0/src/browser/browser_state.rs	2025-09-25 22:44:21.000000000 +0530
++++ broot-1.50.0.mod/src/browser/browser_state.rs	2025-10-05 10:48:52.887174535 +0530
+@@ -681,6 +681,15 @@
+                     CmdResult::Keep
+                 }
+             },
++            #[cfg(any(
++                target_os = "windows",
++                all(
++                    unix,
++                    not(target_os = "macos"),
++                    not(target_os = "ios"),
++                    not(target_os = "android")
++                )
++            ))]
+             Internal::trash => {
+                 let path = self.displayed_tree().selected_line().path.to_path_buf();
+                 info!("trash {:?}", &path);
+diff -uNr broot-1.50.0/src/stage/stage_state.rs broot-1.50.0.mod/src/stage/stage_state.rs
+--- broot-1.50.0/src/stage/stage_state.rs	2025-09-25 22:44:21.000000000 +0530
++++ broot-1.50.0.mod/src/stage/stage_state.rs	2025-10-05 10:49:19.810894909 +0530
+@@ -474,6 +474,15 @@
+                     CmdResult::error("you must select a path to unstage")
+                 }
+             }
++            #[cfg(any(
++                target_os = "windows",
++                all(
++                    unix,
++                    not(target_os = "macos"),
++                    not(target_os = "ios"),
++                    not(target_os = "android")
++                )
++            ))]
+             Internal::trash => {
+                 info!("trash {} staged files", app_state.stage.len());
+ 
