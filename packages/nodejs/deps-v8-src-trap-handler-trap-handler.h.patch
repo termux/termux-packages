@@ -1,6 +1,6 @@
---- ./deps/v8/src/trap-handler/trap-handler.h.orig	2025-05-08 13:56:19.000000000 +0530
-+++ ./deps/v8/src/trap-handler/trap-handler.h	2025-05-09 19:48:23.129472068 +0530
-@@ -15,45 +15,7 @@
+--- ./deps/v8/src/trap-handler/trap-handler.h.orig	2025-10-06 04:33:30.681637509 +0530
++++ ./deps/v8/src/trap-handler/trap-handler.h	2025-10-06 04:33:35.761027106 +0530
+@@ -15,49 +15,7 @@
  
  namespace v8::internal::trap_handler {
  
@@ -9,10 +9,14 @@
 -    ((V8_OS_LINUX && !V8_OS_ANDROID) || V8_OS_WIN || V8_OS_DARWIN || \
 -     V8_OS_FREEBSD)
 -#define V8_TRAP_HANDLER_SUPPORTED true
--// Arm64 (non-simulator) on Linux, Windows, MacOS.
+-// Arm64 native on Linux, Windows, MacOS.
 -#elif V8_TARGET_ARCH_ARM64 && V8_HOST_ARCH_ARM64 && \
 -    ((V8_OS_LINUX && !V8_OS_ANDROID) || V8_OS_WIN || V8_OS_DARWIN)
 -#define V8_TRAP_HANDLER_SUPPORTED true
+-// For Linux and Mac, enable the simulator when it's been requested.
+-#if USE_SIMULATOR && ((V8_OS_LINUX && !V8_OS_ANDROID) || V8_OS_DARWIN)
+-#define V8_TRAP_HANDLER_VIA_SIMULATOR
+-#endif
 -// Arm64 simulator on x64 on Linux, Mac, or Windows.
 -//
 -// The simulator case uses some inline assembly code, which cannot be
