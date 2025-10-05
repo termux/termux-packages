@@ -121,39 +121,74 @@ check_indentation() {
 	return 0
 }
 
-# Check the latest commit that modified `$package`
-# It must either:
-# - Modify TERMUX_PKG_REVISION
-# - Modify TERMUX_PKG_VERSION
-# - Or specify one of the CI skip tags
-check_version_change() {
-	local base_commit commit_diff package_dir="${1%/*}"
+check_version() {
+	if ! (( ${#TERMUX_PKG_VERSION} )); then
+		echo "NOT SET"
+		return 1
+	fi
+
+	if ! dpkg --validate-version "${TERMUX_PKG_VERSION}"; then
+		echo "INVALID (contains characters that are not allowed)"
+		return 1
+	fi
+
+	# We need the HEAD of origin/master as a reference point
+	local base_commit package_dir="${1%/*}"
 	base_commit="$(< "$TERMUX_SCRIPTDIR/.git/refs/remotes/origin/master")"
 
 	[[ -z "$base_commit" ]] && {
-		echo
-		echo
-		echo "Couldn't determine base commit of branch."
-		echo "This shouldn't be able to happen..."
-		ls -AR "$TERMUX_SCRIPTDIR/.git/refs"
-		exit 1
+		echo "FAIL"
+		echo -e "\tCouldn't determine HEAD commit of 'origin/master'."
+		echo -e "\tThis shouldn't be able to happen..."
+		ls -AR "$TERMUX_SCRIPTDIR/.git/refs/remotes/origin"
+		return 1
 	} >&2
 
-	commit_diff="$(git log --patch "${base_commit}.." -- "$package_dir")"
+	# Was the package modified in this branch?
+	[[ -z "$(git -P diff --name-only "${base_commit}".. -- "${package_dir}" 2> /dev/null)" ]] && {
+		echo "PASS (not modified in this branch)"
+		return 0
+	}
 
-	# If the diff is empty there's no commit modifying that package on this branch, which is a PASS.
-	[[ -z "$commit_diff" ]] && return
+	local version_new version_old
+	version_new="${TERMUX_PKG_VERSION:-0}-${TERMUX_PKG_REVISION:-0}"
+	version_old=$(
+		unset TERMUX_PKG_VERSION TERMUX_PKG_REVISION
+		# shellcheck source=/dev/null
+		. <(git -P show "${base_commit}:${package_dir}/build.sh" 2> /dev/null)
+		echo "${TERMUX_PKG_VERSION:-0}-${TERMUX_PKG_REVISION:-0}"
+	)
 
-	grep -q \
-		-e '^+TERMUX_PKG_REVISION=' \
-		-e '^+TERMUX_PKG_VERSION=' \
-		-e '\[no version check\]' <<< "$commit_diff" \
-	|| return 1
+	# if "$version_new" isn't greater than "$version_old" that's an issue.
+	if dpkg --compare-versions "$version_new" le "$version_old"; then
+		echo "FAILED"
+		echo ""
+		printf '%s\n' \
+			"Version of '$package_name' has not been incremented." \
+			"Either 'TERMUX_PKG_VERSION' or 'TERMUX_PKG_REVISION'" \
+			"need to be modified in the build.sh when changing a package build."
+
+		# If the version decreased throw in a suggestion for how to downgrade packages
+		dpkg --compare-versions "$version_new" lt "$version_old" && \
+		printf '%s\n' \
+			"" \
+			"- If you are reverting '$package_name' to an older version use the '+really' suffix" \
+			"e.g. TERMUX_PKG_VERSION=${version_new%-*}+really${version_old%-*}" \
+			"- If ${package_name}'s version scheme has changed completely an epoch may be needed." \
+			"For more information see:" \
+			"https://www.debian.org/doc/debian-policy/ch-controlfields.html#epochs-should-be-used-sparingly"
+
+		echo ""
+		return 1
+	fi
+
+	# If we've passed also print out the old and new versions.
+	# Remove the revision if it's 0.
+	echo "PASS (${version_old%-0} -> ${version_new%-0})"
 }
 
 lint_package() {
-	local package_script
-	local package_name
+	local package_script package_name
 
 	package_script="$1"
 	package_name="$(basename "$(dirname "$package_script")")"
@@ -244,21 +279,6 @@ lint_package() {
 	fi
 	echo "PASS"
 
-	echo -n "Version change check: "
-	if ! check_version_change "$package_script"; then
-		echo "FAILED"
-		echo
-		echo "Version of '$package_name' has not changed."
-		echo "Either 'TERMUX_PKG_REVISION' or 'TERMUX_PKG_VERSION'"
-		echo "need to be modified in the build.sh when changing a package build."
-		echo "Alternatively you can add '[no version check]'."
-		echo "To the commit message to skip this check."
-		echo
-		return 1
-	fi
-	echo "PASS"
-	echo
-
 	# Fields checking is done in subshell since we will source build.sh.
 	(set +e +u
 		local pkg_lint_error
@@ -342,17 +362,7 @@ lint_package() {
 		fi
 
 		echo -n "TERMUX_PKG_VERSION: "
-		if (( ${#TERMUX_PKG_VERSION} )); then
-			if dpkg --validate-version "${TERMUX_PKG_VERSION}"; then
-				echo "PASS"
-			else
-				echo "INVALID (contains characters that are not allowed)"
-				pkg_lint_error=true
-			fi
-		else
-			echo "NOT SET"
-			pkg_lint_error=true
-		fi
+		check_version "$package_script" || pkg_lint_error=true
 
 		if (( ${#TERMUX_PKG_REVISION} )); then
 		echo -n "TERMUX_PKG_REVISION: "
