@@ -327,6 +327,10 @@ termux_step_post_make_install() {
 	return
 }
 
+# Generate application icons and place them in the package.
+# shellcheck source=scripts/build/termux_step_install_icons.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_install_icons.sh"
+
 # Install hooks (alpm-hooks) and hook-scripts into the pacman package
 # shellcheck source=scripts/build/termux_step_install_pacman_hooks.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_install_pacman_hooks.sh"
@@ -656,19 +660,19 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && [ -n "${TERMUX_ARCH+x}" ] && [ "${TERMUX_ARCH}" = 'all' ]; then
 			for arch in 'aarch64' 'arm' 'i686' 'x86_64'; do
 				env TERMUX_ARCH="$arch" TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh \
-					 $(test "${TERMUX_CLEANUP_BUILT_PACKAGES_ON_LOW_DISK_SPACE:-}" = "true" && echo "-C") \
-					 $(test "${TERMUX_DEBUG_BUILD:-}" = "true" && echo "-d") \
-					 $(test "${TERMUX_IS_DISABLED:-}" = "true" && echo "-D") \
-					 $({ test "${TERMUX_FORCE_BUILD:-}" = "true" && test "${TERMUX_FORCE_BUILD_DEPENDENCIES:-}" != "true"; } && echo "-f") \
-					 $({ test "${TERMUX_FORCE_BUILD:-}" = "true" && test "${TERMUX_FORCE_BUILD_DEPENDENCIES:-}" = "true"; } && echo "-F") \
-					 $({ test "${TERMUX_INSTALL_DEPS:-}" = "true" && test "${TERMUX_PKGS__BUILD__RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES:-}" != "false"; } && echo "-i") \
-					 $({ test "${TERMUX_INSTALL_DEPS:-}" = "true" && test "${TERMUX_PKGS__BUILD__RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES:-}" = "false"; } && echo "-I") \
-					 $(test "${TERMUX_GLOBAL_LIBRARY:-}" = "true" && echo "-L") \
-					 $(test -n "${TERMUX_OUTPUT_DIR:-}" && echo "-o $TERMUX_OUTPUT_DIR") \
-					 $(test "${TERMUX_PKGS__BUILD__RM_ALL_PKG_BUILD_DEPENDENT_DIRS:-}" = "true" && echo "-r") \
-					 $(test "${TERMUX_WITHOUT_DEPVERSION_BINDING:-}" = "true" && echo "-w") \
-					 $(test -n "${TERMUX_PACKAGE_FORMAT:-}" && echo "--format $TERMUX_PACKAGE_FORMAT") \
-					 $(test -n "${TERMUX_PACKAGE_LIBRARY:-}" && echo "--library $TERMUX_PACKAGE_LIBRARY") \
+					$(test "${TERMUX_CLEANUP_BUILT_PACKAGES_ON_LOW_DISK_SPACE:-}" = "true" && echo "-C") \
+					$(test "${TERMUX_DEBUG_BUILD:-}" = "true" && echo "-d") \
+					$(test "${TERMUX_IS_DISABLED:-}" = "true" && echo "-D") \
+					$({ test "${TERMUX_FORCE_BUILD:-}" = "true" && test "${TERMUX_FORCE_BUILD_DEPENDENCIES:-}" != "true"; } && echo "-f") \
+					$({ test "${TERMUX_FORCE_BUILD:-}" = "true" && test "${TERMUX_FORCE_BUILD_DEPENDENCIES:-}" = "true"; } && echo "-F") \
+					$({ test "${TERMUX_INSTALL_DEPS:-}" = "true" && test "${TERMUX_PKGS__BUILD__RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES:-}" != "false"; } && echo "-i") \
+					$({ test "${TERMUX_INSTALL_DEPS:-}" = "true" && test "${TERMUX_PKGS__BUILD__RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES:-}" = "false"; } && echo "-I") \
+					$(test "${TERMUX_GLOBAL_LIBRARY:-}" = "true" && echo "-L") \
+					$(test -n "${TERMUX_OUTPUT_DIR:-}" && echo "-o $TERMUX_OUTPUT_DIR") \
+					$(test "${TERMUX_PKGS__BUILD__RM_ALL_PKG_BUILD_DEPENDENT_DIRS:-}" = "true" && echo "-r") \
+					$(test "${TERMUX_WITHOUT_DEPVERSION_BINDING:-}" = "true" && echo "-w") \
+					$(test -n "${TERMUX_PACKAGE_FORMAT:-}" && echo "--format $TERMUX_PACKAGE_FORMAT") \
+					$(test -n "${TERMUX_PACKAGE_LIBRARY:-}" && echo "--library $TERMUX_PACKAGE_LIBRARY") \
 					"${PACKAGE_LIST[i]}"
 			done
 			exit
@@ -751,6 +755,11 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		termux_run_base_and_multilib_build_step termux_step_make_install
 		cd "$TERMUX_PKG_BUILDDIR"
 		termux_step_post_make_install
+		if [ -n "$TERMUX_PKG_ICONS" ]; then
+			cd "$TERMUX_PKG_SRCDIR"
+			termux_step_install_icons
+			cd "$TERMUX_PKG_BUILDDIR"
+		fi
 		termux_step_install_pacman_hooks
 		termux_step_install_service_scripts
 		termux_step_install_license

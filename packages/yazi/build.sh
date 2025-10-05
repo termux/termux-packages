@@ -6,13 +6,20 @@ TERMUX_PKG_VERSION="25.5.31"
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/sxyazi/yazi/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4d005e7c3f32b5574d51ab105597f3da3a4be2f7b5cd1bcb284143ad38253ed4
-TERMUX_PKG_BUILD_DEPENDS='aosp-libs, imagemagick'
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_ICONS="assets/logo.png"
+TERMUX_PKG_ICON_NAMES="yazi"
 
 termux_step_pre_configure() {
 	termux_setup_rust
-	[[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]] && termux_setup_proot
+	# Fix for `TERMUX_ON_DEVICE_BUILD=true` builds
+	# To prevent `ld.lld: error: unable to find library -lgcc`
+	# Should have been fixed in Rust 1.54.0 (https://github.com/rust-lang/rust/pull/85806)
+	# But still seems to occur.
+	echo "INPUT(-lunwind)" > "${TERMUX_PKG_BUILDDIR}/libgcc.a"
+	local -u env_host="${CARGO_TARGET_NAME//-/_}"
+	export CARGO_TARGET_"${env_host}"_RUSTFLAGS+=" -L ${TERMUX_PKG_BUILDDIR}"
 }
 
 termux_step_make() {
@@ -34,20 +41,6 @@ termux_step_make_install() {
 
 	# desktop entry
 	install -Dm644 assets/yazi.desktop "$TERMUX_PREFIX/share/applications/yazi.desktop"
-
-	# application icons
-	local res
-	echo -n "Generating icons:"
-	for res in 16 24 32 48 64 128 256; do
-		mkdir -p "${TERMUX_PREFIX}/share/icons/hicolor/${res}x${res}/apps"
-		termux-proot-run magick assets/logo.png \
-			-resize "${res}x${res}" \
-			"${TERMUX_PREFIX}/share/icons/hicolor/${res}x${res}/apps/yazi.png"
-		[[ -e "${TERMUX_PREFIX}/share/icons/hicolor/${res}x${res}/apps/yazi.png" ]] && {
-			echo -n " ${res}x${res}"
-		}
-	done
-	echo
 }
 
 termux_step_create_debscripts() {
