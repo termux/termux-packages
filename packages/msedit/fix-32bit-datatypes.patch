@@ -1,0 +1,37 @@
+32-bit Android's st_dev and st_ino are 64-bit unsigned integers, not 32-bit unsigned integers
+
+https://android.googlesource.com/platform/bionic/+/refs/heads/android15-release/libc/include/sys/stat.h#83
+
+Fixes:
+error[E0308]: mismatched types
+   --> src/sys/unix.rs:380:29
+    |
+380 |         Ok(FileId { st_dev: stat.st_dev, st_ino: stat.st_ino })
+    |                             ^^^^^^^^^^^ expected `u32`, found `u64`
+
+error[E0308]: mismatched types
+   --> src/sys/unix.rs:380:50
+    |
+380 |         Ok(FileId { st_dev: stat.st_dev, st_ino: stat.st_ino })
+    |                                                  ^^^^^^^^^^^ expected `u32`, found `u64`
+
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `edit` (lib) due to 2 previous errors
+
+--- a/src/sys/unix.rs
++++ b/src/sys/unix.rs
+@@ -360,6 +360,14 @@ pub fn open_stdin_if_redirected() -> Option<File> {
+     }
+ }
+ 
++#[cfg(all(target_os = "android", target_pointer_width = "32"))]
++#[derive(Clone, PartialEq, Eq)]
++pub struct FileId {
++    st_dev: u64,
++    st_ino: u64,
++}
++
++#[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+ #[derive(Clone, PartialEq, Eq)]
+ pub struct FileId {
+     st_dev: libc::dev_t,
