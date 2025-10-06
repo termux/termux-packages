@@ -13,7 +13,12 @@ from typing import Dict, List, Set, Tuple, TypeAlias
 logger = logging.getLogger(__name__)
 
 
-TERMUX_ARCH = (os.getenv("TERMUX_ARCH") or "aarch64").replace("x86_64", "x86-64")
+TERMUX_ON_DEVICE_BUILD = os.getenv("TERMUX_ON_DEVICE_BUILD") == "true"
+TERMUX_GLOBAL_LIBRARY = os.getenv("TERMUX_GLOBAL_LIBRARY") == "true"
+TERMUX_PACKAGE_LIBRARY = os.getenv("TERMUX_PACKAGE_LIBRARY", "bionic")
+TERMUX_ARCH = os.getenv("TERMUX_ARCH", "aarch64").replace("x86_64", "x86-64")
+
+ON_DEVICE_ALWAYS_DEPENDENCIES = ("libc++",)
 
 PackageName: TypeAlias = str
 Dependency: TypeAlias = PackageName
@@ -113,20 +118,83 @@ class BuildOrder:
         self.repos = repos
         self.build_mode = build_mode
 
-    def get(self) -> List[Package]:
+    def get_order(self) -> List[Package]:
         return self.__generate_order()
+
+    def __generate_order(self) -> List[Package]:
+        package_map: PackageMap = self.__generate_package_map()
+
+        logger.debug("Total packages in repo: %d" % len(package_map))
+
+        build_order: List[Package] = []
+
+        stack: List[Tuple[PackageName, bool]] = []
+        visited: Set[PackageName] = set()  # Contains nodes that have been fully explored.
+        path: List[PackageName] = []
+
+        def dfs():
+            while stack:
+                node, is_backtracking = stack.pop()
+
+                package = package_map[node]
+
+                if is_backtracking:
+                    path.pop()
+                    visited.add(node)
+                    build_order.append(package)
+                    continue
+
+                if node in visited:
+                    continue
+
+                stack.append((node, True))  # Backtracking.
+                path.append(node)
+                logger.debug("'%s' depends upon: %s", package.name, package.dependencies)
+                for dep in package.dependencies:
+                    if isinstance(dep, AlternativeDependency):
+                        dep = next(iter(visited.intersection(dep.options)), dep.default)
+                    if dep in path:
+                        raise Exception("Cycle exists: %s" % (path[path.index(dep) :] + [dep]))
+                    if dep not in visited:
+                        stack.append((dep, False))
+
+        if self.root_pkg:
+            stack.append((self.root_pkg, False))
+            dfs()
+        else:
+            for pkg in package_map.keys():
+                if pkg not in visited:
+                    stack.append((pkg, False))
+                    dfs()
+
+        logger.debug("Total in build_order: %d", len(build_order))
+
+        build_order.pop()  # Remove self.root_pkg from the set.
+        return build_order
 
     def __generate_package_map(self) -> PackageMap:
         package_map: Dict[PackageName, Package] = {}
 
         for repo in self.repos:
             for package_path in repo.iterdir():
-                package_info = BuildScriptParser(package_path / "build.sh")
-
                 package_name = package_path.name
-                # For root package we are in OFFLINE mode as we are building it:
+
+                if repo.name == "gpkg":
+                    s = package_name.split("-")
+                    package_name = (
+                        package_name
+                        if "glibc" in s or "glibc32" in s
+                        else (
+                            package_name.replace("-static", "-glibc-static")
+                            if "static" == s[-1]
+                            else package_name + "-glibc"
+                        )
+                    )
+
+                # For root package we are always in OFFLINE mode as we are building it:
                 build_mode = BuildMode.OFFLINE if package_name == self.root_pkg else self.build_mode
 
+                package_info = BuildScriptParser(package_path / "build.sh")
                 dependencies = package_info.get_dependencies(build_mode)
 
                 if package_info.is_metapackage():
@@ -134,6 +202,12 @@ class BuildOrder:
                         name=package_name, path=package_path, dependencies=dependencies, type=PackageType.VIRTUAL
                     )
                     continue
+
+                # This is not needed for metapackages.
+                if TERMUX_ON_DEVICE_BUILD and TERMUX_PACKAGE_LIBRARY == "bionic":
+                    for d in ON_DEVICE_ALWAYS_DEPENDENCIES:
+                        if package_name != d:
+                            dependencies.add(d)
 
                 # Note for self: See page 6 of your notebook.
                 if build_mode == BuildMode.OFFLINE:
@@ -227,59 +301,7 @@ class BuildOrder:
                 sanitized_map[package.name] = Package(
                     name=package.name, path=package.path, dependencies=set(sanitized_deps), type=package.type
                 )
-
         return sanitized_map
-
-    def __generate_order(self) -> List[Package]:
-        package_map: PackageMap = self.__generate_package_map()
-
-        logger.debug("Total packages in repo: %d" % len(package_map))
-
-        build_order: List[Package] = []
-
-        stack: List[Tuple[PackageName, bool]] = []
-        visited: Set[PackageName] = set()  # Contains nodes that have been fully explored.
-        path: List[PackageName] = []
-
-        def dfs():
-            while stack:
-                node, is_backtracking = stack.pop()
-
-                package = package_map[node]
-
-                if is_backtracking:
-                    path.pop()
-                    visited.add(node)
-                    build_order.append(package)
-                    continue
-
-                if node in visited:
-                    continue
-
-                stack.append((node, True))  # Backtracking.
-                path.append(node)
-                logger.debug("'%s' depends upon: %s", package.name, package.dependencies)
-                for dep in package.dependencies:
-                    if isinstance(dep, AlternativeDependency):
-                        dep = next(iter(visited.intersection(dep.options)), dep.default)
-                    if dep in path:
-                        raise Exception("Cycle exists: %s" % (path[path.index(dep) :] + [dep]))
-                    if dep not in visited:
-                        stack.append((dep, False))
-
-        if self.root_pkg:
-            stack.append((self.root_pkg, False))
-            dfs()
-        else:
-            for pkg in package_map.keys():
-                if pkg not in visited:
-                    stack.append((pkg, False))
-                    dfs()
-
-        logger.debug("Total in build_order: %d", len(build_order))
-
-        build_order.pop()  # Remove self.root_pkg from list.
-        return build_order
 
 
 def die(msg: str) -> None:
@@ -296,28 +318,40 @@ def main() -> None:
     )
     parser.add_argument(
         "-i",
-        default=False,
         action="store_true",
         help="Generate build order in ONLINE mode. This includes subpackages in output since they can be downloaded. [Not compatible with ONLINE mode]",
     )
     parser.add_argument(
-        "package",
-        nargs="?",
-        default=None,
-        help="Package to generate build order for. [Can be skipped to generate full buildorder]",
+        "package", nargs="?", help="Package to generate build order for. [Can be skipped to generate full buildorder]"
     )
     parser.add_argument(
-        "package_dirs",
-        nargs="*",
-        type=Path,
-        help="Directories with packages. [Defaults to those specified in repo.json]",
+        "repos", nargs="*", type=Path, help="Directories with packages. [Defaults to those specified in repo.json]"
     )
+
     args = parser.parse_args()
 
-    online_build_mode: bool = args.i
     package: str = args.package
-    package_directories: List[Path] = args.package_dirs
 
+    build_mode = BuildMode.OFFLINE
+    if args.i:
+        if not package:
+            die("-i (ONLINE) mode has no meaning when building all packages")
+        build_mode = BuildMode.ONLINE
+
+    repos: List[Path] = args.repos
+    if not repos:
+        from json import load as json_load
+
+        try:
+            with open("./repo.json") as f:
+                repos = []
+                for d in json_load(f).keys():
+                    if d != "pkg_format":
+                        repos.append(Path(Path.cwd() / d))
+        except FileNotFoundError:
+            die("'repo.json' file not found at %s. Check script location." % Path.cwd())
+
+    # TEMP
     log_dir = Path("./log")
     log_dir.mkdir(exist_ok=True)
 
@@ -330,34 +364,28 @@ def main() -> None:
 
     logger.debug(f"""Called with following info:
     package: {package},
-    package_directories: {package_directories}
-    online_build_mode: {online_build_mode}
+    repos: {repos}
+    build_mode: {build_mode}
     """)
+    # END TEMP
 
-    full_buildorder = True if not package else False
+    for order in BuildOrder(package, repos, build_mode).get_order():
+        package_name = order.name
 
-    if online_build_mode and full_buildorder:
-        die("-i (ONLINE) mode has no meaning when building all packages")
+        # TODO: This is not complete. Implement for dfs too as there would be no `glibc-` packages in the package
+        # map. We need to add there too.
+        if TERMUX_GLOBAL_LIBRARY and TERMUX_PACKAGE_LIBRARY == "glibc":
+            s = package_name.split("-")
+            package_name = (
+                package_name
+                if "glibc" in s or "glibc32" in s
+                else (
+                    package_name.replace("-static", "-glibc-static") if "static" == s[-1] else package_name + "-glibc"
+                )
+            )
 
-    if not package_directories:
-        import json
-
-        try:
-            with open("./repo.json") as f:
-                package_directories = []
-                for d in json.load(f).keys():
-                    if d != "pkg_format":
-                        package_directories.append(Path(Path.cwd() / d))
-        except FileNotFoundError:
-            die("'repo.json' file not found at %s. Check script location." % Path.cwd())
-
-    for order in BuildOrder(
-        root_pkg=package,
-        build_mode=BuildMode.ONLINE if online_build_mode else BuildMode.OFFLINE,
-        repos=package_directories,
-    ).get():
-        logger.debug("%-40s %s" % (order.name, f"{order.path.parent.name}/{order.path.name}"))
-        print("%-40s %s" % (order.name, f"{order.path.parent.name}/{order.path.name}"))
+        logger.debug("%-40s %s" % (package_name, f"{order.path.parent.name}/{order.path.name}"))
+        print("%-40s %s" % (package_name, f"{order.path.parent.name}/{order.path.name}"))
 
 
 start_time = time.perf_counter()
@@ -368,5 +396,3 @@ if __name__ == "__main__":
 end_time = time.perf_counter()
 
 logger.debug("Elapsed time [total]: %f" % (end_time - start_time))
-
-# TODO: Add support for glibc
