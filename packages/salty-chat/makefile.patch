@@ -1,19 +1,17 @@
 --- a/Makefile
 +++ b/Makefile
-@@ -1,14 +1,14 @@
+@@ -1,7 +1,7 @@
  -include environ.inc
  .PHONY: help deps dev build install image release test clean clean-all
  
 -export CGO_ENABLED=0
--VERSION=$(shell git describe --abbrev=0 --tags 2>/dev/null || echo "0.0.0")
--COMMIT=$(shell git rev-parse --short HEAD || echo "HEAD")
--BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
 +export CGO_ENABLED=1
-+VERSION=$(echo "0.0.0")
-+COMMIT=$(echo "HEAD")
-+BRANCH="master"
+ VERSION=$(shell git describe --abbrev=0 --tags 2>/dev/null || echo "$VERSION")
+ COMMIT=$(shell git rev-parse --short HEAD || echo "$COMMIT")
+ BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
+@@ -9,7 +9,7 @@ BUILD=$(shell git show -s --pretty=format:%cI)
  GOCMD=go
- GOVER=$(shell go version | grep -o -E 'go1\.17\.[0-9]+')
+ GOCMD=go
  
 -DESTDIR=/usr/local/bin
 +DESTDIR=@TERMUX_PREFIX@/bin
