@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://onnxruntime.ai/
 TERMUX_PKG_DESCRIPTION="Cross-platform, high performance ML inferencing and training accelerator"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.22.2"
+TERMUX_PKG_VERSION="1.23.0"
 TERMUX_PKG_REVISION=4
-TERMUX_PKG_SRCURL=git+https://github.com/microsoft/onnxruntime
+TERMUX_PKG_SRCURL=https://github.com/microsoft/onnxruntime/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="abseil-cpp, libc++, protobuf, libre2, python"
 TERMUX_PKG_BUILD_DEPENDS="python-numpy"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -19,6 +19,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DPYBIND11_USE_CROSSCOMPILING=TRUE
 -Donnxruntime_USE_NNAPI_BUILTIN=ON
 -Donnxruntime_USE_XNNPACK=ON
+-Donnxruntime_BUILD_SHARED_LIB=ON
+-DCMAKE_BUILD_TYPE=Release
 "
 
 termux_step_pre_configure() {
@@ -37,7 +39,7 @@ termux_step_pre_configure() {
 	termux_step_configure_cmake
 	TERMUX_PKG_SRCDIR="$TERMUX_PKG_SRCDIR_SAVE"
 
-	cmake --build .
+	cmake --build . -j4
 }
 
 termux_step_make() {
