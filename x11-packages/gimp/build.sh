@@ -2,12 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://www.gimp.org/
 TERMUX_PKG_DESCRIPTION="GNU Image Manipulation Program"
 TERMUX_PKG_LICENSE="GPL-3.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.0.4"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION="3.0.6"
 TERMUX_PKG_SRCURL=git+https://gitlab.gnome.org/GNOME/gimp
 TERMUX_PKG_GIT_BRANCH="GIMP_${TERMUX_PKG_VERSION//./_}"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="aalib, appstream-glib, atk, babl, fontconfig, freetype, gdk-pixbuf, gegl, gexiv2, ghostscript, gimp-data, glib, glib-networking, gtk3, harfbuzz, hicolor-icon-theme, json-glib, libandroid-execinfo, libandroid-shmem, libbz2, libc++, libcairo, libheif, libjpeg-turbo, libjxl, libmypaint, libpng, librsvg, libtiff, libwebp, libxcursor, libxmu, libxpm, littlecms, mypaint-brushes, openexr, openjpeg, pango, poppler, poppler-data, pygobject, zlib"
+TERMUX_PKG_DEPENDS="aalib, appstream, appstream-glib, atk, babl, fontconfig, freetype, gdk-pixbuf, gegl, gexiv2, ghostscript, gimp-data, glib, glib-networking, gtk3, harfbuzz, hicolor-icon-theme, json-glib, libandroid-execinfo, libandroid-shmem, libbz2, libc++, libcairo, libheif, libjpeg-turbo, libjxl, libmypaint, libpng, librsvg, libtiff, libwebp, libxcursor, libxmu, libxpm, littlecms, mypaint-brushes, openexr, openjpeg, pango, poppler, poppler-data, pygobject, zlib"
 TERMUX_PKG_BUILD_DEPENDS="aosp-libs"
 TERMUX_PKG_SUGGESTS="gimp-resynthesizer"
 TERMUX_PKG_VERSIONED_GIR=false
@@ -39,7 +38,7 @@ termux_step_pre_configure() {
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		# Gimp requires using cross-compiled or prebuilt gimp during cross-compilation which is hard to achive here
 		# gimp is required only to generate splash image, so it will be fine to use official appimage.
-		termux_download https://download.gimp.org/gimp/v3.0/linux/GIMP-3.0.4-x86_64.AppImage "$TERMUX_PKG_CACHEDIR/gimp.appimage" 192e0920424a19730e57517a2f9d885a001c77b3a1cc0878ce4d44a2e294b3cb
+		termux_download https://download.gimp.org/gimp/v${TERMUX_PKG_VERSION%.*}/linux/GIMP-${TERMUX_PKG_VERSION}-x86_64.AppImage "$TERMUX_PKG_CACHEDIR/gimp.appimage" 095c8a29d0a8dd48d7b09cdda7d4e1b69ba677036f4db3bd2e7d90c3f91e62d9
 		chmod +x "$TERMUX_PKG_CACHEDIR/gimp.appimage"
 		[ -d $TERMUX_PKG_CACHEDIR/squashfs-root ] || (cd "$TERMUX_PKG_CACHEDIR"; "$TERMUX_PKG_CACHEDIR/gimp.appimage" --appimage-extract)
 
