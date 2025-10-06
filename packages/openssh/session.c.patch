@@ -10,15 +10,6 @@ diff -uNr openssh-portable-V_9_5_P1/session.c openssh-portable-V_9_5_P1.mod/sess
  /* original command from peer. */
  const char *original_command = NULL;
  
-@@ -195,7 +197,7 @@
- 	temporarily_use_uid(pw);
- 
- 	/* Allocate a buffer for the socket name, and format the name. */
--	auth_sock_dir = xstrdup("/tmp/ssh-XXXXXXXXXX");
-+	auth_sock_dir = xstrdup("@TERMUX_PREFIX@/tmp/ssh-XXXXXXXXXX");
- 
- 	/* Create private directory for socket */
- 	if (mkdtemp(auth_sock_dir) == NULL) {
 @@ -265,7 +267,7 @@
  		return;
  
