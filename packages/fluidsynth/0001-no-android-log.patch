@@ -1,0 +1,20 @@
+--- a/src/utils/fluid_sys.c
++++ b/src/utils/fluid_sys.c
+@@ -35,7 +35,7 @@
+ #include <pthread.h>
+ #endif
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #include <android/log.h>
+ #endif
+ 
+@@ -126,7 +126,7 @@
+ void
+ fluid_default_log_function(int level, const char *message, void *data)
+ {
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+     switch(level)
+     {
+     case FLUID_PANIC:
