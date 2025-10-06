@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.23.0"
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/microsoft/onnxruntime/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=907c99c9c66f31bc3c6f7dada064c84c3b97b9c47128ca6d76288edb99390110
 TERMUX_PKG_DEPENDS="abseil-cpp, libc++, protobuf, libre2, python"
 TERMUX_PKG_BUILD_DEPENDS="python-numpy"
 TERMUX_PKG_BUILD_IN_SRC=true
