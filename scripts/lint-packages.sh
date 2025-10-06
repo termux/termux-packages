@@ -76,39 +76,42 @@ check_indentation() {
 	local pkg_script="$1"
 	local line='' heredoc_terminator='' in_array=0 i=0
 	local -a issues=('' '') bad_lines=('FAILED')
+	local heredoc_regex="[^\(/%#]<{2}-?\s*(['\"]?(\w*(\\\.)?)*['\"]?)"
+	# We don't wanna hit version constraints "(<< x.y.z)" with this, so don't match "(<<".
+	# We also wouldn't wanna hit parameter expansions "${var/<<}", ${var%<<}, ${var#<<}
 
 	# parse leading whitespace
 	while IFS=$'\n' read -r line; do
 		((i++))
 
 		# make sure it's a heredoc, not a herestring
-		if ! [[ "$line" == *'<<<'* ]]; then
+		if [[ "$line" != *'<<<'* ]]; then
 			# Skip this check in entirely within heredocs
-			# (see packages/ghc-libs for an example of why)
-				[[ "$line" =~ [^\(]\<{2}-?[\'\"]?([^\'\"]+) ]] && {
+			[[ "$line" =~ $heredoc_regex ]] && {
 				heredoc_terminator="${BASH_REMATCH[1]}"
 			}
 
-			(( ${#heredoc_terminator} )) && \
-			grep -qP "^\s*${heredoc_terminator}" <<< "$line" && {
+			[[ -n ${heredoc_terminator}  && "$line" == [[:space:]]*"${heredoc_terminator//[\'\"]}" ]] && {
 				heredoc_terminator=''
 			}
 			(( ${#heredoc_terminator} )) && continue
 		fi
 
 		# check for mixed indentation
-		grep -qP '^(\t+ +| +\t+)' <<< "$line" && {
+		[[ "$line" =~ ^($'\t'+ +| +$'\t'+) ]] && {
 			issues[0]='Mixed indentation'
-			bad_lines[$i]="${pkg_script}:${i}:$line"
+			bad_lines[i]="${pkg_script}:${i}:$line"
 		}
 
 		[[ "$line" == *'=('* ]] && in_array=1
-		if (( ! in_array )); then # spaces for indentation are okay for aligning arrays
-			grep -qP '^ +' <<< "$line" && { # check for spaces as indentation
-				issues[1]='Use tabs for indentation'
-				bad_lines[$i]="${pkg_script}:${i}:$line"
-			}
-		fi
+
+		# spaces for indentation are okay for aligning arrays
+		[[ "$in_array" == 0 && "$line" == " "* ]] && {
+			# but otherwise we use spaces
+			issues[1]='Use tabs for indentation'
+			bad_lines[i]="${pkg_script}:${i}:$line"
+		}
+
 		[[ "$line" == *')' ]] && in_array=0
 	done < "$pkg_script"
 
@@ -289,10 +292,9 @@ lint_package() {
 	echo "PASS"
 
 	echo -n "Trailing whitespace check: "
-	local trailing_whitespace
-	trailing_whitespace=$(grep -Hn '[[:blank:]]$' "$package_script")
-	if (( ${#trailing_whitespace} )); then
-		echo -e "FAILED\n\n${trailing_whitespace}\n"
+	local re=$'[\t ]\n'
+	if [[ "$(< "$package_script")" =~ $re ]]; then
+		echo -e "FAILED\n\n$(grep -Hn '[[:space:]]$' "$package_script")\n"
 		return 1
 	fi
 	echo "PASS"
@@ -312,7 +314,7 @@ lint_package() {
 
 		echo -n "TERMUX_PKG_HOMEPAGE: "
 		if (( ${#TERMUX_PKG_HOMEPAGE} )); then
-			if ! grep -qP '^https://.+' <<< "$TERMUX_PKG_HOMEPAGE"; then
+			if [[ ! "$TERMUX_PKG_HOMEPAGE" == 'https://'* ]]; then
 				echo "NON-HTTPS (acceptable)"
 			else
 				echo "PASS"
@@ -366,7 +368,7 @@ lint_package() {
 		if (( ${#TERMUX_PKG_API_LEVEL} )); then
 		echo -n "TERMUX_PKG_API_LEVEL: "
 
-			if grep -qP '^[1-9][0-9]$' <<< "$TERMUX_PKG_API_LEVEL"; then
+			if [[ "$TERMUX_PKG_API_LEVEL" == [1-9][0-9] ]]; then
 				if (( TERMUX_PKG_API_LEVEL < 24 )); then
 					echo "INVALID (allowed: number in range >= 24)"
 					pkg_lint_error=true
@@ -410,11 +412,10 @@ lint_package() {
 			urls_ok=true
 			for url in "${TERMUX_PKG_SRCURL[@]}"; do
 				if (( ${#url} )); then
-					if ! grep -qP '^git\+https://.+' <<< "$url" && ! grep -qP '^https://.+' <<< "$url"; then
-						echo "NON-HTTPS (acceptable)"
-						urls_ok=false
-						break
-					fi
+					case "$url" in
+						https://*|git+https://*) continue;;
+						*) echo "NON-HTTPS (acceptable)" ; urls_ok=false; break ;;
+					esac
 				else
 					echo "NOT SET (one of the array elements)"
 					urls_ok=false
@@ -432,24 +433,22 @@ lint_package() {
 			echo -n "TERMUX_PKG_SHA256: "
 			if (( ${#TERMUX_PKG_SHA256} )); then
 				if (( ${#TERMUX_PKG_SRCURL[@]} == ${#TERMUX_PKG_SHA256[@]} )); then
-					sha256_ok=true
+					sha256_ok="PASS"
 
 					for sha256 in "${TERMUX_PKG_SHA256[@]}"; do
-						if ! grep -qP '^[0-9a-fA-F]{64}$' <<< "${sha256}" && [[ "$sha256" != 'SKIP_CHECKSUM' ]]; then
+						if [[ "$sha256" == 'SKIP_CHECKSUM' ]]; then
+							sha256_ok="PASS (SKIP_CHECKSUM)"
+						elif [[ ! "$sha256" =~ [0-9a-f]{64} ]]; then
 							echo "MALFORMED (SHA-256 should contain 64 hexadecimal numbers)"
-							sha256_ok=false
 							pkg_lint_error=true
 							break
 						fi
 					done
-					unset sha256
 
-					if $sha256_ok; then
-						echo "PASS"
-					fi
-					unset sha256_ok
+					echo "$sha256_ok"
+					unset sha256 sha256_ok
 				else
-					echo "LENGTHS OF 'TERMUX_PKG_SRCURL' AND 'TERMUX_PKG_SHA256' ARE NOT EQUAL"
+					echo "LENGTHS OF 'TERMUX_PKG_SRCURL' AND 'TERMUX_PKG_SHA256' ARRAYS ARE NOT EQUAL"
 					pkg_lint_error=true
 				fi
 			elif [[ "${TERMUX_PKG_SRCURL:0:4}" == 'git+' ]]; then
@@ -569,14 +568,14 @@ lint_package() {
 			file_path_ok=true
 
 			while read -r file_path; do
-				[[ -z "$file_path" ]] && continue
-
-				if grep -qP '^(\.\.)?/' <<< "$file_path"; then
-					echo "INVALID (file path should be relative to prefix)"
-					file_path_ok=false
-					pkg_lint_error=true
+				case "$file_path" in
+					/*|./*|../*)
+						echo "INVALID (file path should be relative to prefix)"
+						file_path_ok=false
+						pkg_lint_error=true
 					break
-				fi
+					;;
+				esac
 			done <<< "$TERMUX_PKG_RM_AFTER_INSTALL"
 			unset file_path
 
@@ -591,14 +590,14 @@ lint_package() {
 			file_path_ok=true
 
 			while read -r file_path; do
-				[[ -z "$file_path" ]] && continue
-
-				if grep -qP '^(\.\.)?/' <<< "$file_path"; then
-					echo "INVALID (file path should be relative to prefix)"
-					file_path_ok=false
-					pkg_lint_error=true
-					break
-				fi
+				case "$file_path" in
+					/*|./*|../*)
+						echo "INVALID (file path should be relative to prefix)"
+						file_path_ok=false
+						pkg_lint_error=true
+						break
+					;;
+				esac
 			done <<< "$TERMUX_PKG_CONFFILES"
 			unset file_path
 
