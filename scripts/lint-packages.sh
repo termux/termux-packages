@@ -6,15 +6,10 @@ TERMUX_SCRIPTDIR=$(realpath "$(dirname "$0")/../")
 . "$TERMUX_SCRIPTDIR/scripts/properties.sh"
 
 check_package_license() {
-	local pkg_licenses="$1"
-	local license
-	local license_ok=true
-	local IFS
+	local pkg_licenses license license_ok=true
+	IFS=',' read -ra pkg_licenses <<< "${1//, /,}"
 
-	IFS=","
-	for license in $pkg_licenses; do
-		license=$(sed -r 's/^\s*(\S+(\s+\S+)*)\s*$/\1/' <<< "$license")
-
+	for license in "${pkg_licenses[@]}"; do
 		case "$license" in
 			AFL-2.1|AFL-3.0|AGPL-V3|APL-1.0|APSL-2.0);;
 			Apache-1.0|Apache-1.1|Apache-2.0|Artistic-License-2.0|Attribution);;
@@ -25,8 +20,8 @@ check_package_license() {
 			EUPL-1.1|EUPL-1.2|Eiffel-2.0|Entessa-1.0|Facebook-Platform|Fair|Frameworx-1.0);;
 			GPL-2.0|GPL-2.0-only|GPL-2.0-or-later);;
 			GPL-3.0|GPL-3.0-only|GPL-3.0-or-later);;
-			Go|hdparm|HSQLDB|Historical|HPND|IBMPL-1.0|IJG|IPAFont-1.0|ISC|IU-Extreme-1.1.1);;
-			ImageMagick|JA-SIG|JSON|JTidy);;
+			Go|hdparm|HPND|HSQLDB|Historical|IBMPL-1.0|IJG|IPAFont-1.0);;
+			ISC|IU-Extreme-1.1.1|ImageMagick|JA-SIG|JSON|JTidy);;
 			LGPL-2.0|LGPL-2.0-only|LGPL-2.0-or-later);;
 			LGPL-2.1|LGPL-2.1-only|LGPL-2.1-or-later);;
 			LGPL-3.0|LGPL-3.0-only|LGPL-3.0-or-later);;
@@ -37,19 +32,21 @@ check_package_license() {
 			"Public Domain"|"Public Domain - SUN"|PythonPL|PythonSoftFoundation);;
 			QTPL-1.0|RPL-1.5|Real-1.0|RicohPL|SUNPublic-1.0|Scala|SimPL-2.0|Sleepycat);;
 			Sybase-1.0|TMate|UPL-1.0|Unicode-DFS-2015|Unlicense|UoI-NCSA|"VIM License");;
-			VovidaPL-1.0|W3C|WTFPL|Xnet|ZLIB|ZPL-2.0|wxWindows|X11);;
+			VovidaPL-1.0|W3C|WTFPL|wxWindows|X11|Xnet|ZLIB|ZPL-2.0);;
 
 			*)
 				license_ok=false
 				break
-				;;
+			;;
 		esac
 	done
 
 	if [[ "$license_ok" == 'false' ]]; then
+		echo "INVALID"
 		return 1
 	fi
 
+	echo "PASS"
 	return 0
 }
 
@@ -248,7 +245,7 @@ lint_package() {
 
 	echo -n "End of line check: "
 	local last2octet
-	last2octet=$(xxd -s -2 "$package_script" | awk '{ print $2 }')
+	read -r _ last2octet _ < <(xxd -s -2 "$package_script")
 	if [[ "$last2octet" == "0a0a" ]]; then
 		echo -e "FAILED (duplicate newlines at the end)\n"
 		tail -n5 "$package_script" | sed -e "s|^|  |" -e "5s|^  |>>|"
@@ -340,18 +337,12 @@ lint_package() {
 
 		echo -n "TERMUX_PKG_LICENSE: "
 		if (( ${#TERMUX_PKG_LICENSE} )); then
-			if [[ "$TERMUX_PKG_LICENSE" == *'custom'* ]]; then
-				echo "CUSTOM"
-			elif [[ "$TERMUX_PKG_LICENSE" == 'non-free' ]]; then
-				echo "NON-FREE"
-			else
-				if check_package_license "$TERMUX_PKG_LICENSE"; then
-					echo "PASS"
-				else
-					echo "INVALID"
-					pkg_lint_error=true
-				fi
-			fi
+			case "$TERMUX_PKG_LICENSE" in
+				*custom*) echo "CUSTOM" ;;
+				'non-free') echo "NON-FREE";;
+				*) check_package_license "$TERMUX_PKG_LICENSE" || pkg_lint_error=true
+				;;
+			esac
 		else
 			echo "NOT SET"
 			pkg_lint_error=true
