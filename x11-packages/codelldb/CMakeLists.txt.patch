@@ -31,17 +31,28 @@ LLDB_PACKAGE is replaced with the absolute path to $TERMUX_PREFIX in lldb-paths.
      set(Python python3)
      set(LibPrefix lib)
      set(LibSuffix .a)
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -98,10 +108,9 @@ endif()
+@@ -108,14 +108,13 @@ endif()
+ 
  # Adapter
  
- add_subdirectory(adapter)
 -add_subdirectory(lldb)
+ add_subdirectory(bin)
+ add_subdirectory(adapter)
  add_subdirectory(lang_support)
+ add_subdirectory(extension)
+ add_subdirectory(tests)
  
 -add_dependencies(adapter lldb lang_support)
 +add_dependencies(adapter lang_support)
  
  if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
      configure_file(cargo_config.windows.toml ${CMAKE_BINARY_DIR}/.cargo/config.toml)
+@@ -148,7 +148,7 @@ file(COPY_FILE ${CMAKE_CURRENT_BINARY_DIR}/package-lock.json ${CMAKE_CURRENT_SOU
+ add_custom_command(
+     OUTPUT ${CMAKE_BINARY_DIR}/package.json ${CMAKE_BINARY_DIR}/generated/codelldb.ts
+     DEPENDS ${CMAKE_SOURCE_DIR}/package.json ${CMAKE_SOURCE_DIR}/src/codelldb-types/src/lib.rs
+-    COMMAND cargo run --package codelldb-types -- ${CMAKE_BINARY_DIR}/codelldb.schema.json
++    COMMAND cargo run --manifest-path=${CMAKE_SOURCE_DIR}/Cargo.toml --package codelldb-types -- ${CMAKE_BINARY_DIR}/codelldb.schema.json
+     COMMAND ${WithEnv} NODE_PATH=${CMAKE_CURRENT_BINARY_DIR}/node_modules node ${CMAKE_CURRENT_SOURCE_DIR}/tools/prep-package.js
+             ${CMAKE_CURRENT_BINARY_DIR}/package.pre.json ${CMAKE_CURRENT_BINARY_DIR}/package.json
+     COMMAND ${NPM} run json2ts -- ${CMAKE_BINARY_DIR}/codelldb.schema.json ${CMAKE_BINARY_DIR}/generated/codelldb.ts
