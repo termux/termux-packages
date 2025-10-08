@@ -37,7 +37,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  17 files changed, 90 insertions(+), 11 deletions(-)
 
 diff --git a/crypto/BUILD.gn b/crypto/BUILD.gn
-index fc0fec6413..f04943a602 100644
+index 8055da2de0..561d77810a 100644
 --- a/crypto/BUILD.gn
 +++ b/crypto/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -116,7 +116,7 @@ index 5cca90ac7c..105d4c4ce0 100644
      "bus.cc",
      "bus.h",
 diff --git a/gin/BUILD.gn b/gin/BUILD.gn
-index 56db2cc80e..87caf78852 100644
+index 44f8c84563..ef288ce49b 100644
 --- a/gin/BUILD.gn
 +++ b/gin/BUILD.gn
 @@ -6,11 +6,12 @@ if (is_android) {
@@ -133,7 +133,7 @@ index 56db2cc80e..87caf78852 100644
    sources = [
      "arguments.cc",
      "arguments.h",
-@@ -79,6 +80,9 @@ component("gin") {
+@@ -81,6 +82,9 @@ component("gin") {
      "wrappable.h",
      "wrapper_info.cc",
    ]
@@ -307,7 +307,7 @@ index c9a605d451..26c759fcad 100644
 +#undef kDeviceRegistrationError
 +#undef GetStatusFromError
 diff --git a/headless/BUILD.gn b/headless/BUILD.gn
-index 99ce5ed901..1cba43f52d 100644
+index 08d6796d3b..2fd14d628f 100644
 --- a/headless/BUILD.gn
 +++ b/headless/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -318,7 +318,7 @@ index 99ce5ed901..1cba43f52d 100644
  import("//build/config/python.gni")
  import("//build/util/lastchange.gni")
  import("//build/util/process_version.gni")
-@@ -233,7 +234,7 @@ static_library("backend_cdp_bindings") {
+@@ -235,7 +236,7 @@ static_library("backend_cdp_bindings") {
  }
  
  # Code that is not needed in a renderer process.
@@ -327,7 +327,7 @@ index 99ce5ed901..1cba43f52d 100644
    sources = [
      "lib/browser/command_line_handler.cc",
      "lib/browser/command_line_handler.h",
-@@ -304,6 +305,9 @@ component("headless_non_renderer") {
+@@ -308,6 +309,9 @@ component("headless_non_renderer") {
      "public/internal/value_conversions.h",
      "public/switches.h",
    ]
@@ -338,7 +338,7 @@ index 99ce5ed901..1cba43f52d 100644
    configs += [ "//build/config/compiler:wexit_time_destructors" ]
  
 diff --git a/ipc/BUILD.gn b/ipc/BUILD.gn
-index 1182e91c01..987cf574d0 100644
+index 1523083e49..ef12a2f366 100644
 --- a/ipc/BUILD.gn
 +++ b/ipc/BUILD.gn
 @@ -4,13 +4,14 @@
@@ -367,7 +367,7 @@ index 1182e91c01..987cf574d0 100644
      "ipc_message.cc",
      "ipc_message.h",
 diff --git a/ipc/ipc_sync_channel.cc b/ipc/ipc_sync_channel.cc
-index 5fc172df36..264a8b71df 100644
+index 7d9170ba05..e35d7ffa99 100644
 --- a/ipc/ipc_sync_channel.cc
 +++ b/ipc/ipc_sync_channel.cc
 @@ -30,6 +30,8 @@
@@ -379,14 +379,14 @@ index 5fc172df36..264a8b71df 100644
  namespace IPC {
  
  namespace {
-@@ -593,3 +595,5 @@ void SyncChannel::StartWatching() {
+@@ -571,3 +573,5 @@ void SyncChannel::StartWatching() {
  void SyncChannel::OnChannelInit() {}
  
  }  // namespace IPC
 +
 +#undef OnEventReady
 diff --git a/sql/BUILD.gn b/sql/BUILD.gn
-index 4684b58a0f..b822b1830d 100644
+index 4004b82da8..f40defa317 100644
 --- a/sql/BUILD.gn
 +++ b/sql/BUILD.gn
 @@ -2,6 +2,7 @@

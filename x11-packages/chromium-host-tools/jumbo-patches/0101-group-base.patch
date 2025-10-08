@@ -33,7 +33,7 @@ Enable jumbo build for the following template(s):
  14 files changed, 75 insertions(+), 9 deletions(-)
 
 diff --git a/base/BUILD.gn b/base/BUILD.gn
-index 2f5d46db2e..f40d502a76 100644
+index c835d9ea23..f6f433ab46 100644
 --- a/base/BUILD.gn
 +++ b/base/BUILD.gn
 @@ -28,6 +28,7 @@ import("//build/config/cast.gni")
@@ -44,7 +44,7 @@ index 2f5d46db2e..f40d502a76 100644
  import("//build/config/logging.gni")
  import("//build/config/profiling/profiling.gni")
  import("//build/config/rust.gni")
-@@ -173,7 +174,7 @@ use_epoll = is_linux || is_chromeos || is_android
+@@ -169,7 +170,7 @@ use_epoll = is_linux || is_chromeos || is_android
  # base compilation units to be linked in where they wouldn't have otherwise.
  # This does not include test code (test support and anything in the test
  # directory) which should use source_set as is recommended for GN targets).
@@ -53,7 +53,7 @@ index 2f5d46db2e..f40d502a76 100644
    sources = [
      "allocator/allocator_check.cc",
      "allocator/allocator_check.h",
-@@ -993,6 +994,10 @@ component("base") {
+@@ -996,6 +997,10 @@ component("base") {
      ]
    }
  
@@ -64,7 +64,7 @@ index 2f5d46db2e..f40d502a76 100644
    if (is_linux || is_chromeos) {
      sources += [
        "debug/proc_maps_linux.cc",
-@@ -1012,6 +1017,7 @@ component("base") {
+@@ -1015,6 +1020,7 @@ component("base") {
        "threading/thread_type_delegate.cc",
        "threading/thread_type_delegate.h",
      ]
@@ -72,7 +72,7 @@ index 2f5d46db2e..f40d502a76 100644
    }
  
    if (is_chromeos) {
-@@ -1950,6 +1956,11 @@ component("base") {
+@@ -1946,6 +1952,11 @@ component("base") {
        "win/wrapped_window_proc.h",
      ]
  
@@ -84,7 +84,7 @@ index 2f5d46db2e..f40d502a76 100644
      deps += [ "//base/win:base_win_buildflags" ]
  
      if (com_init_check_hook_disabled) {
-@@ -2867,7 +2878,7 @@ if (enable_rust_translit) {
+@@ -2863,7 +2874,7 @@ if (enable_rust_translit) {
    }
  }
  
@@ -94,7 +94,7 @@ index 2f5d46db2e..f40d502a76 100644
    sources = [
      "i18n/base_i18n_export.h",
 diff --git a/base/sampling_heap_profiler/poisson_allocation_sampler.cc b/base/sampling_heap_profiler/poisson_allocation_sampler.cc
-index c093e98ee2..2f5a25fb44 100644
+index 618a058186..0cd60703b0 100644
 --- a/base/sampling_heap_profiler/poisson_allocation_sampler.cc
 +++ b/base/sampling_heap_profiler/poisson_allocation_sampler.cc
 @@ -20,6 +20,8 @@
@@ -106,7 +106,7 @@ index c093e98ee2..2f5a25fb44 100644
  namespace base {
  
  namespace {
-@@ -65,7 +67,7 @@ struct ThreadLocalData {
+@@ -63,7 +65,7 @@ struct ThreadLocalData {
  // Returns an object storing thread-local state. This does NOT use
  // base::ThreadLocalStorage, so it's safe to call from hooks in the
  // base::ThreadLocalStorage implementation.
@@ -115,7 +115,7 @@ index c093e98ee2..2f5a25fb44 100644
  #if USE_LOCAL_TLS_EMULATION()
    // If available, use ThreadLocalStorage to bypass dependencies introduced by
    // Clang's implementation of thread_local.
-@@ -101,6 +103,8 @@ ThreadLocalData* GetThreadLocalData() {
+@@ -99,6 +101,8 @@ ThreadLocalData* GetThreadLocalData() {
  
  }  // namespace
  
@@ -124,7 +124,7 @@ index c093e98ee2..2f5a25fb44 100644
  PoissonAllocationSamplerStats::PoissonAllocationSamplerStats(
      size_t address_cache_hits,
      size_t address_cache_misses,
-@@ -505,3 +509,6 @@ void PoissonAllocationSampler::RemoveSamplesObserver(
+@@ -503,3 +507,6 @@ void PoissonAllocationSampler::RemoveSamplesObserver(
  }
  
  }  // namespace base
@@ -189,7 +189,7 @@ index 16bd753e47..d6c6178311 100644
 +
 +#undef current_default_handle
 diff --git a/base/task/single_thread_task_runner.cc b/base/task/single_thread_task_runner.cc
-index 651267a81a..179bdf2010 100644
+index 514c9ff38b..911c17b1e8 100644
 --- a/base/task/single_thread_task_runner.cc
 +++ b/base/task/single_thread_task_runner.cc
 @@ -15,6 +15,8 @@
@@ -201,8 +201,8 @@ index 651267a81a..179bdf2010 100644
  namespace base {
  
  namespace {
-@@ -100,3 +102,5 @@ SingleThreadTaskRunner::CurrentHandleOverrideForTesting::
-     ~CurrentHandleOverrideForTesting() = default;
+@@ -148,3 +150,5 @@ SingleThreadTaskRunner::ScopedCanOverrideMainThreadDefaultHandle::
+ }
  
  }  // namespace base
 +
@@ -352,7 +352,7 @@ index d477b64c5e..e100dcc393 100644
 +
 +#undef MakeOpacityFilter
 diff --git a/components/viz/service/frame_sinks/frame_sink_manager_impl.h b/components/viz/service/frame_sinks/frame_sink_manager_impl.h
-index 3ebefa4b63..1350f5c75f 100644
+index 02582cf3ec..ea0f093544 100644
 --- a/components/viz/service/frame_sinks/frame_sink_manager_impl.h
 +++ b/components/viz/service/frame_sinks/frame_sink_manager_impl.h
 @@ -5,6 +5,9 @@
