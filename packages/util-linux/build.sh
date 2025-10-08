@@ -10,12 +10,11 @@ TERMUX_PKG_LICENSE_FILE="
 	Documentation/licenses/COPYING.ISC
 "
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.40.2"
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_VERSION="2.41.2"
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/utils/util-linux/v${TERMUX_PKG_VERSION:0:4}/util-linux-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=d78b37a66f5922d70edf3bdfb01a6b33d34ed3c3cafd6628203b2a2b67c8e8b3
+TERMUX_PKG_SHA256=6062a1d89b571a61932e6fc0211f36060c4183568b81ee866cf363bce9f6583e
 # libcrypt is required for only newgrp and sulogin, which are not built anyways
-TERMUX_PKG_DEPENDS="libcap-ng, libsmartcols, ncurses, zlib, libandroid-glob"
+TERMUX_PKG_DEPENDS="libandroid-glob, libandroid-posix-semaphore, libcap-ng, libsmartcols, ncurses, zlib"
 TERMUX_PKG_ESSENTIAL=true
 TERMUX_PKG_BREAKS="util-linux-dev"
 TERMUX_PKG_REPLACES="util-linux-dev"
@@ -64,4 +63,6 @@ termux_step_pre_configure() {
 		64) TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_prlimit=yes";;
 		32) TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-year2038";;
 	esac
+
+	LDFLAGS+=" -landroid-posix-semaphore"
 }
