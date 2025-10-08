@@ -1,0 +1,20 @@
+--- a/third_party/perfetto/src/base/rt_mutex.cc
++++ b/third_party/perfetto/src/base/rt_mutex.cc
+@@ -21,7 +21,7 @@
+ #include "perfetto/base/logging.h"
+ #include "perfetto/ext/base/utils.h"
+ 
+-#if PERFETTO_BUILDFLAG(PERFETTO_OS_ANDROID)
++#if PERFETTO_BUILDFLAG(PERFETTO_OS_ANDROID) || defined(__TERMUX__)
+ #include <dlfcn.h>
+ #endif
+ 
+@@ -34,7 +34,7 @@
+ RtPosixMutex::RtPosixMutex() noexcept {
+   pthread_mutexattr_t at{};
+   PERFETTO_CHECK(pthread_mutexattr_init(&at) == 0);
+-#if PERFETTO_BUILDFLAG(PERFETTO_OS_ANDROID) && __ANDROID_API__ < 28
++#if (PERFETTO_BUILDFLAG(PERFETTO_OS_ANDROID) || defined(__TERMUX__)) && __ANDROID_API__ < 28
+   // pthread_mutexattr_setprotocol is only available on API 28.
+   using SetprotocolFuncT = int (*)(pthread_mutexattr_t*, int);
+   static auto setprotocol_func = reinterpret_cast<SetprotocolFuncT>(

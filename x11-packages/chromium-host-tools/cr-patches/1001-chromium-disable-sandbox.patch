@@ -1,7 +1,7 @@
 --- a/content/shell/app/shell_main_delegate.cc
 +++ b/content/shell/app/shell_main_delegate.cc
-@@ -91,6 +91,10 @@
- #include "content/shell/common/shell_switches.h"
+@@ -92,6 +92,10 @@
+ #include "content/shell/app/ios/shell_application_ios.h"
  #endif
  
 +#ifdef __TERMUX__
@@ -11,7 +11,7 @@
  namespace {
  
  enum class LoggingDest {
-@@ -273,6 +277,15 @@
+@@ -256,6 +260,15 @@
  }
  
  void ShellMainDelegate::PreSandboxStartup() {
@@ -29,7 +29,7 @@
  // TODO(crbug.com/40188745): Implement crash reporter integration for Fuchsia.
 --- a/chrome/browser/ui/startup/bad_flags_prompt.cc
 +++ b/chrome/browser/ui/startup/bad_flags_prompt.cc
-@@ -71,11 +71,13 @@
+@@ -74,11 +74,13 @@
      switches::kHostRules,
  
      // These flags disable sandbox-related security.
@@ -45,7 +45,7 @@
  #endif
 --- a/chrome/app/chrome_main_delegate.cc
 +++ b/chrome/app/chrome_main_delegate.cc
-@@ -212,6 +212,10 @@
+@@ -226,6 +226,10 @@
  #include "ui/ozone/public/ozone_platform.h"
  #endif  // BUILDFLAG(IS_OZONE)
  
@@ -56,7 +56,7 @@
  base::LazyInstance<ChromeContentGpuClient>::DestructorAtExit
      g_chrome_content_gpu_client = LAZY_INSTANCE_INITIALIZER;
  base::LazyInstance<ChromeContentRendererClient>::DestructorAtExit
-@@ -1035,6 +1039,14 @@
+@@ -1061,6 +1065,14 @@
    const base::CommandLine& command_line =
        *base::CommandLine::ForCurrentProcess();
  
@@ -73,7 +73,7 @@
    // web security by setting the kWebKitWebSecurityEnabled pref directly.
 --- a/content/shell/browser/shell_content_browser_client.cc
 +++ b/content/shell/browser/shell_content_browser_client.cc
-@@ -142,6 +142,10 @@
+@@ -141,6 +141,10 @@
  #include "media/mojo/services/media_foundation_preferences.h"
  #endif  // BUILDFLAG(IS_WIN)
  
@@ -84,7 +84,7 @@
  namespace content {
  
  namespace {
-@@ -452,6 +456,9 @@
+@@ -451,6 +455,9 @@
        // to shell_main.cc that it's a browser test.
        switches::kBrowserTest,
  #endif

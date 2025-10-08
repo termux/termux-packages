@@ -87,6 +87,7 @@ Enable jumbo build for the following component(s)/source_set(s):
 ---
  ui/accessibility/BUILD.gn                         |  5 +++--
  ui/accessibility/platform/BUILD.gn                |  3 ++-
+ .../inspect/ax_inspect_utils_auralinux.cc         |  2 ++
  ui/aura/BUILD.gn                                  |  5 +++--
  ui/base/BUILD.gn                                  | 11 ++++++++---
  ui/base/clipboard/BUILD.gn                        |  9 +++++----
@@ -139,7 +140,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  ui/latency/BUILD.gn                               |  5 +++--
  ui/message_center/BUILD.gn                        |  3 ++-
  ui/message_center/public/cpp/BUILD.gn             |  3 ++-
- ui/native_theme/BUILD.gn                          |  7 ++++---
+ ui/native_theme/BUILD.gn                          |  3 ++-
  ui/ozone/BUILD.gn                                 | 11 ++++++-----
  ui/platform_window/stub/BUILD.gn                  |  4 +++-
  ui/platform_window/win/BUILD.gn                   |  4 +++-
@@ -149,6 +150,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  ui/surface/BUILD.gn                               |  3 ++-
  ui/touch_selection/BUILD.gn                       |  3 ++-
  ui/views/BUILD.gn                                 |  7 ++++---
+ .../view_ax_platform_node_delegate.cc             |  2 +-
  ui/views/animation/pulsing_ink_drop_mask.cc       |  6 ++++++
  ui/views/animation/pulsing_path_ink_drop_mask.cc  |  6 ++++++
  ui/views/bubble/bubble_frame_view.cc              |  2 +-
@@ -160,7 +162,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  ui/web_dialogs/BUILD.gn                           |  6 ++++--
  ui/wm/BUILD.gn                                    |  5 +++--
  ui/wm/public/BUILD.gn                             |  3 ++-
- 75 files changed, 277 insertions(+), 107 deletions(-)
+ 77 files changed, 278 insertions(+), 106 deletions(-)
 
 diff --git a/ui/accessibility/BUILD.gn b/ui/accessibility/BUILD.gn
 index 96cea51f84..89b8fc7b80 100644
@@ -193,7 +195,7 @@ index 96cea51f84..89b8fc7b80 100644
  
    sources = [
 diff --git a/ui/accessibility/platform/BUILD.gn b/ui/accessibility/platform/BUILD.gn
-index 79a01b0079..fa67575fb3 100644
+index 54d483d6b3..a5bb2f6d49 100644
 --- a/ui/accessibility/platform/BUILD.gn
 +++ b/ui/accessibility/platform/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -213,8 +215,26 @@ index 79a01b0079..fa67575fb3 100644
    output_name = "accessibility_platform"
  
    defines = [ "IS_AX_PLATFORM_IMPL" ]
+diff --git a/ui/accessibility/platform/inspect/ax_inspect_utils_auralinux.cc b/ui/accessibility/platform/inspect/ax_inspect_utils_auralinux.cc
+index 00c2c5dc9e..08ac87ba7c 100644
+--- a/ui/accessibility/platform/inspect/ax_inspect_utils_auralinux.cc
++++ b/ui/accessibility/platform/inspect/ax_inspect_utils_auralinux.cc
+@@ -47,11 +47,13 @@ const char* GetNameForPlatformConstant(
+ #define QUOTE(X) \
+   { X, #X }
+ 
++#ifndef ATSPI_CHECK_VERSION
+ #define ATSPI_CHECK_VERSION(major, minor, micro)                           \
+   (major) < ATSPI_MAJOR_VERSION ||                                         \
+       ((major) == ATSPI_MAJOR_VERSION && (minor) < ATSPI_MINOR_VERSION) || \
+       ((major) == ATSPI_MAJOR_VERSION && (minor) == ATSPI_MINOR_VERSION && \
+        (micro) <= ATSPI_MICRO_VERSION)
++#endif
+ 
+ #define CHECK_ATSPI_ERROR_NULLPTR(error) \
+   if (error) {                           \
 diff --git a/ui/aura/BUILD.gn b/ui/aura/BUILD.gn
-index 38fd52aa1e..49b3b57495 100644
+index 3de89188dd..f1eb3c392e 100644
 --- a/ui/aura/BUILD.gn
 +++ b/ui/aura/BUILD.gn
 @@ -2,10 +2,11 @@
@@ -240,7 +260,7 @@ index 38fd52aa1e..49b3b57495 100644
    sources = [
      "test/aura_test_base.cc",
 diff --git a/ui/base/BUILD.gn b/ui/base/BUILD.gn
-index 20361d421d..3c56c95799 100644
+index 1428a0aa8d..e9786252fb 100644
 --- a/ui/base/BUILD.gn
 +++ b/ui/base/BUILD.gn
 @@ -6,6 +6,7 @@ import("//build/buildflag_header.gni")
@@ -251,7 +271,7 @@ index 20361d421d..3c56c95799 100644
  import("//build/config/linux/gtk/gtk.gni")
  import("//build/config/linux/pangocairo/pangocairo.gni")
  import("//build/config/locales.gni")
-@@ -113,7 +114,7 @@ source_set("types") {
+@@ -115,7 +116,7 @@ source_set("types") {
    }
  }
  
@@ -260,7 +280,7 @@ index 20361d421d..3c56c95799 100644
    output_name = "ui_base"
  
    sources = [
-@@ -234,6 +235,10 @@ component("base") {
+@@ -223,6 +224,10 @@ component("base") {
  
    libs = []
  
@@ -271,7 +291,7 @@ index 20361d421d..3c56c95799 100644
    if (is_android) {
      sources += [
        "device_form_factor_android.cc",
-@@ -706,7 +711,7 @@ component("features") {
+@@ -693,7 +698,7 @@ component("features") {
  }
  
  if (is_win || is_mac || is_linux || is_chromeos) {
@@ -280,7 +300,7 @@ index 20361d421d..3c56c95799 100644
      testonly = true
      sources = [
        "test/skia_gold_matching_algorithm.cc",
-@@ -752,7 +757,7 @@ if (use_blink) {
+@@ -753,7 +758,7 @@ if (is_android) {
    }
  }
  
@@ -290,7 +310,7 @@ index 20361d421d..3c56c95799 100644
    sources = [
      "data_transfer_policy/mock_data_transfer_policy_controller.cc",
 diff --git a/ui/base/clipboard/BUILD.gn b/ui/base/clipboard/BUILD.gn
-index 50cfe64442..e6656b4e36 100644
+index c375288ca4..427fcf5408 100644
 --- a/ui/base/clipboard/BUILD.gn
 +++ b/ui/base/clipboard/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -328,7 +348,7 @@ index 50cfe64442..e6656b4e36 100644
    output_name = "ui_base_clipboard"
  
    sources = [
-@@ -198,7 +199,7 @@ component("clipboard") {
+@@ -199,7 +200,7 @@ component("clipboard") {
    }
  }
  
@@ -338,7 +358,7 @@ index 50cfe64442..e6656b4e36 100644
  
    if (use_blink) {
 diff --git a/ui/base/ime/BUILD.gn b/ui/base/ime/BUILD.gn
-index d24d946c61..634cc74f8d 100644
+index 63e2515f5a..71b3d02d29 100644
 --- a/ui/base/ime/BUILD.gn
 +++ b/ui/base/ime/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -366,7 +386,7 @@ index d24d946c61..634cc74f8d 100644
 +jumbo_component("ime") {
    output_name = "ui_base_ime"
    sources = [
-     "constants.cc",
+     "constants.h",
 diff --git a/ui/base/ime/ash/BUILD.gn b/ui/base/ime/ash/BUILD.gn
 index c5cd011135..cee3672eb6 100644
 --- a/ui/base/ime/ash/BUILD.gn
@@ -519,10 +539,10 @@ index c238a1b0cf..dc880044dd 100644
  
    sources = [
 diff --git a/ui/base/x/selection_owner.cc b/ui/base/x/selection_owner.cc
-index 7ae2ba1bcf..75c4592511 100644
+index 35a1178e20..88f994fb95 100644
 --- a/ui/base/x/selection_owner.cc
 +++ b/ui/base/x/selection_owner.cc
-@@ -68,11 +68,13 @@ bool GetAtomPairArrayProperty(
+@@ -69,11 +69,13 @@ bool GetAtomPairArrayProperty(
    return true;
  }
  
@@ -537,7 +557,7 @@ index 7ae2ba1bcf..75c4592511 100644
  void SetSelectionOwner(x11::Window window,
                         x11::Atom selection,
                         x11::Time time = x11::Time::CurrentTime) {
-@@ -343,3 +345,5 @@ SelectionOwner::IncrementalTransfer::operator=(IncrementalTransfer&&) = default;
+@@ -342,3 +344,5 @@ SelectionOwner::IncrementalTransfer::operator=(IncrementalTransfer&&) = default;
  SelectionOwner::IncrementalTransfer::~IncrementalTransfer() = default;
  
  }  // namespace ui
@@ -617,7 +637,7 @@ index f1c43001fe..e99c24c004 100644
 +#undef kXdndActionLink
 +#undef kXdndActionList
 diff --git a/ui/color/BUILD.gn b/ui/color/BUILD.gn
-index 4352824d47..d59dd5d26f 100644
+index 64a92227ea..d8a6912b30 100644
 --- a/ui/color/BUILD.gn
 +++ b/ui/color/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -762,7 +782,7 @@ index cfb992fb9e..fb41100de8 100644
    sources = [
      "display_util.cc",
 diff --git a/ui/events/BUILD.gn b/ui/events/BUILD.gn
-index 689b11d456..b54e70d252 100644
+index 0d27e49b24..96371b43d4 100644
 --- a/ui/events/BUILD.gn
 +++ b/ui/events/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -800,7 +820,7 @@ index 689b11d456..b54e70d252 100644
    public = [
      "cocoa/cocoa_event_utils.h",
      "event.h",
-@@ -454,7 +455,7 @@ component("events") {
+@@ -452,7 +453,7 @@ component("events") {
    configs += [ "//build/config/compiler:no_exit_time_destructors" ]
  }
  
@@ -809,7 +829,7 @@ index 689b11d456..b54e70d252 100644
    public = [ "keyboard_hook.h" ]
  
    defines = [ "IS_KEYBOARD_HOOK_IMPL" ]
-@@ -508,7 +509,7 @@ component("keyboard_hook") {
+@@ -506,7 +507,7 @@ component("keyboard_hook") {
    }
  }
  
@@ -818,7 +838,7 @@ index 689b11d456..b54e70d252 100644
    sources = [
      "gesture_detection/filtered_gesture_provider.cc",
      "gesture_detection/filtered_gesture_provider.h",
-@@ -566,7 +567,7 @@ component("gesture_detection") {
+@@ -564,7 +565,7 @@ component("gesture_detection") {
    }
  }
  
@@ -827,7 +847,7 @@ index 689b11d456..b54e70d252 100644
    sources = [
      "velocity_tracker/bitset_32.h",
      "velocity_tracker/motion_event.cc",
-@@ -589,7 +590,7 @@ component("velocity_tracker") {
+@@ -587,7 +588,7 @@ component("velocity_tracker") {
    ]
  }
  
@@ -979,7 +999,7 @@ index c8abb820bd..7028f735b4 100644
  
    sources = [
 diff --git a/ui/gfx/BUILD.gn b/ui/gfx/BUILD.gn
-index 4c93aa57c3..33ba0745f6 100644
+index 6f09aea6a4..d1bc70c97b 100644
 --- a/ui/gfx/BUILD.gn
 +++ b/ui/gfx/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1026,7 +1046,7 @@ index 4c93aa57c3..33ba0745f6 100644
    sources = [
      "color_space.cc",
      "color_space.h",
-@@ -595,7 +596,7 @@ group("memory_buffer") {
+@@ -599,7 +600,7 @@ group("memory_buffer") {
  }
  
  # Cannot be a static_library in component builds due to exported functions
@@ -1035,7 +1055,7 @@ index 4c93aa57c3..33ba0745f6 100644
    visibility = [ ":*" ]  # Depend on through ":memory_buffer".
  
    # TODO(brettw) refactor this so these sources are in a coherent directory
-@@ -692,7 +693,7 @@ source_set("memory_buffer_sources") {
+@@ -696,7 +697,7 @@ source_set("memory_buffer_sources") {
  }
  
  # TODO(ccameron): This can be moved into a separate source_set.
@@ -1044,7 +1064,7 @@ index 4c93aa57c3..33ba0745f6 100644
    sources = [
      "switches.cc",
      "switches.h",
-@@ -704,7 +705,7 @@ component("gfx_switches") {
+@@ -708,7 +709,7 @@ component("gfx_switches") {
    deps = [ "//base" ]
  }
  
@@ -1304,7 +1324,7 @@ index 51db6c7cfc..3424804225 100644
 +#undef kDisabledCrtc
 +#undef PixelsToMillimeters
 diff --git a/ui/gl/BUILD.gn b/ui/gl/BUILD.gn
-index b26f222044..96c6b92151 100644
+index 795c5b51db..4292c46627 100644
 --- a/ui/gl/BUILD.gn
 +++ b/ui/gl/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -1324,7 +1344,7 @@ index b26f222044..96c6b92151 100644
    output_name = "gl_wrapper"  # Avoid colliding with OS X"s libGL.dylib.
  
    sources = [
-@@ -354,6 +355,10 @@ component("gl") {
+@@ -356,6 +357,10 @@ component("gl") {
      defines += [ "GL_SILENCE_DEPRECATION" ]
    }
  
@@ -1335,7 +1355,7 @@ index b26f222044..96c6b92151 100644
    if (is_android) {
      sources += [
        "android/egl_fence_utils.cc",
-@@ -435,11 +440,15 @@ if (is_mac) {
+@@ -437,11 +442,15 @@ if (is_mac) {
          "//third_party/swiftshader/src/Vulkan:icd_file",
          "//third_party/swiftshader/src/Vulkan:swiftshader_libvulkan",
        ]
@@ -1352,7 +1372,7 @@ index b26f222044..96c6b92151 100644
    testonly = true
    sources = [
      "egl_bindings_autogen_mock.cc",
-@@ -464,7 +473,7 @@ static_library("gl_unittest_utils") {
+@@ -466,7 +475,7 @@ static_library("gl_unittest_utils") {
    ]
  }
  
@@ -1442,27 +1462,22 @@ index 799ce76a32..5cab48bf96 100644
        "//ui/base/x",
        "//ui/events/platform/x11",
 diff --git a/ui/latency/BUILD.gn b/ui/latency/BUILD.gn
-index 5df7f39787..af19851b70 100644
+index 775f1cb8d0..a3e9b48f63 100644
 --- a/ui/latency/BUILD.gn
 +++ b/ui/latency/BUILD.gn
-@@ -3,6 +3,7 @@
+@@ -2,9 +2,10 @@
+ # Use of this source code is governed by a BSD-style license that can be
  # found in the LICENSE file.
  
- import("//build/buildflag_header.gni")
 +import("//build/config/jumbo.gni")
  import("//testing/test.gni")
- 
- declare_args() {
-@@ -16,7 +17,7 @@ buildflag_header("jank_tracker_for_experiments_buildflags") {
-   flags = [ "JANK_TRACKER_FOR_EXPERIMENTS=$use_jank_tracker_for_experiments" ]
- }
  
 -source_set("latency") {
 +jumbo_source_set("latency") {
    sources = [
      "latency_info.cc",
      "latency_info.h",
-@@ -45,7 +46,7 @@ source_set("latency") {
+@@ -24,7 +25,7 @@ source_set("latency") {
    configs += [ "//build/config/compiler:no_exit_time_destructors" ]
  }
  
@@ -1472,7 +1487,7 @@ index 5df7f39787..af19851b70 100644
    sources = [ "latency_info_test_support.cc" ]
  
 diff --git a/ui/message_center/BUILD.gn b/ui/message_center/BUILD.gn
-index e602c3c450..1855b8ded7 100644
+index d081004ac9..0e5650ce0b 100644
 --- a/ui/message_center/BUILD.gn
 +++ b/ui/message_center/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1493,7 +1508,7 @@ index e602c3c450..1855b8ded7 100644
      "//base",
      "//ui/base",
 diff --git a/ui/message_center/public/cpp/BUILD.gn b/ui/message_center/public/cpp/BUILD.gn
-index e15d9b3c19..5b5cdee474 100644
+index be78eb231f..2bbfee8e3b 100644
 --- a/ui/message_center/public/cpp/BUILD.gn
 +++ b/ui/message_center/public/cpp/BUILD.gn
 @@ -2,10 +2,11 @@
@@ -1510,7 +1525,7 @@ index e15d9b3c19..5b5cdee474 100644
  
    sources = [
 diff --git a/ui/native_theme/BUILD.gn b/ui/native_theme/BUILD.gn
-index 7bfcb85881..b4563207f0 100644
+index 3a0957123e..4fb8439039 100644
 --- a/ui/native_theme/BUILD.gn
 +++ b/ui/native_theme/BUILD.gn
 @@ -2,10 +2,11 @@
@@ -1526,22 +1541,8 @@ index 7bfcb85881..b4563207f0 100644
    sources = [
      "caption_style.cc",
      "caption_style.h",
-@@ -112,11 +113,11 @@ if (is_win) {
-     libs = [ "uxtheme.lib" ]
-   }
- } else {
--  source_set("native_theme_browser") {
-+  jumbo_source_set("native_theme_browser") {
-   }
- }
- 
--source_set("test_support") {
-+jumbo_source_set("test_support") {
-   testonly = true
- 
-   deps = [
 diff --git a/ui/ozone/BUILD.gn b/ui/ozone/BUILD.gn
-index 4c12957518..5c66612616 100644
+index 636e630ec8..bafb45528a 100644
 --- a/ui/ozone/BUILD.gn
 +++ b/ui/ozone/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1561,7 +1562,7 @@ index 4c12957518..5c66612616 100644
    sources = [
      "public/gl_ozone.h",
      "public/gpu_platform_support_host.cc",
-@@ -253,7 +254,7 @@ source_set("ozone_switches") {
+@@ -279,7 +280,7 @@ source_set("ozone_switches") {
    ]
  }
  
@@ -1570,7 +1571,7 @@ index 4c12957518..5c66612616 100644
    visibility = []
    visibility = [ "*" ]
    public_deps = [ ":platform" ]
-@@ -270,7 +271,7 @@ source_set("drm_modifiers_filter") {
+@@ -296,7 +297,7 @@ source_set("drm_modifiers_filter") {
    visibility += [ "//gpu/vulkan" ]
  }
  
@@ -1579,7 +1580,7 @@ index 4c12957518..5c66612616 100644
    testonly = true
  
    sources = [
-@@ -293,7 +294,7 @@ source_set("test_support_internal") {
+@@ -319,7 +320,7 @@ source_set("test_support_internal") {
    public_deps = [ "//base/test:test_support" ]
  }
  
@@ -1588,7 +1589,7 @@ index 4c12957518..5c66612616 100644
    visibility = []
    visibility = [ "//ui/views:test_support" ]
  
-@@ -329,7 +330,7 @@ source_set("ozone_interactive_ui_tests") {
+@@ -355,7 +356,7 @@ source_set("ozone_interactive_ui_tests") {
    deps = ozone_platform_interactive_ui_tests_sources
  }
  
@@ -1703,7 +1704,7 @@ index dace1de6c0..e7f68805e9 100644
      "surface_export.h",
      "transport_dib.cc",
 diff --git a/ui/touch_selection/BUILD.gn b/ui/touch_selection/BUILD.gn
-index e454b4e0c8..499944e2aa 100644
+index 5043429e94..83a1accb6f 100644
 --- a/ui/touch_selection/BUILD.gn
 +++ b/ui/touch_selection/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -1724,7 +1725,7 @@ index e454b4e0c8..499944e2aa 100644
  
    sources = [
 diff --git a/ui/views/BUILD.gn b/ui/views/BUILD.gn
-index 3885f2eb20..6e1195c069 100644
+index a7ba817422..92e96c41e4 100644
 --- a/ui/views/BUILD.gn
 +++ b/ui/views/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -1744,7 +1745,7 @@ index 3885f2eb20..6e1195c069 100644
    all_dependent_configs = [ ":flags" ]
  
    public = [
-@@ -978,7 +979,7 @@ component("views") {
+@@ -976,7 +977,7 @@ component("views") {
  }
  
  if (is_win || is_mac || is_linux || is_chromeos) {
@@ -1753,7 +1754,7 @@ index 3885f2eb20..6e1195c069 100644
      testonly = true
      sources = [
        "test/view_skia_gold_pixel_diff.cc",
-@@ -997,7 +998,7 @@ if (is_win || is_mac || is_linux || is_chromeos) {
+@@ -995,7 +996,7 @@ if (is_win || is_mac || is_linux || is_chromeos) {
    }
  }
  
@@ -1762,6 +1763,19 @@ index 3885f2eb20..6e1195c069 100644
    testonly = true
    sources = [
      "accessibility/tree/view_accessibility_ax_tree_source_test_api.h",
+diff --git a/ui/views/accessibility/view_ax_platform_node_delegate.cc b/ui/views/accessibility/view_ax_platform_node_delegate.cc
+index ca7e48f98d..0012187e93 100644
+--- a/ui/views/accessibility/view_ax_platform_node_delegate.cc
++++ b/ui/views/accessibility/view_ax_platform_node_delegate.cc
+@@ -713,7 +713,7 @@ gfx::NativeViewAccessible ViewAXPlatformNodeDelegate::HitTestSync(
+   // Search child widgets first, since they're on top in the z-order.
+   for (Widget* child_widget : GetChildWidgets().child_widgets) {
+     View* child_root_view = child_widget->GetRootView();
+-    if (features::IsAccessibilityHitTestPointCopyEnabled()) {
++    if (::features::IsAccessibilityHitTestPointCopyEnabled()) {
+       // Use a per-iteration copy; don't mutate `point` so later iterations and
+       // the view() hit test use the original ScreenToDIPPoint result.
+       gfx::Point point_for_child = point;
 diff --git a/ui/views/animation/pulsing_ink_drop_mask.cc b/ui/views/animation/pulsing_ink_drop_mask.cc
 index c33e817520..9fa720f76b 100644
 --- a/ui/views/animation/pulsing_ink_drop_mask.cc
@@ -1784,7 +1798,7 @@ index c33e817520..9fa720f76b 100644
 +#undef kFeaturePromoPulseDuration
 +#undef kFeaturePromoPulseInsetDip
 diff --git a/ui/views/animation/pulsing_path_ink_drop_mask.cc b/ui/views/animation/pulsing_path_ink_drop_mask.cc
-index 0e39d27276..3ca1c18cb9 100644
+index f1ce31754a..4376f21dd5 100644
 --- a/ui/views/animation/pulsing_path_ink_drop_mask.cc
 +++ b/ui/views/animation/pulsing_path_ink_drop_mask.cc
 @@ -11,6 +11,9 @@
@@ -1797,7 +1811,7 @@ index 0e39d27276..3ca1c18cb9 100644
  namespace {
  
  // Cycle duration of ink drop pulsing animation used for in-product help.
-@@ -106,3 +109,6 @@ void PulsingPathInkDropMask::AnimationProgressed(
+@@ -105,3 +108,6 @@ void PulsingPathInkDropMask::AnimationProgressed(
    layer_container_->SchedulePaint();
  }
  }  // namespace views
@@ -1805,7 +1819,7 @@ index 0e39d27276..3ca1c18cb9 100644
 +#undef kFeaturePromoPulseDuration
 +#undef kFeaturePromoPulseInsetDip
 diff --git a/ui/views/bubble/bubble_frame_view.cc b/ui/views/bubble/bubble_frame_view.cc
-index deacaed38d..8c22a71591 100644
+index 95ee208dc4..4cca52f579 100644
 --- a/ui/views/bubble/bubble_frame_view.cc
 +++ b/ui/views/bubble/bubble_frame_view.cc
 @@ -158,7 +158,7 @@ std::unique_ptr<Label> BubbleFrameView::CreateDefaultTitleLabel(
@@ -1818,7 +1832,7 @@ index deacaed38d..8c22a71591 100644
      label->GetViewAccessibility().SetHierarchicalLevel(1);
    }
 diff --git a/ui/views/controls/webview/BUILD.gn b/ui/views/controls/webview/BUILD.gn
-index 111d643258..caf62099b0 100644
+index 7f4eff1017..4fd7fe857d 100644
 --- a/ui/views/controls/webview/BUILD.gn
 +++ b/ui/views/controls/webview/BUILD.gn
 @@ -2,9 +2,10 @@
@@ -1834,7 +1848,7 @@ index 111d643258..caf62099b0 100644
      "unhandled_keyboard_event_handler.cc",
      "unhandled_keyboard_event_handler.h",
 diff --git a/ui/views/examples/BUILD.gn b/ui/views/examples/BUILD.gn
-index 500dd0d66f..33c93de234 100644
+index a4564d98d6..bcd069a3e0 100644
 --- a/ui/views/examples/BUILD.gn
 +++ b/ui/views/examples/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -1854,7 +1868,7 @@ index 500dd0d66f..33c93de234 100644
    testonly = true
  
    sources = [
-@@ -399,7 +400,7 @@ if (is_mac) {
+@@ -398,7 +399,7 @@ if (is_mac) {
    }
  }
  
@@ -1864,20 +1878,20 @@ index 500dd0d66f..33c93de234 100644
    sources = [
      "examples_window_with_content.cc",
 diff --git a/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc b/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc
-index 78207bdaf4..8141734751 100644
+index f0622884b2..0393891fb3 100644
 --- a/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc
 +++ b/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc
-@@ -635,7 +635,7 @@ void DesktopNativeWidgetAura::InitNativeWidget(Widget::InitParams params) {
+@@ -634,7 +634,7 @@ void DesktopNativeWidgetAura::InitNativeWidget(Widget::InitParams params) {
+           std::unique_ptr<wm::NativeCursorManager>(native_cursor_manager_));
        cursor_manager_->SetDisplay(
-           display::Screen::GetScreen()->GetDisplayNearestWindow(
-               host_->window()));
+           display::Screen::Get()->GetDisplayNearestWindow(host_->window()));
 -      if (features::IsSystemCursorSizeSupported()) {
 +      if (::features::IsSystemCursorSizeSupported()) {
          native_cursor_manager_->InitCursorSizeObserver(cursor_manager_);
        }
      }
 diff --git a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
-index bb728fa390..8d7ebaf1c7 100644
+index 8432836c97..f07d8cd80f 100644
 --- a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
 +++ b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
 @@ -342,7 +342,7 @@ void DesktopWindowTreeHostPlatform::OnActiveWindowChanged(bool active) {
@@ -1915,7 +1929,7 @@ index fde771e6d2..10dcd9821e 100644
    sources = [
      "views_content_browser_client.cc",
 diff --git a/ui/web_dialogs/BUILD.gn b/ui/web_dialogs/BUILD.gn
-index 53620cb10e..eaf516f983 100644
+index e8e8872057..3d828e962c 100644
 --- a/ui/web_dialogs/BUILD.gn
 +++ b/ui/web_dialogs/BUILD.gn
 @@ -4,7 +4,9 @@

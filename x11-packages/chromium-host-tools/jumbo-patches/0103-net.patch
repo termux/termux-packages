@@ -21,7 +21,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  net/dns/host_resolver_manager.cc                 |  4 ++++
  net/filter/filter_source_stream.cc               |  5 ++++-
  net/filter/gzip_source_stream.cc                 |  4 +++-
- net/http/http_cache_transaction.cc               |  4 ++++
+ net/http/http_cache.cc                           |  4 ++++
  net/http/http_proxy_connect_job.cc               |  4 ++++
  net/http/http_server_properties_manager.cc       |  4 ++++
  net/http/http_stream_factory_job.cc              |  4 ++++
@@ -38,17 +38,16 @@ Enable jumbo build for the following component(s)/source_set(s):
  net/reporting/reporting_service.cc               |  6 ++++++
  net/server/web_socket_encoder.cc                 | 14 ++++++++++++++
  net/url_request/url_request_error_job.cc         |  4 ++++
- net/url_request/url_request_http_job.cc          |  4 ++++
  net/url_request/url_request_job.cc               |  4 ++++
  net/url_request/url_request_redirect_job.cc      |  4 ++++
  net/websockets/websocket_channel.cc              |  4 ++++
  net/websockets/websocket_frame.cc                | 16 ++++++++++++++++
  .../websocket_http2_handshake_stream.cc          |  4 ++++
  .../websocket_http3_handshake_stream.cc          |  4 ++++
- 36 files changed, 194 insertions(+), 8 deletions(-)
+ 35 files changed, 190 insertions(+), 8 deletions(-)
 
 diff --git a/net/BUILD.gn b/net/BUILD.gn
-index 5af55015bd..dd7e61a423 100644
+index 21a8ed73bb..9512993be6 100644
 --- a/net/BUILD.gn
 +++ b/net/BUILD.gn
 @@ -7,6 +7,7 @@ import("//build/config/cast.gni")
@@ -59,8 +58,8 @@ index 5af55015bd..dd7e61a423 100644
  import("//crypto/features.gni")
  import("//net/features.gni")
  import("//testing/libfuzzer/fuzzer_test.gni")
-@@ -152,7 +153,7 @@ proto_library("device_bound_sessions_storage_proto") {
-   sources = [ "device_bound_sessions/proto/storage.proto" ]
+@@ -163,7 +164,7 @@ source_set("net_features") {
+   ]
  }
  
 -component("net") {
@@ -68,7 +67,7 @@ index 5af55015bd..dd7e61a423 100644
    sources = [
      "base/address_family.cc",
      "base/address_family.h",
-@@ -1139,6 +1140,9 @@ component("net") {
+@@ -1149,6 +1150,9 @@ component("net") {
      "url_request/websocket_handshake_userdata_key.cc",
      "url_request/websocket_handshake_userdata_key.h",
    ]
@@ -78,7 +77,7 @@ index 5af55015bd..dd7e61a423 100644
  
    if (is_posix || is_fuchsia) {
      sources += [ "base/net_errors_posix.cc" ]
-@@ -1347,6 +1351,10 @@ component("net") {
+@@ -1360,6 +1364,10 @@ component("net") {
        "base/network_interfaces_linux.h",
        "base/platform_mime_util_linux.cc",
      ]
@@ -109,7 +108,7 @@ index 1103287fc3..356042489f 100644
 +
 +#undef kValuePortKey
 diff --git a/net/base/ip_endpoint.cc b/net/base/ip_endpoint.cc
-index 9396da7226..a202d67147 100644
+index e6f265d0e2..442548e0a1 100644
 --- a/net/base/ip_endpoint.cc
 +++ b/net/base/ip_endpoint.cc
 @@ -37,6 +37,8 @@
@@ -121,14 +120,14 @@ index 9396da7226..a202d67147 100644
  namespace net {
  
  namespace {
-@@ -318,3 +320,5 @@ std::ostream& operator<<(std::ostream& os, const IPEndPoint& ip_endpoint) {
+@@ -319,3 +321,5 @@ std::ostream& operator<<(std::ostream& os, const IPEndPoint& ip_endpoint) {
  }
  
  }  // namespace net
 +
 +#undef kValuePortKey
 diff --git a/net/dns/BUILD.gn b/net/dns/BUILD.gn
-index 2a70752c12..90de6526db 100644
+index 7f9f28b70a..127b6f4fd6 100644
 --- a/net/dns/BUILD.gn
 +++ b/net/dns/BUILD.gn
 @@ -2,13 +2,14 @@
@@ -209,7 +208,7 @@ index 93032e14bb..a8e8ce6f22 100644
 +
 +#undef kSecureKey
 diff --git a/net/dns/host_resolver_dns_task.cc b/net/dns/host_resolver_dns_task.cc
-index 7a32ae4337..95440125af 100644
+index 207964ab02..27a44f7ec5 100644
 --- a/net/dns/host_resolver_dns_task.cc
 +++ b/net/dns/host_resolver_dns_task.cc
 @@ -25,6 +25,8 @@
@@ -221,7 +220,7 @@ index 7a32ae4337..95440125af 100644
  namespace net {
  
  // When enabled, query HTTPS RR first.
-@@ -1178,3 +1180,5 @@ bool HostResolverDnsTask::ShouldTriggerHttpToHttpsUpgrade(
+@@ -1176,3 +1178,5 @@ bool HostResolverDnsTask::ShouldTriggerHttpToHttpsUpgrade(
  }
  
  }  // namespace net
@@ -249,10 +248,10 @@ index afaf662c21..df2c1ec958 100644
 +#undef EndpointMetadataPairToValue
 +#undef EndpointMetadataPairFromValue
 diff --git a/net/dns/host_resolver_manager.cc b/net/dns/host_resolver_manager.cc
-index e23ea3fe98..3949ff88cf 100644
+index 92e3b34000..da868e484b 100644
 --- a/net/dns/host_resolver_manager.cc
 +++ b/net/dns/host_resolver_manager.cc
-@@ -140,6 +140,8 @@
+@@ -139,6 +139,8 @@
  #endif  // BUILDFLAG(IS_ANDROID)
  #endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
  
@@ -333,27 +332,27 @@ index f25eed8ac6..2c325feebd 100644
    *consumed_bytes = 0;
  
    // Span that tracks the portion of `input_buffer` that has not yet been
-diff --git a/net/http/http_cache_transaction.cc b/net/http/http_cache_transaction.cc
-index 369ec46120..ca7fe1d2ce 100644
---- a/net/http/http_cache_transaction.cc
-+++ b/net/http/http_cache_transaction.cc
-@@ -72,6 +72,8 @@
- using base::Time;
- using base::TimeTicks;
+diff --git a/net/http/http_cache.cc b/net/http/http_cache.cc
+index 86a4cea9a1..a641790d3a 100644
+--- a/net/http/http_cache.cc
++++ b/net/http/http_cache.cc
+@@ -64,6 +64,8 @@
+ #include <unistd.h>
+ #endif
  
-+#define TaskRunner TaskRunner_HttpCacheTransaction
++#define TaskRunner TaskRunner_HttpCache
 +
  namespace net {
  
- using CacheEntryStatus = HttpResponseInfo::CacheEntryStatus;
-@@ -4228,3 +4230,5 @@ void HttpCache::Transaction::EnsureMutableRequest() {
+ namespace {
+@@ -1752,3 +1754,5 @@ void HttpCache::OnNoVarySearchCacheLoadComplete(
  }
  
  }  // namespace net
 +
 +#undef TaskRunner
 diff --git a/net/http/http_proxy_connect_job.cc b/net/http/http_proxy_connect_job.cc
-index a34459b3f3..e2d7f0102c 100644
+index 3636b1e26f..354ecf6c6a 100644
 --- a/net/http/http_proxy_connect_job.cc
 +++ b/net/http/http_proxy_connect_job.cc
 @@ -54,6 +54,8 @@
@@ -365,14 +364,14 @@ index a34459b3f3..e2d7f0102c 100644
  namespace net {
  
  namespace {
-@@ -1008,3 +1010,5 @@ void HttpProxyConnectJob::EmitConnectLatency(NextProto http_version,
+@@ -1002,3 +1004,5 @@ void HttpProxyConnectJob::EmitConnectLatency(NextProto http_version,
  }
  
  }  // namespace net
 +
 +#undef TaskRunner
 diff --git a/net/http/http_server_properties_manager.cc b/net/http/http_server_properties_manager.cc
-index ebaa8e9a5e..1f295d4f83 100644
+index aee6483719..b81d6ecb19 100644
 --- a/net/http/http_server_properties_manager.cc
 +++ b/net/http/http_server_properties_manager.cc
 @@ -29,6 +29,8 @@
@@ -391,7 +390,7 @@ index ebaa8e9a5e..1f295d4f83 100644
 +
 +#undef kVersionKey
 diff --git a/net/http/http_stream_factory_job.cc b/net/http/http_stream_factory_job.cc
-index d2ff50d380..09aee680f5 100644
+index 8215e860da..5e79108e59 100644
 --- a/net/http/http_stream_factory_job.cc
 +++ b/net/http/http_stream_factory_job.cc
 @@ -56,6 +56,8 @@
@@ -403,33 +402,33 @@ index d2ff50d380..09aee680f5 100644
  namespace net {
  
  namespace {
-@@ -1349,3 +1351,5 @@ void HttpStreamFactory::Job::RecordCompletionHistograms(int result) {
+@@ -1350,3 +1352,5 @@ void HttpStreamFactory::Job::RecordCompletionHistograms(int result) {
  }
  
  }  // namespace net
 +
 +#undef TaskRunner
 diff --git a/net/http/http_stream_factory_job_controller.cc b/net/http/http_stream_factory_job_controller.cc
-index a49e20c52c..f8e8c4757c 100644
+index e9fef49e16..ebb7391769 100644
 --- a/net/http/http_stream_factory_job_controller.cc
 +++ b/net/http/http_stream_factory_job_controller.cc
-@@ -45,6 +45,8 @@
+@@ -44,6 +44,8 @@
  #include "url/scheme_host_port.h"
  #include "url/url_constants.h"
  
-+#define TaskRunner TaskRunner_HttpStreamJobFactoryJobController
++#define TaskRunner TaskRunner_HttpStreamFactoryJobController
 +
  namespace net {
  
  namespace {
-@@ -1559,3 +1561,5 @@ void HttpStreamFactory::JobController::OnPoolPreconnectsComplete(int rv) {
+@@ -1533,3 +1535,5 @@ void HttpStreamFactory::JobController::OnPoolPreconnectsComplete(int rv) {
  }
  
  }  // namespace net
 +
 +#undef TaskRunner
 diff --git a/net/http/transport_security_persister.cc b/net/http/transport_security_persister.cc
-index 88553f5da3..9beacacd41 100644
+index 70d714e935..d450e95632 100644
 --- a/net/http/transport_security_persister.cc
 +++ b/net/http/transport_security_persister.cc
 @@ -30,6 +30,9 @@
@@ -441,8 +440,8 @@ index 88553f5da3..9beacacd41 100644
 +
  namespace net {
  
- BASE_FEATURE(kTransportSecurityFileWriterSchedule,
-@@ -323,3 +326,6 @@ void TransportSecurityPersister::CompleteLoad(const std::string& state) {
+ BASE_FEATURE(TransportSecurityFileWriterSchedule,
+@@ -322,3 +325,6 @@ void TransportSecurityPersister::CompleteLoad(const std::string& state) {
  }
  
  }  // namespace net
@@ -475,7 +474,7 @@ index 6cfb23ce25..6fb6719545 100644
 +#undef kMaxJsonSize
 +#undef kMaxJsonDepth
 diff --git a/net/proxy_resolution/configured_proxy_resolution_service.cc b/net/proxy_resolution/configured_proxy_resolution_service.cc
-index 82c6860602..cfe77c50ef 100644
+index 10da415986..345a25617c 100644
 --- a/net/proxy_resolution/configured_proxy_resolution_service.cc
 +++ b/net/proxy_resolution/configured_proxy_resolution_service.cc
 @@ -161,6 +161,10 @@ class DefaultPollPolicy
@@ -567,7 +566,7 @@ index 83bf267ae0..141591c353 100644
 +
 +#undef ScopedBoolSaver
 diff --git a/net/quic/dedicated_web_transport_http3_client.cc b/net/quic/dedicated_web_transport_http3_client.cc
-index fe8547b0ce..5ab7727dc5 100644
+index 6215a9689c..07fef1dd33 100644
 --- a/net/quic/dedicated_web_transport_http3_client.cc
 +++ b/net/quic/dedicated_web_transport_http3_client.cc
 @@ -32,6 +32,8 @@
@@ -579,7 +578,7 @@ index fe8547b0ce..5ab7727dc5 100644
  namespace net {
  
  namespace {
-@@ -997,3 +999,5 @@ void DedicatedWebTransportHttp3Client::OnDatagramProcessed(
+@@ -995,3 +997,5 @@ void DedicatedWebTransportHttp3Client::OnDatagramProcessed(
  }
  
  }  // namespace net
@@ -605,10 +604,10 @@ index 1a267f5f48..082b3bdca6 100644
 +
 +#undef ScopedBoolSaver
 diff --git a/net/quic/quic_session_pool.cc b/net/quic/quic_session_pool.cc
-index fd239e0b51..fac662141c 100644
+index 28e4fdd001..ac0e90b5ae 100644
 --- a/net/quic/quic_session_pool.cc
 +++ b/net/quic/quic_session_pool.cc
-@@ -90,6 +90,8 @@
+@@ -91,6 +91,8 @@
  #include "url/scheme_host_port.h"
  #include "url/url_constants.h"
  
@@ -617,7 +616,7 @@ index fd239e0b51..fac662141c 100644
  namespace net {
  
  namespace {
-@@ -2466,3 +2468,5 @@ bool QuicSessionPool::CryptoConfigCacheIsEmptyForTesting(
+@@ -2480,3 +2482,5 @@ bool QuicSessionPool::CryptoConfigCacheIsEmptyForTesting(
  }
  
  }  // namespace net
@@ -713,27 +712,8 @@ index 6d9a7d4394..5f58a96b9c 100644
  }  // namespace net
 +
 +#undef TaskRunner
-diff --git a/net/url_request/url_request_http_job.cc b/net/url_request/url_request_http_job.cc
-index f25e19b68c..6ea5a97112 100644
---- a/net/url_request/url_request_http_job.cc
-+++ b/net/url_request/url_request_http_job.cc
-@@ -114,6 +114,8 @@
- #include "net/device_bound_sessions/session_service.h"
- #endif  // BUILDFLAG(ENABLE_DEVICE_BOUND_SESSIONS)
- 
-+#define TaskRunner TaskRunner_URLRequestHttpJob
-+
- namespace net {
- 
- namespace {
-@@ -2178,3 +2180,5 @@ bool URLRequestHttpJob::ShouldRecordPartitionedCookieUsage() const {
- }
- 
- }  // namespace net
-+
-+#undef TaskRunner
 diff --git a/net/url_request/url_request_job.cc b/net/url_request/url_request_job.cc
-index ff36f3719d..b4a2ac28a9 100644
+index f65b7e6ecc..62debd054f 100644
 --- a/net/url_request/url_request_job.cc
 +++ b/net/url_request/url_request_job.cc
 @@ -40,6 +40,8 @@
@@ -745,7 +725,7 @@ index ff36f3719d..b4a2ac28a9 100644
  namespace net {
  
  namespace {
-@@ -775,3 +777,5 @@ void URLRequestJob::RecordBytesRead(int bytes_read) {
+@@ -777,3 +779,5 @@ void URLRequestJob::RecordBytesRead(int bytes_read) {
  }
  
  }  // namespace net
