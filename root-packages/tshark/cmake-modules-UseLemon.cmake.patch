@@ -1,0 +1,13 @@
+# Allow cmake to find lemon executable from host build
+
+--- a/cmake/modules/UseLemon.cmake
++++ b/cmake/modules/UseLemon.cmake
+@@ -3,7 +3,7 @@
+ # If we're cross-compiling and /usr/share/lemon/lempar.c exists, try to
+ # find the system lemon and use it. We need to build our own lemon
+ # otherwise.
+-if (CMAKE_CROSSCOMPILING AND EXISTS /usr/share/lemon/lempar.c)
++if (CMAKE_CROSSCOMPILING)
+ 	find_program(LEMON_EXECUTABLE lemon)
+ endif()
+ 
