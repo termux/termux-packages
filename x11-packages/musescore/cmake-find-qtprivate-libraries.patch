@@ -1,0 +1,69 @@
+diff --git a/src/appshell/CMakeLists.txt b/src/appshell/CMakeLists.txt
+index 868dd99..a29da29 100644
+--- a/src/appshell/CMakeLists.txt
++++ b/src/appshell/CMakeLists.txt
+@@ -143,7 +143,10 @@ if (NOT OS_IS_MAC)
+ endif(NOT OS_IS_MAC)
+ 
+ if (QT_SUPPORT)
+-    list(APPEND MODULE_LINK Qt::Core5Compat Qt::Quick Qt::Svg Qt::Widgets)
++    if (Qt6Gui_VERSION VERSION_GREATER_EQUAL "6.10.0")
++        find_package(Qt6GuiPrivate ${QT_MIN_VERSION} REQUIRED)
++    endif()
++    list(APPEND MODULE_LINK Qt::Core5Compat Qt::Quick Qt::Svg Qt::Widgets Qt6::GuiPrivate)
+ endif()
+ 
+ setup_module()
+diff --git a/src/framework/accessibility/CMakeLists.txt b/src/framework/accessibility/CMakeLists.txt
+index cdb8c08..fc76f20 100644
+--- a/src/framework/accessibility/CMakeLists.txt
++++ b/src/framework/accessibility/CMakeLists.txt
+@@ -47,6 +47,9 @@ set(MODULE_SRC
+     )
+ 
+ if (OS_IS_LIN)
++    if (Qt6Core_VERSION VERSION_GREATER_EQUAL "6.10.0")
++        find_package(Qt6CorePrivate ${QT_MIN_VERSION} REQUIRED)
++    endif()
+     # it needed to send a spontaneous event by activating navigation
+     set(MODULE_INCLUDE_PRIVATE ${Qt6Core_PRIVATE_INCLUDE_DIRS})
+ endif()
+@@ -57,7 +60,7 @@ if (MUSE_MODULE_ACCESSIBILITY_TRACE)
+ endif()
+ 
+ if (QT_SUPPORT)
+-    list(APPEND MODULE_LINK Qt::Quick)
++    list(APPEND MODULE_LINK Qt::Quick Qt6::CorePrivate)
+ endif()
+ 
+ setup_module()
+diff --git a/src/framework/dockwindow/thirdparty/KDDockWidgets/CMakeLists.txt b/src/framework/dockwindow/thirdparty/KDDockWidgets/CMakeLists.txt
+index 1f15515..fd03655 100644
+--- a/src/framework/dockwindow/thirdparty/KDDockWidgets/CMakeLists.txt
++++ b/src/framework/dockwindow/thirdparty/KDDockWidgets/CMakeLists.txt
+@@ -125,6 +125,9 @@ if(${PROJECT_NAME}_QT6)
+   set(QT_MIN_VERSION "6.0.0")
+   find_package(Qt6Widgets ${QT_MIN_VERSION} REQUIRED)
+   find_package(Qt6Test ${QT_MIN_VERSION} REQUIRED)
++  if (Qt6Gui_VERSION VERSION_GREATER_EQUAL "6.10.0")
++    find_package(Qt6GuiPrivate ${QT_MIN_VERSION} REQUIRED)
++  endif()
+   set(${PROJECT_NAME}_LIBRARY_QTID "-qt6")
+ else()
+   set(Qt_VERSION_MAJOR 5)
+diff --git a/src/importexport/midi/internal/midiimport/importmidi_tuplet.cpp b/src/importexport/midi/internal/midiimport/importmidi_tuplet.cpp
+index 729e928..c564594 100644
+--- a/src/importexport/midi/internal/midiimport/importmidi_tuplet.cpp
++++ b/src/importexport/midi/internal/midiimport/importmidi_tuplet.cpp
+@@ -895,9 +895,10 @@ void addTupletEvents(std::multimap<ReducedFraction, TupletData>& tupletEvents,
+                 message += QString::number(tiedTuplet.voice) + ", chord voice = ";
+                 message += QString::number(midiChord.voice) + ", bar number (from 1) = ";
+                 message += QString::number(midiChord.barIndex + 1);
+-#endif
++
+                 Q_ASSERT_X(tiedTuplet.voice == midiChord.voice,
+                            "MidiTuplet::addTupletEvents", message.toLatin1().data());
++#endif
+ 
+                 for (int j: tiedTuplet.tiedNoteIndexes) {
+                     midiChord.notes[j].tuplet = it;
