@@ -121,6 +121,12 @@ check_indentation() {
 	return 0
 }
 
+# We'll need the 'remotes/origin/master' ref as a base commit when running the version check.
+# So try fetching it now if it doesn't exist.
+if [[ ! -e "$TERMUX_SCRIPTDIR/.git/refs/remotes/origin/master" ]]; then
+	git fetch origin '+master:refs/remotes/origin/master' &> /dev/null || :
+fi
+
 check_version() {
 	if ! (( ${#TERMUX_PKG_VERSION} )); then
 		echo "NOT SET"
@@ -132,7 +138,12 @@ check_version() {
 		return 1
 	fi
 
-	# We need the HEAD of origin/master as a reference point
+	# If we failed to get 'remotes/origin/master' skip the rest of the check.
+	[[ -e "$TERMUX_SCRIPTDIR/.git/refs/remotes/origin/master" ]] || {
+			echo "PARTIAL PASS (can't check version change)"
+			return 0
+	}
+
 	local base_commit package_dir="${1%/*}"
 	base_commit="$(< "$TERMUX_SCRIPTDIR/.git/refs/remotes/origin/master")"
 
