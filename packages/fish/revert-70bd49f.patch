@@ -1,0 +1,67 @@
+Reverts https://github.com/fish-shell/fish-shell/commit/70bd49f61265c3a50c98d439fc77e13ef4409231,
+because it causes this compilation failure on Android:
+
+error[E0432]: unresolved import `libc::confstr`
+  --> src/env/environment.rs:31:19
+   |
+31 | use libc::{c_int, confstr, uid_t, STDOUT_FILENO, _IONBF};
+   |                   ^^^^^^^ no `confstr` in the root
+
+--- a/src/env/environment.rs
++++ b/src/env/environment.rs
+@@ -28,7 +28,7 @@ use crate::wcstringutil::join_strings;
+ use crate::wutil::{fish_wcstol, wgetcwd, wgettext};
+ use std::sync::atomic::Ordering;
+ 
+-use libc::{c_int, confstr, uid_t, STDOUT_FILENO, _IONBF};
++use libc::{c_int, uid_t, STDOUT_FILENO, _IONBF};
+ use once_cell::sync::{Lazy, OnceCell};
+ use std::collections::HashMap;
+ use std::ffi::CStr;
+@@ -569,7 +569,7 @@ fn setup_user(vars: &EnvStack) {
+ }
+ 
+ pub(crate) static FALLBACK_PATH: Lazy<&[WString]> = Lazy::new(|| {
+-    use crate::libc::_CS_PATH;
++    use crate::libc::{confstr, _CS_PATH};
+     // _CS_PATH: colon-separated paths to find POSIX utilities
+     let buf_size = unsafe { confstr(_CS_PATH(), std::ptr::null_mut(), 0) };
+     Box::leak(
+--- a/src/libc.c
++++ b/src/libc.c
+@@ -21,6 +21,21 @@ uint64_t C_ST_LOCAL() {
+ #endif
+ }
+ 
++// confstr + _CS_PATH is only available on macOS with rust's libc
++// we could just declare extern "C" confstr directly in Rust
++// that would panic if it failed to link, which C++ did not
++// therefore we define a backup, which just returns an error
++// which for confstr is 0
++#if defined(_CS_PATH)
++#else
++size_t confstr(int name, char* buf, size_t size) {
++    UNUSED(name);
++    UNUSED(buf);
++    UNUSED(size);
++    return 0;
++}
++#endif
++
+ int C_CS_PATH() {
+ #if defined(_CS_PATH)
+     return _CS_PATH;
+--- a/src/libc.rs
++++ b/src/libc.rs
+@@ -14,6 +14,11 @@ extern "C" {
+ }
+ 
+ extern "C" {
++    pub(crate) fn confstr(
++        name: libc::c_int,
++        buf: *mut libc::c_char,
++        len: libc::size_t,
++    ) -> libc::size_t;
+     pub fn stdout_stream() -> *mut libc::FILE;
+     pub fn setlinebuf(stream: *mut libc::FILE);
+ }
