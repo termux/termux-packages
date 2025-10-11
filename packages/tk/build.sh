@@ -9,6 +9,8 @@ TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/sourceforge/tcl/tk${TERMUX_P
 TERMUX_PKG_SHA256=8ffdb720f47a6ca6107eac2dd877e30b0ef7fac14f3a84ebbd0b3612cee41a94
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="fontconfig, libx11, libxft, libxss, tcl"
+# fatal error: 'X11/Xlib.h' file not found
+TERMUX_PKG_BUILD_DEPENDS="libx11"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_MAKE_INSTALL_TARGET="install install-private-headers"
 
