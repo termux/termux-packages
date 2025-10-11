@@ -62,7 +62,7 @@ termux_step_post_make_install() {
 	local vulkan_loader_version
 	vulkan_loader_version="$(${TERMUX_PKG_HOSTBUILD_DIR}/vulkan_header_version)"
 	if [[ -z "${vulkan_loader_version}" ]]; then
-		termux_error_exit "ERROR: Host built vulkan_header_version is not printing version!"
+		termux_error_exit "Host built vulkan_header_version is not printing version!"
 	fi
 
 	# https://github.com/KhronosGroup/Vulkan-Loader/blob/master/loader/vulkan.pc.in

@@ -56,7 +56,7 @@ TERMUX_PKG_CONFFILES="etc/ssh/ssh_config etc/ssh/sshd_config"
 termux_pkg_auto_update() {
 	local latest_tag version
 	latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" newest-tag)"
-	[[ -z "${latest_tag}" ]] && termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
+	[[ -z "${latest_tag}" ]] && termux_error_exit "Unable to get tag from ${TERMUX_PKG_SRCURL}"
 	version="$(sed -E 's/V_([0-9]+)_([0-9]+)_P([0-9]+)/\1.\2p\3/' <<< "${latest_tag}")"
 	termux_pkg_upgrade_version "$version"
 }
