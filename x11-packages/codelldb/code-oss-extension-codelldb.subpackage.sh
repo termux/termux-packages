@@ -3,8 +3,7 @@ TERMUX_SUBPKG_INCLUDE="share/doc/code-oss-extension-codelldb"
 TERMUX_SUBPKG_DEPENDS="code-oss, vsix-package-codelldb"
 # depends on vsix-package-codelldb,
 # which depends on codelldb,
-# which depends on lldb,
-# which does not exist on 32-bit
+# which does not work properly on 32-bit Android
 TERMUX_SUBPKG_PLATFORM_INDEPENDENT=false
 
 termux_step_create_subpkg_debscripts() {
