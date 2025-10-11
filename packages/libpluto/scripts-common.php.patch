@@ -1,23 +1,24 @@
-+++ ./scripts/common.php
-@@ -44,12 +44,20 @@ function check_compiler()
+--- a/scripts/common.php
++++ b/scripts/common.php
+@@ -63,12 +63,20 @@ function check_compiler()
  			}
  		}
  	}
 +	if (getenv("CXXFLAGS"))
 +	{
-+	   $compiler .= " ".getenv("CXXFLAGS");
++		$compiler .= " ".getenv("CXXFLAGS");
 +	}
  }
  
- function prepare_link()
+ function get_link_flags()
  {
- 	global $compiler;
--	$compiler .= " -L".__DIR__."/../src/vendor/Soup -lsoup";
+ 	global $is_windows_target;
+-	$flags = " -L".__DIR__."/../src/vendor/Soup -lsoup";
 +	$srcdir = __DIR__."/../src";
-+	$compiler .= " -L$srcdir/vendor/Soup -L$srcdir -lsoup";
++	$flags .= " -L$srcdir/vendor/Soup -L$srcdir -lsoup";
 +	if (getenv("LDFLAGS")) {
-+	   $compiler .= " ".getenv("LDFLAGS");
++		$flags .= " ".getenv("LDFLAGS");
 +	}
- }
- 
- function resolve_installed_program($exe)
+ 	if ($is_windows_target)
+ 	{
+ 		$flags .= " -lws2_32 -lbcrypt";
