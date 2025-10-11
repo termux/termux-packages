@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.chromium.org/Home
 TERMUX_PKG_DESCRIPTION="Chromium web browser"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION=140.0.7339.207
+TERMUX_PKG_VERSION=141.0.7390.54
 TERMUX_PKG_SRCURL=https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=8d0ca453c3a055cbbca7588ba04a5117812e6e827d72611d3fbc88ba5f1f118b
+TERMUX_PKG_SHA256=7b4dabb601e19ccf9746d65ee6ade9c297bc2654dad417b3cf400a67119956ec
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="chromium-host-tools, libffi-static"
 # TODO: Split chromium-common and chromium-headless
@@ -18,6 +18,12 @@ SYSTEM_LIBRARIES="    fontconfig"
 # TERMUX_PKG_DEPENDS="fontconfig"
 
 termux_step_post_get_source() {
+	# Version guard
+	local version_tools=$(. $TERMUX_SCRIPTDIR/x11-packages/chromium-host-tools/build.sh; echo ${TERMUX_PKG_VERSION})
+	if [ "${version_tools}" != "${TERMUX_PKG_VERSION}" ]; then
+		termux_error_exit "Version mismatch between chromium-host-tools and chromium."
+	fi
+
 	# Apply patches related to chromium
 	local f
 	for f in $(find "$TERMUX_PKG_BUILDER_DIR/../chromium-host-tools/cr-patches" -maxdepth 1 -type f -name *.patch | sort); do
@@ -184,6 +190,7 @@ treat_warnings_as_errors = false
 use_system_freetype = false
 use_custom_libcxx = false
 use_custom_libcxx_for_host = true
+use_clang_modules = false
 use_allocator_shim = false
 use_partition_alloc_as_malloc = false
 enable_backup_ref_ptr_slow_checks = false

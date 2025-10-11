@@ -1,0 +1,1526 @@
+Enable jumbo build for the following component(s)/source_set(s):
+
+- //components/attribution_reporting:attribution_reporting
+- //components/download/public/background_service:public
+- //components/drive:drive
+- //components/history/core/browser:browser
+- //components/input:input
+- //components/keyed_service/core:core
+- //components/media_message_center:media_message_center
+- //components/mirroring/service:mirroring_service
+- //components/optimization_guide/core:core_util
+- //components/optimization_guide/core:features
+- //components/optimization_guide/core:filters
+- //components/optimization_guide/core:hints
+- //components/optimization_guide/core:model_execution
+- //components/optimization_guide/core:prediction
+- //components/page_content_annotations/core:core
+- //components/persistent_cache:persistent_cache
+- //components/services/app_service/public/cpp:app_types
+- //components/sessions:sessions
+- //components/sessions:session_id
+- //components/ukm:ukm
+- //components/unexportable_keys:unexportable_keys
+- //components/assist_ranker:assist_ranker
+- //components/bookmarks/browser:browser
+- //components/collaboration/internal:messaging_internal
+- //components/data_sharing/internal:internal
+- //components/dom_distiller/core:core
+- //components/enterprise:enterprise
+- //components/favicon/core:core
+- //components/feedback:feedback
+- //components/gcm_driver:gcm_driver
+- //components/history_clusters/core:core
+- //components/history_embeddings:history_embeddings
+- //components/lens:lens
+- //components/media_router/common/providers/cast/channel:channel
+- //components/live_caption:live_caption
+- //components/media_router/common:common
+- //components/metrics/private_metrics:private_metrics
+- //components/no_state_prefetch/browser:browser
+- //components/offline_pages/core:core
+- //components/ntp_tiles:ntp_tiles
+- //components/offline_pages/core/background:background_offliner
+- //components/search_engines:search_engines
+- //components/security_interstitials/content:security_interstitial_page
+- //components/segmentation_platform/internal:internal
+- //components/signin/core/browser:browser
+- //components/subresource_filter/content/browser:browser
+- //components/subresource_filter/core/common:common
+- //components/supervised_user/core/browser:browser
+- //components/sync/engine:engine
+- //components/sync/model:model
+- //components/sync/nigori:nigori
+- //components/sync_sessions:sync_sessions
+- //components/translate/core/browser:browser
+- //components/trusted_vault:trusted_vault
+- //components/update_client:update_client
+- //components/web_package:web_package
+- //components/webcrypto:webcrypto
+- //components/zucchini:zucchini_lib
+
+diff --git a/components/attribution_reporting/BUILD.gn b/components/attribution_reporting/BUILD.gn
+index 12d7532590..3078e8c947 100644
+--- a/components/attribution_reporting/BUILD.gn
++++ b/components/attribution_reporting/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//mojo/public/tools/bindings/mojom.gni")
+ import("//testing/test.gni")
+ 
+@@ -37,7 +38,7 @@ component("features") {
+   defines = [ "IS_ATTRIBUTION_REPORTING_FEATURES_IMPL" ]
+ }
+ 
+-component("attribution_reporting") {
++jumbo_component("attribution_reporting") {
+   sources = [
+     "aggregatable_debug_reporting_config.cc",
+     "aggregatable_debug_reporting_config.h",
+diff --git a/components/attribution_reporting/aggregatable_trigger_data.cc b/components/attribution_reporting/aggregatable_trigger_data.cc
+index 1f4d357f36..09fefcb74c 100644
+--- a/components/attribution_reporting/aggregatable_trigger_data.cc
++++ b/components/attribution_reporting/aggregatable_trigger_data.cc
+@@ -20,6 +20,8 @@
+ #include "components/attribution_reporting/trigger_registration_error.mojom.h"
+ #include "third_party/abseil-cpp/absl/numeric/int128.h"
+ 
++#define ParseKeyPiece ParseKeyPiece_AggregatableTriggerData
++
+ namespace attribution_reporting {
+ 
+ namespace {
+@@ -129,3 +131,5 @@ base::Value::Dict AggregatableTriggerData::ToJson() const {
+ }
+ 
+ }  // namespace attribution_reporting
++
++#undef ParseKeyPiece
+diff --git a/components/download/public/background_service/BUILD.gn b/components/download/public/background_service/BUILD.gn
+index f5b1cb64a8..6d725c1889 100644
+--- a/components/download/public/background_service/BUILD.gn
++++ b/components/download/public/background_service/BUILD.gn
+@@ -3,13 +3,14 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ 
+ if (is_android) {
+   import("//build/config/android/config.gni")
+   import("//build/config/android/rules.gni")
+ }
+ 
+-component("public") {
++jumbo_component("public") {
+   defines = [ "IS_COMPONENTS_DOWNLOAD_PUBLIC_BACKGROUND_SERVICE_IMPL" ]
+ 
+   sources = [
+diff --git a/components/drive/BUILD.gn b/components/drive/BUILD.gn
+index b03770e3a0..28644ffde4 100644
+--- a/components/drive/BUILD.gn
++++ b/components/drive/BUILD.gn
+@@ -2,9 +2,10 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//third_party/protobuf/proto_library.gni")
+ 
+-component("drive") {
++jumbo_component("drive") {
+   defines = [ "COMPONENTS_DRIVE_IMPLEMENTATION" ]
+ 
+   sources = [
+diff --git a/components/history/core/browser/BUILD.gn b/components/history/core/browser/BUILD.gn
+index e6af16d627..1c5201e86b 100644
+--- a/components/history/core/browser/BUILD.gn
++++ b/components/history/core/browser/BUILD.gn
+@@ -2,6 +2,8 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
++
+ component("features") {
+   sources = [
+     "features.cc",
+@@ -16,7 +18,7 @@ component("features") {
+   defines = [ "IS_HISTORY_FEATURES_IMPL" ]
+ }
+ 
+-static_library("browser") {
++jumbo_static_library("browser") {
+   sources = [
+     "browsing_history_driver.h",
+     "browsing_history_service.cc",
+diff --git a/components/input/BUILD.gn b/components/input/BUILD.gn
+index cfb2567c72..5f4e4eb7c1 100644
+--- a/components/input/BUILD.gn
++++ b/components/input/BUILD.gn
+@@ -2,10 +2,11 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//mojo/public/tools/bindings/mojom.gni")
+ 
+-component("input") {
++jumbo_component("input") {
+   defines = [ "IS_INPUT_IMPL" ]
+   sources = [
+     "child_frame_input_helper.cc",
+diff --git a/components/input/input_router_impl.cc b/components/input/input_router_impl.cc
+index 8ec0b9c4de..8e691c5a72 100644
+--- a/components/input/input_router_impl.cc
++++ b/components/input/input_router_impl.cc
+@@ -719,7 +719,7 @@ void InputRouterImpl::FilterAndSendWebInputEvent(
+           });
+       bool send_touch_event =
+           base::FeatureList::IsEnabled(
+-              features::kSendEmptyGestureScrollUpdate) &&
++              ::features::kSendEmptyGestureScrollUpdate) &&
+           event->Event().GetType() ==
+               blink::WebInputEvent::Type::kGestureScrollUpdate &&
+           last_touch_move_event_.has_value();
+@@ -733,7 +733,7 @@ void InputRouterImpl::FilterAndSendWebInputEvent(
+     }
+   } else {
+     bool store_touch_move_event =
+-        base::FeatureList::IsEnabled(features::kSendEmptyGestureScrollUpdate) &&
++        base::FeatureList::IsEnabled(::features::kSendEmptyGestureScrollUpdate) &&
+         event->Event().GetType() == blink::WebInputEvent::Type::kTouchMove;
+     bool dispatch_last_event =
+         store_touch_move_event && last_touch_move_event_.has_value();
+diff --git a/components/keyed_service/core/BUILD.gn b/components/keyed_service/core/BUILD.gn
+index 3ecedd2080..266f2baf89 100644
+--- a/components/keyed_service/core/BUILD.gn
++++ b/components/keyed_service/core/BUILD.gn
+@@ -4,8 +4,9 @@
+ 
+ import("//build/buildflag_header.gni")
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ 
+-component("core") {
++jumbo_component("core") {
+   output_name = "keyed_service_core"
+   sources = [
+     "dependency_graph.cc",
+diff --git a/components/media_message_center/BUILD.gn b/components/media_message_center/BUILD.gn
+index 1759277e53..a4124a1390 100644
+--- a/components/media_message_center/BUILD.gn
++++ b/components/media_message_center/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-component("media_message_center") {
++import("//build/config/jumbo.gni")
++
++jumbo_component("media_message_center") {
+   sources = [
+     "media_controls_progress_view.cc",
+     "media_controls_progress_view.h",
+diff --git a/components/mirroring/service/BUILD.gn b/components/mirroring/service/BUILD.gn
+index 20a2c0bda7..f89f611595 100644
+--- a/components/mirroring/service/BUILD.gn
++++ b/components/mirroring/service/BUILD.gn
+@@ -2,10 +2,11 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//testing/test.gni")
+ import("//third_party/libaom/options.gni")
+ 
+-component("mirroring_service") {
++jumbo_component("mirroring_service") {
+   sources = [
+     "captured_audio_input.cc",
+     "captured_audio_input.h",
+diff --git a/components/mirroring/service/mirroring_logger.cc b/components/mirroring/service/mirroring_logger.cc
+index c0a89b6206..8bfcbc4e2a 100644
+--- a/components/mirroring/service/mirroring_logger.cc
++++ b/components/mirroring/service/mirroring_logger.cc
+@@ -12,6 +12,8 @@
+ #include "base/strings/stringprintf.h"
+ #include "components/mirroring/mojom/session_observer.mojom.h"
+ 
++#define kLogPrefix kLogPrefix_MirroringLogger
++
+ namespace mirroring {
+ 
+ constexpr char kLogPrefix[] = "mirroring.";
+@@ -78,3 +80,5 @@ void MirroringLogger::LogErrorInternal(const std::string& message) {
+ }
+ 
+ }  // namespace mirroring
++
++#undef kLogPrefix
+diff --git a/components/optimization_guide/core/BUILD.gn b/components/optimization_guide/core/BUILD.gn
+index d4966e6a0f..bc3f0607c4 100644
+--- a/components/optimization_guide/core/BUILD.gn
++++ b/components/optimization_guide/core/BUILD.gn
+@@ -7,6 +7,7 @@ import("//mojo/public/tools/bindings/mojom.gni")
+ if (is_android) {
+   import("//build/config/android/rules.gni")
+ }
++import("//build/config/jumbo.gni")
+ import("//components/optimization_guide/features.gni")
+ 
+ # bloomfilter is isolated because of the allowlisted murmurhash3 dep.
+@@ -22,7 +23,7 @@ source_set("bloomfilter") {
+   configs += [ "//build/config/compiler:wexit_time_destructors" ]
+ }
+ 
+-static_library("filters") {
++jumbo_static_library("filters") {
+   sources = [
+     "filters/hints_component_info.h",
+     "filters/hints_component_util.cc",
+@@ -53,7 +54,7 @@ mojom("interfaces") {
+   public_deps = [ "//mojo/public/mojom/base" ]
+ }
+ 
+-component("features") {
++jumbo_component("features") {
+   sources = [
+     "feature_registry/enterprise_policy_registry.cc",
+     "feature_registry/enterprise_policy_registry.h",
+@@ -99,7 +100,7 @@ component("features") {
+ output_proto_descriptors_cc_file = "$target_gen_dir/model_execution/on_device_model_execution_proto_descriptors.cc"
+ output_proto_enum_templates_h_file = "$target_gen_dir/model_execution/on_device_model_execution_proto_enum_templates.h"
+ 
+-source_set("hints") {
++jumbo_source_set("hints") {
+   sources = [
+     "hints/command_line_top_host_provider.cc",
+     "hints/command_line_top_host_provider.h",
+@@ -154,7 +155,7 @@ source_set("hints") {
+   visibility = [ ":*" ]
+ }
+ 
+-source_set("core_util") {
++jumbo_source_set("core_util") {
+   sources = [
+     "access_token_helper.cc",
+     "access_token_helper.h",
+@@ -188,7 +189,7 @@ source_set("core_util") {
+   ]
+ }
+ 
+-source_set("model_execution") {
++jumbo_source_set("model_execution") {
+   # TODO: crbug.com/421262905 - Should not need these without model_execution
+   sources = [
+     "model_execution/optimization_guide_model_execution_error.cc",
+@@ -367,7 +368,7 @@ static_library("core") {
+   }
+ }
+ 
+-static_library("prediction") {
++jumbo_static_library("prediction") {
+   sources = [
+     "delivery/model_enums.h",
+     "delivery/model_info.cc",
+diff --git a/components/optimization_guide/core/delivery/prediction_model_download_manager.cc b/components/optimization_guide/core/delivery/prediction_model_download_manager.cc
+index a304121919..b731b205a7 100644
+--- a/components/optimization_guide/core/delivery/prediction_model_download_manager.cc
++++ b/components/optimization_guide/core/delivery/prediction_model_download_manager.cc
+@@ -196,7 +196,7 @@ bool PredictionModelDownloadManager::ShouldFetchModels() const {
+   }
+   return (switches::ShouldSkipGoogleApiKeyConfigurationCheck() ||
+           google_apis::HasAPIKeyConfigured()) &&
+-         local_state_->GetBoolean(prefs::kComponentUpdatesEnabled);
++         local_state_->GetBoolean(::prefs::kComponentUpdatesEnabled);
+ }
+ 
+ void PredictionModelDownloadManager::AddObserver(
+diff --git a/components/page_content_annotations/core/BUILD.gn b/components/page_content_annotations/core/BUILD.gn
+index 947f68048e..995b61d1b1 100644
+--- a/components/page_content_annotations/core/BUILD.gn
++++ b/components/page_content_annotations/core/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//components/optimization_guide/features.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
+ 
+@@ -18,7 +19,7 @@ component("features") {
+   defines = [ "IS_PAGE_CONTENT_ANNOTATIONS_FEATURES_IMPL" ]
+ }
+ 
+-static_library("core") {
++jumbo_static_library("core") {
+   sources = [
+     "page_content_annotation_job.cc",
+     "page_content_annotation_job.h",
+diff --git a/components/persistent_cache/BUILD.gn b/components/persistent_cache/BUILD.gn
+index a79b4013ec..3cde314d9c 100644
+--- a/components/persistent_cache/BUILD.gn
++++ b/components/persistent_cache/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-component("persistent_cache") {
++import("//build/config/jumbo.gni")
++
++jumbo_component("persistent_cache") {
+   sources = [
+     "backend.cc",
+     "backend.h",
+diff --git a/components/persistent_cache/persistent_cache_collection.cc b/components/persistent_cache/persistent_cache_collection.cc
+index 72c12a0e29..9efa5ab73e 100644
+--- a/components/persistent_cache/persistent_cache_collection.cc
++++ b/components/persistent_cache/persistent_cache_collection.cc
+@@ -11,6 +11,8 @@
+ #include "components/persistent_cache/entry.h"
+ #include "components/persistent_cache/persistent_cache.h"
+ 
++#define kLruCacheCapacity kLruCacheCapacity_PersistentCacheCollection
++
+ namespace {
+ constexpr size_t kLruCacheCapacity = 100;
+ 
+@@ -116,3 +118,5 @@ PersistentCache* PersistentCacheCollection::GetOrCreateCache(
+ }
+ 
+ }  // namespace persistent_cache
++
++#undef kLruCacheCapacity
+diff --git a/components/services/app_service/public/cpp/BUILD.gn b/components/services/app_service/public/cpp/BUILD.gn
+index 31ebb53d40..531950b6d5 100644
+--- a/components/services/app_service/public/cpp/BUILD.gn
++++ b/components/services/app_service/public/cpp/BUILD.gn
+@@ -2,11 +2,13 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
++
+ # Component for the core data structures and types used by App Service. Large
+ # parts of the codebase are dependent on this target (via
+ # //chromeos/crosapi/mojom), so this must have minimal deps to avoid circular
+ # chains.
+-component("app_types") {
++jumbo_component("app_types") {
+   output_name = "APP_TYPES"
+   sources = [
+     "app.cc",
+diff --git a/components/services/app_service/public/cpp/permission.cc b/components/services/app_service/public/cpp/permission.cc
+index e3c99e943d..31fbe87403 100644
+--- a/components/services/app_service/public/cpp/permission.cc
++++ b/components/services/app_service/public/cpp/permission.cc
+@@ -10,6 +10,8 @@
+ #include "base/containers/to_value_list.h"
+ #include "base/strings/to_string.h"
+ 
++#define kIsManagedKey kIsManagedKey_Permission
++
+ namespace apps {
+ 
+ namespace {
+@@ -179,3 +181,5 @@ Permissions ConvertListToPermissions(const base::Value::List* list) {
+ }
+ 
+ }  // namespace apps
++
++#undef kIsManagedKey
+diff --git a/components/sessions/BUILD.gn b/components/sessions/BUILD.gn
+index 4106b61276..b1fe253c57 100644
+--- a/components/sessions/BUILD.gn
++++ b/components/sessions/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ if (is_android) {
+   import("//build/config/android/config.gni")
+ }
+@@ -11,7 +12,7 @@ config("implementation") {
+ }
+ 
+ if (!is_ios) {
+-  component("sessions") {
++  jumbo_component("sessions") {
+     sources = [
+       "content/content_live_tab.cc",
+       "content/content_live_tab.h",
+@@ -75,7 +76,7 @@ if (!is_ios) {
+   }
+ }
+ 
+-component("session_id") {
++jumbo_component("session_id") {
+   sources = [
+     "core/session_id.cc",
+     "core/session_id.h",
+diff --git a/components/ukm/BUILD.gn b/components/ukm/BUILD.gn
+index 891776217b..e3cf70e5e2 100644
+--- a/components/ukm/BUILD.gn
++++ b/components/ukm/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//testing/test.gni")
+ 
+ component("ukm_recorder") {
+@@ -41,7 +42,7 @@ component("ukm_recorder") {
+ # The Url-Keyed Metrics (UKM) service is responsible for gathering and
+ # uploading reports that contain fine grained performance metrics including
+ # URLs for top-level navigations.
+-static_library("ukm") {
++jumbo_static_library("ukm") {
+   sources = [
+     "app_source_url_recorder.cc",
+     "app_source_url_recorder.h",
+diff --git a/components/unexportable_keys/BUILD.gn b/components/unexportable_keys/BUILD.gn
+index bb07e4dfd7..5b9eb8d911 100644
+--- a/components/unexportable_keys/BUILD.gn
++++ b/components/unexportable_keys/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-component("unexportable_keys") {
++import("//build/config/jumbo.gni")
++
++jumbo_component("unexportable_keys") {
+   sources = [
+     "background_long_task_scheduler.cc",
+     "background_long_task_scheduler.h",
+diff --git a/components/assist_ranker/BUILD.gn b/components/assist_ranker/BUILD.gn
+index e2006de1e9..77062f3150 100644
+--- a/components/assist_ranker/BUILD.gn
++++ b/components/assist_ranker/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-static_library("assist_ranker") {
++import("//build/config/jumbo.gni")
++
++jumbo_static_library("assist_ranker") {
+   sources = [
+     "assist_ranker_service.h",
+     "assist_ranker_service_impl.cc",
+diff --git a/components/bookmarks/browser/BUILD.gn b/components/bookmarks/browser/BUILD.gn
+index 08550ce07f..313b64be5c 100644
+--- a/components/bookmarks/browser/BUILD.gn
++++ b/components/bookmarks/browser/BUILD.gn
+@@ -2,10 +2,11 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
+ 
+-static_library("browser") {
++jumbo_static_library("browser") {
+   friend = [
+     ":unit_tests",
+     "//components/bookmarks/test",
+diff --git a/components/collaboration/internal/BUILD.gn b/components/collaboration/internal/BUILD.gn
+index dd0b72f87a..113f14f0b2 100644
+--- a/components/collaboration/internal/BUILD.gn
++++ b/components/collaboration/internal/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ if (is_android) {
+   import("//build/config/android/config.gni")
+   import("//build/config/android/rules.gni")
+@@ -108,7 +109,7 @@ static_library("comments_internal") {
+   }
+ }
+ 
+-static_library("messaging_internal") {
++jumbo_static_library("messaging_internal") {
+   sources = [
+     "messaging/configuration.cc",
+     "messaging/configuration.h",
+diff --git a/components/data_sharing/internal/BUILD.gn b/components/data_sharing/internal/BUILD.gn
+index 69cf229f71..3562fb847f 100644
+--- a/components/data_sharing/internal/BUILD.gn
++++ b/components/data_sharing/internal/BUILD.gn
+@@ -2,13 +2,14 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ if (is_android) {
+   import("//build/config/android/config.gni")
+   import("//build/config/android/rules.gni")
+   import("//third_party/jni_zero/jni_zero.gni")
+ }
+ 
+-static_library("internal") {
++jumbo_static_library("internal") {
+   visibility = [
+     ":*",
+     "//chrome/browser",
+diff --git a/components/data_sharing/internal/data_sharing_network_loader_impl.cc b/components/data_sharing/internal/data_sharing_network_loader_impl.cc
+index c0f48ed9ef..7be94157e2 100644
+--- a/components/data_sharing/internal/data_sharing_network_loader_impl.cc
++++ b/components/data_sharing/internal/data_sharing_network_loader_impl.cc
+@@ -15,6 +15,8 @@
+ using endpoint_fetcher::EndpointFetcher;
+ using endpoint_fetcher::EndpointResponse;
+ 
++#define kTimeout kTimeout_DataSharingNetworkLoaderImpl
++
+ namespace data_sharing {
+ 
+ namespace {
+@@ -128,3 +130,5 @@ DataSharingNetworkLoaderImpl::GetNetworkTrafficAnnotationTag(
+ }
+ 
+ }  // namespace data_sharing
++
++#undef kTimeout
+diff --git a/components/dom_distiller/core/BUILD.gn b/components/dom_distiller/core/BUILD.gn
+index 2000609c4c..4d2667e7f0 100644
+--- a/components/dom_distiller/core/BUILD.gn
++++ b/components/dom_distiller/core/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-static_library("core") {
++import("//build/config/jumbo.gni")
++
++jumbo_static_library("core") {
+   sources = [
+     "article_distillation_update.cc",
+     "article_distillation_update.h",
+diff --git a/third_party/dom_distiller_js/protoc_plugins/util/writer.py b/third_party/dom_distiller_js/protoc_plugins/util/writer.py
+index 9ee673abd6..8f80074b5c 100644
+--- a/third_party/dom_distiller_js/protoc_plugins/util/writer.py
++++ b/third_party/dom_distiller_js/protoc_plugins/util/writer.py
+@@ -43,3 +43,6 @@ class CodeWriter(object):
+   def WriteCStyleHeader(self):
+     self.Output("// GENERATED FILE")
+     self.Output("// This file generated by DomDistillerJs protoc plugin.")
++    self.Output("")
++    self.Output("#pragma once")
++    self.Output("")
+diff --git a/third_party/dom_distiller_js/test_sample_json_converter.h.golden b/third_party/dom_distiller_js/test_sample_json_converter.h.golden
+index 9ea16e3ba3..b95bdb67c4 100644
+--- a/third_party/dom_distiller_js/test_sample_json_converter.h.golden
++++ b/third_party/dom_distiller_js/test_sample_json_converter.h.golden
+@@ -1,5 +1,8 @@
+ // GENERATED FILE
+ // This file generated by DomDistillerJs protoc plugin.
++
++#pragma once
++
+ #include "test_sample.pb.h"
+ 
+ // base dependencies
+diff --git a/components/enterprise/BUILD.gn b/components/enterprise/BUILD.gn
+index 164699d3fa..6894dd1378 100644
+--- a/components/enterprise/BUILD.gn
++++ b/components/enterprise/BUILD.gn
+@@ -2,9 +2,10 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//components/enterprise/buildflags/buildflags.gni")
+ 
+-static_library("enterprise") {
++jumbo_static_library("enterprise") {
+   sources = [
+     "browser/reporting/browser_report_generator.cc",
+     "browser/reporting/browser_report_generator.h",
+diff --git a/components/favicon/core/BUILD.gn b/components/favicon/core/BUILD.gn
+index a60f3430c5..1cd0f66525 100644
+--- a/components/favicon/core/BUILD.gn
++++ b/components/favicon/core/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-static_library("core") {
++import("//build/config/jumbo.gni")
++
++jumbo_static_library("core") {
+   sources = [
+     "core_favicon_service.cc",
+     "core_favicon_service.h",
+diff --git a/components/feedback/BUILD.gn b/components/feedback/BUILD.gn
+index 2faf25c182..4fe8aa3ca6 100644
+--- a/components/feedback/BUILD.gn
++++ b/components/feedback/BUILD.gn
+@@ -3,9 +3,10 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
+ 
+-static_library("feedback") {
++jumbo_static_library("feedback") {
+   sources = [
+     "features.cc",
+     "features.h",
+diff --git a/components/gcm_driver/BUILD.gn b/components/gcm_driver/BUILD.gn
+index 727e2b700e..f710134593 100644
+--- a/components/gcm_driver/BUILD.gn
++++ b/components/gcm_driver/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/buildflag_header.gni")
++import("//build/config/jumbo.gni")
+ import("//components/gcm_driver/config.gni")
+ 
+ buildflag_header("gcm_buildflags") {
+@@ -10,7 +11,7 @@ buildflag_header("gcm_buildflags") {
+   flags = [ "USE_GCM_FROM_PLATFORM=$use_gcm_from_platform" ]
+ }
+ 
+-static_library("gcm_driver") {
++jumbo_static_library("gcm_driver") {
+   sources = [
+     "features.cc",
+     "features.h",
+diff --git a/components/history_clusters/core/BUILD.gn b/components/history_clusters/core/BUILD.gn
+index 22bd00604b..3547a37394 100644
+--- a/components/history_clusters/core/BUILD.gn
++++ b/components/history_clusters/core/BUILD.gn
+@@ -4,9 +4,10 @@
+ 
+ import("//build/buildflag_header.gni")
+ import("//build/config/chrome_build.gni")
++import("//build/config/jumbo.gni")
+ import("//mojo/public/tools/bindings/mojom.gni")
+ 
+-static_library("core") {
++jumbo_static_library("core") {
+   sources = [
+     "cluster_finalizer.h",
+     "cluster_interaction_state_processor.cc",
+diff --git a/components/history_clusters/core/on_device_clustering_backend.cc b/components/history_clusters/core/on_device_clustering_backend.cc
+index 555aa9ccab..0199555021 100644
+--- a/components/history_clusters/core/on_device_clustering_backend.cc
++++ b/components/history_clusters/core/on_device_clustering_backend.cc
+@@ -38,6 +38,8 @@
+ #include "components/site_engagement/core/site_engagement_score_provider.h"
+ #include "components/url_formatter/url_formatter.h"
+ 
++#define kEngagementScoreCacheSize kEngagementScoreCacheSize_OnDeviceClusteringBackend
++
+ namespace history_clusters {
+ 
+ namespace {
+@@ -396,3 +398,5 @@ OnDeviceClusteringBackend::GetClusterTriggerabilityOnBackgroundThread(
+ }
+ 
+ }  // namespace history_clusters
++
++#undef kEngagementScoreCacheSize
+diff --git a/components/history_embeddings/BUILD.gn b/components/history_embeddings/BUILD.gn
+index b065d399c6..3bf087c937 100644
+--- a/components/history_embeddings/BUILD.gn
++++ b/components/history_embeddings/BUILD.gn
+@@ -2,9 +2,10 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//components/optimization_guide/features.gni")
+ 
+-static_library("history_embeddings") {
++jumbo_static_library("history_embeddings") {
+   sources = [
+     "answerer.cc",
+     "answerer.h",
+diff --git a/components/lens/BUILD.gn b/components/lens/BUILD.gn
+index 08748c24b2..1e83f55272 100644
+--- a/components/lens/BUILD.gn
++++ b/components/lens/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/buildflag_header.gni")
++import("//build/config/jumbo.gni")
+ import("//components/lens/features.gni")
+ import("//mojo/public/tools/bindings/mojom.gni")
+ import("//pdf/features.gni")
+@@ -16,7 +17,7 @@ buildflag_header("buildflags") {
+   ]
+ }
+ 
+-static_library("lens") {
++jumbo_static_library("lens") {
+   sources = [
+     "contextual_input.cc",
+     "contextual_input.h",
+diff --git a/components/media_router/common/providers/cast/channel/BUILD.gn b/components/media_router/common/providers/cast/channel/BUILD.gn
+index 10efd31eac..badca146f6 100644
+--- a/components/media_router/common/providers/cast/channel/BUILD.gn
++++ b/components/media_router/common/providers/cast/channel/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
+ import("//third_party/libprotobuf-mutator/fuzzable_proto_library.gni")
+ import("//third_party/openscreen/src/build_overrides/data_headers_template.gni")
+@@ -12,7 +13,7 @@ source_set("capability") {
+   deps = [ "//base" ]
+ }
+ 
+-static_library("channel") {
++jumbo_static_library("channel") {
+   sources = [
+     "cast_auth_util.cc",
+     "cast_auth_util.h",
+diff --git a/components/live_caption/BUILD.gn b/components/live_caption/BUILD.gn
+index 9964868b34..59d654389c 100644
+--- a/components/live_caption/BUILD.gn
++++ b/components/live_caption/BUILD.gn
+@@ -2,10 +2,11 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ 
+ if (!is_android && !is_ios) {
+-  static_library("live_caption") {
++  jumbo_static_library("live_caption") {
+     sources = [
+       "caption_bubble_context.h",
+       "caption_bubble_context_remote.cc",
+diff --git a/components/media_router/common/BUILD.gn b/components/media_router/common/BUILD.gn
+index 4a33857f65..a637c2596d 100644
+--- a/components/media_router/common/BUILD.gn
++++ b/components/media_router/common/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-static_library("common") {
++import("//build/config/jumbo.gni")
++
++jumbo_static_library("common") {
+   sources = [
+     # media_sink_internal needs to be included with Android due to typemapping.
+     # Ideally, Android shouldn't be the case since it does not use Mojo for
+diff --git a/components/metrics/private_metrics/BUILD.gn b/components/metrics/private_metrics/BUILD.gn
+index 5f5e2990a1..ab8269c878 100644
+--- a/components/metrics/private_metrics/BUILD.gn
++++ b/components/metrics/private_metrics/BUILD.gn
+@@ -2,6 +2,8 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
++
+ component("dwa_recorder") {
+   sources = [
+     "//components/metrics/dwa/dwa_recorder.cc",
+@@ -29,7 +31,7 @@ component("private_metrics_recorder") {
+ }
+ 
+ # TODO(crbug.com/433729993): Build dwa static library under private_metrics static library.
+-static_library("private_metrics") {
++jumbo_static_library("private_metrics") {
+   sources = [
+     "//components/metrics/dwa/dwa_entry_builder.cc",
+     "//components/metrics/dwa/dwa_entry_builder.h",
+diff --git a/components/no_state_prefetch/browser/BUILD.gn b/components/no_state_prefetch/browser/BUILD.gn
+index a080009cd3..e3f45b14b1 100644
+--- a/components/no_state_prefetch/browser/BUILD.gn
++++ b/components/no_state_prefetch/browser/BUILD.gn
+@@ -2,9 +2,10 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//components/guest_view/buildflags/buildflags.gni")
+ 
+-static_library("browser") {
++jumbo_static_library("browser") {
+   sources = [
+     "no_state_prefetch_config.cc",
+     "no_state_prefetch_config.h",
+diff --git a/components/no_state_prefetch/browser/no_state_prefetch_contents.cc b/components/no_state_prefetch/browser/no_state_prefetch_contents.cc
+index 4b6db00e25..590cadc6cb 100644
+--- a/components/no_state_prefetch/browser/no_state_prefetch_contents.cc
++++ b/components/no_state_prefetch/browser/no_state_prefetch_contents.cc
+@@ -50,6 +50,9 @@ using content::RenderFrameHost;
+ using content::SessionStorageNamespace;
+ using content::WebContents;
+ 
++#define ToPreloadingFailureReason      ToPreloadingFailureReason_NoStatePrefetchContents
++#define SetPreloadingTriggeringOutcome SetPreloadingTriggeringOutcome_NoStatePrefetchContents
++
+ namespace prerender {
+ 
+ class NoStatePrefetchContentsFactoryImpl
+@@ -634,3 +637,6 @@ void NoStatePrefetchContents::AddNoStatePrefetchCancelerReceiver(
+ }
+ 
+ }  // namespace prerender
++
++#undef ToPreloadingFailureReason
++#undef SetPreloadingTriggeringOutcome
+diff --git a/components/offline_pages/core/BUILD.gn b/components/offline_pages/core/BUILD.gn
+index 1d702bedae..f05acd3b41 100644
+--- a/components/offline_pages/core/BUILD.gn
++++ b/components/offline_pages/core/BUILD.gn
+@@ -2,11 +2,12 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ if (is_android) {
+   import("//build/config/android/rules.gni")
+ }
+ 
+-static_library("core") {
++jumbo_static_library("core") {
+   sources = [
+     "archive_manager.cc",
+     "archive_manager.h",
+diff --git a/components/offline_pages/core/snapshot_controller.cc b/components/offline_pages/core/snapshot_controller.cc
+index e3163383fd..768aada6a2 100644
+--- a/components/offline_pages/core/snapshot_controller.cc
++++ b/components/offline_pages/core/snapshot_controller.cc
+@@ -11,6 +11,8 @@
+ #include "base/time/time.h"
+ #include "components/offline_pages/core/offline_page_feature.h"
+ 
++#define kDelayForTests kDelayForTests_SnapshotController
++
+ namespace {
+ // Default delay, in milliseconds, between the main document parsed event and
+ // snapshot. Note: this snapshot might not occur if the OnLoad event and
+@@ -119,3 +121,5 @@ int64_t SnapshotController::GetDelayAfterDocumentOnLoadCompletedForTest() {
+ }
+ 
+ }  // namespace offline_pages
++
++#undef kDelayForTests
+diff --git a/components/ntp_tiles/BUILD.gn b/components/ntp_tiles/BUILD.gn
+index 43f193bd38..ad3d42a1f1 100644
+--- a/components/ntp_tiles/BUILD.gn
++++ b/components/ntp_tiles/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//components/supervised_user/buildflags.gni")
+ import("//extensions/buildflags/buildflags.gni")
+ import("//mojo/public/tools/bindings/mojom.gni")
+@@ -10,7 +11,7 @@ if (is_android) {
+   import("//build/config/android/rules.gni")
+ }
+ 
+-static_library("ntp_tiles") {
++jumbo_static_library("ntp_tiles") {
+   sources = [
+     "constants.cc",
+     "constants.h",
+diff --git a/components/offline_pages/core/background/BUILD.gn b/components/offline_pages/core/background/BUILD.gn
+index e2ab2ec451..1a89b0a471 100644
+--- a/components/offline_pages/core/background/BUILD.gn
++++ b/components/offline_pages/core/background/BUILD.gn
+@@ -2,11 +2,12 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ if (is_android) {
+   import("//build/config/android/rules.gni")
+ }
+ 
+-static_library("background_offliner") {
++jumbo_static_library("background_offliner") {
+   sources = [
+     "change_requests_state_task.cc",
+     "change_requests_state_task.h",
+diff --git a/components/search_engines/BUILD.gn b/components/search_engines/BUILD.gn
+index cdf50752a9..e6b5ca7c8d 100644
+--- a/components/search_engines/BUILD.gn
++++ b/components/search_engines/BUILD.gn
+@@ -3,13 +3,14 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//tools/json_to_struct/json_to_struct.gni")
+ if (is_android) {
+   import("//build/config/android/config.gni")
+   import("//build/config/android/rules.gni")
+ }
+ 
+-static_library("search_engines") {
++jumbo_static_library("search_engines") {
+   sources = [
+     "choice_made_location.h",
+     "default_search_manager.cc",
+diff --git a/components/security_interstitials/content/BUILD.gn b/components/security_interstitials/content/BUILD.gn
+index 3dcddc38dc..88ff687d81 100644
+--- a/components/security_interstitials/content/BUILD.gn
++++ b/components/security_interstitials/content/BUILD.gn
+@@ -1,11 +1,13 @@
+ # Copyright 2016 The Chromium Authors
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
++
++import("//build/config/jumbo.gni")
+ import("//components/captive_portal/core/features.gni")
+ import("//components/guest_view/buildflags/buildflags.gni")
+ import("//third_party/protobuf/proto_library.gni")
+ 
+-static_library("security_interstitial_page") {
++jumbo_static_library("security_interstitial_page") {
+   sources = [
+     "bad_clock_blocking_page.cc",
+     "bad_clock_blocking_page.h",
+diff --git a/components/security_interstitials/core/BUILD.gn b/components/security_interstitials/core/BUILD.gn
+index f4acf4f863..12cc2e9352 100644
+--- a/components/security_interstitials/core/BUILD.gn
++++ b/components/security_interstitials/core/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-static_library("core") {
++import("//build/config/jumbo.gni")
++
++jumbo_static_library("core") {
+   sources = [
+     "bad_clock_ui.cc",
+     "bad_clock_ui.h",
+diff --git a/components/security_interstitials/core/https_only_mode_allowlist.cc b/components/security_interstitials/core/https_only_mode_allowlist.cc
+index 97144fecc4..0fb4d3644d 100644
+--- a/components/security_interstitials/core/https_only_mode_allowlist.cc
++++ b/components/security_interstitials/core/https_only_mode_allowlist.cc
+@@ -11,6 +11,8 @@
+ #include "components/content_settings/core/browser/content_settings_pref_provider.h"
+ #include "url/gurl.h"
+ 
++#define GetSecureGURLForHost GetSecureGURLForHost_HttpsOnlyModeEnforcelist
++
+ namespace {
+ 
+ // Key for the expiration time of a decision in the per-site HTTP allowlist
+@@ -132,3 +134,5 @@ void HttpsOnlyModeAllowlist::SetClockForTesting(base::Clock* clock) {
+ }
+ 
+ }  // namespace security_interstitials
++
++#undef GetSecureGURLForHost
+diff --git a/components/segmentation_platform/internal/BUILD.gn b/components/segmentation_platform/internal/BUILD.gn
+index 8849faaa8b..10da011880 100644
+--- a/components/segmentation_platform/internal/BUILD.gn
++++ b/components/segmentation_platform/internal/BUILD.gn
+@@ -7,10 +7,11 @@ if (is_android) {
+   import("//build/config/android/rules.gni")
+   import("//third_party/jni_zero/jni_zero.gni")
+ }
++import("//build/config/jumbo.gni")
+ import("//components/optimization_guide/features.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
+ 
+-static_library("internal") {
++jumbo_static_library("internal") {
+   #TODO(crbug.com/347191610): Refactor code to eliminate visibility
+   #requirement below for `visited_url_ranking`.
+   visibility = [
+diff --git a/components/segmentation_platform/internal/selection/result_refresh_manager.cc b/components/segmentation_platform/internal/selection/result_refresh_manager.cc
+index 470858214f..545e5fe8d7 100644
+--- a/components/segmentation_platform/internal/selection/result_refresh_manager.cc
++++ b/components/segmentation_platform/internal/selection/result_refresh_manager.cc
+@@ -11,6 +11,8 @@
+ #include "components/segmentation_platform/public/constants.h"
+ #include "components/segmentation_platform/public/features.h"
+ 
++#define kModelInitializationTimeoutMs kModelInitializationTimeoutMs_ResultRefreshManager
++
+ namespace segmentation_platform {
+ 
+ namespace {
+@@ -160,3 +162,5 @@ void ResultRefreshManager::OnGetCachedResultOrRunModel(
+ }
+ 
+ }  // namespace segmentation_platform
++
++#undef kModelInitializationTimeoutMs
+diff --git a/components/signin/core/browser/BUILD.gn b/components/signin/core/browser/BUILD.gn
+index 1adf58a3ac..4b2ac7fd7c 100644
+--- a/components/signin/core/browser/BUILD.gn
++++ b/components/signin/core/browser/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//components/signin/features.gni")
+ 
+ if (is_android) {
+@@ -9,7 +10,7 @@ if (is_android) {
+ }
+ 
+ # This target contains code that is used by clients of //components/signin.
+-static_library("browser") {
++jumbo_static_library("browser") {
+   sources = [
+     "about_signin_internals.cc",
+     "about_signin_internals.h",
+diff --git a/components/subresource_filter/content/browser/BUILD.gn b/components/subresource_filter/content/browser/BUILD.gn
+index ab406c0619..c686c5da7d 100644
+--- a/components/subresource_filter/content/browser/BUILD.gn
++++ b/components/subresource_filter/content/browser/BUILD.gn
+@@ -3,8 +3,9 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ 
+-static_library("browser") {
++jumbo_static_library("browser") {
+   sources = [
+     "ad_tagging_utils.cc",
+     "ad_tagging_utils.h",
+diff --git a/components/subresource_filter/core/common/BUILD.gn b/components/subresource_filter/core/common/BUILD.gn
+index 81c9bdf29a..a1f7e05ccc 100644
+--- a/components/subresource_filter/core/common/BUILD.gn
++++ b/components/subresource_filter/core/common/BUILD.gn
+@@ -2,9 +2,10 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
+ 
+-static_library("common") {
++jumbo_static_library("common") {
+   sources = [
+     "activation_decision.h",
+     "activation_list.cc",
+diff --git a/components/supervised_user/core/browser/BUILD.gn b/components/supervised_user/core/browser/BUILD.gn
+index 25112b9d49..af1c25ee3f 100644
+--- a/components/supervised_user/core/browser/BUILD.gn
++++ b/components/supervised_user/core/browser/BUILD.gn
+@@ -5,6 +5,7 @@
+ if (is_android) {
+   import("//build/config/android/rules.gni")
+ }
++import("//build/config/jumbo.gni")
+ 
+ static_library("fetcher_config") {
+   sources = [
+@@ -90,7 +91,7 @@ static_library("fetcher") {
+   ]
+ }
+ 
+-static_library("browser") {
++jumbo_static_library("browser") {
+   sources = [
+     "child_account_service.cc",
+     "child_account_service.h",
+diff --git a/components/supervised_user/core/browser/kids_chrome_management_url_checker_client.cc b/components/supervised_user/core/browser/kids_chrome_management_url_checker_client.cc
+index ea41641007..0f04049fe2 100644
+--- a/components/supervised_user/core/browser/kids_chrome_management_url_checker_client.cc
++++ b/components/supervised_user/core/browser/kids_chrome_management_url_checker_client.cc
+@@ -28,6 +28,8 @@
+ #include "third_party/protobuf/src/google/protobuf/message_lite.h"
+ #include "url/gurl.h"
+ 
++#define OnResponse OnResponse_KidsChromeManagementURLCheckerClient
++
+ namespace supervised_user {
+ namespace {
+ 
+@@ -143,3 +145,5 @@ void KidsChromeManagementURLCheckerClient::CheckURL(
+                        base::BindOnce(&OnResponse, url, std::move(callback)));
+ }
+ }  // namespace supervised_user
++
++#undef OnResponse
+diff --git a/components/supervised_user/core/browser/supervised_user_preferences.cc b/components/supervised_user/core/browser/supervised_user_preferences.cc
+index 9ce64a100a..0cf88de8cd 100644
+--- a/components/supervised_user/core/browser/supervised_user_preferences.cc
++++ b/components/supervised_user/core/browser/supervised_user_preferences.cc
+@@ -17,6 +17,8 @@
+ #include "components/supervised_user/core/common/pref_names.h"
+ #include "components/supervised_user/core/common/supervised_user_constants.h"
+ 
++#define Custodian Custodian_SupervisedUserPreferences
++
+ namespace supervised_user {
+ 
+ namespace {
+@@ -199,3 +201,5 @@ void SetGoogleSafeSearch(PrefService& pref_service,
+                           static_cast<bool>(status));
+ }
+ }  // namespace supervised_user
++
++#undef Custodian
+diff --git a/components/sync/model/BUILD.gn b/components/sync/model/BUILD.gn
+index 0bab27cca4..e5bcdfc0cc 100644
+--- a/components/sync/model/BUILD.gn
++++ b/components/sync/model/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-static_library("model") {
++import("//build/config/jumbo.gni")
++
++jumbo_static_library("model") {
+   sources = [
+     "blocking_data_type_store.h",
+     "blocking_data_type_store_impl.cc",
+diff --git a/components/sync/engine/BUILD.gn b/components/sync/engine/BUILD.gn
+index 44845bd11c..bf7d1ff652 100644
+--- a/components/sync/engine/BUILD.gn
++++ b/components/sync/engine/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-static_library("engine") {
++import("//build/config/jumbo.gni")
++
++jumbo_static_library("engine") {
+   sources = [
+     "active_devices_invalidation_info.cc",
+     "active_devices_invalidation_info.h",
+diff --git a/components/sync/nigori/BUILD.gn b/components/sync/nigori/BUILD.gn
+index 9417a6b73a..30bde206e9 100644
+--- a/components/sync/nigori/BUILD.gn
++++ b/components/sync/nigori/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-static_library("nigori") {
++import("//build/config/jumbo.gni")
++
++jumbo_static_library("nigori") {
+   sources = [
+     "cross_user_sharing_keys.cc",
+     "cross_user_sharing_keys.h",
+diff --git a/components/sync/nigori/nigori_state.cc b/components/sync/nigori/nigori_state.cc
+index 4bb51b0c7d..bf66b5faad 100644
+--- a/components/sync/nigori/nigori_state.cc
++++ b/components/sync/nigori/nigori_state.cc
+@@ -24,6 +24,8 @@
+ #include "components/sync/protocol/nigori_local_data.pb.h"
+ #include "components/sync/protocol/nigori_specifics.pb.h"
+ 
++#define PublicKeyFromProto PublicKeyFromProto_NigoriState
++
+ namespace syncer {
+ 
+ namespace {
+@@ -437,3 +439,5 @@ bool NigoriState::NeedsGenerateCrossUserSharingKeyPair() const {
+ }
+ 
+ }  // namespace syncer
++
++#undef PublicKeyFromProto
+diff --git a/components/sync_sessions/BUILD.gn b/components/sync_sessions/BUILD.gn
+index 39218fce13..452ec69033 100644
+--- a/components/sync_sessions/BUILD.gn
++++ b/components/sync_sessions/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-static_library("sync_sessions") {
++import("//build/config/jumbo.gni")
++
++jumbo_static_library("sync_sessions") {
+   sources = [
+     "features.cc",
+     "features.h",
+diff --git a/components/sync_sessions/session_sync_bridge.cc b/components/sync_sessions/session_sync_bridge.cc
+index f630048c84..d422f1117a 100644
+--- a/components/sync_sessions/session_sync_bridge.cc
++++ b/components/sync_sessions/session_sync_bridge.cc
+@@ -31,6 +31,8 @@
+ #include "components/sync_sessions/synced_window_delegate.h"
+ #include "components/sync_sessions/synced_window_delegates_getter.h"
+ 
++#define MoveToEntityData MoveToEntityData_SessionSyncBridge
++
+ namespace sync_sessions {
+ namespace {
+ 
+@@ -515,3 +517,5 @@ SessionSyncBridge::SyncingState::SyncingState() = default;
+ SessionSyncBridge::SyncingState::~SyncingState() = default;
+ 
+ }  // namespace sync_sessions
++
++#undef MoveToEntityData
+diff --git a/components/translate/core/browser/BUILD.gn b/components/translate/core/browser/BUILD.gn
+index c1167e0450..37117d24bd 100644
+--- a/components/translate/core/browser/BUILD.gn
++++ b/components/translate/core/browser/BUILD.gn
+@@ -2,9 +2,10 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ 
+-static_library("browser") {
++jumbo_static_library("browser") {
+   sources = [
+     "language_state.cc",
+     "language_state.h",
+diff --git a/components/trusted_vault/BUILD.gn b/components/trusted_vault/BUILD.gn
+index 73ae7f66fe..5d374394cd 100644
+--- a/components/trusted_vault/BUILD.gn
++++ b/components/trusted_vault/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-static_library("trusted_vault") {
++import("//build/config/jumbo.gni")
++
++jumbo_static_library("trusted_vault") {
+   sources = [
+     "trusted_vault_client.h",
+     "trusted_vault_server_constants.cc",
+diff --git a/components/update_client/BUILD.gn b/components/update_client/BUILD.gn
+index a0f3587427..6d71784701 100644
+--- a/components/update_client/BUILD.gn
++++ b/components/update_client/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/buildflag_header.gni")
++import("//build/config/jumbo.gni")
+ import("//net/features.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
+ 
+@@ -84,7 +85,7 @@ group("common_impl") {
+   ]
+ }
+ 
+-static_library("update_client") {
++jumbo_static_library("update_client") {
+   include_dirs = [ "//third_party/puffin/src/include" ]
+   sources = [
+     "action_runner.cc",
+diff --git a/components/update_client/op_zucchini.cc b/components/update_client/op_zucchini.cc
+index 9d51fcfbe5..86f02e31fd 100644
+--- a/components/update_client/op_zucchini.cc
++++ b/components/update_client/op_zucchini.cc
+@@ -32,6 +32,11 @@
+ #include "components/update_client/utils.h"
+ #include "components/zucchini/zucchini.h"
+ 
++#define Patch            Patch_OpZucchini
++#define PatchDone        PatchDone_OpZucchini
++#define VerifyAndCleanUp VerifyAndCleanUp_OpZucchini
++#define CacheLookupDone  CacheLookupDone_OpZucchini
++
+ namespace update_client {
+ 
+ namespace {
+@@ -165,3 +170,8 @@ base::OnceClosure ZucchiniOperation(
+ }
+ 
+ }  // namespace update_client
++
++#undef Patch
++#undef PatchDone
++#undef VerifyAndCleanUp
++#undef CacheLookupDone
+diff --git a/components/web_package/BUILD.gn b/components/web_package/BUILD.gn
+index ab6e506030..b5df536707 100644
+--- a/components/web_package/BUILD.gn
++++ b/components/web_package/BUILD.gn
+@@ -2,9 +2,10 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
+ 
+-static_library("web_package") {
++jumbo_static_library("web_package") {
+   sources = [
+     "input_reader.cc",
+     "input_reader.h",
+diff --git a/components/webcrypto/BUILD.gn b/components/webcrypto/BUILD.gn
+index 8de62d024c..3332514af1 100644
+--- a/components/webcrypto/BUILD.gn
++++ b/components/webcrypto/BUILD.gn
+@@ -2,10 +2,11 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
+ import("//testing/test.gni")
+ 
+-static_library("webcrypto") {
++jumbo_static_library("webcrypto") {
+   sources = [
+     "algorithm_dispatch.cc",
+     "algorithm_dispatch.h",
+diff --git a/components/webcrypto/algorithms/aes.cc b/components/webcrypto/algorithms/aes.cc
+index 872f43ad27..bdbb7596da 100644
+--- a/components/webcrypto/algorithms/aes.cc
++++ b/components/webcrypto/algorithms/aes.cc
+@@ -15,6 +15,8 @@
+ #include "third_party/blink/public/platform/web_crypto_algorithm_params.h"
+ #include "third_party/blink/public/platform/web_crypto_key_algorithm.h"
+ 
++#define SynthesizeImportAlgorithmForClone SynthesizeImportAlgorithmForClone_Aes
++
+ namespace webcrypto {
+ 
+ namespace {
+@@ -221,3 +223,5 @@ Status AesAlgorithm::GetKeyLength(
+ }
+ 
+ }  // namespace webcrypto
++
++#undef SynthesizeImportAlgorithmForClone
+diff --git a/components/webcrypto/algorithms/aes_cbc.cc b/components/webcrypto/algorithms/aes_cbc.cc
+index b6f74ae235..c4792e7116 100644
+--- a/components/webcrypto/algorithms/aes_cbc.cc
++++ b/components/webcrypto/algorithms/aes_cbc.cc
+@@ -19,6 +19,8 @@
+ #include "third_party/boringssl/src/include/openssl/aes.h"
+ #include "third_party/boringssl/src/include/openssl/cipher.h"
+ 
++#define GetAESCipherByKeyLength GetAESCipherByKeyLength_AesCbc
++
+ namespace webcrypto {
+ 
+ namespace {
+@@ -122,3 +124,5 @@ std::unique_ptr<AlgorithmImplementation> CreateAesCbcImplementation() {
+ }
+ 
+ }  // namespace webcrypto
++
++#undef GetAESCipherByKeyLength
+diff --git a/components/webcrypto/algorithms/ed25519.cc b/components/webcrypto/algorithms/ed25519.cc
+index 84f80d9ede..8c9bfaa181 100644
+--- a/components/webcrypto/algorithms/ed25519.cc
++++ b/components/webcrypto/algorithms/ed25519.cc
+@@ -22,6 +22,9 @@
+ #include "third_party/boringssl/src/include/openssl/curve25519.h"
+ #include "third_party/boringssl/src/include/openssl/evp.h"
+ 
++#define ReadBytes                         ReadBytes_Ed25519
++#define SynthesizeImportAlgorithmForClone SynthesizeImportAlgorithmForClone_Ed25519
++
+ namespace webcrypto {
+ 
+ namespace {
+@@ -509,3 +512,6 @@ std::unique_ptr<AlgorithmImplementation> CreateEd25519Implementation() {
+ }
+ 
+ }  // namespace webcrypto
++
++#undef ReadBytes
++#undef SynthesizeImportAlgorithmForClone
+diff --git a/components/webcrypto/algorithms/pbkdf2.cc b/components/webcrypto/algorithms/pbkdf2.cc
+index cd362f04fc..d7e42668be 100644
+--- a/components/webcrypto/algorithms/pbkdf2.cc
++++ b/components/webcrypto/algorithms/pbkdf2.cc
+@@ -17,6 +17,8 @@
+ #include "third_party/blink/public/platform/web_crypto_key_algorithm.h"
+ #include "third_party/boringssl/src/include/openssl/evp.h"
+ 
++#define kAllKeyUsages kAllKeyUsages_Pbkdf2
++
+ namespace webcrypto {
+ 
+ namespace {
+@@ -135,3 +137,5 @@ std::unique_ptr<AlgorithmImplementation> CreatePbkdf2Implementation() {
+ }
+ 
+ }  // namespace webcrypto
++
++#undef kAllKeyUsages
+diff --git a/components/webcrypto/algorithms/rsa.cc b/components/webcrypto/algorithms/rsa.cc
+index 8c8547acf7..e2c868b42d 100644
+--- a/components/webcrypto/algorithms/rsa.cc
++++ b/components/webcrypto/algorithms/rsa.cc
+@@ -25,6 +25,8 @@
+ #include "third_party/boringssl/src/include/openssl/evp.h"
+ #include "third_party/boringssl/src/include/openssl/rsa.h"
+ 
++#define SynthesizeImportAlgorithmForClone SynthesizeImportAlgorithmForClone_Rsa
++
+ namespace webcrypto {
+ 
+ namespace {
+@@ -588,3 +590,5 @@ Status RsaHashedAlgorithm::DeserializeKeyForClone(
+ }
+ 
+ }  // namespace webcrypto
++
++#undef SynthesizeImportAlgorithmForClone
+diff --git a/components/webcrypto/algorithms/x25519.cc b/components/webcrypto/algorithms/x25519.cc
+index bb36da9846..ae6fddb9a2 100644
+--- a/components/webcrypto/algorithms/x25519.cc
++++ b/components/webcrypto/algorithms/x25519.cc
+@@ -20,6 +20,8 @@
+ #include "third_party/boringssl/src/include/openssl/curve25519.h"
+ #include "third_party/boringssl/src/include/openssl/evp.h"
+ 
++#define SynthesizeImportAlgorithmForClone SynthesizeImportAlgorithmForClone_X25519
++
+ namespace webcrypto {
+ 
+ namespace {
+@@ -535,3 +537,5 @@ std::unique_ptr<AlgorithmImplementation> CreateX25519Implementation() {
+ }
+ 
+ }  // namespace webcrypto
++
++#undef SynthesizeImportAlgorithmForClone
+diff --git a/components/zucchini/BUILD.gn b/components/zucchini/BUILD.gn
+index edb281cb0e..b5dda120aa 100644
+--- a/components/zucchini/BUILD.gn
++++ b/components/zucchini/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/buildflag_header.gni")
++import("//build/config/jumbo.gni")
+ import("//chrome/process_version_rc_template.gni")
+ import("//testing/test.gni")
+ 
+@@ -24,7 +25,7 @@ buildflag_header("buildflags") {
+   ]
+ }
+ 
+-static_library("zucchini_lib") {
++jumbo_static_library("zucchini_lib") {
+   sources = [
+     "abs32_utils.cc",
+     "abs32_utils.h",
