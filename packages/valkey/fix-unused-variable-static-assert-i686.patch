@@ -1,0 +1,15 @@
+Fixes this error when building for i686:
+
+error: variable 'test' set but not used
+
+--- a/src/crccombine.c
++++ b/src/crccombine.c
+@@ -38,7 +38,7 @@
+   madler@alumni.caltech.edu
+ */
+ 
+-#define STATIC_ASSERT(VVV) do {int test = 1 / (VVV);test++;} while (0)
++#define STATIC_ASSERT(VVV) do {int test = 1 / (VVV);(void)test;test++;} while (0)
+ 
+ #if !((defined(__i386__) || defined(__X86_64__)))
+ 
