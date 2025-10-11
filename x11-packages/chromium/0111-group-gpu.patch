@@ -1,0 +1,93 @@
+Enable jumbo build for the following component(s)/source_set(s):
+
+- //gpu/vulkan:vulkan
+- //printing:metafile
+- //services/network/public/cpp:ip_address_mojom_support
+- //services/network/public/cpp:web_platform
+- //services/webnn:webnn_service
+
+diff --git a/gpu/vulkan/BUILD.gn b/gpu/vulkan/BUILD.gn
+index 9b29e95794..83e3f530b2 100644
+--- a/gpu/vulkan/BUILD.gn
++++ b/gpu/vulkan/BUILD.gn
+@@ -4,6 +4,7 @@
+ 
+ import("//build/buildflag_header.gni")
+ import("//build/config/dcheck_always_on.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ozone.gni")
+ import("//build/config/ui.gni")
+ import("//build_overrides/wayland.gni")
+@@ -80,7 +81,7 @@ if (enable_vulkan) {
+     ]
+   }
+ 
+-  component("vulkan") {
++  jumbo_component("vulkan") {
+     output_name = "vulkan_wrapper"
+ 
+     sources = [
+diff --git a/printing/BUILD.gn b/printing/BUILD.gn
+index 4b7e4db74d..7f818601ec 100644
+--- a/printing/BUILD.gn
++++ b/printing/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/linux/pkg_config.gni")
+ import("//build/config/sysroot.gni")
+ import("//build/config/ui.gni")
+@@ -141,7 +142,7 @@ source_set("native_drawing_context") {
+   deps = [ "//base" ]
+ }
+ 
+-component("metafile") {
++jumbo_component("metafile") {
+   sources = [
+     "metafile.cc",
+     "metafile.h",
+diff --git a/services/network/public/cpp/BUILD.gn b/services/network/public/cpp/BUILD.gn
+index 37ca05babc..6a995cb58f 100644
+--- a/services/network/public/cpp/BUILD.gn
++++ b/services/network/public/cpp/BUILD.gn
+@@ -198,7 +198,7 @@ jumbo_component("cpp") {
+ 
+ # These interfaces are put in their own target so that modules that only
+ # need to depend on mojom_ip_address does not depend on the entire cpp_base.
+-component("ip_address_mojom_support") {
++jumbo_component("ip_address_mojom_support") {
+   sources = [
+     "address_family_mojom_traits.cc",
+     "address_family_mojom_traits.h",
+@@ -385,7 +385,7 @@ component("is_potentially_trustworthy") {
+   defines = [ "IS_NETWORK_CPP_IS_POTENTIALLY_TRUSTWORTHY_IMPL" ]
+ }
+ 
+-component("web_platform") {
++jumbo_component("web_platform") {
+   sources = [
+     "client_hints.cc",
+     "client_hints.h",
+diff --git a/services/webnn/BUILD.gn b/services/webnn/BUILD.gn
+index a5fae96151..bac543d4cd 100644
+--- a/services/webnn/BUILD.gn
++++ b/services/webnn/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/buildflag_header.gni")
++import("//build/config/jumbo.gni")
+ import("//mojo/public/tools/fuzzers/mojolpm.gni")
+ import("//services/on_device_model/on_device_model.gni")
+ import("//services/webnn/features.gni")
+@@ -29,7 +30,7 @@ source_set("webnn_switches") {
+   ]
+ }
+ 
+-component("webnn_service") {
++jumbo_component("webnn_service") {
+   defines = [ "IS_WEBNN_SERVICE_IMPL" ]
+ 
+   sources = [

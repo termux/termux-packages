@@ -1,29 +1,75 @@
-diff --git a/ui/accessibility/platform/inspect/ax_inspect_utils_auralinux.cc b/ui/accessibility/platform/inspect/ax_inspect_utils_auralinux.cc
-index 00c2c5dc9e..08ac87ba7c 100644
---- a/ui/accessibility/platform/inspect/ax_inspect_utils_auralinux.cc
-+++ b/ui/accessibility/platform/inspect/ax_inspect_utils_auralinux.cc
-@@ -47,11 +47,13 @@ const char* GetNameForPlatformConstant(
- #define QUOTE(X) \
-   { X, #X }
+Enable jumbo build for the following component(s)/source_set(s):
+
+- //ui/events/ozone/evdev:evdev
+- //ui/gfx/geometry:geometry_skia
+- //ui/platform_window:platform_window
+
+diff --git a/ui/events/ozone/evdev/BUILD.gn b/ui/events/ozone/evdev/BUILD.gn
+index d37eb09cfd..bf3c2e6733 100644
+--- a/ui/events/ozone/evdev/BUILD.gn
++++ b/ui/events/ozone/evdev/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
  
-+#ifndef ATSPI_CHECK_VERSION
- #define ATSPI_CHECK_VERSION(major, minor, micro)                           \
-   (major) < ATSPI_MAJOR_VERSION ||                                         \
-       ((major) == ATSPI_MAJOR_VERSION && (minor) < ATSPI_MINOR_VERSION) || \
-       ((major) == ATSPI_MAJOR_VERSION && (minor) == ATSPI_MINOR_VERSION && \
-        (micro) <= ATSPI_MICRO_VERSION)
-+#endif
+ import("//build/config/chromeos/args.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/linux/pkg_config.gni")
+ import("//build/config/ui.gni")
  
- #define CHECK_ATSPI_ERROR_NULLPTR(error) \
-   if (error) {                           \
---- a/ui/views/accessibility/view_ax_platform_node_delegate.cc
-+++ b/ui/views/accessibility/view_ax_platform_node_delegate.cc
-@@ -713,7 +713,7 @@
-   // Search child widgets first, since they're on top in the z-order.
-   for (Widget* child_widget : GetChildWidgets().child_widgets) {
-     View* child_root_view = child_widget->GetRootView();
--    if (features::IsAccessibilityHitTestPointCopyEnabled()) {
-+    if (::features::IsAccessibilityHitTestPointCopyEnabled()) {
-       // Use a per-iteration copy; don't mutate `point` so later iterations and
-       // the view() hit test use the original ScreenToDIPPoint result.
-       gfx::Point point_for_child = point;
+@@ -43,7 +44,7 @@ if (use_libinput) {
+   }
+ }
+ 
+-component("evdev") {
++jumbo_component("evdev") {
+   output_name = "events_ozone_evdev"
+ 
+   sources = [
+diff --git a/ui/gfx/geometry/BUILD.gn b/ui/gfx/geometry/BUILD.gn
+index 31ed06e13b..1155f333a2 100644
+--- a/ui/gfx/geometry/BUILD.gn
++++ b/ui/gfx/geometry/BUILD.gn
+@@ -86,7 +86,7 @@ jumbo_component("geometry") {
+   }
+ }
+ 
+-component("geometry_skia") {
++jumbo_component("geometry_skia") {
+   sources = [
+     "linear_gradient.cc",
+     "linear_gradient.h",
+diff --git a/ui/gfx/geometry/transform_operations.cc b/ui/gfx/geometry/transform_operations.cc
+index da9798ae40..247e2cd50f 100644
+--- a/ui/gfx/geometry/transform_operations.cc
++++ b/ui/gfx/geometry/transform_operations.cc
+@@ -14,6 +14,8 @@
+ #include "ui/gfx/geometry/transform_util.h"
+ #include "ui/gfx/geometry/vector3d_f.h"
+ 
++#define TanDegrees TanDegrees_TransformOperations
++
+ namespace gfx {
+ 
+ TransformOperations::TransformOperations() = default;
+@@ -388,3 +390,5 @@ bool TransformOperations::ComputeDecomposedTransform(
+ }
+ 
+ }  // namespace gfx
++
++#undef TanDegrees
+diff --git a/ui/platform_window/BUILD.gn b/ui/platform_window/BUILD.gn
+index b0a39764e1..3c115bfa87 100644
+--- a/ui/platform_window/BUILD.gn
++++ b/ui/platform_window/BUILD.gn
+@@ -2,9 +2,10 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ 
+-component("platform_window") {
++jumbo_component("platform_window") {
+   sources = [
+     "extensions/workspace_extension.cc",
+     "extensions/workspace_extension.h",
