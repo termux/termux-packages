@@ -1,0 +1,72 @@
+--- a/src/bio.c
++++ b/src/bio.c
+@@ -326,7 +326,11 @@ void bioKillThreads(void) {
+ 
+     for (j = 0; j < BIO_WORKER_NUM; j++) {
+         if (bio_threads[j] == pthread_self()) continue;
++#ifndef __ANDROID__
+         if (bio_threads[j] && pthread_cancel(bio_threads[j]) == 0) {
++#else
++        if (bio_threads[j] && pthread_kill(bio_threads[j], SIGUSR2) == 0) {
++#endif
+             if ((err = pthread_join(bio_threads[j], NULL)) != 0) {
+                 serverLog(LL_WARNING, "Bio worker thread #%lu can not be joined: %s", j, strerror(err));
+             } else {
+--- a/src/debug.c
++++ b/src/debug.c
+@@ -1998,7 +1998,11 @@ int memtest_test_linux_anonymous_maps(void) {
+ 
+ static void killMainThread(void) {
+     int err;
++#ifndef __ANDROID__
+     if (pthread_self() != server.main_thread_id && pthread_cancel(server.main_thread_id) == 0) {
++#else
++    if (pthread_self() != server.main_thread_id && pthread_kill(server.main_thread_id, SIGUSR2) == 0) {
++#endif
+         if ((err = pthread_join(server.main_thread_id, NULL)) != 0) {
+             serverLog(LL_WARNING, "main thread can not be joined: %s", strerror(err));
+         } else {
+--- a/src/io_threads.c
++++ b/src/io_threads.c
+@@ -281,7 +281,11 @@ static void shutdownIOThread(int id) {
+     if (tid == pthread_self()) return;
+     if (tid == 0) return;
+ 
++#ifndef __ANDROID__
+     pthread_cancel(tid);
++#else
++    pthread_kill(tid, SIGUSR2);
++#endif
+ 
+     if ((err = pthread_join(tid, NULL)) != 0) {
+         serverLog(LL_WARNING, "IO thread(tid:%lu) can not be joined: %s", (unsigned long)tid, strerror(err));
+--- a/src/server.c
++++ b/src/server.c
+@@ -2743,12 +2743,27 @@ void resetServerStats(void) {
+     lazyfreeResetStats();
+ }
+ 
++#ifdef __ANDROID__
++static void threadSignalHandler(int signum) {
++    pthread_exit(0);
++}
++#endif
++
+ /* Make the thread killable at any time, so that kill threads functions
+  * can work reliably (default cancellability type is PTHREAD_CANCEL_DEFERRED).
+  * Needed for pthread_cancel used by the fast memory test used by the crash report. */
+ void makeThreadKillable(void) {
++#ifndef __ANDROID__
+     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
++#else
++    struct sigaction actions;
++    memset(&actions, 0, sizeof(actions));
++    sigemptyset(&actions.sa_mask);
++    actions.sa_flags = 0;
++    actions.sa_handler = threadSignalHandler;
++    sigaction(SIGUSR2, &actions, NULL);
++#endif
+ }
+ 
+ void initServer(void) {
