@@ -1,8 +1,10 @@
+diff --git a/src/bio.c b/src/bio.c
+index 295850046..2a2185c32 100644
 --- a/src/bio.c
 +++ b/src/bio.c
-@@ -295,7 +295,11 @@ void bioKillThreads(void) {
+@@ -399,7 +399,11 @@ void bioKillThreads(void) {
  
-     for (j = 0; j < BIO_NUM_OPS; j++) {
+     for (j = 0; j < BIO_WORKER_NUM; j++) {
          if (bio_threads[j] == pthread_self()) continue;
 +#ifndef __ANDROID__
          if (bio_threads[j] && pthread_cancel(bio_threads[j]) == 0) {
@@ -11,10 +13,12 @@
 +#endif
              if ((err = pthread_join(bio_threads[j],NULL)) != 0) {
                  serverLog(LL_WARNING,
-                     "Bio thread for job type #%d can not be joined: %s",
+                     "Bio worker thread #%lu can not be joined: %s",
+diff --git a/src/debug.c b/src/debug.c
+index 4ff7da7e7..63405a2b5 100644
 --- a/src/debug.c
 +++ b/src/debug.c
-@@ -1708,7 +1708,11 @@ int memtest_test_linux_anonymous_maps(vo
+@@ -2283,7 +2283,11 @@ int memtest_test_linux_anonymous_maps(void) {
  
  static void killMainThread(void) {
      int err;
@@ -26,24 +30,28 @@
          if ((err = pthread_join(server.main_thread_id,NULL)) != 0) {
              serverLog(LL_WARNING, "main thread can not be joined: %s", strerror(err));
          } else {
---- a/src/networking.c
-+++ b/src/networking.c
-@@ -3606,7 +3606,11 @@ void killIOThreads(void) {
+diff --git a/src/iothread.c b/src/iothread.c
+index 27d533923..ffe98fcfd 100644
+--- a/src/iothread.c
++++ b/src/iothread.c
+@@ -796,7 +796,11 @@ void killIOThreads(void) {
      int err, j;
-     for (j = 0; j < server.io_threads_num; j++) {
-         if (io_threads[j] == pthread_self()) continue;
+     for (j = 1; j < server.io_threads_num; j++) {
+         if (IOThreads[j].tid == pthread_self()) continue;
 +#ifndef __ANDROID__
-         if (io_threads[j] && pthread_cancel(io_threads[j]) == 0) {
+         if (IOThreads[j].tid && pthread_cancel(IOThreads[j].tid) == 0) {
 +#else
-+        if (io_threads[j] && pthread_kill(io_threads[j], SIGUSR2) == 0) {
++        if (IOThreads[j].tid && pthread_kill(IOThreads[j].tid, SIGUSR2) == 0) {
 +#endif
-             if ((err = pthread_join(io_threads[j],NULL)) != 0) {
+             if ((err = pthread_join(IOThreads[j].tid,NULL)) != 0) {
                  serverLog(LL_WARNING,
                      "IO thread(tid:%lu) can not be joined: %s",
+diff --git a/src/server.c b/src/server.c
+index 41607356d..501cb3833 100644
 --- a/src/server.c
 +++ b/src/server.c
-@@ -3144,12 +3144,27 @@ void resetServerStats(void) {
-     server.aof_delayed_fsync = 0;
+@@ -2756,12 +2756,27 @@ void resetServerStats(void) {
+     lazyfreeResetStats();
  }
  
 +#ifdef __ANDROID__
