@@ -1,6 +1,5 @@
-diff -uNr fzf-0.43.0/bin/fzf-tmux fzf-0.43.0.mod/bin/fzf-tmux
---- fzf-0.43.0/bin/fzf-tmux	2023-10-15 00:56:05.000000000 +0800
-+++ fzf-0.43.0.mod/bin/fzf-tmux	2023-10-15 09:53:24.427996936 +0800
+--- ./bin/fzf-tmux.orig	2025-10-13 19:43:40.743574690 +0530
++++ ./bin/fzf-tmux	2025-10-13 19:51:18.698594642 +0530
 @@ -1,4 +1,4 @@
 -#!/usr/bin/env bash
 +#!/usr/bin/bash
@@ -13,7 +12,7 @@ diff -uNr fzf-0.43.0/bin/fzf-tmux fzf-0.43.0.mod/bin/fzf-tmux
  
 -fzf="$(command which fzf)" || fzf="$(dirname "$0")/fzf"
 +fzf="$(command -v fzf)" || fzf="$(dirname "$0")/fzf"
- [[ -x "$fzf" ]] || fail 'fzf executable not found'
+ [[ -x $fzf ]] || fail 'fzf executable not found'
  
  args=()
 @@ -160,10 +160,10 @@
@@ -29,5 +28,5 @@ diff -uNr fzf-0.43.0/bin/fzf-tmux fzf-0.43.0.mod/bin/fzf-tmux
 +fifo2="${TMPDIR:-@TERMUX_PREFIX@/tmp}/fzf-fifo2-$id"
 +fifo3="${TMPDIR:-@TERMUX_PREFIX@/tmp}/fzf-fifo3-$id"
  if tmux_win_opts=$(tmux show-options -p remain-on-exit \; show-options -p synchronize-panes 2> /dev/null); then
-   tmux_win_opts=( $(sed '/ off/d; s/synchronize-panes/set-option -p synchronize-panes/; s/remain-on-exit/set-option -p remain-on-exit/; s/$/ \\;/' <<< "$tmux_win_opts") )
+   tmux_win_opts=($(sed '/ off/d; s/synchronize-panes/set-option -p synchronize-panes/; s/remain-on-exit/set-option -p remain-on-exit/; s/$/ \\;/' <<< "$tmux_win_opts"))
    tmux_off_opts='; set-option -p synchronize-panes off ; set-option -p remain-on-exit off'
