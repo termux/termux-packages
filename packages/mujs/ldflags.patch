@@ -1,0 +1,10 @@
+--- a/Makefile
++++ b/Makefile
+@@ -109,7 +109,7 @@ build/release/libmujs.a: build/release/libmujs.o
+ 	$(AR) cr $@ $^
+ build/release/mujs: main.c build/release/libmujs.o
+-	$(CC) $(CFLAGS) $(OPTIM) -o $@ $^ -lm $(READLINE_CFLAGS) $(READLINE_LIBS)
++	$(CC) $(CFLAGS) $(OPTIM) $(LDFLAGS) -o $@ $^ -lm $(READLINE_CFLAGS) $(READLINE_LIBS)
+ build/release/mujs-pp: pp.c build/release/libmujs.o
+ 	$(CC) $(CFLAGS) $(OPTIM) -o $@ $^ -lm
+ 
