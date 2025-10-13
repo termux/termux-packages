@@ -2277,19 +2277,6 @@ index e438a9075d..c7a78c9ec2 100644
                       ui_scale_factor_, ref_counted_logs),
        base::BindOnce(&LensOverlayQueryController::
                           CreateFullImageRequestAndTryPerformFullImageRequest,
-diff --git a/chrome/browser/ui/lens/lens_overlay_untrusted_ui.cc b/chrome/browser/ui/lens/lens_overlay_untrusted_ui.cc
-index ad157ee3a5..05e392102f 100644
---- a/chrome/browser/ui/lens/lens_overlay_untrusted_ui.cc
-+++ b/chrome/browser/ui/lens/lens_overlay_untrusted_ui.cc
-@@ -335,7 +335,7 @@ LensOverlayUntrustedUI::LensOverlayUntrustedUI(content::WebUI* web_ui)
-   // Determine if the cursor tooltip should appear.
-   Profile* profile = Profile::FromWebUI(web_ui);
-   int lens_overlay_start_count =
--      profile->GetPrefs()->GetInteger(prefs::kLensOverlayStartCount);
-+      profile->GetPrefs()->GetInteger(::prefs::kLensOverlayStartCount);
-   html_source->AddBoolean(
-       "canShowTooltipFromPrefs",
-       lens_overlay_start_count <= kNumTimesToShowCursorTooltips);
 diff --git a/chrome/browser/ui/lens/lens_overlay_url_builder.cc b/chrome/browser/ui/lens/lens_overlay_url_builder.cc
 index 4da4807191..cead9576db 100644
 --- a/chrome/browser/ui/lens/lens_overlay_url_builder.cc
