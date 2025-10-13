@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.chromium.org/Home
 TERMUX_PKG_DESCRIPTION="Chromium web browser"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION=140.0.7339.207
+TERMUX_PKG_VERSION=141.0.7390.54
 TERMUX_PKG_SRCURL=https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=8d0ca453c3a055cbbca7588ba04a5117812e6e827d72611d3fbc88ba5f1f118b
+TERMUX_PKG_SHA256=7b4dabb601e19ccf9746d65ee6ade9c297bc2654dad417b3cf400a67119956ec
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="chromium-host-tools, libffi-static"
 # TODO: Split chromium-common and chromium-headless
@@ -17,7 +17,51 @@ TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 SYSTEM_LIBRARIES="    fontconfig"
 # TERMUX_PKG_DEPENDS="fontconfig"
 
+termux_pkg_auto_update() {
+	local latest_version="$(. $TERMUX_SCRIPTDIR/x11-packages/chromium-host-tools/build.sh; echo ${TERMUX_PKG_VERSION})"
+
+	if ! termux_pkg_is_update_needed \
+		"${TERMUX_PKG_VERSION#*:}" "${latest_version}"; then
+		echo "INFO: No update needed. Already at version '${latest_version}'."
+		return 0
+	fi
+
+	local tmpdir="$(mktemp -d)"
+	curl -sLo "${tmpdir}/tmpfile" "https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$latest_version.tar.xz"
+	local sha="$(sha256sum "${tmpdir}/tmpfile" | cut -d ' ' -f 1)"
+	rm -fr "${tmpdir}"
+	printf '%s\n' 'INFO: Generated checksums:' "${sha}"
+
+	local e=0
+	local uptime_now=$(cat /proc/uptime)
+	local uptime_s="${uptime_now//.*}"
+	local uptime_h_limit=1
+	local uptime_s_limit=$((uptime_h_limit*60*60))
+	[[ -z "${uptime_s}" ]] && [[ "$(uname -o)" != "Android" ]] && e=1
+	[[ "${uptime_s}" == 0 ]] && [[ "$(uname -o)" != "Android" ]] && e=1
+	[[ "${uptime_s}" -gt "${uptime_s_limit}" ]] && e=1
+
+	if [[ "${e}" != 0 ]]; then
+		cat <<- EOL >&2
+		WARN: Auto update failure!
+		latest_version=${latest_version}
+		uptime_now=${uptime_now}
+		uptime_s=${uptime_s}
+		uptime_s_limit=${uptime_s_limit}
+		EOL
+		return
+	fi
+
+	termux_pkg_upgrade_version "${latest_version}"
+}
+
 termux_step_post_get_source() {
+	# Version guard
+	local version_tools=$(. $TERMUX_SCRIPTDIR/x11-packages/chromium-host-tools/build.sh; echo ${TERMUX_PKG_VERSION})
+	if [ "${version_tools}" != "${TERMUX_PKG_VERSION}" ]; then
+		termux_error_exit "Version mismatch between chromium-host-tools and chromium."
+	fi
+
 	# Apply patches related to chromium
 	local f
 	for f in $(find "$TERMUX_PKG_BUILDER_DIR/../chromium-host-tools/cr-patches" -maxdepth 1 -type f -name *.patch | sort); do
@@ -184,6 +228,7 @@ treat_warnings_as_errors = false
 use_system_freetype = false
 use_custom_libcxx = false
 use_custom_libcxx_for_host = true
+use_clang_modules = false
 use_allocator_shim = false
 use_partition_alloc_as_malloc = false
 enable_backup_ref_ptr_slow_checks = false
