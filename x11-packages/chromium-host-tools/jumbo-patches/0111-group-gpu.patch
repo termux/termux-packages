@@ -6,17 +6,18 @@ Subject: [PATCH] reland jumbo 11
 Enable jumbo build for the following component(s)/source_set(s):
 
 - //gpu/command_buffer/client:client_sources
+- //gpu/command_buffer/client:gles2_c_lib
 - //gpu/command_buffer/client:gles2_implementation
 - //gpu/command_buffer/client:gles2_implementation_no_check
-- //gpu/command_buffer/client:gles2_c_lib
 - //gpu/command_buffer/common:common_base_sources
 - //gpu/command_buffer/common:common_sources
 - //gpu/command_buffer/service:service_sources
 - //gpu/config:config_sources
 - //gpu/ipc/service:service
+- //gpu/vulkan:vulkan
 - //media/audio:audio
-- //media/base:base
 - //media/base/ipc:ipc
+- //media/base:base
 - //media/capture:capture_base
 - //media/capture:capture_device_specific
 - //media/capture:capture_lib
@@ -27,12 +28,16 @@ Enable jumbo build for the following component(s)/source_set(s):
 - //media/mojo/clients:clients
 - //media/mojo/common:common
 - //media/mojo/services:services
+- //printing:metafile
 - //services/cert_verifier/cert_net_url_loader:cert_net_url_loader
-- //services/network:network_service
-- //services/network/public/cpp:crash_keys
 - //services/network/public/cpp:cpp
-- //services/network/public/cpp:first_party_sets_mojom_support
 - //services/network/public/cpp:cpp_base
+- //services/network/public/cpp:crash_keys
+- //services/network/public/cpp:first_party_sets_mojom_support
+- //services/network/public/cpp:ip_address_mojom_support
+- //services/network/public/cpp:web_platform
+- //services/network:network_service
+- //services/webnn:webnn_service
 - //storage:browser
 
 ---
@@ -53,6 +58,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  gpu/config/BUILD.gn                           |  3 ++-
  gpu/config/webgpu_blocklist_impl.h            |  3 +++
  gpu/ipc/service/BUILD.gn                      |  3 ++-
+ gpu/vulkan/BUILD.gn                           |  3 ++-
  media/audio/BUILD.gn                          |  3 ++-
  media/audio/fake_audio_manager.cc             |  6 ++++++
  media/audio/pulse/audio_manager_pulse.cc      |  6 ++++++
@@ -76,18 +82,20 @@ Enable jumbo build for the following component(s)/source_set(s):
  media/mojo/clients/BUILD.gn                   |  4 +++-
  media/mojo/common/BUILD.gn                    |  4 +++-
  media/mojo/services/BUILD.gn                  |  3 ++-
+ printing/BUILD.gn                             |  3 ++-
  .../cert_net_url_loader/BUILD.gn              |  3 ++-
  services/network/BUILD.gn                     |  5 +++--
  .../http_server_properties_pref_delegate.cc   |  4 ++++
  .../known_legacy_scope_domains_delegate.cc    |  4 ++++
- services/network/public/cpp/BUILD.gn          | 13 ++++++++----
+ services/network/public/cpp/BUILD.gn          | 17 +++++++++------
  .../cross_origin_embedder_policy_parser.cc    |  8 +++++++
  .../cpp/document_isolation_policy_parser.cc   |  8 +++++++
  services/network/url_loader.cc                |  4 ++++
  .../web_bundle_url_loader_factory.cc          |  4 ++++
  .../frame_timing_details_mojom_traits.cc      |  4 ++++
+ services/webnn/BUILD.gn                       |  3 ++-
  storage/browser/BUILD.gn                      |  5 +++--
- 51 files changed, 244 insertions(+), 37 deletions(-)
+ 54 files changed, 252 insertions(+), 42 deletions(-)
 
 diff --git a/gpu/BUILD.gn b/gpu/BUILD.gn
 index a29736d88b..2a2102df43 100644
@@ -456,6 +464,27 @@ index a09f0dcaf6..f40b86aa08 100644
    output_name = "gpu_ipc_service"
    sources = [
      "command_buffer_stub.cc",
+diff --git a/gpu/vulkan/BUILD.gn b/gpu/vulkan/BUILD.gn
+index 9b29e95794..83e3f530b2 100644
+--- a/gpu/vulkan/BUILD.gn
++++ b/gpu/vulkan/BUILD.gn
+@@ -4,6 +4,7 @@
+ 
+ import("//build/buildflag_header.gni")
+ import("//build/config/dcheck_always_on.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ozone.gni")
+ import("//build/config/ui.gni")
+ import("//build_overrides/wayland.gni")
+@@ -80,7 +81,7 @@ if (enable_vulkan) {
+     ]
+   }
+ 
+-  component("vulkan") {
++  jumbo_component("vulkan") {
+     output_name = "vulkan_wrapper"
+ 
+     sources = [
 diff --git a/media/audio/BUILD.gn b/media/audio/BUILD.gn
 index 7bc2086976..fa3247de1f 100644
 --- a/media/audio/BUILD.gn
@@ -1003,6 +1032,27 @@ index 9f54d77ef9..bb1bc62b6d 100644
    output_name = "media_mojo_services"
    sources = [
      "deferred_destroy_unique_receiver_set.h",
+diff --git a/printing/BUILD.gn b/printing/BUILD.gn
+index 4b7e4db74d..7f818601ec 100644
+--- a/printing/BUILD.gn
++++ b/printing/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/features.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/linux/pkg_config.gni")
+ import("//build/config/sysroot.gni")
+ import("//build/config/ui.gni")
+@@ -141,7 +142,7 @@ source_set("native_drawing_context") {
+   deps = [ "//base" ]
+ }
+ 
+-component("metafile") {
++jumbo_component("metafile") {
+   sources = [
+     "metafile.cc",
+     "metafile.h",
 diff --git a/services/cert_verifier/cert_net_url_loader/BUILD.gn b/services/cert_verifier/cert_net_url_loader/BUILD.gn
 index ffc6bdc4ab..28ab85355d 100644
 --- a/services/cert_verifier/cert_net_url_loader/BUILD.gn
@@ -1087,7 +1137,7 @@ index 188783cc42..7918267eee 100644
 +
 +#undef kPrefPath
 diff --git a/services/network/public/cpp/BUILD.gn b/services/network/public/cpp/BUILD.gn
-index a7ba27f22d..37ca05babc 100644
+index a7ba27f22d..6a995cb58f 100644
 --- a/services/network/public/cpp/BUILD.gn
 +++ b/services/network/public/cpp/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1116,6 +1166,24 @@ index a7ba27f22d..37ca05babc 100644
    output_name = "network_cpp"
  
    sources = [
+@@ -197,7 +198,7 @@ component("cpp") {
+ 
+ # These interfaces are put in their own target so that modules that only
+ # need to depend on mojom_ip_address does not depend on the entire cpp_base.
+-component("ip_address_mojom_support") {
++jumbo_component("ip_address_mojom_support") {
+   sources = [
+     "address_family_mojom_traits.cc",
+     "address_family_mojom_traits.h",
+@@ -384,7 +385,7 @@ component("is_potentially_trustworthy") {
+   defines = [ "IS_NETWORK_CPP_IS_POTENTIALLY_TRUSTWORTHY_IMPL" ]
+ }
+ 
+-component("web_platform") {
++jumbo_component("web_platform") {
+   sources = [
+     "client_hints.cc",
+     "client_hints.h",
 @@ -556,7 +557,7 @@ component("schemeful_site_mojom_support") {
  
  # This component is separate from cpp_base as it is a dependency of
@@ -1255,6 +1323,27 @@ index 15a70d5faa..b152d66874 100644
  }  // namespace mojo
 +
 +#undef Traits
+diff --git a/services/webnn/BUILD.gn b/services/webnn/BUILD.gn
+index 49451355a2..7df8247767 100644
+--- a/services/webnn/BUILD.gn
++++ b/services/webnn/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/buildflag_header.gni")
++import("//build/config/jumbo.gni")
+ import("//mojo/public/tools/fuzzers/mojolpm.gni")
+ import("//services/on_device_model/on_device_model.gni")
+ import("//services/webnn/features.gni")
+@@ -40,7 +41,7 @@ source_set("webnn_headers") {
+   public_deps = [ "//base" ]
+ }
+ 
+-component("webnn_service") {
++jumbo_component("webnn_service") {
+   defines = [ "IS_WEBNN_SERVICE_IMPL" ]
+ 
+   sources = [
 diff --git a/storage/browser/BUILD.gn b/storage/browser/BUILD.gn
 index 880d4b22f5..489e8783ce 100644
 --- a/storage/browser/BUILD.gn

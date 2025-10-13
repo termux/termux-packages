@@ -5,84 +5,87 @@ Subject: [PATCH] reland jumbo 8
 
 Enable jumbo build for the following component(s)/source_set(s):
 
-- //ui/accessibility:ax_base
-- //ui/accessibility:accessibility_internal
 - //ui/accessibility/platform:platform
+- //ui/accessibility:accessibility_internal
+- //ui/accessibility:ax_base
 - //ui/aura:aura
-- //ui/base:base
+- //ui/base/clipboard:clipboard
 - //ui/base/clipboard:clipboard_types
 - //ui/base/clipboard:url_file_parser
-- //ui/base/clipboard:clipboard
-- //ui/base/ime:ime_types
-- //ui/base/ime:ime
 - //ui/base/ime/init:init
 - //ui/base/ime/linux:linux
+- //ui/base/ime:ime
+- //ui/base/ime:ime_types
 - //ui/base/prediction:prediction
 - //ui/base/x:x
+- //ui/base:base
+- //ui/color:color
 - //ui/color:color_headers
 - //ui/color:color_provider_key
-- //ui/color:color
 - //ui/color:mixers
 - //ui/compositor:compositor
-- //ui/display:display
 - //ui/display/manager:manager
 - //ui/display/types:types
 - //ui/display/util:util
-- //ui/events:dom_keycode_converter
-- //ui/events:events_base
-- //ui/events:events
-- //ui/events:keyboard_hook
-- //ui/events:gesture_detection
-- //ui/events:velocity_tracker
-- //ui/events/blink:blink_features
+- //ui/display:display
 - //ui/events/blink:blink
-- //ui/events/devices:devices
+- //ui/events/blink:blink_features
 - //ui/events/devices/x11:x11
+- //ui/events/devices:devices
 - //ui/events/ipc:ipc
-- //ui/events/keycodes:xkb
 - //ui/events/keycodes:x11
-- //ui/events/platform:platform
+- //ui/events/keycodes:xkb
+- //ui/events/ozone/evdev:evdev
 - //ui/events/platform/x11:x11
-- //ui/gfx:color_utils
-- //ui/gfx:gfx_skia
-- //ui/gfx:gfx
-- //ui/gfx:color_space
-- //ui/gfx:memory_buffer_sources
-- //ui/gfx:gfx_switches
+- //ui/events/platform:platform
+- //ui/events:dom_keycode_converter
+- //ui/events:events
+- //ui/events:events_base
+- //ui/events:gesture_detection
+- //ui/events:keyboard_hook
+- //ui/events:velocity_tracker
 - //ui/gfx/animation:animation
 - //ui/gfx/codec:codec
 - //ui/gfx/geometry:geometry
-- //ui/gfx/ipc:ipc
+- //ui/gfx/geometry:geometry_skia
 - //ui/gfx/ipc/buffer_types:buffer_types
 - //ui/gfx/ipc/color:color
 - //ui/gfx/ipc/geometry:geometry
 - //ui/gfx/ipc/skia:skia
+- //ui/gfx/ipc:ipc
 - //ui/gfx/range:range
 - //ui/gfx/x:x
-- //ui/gl:gl
+- //ui/gfx:color_space
+- //ui/gfx:color_utils
+- //ui/gfx:gfx
+- //ui/gfx:gfx_skia
+- //ui/gfx:gfx_switches
+- //ui/gfx:memory_buffer_sources
 - //ui/gl/init:init
+- //ui/gl:gl
 - //ui/gtk:gtk
 - //ui/latency:latency
-- //ui/message_center:message_center
 - //ui/message_center/public/cpp:cpp
+- //ui/message_center:message_center
 - //ui/native_theme:native_theme
 - //ui/native_theme:native_theme_browser
-- //ui/ozone:ozone_base
 - //ui/ozone:ozone
+- //ui/ozone:ozone_base
 - //ui/platform_window/stub:stub
 - //ui/platform_window/win:win
+- //ui/platform_window:platform_window
 # - //ui/resources:?
 - //ui/shell_dialogs:shell_dialogs
 - //ui/snapshot:snapshot
 - //ui/snapshot:snapshot_export
 - //ui/surface:surface
 - //ui/touch_selection:touch_selection
-- //ui/views:views
 - //ui/views/controls/webview:webview
+- //ui/views:views
 - //ui/views_content_client:views_content_client
 - //ui/web_dialogs:web_dialogs
-- //ui/wm:wm
 - //ui/wm/public:public
+- //ui/wm:wm
 
 ---
  ui/accessibility/BUILD.gn                         |  5 +++--
@@ -116,6 +119,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  ui/events/devices/x11/BUILD.gn                    |  3 ++-
  ui/events/ipc/BUILD.gn                            |  4 +++-
  ui/events/keycodes/BUILD.gn                       |  5 +++--
+ ui/events/ozone/evdev/BUILD.gn                    |  3 ++-
  ui/events/platform/BUILD.gn                       |  3 ++-
  ui/events/platform/x11/BUILD.gn                   |  3 ++-
  ui/gfx/BUILD.gn                                   | 15 ++++++++-------
@@ -123,7 +127,8 @@ Enable jumbo build for the following component(s)/source_set(s):
  ui/gfx/codec/BUILD.gn                             |  3 ++-
  ui/gfx/codec/jpeg_codec.cc                        |  4 ++++
  ui/gfx/codec/png_codec.cc                         |  4 ++++
- ui/gfx/geometry/BUILD.gn                          |  4 +++-
+ ui/gfx/geometry/BUILD.gn                          |  6 ++++--
+ ui/gfx/geometry/transform_operations.cc           |  4 ++++
  ui/gfx/ipc/BUILD.gn                               |  4 +++-
  ui/gfx/ipc/buffer_types/BUILD.gn                  |  4 +++-
  ui/gfx/ipc/color/BUILD.gn                         |  4 +++-
@@ -142,6 +147,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  ui/message_center/public/cpp/BUILD.gn             |  3 ++-
  ui/native_theme/BUILD.gn                          |  3 ++-
  ui/ozone/BUILD.gn                                 | 11 ++++++-----
+ ui/platform_window/BUILD.gn                       |  3 ++-
  ui/platform_window/stub/BUILD.gn                  |  4 +++-
  ui/platform_window/win/BUILD.gn                   |  4 +++-
  ui/resources/BUILD.gn                             |  1 +
@@ -162,7 +168,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  ui/web_dialogs/BUILD.gn                           |  6 ++++--
  ui/wm/BUILD.gn                                    |  5 +++--
  ui/wm/public/BUILD.gn                             |  3 ++-
- 77 files changed, 278 insertions(+), 106 deletions(-)
+ 80 files changed, 287 insertions(+), 109 deletions(-)
 
 diff --git a/ui/accessibility/BUILD.gn b/ui/accessibility/BUILD.gn
 index 96cea51f84..89b8fc7b80 100644
@@ -963,6 +969,27 @@ index 4f4fbfb769..30a0b6e142 100644
      output_name = "keycodes_x11"
  
      sources = [
+diff --git a/ui/events/ozone/evdev/BUILD.gn b/ui/events/ozone/evdev/BUILD.gn
+index d37eb09cfd..bf3c2e6733 100644
+--- a/ui/events/ozone/evdev/BUILD.gn
++++ b/ui/events/ozone/evdev/BUILD.gn
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/config/chromeos/args.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/linux/pkg_config.gni")
+ import("//build/config/ui.gni")
+ 
+@@ -43,7 +44,7 @@ if (use_libinput) {
+   }
+ }
+ 
+-component("evdev") {
++jumbo_component("evdev") {
+   output_name = "events_ozone_evdev"
+ 
+   sources = [
 diff --git a/ui/events/platform/BUILD.gn b/ui/events/platform/BUILD.gn
 index 1b54f4b46f..1b6b162b06 100644
 --- a/ui/events/platform/BUILD.gn
@@ -1150,7 +1177,7 @@ index b798d743a2..015025cb29 100644
 +
 +#undef PreparationOutput
 diff --git a/ui/gfx/geometry/BUILD.gn b/ui/gfx/geometry/BUILD.gn
-index a5e3e1be9f..31ed06e13b 100644
+index a5e3e1be9f..1155f333a2 100644
 --- a/ui/gfx/geometry/BUILD.gn
 +++ b/ui/gfx/geometry/BUILD.gn
 @@ -2,7 +2,9 @@
@@ -1164,6 +1191,34 @@ index a5e3e1be9f..31ed06e13b 100644
    sources = [
      "axis_transform2d.cc",
      "axis_transform2d.h",
+@@ -84,7 +86,7 @@ component("geometry") {
+   }
+ }
+ 
+-component("geometry_skia") {
++jumbo_component("geometry_skia") {
+   sources = [
+     "linear_gradient.cc",
+     "linear_gradient.h",
+diff --git a/ui/gfx/geometry/transform_operations.cc b/ui/gfx/geometry/transform_operations.cc
+index da9798ae40..247e2cd50f 100644
+--- a/ui/gfx/geometry/transform_operations.cc
++++ b/ui/gfx/geometry/transform_operations.cc
+@@ -14,6 +14,8 @@
+ #include "ui/gfx/geometry/transform_util.h"
+ #include "ui/gfx/geometry/vector3d_f.h"
+ 
++#define TanDegrees TanDegrees_TransformOperations
++
+ namespace gfx {
+ 
+ TransformOperations::TransformOperations() = default;
+@@ -388,3 +390,5 @@ bool TransformOperations::ComputeDecomposedTransform(
+ }
+ 
+ }  // namespace gfx
++
++#undef TanDegrees
 diff --git a/ui/gfx/ipc/BUILD.gn b/ui/gfx/ipc/BUILD.gn
 index 83f5cd0b14..44f4ad493c 100644
 --- a/ui/gfx/ipc/BUILD.gn
@@ -1598,6 +1653,22 @@ index 636e630ec8..bafb45528a 100644
    visibility = []
    visibility = [
      ":*",
+diff --git a/ui/platform_window/BUILD.gn b/ui/platform_window/BUILD.gn
+index b0a39764e1..3c115bfa87 100644
+--- a/ui/platform_window/BUILD.gn
++++ b/ui/platform_window/BUILD.gn
+@@ -2,9 +2,10 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ 
+-component("platform_window") {
++jumbo_component("platform_window") {
+   sources = [
+     "extensions/workspace_extension.cc",
+     "extensions/workspace_extension.h",
 diff --git a/ui/platform_window/stub/BUILD.gn b/ui/platform_window/stub/BUILD.gn
 index 5f41949321..1d64d126b9 100644
 --- a/ui/platform_window/stub/BUILD.gn
