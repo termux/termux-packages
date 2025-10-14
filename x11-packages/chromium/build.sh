@@ -13,7 +13,7 @@ TERMUX_PKG_BUILD_DEPENDS="chromium-host-tools, libffi-static"
 # Chromium doesn't support i686 on Linux.
 TERMUX_PKG_EXCLUDED_ARCHES="i686"
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
-TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_AUTO_UPDATE=false
 
 SYSTEM_LIBRARIES="    fontconfig"
 # TERMUX_PKG_DEPENDS="fontconfig"
