@@ -21,7 +21,7 @@
  	}
  
  	/* avoids cluttering logs with repeated failure messages from
-@@ -309,8 +307,9 @@
+@@ -311,9 +309,10 @@
  	usershell = ses.authstate.pw_shell;
  	if (usershell[0] == '\0') {
  		/* empty shell in /etc/passwd means /bin/sh according to passwd(5) */
@@ -32,7 +32,8 @@
 +	goto goodshell;
  	/* check the shell is valid. If /etc/shells doesn't exist, getusershell()
  	 * should return some standard shells like "/bin/sh" and "/bin/csh" (this
-@@ -324,7 +323,6 @@
+ 	 * is platform-specific) */
+@@ -326,7 +325,6 @@
  		}
  	}
  	/* no matching shell */

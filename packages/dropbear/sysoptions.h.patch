@@ -1,5 +1,5 @@
 +++ ./src/sysoptions.h
-@@ -90,7 +90,7 @@
+@@ -94,7 +94,7 @@
  
  #define _PATH_TTY "/dev/tty"
  
@@ -8,7 +8,7 @@
  
  /* Default contents of /etc/shells if system getusershell() doesn't exist.
   * Paths taken from getusershell(3) manpage. These can be customised
-@@ -98,7 +98,7 @@
+@@ -102,7 +102,7 @@
    -DCOMPAT_USER_SHELLS='"/bin/sh","/apps/bin/sh","/data/bin/zsh"'
   */
  #ifndef COMPAT_USER_SHELLS
@@ -17,7 +17,7 @@
  #endif
  
  #define DROPBEAR_ESCAPE_CHAR '~'
-@@ -294,9 +294,6 @@
+@@ -338,9 +338,6 @@
  #error "DROPBEAR_SVR_PATM_AUTH requires PAM headers. Perhaps ./configure --enable-pam ?"
  #endif
  
@@ -27,11 +27,11 @@
  
  #if !(DROPBEAR_SVR_PASSWORD_AUTH || DROPBEAR_SVR_PAM_AUTH || DROPBEAR_SVR_PUBKEY_AUTH)
  	#error "At least one server authentication type must be enabled. DROPBEAR_SVR_PUBKEY_AUTH and DROPBEAR_SVR_PASSWORD_AUTH are recommended."
-@@ -404,7 +401,6 @@
+@@ -448,7 +445,6 @@
  #if defined(DROPBEAR_DSS)
  #undef DROPBEAR_DSS
  #endif
 -#define DROPBEAR_DSS 1
  
- #if defined(DROPBEAR_USE_SSH_CONFIG)
- #undef DROPBEAR_USE_SSH_CONFIG
+ #if defined(DROPBEAR_RSA_SHA1)
+ #undef DROPBEAR_RSA_SHA1
