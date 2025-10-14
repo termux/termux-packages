@@ -208,7 +208,6 @@ PACKAGES+=" libunistring-dev"
 
 # Needed by packages in X11 repository.
 PACKAGES+=" alex"
-PACKAGES+=" blueprint-compiler"
 PACKAGES+=" docbook-xsl-ns"
 PACKAGES+=" gnome-common"
 PACKAGES+=" gobject-introspection"
