@@ -1,13 +1,14 @@
+the command 'fish -c "uname"', and most other uses of fish's -c argument,
+are not working if this is enabled.
+
 --- a/build.rs
 +++ b/build.rs
-@@ -96,7 +96,9 @@ fn detect_cfgs(target: &mut Target) {
-             Ok(target.has_symbol("localeconv_l"))
+@@ -90,7 +90,7 @@ fn detect_cfgs(target: &mut Target) {
+             target.has_symbol("localeconv_l")
          }),
          ("FISH_USE_POSIX_SPAWN", &|target| {
--            Ok(target.has_header("spawn.h"))
-+            // the command 'fish -c "uname"', and most other uses of fish's -c argument,
-+            // are not working if this is enabled.
-+            Ok(false)
+-            target.has_header("spawn.h")
++            false
          }),
          ("HAVE_PIPE2", &|target| {
-             Ok(target.has_symbol("pipe2"))
+             target.has_symbol("pipe2")
