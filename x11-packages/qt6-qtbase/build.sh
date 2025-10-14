@@ -4,12 +4,14 @@ TERMUX_PKG_LICENSE="GPL-3.0-only"
 TERMUX_PKG_LICENSE_FILE="LICENSES/GPL-3.0-only.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.10.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtbase-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=ead4623bcb54a32257c5b3e3a5aec6d16ec96f4cda58d2e003f5a0c16f72046d
 TERMUX_PKG_DEPENDS="brotli, double-conversion, freetype, glib, harfbuzz, libandroid-posix-semaphore, libandroid-shmem, libc++, libdrm, libice, libicu, libjpeg-turbo, libpng, libsm, libsqlite, libuuid, libx11, libxcb, libxi, libxkbcommon, libwayland, opengl, openssl, pcre2, vulkan-loader, xcb-util-cursor, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil, xcb-util-wm, zlib, zstd"
 # gtk3 dependency is a run-time dependency only for the gtk platformtheme subpackage
 TERMUX_PKG_BUILD_DEPENDS="binutils-cross, gdk-pixbuf, gtk3, libwayland-protocols, pango, vulkan-headers, vulkan-loader-generic"
+# qt6-qtbase now contains include/qt6/QtWaylandClient/QWaylandClientExtension instead of qt6-qtwayland
+TERMUX_PKG_CONFLICTS="qt6-qtwayland (<< 6.10.0)"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_NO_STATICSPLIT=true
