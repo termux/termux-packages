@@ -5,6 +5,7 @@ TERMUX_PKG_LICENSE_FILE="flang/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@termux"
 LLVM_MAJOR_VERSION=21
 TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.1.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
 	https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-$TERMUX_PKG_VERSION.src.tar.xz
 	https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/LLVM-$TERMUX_PKG_VERSION-Linux-X64.tar.xz

@@ -16,7 +16,8 @@ share/libalpm/scripts/update-libcompiler-rt
 "
 TERMUX_SUBPKG_DEPEND_ON_PARENT=false
 TERMUX_SUBPKG_DEPENDS=libc++
-TERMUX_SUBPKG_CONFLICTS="ndk-multilib (<< 23b-6)"
+# file include/fuzzer/FuzzedDataProvider.h is now in libcompiler-rt instead of libllvm
+TERMUX_SUBPKG_CONFLICTS="libllvm (<< 21.1.3), ndk-multilib (<< 23b-6)"
 
 termux_step_create_subpkg_debscripts() {
 	local RT_OPT_DIR=$TERMUX_PREFIX/opt/ndk-multilib/cross-compiler-rt
