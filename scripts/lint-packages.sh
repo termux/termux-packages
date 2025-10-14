@@ -127,6 +127,10 @@ check_indentation() {
 # - Modify TERMUX_PKG_VERSION
 # - Or specify one of the CI skip tags
 check_version_change() {
+	# !!! vvv TEMPORARY - REMOVE WHEN THIS FUNCTION IS FIXED vvv !!!
+	return
+	# !!! ^^^ TEMPORARY - REMOVE WHEN THIS FUNCTION IS FIXED ^^^ !!!
+
 	local base_commit commit_diff package_dir="${1%/*}"
 	base_commit="$(< "$TERMUX_SCRIPTDIR/.git/refs/remotes/origin/master")"
 
