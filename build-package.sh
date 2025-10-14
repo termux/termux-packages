@@ -76,6 +76,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_download.sh"
 # shellcheck source=scripts/build/setup/termux_setup_proot.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_proot.sh"
 
+# Utility function to setup blueprint-compiler (may be used by gnome-calculator and epiphany).
+# shellcheck source=scripts/build/setup/termux_setup_bpc.sh.
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_bpc.sh"
+
 # Installing packages if necessary for the full operation of CGCT.
 # shellcheck source=scripts/build/termux_step_setup_cgct_environment.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_setup_cgct_environment.sh"
