@@ -3,18 +3,18 @@ TERMUX_PKG_DESCRIPTION="Open source implementation of the library requirements o
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_LICENSE_FILE="libclc/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@termux"
-LLVM_MAJOR_VERSION=20
+LLVM_MAJOR_VERSION=21
 TERMUX_PKG_VERSION=(
-	${LLVM_MAJOR_VERSION}.1.7
 	${LLVM_MAJOR_VERSION}.1.3
+	${LLVM_MAJOR_VERSION}.1.1
 )
 TERMUX_PKG_SRCURL=(
 	https://github.com/llvm/llvm-project/releases/download/llvmorg-${TERMUX_PKG_VERSION[0]}/llvm-project-${TERMUX_PKG_VERSION[0]}.src.tar.xz
 	https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/refs/tags/v${TERMUX_PKG_VERSION[1]}.tar.gz
 )
 TERMUX_PKG_SHA256=(
-	cd8fd55d97ad3e360b1d5aaf98388d1f70dfffb7df36beee478be3b839ff9008
-	8e953931a09b0a4c2a77ddc8f1df4783571d8ffca9546150346c401573866062
+	9c9db50d8046f668156d83f6b594631b4ca79a0d96e4f19bed9dc019b022e58f
+	dda46febdb060a1d5cc2ceeb9682ccaf33e55ae294fd0793274531b54f07c46b
 )
 TERMUX_PKG_BUILD_DEPENDS="clang, libc++, libllvm, libllvm-static, lld, llvm, spirv-llvm-translator"
 TERMUX_PKG_AUTO_UPDATE=false
