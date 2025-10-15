@@ -200,6 +200,36 @@ check_version() {
 			echo ""
 			return 1
 		fi
+
+		local new_revision="${version_new##*-}" old_revision="${version_old##*-}"
+
+		# If the version hasn't changed the revision must be incremented by 1
+		# A decrease or no increase would have been caught above.
+		# But we want to additionally enforce sequential increase.
+		if [[ "${version_new%-*}" == "${version_old%-*}" && "$new_revision" != "$((old_revision + 1))" ]]; then
+			(( error++ )) # Not incremented sequentially
+			printf '%s\n' "FAILED " \
+				"TERMUX_PKG_REVISION should be incremented sequentially" \
+				"when a package is rebuilt with no new upstream release." \
+				"" \
+				"Got     : ${version_old} -> ${version_new}" \
+				"Expected: ${version_old} -> ${version}-$((old_revision + 1))"
+			continue
+		# If that check passed the TERMUX_PKG_VERSION must have changed,
+		# in which case TERMUX_PKG_REVISION should be reset to 0.
+		# This check isn't useful past the first index when $TERMUX_PKG_VERSION is an array
+		# since the main version of such a package may remain unchanged when another is changed.
+		elif [[ "${version_new%-*}" != "${version_old%-*}" && "$new_revision" != "0" && "$i" == 0 ]]; then
+			(( error++ )) # Not reset
+			printf '%s\n' \
+				"FAILED - $version_old -> $version_new" \
+				"" \
+				"TERMUX_PKG_VERSION was bumped but TERMUX_PKG_REVISION wasn't reset." \
+				"Please remove the 'TERMUX_PKG_REVISION=${new_revision}' line." \
+				""
+			continue
+		fi
+
 		echo "PASS - ${version_old%-0}${version_old_is_bad:+" (INVALID)"} -> ${version_new%-0}"
 	done
 	return $error
