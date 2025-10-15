@@ -133,5 +133,5 @@ termux_step_get_dependencies_bionic() {
 				echo "$dep_version" >"$TERMUX_BUILT_PACKAGES_DIRECTORY/$dep"
 			fi
 		fi
-	done < <(./scripts/bionic_buildorder.py $([[ "${TERMUX_INSTALL_DEPS}" == "true" ]] && echo "-i") "$TERMUX_PKG_NAME" || echo "ERROR")
+	done < <(./scripts/bionic_buildorder.py $([[ "${TERMUX_INSTALL_DEPS}" == "true" ]] && echo "-i") "$TERMUX_PKG_NAME" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
 }

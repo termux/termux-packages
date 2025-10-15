@@ -288,17 +288,6 @@ if __name__ == "__main__":
         build_mode = BuildMode.ONLINE
 
     repos: List[Path] = args.repos
-    if not repos:
-        from json import load as json_load
-
-        try:
-            with open("./repo.json") as f:
-                repos = []
-                for d in json_load(f).keys():
-                    if d != "pkg_format":
-                        repos.append(Path(Path.cwd() / d))
-        except FileNotFoundError:
-            die("'repo.json' file not found at %s. Check script location." % Path.cwd())
 
     # TEMP
     log_dir = Path("./log")
@@ -317,6 +306,18 @@ if __name__ == "__main__":
     build_mode: {build_mode}
     """)
     # END TEMP
+
+    if not repos:
+        from json import load as json_load
+
+        try:
+            with open("./repo.json") as f:
+                repos = []
+                for d in json_load(f).keys():
+                    if d != "pkg_format":
+                        repos.append(Path(Path.cwd() / d))
+        except FileNotFoundError:
+            die("'repo.json' file not found at %s. Check script location." % Path.cwd())
 
     for order in BuildOrder(package, repos, build_mode).generate_order():
         package_name = order.name
