@@ -14,10 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 TERMUX_ON_DEVICE_BUILD = os.getenv("TERMUX_ON_DEVICE_BUILD") == "true"
-TERMUX_GLOBAL_LIBRARY = os.getenv("TERMUX_GLOBAL_LIBRARY") == "true"
-TERMUX_PACKAGE_LIBRARY = os.getenv("TERMUX_PACKAGE_LIBRARY", "bionic")
 TERMUX_ARCH = os.getenv("TERMUX_ARCH", "aarch64").replace("x86_64", "x86-64")
-
 ON_DEVICE_ALWAYS_DEPENDENCIES = ("libc++",)
 
 PackageName: TypeAlias = str
@@ -63,25 +60,18 @@ class Package:
 
 
 class BuildScriptParser:
-    _VARS_REGEX = re.compile(
-        r"""
-        ^(
-        TERMUX_PKG_METAPACKAGE
-        | TERMUX_PKG_NO_STATICSPLIT
-        | TERMUX_PKG_BUILD_DEPENDS
-        | TERMUX_PKG_DEPENDS
-        | TERMUX_SUBPKG_DEPENDS
-        | TERMUX_SUBPKG_DEPEND_ON_PARENT
-        )
-        [+]?=["']?(.*?)["']?$
-        """,
-        re.MULTILINE | re.VERBOSE,
+    _BUILD_SCRIPT_REGEX = re.compile(
+        r"^(TERMUX_PKG_DEPENDS|TERMUX_PKG_BUILD_DEPENDS|TERMUX_PKG_METAPACKAGE|TERMUX_PKG_NO_STATICSPLIT)[+]?=[\"']?(.*?)[\"']?$",
+        re.MULTILINE,
+    )
+    _SUBPACKAGE_SCRIPT_REGEX = re.compile(
+        r"^(TERMUX_SUBPKG_DEPENDS|TERMUX_SUBPKG_DEPEND_ON_PARENT)[+]?=[\"']?(.*?)[\"']?$", re.MULTILINE
     )
 
     def __init__(self, script_path: Path) -> None:
         self.variables: Dict[str, str] = {}
-
-        for m in self._VARS_REGEX.finditer(script_path.read_text(encoding="utf-8")):
+        regex = self._BUILD_SCRIPT_REGEX if script_path.name == "build.sh" else self._SUBPACKAGE_SCRIPT_REGEX
+        for m in regex.finditer(script_path.read_text(encoding="utf-8")):
             if m:
                 var, value = m.groups()
                 if self.variables.setdefault(var, value) != value:
@@ -89,9 +79,6 @@ class BuildScriptParser:
 
     def is_metapackage(self) -> bool:
         return self.variables.get("TERMUX_PKG_METAPACKAGE", "false") == "true"
-
-    def is_static_splitting_allowed(self) -> bool:
-        return self.variables.get("TERMUX_PKG_NO_STATICSPLIT", "false") != "true"
 
     def subpackage_relation_with_parent(self) -> str:
         # Default to having dependence on parent.
@@ -119,20 +106,18 @@ class BuildOrder:
         self.root_pkg = root_pkg
         self.repos = repos
         self.build_mode = build_mode
-
         # A map of package name to it's build script:
-        self._package_map: Dict[PackageName, Path] = {}
+        self._package_map: Dict[PackageName, Path] = self._create_package_map()
+        logger.debug("Total packages in repo: %d" % len(self._package_map))
 
+    def _create_package_map(self) -> Dict[PackageName, Path]:
+        package_map = {}
         for repo in self.repos:
             for package_path in repo.iterdir():
-                package_name = package_path.name
-
                 for subpackage_path in package_path.glob("*.subpackage.sh"):
-                    self._package_map[subpackage_path.name.removesuffix(".subpackage.sh")] = subpackage_path
-
-                self._package_map[package_name] = package_path / "build.sh"
-
-        logger.debug("Total packages in repo: %d" % len(self._package_map))
+                    package_map[subpackage_path.name.removesuffix(".subpackage.sh")] = subpackage_path
+                package_map[package_path.name] = package_path / "build.sh"
+        return package_map
 
     def generate_order(self) -> List[Package]:
         build_order: List[Package] = []
@@ -144,7 +129,7 @@ class BuildOrder:
         def dfs():
             while stack:
                 node, is_backtracking = stack.pop()
-                package = self.__get_package(node)
+                package = self._get_package(node)
 
                 if is_backtracking:
                     path.pop()
@@ -158,7 +143,20 @@ class BuildOrder:
                 stack.append((node, True))  # Backtracking.
                 path.append(node)
 
-                for dep in self.__resolve_dependencies(package):
+                resolved_deps = []
+                for dep in package.dependencies:
+                    # Why this skip?
+                    # initially: dotnet8.0 -> dotnet-host -> dotnet-host-8.0 | dotnet-host-9.0
+                    # resolved: dotnet8.0 -> dotnet8.0 | dotnet9.0
+                    # Since, dotnet8.0 is in resolved AlternativeDependency, dotnet-host is built "out of" dotnet8.0.
+                    # Hence, we skip.
+                    resolved_deps.extend(
+                        d
+                        for d in self._resolve_dependencies(dep)
+                        if not (isinstance(d, AlternativeDependency) and package.name in d.options)
+                    )
+
+                for dep in resolved_deps:
                     if isinstance(dep, AlternativeDependency):
                         dep = next(iter(visited.intersection(dep.options)), dep.default)
                     if dep in path:
@@ -167,13 +165,13 @@ class BuildOrder:
                         stack.append((dep, False))
 
         if self.root_pkg:
-            if self.__get_package(self.root_pkg).type == PackageType.VIRTUAL:
+            if self._get_package(self.root_pkg).type == PackageType.VIRTUAL:
                 die("%s is either a metapackage or subpackage. Exiting..." % self.root_pkg)
             stack.append((self.root_pkg, False))
             dfs()
         else:
             for pkg in self._package_map.keys():
-                if pkg not in visited and self.__get_package(pkg).type != PackageType.VIRTUAL:
+                if pkg not in visited and self._get_package(pkg).type != PackageType.VIRTUAL:
                     stack.append((pkg, False))
                     dfs()
 
@@ -183,18 +181,12 @@ class BuildOrder:
         return build_order
 
     @cache
-    def __get_package(self, package_name: PackageName) -> Package:
+    def _get_package(self, package_name: PackageName) -> Package:
         # A non-existent, virtual static package:
         if package_name.endswith("-static") and package_name not in self._package_map:
             parent = package_name.removesuffix("-static")
-            return Package(
-                name=package_name,
-                dependencies={parent},
-                type=PackageType.VIRTUAL,
-                path=self._package_map[parent].parent,
-            )
+            return Package(package_name, PackageType.VIRTUAL, self._package_map[parent].parent, {parent})
 
-        # It should exist now.
         if package_name not in self._package_map:
             die("%s is a non-existent package." % package_name)
 
@@ -204,80 +196,64 @@ class BuildOrder:
         # For root package we are always in OFFLINE mode as we are building it:
         build_mode = BuildMode.OFFLINE if package_name == self.root_pkg else self.build_mode
 
-        package_info = self.__parse_build_script(package_script_path)
+        package_info = self._parse_build_script(package_script_path)
         dependencies = package_info.get_dependencies(build_mode)
 
         if package_info.is_metapackage():
-            return Package(name=package_name, path=package_path, dependencies=dependencies, type=PackageType.VIRTUAL)
+            return Package(package_name, PackageType.VIRTUAL, package_path, dependencies)
 
         if package_script_path.name.endswith(".subpackage.sh"):
             if build_mode == BuildMode.OFFLINE:
-                return Package(
-                    name=package_name, path=package_path, dependencies={package_path.name}, type=PackageType.VIRTUAL
-                )
-            else:
-                # See the following link to understand this behaviour:
-                # https://github.com/termux/termux-packages/blob/abdfb2a00f7d2f2bdd6de42a1a085948c68c050c/scripts/build/termux_create_debian_subpackages.sh#L104
-                match package_info.subpackage_relation_with_parent():
-                    case "true" | "unversioned" if package_name not in dependencies:
-                        dependencies.add(package_path.name)  # Parent.
-                    case "deps":
-                        dependencies.update(self.__parse_build_script(package_path).get_dependencies(build_mode))
-                return Package(name=package_name, path=package_path, dependencies=dependencies, type=PackageType.REAL)
+                return Package(package_name, PackageType.VIRTUAL, package_path, {package_path.name})
+            # See ./build/termux_create_debian_subpackages.sh#L104 to understand the this behaviour:
+            match package_info.subpackage_relation_with_parent():
+                case "true" | "yes" | "unversioned" if package_name not in dependencies:
+                    dependencies.add(package_path.name)  # Parent.
+                case "deps":
+                    dependencies.update(
+                        self._parse_build_script(package_path / "build.sh").get_dependencies(build_mode)
+                    )
+            return Package(package_name, PackageType.REAL, package_path, dependencies)
 
         if build_mode == BuildMode.OFFLINE:
             subpackages = []
-
             for subpackage_path in package_path.glob("*.subpackage.sh"):
-                dependencies.update(self.__parse_build_script(subpackage_path).get_dependencies(build_mode))
+                dependencies.update(self._parse_build_script(subpackage_path).get_dependencies(build_mode))
                 subpackages.append(subpackage_path.name.removesuffix(".subpackage.sh"))
-
             # Remove all the subpackages (of this parent) that might be in it's dependency set.
             dependencies.difference_update(subpackages)
-            dependencies.discard(package_name)  # Some subpackages might explicitly list dependence on parent.
+            # Some subpackages might explicitly list dependence on parent.
+            dependencies.discard(package_name)
 
         # This is not needed for metapackages and subpackages.
-        if TERMUX_ON_DEVICE_BUILD and TERMUX_PACKAGE_LIBRARY == "bionic":
+        if TERMUX_ON_DEVICE_BUILD:
             for d in ON_DEVICE_ALWAYS_DEPENDENCIES:
                 if package_name != d:
                     dependencies.add(d)
 
-        return Package(name=package_name, path=package_path, dependencies=dependencies, type=PackageType.REAL)
+        return Package(package_name, PackageType.REAL, package_path, dependencies)
 
     @cache
-    def __parse_build_script(self, script_path: Path) -> BuildScriptParser:
+    def _parse_build_script(self, script_path: Path) -> BuildScriptParser:
         return BuildScriptParser(script_path)
 
     @cache
-    def __resolve_dependencies(self, package: Package) -> List[Dependency | AlternativeDependency]:
-        def resolve(dep: Dependency | AlternativeDependency):
-            if isinstance(dep, AlternativeDependency):
-                flattened_options = []
-                for d in dep.options:
-                    flattened_options.extend(resolve(d))
-                return [AlternativeDependency(options=tuple(flattened_options))]
+    def _resolve_dependencies(self, dep: Dependency | AlternativeDependency):
+        if isinstance(dep, AlternativeDependency):
+            flattened_options = []
+            for d in dep.options:
+                flattened_options.extend(self._resolve_dependencies(d))
+            return [AlternativeDependency(options=tuple(flattened_options))]
 
-            package = self.__get_package(dep)
+        package = self._get_package(dep)
 
-            if package.type == PackageType.REAL:
-                return [dep]
+        if package.type == PackageType.REAL:
+            return [dep]
 
-            flattened_dependencies = []
-            for d in package.dependencies:
-                flattened_dependencies.extend(resolve(d))
-            return flattened_dependencies
-
-        resolved_deps = []
-        for dep in package.dependencies:
-            # Why this skip?
-            # initially: dotnet8.0 -> dotnet-host -> dotnet-host-8.0 | dotnet-host-9.0
-            # resolved: dotnet8.0 -> dotnet8.0 | dotnet9.0
-            # Since, dotnet8.0 is in resolved AlternativeDependency, dotnet-host is built "out of" dotnet8.0.
-            # Hence, we skip.
-            resolved_deps.extend(
-                d for d in resolve(dep) if not (isinstance(d, AlternativeDependency) and package.name in d.options)
-            )
-        return resolved_deps
+        flattened_dependencies = []
+        for d in package.dependencies:
+            flattened_dependencies.extend(self._resolve_dependencies(d))
+        return flattened_dependencies
 
 
 start_time = time.perf_counter()

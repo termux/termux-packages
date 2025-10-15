@@ -36,7 +36,7 @@ __run_build_package() {
 		--format $TERMUX_PACKAGE_FORMAT --library $set_library "$pkg_dir"
 }
 
-termux_step_get_dependencies() {
+termux_step_get_dependencies_bionic() {
 	[[ "$TERMUX_SKIP_DEPCHECK" == "true" || "$TERMUX_PKG_METAPACKAGE" == "true" ]] && return 0
 
 	# This is used to prevent unnecessary refreshing of repos while building under same call:
@@ -133,5 +133,5 @@ termux_step_get_dependencies() {
 				echo "$dep_version" >"$TERMUX_BUILT_PACKAGES_DIRECTORY/$dep"
 			fi
 		fi
-	done < <(./scripts/new_buildorder.py $([[ "${TERMUX_INSTALL_DEPS}" == "true" ]] && echo "-i") "$TERMUX_PKG_NAME" || echo "ERROR")
+	done < <(./scripts/bionic_buildorder.py $([[ "${TERMUX_INSTALL_DEPS}" == "true" ]] && echo "-i") "$TERMUX_PKG_NAME" || echo "ERROR")
 }
