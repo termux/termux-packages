@@ -3,14 +3,14 @@ TERMUX_PKG_DESCRIPTION="Deployment and management system for Lua modules"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.12.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://luarocks.org/releases/luarocks-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=b0e0c85205841ddd7be485f53d6125766d18a81d226588d2366931e9a1484492
 TERMUX_PKG_AUTO_UPDATE=true
-__LUA_VERSION=5.1 # Lua version against which it will be built.
+__LUA_VERSION=5.4 # Lua version against which it will be built.
 # Do not use varible here since buildorder.py do not evaluate bash before reading.
-TERMUX_PKG_DEPENDS="curl, lua51"
-TERMUX_PKG_BUILD_DEPENDS="liblua51"
+TERMUX_PKG_DEPENDS="curl, lua54"
+TERMUX_PKG_BUILD_DEPENDS="liblua54"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
@@ -23,6 +23,7 @@ termux_step_configure() {
 	fi
 
 	./configure --prefix="$TERMUX_PREFIX" \
+		--lua-version="$__LUA_VERSION" \
 		--with-lua="$TERMUX_PREFIX"
 }
 
