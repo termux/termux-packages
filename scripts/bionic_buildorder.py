@@ -26,6 +26,16 @@ def die(msg: str) -> None:
     exit(1)
 
 
+def add_glibc_suffix(path, name=None):
+    is_sub = path.name.endswith(".subpackage.sh")
+    path = str(path).split("/")
+    if not name:
+        name = path[-1].removesuffix(".subpackage.sh") if is_sub else path[-1]
+    if (path[-3] if is_sub else path[-2]) == "gpkg" and not(any(i in name.split("-") for i in ["glibc", "glibc32"])):
+        return name.replace("-static", "-glibc-static") if name.endswith("static") else name+"-glibc"
+    return name
+
+
 class BuildMode(Enum):
     ONLINE = 0
     OFFLINE = 1
@@ -54,6 +64,7 @@ class Package:
     type: PackageType
     path: Path
     dependencies: Set[Dependency | AlternativeDependency]
+    only_installing: bool
 
     def __hash__(self) -> int:
         return hash(self.name)
@@ -61,7 +72,7 @@ class Package:
 
 class BuildScriptParser:
     _BUILD_SCRIPT_REGEX = re.compile(
-        r"^(TERMUX_PKG_DEPENDS|TERMUX_PKG_BUILD_DEPENDS|TERMUX_PKG_METAPACKAGE|TERMUX_PKG_NO_STATICSPLIT)[+]?=[\"']?(.*?)[\"']?$",
+        r"^(TERMUX_PKG_DEPENDS|TERMUX_PKG_BUILD_DEPENDS|TERMUX_PKG_METAPACKAGE|TERMUX_PKG_NO_STATICSPLIT|TERMUX_PKG_ONLY_INSTALLING)[+]?=[\"']?(.*?)[\"']?$",
         re.MULTILINE,
     )
     _SUBPACKAGE_SCRIPT_REGEX = re.compile(
@@ -83,6 +94,9 @@ class BuildScriptParser:
     def subpackage_relation_with_parent(self) -> str:
         # Default to having dependence on parent.
         return self.variables.get("TERMUX_SUBPKG_DEPEND_ON_PARENT", "true")
+
+    def is_only_installing(self):
+        return self.variables.get("TERMUX_PKG_ONLY_INSTALLING", "false") == "true"
 
     def get_dependencies(self, build_mode: BuildMode) -> Set[Dependency | AlternativeDependency]:
         keys = ["TERMUX_PKG_DEPENDS", "TERMUX_SUBPKG_DEPENDS"]
@@ -115,8 +129,8 @@ class BuildOrder:
         for repo in self.repos:
             for package_path in repo.iterdir():
                 for subpackage_path in package_path.glob("*.subpackage.sh"):
-                    package_map[subpackage_path.name.removesuffix(".subpackage.sh")] = subpackage_path
-                package_map[package_path.name] = package_path / "build.sh"
+                    package_map[add_glibc_suffix(subpackage_path)] = subpackage_path
+                package_map[add_glibc_suffix(package_path)] = package_path / "build.sh"
         return package_map
 
     def generate_order(self) -> List[Package]:
@@ -130,6 +144,9 @@ class BuildOrder:
             while stack:
                 node, is_backtracking = stack.pop()
                 package = self._get_package(node)
+
+                if build_mode == BuildMode.OFFLINE and self.root_pkg != package.name and package.only_installing:
+                    continue
 
                 if is_backtracking:
                     path.pop()
@@ -150,6 +167,8 @@ class BuildOrder:
                     # resolved: dotnet8.0 -> dotnet8.0 | dotnet9.0
                     # Since, dotnet8.0 is in resolved AlternativeDependency, dotnet-host is built "out of" dotnet8.0.
                     # Hence, we skip.
+                    if dep == self.root_pkg:
+                        continue
                     resolved_deps.extend(
                         d
                         for d in self._resolve_dependencies(dep)
@@ -185,7 +204,7 @@ class BuildOrder:
         # A non-existent, virtual static package:
         if package_name.endswith("-static") and package_name not in self._package_map:
             parent = package_name.removesuffix("-static")
-            return Package(package_name, PackageType.VIRTUAL, self._package_map[parent].parent, {parent})
+            return Package(package_name, PackageType.VIRTUAL, self._package_map[parent].parent, {parent}, False)
 
         if package_name not in self._package_map:
             die("%s is a non-existent package." % package_name)
@@ -198,14 +217,15 @@ class BuildOrder:
 
         package_info = self._parse_build_script(package_script_path)
         dependencies = package_info.get_dependencies(build_mode)
+        only_installing = package_info.is_only_installing()
 
         if package_info.is_metapackage():
-            return Package(package_name, PackageType.VIRTUAL, package_path, dependencies)
+            return Package(package_name, PackageType.VIRTUAL, package_path, dependencies, only_installing)
 
         if package_script_path.name.endswith(".subpackage.sh"):
-            parent = package_path.name
+            parent = add_glibc_suffix(package_path)
             if build_mode == BuildMode.OFFLINE:
-                return Package(package_name, PackageType.VIRTUAL, package_path, {parent})
+                return Package(package_name, PackageType.VIRTUAL, package_path, {parent}, only_installing)
             # See ./build/termux_create_debian_subpackages.sh#L104 to understand the this behaviour:
             parent_deps = self._parse_build_script(package_path / "build.sh").get_dependencies(build_mode)
             match package_info.subpackage_relation_with_parent():
@@ -213,13 +233,13 @@ class BuildOrder:
                     dependencies.add(parent)
                 case "deps":
                     dependencies.update(parent_deps)
-            return Package(package_name, PackageType.REAL, package_path, dependencies)
+            return Package(package_name, PackageType.REAL, package_path, dependencies, only_installing)
 
         if build_mode == BuildMode.OFFLINE:
             subpackages = []
             for subpackage_path in package_path.glob("*.subpackage.sh"):
                 dependencies.update(self._parse_build_script(subpackage_path).get_dependencies(build_mode))
-                subpackages.append(subpackage_path.name.removesuffix(".subpackage.sh"))
+                subpackages.append(add_glibc_suffix(subpackage_path))
             # Remove all the subpackages (of this parent) that might be in it's dependency set.
             dependencies.difference_update(subpackages)
             # Some subpackages might explicitly list dependence on parent.
@@ -231,7 +251,7 @@ class BuildOrder:
                 if package_name != d:
                     dependencies.add(d)
 
-        return Package(package_name, PackageType.REAL, package_path, dependencies)
+        return Package(package_name, PackageType.REAL, package_path, dependencies, only_installing)
 
     @cache
     def _parse_build_script(self, script_path: Path) -> BuildScriptParser:
