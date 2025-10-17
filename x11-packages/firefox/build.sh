@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.mozilla.org/firefox
 TERMUX_PKG_DESCRIPTION="Mozilla Firefox web browser"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="143.0"
+TERMUX_PKG_VERSION="144.0"
 TERMUX_PKG_SRCURL=https://archive.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION}/source/firefox-${TERMUX_PKG_VERSION}.source.tar.xz
-TERMUX_PKG_SHA256=6c45ca38091820c2c9925a85c80c04120de0ced98589065358c34d257e1edf83
+TERMUX_PKG_SHA256=612064a55610f0dfddfbff681930bea16f7593b40bd70c86e0518dc85d096b1f
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
@@ -49,9 +49,12 @@ termux_step_post_get_source() {
 	sed -E '/^#define (CONFIG_LINUX_PERF|HAVE_SYSCTL) /s/1$/0/' -i ${f}
 
 	# Update Cargo.toml to use the patched cc
-	echo "" >> Cargo.toml
-	echo 'cc = { path = "third_party/rust/cc" }' >> Cargo.toml
-	cargo update -p cc
+	sed -i 's|^\(\[patch\.crates-io\]\)$|\1\ncc = { path = "third_party/rust/cc" }|g' \
+		Cargo.toml
+	(
+		termux_setup_rust
+		cargo update -p cc
+	)
 }
 
 termux_step_pre_configure() {
