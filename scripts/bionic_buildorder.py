@@ -203,16 +203,16 @@ class BuildOrder:
             return Package(package_name, PackageType.VIRTUAL, package_path, dependencies)
 
         if package_script_path.name.endswith(".subpackage.sh"):
+            parent = package_path.name
             if build_mode == BuildMode.OFFLINE:
-                return Package(package_name, PackageType.VIRTUAL, package_path, {package_path.name})
+                return Package(package_name, PackageType.VIRTUAL, package_path, {parent})
             # See ./build/termux_create_debian_subpackages.sh#L104 to understand the this behaviour:
+            parent_deps = self._parse_build_script(package_path / "build.sh").get_dependencies(build_mode)
             match package_info.subpackage_relation_with_parent():
-                case "true" | "yes" | "unversioned" if package_name not in dependencies:
-                    dependencies.add(package_path.name)  # Parent.
+                case "true" | "yes" | "unversioned" if package_name not in parent_deps:
+                    dependencies.add(parent)
                 case "deps":
-                    dependencies.update(
-                        self._parse_build_script(package_path / "build.sh").get_dependencies(build_mode)
-                    )
+                    dependencies.update(parent_deps)
             return Package(package_name, PackageType.REAL, package_path, dependencies)
 
         if build_mode == BuildMode.OFFLINE:
