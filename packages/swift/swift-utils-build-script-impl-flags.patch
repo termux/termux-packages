@@ -20,9 +20,9 @@ index b1d060328bc..218c9215260 100755
  
                  if [[ ! "${SKIP_BUILD_WASM}" ]]; then
 @@ -1785,6 +1788,9 @@
-                         "${cmake_options[@]}"
                          -DLLVM_TABLEGEN=$(build_directory "${LOCAL_HOST}" llvm)/bin/llvm-tblgen
                          -DSWIFT_INCLUDE_TEST_BINARIES:BOOL=FALSE
+                         -DSWIFT_INCLUDE_TOOLS:BOOL=$(true_false "${CROSS_COMPILE_BUILD_SWIFT_TOOLS}")
 +                        -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"
 +                        -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
 +                        -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY
