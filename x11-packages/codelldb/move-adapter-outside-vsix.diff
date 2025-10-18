@@ -80,15 +80,15 @@ package file to outside of it.
      if (options.liblldb) {
 --- a/extension/main.ts
 +++ b/extension/main.ts
-@@ -234,7 +234,7 @@ class Extension implements DebugAdapterDescriptorFactory {
- 
+@@ -263,7 +263,7 @@ class Extension implements DebugAdapterDescriptorFactory {
+     ): Promise<DebugConfiguration | undefined | null> {
          if (debugConfig.cargo) {
              let cargo = new Cargo(folder, cancellation);
--            let launcher = path.join(this.context.extensionPath, 'adapter', 'codelldb-launch');
+-            let launcher = path.join(this.context.extensionPath, 'bin', 'codelldb-launch');
 +            let launcher = '@TERMUX_PREFIX@/bin/codelldb-launch';
              debugConfig = await cargo.resolveCargoConfig(debugConfig, launcher);
          }
- 
+         if (cancellation?.isCancellationRequested)
 --- a/src/codelldb/src/terminal.rs
 +++ b/src/codelldb/src/terminal.rs
 @@ -5,6 +5,7 @@ use adapter_protocol::*;
