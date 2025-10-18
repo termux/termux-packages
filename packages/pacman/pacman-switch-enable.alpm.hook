@@ -1,0 +1,10 @@
+[Trigger]
+Type = Path
+Operation = Install
+Target = @TERMUX_PREFIX_TARGET@/share/pacman-switch/*.sw
+
+[Action]
+Description = Automatic enabling switchers...
+When = PostTransaction
+Exec = @TERMUX_PREFIX@/share/libalpm/scripts/run-pacman-switch enable
+NeedsTargets

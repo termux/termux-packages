@@ -1,57 +1,24 @@
 # shellcheck shell=bash
 
-# The Debian `.alternatives` format is a simple ad-hoc plain text format
-# to declaratively define groups for `update-alternatives`.
-# This function parses files of this format and returns their contents
-# in the associative arrays: ${LINK[@]} ${[ALTERNATIVE@]} ${DEPENDENTS[@]} ${PRIORITY[@]}
-termux_parse_alternatives() {
-	local line key value
-	local dependents=0
-	while IFS=$'\n' read -r line; do
-
-		key="${line%%:*}" # Part before the first ':'
-		value="${line#*:[[:blank:]]*}" # Part after the first `:`, leading whitespace stripped
-
-		case "$key" in
-			'Name') NAME+=("$value") dependents=0 ;;
-			'Link')               LINK[${NAME[-1]}]="$value" dependents=0 ;;
-			'Alternative') ALTERNATIVE[${NAME[-1]}]="$value" dependents=0 ;;
-			'Priority')       PRIORITY[${NAME[-1]}]="$value" dependents=0 ;;
-			'Dependents') dependents=1; continue;;
-		esac
-
-		if (( dependents )); then
-			read -r dep_link dep_name dep_alternative <<< "$line"
-			DEPENDENTS[${NAME[-1]}]+="      --slave \"${TERMUX_PREFIX}/${dep_link}\" \"${dep_name}\" \"${TERMUX_PREFIX}/${dep_alternative}\""$' \\\n'
-		fi
-
-	done < <(sed -e 's|\s*#.*$||g' "$1") # Strip out any comments
-}
-
 termux_step_update_alternatives() {
 	printf '%s\n' "INFO: Processing 'update-alternatives' entries:" 1>&2
 	for alternatives_file in "${TERMUX_PKG_BUILDER_DIR}"/*.alternatives; do
 		[[ -f "$alternatives_file" ]] || continue
 		local -a NAME=()
 		local -A DEPENDENTS=() LINK=() ALTERNATIVE=() PRIORITY=()
-		termux_parse_alternatives "$alternatives_file"
+		termux_alternatives__parse_alternatives_file "$alternatives_file"
 
 		# Handle postinst script
 		[[ -f postinst ]] && mv postinst{,.orig}
 
 		local name
-		for name in "${NAME[@]}"; do
-			# Not every entry will have dependents in its group
-			# but we need to initialize the keys regardless
-			: "${DEPENDENTS[$name]:=}"
-		done
 
 		{ # Splice in the alternatives
 		# Use the original shebang if there's a 'postinst.orig'
 		[[ -f postinst.orig ]] && head -n1 postinst.orig || echo "#!${TERMUX_PREFIX}/bin/sh"
 		# Boilerplate header comment and checks
 		echo "# Automatically added by termux_step_update_alternatives"
-		echo "if [ \"\$1\" = 'configure' ] || [ \"\$1\" = 'abort-upgrade' ] || [ \"\$1\" = 'abort-deconfigure' ] || [ \"\$1\" = 'abort-remove' ] || [ \"${TERMUX_PACKAGE_FORMAT}\" = 'pacman' ]; then"
+		echo "if [ \"\$1\" = 'configure' ] || [ \"\$1\" = 'abort-upgrade' ] || [ \"\$1\" = 'abort-deconfigure' ] || [ \"\$1\" = 'abort-remove' ]; then"
 		echo "  if [ -x \"${TERMUX_PREFIX}/bin/update-alternatives\" ]; then"
 		# 'update-alternatives' command for each group
 		for name in "${NAME[@]}"; do
@@ -86,7 +53,7 @@ termux_step_update_alternatives() {
 		[[ -f prerm.orig ]] && head -n1 prerm.orig || echo "#!${TERMUX_PREFIX}/bin/sh"
 		# Boilerplate header comment and checks
 		echo "# Automatically added by termux_step_update_alternatives"
-		echo "if [ \"\$1\" = 'remove' ] || [ \"\$1\" != 'upgrade' ] || [ \"${TERMUX_PACKAGE_FORMAT}\" = 'pacman' ]; then"
+		echo "if [ \"\$1\" = 'remove' ] || [ \"\$1\" != 'upgrade' ]; then"
 		echo "  if [ -x \"${TERMUX_PREFIX}/bin/update-alternatives\" ]; then"
 		# Remove each group
 		for name in "${NAME[@]}"; do
