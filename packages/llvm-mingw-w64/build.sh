@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@licy183"
 # Bump llvm-mingw-w64* to the same version in one PR.
 TERMUX_PKG_VERSION="20250402"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/mstorsjo/llvm-mingw/releases/download/$TERMUX_PKG_VERSION/llvm-mingw-$TERMUX_PKG_VERSION-ucrt-ubuntu-20.04-x86_64.tar.xz
 TERMUX_PKG_SHA256=a23248baa1447df94ed14dce07997ab01da45bda74ac5370bbd098ed1c56a362
 TERMUX_PKG_AUTO_UPDATE=false
