@@ -3,13 +3,14 @@ TERMUX_PKG_DESCRIPTION="Cinnamon shell"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.4.13"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL="https://github.com/linuxmint/cinnamon/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=32de89ebd195ea27d9a220715e70c65664058d3e89a380f83addc07c81692d2d
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_DEPENDS="atk, cinnamon-control-center, cinnamon-menus, cinnamon-session, cinnamon-settings-daemon, cjs, clutter, clutter-gtk, cogl, dbus, gcr, gdk-pixbuf, gettext, glib, gnome-backgrounds, gobject-introspection, gsound, gtk3, libadapta, libx11, libxml2, mint-themes, mint-y-icon-theme, muffin, nemo, opengl, pango, python-pillow, python-xapp, sassc, xapp"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross, intltool, python-libsass"
+TERMUX_PKG_PYTHON_TARGET_DEPS="pytz, tinycss2, requests"
 TERMUX_PKG_SUGGESTS="gnome-terminal, gnome-screenshot"
 TERMUX_PKG_PYTHON_BUILD_DEPS="pysass"
 TERMUX_PKG_VERSIONED_GIR=false
@@ -81,12 +82,4 @@ termux_step_post_make_install() {
 	styles_dir="$TERMUX_PREFIX/share/cinnamon/styles.d"
 	mkdir -p "$styles_dir"
 	install -Dm644 "$TERMUX_PKG_BUILDER_DIR/22_termux.styles" "$styles_dir/22_termux.styles"
-}
-
-termux_step_create_debscripts() {
-	cat <<-EOF >./postinst
-		#!$TERMUX_PREFIX/bin/sh
-		echo "Installing dependencies through pip..."
-		pip3 install pytz tinycss2 requests
-	EOF
 }
