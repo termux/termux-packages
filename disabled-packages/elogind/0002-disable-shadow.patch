@@ -1,0 +1,100 @@
+--- a/src/shared/user-record-nss.h
++++ b/src/shared/user-record-nss.h
+@@ -2,9 +2,15 @@
+ #pragma once
+ 
+ #include <grp.h>
++#ifdef ENABLE_GSHADOW
+ #include <gshadow.h>
++#endif
+ #include <pwd.h>
++#ifndef __ANDROID__
+ #include <shadow.h>
++#else
++struct spwd {};
++#endif
+ 
+ //#include "group-record.h"
+ #include "user-record.h"
+--- a/src/shared/user-record-nss.c
++++ b/src/shared/user-record-nss.c
+@@ -50,8 +50,13 @@
+         if (isempty(pwd->pw_name))
+                 return -EINVAL;
+ 
++#ifndef __ANDROID__
+         if (spwd && !streq_ptr(spwd->sp_namp, pwd->pw_name))
+                 return -EINVAL;
++#else
++        if (spwd)
++                return -EINVAL;
++#endif
+ 
+         hr = user_record_new();
+         if (!hr)
+@@ -92,6 +97,7 @@
+         hr->uid = pwd->pw_uid;
+         hr->gid = pwd->pw_gid;
+ 
++#ifndef __ANDROID__
+         if (spwd &&
+             looks_like_hashed_password(utf8_only(spwd->sp_pwdp))) { /* Ignore locked, disabled, and mojibake passwords */
+                 strv_free_erase(hr->hashed_password);
+@@ -137,6 +143,7 @@
+          SET_IF(hr->password_change_inactive_usec,
+                 spwd && spwd->sp_inact > 0 && (uint64_t) spwd->sp_inact <= (UINT64_MAX-1)/USEC_PER_DAY,
+                 spwd->sp_inact * USEC_PER_DAY, UINT64_MAX);
++#endif
+ 
+         hr->json = json_variant_unref(hr->json);
+         r = json_build(&hr->json, JSON_BUILD_OBJECT(
+@@ -168,6 +175,9 @@
+ }
+ 
+ int nss_spwd_for_passwd(const struct passwd *pwd, struct spwd *ret_spwd, char **ret_buffer) {
++#ifdef __ANDROID__
++        return -EIO;
++#else
+         size_t buflen = 4096;
+         int r;
+ 
+@@ -203,6 +213,7 @@
+                 buflen *= 2;
+                 buf = mfree(buf);
+         }
++#endif
+ }
+ 
+ int nss_user_record_by_name(
+@@ -244,6 +255,7 @@
+                 buf = mfree(buf);
+         }
+ 
++#ifndef __ANDROID__
+         if (with_shadow) {
+                 r = nss_spwd_for_passwd(result, &spwd, &sbuf);
+                 if (r < 0) {
+@@ -252,6 +264,7 @@
+                 } else
+                         sresult = &spwd;
+         } else
++#endif
+                 incomplete = true;
+ 
+         r = nss_passwd_to_user_record(result, sresult, ret);
+@@ -299,6 +312,7 @@
+                 buf = mfree(buf);
+         }
+ 
++#ifndef __ANDROID__
+         if (with_shadow)  {
+                 r = nss_spwd_for_passwd(result, &spwd, &sbuf);
+                 if (r < 0) {
+@@ -307,6 +321,7 @@
+                 } else
+                         sresult = &spwd;
+         } else
++#endif
+                 incomplete = true;
+ 
+         r = nss_passwd_to_user_record(result, sresult, ret);
