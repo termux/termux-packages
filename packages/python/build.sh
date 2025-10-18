@@ -9,7 +9,6 @@ TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python
 TERMUX_PKG_SHA256=fb85a13414b028c49ba18bbd523c2d055a30b56b18b92ce454ea2c51edc656c4
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib"
-TERMUX_PKG_BUILD_DEPENDS="tk"
 TERMUX_PKG_RECOMMENDS="python-ensurepip-wheels, python-pip"
 TERMUX_PKG_SUGGESTS="python-tkinter"
 TERMUX_PKG_BREAKS="python2 (<= 2.7.15), python-dev"
@@ -95,9 +94,16 @@ termux_step_post_make_install() {
 
 termux_step_post_massage() {
 	# Verify that desired modules have been included:
-	for module in _bz2 _curses _lzma _sqlite3 _ssl _tkinter zlib; do
+	local -a modules=("_bz2" "_curses" "_lzma" "_sqlite3" "_ssl" "zlib")
+
+	# If `python-tkinter` subpackage did not need to be built, then do not check its module.
+	if [[ "$TERMUX_PKGS__BUILD__NO_BUILD_UNNEEDED_SUBPACKAGES" != "true" ]]; then
+		modules+=("_tkinter")
+	fi
+
+	for module in "${modules[@]}"; do
 		if [ ! -f "${TERMUX_PREFIX}/lib/python${_MAJOR_VERSION}/lib-dynload/${module}".*.so ]; then
-			termux_error_exit "Python module library $module not built"
+			termux_error_exit "Python module library '$module' not built"
 		fi
 	done
 }

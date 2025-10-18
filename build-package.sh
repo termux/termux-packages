@@ -24,11 +24,19 @@ cd "$(realpath "$(dirname "$0")")"
 TERMUX_SCRIPTDIR=$(pwd)
 export TERMUX_SCRIPTDIR
 
-# Store pid of current process in a file for docker__run_docker_exec_trap
-source "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"; docker__create_docker_exec_pid_file
 
-# Source the `termux_package` library.
-source "$TERMUX_SCRIPTDIR/scripts/utils/termux/package/termux_package.sh"
+
+# Source the utils library.
+# shellcheck source=scripts/utils/utils.sh
+source "$TERMUX_SCRIPTDIR/scripts/utils/utils.sh"
+
+# Set all utils library default variables
+utils__set_all_default_variables || exit $?
+
+# Store pid of current process in a file for docker__run_docker_exec_trap
+docker__create_docker_exec_pid_file
+
+
 
 export SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH:-$(git -c log.showSignature=false log -1 --pretty=%ct 2>/dev/null || date "+%s")}
 
@@ -59,6 +67,8 @@ if [ ! -e "$TERMUX_BUILD_LOCK_FILE" ]; then
 fi
 
 export TERMUX_REPO_PKG_FORMAT=$(jq --raw-output '.pkg_format // "debian"' ${TERMUX_SCRIPTDIR}/repo.json)
+
+export TERMUX_PKGS__BUILD__NO_BUILD_UNNEEDED_SUBPACKAGES="false"
 
 # Special variable for internal use. It forces script to ignore
 # lock file.
@@ -233,6 +243,15 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_start_build.sh"
 # shellcheck source=scripts/build/termux_step_start_build.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_cleanup_packages.sh"
 
+# Set the package version variables. Not to be overridden by packages.
+# shellcheck source=scripts/build/termux_set_package_version_variables.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_set_package_version_variables.sh"
+
+# Validate if all package files for package were successfully built.
+# Not to be overridden by packages.
+# shellcheck source=scripts/build/termux_validate_built_packages.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_validate_built_packages.sh"
+
 # Download or build dependencies. Not to be overridden by packages.
 # shellcheck source=scripts/build/termux_step_create_timestamp_file.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_timestamp_file.sh"
@@ -355,6 +374,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_copy_into_massagedir.sh"
 # shellcheck source=scripts/build/termux_step_create_subpkg_debscripts.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_subpkg_debscripts.sh"
 
+# Set all subpackages for package in TERMUX_PKG_SUBPACKAGES_LIST.
+# shellcheck source=scripts/build/termux_set_subpackages.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_set_subpackages.sh"
+
 # Create all subpackages. Run from termux_step_massage
 # shellcheck source=scripts/build/termux_create_debian_subpackages.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_create_debian_subpackages.sh"
@@ -393,6 +416,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_debscripts.sh"
 # This is used only when creating pacman packages.
 # shellcheck source=scripts/build/termux_step_create_pacman_install_hook.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_pacman_install_hook.sh"
+
+# Set the package file variables. Not to be overridden by packages.
+# shellcheck source=scripts/build/termux_set_package_file_variables.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_set_package_file_variables.sh"
 
 # Create the build deb file. Not to be overridden by package scripts.
 # shellcheck source=scripts/build/termux_step_create_debian_package.sh
@@ -519,10 +546,11 @@ _show_usage() {
 	echo "  -o Specify directory where to put built packages. Default: output/."
 	echo "  --format Specify package output format (debian, pacman)."
 	echo "  --library Specify library of package (bionic, glibc)."
+	echo "  --no-build-unneeded-subpackages Do not build unneeded subpackages that are not dependencies of parent package."
 	exit 1
 }
 
-declare -a PACKAGE_LIST=()
+declare -a PACKAGES_ARGS_LIST=()
 
 if [ "$#" -lt 1 ]; then _show_usage; fi
 while (($# >= 1)); do
@@ -550,6 +578,9 @@ while (($# >= 1)); do
 			else
 				termux_error_exit "./build-package.sh: option '--library' requires an argument"
 			fi
+			;;
+		--no-build-unneeded-subpackages)
+			TERMUX_PKGS__BUILD__NO_BUILD_UNNEEDED_SUBPACKAGES="true"
 			;;
 		-a)
 			if [ $# -ge 2 ]; then
@@ -601,11 +632,10 @@ while (($# >= 1)); do
 		-c) TERMUX_CONTINUE_BUILD=true;;
 		-C) TERMUX_CLEANUP_BUILT_PACKAGES_ON_LOW_DISK_SPACE=true;;
 		-*) termux_error_exit "./build-package.sh: illegal option '$1'";;
-		*) PACKAGE_LIST+=("$1");;
+		*) PACKAGES_ARGS_LIST+=("$1");;
 	esac
 	shift 1
 done
-unset -f _show_usage
 
 # Dependencies should be used from repo only if they are built for
 # same package name.
@@ -632,6 +662,11 @@ if [ -n "${TERMUX_PACKAGE_LIBRARY-}" ]; then
 	esac
 fi
 
+if [ "${TERMUX_INSTALL_DEPS:-false}" = "true" ]; then
+	# Request `buildorder.py` to return legacy build order if a cycle is found with topological build order.
+	export TERMUX_PKGS__BUILD_ORDER__RETURN_LEGACY_TARGET_BUILD_ORDER_ON_CYCLE="true"
+fi
+
 if [ "${TERMUX_INSTALL_DEPS-false}" = "true" ] || [ "${TERMUX_PACKAGE_LIBRARY-bionic}" = "glibc" ]; then
 	# Setup PGP keys for verifying integrity of dependencies.
 	# Keys are obtained from our keyring package.
@@ -649,7 +684,32 @@ if [ "${TERMUX_INSTALL_DEPS-false}" = "true" ] || [ "${TERMUX_PACKAGE_LIBRARY-bi
 	}
 fi
 
-for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
+# Remove duplicate and empty packages passed
+declare -A PACKAGES_FOUND_LIST=()
+declare -a PACKAGES_LIST=()
+
+for i in "${PACKAGES_ARGS_LIST[@]}"; do
+	if [[ -z "${i:-}" ]]; then
+        continue
+    fi
+    if [[ -z "${PACKAGES_FOUND_LIST["$i"]:-}" ]]; then
+        PACKAGES_LIST+=("$i")
+    fi
+    PACKAGES_FOUND_LIST["$i"]=1
+done
+unset PACKAGES_ARGS_LIST
+unset PACKAGES_FOUND_LIST
+
+if [ "${#PACKAGES_LIST[@]}" -lt 1 ]; then _show_usage; unset -f _show_usage; fi
+
+
+
+# Build all packages in PACKAGES_LIST
+if [ "$TERMUX_BUILD_PACKAGE_CALL_DEPTH" -ge 1 ]; then echo $'\n\n\n\n\n'; fi
+echo -n "[*] Building packages for arch '${TERMUX_ARCH:="aarch64"}': "
+for ((i=0; i<${#PACKAGES_LIST[@]}; i++)); do [ "$i" -ge 1 ] && echo -n ", "; echo -n "'${PACKAGES_LIST[i]}'"; done; echo
+
+for ((i=0; i<${#PACKAGES_LIST[@]}; i++)); do
 	# Following commands must be executed under lock to prevent running
 	# multiple instances of "./build-package.sh".
 	#
@@ -677,35 +737,32 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 					 $(test "${TERMUX_WITHOUT_DEPVERSION_BINDING:-}" = "true" && echo "-w") \
 					 $(test -n "${TERMUX_PACKAGE_FORMAT:-}" && echo "--format $TERMUX_PACKAGE_FORMAT") \
 					 $(test -n "${TERMUX_PACKAGE_LIBRARY:-}" && echo "--library $TERMUX_PACKAGE_LIBRARY") \
-					"${PACKAGE_LIST[i]}"
+					 $(test "${TERMUX_PKGS__BUILD__NO_BUILD_UNNEEDED_SUBPACKAGES:-}" = "true" && echo "--no-build-unneeded-subpackages") \
+					"${PACKAGES_LIST[i]}"
 			done
 			exit
 		fi
 
-		# Check the package to build:
-		TERMUX_PKG_NAME=$(basename "${PACKAGE_LIST[i]}")
-		export TERMUX_PKG_BUILDER_DIR=
-		if [[ ${PACKAGE_LIST[i]} == *"/"* ]]; then
-			# Path to directory which may be outside this repo:
-			if [ ! -d "${PACKAGE_LIST[i]}" ]; then termux_error_exit "'${PACKAGE_LIST[i]}' seems to be a path but is not a directory"; fi
-			export TERMUX_PKG_BUILDER_DIR=$(realpath "${PACKAGE_LIST[i]}")
+		# Get package directory and type for the package to build:
+		declare orig_package_name package_name package_dir subpackage_name is_subpackage is_virtual
+		termux_package__set_package_build_file_variables "${PACKAGES_LIST[i]}" "$TERMUX_SCRIPTDIR" "$TERMUX_PACKAGES_DIRECTORIES" "${TERMUX_IS_DISABLED:-}"
+
+		if [ "$i" -ge 1 ]; then echo $'\n\n\n'; fi
+		if [ "$is_subpackage" != "true" ]; then
+			echo "[*] Building package '$package_name'..."
 		else
-			# Package name:
-			for package_directory in $TERMUX_PACKAGES_DIRECTORIES; do
-				if [ -d "${TERMUX_SCRIPTDIR}/${package_directory}/${TERMUX_PKG_NAME}" ]; then
-					export TERMUX_PKG_BUILDER_DIR=${TERMUX_SCRIPTDIR}/$package_directory/$TERMUX_PKG_NAME
-					break
-				elif [ -n "${TERMUX_IS_DISABLED=""}" ] && [ -d "${TERMUX_SCRIPTDIR}/disabled-packages/${TERMUX_PKG_NAME}" ]; then
-					export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/disabled-packages/$TERMUX_PKG_NAME
-					break
-				fi
-			done
-			if [ -z "${TERMUX_PKG_BUILDER_DIR}" ]; then
-				termux_error_exit "No package $TERMUX_PKG_NAME found in any of the enabled repositories. Are you trying to set up a custom repository?"
+			if [ "$is_virtual" = "true" ]; then
+				echo "[*] Building package '$package_name' for virtual subpackage '$subpackage_name'..."
+			else
+				echo "[*] Building package '$package_name' for subpackage '$subpackage_name'..."
 			fi
 		fi
+
+		TERMUX_PKG_NAME="$package_name"
+		export TERMUX_ORIG_PKG_NAME="$orig_package_name"
+		export TERMUX_PKG_BUILDER_DIR="$package_dir"
 		TERMUX_PKG_BUILDER_SCRIPT=$TERMUX_PKG_BUILDER_DIR/build.sh
-		if test ! -f "$TERMUX_PKG_BUILDER_SCRIPT"; then
+		if [ ! -f "$TERMUX_PKG_BUILDER_SCRIPT" ]; then
 			termux_error_exit "No build.sh script at package dir $TERMUX_PKG_BUILDER_DIR!"
 		fi
 
@@ -782,11 +839,15 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		else
 			termux_error_exit "Unknown packaging format '$TERMUX_PACKAGE_FORMAT'."
 		fi
+
+		termux_validate_built_packages
+
 		# Saving a list of compiled packages for further work with it
 		if termux_check_package_in_building_packages_list "${TERMUX_PKG_BUILDER_DIR#${TERMUX_SCRIPTDIR}/}"; then
 			sed -i "\|^${TERMUX_PKG_BUILDER_DIR#${TERMUX_SCRIPTDIR}/}$|d" "$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH"
 		fi
 		termux_add_package_to_built_packages_list "$TERMUX_PKG_NAME"
+
 		termux_step_finish_build
 	) 5< "$TERMUX_BUILD_LOCK_FILE"
 done
