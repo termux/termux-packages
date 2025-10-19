@@ -148,14 +148,14 @@ check_version() {
 		(( i++ ))
 
 		# Is this version valid?
-		dpkg --validate-version "${version}" &>/dev/null || {
+		dpkg --validate-version "${version}" &> /dev/null || {
 			printf 'INVALID %s\n' "$(dpkg --validate-version "${version}" 2>&1)"
 			(( error++ ))
 			continue
 		}
 
 		# Was the package modified in this branch?
-		git diff --exit-code "${base_commit}" -- "${package_dir}" 2> /dev/null && {
+		git diff --exit-code "${base_commit}" -- "${package_dir}" &> /dev/null && {
 			printf '%s\n' "PASS - ${version} (not modified in this branch)"
 			continue
 		}
@@ -175,7 +175,7 @@ check_version() {
 
 		# Is ${version_old} valid?
 		local version_old_is_bad=""
-		dpkg --validate-version "${version_old}" &>/dev/null || version_old_is_bad="0~invalid"
+		dpkg --validate-version "${version_old}" &> /dev/null || version_old_is_bad="0~invalid"
 
 		# If ${version_new} isn't greater than "$version_old" that's an issue.
 		# If ${version_old} isn't valid this check is a no-op.
