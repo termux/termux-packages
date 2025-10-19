@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
 TERMUX_PKG_DESCRIPTION="Library for parsing XML documents"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.15.0"
+TERMUX_PKG_VERSION="2.15.1"
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/libxml2/${TERMUX_PKG_VERSION%.*}/libxml2-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=5abc766497c5b1d6d99231f662e30c99402a90d03b06c67b62d6c1179dedd561
+TERMUX_PKG_SHA256=c008bac08fd5c7b4a87f7b8a71f283fa581d80d80ff8d2efd3b26224c39bc54c
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SETUP_PYTHON=true
 # disabled due to compiler warnings
@@ -30,12 +30,13 @@ share/doc/libxml2/html
 share/doc/libxml2/xmlcatalog.html
 share/doc/libxml2/xmllint.html
 "
-TERMUX_PKG_DEPENDS="libiconv, libicu, zlib"
+TERMUX_PKG_DEPENDS="libandroid-glob, libiconv, libicu, zlib"
 TERMUX_PKG_BUILD_DEPENDS="python, readline"
 TERMUX_PKG_BREAKS="libxml2-dev"
 TERMUX_PKG_REPLACES="libxml2-dev"
 
 termux_step_configure() {
+	LDFLAGS+=" -landroid-glob"
 	# This directory is usually made by doxygen
 	# and python/generator.py expects it to be there.
 	mkdir -p "$TERMUX_PKG_BUILDDIR/python/doc/xml"
