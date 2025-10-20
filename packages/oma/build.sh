@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://aosc.io/oma
 TERMUX_PKG_DESCRIPTION="oma is an attempt at reworking APT's interface"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.22.1"
+TERMUX_PKG_VERSION="1.22.2"
 TERMUX_PKG_SRCURL="https://github.com/AOSC-Dev/oma/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=ff8bc610c4af363f6a7a6122c81b319061dc8212aa9fe1f93dcb1c7bbe671db2
+TERMUX_PKG_SHA256=1479073c86cb6220737059dbf2c3e37f1b40aa79eab75d64a8db980cca958f0f
 TERMUX_PKG_DEPENDS="libnettle, apt"
 TERMUX_PKG_RECOMMENDS="ripgrep"
 # 32-bit Support is being added upstream, we need to wait.
