@@ -1,10 +1,10 @@
-TERMUX_PKG_HOMEPAGE=https://www.pcre.org
+TERMUX_PKG_HOMEPAGE=https://pcre2project.github.io/pcre2/
 TERMUX_PKG_DESCRIPTION="Perl 5 compatible regular expression library"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="10.46"
-TERMUX_PKG_SRCURL=https://github.com/PhilipHazel/pcre2/releases/download/pcre2-${TERMUX_PKG_VERSION}/pcre2-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=15fbc5aba6beee0b17aecb04602ae39432393aba1ebd8e39b7cabf7db883299f
+TERMUX_PKG_VERSION="10.47"
+TERMUX_PKG_SRCURL=https://github.com/PCRE2Project/pcre2/releases/download/pcre2-${TERMUX_PKG_VERSION}/pcre2-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_SHA256=47fe8c99461250d42f89e6e8fdaeba9da057855d06eb7fc08d9ca03fd08d7bc7
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+"
 TERMUX_PKG_BREAKS="pcre2-dev"
