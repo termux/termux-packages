@@ -1,0 +1,16 @@
+https://salsa.debian.org/debian/chntpw/-/blob/e00c8dd756fdb6a04d6dd27e7bedf19981a398f8/debian/patches/08_no_deref_null
+
+--- a/reged.c
++++ b/reged.c
+@@ -167,6 +167,11 @@ int main(int argc, char **argv)
+ 
+   if (edit) {  /* Call editor. Rest of arguments are considered hives to load */
+     hivename = argv[optind+no_hives];
++    if (!hivename) {
++      fprintf(stderr,"with -e you must specify at least one hive file name\n");
++      usage();
++      exit(1);
++    }
+     do {
+       if (!(hive[no_hives] = openHive(hivename,
+ 				      HMODE_RW|mode))) {

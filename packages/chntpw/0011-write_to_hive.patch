@@ -1,0 +1,13 @@
+https://salsa.debian.org/debian/chntpw/-/blob/e00c8dd756fdb6a04d6dd27e7bedf19981a398f8/debian/patches/13_write_to_hive
+
+--- a/sampasswd.c
++++ b/sampasswd.c
+@@ -243,7 +243,7 @@ int main(int argc, char **argv)
+ 
+   wret = 0;
+   for (il = 0; il < no_hives; il++) {
+-    //    wret |= writeHive(hive[il]);
++    wret |= writeHive(hive[il]);
+     if (hive[il]->state & HMODE_DIDEXPAND)
+       fprintf(stderr," WARNING: Registry file %s was expanded! Experimental! Use at own risk!\n",hive[il]->filename);  
+     while (no_hives > 0)
