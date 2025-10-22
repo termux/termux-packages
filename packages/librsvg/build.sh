@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library to render SVG files using cairo"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.61.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/librsvg/${TERMUX_PKG_VERSION%.*}/librsvg-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=4644d83623dd61cc4479c2b3c372e1da2b281552ebc90035c8d1ac502eb1dc00
 TERMUX_PKG_AUTO_UPDATE=true
@@ -18,6 +19,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dintrospection=enabled
 -Dtests=false
 -Dvala=enabled
+-Dpixbuf-loader=enabled
 "
 
 termux_step_pre_configure() {
