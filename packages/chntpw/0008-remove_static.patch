@@ -1,0 +1,20 @@
+https://salsa.debian.org/debian/chntpw/-/blob/e00c8dd756fdb6a04d6dd27e7bedf19981a398f8/debian/patches/10_remove_static
+
+--- a/Makefile
++++ b/Makefile
+@@ -26,7 +26,7 @@ OSSLLIB=$(OSSLPATH)/lib
+ LIBS=-L$(OSSLLIB)
+ 
+ 
+-all: chntpw chntpw.static cpnt reged reged.static samusrgrp samusrgrp.static sampasswd sampasswd.static
++all: chntpw cpnt reged samusrgrp sampasswd
+ 
+ chntpw: chntpw.o ntreg.o edlib.o libsam.o
+ 	$(CC) $(CFLAGS) -o chntpw chntpw.o ntreg.o edlib.o libsam.o $(LIBS)
+@@ -66,5 +66,5 @@ sampasswd.static: sampasswd.o ntreg.o libsam.o
+ 	$(CC) -c $(CFLAGS) $<
+ 
+ clean:
+-	rm -f *.o chntpw chntpw.static cpnt reged reged.static samusrgrp samusrgrp.static sampasswd sampasswd.static *~
++	rm -f *.o chntpw cpnt reged samusrgrp sampasswd *~
+ 

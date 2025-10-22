@@ -1,0 +1,29 @@
+https://salsa.debian.org/debian/chntpw/-/blob/e00c8dd756fdb6a04d6dd27e7bedf19981a398f8/debian/patches/12_readonly_filesystem
+
+--- a/ntreg.c
++++ b/ntreg.c
+@@ -4241,9 +4241,9 @@ struct hive *openHive(char *filename, int mode)
+   do {  /* On some platforms read may not block, and read in chunks. handle that */
+     r = read(hdesc->filedesc, hdesc->buffer + rt, hdesc->size - rt);
+     rt += r;
+-  } while ( !errno && (rt < hdesc->size) );
++  } while ( (r > 0 || (r < 0 && errno == EINTR)) && (rt < hdesc->size) );
+ 
+-  if (errno) { 
++  if (r < 0) {
+     perror("openHive(): read error: ");
+     closeHive(hdesc);
+     return(NULL);
+@@ -4255,10 +4255,10 @@ struct hive *openHive(char *filename, int mode)
+     return(NULL);
+   }
+ 
+-  if (r < sizeof (*hdesc)) {
++  if (rt < sizeof (*hdesc)) {
+     fprintf(stderr,
+ 	    "file is too small; got %d bytes while expecting %d or more\n",
+-	    r, sizeof (*hdesc));
++	    rt, sizeof (*hdesc));
+     closeHive(hdesc);
+     return(NULL);
+   }
