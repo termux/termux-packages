@@ -116,6 +116,7 @@ termux_step_setup_variables() {
 	else
 		TERMUX_PKG_CACHEDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/cache
 	fi
+	TERMUX_PKG_SUBPACKAGES_LIST=()
 	TERMUX_CMAKE_BUILD=Ninja # Which cmake generator to use
 	TERMUX_PKG_ANTI_BUILD_DEPENDS="" # This cannot be used to "resolve" circular dependencies
 	TERMUX_PKG_BREAKS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps

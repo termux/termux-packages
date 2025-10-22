@@ -395,6 +395,7 @@ termux_step_massage() {
 		unset pattern_file_undef pattern_file_openmp
 	fi
 
+	termux_set_subpackages "false"
 	if [ "$TERMUX_PACKAGE_FORMAT" = "debian" ]; then
 		termux_create_debian_subpackages
 	elif [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then

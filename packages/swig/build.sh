@@ -8,4 +8,6 @@ TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/swig/swig-$TERMUX_PKG_VERSIO
 TERMUX_PKG_SHA256=c3f8e5dcd68c18aa19847b33b0a1bb92f07e904c53ae9cf5ae4ff8727a72927e
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, pcre2, zlib"
+# fatal error: 'pcre2.h' file not found
+TERMUX_PKG_BUILD_DEPENDS="pcre2"
 TERMUX_PKG_BUILD_IN_SRC=true

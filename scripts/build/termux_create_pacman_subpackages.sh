@@ -1,27 +1,21 @@
 termux_create_pacman_subpackages() {
-	# Sub packages:
-	local _ADD_PREFIX=""
-	if [[ "$TERMUX_PACKAGE_LIBRARY" == 'glibc' ]]; then
-		_ADD_PREFIX="glibc/"
-	fi
-	if [[ "$TERMUX_PKG_NO_STATICSPLIT" == 'false' && -n "$(shopt -s globstar; shopt -s nullglob; echo ${_ADD_PREFIX}lib{,32}/**/*.a)" ]]; then
-		# Add virtual -static sub package if there are include files:
-		local _STATIC_SUBPACKAGE_FILE=$TERMUX_PKG_TMPDIR/${TERMUX_PKG_NAME}-static.subpackage.sh
-		echo TERMUX_SUBPKG_INCLUDE=\"$(find ${_ADD_PREFIX}lib{,32} -name '*.a' -o -name '*.la' 2> /dev/null) $TERMUX_PKG_STATICSPLIT_EXTRA_PATTERNS\" > "$_STATIC_SUBPACKAGE_FILE"
-		echo "TERMUX_SUBPKG_DESCRIPTION=\"Static libraries for ${TERMUX_PKG_NAME}\"" >> "$_STATIC_SUBPACKAGE_FILE"
-	fi
+	local TERMUX_PKG_FILE TERMUX_PKG_ARCH TERMUX_PACMAN_PACKAGE_COMPRESS_CMD TERMUX_PARENT_DEPEND_ON_SUBPKG
 
 	# Now build all sub packages
 	rm -Rf "$TERMUX_TOPDIR/$TERMUX_PKG_NAME/subpackages"
-	for subpackage in $TERMUX_PKG_BUILDER_DIR/*.subpackage.sh $TERMUX_PKG_TMPDIR/*subpackage.sh; do
-		[[ -f "$subpackage" ]] || continue
+	for subpackage in "${TERMUX_PKG_SUBPACKAGES_LIST[@]}"; do
+		if [ ! -f "$subpackage" ]; then
+			termux_error_exit "Failed to find subpackage build file \"$subpackage\" of package \"$TERMUX_PKG_NAME\""
+		fi
+
 		local SUB_PKG_NAME
 		SUB_PKG_NAME=$(basename "$subpackage" .subpackage.sh)
 		if [[ "$TERMUX_PACKAGE_LIBRARY" == 'glibc' ]] && ! termux_package__is_package_name_have_glibc_prefix "$SUB_PKG_NAME"; then
 			SUB_PKG_NAME="$(termux_package__add_prefix_glibc_to_package_name ${SUB_PKG_NAME})"
 		fi
+
 		# Default value is same as main package, but sub package may override:
-		local TERMUX_SUBPKG_PLATFORM_INDEPENDENT=$TERMUX_PKG_PLATFORM_INDEPENDENT
+		local TERMUX_SUBPKG_PLATFORM_INDEPENDENT="$TERMUX_PKG_PLATFORM_INDEPENDENT"
 		local SUB_PKG_DIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/subpackages/$SUB_PKG_NAME
 		local TERMUX_SUBPKG_ESSENTIAL=false
 		local TERMUX_SUBPKG_BREAKS=""
@@ -68,8 +62,31 @@ termux_create_pacman_subpackages() {
 		done
 		shopt -u globstar
 
-		local SUB_PKG_ARCH=$TERMUX_ARCH
-		[[ "$TERMUX_SUBPKG_PLATFORM_INDEPENDENT" == "true" ]] && SUB_PKG_ARCH=any
+		# Do not create subpackage for specific arches.
+		# Using TERMUX_ARCH instead of SUB_PKG_ARCH (defined below) is intentional.
+		if [[ " ${TERMUX_SUBPKG_EXCLUDED_ARCHES//,/ } " == *" ${TERMUX_ARCH} "* ]]; then
+			echo "Skipping creating subpackage '$SUB_PKG_NAME' for arch $TERMUX_ARCH"
+			continue
+		fi
+
+		termux_package__does_dependency_exists_in_dependencies_list TERMUX_PARENT_DEPEND_ON_SUBPKG "$SUB_PKG_NAME" "$TERMUX_PKG_DEPENDS"
+		termux_package__does_dependency_exists_in_dependencies_list TERMUX_PARENT_BUILD_DEPEND_ON_SUBPKG "$SUB_PKG_NAME" "$TERMUX_PKG_BUILD_DEPENDS"
+
+		if [ "$SUB_PKG_NAME" != "$TERMUX_ORIG_PKG_NAME" ] &&
+			[ "$TERMUX_PKGS__BUILD__NO_BUILD_UNNEEDED_SUBPACKAGES" = "true" ] &&
+			[ "$TERMUX_PARENT_DEPEND_ON_SUBPKG" = "false" ] && [ "$TERMUX_PARENT_BUILD_DEPEND_ON_SUBPKG" = "false" ]; then
+			echo "Not building subpackage \"$SUB_PKG_NAME\" of package \"$TERMUX_PKG_NAME\" since its not a dependency of parent package and TERMUX_PKGS__BUILD__NO_BUILD_UNNEEDED_SUBPACKAGES is enabled"
+			continue
+		fi
+
+		# Set `TERMUX_PKG_FILE`, `TERMUX_PKG_ARCH` and `TERMUX_PACMAN_PACKAGE_COMPRESS_CMD`.
+		termux_set_package_file_variables "$SUB_PKG_NAME" "true"
+		shell__validate_variable_set TERMUX_PKG_FILE termux_create_pacman_subpackages " for subpackage \"$SUB_PKG_NAME\" of package \"$TERMUX_PKG_NAME\"" || exit $?
+		shell__validate_variable_set TERMUX_PKG_ARCH termux_create_pacman_subpackages " for subpackage \"$SUB_PKG_NAME\" of package \"$TERMUX_PKG_NAME\"" || exit $?
+		shell__validate_variable_set TERMUX_PACMAN_PACKAGE_COMPRESS_CMD termux_create_pacman_subpackages " for subpackage \"$SUB_PKG_NAME\" of package \"$TERMUX_PKG_NAME\"" || exit $?
+
+		# From here on `SUB_PKG_ARCH` is set to `all` if `TERMUX_SUBPKG_PLATFORM_INDEPENDENT` is set by the subpackage.
+		local SUB_PKG_ARCH="$TERMUX_PKG_ARCH"
 
 		cd "$SUB_PKG_DIR/massage"
 		# Check that files were actually installed, else don't subpackage.
@@ -84,7 +101,7 @@ termux_create_pacman_subpackages() {
 
 		# If the subpackage is not in the $TERMUX_PKG_DEPENDS for the parent package,
 		# and TERMUX_SUBPKG_DEPEND_ON_PARENT doesn't have a value, the subpackage should depend on its parent
-		[[ " ${TERMUX_PKG_DEPENDS//,/ } " != *" $SUB_PKG_NAME "* ]] && : "${TERMUX_SUBPKG_DEPEND_ON_PARENT:=true}"
+		[ "$TERMUX_PARENT_DEPEND_ON_SUBPKG" = "false" ] && : "${TERMUX_SUBPKG_DEPEND_ON_PARENT:=true}"
 
 		case "$TERMUX_SUBPKG_DEPEND_ON_PARENT" in
 			'unversioned') TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_NAME";;
@@ -169,41 +186,10 @@ termux_create_pacman_subpackages() {
 		termux_step_create_subpkg_debscripts
 		termux_step_create_pacman_install_hook
 
-		# Configuring the selection of a copress for a batch.
-		local COMPRESS
-		local PKG_FORMAT
-		case $TERMUX_PACMAN_PACKAGE_COMPRESSION in
-			"gzip")
-				COMPRESS=(gzip -c -f -n)
-				PKG_FORMAT="gz";;
-			"bzip2")
-				COMPRESS=(bzip2 -c -f)
-				PKG_FORMAT="bz2";;
-			"zstd")
-				COMPRESS=(zstd -c -z -q -)
-				PKG_FORMAT="zst";;
-			"lrzip")
-				COMPRESS=(lrzip -q)
-				PKG_FORMAT="lrz";;
-			"lzop")
-				COMPRESS=(lzop -q)
-				PKG_FORMAT="lzop";;
-			"lz4")
-				COMPRESS=(lz4 -q)
-				PKG_FORMAT="lz4";;
-			"lzip")
-				COMPRESS=(lzip -c -f)
-				PKG_FORMAT="lz";;
-			"xz" | *)
-				COMPRESS=(xz -c -z -)
-				PKG_FORMAT="xz";;
-		esac
-
 		# ensure all elements of the package have the same mtime
 		find . -exec touch -h -d @$SOURCE_DATE_EPOCH {} +
 
 		# Create the actual .pkg file:
-		local TERMUX_SUBPKG_PACMAN_FILE=$TERMUX_OUTPUT_DIR/${SUB_PKG_NAME}${DEBUG}-${TERMUX_PKG_FULLVERSION_FOR_PACMAN}-${SUB_PKG_ARCH}.pkg.tar.${PKG_FORMAT}
 		shopt -s dotglob globstar
 		printf '%s\0' **/* | bsdtar -cnf - --format=mtree \
 			--options='!all,use-set,type,uid,gid,mode,time,size,md5,sha256,link' \
@@ -211,7 +197,7 @@ termux_create_pacman_subpackages() {
 			gzip -c -f -n > .MTREE
 		touch -d @$SOURCE_DATE_EPOCH .MTREE
 		printf '%s\0' **/* | bsdtar --no-fflags -cnf - --null --files-from - | \
-			$COMPRESS > "$TERMUX_SUBPKG_PACMAN_FILE"
+			"${TERMUX_PACMAN_PACKAGE_COMPRESS_CMD[@]}" > "$TERMUX_PKG_FILE"
 		shopt -u dotglob globstar
 
 		# Go back to main package:

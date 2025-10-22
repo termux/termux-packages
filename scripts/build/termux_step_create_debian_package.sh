@@ -1,4 +1,6 @@
 termux_step_create_debian_package() {
+	local TERMUX_PKG_INSTALLSIZE TERMUX_PKG_FILE TERMUX_PKG_ARCH
+
 	if [ "$TERMUX_PKG_METAPACKAGE" = "true" ]; then
 		# Metapackage doesn't have data inside.
 		rm -rf data
@@ -9,11 +11,15 @@ termux_step_create_debian_package() {
 		-cJf "$TERMUX_PKG_PACKAGEDIR/data.tar.xz" -H gnu .
 
 	# Get install size. This will be written as the "Installed-Size" deb field so is measured in 1024-byte blocks:
-	local TERMUX_PKG_INSTALLSIZE
 	TERMUX_PKG_INSTALLSIZE=$(du -sk . | cut -f 1)
 
+	# Set TERMUX_PKG_FILE and TERMUX_PKG_ARCH
+	termux_set_package_file_variables "$TERMUX_PKG_NAME" "false"
+	shell__validate_variable_set TERMUX_PKG_FILE termux_step_create_debian_package " for package \"$TERMUX_PKG_NAME\"" || exit $?
+	shell__validate_variable_set TERMUX_PKG_ARCH termux_step_create_debian_package " for package \"$TERMUX_PKG_NAME\"" || exit $?
+
 	# From here on TERMUX_ARCH is set to "all" if TERMUX_PKG_PLATFORM_INDEPENDENT is set by the package
-	[ "$TERMUX_PKG_PLATFORM_INDEPENDENT" = "true" ] && TERMUX_ARCH=all
+	local TERMUX_ARCH="$TERMUX_PKG_ARCH"
 
 	mkdir -p DEBIAN
 	cat > DEBIAN/control <<-HERE
@@ -62,9 +68,8 @@ termux_step_create_debian_package() {
 		-cJf "$TERMUX_PKG_PACKAGEDIR/control.tar.xz" -H gnu .
 
 	test ! -f "$TERMUX_COMMON_CACHEDIR/debian-binary" && echo "2.0" > "$TERMUX_COMMON_CACHEDIR/debian-binary"
-	TERMUX_PKG_DEBFILE=$TERMUX_OUTPUT_DIR/${TERMUX_PKG_NAME}${DEBUG}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
 	# Create the actual .deb file:
-	${AR-ar} cr "$TERMUX_PKG_DEBFILE" \
+	${AR-ar} cr "$TERMUX_PKG_FILE" \
 		"$TERMUX_COMMON_CACHEDIR/debian-binary" \
 		"$TERMUX_PKG_PACKAGEDIR/control.tar.xz" \
 		"$TERMUX_PKG_PACKAGEDIR/data.tar.xz"
