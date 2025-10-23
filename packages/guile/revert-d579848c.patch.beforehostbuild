@@ -1,0 +1,80 @@
+Reverts https://cgit.git.savannah.gnu.org/cgit/guile.git/commit/?id=d579848cb5d65440af5afd9c8968628665554c22
+Fixes https://github.com/termux/termux-packages/issues/26976
+Also allows using this guile to build gnucash for 32-bit devices while running the 32-bit Termux guile inside termux-proot-run
+
+--- a/module/language/cps/specialize-numbers.scm
++++ b/module/language/cps/specialize-numbers.scm
+@@ -284,23 +284,18 @@
+ 
+ (define significant-bits-handlers (make-hash-table))
+ (define-syntax-rule (define-significant-bits-handler
+-                      ((primop label types out def ...) param arg ...)
++                      ((primop label types out def ...) arg ...)
+                       body ...)
+   (hashq-set! significant-bits-handlers 'primop
+               (lambda (label types out param args defs)
+                 (match args ((arg ...) (match defs ((def ...) body ...)))))))
+ 
+-(define-significant-bits-handler ((logand label types out res) param a b)
++(define-significant-bits-handler ((logand label types out res) a b)
+   (let ((sigbits (sigbits-intersect3 (inferred-sigbits types label a)
+                                      (inferred-sigbits types label b)
+                                      (intmap-ref out res (lambda (_) 0)))))
+     (intmap-add (intmap-add out a sigbits sigbits-union)
+                 b sigbits sigbits-union)))
+-(define-significant-bits-handler ((logand/immediate label types out res) param a)
+-  (let ((sigbits (sigbits-intersect3 (inferred-sigbits types label a)
+-                                     param
+-                                     (intmap-ref out res (lambda (_) 0)))))
+-    (intmap-add out a sigbits sigbits-union)))
+ 
+ (define (significant-bits-handler primop)
+   (hashq-ref significant-bits-handlers primop))
+@@ -561,11 +556,11 @@
+               (specialize-unop cps k src op param a
+                                (unbox-u64 a) (box-u64 result))))
+ 
+-           (('logand/immediate (? u64-result? ) param (? u64-operand? a))
++           (('logand/immediate (? u64-result? ) param a)
+             (specialize-unop cps k src 'ulogand/immediate
+                              (logand param (1- (ash 1 64)))
+                              a
+-                             (unbox-u64 a) (box-u64 result)))
++                             (unbox-u64/truncate a) (box-u64 result)))
+ 
+            (((or 'add/immediate 'sub/immediate 'mul/immediate)
+              (? s64-result?) (? s64-parameter?) (? s64-operand? a))
+--- a/module/language/cps/type-fold.scm
++++ b/module/language/cps/type-fold.scm
+@@ -692,9 +692,13 @@
+    ((and (eqv? type1 &fixnum) (eqv? min1 max1) (power-of-two? min1)
+          (<= 0 min0))
+     (with-cps cps
+-      (build-term
++      (letv mask)
++      (letk kmask
++            ($kargs ('mask) (mask)
+         ($continue k src
+-          ($primcall 'logand/immediate (1- min1) (arg0))))))
++                ($primcall 'logand #f (arg0 mask)))))
++      (build-term
++        ($continue kmask src ($const (1- min1))))))
+    (else
+     (with-cps cps #f))))
+ 
+@@ -706,9 +710,13 @@
+     (with-cps cps #f))
+    ((and (eqv? type1 &fixnum) (eqv? min1 max1) (power-of-two? min1))
+     (with-cps cps
+-      (build-term
++      (letv mask)
++      (letk kmask
++            ($kargs ('mask) (mask)
+         ($continue k src
+-          ($primcall 'logand/immediate (1- min1) (arg0))))))
++                ($primcall 'logand #f (arg0 mask)))))
++      (build-term
++        ($continue kmask src ($const (1- min1))))))
+    (else
+     (with-cps cps #f))))
+ 
