@@ -1,0 +1,21 @@
+https://github.com/termux/termux-packages/issues/26970
+
+--- a/ext/node/ops/os/mod.rs
++++ b/ext/node/ops/os/mod.rs
+@@ -276,7 +276,15 @@
+     permissions.check_sys("cpus", "node:os.cpus()")?;
+   }
+ 
+-  cpus::cpu_info().ok_or(OsError::FailedToGetCpuInfo)
++  #[cfg(target_os = "android")]
++  {
++    return Ok(cpus::cpu_info().unwrap_or_default());
++  }
++
++  #[cfg(not(target_os = "android"))]
++  {
++    return cpus::cpu_info().ok_or(OsError::FailedToGetCpuInfo);
++  }
+ }
+ 
+ #[op2(stack_trace)]
