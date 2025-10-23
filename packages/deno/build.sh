@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A modern runtime for JavaScript and TypeScript"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 TERMUX_PKG_VERSION=1:2.5.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
 	https://github.com/denoland/deno/releases/download/v${TERMUX_PKG_VERSION:2}/deno_src.tar.gz
 	https://github.com/termux/deno-snapshot/releases/download/v${TERMUX_PKG_VERSION:2}/deno-snapshot-aarch64-linux-android-${TERMUX_PKG_VERSION:2}.tar.bz2
@@ -138,7 +139,7 @@ use_jumbo_build=true
 
 	export V8_FROM_SOURCE=1
 	# TODO: How to track the output of v8's build.rs without passing `-vv`
-	cargo build --jobs "${TERMUX_PKG_MAKE_PROCESSES}" --target "${CARGO_TARGET_NAME}" --release -vv
+	cargo build --jobs "${TERMUX_PKG_MAKE_PROCESSES}" --target "${CARGO_TARGET_NAME}" --release
 
 	unset BINDGEN_EXTRA_CLANG_ARGS "$env_name" V8_FROM_SOURCE
 	touch "$__SRC_DIR"/.built
