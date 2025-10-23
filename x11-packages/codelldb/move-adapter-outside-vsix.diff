@@ -78,6 +78,15 @@ package file to outside of it.
  
      let args: string[] = [];
      if (options.liblldb) {
+@@ -84,7 +84,7 @@ export async function findLibLLDB(pathHint: string): Promise<string | undefined>
+ 
+     let libDir;
+     let pattern;
+-    if (process.platform == 'linux') {
++    if (process.platform == 'linux' || process.platform == 'android') {
+         libDir = path.join(pathHint, 'lib');
+         pattern = /liblldb.*\.so.*/;
+     } else if (process.platform == 'darwin') {
 --- a/extension/main.ts
 +++ b/extension/main.ts
 @@ -263,7 +263,7 @@ class Extension implements DebugAdapterDescriptorFactory {
