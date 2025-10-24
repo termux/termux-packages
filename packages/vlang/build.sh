@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@ilyas-ozt"
 TERMUX_PKG_VERSION="0.1.0"
 TERMUX_PKG_GIT_URL=https://github.com/vlang/v
 TERMUX_PKG_GIT_BRANCH=master
-TERMUX_PKG_DEPENDS="clang, libexecinfo, libgc, libgc-static, make"
+TERMUX_PKG_DEPENDS="clang, libandroid-execinfo, libgc, libgc-static, make"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
