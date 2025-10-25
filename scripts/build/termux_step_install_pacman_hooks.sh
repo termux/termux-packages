@@ -1,7 +1,5 @@
 termux_step_install_pacman_hooks() {
-	[[ "$TERMUX_PACKAGE_FORMAT" != "pacman" ]] && return
-
-	local sed="sed -e s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g -e s|@TERMUX_PREFIX_TARGET@|${TERMUX_PREFIX:1}|g -e s|@TERMUX_ARCH@|${TERMUX_ARCH}|g"
+	local sed="sed -e s|@TERMUX_PREFIX@|${TERMUX_PREFIX_CLASSICAL}|g -e s|@TERMUX_PREFIX_TARGET@|${TERMUX_PREFIX_CLASSICAL:1}|g -e s|@TERMUX_ARCH@|${TERMUX_ARCH}|g"
 
 	# Installing hooks
 	local hooks
@@ -10,7 +8,7 @@ termux_step_install_pacman_hooks() {
 		mkdir -p ${TERMUX_PREFIX}/share/libalpm/hooks
 		local hook
 		for hook in ${hooks}; do
-			${sed} "${hook}" > "${TERMUX_PREFIX}/share/libalpm/hooks/$(sed 's|.alpm.hook$|.hook|' <<< "${hook##*/}")"
+			${sed} "${hook}" > "${TERMUX_PREFIX_CLASSICAL}/share/libalpm/hooks/$(sed 's|.alpm.hook$|.hook|' <<< "${hook##*/}")"
 		done
 	fi
 
@@ -21,7 +19,7 @@ termux_step_install_pacman_hooks() {
 		mkdir -p ${TERMUX_PREFIX}/share/libalpm/scripts
 		local script script_alpm
 		for script in ${scripts}; do
-			script_alpm="${TERMUX_PREFIX}/share/libalpm/scripts/$(sed 's|.alpm.script$||' <<< "${script##*/}")"
+			script_alpm="${TERMUX_PREFIX_CLASSICAL}/share/libalpm/scripts/$(sed 's|.alpm.script$||' <<< "${script##*/}")"
 			${sed} "${script}" > "${script_alpm}"
 			chmod +x "${script_alpm}"
 		done
