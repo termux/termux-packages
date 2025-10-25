@@ -3,6 +3,7 @@ TERMUX_SUBPKG_INCLUDE="
 lib/swift/android/aarch64/*.swiftdoc
 lib/swift/android/aarch64/*.swiftmodule
 lib/swift/android/aarch64/android.modulemap
+lib/swift/android/aarch64/lib_TestDiscovery.a
 lib/swift/android/aarch64/libswiftCxx.a
 lib/swift/android/aarch64/libswiftCxxStdlib.a
 lib/swift/android/aarch64/SwiftAndroidNDK.h

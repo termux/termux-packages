@@ -2,11 +2,12 @@ diff --git a/swift/utils/swift_build_support/swift_build_support/targets.py b/sw
 index 7ebcdc070c1..5a6ed88182e 100644
 --- a/swift/utils/swift_build_support/swift_build_support/targets.py
 +++ b/swift/utils/swift_build_support/swift_build_support/targets.py
-@@ -158,6 +158,7 @@ class AndroidPlatform(Platform):
+@@ -158,6 +158,8 @@ class AndroidPlatform(Platform):
  
          flags += '-sdk %s/sysroot ' % (android_toolchain_path)
          flags += '-tools-directory %s/bin' % (android_toolchain_path)
-+        flags += ' -Xlinker -rpath -Xlinker @TERMUX_PREFIX@/lib'
++        flags += ' -Xlinker -rpath -Xlinker @TERMUX_PREFIX@/lib '
++        flags += '-Xclang-linker -Wl,-z,max-page-size=16384'
          return flags
  
      def cmake_options(self, args):
