@@ -1,0 +1,396 @@
+From 2533f094d477ce2df205646ab1320c8b8d07359e Mon Sep 17 00:00:00 2001
+From: xingguangcuican6666 <xingguangcuican666@foxmail.com>
+Date: Thu, 23 Oct 2025 18:08:14 +0800
+Subject: [PATCH 03/12] fix_valloc_undeclared
+
+---
+ include/xconfig.h.in      | 2 +-
+ libusal/scsi-aix.c        | 6 +++---
+ libusal/scsi-amigaos.c    | 4 ++--
+ libusal/scsi-apollo.c     | 6 +++---
+ libusal/scsi-bsd.c        | 6 +++---
+ libusal/scsi-hpux.c       | 4 ++--
+ libusal/scsi-linux-pg.c   | 3 ++-
+ libusal/scsi-linux-sg.c   | 4 ++--
+ libusal/scsi-next.c       | 4 ++--
+ libusal/scsi-openserver.c | 4 ++--
+ libusal/scsi-osf.c        | 4 ++--
+ libusal/scsi-remote.c     | 4 ++--
+ libusal/scsi-sgi.c        | 4 ++--
+ libusal/scsi-sun.c        | 4 ++--
+ libusal/scsi-unixware.c   | 4 ++--
+ libusal/scsi-vms.c        | 4 ++--
+ 16 files changed, 34 insertions(+), 33 deletions(-)
+
+diff --git a/include/xconfig.h.in b/include/xconfig.h.in
+index 52a49c2..f92b649 100644
+--- a/include/xconfig.h.in
++++ b/include/xconfig.h.in
+@@ -174,7 +174,7 @@
+ #define HAVE_USLEEP 1		/* usleep() is present in libc */
+ #define HAVE_FORK 1		/* fork() is present in libc */
+ #define HAVE_ALLOCA 1		/* alloca() is present (else use malloc())*/
+-#define HAVE_VALLOC 1		/* valloc() is present in libc (else use malloc())*/
++//#define HAVE_VALLOC 1		/* valloc() is present in libc (else use malloc())*/
+ 
+ /*
+  * Important:	This must be a result from a check _before_ the Large File test
+diff --git a/libusal/scsi-aix.c b/libusal/scsi-aix.c
+index a7b4be6..d67a057 100644
+--- a/libusal/scsi-aix.c
++++ b/libusal/scsi-aix.c
+@@ -41,7 +41,7 @@
+  */
+ 
+ #include <sys/scdisk.h>
+-
++#include <stdlib.h>
+ /*
+  *	Warning: you may change this source, but if you do that
+  *	you need to change the _usal_version and _usal_auth* string below.
+@@ -213,7 +213,7 @@ usalo_getbuf(SCSI *usalp, long amt)
+ {
+ /* assume having a modern AIX here */
+ #ifdef HAVE_ALLOCA_H
+-    usalp->bufbase = (void *)valloc((size_t)amt);
++    usalp->bufbase = (void *)malloc((size_t)amt);
+     return (usalp->bufbase);
+ #else
+ 	void	*ret;
+@@ -224,7 +224,7 @@ usalo_getbuf(SCSI *usalp, long amt)
+ 				"usalo_getbuf: %ld bytes\n", amt);
+ 	}
+ 	/*
+-	 * Damn AIX is a paged system but has no valloc()
++	 * Damn AIX is a paged system but has no malloc()
+ 	 */
+ 	usalp->bufbase = ret = malloc((size_t)(amt+pagesize));
+ 	if (ret == NULL)
+diff --git a/libusal/scsi-amigaos.c b/libusal/scsi-amigaos.c
+index 991a4ab..649f21c 100644
+--- a/libusal/scsi-amigaos.c
++++ b/libusal/scsi-amigaos.c
+@@ -51,7 +51,7 @@
+ #include <exec/execbase.h>
+ #include <clib/exec_protos.h>
+ #include <clib/alib_protos.h>
+-
++#include <stdlib.h>
+ /*
+  *	Warning: you may change this source, but if you do that
+  *	you need to change the _usal_version and _usal_auth* string below.
+@@ -283,7 +283,7 @@ usalo_getbuf(SCSI *usalp, long amt)
+ 		fprintf((FILE *)usalp->errfile,
+ 			"usalo_getbuf: %ld bytes\n", amt);
+ 	}
+-	usalp->bufbase = valloc((size_t)(amt));
++	usalp->bufbase = malloc((size_t)(amt));
+ 	return (usalp->bufbase);
+ }
+ 
+diff --git a/libusal/scsi-apollo.c b/libusal/scsi-apollo.c
+index c368468..d8ddc6a 100644
+--- a/libusal/scsi-apollo.c
++++ b/libusal/scsi-apollo.c
+@@ -36,7 +36,7 @@
+ #include <apollo/scsi.h>
+ #include <assert.h>
+ #define	DomainScsiTimeout	100000
+-
++#include <stdlib.h>
+ /*
+  *	Warning: you may change this source, but if you do that
+  *	you need to change the _usal_version and _usal_auth* string below.
+@@ -124,7 +124,7 @@ usalo_open(SCSI *usalp, char *device)
+ 	/*
+ 	 * Allocate the sense buffer
+ 	 */
+-	usallocal(usalp)->DomainSensePointer = (Uchar *)valloc((size_t) (SCG_MAX_SENSE + getpagesize()));
++	usallocal(usalp)->DomainSensePointer = (Uchar *)malloc((size_t) (SCG_MAX_SENSE + getpagesize()));
+ 	assert(status.all == 0);
+ 	/*
+ 	 * Wire the sense buffer
+@@ -178,7 +178,7 @@ usalo_getbuf(SCSI *usalp, long amt)
+ 
+ 	if (usalp->debug > 1)
+ 		printf("scsi_getbuf: %ld bytes\n", amt);
+-	ret = valloc((size_t)amt);
++	ret = malloc((size_t)amt);
+ 	if (ret == NULL)
+ 		return (ret);
+ 	usalp->bufbase = ret;
+diff --git a/libusal/scsi-bsd.c b/libusal/scsi-bsd.c
+index 6e6c240..11ddf6d 100644
+--- a/libusal/scsi-bsd.c
++++ b/libusal/scsi-bsd.c
+@@ -47,7 +47,7 @@
+ 
+ #undef	sense
+ #include <sys/scsiio.h>
+-
++#include <stdlib.h>
+ /*
+  *	Warning: you may change this source, but if you do that
+  *	you need to change the _usal_version and _usal_auth* string below.
+@@ -327,7 +327,7 @@ usalo_getbuf(SCSI *usalp, long amt)
+ 		fprintf((FILE *)usalp->errfile,
+ 			"usalo_getbuf: %ld bytes\n", amt);
+ 	}
+-	usalp->bufbase = valloc((size_t)(amt));
++	usalp->bufbase = malloc((size_t)(amt));
+ 	return (usalp->bufbase);
+ }
+ 
+@@ -801,7 +801,7 @@ usalo_getbuf(SCSI *usalp, long amt)
+ 		fprintf((FILE *)usalp->errfile,
+ 			"usalo_getbuf: %ld bytes\n", amt);
+ 	}
+-	usalp->bufbase = valloc((size_t)(amt));
++	usalp->bufbase = malloc((size_t)(amt));
+ 	return (usalp->bufbase);
+ }
+ 
+diff --git a/libusal/scsi-hpux.c b/libusal/scsi-hpux.c
+index f7eb553..f58ccd7 100644
+--- a/libusal/scsi-hpux.c
++++ b/libusal/scsi-hpux.c
+@@ -39,7 +39,7 @@
+ 
+ #undef	sense
+ #include <sys/scsi.h>
+-
++#include <stdlib.h>
+ /*
+  *	Warning: you may change this source, but if you do that
+  *	you need to change the _usal_version and _usal_auth* string below.
+@@ -210,7 +210,7 @@ usalo_getbuf(SCSI *usalp, long amt)
+ 		fprintf((FILE *)usalp->errfile,
+ 			"usalo_getbuf: %ld bytes\n", amt);
+ 	}
+-	usalp->bufbase = valloc((size_t)(amt));
++	usalp->bufbase = malloc((size_t)(amt));
+ 	return (usalp->bufbase);
+ }
+ 
+diff --git a/libusal/scsi-linux-pg.c b/libusal/scsi-linux-pg.c
+index 00edf5d..bf942e0 100644
+--- a/libusal/scsi-linux-pg.c
++++ b/libusal/scsi-linux-pg.c
+@@ -45,6 +45,7 @@
+ #ifdef	HAVE_LINUX_PG_H
+ #include <linux/pg.h>
+ #else
++#include <stdlib.h>
+ #include "pg.h"		/* Use local version as Linux sometimes doesn't have */
+ #endif			/* installed. Now libusal always supports PP SCSI    */
+ 
+@@ -316,7 +317,7 @@ usalo_getbuf(SCSI *usalp, long amt)
+ 		fprintf((FILE *)usalp->errfile,
+ 			"usalo_getbuf: %ld bytes\n", amt);
+ 	}
+-	ret = valloc((size_t)(amt+getpagesize()));
++	ret = malloc((size_t)(amt+getpagesize()));
+ 	if (ret == NULL)
+ 		return (ret);
+ 	usalp->bufbase = ret;
+diff --git a/libusal/scsi-linux-sg.c b/libusal/scsi-linux-sg.c
+index 81d33d4..d468807 100644
+--- a/libusal/scsi-linux-sg.c
++++ b/libusal/scsi-linux-sg.c
+@@ -68,7 +68,7 @@
+ #include <sys/types.h>
+ #include <dirent.h>
+ #include <sys/utsname.h>
+-
++#include <stdlib.h>
+ #ifndef LINUX_VERSION_CODE	/* Very old kernel? */
+ #	define LINUX_VERSION_CODE 0
+ #endif
+@@ -1094,7 +1094,7 @@ usalo_getbuf(SCSI *usalp, long amt)
+ 	 * copying the whole buffer contents when
+ 	 * setting up the /dev/sg data structures.
+ 	 */
+-	ret = valloc((size_t)(amt+getpagesize()));
++	ret = malloc((size_t)(amt+getpagesize()));
+ 	if (ret == NULL)
+ 		return (ret);
+ 	usalp->bufbase = ret;
+diff --git a/libusal/scsi-next.c b/libusal/scsi-next.c
+index bfbe2b3..1fcf2d3 100644
+--- a/libusal/scsi-next.c
++++ b/libusal/scsi-next.c
+@@ -41,7 +41,7 @@
+  */
+ 
+ #include <bsd/dev/scsireg.h>
+-
++#include <stdlib.h>
+ /*
+  *	Warning: you may change this source, but if you do that
+  *	you need to change the _usal_version and _usal_auth* string below.
+@@ -270,7 +270,7 @@ usalo_getbuf(SCSI *usalp, long amt)
+ 		fprintf((FILE *)usalp->errfile,
+ 			"usalo_getbuf: %ld bytes\n", amt);
+ 	}
+-	usalp->bufbase = valloc((size_t)(amt));
++	usalp->bufbase = malloc((size_t)(amt));
+ 	return (usalp->bufbase);
+ }
+ 
+diff --git a/libusal/scsi-openserver.c b/libusal/scsi-openserver.c
+index d192302..f8d86e2 100644
+--- a/libusal/scsi-openserver.c
++++ b/libusal/scsi-openserver.c
+@@ -40,7 +40,7 @@
+ #undef	sense
+ 
+ #include <sys/scsicmd.h>
+-
++#include <stdlib.h>
+ /*
+  *	Warning: you may change this source, but if you do that
+  *	you need to change the _usal_version and _usal_auth* string below.
+@@ -758,7 +758,7 @@ usalo_getbuf(SCSI *usalp, long amt)
+ 		fprintf((FILE *)usalp->errfile,
+ 			"usalo_getbuf: %ld bytes\n", amt);
+ 	}
+-	usalp->bufbase = valloc((size_t)(amt));
++	usalp->bufbase = malloc((size_t)(amt));
+ 
+ 	return (usalp->bufbase);
+ }
+diff --git a/libusal/scsi-osf.c b/libusal/scsi-osf.c
+index 79d0708..ae75b28 100644
+--- a/libusal/scsi-osf.c
++++ b/libusal/scsi-osf.c
+@@ -45,7 +45,7 @@
+ #include <io/common/iotypes.h>
+ #include <io/cam/cam.h>
+ #include <io/cam/uagt.h>
+-
++#include <stdlib.h>
+ /*
+  *	Warning: you may change this source, but if you do that
+  *	you need to change the _usal_version and _usal_auth* string below.
+@@ -256,7 +256,7 @@ usalo_getbuf(SCSI *usalp, long amt)
+ 		fprintf((FILE *)usalp->errfile,
+ 			"usalo_getbuf: %ld bytes\n", amt);
+ 	}
+-	usalp->bufbase = valloc((size_t)(amt));
++	usalp->bufbase = malloc((size_t)(amt));
+ 	return (usalp->bufbase);
+ }
+ 
+diff --git a/libusal/scsi-remote.c b/libusal/scsi-remote.c
+index f9b40d6..7689e6a 100644
+--- a/libusal/scsi-remote.c
++++ b/libusal/scsi-remote.c
+@@ -39,7 +39,7 @@
+  */
+ 
+ #include <mconfig.h>
+-
++#include <stdlib.h>
+ #if !defined(HAVE_FORK) || !defined(HAVE_SOCKETPAIR) || !defined(HAVE_DUP2)
+ #undef	USE_RCMD_RSH
+ #endif
+@@ -399,7 +399,7 @@ usalo_rgetbuf(usalp, amt)
+ 		return ((void *)0);
+ 
+ #ifdef	HAVE_VALLOC
+-	usalp->bufbase = (void *)valloc((size_t)amt);
++	usalp->bufbase = (void *)malloc((size_t)amt);
+ #else
+ 	usalp->bufbase = (void *)malloc((size_t)amt);
+ #endif
+diff --git a/libusal/scsi-sgi.c b/libusal/scsi-sgi.c
+index b19a3ae..5f3ac4c 100644
+--- a/libusal/scsi-sgi.c
++++ b/libusal/scsi-sgi.c
+@@ -44,7 +44,7 @@
+  */
+ 
+ #include <dslib.h>
+-
++#include <stdlib.h>
+ /*
+  *	Warning: you may change this source, but if you do that
+  *	you need to change the _usal_version and _usal_auth* string below.
+@@ -241,7 +241,7 @@ usalo_getbuf(SCSI *usalp, long amt)
+ 		fprintf((FILE *)usalp->errfile,
+ 				"usalo_getbuf: %ld bytes\n", amt);
+ 	}
+-	usalp->bufbase = valloc((size_t)(amt));
++	usalp->bufbase = malloc((size_t)(amt));
+ 	return (usalp->bufbase);
+ }
+ 
+diff --git a/libusal/scsi-sun.c b/libusal/scsi-sun.c
+index 9ea8da8..de5a963 100644
+--- a/libusal/scsi-sun.c
++++ b/libusal/scsi-sun.c
+@@ -39,7 +39,7 @@
+  */
+ 
+ #include <usal/usalio.h>
+-
++#include <stdlib.h>
+ #include <libport.h>		/* Needed for gethostid() */
+ #ifdef	HAVE_SUN_DKIO_H
+ #	include <sun/dkio.h>
+@@ -382,7 +382,7 @@ usalo_reset(SCSI *usalp, int what)
+ static void *
+ usalo_getbuf(SCSI *usalp, long amt)
+ {
+-	usalp->bufbase = (void *)valloc((size_t)amt);
++	usalp->bufbase = (void *)malloc((size_t)amt);
+ 	return (usalp->bufbase);
+ }
+ 
+diff --git a/libusal/scsi-unixware.c b/libusal/scsi-unixware.c
+index 4a149f1..5c754eb 100644
+--- a/libusal/scsi-unixware.c
++++ b/libusal/scsi-unixware.c
+@@ -45,7 +45,7 @@
+ #include <sys/scsi.h>
+ #include <sys/sdi_edt.h>
+ #include <sys/sdi.h>
+-
++#include <stdlib.h>
+ /*
+  *	Warning: you may change this source, but if you do that
+  *	you need to change the _usal_version and _usal_auth* string below.
+@@ -573,7 +573,7 @@ usalo_getbuf(SCSI *usalp, long amt)
+ 		fprintf((FILE *)usalp->errfile,
+ 			"usalo_getbuf: %ld bytes\n", amt);
+ 	}
+-	usalp->bufbase = (void *) valloc((size_t)(amt));
++	usalp->bufbase = (void *) malloc((size_t)(amt));
+ 
+ 	return (usalp->bufbase);
+ }
+diff --git a/libusal/scsi-vms.c b/libusal/scsi-vms.c
+index ef29d76..bc694a2 100644
+--- a/libusal/scsi-vms.c
++++ b/libusal/scsi-vms.c
+@@ -50,7 +50,7 @@
+ #include <starlet.h>
+ #include <string.h>
+ #include <LIB$ROUTINES.H>
+-
++#include <stdlib.h>
+ /*
+  *	Warning: you may change this source, but if you do that
+  *	you need to change the _usal_version and _usal_auth* string below.
+@@ -348,7 +348,7 @@ usalo_getbuf(SCSI *usalp, long amt)
+ 		fprintf((FILE *)usalp->errfile,
+ 				"usalo_getbuf: %ld bytes\n", amt);
+ 	}
+-	usalp->bufbase = malloc((size_t)(amt));	/* XXX JS XXX valloc() ??? */
++	usalp->bufbase = malloc((size_t)(amt));	/* XXX JS XXX malloc() ??? */
+ 	return (usalp->bufbase);
+ }
+ 
+-- 
+2.51.1
+

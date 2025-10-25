@@ -1,0 +1,101 @@
+From b1619a1627e4f83754c15a61f28381d5835ffb04 Mon Sep 17 00:00:00 2001
+From: xingguangcuican6666 <xingguangcuican666@foxmail.com>
+Date: Thu, 23 Oct 2025 19:40:31 +0800
+Subject: [PATCH 10/12] remove_set*id_used
+
+---
+ genisoimage/genisoimage.c | 18 +++++++++---------
+ readom/readom.c           | 18 +++++++++---------
+ wodim/wodim.c             | 18 +++++++++---------
+ 3 files changed, 27 insertions(+), 27 deletions(-)
+
+diff --git a/genisoimage/genisoimage.c b/genisoimage/genisoimage.c
+index 46998fc..4ace060 100644
+--- a/genisoimage/genisoimage.c
++++ b/genisoimage/genisoimage.c
+@@ -2660,15 +2660,15 @@ parse_input_files:
+ 		}
+ 	}
+ 	/* We don't need root privilleges anymore. */
+-#ifdef	HAVE_SETREUID
+-	if (setreuid(-1, getuid()) < 0)
+-#else
+-#ifdef	HAVE_SETEUID
+-	if (seteuid(getuid()) < 0)
+-#else
+-	if (setuid(getuid()) < 0)
+-#endif
+-#endif
++//#ifdef	HAVE_SETREUID
++//	if (setreuid(-1, getuid()) < 0)
++//#else
++//#ifdef	HAVE_SETEUID
++//	if (seteuid(getuid()) < 0)
++//#else
++//	if (setuid(getuid()) < 0)
++//#endif
++//#endif
+ #ifdef	USE_LIBSCHILY
+ 		comerr("Panic cannot set back effective uid.\n");
+ #else
+diff --git a/readom/readom.c b/readom/readom.c
+index d52fe5d..0deb93e 100644
+--- a/readom/readom.c
++++ b/readom/readom.c
+@@ -442,15 +442,15 @@ main(int argc, char *argv[])
+ 	/*
+ 	 * We don't need root privilleges anymore.
+ 	 */
+-#ifdef	HAVE_SETREUID
+-	if (setreuid(-1, getuid()) < 0)
+-#else
+-#ifdef	HAVE_SETEUID
+-	if (seteuid(getuid()) < 0)
+-#else
+-	if (setuid(getuid()) < 0)
+-#endif
+-#endif
++//#ifdef	HAVE_SETREUID
++//	if (setreuid(-1, getuid()) < 0)
++//#else
++//#ifdef	HAVE_SETEUID
++//	if (seteuid(getuid()) < 0)
++//#else
++//	if (setuid(getuid()) < 0)
++//#endif
++//#endif
+ 		comerr("Panic cannot set back effective uid.\n");
+ 
+ 	/* code to use SCG */
+diff --git a/wodim/wodim.c b/wodim/wodim.c
+index 7a54ccc..2e2605d 100644
+--- a/wodim/wodim.c
++++ b/wodim/wodim.c
+@@ -460,15 +460,15 @@ int main(int argc, char *argv[])
+ 	 */
+ 	if (geteuid() != getuid()) {	/* AIX does not like to do this */
+ 					/* If we are not root		*/
+-#ifdef	HAVE_SETREUID
+-		if (setreuid(-1, getuid()) < 0)
+-#else
+-#ifdef	HAVE_SETEUID
+-		if (seteuid(getuid()) < 0)
+-#else
+-		if (setuid(getuid()) < 0)
+-#endif
+-#endif
++//#ifdef	HAVE_SETREUID
++//		if (setreuid(-1, getuid()) < 0)
++//#else
++//#ifdef	HAVE_SETEUID
++//		if (seteuid(getuid()) < 0)
++//#else
++//		if (setuid(getuid()) < 0)
++//#endif
++//#endif
+ 			comerr("Panic cannot set back effective uid.\n");
+ 	}
+ 
+-- 
+2.51.1
+

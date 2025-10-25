@@ -1,0 +1,67 @@
+From 90505a33ca7d811f62896a817eb404bdf199b39d Mon Sep 17 00:00:00 2001
+From: xingguangcuican6666 <xingguangcuican666@foxmail.com>
+Date: Thu, 23 Oct 2025 20:06:33 +0800
+Subject: [PATCH 11/12] fix_comerr_problem
+
+---
+ genisoimage/genisoimage.c | 16 ++++++++--------
+ readom/readom.c           |  2 +-
+ wodim/wodim.c             |  2 +-
+ 3 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/genisoimage/genisoimage.c b/genisoimage/genisoimage.c
+index 4ace060..7675e22 100644
+--- a/genisoimage/genisoimage.c
++++ b/genisoimage/genisoimage.c
+@@ -2669,14 +2669,14 @@ parse_input_files:
+ //	if (setuid(getuid()) < 0)
+ //#endif
+ //#endif
+-#ifdef	USE_LIBSCHILY
+-		comerr("Panic cannot set back effective uid.\n");
+-#else
+-	{
+-		perror("Panic cannot set back effective uid.");
+-		exit(1);
+-	}
+-#endif
++//#ifdef	USE_LIBSCHILY
++//		comerr("Panic cannot set back effective uid.\n");
++//#else
++//	{
++//		perror("Panic cannot set back effective uid.");
++//		exit(1);
++//	}
++//#endif
+ 
+ 
+ #ifdef	no_more_needed
+diff --git a/readom/readom.c b/readom/readom.c
+index 0deb93e..a71c9a3 100644
+--- a/readom/readom.c
++++ b/readom/readom.c
+@@ -451,7 +451,7 @@ main(int argc, char *argv[])
+ //	if (setuid(getuid()) < 0)
+ //#endif
+ //#endif
+-		comerr("Panic cannot set back effective uid.\n");
++//		comerr("Panic cannot set back effective uid.\n");
+ 
+ 	/* code to use SCG */
+ 
+diff --git a/wodim/wodim.c b/wodim/wodim.c
+index 2e2605d..a41a44c 100644
+--- a/wodim/wodim.c
++++ b/wodim/wodim.c
+@@ -469,7 +469,7 @@ int main(int argc, char *argv[])
+ //		if (setuid(getuid()) < 0)
+ //#endif
+ //#endif
+-			comerr("Panic cannot set back effective uid.\n");
++//			comerr("Panic cannot set back effective uid.\n");
+ 	}
+ 
+ #ifdef __linux__
+-- 
+2.51.1
+
