@@ -1,0 +1,95 @@
+--- a/meson.options
++++ b/meson.options
+@@ -57,3 +57,9 @@
+   value: '',
+   description: 'The path to gjs'
+ )
++
++option('polkit',
++  type: 'boolean',
++  value: true,
++  description: 'Enable polkit support'
++)
+--- a/meson.build
++++ b/meson.build
+@@ -83,7 +83,11 @@
+ mtk_dep = dependency(mtk_pc, version: mutter_req)
+ cogl_dep = dependency(cogl_pc, version: mutter_req)
+ mutter_dep = dependency(libmutter_pc, version: mutter_req)
++if get_option('polkit')
+ polkit_dep = dependency('polkit-agent-1', version: polkit_req)
++else
++polkit_dep = dependency('', required : false)
++endif
+ schemas_dep = dependency('gsettings-desktop-schemas', version: schemas_req)
+ gnome_desktop_dep = dependency('gnome-desktop-4', version: gnome_desktop_req)
+ pango_dep = dependency('pango', version: pango_req)
+@@ -173,6 +177,7 @@
+           cc.has_function('fdwalk')
+ )
+ 
++cdata.set('HAVE_POLKIT_SUPPORT', get_option('polkit'))
+ polkit_has_autocleanup = cc.compiles(
+ '''
+   #define POLKIT_AGENT_I_KNOW_API_IS_SUBJECT_TO_CHANGE
+--- a/config.h.meson
++++ b/config.h.meson
+@@ -45,3 +45,6 @@
+ 
+ /* Whether GNOME Shell is built with X11 clients support */
+ #mesondefine HAVE_X11_CLIENT
++
++/* Whether GNOME Shell is built with polkit support */
++#mesondefine HAVE_POLKIT_SUPPORT
+--- a/src/shell-polkit-authentication-agent.h
++++ b/src/shell-polkit-authentication-agent.h
+@@ -8,6 +8,9 @@
+ 
+ #pragma once
+ 
++#include "config.h"
++#ifdef HAVE_POLKIT_SUPPORT
++
+ #define POLKIT_AGENT_I_KNOW_API_IS_SUBJECT_TO_CHANGE
+ #include <polkitagent/polkitagent.h>
+ #include <glib-object.h>
+@@ -32,3 +35,5 @@
+ void                            shell_polkit_authentication_agent_unregister (ShellPolkitAuthenticationAgent *agent);
+ 
+ G_END_DECLS
++
++#endif
+--- a/src/shell-polkit-authentication-agent.c
++++ b/src/shell-polkit-authentication-agent.c
+@@ -8,6 +8,8 @@
+ 
+ #include "config.h"
+ 
++#ifdef HAVE_POLKIT_SUPPORT
++
+ #include <pwd.h>
+ 
+ #include "shell-polkit-authentication-agent.h"
+@@ -427,3 +429,5 @@
+ 
+   auth_request_complete (agent->current_request, dismissed);
+ }
++
++#endif
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -257,10 +257,13 @@
+   'Clutter-@0@'.format(mutter_api_version),
+   'Meta-@0@'.format(mutter_api_version),
+   'Gcr-4',
+-  'PolkitAgent-1.0',
+   'GdkPixbuf-2.0'
+ ]
+ 
++if get_option('polkit')
++  libshell_gir_includes += ['PolkitAgent-1.0']
++endif
++
+ if have_networkmanager
+   libshell_gir_includes += ['NM-1.0']
+ endif

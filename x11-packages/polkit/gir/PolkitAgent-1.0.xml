@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<dump>
+  <flags name="PolkitAgentRegisterFlags" get-type="polkit_agent_register_flags_get_type">
+    <member name="POLKIT_AGENT_REGISTER_FLAGS_NONE" nick="none" value="0"/>
+    <member name="POLKIT_AGENT_REGISTER_FLAGS_RUN_IN_THREAD" nick="run-in-thread" value="1"/>
+  </flags>
+  <class name="PolkitAgentListener" get-type="polkit_agent_listener_get_type" parents="GObject" abstract="1">
+  </class>
+  <class name="PolkitAgentTextListener" get-type="polkit_agent_text_listener_get_type" parents="PolkitAgentListener,GObject">
+    <implements name="GInitable"/>
+    <property name="use-color" type="gboolean" flags="11" default-value="TRUE"/>
+    <property name="use-alternate-buffer" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="delay" type="guint" flags="11" default-value="1"/>
+    <signal name="tty-attrs-changed" return="void" when="last" no-recurse="1" no-hooks="1">
+      <param type="gboolean"/>
+    </signal>
+  </class>
+  <class name="PolkitAgentSession" get-type="polkit_agent_session_get_type" parents="GObject">
+    <property name="identity" type="PolkitIdentity" flags="235"/>
+    <property name="cookie" type="gchararray" flags="235" default-value="NULL"/>
+    <signal name="request" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="show-info" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="show-error" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="completed" return="void" when="last">
+      <param type="gboolean"/>
+    </signal>
+  </class>
+</dump>
