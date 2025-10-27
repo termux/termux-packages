@@ -1,0 +1,30 @@
+From c483abd7fae24a152b0ba7edb81c7c5af4a1c4db Mon Sep 17 00:00:00 2001
+From: Jimi Huotari <chiitoo@gentoo.org>
+Date: Sat, 28 Jun 2025 16:46:55 +0300
+Subject: [PATCH] cmake: fix build with Qt 6.10
+
+The 'Qt6FooPrivate' targets have been split into separate CMake files
+in Qt 6.9, and require a 'find_package(Qt6FooPrivate)' call starting
+with Qt 6.10.
+
+See also: https://bugreports.qt.io/browse/QTBUG-87776
+---
+ CMakeLists.txt | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 241166ad4..ecb283c82 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -42,6 +42,11 @@ find_package(lxqt-menu-data ${LXQT_MINIMUM_VERSION} REQUIRED)
+ 
+ find_package(LayerShellQt REQUIRED)
+ 
++if (Qt6Gui_VERSION VERSION_GREATER_EQUAL "6.10.0")
++    find_package(Qt6GuiPrivate REQUIRED)
++    find_package(Qt6WaylandClientPrivate REQUIRED)
++endif()
++
+ # Patch Version
+ set(LXQT_PANEL_PATCH_VERSION 2)
+ set(LXQT_PANEL_VERSION ${LXQT_MAJOR_VERSION}.${LXQT_MINOR_VERSION}.${LXQT_PANEL_PATCH_VERSION})
