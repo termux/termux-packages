@@ -1,0 +1,25 @@
+From e8f2403e39703b5126e59dac1d50aba7e39ea0b7 Mon Sep 17 00:00:00 2001
+From: xingguangcuican6666 <xingguangcuican666@foxmail.com>
+Date: Sun, 26 Oct 2025 12:31:35 +0800
+Subject: [PATCH 12/13] fix_building_problem
+
+---
+ CMakeLists.txt | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7b21bde..79c6b9a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,5 +1,8 @@
+ cmake_minimum_required(VERSION 3.10)
+ PROJECT (cdrkit C)
++if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_ANDROID_ARCH)
++    link_libraries(android-glob android-utimes)
++endif()
+ add_definitions("-D__THROW=")
+ add_definitions("-UTHREADED_CHECKSUMS")
+ SUBDIRS(include genisoimage wodim libedc libhfs_iso libparanoia icedax libusal librols libunls readom netscsid 3rd-party/dirsplit)
+-- 
+2.51.1
+
