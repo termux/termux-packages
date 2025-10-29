@@ -2,17 +2,16 @@ TERMUX_PKG_HOMEPAGE=https://deno.land/
 TERMUX_PKG_DESCRIPTION="A modern runtime for JavaScript and TypeScript"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION=1:2.5.4
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=1:2.5.5
 TERMUX_PKG_SRCURL=(
 	https://github.com/denoland/deno/releases/download/v${TERMUX_PKG_VERSION:2}/deno_src.tar.gz
 	https://github.com/termux/deno-snapshot/releases/download/v${TERMUX_PKG_VERSION:2}/deno-snapshot-aarch64-linux-android-${TERMUX_PKG_VERSION:2}.tar.bz2
 	https://github.com/termux/deno-snapshot/releases/download/v${TERMUX_PKG_VERSION:2}/deno-snapshot-x86_64-linux-android-${TERMUX_PKG_VERSION:2}.tar.bz2
 )
 TERMUX_PKG_SHA256=(
-	d92d0c2b85f016769dcc2f0b86ae03861d2303bb165aac4c7911559c052301ca
-	d77522c04c9ffa8b88ba70a87d90b6dbe4892fcc5b42f6af37397233993b8ea4
-	44948563e985fee3b8277da80fbe018f0df33df332e6755224f871ccc4de9053
+	900be91d2a925a293915b454ec24e94188ce14c68fb04916d9a00e2e2f6d5a89
+	b86e78e863edf988ba10b5335e9027aef3fb90a22a9c9066ac1449778bf7b483
+	3d71a4d51fa18801a9fa18e1008975a350f2adfb6721ae1d018415d1373a4f1d
 )
 TERMUX_PKG_DEPENDS="libandroid-stub, libffi, libsqlite, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
