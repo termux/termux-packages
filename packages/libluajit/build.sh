@@ -12,6 +12,33 @@ TERMUX_PKG_REPLACES="libluajit-dev"
 TERMUX_PKG_EXTRA_MAKE_ARGS="amalg PREFIX=$TERMUX_PREFIX"
 TERMUX_PKG_BUILD_IN_SRC=true
 
+termux_pkg_auto_update() {
+	local latest_version
+	# Get the latest version from Arch Linux's API.
+	# Since this project doesn't do release tags,
+	# Repology doesn't return a meaningfully interpretable latest version.
+	# We should also identify ourselves via 'User-Agent' as a courtesy.
+	latest_version=$(curl -s \
+	-H 'User-Agent: Termux update checker 1.0 (github.com/termux/termux-packages)' \
+	"https://archlinux.org/packages/search/json/?name=luajit" \
+	| jq -r '.results[0].pkgver')
+
+	local current_version="${TERMUX_PKG_VERSION#*:}"
+	if [[ "$current_version" == "$latest_version" ]]; then
+		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+		return
+	fi
+
+	termux_pkg_upgrade_version "${latest_version}"
+	# If this isn't a dry-run add a human readable (ISO 8601)
+	# version of the timestamp as a comment to the version.
+	if [[ "${BUILD_PACKAGES}" != "false" ]]; then
+		sed \
+			-e "s|^\(TERMUX_PKG_VERSION=.*\"\).*|\1 # $(date -d "@${latest_version:4}" --utc '+%Y-%m-%dT%H:%M:%SZ')|" \
+			-i "$TERMUX_PKG_BUILDER_DIR/build.sh"
+	fi
+}
+
 termux_step_post_get_source() {
 	# Do the same as e.g. Arch linux is doing:
 	# The patch version is the timestamp of the above git commit, obtain via `git log`
