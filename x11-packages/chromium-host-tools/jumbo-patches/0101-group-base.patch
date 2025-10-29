@@ -7,6 +7,7 @@ Enable jumbo build for the following component(s)/source_set(s):
 
 - //base:base
 - //base:i18n
+# - //cc/slim:slim # Used in Android
 
 Enable jumbo build for the following template(s):
 
@@ -23,17 +24,16 @@ Enable jumbo build for the following template(s):
  base/task/single_thread_task_runner.cc            |  4 ++++
  base/threading/platform_thread_metrics_linux.cc   |  4 ++++
  cc/cc.gni                                         |  5 +++--
- components/viz/service/BUILD.gn                   |  8 ++++++++
  .../viz/service/display/occlusion_culler.cc       |  4 ++++
  .../service/display/overlay_candidate_factory.cc  |  4 ++++
  components/viz/service/display/skia_renderer.cc   |  4 ++++
  .../viz/service/display/software_renderer.cc      |  4 ++++
  .../service/frame_sinks/frame_sink_manager_impl.h |  3 +++
  components/viz/viz.gni                            |  7 ++++---
- 14 files changed, 75 insertions(+), 9 deletions(-)
+ 13 files changed, 67 insertions(+), 9 deletions(-)
 
 diff --git a/base/BUILD.gn b/base/BUILD.gn
-index c835d9ea23..f6f433ab46 100644
+index f73ed42f84..f9e71f34c7 100644
 --- a/base/BUILD.gn
 +++ b/base/BUILD.gn
 @@ -28,6 +28,7 @@ import("//build/config/cast.gni")
@@ -44,7 +44,7 @@ index c835d9ea23..f6f433ab46 100644
  import("//build/config/logging.gni")
  import("//build/config/profiling/profiling.gni")
  import("//build/config/rust.gni")
-@@ -169,7 +170,7 @@ use_epoll = is_linux || is_chromeos || is_android
+@@ -173,7 +174,7 @@ use_epoll = is_linux || is_chromeos || is_android
  # base compilation units to be linked in where they wouldn't have otherwise.
  # This does not include test code (test support and anything in the test
  # directory) which should use source_set as is recommended for GN targets).
@@ -53,7 +53,7 @@ index c835d9ea23..f6f433ab46 100644
    sources = [
      "allocator/allocator_check.cc",
      "allocator/allocator_check.h",
-@@ -996,6 +997,10 @@ component("base") {
+@@ -985,6 +986,10 @@ component("base") {
      ]
    }
  
@@ -64,7 +64,7 @@ index c835d9ea23..f6f433ab46 100644
    if (is_linux || is_chromeos) {
      sources += [
        "debug/proc_maps_linux.cc",
-@@ -1015,6 +1020,7 @@ component("base") {
+@@ -1004,6 +1009,7 @@ component("base") {
        "threading/thread_type_delegate.cc",
        "threading/thread_type_delegate.h",
      ]
@@ -72,7 +72,7 @@ index c835d9ea23..f6f433ab46 100644
    }
  
    if (is_chromeos) {
-@@ -1946,6 +1952,11 @@ component("base") {
+@@ -1944,6 +1950,11 @@ component("base") {
        "win/wrapped_window_proc.h",
      ]
  
@@ -84,7 +84,7 @@ index c835d9ea23..f6f433ab46 100644
      deps += [ "//base/win:base_win_buildflags" ]
  
      if (com_init_check_hook_disabled) {
-@@ -2863,7 +2874,7 @@ if (enable_rust_translit) {
+@@ -2838,7 +2849,7 @@ if (enable_rust_translit) {
    }
  }
  
@@ -94,7 +94,7 @@ index c835d9ea23..f6f433ab46 100644
    sources = [
      "i18n/base_i18n_export.h",
 diff --git a/base/sampling_heap_profiler/poisson_allocation_sampler.cc b/base/sampling_heap_profiler/poisson_allocation_sampler.cc
-index 618a058186..0cd60703b0 100644
+index c093e98ee2..2f5a25fb44 100644
 --- a/base/sampling_heap_profiler/poisson_allocation_sampler.cc
 +++ b/base/sampling_heap_profiler/poisson_allocation_sampler.cc
 @@ -20,6 +20,8 @@
@@ -106,7 +106,7 @@ index 618a058186..0cd60703b0 100644
  namespace base {
  
  namespace {
-@@ -63,7 +65,7 @@ struct ThreadLocalData {
+@@ -65,7 +67,7 @@ struct ThreadLocalData {
  // Returns an object storing thread-local state. This does NOT use
  // base::ThreadLocalStorage, so it's safe to call from hooks in the
  // base::ThreadLocalStorage implementation.
@@ -115,7 +115,7 @@ index 618a058186..0cd60703b0 100644
  #if USE_LOCAL_TLS_EMULATION()
    // If available, use ThreadLocalStorage to bypass dependencies introduced by
    // Clang's implementation of thread_local.
-@@ -99,6 +101,8 @@ ThreadLocalData* GetThreadLocalData() {
+@@ -101,6 +103,8 @@ ThreadLocalData* GetThreadLocalData() {
  
  }  // namespace
  
@@ -124,7 +124,7 @@ index 618a058186..0cd60703b0 100644
  PoissonAllocationSamplerStats::PoissonAllocationSamplerStats(
      size_t address_cache_hits,
      size_t address_cache_misses,
-@@ -503,3 +507,6 @@ void PoissonAllocationSampler::RemoveSamplesObserver(
+@@ -505,3 +509,6 @@ void PoissonAllocationSampler::RemoveSamplesObserver(
  }
  
  }  // namespace base
@@ -189,7 +189,7 @@ index 16bd753e47..d6c6178311 100644
 +
 +#undef current_default_handle
 diff --git a/base/task/single_thread_task_runner.cc b/base/task/single_thread_task_runner.cc
-index 514c9ff38b..911c17b1e8 100644
+index 651267a81a..179bdf2010 100644
 --- a/base/task/single_thread_task_runner.cc
 +++ b/base/task/single_thread_task_runner.cc
 @@ -15,6 +15,8 @@
@@ -201,8 +201,8 @@ index 514c9ff38b..911c17b1e8 100644
  namespace base {
  
  namespace {
-@@ -148,3 +150,5 @@ SingleThreadTaskRunner::ScopedCanOverrideMainThreadDefaultHandle::
- }
+@@ -100,3 +102,5 @@ SingleThreadTaskRunner::CurrentHandleOverrideForTesting::
+     ~CurrentHandleOverrideForTesting() = default;
  
  }  // namespace base
 +
@@ -227,7 +227,7 @@ index 13f0eb30a8..3935f876c5 100644
 +
 +#undef ParseTotalCPUTimeFromStats
 diff --git a/cc/cc.gni b/cc/cc.gni
-index 4ba9871f4a..2aaa530b47 100644
+index 090420c902..6b0e76bf21 100644
 --- a/cc/cc.gni
 +++ b/cc/cc.gni
 @@ -2,6 +2,7 @@
@@ -256,27 +256,8 @@ index 4ba9871f4a..2aaa530b47 100644
      forward_variables_from(invoker, "*", [ "configs" ])
      if (defined(invoker.configs)) {
        configs += invoker.configs
-diff --git a/components/viz/service/BUILD.gn b/components/viz/service/BUILD.gn
-index 4017fef63c..9731037329 100644
---- a/components/viz/service/BUILD.gn
-+++ b/components/viz/service/BUILD.gn
-@@ -273,6 +273,14 @@ viz_component("service") {
-     "transitions/transferable_resource_tracker.cc",
-     "transitions/transferable_resource_tracker.h",
-   ]
-+  jumbo_excluded_sources = [
-+    # `gpu/GLES2/gl2chromium_autogen.h` and `gpu/GLES2/gl2chromium.h` has macro confliction,
-+    #  and it is included by `layers/layer_context_impl.cc`
-+    # - components/viz/client/client_resource_provider.h
-+    # - third_party/khronos/GLES2/gl2.h
-+    # - gpu/GLES2/gl2chromium.h
-+    "layers/layer_context_impl.cc"
-+  ]
- 
-   defines = [ "VIZ_SERVICE_IMPLEMENTATION" ]
- 
 diff --git a/components/viz/service/display/occlusion_culler.cc b/components/viz/service/display/occlusion_culler.cc
-index e5c5ff2dc5..b59e0dff34 100644
+index 10d1bba2ce..b895d3a63f 100644
 --- a/components/viz/service/display/occlusion_culler.cc
 +++ b/components/viz/service/display/occlusion_culler.cc
 @@ -26,6 +26,8 @@
@@ -288,7 +269,7 @@ index e5c5ff2dc5..b59e0dff34 100644
  namespace viz {
  namespace {
  
-@@ -554,3 +556,5 @@ bool OcclusionCuller::CanSplitDrawQuad(
+@@ -536,3 +538,5 @@ bool OcclusionCuller::CanSplitDrawQuad(
  }
  
  }  // namespace viz
@@ -314,7 +295,7 @@ index 898652d4d8..696a784ff1 100644
 +
 +#undef kEpsilon
 diff --git a/components/viz/service/display/skia_renderer.cc b/components/viz/service/display/skia_renderer.cc
-index b1b8148ec5..7fa94567f2 100644
+index 16de85a38b..2e699dd26e 100644
 --- a/components/viz/service/display/skia_renderer.cc
 +++ b/components/viz/service/display/skia_renderer.cc
 @@ -110,6 +110,8 @@
@@ -326,17 +307,17 @@ index b1b8148ec5..7fa94567f2 100644
  namespace viz {
  
  namespace {
-@@ -4503,3 +4505,5 @@ bool SkiaRenderer::OverlayLockKeyEqual::operator()(
+@@ -4500,3 +4502,5 @@ bool SkiaRenderer::OverlayLockKeyEqual::operator()(
  #endif
  
  }  // namespace viz
 +
 +#undef MakeOpacityFilter
 diff --git a/components/viz/service/display/software_renderer.cc b/components/viz/service/display/software_renderer.cc
-index d477b64c5e..e100dcc393 100644
+index 2d952f903f..fab2724532 100644
 --- a/components/viz/service/display/software_renderer.cc
 +++ b/components/viz/service/display/software_renderer.cc
-@@ -54,6 +54,8 @@
+@@ -53,6 +53,8 @@
  #include "ui/gfx/geometry/skia_conversions.h"
  #include "ui/gfx/geometry/transform.h"
  
@@ -352,7 +333,7 @@ index d477b64c5e..e100dcc393 100644
 +
 +#undef MakeOpacityFilter
 diff --git a/components/viz/service/frame_sinks/frame_sink_manager_impl.h b/components/viz/service/frame_sinks/frame_sink_manager_impl.h
-index 02582cf3ec..ea0f093544 100644
+index 3ebefa4b63..1350f5c75f 100644
 --- a/components/viz/service/frame_sinks/frame_sink_manager_impl.h
 +++ b/components/viz/service/frame_sinks/frame_sink_manager_impl.h
 @@ -5,6 +5,9 @@
@@ -366,7 +347,7 @@ index 02582cf3ec..ea0f093544 100644
  
  #include <list>
 diff --git a/components/viz/viz.gni b/components/viz/viz.gni
-index 38764bf6c4..970db42556 100644
+index 191ddca368..a4008193b5 100644
 --- a/components/viz/viz.gni
 +++ b/components/viz/viz.gni
 @@ -2,6 +2,7 @@
@@ -386,7 +367,7 @@ index 38764bf6c4..970db42556 100644
      forward_variables_from(invoker, "*", [ "configs" ])
      if (defined(invoker.configs)) {
        configs += invoker.configs
-@@ -48,7 +49,7 @@ template("viz_source_set") {
+@@ -44,7 +45,7 @@ template("viz_source_set") {
  }
  
  template("viz_component") {
@@ -395,7 +376,7 @@ index 38764bf6c4..970db42556 100644
      forward_variables_from(invoker, "*", [ "configs" ])
      if (defined(invoker.configs)) {
        configs += invoker.configs
-@@ -59,7 +60,7 @@ template("viz_component") {
+@@ -55,7 +56,7 @@ template("viz_component") {
  }
  
  template("viz_static_library") {
@@ -404,3 +385,22 @@ index 38764bf6c4..970db42556 100644
      forward_variables_from(invoker, "*", [ "configs" ])
      if (defined(invoker.configs)) {
        configs += invoker.configs
+diff --git a/components/viz/service/BUILD.gn b/components/viz/service/BUILD.gn
+index 9f18a00af5..870c7dbae4 100644
+--- a/components/viz/service/BUILD.gn
++++ b/components/viz/service/BUILD.gn
+@@ -273,6 +273,14 @@ viz_component("service") {
+     "transitions/transferable_resource_tracker.cc",
+     "transitions/transferable_resource_tracker.h",
+   ]
++  jumbo_excluded_sources = [
++    # `gpu/GLES2/gl2chromium_autogen.h` and `gpu/GLES2/gl2chromium.h` has macro confliction,
++    #  and it is included by `layers/layer_context_impl.cc`
++    # - components/viz/client/client_resource_provider.h
++    # - third_party/khronos/GLES2/gl2.h
++    # - gpu/GLES2/gl2chromium.h
++    "layers/layer_context_impl.cc"
++  ]
+ 
+   defines = [ "VIZ_SERVICE_IMPLEMENTATION" ]
+ 

@@ -155,10 +155,11 @@ Enable jumbo build for the following component(s)/source_set(s):
  ui/snapshot/BUILD.gn                              |  5 +++--
  ui/surface/BUILD.gn                               |  3 ++-
  ui/touch_selection/BUILD.gn                       |  3 ++-
- ui/views/BUILD.gn                                 |  7 ++++---
+ ui/views/BUILD.gn                                 | 11 ++++++++---
  .../view_ax_platform_node_delegate.cc             |  2 +-
  ui/views/animation/pulsing_ink_drop_mask.cc       |  6 ++++++
  ui/views/animation/pulsing_path_ink_drop_mask.cc  |  6 ++++++
+ ui/views/border.cc                                |  2 +-
  ui/views/bubble/bubble_frame_view.cc              |  2 +-
  ui/views/controls/webview/BUILD.gn                |  3 ++-
  ui/views/examples/BUILD.gn                        |  5 +++--
@@ -168,10 +169,10 @@ Enable jumbo build for the following component(s)/source_set(s):
  ui/web_dialogs/BUILD.gn                           |  6 ++++--
  ui/wm/BUILD.gn                                    |  5 +++--
  ui/wm/public/BUILD.gn                             |  3 ++-
- 80 files changed, 287 insertions(+), 109 deletions(-)
+ 81 files changed, 292 insertions(+), 110 deletions(-)
 
 diff --git a/ui/accessibility/BUILD.gn b/ui/accessibility/BUILD.gn
-index 96cea51f84..89b8fc7b80 100644
+index 3c7b11706a..1e6453522b 100644
 --- a/ui/accessibility/BUILD.gn
 +++ b/ui/accessibility/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -509,7 +510,7 @@ index 8972a21f80..503331ceda 100644
    defines = [ "IS_UI_BASE_IME_WIN_IMPL" ]
  
 diff --git a/ui/base/prediction/BUILD.gn b/ui/base/prediction/BUILD.gn
-index 5fc0bd1775..1200ca52a5 100644
+index ed391d69a3..f8a05f3818 100644
 --- a/ui/base/prediction/BUILD.gn
 +++ b/ui/base/prediction/BUILD.gn
 @@ -2,7 +2,9 @@
@@ -708,7 +709,7 @@ index f1ed7c7da8..5cf86b05b1 100644
    sources = [
      "test/begin_main_frame_waiter.cc",
 diff --git a/ui/display/BUILD.gn b/ui/display/BUILD.gn
-index 5c78ec2621..8818a31ace 100644
+index ca9b2b6f9a..ff39e7d684 100644
 --- a/ui/display/BUILD.gn
 +++ b/ui/display/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -728,7 +729,7 @@ index 5c78ec2621..8818a31ace 100644
    sources = [
      "display.cc",
      "display.h",
-@@ -181,7 +182,7 @@ if (is_chromeos) {
+@@ -183,7 +184,7 @@ if (is_chromeos) {
    }
  }
  
@@ -788,7 +789,7 @@ index cfb992fb9e..fb41100de8 100644
    sources = [
      "display_util.cc",
 diff --git a/ui/events/BUILD.gn b/ui/events/BUILD.gn
-index 0d27e49b24..96371b43d4 100644
+index b48f9cf24a..554eff5943 100644
 --- a/ui/events/BUILD.gn
 +++ b/ui/events/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -817,7 +818,7 @@ index 0d27e49b24..96371b43d4 100644
    sources = [
      "base_event_utils.cc",
      "base_event_utils.h",
-@@ -232,7 +233,7 @@ component("events_base") {
+@@ -230,7 +231,7 @@ component("events_base") {
    }
  }
  
@@ -826,7 +827,7 @@ index 0d27e49b24..96371b43d4 100644
    public = [
      "cocoa/cocoa_event_utils.h",
      "event.h",
-@@ -452,7 +453,7 @@ component("events") {
+@@ -450,7 +451,7 @@ component("events") {
    configs += [ "//build/config/compiler:no_exit_time_destructors" ]
  }
  
@@ -835,7 +836,7 @@ index 0d27e49b24..96371b43d4 100644
    public = [ "keyboard_hook.h" ]
  
    defines = [ "IS_KEYBOARD_HOOK_IMPL" ]
-@@ -506,7 +507,7 @@ component("keyboard_hook") {
+@@ -504,7 +505,7 @@ component("keyboard_hook") {
    }
  }
  
@@ -844,7 +845,7 @@ index 0d27e49b24..96371b43d4 100644
    sources = [
      "gesture_detection/filtered_gesture_provider.cc",
      "gesture_detection/filtered_gesture_provider.h",
-@@ -564,7 +565,7 @@ component("gesture_detection") {
+@@ -562,7 +563,7 @@ component("gesture_detection") {
    }
  }
  
@@ -853,7 +854,7 @@ index 0d27e49b24..96371b43d4 100644
    sources = [
      "velocity_tracker/bitset_32.h",
      "velocity_tracker/motion_event.cc",
-@@ -587,7 +588,7 @@ component("velocity_tracker") {
+@@ -585,7 +586,7 @@ component("velocity_tracker") {
    ]
  }
  
@@ -888,7 +889,7 @@ index 82effa0b84..3a6d0dfbd9 100644
      "blink_event_util.cc",
      "blink_event_util.h",
 diff --git a/ui/events/devices/BUILD.gn b/ui/events/devices/BUILD.gn
-index 765acaf84e..e7de1c8032 100644
+index 31e12b0195..e62ccdbd80 100644
 --- a/ui/events/devices/BUILD.gn
 +++ b/ui/events/devices/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1026,7 +1027,7 @@ index c8abb820bd..7028f735b4 100644
  
    sources = [
 diff --git a/ui/gfx/BUILD.gn b/ui/gfx/BUILD.gn
-index 6f09aea6a4..d1bc70c97b 100644
+index f6a40abfe9..8c4f0f710d 100644
 --- a/ui/gfx/BUILD.gn
 +++ b/ui/gfx/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1064,7 +1065,7 @@ index 6f09aea6a4..d1bc70c97b 100644
    sources = [
      "break_list.h",
      "color_analysis.cc",
-@@ -452,7 +453,7 @@ component("gfx") {
+@@ -450,7 +451,7 @@ component("gfx") {
    }
  }
  
@@ -1073,7 +1074,7 @@ index 6f09aea6a4..d1bc70c97b 100644
    sources = [
      "color_space.cc",
      "color_space.h",
-@@ -599,7 +600,7 @@ group("memory_buffer") {
+@@ -593,7 +594,7 @@ group("memory_buffer") {
  }
  
  # Cannot be a static_library in component builds due to exported functions
@@ -1082,7 +1083,7 @@ index 6f09aea6a4..d1bc70c97b 100644
    visibility = [ ":*" ]  # Depend on through ":memory_buffer".
  
    # TODO(brettw) refactor this so these sources are in a coherent directory
-@@ -696,7 +697,7 @@ source_set("memory_buffer_sources") {
+@@ -690,7 +691,7 @@ source_set("memory_buffer_sources") {
  }
  
  # TODO(ccameron): This can be moved into a separate source_set.
@@ -1091,7 +1092,7 @@ index 6f09aea6a4..d1bc70c97b 100644
    sources = [
      "switches.cc",
      "switches.h",
-@@ -708,7 +709,7 @@ component("gfx_switches") {
+@@ -702,7 +703,7 @@ component("gfx_switches") {
    deps = [ "//base" ]
  }
  
@@ -1122,7 +1123,7 @@ index a8ee2ddc03..24b9dc8fd3 100644
      "animation.cc",
      "animation.h",
 diff --git a/ui/gfx/codec/BUILD.gn b/ui/gfx/codec/BUILD.gn
-index 327eb6d2d0..def3b7850b 100644
+index 9bb4c91504..0c751935ea 100644
 --- a/ui/gfx/codec/BUILD.gn
 +++ b/ui/gfx/codec/BUILD.gn
 @@ -3,10 +3,11 @@
@@ -1158,10 +1159,10 @@ index 6b233181ea..ef823b815d 100644
 +
 +#undef PreparationOutput
 diff --git a/ui/gfx/codec/png_codec.cc b/ui/gfx/codec/png_codec.cc
-index b798d743a2..015025cb29 100644
+index 94d5c65d60..2e0f5db620 100644
 --- a/ui/gfx/codec/png_codec.cc
 +++ b/ui/gfx/codec/png_codec.cc
-@@ -24,6 +24,8 @@
+@@ -20,6 +20,8 @@
  #include "ui/gfx/codec/vector_wstream.h"
  #include "ui/gfx/geometry/size.h"
  
@@ -1170,7 +1171,7 @@ index b798d743a2..015025cb29 100644
  namespace gfx {
  
  PNGCodec::DecodeOutput::DecodeOutput() = default;
-@@ -316,3 +318,5 @@ PNGCodec::Comment::Comment(const std::string& k, const std::string& t)
+@@ -301,3 +303,5 @@ PNGCodec::Comment::Comment(const std::string& k, const std::string& t)
  PNGCodec::Comment::~Comment() = default;
  
  }  // namespace gfx
@@ -1473,7 +1474,7 @@ index 8ecd6bdc7e..377240cc6d 100644
  
    public = [
 diff --git a/ui/gtk/BUILD.gn b/ui/gtk/BUILD.gn
-index 799ce76a32..5cab48bf96 100644
+index 967f63763b..08bcd53160 100644
 --- a/ui/gtk/BUILD.gn
 +++ b/ui/gtk/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1496,7 +1497,7 @@ index 799ce76a32..5cab48bf96 100644
    sources = [
      "gtk_color_mixers.cc",
      "gtk_color_mixers.h",
-@@ -100,6 +100,7 @@ component("gtk") {
+@@ -102,6 +102,7 @@ component("gtk") {
      "window_frame_provider_gtk.cc",
      "window_frame_provider_gtk.h",
    ]
@@ -1504,7 +1505,7 @@ index 799ce76a32..5cab48bf96 100644
  
    if (enable_printing) {
      sources += [
-@@ -165,6 +166,11 @@ component("gtk") {
+@@ -168,6 +169,11 @@ component("gtk") {
        "x/gtk_ui_platform_x11.cc",
        "x/gtk_ui_platform_x11.h",
      ]
@@ -1517,7 +1518,7 @@ index 799ce76a32..5cab48bf96 100644
        "//ui/base/x",
        "//ui/events/platform/x11",
 diff --git a/ui/latency/BUILD.gn b/ui/latency/BUILD.gn
-index 775f1cb8d0..a3e9b48f63 100644
+index 19184a5b6c..2df6fbd33b 100644
 --- a/ui/latency/BUILD.gn
 +++ b/ui/latency/BUILD.gn
 @@ -2,9 +2,10 @@
@@ -1542,7 +1543,7 @@ index 775f1cb8d0..a3e9b48f63 100644
    sources = [ "latency_info_test_support.cc" ]
  
 diff --git a/ui/message_center/BUILD.gn b/ui/message_center/BUILD.gn
-index d081004ac9..0e5650ce0b 100644
+index 3047e2c9da..2e8b143de3 100644
 --- a/ui/message_center/BUILD.gn
 +++ b/ui/message_center/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1580,7 +1581,7 @@ index be78eb231f..2bbfee8e3b 100644
  
    sources = [
 diff --git a/ui/native_theme/BUILD.gn b/ui/native_theme/BUILD.gn
-index 3a0957123e..4fb8439039 100644
+index 0f0cfc2920..539b257111 100644
 --- a/ui/native_theme/BUILD.gn
 +++ b/ui/native_theme/BUILD.gn
 @@ -2,10 +2,11 @@
@@ -1597,7 +1598,7 @@ index 3a0957123e..4fb8439039 100644
      "caption_style.cc",
      "caption_style.h",
 diff --git a/ui/ozone/BUILD.gn b/ui/ozone/BUILD.gn
-index 636e630ec8..bafb45528a 100644
+index 5ec68d1ff7..19fdbd21be 100644
 --- a/ui/ozone/BUILD.gn
 +++ b/ui/ozone/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1617,7 +1618,7 @@ index 636e630ec8..bafb45528a 100644
    sources = [
      "public/gl_ozone.h",
      "public/gpu_platform_support_host.cc",
-@@ -279,7 +280,7 @@ source_set("ozone_switches") {
+@@ -280,7 +281,7 @@ source_set("ozone_switches") {
    ]
  }
  
@@ -1626,7 +1627,7 @@ index 636e630ec8..bafb45528a 100644
    visibility = []
    visibility = [ "*" ]
    public_deps = [ ":platform" ]
-@@ -296,7 +297,7 @@ source_set("drm_modifiers_filter") {
+@@ -297,7 +298,7 @@ source_set("drm_modifiers_filter") {
    visibility += [ "//gpu/vulkan" ]
  }
  
@@ -1635,7 +1636,7 @@ index 636e630ec8..bafb45528a 100644
    testonly = true
  
    sources = [
-@@ -319,7 +320,7 @@ source_set("test_support_internal") {
+@@ -320,7 +321,7 @@ source_set("test_support_internal") {
    public_deps = [ "//base/test:test_support" ]
  }
  
@@ -1644,7 +1645,7 @@ index 636e630ec8..bafb45528a 100644
    visibility = []
    visibility = [ "//ui/views:test_support" ]
  
-@@ -355,7 +356,7 @@ source_set("ozone_interactive_ui_tests") {
+@@ -356,7 +357,7 @@ source_set("ozone_interactive_ui_tests") {
    deps = ozone_platform_interactive_ui_tests_sources
  }
  
@@ -1796,7 +1797,7 @@ index 5043429e94..83a1accb6f 100644
  
    sources = [
 diff --git a/ui/views/BUILD.gn b/ui/views/BUILD.gn
-index a7ba817422..92e96c41e4 100644
+index 95a2d5d04a..47b61bb43f 100644
 --- a/ui/views/BUILD.gn
 +++ b/ui/views/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -1816,7 +1817,18 @@ index a7ba817422..92e96c41e4 100644
    all_dependent_configs = [ ":flags" ]
  
    public = [
-@@ -976,7 +977,7 @@ component("views") {
+@@ -547,6 +548,10 @@ component("views") {
+     "window/window_shape.cc",
+     "windows_stationarity_monitor.cc",
+   ]
++  jumbo_excluded_sources = [
++    # explicit specialization of 'GetProperty<views::FocusManager *>' after instantiation
++    "view_class_properties.cc",
++  ]
+ 
+   # Other targets in this file (e.g. tests) get access to the internal headers.
+   friend = [ ":*" ]
+@@ -978,7 +983,7 @@ component("views") {
  }
  
  if (is_win || is_mac || is_linux || is_chromeos) {
@@ -1825,7 +1837,7 @@ index a7ba817422..92e96c41e4 100644
      testonly = true
      sources = [
        "test/view_skia_gold_pixel_diff.cc",
-@@ -995,7 +996,7 @@ if (is_win || is_mac || is_linux || is_chromeos) {
+@@ -997,7 +1002,7 @@ if (is_win || is_mac || is_linux || is_chromeos) {
    }
  }
  
@@ -1889,11 +1901,24 @@ index f1ce31754a..4376f21dd5 100644
 +
 +#undef kFeaturePromoPulseDuration
 +#undef kFeaturePromoPulseInsetDip
+diff --git a/ui/views/border.cc b/ui/views/border.cc
+index 2aafa2e12e..f5df5f6562 100644
+--- a/ui/views/border.cc
++++ b/ui/views/border.cc
+@@ -55,7 +55,7 @@ void SolidSidedBorder::Paint(const View& view, gfx::Canvas* canvas) {
+   gfx::RectF scaled_bounds;
+   gfx::InsetsF insets_in_pixels;
+ 
+-  if (!features::IsPixelCanvasRecordingEnabled()) {
++  if (!::features::IsPixelCanvasRecordingEnabled()) {
+     // Undo DSF so that we can be sure to draw an integral number of pixels for
+     // the border. Integral scale factors should be unaffected by this, but for
+     // fractional scale factors this ensures sharp lines.
 diff --git a/ui/views/bubble/bubble_frame_view.cc b/ui/views/bubble/bubble_frame_view.cc
-index 95ee208dc4..4cca52f579 100644
+index d5861bde36..f8b5022ea1 100644
 --- a/ui/views/bubble/bubble_frame_view.cc
 +++ b/ui/views/bubble/bubble_frame_view.cc
-@@ -158,7 +158,7 @@ std::unique_ptr<Label> BubbleFrameView::CreateDefaultTitleLabel(
+@@ -160,7 +160,7 @@ std::unique_ptr<Label> BubbleFrameView::CreateDefaultTitleLabel(
      const std::u16string& title_text) {
    std::unique_ptr<Label> label = CreateLabelWithContextAndStyle(
        title_text, style::CONTEXT_DIALOG_TITLE, style::STYLE_PRIMARY);
@@ -1903,7 +1928,7 @@ index 95ee208dc4..4cca52f579 100644
      label->GetViewAccessibility().SetHierarchicalLevel(1);
    }
 diff --git a/ui/views/controls/webview/BUILD.gn b/ui/views/controls/webview/BUILD.gn
-index 7f4eff1017..4fd7fe857d 100644
+index 50bb38a38d..cf7c4610f3 100644
 --- a/ui/views/controls/webview/BUILD.gn
 +++ b/ui/views/controls/webview/BUILD.gn
 @@ -2,9 +2,10 @@
@@ -1949,7 +1974,7 @@ index a4564d98d6..bcd069a3e0 100644
    sources = [
      "examples_window_with_content.cc",
 diff --git a/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc b/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc
-index f0622884b2..0393891fb3 100644
+index e0f75fb36d..ce7f525279 100644
 --- a/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc
 +++ b/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc
 @@ -634,7 +634,7 @@ void DesktopNativeWidgetAura::InitNativeWidget(Widget::InitParams params) {
@@ -1962,7 +1987,7 @@ index f0622884b2..0393891fb3 100644
        }
      }
 diff --git a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
-index 8432836c97..f07d8cd80f 100644
+index 3c3b51cae5..10e9f60d76 100644
 --- a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
 +++ b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
 @@ -342,7 +342,7 @@ void DesktopWindowTreeHostPlatform::OnActiveWindowChanged(bool active) {
@@ -1974,7 +1999,7 @@ index 8432836c97..f07d8cd80f 100644
        active && !is_active_ && !window_children_.empty()) {
      Activate();
    }
-@@ -782,7 +782,7 @@ void DesktopWindowTreeHostPlatform::SetFullscreen(bool fullscreen,
+@@ -781,7 +781,7 @@ void DesktopWindowTreeHostPlatform::SetFullscreen(bool fullscreen,
      return;
    }
  

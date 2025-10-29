@@ -8,6 +8,7 @@
 - //cc/metrics/shared_metrics_buffer.h
 - //services/device/public/cpp/generic_sensor/sensor_reading_shared_buffer_reader.cc
 - //services/device/generic_sensor/platform_sensor.cc
+- //v8/src/utils/memcopy.h
 
 --- a/third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h
 +++ b/third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h
@@ -952,3 +953,30 @@ index 6f39e15f88..6cb29b4f02 100644
        .store(reading, std::memory_order_relaxed);
    reading_buffer_->seqlock.value().WriteEnd();
  }
+--- a/v8/src/utils/memcopy.h
++++ b/v8/src/utils/memcopy.h
+@@ -17,6 +17,15 @@
+ #include "src/base/macros.h"
+ #include "src/utils/utils.h"
+ 
++#ifdef __TERMUX__
++#include "third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h"
++template <typename T>
++using __my_atomic_ref = Foo::atomic_ref<T>;
++#else
++template <typename T>
++using __my_atomic_ref = std::atomic_ref<T>;
++#endif
++
+ namespace v8::internal {
+ 
+ using Address = uintptr_t;
+@@ -345,7 +354,7 @@
+   requires std::is_integral_v<T>
+ {
+   for (size_t i = 0; i < count; i++) {
+-    std::atomic_ref<T>(destination[i]).store(value, std::memory_order_relaxed);
++    __my_atomic_ref<T>(destination[i]).store(value, std::memory_order_relaxed);
+   }
+ }
+ 

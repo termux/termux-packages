@@ -98,7 +98,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  54 files changed, 252 insertions(+), 42 deletions(-)
 
 diff --git a/gpu/BUILD.gn b/gpu/BUILD.gn
-index a29736d88b..2a2102df43 100644
+index 0d5e199c75..fd91eb30c7 100644
 --- a/gpu/BUILD.gn
 +++ b/gpu/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -119,7 +119,7 @@ index a29736d88b..2a2102df43 100644
    sources = [
      "command_buffer/client/client_test_helper.cc",
 diff --git a/gpu/command_buffer/client/BUILD.gn b/gpu/command_buffer/client/BUILD.gn
-index 796e20d541..743052bf16 100644
+index ee29b28e53..1165606bab 100644
 --- a/gpu/command_buffer/client/BUILD.gn
 +++ b/gpu/command_buffer/client/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -130,8 +130,8 @@ index 796e20d541..743052bf16 100644
  import("//build/config/ozone.gni")
  import("//skia/features.gni")
  import("//ui/gl/features.gni")
-@@ -47,7 +48,7 @@ group("webgpu") {
-   }
+@@ -51,7 +52,7 @@ source_set("export") {
+   sources = [ "gpu_command_buffer_client_export.h" ]
  }
  
 -source_set("client_sources") {
@@ -139,7 +139,7 @@ index 796e20d541..743052bf16 100644
    # External code should depend on this via //gpu/client above rather than
    # depending on this directly or the component build will break.
    visibility = [ ":client" ]
-@@ -227,7 +228,7 @@ source_set("webgpu_interface") {
+@@ -232,7 +233,7 @@ source_set("webgpu_interface") {
  }
  
  # Library emulates GLES2 using command_buffers.
@@ -148,7 +148,7 @@ index 796e20d541..743052bf16 100644
    sources = gles2_implementation_source_files
  
    defines = [ "GLES2_IMPL_IMPLEMENTATION" ]
-@@ -324,7 +325,7 @@ source_set("webgpu_sources") {
+@@ -329,7 +330,7 @@ source_set("webgpu_sources") {
  }
  
  # Library emulates GLES2 using command_buffers.
@@ -157,7 +157,7 @@ index 796e20d541..743052bf16 100644
    sources = gles2_implementation_source_files
  
    defines = [ "GLES2_IMPL_IMPLEMENTATION" ]
-@@ -348,7 +349,7 @@ component("gles2_implementation_no_check") {
+@@ -353,7 +354,7 @@ component("gles2_implementation_no_check") {
    ]
  }
  
@@ -188,7 +188,7 @@ index bf9b43d7f1..0514195413 100644
  
    sources = [
 diff --git a/gpu/command_buffer/service/BUILD.gn b/gpu/command_buffer/service/BUILD.gn
-index b13c4774f4..b04308ef83 100644
+index 34830c7aa5..1691a2bb6b 100644
 --- a/gpu/command_buffer/service/BUILD.gn
 +++ b/gpu/command_buffer/service/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -211,7 +211,7 @@ index b13c4774f4..b04308ef83 100644
  }
  source_set("service_sources") {
    # External code should depend on this via //gpu/command_buffer/service above
-@@ -657,7 +658,7 @@ proto_library("disk_cache_proto") {
+@@ -683,7 +684,7 @@ proto_library("disk_cache_proto") {
  }
  
  if (is_android) {
@@ -355,11 +355,11 @@ index 16ce3e2a79..ed9a7109c9 100644
 +
 +#undef kSupportedUsage
 diff --git a/gpu/command_buffer/service/shared_image/shared_image_representation.cc b/gpu/command_buffer/service/shared_image/shared_image_representation.cc
-index ad6f5317df..133462c0f5 100644
+index dc53451bb2..1b81ab938b 100644
 --- a/gpu/command_buffer/service/shared_image/shared_image_representation.cc
 +++ b/gpu/command_buffer/service/shared_image/shared_image_representation.cc
-@@ -29,6 +29,9 @@
- #include "gpu/vulkan/vulkan_fence_helper.h"
+@@ -34,6 +34,9 @@
+ #include "ui/gfx/win/d3d_shared_fence.h"
  #endif
  
 +// Macro 'None' from X11/X.h will cause confliction
@@ -369,7 +369,7 @@ index ad6f5317df..133462c0f5 100644
  
  namespace {
 diff --git a/gpu/command_buffer/service/shared_image/wrapped_graphite_texture_backing.cc b/gpu/command_buffer/service/shared_image/wrapped_graphite_texture_backing.cc
-index d7f2efb51e..8b239d1571 100644
+index b835e11e2f..4e169678f1 100644
 --- a/gpu/command_buffer/service/shared_image/wrapped_graphite_texture_backing.cc
 +++ b/gpu/command_buffer/service/shared_image/wrapped_graphite_texture_backing.cc
 @@ -33,6 +33,9 @@
@@ -444,7 +444,7 @@ index 870bf84ac0..a78a41f79a 100644
  #include <string>
  
 diff --git a/gpu/ipc/service/BUILD.gn b/gpu/ipc/service/BUILD.gn
-index a09f0dcaf6..f40b86aa08 100644
+index 97e32dddd0..25a904dba7 100644
 --- a/gpu/ipc/service/BUILD.gn
 +++ b/gpu/ipc/service/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -549,7 +549,7 @@ index 8937e42da6..22c457d6d6 100644
 +#undef kDefaultSampleRate
 +#undef kDefaultInputBufferSize
 diff --git a/media/base/BUILD.gn b/media/base/BUILD.gn
-index 5ba5a2e214..442f6c8333 100644
+index 8a6e445c97..cda5f864e9 100644
 --- a/media/base/BUILD.gn
 +++ b/media/base/BUILD.gn
 @@ -5,6 +5,7 @@
@@ -569,7 +569,7 @@ index 5ba5a2e214..442f6c8333 100644
    # Do not expand the visibility here without double-checking with OWNERS, this
    # is a roll-up target which is part of the //media component. Most other DEPs
    # should be using //media and not directly DEP this roll-up target.
-@@ -460,6 +461,8 @@ source_set("base") {
+@@ -462,6 +463,8 @@ source_set("base") {
        "libaom_thread_wrapper.cc",
        "libaom_thread_wrapper.h",
      ]
@@ -579,7 +579,7 @@ index 5ba5a2e214..442f6c8333 100644
    }
  
 diff --git a/media/base/android/BUILD.gn b/media/base/android/BUILD.gn
-index 8e59703e48..77ca39baeb 100644
+index 91bf799509..3f4c35ff4f 100644
 --- a/media/base/android/BUILD.gn
 +++ b/media/base/android/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -654,7 +654,7 @@ index d0637863ef..803f51d16f 100644
      "dxgi_device_manager.cc",
      "dxgi_device_manager.h",
 diff --git a/media/capture/BUILD.gn b/media/capture/BUILD.gn
-index ab0b9d1495..f73ae93597 100644
+index e150aa2560..1d3c228c07 100644
 --- a/media/capture/BUILD.gn
 +++ b/media/capture/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -664,8 +664,8 @@ index ab0b9d1495..f73ae93597 100644
 +import("//build/config/jumbo.gni")
  import("//build/config/ui.gni")
  import("//media/media_options.gni")
- import("//services/video_effects/args.gni")
-@@ -34,7 +35,7 @@ component("capture_switches") {
+ import("//testing/test.gni")
+@@ -33,7 +34,7 @@ component("capture_switches") {
  }
  
  # Things needed by //media/capture/mojom/video_capture_types.mojom.
@@ -674,7 +674,7 @@ index ab0b9d1495..f73ae93597 100644
    defines = [ "CAPTURE_IMPLEMENTATION" ]
    sources = [
      "capture_export.h",
-@@ -56,7 +57,7 @@ component("capture_base") {
+@@ -55,7 +56,7 @@ component("capture_base") {
  }
  
  # Target which allows breakout of Android BUILD.gn files.
@@ -683,7 +683,7 @@ index ab0b9d1495..f73ae93597 100644
    visibility = [
      ":capture_lib",
      "//media/capture/video/android",
-@@ -117,7 +118,7 @@ source_set("capture_device_specific") {
+@@ -116,7 +117,7 @@ source_set("capture_device_specific") {
    ]
  }
  
@@ -864,7 +864,7 @@ index 7acc0d64cd..de9ebe7549 100644
 +#undef kHistogramDroppedFrames
 +#undef kHistogramFrameDropped
 diff --git a/media/filters/BUILD.gn b/media/filters/BUILD.gn
-index c490809755..0d649df0a8 100644
+index 9d0c99973c..5caa98792f 100644
 --- a/media/filters/BUILD.gn
 +++ b/media/filters/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -1071,7 +1071,7 @@ index ffc6bdc4ab..28ab85355d 100644
      "cert_net_fetcher_url_loader.cc",
      "cert_net_fetcher_url_loader.h",
 diff --git a/services/network/BUILD.gn b/services/network/BUILD.gn
-index 9bd750e446..9278168387 100644
+index 7e605af85a..e3e0d7c7aa 100644
 --- a/services/network/BUILD.gn
 +++ b/services/network/BUILD.gn
 @@ -3,12 +3,13 @@
@@ -1267,10 +1267,10 @@ index b32b864b80..3407788fbe 100644
 +#undef kReportOnlyHeaderName
 +#undef Parse
 diff --git a/services/network/url_loader.cc b/services/network/url_loader.cc
-index a130ee693c..4f9326bd5e 100644
+index 7834c23474..cc79011f44 100644
 --- a/services/network/url_loader.cc
 +++ b/services/network/url_loader.cc
-@@ -133,6 +133,8 @@
+@@ -137,6 +137,8 @@
  #include "third_party/abseil-cpp/absl/container/inlined_vector.h"
  #include "url/origin.h"
  
@@ -1279,17 +1279,17 @@ index a130ee693c..4f9326bd5e 100644
  namespace network {
  
  namespace {
-@@ -2616,3 +2618,5 @@ void URLLoader::MaybeCollectDurableMessage(size_t new_data_offset,
+@@ -2644,3 +2646,5 @@ void URLLoader::MaybeCollectDurableMessage(size_t new_data_offset,
  }
  
  }  // namespace network
 +
 +#undef kBlockedBodyAllocationSize
 diff --git a/services/network/web_bundle/web_bundle_url_loader_factory.cc b/services/network/web_bundle/web_bundle_url_loader_factory.cc
-index 6d7f10645e..d8c8ddcd96 100644
+index 517bfc4dde..f449c05251 100644
 --- a/services/network/web_bundle/web_bundle_url_loader_factory.cc
 +++ b/services/network/web_bundle/web_bundle_url_loader_factory.cc
-@@ -35,6 +35,8 @@
+@@ -36,6 +36,8 @@
  #include "services/network/web_bundle/web_bundle_chunked_buffer.h"
  #include "services/network/web_bundle/web_bundle_memory_quota_consumer.h"
  
@@ -1298,14 +1298,14 @@ index 6d7f10645e..d8c8ddcd96 100644
  namespace network {
  
  namespace {
-@@ -983,3 +985,5 @@ void WebBundleURLLoaderFactory::OnWebBundleFetchFailed() {
+@@ -984,3 +986,5 @@ void WebBundleURLLoaderFactory::OnWebBundleFetchFailed() {
  }
  
  }  // namespace network
 +
 +#undef kBlockedBodyAllocationSize
 diff --git a/services/viz/public/cpp/compositing/frame_timing_details_mojom_traits.cc b/services/viz/public/cpp/compositing/frame_timing_details_mojom_traits.cc
-index 15a70d5faa..b152d66874 100644
+index 863c20cdd2..a77aa0f7fb 100644
 --- a/services/viz/public/cpp/compositing/frame_timing_details_mojom_traits.cc
 +++ b/services/viz/public/cpp/compositing/frame_timing_details_mojom_traits.cc
 @@ -8,6 +8,8 @@
@@ -1317,14 +1317,14 @@ index 15a70d5faa..b152d66874 100644
  namespace mojo {
  
  using Traits = StructTraits<viz::mojom::FrameTimingDetailsDataView,
-@@ -28,3 +30,5 @@ bool Traits::Read(viz::mojom::FrameTimingDetailsDataView data,
+@@ -29,3 +31,5 @@ bool Traits::Read(viz::mojom::FrameTimingDetailsDataView data,
  }
  
  }  // namespace mojo
 +
 +#undef Traits
 diff --git a/services/webnn/BUILD.gn b/services/webnn/BUILD.gn
-index 49451355a2..7df8247767 100644
+index a5fae96151..bac543d4cd 100644
 --- a/services/webnn/BUILD.gn
 +++ b/services/webnn/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1335,8 +1335,8 @@ index 49451355a2..7df8247767 100644
  import("//mojo/public/tools/fuzzers/mojolpm.gni")
  import("//services/on_device_model/on_device_model.gni")
  import("//services/webnn/features.gni")
-@@ -40,7 +41,7 @@ source_set("webnn_headers") {
-   public_deps = [ "//base" ]
+@@ -29,7 +30,7 @@ source_set("webnn_switches") {
+   ]
  }
  
 -component("webnn_service") {

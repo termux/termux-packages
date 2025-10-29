@@ -33,6 +33,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  .../file_system_access_watcher_manager.cc     |   4 +
  content/browser/find_request_manager.cc       |   2 +-
  .../gpu/gpu_data_manager_impl_private.cc      |  10 +-
+ content/browser/gpu/gpu_process_host.cc       |   2 +-
  content/browser/guest_page_holder_impl.cc     |   2 +-
  content/browser/hid/hid_service.cc            |   4 +
  content/browser/host_zoom_map_impl.cc         |   2 +-
@@ -55,14 +56,15 @@ Enable jumbo build for the following component(s)/source_set(s):
  .../partitioned_popins_navigation_throttle.cc |   2 +-
  .../private_network_access_util.cc            |  34 ++--
  .../randomized_confidence_utils.cc            |   2 +-
- .../renderer_host/render_frame_host_impl.cc   |  58 +++---
+ .../renderer_host/render_frame_host_impl.cc   |  64 +++---
  .../render_frame_host_manager.cc              |  70 +++----
  .../renderer_host/render_frame_proxy_host.cc  |   6 +-
  .../renderer_host/render_message_filter.cc    |   2 +-
- .../renderer_host/render_process_host_impl.cc |  32 +--
+ .../renderer_host/render_process_host_impl.cc |  28 +--
  .../renderer_host/render_view_host_impl.cc    |   4 +-
  .../renderer_host/render_widget_host_impl.cc  |   4 +-
  .../render_widget_host_view_aura.cc           |   2 +-
+ .../renderer_cancellation_throttle.cc         |   6 +-
  .../spare_render_process_host_manager_impl.cc |  14 +-
  .../cross_origin_opener_policy_reporter.cc    |   4 +
  .../dip/document_isolation_policy_reporter.cc |   4 +
@@ -82,10 +84,10 @@ Enable jumbo build for the following component(s)/source_set(s):
  content/services/auction_worklet/BUILD.gn     |   7 +-
  content/test/BUILD.gn                         |   5 +-
  content/utility/BUILD.gn                      |   3 +-
- 63 files changed, 421 insertions(+), 210 deletions(-)
+ 65 files changed, 426 insertions(+), 215 deletions(-)
 
 diff --git a/content/browser/BUILD.gn b/content/browser/BUILD.gn
-index c92c7110c7..8f92f361e4 100644
+index 5a1b57da76..de62ed0411 100644
 --- a/content/browser/BUILD.gn
 +++ b/content/browser/BUILD.gn
 @@ -6,6 +6,7 @@ import("//base/allocator/partition_allocator/partition_alloc.gni")
@@ -214,7 +216,7 @@ index c92c7110c7..8f92f361e4 100644
    # Only the public target should depend on this. All other targets (even
    # internal content ones) should depend on the public one.
    visibility = [
-@@ -169,8 +279,6 @@ source_set("browser") {
+@@ -172,8 +282,6 @@ source_set("browser") {
      "//content/browser/cache_storage:cache_storage_proto",
      "//content/browser/content_index:content_index_proto",
      "//content/browser/cookie_store:cookie_store_proto",
@@ -223,7 +225,7 @@ index c92c7110c7..8f92f361e4 100644
      "//content/browser/download:proto",
      "//content/browser/file_system_access:proto",
      "//content/browser/indexed_db:internals_mojo_bindings",
-@@ -344,6 +452,7 @@ source_set("browser") {
+@@ -347,6 +455,7 @@ source_set("browser") {
      "//ui/webui/resources",
      "//v8",
      "//v8:v8_version",
@@ -231,7 +233,7 @@ index c92c7110c7..8f92f361e4 100644
    ]
  
    public_deps = [
-@@ -361,62 +470,6 @@ source_set("browser") {
+@@ -364,62 +473,6 @@ source_set("browser") {
    ]
  
    sources = [
@@ -294,7 +296,7 @@ index c92c7110c7..8f92f361e4 100644
      "about_url_loader_factory.cc",
      "about_url_loader_factory.h",
      "accessibility/accessibility_tree_formatter_blink.cc",
-@@ -2540,6 +2593,7 @@ source_set("browser") {
+@@ -2539,6 +2592,7 @@ source_set("browser") {
      "worker_host/worker_script_loader_factory.cc",
      "worker_host/worker_script_loader_factory.h",
    ]
@@ -302,7 +304,7 @@ index c92c7110c7..8f92f361e4 100644
  
    if (is_android) {
      sources += [
-@@ -2557,8 +2611,6 @@ source_set("browser") {
+@@ -2556,8 +2610,6 @@ source_set("browser") {
      ]
  
      sources += [
@@ -311,7 +313,7 @@ index c92c7110c7..8f92f361e4 100644
        "devtools/protocol/bluetooth_emulation_handler.cc",
        "devtools/protocol/bluetooth_emulation_handler.h",
      ]
-@@ -2596,8 +2648,6 @@ source_set("browser") {
+@@ -2595,8 +2647,6 @@ source_set("browser") {
  
    if (use_viz_debugger) {
      sources += [
@@ -320,7 +322,7 @@ index c92c7110c7..8f92f361e4 100644
        "devtools/protocol/visual_debugger_handler.cc",
        "devtools/protocol/visual_debugger_handler.h",
      ]
-@@ -3007,6 +3057,9 @@ source_set("browser") {
+@@ -3006,6 +3056,9 @@ source_set("browser") {
        ]
        public_deps += [ "//ui/base/cursor" ]
        deps += [ "//third_party/webrtc_overrides:webrtc_component" ]
@@ -330,7 +332,7 @@ index c92c7110c7..8f92f361e4 100644
      }
      if (use_aura) {
        sources += [
-@@ -3396,6 +3449,12 @@ source_set("browser") {
+@@ -3407,6 +3460,12 @@ source_set("browser") {
        "web_contents/web_contents_view_android.h",
      ]
  
@@ -343,7 +345,7 @@ index c92c7110c7..8f92f361e4 100644
      deps += [
        ":fontations_name_table_ffi",
        ":reflection_jni_headers",
-@@ -3429,9 +3488,6 @@ source_set("browser") {
+@@ -3440,9 +3499,6 @@ source_set("browser") {
    } else {
      # Not Android.
      sources += [
@@ -353,7 +355,7 @@ index c92c7110c7..8f92f361e4 100644
        "devtools/protocol/webauthn_handler.cc",
        "devtools/protocol/webauthn_handler.h",
        "media/session/audio_focus_delegate_default.cc",
-@@ -3670,8 +3726,6 @@ source_set("browser") {
+@@ -3683,8 +3739,6 @@ source_set("browser") {
  
    if (use_clang_profiling_inside_sandbox && chrome_pgo_phase == 1) {
      sources += [
@@ -382,7 +384,7 @@ index 082d8b3e0c..b3401d93b8 100644
 +
 +#undef kDatabasePath
 diff --git a/content/browser/attribution_reporting/attribution_resolver_impl.cc b/content/browser/attribution_reporting/attribution_resolver_impl.cc
-index b3444daca6..56579e51e1 100644
+index c6d4853e53..ae5182985c 100644
 --- a/content/browser/attribution_reporting/attribution_resolver_impl.cc
 +++ b/content/browser/attribution_reporting/attribution_resolver_impl.cc
 @@ -63,7 +63,7 @@ using AggregatableResult = AttributionTrigger::AggregatableResult;
@@ -394,7 +396,7 @@ index b3444daca6..56579e51e1 100644
  
  // These values are persisted to logs. Entries should not be renumbered and
  // numeric values should never be reused.
-@@ -899,7 +899,7 @@ AttributionResolverImpl::MaybeCreateEventLevelReport(
+@@ -895,7 +895,7 @@ AttributionResolverImpl::MaybeCreateEventLevelReport(
  
    return CreateReportResult::EventLevelSuccess(
        AttributionReport(
@@ -403,7 +405,7 @@ index b3444daca6..56579e51e1 100644
            /*initial_report_time=*/report_time, delegate_->NewReportID(),
            /*failed_send_attempts=*/0,
            AttributionReport::EventLevelData(*trigger_data,
-@@ -981,7 +981,7 @@ AttributionResolverImpl::MaybeCreateAggregatableAttributionReport(
+@@ -977,7 +977,7 @@ AttributionResolverImpl::MaybeCreateAggregatableAttributionReport(
        GetAggregatableReportTime(trigger, attribution_info.time);
  
    return CreateReportResult::AggregatableSuccess(AttributionReport(
@@ -413,7 +415,7 @@ index b3444daca6..56579e51e1 100644
        /*failed_send_attempts=*/0,
        AttributionReport::AggregatableData(
 diff --git a/content/browser/attribution_reporting/attribution_storage_sql.cc b/content/browser/attribution_reporting/attribution_storage_sql.cc
-index 707e74ebb3..ec8c6f5093 100644
+index b32d9d850e..19577278fc 100644
 --- a/content/browser/attribution_reporting/attribution_storage_sql.cc
 +++ b/content/browser/attribution_reporting/attribution_storage_sql.cc
 @@ -99,6 +99,9 @@
@@ -426,7 +428,7 @@ index 707e74ebb3..ec8c6f5093 100644
  namespace content {
  
  namespace {
-@@ -3221,3 +3224,6 @@ int64_t AttributionStorageSql::CountUniqueReportingOriginsPerSiteForAttribution(
+@@ -3215,3 +3218,6 @@ int64_t AttributionStorageSql::CountUniqueReportingOriginsPerSiteForAttribution(
  }
  
  }  // namespace content
@@ -434,7 +436,7 @@ index 707e74ebb3..ec8c6f5093 100644
 +#undef kDatabasePath
 +#undef kUnsetRecordId
 diff --git a/content/browser/btm/btm_page_visit_observer.cc b/content/browser/btm/btm_page_visit_observer.cc
-index 56e7291720..7d663c335c 100644
+index 92b72a5bbc..90e9ec5edd 100644
 --- a/content/browser/btm/btm_page_visit_observer.cc
 +++ b/content/browser/btm/btm_page_visit_observer.cc
 @@ -55,6 +55,8 @@ BtmPageVisitObserver::~BtmPageVisitObserver() {
@@ -479,7 +481,7 @@ index 88b7ce7dff..d969098099 100644
  }
  
 diff --git a/content/browser/devtools/render_frame_devtools_agent_host.cc b/content/browser/devtools/render_frame_devtools_agent_host.cc
-index 05f280c657..578c0418c0 100644
+index bcd8d328de..ad84e6ad8e 100644
 --- a/content/browser/devtools/render_frame_devtools_agent_host.cc
 +++ b/content/browser/devtools/render_frame_devtools_agent_host.cc
 @@ -89,6 +89,8 @@
@@ -491,14 +493,14 @@ index 05f280c657..578c0418c0 100644
  namespace content {
  
  namespace {
-@@ -1119,3 +1121,5 @@ bool RenderFrameDevToolsAgentHost::HasSessionsWithoutTabTargetSupport() const {
+@@ -1123,3 +1125,5 @@ bool RenderFrameDevToolsAgentHost::HasSessionsWithoutTabTargetSupport() const {
  }
  
  }  // namespace content
 +
 +#undef g_agent_host_instances
 diff --git a/content/browser/devtools/web_contents_devtools_agent_host.cc b/content/browser/devtools/web_contents_devtools_agent_host.cc
-index 09893d8c24..6159df163a 100644
+index 0a04bfd529..452e2b245b 100644
 --- a/content/browser/devtools/web_contents_devtools_agent_host.cc
 +++ b/content/browser/devtools/web_contents_devtools_agent_host.cc
 @@ -16,6 +16,8 @@
@@ -510,14 +512,14 @@ index 09893d8c24..6159df163a 100644
  namespace content {
  
  namespace {
-@@ -416,3 +418,5 @@ WebContentsDevToolsAgentHost::RevalidateSessionAccess() {
+@@ -420,3 +422,5 @@ WebContentsDevToolsAgentHost::RevalidateSessionAccess() {
  }
  
  }  // namespace content
 +
 +#undef GetAgentHostInstances
 diff --git a/content/browser/direct_sockets/direct_sockets_service_impl.cc b/content/browser/direct_sockets/direct_sockets_service_impl.cc
-index 14d0f366b5..2423f9dd91 100644
+index d137448eeb..faccec40dd 100644
 --- a/content/browser/direct_sockets/direct_sockets_service_impl.cc
 +++ b/content/browser/direct_sockets/direct_sockets_service_impl.cc
 @@ -59,6 +59,8 @@
@@ -529,7 +531,7 @@ index 14d0f366b5..2423f9dd91 100644
  namespace content {
  
  namespace {
-@@ -827,3 +829,5 @@ void DirectSocketsServiceImpl::CreateRestrictedUDPSocketImpl(
+@@ -877,3 +879,5 @@ void DirectSocketsServiceImpl::CreateRestrictedUDPSocketImpl(
  }
  
  }  // namespace content
@@ -587,7 +589,7 @@ index 33adf34169..e882cd44c8 100644
      return false;
    } else {
 diff --git a/content/browser/gpu/gpu_data_manager_impl_private.cc b/content/browser/gpu/gpu_data_manager_impl_private.cc
-index 0d045d06a8..c534187363 100644
+index 9b6fec4029..d6f7437458 100644
 --- a/content/browser/gpu/gpu_data_manager_impl_private.cc
 +++ b/content/browser/gpu/gpu_data_manager_impl_private.cc
 @@ -396,7 +396,7 @@ bool SoftwareGLAllowed() {
@@ -626,7 +628,7 @@ index 0d045d06a8..c534187363 100644
        gpu_feature_info_
                .status_values[gpu::GPU_FEATURE_TYPE_GPU_TILE_RASTERIZATION] ==
            gpu::kGpuFeatureStatusEnabled;
-@@ -1686,7 +1686,7 @@ void GpuDataManagerImplPrivate::FallBackToNextGpuModeDueToCrash() {
+@@ -1684,7 +1684,7 @@ void GpuDataManagerImplPrivate::FallBackToNextGpuModeDueToCrash() {
    // If we fell back to sofware GL due to crashes and it is disabled with a
    // feature. Fall back again.
    if (gpu_mode_ == gpu::GpuMode::SOFTWARE_GL &&
@@ -635,6 +637,19 @@ index 0d045d06a8..c534187363 100644
            base::CommandLine::ForCurrentProcess())) {
      FallBackToNextGpuMode();
      DCHECK_NE(gpu_mode_, gpu::GpuMode::SOFTWARE_GL);
+diff --git a/content/browser/gpu/gpu_process_host.cc b/content/browser/gpu/gpu_process_host.cc
+index 980f31b217..ae49b7d807 100644
+--- a/content/browser/gpu/gpu_process_host.cc
++++ b/content/browser/gpu/gpu_process_host.cc
+@@ -539,7 +539,7 @@ void BindDiscardableMemoryReceiverOnUI(
+ // for all cache types.
+ void InitGpuPersistentCacheFileFactoryOnce() {
+ #if BUILDFLAG(SKIA_USE_DAWN)
+-  if (features::kSkiaGraphiteDawnUsePersistentCache.Get() &&
++  if (::features::kSkiaGraphiteDawnUsePersistentCache.Get() &&
+       !viz::PersistentCacheSandboxedFileFactory::GetInstance()) {
+     base::FilePath cache_root_dir =
+         GetContentClient()->browser()->GetShaderDiskCacheDirectory();
 diff --git a/content/browser/guest_page_holder_impl.cc b/content/browser/guest_page_holder_impl.cc
 index 6c8c488087..fb301afbf5 100644
 --- a/content/browser/guest_page_holder_impl.cc
@@ -668,10 +683,10 @@ index 3e563d1ae0..a6f59d041d 100644
 +
 +#undef DocumentHelper
 diff --git a/content/browser/host_zoom_map_impl.cc b/content/browser/host_zoom_map_impl.cc
-index 08286c24e4..2e4969624b 100644
+index e36ad1b3c0..09f047c4cc 100644
 --- a/content/browser/host_zoom_map_impl.cc
 +++ b/content/browser/host_zoom_map_impl.cc
-@@ -75,7 +75,7 @@ bool IsIndependentSubframeZoomEnabled() {
+@@ -81,7 +81,7 @@ bool IsIndependentSubframeZoomEnabled() {
    // only return true here if some feature that requires subframe zoom is also
    // enabled.
    return base::FeatureList::IsEnabled(kSubframeZoom) &&
@@ -713,7 +728,7 @@ index 771736dea6..dbcbb60703 100644
 +
 +#undef kFramingHeaderSize
 diff --git a/content/browser/interest_group/bidding_and_auction_serializer.cc b/content/browser/interest_group/bidding_and_auction_serializer.cc
-index f66cd503b4..5f02772233 100644
+index fec434fced..508e4a4529 100644
 --- a/content/browser/interest_group/bidding_and_auction_serializer.cc
 +++ b/content/browser/interest_group/bidding_and_auction_serializer.cc
 @@ -41,6 +41,8 @@
@@ -846,7 +861,7 @@ index d9886ec49e..77565a1e6a 100644
 +
 +#undef kUmaPrefix
 diff --git a/content/browser/preloading/prefetch/prefetch_service.cc b/content/browser/preloading/prefetch/prefetch_service.cc
-index e104c86c35..fcdcffa2cb 100644
+index 160e653feb..ca1aae19f3 100644
 --- a/content/browser/preloading/prefetch/prefetch_service.cc
 +++ b/content/browser/preloading/prefetch/prefetch_service.cc
 @@ -65,6 +65,8 @@
@@ -858,14 +873,14 @@ index e104c86c35..fcdcffa2cb 100644
  namespace content {
  
  namespace {
-@@ -2163,3 +2165,5 @@ void PrefetchService::EvictPrefetchesForBrowsingDataRemoval(
+@@ -2065,3 +2067,5 @@ void PrefetchService::EvictPrefetchesForBrowsingDataRemoval(
  }
  
  }  // namespace content
 +
 +#undef BrowserContextFromFrameTreeNodeId
 diff --git a/content/browser/preloading/prefetch/prefetch_url_loader_interceptor.cc b/content/browser/preloading/prefetch/prefetch_url_loader_interceptor.cc
-index f25be8c961..a5a337addf 100644
+index d2f2749fdc..a4f1814540 100644
 --- a/content/browser/preloading/prefetch/prefetch_url_loader_interceptor.cc
 +++ b/content/browser/preloading/prefetch/prefetch_url_loader_interceptor.cc
 @@ -22,6 +22,8 @@
@@ -877,7 +892,7 @@ index f25be8c961..a5a337addf 100644
  namespace content {
  namespace {
  
-@@ -302,3 +304,5 @@ void PrefetchURLLoaderInterceptor::OnGetPrefetchComplete(
+@@ -308,3 +310,5 @@ void PrefetchURLLoaderInterceptor::OnGetPrefetchComplete(
  }
  
  }  // namespace content
@@ -922,7 +937,7 @@ index 2eef5a66d3..3e9fe2e2c9 100644
 +
 +#undef GetRootPrerenderFrameTreeNode
 diff --git a/content/browser/renderer_host/media/media_devices_manager.cc b/content/browser/renderer_host/media/media_devices_manager.cc
-index 0785d1d380..f24e7ac294 100644
+index 49d62107d1..2764ac790f 100644
 --- a/content/browser/renderer_host/media/media_devices_manager.cc
 +++ b/content/browser/renderer_host/media/media_devices_manager.cc
 @@ -56,6 +56,9 @@
@@ -943,10 +958,10 @@ index 0785d1d380..f24e7ac294 100644
 +#undef DeviceTypeToString
 +#undef SendLogMessage
 diff --git a/content/browser/renderer_host/media/media_stream_manager.cc b/content/browser/renderer_host/media/media_stream_manager.cc
-index aebb8fcf99..b736478e37 100644
+index 04c7b6e806..f036746b1f 100644
 --- a/content/browser/renderer_host/media/media_stream_manager.cc
 +++ b/content/browser/renderer_host/media/media_stream_manager.cc
-@@ -107,6 +107,9 @@
+@@ -108,6 +108,9 @@
  
  using ::blink::mojom::MediaDeviceType;
  
@@ -956,7 +971,7 @@ index aebb8fcf99..b736478e37 100644
  namespace content {
  
  constinit thread_local MediaStreamManager* media_stream_manager = nullptr;
-@@ -4705,3 +4708,6 @@ void MediaStreamManager::OnVideoCaptureHostConnectionError() {
+@@ -4708,3 +4711,6 @@ void MediaStreamManager::OnVideoCaptureHostConnectionError() {
  #endif
  
  }  // namespace content
@@ -996,7 +1011,7 @@ index 85085eb3d2..9be5a64a58 100644
    }
    const net::HttpResponseHeaders* response_headers =
 diff --git a/content/browser/renderer_host/private_network_access_util.cc b/content/browser/renderer_host/private_network_access_util.cc
-index c860d9aefb..bc72719a4e 100644
+index 8b4c7da73d..93b6ad0c75 100644
 --- a/content/browser/renderer_host/private_network_access_util.cc
 +++ b/content/browser/renderer_host/private_network_access_util.cc
 @@ -42,22 +42,22 @@ FeatureState FeatureStateForContext(RequestContext request_context) {
@@ -1140,10 +1155,10 @@ index 4297ff2a1a..a0a2f4bc1c 100644
        state_count /
        ((state_count - 1) + std::exp(navigation_confidence_epsilon));
 diff --git a/content/browser/renderer_host/render_frame_host_impl.cc b/content/browser/renderer_host/render_frame_host_impl.cc
-index d7cf66c91b..4d147fa562 100644
+index 59c9498a6d..da3a53602a 100644
 --- a/content/browser/renderer_host/render_frame_host_impl.cc
 +++ b/content/browser/renderer_host/render_frame_host_impl.cc
-@@ -357,6 +357,8 @@ BASE_FEATURE(DoNotEvictOnAXLocationChange,
+@@ -357,6 +357,8 @@ BASE_FEATURE(kDoNotEvictOnAXLocationChange, base::FEATURE_ENABLED_BY_DEFAULT);
  
  }  // namespace features
  
@@ -1152,7 +1167,18 @@ index d7cf66c91b..4d147fa562 100644
  namespace content {
  
  class RenderFrameHostOrProxy {
-@@ -893,7 +895,7 @@ GURL GetLastDocumentURL(
+@@ -845,8 +847,8 @@ base::TimeDelta GetSubframeProcessShutdownDelay(
+     return kZeroDelay;
+   }
+ 
+-  if (base::FeatureList::IsEnabled(features::kSubframeProcessShutdownDelay)) {
+-    return base::Seconds(features::kSubframeProcessShutdownDelaySeconds.Get());
++  if (base::FeatureList::IsEnabled(::features::kSubframeProcessShutdownDelay)) {
++    return base::Seconds(::features::kSubframeProcessShutdownDelaySeconds.Get());
+   }
+ 
+   return kSubframeProcessShutdownDelay;
+@@ -897,7 +899,7 @@ GURL GetLastDocumentURL(
  // Return true when `mode` is enabled for kAvoidUnnecessaryBeforeUnloadCheckSync
  // feature (see: https://crbug.com/396998476).
  bool IsAvoidUnnecessaryBeforeUnloadCheckSyncEnabledFor(
@@ -1161,7 +1187,7 @@ index d7cf66c91b..4d147fa562 100644
    if (!GetContentClient()
             ->browser()
             ->SupportsAvoidUnnecessaryBeforeUnloadCheckSync()) {
-@@ -901,11 +903,11 @@ bool IsAvoidUnnecessaryBeforeUnloadCheckSyncEnabledFor(
+@@ -905,11 +907,11 @@ bool IsAvoidUnnecessaryBeforeUnloadCheckSyncEnabledFor(
    }
  
    if (!base::FeatureList::IsEnabled(
@@ -1175,7 +1201,7 @@ index d7cf66c91b..4d147fa562 100644
  }
  
  // Returns true if `host` has the Window Management permission granted.
-@@ -2560,7 +2562,7 @@ RenderFrameHostImpl::RenderFrameHostImpl(
+@@ -2571,7 +2573,7 @@ RenderFrameHostImpl::RenderFrameHostImpl(
      if (is_main_frame())
        GetLocalRenderWidgetHost()->SetIntersectsViewport(true);
      GetLocalRenderWidgetHost()->SetFrameDepth(depth_);
@@ -1184,7 +1210,7 @@ index d7cf66c91b..4d147fa562 100644
        GetLocalRenderWidgetHost()->SetShouldContributePriorityToProcess(
            ShouldContributePriorityToProcess(lifecycle_state_));
      }
-@@ -2637,7 +2639,7 @@ RenderFrameHostImpl::~RenderFrameHostImpl() {
+@@ -2648,7 +2650,7 @@ RenderFrameHostImpl::~RenderFrameHostImpl() {
    MaybeResetBoostRenderProcessForLoading();
  
    if (is_main_frame() &&
@@ -1193,7 +1219,7 @@ index d7cf66c91b..4d147fa562 100644
      // The main frame RenderWidgetHost sets is_discarding of RenderWidgetHost to
      // true at DiscardFrame(). However, the is_discarding state is not reset if
      // the renderer process terminates before sending a response to
-@@ -4337,7 +4339,7 @@ bool RenderFrameHostImpl::CreateRenderFrame(
+@@ -4347,7 +4349,7 @@ bool RenderFrameHostImpl::CreateRenderFrame(
         (navigation_request->commit_params()
              .is_cross_site_cross_browsing_context_group &&
          base::FeatureList::IsEnabled(
@@ -1202,7 +1228,7 @@ index d7cf66c91b..4d147fa562 100644
          GetContentClient()
              ->browser()
              ->IsClearWindowNameForNewBrowsingContextGroupAllowed(context)));
-@@ -4976,7 +4978,7 @@ void RenderFrameHostImpl::DidNavigate(
+@@ -4986,7 +4988,7 @@ void RenderFrameHostImpl::DidNavigate(
    SetLastCommittedUrl(params.url);
    // The origin is only updated for cross-document navigations.
    if (!was_within_same_document ||
@@ -1211,7 +1237,7 @@ index d7cf66c91b..4d147fa562 100644
      SetLastCommittedOrigin(params.origin,
                             params.has_potentially_trustworthy_unique_origin);
    }
-@@ -5879,7 +5881,7 @@ bool RenderFrameHostImpl::VerifyFencedFrameFocusChange(
+@@ -5901,7 +5903,7 @@ bool RenderFrameHostImpl::VerifyFencedFrameFocusChange(
    // TODO(crbug.com/40274134): We will later badmessage the renderer, but, for
    // now, we will dump without crashing to monitor if any legitimate cases are
    // reaching this point.
@@ -1220,7 +1246,7 @@ index d7cf66c91b..4d147fa562 100644
      bad_message::ReceivedBadMessage(
          GetProcess(), bad_message::RFH_FOCUS_ACROSS_FENCED_BOUNDARY);
    } else {
-@@ -6589,7 +6591,7 @@ void RenderFrameHostImpl::SwapOuterDelegateFrame(
+@@ -6609,7 +6611,7 @@ void RenderFrameHostImpl::SwapOuterDelegateFrame(
    // `devtools_frame_token`) to indicate to DevTools clients that the guest has
    // been attached to this placeholder iframe.
    const bool should_swap_devtools_frame_token =
@@ -1229,7 +1255,7 @@ index d7cf66c91b..4d147fa562 100644
    GetMojomFrameInRenderer()->Unload(
        /*is_loading=*/false,
        browsing_context_state_->current_replication_state().Clone(),
-@@ -8671,7 +8673,7 @@ bool RenderFrameHostImpl::IsInactiveAndDisallowActivation(uint64_t reason) {
+@@ -8709,7 +8711,7 @@ bool RenderFrameHostImpl::IsInactiveAndDisallowActivation(uint64_t reason) {
        // continue to process accessibility location changes unless
        // kDoNotEvictOnAXLocationChange is off.
        if (base::FeatureList::IsEnabled(
@@ -1238,7 +1264,7 @@ index d7cf66c91b..4d147fa562 100644
          CHECK_NE(reason, kAXLocationChange);
        }
        BackForwardCacheCanStoreDocumentResult can_store_flat;
-@@ -9095,7 +9097,7 @@ void RenderFrameHostImpl::MaybeIsolateForUserActivation() {
+@@ -9133,7 +9135,7 @@ void RenderFrameHostImpl::MaybeIsolateForUserActivation() {
      // the isolation eligibility checks, such as having the corresponding
      // feature enabled or satisfying memory requirements.
      DCHECK(base::FeatureList::IsEnabled(
@@ -1247,7 +1273,7 @@ index d7cf66c91b..4d147fa562 100644
  
      bool is_same_origin_activation =
          GetParent() ? GetMainFrame()->GetLastCommittedOrigin().IsSameOriginWith(
-@@ -11463,7 +11465,7 @@ void RenderFrameHostImpl::HandleAXLocationChanges(
+@@ -11501,7 +11503,7 @@ void RenderFrameHostImpl::HandleAXLocationChanges(
      return;
    }
  
@@ -1256,7 +1282,7 @@ index d7cf66c91b..4d147fa562 100644
      // If the flag is off, we should evict the back/forward cache entry.
      if (IsInactiveAndDisallowActivation(
              DisallowActivationReasonId::kAXLocationChange)) {
-@@ -11532,7 +11534,7 @@ CanCommitStatus RenderFrameHostImpl::CanCommitOriginAndUrl(
+@@ -11570,7 +11572,7 @@ CanCommitStatus RenderFrameHostImpl::CanCommitOriginAndUrl(
    }
  
    // Same-document navigations cannot change origins.
@@ -1265,7 +1291,7 @@ index d7cf66c91b..4d147fa562 100644
        is_same_document_navigation && origin != GetLastCommittedOrigin()) {
      LogCanCommitOriginAndUrlFailureReason("cross_origin_same_document");
      return CanCommitStatus::CANNOT_COMMIT_ORIGIN;
-@@ -11568,7 +11570,7 @@ CanCommitStatus RenderFrameHostImpl::CanCommitOriginAndUrl(
+@@ -11606,7 +11608,7 @@ CanCommitStatus RenderFrameHostImpl::CanCommitOriginAndUrl(
    // TODO(crbug.com/40580002): Remove this block in favor of the enforcement
    // above once kEnforceSameDocumentOriginInvariants and
    // kTreatMhtmlInitialDocumentLoadsAsCrossDocument finish launching.
@@ -1274,7 +1300,7 @@ index d7cf66c91b..4d147fa562 100644
      if (is_same_document_navigation && origin != GetLastCommittedOrigin()) {
        LogCanCommitOriginAndUrlFailureReason("cross_origin_same_document");
        return CanCommitStatus::CANNOT_COMMIT_ORIGIN;
-@@ -11872,7 +11874,7 @@ RenderFrameHostImpl::CheckOrDispatchBeforeUnloadForFrame(
+@@ -11909,7 +11911,7 @@ RenderFrameHostImpl::CheckOrDispatchBeforeUnloadForFrame(
    const bool run_beforeunload_for_legacy_frame =
        rfh == this && !rfh->has_before_unload_handler_ &&
        !IsAvoidUnnecessaryBeforeUnloadCheckSyncEnabledFor(
@@ -1283,7 +1309,7 @@ index d7cf66c91b..4d147fa562 100644
                kWithoutSendBeforeUnload);
    const bool should_run_beforeunload =
        rfh->has_before_unload_handler_ || run_beforeunload_for_legacy_frame;
-@@ -13891,7 +13893,7 @@ void RenderFrameHostImpl::CreateSecurePaymentConfirmationService(
+@@ -13933,7 +13935,7 @@ void RenderFrameHostImpl::CreateSecurePaymentConfirmationService(
  
  void RenderFrameHostImpl::CreateWebUsbService(
      mojo::PendingReceiver<blink::mojom::WebUsbService> receiver) {
@@ -1292,7 +1318,16 @@ index d7cf66c91b..4d147fa562 100644
      return;
    }
    if (!IsFeatureEnabled(network::mojom::PermissionsPolicyFeature::kUsb)) {
-@@ -15307,7 +15309,7 @@ bool RenderFrameHostImpl::DidCommitNavigationInternal(
+@@ -14115,7 +14117,7 @@ FrameTreeNode* RenderFrameHostImpl::GetPrerenderOuterMostMainFrame() {
+ 
+ bool RenderFrameHostImpl::CancelPrerenderingForLoadingError(
+     int32_t loading_error_code) {
+-  if (!base::FeatureList::IsEnabled(features::kPrerender2ReuseHost)) {
++  if (!base::FeatureList::IsEnabled(::features::kPrerender2ReuseHost)) {
+     return CancelPrerendering(
+         PrerenderCancellationReason::BuildForLoadingError(loading_error_code));
+   }
+@@ -15384,7 +15386,7 @@ bool RenderFrameHostImpl::DidCommitNavigationInternal(
    // policy must be identical to the values that were already present in the
    // FrameTreeNode / RenderFrameHost before this commit.
    if (is_same_document_navigation &&
@@ -1301,7 +1336,7 @@ index d7cf66c91b..4d147fa562 100644
      if (params->insecure_request_policy !=
          frame_tree_node_->current_replication_state().insecure_request_policy) {
        bad_message::ReceivedBadMessage(
-@@ -16273,7 +16275,7 @@ void RenderFrameHostImpl::SendCommitNavigation(
+@@ -16352,7 +16354,7 @@ void RenderFrameHostImpl::SendCommitNavigation(
    // TODO(crbug.com/40205612): Remove the kill switch for this check.
    bool should_block_storage_access_for_pdf =
        GetSiteInstance()->GetSiteInfo().is_pdf() &&
@@ -1310,7 +1345,7 @@ index d7cf66c91b..4d147fa562 100644
  
    // Make sure the origin of the isolation info and origin to commit match,
    // otherwise the cookie manager will crash. Sending the cookie manager here
-@@ -16671,7 +16673,7 @@ void RenderFrameHostImpl::SendBeforeUnload(
+@@ -16752,7 +16754,7 @@ void RenderFrameHostImpl::SendBeforeUnload(
      const bool can_be_in_navigate_to_pending_entry =
          is_eligible_for_avoid_unnecessary_beforeunload &&
          IsAvoidUnnecessaryBeforeUnloadCheckSyncEnabledFor(
@@ -1319,7 +1354,7 @@ index d7cf66c91b..4d147fa562 100644
                  kDumpWithoutCrashing) &&
          frame_tree()->controller().in_navigate_to_pending_entry();
  
-@@ -16679,7 +16681,7 @@ void RenderFrameHostImpl::SendBeforeUnload(
+@@ -16760,7 +16762,7 @@ void RenderFrameHostImpl::SendBeforeUnload(
  
      if (is_eligible_for_avoid_unnecessary_beforeunload &&
          IsAvoidUnnecessaryBeforeUnloadCheckSyncEnabledFor(
@@ -1328,7 +1363,7 @@ index d7cf66c91b..4d147fa562 100644
                  kWithSendBeforeUnload)) {
        std::move(before_unload_closure)
            .Run(/*proceed=*/true, send_before_unload_start_time_,
-@@ -17274,7 +17276,7 @@ bool ShouldVerify(const std::string& param) {
+@@ -17355,7 +17357,7 @@ bool ShouldVerify(const std::string& param) {
    // For other params, default to disable checking the param. However, it's
    // possible to force-enable checking the param via the VerifyDidCommitParams
    // flag's param.
@@ -1337,7 +1372,7 @@ index d7cf66c91b..4d147fa562 100644
                                             param, false);
  #endif
  }
-@@ -17323,7 +17325,7 @@ void RenderFrameHostImpl::
+@@ -17404,7 +17406,7 @@ void RenderFrameHostImpl::
  #if !DCHECK_IS_ON()
    // Only check for the flag if DCHECK is not enabled, so that we will always
    // verify the params for tests.
@@ -1346,7 +1381,7 @@ index d7cf66c91b..4d147fa562 100644
      return;
  #endif
    // Check if these values from DidCommitProvisionalLoadParams sent by the
-@@ -18209,7 +18211,7 @@ void RenderFrameHostImpl::SetLifecycleState(LifecycleStateImpl new_state) {
+@@ -18290,7 +18292,7 @@ void RenderFrameHostImpl::SetLifecycleState(LifecycleStateImpl new_state) {
    LifecycleStateImpl old_state = lifecycle_state_;
    lifecycle_state_ = new_state;
  
@@ -1355,7 +1390,7 @@ index d7cf66c91b..4d147fa562 100644
      auto* local_render_widget_host = GetLocalRenderWidgetHost();
      if (local_render_widget_host) {
        // The priority contribution of the main frame is controlled also by
-@@ -18571,14 +18573,14 @@ void RenderFrameHostImpl::SetFrameTreeNode(FrameTreeNode& frame_tree_node) {
+@@ -18652,14 +18654,14 @@ void RenderFrameHostImpl::SetFrameTreeNode(FrameTreeNode& frame_tree_node) {
    // the new functionality for swapping BrowsingContext on cross
    // BrowsingInstance navigations, the BrowsingContextState is the only field
    // that will need to be swapped.
@@ -1373,7 +1408,7 @@ index d7cf66c91b..4d147fa562 100644
                kSwapForCrossBrowsingInstanceNavigations):
        // TODO(crbug.com/40205442): implement functionality for swapping on cross
        // browsing instance navigations as needed. This will likely be removed
-@@ -18887,7 +18889,7 @@ bool RenderFrameHostImpl::ShouldReuseCompositing(
+@@ -18970,7 +18972,7 @@ bool RenderFrameHostImpl::ShouldReuseCompositing(
      return false;
    }
  
@@ -1382,14 +1417,14 @@ index d7cf66c91b..4d147fa562 100644
      return false;
    }
  
-@@ -19026,3 +19028,5 @@ void RenderFrameHostImpl::SetPrerenderStateChangedCallback(
+@@ -19109,3 +19111,5 @@ void RenderFrameHostImpl::SetPrerenderStateChangedCallback(
  }
  
  }  // namespace content
 +
 +#undef TokenFrameMap
 diff --git a/content/browser/renderer_host/render_frame_host_manager.cc b/content/browser/renderer_host/render_frame_host_manager.cc
-index 546f55dc3e..f22e05ad67 100644
+index 376fa17253..b55956813c 100644
 --- a/content/browser/renderer_host/render_frame_host_manager.cc
 +++ b/content/browser/renderer_host/render_frame_host_manager.cc
 @@ -390,9 +390,9 @@ void UpdateProcessReusePolicyForMainFrame(SiteInstanceImpl* site_instance,
@@ -1621,7 +1656,7 @@ index 546f55dc3e..f22e05ad67 100644
        BrowsingContextState::RenderFrameProxyHostMap proxy_hosts_to_restore =
            pending_stored_page->TakeProxyHosts();
 diff --git a/content/browser/renderer_host/render_frame_proxy_host.cc b/content/browser/renderer_host/render_frame_proxy_host.cc
-index 895085d01b..f976949713 100644
+index fd1362129c..dcbd4c58e5 100644
 --- a/content/browser/renderer_host/render_frame_proxy_host.cc
 +++ b/content/browser/renderer_host/render_frame_proxy_host.cc
 @@ -55,6 +55,8 @@
@@ -1662,10 +1697,10 @@ index 7517bdd84c..ca2d78e5b8 100644
      render_widget_helper_->Init(render_process_id_);
    }
 diff --git a/content/browser/renderer_host/render_process_host_impl.cc b/content/browser/renderer_host/render_process_host_impl.cc
-index 3f7b3f4bc3..1db4cea359 100644
+index 512feca6fa..16232be5bf 100644
 --- a/content/browser/renderer_host/render_process_host_impl.cc
 +++ b/content/browser/renderer_host/render_process_host_impl.cc
-@@ -507,10 +507,10 @@ bool HasEnoughMemoryForAnotherMainFrame(RenderProcessHost* host,
+@@ -516,10 +516,10 @@ bool HasEnoughMemoryForAnotherMainFrame(RenderProcessHost* host,
        private_memory_footprint /
        std::max(main_frame_count, static_cast<size_t>(1));
    uint64_t process_memory_limit = base::saturated_cast<uint64_t>(
@@ -1678,16 +1713,7 @@ index 3f7b3f4bc3..1db4cea359 100644
    // Check that we have a factor of at least 1.
    if (frame_size_factor < 1.0f) {
      frame_size_factor = 1.0f;
-@@ -553,7 +553,7 @@ bool IsBelowReuseResourceThresholds(RenderProcessHost* host,
-   if (process_reuse_policy ==
-           ProcessReusePolicy::kReusePendingOrCommittedSiteSubframe &&
-       !base::FeatureList::IsEnabled(
--          features::kSubframeProcessReuseThresholds)) {
-+          ::features::kSubframeProcessReuseThresholds)) {
-     return true;
-   }
- 
-@@ -580,7 +580,7 @@ bool IsBelowReuseResourceThresholds(RenderProcessHost* host,
+@@ -582,7 +582,7 @@ bool IsBelowReuseResourceThresholds(RenderProcessHost* host,
      // If a threshold is specified, don't reuse `host` if it already hosts more
      // main frames (including BFCached and prerendered) than the threshold.
      size_t main_frame_threshold = base::checked_cast<size_t>(
@@ -1696,16 +1722,7 @@ index 3f7b3f4bc3..1db4cea359 100644
      if (main_frame_count >= main_frame_threshold) {
        return false;
      }
-@@ -610,7 +610,7 @@ bool IsBelowReuseResourceThresholds(RenderProcessHost* host,
-   // would be necessarily added to `host` later if the current frame were
-   // allowed to reuse it (e.g., as its subframes), etc.
-   uint64_t process_memory_limit = base::saturated_cast<uint64_t>(
--      features::kSubframeProcessReuseMemoryThreshold.Get());
-+      ::features::kSubframeProcessReuseMemoryThreshold.Get());
-   if (host->GetPrivateMemoryFootprint() < process_memory_limit) {
-     return true;
-   }
-@@ -685,7 +685,7 @@ bool IsEmptyRendererProcessesReuseAllowed() {
+@@ -686,7 +686,7 @@ bool IsEmptyRendererProcessesReuseAllowed() {
      return false;
    }
    return base::FeatureList::IsEnabled(
@@ -1714,7 +1731,7 @@ index 3f7b3f4bc3..1db4cea359 100644
  }
  
  class SiteProcessCountTracker : public base::SupportsUserData::Data,
-@@ -1407,8 +1407,8 @@ size_t RenderProcessHost::GetMaxRendererProcessCount() {
+@@ -1419,8 +1419,8 @@ size_t RenderProcessHost::GetMaxRendererProcessCount() {
    // processes remains reasonable, and on Android the OS takes care of that.
    // This has shown to have adversarial effects, so we fall back to desktop
    // behavior for desktop-like form factors.
@@ -1725,7 +1742,7 @@ index 3f7b3f4bc3..1db4cea359 100644
    } else {
      return std::numeric_limits<size_t>::max();
    }
-@@ -3212,19 +3212,19 @@ bool RenderProcessHostImpl::IsSpareProcessKeptAtAllTimes() {
+@@ -3262,19 +3262,19 @@ bool RenderProcessHostImpl::IsSpareProcessKeptAtAllTimes() {
    // ensure that devices with exactly 1GB of RAM won't get included because of
    // inaccuracies or off-by-one errors.
    if (base::SysInfo::AmountOfPhysicalMemory().InMiB() <=
@@ -1748,7 +1765,7 @@ index 3f7b3f4bc3..1db4cea359 100644
        !android_spare_process_override) {
      return false;
    }
-@@ -3434,7 +3434,7 @@ void RenderProcessHostImpl::AppendRendererCommandLine(
+@@ -3484,7 +3484,7 @@ void RenderProcessHostImpl::AppendRendererCommandLine(
      command_line->AppendSwitch(switches::kDisallowV8FeatureFlagOverrides);
    }
  
@@ -1757,7 +1774,7 @@ index 3f7b3f4bc3..1db4cea359 100644
      command_line->AppendSwitchASCII(
          blink::switches::kTouchTextSelectionStrategy,
          blink::switches::kTouchTextSelectionStrategy_Direction);
-@@ -4815,7 +4815,7 @@ bool RenderProcessHost::IsProcessLimitReached() {
+@@ -4885,7 +4885,7 @@ bool RenderProcessHost::IsProcessLimitReached() {
      // users, as the experiment is configured with "starts_active" set to false
      // (meaning it only collects data from users who reach this code).
  #if !BUILDFLAG(IS_ANDROID)
@@ -1766,7 +1783,7 @@ index 3f7b3f4bc3..1db4cea359 100644
        // This is used for tests. To avoid changing test behaviors, don't
        // change the behavior when it is set.
        if (g_max_renderer_count_override) {
-@@ -4942,7 +4942,7 @@ RenderProcessHost* RenderProcessHostImpl::GetProcessHostForSiteInstance(
+@@ -5012,7 +5012,7 @@ RenderProcessHost* RenderProcessHostImpl::GetProcessHostForSiteInstance(
      case ProcessReusePolicy::
          kReusePendingOrCommittedSiteWithMainFrameThreshold: {
        CHECK(base::FeatureList::IsEnabled(
@@ -1775,7 +1792,7 @@ index 3f7b3f4bc3..1db4cea359 100644
        [[fallthrough]];
      }
      case ProcessReusePolicy::kReusePrerenderingProcessForMainFrame: {
-@@ -5025,7 +5025,7 @@ RenderProcessHost* RenderProcessHostImpl::GetProcessHostForSiteInstance(
+@@ -5095,7 +5095,7 @@ RenderProcessHost* RenderProcessHostImpl::GetProcessHostForSiteInstance(
      base::UmaHistogramBoolean(
          "BrowserRenderProcessHost.ExistingRendererIsInitializedAndNotDead",
          render_process_host->IsInitializedAndNotDead());
@@ -1784,7 +1801,7 @@ index 3f7b3f4bc3..1db4cea359 100644
        render_process_host->Init();
      }
    }
-@@ -5556,7 +5556,7 @@ void RenderProcessHostImpl::UpdateProcessPriority() {
+@@ -5632,7 +5632,7 @@ void RenderProcessHostImpl::UpdateProcessPriority() {
      }
  #if BUILDFLAG(IS_MAC)
      if (base::FeatureList::IsEnabled(
@@ -1794,10 +1811,10 @@ index 3f7b3f4bc3..1db4cea359 100644
      }
  #else   // !BUILDFLAG(IS_MAC)
 diff --git a/content/browser/renderer_host/render_view_host_impl.cc b/content/browser/renderer_host/render_view_host_impl.cc
-index ac7638da0c..4d00855633 100644
+index 270750b918..606fb9cebc 100644
 --- a/content/browser/renderer_host/render_view_host_impl.cc
 +++ b/content/browser/renderer_host/render_view_host_impl.cc
-@@ -559,7 +559,7 @@ bool RenderViewHostImpl::CreateRenderView(
+@@ -558,7 +558,7 @@ bool RenderViewHostImpl::CreateRenderView(
                    frame_tree_node->current_frame_host()->GetFrameToken()));
      } else if (frame_tree_->is_prerendering() &&
                 (!base::FeatureList::IsEnabled(
@@ -1806,7 +1823,7 @@ index ac7638da0c..4d00855633 100644
                  main_rfh->lifecycle_state() ==
                      RenderFrameHostImpl::LifecycleStateImpl::kSpeculative)) {
        // During prerender, the browser may need to create new speculative local
-@@ -641,7 +641,7 @@ bool RenderViewHostImpl::CreateRenderView(
+@@ -640,7 +640,7 @@ bool RenderViewHostImpl::CreateRenderView(
              .AsMojom();
    }
  
@@ -1816,10 +1833,10 @@ index ac7638da0c..4d00855633 100644
          frame_tree()->controller().GetLastCommittedEntryIndex();
      params->history_length = frame_tree()->controller().GetEntryCount();
 diff --git a/content/browser/renderer_host/render_widget_host_impl.cc b/content/browser/renderer_host/render_widget_host_impl.cc
-index 817b5da3f1..720f0acd84 100644
+index b70623b562..d490f7e995 100644
 --- a/content/browser/renderer_host/render_widget_host_impl.cc
 +++ b/content/browser/renderer_host/render_widget_host_impl.cc
-@@ -2111,7 +2111,7 @@ RenderProcessHostPriorityClient::Priority RenderWidgetHostImpl::GetPriority() {
+@@ -2104,7 +2104,7 @@ RenderProcessHostPriorityClient::Priority RenderWidgetHostImpl::GetPriority() {
  #endif
    };
    bool should_contribute = false;
@@ -1828,7 +1845,7 @@ index 817b5da3f1..720f0acd84 100644
      should_contribute = should_contribute_priority_to_process_;
      if (owner_delegate_ && !owner_delegate_->IsMainFrameActive()) {
        // If this RenderWidgetHost is owned by a RenderViewHost which does not
-@@ -2176,7 +2176,7 @@ void RenderWidgetHostImpl::GetSnapshotFromBrowser(
+@@ -2169,7 +2169,7 @@ void RenderWidgetHostImpl::GetSnapshotFromBrowser(
    if (from_surface) {
      pending_surface_browser_snapshots_.insert(
          std::make_pair(snapshot_id, std::move(callback)));
@@ -1838,10 +1855,10 @@ index 817b5da3f1..720f0acd84 100644
        blink_widget_->ForceRedraw(base::DoNothing());
        // 2. Force a repaint to ensure that surface is updated.
 diff --git a/content/browser/renderer_host/render_widget_host_view_aura.cc b/content/browser/renderer_host/render_widget_host_view_aura.cc
-index 1ae2c93286..858431b9f4 100644
+index b8f74e321a..e577fb7b31 100644
 --- a/content/browser/renderer_host/render_widget_host_view_aura.cc
 +++ b/content/browser/renderer_host/render_widget_host_view_aura.cc
-@@ -3077,7 +3077,7 @@ void RenderWidgetHostViewAura::CreateSelectionController() {
+@@ -3074,7 +3074,7 @@ void RenderWidgetHostViewAura::CreateSelectionController() {
    tsc_config.tap_slop = ui::GestureConfiguration::GetInstance()
                              ->max_touch_move_in_pixels_for_click();
    tsc_config.enable_longpress_drag_selection =
@@ -1850,11 +1867,42 @@ index 1ae2c93286..858431b9f4 100644
    selection_controller_ = std::make_unique<ui::TouchSelectionController>(
        selection_controller_client_.get(), tsc_config);
  }
+diff --git a/content/browser/renderer_host/renderer_cancellation_throttle.cc b/content/browser/renderer_host/renderer_cancellation_throttle.cc
+index c9e326107e..95a503a865 100644
+--- a/content/browser/renderer_host/renderer_cancellation_throttle.cc
++++ b/content/browser/renderer_host/renderer_cancellation_throttle.cc
+@@ -17,7 +17,7 @@ namespace {
+ // UMA, 99% of navigations' cancellation window ends in under 2000ms, and all
+ // cancellation windows end in under 10000ms, so setting this to 11000ms.
+ const base::FeatureParam<base::TimeDelta> throttle_timeout{
+-    &features::kRendererCancellationThrottleImprovements, "timeout",
++    &::features::kRendererCancellationThrottleImprovements, "timeout",
+     base::Milliseconds(11000)};
+ 
+ }  // namespace
+@@ -115,7 +115,7 @@ void RendererCancellationThrottle::NavigationCancellationWindowEnded() {
+   renderer_cancellation_timeout_timer_.Stop();
+ 
+   if (!base::FeatureList::IsEnabled(
+-          features::kRendererCancellationThrottleImprovements)) {
++          ::features::kRendererCancellationThrottleImprovements)) {
+     request->GetRenderFrameHost()
+         ->GetRenderWidgetHost()
+         ->RendererIsResponsive();
+@@ -137,7 +137,7 @@ void RendererCancellationThrottle::OnTimeout() {
+       "Navigation.RendererCancellationThrottle.NotCancelled.TimeoutIsHit",
+       true);
+   if (base::FeatureList::IsEnabled(
+-          features::kRendererCancellationThrottleImprovements)) {
++          ::features::kRendererCancellationThrottleImprovements)) {
+     // Resume the navigation once it hits the timeout, without marking the
+     // renderer as unresponsive.
+     did_resume_navigation_ = true;
 diff --git a/content/browser/renderer_host/spare_render_process_host_manager_impl.cc b/content/browser/renderer_host/spare_render_process_host_manager_impl.cc
-index 8087773b82..3575e3f1e8 100644
+index 8e776265d6..d7d5b005bb 100644
 --- a/content/browser/renderer_host/spare_render_process_host_manager_impl.cc
 +++ b/content/browser/renderer_host/spare_render_process_host_manager_impl.cc
-@@ -206,7 +206,7 @@ size_t GetSpareRPHCount() {
+@@ -236,7 +236,7 @@ size_t GetSpareRPHCount() {
    if (base::SysInfo::AmountOfPhysicalMemory() < base::GiB(4)) {
      return 1u;
    }
@@ -1863,7 +1911,7 @@ index 8087773b82..3575e3f1e8 100644
  }
  
  void LogAllocationContext(const std::string& source_uma_name,
-@@ -729,17 +729,17 @@ void SpareRenderProcessHostManagerImpl::PrepareForFutureRequests(
+@@ -779,17 +779,17 @@ void SpareRenderProcessHostManagerImpl::PrepareForFutureRequests(
    if (RenderProcessHostImpl::IsSpareProcessKeptAtAllTimes()) {
      std::optional<base::TimeDelta> timeout = std::nullopt;
      if (base::FeatureList::IsEnabled(
@@ -1886,15 +1934,15 @@ index 8087773b82..3575e3f1e8 100644
        }
      }
      // Always keep around a spare process for the most recently requested
-@@ -857,7 +857,7 @@ void SpareRenderProcessHostManagerImpl::RenderProcessReady(
-   UMA_HISTOGRAM_TIMES("BrowserRenderProcessHost.SpareProcessStartupTime",
-                       process_startup_timer_->Elapsed());
+@@ -1079,7 +1079,7 @@ bool SpareRenderProcessHostManagerImpl::
  
--  if (base::FeatureList::IsEnabled(features::kSpareRendererProcessPriority)) {
-+  if (base::FeatureList::IsEnabled(::features::kSpareRendererProcessPriority)) {
-     host->SetHasSpareRendererPriority(true);
+ void SpareRenderProcessHostManagerImpl::OnApplicationStateChange(
+     base::android::ApplicationState state) {
+-  if (!features::kAndroidSpareRendererKillWhenBackgrounded.Get()) {
++  if (!::features::kAndroidSpareRendererKillWhenBackgrounded.Get()) {
+     return;
    }
- 
+   using ApplicationState = base::android::ApplicationState;
 diff --git a/content/browser/security/coop/cross_origin_opener_policy_reporter.cc b/content/browser/security/coop/cross_origin_opener_policy_reporter.cc
 index 27af8106d6..150541127c 100644
 --- a/content/browser/security/coop/cross_origin_opener_policy_reporter.cc
@@ -1934,7 +1982,7 @@ index 464954acf9..696389fd45 100644
 +
 +#undef kType
 diff --git a/content/browser/webid/accounts_fetcher.cc b/content/browser/webid/accounts_fetcher.cc
-index d252b946df..1a6ebab331 100644
+index 28ddad3485..6fce48cb56 100644
 --- a/content/browser/webid/accounts_fetcher.cc
 +++ b/content/browser/webid/accounts_fetcher.cc
 @@ -20,6 +20,8 @@ using LoginState = content::IdentityRequestAccount::LoginState;
@@ -1946,17 +1994,17 @@ index d252b946df..1a6ebab331 100644
  namespace content::webid {
  
  namespace {
-@@ -632,3 +634,5 @@ void AccountsFetcher::SendFailedTokenRequestMetrics(
+@@ -665,3 +667,5 @@ void AccountsFetcher::SendFailedTokenRequestMetrics(
  }
  
  }  // namespace content::webid
 +
 +#undef IsFrameActive
 diff --git a/content/browser/webid/request_service.cc b/content/browser/webid/request_service.cc
-index bffa357116..e19d967fa7 100644
+index 44fd712474..f30eec1a35 100644
 --- a/content/browser/webid/request_service.cc
 +++ b/content/browser/webid/request_service.cc
-@@ -79,6 +79,8 @@ using CompleteRequestWithErrorCallback =
+@@ -80,6 +80,8 @@ using CompleteRequestWithErrorCallback =
                              std::optional<content::webid::RequestIdTokenStatus>,
                              bool)>;
  
@@ -1965,7 +2013,7 @@ index bffa357116..e19d967fa7 100644
  namespace content::webid {
  
  namespace {
-@@ -2714,3 +2716,5 @@ RelyingPartyData RequestService::CreateRpData() const {
+@@ -2733,3 +2735,5 @@ RelyingPartyData RequestService::CreateRpData(
  }
  
  }  // namespace content::webid
@@ -2017,7 +2065,7 @@ index 15fd604464..1c87fed47c 100644
  target(link_target_type, "child") {
    # Targets external to content should always link to the public API.
 diff --git a/content/common/BUILD.gn b/content/common/BUILD.gn
-index 54767e50a8..1b5593a287 100644
+index 6d7ad583bc..9438164afb 100644
 --- a/content/common/BUILD.gn
 +++ b/content/common/BUILD.gn
 @@ -58,7 +58,7 @@ if (is_linux || is_chromeos) {
@@ -2041,7 +2089,7 @@ index 54767e50a8..1b5593a287 100644
    configs += [
      "//content:content_implementation",
 diff --git a/content/gpu/BUILD.gn b/content/gpu/BUILD.gn
-index 0823021f79..9826dd5da7 100644
+index 9ad6d34c60..75f1536422 100644
 --- a/content/gpu/BUILD.gn
 +++ b/content/gpu/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -2065,7 +2113,7 @@ index 0823021f79..9826dd5da7 100644
  
  target(link_target_type, "gpu_sources") {
 diff --git a/content/public/browser/BUILD.gn b/content/public/browser/BUILD.gn
-index ac55a41ce6..7cbfc61e74 100644
+index 143bd74a69..c41435d44d 100644
 --- a/content/public/browser/BUILD.gn
 +++ b/content/public/browser/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -2108,7 +2156,7 @@ index 5557767f68..2541477a49 100644
    visibility = [ "//content/*" ]
  
 diff --git a/content/public/common/BUILD.gn b/content/public/common/BUILD.gn
-index 981abc2963..2a2cb92933 100644
+index 8e91c465c6..20179ebdfb 100644
 --- a/content/public/common/BUILD.gn
 +++ b/content/public/common/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -2129,7 +2177,7 @@ index 981abc2963..2a2cb92933 100644
    visibility = [ "//content/*" ]
  
 diff --git a/content/public/renderer/BUILD.gn b/content/public/renderer/BUILD.gn
-index ea36bc127d..e4299d1fed 100644
+index 11cdec1494..e32f8a4846 100644
 --- a/content/public/renderer/BUILD.gn
 +++ b/content/public/renderer/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -2153,7 +2201,7 @@ index ea36bc127d..e4299d1fed 100644
  target(link_target_type, "renderer_sources") {
    # External code should depend on via ":renderer" above.
 diff --git a/content/renderer/BUILD.gn b/content/renderer/BUILD.gn
-index b31aef089e..6cdc9dcd55 100644
+index 1cad7f1d08..8a0544e514 100644
 --- a/content/renderer/BUILD.gn
 +++ b/content/renderer/BUILD.gn
 @@ -5,6 +5,7 @@
@@ -2247,7 +2295,7 @@ index a4b43fc075..752aff12bc 100644
      "//build/config/compiler:wexit_time_destructors",
      "//v8:external_startup_data",
 diff --git a/content/test/BUILD.gn b/content/test/BUILD.gn
-index 8e939c6c74..83c2970c62 100644
+index 0cb62bf470..5a4403b2a5 100644
 --- a/content/test/BUILD.gn
 +++ b/content/test/BUILD.gn
 @@ -7,6 +7,7 @@ import("//build/config/chrome_build.gni")
@@ -2258,7 +2306,7 @@ index 8e939c6c74..83c2970c62 100644
  import("//build/config/ui.gni")
  import("//build/nocompile.gni")
  import("//components/viz/common/debugger/viz_debugger.gni")
-@@ -43,7 +44,7 @@ if (is_ios) {
+@@ -72,7 +73,7 @@ static_library("setup_field_trials") {
  
  # Use a static library here because many test binaries depend on this but don't
  # require many files from it. This makes linking more efficient.
@@ -2267,7 +2315,7 @@ index 8e939c6c74..83c2970c62 100644
    testonly = true
  
    # See comment at the top of //content/BUILD.gn for why this is disabled in
-@@ -1046,7 +1047,7 @@ source_set("default_content_test_launcher") {
+@@ -1078,7 +1079,7 @@ source_set("default_content_test_launcher") {
  
  # browsertest_support can be used by targets that run content_shell based
  # browser tests.

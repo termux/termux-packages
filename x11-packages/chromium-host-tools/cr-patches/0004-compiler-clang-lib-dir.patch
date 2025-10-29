@@ -1,9 +1,9 @@
 --- a/build/config/clang/clang.gni
 +++ b/build/config/clang/clang.gni
-@@ -65,6 +65,9 @@
-       current_cpu == "x64" &&
-       # reclient doesn't handle headers in modulemap config.
-       !use_reclient && !is_cronet_for_aosp_build
+@@ -95,6 +95,9 @@
+       clang_modules_platform_supported && using_tested_sysroot &&
+       # reclient and icecc don't handle headers in modulemap config.
+       !use_reclient && !is_cronet_for_aosp_build && cc_wrapper != "icecc"
 +
 +  custom_toolchain_clang_base_path = ""
 +  custom_toolchain_clang_version = ""
