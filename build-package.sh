@@ -509,7 +509,7 @@ _show_usage() {
 	echo "  -I Download and extract dependencies instead of building them, keep existing $TERMUX_BASE_DIR files."
 	echo "  -L The package and its dependencies will be based on the same library."
 	echo "  -q Quiet build."
-	echo "  -Q Loud build -- set -x debug output."
+	echo "  -Q Loud build -- set -x debug output and function tracing."
 	echo "  -r Remove all package build dependent dirs that '-f/-F'"
 	echo "     flags alone would not remove, like cache dir containing "
 	echo "     package sources and host build dir. Ignored if '-f/-F'"
@@ -583,7 +583,7 @@ while (($# >= 1)); do
 			;;
 		-L) export TERMUX_GLOBAL_LIBRARY=true;;
 		-q) export TERMUX_QUIET_BUILD=true;;
-		-Q) set -x;;
+		-Q) export PS4='+$0 \[\e[32m\]${FUNCNAME[0]:-<global scope>}${FUNCNAME[*]:+()}:$LINENO\[\e[0m\] '; set -x;;
 		-r) export TERMUX_PKGS__BUILD__RM_ALL_PKG_BUILD_DEPENDENT_DIRS=true;;
 		-w) export TERMUX_WITHOUT_DEPVERSION_BINDING=true;;
 		-s) export TERMUX_SKIP_DEPCHECK=true;;
