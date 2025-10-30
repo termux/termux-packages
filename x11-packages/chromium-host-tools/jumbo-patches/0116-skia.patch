@@ -13,10 +13,9 @@ Enable jumbo build for the following template(s):
 
 ---
  skia/BUILD.gn                                 | 45 ++++++++++++++++++-
- .../rust_png/decoder/impl/SkPngRustCodec.cpp  |  5 +++
- .../encoder/impl/SkPngRustEncoderImpl.cpp     |  5 +++
  .../skottie/src/animator/KeyframeAnimator.cpp |  6 +--
  .../src/layers/shapelayer/ShapeLayer.cpp      |  4 ++
+ third_party/skia/src/codec/SkPngRustCodec.cpp |  5 +++
  third_party/skia/src/core/SkBlitMask_opts.cpp |  5 +++
  .../skia/src/core/SkBlitMask_opts_ssse3.cpp   |  2 +
  third_party/skia/src/core/SkBlitRow_opts.cpp  |  5 +++
@@ -31,6 +30,7 @@ Enable jumbo build for the following template(s):
  .../skia/src/core/SkSwizzler_opts_hsw.cpp     |  2 +
  .../skia/src/core/SkSwizzler_opts_ssse3.cpp   |  2 +
  third_party/skia/src/core/SkVertices.cpp      |  4 ++
+ .../skia/src/encode/SkPngRustEncoderImpl.cpp  |  5 +++
  third_party/skia/src/gpu/ganesh/Device.cpp    |  2 +
  .../skia/src/gpu/ganesh/GrDirectContext.cpp   |  2 +
  .../src/gpu/ganesh/GrDirectContextPriv.cpp    |  2 +
@@ -77,7 +77,7 @@ Enable jumbo build for the following template(s):
  62 files changed, 308 insertions(+), 9 deletions(-)
 
 diff --git a/skia/BUILD.gn b/skia/BUILD.gn
-index 5b91744f07..ca045fd853 100644
+index d0260eb23d..2ad7fc2c0b 100644
 --- a/skia/BUILD.gn
 +++ b/skia/BUILD.gn
 @@ -7,6 +7,7 @@ import("//build/config/avx512.gni")
@@ -111,9 +111,9 @@ index 5b91744f07..ca045fd853 100644
    public = [
      "ext/benchmarking_canvas.h",
      "ext/cicp.h",
-@@ -299,6 +306,13 @@ component("skia") {
+@@ -297,6 +304,13 @@ component("skia") {
+     "ext/skia_trace_memory_dump_impl.cc",
      "ext/skia_utils_base.cc",
-     "rusty_png_feature.cc",
    ]
 +  jumbo_excluded_sources += [
 +    # Macro confliction between `base/trace_event/trace_event.h` and `third_party/skia/src/core/SkTraceEvent.h`
@@ -125,7 +125,7 @@ index 5b91744f07..ca045fd853 100644
    if (is_ios) {
      public += [ "ext/skia_utils_ios.h" ]
      sources += [ "ext/skia_utils_ios.mm" ]
-@@ -378,6 +392,11 @@ component("skia") {
+@@ -376,6 +390,11 @@ component("skia") {
    sources += skia_encode_rust_png_srcs
    sources += skia_encode_webp_srcs
  
@@ -137,7 +137,7 @@ index 5b91744f07..ca045fd853 100644
    sources += [
      "//third_party/skia/src/sfnt/SkOTTable_name.cpp",
      "//third_party/skia/src/sfnt/SkOTUtils.cpp",
-@@ -678,7 +697,12 @@ source_set("rust_png_ffi_cpp") {
+@@ -676,7 +695,12 @@ source_set("rust_png_ffi_cpp") {
  # These are all opted out of check_includes, due to (logically) being part of
  # skia.
  template("skia_source_set") {
@@ -151,7 +151,7 @@ index 5b91744f07..ca045fd853 100644
      forward_variables_from(invoker, "*")
  
      check_includes = false
-@@ -730,6 +754,18 @@ skia_source_set("skia_core_and_effects") {
+@@ -728,6 +752,18 @@ skia_source_set("skia_core_and_effects") {
    sources += skia_effects_sources
    sources += skia_effects_imagefilter_sources
    sources += skia_pathops_sources
@@ -170,7 +170,7 @@ index 5b91744f07..ca045fd853 100644
    if (skia_support_gpu) {
      deps = [ "//gpu/config:workaround_list" ]
    }
-@@ -943,6 +979,11 @@ if (skia_support_gpu) {
+@@ -941,6 +977,11 @@ if (skia_support_gpu) {
    skia_source_set("skia_graphite_private") {
      sources = skia_graphite_sources + skia_graphite_precompile_sources +
                skia_sksl_graphite_modules_sources
@@ -182,46 +182,6 @@ index 5b91744f07..ca045fd853 100644
      if (skia_use_dawn) {
        sources += skia_graphite_dawn_sources
      }
-diff --git a/third_party/skia/experimental/rust_png/decoder/impl/SkPngRustCodec.cpp b/third_party/skia/experimental/rust_png/decoder/impl/SkPngRustCodec.cpp
-index d0c1f6e9f3..9d80de0238 100644
---- a/third_party/skia/experimental/rust_png/decoder/impl/SkPngRustCodec.cpp
-+++ b/third_party/skia/experimental/rust_png/decoder/impl/SkPngRustCodec.cpp
-@@ -30,6 +30,7 @@
- #include "third_party/rust/cxx/v1/cxx.h"
- 
- #ifdef __clang__
-+#pragma clang diagnostic push
- #pragma clang diagnostic error "-Wconversion"
- #endif
- 
-@@ -1250,3 +1251,7 @@ SkCodec::Result SkPngRustCodec::FrameHolder::setFrameInfoFromCurrentFctlChunk(
-     this->setAlphaAndRequiredFrame(frame);
-     return kSuccess;
- }
-+
-+#ifdef __clang__
-+#pragma clang diagnostic pop
-+#endif
-diff --git a/third_party/skia/experimental/rust_png/encoder/impl/SkPngRustEncoderImpl.cpp b/third_party/skia/experimental/rust_png/encoder/impl/SkPngRustEncoderImpl.cpp
-index a0bf27910d..55d915c487 100644
---- a/third_party/skia/experimental/rust_png/encoder/impl/SkPngRustEncoderImpl.cpp
-+++ b/third_party/skia/experimental/rust_png/encoder/impl/SkPngRustEncoderImpl.cpp
-@@ -25,6 +25,7 @@
- #include "third_party/rust/cxx/v1/cxx.h"
- 
- #ifdef __clang__
-+#pragma clang diagnostic push
- #pragma clang diagnostic error "-Wconversion"
- #endif
- 
-@@ -271,3 +272,7 @@ bool SkPngRustEncoderImpl::onEncodeRow(SkSpan<const uint8_t> row) {
- bool SkPngRustEncoderImpl::onFinishEncoding() {
-     return rust_png::finish_encoding(std::move(fStreamWriter)) == rust_png::EncodingResult::Success;
- }
-+
-+#ifdef __clang__
-+#pragma clang diagnostic pop
-+#endif
 diff --git a/third_party/skia/modules/skottie/src/animator/KeyframeAnimator.cpp b/third_party/skia/modules/skottie/src/animator/KeyframeAnimator.cpp
 index 86c7da9508..63581ed2f5 100644
 --- a/third_party/skia/modules/skottie/src/animator/KeyframeAnimator.cpp
@@ -265,6 +225,26 @@ index 9f61ed6c52..bc42da4245 100644
  } // namespace skottie
 +
 +#undef ShapeInfo
+diff --git a/third_party/skia/src/codec/SkPngRustCodec.cpp b/third_party/skia/src/codec/SkPngRustCodec.cpp
+index 4c9446165c..30da118500 100644
+--- a/third_party/skia/src/codec/SkPngRustCodec.cpp
++++ b/third_party/skia/src/codec/SkPngRustCodec.cpp
+@@ -32,6 +32,7 @@
+ #include "third_party/rust/cxx/v1/cxx.h"
+ 
+ #ifdef __clang__
++#pragma clang diagnostic push
+ #pragma clang diagnostic error "-Wconversion"
+ #endif
+ 
+@@ -1374,3 +1375,7 @@ SkCodec::Result SkPngRustCodec::FrameHolder::setFrameInfoFromCurrentFctlChunk(
+     this->setAlphaAndRequiredFrame(frame);
+     return kSuccess;
+ }
++
++#ifdef __clang__
++#pragma clang diagnostic pop
++#endif
 diff --git a/third_party/skia/src/core/SkBlitMask_opts.cpp b/third_party/skia/src/core/SkBlitMask_opts.cpp
 index 42307c4052..c3afc3a062 100644
 --- a/third_party/skia/src/core/SkBlitMask_opts.cpp
@@ -328,7 +308,7 @@ index e110b8c3fa..a51bb5ae74 100644
 +
  #endif // SK_CPU_X86 && !SK_ENABLE_OPTIMIZE_SIZE
 diff --git a/third_party/skia/src/core/SkGeometry.cpp b/third_party/skia/src/core/SkGeometry.cpp
-index f3419f9aed..418a852670 100644
+index 8500efdf2e..e1b3469d0a 100644
 --- a/third_party/skia/src/core/SkGeometry.cpp
 +++ b/third_party/skia/src/core/SkGeometry.cpp
 @@ -27,6 +27,8 @@
@@ -340,7 +320,7 @@ index f3419f9aed..418a852670 100644
  namespace {
  
  using float2 = skvx::float2;
-@@ -1816,3 +1818,5 @@ int SkConic::BuildUnitArc(const SkVector& uStart, const SkVector& uStop, SkPathD
+@@ -1825,3 +1827,5 @@ int SkConic::BuildUnitArc(const SkVector& uStart, const SkVector& uStop, SkPathD
      }
      return conicCount;
  }
@@ -408,10 +388,10 @@ index a74175be55..c78789cd5e 100644
 +
 +#undef INHERITED
 diff --git a/third_party/skia/src/core/SkScalerContext.cpp b/third_party/skia/src/core/SkScalerContext.cpp
-index 1422cb2a65..f5948e13f1 100644
+index e9089a234d..a0879304da 100644
 --- a/third_party/skia/src/core/SkScalerContext.cpp
 +++ b/third_party/skia/src/core/SkScalerContext.cpp
-@@ -48,6 +48,8 @@
+@@ -49,6 +49,8 @@
  #include <new>
  #include <utility>
  
@@ -420,7 +400,7 @@ index 1422cb2a65..f5948e13f1 100644
  ///////////////////////////////////////////////////////////////////////////////
  
  namespace {
-@@ -1323,3 +1325,5 @@ std::unique_ptr<SkScalerContext> SkScalerContext::MakeEmpty(
+@@ -1324,3 +1326,5 @@ std::unique_ptr<SkScalerContext> SkScalerContext::MakeEmpty(
  
  
  
@@ -487,11 +467,31 @@ index 84c13909b6..630be73dbe 100644
  }
 +
 +#undef next_id
+diff --git a/third_party/skia/src/encode/SkPngRustEncoderImpl.cpp b/third_party/skia/src/encode/SkPngRustEncoderImpl.cpp
+index a2c7491699..91e04a5128 100644
+--- a/third_party/skia/src/encode/SkPngRustEncoderImpl.cpp
++++ b/third_party/skia/src/encode/SkPngRustEncoderImpl.cpp
+@@ -25,6 +25,7 @@
+ #include "third_party/rust/cxx/v1/cxx.h"
+ 
+ #ifdef __clang__
++#pragma clang diagnostic push
+ #pragma clang diagnostic error "-Wconversion"
+ #endif
+ 
+@@ -271,3 +272,7 @@ bool SkPngRustEncoderImpl::onEncodeRow(SkSpan<const uint8_t> row) {
+ bool SkPngRustEncoderImpl::onFinishEncoding() {
+     return rust_png::finish_encoding(std::move(fStreamWriter)) == rust_png::EncodingResult::Success;
+ }
++
++#ifdef __clang__
++#pragma clang diagnostic pop
++#endif
 diff --git a/third_party/skia/src/gpu/ganesh/Device.cpp b/third_party/skia/src/gpu/ganesh/Device.cpp
-index 96a462ca46..fbe6d5faa3 100644
+index c96024cd9a..3dc727f666 100644
 --- a/third_party/skia/src/gpu/ganesh/Device.cpp
 +++ b/third_party/skia/src/gpu/ganesh/Device.cpp
-@@ -1460,3 +1460,5 @@ void Device::drawSlug(SkCanvas* canvas, const sktext::gpu::Slug* slug, const SkP
+@@ -1456,3 +1456,5 @@ void Device::drawSlug(SkCanvas* canvas, const sktext::gpu::Slug* slug, const SkP
  }
  
  }  // namespace skgpu::ganesh
@@ -561,7 +561,7 @@ index 8d2cedac90..b9631a2ca7 100644
 +#undef Attribute
 +#undef AttributeSet
 diff --git a/third_party/skia/src/gpu/ganesh/GrProxyProvider.cpp b/third_party/skia/src/gpu/ganesh/GrProxyProvider.cpp
-index 9dcf9bf878..d56969befb 100644
+index 1b57bd9bca..2e6e1efaa6 100644
 --- a/third_party/skia/src/gpu/ganesh/GrProxyProvider.cpp
 +++ b/third_party/skia/src/gpu/ganesh/GrProxyProvider.cpp
 @@ -1040,3 +1040,5 @@ void GrProxyProvider::removeAllUniqueKeys() {
@@ -581,7 +581,7 @@ index 9ed45eba99..c7580ea869 100644
 +
 +#undef ASSERT_SINGLE_OWNER
 diff --git a/third_party/skia/src/gpu/ganesh/GrResourceProvider.cpp b/third_party/skia/src/gpu/ganesh/GrResourceProvider.cpp
-index 6519896156..daa59d347b 100644
+index 7536f94310..ccae63c750 100644
 --- a/third_party/skia/src/gpu/ganesh/GrResourceProvider.cpp
 +++ b/third_party/skia/src/gpu/ganesh/GrResourceProvider.cpp
 @@ -930,3 +930,5 @@ sk_sp<GrTexture> GrResourceProvider::writePixels(sk_sp<GrTexture> texture,
@@ -673,7 +673,7 @@ index 1436de3977..f78aa1d8a8 100644
 +#undef GL_CALL_RET
 +#undef GL_ALLOC_CALL
 diff --git a/third_party/skia/src/gpu/ganesh/gl/GrGLGpu.cpp b/third_party/skia/src/gpu/ganesh/gl/GrGLGpu.cpp
-index ea5c1e8a12..72ad5deb00 100644
+index a800de5d12..f46b202a01 100644
 --- a/third_party/skia/src/gpu/ganesh/gl/GrGLGpu.cpp
 +++ b/third_party/skia/src/gpu/ganesh/gl/GrGLGpu.cpp
 @@ -4581,3 +4581,7 @@ void GrGLGpu::onDumpJSON(SkJSONWriter* writer) const {
@@ -751,7 +751,7 @@ index e5c2dcb43b..07c95fb08b 100644
 +
 +#undef VK_CALL
 diff --git a/third_party/skia/src/gpu/ganesh/vk/GrVkGpu.cpp b/third_party/skia/src/gpu/ganesh/vk/GrVkGpu.cpp
-index 8ca500cecc..190d27f796 100644
+index 3f757df998..6f6a34b5fb 100644
 --- a/third_party/skia/src/gpu/ganesh/vk/GrVkGpu.cpp
 +++ b/third_party/skia/src/gpu/ganesh/vk/GrVkGpu.cpp
 @@ -2755,3 +2755,6 @@ void GrVkGpu::storeVkPipelineCacheData(size_t maxSize) {
@@ -781,40 +781,40 @@ index 8d822c4d7b..4270c4faa6 100644
 +
 +#undef kSKSL_Tag
 diff --git a/third_party/skia/src/gpu/graphite/Context.cpp b/third_party/skia/src/gpu/graphite/Context.cpp
-index 6e34e75b0a..8cd2917c4c 100644
+index 0c4f66ed79..b0d91d6f1f 100644
 --- a/third_party/skia/src/gpu/graphite/Context.cpp
 +++ b/third_party/skia/src/gpu/graphite/Context.cpp
-@@ -1036,3 +1036,5 @@ std::unique_ptr<Context> ContextCtorAccessor::MakeContext(
+@@ -1043,3 +1043,5 @@ std::unique_ptr<Context> ContextCtorAccessor::MakeContext(
  }
  
  } // namespace skgpu::graphite
 +
 +#undef ASSERT_SINGLE_OWNER
 diff --git a/third_party/skia/src/gpu/graphite/Device.cpp b/third_party/skia/src/gpu/graphite/Device.cpp
-index 275879d561..54716ad406 100644
+index 1bc1f0d517..ea65898918 100644
 --- a/third_party/skia/src/gpu/graphite/Device.cpp
 +++ b/third_party/skia/src/gpu/graphite/Device.cpp
-@@ -2239,3 +2239,5 @@ bool Device::drawBlurredRRect(const SkRRect& rrect, const SkPaint& paint, float
+@@ -2252,3 +2252,5 @@ bool Device::drawBlurredRRect(const SkRRect& rrect, const SkPaint& paint, float
  }
  
  } // namespace skgpu::graphite
 +
 +#undef ASSERT_SINGLE_OWNER
 diff --git a/third_party/skia/src/gpu/graphite/PrecompileContext.cpp b/third_party/skia/src/gpu/graphite/PrecompileContext.cpp
-index 2da674463c..9495430bb8 100644
+index 4838c32ac3..d8660830ab 100644
 --- a/third_party/skia/src/gpu/graphite/PrecompileContext.cpp
 +++ b/third_party/skia/src/gpu/graphite/PrecompileContext.cpp
-@@ -129,3 +129,5 @@ std::string PrecompileContext::getPipelineLabel(sk_sp<SkData> serializedPipeline
+@@ -121,3 +121,5 @@ std::string PrecompileContext::getPipelineLabel(sk_sp<SkData> serializedPipeline
  
  
  } // namespace skgpu::graphite
 +
 +#undef ASSERT_SINGLE_OWNER
 diff --git a/third_party/skia/src/gpu/graphite/Recorder.cpp b/third_party/skia/src/gpu/graphite/Recorder.cpp
-index 79cf2c7fef..c08e101932 100644
+index 856b364aa4..5f163121df 100644
 --- a/third_party/skia/src/gpu/graphite/Recorder.cpp
 +++ b/third_party/skia/src/gpu/graphite/Recorder.cpp
-@@ -68,6 +68,8 @@
+@@ -69,6 +69,8 @@
  
  enum SkColorType : int;
  
@@ -823,8 +823,8 @@ index 79cf2c7fef..c08e101932 100644
  namespace skgpu::graphite {
  
  #define ASSERT_SINGLE_OWNER SKGPU_ASSERT_SINGLE_OWNER(this->singleOwner())
-@@ -631,3 +633,7 @@ void RecorderPriv::issueFlushToken() {
- 
+@@ -693,3 +695,7 @@ void RecorderPriv::issueFlushToken() {
+ #endif
  
  } // namespace skgpu::graphite
 +
@@ -1135,7 +1135,7 @@ index 686a547730..5b3f1e0b3d 100644
 +#undef kInverse3x3
 +#undef kInverse4x4
 diff --git a/third_party/skia/src/utils/SkCustomTypeface.cpp b/third_party/skia/src/utils/SkCustomTypeface.cpp
-index 73f9bcb2d0..7cf8b8459d 100644
+index 2bc4c43e69..b41c45855f 100644
 --- a/third_party/skia/src/utils/SkCustomTypeface.cpp
 +++ b/third_party/skia/src/utils/SkCustomTypeface.cpp
 @@ -48,6 +48,8 @@
@@ -1154,10 +1154,10 @@ index 73f9bcb2d0..7cf8b8459d 100644
 +
 +#undef kSkShowTextBlitCoverage
 diff --git a/third_party/skia/src/utils/SkParsePath.cpp b/third_party/skia/src/utils/SkParsePath.cpp
-index 6f193b95dc..070be4fe01 100644
+index dc38257ceb..e7187190de 100644
 --- a/third_party/skia/src/utils/SkParsePath.cpp
 +++ b/third_party/skia/src/utils/SkParsePath.cpp
-@@ -18,6 +18,13 @@
+@@ -19,6 +19,13 @@
  
  #include <cstdio>
  

@@ -14,11 +14,9 @@ Enable jumbo build for the following template(s):
  .../baseline/arm/baseline-compiler-arm-inl.h  |   2 +
  v8/src/baseline/baseline-compiler.cc          |   2 +
  v8/src/compiler/backend/instruction.h         |   4 +-
- v8/src/compiler/revectorizer.cc               |   2 +
  .../turboshaft/loop-unrolling-reducer.cc      |   6 +-
  .../wasm-in-js-inlining-reducer-inl.h         |   2 +
  .../wasm-load-elimination-reducer.h           |   1 +
- .../compiler/turboshaft/wasm-revec-reducer.cc |   2 +
  v8/src/compiler/wasm-compiler.cc              |   6 +-
  v8/src/diagnostics/perf-jit.cc                |   2 +
  v8/src/handles/global-handles.cc              |   4 +-
@@ -32,8 +30,6 @@ Enable jumbo build for the following template(s):
  v8/src/maglev/maglev-assembler-inl.h          |   4 +-
  v8/src/maglev/maglev-assembler.cc             |   2 +
  v8/src/maglev/maglev-code-generator.cc        |   4 +-
- v8/src/maglev/maglev-graph-builder.cc         |   3 +
- v8/src/maglev/maglev-inlining.cc              |   2 +
  v8/src/maglev/maglev-ir.cc                    |   2 +
  v8/src/objects/js-atomics-synchronization.h   |   8 +-
  v8/src/objects/js-collator.cc                 |   4 +
@@ -47,10 +43,11 @@ Enable jumbo build for the following template(s):
  v8/src/torque/csa-generator.cc                |   4 +
  v8/src/utils/sha-256.cc                       |   3 +
  v8/src/wasm/wasm-external-refs.cc             |   3 +
- 38 files changed, 212 insertions(+), 34 deletions(-)
+ v8/src/wasm/wrappers.cc                       |   2 +
+ 35 files changed, 205 insertions(+), 34 deletions(-)
 
 diff --git a/v8/BUILD.gn b/v8/BUILD.gn
-index 487a746616..88110d5fc9 100644
+index 05490a65a0..b759021b2a 100644
 --- a/v8/BUILD.gn
 +++ b/v8/BUILD.gn
 @@ -7,6 +7,7 @@ import("//build/config/arm.gni")
@@ -61,7 +58,7 @@ index 487a746616..88110d5fc9 100644
  import("//build/config/mips.gni")
  import("//build/config/riscv.gni")
  import("//build/config/rust.gni")
-@@ -3114,26 +3115,54 @@ v8_source_set("v8_initializers") {
+@@ -3101,26 +3102,54 @@ v8_source_set("v8_initializers") {
      }
    }
  
@@ -116,7 +113,7 @@ index 487a746616..88110d5fc9 100644
    } else if (v8_current_cpu == "mips64" || v8_current_cpu == "mips64el") {
      sources += [
        ### gcmole(mips64el) ###
-@@ -5219,6 +5248,24 @@ v8_compiler_sources = [
+@@ -5200,6 +5229,24 @@ v8_compiler_sources = [
    "src/compiler/zone-stats.cc",
  ]
  
@@ -141,7 +138,7 @@ index 487a746616..88110d5fc9 100644
  if (!v8_enable_maglev) {
    # When Maglev is not enabled, Turboshaft still needs Maglev's graph builder.
    v8_compiler_sources += [
-@@ -5244,6 +5291,11 @@ if (v8_current_cpu == "x86") {
+@@ -5225,6 +5272,11 @@ if (v8_current_cpu == "x86") {
      "src/compiler/backend/ia32/instruction-scheduler-ia32.cc",
      "src/compiler/backend/ia32/instruction-selector-ia32.cc",
    ]
@@ -153,7 +150,7 @@ index 487a746616..88110d5fc9 100644
  } else if (v8_current_cpu == "x64") {
    v8_compiler_sources += [
      ### gcmole(x64) ###
-@@ -5252,6 +5304,9 @@ if (v8_current_cpu == "x86") {
+@@ -5233,6 +5285,9 @@ if (v8_current_cpu == "x86") {
      "src/compiler/backend/x64/instruction-selector-x64.cc",
      "src/compiler/backend/x64/unwinding-info-writer-x64.cc",
    ]
@@ -163,7 +160,7 @@ index 487a746616..88110d5fc9 100644
  } else if (v8_current_cpu == "arm") {
    v8_compiler_sources += [
      ### gcmole(arm) ###
-@@ -5260,6 +5315,9 @@ if (v8_current_cpu == "x86") {
+@@ -5241,6 +5296,9 @@ if (v8_current_cpu == "x86") {
      "src/compiler/backend/arm/instruction-selector-arm.cc",
      "src/compiler/backend/arm/unwinding-info-writer-arm.cc",
    ]
@@ -173,7 +170,7 @@ index 487a746616..88110d5fc9 100644
  } else if (v8_current_cpu == "arm64") {
    v8_compiler_sources += [
      ### gcmole(arm64) ###
-@@ -5268,6 +5326,9 @@ if (v8_current_cpu == "x86") {
+@@ -5249,6 +5307,9 @@ if (v8_current_cpu == "x86") {
      "src/compiler/backend/arm64/instruction-selector-arm64.cc",
      "src/compiler/backend/arm64/unwinding-info-writer-arm64.cc",
    ]
@@ -183,7 +180,7 @@ index 487a746616..88110d5fc9 100644
  } else if (v8_current_cpu == "mips64" || v8_current_cpu == "mips64el") {
    v8_compiler_sources += [
      ### gcmole(mips64el) ###
-@@ -5341,6 +5402,10 @@ if (v8_enable_webassembly) {
+@@ -5322,6 +5383,10 @@ if (v8_enable_webassembly) {
      "src/wasm/turboshaft-graph-interface.cc",
      "src/wasm/wrappers.cc",
    ]
@@ -194,7 +191,7 @@ index 487a746616..88110d5fc9 100644
  }
  
  if (v8_enable_wasm_simd256_revec) {
-@@ -5361,6 +5426,7 @@ v8_source_set("v8_compiler_for_mksnapshot_source_set") {
+@@ -5342,6 +5407,7 @@ v8_source_set("v8_compiler_for_mksnapshot_source_set") {
    visibility = [ ":*" ]  # Only targets in this file can depend on this.
  
    sources = v8_compiler_sources
@@ -202,7 +199,7 @@ index 487a746616..88110d5fc9 100644
  
    public_deps = [
      ":generate_bytecode_builtins_list",
-@@ -5396,6 +5462,7 @@ v8_source_set("v8_compiler") {
+@@ -5377,6 +5443,7 @@ v8_source_set("v8_compiler") {
  
    if (v8_enable_turbofan) {
      sources = v8_compiler_sources
@@ -210,7 +207,7 @@ index 487a746616..88110d5fc9 100644
    } else {
      # With Turbofan disabled, we only include the stubbed-out API.
      sources = [ "src/compiler/turbofan-disabled.cc" ]
-@@ -5957,6 +6024,8 @@ v8_source_set("v8_base_without_compiler") {
+@@ -5935,6 +6002,8 @@ v8_source_set("v8_base_without_compiler") {
      ]
    }
  
@@ -219,7 +216,7 @@ index 487a746616..88110d5fc9 100644
    if (v8_enable_maglev) {
      sources += [
        "src/maglev/maglev-assembler.cc",
-@@ -5989,6 +6058,10 @@ v8_source_set("v8_base_without_compiler") {
+@@ -5967,6 +6036,10 @@ v8_source_set("v8_base_without_compiler") {
          "src/maglev/arm64/maglev-assembler-arm64.cc",
          "src/maglev/arm64/maglev-ir-arm64.cc",
        ]
@@ -230,7 +227,7 @@ index 487a746616..88110d5fc9 100644
      } else if (v8_current_cpu == "riscv64") {
        sources += [
          "src/maglev/riscv/maglev-assembler-riscv.cc",
-@@ -5999,6 +6072,10 @@ v8_source_set("v8_base_without_compiler") {
+@@ -5977,6 +6050,10 @@ v8_source_set("v8_base_without_compiler") {
          "src/maglev/x64/maglev-assembler-x64.cc",
          "src/maglev/x64/maglev-ir-x64.cc",
        ]
@@ -241,7 +238,7 @@ index 487a746616..88110d5fc9 100644
      } else if (v8_current_cpu == "s390x") {
        sources += [
          "src/maglev/s390/maglev-assembler-s390.cc",
-@@ -6077,6 +6154,15 @@ v8_source_set("v8_base_without_compiler") {
+@@ -6055,6 +6132,15 @@ v8_source_set("v8_base_without_compiler") {
        "src/wasm/wasm-subtyping.cc",
        "src/wasm/well-known-imports.cc",
      ]
@@ -257,7 +254,7 @@ index 487a746616..88110d5fc9 100644
      if (v8_wasm_random_fuzzers) {
        sources += [
          ### gcmole(all) ###
-@@ -6111,6 +6197,26 @@ v8_source_set("v8_base_without_compiler") {
+@@ -6089,6 +6175,26 @@ v8_source_set("v8_base_without_compiler") {
      sources += [ "src/heap/reference-summarizer.cc" ]
    }
  
@@ -284,7 +281,7 @@ index 487a746616..88110d5fc9 100644
    if (v8_current_cpu == "x86") {
      sources += [
        ### gcmole(ia32) ###
-@@ -6217,6 +6323,11 @@ v8_source_set("v8_base_without_compiler") {
+@@ -6195,6 +6301,11 @@ v8_source_set("v8_base_without_compiler") {
      if (is_win) {
        sources += [ "src/diagnostics/unwinding-info-win64.cc" ]
      }
@@ -343,10 +340,10 @@ index 6d99dbe529..d6805a0a05 100644
  }  // namespace internal
  }  // namespace v8
 diff --git a/v8/src/baseline/baseline-compiler.cc b/v8/src/baseline/baseline-compiler.cc
-index 5d39b198f2..afcb51e948 100644
+index 45a624a7da..e2073c4aab 100644
 --- a/v8/src/baseline/baseline-compiler.cc
 +++ b/v8/src/baseline/baseline-compiler.cc
-@@ -2527,6 +2527,8 @@ SaveAccumulatorScope::~SaveAccumulatorScope() {
+@@ -2517,6 +2517,8 @@ SaveAccumulatorScope::~SaveAccumulatorScope() {
  #undef RCS_BASELINE_SCOPE
  #undef __
  
@@ -371,16 +368,6 @@ index bb743f3552..c4e4cb0348 100644
    }
  
    FloatRegister GetFloatRegister() const {
-diff --git a/v8/src/compiler/revectorizer.cc b/v8/src/compiler/revectorizer.cc
-index 1d332c42ae..dc9e3906b6 100644
---- a/v8/src/compiler/revectorizer.cc
-+++ b/v8/src/compiler/revectorizer.cc
-@@ -1459,3 +1459,5 @@ void Revectorizer::PrintStores(ZoneMap<Node*, StoreNodeSet>* store_chains) {
- }  // namespace compiler
- }  // namespace internal
- }  // namespace v8
-+
-+#undef TRACE
 diff --git a/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc b/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc
 index cc5b406f1b..9fac217286 100644
 --- a/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc
@@ -423,10 +410,10 @@ index 580cc321a0..29c3f8e648 100644
  
  #include "src/compiler/turboshaft/undef-assembler-macros.inc"
 diff --git a/v8/src/compiler/turboshaft/wasm-load-elimination-reducer.h b/v8/src/compiler/turboshaft/wasm-load-elimination-reducer.h
-index 9ea3b28608..41273cae91 100644
+index 569d4438b2..d5022dfe4f 100644
 --- a/v8/src/compiler/turboshaft/wasm-load-elimination-reducer.h
 +++ b/v8/src/compiler/turboshaft/wasm-load-elimination-reducer.h
-@@ -554,6 +554,7 @@ class WasmLoadEliminationReducer : public Next {
+@@ -544,6 +544,7 @@ class WasmLoadEliminationReducer : public Next {
    EMIT_OP(StringAsWtf16)
    EMIT_OP(StringPrepareForGetCodeUnit)
    EMIT_OP(AnyConvertExtern)
@@ -434,18 +421,8 @@ index 9ea3b28608..41273cae91 100644
  
    OpIndex REDUCE_INPUT_GRAPH(StructGet)(OpIndex ig_index,
                                          const StructGetOp& op) {
-diff --git a/v8/src/compiler/turboshaft/wasm-revec-reducer.cc b/v8/src/compiler/turboshaft/wasm-revec-reducer.cc
-index d49c3653c7..f01c295856 100644
---- a/v8/src/compiler/turboshaft/wasm-revec-reducer.cc
-+++ b/v8/src/compiler/turboshaft/wasm-revec-reducer.cc
-@@ -1603,3 +1603,5 @@ void WasmRevecAnalyzer::Print(const char* info) {
- #undef TRACE
- 
- }  // namespace v8::internal::compiler::turboshaft
-+
-+#undef TRACE
 diff --git a/v8/src/compiler/wasm-compiler.cc b/v8/src/compiler/wasm-compiler.cc
-index 53672a6e8b..ed7a783642 100644
+index b92154e46f..fa1b452c2f 100644
 --- a/v8/src/compiler/wasm-compiler.cc
 +++ b/v8/src/compiler/wasm-compiler.cc
 @@ -70,7 +70,7 @@ namespace {
@@ -466,7 +443,7 @@ index 53672a6e8b..ed7a783642 100644
  }
  
  // TODO(ahaas): Merge TrapId with TrapReason.
-@@ -1262,6 +1262,6 @@ AssemblerOptions WasmStubAssemblerOptions() {
+@@ -1231,6 +1231,6 @@ AssemblerOptions WasmStubAssemblerOptions() {
    };
  }
  
@@ -475,7 +452,7 @@ index 53672a6e8b..ed7a783642 100644
  
  }  // namespace v8::internal::compiler
 diff --git a/v8/src/diagnostics/perf-jit.cc b/v8/src/diagnostics/perf-jit.cc
-index b9d924f656..e2e6d659bd 100644
+index c509e4220c..e9ccece0d4 100644
 --- a/v8/src/diagnostics/perf-jit.cc
 +++ b/v8/src/diagnostics/perf-jit.cc
 @@ -37,6 +37,8 @@
@@ -488,10 +465,10 @@ index b9d924f656..e2e6d659bd 100644
  
  #include "src/base/platform/wrappers.h"
 diff --git a/v8/src/handles/global-handles.cc b/v8/src/handles/global-handles.cc
-index d697399492..182a6c430c 100644
+index af448aa4f2..f9d1b5f3a6 100644
 --- a/v8/src/handles/global-handles.cc
 +++ b/v8/src/handles/global-handles.cc
-@@ -757,7 +757,7 @@ void GlobalHandles::InvokeSecondPassPhantomCallbacks() {
+@@ -756,7 +756,7 @@ void GlobalHandles::InvokeSecondPassPhantomCallbacks() {
    if (scope.CheckReenter()) {
      TRACE_EVENT0("v8", "V8.GCPhantomHandleProcessingCallback");
      isolate()->heap()->CallGCPrologueCallbacks(
@@ -500,7 +477,7 @@ index d697399492..182a6c430c 100644
          GCTracer::Scope::HEAP_EXTERNAL_PROLOGUE);
      {
        TRACE_GC(isolate_->heap()->tracer(),
-@@ -769,7 +769,7 @@ void GlobalHandles::InvokeSecondPassPhantomCallbacks() {
+@@ -768,7 +768,7 @@ void GlobalHandles::InvokeSecondPassPhantomCallbacks() {
        }
      }
      isolate()->heap()->CallGCEpilogueCallbacks(
@@ -609,10 +586,10 @@ index 7966799bc8..a613b69033 100644
 +
 +#undef kDefaultDeadlineCheckInterval
 diff --git a/v8/src/heap/minor-mark-sweep.cc b/v8/src/heap/minor-mark-sweep.cc
-index d422112975..d04d9f1150 100644
+index 7dfcaa336c..278397237f 100644
 --- a/v8/src/heap/minor-mark-sweep.cc
 +++ b/v8/src/heap/minor-mark-sweep.cc
-@@ -866,6 +866,8 @@ void MinorMarkSweepCollector::TraceFragmentation() {
+@@ -862,6 +862,8 @@ void MinorMarkSweepCollector::TraceFragmentation() {
                 free_bytes_of_class[3]);
  }
  
@@ -621,7 +598,7 @@ index d422112975..d04d9f1150 100644
  namespace {
  
  // NewSpacePages with more live bytes than this threshold qualify for fast
-@@ -907,6 +909,8 @@ bool ShouldMovePage(PageMetadata* p, intptr_t live_bytes,
+@@ -903,6 +905,8 @@ bool ShouldMovePage(PageMetadata* p, intptr_t live_bytes,
  
  }  // namespace
  
@@ -669,10 +646,10 @@ index d462924aad..37f63d65f8 100644
  }  // namespace internal
  }  // namespace v8
 diff --git a/v8/src/maglev/maglev-assembler-inl.h b/v8/src/maglev/maglev-assembler-inl.h
-index f892fe4c56..6d2626c019 100644
+index 62f23d0328..6c4c2d016a 100644
 --- a/v8/src/maglev/maglev-assembler-inl.h
 +++ b/v8/src/maglev/maglev-assembler-inl.h
-@@ -615,11 +615,11 @@ void CheckArgs(Args&&... args) {}
+@@ -603,11 +603,11 @@ void CheckArgs(Args&&... args) {}
  
  #endif  // DEBUG
  
@@ -687,7 +664,7 @@ index f892fe4c56..6d2626c019 100644
          } else {
            masm->PushReverse(std::forward<decltype(stack_args)>(stack_args)...);
 diff --git a/v8/src/maglev/maglev-assembler.cc b/v8/src/maglev/maglev-assembler.cc
-index f90fee1bd2..c35ad69a9b 100644
+index 71cdaea16b..9009e0f3d3 100644
 --- a/v8/src/maglev/maglev-assembler.cc
 +++ b/v8/src/maglev/maglev-assembler.cc
 @@ -712,6 +712,8 @@ void MaglevAssembler::TryMigrateInstanceAndMarkMapAsMigrationTarget(
@@ -700,7 +677,7 @@ index f90fee1bd2..c35ad69a9b 100644
  }  // namespace internal
  }  // namespace v8
 diff --git a/v8/src/maglev/maglev-code-generator.cc b/v8/src/maglev/maglev-code-generator.cc
-index 2f5836b0b8..14601a041e 100644
+index 4207c84b70..4d612125e9 100644
 --- a/v8/src/maglev/maglev-code-generator.cc
 +++ b/v8/src/maglev/maglev-code-generator.cc
 @@ -429,7 +429,6 @@ class ParallelMoveResolver {
@@ -719,7 +696,7 @@ index 2f5836b0b8..14601a041e 100644
        if (targets.needs_decompression == kNeedsDecompression) {
          __ DecompressTagged(register_with_slot_value, register_with_slot_value);
          targets.needs_decompression = kDoesNotNeedDecompression;
-@@ -2150,6 +2148,8 @@ Handle<DeoptimizationData> MaglevCodeGenerator::GenerateDeoptimizationData(
+@@ -2130,6 +2128,8 @@ Handle<DeoptimizationData> MaglevCodeGenerator::GenerateDeoptimizationData(
    return data;
  }
  
@@ -728,33 +705,11 @@ index 2f5836b0b8..14601a041e 100644
  }  // namespace maglev
  }  // namespace internal
  }  // namespace v8
-diff --git a/v8/src/maglev/maglev-graph-builder.cc b/v8/src/maglev/maglev-graph-builder.cc
-index 1ea08b3d35..3025287ec8 100644
---- a/v8/src/maglev/maglev-graph-builder.cc
-+++ b/v8/src/maglev/maglev-graph-builder.cc
-@@ -16526,3 +16526,6 @@ ValueNode* MaglevGraphBuilder::BuildGetCharCodeAt(ValueNode* string,
- }
- 
- }  // namespace v8::internal::maglev
-+
-+#undef TRACE
-+#undef FAIL
-diff --git a/v8/src/maglev/maglev-inlining.cc b/v8/src/maglev/maglev-inlining.cc
-index 83b46cda3d..cd6dcd6ab6 100644
---- a/v8/src/maglev/maglev-inlining.cc
-+++ b/v8/src/maglev/maglev-inlining.cc
-@@ -419,4 +419,6 @@ ProcessResult ReturnedValueRepresentationSelector::Process(
-   return ProcessResult::kContinue;
- }
- 
-+#undef TRACE
-+
- }  // namespace v8::internal::maglev
 diff --git a/v8/src/maglev/maglev-ir.cc b/v8/src/maglev/maglev-ir.cc
-index a34f3fa8fd..55a36518fc 100644
+index 3f46599fbb..67e7cec3db 100644
 --- a/v8/src/maglev/maglev-ir.cc
 +++ b/v8/src/maglev/maglev-ir.cc
-@@ -8638,6 +8638,8 @@ RangeType ValueNode::GetRange() const {
+@@ -8634,6 +8634,8 @@ RangeType ValueNode::GetRange() const {
    }
  }
  
@@ -866,7 +821,7 @@ index 60041add16..1094a8d5a5 100644
 +
 +#undef CreateDataPropertyForOptions
 diff --git a/v8/src/regexp/experimental/experimental-compiler.cc b/v8/src/regexp/experimental/experimental-compiler.cc
-index ffe54f832f..dfa98a026d 100644
+index 7bee9f1179..391dac8cad 100644
 --- a/v8/src/regexp/experimental/experimental-compiler.cc
 +++ b/v8/src/regexp/experimental/experimental-compiler.cc
 @@ -224,7 +224,7 @@ bool ExperimentalRegExpCompiler::CanBeHandled(RegExpTree* tree,
@@ -878,7 +833,7 @@ index ffe54f832f..dfa98a026d 100644
  
  // A label in bytecode which starts with no known address. The address *must*
  // be bound with `Bind` before the label goes out of scope.
-@@ -1236,7 +1236,7 @@ class CompileVisitor : private RegExpVisitor {
+@@ -1226,7 +1226,7 @@ class CompileVisitor : private RegExpVisitor {
  
  ZoneList<RegExpInstruction> ExperimentalRegExpCompiler::Compile(
      RegExpTree* tree, RegExpFlags flags, Zone* zone) {
@@ -888,7 +843,7 @@ index ffe54f832f..dfa98a026d 100644
  
  }  // namespace internal
 diff --git a/v8/src/regexp/regexp-compiler-tonode.cc b/v8/src/regexp/regexp-compiler-tonode.cc
-index e6a2ca8c7e..424a247539 100644
+index fd5589921d..190e9ee025 100644
 --- a/v8/src/regexp/regexp-compiler-tonode.cc
 +++ b/v8/src/regexp/regexp-compiler-tonode.cc
 @@ -18,6 +18,8 @@
@@ -900,17 +855,17 @@ index e6a2ca8c7e..424a247539 100644
  namespace v8 {
  namespace internal {
  
-@@ -2108,3 +2110,5 @@ RegExpNode* RegExpQuantifier::ToNode(int min, int max, bool is_greedy,
+@@ -2110,3 +2112,5 @@ RegExpNode* RegExpQuantifier::ToNode(int min, int max, bool is_greedy,
  
  }  // namespace internal
  }  // namespace v8
 +
 +#undef kMaxCodePoint
 diff --git a/v8/src/sandbox/testing.cc b/v8/src/sandbox/testing.cc
-index f263687ef6..fa6dd4ae5b 100644
+index 52d7395145..d96f56f433 100644
 --- a/v8/src/sandbox/testing.cc
 +++ b/v8/src/sandbox/testing.cc
-@@ -21,6 +21,7 @@
+@@ -20,6 +20,7 @@
  #include <sys/mman.h>
  #include <sys/ucontext.h>
  #include <unistd.h>
@@ -919,7 +874,7 @@ index f263687ef6..fa6dd4ae5b 100644
  
  #ifdef V8_USE_ADDRESS_SANITIZER
 diff --git a/v8/src/snapshot/read-only-deserializer.cc b/v8/src/snapshot/read-only-deserializer.cc
-index 4777e7ee86..d53b86ca32 100644
+index 24e770f1ab..3568071acb 100644
 --- a/v8/src/snapshot/read-only-deserializer.cc
 +++ b/v8/src/snapshot/read-only-deserializer.cc
 @@ -14,6 +14,8 @@
@@ -968,7 +923,7 @@ index 4b1d2bd42b..f55c0b4aec 100644
 +#undef ror
 +#undef shr
 diff --git a/v8/src/wasm/wasm-external-refs.cc b/v8/src/wasm/wasm-external-refs.cc
-index 2117a63680..4995e920a6 100644
+index 2be79a9db1..faa205ef32 100644
 --- a/v8/src/wasm/wasm-external-refs.cc
 +++ b/v8/src/wasm/wasm-external-refs.cc
 @@ -715,6 +715,8 @@ V ReadAndIncrementOffset(Address data, size_t* offset) {
@@ -985,3 +940,41 @@ index 2117a63680..4995e920a6 100644
  #undef V8_WITH_SANITIZER
  #undef RESET_THREAD_IN_WASM_FLAG_FOR_ASAN_ON_WINDOWS
 +#undef kSuccess
+diff --git a/v8/src/compiler/revectorizer.cc b/v8/src/compiler/revectorizer.cc
+index 1d332c42ae..dc9e3906b6 100644
+--- a/v8/src/compiler/revectorizer.cc
++++ b/v8/src/compiler/revectorizer.cc
+@@ -1459,3 +1459,5 @@ void Revectorizer::PrintStores(ZoneMap<Node*, StoreNodeSet>* store_chains) {
+ }  // namespace compiler
+ }  // namespace internal
+ }  // namespace v8
++
++#undef TRACE
+diff --git a/v8/src/compiler/turboshaft/wasm-revec-reducer.cc b/v8/src/compiler/turboshaft/wasm-revec-reducer.cc
+index ddf3b81c7a..f6548579c7 100644
+--- a/v8/src/compiler/turboshaft/wasm-revec-reducer.cc
++++ b/v8/src/compiler/turboshaft/wasm-revec-reducer.cc
+@@ -1620,3 +1620,5 @@ void WasmRevecAnalyzer::Print(const char* info) {
+ }
+ 
+ }  // namespace v8::internal::compiler::turboshaft
++
++#undef TRACE
+--- a/v8/src/maglev/maglev-graph-builder.cc
++++ b/v8/src/maglev/maglev-graph-builder.cc
+@@ -16509,3 +16509,6 @@
+ }
+ 
+ }  // namespace v8::internal::maglev
++
++#undef TRACE
++#undef FAIL
+--- a/v8/src/maglev/maglev-inlining.cc
++++ b/v8/src/maglev/maglev-inlining.cc
+@@ -411,4 +411,6 @@
+   return ProcessResult::kContinue;
+ }
+ 
++#undef TRACE
++
+ }  // namespace v8::internal::maglev
