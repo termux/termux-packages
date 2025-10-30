@@ -77,6 +77,16 @@ termux_step_pre_configure() {
 		-e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
 		-e "s%\@TERMUX_TMPDIR_PATH_LENGTH\@%${#tmpdir_path}%g" \
 		"$patch" | patch --silent -p1
+
+	# g1gc causes 'Illegal instruction' on 32-bit ARM after
+	# https://github.com/openjdk/jdk24u/commit/0b467e902d591ae9feeec1669918d1588987cd1c
+	# and LTO causes 'Segmentation fault' on 32-bit ARM after
+	# https://github.com/openjdk/jdk24u/commit/85fedbf668023fd00d70ec649504c2f80e4c84bb
+	# (disabling both commits is necessary,
+	# if either one is disabled alone, respective crash still happens)
+	if [[ "$TERMUX_ARCH" == "arm" ]]; then
+		__jvm_features="-g1gc,-link-time-opt"
+	fi
 }
 
 termux_step_configure() {
