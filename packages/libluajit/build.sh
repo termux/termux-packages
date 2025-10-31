@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://luajit.org/
 TERMUX_PKG_DESCRIPTION="Just-In-Time Compiler for Lua"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1:2.1.1761727121"
+TERMUX_PKG_VERSION="1:2.1.1761727121" # 2025-10-29T08:38:41Z
 TERMUX_PKG_SRCURL=git+https://github.com/LuaJIT/LuaJIT.git
 TERMUX_PKG_GIT_BRANCH=v${TERMUX_PKG_VERSION:2:3}
 TERMUX_PKG_AUTO_UPDATE=true
@@ -12,30 +12,53 @@ TERMUX_PKG_EXTRA_MAKE_ARGS="amalg PREFIX=$TERMUX_PREFIX"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_pkg_auto_update() {
-	local latest_version
+	local response latest_version
+	local api_url='https://archlinux.org/packages/search/json/?name=luajit'
 	# Get the latest version from Arch Linux's API.
 	# Since this project doesn't do release tags,
 	# Repology doesn't return a meaningfully interpretable latest version.
 	# We should also identify ourselves via 'User-Agent' as a courtesy.
-	latest_version=$(curl -s \
-	-H 'User-Agent: Termux update checker 1.0 (github.com/termux/termux-packages)' \
-	"https://archlinux.org/packages/search/json/?name=luajit" \
-	| jq -r '.results[0].pkgver')
+	response="$(curl -s \
+		-H 'User-Agent: Termux update checker 1.0 (github.com/termux/termux-packages)' \
+		"${api_url}"
+	)"
+	latest_version="$(jq -r '.results[0].pkgver' <<< "$response")"
 
-	local current_version="${TERMUX_PKG_VERSION#*:}"
-	if [[ "$current_version" == "$latest_version" ]]; then
-		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+	if [[ "${latest_version}" == "null" ]]; then
+		local summary
+		# shellcheck disable=SC2016
+		printf -v summary '%s\n' \
+			'### `libluajit`' \
+			''\
+			"Failed to get latest version of 'luajit'" \
+			"from '${api_url}'" \
+			''\
+			'Prettified `curl` response:' \
+			'```json' \
+			"$(jq -r <<< "$response")" \
+			'```'
+
+		if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+			# If this is the CI, output to the summary file
+			echo "$summary" >> "$GITHUB_STEP_SUMMARY"
+		else
+			# Otherwise output to whatever qualifies as FD2.
+			echo "$summary" >&2
+		fi
+		echo "WARN: Couldn't query new version. Staying at version '${TERMUX_PKG_VERSION}'."
 		return
 	fi
 
-	termux_pkg_upgrade_version "${latest_version}"
+	local current_version="${TERMUX_PKG_VERSION#*:}"
 	# If this isn't a dry-run add a human readable (ISO 8601)
 	# version of the timestamp as a comment to the version.
-	if [[ "${BUILD_PACKAGES}" != "false" ]]; then
+	if [[ "${BUILD_PACKAGES}" != "false" && "$current_version" != "$latest_version" ]]; then
 		sed \
 			-e "s|^\(TERMUX_PKG_VERSION=.*\"\).*|\1 # $(date -d "@${latest_version:4}" --utc '+%Y-%m-%dT%H:%M:%SZ')|" \
 			-i "$TERMUX_PKG_BUILDER_DIR/build.sh"
 	fi
+
+	termux_pkg_upgrade_version "${latest_version}"
 }
 
 termux_step_post_get_source() {
