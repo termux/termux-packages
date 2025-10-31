@@ -16,6 +16,8 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
+	termux_setup_rust
+
 	# error: version script assignment of 'global' to symbol '__muloti4' failed: symbol not defined
 	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
 	export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=-Wl,--undefined-version"

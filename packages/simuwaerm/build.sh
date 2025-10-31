@@ -9,3 +9,7 @@ TERMUX_PKG_SRCURL="https://github.com/file-acomplaint/simuwaerm/archive/refs/tag
 TERMUX_PKG_SHA256=cf3d86e9883e917b9c74ff3d1fc9146197b216b5aa84e84cc188326c8d922ac0
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_step_pre_configure() {
+	termux_setup_rust
+}

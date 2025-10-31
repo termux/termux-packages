@@ -29,3 +29,7 @@ termux_step_post_get_source() {
 		termux_error_exit "Checksum mismatch for source files."
 	fi
 }
+
+termux_step_pre_configure() {
+	termux_setup_rust
+}

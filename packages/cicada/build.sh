@@ -10,6 +10,8 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 termux_step_pre_configure() {
+	termux_setup_rust
+
 	rm -f Makefile
 
 	if [ "$TERMUX_ARCH" == "x86_64" ]; then

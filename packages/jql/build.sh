@@ -11,6 +11,8 @@ TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+.\d+.\d+"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
+	termux_setup_rust
+
 	TERMUX_PKG_SRCDIR+="/crates/jql"
 	TERMUX_PKG_BUILDDIR="$TERMUX_PKG_SRCDIR"
 }
