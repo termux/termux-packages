@@ -29,7 +29,6 @@ termux_setup_rust() {
 	if [[ "${TERMUX_RUST_VERSION}" == *"~beta"* ]]; then
 		TERMUX_RUST_VERSION="beta"
 	fi
-	TERMUX_RUST_VERSION="${TERMUX_RUST_VERSION##*y}"
 
 	curl https://sh.rustup.rs -sSfo "${TERMUX_PKG_TMPDIR}"/rustup.sh
 	sh "${TERMUX_PKG_TMPDIR}"/rustup.sh -y --default-toolchain "${TERMUX_RUST_VERSION}"
