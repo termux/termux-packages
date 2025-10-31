@@ -11,6 +11,8 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="openssl"
 
 termux_step_pre_configure() {
+	termux_setup_rust
+
 	rm -f Makefile
 
 	# ld: error: undefined symbol: __atomic_is_lock_free

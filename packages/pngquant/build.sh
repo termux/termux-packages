@@ -12,6 +12,10 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
+termux_step_pre_configure() {
+	termux_setup_rust
+}
+
 termux_step_post_make_install() {
 	install -Dm600 -t $TERMUX_PREFIX/share/man/man1 pngquant.1
 }

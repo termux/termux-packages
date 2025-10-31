@@ -12,5 +12,7 @@ TERMUX_PKG_DEPENDS="openssl, resolv-conf"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
+	termux_setup_rust
+
 	rm $TERMUX_PKG_SRCDIR/makefile
 }

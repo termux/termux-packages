@@ -4,13 +4,17 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="15.1.0"
 TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://github.com/BurntSushi/ripgrep/archive/$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SRCURL=https://github.com/BurntSushi/ripgrep/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=046fa01a216793b8bd2750f9d68d4ad43986eb9c0d6122600f993906012972e8
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="pcre2"
 TERMUX_PKG_RECOMMENDS="brotli, lz4"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--features pcre2"
+
+termux_step_pre_configure() {
+	termux_setup_rust
+}
 
 termux_step_post_make_install() {
 	# shell completions

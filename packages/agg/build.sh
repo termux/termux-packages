@@ -8,3 +8,7 @@ TERMUX_PKG_SHA256=8927e2f3b1db53feed2e74319497ddc8404ac7989cb592099c402fbd05d94a
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_RECOMMENDS="asciinema"
 TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_step_pre_configure() {
+	termux_setup_rust
+}

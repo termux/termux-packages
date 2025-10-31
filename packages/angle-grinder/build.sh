@@ -10,6 +10,8 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
+	termux_setup_rust
+
 	# ld: error: undefined symbol: __emutls_get_address
 	if [[ "${TERMUX_ARCH}" == "arm" ]]; then
 		local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)

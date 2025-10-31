@@ -14,6 +14,8 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
+	termux_setup_rust
+
 	rm -f Makefile
 }
 
