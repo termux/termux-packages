@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="25.0.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/openjdk/jdk25u/archive/refs/tags/jdk-${TERMUX_PKG_VERSION}-ga.tar.gz
 TERMUX_PKG_SHA256=99864b94b65a9d8e180ec55b8e53a9ab39b0eaebd3ba4438388bf7ea7d5e079a
 TERMUX_PKG_AUTO_UPDATE=true
@@ -68,6 +69,24 @@ termux_step_host_build() {
 
 termux_step_pre_configure() {
 	unset JAVA_HOME
+
+	local patch="$TERMUX_PKG_BUILDER_DIR/tmpdir-path-length.diff"
+	local tmpdir_path="$TERMUX_PREFIX/tmp"
+	echo "Applying patch: $(basename "$patch")"
+	test -f "$patch" && sed \
+		-e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
+		-e "s%\@TERMUX_TMPDIR_PATH_LENGTH\@%${#tmpdir_path}%g" \
+		"$patch" | patch --silent -p1
+
+	# g1gc causes 'Illegal instruction' on 32-bit ARM after
+	# https://github.com/openjdk/jdk24u/commit/0b467e902d591ae9feeec1669918d1588987cd1c
+	# and LTO causes 'Segmentation fault' on 32-bit ARM after
+	# https://github.com/openjdk/jdk24u/commit/85fedbf668023fd00d70ec649504c2f80e4c84bb
+	# (disabling both commits is necessary,
+	# if either one is disabled alone, respective crash still happens)
+	if [[ "$TERMUX_ARCH" == "arm" ]]; then
+		__jvm_features="-g1gc,-link-time-opt"
+	fi
 }
 
 termux_step_configure() {

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="21.0.9"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/openjdk/jdk21u/archive/refs/tags/jdk-${TERMUX_PKG_VERSION}-ga.tar.gz
 TERMUX_PKG_SHA256=4ffe05ff839192b01ed53ccd69835f7b5508bee7ca0d5703ac210897065e7ff0
 TERMUX_PKG_AUTO_UPDATE=true
@@ -51,6 +52,14 @@ termux_pkg_auto_update() {
 
 termux_step_pre_configure() {
 	unset JAVA_HOME
+
+	local patch="$TERMUX_PKG_BUILDER_DIR/tmpdir-path-length.diff"
+	local tmpdir_path="$TERMUX_PREFIX/tmp"
+	echo "Applying patch: $(basename "$patch")"
+	test -f "$patch" && sed \
+		-e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
+		-e "s%\@TERMUX_TMPDIR_PATH_LENGTH\@%${#tmpdir_path}%g" \
+		"$patch" | patch --silent -p1
 }
 
 termux_step_configure() {
