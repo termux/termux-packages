@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
 TERMUX_PKG_DESCRIPTION="Library for parsing XML documents"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.15.0"
+TERMUX_PKG_VERSION="2.15.1"
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/libxml2/${TERMUX_PKG_VERSION%.*}/libxml2-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=5abc766497c5b1d6d99231f662e30c99402a90d03b06c67b62d6c1179dedd561
+TERMUX_PKG_SHA256=c008bac08fd5c7b4a87f7b8a71f283fa581d80d80ff8d2efd3b26224c39bc54c
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SETUP_PYTHON=true
 # disabled due to compiler warnings
