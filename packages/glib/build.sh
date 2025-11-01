@@ -3,12 +3,15 @@ TERMUX_PKG_DESCRIPTION="Library providing core building blocks for libraries and
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.86.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/glib/${TERMUX_PKG_VERSION%.*}/glib-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=119d1708ca022556d6d2989ee90ad1b82bd9c0d1667e066944a6d0020e2d5e57
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-support, libffi, libiconv, pcre2, resolv-conf, zlib, python"
+TERMUX_PKG_BUILD_DEPENDS="gobject-introspection"
 TERMUX_PKG_BREAKS="glib-dev, glib-bin"
 TERMUX_PKG_REPLACES="glib-dev, glib-bin"
+TERMUX_PKG_ACCEPT_PKG_IN_DEP=true
 TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -70,70 +73,17 @@ termux_step_pre_configure() {
 	rm -rf $TERMUX_HOSTBUILD_MARKER
 	# glib checks for __BIONIC__ instead of __ANDROID__:
 	CFLAGS+=" -D__BIONIC__=1"
-	_PREFIX="$TERMUX_PKG_TMPDIR/prefix"
-	local _WRAPPER_BIN="${TERMUX_PKG_BUILDDIR}/_wrapper/bin"
-	rm -rf "$_PREFIX" "$_WRAPPER_BIN"
-	mkdir -p "$_PREFIX" "$_WRAPPER_BIN"
-
-	sed '/^export PKG_CONFIG_LIBDIR=/s|$|:'${_PREFIX}'/lib/pkgconfig|' \
-		"${TERMUX_STANDALONE_TOOLCHAIN}/bin/pkg-config" \
-		> "${_WRAPPER_BIN}/pkg-config"
-	chmod +x "${_WRAPPER_BIN}/pkg-config"
-	export PKG_CONFIG="${_WRAPPER_BIN}/pkg-config"
-	export PATH="${_WRAPPER_BIN}:${PATH}"
-
-	# Magic happens here.
-	# I borrowed nested building method from https://github.com/termux/termux-packages/blob/1244c75380beefc7f7da9744d55aa88df1640acb/x11-packages/qbittorrent/build.sh#L21-L28
-	# and modified termux_step_configure_meson in runtime to make it use another prefix
-	# Also I used advice from here https://github.com/termux/termux-packages/issues/20447#issuecomment-2156066062
-
-	# Running a subshell to not mess with variables
-	(
-		# Building `glib` with `-Dintrospection=disabled` and installing it to temporary directory
-		TERMUX_PKG_BUILDDIR="$TERMUX_PKG_TMPDIR/glib-build"
-		mkdir -p "$TERMUX_PKG_BUILDDIR"
-		TERMUX_PKG_EXTRA_CONFIGURE_ARGS="${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/"-Dintrospection=enabled"/"-Dintrospection=disabled"}"
-		termux_setup_gir
-
-		cd "$TERMUX_PKG_BUILDDIR"
-		TERMUX_PREFIX="$_PREFIX" termux_step_configure
-		cd "$TERMUX_PKG_BUILDDIR"
-		termux_step_make
-		cd "$TERMUX_PKG_BUILDDIR"
-		termux_step_make_install
-	)
-
-	# Running a subshell to not mess with variables
-	(
-		# Building `gobject-introspection` and installing it to temporary directory
-		TERMUX_PKG_BUILDER_DIR="$TERMUX_SCRIPTDIR/packages/gobject-introspection"
-		TERMUX_PKG_BUILDDIR="$TERMUX_PKG_TMPDIR/gobject-introspection-build"
-		TERMUX_PKG_SRCDIR="$TERMUX_PKG_TMPDIR/gobject-introspection-src"
-		LDFLAGS+=" -L${_PREFIX}/lib"
-		mkdir -p "$TERMUX_PKG_BUILDDIR" "$TERMUX_PKG_SRCDIR"
-		# Sourcing another build script for nested build
-		. "$TERMUX_PKG_BUILDER_DIR/build.sh"
-		cd "$TERMUX_PKG_CACHEDIR"
-
-		termux_step_get_source
-		termux_step_get_dependencies_python
-		termux_step_patch_package
-
-		termux_step_pre_configure
-
-		cd "$TERMUX_PKG_BUILDDIR"
-		TERMUX_PREFIX="$_PREFIX" termux_step_configure
-		cd "$TERMUX_PKG_BUILDDIR"
-		termux_step_make
-		cd "$TERMUX_PKG_BUILDDIR"
-		termux_step_make_install
-	)
 
 	# Place the GIR files inside the root of the GIR directory (gir/.) of the package
 	termux_setup_gir
 
 	# The package will be built with using gobject-introspection we built before...
 	export TERMUX_MESON_ENABLE_SOVERSION=1
+}
+
+termux_step_make_install() {
+	rm -f "${TERMUX_PREFIX}"/lib/libg{lib,object,thread,module,io,irepository}-2.0.so
+	ninja -j $TERMUX_PKG_MAKE_PROCESSES install
 }
 
 termux_step_post_make_install() {
