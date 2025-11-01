@@ -5,9 +5,9 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Version should be equal to TERMUX_NDK_{VERSION_NUM,REVISION} in
 # scripts/properties.sh
 TERMUX_PKG_VERSION=28c
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://dl.google.com/android/repository/android-ndk-r${TERMUX_PKG_VERSION}-linux.zip
-TERMUX_PKG_SHA256=59c2f6dc96743b5daf5d1626684640b20a6bd2b1d85b13156b90333741bad5cc
+TERMUX_PKG_SHA256=dfb20d396df28ca02a8c708314b814a4d961dc9074f9a161932746f815aa552f
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -26,6 +26,7 @@ termux_step_get_source() {
 		termux_download_src_archive
 		cd $TERMUX_PKG_TMPDIR
 		termux_extract_src_archive
+		mv "$TERMUX_PKG_SRCDIR/android-ndk-r$TERMUX_PKG_VERSION"/* "$TERMUX_PKG_SRCDIR"
 	else
 		local lib_path="toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr"
 		mkdir -p "$TERMUX_PKG_SRCDIR"/"$lib_path"
