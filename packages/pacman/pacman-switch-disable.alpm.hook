@@ -1,0 +1,10 @@
+[Trigger]
+Type = Path
+Operation = Remove
+Target = @TERMUX_PREFIX_TARGET@/share/pacman-switch/*.sw
+
+[Action]
+Description = Automatic disabling switchers...
+When = PreTransaction
+Exec = @TERMUX_PREFIX@/share/libalpm/scripts/run-pacman-switch disable
+NeedsTargets
