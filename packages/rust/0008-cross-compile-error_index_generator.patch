@@ -1,0 +1,31 @@
+ErrorIndexGenerator should run on the build machine rather than the target machine.
+This seems a bug since https://github.com/rust-lang/rust/pull/145007
+
+--- a/src/bootstrap/src/core/build_steps/tool.rs
++++ b/src/bootstrap/src/core/build_steps/tool.rs
+@@ -571,9 +571,9 @@
+         // for rustc_private and libLLVM.so, and `sysroot_lib` for libstd, etc.
+         let mut cmd = command(builder.ensure(ErrorIndex { compilers }).tool_path);
+ 
+-        let target_compiler = compilers.target_compiler();
+-        let mut dylib_paths = builder.rustc_lib_paths(target_compiler);
+-        dylib_paths.push(builder.sysroot_target_libdir(target_compiler, target_compiler.host));
++        let build_compiler = compilers.build_compiler();
++        let mut dylib_paths = builder.rustc_lib_paths(build_compiler);
++        dylib_paths.push(builder.sysroot_target_libdir(build_compiler, build_compiler.host));
+         add_dylib_path(dylib_paths, &mut cmd);
+         cmd
+     }
+@@ -602,9 +602,11 @@
+     }
+ 
+     fn run(self, builder: &Builder<'_>) -> ToolBuildResult {
++        builder.std(self.compilers.build_compiler, self.compilers.build_compiler.host);
++        builder.ensure(compile::Rustc::new(self.compilers.build_compiler, self.compilers.build_compiler.host));
+         builder.ensure(ToolBuild {
+             build_compiler: self.compilers.build_compiler,
+-            target: self.compilers.target(),
++            target: self.compilers.build_compiler.host,
+             tool: "error_index_generator",
+             mode: Mode::ToolRustcPrivate,
+             path: "src/tools/error_index_generator",
