@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A modern runtime for JavaScript and TypeScript"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 TERMUX_PKG_VERSION="1:2.5.6"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/denoland/deno/releases/download/v${TERMUX_PKG_VERSION:2}/deno_src.tar.gz
 TERMUX_PKG_SHA256=62d3e8f87aed734cdce27660ebfed1c31b6b279f21f36070cdc64e828ae3bfb0
 TERMUX_PKG_DEPENDS="libandroid-stub, libffi, libsqlite, zlib"
@@ -25,13 +25,12 @@ termux_step_get_source() {
 	tar xf "$file" -C "$TERMUX_PKG_SRCDIR" --strip-components=1
 }
 
-termux_step_post_get_source() {
+termux_step_pre_configure() {
+	# Backup source of deno_snapshots
 	mv "$TERMUX_PKG_SRCDIR"/cli/snapshot "$TERMUX_PKG_TMPDIR"/snapshot.orig
 	mkdir -p "$TERMUX_PKG_SRCDIR"/cli/snapshot
 	cp -Rf "$TERMUX_PKG_TMPDIR"/snapshot.orig/* "$TERMUX_PKG_SRCDIR"/cli/snapshot/
-}
 
-termux_step_pre_configure() {
 	termux_setup_rust
 
 	: "${CARGO_HOME:=$HOME/.cargo}"
@@ -231,7 +230,7 @@ termux_step_make() {
 		--manifest-path ./cli/snapshot/Cargo.toml
 
 	# Generate cli snapshot
-	local _deno_prebuilt_snapshot_dir="$TERMUX_PKG_TMPDIR/deno-snapshot-$CARGO_TARGET_NAME-${TERMUX_PKG_VERSION:2}/"
+	local _deno_prebuilt_snapshot_dir="$TERMUX_PKG_TMPDIR/deno-snapshot-$CARGO_TARGET_NAME-${TERMUX_PKG_VERSION:2}"
 	mkdir -p "$_deno_prebuilt_snapshot_dir"
 	termux_setup_proot
 	termux-proot-run env LD_PRELOAD= LD_LIBRARY_PATH= \
