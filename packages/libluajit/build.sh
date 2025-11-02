@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Just-In-Time Compiler for Lua"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1:2.1.1761727121" # 2025-10-29T08:38:41Z
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/LuaJIT/LuaJIT.git
 TERMUX_PKG_GIT_BRANCH=v${TERMUX_PKG_VERSION:2:3}
 TERMUX_PKG_AUTO_UPDATE=true
@@ -96,9 +97,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_make_install () {
-	# This is the "minor version" of LuaJIT, e.g 2.1
-	# It's also needed by the 'luajit' subpackage so export it.
-	export LUAJIT_MINOR_VERSION="${TERMUX_PKG_VERSION:2:3}"
+	local LUAJIT_MINOR_VERSION="${TERMUX_PKG_VERSION:2:3}"
 
 	mkdir -p "$TERMUX_PREFIX/include/luajit-${LUAJIT_MINOR_VERSION}/"
 	cp -f "$TERMUX_PKG_SRCDIR"/src/{lauxlib.h,lua.h,lua.hpp,luaconf.h,luajit.h,lualib.h} "$TERMUX_PREFIX/include/luajit-${LUAJIT_MINOR_VERSION}/"
