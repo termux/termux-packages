@@ -73,7 +73,7 @@ check_indentation() {
 	local pkg_script="$1"
 	local line='' heredoc_terminator='' in_array=0 i=0
 	local -a issues=('' '') bad_lines=('FAILED')
-	local heredoc_regex="[^\(/%#]<{2}-?\s*(['\"]?(\w*(\\\.)?)*['\"]?)"
+	local heredoc_regex="[^\(/%#]<{2}-?[[:space:]]*(['\"]?([[:alnum:]_]*(\\\.)?)*['\"]?)"
 	# We don't wanna hit version constraints "(<< x.y.z)" with this, so don't match "(<<".
 	# We also wouldn't wanna hit parameter expansions "${var/<<}", ${var%<<}, ${var#<<}
 
@@ -94,7 +94,12 @@ check_indentation() {
 			(( ${#heredoc_terminator} )) && continue
 		fi
 
-		# check for mixed indentation
+		# Check for mixed indentation.
+		# We do this after the heredoc checks because space indentation
+		# is significant for languages like Haskell or Nim.
+		# Those probably shouldn't get inlined as heredocs,
+		# but the Haskell `cabal.project.local` overrides currently are.
+		# So let's not break builds for that.
 		[[ "$line" =~ ^($'\t'+ +| +$'\t'+) ]] && {
 			issues[0]='Mixed indentation'
 			bad_lines[i]="${pkg_script}:${i}:$line"
@@ -185,7 +190,8 @@ check_version() {
 				"" \
 				"Version of '$package_name' has not been incremented." \
 				"Either 'TERMUX_PKG_VERSION' or 'TERMUX_PKG_REVISION'" \
-				"need to be modified in the build.sh when changing a package build."
+				"need to be modified in the build.sh when changing a package build." \
+				"You can use ./scripts/bin/revbump '$package_name' to do this automatically."
 
 			# If the version decreased throw in a suggestion for how to downgrade packages
 			dpkg --compare-versions "$version_new" lt "$version_old" && \
