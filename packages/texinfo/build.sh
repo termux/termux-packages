@@ -3,15 +3,15 @@ TERMUX_PKG_DESCRIPTION="Documentation system for on-line information and printed
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="7.2"
-TERMUX_PKG_REVISION=3
-_DEBIAN_REVISION="-4"
+TERMUX_PKG_REVISION=4
+_DEBIAN_REVISION="-5"
 TERMUX_PKG_SRCURL=(
 	https://mirrors.kernel.org/gnu/texinfo/texinfo-${TERMUX_PKG_VERSION}.tar.xz
-	https://deb.debian.org/debian/pool/main/t/texinfo/texinfo_${TERMUX_PKG_VERSION}${_DEBIAN_REVISION}.debian.tar.xz
+	https://salsa.debian.org/tex-team/texinfo/-/archive/debian/${TERMUX_PKG_VERSION}${_DEBIAN_REVISION}/texinfo-debian-${TERMUX_PKG_VERSION}${_DEBIAN_REVISION}.tar.gz
 )
 TERMUX_PKG_SHA256=(
 	0329d7788fbef113fa82cb80889ca197a344ce0df7646fe000974c5d714363a6
-	89f0bcd91adc7c8cbd8fb90610fbacaa7c625819f7a8f2ebaeffff9d33eceeff
+	c5ad9c7d303af6ce6eeb40c6c75f14a4e537592f81141d1834c93b129e60ea3f
 )
 TERMUX_PKG_AUTO_UPDATE=true
 # gawk is used by texindex:
@@ -40,7 +40,7 @@ termux_pkg_auto_update() {
 	fi
 	rm -f "${TERMUX_REPOLOGY_DATA_FILE}"
 
-	local api_url=$(dirname "${TERMUX_PKG_SRCURL[1]}")
+	local api_url=https://deb.debian.org/debian/pool/main/t/texinfo/
 	local api_url_r=$(curl -sL "${api_url}")
 	local api_url_r1=$(echo "${api_url_r}" | grep "texinfo_${latest_version}")
 	local debian_revision=$(echo "${api_url_r1}" | sed -nE "s/.*>texinfo_${latest_version}(.*).debian.tar.xz<.*/\1/p")
@@ -58,10 +58,10 @@ termux_pkg_auto_update() {
 		"$(dirname "${TERMUX_PKG_SRCURL[0]}")/texinfo-${latest_version}.tar.xz" \
 		-o "${tmpdir}/texinfo-${latest_version}.tar.xz"
 	curl -sLC- \
-		"$(dirname "${TERMUX_PKG_SRCURL[1]}")/texinfo_${latest_version}${debian_revision}.debian.tar.xz" \
-		-o "${tmpdir}/texinfo_${latest_version}${debian_revision}.debian.tar.xz"
+		"https://salsa.debian.org/tex-team/texinfo/-/archive/debian/${latest_version}${debian_revision}/texinfo-debian-${latest_version}${debian_revision}.tar.gz" \
+		-o "${tmpdir}/texinfo-debian-${latest_version}${debian_revision}.tar.gz"
 	local texinfo_txz_sha256=$(sha256sum "${tmpdir}/texinfo-${latest_version}.tar.xz" | sed -e "s| .*$||")
-	local texinfo_debian_txz_sha256=$(sha256sum "${tmpdir}/texinfo_${latest_version}${debian_revision}.debian.tar.xz" | sed -e "s| .*$||")
+	local texinfo_debian_txz_sha256=$(sha256sum "${tmpdir}/texinfo-debian-${latest_version}${debian_revision}.tar.gz" | sed -e "s| .*$||")
 	if [[ -z "${texinfo_txz_sha256}" || -z "${texinfo_debian_txz_sha256}" ]]; then
 		cat <<- EOL >&2
 		WARN: Auto update failure!
@@ -80,6 +80,11 @@ termux_pkg_auto_update() {
 	rm -fr "${tmpdir}"
 
 	termux_pkg_upgrade_version "${latest_version}"
+}
+
+termux_step_post_get_source() {
+	mv "${TERMUX_PKG_SRCDIR}/texinfo-debian-${TERMUX_PKG_VERSION}${_DEBIAN_REVISION}/debian" \
+		"${TERMUX_PKG_SRCDIR}/"
 }
 
 termux_step_post_make_install() {
