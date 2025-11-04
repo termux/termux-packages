@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION='A non-linear video editor for Linux using the MLT video 
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="25.08.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/kdenlive-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=464529bae5c5fbe7473dbd0308fa8c3588f68f27b5c99644ad18329da557b8d9
 TERMUX_PKG_DEPENDS="libc++, ffplay, frei0r-plugins, kf6-karchive, kf6-kbookmarks, kf6-kcodecs, kf6-kcolorscheme, kf6-kcompletion, kf6-kconfig, kf6-kconfigwidgets, kf6-kcoreaddons, kf6-kdbusaddons, kf6-kfilemetadata, kf6-kguiaddons, kf6-ki18n, kf6-kiconthemes, kf6-kio, kf6-kitemviews, kf6-knewstuff, kf6-knotifications, kf6-knotifyconfig, kf6-ktextwidgets, kf6-kwidgetsaddons, kf6-kxmlgui, kf6-purpose, kf6-qqc2-desktop-style, kf6-solid, mediainfo, mlt, opentimelineio, qt6-qtbase, qt6-qtdeclarative, qt6-qtmultimedia, qt6-qtnetworkauth, qt6-qtsvg, shared-mime-info"
@@ -11,7 +12,6 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_SYSTEM_NAME=Linux
 -DFETCH_OTIO=OFF
--DKF6_HOST_TOOLING=$TERMUX_PREFIX/opt/kf6/cross/lib/cmake/
 -DUSE_DBUS=OFF
 "
 # FIXME: -DUSE_DBUS=OFF is needed because there seems to be an issue related to qdbus and kf6-kjobwidgets causing kdenlive video rendering stuck at "WAITING"
@@ -19,4 +19,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_pre_configure() {
 	# Prevent ERROR: MIME cache found in package. Please disable `update-mime-database`
 	sed -e 's|update_xdg_mimetypes(|# update_xdg_mimetypes(|' -i data/CMakeLists.txt
+
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DKF6_HOST_TOOLING=$TERMUX_PREFIX/opt/kf6/cross/lib/cmake/"
+	fi
 }
