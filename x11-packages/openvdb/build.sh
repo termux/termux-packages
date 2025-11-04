@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.openvdb.org/
 TERMUX_PKG_DESCRIPTION="Sparse volume data structure and tools"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="12.1.1"
+TERMUX_PKG_VERSION="13.0.0"
 TERMUX_PKG_SRCURL="https://github.com/AcademySoftwareFoundation/openvdb/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=ccd0ea1669a53c7c13087a08ac5a1351041c4cdd308f6d6f591074a106fcb565
+TERMUX_PKG_SHA256=4d6a91df5f347017496fe8d22c3dbb7c4b5d7289499d4eb4d53dd2c75bb454e1
 TERMUX_PKG_DEPENDS="boost, imath, libblosc, libtbb, zlib"
 TERMUX_PKG_BUILD_DEPENDS="mesa, glfw, glu"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -22,7 +22,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	local _SOVERSION=121
+	local _SOVERSION=130
 
 	local major_ver=$(sed -En 's/^set\(OpenVDB_MAJOR_VERSION\s+([0-9]+).*/\1/p' "$TERMUX_PKG_SRCDIR"/CMakeLists.txt)
 	local minor_ver=$(sed -En 's/^set\(OpenVDB_MINOR_VERSION\s+([0-9]+).*/\1/p' "$TERMUX_PKG_SRCDIR"/CMakeLists.txt)
