@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://gitea.io
 TERMUX_PKG_DESCRIPTION="Git with a cup of tea, painless self-hosted git service"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.24.7"
+TERMUX_PKG_VERSION="1.25.1"
 TERMUX_PKG_SRCURL=https://github.com/go-gitea/gitea/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=8f8315b6da1ef771d3c3ade2000399b08bf0f82cd1f21f962583a88988d6100e
+TERMUX_PKG_SHA256=bb6b6cf6efe57b754a245af3398e711eb8c2371a7ed7cbe40e98a07a7c1fa9e2
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="dash, git"
 TERMUX_PKG_CONFFILES="etc/gitea/app.ini"
@@ -16,9 +16,12 @@ termux_step_pre_configure() {
 
 termux_step_make() {
 	export GOPATH=$TERMUX_PKG_BUILDDIR
-
 	mkdir -p "$GOPATH"/src/code.gitea.io
 	cp -a "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/code.gitea.io/gitea
+
+	(cd "$TERMUX_PKG_SRCDIR" && npm install pnpm)
+	export PATH="$TERMUX_PKG_SRCDIR/node_modules/.bin:$PATH"
+
 	cd "$GOPATH"/src/code.gitea.io/gitea
 
 	go mod init || :
