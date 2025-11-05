@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="A translator library for raster and vector geospatial da
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.11.4"
+TERMUX_PKG_VERSION="3.11.5"
 TERMUX_PKG_SRCURL=https://download.osgeo.org/gdal/${TERMUX_PKG_VERSION}/gdal-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=6401eba2bb63f5ef7a08d2157f240194f06d508d096898a705637aeea9d3bbe8
+TERMUX_PKG_SHA256=79f66756f1c843b5ee52c8482d4f6bd2a8b7706d6161cc11f0b27c83d638796a
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="giflib, json-c, libc++, libcurl, libexpat, libfreexl, libgeos, libiconv, libjpeg-turbo, libjxl, liblzma, libpng, libspatialite, libsqlite, libwebp, libxml2, netcdf-c (>= 4.9.3), openjpeg, openssl, proj, postgresql, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="json-c-static"
