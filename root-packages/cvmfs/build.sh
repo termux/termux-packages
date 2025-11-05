@@ -59,67 +59,16 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 # TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="ac_cv_prog_HELP2MAN="
 
 termux_step_pre_configure () {
-    termux_setup_cmake
     # Get `protoc` that can be used on host architecture during build
     termux_setup_protobuf
 
-    # export CFLAGS="${CFLAGS} -isystem/usr/include"
+    # for backtrace and backtrace_symbols_fd
+    LDFLAGS+=" -landroid-execinfo"
 
     # Make variables available to build scripts
     export TERMUX_HOST_PLATFORM
     export TERMUX_PKG_API_LEVEL
     export CLANG_TARGET_TRIPLE="${TERMUX_HOST_PLATFORM}${TERMUX_PKG_API_LEVEL}"
     export TERMUX_STANDALONE_TOOLCHAIN
-    # export CCOMP_FLAGS="--target=${CLANG_TARGET_TRIPLE} --sysroot=$(TERMUX_STANDALONE_TOOLCHAIN)/sysroot"
+    export LDFLAGS
 }
-
-# termux_step_make () {
-#     cmake --build . -- -j 1 # -j $TERMUX_PKG_MAKE_PROCESSES
-# }
-
-# -DLibcrypto_INCLUDE_DIRS=$TERMUX_PREFIX/include
-# -DLibcrypto_LIBRARIES=$TERMUX_PREFIX/lib/libcrypto.so
-
-# -DSHA3_INCLUDE_DIRS=/home/builder/.termux-build/cvmfs/src/externals_install.aarch64/include
-# -DSHA3_LIBRARIES=/home/builder/.termux-build/cvmfs/src/externals_install.aarch64/lib/libsha3.a
-# -DBUILTIN_EXTERNALS_LIST=vjson;sha3;maxminddb
-
-# TERMUX_PKG_DEPENDS="keyutils, libblkid, libcap, libdevmapper, libevent, libmount, libnl, libsqlite, libtirpc, libuuid, openldap"
-# TERMUX_PKG_BUILD_DEPENDS="libxml2"
-# TERMUX_PKG_AUTO_UPDATE=true
-# TERMUX_PKG_BUILD_IN_SRC=true
-# TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
-# ac_cv_lib_resolv___res_querydomain=yes
-# libsqlite3_cv_is_recent=yes
-# --disable-gss
-# --disable-sbin-override
-# --with-modprobedir=$TERMUX_PREFIX/lib/modprobe.d
-# --with-mountfile=$TERMUX_PREFIX/etc/nfsmounts.conf
-# --with-nfsconfig=$TERMUX_PREFIX/etc/nfs.conf
-# --with-start-statd=$TERMUX_PREFIX/bin/start-statd
-# --with-statedir=$TERMUX_PREFIX/var/lib/nfs
-# "
-# TERMUX_PKG_RM_AFTER_INSTALL="
-# lib/udev
-# "
-
-# termux_step_pre_configure() {
-# 	autoreconf -fi
-
-# 	CPPFLAGS+=" -D__USE_GNU"
-
-# 	local _lib="$TERMUX_PKG_BUILDDIR/_lib"
-# 	rm -rf "${_lib}"
-# 	mkdir -p "${_lib}"
-# 	pushd "${_lib}"
-# 	local f
-# 	for f in strverscmp versionsort; do
-# 		$CC $CFLAGS $CPPFLAGS "$TERMUX_PKG_BUILDER_DIR/${f}.c" \
-# 			-fvisibility=hidden -c -o "./${f}.o"
-# 	done
-# 	$AR cru libversionsort.a strverscmp.o versionsort.o
-# 	echo '!<arch>' > libresolv.a
-# 	popd
-
-# 	LDFLAGS+=" -L${_lib} -l:libversionsort.a"
-# }
