@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A set of simple scripts that provide basic desktop integ
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.2.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gitlab.freedesktop.org/xdg/xdg-utils/-/archive/v${TERMUX_PKG_VERSION}/xdg-utils-v${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=93d510dccf328378f012fe195b4574c2fac1cd65a74d0852d6eaa72e5a2065a7
 TERMUX_PKG_AUTO_UPDATE=true
@@ -34,7 +35,7 @@ termux_step_create_debscripts() {
 	set -e
 
 	echo "Sideloading Perl File::MimeInfo ..."
-	cpan -fi File::MimeInfo
+	cpan -Ti File::MimeInfo
 
 	exit 0
 	POSTINST_EOF

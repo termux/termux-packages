@@ -9,7 +9,7 @@ termux_step_create_subpkg_debscripts() {
 	set -e
 
 	echo "Sideloading Perl Locale::gettext ..."
-	cpan -fi Locale::gettext
+	cpan -Ti Locale::gettext
 
 	exit 0
 	POSTINST_EOF
