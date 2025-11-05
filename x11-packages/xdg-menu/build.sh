@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tool that generates XDG Desktop Menus for icewm and othe
 TERMUX_PKG_LICENSE="GPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.7.6.6"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://arch.p5n.pp.ru/~sergej/dl/2023/arch-xdg-menu-$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=01cbd3749939c180fed33783f0f7c4f47ac9563af2d1c4b39e23cb6cba792b40
 TERMUX_PKG_DEPENDS="perl"
@@ -38,7 +39,7 @@ termux_step_create_debscripts()  {
 	set -e
 
 	echo "Sideloading Perl XML::Parser..."
-	cpan install XML::Parser
+	cpan -Ti XML::Parser
 
 	exit 0
 	POSTINST_EOF
