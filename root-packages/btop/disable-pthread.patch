@@ -1,0 +1,31 @@
+diff --git a/src/btop.cpp b/src/btop.cpp
+index ffd5ee6..21568d6 100644
+--- a/src/btop.cpp
++++ b/src/btop.cpp
+@@ -202,12 +202,6 @@ void clean_quit(int sig) {
+ 			Logger::warning("Failed to join _runner thread on exit!");
+ 			pthread_cancel(Runner::runner_id);
+ 		}
+-	#else
+-		constexpr struct timespec ts { .tv_sec = 5, .tv_nsec = 0 };
+-		if (pthread_timedjoin_np(Runner::runner_id, nullptr, &ts) != 0) {
+-			Logger::warning("Failed to join _runner thread on exit!");
+-			pthread_cancel(Runner::runner_id);
+-		}
+ 	#endif
+ 	}
+ 
+@@ -719,12 +713,7 @@ namespace Runner {
+ 		if (active) {
+ 			Logger::error("Stall in Runner thread, restarting!");
+ 			active = false;
+-			// exit(1);
+-			pthread_cancel(Runner::runner_id);
+-			if (pthread_create(&Runner::runner_id, nullptr, &Runner::_runner, nullptr) != 0) {
+-				Global::exit_error_msg = "Failed to re-create _runner thread!";
+-				clean_quit(1);
+-			}
++			exit(1);
+ 		}
+ 		if (stopping or Global::resized) return;
+ 
