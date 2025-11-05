@@ -1,0 +1,99 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 44cd9ac6e..30f659a4f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -138,38 +138,41 @@ else ()
+   set (ARM FALSE)
+ endif ()
+ 
+-#
+-# define the installation location of the shared library files
+-# Note: We do not support multi-arch on Debian systems for the time being and
+-#       hence cannot use GNUInstallDirs as this would assume multi-arch.
+-#       (https://wiki.debian.org/Multiarch)
+-#
+-if (MACOSX)
+-  set (CMAKE_INSTALL_LIBDIR "lib")
+-  set (CMAKE_MOUNT_INSTALL_BINDIR "${CMAKE_INSTALL_PREFIX}/sbin")
+-  set (CVMFS_LIBEXEC_DIR "libexec/cvmfs")
+-  set (CMAKE_MACOSX_RPATH true)
+-  list( APPEND CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib )
+-else (MACOSX) # --> Linux
+-  if (DEBIAN OR ARCHLINUX)
+-    if (ARCHLINUX)
+-      set (CMAKE_MOUNT_INSTALL_BINDIR "/usr/bin")
+-      set (CVMFS_LIBEXEC_DIR "lib/cvmfs")
+-    else (ARCHLINUX)
+-      set (CMAKE_MOUNT_INSTALL_BINDIR "/sbin")
+-      set (CVMFS_LIBEXEC_DIR "libexec/cvmfs")
+-    endif (ARCHLINUX)
+-    set (CMAKE_INSTALL_LIBDIR "lib")
+-  else (DEBIAN OR ARCHLINUX) # --> RedHat, Fedora, CentOS, SuSE
+-    set (CMAKE_MOUNT_INSTALL_BINDIR "/sbin")
+-    set (CVMFS_LIBEXEC_DIR "libexec/cvmfs")
+-    if (IS_64_BIT)
+-      set (CMAKE_INSTALL_LIBDIR "lib64")
+-    else (IS_64_BIT) # --> 32 Bit
+-      set (CMAKE_INSTALL_LIBDIR "lib")
+-    endif (IS_64_BIT)
+-  endif (DEBIAN OR ARCHLINUX)
+-endif (MACOSX)
++# #
++# # define the installation location of the shared library files
++# # Note: We do not support multi-arch on Debian systems for the time being and
++# #       hence cannot use GNUInstallDirs as this would assume multi-arch.
++# #       (https://wiki.debian.org/Multiarch)
++# #
++# if (MACOSX)
++#   set (CMAKE_INSTALL_LIBDIR "lib")
++#   set (CMAKE_MOUNT_INSTALL_BINDIR "${CMAKE_INSTALL_PREFIX}/sbin")
++#   set (CVMFS_LIBEXEC_DIR "libexec/cvmfs")
++#   set (CMAKE_MACOSX_RPATH true)
++#   list( APPEND CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib )
++# else (MACOSX) # --> Linux
++#   if (DEBIAN OR ARCHLINUX)
++#     if (ARCHLINUX)
++#       set (CMAKE_MOUNT_INSTALL_BINDIR "/usr/bin")
++#       set (CVMFS_LIBEXEC_DIR "lib/cvmfs")
++#     else (ARCHLINUX)
++#       set (CMAKE_MOUNT_INSTALL_BINDIR "/sbin")
++#       set (CVMFS_LIBEXEC_DIR "libexec/cvmfs")
++#     endif (ARCHLINUX)
++#     set (CMAKE_INSTALL_LIBDIR "lib")
++#   else (DEBIAN OR ARCHLINUX) # --> RedHat, Fedora, CentOS, SuSE
++#     set (CMAKE_MOUNT_INSTALL_BINDIR "/sbin")
++#     set (CVMFS_LIBEXEC_DIR "libexec/cvmfs")
++#     if (IS_64_BIT)
++#       set (CMAKE_INSTALL_LIBDIR "lib64")
++#     else (IS_64_BIT) # --> 32 Bit
++#       set (CMAKE_INSTALL_LIBDIR "lib")
++#     endif (IS_64_BIT)
++#   endif (DEBIAN OR ARCHLINUX)
++# endif (MACOSX)
++set (CMAKE_MOUNT_INSTALL_BINDIR "${CMAKE_INSTALL_PREFIX}/sbin")
++set (CVMFS_LIBEXEC_DIR "lib/cvmfs")
++set (CMAKE_INSTALL_LIBDIR "lib")
+ message ("Installing shared libraries to: ${CMAKE_INSTALL_LIBDIR}")
+ 
+ #
+diff --git a/cvmfs/CMakeLists.txt b/cvmfs/CMakeLists.txt
+index d7409cc67..e49f1434f 100644
+--- a/cvmfs/CMakeLists.txt
++++ b/cvmfs/CMakeLists.txt
+@@ -372,11 +372,11 @@ if (BUILD_CVMFS)
+   endif ()
+   if (NOT MACOSX)
+   # Systemd service unit for reloads after package upgrades
+-  install (
+-    FILES pkg/cvmfs-reload.service
+-    DESTINATION /usr/lib/systemd/system
+-    PERMISSIONS   OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+-  )
++  # install (
++  #   FILES pkg/cvmfs-reload.service
++  #   DESTINATION /usr/lib/systemd/system
++  #   PERMISSIONS   OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
++  # )
+ 
+   endif()
+ 
