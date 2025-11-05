@@ -1,0 +1,26 @@
+diff --git a/cvmfs/fuse_main.cc b/cvmfs/fuse_main.cc
+index 48eb6b34d..7b7982594 100644
+--- a/cvmfs/fuse_main.cc
++++ b/cvmfs/fuse_main.cc
+@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
+     }
+   }
+ 
+-  std::string local_lib_path = "./";
++  std::string local_lib_path = "/data/data/com.termux/files/usr/lib/";
+   if (getenv("CVMFS_LIBRARY_PATH") != NULL) {
+     local_lib_path = getenv("CVMFS_LIBRARY_PATH");
+     if (!local_lib_path.empty() && (*local_lib_path.rbegin() != '/'))
+diff --git a/cvmfs/loader.cc b/cvmfs/loader.cc
+index 45d291e7c..483dc5161 100644
+--- a/cvmfs/loader.cc
++++ b/cvmfs/loader.cc
+@@ -486,7 +486,7 @@ static void CloseLibrary() {
+ 
+ static CvmfsExports *LoadLibrary(const bool debug_mode,
+                                  LoaderExports *loader_exports) {
+-  std::string local_lib_path = "./";
++  std::string local_lib_path = "/data/data/com.termux/files/usr/lib/";
+   if (getenv("CVMFS_LIBRARY_PATH") != NULL) {
+     local_lib_path = getenv("CVMFS_LIBRARY_PATH");
+     if (!local_lib_path.empty() && (*local_lib_path.rbegin() != '/'))

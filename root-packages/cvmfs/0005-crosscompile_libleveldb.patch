@@ -1,0 +1,13 @@
+diff --git a/externals/leveldb/src/makeHook.sh b/externals/leveldb/src/makeHook.sh
+index 3561fad11..ca4bdd773 100755
+--- a/externals/leveldb/src/makeHook.sh
++++ b/externals/leveldb/src/makeHook.sh
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ 
+ make clean
+-CFLAGS="$CVMFS_BASE_C_FLAGS -fPIC" CXXFLAGS="$CVMFS_BASE_CXX_FLAGS -fPIC" make -j ${CVMFS_BUILD_EXTERNAL_NJOBS}
++CFLAGS="$CVMFS_BASE_C_FLAGS -fPIC" CXXFLAGS="$CVMFS_BASE_CXX_FLAGS -fPIC --target=${CLANG_TARGET_TRIPLE}" make -j ${CVMFS_BUILD_EXTERNAL_NJOBS}
+ strip -S libleveldb.a
+ 
+ cp -rv include/leveldb $EXTERNALS_INSTALL_LOCATION/include/
