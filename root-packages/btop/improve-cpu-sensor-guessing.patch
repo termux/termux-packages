@@ -1,0 +1,22 @@
+diff --git a/src/linux/btop_collect.cpp b/src/linux/btop_collect.cpp
+index 119dd6a..2ae36e8 100644
+--- a/src/linux/btop_collect.cpp
++++ b/src/linux/btop_collect.cpp
+@@ -517,6 +517,17 @@ namespace Cpu {
+ 					cpu_sensor = name;
+ 					break;
+ 				}
++
++				// Android frequently has heterogeneous CPUs. Try to grab the sensor for the BIG cores.
++				if (s_contains(str_to_lower(name), "big")) {
++					cpu_sensor = name;
++					break;
++				}
++				// Failing that, grab the first thermal zone so the random pick below doesn't choose the battery or some other chip.
++				if (s_contains(str_to_lower(name), "thermal0/")) {
++					cpu_sensor = name;
++					break;
++				}
+ 			}
+ 			if (cpu_sensor.empty()) {
+ 				cpu_sensor = found_sensors.begin()->first;

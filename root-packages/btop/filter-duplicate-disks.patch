@@ -1,0 +1,29 @@
+diff --git a/src/linux/btop_collect.cpp b/src/linux/btop_collect.cpp
+index cc58b46..5128f7c 100644
+--- a/src/linux/btop_collect.cpp
++++ b/src/linux/btop_collect.cpp
+@@ -2325,12 +2326,23 @@ namespace Mem {
+ 					disks.at("swap").used_percent = mem.percent.at("swap_used").back();
+ 					disks.at("swap").free_percent = mem.percent.at("swap_free").back();
+ 				}
+-				for (const auto& name : last_found)
++				// Android has a lot of bind mounts. Remove the apparently-redundant disks from this list.
++				auto disk_names_seen = std::unordered_set<std::string>();
++				for (const auto& name : last_found) {
++					// `name` here is actually a mountpoint.
++					auto disk_name = disks[name].name;
++					if (auto contains = disk_names_seen.find(disk_name); contains != disk_names_seen.end()) {
++						continue;
++					} else {
++						disk_names_seen.insert(disk_name);
++					}
++
+ 					#ifdef SNAPPED
+ 						if (not is_in(name, "/mnt", "swap")) mem.disks_order.push_back(name);
+ 					#else
+ 						if (not is_in(name, "/", "swap")) mem.disks_order.push_back(name);
+ 					#endif
++				}
+ 
+ 				//? Get disks IO
+ 				int64_t sectors_read, sectors_write, io_ticks, io_ticks_temp;
