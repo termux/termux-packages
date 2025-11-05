@@ -4,30 +4,27 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="38.0.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/bytecodealliance/wasmtime
 TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION}"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
-# arm:
-# ```
-# error: failed to run custom build command for `cranelift-codegen v0.90.1 (/home/builder/.termux-build/wasmtime/src/cranelift/codegen)`
-#
-# Caused by:
-#   process didn't exit successfully: `/home/builder/.termux-build/wasmtime/src/target/release/build/cranelift-codegen-6ca5eab3f38213ac/build-script-build` (exit status: 101)
-#   --- stderr
-#   thread 'main' panicked at 'error when identifying target: "no supported isa found for arch `armv7`"', cranelift/codegen/build.rs:42:53
-# ```
-#
-# arm, i686:
-# ```
-# error[E0308]: mismatched types
-#   --> /home/builder/.cargo/registry/src/github.com-1ecc6299db9ec823/listenfd-1.0.0/src/unix.rs:14:25
-#    |
-# 14 |         (stat.st_mode & libc::S_IFMT) == libc::S_IFSOCK
-#    |                         ^^^^^^^^^^^^ expected `u32`, found `u16`
-# ```
-TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
+#   = note: ld.lld: error: relocation R_386_32 cannot be used against local symbol;
+# recompile with -fPIC
+#           >>> defined in /home/builder/.termux-build/wasmtime/src/target/
+# i686-linux-android/release/deps/libwasmtime_internal_fiber-ed766d87e782b761.rlib
+# (wasmtime_internal_fiber-ed766d87e782b761.wasmtime_internal_fiber.32287cf82a9b7e1f-cgu.
+# 0.rcgu.o)
+#           >>> referenced by wasmtime_internal_fiber.32287cf82a9b7e1f-cgu.0
+#           >>>               wasmtime_internal_fiber-ed766d87e782b761.
+# wasmtime_internal_fiber.32287cf82a9b7e1f-cgu.0.rcgu.o:(wasmtime_internal_fiber::
+# stackswitch::x86::wasmtime_fiber_init::hd48a3380a323ed84) in archive
+# /home/builder/.termux-build/wasmtime/src/target/i686-linux-android/
+# release/deps/libwasmtime_internal_fiber-ed766d87e782b761.rlib
+#           clang: error: linker command failed with exit code 1
+# (use -v to see invocation)
+TERMUX_PKG_EXCLUDED_ARCHES="i686"
 
 termux_pkg_auto_update() {
 	local e=0
@@ -58,6 +55,21 @@ termux_pkg_auto_update() {
 
 termux_step_pre_configure() {
 	termux_setup_rust
+
+	cargo vendor
+	find ./vendor \
+		-mindepth 1 -maxdepth 1 -type d \
+		! -wholename ./vendor/listenfd \
+		-exec rm -rf '{}' \;
+
+	local patch="$TERMUX_PKG_BUILDER_DIR/listenfd-32-bit-android.diff"
+	local dir="vendor/listenfd"
+	echo "Applying patch: $patch"
+	patch -p1 -d "$dir" < "${patch}"
+
+	echo "" >> Cargo.toml
+	echo '[patch.crates-io]' >> Cargo.toml
+	echo 'listenfd = { path = "./vendor/listenfd" }' >> Cargo.toml
 }
 
 termux_step_make() {
