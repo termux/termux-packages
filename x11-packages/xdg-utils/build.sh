@@ -34,6 +34,8 @@ termux_step_create_debscripts() {
 	#!$TERMUX_PREFIX/bin/bash
 	set -e
 
+	export PERL_MM_USE_DEFAULT=1
+
 	echo "Sideloading Perl File::MimeInfo ..."
 	cpan -Ti File::MimeInfo
 
