@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/sparsehash/sparsehash
+TERMUX_PKG_DESCRIPTION="C++ associative containers "
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="2.0.4"
+TERMUX_PKG_SRCURL=https://github.com/sparsehash/sparsehash/archive/refs/tags/sparsehash-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=8cd1a95827dfd8270927894eb77f62b4087735cbede953884647f16c521c7e58
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_BUILD_IN_SRC=true

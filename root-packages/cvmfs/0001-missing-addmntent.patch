@@ -1,0 +1,27 @@
+From 5b5b9f69312f7aa5e6fc90522ef48dce8b4c8da0 Mon Sep 17 00:00:00 2001
+From: crivella <davide.grassano@epfl.ch>
+Date: Tue, 4 Nov 2025 10:54:32 +0100
+Subject: [PATCH] missing addmntent
+
+---
+ cvmfs/util/platform.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/cvmfs/util/platform.h b/cvmfs/util/platform.h
+index fba1ede8e..3ec5ab2f8 100644
+--- a/cvmfs/util/platform.h
++++ b/cvmfs/util/platform.h
+@@ -4,6 +4,10 @@
+  * Dispatcher for platform specific system/library calls.
+  */
+ 
++#ifdef __ANDROID__
++#define addmntent(s,m) (1)
++#endif
++
+ #ifndef CVMFS_UTIL_PLATFORM_H_
+ #define CVMFS_UTIL_PLATFORM_H_
+ 
+-- 
+2.34.1
+

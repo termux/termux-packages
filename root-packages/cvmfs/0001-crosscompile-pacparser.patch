@@ -1,0 +1,83 @@
+diff --git a/externals/pacparser/src/crosscompile.patch b/externals/pacparser/src/crosscompile.patch
+new file mode 100644
+index 000000000..737ed36ff
+--- /dev/null
++++ b/externals/pacparser/src/crosscompile.patch
+@@ -0,0 +1,59 @@
++diff --git a/Makefile b/Makefile
++index 358be12..5ebf00f 100644
++--- a/src/Makefile
+++++ b/src/Makefile
++@@ -79,7 +79,7 @@ ifndef PYTHON
++ endif
++ 
++ # Spidermonkey library.
++-MAINT_CFLAGS += -Ispidermonkey/js/src
+++MAINT_CFLAGS += -Ispidermonkey/js/src --target=$(CLANG_TARGET_TRIPLE) --sysroot=$(TERMUX_STANDALONE_TOOLCHAIN)/sysroot -DINET6_ADDRSTRLEN=46
++ 
++ LIBRARY_LINK = $(LIBRARY_NAME).$(SO_SUFFIX)
++ PREFIX := $(DESTDIR)$(PREFIX)
++diff --git a/spidermonkey/js/src/rules.mk b/spidermonkey/js/src/rules.mk
++index 8d484db..31fd6dd 100644
++--- a/src/spidermonkey/js/src/rules.mk
+++++ b/src/spidermonkey/js/src/rules.mk
++@@ -72,15 +72,20 @@ $(OBJDIR)/%: %.c
++ 	@$(MAKE_OBJDIR)
++ 	$(CC) -o $@ $(CFLAGS) $*.c $(LDFLAGS)
++ 
+++ARCCFLAGS = $(CFLAGS) --target=$(CLANG_TARGET_TRIPLE) --sysroot=$(TERMUX_STANDALONE_TOOLCHAIN)/sysroot
+++
++ # This rule must come before the rule with no dep on header
+++$(OBJDIR)/jscpucfg.o: jscpucfg.c
+++	$(CC) -o $@ -c $(CFLAGS) jscpucfg.c
+++
++ $(OBJDIR)/%.o: %.c %.h
++ 	@$(MAKE_OBJDIR)
++-	$(CC) -o $@ -c $(CFLAGS) $*.c
+++	$(CC) -o $@ -c $(ARCCFLAGS) $*.c
++ 
++ 
++ $(OBJDIR)/%.o: %.c
++ 	@$(MAKE_OBJDIR)
++-	$(CC) -o $@ -c $(CFLAGS) $*.c
+++	$(CC) -o $@ -c $(ARCCFLAGS) $*.c
++ 
++ $(OBJDIR)/%.o: %.s
++ 	@$(MAKE_OBJDIR)
++@@ -89,15 +94,15 @@ $(OBJDIR)/%.o: %.s
++ # This rule must come before rule with no dep on header
++ $(OBJDIR)/%.obj: %.c %.h
++ 	@$(MAKE_OBJDIR)
++-	$(CC) -Fo$(OBJDIR)/ -c $(CFLAGS) $(JSDLL_CFLAGS) $*.c
+++	$(CC) -Fo$(OBJDIR)/ -c $(ARCCFLAGS) $(JSDLL_CFLAGS) $*.c
++ 
++ $(OBJDIR)/%.obj: %.c
++ 	@$(MAKE_OBJDIR)
++-	$(CC) -Fo$(OBJDIR)/ -c $(CFLAGS) $(JSDLL_CFLAGS) $*.c
+++	$(CC) -Fo$(OBJDIR)/ -c $(ARCCFLAGS) $(JSDLL_CFLAGS) $*.c
++ 
++ $(OBJDIR)/js.obj: js.c
++ 	@$(MAKE_OBJDIR)
++-	$(CC) -Fo$(OBJDIR)/ -c $(CFLAGS) $<
+++	$(CC) -Fo$(OBJDIR)/ -c $(ARCCFLAGS) $<
++ 
++ ifeq ($(OS_ARCH),OS2)
++ $(LIBRARY): $(LIB_OBJS)
+diff --git a/externals/pacparser/src/makeHook.sh b/externals/pacparser/src/makeHook.sh
+index 55b1a95c5..3acb323d2 100755
+--- a/externals/pacparser/src/makeHook.sh
++++ b/externals/pacparser/src/makeHook.sh
+@@ -14,10 +14,12 @@ if ! python3 -V >/dev/null 2>&1; then
+   FIX_PYTHON="PYTHON=python"
+ fi
+ 
++patch -p1 < crosscompile.patch
++
+ echo "make clean && make for libpacparser (omitting test execution)..."
+ [ -d $static_result_dir ] && rm -fR $static_result_dir
+ make $FIX_PYTHON -C src clean -j ${CVMFS_BUILD_EXTERNAL_NJOBS}
+-make $FIX_PYTHON $FIX_COMP CVMFS_BASE_C_FLAGS="$CVMFS_BASE_C_FLAGS" -j1 -C src pacparser.o spidermonkey/libjs.a  # default target runs tests!
++make $FIX_PYTHON $FIX_COMP CVMFS_BASE_C_FLAGS="$CVMFS_BASE_C_FLAGS" CC="clang" -j1 -C src pacparser.o spidermonkey/libjs.a  # default target runs tests!
+ echo "finished internal build of libpacparser"
+ 
+ echo "creating static link library for libpacparser..."
