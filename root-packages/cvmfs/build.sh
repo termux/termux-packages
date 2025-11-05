@@ -1,18 +1,13 @@
 TERMUX_PKG_HOMEPAGE=https://cernvm.cern.ch/fs/
 TERMUX_PKG_DESCRIPTION="The CernVM File System"
-TERMUX_PKG_LICENSE="BSD-3-Clause"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@Crivella"
 TERMUX_PKG_VERSION="2.13.3"
 TERMUX_PKG_SRCURL=https://github.com/cvmfs/cvmfs/archive/refs/tags/cvmfs-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=1ee9db980608d6cd25c6566c49acf5903b67e9110774563df4ca2397eb137393
-# TERMUX_PKG_DEPENDS="libcurl, libcrypt, pacparser(XXX), zlib, leveldb, (maxminddb)XXX, libprotobuf, libsqlite, vjson(XXX), sha3(XXX), libarchive"
 TERMUX_PKG_DEPENDS="c-ares, libc++, libandroid-execinfo, libcurl, zlib, leveldb, libprotobuf, protobuf, libsqlite, libarchive, libuuid, libcap, sparsehash, libfuse3"
-# TERMUX_PKG_BUILD_DEPENDS="libprotobuf"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
-# Needs its own build of:
-# - sha3: fork of ... taking only subset of modified files
-# - libcrypto: libressl
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_CVMFS=ON
 -DBUILD_LIBCVMFS=ON
@@ -23,8 +18,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_DUCC=OFF
 -DBUILD_SNAPSHOTTER=OFF
 -DBUILD_STRESS_TESTS=OFF
-
--DCMAKE_VERBOSE_MAKEFILE=ON
 
 -DBUILTIN_EXTERNALS=ON
 -DBUILTIN_EXTERNALS_LIST=vjson;sha3;libcrypto;pacparser
@@ -48,15 +41,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLibcrypto_INCLUDE_DIRS=$TERMUX_PKG_SRCDIR/externals_install.aarch64/crypto/include
 -DLibcrypto_LIBRARIES=$TERMUX_PKG_SRCDIR/externals_install.aarch64/crypto/lib/libcrypto.a
 "
-# -DBUILTIN_EXTERNALS_LIST=vjson;sha3;libcrypto;pacparser
-# -DPACPARSER_INCLUDE_DIR=$TERMUX_PKG_SRCDIR/externals_install.aarch64/include
-# -DPACPARSER_LIBRARY=$TERMUX_PKG_SRCDIR/externals_install.aarch64/lib/libpacparser.so
-# -DPACPARSER_INCLUDE_DIR=$TERMUX_PREFIX/include
-# -DPACPARSER_LIBRARY=$TERMUX_PREFIX/lib/libpacparser.so
-
-# We cannot run cross-compiled programs to get help message, so disable
-# man-page generation with help2man
-# TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="ac_cv_prog_HELP2MAN="
 
 termux_step_pre_configure () {
     # Get `protoc` that can be used on host architecture during build
