@@ -1,0 +1,13 @@
+diff --git a/src/linux/btop_collect.cpp b/src/linux/btop_collect.cpp
+index 8b538bd..c56610f 100644
+--- a/src/linux/btop_collect.cpp
++++ b/src/linux/btop_collect.cpp
+@@ -943,7 +943,7 @@ namespace Cpu {
+ 		try {
+ 			//? Get cpu total times for all cores from /proc/stat
+ 			string cpu_name;
+-			cread.open(Shared::procPath / "stat");
++			cread.open("@TERMUX_PREFIX@/var/btop/stat");
+ 			int i = 0;
+ 			int target = Shared::coreCount;
+ 			for (; i <= target or (cread.good() and cread.peek() == 'c'); i++) {
