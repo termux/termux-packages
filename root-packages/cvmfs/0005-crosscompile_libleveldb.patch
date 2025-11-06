@@ -41,12 +41,14 @@ index 755db1160..1309cf946 100644
 +include(FindPackageHandleStandardArgs)
 +find_package_handle_standard_args(leveldb DEFAULT_MSG LEVELDB_LIB_DIR LEVELDB_INCLUDE_DIR )
 diff --git a/externals/leveldb/src/makeHook.sh b/externals/leveldb/src/makeHook.sh
-index 3561fad11..ca4bdd773 100755
+index 3561fad11..df4452877 100755
 --- a/externals/leveldb/src/makeHook.sh
 +++ b/externals/leveldb/src/makeHook.sh
-@@ -1,7 +1,7 @@
+@@ -1,7 +1,9 @@
  #!/bin/sh
  
++find . -name '*.cc' -exec sed -i 's/_unlocked//g' {} \;
++
  make clean
 -CFLAGS="$CVMFS_BASE_C_FLAGS -fPIC" CXXFLAGS="$CVMFS_BASE_CXX_FLAGS -fPIC" make -j ${CVMFS_BUILD_EXTERNAL_NJOBS}
 +CFLAGS="$CVMFS_BASE_C_FLAGS -fPIC" CXXFLAGS="$CVMFS_BASE_CXX_FLAGS -fPIC --target=${CLANG_TARGET_TRIPLE}" make -j ${CVMFS_BUILD_EXTERNAL_NJOBS}
