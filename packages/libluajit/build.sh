@@ -13,7 +13,8 @@ TERMUX_PKG_EXTRA_MAKE_ARGS="amalg PREFIX=$TERMUX_PREFIX"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_pkg_auto_update() {
-	local response latest_version
+	local current_version="${TERMUX_PKG_VERSION#*:}"
+	local response latest_version unix_timestamp_latest
 	local api_url='https://archlinux.org/packages/search/json/?name=luajit'
 	# Get the latest version from Arch Linux's API.
 	# Since this project doesn't do release tags,
@@ -24,8 +25,9 @@ termux_pkg_auto_update() {
 		"${api_url}"
 	)"
 	latest_version="$(jq -r '.results[0].pkgver' <<< "$response")"
+	unix_timestamp_latest="${latest_version##*.}"
 
-	if [[ "${latest_version}" == "null" ]]; then
+	if ! date -d "@${unix_timestamp_latest}" &> /dev/null; then
 		local summary
 		# shellcheck disable=SC2016
 		printf -v summary '%s\n' \
@@ -34,6 +36,7 @@ termux_pkg_auto_update() {
 			"Failed to get latest version of 'luajit'" \
 			"from '${api_url}'" \
 			''\
+			"Timestamp - $(date -d "@${unix_timestamp_latest}" --utc '+%Y-%m-%dT%H:%M:%SZ' 2>&1)" \
 			'Prettified `curl` response:' \
 			'```json' \
 			"$(jq -r <<< "$response")" \
@@ -47,15 +50,14 @@ termux_pkg_auto_update() {
 			echo "$summary" >&2
 		fi
 		echo "WARN: Couldn't query new version. Staying at version '${TERMUX_PKG_VERSION}'."
-		return
+		return 0
 	fi
 
-	local current_version="${TERMUX_PKG_VERSION#*:}"
 	# If this isn't a dry-run add a human readable (ISO 8601)
 	# version of the timestamp as a comment to the version.
 	if [[ "${BUILD_PACKAGES}" != "false" && "$current_version" != "$latest_version" ]]; then
 		sed \
-			-e "s|^\(TERMUX_PKG_VERSION=.*\"\).*|\1 # $(date -d "@${latest_version:4}" --utc '+%Y-%m-%dT%H:%M:%SZ')|" \
+			-e "s|^\(TERMUX_PKG_VERSION=.*\"\).*|\1 # $(date -d "@${unix_timestamp_latest}" --utc '+%Y-%m-%dT%H:%M:%SZ')|" \
 			-i "$TERMUX_PKG_BUILDER_DIR/build.sh"
 	fi
 
