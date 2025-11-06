@@ -58,9 +58,3 @@ termux_step_pre_configure () {
     export TERMUX_STANDALONE_TOOLCHAIN
     export LDFLAGS
 }
-
-# Potential issues:
-# when cvmfs compiles its external pacparser dependency, it needs to generate an executable that than writes som header files
-# This will also dumb the length of certain sizeofs into the generated files.
-# When cross-compiling this executable needs to be runnable on the build host, but if the bitness differs between host and target,
-# The compilation will fail afterward due to a precompiler check that the sizeof is what is expected.
