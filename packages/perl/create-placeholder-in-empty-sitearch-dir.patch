@@ -1,0 +1,21 @@
+Fixes https://github.com/termux/termux-packages/issues/27136
+by preventing termux_step_massage()
+from deleting the empty folder
+/data/data/com.termux/files/usr/lib/perl5/site_perl/5.40.3/aarch64-android/
+from the perl package
+so that it is detected as present and writable by
+cpan/CPAN/lib/CPAN/FirstTime.pm
+during the command
+cpan -i XML::Parser
+during postinst scripts
+
+--- a/installperl
++++ b/installperl
+@@ -297,6 +297,7 @@ mkpath($installprivlib);
+ mkpath($installarchlib);
+ mkpath($installsitelib, $opts{verbose}, 0777) if ($installsitelib);
+ mkpath($installsitearch, $opts{verbose}, 0777) if ($installsitearch);
++system("touch", "$installsitearch/.placeholder");
+ 
+ if (-d 'lib') {
+     find({no_chdir => 1, wanted => \&installlib}, 'lib')
