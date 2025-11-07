@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION="2.13.3"
 TERMUX_PKG_SRCURL=https://github.com/cvmfs/cvmfs/archive/refs/tags/cvmfs-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=1ee9db980608d6cd25c6566c49acf5903b67e9110774563df4ca2397eb137393
 TERMUX_PKG_GROUPS="science"
-TERMUX_PKG_DEPENDS="c-ares, libc++, libandroid-execinfo, libandroid-posix-semaphore, libcurl, zlib, libprotobuf, protobuf, libsqlite, libarchive, libuuid, libcap, libfuse3"
+TERMUX_PKG_DEPENDS="leveldb, c-ares, libc++, libandroid-execinfo, libandroid-posix-semaphore, libcurl, zlib, libprotobuf, protobuf, libsqlite, libarchive, libuuid, libcap, libfuse3"
 TERMUX_PKG_BUILD_DEPENDS="sparsehash"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
@@ -24,7 +24,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_STRESS_TESTS=OFF
 
 -DBUILTIN_EXTERNALS=ON
--DBUILTIN_EXTERNALS_LIST=vjson;sha3;libcrypto;pacparser;leveldb;
+-DBUILTIN_EXTERNALS_LIST=vjson;sha3;libcrypto;pacparser;
 
 -DCARES_INCLUDE_DIR=$TERMUX_PREFIX/include
 -DCARES_LIBRARY=$TERMUX_PREFIX/lib/libcares.so
@@ -36,8 +36,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLibArchive_LIBRARY=$TERMUX_PREFIX/lib/libarchive.so
 -DSPARSEHASH_INCLUDE_DIR=$TERMUX_PREFIX/include/sparsehash
 
--DLEVELDB_INCLUDE_DIR=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH/arm/armv7-a/}/include
--DLEVELDB_LIBRARIES=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH/arm/armv7-a/}/lib/libleveldb.a
 -DPACPARSER_INCLUDE_DIR=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH/arm/armv7-a/}/include
 -DPACPARSER_LIBRARY=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH/arm/armv7-a/}/lib/libpacparser.a
 -DVJSON_INCLUDE_DIRS=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH/arm/armv7-a/}/include
