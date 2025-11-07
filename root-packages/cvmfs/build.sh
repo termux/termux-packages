@@ -35,16 +35,16 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLibArchive_LIBRARY=$TERMUX_PREFIX/lib/libarchive.so
 -DSPARSEHASH_INCLUDE_DIR=$TERMUX_PREFIX/include/sparsehash
 
--DLEVELDB_INCLUDE_DIR=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH}/include
--DLEVELDB_LIBRARIES=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH}/lib/libleveldb.a
--DPACPARSER_INCLUDE_DIR=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH}/include
--DPACPARSER_LIBRARY=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH}/lib/libpacparser.a
--DVJSON_INCLUDE_DIRS=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH}/include
--DVJSON_LIBRARIES=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH}/lib/libvjson.a
--DSHA3_INCLUDE_DIRS=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH}/include
--DSHA3_LIBRARIES=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH}/lib/libsha3.a
--DLibcrypto_INCLUDE_DIRS=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH}/crypto/include
--DLibcrypto_LIBRARIES=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH}/crypto/lib/libcrypto.a
+-DLEVELDB_INCLUDE_DIR=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH/arm/armv7-a/}/include
+-DLEVELDB_LIBRARIES=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH/arm/armv7-a/}/lib/libleveldb.a
+-DPACPARSER_INCLUDE_DIR=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH/arm/armv7-a/}/include
+-DPACPARSER_LIBRARY=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH/arm/armv7-a/}/lib/libpacparser.a
+-DVJSON_INCLUDE_DIRS=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH/arm/armv7-a/}/include
+-DVJSON_LIBRARIES=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH/arm/armv7-a/}/lib/libvjson.a
+-DSHA3_INCLUDE_DIRS=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH/arm/armv7-a/}/include
+-DSHA3_LIBRARIES=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH/arm/armv7-a/}/lib/libsha3.a
+-DLibcrypto_INCLUDE_DIRS=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH/arm/armv7-a/}/crypto/include
+-DLibcrypto_LIBRARIES=$TERMUX_PKG_SRCDIR/externals_install.${TERMUX_ARCH/arm/armv7-a/}/crypto/lib/libcrypto.a
 "
 
 termux_step_pre_configure () {
