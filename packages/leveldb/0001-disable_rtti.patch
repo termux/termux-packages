@@ -1,0 +1,15 @@
+Patch taken from
+https://gitlab.archlinux.org/archlinux/packaging/packages/leveldb/-/blob/ef72948b3d6c01b89a93a03c76ba81dacc17be58/020-leveldb-do-not-disable-rtti.patch
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -72,8 +72,8 @@ else(CMAKE_CXX_COMPILER_ID STREQUAL "MSV
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions")
+ 
+   # Disable RTTI.
+-  string(REGEX REPLACE "-frtti" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
++  #string(REGEX REPLACE "-frtti" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
++  #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
+ endif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+ 
+ # Test whether -Wthread-safety is available. See
