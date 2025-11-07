@@ -45,16 +45,16 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure () {
-    # Get `protoc` that can be used on host architecture during build
-    termux_setup_protobuf
+	# Get `protoc` that can be used on host architecture during build
+	termux_setup_protobuf
 
-    # for backtrace and backtrace_symbols_fd
-    LDFLAGS+=" -landroid-execinfo"
+	# for backtrace and backtrace_symbols_fd
+	LDFLAGS+=" -landroid-execinfo"
 
-    # Make variables available to build scripts
-    export TERMUX_HOST_PLATFORM
-    export TERMUX_PKG_API_LEVEL
-    export CLANG_TARGET_TRIPLE="${TERMUX_HOST_PLATFORM}${TERMUX_PKG_API_LEVEL}"
-    export TERMUX_STANDALONE_TOOLCHAIN
-    export LDFLAGS
+	# Make variables available to build scripts
+	export TERMUX_HOST_PLATFORM
+	export TERMUX_PKG_API_LEVEL
+	export CLANG_TARGET_TRIPLE="${TERMUX_HOST_PLATFORM}${TERMUX_PKG_API_LEVEL}"
+	export TERMUX_STANDALONE_TOOLCHAIN
+	export LDFLAGS
 }
