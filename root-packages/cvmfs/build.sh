@@ -54,6 +54,7 @@ termux_step_pre_configure () {
 	# Make variables available to build scripts
 	export CLANG_TARGET_TRIPLE="${TERMUX_HOST_PLATFORM}${TERMUX_PKG_API_LEVEL}"
 	export TERMUX_STANDALONE_TOOLCHAIN
+	export TERMUX_ARCH_BITS
 	# for backtrace and backtrace_symbols_fd
 	export LDFLAGS+=" -landroid-execinfo"
 }

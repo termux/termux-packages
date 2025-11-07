@@ -1,3 +1,5 @@
+Thanks to @robertkirkman the `-m${TERMUX_ARCH_BITS}` tip
+Force bitness of executable to match that of the target architecture
 diff --git a/externals/pacparser/src/crosscompile.patch b/externals/pacparser/src/crosscompile.patch
 new file mode 100644
 index 000000000..737ed36ff
@@ -77,7 +79,7 @@ index 55b1a95c5..3acb323d2 100755
  [ -d $static_result_dir ] && rm -fR $static_result_dir
  make $FIX_PYTHON -C src clean -j ${CVMFS_BUILD_EXTERNAL_NJOBS}
 -make $FIX_PYTHON $FIX_COMP CVMFS_BASE_C_FLAGS="$CVMFS_BASE_C_FLAGS" -j1 -C src pacparser.o spidermonkey/libjs.a  # default target runs tests!
-+make $FIX_PYTHON $FIX_COMP CVMFS_BASE_C_FLAGS="$CVMFS_BASE_C_FLAGS" CC="clang" -j1 -C src pacparser.o spidermonkey/libjs.a  # default target runs tests!
++make $FIX_PYTHON $FIX_COMP CVMFS_BASE_C_FLAGS="$CVMFS_BASE_C_FLAGS" CC="clang -m${TERMUX_ARCH_BITS}" -j1 -C src pacparser.o spidermonkey/libjs.a  # default target runs tests!
  echo "finished internal build of libpacparser"
  
  echo "creating static link library for libpacparser..."
