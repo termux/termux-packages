@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@Crivella"
 TERMUX_PKG_VERSION="2.13.3"
 TERMUX_PKG_SRCURL=https://github.com/cvmfs/cvmfs/archive/refs/tags/cvmfs-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=1ee9db980608d6cd25c6566c49acf5903b67e9110774563df4ca2397eb137393
+TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_DEPENDS="c-ares, libc++, libandroid-execinfo, libandroid-posix-semaphore, libcurl, zlib, libprotobuf, protobuf, libsqlite, libarchive, libuuid, libcap, libfuse3"
 TERMUX_PKG_BUILD_DEPENDS="sparsehash"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -49,13 +50,9 @@ termux_step_pre_configure () {
 	# Get `protoc` that can be used on host architecture during build
 	termux_setup_protobuf
 
-	# for backtrace and backtrace_symbols_fd
-	LDFLAGS+=" -landroid-execinfo"
-
 	# Make variables available to build scripts
-	export TERMUX_HOST_PLATFORM
-	export TERMUX_PKG_API_LEVEL
 	export CLANG_TARGET_TRIPLE="${TERMUX_HOST_PLATFORM}${TERMUX_PKG_API_LEVEL}"
 	export TERMUX_STANDALONE_TOOLCHAIN
-	export LDFLAGS
+	# for backtrace and backtrace_symbols_fd
+	export LDFLAGS+=" -landroid-execinfo"
 }
