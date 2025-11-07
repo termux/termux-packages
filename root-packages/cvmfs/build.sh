@@ -9,6 +9,7 @@ TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_DEPENDS="c-ares, libc++, libandroid-execinfo, libandroid-posix-semaphore, libcurl, zlib, libprotobuf, protobuf, libsqlite, libarchive, libuuid, libcap, libfuse3"
 TERMUX_PKG_BUILD_DEPENDS="sparsehash"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
