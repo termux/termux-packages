@@ -226,7 +226,10 @@ check_version() {
 				"" \
 				"TERMUX_PKG_VERSION was bumped but TERMUX_PKG_REVISION wasn't reset." \
 				"Please remove the 'TERMUX_PKG_REVISION=${new_revision}' line." \
-				""
+				"base_commit: $base_commit" \
+				"HEAD commit hash: $(git rev-parse HEAD)" \
+				"git status: $(git status)" \
+				"git log: $(git log)"
 			continue
 		fi
 
