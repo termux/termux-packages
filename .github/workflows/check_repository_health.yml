@@ -34,4 +34,15 @@ jobs:
         run: |
           ISSUE_TITLE="Repository Health Check Failed"
           ISSUE_BODY=$(cat repository-health.txt)
+          # if the Repository Health Check Failed issue is open, close it first
+          number=$(gh issue list \
+            --limit 1 \
+            --label "health-check" \
+            --state open \
+            --search "$ISSUE_TITLE in:title type:issue" \
+            --json number | jq -r '.[] | .number')
+          if [[ -n "$number" ]]; then
+            echo "INFO: Closing issue number: $number"
+            gh issue close "$number" --reason completed
+          fi
           gh issue create --title "$ISSUE_TITLE" --body "$ISSUE_BODY" --label "health-check" --assignee "thunder-coding"
