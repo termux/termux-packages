@@ -133,6 +133,10 @@ if ! base_commit="HEAD~$(git rev-list --count FETCH_HEAD..)"; then
 	base_commit="HEAD~$(git rev-list --count FETCH_HEAD..)"
 fi
 
+# Also figure out if we have a `%ci:no-build` trailer in the commit range,
+# we may skip some checks later if yes.
+no_build="$(git log --fixed-strings --grep '%ci:no-build' --pretty=format:%H "$base_commit")"
+
 check_version() {
 	local package_dir="${1%/*}"
 
@@ -145,23 +149,16 @@ check_version() {
 	} >&2
 
 	# If TERMUX_PKG_VERSION is an array that changes the formatting.
-	local version i=-1 error=0 is_array="${TERMUX_PKG_VERSION@a}"
+	local version i=0 error=0 is_array="${TERMUX_PKG_VERSION@a}"
 	printf '%s' "${is_array:+$'ARRAY\n'}"
 
 	for version in "${TERMUX_PKG_VERSION[@]}"; do
 		printf '%s' "${is_array:+$'\t'}"
-		(( i++ ))
 
 		# Is this version valid?
 		dpkg --validate-version "${version}" &> /dev/null || {
 			printf 'INVALID %s\n' "$(dpkg --validate-version "${version}" 2>&1)"
 			(( error++ ))
-			continue
-		}
-
-		# Was the package modified in this branch?
-		git diff --exit-code "${base_commit}" -- "${package_dir}" &> /dev/null && {
-			printf '%s\n' "PASS - ${version} (not modified in this branch)"
 			continue
 		}
 
@@ -171,22 +168,38 @@ check_version() {
 			unset TERMUX_PKG_VERSION TERMUX_PKG_REVISION
 			# shellcheck source=/dev/null
 			. <(git -P show "${base_commit}:${package_dir}/build.sh" 2> /dev/null)
-			if [[ -n "$is_array" ]]; then
-				echo "${TERMUX_PKG_VERSION[$i]:-0}-${TERMUX_PKG_REVISION:-0}"
-			else
-				echo "${TERMUX_PKG_VERSION:-0}-${TERMUX_PKG_REVISION:-0}"
-			fi
+			# ${TERMUX_PKG_VERSION[0]} also works fine for non-array versions.
+			# Since those resolve in 1 iteration, no higher index is ever attempted to be called.
+			echo "${TERMUX_PKG_VERSION[$i]:-0}-${TERMUX_PKG_REVISION:-0}"
 		)
 
 		# Is ${version_old} valid?
 		local version_old_is_bad=""
 		dpkg --validate-version "${version_old}" &> /dev/null || version_old_is_bad="0~invalid"
 
+		# The rest of the checks aren't useful past the first index when $TERMUX_PKG_VERSION is an array
+		# since that is the index that determines the actual version.
+		if (( i++ > 0 )); then
+			echo "PASS - ${version_old%-0}${version_old_is_bad:+" (INVALID)"} -> ${version_new%-0}"
+			continue
+		fi
+
+		# Was the package modified in this branch?
+		git diff --exit-code "${base_commit}" -- "${package_dir}" &> /dev/null && {
+			printf '%s\n' "PASS - ${version_new%-0} (not modified in this branch)"
+			return 0
+		}
+
+		[[ -n "$no_build" ]] && {
+			echo "SKIP - ${version_new%-0} ('%ci:no-build' trailer detected on commit ${no_build::7})"
+			return 0
+		}
+
 		# If ${version_new} isn't greater than "$version_old" that's an issue.
 		# If ${version_old} isn't valid this check is a no-op.
 		if dpkg --compare-versions "$version_new" le "${version_old_is_bad:-$version_old}"; then
 			printf '%s\n' \
-				"FAILED" \
+				"FAILED ${version_old_is_bad:-$version_old} -> ${version_new}" \
 				"" \
 				"Version of '$package_name' has not been incremented." \
 				"Either 'TERMUX_PKG_VERSION' or 'TERMUX_PKG_REVISION'" \
@@ -223,9 +236,7 @@ check_version() {
 			continue
 		# If that check passed the TERMUX_PKG_VERSION must have changed,
 		# in which case TERMUX_PKG_REVISION should be reset to 0.
-		# This check isn't useful past the first index when $TERMUX_PKG_VERSION is an array
-		# since the main version of such a package may remain unchanged when another is changed.
-		elif [[ "${version_new%-*}" != "${version_old%-*}" && "$new_revision" != "0" && "$i" == 0 ]]; then
+		elif [[ "${version_new%-*}" != "${version_old%-*}" && "$new_revision" != "0" ]]; then
 			(( error++ )) # Not reset
 			printf '%s\n' \
 				"FAILED - $version_old -> $version_new" \
