@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Tools and libraries to manipulate a wide range of multim
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Please align version with `ffplay` package.
-TERMUX_PKG_VERSION="7.1.2"
+TERMUX_PKG_VERSION="8.0"
 TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=089bc60fb59d6aecc5d994ff530fd0dcb3ee39aa55867849a2bbc4e555f9c304
+TERMUX_PKG_SHA256=b2751fccb6cc4c77708113cd78b561059b6fa904b24162fa0be2d60273d27b8e
 TERMUX_PKG_DEPENDS="fontconfig, freetype, fribidi, game-music-emu, glslang, harfbuzz, libaom, libandroid-glob, libandroid-stub, libass, libbluray, libbz2, libdav1d, libgnutls, libiconv, liblzma, libmp3lame, libopencore-amr, libopenmpt, libopus, libplacebo, librav1e, libsoxr, libsrt, libssh, libtheora, libv4l, libvidstab, libvmaf, libvo-amrwbenc, libvorbis, libvpx, libwebp, libx264, libx265, libxml2, libzimg, libzmq, littlecms, ocl-icd, rubberband, svt-av1, vulkan-icd, xvidcore, zlib"
 TERMUX_PKG_BUILD_DEPENDS="opencl-headers, vulkan-headers"
 TERMUX_PKG_CONFLICTS="libav"
@@ -15,50 +15,53 @@ TERMUX_PKG_REPLACES="ffmpeg-dev"
 termux_step_pre_configure() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed. (These variables are also used afterwards.)
-	_FFMPEG_SOVER_avutil=59
-	_FFMPEG_SOVER_avcodec=61
-	_FFMPEG_SOVER_avformat=61
+	declare -gA _FFMPEG_SOVER=(
+		[avutil]=60
+		[avcodec]=62
+		[avformat]=62
+	)
 
-	local f
-	for f in util codec format; do
-		local v=$(sh ffbuild/libversion.sh av${f} \
-				libav${f}/version.h libav${f}/version_major.h \
-				| sed -En 's/^libav'"${f}"'_VERSION_MAJOR=([0-9]+)$/\1/p')
-		if [ ! "${v}" ] || [ "$(eval echo \$_FFMPEG_SOVER_av${f})" != "${v}" ]; then
-			termux_error_exit "SOVERSION guard check failed for libav${f}.so. expected ${v}"
+	local lib so_version
+	for lib in util codec format; do
+		so_version=$(sh ffbuild/libversion.sh av${lib} \
+				libav${lib}/version.h libav${lib}/version_major.h \
+				| sed -En 's/^libav'"${lib}"'_VERSION_MAJOR=([0-9]+)$/\1/p')
+		if [[ ! "${so_version}"  ||  "${_FFMPEG_SOVER[av${lib}]}" != "${so_version}" ]]; then
+			termux_error_exit "SOVERSION guard check failed for libav${lib}.so. expected ${so_version}"
 		fi
 	done
-
-	# use '-Wno-error=incompatible-pointer-types' with 32-bit ARM target to work around
-	# error: incompatible function pointer types initializing
-	# 'PFN_vkDebugUtilsMessengerCallbackEXT'... with an expression of type 'VkBool32`...
-	# following the example of the Arch Linux AUR lib32-ffmpeg package:
-	# https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=lib32-ffmpeg&id=41476d610980376bcbe054ee183f46705be27747#n171
-	if [[ "$TERMUX_ARCH" == "arm" ]]; then
-		CFLAGS+=" -Wno-error=incompatible-pointer-types"
-	fi
 }
 
 termux_step_configure() {
 	cd $TERMUX_PKG_BUILDDIR
 
 	local _EXTRA_CONFIGURE_FLAGS=""
-	if [ $TERMUX_ARCH = "arm" ]; then
-		_ARCH="armeabi-v7a"
-		_EXTRA_CONFIGURE_FLAGS="--enable-neon"
-	elif [ $TERMUX_ARCH = "i686" ]; then
-		_ARCH="x86"
-		# Specify --disable-asm to prevent text relocations on i686,
-		# see https://trac.ffmpeg.org/ticket/4928
-		_EXTRA_CONFIGURE_FLAGS="--disable-asm"
-	elif [ $TERMUX_ARCH = "x86_64" ]; then
-		_ARCH="x86_64"
-	elif [ $TERMUX_ARCH = "aarch64" ]; then
-		_ARCH=$TERMUX_ARCH
-		_EXTRA_CONFIGURE_FLAGS="--enable-neon"
-	else
-		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
-	fi
+	case "$TERMUX_ARCH" in
+		"aarch64")
+			_ARCH="$TERMUX_ARCH"
+			_EXTRA_CONFIGURE_FLAGS="--enable-neon"
+		;;
+		"arm")
+			_ARCH="armeabi-v7a"
+			_EXTRA_CONFIGURE_FLAGS="--enable-neon"
+			# use '-Wno-error=incompatible-pointer-types' with 32-bit ARM target to work around
+			# error: incompatible function pointer types initializing
+			# 'PFN_vkDebugUtilsMessengerCallbackEXT'... with an expression of type 'VkBool32`...
+			# following the example of the Arch Linux AUR lib32-ffmpeg package:
+			# https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=lib32-ffmpeg&id=41476d610980376bcbe054ee183f46705be27747#n171
+			CFLAGS+=" -Wno-error=incompatible-pointer-types"
+		;;
+		"i686")
+			_ARCH="x86"
+			# Specify --disable-asm to prevent text relocations on i686,
+			# see https://trac.ffmpeg.org/ticket/4928
+			_EXTRA_CONFIGURE_FLAGS="--disable-asm"
+		;;
+		"x86_64")
+			_ARCH="x86_64"
+		;;
+		*) termux_error_exit "Unsupported arch: $TERMUX_ARCH";;
+	esac
 
 	$TERMUX_PKG_SRCDIR/configure \
 		--arch="${_ARCH}" \
@@ -131,16 +134,16 @@ termux_step_configure() {
 }
 
 termux_step_post_massage() {
-	cd ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib || exit 1
-	local f
-	for f in util codec format; do
-		local s=$(eval echo \$_FFMPEG_SOVER_av${f})
-		if [ ! "${s}" ]; then
-			termux_error_exit "Empty SOVERSION for libav${f}."
+	cd "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib" || termux_error_exit "couldn't symlink shared libraries."
+	local lib so_version
+	for lib in util codec format; do
+		so_version="${_FFMPEG_SOVER[av${lib}]}"
+		if [[ ! "${so_version}" ]]; then
+			termux_error_exit "Empty SOVERSION for libav${lib}."
 		fi
 		# SOVERSION suffix is expected by some programs, e.g. Firefox.
-		if [ ! -e "./libav${f}.so.${s}" ]; then
-			ln -sf libav${f}.so libav${f}.so.${s}
+		if [[ ! -e "./libav${lib}.so.${so_version}" ]]; then
+			ln -sf "libav${lib}.so" "libav${lib}.so.${so_version}"
 		fi
 	done
 }
