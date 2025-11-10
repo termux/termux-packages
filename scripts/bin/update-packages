@@ -151,7 +151,10 @@ _fetch_and_cache_tags() {
 		__PACKAGES+=("${pkg_dir}")
 
 		# bash-builtin version of `grep '^TERMUX_PKG_SRCURL=' "${pkg_dir}/build.sh" | grep -q 'github.com'` without spawning extra processes
-		[[ "$(<"$pkg_dir/build.sh")" =~ TERMUX_PKG_SRCURL=[^[:space:]]*github\.com ]] && __GITHUB_PACKAGES+=("$pkg_dir") || :
+		if [[ "$(<"$pkg_dir/build.sh")" =~ TERMUX_PKG_SRCURL=[^[:space:]]*github\.com ]] &&
+			[[ "$(<"$pkg_dir/build.sh")" =~ TERMUX_PKG_UPDATE_METHOD=[^[:space:]]*github || ! "$(<"$pkg_dir/build.sh")" =~ TERMUX_PKG_UPDATE_METHOD=[^[:space:]]* ]]; then
+			__GITHUB_PACKAGES+=("$pkg_dir")
+		fi
 
 	# Find all build.sh files and explicitly filter only files without custom `termux_pkg_auto_update`
 	done < <(grep -rL '^termux_pkg_auto_update' $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json") --include=build.sh | sed 's#/build\.sh$##')
