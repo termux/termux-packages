@@ -1,0 +1,65 @@
+Reverts https://github.com/fish-shell/fish-shell/commit/174130fe2f3b2a1a8d9523653bfb660a79025a27,
+because it causes this compilation failure on Android:
+
+error[E0425]: cannot find value `_CS_PATH` in crate `libc`
+   --> src/env/environment.rs:562:25
+    |
+562 |     let cs_path = libc::_CS_PATH;
+    |                         ^^^^^^^^ not found in `libc`
+
+--- a/src/env/environment.rs
++++ b/src/env/environment.rs
+@@ -557,14 +557,12 @@ fn setup_user(vars: &EnvStack) {
+ }
+ 
+ pub(crate) static FALLBACK_PATH: Lazy<&[WString]> = Lazy::new(|| {
+-    use crate::libc::confstr;
++    use crate::libc::{confstr,_CS_PATH};
+     // _CS_PATH: colon-separated paths to find POSIX utilities. Same as USER_CS_PATH.
+-    let cs_path = libc::_CS_PATH;
+-
+-    let buf_size = unsafe { confstr(cs_path, std::ptr::null_mut(), 0) };
++    let buf_size = unsafe { confstr(_CS_PATH(), std::ptr::null_mut(), 0) };
+     let paths: Vec<WString> = if buf_size > 0 {
+         let mut buf = vec![b'\0' as libc::c_char; buf_size];
+-        unsafe { confstr(cs_path, buf.as_mut_ptr(), buf_size) };
++        unsafe { confstr(_CS_PATH(), buf.as_mut_ptr(), buf_size) };
+         let buf = buf;
+         // safety: buf should contain a null-byte, and is not mutable unless we move ownership
+         let cstr = unsafe { CStr::from_ptr(buf.as_ptr()) };
+--- a/src/libc.c
++++ b/src/libc.c
+@@ -34,6 +34,14 @@ size_t confstr(int name, char* buf, size_t size) {
+ }
+ #endif
+ 
++int C_CS_PATH() {
++#if defined(_CS_PATH)
++    return _CS_PATH;
++#else
++    return -1;
++#endif
++}
++
+ const char* C_PATH_BSHELL() { return _PATH_BSHELL; }
+ 
+ FILE* stdout_stream() { return stdout; }
+--- a/src/libc.rs
++++ b/src/libc.rs
+@@ -5,3 +5,16 @@ unsafe extern "C" {
+         len: libc::size_t,
+     ) -> libc::size_t;
+ }
++
++macro_rules! CVAR {
++    ($cfn:ident, $cvar:ident, $type:ident) => {
++        pub fn $cvar() -> $type {
++            unsafe extern "C" {
++                fn $cfn() -> $type;
++            }
++            unsafe { $cfn() }
++        }
++    };
++}
++
++CVAR!(C_CS_PATH, _CS_PATH, i32);

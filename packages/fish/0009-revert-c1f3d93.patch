@@ -1,0 +1,91 @@
+Reverts https://github.com/fish-shell/fish-shell/commit/c1f3d93b3bd8e7e14ab9b1f490f25b8a9999d9d4,
+because it causes this compilation failure on Android:
+
+error[E0425]: cannot find value `MNT_LOCAL` in crate `libc`
+    --> src/path.rs:725:27
+     |
+ 725 |         if flags & (libc::MNT_LOCAL as u64) != 0 {
+     |                           ^^^^^^^^^ help: a constant with a similar name exists: `RTN_LOCAL`
+
+--- a/src/libc.c
++++ b/src/libc.c
+@@ -42,6 +42,14 @@ int C_CS_PATH() {
+ #endif
+ }
+ 
++int64_t C_MNT_LOCAL() {
++#if defined(MNT_LOCAL)
++    return MNT_LOCAL;
++#else
++    return 0;
++#endif
++}
++
+ const char* C_PATH_BSHELL() { return _PATH_BSHELL; }
+ 
+ FILE* stdout_stream() { return stdout; }
+--- a/src/libc.rs
++++ b/src/libc.rs
+@@ -17,4 +17,7 @@ macro_rules! CVAR {
+     };
+ }
+ 
++CVAR!(C_ST_LOCAL, ST_LOCAL, u64);
++CVAR!(C_MNT_LOCAL, MNT_LOCAL, u64);
++
+ CVAR!(C_CS_PATH, _CS_PATH, i32);
+--- a/src/path.rs
++++ b/src/path.rs
+@@ -713,20 +713,39 @@ pub fn path_remoteness(path: &wstr) -> DirRemoteness {
+ 
+     #[cfg(not(any(target_os = "linux", target_os = "netbsd", cygwin)))]
+     {
+-        let mut buf = MaybeUninit::uninit();
+-        if unsafe { libc::statfs(narrow.as_ptr(), buf.as_mut_ptr()) } < 0 {
+-            return DirRemoteness::unknown;
+-        }
+-        let buf = unsafe { buf.assume_init() };
+-        // statfs::f_flags types differ.
+-        #[allow(clippy::useless_conversion)]
+-        let flags = buf.f_flags as u64;
+-        #[allow(clippy::unnecessary_cast)]
+-        if flags & (libc::MNT_LOCAL as u64) != 0 {
+-            DirRemoteness::local
+-        } else {
+-            DirRemoteness::remote
++        fn remoteness_via_statfs<StatFS, Flags>(
++            statfn: unsafe extern "C" fn(*const libc::c_char, *mut StatFS) -> libc::c_int,
++            flagsfn: fn(&StatFS) -> Flags,
++            is_local_flag: u64,
++            path: &std::ffi::CStr,
++        ) -> DirRemoteness
++        where
++            u64: From<Flags>,
++        {
++            if is_local_flag == 0 {
++                return DirRemoteness::unknown;
++            }
++            let mut buf = MaybeUninit::uninit();
++            if unsafe { (statfn)(path.as_ptr(), buf.as_mut_ptr()) } < 0 {
++                return DirRemoteness::unknown;
++            }
++            let buf = unsafe { buf.assume_init() };
++            // statfs::f_flag is hard-coded as 64-bits on 32/64-bit FreeBSD but it's a (4-byte)
++            // long on 32-bit NetBSD.. and always 4-bytes on macOS (even on 64-bit builds).
++            #[allow(clippy::useless_conversion)]
++            if u64::from((flagsfn)(&buf)) & is_local_flag != 0 {
++                DirRemoteness::local
++            } else {
++                DirRemoteness::remote
++            }
+         }
++        let remoteness = remoteness_via_statfs(
++            libc::statfs,
++            |stat: &libc::statfs| stat.f_flags,
++            crate::libc::MNT_LOCAL(),
++            &narrow,
++        );
++        remoteness
+     }
+ }
+ 
