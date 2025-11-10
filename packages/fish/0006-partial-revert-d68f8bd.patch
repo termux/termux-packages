@@ -11,11 +11,11 @@ reverted or partially reverted.
 --- a/src/libc.c
 +++ b/src/libc.c
 @@ -9,6 +9,8 @@
- #include <sys/statvfs.h>  // ST_LOCAL
- #include <unistd.h>       // _CS_PATH, _PC_CASE_SENSITIVE
+ #include <sys/statvfs.h>
+ #include <unistd.h>
  
 +#define UNUSED(x) (void)(x)
 +
- size_t C_MB_CUR_MAX() { return MB_CUR_MAX; }
- 
  uint64_t C_ST_LOCAL() {
+ #if defined(ST_LOCAL)
+     return ST_LOCAL;
