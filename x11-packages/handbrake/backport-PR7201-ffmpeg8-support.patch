@@ -1,0 +1,175 @@
+diff --git a/libhb/encavcodec.c b/libhb/encavcodec.c
+index bbbe6baf8..205ebae14 100644
+--- a/libhb/encavcodec.c
++++ b/libhb/encavcodec.c
+@@ -1614,7 +1614,7 @@ static int apply_encoder_level(AVCodecContext *context, AVDictionary **av_opts,
+             break;
+     }
+ 
+-    context->level = FF_LEVEL_UNKNOWN;
++    context->level = AV_FIELD_UNKNOWN;
+ 
+     if (level_names == NULL || level_values == NULL)
+     {
+diff --git a/libhb/encavcodecaudio.c b/libhb/encavcodecaudio.c
+index 27793daf4..e3e7cac61 100644
+--- a/libhb/encavcodecaudio.c
++++ b/libhb/encavcodecaudio.c
+@@ -272,7 +272,7 @@ static int encavcodecaInit(hb_work_object_t *w, hb_job_t *job)
+     pv->input_buf         = malloc(pv->input_samples * sizeof(float));
+     // Some encoders in libav (e.g. fdk-aac) fail if the output buffer
+     // size is not some minimum value.  8K seems to be enough :(
+-    pv->max_output_bytes  = MAX(AV_INPUT_BUFFER_MIN_SIZE,
++    pv->max_output_bytes  = MAX(16384,
+                                 (pv->input_samples *
+                                  av_get_bytes_per_sample(context->sample_fmt)));
+ 
+diff --git a/libhb/hbavfilter.c b/libhb/hbavfilter.c
+index d8e11bdf6..76d3680f0 100644
+--- a/libhb/hbavfilter.c
++++ b/libhb/hbavfilter.c
+@@ -62,71 +62,54 @@ hb_avfilter_graph_init(hb_value_t * settings, hb_filter_init_t * init)
+ #endif
+ 
+     // Build filter input
++
++    if (init->hw_pix_fmt != AV_PIX_FMT_NONE)
+     {
+-        enum AVPixelFormat pix_fmt = init->pix_fmt;
++        int initial_pool_size = init->hw_pix_fmt == AV_PIX_FMT_QSV ? 32 : 0;
++
++        par = av_buffersrc_parameters_alloc();
++        par->format = init->hw_pix_fmt;
+         if (init->hw_pix_fmt == AV_PIX_FMT_QSV)
+         {
+-            par = av_buffersrc_parameters_alloc();
+-            par->format = init->hw_pix_fmt;
+-            // TODO: qsv_vpp changes time_base, adapt settings to hb pipeline
++            // TODO: qsv_vpp changes time_base
++            // adapt settings to hb pipeline
+             par->frame_rate.num = init->time_base.den;
+             par->frame_rate.den = init->time_base.num;
+-
+-            par->width = init->geometry.width;
+-            par->height = init->geometry.height;
+-
+-            par->sample_aspect_ratio.num = init->geometry.par.num;
+-            par->sample_aspect_ratio.den = init->geometry.par.den;
+-
+-            par->time_base.num = init->time_base.num;
+-            par->time_base.den = init->time_base.den;
+-            par->hw_frames_ctx = hb_hwaccel_init_hw_frames_ctx((AVBufferRef*)init->job->hw_device_ctx,
+-                                                    init->pix_fmt,
+-                                                    init->hw_pix_fmt,
+-                                                    par->width,
+-                                                    par->height,
+-                                                            32);
+-            if (!par->hw_frames_ctx)
+-            {   
+-                goto fail;
+-            }
+-            pix_fmt = init->hw_pix_fmt;
+         }
+-        else if (init->hw_pix_fmt == AV_PIX_FMT_CUDA)
++        else
+         {
+-            par = av_buffersrc_parameters_alloc();
+-            par->format = init->hw_pix_fmt;
+-            par->frame_rate.num = init->geometry.par.num;
+-            par->frame_rate.den = init->time_base.den;
+-            par->width = init->geometry.width;
+-            par->height = init->geometry.height;
+-            par->hw_frames_ctx = hb_hwaccel_init_hw_frames_ctx((AVBufferRef*)init->job->hw_device_ctx,
+-                                                    init->pix_fmt,
+-                                                    init->hw_pix_fmt,
+-                                                    par->width,
+-                                                    par->height,
+-                                                             0);
+-            if (!par->hw_frames_ctx)
+-            {   
+-                goto fail;
+-            }
+-            par->sample_aspect_ratio.num = init->geometry.par.num;
+-            par->sample_aspect_ratio.den = init->geometry.par.den;
+-            par->time_base.num = init->time_base.num;
+-            par->time_base.den = init->time_base.den;
+-
+-            pix_fmt = init->hw_pix_fmt;
++            par->frame_rate.num = init->vrate.num;
++            par->frame_rate.den = init->vrate.den;
+         }
+-        filter_args = hb_strdup_printf(
++        par->width  = init->geometry.width;
++        par->height = init->geometry.height;
++        par->sample_aspect_ratio.num = init->geometry.par.num;
++        par->sample_aspect_ratio.den = init->geometry.par.den;
++        par->time_base.num = init->time_base.num;
++        par->time_base.den = init->time_base.den;
++        par->color_space = init->color_matrix;
++        par->color_range = init->color_range;
++        par->hw_frames_ctx = hb_hwaccel_init_hw_frames_ctx((AVBufferRef *)init->job->hw_device_ctx,
++                                                           init->pix_fmt,
++                                                           init->hw_pix_fmt,
++                                                           par->width,
++                                                           par->height,
++                                                           initial_pool_size);
++        if (!par->hw_frames_ctx)
++        {
++            goto fail;
++        }
++    }
++
++    filter_args = hb_strdup_printf(
+                     "width=%d:height=%d:pix_fmt=%d:sar=%d/%d:"
+                     "colorspace=%d:range=%d:"
+                     "time_base=%d/%d:frame_rate=%d/%d",
+-                    init->geometry.width, init->geometry.height, pix_fmt,
++                    init->geometry.width, init->geometry.height, init->pix_fmt,
+                     init->geometry.par.num, init->geometry.par.den,
+                     init->color_matrix, init->color_range,
+                     init->time_base.num, init->time_base.den,
+                     init->vrate.num, init->vrate.den);
+-    }
+ 
+     // buffer video source: the decoded frames from the decoder will be inserted here.
+     result = avfilter_graph_create_filter(&graph->input, avfilter_get_by_name("buffer"), "in",
+@@ -137,11 +120,13 @@ hb_avfilter_graph_init(hb_value_t * settings, hb_filter_init_t * init)
+         hb_error("hb_avfilter_graph_init: failed to create buffer source filter");
+         goto fail;
+     }
++
+     if (par)
+     {
+         result = av_buffersrc_parameters_set(graph->input, par);
+         if (result < 0)
+         {
++            hb_error("hb_avfilter_graph_init: failed to set buffer source parameters");
+             goto fail;
+         }
+     }
+diff --git a/libhb/hwaccel.c b/libhb/hwaccel.c
+index de801b8ba..edeaec905 100644
+--- a/libhb/hwaccel.c
++++ b/libhb/hwaccel.c
+@@ -27,18 +27,21 @@ static hb_buffer_t * upload(void *hw_frames_ctx, hb_buffer_t **buf_in)
+     ret = av_hwframe_get_buffer(hw_frames_ctx, hw_frame, 0);
+     if (ret < 0)
+     {
++        hb_log("hwaccel: failed to get hwframe buffer");
+         goto fail;
+     }
+ 
+     av_frame_copy_props(hw_frame, &frame);
+     if (ret < 0)
+     {
++        hb_log("hwaccel: failed to copy props");
+         goto fail;
+     }
+ 
+     av_hwframe_transfer_data(hw_frame, &frame, 0);
+     if (ret < 0)
+     {
++        hb_log("hwaccel: failed to transfer data");
+         goto fail;
+     }
+ 
