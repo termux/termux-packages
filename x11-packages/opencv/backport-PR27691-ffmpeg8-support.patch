@@ -1,0 +1,43 @@
+From 90c444abd387ffa70b2e72a34922903a2f0f4f5a Mon Sep 17 00:00:00 2001
+From: Alexander Smorkalov <alexander.smorkalov@opencv.ai>
+Date: Wed, 20 Aug 2025 10:53:51 +0300
+Subject: [PATCH] FFmpeg 8.0 support.
+
+---
+ modules/videoio/src/cap_ffmpeg_impl.hpp | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/modules/videoio/src/cap_ffmpeg_impl.hpp b/modules/videoio/src/cap_ffmpeg_impl.hpp
+index 489dbe565d3d..5780b4c11361 100644
+--- a/modules/videoio/src/cap_ffmpeg_impl.hpp
++++ b/modules/videoio/src/cap_ffmpeg_impl.hpp
+@@ -685,7 +685,10 @@ void CvCapture_FFMPEG::close()
+     if( video_st )
+     {
+ #ifdef CV_FFMPEG_CODECPAR
++// avcodec_close removed in FFmpeg release 8.0
++# if (LIBAVCODEC_BUILD < CALC_FFMPEG_VERSION(62, 11, 100))
+         avcodec_close( context );
++# endif
+ #endif
+         video_st = NULL;
+     }
+@@ -2005,7 +2008,18 @@ void CvCapture_FFMPEG::get_rotation_angle()
+     rotation_angle = 0;
+ #if LIBAVFORMAT_BUILD >= CALC_FFMPEG_VERSION(57, 68, 100)
+     const uint8_t *data = 0;
++    // av_stream_get_side_data removed in FFmpeg release 8.0
++# if (LIBAVCODEC_BUILD < CALC_FFMPEG_VERSION(62, 11, 100))
+     data = av_stream_get_side_data(video_st, AV_PKT_DATA_DISPLAYMATRIX, NULL);
++# else
++    AVPacketSideData* sd = video_st->codecpar->coded_side_data;
++    int nb_sd = video_st->codecpar->nb_coded_side_data;
++    if (sd && nb_sd > 0)
++    {
++        const AVPacketSideData* mtx = av_packet_side_data_get(sd,  nb_sd, AV_PKT_DATA_DISPLAYMATRIX);
++        data = mtx->data;
++    }
++# endif
+     if (data)
+     {
+         rotation_angle = -cvRound(av_display_rotation_get((const int32_t*)data));
