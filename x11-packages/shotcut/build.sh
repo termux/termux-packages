@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Cross-platform Qt based Video Editor"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="25.10.31"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/mltframework/shotcut/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=1ece89c86fc0abe18c3ca915a7992240d690a91fdd964f9cb75a44f89c04e01a
 TERMUX_PKG_DEPENDS="ffmpeg, fftw, frei0r-plugins, mlt, libx264, libvpx, lame, ladspa-sdk, movit, qt6-qtbase, qt6-qtcharts, qt6-qtdeclarative, qt6-qtimageformats, qt6-qtmultimedia, qt6-qttranslations, qt6-qtwebsockets, sdl2 | sdl2-compat"
