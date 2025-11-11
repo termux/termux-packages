@@ -2,6 +2,8 @@
 
 set -e -u
 
+start_time="$(date +%10s.%3N)"
+
 TERMUX_SCRIPTDIR=$(realpath "$(dirname "$0")/../")
 . "$TERMUX_SCRIPTDIR/scripts/properties.sh"
 
@@ -126,12 +128,15 @@ check_indentation() {
 	return 0
 }
 
-# We'll need the 'origin/master' as a base commit when running the version check.
-# So try fetching it now if it doesn't exist.
-if ! base_commit="HEAD~$(git rev-list --no-merges --count FETCH_HEAD..)"; then
-	git fetch https://github.com/termux/termux-packages.git
-	base_commit="HEAD~$(git rev-list --no-merges --count FETCH_HEAD..)"
-fi
+{
+	# We'll need the termux/termux-packages master@HEAD commit as a base commit when running the version check.
+	# So try fetching it now.
+	git fetch https://github.com/termux/termux-packages.git || {
+		echo "ERROR: Unable to fetch 'https://github.com/termux/termux-packages.git'"
+		echo "Falling back to HEAD~1"
+	}
+	base_commit="HEAD~$(git rev-list --count FETCH_HEAD.. -- || printf 1)"
+} 2> /dev/null
 
 # Also figure out if we have a `%ci:no-build` trailer in the commit range,
 # we may skip some checks later if yes.
@@ -701,6 +706,18 @@ linter_main() {
 	echo "================================================================"
 	return
 }
+
+time_elapsed() {
+	local start="$1" end="$(date +%10s.%3N)"
+	local elapsed="$(( ${end/.} - ${start/.} ))"
+	echo "[INFO]: Finished linting build scripts ($(date -d "@$end" --utc '+%Y-%m-%dT%H:%M:%SZ' 2>&1))"
+	printf '[INFO]: Time elapsed: %s\n' \
+		"$(sed 's/0m //;s/0s //' <<< "$(( elapsed % 3600000 / 60000 ))m$(( elapsed % 60000 / 1000 ))s$(( elapsed % 1000 ))ms")"
+}
+
+echo "[INFO]: Starting build script linter ($(date -d "@$start_time" --utc '+%Y-%m-%dT%H:%M:%SZ' 2>&1))"
+echo "[INFO]: $base_commit ($(git rev-parse "$base_commit"))"
+trap 'time_elapsed "$start_time"' EXIT
 
 package_counter=0
 if (( $# )); then
