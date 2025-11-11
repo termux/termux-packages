@@ -15,9 +15,9 @@
          RandomLayer()
          {
 +#if defined(__ANDROID__) && __ANDROID_API__ < 28
-+            if (syscall(__NR_getrandom, nullptr, 0, 0) < 0)
++            if (unsigned char buf = 0; syscall(__NR_getrandom, &buf, sizeof(buf), 0) < 0)
 +#else
-             if (::getrandom(nullptr, 0, 0) < 0)
+             if (unsigned char buf = 0; ::getrandom(&buf, sizeof(buf), 0) < 0)
 +#endif
              {
                  if (errno == ENOSYS)
