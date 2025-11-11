@@ -123,10 +123,17 @@ check_indentation() {
 
 # We'll need the 'origin/master' as a base commit when running the version check.
 # So try fetching it now if it doesn't exist.
-if ! base_commit="HEAD~$(git rev-list --count FETCH_HEAD..)"; then
+# if this script is running in GitHub Actions, the base_commit is actually HEAD~1
+# not HEAD~$(git rev-list --count FETCH_HEAD..)
+# See https://github.com/actions/checkout/issues/504 for more information
+if [[ "${CI-false}" == "true" ]]; then
+	base_commit="HEAD~1"
+elif ! base_commit="HEAD~$(git rev-list  --count FETCH_HEAD..)"; then
 	git fetch https://github.com/termux/termux-packages.git
 	base_commit="HEAD~$(git rev-list --count FETCH_HEAD..)"
 fi
+
+printf '%s\n' "base_commit: $(git rev-parse "$base_commit")"
 
 check_version() {
 	local package_dir="${1%/*}"
