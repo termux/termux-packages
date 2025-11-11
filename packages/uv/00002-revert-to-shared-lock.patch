@@ -1,0 +1,221 @@
+commit 6f22693e07c34a68ab1654fa16929d3c7f698802
+Author: Elliana May <me@mause.me>
+Date:   Tue Nov 11 20:51:34 2025 +0800
+
+    Revert "Remove fs2 dependency and update Rust to 1.89 (#15764)"
+    
+    This reverts commit 485503ee65aa2239aab18ae68281f953e2bba96c.
+
+diff --git a/Cargo.lock b/Cargo.lock
+index 43eea7c83..1adb09628 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -1467,6 +1467,16 @@ dependencies = [
+  "tokio",
+ ]
+ 
++[[package]]
++name = "fs2"
++version = "0.4.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "9564fc758e15025b46aa6643b1b77d047d1a56a1aea6e01002ac0c7026876213"
++dependencies = [
++ "libc",
++ "winapi",
++]
++
+ [[package]]
+ name = "futures"
+ version = "0.3.31"
+@@ -5979,6 +5989,7 @@ dependencies = [
+  "either",
+  "encoding_rs_io",
+  "fs-err",
++ "fs2",
+  "junction",
+  "path-slash",
+  "percent-encoding",
+diff --git a/Cargo.toml b/Cargo.toml
+index a9aad6bea..9f7303161 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -112,6 +112,7 @@ encoding_rs_io = { version = "0.1.7" }
+ etcetera = { version = "0.11.0" }
+ flate2 = { version = "1.0.33", default-features = false, features = ["zlib-rs"] }
+ fs-err = { version = "3.0.0", features = ["tokio"] }
++fs2 = { version = "0.4.3" }
+ futures = { version = "0.3.30" }
+ glob = { version = "0.3.1" }
+ globset = { version = "0.4.15" }
+diff --git a/crates/uv-fs/Cargo.toml b/crates/uv-fs/Cargo.toml
+index 35608e7bd..a02372cba 100644
+--- a/crates/uv-fs/Cargo.toml
++++ b/crates/uv-fs/Cargo.toml
+@@ -20,6 +20,7 @@ dunce = { workspace = true }
+ either = { workspace = true }
+ encoding_rs_io = { workspace = true }
+ fs-err = { workspace = true }
++fs2 = { workspace = true }
+ path-slash = { workspace = true }
+ percent-encoding = { workspace = true }
+ same-file = { workspace = true }
+diff --git a/crates/uv-fs/src/lib.rs b/crates/uv-fs/src/lib.rs
+index f5ad66cef..c73f486f8 100644
+--- a/crates/uv-fs/src/lib.rs
++++ b/crates/uv-fs/src/lib.rs
+@@ -1,7 +1,9 @@
+ use std::borrow::Cow;
+ use std::fmt::Display;
++use std::io;
+ use std::path::{Path, PathBuf};
+ 
++use fs2::FileExt;
+ use tempfile::NamedTempFile;
+ use tracing::{debug, error, info, trace, warn};
+ 
+@@ -553,12 +555,10 @@ pub fn persist_with_retry_sync(
+ /// Iterate over the subdirectories of a directory.
+ ///
+ /// If the directory does not exist, returns an empty iterator.
+-pub fn directories(
+-    path: impl AsRef<Path>,
+-) -> Result<impl Iterator<Item = PathBuf>, std::io::Error> {
++pub fn directories(path: impl AsRef<Path>) -> Result<impl Iterator<Item = PathBuf>, io::Error> {
+     let entries = match path.as_ref().read_dir() {
+         Ok(entries) => Some(entries),
+-        Err(err) if err.kind() == std::io::ErrorKind::NotFound => None,
++        Err(err) if err.kind() == io::ErrorKind::NotFound => None,
+         Err(err) => return Err(err),
+     };
+     Ok(entries
+@@ -578,10 +578,10 @@ pub fn directories(
+ /// Iterate over the entries in a directory.
+ ///
+ /// If the directory does not exist, returns an empty iterator.
+-pub fn entries(path: impl AsRef<Path>) -> Result<impl Iterator<Item = PathBuf>, std::io::Error> {
++pub fn entries(path: impl AsRef<Path>) -> Result<impl Iterator<Item = PathBuf>, io::Error> {
+     let entries = match path.as_ref().read_dir() {
+         Ok(entries) => Some(entries),
+-        Err(err) if err.kind() == std::io::ErrorKind::NotFound => None,
++        Err(err) if err.kind() == io::ErrorKind::NotFound => None,
+         Err(err) => return Err(err),
+     };
+     Ok(entries
+@@ -600,10 +600,10 @@ pub fn entries(path: impl AsRef<Path>) -> Result<impl Iterator<Item = PathBuf>,
+ /// Iterate over the files in a directory.
+ ///
+ /// If the directory does not exist, returns an empty iterator.
+-pub fn files(path: impl AsRef<Path>) -> Result<impl Iterator<Item = PathBuf>, std::io::Error> {
++pub fn files(path: impl AsRef<Path>) -> Result<impl Iterator<Item = PathBuf>, io::Error> {
+     let entries = match path.as_ref().read_dir() {
+         Ok(entries) => Some(entries),
+-        Err(err) if err.kind() == std::io::ErrorKind::NotFound => None,
++        Err(err) if err.kind() == io::ErrorKind::NotFound => None,
+         Err(err) => return Err(err),
+     };
+     Ok(entries
+@@ -653,17 +653,17 @@ pub fn is_virtualenv_base(path: impl AsRef<Path>) -> bool {
+ }
+ 
+ /// Whether the error is due to a lock being held.
+-fn is_known_already_locked_error(err: &std::fs::TryLockError) -> bool {
+-    match err {
+-        std::fs::TryLockError::WouldBlock => true,
+-        std::fs::TryLockError::Error(err) => {
+-            // On Windows, we've seen: Os { code: 33, kind: Uncategorized, message: "The process cannot access the file because another process has locked a portion of the file." }
+-            if cfg!(windows) && err.raw_os_error() == Some(33) {
+-                return true;
+-            }
+-            false
+-        }
++fn is_known_already_locked_error(err: &std::io::Error) -> bool {
++    if matches!(err.kind(), std::io::ErrorKind::WouldBlock) {
++        return true;
++    }
++
++    // On Windows, we've seen: Os { code: 33, kind: Uncategorized, message: "The process cannot access the file because another process has locked a portion of the file." }
++    if cfg!(windows) && err.raw_os_error() == Some(33) {
++        return true;
+     }
++
++    false
+ }
+ 
+ /// A file lock that is automatically released when dropped.
+@@ -678,7 +678,7 @@ impl LockedFile {
+             "Checking lock for `{resource}` at `{}`",
+             file.path().user_display()
+         );
+-        match file.file().try_lock() {
++        match file.file().try_lock_exclusive() {
+             Ok(()) => {
+                 debug!("Acquired lock for `{resource}`");
+                 Ok(Self(file))
+@@ -692,7 +692,15 @@ impl LockedFile {
+                     "Waiting to acquire lock for `{resource}` at `{}`",
+                     file.path().user_display(),
+                 );
+-                file.lock()?;
++                file.file().lock_exclusive().map_err(|err| {
++                    // Not an fs_err method, we need to build our own path context
++                    std::io::Error::other(format!(
++                        "Could not acquire lock for `{resource}` at `{}`: {}",
++                        file.path().user_display(),
++                        err
++                    ))
++                })?;
++
+                 debug!("Acquired lock for `{resource}`");
+                 Ok(Self(file))
+             }
+@@ -705,7 +713,7 @@ impl LockedFile {
+             "Checking lock for `{resource}` at `{}`",
+             file.path().user_display()
+         );
+-        match file.try_lock() {
++        match file.file().try_lock_exclusive() {
+             Ok(()) => {
+                 debug!("Acquired lock for `{resource}`");
+                 Some(Self(file))
+@@ -731,7 +739,8 @@ impl LockedFile {
+             "Checking shared lock for `{resource}` at `{}`",
+             file.path().user_display()
+         );
+-        match file.try_lock_shared() {
++        // TODO(konsti): Update fs_err to support this.
++        match FileExt::try_lock_shared(file.file()) {
+             Ok(()) => {
+                 debug!("Acquired shared lock for `{resource}`");
+                 Ok(Self(file))
+@@ -745,7 +754,15 @@ impl LockedFile {
+                     "Waiting to acquire shared lock for `{resource}` at `{}`",
+                     file.path().user_display(),
+                 );
+-                file.lock_shared()?;
++                FileExt::lock_shared(file.file()).map_err(|err| {
++                    // Not an fs_err method, we need to build our own path context
++                    std::io::Error::other(format!(
++                        "Could not acquire shared lock for `{resource}` at `{}`: {}",
++                        file.path().user_display(),
++                        err
++                    ))
++                })?;
++
+                 debug!("Acquired shared lock for `{resource}`");
+                 Ok(Self(file))
+             }
+@@ -867,10 +884,11 @@ impl LockedFile {
+ 
+ impl Drop for LockedFile {
+     fn drop(&mut self) {
+-        if let Err(err) = self.0.unlock() {
++        if let Err(err) = fs2::FileExt::unlock(self.0.file()) {
+             error!(
+-                "Failed to unlock resource at `{}`; program may be stuck: {err}",
+-                self.0.path().display()
++                "Failed to unlock {}; program may be stuck: {}",
++                self.0.path().display(),
++                err
+             );
+         } else {
+             debug!("Released lock at `{}`", self.0.path().display());
