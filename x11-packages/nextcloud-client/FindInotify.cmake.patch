@@ -1,11 +1,18 @@
---- a/cmake/modules/FindInotify.cmake
-+++ b/cmake/modules/FindInotify.cmake
-@@ -34,7 +34,7 @@ find_path(Inotify_INCLUDE_DIRS sys/inotify.h)
- if(Inotify_INCLUDE_DIRS)
- # On Linux there is no library to link against, on the BSDs there is.
- # On the BSD's, inotify is implemented through a library, libinotify.
--    if( CMAKE_SYSTEM_NAME MATCHES "Linux")
-+    if( CMAKE_SYSTEM_NAME MATCHES "Android")
-         set(Inotify_FOUND TRUE)
-         set(Inotify_LIBRARIES "")
-         set(Inotify_INCLUDE_DIRS "")
+diff -uNr a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt	2025-10-27 21:28:23.000000000 +0530
++++ b/CMakeLists.txt	2025-11-11 20:33:54.536726978 +0530
+@@ -249,7 +249,13 @@
+     endif()
+ 
+     if(UNIX AND NOT APPLE)
+-        find_package(Inotify REQUIRED)
++        if(CMAKE_SYSTEM_NAME MATCHES "Android")
++            set(Inotify_FOUND TRUE)
++            set(Inotify_LIBRARIES "")
++            set(Inotify_INCLUDE_DIRS "")
++        else()
++            find_package(Inotify REQUIRED)
++        endif()
+     endif()
+     find_package(OpenSSL 1.1 REQUIRED )
+     find_package(PkgConfig REQUIRED)
