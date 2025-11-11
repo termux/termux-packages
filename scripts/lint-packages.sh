@@ -177,6 +177,16 @@ check_version() {
 		local version_old_is_bad=""
 		dpkg --validate-version "${version_old}" &> /dev/null || version_old_is_bad="0~invalid"
 
+		# Did this package get "resurrected" from disabled-packages?
+		if [[ "$version_old" == '0-0' ]]; then
+			case "$(git diff --name-status --word-diff=porcelain "${base_commit}" -- "disabled-packages/${package_name}/build.sh" 2> /dev/null)" in
+				'D'*) # Check that there's a delete of the build script from disabled-packages/$package_name/build.sh
+					echo "PASS - ${version_new} (restored from disabled-packages)"
+					continue
+				;;
+			esac
+		fi
+
 		# If ${version_new} isn't greater than "$version_old" that's an issue.
 		# If ${version_old} isn't valid this check is a no-op.
 		if dpkg --compare-versions "$version_new" le "${version_old_is_bad:-$version_old}"; then
