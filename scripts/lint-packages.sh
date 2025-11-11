@@ -123,9 +123,9 @@ check_indentation() {
 
 # We'll need the 'origin/master' as a base commit when running the version check.
 # So try fetching it now if it doesn't exist.
-if ! base_commit="HEAD~$(git rev-list --count FETCH_HEAD..)"; then
+if ! base_commit="HEAD~$(git rev-list --no-merges --count FETCH_HEAD..)"; then
 	git fetch https://github.com/termux/termux-packages.git
-	base_commit="HEAD~$(git rev-list --count FETCH_HEAD..)"
+	base_commit="HEAD~$(git rev-list --no-merges --count FETCH_HEAD..)"
 fi
 
 check_version() {
@@ -155,7 +155,7 @@ check_version() {
 		}
 
 		# Was the package modified in this branch?
-		git diff --exit-code "${base_commit}" -- "${package_dir}" &> /dev/null && {
+		git diff --no-merges --exit-code "${base_commit}" -- "${package_dir}" &> /dev/null && {
 			printf '%s\n' "PASS - ${version} (not modified in this branch)"
 			continue
 		}
@@ -226,7 +226,11 @@ check_version() {
 				"" \
 				"TERMUX_PKG_VERSION was bumped but TERMUX_PKG_REVISION wasn't reset." \
 				"Please remove the 'TERMUX_PKG_REVISION=${new_revision}' line." \
-				""
+				"base_commit: $base_commit" \
+				"HEAD commit hash: $(git rev-parse HEAD)" \
+				"git status: $(git status)" \
+				"git diff --no-merges: $(git diff --no-merges --exit-code "${base_commit}" -- "${package_dir}")" \
+				"git log: $(git log)"
 			continue
 		fi
 
