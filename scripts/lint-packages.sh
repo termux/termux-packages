@@ -129,12 +129,16 @@ check_indentation() {
 }
 
 {
-	# We'll need the termux/termux-packages master@HEAD commit as a base commit when running the version check.
+	# We'll need the origin/master HEAD commit as a base commit when running the version check.
 	# So try fetching it now.
-	git fetch https://github.com/termux/termux-packages.git || {
-		echo "ERROR: Unable to fetch 'https://github.com/termux/termux-packages.git'"
-		echo "Falling back to HEAD~1"
-	}
+	if origin_url="$(git config --get remote.origin.url)"; then
+		git fetch "${origin_url}" || {
+			echo "ERROR: Unable to fetch '${origin_url}'"
+			echo "Falling back to HEAD~1"
+		}
+	else
+		origin_url="unknown"
+	fi
 	base_commit="HEAD~$(git rev-list --count FETCH_HEAD.. -- || printf 1)"
 } 2> /dev/null
 
@@ -716,7 +720,8 @@ time_elapsed() {
 }
 
 echo "[INFO]: Starting build script linter ($(date -d "@$start_time" --utc '+%Y-%m-%dT%H:%M:%SZ' 2>&1))"
-echo "[INFO]: $base_commit ($(git rev-parse "$base_commit"))"
+echo "[INFO]: Base commit: $base_commit ($(git rev-parse "$base_commit"))"
+echo "[INFO]: Origin URL: ${origin_url}"
 trap 'time_elapsed "$start_time"' EXIT
 
 package_counter=0
