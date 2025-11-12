@@ -35,6 +35,13 @@ termux_step_make_install() {
 		-t "$TERMUX_PREFIX"/share/zsh/site-functions
 	install -Dm600 $TERMUX_PKG_HOSTBUILD_DIR/src/completions/fish/yt-dlp.fish \
 		-t "$TERMUX_PREFIX"/share/fish/completions
+
+	# Install cofig file
+	if [[ "$TERMUX_ARCH" == "arm" ]] || [[ "$TERMUX_ARCH" == "i686" ]]; then
+		cat <<- EOF > "$TERMUX_PREFIX/etc/yt-dlp.conf"
+		--js-runtimes node
+		EOF
+	fi
 }
 
 termux_step_create_debscripts() {
