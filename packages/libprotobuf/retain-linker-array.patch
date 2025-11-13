@@ -1,0 +1,14 @@
+partially reverts https://github.com/protocolbuffers/protobuf/pull/23378
+to prevent error ld.lld: error: undefined symbol: __stop_linkarr_upb_AllExts
+
+--- a/upb/port/def.inc
++++ b/upb/port/def.inc
+@@ -511,7 +511,7 @@ Error, UINTPTR_MAX is undefined
+ #if defined(__ELF__) || defined(__wasm__)
+ 
+ #define UPB_LINKARR_APPEND(name) \
+-  __attribute__((section("linkarr_" #name))) UPB_NO_SANITIZE_ADDRESS
++  __attribute__((retain, used, section("linkarr_" #name))) UPB_NO_SANITIZE_ADDRESS
+ #define UPB_LINKARR_DECLARE(name, type) \
+   extern type __start_linkarr_##name;   \
+   extern type __stop_linkarr_##name;    \
