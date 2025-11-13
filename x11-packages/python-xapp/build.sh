@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/linuxmint/python3-xapp
 TERMUX_PKG_DESCRIPTION="XApp library Python bindings"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.4.2"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION="3.0.0"
 TERMUX_PKG_SRCURL=https://github.com/linuxmint/python3-xapp/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=39e4c3f06732e9d197b9aed31444653da2976c1d66dded870b52cc9782f2237d
+TERMUX_PKG_SHA256=fef58cacd5a888eb1b7430a695ca3eb3c4c73c0547192d5b94c25123a8a4957c
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_DEPENDS="python, xapp"
@@ -32,5 +31,6 @@ termux_step_configure() {
 	termux_setup_meson
 	export PYTHON_SITELIB="$TERMUX_PYTHON_HOME/site-packages"
 	$TERMUX_MESON setup "$TERMUX_PKG_BUILDDIR" "$TERMUX_PKG_SRCDIR" \
+		-Dlocaledir="$TERMUX_PREFIX"/share/locale \
 		-Dpython.purelibdir="$PYTHON_SITELIB"
 }
