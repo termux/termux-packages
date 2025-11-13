@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="PyTorch media decoding and encoding"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.8.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/pytorch/torchcodec/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=86e2d8919fecf8f7c171057a120acce721d059f1625f45cdd6cf88b0035cbd52
 TERMUX_PKG_DEPENDS="ffmpeg, google-glog, libc++, python, python-torch"
