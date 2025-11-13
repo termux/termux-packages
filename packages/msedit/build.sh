@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A simple editor for simple needs (Microsoft Edit)"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.2.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/microsoft/edit/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=41c719b08212fa4ab6e434a53242b2718ba313e8d24d090f244bb857d6a9d0fd
 TERMUX_PKG_DEPENDS="libicu"
