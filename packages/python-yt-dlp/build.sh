@@ -13,6 +13,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_PROVIDES='yt-dlp'
+TERMUX_PKG_REVISION=1
 
 termux_step_host_build() {
 	cp -Rf $TERMUX_PKG_SRCDIR ./
@@ -38,7 +39,8 @@ termux_step_make_install() {
 
 	# Install config file
 	if [[ "$TERMUX_ARCH_BITS" == "32" ]]; then
-		cat <<- EOF > "$TERMUX_PREFIX/etc/yt-dlp.conf"
+		mkdir -p "$TERMUX_PREFIX/etc/yt-dlp"
+		cat <<- EOF > "$TERMUX_PREFIX/etc/yt-dlp/yt-dlp.conf"
 		--js-runtimes node
 		EOF
 	fi
