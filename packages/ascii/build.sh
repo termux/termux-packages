@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.catb.org/~esr/ascii/
 TERMUX_PKG_DESCRIPTION="List ASCII idiomatic names and octal/decimal code-point forms"
-TERMUX_PKG_LICENSE=BSD-2-Clause
+TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.30
 TERMUX_PKG_SRCURL="http://www.catb.org/~esr/ascii/ascii-$TERMUX_PKG_VERSION.tar.gz"
