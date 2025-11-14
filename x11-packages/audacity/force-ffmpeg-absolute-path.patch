@@ -1,0 +1,17 @@
+For some reason, the user-specified path of ffmpeg libraries is not being respected by
+audacity anymore, and is not being prepended to the relative path from BuildAVFormatPaths(),
+so audacity-ffmpeg cannot be automatically or manually selected anymore.
+This forces audacity to use only audacity-ffmpeg and prevents it from attempting to
+use any other ffmpeg.
+
+--- a/modules/import-export/mod-ffmpeg/lib-ffmpeg-support/FFmpegFunctions.cpp
++++ b/modules/import-export/mod-ffmpeg/lib-ffmpeg-support/FFmpegFunctions.cpp
+@@ -134,7 +134,7 @@ std::vector<wxString> BuildAVFormatPaths(int version)
+ #elif defined(__OpenBSD__)
+       wxString::Format("libavformat.so"),
+ #else
+-      wxString::Format("libavformat.so.%d", version),
++      wxString::Format("@TERMUX_PREFIX@/opt/audacity/lib/libavformat.so.%d", version),
+ #endif
+ };
+ }
