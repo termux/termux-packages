@@ -1,0 +1,24 @@
+commit ae8bc425079a789eb340d1e8ad58f94a481fd93b
+Author: Elliana May <me@mause.me>
+Date:   Mon Nov 10 11:15:01 2025 +0800
+
+    execute extension shell scripts via sh
+    
+    this resolves the issue where the shebang refers to a non termux prefixed path
+
+diff --git a/pkg/cmd/extension/manager.go b/pkg/cmd/extension/manager.go
+index b7f1f1c0c..e8340ee70 100644
+--- a/pkg/cmd/extension/manager.go
++++ b/pkg/cmd/extension/manager.go
+@@ -112,9 +112,9 @@ func (m *Manager) Dispatch(args []string, stdin io.Reader, stdout, stderr io.Wri
+ 
+ 	var externalCmd *exec.Cmd
+ 
+-	if ext.IsBinary() || runtime.GOOS != "windows" {
++	if ext.IsBinary() {
+ 		externalCmd = m.newCommand(exe, forwardArgs...)
+-	} else if runtime.GOOS == "windows" {
++	} else {
+ 		// Dispatch all extension calls through the `sh` interpreter to support executable files with a
+ 		// shebang line on Windows.
+ 		shExe, err := m.findSh()
