@@ -1,6 +1,54 @@
 termux_step_start_build() {
 	# shellcheck source=/dev/null
 	source "$TERMUX_PKG_BUILDER_SCRIPT"
+
+	if [ -n "$TERMUX_VIRTUAL_PKG_SRC" ]; then
+		export TERMUX_VIRTUAL_PKG=true
+	fi
+	if [ "$TERMUX_VIRTUAL_PKG" = "true" ]; then
+		if [ -z "${TERMUX_PKG_VERSION:=}" ]; then
+			TERMUX_PKG_VERSION="0"
+		fi
+		if [ -n "$TERMUX_VIRTUAL_PKG_SRC" ]; then
+			# Parsing the original package
+			termux_step_get_build_script_directory "$TERMUX_VIRTUAL_PKG_SRC"
+			# Checking that the original package is not a virtual package
+			(
+				local TERMUX_VIRTUAL_PKG_SRC_ORG="$TERMUX_VIRTUAL_PKG_SRC"
+				TERMUX_VIRTUAL_PKG=false
+				TERMUX_VIRTUAL_PKG_SRC=""
+				source "$TERMUX_PKG_BUILDER_SCRIPT"
+				if [ "$TERMUX_VIRTUAL_PKG" = "true" ] || [ -n "$TERMUX_VIRTUAL_PKG_SRC" ]; then
+					termux_error_exit "Virtual package '${TERMUX_VIRTUAL_PKG_NAME}' specifies virtual package '${TERMUX_VIRTUAL_PKG_SRC_ORG}' as source package. Cannot use virtual package as source."
+				fi
+			)
+			# Mixing the original package with the virtual package
+			source "$TERMUX_PKG_BUILDER_SCRIPT"
+			source "$TERMUX_VIRTUAL_PKG_BUILDER_SCRIPT"
+			# Setting the source in the virtual package
+			if [ "$TERMUX_VIRTUAL_PKG_INCLUDE" != "false" ]; then
+				if [ -z "$TERMUX_VIRTUAL_PKG_INCLUDE" ]; then
+					export TERMUX_VIRTUAL_PKG_INCLUDE=$(find "$TERMUX_PKG_BUILDER_DIR" -mindepth 1 -maxdepth 1 \
+						! -name "build.sh" ! -name "*.subpackage.sh" -exec basename {} ';')
+				fi
+				for src in $TERMUX_VIRTUAL_PKG_INCLUDE; do
+					if [ -e "${TERMUX_VIRTUAL_PKG_BUILDER_DIR}/${src}" ]; then
+						if [ "$(readlink "${TERMUX_VIRTUAL_PKG_BUILDER_DIR}/${src}")" = "${TERMUX_PKG_BUILDER_DIR}/${src}" ]; then
+							continue
+						else
+							termux_error_exit "conflict, file '${src}' already exists"
+						fi
+					fi
+					ln -s "${TERMUX_PKG_BUILDER_DIR}/${src}" "${TERMUX_VIRTUAL_PKG_BUILDER_DIR}"
+				done
+			fi
+			# Restoring variables by virtual package
+			TERMUX_PKG_NAME="$TERMUX_VIRTUAL_PKG_NAME"
+			export TERMUX_PKG_BUILDER_DIR="$TERMUX_VIRTUAL_PKG_BUILDER_DIR"
+			TERMUX_PKG_BUILDER_SCRIPT="$TERMUX_VIRTUAL_PKG_BUILDER_SCRIPT"
+		fi
+	fi
+
 	# Path to hostbuild marker, for use if package has hostbuild step
 	TERMUX_HOSTBUILD_MARKER="$TERMUX_PKG_HOSTBUILD_DIR/TERMUX_BUILT_FOR_$TERMUX_PKG_VERSION"
 
@@ -57,6 +105,9 @@ termux_step_start_build() {
 			[ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME")" = "$TERMUX_PKG_FULLVERSION" ]; then
 			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION built - skipping (rm $TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME to force rebuild)"
 			exit 0
+		elif [ "$TERMUX_VIRTUAL_PKG" = "true" ] && [ -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME-virtual" ]; then
+			echo "virtual $TERMUX_PKG_NAME built - skipping (rm $TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME-virtual)"
+			exit 0
 		elif [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] &&
 			([[ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" && "$(dpkg-query -W -f '${db:Status-Status} ${Version}\n' "$TERMUX_PKG_NAME" 2>/dev/null)" = "installed $TERMUX_PKG_FULLVERSION" ]] ||
 			 [[ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" && "$(pacman -Q $TERMUX_PKG_NAME 2>/dev/null)" = "$TERMUX_PKG_NAME $TERMUX_PKG_FULLVERSION_FOR_PACMAN" ]]); then
@@ -72,7 +123,7 @@ termux_step_start_build() {
 		TERMUX_PKG_BUILD_ONLY_MULTILIB=true
 	fi
 
-	echo "termux - building $TERMUX_PKG_NAME for arch $TERMUX_ARCH..."
+	echo "termux - building $(test "${TERMUX_VIRTUAL_PKG}" = "true" && echo "virtual ")$TERMUX_PKG_NAME for arch $TERMUX_ARCH..."
 	test -t 1 && printf "\033]0;%s...\007" "$TERMUX_PKG_NAME"
 
 	# Avoid exporting PKG_CONFIG_LIBDIR until after termux_step_host_build.
