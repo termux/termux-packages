@@ -8,6 +8,16 @@ TERMUX_PKG_SRCURL=https://github.com/rust-lang/mdBook/archive/refs/tags/v${TERMU
 TERMUX_PKG_SHA256=d46f3b79e210eed383b6966847ea86ec441b6b505e9d9d868294bb9742130c9c
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+$"
+
+termux_pkg_auto_update() {
+	local latest_tag
+	latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" latest-regex "${TERMUX_PKG_UPDATE_VERSION_REGEXP}")"
+	if [[ -z "${latest_tag}" ]]; then
+		termux_error_exit "Unable to get tag from ${TERMUX_PKG_SRCURL}"
+	fi
+	termux_pkg_upgrade_version "${latest_tag}"
+}
 
 termux_step_make() {
 	termux_setup_rust
