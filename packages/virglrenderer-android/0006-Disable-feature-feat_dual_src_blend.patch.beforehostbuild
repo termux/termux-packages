@@ -1,7 +1,7 @@
-diff --git a/src/vrend_renderer.c b/src/vrend_renderer.c
---- a/src/vrend_renderer.c
-+++ b/src/vrend_renderer.c
-@@ -386,6 +386,14 @@ static struct global_renderer_state vrend_state;
+diff -ur orig/src/vrend/vrend_renderer.c mod/src/vrend/vrend_renderer.c
+--- orig/src/vrend/vrend_renderer.c	2025-09-08 13:49:31.000000000 +0200
++++ mod/src/vrend/vrend_renderer.c	2025-09-10 21:38:29.664104532 +0200
+@@ -417,6 +417,14 @@
  
  static inline bool has_feature(enum features_id feature_id)
  {
@@ -16,7 +16,7 @@ diff --git a/src/vrend_renderer.c b/src/vrend_renderer.c
     int slot = feature_id / 64;
     uint64_t mask = 1ull << (feature_id & 63);
     bool retval = vrend_state.features[slot] & mask ? true : false;
-@@ -7444,7 +7452,7 @@ struct vrend_context *vrend_create_context(int id, uint32_t nlen, const char *de
+@@ -7992,7 +8000,7 @@
     grctx->shader_cfg.has_es31_compat = has_feature(feat_gles31_compatibility);
     grctx->shader_cfg.has_conservative_depth = has_feature(feat_conservative_depth);
     grctx->shader_cfg.use_integer = vrend_state.use_integer;
