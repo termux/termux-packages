@@ -422,10 +422,8 @@ _gh_create_new_issue() {
 	local issue_number
 	local body
 	local link
-	local assignee="${GITHUB_ACTOR:-}"
-	if [[ "${assignee:-termuxbot2}" == "termuxbot2" ]]; then
-		assignee="MrAdityaAlok" # Assign myself if termuxbot2 is the actor.
-	fi
+	local assignee=""
+	[[ "${GITHUB_ACTOR:-termuxbot2}" != "termuxbot2" ]] && assignee="--assignee $GITHUB_ACTOR"
 
 	if [[ "${CREATE_ISSUE}" != "true" ]]; then
 		echo "INFO: CREATE_ISSUE set to '${CREATE_ISSUE}'. Not creating new issue."
@@ -461,12 +459,13 @@ _gh_create_new_issue() {
 			</i>
 		EOF
 	)"
+	# shellcheck disable=SC2086
 	issue_number=$(
 		gh issue create \
 			--title "Auto update failing for ${pkg_name}" \
 			--body "${body:0:${max_body_length}}" \
 			--label "auto update failing" --label "bot" \
-			--assignee "${assignee}" |
+			$assignee |
 			grep -oE "[0-9]+" # Last component of the URL returned is the issue number.
 	)
 	if [ -z "${issue_number}" ]; then
