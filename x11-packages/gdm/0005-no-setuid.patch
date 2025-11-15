@@ -1,0 +1,11 @@
+--- a/daemon/gdm-session-worker.c
++++ b/daemon/gdm-session-worker.c
+@@ -2132,7 +2274,7 @@ gdm_session_worker_start_session (GdmSessionWorker  *worker,
+                                  passwd_entry->pw_name, g_strerror (errno));
+                         _exit (EXIT_FAILURE);
+                 }
+-#else
++#elif !defined(__TERMUX__)
+                 if (setuid (worker->uid) < 0) {
+                         g_debug ("GdmSessionWorker: could not reset uid: %s", g_strerror (errno));
+                         _exit (EXIT_FAILURE);
