@@ -1,0 +1,25 @@
+From c037b9f3c90ff5dd9ae3f0a79a557dbdbf99b8c2 Mon Sep 17 00:00:00 2001
+From: xingguangcuican6666 <xingguangcuican666@foxmail.com>
+Date: Sun, 26 Oct 2025 12:31:34 +0800
+Subject: [PATCH 09/13] add_android-shmem_lib
+
+---
+ icedax/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/icedax/CMakeLists.txt b/icedax/CMakeLists.txt
+index 54c2e7d..5692bca 100644
+--- a/icedax/CMakeLists.txt
++++ b/icedax/CMakeLists.txt
+@@ -25,7 +25,7 @@ ENDIF (WIN32)
+ 
+ LINK_DIRECTORIES(../librols ../libusal  ../libparanoia)
+ ADD_EXECUTABLE (icedax aifc.c aiff.c base64.c icedax.c interface.c ioctl.c raw.c resample.c ringbuff.c scsi_cmds.c semshm.c setuid.c sha_func.c sndconfig.c sun.c toc.c wav.c)
+-TARGET_LINK_LIBRARIES(icedax wodimstuff ${EXTRA_LIBS})
++TARGET_LINK_LIBRARIES(icedax android-shmem wodimstuff ${EXTRA_LIBS})
+ SET_TARGET_PROPERTIES(icedax PROPERTIES  SKIP_BUILD_RPATH TRUE)
+ 
+ INSTALL(TARGETS icedax DESTINATION bin)
+-- 
+2.51.1
+

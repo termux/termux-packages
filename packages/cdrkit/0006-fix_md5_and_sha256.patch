@@ -1,0 +1,36 @@
+From fbbf585517c216ecb0479dfebae060b1486c44c6 Mon Sep 17 00:00:00 2001
+From: xingguangcuican6666 <xingguangcuican666@foxmail.com>
+Date: Sun, 26 Oct 2025 12:31:34 +0800
+Subject: [PATCH 06/13] fix_md5_and_sha256
+
+---
+ CMakeLists.txt    | 1 +
+ genisoimage/jte.c | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index bf224e1..c22b720 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,5 @@
+ cmake_minimum_required(VERSION 3.10)
+ PROJECT (cdrkit C)
++add_definitions("-D__THROW=")
+ SUBDIRS(include genisoimage wodim libedc libhfs_iso libparanoia icedax libusal librols libunls readom netscsid 3rd-party/dirsplit)
+ 
+diff --git a/genisoimage/jte.c b/genisoimage/jte.c
+index 0dff289..b9f6c4f 100644
+--- a/genisoimage/jte.c
++++ b/genisoimage/jte.c
+@@ -35,7 +35,7 @@
+ #ifdef	VMS
+ #include "vms.h"
+ #endif
+-
++#include "md5.h"
+ /* Different types used in building our state list below */
+ #define JTET_FILE_MATCH 1
+ #define JTET_NOMATCH    2
+-- 
+2.51.1
+
