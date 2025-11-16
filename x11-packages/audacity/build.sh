@@ -3,18 +3,11 @@ TERMUX_PKG_DESCRIPTION="An easy-to-use, multi-track audio editor and recorder"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.7.5"
-_FFMPEG_VERSION=7.1.1
-TERMUX_PKG_SRCURL=(https://github.com/audacity/audacity/archive/Audacity-${TERMUX_PKG_VERSION}.tar.gz
-                   https://www.ffmpeg.org/releases/ffmpeg-${_FFMPEG_VERSION}.tar.xz)
-TERMUX_PKG_SHA256=(
-	2520d9ff2e8f7d69d62e033b167eb6c53d1db89e89876689545769a2f8ef72ac
-	733984395e0dbbe5c046abda2dc49a5544e7e0e1e2366bba849222ae9e3a03b1
-)
-TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libc++, libexpat, libflac, libid3tag, libogg, libopus, libsndfile, libsoundtouch, libsoxr, libuuid, libvorbis, libwavpack, libmpg123, opusfile, portaudio, portmidi, wxwidgets"
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL="https://github.com/audacity/audacity/archive/Audacity-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=2520d9ff2e8f7d69d62e033b167eb6c53d1db89e89876689545769a2f8ef72ac
+TERMUX_PKG_DEPENDS="ffmpeg, gdk-pixbuf, glib, gtk3, libc++, libexpat, libflac, libid3tag, libogg, libopus, libsndfile, libsoundtouch, libsoxr, libuuid, libvorbis, libwavpack, libmpg123, opusfile, portaudio, portmidi, wxwidgets"
 TERMUX_PKG_BUILD_DEPENDS="libjpeg-turbo, libjpeg-turbo-static, libmp3lame, libpng, rapidjson, zlib"
-# Support for FFmpeg 5.0 is not backported:
-# https://github.com/audacity/audacity/issues/2445
-TERMUX_PKG_SUGGESTS="audacity-ffmpeg"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+.\d+.\d+"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -43,11 +36,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Daudacity_use_soundtouch=system
 -Daudacity_use_twolame=off
 -DUSE_MIDI=OFF
-"
-TERMUX_PKG_RM_AFTER_INSTALL="
-opt/audacity/include
-opt/audacity/lib/pkgconfig
-opt/audacity/share
 "
 
 # Function to obtain the .deb URL
@@ -121,49 +109,6 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
-	local _FFMPEG_PREFIX=${TERMUX_PREFIX}/opt/${TERMUX_PKG_NAME}
-	LDFLAGS="-Wl,-rpath=${_FFMPEG_PREFIX}/lib ${LDFLAGS}"
-
-	local _ARCH
-	case ${TERMUX_ARCH} in
-		arm ) _ARCH=armeabi-v7a ;;
-		i686 ) _ARCH=x86 ;;
-		* ) _ARCH=$TERMUX_ARCH ;;
-	esac
-
-	mkdir -p _ffmpeg-${_FFMPEG_VERSION}
-	pushd _ffmpeg-${_FFMPEG_VERSION}
-	$TERMUX_PKG_SRCDIR/ffmpeg-${_FFMPEG_VERSION}/configure \
-		--prefix=${_FFMPEG_PREFIX} \
-		--cc=${CC} \
-		--pkg-config=false \
-		--arch=${_ARCH} \
-		--cross-prefix=llvm- \
-		--enable-cross-compile \
-		--target-os=android \
-		--disable-version3 \
-		--disable-static \
-		--enable-shared \
-		--disable-all \
-		--disable-autodetect \
-		--disable-doc \
-		--enable-avcodec \
-		--enable-avformat \
-		--disable-asm
-	make -j ${TERMUX_PKG_MAKE_PROCESSES}
-	make install
-	popd
-
-	local lib
-	for lib in libavcodec libavformat libavutil; do
-		local pc=${TERMUX_PREFIX}/lib/pkgconfig/${lib}.pc
-		if [ -e ${pc} ]; then
-			mv ${pc}{,.tmp}
-		fi
-	done
-	export PKG_CONFIG_PATH=${_FFMPEG_PREFIX}/lib/pkgconfig
-	CPPFLAGS="-I${_FFMPEG_PREFIX}/include ${CPPFLAGS}"
-
 	CPPFLAGS+=" -Dushort=u_short -Dulong=u_long"
 	CXXFLAGS+=" -std=c++17"
 	# Adding `image-compiler` we built in host_build step
@@ -171,26 +116,6 @@ termux_step_pre_configure() {
 	LDFLAGS+=" -Wl,-rpath=$TERMUX_PREFIX/lib/audacity"
 	# For some reason `image-compiler` fails to find it's libraries in our custom prefix, let's help it.
 	export LD_LIBRARY_PATH="$TERMUX_PKG_HOSTBUILD_DIR/prefix/usr/lib/x86_64-linux-gnu"
-}
-
-termux_step_post_make_install() {
-	unset PKG_CONFIG_PATH
-	local lib
-	for lib in libavcodec libavformat libavutil; do
-		local pc=${TERMUX_PREFIX}/lib/pkgconfig/${lib}.pc
-		if [ -e ${pc}.tmp ] && [ ! -e ${pc} ]; then
-			mv ${pc}{.tmp,}
-		fi
-	done
-
-	local _FFMPEG_DOCDIR=$TERMUX_PREFIX/share/doc/audacity-ffmpeg
-	mkdir -p ${_FFMPEG_DOCDIR}
-	ln -sfr ${TERMUX_PREFIX}/share/LICENSES/LGPL-2.1.txt \
-		${_FFMPEG_DOCDIR}/LICENSE
-}
-
-termux_step_post_massage() {
-	rm -rf lib/pkgconfig
 }
 
 termux_step_create_debscripts() {
