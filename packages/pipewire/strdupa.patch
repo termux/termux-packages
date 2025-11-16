@@ -1,0 +1,26 @@
+--- pipewire-1.4.9/spa/plugins/filter-graph/filter-graph.c.orig	2025-11-17 12:09:43.614306994 +0530
++++ pipewire-1.4.9/spa/plugins/filter-graph/filter-graph.c	2025-11-17 12:25:37.989005819 +0530
+@@ -34,6 +34,10 @@
+ #include "audio-plugin.h"
+ #include "audio-dsp-impl.h"
+ 
++#if !defined(strdupa)
++#define strdupa(s) strcpy(alloca(strlen(s) + 1), s)
++#endif
++
+ #undef SPA_LOG_TOPIC_DEFAULT
+ #define SPA_LOG_TOPIC_DEFAULT &log_topic
+ SPA_LOG_TOPIC_DEFINE_STATIC(log_topic, "spa.filter-graph");
+--- pipewire-1.4.9/src/modules/network-utils.h.orig	2025-11-17 12:21:52.460494715 +0530
++++ pipewire-1.4.9/src/modules/network-utils.h	2025-11-17 12:24:19.353902408 +0530
+@@ -12,6 +12,10 @@
+ #define ifr_ifindex ifr_index
+ #endif
+ 
++#if !defined(strdupa)
++#define strdupa(s) strcpy(alloca(strlen(s) + 1), s)
++#endif
++
+ static inline int pw_net_parse_address(const char *address, uint16_t port,
+ 		struct sockaddr_storage *addr, socklen_t *len)
+ {
