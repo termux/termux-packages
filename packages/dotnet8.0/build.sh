@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION=".NET 8.0"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
 TERMUX_PKG_VERSION="8.0.22"
+TERMUX_PKG_REVISION=1
 _DOTNET_SDK_VERSION="8.0.122"
 TERMUX_PKG_SRCURL=git+https://github.com/dotnet/dotnet
 TERMUX_PKG_GIT_BRANCH="v${_DOTNET_SDK_VERSION}"
@@ -49,9 +50,9 @@ termux_step_pre_configure() {
 	termux_setup_cmake
 	termux_setup_ninja
 
-	# aspnetcore needs nodejs <= 19, but nodejs 19.x is EOL
-	local NODEJS_VERSION=18.20.5
-	local NODEJS_SHA256=e4a3a21e5ac7e074ed50d2533dd0087d8460647ab567464867141a2b643f3fb3
+	# aspnetcore needs nodejs <= 19, but nodejs 18.x and 19.x are EOL
+	local NODEJS_VERSION=18.20.8
+	local NODEJS_SHA256=5467ee62d6af1411d46b6a10e3fb5cacc92734dbcef465fea14e7b90993001c9
 	local NODEJS_FOLDER="${TERMUX_PKG_CACHEDIR}/nodejs-${NODEJS_VERSION}"
 	local NODEJS_TAR_XZ="${TERMUX_PKG_CACHEDIR}/node.tar.xz"
 	termux_download \
@@ -354,9 +355,16 @@ termux_step_post_make_install() {
 }
 
 termux_step_post_massage() {
+	local _microsoft_netcore_app_dir="${TERMUX_PREFIX}/lib/dotnet/shared/Microsoft.NETCore.App"
 	local _rpath_check_file
 	for _rpath_check_file in libSystem.Security.Cryptography.Native.OpenSsl.so libcoreclr.so libSystem.Net.Security.Native.so; do
-		local _rpath_check_readelf=$("$READELF" -d "${TERMUX_PREFIX}/lib/dotnet/shared/Microsoft.NETCore.App/${TERMUX_PKG_VERSION}/${_rpath_check_file}")
+		if [[ ! -f "${_microsoft_netcore_app_dir}/${TERMUX_PKG_VERSION}/${_rpath_check_file}" ]]; then
+			echo "ERROR: ${_microsoft_netcore_app_dir}/${TERMUX_PKG_VERSION}/${_rpath_check_file} does not exist!"
+			echo "ERROR: Finding '${_rpath_check_file}' in '${_microsoft_netcore_app_dir}':"
+			find "${_microsoft_netcore_app_dir}" -name "${_rpath_check_file}" | sort || :
+			termux_error_exit "Please review error above!"
+		fi
+		local _rpath_check_readelf=$("$READELF" -d "${_microsoft_netcore_app_dir}/${TERMUX_PKG_VERSION}/${_rpath_check_file}")
 		local _rpath=$(echo "${_rpath_check_readelf}" | sed -ne "s|.*RUNPATH.*\[\(.*\)\].*|\1|p")
 		if [[ "${_rpath}" != "${TERMUX_PREFIX}/lib" ]]; then
 			termux_error_exit "
