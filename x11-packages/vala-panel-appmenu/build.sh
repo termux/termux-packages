@@ -3,11 +3,12 @@ TERMUX_PKG_DESCRIPTION="Global Menu for Vala Panel (metapackage)"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="25.04"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gitlab.com/vala-panel-project/vala-panel-appmenu/-/archive/${TERMUX_PKG_VERSION}/vala-panel-appmenu-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=ff270de372c41f18f64e8788629dd4cc9f116a89ee8947e3fc2657b19182e2dc
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="glib"
-TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross, gtk2, gtk3, valac"
+TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross, gtk3, valac"
 TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dwm_backend=wnck
@@ -18,6 +19,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dregistrar=disabled
 -Dappmenu-gtk-module=enabled
 -Djayatana=disabled
+-Dappmenu-gtk-module:gtk=3
 "
 
 termux_step_pre_configure() {
