@@ -1,26 +1,40 @@
-TERMUX_PKG_HOMEPAGE=https://maunium.net/go/gomuks/
+TERMUX_PKG_HOMEPAGE=https://go.mau.fi/gomuks
 TERMUX_PKG_DESCRIPTION="A terminal Matrix client written in Go"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.3.1"
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://github.com/tulir/gomuks/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=e5212c416a84a5e8f46ab6b36cf9cfec36918930dbf7a155cce00570887600f7
+TERMUX_PKG_VERSION="25.11"
+TERMUX_PKG_SRCURL=https://github.com/gomuks/gomuks/archive/refs/tags/v0.${TERMUX_PKG_VERSION/.}.0.tar.gz
+TERMUX_PKG_SHA256=b581393db960fd91d22942317af11e869821a14fca716e446cf2b9eaacfccf7e
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libolm, resolv-conf"
 TERMUX_PKG_BUILD_IN_SRC=true
+# i686 fails to compile:
+# go.mau.fi/goheif/libde265
+# In file included from libde265.cc:2:
+# ./libde265-all.inl:10:10: fatal error: 'alloc_pool.cc' file not found
+TERMUX_PKG_EXCLUDED_ARCHES="i686"
 
 termux_step_pre_configure() {
 	termux_setup_golang
-
-	go mod init || :
-	go mod tidy
 }
 
 termux_step_make() {
-	go build
+	local ldflags tag_commit
+	# This is adapted directly from the upstream `./build-noweb.sh`
+	# https://github.com/gomuks/gomuks/blob/v0.2511.0/build-noweb.sh
+	mkdir -p web/dist/
+	touch web/dist/empty
+	MAUTRIX_VERSION=$(cat go.mod | grep 'maunium.net/go/mautrix ' | head -n1 | awk '{ print $2 }')
+	export MAUTRIX_VERSION
+	read -r tag_commit _ < <(git ls-remote https://github.com/gomuks/gomuks "refs/tags/v0.${TERMUX_PKG_VERSION/.}.0")
+	ldflags+=" -X go.mau.fi/gomuks/version.Tag=${TERMUX_PKG_VERSION}"
+	ldflags+=" -X go.mau.fi/gomuks/version.Commit=${tag_commit}"
+	ldflags+=" -X 'go.mau.fi/gomuks/version.BuildTime=$(date --utc -Iseconds)'"
+	ldflags+=" -X 'maunium.net/go/mautrix.GoModVersion=$MAUTRIX_VERSION'"
+
+	go build -ldflags "$ldflags" ./cmd/gomuks "$@"
 }
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin gomuks
+	install -Dm700 -t "$TERMUX_PREFIX/bin" gomuks
 }
