@@ -1,0 +1,14 @@
+--- a/Makefile
++++ b/Makefile
+@@ -56,8 +56,8 @@ splint: nametable.h splashscreen.h
+ 	splint +quiet +posixlib $(SPLINT_SUPPRESSIONS) ascii.c
+ 
+ install: ascii ascii.1
+-	cp ascii $(DESTDIR)$(PREFIX)/bin/ascii
+-	cp ascii.1 $(DESTDIR)$(PREFIX)/share/man/man1
++	install -Dm755 ascii -t $(DESTDIR)$(PREFIX)/bin
++	install -Dm644 ascii.1 -t $(DESTDIR)$(PREFIX)/share/man/man1
+ 
+ uninstall:
+ 	rm $(DESTDIR)$(PREFIX)/bin/ascii
+
