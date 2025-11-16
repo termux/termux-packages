@@ -1,0 +1,11 @@
+--- tar-1.35/src/extract.c	2023-07-10 13:13:55.000000000 +0300
++++ src/src/extract.c	2025-09-22 11:47:15.534159916 +0300
+@@ -1507,7 +1507,7 @@
+     {
+       struct stat st1, st2;
+       int e;
+-      int status = linkat (chdir_fd, link_name, chdir_fd, file_name, 0);
++      int status = symlinkat (link_name, chdir_fd, file_name);
+       e = errno;
+ 
+       if (status == 0)
