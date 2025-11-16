@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="A Suite of Sparse matrix packages."
 TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="7.9.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="7.12.1"
 TERMUX_PKG_SRCURL=https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=bc0b3987a502913959581614ab67098f9f203a45bb424870f2342375f96dbcb7
+TERMUX_PKG_SHA256=794ae22f7e38e2ac9f5cbb673be9dd80cdaff2cdf858f5104e082694f743b0ba
 TERMUX_PKG_DEPENDS="libandroid-complex-math, libgmp, libmpfr, libopenblas"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_FORCE_CMAKE=true
@@ -92,19 +91,19 @@ lib/libccolamd.so.3
 lib/libcholmod.so.5
 lib/libcolamd.so.3
 lib/libcxsparse.so.4
-lib/libgraphblas.so.9
-lib/libklu.so.2
+lib/libgraphblas.so.10
 lib/libklu_cholmod.so.2
+lib/libklu.so.2
 lib/liblagraph.so.1
 lib/liblagraphx.so.1
 lib/libldl.so.3
 lib/libparu.so.1
 lib/librbio.so.4
-lib/libspex.so.3
 lib/libspexpython.so.3
+lib/libspex.so.3
 lib/libspqr.so.4
-lib/libsuitesparse_mongoose.so.3
 lib/libsuitesparseconfig.so.7
+lib/libsuitesparse_mongoose.so.3
 lib/libumfpack.so.6
 "
 	local f
