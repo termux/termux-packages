@@ -1,0 +1,13 @@
+# Patch for dlinfo and RTLD_DI_LINKMAP.
+
+--- a/arclite/src/Patch7zCP.cpp	2025-11-16 22:35:01.958767912 +0530
++++ b/arclite/src/Patch7zCP.cpp	2025-11-16 22:35:05.392809046 +0530
+@@ -778,7 +778,7 @@
+ 
+ static bool patch_plt(void *handle)
+ {
+-#if defined(__APPLE__) || defined(__UCLIBC__)
++#if defined(__APPLE__) || defined(__UCLIBC__) || defined(__ANDROID__)
+ 	return false;
+ #else
+ 	struct link_map *map;
