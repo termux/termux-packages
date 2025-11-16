@@ -4,10 +4,9 @@ TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_MAINTAINER="@termux"
 # Version should be equal to TERMUX_NDK_{VERSION_NUM,REVISION} in
 # scripts/properties.sh
-TERMUX_PKG_VERSION=28c
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=29
 TERMUX_PKG_SRCURL=https://dl.google.com/android/repository/android-ndk-r${TERMUX_PKG_VERSION}-linux.zip
-TERMUX_PKG_SHA256=dfb20d396df28ca02a8c708314b814a4d961dc9074f9a161932746f815aa552f
+TERMUX_PKG_SHA256=4abbbcdc842f3d4879206e9695d52709603e52dd68d3c1fff04b3b5e7a308ecf
 TERMUX_PKG_AUTO_UPDATE=false
 # This package has taken over <pty.h> from the previous libutil-dev
 # and iconv.h from libandroid-support-dev:
@@ -89,10 +88,10 @@ termux_step_make_install() {
 	NDK_ARCH=$TERMUX_ARCH
 	test $NDK_ARCH == 'i686' && NDK_ARCH='i386'
 
-	# clang 13 requires libunwind on Android.
-	cp toolchains/llvm/prebuilt/linux-x86_64/lib/clang/19/lib/linux/$NDK_ARCH/libatomic.a \
+	# clang requires libunwind on Android.
+	cp toolchains/llvm/prebuilt/linux-x86_64/lib/clang/21/lib/linux/$NDK_ARCH/libatomic.a \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
-	cp toolchains/llvm/prebuilt/linux-x86_64/lib/clang/19/lib/linux/$NDK_ARCH/libunwind.a \
+	cp toolchains/llvm/prebuilt/linux-x86_64/lib/clang/21/lib/linux/$NDK_ARCH/libunwind.a \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
 
 	# librt and libpthread are built into libc on android, so setup them as symlinks
