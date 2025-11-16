@@ -1,81 +1,22 @@
 Not sure if this will work properly...
 
-diff -uNr libx86emu-2.3/mem.c libx86emu-2.3.mod/mem.c
---- libx86emu-2.3/mem.c	2019-04-24 09:37:42.000000000 +0300
-+++ libx86emu-2.3.mod/mem.c	2019-06-26 13:09:22.557277079 +0300
+--- a/mem.c
++++ b/mem.c
 @@ -33,9 +33,6 @@
  
  
  #include "include/x86emu_int.h"
 -#if defined(__i386__) || defined (__x86_64__)
 -#include <sys/io.h>
+-#else
+ /* define some dummy macros; see also WITH_IOPL in x86emu_int.h */
+ #define inb(addr) 0xff
+ #define inw(addr) 0xffff
+@@ -43,7 +40,6 @@
+ #define outb(val, addr)
+ #define outw(val, addr)
+ #define outl(val, addr)
 -#endif
  
  #define PERM16(a)	((a) + ((a) << 8))
  #define PERM32(a)	(PERM16(a) + (PERM16(a) << 16))
-@@ -186,9 +183,9 @@
- 
-   emu->io.iopl_needed = (perm & (X86EMU_PERM_R | X86EMU_PERM_W)) ? 1 : 0;
- 
--#if WITH_IOPL 
-+#if WITH_IOPL
-   emu->io.iopl_ok = emu->io.iopl_needed && getiopl() != 3 ? 0 : 1;
--#else 
-+#else
-   emu->io.iopl_ok = 1;
- #endif
- }
-@@ -578,7 +575,7 @@
- 
-     emu->io.stats_i[addr]++;
- 
--    return inb(addr);
-+    return *((volatile unsigned char *)(addr));
-   }
-   else {
-     *perm |= X86EMU_ACC_INVALID;
-@@ -616,7 +613,7 @@
-   emu->io.stats_i[addr]++;
-   emu->io.stats_i[addr + 1]++;
- 
--  return inw(addr);
-+  return *((volatile unsigned short *)(addr));
- }
- 
- 
-@@ -654,7 +651,7 @@
-   emu->io.stats_i[addr + 2]++;
-   emu->io.stats_i[addr + 3]++;
- 
--  return inl(addr);
-+  return *((volatile unsigned long *)(addr));
- }
- 
- 
-@@ -673,7 +670,7 @@
- 
-     emu->io.stats_o[addr]++;
- 
--    outb(val, addr);
-+    *((volatile unsigned char *)(addr)) = val;
-   }
-   else {
-     *perm |= X86EMU_ACC_INVALID;
-@@ -708,7 +705,7 @@
-   emu->io.stats_o[addr]++;
-   emu->io.stats_o[addr + 1]++;
- 
--  outw(val, addr);
-+  *((volatile unsigned short *)(addr)) = val;
- }
- 
- 
-@@ -745,7 +742,7 @@
-   emu->io.stats_o[addr + 2]++;
-   emu->io.stats_o[addr + 3]++;
- 
--  outl(val, addr);
-+  *((volatile unsigned long *)(addr)) = val;
- }
- 
- 
