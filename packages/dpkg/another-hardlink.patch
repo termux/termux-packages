@@ -1,0 +1,11 @@
+--- archives.c	2025-09-22 12:42:56.058534783 +0300
++++ src/src/main/archives.c	2025-09-22 12:43:12.130534772 +0300
+@@ -434,7 +434,7 @@
+     if (linknode->flags & (FNNF_DEFERRED_RENAME | FNNF_NEW_CONFF))
+       varbuf_add_str(&hardlinkfn, DPKGNEWEXT);
+     varbuf_end_str(&hardlinkfn);
+-    if (link(hardlinkfn.buf, path))
++    if (symlink(hardlinkfn.buf, path))
+       ohshite(_("error creating hard link '%.255s'"), te->name);
+     namenode->newhash = linknode->newhash;
+     debug(dbg_eachfiledetail, "tarobject hardlink digest=%s", namenode->newhash);
