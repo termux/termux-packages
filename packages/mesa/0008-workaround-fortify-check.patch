@@ -2,7 +2,7 @@ https://github.com/termux/termux-packages/issues/18823
 
 --- a/src/c11/threads.h
 +++ b/src/c11/threads.h
-@@ -117,7 +117,15 @@
+@@ -117,7 +117,15 @@ typedef struct
  typedef pthread_cond_t  cnd_t;
  typedef pthread_t       thrd_t;
  typedef pthread_key_t   tss_t;
@@ -15,9 +15,9 @@ https://github.com/termux/termux-packages/issues/18823
 +#else
  typedef pthread_mutex_t mtx_t;
 +#endif
+ #ifndef __once_flag_defined
  typedef pthread_once_t  once_flag;
  #  define ONCE_FLAG_INIT PTHREAD_ONCE_INIT
- #  ifdef PTHREAD_DESTRUCTOR_ITERATIONS
 --- a/src/c11/impl/threads_posix.c
 +++ b/src/c11/impl/threads_posix.c
 @@ -120,7 +120,11 @@
