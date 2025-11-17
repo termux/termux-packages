@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.15.5
 TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/5.15/${TERMUX_PKG_VERSION}/submodules/qtbase-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SRCURL="https://download.qt.io/archive/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtbase-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz"
 # TERMUX_PKG_SHA256 is not used in termux-build-qmake.sh.
 TERMUX_PKG_SHA256=SKIP_CHECKSUM
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
