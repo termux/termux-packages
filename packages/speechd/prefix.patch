@@ -1,0 +1,206 @@
+--- a/src/api/python/speechd_config/config.py	2025-05-07 00:38:06.000000000 +0530
++++ b/src/api/python/speechd_config/config.py	2025-11-16 17:46:35.462886486 +0530
+@@ -205,7 +205,7 @@
+             report(_("""Hint: Most likely, your Festival server is not running now
+ or not at the default port %d.
+ 
+-Try /etc/init.d/festival start or run 'festival --server' from the command line.""" % port))
++Try @TERMUX_PREFIX@/etc/init.d/festival start or run 'festival --server' from the command line.""" % port))
+             return False
+         return True
+ 
+@@ -464,7 +464,7 @@
+         if 'TMPDIR' in os.environ:
+             tmpdir = os.environ['TMPDIR']
+         else:
+-            tmpdir = "/tmp/"
++            tmpdir = "@TERMUX_PREFIX@/tmp/"
+         debugdir_path = os.path.join(tmpdir, "speechd-debug")
+         date = datetime.date.today()
+         debugarchive_path = os.path.join(tmpdir, "speechd-debug-%d-%d-%d.tar.gz" %
+@@ -716,13 +716,13 @@
+         report(_("Warning: You must be root or under sudo to do this.")        )
+         report(_("Starting Speech Dispatcher in system-mode"))
+ 
+-        reply = question(_("Is your system using an /etc/init.d/speech-dispatcher script?"),
++        reply = question(_("Is your system using an @TERMUX_PREFIX@/etc/init.d/speech-dispatcher script?"),
+                          True)
+         if reply:
+             report(_("Stopping Speech Dispatcher in case any is running already"))
+-            os.system("/etc/init.d/speech-dispatcher stop")
+-            report(_("Starting Speech Dispatcher via /etc/init.d/speech-dispatcher"))
+-            ret = os.system("/etc/init.d/speech-dispatcher start")
++            os.system("@TERMUX_PREFIX@/etc/init.d/speech-dispatcher stop")
++            report(_("Starting Speech Dispatcher via @TERMUX_PREFIX@/etc/init.d/speech-dispatcher"))
++            ret = os.system("@TERMUX_PREFIX@/etc/init.d/speech-dispatcher start")
+             if ret:
+                 report(_("Can't start Speech Dispatcher. Exited with status %d" % ret))
+                 return False
+--- a/src/clients/spdsend/server.c	2025-05-07 00:38:06.000000000 +0530
++++ b/src/clients/spdsend/server.c	2025-11-16 17:47:32.765820229 +0530
+@@ -340,7 +340,7 @@
+ static const char *server_socket_name()
+ {
+ 	char *name;
+-	if (asprintf(&name, "/tmp/spdsend-server.%s", login_name()) < 0)
++	if (asprintf(&name, "@TERMUX_PREFIX@/tmp/spdsend-server.%s", login_name()) < 0)
+ 		system_error("memory allocation");
+ 	return name;
+ }
+--- a/src/modules/cicero.c	2025-05-07 00:38:06.000000000 +0530
++++ b/src/modules/cicero.c	2025-11-16 17:48:32.666192210 +0530
+@@ -134,9 +134,9 @@
+ {
+ 	INIT_SETTINGS_TABLES();
+ 	REGISTER_DEBUG();
+-	MOD_OPTION_1_STR_REG(CiceroExecutable, "/usr/bin/cicero");
++	MOD_OPTION_1_STR_REG(CiceroExecutable, "@TERMUX_PREFIX@/usr/bin/cicero");
+ 	MOD_OPTION_1_STR_REG(CiceroExecutableLog,
+-			     "/var/log/speech-dispatcher/cicero-executable.log");
++			     "@TERMUX_PREFIX@/var/log/speech-dispatcher/cicero-executable.log");
+ 	return 0;
+ }
+ 
+--- a/src/modules/festival.c	2025-05-07 00:38:06.000000000 +0530
++++ b/src/modules/festival.c	2025-11-16 18:01:21.818355609 +0530
+@@ -577,7 +577,7 @@
+ 						char filename_debug
+ 						    [256];
+ 						sprintf(filename_debug,
+-							"/tmp/debug-festival-%d.snd",
++							"@TERMUX_PREFIX@/tmp/debug-festival-%d.snd",
+ 							debug_count++);
+ 						save_FT_Wave_snd(fwave,
+ 								 filename_debug);
+@@ -720,7 +720,7 @@
+ 			if (FestivalDebugSaveOutput) {
+ 				char filename_debug[256];
+ 				sprintf(filename_debug,
+-					"/tmp/debug-festival-%d.snd",
++					"@TERMUX_PREFIX@/tmp/debug-festival-%d.snd",
+ 					debug_count++);
+ 				save_FT_Wave_snd(fwave, filename_debug);
+ 			}
+--- a/src/modules/generic.c	2025-05-07 00:38:06.000000000 +0530
++++ b/src/modules/generic.c	2025-11-16 18:10:45.430906931 +0530
+@@ -120,7 +120,7 @@
+ 	MOD_OPTION_1_STR_REG(GenericExecuteSynth, "");
+ 	MOD_OPTION_1_STR_REG(GenericCmdDependency, "");
+ 	MOD_OPTION_1_INT_REG(GenericPortDependency, 0);
+-	MOD_OPTION_1_STR_REG(GenericSoundIconFolder, "/usr/share/sounds/sound-icons/");
++	MOD_OPTION_1_STR_REG(GenericSoundIconFolder, "@TERMUX_PREFIX@/usr/share/sounds/sound-icons/");
+ 
+ 	REGISTER_DEBUG();
+ 
+@@ -475,7 +475,7 @@
+ 				if (helper)
+ 					tmpdir = g_strdup(helper);
+ 				else
+-					tmpdir = g_strdup("/tmp");
++					tmpdir = g_strdup("@TERMUX_PREFIX@/tmp");
+ 
+ 				helper = g_get_home_dir();
+ 				if (helper)
+@@ -648,9 +648,9 @@
+ 					exit(EXIT_FAILURE);
+ 				} else if (pid == 0) {
+ 					// child, execute command
+-					ret = execl("/bin/bash", "bash", "-c", command, (char *) NULL);
++					ret = execl("@TERMUX_PREFIX@/bin/bash", "bash", "-c", command, (char *) NULL);
+ 					// catch missing bash
+-					DBG("Missing /bin/bash? (ret=%d error=%d) %s", ret, errno, strerror(errno));
++					DBG("Missing @TERMUX_PREFIX@/bin/bash? (ret=%d error=%d) %s", ret, errno, strerror(errno));
+ 					exit(EXIT_FAILURE);
+ 				} else {
+ 					int status;
+--- a/src/modules/ibmtts.c	2025-05-07 00:38:06.000000000 +0530
++++ b/src/modules/ibmtts.c	2025-11-16 18:10:52.989800875 +0530
+@@ -341,11 +341,11 @@
+ 	MOD_OPTION_1_INT_REG(IbmttsUseAbbreviation, 1);
+ 	MOD_OPTION_1_STR_REG(IbmttsPunctuationList, "()?");
+ 	MOD_OPTION_1_STR_REG(IbmttsDictionaryFolder,
+-			     "/var/opt/IBM/ibmtts/dict");
++			     "@TERMUX_PREFIX@/var/opt/IBM/ibmtts/dict");
+ 
+ 	MOD_OPTION_1_INT_REG(IbmttsAudioChunkSize, 20000);
+ 	MOD_OPTION_1_STR_REG(IbmttsSoundIconFolder,
+-			     "/usr/share/sounds/sound-icons/");
++			     "@TERMUX_PREFIX@/usr/share/sounds/sound-icons/");
+ 
+ 	/* Register voices. */
+ 	module_register_settings_voices();
+--- a/src/modules/ivona.c	2025-05-07 00:38:06.000000000 +0530
++++ b/src/modules/ivona.c	2025-11-16 18:11:17.621986559 +0530
+@@ -83,7 +83,7 @@
+ 	MOD_OPTION_1_STR_REG(IvonaDelimiters, ".;:,!?");
+ 	MOD_OPTION_1_INT_REG(IvonaMinCapLet, 0);
+ 	MOD_OPTION_1_STR_REG(IvonaSoundIconPath,
+-			     "/usr/share/sound/sound-icons/");
++			     "@TERMUX_PREFIX@/usr/share/sound/sound-icons/");
+ 
+ 	MOD_OPTION_1_STR_REG(IvonaServerHost, "127.0.0.1");
+ 	MOD_OPTION_1_INT_REG(IvonaServerPort, 9123);
+--- a/src/modules/dummy-message.txt	2025-05-07 00:38:06.000000000 +0530
++++ b/src/modules/dummy-message.txt	2025-11-16 18:12:16.183172391 +0530
+@@ -6,6 +6,6 @@
+ 
+ /run/user/1000something/speech-dispatcher/log/speech-dispatcher.log
+ 
+-/var/log/speech-dispatcher/speech-dispatcher.log
++@TERMUX_PREFIX@/var/log/speech-dispatcher/speech-dispatcher.log
+ 
+ or in your home in dot speech-dispatcher/log/speech-dispatcher.log
+--- a/src/server/options.c	2025-05-07 00:38:06.000000000 +0530
++++ b/src/server/options.c	2025-11-16 18:08:29.956221488 +0530
+@@ -107,7 +107,7 @@
+ 	printf(_("Output debugging information into $TMPDIR/%s\n"),
+ 	       "speechd-debug");
+ 	printf("                        ");
+-	printf(_("if TMPDIR is exported, otherwise to /tmp/%s\n"),
++	printf(_("if TMPDIR is exported, otherwise to @TERMUX_PREFIX@/tmp/%s\n"),
+ 	       "speechd-debug");
+ 	printf("  -h, --help            ");
+ 	printf(_("Print this info\n"));
+@@ -201,7 +201,7 @@
+ 		case 'D':
+ 			tmpdir = g_strdup(getenv("TMPDIR"));
+ 			if (!tmpdir)
+-				tmpdir = g_strdup("/tmp");
++				tmpdir = g_strdup("@TERMUX_PREFIX@/tmp");
+ 			SpeechdOptions.debug_destination =
+ 			    g_strdup_printf("%s/speechd-debug", tmpdir);
+ 			g_free(tmpdir);
+--- a/src/server/speechd.c	2025-05-07 00:38:06.000000000 +0530
++++ b/src/server/speechd.c	2025-11-16 18:08:54.831349350 +0530
+@@ -1203,7 +1203,7 @@
+ 				    g_strdup(SYS_CONF);
+ 			else
+ 				SpeechdOptions.conf_dir =
+-				    g_strdup("/etc/speech-dispatcher/");
++				    g_strdup("@TERMUX_PREFIX@/etc/speech-dispatcher/");
+ 			SpeechdOptions.user_conf_dir =
+ 			    g_build_filename(user_config_dir,
+ 					     "speech-dispatcher", NULL);
+--- a/src/modules/openjtalk.c	2025-05-07 00:38:06.000000000 +0530
++++ b/src/modules/openjtalk.c	2025-11-16 18:23:56.936287975 +0530
+@@ -60,9 +60,9 @@
+ 	REGISTER_DEBUG();
+ 
+ 	MOD_OPTION_1_STR_REG(OpenjtalkDictionaryDirectory,
+-			     "/var/lib/mecab/dic/open-jtalk/naist-jdic");
++			     "@TERMUX_PREFIX@/var/lib/mecab/dic/open-jtalk/naist-jdic");
+ 	MOD_OPTION_1_STR_REG(OpenjtalkVoice,
+-			     "/usr/share/hts-voice/nitech-jp-atr503-m001/nitech_jp_atr503_m001.htsvoice");
++			     "@TERMUX_PREFIX@/share/hts-voice/nitech-jp-atr503-m001/nitech_jp_atr503_m001.htsvoice");
+ 
+ 	DBG("OpenjtalkDictionaryDirectory: %s", OpenjtalkDictionaryDirectory);
+ 	DBG("OpenjtalkVoice: %s", OpenjtalkVoice);
+@@ -136,7 +136,7 @@
+ 	/* Strip SSML (Open JTalk does not support it.) */
+ 	char *plain_data = module_strip_ssml(data);
+ 
+-	char template[] = "/tmp/speechd-openjtalk-XXXXXX";
++	char template[] = "@TERMUX_PREFIX@/tmp/speechd-openjtalk-XXXXXX";
+ 	umask(0077);
+ 	int tmp_fd = mkstemp(template);
+ 	if (tmp_fd == -1) {
