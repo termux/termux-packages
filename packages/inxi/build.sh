@@ -11,7 +11,6 @@ TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+(-|\.)\d+"
 # Sometimes repology returns ds.ds.ds.ds instead of ds.ds.ds-ds, fix that:
 TERMUX_PKG_UPDATE_VERSION_SED_REGEXP="s/\.([0-9]+)$/-\1/"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_DEPENDS="perl"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
