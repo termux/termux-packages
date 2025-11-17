@@ -1,0 +1,19 @@
+--- a/Source/cmake/OptionsCommon.cmake
++++ b/Source/cmake/OptionsCommon.cmake
+@@ -1,4 +1,4 @@
+-set(CMAKE_CXX_STANDARD 23)
++set(CMAKE_CXX_STANDARD 20)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ set(CMAKE_CXX_EXTENSIONS OFF)
+ set(CMAKE_EXPERIMENTAL_CXX_MODULE_DYNDEP OFF)
+--- a/Source/WTF/wtf/Compiler.h
++++ b/Source/WTF/wtf/Compiler.h
+@@ -558,7 +558,7 @@
+ #define SUPPRESS_UNCOUNTED_MEMBER \
+     IGNORE_CLANG_STATIC_ANALYZER_WARNINGS_ATTRIBUTE_ON_MEMBER("webkit.NoUncountedMemberChecker")
+ 
+-#if COMPILER(APPLE_CLANG) || defined(CLANG_WEBKIT_BRANCH) || !defined __clang_major__ || __clang_major__ >= 19
++#if COMPILER(APPLE_CLANG) || defined(CLANG_WEBKIT_BRANCH) || !defined __clang_major__ || (__clang_major__ >= 19 && (!defined __cplusplus || __cplusplus >= 202302L))
+ #define SUPPRESS_UNCOUNTED_LAMBDA_CAPTURE \
+     IGNORE_CLANG_STATIC_ANALYZER_WARNINGS_ATTRIBUTE("webkit.UncountedLambdaCapturesChecker")
+ #else
