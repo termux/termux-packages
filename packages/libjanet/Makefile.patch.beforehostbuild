@@ -104,15 +104,12 @@ index f43c9dbc..6d8e4fff 100644
  	echo 'Cflags: -I$${includedir}' >> $@
  	echo 'Libs: -L$${libdir} -ljanet' >> $@
  	echo 'Libs.private: $(CLIBS)' >> $@
-@@ -335,9 +346,9 @@ install: $(JANET_TARGET) $(JANET_LIBRARY) $(JANET_STATIC_LIBRARY) build/janet.pc
- 		ln -sf $(SONAME) '$(DESTDIR)$(LIBDIR)/libjanet.dylib' ; \
- 		ln -sf libjanet.$(shell $(JANET_TARGET) -e '(print janet/version)').dylib $(DESTDIR)$(LIBDIR)/$(SONAME) ; \
- 	else \
--		cp $(JANET_LIBRARY) '$(DESTDIR)$(LIBDIR)/libjanet.so.$(shell $(JANET_TARGET) -e '(print janet/version)')' ; \
-+		cp $(JANET_LIBRARY) '$(DESTDIR)$(LIBDIR)/libjanet.so.$(shell $(JANET_HOST_TARGET) -e '(print janet/version)')' ; \
- 		ln -sf $(SONAME) '$(DESTDIR)$(LIBDIR)/libjanet.so' ; \
--		ln -sf libjanet.so.$(shell $(JANET_TARGET) -e '(print janet/version)') $(DESTDIR)$(LIBDIR)/$(SONAME) ; \
-+		ln -sf libjanet.so.$(shell $(JANET_HOST_TARGET) -e '(print janet/version)') $(DESTDIR)$(LIBDIR)/$(SONAME) ; \
- 	fi
- 	cp $(JANET_STATIC_LIBRARY) '$(DESTDIR)$(LIBDIR)/libjanet.a'
- 	mkdir -p '$(DESTDIR)$(JANET_MANPATH)'
+@@ -347,7 +347,7 @@ build/janet.pc: $(JANET_TARGET)
+ 	echo 'Libs.private: $(CLIBS)' >> $@
+ 
+ install: $(JANET_TARGET) $(JANET_LIBRARY) $(JANET_STATIC_LIBRARY) build/janet.pc build/janet.h
+-	$(eval JANET_VERSION := $(shell $(JANET_TARGET) -e '(print janet/version)'))
++	$(eval JANET_VERSION := $(shell $(JANET_HOST_TARGET) -e '(print janet/version)'))
+ 	mkdir -p '$(DESTDIR)$(BINDIR)'
+ 	cp $(JANET_TARGET) '$(DESTDIR)$(BINDIR)/janet'
+ 	strip $(STRIPFLAGS) '$(DESTDIR)$(BINDIR)/janet'
