@@ -1,16 +1,16 @@
 diff -uNr debootstrap-1.0.106/scripts/debian-common debootstrap-1.0.106.mod/scripts/debian-common
 --- debootstrap-1.0.106/scripts/debian-common	2018-07-05 11:48:22.000000000 +0300
 +++ debootstrap-1.0.106.mod/scripts/debian-common	2018-07-10 15:33:41.289906934 +0300
-@@ -60,7 +60,7 @@
- 	setup_etc
- 	if [ ! -e "$TARGET/etc/fstab" ]; then
- 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+@@ -130,7 +130,7 @@
+ #
+ # <file system> <mount point>   <type>  <options>       <dump>  <pass>
+ EOF
 -		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
 +		chmod 644 "$TARGET/etc/fstab"
  	fi
  
  	setup_devices
-@@ -102,7 +102,6 @@
+@@ -172,7 +172,6 @@
  	}
  
  	if ! doing_variant fakechroot; then
@@ -18,7 +18,7 @@ diff -uNr debootstrap-1.0.106/scripts/debian-common debootstrap-1.0.106.mod/scri
  		in_target /sbin/ldconfig
  	fi
  
-@@ -172,6 +171,20 @@
+@@ -242,6 +241,20 @@
  echo \"Warning: Fake start-stop-daemon called, doing nothing\"" > "$TARGET/sbin/start-stop-daemon"
  	chmod 755 "$TARGET/sbin/start-stop-daemon"
  
