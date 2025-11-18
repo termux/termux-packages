@@ -77,15 +77,21 @@ diff -uNr debootstrap/scripts/sarge debootstrap.mod/scripts/sarge
 diff -uNr debootstrap/scripts/sid debootstrap.mod/scripts/sid
 --- debootstrap/scripts/sid	2018-11-20 20:55:53.000000000 +0200
 +++ debootstrap.mod/scripts/sid	2019-01-19 00:02:00.832801917 +0200
-@@ -2,7 +2,7 @@
+@@ -3,11 +3,11 @@
  download_style apt
  finddebs_style from-indices
  variants - buildd fakechroot minbase
--keyring /usr/share/keyrings/debian-archive-keyring.gpg
-+keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-keyring.gpg
+-if [ -e /usr/share/keyrings/debian-archive-keyring.pgp ]; then
++if [ -e @TERMUX_PREFIX@/share/keyrings/debian-archive-keyring.pgp ]; then
+   # Starting with Debian 13 (trixie).
+-  keyring /usr/share/keyrings/debian-archive-keyring.pgp
++  keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-keyring.pgp
+ else
+-  keyring /usr/share/keyrings/debian-archive-keyring.gpg
++  keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-keyring.gpg
+ fi
  
  # include common settings
- if [ -e "$DEBOOTSTRAP_DIR/scripts/debian-common" ]; then
 diff -uNr debootstrap/scripts/woody debootstrap.mod/scripts/woody
 --- debootstrap/scripts/woody	2018-11-20 20:55:53.000000000 +0200
 +++ debootstrap.mod/scripts/woody	2019-01-19 00:02:06.079513823 +0200
