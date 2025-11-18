@@ -8,6 +8,7 @@ TERMUX_PKG_VERSION=(
 	"0.44.0"
 	"15.0.7"
 )
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
 	"https://github.com/numba/llvmlite/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.tar.gz"
 	"https://github.com/llvm/llvm-project/releases/download/llvmorg-${TERMUX_PKG_VERSION[1]}/llvm-project-${TERMUX_PKG_VERSION[1]}.src.tar.xz"
@@ -21,6 +22,7 @@ TERMUX_PKG_PYTHON_COMMON_DEPS="wheel"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_RM_AFTER_INSTALL="include"
 
 # See http://llvm.org/docs/CMake.html:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -132,6 +134,7 @@ __llvmlite_build_lib() {
 	termux_setup_ninja
 
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DLLVM_DIR=$_LLVMLITE_LLVM_INSTALL_DIR/lib/cmake/llvm"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_POLICY_VERSION_MINIMUM=3.5"
 
 	# Backup dirs and envs
 	local __old_srcdir="$TERMUX_PKG_SRCDIR"
