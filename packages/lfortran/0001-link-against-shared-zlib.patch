@@ -1,0 +1,42 @@
+Description: Ensure we don't include a static copy of ZLIB
+Author: Alastair McKinstry <mckinstry@debian.org>
+Last-Updated: 2024-01-23
+Forwarded: no
+
+Index: lfortran-0.43.0/src/lfortran/CMakeLists.txt
+===================================================================
+--- lfortran-0.43.0.orig/src/lfortran/CMakeLists.txt
++++ lfortran-0.43.0/src/lfortran/CMakeLists.txt
+@@ -45,7 +45,7 @@ target_link_libraries(lfortran_lib asr l
+ 
+ 
+ if (WITH_ZLIB)
+-    target_link_libraries(lfortran_lib ZLIB::ZLIB)
++    target_link_libraries(lfortran_lib p::z)
+ endif()
+ 
+ target_include_directories(lfortran_lib BEFORE PUBLIC ${lfortran_SOURCE_DIR}/src)
+Index: lfortran-0.43.0/cmake/FindStaticZLIB.cmake
+===================================================================
+--- lfortran-0.43.0.orig/cmake/FindStaticZLIB.cmake
++++ lfortran-0.43.0/cmake/FindStaticZLIB.cmake
+@@ -1,12 +1,9 @@
+-# Backup the original value of the requested library suffixes
+-set(_CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
+-# Static libraries end with .a on Unix and .lib on Windows
+-set(CMAKE_FIND_LIBRARY_SUFFIXES .a .lib)
++find_path(ZLIB_HEADER zlib.h)
+ 
+-# Now use CMake's built-in ZLIB finder
+-find_package(ZLIB REQUIRED)
++include(FindPackageHandleStandardArgs)
++find_package_handle_standard_args(ZLIB DEFAULT_MSG ZLIB_HEADER)
++
++add_library(p::z INTERFACE IMPORTED)
++set_property(TARGET p::z PROPERTY INTERFACE_INCLUDE_DIRECTORIES
++    ${ZLIB_HEADER})
+ 
+-# Reset the library suffixes to the original value
+-set(CMAKE_FIND_LIBRARY_SUFFIXES ${_CMAKE_FIND_LIBRARY_SUFFIXES})
+-# Unset the temporary to not pollute the global namespace
+-unset(_CMAKE_FIND_LIBRARY_SUFFIXES)

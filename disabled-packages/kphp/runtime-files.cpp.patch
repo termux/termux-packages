@@ -1,0 +1,13 @@
+--- a/runtime/files.cpp
++++ b/runtime/files.cpp
+@@ -10,6 +10,10 @@
+ #include <sys/utsname.h>
+ #include <unistd.h>
+ 
++#ifdef __ANDROID__
++#define __xpg_basename __posix_basename
++#endif
++
+ #undef basename
+ 
+ #include "common/macos-ports.h"

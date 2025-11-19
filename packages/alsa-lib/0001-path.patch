@@ -1,0 +1,27 @@
+diff --git a/src/conf/alsa.conf b/src/conf/alsa.conf
+index e65bf2c..22e0730 100644
+--- a/src/conf/alsa.conf
++++ b/src/conf/alsa.conf
+@@ -8,10 +8,9 @@
+ 	{
+ 		func load
+ 		files [
+-			"/var/lib/alsa/conf.d"
+-			"/usr/etc/alsa/conf.d"
+-			"/etc/alsa/conf.d"
+-			"/etc/asound.conf|||/usr/etc/asound.conf"
++			"@TERMUX_PREFIX@/var/lib/alsa/conf.d"
++			"@TERMUX_PREFIX@/etc/alsa/conf.d"
++			"@TERMUX_PREFIX@/etc/asound.conf"
+ 			"~/.asoundrc"
+ 			{
+ 				@func concat
+@@ -65,7 +64,7 @@ cards.@hooks [
+ 				file {
+ 					@func concat
+ 					strings [
+-						"/var/lib/alsa/card"
++						"@TERMUX_ALSA@/var/lib/alsa/card"
+ 						{ @func private_integer }
+ 						".conf.d"
+ 					]

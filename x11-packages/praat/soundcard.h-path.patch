@@ -1,0 +1,36 @@
+diff -uNr praat-6.2.23/fon/Sound_audio.cpp praat-6.2.23.mod/fon/Sound_audio.cpp
+--- praat-6.2.23/fon/Sound_audio.cpp	2022-10-08 21:02:21.000000000 +0900
++++ praat-6.2.23.mod/fon/Sound_audio.cpp	2022-10-18 20:22:25.338023046 +0900
+@@ -43,7 +43,7 @@
+ 		#if defined (__OpenBSD__) || defined (__NetBSD__)
+ 			#include <soundcard.h>
+ 		#else
+-			#include <sys/soundcard.h>
++			#include <linux/soundcard.h>
+ 		#endif
+ 	#endif
+ 	#include <sys/ioctl.h>   /* ioctl */
+diff -uNr praat-6.2.23/foned/SoundRecorder.h praat-6.2.23.mod/foned/SoundRecorder.h
+--- praat-6.2.23/foned/SoundRecorder.h	2022-10-08 21:02:21.000000000 +0900
++++ praat-6.2.23.mod/foned/SoundRecorder.h	2022-10-18 20:22:53.188252747 +0900
+@@ -38,7 +38,7 @@
+ 		#if defined (__OpenBSD__) || defined (__NetBSD__)
+ 			#include <soundcard.h>
+ 		#else
+-			#include <sys/soundcard.h>
++			#include <linux/soundcard.h>
+ 		#endif
+ 	#endif
+ #endif
+diff -uNr praat-6.2.23/melder/melder_audio.cpp praat-6.2.23.mod/melder/melder_audio.cpp
+--- praat-6.2.23/melder/melder_audio.cpp	2022-10-08 21:02:21.000000000 +0900
++++ praat-6.2.23.mod/melder/melder_audio.cpp	2022-10-18 20:19:13.633103382 +0900
+@@ -36,7 +36,7 @@
+ 		#if defined (__OpenBSD__) || defined (__NetBSD__)
+ 			#include <soundcard.h>
+ 		#else
+-			#include <sys/soundcard.h>
++			#include <linux/soundcard.h>
+ 		#endif
+ 	#endif
+ 	#include <errno.h>

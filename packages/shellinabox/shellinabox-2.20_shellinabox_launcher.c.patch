@@ -1,0 +1,97 @@
+diff -uNr shellinabox-2.20/shellinabox/launcher.c shellinabox-2.20.mod/shellinabox/launcher.c
+--- shellinabox-2.20/shellinabox/launcher.c	2016-11-09 21:40:33.000000000 +0200
++++ shellinabox-2.20.mod/shellinabox/launcher.c	2020-08-11 21:49:21.332502608 +0300
+@@ -676,10 +676,13 @@
+       // Temporarily regain privileges to update the utmp database
+       uid_t r_uid, e_uid, s_uid;
+       uid_t r_gid, e_gid, s_gid;
++
++#ifndef __ANDROID__
+       check(!getresuid(&r_uid, &e_uid, &s_uid));
+       check(!getresgid(&r_gid, &e_gid, &s_gid));
+       UNUSED_RETURN(setresuid(0, 0, 0));
+       UNUSED_RETURN(setresgid(0, 0, 0));
++#endif
+ 
+       if (enableUtmpLogging) {
+         setutxent();
+@@ -693,10 +696,12 @@
+ #endif
+       }
+ 
++#ifndef __ANDROID__
+       // Switch back to the lower privileges
+       check(!setresgid(r_gid, e_gid, s_gid));
+       check(!setresuid(r_uid, e_uid, s_uid));
+ #endif
++#endif
+ 
+       NOINTR(close(utmp->pty));
+     }
+@@ -1162,8 +1167,7 @@
+ 
+   if (service->useDefaultShell) {
+     check(!service->cmdline);
+-    service->cmdline           = strdup(*pw->pw_shell ?
+-                                        pw->pw_shell : "/bin/sh");
++    service->cmdline           = strdup("@TERMUX_PREFIX@/bin/bash");
+   }
+ 
+   if (restricted &&
+@@ -1217,7 +1221,9 @@
+         break;
+       }
+     }
++#ifndef __ANDROID__
+     setgroups(ngroups, groups);
++#endif
+     free(groups);
+   }
+ 
+@@ -1231,7 +1237,7 @@
+   (*environment)[numEnvVars++] = stringPrintf(NULL, "SHELL=%s", pw->pw_shell);
+   check(
+   (*environment)[numEnvVars++] = strdup(
+-                              "PATH=/usr/local/bin:/usr/bin:/bin:/usr/games"));
++                              "PATH=@TERMUX_PREFIX@/bin"));
+   (*environment)[numEnvVars++] = stringPrintf(NULL, "LOGNAME=%s",
+                                               service->user);
+   (*environment)[numEnvVars++] = stringPrintf(NULL, "USER=%s", service->user);
+@@ -1566,10 +1572,13 @@
+   cfsetospeed(&tt, B38400);
+   tcsetattr(0, TCSAFLUSH, &tt);
+ 
++#ifndef __ANDROID__
+   // Assert root privileges in order to update utmp entry. We can only do that,
+   // if we have root permissions otherwise this fails.
+   UNUSED_RETURN(setresuid(0, 0, 0));
+   UNUSED_RETURN(setresgid(0, 0, 0));
++#endif
++
+ #ifdef HAVE_UTMPX_H
+   if (enableUtmpLogging) {
+     setutxent();
+@@ -1641,9 +1650,11 @@
+ #endif
+   }
+ 
++#ifndef __ANDROID__
+   // Change user and group ids
+   check(!setresgid(service->gid, service->gid, service->gid));
+   check(!setresuid(service->uid, service->uid, service->uid));
++#endif
+ 
+   // Change working directory
+   if (service->useHomeDir) {
+@@ -1682,10 +1693,7 @@
+     snprintf(remoteHost, 256,
+              (*realIP) ? "%s, %s" : "%s%s", peerName,
+              (*realIP) ? realIP : "");
+-    execle("/bin/login", "login", "-p", "-h", remoteHost,
+-           (void *)0, environment);
+-    execle("/usr/bin/login", "login", "-p", "-h", remoteHost,
+-           (void *)0, environment);
++    execle("@TERMUX_PREFIX@/bin/pwlogin", "pwlogin", (void *)0, environment);
+   } else {
+     // Launch user provied service
+     execService(width, height, service, peerName, realIP, environment, url);

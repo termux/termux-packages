@@ -1,0 +1,14 @@
+--- a/v8/src/wasm/wasm-objects.cc
++++ b/v8/src/wasm/wasm-objects.cc
+@@ -11,6 +11,11 @@
+ #undef MAP_TYPE
+ #endif  // V8_TARGET_OS_LINUX
+ 
++#if defined __ANDROID__ && __ANDROID_API__ < 30
++#include <sys/syscall.h>
++#define memfd_create(name,flags) syscall(SYS_memfd_create,name,flags)
++#endif
++
+ #include "src/wasm/wasm-objects.h"
+ 
+ #include <optional>

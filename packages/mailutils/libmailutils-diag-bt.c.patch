@@ -1,0 +1,20 @@
+--- a/libmailutils/diag/bt.c
++++ b/libmailutils/diag/bt.c
+@@ -45,7 +45,7 @@
+   
+   if (!mu_program_name)
+     abort ();
+-  sprintf (fname, "/tmp/mailutils.%s.%lu",
++  sprintf (fname, "@TERMUX_PREFIX@/tmp/mailutils.%s.%lu",
+ 	   mu_program_name, (unsigned long) master_pid);
+   
+   pid = fork ();
+@@ -67,7 +67,7 @@
+   dup2 (fd, 2);
+   close (fd);
+   
+-  argv[0] = "/usr/bin/gdb";
++  argv[0] = "@TERMUX_PREFIX@/bin/gdb";
+   argv[1] = (char*) mu_full_program_name;
+   sprintf (buf, "%lu", (unsigned long) master_pid);
+   argv[2] = buf;

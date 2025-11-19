@@ -1,0 +1,20 @@
+--- a/sysdeps/linux/netload.c
++++ b/sysdeps/linux/netload.c
+@@ -158,7 +158,7 @@
+ 
+ 	else if (IN6_IS_ADDR_SITELOCAL (buf->address6))
+ 		buf->scope6 = GLIBTOP_IF_IN6_SCOPE_SITE;
+-
++#ifndef __ANDROID__
+ 	else if (IN6_IS_ADDR_GLOBAL (buf->address6)
+ 		 || IN6_IS_ADDR_MC_ORGLOCAL (buf->address6)
+ 		 || IN6_IS_ADDR_V4COMPAT (buf->address6)
+@@ -169,7 +169,7 @@
+ 
+ 	else if (IN6_IS_ADDR_LOOPBACK (buf->address6))
+ 		buf->scope6 = GLIBTOP_IF_IN6_SCOPE_HOST;
+-
++#endif
+ 	else
+ 		buf->scope6 = GLIBTOP_IF_IN6_SCOPE_UNKNOWN;
+ 

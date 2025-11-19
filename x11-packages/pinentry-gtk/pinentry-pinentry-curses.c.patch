@@ -1,0 +1,24 @@
+--- a/pinentry/pinentry-curses.c
++++ b/pinentry/pinentry-curses.c
+@@ -156,8 +156,10 @@ pinentry_utf8_to_local (const char *lc_c
+     {
+       if (! lc_ctype_unknown_warning)
+ 	{
++#ifndef __ANDROID__
+ 	  fprintf (stderr, "%s: no LC_CTYPE known - assuming UTF-8\n",
+ 		   pgmname);
++#endif
+ 	  lc_ctype_unknown_warning = 1;
+ 	}
+       return strdup (text);
+@@ -223,8 +225,10 @@ pinentry_local_to_utf8 (char *lc_ctype,
+     {
+       if (! lc_ctype_unknown_warning)
+ 	{
++#ifndef __ANDROID__
+ 	  fprintf (stderr, "%s: no LC_CTYPE known - assuming UTF-8\n",
+ 		   pgmname);
++#endif
+ 	  lc_ctype_unknown_warning = 1;
+ 	}
+       output_buf = secure? secmem_malloc (input_len) : malloc (input_len);

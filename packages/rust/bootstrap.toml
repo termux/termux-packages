@@ -1,0 +1,81 @@
+# See documentation at
+# https://github.com/rust-lang/rust/blob/master/bootstrap.example.toml
+
+# change this every few releases (do not use autoupdater)
+change-id = 140732
+
+# https://github.com/rust-lang/rust/issues/135358
+profile = "dist"
+
+[llvm]
+download-ci-llvm = false
+link-shared = true
+
+[build]
+host = ["@CARGO_TARGET_NAME@"]
+target = [
+    "aarch64-linux-android",
+    "armv7-linux-androideabi",
+    "i686-linux-android",
+    "x86_64-linux-android",
+]
+rustc = "@RUSTC@"
+cargo = "@CARGO@"
+python = "python3"
+extended = true
+tools = [
+    "cargo",
+    "clippy",
+    "rustdoc",
+    "rustfmt",
+    "rust-analyzer-proc-macro-srv",
+    "analysis",
+    "src",
+]
+sanitizers = false
+android-ndk = "@TERMUX_STANDALONE_TOOLCHAIN@"
+
+[install]
+prefix = "@TERMUX_PREFIX@"
+sysconfdir = "etc"
+docdir = "share/doc/rust"
+
+[rust]
+optimize = true
+debug = false
+codegen-units = 0
+jemalloc = false
+channel = "stable"
+rpath = false
+lld = false
+
+[target.x86_64-unknown-linux-gnu]
+llvm-config = "@TERMUX_HOST_LLVM_BASE_DIR@/bin/llvm-config"
+rpath = true
+
+[target.aarch64-linux-android]
+llvm-config = "@TERMUX_PREFIX@/bin/llvm-config"
+profiler = true
+
+[target.armv7-linux-androideabi]
+llvm-config = "@TERMUX_PREFIX@/bin/llvm-config"
+profiler = true
+
+[target.i686-linux-android]
+llvm-config = "@TERMUX_PREFIX@/bin/llvm-config"
+profiler = true
+
+[target.x86_64-linux-android]
+llvm-config = "@TERMUX_PREFIX@/bin/llvm-config"
+profiler = true
+
+[target.wasm32-wasip1]
+wasi-root = "@TERMUX_PREFIX@/share/wasi-sysroot"
+
+[target.wasm32-wasip2]
+wasi-root = "@TERMUX_PREFIX@/share/wasi-sysroot"
+
+[dist]
+src-tarball = false
+compression-formats = ["gz"]
+#missing-tools = true

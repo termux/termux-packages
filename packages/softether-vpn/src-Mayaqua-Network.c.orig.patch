@@ -1,0 +1,29 @@
+--- a/src/Mayaqua/Network.c
++++ b/src/Mayaqua/Network.c
+@@ -8024,7 +8024,7 @@
+ 
+ 		GetLocalHostIP4(ip);
+ 
+-		b = ReadDump("/etc/resolv.conf");
++		b = ReadDump("@TERMUX_PREFIX@/etc/resolv.conf");
+ 		if (b != NULL)
+ 		{
+ 			char *s;
+@@ -9980,7 +9980,7 @@
+ bool UnixGetDomainName(char *name, UINT size)
+ {
+ 	bool ret = false;
+-	BUF *b = ReadDump("/etc/resolv.conf");
++	BUF *b = ReadDump("@TERMUX_PREFIX@/etc/resolv.conf");
+ 
+ 	if (b == NULL)
+ 	{
+@@ -14907,7 +14907,7 @@
+ 		return false;
+ 	}
+ 
+-	b = ReadDump("/etc/hosts");
++	b = ReadDump("@TERMUX_PREFIX@/etc/hosts");
+ 	if (b == NULL)
+ 	{
+ 		return false;

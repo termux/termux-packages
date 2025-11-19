@@ -1,0 +1,11 @@
+--- a/src/dbus/qdbusserver.cpp
++++ b/src/dbus/qdbusserver.cpp
+@@ -51,7 +51,7 @@
+     : QDBusServer(
+ #ifdef Q_OS_UNIX
+             // Use Unix sockets on Unix systems only
+-            QStringLiteral("unix:tmpdir=/tmp"),
++            QStringLiteral("unix:tmpdir=@TERMUX_PREFIX@/tmp"),
+ #else
+             QStringLiteral("tcp:"),
+ #endif

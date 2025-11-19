@@ -1,0 +1,11 @@
+--- a/src/3rdparty/chromium/services/device/serial/serial_io_handler_posix.cc
++++ b/src/3rdparty/chromium/services/device/serial/serial_io_handler_posix.cc
+@@ -16,7 +16,7 @@
+ #include "build/build_config.h"
+ #include "components/device_event_log/device_event_log.h"
+ 
+-#if defined(OS_LINUX) || defined(OS_CHROMEOS)
++#if (defined(OS_LINUX) && !defined(__TERMUX__)) || defined(OS_CHROMEOS)
+ #include <asm-generic/ioctls.h>
+ #include <linux/serial.h>
+ 

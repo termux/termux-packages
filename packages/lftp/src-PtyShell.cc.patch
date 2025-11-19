@@ -1,0 +1,11 @@
+--- ../cache/lftp-4.8.0/src/PtyShell.cc	2016-02-21 00:57:52.000000000 +1100
++++ ./src/PtyShell.cc	2017-07-21 14:33:14.130083766 +1000
+@@ -143,7 +143,7 @@
+       putenv((char*)"LANGUAGE=C");
+       if(a)
+ 	 execvp(a->a0(),a->GetVNonConst());
+-      execl("/bin/sh","sh","-c",name.get(),NULL);
++      execl("@TERMUX_PREFIX@/bin/sh","sh","-c",name.get(),NULL);
+       fprintf(stderr,_("execl(/bin/sh) failed: %s\n"),strerror(errno));
+       fflush(stderr);
+       _exit(1);

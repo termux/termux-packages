@@ -1,0 +1,21 @@
+diff -uNr wireshark-2.6.1/caputils/ws80211_utils.c wireshark-2.6.1.mod/caputils/ws80211_utils.c
+--- wireshark-2.6.1/caputils/ws80211_utils.c	2018-05-22 21:53:08.000000000 +0300
++++ wireshark-2.6.1.mod/caputils/ws80211_utils.c	2018-06-26 18:49:28.794971784 +0300
+@@ -680,7 +680,7 @@
+ 
+ 	/* Update names of user created monitor interfaces */
+ 	while(fgets(line, sizeof(line), fh)) {
+-		t = index(line, ':');
++		t = strchr(line, ':');
+ 		if (!t)
+ 			continue;
+ 		*t = 0;
+@@ -934,7 +934,7 @@
+ 	return -1;
+ }
+ 
+-const char *network_manager_path = "/usr/sbin/NetworkManager"; /* Is this correct? */
++const char *network_manager_path = "@TERMUX_PREFIX@/bin/NetworkManager"; /* Is this correct? */
+ const char *ws80211_get_helper_path(void) {
+ 	if (g_file_test(network_manager_path, G_FILE_TEST_IS_EXECUTABLE)) {
+ 		return network_manager_path;

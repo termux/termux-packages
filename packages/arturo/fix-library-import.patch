@@ -1,0 +1,28 @@
+diff --git a/src/vm/vm.nim b/src/vm/vm.nim
+index 28e9d5c5e..6b86353b0 100644
+--- a/src/vm/vm.nim
++++ b/src/vm/vm.nim
+@@ -64,6 +64,7 @@ else:
+ 
+ macro importLib(name: static[string]): untyped =
+     let id = ident(name & "Lib")
++    let libpath = ident("library/" & name)
+     let libname = name.toUpperAscii()
+     result = quote do:
+         when not defined(PORTABLE) or not compact or mods.contains(`name`):
+@@ -72,7 +73,7 @@ macro importLib(name: static[string]): untyped =
+                     echo "-------------------------"
+                     echo " ## " & `libname`
+                     echo "-------------------------"
+-            import library/`name` as `id`
++            import `libpath` as `id`
+ 
+ #=======================================
+ # Standard library setup
+@@ -264,4 +265,4 @@ else:
+                 ret = sTop()
+             
+             return generateJsObject(ret)
+-    
+\ No newline at end of file
++    

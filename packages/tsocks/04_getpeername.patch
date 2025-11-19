@@ -1,0 +1,268 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 04_getpeername.dpatch by Nico Golde <nion@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: No description.
+
+--- a/acconfig.h
++++ b/acconfig.h
+@@ -43,6 +43,9 @@ allows socksified DNS */
+ /* Prototype and function header for close function */
+ #undef CLOSE_SIGNATURE
+ 
++/* Prototype and function header for getpeername function */
++#undef GETPEERNAME_SIGNATURE
++
+ /* Work out which function we have for conversion from string IPs to 
+ numerical ones */
+ #undef HAVE_INET_ADDR
+--- a/config.h.in
++++ b/config.h.in
+@@ -46,6 +46,9 @@ allows socksified DNS */
+ /* Prototype and function header for close function */
+ #undef CLOSE_SIGNATURE
+ 
++/* Prototype and function header for close function */
++#undef GETPEERNAME_SIGNATURE
++
+ /* Work out which function we have for conversion from string IPs to 
+ numerical ones */
+ #undef HAVE_INET_ADDR
+--- a/configure
++++ b/configure
+@@ -2225,14 +2225,60 @@ cat >> confdefs.h <<EOF
+ EOF
+ 
+ 
++
++echo $ac_n "checking for correct getpeername prototype""... $ac_c" 1>&6
++echo "configure:2231: checking for correct getpeername prototype" >&5
++PROTO=
++PROTO1='int __fd, const struct sockaddr * __name, int *__namelen'
++PROTO2='int __fd, const struct sockaddr_in * __name, socklen_t *__namelen'
++PROTO3='int __fd, struct sockaddr * __name, socklen_t *__namelen'
++PROTO4='int __fd, const struct sockaddr * __name, socklen_t *__namelen'
++for testproto in "${PROTO1}" \
++                 "${PROTO2}" \
++                 "${PROTO3}" \
++                 "${PROTO4}" 
++do
++  if test "${PROTO}" = ""; then
++    cat > conftest.$ac_ext <<EOF
++#line 2244 "configure"
++#include "confdefs.h"
++
++      #include <sys/socket.h>
++      int getpeername($testproto);
++    
++int main() {
++
++; return 0; }
++EOF
++if { (eval echo configure:2254: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
++  rm -rf conftest*
++  PROTO="$testproto";
++else
++  echo "configure: failed program was:" >&5
++  cat conftest.$ac_ext >&5
++fi
++rm -f conftest*
++  fi
++done
++if test "${PROTO}" = ""; then
++  { echo "configure: error: "no match found!"" 1>&2; exit 1; }
++fi
++echo "$ac_t""getpeername(${PROTO})" 1>&6
++cat >> confdefs.h <<EOF
++#define GETPEERNAME_SIGNATURE ${PROTO}
++EOF
++
++
++
++
+ echo $ac_n "checking for correct poll prototype""... $ac_c" 1>&6
+-echo "configure:2230: checking for correct poll prototype" >&5
++echo "configure:2276: checking for correct poll prototype" >&5
+ PROTO=
+ for testproto in 'struct pollfd *ufds, unsigned long nfds, int timeout' 
+ do
+   if test "${PROTO}" = ""; then
+     cat > conftest.$ac_ext <<EOF
+-#line 2236 "configure"
++#line 2282 "configure"
+ #include "confdefs.h"
+ 
+       #include <sys/poll.h>
+@@ -2242,7 +2288,7 @@ int main() {
+ 
+ ; return 0; }
+ EOF
+-if { (eval echo configure:2246: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
++if { (eval echo configure:2292: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+   rm -rf conftest*
+   PROTO="$testproto";
+ else
+--- a/configure.in
++++ b/configure.in
+@@ -309,6 +309,34 @@ fi
+ AC_MSG_RESULT([close(${PROTO})])
+ AC_DEFINE_UNQUOTED(CLOSE_SIGNATURE, [${PROTO}])
+ 
++
++dnl Find the correct getpeername prototype on this machine 
++AC_MSG_CHECKING(for correct getpeername prototype)
++PROTO=
++PROTO1='int __fd, const struct sockaddr * __name, int *__namelen'
++PROTO2='int __fd, const struct sockaddr_in * __name, socklen_t *__namelen'
++PROTO3='int __fd, struct sockaddr * __name, socklen_t *__namelen'
++PROTO4='int __fd, const struct sockaddr * __name, socklen_t *__namelen'
++for testproto in "${PROTO1}" \
++                 "${PROTO2}" \
++                 "${PROTO3}" \
++                 "${PROTO4}" 
++do
++  if test "${PROTO}" = ""; then
++    AC_TRY_COMPILE([
++      #include <sys/socket.h>
++      int getpeername($testproto);
++    ],,[PROTO="$testproto";],)
++  fi
++done
++if test "${PROTO}" = ""; then
++  AC_MSG_ERROR("no match found!")
++fi
++AC_MSG_RESULT([getpeername(${PROTO})])
++AC_DEFINE_UNQUOTED(GETPEERNAME_SIGNATURE, [${PROTO}])
++
++
++
+ dnl Find the correct poll prototype on this machine 
+ AC_MSG_CHECKING(for correct poll prototype)
+ PROTO=
+--- a/tsocks.c
++++ b/tsocks.c
+@@ -62,6 +62,7 @@ static int (*realconnect)(CONNECT_SIGNAT
+ static int (*realselect)(SELECT_SIGNATURE);
+ static int (*realpoll)(POLL_SIGNATURE);
+ static int (*realclose)(CLOSE_SIGNATURE);
++static int (*realgetpeername)(GETPEERNAME_SIGNATURE);
+ static struct parsedfile *config;
+ static struct connreq *requests = NULL;
+ static int suid = 0;
+@@ -73,6 +74,7 @@ int connect(CONNECT_SIGNATURE);
+ int select(SELECT_SIGNATURE);
+ int poll(POLL_SIGNATURE);
+ int close(CLOSE_SIGNATURE);
++int getpeername(GETPEERNAME_SIGNATURE);
+ #ifdef USE_SOCKS_DNS
+ int res_init(void);
+ #endif
+@@ -109,14 +111,15 @@ void _init(void) {
+ 	/* most programs that are run won't use our services, so     */
+ 	/* we do our general initialization on first call            */
+ 
+-   /* Determine the logging level */
+-   suid = (getuid() != geteuid());
++	/* Determine the logging level */
++	suid = (getuid() != geteuid());
+ 
+ #ifndef USE_OLD_DLSYM
+ 	realconnect = dlsym(RTLD_NEXT, "connect");
+ 	realselect = dlsym(RTLD_NEXT, "select");
+ 	realpoll = dlsym(RTLD_NEXT, "poll");
+ 	realclose = dlsym(RTLD_NEXT, "close");
++	realgetpeername = dlsym(RTLD_NEXT, "getpeername");
+ 	#ifdef USE_SOCKS_DNS
+ 	realresinit = dlsym(RTLD_NEXT, "res_init");
+ 	#endif
+@@ -125,14 +128,15 @@ void _init(void) {
+ 	realconnect = dlsym(lib, "connect");
+ 	realselect = dlsym(lib, "select");
+ 	realpoll = dlsym(lib, "poll");
++	realgetpeername = dlsym(lib, "getpeername");
+ 	#ifdef USE_SOCKS_DNS
+ 	realresinit = dlsym(lib, "res_init");
+ 	#endif
+-	dlclose(lib);	
++	dlclose(lib);
+ 
+ 	lib = dlopen(LIBC, RTLD_LAZY);
+-   realclose = dlsym(lib, "close");
+-	dlclose(lib);	
++	realclose = dlsym(lib, "close");
++	dlclose(lib);
+ #endif
+ }
+ 
+@@ -350,8 +354,10 @@ int select(SELECT_SIGNATURE) {
+ 
+    /* If we're not currently managing any requests we can just 
+     * leave here */
+-   if (!requests)
++   if (!requests) {
++      show_msg(MSGDEBUG, "No requests waiting, calling real select\n");
+       return(realselect(n, readfds, writefds, exceptfds, timeout));
++   }
+ 
+    get_environment();
+ 
+@@ -705,6 +711,50 @@ int close(CLOSE_SIGNATURE) {
+    return(rc);
+ }
+ 
++/* If we are not done setting up the connection yet, return
++ * -1 and ENOTCONN, otherwise call getpeername
++ *
++ * This is necessary since some applications, when using non-blocking connect,
++ * (like ircII) use getpeername() to find out if they are connected already.
++ *
++ * This results in races sometimes, where the client sends data to the socket
++ * before we are done with the socks connection setup.  Another solution would
++ * be to intercept send().
++ * 
++ * This could be extended to actually set the peername to the peer the
++ * client application has requested, but not for now.
++ *
++ * PP, Sat, 27 Mar 2004 11:30:23 +0100
++ */
++int getpeername(GETPEERNAME_SIGNATURE) {
++   struct connreq *conn;
++   int rc;
++
++    if (realgetpeername == NULL) {
++        show_msg(MSGERR, "Unresolved symbol: getpeername\n");
++        return(-1);
++    }
++
++   show_msg(MSGDEBUG, "Call to getpeername for fd %d\n", __fd);
++
++
++   rc = realgetpeername(__fd, __name, __namelen);
++   if (rc == -1)
++       return rc;
++
++   /* Are we handling this connect? */
++   if ((conn = find_socks_request(__fd, 1))) {
++       /* While we are at it, we might was well try to do something useful */
++       handle_request(conn);
++
++       if (conn->state != DONE) {
++           errno = ENOTCONN;
++           return(-1);
++       }
++   }
++   return rc;
++}
++
+ static struct connreq *new_socks_request(int sockid, struct sockaddr_in *connaddr, 
+                                          struct sockaddr_in *serveraddr, 
+                                          struct serverent *path) {
+@@ -854,7 +904,7 @@ static int connect_server(struct connreq
+                     sizeof(conn->serveraddr));
+ 
+    show_msg(MSGDEBUG, "Connect returned %d, errno is %d\n", rc, errno); 
+-	if (rc) {
++   if (rc) {
+       if (errno != EINPROGRESS) {
+          show_msg(MSGERR, "Error %d attempting to connect to SOCKS "
+                   "server (%s)\n", errno, strerror(errno));

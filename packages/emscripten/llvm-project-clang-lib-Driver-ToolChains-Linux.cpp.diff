@@ -1,0 +1,40 @@
+--- a/clang/lib/Driver/ToolChains/Linux.cpp
++++ b/clang/lib/Driver/ToolChains/Linux.cpp
+@@ -197,8 +197,8 @@
+   // FIXME: This is a bit of a hack. We should really unify this code for
+   // reasoning about oslibdir spellings with the lib dir spellings in the
+   // GCCInstallationDetector, but that is a more significant refactoring.
+-  if (Triple.getArch() == llvm::Triple::x86 || Triple.isPPC32() ||
+-      Triple.getArch() == llvm::Triple::sparc)
++  if (!Triple.isAndroid() && (Triple.getArch() == llvm::Triple::x86 || Triple.isPPC32() ||
++      Triple.getArch() == llvm::Triple::sparc))
+     return "lib32";
+ 
+   if (Triple.getArch() == llvm::Triple::x86_64 && Triple.isX32())
+@@ -343,7 +343,8 @@
+   }
+ 
+   addPathIfExists(D, concat(SysRoot, "/usr/lib", MultiarchTriple), Paths);
+-  addPathIfExists(D, concat(SysRoot, "/usr", OSLibDir), Paths);
++  if (!IsAndroid)
++    addPathIfExists(D, concat(SysRoot, "/usr", OSLibDir), Paths);
+   if (IsRISCV) {
+     StringRef ABIName = tools::riscv::getRISCVABI(Args, Triple);
+     addPathIfExists(D, concat(SysRoot, "/", OSLibDir, ABIName), Paths);
+@@ -353,7 +354,15 @@
+   Generic_GCC::AddMultiarchPaths(D, SysRoot, OSLibDir, Paths);
+ 
+   addPathIfExists(D, concat(SysRoot, "/lib"), Paths);
+-  addPathIfExists(D, concat(SysRoot, "/usr/lib"), Paths);
++  bool nativeBuild = MultiarchTriple == getMultiarchTriple(D, llvm::Triple(llvm::sys::getDefaultTargetTriple()), SysRoot);
++  if (nativeBuild || !IsAndroid)
++    addPathIfExists(D, concat(SysRoot, "/usr/lib"), Paths);
++
++  if (IsAndroid) {
++    addPathIfExists(D, concat(SysRoot, "/usr/", MultiarchTriple, "/lib"), Paths);
++    addPathIfExists(D, concat("/system/", OSLibDir), Paths);
++    ExtraOpts.push_back(concat("-rpath=", SysRoot, "/usr/lib"));
++  }
+ }
+ 
+ ToolChain::RuntimeLibType Linux::GetDefaultRuntimeLibType() const {

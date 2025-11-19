@@ -1,0 +1,48 @@
+--- /dev/null	1972-07-31 19:09:33.659999999 +0530
++++ ./src/getaddrinfo.c	2022-05-20 09:52:04.320665911 +0530
+@@ -0,0 +1,45 @@
++// A really ugly fix for https://github.com/termux/termux-packages/issues/10277
++#include <dlfcn.h>
++#include <netdb.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#ifdef __TERMUX__
++
++#if defined(__aarch64__) || defined(__x86_64__)
++#define LIBC_PATH "/system/lib64/libc.so"
++#elif defined(__i686__) || defined(__arm__)
++#define LIBC_PATH "/system/lib/libc.so"
++#else
++#error Unsupported architecture
++#endif
++
++int getaddrinfo(const char* node,
++                const char* service,
++                const struct addrinfo* hints,
++                struct addrinfo** result) {
++  void* handle = dlopen(LIBC_PATH, RTLD_NOW);
++  if (!handle) {
++    fprintf(stderr, "%s\n", dlerror());
++    exit(EXIT_FAILURE);
++  }
++  // Clear any existing error
++  dlerror();
++  char* error;
++  if ((error = dlerror()) != NULL) {
++    fprintf(stderr, "%s\n", error);
++    exit(EXIT_FAILURE);
++  }
++  int getaddrinfo_ret;
++  int (*real_getaddrinfo)(
++      const char*, const char*, const struct addrinfo*, struct addrinfo**) =
++      dlsym(handle, "getaddrinfo");
++  if ((hints->ai_family == PF_INET6) && !strcmp(node, "localhost")) {
++    getaddrinfo_ret = real_getaddrinfo("ip6-localhost", service, hints, result);
++  } else {
++    getaddrinfo_ret = real_getaddrinfo(node, service, hints, result);
++  }
++  dlclose(handle);
++  return getaddrinfo_ret;
++}
++#endif

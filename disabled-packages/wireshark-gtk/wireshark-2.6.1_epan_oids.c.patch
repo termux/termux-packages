@@ -1,0 +1,12 @@
+diff -uNr wireshark-2.6.1/epan/oids.c wireshark-2.6.1.mod/epan/oids.c
+--- wireshark-2.6.1/epan/oids.c	2018-05-22 21:53:09.000000000 +0300
++++ wireshark-2.6.1.mod/epan/oids.c	2018-06-26 18:49:28.834971786 +0300
+@@ -1276,7 +1276,7 @@
+ 	g_string_append_printf(path_str, "%s", path);
+ 	g_free (path);
+ #else
+-	g_string_append(path_str, "/usr/share/snmp/mibs");
++	g_string_append(path_str, "@TERMUX_PREFIX@/share/snmp/mibs");
+ 	if (!smi_init_done)
+ 		smiInit(NULL);
+ 	path = smiGetPath();

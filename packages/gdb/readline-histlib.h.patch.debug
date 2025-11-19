@@ -1,0 +1,11 @@
+--- ./readline/histlib.h	2017-06-04 15:51:27.000000000 +0000
++++ ../histlib.h	2018-03-21 15:09:37.286670845 +0000
+@@ -52,7 +52,7 @@
+ 
+ #ifndef member
+ #  ifndef strchr
+-extern char *strchr ();
++extern char __attribute__((overloadable)) *strchr ();
+ #  endif
+ #define member(c, s) ((c) ? ((char *)strchr ((s), (c)) != (char *)NULL) : 0)
+ #endif

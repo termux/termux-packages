@@ -1,0 +1,11 @@
+--- ../cache/gnuit-4.9.5/src/system.c	2009-02-18 02:31:26.000000000 +0000
++++ ./src/system.c	2017-05-31 02:32:44.499460109 +0000
+@@ -162,7 +162,7 @@
+ 		close(0);
+ 	}
+ 
+-	execle("/bin/sh", "sh", "-c", command, (char *)NULL, environ);
++	execle("@TERMUX_PREFIX@/bin/sh", "sh", "-c", command, (char *)NULL, environ);
+ 
+ 	/* Make sure we exit if exec() fails.  Call _exit() instead of
+ 	   exit() to avoid flushing file descriptors twice (in the

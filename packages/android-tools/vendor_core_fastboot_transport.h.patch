@@ -1,0 +1,15 @@
+diff --git a/vendor/core/fastboot/transport.h b/vendor/core/fastboot/transport.h
+index de0cc92..0f73b5a 100644
+--- a/vendor/core/fastboot/transport.h
++++ b/vendor/core/fastboot/transport.h
+@@ -42,6 +42,10 @@ class Transport {
+     // this will return immediately. Returns 0 on success.
+     virtual int WaitForDisconnect() { return 0; }
+ 
++#ifdef __ANDROID__
++    virtual bool NotReusable() { return false; }
++#endif
++
+   private:
+     DISALLOW_COPY_AND_ASSIGN(Transport);
+ };

@@ -1,0 +1,224 @@
+diff -uNr qemu-8.2.5/accel/tcg/perf.c qemu-8.2.5.mod/accel/tcg/perf.c
+--- qemu-8.2.5/accel/tcg/perf.c	2024-06-10 20:19:05.000000000 +0300
++++ qemu-8.2.5.mod/accel/tcg/perf.c	2024-06-12 21:43:13.385221419 +0300
+@@ -50,7 +50,7 @@
+ {
+     char map_file[32];
+ 
+-    snprintf(map_file, sizeof(map_file), "/tmp/perf-%d.map", getpid());
++    snprintf(map_file, sizeof(map_file), "@TERMUX_PREFIX@/tmp/perf-%d.map", getpid());
+     perfmap = safe_fopen_w(map_file);
+     if (perfmap == NULL) {
+         warn_report("Could not open %s: %s, proceeding without perfmap",
+diff -uNr qemu-8.2.5/block/gluster.c qemu-8.2.5.mod/block/gluster.c
+--- qemu-8.2.5/block/gluster.c	2024-06-10 20:19:05.000000000 +0300
++++ qemu-8.2.5.mod/block/gluster.c	2024-06-12 21:43:13.385221419 +0300
+@@ -707,7 +707,7 @@
+                              "file.server.0.host=1.2.3.4,"
+                              "file.server.0.port=24007,"
+                              "file.server.1.transport=unix,"
+-                             "file.server.1.path=/var/run/glusterd.socket ..."
++                             "file.server.1.path=@TERMUX_PREFIX@/var/run/glusterd.socket ..."
+                              "\n");
+             return ret;
+         }
+diff -uNr qemu-8.2.5/block.c qemu-8.2.5.mod/block.c
+--- qemu-8.2.5/block.c	2024-06-10 20:19:05.000000000 +0300
++++ qemu-8.2.5.mod/block.c	2024-06-12 21:43:13.389221438 +0300
+@@ -861,7 +861,7 @@
+      * /var/tmp is usually on a disk, so more appropriate for disk images.
+      */
+     if (!g_strcmp0(tmpdir, "/tmp")) {
+-        tmpdir = "/var/tmp";
++        tmpdir = "@TERMUX_PREFIX@/tmp";
+     }
+ #endif
+ 
+diff -uNr qemu-8.2.5/contrib/ivshmem-server/main.c qemu-8.2.5.mod/contrib/ivshmem-server/main.c
+--- qemu-8.2.5/contrib/ivshmem-server/main.c	2024-06-10 20:19:05.000000000 +0300
++++ qemu-8.2.5.mod/contrib/ivshmem-server/main.c	2024-06-12 21:43:13.389221438 +0300
+@@ -14,8 +14,8 @@
+ 
+ #define IVSHMEM_SERVER_DEFAULT_VERBOSE        0
+ #define IVSHMEM_SERVER_DEFAULT_FOREGROUND     0
+-#define IVSHMEM_SERVER_DEFAULT_PID_FILE       "/var/run/ivshmem-server.pid"
+-#define IVSHMEM_SERVER_DEFAULT_UNIX_SOCK_PATH "/tmp/ivshmem_socket"
++#define IVSHMEM_SERVER_DEFAULT_PID_FILE       "@TERMUX_PREFIX@/var/run/ivshmem-server.pid"
++#define IVSHMEM_SERVER_DEFAULT_UNIX_SOCK_PATH "@TERMUX_PREFIX@/tmp/ivshmem_socket"
+ #define IVSHMEM_SERVER_DEFAULT_SHM_PATH       "ivshmem"
+ #define IVSHMEM_SERVER_DEFAULT_SHM_SIZE       (4 * 1024 * 1024)
+ #define IVSHMEM_SERVER_DEFAULT_N_VECTORS      1
+diff -uNr qemu-8.2.5/contrib/rdmacm-mux/main.c qemu-8.2.5.mod/contrib/rdmacm-mux/main.c
+--- qemu-8.2.5/contrib/rdmacm-mux/main.c	2024-06-10 20:19:05.000000000 +0300
++++ qemu-8.2.5.mod/contrib/rdmacm-mux/main.c	2024-06-12 21:43:13.389221438 +0300
+@@ -41,7 +41,7 @@
+ #define CM_SIDR_REQ_DGID_POS 44
+ 
+ /* The below can be override by command line parameter */
+-#define UNIX_SOCKET_PATH "/var/run/rdmacm-mux"
++#define UNIX_SOCKET_PATH "@TERMUX_PREFIX@/var/run/rdmacm-mux"
+ /* Has format %s-%s-%d" <path>-<rdma-dev--name>-<port> */
+ #define SOCKET_PATH_MAX (PATH_MAX - NAME_MAX - sizeof(int) - 2)
+ #define RDMA_PORT_NUM 1
+diff -uNr qemu-8.2.5/hw/hppa/machine.c qemu-8.2.5.mod/hw/hppa/machine.c
+--- qemu-8.2.5/hw/hppa/machine.c	2024-06-10 20:19:05.000000000 +0300
++++ qemu-8.2.5.mod/hw/hppa/machine.c	2024-06-12 21:43:54.585416673 +0300
+@@ -205,37 +205,37 @@
+     fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, ms->ram_size);
+ 
+     val = cpu_to_le64(MIN_SEABIOS_HPPA_VERSION);
+-    fw_cfg_add_file(fw_cfg, "/etc/firmware-min-version",
++    fw_cfg_add_file(fw_cfg, "@TERMUX_PREFIX@/etc/firmware-min-version",
+                     g_memdup(&val, sizeof(val)), sizeof(val));
+ 
+     val = cpu_to_le64(HPPA_TLB_ENTRIES - btlb_entries);
+-    fw_cfg_add_file(fw_cfg, "/etc/cpu/tlb_entries",
++    fw_cfg_add_file(fw_cfg, "@TERMUX_PREFIX@/etc/cpu/tlb_entries",
+                     g_memdup(&val, sizeof(val)), sizeof(val));
+ 
+     val = cpu_to_le64(btlb_entries);
+-    fw_cfg_add_file(fw_cfg, "/etc/cpu/btlb_entries",
++    fw_cfg_add_file(fw_cfg, "@TERMUX_PREFIX@/etc/cpu/btlb_entries",
+                     g_memdup(&val, sizeof(val)), sizeof(val));
+ 
+     len = strlen(mc->name) + 1;
+-    fw_cfg_add_file(fw_cfg, "/etc/hppa/machine",
++    fw_cfg_add_file(fw_cfg, "@TERMUX_PREFIX@/etc/hppa/machine",
+                     g_memdup(mc->name, len), len);
+ 
+     val = cpu_to_le64(soft_power_reg);
+-    fw_cfg_add_file(fw_cfg, "/etc/hppa/power-button-addr",
++    fw_cfg_add_file(fw_cfg, "@TERMUX_PREFIX@/etc/hppa/power-button-addr",
+                     g_memdup(&val, sizeof(val)), sizeof(val));
+ 
+     val = cpu_to_le64(CPU_HPA + 16);
+-    fw_cfg_add_file(fw_cfg, "/etc/hppa/rtc-addr",
++    fw_cfg_add_file(fw_cfg, "@TERMUX_PREFIX@/etc/hppa/rtc-addr",
+                     g_memdup(&val, sizeof(val)), sizeof(val));
+ 
+     val = cpu_to_le64(CPU_HPA + 24);
+-    fw_cfg_add_file(fw_cfg, "/etc/hppa/DebugOutputPort",
++    fw_cfg_add_file(fw_cfg, "@TERMUX_PREFIX@/etc/hppa/DebugOutputPort",
+                     g_memdup(&val, sizeof(val)), sizeof(val));
+ 
+     fw_cfg_add_i16(fw_cfg, FW_CFG_BOOT_DEVICE, ms->boot_config.order[0]);
+     qemu_register_boot_set(fw_cfg_boot_set, fw_cfg);
+ 
+-    fw_cfg_add_file(fw_cfg, "/etc/qemu-version",
++    fw_cfg_add_file(fw_cfg, "@TERMUX_PREFIX@/etc/qemu-version",
+                     g_memdup(qemu_version, sizeof(qemu_version)),
+                     sizeof(qemu_version));
+ 
+diff -uNr qemu-8.2.5/hw/usb/ccid-card-emulated.c qemu-8.2.5.mod/hw/usb/ccid-card-emulated.c
+--- qemu-8.2.5/hw/usb/ccid-card-emulated.c	2024-06-10 20:19:05.000000000 +0300
++++ qemu-8.2.5.mod/hw/usb/ccid-card-emulated.c	2024-06-12 21:43:13.389221438 +0300
+@@ -417,7 +417,7 @@
+     event_notifier_cleanup(&card->notifier);
+ }
+ 
+-#define CERTIFICATES_DEFAULT_DB "/etc/pki/nssdb"
++#define CERTIFICATES_DEFAULT_DB "@TERMUX_PREFIX@/etc/pki/nssdb"
+ #define CERTIFICATES_ARGS_TEMPLATE\
+     "db=\"%s\" use_hw=no soft=(,Virtual Reader,CAC,,%s,%s,%s)"
+ 
+diff -uNr qemu-8.2.5/linux-user/main.c qemu-8.2.5.mod/linux-user/main.c
+--- qemu-8.2.5/linux-user/main.c	2024-06-10 20:19:05.000000000 +0300
++++ qemu-8.2.5.mod/linux-user/main.c	2024-06-12 21:43:13.389221438 +0300
+@@ -519,7 +519,7 @@
+      "",           "assume CALL0 Xtensa ABI"},
+ #endif
+     {"perfmap",    "QEMU_PERFMAP",     false, handle_arg_perfmap,
+-     "",           "Generate a /tmp/perf-${pid}.map file for perf"},
++     "",           "Generate a @TERMUX_PREFIX@/tmp/perf-${pid}.map file for perf"},
+     {"jitdump",    "QEMU_JITDUMP",     false, handle_arg_jitdump,
+      "",           "Generate a jit-${pid}.dump file for perf"},
+     {NULL, NULL, false, NULL, NULL, NULL}
+diff -uNr qemu-8.2.5/linux-user/syscall.c qemu-8.2.5.mod/linux-user/syscall.c
+--- qemu-8.2.5/linux-user/syscall.c	2024-06-10 20:19:05.000000000 +0300
++++ qemu-8.2.5.mod/linux-user/syscall.c	2024-06-12 21:43:13.389221438 +0300
+@@ -8380,7 +8380,7 @@
+             /* create temporary file to map stat to */
+             tmpdir = getenv("TMPDIR");
+             if (!tmpdir)
+-                tmpdir = "/tmp";
++                tmpdir = "@TERMUX_PREFIX@/tmp";
+             snprintf(filename, sizeof(filename), "%s/qemu-open.XXXXXX", tmpdir);
+             fd = mkstemp(filename);
+             if (fd < 0) {
+diff -uNr qemu-8.2.5/migration/migration.c qemu-8.2.5.mod/migration/migration.c
+--- qemu-8.2.5/migration/migration.c	2024-06-10 20:19:05.000000000 +0300
++++ qemu-8.2.5.mod/migration/migration.c	2024-06-12 21:43:13.393221456 +0300
+@@ -476,7 +476,7 @@
+         QAPI_LIST_APPEND(tail, g_strdup(exec_get_cmd_path()));
+         QAPI_LIST_APPEND(tail, g_strdup("/c"));
+ #else
+-        QAPI_LIST_APPEND(tail, g_strdup("/bin/sh"));
++        QAPI_LIST_APPEND(tail, g_strdup("@TERMUX_PREFIX@/bin/sh"));
+         QAPI_LIST_APPEND(tail, g_strdup("-c"));
+ #endif
+         QAPI_LIST_APPEND(tail, g_strdup(uri + strlen("exec:")));
+diff -uNr qemu-8.2.5/net/tap.c qemu-8.2.5.mod/net/tap.c
+--- qemu-8.2.5/net/tap.c	2024-06-10 20:19:05.000000000 +0300
++++ qemu-8.2.5.mod/net/tap.c	2024-06-12 21:43:13.393221456 +0300
+@@ -578,7 +578,7 @@
+             *parg++ = helper_cmd;
+             *parg++ = NULL;
+ 
+-            execv("/bin/sh", args);
++            execv("@TERMUX_PREFIX@/bin/sh", args);
+             g_free(helper_cmd);
+         } else {
+             /* assume helper is just the executable path name */
+diff -uNr qemu-8.2.5/qemu-io.c qemu-8.2.5.mod/qemu-io.c
+--- qemu-8.2.5/qemu-io.c	2024-06-10 20:19:05.000000000 +0300
++++ qemu-8.2.5.mod/qemu-io.c	2024-06-12 21:43:13.393221456 +0300
+@@ -124,7 +124,7 @@
+ " opens a new file in the requested mode\n"
+ "\n"
+ " Example:\n"
+-" 'open -n -o driver=raw /tmp/data' - opens raw data file read-write, uncached\n"
++" 'open -n -o driver=raw @TERMUX_PREFIX@/tmp/data' - opens raw data file read-write, uncached\n"
+ "\n"
+ " Opens a file for subsequent use by all of the other qemu-io commands.\n"
+ " -r, -- open file read-only\n"
+diff -uNr qemu-8.2.5/qemu-nbd.c qemu-8.2.5.mod/qemu-nbd.c
+--- qemu-8.2.5/qemu-nbd.c	2024-06-10 20:19:05.000000000 +0300
++++ qemu-8.2.5.mod/qemu-nbd.c	2024-06-12 21:43:13.393221456 +0300
+@@ -57,7 +57,6 @@
+ #define HAVE_NBD_DEVICE 0
+ #endif
+ 
+-#define SOCKET_PATH                "/var/lock/qemu-nbd-%s"
+ #define QEMU_NBD_OPT_CACHE         256
+ #define QEMU_NBD_OPT_AIO           257
+ #define QEMU_NBD_OPT_DISCARD       258
+@@ -95,7 +94,7 @@
+ "  -p, --port=PORT           port to listen on (default `%d')\n"
+ "  -b, --bind=IFACE          interface to bind to (default `0.0.0.0')\n"
+ "  -k, --socket=PATH         path to the unix socket\n"
+-"                            (default '"SOCKET_PATH"')\n"
++"                            (default '@TERMUX_PREFIX@/tmp/nbd-%s')\n"
+ "  -e, --shared=NUM          device can be shared by NUM clients (default '1')\n"
+ "  -t, --persistent          don't exit on the last connection\n"
+ "  -v, --verbose             display extra debugging information\n"
+@@ -1032,7 +1031,7 @@
+ 
+     if (opts.device != NULL && sockpath == NULL) {
+         sockpath = g_malloc(128);
+-        snprintf(sockpath, 128, SOCKET_PATH, basename(opts.device));
++        snprintf(sockpath, 128, "@TERMUX_PREFIX@/tmp/nbd-%s", basename(opts.device));
+     }
+ 
+     server = qio_net_listener_new();
+diff -uNr qemu-8.2.5/util/module.c qemu-8.2.5.mod/util/module.c
+--- qemu-8.2.5/util/module.c	2024-06-10 20:19:06.000000000 +0300
++++ qemu-8.2.5.mod/util/module.c	2024-06-12 21:43:13.393221456 +0300
+@@ -242,7 +242,7 @@
+     version_dir = g_strcanon(g_strdup(QEMU_PKGVERSION),
+                              G_CSET_A_2_Z G_CSET_a_2_z G_CSET_DIGITS "+-.~",
+                              '_');
+-    dirs[n_dirs++] = g_strdup_printf("/var/run/qemu/%s", version_dir);
++    dirs[n_dirs++] = g_strdup_printf("@TERMUX_PREFIX@/var/run/qemu/%s", version_dir);
+ #endif
+     assert(n_dirs <= ARRAY_SIZE(dirs));
+ 

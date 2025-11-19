@@ -1,0 +1,18 @@
+Termux sets AT_EACCESS as 0, see ../../ndk-patches/*/linux-fcntl.h.patch.
+This is not allowed in macros FLAG_GENERIC and cause compilation failure.
+
+Although Android doesn't support AT_EACCESS, using its original value here
+shouldn't cause runtime issues.
+
+diff -uNr qemu-8.2.5/linux-user/strace.c qemu-8.2.5.mod/linux-user/strace.c
+--- qemu-8.2.5/linux-user/strace.c	2024-06-10 20:19:05.000000000 +0300
++++ qemu-8.2.5.mod/linux-user/strace.c	2024-06-12 22:41:27.640567571 +0300
+@@ -977,7 +977,7 @@
+ 
+ UNUSED static const struct flags at_file_flags[] = {
+ #ifdef AT_EACCESS
+-    FLAG_GENERIC(AT_EACCESS),
++    FLAG_GENERIC(/* AT_EACCESS */ 0x200),
+ #endif
+ #ifdef AT_SYMLINK_NOFOLLOW
+     FLAG_GENERIC(AT_SYMLINK_NOFOLLOW),

@@ -1,0 +1,28 @@
+diff -uNr openssh-portable-V_9_5_P1/misc.c openssh-portable-V_9_5_P1.mod/misc.c
+--- openssh-portable-V_9_5_P1/misc.c	2023-10-04 07:34:10.000000000 +0300
++++ openssh-portable-V_9_5_P1.mod/misc.c	2023-11-23 16:29:34.264542664 +0200
+@@ -1818,7 +1818,7 @@
+ 		if (r > 0 && (size_t)r < len)
+ 			return;
+ 	}
+-	r = snprintf(s, len, "/tmp/ssh-XXXXXXXXXXXX");
++	r = snprintf(s, len, "@TERMUX_PREFIX@/tmp/ssh-XXXXXXXXXXXX");
+ 	if (r < 0 || (size_t)r >= len)
+ 		fatal_f("template string too short");
+ }
+@@ -2777,6 +2777,7 @@
+ 			    pw->pw_name, (u_int)pw->pw_gid, strerror(errno));
+ 			_exit(1);
+ 		}
++#ifndef __ANDROID__
+ 		if (setresgid(pw->pw_gid, pw->pw_gid, pw->pw_gid) == -1) {
+ 			error("%s: setresgid %u: %s", tag, (u_int)pw->pw_gid,
+ 			    strerror(errno));
+@@ -2787,6 +2788,7 @@
+ 			    strerror(errno));
+ 			_exit(1);
+ 		}
++#endif
+ 		/* stdin is pointed to /dev/null at this point */
+ 		if ((flags & SSH_SUBPROCESS_STDOUT_DISCARD) != 0 &&
+ 		    dup2(STDIN_FILENO, STDERR_FILENO) == -1) {

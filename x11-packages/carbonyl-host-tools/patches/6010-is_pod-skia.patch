@@ -1,0 +1,33 @@
+Upstream relaxes this assertion from `is_pod` to `is_trivially_copyable` in commit [1]
+
+[1] https://skia.googlesource.com/skia/+/a27bf1bfee7af30321e108e7f149213bc27ca866
+
+--- a/third_party/skia/src/gpu/BufferWriter.h
++++ b/third_party/skia/src/gpu/BufferWriter.h
+@@ -264,7 +264,7 @@
+ 
+ template <typename T>
+ inline VertexWriter& operator<<(VertexWriter& w, const T& val) {
+-    static_assert(std::is_pod<T>::value, "");
++    static_assert(std::is_trivial_v<T> && std::is_standard_layout_v<T>, "");
+     w.validate(sizeof(T));
+     memcpy(w.fPtr, &val, sizeof(T));
+     w = w.makeOffset(sizeof(T));
+@@ -273,7 +273,7 @@
+ 
+ template <typename T>
+ inline VertexWriter& operator<<(VertexWriter& w, const VertexWriter::Conditional<T>& val) {
+-    static_assert(std::is_pod<T>::value, "");
++    static_assert(std::is_trivial_v<T> && std::is_standard_layout_v<T>, "");
+     if (val.fCondition) {
+         w << val.fValue;
+     }
+@@ -288,7 +288,7 @@
+ 
+ template <typename T>
+ inline VertexWriter& operator<<(VertexWriter& w, const VertexWriter::ArrayDesc<T>& array) {
+-    static_assert(std::is_pod<T>::value, "");
++    static_assert(std::is_trivial_v<T> && std::is_standard_layout_v<T>, "");
+     w.validate(array.fCount * sizeof(T));
+     memcpy(w.fPtr, array.fArray, array.fCount * sizeof(T));
+     w = w.makeOffset(sizeof(T) * array.fCount);

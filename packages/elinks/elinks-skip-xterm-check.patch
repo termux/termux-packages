@@ -1,0 +1,22 @@
+diff --git a/src/osdep/osdep.c b/src/osdep/osdep.c
+index e8fd5b9e..59f4c6d3 100644
+--- a/src/osdep/osdep.c
++++ b/src/osdep/osdep.c
+@@ -328,6 +328,7 @@ check_more_envs(void)
+ int
+ is_xterm(void)
+ {
++#ifndef __TERMUX__
+ 	static int xt = -1;
+ 
+ 	if (xt == -1) {
+@@ -355,6 +356,9 @@ is_xterm(void)
+ 	}
+ 
+ 	return xt;
++#else
++	return 1; /* Skip checking and always return true on Termux */
++#endif
+ }
+ 
+ #endif

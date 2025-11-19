@@ -1,0 +1,25 @@
+diff -u -r ../checkinstall-1.6.2/installwatch/Makefile ./installwatch/Makefile
+--- ../checkinstall-1.6.2/installwatch/Makefile	2008-11-16 11:20:53.000000000 -0500
++++ ./installwatch/Makefile	2016-10-28 16:34:12.825762120 -0400
+@@ -4,7 +4,7 @@
+ # Well, the only configurable part is the following variable.
+ # Make sure the directory you specify exists.
+ 
+-PREFIX=/usr/local
++PREFIX?=/usr/local
+ 
+ # End of configurable part
+ 
+@@ -16,10 +16,10 @@
+ all: installwatch.so
+ 
+ installwatch.so: installwatch.o
+-	ld -shared -o installwatch.so installwatch.o -ldl -lc
++	$(CC) $(LDFLAGS) -shared -o installwatch.so installwatch.o -ldl -lc -llog
+ 
+ installwatch.o: installwatch.c localdecls.h
+-	gcc -Wall -c -D_GNU_SOURCE -DPIC -fPIC -D_REENTRANT -DVERSION=\"$(VERSION)\" installwatch.c
++	$(CC) $(CFLAGS) -Wall -c -D_GNU_SOURCE -DPIC -fPIC -D_REENTRANT -DVERSION=\"$(VERSION)\" installwatch.c
+ 
+ localdecls.h: create-localdecls
+ 	./create-localdecls

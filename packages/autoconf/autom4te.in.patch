@@ -1,0 +1,11 @@
+--- ./bin/autom4te.in.orig	2021-08-19 21:45:43.203065990 +0200
++++ ./bin/autom4te.in	2021-08-19 21:46:46.779739045 +0200
+@@ -94,7 +94,7 @@
+ my $m4 = $ENV{"M4"} || '@M4@';
+ # Some non-GNU m4's don't reject the --help option, so give them /dev/null.
+ fatal "need GNU m4 1.4 or later: $m4"
+-  if system "$m4 --help </dev/null 2>&1 | grep reload-state >/dev/null";
++  if system "$m4 --help 2>&1 | grep reload-state >/dev/null";
+ 
+ # Set some high recursion limit as the default limit, 250, has already
+ # been hit with AC_OUTPUT.  Don't override the user's choice.

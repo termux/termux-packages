@@ -1,0 +1,29 @@
+--- a/src/keyfile.c
++++ b/src/keyfile.c
+@@ -91,7 +91,7 @@
+ # define GEANY_DEFAULT_FONT_MSG_WINDOW	"Menlo Medium 12"
+ # define GEANY_DEFAULT_FONT_EDITOR		"Menlo Medium 12"
+ #else
+-# define GEANY_DEFAULT_TOOLS_TERMINAL	"xterm -e \"/bin/sh %c\""
++# define GEANY_DEFAULT_TOOLS_TERMINAL	"aterm -e \"@TERMUX_PREFIX@/bin/sh %c\""
+ # define GEANY_DEFAULT_USE_NATIVE_DLGS	FALSE
+ # define GEANY_DEFAULT_FONT_SYMBOL_LIST	"Sans 9"
+ # define GEANY_DEFAULT_FONT_MSG_WINDOW	"Monospace 9"
+@@ -991,7 +991,7 @@
+ 	{
+ 		VteConfig *vc = &vte_config;
+ 		struct passwd *pw = getpwuid(getuid());
+-		const gchar *shell = (pw != NULL) ? pw->pw_shell : "/bin/sh";
++		const gchar *shell = (pw != NULL) ? pw->pw_shell : "@TERMUX_PREFIX@/bin/sh";
+ 
+ #ifdef __APPLE__
+ 		/* Geany is started using launchd on OS X and we don't get any environment variables
+@@ -1053,7 +1053,7 @@
+ 			else
+ 				cmd = g_strconcat(cmd, " %c", NULL);
+ #else
+-			cmd = g_strconcat(cmd, " -e \"/bin/sh %c\"", NULL);
++			cmd = g_strconcat(cmd, " -e \"@TERMUX_PREFIX@/bin/sh %c\"", NULL);
+ #endif
+ 			g_free(tmp_string);
+ 		}

@@ -1,0 +1,16 @@
+TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/gsasl
+TERMUX_PKG_DESCRIPTION="GNU SASL library"
+TERMUX_PKG_LICENSE="LGPL-2.1, GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="2.2.2"
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/gsasl/gsasl-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=41e8e442648eccaf6459d9ad93d4b18530b96c8eaf50e3f342532ef275eff3ba
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libidn"
+TERMUX_PKG_BREAKS="libgsasl-dev"
+TERMUX_PKG_REPLACES="libgsasl-dev"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+ac_cv_func_getpass=yes
+--without-libgcrypt
+"

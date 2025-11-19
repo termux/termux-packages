@@ -1,0 +1,11 @@
+--- a/src/gauche/priv/pairP.h
++++ b/src/gauche/priv/pairP.h
+@@ -65,7 +65,7 @@
+  * and immutable pairs, but that'll break existing code which tests equality
+  * of class, rather than is-a relationship.
+  */
+-typedef struct ScmExtendedPairDescriptorRec {
++typedef __attribute__((__aligned__(8))) struct ScmExtendedPairDescriptorRec {
+     ScmClass *klass;
+     u_long flags;
+     void (*setCar)(ScmObj, ScmObj);

@@ -1,0 +1,11 @@
+--- a/quilt/setup.in
++++ b/quilt/setup.in
+@@ -219,7 +219,7 @@
+ 		specdir=$PWD
+ 	fi
+ 
+-	tmpdir=$(gen_tempfile -d ${VARTMPDIR:-/var/tmp}/${0##*/})
++	tmpdir=$(gen_tempfile -d ${VARTMPDIR:-@TERMUX_PREFIX@/tmp}/${0##*/})
+ 	mkdir -p $tmpdir || exit 1
+ 	add_exit_handler "rm -rf $tmpdir"
+ 	mkdir -p $tmpdir/bin

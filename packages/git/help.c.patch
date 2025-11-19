@@ -1,0 +1,21 @@
+diff -u -r ../git-2.9.3/help.c ./help.c
+--- ../git-2.9.3/help.c	2016-08-12 15:38:45.000000000 -0400
++++ ./help.c	2016-08-23 06:15:57.698156213 -0400
+@@ -307,7 +307,7 @@
+ 
+ static const char bad_interpreter_advice[] =
+ 	N_("'%s' appears to be a git command, but we were not\n"
+-	"able to execute it. Maybe git-%s is broken?");
++	"able to execute it. Maybe you need to 'pkg install perl'?");
+ 
+ const char *help_unknown_cmd(const char *cmd)
+ {
+@@ -339,7 +339,7 @@
+ 		 * it's a bad interpreter in the #! line.
+ 		 */
+ 		if (!strcmp(candidate, cmd))
+-			die(_(bad_interpreter_advice), cmd, cmd);
++			die(_(bad_interpreter_advice), cmd);
+ 
+ 		/* Does the candidate appear in common_cmds list? */
+ 		while (n < ARRAY_SIZE(common_cmds) &&

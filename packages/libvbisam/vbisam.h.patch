@@ -1,0 +1,14 @@
+--- a/vbisam.h
++++ b/vbisam.h
+@@ -25,7 +25,11 @@
+ #define	VBISAM_USE_LONG_LONG	/* Note hack for now */
+ 
+ #ifdef	VBISAM_USE_LONG_LONG
++#ifdef __ANDROID__
++#define	vbisam_off_t	off_t
++#else
+ #define	vbisam_off_t	long long
++#endif
+ #else
+ #define	vbisam_off_t	int
+ #endif

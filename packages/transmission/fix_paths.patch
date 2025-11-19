@@ -1,0 +1,20 @@
+--- a/libtransmission/platform.cc
++++ b/libtransmission/platform.cc
+@@ -304,7 +304,7 @@
+     {
+         char const* const pkg = PACKAGE_DATA_DIR;
+         auto const xdg = tr_env_get_string("XDG_DATA_DIRS"sv);
+-        auto const buf = fmt::format(FMT_STRING("{:s}:{:s}:/usr/local/share:/usr/share"), pkg, xdg);
++        auto const buf = fmt::format(FMT_STRING("{:s}:{:s}:@TERMUX_PREFIX@/share"), pkg, xdg);
+ 
+         auto sv = std::string_view{ buf };
+         auto token = std::string_view{};
+@@ -336,7 +336,7 @@
+ {
+ #ifndef _WIN32
+ 
+-    return std::string{ "/tmp"sv };
++    return std::string{ "@TERMUX_PREFIX@/tmp"sv };
+ 
+ #else
+ 

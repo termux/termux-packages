@@ -1,0 +1,92 @@
+diff --git a/src/task-manager-linux.c b/src/task-manager-linux.c
+index e0b5d71..3f3eb10 100644
+--- a/src/task-manager-linux.c
++++ b/src/task-manager-linux.c
+@@ -21,6 +21,10 @@
+ #include <glib.h>
+ 
+ #include "task-manager.h"
++#ifdef __ANDROID__
++#include <android/api-level.h>
++static GArray *_tasks = NULL;
++#endif
+ 
+ static gushort _cpu_count = 0;
+ static gulong jiffies_total_delta = 0;
+@@ -71,9 +75,51 @@ get_memory_usage (guint64 *memory_total, guint64 *memory_available, guint64 *mem
+ 	return file ? TRUE : FALSE;
+ }
+ 
++#ifdef __ANDROID__
++gboolean
++get_task_list_orig (GArray *task_list);
++
++gboolean
++get_cpu_usage_android_28 (gushort *cpu_count, gfloat *cpu_user, gfloat *cpu_system)
++{
++	static gulong jiffies_total = 0, jiffies_total_old = 0;
++	struct timespec ts;
++	Task task;
++
++    _cpu_count = sysconf(_SC_NPROCESSORS_ONLN);
++
++	jiffies_total_old = jiffies_total;
++    if (0 >= clock_gettime(CLOCK_BOOTTIME, &ts)) {
++        jiffies_total = (ts.tv_sec + ts.tv_nsec * 1.0e-9) * sysconf(_SC_CLK_TCK);
++	}
++	if (jiffies_total > jiffies_total_old)
++	{
++		jiffies_total_delta = (jiffies_total - jiffies_total_old) * _cpu_count;
++	}
++
++	
++	*cpu_system = 0;
++	*cpu_user = 0;
++	*cpu_count = _cpu_count;
++
++	if (_tasks != NULL) { g_array_free(_tasks, TRUE); }
++	_tasks = g_array_new(FALSE, FALSE, sizeof (Task));
++	get_task_list_orig(_tasks);
++	for (guint i = 0; i < _tasks->len; i++) {
++		task = g_array_index(_tasks, Task, i);
++		*cpu_user += task.cpu_user;
++		*cpu_system += task.cpu_system;
++	}
++	return TRUE;
++}
++#endif
++
+ gboolean
+ get_cpu_usage (gushort *cpu_count, gfloat *cpu_user, gfloat *cpu_system)
+ {
++#ifdef __ANDROID__
++    if (android_get_device_api_level() >= 28) return get_cpu_usage_android_28(cpu_count, cpu_user, cpu_system);
++#endif
+ 	FILE *file;
+ 	gchar *filename = "/proc/stat";
+ 	gchar buffer[1024];
+@@ -328,6 +374,24 @@ get_task_details (GPid pid, Task *task)
+ gboolean
+ get_task_list (GArray *task_list)
+ {
++#ifdef __ANDROID__
++    if (android_get_device_api_level() >= 28) {
++		if (_tasks == NULL) { return TRUE; }
++		Task task;
++		for (guint i = 0; i < _tasks->len; i++) {
++			task = g_array_index(_tasks, Task, i);
++			g_array_append_val (task_list, task);
++		}
++		return TRUE;
++	} else {
++		return get_task_list_orig(task_list);
++	}
++}
++
++gboolean
++get_task_list_orig (GArray *task_list) 
++{
++#endif
+ 	GDir *dir;
+ 	const gchar *name;
+ 	GPid pid;

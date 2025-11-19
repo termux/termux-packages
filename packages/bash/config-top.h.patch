@@ -1,0 +1,31 @@
+diff --git a/config-top.h b/config-top.h
+index c47ab01b..5b84833e 100644
+--- a/config-top.h
++++ b/config-top.h
+@@ -58,7 +58,7 @@
+ /* The default value of the PATH variable. */
+ #ifndef DEFAULT_PATH_VALUE
+ #define DEFAULT_PATH_VALUE \
+-  "/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:."
++  "@TERMUX_PREFIX@/bin:."
+ #endif
+ 
+ /* If you want to unconditionally set a value for PATH in every restricted
+@@ -69,7 +69,7 @@
+    the Posix.2 confstr () function, or CS_PATH define are not present. */
+ #ifndef STANDARD_UTILS_PATH
+ #define STANDARD_UTILS_PATH \
+-  "/bin:/usr/bin:/sbin:/usr/sbin"
++  "@TERMUX_PREFIX@/bin"
+ #endif
+ 
+ /* The default path for enable -f */
+@@ -92,7 +92,7 @@
+ #define DEFAULT_BASHRC "~/.bashrc"
+ 
+ /* System-wide .bashrc file for interactive shells. */
+-/* #define SYS_BASHRC "/etc/bash.bashrc" */
++#define SYS_BASHRC "@TERMUX_PREFIX@/etc/bash.bashrc"
+ 
+ /* System-wide .bash_logout for login shells. */
+ /* #define SYS_BASH_LOGOUT "/etc/bash.bash_logout" */

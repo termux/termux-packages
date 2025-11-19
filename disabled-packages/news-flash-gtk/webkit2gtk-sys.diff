@@ -1,0 +1,35 @@
+--- a/Gir.toml
++++ b/Gir.toml
+@@ -3,7 +3,7 @@
+ work_mode = "sys"
+ min_cfg_version="2.4"
+ library = "WebKit2"
+-version = "4.0"
++version = "4.1"
+ single_version_file = "."
+ target_path = "."
+ 
+--- a/build.rs
++++ b/build.rs
+@@ -29,8 +29,8 @@
+ 
+ #[cfg(not(feature = "dox"))]
+ fn find() -> Result<(), Error> {
+-    let package_name = "webkit2gtk-4.0";
+-    let shared_libs = ["webkit2gtk-4.0", "javascriptcoregtk-4.0"];
++    let package_name = "webkit2gtk-4.1";
++    let shared_libs = ["webkit2gtk-4.1", "javascriptcoregtk-4.1"];
+     let version = if cfg!(feature = "v2_28") {
+         "2.28"
+     } else if cfg!(feature = "v2_26") {
+--- a/tests/abi.rs
++++ b/tests/abi.rs
+@@ -14,7 +14,7 @@
+ use tempfile::Builder;
+ use webkit2gtk_sys::*;
+ 
+-static PACKAGES: &[&str] = &["webkit2gtk-4.0"];
++static PACKAGES: &[&str] = &["webkit2gtk-4.1"];
+ 
+ #[derive(Clone, Debug)]
+ struct Compiler {

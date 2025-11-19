@@ -1,0 +1,35 @@
+--- a/w.c
++++ b/w.c
+@@ -57,6 +57,9 @@
+ #include <unistd.h>
+ #ifdef HAVE_UTMPX_H
+ #	include <utmpx.h>
++#ifdef __ANDROID__
++#	include <utmp.h>
++#endif
+ #else
+ #	include <utmp.h>
+ #endif
+@@ -207,13 +207,6 @@
+ 
+ 	if (ip_addresses) { /* -i switch used */
+ 		memcpy(&ut_addr_v6, &u->ut_addr_v6, sizeof(ut_addr_v6));
+-		if (IN6_IS_ADDR_V4MAPPED(&ut_addr_v6)) {
+-			/* map back */
+-			ut_addr_v6[0] = ut_addr_v6[3];
+-			ut_addr_v6[1] = 0;
+-			ut_addr_v6[2] = 0;
+-			ut_addr_v6[3] = 0;
+-		}
+ 		if (ut_addr_v6[1] || ut_addr_v6[2] || ut_addr_v6[3]) {
+ 			/* IPv6 */
+ 			if (!inet_ntop(AF_INET6, &ut_addr_v6, buf_ipv6, sizeof(buf_ipv6))) {
+@@ -626,7 +619,7 @@
+ #ifdef HAVE_UTMPX_H
+ 	setutxent();
+ #else
+-	utmpname(UTMP_FILE);
++	utmpname(_PATH_UTMP);
+ 	setutent();
+ #endif
+ 	if (user) {

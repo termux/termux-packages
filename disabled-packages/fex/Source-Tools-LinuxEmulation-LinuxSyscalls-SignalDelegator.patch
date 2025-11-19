@@ -1,0 +1,23 @@
+diff --git a/Source/Tools/LinuxEmulation/LinuxSyscalls/SignalDelegator.cpp b/Source/Tools/LinuxEmulation/LinuxSyscalls/SignalDelegator.cpp
+index 0f5b166..73db0a5 100644
+--- a/Source/Tools/LinuxEmulation/LinuxSyscalls/SignalDelegator.cpp
++++ b/Source/Tools/LinuxEmulation/LinuxSyscalls/SignalDelegator.cpp
+@@ -41,6 +41,18 @@ $end_info$
+ #define SS_AUTODISARM (1U << 31)
+ #endif
+ 
++/*
++/home/builder/.termux-build/fex/src/Source/Tools/FEXLoader/LinuxSyscalls/SignalDelegator.cpp:931:24: error: expected unqualified-id
++    constexpr uint32_t SA_RESTORER = 0x04000000;
++                       ^
++/home/builder/.termux-build/_cache/android-r26b-api-24-v0/sysroot/usr/include/aarch64-linux-android/asm/signal.h:21:21: note: expanded from macro 'SA_RESTORER'
++#define SA_RESTORER 0x04000000
++                    ^
++*/
++#ifdef SA_RESTORER
++#undef SA_RESTORER
++#endif
++
+ namespace FEX::HLE {
+ #ifdef _M_X86_64
+   __attribute__((naked))

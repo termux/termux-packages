@@ -1,0 +1,303 @@
+From 5211873a91f4d02ab20a2649894d0529f35f7542 Mon Sep 17 00:00:00 2001
+From: xingguangcuican6666 <xingguangcuican666@foxmail.com>
+Date: Mon, 20 Oct 2025 06:23:45 +0800
+Subject: [PATCH] fix_mp_and_Makefile
+
+---
+ Makefile.am       |   2 +-
+ src/mount_image.c | 133 +++++++++++++++++++++-------------------------
+ 2 files changed, 61 insertions(+), 74 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 4d6576a1..cbc3bd2a 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -259,7 +259,7 @@ wimlib_imagex_cmds =	\
+ install-exec-hook:
+ 	for cmd in $(wimlib_imagex_cmds); do				\
+ 		cd $(DESTDIR)$(bindir) &&				\
+-			ln -f wimlib-imagex wim$${cmd};			\
++			ln -sf wimlib-imagex wim$${cmd};			\
+ 	done
+ 
+ install-data-hook:
+diff --git a/src/mount_image.c b/src/mount_image.c
+index 36bf1b97..e8443dd5 100644
+--- a/src/mount_image.c
++++ b/src/mount_image.c
+@@ -45,7 +45,7 @@
+ #include <errno.h>
+ #include <fuse.h>
+ #include <limits.h>
+-#include <mqueue.h>
++#include <sys/socket.h> /* For socketpair() */
+ #include <stdlib.h>
+ #include <string.h>
+ #include <sys/stat.h>
+@@ -81,13 +81,11 @@
+ #  define RENAME_EXCHANGE	(1 << 1)
+ #endif
+ 
+-#define WIMFS_MQUEUE_NAME_LEN 32
+-
+ #define WIMLIB_UNMOUNT_FLAG_SEND_PROGRESS 0x80000000
+ 
+ struct wimfs_unmount_info {
+ 	unsigned unmount_flags;
+-	char mq_name[WIMFS_MQUEUE_NAME_LEN + 1];
++	int ipc_fd; /* PATCH: Replaced mq_name with a file descriptor for IPC */
+ };
+ 
+ struct commit_progress_report {
+@@ -1111,26 +1109,29 @@ static enum wimlib_progress_status
+ commit_progress_func(enum wimlib_progress_msg msg,
+ 		     union wimlib_progress_info *info, void *progctx)
+ {
+-	mqd_t mq = *(mqd_t *)progctx;
++	int ipc_fd = *(int *)progctx;
+ 	struct commit_progress_report report;
+ 
+ 	memset(&report, 0, sizeof(report));
+ 	report.msg = msg;
+ 	if (info)
+ 		report.info = *info;
+-	mq_send(mq, (const char *)&report, sizeof(report), 1);
++	/* PATCH: Replaced mq_send with send */
++	send(ipc_fd, &report, sizeof(report), 0);
+ 	return WIMLIB_PROGRESS_STATUS_CONTINUE;
+ }
+ 
+ /* Commit the mounted image to the underlying WIM file.  */
++/* 替换 commit_image 函数 */
+ static int
+-commit_image(struct wimfs_context *ctx, int unmount_flags, mqd_t mq)
++commit_image(struct wimfs_context *ctx, int unmount_flags, int ipc_fd) /* PATCH: Changed 'mqd_t mq' to 'int ipc_fd' */
+ {
+ 	int write_flags;
+ 
+ 	if (unmount_flags & WIMLIB_UNMOUNT_FLAG_SEND_PROGRESS)
++		/* PATCH: Pass the address of the integer file descriptor */
+ 		wimlib_register_progress_function(ctx->wim,
+-						  commit_progress_func, &mq);
++						  commit_progress_func, &ipc_fd);
+ 	else
+ 		wimlib_register_progress_function(ctx->wim, NULL, NULL);
+ 
+@@ -1168,6 +1169,7 @@ may_unmount_wimfs(void)
+ }
+ 
+ /* Unmount the mounted image, called from the daemon process.  */
++/* 替换 unmount_wimfs 函数 */
+ static int
+ unmount_wimfs(void)
+ {
+@@ -1175,17 +1177,18 @@ unmount_wimfs(void)
+ 	struct wimfs_context *wimfs_ctx = WIMFS_CTX(fuse_ctx);
+ 	const struct wimfs_unmount_info *info = &wimfs_ctx->unmount_info;
+ 	int unmount_flags = info->unmount_flags;
+-	mqd_t mq = (mqd_t)-1;
++	int ipc_fd = -1; /* PATCH: Replaced mqd_t with an integer file descriptor */
+ 	int ret;
+ 
+ 	/* Ignore COMMIT if the image is mounted read-only.  */
+ 	if (!(wimfs_ctx->mount_flags & WIMLIB_MOUNT_FLAG_READWRITE))
+ 		unmount_flags &= ~WIMLIB_UNMOUNT_FLAG_COMMIT;
+ 
++	/* PATCH: The file descriptor is now passed directly in unmount_info, no need to open by name. */
+ 	if (unmount_flags & WIMLIB_UNMOUNT_FLAG_SEND_PROGRESS) {
+-		mq = mq_open(info->mq_name, O_WRONLY | O_NONBLOCK);
+-		if (mq == (mqd_t)-1) {
+-			ret = WIMLIB_ERR_MQUEUE;
++		ipc_fd = info->ipc_fd;
++		if (ipc_fd < 0) { /* Basic validation */
++			ret = WIMLIB_ERR_FUSE; /* Or a more specific error */
+ 			goto out;
+ 		}
+ 	}
+@@ -1209,7 +1212,8 @@ unmount_wimfs(void)
+ 	}
+ 
+ 	if (unmount_flags & WIMLIB_UNMOUNT_FLAG_COMMIT)
+-		ret = commit_image(wimfs_ctx, unmount_flags, mq);
++		/* PATCH: Pass the integer file descriptor 'ipc_fd' to commit_image */
++		ret = commit_image(wimfs_ctx, unmount_flags, ipc_fd);
+ 	else
+ 		ret = 0;  /* Read-only mount, or discarding changes to
+ 			     a read-write mount  */
+@@ -1222,11 +1226,13 @@ out:
+ 		unlock_wim_for_append(wimfs_ctx->wim);
+ 		fuse_exit(fuse_ctx->fuse);
+ 	}
+-	if (mq != (mqd_t)-1)
+-		mq_close(mq);
++	/* PATCH: Close the IPC file descriptor if it was used. */
++	if (ipc_fd != -1)
++		close(ipc_fd);
+ 	return ret;
+ }
+ 
++
+ static void *
+ wimfs_init(struct fuse_conn_info *conn, struct fuse_config *cfg)
+ {
+@@ -2314,7 +2320,7 @@ out:
+ }
+ 
+ struct commit_progress_thread_args {
+-	mqd_t mq;
++	int ipc_fd; /* PATCH: Replaced mqd_t with int fd */
+ 	wimlib_progress_func_t progfunc;
+ 	void *progctx;
+ };
+@@ -2327,8 +2333,8 @@ commit_progress_thread_proc(void *_args)
+ 	ssize_t ret;
+ 
+ 	for (;;) {
+-		ret = mq_receive(args->mq,
+-				 (char *)&report, sizeof(report), NULL);
++		/* PATCH: Replaced mq_receive with recv */
++		ret = recv(args->ipc_fd, &report, sizeof(report), 0);
+ 		if (ret == sizeof(report)) {
+ 			call_progress(args->progfunc, report.msg,
+ 				      &report.info, args->progctx);
+@@ -2340,43 +2346,6 @@ commit_progress_thread_proc(void *_args)
+ 	return NULL;
+ }
+ 
+-static void
+-generate_message_queue_name(char name[WIMFS_MQUEUE_NAME_LEN + 1])
+-{
+-	name[0] = '/';
+-	memcpy(name + 1, "wimfs-", 6);
+-	get_random_alnum_chars(name + 7, WIMFS_MQUEUE_NAME_LEN - 7);
+-	name[WIMFS_MQUEUE_NAME_LEN] = '\0';
+-}
+-
+-static mqd_t
+-create_message_queue(const char *name)
+-{
+-	bool am_root;
+-	mode_t umask_save;
+-	mode_t mode;
+-	struct mq_attr attr;
+-	mqd_t mq;
+-
+-	memset(&attr, 0, sizeof(attr));
+-	attr.mq_maxmsg = 8;
+-	attr.mq_msgsize = sizeof(struct commit_progress_report);
+-
+-	am_root = (geteuid() == 0);
+-	if (am_root) {
+-		/* Filesystem mounted as normal user with --allow-other should
+-		 * be able to send messages to root user, if they're doing the
+-		 * unmount.  */
+-		umask_save = umask(0);
+-		mode = 0666;
+-	} else {
+-		mode = 0600;
+-	}
+-	mq = mq_open(name, O_RDWR | O_CREAT | O_EXCL, mode, &attr);
+-	if (am_root)
+-		umask(umask_save);
+-	return mq;
+-}
+ 
+ /* Unmount a read-only or read-write mounted WIM image.  */
+ static int
+@@ -2423,57 +2392,75 @@ do_unmount_discard(const char *dir)
+ }
+ 
+ /* Unmount a read-write mounted WIM image, committing the changes.  */
++/* 替换 do_unmount_commit 函数 */
+ static int
+ do_unmount_commit(const char *dir, int unmount_flags,
+ 		  wimlib_progress_func_t progfunc, void *progctx)
+ {
+ 	struct wimfs_unmount_info unmount_info;
+-	mqd_t mq = (mqd_t)-1;
++	int ipc_fds[2] = {-1, -1}; /* PATCH: Array to hold the two ends of the socket pair */
+ 	struct commit_progress_thread_args args;
+ 	struct thread commit_progress_tid;
++	bool thread_created = false;
+ 	int ret;
+ 
+ 	memset(&unmount_info, 0, sizeof(unmount_info));
+ 	unmount_info.unmount_flags = unmount_flags;
++	unmount_info.ipc_fd = -1; /* Initialize with an invalid fd */
+ 
+ 	/* The current thread will be stuck in getxattr() until the image is
+ 	 * committed.  Create a thread to handle the progress messages.  */
+ 	if (progfunc) {
+-		generate_message_queue_name(unmount_info.mq_name);
+-
+-		mq = create_message_queue(unmount_info.mq_name);
+-		if (mq == (mqd_t)-1) {
+-			ERROR_WITH_ERRNO("Can't create POSIX message queue");
+-			return WIMLIB_ERR_MQUEUE;
++		/* PATCH: Create a socket pair for IPC instead of a named message queue. */
++		if (socketpair(AF_UNIX, SOCK_STREAM, 0, ipc_fds) != 0) {
++			ERROR_WITH_ERRNO("Can't create socket pair for IPC");
++			/* Using WIMLIB_ERR_FUSE as a generic IPC error */
++			return WIMLIB_ERR_FUSE;
+ 		}
+-		args.mq = mq;
++		
++		/* Pass one end of the socket pair to the FUSE daemon via unmount_info. */
++		unmount_info.ipc_fd = ipc_fds[1];
++		
++		/* Use the other end for the progress handler thread. */
++		args.ipc_fd = ipc_fds[0];
+ 		args.progfunc = progfunc;
+ 		args.progctx = progctx;
++
+ 		if (!thread_create(&commit_progress_tid,
+ 				   commit_progress_thread_proc, &args)) {
+ 			ret = WIMLIB_ERR_NOMEM;
+-			goto out_delete_mq;
++			goto out_close_fds;
+ 		}
++		thread_created = true;
+ 		unmount_info.unmount_flags |= WIMLIB_UNMOUNT_FLAG_SEND_PROGRESS;
+ 	}
+ 
+ 	ret = set_unmount_info(dir, &unmount_info);
+ 	if (!ret)
+ 		ret = do_unmount(dir);
+-	if (progfunc) {
+-		/* Terminate the progress thread.  */
+-		char empty[1];
+-		mq_send(mq, empty, 0, 1);
++
++	if (thread_created) {
++		/* PATCH: Close our end of the socket. This will cause the recv() in the
++		 * progress thread to return 0, signaling the end of communication
++		 * and allowing the thread to terminate gracefully. */
++		close(ipc_fds[0]);
++		ipc_fds[0] = -1; /* Mark as closed */
+ 		thread_join(&commit_progress_tid);
+ 	}
+-out_delete_mq:
+-	if (progfunc) {
+-		mq_close(mq);
+-		mq_unlink(unmount_info.mq_name);
+-	}
++
++out_close_fds:
++	/* PATCH: Clean up any remaining open file descriptors in case of an error. */
++	if (ipc_fds[0] != -1)
++		close(ipc_fds[0]);
++	/* If set_unmount_info or do_unmount failed, the FUSE daemon never received
++	 * its end of the socket, so we must close it here. */
++	if (ipc_fds[1] != -1 && ret != 0)
++		close(ipc_fds[1]);
++	
+ 	return ret;
+ }
+ 
++
+ static int
+ begin_unmount(const char *dir, int unmount_flags, int *mount_flags_ret,
+ 	      wimlib_progress_func_t progfunc, void *progctx)
+-- 
+2.51.1
+

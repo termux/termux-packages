@@ -1,0 +1,55 @@
+--- ./redis.conf.orig	2021-04-20 05:03:58.000000000 +0000
++++ ./redis.conf	2021-05-01 14:31:20.199960661 +0000
+@@ -104,7 +104,7 @@
+ # will silently truncate it to the value of /proc/sys/net/core/somaxconn so
+ # make sure to raise both the value of somaxconn and tcp_max_syn_backlog
+ # in order to get the desired effect.
+-tcp-backlog 511
++tcp-backlog 127
+ 
+ # Unix socket.
+ #
+@@ -252,7 +252,7 @@
+ ################################# GENERAL #####################################
+ 
+ # By default Redis does not run as a daemon. Use 'yes' if you need it.
+-# Note that Redis will write a pid file in /var/run/redis.pid when daemonized.
++# Note that Redis will write a pid file in @TERMUX_PREFIX@/var/run/redis.pid when daemonized.
+ # When Redis is supervised by upstart or systemd, this parameter has no impact.
+ daemonize no
+ 
+@@ -279,14 +279,14 @@
+ #
+ # When the server runs non daemonized, no pid file is created if none is
+ # specified in the configuration. When the server is daemonized, the pid file
+-# is used even if not specified, defaulting to "/var/run/redis.pid".
++# is used even if not specified, defaulting to "@TERMUX_PREFIX@/var/run/redis.pid".
+ #
+ # Creating a pid file is best effort: if Redis is not able to create it
+ # nothing bad happens, the server will start and run normally.
+ #
+ # Note that on modern Linux systems "/run/redis.pid" is more conforming
+ # and should be used instead.
+-pidfile /var/run/redis_6379.pid
++pidfile @TERMUX_PREFIX@/var/run/redis_6379.pid
+ 
+ # Specify the server verbosity level.
+ # This can be one of:
+@@ -949,7 +949,7 @@
+ ################################### CLIENTS ####################################
+ 
+ # Set the max number of connected clients at the same time. By default
+-# this limit is set to 10000 clients, however if the Redis server is not
++# this limit is set to 512 clients, however if the Redis server is not
+ # able to configure the process file limit to allow for the specified limit
+ # the max number of allowed clients is set to the current file limit
+ # minus 32 (as Redis reserves a few file descriptors for internal uses).
+@@ -962,7 +962,7 @@
+ # connections, one incoming and another outgoing. It is important to size the
+ # limit accordingly in case of very large clusters.
+ #
+-# maxclients 10000
++# maxclients 512
+ 
+ ############################## MEMORY MANAGEMENT ################################
+ 

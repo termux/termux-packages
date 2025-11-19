@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/libfuse/sshfs
+TERMUX_PKG_DESCRIPTION="FUSE client based on the SSH File Transfer Protocol"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="3.7.5"
+TERMUX_PKG_SRCURL=https://github.com/libfuse/sshfs/archive/refs/tags/sshfs-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=b975121189cb82ed4c675320155a855adf7632abfd7fbdc385ca448d214b581f
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_SED_REGEXP='s/.*-//'
+TERMUX_PKG_DEPENDS="libfuse3, glib, openssh | dropbear"

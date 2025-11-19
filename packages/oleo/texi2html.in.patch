@@ -1,0 +1,41 @@
+--- src/texi2html.in	2018-02-22 08:34:18.770561548 +0000
++++ src/doc/texi2html.in	2018-02-22 08:35:13.413226481 +0000
+@@ -2752,7 +2752,7 @@
+     s/\@refill\s+//g;
+     # other substitutions
+     &simple_substitutions;
+-    s/\@value{($VARRE)}/$value{$1}/eg;
++    s/\@value\{($VARRE)\}/$value{$1}/eg;
+     s/\@footnote\{/\@footnote$docu_doc\{/g; # mark footnotes, cf. pass 4
+     #
+     # analyze the tag again
+@@ -3174,7 +3174,7 @@
+     #
+     # xref
+     #
+-    while (/\@(x|px|info|)ref{([^{}]+)(}?)/) {
++    while (/\@(x|px|info|)ref\{([^{}]+)(\}?)/) {
+ 	# note: Texinfo may accept other characters
+ 	($type, $nodes, $full) = ($1, $2, $3);
+ 	($before, $after) = ($`, $');
+@@ -3790,9 +3790,9 @@
+     my $ret;
+ 
+     $level--; # here we start at 0
+-    if ($name =~ /^appendix/ || defined(@appendix_sec_num)) {
++    if ($name =~ /^appendix/ || defined()) {
+ 	# appendix style
+-	if (defined(@appendix_sec_num)) {
++	if (defined()) {
+ 	    &incr_sec_num($level, @appendix_sec_num);
+ 	} else {
+ 	    @appendix_sec_num = ('A', 0, 0, 0);
+@@ -3800,7 +3800,7 @@
+ 	$ret = join('.', @appendix_sec_num[0..$level]);
+     } else {
+ 	# normal style
+-	if (defined(@normal_sec_num)) 
++	if (defined()) 
+ 	{
+ 	  &incr_sec_num($level, @normal_sec_num);
+ 	} 

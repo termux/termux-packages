@@ -1,0 +1,25 @@
+Index: aalib.m4
+===================================================================
+RCS file: /cvsroot/aa-project/aalib/aalib.m4,v
+retrieving revision 1.2
+diff -u -r1.2 aalib.m4
+--- a/aalib.m4	3 May 2001 14:56:44 -0000	1.2
++++ b/aalib.m4	28 Mar 2017 08:36:42 -0000
+@@ -40,14 +40,14 @@
+   if test "$AALIB_CONFIG" = "no" ; then
+     no_aalib=yes
+   else
+-    AALIB_CFLAGS=`$AALIB_CONFIG $aalibconf_args --cflags`
+-    AALIB_LIBS=`$AALIB_CONFIG $aalibconf_args --libs`
++    AALIB_CFLAGS=`$AALIB_CONFIG $aalib_args --cflags`
++    AALIB_LIBS=`$AALIB_CONFIG $aalib_args --libs`
+ 
+     aalib_major_version=`$AALIB_CONFIG $aalib_args --version | \
+            sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
+     aalib_minor_version=`$AALIB_CONFIG $aalib_args --version | \
+            sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
+-    aalib_micro_version=`$AALIB_CONFIG $aalib_config_args --version | \
++    aalib_micro_version=`$AALIB_CONFIG $aalib_args --version | \
+            sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
+     if test "x$enable_aalibtest" = "xyes" ; then
+       ac_save_CFLAGS="$CFLAGS"

@@ -1,0 +1,78 @@
+diff -uNr lynx2.8.9rel.1/src/LYNews.c lynx2.8.9rel.1.mod/src/LYNews.c
+--- lynx2.8.9rel.1/src/LYNews.c	2018-03-18 20:51:02.000000000 +0200
++++ lynx2.8.9rel.1.mod/src/LYNews.c	2019-03-01 22:04:51.671752655 +0200
+@@ -261,7 +261,7 @@
+ 	StrAllocCat(cp, org);
+     }
+ #ifdef UNIX
+-    else if ((fp = fopen("/etc/organization", TXT_R)) != NULL) {
++    else if ((fp = fopen("@TERMUX_PREFIX@/etc/organization", TXT_R)) != NULL) {
+ 	char *buffer = 0;
+
+ 	if (LYSafeGets(&buffer, fp) != NULL) {
+diff -uNr lynx2.8.9rel.1/src/LYUtils.c lynx2.8.9rel.1.mod/src/LYUtils.c
+--- lynx2.8.9rel.1/src/LYUtils.c	2018-05-16 00:20:52.000000000 +0300
++++ lynx2.8.9rel.1.mod/src/LYUtils.c	2019-03-01 22:05:42.915339501 +0200
+@@ -165,7 +165,7 @@
+ #if defined(__FreeBSD__) || defined(__bsdi__)
+ #define UTMP_FILE _PATH_UTMP
+ #else
+-#define UTMP_FILE "/etc/utmp"
++#define UTMP_FILE "@TERMUX_PREFIX@/etc/utmp"
+ #endif /* __FreeBSD__ || __bsdi__ */
+ #endif /* !UTMP_FILE */
+
+@@ -5185,7 +5185,7 @@
+ 		/*
+ 		 * Use /tmp; it should be writable.
+ 		 */
+-		StrAllocCopy(HomeDir, "/tmp");
++		StrAllocCopy(HomeDir, "@TERMUX_PREFIX@/tmp");
+ 	    }
+ #endif
+ #endif /* VMS */
+diff -uNr lynx2.8.9rel.1/WWW/Library/Implementation/HTFile.c lynx2.8.9rel.1.mod/WWW/Library/Implementation/HTFile.c
+--- lynx2.8.9rel.1/WWW/Library/Implementation/HTFile.c	2018-05-12 02:20:35.000000000 +0300
++++ lynx2.8.9rel.1.mod/WWW/Library/Implementation/HTFile.c	2019-03-01 22:04:51.675086005 +0200
+@@ -145,7 +145,7 @@
+ static const char *HTCacheRoot = "/WWW$SCRATCH";	/* Where to cache things */
+
+ #else
+-static const char *HTCacheRoot = "/tmp/W3_Cache_";	/* Where to cache things */
++static const char *HTCacheRoot = "@TERMUX_PREFIX@/tmp/W3_Cache_";	/* Where to cache things */
+ #endif /* VMS */
+
+ static char s_no_suffix[] = "*";
+@@ -743,7 +743,7 @@
+ 	home = LYGetEnv("HOME");
+ #endif
+ 	if (home == NULL)
+-	    home = "/tmp";
++	    home = "@TERMUX_PREFIX@/tmp";
+ #endif /* VMS */
+ 	HTSprintf0(&result, "%s/WWW/%s/%s%s", home, acc_method, host, path);
+     } else {
+diff -uNr lynx2.8.9rel.1/WWW/Library/Implementation/HTFormat.c lynx2.8.9rel.1.mod/WWW/Library/Implementation/HTFormat.c
+--- lynx2.8.9rel.1/WWW/Library/Implementation/HTFormat.c	2018-05-12 01:18:24.000000000 +0300
++++ lynx2.8.9rel.1.mod/WWW/Library/Implementation/HTFormat.c	2019-03-01 22:04:51.678419355 +0200
+@@ -27,7 +27,7 @@
+ #ifdef NeXT
+ #define PRESENT_POSTSCRIPT "open %s; /bin/rm -f %s\n"
+ #else
+-#define PRESENT_POSTSCRIPT "(ghostview %s ; /bin/rm -f %s)&\n"
++#define PRESENT_POSTSCRIPT "(ghostview %s ; rm -f %s)&\n"
+ 			   /* Full pathname would be better! */
+ #endif /* NeXT */
+ #endif /* UNIX */
+diff -uNr lynx2.8.9rel.1/WWW/Library/Implementation/HTNews.c lynx2.8.9rel.1.mod/WWW/Library/Implementation/HTNews.c
+--- lynx2.8.9rel.1/WWW/Library/Implementation/HTNews.c	2018-02-26 02:28:40.000000000 +0200
++++ lynx2.8.9rel.1.mod/WWW/Library/Implementation/HTNews.c	2019-03-01 22:04:51.681752704 +0200
+@@ -36,7 +36,7 @@
+ #endif /* DEFAULT_NEWS_HOST */
+
+ #ifndef NEWS_SERVER_FILE
+-#define NEWS_SERVER_FILE "/usr/local/lib/rn/server"
++#define NEWS_SERVER_FILE "@TERMUX_PREFIX@/lib/rn/server"
+ #endif /* NEWS_SERVER_FILE */
+
+ #ifndef NEWS_AUTH_FILE

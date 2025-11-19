@@ -1,0 +1,24 @@
+--- a/src/backend/kopano/checkshares.php
++++ b/src/backend/kopano/checkshares.php
+@@ -67,10 +67,10 @@
+             $this->server = 'default:';
+         }
+         elseif ($this->checkMapiExtVersion('7.2.0')) {
+-            $this->server = 'file:///var/run/zarafad/server.sock';
++            $this->server = 'file://@TERMUX_PREFIX@/var/run/zarafad/server.sock';
+         }
+         else {
+-            $this->server = 'file:///var/run/zarafa';
++            $this->server = 'file://@TERMUX_PREFIX@/var/run/zarafa';
+         }
+     }
+ 
+@@ -331,7 +331,7 @@
+ -s|--server         - KC server location URI or path, e.g http://localhost:236 or default:.
+ -U|--remoteuser     - login as authenticated administration user.
+ -P|--password       - password for the administration user.
+--C|--certpath       - login with a ssl certificate located in this location, e.g. /etc/kopano/ssl/client.pem.
++-C|--certpath       - login with a ssl certificate located in this location, e.g. @TERMUX_PREFIX@/etc/kopano/ssl/client.pem.
+ -W|--certpassword   - password for the ssl certificate for login.
+ 
+ USAGE;

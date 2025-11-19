@@ -1,0 +1,14 @@
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -438,6 +438,11 @@
+         };
+         let host = self.host.clone().unwrap_or_else(|| getenv_unwrap("HOST"));
+ 
++        // Pass CMAKE_POLICY_VERSION_MINIMUM through env
++        if let Some(s) = self.getenv_os("CMAKE_POLICY_VERSION_MINIMUM") {
++            self.define("CMAKE_POLICY_VERSION_MINIMUM", s);
++        }
++
+         // Some decisions later on are made if CMAKE_TOOLCHAIN_FILE is defined,
+         // so we need to read it from the environment variables from the beginning.
+         if !self.defined("CMAKE_TOOLCHAIN_FILE") {

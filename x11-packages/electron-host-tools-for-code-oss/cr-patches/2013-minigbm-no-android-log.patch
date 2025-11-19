@@ -1,0 +1,20 @@
+--- a/third_party/minigbm/src/drv.c
++++ b/third_party/minigbm/src/drv.c
+@@ -15,7 +15,7 @@
+ #include <unistd.h>
+ #include <xf86drm.h>
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #include <cutils/log.h>
+ #include <libgen.h>
+ #endif
+@@ -752,7 +752,7 @@
+ 
+ 	va_list args;
+ 	va_start(args, format);
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 	int prio = ANDROID_LOG_ERROR;
+ 	switch (level) {
+ 	case DRV_LOGV:

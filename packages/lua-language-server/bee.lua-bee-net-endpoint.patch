@@ -1,0 +1,13 @@
+--- a/3rd/bee.lua/bee/net/endpoint.h.orig
++++ b/3rd/bee.lua/bee/net/endpoint.h
+@@ -11,6 +11,10 @@
+ namespace bee::net {
+ #if defined(_WIN32)
+     using socklen_t = int;
++#elif defined(__ANDROID__) && !defined(__LP64__)
++    using socklen_t = std::int32_t;
++#elif defined(__ANDROID__) && defined(__LP64__)
++    using socklen_t = std::uint32_t;
+ #else
+     using socklen_t = unsigned int;
+ #endif

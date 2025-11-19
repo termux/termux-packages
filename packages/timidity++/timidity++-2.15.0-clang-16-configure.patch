@@ -1,0 +1,81 @@
+https://github.com/termux/termux-packages/issues/15852
+Borrowed from https://github.com/gentoo/gentoo/blob/683adc3c6adb00fcb54fa3fee43e9ae700063503/media-sound/timidity++/files/timidity++-2.15.0-clang-16-configure.patch
+
+From 41c0a19ae6e67e518f9f9c43bc7d7b61971bef4e Mon Sep 17 00:00:00 2001
+From: Sam James <sam@gentoo.org>
+Date: Sun, 6 Nov 2022 03:27:57 +0000
+Subject: [PATCH] Fix configure with Clang 15
+
+Signed-off-by: Sam James <sam@gentoo.org>
+--- a/autoconf/utils.m4
++++ b/autoconf/utils.m4
+@@ -62,11 +62,12 @@ yes) i_dlfcn=define;;
+ *)   i_dlfcn=undef;;
+ esac
+ cat > dyna.c <<EOM
+-fred () { }
++int fred (void) { }
+ EOM
+ 
+ cat > fred.c <<EOM
+ #include <stdio.h>
++#include <stdlib,h>
+ #$i_dlfcn I_DLFCN
+ #ifdef I_DLFCN
+ #include <dlfcn.h>      /* the dynamic linker include file for Sunos/Solaris */
+@@ -76,9 +77,9 @@ cat > fred.c <<EOM
+ #include <link.h>
+ #endif
+ 
+-extern int fred() ;
++extern int fred(void) ;
+ 
+-main()
++int main(void)
+ {
+     void * handle ;
+     void * symbol ;
+--- a/configure.in
++++ b/configure.in
+@@ -696,6 +696,7 @@ dnl ***
+ AC_CACHE_CHECK([for an implementation of va_copy()],lib_cv_va_copy,[
+ 	AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ 	#include <stdarg.h>
++	#include <stdlib.h>
+ 	void f (int i, ...) {
+ 	va_list args1, args2;
+ 	va_start (args1, i);
+@@ -704,7 +705,7 @@ AC_CACHE_CHECK([for an implementation of va_copy()],lib_cv_va_copy,[
+ 	  exit (1);
+ 	va_end (args1); va_end (args2);
+ 	}
+-	int main() {
++	int main(void) {
+ 	  f (0, 42);
+ 	  return 0;
+ 	}]])],
+@@ -715,6 +716,7 @@ AC_CACHE_CHECK([for an implementation of va_copy()],lib_cv_va_copy,[
+ AC_CACHE_CHECK([for an implementation of __va_copy()],lib_cv___va_copy,[
+ 	AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ 	#include <stdarg.h>
++	#include <stdlib.h>
+ 	void f (int i, ...) {
+ 	va_list args1, args2;
+ 	va_start (args1, i);
+@@ -723,7 +725,7 @@ AC_CACHE_CHECK([for an implementation of __va_copy()],lib_cv___va_copy,[
+ 	  exit (1);
+ 	va_end (args1); va_end (args2);
+ 	}
+-	int main() {
++	int main(void) {
+ 	  f (0, 42);
+ 	  return 0;
+ 	}]])],
+@@ -745,6 +747,7 @@ fi
+ AC_CACHE_CHECK([whether va_lists can be copied by value],lib_cv_va_val_copy,[
+ 	AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ 	#include <stdarg.h>
++	#include <stdlib.h>
+ 	void f (int i, ...) {
+ 	va_list args1, args2;
+ 	va_start (args1, i);

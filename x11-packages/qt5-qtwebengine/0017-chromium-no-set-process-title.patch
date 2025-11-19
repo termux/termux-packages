@@ -1,0 +1,11 @@
+--- a/src/3rdparty/chromium/content/common/set_process_title.cc
++++ b/src/3rdparty/chromium/content/common/set_process_title.cc
+@@ -44,7 +44,7 @@
+ 
+ // TODO(jrg): Find out if setproctitle or equivalent is available on Android.
+ #if defined(OS_POSIX) && !defined(OS_MAC) && !defined(OS_SOLARIS) && \
+-    !defined(OS_ANDROID) && !defined(OS_FUCHSIA)
++    !defined(OS_ANDROID) && !defined(OS_FUCHSIA) && !defined(__TERMUX__)
+ 
+ void SetProcessTitleFromCommandLine(const char** main_argv) {
+   // Build a single string which consists of all the arguments separated

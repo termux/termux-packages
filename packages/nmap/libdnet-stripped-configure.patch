@@ -1,0 +1,31 @@
+Fixes this error in the configure-time test for "Linux PF_PACKET sockets":
+
+test.c:7:11: error: function definition is not allowed here
+    7 | int foo() { return ETH_P_ALL; }
+      |           ^
+1 error generated.
+
+Which changes this configure log message:
+checking for Linux PF_PACKET sockets... no
+
+to this:
+checking for Linux PF_PACKET sockets... yes
+
+which fixes this error in the command 'sudo nping --arp 192.168.12.1':
+
+doArp: failed to open device wlan0
+
+--- a/libdnet-stripped/configure
++++ b/libdnet-stripped/configure
+@@ -15116,10 +15116,10 @@ printf %s "checking for Linux PF_PACKET sockets... " >&6; }
+ /* end confdefs.h.  */
+ #include <netpacket/packet.h>
+                     #include <linux/if_ether.h>
++int foo() { return ETH_P_ALL; }
+ int
+ main (void)
+ {
+-int foo() { return ETH_P_ALL; }
+   ;
+   return 0;
+ }

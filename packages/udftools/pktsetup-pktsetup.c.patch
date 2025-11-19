@@ -1,0 +1,11 @@
+--- a/pktsetup/pktsetup.c
++++ b/pktsetup/pktsetup.c
+@@ -191,7 +191,7 @@
+ 	dev_t dev;
+ 
+ 	if ((misc_minor = get_misc_minor()) < 0) {
+-		if (system("/sbin/modprobe pktcdvd") != 0) {
++		if (system("@TERMUX_PREFIX@/bin/modprobe pktcdvd") != 0) {
+ 			fprintf(stderr, "pktsetup: Error: Can't load pktcdvd kernel module\n");
+ 		}
+ 		misc_minor = get_misc_minor();

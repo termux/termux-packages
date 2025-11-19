@@ -1,0 +1,31 @@
+https://github.com/termux/termux-packages/issues/8478
+
+--- a/Lib/ctypes/util.py
++++ b/Lib/ctypes/util.py
+@@ -172,7 +172,7 @@
+             # assuming GNU binutils / ELF
+             if not f:
+                 return None
+-            objdump = shutil.which('objdump')
++            objdump = shutil.which('llvm-objdump')
+             if not objdump:
+                 # objdump is not available, give up
+                 return None
+@@ -209,7 +209,7 @@
+             expr = os.fsencode(expr)
+ 
+             try:
+-                proc = subprocess.Popen(('/sbin/ldconfig', '-r'),
++                proc = subprocess.Popen(('@TERMUX_PREFIX@/bin/ldconfig', '-r'),
+                                         stdout=subprocess.PIPE,
+                                         stderr=subprocess.DEVNULL)
+             except OSError:  # E.g. command not found
+@@ -300,7 +300,7 @@
+         def _findLib_ld(name):
+             # See issue #9998 for why this is needed
+             expr = r'[^\(\)\s]*lib%s\.[^\(\)\s]*' % re.escape(name)
+-            cmd = ['ld', '-t']
++            cmd = ['ld.lld', '-t']
+             libpath = os.environ.get('LD_LIBRARY_PATH')
+             if libpath:
+                 for d in libpath.split(':'):

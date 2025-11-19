@@ -1,0 +1,20 @@
+--- ./Makefile.in.orig	2025-02-26 23:06:02.726299956 +0100
++++ ./Makefile.in	2025-02-26 23:08:04.440643754 +0100
+@@ -421,7 +421,7 @@
+ 
+ sanity-check:
+ 	@[ -f .no-advice-on-failure ] && exit 0; true
+-	@v=`src/emacs${EXEEXT} --batch -Q --eval \
++	@v=`src/bootstrap-emacs${EXEEXT} --batch -Q --eval \
+ 	  '(progn (defun f (n) (if (= 0 n) 1 (* n (f (- n 1))))) (princ (f 10)))' \
+ 	  2> /dev/null`; \
+ 	[ "X$$v" = "X3628800" ] && exit 0; \
+@@ -475,7 +475,7 @@
+ 	  -e 's;\(#define.*PATH_LOADSEARCH\).*$$;\1 "${standardlisppath}";'		\
+ 	  -e 's;\(#define.*PATH_REL_LOADSEARCH\).*$$;\1 "${lispdirrel}";'		\
+ 	  -e 's;\(#define.*PATH_SITELOADSEARCH\).*$$;\1 "${locallisppath}";'		\
+-	  -e 's;\(#define.*PATH_DUMPLOADSEARCH\).*$$;\1 "${buildlisppath}";'		\
++	  -e 's;\(#define.*PATH_DUMPLOADSEARCH\).*$$;\1 "${standardlisppath}";'		\
+ 	  -e '/^#define PATH_[^ ]*SEARCH /s/\([":]\):*/\1/g'				\
+ 	  -e '/^#define PATH_[^ ]*SEARCH /s/:"/"/'					\
+ 	  -e 's;\(#define.*PATH_EXEC\).*$$;\1 "${archlibdir}";'				\

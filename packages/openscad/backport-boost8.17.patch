@@ -1,0 +1,44 @@
+diff --git a/src/node.cc b/src/node.cc
+index 39a019216b7..8168d815fd9 100644
+--- a/src/node.cc
++++ b/src/node.cc
+@@ -102,7 +102,7 @@ std::string AbstractIntersectionNode::name() const
+ 
+ void AbstractNode::progress_prepare()
+ {
+-	std::for_each(this->children.begin(), this->children.end(), std::mem_fun(&AbstractNode::progress_prepare));
++	std::for_each(this->children.begin(), this->children.end(), std::mem_fn(&AbstractNode::progress_prepare));
+ 	this->progress_mark = ++progress_report_count;
+ }
+ 
+--- ./src/FileModule.cc.orig	2024-12-22 12:44:51.462463542 +0000
++++ ./src/FileModule.cc	2024-12-22 12:45:36.708971549 +0000
+@@ -65,7 +65,7 @@
+ 	auto ext = fs::path(path).extension().generic_string();
+ 
+ 	if (boost::iequals(ext, ".otf") || boost::iequals(ext, ".ttf")) {
+-		if (fs::is_regular(path)) {
++		if (fs::is_regular_file(path)) {
+ 			FontCache::instance()->register_font_file(path);
+ 		} else {
+ 			LOG(message_group::Error,Location::NONE,"","Can't read font with path '%1$s'",path);
+
+--- ./src/FreetypeRenderer.h.orig	2024-12-22 12:42:09.206366331 +0000
++++ ./src/FreetypeRenderer.h	2024-12-22 12:43:02.166180482 +0000
+@@ -25,6 +25,7 @@
+  */
+ #pragma once
+ 
++#include <functional>
+ #include <string>
+ #include <vector>
+ #include <ostream>
+@@ -124,7 +125,7 @@
+         hb_glyph_position_t *glyph_pos;
+     };
+ 
+-    struct done_glyph : public std::unary_function<const GlyphData *, void> {
++    struct done_glyph : public std::function<void(const GlyphData *)> {
+         void operator() (const GlyphData *glyph_data) {
+             FT_Done_Glyph(glyph_data->get_glyph());
+             delete glyph_data;

@@ -1,0 +1,31 @@
+Fixes the build in TERMUX_ON_DEVICE_BUILD=true mode of reverse dependencies of qt6 like tageditor,
+where CMAKE_HOST_SYSTEM_NAME is "Android" and the path $TERMUX_PREFIX/opt/qt6/cross should never be
+used because it contains GNU/Linux binaries that are sent there by the automatic installation
+of qt6-*-cross-tools packages during termux_step_get_dependencies() by scripts/buildorder.py
+installing the qt6-*-cross-tools subpackages of qt6-* packages during the builds of reverse dependencies
+of qt6,
+https://github.com/termux/termux-packages/blob/da3717f43930c480bd8dfcf1c002430e43e49013/scripts/buildorder.py#L159
+
+without breaking the builds of anything in TERMUX_ON_DEVICE_BUILD=false mode,
+where CMAKE_HOST_SYSTEM_NAME is "Linux" so the paths set by
+"-DQT_HOST_PATH=${TERMUX_PREFIX}/opt/qt6/cross" in TERMUX_PKG_EXTRA_CONFIGURE_ARGS of qt6-qtbase
+are used here instead.
+
+--- a/cmake/QtConfigDependencies.cmake.in
++++ b/cmake/QtConfigDependencies.cmake.in
+@@ -10,8 +10,13 @@ elseif(DEFINED ENV{QT_REQUIRE_HOST_PATH_CHECK})
+ else()
+     set(__qt_platform_requires_host_info_package "@platform_requires_host_info_package@")
+ endif()
+-set(__qt_platform_initial_qt_host_path "@qt_host_path_absolute@")
+-set(__qt_platform_initial_qt_host_path_cmake_dir "@qt_host_path_cmake_dir_absolute@")
++if (${CMAKE_HOST_SYSTEM_NAME} STREQUAL Android)
++    set(__qt_platform_initial_qt_host_path "@TERMUX_PREFIX@")
++    set(__qt_platform_initial_qt_host_path_cmake_dir "@TERMUX_PREFIX@/lib/cmake")
++else()
++    set(__qt_platform_initial_qt_host_path "@qt_host_path_absolute@")
++    set(__qt_platform_initial_qt_host_path_cmake_dir "@qt_host_path_cmake_dir_absolute@")
++endif()
+ 
+ _qt_internal_setup_qt_host_path(
+     "${__qt_platform_requires_host_info_package}"

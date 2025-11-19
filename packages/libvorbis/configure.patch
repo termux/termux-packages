@@ -1,0 +1,15 @@
+clang does not support -mno-ieee-fp:
+  https://llvm.org/bugs/show_bug.cgi?id=25615
+
+diff -u -r ../libvorbis-1.3.6/configure ./configure
+--- ../libvorbis-1.3.6/configure	2018-03-16 03:36:56.000000000 +0000
++++ ./configure	2018-03-18 20:09:59.528102502 +0000
+@@ -12734,7 +12734,7 @@
+ 	case $host in
+ 	*86-*-linux*)
+ 		DEBUG="-g -Wall -Wextra -D_REENTRANT -D__NO_MATH_INLINES -fsigned-char"
+-		CFLAGS="-O3 -Wall -Wextra -ffast-math -mno-ieee-fp -D_REENTRANT -fsigned-char"
++		CFLAGS="-O3 -Wall -Wextra -ffast-math -D_REENTRANT -fsigned-char"
+ #              	PROFILE="-Wall -Wextra -pg -g -O3 -ffast-math -D_REENTRANT -fsigned-char -fno-inline -static"
+ 		PROFILE="-Wall -Wextra -pg -g -O3 -ffast-math -mno-ieee-fp -D_REENTRANT -fsigned-char -fno-inline"
+ 

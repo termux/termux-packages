@@ -1,0 +1,20 @@
+--- src-orig/libparted/arch/linux.c	2019-10-11 00:58:51.000000000 +0200
++++ src/libparted/arch/linux.c	2020-06-03 19:44:42.562845000 +0200
+@@ -2284,7 +2285,7 @@
+                     && isdigit (part_name [strlen (part_name) - 1]))
+                         continue;
+ 
+-                strcpy (dev_name, "/dev/");
++                strcpy (dev_name, "/dev/block/");
+                 strcat (dev_name, part_name);
+                 _ped_device_probe (dev_name);
+         }
+@@ -2339,7 +2340,7 @@
+ 		if (strlen (dirent->d_name) > sizeof (dev_name) - 6)
+ 			continue; /* device name too long! */
+ 
+-		strcpy (dev_name, "/dev/");
++		strcpy (dev_name, "/dev/block/");
+ 		strcat (dev_name, dirent->d_name);
+ 		/* in /sys/block, '/'s are replaced with '!' */
+ 		for (ptr = dev_name; *ptr != '\0'; ptr++) {

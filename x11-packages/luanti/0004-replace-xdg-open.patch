@@ -1,0 +1,19 @@
+xdg-open, from the package main/termux-tools, does not work on folders.
+xdg-utils-xdg-open, the name of the X11 version of xdg-open from desktopp PC,
+is from x11/xdg-utils and does work on folders.
+This is a folder (~/.minetest) so it's necessary to use the implementation that works on
+folders. It's also inside the /data/data/com.termux/files folder.
+--- a/src/porting.cpp
++++ b/src/porting.cpp
+@@ -882,8 +882,8 @@ static bool open_uri(const std::string &uri)
+ 	return posix_spawnp(NULL, "open", NULL, NULL, (char**)argv,
+ 		(*_NSGetEnviron())) == 0;
+ #else
+-	const char *argv[] = {"xdg-open", uri.c_str(), NULL};
+-	return posix_spawnp(NULL, "xdg-open", NULL, NULL, (char**)argv, environ) == 0;
++	const char *argv[] = {"xdg-utils-xdg-open", uri.c_str(), NULL};
++	return posix_spawnp(NULL, "xdg-utils-xdg-open", NULL, NULL, (char**)argv, environ) == 0;
+ #endif
+ }
+
+

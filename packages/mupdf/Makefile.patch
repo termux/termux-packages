@@ -1,0 +1,48 @@
+--- a/Makefile
++++ b/Makefile
+@@ -45,6 +45,7 @@
+   QUIET_CXX = @ echo "    CXX $@" ;
+   QUIET_GEN = @ echo "    GEN $@" ;
+   QUIET_LINK = @ echo "    LINK $@" ;
++  QUIET_LINK_FOR_BUILD = @ echo "    LINK_FOR_BUILD $@" ;
+   QUIET_RM = @ echo "    RM $@" ;
+   QUIET_TAGS = @ echo "    TAGS $@" ;
+   QUIET_WINDRES = @ echo "    WINDRES $@" ;
+@@ -74,6 +74,7 @@
+   RANLIB_CMD = $(QUIET_RANLIB) $(RANLIB) $@
+ endif
+ LINK_CMD = $(QUIET_LINK) $(MKTGTDIR) ; $(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
++LINK_FOR_BUILD_CMD = $(QUIET_LINK_FOR_BUILD) $(MKTGTDIR) ; $(CC_FOR_BUILD) -o $@ $^
+ TAGS_CMD = $(QUIET_TAGS) ctags
+ WINDRES_CMD = $(QUIET_WINDRES) $(MKTGTDIR) ; $(WINDRES) $< $@
+ OBJCOPY_CMD = $(QUIET_OBJCOPY) $(MKTGTDIR) ; $(LD) -r -b binary -z noexecstack -o $@ $<
+@@ -82,7 +84,7 @@
+ 	$(RANLIB_CMD)
+ 
+ $(OUT)/%.exe: %.c
+-	$(LINK_CMD)
++	$(LINK_FOR_BUILD_CMD)
+ 
+ $(OUT)/%.$(SO):
+ 	$(LINK_CMD) $(LIB_LDFLAGS) $(THIRD_LIBS) $(LIBCRYPTO_LIBS)
+@@ -413,9 +415,9 @@
+ 	install -m 644 $(LIBS_TO_INSTALL_IN_LIB) $(DESTDIR)$(libdir)
+ endif
+ 
+-install-apps: apps
++install-tools: tools
+ 	install -d $(DESTDIR)$(bindir)
+-	install -m 755 $(LIBS_TO_INSTALL_IN_BIN) $(TOOL_APPS) $(VIEW_APPS) $(DESTDIR)$(bindir)
++	install -m 755 $(LIBS_TO_INSTALL_IN_BIN) $(TOOL_APPS) $(DESTDIR)$(bindir)
+ 
+ install-docs:
+ 	install -d $(DESTDIR)$(mandir)/man1
+@@ -427,7 +429,7 @@
+ 	install -m 644 docs/*.html docs/*.css docs/*.png $(DESTDIR)$(docdir)
+ 	install -m 644 docs/examples/* $(DESTDIR)$(docdir)/examples
+ 
+-install: install-libs install-apps install-docs
++install: install-libs install-tools install-docs
+ 
+ tarball:
+ 	bash scripts/archive.sh

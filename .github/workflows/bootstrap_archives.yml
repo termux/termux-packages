@@ -1,0 +1,74 @@
+name: Generate bootstrap archives (android-7)
+
+on:
+  schedule:
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+
+permissions: {} # none
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    permissions:
+      contents: read # actions/upload-artifact doesn't need contents: write
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch:
+          - aarch64
+          - arm
+          - i686
+          - x86_64
+    if: github.repository == 'termux/termux-packages'
+    steps:
+      - name: Git clone
+        uses: actions/checkout@v5
+      - name: Create bootstrap archive
+        run: ./scripts/generate-bootstraps.sh --architectures ${{ matrix.arch }}
+      - name: Store artifacts
+        uses: actions/upload-artifact@v5
+        with:
+          name: bootstrap-archives-${{ matrix.arch }}-${{ github.sha }}
+          path: "*.zip"
+  publish:
+    permissions:
+      contents: write # for git push
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Fetch bootstrap archives
+        uses: actions/download-artifact@v6
+        with:
+          merge-multiple: true
+          path: ./
+      - name: Create new tag
+        id: get_tag
+        run: |
+          new_tag="bootstrap-$(date "+%Y.%m.%d")"
+          existing_tag_revision=$(git tag | grep "$new_tag" | sort -r | head -n 1 | cut -d- -f3 | cut -dr -f2)
+          if [ -n "$existing_tag_revision" ]; then
+            tag_rev=$((existing_tag_revision + 1))
+          else
+            tag_rev=1
+          fi
+          new_tag="${new_tag}-r${tag_rev}+apt.android-7"
+          git tag "$new_tag"
+          git push --tags
+          echo "tag_name=$new_tag" >> $GITHUB_OUTPUT
+      - name: Publish bootstrap zips to GitHub release
+        uses: termux/upload-release-action@v4.2.0
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: "*.zip"
+          file_glob: true
+          release_name: "Bootstrap archives for Termux application (apt.android-7)"
+          tag: ${{ steps.get_tag.outputs.tag_name }}
+          checksums: sha256,sha512,md5

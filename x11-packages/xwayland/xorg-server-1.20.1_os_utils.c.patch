@@ -1,0 +1,136 @@
+--- a/os/utils.c
++++ b/os/utils.c
+@@ -227,7 +227,7 @@ OsSignal(int sig, OsSigHandlerPtr handler)
+  * server at a time.  This keeps the servers from stomping on each other
+  * if the user forgets to give them different display numbers.
+  */
+-#define LOCK_DIR "/tmp"
++#define LOCK_DIR "@TERMUX_PREFIX@/tmp"
+ #define LOCK_TMP_PREFIX "/.tX"
+ #define LOCK_PREFIX "/.X"
+ #define LOCK_SUFFIX "-lock"
+@@ -319,7 +319,7 @@ LockServer(void)
+     i = 0;
+     haslock = 0;
+     while ((!haslock) && (i++ < 3)) {
+-        haslock = (link(tmp, LockFile) == 0);
++        haslock = (rename(tmp, LockFile) == 0);
+         if (haslock) {
+             /*
+              * We're done.
+@@ -1343,10 +1343,6 @@ Popen(const char *command, const char *type)
+ #endif
+         return NULL;
+     case 0:                    /* child */
+-        if (setgid(getgid()) == -1)
+-            _exit(127);
+-        if (setuid(getuid()) == -1)
+-            _exit(127);
+         if (*type == 'r') {
+             if (pdes[1] != 1) {
+                 /* stdout */
+@@ -1363,7 +1359,7 @@ Popen(const char *command, const char *type)
+             }
+             close(pdes[1]);
+         }
+-        execl("/bin/sh", "sh", "-c", command, (char *) NULL);
++        execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", command, (char *) NULL);
+         _exit(127);
+     }
+ 
+@@ -1395,20 +1391,7 @@ void *
+ Fopen(const char *file, const char *type)
+ {
+     FILE *iop;
+-    int ruid, euid;
+-
+-    ruid = getuid();
+-    euid = geteuid();
+-
+-    if (seteuid(ruid) == -1) {
+-        return NULL;
+-    }
+     iop = fopen(file, type);
+-
+-    if (seteuid(euid) == -1) {
+-        fclose(iop);
+-        return NULL;
+-    }
+     return iop;
+ }
+ 
+@@ -1483,7 +1466,7 @@ Win32TempDir(void)
+     else if (getenv("TMP") != NULL)
+         return getenv("TMP");
+     else
+-        return "/tmp";
++        return "@TERMUX_PREFIX@/tmp";
+ }
+ 
+ int
+@@ -1533,64 +1516,7 @@ System(const char *cmdline)
+ Bool
+ PrivsElevated(void)
+ {
+-    static Bool privsTested = FALSE;
+-    static Bool privsElevated = TRUE;
+-
+-    if (!privsTested) {
+-#if defined(WIN32)
+-        privsElevated = FALSE;
+-#else
+-        if ((getuid() != geteuid()) || (getgid() != getegid())) {
+-            privsElevated = TRUE;
+-        }
+-        else {
+-#if defined(HAVE_ISSETUGID)
+-            privsElevated = issetugid();
+-#elif defined(HAVE_GETRESUID)
+-            uid_t ruid, euid, suid;
+-            gid_t rgid, egid, sgid;
+-
+-            if ((getresuid(&ruid, &euid, &suid) == 0) &&
+-                (getresgid(&rgid, &egid, &sgid) == 0)) {
+-                privsElevated = (euid != suid) || (egid != sgid);
+-            }
+-            else {
+-                printf("Failed getresuid or getresgid");
+-                /* Something went wrong, make defensive assumption */
+-                privsElevated = TRUE;
+-            }
+-#else
+-            if (getuid() == 0) {
+-                /* running as root: uid==euid==0 */
+-                privsElevated = FALSE;
+-            }
+-            else {
+-                /*
+-                 * If there are saved ID's the process might still be privileged
+-                 * even though the above test succeeded. If issetugid() and
+-                 * getresgid() aren't available, test this by trying to set
+-                 * euid to 0.
+-                 */
+-                unsigned int oldeuid;
+-
+-                oldeuid = geteuid();
+-
+-                if (seteuid(0) != 0) {
+-                    privsElevated = FALSE;
+-                }
+-                else {
+-                    if (seteuid(oldeuid) != 0) {
+-                        FatalError("Failed to drop privileges.  Exiting\n");
+-                    }
+-                    privsElevated = TRUE;
+-                }
+-            }
+-#endif
+-        }
+-#endif
+-        privsTested = TRUE;
+-    }
+-    return privsElevated;
++    return FALSE;
+ }
+ 
+ /*

@@ -1,0 +1,114 @@
+opensc's compat_getpass conflict's with termux's getpass
+
+diff -ur ../opensc-0.26.1/configure.ac ./configure.ac
+--- ../opensc-0.26.1/configure.ac	2025-01-14 15:15:37.000000000 +0000
++++ ./configure.ac	2025-02-01 11:04:19.132197013 +0000
+@@ -444,7 +444,7 @@
+ AC_FUNC_STAT
+ AC_FUNC_VPRINTF
+ AC_CHECK_FUNCS([ \
+-	getpass gettimeofday getline memset mkdir \
++	gettimeofday getline memset mkdir \
+ 	strdup strerror memset_s explicit_bzero \
+ 	strnlen sigaction
+ ])
+--- ./src/common/compat_getpass.c	2025-01-14 15:15:37.000000000 +0000
++++ /dev/null	2025-02-01 10:48:08.578843429 +0000
+@@ -1,56 +0,0 @@
+-#ifdef HAVE_CONFIG_H
+-#include "config.h"
+-#endif
+-
+-#ifndef HAVE_GETPASS	/* empty file if getpass is available */
+-#include <stdio.h>
+-
+-#include "compat_getpass.h"
+-
+-#ifdef _WIN32
+-#include <conio.h>
+-#else
+-#include <stdio.h>
+-#include <termios.h>
+-#include <unistd.h>
+-
+-int _getch(void)
+-{
+-	struct termios old, mute;
+-	int c;
+-
+-	tcgetattr(STDIN_FILENO, &old);
+-	mute = old;
+-	mute.c_lflag &= ~(ICANON|ECHO);
+-
+-	if (0 != tcsetattr(STDIN_FILENO, TCSANOW, &mute)) {
+-		/* XXX an error happened */
+-		/* We prefer to print the password, i.e. ignore the error,
+-		 * rather than to deny the service, i.e. return something like '\0' */
+-	}
+-
+-	c = getchar();
+-
+-	tcsetattr(STDIN_FILENO, TCSANOW, &old);
+-
+-	return c;
+-}
+-#endif
+-
+-char *getpass(const char *prompt)
+-{
+-	static char buf[128];
+-	size_t i;
+-
+-	fputs(prompt, stderr);
+-	fflush(stderr);
+-	for (i = 0; i < sizeof(buf) - 1; i++) {
+-		buf[i] = _getch();
+-		if (buf[i] == '\r')
+-			break;
+-	}
+-	buf[i] = 0;
+-	fputs("\n", stderr);
+-	return buf;
+-}
+-#endif	/* HAVE_GETPASS */
+diff -ur ../opensc-0.26.1/src/common/compat_getpass.h ./src/common/compat_getpass.h
+--- ../opensc-0.26.1/src/common/compat_getpass.h	2025-01-14 15:15:37.000000000 +0000
++++ ./src/common/compat_getpass.h	2025-02-01 11:04:19.132197013 +0000
+@@ -1,6 +1,3 @@
+ #ifndef __COMPAT_GETPASS_H
+ #define __COMPAT_GETPASS_H
+-#ifndef HAVE_GETPASS
+-char *getpass (const char *prompt);
+-#endif
+ #endif
+diff -ur ../opensc-0.26.1/src/common/Makefile.am ./src/common/Makefile.am
+--- ../opensc-0.26.1/src/common/Makefile.am	2025-01-14 15:15:37.000000000 +0000
++++ ./src/common/Makefile.am	2025-02-01 11:04:19.132197013 +0000
+@@ -18,7 +18,6 @@
+ 	compat_strlcat.c \
+ 	compat_strlcpy.c \
+ 	compat_strnlen.c \
+-	compat_getpass.c \
+ 	compat_getopt.c \
+ 	compat_report_rangecheckfailure.c \
+ 	compat___iob_func.c \
+@@ -38,7 +37,7 @@
+ 	compat_strlcat.h compat_strlcat.c \
+ 	compat_strlcpy.h compat_strlcpy.c \
+ 	compat_strnlen.h compat_strnlen.c \
+-	compat_getpass.h compat_getpass.c \
++	compat_getpass.h \
+ 	compat_getopt.h compat_getopt.c \
+ 	compat_report_rangecheckfailure.c \
+ 	compat___iob_func.c \
+diff -ur ../opensc-0.26.1/src/common/Makefile.mak ./src/common/Makefile.mak
+--- ../opensc-0.26.1/src/common/Makefile.mak	2025-01-14 15:15:37.000000000 +0000
++++ ./src/common/Makefile.mak	2025-02-01 11:04:19.132197013 +0000
+@@ -1,6 +1,6 @@
+ TOPDIR = ..\..
+ 
+-COMMON_OBJECTS = compat_getpass.obj compat_getopt.obj compat_strlcpy.obj compat_strlcat.obj simclist.obj compat_report_rangecheckfailure.obj compat___iob_func.obj compat_overflow.obj
++COMMON_OBJECTS = compat_getopt.obj compat_strlcpy.obj compat_strlcat.obj simclist.obj compat_report_rangecheckfailure.obj compat___iob_func.obj compat_overflow.obj
+ 
+ all: common.lib libpkcs11.lib libscdl.lib
+ 

@@ -1,0 +1,11 @@
+--- a/gtk/Session.cc
++++ b/gtk/Session.cc
+@@ -1208,7 +1208,7 @@
+ 
+ void core_read_rpc_response(tr_session* /*session*/, tr_variant* response, gpointer /*user_data*/)
+ {
+-    Glib::signal_idle().connect([owned_response = std::shared_ptr(create_variant(*response))]() mutable
++    Glib::signal_idle().connect([owned_response = std::shared_ptr<tr_variant>(create_variant(*response))]() mutable
+                                 { return core_read_rpc_response_idle(*owned_response); });
+ }
+ 

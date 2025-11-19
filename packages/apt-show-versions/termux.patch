@@ -1,0 +1,74 @@
+--- a/apt-show-versions
++++ b/apt-show-versions
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl -w
++#!@TERMUX_PREFIX@/bin/perl -w
+ 
+ # apt-show-versions - Lists available package versions with distribution
+ 
+@@ -33,9 +33,9 @@ use strict;
+ use Getopt::Long;
+ use Storable qw(nstore retrieve);
+ 
+-my $apackagescachefile="/var/cache/apt-show-versions/apackages-multiarch";
+-my $ipackagescachefile="/var/cache/apt-show-versions/ipackages-multiarch";
+-my $filescachefile="/var/cache/apt-show-versions/files";
++my $apackagescachefile="@TERMUX_PREFIX@/var/cache/apt-show-versions/apackages-multiarch";
++my $ipackagescachefile="@TERMUX_PREFIX@/var/cache/apt-show-versions/ipackages-multiarch";
++my $filescachefile="@TERMUX_PREFIX@/var/cache/apt-show-versions/files";
+ my $cachefilemode=0644;
+ 
+ use AptPkg::Cache;
+@@ -134,9 +134,9 @@ Usage:
+ 
+ Options:
+  -stf|--status-file=<file>  Use <file> as the dpkg status file instead
+-                            of /var/lib/dpkg/status
++                            of @TERMUX_PREFIX@/var/lib/dpkg/status
+  -ld|list-dir=<directory>   Use <directory> as path to apt's list files instead
+-                            of /var/state/apt/lists/ or /var/lib/apt/lists/
++                            of @TERMUX_PREFIX@/var/state/apt/lists/ or @TERMUX_PREFIX@/var/lib/apt/lists/
+  -p|--package=<package>     Print versions for <package>.
+  -r|--regex                 Read package with -p as regex
+  -R|--regex-all             Like --regex, but also show not installed packages.
+@@ -162,7 +162,7 @@ else {
+ }
+ 
+ # Path to dpkg status file
+-my $status_file = $opts{'status-file'} || "/var/lib/dpkg/status";
++my $status_file = $opts{'status-file'} || "@TERMUX_PREFIX@/var/lib/dpkg/status";
+ my @files;
+ my $filesref;
+ 
+@@ -572,7 +572,7 @@ sub parse_file {
+     my ($key, $value, $package, $packages);
+ 
+     my $release = &determine_pkgfile_release($file);
+-    open FILE, "/usr/lib/apt/apt-helper cat-file $file|" or &die("Can't open file $file: $!\n");
++    open FILE, "@TERMUX_PREFIX@/lib/apt/apt-helper cat-file $file|" or &die("Can't open file $file: $!\n");
+     if ($opts{'verbose'}) {print "Parsing $file...";};
+     while (<FILE>) {
+         if (/^$/){
+@@ -902,12 +902,12 @@ package and via a cron.daily job.
+ 
+ =item B<-stf> I<file>, B<--status-file>=I<file>
+ 
+-Use I<file> as the dpkg status file instead of /var/lib/dpkg/status
++Use I<file> as the dpkg status file instead of @TERMUX_PREFIX@/var/lib/dpkg/status
+ 
+ =item B<-ld> I<directory>, B<--list-dir>=I<directory>
+ 
+ Use I<directory> as path to apt's list files instead of
+-/var/state/apt/lists/ or /var/lib/apt/lists/
++@TERMUX_PREFIX@/var/state/apt/lists/ or @TERMUX_PREFIX@/var/lib/apt/lists/
+ 
+ =item B<-h>, B<--help>
+ 
+--- a/debian/apt-show-versions.apt.conf
++++ b/debian/apt-show-versions.apt.conf
+@@ -1,4 +1,4 @@
+ // When Apt's cache is updated (i.e. apt-get update)
+ APT::Update::Post-Invoke-Success {
+-"test -x /usr/bin/apt-show-versions || exit 0 ; apt-show-versions -i";
++"test -x @TERMUX_PREFIX@/bin/apt-show-versions || exit 0 ; apt-show-versions -i";
+ };

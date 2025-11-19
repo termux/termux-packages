@@ -1,0 +1,133 @@
+diff -uNr aterm-1.0.1/src/command.c aterm-1.0.1.mod/src/command.c
+--- aterm-1.0.1/src/command.c	2006-06-26 21:01:20.000000000 +0300
++++ aterm-1.0.1.mod/src/command.c	2018-11-28 19:42:34.678816349 +0200
+@@ -425,45 +425,7 @@
+ void
+ privileges(int mode)
+ {
+-#ifdef HAVE_SETEUID
+-    static uid_t    euid;
+-    static gid_t    egid;
+-
+-    switch (mode) {
+-    case IGNORE:
+-    /*
+-     * change effective uid/gid - not real uid/gid - so we can switch
+-     * back to root later, as required
+-     */
+-	seteuid(getuid());
+-	setegid(getgid());
+-	break;
+-
+-    case SAVE:
+-	euid = geteuid();
+-	egid = getegid();
+-	break;
+-
+-    case RESTORE:
+-	seteuid(euid);
+-	setegid(egid);
+-	break;
+-    }
+-#else
+-# ifndef __CYGWIN32__
+-    switch (mode) {
+-    case IGNORE:
+-	setuid(getuid());
+-	setgid(getgid());
+-	break;
+-
+-    case SAVE:
+-	break;
+-    case RESTORE:
+-	break;
+-    }
+-# endif
+-#endif
++// do nothing on Termux.
+ }
+ /*}}} */
+ 
+@@ -552,20 +514,10 @@
+ {
+     int             fd = -1;
+ 
+-#if defined (__sgi)
+-    ptydev = ttydev = _getpty(&fd, O_RDWR | O_NDELAY, 0622, 0);
+-    if (ptydev == NULL)
+-	goto Failed;
+-#elif defined (__svr4__) || defined(__CYGWIN32__) || defined(__lnx21__)
+-    {
+ 	extern char    *ptsname();
+ 
+     /* open the STREAMS, clone device /dev/ptmx (master pty) */
+-#ifdef HAVE_GETPT
+-	if ((fd = getpt()) < 0) {
+-#else
+ 	if ((fd = open("/dev/ptmx", O_RDWR)) < 0) {
+-#endif
+ 		goto Failed;
+ 	} else {
+ 	    grantpt(fd);	/* change slave permissions */
+@@ -573,61 +525,6 @@
+ 	    ptydev = ttydev = ptsname(fd);	/* get slave's name */
+ 	    goto Found;
+ 	}
+-    }
+-#elif defined (_AIX)
+-    if ((fd = open("/dev/ptc", O_RDWR)) < 0)
+-	goto Failed;
+-    else
+-	ptydev = ttydev = ttyname(fd);
+-#elif defined(ALL_NUMERIC_PTYS)	/* SCO OSr5 */
+-    static char     pty_name[] = "/dev/ptyp??\0\0\0";
+-    static char     tty_name[] = "/dev/ttyp??\0\0\0";
+-    int             len = strlen(tty_name);
+-    char           *c1, *c2;
+-    int             idx;
+-
+-    ptydev = pty_name;
+-    ttydev = tty_name;
+-
+-    for (idx = 0; idx < 256; idx++) {
+-	sprintf(ptydev, "%s%d", "/dev/ptyp", idx);
+-	sprintf(ttydev, "%s%d", "/dev/ttyp", idx);
+-
+-	if (access(ttydev, F_OK) < 0) {
+-	    idx = 256;
+-	    break;
+-	}
+-	if ((fd = open(ptydev, O_RDWR)) >= 0) {
+-	    if (access(ttydev, R_OK | W_OK) == 0)
+-		goto Found;
+-	    close(fd);
+-	}
+-    }
+-    goto Failed;
+-#else
+-    static char     pty_name[] = "/dev/pty??";
+-    static char     tty_name[] = "/dev/tty??";
+-    int             len = strlen(tty_name);
+-    char           *c1, *c2;
+-
+-    ptydev = pty_name;
+-    ttydev = tty_name;
+-
+-# define PTYCHAR1	"pqrstuvwxyz"
+-# define PTYCHAR2     "0123456789abcdefghijklmnopqrstuvwxyz"
+-    for (c1 = PTYCHAR1; *c1; c1++) {
+-	ptydev[len - 2] = ttydev[len - 2] = *c1;
+-	for (c2 = PTYCHAR2; *c2; c2++) {
+-	    ptydev[len - 1] = ttydev[len - 1] = *c2;
+-	    if ((fd = open(ptydev, O_RDWR)) >= 0) {
+-		if (access(ttydev, R_OK | W_OK) == 0)
+-		    goto Found;
+-		close(fd);
+-	    }
+-	}
+-    }
+-    goto Failed;
+-#endif
+ 
+   Found:
+     fcntl(fd, F_SETFL, O_NDELAY);

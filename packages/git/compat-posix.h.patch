@@ -1,0 +1,25 @@
+Fix ST_CTIME_NSEC and ST_MTIME_NSEC macros on Android.
+
+diff --git a/compat/posix.h b/compat/posix.h
+index 067a00f33b..c839d9ca25 100644
+--- a/compat/posix.h
++++ b/compat/posix.h
+@@ -476,6 +476,10 @@ int git_qsort_s(void *base, size_t nmemb, size_t size,
+ 		BUG("qsort_s() failed");			\
+ } while (0)
+ 
++#ifdef __ANDROID__
++#define ST_CTIME_NSEC(st) ((unsigned int)((st).st_ctime_nsec))
++#define ST_MTIME_NSEC(st) ((unsigned int)((st).st_mtime_nsec))
++#else
+ #ifdef NO_NSEC
+ #undef USE_NSEC
+ #define ST_CTIME_NSEC(st) 0
+@@ -489,6 +493,7 @@ int git_qsort_s(void *base, size_t nmemb, size_t size,
+ #define ST_MTIME_NSEC(st) ((unsigned int)((st).st_mtim.tv_nsec))
+ #endif
+ #endif
++#endif
+ 
+ #ifndef va_copy
+ /*

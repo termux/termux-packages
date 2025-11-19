@@ -1,0 +1,11 @@
+--- faust-2.70.3/architecture/osclib/faust/src/threads/pthreads_impl.cpp	2024-01-27 14:11:37.678044497 +0800
++++ faust-2.70.3.mod/architecture/osclib/faust/src/threads/pthreads_impl.cpp	2024-01-27 14:11:18.190044511 +0800
+@@ -73,7 +73,7 @@
+ //_____________________________________________________________________
+ void TThreads::quit ()
+ {
+-#ifndef android
++#if !defined(android) && !defined(__ANDROID__)
+ 	if (fThread) {
+ 		void *threadRet; 
+ 		pthread_cancel (fThread);

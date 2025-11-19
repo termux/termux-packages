@@ -1,0 +1,42 @@
+# Patch meson to copy mu4e source files even if emacs was not found.
+
+--- a/meson.build
++++ b/meson.build
+@@ -294,9 +294,7 @@
+ emacs_name=get_option('emacs')
+ emacs_min_version='26.3'
+ emacs=find_program([emacs_name], version: '>=' + emacs_min_version, required:false)
+-if emacs.found()
+-  emacs28 = find_program([emacs_name], version: '>=28', required:false)
+-  subdir('man')
++if true
+   subdir('mu4e')
+ else
+   message('emacs not found; not pre-compiling mu4e / generating manpages')
+--- a/mu4e/meson.build
++++ b/mu4e/meson.build
+@@ -75,7 +75,7 @@
+ # emacs 28 is guaranteed to have transient
+ # not very elegant, but
+ # https://stackoverflow.com/questions/49221792/byte-compile-file-only-when-library-is-found
+-if emacs28.found()
++if true
+   mu4e_srcs += 'mu4e-transient.el'
+ endif
+ 
+@@ -86,6 +86,7 @@
+ #
+ #... so let's not do that!
+ 
++if false
+ foreach src : mu4e_srcs
+   target_name= '@BASENAME@.elc'
+   target_path = join_paths(meson.current_build_dir(), target_name)
+@@ -129,6 +130,7 @@
+             '--load', 'package',
+             '--eval', '(package-generate-autoloads "mu4e" "' +
+                       meson.current_build_dir() + '" )'])
++endif
+ 
+ # also install the sources and the config
+ install_data(mu4e_srcs, install_dir: mu4e_lispdir)

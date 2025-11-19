@@ -1,0 +1,44 @@
+diff -uNr k2pdfopt_v2.51/willuslib/linux.c k2pdfopt_v2.51.mod/willuslib/linux.c
+--- k2pdfopt_v2.51/willuslib/linux.c	2018-12-07 06:04:19.000000000 +0200
++++ k2pdfopt_v2.51.mod/willuslib/linux.c	2020-07-09 01:36:42.250400501 +0300
+@@ -51,14 +51,7 @@
+     static char file[4096];
+     int   index,j;
+     int used[16];
+-    static char *stddirs[] = {"/usr/sbin",
+-                              "/sbin",
+-                              "/bin",
+-                              "/usr/bin",
+-                              "/usr/local/bin",
+-                              "/usr/kerberos/sbin",
+-                              "/usr/kerberos/bin",
+-                              "/usr/X11R6/bin",
++    static char *stddirs[] = {"@TERMUX_PREFIX@/bin",
+                               ".",
+                               ""};
+ 
+diff -uNr k2pdfopt_v2.51/willuslib/wfile.c k2pdfopt_v2.51.mod/willuslib/wfile.c
+--- k2pdfopt_v2.51/willuslib/wfile.c	2018-07-27 20:47:22.000000000 +0300
++++ k2pdfopt_v2.51.mod/willuslib/wfile.c	2020-07-09 01:36:25.394323871 +0300
+@@ -2003,7 +2003,7 @@
+             strcpy(dir,".");
+         }
+ #else
+-    strcpy(dir,"/tmp");
++    strcpy(dir,"@TERMUX_PREFIX@/tmp");
+ #endif
+     }
+ 
+diff -uNr k2pdfopt_v2.51/willuslib/wgs.c k2pdfopt_v2.51.mod/willuslib/wgs.c
+--- k2pdfopt_v2.51/willuslib/wgs.c	2018-12-30 19:31:32.000000000 +0200
++++ k2pdfopt_v2.51.mod/willuslib/wgs.c	2020-07-09 01:36:25.398323890 +0300
+@@ -223,8 +223,7 @@
+                             "+\\gs","+\\ghostgum","\\gs*","\\ghostgum*",""};
+ #else
+     static char *gsnames[]={"gs",""};
+-    static char *folders[]={"/usr/bin","/usr/share/gs","/usr/local/gs","/opt/gs",
+-                            "/usr/share/gs*","/usr/local/gs*","/opt/gs*",""};
++    static char *folders[]={"@TERMUX_PREFIX@/bin",""};
+ #endif
+     
+ 

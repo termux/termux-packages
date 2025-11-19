@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<dump>
+  <interface name="XdpRequestRequest" get-type="xdp_request_request_get_type">
+    <signal name="handle-close" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="response" return="void" when="last">
+      <param type="guint"/>
+      <param type="GVariant"/>
+    </signal>
+  </interface>
+  <class name="XdpRequestRequestProxy" get-type="xdp_request_request_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="XdpRequestRequest"/>
+  </class>
+  <class name="XdpRequestRequestSkeleton" get-type="xdp_request_request_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="XdpRequestRequest"/>
+  </class>
+  <interface name="XdpRequestObject" get-type="xdp_request_object_get_type">
+    <prerequisite name="GDBusObject"/>
+    <property name="request" type="XdpRequestRequest" flags="227"/>
+  </interface>
+  <class name="XdpRequestObjectProxy" get-type="xdp_request_object_proxy_get_type" parents="GDBusObjectProxy,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="XdpRequestObject"/>
+  </class>
+  <class name="XdpRequestObjectSkeleton" get-type="xdp_request_object_skeleton_get_type" parents="GDBusObjectSkeleton,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="XdpRequestObject"/>
+  </class>
+  <class name="XdpRequestObjectManagerClient" get-type="xdp_request_object_manager_client_get_type" parents="GDBusObjectManagerClient,GObject">
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GDBusObjectManager"/>
+  </class>
+</dump>

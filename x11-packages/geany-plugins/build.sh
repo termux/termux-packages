@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://plugins.geany.org/install.html
+TERMUX_PKG_DESCRIPTION="This is a plug-in for the editor Geany"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="2.1"
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://plugins.geany.org/geany-plugins/geany-plugins-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=77ec3da07be809357ba9c986e9b72d2eca343008ccc0793673c9dcac2ad8dae1
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="geany"

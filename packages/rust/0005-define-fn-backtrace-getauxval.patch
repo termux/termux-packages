@@ -1,0 +1,45 @@
+--- a/compiler/rustc_driver_impl/src/signal_handler.rs
++++ b/compiler/rustc_driver_impl/src/signal_handler.rs
+@@ -24,6 +24,16 @@
+     unsafe { backtrace_symbols_fd(buffer.as_ptr(), size, libc::STDERR_FILENO) };
+ }
+ 
++#[cfg(target_os = "android")]
++unsafe extern "C" {
++    fn backtrace(buf: *mut *mut libc::c_void, sz: libc::c_int) -> libc::c_int;
++}
++
++#[cfg(all(target_os = "android", target_pointer_width = "32"))]
++unsafe extern "C" {
++    fn getauxval(type_: libc::c_ulong) -> libc::c_ulong;
++}
++
+ /// Unbuffered, unsynchronized writer to stderr.
+ ///
+ /// Only acceptable because everything will end soon anyways.
+@@ -66,7 +76,12 @@
+         // in incredibly undesirable and unexpected ways due to e.g. the allocator deadlocking
+         static mut STACK_TRACE: [*mut libc::c_void; MAX_FRAMES] = [ptr::null_mut(); MAX_FRAMES];
+         // Collect return addresses
++        #[cfg(not(target_os = "android"))]
+         let depth = libc::backtrace(&raw mut STACK_TRACE as _, MAX_FRAMES as i32);
++
++        #[cfg(target_os = "android")]
++        let depth = backtrace(&raw mut STACK_TRACE as _, MAX_FRAMES as i32);
++
+         if depth == 0 {
+             return;
+         }
+@@ -165,7 +180,12 @@
+ #[cfg(any(target_os = "linux", target_os = "android"))]
+ fn min_sigstack_size() -> usize {
+     const AT_MINSIGSTKSZ: core::ffi::c_ulong = 51;
++    #[cfg(any(target_os = "linux", all(target_os = "android", target_pointer_width = "64")))]
+     let dynamic_sigstksz = unsafe { libc::getauxval(AT_MINSIGSTKSZ) };
++
++    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++    let dynamic_sigstksz = unsafe { getauxval(AT_MINSIGSTKSZ) };
++
+     // If getauxval couldn't find the entry, it returns 0,
+     // so take the higher of the "constant" and auxval.
+     // This transparently supports older kernels which don't provide AT_MINSIGSTKSZ

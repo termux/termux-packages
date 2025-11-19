@@ -1,0 +1,71 @@
+From 3523b928c8c968d0b7bca2c6c3a84a939e908f8c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?C=C5=93ur?= <coeur@gmx.fr>
+Date: Mon, 10 Jun 2024 22:16:06 +0800
+Subject: [PATCH 1/5] bump miniupnpc to 2.2.8
+
+---
+ libtransmission/port-forwarding-upnp.cc | 4 ++++
+ third-party/miniupnp                    | 2 +-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/libtransmission/port-forwarding-upnp.cc b/libtransmission/port-forwarding-upnp.cc
+index 6d7bbc7f7c2..d805bc18218 100644
+--- a/libtransmission/port-forwarding-upnp.cc
++++ b/libtransmission/port-forwarding-upnp.cc
+@@ -261,7 +261,11 @@ tr_port_forwarding_state tr_upnpPulse(
+ 
+         FreeUPNPUrls(&handle->urls);
+         auto lanaddr = std::array<char, TR_ADDRSTRLEN>{};
++#if (MINIUPNPC_API_VERSION >= 18)
++        if (UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, std::data(lanaddr), std::size(lanaddr) - 1, NULL, 0) ==
++#else
+         if (UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, std::data(lanaddr), std::size(lanaddr) - 1) ==
++#endif
+             UPNP_IGD_VALID_CONNECTED)
+         {
+             tr_logAddInfo(fmt::format(_("Found Internet Gateway Device '{url}'"), fmt::arg("url", handle->urls.controlURL)));
+diff --git a/libtransmission/port-forwarding-upnp.cc b/libtransmission/port-forwarding-upnp.cc
+index d805bc18218..fadf09bb2e5 100644
+--- a/libtransmission/port-forwarding-upnp.cc
++++ b/libtransmission/port-forwarding-upnp.cc
+@@ -261,12 +261,13 @@ tr_port_forwarding_state tr_upnpPulse(
+ 
+         FreeUPNPUrls(&handle->urls);
+         auto lanaddr = std::array<char, TR_ADDRSTRLEN>{};
++        if (
+ #if (MINIUPNPC_API_VERSION >= 18)
+-        if (UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, std::data(lanaddr), std::size(lanaddr) - 1, NULL, 0) ==
++            UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, std::data(lanaddr), std::size(lanaddr) - 1, NULL, 0)
+ #else
+-        if (UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, std::data(lanaddr), std::size(lanaddr) - 1) ==
++            UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, std::data(lanaddr), std::size(lanaddr) - 1)
+ #endif
+-            UPNP_IGD_VALID_CONNECTED)
++            == UPNP_IGD_VALID_CONNECTED)
+         {
+             tr_logAddInfo(fmt::format(_("Found Internet Gateway Device '{url}'"), fmt::arg("url", handle->urls.controlURL)));
+             tr_logAddInfo(fmt::format(_("Local Address is '{address}'"), fmt::arg("address", lanaddr.data())));
+
+From 513327f6f3f216c53086191dc9876dcbe7cbeece Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?C=C5=93ur?= <coeur@gmx.fr>
+Date: Wed, 12 Jun 2024 13:12:24 +0800
+Subject: [PATCH 4/5] Update Transmission.xcodeproj/project.pbxproj
+
+Co-authored-by: Mike Gelfand <mikedld@users.noreply.github.com>
+---
+ Transmission.xcodeproj/project.pbxproj | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libtransmission/port-forwarding-upnp.cc b/libtransmission/port-forwarding-upnp.cc
+index fadf09bb2e5..a4146e0df13 100644
+--- a/libtransmission/port-forwarding-upnp.cc
++++ b/libtransmission/port-forwarding-upnp.cc
+@@ -263,7 +263,7 @@ tr_port_forwarding_state tr_upnpPulse(
+         auto lanaddr = std::array<char, TR_ADDRSTRLEN>{};
+         if (
+ #if (MINIUPNPC_API_VERSION >= 18)
+-            UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, std::data(lanaddr), std::size(lanaddr) - 1, NULL, 0)
++            UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, std::data(lanaddr), std::size(lanaddr) - 1, nullptr, 0)
+ #else
+             UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, std::data(lanaddr), std::size(lanaddr) - 1)
+ #endif

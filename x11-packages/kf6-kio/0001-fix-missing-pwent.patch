@@ -1,0 +1,54 @@
+From 35069f06f2f47051523c3e8b42116633589556f6 Mon Sep 17 00:00:00 2001
+From: Ronald Y <knyipab@gmail.com>
+Date: Tue, 1 Oct 2024 21:53:04 +0800
+Subject: [PATCH] fix missing pwent
+
+---
+ src/widgets/kacleditwidget.cpp | 6 ++++++
+ src/widgets/kurlcompletion.cpp | 7 ++++++-
+ 2 files changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/src/widgets/kacleditwidget.cpp b/src/widgets/kacleditwidget.cpp
+index bca687d..37ed5f8 100644
+--- a/src/widgets/kacleditwidget.cpp
++++ b/src/widgets/kacleditwidget.cpp
+@@ -626,12 +626,18 @@ QStringList KACLListView::allowedUsers(bool defaults, KACLListViewItem *allowedI
+ {
+     if (m_allUsers.isEmpty()) {
+         struct passwd *user = nullptr;
++#if defined __ANDROID__ && __ANDROID_API__ < 26
++        if ((user = getpwuid(getuid())) != nullptr) {
++            m_allUsers << QString::fromLatin1(user->pw_name);
++        }
++#else
+         setpwent();
+         while ((user = getpwent()) != nullptr) {
+             m_allUsers << QString::fromLatin1(user->pw_name);
+         }
+         endpwent();
+         m_allUsers.sort();
++#endif
+     }
+ 
+     QStringList allowedUsers = m_allUsers;
+diff --git a/src/widgets/kurlcompletion.cpp b/src/widgets/kurlcompletion.cpp
+index 5156a4f..6d2742f 100644
+--- a/src/widgets/kurlcompletion.cpp
++++ b/src/widgets/kurlcompletion.cpp
+@@ -265,7 +265,12 @@ protected:
+ 
+         // we don't need to handle prepend here, right? ~user is always at pos 0
+         assert(m_prepend.isEmpty());
+-#ifndef Q_OS_WIN
++#if defined __ANDROID__ && __ANDROID_API__ < 26
++        struct passwd *pw;
++        if ((pw = getpwuid(getuid())) && !terminationRequested()) {
++            addMatch(tilde + QString::fromLocal8Bit(pw->pw_name));
++        }
++#elif !defined(Q_OS_WIN)
+         struct passwd *pw;
+         ::setpwent();
+         while ((pw = ::getpwent()) && !terminationRequested()) {
+-- 
+2.46.1
+

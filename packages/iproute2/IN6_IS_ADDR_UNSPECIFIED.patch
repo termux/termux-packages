@@ -1,0 +1,13 @@
+--- iproute2-5.15.0/lib/utils.c.orig
++++ iproute2-5.15.0/lib/utils.c
+@@ -513,6 +513,10 @@
+ 	return 1;
+ }
+ 
++#undef IN6_IS_ADDR_UNSPECIFIED
++#define IN6_IS_ADDR_UNSPECIFIED(a) \
++	(a[0] == 0 && a[1] == 0 && a[2] == 0 && a[3] == 0)
++
+ static void set_address_type(inet_prefix *addr)
+ {
+ 	switch (addr->family) {

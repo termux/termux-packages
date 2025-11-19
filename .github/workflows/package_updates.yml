@@ -1,0 +1,140 @@
+name: Package updates
+
+on:
+  push:
+    branches:
+    - '**'
+    - '!master'
+    paths:
+    - 'packages/**'
+    - 'root-packages/**'
+    - 'x11-packages/**'
+  pull_request:
+    paths:
+    - 'packages/**'
+    - 'root-packages/**'
+    - 'x11-packages/**'
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: "A space-seperated list of packages to update. Defaults to all packages"
+        default: "@all"
+        required: false
+
+permissions: {} # none
+
+jobs:
+  update-packages-dry-run:
+    permissions:
+      contents: read
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Gather build summary
+        run: |
+          BASE_REF="${{ github.event.pull_request.base.ref }}"
+          git fetch origin "${BASE_REF:-master}" 2>/dev/null
+          BASE_COMMIT="$(git merge-base "origin/${BASE_REF:-master}" "HEAD")"
+          # We are intentionally not using .commits[0].id and .commits[-1].id as github seems to
+          # only send 20 commits in the payload for github action runs instead of the 2048 documented
+          # limit. Perhaps 2048 is the limit just for webhooks, where they haven't documented
+          # properly that the limit for github actions is only 20:
+          #
+          # https://docs.github.com/en/webhooks/webhook-events-and-payloads#push
+          OLD_COMMIT="${{ github.event.before }}"
+          HEAD_COMMIT="${{ github.event.after }}"
+          if [ -z "${{ github.event.pull_request.base.sha }}" ]; then
+            if ! git log "$OLD_COMMIT" > /dev/null; then
+              if [ "$(git branch --show-current)" = "master" ]; then
+                echo "Force push detected on master branch. Unable to proceed."
+                exit 1
+              else
+                OLD_COMMIT=$(git fetch origin master >&2; git merge-base origin/master $HEAD_COMMIT)
+              fi
+            fi
+            echo "Processing commit range: ${OLD_COMMIT}..${HEAD_COMMIT}"
+            CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${OLD_COMMIT}" "${HEAD_COMMIT}")
+          else
+            # Pull requests.
+            echo "Processing pull request #${{ github.event.pull_request.number }}: ${BASE_COMMIT}..HEAD"
+            CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${BASE_COMMIT}" "HEAD")
+          fi
+          for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
+            repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
+            # Parse changed files and identify new packages and modified packages.
+            # Create lists of those packages that will be passed for
+            # further processing.
+            while read -r file; do
+              if [[ "$file" == ${repo_path}/* && "$file" =~ ^${repo_path}/([.a-z0-9+-]*)/.*$ ]] \
+                    && pkg=${BASH_REMATCH[1]} && [[ -d "${repo_path}/${pkg}" ]]; then
+                  echo "$pkg"
+              fi
+            done <<< ${CHANGED_FILES}
+          # Fix so that lists do not contain duplicates and dump to file for processing in the next step
+          done | sort -u > ./built-packages.txt
+      - name: Process package updates
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUILD_PACKAGES: "false"
+          CREATE_ISSUE: "false"
+          GIT_COMMIT_PACKAGES: "false"
+          GIT_PUSH_PACKAGES: "false"
+        run: |
+          readarray -t packages < ./built-packages.txt
+          if [ -n "${packages[*]}" ]; then
+            ./scripts/bin/update-packages "${packages[@]}"
+          fi
+
+  update-packages:
+    permissions:
+      issues: write
+      contents: write
+    if: github.event_name != 'pull_request' && github.event_name != 'push' && github.repository == 'termux/termux-packages'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.TERMUXBOT2_TOKEN }}
+      - name: Set process id limit for 32-bit builds depending on aosp-libs
+        run: echo 65535 | sudo tee /proc/sys/kernel/pid_max
+      - name: Free additional disk space
+        run: CLEAN_DOCKER_IMAGES=false ./scripts/free-space.sh
+      - name: Process package updates
+        env:
+          GITHUB_TOKEN: ${{ secrets.TERMUXBOT2_TOKEN }}
+          BUILD_PACKAGES: "true"
+          TERMUX_DOCKER__CONTAINER_EXEC_COMMAND__PRE_CHECK_IF_WILL_BUILD_PACKAGES: "true"
+          CREATE_ISSUE: "true"
+          GIT_COMMIT_PACKAGES: "true"
+          GIT_PUSH_PACKAGES: "true"
+          MANUAL_INPUT_PACKAGES: ${{ github.event.inputs.packages }}
+        run: |
+          git config --global user.name "Termux Github Actions"
+          git config --global user.email "contact@termux.dev"
+
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            # Ensure MANUAL_INPUT_PACKAGES is newline free, and put it
+            # into an array
+            read -a PACKAGES <<< "${MANUAL_INPUT_PACKAGES//$'\n'/ }"
+            ./scripts/bin/update-packages "${PACKAGES[@]}"
+          else
+            ./scripts/bin/update-packages "@all"
+          fi
+      - name: Trigger repology metadata generation
+        if: always()
+        run: |
+          curl \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: Bearer ${{ secrets.TERMUXBOT2_TOKEN }}" \
+            -X POST \
+            --data '{"ref":"master"}' \
+            "https://api.github.com/repos/termux/repology-metadata/actions/workflows/repology_metadata.yml/dispatches"

@@ -1,0 +1,27 @@
+--- ./runtime.c.orig	2022-05-29 09:26:50.789444359 +0000
++++ ./runtime.c	2022-05-29 09:27:41.589413742 +0000
+@@ -37,10 +37,6 @@
+ # include <sysexits.h>
+ #endif
+
+-#ifdef __ANDROID__
+-# include <android/log.h>
+-#endif
+-
+ #if !defined(PIC)
+ # define NO_DLOAD2
+ #endif
+@@ -606,14 +602,10 @@
+   va_list va;
+
+   va_start(va, fstr);
+-#ifdef __ANDROID__
+-  __android_log_vprint(ANDROID_LOG_DEBUG, prefix, fstr, va);
+-#else
+   C_fflush(C_stdout);
+   C_fprintf(C_stderr, "[%s] ", prefix);
+   C_vfprintf(C_stderr, fstr, va);
+   C_fflush(C_stderr);
+-#endif
+   va_end(va);
+ }

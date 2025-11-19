@@ -1,0 +1,13 @@
+--- a/alpine/imap.c
++++ b/alpine/imap.c
+@@ -51,6 +51,10 @@
+ #include "../pith/smime.h"
+ #endif /* SMIME */
+ 
++#ifdef __ANDROID__
++#include <sys/endian.h>
++#endif
++
+ #if	(WINCRED > 0)
+ #include <wincred.h>
+ #define TNAME     "UWash_Alpine_"

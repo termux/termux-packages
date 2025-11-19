@@ -1,0 +1,24 @@
+diff -uNr openssh-portable-V_9_5_P1/ssh-agent.c openssh-portable-V_9_5_P1.mod/ssh-agent.c
+--- openssh-portable-V_9_5_P1/ssh-agent.c	2023-10-04 07:34:10.000000000 +0300
++++ openssh-portable-V_9_5_P1.mod/ssh-agent.c	2023-11-23 16:29:34.274542842 +0200
+@@ -92,7 +92,7 @@
+ #include "myproposal.h"
+ 
+ #ifndef DEFAULT_ALLOWED_PROVIDERS
+-# define DEFAULT_ALLOWED_PROVIDERS "/usr/lib*/*,/usr/local/lib*/*"
++# define DEFAULT_ALLOWED_PROVIDERS "@TERMUX_PREFIX@/lib*/*,@TERMUX_PREFIX@/local/lib*/*"
+ #endif
+ 
+ /* Maximum accepted message length */
+@@ -2036,9 +2036,11 @@
+ 	/* Ensure that fds 0, 1 and 2 are open or directed to /dev/null */
+ 	sanitise_stdfd();
+ 
++#ifndef __ANDROID__
+ 	/* drop */
+ 	(void)setegid(getgid());
+ 	(void)setgid(getgid());
++#endif
+ 
+ 	platform_disable_tracing(0);	/* strict=no */
+ 

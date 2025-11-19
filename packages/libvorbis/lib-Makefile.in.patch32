@@ -1,0 +1,15 @@
+libvorbisfile uses some functions that are provided by libm
+in 32-bit builds, while 64-bit builds has them as intrinsics.
+
+diff -u -r ../libvorbis-1.3.7/lib/Makefile.in ./lib/Makefile.in
+--- ../libvorbis-1.3.7/lib/Makefile.in	2020-07-04 06:20:16.000000000 +0000
++++ ./lib/Makefile.in	2024-06-03 07:40:24.919706314 +0000
+@@ -461,7 +461,7 @@
+ libvorbis_la_LIBADD = @VORBIS_LIBS@ @OGG_LIBS@
+ libvorbisfile_la_SOURCES = vorbisfile.c
+ libvorbisfile_la_LDFLAGS = -no-undefined -version-info @VF_LIB_CURRENT@:@VF_LIB_REVISION@:@VF_LIB_AGE@
+-libvorbisfile_la_LIBADD = libvorbis.la @OGG_LIBS@
++libvorbisfile_la_LIBADD = libvorbis.la @OGG_LIBS@ -lm
+ libvorbisenc_la_SOURCES = vorbisenc.c 
+ libvorbisenc_la_LDFLAGS = -no-undefined -version-info @VE_LIB_CURRENT@:@VE_LIB_REVISION@:@VE_LIB_AGE@
+ libvorbisenc_la_LIBADD = libvorbis.la @OGG_LIBS@

@@ -1,0 +1,18 @@
+--- a/src/osdep/unix/ckp_psx.c
++++ b/src/osdep/unix/ckp_psx.c
+@@ -36,6 +36,9 @@
+ 
+ struct passwd *checkpw (struct passwd *pw,char *pass,int argc,char *argv[])
+ {
++#ifdef __ANDROID__
++  return NIL;
++#else
+   char tmp[MAILTMPLEN];
+   struct spwd *sp = NIL;
+   time_t left;
+@@ -98,4 +101,5 @@
+     else pw = NIL;		/* password failed */
+   }
+   return pw;
++#endif /* __ANDROID__ */
+ }

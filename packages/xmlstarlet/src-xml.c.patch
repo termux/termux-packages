@@ -1,0 +1,12 @@
+diff -u -r ../xmlstarlet-1.6.1/src/xml.c ./src/xml.c
+--- ../xmlstarlet-1.6.1/src/xml.c	2014-08-09 21:50:55.000000000 +0000
++++ ./src/xml.c	2024-05-21 12:15:20.663891778 +0000
+@@ -104,7 +104,7 @@
+ /* by default all errors are reported */
+ static ErrorInfo errorInfo = { NULL, NULL, VERBOSE, CONTINUE };
+ 
+-void reportError(void *ptr, xmlErrorPtr error)
++void reportError(void *ptr, const xmlError * error)
+ {
+     ErrorInfo *errorInfo = (ErrorInfo*) ptr;
+     assert(errorInfo);

@@ -1,0 +1,24 @@
+--- a/subprojects/libnkutils/core/meson.build
++++ b/subprojects/libnkutils/core/meson.build
+@@ -46,21 +46,7 @@
+         dependencies: dependency('glib-2.0', version: '>= @0@'.format(glib_min_version), native: true),
+         include_directories: nk_inc,
+         install: false,
+-        native: true
+     )
+-    nk_src += custom_target('nkutils-git-version.h',
+-        output: 'nkutils-git-version.h',
+-        command: [ nk_git_version, 'header', '@OUTPUT@', nk_git_work_tree, nk_git ],
+-        build_always_stale: true,
+-        build_by_default: not meson.is_subproject(),
+-    )
+-    nkutils_mandepends += custom_target('nkutils-git-version.ent',
+-        output: 'nkutils-git-version.ent',
+-        command: [ nk_git_version, 'entity', '@OUTPUT@', nk_git_work_tree, nk_git ],
+-        build_always_stale: true,
+-        build_by_default: not meson.is_subproject(),
+-    )
+-
+ endif
+ 
+ libnkutils = declare_dependency(link_with: nk_lib, include_directories: nk_inc, dependencies: nk_deps, sources: nk_src)

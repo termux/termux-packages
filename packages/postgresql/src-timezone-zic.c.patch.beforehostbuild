@@ -1,0 +1,29 @@
+diff -uNr postgresql-13.1/src/timezone/zic.c postgresql-13.1.mod/src/timezone/zic.c
+--- postgresql-13.1/src/timezone/zic.c	2020-11-09 22:24:30.000000000 +0000
++++ postgresql-13.1.mod/src/timezone/zic.c	2020-11-22 15:38:54.515342643 +0000
+@@ -19,6 +19,12 @@
+ #include "private.h"
+ #include "tzfile.h"
+ 
++/*
++ * Avoid the qsort->pg_qsort define to more easily build
++ * a native patched zic tool.
++ */
++#undef qsort
++
+ #define	ZIC_VERSION_PRE_2013 '2'
+ #define	ZIC_VERSION	'3'
+ 
+@@ -1015,8 +1021,12 @@
+ 				progname, directory, target, strerror(EPERM));
+ 		exit(EXIT_FAILURE);
+ 	}
++#if 1
++		staysymlink = true;
++#else
+ 	if (staysymlink)
+ 		staysymlink = itssymlink(linkname);
++#endif
+ 	if (remove(linkname) == 0)
+ 		linkdirs_made = true;
+ 	else if (errno != ENOENT)

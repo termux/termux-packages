@@ -1,0 +1,20 @@
+guile 3.0.10 has an issue with cross-compiling in general
+(including cross-compiling from GNU/Linux x86 to GNU/linux ARM)
+that produces this error while cross-compiling:
+fatal error: libguile/scmconfig.h: No such file or directory
+
+Patch which fixes this copied and pasted from here, which has a good explanation for
+why it is necessary: https://lists.debian.org/debian-cross/2025/04/msg00001.html
+(the instance of `-I.` includes the guile `strings.h` inappropriately)
+
+--- a/libguile/Makefile.am
++++ b/libguile/Makefile.am
+@@ -70,7 +70,7 @@ gen-scmconfig.$(OBJEXT): gen-scmconfig.c
+ 	$(AM_V_GEN) \
+ 	if [ "$(cross_compiling)" = "yes" ]; then \
+ 		$(CC_FOR_BUILD) $(DEFS) $(DEFAULT_INCLUDES) -I$(top_builddir) \
+-		   -I. -c -o $@ $<; \
++		   -c -o $@ $<; \
+ 	else \
+ 		$(COMPILE) -c -o $@ $<; \
+ 	fi

@@ -1,0 +1,12 @@
+diff -uNr vim-8.2.0000/src/os_unix.h vim-8.2.0000.mod/src/os_unix.h
+--- vim-8.2.0000/src/os_unix.h	2019-12-12 15:18:35.000000000 +0200
++++ vim-8.2.0000.mod/src/os_unix.h	2019-12-20 19:27:51.141441414 +0200
+@@ -350,7 +350,7 @@
+ # ifdef VMS
+ #  define DFLT_DIR     "./,sys$login:,tmp:"
+ # else
+-#  define DFLT_DIR     ".,~/tmp,/var/tmp,/tmp" // default for 'directory'
++#  define DFLT_DIR     ".,~/tmp,@TERMUX_PREFIX@/tmp,@TERMUX_PREFIX@/var/tmp" // default for 'directory'
+ # endif
+ #endif
+ 

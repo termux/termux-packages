@@ -1,0 +1,18 @@
+--- ../nginx.c.orig	2020-05-20 16:18:15.028740536 +0200
++++ ./src/core/nginx.c	2020-05-20 16:17:58.883365526 +0200
+@@ -1115,14 +1115,8 @@
+         ccf->user = pwd->pw_uid;
+ 
+         ngx_set_errno(0);
+-        grp = getgrnam(NGX_GROUP);
+-        if (grp == NULL) {
+-            ngx_log_error(NGX_LOG_EMERG, cycle->log, ngx_errno,
+-                          "getgrnam(\"" NGX_GROUP "\") failed");
+-            return NGX_CONF_ERROR;
+-        }
+ 
+-        ccf->group = grp->gr_gid;
++        ccf->group = 9999;
+     }
+ 
+ 

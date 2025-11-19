@@ -1,0 +1,30 @@
+diff -u -r ../swiftshader-da334852e70510d259bfa8cbaa7c5412966b2f41/src/Reactor/Debug.cpp ./src/Reactor/Debug.cpp
+--- ../swiftshader-da334852e70510d259bfa8cbaa7c5412966b2f41/src/Reactor/Debug.cpp	2024-05-08 17:29:21.000000000 +0000
++++ ./src/Reactor/Debug.cpp	2024-05-16 09:00:48.273767070 +0000
+@@ -19,7 +19,7 @@
+ #include <cstdio>
+ #include <string>
+ 
+-#if __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #	include <android/log.h>
+ #endif
+ 
+@@ -105,7 +105,7 @@
+ 	Fatal,
+ };
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ [[maybe_unused]] void logv_android(Level level, const char *msg)
+ {
+ 	switch(level)
+@@ -156,7 +156,7 @@
+ 	char buffer[2048];
+ 	vsnprintf(buffer, sizeof(buffer), format, args);
+ 
+-#	if defined(__ANDROID__)
++#	if defined(__ANDROID__) && !defined(__TERMUX__)
+ 	logv_android(level, buffer);
+ #	elif defined(_WIN32)
+ 	logv_std(level, buffer);

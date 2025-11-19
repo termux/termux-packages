@@ -1,0 +1,12 @@
+To avoid linking against shared libomp.so.
+
+--- a/config.m4
++++ b/config.m4
+@@ -62,6 +62,7 @@
+ 
+   AC_MSG_CHECKING(omp_pause_resource_all usability)
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
++    #error
+     #include <omp.h>
+   ]],[[
+     omp_pause_resource_all(omp_pause_hard);

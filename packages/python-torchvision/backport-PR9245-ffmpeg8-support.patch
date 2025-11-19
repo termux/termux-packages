@@ -1,0 +1,32 @@
+From b574ff86f23b6b2391e93042230f355daa5e8d0f Mon Sep 17 00:00:00 2001
+From: Dominik Mierzejewski <dominik@greysector.net>
+Date: Fri, 17 Oct 2025 10:51:13 +0200
+Subject: [PATCH] Add compatibility with FFmpeg 8.0
+
+key_frame was deprecated in 2023 (FFmpeg 6.1):
+
+2023-05-04 - 0fc9c1f6828 - lavu 58.7.100 - frame.h
+  Deprecate AVFrame.interlaced_frame, AVFrame.top_field_first, and
+  AVFrame.key_frame.
+  Add AV_FRAME_FLAG_INTERLACED, AV_FRAME_FLAG_TOP_FIELD_FIRST, and
+  AV_FRAME_FLAG_KEY flags as replacement.
+---
+ torchvision/csrc/io/decoder/video_stream.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/torchvision/csrc/io/decoder/video_stream.cpp b/torchvision/csrc/io/decoder/video_stream.cpp
+index fa08c65cac1..8f232ae0283 100644
+--- a/torchvision/csrc/io/decoder/video_stream.cpp
++++ b/torchvision/csrc/io/decoder/video_stream.cpp
+@@ -122,7 +122,11 @@ int VideoStream::copyFrameBytes(ByteStorage* out, bool flush) {
+ void VideoStream::setHeader(DecoderHeader* header, bool flush) {
+   Stream::setHeader(header, flush);
+   if (!flush) { // no frames for video flush
++#if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(58,7,100)
++    header->keyFrame = (frame_)->flags & AV_FRAME_FLAG_KEY;
++#else
+     header->keyFrame = frame_->key_frame;
++#endif
+     header->fps = av_q2d(av_guess_frame_rate(
+         inputCtx_, inputCtx_->streams[format_.stream], nullptr));
+   }

@@ -1,0 +1,13 @@
+diff --git a/files/usr/share/cinnamon/cinnamon-settings-users/cinnamon-settings-users.py b/files/usr/share/cinnamon/cinnamon-settings-users/cinnamon-settings-users.py
+index 86c13a4..f41823f 100755
+--- a/files/usr/share/cinnamon/cinnamon-settings-users/cinnamon-settings-users.py
++++ b/files/usr/share/cinnamon/cinnamon-settings-users/cinnamon-settings-users.py
+@@ -855,7 +855,7 @@ class Module:
+                 self.builder.get_object("button_delete_user").set_sensitive(True)
+                 self.builder.get_object("button_delete_user").set_tooltip_text("")
+ 
+-            if os.path.exists("/home/.ecryptfs/%s" % user.get_user_name()):
++            if os.path.exists("@TERMUX_HOME@/.ecryptfs/%s" % user.get_user_name()):
+                 self.password_button.set_sensitive(False)
+                 self.password_button.set_tooltip_text(_("The user's home directory is encrypted. To preserve access to the encrypted directory, only the user should change this password."))
+ 

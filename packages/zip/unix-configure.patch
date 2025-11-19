@@ -1,0 +1,197 @@
+diff -u -r ../zip30/unix/configure ./unix/configure
+--- ../zip30/unix/configure	2008-06-20 04:32:20.000000000 +0100
++++ ./unix/configure	2020-07-12 06:48:24.521323595 +0100
+@@ -348,55 +348,10 @@
+ echo " tests if this OS uses 16-bit UIDs/GIDs and so if the old 16-bit storage"
+ echo " should also be used for backward compatibility.)"
+ # Added 2008-04-15 CS
+-cat > conftest.c << _EOF_
+-# define _LARGEFILE_SOURCE          /* some OSes need this for fseeko */
+-# define _LARGEFILE64_SOURCE
+-# define _FILE_OFFSET_BITS 64       /* select default interface as 64 bit */
+-# define _LARGE_FILES               /* some OSes need this for 64-bit off_t */
+-#include <sys/types.h>
+-#include <sys/stat.h>
+-#include <unistd.h>
+-#include <stdio.h>
+-int main()
+-{
+-  struct stat s;
+-
+-  printf("  s.st_uid is %u bytes\n", sizeof(s.st_uid));
+-  printf("  s.st_gid is %u bytes\n", sizeof(s.st_gid));
+-
+-  /* see if have 16-bit UID */
+-  if (sizeof(s.st_uid) != 2) {
+-    return 1;
+-  }
+-  /* see if have 16-bit GID */
+-  if (sizeof(s.st_gid) != 2) {
+-    return 2;
+-  }
+-  return 3;
+-}
+-_EOF_
+-# compile it
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
+-if [ $? -ne 0 ]; then
+-  echo -- UID/GID test failed on compile - disabling old 16-bit UID/GID support
+-  CFLAGS="${CFLAGS} -DUIDGID_NOT_16BIT"
+-else
+-# run it
+-  ./conftest
+-  r=$?
+-  if [ $r -eq 1 ]; then
++echo '  s.st_uid is 4 bytes'
++echo '  s.st_gid is 4 bytes'
+     echo -- UID not 2 bytes - disabling old 16-bit UID/GID support
+     CFLAGS="${CFLAGS} -DUIDGID_NOT_16BIT"
+-  elif [ $r -eq 2 ]; then
+-    echo -- GID not 2 bytes - disabling old 16-bit UID/GID support
+-    CFLAGS="${CFLAGS} -DUIDGID_NOT_16BIT"
+-  elif [ $r -eq 3 ]; then
+-    echo -- 16-bit UIDs and GIDs - keeping old 16-bit UID/GID support
+-  else
+-    echo -- test failed - conftest returned $r - disabling old 16-bit UID/GID support
+-    CFLAGS="${CFLAGS} -DUIDGID_NOT_16BIT"
+-  fi
+-fi
+ 
+ 
+ # Now we set the 64-bit file environment and check the size of off_t
+@@ -404,50 +359,9 @@
+ # Revised 8/12/2004 EG
+ 
+ echo Check for Large File Support
+-cat > conftest.c << _EOF_
+-# define _LARGEFILE_SOURCE       /* some OSes need this for fseeko */
+-# define _LARGEFILE64_SOURCE
+-# define _FILE_OFFSET_BITS 64       /* select default interface as 64 bit */
+-# define _LARGE_FILES        /* some OSes need this for 64-bit off_t */
+-#include <sys/types.h>
+-#include <sys/stat.h>
+-#include <unistd.h>
+-#include <stdio.h>
+-int main()
+-{
+-  off_t offset;
+-  struct stat s;
+-  /* see if have 64-bit off_t */
+-  if (sizeof(offset) < 8)
+-    return 1;
+-  printf("  off_t is %d bytes\n", sizeof(off_t));
+-  /* see if have 64-bit stat */
+-  if (sizeof(s.st_size) < 8) {
+-    printf("  s.st_size is %d bytes\n", sizeof(s.st_size));
+-    return 2;
+-  }
+-  return 3;
+-}
+-_EOF_
+-# compile it
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
+-if [ $? -ne 0 ]; then
+-  echo -- no Large File Support
+-else
+-# run it
+-  ./conftest
+-  r=$?
+-  if [ $r -eq 1 ]; then
+-    echo -- no Large File Support - no 64-bit off_t
+-  elif [ $r -eq 2 ]; then
+-    echo -- no Large File Support - no 64-bit stat
+-  elif [ $r -eq 3 ]; then
++echo '  off_t is 8 bytes'
+     echo -- yes we have Large File Support!
+     CFLAGS="${CFLAGS} -DLARGE_FILE_SUPPORT"
+-  else
+-    echo -- no Large File Support - conftest returned $r
+-  fi
+-fi
+ 
+ 
+ # Check for wide char for Unicode support
+@@ -509,83 +423,6 @@
+ # Check for missing functions
+ # add NO_'function_name' to flags if missing
+ 
+-for func in rmdir strchr strrchr rename mktemp mktime mkstemp
+-do
+-  echo Check for $func
+-  echo "int main(){ $func(); return 0; }" > conftest.c
+-  $CC $BFLAG -o conftest conftest.c >/dev/null 2>/dev/null
+-  [ $? -ne 0 ] && CFLAGS="${CFLAGS} -DNO_`echo $func | tr '[a-z]' '[A-Z]'`"
+-done
+-
+-
+-echo Check for memset
+-echo "int main(){ char k; memset(&k,0,0); return 0; }" > conftest.c
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
+-[ $? -ne 0 ] && CFLAGS="${CFLAGS} -DZMEM"
+-
+-
+-echo Check for memmove
+-cat > conftest.c << _EOF_
+-#include <string.h>
+-int main() { int a; int b = 0; memmove( &a, &b, sizeof( a)); return a; }
+-_EOF_
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
+-[ $? -ne 0 ] && CFLAGS="${CFLAGS} -DNEED_MEMMOVE"
+-
+-
+-echo Check for strerror
+-cat > conftest.c << _EOF_
+-#include <string.h>
+-int main() { strerror( 0); return 0; }
+-_EOF_
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
+-[ $? -ne 0 ] && CFLAGS="${CFLAGS} -DNEED_STRERROR"
+-
+-echo Check for errno declaration
+-cat > conftest.c << _EOF_
+-#include <errno.h>
+-main()
+-{
+-  errno = 0;
+-  return 0;
+-}
+-_EOF_
+-$CC $CFLAGS -c conftest.c >/dev/null 2>/dev/null
+-[ $? -ne 0 ] && CFLAGS="${CFLAGS} -DNO_ERRNO"
+-
+-
+-echo Check for directory libraries
+-cat > conftest.c << _EOF_
+-int main() { return closedir(opendir(".")); }
+-_EOF_
+-
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
+-if [ $? -ne 0 ]; then
+-  OPT=""
+-  for lib in ndir dir ucb bsd BSD PW x dirent
+-  do
+-    $CC -o conftest conftest.c -l$lib >/dev/null 2>/dev/null
+-    [ $? -eq 0 ] && OPT=-l$lib && break
+-  done
+-  if [ ${OPT} ]; then
+-    LFLAGS2="${LFLAGS2} ${OPT}"
+-  else
+-    CFLAGS="${CFLAGS} -DNO_DIR"
+-  fi
+-fi
+-
+-
+-# Dynix/ptx 1.3 needed this
+-
+-echo Check for readlink
+-echo "int main(){ return readlink(); }" > conftest.c
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
+-if [ $? -ne 0 ]; then
+-  $CC -o conftest conftest.c -lseq >/dev/null 2>/dev/null
+-  [ $? -eq 0 ] && LFLAGS2="${LFLAGS2} -lseq"
+-fi
+-
+-
+ echo Check for directory include file
+ OPT=""
+ for inc in dirent.h sys/ndir.h ndir.h sys/dir.h

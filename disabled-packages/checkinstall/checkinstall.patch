@@ -1,0 +1,48 @@
+diff -u -r ../checkinstall-1.6.2/checkinstall ./checkinstall
+--- ../checkinstall-1.6.2/checkinstall	2009-12-26 14:17:24.000000000 -0500
++++ ./checkinstall	2016-10-28 16:32:12.759574819 -0400
+@@ -492,7 +492,7 @@
+ ckversion
+ echo
+ 
+-CHECKINSTALLRC=${CHECKINSTALLRC:-${INSTALLDIR}/checkinstallrc}
++CHECKINSTALLRC=${CHECKINSTALLRC:-${INSTALLDIR}/lib/checkinstall/checkinstallrc}
+ if ! [ -f $CHECKINSTALLRC ]; then
+    echog "The checkinstallrc file was not found at:\n$CHECKINSTALLRC"
+    echo
+@@ -974,7 +974,7 @@
+ ! [ "$INSTALL" ] && INSTALL=0
+ 
+ # The place where we will be storing the temp files
+-! [ "$BASE_TMP_DIR" ] && BASE_TMP_DIR=/var/tmp
++! [ "$BASE_TMP_DIR" ] && BASE_TMP_DIR=@TERMUX_PREFIX@/tmp
+ 
+ # Default RPM FLAGS
+ ! [ "$RPM_FLAGS" ] && RPM_FLAGS=" --force --nodeps --replacepkgs "
+@@ -1249,7 +1249,7 @@
+    # Fix the PowerPC & Amd64 architecture description if we're on Debian
+    
+    if [ "$CK_DEBIAN" = "1" ] ; then
+-      ARCHITECTURE=`dpkg-architecture -qDEB_HOST_ARCH`
++      ARCHITECTURE=`dpkg --print-architecture`
+    fi
+ fi
+ 
+@@ -1508,7 +1508,7 @@
+ TMP_SCRIPT=${TMP_DIR}/installscript.sh
+ 
+ cat << EOF > $TMP_SCRIPT
+-#!/bin/sh
++#!@TERMUX_PREFIX@/bin/sh
+ 
+ cd "$DIRECTORIO_FUENTE"
+ EOF
+@@ -1538,7 +1538,7 @@
+ # installwatch excludes itself some directories, but we put them all here,
+ # to be explicit.
+ #
+-IEXCLUDE="${DIRECTORIO_FUENTE},/dev,/proc,/tmp,/var/tmp"
++IEXCLUDE="${DIRECTORIO_FUENTE},/dev,/proc,/tmp,/var/tmp,@TERMUX_PREFIX@/tmp"
+   
+ 
+ # Run the install command, showing the results interactively if we were asked

@@ -1,0 +1,135 @@
+diff -uNr procps-ng-3.3.16/proc/sysinfo.c procps-ng-3.3.16.mod/proc/sysinfo.c
+--- procps-ng-3.3.16/proc/sysinfo.c	2019-10-27 13:32:58.347231010 +0200
++++ procps-ng-3.3.16.mod/proc/sysinfo.c	2020-06-07 02:13:55.803923760 +0300
+@@ -33,6 +33,9 @@
+ #ifdef __CYGWIN__
+ #include <sys/param.h>
+ #endif
++#ifdef __ANDROID__
++#include <sys/sysinfo.h>
++#endif
+ #include "alloc.h"
+ #include "version.h"
+ #include "sysinfo.h" /* include self to verify prototypes */
+@@ -104,6 +107,18 @@
+ 
+ /***********************************************************************/
+ int uptime(double *restrict uptime_secs, double *restrict idle_secs) {
++#ifdef __ANDROID__
++    /* Android does not allow read access to /proc/uptime */
++    SET_IF_DESIRED(idle_secs, 0.);
++    struct sysinfo system_information;
++    if (sysinfo(&system_information) == 0) {
++        SET_IF_DESIRED(uptime_secs, (double) system_information.uptime);
++        return (double) system_information.uptime;
++    } else {
++        SET_IF_DESIRED(uptime_secs, 0.);
++        return 0;
++    }
++#else
+     double up=0, idle=0;
+     char *savelocale;
+ 
+@@ -121,6 +136,7 @@
+     SET_IF_DESIRED(uptime_secs, up);
+     SET_IF_DESIRED(idle_secs, idle);
+     return up;	/* assume never be zero seconds in practice */
++#endif
+ }
+ 
+ unsigned long getbtime(void) {
+@@ -134,6 +150,7 @@
+     /* /proc/stat can get very large on multi-CPU systems so we
+        can't use FILE_TO_BUF */
+     if (!(f = fopen(STAT_FILE, "r"))) {
++	return 0;
+ 	fputs(BAD_OPEN_MESSAGE, stderr);
+ 	fflush(NULL);
+ 	_exit(102);
+@@ -193,7 +210,9 @@
+   double up_1, up_2, seconds;
+   unsigned long long jiffies;
+   unsigned h;
++#ifndef __ANDROID__
+   char *savelocale;
++#endif
+   long hz;
+ 
+ #ifdef _SC_CLK_TCK
+@@ -204,8 +223,10 @@
+ #endif
+ 
+   wait_j = hirq_j = sirq_j = stol_j = 0;
++#ifndef __ANDROID__
+   savelocale = strdup(setlocale(LC_NUMERIC, NULL));
+   setlocale(LC_NUMERIC, "C");
++#endif
+   do{
+     FILE_TO_BUF(UPTIME_FILE,uptime_fd);  sscanf(buf, "%lf", &up_1);
+     /* uptime(&up_1, NULL); */
+@@ -214,8 +235,10 @@
+     FILE_TO_BUF(UPTIME_FILE,uptime_fd);  sscanf(buf, "%lf", &up_2);
+     /* uptime(&up_2, NULL); */
+   } while((long long)( (up_2-up_1)*1000.0/up_1 )); /* want under 0.1% error */
++#ifndef __ANDROID__
+   setlocale(LC_NUMERIC, savelocale);
+   free(savelocale);
++#endif
+   jiffies = user_j + nice_j + sys_j + other_j + wait_j + hirq_j + sirq_j + stol_j ;
+   seconds = (up_1 + up_2) / 2;
+   h = (unsigned)( (double)jiffies/seconds/smp_num_cpus );
+@@ -445,6 +468,17 @@
+ /***********************************************************************/
+ void loadavg(double *restrict av1, double *restrict av5, double *restrict av15) {
+     double avg_1=0, avg_5=0, avg_15=0;
++#ifdef __ANDROID__
++#define LOAD_INT(x)  (unsigned)((x) >> 16)
++#define LOAD_FRAC(x) (LOAD_INT(((x) & 65535) * 100) / 100.0f)
++
++    struct sysinfo system_information;
++    if (sysinfo(&system_information) == 0) {
++        avg_1 = LOAD_INT(system_information.loads[0]) + LOAD_FRAC(system_information.loads[0]);
++        avg_5 = LOAD_INT(system_information.loads[1]) + LOAD_FRAC(system_information.loads[1]);
++        avg_15 = LOAD_INT(system_information.loads[2]) + LOAD_FRAC(system_information.loads[2]);
++    }
++#else
+     char *savelocale;
+ 
+     FILE_TO_BUF(LOADAVG_FILE,loadavg_fd);
+@@ -457,6 +491,7 @@
+     }
+     setlocale(LC_NUMERIC, savelocale);
+     free(savelocale);
++#endif
+     SET_IF_DESIRED(av1,  avg_1);
+     SET_IF_DESIRED(av5,  avg_5);
+     SET_IF_DESIRED(av15, avg_15);
+@@ -791,27 +826,8 @@
+     mem_used = kb_main_total - kb_main_free;
+   kb_main_used = (unsigned long)mem_used;
+ 
+-  /* zero? might need fallback for 2.6.27 <= kernel <? 3.14 */
+   if (!kb_main_available) {
+-#ifdef __linux__
+-    if (linux_version_code < LINUX_VERSION(2, 6, 27))
+-      kb_main_available = kb_main_free;
+-    else {
+-      FILE_TO_BUF(VM_MIN_FREE_FILE, vm_min_free_fd);
+-      kb_min_free = (unsigned long) strtoull(buf,&tail,10);
+-
+-      watermark_low = kb_min_free * 5 / 4; /* should be equal to sum of all 'low' fields in /proc/zoneinfo */
+-
+-      mem_available = (signed long)kb_main_free - watermark_low
+-      + kb_inactive_file + kb_active_file - MIN((kb_inactive_file + kb_active_file) / 2, watermark_low)
+-      + kb_slab_reclaimable - MIN(kb_slab_reclaimable / 2, watermark_low);
+-
+-      if (mem_available < 0) mem_available = 0;
+-      kb_main_available = (unsigned long)mem_available;
+-    }
+-#else
+-      kb_main_available = kb_main_free;
+-#endif /* linux */
++      kb_main_available = kb_main_free + kb_page_cache + kb_main_buffers;
+   }
+ }
+ 

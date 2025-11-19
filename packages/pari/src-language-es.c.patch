@@ -1,0 +1,13 @@
+--- a/src/language/es.c
++++ b/src/language/es.c
+@@ -4784,8 +4784,8 @@ pari_tmp_dir(void)
+   s = env_ok("TEMP"); if (s) return s;
+ #endif
+ #if defined(UNIX) || defined(__EMX__)
+-  if (pari_is_rwx("/tmp")) return "/tmp";
+-  if (pari_is_rwx("/var/tmp")) return "/var/tmp";
++  if (pari_is_rwx("@TERMUX_PREFIX@/tmp")) return "@TERMUX_PREFIX@/tmp";
++  if (pari_is_rwx("@TERMUX_PREFIX@/var/tmp")) return "@TERMUX_PREFIX@/var/tmp";
+ #endif
+   return ".";
+ }

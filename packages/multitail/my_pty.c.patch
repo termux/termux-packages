@@ -1,0 +1,47 @@
+diff -u -r ../multitail-6.4.2/my_pty.c ./my_pty.c
+--- ../multitail-6.4.2/my_pty.c	2014-05-01 12:54:06.000000000 +0000
++++ ./my_pty.c	2017-07-07 08:47:03.030247339 +0000
+@@ -22,6 +22,7 @@
+ #include <sys/ioctl.h>
+ 
+ #include "mt.h"
++#include "utils.h" /* For myopen(). */
+ 
+ #ifdef __APPLE__
+ #include <util.h>
+@@ -29,7 +30,7 @@
+ #ifdef __OpenBSD__
+ #include <util.h>
+ #endif
+-#if defined(linux) || defined(__CYGWIN__) || defined(__GNU__) || defined(__GLIBC__)
++#if (defined(linux) && !defined(__ANDROID__)) || defined(__CYGWIN__) || defined(__GNU__) || defined(__GLIBC__)
+ #include <pty.h>
+ #endif
+ #if defined(__FreeBSD__) || defined(__minix)
+@@ -78,7 +79,7 @@
+ 
+ int get_pty_and_fork(int *fd_master, int *fd_slave)
+ {
+-#if defined(__FreeBSD__) || defined(linux) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__APPLE__) || defined(__CYGWIN__) || defined(__GNU__) || defined(__GLIBC__) || defined(__minix)
++#if defined(__FreeBSD__) || (defined(linux) && !defined(__ANDROID__)) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__APPLE__) || defined(__CYGWIN__) || defined(__GNU__) || defined(__GLIBC__) || defined(__minix)
+ 
+ 	if (openpty(fd_master, fd_slave, NULL, NULL, NULL) == -1)
+ 	{
+@@ -88,7 +89,7 @@
+ 
+ 	return fork();
+ 
+-#elif defined(sun) || defined(__sun) || defined(AIX) || defined(_HPUX_SOURCE) || defined(OSF1) || defined(scoos)
++#elif defined(sun) || defined(__sun) || defined(AIX) || defined(_HPUX_SOURCE) || defined(OSF1) || defined(scoos) || defined(__ANDROID__)
+ 
+ 	/*
+ 	 * This code is used e.g. on Solaris 2.x.  (Note that Solaris 2.3
+@@ -123,7 +124,7 @@
+ 		*fd_slave = myopen(pts, O_RDWR | O_NOCTTY);
+ 		if (*fd_slave < 0) error_exit(TRUE, FALSE, "Problem opening slave-side of pseudo tty (file '%s').\n", pts);
+ 
+-#if !defined(AIX) && !defined(scoos)
++#if !defined(AIX) && !defined(scoos) && !defined(__ANDROID__)
+ 		/* Push the appropriate streams modules, as described in Solaris pts(7). */
+ 		if (ioctl(*fd_slave, I_PUSH, "ptem") < 0) error_exit(TRUE, FALSE, "ioctl I_PUSH ptem failed.\n");
+ 		if (ioctl(*fd_slave, I_PUSH, "ldterm") < 0) error_exit(TRUE, FALSE, "ioctl I_PUSH ldterm failed.\n");

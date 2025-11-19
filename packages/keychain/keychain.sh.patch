@@ -1,0 +1,30 @@
+--- a/keychain.sh
++++ b/keychain.sh
+@@ -14,7 +14,7 @@
+ }
+ 
+ version=##VERSION##
+-PATH="${PATH}${PATH:+:}/usr/bin:/bin:/sbin:/usr/sbin:/usr/ucb"
++PATH=@TERMUX_PREFIX@/bin
+ unset pidfile_out
+ unset myaction
+ havelock=false
+@@ -158,16 +158,14 @@
+ 	tmpfile="$lockf.$$"
+ 
+ 	echo $$ >"$tmpfile" 2>/dev/null || exit
+-	if ln "$tmpfile" "$lockf" 2>/dev/null; then
+-		rm -f "$tmpfile"
++	if mv --update=none-fail "$tmpfile" "$lockf" 2>/dev/null; then
+ 		havelock=true && return 0
+ 	fi
+ 	if kill -0 "$(cat "$lockf" 2>/dev/null)" 2>/dev/null; then
+ 		rm -f "$tmpfile"
+ 		return 1
+ 	fi
+-	if ln "$tmpfile" "$lockf" 2>/dev/null; then
+-		rm -f "$tmpfile"
++	if mv --update=none-fail "$tmpfile" "$lockf" 2>/dev/null; then
+ 		havelock=true && return 0
+ 	fi
+ 	rm -f "$tmpfile" "$lockf" && return 1

@@ -1,0 +1,11 @@
+--- a/liblxqt-config-cursor/xcr/xcrimg.cpp
++++ b/liblxqt-config-cursor/xcr/xcrimg.cpp
+@@ -274,7 +274,7 @@
+         // Wayland: get default cursor size
+         QString path = QDir::home().absolutePath() + QStringLiteral("/.icons/default/index.theme");
+         if(! QFile::exists(path))
+-            path = QStringLiteral("/usr/share/icons/default/index.theme");
++            path = QStringLiteral("@TERMUX_PREFIX@/share/icons/default/index.theme");
+         if(! QFile::exists(path))
+             return size;
+         QSettings cursorTheme(path, QSettings::IniFormat);

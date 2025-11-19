@@ -1,0 +1,19 @@
+diff -u -r ../util-linux-2.40.2/misc-utils/fincore.c ./misc-utils/fincore.c
+--- ../util-linux-2.40.2/misc-utils/fincore.c	2024-05-28 08:12:08.137260096 +0000
++++ ./misc-utils/fincore.c	2024-09-15 13:25:23.799947296 +0000
+@@ -49,6 +49,7 @@
+ #define SYS_cachestat 451
+ #endif
+ 
++#ifndef __ANDROID__
+ struct cachestat_range {
+ 	uint64_t off;
+ 	uint64_t len;
+@@ -61,6 +62,7 @@
+ 	uint64_t nr_evicted;
+ 	uint64_t nr_recently_evicted;
+ };
++#endif
+ 
+ static inline int cachestat(unsigned int fd,
+ 			    const struct cachestat_range *cstat_range,

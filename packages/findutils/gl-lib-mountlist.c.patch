@@ -1,0 +1,14 @@
+diff -u -r ../findutils-4.6.0/gl/lib/mountlist.c ./gl/lib/mountlist.c
+--- ../findutils-4.6.0/gl/lib/mountlist.c	2015-12-24 17:41:44.000000000 +0100
++++ ./gl/lib/mountlist.c	2017-06-26 14:11:45.311482879 +0200
+@@ -33,6 +33,10 @@
+ 
+ #include <unistd.h>
+ 
++#ifdef __ANDROID__
++# include <sys/sysmacros.h> /* makedev() macro */
++#endif
++
+ #if HAVE_SYS_PARAM_H
+ # include <sys/param.h>
+ #endif

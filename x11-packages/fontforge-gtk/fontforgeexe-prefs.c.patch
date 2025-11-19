@@ -1,0 +1,12 @@
+--- a/fontforgeexe/prefs.c
++++ b/fontforgeexe/prefs.c
+@@ -585,6 +585,9 @@
+ #if __CygWin
+ 	b[i++] = uc_copy("/usr/share/fonts/");
+ 	b[i++] = uc_copy("/usr/share/X11/fonts/");
++#elif defined __ANDROID__
++	b[i++] = uc_copy("@TERMUX_PREFIX@/share/fonts/");
++	b[i++] = uc_copy("/system/fonts/");
+ #else
+ 	b[i++] = uc_copy("/usr/X11R6/lib/X11/fonts/");
+ #endif

@@ -1,0 +1,16 @@
+TERMUX_PKG_HOMEPAGE=http://www.lxde.org/
+TERMUX_PKG_DESCRIPTION="Lightweight image viewer"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.3.1"
+TERMUX_PKG_SRCURL="https://github.com/lxde/gpicview/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
+TERMUX_PKG_SHA256=b65dd991368ed2b08645a50cb6d4831e21e3c0d0f7d72394d40105ddba754533
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_DEPENDS="gtk3"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-gtk3"
+
+termux_step_pre_configure() {
+	./autogen.sh
+}

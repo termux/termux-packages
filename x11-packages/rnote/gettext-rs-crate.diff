@@ -1,0 +1,180 @@
+Patch gettext-rs crate to use the a custom gettext fetched from upstream instead
+Patch systest crate to skip testing gettext binary when cross compiling
+
+diff --git a/gettext-rs/Cargo.toml b/gettext-rs/Cargo.toml
+index f98bba8..b374080 100644
+--- a/gettext-rs/Cargo.toml
++++ b/gettext-rs/Cargo.toml
+@@ -18,7 +18,7 @@ name = "gettextrs"
+ gettext-system = ["gettext-sys/gettext-system"]
+
+ [dependencies.gettext-sys]
+-version = "0.21.0"
++version = "0.22.0"
+ path = "../gettext-sys"
+
+ [dependencies]
+diff --git a/gettext-rs/tests/integration.rs b/gettext-rs/tests/integration.rs
+index bae3cc1..8d52953 100644
+--- a/gettext-rs/tests/integration.rs
++++ b/gettext-rs/tests/integration.rs
+@@ -86,7 +86,7 @@ fn dcgettext_fn() {
+     );
+
+     assert_eq!(
+-        dcgettext("bound_domain", "Hello, World!", LocaleCategory::LcAll),
++        dcgettext("bound_domain", "Hello, World!", LocaleCategory::LcMessages),
+         "Hello, World!"
+     );
+ }
+@@ -156,7 +156,7 @@ fn dcngettext_fn() {
+             "Hello, World!",
+             "Hello, Worlds!",
+             1,
+-            LocaleCategory::LcAll
++            LocaleCategory::LcMessages
+         ),
+         "Hello, World!"
+     );
+@@ -166,7 +166,7 @@ fn dcngettext_fn() {
+             "Hello, World!",
+             "Hello, Worlds!",
+             2,
+-            LocaleCategory::LcAll
++            LocaleCategory::LcMessages
+         ),
+         "Hello, Worlds!"
+     );
+diff --git a/gettext-sys/Cargo.toml b/gettext-sys/Cargo.toml
+index b5f849c..3baf2fd 100644
+--- a/gettext-sys/Cargo.toml
++++ b/gettext-sys/Cargo.toml
+@@ -2,7 +2,7 @@
+ name = "gettext-sys"
+ description = "Raw FFI bindings for gettext"
+ license = "MIT"
+-version = "0.21.4"
++version = "0.22.5"
+ authors = ["Brian Olsen <brian@maven-group.org>", "Alexander Batischev <eual.jp@gmail.com>"]
+ build = "build.rs"
+ links = "gettext"
+diff --git a/gettext-sys/build.rs b/gettext-sys/build.rs
+index 7772f74..42bc167 100644
+--- a/gettext-sys/build.rs
++++ b/gettext-sys/build.rs
+@@ -191,7 +191,7 @@ fn main() {
+     let mut cmd = Command::new("tar");
+     cmd.current_dir(&build_dir.join("gettext"))
+         .arg("xJf")
+-        .arg(&src.join("gettext-0.21.tar.xz"))
++        .arg(&src.join("gettext-latest.tar.xz"))
+         .arg("--strip-components")
+         .arg("1");
+     if host.contains("windows") {
+diff --git a/systest/Cargo.toml b/systest/Cargo.toml
+index 61895bb..43462d8 100644
+--- a/systest/Cargo.toml
++++ b/systest/Cargo.toml
+@@ -10,3 +10,6 @@ gettext-sys = { path = "../gettext-sys" }
+
+ [build-dependencies]
+ ctest2 = "0.4"
++
++[features]
++cross_compiling = []
+diff --git a/systest/build.rs b/systest/build.rs
+index 42650d9..c8bbca1 100644
+--- a/systest/build.rs
++++ b/systest/build.rs
+@@ -5,9 +5,18 @@ use std::path::{Path, PathBuf};
+ use std::process::{self, Command};
+
+ fn main() {
++    let target = env::var("TARGET").unwrap();
++    let host = env::var("HOST").unwrap();
++    let is_cross = target != host;
++
++    // Set the cross_compiling flag before the tests
++    if is_cross {
++        println!("cargo:rustc-cfg=cross_compiling");
++        println!("cargo::rustc-check-cfg=cfg(cross_compiling)");
++    }
++
+     let mut cfg = ctest2::TestGenerator::new();
+
+-    let target = env::var("TARGET").unwrap();
+     if target.contains("freebsd") {
+         cfg.include("/usr/local/include");
+     }
+@@ -22,24 +31,38 @@ fn main() {
+     // Skip ptr check because the symbol name is different between glibc
+     // implementation and static lib.
+     // eg. gettext is libintl_gettext in static lib
+-    if env::var_os("GETTEXT_SYSTEM").is_none() || env::var("TARGET").unwrap().contains("windows") {
++    if env::var_os("GETTEXT_SYSTEM").is_none() || target.contains("windows") {
+         println!("Skipping ptr check");
+         cfg.skip_fn_ptrcheck(|_| true);
+     }
+
+     cfg.generate("../gettext-sys/lib.rs", "all.rs");
+
+-    // Check that we can find and run gettext binary
++    // Check for the existence of the gettext binary
+     let cmd = if let Some(bin) = env::var_os("DEP_GETTEXT_BIN") {
+         Path::new(&bin).join("gettext")
+     } else {
+         PathBuf::from("gettext")
+     };
+-    let c = Command::new(&cmd).arg("--version").spawn();
+-    if let Ok(mut child) = c {
+-        assert!(child.wait().unwrap().success());
+-    } else {
+-        println!("Could not run {}", cmd.display());
++
++    if !cmd.exists() {
++        println!(
++            "cargo:warning=Gettext binary not found at {}",
++            cmd.display()
++        );
+         process::exit(1);
+     }
++
++    // Only run the binary if not cross-compiling
++    if !is_cross {
++        let c = Command::new(&cmd).arg("--version").spawn();
++        if let Ok(mut child) = c {
++            assert!(child.wait().unwrap().success());
++        } else {
++            println!("Could not run {}", cmd.display());
++            process::exit(1);
++        }
++    } else {
++        println!("cargo:warning=Cross-compiling detected. Gettext binary found but not executed.");
++    }
+ }
+diff --git a/systest/src/main.rs b/systest/src/main.rs
+index befa675..522275d 100644
+--- a/systest/src/main.rs
++++ b/systest/src/main.rs
+@@ -1,7 +1,20 @@
+ #![allow(bad_style)]
+-
++#![allow(unused_imports)]
+ extern crate gettext_sys;
+
++#[cfg(not(feature = "cross_compiling"))]
+ use gettext_sys::*;
+
++#[cfg(not(cross_compiling))]
+ include!(concat!(env!("OUT_DIR"), "/all.rs"));
++
++#[cfg(feature = "cross_compiling")]
++fn main() {
++    println!("Cross-compilation detected. Skipping system tests.");
++}
++
++#[cfg(feature = "cross_compiling")]
++#[test]
++fn dummy_cross_compile_test() {
++    println!("Cross-compilation detected. Skipping system tests.");
++}

@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<dump>
+  <boxed name="CdColorXYZ" get-type="cd_color_xyz_get_type"/>
+  <boxed name="CdColorLab" get-type="cd_color_lab_get_type"/>
+  <boxed name="CdColorRGB" get-type="cd_color_rgb_get_type"/>
+  <boxed name="CdColorYxy" get-type="cd_color_yxy_get_type"/>
+  <boxed name="CdColorUVW" get-type="cd_color_uvw_get_type"/>
+  <boxed name="CdColorSwatch" get-type="cd_color_swatch_get_type"/>
+  <class name="CdEdid" get-type="cd_edid_get_type" parents="GObject">
+  </class>
+  <class name="CdIcc" get-type="cd_icc_get_type" parents="GObject">
+    <property name="size" type="guint" flags="1" default-value="0"/>
+    <property name="filename" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="version" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="kind" type="guint" flags="3" default-value="0"/>
+    <property name="colorspace" type="guint" flags="3" default-value="0"/>
+    <property name="can-delete" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="checksum" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="red" type="CdColorXYZ" flags="1"/>
+    <property name="green" type="CdColorXYZ" flags="1"/>
+    <property name="blue" type="CdColorXYZ" flags="1"/>
+    <property name="white" type="CdColorXYZ" flags="1"/>
+    <property name="temperature" type="guint" flags="1" default-value="0"/>
+  </class>
+  <class name="CdProfile" get-type="cd_profile_get_type" parents="GObject">
+    <property name="object-path" type="gchararray" flags="7" default-value="NULL"/>
+    <property name="connected" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="id" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="filename" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="qualifier" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="format" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="kind" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="colorspace" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="created" type="gint64" flags="1" default-value="0"/>
+    <property name="has-vcgt" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="is-system-wide" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="scope" type="guint" flags="1" default-value="0"/>
+    <property name="owner" type="guint" flags="1" default-value="0"/>
+    <property name="warnings" type="GStrv" flags="1"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="CdDevice" get-type="cd_device_get_type" parents="GObject">
+    <property name="object-path" type="gchararray" flags="7" default-value="NULL"/>
+    <property name="connected" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="created" type="guint64" flags="1" default-value="0"/>
+    <property name="modified" type="guint64" flags="1" default-value="0"/>
+    <property name="id" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="model" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="vendor" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="serial" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="seat" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="format" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="kind" type="guint" flags="1" default-value="0"/>
+    <property name="colorspace" type="guint" flags="1" default-value="0"/>
+    <property name="mode" type="guint" flags="1" default-value="0"/>
+    <property name="scope" type="guint" flags="1" default-value="0"/>
+    <property name="owner" type="guint" flags="1" default-value="0"/>
+    <property name="profiling-inhibitors" type="GStrv" flags="1"/>
+    <property name="enabled" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="embedded" type="gchararray" flags="1" default-value="NULL"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <boxed name="CdSpectrum" get-type="cd_spectrum_get_type"/>
+  <class name="CdSensor" get-type="cd_sensor_get_type" parents="GObject">
+    <property name="object-path" type="gchararray" flags="7" default-value="NULL"/>
+    <property name="id" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="connected" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="kind" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="state" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="mode" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="serial" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="model" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="vendor" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="native" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="embedded" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="locked" type="gchararray" flags="1" default-value="NULL"/>
+    <signal name="button-pressed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="CdClient" get-type="cd_client_get_type" parents="GObject">
+    <property name="daemon-version" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="connected" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="system-vendor" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="system-model" type="gchararray" flags="1" default-value="NULL"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+    <signal name="device-added" return="void" when="last">
+      <param type="CdDevice"/>
+    </signal>
+    <signal name="device-removed" return="void" when="last">
+      <param type="CdDevice"/>
+    </signal>
+    <signal name="device-changed" return="void" when="last">
+      <param type="CdDevice"/>
+    </signal>
+    <signal name="profile-added" return="void" when="last">
+      <param type="CdProfile"/>
+    </signal>
+    <signal name="profile-removed" return="void" when="last">
+      <param type="CdProfile"/>
+    </signal>
+    <signal name="profile-changed" return="void" when="last">
+      <param type="CdProfile"/>
+    </signal>
+    <signal name="sensor-added" return="void" when="last">
+      <param type="CdSensor"/>
+    </signal>
+    <signal name="sensor-removed" return="void" when="last">
+      <param type="CdSensor"/>
+    </signal>
+    <signal name="sensor-changed" return="void" when="last">
+      <param type="CdSensor"/>
+    </signal>
+  </class>
+  <class name="CdIt8" get-type="cd_it8_get_type" parents="GObject">
+    <property name="kind" type="guint" flags="3" default-value="0"/>
+    <property name="instrument" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="reference" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="normalized" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="originator" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="spectral" type="gboolean" flags="1" default-value="FALSE"/>
+  </class>
+  <error-quark function="cd_edid_error_quark" domain="cd_edid_error"/>
+  <error-quark function="cd_icc_error_quark" domain="cd_icc_error"/>
+  <error-quark function="cd_profile_error_quark" domain="cd_profile_error"/>
+  <error-quark function="cd_device_error_quark" domain="cd_device_error"/>
+  <error-quark function="cd_sensor_error_quark" domain="cd_sensor_error"/>
+  <error-quark function="cd_client_error_quark" domain="cd_client_error"/>
+  <error-quark function="cd_it8_error_quark" domain="cd_it8_error"/>
+</dump>

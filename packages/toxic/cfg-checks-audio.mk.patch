@@ -1,0 +1,12 @@
+diff -uNr toxic-0.9.0/cfg/checks/audio.mk toxic-0.9.0.mod/cfg/checks/audio.mk
+--- toxic-0.9.0/cfg/checks/audio.mk	2020-11-14 21:30:56.000000000 +0200
++++ toxic-0.9.0.mod/cfg/checks/audio.mk	2020-11-22 22:29:53.688081812 +0200
+@@ -8,7 +8,7 @@
+ endif
+ 
+ # Check if we can build audio support
+-CHECK_AUDIO_LIBS := $(shell $(PKG_CONFIG) --exists $(AUDIO_LIBS) || echo -n "error")
++CHECK_AUDIO_LIBS := $(shell echo -n "error")
+ ifneq ($(CHECK_AUDIO_LIBS), error)
+     LIBS += $(AUDIO_LIBS)
+     LDFLAGS += -lm

@@ -1,0 +1,11 @@
+--- mono-6.12.0.199/mono/utils/mono-logger.c	2023-06-14 23:11:24.000000000 +0800
++++ mono-6.12.0.199.mod/mono/utils/mono-logger.c	2024-03-17 20:50:45.883998574 +0800
+@@ -151,7 +151,7 @@
+ 	if(level_stack == NULL)
+ 		mono_trace_init();
+ 
+-#if HOST_ANDROID
++#if HOST_ANDROID && !defined(__TERMUX__)
+ 	logger.opener = mono_log_open_logcat;
+ 	logger.writer = mono_log_write_logcat;
+ 	logger.closer = mono_log_close_logcat;

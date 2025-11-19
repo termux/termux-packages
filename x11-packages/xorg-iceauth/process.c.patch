@@ -1,0 +1,10 @@
++++ ./process.c
+@@ -698,7 +698,7 @@
+ 			 ProgramName, temp_name);
+ 	    } else {
+ 		(void) unlink (iceauth_filename);
+-#ifdef WIN32
++#if defined(WIN32) || defined(__ANDROID__)
+ 		if (rename(temp_name, iceauth_filename) == -1)
+ #else
+ 		/* Attempt to rename() if link() fails, since this may be on a FS that does not support hard links */

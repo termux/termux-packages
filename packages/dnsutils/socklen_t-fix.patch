@@ -1,0 +1,10 @@
++++ ./lib/dns/resconf.c
+@@ -227,7 +227,7 @@
+ 	}
+ 
+ 	address = isc_mem_get(mctx, sizeof(*address));
+-	if (res->ai_addrlen > sizeof(address->type)) {
++	if ((size_t) res->ai_addrlen > sizeof(address->type)) {
+ 		isc_mem_put(mctx, address, sizeof(*address));
+ 		result = ISC_R_RANGE;
+ 		goto cleanup;

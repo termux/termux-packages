@@ -1,0 +1,13 @@
+--- enscript-1.6.6/intl/lock.h	2018-08-26 16:33:29.944000060 +0530
++++ lock.h	2018-08-26 16:51:23.894000008 +0530
+@@ -126,8 +126,8 @@
+ #  endif
+ 
+ #  if !PTHREAD_IN_USE_DETECTION_HARD
+-#   pragma weak pthread_cancel
+-#   define pthread_in_use() (pthread_cancel != NULL)
++#   pragma weak pthread_kill
++#   define pthread_in_use() (pthread_kill != NULL)
+ #  endif
+ 
+ # else

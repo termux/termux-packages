@@ -1,0 +1,12 @@
+diff -uNr libX11-1.6.8/src/XlibInt.c libX11-1.6.8.mod/src/XlibInt.c
+--- libX11-1.6.8/src/XlibInt.c	2019-06-17 17:47:35.000000000 +0300
++++ libX11-1.6.8.mod/src/XlibInt.c	2019-06-29 22:13:06.054460413 +0300
+@@ -1263,7 +1263,7 @@
+     WSASetLastError(last_error);
+ #else
+     last_error = errno;
+-    ioctl(ConnectionNumber(dpy), FIONREAD, &bytes);
++    ioctl(ConnectionNumber(dpy), /* FIONREAD */ 0x541B, &bytes);
+     errno = last_error;
+ #endif
+     return bytes;

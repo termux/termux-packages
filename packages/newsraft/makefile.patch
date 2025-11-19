@@ -1,0 +1,26 @@
+diff --git a/makefile b/makefile
+index 2dc7ddb..e504ac3 100644
+--- a/makefile
++++ b/makefile
+@@ -1,9 +1,9 @@
+ .POSIX:
+ .PHONY: all install install-newsraft install-man install-icon install-desktop install-examples man html clean check gperf cppcheck clang-tidy
+ 
+-CC            = cc
+-CFLAGS        = -O3
+-LDFLAGS       =
++CC            ?= cc
++CFLAGS        ?= -O3
++LDFLAGS       ?=
+ CURL_CFLAGS   = `pkg-config --cflags libcurl  2>/dev/null`
+ CURL_LIBS     = `pkg-config --libs   libcurl  2>/dev/null || echo '-lcurl'`
+ EXPAT_CFLAGS  = `pkg-config --cflags expat    2>/dev/null`
+@@ -20,7 +20,7 @@ AUXCFLAGS     = $(CURL_CFLAGS) $(EXPAT_CFLAGS) $(GUMBO_CFLAGS) $(SQLITE_CFLAGS)
+ FEATURECFLAGS = -D_DEFAULT_SOURCE -D_GNU_SOURCE -D_BSD_SOURCE -D_DARWIN_C_SOURCE
+ LDLIBS        = $(CURL_LIBS) $(EXPAT_LIBS) $(GUMBO_LIBS) $(SQLITE_LIBS) $(PTHREAD_LIBS)
+ DESTDIR       =
+-PREFIX        = /usr/local
++PREFIX        ?= /usr/local
+ BINDIR        = $(PREFIX)/bin
+ MANDIR        = $(PREFIX)/share/man
+ ICONSDIR      = $(PREFIX)/share/icons/hicolor/scalable/apps

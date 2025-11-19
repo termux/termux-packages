@@ -1,0 +1,16 @@
+diff -uNr rsync-3.1.3/lib/getpass.c rsync-3.1.3.mod/lib/getpass.c
+--- rsync-3.1.3/lib/getpass.c	2013-05-20 01:01:29.000000000 +0300
++++ rsync-3.1.3.mod/lib/getpass.c	2018-08-16 13:29:02.517996377 +0300
+@@ -23,6 +23,7 @@
+ 
+ #include "rsync.h"
+ 
++#ifndef HAVE_GETPASS
+ char *getpass(const char *prompt)
+ {
+ 	static char password[256];
+@@ -70,3 +71,4 @@
+ 
+ 	return NULL;
+ }
++#endif

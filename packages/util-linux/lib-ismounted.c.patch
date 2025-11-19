@@ -1,0 +1,12 @@
+diff -u -r ../util-linux-2.29.2/lib/ismounted.c ./lib/ismounted.c
+--- ../util-linux-2.29.2/lib/ismounted.c	2017-02-22 11:16:55.241092792 +0100
++++ ./lib/ismounted.c	2017-06-29 00:29:03.385122232 +0200
+@@ -143,7 +143,7 @@
+ #endif /* __GNU__ */
+ 	*mount_flags = MF_MOUNTED;
+ 
+-#ifdef MNTOPT_RO
++#if defined(MNTOPT_RO) && !defined(__ANDROID__)
+ 	/* Check to see if the ro option is set */
+ 	if (hasmntopt(mnt, MNTOPT_RO))
+ 		*mount_flags |= MF_READONLY;

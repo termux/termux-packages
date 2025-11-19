@@ -1,0 +1,23 @@
+Allow building with python 3.12.
+
+diff -u -r ../jack2-1.9.22/waflib/Context.py ./waflib/Context.py
+--- ../jack2-1.9.22/waflib/Context.py	2023-02-02 11:04:10.000000000 +0000
++++ ./waflib/Context.py	2025-01-04 14:41:17.461095402 +0000
+@@ -6,7 +6,7 @@
+ Classes and functions enabling the command system
+ """
+ 
+-import os, re, imp, sys
++import os, re, sys, types
+ from waflib import Utils, Errors, Logs
+ import waflib.Node
+ 
+@@ -660,7 +660,7 @@
+ 	except KeyError:
+ 		pass
+ 
+-	module = imp.new_module(WSCRIPT_FILE)
++	module = types.ModuleType(WSCRIPT_FILE)
+ 	try:
+ 		code = Utils.readf(path, m='r', encoding=encoding)
+ 	except EnvironmentError:

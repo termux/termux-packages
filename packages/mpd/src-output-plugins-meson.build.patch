@@ -1,0 +1,16 @@
+diff -u -r ../MPD-0.21.3/src/output/plugins/meson.build ./src/output/plugins/meson.build
+--- ../MPD-0.21.3/src/output/plugins/meson.build	2018-11-16 12:27:58.000000000 +0000
++++ ./src/output/plugins/meson.build	2018-12-30 23:30:25.443763055 +0000
+@@ -106,12 +106,8 @@
+   need_encoder = true
+ endif
+ 
+-if is_android
+   sles_dep = c_compiler.find_library('OpenSLES')
+   output_plugins_sources += 'sles/SlesOutputPlugin.cxx'
+-else
+-  sles_dep = dependency('', required: false)
+-endif
+ 
+ if libsndio_dep.found()
+   output_plugins_sources += 'SndioOutputPlugin.cxx'

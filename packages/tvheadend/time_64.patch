@@ -1,0 +1,15 @@
+--- tvheadend/src/compat.h	2021-09-19 19:48:05.000000000 +0530
++++ tvheadend-mod/src/compat.h	2021-10-02 10:56:34.486999999 +0530
+@@ -30,10 +30,11 @@
+ #define pthread_yield() sched_yield()
+ #endif
+ #define S_IEXEC S_IXUSR
++#if !defined(__LP64__)
+ #include <time64.h>
+ // 32-bit Android has only timegm64() and not timegm().
+ // We replicate the behaviour of timegm() when the result overflows time_t.
+-
++#endif
+ #endif /* ENABLE_ANDROID */
+ 
+ #ifndef ENABLE_EPOLL_CREATE1

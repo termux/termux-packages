@@ -1,0 +1,41 @@
+Fixes the VTIMEZONE generator of libicu producing an invalid VTIMEZONE,
+which if unpatched, would cause the error
+JavaScript error: resource:///modules/calendar/Ical.sys.mjs, line 1942: ParserError: invalid line (no token ";" or ":") "America/Chicago[2025a]"
+in Thunderbird 115 and newer, which would cause multiple UI elements to be missing or broken.
+More information:
+https://unicode-org.atlassian.net/browse/ICU-22132
+https://bugzilla.mozilla.org/show_bug.cgi?id=1843007
+
+Following the example of Arch Linux:
+https://gitlab.archlinux.org/archlinux/packaging/packages/icu/-/blob/cf70a1eb2d513d0286fb975fb06abb20442a4358/ICU-22132.patch
+
+Before:
+icutzprop: "America/Chicago[2025a]"
+
+After:
+icutzprop: "X-TZINFO:America/Chicago[2025a]"
+
+--- a/i18n/vtzone.cpp	2023-07-14 09:05:38.000000000 +0100
++++ b/i18n/vtzone.cpp	2023-07-14 09:05:38.000000000 +0100
+@@ -1735,14 +1735,14 @@
+             }
+         }
+     } else {
+-        UnicodeString icutzprop;
+-        UVector customProps(nullptr, uhash_compareUnicodeString, status);
++        UVector customProps(uprv_deleteUObject, uhash_compareUnicodeString, status);
+         if (olsonzid.length() > 0 && icutzver.length() > 0) {
+-            icutzprop.append(olsonzid);
+-            icutzprop.append(u'[');
+-            icutzprop.append(icutzver);
+-            icutzprop.append(u']');
+-            customProps.addElement(&icutzprop, status);
++            LocalPointer<UnicodeString> icutzprop(new UnicodeString(ICU_TZINFO_PROP), status);
++            icutzprop->append(olsonzid);
++            icutzprop->append(u'[');
++            icutzprop->append(icutzver);
++            icutzprop->append(u']');
++            customProps.adoptElement(icutzprop.orphan(), status);
+         }
+         writeZone(writer, *tz, &customProps, status);
+     }

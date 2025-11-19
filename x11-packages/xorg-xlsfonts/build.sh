@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
+TERMUX_PKG_DESCRIPTION="List available X fonts"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.0.8"
+TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/archive/individual/app/xlsfonts-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=807f909eace684b866fc63b3e962729c120822a6c96e051ff51cf350b3ffb6cd
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libx11"
+TERMUX_PKG_BUILD_DEPENDS="xorg-util-macros"

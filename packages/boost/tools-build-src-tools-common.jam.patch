@@ -1,0 +1,16 @@
+diff -uNr boost_1_72_0/tools/build/src/tools/common.jam boost_1_72_0.mod/tools/build/src/tools/common.jam
+--- boost_1_72_0/tools/build/src/tools/common.jam	2019-12-10 02:20:17.000000000 +0200
++++ boost_1_72_0.mod/tools/build/src/tools/common.jam	2020-01-13 01:11:52.367381897 +0200
+@@ -979,12 +979,6 @@
+         version = $(version[1]) ;
+     }
+ 
+-    # Ditto, from Clang 4
+-    if ( $(tag) = clang || $(tag) = clangw ) && $(version[1]) && [ numbers.less 3 $(version[1]) ]
+-    {
+-        version = $(version[1]) ;
+-    }
+-
+     # On intel, version is not added, because it does not matter and it is the
+     # version of vc used as backend that matters. Ideally, we should encode the
+     # backend version but that would break compatibility with V1.

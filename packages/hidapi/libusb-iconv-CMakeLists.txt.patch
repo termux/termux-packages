@@ -1,0 +1,20 @@
+--- ./libusb/CMakeLists.txt~	2025-02-01 13:16:49.669029267 +0000
++++ ./libusb/CMakeLists.txt	2025-02-01 13:18:12.309030989 +0000
+@@ -22,7 +22,6 @@
+ if(HIDAPI_NO_ICONV)
+     target_compile_definitions(hidapi_libusb PRIVATE NO_ICONV)
+ else()
+-    if(NOT ANDROID)
+         include(CheckCSourceCompiles)
+ 
+         if(NOT CMAKE_VERSION VERSION_LESS 3.11)
+@@ -77,9 +76,6 @@
+         if(HIDAPI_ICONV_CONST)
+             target_compile_definitions(hidapi_libusb PRIVATE "ICONV_CONST=const")
+         endif()
+-    else()
+-        # On Android Iconv is disabled on the code level anyway, so no issue;
+-    endif()
+ endif()
+ 
+ set_target_properties(hidapi_libusb

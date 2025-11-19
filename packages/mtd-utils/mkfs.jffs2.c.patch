@@ -1,0 +1,14 @@
+diff -uNr mtd-utils-2.1.1/jffsX-utils/mkfs.jffs2.c mtd-utils-2.1.1.mod/jffsX-utils/mkfs.jffs2.c
+--- mtd-utils-2.1.1/jffsX-utils/mkfs.jffs2.c	2018-10-02 15:07:55.000000000 +0300
++++ mtd-utils-2.1.1.mod/jffsX-utils/mkfs.jffs2.c	2019-10-04 20:22:36.232097463 +0300
+@@ -86,6 +86,10 @@
+ 
+ #define PAD(x) (((x)+3)&~3)
+ 
++#ifndef IFTODT
++#define IFTODT(mode) (((mode) & 0170000) >> 12)
++#endif
++
+ struct filesystem_entry {
+ 	char *name;					/* Name of this directory (think basename) */
+ 	char *path;					/* Path of this directory (think dirname) */

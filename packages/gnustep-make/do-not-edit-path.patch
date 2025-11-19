@@ -1,0 +1,26 @@
+This prevents GNUstep.sh from editing $PATH
+to insert $TERMUX_PREFIX/bin to $PATH,
+which is important because:
+- having $TERMUX_PREFIX/bin in $PATH severely breaks cross-compilations
+- on-device builds already have $TERMUX_PREFIX/bin in $PATH at all times, so editing it is not necessary for on-device builds
+
+Also, similarly prevent GNUstep.sh from inserting $TERMUX_PREFIX/lib to $LD_LIBRARY_PATH, for similar reasons
+
+--- a/GNUstep.sh.in
++++ b/GNUstep.sh.in
+@@ -332,6 +332,7 @@ done
+ #
+ old_IFS="$IFS"
+ IFS=:
++GNUSTEP_TOOLS_PATHLIST=
+ for dir in $GNUSTEP_TOOLS_PATHLIST; do
+ 
+   # Prepare the path_fragment
+@@ -365,6 +365,7 @@ GNUSTEP_LIBRARIES_PATHLIST=`$GNUSTEP_MAKEFILES/print_unique_pathlist.sh "$GNUSTE
+ 
+ old_IFS="$IFS"
+ IFS=:
++GNUSTEP_LIBRARIES_PATHLIST=
+   for dir in $GNUSTEP_LIBRARIES_PATHLIST; do
+ 
+     # prepare the path_fragment for libraries and this dir

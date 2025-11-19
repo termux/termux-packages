@@ -1,0 +1,117 @@
+diff --git a/contrib/proxy/gen.c b/contrib/proxy/gen.c
+index dbd74c0..4c76bfe 100644
+--- a/contrib/proxy/gen.c
++++ b/contrib/proxy/gen.c
+@@ -5,7 +5,7 @@
+ #include <unistd.h>
+ 
+ struct stat st;
+-char *file = "/tmp/log";
++char *file = "@TERMUX_PREFIX@/tmp/log";
+ unsigned char *data;
+ int counter = 0;
+ 
+@@ -17,7 +17,7 @@ struct {
+ } tab[100000]; /* should be enough */
+ 
+ unsigned char header[] =
+-"#!/usr/bin/env python3\n"
++"#!@TERMUX_PREFIX@/usr/bin/env python3\n"
+ "import http.server\n\n";
+ 
+ unsigned char footer[] =
+diff --git a/src/network/socket.c b/src/network/socket.c
+index f43d4c6..363dfb7 100644
+--- a/src/network/socket.c
++++ b/src/network/socket.c
+@@ -83,7 +83,7 @@ static INIT_LIST_OF(struct socket_weak_ref, socket_weak_refs);
+ /* To enable logging of tranfers, for debugging purposes. */
+ #if 0
+ 
+-#define DEBUG_TRANSFER_LOGFILE "/tmp/log"
++#define DEBUG_TRANSFER_LOGFILE "@TERMUX_PREFIX@/tmp/log"
+ 
+ static void
+ debug_transfer_log(unsigned char *data, int len)
+diff --git a/src/osdep/unix/sysinfo.h b/src/osdep/unix/sysinfo.h
+index 7b0c205..8292549 100644
+--- a/src/osdep/unix/sysinfo.h
++++ b/src/osdep/unix/sysinfo.h
+@@ -6,7 +6,7 @@
+ 
+ #define SYSTEM_NAME	"Unix"
+ #define SYSTEM_STR	"unix"
+-#define DEFAULT_SHELL	"/bin/sh"
++#define DEFAULT_SHELL	"@TERMUX_PREFIX@/bin/sh"
+ #define GETSHELL	getenv("SHELL")
+ 
+ #ifdef __cplusplus
+diff --git a/src/protocol/file/mailcap.c b/src/protocol/file/mailcap.c
+index 24b4702..aff5490 100644
+--- a/src/protocol/file/mailcap.c
++++ b/src/protocol/file/mailcap.c
+@@ -110,7 +110,7 @@ mailcap_protocol_handler(struct connection *conn)
+ 		/* We implicitly chain stderr to ELinks' stderr. */
+ 		close_all_non_term_fd();
+ 
+-		if (execl("/bin/sh", "/bin/sh", "-c", script, (char *) NULL)) {
++		if (execl("@TERMUX_PREFIX@/bin/sh", "@TERMUX_PREFIX@/bin/sh", "-c", script, (char *) NULL)) {
+ 			_exit(3);
+ 		}
+ 
+diff --git a/src/session/download.c b/src/session/download.c
+index c3ad1d7..dd8b417 100644
+--- a/src/session/download.c
++++ b/src/session/download.c
+@@ -373,7 +373,7 @@ exec_mailcap_command(void *data)
+ 				add_to_string(&string, "mailcap:");
+ 				add_to_string(&string, exec_mailcap->command);
+ 				if (exec_mailcap->file) {
+-					add_to_string(&string, " && /bin/rm -f ");
++					add_to_string(&string, " && @TERMUX_PREFIX@/bin/rm -f ");
+ 					add_to_string(&string, exec_mailcap->file);
+ 				}
+ 
+@@ -1097,7 +1097,7 @@ subst_file(unsigned char *prog, unsigned char *file, unsigned char *uri)
+ 		struct string s;
+ 
+ 		if (init_string(&s)) {
+-			add_to_string(&s, "/bin/cat ");
++			add_to_string(&s, "@TERMUX_PREFIX@/bin/cat ");
+ 			add_shell_quoted_to_string(&s, file, strlen(file));
+ 			add_to_string(&s, " | ");
+ 			add_string_to_string(&s, &name);
+diff --git a/src/setup.h b/src/setup.h
+index f859208..16ef0ef 100644
+--- a/src/setup.h
++++ b/src/setup.h
+@@ -85,11 +85,11 @@
+ 
+ /* Default mime settings */
+ #define DEFAULT_MIME_TYPE		"application/octet-stream"
+-#define DEFAULT_PAGER_PATH		"/usr/bin/pager"
+-#define DEFAULT_LESS_PATH		"/usr/bin/less"
+-#define DEFAULT_MORE_PATH		"/usr/bin/more"
+-#define DEFAULT_MAILCAP_PATH		"~/.mailcap:/etc/mailcap:/usr/etc/mailcap:/usr/local/etc/mailcap:/usr/share/mailcap:/usr/share/misc/mailcap"
+-#define DEFAULT_MIMETYPES_PATH		"~/.mime.types:/etc/mime.types:/usr/etc/mime.types:/usr/local/etc/mime.types:/usr/share/mime.types:/usr/share/misc/mime.types"
++#define DEFAULT_PAGER_PATH		"@TERMUX_PREFIX@/bin/pager"
++#define DEFAULT_LESS_PATH		"@TERMUX_PREFIX@/bin/less"
++#define DEFAULT_MORE_PATH		"@TERMUX_PREFIX@/bin/more"
++#define DEFAULT_MAILCAP_PATH		"~/.mailcap:@TERMUX_PREFIX@/etc/mailcap:@TERMUX_PREFIX@/share/mailcap"
++#define DEFAULT_MIMETYPES_PATH		"~/.mime.types:@TERMUX_PREFIX@/etc/mime.types:@TERMUX_PREFIX@/share/mime.types"
+ 
+ /* Default external commands (see osdep/newwin.c and/or system-specific osdep/
+  * files) */
+diff --git a/src/util/file.c b/src/util/file.c
+index 90882ee..b553e1e 100644
+--- a/src/util/file.c
++++ b/src/util/file.c
+@@ -186,7 +186,7 @@ get_tempdir_filename(unsigned char *name)
+ 	if (!tmpdir || !*tmpdir) tmpdir = getenv("TMP");
+ 	if (!tmpdir || !*tmpdir) tmpdir = getenv("TEMPDIR");
+ 	if (!tmpdir || !*tmpdir) tmpdir = getenv("TEMP");
+-	if (!tmpdir || !*tmpdir) tmpdir = "/tmp";
++	if (!tmpdir || !*tmpdir) tmpdir = "@TERMUX_PREFIX@/tmp";
+ 
+ 	return straconcat(tmpdir, "/", name, (unsigned char *) NULL);
+ }

@@ -1,0 +1,18 @@
+diff --git a/configure.ac b/configure.ac
+index d17ba04a7..9b677a77f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -753,10 +753,10 @@ AS_IF([test x$arch = xaarch64],
+        #   Red Hat: arm-redhat-linux-gnu-gcc
+        #   Fedora:  arm-linux-gnu-gcc
+        #   ALT:     armh-alt-linux-gnueabi-gcc
+-       m4_foreach([triplet1], [arm, arm7, arm7hl, armh], dnl
++       m4_foreach([triplet1], [arm, arm7, armv7a, arm7hl, armh], dnl
+ 		  [m4_foreach([triplet2], [, $host_vendor-], dnl
+-			      [m4_foreach([triplet3], [gnu, gnueabi, gnueabihf], dnl
+-					  [m4_foreach([triplet_cc], [gcc, cc], dnl
++			      [m4_foreach([triplet3], [gnu, gnueabi, gnueabihf, androideabi], dnl
++					  [m4_foreach([triplet_cc], [gcc, cc, clang], dnl
+ 						      [m4_append([arm_compat_compilers], dnl
+ 								 triplet1[-]triplet2[linux-]triplet3[-]triplet_cc)])])])])
+        AC_CHECK_PROGS(CC_FOR_M32, arm_compat_compilers)

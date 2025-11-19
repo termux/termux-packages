@@ -1,0 +1,11 @@
+--- a/src/xdgiconloader/xdgiconloader.cpp
++++ b/src/xdgiconloader/xdgiconloader.cpp
+@@ -564,7 +564,7 @@
+             auto unthemedInfo = unthemedFallback(name, QIcon::themeSearchPaths());
+             if (unthemedInfo.entries.empty()) {
+                 /* Freedesktop standard says to look in /usr/share/pixmaps last */
+-                const QStringList pixmapPath = (QStringList() << QString::fromLatin1("/usr/share/pixmaps"));
++                const QStringList pixmapPath = (QStringList() << QString::fromLatin1("@TERMUX_PREFIX@/share/pixmaps"));
+                 auto pixmapInfo = unthemedFallback(name, pixmapPath);
+                 if (pixmapInfo.entries.empty()) {
+                     return QThemeIconInfo();

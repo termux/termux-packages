@@ -1,0 +1,37 @@
+--- abuild-3.2.0/abuild-rmtemp.c	2018-06-22 10:24:10.000000000 +0300
++++ abuild-3.2.0.mod/abuild-rmtemp.c	2018-11-18 19:54:49.254290401 +0200
+@@ -16,7 +16,7 @@
+ #include <sys/types.h>
+ #include <unistd.h>
+ 
+-#define PREFIX "/var/tmp/abuild."
++#define PREFIX "@TERMUX_PREFIX@/var/tmp/abuild."
+ 
+ static void fail() {
+ 	errx(1, "%s", strerror(errno));
+@@ -29,10 +29,12 @@
+ int main(int argc, char **argv) {
+ 	if (argc < 2) return 0;
+ 
++#ifndef __ANDROID__
+ 	if (getuid()) {
+ 		argv[0] = "-abuild-rmtemp";
+ 		execv("/usr/bin/abuild-sudo", argv);
+ 	}
++#endif
+ 
+ 	if (strncmp(argv[1], PREFIX, strlen(PREFIX)) || \
+ 		strchr(argv[1] + strlen(PREFIX), '/'))
+@@ -40,9 +42,12 @@
+ 
+ 	struct stat s;
+ 	if (lstat(argv[1], &s)) fail();
++
++#ifndef __ANDROID__
+ 	struct passwd *p = getpwnam(getenv("USER"));
+ 	if (!p) errx(1, "Incorrect user");
+ 	if (s.st_uid != p->pw_uid) errx(1, "Permission denied");
++#endif
+ 
+ 	if (nftw(argv[1], handler, 512, FTW_DEPTH)) fail();
+ 

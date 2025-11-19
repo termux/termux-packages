@@ -1,0 +1,13 @@
+--- a/include/net-snmp/session_api.h
++++ b/include/net-snmp/session_api.h
+@@ -17,6 +17,10 @@
+      *    including sending and receiving requests.
+      */
+ 
++#ifdef __ANDROID__
++#include <sys/select.h>
++#endif
++
+ #include <net-snmp/types.h>
+ 
+ #ifdef __cplusplus

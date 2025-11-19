@@ -1,0 +1,26 @@
+--- pacman-7.0.0/scripts/pacman-key.sh.in	2024-07-14 12:11:18.000000000 +0300
++++ pacman-7.0.0/scripts/pacman-key.sh.in.patch	2024-09-15 14:00:52.768174727 +0300
+@@ -266,11 +266,6 @@
+ 		exit 1
+ 	fi
+ 
+-	if (( !(EXPORT || FINGER || LISTKEYS || LISTSIGS || VERIFY) && EUID != 0 )); then
+-		error "$(gettext "You do not have sufficient permissions to run this command.")"
+-		exit 1
+-	fi
+-
+ 	if (( LSIGNKEY || POPULATE )); then
+ 		if [[ $(secret_keys_available) -lt 1 ]]; then
+ 			error "$(gettext "There is no secret key available to sign with.")"
+@@ -691,11 +686,6 @@
+ 	exit 1
+ fi
+ 
+-if (( (ADD || DELETE || EDITKEY || IMPORT || IMPORT_TRUSTDB || INIT || LSIGNKEY || POPULATE || RECEIVE || REFRESH || UPDATEDB) && EUID != 0 )); then
+-	error "$(gettext "%s needs to be run as root for this operation.")" "pacman-key"
+-	exit 1
+-fi
+-
+ CONFIG=${CONFIG:-@sysconfdir@/pacman.conf}
+ if [[ ! -r "${CONFIG}" ]]; then
+ 	error "$(gettext "%s configuration file '%s' not found.")" "pacman" "$CONFIG"

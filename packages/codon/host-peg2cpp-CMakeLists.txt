@@ -1,0 +1,28 @@
+cmake_minimum_required(VERSION 3.14)
+
+set(CPM_DOWNLOAD_VERSION 0.32.3)
+set(CPM_DOWNLOAD_LOCATION "${CMAKE_BINARY_DIR}/cmake/CPM_${CPM_DOWNLOAD_VERSION}.cmake")
+if(NOT (EXISTS ${CPM_DOWNLOAD_LOCATION}))
+    message(STATUS "Downloading CPM.cmake...")
+    file(DOWNLOAD https://github.com/TheLartians/CPM.cmake/releases/download/v${CPM_DOWNLOAD_VERSION}/CPM.cmake ${CPM_DOWNLOAD_LOCATION})
+endif()
+include(${CPM_DOWNLOAD_LOCATION})
+
+CPMAddPackage(
+    NAME peglib
+    GITHUB_REPOSITORY "exaloop/cpp-peglib"
+    GIT_TAG codon
+    OPTIONS "BUILD_TESTS OFF")
+
+CPMAddPackage(
+    NAME fmt
+    GITHUB_REPOSITORY "fmtlib/fmt"
+    GIT_TAG 9.1.0
+    OPTIONS "CMAKE_POSITION_INDEPENDENT_CODE ON"
+            "FMT_INSTALL ON")
+
+find_package(Threads REQUIRED)
+
+add_executable(peg2cpp peg2cpp.cpp)
+target_include_directories(peg2cpp PRIVATE ${peglib_SOURCE_DIR})
+target_link_libraries(peg2cpp PRIVATE Threads::Threads fmt)

@@ -1,0 +1,13 @@
+TERMUX_PKG_HOMEPAGE=https://www.tcsh.org
+TERMUX_PKG_DESCRIPTION="TENEX C Shell, an enhanced version of Berkeley csh"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="6.24.16"
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://github.com/tcsh-org/tcsh/archive/TCSH${TERMUX_PKG_VERSION//./_}.tar.gz
+TERMUX_PKG_SHA256=aa8b6eeca8b93db659a7ebf421a7089b3f7f8457deba34170cd146b92fe60546
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_UPDATE_METHOD=repology
+TERMUX_PKG_BUILD_DEPENDS="libcrypt, libiconv, ncurses"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-nls --disable-nls-catalogs"

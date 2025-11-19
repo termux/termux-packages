@@ -1,0 +1,77 @@
+From fa4d7c92b770e2375b14b4c53edf262534415ab8 Mon Sep 17 00:00:00 2001
+From: Stephan Hartmann <stha09@googlemail.com>
+Date: Tue, 31 Oct 2023 15:43:33 +0100
+Subject: [PATCH] libstdc++: replace deprecated std::is_pod<T>
+
+std::is_pod is deprecated since C++20. Replace with std::trivial and
+std::is_standard_layout. Avoids a lot of warnings.
+
+Bug: chromium:957519
+Change-Id: Idb4bde7401c14c0896a84c357ec668b9916f613e
+Reviewed-on: https://webrtc-review.googlesource.com/c/src/+/325484
+Reviewed-by: Philip Eliasson <philipel@webrtc.org>
+Reviewed-by: Danil Chapovalov <danilchap@webrtc.org>
+Commit-Queue: Philip Eliasson <philipel@webrtc.org>
+Cr-Commit-Position: refs/heads/main@{#41117}
+---
+
+diff --git a/third_party/webrtc/modules/video_coding/include/video_codec_interface.h b/third_party/webrtc/modules/video_coding/include/video_codec_interface.h
+index c6522fc..987e1b6 100644
+--- a/third_party/webrtc/modules/video_coding/include/video_codec_interface.h
++++ b/third_party/webrtc/modules/video_coding/include/video_codec_interface.h
+@@ -50,7 +50,9 @@
+   size_t updatedBuffers[kBuffersCount];
+   size_t updatedBuffersCount;
+ };
+-static_assert(std::is_pod<CodecSpecificInfoVP8>::value, "");
++static_assert(std::is_trivial_v<CodecSpecificInfoVP8> &&
++                  std::is_standard_layout_v<CodecSpecificInfoVP8>,
++              "");
+ 
+ // Hack alert - the code assumes that thisstruct is memset when constructed.
+ struct CodecSpecificInfoVP9 {
+@@ -79,7 +81,9 @@
+   uint8_t num_ref_pics;
+   uint8_t p_diff[kMaxVp9RefPics];
+ };
+-static_assert(std::is_pod<CodecSpecificInfoVP9>::value, "");
++static_assert(std::is_trivial_v<CodecSpecificInfoVP9> &&
++                  std::is_standard_layout_v<CodecSpecificInfoVP9>,
++              "");
+ 
+ // Hack alert - the code assumes that thisstruct is memset when constructed.
+ struct CodecSpecificInfoH264 {
+@@ -88,14 +92,18 @@
+   bool base_layer_sync;
+   bool idr_frame;
+ };
+-static_assert(std::is_pod<CodecSpecificInfoH264>::value, "");
++static_assert(std::is_trivial_v<CodecSpecificInfoH264> &&
++                  std::is_standard_layout_v<CodecSpecificInfoH264>,
++              "");
+ 
+ union CodecSpecificInfoUnion {
+   CodecSpecificInfoVP8 VP8;
+   CodecSpecificInfoVP9 VP9;
+   CodecSpecificInfoH264 H264;
+ };
+-static_assert(std::is_pod<CodecSpecificInfoUnion>::value, "");
++static_assert(std::is_trivial_v<CodecSpecificInfoUnion> &&
++                  std::is_standard_layout_v<CodecSpecificInfoUnion>,
++              "");
+ 
+ // Note: if any pointers are added to this struct or its sub-structs, it
+ // must be fitted with a copy-constructor. This is because it is copied
+diff --git a/third_party/webrtc/test/fuzzers/rtp_frame_reference_finder_fuzzer.cc b/third_party/webrtc/test/fuzzers/rtp_frame_reference_finder_fuzzer.cc
+index ea66c4a..93673f0 100644
+--- a/third_party/webrtc/test/fuzzers/rtp_frame_reference_finder_fuzzer.cc
++++ b/third_party/webrtc/test/fuzzers/rtp_frame_reference_finder_fuzzer.cc
+@@ -23,7 +23,7 @@
+ 
+   template <typename T>
+   void CopyTo(T* object) {
+-    static_assert(std::is_pod<T>(), "");
++    static_assert(std::is_trivial_v<T> && std::is_standard_layout_v<T>, "");
+     uint8_t* destination = reinterpret_cast<uint8_t*>(object);
+     size_t object_size = sizeof(T);
+     size_t num_bytes = std::min(size_ - offset_, object_size);

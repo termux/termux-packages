@@ -1,0 +1,58 @@
+From d5fe7a471fd6ab1bbb2ec9d270f44bddcefaa015 Mon Sep 17 00:00:00 2001
+From: Jeongik Cha <jeongik@google.com>
+Date: Wed, 10 Mar 2021 06:09:02 +0000
+Subject: [PATCH] Supplement the condition for strerror_r in bionic
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The current condition assumes that bionic is used for only android
+device target, but it can be host target as well.
+So to support an android host target using bionic instead of glibc,
+supplement the condition for strerror_r as the condition in strings.h
+in bionic.
+
+Test: build libchrome for linux_glibc, linux_bionic, android_bionic
+Bug: b/181203470
+Change-Id: Id4bec947ecb90c06c47db2cc77b721041b1931d9
+Reviewed-on: https://chromium-review.googlesource.com/c/chromium/src/+/2738587
+Reviewed-by: François Doray <fdoray@chromium.org>
+Reviewed-by: Albert J. Wong <ajwong@chromium.org>
+Auto-Submit: Jeongik Cha <jeongik@google.com>
+Commit-Queue: Jeongik Cha <jeongik@google.com>
+Cr-Commit-Position: refs/heads/master@{#861445}
+---
+ base/posix/safe_strerror.cc | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
+
+diff --git a/base/posix/safe_strerror.cc b/base/posix/safe_strerror.cc
+index aef5742d33135..aab8b879218b5 100644
+--- a/src/3rdparty/chromium/base/posix/safe_strerror.cc
++++ b/src/3rdparty/chromium/base/posix/safe_strerror.cc
+@@ -2,14 +2,6 @@
+ // Use of this source code is governed by a BSD-style license that can be
+ // found in the LICENSE file.
+ 
+-#if defined(__ANDROID__)
+-// Post-L versions of bionic define the GNU-specific strerror_r if _GNU_SOURCE
+-// is defined, but the symbol is renamed to __gnu_strerror_r which only exists
+-// on those later versions. To preserve ABI compatibility with older versions,
+-// undefine _GNU_SOURCE and use the POSIX version.
+-#undef _GNU_SOURCE
+-#endif
+-
+ #include "base/posix/safe_strerror.h"
+ 
+ #include <errno.h>
+@@ -22,6 +14,11 @@ namespace base {
+ 
+ #if defined(__GLIBC__) || defined(OS_NACL)
+ #define USE_HISTORICAL_STRERRO_R 1
++// Post-L versions of bionic define the GNU-specific strerror_r if _GNU_SOURCE
++// is defined, but the symbol is renamed to __gnu_strerror_r which only exists
++// on those later versions. For parity, add the same condition as bionic.
++#elif defined(__BIONIC__) && defined(_GNU_SOURCE) && __ANDROID_API__ >= 23
++#define USE_HISTORICAL_STRERRO_R 1
+ #else
+ #define USE_HISTORICAL_STRERRO_R 0
+ #endif

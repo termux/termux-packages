@@ -1,0 +1,12 @@
+--- ./ext/opcache/config.m4.orig	2024-11-27 23:24:00.473417043 +0700
++++ ./ext/opcache/config.m4	2024-11-27 23:34:36.000000000 +0700
+@@ -342,7 +342,8 @@
+     [$ext_shared],,
+     [-DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 $JIT_CFLAGS],,
+     [yes])
+-
++  OPCACHE_SHARED_LIBADD=-lpcre2-8
++  PHP_SUBST(OPCACHE_SHARED_LIBADD)
+   PHP_ADD_EXTENSION_DEP(opcache, date)
+   PHP_ADD_EXTENSION_DEP(opcache, pcre)
+ 

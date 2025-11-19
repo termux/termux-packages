@@ -1,0 +1,10 @@
++++ ./girepository/compiler/meson.build
+@@ -26,7 +26,7 @@
+ 
+ # Only override the user-installed compiler if we need to generate the GIRs
+ # GLib, Gio, and GObject...
+-if enable_gir
++if enable_gir and meson.can_run_host_binaries()
+   # Replace the default g-ir-compiler target with the version we
+   # just built.
+   meson.override_find_program('g-ir-compiler', gicompilerepository)

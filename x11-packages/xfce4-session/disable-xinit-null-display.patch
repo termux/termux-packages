@@ -1,0 +1,20 @@
+--- a/scripts/startxfce4.in
++++ b/scripts/startxfce4.in
+@@ -114,14 +114,9 @@
+ 
+ if test "x$XFCE4_SESSION_COMPOSITOR" = "x"
+ then
+-  if test "x$DISPLAY" = "x"
+-  then
+-    echo "$0: Starting X server"
+-    prog=xinit
+-
+-    if test ! "x$XDG_VTNR" = "x"; then
+-      SERVERRC="$SERVERRC vt$XDG_VTNR"
+-    fi
++  if test "x$DISPLAY" = "x"; then
++    echo "$0: Failed to connect to display"
++    exit 2
+   else
+     echo "$0: X server already running on display $DISPLAY"
+     prog=/bin/sh

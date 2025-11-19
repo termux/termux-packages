@@ -1,0 +1,96 @@
+diff -uNr openssh-portable-V_9_5_P1/session.c openssh-portable-V_9_5_P1.mod/session.c
+--- openssh-portable-V_9_5_P1/session.c	2023-10-04 07:34:10.000000000 +0300
++++ openssh-portable-V_9_5_P1.mod/session.c	2023-11-23 16:29:34.271209449 +0200
+@@ -139,6 +139,8 @@
+ extern struct sshauthopt *auth_opts;
+ extern char *tun_fwd_ifnames; /* serverloop.c */
+ 
++extern char **environ;
++
+ /* original command from peer. */
+ const char *original_command = NULL;
+ 
+@@ -265,7 +267,7 @@
+ 		return;
+ 
+ 	temporarily_use_uid(pw);
+-	auth_info_file = xstrdup("/tmp/sshauth.XXXXXXXXXXXXXXX");
++	auth_info_file = xstrdup("@TERMUX_PREFIX@/tmp/sshauth.XXXXXXXXXXXXXXX");
+ 	if ((fd = mkstemp(auth_info_file)) == -1) {
+ 		error_f("mkstemp: %s", strerror(errno));
+ 		goto out;
+@@ -793,6 +795,11 @@
+ 	char buf[256];
+ 
+ 	if (options.print_motd) {
++#ifdef __ANDROID__
++		// Normally this environment variable should be already unset, but
++		// doing this anyway.
++		unsetenv("TERMUX_HUSHLOGIN");
++#else
+ #ifdef HAVE_LOGIN_CAP
+ 		f = fopen(login_getcapstr(lc, "welcome", "/etc/motd",
+ 		    "/etc/motd"), "r");
+@@ -804,7 +811,14 @@
+ 				fputs(buf, stdout);
+ 			fclose(f);
+ 		}
++#endif
+ 	}
++#ifdef __ANDROID__
++	else {
++		// Tell Termux login script not to display motd.
++		setenv("TERMUX_HUSHLOGIN", "1", 1);
++	}
++#endif
+ }
+ 
+ 
+@@ -1050,11 +1064,13 @@
+ # endif /* HAVE_CYGWIN */
+ #endif /* HAVE_LOGIN_CAP */
+ 
++#ifdef _PATH_MAILDIR
+ 	if (!options.use_pam) {
+ 		snprintf(buf, sizeof buf, "%.200s/%.50s",
+ 		    _PATH_MAILDIR, pw->pw_name);
+ 		child_set_env(&env, &envsize, "MAIL", buf);
+ 	}
++#endif
+ 
+ 	/* Normal systems set SHELL by default. */
+ 	child_set_env(&env, &envsize, "SHELL", shell);
+@@ -1098,6 +1114,33 @@
+ 		    auth_sock_name);
+ 
+ 
++#ifdef __ANDROID__
++	char const* envs_to_keep[] = {"ASEC_MOUNTPOINT", "BOOTCLASSPATH", "DEX2OATBOOTCLASSPATH", "EXTERNAL_STORAGE", "LANG", "PATH", "PREFIX", "SYSTEMSERVERCLASSPATH", "TMPDIR", "LD_PRELOAD"};
++	for (i = 0; i < (sizeof(envs_to_keep) / sizeof(envs_to_keep[0])); i++) {
++		char const* env_to_keep_name = envs_to_keep[i];
++		char const* env_to_keep_value = getenv(env_to_keep_name);
++		if (env_to_keep_value) child_set_env(&env, &envsize, env_to_keep_name, env_to_keep_value);
++	}
++
++	char const* env_prefixes_to_keep[] = {"ANDROID_", "TERMUX_"};
++	char **all_env_vars = environ;
++	for (; *all_env_vars; all_env_vars++) {
++		for (int i = 0; i < (sizeof(env_prefixes_to_keep) / sizeof(env_prefixes_to_keep[0])); i++) {
++			if (strncmp(env_prefixes_to_keep[i], *all_env_vars, strlen(env_prefixes_to_keep[i])) == 0) {
++				char const* env_var = strdup(*all_env_vars);
++				char const* env_to_keep_name = strtok(env_var, "=");
++				if (env_to_keep_name) {
++					char const* env_to_keep_value = getenv(env_to_keep_name);
++					if (env_to_keep_value) {
++						child_set_env(&env, &envsize, env_to_keep_name, env_to_keep_value);
++					}
++				}
++				free(env_var);
++			}
++		}
++	}
++#endif
++
+ 	/* Set custom environment options from pubkey authentication. */
+ 	if (options.permit_user_env) {
+ 		for (n = 0 ; n < auth_opts->nenv; n++) {

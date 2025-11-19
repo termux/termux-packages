@@ -1,0 +1,88 @@
+--- a/chromium/patches/chromium/0009-Bridge-browser-into-Carbonyl-library.patch
++++ b/chromium/patches/chromium/0009-Bridge-browser-into-Carbonyl-library.patch
+@@ -18,14 +18,14 @@
+ +++ b/headless/app/headless_shell.cc
+ @@ -4,6 +4,8 @@
+  
+- #include "headless/app/headless_shell.h"
++ #include "headless/public/headless_shell.h"
+  
+ +#include "carbonyl/src/browser/bridge.h"
+ +
+  #include <memory>
+  
+  #include "base/base_switches.h"
+-@@ -90,6 +92,8 @@ void HeadlessShell::OnBrowserStart(HeadlessBrowser* browser) {
++@@ -103,6 +105,8 @@
+    HeadlessBrowserContext::Builder context_builder =
+        browser_->CreateBrowserContextBuilder();
+  
+@@ -34,15 +34,13 @@
+    // Retrieve the locale set by InitApplicationLocale() in
+    // headless_content_main_delegate.cc in a way that is free of side-effects.
+    context_builder.SetAcceptLanguage(base::i18n::GetConfiguredLocale());
+-@@ -113,39 +117,14 @@ void HeadlessShell::OnBrowserStart(HeadlessBrowser* browser) {
+- 
+-   GURL target_url = ConvertArgumentToURL(args.front());
++@@ -133,35 +137,12 @@
++   HeadlessWebContents::Builder builder(
++       browser_context->CreateWebContentsBuilder());
+  
+ -  // If driven by a debugger just open the target page and
+ -  // leave expecting the debugger will do what they need.
+--  if (IsRemoteDebuggingEnabled()) {
+--    HeadlessWebContents::Builder builder(
+--        browser_context_->CreateWebContentsBuilder());
++-  if (devtools_enabled) {
+ -    HeadlessWebContents* web_contents =
+ -        builder.SetInitialURL(target_url).Build();
+ -    if (!web_contents) {
+@@ -56,8 +54,6 @@
+ -  // execute the commands against the target page.
+ -#if defined(HEADLESS_ENABLE_COMMANDS)
+ -  GURL handler_url = HeadlessCommandHandler::GetHandlerUrl();
+-   HeadlessWebContents::Builder builder(
+-       browser_context_->CreateWebContentsBuilder());
+    HeadlessWebContents* web_contents =
+ -      builder.SetInitialURL(handler_url).Build();
+ +      builder.SetInitialURL(target_url).Build();
+@@ -71,7 +67,7 @@
+ -  HeadlessCommandHandler::ProcessCommands(
+ -      HeadlessWebContentsImpl::From(web_contents)->web_contents(),
+ -      std::move(target_url),
+--      base::BindOnce(&HeadlessShell::ShutdownSoon, weak_factory_.GetWeakPtr()));
++-      base::BindOnce(&HeadlessShell::ShutdownSoon, base::Unretained(this)));
+ -#endif
+  }
+  
+@@ -90,9 +86,9 @@
+  int main(int argc, const char** argv) {
+ +  carbonyl_shell_main();
+ +
++   content::ContentMainParams params(nullptr);
+  #if BUILDFLAG(IS_WIN)
+    sandbox::SandboxInterfaceInfo sandbox_info = {nullptr};
+-   content::InitializeSandboxInfo(&sandbox_info);
+ diff --git a/headless/lib/browser/headless_browser_impl.cc b/headless/lib/browser/headless_browser_impl.cc
+ index 1a1223108be6d..fd45d215479ab 100644
+ --- a/headless/lib/browser/headless_browser_impl.cc
+@@ -550,7 +546,7 @@
+  
+  #include "base/memory/weak_ptr.h"
+  #include "base/task/single_thread_task_runner.h"
+-@@ -121,9 +122,24 @@ class HEADLESS_EXPORT HeadlessBrowserImpl : public HeadlessBrowser,
++@@ -121,7 +122,22 @@
+    policy::PolicyService* GetPolicyService();
+  #endif
+  
+@@ -566,9 +562,7 @@
+ +  void OnMouseDownInput(unsigned int x, unsigned int y);
+ +  void OnMouseMoveInput(unsigned int x, unsigned int y);
+ +
+-   bool did_shutdown() const { return did_shutdown_; }
+- 
+-  protected:
++  private:
+ + // TODO: use base::TaskRunner
+ +  std::thread input_thread_;
+ +

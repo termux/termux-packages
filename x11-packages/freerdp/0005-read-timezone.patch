@@ -1,0 +1,21 @@
+--- a/winpr/libwinpr/timezone/timezone.c
++++ b/winpr/libwinpr/timezone/timezone.c
+@@ -243,8 +243,16 @@
+ 
+ static char* winpr_get_unix_timezone_identifier_from_file(void)
+ {
+-#if defined(ANDROID)
+-	return winpr_get_android_timezone_identifier();
++#if defined(__TERMUX__)
++	FILE* fp = popen("getprop persist.sys.timezone", "r");
++	char* tzid = NULL;
++
++	if (fp) {
++		tzid = winpr_read_unix_timezone_identifier_from_file(fp);
++		pclose(fp);
++	}
++
++	return tzid;
+ #else
+ 	FILE* fp = NULL;
+ 	char* tzid = NULL;

@@ -1,0 +1,73 @@
+https://github.com/lenmus/lenmus/commit/a18c09a1245cdc9065997f3550bb5cbf3166a0f5
+
+--- a/lomse/trunk/src/render/lomse_font_freetype.cpp
++++ b/lomse/trunk/src/render/lomse_font_freetype.cpp
+@@ -1,30 +1,10 @@
+ //---------------------------------------------------------------------------------------
+ // This file is part of the Lomse library.
+-// Lomse is copyrighted work (c) 2010-2018. All rights reserved.
++// Copyright (c) 2010-present, Lomse Developers
+ //
+-// Redistribution and use in source and binary forms, with or without modification,
+-// are permitted provided that the following conditions are met:
++// Licensed under the MIT license.
+ //
+-//    * Redistributions of source code must retain the above copyright notice, this
+-//      list of conditions and the following disclaimer.
+-//
+-//    * Redistributions in binary form must reproduce the above copyright notice, this
+-//      list of conditions and the following disclaimer in the documentation and/or
+-//      other materials provided with the distribution.
+-//
+-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+-// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+-// OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+-// SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+-// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+-// TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+-// BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+-// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+-// ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+-// DAMAGE.
+-//
+-// For any comment, suggestion or feature request, please contact the manager of
+-// the project at cecilios@users.sourceforge.net
++// See LICENSE and NOTICE.md files in the root directory of this source tree.
+ //---------------------------------------------------------------------------------------
+ 
+ //  This code is based on file agg_font_freetype.cpp from
+@@ -137,10 +117,9 @@ static unsigned calc_crc32(const unsigned char* buf, unsigned size)
+ {
+     unsigned crc = (unsigned)~0;
+     const unsigned char* p;
+-    unsigned len = 0;
+     unsigned nr = size;
+ 
+-    for (len += nr, p = buf; nr--; ++p)
++    for (p = buf; nr--; ++p)
+     {
+         crc = (crc >> 8) ^ crc32tab[(crc ^ *p) & 0xff];
+     }
+@@ -179,7 +158,13 @@ bool decompose_ft_outline(const FT_Outline& outline, bool flip_y, const trans_af
+ 
+     FT_Vector*  point;
+     FT_Vector*  limit;
++    // Freetype version 2.13.3 and later uses unsigned char for tags
++#if (FREETYPE_MAJOR > 2) || (FREETYPE_MAJOR == 2 && FREETYPE_MINOR > 13) || \
++    (FREETYPE_MAJOR == 2 && FREETYPE_MINOR == 13 && FREETYPE_PATCH >= 3)
++    unsigned char*       tags;
++#else
+     char*       tags;
++#endif
+ 
+     int   n;         // index of contour in outline
+     int   first;     // index of first point in contour
+@@ -902,6 +887,8 @@ void font_engine_freetype_base::update_char_size()
+ bool font_engine_freetype_base::prepare_glyph(unsigned glyph_code)
+ {
+     m_glyph_index = FT_Get_Char_Index(m_cur_face, glyph_code);
++    if (m_glyph_index == 0)
++        return false;   //missing glyph
+     m_last_error = FT_Load_Glyph(m_cur_face,
+                                     m_glyph_index,
+                                     m_hinting ? FT_LOAD_DEFAULT : FT_LOAD_NO_HINTING);

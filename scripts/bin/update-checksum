@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+##
+##  Package update helper script which sets new SHA-256 for source bundle.
+##
+##  Licensed under the Apache License, Version 2.0 (the "License");
+##  you may not use this file except in compliance with the License.
+##  You may obtain a copy of the License at
+##
+##    http://www.apache.org/licenses/LICENSE-2.0
+##
+##  Unless required by applicable law or agreed to in writing, software
+##  distributed under the License is distributed on an "AS IS" BASIS,
+##  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+##  See the License for the specific language governing permissions and
+##  limitations under the License.
+##
+
+set -e
+
+if [ "${#}" = "0" ]; then
+	echo "Usage: update-checksum [package name] ..."
+	echo
+	echo "Update TERMUX_PKG_SHA256 of package and optionally commit changes."
+	echo
+	exit 1
+fi
+
+REPO_ROOT=$(realpath "$(dirname "$0")/../../")
+IS_GIT_REPOSITORY=false
+
+if git status >/dev/null 2>&1; then
+	IS_GIT_REPOSITORY=true
+fi
+
+for package in "${@}"; do
+	buildsh_path=
+	repo=
+	if [ -d "${package}" ] && [ -f "${package}/build.sh" ]; then
+		buildsh_path="${package}/build.sh"
+		package=$(basename ${package})
+	else
+		for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' $REPO_ROOT/repo.json); do
+			if [ -d "${repo_path}/${package}" ] && [ -f "${repo_path}/${package}/build.sh" ]; then
+				repo=$(jq --raw-output '.["'$repo_path'"].name' $REPO_ROOT/repo.json)
+				repo=${repo#"termux-"}
+				buildsh_path="${repo_path}/${package}/build.sh"
+				package=$(basename ${package})
+			fi
+		done
+	fi
+
+	if [ ! -f "${buildsh_path}" ]; then
+		echo "${package}: skipping as no build.sh found"
+		continue
+	fi
+
+	# Command substitution create a subshell, we want to do this
+	# to not effect the main scope's variables by sourcing the build script
+	new_checksum=($(
+		source "${buildsh_path}" 2>/dev/null
+		for url in "${TERMUX_PKG_SRCURL[@]}"; do
+			echo "Downloading ${url}" >&2
+			dl_tmpdir=$(mktemp -d "${TMPDIR-/tmp}/termux.src.dl.XXXXXXXX")
+
+			if [[ -d "${dl_tmpdir}" ]]; then
+				if ! curl --fail --location --retry 3 --output "${dl_tmpdir}/source-bundle" "$url"; then
+					rm -rf "${dl_tmpdir}"
+				fi
+
+				if [[ -f "${dl_tmpdir}/source-bundle" ]]; then
+					sha256sum "${dl_tmpdir}/source-bundle" | awk '{ print $1 }'
+				fi
+
+				rm -rf "${dl_tmpdir}"
+			fi
+		done
+	))
+
+	if (( ${#new_checksum[@]} )); then
+		# Replace old SHA-256.
+		if (( ${#new_checksum[@]} > 1 )); then
+			checksum="(\n$(printf '\\t%s\\n' "${new_checksum[@]}"))"
+		else
+			checksum="${new_checksum[0]}"
+		fi
+		if grep -qPz "TERMUX_PKG_SHA256=\([^)]*\)" "${buildsh_path}"; then
+			sed -zi "s/\(TERMUX_PKG_SHA256=\)([^)]*)/\1${checksum}/g" "${buildsh_path}"
+		else
+			sed -i "s/\(TERMUX_PKG_SHA256=\).*/\1${checksum}/g" "${buildsh_path}"
+		fi
+
+		# Delete revision as it shouldn't be present if package was updated.
+		sed -i "/TERMUX_PKG_REVISION=/d" "${buildsh_path}"
+
+		# If we are on Git repository, prompt for committing changes.
+		if ${IS_GIT_REPOSITORY}; then
+			echo
+			echo "You are about to commit these changes:"
+			echo
+			echo "--------------------"
+			git --no-pager diff --patch "${buildsh_path}"
+			echo "--------------------"
+			echo
+			echo "bump(${repo}/${package}): $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
+			echo
+			read -re -p "Do you want to commit changes ? (y/n) " CHOICE
+			echo
+			if [[ ${CHOICE} =~ (Y|y) ]]; then
+				git add "${buildsh_path}"
+				git commit -m "bump(${repo}/${package}): $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
+			else
+				echo "Not committing to Git!"
+			fi
+			echo
+		fi
+	else
+		echo
+		echo "${package}: failed to calculate the new checksum"
+		exit 1
+	fi
+done

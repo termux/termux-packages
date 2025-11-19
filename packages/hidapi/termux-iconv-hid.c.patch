@@ -1,0 +1,29 @@
+--- ./libusb/hid.c~	2023-05-22 10:50:06.000000000 +0000
++++ ./libusb/hid.c	2025-02-01 13:13:05.412357928 +0000
+@@ -42,7 +42,7 @@
+ 
+ /* GNU / LibUSB */
+ #include <libusb.h>
+-#if !defined(__ANDROID__) && !defined(NO_ICONV)
++#if (!defined(__ANDROID__) || defined(__TERMUX__)) && !defined(NO_ICONV)
+ #include <iconv.h>
+ #ifndef ICONV_CONST
+ #define ICONV_CONST
+@@ -406,7 +406,7 @@
+ 	int len;
+ 	wchar_t *str = NULL;
+ 
+-#if !defined(__ANDROID__) && !defined(NO_ICONV) /* we don't use iconv on Android, or when it is explicitly disabled */
++#if (!defined(__ANDROID__) || defined(__TERMUX__)) && !defined(NO_ICONV) /* we don't use iconv on non-Termux Android, or when it is explicitly disabled */
+ 	wchar_t wbuf[256];
+ 	/* iconv variables */
+ 	iconv_t ic;
+@@ -432,7 +432,7 @@
+ 	if (len < 2) /* we always skip first 2 bytes */
+ 		return NULL;
+ 
+-#if defined(__ANDROID__) || defined(NO_ICONV)
++#if (defined(__ANDROID__) || defined(NO_ICONV)) && !defined(__TERMUX__)
+ 
+ 	/* Bionic does not have iconv support nor wcsdup() function, so it
+ 	   has to be done manually.  The following code will only work for

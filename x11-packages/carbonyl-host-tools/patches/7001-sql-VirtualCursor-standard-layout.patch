@@ -1,0 +1,231 @@
+From 80368f8ba7a8bab13440463a254888311efe3986 Mon Sep 17 00:00:00 2001
+From: Stephan Hartmann <stha09@googlemail.com>
+Date: Tue, 04 May 2021 15:00:19 +0000
+Subject: [PATCH] sql: make VirtualCursor standard layout type
+
+sql::recover::VirtualCursor needs to be a standard layout type, but
+has members of type std::unique_ptr. However, std::unique_ptr is not
+guaranteed to be standard layout. Compiling with clang combined with
+gcc-11 libstdc++ fails because of this. Replace std::unique_ptr with
+raw pointers.
+
+Bug: 1189788
+Change-Id: Ia6dc388cc5ef1c0f2afc75f8ca45b9f12687ca9c
+---
+
+diff --git a/sql/recover_module/btree.cc b/sql/recover_module/btree.cc
+index 9ecaafe..839318a 100644
+--- a/sql/recover_module/btree.cc
++++ b/sql/recover_module/btree.cc
+@@ -135,16 +135,25 @@
+               "Move the destructor to the .cc file if it's non-trival");
+ #endif  // !DCHECK_IS_ON()
+ 
+-LeafPageDecoder::LeafPageDecoder(DatabasePageReader* db_reader) noexcept
+-    : page_id_(db_reader->page_id()),
+-      db_reader_(db_reader),
+-      cell_count_(ComputeCellCount(db_reader)),
+-      next_read_index_(0),
+-      last_record_size_(0) {
++void LeafPageDecoder::Initialize(DatabasePageReader* db_reader) {
++  DCHECK(db_reader);
+   DCHECK(IsOnValidPage(db_reader));
++  page_id_ = db_reader->page_id();
++  db_reader_ = db_reader;
++  cell_count_ = ComputeCellCount(db_reader);
++  next_read_index_ = 0;
++  last_record_size_ = 0;
+   DCHECK(DatabasePageReader::IsValidPageId(page_id_));
+ }
+ 
++void LeafPageDecoder::Reset() {
++  db_reader_ = nullptr;
++  page_id_ = 0;
++  cell_count_ = 0;
++  next_read_index_ = 0;
++  last_record_size_ = 0;
++}
++
+ bool LeafPageDecoder::TryAdvance() {
+   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+   DCHECK(CanAdvance());
+diff --git a/sql/recover_module/btree.h b/sql/recover_module/btree.h
+index d76d076..33114b0 100644
+--- a/sql/recover_module/btree.h
++++ b/sql/recover_module/btree.h
+@@ -102,7 +102,7 @@
+   //
+   // |db_reader| must have been used to read an inner page of a table B-tree.
+   // |db_reader| must outlive this instance.
+-  explicit LeafPageDecoder(DatabasePageReader* db_reader) noexcept;
++  explicit LeafPageDecoder() noexcept = default;
+   ~LeafPageDecoder() noexcept = default;
+ 
+   LeafPageDecoder(const LeafPageDecoder&) = delete;
+@@ -150,6 +150,15 @@
+   // read as long as CanAdvance() returns true.
+   bool TryAdvance();
+ 
++  // Initialize with DatabasePageReader
++  void Initialize(DatabasePageReader* db_reader);
++
++  // Reset internal DatabasePageReader
++  void Reset();
++
++  // True if DatabasePageReader is valid
++  bool IsValid() { return (db_reader_ != nullptr); }
++
+   // True if the given reader may point to an inner page in a table B-tree.
+   //
+   // The last ReadPage() call on |db_reader| must have succeeded.
+@@ -163,14 +172,14 @@
+   static int ComputeCellCount(DatabasePageReader* db_reader);
+ 
+   // The number of the B-tree page this reader is reading.
+-  const int64_t page_id_;
++  int64_t page_id_;
+   // Used to read the tree page.
+   //
+   // Raw pointer usage is acceptable because this instance's owner is expected
+   // to ensure that the DatabasePageReader outlives this.
+-  DatabasePageReader* const db_reader_;
++  DatabasePageReader* db_reader_;
+   // Caches the ComputeCellCount() value for this reader's page.
+-  const int cell_count_ = ComputeCellCount(db_reader_);
++  int cell_count_;
+ 
+   // The reader's cursor state.
+   //
+diff --git a/sql/recover_module/cursor.cc b/sql/recover_module/cursor.cc
+index 0029ff9..42548bc 100644
+--- a/sql/recover_module/cursor.cc
++++ b/sql/recover_module/cursor.cc
+@@ -26,7 +26,7 @@
+ int VirtualCursor::First() {
+   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+   inner_decoders_.clear();
+-  leaf_decoder_ = nullptr;
++  leaf_decoder_.Reset();
+ 
+   AppendPageDecoder(table_->root_page_id());
+   return Next();
+@@ -36,18 +36,18 @@
+   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+   record_reader_.Reset();
+ 
+-  while (!inner_decoders_.empty() || leaf_decoder_.get()) {
+-    if (leaf_decoder_.get()) {
+-      if (!leaf_decoder_->CanAdvance()) {
++  while (!inner_decoders_.empty() || leaf_decoder_.IsValid()) {
++    if (leaf_decoder_.IsValid()) {
++      if (!leaf_decoder_.CanAdvance()) {
+         // The leaf has been exhausted. Remove it from the DFS stack.
+-        leaf_decoder_ = nullptr;
++        leaf_decoder_.Reset();
+         continue;
+       }
+-      if (!leaf_decoder_->TryAdvance())
++      if (!leaf_decoder_.TryAdvance())
+         continue;
+ 
+-      if (!payload_reader_.Initialize(leaf_decoder_->last_record_size(),
+-                                      leaf_decoder_->last_record_offset())) {
++      if (!payload_reader_.Initialize(leaf_decoder_.last_record_size(),
++                                      leaf_decoder_.last_record_offset())) {
+         continue;
+       }
+       if (!record_reader_.Initialize())
+@@ -99,13 +99,13 @@
+ int64_t VirtualCursor::RowId() {
+   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+   DCHECK(record_reader_.IsInitialized());
+-  DCHECK(leaf_decoder_.get());
+-  return leaf_decoder_->last_record_rowid();
++  DCHECK(leaf_decoder_.IsValid());
++  return leaf_decoder_.last_record_rowid();
+ }
+ 
+ void VirtualCursor::AppendPageDecoder(int page_id) {
+   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+-  DCHECK(leaf_decoder_.get() == nullptr)
++  DCHECK(!leaf_decoder_.IsValid())
+       << __func__
+       << " must only be called when the current path has no leaf decoder";
+ 
+@@ -113,7 +113,7 @@
+     return;
+ 
+   if (LeafPageDecoder::IsOnValidPage(&db_reader_)) {
+-    leaf_decoder_ = std::make_unique<LeafPageDecoder>(&db_reader_);
++    leaf_decoder_.Initialize(&db_reader_);
+     return;
+   }
+ 
+diff --git a/sql/recover_module/cursor.h b/sql/recover_module/cursor.h
+index afcd690..b15c31d 100644
+--- a/sql/recover_module/cursor.h
++++ b/sql/recover_module/cursor.h
+@@ -129,7 +129,7 @@
+   std::vector<std::unique_ptr<InnerPageDecoder>> inner_decoders_;
+ 
+   // Decodes the leaf page containing records.
+-  std::unique_ptr<LeafPageDecoder> leaf_decoder_;
++  LeafPageDecoder leaf_decoder_;
+ 
+   SEQUENCE_CHECKER(sequence_checker_);
+ };
+diff --git a/sql/recover_module/pager.cc b/sql/recover_module/pager.cc
+index 58e75de..5fe9620 100644
+--- a/sql/recover_module/pager.cc
++++ b/sql/recover_module/pager.cc
+@@ -23,8 +23,7 @@
+               "ints are not appropriate for representing page IDs");
+ 
+ DatabasePageReader::DatabasePageReader(VirtualTable* table)
+-    : page_data_(std::make_unique<uint8_t[]>(table->page_size())),
+-      table_(table) {
++    : page_data_(), table_(table) {
+   DCHECK(table != nullptr);
+   DCHECK(IsValidPageSize(table->page_size()));
+ }
+@@ -57,8 +56,8 @@
+                     std::numeric_limits<int64_t>::max(),
+                 "The |read_offset| computation above may overflow");
+ 
+-  int sqlite_status =
+-      RawRead(sqlite_file, read_size, read_offset, page_data_.get());
++  int sqlite_status = RawRead(sqlite_file, read_size, read_offset,
++                              const_cast<uint8_t*>(page_data_.data()));
+ 
+   // |page_id_| needs to be set to kInvalidPageId if the read failed.
+   // Otherwise, future ReadPage() calls with the previous |page_id_| value
+diff --git a/sql/recover_module/pager.h b/sql/recover_module/pager.h
+index 0e388ddc..99314e3 100644
+--- a/sql/recover_module/pager.h
++++ b/sql/recover_module/pager.h
+@@ -5,6 +5,7 @@
+ #ifndef SQL_RECOVER_MODULE_PAGER_H_
+ #define SQL_RECOVER_MODULE_PAGER_H_
+ 
++#include <array>
+ #include <cstdint>
+ #include <memory>
+ 
+@@ -70,7 +71,7 @@
+     DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+     DCHECK_NE(page_id_, kInvalidPageId)
+         << "Successful ReadPage() required before accessing pager state";
+-    return page_data_.get();
++    return page_data_.data();
+   }
+ 
+   // The number of bytes in the page read by the last ReadPage() call.
+@@ -137,7 +138,7 @@
+   int page_id_ = kInvalidPageId;
+   // Stores the bytes of the last page successfully read by ReadPage().
+   // The content is undefined if the last call to ReadPage() did not succeed.
+-  const std::unique_ptr<uint8_t[]> page_data_;
++  const std::array<uint8_t, kMaxPageSize> page_data_;
+   // Raw pointer usage is acceptable because this instance's owner is expected
+   // to ensure that the VirtualTable outlives this.
+   VirtualTable* const table_;

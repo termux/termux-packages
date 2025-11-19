@@ -1,0 +1,114 @@
+diff --git a/sesman/libsesman/verify_user.c.orig b/sesman/libsesman/verify_user.c
+index ccd289d..154dc69 100644
+--- a/sesman/libsesman/verify_user.c.orig
++++ b/sesman/libsesman/verify_user.c
+@@ -37,19 +37,23 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <sys/types.h>
++#ifndef __ANDROID__
+ #include <crypt.h>
+ #include <shadow.h>
++#endif
+ #include <pwd.h>
+ 
+ #ifndef SECS_PER_DAY
+ #define SECS_PER_DAY (24L*3600L)
+ #endif
+ 
++#ifndef __ANDROID__
+ static int
+ auth_crypt_pwd(const char *pwd, const char *pln, char *crp);
+ 
+ static int
+ auth_account_disabled(struct spwd *stp);
++#endif
+ 
+ /*
+  * Need a complete type for struct auth_info, even though we're
+@@ -65,6 +69,7 @@ struct auth_info *
+ auth_userpass(const char *user, const char *pass,
+               const char *client_ip, enum scp_login_status *errorcode)
+ {
++#ifndef __ANDROID__
+     const char *encr = NULL;
+     struct passwd *spw;
+ 
+@@ -124,6 +129,10 @@ auth_userpass(const char *user, const char *pass,
+     }
+ 
+     return (status == E_SCP_LOGIN_OK) ? &success : NULL;
++#else
++    static struct auth_info success = {0};
++    return &success;
++#endif
+ }
+ 
+ /******************************************************************************/
+@@ -131,6 +140,7 @@ auth_userpass(const char *user, const char *pass,
+ struct auth_info *
+ auth_uds(const char *user, enum scp_login_status *errorcode)
+ {
++#ifndef __ANDROID__
+     struct passwd *spw;
+ 
+     /* Need a non-NULL pointer to return to indicate success */
+@@ -169,6 +179,10 @@ auth_uds(const char *user, enum scp_login_status *errorcode)
+     }
+ 
+     return (status == E_SCP_LOGIN_OK) ? &success : NULL;
++#else
++    static struct auth_info success = {0};
++    return &success;
++#endif
+ }
+ 
+ 
+@@ -198,6 +212,7 @@ auth_set_env(struct auth_info *auth_info)
+ int
+ auth_check_pwd_chg(const char *user)
+ {
++#ifndef __ANDROID__
+     struct passwd *spw;
+     struct spwd *stp;
+     int now;
+@@ -248,13 +263,14 @@ auth_check_pwd_chg(const char *user)
+         /* cannot change pwd for now */
+         return AUTH_PWD_CHG_NOT_NOW;
+     }
+-
++#endif
+     return AUTH_PWD_CHG_OK;
+ }
+ 
+ int
+ auth_change_pwd(const char *user, const char *newpwd)
+ {
++#ifndef __ANDROID__
+     struct passwd *spw;
+     struct spwd *stp;
+     char hash[35] = "";
+@@ -315,6 +331,9 @@ auth_change_pwd(const char *user, const char *newpwd)
+ 
+     ulckpwdf();
+     return 0;
++#else
++    return 1;
++#endif
+ }
+ 
+ /**
+@@ -325,7 +344,7 @@ auth_change_pwd(const char *user, const char *newpwd)
+  * @param crp Crypted new password
+  *
+  */
+-
++#ifndef __ANDROID__
+ static int
+ auth_crypt_pwd(const char *pwd, const char *pln, char *crp)
+ {
+@@ -402,3 +421,4 @@ auth_account_disabled(struct spwd *stp)
+ 
+     return 0;
+ }
++#endif // __ANDROID__

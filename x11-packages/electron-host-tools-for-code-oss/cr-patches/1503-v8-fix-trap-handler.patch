@@ -1,0 +1,26 @@
+--- a/v8/src/trap-handler/trap-handler.h
++++ b/v8/src/trap-handler/trap-handler.h
+@@ -19,7 +19,7 @@
+ 
+ // X64 on Linux, Windows, MacOS, FreeBSD.
+ #if V8_HOST_ARCH_X64 && V8_TARGET_ARCH_X64 &&                        \
+-    ((V8_OS_LINUX && !V8_OS_ANDROID) || V8_OS_WIN || V8_OS_DARWIN || \
++    (V8_OS_LINUX || V8_OS_WIN || V8_OS_DARWIN || \
+      V8_OS_FREEBSD)
+ #define V8_TRAP_HANDLER_SUPPORTED true
+ // Arm64 (non-simulator) on Mac.
+@@ -41,14 +41,6 @@
+ #define V8_TRAP_HANDLER_SUPPORTED false
+ #endif
+ 
+-#if V8_OS_ANDROID && V8_TRAP_HANDLER_SUPPORTED
+-// It would require some careful security review before the trap handler
+-// can be enabled on Android.  Android may do unexpected things with signal
+-// handling and crash reporting that could open up security holes in V8's
+-// trap handling.
+-#error "The V8 trap handler should not be enabled on Android"
+-#endif
+-
+ // Setup for shared library export.
+ #if defined(BUILDING_V8_SHARED) && defined(V8_OS_WIN)
+ #define TH_EXPORT_PRIVATE __declspec(dllexport)

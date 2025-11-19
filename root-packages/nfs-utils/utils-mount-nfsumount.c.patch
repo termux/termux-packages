@@ -1,0 +1,27 @@
+--- a/utils/mount/nfsumount.c
++++ b/utils/mount/nfsumount.c
+@@ -222,6 +222,24 @@
+   { NULL, 0, 0, 0 }
+ };
+ 
++#if defined __ANDROID__ && __ANDROID_API__ < 26
++#include <dlfcn.h>
++static char *hasmntopt(const struct mntent *__entry, const char *__option)
++{
++	static int initialized = 0;
++	static char *(*libc_impl)(const struct mntent *, const char *) = NULL;
++	if (!initialized) {
++		void *libc_handle = dlopen("libc.so", RTLD_NOW);
++		if (libc_handle != NULL)
++			libc_impl = dlsym(libc_handle, "hasmntopt");
++		initialized = 1;
++	}
++	if (libc_impl != NULL)
++		return libc_impl(__entry, __option);
++	return NULL;
++}
++#endif
++
+ int nfsumount(int argc, char *argv[])
+ {
+ 	int c, ret;

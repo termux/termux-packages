@@ -1,0 +1,10 @@
+--- a/blink/machine.h
++++ b/blink/machine.h
+@@ -113,6 +113,7 @@
+ #define HOSTPAGE_CONTAINER(e) DLL_CONTAINER(struct HostPage, elem, e)
+ 
+ #if defined(NOLINEAR) || defined(__SANITIZE_THREAD__) || \
++    defined(__ANDROID__) || \
+     defined(__CYGWIN__) || defined(__NetBSD__) || defined(__COSMOPOLITAN__)
+ #define CanHaveLinearMemory() false
+ #else

@@ -1,0 +1,16 @@
+https://github.com/termux/termux-packages/issues/16476
+
+--- a/read.c
++++ b/read.c
+@@ -445,6 +445,11 @@
+ 		return -1;
+ 	}
+ 
++	if (S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode)) {
++		mandoc_msg(MANDOCERR_BADARG_BAD, 0, 0, "%s", strerror(EINVAL));
++		return -1;
++	}
++
+ 	/*
+ 	 * If we're a regular file, try just reading in the whole entry
+ 	 * via mmap().  This is faster than reading it into blocks, and

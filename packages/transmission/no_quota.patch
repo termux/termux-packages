@@ -1,0 +1,37 @@
+--- a/libtransmission/platform-quota.cc
++++ b/libtransmission/platform-quota.cc
+@@ -23,7 +23,7 @@
+ #endif
+ #elif defined(__sun)
+ #include <sys/fs/ufs_quota.h> /* quotactl */
+-#else
++#elif !defined(__ANDROID__)
+ #include <sys/quota.h> /* quotactl() */
+ #endif
+ #ifdef HAVE_GETMNTENT
+@@ -73,7 +73,9 @@
+ 
+ [[nodiscard]] char const* getdev(std::string_view path)
+ {
+-#ifdef HAVE_GETMNTENT
++#ifdef __ANDROID__
++    return NULL;
++#elif defined(HAVE_GETMNTENT)
+ 
+ #ifdef __sun
+ 
+@@ -281,6 +283,14 @@
+     return disk_space;
+ }
+ 
++#elif defined(__ANDROID__)
++
++[[nodiscard]] tr_disk_space getquota(char const* device)
++{
++    struct tr_disk_space disk_space = { -1, -1 };
++    return disk_space;
++}
++
+ #else
+ 
+ [[nodiscard]] tr_disk_space getquota(char const* device)

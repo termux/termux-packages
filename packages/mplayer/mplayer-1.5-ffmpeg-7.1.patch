@@ -1,0 +1,97 @@
+https://gitlab.archlinux.org/archlinux/packaging/packages/mplayer/-/blob/2ed3ad82c1bfe3a9afb46b7ea80e83ef52a16c4f/ffmpeg-7.patch
+
+Index: libao2/ao_jack.c
+===================================================================
+--- a/libao2/ao_jack.c    (revisión: 38542)
++++ b/libao2/ao_jack.c    (copia de trabajo)
+@@ -71,7 +71,7 @@
+ #define BUFFSIZE (NUM_CHUNKS * CHUNK_SIZE)
+ 
+ //! buffer for audio data
+-static AVFifoBuffer *buffer;
++static AVFifo *buffer;
+ 
+ /**
+  * \brief insert len bytes into buffer
+@@ -82,9 +82,10 @@
+  * If there is not enough room, the buffer is filled up
+  */
+ static int write_buffer(unsigned char* data, int len) {
+-  int free = av_fifo_space(buffer);
++  int free = av_fifo_can_write(buffer);
+   if (len > free) len = free;
+-  return av_fifo_generic_write(buffer, data, len, NULL);
++  av_fifo_write(buffer, data, len);
++  return len;
+ }
+ 
+ static void silence(float **bufs, int cnt, int num_bufs);
+@@ -125,12 +126,12 @@
+  */
+ static int read_buffer(float **bufs, int cnt, int num_bufs) {
+   struct deinterleave di = {bufs, num_bufs, 0, 0};
+-  int buffered = av_fifo_size(buffer);
++  int buffered = av_fifo_can_read(buffer);
+   if (cnt * sizeof(float) * num_bufs > buffered) {
+     silence(bufs, cnt, num_bufs);
+     cnt = buffered / sizeof(float) / num_bufs;
+   }
+-  av_fifo_generic_read(buffer, &di, cnt * num_bufs * sizeof(float), deinterleave);
++  av_fifo_read(buffer, &di, cnt * num_bufs * sizeof(float));
+   return cnt;
+ }
+ 
+@@ -242,7 +243,7 @@
+     mp_msg(MSGT_AO, MSGL_FATAL, "[JACK] cannot open server\n");
+     goto err_out;
+   }
+-  buffer = av_fifo_alloc(BUFFSIZE);
++  buffer = av_fifo_alloc2(BUFFSIZE, 1, 0);
+   jack_set_process_callback(client, outputaudio, 0);
+ 
+   // list matching ports if connections should be made
+@@ -302,7 +303,7 @@
+   free(client_name);
+   if (client)
+     jack_client_close(client);
+-  av_fifo_free(buffer);
++  av_fifo_freep2(&buffer);
+   buffer = NULL;
+   return 0;
+ }
+@@ -315,7 +316,7 @@
+   reset();
+   usec_sleep(100 * 1000);
+   jack_client_close(client);
+-  av_fifo_free(buffer);
++  av_fifo_freep2(&buffer);
+   buffer = NULL;
+ }
+ 
+@@ -324,7 +325,7 @@
+  */
+ static void reset(void) {
+   paused = 1;
+-  av_fifo_reset(buffer);
++  av_fifo_reset2(buffer);
+   paused = 0;
+ }
+ 
+@@ -343,7 +344,7 @@
+ }
+ 
+ static int get_space(void) {
+-  return av_fifo_space(buffer);
++  return av_fifo_can_write(buffer);
+ }
+ 
+ /**
+@@ -357,7 +358,7 @@
+ }
+ 
+ static float get_delay(void) {
+-  int buffered = av_fifo_size(buffer); // could be less
++  int buffered = av_fifo_can_read(buffer); // could be less
+   float in_jack = jack_latency;
+   if (estimate && callback_interval > 0) {
+     float elapsed = (float)GetTimer() / 1000000.0 - callback_time;

@@ -1,0 +1,32 @@
+--- a/compiler/rustc_incremental/src/persist/fs.rs
++++ b/compiler/rustc_incremental/src/persist/fs.rs
+@@ -272,13 +272,9 @@
+         debug!("attempting to copy data from source: {}", source_directory.display());
+ 
+         // Try copying over all files from the source directory
+-        if let Ok(allows_links) = copy_files(sess, &session_dir, &source_directory) {
++        if let Ok(_allows_links) = copy_files(sess, &session_dir, &source_directory) {
+             debug!("successfully copied data from: {}", source_directory.display());
+ 
+-            if !allows_links {
+-                sess.dcx().emit_warn(errors::HardLinkFailed { path: &session_dir });
+-            }
+-
+             sess.init_incr_comp_session(session_dir, directory_lock);
+             return;
+         } else {
+--- a/compiler/rustc_incremental/src/errors.rs
++++ b/compiler/rustc_incremental/src/errors.rs
+@@ -201,12 +201,6 @@
+ }
+ 
+ #[derive(Diagnostic)]
+-#[diag(incremental_hard_link_failed)]
+-pub(crate) struct HardLinkFailed<'a> {
+-    pub path: &'a Path,
+-}
+-
+-#[derive(Diagnostic)]
+ #[diag(incremental_delete_partial)]
+ pub(crate) struct DeletePartial<'a> {
+     pub path: &'a Path,

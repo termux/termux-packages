@@ -1,0 +1,90 @@
+From 100f93f2fe5edcad2901369523e5550eff57e61a Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <licy183@termux.dev>
+Date: Thu, 30 Jan 2025 19:34:12 +0800
+Subject: [PATCH] Fixes for jumbo build 5
+
+To fix the following errors
+
+[3/437] CXX obj/content/browser/browser/browser_jumbo_18.o
+  In file included from gen/content/browser/browser_jumbo_18.cc:40:
+  ./../../../src/chromium/src/content/browser/web_package/web_bundle_blob_data_source.cc:25:7: error: redefinition of 'MojoBlobReaderDelegate'
+    25 | class MojoBlobReaderDelegate : public storage::MojoBlobReader::Delegate {
+        |       ^
+  ./../../../src/chromium/src/content/browser/web_package/prefetched_signed_exchange_cache.cc:110:7: note: previous definition is here
+    110 | class MojoBlobReaderDelegate : public storage::MojoBlobReader::Delegate {
+        |       ^
+  1 error generated.
+
+---
+ .../web_package/prefetched_signed_exchange_cache.cc       | 6 +++---
+ .../browser/web_package/web_bundle_blob_data_source.cc    | 8 ++++----
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/content/browser/web_package/prefetched_signed_exchange_cache.cc b/content/browser/web_package/prefetched_signed_exchange_cache.cc
+index 0d5b2f609..b221667a5 100644
+--- a/content/browser/web_package/prefetched_signed_exchange_cache.cc
++++ b/content/browser/web_package/prefetched_signed_exchange_cache.cc
+@@ -107,9 +107,9 @@ bool IsValidRequestInitiator(const network::ResourceRequest& request,
+ 
+ // A utility subclass of MojoBlobReader::Delegate that calls the passed callback
+ // in OnComplete().
+-class MojoBlobReaderDelegate : public storage::MojoBlobReader::Delegate {
++class MojoBlobReaderDelegate_PSEC : public storage::MojoBlobReader::Delegate {
+  public:
+-  explicit MojoBlobReaderDelegate(base::OnceCallback<void(net::Error)> callback)
++  explicit MojoBlobReaderDelegate_PSEC(base::OnceCallback<void(net::Error)> callback)
+       : callback_(std::move(callback)) {}
+ 
+  private:
+@@ -368,7 +368,7 @@ class InnerResponseURLLoader : public network::mojom::URLLoader {
+       std::unique_ptr<storage::BlobDataHandle> blob_data_handle) {
+     storage::MojoBlobReader::Create(
+         blob_data_handle.get(), net::HttpByteRange(),
+-        std::make_unique<MojoBlobReaderDelegate>(
++        std::make_unique<MojoBlobReaderDelegate_PSEC>(
+             base::BindOnce(&InnerResponseURLLoader::BlobReaderCompleteOnIO,
+                            std::move(loader))),
+         std::move(pipe_producer_handle));
+diff --git a/content/browser/web_package/web_bundle_blob_data_source.cc b/content/browser/web_package/web_bundle_blob_data_source.cc
+index 91f5e93d7..5887e4177 100644
+--- a/content/browser/web_package/web_bundle_blob_data_source.cc
++++ b/content/browser/web_package/web_bundle_blob_data_source.cc
+@@ -20,7 +20,7 @@
+ #include "storage/browser/blob/mojo_blob_reader.h"
+ 
+ namespace content {
+-namespace {
++namespace wbbds_impl {
+ 
+ class MojoBlobReaderDelegate : public storage::MojoBlobReader::Delegate {
+  public:
+@@ -94,7 +94,7 @@ void OnCalculateSizeComplete(
+   auto io_buf =
+       base::MakeRefCounted<net::IOBufferWithSize>(static_cast<size_t>(length));
+   auto split_callback = base::SplitOnceCallback(base::BindOnce(
+-      &OnReadComplete, std::move(callback), std::move(blob_reader), io_buf));
++      &wbbds_impl::OnReadComplete, std::move(callback), std::move(blob_reader), io_buf));
+   int bytes_read;
+   storage::BlobReader::Status read_status =
+       raw_blob_reader->Read(io_buf.get(), io_buf->size(), &bytes_read,
+@@ -354,7 +354,7 @@ void WebBundleBlobDataSource::BlobDataSourceCore::OnBlobReadyForRead(
+   auto blob_reader = blob_->CreateReader();
+   auto* raw_blob_reader = blob_reader.get();
+   auto split_callback = base::SplitOnceCallback(
+-      base::BindOnce(&OnCalculateSizeComplete, offset, length,
++      base::BindOnce(&wbbds_impl::OnCalculateSizeComplete, offset, length,
+                      std::move(callback), std::move(blob_reader)));
+   auto status = raw_blob_reader->CalculateSize(std::move(split_callback.first));
+   if (status != storage::BlobReader::Status::IO_PENDING) {
+@@ -377,7 +377,7 @@ void WebBundleBlobDataSource::BlobDataSourceCore::OnBlobReadyForReadToDataPipe(
+   }
+   storage::MojoBlobReader::Create(
+       blob_.get(), net::HttpByteRange::Bounded(offset, offset + length - 1),
+-      std::make_unique<MojoBlobReaderDelegate>(std::move(callback)),
++      std::make_unique<wbbds_impl::MojoBlobReaderDelegate>(std::move(callback)),
+       std::move(producer_handle));
+ }
+ 
+-- 
+2.43.0
+

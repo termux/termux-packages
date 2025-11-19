@@ -1,0 +1,60 @@
+diff -uNr tinyemu-2019-12-21/fs_net.c tinyemu-2019-12-21.mod/fs_net.c
+--- tinyemu-2019-12-21/fs_net.c	2019-12-22 00:23:54.000000000 +0700
++++ tinyemu-2019-12-21.mod/fs_net.c	2022-04-04 17:30:37.675945776 +0700
+@@ -2093,7 +2093,7 @@
+ static FSDevice *fs_import_fs;
+ #endif
+ 
+-#define DEFAULT_IMPORT_FILE_PATH "/tmp"
++#define DEFAULT_IMPORT_FILE_PATH "@TERMUX_PREFIX@/tmp"
+ 
+ FSDevice *fs_net_init(const char *url, void (*start_cb)(void *opaque),
+                       void *start_opaque)
+diff -uNr tinyemu-2019-12-21/riscv_cpu.c tinyemu-2019-12-21.mod/riscv_cpu.c
+--- tinyemu-2019-12-21/riscv_cpu.c	2019-12-22 00:23:54.000000000 +0700
++++ tinyemu-2019-12-21.mod/riscv_cpu.c	2022-04-04 17:30:37.679945776 +0700
+@@ -69,7 +69,7 @@
+ static void log_vprintf(const char *fmt, va_list ap)
+ {
+     if (!log_file)
+-        log_file = fopen("/tmp/riscemu.log", "wb");
++        log_file = fopen("@TERMUX_PREFIX@/tmp/riscemu.log", "wb");
+     vfprintf(log_file, fmt, ap);
+ }
+ #else
+diff -uNr tinyemu-2019-12-21/riscv_machine.c tinyemu-2019-12-21.mod/riscv_machine.c
+--- tinyemu-2019-12-21/riscv_machine.c	2019-12-22 00:23:54.000000000 +0700
++++ tinyemu-2019-12-21.mod/riscv_machine.c	2022-04-04 17:30:37.683945776 +0700
+@@ -742,7 +742,7 @@
+ #if 0
+     {
+         FILE *f;
+-        f = fopen("/tmp/riscvemu.dtb", "wb");
++        f = fopen("@TERMUX_PREFIX@/tmp/riscvemu.dtb", "wb");
+         fwrite(dst, 1, size, f);
+         fclose(f);
+     }
+diff -uNr tinyemu-2019-12-21/slirp/slirp_config.h tinyemu-2019-12-21.mod/slirp/slirp_config.h
+--- tinyemu-2019-12-21/slirp/slirp_config.h	2019-12-22 00:23:54.000000000 +0700
++++ tinyemu-2019-12-21.mod/slirp/slirp_config.h	2022-04-04 17:30:37.687945776 +0700
+@@ -15,7 +15,7 @@
+ #define MAX_INTERFACES 1
+ #define MAX_PPP_INTERFACES 1
+ 
+-/* Define if you want slirp's socket in /tmp */
++/* Define if you want slirp's socket in @TERMUX_PREFIX@/tmp */
+ /* XXXXXX Do this in ./configure */
+ #undef USE_TMPSOCKET
+ 
+diff -uNr tinyemu-2019-12-21/temu.c tinyemu-2019-12-21.mod/temu.c
+--- tinyemu-2019-12-21/temu.c	2019-12-22 00:23:54.000000000 +0700
++++ tinyemu-2019-12-21.mod/temu.c	2022-04-04 17:30:37.687945776 +0700
+@@ -239,7 +239,7 @@
+     {
+         static FILE *f;
+         if (!f)
+-            f = fopen("/tmp/read_sect.txt", "wb");
++            f = fopen("@TERMUX_PREFIX@/tmp/read_sect.txt", "wb");
+         fprintf(f, "%" PRId64 " %d\n", sector_num, n);
+     }
+ #endif

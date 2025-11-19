@@ -1,0 +1,21 @@
+diff --git a/swift-syntax/cmake/modules/AddSwiftHostLibrary.cmake b/swift-syntax/cmake/modules/AddSwiftHostLibrary.cmake
+index 2a16fa5e..b7fedd87 100644
+--- a/swift-syntax/cmake/modules/AddSwiftHostLibrary.cmake
++++ b/swift-syntax/cmake/modules/AddSwiftHostLibrary.cmake
+@@ -97,6 +97,16 @@ function(add_swift_syntax_library name)
+     $<$<COMPILE_LANGUAGE:Swift>:-color-diagnostics>
+   )
+ 
++  if(BOOTSTRAPPING_MODE STREQUAL "CROSSCOMPILE")
++    target_compile_options(${target} PRIVATE
++      $<$<COMPILE_LANGUAGE:Swift>:-sdk;${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_ARCH_${SWIFT_HOST_VARIANT_ARCH}_PATH};>
++      $<$<COMPILE_LANGUAGE:Swift>:-resource-dir;${SWIFTLIB_DIR};>)
++    if(SWIFT_HOST_VARIANT_SDK STREQUAL "ANDROID" AND NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
++      swift_android_tools_path(${SWIFT_HOST_VARIANT_ARCH} tools_path)
++      target_compile_options(${target} PRIVATE $<$<COMPILE_LANGUAGE:Swift>:-tools-directory;${tools_path};>)
++    endif()
++  endif()
++
+   if(LLVM_USE_LINKER)
+     target_link_options(${target} PRIVATE
+       "-use-ld=${LLVM_USE_LINKER}"

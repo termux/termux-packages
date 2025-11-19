@@ -1,0 +1,1165 @@
+diff --git a/debian/cinnamon-doc.links b/debian/cinnamon-doc.links
+index f541480..fb01921 100644
+--- a/debian/cinnamon-doc.links
++++ b/debian/cinnamon-doc.links
+@@ -1,4 +1,4 @@
+-/usr/share/gtk-doc/html/cinnamon-js/        /usr/share/doc/cinnamon/cinnamon-js
+-/usr/share/gtk-doc/html/cinnamon-st/        /usr/share/doc/cinnamon/cinnamon-st
+-/usr/share/gtk-doc/html/cinnamon-tutorials/ /usr/share/doc/cinnamon/cinnamon-tutorials
+-/usr/share/gtk-doc/html/cinnamon/           /usr/share/doc/cinnamon/cinnamon
++@TERMUX_PREFIX@/share/gtk-doc/html/cinnamon-js/        @TERMUX_PREFIX@/share/doc/cinnamon/cinnamon-js
++@TERMUX_PREFIX@/share/gtk-doc/html/cinnamon-st/        @TERMUX_PREFIX@/share/doc/cinnamon/cinnamon-st
++@TERMUX_PREFIX@/share/gtk-doc/html/cinnamon-tutorials/ @TERMUX_PREFIX@/share/doc/cinnamon/cinnamon-tutorials
++@TERMUX_PREFIX@/share/gtk-doc/html/cinnamon/           @TERMUX_PREFIX@/share/doc/cinnamon/cinnamon
+diff --git a/debian/not-installed b/debian/not-installed
+index c9670e3..6a544b8 100644
+--- a/debian/not-installed
++++ b/debian/not-installed
+@@ -1,7 +1,7 @@
+ # moved to /usr/share
+-usr/lib/cinnamon-*
++@TERMUX_PREFIX@/lib/cinnamon-*
+ # libtool not installed
+-usr/lib/*/cinnamon/libcinnamon-js.la
+-usr/lib/*/cinnamon/libcinnamon.la
++@TERMUX_PREFIX@/lib/*/cinnamon/libcinnamon-js.la
++@TERMUX_PREFIX@/lib/*/cinnamon/libcinnamon.la
+ # manpages are compressed
+-usr/share/man/man1/*.1
++@TERMUX_PREFIX@/share/man/man1/*.1
+diff --git a/debian/rules b/debian/rules
+index c8c2cb2..4ea2f49 100755
+--- a/debian/rules
++++ b/debian/rules
+@@ -15,16 +15,16 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+ 
+ override_dh_auto_configure:
+ 	dh_auto_configure -- \
+-		--libexecdir=/usr/libexec/cinnamon \
++		--libexecdir=@TERMUX_PREFIX@/libexec/cinnamon \
+ 		-D docs=true \
+ 		-D deprecated_warnings=false \
+-		-D py3modules_dir=/usr/lib/python3/dist-packages
++		-D py3modules_dir=@TERMUX_PYTHON_HOME@/site-packages
+ 
+ # workaround for fix lmde4 build
+ override_dh_dwz:
+ 
+ override_dh_python3:
+-	dh_python3 /usr/share/cinnamon
++	dh_python3 @TERMUX_PREFIX@/share/cinnamon
+ 
+ override_dh_makeshlibs:
+ 	dh_makeshlibs -pcinnamon -Xlibcinnamon
+diff --git a/files/usr/bin/cinnamon-desktop-editor b/files/usr/bin/cinnamon-desktop-editor
+index 216e2d7..2d3ee75 100755
+--- a/files/usr/bin/cinnamon-desktop-editor
++++ b/files/usr/bin/cinnamon-desktop-editor
+@@ -7,4 +7,4 @@ See cinnamon/cinnamon-desktop-editor/cinnamon-desktop-editor.py for usage info
+ import os
+ import sys
+ 
+-os.execvp("/usr/share/cinnamon/cinnamon-desktop-editor/cinnamon-desktop-editor.py", (" ",) + tuple(sys.argv[1:]))
++os.execvp("@TERMUX_PREFIX@/share/cinnamon/cinnamon-desktop-editor/cinnamon-desktop-editor.py", (" ",) + tuple(sys.argv[1:]))
+diff --git a/files/usr/bin/cinnamon-hover-click b/files/usr/bin/cinnamon-hover-click
+index cd6990f..a2f2b35 100755
+--- a/files/usr/bin/cinnamon-hover-click
++++ b/files/usr/bin/cinnamon-hover-click
+@@ -14,7 +14,7 @@ from gi.repository import GLib, Gtk, Gdk, XApp, Gio
+ 
+ signal.signal(signal.SIGINT, signal.SIG_DFL)
+ 
+-gettext.install("cinnamon", "/usr/share/locale", names=["ngettext"])
++gettext.install("cinnamon", "@TERMUX_PREFIX@/share/locale", names=["ngettext"])
+ 
+ KEY_ACTION = "hoverclick-action"
+ KEY_GEOMETRY = "hoverclick-geometry"
+diff --git a/files/usr/bin/cinnamon-install-spice b/files/usr/bin/cinnamon-install-spice
+index 370239d..daed128 100755
+--- a/files/usr/bin/cinnamon-install-spice
++++ b/files/usr/bin/cinnamon-install-spice
+@@ -7,7 +7,7 @@ import argparse
+ import gi
+ gi.require_version('Gtk', '3.0')
+ 
+-sys.path.append('/usr/share/cinnamon/cinnamon-settings/bin')
++sys.path.append('@TERMUX_PREFIX@/share/cinnamon/cinnamon-settings/bin')
+ from Spices import Spice_Harvester
+ 
+ USAGE_DESCRIPTION = 'Installs an applet, desklet, extension, or theme from a local folder. Rather than just doing a shallow copy, it will also install translations, schema files (if present) and update the metadata with a timestamp for version comparison.'
+diff --git a/files/usr/bin/cinnamon-launcher b/files/usr/bin/cinnamon-launcher
+index b12664c..6568d96 100755
+--- a/files/usr/bin/cinnamon-launcher
++++ b/files/usr/bin/cinnamon-launcher
+@@ -18,7 +18,7 @@ from gi.repository import Gtk, GLib, Gio, GLib
+ FALLBACK_COMMAND = "metacity"
+ FALLBACK_ARGS = ("--replace",)
+ 
+-gettext.install("cinnamon", "/usr/share/locale")
++gettext.install("cinnamon", "@TERMUX_PREFIX@/share/locale")
+ 
+ panel_process_name = None
+ panel_cmd = None
+diff --git a/files/usr/bin/cinnamon-looking-glass b/files/usr/bin/cinnamon-looking-glass
+index 2676933..2aeb2a7 100755
+--- a/files/usr/bin/cinnamon-looking-glass
++++ b/files/usr/bin/cinnamon-looking-glass
+@@ -8,4 +8,4 @@ Usage:  cinnamon-looking-glass {daemon|inspect}
+ import os
+ import sys
+ 
+-os.execvp("/usr/share/cinnamon/cinnamon-looking-glass/cinnamon-looking-glass.py", (" ",) + tuple(sys.argv[1:]))
++os.execvp("@TERMUX_PREFIX@/share/cinnamon/cinnamon-looking-glass/cinnamon-looking-glass.py", (" ",) + tuple(sys.argv[1:]))
+diff --git a/files/usr/bin/cinnamon-menu-editor b/files/usr/bin/cinnamon-menu-editor
+index b2af779..a46ba63 100755
+--- a/files/usr/bin/cinnamon-menu-editor
++++ b/files/usr/bin/cinnamon-menu-editor
+@@ -8,7 +8,7 @@ Usage:  cinnamon-menu-editor
+ import sys
+ from setproctitle import setproctitle
+ 
+-sys.path.insert(0, '/usr/share/cinnamon/cinnamon-menu-editor')  # noqa
++sys.path.insert(0, '@TERMUX_PREFIX@/share/cinnamon/cinnamon-menu-editor')  # noqa
+ from cme import MainWindow
+ 
+ 
+diff --git a/files/usr/bin/cinnamon-screensaver-lock-dialog b/files/usr/bin/cinnamon-screensaver-lock-dialog
+index b6e51ae..8ef6838 100755
+--- a/files/usr/bin/cinnamon-screensaver-lock-dialog
++++ b/files/usr/bin/cinnamon-screensaver-lock-dialog
+@@ -5,4 +5,4 @@
+ 
+ import os
+ 
+-os.system("/usr/share/cinnamon/cinnamon-screensaver-lock-dialog/cinnamon-screensaver-lock-dialog.py")
++os.system("@TERMUX_PREFIX@/share/cinnamon/cinnamon-screensaver-lock-dialog/cinnamon-screensaver-lock-dialog.py")
+diff --git a/files/usr/bin/cinnamon-settings b/files/usr/bin/cinnamon-settings
+index fb941c7..fbf1139 100755
+--- a/files/usr/bin/cinnamon-settings
++++ b/files/usr/bin/cinnamon-settings
+@@ -116,18 +116,18 @@ if len(sys.argv) > 1:
+     module = sys.argv[1]
+     if module in ("applets", "desklets", "extensions") and len(sys.argv) > 2 and sys.argv[2][0:5] != "panel":
+         if not optional_args:
+-            os.execvp("/usr/share/cinnamon/cinnamon-settings/xlet-settings.py", (" ", module[0:-1]) + tuple(sys.argv[2:]))
+-        elif os.path.exists("/usr/share/cinnamon/cinnamon-settings/modules/cs_%s.py" % module):
+-            os.execvp("/usr/share/cinnamon/cinnamon-settings/cinnamon-settings.py", (" ",) + tuple(sys.argv[1:]))
+-    elif os.path.exists("/usr/share/cinnamon/cinnamon-settings/modules/cs_%s.py" % module):
+-        os.execvp("/usr/share/cinnamon/cinnamon-settings/cinnamon-settings.py", (" ",) + tuple(sys.argv[1:]))
++            os.execvp("@TERMUX_PREFIX@/share/cinnamon/cinnamon-settings/xlet-settings.py", (" ", module[0:-1]) + tuple(sys.argv[2:]))
++        elif os.path.exists("@TERMUX_PREFIX@/share/cinnamon/cinnamon-settings/modules/cs_%s.py" % module):
++            os.execvp("@TERMUX_PREFIX@/share/cinnamon/cinnamon-settings/cinnamon-settings.py", (" ",) + tuple(sys.argv[1:]))
++    elif os.path.exists("@TERMUX_PREFIX@/share/cinnamon/cinnamon-settings/modules/cs_%s.py" % module):
++        os.execvp("@TERMUX_PREFIX@/share/cinnamon/cinnamon-settings/cinnamon-settings.py", (" ",) + tuple(sys.argv[1:]))
+     elif shutil.which("cinnamon-control-center"):
+-        os.execvp("/usr/share/cinnamon/cinnamon-settings/cinnamon-settings.py", (" ",) + tuple(sys.argv[1:]))
++        os.execvp("@TERMUX_PREFIX@/share/cinnamon/cinnamon-settings/cinnamon-settings.py", (" ",) + tuple(sys.argv[1:]))
+     elif shutil.which("gnome-control-center"):
+         print ("Unknown module %s, calling gnome-control-center" % module)
+         os.execvp("gnome-control-center", (" ",) + tuple(sys.argv[1:]))
+     else:
+         print ("Unknown module %s" % module)
+-        os.execvp("/usr/share/cinnamon/cinnamon-settings/cinnamon-settings.py", (" ",) + tuple(sys.argv[1:]))
++        os.execvp("@TERMUX_PREFIX@/share/cinnamon/cinnamon-settings/cinnamon-settings.py", (" ",) + tuple(sys.argv[1:]))
+ else:
+-    os.execvp("/usr/share/cinnamon/cinnamon-settings/cinnamon-settings.py", (" ",) + tuple(sys.argv[1:]))
++    os.execvp("@TERMUX_PREFIX@/share/cinnamon/cinnamon-settings/cinnamon-settings.py", (" ",) + tuple(sys.argv[1:]))
+diff --git a/files/usr/bin/cinnamon-settings-users b/files/usr/bin/cinnamon-settings-users
+index 47c358d..9b13fa9 100755
+--- a/files/usr/bin/cinnamon-settings-users
++++ b/files/usr/bin/cinnamon-settings-users
+@@ -5,4 +5,4 @@
+ 
+ import os
+ 
+-os.system("pkexec /usr/share/cinnamon/cinnamon-settings-users/cinnamon-settings-users.py")
++os.system("pkexec @TERMUX_PREFIX@/share/cinnamon/cinnamon-settings-users/cinnamon-settings-users.py")
+diff --git a/files/usr/bin/cinnamon-slideshow b/files/usr/bin/cinnamon-slideshow
+index 7e94204..5b410cf 100755
+--- a/files/usr/bin/cinnamon-slideshow
++++ b/files/usr/bin/cinnamon-slideshow
+@@ -5,4 +5,4 @@
+ 
+ import os
+ 
+-os.execvp("/usr/share/cinnamon/cinnamon-slideshow/cinnamon-slideshow.py", (" ",))
++os.execvp("@TERMUX_PREFIX@/share/cinnamon/cinnamon-slideshow/cinnamon-slideshow.py", (" ",))
+diff --git a/files/usr/bin/xlet-about-dialog b/files/usr/bin/xlet-about-dialog
+index a81d27f..8533807 100755
+--- a/files/usr/bin/xlet-about-dialog
++++ b/files/usr/bin/xlet-about-dialog
+@@ -10,7 +10,7 @@ import gi
+ gi.require_version('Gtk', '3.0')
+ from gi.repository import Gtk, GdkPixbuf, GLib
+ 
+-gettext.install('cinnamon', '/usr/share/locale')
++gettext.install('cinnamon', '@TERMUX_PREFIX@/share/locale')
+ 
+ home = os.path.expanduser('~')
+ 
+@@ -109,7 +109,7 @@ if __name__ == "__main__":
+     uuid = _args.uuid[0]
+ 
+     suffix = f'share/nemo/actions/{uuid}' if xlet_type == 'actions' else f'share/cinnamon/{xlet_type}/{uuid}'
+-    prefixes = [os.path.join(home, '.local'), '/usr']
++    prefixes = [os.path.join(home, '.local'), '@TERMUX_PREFIX@']
+ 
+     path = None
+     for prefix in prefixes:
+diff --git a/files/usr/bin/xlet-settings b/files/usr/bin/xlet-settings
+index 4cf4d11..377f649 100755
+--- a/files/usr/bin/xlet-settings
++++ b/files/usr/bin/xlet-settings
+@@ -6,4 +6,4 @@ import sys
+ if len(sys.argv) < 3:
+     print("usage:\n    xlet-settings <xlet_type> <uuid>\nor\n    xlet-settings <xlet_type> <uuid> <instance_id>")
+ else:
+-    os.execvp("/usr/share/cinnamon/cinnamon-settings/xlet-settings.py", (" ",) + tuple(sys.argv[1:]))
++    os.execvp("@TERMUX_PREFIX@/share/cinnamon/cinnamon-settings/xlet-settings.py", (" ",) + tuple(sys.argv[1:]))
+diff --git a/files/usr/share/cinnamon/applets/a11y@cinnamon.org/applet.js b/files/usr/share/cinnamon/applets/a11y@cinnamon.org/applet.js
+index 2f10315..bf9e38a 100644
+--- a/files/usr/share/cinnamon/applets/a11y@cinnamon.org/applet.js
++++ b/files/usr/share/cinnamon/applets/a11y@cinnamon.org/applet.js
+@@ -58,7 +58,7 @@ class CinnamonA11YApplet extends Applet.TextIconApplet {
+             let textZoom = this._buildFontItem();
+             this.menu.addMenuItem(textZoom);
+ 
+-            if (GLib.file_test("/usr/bin/orca", GLib.FileTest.EXISTS)) {
++            if (GLib.file_test("@TERMUX_PREFIX@/bin/orca", GLib.FileTest.EXISTS)) {
+                 let screenReader = this._buildItem(_("Screen Reader"), APPLICATIONS_SCHEMA,
+                                                                       'screen-reader-enabled');
+                 this.menu.addMenuItem(screenReader);
+diff --git a/files/usr/share/cinnamon/applets/grouped-window-list@cinnamon.org/menus.js b/files/usr/share/cinnamon/applets/grouped-window-list@cinnamon.org/menus.js
+index 0c0f40d..aef9d2a 100644
+--- a/files/usr/share/cinnamon/applets/grouped-window-list@cinnamon.org/menus.js
++++ b/files/usr/share/cinnamon/applets/grouped-window-list@cinnamon.org/menus.js
+@@ -414,7 +414,7 @@ class AppMenuButtonRightClickMenu extends Applet.AppletPopupMenu {
+         const cmd = [
+             'bash',
+             '-c',
+-            'python3 /usr/share/cinnamon/applets/grouped-window-list@cinnamon.org/utils.py get_process ' + proc.toString()
++            'python3 @TERMUX_PREFIX@/share/cinnamon/applets/grouped-window-list@cinnamon.org/utils.py get_process ' + proc.toString()
+         ];
+         spawn_async(cmd, (stdout) => {
+             if (stdout) {
+diff --git a/files/usr/share/cinnamon/applets/keyboard@cinnamon.org/applet.js b/files/usr/share/cinnamon/applets/keyboard@cinnamon.org/applet.js
+index 3eff44b..0ef4587 100644
+--- a/files/usr/share/cinnamon/applets/keyboard@cinnamon.org/applet.js
++++ b/files/usr/share/cinnamon/applets/keyboard@cinnamon.org/applet.js
+@@ -13,7 +13,7 @@ const PANEL_EDIT_MODE_KEY = "panel-edit-mode";
+ const POPUP_MENU_ICON_STYLE_CLASS = "popup-menu-icon";
+ const APPLET_ICON_STYLE_CLASS = "applet-icon";
+ 
+-const getFlagFileName = name => `/usr/share/iso-flag-png/${name}.png`;
++const getFlagFileName = name => `@TERMUX_PREFIX@/share/iso-flag-png/${name}.png`;
+ 
+ class EmblemedIcon {
+     constructor(file_path, layout_dupe_id, style_class) {
+diff --git a/files/usr/share/cinnamon/applets/menu@cinnamon.org/applet.js b/files/usr/share/cinnamon/applets/menu@cinnamon.org/applet.js
+index 219c75f..98c4354 100644
+--- a/files/usr/share/cinnamon/applets/menu@cinnamon.org/applet.js
++++ b/files/usr/share/cinnamon/applets/menu@cinnamon.org/applet.js
+@@ -390,7 +390,7 @@ class ApplicationContextMenuItem extends PopupMenu.PopupBaseMenuItem {
+                 Util.spawnCommandLine("cinnamon-desktop-editor -mlauncher -o" + GLib.shell_quote(this._appButton.app.get_app_info().get_filename()));
+                 break;
+             case "uninstall":
+-                Util.spawnCommandLine("/usr/bin/cinnamon-remove-application '" + this._appButton.app.get_app_info().get_filename() + "'");
++                Util.spawnCommandLine("@TERMUX_PREFIX@/bin/cinnamon-remove-application '" + this._appButton.app.get_app_info().get_filename() + "'");
+                 break;
+             case "run_with_nvidia_gpu":
+                 Util.spawnCommandLine("optirun gtk-launch " + this._appButton.app.get_id());
+@@ -1264,7 +1264,7 @@ class CinnamonMenuApplet extends Applet.TextIconApplet {
+         this._activeActor = null;
+         this._knownApps = new Set(); // Used to keep track of apps that are already installed, so we can highlight newly installed ones
+         this._appsWereRefreshed = false;
+-        this._canUninstallApps = GLib.file_test("/usr/bin/cinnamon-remove-application", GLib.FileTest.EXISTS);
++        this._canUninstallApps = GLib.file_test("@TERMUX_PREFIX@/bin/cinnamon-remove-application", GLib.FileTest.EXISTS);
+         this.RecentManager = DocInfo.getDocManager();
+         this.privacy_settings = new Gio.Settings( {schema_id: PRIVACY_SCHEMA} );
+         this.noRecentDocuments = true;
+@@ -2642,7 +2642,7 @@ class CinnamonMenuApplet extends Applet.TextIconApplet {
+             this.menu.close();
+ 
+             let screensaver_settings = new Gio.Settings({ schema_id: "org.cinnamon.desktop.screensaver" });
+-            let screensaver_dialog = Gio.file_new_for_path("/usr/bin/cinnamon-screensaver-command");
++            let screensaver_dialog = Gio.file_new_for_path("@TERMUX_PREFIX@/bin/cinnamon-screensaver-command");
+             if (screensaver_dialog.query_exists(null)) {
+                 if (screensaver_settings.get_boolean("ask-for-away-message")) {
+                     Util.spawnCommandLine("cinnamon-screensaver-lock-dialog");
+diff --git a/files/usr/share/cinnamon/applets/printers@cinnamon.org/applet.js b/files/usr/share/cinnamon/applets/printers@cinnamon.org/applet.js
+index 67b21d9..1e2edaf 100644
+--- a/files/usr/share/cinnamon/applets/printers@cinnamon.org/applet.js
++++ b/files/usr/share/cinnamon/applets/printers@cinnamon.org/applet.js
+@@ -136,7 +136,7 @@ class CinnamonPrintersApplet extends Applet.TextIconApplet {
+         //Add Printers
+         Util.spawn_async(['python3', APPLET_PATH + '/lpstat-a.py'], Lang.bind(this, function(out) {
+             this.printers = [];
+-            Util.spawn_async(['/usr/bin/lpstat', '-d'], Lang.bind(this, function(out2) {//To check default printer
++            Util.spawn_async(['@TERMUX_PREFIX@/bin/lpstat', '-d'], Lang.bind(this, function(out2) {//To check default printer
+                 if(out2.split(': ')[1] != undefined) {
+                     out2 = out2.split(': ')[1].trim();
+                 } else {
+@@ -160,7 +160,7 @@ class CinnamonPrintersApplet extends Applet.TextIconApplet {
+                 this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem);
+ 
+                 //Add Jobs
+-                Util.spawn_async(['/usr/bin/lpstat', '-o'], Lang.bind(this, function(out) {
++                Util.spawn_async(['@TERMUX_PREFIX@/bin/lpstat', '-o'], Lang.bind(this, function(out) {
+                     //Cancel all Jobs
+                     if(out.length > 0) {
+                         let cancelAll = new PopupMenu.PopupIconMenuItem(_("Cancel all jobs"), 'edit-delete', St.IconType.SYMBOLIC);
+@@ -175,7 +175,7 @@ class CinnamonPrintersApplet extends Applet.TextIconApplet {
+                     //Cancel Job
+                     out = out.split(/\n/);
+                     this.jobsCount = out.length - 1;
+-                    Util.spawn_async(['/usr/bin/lpq', '-a'], Lang.bind(this, function(out2) {
++                    Util.spawn_async(['@TERMUX_PREFIX@/bin/lpq', '-a'], Lang.bind(this, function(out2) {
+                         out2 = out2.replace(/\n/g, ' ').split(/\s+/);
+                         let sendJobs = [];
+                         for(var n = 0; n < out.length - 1; n++) {
+@@ -237,7 +237,7 @@ class CinnamonPrintersApplet extends Applet.TextIconApplet {
+                         } else {
+                             this.actor.hide();
+                         }
+-                        Util.spawn_async(['/usr/bin/lpstat', '-l'], Lang.bind(this, function(out) {
++                        Util.spawn_async(['@TERMUX_PREFIX@/bin/lpstat', '-l'], Lang.bind(this, function(out) {
+                             if(out != '') {
+                                 let printStatus = out.split('\n')[1].trim();
+                                 this.set_applet_tooltip(printStatus);
+diff --git a/files/usr/share/cinnamon/applets/printers@cinnamon.org/cancel-print-dialog.py b/files/usr/share/cinnamon/applets/printers@cinnamon.org/cancel-print-dialog.py
+index 42f4be4..bbdf2d7 100644
+--- a/files/usr/share/cinnamon/applets/printers@cinnamon.org/cancel-print-dialog.py
++++ b/files/usr/share/cinnamon/applets/printers@cinnamon.org/cancel-print-dialog.py
+@@ -7,7 +7,7 @@ from gi.repository import Gtk
+ import gettext
+ 
+ # i18n
+-gettext.install("cinnamon", "/usr/share/locale")
++gettext.install("cinnamon", "@TERMUX_PREFIX@/share/locale")
+ 
+ class CancelPrintJob:
+     def __init__(self):
+diff --git a/files/usr/share/cinnamon/applets/printers@cinnamon.org/lpstat-a.py b/files/usr/share/cinnamon/applets/printers@cinnamon.org/lpstat-a.py
+index dae989d..d254109 100644
+--- a/files/usr/share/cinnamon/applets/printers@cinnamon.org/lpstat-a.py
++++ b/files/usr/share/cinnamon/applets/printers@cinnamon.org/lpstat-a.py
+@@ -3,6 +3,6 @@
+ import subprocess
+ 
+ try:
+-    print(subprocess.check_output(['/usr/bin/lpstat', '-a']).decode("utf-8"))
++    print(subprocess.check_output(['@TERMUX_PREFIX@/bin/lpstat', '-a']).decode("utf-8"))
+ except subprocess.CalledProcessError as e:
+     print("No printers available!")
+diff --git a/files/usr/share/cinnamon/applets/trash@cinnamon.org/metadata.json b/files/usr/share/cinnamon/applets/trash@cinnamon.org/metadata.json
+index e941f24..739163f 100644
+--- a/files/usr/share/cinnamon/applets/trash@cinnamon.org/metadata.json
++++ b/files/usr/share/cinnamon/applets/trash@cinnamon.org/metadata.json
+@@ -3,6 +3,6 @@
+  "name": "Trash",
+  "description": "Control the trash from the panel",
+  "icon": "user-trash",
+- "localedir": "/usr/share/locale",
++ "localedir": "@TERMUX_PREFIX@/share/locale",
+  "max-instances": -1
+ }
+diff --git a/files/usr/share/cinnamon/applets/user@cinnamon.org/applet.js b/files/usr/share/cinnamon/applets/user@cinnamon.org/applet.js
+index af3e5a6..9446eaf 100644
+--- a/files/usr/share/cinnamon/applets/user@cinnamon.org/applet.js
++++ b/files/usr/share/cinnamon/applets/user@cinnamon.org/applet.js
+@@ -12,7 +12,7 @@ const Settings = imports.ui.settings;
+ const UserWidget = imports.ui.userWidget;
+ 
+ const DIALOG_ICON_SIZE = 64;
+-const USER_DEFAULT_IMG_PATH = "/usr/share/cinnamon/faces/user-generic.png";
++const USER_DEFAULT_IMG_PATH = "@TERMUX_PREFIX@/share/cinnamon/faces/user-generic.png";
+ 
+ class CinnamonUserApplet extends Applet.TextApplet {
+     constructor(orientation, panel_height, instance_id) {
+@@ -80,7 +80,7 @@ class CinnamonUserApplet extends Applet.TextApplet {
+         item = new PopupMenu.PopupIconMenuItem(_("Lock Screen"), "system-lock-screen", St.IconType.SYMBOLIC);
+         item.connect('activate', Lang.bind(this, function() {
+             let screensaver_settings = new Gio.Settings({ schema_id: "org.cinnamon.desktop.screensaver" });
+-            let screensaver_dialog = Gio.file_new_for_path("/usr/bin/cinnamon-screensaver-command");
++            let screensaver_dialog = Gio.file_new_for_path("@TERMUX_PREFIX@/bin/cinnamon-screensaver-command");
+             if (screensaver_dialog.query_exists(null)) {
+                 if (screensaver_settings.get_boolean("ask-for-away-message")) {
+                     Util.spawnCommandLine("cinnamon-screensaver-lock-dialog");
+@@ -106,7 +106,7 @@ class CinnamonUserApplet extends Applet.TextApplet {
+                 }));
+                 this.menu.addMenuItem(item);
+             }
+-            else if (GLib.file_test("/usr/bin/mdmflexiserver", GLib.FileTest.EXISTS)) {
++            else if (GLib.file_test("@TERMUX_PREFIX@/bin/mdmflexiserver", GLib.FileTest.EXISTS)) {
+                 // MDM
+                 item = new PopupMenu.PopupIconMenuItem(_("Switch User"), "system-switch-user", St.IconType.SYMBOLIC);
+                 item.connect('activate', Lang.bind(this, function() {
+@@ -114,7 +114,7 @@ class CinnamonUserApplet extends Applet.TextApplet {
+                 }));
+                 this.menu.addMenuItem(item);
+             }
+-            else if (GLib.file_test("/usr/bin/gdmflexiserver", GLib.FileTest.EXISTS)) {
++            else if (GLib.file_test("@TERMUX_PREFIX@/bin/gdmflexiserver", GLib.FileTest.EXISTS)) {
+                 // GDM
+                 item = new PopupMenu.PopupIconMenuItem(_("Switch User"), "system-switch-user", St.IconType.SYMBOLIC);
+                 item.connect('activate', Lang.bind(this, function() {
+diff --git a/files/usr/share/cinnamon/applets/xrandr@cinnamon.org/metadata.json b/files/usr/share/cinnamon/applets/xrandr@cinnamon.org/metadata.json
+index e9316d1..48d2cf3 100644
+--- a/files/usr/share/cinnamon/applets/xrandr@cinnamon.org/metadata.json
++++ b/files/usr/share/cinnamon/applets/xrandr@cinnamon.org/metadata.json
+@@ -3,5 +3,5 @@
+  "name": "Display",
+  "description": "XRandR monitor control applet",
+  "icon": "cs-display",
+- "localedir": "/usr/share/locale"
++ "localedir": "@TERMUX_PREFIX@/share/locale"
+ }
+diff --git a/files/usr/share/cinnamon/cinnamon-desktop-editor/cinnamon-desktop-editor.py b/files/usr/share/cinnamon/cinnamon-desktop-editor/cinnamon-desktop-editor.py
+index c2d9eb2..1389695 100755
+--- a/files/usr/share/cinnamon/cinnamon-desktop-editor/cinnamon-desktop-editor.py
++++ b/files/usr/share/cinnamon/cinnamon-desktop-editor/cinnamon-desktop-editor.py
+@@ -15,14 +15,14 @@ gi.require_version("Gtk", "3.0")
+ gi.require_version("CMenu", "3.0")
+ from gi.repository import GLib, Gtk, Gio, CMenu
+ 
+-sys.path.insert(0, '/usr/share/cinnamon/cinnamon-menu-editor')
++sys.path.insert(0, '@TERMUX_PREFIX@/share/cinnamon/cinnamon-menu-editor')
+ from cme import util
+ 
+-sys.path.insert(0, '/usr/share/cinnamon/cinnamon-settings/bin')
++sys.path.insert(0, '@TERMUX_PREFIX@/share/cinnamon/cinnamon-settings/bin')
+ import JsonSettingsWidgets
+ 
+ # i18n
+-gettext.install("cinnamon", "/usr/share/locale")
++gettext.install("cinnamon", "@TERMUX_PREFIX@/share/locale")
+ # i18n for menu item
+ 
+ #_ = gettext.gettext # bug !!! _ is already defined by gettext.install!
+@@ -198,7 +198,7 @@ class ItemEditor(object):
+             self.callback(False, self.item_path)
+ 
+ class LauncherEditor(ItemEditor):
+-    ui_file = '/usr/share/cinnamon/cinnamon-desktop-editor/launcher-editor.ui'
++    ui_file = '@TERMUX_PREFIX@/share/cinnamon/cinnamon-desktop-editor/launcher-editor.ui'
+ 
+     def build_ui(self):
+         self.builder.get_object('exec-browse').connect('clicked', self.pick_exec)
+@@ -246,7 +246,7 @@ class LauncherEditor(ItemEditor):
+             self.item_path = os.path.join(util.getUserItemPath(), os.path.split(self.item_path)[1])
+ 
+ class DirectoryEditor(ItemEditor):
+-    ui_file = '/usr/share/cinnamon/cinnamon-desktop-editor/directory-editor.ui'
++    ui_file = '@TERMUX_PREFIX@/share/cinnamon/cinnamon-desktop-editor/directory-editor.ui'
+ 
+     def build_ui(self):
+         self.builder.get_object('name-entry').connect('changed', self.resync_validity)
+@@ -272,7 +272,7 @@ class DirectoryEditor(ItemEditor):
+         self.item_path = os.path.join(util.getUserDirectoryPath(), os.path.split(self.item_path)[1])
+ 
+ class CinnamonLauncherEditor(ItemEditor):
+-    ui_file = '/usr/share/cinnamon/cinnamon-desktop-editor/launcher-editor.ui'
++    ui_file = '@TERMUX_PREFIX@/share/cinnamon/cinnamon-desktop-editor/launcher-editor.ui'
+ 
+     def build_ui(self):
+         self.builder.get_object('exec-browse').connect('clicked', self.pick_exec)
+diff --git a/files/usr/share/cinnamon/cinnamon-menu-editor/cme/MainWindow.py b/files/usr/share/cinnamon/cinnamon-menu-editor/cme/MainWindow.py
+index 7188dfa..15757d4 100644
+--- a/files/usr/share/cinnamon/cinnamon-menu-editor/cme/MainWindow.py
++++ b/files/usr/share/cinnamon/cinnamon-menu-editor/cme/MainWindow.py
+@@ -47,7 +47,7 @@ class MainWindow(object):
+         Gtk.Window.set_default_icon_name('alacarte')
+         self.tree = Gtk.Builder()
+         self.tree.set_translation_domain(config.GETTEXT_PACKAGE)
+-        self.tree.add_from_file('/usr/share/cinnamon/cinnamon-menu-editor/cinnamon-menu-editor.ui')
++        self.tree.add_from_file('@TERMUX_PREFIX@/share/cinnamon/cinnamon-menu-editor/cinnamon-menu-editor.ui')
+         self.tree.connect_signals(self)
+         self.setupMenuTree()
+         self.setupItemTree()
+diff --git a/files/usr/share/cinnamon/cinnamon-menu-editor/cme/config.py b/files/usr/share/cinnamon/cinnamon-menu-editor/cme/config.py
+index 71b8cb6..647b8bb 100644
+--- a/files/usr/share/cinnamon/cinnamon-menu-editor/cme/config.py
++++ b/files/usr/share/cinnamon/cinnamon-menu-editor/cme/config.py
+@@ -1,8 +1,8 @@
+-prefix="/usr"
+-datadir="/usr/share"
++prefix="@TERMUX_PREFIX@"
++datadir="@TERMUX_PREFIX@share"
+ localedir=datadir+"/locale"
+-libdir="/usr/share/cinnamon"
+-libexecdir="/usr/share/cinnamon/cinnamon-menu-editor"
++libdir="@TERMUX_PREFIX@/share/cinnamon"
++libexecdir="@TERMUX_PREFIX@/share/cinnamon/cinnamon-menu-editor"
+ PACKAGE="cinnamon-menu-editor"
+ VERSION="1.6.1"
+ GETTEXT_PACKAGE="cinnamon"
+diff --git a/files/usr/share/cinnamon/cinnamon-screensaver-lock-dialog/cinnamon-screensaver-lock-dialog.py b/files/usr/share/cinnamon/cinnamon-screensaver-lock-dialog/cinnamon-screensaver-lock-dialog.py
+index f9c47eb..4a30750 100755
+--- a/files/usr/share/cinnamon/cinnamon-screensaver-lock-dialog/cinnamon-screensaver-lock-dialog.py
++++ b/files/usr/share/cinnamon/cinnamon-screensaver-lock-dialog/cinnamon-screensaver-lock-dialog.py
+@@ -12,7 +12,7 @@ gi.require_version("XApp", "1.0")
+ from gi.repository import Gtk, XApp
+ 
+ # i18n
+-gettext.install("cinnamon", "/usr/share/locale")
++gettext.install("cinnamon", "@TERMUX_PREFIX@/share/locale")
+ 
+ 
+ class MainWindow:
+@@ -27,7 +27,7 @@ class MainWindow:
+ 
+         self.builder = Gtk.Builder()
+         self.builder.set_translation_domain('cinnamon') # let it translate!
+-        self.builder.add_from_file("/usr/share/cinnamon/cinnamon-screensaver-lock-dialog/cinnamon-screensaver-lock-dialog.ui")
++        self.builder.add_from_file("@TERMUX_PREFIX@/share/cinnamon/cinnamon-screensaver-lock-dialog/cinnamon-screensaver-lock-dialog.ui")
+ 
+         self.window = self.builder.get_object("main_dialog")
+         self.button_cancel = self.builder.get_object("button_cancel")
+diff --git a/files/usr/share/cinnamon/cinnamon-settings-users/cinnamon-settings-users.py b/files/usr/share/cinnamon/cinnamon-settings-users/cinnamon-settings-users.py
+index 48d54b7..09f19b8 100755
+--- a/files/usr/share/cinnamon/cinnamon-settings-users/cinnamon-settings-users.py
++++ b/files/usr/share/cinnamon/cinnamon-settings-users/cinnamon-settings-users.py
+@@ -17,7 +17,7 @@ gi.require_version("Gtk", "3.0")
+ gi.require_version("AccountsService", "1.0")
+ from gi.repository import Gtk, GObject, Gio, GdkPixbuf, AccountsService, GLib
+ 
+-gettext.install("cinnamon", "/usr/share/locale")
++gettext.install("cinnamon", "@TERMUX_PREFIX@/share/locale")
+ 
+ class PrivHelper(object):
+     """A helper for performing temporary privilege drops. Necessary for
+@@ -465,7 +465,7 @@ class Module:
+         try:
+             self.builder = Gtk.Builder()
+             self.builder.set_translation_domain('cinnamon') # let it translate!
+-            self.builder.add_from_file("/usr/share/cinnamon/cinnamon-settings-users/cinnamon-settings-users.ui")
++            self.builder.add_from_file("@TERMUX_PREFIX@/share/cinnamon/cinnamon-settings-users/cinnamon-settings-users.ui")
+             self.window = self.builder.get_object("main_window")
+             self.window.connect("destroy", Gtk.main_quit)
+ 
+@@ -521,7 +521,7 @@ class Module:
+             self.face_image = Gtk.Image()
+             self.face_image.set_size_request(96, 96)
+             self.face_button.set_image(self.face_image)
+-            self.face_image.set_from_file("/usr/share/cinnamon/faces/user-generic.png")
++            self.face_image.set_from_file("@TERMUX_PREFIX@/share/cinnamon/faces/user-generic.png")
+             self.face_button.set_alignment(0.0, 0.5)
+             self.face_button.set_tooltip_text(_("Click to change the picture"))
+ 
+@@ -535,7 +535,7 @@ class Module:
+             row = 0
+             col = 0
+             num_cols = 4
+-            face_dirs = ["/usr/share/cinnamon/faces"]
++            face_dirs = ["@TERMUX_PREFIX@/share/cinnamon/faces"]
+             for face_dir in face_dirs:
+                 if os.path.exists(face_dir):
+                     pictures = sorted(os.listdir(face_dir))
+@@ -772,7 +772,7 @@ class Module:
+             if os.path.exists(user.get_icon_file()):
+                 pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(user.get_icon_file(), 48, 48)
+             else:
+-                pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size("/usr/share/cinnamon/faces/user-generic.png", 48, 48)
++                pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size("@TERMUX_PREFIX@/share/cinnamon/faces/user-generic.png", 48, 48)
+ 
+             real_name = GLib.markup_escape_text(user.get_real_name())
+             user_name = GLib.markup_escape_text(user.get_user_name())
+@@ -836,7 +836,7 @@ class Module:
+             else:
+                 if message != "":
+                     print(message)
+-                self.face_image.set_from_file("/usr/share/cinnamon/faces/user-generic.png")
++                self.face_image.set_from_file("@TERMUX_PREFIX@/share/cinnamon/faces/user-generic.png")
+ 
+             groups = []
+             for group in grp.getgrall():
+@@ -895,7 +895,7 @@ class Module:
+             username = dialog.username_entry.get_text()
+             new_user = self.accountService.create_user(username, fullname, account_type)
+             new_user.set_password_mode(AccountsService.UserPasswordMode.NONE)
+-            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size("/usr/share/cinnamon/faces/user-generic.png", 48, 48)
++            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size("@TERMUX_PREFIX@/share/cinnamon/faces/user-generic.png", 48, 48)
+             description = "<b>%s</b>\n%s" % (GLib.markup_escape_text(fullname), GLib.markup_escape_text(username))
+             piter = self.users.append(None, [new_user, pixbuf, description])
+             # Add the user to his/her own group and sudo if Administrator was selected
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/bin/ChooserButtonWidgets.py b/files/usr/share/cinnamon/cinnamon-settings/bin/ChooserButtonWidgets.py
+index a05b47b..198efd7 100644
+--- a/files/usr/share/cinnamon/cinnamon-settings/bin/ChooserButtonWidgets.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/bin/ChooserButtonWidgets.py
+@@ -4,7 +4,7 @@ from gi.repository import Gtk, GObject, GLib, Gdk, GdkPixbuf, Gio
+ import os
+ import gettext
+ import datetime
+-gettext.install("cinnamon", "/usr/share/locale")
++gettext.install("cinnamon", "@TERMUX_PREFIX@/share/locale")
+ 
+ class BaseChooserButton(Gtk.Button):
+     def __init__ (self, has_button_label=False, frame=False):
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/bin/CinnamonGtkSettings.py b/files/usr/share/cinnamon/cinnamon-settings/bin/CinnamonGtkSettings.py
+index d554f10..09983dd 100644
+--- a/files/usr/share/cinnamon/cinnamon-settings/bin/CinnamonGtkSettings.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/bin/CinnamonGtkSettings.py
+@@ -386,7 +386,7 @@ class PreviewWidget(SettingsWidget):
+ 
+         self.builder = Gtk.Builder()
+         self.builder.set_translation_domain('cinnamon')
+-        self.builder.add_from_file("/usr/share/cinnamon/cinnamon-settings/bin/scrollbar-test-widget.glade")
++        self.builder.add_from_file("@TERMUX_PREFIX@/share/cinnamon/cinnamon-settings/bin/scrollbar-test-widget.glade")
+ 
+         self.content_widget = self.builder.get_object("content_box")
+         self.content_widget.set_valign(Gtk.Align.CENTER)
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/bin/ExtensionCore.py b/files/usr/share/cinnamon/cinnamon-settings/bin/ExtensionCore.py
+index 8f045c7..02d2180 100644
+--- a/files/usr/share/cinnamon/cinnamon-settings/bin/ExtensionCore.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/bin/ExtensionCore.py
+@@ -80,7 +80,7 @@ def translate(uuid, string):
+             translations[uuid] = gettext.translation(uuid, home + '/.local/share/locale').gettext
+         except IOError:
+             try:
+-                translations[uuid] = gettext.translation(uuid, '/usr/share/locale').gettext
++                translations[uuid] = gettext.translation(uuid, '@TERMUX_PREFIX@/share/locale').gettext
+             except IOError:
+                 translations[uuid] = None
+ 
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/bin/SettingsWidgets.py b/files/usr/share/cinnamon/cinnamon-settings/bin/SettingsWidgets.py
+index c499f2e..3b50db8 100755
+--- a/files/usr/share/cinnamon/cinnamon-settings/bin/SettingsWidgets.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/bin/SettingsWidgets.py
+@@ -29,7 +29,7 @@ class BinFileMonitor(GObject.GObject):
+         env = GLib.getenv("PATH")
+ 
+         if env is None:
+-            env = "/bin:/usr/bin:."
++            env = "@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin:."
+ 
+         self.paths = env.split(":")
+ 
+@@ -377,7 +377,7 @@ class SoundFileChooser(SettingsWidget):
+         if os.path.exists(self.get_value()):
+             dialog.set_filename(self.get_value())
+         else:
+-            dialog.set_current_folder('/usr/share/sounds')
++            dialog.set_current_folder('@TERMUX_PREFIX@/share/sounds')
+ 
+         sound_filter = Gtk.FileFilter()
+         if self.event_sounds:
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/bin/Spices.py b/files/usr/share/cinnamon/cinnamon-settings/bin/Spices.py
+index a00c300..3636773 100644
+--- a/files/usr/share/cinnamon/cinnamon-settings/bin/Spices.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/bin/Spices.py
+@@ -184,7 +184,7 @@ class Spice_Harvester(GObject.Object):
+             self.spices_directories = (sys_dirs)
+         else:
+             self.install_folder = f'{home}/.local/share/cinnamon/{self.collection_type}s/'
+-            self.spices_directories = (f'/usr/share/cinnamon/{self.collection_type}s/', self.install_folder)
++            self.spices_directories = (f'@TERMUX_PREFIX@/share/cinnamon/{self.collection_type}s/', self.install_folder)
+ 
+         self._update_status()
+ 
+@@ -282,7 +282,7 @@ class Spice_Harvester(GObject.Object):
+     def open_spice_page(self, uuid):
+         """ opens to the web page of the given uuid"""
+         id = self.index_cache[uuid]['spices-id']
+-        subprocess.run(['/usr/bin/xdg-open',
++        subprocess.run(['@TERMUX_PREFIX@/bin/xdg-open',
+                        f"{URL_SPICES_HOME}/{self.collection_type}s/view/{id}"],
+                        check=True)
+ 
+@@ -733,14 +733,14 @@ class Spice_Harvester(GObject.Object):
+                         lang = file.split(".")[0]
+                         locale_dir = os.path.join(locale_inst, lang, 'LC_MESSAGES')
+                         os.makedirs(locale_dir, mode=0o755, exist_ok=True)
+-                        subprocess.run(['/usr/bin/msgfmt', '-c',
++                        subprocess.run(['@TERMUX_PREFIX@/bin/msgfmt', '-c',
+                                        os.path.join(po_dir, file), '-o',
+                                        os.path.join(locale_dir, f'{uuid}.mo')],
+                                        check=True)
+ 
+         # Create install folder on demand
+         if not os.path.exists(self.install_folder):
+-            subprocess.run(["/usr/bin/mkdir", "-p", self.install_folder], check=True)
++            subprocess.run(["@TERMUX_PREFIX@/bin/mkdir", "-p", self.install_folder], check=True)
+ 
+         dest = os.path.join(self.install_folder, uuid)
+         if os.path.exists(dest):
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/bin/capi.py b/files/usr/share/cinnamon/cinnamon-settings/bin/capi.py
+index 4d0fa4f..d81dc1b 100644
+--- a/files/usr/share/cinnamon/cinnamon-settings/bin/capi.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/bin/capi.py
+@@ -38,9 +38,9 @@ class CManager:
+         x86archs = ["i386", "i486", "i586", "i686"]
+         if architecture in x86archs:
+             for arch in x86archs:
+-                paths += ["/usr/lib/%s" % arch]
++                paths += ["@TERMUX_PREFIX@/lib/%s" % arch]
+         else:
+-            paths += ["/usr/lib/%s" % architecture]
++            paths += ["@TERMUX_PREFIX@/lib/%s" % architecture]
+ 
+         for path in paths:
+             if not os.path.islink(path):
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/bin/util.py b/files/usr/share/cinnamon/cinnamon-settings/bin/util.py
+index 8015a4b..955e9da 100644
+--- a/files/usr/share/cinnamon/cinnamon-settings/bin/util.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/bin/util.py
+@@ -12,7 +12,7 @@ def strip_syspath_locals():
+ 
+     new_path = []
+     for path in sys.path:
+-        if path.startswith(("/usr/local", os.path.expanduser("~/.local"))):
++        if path.startswith(("@TERMUX_PREFIX@/local", os.path.expanduser("~/.local"))):
+             continue
+         new_path.append(path)
+ 
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/cinnamon-settings.py b/files/usr/share/cinnamon/cinnamon-settings/cinnamon-settings.py
+index b97595d..161ec84 100755
+--- a/files/usr/share/cinnamon/cinnamon-settings/cinnamon-settings.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/cinnamon-settings.py
+@@ -29,7 +29,7 @@ from bin import proxygsettings
+ from bin import SettingsWidgets
+ 
+ # i18n
+-gettext.install("cinnamon", "/usr/share/locale", names=["ngettext"])
++gettext.install("cinnamon", "@TERMUX_PREFIX@/share/locale", names=["ngettext"])
+ 
+ # i18n for menu item
+ menuName = _("System Settings")
+@@ -83,7 +83,7 @@ STANDALONE_MODULES = [
+     [_("Software Sources"),           "pkexec mintsources",                   "cs-sources",                "admin",      _("ppa, repository, package, source, download")],
+     [_("Package Management"),         "dnfdragora",                           "dnfdragora",                "admin",      _("update, install, repository, package, source, download")],
+     [_("Package Management"),         "gpk-application",                      "gpk-prefs",                 "admin",      _("update, install, repository, package, source, download")],
+-    [_("Package Management"),         "/usr/bin/octopi",                      "octopi",                    "admin",      _("update, install, repository, package, source, download")],
++    [_("Package Management"),         "@TERMUX_PREFIX@/bin/octopi",                      "octopi",                    "admin",      _("update, install, repository, package, source, download")],
+     [_("Package Management"),         "pamac-manager",                        "system-software-install",   "admin",      _("update, install, repository, package, source, download")],
+     [_("Package Management"),         "yumex",                                "yumex",                     "admin",      _("update, install, repository, package, source, download")],
+     [_("Users and Groups"),           "cinnamon-settings-users",              "cs-user-accounts",          "admin",      _("user, users, account, accounts, group, groups, password")],
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_applets.py b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_applets.py
+index 8eba569..7efac47 100644
+--- a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_applets.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_applets.py
+@@ -48,7 +48,7 @@ class AppletsViewSidePage(SidePage):
+         self.stack.add_titled(download_applets_page, "more", _("Download"))
+ 
+ class ManageAppletsPage(ManageSpicesPage):
+-    directories = ["%s/.local/share/cinnamon/applets" % GLib.get_home_dir(), "/usr/share/cinnamon/applets"]
++    directories = ["%s/.local/share/cinnamon/applets" % GLib.get_home_dir(), "@TERMUX_PREFIX@/share/cinnamon/applets"]
+     collection_type = "applet"
+     installed_page_title = _("Installed applets")
+     instance_button_text = _("Add")
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_backgrounds.py b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_backgrounds.py
+index 77c95ac..64df2b0 100755
+--- a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_backgrounds.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_backgrounds.py
+@@ -21,7 +21,7 @@ from gi.repository import Gio, Gtk, Gdk, GdkPixbuf, Pango, GLib
+ from SettingsWidgets import SidePage
+ from xapp.GSettingsWidgets import *
+ 
+-gettext.install("cinnamon", "/usr/share/locale")
++gettext.install("cinnamon", "@TERMUX_PREFIX@/share/locale")
+ 
+ BACKGROUND_COLOR_SHADING_TYPES = [
+     ("solid", _("Solid color")),
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_desklets.py b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_desklets.py
+index a346d41..ada6607 100644
+--- a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_desklets.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_desklets.py
+@@ -73,7 +73,7 @@ class DeskletsViewSidePage(SidePage):
+         settings.add_row(GSettingsSwitch(_("Lock desklets in their current position"), "org.cinnamon", "lock-desklets"))
+ 
+ class ManageDeskletsPage(ManageSpicesPage):
+-    directories = ["%s/.local/share/cinnamon/desklets" % GLib.get_home_dir(), "/usr/share/cinnamon/desklets"]
++    directories = ["%s/.local/share/cinnamon/desklets" % GLib.get_home_dir(), "@TERMUX_PREFIX@/share/cinnamon/desklets"]
+     collection_type = "desklet"
+     installed_page_title = _("Installed desklets")
+     instance_button_text = _("Add")
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_display.py b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_display.py
+index db539df..950f57e 100644
+--- a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_display.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_display.py
+@@ -87,4 +87,4 @@ class Module:
+ 
+     def on_navigate_out_of_module(self):
+         if self.display_c_widget:
+-            self.display_c_widget.hide()
+\ No newline at end of file
++            self.display_c_widget.hide()
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_extensions.py b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_extensions.py
+index 3467be8..3794b2b 100755
+--- a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_extensions.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_extensions.py
+@@ -48,7 +48,7 @@ class ExtensionViewSidePage(SidePage):
+         self.stack.add_titled(download_extensions_page, "more", _("Download"))
+ 
+ class ManageExtensionsPage(ManageSpicesPage):
+-    directories = ['/usr/share/cinnamon/extensions', "%s/.local/share/cinnamon/extensions" % GLib.get_home_dir()]
++    directories = ['@TERMUX_PREFIX@/share/cinnamon/extensions', "%s/.local/share/cinnamon/extensions" % GLib.get_home_dir()]
+     collection_type = "extension"
+     installed_page_title = _("Installed extensions")
+     instance_button_text = _("Enable")
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_info.py b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_info.py
+index ccc46e0..ed11966 100755
+--- a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_info.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_info.py
+@@ -40,7 +40,7 @@ def getGraphicsInfos():
+     cards = {}
+     count = 0
+     envpath = os.environ["PATH"]
+-    os.environ["PATH"] = envpath + ":/usr/local/sbin:/usr/sbin:/sbin"
++    os.environ["PATH"] = envpath + ":@TERMUX_PREFIX@/local/sbin:@TERMUX_PREFIX@/sbin:/sbin"
+     for card in getProcessOut("lspci"):
+         for prefix in ["VGA compatible controller:", "3D controller:", "Display controller:"]:
+             if prefix in card:
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_keyboard.py b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_keyboard.py
+index 398d2e8..3003435 100755
+--- a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_keyboard.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_keyboard.py
+@@ -17,7 +17,7 @@ from SettingsWidgets import SidePage
+ from bin import util
+ from xapp.GSettingsWidgets import *
+ 
+-gettext.install("cinnamon", "/usr/share/locale")
++gettext.install("cinnamon", "@TERMUX_PREFIX@/share/locale")
+ 
+ # Keybindings page - check if we need to store custom
+ # keybindings to gsettings key as well as GConf (In Mint 14 this is changed)
+@@ -528,7 +528,7 @@ class Module:
+                 properties = {spice: spice_properties[spice]}
+                 _type = spice_properties[spice]["type"]
+                 if "@cinnamon.org" in name:
+-                    with open(f"/usr/share/cinnamon/{_type}/{name}/metadata.json", encoding="utf-8") as metadata:
++                    with open(f"@TERMUX_PREFIX@/share/cinnamon/{_type}/{name}/metadata.json", encoding="utf-8") as metadata:
+                         json_data = json.load(metadata)
+                         category_label = _(json_data["name"])
+                 else:
+@@ -1093,7 +1093,7 @@ class Module:
+             highlight_on = next(iter(self.last_selected_category))
+             _uuid, *_id = highlight_on.split()
+             _id = f"'{_id[0]}'" if _id else _uuid
+-            subprocess.run(["/usr/bin/cinnamon-dbus-command", "highlightXlet",
++            subprocess.run(["@TERMUX_PREFIX@/bin/cinnamon-dbus-command", "highlightXlet",
+                             _uuid, _id, "True"],
+                            stdout=subprocess.DEVNULL, check=False)
+ 
+@@ -1103,7 +1103,7 @@ class Module:
+             highlight_off = next(iter(self.last_selected_category))
+             _uuid, *_id = highlight_off.split()
+             _id = f"'{_id[0]}'" if _id else _uuid
+-            subprocess.run(["/usr/bin/cinnamon-dbus-command", "highlightXlet",
++            subprocess.run(["@TERMUX_PREFIX@/bin/cinnamon-dbus-command", "highlightXlet",
+                             _uuid, _id, "False"],
+                            stdout=subprocess.DEVNULL, check=False)
+ 
+@@ -1118,7 +1118,7 @@ class Module:
+         if self.last_selected_binding:
+             _uuid, *_id = self.last_selected_binding.split()
+             _id = f"'{_id[0]}'" if _id else _uuid
+-            subprocess.run(["/usr/bin/cinnamon-dbus-command", "highlightXlet",
++            subprocess.run(["@TERMUX_PREFIX@/bin/cinnamon-dbus-command", "highlightXlet",
+                             _uuid, _id, "True"],
+                            stdout=subprocess.DEVNULL, check=False)
+ 
+@@ -1127,7 +1127,7 @@ class Module:
+         if self.last_selected_binding:
+             _uuid, *_id = self.last_selected_binding.split()
+             _id = f"'{_id[0]}'" if _id else _uuid
+-            subprocess.run(["/usr/bin/cinnamon-dbus-command", "highlightXlet",
++            subprocess.run(["@TERMUX_PREFIX@/bin/cinnamon-dbus-command", "highlightXlet",
+                             _uuid, _id, "False"],
+                            stdout=subprocess.DEVNULL, check=False)
+ 
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_screensaver.py b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_screensaver.py
+index 4c2eb26..8cf2524 100755
+--- a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_screensaver.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_screensaver.py
+@@ -36,7 +36,7 @@ LOCK_INACTIVE_OPTIONS = [
+     (3600, _("1 hour"))
+ ]
+ 
+-XSCREENSAVER_PATH = "/usr/share/xscreensaver/config/"
++XSCREENSAVER_PATH = "@TERMUX_PREFIX@/share/xscreensaver/config/"
+ 
+ 
+ def list_header_func(row, before, user_data):
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_themes.py b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_themes.py
+index 4c86252..8d640cb 100755
+--- a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_themes.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_themes.py
+@@ -197,7 +197,7 @@ class Module:
+ 
+             selected_meta_theme = None
+ 
+-            gladefile = "/usr/share/cinnamon/cinnamon-settings/themes.ui"
++            gladefile = "@TERMUX_PREFIX@/share/cinnamon/cinnamon-settings/themes.ui"
+             builder = Gtk.Builder()
+             builder.set_translation_domain('cinnamon')
+             builder.add_from_file(gladefile)
+@@ -218,13 +218,13 @@ class Module:
+ 
+             # HiDPI support
+             for mode in ["mixed", "dark", "light"]:
+-                path = f"/usr/share/cinnamon/cinnamon-settings/appearance-{mode}.svg"
++                path = f"@TERMUX_PREFIX@/share/cinnamon/cinnamon-settings/appearance-{mode}.svg"
+                 pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(path, 112*self.scale, 80*self.scale)
+                 surface = Gdk.cairo_surface_create_from_pixbuf(pixbuf, self.scale)
+                 builder.get_object(f"image_{mode}").set_from_surface(surface)
+ 
+             self.color_dot_svg = ""
+-            with open("/usr/share/cinnamon/cinnamon-settings/color_dot.svg") as f:
++            with open("@TERMUX_PREFIX@/share/cinnamon/cinnamon-settings/color_dot.svg") as f:
+                 self.color_dot_svg = f.read()
+ 
+             self.reset_look_ui()
+@@ -415,7 +415,7 @@ class Module:
+         self.active_mode_name = None
+         self.active_variant = None
+ 
+-        path = "/usr/share/cinnamon/styles.d"
++        path = "@TERMUX_PREFIX@/share/cinnamon/styles.d"
+         if os.path.exists(path):
+             for filename in sorted(os.listdir(path)):
+                 if filename.endswith(".styles"):
+@@ -651,7 +651,7 @@ class Module:
+             if os.path.exists(icon_cache_path):
+                 read_path = icon_cache_path
+             else:
+-                read_path = '/usr/share/cinnamon/cinnamon-settings/icons'
++                read_path = '@TERMUX_PREFIX@/share/cinnamon/cinnamon-settings/icons'
+ 
+             icon_paths = {}
+             with open(read_path, 'r') as cache_file:
+@@ -704,7 +704,7 @@ class Module:
+ 
+         else:
+             if path_suffix == "cinnamon":
+-                chooser.add_picture("/usr/share/cinnamon/theme/thumbnail.png", callback, title="cinnamon", id="cinnamon")
++                chooser.add_picture("@TERMUX_PREFIX@/share/cinnamon/theme/thumbnail.png", callback, title="cinnamon", id="cinnamon")
+             if path_suffix in ["gtk-3.0", "cinnamon"]:
+                 themes = sorted(themes, key=lambda t: (not t[1].startswith(GLib.get_home_dir())))
+ 
+@@ -713,13 +713,13 @@ class Module:
+                 theme_path = theme[1]
+                 try:
+                     for path in ["%s/%s/%s/thumbnail.png" % (theme_path, theme_name, path_suffix),
+-                                 "/usr/share/cinnamon/thumbnails/%s/%s.png" % (path_suffix, theme_name),
+-                                 "/usr/share/cinnamon/thumbnails/%s/unknown.png" % path_suffix]:
++                                 "@TERMUX_PREFIX@/share/cinnamon/thumbnails/%s/%s.png" % (path_suffix, theme_name),
++                                 "@TERMUX_PREFIX@/share/cinnamon/thumbnails/%s/unknown.png" % path_suffix]:
+                         if os.path.exists(path):
+                             chooser.add_picture(path, callback, title=theme_name, id=theme_name)
+                             break
+                 except:
+-                    chooser.add_picture("/usr/share/cinnamon/thumbnails/%s/unknown.png" % path_suffix, callback, title=theme_name, id=theme_name)
++                    chooser.add_picture("@TERMUX_PREFIX@/share/cinnamon/thumbnails/%s/unknown.png" % path_suffix, callback, title=theme_name, id=theme_name)
+                 GLib.timeout_add(5, self.increment_progress, (chooser, inc))
+         GLib.timeout_add(500, self.hide_progress, chooser)
+ 
+@@ -757,7 +757,7 @@ class Module:
+     def set_button_chooser(self, chooser, theme, path_prefix, path_suffix, button_picture_width):
+         self.set_button_chooser_text(chooser, theme)
+         if path_suffix == "cinnamon" and theme == "cinnamon":
+-            chooser.set_picture_from_file("/usr/share/cinnamon/theme/thumbnail.png")
++            chooser.set_picture_from_file("@TERMUX_PREFIX@/share/cinnamon/theme/thumbnail.png")
+         elif path_suffix == "icons":
+             current_theme = Gtk.IconTheme.get_default()
+             folder = current_theme.lookup_icon_for_scale("folder", button_picture_width, self.window.get_scale_factor(), 0)
+@@ -768,13 +768,13 @@ class Module:
+             try:
+                 for path in ([os.path.join(datadir, path_prefix, theme, path_suffix, "thumbnail.png") for datadir in GLib.get_system_data_dirs()]
+                              + [os.path.expanduser("~/.%s/%s/%s/thumbnail.png" % (path_prefix, theme, path_suffix)),
+-                             "/usr/share/cinnamon/thumbnails/%s/%s.png" % (path_suffix, theme),
+-                             "/usr/share/cinnamon/thumbnails/%s/unknown.png" % path_suffix]):
++                             "@TERMUX_PREFIX@/share/cinnamon/thumbnails/%s/%s.png" % (path_suffix, theme),
++                             "@TERMUX_PREFIX@/share/cinnamon/thumbnails/%s/unknown.png" % path_suffix]):
+                     if os.path.exists(path):
+                         chooser.set_picture_from_file(path)
+                         break
+             except:
+-                chooser.set_picture_from_file("/usr/share/cinnamon/thumbnails/%s/unknown.png" % path_suffix)
++                chooser.set_picture_from_file("@TERMUX_PREFIX@/share/cinnamon/thumbnails/%s/unknown.png" % path_suffix)
+ 
+     def set_button_chooser_text(self, chooser, theme):
+         chooser.set_button_label(theme)
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_user.py b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_user.py
+index c50dde9..e24a2d3 100755
+--- a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_user.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_user.py
+@@ -63,7 +63,7 @@ class Module:
+             self.face_browse_menuitem = Gtk.MenuItem.new_with_label(_("Browse for more pictures..."))
+             self.face_browse_menuitem.connect('activate', self._on_face_browse_menuitem_activated)
+ 
+-            face_dirs = ["/usr/share/cinnamon/faces"]
++            face_dirs = ["@TERMUX_PREFIX@/share/cinnamon/faces"]
+             for face_dir in face_dirs:
+                 if os.path.exists(face_dir):
+                     pictures = sorted(os.listdir(face_dir))
+@@ -227,7 +227,7 @@ class Module:
+ 
+     def load_user_info(self, user, param):
+         self.realname_entry.set_text(user.get_real_name())
+-        for path in [os.path.join(self.accountService.get_home_dir(), ".face"), user.get_icon_file(), "/usr/share/cinnamon/faces/user-generic.png"]:
++        for path in [os.path.join(self.accountService.get_home_dir(), ".face"), user.get_icon_file(), "@TERMUX_PREFIX@/share/cinnamon/faces/user-generic.png"]:
+             if os.path.exists(path):
+                 self.face_button.set_picture_from_file(path)
+                 break
+@@ -331,7 +331,7 @@ class PasswordDialog(Gtk.Dialog):
+     def change_password(self):
+         oldpass = self.current_password.get_text()
+         newpass = self.new_password.get_text()
+-        passwd = pexpect.spawn("/usr/bin/passwd")
++        passwd = pexpect.spawn("@TERMUX_PREFIX@/bin/passwd")
+         time.sleep(0.5)
+         passwd.sendline(oldpass)
+         time.sleep(0.5)
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/xlet-settings.py b/files/usr/share/cinnamon/cinnamon-settings/xlet-settings.py
+index 3ff2f4d..fe42667 100755
+--- a/files/usr/share/cinnamon/cinnamon-settings/xlet-settings.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/xlet-settings.py
+@@ -24,7 +24,7 @@ from ExtensionCore import find_extension_subdir
+ from gi.repository import Gtk, Gio, XApp, GLib
+ 
+ # i18n
+-gettext.install("cinnamon", "/usr/share/locale")
++gettext.install("cinnamon", "@TERMUX_PREFIX@/share/locale")
+ 
+ home = os.path.expanduser("~")
+ settings_dir = os.path.join(GLib.get_user_config_dir(), 'cinnamon', 'spices')
+@@ -71,7 +71,7 @@ def translate(uuid, string):
+             translations[uuid] = gettext.translation(uuid, home + "/.local/share/locale").gettext
+         except IOError:
+             try:
+-                translations[uuid] = gettext.translation(uuid, "/usr/share/locale").gettext
++                translations[uuid] = gettext.translation(uuid, "@TERMUX_PREFIX@/share/locale").gettext
+             except IOError:
+                 translations[uuid] = None
+ 
+@@ -175,7 +175,7 @@ class MainWindow(object):
+             proxy.highlightXlet('(ssb)', self.uuid, self.selected_instance["id"], True)
+ 
+     def load_xlet_data (self):
+-        self.xlet_dir = "/usr/share/cinnamon/%ss/%s" % (self.type, self.uuid)
++        self.xlet_dir = "@TERMUX_PREFIX@/share/cinnamon/%ss/%s" % (self.type, self.uuid)
+         if not os.path.exists(self.xlet_dir):
+             self.xlet_dir = "%s/.local/share/cinnamon/%ss/%s" % (home, self.type, self.uuid)
+ 
+diff --git a/files/usr/share/cinnamon/desklets/launcher@cinnamon.org/desklet.js b/files/usr/share/cinnamon/desklets/launcher@cinnamon.org/desklet.js
+index 117ac3c..0d5eba9 100644
+--- a/files/usr/share/cinnamon/desklets/launcher@cinnamon.org/desklet.js
++++ b/files/usr/share/cinnamon/desklets/launcher@cinnamon.org/desklet.js
+@@ -29,7 +29,7 @@ class CinnamonLauncherDesklet extends Desklet.Desklet {
+         this._menu.addAction(
+             _('Edit launcher'),
+             Lang.bind(this, function() {
+-                Util.spawnCommandLine('/usr/share/cinnamon/desklets/launcher@cinnamon.org/editorDialog.py ' + this.instance_id);
++                Util.spawnCommandLine('@TERMUX_PREFIX@/share/cinnamon/desklets/launcher@cinnamon.org/editorDialog.py ' + this.instance_id);
+             })
+         );
+ 
+diff --git a/files/usr/share/cinnamon/desklets/launcher@cinnamon.org/editorDialog.py b/files/usr/share/cinnamon/desklets/launcher@cinnamon.org/editorDialog.py
+index ccb38a5..0ee4df0 100755
+--- a/files/usr/share/cinnamon/desklets/launcher@cinnamon.org/editorDialog.py
++++ b/files/usr/share/cinnamon/desklets/launcher@cinnamon.org/editorDialog.py
+@@ -189,8 +189,8 @@ class Application:
+             self._path = custom_path
+         elif os.path.exists(old_custom_path):
+             self._path = old_custom_path
+-        elif os.path.exists("/usr/share/applications/" + file_name):
+-            self._path = "/usr/share/applications/" + file_name
++        elif os.path.exists("@TERMUX_PREFIX@/share/applications/" + file_name):
++            self._path = "@TERMUX_PREFIX@/share/applications/" + file_name
+ 
+         if self._path:
+             self._file = open(self._path, "r")
+diff --git a/generate_additional_files.py b/generate_additional_files.py
+index 2c2cc7a..29e3c7a 100755
+--- a/generate_additional_files.py
++++ b/generate_additional_files.py
+@@ -5,7 +5,7 @@ import gettext
+ from mintcommon import additionalfiles
+ 
+ DOMAIN = "cinnamon"
+-PATH = "/usr/share/locale"
++PATH = "@TERMUX_PREFIX@/share/locale"
+ 
+ os.environ['LANGUAGE'] = "en_US.UTF-8"
+ gettext.install(DOMAIN, PATH)
+diff --git a/generate_cs_module_desktop_files.py b/generate_cs_module_desktop_files.py
+index cc8e1cc..9d29705 100755
+--- a/generate_cs_module_desktop_files.py
++++ b/generate_cs_module_desktop_files.py
+@@ -10,7 +10,7 @@ from mintcommon import additionalfiles
+ import traceback
+ 
+ DOMAIN = "cinnamon"
+-PATH = "/usr/share/locale"
++PATH = "@TERMUX_PREFIX@/share/locale"
+ 
+ os.environ['LANGUAGE'] = "en_US.UTF-8"
+ gettext.install(DOMAIN, PATH)
+diff --git a/js/ui/expo.js b/js/ui/expo.js
+index 260488e..29f92f8 100644
+--- a/js/ui/expo.js
++++ b/js/ui/expo.js
+@@ -231,7 +231,7 @@ Expo.prototype = {
+         this._addWorkspaceButton.set_position((primary.width - buttonWidth), buttonY);
+         this._addWorkspaceButton.set_size(buttonWidth, buttonHeight); 
+         if (this._addWorkspaceButton.get_theme_node().get_background_image() == null)
+-            this._addWorkspaceButton.set_style('background-image: url("/usr/share/cinnamon/theme/add-workspace.png");'); 
++            this._addWorkspaceButton.set_style('background-image: url("@TERMUX_PREFIX@/share/cinnamon/theme/add-workspace.png");'); 
+ 
+         this._windowCloseArea.set_position((primary.width - this._windowCloseArea.width) / 2 , primary.height);
+         this._windowCloseArea.set_size(this._windowCloseArea.width, this._windowCloseArea.height);
+diff --git a/js/ui/main.js b/js/ui/main.js
+index b487c16..d927ff4 100644
+--- a/js/ui/main.js
++++ b/js/ui/main.js
+@@ -210,7 +210,7 @@ var runState = RunState.INIT;
+ 
+ // Override Gettext localization
+ const Gettext = imports.gettext;
+-Gettext.bindtextdomain('cinnamon', '/usr/share/locale');
++Gettext.bindtextdomain('cinnamon', '@TERMUX_PREFIX@/share/locale');
+ Gettext.textdomain('cinnamon');
+ const _ = Gettext.gettext;
+ 
+@@ -343,7 +343,7 @@ function start() {
+     global.stage.background_color = DEFAULT_BACKGROUND_COLOR;
+     global.stage.no_clear_hint = true;
+ 
+-    Gtk.IconTheme.get_default().append_search_path("/usr/share/cinnamon/icons/");
++    Gtk.IconTheme.get_default().append_search_path("@TERMUX_PREFIX@/share/cinnamon/icons/");
+     _defaultCssStylesheet = global.datadir + '/theme/cinnamon.css';
+ 
+     soundManager = new SoundManager.SoundManager();
+@@ -567,7 +567,7 @@ function notifyCinnamon2d() {
+                        _("You may experience poor performance and high CPU usage."),
+                        icon);
+ 
+-    if (GLib.file_test("/usr/bin/cinnamon-driver-manager", GLib.FileTest.EXISTS)) {
++    if (GLib.file_test("@TERMUX_PREFIX@/bin/cinnamon-driver-manager", GLib.FileTest.EXISTS)) {
+         notification.addButton("driver-manager", _("Launch Driver Manager"));
+         notification.connect("action-invoked", this.launchDriverManager);
+     }
+diff --git a/python3/cinnamon/updates.py b/python3/cinnamon/updates.py
+index 29d2f3e..efb7a90 100644
+--- a/python3/cinnamon/updates.py
++++ b/python3/cinnamon/updates.py
+@@ -7,7 +7,7 @@ from . import harvester
+ 
+ gi.require_version('Gtk', '3.0')
+ 
+-gettext.install("cinnamon", "/usr/share/locale", names=["ngettext"])
++gettext.install("cinnamon", "@TERMUX_PREFIX@/share/locale", names=["ngettext"])
+ 
+ SPICE_TYPE_APPLET = "applet"
+ SPICE_TYPE_DESKLET = "desklet"
+diff --git a/restore b/restore
+index 34cf912..31bdec8 100755
+--- a/restore
++++ b/restore
+@@ -1,4 +1,4 @@
+ #!/bin/bash
+ 
+-rm -rf /usr/share/cinnamon/js
+-mv /usr/share/cinnamon/js-backup /usr/share/cinnamon/js
++rm -rf @TERMUX_PREFIX@/share/cinnamon/js
++mv @TERMUX_PREFIX@/share/cinnamon/js-backup @TERMUX_PREFIX@/share/cinnamon/js

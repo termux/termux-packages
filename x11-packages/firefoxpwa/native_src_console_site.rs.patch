@@ -1,0 +1,22 @@
+--- a/native/src/console/site.rs
++++ b/native/src/console/site.rs
+@@ -46,7 +46,7 @@ impl Run for SiteLaunchCommand {
+             bail!("Runtime not installed");
+         }
+ 
+-        #[cfg(all(platform_linux, not(feature = "immutable-runtime")))]
++        #[cfg(all(any(platform_linux, platform_termux), not(feature = "immutable-runtime")))]
+         {
+             use std::fs::File;
+             use std::io::Read;
+@@ -62,8 +62,8 @@ impl Run for SiteLaunchCommand {
+                 hash(&buf)
+             }
+ 
+-            if storage.config.use_linked_runtime
+-                && hasher(crate::components::runtime::FFOX) != hasher(&runtime.directory)
++            if cfg!(platform_termux) || (storage.config.use_linked_runtime
++                && hasher(crate::components::runtime::FFOX) != hasher(&runtime.directory))
+             {
+                 runtime.link()?;
+             }

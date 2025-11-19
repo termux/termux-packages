@@ -1,0 +1,33 @@
+diff -u -r ../cache/util-linux-2.40.2/schedutils/sched_attr.h ./schedutils/sched_attr.h
+--- ../cache/util-linux-2.40.2/schedutils/sched_attr.h	2024-01-31 10:02:15.742809948 +0000
++++ ./schedutils/sched_attr.h	2025-08-07 22:32:31.062558966 +0000
+@@ -84,6 +84,7 @@
+ #if defined (__linux__) && !defined(HAVE_SCHED_SETATTR) && defined(SYS_sched_setattr)
+ # define HAVE_SCHED_SETATTR
+ 
++#ifndef __ANDROID__
+ struct sched_attr {
+ 	uint32_t size;
+ 	uint32_t sched_policy;
+@@ -104,16 +105,19 @@
+ 	uint32_t sched_util_min;
+ 	uint32_t sched_util_max;
+ };
++#endif
+ 
+-static int sched_setattr(pid_t pid, const struct sched_attr *attr, unsigned int flags)
++static int sched_setattr_compat(pid_t pid, const struct sched_attr *attr, unsigned int flags)
+ {
+ 	return syscall(SYS_sched_setattr, pid, attr, flags);
+ }
+ 
+-static int sched_getattr(pid_t pid, struct sched_attr *attr, unsigned int size, unsigned int flags)
++static int sched_getattr_compat(pid_t pid, struct sched_attr *attr, unsigned int size, unsigned int flags)
+ {
+ 	return syscall(SYS_sched_getattr, pid, attr, size, flags);
+ }
++#define sched_setattr sched_setattr_compat
++#define sched_getattr sched_getattr_compat
+ #endif
+ 
+ /* the SCHED_DEADLINE is supported since Linux 3.14

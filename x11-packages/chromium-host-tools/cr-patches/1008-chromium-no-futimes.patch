@@ -1,0 +1,11 @@
+--- a/base/files/file_posix.cc
++++ b/base/files/file_posix.cc
+@@ -115,7 +115,7 @@
+ }
+ 
+ int CallFutimes(PlatformFile file, const std::array<struct timeval, 2> times) {
+-#ifdef __USE_XOPEN2K8
++#if defined(__USE_XOPEN2K8) || (defined(__ANDROID__) && __ANDROID_API__ < 26)
+   // futimens should be available, but futimes might not be
+   // http://pubs.opengroup.org/onlinepubs/9699919799/
+ 

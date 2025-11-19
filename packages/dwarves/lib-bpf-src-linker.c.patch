@@ -1,0 +1,15 @@
+--- a/lib/bpf/src/linker.c
++++ b/lib/bpf/src/linker.c
+@@ -29,6 +29,12 @@
+ 
+ #define BTF_EXTERN_SEC ".extern"
+ 
++#if defined(__ANDROID__) && __ANDROID_API__ < 30
++#include <linux/memfd.h>
++#include <sys/syscall.h>
++#define memfd_create(name,flags) syscall(SYS_memfd_create,name,flags)
++#endif
++
+ struct src_sec {
+ 	const char *sec_name;
+ 	/* positional (not necessarily ELF) index in an array of sections */

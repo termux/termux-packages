@@ -1,0 +1,16 @@
+Causes libresolv-wrapper to check for, and use, dlopen() instead of
+libdl, to work around https://github.com/termux/termux-packages/issues/26478
+
+-- Looking for dlopen
+-- Looking for dlopen - found
+
+--- a/ConfigureChecks.cmake
++++ b/ConfigureChecks.cmake
+@@ -131,7 +131,6 @@ if (UNIX)
+     check_function_exists(getaddrinfo HAVE_GETADDRINFO)
+ endif (UNIX)
+ 
+-find_library(DLFCN_LIBRARY dl)
+ if (DLFCN_LIBRARY)
+     list(APPEND _REQUIRED_LIBRARIES ${DLFCN_LIBRARY})
+ else()

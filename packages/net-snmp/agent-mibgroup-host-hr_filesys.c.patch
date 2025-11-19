@@ -1,0 +1,11 @@
+--- a/agent/mibgroup/host/hr_filesys.c
++++ b/agent/mibgroup/host/hr_filesys.c
+@@ -892,7 +892,7 @@
+     if (cp1 == NULL)
+         cp1 = filesys;
+ 
+-    if ((dump_fp = fopen("/etc/dumpdates", "r")) == NULL)
++    if ((dump_fp = fopen("@TERMUX_PREFIX@/etc/dumpdates", "r")) == NULL)
+         return date_n_time(NULL, length);
+ 
+     while (fgets(line, sizeof(line), dump_fp) != NULL) {

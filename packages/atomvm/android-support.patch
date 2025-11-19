@@ -1,0 +1,55 @@
++++ ./CMakeLists.txt
+@@ -38,6 +38,7 @@
+ 
+ if((${CMAKE_SYSTEM_NAME} STREQUAL "Darwin") OR
+    (${CMAKE_SYSTEM_NAME} STREQUAL "Linux") OR
++   (${CMAKE_SYSTEM_NAME} STREQUAL "Android") OR
+    (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD") OR
+    (${CMAKE_SYSTEM_NAME} STREQUAL "DragonFly"))
+     add_subdirectory(src/platforms/generic_unix)
++++ ./src/platforms/generic_unix/CMakeLists.txt
+@@ -27,7 +27,7 @@
+     target_compile_options(AtomVM PUBLIC -Wall -pedantic -Wextra -ggdb)
+ endif()
+ 
+-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
++if((${CMAKE_SYSTEM_NAME} STREQUAL "Linux") OR (${CMAKE_SYSTEM_NAME} STREQUAL "Android"))
+     include(CheckLibraryExists)
+     check_library_exists(rt clock_gettime "time.h" HAVE_CLOCK_GETTIME)
+     if (HAVE_CLOCK_GETTIME)
++++ ./src/libAtomVM/CMakeLists.txt
+@@ -220,6 +220,7 @@
+ # Automatically use zlib if present to load .beam files
+ if ((${CMAKE_SYSTEM_NAME} STREQUAL "Darwin") OR
+     (${CMAKE_SYSTEM_NAME} STREQUAL "Linux") OR
++    (${CMAKE_SYSTEM_NAME} STREQUAL "Android") OR
+     (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD") OR
+     (${CMAKE_SYSTEM_NAME} STREQUAL "DragonFly"))
+     find_package(ZLIB)
++++ ./tools/packbeam/CMakeLists.txt
+@@ -39,6 +39,7 @@
+ 
+ if((${CMAKE_SYSTEM_NAME} STREQUAL "Darwin") OR
+    (${CMAKE_SYSTEM_NAME} STREQUAL "Linux") OR
++   (${CMAKE_SYSTEM_NAME} STREQUAL "Android") OR
+    (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD") OR
+    (${CMAKE_SYSTEM_NAME} STREQUAL "DragonFly"))
+     target_include_directories(PackBEAM PRIVATE ../../src/platforms/generic_unix/lib)
++++ ./tests/CMakeLists.txt
+@@ -38,7 +38,7 @@
+     target_compile_options(test-structs PUBLIC -Wall -pedantic -Wextra -ggdb)
+ endif()
+ 
+-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
++if((${CMAKE_SYSTEM_NAME} STREQUAL "Linux") OR (${CMAKE_SYSTEM_NAME} STREQUAL "Android"))
+     include(CheckFunctionExists)
+     include(CheckLibraryExists)
+     check_library_exists(rt clock_gettime "time.h" HAVE_CLOCK_GETTIME)
+@@ -69,6 +69,7 @@
+ 
+ if((${CMAKE_SYSTEM_NAME} STREQUAL "Darwin") OR
+    (${CMAKE_SYSTEM_NAME} STREQUAL "Linux") OR
++   (${CMAKE_SYSTEM_NAME} STREQUAL "Android") OR
+    (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD") OR
+    (${CMAKE_SYSTEM_NAME} STREQUAL "DragonFly"))
+     target_include_directories(test-erlang PRIVATE ../src/platforms/generic_unix/lib)

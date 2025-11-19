@@ -1,0 +1,42 @@
+This is https://github.com/Dushistov/sdcv/pull/110
+
+From 6ebec7c32dc9f83bf48de654c5d355f8357e25c5 Mon Sep 17 00:00:00 2001
+From: Norayr Chilingarian <norayr@arnet.am>
+Date: Sun, 18 May 2025 13:39:02 +0400
+Subject: [PATCH] Fix build with GCC 14 and modern glib: const correctness and
+ deprecated API
+
+- Use 'const gchar*' for result of g_utf8_next_char() to satisfy GCC 14's stricter const rules
+- Remove incorrect g_free() on non-allocated pointer from g_utf8_next_char()
+- Replace deprecated g_pattern_match_string() with g_pattern_spec_match_string()
+---
+ src/stardict_lib.cpp | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/src/stardict_lib.cpp b/src/stardict_lib.cpp
+index 83fbc59..13cf779 100644
+--- a/src/stardict_lib.cpp
++++ b/src/stardict_lib.cpp
+@@ -989,7 +989,7 @@ bool Dict::LookupWithRule(GPatternSpec *pspec, glong *aIndex, int iBuffLen)
+     int iIndexCount = 0;
+ 
+     for (guint32 i = 0; i < narticles() && iIndexCount < (iBuffLen - 1); i++)
+-        if (g_pattern_match_string(pspec, get_key(i)))
++        if (g_pattern_spec_match_string(pspec, get_key(i)))
+             aIndex[iIndexCount++] = i;
+ 
+     aIndex[iIndexCount] = -1; // -1 is the end.
+@@ -1047,12 +1047,11 @@ bool Libs::LookupSimilarWord(const gchar *sWord, std::set<glong> &iWordIndices,
+         }
+         // Upper the first character and lower others.
+         if (!bFound) {
+-            gchar *nextchar = g_utf8_next_char(sWord);
++            const gchar *nextchar = g_utf8_next_char(sWord);
+             gchar *firstchar = g_utf8_strup(sWord, nextchar - sWord);
+             nextchar = g_utf8_strdown(nextchar, -1);
+             casestr = g_strdup_printf("%s%s", firstchar, nextchar);
+             g_free(firstchar);
+-            g_free(nextchar);
+             if (strcmp(casestr, sWord)) {
+                 if (oLib[iLib]->Lookup(casestr, iWordIndices))
+                     bFound = true;

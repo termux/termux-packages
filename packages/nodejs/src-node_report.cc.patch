@@ -1,0 +1,12 @@
+--- ./src/node_report.cc.orig	2022-06-04 20:28:45.524998388 +0530
++++ ./src/node_report.cc	2022-06-04 20:30:09.764998356 +0530
+@@ -425,6 +425,9 @@
+     }
+     writer->json_arrayend();
+     uv_free_cpu_info(cpu_info, count);
++  } else {
++    writer->json_arraystart("cpus");
++    writer->json_arrayend();
+   }
+ }
+ 

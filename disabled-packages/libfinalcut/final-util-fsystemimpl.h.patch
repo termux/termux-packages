@@ -1,0 +1,15 @@
+--- a/final/util/fsystemimpl.h
++++ b/final/util/fsystemimpl.h
+@@ -49,10 +49,12 @@
+     #endif
+   #endif
+ 
++  #ifndef __ANDROID__
+   #if defined(__x86_64__) || defined(__i386) || defined(ARM_ISA_SYSCTL)
+     #define ISA_SYSCTL_SUPPORT
+     #include <sys/io.h>
+   #endif  // defined(__x86_64__) || defined(__i386) || defined(ARM_ISA_SYSCTL)
++  #endif /* __ANDROID__ */
+ 
+ #endif  // defined(__linux__)
+ 

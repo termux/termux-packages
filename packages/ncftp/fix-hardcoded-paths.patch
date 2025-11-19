@@ -1,0 +1,149 @@
+--- a/libncftp/lglob.c
++++ b/libncftp/lglob.c
+@@ -137,7 +137,7 @@
+ 	 * work for us.
+ 	 */
+ #ifdef HAVE_SNPRINTF
+-	(void) snprintf(cmd, sizeof(cmd) - 1, "%s -c \"%s %s %s\"", "/bin/sh", "/bin/ls",
++	(void) snprintf(cmd, sizeof(cmd) - 1, "%s -c \"%s %s %s\"", "@TERMUX_PREFIX@/bin/sh", "@TERMUX_PREFIX@/bin/ls",
+ 		"-d", pattern);
+ 	cmd[sizeof(cmd) - 1] = '\0';
+ #else
+--- a/libncftp/open.c
++++ b/libncftp/open.c
+@@ -770,6 +770,7 @@
+ 		char etc_line[256], *etc_cp;
+ 
+ 		const char *etc_fnames[] = {
++#ifndef __ANDROID__
+ 			"/etc/yellowdog-release",
+ 			"/etc/gentoo-release",
+ 			"/etc/turbolinux-release",
+@@ -781,7 +782,8 @@
+ 			"/etc/SuSE-release",
+ 			"/etc/fedora-release",
+ 			"/etc/redhat-release",	/* Works for CentOS, too. */
+-			"/etc/issue",
++#endif
++			"@TERMUX_PREFIX@/etc/issue",
+ 			NULL,
+ 		};
+ 
+--- a/libncftp/u_gethome.c
++++ b/libncftp/u_gethome.c
+@@ -117,7 +117,7 @@
+ 	if ((Stat(dst, &st) >= 0) && (S_ISDIR(st.st_mode))) 
+ 		return;
+ #else
+-	(void) Strncpy(dst, "/tmp", size);
++	(void) Strncpy(dst, "@TERMUX_PREFIX@/tmp", size);
+ 	if ((Stat(dst, &st) >= 0) && (S_ISDIR(st.st_mode))) 
+ 		return;
+ #endif
+--- a/ncftp/cmds.c
++++ b/ncftp/cmds.c
+@@ -2005,7 +2005,7 @@
+ 	(void) fflush(stdin);
+ 	outfp = OpenPager();
+ 
+-	(void) STRNCPY(incmd, "/bin/ls");
++	(void) STRNCPY(incmd, "@TERMUX_PREFIX@/bin/ls");
+ 	for (i=1, dashopts=0; i<argc; i++) {
+ 		(void) STRNCAT(incmd, " ");
+ 		if (argv[i][0] == '-')
+@@ -2014,7 +2014,7 @@
+ 	}
+ 
+ 	if (dashopts == 0) {
+-		(void) STRNCPY(incmd, "/bin/ls -CF");
++		(void) STRNCPY(incmd, "@TERMUX_PREFIX@/bin/ls -CF");
+ 		for (i=1; i<argc; i++) {
+ 			(void) STRNCAT(incmd, " ");
+ 			(void) STRNCAT(incmd, argv[i]);
+@@ -2109,7 +2109,7 @@
+ LocalChmodCmd(const int argc, char **const argv, const CommandPtr cmdp, const ArgvInfoPtr aip)
+ {
+ 	ARGSUSED(gUnusedArg);
+-	Sys(argc, argv, aip, "/bin/chmod", 1);
++	Sys(argc, argv, aip, "@TERMUX_PREFIX@/bin/chmod", 1);
+ }	/* LocalChmodCmd */
+ #endif
+ 
+@@ -2130,7 +2130,7 @@
+ 	}
+ #else
+ 	ARGSUSED(gUnusedArg);
+-	Sys(argc, argv, aip, "/bin/mkdir", 0);
++	Sys(argc, argv, aip, "@TERMUX_PREFIX@/bin/mkdir", 0);
+ #endif
+ }	/* LocalMkdirCmd */
+ 
+@@ -2159,7 +2159,7 @@
+ 	}
+ #else
+ 	ARGSUSED(gUnusedArg);
+-	Sys(argc, argv, aip, "/bin/mv", 1);
++	Sys(argc, argv, aip, "@TERMUX_PREFIX@/bin/mv", 1);
+ #endif
+ }	/* LocalRenameCmd */
+ 
+@@ -2193,7 +2193,7 @@
+ 	}
+ #else
+ 	ARGSUSED(gUnusedArg);
+-	Sys(argc, argv, aip, "/bin/rm", 1);
++	Sys(argc, argv, aip, "@TERMUX_PREFIX@/bin/rm", 1);
+ #endif
+ }	/* LocalRmCmd */
+ 
+@@ -2227,7 +2227,7 @@
+ 	}
+ #else
+ 	ARGSUSED(gUnusedArg);
+-	Sys(argc, argv, aip, "/bin/rmdir", 1);
++	Sys(argc, argv, aip, "@TERMUX_PREFIX@/bin/rmdir", 1);
+ #endif
+ }	/* LocalRmdirCmd */
+ 
+--- a/ncftp/util.c
++++ b/ncftp/util.c
+@@ -494,7 +494,7 @@
+ 
+ 		envp = getenv("SHELL");
+ 		if (envp == NULL)
+-			(void) STRNCPY(gShell, "/bin/sh");
++			(void) STRNCPY(gShell, "@TERMUX_PREFIX@/bin/sh");
+ 		else
+ 			(void) STRNCPY(gShell, envp);
+ 	} else {
+--- a/sh_util/ncftpbatch.c
++++ b/sh_util/ncftpbatch.c
+@@ -667,7 +667,7 @@
+ 			 * in the root directory which we probably
+ 			 * can't write the core file to.
+ 			 */
+-			if ((chdir("/tmp") == 0) || (chdir("/") == 0))
++			if ((chdir("@TERMUX_PREFIX@/tmp") == 0) || (chdir("/") == 0))
+ 				abort();
+ 		} else {
+ 			Log(0, "-----caught signal %d, exiting-----\n", sigNum);
+@@ -831,7 +831,7 @@
+ #if (defined(WIN32) || defined(_WINDOWS)) && !defined(__CYGWIN__)
+ #else
+ 		if (gSpoolDir[0] == '\0')
+-			STRNCPY(gSpoolDir, "/var/spool/ncftp");
++			STRNCPY(gSpoolDir, "@TERMUX_PREFIX@/var/spool/ncftp");
+ 		if (chdir(gSpoolDir) < 0) {
+ 			/* Print a warning if we can't access it yet,
+ 			 * but allow for it to be created later by
+--- a/sio/DNSUtil.c
++++ b/sio/DNSUtil.c
+@@ -528,7 +528,7 @@
+ 		char srch[128];
+ 		char *tok;
+ 
+-		fp = fopen("/etc/resolv.conf", "r");
++		fp = fopen("@TERMUX_PREFIX@/etc/resolv.conf", "r");
+ 		if (fp != NULL) {
+ 			srch[0] = '\0';
+ 			memset(line, 0, sizeof(line));

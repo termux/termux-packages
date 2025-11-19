@@ -1,0 +1,36 @@
+diff --git a/linux/LinuxMachine.c b/linux/LinuxMachine.c
+--- a/linux/LinuxMachine.c
++++ b/linux/LinuxMachine.c
+@@ -404,7 +404,15 @@ static void LinuxMachine_scanCPUTime(LinuxMachine* this) {
+ 
+    LinuxMachine_updateCPUcount(this);
+ 
+-   FILE* file = fopen(PROCSTATFILE, "r");
++   FILE* file;
++
++   /* Read the actual procstat file only if the /proc/stat is readable by any means */
++   if (access("/proc/stat", R_OK) == 0){
++      file = fopen("/proc/stat", "r");
++   } else {
++      file = fopen(PROCSTATFILE, "r");
++   }
++
+    if (!file)
+       CRT_fatalError("Cannot open " PROCSTATFILE);
+ 
+@@ -653,7 +661,14 @@ Machine* Machine_new(UsersTable* usersTable, uid_t userId) {
+       CRT_fatalError("Cannot get clock ticks by sysconf(_SC_CLK_TCK)");
+ 
+    // Read btime (the kernel boot time, as number of seconds since the epoch)
+-   FILE* statfile = fopen(PROCSTATFILE, "r");
++   FILE* statfile;
++
++   if (access("/proc/stat", R_OK) == 0){
++      statfile = fopen("/proc/stat", "r");
++   } else {
++      statfile = fopen(PROCSTATFILE, "r");
++   }
++
+    if (statfile == NULL)
+       CRT_fatalError("Cannot open " PROCSTATFILE);
+ 

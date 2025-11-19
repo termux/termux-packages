@@ -1,0 +1,5 @@
+TERMUX_SUBPKG_DESCRIPTION="LADSPA plugin for Rubber Band"
+TERMUX_SUBPKG_INCLUDE="lib/ladspa/ share/ladspa/"
+TERMUX_SUBPKG_DEPENDS="ladspa-sdk"
+TERMUX_SUBPKG_BREAKS="rubberband (<< 3.1.2-1)"
+TERMUX_SUBPKG_REPLACES="rubberband (<< 3.1.2-1)"

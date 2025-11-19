@@ -1,0 +1,11 @@
+--- a/udpgw/udpgw.c
++++ b/udpgw/udpgw.c
+@@ -1437,7 +1437,7 @@
+ 
+ void maybe_update_dns (void)
+ {
+-#ifndef BADVPN_USE_WINAPI
++#if !defined BADVPN_USE_WINAPI && !defined __ANDROID__
+     btime_t now = btime_gettime();
+     if (now < btime_add(last_dns_update_time, DNS_UPDATE_TIME)) {
+         return;

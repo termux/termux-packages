@@ -1,0 +1,22 @@
+diff -uNr hwinfo-21.60/src/ids/Makefile hwinfo-21.60.mod/src/ids/Makefile
+--- hwinfo-21.60/src/ids/Makefile	2018-10-17 16:23:47.000000000 +0300
++++ hwinfo-21.60.mod/src/ids/Makefile	2019-06-25 22:54:25.404041321 +0300
+@@ -53,11 +53,14 @@
+ check_hd: check_hd.c
+ 	$(CC) $(CFLAGS) $< -o $@
+ 
++check_hd_host: check_hd.c
++	gcc -O2 $< -o $@
++
+ hd_ids.c: hd_ids.h hd_ids_tiny.h
+ 
+-hd_ids.h hd.ids: check_hd $(IDFILES)
+-	./check_hd --check --sort --cfile hd_ids.h $(IDFILES)
++hd_ids.h hd.ids: check_hd check_hd_host $(IDFILES)
++	./check_hd_host --check --sort --cfile hd_ids.h $(IDFILES)
+ 
+-hd_ids_tiny.h: check_hd hd.ids
+-	./check_hd --mini --cfile hd_ids_tiny.h --log=hd_tiny.log --out=hd_tiny.ids hd.ids
++hd_ids_tiny.h: check_hd check_hd_host hd.ids
++	./check_hd_host --mini --cfile hd_ids_tiny.h --log=hd_tiny.log --out=hd_tiny.ids hd.ids
+ 

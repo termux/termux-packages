@@ -1,0 +1,14 @@
+diff -u -r ../torsocks-2.2.0/src/common/config-file.h ./src/common/config-file.h
+--- ../torsocks-2.2.0/src/common/config-file.h	2016-10-18 12:44:01.000000000 -0400
++++ ./src/common/config-file.h	2016-12-20 21:18:35.084929826 -0500
+@@ -21,6 +21,10 @@
+ #define CONFIG_FILE_H
+ 
+ #include <netinet/in.h>
++#ifdef __ANDROID__
++/* For in_addr_t. */
++#include <arpa/inet.h>
++#endif
+ 
+ #include "connection.h"
+ #include "socks5.h"

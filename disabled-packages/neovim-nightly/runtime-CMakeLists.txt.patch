@@ -1,0 +1,21 @@
+diff -u -r ../neovim-0.3.2/runtime/CMakeLists.txt ./runtime/CMakeLists.txt
+--- ../neovim-0.3.2/runtime/CMakeLists.txt	2018-12-31 00:06:17.000000000 +0000
++++ ./runtime/CMakeLists.txt	2019-01-03 00:07:55.652628776 +0000
+@@ -32,7 +32,7 @@
+     add_custom_target("${PACKNAME}-tags"
+       COMMAND ${CMAKE_COMMAND} -E copy_directory
+         ${PACKAGE} ${GENERATED_PACKAGE_DIR}/${PACKNAME}
+-      COMMAND "${PROJECT_BINARY_DIR}/bin/nvim"
++      COMMAND "${PROJECT_BINARY_DIR}/../host-build/bin/nvim"
+         -u NONE -i NONE -e --headless -c "helptags doc" -c quit
+       DEPENDS
+         nvim
+@@ -71,7 +71,7 @@
+   COMMAND ${CMAKE_COMMAND} -E remove doc/*
+   COMMAND ${CMAKE_COMMAND} -E copy_directory
+     ${PROJECT_SOURCE_DIR}/runtime/doc doc
+-  COMMAND "${PROJECT_BINARY_DIR}/bin/nvim"
++  COMMAND "${PROJECT_BINARY_DIR}/../host-build/bin/nvim"
+     -u NONE -i NONE -e --headless -c "helptags ++t doc" -c quit
+   DEPENDS
+     nvim

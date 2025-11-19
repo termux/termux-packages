@@ -1,0 +1,14 @@
+--- ext/standard/proc_open.c.orig	2019-12-28 22:27:36.923774794 +0000
++++ ./ext/standard/proc_open.c	2019-12-28 22:28:31.914719970 +0000
+@@ -1048,9 +1048,9 @@
+ 			execvp(command, argv);
+ 		} else {
+ 			if (env.envarray) {
+-				execle("/bin/sh", "sh", "-c", command, NULL, env.envarray);
++				execle("@TERMUX_PREFIX@/bin/sh", "sh", "-c", command, NULL, env.envarray);
+ 			} else {
+-				execl("/bin/sh", "sh", "-c", command, NULL);
++				execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", command, NULL);
+ 			}
+ 		}
+ 		_exit(127);

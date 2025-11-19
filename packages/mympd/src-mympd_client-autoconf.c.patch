@@ -1,0 +1,15 @@
+--- a/src/mympd_client/autoconf.c
++++ b/src/mympd_client/autoconf.c
+@@ -99,9 +99,9 @@
+     FREE_SDS(xdg_runtime_dir);
+ 
+     const char *test_sockets[] = {
+-        "/run/mpd/socket",
+-        "/var/run/mpd/socket",
+-        "/var/lib/mpd/socket", //Gentoo default
++        "@TERMUX_PREFIX@/var/run/mpd.socket",
++        "@TERMUX_PREFIX@/run/mpd.socket",
++        "@TERMUX_PREFIX@/var/lib/mpd.socket", //Gentoo default
+         NULL
+     };
+ 

@@ -1,0 +1,28 @@
+--- ./deps/uv/uv.gyp	2023-01-06 04:16:46.000000000 +0530
++++ ./deps/uv/uv.gyp.mod	2023-01-10 19:53:16.953276157 +0530
+@@ -40,7 +40,7 @@
+     {
+       'target_name': 'libuv',
+       'type': '<(uv_library)',
+-      'include_dirs': [
++      'include_dirs+': [
+         'include',
+         'src/',
+       ],
+@@ -55,7 +55,7 @@
+           '<@(shared_unix_defines)',
+           '<@(shared_zos_defines)',
+         ],
+-        'include_dirs': [ 'include' ],
++        'include_dirs+': [ 'include' ],
+         'conditions': [
+           ['OS == "linux"', {
+             'defines': [ '_POSIX_C_SOURCE=200112' ],
+@@ -267,6 +266,7 @@
+             'src/unix/random-sysctl-linux.c',
+             'src/unix/epoll.c',
+           ],
++          'defines': [ '__USE_GNU' ],
+           'link_settings': {
+             'libraries': [ '-ldl' ],
+           },

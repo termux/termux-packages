@@ -1,0 +1,13 @@
+diff --git a/erts/emulator/asmjit/core/virtmem.cpp b/erts/emulator/asmjit/core/virtmem.cpp
+index a1b0f95..d1eb1ad 100644
+--- a/erts/emulator/asmjit/core/virtmem.cpp
++++ b/erts/emulator/asmjit/core/virtmem.cpp
+@@ -388,7 +396,7 @@ static ASMJIT_INLINE int VirtMem_appleSpecificMMapFlags(uint32_t flags) noexcept
+ #if !defined(SHM_ANON)
+ static const char* VirtMem_getTmpDir() noexcept {
+   const char* tmpDir = getenv("TMPDIR");
+-  return tmpDir ? tmpDir : "/tmp";
++  return tmpDir ? tmpDir : "@TERMUX_PREFIX@/tmp";
+ }
+ #endif
+ 

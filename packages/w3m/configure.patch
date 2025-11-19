@@ -1,0 +1,28 @@
+Ensure host libraries are not picked up
+--- ../configure.orig	2020-07-06 08:56:18.121237416 +0200
++++ ./configure	2020-07-06 08:56:42.224520722 +0200
+@@ -7361,24 +7361,6 @@
+ _ACEOF
+ 
+ 
+-for lib in bsd BSD 44bsd socket nsl dld dl
+-do
+- lib=$lib
+- { $as_echo "$as_me:${as_lineno-$LINENO}: checking for -l$lib" >&5
+-$as_echo_n "checking for -l$lib... " >&6; }
+- extlib="not found"
+- for dir in /lib /usr/lib /usr/local/lib /usr/ucblib /usr/ccslib /usr/ccs/lib /lib64 /usr/lib64
+- do
+-   if test -f $dir/lib$lib.a -o -f $dir/lib$lib.so ; then
+-    LIBS="$LIBS -l$lib"
+-    extlib="found at $dir"
+-    break
+-   fi
+- done
+- { $as_echo "$as_me:${as_lineno-$LINENO}: result: $extlib" >&5
+-$as_echo "$extlib" >&6; }
+-done
+-
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking if IPv6 support is enabled" >&5
+ $as_echo_n "checking if IPv6 support is enabled... " >&6; }
+ # Check whether --enable-ipv6 was given.

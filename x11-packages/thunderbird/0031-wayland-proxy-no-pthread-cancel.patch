@@ -1,0 +1,16 @@
+firefox does not need this yet because Wayland is disabled in firefox
+because of an issue that does not seem reproducible in Thunderbird
+https://github.com/termux/termux-packages/pull/19441#issuecomment-2000151761
+
+--- a/third_party/wayland-proxy/wayland-proxy.cpp
++++ b/third_party/wayland-proxy/wayland-proxy.cpp
+@@ -739,7 +739,9 @@
+   if (mThreadRunning) {
+     Info("thread is still running, terminating.\n");
+     mThreadRunning = false;
++#ifndef __TERMUX__
+     pthread_cancel(mThread);
++#endif
+     pthread_join(mThread, nullptr);
+   }
+   if (mProxyServerSocket != -1) {

@@ -1,0 +1,11 @@
+--- a/lsfd-cmd/sock-xinfo.c
++++ b/lsfd-cmd/sock-xinfo.c
+@@ -1580,7 +1580,7 @@ static void *tcp6_xinfo_get_addr(struct l4_xinfo * l4, enum l4_side side)
+ 
+ static bool tcp6_xinfo_is_any_addr(void *addr)
+ {
+-	return IN6_ARE_ADDR_EQUAL(addr, &(struct in6_addr)IN6ADDR_ANY_INIT);
++	return IN6_ARE_ADDR_EQUAL((struct in6_addr *)addr, &(struct in6_addr)IN6ADDR_ANY_INIT);
+ }
+ 
+ static const struct l4_xinfo_class tcp6_xinfo_class = {

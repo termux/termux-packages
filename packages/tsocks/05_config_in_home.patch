@@ -1,0 +1,42 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 05_config_in_home.dpatch by Reinhard Tartler <siretart@tauware.de>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Additionally search for the configuration file in user home directory
+
+diff -urNad tsocks-1.8beta5~/parser.c tsocks-1.8beta5/parser.c
+--- tsocks-1.8beta5~/parser.c	2008-03-03 14:05:14.000000000 +0100
++++ tsocks-1.8beta5/parser.c	2008-03-03 14:05:36.000000000 +0100
+@@ -36,6 +36,32 @@
+ static int handle_defpass(struct parsedfile *, int, char *);
+ static int make_netent(char *value, struct netent **ent);
+ 
++char __attribute__ ((visibility ("hidden")))
++*find_config(char *line) {
++	struct passwd* pw;
++
++	errno = 0;
++
++	pw = getpwuid(getuid());
++	if (errno) {
++		perror("getpwuid");
++		return NULL;
++	}
++
++	/* check for config in $HOME */
++	snprintf(line, MAXLINE - 1, "%s/.tsocks.conf", pw->pw_dir);
++
++	if (access(line, R_OK)) {
++		show_msg(MSGDEBUG, "Can't access %s, using " CONF_FILE " instead.\n", line);
++		strncpy(line, CONF_FILE, MAXLINE - 1);
++	}
++
++	/* Insure null termination */
++	line[MAXLINE - 1] = (char) 0;
++
++	return line;
++}
++
+ int __attribute__ ((visibility ("hidden")))
+ read_config (char *filename, struct parsedfile *config) {
+ 	FILE *conf;

@@ -1,0 +1,13 @@
+--- ./protocols.cc.orig	2022-01-26 13:59:35.461929052 +0530
++++ ./protocols.cc	2022-01-26 13:58:31.191929077 +0530
+@@ -87,8 +87,8 @@
+   int res;
+ 
+   if (nmap_fetchfile(filename, sizeof(filename), "nmap-protocols") != 1) {
+-    error("Unable to find nmap-protocols!  Resorting to /etc/protocols");
+-    strcpy(filename, "/etc/protocols");
++    error("Unable to find nmap-protocols!  Resorting to @TERMUX_PREFIX@/etc/protocols");
++    strcpy(filename, "@TERMUX_PREFIX@/etc/protocols");
+   }
+ 
+   fp = fopen(filename, "r");

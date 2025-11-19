@@ -1,0 +1,24 @@
+--- a/main/streams/cast.c
++++ b/main/streams/cast.c
+@@ -33,6 +33,12 @@
+ /* NetBSD 6.0+ uses off_t instead of fpos_t in funopen */
+ # if defined(__NetBSD__) && (__NetBSD_Version__ >= 600000000)
+ #  define PHP_FPOS_T off_t
++# elif defined(__ANDROID__)
++#  if defined(__LP64__)
++#   define PHP_FPOS_T int64_t
++#  else
++#   define PHP_FPOS_T __kernel_off_t
++#  endif
+ # else
+ #  define PHP_FPOS_T fpos_t
+ # endif
+@@ -72,7 +78,7 @@
+ 	return php_stream_write((php_stream *)cookie, (char *)buffer, size);
+ }
+ 
+-static PHP_FPOS_T stream_cookie_seeker(void *cookie, zend_off_t position, int whence)
++static PHP_FPOS_T stream_cookie_seeker(void *cookie, PHP_FPOS_T position, int whence)
+ {
+ 
+ 	return (PHP_FPOS_T)php_stream_seek((php_stream *)cookie, position, whence);

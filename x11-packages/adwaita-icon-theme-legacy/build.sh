@@ -1,0 +1,12 @@
+TERMUX_PKG_HOMEPAGE=https://gitlab.gnome.org/GNOME/adwaita-icon-theme-legacy
+TERMUX_PKG_DESCRIPTION="GNOME fallback icons for legacy apps"
+TERMUX_PKG_LICENSE="LGPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="46.2"
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://download.gnome.org/sources/adwaita-icon-theme-legacy/${TERMUX_PKG_VERSION%.*}/adwaita-icon-theme-legacy-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=548480f58589a54b72d18833b755b15ffbd567e3187249d74e2e1f8f99f22fb4
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="hicolor-icon-theme"
+TERMUX_PKG_RM_AFTER_INSTALL="share/icons/AdwaitaLegacy/icon-theme.cache"

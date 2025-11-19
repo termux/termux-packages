@@ -1,0 +1,29 @@
+--- a/media/audio/pulse/pulse_util.cc
++++ b/media/audio/pulse/pulse_util.cc
+@@ -44,8 +44,12 @@
+ 
+ #if defined(DLOPEN_PULSEAUDIO)
+ static const base::FilePath::CharType kPulseLib[] =
++#ifdef __TERMUX__
++    FILE_PATH_LITERAL("libpulse.so");
++#else
+     FILE_PATH_LITERAL("libpulse.so.0");
+ #endif
++#endif
+ 
+ void DestroyMainloop(pa_threaded_mainloop* mainloop) {
+   pa_threaded_mainloop_stop(mainloop);
+--- a/third_party/webrtc/modules/audio_device/linux/pulseaudiosymboltable_linux.cc
++++ b/third_party/webrtc/modules/audio_device/linux/pulseaudiosymboltable_linux.cc
+@@ -30,7 +30,11 @@
+ namespace webrtc {
+ namespace adm_linux_pulse {
+ 
++#ifdef __TERMUX__
++LATE_BINDING_SYMBOL_TABLE_DEFINE_BEGIN(PulseAudioSymbolTable, "libpulse.so")
++#else
+ LATE_BINDING_SYMBOL_TABLE_DEFINE_BEGIN(PulseAudioSymbolTable, "libpulse.so.0")
++#endif
+ #define X(sym) \
+   LATE_BINDING_SYMBOL_TABLE_DEFINE_ENTRY(PulseAudioSymbolTable, sym)
+ PULSE_AUDIO_SYMBOLS_LIST

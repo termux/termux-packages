@@ -1,0 +1,17 @@
+diff --git a/src/cmake/compiler.cmake b/src/cmake/compiler.cmake
+index 6dfad31..f199767 100644
+--- a/src/cmake/compiler.cmake
++++ b/src/cmake/compiler.cmake
+@@ -206,12 +206,6 @@ if (MSVC)
+     add_compile_definitions (JAS_WIN_MSVC_BUILD)
+ endif (MSVC)
+ 
+-if (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD"
+-    AND ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "i386")
+-    # For FreeBSD, minimum arch of i586 is needed for atomic cpu instructions
+-    add_compile_options (-march=i586)
+-endif ()
+-
+ # Fast-math mode may go faster, but it breaks IEEE and also makes inconsistent
+ # results on different compilers/platforms, so we don't use it by default.
+ option (ENABLE_FAST_MATH "Use fast math (may break IEEE fp rules)" OFF)

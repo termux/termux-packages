@@ -1,0 +1,15 @@
+--- a/cipher/keccak.c
++++ b/cipher/keccak.c
+@@ -1207,10 +1207,12 @@
+   else if (features & HWF_INTEL_BMI2)
+     ctx->ops = &keccak_bmi2_32bi_ops;
+ #endif
++#ifdef HAVE_CPU_ARCH_X86
+ #ifdef USE_64BIT_SHLD
+   else if (features & HWF_INTEL_FAST_SHLD)
+     ctx->ops = &keccak_shld_64_ops;
+ #endif
++#endif
+ #ifdef USE_RISCV_ZBB
+   else if ((features & HWF_RISCV_IMAFDC) && (features & HWF_RISCV_ZBB))
+     ctx->ops = &keccak_riscv_zbb_64_ops;

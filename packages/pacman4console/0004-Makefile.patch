@@ -1,0 +1,31 @@
+--- ../Makefile.orig	2019-08-11 10:45:43.818342372 +0200
++++ ./Makefile	2019-08-11 11:22:54.202576206 +0200
+@@ -1,20 +1,18 @@
+-prefix=/usr/local
+-bindir=$(prefix)/bin
+-datarootdir=$(prefix)/share
++CC?=gcc
++prefix?=/usr/local
++bindir?=$(prefix)/bin
++datarootdir?=$(prefix)/share
+ 
+ all:
+-	gcc pacman.c     -o pacman     -DDATAROOTDIR=\"$(datarootdir)\" $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -lncurses
+-	gcc pacmanedit.c -o pacmanedit -DDATAROOTDIR=\"$(datarootdir)\" $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -lncurses
++	$(CC) pacman.c     -o pacmanplay     -DDATAROOTDIR=\"$(datarootdir)\" $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -lncurses
++	$(CC) pacmanedit.c -o pacmanedit -DDATAROOTDIR=\"$(datarootdir)\" $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -lncurses
+ 
+ install:    all
+ 	mkdir -p $(DESTDIR)$(bindir)
+ 	mkdir -p $(DESTDIR)$(datarootdir)/pacman
+ 	cp -fR Levels/ $(DESTDIR)$(datarootdir)/pacman/
+-	-chown root:games $(DESTDIR)$(bindir)/pacman
+-	-chown root:games $(DESTDIR)$(datarootdir)/pacman -R
+-	chmod 750 $(DESTDIR)$(bindir)/pacman
+-	chmod 750 $(DESTDIR)$(bindir)/pacmanedit
+-	chmod 750 $(DESTDIR)$(datarootdir)/pacman/ -R
++	install -Dm755 pacmanplay pacmanedit $(DESTDIR)$(bindir)/
++	chmod 755 $(DESTDIR)$(datarootdir)/pacman/ -R
+ 
+ uninstall:
+ 	rm -f $(DESTDIR)$(bindir)/pacman

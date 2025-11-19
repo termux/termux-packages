@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
+TERMUX_PKG_DESCRIPTION="X Present Extension library"
+TERMUX_PKG_LICENSE="HPND, MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.0.2"
+TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/lib/libXpresent-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=4e5b21b4812206a4b223013606ae31170502c1043038777a1ef8f70c09d37602
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libx11, libxext, libxfixes, libxrandr"
+TERMUX_PKG_BUILD_DEPENDS="xorgproto"

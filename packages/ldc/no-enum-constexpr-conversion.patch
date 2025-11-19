@@ -1,0 +1,23 @@
+--- a/llvm/projects/SPIRV-LLVM-Translator/lib/SPIRV/libSPIRV/spirv_internal.hpp
++++ b/llvm/projects/SPIRV-LLVM-Translator/lib/SPIRV/libSPIRV/spirv_internal.hpp
+@@ -26,6 +26,11 @@
+ #ifndef spirv_internal_HPP
+ #define spirv_internal_HPP
+ 
++#if defined(__clang__) && __clang_major__ >= 16
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wenum-constexpr-conversion"
++#endif
++
+ namespace spv {
+ namespace internal {
+ 
+@@ -193,4 +198,8 @@
+ } // namespace internal
+ } // namespace spv
+ 
++#if defined(__clang__) && __clang_major__ >= 16
++#pragma GCC diagnostic pop
++#endif
++
+ #endif // #ifndef spirv_internal_HPP

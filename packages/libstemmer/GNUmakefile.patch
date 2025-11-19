@@ -1,0 +1,14 @@
+--- a/GNUmakefile
++++ b/GNUmakefile
+@@ -204,7 +204,10 @@
+ 	-rmdir $(js_output_dir)
+ 
+ snowball$(EXEEXT): $(COMPILER_OBJECTS)
+-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
++	$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o $@ $^
++
++compiler/%.o: compiler/%.c
++	$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) -c $< -o $@
+ 
+ $(COMPILER_OBJECTS): $(COMPILER_HEADERS)
+ 

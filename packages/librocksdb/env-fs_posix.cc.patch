@@ -1,0 +1,13 @@
+--- a/env/fs_posix.cc
++++ b/env/fs_posix.cc
+@@ -905,8 +905,8 @@
+     if (env && env[0] != '\0') {
+       *result = env;
+     } else {
+-      char buf[100];
+-      snprintf(buf, sizeof(buf), "/tmp/rocksdbtest-%d", int(geteuid()));
++      char buf[] = "@TERMUX_PREFIX@/tmp/rocksdbtest-XXXXXXXXXXX";
++      snprintf(buf, sizeof(buf), "@TERMUX_PREFIX@/tmp/rocksdbtest-%d", int(geteuid()));
+       *result = buf;
+     }
+     // Directory may already exist

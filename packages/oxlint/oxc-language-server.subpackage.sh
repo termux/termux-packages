@@ -1,0 +1,3 @@
+TERMUX_SUBPKG_DESCRIPTION="Oxc JavaScript linter language server"
+TERMUX_SUBPKG_INCLUDE="bin/oxc_language_server"
+TERMUX_SUBPKG_DEPEND_ON_PARENT=false

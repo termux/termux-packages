@@ -1,0 +1,11 @@
+--- godot-4.0-stable/thirdparty/openxr/src/common/platform_utils.hpp	2023-03-01 03:38:07.000000000 +0300
++++ godot-4.0-stable/thirdparty/openxr/src/common/platform_utils.hpp.patch	2023-03-04 14:53:44.060311400 +0300
+@@ -50,7 +50,7 @@
+ static inline int ImplSetEnv(const char* name, const char* value, int overwrite) { return setenv(name, value, overwrite); }
+ 
+ static inline char* ImplGetSecureEnv(const char* name) {
+-#ifdef HAVE_SECURE_GETENV
++#if defined(HAVE_SECURE_GETENV) && !defined(__ANDROID__)
+     return secure_getenv(name);
+ #elif defined(HAVE___SECURE_GETENV)
+     return __secure_getenv(name);

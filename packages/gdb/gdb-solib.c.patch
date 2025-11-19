@@ -1,0 +1,20 @@
+diff -u -r ../gdb-7.10.1/gdb/solib.c ./gdb/solib.c
+--- ../gdb-7.10.1/gdb/solib.c	2015-12-05 10:16:45.000000000 -0500
++++ ./gdb/solib.c	2016-02-07 17:29:11.431584611 -0500
+@@ -1703,6 +1703,16 @@
+   add_alias_cmd ("solib-absolute-prefix", "sysroot", class_support, 0,
+ 		 &showlist);
+ 
++#ifdef __ANDROID__
++  /* Termux modification to find system shared libraries. */
++  solib_search_path =
++# ifdef __LP64__
++    "/system/lib64:/system/vendor/lib64";
++# else
++    "/system/lib:/system/vendor/lib";
++# endif
++#endif
++
+   add_setshow_optional_filename_cmd ("solib-search-path", class_support,
+ 				     &solib_search_path, _("\
+ Set the search path for loading non-absolute shared library symbol files."),

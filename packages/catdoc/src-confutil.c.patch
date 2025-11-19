@@ -1,0 +1,14 @@
+--- a/src/confutil.c
++++ b/src/confutil.c
+@@ -103,7 +103,11 @@
+ #ifndef __TURBOC__	
+ 	if (!setlocale(LC_CTYPE,"")) return;
+ #endif
++#ifdef __ANDROID__
++	codeset = "UTF-8";
++#else
+ 	codeset = nl_langinfo(CODESET);
++#endif
+ 	if (!strncmp(codeset,"ISO",3)||!strncmp(codeset,"iso",3)) {
+ 		codeset+=3;
+ 		if (*codeset=='-') codeset++;

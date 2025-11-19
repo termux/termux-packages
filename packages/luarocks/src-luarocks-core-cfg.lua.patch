@@ -1,0 +1,20 @@
+--- a/src/luarocks/core/cfg.lua
++++ b/src/luarocks/core/cfg.lua
+@@ -242,7 +242,7 @@
+          MKDIR = "mkdir",
+          RMDIR = "rmdir",
+          CP = "cp",
+-         LN = "ln",
++         LN = "ln -s",
+          LS = "ls",
+          RM = "rm",
+          FIND = "find",
+@@ -377,7 +377,7 @@
+       defaults.static_lib_extension = "a"
+       defaults.external_lib_extension = "so"
+       defaults.obj_extension = "o"
+-      defaults.external_deps_dirs = { "/usr/local", "/usr", "/" }
++      defaults.external_deps_dirs = { "@TERMUX_PREFIX@/local", "@TERMUX_PREFIX@" }
+
+       defaults.variables.CFLAGS = os.getenv("CFLAGS") or "-O2"
+       -- we pass -fPIC via CFLAGS because of old Makefile-based Lua projects

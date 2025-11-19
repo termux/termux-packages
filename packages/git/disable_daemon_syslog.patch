@@ -1,0 +1,25 @@
+diff -u -r ../git-2.17.0/daemon.c ./daemon.c
+--- ../git-2.17.0/daemon.c	2018-04-02 19:44:04.000000000 +0200
++++ ./daemon.c	2018-04-03 23:10:19.566140810 +0200
+@@ -82,9 +82,11 @@
+ {
+ 	switch (log_destination) {
+ 	case LOG_DESTINATION_SYSLOG: {
++		/*
+ 		char buf[1024];
+ 		vsnprintf(buf, sizeof(buf), err, params);
+ 		syslog(priority, "%s", buf);
++		*/
+ 		break;
+ 	}
+ 	case LOG_DESTINATION_STDERR:
+@@ -1432,7 +1434,9 @@
+ 	}
+ 
+ 	if (log_destination == LOG_DESTINATION_SYSLOG) {
++		/*
+ 		openlog("git-daemon", LOG_PID, LOG_DAEMON);
++		*/
+ 		set_die_routine(daemon_die);
+ 	} else
+ 		/* avoid splitting a message in the middle */

@@ -1,0 +1,11 @@
+--- a/wsutil/ws_pipe.c
++++ b/wsutil/ws_pipe.c
+@@ -109,7 +109,7 @@
+         close(dir_fd);
+     } else {
+         /* Slow fallback in case /proc is not mounted */
+-        for (int fd = STDERR_FILENO + 1; fd < getdtablesize(); fd++) {
++        for (int fd = STDERR_FILENO + 1; fd < sysconf(_SC_OPEN_MAX); fd++) {
+             fcntl(fd, F_SETFD, FD_CLOEXEC);
+         }
+     }

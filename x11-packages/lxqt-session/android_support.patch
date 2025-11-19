@@ -1,0 +1,59 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 91d0e2c..c8d85ad 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -34,7 +34,7 @@
+ find_package(X11 REQUIRED)
+ message(STATUS "Building with Qt${Qt5Core_VERSION}")
+ find_package(PkgConfig REQUIRED)
+-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
++if (CMAKE_SYSTEM_NAME MATCHES "Linux|Android")
+     pkg_search_module(PROCPS REQUIRED libproc2 libprocps)
+     message(STATUS "Using PROCPS -> ${PROCPS_MODULE_NAME} v${PROCPS_VERSION}")
+     if (PROCPS_VERSION VERSION_GREATER_EQUAL 4.0.0)
+@@ -43,7 +43,6 @@
+ endif()
+ 
+ # Please don't move, must be after lxqt
+-find_package(XdgUserDirs REQUIRED)
+ 
+ # Patch Version
+ set(LXQT_SESSION_PATCH_VERSION 0)
+diff --git a/lxqt-session/CMakeLists.txt b/lxqt-session/CMakeLists.txt
+index 04dcd82..88d3705 100644
+--- a/lxqt-session/CMakeLists.txt
++++ b/lxqt-session/CMakeLists.txt
+@@ -9,11 +9,10 @@ endif()
+ include_directories(
+     ${X11_INCLUDE_DIR}
+ )
+-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+-    include_directories(
+-        ${PROCPS_INCLUDE_DIRS}
+-    )
+-endif()
++
++include_directories(
++	${PROCPS_INCLUDE_DIRS}
++)
+ 
+ set(lxqt-session_HDRS "")
+ 
+@@ -67,11 +66,12 @@ target_link_libraries(lxqt-session
+     ${X11_LIBRARIES}
+     KF5::WindowSystem
+ )
+-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+-    target_link_libraries(lxqt-session
+-        ${PROCPS_LIBRARIES}
+-    )
+-elseif (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
++
++target_link_libraries(lxqt-session
++	${PROCPS_LIBRARIES}
++)
++
++if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+     target_link_libraries(lxqt-session
+         -lutil
+     )

@@ -1,0 +1,105 @@
+https://github.com/termux/termux-packages/issues/15852
+
+--- a/libloqui/loqui-generic-profile-factory.c
++++ b/libloqui/loqui-generic-profile-factory.c
+@@ -69,7 +69,7 @@
+ static void loqui_generic_profile_factory_init (LoquiGenericProfileFactory * o) G_GNUC_UNUSED;
+ static void loqui_generic_profile_factory_class_init (LoquiGenericProfileFactoryClass * c) G_GNUC_UNUSED;
+ #line 51 "loqui-generic-profile-factory.gob"
+-static const gchar * loqui_generic_profile_factory_get_profile_type_name_static (LoquiProfileFactory * factory) G_GNUC_UNUSED;
++static gchar * loqui_generic_profile_factory_get_profile_type_name_static (LoquiProfileFactory * factory) G_GNUC_UNUSED;
+ #line 74 "loqui-generic-profile-factory.c"
+ #line 61 "loqui-generic-profile-factory.gob"
+ static LoquiProfile * loqui_generic_profile_factory_create_profile (LoquiProfileFactory * factory) G_GNUC_UNUSED;
+@@ -219,7 +219,7 @@
+ #undef __GOB_FUNCTION__
+ 
+ #line 51 "loqui-generic-profile-factory.gob"
+-static const gchar * 
++static gchar * 
+ loqui_generic_profile_factory_get_profile_type_name_static (LoquiProfileFactory * factory)
+ {
+ #line 226 "loqui-generic-profile-factory.c"
+--- a/libloqui/loqui-property-profile.c
++++ b/libloqui/loqui-property-profile.c
+@@ -81,7 +81,7 @@
+ static void loqui_property_profile_get_profile_value (LoquiProfile * profile, const gchar * key, GValue * value) G_GNUC_UNUSED;
+ #line 83 "loqui-property-profile.c"
+ #line 64 "loqui-property-profile.gob"
+-static const GParamSpec * loqui_property_profile_get_profile_value_spec (LoquiProfile * profile, const gchar * key, const gchar * type_hint) G_GNUC_UNUSED;
++static GParamSpec * loqui_property_profile_get_profile_value_spec (LoquiProfile * profile, const gchar * key, const gchar * type_hint) G_GNUC_UNUSED;
+ #line 86 "loqui-property-profile.c"
+ #line 69 "loqui-property-profile.gob"
+ static GList * loqui_property_profile_get_profile_key_list (LoquiProfile * profile) G_GNUC_UNUSED;
+@@ -267,7 +267,7 @@
+ #undef __GOB_FUNCTION__
+ 
+ #line 64 "loqui-property-profile.gob"
+-static const GParamSpec * 
++static GParamSpec * 
+ loqui_property_profile_get_profile_value_spec (LoquiProfile * profile, const gchar * key, const gchar * type_hint)
+ {
+ #line 274 "loqui-property-profile.c"
+--- a/libloqui/loqui-protocol.c
++++ b/libloqui/loqui-protocol.c
+@@ -71,7 +71,7 @@
+ static void loqui_protocol_init (LoquiProtocol * o) G_GNUC_UNUSED;
+ static void loqui_protocol_class_init (LoquiProtocolClass * c) G_GNUC_UNUSED;
+ #line 77 "loqui-protocol.gob"
+-static const gchar * loqui_protocol_get_profile_type_name_static (LoquiProfileFactory * factory) G_GNUC_UNUSED;
++static gchar * loqui_protocol_get_profile_type_name_static (LoquiProfileFactory * factory) G_GNUC_UNUSED;
+ #line 76 "loqui-protocol.c"
+ #line 87 "loqui-protocol.gob"
+ static LoquiProfile * loqui_protocol_create_profile (LoquiProfileFactory * factory) G_GNUC_UNUSED;
+@@ -198,7 +198,7 @@
+ #undef __GOB_FUNCTION__
+ 
+ #line 77 "loqui-protocol.gob"
+-static const gchar * 
++static gchar * 
+ loqui_protocol_get_profile_type_name_static (LoquiProfileFactory * factory)
+ {
+ #line 205 "loqui-protocol.c"
+--- a/src/loqui-core-gtk.c
++++ b/src/loqui-core-gtk.c
+@@ -65,6 +65,8 @@
+ #include "prefs_general_upgrader.h"
+ #include "loqui-notifier-gtk.h"
+ 
++#include "account_list_dialog.h"
++
+ 
+ #line 70 "loqui-core-gtk.c"
+ /* self casting macros */
+--- a/src/loqui_channel_text_view.c
++++ b/src/loqui_channel_text_view.c
+@@ -82,6 +82,7 @@
+ static gboolean loqui_channel_text_view_button_press_event(GtkWidget *widget, GdkEventButton *event_button);
+ static gboolean loqui_channel_text_view_button_release_event(GtkWidget *widget, GdkEventButton *event_button);
+ 
++static void loqui_channel_text_view_populate_popup_(GtkTextView *textview, GtkWidget *widget);
+ static void loqui_channel_text_view_populate_popup(GtkTextView *textview, GtkMenu *menu);
+ static void loqui_channel_text_view_search_keyword_cb(GtkMenuItem *item, gpointer user_data);
+ 
+@@ -221,7 +222,7 @@
+ 	widget_class->button_press_event = loqui_channel_text_view_button_press_event;
+ 	widget_class->button_release_event = loqui_channel_text_view_button_release_event;
+ 
+-	text_view_class->populate_popup = loqui_channel_text_view_populate_popup;
++	text_view_class->populate_popup = loqui_channel_text_view_populate_popup_;
+ 
+ 	g_object_class_install_property(object_class,
+ 					PROP_IS_SCROLL,
+@@ -443,6 +444,12 @@
+ }
+ 
+ static void
++loqui_channel_text_view_populate_popup_(GtkTextView *textview, GtkWidget *widget)
++{
++	loqui_channel_text_view_populate_popup(textview, (GtkMenu *) widget);
++}
++
++static void
+ loqui_channel_text_view_populate_popup(GtkTextView *textview, GtkMenu *menu)
+ {
+ 	GtkWidget *menu_item;

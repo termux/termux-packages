@@ -1,0 +1,46 @@
+--- ghc-9.12.2/hadrian/src/Settings/Packages.hs	2025-03-29 15:32:47.000000000 +0530
++++ ghc-9.12.2.mod/hadrian/src/Settings/Packages.hs	2025-04-07 15:06:41.398290889 +0530
+@@ -85,8 +85,8 @@
+             -- (#14335) and completely untested in CI for cross
+             -- backends at the moment, so we might as well disable it
+             -- for cross GHC.
+-            [ andM [expr ghcWithInterpreter, notStage0, notCross] `cabalFlag` "internal-interpreter"
+-            , notM cross `cabalFlag` "terminfo"
++            [ andM [expr ghcWithInterpreter, notStage0] `cabalFlag` "internal-interpreter"
++            , notStage0 `cabalFlag` "terminfo"
+             , arg "-build-tool-depends"
+             , flag UseLibzstd `cabalFlag` "with-libzstd"
+             -- ROMES: While the boot compiler is not updated wrt -this-unit-id
+@@ -121,7 +121,7 @@
+ 
+         -------------------------------- ghcPkg --------------------------------
+         , package ghcPkg ?
+-          builder (Cabal Flags) ? notM cross `cabalFlag` "terminfo"
++          builder (Cabal Flags) ? notStage0 `cabalFlag` "terminfo"
+ 
+         -------------------------------- ghcPrim -------------------------------
+         , package ghcPrim ? mconcat
+@@ -213,7 +213,7 @@
+         -- dependencies.
+         -- TODO: Perhaps the user should rather be responsible for this?
+         , package haskeline ?
+-          builder (Cabal Flags) ? notM cross `cabalFlag` "terminfo"
++          builder (Cabal Flags) ? notStage0 `cabalFlag` "terminfo"
+ 
+         -------------------------------- terminfo ------------------------------
+         , package terminfo ?
+@@ -374,10 +374,10 @@
+ 
+           , input "**/RtsUtils.c" ? pure
+             [ "-DProjectVersion="            ++ show projectVersion
+-            , "-DHostPlatform="              ++ show hostPlatform
+-            , "-DHostArch="                  ++ show hostArch
+-            , "-DHostOS="                    ++ show hostOs
+-            , "-DHostVendor="                ++ show hostVendor
++            , "-DHostPlatform="              ++ show targetPlatform
++            , "-DHostArch="                  ++ show targetArch
++            , "-DHostOS="                    ++ show targetOs
++            , "-DHostVendor="                ++ show targetVendor
+             , "-DBuildPlatform="             ++ show buildPlatform
+             , "-DBuildArch="                 ++ show buildArch
+             , "-DBuildOS="                   ++ show buildOs

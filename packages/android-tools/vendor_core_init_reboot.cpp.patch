@@ -1,0 +1,13 @@
+diff --git a/vendor/core/init/reboot.cpp b/vendor/core/init/reboot.cpp
+index 464746d..dadf811 100644
+--- a/vendor/core/init/reboot.cpp
++++ b/vendor/core/init/reboot.cpp
+@@ -246,7 +246,7 @@ static bool FindPartitionsToUmount(std::vector<MountEntry>* block_dev_partitions
+         if (dump) {
+             LOG(INFO) << "mount entry " << mentry->mnt_fsname << ":" << mentry->mnt_dir << " opts "
+                       << mentry->mnt_opts << " type " << mentry->mnt_type;
+-        } else if (MountEntry::IsBlockDevice(*mentry) && hasmntopt(mentry, "rw")) {
++        } else if (MountEntry::IsBlockDevice(*mentry) && 0) {
+             std::string mount_dir(mentry->mnt_dir);
+             // These are R/O partitions changed to R/W after adb remount.
+             // Do not umount them as shutdown critical services may rely on them.

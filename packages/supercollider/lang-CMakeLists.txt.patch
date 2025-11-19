@@ -1,0 +1,17 @@
+diff --git a/lang/CMakeLists.txt b/lang/CMakeLists.txt
+index 561023da4..20896f759 100644
+--- a/lang/CMakeLists.txt
++++ b/lang/CMakeLists.txt
+@@ -143,10 +143,10 @@ if(UNIX)
+ 		if(ALSA_FOUND)
+ 			list(APPEND sclang_sources LangPrimSource/SC_AlsaMIDI.cpp)
+ 		endif()
+-		if(LINUX)
++		if(LINUX AND NOT ANDROID)
+ 			list(APPEND sclang_sources LangPrimSource/SC_LID.cpp)
+ 			add_definitions(-DHAVE_LID)
+-		endif(LINUX)
++		endif(LINUX AND NOT ANDROID)
+ 	endif(APPLE)
+ endif(UNIX)
+ 

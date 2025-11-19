@@ -1,0 +1,33 @@
+diff -uNr mate-terminal-1.24.1/src/Makefile.am mate-terminal-1.24.1.mod/src/Makefile.am
+--- mate-terminal-1.24.1/src/Makefile.am	2020-08-16 13:22:47.000000000 +0000
++++ mate-terminal-1.24.1.mod/src/Makefile.am	2021-05-26 04:11:49.449423037 +0000
+@@ -118,25 +118,25 @@
+ 	@true
+ 
+ stamp-terminal-type-builtins.h: terminal-type-builtins.h.template $(TYPES_H_FILES)
+-	$(AM_V_GEN) $(GLIB_MKENUMS) --template $< $(filter-out $<,$^) > xgen-ttbh \
++	$(AM_V_GEN) glib-mkenums --template $< $(filter-out $<,$^) > xgen-ttbh \
+ 	&& (cmp -s xgen-ttbh terminal-type-builtins.h || cp xgen-ttbh terminal-type-builtins.h ) \
+ 	&& rm -f xgen-ttbh \
+ 	&& echo timestamp > $(@F)
+ 
+ terminal-type-builtins.c: terminal-type-builtins.c.template $(TYPES_H_FILES)
+-	$(AM_V_GEN) $(GLIB_MKENUMS) --template $< $(filter-out $<,$^) > xgen-ttbc \
++	$(AM_V_GEN) glib-mkenums --template $< $(filter-out $<,$^) > xgen-ttbc \
+ 	&& (cmp -s xgen-ttbc terminal-type-builtins.c || cp xgen-ttbc terminal-type-builtins.c ) \
+ 	&& rm -f xgen-ttbc
+ 
+ terminal-marshal.h: $(srcdir)/terminal-marshal.list
+-	$(AM_V_GEN) ( $(GLIB_GENMARSHAL) --prefix=_terminal_marshal $(srcdir)/terminal-marshal.list \
++	$(AM_V_GEN) ( glib-genmarshal --prefix=_terminal_marshal $(srcdir)/terminal-marshal.list \
+ 			--header \
+ 			--internal > terminal-marshal.h.tmp \
+ 	&& mv terminal-marshal.h.tmp terminal-marshal.h ) \
+ 	|| ( rm -f terminal-marshal.h.tmp && exit 1 )
+ 
+ terminal-marshal.c: $(srcdir)/terminal-marshal.list
+-	$(AM_V_GEN) ( $(GLIB_GENMARSHAL) --prefix=_terminal_marshal $(srcdir)/terminal-marshal.list \
++	$(AM_V_GEN) ( glib-genmarshal --prefix=_terminal_marshal $(srcdir)/terminal-marshal.list \
+ 				--header \
+ 				--body \
+ 				--internal > terminal-marshal.c.tmp \

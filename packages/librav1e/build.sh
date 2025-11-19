@@ -1,0 +1,61 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/xiph/rav1e/
+TERMUX_PKG_DESCRIPTION="An AV1 encoder library focused on speed and safety"
+TERMUX_PKG_LICENSE="BSD 2-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.8.1"
+TERMUX_PKG_SRCURL=https://github.com/xiph/rav1e/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=06d1523955fb6ed9cf9992eace772121067cca7e8926988a1ee16492febbe01e
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
+TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=0
+
+	local v=$(echo ${TERMUX_PKG_VERSION#*:} | cut -d . -f 1)
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
+termux_step_pre_configure() {
+	termux_setup_rust
+	termux_setup_cargo_c
+
+	export CARGO_BUILD_TARGET=$CARGO_TARGET_NAME
+
+	# clash with rust host build
+	unset CFLAGS
+
+	cargo fetch \
+		--target $CARGO_TARGET_NAME
+}
+
+termux_step_make_install() {
+	cargo install \
+		--jobs $TERMUX_PKG_MAKE_PROCESSES \
+		--path . \
+		--force \
+		--locked \
+		--no-track \
+		--target $CARGO_TARGET_NAME \
+		--root $TERMUX_PREFIX
+
+	# `cargo cinstall` refuses to work with Android
+	cargo cbuild \
+		--release \
+		--prefix $TERMUX_PREFIX \
+		--jobs $TERMUX_PKG_MAKE_PROCESSES \
+		--target $CARGO_TARGET_NAME
+
+	cd target/$CARGO_TARGET_NAME/release/
+	install -Dm644 -t $TERMUX_PREFIX/include/rav1e/ rav1e.h
+	install -Dm644 -t $TERMUX_PREFIX/lib/pkgconfig/ rav1e.pc
+	install -Dm644 -t $TERMUX_PREFIX/lib/ librav1e.a
+	install -Dm644 librav1e.so $TERMUX_PREFIX/lib/librav1e.so.$TERMUX_PKG_VERSION
+	ln -fs librav1e.so.$TERMUX_PKG_VERSION \
+		$TERMUX_PREFIX/lib/librav1e.so.${TERMUX_PKG_VERSION%%.*}
+	ln -fs librav1e.so.$TERMUX_PKG_VERSION $TERMUX_PREFIX/lib/librav1e.so
+}

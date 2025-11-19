@@ -1,0 +1,11 @@
+--- a/third_party/perfetto/include/perfetto/base/build_config.h
++++ b/third_party/perfetto/include/perfetto/base/build_config.h
+@@ -24,7 +24,7 @@
+ #define PERFETTO_BUILDFLAG(flag) \
+   (PERFETTO_BUILDFLAG_CAT(PERFETTO_BUILDFLAG_DEFINE_, flag)())
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #define PERFETTO_BUILDFLAG_DEFINE_PERFETTO_OS_ANDROID() 1
+ #define PERFETTO_BUILDFLAG_DEFINE_PERFETTO_OS_LINUX() 0
+ #define PERFETTO_BUILDFLAG_DEFINE_PERFETTO_OS_WIN() 0

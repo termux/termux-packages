@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=http://silicone.homelinux.org/projects/netsed/
+TERMUX_PKG_DESCRIPTION="Alter the contents of packets forwarded through network in real time"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=1.4
+TERMUX_PKG_SRCURL=http://silicone.homelinux.org/release/netsed/netsed-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=1e23686b8887ebe461786c059d848b412188c635929071955d134041b07996a7
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true

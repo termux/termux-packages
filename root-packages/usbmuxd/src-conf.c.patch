@@ -1,0 +1,14 @@
+--- a/src/conf.c
++++ b/src/conf.c
+@@ -127,9 +127,9 @@
+ 	}
+ #else
+ #ifdef __APPLE__
+-	base_config_dir = strdup("/var/db");
++	base_config_dir = strdup("@TERMUX_PREFIX@/var/db");
+ #else
+-	base_config_dir = strdup("/var/lib");
++	base_config_dir = strdup("@TERMUX_PREFIX@/var/lib");
+ #endif
+ #endif
+ 	__config_dir = string_concat(base_config_dir, DIR_SEP_S, CONFIG_DIR, NULL);

@@ -1,0 +1,34 @@
+diff -uNr screen-5.0.0/socket.c screen-5.0.0.mod/socket.c
+--- screen-5.0.0/socket.c	2024-08-28 22:55:03.000000000 +0300
++++ screen-5.0.0.mod/socket.c	2024-12-22 03:05:24.793315420 +0200
+@@ -46,6 +46,8 @@
+ #include <unistd.h>
+ #include <signal.h>
+ 
++#include <termux-auth.h>
++
+ #if ENABLE_PAM
+   #include <security/pam_appl.h>
+ #else
+@@ -1202,6 +1204,21 @@
+ 	return ret;
+ }
+ 
++#elif __ANDROID__
++
++static bool CheckPassword(const char *password) {
++	struct passwd *pwd;
++	pwd = getpwuid(getuid());
++
++	if (!pwd) return false;
++
++	if (termux_auth(pwd->pw_name, password)) {
++		return true;
++	}
++
++	return false;
++}
++
+ #else /* ENABLE_PAM */
+ 
+ static bool CheckPassword(const char *password) {

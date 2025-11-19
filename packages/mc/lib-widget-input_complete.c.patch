@@ -1,0 +1,19 @@
+diff -u -r ../mc-4.8.17/lib/widget/input_complete.c ./lib/widget/input_complete.c
+--- ../mc-4.8.17/lib/widget/input_complete.c	2016-05-07 11:42:52.000000000 -0400
++++ ./lib/widget/input_complete.c	2016-05-21 17:03:05.409602557 -0400
+@@ -313,6 +313,7 @@
+ static char *
+ username_completion_function (const char *text, int state, input_complete_t flags)
+ {
++#ifndef __ANDROID__
+     static struct passwd *entry = NULL;
+     static size_t userlen = 0;
+ 
+@@ -340,6 +341,7 @@
+         return g_strconcat ("~", entry->pw_name, PATH_SEP_STR, (char *) NULL);
+ 
+     endpwent ();
++#endif
+     return NULL;
+ }
+ 

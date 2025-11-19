@@ -1,0 +1,17 @@
+Fallback to `@TERMUX_PREFIX@/tmp` if env `XDG_RUNTIME_DIR` is not set.
+
+--- a/src/core/meta-anonymous-file.c
++++ b/src/core/meta-anonymous-file.c
+@@ -115,6 +115,12 @@
+       char *name;
+ 
+       path = getenv ("XDG_RUNTIME_DIR");
++#ifdef __TERMUX__
++      if (!path)
++        {
++          path = "@TERMUX_PREFIX@/tmp";
++        }
++#endif
+       if (!path)
+         {
+           errno = ENOENT;

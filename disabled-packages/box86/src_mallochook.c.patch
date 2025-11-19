@@ -1,0 +1,18 @@
+--- a/src/mallochook.c
++++ b/src/mallochook.c
+@@ -208,6 +208,15 @@
+ 
+ #endif
+ 
++#if defined(__ANDROID__) && __ANDROID_API__ < 26
++EXPORT void *aligned_alloc(size_t align, size_t size)
++{
++    void *result = NULL;
++    posix_memalign(&result, align, size);
++    return result;
++}
++#endif
++
+ EXPORT void* valloc(size_t size)
+ {
+     return box_memalign(box86_pagesize, size);

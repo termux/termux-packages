@@ -1,0 +1,12 @@
+diff -uNr go/src/os/file_unix.go go.mod/src/os/file_unix.go
+--- go/src/os/file_unix.go	2023-04-26 18:32:02.000000000 +0300
++++ go.mod/src/os/file_unix.go	2023-05-21 19:08:51.516090953 +0300
+@@ -339,7 +339,7 @@
+ 	dir := Getenv("TMPDIR")
+ 	if dir == "" {
+ 		if runtime.GOOS == "android" {
+-			dir = "/data/local/tmp"
++			dir = "@TERMUX_PREFIX@/tmp"
+ 		} else {
+ 			dir = "/tmp"
+ 		}

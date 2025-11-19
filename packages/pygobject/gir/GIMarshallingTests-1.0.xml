@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<dump>
+  <enum name="GIMarshallingTestsGEnum" get-type="gi_marshalling_tests_genum_get_type">
+    <member name="GI_MARSHALLING_TESTS_GENUM_VALUE1" nick="value1" value="0"/>
+    <member name="GI_MARSHALLING_TESTS_GENUM_VALUE2" nick="value2" value="1"/>
+    <member name="GI_MARSHALLING_TESTS_GENUM_VALUE3" nick="value3" value="42"/>
+  </enum>  <flags name="GIMarshallingTestsFlags" get-type="gi_marshalling_tests_flags_get_type">
+    <member name="GI_MARSHALLING_TESTS_FLAGS_VALUE1" nick="value1" value="1"/>
+    <member name="GI_MARSHALLING_TESTS_FLAGS_VALUE2" nick="value2" value="2"/>
+    <member name="GI_MARSHALLING_TESTS_FLAGS_VALUE3" nick="value3" value="4"/>
+    <member name="GI_MARSHALLING_TESTS_FLAGS_MASK" nick="mask" value="3"/>
+    <member name="GI_MARSHALLING_TESTS_FLAGS_MASK2" nick="mask2" value="3"/>
+  </flags>
+  <boxed name="GIMarshallingTestsBoxedStruct" get-type="gi_marshalling_tests_boxed_struct_get_type"/>
+  <boxed name="GIMarshallingTestsUnion" get-type="gi_marshalling_tests_union_get_type"/>
+  <boxed name="GIMarshallingTestsStructuredUnion" get-type="gi_marshalling_tests_structured_union_get_type"/>
+  <class name="GIMarshallingTestsObject" get-type="gi_marshalling_tests_object_get_type" parents="GObject">
+    <property name="int" type="gint" flags="7" default-value="0"/>
+  </class>
+  <class name="GIMarshallingTestsSubObject" get-type="gi_marshalling_tests_sub_object_get_type" parents="GIMarshallingTestsObject,GObject">
+  </class>
+  <class name="GIMarshallingTestsSubSubObject" get-type="gi_marshalling_tests_sub_sub_object_get_type" parents="GIMarshallingTestsSubObject,GIMarshallingTestsObject,GObject">
+  </class>
+  <interface name="GIMarshallingTestsInterface" get-type="gi_marshalling_tests_interface_get_type">
+  </interface>
+  <class name="GIMarshallingTestsInterfaceImpl" get-type="gi_marshalling_tests_interface_impl_get_type" parents="GObject">
+    <implements name="GIMarshallingTestsInterface"/>
+  </class>
+  <interface name="GIMarshallingTestsInterface2" get-type="gi_marshalling_tests_interface2_get_type">
+  </interface>
+  <interface name="GIMarshallingTestsInterface3" get-type="gi_marshalling_tests_interface3_get_type">
+  </interface>
+  <boxed name="GIMarshallingTestsOverridesStruct" get-type="gi_marshalling_tests_overrides_struct_get_type"/>
+  <class name="GIMarshallingTestsOverridesObject" get-type="gi_marshalling_tests_overrides_object_get_type" parents="GObject">
+  </class>
+  <class name="GIMarshallingTestsPropertiesObject" get-type="gi_marshalling_tests_properties_object_get_type" parents="GObject">
+    <property name="some-boolean" type="gboolean" flags="7" default-value="FALSE"/>
+    <property name="some-char" type="gchar" flags="7" default-value="0"/>
+    <property name="some-uchar" type="guchar" flags="7" default-value="0"/>
+    <property name="some-int" type="gint" flags="7" default-value="0"/>
+    <property name="some-uint" type="guint" flags="7" default-value="0"/>
+    <property name="some-long" type="glong" flags="7" default-value="0"/>
+    <property name="some-ulong" type="gulong" flags="7" default-value="0"/>
+    <property name="some-int64" type="gint64" flags="7" default-value="0"/>
+    <property name="some-uint64" type="guint64" flags="7" default-value="0"/>
+    <property name="some-float" type="gfloat" flags="7" default-value="0.000000"/>
+    <property name="some-string" type="gchararray" flags="7" default-value="NULL"/>
+    <property name="some-double" type="gdouble" flags="7" default-value="0.000000"/>
+    <property name="some-strv" type="GStrv" flags="7"/>
+    <property name="some-boxed-struct" type="GIMarshallingTestsBoxedStruct" flags="7"/>
+    <property name="some-variant" type="GVariant" flags="7"/>
+    <property name="some-boxed-glist" type="GIMarshallingTestsBoxedGList" flags="7"/>
+    <property name="some-gvalue" type="GValue" flags="7"/>
+    <property name="some-object" type="GObject" flags="7"/>
+    <property name="some-flags" type="GIMarshallingTestsFlags" flags="7" default-value="GI_MARSHALLING_TESTS_FLAGS_VALUE1"/>
+    <property name="some-enum" type="GIMarshallingTestsGEnum" flags="7" default-value="GI_MARSHALLING_TESTS_GENUM_VALUE1"/>
+    <property name="some-byte-array" type="GByteArray" flags="7"/>
+    <property name="some-readonly" type="gint" flags="1" default-value="0"/>
+  </class>
+  <class name="GIMarshallingTestsSignalsObject" get-type="gi_marshalling_tests_signals_object_get_type" parents="GObject">
+    <signal name="some-boxed-struct" return="void" when="last">
+      <param type="GIMarshallingTestsBoxedStruct"/>
+    </signal>
+    <signal name="some-boxed-gptrarray-utf8" return="void" when="last">
+      <param type="GPtrArray"/>
+    </signal>
+    <signal name="some-boxed-gptrarray-utf8-container" return="void" when="last">
+      <param type="GPtrArray"/>
+    </signal>
+    <signal name="some-boxed-gptrarray-utf8-full" return="void" when="last">
+      <param type="GPtrArray"/>
+    </signal>
+    <signal name="some-boxed-gptrarray-boxed-struct" return="void" when="last">
+      <param type="GPtrArray"/>
+    </signal>
+    <signal name="some-boxed-gptrarray-boxed-struct-container" return="void" when="last">
+      <param type="GPtrArray"/>
+    </signal>
+    <signal name="some-boxed-gptrarray-boxed-struct-full" return="void" when="last">
+      <param type="GPtrArray"/>
+    </signal>
+    <signal name="some-hash-table-utf8-int" return="void" when="last">
+      <param type="GHashTable"/>
+    </signal>
+    <signal name="some-hash-table-utf8-int-container" return="void" when="last">
+      <param type="GHashTable"/>
+    </signal>
+    <signal name="some-hash-table-utf8-int-full" return="void" when="last">
+      <param type="GHashTable"/>
+    </signal>
+    <signal name="some-boxed-struct-full" return="void" when="last">
+      <param type="GIMarshallingTestsBoxedStruct"/>
+    </signal>
+  </class>
+  <flags name="GIMarshallingTestsExtraFlags" get-type="gi_marshalling_tests_extra_flags_get_type">
+    <member name="GI_MARSHALLING_TESTS_EXTRA_FLAGS_VALUE1" nick="value1" value="0"/>
+    <member name="GI_MARSHALLING_TESTS_EXTRA_FLAGS_VALUE2" nick="value2" value="2147483648"/>
+  </flags>
+</dump>

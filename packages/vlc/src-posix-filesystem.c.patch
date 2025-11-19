@@ -1,0 +1,20 @@
+--- a/src/posix/filesystem.c
++++ b/src/posix/filesystem.c
+@@ -113,7 +113,7 @@
+ {
+     int fd;
+ #if O_TMPFILE
+-    fd = vlc_open ("/tmp", O_RDWR|O_TMPFILE, S_IRUSR|S_IWUSR);
++    fd = vlc_open ("@TERMUX_PREFIX@/tmp", O_RDWR|O_TMPFILE, S_IRUSR|S_IWUSR);
+     if (fd != -1)
+         return fd;
+     /* ENOENT means either /tmp is missing (!) or the kernel does not support
+@@ -124,7 +124,7 @@
+         return -1;
+ #endif
+ 
+-    char bufpath[] = "/tmp/"PACKAGE_NAME"XXXXXX";
++    char bufpath[] = "@TERMUX_PREFIX@/tmp/"PACKAGE_NAME"XXXXXX";
+ 
+     fd = vlc_mkstemp (bufpath);
+     if (fd != -1)

@@ -1,0 +1,21 @@
+diff -uNr steghide-0.5.1/src/Makefile.in steghide-0.5.1.mod/src/Makefile.in
+--- steghide-0.5.1/src/Makefile.in	2003-10-15 11:01:29.000000000 +0300
++++ steghide-0.5.1.mod/src/Makefile.in	2019-07-01 15:51:46.023373760 +0300
+@@ -190,7 +190,7 @@
+ WavPCMSampleValue.cc error.cc main.cc msg.cc SMDConstructionHeuristic.cc
+ 
+ localedir = $(datadir)/locale
+-LIBTOOL = $(SHELL) libtool
++LIBTOOL = $(SHELL) /usr/bin/libtool
+ MAINTAINERCLEANFILES = Makefile.in
+ subdir = src
+ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+@@ -278,7 +278,7 @@
+ 	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+ 	$(AM_CXXFLAGS) $(CXXFLAGS)
+ CXXLD = $(CXX)
+-CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
++CXXLINK = $(LIBTOOL) --mode=link --tag=CXX $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
+ 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+ DIST_SOURCES = $(steghide_SOURCES)
+ HEADERS = $(noinst_HEADERS)

@@ -1,0 +1,34 @@
+diff --git a/src/modules/rtaudio/RtAudio.cpp b/src/modules/rtaudio/RtAudio.cpp
+index 4178219..bd597ef 100644
+--- a/src/modules/rtaudio/RtAudio.cpp
++++ b/src/modules/rtaudio/RtAudio.cpp
+@@ -9087,7 +9087,9 @@ static void *alsaCallbackHandler( void *ptr )
+ #endif
+ 
+   while ( *isRunning == true ) {
++#ifndef __ANDROID__
+     pthread_testcancel();
++#endif
+     object->callbackEvent();
+   }
+ 
+@@ -9363,7 +9365,9 @@ static void *pulseaudio_callback( void * user )
+ #endif
+   
+   while ( *isRunning ) {
++#ifndef __ANDROID__
+     pthread_testcancel();
++#endif
+     context->callbackEvent();
+   }
+ 
+@@ -10846,7 +10850,9 @@ static void *ossCallbackHandler( void *ptr )
+ #endif
+ 
+   while ( *isRunning == true ) {
++#ifndef __ANDROID__
+     pthread_testcancel();
++#endif
+     object->callbackEvent();
+   }
+ 

@@ -1,0 +1,11 @@
+--- ./lib/mu-scanner.cc	2024-04-24 01:28:29.784265224 +0800
++++ ./lib/mu-scanner.cc	2024-04-24 01:28:49.252970705 +0800
+@@ -46,7 +46,7 @@
+ struct dentry_t {
+ 	dentry_t(const struct dirent *dentry):
+ #if HAVE_DIRENT_D_INO
+-		d_ino{dentry->d_ino},
++		d_ino{static_cast<ino_t>(dentry->d_ino)},
+ #endif /*HAVE_DIRENT_D_INO*/
+ 
+ #if HAVE_DIRENT_D_TYPE

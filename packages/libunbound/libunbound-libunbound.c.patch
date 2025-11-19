@@ -1,0 +1,20 @@
+--- a/libunbound/libunbound.c
++++ b/libunbound/libunbound.c
+@@ -1095,7 +1095,7 @@
+ 
+ 	if(fname == NULL) {
+ #if !defined(UB_ON_WINDOWS) || !defined(HAVE_WINDOWS_H)
+-		fname = "/etc/resolv.conf";
++		fname = "@TERMUX_PREFIX@/etc/resolv.conf";
+ #else
+ 		FIXED_INFO *info;
+ 		ULONG buflen = sizeof(*info);
+@@ -1204,7 +1204,7 @@
+ 		}
+ 		return UB_READFILE;
+ #else
+-		fname = "/etc/hosts";
++		fname = "@TERMUX_PREFIX@/etc/hosts";
+ #endif /* WIN32 */
+ 	}
+ 	in = fopen(fname, "r");

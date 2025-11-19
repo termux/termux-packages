@@ -1,0 +1,14 @@
+--- ./networking/ftpd.c.orig	2021-08-19 16:49:06.730314230 +0200
++++ ./networking/ftpd.c	2021-08-19 16:49:06.753647572 +0200
+@@ -1302,8 +1302,11 @@
+ 		G.root_fd = xopen("/", O_RDONLY | O_DIRECTORY);
+ 		close_on_exec_on(G.root_fd);
+ #endif
++#ifndef __ANDROID__
++		/* Do not try chroot() on Android because it may trigger seccomp. */
+ 		if (chroot(basedir) == 0)
+ 			basedir = "/";
++#endif
+ #if !BB_MMU
+ 		else {
+ 			close(G.root_fd);

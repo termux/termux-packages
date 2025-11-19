@@ -1,0 +1,20 @@
+--- ../kona-Win.3.36-64/src/getline_android.c	2015-07-30 11:18:02.000000000 -0400
++++ ./src/getline_android.c	2015-12-06 03:22:55.000000000 -0500
+@@ -9,7 +9,7 @@
+ #include <errno.h>
+ #include <stdlib.h>
+ 
+-I getline(S *s,size_t*n, FILE *f){ R getdelim(s,n,'\n',f);}
++I new_getline(S *s,size_t*n, FILE *f){ R getdelim(s,n,'\n',f);}
+ 
+ /* getdelim.c --- Implementation of replacement getdelim function.
+    Copyright (C) 1994, 1996-1998, 2001, 2003, 2005-2012 Free Software
+@@ -44,7 +44,7 @@
+    necessary.  Returns the number of characters read (not including
+    the null terminator), or -1 on error or EOF.  */
+ 
+-I getdelim (S *lineptr, size_t * __restrict__ n, I delimiter, FILE *fp)
++I new_getdelim (S *lineptr, size_t * __restrict__ n, I delimiter, FILE *fp)
+ {
+   ssize_t result;
+   size_t cur_len = 0;

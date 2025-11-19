@@ -1,0 +1,74 @@
+diff -uNr libgcrypt-1.8.5/random/random.c libgcrypt-1.8.5.mod/random/random.c
+--- libgcrypt-1.8.5/random/random.c	2017-11-23 20:16:58.000000000 +0200
++++ libgcrypt-1.8.5.mod/random/random.c	2020-07-09 01:38:34.654910933 +0300
+@@ -40,7 +40,7 @@
+ #include "cipher.h"         /* For _gcry_sha1_hash_buffer().  */
+ 
+ /* The name of a file used to globally configure the RNG. */
+-#define RANDOM_CONF_FILE "/etc/gcrypt/random.conf"
++#define RANDOM_CONF_FILE "@TERMUX_PREFIX@/etc/gcrypt/random.conf"
+ 
+ 
+ /* If not NULL a progress function called from certain places and the
+diff -uNr libgcrypt-1.8.5/random/rndunix.c libgcrypt-1.8.5.mod/random/rndunix.c
+--- libgcrypt-1.8.5/random/rndunix.c	2017-11-23 20:16:58.000000000 +0200
++++ libgcrypt-1.8.5.mod/random/rndunix.c	2020-07-09 01:39:42.815220008 +0300
+@@ -226,6 +226,34 @@
+     const int hasAlternative;	    /* Whether source has alt.location */
+ } dataSources[] = {
+ 
++    // For Android
++    {	"/system/bin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 1    },
++    {	"/system/xbin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 1    },
++    {	"/system/bin/netstat", "-s", SC(2), NULL, 0, 0, 0, 1 },
++    {	"/system/xbin/netstat", "-s", SC(2), NULL, 0, 0, 0, 1 },
++    {	"/system/bin/mpstat", NULL, SC(1), NULL, 0, 0, 0, 0     },
++    {	"/system/xbin/mpstat", NULL, SC(1), NULL, 0, 0, 0, 0     },
++    {	"/system/bin/df", NULL, SC(1), NULL, 0, 0, 0, 0             },
++    {	"/system/xbin/df", NULL, SC(1), NULL, 0, 0, 0, 0             },
++    {	"/system/bin/iostat", NULL, SC(SC_0), NULL, 0, 0, 0, 0  },
++    {	"/system/xbin/iostat", NULL, SC(SC_0), NULL, 0, 0, 0, 0  },
++    {	"/system/bin/uptime", NULL, SC(SC_0), NULL, 0, 0, 0, 1   },
++    {	"/system/xbin/uptime", NULL, SC(SC_0), NULL, 0, 0, 0, 1   },
++    {	"/system/bin/ps", "aux", SC(0.3), NULL, 0, 0, 0, 1       },
++    {	"/system/xbin/ps", "aux", SC(0.3), NULL, 0, 0, 0, 1       },
++    {	"/system/bin/arp", "-a", SC(0.1), NULL, 0, 0, 0, 1  },
++    {	"/system/xbin/arp", "-a", SC(0.1), NULL, 0, 0, 0, 1  },
++
++    // For Termux
++    {	"@TERMUX_PREFIX@/bin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 1    },
++    {	"@TERMUX_PREFIX@/bin/netstat", "-s", SC(2), NULL, 0, 0, 0, 1 },
++    {	"@TERMUX_PREFIX@/bin/mpstat", NULL, SC(1), NULL, 0, 0, 0, 0     },
++    {	"@TERMUX_PREFIX@/bin/df", NULL, SC(1), NULL, 0, 0, 0, 0             },
++    {	"@TERMUX_PREFIX@/bin/iostat", NULL, SC(SC_0), NULL, 0, 0, 0, 0  },
++    {	"@TERMUX_PREFIX@/bin/uptime", NULL, SC(SC_0), NULL, 0, 0, 0, 1   },
++    {	"@TERMUX_PREFIX@/bin/ps", "aux", SC(0.3), NULL, 0, 0, 0, 1       },
++    {	"@TERMUX_PREFIX@/bin/arp", "-a", SC(0.1), NULL, 0, 0, 0, 1  },
++
+     {	"/bin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 1    },
+     {	"/usr/bin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 0},
+     {	"/bin/vmstat", "-c", SC(-3), NULL, 0, 0, 0, 1     },
+diff -uNr libgcrypt-1.8.5/src/fips.c libgcrypt-1.8.5.mod/src/fips.c
+--- libgcrypt-1.8.5/src/fips.c	2017-11-23 20:16:58.000000000 +0200
++++ libgcrypt-1.8.5.mod/src/fips.c	2020-07-09 01:38:34.658910952 +0300
+@@ -36,7 +36,7 @@
+ 
+ 
+ /* The name of the file used to force libgcrypt into fips mode. */
+-#define FIPS_FORCE_FILE "/etc/gcrypt/fips_enabled"
++#define FIPS_FORCE_FILE "@TERMUX_PREFIX@/etc/gcrypt/fips_enabled"
+ 
+ 
+ /* The states of the finite state machine used in fips mode.  */
+diff -uNr libgcrypt-1.8.5/src/hwfeatures.c libgcrypt-1.8.5.mod/src/hwfeatures.c
+--- libgcrypt-1.8.5/src/hwfeatures.c	2017-11-23 20:16:58.000000000 +0200
++++ libgcrypt-1.8.5.mod/src/hwfeatures.c	2020-07-09 01:38:34.658910952 +0300
+@@ -33,7 +33,7 @@
+ #include "hwf-common.h"
+ 
+ /* The name of a file used to globally disable selected features. */
+-#define HWF_DENY_FILE "/etc/gcrypt/hwf.deny"
++#define HWF_DENY_FILE "@TERMUX_PREFIX@/etc/gcrypt/hwf.deny"
+ 
+ /* A table to map hardware features to a string.  */
+ static struct

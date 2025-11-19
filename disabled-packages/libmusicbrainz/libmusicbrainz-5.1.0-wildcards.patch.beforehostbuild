@@ -1,0 +1,27 @@
+From 36262d60fe92fe7a2c9bfb40e736bfcd29a6c3bd Mon Sep 17 00:00:00 2001
+From: Abderrahim Kitouni <a.kitouni@gmail.com>
+Date: Fri, 13 Apr 2018 09:56:57 +0100
+Subject: [PATCH 2/2] src/CMakelists.txt: do not use wildcards for dependencies
+
+This is discouraged by cmake's documentation and doesn't work with the ninja generator.
+---
+ src/CMakeLists.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 68c04e3..f7439d3 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -37,7 +37,8 @@ ADD_CUSTOM_COMMAND(
+ 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mb5_c.cc ${CMAKE_CURRENT_BINARY_DIR}/mb5_c.h ${CMAKE_CURRENT_BINARY_DIR}/../include/musicbrainz5/mb5_c.h
+ 	COMMAND make-c-interface ${CMAKE_CURRENT_SOURCE_DIR} cinterface.xml ${CMAKE_CURRENT_BINARY_DIR} mb5_c.cc mb5_c.h
+ 	COMMAND ${CMAKE_COMMAND} -E copy_if_different 	${CMAKE_CURRENT_BINARY_DIR}/mb5_c.h ${CMAKE_CURRENT_BINARY_DIR}/../include/musicbrainz5/mb5_c.h
+-	DEPENDS make-c-interface cinterface.xml *.inc
++	DEPENDS make-c-interface cinterface.xml c-int-medium-defines.inc c-int-query-source.inc c-int-source-funcs.inc
++                c-int-medium-source.inc c-int-release-defines.inc c-int-query-defines.inc c-int-release-source.inc
+ )
+ 
+ ADD_CUSTOM_TARGET(src_gen DEPENDS mb5_c.h)
+-- 
+2.26.2
+

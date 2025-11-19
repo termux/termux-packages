@@ -1,0 +1,20 @@
+diff -uNr src/config.tests/pulseaudio/pulseaudio.cpp src.mod/config.tests/pulseaudio/pulseaudio.cpp
+--- src/config.tests/pulseaudio/pulseaudio.cpp	2020-10-15 06:53:20.000000000 +0000
++++ src.mod/config.tests/pulseaudio/pulseaudio.cpp	2021-05-08 17:18:24.844729781 +0000
+@@ -27,7 +27,7 @@
+ ****************************************************************************/
+ 
+ #include <pulse/pulseaudio.h>
+-#include <pulse/glib-mainloop.h>
++#include <pulse/mainloop.h>
+ 
+ #if !defined(PA_API_VERSION) || PA_API_VERSION-0 != 12
+ # error "Incompatible PulseAudio API version"
+@@ -37,6 +37,6 @@
+ {
+     const char *headers = pa_get_headers_version();
+     const char *library = pa_get_library_version();
+-    pa_glib_mainloop_new(0);
++    pa_mainloop_new();
+     return (headers - library) * 0;
+ }

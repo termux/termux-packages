@@ -1,0 +1,57 @@
+
+diff -uNr parallel/src/parallel parallel.mod/src/parallel
+--- parallel/src/parallel	2023-09-28 21:55:48.803300511 +0800
++++ parallel.mod/src/parallel	2023-09-28 21:58:17.203300520 +0800
+@@ -2392,10 +2392,10 @@
+     ## Shell
+     #
+     if($opt::fast) {
+-	$Global::shell = $ENV{'PARALLEL_SHELL'} || which("dash") || "/bin/sh";
++	$Global::shell = $ENV{'PARALLEL_SHELL'} || which("dash") || "@TERMUX_PREFIX@/bin/sh";
+     } else {
+ 	$Global::shell = $ENV{'PARALLEL_SHELL'} || parent_shell($$)
+-	    || $ENV{'SHELL'} || "/bin/sh";
++	    || $ENV{'SHELL'} || "@TERMUX_PREFIX@/bin/sh";
+     }
+     if(not -x $Global::shell and not which($Global::shell)) {
+ 	::error("Shell '$Global::shell' not found.");
+@@ -3080,15 +3080,15 @@
+     $Global::trim = 'n';
+     $Global::max_jobs_running = 0;
+     $Global::job_already_run = '';
+-    $ENV{'TMPDIR'} ||= "/tmp";
+-    $ENV{'PARALLEL_REMOTE_TMPDIR'} ||= "/tmp";
++    $ENV{'TMPDIR'} ||= "@TERMUX_PREFIX@/tmp";
++    $ENV{'PARALLEL_REMOTE_TMPDIR'} ||= "@TERMUX_PREFIX@/tmp";
+     # bug #55398: set $OLDPWD when using --wd
+     $ENV{'OLDPWD'} = $ENV{'PWD'};
+     test_safe_env_vars();
+     if(not $ENV{HOME}) {
+ 	# $ENV{HOME} is sometimes not set if called from PHP
+-	::warning("\$HOME not set. Using /tmp.");
+-	$ENV{HOME} = "/tmp";
++	::warning("\$HOME not set. Using @TERMUX_PREFIX@/tmp.");
++	$ENV{HOME} = "@TERMUX_PREFIX@/tmp";
+     }
+     # no warnings to allow for undefined $XDG_*
+     no warnings 'uninitialized';
+@@ -5224,7 +5224,7 @@
+     unlink $stderrname;
+ 
+     my $pid = ::open3($stdin_fh,$stdout_fh,$stderr_fh,
+-		      $0,qw(--plain --shell /bin/sh --will-cite), @args);
++		      $0,qw(--plain --shell @TERMUX_PREFIX@/bin/sh --will-cite), @args);
+     if(my $writerpid = fork()) {
+ 	close $stdin_fh;
+ 	@stdout = <$stdout_fh>;
+@@ -9115,8 +9115,8 @@
+     #	  'cores' => #cores
+     #	  'threads' => #threads
+     #	  'active' => #taskset_threads }
+-    # Use GNU/Linux
+-    return sct_gnu_linux($_[0]);
++    # Use Hurd which uses nproc
++    return sct_hurd($_[0]);
+ }
+ 
+ sub sct_freebsd($) {

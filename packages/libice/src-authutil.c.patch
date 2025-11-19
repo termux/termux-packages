@@ -1,0 +1,12 @@
+diff -uNr libICE-1.0.10/src/authutil.c libICE-1.0.10.mod/src/authutil.c
+--- libICE-1.0.10/src/authutil.c	2019-07-14 20:43:16.000000000 +0300
++++ libICE-1.0.10.mod/src/authutil.c	2020-01-05 16:10:46.039276106 +0200
+@@ -188,7 +188,7 @@
+ 
+ 	if (creat_fd != -1)
+ 	{
+-	    if (link (creat_name, link_name) != -1)
++	    if (symlink (creat_name, link_name) != -1)
+ 		return (IceAuthLockSuccess);
+ 
+ 	    if (errno == ENOENT)

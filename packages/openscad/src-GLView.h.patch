@@ -1,0 +1,29 @@
++++ a/src/GLView.h
+@@ -71,7 +71,6 @@
+ 	bool showcrosshairs;
+ 	bool showscale;
+ 
+-#ifdef ENABLE_OPENCSG
+ 	/// Shader attribute identifiers
+ 	struct shaderinfo_t {
+ 		enum shader_type_t {
+@@ -80,6 +79,7 @@
+ 			SELECT_RENDERING,
+ 		};
+ 		int progid = 0;
+ 		shader_type_t type;
++#ifdef ENABLE_OPENCSG
+ 		union {
+ 			struct {
+@@ -92,9 +92,10 @@
+ 				int identifier;
+ 			} select_rendering;
+ 		} data;
+-
++#endif
+ 	};
+ 
++#ifdef ENABLE_OPENCSG
+ 	shaderinfo_t shaderinfo;
+ 	bool is_opencsg_capable;
+ 	bool has_shaders;

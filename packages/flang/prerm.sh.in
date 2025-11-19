@@ -1,0 +1,30 @@
+#!@TERMUX_PREFIX@/bin/env bash
+
+TERMUX_PREFIX="@TERMUX_PREFIX@"
+
+cleanup_module_files() {
+    local _modules=(
+    "__fortran_builtins"
+    "__fortran_type_info"
+    "__fortran_ieee_exceptions"
+    "__ppc_types"
+    "__cuda_builtins"
+    "ieee_arithmetic"
+    "ieee_exceptions"
+    "ieee_features"
+    "iso_c_binding"
+    "iso_fortran_env_impl"
+    "iso_fortran_env"
+    "__ppc_intrinsics"
+    "mma"
+    )
+
+    local file
+    for file in ${_modules[@]}; do
+        echo "Removing ${file}.mod..."
+        rm "$TERMUX_PREFIX"/include/flang/"$file".mod
+        rm "$TERMUX_PREFIX"/include/flang/"$file".f18.mod
+    done
+}
+
+cleanup_module_files

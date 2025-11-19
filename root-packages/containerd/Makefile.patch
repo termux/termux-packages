@@ -1,0 +1,36 @@
+--- ../cache/tmp-checkout/Makefile	2023-10-23 19:42:08.826348963 +0000
++++ ./Makefile	2023-10-23 19:48:19.356921771 +0000
+@@ -81,7 +81,7 @@
+ PKG=github.com/containerd/containerd
+ 
+ # Project binaries.
+-COMMANDS=ctr containerd containerd-stress
++COMMANDS=ctr containerd containerd-stress containerd-shim containerd-shim-runc-v1 containerd-shim-runc-v2
+ MANPAGES=ctr.8 containerd.8 containerd-config.8 containerd-config.toml.5
+ 
+ ifdef BUILDTAGS
+@@ -100,7 +100,7 @@
+ endif
+ GO_LDFLAGS+='
+ 
+-SHIM_GO_LDFLAGS=-ldflags '-X $(PKG)/version.Version=$(VERSION) -X $(PKG)/version.Revision=$(REVISION) -X $(PKG)/version.Package=$(PACKAGE) -extldflags "-static" $(EXTRA_LDFLAGS)'
++SHIM_GO_LDFLAGS=-ldflags '-X $(PKG)/version.Version=$(VERSION) -X $(PKG)/version.Revision=$(REVISION) -X $(PKG)/version.Package=$(PACKAGE) -extldflags $(EXTRA_LDFLAGS)'
+ 
+ # Project packages.
+ PACKAGES=$(shell $(GO) list ${GO_TAGS} ./... | grep -v /vendor/ | grep -v /integration)
+@@ -274,11 +274,13 @@
+ 
+ man/containerd.8: FORCE
+ 	@echo "$(WHALE) $@"
+-	$(GO) run -mod=readonly ${GO_TAGS} cmd/gen-manpages/main.go $(@F) $(@D)
++	-CC=gcc CFLAGS= LDFLAGS= GOOS= GOARCH= $(GO) run -mod=readonly ${GO_TAGS} cmd/gen-manpages/main.go $(@F) $(@D)
++	touch $@
+ 
+ man/ctr.8: FORCE
+ 	@echo "$(WHALE) $@"
+-	$(GO) run -mod=readonly ${GO_TAGS} cmd/gen-manpages/main.go $(@F) $(@D)
++	-CC=gcc CFLAGS= LDFLAGS= GOOS= GOARCH= $(GO) run -mod=readonly ${GO_TAGS} cmd/gen-manpages/main.go $(@F) $(@D)
++	touch $@
+ 
+ man/%: docs/man/%.md FORCE
+ 	@echo "$(WHALE) $@"

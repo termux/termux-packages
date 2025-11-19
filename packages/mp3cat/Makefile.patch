@@ -1,0 +1,11 @@
+--- a/Makefile
++++ b/Makefile
+@@ -4,7 +4,7 @@
+ INSTALL_COMMAND?=install -o $(INSTALL_USER) -g $(INSTALL_GROUP) -m 0555
+ all: mp3cat
+ mp3cat: *.c *.h
+-	cc -o mp3cat *.c
++	$(CC) $(CFLAGS) $(CPPFLAGS) -o mp3cat *.c $(LDFLAGS)
+ install: install_bin install_scripts
+ install_bin: mp3cat
+ 	mkdir -p $(PREFIX)/bin

@@ -1,0 +1,31 @@
+From 0e98a83a8e5e32898ef52764acef48d1db2d960d Mon Sep 17 00:00:00 2001
+From: Michael Forney <mforney@mforney.org>
+Date: Sat, 17 Jun 2023 10:44:00 -0700
+Subject: [PATCH] Rename reallocarray to prevent conflict with libc
+
+---
+ util.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/util.c b/util.c
+index aee8109..6a67065 100644
+--- a/util.c
++++ b/util.c
+@@ -58,7 +58,7 @@ xmalloc(size_t n)
+ }
+ 
+ static void *
+-reallocarray(void *p, size_t n, size_t m)
++reallocarray_(void *p, size_t n, size_t m)
+ {
+ 	if (m && n > SIZE_MAX / m) {
+ 		errno = ENOMEM;
+@@ -70,7 +70,7 @@ reallocarray(void *p, size_t n, size_t m)
+ void *
+ xreallocarray(void *p, size_t n, size_t m)
+ {
+-	p = reallocarray(p, n, m);
++	p = reallocarray_(p, n, m);
+ 	if (!p)
+ 		fatal("reallocarray:");
+ 

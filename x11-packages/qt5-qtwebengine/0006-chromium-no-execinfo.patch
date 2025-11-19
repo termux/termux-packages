@@ -1,0 +1,107 @@
+--- a/src/3rdparty/chromium/base/debug/stack_trace_posix.cc
++++ b/src/3rdparty/chromium/base/debug/stack_trace_posix.cc
+@@ -27,7 +27,7 @@
+ #if !defined(USE_SYMBOLIZE)
+ #include <cxxabi.h>
+ #endif
+-#if !defined(__UCLIBC__) && !defined(_AIX)
++#if defined(__GLIBC__) && !defined(_AIX)
+ #include <execinfo.h>
+ #endif
+ 
+@@ -88,7 +88,7 @@
+   // Note: code in this function is NOT async-signal safe (std::string uses
+   // malloc internally).
+ 
+-#if !defined(__UCLIBC__) && !defined(_AIX)
++#if defined(__GLIBC__) && !defined(_AIX)
+   std::string::size_type search_from = 0;
+   while (search_from < text->size()) {
+     // Look for the start of a mangled symbol, from search_from.
+@@ -135,7 +135,7 @@
+   virtual ~BacktraceOutputHandler() = default;
+ };
+ 
+-#if !defined(__UCLIBC__) && !defined(_AIX)
++#if defined(__GLIBC__) && !defined(_AIX)
+ void OutputPointer(void* pointer, BacktraceOutputHandler* handler) {
+   // This should be more than enough to store a 64-bit number in hex:
+   // 16 hex digits + 1 for null-terminator.
+@@ -834,7 +834,7 @@
+   // NOTE: This code MUST be async-signal safe (it's used by in-process
+   // stack dumping signal handler). NO malloc or stdio is allowed here.
+ 
+-#if !defined(__UCLIBC__) && !defined(_AIX)
++#if defined(__GLIBC__) && !defined(_AIX)
+   // Though the backtrace API man page does not list any possible negative
+   // return values, we take no chance.
+   return base::saturated_cast<size_t>(backtrace(trace, count));
+@@ -847,13 +847,13 @@
+ // NOTE: This code MUST be async-signal safe (it's used by in-process
+ // stack dumping signal handler). NO malloc or stdio is allowed here.
+ 
+-#if !defined(__UCLIBC__) && !defined(_AIX)
++#if defined(__GLIBC__) && !defined(_AIX)
+   PrintBacktraceOutputHandler handler;
+   ProcessBacktrace(trace_, count_, prefix_string, &handler);
+ #endif
+ }
+ 
+-#if !defined(__UCLIBC__) && !defined(_AIX)
++#if defined(__GLIBC__) && !defined(_AIX)
+ void StackTrace::OutputToStreamWithPrefix(std::ostream* os,
+                                           const char* prefix_string) const {
+   StreamBacktraceOutputHandler handler(os);
+--- a/src/3rdparty/chromium/v8/src/codegen/external-reference-table.cc
++++ b/src/3rdparty/chromium/v8/src/codegen/external-reference-table.cc
+@@ -11,7 +11,9 @@
+ 
+ #if defined(DEBUG) && defined(V8_OS_LINUX) && !defined(V8_OS_ANDROID)
+ #define SYMBOLIZE_FUNCTION
++#if defined(__GLIBC__)
+ #include <execinfo.h>
++#endif
+ #include <vector>
+ #endif  // DEBUG && V8_OS_LINUX && !V8_OS_ANDROID
+ 
+@@ -93,7 +95,7 @@
+ }
+ 
+ const char* ExternalReferenceTable::ResolveSymbol(void* address) {
+-#ifdef SYMBOLIZE_FUNCTION
++#if defined(SYMBOLIZE_FUNCTION) && defined(__GLIBC__)
+   char** names = backtrace_symbols(&address, 1);
+   const char* name = names[0];
+   // The array of names is malloc'ed. However, each name string is static
+--- a/src/3rdparty/chromium/base/debug/stack_trace.cc
++++ b/src/3rdparty/chromium/base/debug/stack_trace.cc
+@@ -217,7 +217,9 @@
+ }
+ 
+ void StackTrace::OutputToStream(std::ostream* os) const {
++#if defined(__GLIBC__) && !defined(_AIX)
+   OutputToStreamWithPrefix(os, nullptr);
++#endif
+ }
+ 
+ std::string StackTrace::ToString() const {
+@@ -225,7 +227,7 @@
+ }
+ std::string StackTrace::ToStringWithPrefix(const char* prefix_string) const {
+   std::stringstream stream;
+-#if !defined(__UCLIBC__) && !defined(_AIX)
++#if defined(__GLIBC__) && !defined(_AIX)
+   OutputToStreamWithPrefix(&stream, prefix_string);
+ #endif
+   return stream.str();
+--- a/src/3rdparty/chromium/v8/src/base/debug/stack_trace_posix.cc
++++ b/src/3rdparty/chromium/v8/src/base/debug/stack_trace_posix.cc
+@@ -25,7 +25,7 @@
+ #include <string>
+ #include <vector>
+ 
+-#if V8_LIBC_GLIBC || V8_LIBC_BSD || V8_LIBC_UCLIBC || V8_OS_SOLARIS
++#if (V8_LIBC_GLIBC || V8_LIBC_BSD || V8_LIBC_UCLIBC || V8_OS_SOLARIS) && !defined(__ANDROID__)
+ #define HAVE_EXECINFO_H 1
+ #endif
+ 

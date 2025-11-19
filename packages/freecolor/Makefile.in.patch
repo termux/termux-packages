@@ -1,0 +1,16 @@
+diff -uNr freecolor-0.9.3/Makefile.in freecolor-0.9.3.mod/Makefile.in
+--- freecolor-0.9.3/Makefile.in	2016-01-26 09:14:07.000000000 +0800
++++ freecolor-0.9.3.mod/Makefile.in	2022-07-21 17:21:22.062152014 +0800
+@@ -16,11 +16,9 @@
+ 	$(CC) $(LDFLAGS) $(CPPFLAGS) $(CFLAGS) -o free freecolor.c $(LIBS)
+ 
+ install-over-free:
+-	strip free
+-	cp -i free `which free`
++	cp -i free @TERMUX_PREFIX@/bin/free
+ 
+ install:
+-	strip free
+ 	-$(INSTALL) -d $(bindir)
+ 	-$(INSTALL) -d $(mandir)/man1
+ 	$(INSTALL) -m 755 free $(bindir)/freecolor

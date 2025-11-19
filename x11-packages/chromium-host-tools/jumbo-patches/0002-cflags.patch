@@ -1,0 +1,24 @@
+From ca5ceb5264c880315f18ba56417e8c66c9fc3cf3 Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <licy183@termux.dev>
+Date: Sun, 24 Aug 2025 00:06:38 +0800
+Subject: [PATCH] Treat `macro redefined` as error in jumbo build
+
+---
+ build/config/compiler/BUILD.gn | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/build/config/compiler/BUILD.gn b/build/config/compiler/BUILD.gn
+index 74594e1a36..daf977b133 100644
+--- a/build/config/compiler/BUILD.gn
++++ b/build/config/compiler/BUILD.gn
+@@ -2219,6 +2219,10 @@ config("default_warnings") {
+   cflags += [
+     "-Wno-unknown-warning-option",
+     "-Wno-unknown-pragmas",
++
++    # Treat macro redefined as error
++    # In jumbo build, it may cause undefined behavior
++    "-Werror=macro-redefined",
+   ]
+ 
+   # Rust warnings

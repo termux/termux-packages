@@ -1,0 +1,22 @@
+--- a/src/core/fileinfo.cpp
++++ b/src/core/fileinfo.cpp
+@@ -404,7 +404,7 @@
+                    which may be considered as a safe desktop entry path */
+                 auto target = FilePath::fromPathStr(target_.c_str());
+                 if(target.isNative()) {
+-                    auto usrShare = FilePath::fromPathStr("/usr/share/");
++                    auto usrShare = FilePath::fromPathStr("@TERMUX_PREFIX@/share/");
+                     if(!usrShare.isPrefixOf(target)) {
+                         return true;
+                     }
+--- a/src/core/vfs/vfs-menu.c
++++ b/src/core/vfs/vfs-menu.c
+@@ -165,7 +165,7 @@
+     child = fm_xml_file_item_new(menuTag_MergeFile);
+     fm_xml_file_item_set_attribute(child, "type", "parent");
+     /* FIXME: what is correct way to handle this? is it required at all? */
+-    path = g_strdup_printf("/etc/xdg/menus/%s", basename);
++    path = g_strdup_printf("@TERMUX_PREFIX@/etc/xdg/menus/%s", basename);
+     fm_xml_file_item_append_text(child, path, -1, FALSE);
+     g_free(path);
+     fm_xml_file_item_append_child(item, child);

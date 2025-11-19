@@ -1,0 +1,30 @@
+From 0bf96f4ccb5e0ef9e947a728a97cd23274a7a8eb Mon Sep 17 00:00:00 2001
+From: yangfl <yangfl@users.noreply.github.com>
+Date: Sun, 14 Jun 2020 13:32:54 +0800
+Subject: [PATCH 09/10] CMakeLists.txt: use system gocr
+
+---
+ CMakeLists.txt | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 98094d5..67e9d14 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -80,7 +80,12 @@ if(DJVU_FOUND)
+   set(K2PDFOPT_LIB ${K2PDFOPT_LIB} ${DJVU_LDFLAGS})
+ endif(DJVU_FOUND)
+ 
+-# HAVE_GOCR_LIB
++find_library(GOCR NAMES gocr)
++if(GOCR_FOUND)
++  set(HAVE_GOCR_LIB 1)
++  set(K2PDFOPT_LIB ${K2PDFOPT_LIB} ${GOCR_LIB})
++  include_directories(SYSTEM ${GOCR_INCLUDEDIR})
++endif(GOCR_FOUND)
+ 
+ pkg_check_modules(LEPT lept)
+ if(LEPT_FOUND)
+-- 
+2.28.0
+

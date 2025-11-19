@@ -1,0 +1,71 @@
+https://github.com/termux/termux-packages/issues/15852
+Borrowed from https://github.com/gentoo/gentoo/blob/496cb065e413016d6f788c26f485d55349b1c46b/app-arch/cpio/files/cpio-2.13-sysmacros-glibc-2.26.patch
+
++++ ./am/ax_compile_check_rettype.m4
+@@ -70,6 +70,9 @@
+ [for ac_type in char short int long "long long" $4
+  do 
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
++#ifdef HAVE_SYS_SYSMACROS_H
++#include <sys/sysmacros.h>
++#endif
+ #include <sys/types.h>
+ $3
+ ]], [[switch (0) case 0: case (sizeof ($1($2)) == sizeof ($ac_type)):;]])], [AC_CV_NAME=$ac_type])
++++ ./configure.ac
+@@ -37,28 +37,11 @@
+ AC_C_PROTOTYPES
+ 
+ AC_SYS_LARGEFILE
+-AC_HEADER_MAJOR
+ AC_C_CONST
+ AC_TYPE_UID_T
+ AC_CHECK_TYPE(gid_t, int)
+ 
+ AC_HEADER_DIRENT
+-AX_COMPILE_CHECK_RETTYPE([major], [0], [
+-#include <sys/types.h>
+-#ifdef MAJOR_IN_MKDEV
+-# include <sys/mkdev.h>
+-#endif
+-#ifdef MAJOR_IN_SYSMACROS
+-# include <sys/sysmacros.h>
+-#endif])
+-AX_COMPILE_CHECK_RETTYPE([minor], [0], [
+-#include <sys/types.h>
+-#ifdef MAJOR_IN_MKDEV
+-# include <sys/mkdev.h>
+-#endif
+-#ifdef MAJOR_IN_SYSMACROS
+-# include <sys/sysmacros.h>
+-#endif])
+ 
+ AC_CHECK_FUNCS([fchmod fchown])
+ # This is needed for mingw build
+@@ -79,7 +62,25 @@
+ 
+ AM_CONDITIONAL([CPIO_MT_COND], [test "$enable_mt" = yes])
+ 
+-AC_CHECK_HEADERS([unistd.h stdlib.h string.h fcntl.h pwd.h grp.h sys/io/trioctl.h utmp.h getopt.h locale.h libintl.h sys/wait.h utime.h locale.h process.h sys/ioctl.h])
++AC_CHECK_HEADERS([unistd.h stdlib.h string.h fcntl.h pwd.h grp.h sys/io/trioctl.h utmp.h getopt.h locale.h libintl.h sys/wait.h utime.h locale.h process.h sys/ioctl.h sys/sysmacros.h])
++
++AC_HEADER_MAJOR
++AX_COMPILE_CHECK_RETTYPE([major], [0], [
++#include <sys/types.h>
++#ifdef MAJOR_IN_MKDEV
++# include <sys/mkdev.h>
++#endif
++#ifdef MAJOR_IN_SYSMACROS
++# include <sys/sysmacros.h>
++#endif])
++AX_COMPILE_CHECK_RETTYPE([minor], [0], [
++#include <sys/types.h>
++#ifdef MAJOR_IN_MKDEV
++# include <sys/mkdev.h>
++#endif
++#ifdef MAJOR_IN_SYSMACROS
++# include <sys/sysmacros.h>
++#endif])
+ 
+ AC_CHECK_DECLS([errno, getpwnam, getgrnam, getgrgid, strdup, strerror, getenv, atoi, exit], , , [
+ #include <stdio.h>

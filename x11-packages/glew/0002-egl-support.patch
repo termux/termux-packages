@@ -1,0 +1,173 @@
+diff --git a/src/glew.c b/src/glew.c
+index c9bf3f7..703f8da 100644
+--- a/src/glew.c
++++ b/src/glew.c
+@@ -36,11 +36,13 @@
+ #  include GLEW_INCLUDE
+ #endif
+ 
++#if defined(GLEW_EGL)
++#  include <GL/eglew.h>
++#endif
++
+ #if defined(GLEW_OSMESA)
+ #  define GLAPI extern
+ #  include <GL/osmesa.h>
+-#elif defined(GLEW_EGL)
+-#  include <GL/eglew.h>
+ #elif defined(_WIN32)
+ /*
+  * If NOGDI is defined, wingdi.h won't be included by windows.h, and thus
+@@ -57,8 +59,7 @@
+ 
+ #include <stddef.h>  /* For size_t */
+ 
+-#if defined(GLEW_EGL)
+-#elif defined(GLEW_REGAL)
++#if defined(GLEW_REGAL)
+ 
+ /* In GLEW_REGAL mode we call direcly into the linked
+    libRegal.so glGetProcAddressREGAL for looking up
+@@ -159,25 +160,40 @@ void* NSGLGetProcAddress (const GLubyte *name)
+  * Define glewGetProcAddress.
+  */
+ #if defined(GLEW_REGAL)
+-#  define glewGetProcAddress(name) regalGetProcAddress((const GLchar *)name)
++#  define _glewGetProcAddress(name) regalGetProcAddress((const GLchar *)name)
+ #elif defined(GLEW_OSMESA)
+-#  define glewGetProcAddress(name) OSMesaGetProcAddress((const char *)name)
+-#elif defined(GLEW_EGL)
+-#  define glewGetProcAddress(name) eglGetProcAddress((const char *)name)
++#  define _glewGetProcAddress(name) OSMesaGetProcAddress((const char *)name)
+ #elif defined(_WIN32)
+-#  define glewGetProcAddress(name) wglGetProcAddress((LPCSTR)name)
++#  define _glewGetProcAddress(name) wglGetProcAddress((LPCSTR)name)
+ #elif defined(__APPLE__) && !defined(GLEW_APPLE_GLX)
+-#  define glewGetProcAddress(name) NSGLGetProcAddress(name)
++#  define _glewGetProcAddress(name) NSGLGetProcAddress(name)
+ #elif defined(__sgi) || defined(__sun) || defined(__HAIKU__)
+-#  define glewGetProcAddress(name) dlGetProcAddress(name)
++#  define _glewGetProcAddress(name) dlGetProcAddress(name)
+ #elif defined(__NOANDROID__)
+-#  define glewGetProcAddress(name) NULL /* TODO */
++#  define _glewGetProcAddress(name) NULL /* TODO */
+ #elif defined(__native_client__)
+-#  define glewGetProcAddress(name) NULL /* TODO */
++#  define _glewGetProcAddress(name) NULL /* TODO */
+ #else /* __linux */
+-#  define glewGetProcAddress(name) (*glXGetProcAddressARB)(name)
++#  define _glewGetProcAddress(name) (*glXGetProcAddressARB)(name)
++#endif
++
++#if defined(GLEW_EGL)
++static GLboolean _EGL_available = GL_FALSE;
++static void (*glewGetProcAddress (const GLubyte *name)) (void)
++{
++  void (*addr)(void);
++  if (_EGL_available)
++  {
++    addr = eglGetProcAddress((const char *)name);
++    if (addr) return addr;
++  }
++  return _glewGetProcAddress(name);
++}
++#else
++#  define glewGetProcAddress(name) _glewGetProcAddress(name)
+ #endif
+ 
++
+ /*
+  * Redefine GLEW_GET_VAR etc without const cast
+  */
+@@ -19297,9 +19313,7 @@ static GLenum GLEWAPIENTRY glewContextInit ()
+ }
+ 
+ 
+-#if defined(GLEW_OSMESA)
+-
+-#elif defined(GLEW_EGL)
++#if defined(GLEW_EGL)
+ 
+ PFNEGLCHOOSECONFIGPROC __eglewChooseConfig = NULL;
+ PFNEGLCOPYBUFFERSPROC __eglewCopyBuffers = NULL;
+@@ -20490,8 +20504,8 @@ GLenum eglewInit (EGLDisplay display)
+   PFNEGLQUERYSTRINGPROC queryString = NULL;
+ 
+   /* Load necessary entry points */
+-  initialize = (PFNEGLINITIALIZEPROC)   glewGetProcAddress("eglInitialize");
+-  queryString = (PFNEGLQUERYSTRINGPROC) glewGetProcAddress("eglQueryString");
++  initialize = (PFNEGLINITIALIZEPROC)   eglGetProcAddress("eglInitialize");
++  queryString = (PFNEGLQUERYSTRINGPROC) eglGetProcAddress("eglQueryString");
+   if (!initialize || !queryString)
+     return 1;
+ 
+@@ -21029,7 +21043,9 @@ GLenum eglewInit (EGLDisplay display)
+   return GLEW_OK;
+ }
+ 
+-#elif defined(_WIN32)
++#endif
++
++#if defined(_WIN32)
+ 
+ PFNWGLSETSTEREOEMITTERSTATE3DLPROC __wglewSetStereoEmitterState3DL = NULL;
+ 
+@@ -23105,13 +23121,26 @@ GLenum GLEWAPIENTRY glewInit (void)
+   GLenum r;
+ #if defined(GLEW_EGL)
+   PFNEGLGETCURRENTDISPLAYPROC getCurrentDisplay = NULL;
++  EGLDisplay display;
+ #endif
+   r = glewContextInit();
+   if ( r != 0 ) return r;
+ #if defined(GLEW_EGL)
+-  getCurrentDisplay = (PFNEGLGETCURRENTDISPLAYPROC) glewGetProcAddress("eglGetCurrentDisplay");
+-  return eglewInit(getCurrentDisplay());
+-#elif defined(GLEW_OSMESA) || defined(__NOANDROID__) || defined(__native_client__) || defined(__HAIKU__)
++  getCurrentDisplay = (PFNEGLGETCURRENTDISPLAYPROC) eglGetProcAddress("eglGetCurrentDisplay");
++  if (getCurrentDisplay)
++    display = getCurrentDisplay();
++  else
++    display = EGL_NO_DISPLAY;
++  if (display != EGL_NO_DISPLAY)
++  {
++    r = eglewInit(display);
++    if ( r == 0 ) {
++      _EGL_available = GL_TRUE;
++      return r;
++    }
++  }
++#endif
++#if defined(GLEW_OSMESA) || defined(__NOANDROID__) || defined(__native_client__) || defined(__HAIKU__)
+   return r;
+ #elif defined(_WIN32)
+   return wglewInit();
+@@ -29785,7 +29814,7 @@ GLboolean GLEWAPIENTRY glewIsSupported (const char* name)
+   return ret;
+ }
+ 
+-#if defined(_WIN32) && !defined(GLEW_EGL) && !defined(GLEW_OSMESA)
++#if defined(_WIN32) && !defined(GLEW_OSMESA)
+ 
+ GLboolean GLEWAPIENTRY wglewIsSupported (const char* name)
+ {
+@@ -30228,7 +30257,7 @@ GLboolean GLEWAPIENTRY wglewIsSupported (const char* name)
+   return ret;
+ }
+ 
+-#elif !defined(GLEW_OSMESA) && !defined(GLEW_EGL) && !defined(__NOANDROID__) && !defined(__native_client__) && !defined(__HAIKU__) && !defined(__APPLE__) || defined(GLEW_APPLE_GLX)
++#elif !defined(GLEW_OSMESA) && !defined(__NOANDROID__) && !defined(__native_client__) && !defined(__HAIKU__) && !defined(__APPLE__) || defined(GLEW_APPLE_GLX)
+ 
+ GLboolean glxewIsSupported (const char* name)
+ {
+@@ -30805,7 +30834,9 @@ GLboolean glxewIsSupported (const char* name)
+   return ret;
+ }
+ 
+-#elif defined(GLEW_EGL)
++#endif
++
++#if defined(GLEW_EGL)
+ 
+ GLboolean eglewIsSupported (const char* name)
+ {

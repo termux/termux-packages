@@ -1,0 +1,47 @@
+diff -u -r ../vifm-0.10/src/utils/shmem_nix.c ./src/utils/shmem_nix.c
+--- ../vifm-0.10/src/utils/shmem_nix.c	2018-11-11 15:20:19.000000000 +0000
++++ ./src/utils/shmem_nix.c	2018-11-17 21:37:18.757403620 +0000
+@@ -41,6 +41,9 @@
+ shmem_t *
+ shmem_create(const char name[], size_t initial_size, size_t max_size)
+ {
++#ifdef __ANDROID__
++	return NULL;
++#else
+ 	int error_other;
+ 	int error_excl_already_exists;
+ 	int error_normal_does_not_exist;
+@@ -135,21 +138,25 @@
+ 	}
+ 
+ 	return shmem;
++#endif
+ }
+ 
+ void
+ shmem_destroy(shmem_t *shmem)
+ {
++#ifndef __ANDROID__
+ 	if(shmem != NULL)
+ 	{
+ 		shm_unlink(shmem->name);
+ 		shmem_free(shmem);
+ 	}
++#endif
+ }
+ 
+ void
+ shmem_free(shmem_t *shmem)
+ {
++#ifndef __ANDROID__
+ 	if(shmem == NULL)
+ 	{
+ 		return;
+@@ -163,6 +170,7 @@
+ 	close(shmem->fd);
+ 	free(shmem->name);
+ 	free(shmem);
++#endif
+ }
+ 
+ int

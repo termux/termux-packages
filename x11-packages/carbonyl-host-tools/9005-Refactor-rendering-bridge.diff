@@ -1,0 +1,121 @@
+--- a/chromium/patches/chromium/0013-Refactor-rendering-bridge.patch
++++ b/chromium/patches/chromium/0013-Refactor-rendering-bridge.patch
+@@ -528,35 +528,34 @@
+ index 1df3ffe72c93d..5aa0bdc25e409 100644
+ --- a/headless/lib/browser/headless_browser_impl.cc
+ +++ b/headless/lib/browser/headless_browser_impl.cc
+-@@ -15,6 +15,7 @@
++@@ -13,6 +13,7 @@
++ #include "base/functional/callback.h"
+  #include "base/memory/ptr_util.h"
+- #include "base/run_loop.h"
+- #include "base/threading/thread_task_runner_handle.h"
++ #include "base/task/single_thread_task_runner.h"
+ +#include "components/zoom/zoom_controller.h"
+- #include "content/public/app/content_main.h"
+  #include "content/public/browser/browser_task_traits.h"
+  #include "content/public/browser/browser_thread.h"
+-@@ -24,9 +25,11 @@
++ #include "content/public/browser/devtools_agent_host.h"
++@@ -20,6 +21,7 @@
+  #include "headless/lib/browser/headless_browser_context_impl.h"
+  #include "headless/lib/browser/headless_browser_main_parts.h"
+  #include "headless/lib/browser/headless_devtools_agent_host_client.h"
+ +#include "headless/lib/browser/headless_screen.h"
+  #include "headless/lib/browser/headless_web_contents_impl.h"
+- #include "net/http/http_util.h"
+- #include "services/network/public/cpp/network_switches.h"
+-+#include "ui/compositor/compositor.h"
+- #include "ui/events/devices/device_data_manager.h"
++ #include "headless/public/version.h"
+  
+- #include "content/public/browser/render_frame_host.h"
+-@@ -34,6 +37,7 @@
++@@ -28,8 +30,10 @@
+  #include "content/public/browser/render_widget_host.h"
+  #include "content/public/browser/web_contents.h"
+  #include "carbonyl/src/browser/bridge.h"
+ +#include "carbonyl/src/browser/renderer.h"
+  #include "third_party/blink/public/common/input/web_mouse_event.h"
+  #include "third_party/blink/public/common/input/web_mouse_wheel_event.h"
+++#include "ui/compositor/compositor.h"
+  #include "ui/events/keycodes/keyboard_codes.h"
+-@@ -119,7 +123,7 @@ void HeadlessBrowserImpl::set_browser_main_parts(
++ 
++ namespace carbonyl {
++@@ -213,7 +217,7 @@
+  }
+  
+  void HeadlessBrowserImpl::Resize() {
+@@ -565,7 +564,7 @@
+    auto rect = gfx::Rect(0, 0, size.width(), size.height());
+  
+    for (auto* ctx: GetAllBrowserContexts()) {
+-@@ -133,8 +137,6 @@ void HeadlessBrowserImpl::Resize() {
++@@ -227,8 +231,6 @@
+        PlatformSetWebContentsBounds(impl, rect);
+      }
+    }
+@@ -574,7 +573,7 @@
+  }
+  
+  void HeadlessBrowserImpl::OnShutdownInput() {
+-@@ -436,7 +438,7 @@ void HeadlessBrowserImpl::RunOnStartCallback() {
++@@ -530,7 +532,7 @@
+    input_thread_ = std::thread([=]() {
+      carbonyl::browser = this;
+  
+@@ -583,7 +582,7 @@
+        .shutdown = []() {
+          if (carbonyl::browser) {
+            carbonyl::browser->OnShutdownInput();
+-@@ -500,7 +502,7 @@ void HeadlessBrowserImpl::RunOnStartCallback() {
++@@ -594,7 +596,7 @@
+        }
+      };
+  
+@@ -609,30 +608,25 @@
+ index e2cb88fbcf708..397b2585f3d0f 100644
+ --- a/headless/lib/browser/headless_browser_impl_mac.mm
+ +++ b/headless/lib/browser/headless_browser_impl_mac.mm
+-@@ -6,6 +6,8 @@
+- 
++@@ -7,6 +7,8 @@
+  #import "base/mac/scoped_objc_class_swizzler.h"
++ #include "base/memory/weak_ptr.h"
+  #include "base/no_destructor.h"
+ +#include "carbonyl/src/browser/bridge.h"
+ +#include "content/browser/renderer_host/render_widget_host_view_mac.h"
++ #include "content/public/browser/browser_task_traits.h"
++ #include "content/public/browser/browser_thread.h"
+  #include "content/public/browser/render_widget_host_view.h"
+- #include "content/public/browser/web_contents.h"
+- #include "headless/lib/browser/headless_web_contents_impl.h"
+-@@ -95,8 +97,13 @@ void HeadlessBrowserImpl::PlatformSetWebContentsBounds(
+- 
+-   content::RenderWidgetHostView* host_view =
+-       web_contents->web_contents()->GetRenderWidgetHostView();
+--  if (host_view)
+-+  if (host_view) {
+-     host_view->SetWindowFrameInScreen(bounds);
+-+
+-+    static_cast<content::RenderWidgetHostViewMac*>(host_view)->SetCurrentDeviceScaleFactor(
+-+      carbonyl::Bridge::GetDPI()
+-+    );
+-+  }
+- }
+- 
+- ui::Compositor* HeadlessBrowserImpl::PlatformGetCompositor(
++@@ -109,6 +111,9 @@
++                   content_web_contents->GetRenderWidgetHostView();
++               if (host_view) {
++                 host_view->SetWindowFrameInScreen(bounds);
+++                static_cast<content::RenderWidgetHostViewMac*>(host_view)->SetCurrentDeviceScaleFactor(
+++                  carbonyl::Bridge::GetDPI()
+++                );
++               }
++             }
++           },
+ diff --git a/headless/lib/browser/headless_browser_main_parts_mac.mm b/headless/lib/browser/headless_browser_main_parts_mac.mm
+ index 718e37ef8bd3e..8ca30b9d88d5b 100644
+ --- a/headless/lib/browser/headless_browser_main_parts_mac.mm

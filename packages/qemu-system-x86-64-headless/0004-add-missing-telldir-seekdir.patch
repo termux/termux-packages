@@ -1,0 +1,74 @@
+diff -uNr qemu-4.2.0/hw/9pfs/9p-local.c qemu-4.2.0.mod/hw/9pfs/9p-local.c
+--- qemu-4.2.0/hw/9pfs/9p-local.c	2019-12-12 20:20:47.000000000 +0200
++++ qemu-4.2.0.mod/hw/9pfs/9p-local.c	2019-12-15 00:12:11.073725293 +0200
+@@ -535,9 +535,23 @@
+     rewinddir(fs->dir.stream);
+ }
+ 
++struct DIR {
++    int fd_;
++};
++
++static long android_telldir(struct DIR *dirp)
++{
++    return (long) lseek(dirp->fd_, 0, SEEK_CUR);
++}
++
++static void android_seekdir(DIR *dirp, long loc)
++{
++    (void) lseek(dirp->fd_, loc, SEEK_SET);
++}
++
+ static off_t local_telldir(FsContext *ctx, V9fsFidOpenState *fs)
+ {
+-    return telldir(fs->dir.stream);
++    return android_telldir(fs->dir.stream);
+ }
+ 
+ static bool local_is_mapped_file_metadata(FsContext *fs_ctx, const char *name)
+@@ -571,7 +585,7 @@
+ 
+ static void local_seekdir(FsContext *ctx, V9fsFidOpenState *fs, off_t off)
+ {
+-    seekdir(fs->dir.stream, off);
++    android_seekdir(fs->dir.stream, off);
+ }
+ 
+ static ssize_t local_preadv(FsContext *ctx, V9fsFidOpenState *fs,
+diff -uNr qemu-4.2.0/hw/9pfs/9p-proxy.c qemu-4.2.0.mod/hw/9pfs/9p-proxy.c
+--- qemu-4.2.0/hw/9pfs/9p-proxy.c	2019-12-12 20:20:47.000000000 +0200
++++ qemu-4.2.0.mod/hw/9pfs/9p-proxy.c	2019-12-15 00:12:11.074725297 +0200
+@@ -675,9 +675,23 @@
+     rewinddir(fs->dir.stream);
+ }
+ 
++struct DIR {
++    int fd_;
++};
++
++static long android_telldir(struct DIR *dirp)
++{
++    return (long) lseek(dirp->fd_, 0, SEEK_CUR);
++}
++
++static void android_seekdir(DIR *dirp, long loc)
++{
++    (void) lseek(dirp->fd_, loc, SEEK_SET);
++}
++
+ static off_t proxy_telldir(FsContext *ctx, V9fsFidOpenState *fs)
+ {
+-    return telldir(fs->dir.stream);
++    return android_telldir(fs->dir.stream);
+ }
+ 
+ static struct dirent *proxy_readdir(FsContext *ctx, V9fsFidOpenState *fs)
+@@ -687,7 +701,7 @@
+ 
+ static void proxy_seekdir(FsContext *ctx, V9fsFidOpenState *fs, off_t off)
+ {
+-    seekdir(fs->dir.stream, off);
++    android_seekdir(fs->dir.stream, off);
+ }
+ 
+ static ssize_t proxy_preadv(FsContext *ctx, V9fsFidOpenState *fs,

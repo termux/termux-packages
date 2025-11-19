@@ -1,0 +1,87 @@
+diff -uNr busybox-1.31.1/coreutils/mktemp.c busybox-1.31.1.mod/coreutils/mktemp.c
+--- busybox-1.31.1/coreutils/mktemp.c	2019-06-10 13:50:53.000000000 +0300
++++ busybox-1.31.1.mod/coreutils/mktemp.c	2019-11-11 21:46:00.848464330 +0200
+@@ -50,7 +50,7 @@
+ //usage:     "\n	-p DIR	Use DIR as a base directory (implies -t)"
+ //usage:     "\n	-u	Do not create anything; print a name"
+ //usage:     "\n"
+-//usage:     "\nBase directory is: -p DIR, else $TMPDIR, else /tmp"
++//usage:     "\nBase directory is: -p DIR, else $TMPDIR, else @TERMUX_PREFIX@/tmp"
+ //usage:
+ //usage:#define mktemp_example_usage
+ //usage:       "$ mktemp /tmp/temp.XXXXXX\n"
+@@ -76,7 +76,7 @@
+ 
+ 	path = getenv("TMPDIR");
+ 	if (!path || path[0] == '\0')
+-		path = "/tmp";
++		path = "@TERMUX_PREFIX@/tmp";
+ 
+ 	opts = getopt32(argv, "^" "dqtp:u" "\0" "?1"/*1 arg max*/, &path);
+ 
+diff -uNr busybox-1.31.1/editors/diff.c busybox-1.31.1.mod/editors/diff.c
+--- busybox-1.31.1/editors/diff.c	2019-06-10 13:50:53.000000000 +0300
++++ busybox-1.31.1.mod/editors/diff.c	2019-11-11 21:46:33.625316185 +0200
+@@ -730,7 +730,7 @@
+ 		 * When we meet non-seekable file, we must make a temp copy.
+ 		 */
+ 		if (lseek(fd, 0, SEEK_SET) == -1 && errno == ESPIPE) {
+-			char name[] = "/tmp/difXXXXXX";
++			char name[] = "@TERMUX_PREFIX@/tmp/difXXXXXX";
+ 			int fd_tmp = xmkstemp(name);
+ 
+ 			unlink(name);
+diff -uNr busybox-1.31.1/include/libbb.h busybox-1.31.1.mod/include/libbb.h
+--- busybox-1.31.1/include/libbb.h	2019-06-10 13:50:53.000000000 +0300
++++ busybox-1.31.1.mod/include/libbb.h	2019-11-11 21:55:22.141411848 +0200
+@@ -2126,12 +2126,12 @@
+  * use bb_default_login_shell and following defines.
+  * If you change LIBBB_DEFAULT_LOGIN_SHELL,
+  * don't forget to change increment constant. */
+-#define LIBBB_DEFAULT_LOGIN_SHELL  "-/bin/sh"
++#define LIBBB_DEFAULT_LOGIN_SHELL  "-@TERMUX_PREFIX@/bin/sh"
+ extern const char bb_default_login_shell[] ALIGN1;
+-/* "/bin/sh" */
++/* "@TERMUX_PREFIX@/bin/sh" */
+ #define DEFAULT_SHELL              (bb_default_login_shell+1)
+ /* "sh" */
+-#define DEFAULT_SHELL_SHORT_NAME   (bb_default_login_shell+6)
++#define DEFAULT_SHELL_SHORT_NAME   (bb_default_login_shell+1+sizeof("@TERMUX_PREFIX@/bin"))
+ 
+ /* The following devices are the same on all systems.  */
+ #define CURRENT_TTY "/dev/tty"
+diff -uNr ../busybox-1.35.0/networking/telnetd.c ./networking/telnetd.c
+--- ../busybox-1.35.0/networking/telnetd.c	2021-12-26 17:53:21.000000000 +0100
++++ ./networking/telnetd.c	2022-08-05 08:44:20.976821463 +0200
+@@ -105,7 +105,7 @@
+ //usage:       "Handle incoming telnet connections"
+ //usage:	IF_NOT_FEATURE_TELNETD_STANDALONE(" via inetd") "\n"
+ //usage:     "\n	-l LOGIN	Exec LOGIN on connect"
+-//usage:     "\n	-f ISSUE_FILE	Display ISSUE_FILE instead of /etc/issue"
++//usage:     "\n	-f ISSUE_FILE	Display ISSUE_FILE instead of @TERMUX_PREFIX@/etc/issue.net"
+ //usage:     "\n	-K		Close connection as soon as login exits"
+ //usage:     "\n			(normally wait until all programs close slave pty)"
+ //usage:	IF_FEATURE_TELNETD_STANDALONE(
+@@ -166,8 +166,8 @@
+ #define G (*(struct globals*)bb_common_bufsiz1)
+ #define INIT_G() do { \
+ 	setup_common_bufsiz(); \
+-	G.loginpath = "/bin/login"; \
+-	G.issuefile = "/etc/issue.net"; \
++	G.loginpath = "@TERMUX_PREFIX@/bin/login"; \
++	G.issuefile = "@TERMUX_PREFIX@/etc/issue.net"; \
+ } while (0)
+ 
+ 
+diff -uNr busybox-1.31.1/util-linux/setarch.c busybox-1.31.1.mod/util-linux/setarch.c
+--- busybox-1.31.1/util-linux/setarch.c	2019-06-10 13:50:53.000000000 +0300
++++ busybox-1.31.1.mod/util-linux/setarch.c	2019-11-11 21:56:31.521753610 +0200
+@@ -98,7 +98,7 @@
+ 
+ 	argv += optind;
+ 	if (!argv[0])
+-		(--argv)[0] = (char*)"/bin/sh";
++		(--argv)[0] = (char*)"@TERMUX_PREFIX@/bin/sh";
+ 
+ 	/* Try to execute the program */
+ 	BB_EXECVP_or_die(argv);

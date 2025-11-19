@@ -1,0 +1,11 @@
+--- lua-language-server/3rd/luamake/compile/ninja/android.ninja	2021-10-27 21:38:40.667928105 +0530
++++ lua-language-server-patch/3rd/luamake/compile/ninja/android.ninja	2021-10-27 21:37:31.217928132 +0530
+@@ -116,7 +116,7 @@
+ build $obj/source_bootstrap/progdir.obj: cxx_source_bootstrap $
+     3rd/bee.lua/bootstrap/progdir.cpp
+ rule link_luamake
+-  command = $cc $in -o $out -lm -ldl -Wl,-E -lstdc++ -s
++  command = $cc $in -o $out -lm -ldl -Wl,-E -lstdc++ -landroid-spawn -s
+   description = Link    Exe $out
+ build $bin/luamake: link_luamake $obj/source_bootstrap/main.obj $
+     $obj/source_bootstrap/progdir.obj $obj/source_bee/lua-seri.obj $

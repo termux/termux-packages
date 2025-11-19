@@ -1,0 +1,982 @@
+`atomic_ref` is not landed in NDK r28c, and it is used in:
+
+- //base/atomicops.cc
+- //third_party/simdutf/simdutf.cpp
+- //v8/src/objects/simd.cc
+- //media/audio/audio_input_device.c
+- //services/audio/input_sync_writer.cc
+- //cc/metrics/shared_metrics_buffer.h
+- //services/device/public/cpp/generic_sensor/sensor_reading_shared_buffer_reader.cc
+- //services/device/generic_sensor/platform_sensor.cc
+- //v8/src/utils/memcopy.h
+
+--- a/third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h
++++ b/third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h
+@@ -0,0 +1,607 @@
++// Origin: https://github.com/ORNL/cpp-proposals-pub
++// Origin Description: Collaborating on papers for the ISO C++ committee - public repo
++// Origin LICENSE: Public Domain
++
++#ifndef TERMUX_HEADER_ONLY_ATOMIC_REF_POLYFILL_H
++#define TERMUX_HEADER_ONLY_ATOMIC_REF_POLYFILL_H
++
++// INCLUDE: https://github.com/ORNL/cpp-proposals-pub/blob/688e59475994cc71011d916f8d08e20513109728/P0019/atomic_ref.hpp
++//------------------------------------------------------------------------------
++// std::experimental::atomic_ref
++//
++// reference implementation for compilers which support GNU atomic builtins
++// https://gcc.gnu.org/onlinedocs/gcc/_005f_005fatomic-Builtins.html
++//
++//------------------------------------------------------------------------------
++
++#include <atomic>
++#include <type_traits>
++#include <cstdint>
++#include <cmath>
++
++#if defined( _MSC_VER ) //msvc
++  #error "Error: MSVC not currently supported"
++#endif
++
++#ifndef ATOMIC_REF_FORCEINLINE
++  #define ATOMIC_REF_FORCEINLINE inline __attribute__((always_inline))
++#endif
++
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wsign-conversion"
++
++namespace Foo {
++
++template <typename E>
++constexpr typename std::underlying_type<E>::type to_underlying(E e) noexcept {
++    return static_cast<typename std::underlying_type<E>::type>(e);
++}
++
++static_assert(  (__ATOMIC_RELAXED == to_underlying(std::memory_order_relaxed) )
++             && (__ATOMIC_CONSUME == to_underlying(std::memory_order_consume) )
++             && (__ATOMIC_ACQUIRE == to_underlying(std::memory_order_acquire) )
++             && (__ATOMIC_RELEASE == to_underlying(std::memory_order_release) )
++             && (__ATOMIC_ACQ_REL == to_underlying(std::memory_order_acq_rel) )
++             && (__ATOMIC_SEQ_CST == to_underlying(std::memory_order_seq_cst) )
++             , "Error: std::memory_order values are not equivalent to builtins"
++             );
++
++namespace Impl {
++
++//------------------------------------------------------------------------------
++template <typename T>
++inline constexpr size_t atomic_ref_required_alignment_v = sizeof(T) == sizeof(uint8_t)  ? sizeof(uint8_t)
++                                                        : sizeof(T) == sizeof(uint16_t) ? sizeof(uint16_t)
++                                                        : sizeof(T) == sizeof(uint32_t) ? sizeof(uint32_t)
++                                                        : sizeof(T) == sizeof(uint64_t) ? sizeof(uint64_t)
++                                                        : std::alignment_of_v<T>
++                                                        ;
++
++template <typename T>
++inline constexpr bool atomic_use_native_ops_v =  sizeof(T) <= sizeof(uint64_t)
++                                              && (  std::is_integral_v<T>
++                                                 || std::is_enum_v<T>
++                                                 || std::is_pointer_v<T>
++                                                 )
++                                              ;
++
++template <typename T>
++inline constexpr bool atomic_use_cast_ops_v =  !atomic_use_native_ops_v<T>
++                                            && (  sizeof(T) == sizeof(uint8_t)
++                                               || sizeof(T) == sizeof(uint16_t)
++                                               || sizeof(T) == sizeof(uint32_t)
++                                               || sizeof(T) == sizeof(uint64_t)
++                                               )
++                                            ;
++
++template <typename T>
++using atomic_ref_cast_t = std::conditional_t< sizeof(T) == sizeof(uint8_t),  uint8_t
++                        , std::conditional_t< sizeof(T) == sizeof(uint16_t), uint16_t
++                        , std::conditional_t< sizeof(T) == sizeof(uint32_t), uint32_t
++                        , std::conditional_t< sizeof(T) == sizeof(uint64_t), uint64_t
++                        , T
++                        >>>>
++                        ;
++
++//------------------------------------------------------------------------------
++// atomic_ref_ops: generic
++//------------------------------------------------------------------------------
++template <typename Base, typename ValueType, typename Enable = void>
++struct atomic_ref_ops
++{};
++
++
++//------------------------------------------------------------------------------
++// atomic_ref_ops: integral
++//------------------------------------------------------------------------------
++template <typename Base, typename ValueType>
++struct atomic_ref_ops< Base, ValueType
++                     , std::enable_if_t<  std::is_integral_v<ValueType>
++                                       && !std::is_same_v<bool,ValueType>
++                                       >
++                     >
++{
++ public:
++   using difference_type = ValueType;
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type fetch_add( difference_type val
++                           , std::memory_order order = std::memory_order_seq_cst
++                           ) const noexcept
++  {
++    return __atomic_fetch_add( static_cast<const Base*>(this)->ptr_
++                             , val
++                             , to_underlying(order)
++                             );
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type fetch_sub( difference_type val
++                           , std::memory_order order = std::memory_order_seq_cst
++                           ) const noexcept
++  {
++    return __atomic_fetch_sub( static_cast<const Base*>(this)->ptr_
++                             , val
++                             , to_underlying(order)
++                             );
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type fetch_and( difference_type val
++                           , std::memory_order order = std::memory_order_seq_cst
++                           ) const noexcept
++  {
++    return __atomic_fetch_and( static_cast<const Base*>(this)->ptr_
++                             , val
++                             , to_underlying(order)
++                             );
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type fetch_or( difference_type val
++                           , std::memory_order order = std::memory_order_seq_cst
++                           ) const noexcept
++  {
++    return __atomic_fetch_or( static_cast<const Base*>(this)->ptr_
++                            , val
++                            , to_underlying(order)
++                            );
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type fetch_xor( difference_type val
++                           , std::memory_order order = std::memory_order_seq_cst
++                           ) const noexcept
++  {
++    return __atomic_fetch_xor( static_cast<const Base*>(this)->ptr_
++                             , val
++                             , to_underlying(order)
++                             );
++  }
++
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type operator++(int) const noexcept
++  {
++	constexpr auto order = std::memory_order_seq_cst;
++    return __atomic_fetch_add( static_cast<const Base*>(this)->ptr_, static_cast<difference_type>(1), to_underlying(order) );
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type operator--(int) const noexcept
++  {
++	constexpr auto order = std::memory_order_seq_cst;
++    return __atomic_fetch_sub( static_cast<const Base*>(this)->ptr_, static_cast<difference_type>(1), to_underlying(order) );
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type operator++() const noexcept
++  {
++	constexpr auto order = std::memory_order_seq_cst;
++    return __atomic_add_fetch( static_cast<const Base*>(this)->ptr_, static_cast<difference_type>(1), to_underlying(order) );
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type operator--() const noexcept
++  {
++	constexpr auto order = std::memory_order_seq_cst;
++    return __atomic_sub_fetch( static_cast<const Base*>(this)->ptr_, static_cast<difference_type>(1), to_underlying(order) );
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type operator+=(difference_type val) const noexcept
++  {
++	constexpr auto order = std::memory_order_seq_cst;
++    return __atomic_add_fetch( static_cast<const Base*>(this)->ptr_, val, to_underlying(order) );
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type operator-=(difference_type val) const noexcept
++  {
++	constexpr auto order = std::memory_order_seq_cst;
++    return __atomic_sub_fetch( static_cast<const Base*>(this)->ptr_, val, to_underlying(order) );
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type operator&=(difference_type val) const noexcept
++  {
++	constexpr auto order = std::memory_order_seq_cst;
++    return __atomic_sub_fetch( static_cast<const Base*>(this)->ptr_, val, to_underlying(order) );
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type operator|=(difference_type val) const noexcept
++  {
++	constexpr auto order = std::memory_order_seq_cst;
++    return __atomic_or_fetch( static_cast<const Base*>(this)->ptr_, val, to_underlying(order) );
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type operator^=(difference_type val) const noexcept
++  {
++	constexpr auto order = std::memory_order_seq_cst;
++    return __atomic_xor_fetch( static_cast<const Base*>(this)->ptr_, val, to_underlying(order) );
++  }
++};
++
++
++//------------------------------------------------------------------------------
++// atomic_ref_ops: floating-point
++//------------------------------------------------------------------------------
++template <typename Base, typename ValueType>
++struct atomic_ref_ops< Base, ValueType
++                     , std::enable_if_t<  std::is_floating_point_v<ValueType> >
++                     >
++{
++ public:
++   using difference_type = ValueType;
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type fetch_add( difference_type val
++                           , std::memory_order order = std::memory_order_seq_cst
++                           ) const noexcept
++  {
++    difference_type expected = static_cast<const Base*>(this)->load(std::memory_order_relaxed);
++    difference_type desired = expected + val;
++
++    while (! static_cast<const Base*>(this)->
++              compare_exchange_weak( expected
++                                   , desired
++                                   , order
++                                   , std::memory_order_relaxed
++                                   )
++         )
++    {
++      desired = expected + val;
++      if (std::isnan(expected)) break;
++    }
++
++    return expected;
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type fetch_sub( difference_type val
++                           , std::memory_order order = std::memory_order_seq_cst
++                           ) const noexcept
++  {
++    difference_type expected = static_cast<const Base*>(this)->load(std::memory_order_relaxed);
++    difference_type desired = expected - val;
++
++    while (! static_cast<const Base*>(this)->
++              compare_exchange_weak( expected
++                                   , desired
++                                   , order
++                                   , std::memory_order_relaxed
++                                   )
++         )
++    {
++      desired = expected - val;
++      if (std::isnan(expected)) break;
++    }
++
++    return expected;
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type operator+=(difference_type val) const noexcept
++  {
++    return fetch_add( val ) + val;
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type operator-=(difference_type val) const noexcept
++  {
++    return fetch_sub( val ) - val;
++  }
++};
++
++
++//------------------------------------------------------------------------------
++// atomic_ref_ops: pointer to object
++//------------------------------------------------------------------------------
++template <typename Base, typename ValueType>
++struct atomic_ref_ops< Base, ValueType
++                     , std::enable_if<  std::is_pointer_v<ValueType>
++                                     && std::is_object_v< std::remove_pointer_t<ValueType>>
++                                     >
++                     >
++{
++  static constexpr ptrdiff_t stride = static_cast<ptrdiff_t>(sizeof( std::remove_pointer_t<ValueType> ));
++
++ public:
++  using difference_type = ptrdiff_t;
++
++  ATOMIC_REF_FORCEINLINE
++  ValueType fetch_add( difference_type val
++                     , std::memory_order order = std::memory_order_seq_cst
++                     ) const noexcept
++  {
++    return val >= 0
++           ? __atomic_fetch_add( static_cast<const Base*>(this)->ptr_
++                                , stride*val
++                                , to_underlying(order)
++                               )
++           : __atomic_fetch_sub( static_cast<const Base*>(this)->ptr_
++                               , -(stride*val)
++                               , to_underlying(order)
++                               )
++           ;
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  ValueType fetch_sub( difference_type val
++                     , std::memory_order order = std::memory_order_seq_cst
++                     ) const noexcept
++  {
++    return val >= 0
++           ? __atomic_fetch_sub( static_cast<const Base*>(this)->ptr_
++                                , stride*val
++                                , to_underlying(order)
++                               )
++           : __atomic_fetch_add( static_cast<const Base*>(this)->ptr_
++                               , -(stride*val)
++                               , to_underlying(order)
++                               )
++           ;
++  }
++
++
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type operator++(int) const noexcept
++  {
++	constexpr auto order = std::memory_order_seq_cst;
++    return __atomic_fetch_add( static_cast<const Base*>(this)->ptr_, stride, to_underlying(order) );
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type operator--(int) const noexcept
++  {
++	constexpr auto order = std::memory_order_seq_cst;
++    return __atomic_fetch_sub( static_cast<const Base*>(this)->ptr_, stride, to_underlying(order) );
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type operator++() const noexcept
++  {
++	constexpr auto order = std::memory_order_seq_cst;
++    return __atomic_add_fetch( static_cast<const Base*>(this)->ptr_, stride, to_underlying(order) );
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type operator--() const noexcept
++  {
++	constexpr auto order = std::memory_order_seq_cst;
++    return __atomic_sub_fetch( static_cast<const Base*>(this)->ptr_, stride, to_underlying(order) );
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type operator+=(difference_type val) const noexcept
++  {
++	constexpr auto order = std::memory_order_seq_cst;
++    return val >= 0
++           ? __atomic_fetch_add( static_cast<const Base*>(this)->ptr_
++                                , stride*val
++                                , to_underlying(order)
++                               )
++           : __atomic_fetch_sub( static_cast<const Base*>(this)->ptr_
++                               , -(stride*val)
++                                , to_underlying(order)
++                               )
++           ;
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  difference_type operator-=(difference_type val) const noexcept
++  {
++	constexpr auto order = std::memory_order_seq_cst;
++    return val >= 0
++           ? __atomic_fetch_sub( static_cast<const Base*>(this)->ptr_
++                                , stride*val
++                                , to_underlying(order)
++                               )
++           : __atomic_fetch_add( static_cast<const Base*>(this)->ptr_
++                               , -(stride*val)
++                                , to_underlying(order)
++                               )
++           ;
++  }
++};
++
++} // namespace Impl
++
++template < class T >
++struct atomic_ref
++  : public Impl::atomic_ref_ops< atomic_ref<T>, T >
++{
++  static_assert( std::is_trivially_copyable_v<T>
++               , "Error: atomic_ref<T> requires T to be trivially copyable");
++
++private:
++  T* ptr_;
++
++  friend struct Impl::atomic_ref_ops< atomic_ref<T>, T>;
++
++public:
++
++  using value_type = T;
++
++  static constexpr size_t required_alignment  = Impl::atomic_ref_required_alignment_v<T>;
++  static constexpr bool   is_always_lock_free = __atomic_always_lock_free( sizeof(T) <= required_alignment
++                                                                                      ? required_alignment 
++                                                                                      : sizeof(T)
++                                                                         , nullptr
++                                                                         );
++
++  atomic_ref() = delete;
++  atomic_ref & operator=( const atomic_ref & ) = delete;
++
++  ATOMIC_REF_FORCEINLINE
++  explicit atomic_ref( value_type & obj )
++    : ptr_{&obj}
++  {}
++
++  ATOMIC_REF_FORCEINLINE
++  atomic_ref( const atomic_ref & ref ) noexcept = default;
++
++  ATOMIC_REF_FORCEINLINE
++  value_type operator=( value_type desired ) const noexcept
++  {
++    store(desired);
++    return desired;
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  operator value_type() const noexcept
++  {
++    return load();
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  bool is_lock_free() const noexcept
++  {
++    return __atomic_is_lock_free( sizeof(value_type), ptr_ );
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  void store( value_type desired
++            , std::memory_order order = std::memory_order_seq_cst
++            ) const noexcept
++  {
++    if constexpr ( Impl::atomic_use_native_ops_v<T> ) {
++      __atomic_store_n( ptr_, desired, to_underlying(order) );
++    }
++    else if constexpr ( Impl::atomic_use_cast_ops_v<T> ) {
++      typedef Impl::atomic_ref_cast_t<T> __attribute__((__may_alias__)) cast_type;
++
++      __atomic_store_n( reinterpret_cast<cast_type*>(ptr_)
++                      , *reinterpret_cast<cast_type*>(&desired)
++                      , to_underlying(order)
++                      );
++    }
++    else {
++      __atomic_store( ptr_, &desired, to_underlying(order) );
++    }
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  value_type load( std::memory_order order = std::memory_order_seq_cst ) const noexcept
++  {
++    if constexpr ( Impl::atomic_use_native_ops_v<T> ) {
++      return __atomic_load_n( ptr_, to_underlying(order) );
++    }
++    else if constexpr ( Impl::atomic_use_cast_ops_v<T> ) {
++      typedef Impl::atomic_ref_cast_t<T> __attribute__((__may_alias__)) cast_type;
++
++      cast_type tmp = __atomic_load_n( reinterpret_cast<cast_type*>(ptr_)
++                                     , to_underlying(order)
++                                     );
++      return *reinterpret_cast<value_type*>(&tmp);
++    }
++    else {
++      value_type result;
++      __atomic_load( ptr_, &result, to_underlying(order) );
++      return result;
++    }
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  value_type exchange( value_type desired
++                     , std::memory_order order = std::memory_order_seq_cst
++                     ) const noexcept
++  {
++    if constexpr ( Impl::atomic_use_native_ops_v<T> ) {
++      return __atomic_exchange_n( ptr_, desired, to_underlying(order) );
++    }
++    else if constexpr ( Impl::atomic_use_cast_ops_v<T> ) {
++      typedef Impl::atomic_ref_cast_t<T> __attribute__((__may_alias__)) cast_type;
++
++      cast_type tmp = __atomic_exchange_n( reinterpret_cast<cast_type*>(ptr_)
++                                         , *reinterpret_cast<cast_type*>(&desired)
++                                         , to_underlying(order)
++                                         );
++      return *reinterpret_cast<value_type*>(&tmp);
++    }
++    else {
++      value_type result;
++      __atomic_exchange( ptr_, &desired, &result, to_underlying(order));
++      return result;
++    }
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  bool compare_exchange_weak( value_type& expected
++                            , value_type desired
++                            , std::memory_order success
++                            , std::memory_order failure
++                            ) const noexcept
++  {
++    if constexpr ( Impl::atomic_use_native_ops_v<T> ) {
++      return __atomic_compare_exchange_n( ptr_, &expected, desired, true, to_underlying(success), to_underlying(success) );
++    }
++    else if constexpr ( Impl::atomic_use_cast_ops_v<T> ) {
++      typedef Impl::atomic_ref_cast_t<T> __attribute__((__may_alias__)) cast_type;
++
++      return __atomic_compare_exchange_n( reinterpret_cast<cast_type*>(ptr_)
++                                        , reinterpret_cast<cast_type*>(&expected)
++                                        , *reinterpret_cast<cast_type*>(&desired)
++                                        , true
++                                        , to_underlying(success)
++                                        , to_underlying(failure)
++                                        );
++    }
++    else {
++      return __atomic_compare_exchange( ptr_, &expected, &desired, true, to_underlying(success), to_underlying(failure) );
++    }
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  bool compare_exchange_strong( value_type& expected
++                              , value_type desired
++                              , std::memory_order success
++                              , std::memory_order failure
++                              ) const noexcept
++  {
++    if constexpr ( Impl::atomic_use_native_ops_v<T> ) {
++      return __atomic_compare_exchange_n( ptr_, &expected, desired, false, to_underlying(success), to_underlying(failure) );
++    }
++    else if constexpr ( Impl::atomic_use_cast_ops_v<T> ) {
++      typedef Impl::atomic_ref_cast_t<T> __attribute__((__may_alias__)) cast_type;
++
++      return __atomic_compare_exchange_n( reinterpret_cast<cast_type*>(ptr_)
++                                        , reinterpret_cast<cast_type*>(&expected)
++                                        , *reinterpret_cast<cast_type*>(&desired)
++                                        , false
++                                        , to_underlying(success)
++                                        , to_underlying(failure)
++                                        );
++    }
++    else {
++      return __atomic_compare_exchange( ptr_, &expected, &desired, false, to_underlying(success), to_underlying(failure) );
++    }
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  bool compare_exchange_weak( value_type& expected
++                            , value_type desired
++                            , std::memory_order order = std::memory_order_seq_cst
++                            ) const noexcept
++  {
++    return compare_exchange_weak( expected, desired, order, order );
++  }
++
++  ATOMIC_REF_FORCEINLINE
++  bool compare_exchange_strong( value_type& expected
++                              , value_type desired
++                              , std::memory_order order = std::memory_order_seq_cst
++                              ) const noexcept
++  {
++    return compare_exchange_strong( expected, desired, order, order );
++  }
++};
++
++} // namespace Foo
++
++#pragma GCC diagnostic pop
++
++#endif // TERMUX_HEADER_ONLY_ATOMIC_REF_POLYFILL_H
+--- a/base/atomicops.cc
++++ b/base/atomicops.cc
+@@ -8,6 +8,15 @@
+ 
+ #include "base/memory/aligned_memory.h"
+ 
++#ifdef __TERMUX__
++#include "third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h"
++template <typename T>
++using __my_atomic_ref = Foo::atomic_ref<T>;
++#else
++template <typename T>
++using __my_atomic_ref = std::atomic_ref<T>;
++#endif
++
+ namespace base::subtle {
+ 
+ void RelaxedAtomicWriteMemcpy(base::span<uint8_t> dst,
+@@ -17,16 +26,16 @@
+   uint8_t* dst_byte_ptr = dst.data();
+   const uint8_t* src_byte_ptr = src.data();
+   // Make sure that we can at least copy byte by byte with atomics.
+-  static_assert(std::atomic_ref<uint8_t>::required_alignment == 1);
++  static_assert(__my_atomic_ref<uint8_t>::required_alignment == 1);
+ 
+   // Alignment for uintmax_t atomics that we use in the happy case.
+   constexpr size_t kDesiredAlignment =
+-      std::atomic_ref<uintmax_t>::required_alignment;
++      __my_atomic_ref<uintmax_t>::required_alignment;
+ 
+   // Copy byte-by-byte until `dst_byte_ptr` is not properly aligned for
+   // the happy case.
+   while (bytes > 0 && !IsAligned(dst_byte_ptr, kDesiredAlignment)) {
+-    std::atomic_ref<uint8_t>(*dst_byte_ptr)
++    __my_atomic_ref<uint8_t>(*dst_byte_ptr)
+         .store(*src_byte_ptr, std::memory_order_relaxed);
+     // SAFETY: We check above that `dst_byte_ptr` and `src_byte_ptr` point
+     // to spans of sufficient size.
+@@ -39,7 +48,7 @@
+   // aligned and the largest possible atomic is used for copying.
+   if (IsAligned(src_byte_ptr, kDesiredAlignment)) {
+     while (bytes >= sizeof(uintmax_t)) {
+-      std::atomic_ref<uintmax_t>(*reinterpret_cast<uintmax_t*>(dst_byte_ptr))
++      __my_atomic_ref<uintmax_t>(*reinterpret_cast<uintmax_t*>(dst_byte_ptr))
+           .store(*reinterpret_cast<const uintmax_t*>(src_byte_ptr),
+                  std::memory_order_relaxed);
+       // SAFETY: We check above that `dst_byte_ptr` and `src_byte_ptr` point
+@@ -52,7 +61,7 @@
+ 
+   // Copy what's left after the happy-case byte-by-byte.
+   while (bytes > 0) {
+-    std::atomic_ref<uint8_t>(*dst_byte_ptr)
++    __my_atomic_ref<uint8_t>(*dst_byte_ptr)
+         .store(*src_byte_ptr, std::memory_order_relaxed);
+     // SAFETY: We check above that `dst_byte_ptr` and `src_byte_ptr` point
+     // to spans of sufficient size.
+
+--- a/third_party/simdutf/simdutf.h
++++ b/third_party/simdutf/simdutf.h
+@@ -82,7 +82,7 @@
+       !defined(SIMDUTF_SPAN_DISABLED)
+     #define SIMDUTF_SPAN 1
+   #endif // __cpp_concepts >= 201907L && __cpp_lib_span >= 202002L
+-  #if __cpp_lib_atomic_ref >= 201806L
++  #if __cpp_lib_atomic_ref >= 201806L || defined(__TERMUX__)
+     #define SIMDUTF_ATOMIC_REF 1
+   #endif // __cpp_lib_atomic_ref
+ #endif
+--- a/third_party/simdutf/simdutf.cpp
++++ b/third_party/simdutf/simdutf.cpp
+@@ -2,6 +2,17 @@
+ /* begin file src/simdutf.cpp */
+ #include "simdutf.h"
+ 
++#ifdef SIMDUTF_ATOMIC_REF
++#ifdef __TERMUX__
++#include "third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h"
++template <typename T>
++using __my_atomic_ref = Foo::atomic_ref<T>;
++#else
++template <typename T>
++using __my_atomic_ref = std::atomic_ref<T>;
++#endif
++#endif
++
+ #if SIMDUTF_FEATURE_BASE64
+   // We include base64_tables once.
+ /* begin file src/tables/base64_tables.h */
+@@ -16160,7 +16171,7 @@
+ // This function is a memcpy that uses atomic operations to read from the
+ // source.
+ inline void memcpy_atomic_read(char *dst, const char *src, size_t len) {
+-  static_assert(std::atomic_ref<char>::required_alignment == sizeof(char),
++  static_assert(__my_atomic_ref<char>::required_alignment == sizeof(char),
+                 "std::atomic_ref requires the same alignment as char_type");
+   // We expect all 64-bit systems to be able to read 64-bit words from an
+   // aligned memory region atomically. You might be able to do better on
+@@ -16173,7 +16184,7 @@
+     char *mutable_src = const_cast<char *>(bytesrc);
+     for (size_t j = 0; j < bytelen; ++j) {
+       bytedst[j] =
+-          std::atomic_ref<char>(mutable_src[j]).load(std::memory_order_relaxed);
++          __my_atomic_ref<char>(mutable_src[j]).load(std::memory_order_relaxed);
+     }
+   };
+ 
+@@ -16191,7 +16202,7 @@
+   while (len >= alignment) {
+     auto *src_aligned = reinterpret_cast<uint64_t *>(const_cast<char *>(src));
+     const auto dst_value =
+-        std::atomic_ref<uint64_t>(*src_aligned).load(std::memory_order_relaxed);
++        __my_atomic_ref<uint64_t>(*src_aligned).load(std::memory_order_relaxed);
+     std::memcpy(dst, &dst_value, sizeof(uint64_t));
+     src += alignment;
+     dst += alignment;
+@@ -16207,7 +16218,7 @@
+ // This function is a memcpy that uses atomic operations to write to the
+ // destination.
+ inline void memcpy_atomic_write(char *dst, const char *src, size_t len) {
+-  static_assert(std::atomic_ref<char>::required_alignment == sizeof(char),
++  static_assert(__my_atomic_ref<char>::required_alignment == sizeof(char),
+                 "std::atomic_ref requires the same alignment as char");
+   // We expect all 64-bit systems to be able to write 64-bit words to an aligned
+   // memory region atomically.
+@@ -16219,7 +16230,7 @@
+   auto bbb_memcpy_atomic_write = [](char *bytedst, const char *bytesrc,
+                                     size_t bytelen) noexcept {
+     for (size_t j = 0; j < bytelen; ++j) {
+-      std::atomic_ref<char>(bytedst[j])
++      __my_atomic_ref<char>(bytedst[j])
+           .store(bytesrc[j], std::memory_order_relaxed);
+     }
+   };
+@@ -16239,7 +16250,7 @@
+     auto *dst_aligned = reinterpret_cast<uint64_t *>(dst);
+     uint64_t src_val;
+     std::memcpy(&src_val, src, sizeof(uint64_t)); // Non-atomic read from src
+-    std::atomic_ref<uint64_t>(*dst_aligned)
++    __my_atomic_ref<uint64_t>(*dst_aligned)
+         .store(src_val, std::memory_order_relaxed);
+     dst += alignment;
+     src += alignment;
+--- a/v8/src/objects/simd.cc
++++ b/v8/src/objects/simd.cc
+@@ -32,6 +32,15 @@
+ #include <arm_neon.h>
+ #endif
+ 
++#ifdef __TERMUX__
++#include "third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h"
++template <typename T>
++using __my_atomic_ref = Foo::atomic_ref<T>;
++#else
++template <typename T>
++using __my_atomic_ref = std::atomic_ref<T>;
++#endif
++
+ namespace v8 {
+ namespace internal {
+ 
+@@ -487,7 +496,7 @@
+   char* mutable_bytes = const_cast<char*>(bytes);
+   for (size_t i = 0; i < length; i++) {
+     uint8_t byte =
+-        std::atomic_ref<char>(mutable_bytes[i]).load(std::memory_order_relaxed);
++        __my_atomic_ref<char>(mutable_bytes[i]).load(std::memory_order_relaxed);
+     PerformNibbleToHexAndWriteIntoStringOutPut(byte, index, string_output);
+     index += 2;
+   }
+@@ -1082,7 +1091,7 @@
+     result = HandleRemainingHexValues(input_vector, i);
+     if (result.has_value()) {
+       if (is_shared) {
+-        std::atomic_ref<uint8_t>(buffer[index++])
++        __my_atomic_ref<uint8_t>(buffer[index++])
+             .store(result.value(), std::memory_order_relaxed);
+       } else {
+         buffer[index++] = result.value();
+--- a/media/audio/audio_input_device.cc
++++ b/media/audio/audio_input_device.cc
+@@ -28,6 +28,15 @@
+ #include "media/base/audio_bus.h"
+ #include "media/base/media_switches.h"
+ 
++#ifdef __TERMUX__
++#include "third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h"
++template <typename T>
++using __my_atomic_ref = Foo::atomic_ref<T>;
++#else
++template <typename T>
++using __my_atomic_ref = std::atomic_ref<T>;
++#endif
++
+ namespace media {
+ 
+ namespace {
+@@ -499,7 +508,7 @@
+     // callback_capture_->Capture() doesn't get moved to after has_unread_data
+     // has been changed, which would risk that the other side overwrites the
+     // memory while being used in Capture().
+-    std::atomic_ref<uint32_t> has_unread_data(buffer->params.has_unread_data);
++    __my_atomic_ref<uint32_t> has_unread_data(buffer->params.has_unread_data);
+     has_unread_data.store(0, std::memory_order_release);
+   }
+ 
+diff --git a/services/audio/input_sync_writer.cc b/services/audio/input_sync_writer.cc
+index 6f39e15f88..6cb29b4f02 100644
+--- a/services/audio/input_sync_writer.cc
++++ b/services/audio/input_sync_writer.cc
+@@ -22,6 +22,15 @@
+ #include "media/base/media_switches.h"
+ #include "services/audio/input_glitch_counter.h"
+ 
++#ifdef __TERMUX__
++#include "third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h"
++template <typename T>
++using __my_atomic_ref = Foo::atomic_ref<T>;
++#else
++template <typename T>
++using __my_atomic_ref = std::atomic_ref<T>;
++#endif
++
+ namespace audio {
+ 
+ namespace {
+@@ -268,7 +277,7 @@ void InputSyncWriter::ReceiveReadConfirmationsFromConsumer() {
+       // The next buffer we expect to read a confirmation from.
+       media::AudioInputBuffer* buffer =
+           GetSharedInputBuffer(next_read_buffer_index_ % audio_buses_.size());
+-      std::atomic_ref<uint32_t> has_unread_data(buffer->params.has_unread_data);
++      __my_atomic_ref<uint32_t> has_unread_data(buffer->params.has_unread_data);
+       // If this buffer has been read by the consumer side, it will have set the
+       // `has_unread_data` flag to 0.
+       if (has_unread_data.load(std::memory_order_relaxed)) {
+@@ -378,7 +387,7 @@ bool InputSyncWriter::WriteDataToCurrentSegment(
+     // Part of the experimental synchronization mechanism. We will not write
+     // more data to this buffer until the consumer side has set this flag back
+     // to 0.
+-    std::atomic_ref<uint32_t> has_unread_data(buffer->params.has_unread_data);
++    __my_atomic_ref<uint32_t> has_unread_data(buffer->params.has_unread_data);
+     has_unread_data.store(1, std::memory_order_relaxed);
+   }
+ 
+--- a/cc/metrics/shared_metrics_buffer.h
++++ b/cc/metrics/shared_metrics_buffer.h
+@@ -9,6 +9,15 @@
+ 
+ #include "device/base/synchronization/one_writer_seqlock.h"
+ 
++#ifdef __TERMUX__
++#include "third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h"
++template <typename T>
++using __my_atomic_ref = Foo::atomic_ref<T>;
++#else
++template <typename T>
++using __my_atomic_ref = std::atomic_ref<T>;
++#endif
++
+ namespace cc {
+ // The struct written in shared memory to transport metrics across
+ // processes. |data| is protected by the sequence-lock |seq_lock|.
+@@ -35,7 +44,7 @@
+       // TODO(https://github.com/llvm/llvm-project/issues/118378): Remove
+       // const_cast.
+       out =
+-          std::atomic_ref(const_cast<T&>(data)).load(std::memory_order_relaxed);
++          __my_atomic_ref(const_cast<T&>(data)).load(std::memory_order_relaxed);
+     } while (seq_lock.ReadRetry(version) && ++retries < kMaxRetries);
+ 
+     // Consider the number of retries less than kMaxRetries as success.
+@@ -44,7 +53,7 @@
+ 
+   void Write(const T& in) {
+     seq_lock.WriteBegin();
+-    std::atomic_ref(data).store(in, std::memory_order_relaxed);
++    __my_atomic_ref(data).store(in, std::memory_order_relaxed);
+     seq_lock.WriteEnd();
+   }
+ };
+--- a/services/device/public/cpp/generic_sensor/sensor_reading_shared_buffer_reader.cc
++++ b/services/device/public/cpp/generic_sensor/sensor_reading_shared_buffer_reader.cc
+@@ -12,6 +12,15 @@
+ #include "services/device/public/cpp/generic_sensor/sensor_reading.h"
+ #include "services/device/public/cpp/generic_sensor/sensor_reading_shared_buffer.h"
+ 
++#ifdef __TERMUX__
++#include "third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h"
++template <typename T>
++using __my_atomic_ref = Foo::atomic_ref<T>;
++#else
++template <typename T>
++using __my_atomic_ref = std::atomic_ref<T>;
++#endif
++
+ namespace {
+ 
+ constexpr int kMaxReadAttemptsCount = 10;
+@@ -61,7 +70,7 @@
+     version = buffer->seqlock.value().ReadBegin();
+     // TODO(https://github.com/llvm/llvm-project/issues/118378): Remove
+     // const_cast.
+-    *result = std::atomic_ref(const_cast<SensorReading&>(buffer->reading))
++    *result = __my_atomic_ref(const_cast<SensorReading&>(buffer->reading))
+                   .load(std::memory_order_relaxed);
+   } while (buffer->seqlock.value().ReadRetry(version) &&
+            ++retries < kMaxReadAttemptsCount);
+--- a/services/device/generic_sensor/platform_sensor.cc
++++ b/services/device/generic_sensor/platform_sensor.cc
+@@ -19,6 +19,15 @@
+ #include "services/device/public/cpp/generic_sensor/sensor_reading_shared_buffer.h"
+ #include "services/device/public/cpp/generic_sensor/sensor_reading_shared_buffer_reader.h"
+ 
++#ifdef __TERMUX__
++#include "third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h"
++template <typename T>
++using __my_atomic_ref = Foo::atomic_ref<T>;
++#else
++template <typename T>
++using __my_atomic_ref = std::atomic_ref<T>;
++#endif
++
+ namespace device {
+ 
+ PlatformSensor::PlatformSensor(mojom::SensorType type,
+@@ -184,7 +193,7 @@
+ void PlatformSensor::WriteToSharedBuffer(const SensorReading& reading) {
+   CHECK(is_active_);
+   reading_buffer_->seqlock.value().WriteBegin();
+-  std::atomic_ref(reading_buffer_->reading)
++  __my_atomic_ref(reading_buffer_->reading)
+       .store(reading, std::memory_order_relaxed);
+   reading_buffer_->seqlock.value().WriteEnd();
+ }
+--- a/v8/src/utils/memcopy.h
++++ b/v8/src/utils/memcopy.h
+@@ -17,6 +17,15 @@
+ #include "src/base/macros.h"
+ #include "src/utils/utils.h"
+ 
++#ifdef __TERMUX__
++#include "third_party/termux-polyfill/__termux_header_only_atomic_ref_polyfill.h"
++template <typename T>
++using __my_atomic_ref = Foo::atomic_ref<T>;
++#else
++template <typename T>
++using __my_atomic_ref = std::atomic_ref<T>;
++#endif
++
+ namespace v8::internal {
+ 
+ using Address = uintptr_t;
+@@ -345,7 +354,7 @@
+   requires std::is_integral_v<T>
+ {
+   for (size_t i = 0; i < count; i++) {
+-    std::atomic_ref<T>(destination[i]).store(value, std::memory_order_relaxed);
++    __my_atomic_ref<T>(destination[i]).store(value, std::memory_order_relaxed);
+   }
+ }
+ 

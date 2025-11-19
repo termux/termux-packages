@@ -1,0 +1,35 @@
+diff -uNr wget2-2.1.0/libwget/io.c wget2-2.1.0.mod/libwget/io.c
+--- wget2-2.1.0/libwget/io.c	2023-08-31 18:49:57.000000000 +0800
++++ wget2-2.1.0.mod/libwget/io.c	2023-09-28 06:24:36.119998368 +0800
+@@ -413,7 +413,7 @@
+ 	// find out system temp directory
+ 	if (!(tmpdir = getenv("TMPDIR")) && !(tmpdir = getenv("TMP"))
+ 		&& !(tmpdir = getenv("TEMP")) && !(tmpdir = getenv("TEMPDIR")))
+-		tmpdir = "/tmp";
++		tmpdir = "@TERMUX_PREFIX@/tmp";
+ 
+ 	// create a per-usr tmp file name
+ #ifdef HAVE_GETUID
+diff -uNr wget2-2.1.0/libwget/ssl.c wget2-2.1.0.mod/libwget/ssl.c
+--- wget2-2.1.0/libwget/ssl.c	2023-08-31 18:49:57.000000000 +0800
++++ wget2-2.1.0.mod/libwget/ssl.c	2023-09-28 06:39:10.995998420 +0800
+@@ -28,7 +28,7 @@
+ 
+ const char *wget_ssl_default_cert_dir(void)
+ {
+-	return "/etc/ssl/certs";
++	return "@TERMUX_PREFIX@/etc/ssl/certs";
+ }
+ 
+ const char *wget_ssl_default_ca_bundle_path(void)
+@@ -49,8 +49,8 @@
+ // ssl_default_path() is only called once in tls_init().
+ static const char *ssl_default_path(const char *base)
+ {
+-	if (access("/etc/ssl/certs", F_OK) == 0) {
+-		return wget_strdup("/etc/ssl/certs");
++	if (access("@TERMUX_PREFIX@/etc/ssl/certs", F_OK) == 0) {
++		return wget_strdup("@TERMUX_PREFIX@/etc/ssl/certs");
+ 	}
+ 
+ 	const char *progData = getenv("ProgramData");

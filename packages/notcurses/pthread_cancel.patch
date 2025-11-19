@@ -1,0 +1,234 @@
+--- a/src/demo/input.c
++++ b/src/demo/input.c
+@@ -4,6 +4,15 @@
+ #include <pthread.h>
+ #include "demo.h"
+ 
++#ifdef __ANDROID__
++#define PTHREAD_CANCELED ((void *)-1)
++static void
++thread_signal_handler(int signum)
++{
++  pthread_exit(PTHREAD_CANCELED);
++}
++#endif
++
+ typedef struct nciqueue {
+   ncinput ni;
+   struct nciqueue *next;
+@@ -118,6 +127,15 @@
+ 
+ static void *
+ ultramegaok_demo(void* vnc){
++#ifdef __ANDROID__
++  struct sigaction actions;
++  memset(&actions, 0, sizeof(actions));
++  sigemptyset(&actions.sa_mask);
++  actions.sa_flags = 0;
++  actions.sa_handler = thread_signal_handler;
++  sigaction(SIGUSR2, &actions, NULL);
++#endif
++
+   ncinput ni;
+   struct notcurses* nc = vnc;
+   uint32_t id;
+@@ -176,7 +194,11 @@
+ int stop_input(void){
+   int ret = 0;
+   if(input_pipefds[0] >= 0){
++#ifndef __ANDROID__
+     ret |= pthread_cancel(tid);
++#else
++    ret |= pthread_kill(tid, SIGUSR2);
++#endif
+     ret |= pthread_join(tid, NULL);
+     ret |= close(input_pipefds[0]);
+     ret |= close(input_pipefds[1]);
+--- a/src/demo/reel.c
++++ b/src/demo/reel.c
+@@ -7,6 +7,15 @@
+ #include <pthread.h>
+ #include "demo.h"
+ 
++#ifdef __ANDROID__
++#define PTHREAD_CANCELED ((void *)-1)
++static void
++thread_signal_handler(int signum)
++{
++  pthread_exit(PTHREAD_CANCELED);
++}
++#endif
++
+ #define INITIAL_TABLET_COUNT 4
+ 
+ static pthread_mutex_t renderlock = PTHREAD_MUTEX_INITIALIZER;
+@@ -27,9 +36,13 @@
+ kill_tablet(tabletctx** tctx){
+   tabletctx* t = *tctx;
+   if(t){
++#ifndef __ANDROID__
+     if(pthread_cancel(t->tid)){
+       fprintf(stderr, "Warning: error sending pthread_cancel (%s)\n", strerror(errno));
+     }
++#else
++    pthread_kill(t->tid, SIGUSR2);
++#endif
+     if(pthread_join(t->tid, NULL)){
+       fprintf(stderr, "Warning: error joining pthread (%s)\n", strerror(errno));
+     }
+@@ -117,6 +130,15 @@
+ // events for its tablet.
+ static void*
+ tablet_thread(void* vtabletctx){
++#ifdef __ANDROID__
++  struct sigaction actions;
++  memset(&actions, 0, sizeof(actions));
++  sigemptyset(&actions.sa_mask);
++  actions.sa_flags = 0;
++  actions.sa_handler = thread_signal_handler;
++  sigaction(SIGUSR2, &actions, NULL);
++#endif
++
+   static int MINSECONDS = 0;
+   tabletctx* tctx = vtabletctx;
+   while(true){
+--- a/src/demo/outro.c
++++ b/src/demo/outro.c
+@@ -1,6 +1,10 @@
+ #include <pthread.h>
+ #include "demo.h"
+ 
++#ifdef __ANDROID__
++#define PTHREAD_CANCELED ((void *)-1)
++#endif
++
+ static int y;
+ static int targy;
+ static unsigned xstart;
+--- a/src/lib/fd.c
++++ b/src/lib/fd.c
+@@ -23,6 +23,15 @@
+ #define NCPOLLEVENTS (POLLIN)
+ #endif
+ 
++#ifdef __ANDROID__
++#define PTHREAD_CANCELED ((void *)-1)
++static void
++thread_signal_handler(int signum)
++{
++  pthread_exit(PTHREAD_CANCELED);
++}
++#endif
++
+ // release the memory and fd, but don't join the thread (since we might be
+ // getting called within the thread's context, on a callback).
+ static int
+@@ -85,6 +94,15 @@
+ 
+ static void *
+ ncfdplane_thread(void* vncfp){
++#ifdef __ANDROID__
++  struct sigaction actions;
++  memset(&actions, 0, sizeof(actions));
++  sigemptyset(&actions.sa_mask);
++  actions.sa_flags = 0;
++  actions.sa_handler = thread_signal_handler;
++  sigaction(SIGUSR2, &actions, NULL);
++#endif
++
+   fdthread(vncfp, -1);
+   return NULL;
+ }
+@@ -266,6 +284,15 @@
+ // need a poll on both main fd and pidfd
+ static void *
+ ncsubproc_thread(void* vncsp){
++#ifdef __ANDROID__
++  struct sigaction actions;
++  memset(&actions, 0, sizeof(actions));
++  sigemptyset(&actions.sa_mask);
++  actions.sa_flags = 0;
++  actions.sa_handler = thread_signal_handler;
++  sigaction(SIGUSR2, &actions, NULL);
++#endif
++
+   int* status = malloc(sizeof(*status));
+   if(status){
+     ncsubproc* ncsp = vncsp;
+@@ -287,6 +314,15 @@
+ // wake up our poll()ing thread).
+ static void *
+ ncsubproc_waiter(void* vncsp){
++#ifdef __ANDROID__
++  struct sigaction actions;
++  memset(&actions, 0, sizeof(actions));
++  sigemptyset(&actions.sa_mask);
++  actions.sa_flags = 0;
++  actions.sa_handler = thread_signal_handler;
++  sigaction(SIGUSR2, &actions, NULL);
++#endif
++
+   ncsubproc* ncsp = vncsp;
+   int* status = malloc(sizeof(*status));
+   pid_t pid;
+@@ -425,7 +461,11 @@
+     // then exits. don't try to cancel the thread in that case; rely instead on
+     // killing the subprocess.
+     if(n->pidfd < 0){
++#ifndef __ANDROID__
+       pthread_cancel(n->nfp->tid);
++#else
++      pthread_kill(n->nfp->tid, SIGUSR2);
++#endif
+       // shouldn't need a cancellation of waittid thanks to SIGKILL
+       pthread_join(n->waittid, &vret);
+     }
+--- a/src/lib/in.c
++++ b/src/lib/in.c
+@@ -7,6 +7,15 @@
+ #include "render.h"
+ #include "in.h"
+ 
++#ifdef __ANDROID__
++#define PTHREAD_CANCELED ((void *)-1)
++static void
++thread_signal_handler(int signum)
++{
++  pthread_exit(PTHREAD_CANCELED);
++}
++#endif
++
+ // Notcurses takes over stdin, and if it is not connected to a terminal, also
+ // tries to make a connection to the controlling terminal. If such a connection
+ // is made, it will read from that source (in addition to stdin). We dump one or
+@@ -2498,6 +2507,14 @@
+ static void*
+ input_thread(void* vmarshall){
+   setup_alt_sig_stack();
++#ifdef __ANDROID__
++  struct sigaction actions;
++  memset(&actions, 0, sizeof(actions));
++  sigemptyset(&actions.sa_mask);
++  actions.sa_flags = SA_ONSTACK;
++  actions.sa_handler = thread_signal_handler;
++  sigaction(SIGUSR2, &actions, NULL);
++#endif
+   inputctx* ictx = vmarshall;
+   if(prep_all_keys(ictx) || build_cflow_automaton(ictx)){
+     ictx->failed = true;
+--- a/src/lib/internal.h
++++ b/src/lib/internal.h
+@@ -1832,9 +1832,13 @@
+ // have already exited), and then join it (an error here is propagated).
+ static inline int
+ cancel_and_join(const char* name, pthread_t tid, void** res){
++#ifndef __ANDROID__
+   if(pthread_cancel(tid)){
+     logerror("couldn't cancel %s thread", name); // tid might have died
+   }
++#else
++  pthread_kill(tid, SIGUSR2);
++#endif
+   if(pthread_join(tid, res)){
+     logerror("error joining %s thread", name);
+     return -1;

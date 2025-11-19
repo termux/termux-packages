@@ -1,0 +1,12 @@
+diff -uNr gzip-1.10/zgrep.in gzip-1.10.mod/zgrep.in
+--- gzip-1.10/zgrep.in	2018-03-31 06:55:32.000000000 +0300
++++ gzip-1.10.mod/zgrep.in	2019-03-01 18:41:31.001645453 +0200
+@@ -136,7 +136,7 @@
+       case $TMPDIR in
+         / | /*/) ;;
+         /*) TMPDIR=$TMPDIR/;;
+-        *) TMPDIR=/tmp/;;
++        *) TMPDIR=@TERMUX_PREFIX@/tmp/;;
+       esac
+       if type mktemp >/dev/null 2>&1; then
+         pattmp=$(mktemp "${TMPDIR}zgrepXXXXXXXXX") || exit 2

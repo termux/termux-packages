@@ -1,0 +1,56 @@
+diff -uNr ./configure.ac.orig ./configure.ac
+--- ./configure.ac.orig	2021-06-10 11:24:57.000000000 +0300
++++ ./configure.ac	2021-06-28 22:07:57.708407636 +0300
+@@ -52,9 +52,6 @@
+ PKG_PROG_PKG_CONFIG
+ AC_USE_SYSTEM_EXTENSIONS
+
+-# Default tmux.conf goes in /etc not ${prefix}/etc.
+-test "$sysconfdir" = '${prefix}/etc' && sysconfdir=/etc
+-
+ # Is this --enable-debug?
+ case "x$VERSION" in xnext*) enable_debug=yes;; esac
+ AC_ARG_ENABLE(
+@@ -176,38 +173,10 @@
+ ])
+ AC_FUNC_STRNLEN
+
+-# Check if strtonum works.
+-AC_MSG_CHECKING([for working strtonum])
+-AC_RUN_IFELSE([AC_LANG_PROGRAM(
+-		[#include <stdlib.h>],
+-		[return (strtonum("0", 0, 1, NULL) == 0 ? 0 : 1);]
+-	)],
+-	[AC_DEFINE(HAVE_STRTONUM) AC_MSG_RESULT(yes)],
+-	[AC_LIBOBJ(strtonum) AC_MSG_RESULT(no)],
+-	[AC_LIBOBJ(strtonum) AC_MSG_RESULT(no)]
+-)
+-
+-# Clang sanitizers wrap reallocarray even if it isn't available on the target
+-# system. When compiled it always returns NULL and crashes the program. To
+-# detect this we need a more complicated test.
+-AC_MSG_CHECKING([for working reallocarray])
+-AC_RUN_IFELSE([AC_LANG_PROGRAM(
+-		[#include <stdlib.h>],
+-		[return (reallocarray(NULL, 1, 1) == NULL);]
+-	)],
+-	AC_MSG_RESULT(yes),
+-	[AC_LIBOBJ(reallocarray) AC_MSG_RESULT([no])],
+-	[AC_LIBOBJ(reallocarray) AC_MSG_RESULT([no])]
+-)
+-AC_MSG_CHECKING([for working recallocarray])
+-AC_RUN_IFELSE([AC_LANG_PROGRAM(
+-		[#include <stdlib.h>],
+-		[return (recallocarray(NULL, 1, 1, 1) == NULL);]
+-	)],
+-	AC_MSG_RESULT(yes),
+-	[AC_LIBOBJ(recallocarray) AC_MSG_RESULT([no])],
+-	[AC_LIBOBJ(recallocarray) AC_MSG_RESULT([no])]
+-)
++AC_LIBOBJ(strtonum)
++AC_LIBOBJ(strtonum)
++AC_LIBOBJ(reallocarray)
++AC_LIBOBJ(recallocarray)
+
+ # Look for clock_gettime. Must come before event_init.
+ AC_SEARCH_LIBS(clock_gettime, rt)

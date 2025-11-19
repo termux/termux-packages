@@ -1,0 +1,52 @@
+--- fakeroot-1.30.1/communicate.c	2022-01-17 23:42:20.000000000 +0300
++++ fakeroot-1.30.1/communicate.c.patch	2022-11-11 22:36:56.954338881 +0300
+@@ -494,9 +494,9 @@
+   }
+ }
+ 
+-void lock_comm_sd(void)
++int lock_comm_sd(void)
+ {
+-  pthread_mutex_lock(&comm_sd_mutex);
++  return pthread_mutex_trylock(&comm_sd_mutex);
+ }
+ 
+ void unlock_comm_sd(void)
+@@ -654,12 +654,12 @@
+ 
+ void send_fakem(const struct fake_msg *buf)
+ {
+-  lock_comm_sd();
++  if (!lock_comm_sd()) {
++    open_comm_sd();
++    send_fakem_nr(buf);
+ 
+-  open_comm_sd();
+-  send_fakem_nr(buf);
+-
+-  unlock_comm_sd();
++    unlock_comm_sd();
++  }
+ }
+ 
+ static void get_fakem_nr(struct fake_msg *buf)
+@@ -694,13 +694,13 @@
+ 
+ void send_get_fakem(struct fake_msg *buf)
+ {
+-  lock_comm_sd();
++  if (!lock_comm_sd()) {
++    open_comm_sd();
++    send_fakem_nr(buf);
++    get_fakem_nr(buf);
+ 
+-  open_comm_sd();
+-  send_fakem_nr(buf);
+-  get_fakem_nr(buf);
+-
+-  unlock_comm_sd();
++    unlock_comm_sd();
++  }
+ }
+ 
+ #endif /* FAKEROOT_FAKENET */

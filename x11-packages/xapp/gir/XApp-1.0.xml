@@ -1,0 +1,196 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="XAppDarkModeManager" get-type="xapp_dark_mode_manager_get_type" parents="GObject">
+  </class>
+  <class name="XAppFavorites" get-type="xapp_favorites_get_type" parents="GObject">
+    <signal name="changed" return="void" when="first" action="1">
+    </signal>
+  </class>
+  <boxed name="XAppFavoriteInfo" get-type="xapp_favorite_info_get_type"/>
+  <class name="XAppGtkWindow" get-type="xapp_gtk_window_get_type" parents="GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <class name="XAppGpuOffloadHelper" get-type="xapp_gpu_offload_helper_get_type" parents="GObject">
+    <signal name="ready" return="void" when="last" action="1">
+      <param type="gboolean"/>
+    </signal>
+  </class>
+  <boxed name="XAppGpuInfo" get-type="xapp_gpu_info_get_type"/>
+  <class name="XAppIconChooserDialog" get-type="xapp_icon_chooser_dialog_get_type" parents="XAppGtkWindow,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="icon-size" type="XAppIconSize" flags="1073741827" default-value="XAPP_ICON_SIZE_32"/>
+    <property name="allow-paths" type="gboolean" flags="1073741827" default-value="TRUE"/>
+    <property name="default-icon" type="gchararray" flags="1073741827" default-value="NULL"/>
+    <signal name="close" return="void" when="last" action="1">
+    </signal>
+    <signal name="select" return="void" when="last" action="1">
+    </signal>
+  </class>
+  <enum name="XAppIconSize" get-type="xapp_icon_size_get_type">
+    <member name="XAPP_ICON_SIZE_16" nick="16" value="16"/>
+    <member name="XAPP_ICON_SIZE_22" nick="22" value="22"/>
+    <member name="XAPP_ICON_SIZE_24" nick="24" value="24"/>
+    <member name="XAPP_ICON_SIZE_32" nick="32" value="32"/>
+    <member name="XAPP_ICON_SIZE_48" nick="48" value="48"/>
+    <member name="XAPP_ICON_SIZE_96" nick="96" value="96"/>
+  </enum>  <enum name="XAppStatusIconState" get-type="xapp_status_icon_state_get_type">
+    <member name="XAPP_STATUS_ICON_STATE_NATIVE" nick="native" value="0"/>
+    <member name="XAPP_STATUS_ICON_STATE_FALLBACK" nick="fallback" value="1"/>
+    <member name="XAPP_STATUS_ICON_STATE_NO_SUPPORT" nick="no-support" value="2"/>
+  </enum>  <enum name="XAppScrollDirection" get-type="xapp_scroll_direction_get_type">
+    <member name="XAPP_SCROLL_UP" nick="up" value="0"/>
+    <member name="XAPP_SCROLL_DOWN" nick="down" value="1"/>
+    <member name="XAPP_SCROLL_LEFT" nick="left" value="2"/>
+    <member name="XAPP_SCROLL_RIGHT" nick="right" value="3"/>
+  </enum>  <class name="XAppIconChooserButton" get-type="xapp_icon_chooser_button_get_type" parents="GtkButton,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <implements name="GtkActivatable"/>
+    <property name="icon-size" type="GtkIconSize" flags="1073741827" default-value="GTK_ICON_SIZE_DND"/>
+    <property name="icon" type="gchararray" flags="1073741827" default-value=""/>
+    <property name="category" type="gchararray" flags="1073741827" default-value=""/>
+  </class>
+  <class name="XAppMonitorBlanker" get-type="xapp_monitor_blanker_get_type" parents="GObject">
+  </class>
+  <class name="XAppPreferencesWindow" get-type="xapp_preferences_window_get_type" parents="GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <signal name="close" return="void" when="last" action="1">
+    </signal>
+  </class>
+  <class name="XAppStackSidebar" get-type="xapp_stack_sidebar_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="stack" type="GtkStack" flags="1073742051"/>
+  </class>
+  <class name="XAppStatusIcon" get-type="xapp_status_icon_get_type" parents="GObject">
+    <property name="primary-menu" type="GtkWidget" flags="3"/>
+    <property name="secondary-menu" type="GtkWidget" flags="3"/>
+    <property name="icon-size" type="gint" flags="3" default-value="0"/>
+    <property name="name" type="gchararray" flags="7" default-value="NULL"/>
+    <signal name="state-changed" return="void" when="first" action="1">
+      <param type="XAppStatusIconState"/>
+    </signal>
+    <signal name="button-press-event" return="void" when="last" action="1">
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="button-release-event" return="void" when="last" action="1">
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="scroll-event" return="void" when="first" action="1">
+      <param type="gint"/>
+      <param type="XAppScrollDirection"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="activate" return="void" when="first" action="1">
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+  </class>
+  <class name="XAppStatusIconMonitor" get-type="xapp_status_icon_monitor_get_type" parents="GObject">
+    <signal name="icon-added" return="void" when="last" action="1">
+      <param type="XAppStatusIconInterfaceProxy"/>
+    </signal>
+    <signal name="icon-removed" return="void" when="last" action="1">
+      <param type="XAppStatusIconInterfaceProxy"/>
+    </signal>
+  </class>
+  <class name="XAppStyleManager" get-type="xapp_style_manager_get_type" parents="GObject">
+    <property name="widget" type="GtkWidget" flags="1073742051"/>
+  </class>
+  <boxed name="XAppVisibilityGroup" get-type="xapp_visibility_group_get_type"/>
+  <class name="XAppKbdLayoutController" get-type="xapp_kbd_layout_controller_get_type" parents="GObject">
+    <property name="enabled" type="gboolean" flags="1" default-value="FALSE"/>
+    <signal name="layout-changed" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="config-changed" return="void" when="last">
+    </signal>
+  </class>
+  <interface name="XAppSwitcherooControl" get-type="xapp_switcheroo_control_get_type">
+    <property name="gpus" type="GVariant" flags="227"/>
+    <property name="has-dual-gpu" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="num-gpus" type="guint" flags="227" default-value="0"/>
+  </interface>
+  <class name="XAppSwitcherooControlProxy" get-type="xapp_switcheroo_control_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="XAppSwitcherooControl"/>
+  </class>
+  <class name="XAppSwitcherooControlSkeleton" get-type="xapp_switcheroo_control_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="XAppSwitcherooControl"/>
+  </class>
+  <interface name="XAppStatusIconInterface" get-type="xapp_status_icon_interface_get_type">
+    <property name="icon-name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="icon-size" type="gint" flags="227" default-value="0"/>
+    <property name="label" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="metadata" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="primary-menu-is-open" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="secondary-menu-is-open" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="tooltip-text" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="visible" type="gboolean" flags="227" default-value="FALSE"/>
+    <signal name="handle-button-press" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="handle-button-release" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="handle-scroll" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="guint"/>
+    </signal>
+  </interface>
+  <class name="XAppStatusIconInterfaceProxy" get-type="xapp_status_icon_interface_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="XAppStatusIconInterface"/>
+  </class>
+  <class name="XAppStatusIconInterfaceSkeleton" get-type="xapp_status_icon_interface_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="XAppStatusIconInterface"/>
+  </class>
+  <interface name="XAppObject" get-type="xapp_object_get_type">
+    <prerequisite name="GDBusObject"/>
+    <property name="status-icon-interface" type="XAppStatusIconInterface" flags="227"/>
+  </interface>
+  <class name="XAppObjectProxy" get-type="xapp_object_proxy_get_type" parents="GDBusObjectProxy,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="XAppObject"/>
+  </class>
+  <class name="XAppObjectSkeleton" get-type="xapp_object_skeleton_get_type" parents="GDBusObjectSkeleton,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="XAppObject"/>
+  </class>
+  <class name="XAppObjectManagerClient" get-type="xapp_object_manager_client_get_type" parents="GDBusObjectManagerClient,GObject">
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GDBusObjectManager"/>
+  </class>
+</dump>

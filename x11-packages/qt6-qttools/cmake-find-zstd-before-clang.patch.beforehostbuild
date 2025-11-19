@@ -1,0 +1,47 @@
+# https://salsa.debian.org/qt-kde-team/qt6/qt6-tools/-/blob/debian/6.8.2-4/debian/patches/cmake-find-zstd-before-clang.diff
+# Fixes the following error
+# CMake Error at /data/data/com.termux/files/usr/lib/cmake/zstd/zstdTargets.cmake:42 (message):
+# Some (but not all) targets in this export set were already defined.
+# Targets Defined: zstd::libzstd_shared
+# Targets not yet defined: zstd::libzstd
+
+--- a/configure.cmake
++++ b/configure.cmake
+@@ -3,6 +3,19 @@
+
+ #### Tests
+
++# HACK: look for libzstd before Clang/LLVM; this way all the right
++# libzstd cmake targets are defined, instead of the partial ones defined
++# by the Findzstd shipped with LLVM
++if(NOT TARGET WrapZSTD::WrapZSTD)
++    qt_find_package(WrapZSTD 1.3
++        PROVIDED_TARGETS
++            WrapZSTD::WrapZSTD
++            zstd::libzstd
++            zstd::libzstd_static
++            zstd::libzstd_shared
++    )
++endif()
++
+ qt_find_package(WrapLibClang 8 PROVIDED_TARGETS WrapLibClang::WrapLibClang)
+
+ if(TARGET WrapLibClang::WrapLibClang)
+--- a/src/designer/src/lib/CMakeLists.txt
++++ b/src/designer/src/lib/CMakeLists.txt
+@@ -421,15 +421,6 @@
+ if(TARGET zstd::libzstd_static)
+     qt_internal_disable_find_package_global_promotion(zstd::libzstd_static)
+ endif()
+-if(NOT TARGET WrapZSTD::WrapZSTD)
+-    qt_find_package(WrapZSTD 1.3
+-        PROVIDED_TARGETS
+-            WrapZSTD::WrapZSTD
+-            zstd::libzstd
+-            zstd::libzstd_static
+-            zstd::libzstd_shared
+-    )
+-endif()
+
+ qt_internal_extend_target(Designer CONDITION QT_FEATURE_zstd
+     LIBRARIES

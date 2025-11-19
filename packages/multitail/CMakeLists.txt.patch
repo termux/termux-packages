@@ -1,0 +1,20 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -139,7 +139,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+         message(FATAL_ERROR "/usr/local/include/gnu/regex.h missing, did you install libgnuregex?")
+     endif()
+ else ()
+-    add_definitions(-DCONFIG_FILE=\"/etc/multitail.conf\")
++    add_definitions(-DCONFIG_FILE=\"@TERMUX_PREFIX@/etc/multitail.conf\")
+ endif()
+ 
+ # Set ``CURSES_NEED_NCURSES`` to ``TRUE`` before the
+@@ -142,7 +142,7 @@
+ # install the bin
+ install(TARGETS multitail DESTINATION bin)
+ # install the config file
+-install(FILES multitail.conf DESTINATION etc RENAME multitail.conf.new)
++install(FILES multitail.conf DESTINATION etc)
+ # install the manual files
+ install(FILES multitail.1 DESTINATION share/man/man1)
+ # install doc files

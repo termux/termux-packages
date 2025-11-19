@@ -1,0 +1,26 @@
+diff -Naur Python-2.7.2.orig/Lib/plat-linux2/DLFCN.py Python-2.7.2/Lib/plat-linux2/DLFCN.py
+--- Python-2.7.2.orig/Lib/plat-linux2/DLFCN.py	2011-06-11 17:46:24.000000000 +0200
++++ Python-2.7.2/Lib/plat-linux2/DLFCN.py	2013-07-29 16:34:45.318131844 +0200
+@@ -74,10 +74,17 @@
+ # Included from gnu/stubs.h
+ 
+ # Included from bits/dlfcn.h
++# PATCHED FOR ANDROID (the only supported symbols are):
++# enum {
++#  RTLD_NOW  = 0,
++#  RTLD_LAZY = 1,
++#  RTLD_LOCAL  = 0,
++#  RTLD_GLOBAL = 2,
++# };
+ RTLD_LAZY = 0x00001
+-RTLD_NOW = 0x00002
+-RTLD_BINDING_MASK = 0x3
+-RTLD_NOLOAD = 0x00004
+-RTLD_GLOBAL = 0x00100
++RTLD_NOW = 0x00000
++RTLD_BINDING_MASK = 0x0
++RTLD_NOLOAD = 0x00000
++RTLD_GLOBAL = 0x00002
+ RTLD_LOCAL = 0
+-RTLD_NODELETE = 0x01000
++RTLD_NODELETE = 0x00000

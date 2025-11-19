@@ -1,0 +1,11 @@
+--- a/core/libcutils/sockets_unix.cpp
++++ b/core/libcutils/sockets_unix.cpp
+@@ -50,7 +50,7 @@
+     return writev(sock, iovec_buffers, num_buffers);
+ }
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ int android_get_control_socket(const char* name) {
+     int fd = __android_get_control_from_env(ANDROID_SOCKET_ENV_PREFIX, name);
+ 

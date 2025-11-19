@@ -1,0 +1,30 @@
++++ ./CMakeLists.txt
+@@ -1,16 +1,9 @@
+ cmake_minimum_required(VERSION 3.7)
+ 
+-project(osmpbf VERSION 1.5.0)
++project(osmpbf VERSION 1.5.1)
+ 
+ include(GNUInstallDirs)
+ 
+-# This is needed for the protobuf_generate_cpp() function to work on newer
+-# versions of the Protobuf CMake config.
+-set(protobuf_MODULE_COMPATIBLE ON CACHE BOOL "")
+-
+-# This is needed so that we pick up the (more modern) CONFIG mode cmake file
+-# before the (older) MODULE mode cmake config file. Seems to be needed on macOS.
+-set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
+ 
+ find_package(Protobuf REQUIRED)
+ 
++++ ./osmpbf/CMakeLists.txt
+@@ -1,7 +1,7 @@
+ protobuf_generate_cpp(CPPS HS fileformat.proto osmformat.proto)
+ 
+ add_library(osmpbf STATIC ${CPPS})
+-target_compile_features(osmpbf PUBLIC cxx_std_11)
++target_compile_features(osmpbf PUBLIC cxx_std_17)
+ target_link_libraries(osmpbf PRIVATE protobuf::libprotobuf)
+ target_include_directories(osmpbf SYSTEM PUBLIC ${Protobuf_INCLUDE_DIRS})
+ install(TARGETS osmpbf ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+

@@ -1,0 +1,19 @@
+diff -u -r ../pick-3.0.1/configure ./configure
+--- ../pick-3.0.1/configure	2019-03-10 08:43:32.000000000 +0000
++++ ./configure	2019-05-07 23:32:41.496767302 +0000
+@@ -158,15 +158,8 @@
+ # Enable tracing, will end up in config.log.
+ set -x
+ 
+-if (LDFLAGS=-lcurses check_curses); then
+-	HAVE_CURSES=1
+-	LDFLAGS="${LDFLAGS} -lcurses"
+-elif (LDFLAGS=-lncursesw check_curses); then
+ 	HAVE_NCURSESW=1
+ 	LDFLAGS="${LDFLAGS} -lncursesw"
+-else
+-	fatal "curses library not found"
+-fi
+ 
+ check_dead __dead && HAVE_DEAD=1
+ check_dead __dead2 && HAVE_DEAD2=1

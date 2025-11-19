@@ -1,0 +1,17 @@
+diff --git a/src/misc.c b/src/misc.c
+index 2690923..cf9d4a7 100644
+--- a/misc.c
++++ b/misc.c
+@@ -156,8 +156,11 @@ void closeallfiles(int except)
+ 	int maxfd, i, fd, ret, z;
+ 
+ 	i = 3; /* skip stdin, stdout and stderr */
++	#if defined(__ANDROID__)
++		maxfd = sysconf(_SC_OPEN_MAX);
++	#else
+ 	maxfd = getdtablesize();
+-
++	#endif
+ 	while (i < maxfd) {
+ 		memset(pfd, 0, sizeof(pfd));
+ 

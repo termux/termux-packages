@@ -1,0 +1,17 @@
+--- a/src/runtime/src/native/libs/CMakeLists.txt
++++ b/src/runtime/src/native/libs/CMakeLists.txt
+@@ -150,13 +150,10 @@ if (CLR_CMAKE_TARGET_UNIX OR CLR_CMAKE_TARGET_BROWSER OR CLR_CMAKE_TARGET_WASI)
+         #add_subdirectory(System.Net.Security.Native) # no gssapi on tvOS, see https://developer.apple.com/documentation/gss
+         # System.Security.Cryptography.Native is intentionally disabled on tvOS
+         # it is only used for interacting with OpenSSL which isn't useful there
+-    elseif (CLR_CMAKE_TARGET_ANDROID AND NOT FORCE_ANDROID_OPENSSL)
+-        add_subdirectory(System.Security.Cryptography.Native.Android)
+-    elseif (FORCE_ANDROID_OPENSSL)
+-        add_subdirectory(System.Security.Cryptography.Native)
+     else ()
+         add_subdirectory(System.Net.Security.Native)
+         add_subdirectory(System.Security.Cryptography.Native)
++        add_subdirectory(System.Security.Cryptography.Native.Android)
+     endif ()
+ 
+     if (CLR_CMAKE_TARGET_APPLE)

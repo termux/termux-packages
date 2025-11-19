@@ -1,0 +1,117 @@
+--- a/boost/interprocess/detail/os_file_functions.hpp
++++ b/boost/interprocess/detail/os_file_functions.hpp
+@@ -537,11 +537,12 @@ inline bool remove_directory(const char *path)
+ 
+ inline bool get_temporary_path(char *buffer, std::size_t buf_len, std::size_t &required_len)
+ {
+-   required_len = 5u;
++   std::string tmpdir("@TERMUX_PREFIX@/tmp");
++   required_len = tmpdir.length() + 1;
+    if(buf_len < required_len)
+       return false;
+    else{
+-      std::strcpy(buffer, "/tmp");
++      std::strcpy(buffer, tmpdir.c_str());
+    }
+    return true;
+ }
+--- a/boost/interprocess/detail/shared_dir_helpers.hpp
++++ b/boost/interprocess/detail/shared_dir_helpers.hpp
+@@ -133,7 +133,7 @@ inline void get_shared_dir_root(std::basic_string<CharT> &dir_path)
+    #if defined (BOOST_INTERPROCESS_WINDOWS)
+       winapi::get_shared_documents_folder(dir_path);
+    #else               
+-      dir_path = "/tmp";
++      dir_path = "@TERMUX_PREFIX@/tmp";
+    #endif
+ 
+    //We always need this path, so throw on error
+--- a/libs/asio/example/cpp11/fork/daemon.cpp
++++ b/libs/asio/example/cpp11/fork/daemon.cpp
+@@ -155,7 +155,7 @@ int main()
+     }
+ 
+     // Send standard output to a log file.
+-    const char* output = "/tmp/asio.daemon.out";
++    const char* output = "@TERMUX_PREFIX@/tmp/asio.daemon.out";
+     const int flags = O_WRONLY | O_CREAT | O_APPEND;
+     const mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+     if (open(output, flags, mode) < 0)
+--- a/libs/charconv/fuzzing/Jamfile
++++ b/libs/charconv/fuzzing/Jamfile
+@@ -20,8 +20,8 @@ for local fuzzer in $(all_fuzzers)
+     local fuzz_time = 30 ;
+ 
+     # Create the output corpus directories
+-    make /tmp/corpus/$(fuzzer) : : common.MkDir ;
+-    make /tmp/mincorpus/$(fuzzer) : : common.MkDir ;
++    make @TERMUX_PREFIX@/tmp/corpus/$(fuzzer) : : common.MkDir ;
++    make @TERMUX_PREFIX@/tmp/mincorpus/$(fuzzer) : : common.MkDir ;
+ 
+     # Build the fuzzer
+     exe $(fuzzer)
+@@ -52,16 +52,16 @@ for local fuzzer in $(all_fuzzers)
+         : <testing.arg>"seedcorpus/$(fuzzer) -max_total_time=$(fuzz_time)"
+         : target-name $(fuzzer)-fuzzing
+         : requirements
+-            <dependency>/tmp/corpus/$(fuzzer)
++            <dependency>@TERMUX_PREFIX@/tmp/corpus/$(fuzzer)
+     ;
+ 
+     # Minimize the corpus
+     run $(fuzzer)
+-        : <testing.arg>"/tmp/mincorpus/$(fuzzer) /tmp/corpus/$(fuzzer) -merge=1"
++        : <testing.arg>"@TERMUX_PREFIX@/tmp/mincorpus/$(fuzzer) @TERMUX_PREFIX@/tmp/corpus/$(fuzzer) -merge=1"
+         : target-name $(fuzzer)-minimize-corpus
+         : requirements
+             <dependency>$(fuzzer)-fuzzing
+-            <dependency>/tmp/corpus/$(fuzzer)
+-            <dependency>/tmp/mincorpus/$(fuzzer)
++            <dependency>@TERMUX_PREFIX@/tmp/corpus/$(fuzzer)
++            <dependency>@TERMUX_PREFIX@/tmp/mincorpus/$(fuzzer)
+     ;
+ }
+--- a/libs/filesystem/src/operations.cpp
++++ b/libs/filesystem/src/operations.cpp
+@@ -4754,7 +4754,7 @@ path temp_directory_path(system::error_code* ec)
+         (val = std::getenv("TEMPDIR"));
+ 
+ #ifdef __ANDROID__
+-    const char* default_tmp = "/data/local/tmp";
++    const char* default_tmp = "@TERMUX_PREFIX@/tmp";
+ #else
+     const char* default_tmp = "/tmp";
+ #endif
+--- a/libs/json/example/parse_into.cpp
++++ b/libs/json/example/parse_into.cpp
+@@ -135,7 +135,7 @@ using namespace std::chrono_literals;
+ int main()
+ {
+     // https://github.com/kostya/benchmarks/blob/master/json/generate_json.rb
+-    std::ifstream is( "/tmp/1.json" );
++    std::ifstream is( "@TERMUX_PREFIX@/tmp/1.json" );
+     std::string json( std::istreambuf_iterator<char>( is ), std::istreambuf_iterator<char>{} );
+ 
+     std::cout << "1.json: " << json.size() << " bytes\n";
+--- a/tools/build/src/engine/pathunix.cpp
++++ b/tools/build/src/engine/pathunix.cpp
+@@ -42,7 +42,7 @@ unsigned long path_get_process_id_( void )
+ void path_get_temp_path_( string * buffer )
+ {
+     char const * t = getenv( "TMPDIR" );
+-    string_append( buffer, t ? t : "/tmp" );
++    string_append( buffer, t ? t : "@TERMUX_PREFIX@/tmp" );
+ }
+ 
+ 
+--- a/tools/build/src/engine/pathvms.cpp
++++ b/tools/build/src/engine/pathvms.cpp
+@@ -74,7 +74,7 @@ unsigned long path_get_process_id_( void )
+ void path_get_temp_path_( string * buffer )
+ {
+     char const * t = getenv( "TMPDIR" );
+-    string_append( buffer, t ? t : "/tmp" );
++    string_append( buffer, t ? t : "@TERMUX_PREFIX@/tmp" );
+ }
+ 
+ 

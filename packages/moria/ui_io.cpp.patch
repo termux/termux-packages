@@ -1,0 +1,36 @@
+Fix error
+```
+/storage/termux-build/moria/src/src/ui_io.cpp:524:19: error: cast from 'int *' to 'fd_set *' increases required alignment from 4 to 8 [-Werror,-Wcast-align]
+    if (select(1, (fd_set *) &smask, (fd_set *) nullptr, (fd_set *) nullptr, &tbuf) == 1) {
+                  ^~~~~~~~~~~~~~~~~
+```
+--- ../ui_io.cpp.orig	2020-06-06 09:51:45.583712965 +0200
++++ ./src/ui_io.cpp	2020-06-06 09:50:23.113801315 +0200
+@@ -514,14 +514,15 @@
+ #else
+     struct timeval tbuf {};
+     int ch;
+-    int smask;
++    fd_set readfds;
++
++    FD_SET(1, &readfds);
+ 
+     // Return true if a read on descriptor 1 will not block.
+     tbuf.tv_sec = 0;
+     tbuf.tv_usec = microseconds;
+ 
+-    smask = 1; // i.e. (1 << 0)
+-    if (select(1, (fd_set *) &smask, (fd_set *) nullptr, (fd_set *) nullptr, &tbuf) == 1) {
++    if (select(1, &readfds, (fd_set *) nullptr, (fd_set *) nullptr, &tbuf) == 1) {
+         ch = getch();
+         // check for EOF errors here, select sometimes works even when EOF
+         if (ch == -1) {
+@@ -636,7 +637,7 @@
+ // Check user permissions on Unix based systems,
+ // or if on Windows just return. -MRC-
+ bool checkFilePermissions() {
+-#ifndef _WIN32
++#if !defined(_WIN32) && !defined(__ANDROID__)
+     if (0 != setuid(getuid())) {
+         perror("Can't set permissions correctly!  Setuid call failed.\n");
+         return false;

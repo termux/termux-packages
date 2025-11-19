@@ -1,0 +1,24 @@
+diff --color -uNr qtbase-everywhere-src-5.12.10/src/network/ssl/qsslsocket.cpp qtbase-everywhere-src-5.12.10.mod/src/network/ssl/qsslsocket.cpp
+--- qtbase-everywhere-src-5.12.10/src/network/ssl/qsslsocket.cpp	2020-09-21 14:16:21.000000000 +0100
++++ qtbase-everywhere-src-5.12.10.mod/src/network/ssl/qsslsocket.cpp	2021-05-15 21:38:31.770873374 +0100
+@@ -2800,7 +2800,8 @@
+                                << "/usr/local/ssl/certs/" // Solaris
+                                << "/etc/openssl/certs/" // BlackBerry
+                                << "/opt/openssl/certs/" // HP-UX
+-                               << "/etc/ssl/"; // OpenBSD
++                               << "/etc/ssl/" // OpenBSD
++                               << "@TERMUX_PREFIX@/etc/tls/"; // Termux
+ }
+ 
+ /*!
+diff --color -uNr qtbase-everywhere-src-5.12.10/src/network/ssl/qsslsocket_openssl.cpp qtbase-everywhere-src-5.12.10.mod/src/network/ssl/qsslsocket_openssl.cpp
+--- qtbase-everywhere-src-5.12.10/src/network/ssl/qsslsocket_openssl.cpp	2020-09-21 14:16:21.000000000 +0100
++++ qtbase-everywhere-src-5.12.10.mod/src/network/ssl/qsslsocket_openssl.cpp	2021-05-15 21:36:38.303135420 +0100
+@@ -670,6 +670,7 @@
+         systemCerts.append(QSslCertificate::fromPath(QLatin1String("/etc/pki/tls/certs/ca-bundle.crt"), QSsl::Pem)); // Fedora, Mandriva
+         systemCerts.append(QSslCertificate::fromPath(QLatin1String("/usr/local/share/certs/ca-root-nss.crt"), QSsl::Pem)); // FreeBSD's ca_root_nss
+ # endif
++        systemCerts.append(QSslCertificate::fromPath(QLatin1String("@TERMUX_PREFIX@/etc/tls/cert.pem"), QSsl::Pem)); // Termux ca-certificates
+     }
+ #endif
+ #ifdef QSSLSOCKET_DEBUG

@@ -1,0 +1,16 @@
+LLDB uses a really broken logic to find whether the shell command failed or
+not for Android. Sadly there's nothing much we can do to fix it (unless anyone
+decides to work on a write a proper patch for the same).
+--- a/lldb/source/Plugins/Platform/Android/AdbClient.cpp	2022-06-09 10:32:03.335331787 +0530
++++ b/lldb/source/Plugins/Platform/Android/AdbClient.cpp	2022-06-09 10:37:37.749300877 +0530
+@@ -370,8 +370,8 @@
+     return error;
+ 
+   // ADB doesn't propagate return code of shell execution - if
+-  // output starts with /system/bin/sh: most likely command failed.
+-  static const char *kShellPrefix = "/system/bin/sh:";
++  // output starts with @TERMUX_PREFIX@/bin/sh: most likely command failed.
++  static const char *kShellPrefix = "@TERMUX_PREFIX@/bin/sh:";
+   if (output_buf.size() > strlen(kShellPrefix)) {
+     if (!memcmp(&output_buf[0], kShellPrefix, strlen(kShellPrefix)))
+       return Status("Shell command %s failed: %s", command,

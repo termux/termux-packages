@@ -1,0 +1,21 @@
+------------------------------------------------------------------------
+r12532 | ollydbg | 2021-10-06 23:29:21 +0900 (Wed, 06 Oct 2021) | 4 lines
+
+* Fix CCManager compilation with C++17(apply patch #1142, thanks Miguel Gimenez)
+
+See details in: https://sourceforge.net/p/codeblocks/tickets/1142/
+and forum discussion: https://forums.codeblocks.org/index.php/topic,24643.0.html
+------------------------------------------------------------------------
+Index: src/include/ccmanager.h
+===================================================================
+--- src/include/ccmanager.h	(revision 12531)
++++ src/include/ccmanager.h	(revision 12532)
+@@ -44,7 +44,7 @@
+  * list or the doxygen popup, the scroll event is instead sent there (and skipped for the editor
+  * window).
+  */
+-class DLLIMPORT CCManager : public Mgr<CCManager>, wxEvtHandler
++class DLLIMPORT CCManager : public Mgr<CCManager>, public wxEvtHandler
+ {
+     public:
+         friend class Mgr<CCManager>;

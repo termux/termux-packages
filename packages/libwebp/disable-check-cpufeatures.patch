@@ -1,0 +1,17 @@
+libcpufeatures in only used in libwebp for NEON,
+and all Termux's supported ARM devices support NEON
+(Android 5.0+ requires NEON: https://developer.android.com/ndk/guides/cpu-arm-neon)
+and the NEON support is already successfully detected at configure-time separately from this:
+-- Performing Test WEBP_HAVE_FLAG_NEON - Success
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -181,7 +181,7 @@ endif()
+ 
+ # ##############################################################################
+ # Android only.
+-if(ANDROID)
++if(FALSE)
+   include_directories(${ANDROID_NDK}/sources/android/cpufeatures)
+   add_library(cpufeatures-webp STATIC
+               ${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c)

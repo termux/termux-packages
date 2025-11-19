@@ -1,0 +1,41 @@
+diff -uNr testdisk-7.1/Makefile.am testdisk-7.1.mod/Makefile.am
+--- testdisk-7.1/Makefile.am	2018-02-26 11:38:21.000000000 +0200
++++ testdisk-7.1.mod/Makefile.am	2020-01-14 21:35:16.960542921 +0200
+@@ -47,7 +47,7 @@
+ 
+ static:
+ 	rm -f src/testdisk src/testdisk.exe src/photorec src/photorec.exe src/fidentify src/fidentify.exe src/qphotorec src/qphotorec.exe
+-	$(MAKE) LDFLAGS="$(LDFLAGS) -static" LIBS="$(PTHREAD_LIBS) $(LIBS)" CFLAGS="$(PTHREAD_CFLAGS) $(CFLAGS)" CXXFLAGS="$(PTHREAD_CFLAGS) $(CXXFLAGS)"
++	$(MAKE) LDFLAGS="$(LDFLAGS)" LIBS="$(PTHREAD_LIBS) $(LIBS)" CFLAGS="$(PTHREAD_CFLAGS) $(CFLAGS)" CXXFLAGS="$(PTHREAD_CFLAGS) $(CXXFLAGS)"
+ 
+ smallstatic:
+ 	$(MAKE) static
+@@ -57,6 +57,6 @@
+ 	(cd src && $(MAKE) extras) || exit 1;
+ 
+ extrasstatic:
+-	$(MAKE) LDFLAGS="$(LDFLAGS) -static" LIBS="$(PTHREAD_LIBS) $(LIBS)" CFLAGS="$(PTHREAD_CFLAGS) $(CFLAGS)" CXXFLAGS="$(PTHREAD_CFLAGS) $(CXXFLAGS)" extras
++	$(MAKE) LDFLAGS="$(LDFLAGS)" LIBS="$(PTHREAD_LIBS) $(LIBS)" CFLAGS="$(PTHREAD_CFLAGS) $(CFLAGS)" CXXFLAGS="$(PTHREAD_CFLAGS) $(CXXFLAGS)" extras
+ 
+ DISTCLEANFILES = *~ core
+diff -uNr testdisk-7.1/Makefile.in testdisk-7.1.mod/Makefile.in
+--- testdisk-7.1/Makefile.in	2019-07-07 17:26:07.000000000 +0300
++++ testdisk-7.1.mod/Makefile.in	2020-01-14 21:35:57.776699056 +0200
+@@ -866,7 +866,7 @@
+ 
+ static:
+ 	rm -f src/testdisk src/testdisk.exe src/photorec src/photorec.exe src/fidentify src/fidentify.exe src/qphotorec src/qphotorec.exe
+-	$(MAKE) LDFLAGS="$(LDFLAGS) -static" LIBS="$(PTHREAD_LIBS) $(LIBS)" CFLAGS="$(PTHREAD_CFLAGS) $(CFLAGS)" CXXFLAGS="$(PTHREAD_CFLAGS) $(CXXFLAGS)"
++	$(MAKE) LDFLAGS="$(LDFLAGS)" LIBS="$(PTHREAD_LIBS) $(LIBS)" CFLAGS="$(PTHREAD_CFLAGS) $(CFLAGS)" CXXFLAGS="$(PTHREAD_CFLAGS) $(CXXFLAGS)"
+ 
+ smallstatic:
+ 	$(MAKE) static
+@@ -876,7 +876,7 @@
+ 	(cd src && $(MAKE) extras) || exit 1;
+ 
+ extrasstatic:
+-	$(MAKE) LDFLAGS="$(LDFLAGS) -static" LIBS="$(PTHREAD_LIBS) $(LIBS)" CFLAGS="$(PTHREAD_CFLAGS) $(CFLAGS)" CXXFLAGS="$(PTHREAD_CFLAGS) $(CXXFLAGS)" extras
++	$(MAKE) LDFLAGS="$(LDFLAGS)" LIBS="$(PTHREAD_LIBS) $(LIBS)" CFLAGS="$(PTHREAD_CFLAGS) $(CFLAGS)" CXXFLAGS="$(PTHREAD_CFLAGS) $(CXXFLAGS)" extras
+ 
+ # Tell versions [3.59,3.63) of GNU make to not export all variables.
+ # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -1,0 +1,20 @@
+diff -u -r ../cairo-dock-core-3.5.1/src/gldit/CMakeLists.txt ./src/gldit/CMakeLists.txt
+--- ../cairo-dock-core-3.5.1/src/gldit/CMakeLists.txt	2024-09-21 17:48:58.000000000 +0000
++++ ./src/gldit/CMakeLists.txt	2025-01-06 12:27:25.206975976 +0000
+@@ -108,6 +108,7 @@
+ 
+ # Link the result to the librairies.
+ target_link_libraries("gldi"
++	"m"
+ 	${PACKAGE_LIBRARIES}
+ 	${GTK_LIBRARIES}
+ 	${EGL_LIBRARIES}
+@@ -122,8 +123,6 @@
+ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/gldi.pc.in ${CMAKE_CURRENT_BINARY_DIR}/gldi.pc)
+ install (FILES  ${CMAKE_CURRENT_BINARY_DIR}/gldi.pc DESTINATION ${install-pc-path})
+ install (FILES  ${CMAKE_CURRENT_BINARY_DIR}/libgldi.so DESTINATION ${libdir})
+-install (FILES  ${CMAKE_CURRENT_BINARY_DIR}/libgldi.so.${VERSION} DESTINATION ${libdir})
+-install (FILES  ${CMAKE_CURRENT_BINARY_DIR}/libgldi.so.${SOVERSION} DESTINATION ${libdir})
+ 
+ ########### install files ###############
+ 

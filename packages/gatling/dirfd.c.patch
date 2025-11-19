@@ -1,0 +1,13 @@
+--- ./dirfd.c.orig	2022-02-16 19:21:13.191563941 +0530
++++ ./dirfd.c	2022-02-16 19:21:53.651563925 +0530
+@@ -12,6 +12,10 @@
+ 
+ int maxlngdelta=10;
+ 
++#ifdef __linux__
++int ifd;
++#endif
++
+ #if __GNUC__ < 3
+ #define __expect(foo,bar) (foo)
+ #else

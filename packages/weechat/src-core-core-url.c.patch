@@ -1,0 +1,48 @@
+--- a/src/core/core-url.c
++++ b/src/core/core-url.c
+@@ -1337,8 +1337,9 @@
+  */
+ 
+ int
+-weeurl_download (const char *url, struct t_hashtable *options,
+-                 struct t_hashtable *output)
++weeurl_download_internal (const char *url, struct t_hashtable *options,
++                 struct t_hashtable *output, void (thread_testcancel_func)(void *args),
++                 void *thread_test_cancel_args)
+ {
+     CURL *curl;
+     struct t_url_file url_file[2];
+@@ -1374,7 +1375,9 @@
+         goto end;
+     }
+ 
++    if (thread_testcancel_func != NULL) thread_testcancel_func (thread_test_cancel_args);
+     curl = curl_easy_init ();
++    if (thread_testcancel_func != NULL) thread_testcancel_func (thread_test_cancel_args);
+     if (!curl)
+     {
+         snprintf (url_error, sizeof (url_error), "%s", _("not enough memory"));
+@@ -1452,7 +1455,9 @@
+     curl_easy_setopt (curl, CURLOPT_ERRORBUFFER, url_error);
+ 
+     /* perform action! */
++    if (thread_testcancel_func != NULL) thread_testcancel_func (thread_test_cancel_args);
+     curl_rc = curl_easy_perform (curl);
++    if (thread_testcancel_func != NULL) thread_testcancel_func (thread_test_cancel_args);
+     if (curl_rc == CURLE_OK)
+     {
+         if (output)
+@@ -1516,6 +1521,13 @@
+     return rc;
+ }
+ 
++int
++weeurl_download (const char *url, struct t_hashtable *options,
++                 struct t_hashtable *output)
++{
++    return weeurl_download_internal (url, options, output, NULL, NULL);
++}
++
+ /*
+  * Adds an URL option in an infolist.
+  *

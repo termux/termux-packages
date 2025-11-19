@@ -1,0 +1,23 @@
+From 62d5b2d96bd8890d82ee5150fc4d0db76e68106d Mon Sep 17 00:00:00 2001
+From: Boyi C <fanthos@live.com>
+Date: Tue, 28 Mar 2023 12:23:33 +0800
+Subject: [PATCH] Update tty.rs to support putty
+
+Add mode 1002 to tts, to make mouse works in Putty.
+---
+ src/input/tty.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/input/tty.rs b/src/input/tty.rs
+index 5cf491b..38dd3f6 100644
+--- a/src/input/tty.rs
++++ b/src/input/tty.rs
+@@ -65,7 +65,7 @@ enum TTY {
+     File(File),
+ }
+ 
+-const SEQUENCES: [(u32, bool); 4] = [(1049, true), (1003, true), (1006, true), (25, false)];
++const SEQUENCES: [(u32, bool); 5] = [(1049, true), (1002, true), (1003, true), (1006, true), (25, false)];
+ 
+ impl TTY {
+     fn stdin() -> TTY {

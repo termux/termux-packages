@@ -1,0 +1,39 @@
+diff -uNr e2fsprogs-1.44.4/lib/ext2fs/ismounted.c e2fsprogs-1.44.4.mod/lib/ext2fs/ismounted.c
+--- e2fsprogs-1.44.4/lib/ext2fs/ismounted.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/lib/ext2fs/ismounted.c	2018-09-22 15:22:14.795917878 +0300
+@@ -57,6 +57,26 @@
+ #include "ext2fs.h"
+ #include "ext2fsP.h"
+ 
++char *hasmntopt(const struct mntent *mnt, const char *opt)
++{
++	char *cp = mnt->mnt_opts;
++	int	len = strlen(opt);
++
++	if (!mnt->mnt_opts)
++		return 0;
++
++	while (1) {
++		if (!(cp = strstr(cp, opt)))
++			break;
++		if ((cp == mnt->mnt_opts || cp[-1]==',') &&
++		    (cp[len] == 0 || cp[len] == ',' || cp[len] == '='))
++			return cp;
++		cp += (len + 1);
++	}
++
++	return 0;
++}
++
+ #ifdef HAVE_SETMNTENT
+ /*
+  * Check to see if a regular file is mounted.
+@@ -234,7 +254,7 @@
+ 	errcode_t	retval;
+ 
+ #ifdef DEBUG
+-	retval = check_mntent_file("/tmp/mtab", file, mount_flags,
++	retval = check_mntent_file("@TERMUX_PREFIX@/tmp/mtab", file, mount_flags,
+ 				   mtpt, mtlen);
+ 	if (retval == 0)
+ 		return 0;

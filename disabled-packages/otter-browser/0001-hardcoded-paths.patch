@@ -1,0 +1,50 @@
+diff --color -uNr src/3rdparty/breakpad/src/client/linux/crash_generation/crash_generation_server.cc src.mod/3rdparty/breakpad/src/client/linux/crash_generation/crash_generation_server.cc
+--- src/3rdparty/breakpad/src/client/linux/crash_generation/crash_generation_server.cc	2020-12-21 21:34:21.000000000 +0000
++++ src.mod/3rdparty/breakpad/src/client/linux/crash_generation/crash_generation_server.cc	2021-05-22 17:09:44.802941078 +0100
+@@ -72,7 +72,7 @@
+   if (dump_path)
+     dump_dir_ = *dump_path;
+   else
+-    dump_dir_ = "/tmp";
++    dump_dir_ = "@TERMUX_PREFIX@/tmp";
+ }
+ 
+ CrashGenerationServer::~CrashGenerationServer()
+diff --color -uNr src/3rdparty/breakpad/src/client/linux/minidump_writer/minidump_writer.cc src.mod/3rdparty/breakpad/src/client/linux/minidump_writer/minidump_writer.cc
+--- src/3rdparty/breakpad/src/client/linux/minidump_writer/minidump_writer.cc	2020-12-21 21:34:21.000000000 +0000
++++ src.mod/3rdparty/breakpad/src/client/linux/minidump_writer/minidump_writer.cc	2021-05-22 17:08:14.343199518 +0100
+@@ -229,7 +229,7 @@
+     dir.CopyIndex(dir_index++, &dirent);
+ 
+     dirent.stream_type = MD_LINUX_LSB_RELEASE;
+-    if (!WriteFile(&dirent.location, "/etc/lsb-release"))
++    if (!WriteFile(&dirent.location, "@TERMUX_PREFIX@/etc/lsb-release"))
+       NullifyDirectoryEntry(&dirent);
+     dir.CopyIndex(dir_index++, &dirent);
+ 
+diff --color -uNr src/3rdparty/libmimeapps/Tools.cpp src.mod/3rdparty/libmimeapps/Tools.cpp
+--- src/3rdparty/libmimeapps/Tools.cpp	2020-12-21 21:34:21.000000000 +0000
++++ src.mod/3rdparty/libmimeapps/Tools.cpp	2021-05-22 17:05:20.315735013 +0100
+@@ -166,8 +166,8 @@
+ 		std::map<std::string, std::string> defaultVariableValues;
+ 		defaultVariableValues["XDG_DATA_HOME"] = std::string("$HOME/.local/share");
+ 		defaultVariableValues["XDG_CONFIG_HOME"] = std::string("$HOME/.config");
+-		defaultVariableValues["XDG_DATA_DIRS"] = std::string("/usr/local/share/:/usr/share/");
+-		defaultVariableValues["XDG_CONFIG_DIRS"] = std::string("/etc/xdg");
++		defaultVariableValues["XDG_DATA_DIRS"] = std::string("@TERMUX_PREFIX@/local/share/:@TERMUX_PREFIX@/share/");
++		defaultVariableValues["XDG_CONFIG_DIRS"] = std::string("@TERMUX_PREFIX@/etc/xdg");
+ 
+ 		if (defaultVariableValues.find(name) != defaultVariableValues.end())
+ 		{
+diff --color -uNr src/3rdparty/sonnet/src/plugins/hunspell/hunspellclient.cpp src.mod/3rdparty/sonnet/src/plugins/hunspell/hunspellclient.cpp
+--- src/3rdparty/sonnet/src/plugins/hunspell/hunspellclient.cpp	2020-12-21 21:34:21.000000000 +0000
++++ src.mod/3rdparty/sonnet/src/plugins/hunspell/hunspellclient.cpp	2021-05-22 17:06:28.327518090 +0100
+@@ -57,7 +57,7 @@
+ #ifdef Q_OS_MAC
+     directories << QLatin1String("/System/Library/Spelling/");
+ #else
+-    directories << QLatin1String("/usr/share/hunspell/") << QLatin1String("/usr/local/share/hunspell/") << QLatin1String("/usr/share/myspell/") << QLatin1String("/usr/share/myspell/dicts/") << QLatin1String("/usr/local/share/mozilla-dicts/");
++    directories << QLatin1String("@TERMUX_PREFIX@/share/hunspell/") << QLatin1String("@TERMUX_PREFIX@/local/share/hunspell/") << QLatin1String("@TERMUX_PREFIX@/share/myspell/") << QLatin1String("@TERMUX_PREFIX@/share/myspell/dicts/") << QLatin1String("@TERMUX_PREFIX@/local/share/mozilla-dicts/");
+ #endif
+ 
+     const QString otterDirectory(qgetenv("OTTER_DICTIONARIES"));

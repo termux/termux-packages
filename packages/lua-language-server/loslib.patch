@@ -1,0 +1,15 @@
+--- lua-language-server/3rd/bee.lua/3rd/lua/loslib.c	2021-08-09 14:37:07.223522941 +0530
++++ lua-language-server-patch/3rd/bee.lua/3rd/lua/loslib.c	2021-08-10 00:15:30.293997622 +0530
+@@ -114,10 +114,10 @@
+ 
+ #include <unistd.h>
+ 
+-#define LUA_TMPNAMBUFSIZE	32
++#define LUA_TMPNAMBUFSIZE	128
+ 
+ #if !defined(LUA_TMPNAMTEMPLATE)
+-#define LUA_TMPNAMTEMPLATE	"/tmp/lua_XXXXXX"
++#define LUA_TMPNAMTEMPLATE	"@TERMUX_PREFIX@/tmp/lua_XXXXXX"
+ #endif
+ 
+ #define lua_tmpnam(b,e) { \

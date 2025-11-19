@@ -1,0 +1,21 @@
+diff -uNr openssh-portable-V_9_8_P1/servconf.c openssh-portable-V_9_8_P1.mod/servconf.c
+--- openssh-portable-V_9_8_P1/servconf.c	2024-07-01 12:36:28.000000000 +0800
++++ openssh-portable-V_9_8_P1.mod/servconf.c	2024-07-01 17:43:33.815637935 +0800
+@@ -317,7 +317,7 @@
+ 	}
+ 	/* No certificates by default */
+ 	if (options->num_ports == 0)
+-		options->ports[options->num_ports++] = SSH_DEFAULT_PORT;
++		options->ports[options->num_ports++] = 8022 /*SSH_DEFAULT_PORT*/;
+ 	if (options->address_family == -1)
+ 		options->address_family = AF_UNSPEC;
+ 	if (options->listen_addrs == NULL)
+@@ -933,7 +933,7 @@
+ 	struct queued_listenaddr *qla;
+ 
+ 	if (options->num_ports == 0)
+-		options->ports[options->num_ports++] = SSH_DEFAULT_PORT;
++		options->ports[options->num_ports++] = 8022 /*SSH_DEFAULT_PORT*/;
+ 	if (options->address_family == -1)
+ 		options->address_family = AF_UNSPEC;
+ 

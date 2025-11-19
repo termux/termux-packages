@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://git.vuxu.org/lr/about/
+TERMUX_PKG_DESCRIPTION="list files, recursively, includes the best features of ls, find, stat and du"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="2.0.1"
+TERMUX_PKG_SRCURL=https://git.vuxu.org/lr/snapshot/lr-$TERMUX_PKG_VERSION.tar.xz
+TERMUX_PKG_SHA256=9131f272891f14fbb8f222d6758e07acd69a8d6bda610c674b98bd07801c3a7c
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_BUILD_IN_SRC=true

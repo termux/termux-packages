@@ -1,0 +1,13 @@
+https://github.com/termux/termux-packages/issues/13590
+
+--- a/cli/helper.cpp
++++ b/cli/helper.cpp
+@@ -778,7 +778,7 @@ FieldId FieldId::fromTagDenotation(std::
+     if (knownField == KnownField::Invalid) {
+         throw ConversionException("generic field name is unknown");
+     }
+-    return FieldId(knownField, nullptr, 0);
++    return FieldId(knownField, denotation.data(), denotation.size());
+ }
+ 
+ FieldId FieldId::fromTrackDenotation(std::string_view denotation)

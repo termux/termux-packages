@@ -1,0 +1,24 @@
+diff -u -r ../deborphan/src/pkginfo.c ./src/pkginfo.c
+--- ../deborphan/src/pkginfo.c	2016-02-21 09:05:27.000000000 -0500
++++ ./src/pkginfo.c	2016-08-11 06:10:28.211955162 -0400
+@@ -106,10 +106,16 @@
+     regfree(&re_statushold);
+     regfree(&re_statusconfig);
+     regfree(&re_status);
+-    regfree(&re_namedev);
+-    regfree(&re_gnugrepv);
+-    regfree(&re_descdummy);
+-    regfree(&re_desctransit);
++    if (options[GUESS]) {
++        if (!guess_unique(GUESS_SECTION))
++            regfree(&re_namedev);
++        if (guess_chk(GUESS_SECTION))
++            regfree(&re_gnugrepv);
++        if (guess_chk(GUESS_DUMMY)) {
++            regfree(&re_descdummy);
++            regfree(&re_desctransit);
++        }
++    }
+ }
+ 
+ /* A similar "hack" was created by Paul Martin a while ago. It was not

@@ -1,0 +1,19 @@
+We use `clang-13` as host CC, `libgcc` as compiler runtime. `clang-13` will make
+`__builtin_mul_overflow` link against `__mulodi4`, which doesn't exist in `libgcc`.
+
+Break since commit v8/v8@2301870e757aac6148fd9f7508201d5a8217110c
+
+See also:
+[1] https://github.com/ClangBuiltLinux/linux/issues/1438#issuecomment-908551114
+[2] https://reviews.llvm.org/D108928
+--- a/v8/include/v8config.h
++++ b/v8/include/v8config.h
+@@ -366,7 +366,7 @@
+ # define V8_HAS_BUILTIN_POPCOUNT (__has_builtin(__builtin_popcount))
+ # define V8_HAS_BUILTIN_ADD_OVERFLOW (__has_builtin(__builtin_add_overflow))
+ # define V8_HAS_BUILTIN_SUB_OVERFLOW (__has_builtin(__builtin_sub_overflow))
+-# define V8_HAS_BUILTIN_MUL_OVERFLOW (__has_builtin(__builtin_mul_overflow))
++# define V8_HAS_BUILTIN_MUL_OVERFLOW (0)
+ # define V8_HAS_BUILTIN_SADD_OVERFLOW (__has_builtin(__builtin_sadd_overflow))
+ # define V8_HAS_BUILTIN_SSUB_OVERFLOW (__has_builtin(__builtin_ssub_overflow))
+ # define V8_HAS_BUILTIN_UADD_OVERFLOW (__has_builtin(__builtin_uadd_overflow))

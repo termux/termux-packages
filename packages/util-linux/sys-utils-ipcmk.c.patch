@@ -1,0 +1,59 @@
+--- ./sys-utils/ipcmk.c.orig	2021-06-05 14:50:46.811230515 +0000
++++ ./sys-utils/ipcmk.c	2021-06-05 14:52:14.776138430 +0000
+@@ -26,8 +26,10 @@
+ #include <stdlib.h>
+ #include <sys/ipc.h>
+ #include <sys/msg.h>
++#ifndef __ANDROID__
+ #include <sys/sem.h>
+ #include <sys/shm.h>
++#endif
+ #include <sys/time.h>
+ 
+ #include "c.h"
+@@ -56,10 +56,14 @@
+ 
+ static int create_shm(size_t size, int permission)
+ {
++#ifdef __ANDROID__
++	return -1;
++#else
+ 	key_t key;
+ 
+ 	ul_random_get_bytes(&key, sizeof(key));
+ 	return shmget(key, size, permission | IPC_CREAT);
++#endif
+ }
+ 
+ #ifndef HAVE_SYS_MMAN_H
+@@ -91,10 +95,14 @@ static int create_posix_shm(const char *name, size_t size, int permission)
+ 
+ static int create_msg(int permission)
+ {
++#ifdef __ANDROID__
++	return -1;
++#else
+ 	key_t key;
+ 
+ 	ul_random_get_bytes(&key, sizeof(key));
+ 	return msgget(key, permission | IPC_CREAT);
++#endif
+ }
+ 
+ #ifndef HAVE_MQUEUE_H
+@@ -120,10 +128,14 @@ static int create_posix_msg(const char *name, int permission)
+
+ 
+ static int create_sem(int nsems, int permission)
+ {
++#ifdef __ANDROID__
++	return -1;
++#else
+ 	key_t key;
+ 
+ 	ul_random_get_bytes(&key, sizeof(key));
+ 	return semget(key, nsems, permission | IPC_CREAT);
++#endif
+ }
+ 
+ #ifndef HAVE_SEMAPHORE_H

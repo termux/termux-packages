@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/fcitx/fcitx5-hangul
+TERMUX_PKG_DESCRIPTION="libhangul input method support for fcitx5"
+TERMUX_PKG_LICENSE="LGPL-2.1"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="5.1.8"
+TERMUX_PKG_SRCURL="https://github.com/fcitx/fcitx5-hangul/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=69b3c58c5df2d13e5b2ed08d2d27a9e1fca26eef4e34e44903f85850d738db9e
+TERMUX_PKG_DEPENDS="fcitx5, libc++, libhangul"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"

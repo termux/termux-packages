@@ -1,0 +1,54 @@
+diff -uNr mtools-4.0.23/privileges.c mtools-4.0.23.mod/privileges.c
+--- mtools-4.0.23/privileges.c	2018-12-09 12:57:33.000000000 +0200
++++ mtools-4.0.23.mod/privileges.c	2020-01-10 12:49:08.689245870 +0200
+@@ -93,6 +93,9 @@
+ 
+ static __inline__ void Setuid(uid_t uid)
+ {
++#ifdef __ANDROID__
++	return;
++#endif
+ #if defined HAVE_SETEUID || defined HAVE_SETRESUID
+ 	if(euid == 0) {
+ #ifdef HAVE_SETEUID
+@@ -110,6 +113,9 @@
+ 
+ void reclaim_privs(void)
+ {
++#ifdef __ANDROID__
++	return;
++#endif
+ 	if(noPrivileges)
+ 		return;
+ 	setgid(egid);
+@@ -119,6 +125,9 @@
+ 
+ void drop_privs(void)
+ {
++#ifdef __ANDROID__
++	return;
++#endif
+ 	Setuid(ruid);
+ 	setgid(rgid);
+ 	print_privs("after drop_privs, real should be 0, effective should not ");
+@@ -126,7 +135,9 @@
+ 
+ void destroy_privs(void)
+ {
+-
++#ifdef __ANDROID__
++	return;
++#endif
+ #if defined HAVE_SETEUID || defined HAVE_SETRESUID
+ 	if(euid == 0) {
+ #ifdef HAVE_SETEUID
+@@ -159,6 +170,9 @@
+ 
+ void init_privs(void)
+ {
++#ifdef __ANDROID__
++	return;
++#endif
+ 	euid = geteuid();
+ 	ruid = getuid();
+ 	egid = getegid();

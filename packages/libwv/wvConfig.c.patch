@@ -1,0 +1,13 @@
+--- a/wvConfig.c
++++ b/wvConfig.c
+@@ -3613,8 +3613,8 @@
+ 	memset(&hdl, 0, sizeof(hdl));
+ 
+ 	hdl.getEntity = _getEntity;
+-	hdl.startElement = exstartElement;
+-	hdl.endElement = exendElement;
++	hdl.startElement = (startElementSAXFunc) exstartElement;
++	hdl.endElement = (endElementSAXFunc) exendElement;
+ 	hdl.characters = excharData;
+ 
+ 	ctxt = xmlCreateMemoryParserCtxt ((const char *) buf, len);

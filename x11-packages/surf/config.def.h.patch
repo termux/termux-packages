@@ -1,0 +1,37 @@
+--- a/config.def.h
++++ b/config.def.h
+@@ -66,7 +66,7 @@
+ 
+ /* SETPROP(readprop, setprop, prompt)*/
+ #define SETPROP(r, s, p) { \
+-        .v = (const char *[]){ "/bin/sh", "-c", \
++        .v = (const char *[]){ "@TERMUX_PREFIX@/bin/sh", "-c", \
+              "prop=\"$(printf '%b' \"$(xprop -id $1 $2 " \
+              "| sed \"s/^$2(STRING) = //;s/^\\\"\\(.*\\)\\\"$/\\1/\")\" " \
+              "| dmenu -p \"$4\" -w $1)\" && xprop -id $1 -f $3 8s -set $3 \"$prop\"", \
+@@ -76,7 +76,7 @@
+ 
+ /* DOWNLOAD(URI, referer) */
+ #define DOWNLOAD(u, r) { \
+-        .v = (const char *[]){ "st", "-e", "/bin/sh", "-c",\
++        .v = (const char *[]){ "st", "-e", "@TERMUX_PREFIX@/bin/sh", "-c",\
+              "curl -g -L -J -O -A \"$1\" -b \"$2\" -c \"$2\"" \
+              " -e \"$3\" \"$4\"; read", \
+              "surf-download", useragent, cookiefile, r, u, NULL \
+@@ -88,14 +88,14 @@
+  * "http://" or "https://" should be opened.
+  */
+ #define PLUMB(u) {\
+-        .v = (const char *[]){ "/bin/sh", "-c", \
++        .v = (const char *[]){ "@TERMUX_PREFIX@/bin/sh", "-c", \
+              "xdg-open \"$0\"", u, NULL \
+         } \
+ }
+ 
+ /* VIDEOPLAY(URI) */
+ #define VIDEOPLAY(u) {\
+-        .v = (const char *[]){ "/bin/sh", "-c", \
++        .v = (const char *[]){ "@TERMUX_PREFIX@/bin/sh", "-c", \
+              "mpv --really-quiet \"$0\"", u, NULL \
+         } \
+ }

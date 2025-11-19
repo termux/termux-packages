@@ -1,0 +1,20 @@
+--- a/src/corelib/io/qstandardpaths_unix.cpp
++++ b/src/corelib/io/qstandardpaths_unix.cpp
+@@ -394,7 +394,7 @@
+ 
+     QStringList dirs = dirsList(xdgDataDirsEnv);
+     if (dirs.isEmpty())
+-        dirs = QStringList{u"/usr/local/share"_s, u"/usr/share"_s};
++        dirs = QStringList{u"@TERMUX_PREFIX@/local/share"_s, u"@TERMUX_PREFIX@/share"_s};
+ 
+     return dirs;
+ }
+@@ -406,7 +406,7 @@
+ 
+     QStringList dirs = dirsList(xdgConfigDirs);
+     if (dirs.isEmpty())
+-        dirs.push_back(u"/etc/xdg"_s);
++        dirs.push_back(u"@TERMUX_PREFIX@/etc/xdg"_s);
+ 
+     return dirs;
+ }

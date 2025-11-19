@@ -1,0 +1,40 @@
+--- a/src/unix/mimetype.cpp
++++ b/src/unix/mimetype.cpp
+@@ -536,8 +536,8 @@ void wxMimeTypesManagerImpl::Initialize(
+ #else
+ 
+     // Read MIME type - extension associations
+-    LoadXDGGlobs( "/usr/share/mime/globs" );
+-    LoadXDGGlobs( "/usr/local/share/mime/globs" );
++    LoadXDGGlobs( "@TERMUX_PREFIX@/share/mime/globs" );
++    LoadXDGGlobs( "@TERMUX_PREFIX@/local/share/mime/globs" );
+ 
+     // Load desktop files for XDG, and then override them with the defaults.
+     // We will override them one desktop file at a time, rather
+@@ -550,12 +550,12 @@ void wxMimeTypesManagerImpl::Initialize(
+         wxString xdgDataDirs = wxGetenv("XDG_DATA_DIRS");
+         if ( xdgDataDirs.empty() )
+         {
+-            xdgDataDirs = "/usr/local/share:/usr/share";
++            xdgDataDirs = "@TERMUX_PREFIX@/local/share:@TERMUX_PREFIX@/share";
+ 
+             if ( mailcapStyles & wxMAILCAP_GNOME )
+             {
+-                AppendToPathIfExists(xdgDataDirs, "/usr/share/gnome");
+-                AppendToPathIfExists(xdgDataDirs, "/opt/gnome/share");
++                AppendToPathIfExists(xdgDataDirs, "@TERMUX_PREFIX@/share/gnome");
++                AppendToPathIfExists(xdgDataDirs, "@TERMUX_PREFIX@/opt/gnome/share");
+             }
+ 
+             if ( mailcapStyles & wxMAILCAP_KDE )
+@@ -563,8 +563,8 @@ void wxMimeTypesManagerImpl::Initialize(
+                 for ( int kdeVer = 5; kdeVer >= 3; kdeVer-- )
+                 {
+                     const wxString& kdeDir = wxString::Format("kde%d", kdeVer);
+-                    if ( AppendToPathIfExists(xdgDataDirs, "/usr/share/" + kdeDir)
+-                            || AppendToPathIfExists(xdgDataDirs, "/opt/" + kdeDir + "/share") )
++                    if ( AppendToPathIfExists(xdgDataDirs, "@TERMUX_PREFIX@/share/" + kdeDir)
++                            || AppendToPathIfExists(xdgDataDirs, "@TERMUX_PREFIX@/opt/" + kdeDir + "/share") )
+                     {
+                         // We don't need to use earlier versions if we found a
+                         // later one.

@@ -1,0 +1,22 @@
+--- backport-r12190.diff.orig
++++ backport-r12190.diff
+@@ -2996,15 +2996,15 @@
+ +++ src/src/environmentsettingsdlg.h	(revision 12190)
+ @@ -19,8 +19,8 @@
+  {
+-     public:
++ 	public:
+  		EnvironmentSettingsDlg(wxWindow* parent, wxAuiDockArt* art);
+ -		virtual ~EnvironmentSettingsDlg();
+ -		virtual void EndModal(int retCode);
+ +		~EnvironmentSettingsDlg() override;
+ +		void EndModal(int retCode) override;
+- 
+-     public:
+-         // From cbConfigurationPanelColoursInterface
++ 	protected:
++         void OnPageChanging(wxListbookEvent& event);
++         void OnPageChanged(wxListbookEvent& event);
+ Index: src/src/examinememorydlg.h
+ ===================================================================
+ --- src/src/examinememorydlg.h	(revision 12189)

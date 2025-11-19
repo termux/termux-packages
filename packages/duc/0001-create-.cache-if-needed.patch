@@ -1,0 +1,23 @@
+From ab7d4e2e774eae25961fca8c04853e923e04bbe0 Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <45286352+licy183@users.noreply.github.com>
+Date: Tue, 26 Jul 2022 15:43:50 +0800
+Subject: [PATCH] duc.c: Create ~/.cache if needed
+
+---
+ src/libduc/duc.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/libduc/duc.c b/src/libduc/duc.c
+index a791291..9030ed8 100644
+--- a/src/libduc/duc.c
++++ b/src/libduc/duc.c
+@@ -104,6 +104,9 @@ int duc_open(duc *duc, const char *path_db, duc_open_flags flags)
+ 	if(path_db == NULL) {
+ 		char *home = getenv("HOME");
+ 		if(home) {
++			/* Create ~/.cache if needed */
++			snprintf(tmp, sizeof tmp, "%s/.cache", home);
++			mkdir(tmp, 0700);
+ 			/* Append parent folder */
+ 			snprintf(tmp, sizeof tmp, "%s/.cache/duc", home);
+ 			/* Create if needed */

@@ -1,0 +1,21 @@
+Fixes this error:
+
+src/amailbox.cc:121:9: error: no matching function for call to 'inrange'
+  121 |     if (inrange(fPort, 1, USHRT_MAX)) {
+      |         ^~~~~~~
+src/base.h:50:13: note: candidate template ignored: deduced conflicting types for parameter 'T' ('int' vs. 'unsigned int')
+   50 | inline bool inrange(T value, T lower, T upper) {
+      |             ^
+1 error generated.
+
+--- a/src/amailbox.cc
++++ b/src/amailbox.cc
+@@ -118,7 +118,7 @@ void MailCheck::resolve() {
+     setState(IDLE);
+ 
+     fPort = portNumber();
+-    if (inrange(fPort, 1, USHRT_MAX)) {
++    if (inrange(fPort, 1, (int)USHRT_MAX)) {
+         if (ssl()) return; // fAddr is unnecessary for SSL
+ 
+         addrinfo hints = {};

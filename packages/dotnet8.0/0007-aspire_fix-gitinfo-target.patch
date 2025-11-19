@@ -1,0 +1,20 @@
+https://git.alpinelinux.org/aports/plain/community/dotnet8-runtime/aspire_fix-gitinfo-target.patch
+
+--- a/src/aspire/Directory.Build.targets.orig
++++ b/src/aspire/Directory.Build.targets
+@@ -6,13 +6,12 @@
+     <PackageReadmeFile Condition="'$(PackageReadmeFile)' == '' And '$(ReadMeExists)' == 'true'">README.md</PackageReadmeFile>
+   </PropertyGroup>
+ 
+-  <Import Condition="'$(SampleProject)' == 'true' or '$(CI)' != 'true' " Project="eng\Versions.dev.targets" />
+-  <Import Condition="'$(SampleProject)' != 'true' and '$(CI)' == 'true' " Project="eng\Versions.targets" />
++  <Import Project="eng\Versions.dev.targets" />
+ 
+   <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
+ 
+   <ItemGroup Condition="'$(ReadMeExists)' == 'true'">
+     <None Include="$(ReadMePath)" Pack="true" PackagePath="\" />
+   </ItemGroup>
+-  
++
+ </Project>

@@ -1,0 +1,42 @@
+commit cc49ad8dac24309f5452d5dea9abd406615a52d9
+Author: Jordan Brown <github@jordan.maileater.net>
+Date:   Sun Jul 18 21:01:46 2021 -0700
+
+    Fix build failure with "generic_print_polyhedron" on CGAL-5.3.
+
+diff --git a/src/cgalutils-polyhedron.cc b/src/cgalutils-polyhedron.cc
+index 0e5c72c3602b..14bddb7f44ce 100644
+--- a/src/cgalutils-polyhedron.cc
++++ b/src/cgalutils-polyhedron.cc
+@@ -335,19 +335,6 @@ namespace CGALUtils {
+     }
+ 	};
+ 
+-	template <typename Polyhedron>
+-	std::string printPolyhedron(const Polyhedron &p) {
+-		std::ostringstream sstream;
+-		sstream.precision(20);
+-
+-    Polyhedron_writer writer;
+-    generic_print_polyhedron(sstream, p, writer);
+-		
+-		return sstream.str();
+-	}
+-
+-	template std::string printPolyhedron(const CGAL_Polyhedron &p);
+-
+ }; // namespace CGALUtils
+ 
+ #endif /* ENABLE_CGAL */
+diff --git a/src/cgalutils.h b/src/cgalutils.h
+index 231762ebc8ce..7da5a25ca6e4 100644
+--- a/src/cgalutils.h
++++ b/src/cgalutils.h
+@@ -33,7 +33,6 @@ namespace CGALUtils {
+ 	bool is_approximately_convex(const PolySet &ps);
+ 	Geometry const* applyMinkowski(const Geometry::Geometries &children);
+ 
+-	template <typename Polyhedron> std::string printPolyhedron(const Polyhedron &p);
+ 	template <typename Polyhedron> bool createPolySetFromPolyhedron(const Polyhedron &p, PolySet &ps);
+ 	template <typename Polyhedron> bool createPolyhedronFromPolySet(const PolySet &ps, Polyhedron &p);
+ 	template <class Polyhedron_A, class Polyhedron_B> 

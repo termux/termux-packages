@@ -1,0 +1,17 @@
+diff --git a/src/extra/tcp.c b/src/extra/tcp.c
+index 933c6ee..e69d629 100644
+--- a/src/extra/tcp.c
++++ b/src/extra/tcp.c
+@@ -139,10 +139,12 @@ void nfq_tcp_compute_checksum_ipv6(struct tcphdr *tcph, struct ip6_hdr *ip6h)
+  *  (union is compatible to any of its members)
+  *  This means this part of the code is -fstrict-aliasing safe now.
+  */
++/*
+ union tcp_word_hdr {
+ 	struct tcphdr hdr;
+ 	uint32_t  words[5];
+ };
++*/
+ 
+ #define tcp_flag_word(tp) ( ((union tcp_word_hdr *)(tp))->words[3])
+ 

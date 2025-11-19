@@ -1,0 +1,52 @@
++++ ./scheduler/Makefile
+@@ -164,49 +164,11 @@
+ 	$(INSTALL_DIR) -m 1770 -g $(CUPS_GROUP) $(REQUESTS)/tmp
+ 	echo Creating $(CACHEDIR)...
+ 	$(INSTALL_DIR) -m 770 -g $(CUPS_GROUP) $(CACHEDIR)
+-	if test "x$(INITDIR)" != x; then \
+-		echo Installing init scripts...; \
+-		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/init.d; \
+-		$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDIR)/init.d/cups; \
+-		for level in $(RCLEVELS); do \
+-			$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc$${level}.d; \
+-			$(LN) ../init.d/cups $(BUILDROOT)$(INITDIR)/rc$${level}.d/S$(RCSTART)cups; \
+-			$(LN) ../init.d/cups $(BUILDROOT)$(INITDIR)/rc$${level}.d/K$(RCSTOP)cups; \
+-		done; \
+-		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc0.d; \
+-		$(LN) ../init.d/cups $(BUILDROOT)$(INITDIR)/rc0.d/K$(RCSTOP)cups; \
+-	fi
+-	if test "x$(INITDDIR)" != x; then \
+-		echo Installing init script...; \
+-		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDDIR); \
+-		$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDDIR); \
+-	fi
+-	if test "x$(LAUNCHD_DIR)" != x; then \
+-		echo Installing launchd configuration files...; \
+-		$(INSTALL_DIR) $(BUILDROOT)$(LAUNCHD_DIR); \
+-		$(INSTALL_DATA) org.cups.cupsd.plist $(BUILDROOT)$(LAUNCHD_DIR); \
+-		$(INSTALL_DATA) org.cups.cups-lpd.plist $(BUILDROOT)$(LAUNCHD_DIR); \
+-	fi
+ 	if test "x$(SMFMANIFESTDIR)" != x; then \
+ 		echo Installing SMF manifest in $(SMFMANIFESTDIR)...;\
+-		$(INSTALL_DIR) $(BUILDROOT)/$(SMFMANIFESTDIR); \
++		$(INSTALL_DIR) $(BUILDROOTs)/$(SMFMANIFESTDIR); \
+ 		$(INSTALL_SCRIPT) cups.xml $(BUILDROOT)$(SMFMANIFESTDIR)/cups.xml; \
+ 	fi
+-	if test "x$(SYSTEMD_DIR)" != x; then \
+-		echo Installing systemd configuration files...; \
+-		$(INSTALL_DIR) $(BUILDROOT)$(SYSTEMD_DIR); \
+-		$(INSTALL_DATA) system-cups.slice $(BUILDROOT)$(SYSTEMD_DIR); \
+-		$(INSTALL_DATA) cups.path $(BUILDROOT)$(SYSTEMD_DIR); \
+-		$(INSTALL_DATA) cups.service $(BUILDROOT)$(SYSTEMD_DIR); \
+-		$(INSTALL_DATA) cups.socket $(BUILDROOT)$(SYSTEMD_DIR); \
+-		$(INSTALL_DATA) cups-lpdAT.service $(BUILDROOT)$(SYSTEMD_DIR)/cups-lpd@.service; \
+-		$(INSTALL_DATA) cups-lpd.socket $(BUILDROOT)$(SYSTEMD_DIR); \
+-	fi
+-	if test "x$(XINETD)" != x; then \
+-		echo Installing xinetd configuration file for cups-lpd...; \
+-		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(XINETD); \
+-		$(INSTALL_DATA) cups-lpd.xinetd $(BUILDROOT)$(XINETD)/cups-lpd; \
+-	fi
+ 
+ 
+ #

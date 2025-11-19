@@ -1,0 +1,12 @@
+diff -uNr hub-2.12.1/utils/utils.go hub-2.12.1.mod/utils/utils.go
+--- hub-2.12.1/utils/utils.go	2019-06-28 23:19:41.000000000 +0300
++++ hub-2.12.1.mod/utils/utils.go	2019-06-29 17:11:57.853729989 +0300
+@@ -30,7 +30,7 @@
+ func BrowserLauncher() ([]string, error) {
+ 	browser := os.Getenv("BROWSER")
+ 	if browser == "" {
+-		browser = searchBrowserLauncher(runtime.GOOS)
++		browser = "termux-open"
+ 	} else {
+ 		browser = os.ExpandEnv(browser)
+ 	}

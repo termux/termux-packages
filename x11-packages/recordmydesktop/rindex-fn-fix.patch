@@ -1,0 +1,12 @@
+diff -uNr recordmydesktop-0.3.8.1/src/rmd_shortcuts.c recordmydesktop-0.3.8.1.mod/src/rmd_shortcuts.c
+--- recordmydesktop-0.3.8.1/src/rmd_shortcuts.c	2008-12-13 18:15:14.000000000 +0200
++++ recordmydesktop-0.3.8.1.mod/src/rmd_shortcuts.c	2020-02-11 14:33:50.646143593 +0200
+@@ -71,7 +71,7 @@
+     //modifier.
+     if(modifier_mask == 0)
+         return 1;
+-    if((keystr=rindex(shortcut,'+'))!=NULL){
++    if((keystr=strrchr(shortcut,'+'))!=NULL){
+         keystr++;
+         if((key=XStringToKeysym(keystr))==NoSymbol)
+             return 1;

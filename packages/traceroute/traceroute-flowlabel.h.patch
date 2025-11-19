@@ -1,0 +1,18 @@
+--- a/traceroute/flowlabel.h
++++ b/traceroute/flowlabel.h
+@@ -6,6 +6,7 @@
+    conflicts with "netinet/in.h" .
+ */
+ 
++#ifndef __ANDROID__
+ struct in6_flowlabel_req
+ {
+ 	struct in6_addr	flr_dst;
+@@ -18,6 +19,7 @@
+ 	__u32	__flr_pad;
+ 	/* Options in format of IPV6_PKTOPTIONS */
+ };
++#endif
+ 
+ #define IPV6_FL_A_GET	0
+ #define IPV6_FL_A_PUT	1

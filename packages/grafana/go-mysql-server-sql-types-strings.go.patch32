@@ -1,0 +1,19 @@
+--- ./vendor/github.com/dolthub/go-mysql-server/sql/types/strings.go.orig	2025-05-21 05:20:36.774867843 +0000
++++ ./vendor/github.com/dolthub/go-mysql-server/sql/types/strings.go	2025-05-21 05:21:43.995602742 +0000
+@@ -17,6 +17,7 @@
+ import (
+ 	"bytes"
+ 	"fmt"
++	"math"
+ 	"reflect"
+ 	"strconv"
+ 	strings2 "strings"
+@@ -41,7 +42,7 @@
+ 	TinyTextBlobMax   = charBinaryMax
+ 	TextBlobMax       = varcharVarbinaryMax
+ 	MediumTextBlobMax = 16_777_215
+-	LongTextBlobMax   = int64(4_294_967_295)
++	LongTextBlobMax   = int64(math.MaxInt32)
+ )
+ 
+ var (

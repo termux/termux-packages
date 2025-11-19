@@ -1,0 +1,20 @@
+--- a/cmake/external/glib/generate_cppgir.cmake
++++ b/cmake/external/glib/generate_cppgir.cmake
+@@ -23,11 +23,16 @@
+         set(gir_path ${gir})
+     endif()
+ 
++    set(cppgir_executable CppGir::cppgir)
++    if (PREBUILT_CPPGIR)
++        set(cppgir_executable ${PREBUILT_CPPGIR})
++    endif()
++
+     add_custom_command(
+     OUTPUT
+         ${gen_timestamp}
+     COMMAND
+-        CppGir::cppgir
++        ${cppgir_executable}
+         --debug
+         1
+         --class

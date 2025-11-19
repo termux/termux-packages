@@ -1,0 +1,51 @@
+diff --git a/swift-corelibs-foundation/CMakeLists.txt b/swift-corelibs-foundation/CMakeLists.txt
+index 7f290d16..95366592 100644
+--- a/swift-corelibs-foundation/CMakeLists.txt
++++ b/swift-corelibs-foundation/CMakeLists.txt
+@@ -51,6 +51,7 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL Windows)
+     endif()
+ endif()
+ 
++set(CMAKE_SHARED_LINKER_FLAGS "")
+ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+diff --git a/swift-corelibs-foundation/Sources/Foundation/Process.swift b/swift-corelibs-foundation/Sources/Foundation/Process.swift
+index 758dd1df..02970992 100644
+--- a/swift-corelibs-foundation/Sources/Foundation/Process.swift
++++ b/swift-corelibs-foundation/Sources/Foundation/Process.swift
+@@ -944,7 +944,7 @@ open class Process: NSObject, @unchecked Sendable {
+         var spawnAttrs: posix_spawnattr_t = posix_spawnattr_t()
+ #endif
+         try _throwIfPosixError(posix_spawnattr_init(&spawnAttrs))
+-#if os(Android)
++#if os(Windows)
+         guard var spawnAttrs else {
+             throw NSError(domain: NSPOSIXErrorDomain, code: Int(errno),
+                           userInfo: [NSURLErrorKey:self.executableURL!])
+diff --git a/swift-foundation/Sources/FoundationEssentials/String/String+Path.swift b/swift-foundation/Sources/FoundationEssentials/String/String+Path.swift
+index f1cb26d..44600dd 100644
+--- a/swift-foundation/Sources/FoundationEssentials/String/String+Path.swift
++++ b/swift-foundation/Sources/FoundationEssentials/String/String+Path.swift
+@@ -467,7 +467,7 @@ extension String {
+             return envVar.standardizingPath
+         }
+         
+-        #if !os(WASI) // WASI does not have user concept
++        #if !os(WASI) && !canImport(Android) // WASI does not have user concept
+         // Next, attempt to find the home directory via getpwuid
+         // We use the real UID instead of the EUID here when the EUID is the root user (i.e. a process has called seteuid(0))
+         // In this instance, we historically do this to ensure a stable home directory location for processes that call seteuid(0)
+diff --git a/swift-foundation-icu/icuSources/CMakeLists.txt b/swift-foundation-icu/icuSources/CMakeLists.txt
+index fde8755..343f3b4 100644
+--- a/swift-foundation-icu/icuSources/CMakeLists.txt
++++ b/swift-foundation-icu/icuSources/CMakeLists.txt
+@@ -20,7 +20,7 @@ target_include_directories(_FoundationICU
+ 
+ target_compile_options(_FoundationICU INTERFACE
+   "$<$<COMPILE_LANGUAGE:Swift>:SHELL:-Xcc -fmodule-map-file=${CMAKE_CURRENT_SOURCE_DIR}/include/_foundation_unicode/module.modulemap>")
+-
++target_link_options(_FoundationICU PRIVATE "SHELL:--target=$ENV{CCTERMUX_HOST_PLATFORM} -Xlinker -rpath=@TERMUX_PREFIX@/lib")
+ add_subdirectory(common)
+ add_subdirectory(i18n)
+ add_subdirectory(io)

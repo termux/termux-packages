@@ -1,0 +1,21 @@
+diff -uNr xfce4-notifyd-0.8.2/common/xfce-notify-log-util.c xfce4-notifyd-0.8.2.mod/common/xfce-notify-log-util.c
+--- xfce4-notifyd-0.8.2/common/xfce-notify-log-util.c	2023-02-17 08:28:07.000000000 +0200
++++ xfce4-notifyd-0.8.2.mod/common/xfce-notify-log-util.c	2023-04-04 10:51:53.020024342 +0300
+@@ -229,7 +229,7 @@
+         /* If the image path is in the tmp directory we copy it to the cache directory to make it persistent
+            (e.g. Chrome/Chromium uses the tmp directory to store and reference icons, see https://bugzilla.xfce.org/show_bug.cgi?id=15215)*/
+         gchar *image_dir = g_path_get_dirname (image_path);
+-        gboolean is_in_tmp = g_strcmp0 ("/tmp", image_dir) == 0;
++        gboolean is_in_tmp = g_strcmp0 ("@TERMUX_PREFIX@/tmp", image_dir) == 0;
+ 
+         g_free(image_dir);
+ 
+@@ -242,7 +242,7 @@
+                 gchar *filename = g_strconcat (notify_log_icon_folder, G_DIR_SEPARATOR_S, image_data_sha1, ".png", NULL);
+                 if (!g_file_test (filename, G_FILE_TEST_EXISTS)) {
+                     if (!g_file_set_contents (filename, image_data, image_data_size, NULL)) {
+-                        g_warning ("Failed to copy the image from /tmp to the cache directory: %s", filename);
++                        g_warning ("Failed to copy the image from @TERMUX_PREFIX@/tmp to the cache directory: %s", filename);
+                     }
+                 }
+                 g_free (filename);

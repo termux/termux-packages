@@ -1,0 +1,60 @@
+--- ./src/iomode.c.orig	2021-11-10 10:09:28.314172038 +0100
++++ ./src/iomode.c	2021-11-10 10:08:57.053490735 +0100
+@@ -26,6 +26,7 @@
+ #include "lrzsz.h"
+ 
+ #include <sys/types.h>
++#include <syslog.h>
+ 
+ static struct termios oldtty;
+ 
+--- ./src/lrz.c.orig	2021-11-10 10:07:52.992094536 +0100
++++ ./src/lrz.c	2021-11-10 10:08:43.819868988 +0100
+@@ -32,6 +32,7 @@
+ #include <errno.h>
+ #include <getopt.h>
+ #include <time.h>
++#include <syslog.h>
+ 
+ #include "timing.h"
+ #include "long-options.h"
+--- ./src/log.c.orig	2021-11-10 10:08:42.623176240 +0100
++++ ./src/log.c	2021-11-10 10:08:49.183319213 +0100
+@@ -28,6 +28,7 @@
+ #include <string.h>
+ #include <stdio.h>
+ #include <ctype.h>
++#include <syslog.h>
+ 
+ static const char *username;
+ static int lrzsz_locallog_severity=LOG_INFO;
+--- ./src/zm.c.orig	2021-11-10 10:15:55.309272598 +0100
++++ ./src/zm.c	2021-11-10 10:16:04.896148184 +0100
+@@ -40,6 +40,7 @@
+ #include "lrzsz.h"
+ 
+ #include <stdio.h>
++#include <syslog.h>
+ 
+ unsigned int Rxtimeout = 100;		/* Tenths of seconds to wait for something */
+ 
+--- ./src/lsz.c.orig	2021-11-10 10:26:52.693598169 +0100
++++ ./src/lsz.c	2021-11-10 10:27:05.573878846 +0100
+@@ -33,6 +33,7 @@
+ #include <ctype.h>
+ #include <errno.h>
+ #include <getopt.h>
++#include <syslog.h>
+ 
+ struct lrzsz_config config;
+ 
+--- ./src/zreadline.c.orig	2021-11-10 10:29:30.677040827 +0100
++++ ./src/zreadline.c	2021-11-10 10:29:41.483942987 +0100
+@@ -30,6 +30,7 @@
+ #include <signal.h>
+ #include <ctype.h>
+ #include <errno.h>
++#include <syslog.h>
+ 
+ #include "error.h"
+ 

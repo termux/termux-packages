@@ -1,0 +1,5 @@
+TERMUX_SUBPKG_DESCRIPTION="MuseScore sound fonts"
+TERMUX_SUBPKG_PLATFORM_INDEPENDENT=true
+TERMUX_SUBPKG_INCLUDE="
+share/mscore-*/sound
+"

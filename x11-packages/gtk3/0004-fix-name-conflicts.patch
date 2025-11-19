@@ -1,0 +1,68 @@
+diff -uNr gtk-3.22.30/examples/sunny.c gtk-3.22.30.mod/examples/sunny.c
+--- gtk-3.22.30/examples/sunny.c	2018-04-16 21:06:02.000000000 +0300
++++ gtk-3.22.30.mod/examples/sunny.c	2018-06-22 20:55:46.621292924 +0300
+@@ -56,7 +56,7 @@
+ }
+ 
+ static void
+-open (GApplication  *application,
++opened (GApplication  *application,
+       GFile        **files,
+       gint           n_files,
+       const gchar   *hint)
+@@ -173,7 +173,7 @@
+ 
+   application_class->startup = startup;
+   application_class->activate = activate;
+-  application_class->open = open;
++  application_class->open = opened;
+ }
+ 
+ MenuButton *
+diff -uNr gtk-3.22.30/tests/testappchooser.c gtk-3.22.30.mod/tests/testappchooser.c
+--- gtk-3.22.30/tests/testappchooser.c	2018-04-16 21:06:02.000000000 +0300
++++ gtk-3.22.30.mod/tests/testappchooser.c	2018-06-22 20:55:46.621292924 +0300
+@@ -23,7 +23,7 @@
+ 
+ static GtkWidget *toplevel;
+ static GFile *file;
+-static GtkWidget *grid, *file_l, *open;
++static GtkWidget *grid, *file_l, *opened;
+ static GtkWidget *radio_file, *radio_content, *dialog;
+ static GtkWidget *app_chooser_widget;
+ static GtkWidget *def, *recommended, *fallback, *other, *all;
+@@ -146,7 +146,7 @@
+ 
+   gtk_widget_destroy (w);
+ 
+-  gtk_widget_set_sensitive (open, TRUE);
++  gtk_widget_set_sensitive (opened, TRUE);
+ 
+   g_free (path);
+ }
+@@ -189,13 +189,13 @@
+   gtk_grid_attach_next_to (GTK_GRID (grid), radio_content,
+                            radio_file, GTK_POS_BOTTOM, 1, 1);
+ 
+-  open = gtk_button_new_with_label ("Trigger App Chooser dialog");
+-  gtk_grid_attach_next_to (GTK_GRID (grid), open,
++  opened = gtk_button_new_with_label ("Trigger App Chooser dialog");
++  gtk_grid_attach_next_to (GTK_GRID (grid), opened,
+                            radio_content, GTK_POS_BOTTOM, 1, 1);
+ 
+   recommended = gtk_check_button_new_with_label ("Show recommended");
+   gtk_grid_attach_next_to (GTK_GRID (grid), recommended,
+-                           open, GTK_POS_BOTTOM, 1, 1);
++                           opened, GTK_POS_BOTTOM, 1, 1);
+   g_object_set (recommended, "active", TRUE, NULL);
+ 
+   fallback = gtk_check_button_new_with_label ("Show fallback");
+@@ -216,7 +216,7 @@
+ 
+   g_object_set (recommended, "active", TRUE, NULL);
+   prepare_dialog ();
+-  g_signal_connect (open, "clicked",
++  g_signal_connect (opened, "clicked",
+                     G_CALLBACK (display_dialog), NULL);
+ 
+   gtk_container_add (GTK_CONTAINER (toplevel), grid);

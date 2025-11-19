@@ -1,0 +1,29 @@
+This is https://github.com/PixarAnimationStudios/OpenSubdiv/pull/1315
+It was developed for another non-FHS-compliant distro, NixOS, and also works for Termux.
+
+From 19b2bac39aa075fe231259e519d13aed6ee373bf Mon Sep 17 00:00:00 2001
+From: chayleaf <chayleaf-git@pavluk.org>
+Date: Sat, 12 Aug 2023 20:55:50 +0700
+Subject: [PATCH] respect GNU install dirs
+
+CMAKE_INSTALL_LIBDIR and CMAKE_INSTALL_INCLUDEDIR are allowed to be
+absolute, so they shouldn't be concatenated to absolute paths. Instead,
+use CMAKE_INSTALL_FULL_LIBDIR and CMAKE_INSTALL_FULL_INCLUDEDIR, which
+are known to be absolute.
+---
+ opensubdiv-config.cmake.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/opensubdiv-config.cmake.in b/opensubdiv-config.cmake.in
+index 08a005aaf..c08753796 100644
+--- a/opensubdiv-config.cmake.in
++++ b/opensubdiv-config.cmake.in
+@@ -1,6 +1,6 @@
+ @PACKAGE_INIT@
+ 
+-set_and_check(OpenSubdiv_INCLUDE_DIR "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_INCLUDEDIR@")
+-set_and_check(OpenSubdiv_LIB_DIR "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@")
++set_and_check(OpenSubdiv_INCLUDE_DIR "@CMAKE_INSTALL_FULL_INCLUDEDIR@")
++set_and_check(OpenSubdiv_LIB_DIR "@CMAKE_INSTALL_FULL_LIBDIR@")
+ 
+ include("${CMAKE_CURRENT_LIST_DIR}/OpenSubdivTargets.cmake")

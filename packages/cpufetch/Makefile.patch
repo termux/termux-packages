@@ -1,0 +1,13 @@
+--- a/Makefile
++++ b/Makefile
+@@ -11,8 +11,8 @@
+ COMMON_HDR = $(SRC_COMMON)ascii.h $(SRC_COMMON)cpu.h $(SRC_COMMON)udev.h $(SRC_COMMON)printer.h $(SRC_COMMON)args.h $(SRC_COMMON)global.h
+ 
+ ifneq ($(OS),Windows_NT)
+-	GIT_VERSION := "$(shell git describe --abbrev=4 --dirty --always --tags)"
+-	arch := $(shell uname -m)
++	GIT_VERSION := ""
++	arch := ${TERMUX_ARCH}
+ 	os := $(shell uname -s)
+ 
+ 	ifeq ($(os), Linux)

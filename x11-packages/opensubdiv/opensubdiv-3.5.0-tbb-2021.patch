@@ -1,0 +1,42 @@
+https://github.com/PixarAnimationStudios/OpenSubdiv/pull/1234
+
+From 9079a517f406afba9ea50657b0a0786ad7a7bdcb Mon Sep 17 00:00:00 2001
+From: Artur Sinila <freesoftware@logarithmus.dev>
+Date: Sun, 25 Jul 2021 20:58:27 +0300
+Subject: [PATCH 2/2] Support oneTBB 2021
+
+---
+ opensubdiv/osd/tbbEvaluator.cpp | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/opensubdiv/osd/tbbEvaluator.cpp b/opensubdiv/osd/tbbEvaluator.cpp
+index c98db9f6d..66c2ed58f 100644
+--- a/opensubdiv/osd/tbbEvaluator.cpp
++++ b/opensubdiv/osd/tbbEvaluator.cpp
+@@ -29,7 +29,8 @@
+ #include <tbb/parallel_for.h>
+ #if defined(TBB_INTERFACE_VERSION_MAJOR) && (TBB_INTERFACE_VERSION_MAJOR < 12)
+ // This is deprecated functionality.
+-#include <tbb/task_scheduler_init.h>
++#define TBB_PREVIEW_GLOBAL_CONTROL true
++#include <tbb/global_control.h>
+ #endif
+ 
+ namespace OpenSubdiv {
+@@ -223,10 +224,12 @@
+ #if defined(TBB_INTERFACE_VERSION_MAJOR) && (TBB_INTERFACE_VERSION_MAJOR < 12)
+     // This is deprecated functionality. We preserve the existing behavior
+     // for consistency (when using older versions of tbb).
+-    if (numThreads == -1) {
+-        tbb::task_scheduler_init init;
+-    } else {
+-        tbb::task_scheduler_init init(numThreads);
++
++    if (numThreads != -1) {
++		tbb::global_control tbb_global_control(
++			tbb::global_control::max_allowed_parallelism,
++			numThreads
++		);
+     }
+ #endif
+ }

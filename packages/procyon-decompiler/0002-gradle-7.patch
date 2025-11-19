@@ -1,0 +1,785 @@
+This PR: https://github.com/mstrobel/procyon/pull/50
+
+diff --git a/.idea/.name b/.idea/.name
+deleted file mode 100644
+index c8fb8eb0..00000000
+--- a/.idea/.name
++++ /dev/null
+@@ -1 +0,0 @@
+-Procyon
+\ No newline at end of file
+diff --git a/Procyon.CompilerTools/build.gradle b/Procyon.CompilerTools/build.gradle
+index 89e8578f..1b76c000 100644
+--- a/Procyon.CompilerTools/build.gradle
++++ b/Procyon.CompilerTools/build.gradle
+@@ -1,7 +1,7 @@
+ compileTestJava.options.encoding = 'UTF-8'
+ 
+ dependencies {
+-    compile project(':Procyon.Core')
+-    testCompile project(':Procyon.Reflection')
+-    testCompile files('src/test/resources')
++    implementation project(':Procyon.Core')
++    testImplementation project(':Procyon.Reflection')
++    testImplementation files('src/test/resources')
+ }
+diff --git a/Procyon.Decompiler/build.gradle b/Procyon.Decompiler/build.gradle
+index b81fa7fe..6ca77aa6 100644
+--- a/Procyon.Decompiler/build.gradle
++++ b/Procyon.Decompiler/build.gradle
+@@ -1,17 +1,15 @@
+-uploadArchives.enabled = false
+-
+ jar {
+     manifest {
+-        attributes 'Title': archivesBaseName, 'Manifest-Version': '1.0', 'Version': version, 'Main-Class' : 'com.strobel.decompiler.DecompilerDriver'
++        attributes 'Title': archivesBaseName, 'Manifest-Version': '1.0', 'Version': archiveVersion, 'Main-Class' : 'com.strobel.decompiler.DecompilerDriver'
+     }
+ 
+     from {
+-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
++        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+     }
+ }
+ 
+ dependencies {
+-    compile 'com.beust:jcommander:1.78'
+-    compile project(':Procyon.Core')
+-    compile project(':Procyon.CompilerTools')
++    implementation 'com.beust:jcommander:1.78'
++    implementation project(':Procyon.Core')
++    implementation project(':Procyon.CompilerTools')
+ }
+diff --git a/Procyon.Expressions/build.gradle b/Procyon.Expressions/build.gradle
+index fbba7a05..c651aac9 100644
+--- a/Procyon.Expressions/build.gradle
++++ b/Procyon.Expressions/build.gradle
+@@ -1,10 +1,10 @@
+ dependencies {
+-    compile project(':Procyon.Core')
+-    compile project(':Procyon.Reflection')
++    implementation project(':Procyon.Core')
++    implementation project(':Procyon.Reflection')
+ }
+ 
+ /*
+ about the surefire plugin..
+ 
+ http://forums.gradle.org/gradle/topics/does_anyone_know_how_to_configure_maven_surefire_plugin_with_gradle_for_unit_tests?page=1
+-*/
+\ No newline at end of file
++*/
+diff --git a/Procyon.Reflection/build.gradle b/Procyon.Reflection/build.gradle
+index 4e727b26..f0a7e599 100644
+--- a/Procyon.Reflection/build.gradle
++++ b/Procyon.Reflection/build.gradle
+@@ -1,7 +1,7 @@
+ dependencies {
+-    compile project(':Procyon.Core')
++    implementation project(':Procyon.Core')
+ }
+ 
+ /*
+ see Expressions build.gradle file for surefire plugin
+-*/
+\ No newline at end of file
++*/
+diff --git a/Procyon.Reflection/src/main/java/com/strobel/reflection/emit/CodeGenerator.java b/Procyon.Reflection/src/main/java/com/strobel/reflection/emit/CodeGenerator.java
+index b4dbc952..e461aae8 100644
+--- a/Procyon.Reflection/src/main/java/com/strobel/reflection/emit/CodeGenerator.java
++++ b/Procyon.Reflection/src/main/java/com/strobel/reflection/emit/CodeGenerator.java
+@@ -1503,7 +1503,7 @@ private boolean tryEmitConstant(final Object value, final Type<?> type) {
+                     return true;
+                 }
+                 if (unboxedType.isEnum()) {
+-                    getField(unboxedType.getField(value.toString()));
++                    getField(unboxedType.getField(((Enum<?>)value).name()));
+                     return true;
+                 }
+                 return false;
+@@ -2908,4 +2908,4 @@ private void registerCheckedExceptions(final MethodBase method) {
+     }
+ 
+     // </editor-fold>
+-}
+\ No newline at end of file
++}
+diff --git a/build.gradle b/build.gradle
+index 550c0a4f..de67b35e 100644
+--- a/build.gradle
++++ b/build.gradle
+@@ -2,8 +2,8 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+ import org.gradle.api.tasks.testing.logging.TestLogEvent
+ 
+ apply plugin: 'java'
+-apply plugin: 'maven'
+ apply plugin: 'idea'
++apply plugin: 'maven-publish'
+ 
+ archivesBaseName = 'procyon'
+ 
+@@ -35,7 +35,7 @@ final def procyonVersion = getProcyonVersion()
+ allprojects {
+     apply plugin: 'java'
+     apply plugin: 'idea'
+-    apply plugin: 'maven'
++    apply plugin: 'maven-publish'
+ 
+     buildDir = rootDir.canonicalPath + "/build/" + rootProject.relativePath(projectDir.canonicalPath)
+ 
+@@ -48,8 +48,13 @@ allprojects {
+         mavenCentral()
+     }
+ 
++    java {
++        withJavadocJar()
++        withSourcesJar()
++    }
++
+     dependencies {
+-        testCompile 'junit:junit:4.13.2'
++        testImplementation 'junit:junit:4.13.2'
+     }
+ }
+ 
+@@ -58,10 +63,9 @@ allprojects {
+ //
+ rootProject.tasks.each { it.enabled = false }
+ rootProject.tasks.withType(DefaultTask).each { it.enabled = true }
+-rootProject.uploadArchives.enabled = false
+ 
+ subprojects {
+-    apply plugin: 'maven'
++    apply plugin: 'maven-publish'
+     apply plugin: 'signing'
+ 
+     final boolean shouldSign = "true".equalsIgnoreCase(System.properties.getProperty("procyon.signing.enabled"))
+@@ -75,22 +79,12 @@ subprojects {
+         }
+     }
+ 
+-    task javadocJar(type: Jar, dependsOn: javadoc) {
+-        classifier = 'javadoc'
+-        from 'build/docs/javadoc'
+-    }
+-
+-    task sourcesJar(type: Jar, dependsOn: classes) {
+-        classifier = 'sources'
+-        from sourceSets.main.allSource
+-    }
+-
+     tasks.withType(Test) {
+         testLogging {
+             // set options for log level LIFECYCLE
+             events TestLogEvent.FAILED,
+-                   TestLogEvent.PASSED,
+-                   TestLogEvent.SKIPPED
++                    TestLogEvent.PASSED,
++                    TestLogEvent.SKIPPED
+             exceptionFormat TestExceptionFormat.FULL
+             showExceptions true
+             showCauses true
+@@ -99,11 +93,11 @@ subprojects {
+             // set options for log level DEBUG and INFO
+             debug.with {
+                 events TestLogEvent.STARTED,
+-                       TestLogEvent.FAILED,
+-                       TestLogEvent.PASSED,
+-                       TestLogEvent.SKIPPED,
+-                       TestLogEvent.STANDARD_ERROR,
+-                       TestLogEvent.STANDARD_OUT
++                        TestLogEvent.FAILED,
++                        TestLogEvent.PASSED,
++                        TestLogEvent.SKIPPED,
++                        TestLogEvent.STANDARD_ERROR,
++                        TestLogEvent.STANDARD_OUT
+                 exceptionFormat TestExceptionFormat.FULL
+             }
+ 
+@@ -125,8 +119,7 @@ subprojects {
+         artifacts {
+             archives jar
+         }
+-    }
+-    else {
++    } else {
+         javadoc {
+             options.encoding = 'UTF-8'
+         }
+@@ -140,77 +133,65 @@ subprojects {
+         if (shouldSign) {
+             signing {
+                 sign configurations.archives
++                sign publishing.publications.mavenJava
+             }
+         }
+ 
+-        uploadArchives {
+-            repositories.mavenDeployer {
+-                if (shouldSign) {
+-                    beforeDeployment { MavenDeployment deployment ->
+-                        signing.signPom(deployment)
++        publishing {
++            repositories {
++                maven {
++                    name 'Snapshots'
++                    url 'https://oss.sonatype.org/content/repositories/snapshots'
++                    credentials {
++                        username = project.properties.get("procyon.sonatype.username")
++                        password = project.properties.get("procyon.sonatype.password")
+                     }
+                 }
+-
+-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+-                    authentication(userName: project.properties.get("procyon.sonatype.username"),
+-                                   password: project.properties.get("procyon.sonatype.password"))
+-                }
+-
+-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+-                    authentication(userName: project.properties.get("procyon.sonatype.username"),
+-                                   password: project.properties.get("procyon.sonatype.password"))
++                maven {
++                    name 'Releases'
++                    url 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
++                    credentials {
++                        username = project.properties.get("procyon.sonatype.username")
++                        password = project.properties.get("procyon.sonatype.password")
++                    }
+                 }
+-
+-                pom {
++            }
++            publications {
++                mavenJava(MavenPublication) {
++                    from components.java
+                     groupId = project.group
+                     version = project.version
+                     artifactId = project.archivesBaseName
+-
+-                    project {
+-                        name project.archivesBaseName
+-                        packaging 'jar'
+-                        description 'Procyon'
+-                        url 'https://github.com/mstrobel/procyon'
+-
+-                        scm {
+-                            url 'https://github.com/mstrobel/procyon'
+-                            connection 'scm:git:https://github.com/mstrobel/procyon.git'
+-                            developerConnection 'scm:git:https://mstrobel@github.com/mstrobel/procyon.git'
+-                        }
+-
+-                        issueManagement {
+-                            system 'github'
+-                            url 'https://github.com/mstrobel/procyon/issues'
+-                        }
++                    pom {
++                        name = project.archivesBaseName
++                        description = 'Procyon'
++                        url = 'https://github.com/mstrobel/procyon'
+ 
+                         licenses {
+                             license {
+-                                name 'The Apache Software License, Version 2.0'
+-                                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+-                                distribution 'repo'
++                                name = 'The Apache Software License, Version 2.0'
++                                url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
++                                distribution = 'repo'
+                             }
+                         }
+ 
+                         developers {
+                             developer {
+-                                id 'mstrobel'
+-                                name 'Mike Strobel'
+-                                roles {
+-                                    role 'owner'
+-                                    role 'packager'
+-                                    role 'developer'
+-                                }
++                                id = 'mstrobel'
++                                name = 'Mike Strobel'
++                                roles = ['owner', 'packager', 'developer']
+                             }
+                         }
+ 
+-                        dependencies {
+-                            dependency {
+-                                groupId 'junit'
+-                                artifactId 'junit'
+-                                version '4.11'
+-                                scope 'test'
+-//                                optional = true
+-                            }
++                        scm {
++                            connection = 'scm:git:https://github.com/mstrobel/procyon.git'
++                            developerConnection = 'scm:git:https://mstrobel@github.com/mstrobel/procyon.git'
++                            url = 'https://github.com/mstrobel/procyon'
++                        }
++
++                        issueManagement {
++                            system = 'github'
++                            url = 'https://github.com/mstrobel/procyon/issues'
+                         }
+                     }
+                 }
+diff --git a/gradle/wrapper/gradle-wrapper.jar b/gradle/wrapper/gradle-wrapper.jar
+index 05ef575b..41d9927a 100644
+Binary files a/gradle/wrapper/gradle-wrapper.jar and b/gradle/wrapper/gradle-wrapper.jar differ
+diff --git a/gradle/wrapper/gradle-wrapper.properties b/gradle/wrapper/gradle-wrapper.properties
+index 93eef23b..41dfb879 100644
+--- a/gradle/wrapper/gradle-wrapper.properties
++++ b/gradle/wrapper/gradle-wrapper.properties
+@@ -1,6 +1,5 @@
+-#Sun Oct 27 14:39:59 EDT 2019
+-distributionUrl=https\://services.gradle.org/distributions/gradle-6.9-bin.zip
+ distributionBase=GRADLE_USER_HOME
+ distributionPath=wrapper/dists
+-zipStorePath=wrapper/dists
++distributionUrl=https\://services.gradle.org/distributions/gradle-7.4-bin.zip
+ zipStoreBase=GRADLE_USER_HOME
++zipStorePath=wrapper/dists
+diff --git a/gradlew b/gradlew
+index 9d82f789..1b6c7873 100755
+--- a/gradlew
++++ b/gradlew
+@@ -1,74 +1,129 @@
+-#!/usr/bin/env bash
++#!/bin/sh
++
++#
++# Copyright © 2015-2021 the original authors.
++#
++# Licensed under the Apache License, Version 2.0 (the "License");
++# you may not use this file except in compliance with the License.
++# You may obtain a copy of the License at
++#
++#      https://www.apache.org/licenses/LICENSE-2.0
++#
++# Unless required by applicable law or agreed to in writing, software
++# distributed under the License is distributed on an "AS IS" BASIS,
++# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++# See the License for the specific language governing permissions and
++# limitations under the License.
++#
+ 
+ ##############################################################################
+-##
+-##  Gradle start up script for UN*X
+-##
++#
++#   Gradle start up script for POSIX generated by Gradle.
++#
++#   Important for running:
++#
++#   (1) You need a POSIX-compliant shell to run this script. If your /bin/sh is
++#       noncompliant, but you have some other compliant shell such as ksh or
++#       bash, then to run this script, type that shell name before the whole
++#       command line, like:
++#
++#           ksh Gradle
++#
++#       Busybox and similar reduced shells will NOT work, because this script
++#       requires all of these POSIX shell features:
++#         * functions;
++#         * expansions «$var», «${var}», «${var:-default}», «${var+SET}»,
++#           «${var#prefix}», «${var%suffix}», and «$( cmd )»;
++#         * compound commands having a testable exit status, especially «case»;
++#         * various built-in commands including «command», «set», and «ulimit».
++#
++#   Important for patching:
++#
++#   (2) This script targets any POSIX shell, so it avoids extensions provided
++#       by Bash, Ksh, etc; in particular arrays are avoided.
++#
++#       The "traditional" practice of packing multiple parameters into a
++#       space-separated string is a well documented source of bugs and security
++#       problems, so this is (mostly) avoided, by progressively accumulating
++#       options in "$@", and eventually passing that to Java.
++#
++#       Where the inherited environment variables (DEFAULT_JVM_OPTS, JAVA_OPTS,
++#       and GRADLE_OPTS) rely on word-splitting, this is performed explicitly;
++#       see the in-line comments for details.
++#
++#       There are tweaks for specific operating systems such as AIX, CygWin,
++#       Darwin, MinGW, and NonStop.
++#
++#   (3) This script is generated from the Groovy template
++#       https://github.com/gradle/gradle/blob/master/subprojects/plugins/src/main/resources/org/gradle/api/internal/plugins/unixStartScript.txt
++#       within the Gradle project.
++#
++#       You can find Gradle at https://github.com/gradle/gradle/.
++#
+ ##############################################################################
+ 
+-# Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
+-DEFAULT_JVM_OPTS=""
++# Attempt to set APP_HOME
++
++# Resolve links: $0 may be a link
++app_path=$0
++
++# Need this for daisy-chained symlinks.
++while
++    APP_HOME=${app_path%"${app_path##*/}"}  # leaves a trailing /; empty if no leading path
++    [ -h "$app_path" ]
++do
++    ls=$( ls -ld "$app_path" )
++    link=${ls#*' -> '}
++    case $link in             #(
++      /*)   app_path=$link ;; #(
++      *)    app_path=$APP_HOME$link ;;
++    esac
++done
++
++APP_HOME=$( cd "${APP_HOME:-./}" && pwd -P ) || exit
+ 
+ APP_NAME="Gradle"
+-APP_BASE_NAME=`basename "$0"`
++APP_BASE_NAME=${0##*/}
++
++# Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
++DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
+ 
+ # Use the maximum available, or set MAX_FD != -1 to use that value.
+-MAX_FD="maximum"
++MAX_FD=maximum
+ 
+-warn ( ) {
++warn () {
+     echo "$*"
+-}
++} >&2
+ 
+-die ( ) {
++die () {
+     echo
+     echo "$*"
+     echo
+     exit 1
+-}
++} >&2
+ 
+ # OS specific support (must be 'true' or 'false').
+ cygwin=false
+ msys=false
+ darwin=false
+-case "`uname`" in
+-  CYGWIN* )
+-    cygwin=true
+-    ;;
+-  Darwin* )
+-    darwin=true
+-    ;;
+-  MINGW* )
+-    msys=true
+-    ;;
++nonstop=false
++case "$( uname )" in                #(
++  CYGWIN* )         cygwin=true  ;; #(
++  Darwin* )         darwin=true  ;; #(
++  MSYS* | MINGW* )  msys=true    ;; #(
++  NONSTOP* )        nonstop=true ;;
+ esac
+ 
+-# Attempt to set APP_HOME
+-# Resolve links: $0 may be a link
+-PRG="$0"
+-# Need this for relative symlinks.
+-while [ -h "$PRG" ] ; do
+-    ls=`ls -ld "$PRG"`
+-    link=`expr "$ls" : '.*-> \(.*\)$'`
+-    if expr "$link" : '/.*' > /dev/null; then
+-        PRG="$link"
+-    else
+-        PRG=`dirname "$PRG"`"/$link"
+-    fi
+-done
+-SAVED="`pwd`"
+-cd "`dirname \"$PRG\"`/" >/dev/null
+-APP_HOME="`pwd -P`"
+-cd "$SAVED" >/dev/null
+-
+ CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
+ 
++
+ # Determine the Java command to use to start the JVM.
+ if [ -n "$JAVA_HOME" ] ; then
+     if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
+         # IBM's JDK on AIX uses strange locations for the executables
+-        JAVACMD="$JAVA_HOME/jre/sh/java"
++        JAVACMD=$JAVA_HOME/jre/sh/java
+     else
+-        JAVACMD="$JAVA_HOME/bin/java"
++        JAVACMD=$JAVA_HOME/bin/java
+     fi
+     if [ ! -x "$JAVACMD" ] ; then
+         die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
+@@ -77,7 +132,7 @@ Please set the JAVA_HOME variable in your environment to match the
+ location of your Java installation."
+     fi
+ else
+-    JAVACMD="java"
++    JAVACMD=java
+     which java >/dev/null 2>&1 || die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
+ 
+ Please set the JAVA_HOME variable in your environment to match the
+@@ -85,76 +140,95 @@ location of your Java installation."
+ fi
+ 
+ # Increase the maximum file descriptors if we can.
+-if [ "$cygwin" = "false" -a "$darwin" = "false" ] ; then
+-    MAX_FD_LIMIT=`ulimit -H -n`
+-    if [ $? -eq 0 ] ; then
+-        if [ "$MAX_FD" = "maximum" -o "$MAX_FD" = "max" ] ; then
+-            MAX_FD="$MAX_FD_LIMIT"
+-        fi
+-        ulimit -n $MAX_FD
+-        if [ $? -ne 0 ] ; then
+-            warn "Could not set maximum file descriptor limit: $MAX_FD"
+-        fi
+-    else
+-        warn "Could not query maximum file descriptor limit: $MAX_FD_LIMIT"
+-    fi
++if ! "$cygwin" && ! "$darwin" && ! "$nonstop" ; then
++    case $MAX_FD in #(
++      max*)
++        MAX_FD=$( ulimit -H -n ) ||
++            warn "Could not query maximum file descriptor limit"
++    esac
++    case $MAX_FD in  #(
++      '' | soft) :;; #(
++      *)
++        ulimit -n "$MAX_FD" ||
++            warn "Could not set maximum file descriptor limit to $MAX_FD"
++    esac
+ fi
+ 
+-# For Darwin, add options to specify how the application appears in the dock
+-if $darwin; then
+-    GRADLE_OPTS="$GRADLE_OPTS \"-Xdock:name=$APP_NAME\" \"-Xdock:icon=$APP_HOME/media/gradle.icns\""
+-fi
++# Collect all arguments for the java command, stacking in reverse order:
++#   * args from the command line
++#   * the main class name
++#   * -classpath
++#   * -D...appname settings
++#   * --module-path (only if needed)
++#   * DEFAULT_JVM_OPTS, JAVA_OPTS, and GRADLE_OPTS environment variables.
++
++# For Cygwin or MSYS, switch paths to Windows format before running java
++if "$cygwin" || "$msys" ; then
++    APP_HOME=$( cygpath --path --mixed "$APP_HOME" )
++    CLASSPATH=$( cygpath --path --mixed "$CLASSPATH" )
++
++    JAVACMD=$( cygpath --unix "$JAVACMD" )
+ 
+-# For Cygwin, switch paths to Windows format before running java
+-if $cygwin ; then
+-    APP_HOME=`cygpath --path --mixed "$APP_HOME"`
+-    CLASSPATH=`cygpath --path --mixed "$CLASSPATH"`
+-    JAVACMD=`cygpath --unix "$JAVACMD"`
+-
+-    # We build the pattern for arguments to be converted via cygpath
+-    ROOTDIRSRAW=`find -L / -maxdepth 1 -mindepth 1 -type d 2>/dev/null`
+-    SEP=""
+-    for dir in $ROOTDIRSRAW ; do
+-        ROOTDIRS="$ROOTDIRS$SEP$dir"
+-        SEP="|"
+-    done
+-    OURCYGPATTERN="(^($ROOTDIRS))"
+-    # Add a user-defined pattern to the cygpath arguments
+-    if [ "$GRADLE_CYGPATTERN" != "" ] ; then
+-        OURCYGPATTERN="$OURCYGPATTERN|($GRADLE_CYGPATTERN)"
+-    fi
+     # Now convert the arguments - kludge to limit ourselves to /bin/sh
+-    i=0
+-    for arg in "$@" ; do
+-        CHECK=`echo "$arg"|egrep -c "$OURCYGPATTERN" -`
+-        CHECK2=`echo "$arg"|egrep -c "^-"`                                 ### Determine if an option
+-
+-        if [ $CHECK -ne 0 ] && [ $CHECK2 -eq 0 ] ; then                    ### Added a condition
+-            eval `echo args$i`=`cygpath --path --ignore --mixed "$arg"`
+-        else
+-            eval `echo args$i`="\"$arg\""
++    for arg do
++        if
++            case $arg in                                #(
++              -*)   false ;;                            # don't mess with options #(
++              /?*)  t=${arg#/} t=/${t%%/*}              # looks like a POSIX filepath
++                    [ -e "$t" ] ;;                      #(
++              *)    false ;;
++            esac
++        then
++            arg=$( cygpath --path --ignore --mixed "$arg" )
+         fi
+-        i=$((i+1))
++        # Roll the args list around exactly as many times as the number of
++        # args, so each arg winds up back in the position where it started, but
++        # possibly modified.
++        #
++        # NB: a `for` loop captures its iteration list before it begins, so
++        # changing the positional parameters here affects neither the number of
++        # iterations, nor the values presented in `arg`.
++        shift                   # remove old arg
++        set -- "$@" "$arg"      # push replacement arg
+     done
+-    case $i in
+-        (0) set -- ;;
+-        (1) set -- "$args0" ;;
+-        (2) set -- "$args0" "$args1" ;;
+-        (3) set -- "$args0" "$args1" "$args2" ;;
+-        (4) set -- "$args0" "$args1" "$args2" "$args3" ;;
+-        (5) set -- "$args0" "$args1" "$args2" "$args3" "$args4" ;;
+-        (6) set -- "$args0" "$args1" "$args2" "$args3" "$args4" "$args5" ;;
+-        (7) set -- "$args0" "$args1" "$args2" "$args3" "$args4" "$args5" "$args6" ;;
+-        (8) set -- "$args0" "$args1" "$args2" "$args3" "$args4" "$args5" "$args6" "$args7" ;;
+-        (9) set -- "$args0" "$args1" "$args2" "$args3" "$args4" "$args5" "$args6" "$args7" "$args8" ;;
+-    esac
+ fi
+ 
+-# Split up the JVM_OPTS And GRADLE_OPTS values into an array, following the shell quoting and substitution rules
+-function splitJvmOpts() {
+-    JVM_OPTS=("$@")
+-}
+-eval splitJvmOpts $DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS
+-JVM_OPTS[${#JVM_OPTS[*]}]="-Dorg.gradle.appname=$APP_BASE_NAME"
+-
+-exec "$JAVACMD" "${JVM_OPTS[@]}" -classpath "$CLASSPATH" org.gradle.wrapper.GradleWrapperMain "$@"
++# Collect all arguments for the java command;
++#   * $DEFAULT_JVM_OPTS, $JAVA_OPTS, and $GRADLE_OPTS can contain fragments of
++#     shell script including quotes and variable substitutions, so put them in
++#     double quotes to make sure that they get re-expanded; and
++#   * put everything else in single quotes, so that it's not re-expanded.
++
++set -- \
++        "-Dorg.gradle.appname=$APP_BASE_NAME" \
++        -classpath "$CLASSPATH" \
++        org.gradle.wrapper.GradleWrapperMain \
++        "$@"
++
++# Use "xargs" to parse quoted args.
++#
++# With -n1 it outputs one arg per line, with the quotes and backslashes removed.
++#
++# In Bash we could simply go:
++#
++#   readarray ARGS < <( xargs -n1 <<<"$var" ) &&
++#   set -- "${ARGS[@]}" "$@"
++#
++# but POSIX shell has neither arrays nor command substitution, so instead we
++# post-process each arg (as a line of input to sed) to backslash-escape any
++# character that might be a shell metacharacter, then use eval to reverse
++# that process (while maintaining the separation between arguments), and wrap
++# the whole thing up as a single "set" statement.
++#
++# This will of course break if any of these variables contains a newline or
++# an unmatched quote.
++#
++
++eval "set -- $(
++        printf '%s\n' "$DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS" |
++        xargs -n1 |
++        sed ' s~[^-[:alnum:]+,./:=@_]~\\&~g; ' |
++        tr '\n' ' '
++    )" '"$@"'
++
++exec "$JAVACMD" "$@"
+diff --git a/gradlew.bat b/gradlew.bat
+index aec99730..ac1b06f9 100644
+--- a/gradlew.bat
++++ b/gradlew.bat
+@@ -1,3 +1,19 @@
++@rem
++@rem Copyright 2015 the original author or authors.
++@rem
++@rem Licensed under the Apache License, Version 2.0 (the "License");
++@rem you may not use this file except in compliance with the License.
++@rem You may obtain a copy of the License at
++@rem
++@rem      https://www.apache.org/licenses/LICENSE-2.0
++@rem
++@rem Unless required by applicable law or agreed to in writing, software
++@rem distributed under the License is distributed on an "AS IS" BASIS,
++@rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++@rem See the License for the specific language governing permissions and
++@rem limitations under the License.
++@rem
++
+ @if "%DEBUG%" == "" @echo off
+ @rem ##########################################################################
+ @rem
+@@ -8,20 +24,23 @@
+ @rem Set local scope for the variables with windows NT shell
+ if "%OS%"=="Windows_NT" setlocal
+ 
+-@rem Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
+-set DEFAULT_JVM_OPTS=
+-
+ set DIRNAME=%~dp0
+ if "%DIRNAME%" == "" set DIRNAME=.
+ set APP_BASE_NAME=%~n0
+ set APP_HOME=%DIRNAME%
+ 
++@rem Resolve any "." and ".." in APP_HOME to make it shorter.
++for %%i in ("%APP_HOME%") do set APP_HOME=%%~fi
++
++@rem Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
++set DEFAULT_JVM_OPTS="-Xmx64m" "-Xms64m"
++
+ @rem Find java.exe
+ if defined JAVA_HOME goto findJavaFromJavaHome
+ 
+ set JAVA_EXE=java.exe
+ %JAVA_EXE% -version >NUL 2>&1
+-if "%ERRORLEVEL%" == "0" goto init
++if "%ERRORLEVEL%" == "0" goto execute
+ 
+ echo.
+ echo ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
+@@ -35,7 +54,7 @@ goto fail
+ set JAVA_HOME=%JAVA_HOME:"=%
+ set JAVA_EXE=%JAVA_HOME%/bin/java.exe
+ 
+-if exist "%JAVA_EXE%" goto init
++if exist "%JAVA_EXE%" goto execute
+ 
+ echo.
+ echo ERROR: JAVA_HOME is set to an invalid directory: %JAVA_HOME%
+@@ -45,34 +64,14 @@ echo location of your Java installation.
+ 
+ goto fail
+ 
+-:init
+-@rem Get command-line arguments, handling Windowz variants
+-
+-if not "%OS%" == "Windows_NT" goto win9xME_args
+-if "%@eval[2+2]" == "4" goto 4NT_args
+-
+-:win9xME_args
+-@rem Slurp the command line arguments.
+-set CMD_LINE_ARGS=
+-set _SKIP=2
+-
+-:win9xME_args_slurp
+-if "x%~1" == "x" goto execute
+-
+-set CMD_LINE_ARGS=%*
+-goto execute
+-
+-:4NT_args
+-@rem Get arguments from the 4NT Shell from JP Software
+-set CMD_LINE_ARGS=%$
+-
+ :execute
+ @rem Setup the command line
+ 
+ set CLASSPATH=%APP_HOME%\gradle\wrapper\gradle-wrapper.jar
+ 
++
+ @rem Execute Gradle
+-"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -classpath "%CLASSPATH%" org.gradle.wrapper.GradleWrapperMain %CMD_LINE_ARGS%
++"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -classpath "%CLASSPATH%" org.gradle.wrapper.GradleWrapperMain %*
+ 
+ :end
+ @rem End local scope for the variables with windows NT shell

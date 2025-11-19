@@ -1,0 +1,15 @@
+--- a/common/rpackage.cc
++++ b/common/rpackage.cc
+@@ -233,10 +233,10 @@
+    filelist.erase(filelist.begin(), filelist.end());
+ 
+    // try normal file first
+-   string f = "/var/lib/dpkg/info/" + string(name()) + ".list";
++   string f = "@TERMUX_PREFIX@/var/lib/dpkg/info/" + string(name()) + ".list";
+    // try multiarch name next
+    if (!FileExists(f))
+-      f = "/var/lib/dpkg/info/" + string(name()) + ":" + arch() + ".list";
++      f = "@TERMUX_PREFIX@/var/lib/dpkg/info/" + string(name()) + ":" + arch() + ".list";
+    if (FileExists(f)) {
+       ifstream in(f.c_str());
+       if (!in != 0)

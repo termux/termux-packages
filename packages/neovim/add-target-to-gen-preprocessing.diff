@@ -1,0 +1,11 @@
+--- a/src/nvim/CMakeLists.txt
++++ b/src/nvim/CMakeLists.txt
+@@ -494,6 +494,8 @@ if(MSVC)
+   list(APPEND gen_cflags -wd4003)
+ endif()
+ 
++list(APPEND gen_cflags --target=@TARGET@)
++
+ set(NVIM_VERSION_GIT_H ${PROJECT_BINARY_DIR}/cmake.config/auto/versiondef_git.h)
+ add_custom_target(update_version_stamp
+   COMMAND ${CMAKE_COMMAND}

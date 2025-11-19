@@ -1,0 +1,27 @@
+From 1d3d78dff5df323dfb1c729f2e22dc5bd8bc9593 Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Mon, 8 Sep 2025 10:11:49 +0200
+Subject: [PATCH] Replace deprecated $function by new $action
+
+The long-deprecated $function was removed from future SWIG 4.4.0.
+It can be safely replaced by $action.
+---
+ libunbound/python/libunbound.i | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libunbound/python/libunbound.i b/libunbound/python/libunbound.i
+index dc12514..9ed1be9 100644
+--- a/libunbound/python/libunbound.i
++++ b/libunbound/python/libunbound.i
+@@ -853,7 +853,7 @@ Result: ['74.125.43.147', '74.125.43.99', '74.125.43.103', '74.125.43.104']
+ %{ 
+   //printf("resolve_start(%lX)\n",(long unsigned int)arg1);
+   Py_BEGIN_ALLOW_THREADS 
+-  $function 
++  $action
+   Py_END_ALLOW_THREADS 
+   //printf("resolve_stop()\n");
+ %} 
+-- 
+2.51.2
+

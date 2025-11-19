@@ -1,0 +1,8 @@
+TERMUX_PKG_HOMEPAGE=https://drobilla.net/software/serd.html
+TERMUX_PKG_DESCRIPTION="A lightweight C library for RDF syntax"
+TERMUX_PKG_LICENSE="ISC"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.32.6"
+TERMUX_PKG_SRCURL=https://download.drobilla.net/serd-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=0fbe094952fe176ba4da4f2f767ddfb5f60e67e64d1761b4383a0b872cfd071a
+TERMUX_PKG_AUTO_UPDATE=true

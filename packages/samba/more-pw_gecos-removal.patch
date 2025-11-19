@@ -1,0 +1,99 @@
+diff --git a/nsswitch/wbinfo.c b/nsswitch/wbinfo.c
+index ae89f87..6b4eb7a 100644
+--- a/nsswitch/wbinfo.c
++++ b/nsswitch/wbinfo.c
+@@ -180,7 +180,7 @@ static bool wbinfo_get_userinfo(char *user)
+ 		 pwd->pw_passwd,
+ 		 (unsigned int)pwd->pw_uid,
+ 		 (unsigned int)pwd->pw_gid,
+-		 pwd->pw_gecos,
++		 pwd->pw_name,
+ 		 pwd->pw_dir,
+ 		 pwd->pw_shell);
+ 
+@@ -207,7 +207,7 @@ static bool wbinfo_get_uidinfo(int uid)
+ 		 pwd->pw_passwd,
+ 		 (unsigned int)pwd->pw_uid,
+ 		 (unsigned int)pwd->pw_gid,
+-		 pwd->pw_gecos,
++		 pwd->pw_name,
+ 		 pwd->pw_dir,
+ 		 pwd->pw_shell);
+ 
+@@ -235,7 +235,7 @@ static bool wbinfo_get_user_sidinfo(const char *sid_str)
+ 		 pwd->pw_passwd,
+ 		 (unsigned int)pwd->pw_uid,
+ 		 (unsigned int)pwd->pw_gid,
+-		 pwd->pw_gecos,
++		 pwd->pw_name,
+ 		 pwd->pw_dir,
+ 		 pwd->pw_shell);
+ 
+diff --git a/nsswitch/winbind_nss_linux.c b/nsswitch/winbind_nss_linux.c
+index 635813c..0c69bb9 100644
+--- a/nsswitch/winbind_nss_linux.c
++++ b/nsswitch/winbind_nss_linux.c
+@@ -201,19 +201,6 @@ static NSS_STATUS fill_pwent(struct passwd *result,
+ 	result->pw_uid = pw->pw_uid;
+ 	result->pw_gid = pw->pw_gid;
+ 
+-	/* GECOS */
+-	len = strlen(pw->pw_gecos) + 1;
+-
+-	if ((result->pw_gecos =
+-	     get_static(buffer, buflen, len)) == NULL) {
+-
+-		/* Out of memory */
+-
+-		return NSS_STATUS_TRYAGAIN;
+-	}
+-
+-	memcpy(result->pw_gecos, pw->pw_gecos, len);
+-
+ 	/* Home directory */
+ 	len = strlen(pw->pw_dir) + 1;
+ 
+diff --git a/source3/passdb/passdb.c b/source3/passdb/passdb.c
+index a66b646..15c1251 100644
+--- a/source3/passdb/passdb.c
++++ b/source3/passdb/passdb.c
+@@ -148,24 +148,10 @@ static NTSTATUS samu_set_unix_internal(struct pdb_methods *methods,
+ 
+ 	fullname = NULL;
+ 
+-	if (count_commas(pwd->pw_gecos) == 3) {
+-		/*
+-		 * Heuristic: This seems to be a gecos field that has been
+-		 * edited by chfn(1). Only use the part before the first
+-		 * comma. Fixes bug 5198.
+-		 */
+-		fullname = talloc_strndup(
+-			talloc_tos(), pwd->pw_gecos,
+-			strchr(pwd->pw_gecos, ',') - pwd->pw_gecos);
+-		if (fullname == NULL) {
+-			return NT_STATUS_NO_MEMORY;
+-		}
+-	}
+-
+ 	if (fullname != NULL) {
+ 		ok = pdb_set_fullname(user, fullname, PDB_SET);
+ 	} else {
+-		ok = pdb_set_fullname(user, pwd->pw_gecos, PDB_SET);
++		ok = pdb_set_fullname(user, pwd->pw_name, PDB_SET);
+ 	}
+ 	TALLOC_FREE(fullname);
+ 
+diff --git a/source3/winbindd/wb_getpwsid.c b/source3/winbindd/wb_getpwsid.c
+index 8dc09eb..52d1ecc 100644
+--- a/source3/winbindd/wb_getpwsid.c
++++ b/source3/winbindd/wb_getpwsid.c
+@@ -116,9 +116,6 @@ static void wb_getpwsid_queryuser_done(struct tevent_req *subreq)
+ 
+ 	strlcpy(pw->pw_name, output_username, sizeof(pw->pw_name));
+ 
+-	strlcpy(pw->pw_gecos, info->full_name ? info->full_name : "",
+-		sizeof(pw->pw_gecos));
+-
+ 	tmp = talloc_sub_specified(
+ 		state, info->homedir, acct_name,
+ 		info->primary_group_name, info->domain_name,

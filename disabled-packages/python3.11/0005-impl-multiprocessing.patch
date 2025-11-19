@@ -1,0 +1,131 @@
+--- a/setup.py
++++ b/setup.py
+@@ -1328,8 +1329,8 @@
+             sysconfig.get_config_var('POSIX_SEMAPHORES_NOT_ENABLED')
+         ):
+             multiprocessing_srcs.append('_multiprocessing/semaphore.c')
+-        self.addext(Extension('_multiprocessing', multiprocessing_srcs))
+-        self.addext(Extension('_posixshmem', ['_multiprocessing/posixshmem.c']))
++        self.addext(Extension('_multiprocessing', multiprocessing_srcs, libraries=["android-posix-semaphore"]))
++        self.addext(Extension('_posixshmem', ['_multiprocessing/posixshmem.c','_multiprocessing/posix-shm-extension.c']))
+ 
+     def detect_uuid(self):
+         # Build the _uuid module if possible
+
+--- a/Lib/multiprocessing/heap.py
++++ b/Lib/multiprocessing/heap.py
+@@ -70,7 +70,7 @@
+         """
+ 
+         if sys.platform == 'linux':
+-            _dir_candidates = ['/dev/shm']
++            _dir_candidates = []
+         else:
+             _dir_candidates = []
+ 
+
+--- a/Modules/_multiprocessing/multiprocessing.c
++++ b/Modules/_multiprocessing/multiprocessing.c
+@@ -172,7 +172,7 @@
+     _MULTIPROCESSING_RECV_METHODDEF
+     _MULTIPROCESSING_SEND_METHODDEF
+ #endif
+-#if !defined(POSIX_SEMAPHORES_NOT_ENABLED) && !defined(__ANDROID__)
++#if !defined(POSIX_SEMAPHORES_NOT_ENABLED)
+     _MULTIPROCESSING_SEM_UNLINK_METHODDEF
+ #endif
+     {NULL}
+
+--- a/Modules/_multiprocessing/posixshmem.c
++++ b/Modules/_multiprocessing/posixshmem.c
+@@ -11,6 +11,9 @@
+ #include <sys/mman.h>
+ #endif
+ 
++int shm_open(const char *, int, mode_t);
++int shm_unlink(const char *);
++
+ /*[clinic input]
+ module _posixshmem
+ [clinic start generated code]*/
+
+--- a/Modules/_multiprocessing/posix-shm-extension.c
++++ b/Modules/_multiprocessing/posix-shm-extension.c
+@@ -0,0 +1,76 @@
++/* This file is a port of posix shared memory for Python3 on Termux Android, 
++   based on musl-libc which is licensed under the following standard MIT 
++   license. The ported files are listed as following.
++
++   File(s): src/mman/shm_open.c
++
++   Copyright © 2005-2020 Rich Felker, et al.
++
++   Permission is hereby granted, free of charge, to any person obtaining
++   a copy of this software and associated documentation files (the
++   "Software"), to deal in the Software without restriction, including
++   without limitation the rights to use, copy, modify, merge, publish,
++   distribute, sublicense, and/or sell copies of the Software, and to
++   permit persons to whom the Software is furnished to do so, subject to
++   the following conditions:
++
++   The above copyright notice and this permission notice shall be
++   included in all copies or substantial portions of the Software.
++
++   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
++   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
++   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
++   CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
++   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
++   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ */
++
++#include <fcntl.h>     // open()
++#include <string.h>    // strlen(), memcpy()
++#include <errno.h>     // errno
++#include <limits.h>    // NAME_MAX
++#include <unistd.h>    // unlink()
++
++#define SHM_PREFIX "@TERMUX_PREFIX@/tmp/shm."
++
++static __inline__ char *__strchrnul(const char *s, int c)
++{
++    c = (unsigned char)c;
++    if (!c) return (char *)s + strlen(s);
++    for (; *s && *(unsigned char *)s != c; s++);
++    return (char *)s;
++}
++
++static char *__shm_mapname(const char *name, char *buf)
++{
++    char *p;
++    while (*name == '/') name++;
++    if (*(p = __strchrnul(name, '/')) || p==name ||
++        (p-name <= 2 && name[0]=='.' && p[-1]=='.')) {
++        errno = EINVAL;
++        return 0;
++    }
++    if (p-name > NAME_MAX-4) {
++        errno = ENAMETOOLONG;
++        return 0;
++    }
++    memcpy(buf, SHM_PREFIX, strlen(SHM_PREFIX));
++    memcpy(buf+strlen(SHM_PREFIX), name, p-name+1);
++    return buf;
++}
++
++int shm_open(const char *name, int flag, mode_t mode)
++{
++    char buf[NAME_MAX+strlen(SHM_PREFIX)+1];
++    if (!(name = __shm_mapname(name, buf))) return -1;
++    int fd = open(name, flag|O_NOFOLLOW|O_CLOEXEC|O_NONBLOCK, mode);
++    return fd;
++}
++
++int shm_unlink(const char *name)
++{
++    char buf[NAME_MAX+strlen(SHM_PREFIX)+1];
++    if (!(name = __shm_mapname(name, buf))) return -1;
++    return unlink(name);
++}
+

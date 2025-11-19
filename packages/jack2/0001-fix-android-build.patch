@@ -1,0 +1,403 @@
+diff --git a/common/Jackdmp.cpp b/common/Jackdmp.cpp
+index 04e722b..45a5ba3 100644
+--- a/common/Jackdmp.cpp
++++ b/common/Jackdmp.cpp
+@@ -35,7 +35,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ #include "JackConstants.h"
+ #include "JackPlatformPlug.h"
+ #ifdef __ANDROID__
+-#include "JackControlAPIAndroid.h"
++#include "../android/JackControlAPIAndroid.h"
+ #endif
+ 
+ #if defined(JACK_DBUS) && defined(__linux__)
+diff --git a/common/shm.c b/common/shm.c
+index b1e7fc7..765bb13 100644
+--- a/common/shm.c
++++ b/common/shm.c
+@@ -50,7 +50,7 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <sys/shm.h>
+-#include <sys/sem.h>
++#include <semaphore.h>
+ #include <stdlib.h>
+ #include "promiscuous.h"
+ 
+@@ -143,12 +143,13 @@ static jack_shm_registry_t *jack_shm_registry = NULL;
+  * again on that machine until after a reboot.
+  */
+ 
+-#define JACK_SEMAPHORE_KEY 0x282929
++// #define JACK_SEMAPHORE_NAME "/jack_termux_semaphore"
+ #ifndef USE_POSIX_SHM
+-#define JACK_SHM_REGISTRY_KEY JACK_SEMAPHORE_KEY
++#define JACK_SHM_REGISTRY_KEY 0x282929
+ #endif
+ 
+ static int semid = -1;
++static sem_t semaphore;
+ 
+ #ifdef WIN32
+ 
+@@ -195,55 +196,35 @@ semaphore_error (char *msg)
+ static int
+ semaphore_init ()
+ {
+-	key_t semkey = JACK_SEMAPHORE_KEY;
+-	struct sembuf sbuf;
+-	int create_flags = IPC_CREAT | IPC_EXCL
+-		| S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
+-
+ 	/* Get semaphore ID associated with this key. */
+-	if ((semid = semget(semkey, 0, 0)) == -1) {
+-
+-		/* Semaphore does not exist - Create. */
+-		if ((semid = semget(semkey, 1, create_flags)) != -1) {
+-
+-			/* Initialize the semaphore, allow one owner. */
+-			sbuf.sem_num = 0;
+-			sbuf.sem_op = 1;
+-			sbuf.sem_flg = 0;
+-			if (semop(semid, &sbuf, 1) == -1) {
+-                semaphore_error ("semop");
+-                return -1;
+-			}
+-
+-		} else if (errno == EEXIST) {
+-			if ((semid = semget(semkey, 0, 0)) == -1) {
+-                semaphore_error ("semget");
+-                return -1;
+-			}
+-
+-		} else {
+-            semaphore_error ("semget creation");
+-            return -1;
+-		}
++	// if ((semid = sem_open(JACK_SEMAPHORE_NAME, O_CREAT, 0777, 1)) == SEM_FAILED) {
++	if ((semid = sem_init(&semaphore, 1, 1)) == -1) {
++		semaphore_error("sem_open");
++		return -1;
+ 	}
+ 
+     return 0;
+ }
+ 
+-static inline int
++static int
+ semaphore_add (int value)
+ {
+-	struct sembuf sbuf;
+-
+-	sbuf.sem_num = 0;
+-	sbuf.sem_op = value;
+-	sbuf.sem_flg = SEM_UNDO;
+-
+-	if (semop(semid, &sbuf, 1) == -1) {
+-		semaphore_error ("semop");
+-        return -1;
+-	}
+-
++    if (value == 0) { return 0; }
++    else if (value > 0) {
++        for (int i = 0; i < value; i++) {
++            if (sem_post(&semaphore) == -1) {
++                semaphore_error("sem_post");
++                return -1;
++            }
++        }
++    } else if (value < 0) {
++    	for (int i = 0; i > value; i--) {
++            if (sem_wait(&semaphore) == -1) {
++                semaphore_error("sem_wait");
++                return -1;
++            }
++        }
++    }
+     return 0;
+ }
+ 
+@@ -705,6 +686,67 @@ jack_attach_lib_shm_read (jack_shm_info_t* si)
+ 
+ #ifdef USE_POSIX_SHM
+ 
++
++
++static int shm_unlink(const char *name) {
++    size_t namelen;
++    char *fname;
++
++    /* Construct the filename.  */
++    while (name[0] == '/') ++name;
++
++    if (name[0] == '\0') {
++        /* The name "/" is not supported.  */
++        errno = EINVAL;
++        return -1;
++    }
++
++    namelen = strlen(name);
++    fname = (char *) alloca(sizeof("@TERMUX_PREFIX@/tmp/") - 1 + namelen + 1);
++    memcpy(fname, "@TERMUX_PREFIX@/tmp/", sizeof("@TERMUX_PREFIX@/tmp/") - 1);
++    memcpy(fname + sizeof("@TERMUX_PREFIX@/tmp/") - 1, name, namelen + 1);
++
++    return unlink(fname);
++}
++
++static int shm_open(const char *name, int oflag, mode_t mode) {
++    size_t namelen;
++    char *fname;
++    int fd;
++
++    /* Construct the filename.  */
++    while (name[0] == '/') ++name;
++
++    if (name[0] == '\0') {
++        /* The name "/" is not supported.  */
++        errno = EINVAL;
++        return -1;
++    }
++
++    namelen = strlen(name);
++    fname = (char *) alloca(sizeof("@TERMUX_PREFIX@/tmp/") - 1 + namelen + 1);
++    memcpy(fname, "@TERMUX_PREFIX@/tmp/", sizeof("@TERMUX_PREFIX@/tmp/") - 1);
++    memcpy(fname + sizeof("@TERMUX_PREFIX@/tmp/") - 1, name, namelen + 1);
++
++    fd = open(fname, oflag, mode);
++    if (fd != -1) {
++        /* We got a descriptor.  Now set the FD_CLOEXEC bit.  */
++        int flags = fcntl(fd, F_GETFD, 0);
++        flags |= FD_CLOEXEC;
++        flags = fcntl(fd, F_SETFD, flags);
++
++        if (flags == -1) {
++            /* Something went wrong.  We cannot return the descriptor.  */
++            int save_errno = errno;
++            close(fd);
++            fd = -1;
++            errno = save_errno;
++        }
++    }
++
++    return fd;
++}
++
+ /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+  * POSIX interface-dependent functions
+  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+diff --git a/common/shm.h b/common/shm.h
+index 3e3276d..3f0cf3a 100644
+--- a/common/shm.h
++++ b/common/shm.h
+@@ -70,6 +70,7 @@ extern "C"
+ #endif
+     typedef char shm_name_t[SHM_NAME_MAX];
+     typedef shm_name_t jack_shm_id_t;
++    typedef int jack_shm_fd_t;
+ 
+ #elif WIN32
+ #define NAME_MAX 255
+@@ -89,7 +90,7 @@ extern "C"
+ #define SHM_NAME_MAX NAME_MAX
+ #endif
+     typedef char shm_name_t[SHM_NAME_MAX];
+-    typedef shm_name_t jack_shm_id_t;
++    typedef int	jack_shm_id_t;
+     typedef int jack_shm_fd_t;
+ 
+ #else
+diff --git a/common/wscript b/common/wscript
+index 178d4c1..720b28f 100644
+--- a/common/wscript
++++ b/common/wscript
+@@ -87,7 +87,7 @@ def build(bld):
+             'JackDebugClient.cpp',
+             'timestamps.c',
+             'promiscuous.c',
+-            '../posix/JackPosixThread.cpp',
++            '../android/JackAndroidThread.cpp',
+             '../posix/JackPosixProcessSync.cpp',
+             '../posix/JackPosixMutex.cpp',
+             '../posix/JackSocket.cpp',
+@@ -309,6 +309,7 @@ def build(bld):
+             '../posix/JackSocketNotifyChannel.cpp',
+             '../posix/JackSocketServerNotifyChannel.cpp',
+             '../posix/JackNetUnixSocket.cpp',
++            '../android/JackControlAPIAndroid.cpp',
+             ]
+ 
+     if bld.env['IS_FREEBSD']:
+@@ -397,7 +398,7 @@ def build(bld):
+         if bld.env['IS_LINUX']:
+             netlib.source += [
+                 '../posix/JackNetUnixSocket.cpp',
+-                '../posix/JackPosixThread.cpp',
++                '../android/JackAndroidThread.cpp',
+                 '../posix/JackPosixMutex.cpp',
+                 '../linux/JackLinuxTime.c',
+             ]
+diff --git a/linux/JackLinuxFutex.cpp b/linux/JackLinuxFutex.cpp
+index 29b1390..64b9aeb 100644
+--- a/linux/JackLinuxFutex.cpp
++++ b/linux/JackLinuxFutex.cpp
+@@ -34,6 +34,66 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ #define SYS_futex SYS_futex_time64
+ #endif
+ 
++
++static int shm_unlink(const char *name) {
++    size_t namelen;
++    char *fname;
++
++    /* Construct the filename.  */
++    while (name[0] == '/') ++name;
++
++    if (name[0] == '\0') {
++        /* The name "/" is not supported.  */
++        errno = EINVAL;
++        return -1;
++    }
++
++    namelen = strlen(name);
++    fname = (char *) alloca(sizeof("@TERMUX_PREFIX@/tmp/") - 1 + namelen + 1);
++    memcpy(fname, "@TERMUX_PREFIX@/tmp/", sizeof("@TERMUX_PREFIX@/tmp/") - 1);
++    memcpy(fname + sizeof("@TERMUX_PREFIX@/tmp/") - 1, name, namelen + 1);
++
++    return unlink(fname);
++}
++
++static int shm_open(const char *name, int oflag, mode_t mode) {
++    size_t namelen;
++    char *fname;
++    int fd;
++
++    /* Construct the filename.  */
++    while (name[0] == '/') ++name;
++
++    if (name[0] == '\0') {
++        /* The name "/" is not supported.  */
++        errno = EINVAL;
++        return -1;
++    }
++
++    namelen = strlen(name);
++    fname = (char *) alloca(sizeof("@TERMUX_PREFIX@/tmp/") - 1 + namelen + 1);
++    memcpy(fname, "@TERMUX_PREFIX@/tmp/", sizeof("@TERMUX_PREFIX@/tmp/") - 1);
++    memcpy(fname + sizeof("@TERMUX_PREFIX@/tmp/") - 1, name, namelen + 1);
++
++    fd = open(fname, oflag, mode);
++    if (fd != -1) {
++        /* We got a descriptor.  Now set the FD_CLOEXEC bit.  */
++        int flags = fcntl(fd, F_GETFD, 0);
++        flags |= FD_CLOEXEC;
++        flags = fcntl(fd, F_SETFD, flags);
++
++        if (flags == -1) {
++            /* Something went wrong.  We cannot return the descriptor.  */
++            int save_errno = errno;
++            close(fd);
++            fd = -1;
++            errno = save_errno;
++        }
++    }
++
++    return fd;
++}
++
+ namespace Jack
+ {
+ 
+diff --git a/linux/JackPlatformPlug_os.h b/linux/JackPlatformPlug_os.h
+index 60c9a58..cd0803a 100644
+--- a/linux/JackPlatformPlug_os.h
++++ b/linux/JackPlatformPlug_os.h
+@@ -30,7 +30,7 @@ namespace Jack
+     struct JackResult;
+ 
+     class JackPosixMutex;
+-    class JackPosixThread;
++    class JackAndroidThread;
+     class JackFifo;
+     class JackSocketServerChannel;
+     class JackSocketClientChannel;
+@@ -46,7 +46,7 @@ namespace Jack {typedef JackPosixMutex JackMutex; }
+ 
+ /* __JackPlatformThread__ */
+ #include "JackPosixThread.h"
+-namespace Jack { typedef JackPosixThread JackThread; }
++namespace Jack { typedef JackAndroidThread JackThread; }
+ 
+ /* __JackPlatformSynchro__  client activation */
+ /*
+diff --git a/linux/alsa/JackAlsaDriver.cpp b/linux/alsa/JackAlsaDriver.cpp
+index 0ac2919..2aa310f 100644
+--- a/linux/alsa/JackAlsaDriver.cpp
++++ b/linux/alsa/JackAlsaDriver.cpp
+@@ -40,7 +40,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ #include "JackGraphManager.h"
+ #include "JackLockedEngine.h"
+ #ifdef __ANDROID__
+-#include "JackAndroidThread.h"
++#include "../android/JackAndroidThread.h"
+ #else
+ #include "JackPosixThread.h"
+ #endif
+@@ -362,7 +362,7 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
+     fPlaybackChannels = ((alsa_driver_t *)fDriver)->playback_nchannels;
+     if (JackServerGlobals::on_device_reservation_loop != NULL) {
+         device_reservation_loop_running = true;
+-        if (JackPosixThread::StartImp(&fReservationLoopThread, 0, 0, on_device_reservation_loop, NULL) != 0) {
++        if (JackAndroidThread::StartImp(&fReservationLoopThread, 0, 0, on_device_reservation_loop, NULL) != 0) {
+             device_reservation_loop_running = false;
+         }
+     }
+@@ -381,7 +381,7 @@ int JackAlsaDriver::Close()
+ 
+     if (device_reservation_loop_running) {
+         device_reservation_loop_running = false;
+-        JackPosixThread::StopImp(fReservationLoopThread);
++        JackAndroidThread::StopImp(fReservationLoopThread);
+     }
+ 
+     if (JackServerGlobals::on_device_release != NULL)
+diff --git a/posix/JackPosixThread.h b/posix/JackPosixThread.h
+index 599bf49..1d0fa32 100644
+--- a/posix/JackPosixThread.h
++++ b/posix/JackPosixThread.h
+@@ -21,6 +21,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ #ifndef __JackPosixThread__
+ #define __JackPosixThread__
+ 
++#ifdef __ANDROID__
++
++#include "../android/JackAndroidThread.h"
++
++#else
++
+ #include "JackThread.h"
+ #include <pthread.h>
+ 
+@@ -85,5 +91,6 @@ SERVER_EXPORT void ThreadExit();
+ 
+ } // end of namespace
+ 
++#endif
+ 
+ #endif
+diff --git a/posix/JackSystemDeps_os.h b/posix/JackSystemDeps_os.h
+index 18ea74c..6d12bad 100644
+--- a/posix/JackSystemDeps_os.h
++++ b/posix/JackSystemDeps_os.h
+@@ -41,4 +41,12 @@
+ 
+ #define JACK_DEBUG (getenv("JACK_CLIENT_DEBUG") && strcmp(getenv("JACK_CLIENT_DEBUG"), "on") == 0)
+ 
++#ifdef __ANDROID__
++
++/**
++ *  bionic c dependent functions, copied from ../android/JackSystemDeps_os.h
++ */
++#define pthread_setcanceltype(x,y)  (0)
++#endif
++
+ #endif

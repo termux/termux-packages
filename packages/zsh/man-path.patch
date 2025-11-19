@@ -1,0 +1,11 @@
+--- ./Completion/Unix/Command/_man	2022-05-08 08:18:22.000000000 +0200
++++ ../zsh-5.9-patched/Completion/Unix/Command/_man	2022-09-23 21:48:20.995363539 +0200
+@@ -180,7 +180,7 @@
+   fi
+ 
+   (( $#_manpath )) ||
+-      _manpath=( /usr/man(-/) /(opt|usr)/(pkg|dt|share|X11R6|local)/(cat|)man(-/) )
++      _manpath=( @TERMUX_PREFIX@/man(-/) @TERMUX_PREFIX@/(pkg|dt|share|X11R6|local)/(cat|)man(-/) )
+ 
+   # Override man path
+   [[ -n ${opt_args[-M]} ]] &&

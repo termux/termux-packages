@@ -1,0 +1,25 @@
+Most Android 11+ devices do not have permission
+to access /proc/net/dev without root, with
+some exceptions, so suppress this warning with
+the assumption that users of Android 11+ are
+probably familiar with this limitation and would rather
+not be annoyed by this warning spamming.
+The other observable effect when this warning occurs is
+the network status monitor not working,
+and if the user sees that happening, trying the commands
+'pkg install iproute2' and 'ip a' on the same device without
+using root will show the user the same 'permission denied'
+message, informing them that they are using a device
+that does not permit network adapter metadata permission
+without root.
+--- a/src/apppstatus.cc
++++ b/src/apppstatus.cc
+@@ -761,7 +761,7 @@ bool NetStatusControl::readNetDev(char* data, size_t size) {
+     if (fNetDev < 0) {
+         fNetDev = open(path, O_RDONLY | O_CLOEXEC);
+         if (fNetDev < 0) {
+-            fail("open %s", path);
++            //fail("open %s", path);
+             return false;
+         }
+     }

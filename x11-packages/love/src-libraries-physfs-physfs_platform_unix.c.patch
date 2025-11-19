@@ -1,0 +1,11 @@
+--- a/src/libraries/physfs/physfs_platform_unix.c
++++ b/src/libraries/physfs/physfs_platform_unix.c
+@@ -101,7 +101,7 @@
+     FILE *mounts = NULL;
+     struct mntent *ent = NULL;
+ 
+-    mounts = setmntent("/etc/mtab", "r");
++    mounts = setmntent("@TERMUX_PREFIX@/etc/mtab", "r");
+     BAIL_IF(mounts == NULL, PHYSFS_ERR_IO, /*return void*/);
+ 
+     while ( (ent = getmntent(mounts)) != NULL )

@@ -1,0 +1,25 @@
+--- a/Makefile
++++ b/Makefile
+@@ -5,10 +5,10 @@
+ PREFIX ?= /usr/local
+ BINDIR ?= bin
+ MANDIR ?= share/man
+-SYSCONFDIR ?= /etc
+-RUNDIR ?= /run
++SYSCONFDIR = @TERMUX_PREFIX@/etc
++RUNDIR = @TERMUX_PREFIX@/var/run
+ 
+-sharedstatedir := /var/lib
++sharedstatedir := @TERMUX_PREFIX@/var/lib
+ config_path := $(SYSCONFDIR)/soju/config
+ admin_socket_path := $(RUNDIR)/soju/admin
+ goldflags := -X 'codeberg.org/emersion/soju/config.DefaultPath=$(config_path)' \
+@@ -36,7 +36,7 @@
+ 	mkdir -p $(DESTDIR)$(sharedstatedir)/soju
+ 	cp -f $(commands) $(DESTDIR)$(PREFIX)/$(BINDIR)
+ 	cp -f $(man_pages) $(DESTDIR)$(PREFIX)/$(MANDIR)/man1
+-	[ -f $(DESTDIR)$(config_path) ] || cp -f config.in $(DESTDIR)$(config_path)
++	cp -f config.in $(DESTDIR)$(config_path)
+ 	if go version -m soju | grep -E '^\s*build\s*-tags=' | grep -Eq '(=|,)pam($|,)'; then \
+ 	  mkdir -p $(DESTDIR)$(SYSCONFDIR)/pam.d; \
+ 	  cp -f auth/pam_config $(DESTDIR)$(SYSCONFDIR)/pam.d/soju; \

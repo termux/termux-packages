@@ -1,0 +1,31 @@
+diff -uNr NXEngine-1.0.0.4-Rev4/Makefile.linux NXEngine-1.0.0.4-Rev4.mod/Makefile.linux
+--- NXEngine-1.0.0.4-Rev4/Makefile.linux	2014-01-25 15:05:18.000000000 +0200
++++ NXEngine-1.0.0.4-Rev4.mod/Makefile.linux	2021-08-19 20:50:38.199439852 +0300
+@@ -11,17 +11,17 @@
+ # Please uncomment "-D_L10N_CP1251" for Russian Localization
+ BUILD         = shared
+ 
+-CC            = gcc
+-CXX           = g++
++CC            ?= gcc
++CXX           ?= g++
+ DEFINES       = # -D_L10N_CP1251
+-CFLAGS        = -pipe -O2 $(DEFINES)
+-CXXFLAGS      = -pipe -O2 $(DEFINES)
+-INCPATH       = -I/usr/include -I/usr/include/SDL -I/usr/local/include -I/usr/local/include/SDL -I.
+-LINK          = g++
+-LFLAGS        = -Wl,-O1 -Wl,-rpath,/usr/lib
+-LIBS_SHARED   = -lSDLmain -lSDL -lSDL_ttf
+-LIBS_STATIC   = /usr/local/lib/libSDLmain.a /usr/local/lib/libSDL.a /usr/local/lib/libSDL_ttf.a -ldl -lpthread -lfreetype
+-STRIP         = strip
++CFLAGS        ?= -pipe -O2 $(DEFINES)
++CXXFLAGS      ?= -pipe -O2 $(DEFINES)
++INCPATH       = -I@TERMUX_PREFIX@/include -I@TERMUX_PREFIX@/include/SDL -I.
++LINK          ?= g++
++LFLAGS        ?= -Wl,-O1
++LIBS_SHARED   = -lSDL -lSDL_ttf
++LIBS_STATIC   = @TERMUX_PREFIX@/lib/libSDLmain.a @TERMUX_PREFIX@/lib/libSDL.a @TERMUX_PREFIX@/lib/libSDL_ttf.a -ldl -lpthread -lfreetype
++STRIP         ?= strip
+ DEL_FILE      = rm -f
+ 
+ ####### Output directory

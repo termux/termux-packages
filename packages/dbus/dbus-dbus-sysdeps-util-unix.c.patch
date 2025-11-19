@@ -1,0 +1,36 @@
+--- a/dbus/dbus-sysdeps-util-unix.c
++++ b/dbus/dbus-sysdeps-util-unix.c
+@@ -311,11 +311,16 @@
+ dbus_bool_t
+ _dbus_verify_daemon_user (const char *user)
+ {
++/* Termux is a single-user environment. */
++#ifdef __ANDROID__
++  return TRUE;
++#else
+   DBusString u;
+ 
+   _dbus_string_init_const (&u, user);
+ 
+   return _dbus_get_user_id_and_primary_group (&u, NULL, NULL);
++#endif
+ }
+ 
+ 
+@@ -332,6 +337,8 @@
+ _dbus_change_to_daemon_user  (const char    *user,
+                               DBusError     *error)
+ {
++/* Termux is a single-user environment. */
++#ifndef __ANDROID__
+   dbus_uid_t uid;
+   dbus_gid_t gid;
+   DBusString u;
+@@ -375,6 +382,7 @@
+                       _dbus_strerror (errno));
+       return FALSE;
+     }
++#endif
+ 
+   return TRUE;
+ }

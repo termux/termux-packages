@@ -1,0 +1,18 @@
+--- ../android.c.orig	2020-05-15 19:44:11.410344718 +0200
++++ ./src/wg-quick/android.c	2020-05-15 21:42:30.220908645 +0200
+@@ -615,12 +615,12 @@
+ 		return;
+ 
+ 	args[0] = "su";
+-	args[1] = "-p";
+-	args[2] = "-c";
++	args[1] = "-c";
++	args[2] = "PATH=@TERMUX_PREFIX@/bin:/system/bin";
+ 	memcpy(&args[3], argv, argc * sizeof(*args));
+ 	args[argc + 3] = NULL;
+ 
+-	printf("[$] su -p -c ");
++	printf("[$] su PATH=@TERMUX_PREFIX@/bin:/system/bin ");
+ 	for (int i = 0; i < argc; ++i)
+ 		printf("%s%c", argv[i], i == argc - 1 ? '\n' : ' ');
+ 

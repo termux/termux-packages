@@ -1,0 +1,31 @@
+--- a/openpgpkey
++++ b/openpgpkey
+@@ -94,8 +94,8 @@
+ 	parser.add_argument('--version', action='version', version='openpgpkey version: %s'%VERSION, help='show version and exit')
+ 
+ 	parser.add_argument('--insecure', action='store_true', default=False, help='Allow use of non-dnssec secured answers')
+-	parser.add_argument('--resolvconf', action='store', default='', help='Use a recursive resolver listed in a resolv.conf file (default: /etc/resolv.conf)')
+-	parser.add_argument('--rootanchor', action='store', default='', help='Location of the unbound compatible DNSSEC root.anchor (default: /var/lib/unbound/root.anchor)')
++	parser.add_argument('--resolvconf', action='store', default='', help='Use a recursive resolver listed in a resolv.conf file (default: @TERMUX_PREFIX@/etc/resolv.conf)')
++	parser.add_argument('--rootanchor', action='store', default='', help='Location of the unbound compatible DNSSEC root.anchor (default: @TERMUX_PREFIX@/var/lib/unbound/root.anchor)')
+ 	parser.add_argument('email', metavar="email")
+ 
+ 	parser.add_argument('--uid', action='store', default='', help='override the uid (email address) within the key')
+@@ -116,7 +116,7 @@
+ 		# unbound setup, only for verify
+ 		global ctx
+ 		ctx = unbound.ub_ctx()
+-		resolvconf = "/etc/resolv.conf"
++		resolvconf = "@TERMUX_PREFIX@/etc/resolv.conf"
+ 		rootanchor = None
+ 		if args.rootanchor:
+ 			if os.path.isfile(args.rootanchor):
+@@ -125,7 +125,7 @@
+ 				print('openpgpkey: %s is not a file. Unable to use it as rootanchor' % args.rootanchor, file=sys.stdout)
+ 				sys.exit(1)
+ 		else:
+-			cauldron = ( "/var/lib/unbound/root.anchor", "/var/lib/unbound/root.key", "/etc/unbound/root.key" )
++			cauldron = ( "@TERMUX_PREFIX@/var/lib/unbound/root.anchor", "@TERMUX_PREFIX@/var/lib/unbound/root.key", "@TERMUX_PREFIX@/etc/unbound/root.key" )
+ 			for root in cauldron:
+ 				if os.path.isfile(root):
+ 					rootanchor=root

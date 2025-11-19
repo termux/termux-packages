@@ -1,0 +1,55 @@
+--- a/avahi-autoipd/main.c
++++ b/avahi-autoipd/main.c
+@@ -934,6 +934,7 @@
+ 
+     /* Get user/group ID */
+ 
++#ifndef __ANDROID__
+     if (!no_drop_root) {
+ 
+         if (!(pw = getpwnam(AVAHI_AUTOIPD_USER))) {
+@@ -948,6 +949,7 @@
+ 
+         daemon_log(LOG_INFO, "Found user '"AVAHI_AUTOIPD_USER"' (UID %lu) and group '"AVAHI_AUTOIPD_GROUP"' (GID %lu).", (unsigned long) pw->pw_uid, (unsigned long) gr->gr_gid);
+     }
++#endif
+ 
+     /* Create directory */
+     u = umask(0000);
+@@ -964,14 +966,20 @@
+     if (!no_drop_root) {
+         struct stat st;
+ 
++#ifndef __ANDROID__
+         chown(AVAHI_IPDATA_DIR, pw->pw_uid, gr->gr_gid);
++#endif
+ 
+         if (stat(AVAHI_IPDATA_DIR, &st) < 0) {
+             daemon_log(LOG_ERR, "stat(): %s\n", strerror(errno));
+             return -1;
+         }
+ 
++#ifndef __ANDROID__
+         if (!S_ISDIR(st.st_mode) || st.st_uid != pw->pw_uid || st.st_gid != gr->gr_gid) {
++#else
++        if (!S_ISDIR(st.st_mode)) {
++#endif
+             daemon_log(LOG_ERR, "Failed to create runtime directory "AVAHI_IPDATA_DIR".");
+             return -1;
+         }
+@@ -995,6 +1003,7 @@
+ 
+ #endif
+ 
++#ifndef __ANDROID__
+     if (!no_drop_root) {
+ 
+         if (initgroups(AVAHI_AUTOIPD_USER, gr->gr_gid) != 0) {
+@@ -1040,6 +1049,7 @@
+ 
+         daemon_log(LOG_INFO, "Successfully dropped root privileges.");
+     }
++#endif /* __ANDROID__ */
+ 
+     return 0;
+ }

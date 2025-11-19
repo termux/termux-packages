@@ -1,0 +1,31 @@
+From ed2a7d72cfdbd57b2d07912f17aebd04df5f7d13 Mon Sep 17 00:00:00 2001
+From: Matt Fellenz <mattf53190@gmail.com>
+Date: Mon, 16 Aug 2021 08:48:17 -0700
+Subject: [PATCH] Fix improper string + int concatenation
+
+When using the `+` operator on a string literal (which is natively a `char*`) and an integer, you are actually adding to the pointer value rather than concatenating to the string. Instead, by first explicitly constructing an `std::string` from the string literal, and second using `std::to_string` on the integer, the string will be properly concatenated.
+---
+ src/CallableParameterMetaData.cpp | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/CallableParameterMetaData.cpp b/src/CallableParameterMetaData.cpp
+index d90626c..7f7d392 100644
+--- a/src/CallableParameterMetaData.cpp
++++ b/src/CallableParameterMetaData.cpp
+@@ -17,7 +17,6 @@
+    51 Franklin St., Fifth Floor, Boston, MA 02110, USA
+ *************************************************************************************/
+ 
+-
+ #include "CallableParameterMetaData.h"
+ 
+ #include "ColumnType.h"
+@@ -59,7 +58,7 @@ namespace mariadb
+   void CallableParameterMetaData::setIndex(uint32_t index)
+   {
+     if (index < 1 || index > parameterCount) {
+-      throw SQLException("invalid parameter index " + index);
++      throw SQLException(std::string("invalid parameter index ") + std::to_string(index));
+     }
+     rs->absolute(index);
+   }

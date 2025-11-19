@@ -1,0 +1,11 @@
+--- a/torch/headeronly/macros/Macros.h
++++ b/torch/headeronly/macros/Macros.h
+@@ -482,7 +482,7 @@ __host__ __device__
+ #include <TargetConditionals.h>
+ #endif
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #define C10_ANDROID 1
+ #define C10_MOBILE 1
+ #elif (                   \

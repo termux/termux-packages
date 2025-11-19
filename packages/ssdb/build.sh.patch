@@ -1,0 +1,34 @@
+--- a/build.sh
++++ b/build.sh
+@@ -66,6 +66,7 @@
+ esac
+ 
+ 
++if false; then
+ DIR=`pwd`
+ cd $SNAPPY_PATH
+ if [ ! -f Makefile ]; then
+@@ -79,6 +80,7 @@
+ 	echo ""
+ fi
+ cd "$DIR"
++fi
+ 
+ 
+ case "$TARGET_OS" in
+@@ -132,12 +134,11 @@
+ 
+ echo "CFLAGS=" >> build_config.mk
+ echo "CFLAGS = -DNDEBUG -D__STDC_FORMAT_MACROS -Wall -O2 -Wno-sign-compare" >> build_config.mk
+-echo "CFLAGS += ${PLATFORM_CFLAGS}" >> build_config.mk
+-echo "CFLAGS += -I \"$LEVELDB_PATH/include\"" >> build_config.mk
++echo "CFLAGS += ${CXXFLAGS} ${CPPFLAGS}" >> build_config.mk
+ 
+ echo "CLIBS=" >> build_config.mk
+-echo "CLIBS += \"$LEVELDB_PATH/out-static/libleveldb.a\"" >> build_config.mk
+-echo "CLIBS += \"$SNAPPY_PATH/.libs/libsnappy.a\"" >> build_config.mk
++echo "CLIBS += ${LDFLAGS}" >> build_config.mk
++echo "CLIBS += -lleveldb" >> build_config.mk
+ 
+ case "$TARGET_OS" in
+ 	CYGWIN*|FreeBSD|OS_ANDROID_CROSSCOMPILE)

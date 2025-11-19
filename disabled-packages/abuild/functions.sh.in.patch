@@ -1,0 +1,147 @@
+diff -uNr abuild-3.4.0/functions.sh.in abuild-3.4.0.mod/functions.sh.in
+--- abuild-3.4.0/functions.sh.in	2019-06-14 15:13:23.000000000 +0300
++++ abuild-3.4.0.mod/functions.sh.in	2019-07-21 17:00:19.730135313 +0300
+@@ -5,40 +5,20 @@
+ 
+ arch_to_hostspec() {
+ 	case "$1" in
+-	aarch64)	echo "aarch64-alpine-linux-musl" ;;
+-	armel)		echo "armv5-alpine-linux-musleabi" ;;
+-	armhf)		echo "armv6-alpine-linux-musleabihf" ;;
+-	armv7)		echo "armv7-alpine-linux-musleabihf" ;;
+-	mips)           echo "mips-alpine-linux-musl" ;;
+-	mips64)         echo "mips64-alpine-linux-musl" ;;
+-	mipsel)         echo "mipsel-alpine-linux-musl" ;;
+-	mips64el)       echo "mips64el-alpine-linux-musl" ;;
+-	ppc)		echo "powerpc-alpine-linux-musl" ;;
+-	ppc64)		echo "powerpc64-alpine-linux-musl" ;;
+-	ppc64le)	echo "powerpc64le-alpine-linux-musl" ;;
+-	s390x)		echo "s390x-alpine-linux-musl" ;;
+-	x86)		echo "i586-alpine-linux-musl" ;;
+-	x86_64)		echo "x86_64-alpine-linux-musl" ;;
++	aarch64)    echo "aarch64-linux-android" ;;
++	arm)        echo "arm-linux-androideabi" ;;
++	i686)       echo "i686-linux-android" ;;
++	x86_64)     echo "x86_64-linux-android" ;;
+ 	*)		echo "unknown" ;;
+ 	esac
+ }
+ 
+ hostspec_to_arch() {
+ 	case "$1" in
+-	aarch64*-*-*-*)		echo "aarch64" ;;
+-	arm*-*-*-*eabi)		echo "armel" ;;
+-	armv6*-*-*-*eabihf)	echo "armhf" ;;
+-	armv7*-*-*-*eabihf)	echo "armv7" ;;
+-	i[0-9]86-*-*-*)		echo "x86" ;;
+-	mips-*-*-*)             echo "mips" ;;
+-	mips64-*-*-*)           echo "mips64" ;;
+-	mipsel-*-*-*)           echo "mipsel" ;;
+-	mips64el-*-*-*)         echo "mips64el" ;;
+-	powerpc-*-*-*)		echo "ppc" ;;
+-	powerpc64-*-*-*)	echo "ppc64" ;;
+-	powerpc64le-*-*-*)	echo "ppc64le" ;;
+-	s390x-*-*-*)		echo "s390x" ;;
+-	x86_64-*-*-*)		echo "x86_64" ;;
++	aarch64-*)  echo "aarch64" ;;
++	arm-*)      echo "arm" ;;
++	i686-*)     echo "i686" ;;
++	x86_64-*)   echo "x86_64" ;;
+ 	*)			echo "unknown" ;;
+ 	esac
+ }
+@@ -114,7 +94,7 @@
+ 	PACKAGER=${_PACKAGER-$PACKAGER}
+ 	USE_COLORS=${_USE_COLORS-$USE_COLORS}
+ 
+-	[ -z "$CBUILD" ] && CBUILD="$(gcc -dumpmachine)"
++	[ -z "$CBUILD" ] && CBUILD="$(clang -dumpmachine)"
+ 	[ -z "$CHOST" ] && CHOST="$CBUILD"
+ 	[ -z "$CTARGET" ] && CTARGET="$CHOST"
+ 	[ "$(arch_to_hostspec $CBUILD)" != "unknown" ] && CBUILD="$(arch_to_hostspec $CBUILD)"
+@@ -134,11 +114,71 @@
+ 		# setup build root
+ 		[ -z "$CBUILDROOT" ] && export CBUILDROOT="$HOME/sysroot-$CTARGET_ARCH/"
+ 		# prepare pkg-config for cross building
+-		[ -z "$PKG_CONFIG_PATH" ] && export PKG_CONFIG_PATH="${CBUILDROOT}/usr/lib/pkgconfig/"
++		[ -z "$PKG_CONFIG_PATH" ] && export PKG_CONFIG_PATH="${CBUILDROOT}/lib/pkgconfig/"
+ 		[ -z "$PKG_CONFIG_SYSROOT_DIR" ] && export PKG_CONFIG_SYSROOT_DIR="${CBUILDROOT}"
++
+ 		# libtool bug workaround for extra rpaths
+-		[ -z "$lt_cv_sys_lib_dlsearch_path_spec" ] && \
+-			export lt_cv_sys_lib_dlsearch_path_spec="${CBUILDROOT}/lib ${CBUILDROOT}/usr/lib /usr/lib /lib /usr/local/lib"
++		if [ -z "$lt_cv_sys_lib_dlsearch_path_spec" ]; then
++			case $CTARGET_ARCH in
++			aarch64|x86_64) export lt_cv_sys_lib_dlsearch_path_spec="${CBUILDROOT}/lib @TERMUX_PREFIX@/lib /system/lib64" ;;
++			*) export lt_cv_sys_lib_dlsearch_path_spec="${CBUILDROOT}/lib @TERMUX_PREFIX@/lib /system/lib" ;;
++			esac
++		fi
++
++		# Originally set in build-package.sh script in Termux build environment.
++		# https://github.com/termux/termux-packages/blob/master/build-package.sh
++		export ac_cv_func_getpwent=no
++		export ac_cv_func_getpwnam=no
++		export ac_cv_func_getpwuid=no
++		export ac_cv_func_sigsetmask=no
++		export ac_cv_c_bigendian=no
++		export ac_cv_func_calloc_0_nonnull=yes
++		export ac_cv_func_calloc_0_nonnull=yes
++		export ac_cv_func_chown_works=yes
++		export ac_cv_func_getgroups_works=yes
++		export ac_cv_func_malloc_0_nonnull=yes
++		export ac_cv_func_realloc_0_nonnull=yes
++		export am_cv_func_working_getline=yes
++		export gl_cv_C_locale_sans_EILSEQ=yes
++		export gl_cv_func_dup2_works=yes
++		export gl_cv_func_fcntl_f_dupfd_cloexec=yes
++		export gl_cv_func_fcntl_f_dupfd_works=yes
++		export gl_cv_func_fnmatch_posix=yes
++		export gl_cv_func_getcwd_abort_bug=no
++		export gl_cv_func_getcwd_null=yes
++		export gl_cv_func_getcwd_path_max=yes
++		export gl_cv_func_getcwd_posix_signature=yes
++		export gl_cv_func_gettimeofday_clobber=no
++		export gl_cv_func_gettimeofday_posix_signature=yes
++		export gl_cv_func_link_works=yes
++		export gl_cv_func_lstat_dereferences_slashed_symlink=yes
++		export gl_cv_func_malloc_0_nonnull=yes
++		export gl_cv_func_memchr_works=yes
++		export gl_cv_func_mkdir_trailing_dot_works=yes
++		export gl_cv_func_mkdir_trailing_slash_works=yes
++		export gl_cv_func_mkfifo_works=yes
++		export gl_cv_func_mknod_works=yes
++		export gl_cv_func_realpath_works=yes
++		export gl_cv_func_select_detects_ebadf=yes
++		export gl_cv_func_snprintf_posix=yes
++		export gl_cv_func_snprintf_retval_c99=yes
++		export gl_cv_func_snprintf_truncation_c99=yes
++		export gl_cv_func_stat_dir_slash=yes
++		export gl_cv_func_stat_file_slash=yes
++		export gl_cv_func_strerror_0_works=yes
++		export gl_cv_func_symlink_works=yes
++		export gl_cv_func_tzset_clobber=no
++		export gl_cv_func_unlink_honors_slashes=yes
++		export gl_cv_func_unlink_honors_slashes=yes
++		export gl_cv_func_vsnprintf_posix=yes
++		export gl_cv_func_vsnprintf_zerosize_c99=yes
++		export gl_cv_func_wcwidth_works=yes
++		export gl_cv_func_working_getdelim=yes
++		export gl_cv_func_working_mkstemp=yes
++		export gl_cv_func_working_mktime=yes
++		export gl_cv_func_working_strerror=yes
++		export gl_cv_header_working_fcntl_h=yes
++
+ 		# setup cross-compiler
+ 		if [ -z "$CROSS_COMPILE" ]; then
+ 			export CROSS_COMPILE="${CHOST}-"
+@@ -149,8 +189,8 @@
+ 			export HOSTCXXFLAGS="$CXXFLAGS"
+ 			export HOSTCFLAGS="$CFLAGS"
+ 			export HOSTLDFLAGS="$LDFLAGS"
+-			export CC=${CROSS_COMPILE}gcc
+-			export CXX=${CROSS_COMPILE}g++
++			export CC=${CROSS_COMPILE}clang
++			export CXX=${CROSS_COMPILE}clang++
+ 			export LD=${CROSS_COMPILE}ld
+ 			export CPPFLAGS="--sysroot=${CBUILDROOT} $CPPFLAGS"
+ 			export CXXFLAGS="--sysroot=${CBUILDROOT} $CXXFLAGS"

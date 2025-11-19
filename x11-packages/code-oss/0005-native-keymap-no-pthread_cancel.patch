@@ -1,0 +1,50 @@
+diff -uNr a/node-native-keymap-src/src/keyboard_x.cc b/node-native-keymap-src/src/keyboard_x.cc
+--- a/node-native-keymap-src/src/keyboard_x.cc
++++ b/node-native-keymap-src/src/keyboard_x.cc
+@@ -351,7 +353,11 @@
+   struct timeval tv;
+   int x11_fd = ConnectionNumber(display);
+ 
++#ifndef __ANDROID__
+   while (true) {
++#else
++  while (!data->interrupted.load()) {
++#endif
+     // See https://stackoverflow.com/a/8592969 which explains
+     // the technique of waiting for an XEvent with a timeout
+ 
+@@ -395,7 +405,11 @@
+ }
+ 
+ void DisposeKeyboardLayoutChangeListenerImpl(NotificationCallbackData *data) {
++#ifndef __ANDROID__
+   pthread_cancel(data->tid);
++#else
++  data->interrupted.store(true);
++#endif
+   void *res;
+   pthread_join(data->tid, &res);
+ }
+diff -uNr a/node-native-keymap-src/src/keymapping.h b/node-native-keymap-src/src/keymapping.h
+--- a/node-native-keymap-src/src/keymapping.h
++++ b/node-native-keymap-src/src/keymapping.h
+@@ -12,6 +12,9 @@
+ #include <vector>
+ #include "../deps/chromium/keyboard_codes.h"
+ 
++#if defined(__ANDROID__)
++#include <atomic>
++#endif
+ #if defined(__unix__)
+ #include <pthread.h>
+ #endif
+@@ -41,6 +44,9 @@
+ #if defined(_WIN32)
+   void* listener;
+ #endif
++#if defined(__ANDROID__)
++  std::atomic<bool> interrupted;
++#endif
+ #if defined(__unix__)
+   pthread_t tid;
+ #endif

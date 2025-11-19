@@ -1,0 +1,158 @@
+diff -u -r ../gnucap-20171003/apps/Make2.Debug ./apps/Make2.Debug
+--- ../gnucap-20171003/apps/Make2.Debug	2017-10-04 00:50:49.000000000 +0200
++++ ./apps/Make2.Debug	2019-01-24 22:30:16.059909732 +0100
+@@ -24,7 +24,7 @@
+ # Standard base for g++, debugging, a little optimization
+ # Running the program will give a spew of line markers for debugging.
+ 
+-CCC = g++
++CCC = $(CXX)
+ TARGET_EXT = .so
+ 
+ CCFLAGS = \
+diff -u -r ../gnucap-20171003/apps/Make2.g++ ./apps/Make2.g++
+--- ../gnucap-20171003/apps/Make2.g++	2017-10-04 00:50:49.000000000 +0200
++++ ./apps/Make2.g++	2019-01-24 22:30:16.059909732 +0100
+@@ -23,7 +23,7 @@
+ 
+ # Standard base for g++.
+ 
+-CCC = g++
++CCC = $(CXX)
+ TARGET_EXT = .so
+ 
+ CCFLAGS = \
+diff -u -r ../gnucap-20171003/include/configure ./include/configure
+--- ../gnucap-20171003/include/configure	2017-10-04 00:50:49.000000000 +0200
++++ ./include/configure	2019-01-24 22:30:16.059909732 +0100
+@@ -22,7 +22,7 @@
+ #----------------------------------------------------------------
+ echo \# created by $PWD/$0. do not edit >Make2
+ echo \#------------------------------------------------------------------------ >>Make2
+-echo "CCC = c++" >>Make2
++echo "CCC = \$(CXX)" >>Make2
+ echo "PREFIX = " $prefix >>Make2
+ echo "" >>Make2
+ 
+diff -u -r ../gnucap-20171003/lib/Make2.Debug ./lib/Make2.Debug
+--- ../gnucap-20171003/lib/Make2.Debug	2017-10-04 00:50:49.000000000 +0200
++++ ./lib/Make2.Debug	2019-01-24 22:30:16.059909732 +0100
+@@ -24,7 +24,7 @@
+ # Standard base for g++, debugging, a little optimization
+ # Running the program will give a spew of line markers for debugging.
+ 
+-CCC = g++
++CCC = $(CXX)
+ TARGET_EXT = .so
+ 
+ CCFLAGS = \
+diff -u -r ../gnucap-20171003/lib/Make2.g++ ./lib/Make2.g++
+--- ../gnucap-20171003/lib/Make2.g++	2017-10-04 00:50:49.000000000 +0200
++++ ./lib/Make2.g++	2019-01-24 22:30:16.059909732 +0100
+@@ -23,7 +23,7 @@
+ 
+ # Standard base for g++.
+ 
+-CCC = g++
++CCC = $(CXX)
+ TARGET_EXT = .so
+ 
+ CCFLAGS = \
+diff -u -r ../gnucap-20171003/main/configure ./main/configure
+--- ../gnucap-20171003/main/configure	2017-10-04 00:50:49.000000000 +0200
++++ ./main/configure	2019-01-24 22:31:37.649909149 +0100
+@@ -26,7 +26,7 @@
+ pkglibdir=$prefix/lib/gnucap
+ 
+ # bug. this is not implemented consistently.
+-CXX=${CXX-c++}
++CXX=${CXX}
+ 
+ fill_template() {
+ sed -e "s#@prefix@#$prefix#" \
+@@ -48,7 +48,7 @@
+ chmod +x gnucap-conf
+ #----------------------------------------------------------------
+ echo "CCFLAGS = \\" >Make.ccflags
+-echo "-DUNIX -O2 -DNDEBUG -I. -I../include -I../../include -W" >>Make.ccflags
++echo "-DUNIX -O2 -DNDEBUG \$(CPPFLAGS) -I. -I../include -I../../include -W" >>Make.ccflags
+ 
+ echo "LIBS = \\" >Make.libs
+ echo "-lgnucap \\" >>Make.libs
+@@ -59,10 +59,10 @@
+ cat <<CAT_EOF >Make.sys
+ #------------------------------------------------------------------------
+ VPATH = .:..
+-CCC = c++
++CCC = \$(CXX)
+ TARGET_EXT =
+ 
+-LDFLAGS = -rdynamic \
++LDFLAGS += -rdynamic \
+ -L../../lib/O
+ 
+ .SUFFIXES : .o .cc
+diff -u -r ../gnucap-20171003/main/Make2.Debug ./main/Make2.Debug
+--- ../gnucap-20171003/main/Make2.Debug	2017-10-04 00:50:49.000000000 +0200
++++ ./main/Make2.Debug	2019-01-24 22:30:16.059909732 +0100
+@@ -24,7 +24,7 @@
+ # Standard base for g++, debugging, no optimization
+ # Running the program will give a spew of line markers for debugging.
+ 
+-CCC = g++
++CCC = $(CXX)
+ 
+ CCFLAGS = \
+ -DUNIX  -g -O0 -I. -I../../include -DTRACE_UNTESTED \
+diff -u -r ../gnucap-20171003/main/Make2.g++ ./main/Make2.g++
+--- ../gnucap-20171003/main/Make2.g++	2017-10-04 00:50:49.000000000 +0200
++++ ./main/Make2.g++	2019-01-24 22:30:16.059909732 +0100
+@@ -23,7 +23,7 @@
+ 
+ # Standard base for g++.
+ 
+-CCC = g++
++CCC = $(CXX)
+ 
+ CCFLAGS = \
+ -DUNIX -O3 -DNDEBUG -I. -I../include -I../../include -W
+diff -u -r ../gnucap-20171003/modelgen/configure ./modelgen/configure
+--- ../gnucap-20171003/modelgen/configure	2017-10-04 00:50:49.000000000 +0200
++++ ./modelgen/configure	2019-01-24 22:31:17.489909279 +0100
+@@ -36,10 +36,10 @@
+ cat <<CAT_EOF >Make.sys
+ #------------------------------------------------------------------------
+ VPATH = .:..
+-CCC = c++
++CCC = \$(CXX)
+ TARGET_EXT =
+ 
+-LDFLAGS = -rdynamic \
++LDFLAGS += -rdynamic \
+ -L../../lib/O
+ 
+ .SUFFIXES : .o .cc
+diff -u -r ../gnucap-20171003/modelgen/Make2.Debug ./modelgen/Make2.Debug
+--- ../gnucap-20171003/modelgen/Make2.Debug	2017-10-04 00:50:49.000000000 +0200
++++ ./modelgen/Make2.Debug	2019-01-24 22:30:16.059909732 +0100
+@@ -24,7 +24,7 @@
+ # Standard base for g++, debugging, no optimization
+ # Running the program will give a spew of line markers for debugging.
+ 
+-CCC = g++
++CCC = $(CXX)
+ 
+ CCFLAGS = \
+ -DUNIX  -g -O0 -I. -I../../include -DTRACE_UNTESTED \
+diff -u -r ../gnucap-20171003/modelgen/Make2.g++ ./modelgen/Make2.g++
+--- ../gnucap-20171003/modelgen/Make2.g++	2017-10-04 00:50:49.000000000 +0200
++++ ./modelgen/Make2.g++	2019-01-24 22:30:16.059909732 +0100
+@@ -23,7 +23,7 @@
+ 
+ # Standard base for g++.
+ 
+-CCC = g++
++CCC = $(CXX)
+ 
+ CCFLAGS = \
+ -DUNIX -O3 -DNDEBUG -I. -I../include -I../../include -W

@@ -1,0 +1,12 @@
+--- a/ml/backend/ggml/ggml/src/ggml-vulkan/CMakeLists.txt
++++ b/ml/backend/ggml/ggml/src/ggml-vulkan/CMakeLists.txt
+@@ -31,6 +31,9 @@
+     if (${glslc_error} MATCHES ".*extension not supported: ${EXTENSION_NAME}.*")
+         message(STATUS "${EXTENSION_NAME} not supported by glslc")
+         set(${RESULT_VARIABLE} OFF PARENT_SCOPE)
++    elseif(CMAKE_SYSTEM_NAME MATCHES "Android")
++        message(STATUS "Force disable ${EXTENSION_NAME} on Android")
++        set(${RESULT_VARIABLE} OFF PARENT_SCOPE)
+     else()
+         message(STATUS "${EXTENSION_NAME} supported by glslc")
+         set(${RESULT_VARIABLE} ON PARENT_SCOPE)

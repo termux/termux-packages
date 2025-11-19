@@ -1,0 +1,11 @@
+--- a/src/corelib/io/qtemporaryfile_p.h
++++ b/src/corelib/io/qtemporaryfile_p.h
+@@ -22,7 +22,7 @@
+ #include "private/qfile_p.h"
+ #include "qtemporaryfile.h"
+ 
+-#if defined(Q_OS_LINUX) && QT_CONFIG(linkat)
++#if defined(Q_OS_LINUX) && QT_CONFIG(linkat) && !defined(__ANDROID__)
+ #  include <fcntl.h>
+ #  ifdef O_TMPFILE
+ // some early libc support had the wrong values for O_TMPFILE

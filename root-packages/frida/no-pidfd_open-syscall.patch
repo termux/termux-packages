@@ -1,0 +1,14 @@
+--- ../frida-core.orig/lib/base/linux.vala	2025-07-11 09:34:31.046128020 +0000
++++ ./subprojects/frida-core/lib/base/linux.vala	2025-07-14 05:48:35.752938907 +0000
+@@ -51,10 +51,7 @@
+ 		}
+ 
+ 		public static PidFileDescriptor from_pid (uint pid) throws Error {
+-			int fd = pidfd_open (pid, 0);
+-			if (fd == -1)
+-				throw_pidfd_error (pid, errno);
+-			return new PidFileDescriptor (fd, pid);
++			throw_pidfd_error (pid, errno);
+ 		}
+ 
+ 		public FileDescriptor getfd (int targetfd) throws Error {

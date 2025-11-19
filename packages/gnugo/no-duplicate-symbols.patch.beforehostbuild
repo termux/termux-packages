@@ -1,0 +1,26 @@
+--- ../unconditional.c.orig	2022-02-08 06:47:33.832807668 +0000
++++ ./engine/unconditional.c	2022-02-08 06:47:59.759417274 +0000
+@@ -29,6 +29,10 @@
+ 
+ #include "liberty.h"
+ 
++/* Unconditionally meaningless moves. */
++int meaningless_black_moves[BOARDMAX];
++int meaningless_white_moves[BOARDMAX];
++
+ /* Capture as many strings of the given color as we can. Played stones
+  * are left on the board and the number of played stones is returned.
+  * Strings marked in the exceptions array are excluded from capturing
+--- ../liberty.h.orig	2022-02-08 06:41:21.633651516 +0000
++++ ./engine/liberty.h	2022-02-08 06:47:51.259435972 +0000
+@@ -856,10 +856,6 @@
+ 
+ extern struct worm_data worm[BOARDMAX];
+ 
+-/* Unconditionally meaningless moves. */
+-int meaningless_black_moves[BOARDMAX];
+-int meaningless_white_moves[BOARDMAX];
+-
+ /* Surround cache (see surround.c) */
+ 
+ #define MAX_SURROUND 10

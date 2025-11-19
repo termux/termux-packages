@@ -1,0 +1,30 @@
+diff -u -r ../mc-4.8.12/src/filemanager/ext.c ./src/filemanager/ext.c
+--- ../mc-4.8.12/src/filemanager/ext.c	2014-04-01 12:54:01.000000000 +0200
++++ ./src/filemanager/ext.c	2014-06-05 16:26:24.821998594 +0200
+@@ -454,7 +454,7 @@
+     }
+ 
+     cmd_file = fdopen (cmd_file_fd, "w");
+-    fputs ("#! /bin/sh\n\n", cmd_file);
++    fputs ("#! @TERMUX_PREFIX@/bin/sh\n\n", cmd_file);
+ 
+     export_variables = exec_get_export_variables (filename_vpath);
+     if (export_variables != NULL)
+@@ -472,7 +472,7 @@
+      * so we clean up after calling view().
+      */
+     if (!run_view)
+-        fprintf (cmd_file, "\n/bin/rm -f %s\n", vfs_path_as_str (script_vpath));
++        fprintf (cmd_file, "\n@TERMUX_PREFIX@/bin/rm -f %s\n", vfs_path_as_str (script_vpath));
+ 
+     fclose (cmd_file);
+ 
+@@ -486,7 +486,7 @@
+         /* Set executable flag on the command file ... */
+         mc_chmod (script_vpath, S_IRWXU);
+         /* ... but don't rely on it - run /bin/sh explicitly */
+-        cmd = g_strconcat ("/bin/sh ", vfs_path_as_str (script_vpath), (char *) NULL);
++        cmd = g_strconcat ("@TERMUX_PREFIX@/bin/sh ", vfs_path_as_str (script_vpath), (char *) NULL);
+     }
+ 
+     if (run_view)

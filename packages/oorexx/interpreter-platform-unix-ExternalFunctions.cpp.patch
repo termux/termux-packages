@@ -1,0 +1,21 @@
+--- a/interpreter/platform/unix/ExternalFunctions.cpp
++++ b/interpreter/platform/unix/ExternalFunctions.cpp
+@@ -84,15 +84,15 @@
+ 
+ #define CMDBUFSIZE      1024                 /* Max size of executable cmd     */
+ #if defined(AIX)
+-#define CMDDEFNAME      "/bin/ksh"           /* Default unix sys cmd handler   */
++#define CMDDEFNAME      "@TERMUX_PREFIX@/bin/ksh"           /* Default unix sys cmd handler   */
+ #define COMSPEC         "ksh"                /* unix cmd handler env name      */
+ #define SYSENV          "ksh"                /* Default AIX  cmd environment   */
+ #elif defined(OPSYS_SUN)
+-#define CMDDEFNAME      "/bin/sh"            /* Default unix sys cmd handler   */
++#define CMDDEFNAME      "@TERMUX_PREFIX@/bin/sh"            /* Default unix sys cmd handler   */
+ #define COMSPEC         "sh"                 /* unix cmd handler env name      */
+ #define SYSENV          "sh"                 /* Default LINUX cmd environment  */
+ #else
+-#define CMDDEFNAME      "/bin/bash"          /* Default unix sys cmd handler   */
++#define CMDDEFNAME      "@TERMUX_PREFIX@/bin/bash"          /* Default unix sys cmd handler   */
+ #define COMSPEC         "bash"               /* unix cmd handler env name      */
+ #define SYSENV          "bash"               /* Default AIX  cmd environment   */
+ #endif

@@ -1,0 +1,704 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="GdkDevice" get-type="gdk_device_get_type" parents="GObject" abstract="1">
+    <property name="display" type="GdkDisplay" flags="235"/>
+    <property name="device-manager" type="GdkDeviceManager" flags="235"/>
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="associated-device" type="GdkDevice" flags="225"/>
+    <property name="type" type="GdkDeviceType" flags="235" default-value="GDK_DEVICE_TYPE_MASTER"/>
+    <property name="input-source" type="GdkInputSource" flags="1073742059" default-value="GDK_SOURCE_MOUSE"/>
+    <property name="input-mode" type="GdkInputMode" flags="1073742051" default-value="GDK_MODE_DISABLED"/>
+    <property name="has-cursor" type="gboolean" flags="235" default-value="FALSE"/>
+    <property name="n-axes" type="guint" flags="225" default-value="0"/>
+    <property name="vendor-id" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="product-id" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="seat" type="GdkSeat" flags="227"/>
+    <property name="num-touches" type="guint" flags="235" default-value="0"/>
+    <property name="axes" type="GdkAxisFlags" flags="225" default-value="0"/>
+    <property name="tool" type="GdkDeviceTool" flags="225"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+    <signal name="tool-changed" return="void" when="last">
+      <param type="GdkDeviceTool"/>
+    </signal>
+  </class>
+  <class name="GdkDragContext" get-type="gdk_drag_context_get_type" parents="GObject">
+    <signal name="cancel" return="void" when="last">
+      <param type="GdkDragCancelReason"/>
+    </signal>
+    <signal name="drop-performed" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+    <signal name="dnd-finished" return="void" when="last">
+    </signal>
+    <signal name="action-changed" return="void" when="last">
+      <param type="GdkDragAction"/>
+    </signal>
+  </class>
+  <class name="GdkDeviceTool" get-type="gdk_device_tool_get_type" parents="GObject">
+    <property name="serial" type="guint64" flags="11" default-value="0"/>
+    <property name="tool-type" type="GdkDeviceToolType" flags="11" default-value="GDK_DEVICE_TOOL_TYPE_UNKNOWN"/>
+    <property name="axes" type="GdkAxisFlags" flags="11" default-value="0"/>
+    <property name="hardware-id" type="guint64" flags="11" default-value="0"/>
+  </class>
+  <boxed name="GdkEvent" get-type="gdk_event_get_type"/>
+  <boxed name="GdkEventSequence" get-type="gdk_event_sequence_get_type"/>
+  <class name="GdkDeviceManager" get-type="gdk_device_manager_get_type" parents="GObject" abstract="1">
+    <property name="display" type="GdkDisplay" flags="235"/>
+    <signal name="device-added" return="void" when="last">
+      <param type="GdkDevice"/>
+    </signal>
+    <signal name="device-removed" return="void" when="last">
+      <param type="GdkDevice"/>
+    </signal>
+    <signal name="device-changed" return="void" when="last">
+      <param type="GdkDevice"/>
+    </signal>
+  </class>
+  <class name="GdkDrawingContext" get-type="gdk_drawing_context_get_type" parents="GObject">
+    <property name="window" type="GdkWindow" flags="235"/>
+    <property name="clip" type="CairoRegion" flags="235"/>
+  </class>
+  <boxed name="GdkFrameTimings" get-type="gdk_frame_timings_get_type"/>
+  <class name="GdkFrameClock" get-type="gdk_frame_clock_get_type" parents="GObject" abstract="1">
+    <signal name="flush-events" return="void" when="last">
+    </signal>
+    <signal name="before-paint" return="void" when="last">
+    </signal>
+    <signal name="update" return="void" when="last">
+    </signal>
+    <signal name="layout" return="void" when="last">
+    </signal>
+    <signal name="paint" return="void" when="last">
+    </signal>
+    <signal name="after-paint" return="void" when="last">
+    </signal>
+    <signal name="resume-events" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GdkWindow" get-type="gdk_window_get_type" parents="GObject" abstract="1">
+    <property name="cursor" type="GdkCursor" flags="3"/>
+    <signal name="pick-embedded-child" return="GdkWindow" when="last">
+      <param type="gdouble"/>
+      <param type="gdouble"/>
+    </signal>
+    <signal name="to-embedder" return="void" when="last">
+      <param type="gdouble"/>
+      <param type="gdouble"/>
+      <param type="gpointer"/>
+      <param type="gpointer"/>
+    </signal>
+    <signal name="from-embedder" return="void" when="last">
+      <param type="gdouble"/>
+      <param type="gdouble"/>
+      <param type="gpointer"/>
+      <param type="gpointer"/>
+    </signal>
+    <signal name="create-surface" return="CairoSurface" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="moved-to-rect" return="void" when="first">
+      <param type="gpointer"/>
+      <param type="gpointer"/>
+      <param type="gboolean"/>
+      <param type="gboolean"/>
+    </signal>
+  </class>
+  <class name="GdkSeat" get-type="gdk_seat_get_type" parents="GObject" abstract="1">
+    <property name="display" type="GdkDisplay" flags="235"/>
+    <signal name="device-added" return="void" when="last">
+      <param type="GdkDevice"/>
+    </signal>
+    <signal name="device-removed" return="void" when="last">
+      <param type="GdkDevice"/>
+    </signal>
+    <signal name="tool-added" return="void" when="last">
+      <param type="GdkDeviceTool"/>
+    </signal>
+    <signal name="tool-removed" return="void" when="last">
+      <param type="GdkDeviceTool"/>
+    </signal>
+  </class>
+  <boxed name="GdkRectangle" get-type="gdk_rectangle_get_type"/>
+  <class name="GdkMonitor" get-type="gdk_monitor_get_type" parents="GObject">
+    <property name="display" type="GdkDisplay" flags="11"/>
+    <property name="manufacturer" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="model" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="scale-factor" type="gint" flags="1" default-value="1"/>
+    <property name="geometry" type="GdkRectangle" flags="1"/>
+    <property name="workarea" type="GdkRectangle" flags="1"/>
+    <property name="width-mm" type="gint" flags="1" default-value="0"/>
+    <property name="height-mm" type="gint" flags="1" default-value="0"/>
+    <property name="refresh-rate" type="gint" flags="1" default-value="0"/>
+    <property name="subpixel-layout" type="GdkSubpixelLayout" flags="1" default-value="GDK_SUBPIXEL_LAYOUT_UNKNOWN"/>
+    <signal name="invalidate" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GdkDisplay" get-type="gdk_display_get_type" parents="GObject">
+    <signal name="opened" return="void" when="last">
+    </signal>
+    <signal name="closed" return="void" when="last">
+      <param type="gboolean"/>
+    </signal>
+    <signal name="seat-added" return="void" when="last">
+      <param type="GdkSeat"/>
+    </signal>
+    <signal name="seat-removed" return="void" when="last">
+      <param type="GdkSeat"/>
+    </signal>
+    <signal name="monitor-added" return="void" when="last">
+      <param type="GdkMonitor"/>
+    </signal>
+    <signal name="monitor-removed" return="void" when="last">
+      <param type="GdkMonitor"/>
+    </signal>
+  </class>
+  <class name="GdkScreen" get-type="gdk_screen_get_type" parents="GObject">
+    <property name="font-options" type="gpointer" flags="227"/>
+    <property name="resolution" type="gdouble" flags="227" default-value="-1.000000"/>
+    <signal name="size-changed" return="void" when="last">
+    </signal>
+    <signal name="composited-changed" return="void" when="last">
+    </signal>
+    <signal name="monitors-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GdkAppLaunchContext" get-type="gdk_app_launch_context_get_type" parents="GAppLaunchContext,GObject">
+    <property name="display" type="GdkDisplay" flags="235"/>
+  </class>
+  <boxed name="GdkColor" get-type="gdk_color_get_type"/>
+  <boxed name="GdkRGBA" get-type="gdk_rgba_get_type"/>
+  <class name="GdkCursor" get-type="gdk_cursor_get_type" parents="GObject" abstract="1">
+    <property name="cursor-type" type="GdkCursorType" flags="11" default-value="GDK_X_CURSOR"/>
+    <property name="display" type="GdkDisplay" flags="11"/>
+  </class>
+  <interface name="GdkDevicePad" get-type="gdk_device_pad_get_type">
+    <prerequisite name="GdkDevice"/>
+  </interface>
+  <class name="GdkDisplayManager" get-type="gdk_display_manager_get_type" parents="GObject">
+    <property name="default-display" type="GdkDisplay" flags="227"/>
+    <signal name="display-opened" return="void" when="last">
+      <param type="GdkDisplay"/>
+    </signal>
+  </class>
+  <enum name="GdkCursorType" get-type="gdk_cursor_type_get_type">
+    <member name="GDK_X_CURSOR" nick="x-cursor" value="0"/>
+    <member name="GDK_ARROW" nick="arrow" value="2"/>
+    <member name="GDK_BASED_ARROW_DOWN" nick="based-arrow-down" value="4"/>
+    <member name="GDK_BASED_ARROW_UP" nick="based-arrow-up" value="6"/>
+    <member name="GDK_BOAT" nick="boat" value="8"/>
+    <member name="GDK_BOGOSITY" nick="bogosity" value="10"/>
+    <member name="GDK_BOTTOM_LEFT_CORNER" nick="bottom-left-corner" value="12"/>
+    <member name="GDK_BOTTOM_RIGHT_CORNER" nick="bottom-right-corner" value="14"/>
+    <member name="GDK_BOTTOM_SIDE" nick="bottom-side" value="16"/>
+    <member name="GDK_BOTTOM_TEE" nick="bottom-tee" value="18"/>
+    <member name="GDK_BOX_SPIRAL" nick="box-spiral" value="20"/>
+    <member name="GDK_CENTER_PTR" nick="center-ptr" value="22"/>
+    <member name="GDK_CIRCLE" nick="circle" value="24"/>
+    <member name="GDK_CLOCK" nick="clock" value="26"/>
+    <member name="GDK_COFFEE_MUG" nick="coffee-mug" value="28"/>
+    <member name="GDK_CROSS" nick="cross" value="30"/>
+    <member name="GDK_CROSS_REVERSE" nick="cross-reverse" value="32"/>
+    <member name="GDK_CROSSHAIR" nick="crosshair" value="34"/>
+    <member name="GDK_DIAMOND_CROSS" nick="diamond-cross" value="36"/>
+    <member name="GDK_DOT" nick="dot" value="38"/>
+    <member name="GDK_DOTBOX" nick="dotbox" value="40"/>
+    <member name="GDK_DOUBLE_ARROW" nick="double-arrow" value="42"/>
+    <member name="GDK_DRAFT_LARGE" nick="draft-large" value="44"/>
+    <member name="GDK_DRAFT_SMALL" nick="draft-small" value="46"/>
+    <member name="GDK_DRAPED_BOX" nick="draped-box" value="48"/>
+    <member name="GDK_EXCHANGE" nick="exchange" value="50"/>
+    <member name="GDK_FLEUR" nick="fleur" value="52"/>
+    <member name="GDK_GOBBLER" nick="gobbler" value="54"/>
+    <member name="GDK_GUMBY" nick="gumby" value="56"/>
+    <member name="GDK_HAND1" nick="hand1" value="58"/>
+    <member name="GDK_HAND2" nick="hand2" value="60"/>
+    <member name="GDK_HEART" nick="heart" value="62"/>
+    <member name="GDK_ICON" nick="icon" value="64"/>
+    <member name="GDK_IRON_CROSS" nick="iron-cross" value="66"/>
+    <member name="GDK_LEFT_PTR" nick="left-ptr" value="68"/>
+    <member name="GDK_LEFT_SIDE" nick="left-side" value="70"/>
+    <member name="GDK_LEFT_TEE" nick="left-tee" value="72"/>
+    <member name="GDK_LEFTBUTTON" nick="leftbutton" value="74"/>
+    <member name="GDK_LL_ANGLE" nick="ll-angle" value="76"/>
+    <member name="GDK_LR_ANGLE" nick="lr-angle" value="78"/>
+    <member name="GDK_MAN" nick="man" value="80"/>
+    <member name="GDK_MIDDLEBUTTON" nick="middlebutton" value="82"/>
+    <member name="GDK_MOUSE" nick="mouse" value="84"/>
+    <member name="GDK_PENCIL" nick="pencil" value="86"/>
+    <member name="GDK_PIRATE" nick="pirate" value="88"/>
+    <member name="GDK_PLUS" nick="plus" value="90"/>
+    <member name="GDK_QUESTION_ARROW" nick="question-arrow" value="92"/>
+    <member name="GDK_RIGHT_PTR" nick="right-ptr" value="94"/>
+    <member name="GDK_RIGHT_SIDE" nick="right-side" value="96"/>
+    <member name="GDK_RIGHT_TEE" nick="right-tee" value="98"/>
+    <member name="GDK_RIGHTBUTTON" nick="rightbutton" value="100"/>
+    <member name="GDK_RTL_LOGO" nick="rtl-logo" value="102"/>
+    <member name="GDK_SAILBOAT" nick="sailboat" value="104"/>
+    <member name="GDK_SB_DOWN_ARROW" nick="sb-down-arrow" value="106"/>
+    <member name="GDK_SB_H_DOUBLE_ARROW" nick="sb-h-double-arrow" value="108"/>
+    <member name="GDK_SB_LEFT_ARROW" nick="sb-left-arrow" value="110"/>
+    <member name="GDK_SB_RIGHT_ARROW" nick="sb-right-arrow" value="112"/>
+    <member name="GDK_SB_UP_ARROW" nick="sb-up-arrow" value="114"/>
+    <member name="GDK_SB_V_DOUBLE_ARROW" nick="sb-v-double-arrow" value="116"/>
+    <member name="GDK_SHUTTLE" nick="shuttle" value="118"/>
+    <member name="GDK_SIZING" nick="sizing" value="120"/>
+    <member name="GDK_SPIDER" nick="spider" value="122"/>
+    <member name="GDK_SPRAYCAN" nick="spraycan" value="124"/>
+    <member name="GDK_STAR" nick="star" value="126"/>
+    <member name="GDK_TARGET" nick="target" value="128"/>
+    <member name="GDK_TCROSS" nick="tcross" value="130"/>
+    <member name="GDK_TOP_LEFT_ARROW" nick="top-left-arrow" value="132"/>
+    <member name="GDK_TOP_LEFT_CORNER" nick="top-left-corner" value="134"/>
+    <member name="GDK_TOP_RIGHT_CORNER" nick="top-right-corner" value="136"/>
+    <member name="GDK_TOP_SIDE" nick="top-side" value="138"/>
+    <member name="GDK_TOP_TEE" nick="top-tee" value="140"/>
+    <member name="GDK_TREK" nick="trek" value="142"/>
+    <member name="GDK_UL_ANGLE" nick="ul-angle" value="144"/>
+    <member name="GDK_UMBRELLA" nick="umbrella" value="146"/>
+    <member name="GDK_UR_ANGLE" nick="ur-angle" value="148"/>
+    <member name="GDK_WATCH" nick="watch" value="150"/>
+    <member name="GDK_XTERM" nick="xterm" value="152"/>
+    <member name="GDK_LAST_CURSOR" nick="last-cursor" value="153"/>
+    <member name="GDK_BLANK_CURSOR" nick="blank-cursor" value="-2"/>
+    <member name="GDK_CURSOR_IS_PIXMAP" nick="cursor-is-pixmap" value="-1"/>
+  </enum>  <enum name="GdkInputSource" get-type="gdk_input_source_get_type">
+    <member name="GDK_SOURCE_MOUSE" nick="mouse" value="0"/>
+    <member name="GDK_SOURCE_PEN" nick="pen" value="1"/>
+    <member name="GDK_SOURCE_ERASER" nick="eraser" value="2"/>
+    <member name="GDK_SOURCE_CURSOR" nick="cursor" value="3"/>
+    <member name="GDK_SOURCE_KEYBOARD" nick="keyboard" value="4"/>
+    <member name="GDK_SOURCE_TOUCHSCREEN" nick="touchscreen" value="5"/>
+    <member name="GDK_SOURCE_TOUCHPAD" nick="touchpad" value="6"/>
+    <member name="GDK_SOURCE_TRACKPOINT" nick="trackpoint" value="7"/>
+    <member name="GDK_SOURCE_TABLET_PAD" nick="tablet-pad" value="8"/>
+  </enum>  <enum name="GdkInputMode" get-type="gdk_input_mode_get_type">
+    <member name="GDK_MODE_DISABLED" nick="disabled" value="0"/>
+    <member name="GDK_MODE_SCREEN" nick="screen" value="1"/>
+    <member name="GDK_MODE_WINDOW" nick="window" value="2"/>
+  </enum>  <enum name="GdkDeviceType" get-type="gdk_device_type_get_type">
+    <member name="GDK_DEVICE_TYPE_MASTER" nick="master" value="0"/>
+    <member name="GDK_DEVICE_TYPE_SLAVE" nick="slave" value="1"/>
+    <member name="GDK_DEVICE_TYPE_FLOATING" nick="floating" value="2"/>
+  </enum>  <enum name="GdkDevicePadFeature" get-type="gdk_device_pad_feature_get_type">
+    <member name="GDK_DEVICE_PAD_FEATURE_BUTTON" nick="button" value="0"/>
+    <member name="GDK_DEVICE_PAD_FEATURE_RING" nick="ring" value="1"/>
+    <member name="GDK_DEVICE_PAD_FEATURE_STRIP" nick="strip" value="2"/>
+  </enum>  <enum name="GdkDeviceToolType" get-type="gdk_device_tool_type_get_type">
+    <member name="GDK_DEVICE_TOOL_TYPE_UNKNOWN" nick="unknown" value="0"/>
+    <member name="GDK_DEVICE_TOOL_TYPE_PEN" nick="pen" value="1"/>
+    <member name="GDK_DEVICE_TOOL_TYPE_ERASER" nick="eraser" value="2"/>
+    <member name="GDK_DEVICE_TOOL_TYPE_BRUSH" nick="brush" value="3"/>
+    <member name="GDK_DEVICE_TOOL_TYPE_PENCIL" nick="pencil" value="4"/>
+    <member name="GDK_DEVICE_TOOL_TYPE_AIRBRUSH" nick="airbrush" value="5"/>
+    <member name="GDK_DEVICE_TOOL_TYPE_MOUSE" nick="mouse" value="6"/>
+    <member name="GDK_DEVICE_TOOL_TYPE_LENS" nick="lens" value="7"/>
+  </enum>  <flags name="GdkDragAction" get-type="gdk_drag_action_get_type">
+    <member name="GDK_ACTION_DEFAULT" nick="default" value="1"/>
+    <member name="GDK_ACTION_COPY" nick="copy" value="2"/>
+    <member name="GDK_ACTION_MOVE" nick="move" value="4"/>
+    <member name="GDK_ACTION_LINK" nick="link" value="8"/>
+    <member name="GDK_ACTION_PRIVATE" nick="private" value="16"/>
+    <member name="GDK_ACTION_ASK" nick="ask" value="32"/>
+  </flags>
+  <enum name="GdkDragCancelReason" get-type="gdk_drag_cancel_reason_get_type">
+    <member name="GDK_DRAG_CANCEL_NO_TARGET" nick="no-target" value="0"/>
+    <member name="GDK_DRAG_CANCEL_USER_CANCELLED" nick="user-cancelled" value="1"/>
+    <member name="GDK_DRAG_CANCEL_ERROR" nick="error" value="2"/>
+  </enum>  <enum name="GdkDragProtocol" get-type="gdk_drag_protocol_get_type">
+    <member name="GDK_DRAG_PROTO_NONE" nick="none" value="0"/>
+    <member name="GDK_DRAG_PROTO_MOTIF" nick="motif" value="1"/>
+    <member name="GDK_DRAG_PROTO_XDND" nick="xdnd" value="2"/>
+    <member name="GDK_DRAG_PROTO_ROOTWIN" nick="rootwin" value="3"/>
+    <member name="GDK_DRAG_PROTO_WIN32_DROPFILES" nick="win32-dropfiles" value="4"/>
+    <member name="GDK_DRAG_PROTO_OLE2" nick="ole2" value="5"/>
+    <member name="GDK_DRAG_PROTO_LOCAL" nick="local" value="6"/>
+    <member name="GDK_DRAG_PROTO_WAYLAND" nick="wayland" value="7"/>
+  </enum>  <enum name="GdkFilterReturn" get-type="gdk_filter_return_get_type">
+    <member name="GDK_FILTER_CONTINUE" nick="continue" value="0"/>
+    <member name="GDK_FILTER_TRANSLATE" nick="translate" value="1"/>
+    <member name="GDK_FILTER_REMOVE" nick="remove" value="2"/>
+  </enum>  <enum name="GdkEventType" get-type="gdk_event_type_get_type">
+    <member name="GDK_NOTHING" nick="nothing" value="-1"/>
+    <member name="GDK_DELETE" nick="delete" value="0"/>
+    <member name="GDK_DESTROY" nick="destroy" value="1"/>
+    <member name="GDK_EXPOSE" nick="expose" value="2"/>
+    <member name="GDK_MOTION_NOTIFY" nick="motion-notify" value="3"/>
+    <member name="GDK_BUTTON_PRESS" nick="button-press" value="4"/>
+    <member name="GDK_2BUTTON_PRESS" nick="2button-press" value="5"/>
+    <member name="GDK_DOUBLE_BUTTON_PRESS" nick="double-button-press" value="5"/>
+    <member name="GDK_3BUTTON_PRESS" nick="3button-press" value="6"/>
+    <member name="GDK_TRIPLE_BUTTON_PRESS" nick="triple-button-press" value="6"/>
+    <member name="GDK_BUTTON_RELEASE" nick="button-release" value="7"/>
+    <member name="GDK_KEY_PRESS" nick="key-press" value="8"/>
+    <member name="GDK_KEY_RELEASE" nick="key-release" value="9"/>
+    <member name="GDK_ENTER_NOTIFY" nick="enter-notify" value="10"/>
+    <member name="GDK_LEAVE_NOTIFY" nick="leave-notify" value="11"/>
+    <member name="GDK_FOCUS_CHANGE" nick="focus-change" value="12"/>
+    <member name="GDK_CONFIGURE" nick="configure" value="13"/>
+    <member name="GDK_MAP" nick="map" value="14"/>
+    <member name="GDK_UNMAP" nick="unmap" value="15"/>
+    <member name="GDK_PROPERTY_NOTIFY" nick="property-notify" value="16"/>
+    <member name="GDK_SELECTION_CLEAR" nick="selection-clear" value="17"/>
+    <member name="GDK_SELECTION_REQUEST" nick="selection-request" value="18"/>
+    <member name="GDK_SELECTION_NOTIFY" nick="selection-notify" value="19"/>
+    <member name="GDK_PROXIMITY_IN" nick="proximity-in" value="20"/>
+    <member name="GDK_PROXIMITY_OUT" nick="proximity-out" value="21"/>
+    <member name="GDK_DRAG_ENTER" nick="drag-enter" value="22"/>
+    <member name="GDK_DRAG_LEAVE" nick="drag-leave" value="23"/>
+    <member name="GDK_DRAG_MOTION" nick="drag-motion" value="24"/>
+    <member name="GDK_DRAG_STATUS" nick="drag-status" value="25"/>
+    <member name="GDK_DROP_START" nick="drop-start" value="26"/>
+    <member name="GDK_DROP_FINISHED" nick="drop-finished" value="27"/>
+    <member name="GDK_CLIENT_EVENT" nick="client-event" value="28"/>
+    <member name="GDK_VISIBILITY_NOTIFY" nick="visibility-notify" value="29"/>
+    <member name="GDK_SCROLL" nick="scroll" value="31"/>
+    <member name="GDK_WINDOW_STATE" nick="window-state" value="32"/>
+    <member name="GDK_SETTING" nick="setting" value="33"/>
+    <member name="GDK_OWNER_CHANGE" nick="owner-change" value="34"/>
+    <member name="GDK_GRAB_BROKEN" nick="grab-broken" value="35"/>
+    <member name="GDK_DAMAGE" nick="damage" value="36"/>
+    <member name="GDK_TOUCH_BEGIN" nick="touch-begin" value="37"/>
+    <member name="GDK_TOUCH_UPDATE" nick="touch-update" value="38"/>
+    <member name="GDK_TOUCH_END" nick="touch-end" value="39"/>
+    <member name="GDK_TOUCH_CANCEL" nick="touch-cancel" value="40"/>
+    <member name="GDK_TOUCHPAD_SWIPE" nick="touchpad-swipe" value="41"/>
+    <member name="GDK_TOUCHPAD_PINCH" nick="touchpad-pinch" value="42"/>
+    <member name="GDK_PAD_BUTTON_PRESS" nick="pad-button-press" value="43"/>
+    <member name="GDK_PAD_BUTTON_RELEASE" nick="pad-button-release" value="44"/>
+    <member name="GDK_PAD_RING" nick="pad-ring" value="45"/>
+    <member name="GDK_PAD_STRIP" nick="pad-strip" value="46"/>
+    <member name="GDK_PAD_GROUP_MODE" nick="pad-group-mode" value="47"/>
+    <member name="GDK_EVENT_LAST" nick="event-last" value="48"/>
+  </enum>  <enum name="GdkVisibilityState" get-type="gdk_visibility_state_get_type">
+    <member name="GDK_VISIBILITY_UNOBSCURED" nick="unobscured" value="0"/>
+    <member name="GDK_VISIBILITY_PARTIAL" nick="partial" value="1"/>
+    <member name="GDK_VISIBILITY_FULLY_OBSCURED" nick="fully-obscured" value="2"/>
+  </enum>  <enum name="GdkTouchpadGesturePhase" get-type="gdk_touchpad_gesture_phase_get_type">
+    <member name="GDK_TOUCHPAD_GESTURE_PHASE_BEGIN" nick="begin" value="0"/>
+    <member name="GDK_TOUCHPAD_GESTURE_PHASE_UPDATE" nick="update" value="1"/>
+    <member name="GDK_TOUCHPAD_GESTURE_PHASE_END" nick="end" value="2"/>
+    <member name="GDK_TOUCHPAD_GESTURE_PHASE_CANCEL" nick="cancel" value="3"/>
+  </enum>  <enum name="GdkScrollDirection" get-type="gdk_scroll_direction_get_type">
+    <member name="GDK_SCROLL_UP" nick="up" value="0"/>
+    <member name="GDK_SCROLL_DOWN" nick="down" value="1"/>
+    <member name="GDK_SCROLL_LEFT" nick="left" value="2"/>
+    <member name="GDK_SCROLL_RIGHT" nick="right" value="3"/>
+    <member name="GDK_SCROLL_SMOOTH" nick="smooth" value="4"/>
+  </enum>  <enum name="GdkNotifyType" get-type="gdk_notify_type_get_type">
+    <member name="GDK_NOTIFY_ANCESTOR" nick="ancestor" value="0"/>
+    <member name="GDK_NOTIFY_VIRTUAL" nick="virtual" value="1"/>
+    <member name="GDK_NOTIFY_INFERIOR" nick="inferior" value="2"/>
+    <member name="GDK_NOTIFY_NONLINEAR" nick="nonlinear" value="3"/>
+    <member name="GDK_NOTIFY_NONLINEAR_VIRTUAL" nick="nonlinear-virtual" value="4"/>
+    <member name="GDK_NOTIFY_UNKNOWN" nick="unknown" value="5"/>
+  </enum>  <enum name="GdkCrossingMode" get-type="gdk_crossing_mode_get_type">
+    <member name="GDK_CROSSING_NORMAL" nick="normal" value="0"/>
+    <member name="GDK_CROSSING_GRAB" nick="grab" value="1"/>
+    <member name="GDK_CROSSING_UNGRAB" nick="ungrab" value="2"/>
+    <member name="GDK_CROSSING_GTK_GRAB" nick="gtk-grab" value="3"/>
+    <member name="GDK_CROSSING_GTK_UNGRAB" nick="gtk-ungrab" value="4"/>
+    <member name="GDK_CROSSING_STATE_CHANGED" nick="state-changed" value="5"/>
+    <member name="GDK_CROSSING_TOUCH_BEGIN" nick="touch-begin" value="6"/>
+    <member name="GDK_CROSSING_TOUCH_END" nick="touch-end" value="7"/>
+    <member name="GDK_CROSSING_DEVICE_SWITCH" nick="device-switch" value="8"/>
+  </enum>  <enum name="GdkPropertyState" get-type="gdk_property_state_get_type">
+    <member name="GDK_PROPERTY_NEW_VALUE" nick="new-value" value="0"/>
+    <member name="GDK_PROPERTY_DELETE" nick="delete" value="1"/>
+  </enum>  <flags name="GdkWindowState" get-type="gdk_window_state_get_type">
+    <member name="GDK_WINDOW_STATE_WITHDRAWN" nick="withdrawn" value="1"/>
+    <member name="GDK_WINDOW_STATE_ICONIFIED" nick="iconified" value="2"/>
+    <member name="GDK_WINDOW_STATE_MAXIMIZED" nick="maximized" value="4"/>
+    <member name="GDK_WINDOW_STATE_STICKY" nick="sticky" value="8"/>
+    <member name="GDK_WINDOW_STATE_FULLSCREEN" nick="fullscreen" value="16"/>
+    <member name="GDK_WINDOW_STATE_ABOVE" nick="above" value="32"/>
+    <member name="GDK_WINDOW_STATE_BELOW" nick="below" value="64"/>
+    <member name="GDK_WINDOW_STATE_FOCUSED" nick="focused" value="128"/>
+    <member name="GDK_WINDOW_STATE_TILED" nick="tiled" value="256"/>
+    <member name="GDK_WINDOW_STATE_TOP_TILED" nick="top-tiled" value="512"/>
+    <member name="GDK_WINDOW_STATE_TOP_RESIZABLE" nick="top-resizable" value="1024"/>
+    <member name="GDK_WINDOW_STATE_RIGHT_TILED" nick="right-tiled" value="2048"/>
+    <member name="GDK_WINDOW_STATE_RIGHT_RESIZABLE" nick="right-resizable" value="4096"/>
+    <member name="GDK_WINDOW_STATE_BOTTOM_TILED" nick="bottom-tiled" value="8192"/>
+    <member name="GDK_WINDOW_STATE_BOTTOM_RESIZABLE" nick="bottom-resizable" value="16384"/>
+    <member name="GDK_WINDOW_STATE_LEFT_TILED" nick="left-tiled" value="32768"/>
+    <member name="GDK_WINDOW_STATE_LEFT_RESIZABLE" nick="left-resizable" value="65536"/>
+  </flags>
+  <enum name="GdkSettingAction" get-type="gdk_setting_action_get_type">
+    <member name="GDK_SETTING_ACTION_NEW" nick="new" value="0"/>
+    <member name="GDK_SETTING_ACTION_CHANGED" nick="changed" value="1"/>
+    <member name="GDK_SETTING_ACTION_DELETED" nick="deleted" value="2"/>
+  </enum>  <enum name="GdkOwnerChange" get-type="gdk_owner_change_get_type">
+    <member name="GDK_OWNER_CHANGE_NEW_OWNER" nick="new-owner" value="0"/>
+    <member name="GDK_OWNER_CHANGE_DESTROY" nick="destroy" value="1"/>
+    <member name="GDK_OWNER_CHANGE_CLOSE" nick="close" value="2"/>
+  </enum>  <flags name="GdkFrameClockPhase" get-type="gdk_frame_clock_phase_get_type">
+    <member name="GDK_FRAME_CLOCK_PHASE_NONE" nick="none" value="0"/>
+    <member name="GDK_FRAME_CLOCK_PHASE_FLUSH_EVENTS" nick="flush-events" value="1"/>
+    <member name="GDK_FRAME_CLOCK_PHASE_BEFORE_PAINT" nick="before-paint" value="2"/>
+    <member name="GDK_FRAME_CLOCK_PHASE_UPDATE" nick="update" value="4"/>
+    <member name="GDK_FRAME_CLOCK_PHASE_LAYOUT" nick="layout" value="8"/>
+    <member name="GDK_FRAME_CLOCK_PHASE_PAINT" nick="paint" value="16"/>
+    <member name="GDK_FRAME_CLOCK_PHASE_RESUME_EVENTS" nick="resume-events" value="32"/>
+    <member name="GDK_FRAME_CLOCK_PHASE_AFTER_PAINT" nick="after-paint" value="64"/>
+  </flags>
+  <enum name="GdkSubpixelLayout" get-type="gdk_subpixel_layout_get_type">
+    <member name="GDK_SUBPIXEL_LAYOUT_UNKNOWN" nick="unknown" value="0"/>
+    <member name="GDK_SUBPIXEL_LAYOUT_NONE" nick="none" value="1"/>
+    <member name="GDK_SUBPIXEL_LAYOUT_HORIZONTAL_RGB" nick="horizontal-rgb" value="2"/>
+    <member name="GDK_SUBPIXEL_LAYOUT_HORIZONTAL_BGR" nick="horizontal-bgr" value="3"/>
+    <member name="GDK_SUBPIXEL_LAYOUT_VERTICAL_RGB" nick="vertical-rgb" value="4"/>
+    <member name="GDK_SUBPIXEL_LAYOUT_VERTICAL_BGR" nick="vertical-bgr" value="5"/>
+  </enum>  <enum name="GdkPropMode" get-type="gdk_prop_mode_get_type">
+    <member name="GDK_PROP_MODE_REPLACE" nick="replace" value="0"/>
+    <member name="GDK_PROP_MODE_PREPEND" nick="prepend" value="1"/>
+    <member name="GDK_PROP_MODE_APPEND" nick="append" value="2"/>
+  </enum>  <flags name="GdkSeatCapabilities" get-type="gdk_seat_capabilities_get_type">
+    <member name="GDK_SEAT_CAPABILITY_NONE" nick="none" value="0"/>
+    <member name="GDK_SEAT_CAPABILITY_POINTER" nick="pointer" value="1"/>
+    <member name="GDK_SEAT_CAPABILITY_TOUCH" nick="touch" value="2"/>
+    <member name="GDK_SEAT_CAPABILITY_TABLET_STYLUS" nick="tablet-stylus" value="4"/>
+    <member name="GDK_SEAT_CAPABILITY_KEYBOARD" nick="keyboard" value="8"/>
+    <member name="GDK_SEAT_CAPABILITY_ALL_POINTING" nick="all-pointing" value="7"/>
+    <member name="GDK_SEAT_CAPABILITY_ALL" nick="all" value="15"/>
+  </flags>
+  <enum name="GdkByteOrder" get-type="gdk_byte_order_get_type">
+    <member name="GDK_LSB_FIRST" nick="lsb-first" value="0"/>
+    <member name="GDK_MSB_FIRST" nick="msb-first" value="1"/>
+  </enum>  <flags name="GdkModifierType" get-type="gdk_modifier_type_get_type">
+    <member name="GDK_SHIFT_MASK" nick="shift-mask" value="1"/>
+    <member name="GDK_LOCK_MASK" nick="lock-mask" value="2"/>
+    <member name="GDK_CONTROL_MASK" nick="control-mask" value="4"/>
+    <member name="GDK_MOD1_MASK" nick="mod1-mask" value="8"/>
+    <member name="GDK_MOD2_MASK" nick="mod2-mask" value="16"/>
+    <member name="GDK_MOD3_MASK" nick="mod3-mask" value="32"/>
+    <member name="GDK_MOD4_MASK" nick="mod4-mask" value="64"/>
+    <member name="GDK_MOD5_MASK" nick="mod5-mask" value="128"/>
+    <member name="GDK_BUTTON1_MASK" nick="button1-mask" value="256"/>
+    <member name="GDK_BUTTON2_MASK" nick="button2-mask" value="512"/>
+    <member name="GDK_BUTTON3_MASK" nick="button3-mask" value="1024"/>
+    <member name="GDK_BUTTON4_MASK" nick="button4-mask" value="2048"/>
+    <member name="GDK_BUTTON5_MASK" nick="button5-mask" value="4096"/>
+    <member name="GDK_MODIFIER_RESERVED_13_MASK" nick="modifier-reserved-13-mask" value="8192"/>
+    <member name="GDK_MODIFIER_RESERVED_14_MASK" nick="modifier-reserved-14-mask" value="16384"/>
+    <member name="GDK_MODIFIER_RESERVED_15_MASK" nick="modifier-reserved-15-mask" value="32768"/>
+    <member name="GDK_MODIFIER_RESERVED_16_MASK" nick="modifier-reserved-16-mask" value="65536"/>
+    <member name="GDK_MODIFIER_RESERVED_17_MASK" nick="modifier-reserved-17-mask" value="131072"/>
+    <member name="GDK_MODIFIER_RESERVED_18_MASK" nick="modifier-reserved-18-mask" value="262144"/>
+    <member name="GDK_MODIFIER_RESERVED_19_MASK" nick="modifier-reserved-19-mask" value="524288"/>
+    <member name="GDK_MODIFIER_RESERVED_20_MASK" nick="modifier-reserved-20-mask" value="1048576"/>
+    <member name="GDK_MODIFIER_RESERVED_21_MASK" nick="modifier-reserved-21-mask" value="2097152"/>
+    <member name="GDK_MODIFIER_RESERVED_22_MASK" nick="modifier-reserved-22-mask" value="4194304"/>
+    <member name="GDK_MODIFIER_RESERVED_23_MASK" nick="modifier-reserved-23-mask" value="8388608"/>
+    <member name="GDK_MODIFIER_RESERVED_24_MASK" nick="modifier-reserved-24-mask" value="16777216"/>
+    <member name="GDK_MODIFIER_RESERVED_25_MASK" nick="modifier-reserved-25-mask" value="33554432"/>
+    <member name="GDK_SUPER_MASK" nick="super-mask" value="67108864"/>
+    <member name="GDK_HYPER_MASK" nick="hyper-mask" value="134217728"/>
+    <member name="GDK_META_MASK" nick="meta-mask" value="268435456"/>
+    <member name="GDK_MODIFIER_RESERVED_29_MASK" nick="modifier-reserved-29-mask" value="536870912"/>
+    <member name="GDK_RELEASE_MASK" nick="release-mask" value="1073741824"/>
+    <member name="GDK_MODIFIER_MASK" nick="modifier-mask" value="1543512063"/>
+  </flags>
+  <enum name="GdkModifierIntent" get-type="gdk_modifier_intent_get_type">
+    <member name="GDK_MODIFIER_INTENT_PRIMARY_ACCELERATOR" nick="primary-accelerator" value="0"/>
+    <member name="GDK_MODIFIER_INTENT_CONTEXT_MENU" nick="context-menu" value="1"/>
+    <member name="GDK_MODIFIER_INTENT_EXTEND_SELECTION" nick="extend-selection" value="2"/>
+    <member name="GDK_MODIFIER_INTENT_MODIFY_SELECTION" nick="modify-selection" value="3"/>
+    <member name="GDK_MODIFIER_INTENT_NO_TEXT_INPUT" nick="no-text-input" value="4"/>
+    <member name="GDK_MODIFIER_INTENT_SHIFT_GROUP" nick="shift-group" value="5"/>
+    <member name="GDK_MODIFIER_INTENT_DEFAULT_MOD_MASK" nick="default-mod-mask" value="6"/>
+  </enum>  <enum name="GdkStatus" get-type="gdk_status_get_type">
+    <member name="GDK_OK" nick="ok" value="0"/>
+    <member name="GDK_ERROR" nick="error" value="-1"/>
+    <member name="GDK_ERROR_PARAM" nick="error-param" value="-2"/>
+    <member name="GDK_ERROR_FILE" nick="error-file" value="-3"/>
+    <member name="GDK_ERROR_MEM" nick="error-mem" value="-4"/>
+  </enum>  <enum name="GdkGrabStatus" get-type="gdk_grab_status_get_type">
+    <member name="GDK_GRAB_SUCCESS" nick="success" value="0"/>
+    <member name="GDK_GRAB_ALREADY_GRABBED" nick="already-grabbed" value="1"/>
+    <member name="GDK_GRAB_INVALID_TIME" nick="invalid-time" value="2"/>
+    <member name="GDK_GRAB_NOT_VIEWABLE" nick="not-viewable" value="3"/>
+    <member name="GDK_GRAB_FROZEN" nick="frozen" value="4"/>
+    <member name="GDK_GRAB_FAILED" nick="failed" value="5"/>
+  </enum>  <enum name="GdkGrabOwnership" get-type="gdk_grab_ownership_get_type">
+    <member name="GDK_OWNERSHIP_NONE" nick="none" value="0"/>
+    <member name="GDK_OWNERSHIP_WINDOW" nick="window" value="1"/>
+    <member name="GDK_OWNERSHIP_APPLICATION" nick="application" value="2"/>
+  </enum>  <flags name="GdkEventMask" get-type="gdk_event_mask_get_type">
+    <member name="GDK_EXPOSURE_MASK" nick="exposure-mask" value="2"/>
+    <member name="GDK_POINTER_MOTION_MASK" nick="pointer-motion-mask" value="4"/>
+    <member name="GDK_POINTER_MOTION_HINT_MASK" nick="pointer-motion-hint-mask" value="8"/>
+    <member name="GDK_BUTTON_MOTION_MASK" nick="button-motion-mask" value="16"/>
+    <member name="GDK_BUTTON1_MOTION_MASK" nick="button1-motion-mask" value="32"/>
+    <member name="GDK_BUTTON2_MOTION_MASK" nick="button2-motion-mask" value="64"/>
+    <member name="GDK_BUTTON3_MOTION_MASK" nick="button3-motion-mask" value="128"/>
+    <member name="GDK_BUTTON_PRESS_MASK" nick="button-press-mask" value="256"/>
+    <member name="GDK_BUTTON_RELEASE_MASK" nick="button-release-mask" value="512"/>
+    <member name="GDK_KEY_PRESS_MASK" nick="key-press-mask" value="1024"/>
+    <member name="GDK_KEY_RELEASE_MASK" nick="key-release-mask" value="2048"/>
+    <member name="GDK_ENTER_NOTIFY_MASK" nick="enter-notify-mask" value="4096"/>
+    <member name="GDK_LEAVE_NOTIFY_MASK" nick="leave-notify-mask" value="8192"/>
+    <member name="GDK_FOCUS_CHANGE_MASK" nick="focus-change-mask" value="16384"/>
+    <member name="GDK_STRUCTURE_MASK" nick="structure-mask" value="32768"/>
+    <member name="GDK_PROPERTY_CHANGE_MASK" nick="property-change-mask" value="65536"/>
+    <member name="GDK_VISIBILITY_NOTIFY_MASK" nick="visibility-notify-mask" value="131072"/>
+    <member name="GDK_PROXIMITY_IN_MASK" nick="proximity-in-mask" value="262144"/>
+    <member name="GDK_PROXIMITY_OUT_MASK" nick="proximity-out-mask" value="524288"/>
+    <member name="GDK_SUBSTRUCTURE_MASK" nick="substructure-mask" value="1048576"/>
+    <member name="GDK_SCROLL_MASK" nick="scroll-mask" value="2097152"/>
+    <member name="GDK_TOUCH_MASK" nick="touch-mask" value="4194304"/>
+    <member name="GDK_SMOOTH_SCROLL_MASK" nick="smooth-scroll-mask" value="8388608"/>
+    <member name="GDK_TOUCHPAD_GESTURE_MASK" nick="touchpad-gesture-mask" value="16777216"/>
+    <member name="GDK_TABLET_PAD_MASK" nick="tablet-pad-mask" value="33554432"/>
+    <member name="GDK_ALL_EVENTS_MASK" nick="all-events-mask" value="67108862"/>
+  </flags>
+  <enum name="GdkGLError" get-type="gdk_gl_error_get_type">
+    <member name="GDK_GL_ERROR_NOT_AVAILABLE" nick="not-available" value="0"/>
+    <member name="GDK_GL_ERROR_UNSUPPORTED_FORMAT" nick="unsupported-format" value="1"/>
+    <member name="GDK_GL_ERROR_UNSUPPORTED_PROFILE" nick="unsupported-profile" value="2"/>
+  </enum>  <enum name="GdkWindowTypeHint" get-type="gdk_window_type_hint_get_type">
+    <member name="GDK_WINDOW_TYPE_HINT_NORMAL" nick="normal" value="0"/>
+    <member name="GDK_WINDOW_TYPE_HINT_DIALOG" nick="dialog" value="1"/>
+    <member name="GDK_WINDOW_TYPE_HINT_MENU" nick="menu" value="2"/>
+    <member name="GDK_WINDOW_TYPE_HINT_TOOLBAR" nick="toolbar" value="3"/>
+    <member name="GDK_WINDOW_TYPE_HINT_SPLASHSCREEN" nick="splashscreen" value="4"/>
+    <member name="GDK_WINDOW_TYPE_HINT_UTILITY" nick="utility" value="5"/>
+    <member name="GDK_WINDOW_TYPE_HINT_DOCK" nick="dock" value="6"/>
+    <member name="GDK_WINDOW_TYPE_HINT_DESKTOP" nick="desktop" value="7"/>
+    <member name="GDK_WINDOW_TYPE_HINT_DROPDOWN_MENU" nick="dropdown-menu" value="8"/>
+    <member name="GDK_WINDOW_TYPE_HINT_POPUP_MENU" nick="popup-menu" value="9"/>
+    <member name="GDK_WINDOW_TYPE_HINT_TOOLTIP" nick="tooltip" value="10"/>
+    <member name="GDK_WINDOW_TYPE_HINT_NOTIFICATION" nick="notification" value="11"/>
+    <member name="GDK_WINDOW_TYPE_HINT_COMBO" nick="combo" value="12"/>
+    <member name="GDK_WINDOW_TYPE_HINT_DND" nick="dnd" value="13"/>
+  </enum>  <enum name="GdkAxisUse" get-type="gdk_axis_use_get_type">
+    <member name="GDK_AXIS_IGNORE" nick="ignore" value="0"/>
+    <member name="GDK_AXIS_X" nick="x" value="1"/>
+    <member name="GDK_AXIS_Y" nick="y" value="2"/>
+    <member name="GDK_AXIS_PRESSURE" nick="pressure" value="3"/>
+    <member name="GDK_AXIS_XTILT" nick="xtilt" value="4"/>
+    <member name="GDK_AXIS_YTILT" nick="ytilt" value="5"/>
+    <member name="GDK_AXIS_WHEEL" nick="wheel" value="6"/>
+    <member name="GDK_AXIS_DISTANCE" nick="distance" value="7"/>
+    <member name="GDK_AXIS_ROTATION" nick="rotation" value="8"/>
+    <member name="GDK_AXIS_SLIDER" nick="slider" value="9"/>
+    <member name="GDK_AXIS_LAST" nick="last" value="10"/>
+  </enum>  <flags name="GdkAxisFlags" get-type="gdk_axis_flags_get_type">
+    <member name="GDK_AXIS_FLAG_X" nick="x" value="2"/>
+    <member name="GDK_AXIS_FLAG_Y" nick="y" value="4"/>
+    <member name="GDK_AXIS_FLAG_PRESSURE" nick="pressure" value="8"/>
+    <member name="GDK_AXIS_FLAG_XTILT" nick="xtilt" value="16"/>
+    <member name="GDK_AXIS_FLAG_YTILT" nick="ytilt" value="32"/>
+    <member name="GDK_AXIS_FLAG_WHEEL" nick="wheel" value="64"/>
+    <member name="GDK_AXIS_FLAG_DISTANCE" nick="distance" value="128"/>
+    <member name="GDK_AXIS_FLAG_ROTATION" nick="rotation" value="256"/>
+    <member name="GDK_AXIS_FLAG_SLIDER" nick="slider" value="512"/>
+  </flags>
+  <enum name="GdkVisualType" get-type="gdk_visual_type_get_type">
+    <member name="GDK_VISUAL_STATIC_GRAY" nick="static-gray" value="0"/>
+    <member name="GDK_VISUAL_GRAYSCALE" nick="grayscale" value="1"/>
+    <member name="GDK_VISUAL_STATIC_COLOR" nick="static-color" value="2"/>
+    <member name="GDK_VISUAL_PSEUDO_COLOR" nick="pseudo-color" value="3"/>
+    <member name="GDK_VISUAL_TRUE_COLOR" nick="true-color" value="4"/>
+    <member name="GDK_VISUAL_DIRECT_COLOR" nick="direct-color" value="5"/>
+  </enum>  <enum name="GdkWindowWindowClass" get-type="gdk_window_window_class_get_type">
+    <member name="GDK_INPUT_OUTPUT" nick="input-output" value="0"/>
+    <member name="GDK_INPUT_ONLY" nick="input-only" value="1"/>
+  </enum>  <enum name="GdkWindowType" get-type="gdk_window_type_get_type">
+    <member name="GDK_WINDOW_ROOT" nick="root" value="0"/>
+    <member name="GDK_WINDOW_TOPLEVEL" nick="toplevel" value="1"/>
+    <member name="GDK_WINDOW_CHILD" nick="child" value="2"/>
+    <member name="GDK_WINDOW_TEMP" nick="temp" value="3"/>
+    <member name="GDK_WINDOW_FOREIGN" nick="foreign" value="4"/>
+    <member name="GDK_WINDOW_OFFSCREEN" nick="offscreen" value="5"/>
+    <member name="GDK_WINDOW_SUBSURFACE" nick="subsurface" value="6"/>
+  </enum>  <flags name="GdkWindowAttributesType" get-type="gdk_window_attributes_type_get_type">
+    <member name="GDK_WA_TITLE" nick="title" value="2"/>
+    <member name="GDK_WA_X" nick="x" value="4"/>
+    <member name="GDK_WA_Y" nick="y" value="8"/>
+    <member name="GDK_WA_CURSOR" nick="cursor" value="16"/>
+    <member name="GDK_WA_VISUAL" nick="visual" value="32"/>
+    <member name="GDK_WA_WMCLASS" nick="wmclass" value="64"/>
+    <member name="GDK_WA_NOREDIR" nick="noredir" value="128"/>
+    <member name="GDK_WA_TYPE_HINT" nick="type-hint" value="256"/>
+  </flags>
+  <flags name="GdkWindowHints" get-type="gdk_window_hints_get_type">
+    <member name="GDK_HINT_POS" nick="pos" value="1"/>
+    <member name="GDK_HINT_MIN_SIZE" nick="min-size" value="2"/>
+    <member name="GDK_HINT_MAX_SIZE" nick="max-size" value="4"/>
+    <member name="GDK_HINT_BASE_SIZE" nick="base-size" value="8"/>
+    <member name="GDK_HINT_ASPECT" nick="aspect" value="16"/>
+    <member name="GDK_HINT_RESIZE_INC" nick="resize-inc" value="32"/>
+    <member name="GDK_HINT_WIN_GRAVITY" nick="win-gravity" value="64"/>
+    <member name="GDK_HINT_USER_POS" nick="user-pos" value="128"/>
+    <member name="GDK_HINT_USER_SIZE" nick="user-size" value="256"/>
+  </flags>
+  <flags name="GdkWMDecoration" get-type="gdk_wm_decoration_get_type">
+    <member name="GDK_DECOR_ALL" nick="all" value="1"/>
+    <member name="GDK_DECOR_BORDER" nick="border" value="2"/>
+    <member name="GDK_DECOR_RESIZEH" nick="resizeh" value="4"/>
+    <member name="GDK_DECOR_TITLE" nick="title" value="8"/>
+    <member name="GDK_DECOR_MENU" nick="menu" value="16"/>
+    <member name="GDK_DECOR_MINIMIZE" nick="minimize" value="32"/>
+    <member name="GDK_DECOR_MAXIMIZE" nick="maximize" value="64"/>
+  </flags>
+  <flags name="GdkWMFunction" get-type="gdk_wm_function_get_type">
+    <member name="GDK_FUNC_ALL" nick="all" value="1"/>
+    <member name="GDK_FUNC_RESIZE" nick="resize" value="2"/>
+    <member name="GDK_FUNC_MOVE" nick="move" value="4"/>
+    <member name="GDK_FUNC_MINIMIZE" nick="minimize" value="8"/>
+    <member name="GDK_FUNC_MAXIMIZE" nick="maximize" value="16"/>
+    <member name="GDK_FUNC_CLOSE" nick="close" value="32"/>
+  </flags>
+  <enum name="GdkGravity" get-type="gdk_gravity_get_type">
+    <member name="GDK_GRAVITY_NORTH_WEST" nick="north-west" value="1"/>
+    <member name="GDK_GRAVITY_NORTH" nick="north" value="2"/>
+    <member name="GDK_GRAVITY_NORTH_EAST" nick="north-east" value="3"/>
+    <member name="GDK_GRAVITY_WEST" nick="west" value="4"/>
+    <member name="GDK_GRAVITY_CENTER" nick="center" value="5"/>
+    <member name="GDK_GRAVITY_EAST" nick="east" value="6"/>
+    <member name="GDK_GRAVITY_SOUTH_WEST" nick="south-west" value="7"/>
+    <member name="GDK_GRAVITY_SOUTH" nick="south" value="8"/>
+    <member name="GDK_GRAVITY_SOUTH_EAST" nick="south-east" value="9"/>
+    <member name="GDK_GRAVITY_STATIC" nick="static" value="10"/>
+  </enum>  <flags name="GdkAnchorHints" get-type="gdk_anchor_hints_get_type">
+    <member name="GDK_ANCHOR_FLIP_X" nick="flip-x" value="1"/>
+    <member name="GDK_ANCHOR_FLIP_Y" nick="flip-y" value="2"/>
+    <member name="GDK_ANCHOR_SLIDE_X" nick="slide-x" value="4"/>
+    <member name="GDK_ANCHOR_SLIDE_Y" nick="slide-y" value="8"/>
+    <member name="GDK_ANCHOR_RESIZE_X" nick="resize-x" value="16"/>
+    <member name="GDK_ANCHOR_RESIZE_Y" nick="resize-y" value="32"/>
+    <member name="GDK_ANCHOR_FLIP" nick="flip" value="3"/>
+    <member name="GDK_ANCHOR_SLIDE" nick="slide" value="12"/>
+    <member name="GDK_ANCHOR_RESIZE" nick="resize" value="48"/>
+  </flags>
+  <enum name="GdkWindowEdge" get-type="gdk_window_edge_get_type">
+    <member name="GDK_WINDOW_EDGE_NORTH_WEST" nick="north-west" value="0"/>
+    <member name="GDK_WINDOW_EDGE_NORTH" nick="north" value="1"/>
+    <member name="GDK_WINDOW_EDGE_NORTH_EAST" nick="north-east" value="2"/>
+    <member name="GDK_WINDOW_EDGE_WEST" nick="west" value="3"/>
+    <member name="GDK_WINDOW_EDGE_EAST" nick="east" value="4"/>
+    <member name="GDK_WINDOW_EDGE_SOUTH_WEST" nick="south-west" value="5"/>
+    <member name="GDK_WINDOW_EDGE_SOUTH" nick="south" value="6"/>
+    <member name="GDK_WINDOW_EDGE_SOUTH_EAST" nick="south-east" value="7"/>
+  </enum>  <enum name="GdkFullscreenMode" get-type="gdk_fullscreen_mode_get_type">
+    <member name="GDK_FULLSCREEN_ON_CURRENT_MONITOR" nick="current-monitor" value="0"/>
+    <member name="GDK_FULLSCREEN_ON_ALL_MONITORS" nick="all-monitors" value="1"/>
+  </enum>  <class name="GdkGLContext" get-type="gdk_gl_context_get_type" parents="GObject" abstract="1">
+    <property name="display" type="GdkDisplay" flags="235"/>
+    <property name="window" type="GdkWindow" flags="235"/>
+    <property name="shared-context" type="GdkGLContext" flags="235"/>
+  </class>
+  <class name="GdkKeymap" get-type="gdk_keymap_get_type" parents="GObject">
+    <signal name="direction-changed" return="void" when="last">
+    </signal>
+    <signal name="keys-changed" return="void" when="last">
+    </signal>
+    <signal name="state-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GdkVisual" get-type="gdk_visual_get_type" parents="GObject">
+  </class>
+  <error-quark function="gdk_gl_error_quark" domain="gdk-gl-error-quark"/>
+</dump>

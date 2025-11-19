@@ -1,0 +1,12 @@
+diff -uNr tar-1.33/src/xheader.c tar-1.33.mod/src/xheader.c
+--- tar-1.33/src/xheader.c	2021-01-06 15:52:09.000000000 +0000
++++ tar-1.33.mod/src/xheader.c	2021-02-07 21:18:57.425078913 +0000
+@@ -404,7 +404,7 @@
+       const char *global_header_template = HEADER_TEMPLATE (pax_global_header);
+       const char *tmp = getenv ("TMPDIR");
+       if (!tmp)
+-	tmp = "/tmp";
++	tmp = "@TERMUX_PREFIX@/tmp";
+       len = strlen (tmp) + strlen (global_header_template) + 1;
+       globexthdr_name = xmalloc (len);
+       strcpy(globexthdr_name, tmp);

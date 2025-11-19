@@ -1,0 +1,20 @@
+--- a/gtk/rgdebinstallprogress.cc
++++ b/gtk/rgdebinstallprogress.cc
+@@ -142,7 +142,7 @@
+ }
+ /* end read_fd */
+ 
+-#define UNIXSTR_PATH "/var/run/synaptic.socket"
++#define UNIXSTR_PATH "@TERMUX_PREFIX@/var/run/synaptic.socket"
+ 
+ int ipc_send_fd(int fd)
+ {
+@@ -259,7 +259,7 @@
+    // read diff
+    string diff;
+    char buf[512];
+-   char *cmd = g_strdup_printf("/usr/bin/diff -u %s %s", orig_file.c_str(), new_file.c_str());
++   char *cmd = g_strdup_printf("@TERMUX_PREFIX@/bin/diff -u %s %s", orig_file.c_str(), new_file.c_str());
+    FILE *f = popen(cmd,"r");
+    while(fgets(buf,sizeof(buf),f) != NULL) {
+       diff += utf8(buf);

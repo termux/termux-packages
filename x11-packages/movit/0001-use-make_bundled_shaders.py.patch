@@ -1,0 +1,11 @@
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -185,7 +185,7 @@
+ make_bundled_shaders: $(MAKE_BUNDLE_OBJS)
+ 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o make_bundled_shaders $(MAKE_BUNDLE_OBJS) -lepoxy 
+ bundled_shaders.cpp: make_bundled_shaders $(SHADERS)
+-	./make_bundled_shaders $(SHADERS) > $@
++	./make_bundled_shaders.py $(SHADERS) > $@
+ 
+ install: libmovit.la
+ 	$(MKDIR) -p $(DESTDIR)$(libdir)/

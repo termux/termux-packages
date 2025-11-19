@@ -1,0 +1,25 @@
+diff -u -r ../moon-buggy-1.0.51/realname.c ./realname.c
+--- ../moon-buggy-1.0.51/realname.c	2006-03-19 20:28:18.000000000 +0100
++++ ./realname.c	2014-02-22 18:14:49.000000000 +0100
+@@ -37,18 +37,9 @@
+   char *tmp;
+   
+   if (buffer[0] == '\0') {
+-    uid_t me = geteuid ();
+-    struct passwd *my_passwd = getpwuid (me);
+-    if (my_passwd) {
+-      int  i;
+-      strncpy (buffer, my_passwd->pw_gecos, size);
+-      for (i=0; i<size; ++i) {
+-	if (buffer[i] == ',') {
+-	  buffer[i] = '\0';
+-	  break;
+-	}
+-      }
+-    }
++    char* name_default = getenv("USER");
++    if (name_default == NULL) name_default = "Droid";
++    strncpy(buffer, name_default, size);
+   }
+ 
+   werase (message);

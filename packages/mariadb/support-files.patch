@@ -1,0 +1,67 @@
+--- a/support-files/mysql-multi.server.sh
++++ b/support-files/mysql-multi.server.sh
+@@ -77,8 +77,8 @@
+ then
+   print_defaults="@bindir@/mysql_print_defaults"
+ else
+-  # Try to find basedir in /etc/my.cnf
+-  conf=/etc/my.cnf
++  # Try to find basedir in @TERMUX_PREFIX@/etc/my.cnf
++  conf=@TERMUX_PREFIX@/etc/my.cnf
+   print_defaults=
+   if test -r $conf
+   then
+--- a/support-files/mysql.server.sh
++++ b/support-files/mysql.server.sh
+@@ -160,8 +160,8 @@
+ if test -x "$bindir/my_print_defaults";  then
+   print_defaults="$bindir/my_print_defaults"
+ else
+-  # Try to find basedir in /etc/my.cnf
+-  conf=/etc/my.cnf
++  # Try to find basedir in @TERMUX_PREFIX@/etc/my.cnf
++  conf=@TERMUX_PREFIX@/etc/my.cnf
+   print_defaults=
+   if test -r $conf
+   then
+@@ -185,11 +185,7 @@
+ user='@MYSQLD_USER@'
+ 
+ su_kill() {
+-  if test "$USER" = "$user"; then
+     kill $* >/dev/null 2>&1
+-  else
+-    su - $user -s /bin/sh -c "kill $*" >/dev/null 2>&1
+-  fi
+ }
+ 
+ #
+--- a/support-files/policy/apparmor/usr.sbin.mysqld
++++ b/support-files/policy/apparmor/usr.sbin.mysqld
+@@ -29,7 +29,7 @@
+   /etc/hosts.deny r,
+   /etc/ld.so.cache r,
+   /etc/mtab r,
+-  /etc/my.cnf r,
++  @TERMUX_PREFIX@/etc/my.cnf r,
+   /etc/mysql/*.cnf r,
+   /etc/mysql/*.pem r,
+   /etc/mysql/conf.d/ r,
+@@ -81,7 +81,7 @@
+     /bin/which rix,
+     /dev/tty rw,
+     /etc/ld.so.cache r,
+-    /etc/my.cnf r,
++    @TERMUX_PREFIX@/etc/my.cnf r,
+     /proc/ r,
+     /proc/*/cmdline r,
+     /proc/*/fd/ r,
+--- a/support-files/rpm/my.cnf
++++ b/support-files/rpm/my.cnf
+@@ -7,5 +7,5 @@
+ #
+ # include *.cnf from the config directory
+ #
+-!includedir /etc/my.cnf.d
++!includedir @TERMUX_PREFIX@/etc/my.cnf.d
+ 

@@ -1,0 +1,14 @@
+diff -uNr wireshark-2.6.1/epan/dissectors/packet-snort.c wireshark-2.6.1.mod/epan/dissectors/packet-snort.c
+--- wireshark-2.6.1/epan/dissectors/packet-snort.c	2018-05-22 21:53:09.000000000 +0300
++++ wireshark-2.6.1.mod/epan/dissectors/packet-snort.c	2018-06-26 18:49:28.831638452 +0300
+@@ -115,8 +115,8 @@
+ 
+ /* Snort binary and config file */
+ #ifndef _WIN32
+-static const char *pref_snort_binary_filename = "/usr/sbin/snort";
+-static const char *pref_snort_config_filename = "/etc/snort/snort.conf";
++static const char *pref_snort_binary_filename = "@TERMUX_PREFIX@/bin/snort";
++static const char *pref_snort_config_filename = "@TERMUX_PREFIX@/etc/snort/snort.conf";
+ #else
+ /* Default locations from Snort Windows installer */
+ static const char *pref_snort_binary_filename = "C:\\Snort\\bin\\snort.exe";

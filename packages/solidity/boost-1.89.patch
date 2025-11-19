@@ -1,0 +1,37 @@
+From db18d42bdeccf305695e477c74fc2a4141493c5e Mon Sep 17 00:00:00 2001
+From: Michael Cho <michael@michaelcho.dev>
+Date: Tue, 12 Aug 2025 18:55:45 -0400
+Subject: [PATCH] Fix build with Boost 1.89.0
+
+Boost.System has been header-only since Boost 1.69 and will be dropping
+the compatibility stub library in Boost 1.89 (boostorg/system@7a495bb).
+
+Since the `system` component is only needed for Boost < 1.69, it can be
+added to `BOOST_COMPONENTS` in the fallback find_package.
+
+Signed-off-by: Michael Cho <michael@michaelcho.dev>
+---
+ cmake/EthDependencies.cmake | 3 ++-
+ libsolutil/CMakeLists.txt   | 2 +-
+ test/tools/CMakeLists.txt   | 4 ++--
+ 3 files changed, 5 insertions(+), 4 deletions(-)
+
+--- a/cmake/EthDependencies.cmake
++++ b/cmake/EthDependencies.cmake
+@@ -29,7 +29,7 @@ if (WIN32)
+ 	option(Boost_USE_STATIC_RUNTIME "Link Boost against static C++ runtime libraries" ON)
+ endif()
+ 
+-set(BOOST_COMPONENTS "filesystem;unit_test_framework;program_options;system")
++set(BOOST_COMPONENTS "filesystem;unit_test_framework;program_options")
+ 
+ # CMake >= 3.30 should not use the vendored boost
+ if(POLICY CMP0167)
+@@ -50,6 +50,7 @@ else()
+ 		if(POLICY CMP0167)
+ 			cmake_policy(SET CMP0167 OLD)
+ 		endif()
++		list(APPEND BOOST_COMPONENTS system)
+ 		find_package(Boost 1.67.0 QUIET REQUIRED COMPONENTS ${BOOST_COMPONENTS})
+ 	endif()
+ endif()

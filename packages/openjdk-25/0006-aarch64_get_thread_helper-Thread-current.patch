@@ -1,0 +1,36 @@
+From 7542283e6c7c692bcbf6b415393d9e048a61ea13 Mon Sep 17 00:00:00 2001
+From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
+Date: Thu, 10 Jun 2021 08:45:16 +0700
+Subject: [PATCH 07/37] aarch64_get_thread_helper() -> Thread::current()
+
+Can't build for Android:
+
+src/hotspot/os_cpu/linux_aarch64/threadLS_linux_aarch64.S:37: undefined reference to `Thread::_thr_current'
+27560
+clang90++: error: linker command failed with exit code 1 (use -v to see invocation)
+---
+ .../os_cpu/linux_aarch64/javaThread_linux_aarch64.hpp    | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/src/hotspot/os_cpu/linux_aarch64/javaThread_linux_aarch64.hpp b/src/hotspot/os_cpu/linux_aarch64/javaThread_linux_aarch64.hpp
+index c6e012ecf..b19468fd0 100644
+--- a/src/hotspot/os_cpu/linux_aarch64/javaThread_linux_aarch64.hpp
++++ b/src/hotspot/os_cpu/linux_aarch64/javaThread_linux_aarch64.hpp
+@@ -47,6 +47,13 @@ private:
+   bool pd_get_top_frame(frame* fr_addr, void* ucontext, bool isInJava);
+ public:
+ 
+-  static Thread *aarch64_get_thread_helper();
++  static Thread *aarch64_get_thread_helper()
++#ifndef __ANDROID__
++;
++#else
++  {
++    return Thread::current();
++  }
++#endif
+ 
+ #endif // OS_CPU_LINUX_AARCH64_JAVATHREAD_LINUX_AARCH64_HPP
+-- 
+2.45.2
+

@@ -1,0 +1,11 @@
+--- a/command.c
++++ b/command.c
+@@ -3375,7 +3375,7 @@
+             if (!fork()) {
+                 char *exp_cmd = property_expand_string(mpctx, cmd->args[0].v.s);
+                 if (exp_cmd) {
+-                    execl("/bin/sh", "sh", "-c", exp_cmd, NULL);
++                    execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", exp_cmd, NULL);
+                     free(exp_cmd);
+                 }
+                 exit(0);

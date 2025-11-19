@@ -1,0 +1,16 @@
++++ ./src/standard/thread.c
+@@ -390,12 +390,14 @@
+   ENFORCE_ARG_TYPE(get_name, 0, IS_PTR);
+   b_thread_handle *thread = AS_PTR(args[0])->pointer;
+ 
++#ifndef __ANDROID__
+   if(thread != NULL && thread->vm != NULL) {
+     char buffer[255];
+     if(pthread_getname_np(thread->thread, buffer, 255) == 0) {
+       RETURN_STRING(buffer);
+     }
+   }
++#endif
+ 
+   RETURN_VALUE(EMPTY_STRING_VAL);
+ }

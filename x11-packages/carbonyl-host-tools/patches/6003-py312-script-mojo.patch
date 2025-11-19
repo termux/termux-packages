@@ -1,0 +1,42 @@
+From f5f6e361d037c31630661186e7bd7b31d2784cb8 Mon Sep 17 00:00:00 2001
+From: Bruno Pitrus <brunopitrus@hotmail.com>
+Date: Tue, 25 Jul 2023 18:34:09 +0000
+Subject: [PATCH] Remove unused python import
+
+The `imp` module has been removed in Python 3.12 causing these scripts to error out.
+
+Change-Id: Ic7c038d21b86052bdda13015f80934db52a2143e
+Reviewed-on: https://chromium-review.googlesource.com/c/chromium/src/+/4714859
+Auto-Submit: Bruno Pitrus <brunopitrus@hotmail.com>
+Reviewed-by: Ken Rockot <rockot@google.com>
+Commit-Queue: Ken Rockot <rockot@google.com>
+Cr-Commit-Position: refs/heads/main@{#1174966}
+---
+ mojo/public/tools/mojom/mojom/fileutil.py    | 1 -
+ mojo/public/tools/mojom/mojom/parse/lexer.py | 1 -
+ 2 files changed, 2 deletions(-)
+
+diff --git a/mojo/public/tools/mojom/mojom/fileutil.py b/mojo/public/tools/mojom/mojom/fileutil.py
+index 29daec367c5dc1..124f12c134b9d3 100644
+--- a/mojo/public/tools/mojom/mojom/fileutil.py
++++ b/mojo/public/tools/mojom/mojom/fileutil.py
+@@ -3,7 +3,6 @@
+ # found in the LICENSE file.
+ 
+ import errno
+-import imp
+ import os.path
+ import sys
+ 
+diff --git a/mojo/public/tools/mojom/mojom/parse/lexer.py b/mojo/public/tools/mojom/mojom/parse/lexer.py
+index 73ca15df94c9d0..1083a1af7bb25e 100644
+--- a/mojo/public/tools/mojom/mojom/parse/lexer.py
++++ b/mojo/public/tools/mojom/mojom/parse/lexer.py
+@@ -2,7 +2,6 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-import imp
+ import os.path
+ import sys
+ 

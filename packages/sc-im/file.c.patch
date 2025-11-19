@@ -1,0 +1,11 @@
+--- ./src/file.c.orig	2017-12-13 17:48:59.000000000 +0000
++++ ./src/file.c	2017-12-30 00:00:31.625092570 +0000
+@@ -829,7 +829,7 @@
+             (void) dup(pipefd[3]);       // connect to second pipe
+         }
+         (void) signal(SIGINT, SIG_DFL);  // reset
+-        execl("/bin/sh", "sh", "-c", efname, 0, (char *) NULL);
++        execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", efname, 0, (char *) NULL);
+         exit (-127);
+     } else {                             // else parent
+         *rpid = pid;

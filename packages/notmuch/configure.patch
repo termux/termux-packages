@@ -1,0 +1,41 @@
+diff -u -r ../notmuch-0.30/configure ./configure
+--- ../notmuch-0.30/configure	2020-07-11 01:25:04.000000000 +0000
++++ ./configure	2020-07-27 08:25:19.401273000 +0000
+@@ -409,7 +409,7 @@
+     return 0;
+ }
+ EOF
+-if ${CC} ${CFLAGS} -I"$srcdir" _libversion.c -o _libversion > /dev/null 2>&1 \
++if ${CC_FOR_BUILD} -I"$srcdir" _libversion.c -o _libversion > /dev/null 2>&1 \
+        && ./_libversion > _libversion.sh && . ./_libversion.sh
+ then
+     printf "OK.\n"
+@@ -490,6 +490,7 @@
+     gmime_cflags=$(pkg-config --cflags gmime-3.0)
+     gmime_ldflags=$(pkg-config --libs gmime-3.0)
+ 
++if false; then
+     printf "Checking for GMime session key extraction support... "
+ 
+     cat > _check_session_keys.c <<EOF
+@@ -714,6 +715,7 @@
+     if [ -n "$TEMP_GPG" -a -d "$TEMP_GPG" ]; then
+ 	rm -rf "$TEMP_GPG"
+     fi
++fi # false
+ else
+     have_gmime=0
+     printf "No.\n"
+@@ -830,12 +620,7 @@
+ fi
+ 
+ printf "Checking for bash-completion (>= 1.90)... "
+-if pkg-config --atleast-version=1.90 bash-completion; then
+     printf "Yes.\n"
+-else
+-    printf "No (will not install bash completion).\n"
+-    WITH_BASH=0
+-fi
+ 
+ if [ -z "${EMACSLISPDIR-}" ]; then
+     EMACSLISPDIR="\$(prefix)/share/emacs/site-lisp"

@@ -1,0 +1,23 @@
+--- a/recover.c
++++ b/recover.c
+@@ -942,7 +942,7 @@
+ 	last_update = ctime(&tupd);
+ 	/* Start up mail */
+ 	if ((mail_prog = getenv("JOVEMAILER")) == NULL)
+-	    mail_prog = "/bin/mail";
++	    mail_prog = "@TERMUX_PREFIX@/bin/mail";
+ 	mail_cmd = copystrs(mail_prog, pw->pw_name);
+ 	if ((r = setuid(getuid())) < 0) {
+ 	    fprintf(stderr, "WARNING: %s: setuid(getuid()) failed: %s\n",
+@@ -1036,9 +1036,9 @@
+ 					close(fd);
+ 			}
+ 			MailUser(&header);
+-			execl("/bin/mv", "mv", fp->file_data, fp->file_rec,
++			execl("@TERMUX_PREFIX@/bin/mv", "mv", fp->file_data, fp->file_rec,
+ 				  RecDir, (char *)NULL);
+-			fprintf(stderr, "%s: cannot execl /bin/mv. %s\n", progname, strerror(errno));
++			fprintf(stderr, "%s: cannot execl @TERMUX_PREFIX@/bin/mv. %s\n", progname, strerror(errno));
+ 			exit(-1);
+ 			/*NOTREACHED*/
+ 

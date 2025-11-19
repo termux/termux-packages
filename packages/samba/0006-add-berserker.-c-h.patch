@@ -1,0 +1,280 @@
+From 5131708f0337fc90b03dad4d180f571c973d07c6 Mon Sep 17 00:00:00 2001
+From: Faheem Pervez <trippin1@gmail.com>
+Date: Thu, 18 Jun 2020 11:51:38 +0000
+Subject: [PATCH 6/6] add berserker.{c,h}
+
+The idea of berserker.c is to define missing functions: 
+wrapping getpwnam etc. to return only a root entry, 
+giving any user added to Samba full access.
+
+getpasswd_wrapper is from JimmyChingala:
+https://forum.xda-developers.com/showpost.php?p=8239139&postcount=128
+
+The original berserker.c can be found here,
+from Berserker's port for SambaDroid:
+https://github.com/berserker/android_samba
+
+elliott10 updated it for Samba 4:
+https://github.com/elliott10/samba-4.5.1
+
+I've made the following changes:
+* Use Termux values for root user
+* _Naively_ (really - I know volatile won't help much) prevent
+  getpwent inf. loops
+* Wrap getgrnam and getgrgid, thanks
+  https://blog.csdn.net/jk198310/article/details/15809341
+* Add a couple o' more Android groups
+---
+ source3/include/berserker.c | 148 ++++++++++++++++++++++++++++++++++++
+ source3/include/berserker.h |  51 +++++++++++++
+ source3/include/includes.h  |   1 +
+ source3/wscript_build       |   2 +
+ 4 files changed, 202 insertions(+)
+ create mode 100644 source3/include/berserker.c
+ create mode 100644 source3/include/berserker.h
+
+diff --git a/source3/include/berserker.c b/source3/include/berserker.c
+new file mode 100644
+index 0000000..ac75cb7
+--- /dev/null
++++ b/source3/include/berserker.c
+@@ -0,0 +1,147 @@
++#define BERSERKER_USE_ORIG
++#include "includes.h"
++
++#ifndef AID_ROOT
++#define AID_ROOT 0
++#define AID_MEDIA_RW 1023
++#define AID_EVERYBODY 9997
++#endif
++
++//int getpwnam_r(const char* __name, struct passwd* __pwd, char* __buf, size_t __n, struct passwd** __result);
++
++static volatile int getpwent_ok = 1;
++
++static struct group *group_wrapper(gid_t __gid)
++{
++	static char *rootmem[] = {
++		"root",
++		NULL
++	};
++	static struct group rootgr = {
++		"root",
++		"x" /* NULL */,
++		AID_ROOT,
++		rootmem
++	};
++	static char *everybodymem[] = {
++		"everybody",
++		NULL
++	};
++	static struct group everybodygr = {
++		"everybody",
++		"x" /* NULL */,
++		AID_EVERYBODY,
++		everybodymem
++	};
++	static char *mediarwmem[] = {
++		"media_rw",
++		NULL
++	};
++	static struct group mediarwgr = {
++		"media_rw",
++		"x" /* NULL */,
++		AID_MEDIA_RW,
++		mediarwmem
++	};
++
++	if (__gid == AID_EVERYBODY)
++		return &everybodygr;
++	if (__gid == AID_MEDIA_RW)
++		return &mediarwgr;
++	return &rootgr;
++}
++
++static struct passwd *getpasswd_wrapper()
++{
++#if 0 /* Inconsistencies abound... */
++	static struct passwd pwd;
++	static struct passwd *result = NULL;
++	static char *buf = NULL;
++
++	if (!result) {
++		size_t bufsize;
++		memset(&pwd, 0, sizeof(pwd));
++
++		bufsize = sysconf(_SC_GETPW_R_SIZE_MAX);
++		if (bufsize == -1)
++			bufsize = 16384;
++
++		buf = malloc(bufsize);
++		if (buf == NULL)
++			return NULL;
++
++		(void) getpwnam_r("root", &pwd, buf, bufsize, &result);
++		if (!result) {
++			free(buf);
++			return NULL;
++		}
++
++		if (!pwd.pw_passwd || pwd.pw_passwd[0] == '*')
++			pwd.pw_passwd = "x";
++	}
++
++	return result;
++#else
++	static struct passwd pw = {
++		.pw_name = "root",
++		.pw_passwd = "x",
++		.pw_uid = AID_ROOT,
++		.pw_gid = AID_ROOT,
++		.pw_dir = "@TERMUX_HOME@",
++		.pw_shell = "@TERMUX_PREFIX@/bin/login"
++	 };
++	return &pw;
++#endif
++}
++
++/* getpwent restituisce il prossimo della lista */
++struct passwd *berserker_getpwnam(const char* __name)
++{
++	(void)__name;
++	return getpasswd_wrapper();
++}
++
++struct passwd *berserker_getpwuid(uid_t __uid)
++{
++	(void)__uid;
++	return getpasswd_wrapper();
++}
++
++/* setpwent resetta la lista per iterare su passwd */
++void berserker_setpwent()
++{
++	getpwent_ok = 1;
++}
++
++/* getpwent restituisce la prossima struttura passwd */
++struct passwd *berserker_getpwent()
++{
++	if (getpwent_ok) {
++		getpwent_ok = 0;
++		return getpasswd_wrapper();
++	}
++
++	return NULL;
++}
++
++/* termina il ciclo di iterazione su passwd */
++void berserker_endpwent()
++{
++	getpwent_ok = 1;
++}
++
++struct group *berserker_getgrnam(const char* __name)
++{
++	if (__name) {
++		if (!strcmp(__name, "everybody"))
++			return group_wrapper(AID_EVERYBODY);
++		if (!strcmp(__name, "media_rw"))
++			return group_wrapper(AID_MEDIA_RW);
++	}
++	return group_wrapper(AID_ROOT);
++}
++
++struct group *berserker_getgrgid(gid_t __gid)
++{
++	return group_wrapper(__gid);
++}
+diff --git a/source3/include/berserker.h b/source3/include/berserker.h
+new file mode 100644
+index 0000000..7882380
+--- /dev/null
++++ b/source3/include/berserker.h
+@@ -0,0 +1,51 @@
++#ifndef __BERSERKER_H__
++#define __BERSERKER_H__
++
++#define _PWD_H_	/* disabilita l'inclusione del file pwd.h sotto android */
++#define _GRP_H_
++
++#include <unistd.h>
++#include <sys/types.h>
++
++struct passwd {
++  char* pw_name;
++  char* pw_passwd;
++  uid_t pw_uid;
++  gid_t pw_gid;
++#ifdef __LP64__
++  char* pw_gecos;
++#endif
++  char* pw_dir;
++  char* pw_shell;
++};
++
++struct group {
++  char* gr_name;
++  char* gr_passwd;
++  gid_t gr_gid;
++  char** gr_mem;
++};
++
++#ifndef BERSERKER_USE_ORIG
++#define getpwnam berserker_getpwnam
++struct passwd *berserker_getpwnam(const char* __name);
++#define getpwuid berserker_getpwuid
++struct passwd *berserker_getpwuid(uid_t __uid);
++#define setpwent berserker_setpwent
++void berserker_setpwent(void);
++#define getpwent berserker_getpwent
++struct passwd *berserker_getpwent(void);
++#define endpwent berserker_endpwent
++void berserker_endpwent(void);
++#define getgrnam berserker_getgrnam
++struct group *berserker_getgrnam(const char* __name);
++#define getgrgid berserker_getgrgid
++struct group *berserker_getgrgid(gid_t __gid);
++#endif
++
++/* fix per defines mancanti di utmp.ut_type */
++#ifndef DEAD_PROCESS
++#define DEAD_PROCESS  8
++#endif
++
++#endif
+diff --git a/source3/include/includes.h b/source3/include/includes.h
+index 2dafc65..6937912 100644
+--- a/source3/include/includes.h
++++ b/source3/include/includes.h
+@@ -20,6 +20,7 @@
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
++#include "berserker.h"
+ #include "../replace/replace.h"
+ 
+ /* make sure we have included the correct config.h */
+diff --git a/source3/wscript_build b/source3/wscript_build
+index 10d9f71..bbe3665 100644
+--- a/source3/wscript_build
++++ b/source3/wscript_build
+@@ -166,6 +166,7 @@ bld.SAMBA3_SUBSYSTEM('pdb',
+                           lib/privileges.c
+                           lib/util_nscd.c
+                           lib/winbind_util.c
++                          include/berserker.c
+                           passdb/pdb_util.c
+                           passdb/pdb_interface.c
+                           passdb/pdb_secrets.c''',
+@@ -392,6 +393,7 @@ bld.SAMBA3_SUBSYSTEM('samba3core',
+                           ../lib/util/debug_s3.c
+                           lib/dumpcore.c
+                           lib/interface.c
++                          include/berserker.c
+                           lib/username.c
+                           lib/smbrun.c
+                           lib/wins_srv.c
+-- 
+2.25.1
+

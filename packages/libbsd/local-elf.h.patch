@@ -1,0 +1,24 @@
+--- ../cache/libbsd-0.9.1/src/local-elf.h	2018-04-21 21:30:22.000000000 +0000
++++ ./src/local-elf.h	2018-10-16 03:40:41.756419536 +0000
+@@ -240,8 +240,10 @@
+ #endif
+ 
+ #if ELF_TARG_CLASS == ELFCLASS32
++#if !defined(__ANDROID__)
+ #define ELF_ST_BIND	ELF32_ST_BIND
+ #define ELF_ST_TYPE	ELF32_ST_TYPE
++#endif
+ #define Elf_Word	Elf32_Word
+ #define Elf_Sword	Elf32_Sword
+ #define Elf_Sym		Elf32_Sym
+@@ -249,8 +251,10 @@
+ #define Elf_Shdr	Elf32_Shdr
+ #define Elf_Ehdr	Elf32_Ehdr
+ #elif ELF_TARG_CLASS == ELFCLASS64
++#if !defined(__ANDROID__)
+ #define ELF_ST_BIND	ELF64_ST_BIND
+ #define ELF_ST_TYPE	ELF64_ST_TYPE
++#endif
+ #define Elf_Word	Elf64_Word
+ #define Elf_Sword	Elf64_Sword
+ #define Elf_Sym		Elf64_Sym

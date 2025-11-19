@@ -1,0 +1,18 @@
+import("//build/config/sysroot.gni")
+import("//build/toolchain/gcc_toolchain.gni")
+
+gcc_toolchain("host") {
+  cc = "@HOST_CC@"
+  cxx = "@HOST_CXX@"
+  ld = "@HOST_LD@"
+  ar = "@HOST_AR@"
+  nm = "@HOST_NM@"
+  toolchain_args = {
+    current_os = "linux"
+    current_cpu = "x64"
+    v8_current_cpu = "@V8_CURRENT_CPU@"
+    is_clang = @HOST_IS_CLANG@
+    use_gold = @HOST_USE_GOLD@
+    sysroot = "@HOST_SYSROOT@"
+  }
+}

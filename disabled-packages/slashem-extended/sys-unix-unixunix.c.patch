@@ -1,0 +1,20 @@
+--- a/sys/unix/unixunix.c
++++ b/sys/unix/unixunix.c
+@@ -387,7 +387,7 @@
+ 		if((str = getenv("SHELL")) != (char*)0)
+ 			(void) execl(str, str, (char *)0);
+ 		else
+-			(void) execl("/bin/sh", "sh", (char *)0);
++			(void) execl("@TERMUX_PREFIX@/bin/sh", "sh", (char *)0);
+ 		raw_print("sh: cannot execute.");
+ 		exit(EXIT_FAILURE);
+ 	}
+@@ -395,7 +395,7 @@
+ }
+ #endif /* PUBLIC_SERVER */
+ 
+-#if defined(SHELL) || defined(DEF_PAGER) || defined(DEF_MAILREADER)
++#if 1
+ int
+ child(wt)
+ int wt;

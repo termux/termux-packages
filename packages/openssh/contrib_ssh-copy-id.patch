@@ -1,0 +1,12 @@
+diff -uNr openssh-portable-V_9_5_P1/contrib/ssh-copy-id openssh-portable-V_9_5_P1.mod/contrib/ssh-copy-id
+--- openssh-portable-V_9_5_P1/contrib/ssh-copy-id	2023-10-04 07:34:10.000000000 +0300
++++ openssh-portable-V_9_5_P1.mod/contrib/ssh-copy-id	2023-11-23 16:29:34.257875879 +0200
+@@ -41,7 +41,7 @@
+ # check that we have something mildly sane as our shell, or try to find something better
+ if false ^ printf "%s: WARNING: ancient shell, hunting for a more modern one... " "$0"
+ then
+-  SANE_SH=${SANE_SH:-/usr/bin/ksh}
++  SANE_SH=${SANE_SH:-@TERMUX_PREFIX@/bin/bash}
+   if printf 'true ^ false\n' | "$SANE_SH"
+   then
+     printf "'%s' seems viable.\\n" "$SANE_SH"

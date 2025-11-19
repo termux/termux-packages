@@ -1,0 +1,29 @@
+--- ./tlpkg/TeXLive/TLUtils.pm.orig	2025-03-09 17:32:05.186972766 +0100
++++ ./tlpkg/TeXLive/TLUtils.pm	2025-03-07 09:43:36.840306694 +0100
+@@ -2040,7 +2040,7 @@
+   }
+   my $cmd = $keyval{'cmd'};
+ 
+-  my $texdir = `kpsewhich -var-value=TEXMFROOT`;
++  my $texdir = "@TERMUX_PREFIX@/share/texlive/@YEAR@";
+   chomp($texdir);
+   my $texdir_bsl = conv_to_w32_path($texdir);
+   $cmd =~ s!^("?)TEXDIR/!$1$texdir/!g;
+@@ -2115,7 +2115,7 @@
+   if (wndws() && defined($keyval{'filew32'})) {
+     $file = $keyval{'filew32'};
+   }
+-  my $texdir = `kpsewhich -var-value=TEXMFROOT`;
++  my $texdir = "@TERMUX_PREFIX@/share/texlive/@YEAR@";
+   chomp($texdir);
+   my @syscmd;
+   if ($file =~ m/\.pl$/i) {
+@@ -2190,7 +2190,7 @@
+ 
+   &log("postaction $how shortcut for " . $tlpobj->name . "\n");
+   if ($how eq "install") {
+-    my $texdir = `kpsewhich -var-value=TEXMFROOT`;
++    my $texdir = "@TERMUX_PREFIX@/share/texlive/@YEAR@";
+     chomp($texdir);
+     my $texdir_bsl = conv_to_w32_path($texdir);
+     $icon =~ s!^TEXDIR/!$texdir/!;

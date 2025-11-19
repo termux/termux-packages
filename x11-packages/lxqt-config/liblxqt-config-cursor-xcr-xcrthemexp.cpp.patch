@@ -1,0 +1,13 @@
+--- a/liblxqt-config-cursor/xcr/xcrthemexp.cpp
++++ b/liblxqt-config-cursor/xcr/xcrthemexp.cpp
+@@ -203,8 +203,8 @@
+ static QString unzipFile (const QString &zipFile) {
+   QStringList args;
+ 
+-  char tmpDirName[18];
+-  strcpy(tmpDirName, "/tmp/unzXXXXXX");
++  char tmpDirName[46];
++  strcpy(tmpDirName, "@TERMUX_PREFIX@/tmp/unzXXXXXX");
+   char *td = mkdtemp(tmpDirName);
+   if (!td) return QString();
+ 

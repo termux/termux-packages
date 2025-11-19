@@ -1,0 +1,10 @@
++++ ./vendor/core/fastboot/fastboot_driver.h
+@@ -131,6 +131,8 @@
+     RetCode RawCommand(const std::string& cmd, std::string* response = nullptr,
+                        std::vector<std::string>* info = nullptr, int* dsize = nullptr);
+ 
++    Transport* transport() { return transport_.get(); }
++
+   protected:
+     RetCode DownloadCommand(uint32_t size, std::string* response = nullptr,
+                             std::vector<std::string>* info = nullptr);

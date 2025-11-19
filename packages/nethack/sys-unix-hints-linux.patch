@@ -1,0 +1,39 @@
+--- ../NetHack-NetHack-3.6.6_Released/sys/unix/hints/linux	2020-03-08 18:29:31.000000000 +0100
++++ ./sys/unix/hints/linux	2020-10-11 15:24:45.859200937 +0200
+@@ -9,20 +9,20 @@
+ # for Ubuntu dapper.
+ 
+ 
+-#PREFIX=/usr
+-PREFIX=$(wildcard ~)/nh/install
++GAME=nethack
++PREFIX=@TERMUX_PREFIX@
+ HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
+-SHELLDIR = $(PREFIX)/games
+-INSTDIR=$(HACKDIR)
+-VARDIR = $(HACKDIR)
++SHELLDIR = $(DESTDIR)$(PREFIX)/games
++INSTDIR = $(DESTDIR)$(HACKDIR)
++VARDIR = $(DESTDIR)$(HACKDIR)
+ 
+ 
+ 
+ POSTINSTALL=cp -n sys/unix/sysconf $(INSTDIR)/sysconf; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
+ 
+-CFLAGS=-g -O -I../include -DNOTPARMDECL
++CFLAGS+= -I../include -DNOTPARMDECL
+ CFLAGS+=-DDLB
+-CFLAGS+=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
++CFLAGS+=-DCOMPRESS=\"@TERMUX_PREFIX@/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
+ CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
+ CFLAGS+=-DTIMED_DELAY
+ CFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
+@@ -37,7 +37,7 @@
+ 
+ LINK=$(CC)
+ # Only needed for GLIBC stack trace:
+-LFLAGS=-rdynamic
++LFLAGS+=-rdynamic
+ 
+ WINSRC = $(WINTTYSRC) $(WINCURSESSRC)
+ WINOBJ = $(WINTTYOBJ) $(WINCURSESOBJ)

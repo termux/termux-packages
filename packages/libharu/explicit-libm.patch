@@ -1,0 +1,34 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -53,9 +53,6 @@ find_package(ZLIB)
+ # check png availability
+ find_package(PNG)
+ 
+-# Find math library, sometimes needs to be explicitly linked against
+-find_library(M_LIB m)
+-
+ # =======================================================================
+ # configure header files, add compiler flags
+ # =======================================================================
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -93,7 +93,7 @@ endif()
+ 
+ # Math library
+ if(UNIX AND NOT APPLE)
+-    target_link_libraries (hpdf ${M_LIB})
++    target_link_libraries (hpdf m)
+ endif()
+ 
+ install(
+--- a/cmake/modules/haru.cmake
++++ b/cmake/modules/haru.cmake
+@@ -11,7 +11,7 @@ include(CheckIncludeFiles)
+ # =======================================================================
+ # On windows systems the math library is not separated so do not specify
+ # it unless you are on a non-windows system.
+-if(NOT WIN32)
++if(FALSE)
+   find_library(MATH_LIB NAMES m PATHS /usr/local/lib /usr/lib)
+   if(NOT MATH_LIB)
+     message(FATAL_ERROR "Cannot find required math library")

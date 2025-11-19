@@ -1,0 +1,15 @@
+diff -u -r ../kitty-0.36.4/kitty/systemd.c ./kitty/systemd.c
+--- ../kitty-0.36.4/kitty/systemd.c	2024-09-27 04:50:49.000000000 +0000
++++ ./kitty/systemd.c	2024-09-27 22:29:07.912178101 +0000
+@@ -51,6 +51,11 @@
+ ensure_initialized(void) {
+     if (systemd.initialized) return;
+     systemd.initialized = true;
++#ifdef __ANDROID__
++    // Avoid an error log entry on each startup.
++    systemd.lib = NULL;
++    return;
++#endif
+ 
+     const char* libnames[] = {
+ #if defined(_KITTY_SYSTEMD_LIBRARY)

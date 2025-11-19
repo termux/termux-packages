@@ -1,0 +1,21 @@
+diff -uNr a/dlls/ntdll/unix/loader.c b/dlls/ntdll/unix/loader.c
+--- a/dlls/ntdll/unix/loader.c
++++ b/dlls/ntdll/unix/loader.c
+@@ -74,7 +74,7 @@
+ #  define _POSIX_SPAWN_DISABLE_ASLR 0x0100
+ # endif
+ #endif
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && ! defined(__TERMUX__)
+ # include <jni.h>
+ #endif
+ 
+@@ -2108,7 +2108,7 @@
+     server_init_process_done();
+ }
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && ! defined(__TERMUX__)
+ 
+ #ifndef WINE_JAVA_CLASS
+ #define WINE_JAVA_CLASS "org/winehq/wine/WineActivity"

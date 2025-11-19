@@ -1,0 +1,12 @@
+diff -u -r ../mosh-05fe24d50ddbabf1c87be748b7397907ae1b9654/scripts/mosh.pl ./scripts/mosh.pl
+--- ../mosh-05fe24d50ddbabf1c87be748b7397907ae1b9654/scripts/mosh.pl	2016-05-25 02:13:12.000000000 -0400
++++ ./scripts/mosh.pl	2016-06-01 05:51:47.622538718 -0400
+@@ -370,7 +370,7 @@
+   if ( $use_remote_ip eq 'proxy' ) {
+     # Non-standard shells and broken shrc files cause the ssh
+     # proxy to break mysteriously.
+-    $ENV{ 'SHELL' } = '/bin/sh';
++    $ENV{ 'SHELL' } = '@TERMUX_PREFIX@/bin/sh';
+     my $quoted_proxy_command = shell_quote( $0, "--family=$family" );
+     push @sshopts, ( '-S', 'none', '-o', "ProxyCommand=$quoted_proxy_command --fake-proxy -- %h %p" );
+   }

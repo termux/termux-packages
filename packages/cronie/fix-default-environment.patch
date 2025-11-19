@@ -1,0 +1,54 @@
++++ ./src/env.c
+@@ -122,21 +122,19 @@
+ 
+ int env_set_from_environ(char ***envpp) {
+ 	static const char *names[] = {
+-		"LANG",
+-		"LC_CTYPE",
+-		"LC_NUMERIC",
+-		"LC_TIME",
+-		"LC_COLLATE",
+-		"LC_MONETARY",
+-		"LC_MESSAGES",
+-		"LC_PAPER",
+-		"LC_NAME",
+-		"LC_ADDRESS",
+-		"LC_TELEPHONE",
+-		"LC_MEASUREMENT",
+-		"LC_IDENTIFICATION",
+-		"LC_ALL",
+-		"LANGUAGE",
++    "ANDROID_ART_ROOT",
++		"ANDROID_DATA",
++		"ANDROID_I18N_ROOT",
++		"ANDROID_ROOT",
++		"ANDROID_RUNTIME_ROOT",
++		"ANDROID_TZDATA_ROOT",
++		"BOOTCLASSPATH",
++		"DEX2OATBOOTCLASSPATH",
++		"EXTERNAL_STORAGE",
++		"LD_PRELOAD",
++		"PREFIX",
++		"TMPDIR",
++		"TZ",
+ 		"RANDOM_DELAY",
+ 		"MAILFROM",
+ 		NULL
+@@ -149,7 +147,7 @@
+ 			size_t namelen;
+ 
+ 			namelen = strlen(*name);
+-			if (strncmp(*name, *procenv, namelen) == 0 
++			if (strncmp(*name, *procenv, namelen) == 0
+ 			    && (*procenv)[namelen] == '=') {
+ 				char **tmpenv;
+ 
+@@ -298,7 +296,7 @@
+ 
+ 	if (glue_strings(envstr, sizeof envstr, "HOME", dir, '=')) {
+ 		envp = env_set(envp, envstr);
+-	}			
++	}
+ 	else
+ 		log_it("CRON", getpid(), "ERROR", "can't set HOME", 0);
+ 

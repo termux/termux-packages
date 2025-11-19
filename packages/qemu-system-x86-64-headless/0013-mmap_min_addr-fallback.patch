@@ -1,0 +1,17 @@
+diff -uNr qemu-5.2.0/linux-user/main.c qemu-5.2.0.mod/linux-user/main.c
+--- qemu-5.2.0/linux-user/main.c	2020-12-08 18:59:44.000000000 +0200
++++ qemu-5.2.0.mod/linux-user/main.c	2020-12-24 17:41:07.982481916 +0200
+@@ -770,7 +770,13 @@
+      * If we're in a chroot with no /proc, fall back to 1 page.
+      */
+     if (mmap_min_addr == 0) {
++#ifdef __ANDROID__
++        // Go with 8 pages (32768 bytes) as default value for Android (Termux).
++        // Issue https://github.com/termux/termux-packages/issues/6172.
++        mmap_min_addr = qemu_host_page_size * 8;
++#else
+         mmap_min_addr = qemu_host_page_size;
++#endif
+         qemu_log_mask(CPU_LOG_PAGE,
+                       "host mmap_min_addr=0x%lx (fallback)\n",
+                       mmap_min_addr);

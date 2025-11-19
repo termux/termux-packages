@@ -1,0 +1,19 @@
++++ ./glib/gspawn-posix.c
+@@ -1404,7 +1404,7 @@
+        * * what to search if PATH is unset. POSIX may, dunno.
+        * */
+ 
+-      chosen_search_path = "/bin:/usr/bin:.";
++      chosen_search_path = "@TERMUX_PREFIX@/bin:.";
+     }
+ 
+   if (search_path || search_path_from_envp)
+@@ -1815,7 +1815,7 @@
+   if (argc + 2 > argv_buffer_len)
+     return FALSE;
+ 
+-  argv_buffer[0] = (char *) "/bin/sh";
++  argv_buffer[0] = (char *) "@TERMUX_PREFIX@/bin/sh";
+   argv_buffer[1] = (char *) file;
+   while (argc > 0)
+     {

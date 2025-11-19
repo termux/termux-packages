@@ -1,0 +1,19 @@
+--- ./cli/cli/config/config.go.orig	2021-11-18 00:49:46.000000000 +0100
++++ ./cli/cli/config/config.go	2021-12-05 15:25:14.622966748 +0100
+@@ -11,7 +11,6 @@
+ 	"github.com/docker/cli/cli/config/configfile"
+ 	"github.com/docker/cli/cli/config/credentials"
+ 	"github.com/docker/cli/cli/config/types"
+-	"github.com/docker/docker/pkg/homedir"
+ 	"github.com/pkg/errors"
+ )
+ 
+@@ -36,7 +36,7 @@
+ 
+ func getHomeDir() string {
+ 	if homeDir == "" {
+-		homeDir = homedir.Get()
++		homeDir = "@TERMUX_HOME@"
+ 	}
+ 	return homeDir
+ }

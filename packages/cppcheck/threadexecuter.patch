@@ -1,0 +1,12 @@
+diff -uNr cppcheck-2.9/cli/processexecutor.cpp cppcheck-2.9.mod/cli/processexecutor.cpp
+--- cppcheck-2.9/cli/processexecutor.cpp	2022-08-28 20:43:18.000000000 +0800
++++ cppcheck-2.9.mod/cli/processexecutor.cpp	2022-08-29 21:18:31.413328864 +0800
+@@ -193,7 +193,7 @@
+ 
+ bool ProcessExecutor::checkLoadAverage(size_t nchildren)
+ {
+-#if defined(__QNX__) || defined(__HAIKU__)  // getloadavg() is unsupported on Qnx, Haiku.
++#if defined(__QNX__) || defined(__HAIKU__) || defined(__ANDROID__)  // getloadavg() is unsupported on Qnx, Haiku, Android.
+     (void)nchildren;
+     return true;
+ #else

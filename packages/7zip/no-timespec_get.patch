@@ -1,0 +1,11 @@
+--- a/CPP/Windows/TimeUtils.cpp
++++ b/CPP/Windows/TimeUtils.cpp
+@@ -260,7 +260,7 @@
+       Cygwin 2.9, mingw, MSVC 14, Android 9.0.
+   Android NDK defines TIME_UTC but doesn't have the timespec_get().
+ */
+-#if defined(TIME_UTC) && !defined(__ANDROID__)
++#if defined(TIME_UTC) && (!defined __ANDROID_API__ || __ANDROID_API__ >= 29)
+ #define ZIP7_USE_timespec_get
+ // #pragma message("ZIP7_USE_timespec_get")
+ #elif defined(CLOCK_REALTIME)

@@ -1,0 +1,14 @@
+https://github.com/termux/termux-packages/issues/15852
+
+--- a/packages/xml/expat/expat.c
++++ b/packages/xml/expat/expat.c
+@@ -478,7 +478,8 @@
+ 
+ static void
+ gst_SkippedEntityHandler (void *userData,
+-			  const XML_Char * entityName)
++			  const XML_Char * entityName,
++			  int is_parameter_entity __attribute__((unused)))
+ {
+   XML_Parser p = userData;
+   OOP parserOOP = XML_GetUserData (p);

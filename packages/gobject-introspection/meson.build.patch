@@ -1,0 +1,24 @@
+--- a/meson.build
++++ b/meson.build
+@@ -155,7 +155,7 @@
+ libffi_dep = dependency('libffi')
+ 
+ if not (host_system == 'darwin' and host_arch == 'aarch64' or
+-        host_system == 'linux' and libffi_dep.version().version_compare('>= 3.4'))
++        (host_system == 'linux' or host_system == 'android') and libffi_dep.version().version_compare('>= 3.4'))
+   config.set('LEGACY_GIRFFI_FREE', 1)
+ endif
+ 
+@@ -265,9 +265,9 @@
+ endif
+ 
+ pkgconfig_variables = [
+-  'g_ir_scanner=${bindir}/g-ir-scanner',
+-  'g_ir_compiler=${bindir}/g-ir-compiler@0@'.format(exe_ext),
+-  'g_ir_generate=${bindir}/g-ir-generate@0@'.format(exe_ext),
++  'g_ir_scanner=g-ir-scanner',
++  'g_ir_compiler=g-ir-compiler@0@'.format(exe_ext),
++  'g_ir_generate=g-ir-generate@0@'.format(exe_ext),
+   'gidatadir=${datadir}/gobject-introspection-1.0',
+   'girdir=' + gir_dir_pc_prefix / 'gir-1.0',
+   'typelibdir=${libdir}/girepository-1.0',

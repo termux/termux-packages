@@ -1,0 +1,34 @@
+diff -u -r ../zip30/unix/Makefile ./unix/Makefile
+--- ../zip30/unix/Makefile	2008-05-07 08:33:56.000000000 +0200
++++ ./unix/Makefile	2014-05-28 01:20:58.000000000 +0200
+@@ -22,10 +22,7 @@
+ LN = ln -s
+ 
+ # (to use the GNU compiler, change cc to gcc in CC)
+-CC = cc
+ BIND = $(CC)
+-AS = $(CC) -c
+-CPP = /lib/cpp
+ E =
+ 
+ # probably can change this to 'install' if you have it
+@@ -38,10 +35,9 @@
+ MANFLAGS = 644
+ 
+ # target directories - where to install executables and man pages to
+-prefix = /usr/local
+ BINDIR = $(prefix)/bin
+ MANEXT=1
+-MANDIR = $(prefix)/man/man$(MANEXT)
++MANDIR = $(prefix)/share/man/man$(MANEXT)
+ ZIPMANUAL = zip.txt
+ ZIPMANUALcloak = zipcloak.txt
+ ZIPMANUALnote = zipnote.txt
+@@ -58,7 +54,6 @@
+ #   LFLAGS1   flags after output file spec, before obj file list
+ #   LFLAGS2   flags after obj file list (libraries, etc)
+ CFLAGS_NOOPT = -I. -DUNIX $(LOCAL_ZIP)
+-CFLAGS = -O2 $(CFLAGS_NOOPT)
+ LFLAGS1 =
+ LFLAGS2 = -s
+ 

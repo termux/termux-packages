@@ -1,0 +1,17 @@
+`_mesa_glapi_tls_Context` and `_mesa_glapi_tls_Dispatch` is declared as thread_local.
+Their symbol names will be `__emutls_v._mesa_glapi_tls_Context` and `__emutls_v._mesa_glapi_tls_Dispatch`
+as emulated TLS is enabled by NDK when `__ANDROID_API__` <= 28.
+
+--- a/src/gallium/targets/dri/dri.sym.in
++++ b/src/gallium/targets/dri/dri.sym.in
+@@ -8,8 +8,8 @@
+                 _mesa_glapi_get_proc_offset;
+                 _mesa_glapi_set_context;
+                 _mesa_glapi_set_dispatch;
+-                _mesa_glapi_tls_Context;
+-                _mesa_glapi_tls_Dispatch;
++                __emutls_v._mesa_glapi_tls_Context;
++                __emutls_v._mesa_glapi_tls_Dispatch;
+ 
+ 		ddebug_screen_create;
+ 		noop_screen_create;

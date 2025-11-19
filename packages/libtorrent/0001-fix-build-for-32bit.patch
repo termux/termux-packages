@@ -1,0 +1,13 @@
+--- a/src/net/socket_datagram.cc
++++ b/src/net/socket_datagram.cc
+@@ -59,7 +59,9 @@
+   if (from_sa == nullptr)
+     throw internal_error("Tried to receive datagram with NULL sockaddr pointer");
+ 
+-  return ::recvfrom(m_fileDesc, buffer, length, 0, from_sa, &from_length);
++  socklen_t fromlen = from_length;
++
++  return ::recvfrom(m_fileDesc, buffer, length, 0, from_sa, &fromlen);
+ }
+ 
+ int

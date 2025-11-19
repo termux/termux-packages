@@ -1,0 +1,54 @@
+diff --git a/src/ctypes.c b/src/ctypes.c
+index 7d976ee..cd6411f 100644
+--- a/src/ctypes.c
++++ b/src/ctypes.c
+@@ -452,7 +452,7 @@ static char *dlcall_usage[] = {
+     "These are specified followed by a ':' then the type.",
+     "",
+     "    $ dlopen libc.so.6",
+-    "    $ dlcall lchown string:/tmp/foo int:$UID int:-1",
++    "    $ dlcall lchown string:@TERMUX_PREFIX@/tmp/foo int:$UID int:-1",
+     "",
+     "Options:",
+     "    -a abi      Use the specified ABI rather than the default.",
+diff --git a/src/struct/dutil.h b/src/struct/dutil.h
+index 0401b3e..c6d35f3 100644
+--- a/src/struct/dutil.h
++++ b/src/struct/dutil.h
+@@ -296,7 +296,7 @@ void *zalloc(const size_t size);
+ Elf_Scn *elf_section_by_name(Elf *elf, GElf_Ehdr *ep,
+ 			     GElf_Shdr *shp, const char *name, size_t *index);
+ 
+-#ifndef SHT_GNU_ATTRIBUTES
++#if !defined(SHT_GNU_ATTRIBUTES) && !defined(__ANDROID__)
+ /* Just a way to check if we're using an old elfutils version */
+ static inline int elf_getshdrstrndx(Elf *elf, size_t *dst)
+ {
+diff --git a/src/struct/struct.c b/src/struct/struct.c
+index dd3687d..70d0a8d 100644
+--- a/src/struct/struct.c
++++ b/src/struct/struct.c
+@@ -21,6 +21,10 @@
+ 
+ #define MAX_ELEMENT_SIZE 128    // Maximum length of array_name[element_name]
+ 
++#ifdef __ANDROID__
++#define strdupa(s) strcpy(alloca(strlen(s) + 1), s)
++#endif
++
+ static int select_union_string(char *unionstr, const char *unionname, char *membername, size_t maxlen);
+ 
+ // This is just to disable ctf support.
+diff --git a/src/unpack.c b/src/unpack.c
+index e50c33b..d9dd611 100644
+--- a/src/unpack.c
++++ b/src/unpack.c
+@@ -22,7 +22,7 @@
+ #include "types.h"
+ #include "shell.h"
+ 
+-#if !defined(__GLIBC__) && !defined(__NEWLIB__)
++#if !defined(__GLIBC__) && !defined(__NEWLIB__) && __ANDROID_API__ < 23
+ static inline void *mempcpy(void *dest, const void *src, size_t n)
+ {
+     memcpy(dest, src, n);

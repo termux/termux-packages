@@ -1,0 +1,93 @@
+--- a/winpr/libwinpr/path/shell.c
++++ b/winpr/libwinpr/path/shell.c
+@@ -114,7 +114,7 @@
+ 	path = GetEnvAlloc("TMPDIR");
+ 
+ 	if (!path)
+-		path = _strdup("/tmp");
++		path = _strdup("@TERMUX_PREFIX@/tmp");
+ 
+ #endif
+ 	return path;
+--- a/winpr/libwinpr/sspi/Schannel/schannel_openssl.c
++++ b/winpr/libwinpr/sspi/Schannel/schannel_openssl.c
+@@ -276,7 +276,7 @@
+ 	SSL_CTX_set_options(context->ctx, options);
+ 
+ #if defined(WITH_DEBUG_SCHANNEL)
+-	if (SSL_CTX_use_RSAPrivateKey_file(context->ctx, "/tmp/localhost.key", SSL_FILETYPE_PEM) <= 0)
++	if (SSL_CTX_use_RSAPrivateKey_file(context->ctx, "@TERMUX_PREFIX@/tmp/localhost.key", SSL_FILETYPE_PEM) <= 0)
+ 	{
+ 		WLog_ERR(TAG, "SSL_CTX_use_RSAPrivateKey_file failed");
+ 		goto fail;
+@@ -291,7 +291,7 @@
+ 		goto fail;
+ 	}
+ 
+-	if (SSL_use_certificate_file(context->ssl, "/tmp/localhost.crt", SSL_FILETYPE_PEM) <= 0)
++	if (SSL_use_certificate_file(context->ssl, "@TERMUX_PREFIX@/tmp/localhost.crt", SSL_FILETYPE_PEM) <= 0)
+ 	{
+ 		WLog_ERR(TAG, "SSL_use_certificate_file failed");
+ 		goto fail;
+--- a/server/shadow/X11/x11_shadow.c
++++ b/server/shadow/X11/x11_shadow.c
+@@ -131,7 +131,7 @@
+ 
+ static BOOL x11_shadow_pam_get_service_name(SHADOW_PAM_AUTH_INFO* info)
+ {
+-	const char* base = "/etc/pam.d";
++	const char* base = "@TERMUX_PREFIX@/etc/pam.d";
+ 	const char* hints[] = { "lightdm", "gdm", "xdm", "login", "sshd" };
+ 
+ 	for (size_t x = 0; x < ARRAYSIZE(hints); x++)
+--- a/winpr/libwinpr/timezone/timezone.c
++++ b/winpr/libwinpr/timezone/timezone.c
+@@ -102,7 +102,7 @@
+ 
+ static char* winpr_get_timezone_from_link(const char* links[], size_t count)
+ {
+-	const char* _links[] = { "/etc/localtime", "/etc/TZ" };
++	const char* _links[] = { "@TERMUX_PREFIX@/etc/localtime", "@TERMUX_PREFIX@/etc/TZ" };
+ 
+ 	if (links == NULL)
+ 	{
+@@ -295,7 +295,7 @@
+ 
+ static char* winpr_translate_time_zone(const char* tzid)
+ {
+-	const char* zipath = "/usr/share/zoneinfo/";
++	const char* zipath = "@TERMUX_PREFIX@/share/zoneinfo/";
+ 	char* buf = NULL;
+ 	const char* links[] = { buf };
+ 
+--- a/winpr/libwinpr/wtsapi/wtsapi.c
++++ b/winpr/libwinpr/wtsapi/wtsapi.c
+@@ -740,7 +740,7 @@
+ 
+ 	ini = IniFile_New();
+ 
+-	if (IniFile_ReadFile(ini, "/var/run/freerds.instance") < 0)
++	if (IniFile_ReadFile(ini, "@TERMUX_PREFIX@/var/run/freerds.instance") < 0)
+ 	{
+ 		IniFile_Free(ini);
+ 		WLog_ERR(TAG, "failed to parse freerds.instance");
++++ ./libfreerdp/codec/test/TestFreeRDPCodecProgressive.c
+@@ -1087,7 +1087,7 @@
+ 	{
+ 		*dstImage = *image;
+ 		dstImage->data = resultData;
+-		winpr_image_write(dstImage, "/tmp/test.bmp");
++		winpr_image_write(dstImage, "@TERMUX_PREFIX@/tmp/test.bmp");
+ 	}
+ 	for (size_t y = 0; y < image->height; y++)
+ 	{
++++ ./cmake/PlatformDefaults.cmake
+@@ -17,7 +17,7 @@
+   if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+     # Linux already does define _POSIX_C_SOURCE by default, nothing to do
+     add_compile_definitions("_FILE_OFFSET_BITS=64")
+-    set(WINPR_TIMEZONE_FILE "/etc/timezone")
++    set(WINPR_TIMEZONE_FILE "@TERMUX_PREFIX@/etc/timezone")
+   endif()
+ 
+   if("${CMAKE_SYSTEM_NAME}" MATCHES "FreeBSD")

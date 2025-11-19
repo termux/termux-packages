@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE="https://xorg.freedesktop.org/"
+TERMUX_PKG_DESCRIPTION="Primitive command line interface to RandR extension"
+TERMUX_PKG_LICENSE="HPND"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.5.3"
+TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/app/xrandr-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=f8dd7566adb74147fab9964680b6bbadee87cf406a7fcff51718a5e6949b841c
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libx11, libxrandr"
+TERMUX_PKG_BUILD_DEPENDS="xorg-util-macros, xorgproto"

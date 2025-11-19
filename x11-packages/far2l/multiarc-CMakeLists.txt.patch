@@ -1,0 +1,19 @@
+diff --git a/multiarc/CMakeLists.txt b/multiarc/CMakeLists.txt
+index dbba098..39d0d70 100644
+--- a/multiarc/CMakeLists.txt
++++ b/multiarc/CMakeLists.txt
+@@ -85,6 +85,14 @@ set(SOURCES
+         src/formats/ha/ha/swdict.c
+ )
+ 
++if(CMAKE_ANDROID_ARCH_ABI STREQUAL "arm64-v8a")
++    set_source_files_properties(
++        src/formats/7z/C/AesOpt.c
++        src/formats/7z/C/Sha1Opt.c
++        src/formats/7z/C/Sha256Opt.c
++        PROPERTIES COMPILE_OPTIONS "-march=armv8-a+crc+crypto")
++endif()
++
+ if("${UNRAR}" STREQUAL "lib")
+     set(SOURCES
+         ${SOURCES}

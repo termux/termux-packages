@@ -1,0 +1,31 @@
+--- a/src/base/i18n.cc
++++ b/src/base/i18n.cc
+@@ -39,14 +39,16 @@
+ #define SETLOCALE libintl_setlocale
+ #endif  // LIBINTL_VERSION
+ #else   // __APPLE__
+-#if defined _WIN32
++#if defined _WIN32 || defined __ANDROID__
+ #define SETLOCALE setlocale
+ #else
+ #define SETLOCALE std::setlocale
+ #endif
+ #endif
+ 
++#ifndef __ANDROID__
+ extern int _nl_msg_cat_cntr;
++#endif
+ 
+ namespace i18n {
+ 
+@@ -335,8 +337,10 @@
+ 	}
+ 
+ 	/* Finally make changes known.  */
++#ifndef __ANDROID__
+ 	++_nl_msg_cat_cntr;
+ #endif
++#endif
+ 
+ 	SETLOCALE(LC_ALL, "");  //  call to libintl
+ 

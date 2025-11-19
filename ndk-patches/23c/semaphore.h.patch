@@ -1,0 +1,18 @@
+--- ./usr/include/semaphore.h.orig
++++ ./usr/include/semaphore.h
+@@ -71,9 +71,14 @@
+ int sem_trywait(sem_t* __sem);
+ int sem_wait(sem_t* __sem);
+ 
+-/* These aren't actually implemented. */
++#undef sem_open
++#define sem_open libandroid_sem_open
+ sem_t* sem_open(const char* __name, int _flags, ...);
++#undef sem_close
++#define sem_close libandroid_sem_close
+ int sem_close(sem_t* __sem);
++#undef sem_unlink
++#define sem_unlink libandroid_sem_unlink
+ int sem_unlink(const char* __name);
+ 
+ __END_DECLS

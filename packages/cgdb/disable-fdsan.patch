@@ -1,0 +1,35 @@
+--- ./cgdb/cgdb.cpp~	2021-12-13 09:02:26.731050742 +0100
++++ ./cgdb/cgdb.cpp	2021-12-13 09:07:32.078899611 +0100
+@@ -84,6 +84,11 @@
+ #include "rline.h"
+ #include "usage.h"
+ 
++#ifdef __ANDROID__
++#include <android/fdsan.h>
++#include <dlfcn.h>
++#endif
++
+ /* --------- */
+ /* Constants */
+ /* --------- */
+@@ -1757,6 +1762,20 @@
+ {
+     parse_long_options(&argc, &argv);
+ 
++
++    #ifdef __ANDROID__
++        // For Android 11+.
++        void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++        if (lib_handle) {
++            void (*set_fdsan_error_level)(enum android_fdsan_error_level);
++            set_fdsan_error_level = (void (*)(enum android_fdsan_error_level))dlsym(lib_handle, "android_fdsan_set_error_level");
++            if (set_fdsan_error_level) {
++                set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++            }
++            dlclose(lib_handle);
++        }
++    #endif
++
+     /* Debugging helper - wait for debugger to attach to us before continuing */
+     if (wait_for_debugger_to_attach) {
+         if (cgdb_supports_debugger_attach_detection()) {

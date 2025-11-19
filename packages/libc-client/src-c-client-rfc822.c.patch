@@ -1,0 +1,13 @@
+--- a/src/c-client/rfc822.c
++++ b/src/c-client/rfc822.c
+@@ -37,6 +37,10 @@
+ #include <time.h>
+ #include "c-client.h"
+ 
++#ifdef __ANDROID__
++#define gethostid() (0L)
++#endif
++
+ 
+ /* Support for deprecated features in earlier specifications.  Note that this
+  * module follows RFC 2822, and all use of "rfc822" in function names is

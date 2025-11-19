@@ -1,0 +1,20 @@
+--- a/incremental_delivery/incfs/util/map_ptr.cpp
++++ b/incremental_delivery/incfs/util/map_ptr.cpp
+@@ -18,7 +18,7 @@
+ #include <android-base/stringprintf.h>
+ #include <utils/FileMap.h>
+ 
+-#ifdef __ANDROID__
++#if defined __ANDROID__ && !defined __TERMUX__
+ #include "incfs_inline.h"
+ #endif
+ 
+@@ -50,7 +50,7 @@
+     return Create(fd, offset, length, file_name, true /* verify */);
+ }
+ 
+-#ifdef __ANDROID__
++#if defined __ANDROID__ && !defined __TERMUX__
+ static bool IsVerificationEnabled(int fd) {
+     return isIncFsFd(fd) && isFullyLoaded(fd) != LoadingState::Full;
+ }

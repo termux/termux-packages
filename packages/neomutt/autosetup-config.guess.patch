@@ -1,0 +1,11 @@
+--- ./autosetup/autosetup-config.guess.orig	2021-12-15 17:51:59.116965854 +0530
++++ ./autosetup/autosetup-config.guess	2021-12-15 17:55:55.635005030 +0530
+@@ -114,7 +114,7 @@
+ set_cc_for_build() {
+     # prevent multiple calls if $tmp is already set
+     test "$tmp" && return 0
+-    : "${TMPDIR=/tmp}"
++    : "${TMPDIR=@TERMUX_PREFIX@/tmp}"
+     # shellcheck disable=SC2039,SC3028
+     { tmp=`(umask 077 && mktemp -d "$TMPDIR/cgXXXXXX") 2>/dev/null` && test -n "$tmp" && test -d "$tmp" ; } ||
+ 	{ test -n "$RANDOM" && tmp=$TMPDIR/cg$$-$RANDOM && (umask 077 && mkdir "$tmp" 2>/dev/null) ; } ||

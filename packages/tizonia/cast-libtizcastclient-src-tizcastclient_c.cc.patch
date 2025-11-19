@@ -1,0 +1,13 @@
+--- a/cast/libtizcastclient/src/tizcastclient_c.cc
++++ b/cast/libtizcastclient/src/tizcastclient_c.cc
+@@ -31,6 +31,10 @@
+ 
+ #include <assert.h>
+ 
++#ifdef __ANDROID__
++#define pthread_yield() (0)
++#endif
++
+ #include "tizcastclient_c.h"
+ #include "tizcastclient.hh"
+ #include "tizplatform.h"

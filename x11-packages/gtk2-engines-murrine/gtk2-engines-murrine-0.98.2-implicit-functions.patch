@@ -1,0 +1,32 @@
+https://github.com/termux/termux-packages/issues/15852
+Borrowed from https://github.com/gentoo/gentoo/blob/d5fca8d5622b376e09174784c91082357d8be597/x11-themes/gtk-engines-murrine/files/0.98.2-implicit-functions.patch
+
+--- a/src/murrine_rc_style.h
++++ b/src/murrine_rc_style.h
+@@ -154,5 +154,6 @@
+ };
+ 
+ GType murrine_rc_style_get_type	(void);
++void murrine_rc_style_register_types (GTypeModule *);
+ 
+ #endif /* MURRINE_RC_STYLE_H */
+--- a/src/murrine_style.h
++++ b/src/murrine_style.h
+@@ -102,5 +102,6 @@
+ };
+ 
+ GType murrine_style_get_type (void);
++void murrine_style_register_types (GTypeModule *);
+ 
+ #endif /* MURRINE_STYLE_H */
+--- a/src/support.h	2012-01-17 18:46:01.000000000 +0100
++++ b/src/support.h	2021-11-28 01:08:50.868702336 +0100
+@@ -148,5 +148,8 @@
+ G_GNUC_INTERNAL void murrine_get_notebook_tab_position (GtkWidget *widget,
+                                                         gboolean  *start,
+                                                         gboolean  *end);
++G_GNUC_INTERNAL gboolean murrine_object_is_a (const GObject *object,
++                                              const gchar   *type_name);
++G_GNUC_INTERNAL gboolean murrine_widget_is_ltr (GtkWidget *widget);
+ 
+ #endif /* SUPPORT_H */

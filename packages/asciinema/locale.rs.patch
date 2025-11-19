@@ -1,0 +1,28 @@
+diff --git a/src/locale.rs b/src/locale.rs
+index 78119a0..b4b6a29 100644
+--- a/src/locale.rs
++++ b/src/locale.rs
+@@ -1,7 +1,7 @@
+ use std::env;
+ use std::ffi::CStr;
+ 
+-use nix::libc::{self, CODESET, LC_ALL};
++use nix::libc::{self, LC_ALL};
+ 
+ pub fn check_utf8_locale() -> anyhow::Result<()> {
+     initialize_from_env();
+@@ -27,7 +27,14 @@ pub fn initialize_from_env() {
+     };
+ }
+ 
++#[cfg(target_os = "android")]
+ fn get_encoding() -> String {
++    String::from("UTF-8")
++}
++
++#[cfg(not(target_os = "android"))]
++fn get_encoding() -> String {
++    use nix::libc::{self, CODESET};
+     let codeset = unsafe { CStr::from_ptr(libc::nl_langinfo(CODESET)) };
+ 
+     let mut encoding = codeset

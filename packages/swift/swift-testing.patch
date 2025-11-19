@@ -1,0 +1,18 @@
+diff --git a/swift-testing/Sources/Testing/SourceAttribution/Backtrace.swift b/swift-testing/Sources/Testing/SourceAttribution/Backtrace.swift
+index 78227e3..e0db2e9 100644
+--- a/swift-testing/Sources/Testing/SourceAttribution/Backtrace.swift
++++ b/swift-testing/Sources/Testing/SourceAttribution/Backtrace.swift
+@@ -65,11 +65,11 @@ public struct Backtrace: Sendable {
+       } else {
+         initializedCount = .init(clamping: backtrace(addresses.baseAddress!, .init(clamping: addresses.count)))
+       }
+-#elseif os(Android)
++#elseif os(Androi)
+       initializedCount = addresses.withMemoryRebound(to: UnsafeMutableRawPointer.self) { addresses in
+         .init(clamping: backtrace(addresses.baseAddress!, .init(clamping: addresses.count)))
+       }
+-#elseif os(Linux) || os(FreeBSD) || os(OpenBSD)
++#elseif os(Linux) || os(FreeBSD) || os(OpenBSD) || os(Android)
+       initializedCount = .init(clamping: backtrace(addresses.baseAddress!, .init(clamping: addresses.count)))
+ #elseif os(Windows)
+       initializedCount = Int(clamping: RtlCaptureStackBackTrace(0, ULONG(clamping: addresses.count), addresses.baseAddress!, nil))

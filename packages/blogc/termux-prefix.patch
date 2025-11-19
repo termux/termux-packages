@@ -1,0 +1,26 @@
+diff --git a/src/blogc-make/atom.c b/src/blogc-make/atom.c
+index d5f5387..5154bb9 100644
+--- a/src/blogc-make/atom.c
++++ b/src/blogc-make/atom.c
+@@ -55,7 +55,7 @@ bm_atom_deploy(bm_settings_t *settings, bc_error_t **err)
+         return NULL;
+ 
+     // this is not really portable
+-    char fname[] = "/tmp/blogc-make_XXXXXX";
++    char fname[] = "@TERMUX_PREFIX@/tmp/blogc-make_XXXXXX";
+     int fd;
+     if (-1 == (fd = mkstemp(fname))) {
+         *err = bc_error_new_printf(BLOGC_MAKE_ERROR_ATOM,
+diff --git a/src/blogc-make/exec.c b/src/blogc-make/exec.c
+index db20cae..86e8d25 100644
+--- a/src/blogc-make/exec.c
++++ b/src/blogc-make/exec.c
+@@ -116,7 +116,7 @@ bm_exec_command(const char *cmd, const char *input, char **output,
+         dup2(fd_err[1], STDERR_FILENO);
+ 
+         char *const argv[] = {
+-            "/bin/sh",
++            "@TERMUX_PREFIX@/bin/sh",
+             "-c",
+             (char*) cmd,
+             NULL,

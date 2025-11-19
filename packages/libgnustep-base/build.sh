@@ -1,0 +1,45 @@
+TERMUX_PKG_HOMEPAGE=https://www.gnustep.org
+TERMUX_PKG_DESCRIPTION="A library of general-purpose, non-graphical Objective C objects"
+TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.31.1"
+TERMUX_PKG_REVISION=3
+TERMUX_PKG_SRCURL="https://github.com/gnustep/libs-base/releases/download/base-${TERMUX_PKG_VERSION//./_}/gnustep-base-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=e7546f1c978a7c75b676953a360194a61e921cb45a4804497b4f346a460545cd
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP='(?<=-).+'
+TERMUX_PKG_DEPENDS="gnustep-make, libcurl, libc++, libffi, libgmp, libgnutls, libiconv, libicu, libxml2, libxslt, zlib"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--with-default-config=$TERMUX_PREFIX/etc/GNUstep/GNUstep.conf
+--enable-procfs
+--disable-procfs-psinfo
+iswindows=no
+cross_reuseaddr_ok=1
+cross_gs_cv_objc_works=yes
+cross_gs_cv_objc_compiler_supports_constant_string_class=yes
+cross_gs_cv_objc_load_method_worked=yes
+cross_have_poll=yes
+cross_VSPRINTF_RETURNS_LENGTH=1
+cross_VASPRINTF_RETURNS_LENGTH=1
+cross_NEED_WORD_ALIGNMENT=1
+cross_working_register_printf=0
+cross_wide_register_printf=0
+cross_gs_cv_program_invocation_name_worked=no
+cross_CMDLINE_TERMINATED=1
+cross_have_kvm_env=0
+cross_ffi_ok=yes
+cross_non_fragile=yes
+cross_have_unexpected=yes
+cross_safe_initialize=yes
+cross_found_iconv_libc=no
+cross_found_iconv_liconv=yes
+cross_found_iconv_lgiconv=no
+cross_objc2_runtime=1
+ac_cv_func_setpgrp_void=yes
+"
+
+termux_step_pre_configure() {
+	rm cross.config
+	touch cross.config
+}

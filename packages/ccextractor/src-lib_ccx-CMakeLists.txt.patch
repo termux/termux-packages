@@ -1,0 +1,75 @@
+--- a/src/lib_ccx/CMakeLists.txt
++++ b/src/lib_ccx/CMakeLists.txt
+@@ -3,16 +3,40 @@
+ if(MSVC)
+     set (CMAKE_C_FLAGS "-W3 /wd4005 /wd4996")
+ else (MSVC)
+-    set (CMAKE_C_FLAGS "-Wall -Wno-pointer-sign -g -std=gnu99")
++    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-pointer-sign -g -std=gnu99")
+ endif(MSVC)
+ 
+ if(WIN32)
+     add_definitions(-DWIN32)
+ endif(WIN32)
+ 
+-if (WITH_FFMPEG)
+-    find_package(PkgConfig)
++find_package (PkgConfig REQUIRED)
++
++pkg_check_modules (GPAC REQUIRED gpac)
++pkg_check_modules (PROTOBUF_C REQUIRED libprotobuf-c)
++pkg_check_modules (LIBMD REQUIRED libmd)
++pkg_check_modules (LIBPNG REQUIRED libpng)
++pkg_check_modules (ZLIB REQUIRED zlib)
++pkg_check_modules (FREETYPE REQUIRED freetype2)
++pkg_check_modules (UTF8PROC REQUIRED libutf8proc)
++
++set (EXTRA_LIBS ${EXTRA_LIBS} ${GPAC_LIBRARIES})
++set (EXTRA_LIBS ${EXTRA_LIBS} ${PROTOBUF_C_LIBRARIES})
++set (EXTRA_LIBS ${EXTRA_LIBS} ${LIBMD_LIBRARIES})
++set (EXTRA_LIBS ${EXTRA_LIBS} ${LIBPNG_LIBRARIES})
++set (EXTRA_LIBS ${EXTRA_LIBS} ${ZLIB_LIBRARIES})
++set (EXTRA_LIBS ${EXTRA_LIBS} ${FREETYPE_LIBRARIES})
++set (EXTRA_LIBS ${EXTRA_LIBS} ${UTF8PROC_LIBRARIES})
++
++set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${GPAC_INCLUDE_DIRS})
++set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${PROTOBUF_C_INCLUDE_DIRS})
++set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${LIBMD_INCLUDE_DIRS})
++set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${LIBPNG_INCLUDE_DIRS})
++set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${ZLIB_INCLUDE_DIRS})
++set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${FREETYPE_INCLUDE_DIRS})
++set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${UTF8PROC_INCLUDE_DIRS})
+ 
++if (WITH_FFMPEG)
+     pkg_check_modules (AVFORMAT REQUIRED libavformat)
+     pkg_check_modules (AVUTIL REQUIRED libavutil)
+     pkg_check_modules (AVCODEC REQUIRED libavcodec)
+@@ -55,7 +79,6 @@
+ endif (WITH_SHARING)
+ 
+ aux_source_directory ("${PROJECT_SOURCE_DIR}/lib_ccx/" SOURCEFILE)
+-aux_source_directory ("${PROJECT_SOURCE_DIR}/gpacmp4/" SOURCEFILE)
+ 
+ add_library (ccx ${SOURCEFILE} ccx_dtvcc.h ccx_dtvcc.c ccx_encoders_mcc.c ccx_encoders_mcc.h)
+ target_link_libraries (ccx ${EXTRA_LIBS})
+@@ -97,20 +120,3 @@
+ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DGPAC_CONFIG_DARWIN")
+ endif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+-
+-
+-file (GLOB HeaderFiles *.h)
+-file (WRITE ccx.pc "prefix=${CMAKE_INSTALL_PREFIX}\n"
+-                  "includedir=\${prefix}/include\n"
+-                  "libdir=\${prefix}/lib\n\n"
+-                  "Name: ccx\n"
+-                  "Description: Closed Caption Extraction library\n"
+-                  "Version: 0.75\n"
+-                  "Cflags: -I\${includedir}/\n"
+-                  "Libs: -L\${libdir} -lccx -lpng\n"
+-                  "Libs.private: -lpng\n"
+-                  )
+-
+-install (TARGETS ccx DESTINATION lib)
+-install (FILES ${HeaderFiles} DESTINATION include)
+-install (FILES ccx.pc DESTINATION lib/pkgconfig)

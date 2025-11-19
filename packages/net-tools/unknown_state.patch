@@ -1,0 +1,16 @@
+Fix the case of unknown state.
+
+On android we sometimes get state 138. Show it properly as "Unknown(138)"
+rather than a random string in the binary.
+
+--- net-tools/netstat.c	2017-02-21 19:24:32.000000000 +0100
++++ net-tools-mod/netstat.c	2017-08-27 13:55:54.221049921 +0200
+@@ -1195,7 +1195,7 @@
+ 	    }
+ 
+ 	printf("%-4s  %6ld %6ld %-*s %-*s %-11s",
+-	       prot, rxq, txq, (int)netmax(23,strlen(local_addr)), local_addr, (int)netmax(23,strlen(rem_addr)), rem_addr, _(tcp_state[state]));
++	       prot, rxq, txq, (int)netmax(23,strlen(local_addr)), local_addr, (int)netmax(23,strlen(rem_addr)), rem_addr, sctp_socket_state_str(state));
+ 
+ 	finish_this_one(uid,inode,timers);
+ }

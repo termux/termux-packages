@@ -1,0 +1,24 @@
+diff --git a/completions/man b/completions/man
+index b405f084..eaa5b811 100644
+--- a/completions/man
++++ b/completions/man
+@@ -56,18 +56,7 @@ _comp_cmd_man()
+         return
+     fi
+ 
+-    local manpath=$(manpath 2>/dev/null || command man -w 2>/dev/null)
+-    if [[ ! $manpath ]]; then
+-        # Note: Both "manpath" and "man -w" may be unavailable, in
+-        # which case we determine the man paths based on the
+-        # environment variable MANPATH.
+-        manpath=:${MANPATH-}:
+-        # Note: An empty path (represented by two consecutive colons
+-        # or a preceding/trailing colon) represents the system man
+-        # paths.
+-        manpath=${manpath//::/':/usr/share/man:/usr/local/share/man:'}
+-        manpath=${manpath:1:-1}
+-    fi
++    local manpath="${MANPATH-@TERMUX_PREFIX@/share/man}"
+ 
+     # determine manual section to search
+     local sect

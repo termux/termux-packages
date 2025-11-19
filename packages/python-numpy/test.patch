@@ -1,0 +1,12 @@
+diff -u -r ../cache/tmp-checkout/numpy/_core/tests/test_mem_policy.py ./numpy/_core/tests/test_mem_policy.py
+--- ../cache/tmp-checkout/numpy/_core/tests/test_mem_policy.py	2024-09-25 20:21:18.703117205 +0000
++++ ./numpy/_core/tests/test_mem_policy.py	2024-09-25 20:24:40.984240601 +0000
+@@ -21,6 +21,8 @@
+     """
+     if sys.platform.startswith('cygwin'):
+         pytest.skip('link fails on cygwin')
++    if os.path.exists("/system/bin/app_process"):
++        pytest.skip('link fails on Android')
+     if IS_WASM:
+         pytest.skip("Can't build module inside Wasm")
+     if IS_EDITABLE:

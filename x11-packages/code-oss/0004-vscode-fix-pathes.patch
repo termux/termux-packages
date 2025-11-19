@@ -1,0 +1,12 @@
+--- a/src/vs/platform/environment/node/userDataPath.ts
++++ a/src/vs/platform/environment/node/userDataPath.ts
+@@ -79,6 +79,9 @@
+ 		case 'linux':
+ 			appDataPath = process.env['XDG_CONFIG_HOME'] || path.join(os.homedir(), '.config');
+ 			break;
++		case 'android':
++			appDataPath = process.env['XDG_CONFIG_HOME'] || "@TERMUX_HOME@/.config";
++			break;
+ 		default:
+ 			throw new Error('Platform not supported');
+ 	}

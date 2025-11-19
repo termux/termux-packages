@@ -1,0 +1,26 @@
+diff -uNr ntfs-3g-2022.10.3/src/Makefile.am ntfs-3g-2022.10.3.mod/src/Makefile.am
+--- ntfs-3g-2022.10.3/src/Makefile.am	2022-10-03 17:10:36.000000000 +0800
++++ ntfs-3g-2022.10.3.mod/src/Makefile.am	2022-11-26 16:38:21.634557533 +0800
+@@ -67,8 +67,8 @@
+ if ENABLE_MOUNT_HELPER
+ install-exec-local:	install-rootbinPROGRAMS
+ 	$(MKDIR_P) "$(DESTDIR)/sbin"
+-	$(LN_S) -f "$(rootbindir)/ntfs-3g" "$(DESTDIR)/sbin/mount.ntfs-3g"
+-	$(LN_S) -f "$(rootbindir)/lowntfs-3g" "$(DESTDIR)/sbin/mount.lowntfs-3g"
++	$(LN_S) -f "$(DESTDIR)$(rootbindir)/ntfs-3g" "$(DESTDIR)/bin/mount.ntfs-3g"
++	$(LN_S) -f "$(DESTDIR)$(rootbindir)/lowntfs-3g" "$(DESTDIR)/bin/mount.lowntfs-3g"
+ 
+ install-data-local:	install-man8
+ 	$(LN_S) -f ntfs-3g.8 "$(DESTDIR)$(man8dir)/mount.ntfs-3g.8"
+diff -uNr ntfs-3g-2022.10.3/ntfsprogs/Makefile.am ntfs-3g-2022.10.3.mod/ntfsprogs/Makefile.am
+--- ntfs-3g-2022.10.3/ntfsprogs/Makefile.am	2022-10-03 17:10:36.000000000 +0800
++++ ntfs-3g-2022.10.3.mod/ntfsprogs/Makefile.am	2023-11-19 18:38:37.711652938 +0800
+@@ -166,7 +166,7 @@
+ if ENABLE_MOUNT_HELPER
+ install-exec-hook:
+ 	$(INSTALL) -d $(DESTDIR)/$(sbindir)
+-	$(LN_S) -f $(sbindir)/mkntfs $(DESTDIR)$(sbindir)/mkfs.ntfs
++	$(LN_S) -f $(DESTDIR)$(sbindir)/mkntfs $(DESTDIR)$(sbindir)/mkfs.ntfs
+ 
+ install-data-hook:
+ 	$(INSTALL) -d $(DESTDIR)$(man8dir)

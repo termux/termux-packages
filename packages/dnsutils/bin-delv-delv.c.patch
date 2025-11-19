@@ -1,0 +1,12 @@
+diff -u -r ../bind-9.10.3/bin/delv/delv.c ./bin/delv/delv.c
+--- ../bind-9.10.3/bin/delv/delv.c	2015-09-08 22:23:40.000000000 -0400
++++ ./bin/delv/delv.c	2015-09-18 09:20:21.037363830 -0400
+@@ -869,7 +869,7 @@
+ 	if (result != ISC_R_SUCCESS)
+ 		fatal("Couldn't parse port number");
+ 
+-	result = irs_resconf_load(mctx, "/etc/resolv.conf", &resconf);
++	result = irs_resconf_load(mctx, RESOLV_CONF, &resconf);
+ 	if (result != ISC_R_SUCCESS && result != ISC_R_FILENOTFOUND) {
+ 		delv_log(ISC_LOG_ERROR, "irs_resconf_load: %s",
+ 			  isc_result_totext(result));

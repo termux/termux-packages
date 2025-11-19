@@ -1,0 +1,201 @@
+Backport of a patch that fixes globbing when the parent directory is not
+readable.
+
+This bug caused all full path globs to fail under the Termux folder when
+NO_CASE_GLOB was set, since /data is not readable on Android.
+
+Fixes https://github.com/termux/termux-packages/issues/1894
+
+diff -u -r zsh-5.8/Src/glob.c zsh-5.8.mod/Src/glob.c
+--- zsh-5.8/Src/glob.c	2021-01-12 22:21:35.761008130 -0500
++++ zsh-5.8.mod/Src/glob.c	2021-01-12 22:22:52.327682424 -0500
+@@ -551,100 +551,109 @@
+     } else {
+ 	/* Do pattern matching on current path section. */
+ 	char *fn = pathbuf[pathbufcwd] ? unmeta(pathbuf + pathbufcwd) : ".";
+-	int dirs = !!q->next;
+-	DIR *lock = opendir(fn);
+ 	char *subdirs = NULL;
+ 	int subdirlen = 0;
+ 
+-	if (lock == NULL)
++	/* First check for search permission. */
++	if (access(fn, X_OK) != 0)
+ 	    return;
+-	while ((fn = zreaddir(lock, 1)) && !errflag) {
+-	    /* prefix and suffix are zle trickery */
+-	    if (!dirs && !colonmod &&
+-		((glob_pre && !strpfx(glob_pre, fn))
+-		 || (glob_suf && !strsfx(glob_suf, fn))))
+-		continue;
+-	    errsfound = errssofar;
+-	    if (pattry(p, fn)) {
+-		/* if this name matches the pattern... */
+-		if (pbcwdsav == pathbufcwd &&
+-		    strlen(fn) + pathpos - pathbufcwd >= PATH_MAX) {
+-		    int err;
+-
+-		    DPUTS(pathpos == pathbufcwd,
+-			  "BUG: filename longer than PATH_MAX");
+-		    err = lchdir(unmeta(pathbuf + pathbufcwd), &ds, 0);
+-		    if (err == -1)
+-			break;
+-		    if (err) {
+-			zerr("current directory lost during glob");
+-			break;
++
++	/* Then, if we have read permission, try to open the directory. */
++	if (access(fn, R_OK) == 0) {
++	    int dirs = !!q->next;
++	    DIR *lock = opendir(fn);
++
++	    if (lock == NULL)
++		return;
++
++	    while ((fn = zreaddir(lock, 1)) && !errflag) {
++		/* prefix and suffix are zle trickery */
++		if (!dirs && !colonmod &&
++		    ((glob_pre && !strpfx(glob_pre, fn))
++		     || (glob_suf && !strsfx(glob_suf, fn))))
++		    continue;
++		errsfound = errssofar;
++		if (pattry(p, fn)) {
++		    /* if this name matches the pattern... */
++		    if (pbcwdsav == pathbufcwd &&
++			strlen(fn) + pathpos - pathbufcwd >= PATH_MAX) {
++			int err;
++
++			DPUTS(pathpos == pathbufcwd,
++			      "BUG: filename longer than PATH_MAX");
++			err = lchdir(unmeta(pathbuf + pathbufcwd), &ds, 0);
++			if (err == -1)
++			    break;
++			if (err) {
++			    zerr("current directory lost during glob");
++			    break;
++			}
++			pathbufcwd = pathpos;
+ 		    }
+-		    pathbufcwd = pathpos;
+-		}
+-		if (dirs) {
+-		    int l;
++		    if (dirs) {
++			int l;
+ 
+-		    /*
+-		     * If not the last component in the path:
+-		     *
+-		     * If we made an approximation in the new path segment,
+-		     * then it is possible we made too many errors.  For
+-		     * example, (ab)#(cb)# will match the directory abcb
+-		     * with one error if allowed to, even though it can
+-		     * match with none.  This will stop later parts of the
+-		     * path matching, so we need to check by reducing the
+-		     * maximum number of errors and seeing if the directory
+-		     * still matches.  Luckily, this is not a terribly
+-		     * common case, since complex patterns typically occur
+-		     * in the last part of the path which is not affected
+-		     * by this problem.
+-		     */
+-		    if (errsfound > errssofar) {
+-			forceerrs = errsfound - 1;
+-			while (forceerrs >= errssofar) {
+-			    errsfound = errssofar;
+-			    if (!pattry(p, fn))
+-				break;
++			/*
++			 * If not the last component in the path:
++			 *
++			 * If we made an approximation in the new path segment,
++			 * then it is possible we made too many errors.  For
++			 * example, (ab)#(cb)# will match the directory abcb
++			 * with one error if allowed to, even though it can
++			 * match with none.  This will stop later parts of the
++			 * path matching, so we need to check by reducing the
++			 * maximum number of errors and seeing if the directory
++			 * still matches.  Luckily, this is not a terribly
++			 * common case, since complex patterns typically occur
++			 * in the last part of the path which is not affected
++			 * by this problem.
++			 */
++			if (errsfound > errssofar) {
+ 			    forceerrs = errsfound - 1;
++			    while (forceerrs >= errssofar) {
++				errsfound = errssofar;
++				if (!pattry(p, fn))
++				    break;
++				forceerrs = errsfound - 1;
++			    }
++			    errsfound = forceerrs + 1;
++			    forceerrs = -1;
+ 			}
+-			errsfound = forceerrs + 1;
+-			forceerrs = -1;
+-		    }
+-		    if (closure) {
+-			/* if matching multiple directories */
+-			struct stat buf;
+-
+-			if (statfullpath(fn, &buf, !q->follow)) {
+-			    if (errno != ENOENT && errno != EINTR &&
+-				errno != ENOTDIR && !errflag) {
+-				zwarn("%e: %s", errno, fn);
++			if (closure) {
++			    /* if matching multiple directories */
++			    struct stat buf;
++
++			    if (statfullpath(fn, &buf, !q->follow)) {
++				if (errno != ENOENT && errno != EINTR &&
++				    errno != ENOTDIR && !errflag) {
++				    zwarn("%e: %s", errno, fn);
++				}
++				continue;
+ 			    }
+-			    continue;
++			    if (!S_ISDIR(buf.st_mode))
++				continue;
++			}
++			l = strlen(fn) + 1;
++			subdirs = hrealloc(subdirs, subdirlen, subdirlen + l
++					   + sizeof(int));
++			strcpy(subdirs + subdirlen, fn);
++			subdirlen += l;
++			/* store the count of errors made so far, too */
++			memcpy(subdirs + subdirlen, (char *)&errsfound,
++			       sizeof(int));
++			subdirlen += sizeof(int);
++		    } else {
++			/* if the last filename component, just add it */
++			insert(fn, 1);
++			if (shortcircuit && shortcircuit == matchct) {
++			    closedir(lock);
++			    return;
+ 			}
+-			if (!S_ISDIR(buf.st_mode))
+-			    continue;
+-		    }
+-		    l = strlen(fn) + 1;
+-		    subdirs = hrealloc(subdirs, subdirlen, subdirlen + l
+-				       + sizeof(int));
+-		    strcpy(subdirs + subdirlen, fn);
+-		    subdirlen += l;
+-		    /* store the count of errors made so far, too */
+-		    memcpy(subdirs + subdirlen, (char *)&errsfound,
+-			   sizeof(int));
+-		    subdirlen += sizeof(int);
+-		} else {
+-		    /* if the last filename component, just add it */
+-		    insert(fn, 1);
+-		    if (shortcircuit && shortcircuit == matchct) {
+-			closedir(lock);
+-			return;
+ 		    }
+ 		}
+ 	    }
++	    closedir(lock);
+ 	}
+-	closedir(lock);
+ 	if (subdirs) {
+ 	    int oppos = pathpos;
+ 

@@ -1,0 +1,127 @@
+diff -uNr weston-14.0.0/libweston/libweston-internal.h weston-14.0.0.mod/libweston/libweston-internal.h
+--- weston-14.0.0/libweston/libweston-internal.h	2024-09-04 16:53:50.000000000 +0800
++++ weston-14.0.0.mod/libweston/libweston-internal.h	2024-09-08 09:21:17.560180824 +0800
+@@ -142,6 +142,7 @@
+ 	void (*remove_renderbuffer_dmabuf)(struct weston_output *output,
+ 					   struct weston_renderbuffer *renderbuffer);
+ 
++#ifndef __ANDROID__
+ 	/* Allocate a DMABUF that can be imported as renderbuffer
+ 	 *
+ 	 * \param renderer The renderer that allocated the DMABUF
+@@ -161,6 +162,7 @@
+ 					unsigned int width, unsigned int height,
+ 					uint32_t format,
+ 					const uint64_t *modifiers, unsigned int count);
++#endif
+ 
+ 	enum weston_renderer_type type;
+ 	const struct gl_renderer_interface *gl;
+diff -uNr weston-14.0.0/libweston/renderer-gl/gl-renderer-internal.h weston-14.0.0.mod/libweston/renderer-gl/gl-renderer-internal.h
+--- weston-14.0.0/libweston/renderer-gl/gl-renderer-internal.h	2024-09-04 16:53:50.000000000 +0800
++++ weston-14.0.0.mod/libweston/renderer-gl/gl-renderer-internal.h	2024-09-07 20:41:26.504426793 +0800
+@@ -142,7 +142,6 @@
+ 
+ struct gl_shader;
+ struct weston_color_transform;
+-struct dmabuf_allocator;
+ 
+ struct gl_shader_config {
+ 	struct gl_shader_requirements req;
+diff -uNr weston-14.0.0/libweston/renderer-gl/gl-renderer.c weston-14.0.0.mod/libweston/renderer-gl/gl-renderer.c
+--- weston-14.0.0/libweston/renderer-gl/gl-renderer.c	2024-09-04 16:53:50.000000000 +0800
++++ weston-14.0.0.mod/libweston/renderer-gl/gl-renderer.c	2024-09-08 09:26:45.180180699 +0800
+@@ -31,7 +31,6 @@
+ #include <GLES2/gl2ext.h>
+ #include <GLES3/gl3.h>
+ 
+-#include <fcntl.h>
+ #include <stdbool.h>
+ #include <stdint.h>
+ #include <stdlib.h>
+@@ -43,8 +42,6 @@
+ #include <linux/input.h>
+ #include <unistd.h>
+ 
+-#include <gbm.h>
+-
+ #include "linux-sync-file.h"
+ #include "timeline.h"
+ 
+@@ -4205,6 +4202,7 @@
+ 	gl_renderer_remove_renderbuffer(gl_renderbuffer);
+ }
+ 
++#ifndef __ANDROID__
+ static void
+ gl_renderer_dmabuf_destroy(struct linux_dmabuf_memory *dmabuf)
+ {
+@@ -4281,6 +4279,7 @@
+ 
+ 	return dmabuf;
+ }
++#endif
+ 
+ static void
+ gl_renderer_output_destroy(struct weston_output *output)
+@@ -4332,6 +4331,7 @@
+ 	return fd;
+ }
+ 
++#ifndef __ANDROID__
+ static void
+ gl_renderer_allocator_destroy(struct dmabuf_allocator *allocator)
+ {
+@@ -4368,6 +4368,7 @@
+ 
+ 	return allocator;
+ }
++#endif
+ 
+ static void
+ gl_renderer_destroy(struct weston_compositor *ec)
+@@ -4401,7 +4402,9 @@
+ 
+ 	weston_drm_format_array_fini(&gr->supported_formats);
+ 
++#ifndef __ANDROID__
+ 	gl_renderer_allocator_destroy(gr->allocator);
++#endif
+ 
+ 	eglTerminate(gr->egl_display);
+ 	eglReleaseThread();
+@@ -4492,9 +4495,11 @@
+ 	if (gl_renderer_setup_egl_display(gr, options->egl_native_display) < 0)
+ 		goto fail;
+ 
++#ifndef __ANDROID__
+ 	gr->allocator = gl_renderer_allocator_create(gr, options);
+ 	if (!gr->allocator)
+ 		weston_log("failed to initialize allocator\n");
++#endif
+ 
+ 	weston_drm_format_array_init(&gr->supported_formats);
+ 
+@@ -4531,8 +4536,10 @@
+ 	if (gr->has_native_fence_sync && gr->has_wait_sync)
+ 		ec->capabilities |= WESTON_CAP_EXPLICIT_SYNC;
+ 
++#ifndef __ANDROID__
+ 	if (gr->allocator)
+ 		gr->base.dmabuf_alloc = gl_renderer_dmabuf_alloc;
++#endif
+ 
+ 	if (gr->has_dmabuf_import) {
+ 		gr->base.import_dmabuf = gl_renderer_import_dmabuf;
+
+diff -uNr weston-14.0.0/libweston/renderer-gl/meson.build weston-14.0.0.mod/libweston/renderer-gl/meson.build
+--- weston-14.0.0/libweston/renderer-gl/meson.build	2024-09-04 16:53:50.000000000 +0800
++++ weston-14.0.0.mod/libweston/renderer-gl/meson.build	2024-09-07 20:45:16.000426706 +0800
+@@ -30,7 +30,6 @@
+ ]
+ 
+ deps_renderer_gl = [
+-	dep_gbm,
+ 	dep_libm,
+ 	dep_pixman,
+ 	dep_libweston_private,

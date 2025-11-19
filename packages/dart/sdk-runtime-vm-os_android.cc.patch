@@ -1,0 +1,11 @@
+--- ./sdk/runtime/vm/os_android.cc
++++ ./sdk/runtime/vm/os_android.cc
+@@ -53,7 +53,7 @@ class PerfCodeObserver : public CodeObserver {
+       return;
+     }
+     intptr_t pid = getpid();
+-    char* filename = OS::SCreate(nullptr, "/tmp/perf-%" Pd ".map", pid);
++    char* filename = OS::SCreate(nullptr, "@TERMUX_PREFIX@/tmp/perf-%" Pd ".map", pid);
+     out_file_ = (*file_open)(filename, true);
+     free(filename);
+   } 

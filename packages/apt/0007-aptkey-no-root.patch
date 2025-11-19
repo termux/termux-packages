@@ -1,0 +1,12 @@
+diff -uNr apt-2.1.11/cmdline/apt-key.in apt-2.1.11.mod/cmdline/apt-key.in
+--- apt-2.1.11/cmdline/apt-key.in	2020-11-05 15:59:00.521530818 +0200
++++ apt-2.1.11.mod/cmdline/apt-key.in	2020-11-05 16:12:58.999142102 +0200
+@@ -84,7 +84,7 @@
+ }
+ 
+ requires_root() {
+-	if [ "$(id -u)" -ne 0 ]; then
++	if [ ! -d "@TERMUX_PREFIX@" ] && [ "$(id -u)" -ne 0 ]; then
+ 		apt_error "This command can only be used by root."
+ 		exit 1
+ 	fi

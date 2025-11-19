@@ -1,0 +1,20 @@
+diff -uNr bzip2-1.0.8/bzdiff bzip2-1.0.8.mod/bzdiff
+--- bzip2-1.0.8/bzdiff	2019-07-13 20:50:05.000000000 +0300
++++ bzip2-1.0.8.mod/bzdiff	2019-07-20 11:46:36.090211623 +0300
+@@ -49,14 +49,14 @@
+                 case "$2" in
+ 	        *.bz2)
+ 			F=`echo "$2" | sed 's|.*/||;s|.bz2$||'`
+-			tmp=`mktemp "${TMPDIR:-/tmp}"/bzdiff.XXXXXXXXXX` || {
++			tmp=`mktemp "${TMPDIR:-@TERMUX_PREFIX@/tmp}"/bzdiff.XXXXXXXXXX` || {
+ 			      echo 'cannot create a temporary file' >&2
+ 			      exit 1
+ 			}
+                         bzip2 -cdfq "$2" > "$tmp"
+                         bzip2 -cdfq "$1" | $comp $OPTIONS - "$tmp"
+                         STAT="$?"
+-			/bin/rm -f "$tmp";;
++			rm -f "$tmp";;
+
+                 *)      bzip2 -cdfq "$1" | $comp $OPTIONS - "$2"
+                         STAT="$?";;

@@ -1,0 +1,17 @@
+--- a/bounce.h
++++ b/bounce.h
+@@ -34,6 +34,14 @@
+ #include <sys/time.h>
+ #include <tls.h>
+ 
++#ifdef __ANDROID__
++#include <crypt.h>
++
++static void *(*volatile explicit_memset)(void *, int, size_t) = memset;
++#undef explicit_bzero
++#define explicit_bzero(s, n) explicit_memset(s, 0, n)
++#endif
++
+ #ifndef OPENSSL_BIN
+ #define OPENSSL_BIN "openssl"
+ #endif

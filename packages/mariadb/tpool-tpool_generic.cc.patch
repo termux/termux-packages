@@ -1,0 +1,13 @@
+This requires libaio or liburing
+
+--- a/tpool/tpool_generic.cc
++++ b/tpool/tpool_generic.cc
+@@ -296,7 +296,7 @@
+ #ifdef _WIN32
+   aio *create_native_aio(int max_io, aio_implementation) override
+   { return create_win_aio(this, max_io); }
+-#elif defined __linux__
++#elif defined __linux__ && !defined(__ANDROID__)
+   aio *create_native_aio(int max_io, aio_implementation impl) override
+   { return create_linux_aio(this, max_io, impl); }
+ #else

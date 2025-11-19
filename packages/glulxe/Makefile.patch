@@ -1,0 +1,27 @@
+--- ../Makefile.orig	2017-01-23 20:14:37.000000000 +0100
++++ ./Makefile	2019-10-24 21:25:57.022914016 +0200
+@@ -7,9 +7,9 @@
+ # sets of values appear below; uncomment one of them and change the
+ # directories appropriately.
+ 
+-GLKINCLUDEDIR = ../cheapglk
+-GLKLIBDIR = ../cheapglk
+-GLKMAKEFILE = Make.cheapglk
++GLKINCLUDEDIR = glkterm
++GLKLIBDIR = glkterm
++GLKMAKEFILE = Make.glktermw
+ 
+ #GLKINCLUDEDIR = ../glkterm
+ #GLKLIBDIR = ../glkterm
+@@ -38,10 +38,9 @@
+ # (MacOS always uses ARC4, in case you were wondering.)
+ 
+ # Pick a C compiler.
+-CC = cc
+ #CC = gcc
+ 
+-OPTIONS = -g -Wall -Wmissing-prototypes -Wno-unused -DOS_MAC
++OPTIONS := $(CFLAGS) -DOS_UNIX
+ 
+ # Locate the libxml2 library. You only need these lines if you are using
+ # the VM_DEBUGGER option. If so, uncomment these and set appropriately.

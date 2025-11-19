@@ -1,0 +1,53 @@
+Initially added in https://gitweb.gentoo.org/repo/gentoo.git/commit/?id=cb196546c62e9894a46900e8078f753388d4cc1a.
+Commit mentions it being from Debian but not found any other references yet.
+
+We use -largp fairly extensively across the tree which this patch
+accommodates (easier than forcing includes?).
+--- a/Makefile.am	2022-05-03 03:41:05.000000000 -0400
++++ b/Makefile.am	2022-05-30 12:28:33.850249380 -0400
+@@ -21,19 +21,19 @@
+ AUTOMAKE_OPTIONS = foreign
+ SUBDIRS = . testsuite
+ 
+-LIBOBJS = @LIBOBJS@
++LTLIBOBJS = @LTLIBOBJS@
+ 
+-noinst_LIBRARIES = libargp.a
++lib_LTLIBRARIES = libargp.la
+ noinst_PROGRAMS = argp-test
+ noinst_HEADERS = argp.h argp-fmtstream.h argp-namefrob.h # argp-comp.h
+ 
+ EXTRA_DIST = mempcpy.c strchrnul.c strndup.c Versions
+ 
+ # Leaves out argp-fs-xinl.c and argp-xinl.c
+-libargp_a_SOURCES = argp-ba.c argp-eexst.c argp-fmtstream.c \
++libargp_la_SOURCES = argp-ba.c argp-eexst.c argp-fmtstream.c \
+ 		    argp-help.c argp-parse.c argp-pv.c \
+ 		    argp-pvh.c
+ 
+-libargp_a_LIBADD = $(LIBOBJS)
++libargp_la_LIBADD = $(LTLIBOBJS)
+ 
+-argp_test_LDADD = libargp.a
++argp_test_LDADD = libargp.la
+--- a/configure.ac	2022-05-03 03:41:05.000000000 -0400
++++ b/configure.ac	2022-05-30 12:27:08.688735341 -0400
+@@ -17,6 +17,7 @@
+ AC_PROG_MAKE_SET
+ AC_PROG_RANLIB
+ AM_PROG_CC_STDC
++AC_PROG_LIBTOOL
+ 
+ if test "x$am_cv_prog_cc_stdc" = xno ; then
+   AC_ERROR([the C compiler doesn't handle ANSI-C])
+--- a/testsuite/Makefile.am	2022-05-03 03:41:05.000000000 -0400
++++ b/testsuite/Makefile.am	2022-05-30 12:27:08.688735341 -0400
+@@ -5,7 +5,7 @@
+ 
+ noinst_PROGRAMS = $(TS_PROGS) ex1 ex3 ex4
+ 
+-LDADD = ../libargp.a
++LDADD = -L../.libs -largp
+ 
+ EXTRA_DIST = $(TS_SH) run-tests
+ CLEANFILES = test.out

@@ -1,0 +1,53 @@
+--- a/cmd/grv/vendor/gopkg.in/libgit2/git2go.v27/git_dynamic.go
++++ b/cmd/grv/vendor/gopkg.in/libgit2/git2go.v27/git_dynamic.go
+@@ -6,7 +6,7 @@ package git
+ #include <git2.h>
+ #cgo pkg-config: libgit2
+ 
+-#if LIBGIT2_VER_MAJOR != 0 || LIBGIT2_VER_MINOR != 27
++#if 0
+ # error "Invalid libgit2 version; this git2go supports libgit2 v0.27"
+ #endif
+ 
+--- a/cmd/grv/vendor/gopkg.in/libgit2/git2go.v27/merge.go
++++ b/cmd/grv/vendor/gopkg.in/libgit2/git2go.v27/merge.go
+@@ -132,7 +132,7 @@ func (mo *MergeOptions) toC() *C.git_mer
+ 	}
+ 	return &C.git_merge_options{
+ 		version:          C.uint(mo.Version),
+-		flags:            C.git_merge_flag_t(mo.TreeFlags),
++		flags:            C.uint32_t(mo.TreeFlags),
+ 		rename_threshold: C.uint(mo.RenameThreshold),
+ 		target_limit:     C.uint(mo.TargetLimit),
+ 		file_favor:       C.git_merge_file_favor_t(mo.FileFavor),
+@@ -374,7 +374,7 @@ func populateCMergeFileOptions(c *C.git_
+ 	c.our_label = C.CString(options.OurLabel)
+ 	c.their_label = C.CString(options.TheirLabel)
+ 	c.favor = C.git_merge_file_favor_t(options.Favor)
+-	c.flags = C.git_merge_file_flag_t(options.Flags)
++	c.flags = C.uint32_t(options.Flags)
+ 	c.marker_size = C.ushort(options.MarkerSize)
+ }
+ 
+--- a/cmd/grv/vendor/gopkg.in/libgit2/git2go.v27/odb.go
++++ b/cmd/grv/vendor/gopkg.in/libgit2/git2go.v27/odb.go
+@@ -210,7 +210,7 @@ func (v *Odb) NewWriteStream(size int64,
+ 	runtime.LockOSThread()
+ 	defer runtime.UnlockOSThread()
+ 
+-	ret := C.git_odb_open_wstream(&stream.ptr, v.ptr, C.git_off_t(size), C.git_otype(otype))
++	ret := C.git_odb_open_wstream(&stream.ptr, v.ptr, C.git_object_size_t(size), C.git_otype(otype))
+ 	runtime.KeepAlive(v)
+ 	if ret < 0 {
+ 		return nil, MakeGitError(ret)
+--- a/cmd/grv/vendor/gopkg.in/libgit2/git2go.v27/stash.go
++++ b/cmd/grv/vendor/gopkg.in/libgit2/git2go.v27/stash.go
+@@ -171,7 +171,7 @@ func (opts *StashApplyOptions) toC() (
+ 
+ 		optsC = &C.git_stash_apply_options{
+ 			version: C.GIT_STASH_APPLY_OPTIONS_VERSION,
+-			flags:   C.git_stash_apply_flags(opts.Flags),
++			flags:   C.uint32_t(opts.Flags),
+ 		}
+ 		populateCheckoutOpts(&optsC.checkout_options, &opts.CheckoutOptions)
+ 		if opts.ProgressCallback != nil {

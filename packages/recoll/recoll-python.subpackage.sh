@@ -1,0 +1,3 @@
+TERMUX_SUBPKG_INCLUDE="lib/python*"
+TERMUX_SUBPKG_DESCRIPTION="Python interface for Recoll"
+TERMUX_SUBPKG_DEPENDS="python"

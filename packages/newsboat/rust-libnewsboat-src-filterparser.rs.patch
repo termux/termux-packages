@@ -1,0 +1,46 @@
+--- a/rust/libnewsboat/src/filterparser.rs
++++ b/rust/libnewsboat/src/filterparser.rs
+@@ -1,6 +1,5 @@
+ //! Parses filter expressions.
+ 
+-use gettextrs::gettext;
+ use nom::AsChar;
+ use nom::{
+     branch::alt,
+@@ -126,11 +125,11 @@
+ /// indicating the thing thah was expected.
+ fn translate_expected(expected: Expected) -> String {
+     match expected {
+-        Expected::AttributeName => gettext("attribute name"),
++        Expected::AttributeName => "attribute name".to_string(),
+         // Don't translate "between" -- it's a keyword, not an English word.
+-        Expected::Operators => gettext("one of: =~, ==, =, !~, !=, <=, >=, <, >, between, #, !#"),
++        Expected::Operators => "one of: =~, ==, =, !~, !=, <=, >=, <, >, between, #, !#".to_string(),
+         // The options ("quoted string" etc.) are not keywords, so please translate them.
+-        Expected::Value => gettext("one of: quoted string, range, number"),
++        Expected::Value => "one of: quoted string, range, number".to_string(),
+     }
+ }
+ 
+@@ -423,18 +422,18 @@
+                 Error::TrailingCharacters(pos, tail) => fmt!(
+                     // The first %s is an integer offset at which trailing characters start, the
+                     // second %s is the tail itself.
+-                    &gettext("Parse error: trailing characters after position %s: %s"),
++                    "Parse error: trailing characters after position %s: %s",
+                     &pos.to_string(),
+                     tail
+                 ),
+                 Error::AtPos(pos, expected) => fmt!(
+                     // The first %s is a zero-based offset into the string, the second %s is the
+                     // description of what the program expected at that point.
+-                    &gettext("Parse error at position %s: expected %s"),
++                    "Parse error at position %s: expected %s",
+                     &pos.to_string(),
+                     &translate_expected(expected)
+                 ),
+-                Error::Internal => fmt!(&gettext("Internal parse error")),
++                Error::Internal => fmt!("Internal parse error"),
+             };
+             Err(err)
+         }

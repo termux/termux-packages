@@ -1,0 +1,30 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -80,7 +80,7 @@
+ 
+ # cross platform deps
+ fribidi_req='fribidi >= 0.10.4'
+-glib_req='glib-2.0 >= 2.6.0 gthread-2.0 >= 2.6.0 gobject-2.0 >= 2.6.0'
++glib_req='glib-2.0 >= 2.6.0 gthread-2.0 >= 2.6.0 gobject-2.0 >= 2.6.0 gmodule-2.0 >= 2.6.0'
+ gsf_req='libgsf-1 >= 1.14.18'
+ gsf_gio_req='libgsf-1 >= 1.14.9'
+ wv_req='wv-1.0 >= 1.2.0'
+@@ -644,7 +644,6 @@
+ if test "$GCC" = "yes"; then
+ 	for option in -Wall -Wextra -Wsign-compare -Wpointer-arith \
+ 		      -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn \
+-                      -Wformat-overflow=2 \
+ 		      -Wunused -Wpointer-arith -Wshadow; do
+ 		SAVE_CPPFLAGS="$CPPFLAGS"
+ 		CPPFLAGS="$CPPFLAGS $option"
+@@ -1030,8 +1029,8 @@
+ 	if test "$abi_cv_disable_default_plugins" != "yes"; then
+ 		PLUGINS="$default_plugins"
+ 	fi
+-	for i in $abi_cv_plugins; do
+-		if test -d "plugins/$i"; then 
++	for i in $(echo $abi_cv_plugins | tr , ' '); do
++		if test -d "$srcdir/plugins/$i"; then 
+ 			PLUGINS="$PLUGINS $i"
+ 		else
+ 			AC_MSG_WARN([Plugin $i does not exist.])

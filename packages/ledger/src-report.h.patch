@@ -1,0 +1,16 @@
+diff --git a/src/report.h b/src/report.h
+index 6c33889c..6722fbf6 100644
+--- a/src/report.h
++++ b/src/report.h
+@@ -814,9 +814,8 @@ public:
+      if (isatty(STDOUT_FILENO)) {
+        if (! std::getenv("PAGER")) {
+          bool have_less = false;
+-         if (exists(path("/opt/local/bin/less")) ||
+-             exists(path("/usr/local/bin/less")) ||
+-             exists(path("/usr/bin/less")))
++         if (exists(path("@TERMUX_PREFIX@/bin/less")) ||
++             exists(path("@TERMUX_PREFIX@/local/bin/less")))
+            have_less = true;
+ 
+          if (have_less) {

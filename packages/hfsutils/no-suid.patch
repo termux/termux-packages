@@ -1,0 +1,34 @@
+diff -uNr hfsutils-3.2.6/suid.c hfsutils-3.2.6.mod/suid.c
+--- hfsutils-3.2.6/suid.c	1998-04-11 11:27:00.000000000 +0300
++++ hfsutils-3.2.6.mod/suid.c	2020-08-08 15:48:00.553301290 +0300
+@@ -52,6 +52,10 @@
+  */
+ void suid_init(void)
+ {
++#ifdef __ANDROID__
++  return;
++#endif
++
+   uid  = getuid();
+   gid  = getgid();
+ 
+@@ -67,6 +71,9 @@
+  */
+ void suid_enable(void)
+ {
++#ifdef __ANDROID__
++  return;
++#endif
+ # ifdef HAVE_SETREUID
+ 
+   setreuid(-1, euid);
+@@ -86,6 +93,9 @@
+  */
+ void suid_disable(void)
+ {
++#ifdef __ANDROID__
++  return;
++#endif
+ # ifdef HAVE_SETREUID
+ 
+   setreuid(-1, uid);

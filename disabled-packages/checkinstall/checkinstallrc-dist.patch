@@ -1,0 +1,29 @@
+diff -u -r ../checkinstall-1.6.2/checkinstallrc-dist ./checkinstallrc-dist
+--- ../checkinstall-1.6.2/checkinstallrc-dist	2008-11-11 14:10:34.000000000 -0500
++++ ./checkinstallrc-dist	2016-10-28 16:28:56.558529656 -0400
+@@ -16,14 +16,14 @@
+ DEBUG=0
+ 
+ # Location of the "installwatch" program
+-INSTALLWATCH_PREFIX="/usr/local"
++INSTALLWATCH_PREFIX="@TERMUX_PREFIX@"
+ INSTALLWATCH=${INSTALLWATCH_PREFIX}/bin/installwatch
+ 
+ # Location of the makepkg program. "makepak" is the default, and is 
+ # included with checkinstall. If you want to use Slackware's native "makepkg"
+ # then set this to "makepkg"
+ 
+-MAKEPKG=/sbin/makepkg
++MAKEPKG=@TERMUX_PREFIX@/bin/makepkg
+ 
+ # makepkg optional flags. These are recommended if running a newer Slackware
+ # version: "-l y -c n"
+@@ -36,7 +36,7 @@
+ SHOW_MAKEPKG=0
+ 
+ # Where will we keep our temp files?
+-BASE_TMP_DIR=/var/tmp   ##  Don't set this to /tmp or / !! 
++BASE_TMP_DIR=@TERMUX_PREFIX@/tmp   ##  Don't set this to /tmp or / !! 
+ 
+ # Where to place the installed document files
+ DOC_DIR=""

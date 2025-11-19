@@ -1,0 +1,29 @@
+--- a/toolkit/xre/nsXREDirProvider.cpp
++++ b/toolkit/xre/nsXREDirProvider.cpp
+@@ -294,7 +294,7 @@ static nsresult GetSystemParentDirectory(nsIFile** aFile) {
+ #    elif defined(__OpenBSD__) || defined(__FreeBSD__)
+       "/usr/local/lib/mozilla"_ns
+ #    else
+-      "/usr/lib/mozilla"_ns
++      "@TERMUX_PREFIX@/lib/mozilla"_ns
+ #    endif
+       ;
+   rv = NS_NewNativeLocalFile(dirname, getter_AddRefs(localDir));
+@@ -400,7 +400,7 @@ nsXREDirProvider::GetFile(const char* aProperty, bool* aPersistent,
+ #    if defined(__OpenBSD__) || defined(__FreeBSD__)
+     static const char* const sysLExtDir = "/usr/local/share/mozilla/extensions";
+ #    else
+-    static const char* const sysLExtDir = "/usr/share/mozilla/extensions";
++    static const char* const sysLExtDir = "@TERMUX_PREFIX@/share/mozilla/extensions";
+ #    endif
+     rv = NS_NewNativeLocalFile(nsDependentCString(sysLExtDir),
+                                getter_AddRefs(file));
+@@ -413,7 +413,7 @@ nsXREDirProvider::GetFile(const char* aProperty, bool* aPersistent,
+ #endif
+   } else if (!strcmp(aProperty, XRE_USER_RUNTIME_DIR)) {
+ #if defined(XP_UNIX)
+-    nsPrintfCString path("/run/user/%d/%s/", getuid(), GetAppName());
++    nsPrintfCString path("@TERMUX_PREFIX@/var/run/user/%d/%s/", getuid(), GetAppName());
+     ToLowerCase(path);
+     rv = NS_NewNativeLocalFile(path, getter_AddRefs(file));
+ #endif

@@ -1,0 +1,12 @@
+diff -uNr shellinabox-2.20/libhttp/ssl.c shellinabox-2.20.mod/libhttp/ssl.c
+--- shellinabox-2.20/libhttp/ssl.c	2016-11-09 21:40:33.000000000 +0200
++++ shellinabox-2.20.mod/libhttp/ssl.c	2020-01-03 01:52:35.381088443 +0200
+@@ -398,7 +398,7 @@
+     check(NOINTR(dup2(fd, STDIN_FILENO)) == STDIN_FILENO);
+     check(NOINTR(close(fd)) == 0);
+     umask(077);
+-    check(setenv("PATH", "/usr/bin:/usr/sbin", 1) == 0);
++    check(setenv("PATH", "@TERMUX_PREFIX@/bin", 1) == 0);
+     char *subject;
+     check(subject = stringPrintf(NULL, "/CN=%s/", serverName));
+     if (execlp("openssl", "openssl", "req", "-x509", "-nodes", "-days", "7300",

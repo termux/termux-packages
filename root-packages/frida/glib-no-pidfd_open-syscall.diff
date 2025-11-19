@@ -1,0 +1,22 @@
+--- ./subprojects/glib/meson.build.orig	2025-07-14 07:19:45.851686376 +0000
++++ ./subprojects/glib/meson.build	2025-07-14 07:19:10.526682458 +0000
+@@ -931,19 +931,6 @@
+   glib_conf.set('HAVE_EVENTFD', 1)
+ endif
+ 
+-# Check for pidfd_open(2)
+-if cc.links('''#include <sys/syscall.h>
+-               #include <sys/wait.h>
+-               #include <linux/wait.h>
+-               #include <unistd.h>
+-               int main (int argc, char ** argv) {
+-                 siginfo_t child_info = { 0, };
+-                 syscall (SYS_pidfd_open, 0, 0);
+-                 waitid (P_PIDFD, 0, &child_info, WEXITED | WNOHANG);
+-                 return 0;
+-               }''', name : 'pidfd_open(2) system call')
+-  glib_conf.set('HAVE_PIDFD', 1)
+-endif
+ 
+ # Check for __uint128_t (gcc) by checking for 128-bit division
+ uint128_t_src = '''int main() {

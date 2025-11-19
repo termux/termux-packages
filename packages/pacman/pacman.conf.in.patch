@@ -1,0 +1,82 @@
+--- pacman-7.0.0/etc/pacman.conf.in	2024-07-14 12:11:18.000000000 +0300
++++ pacman-7.0.0/etc/pacman.conf.in.patch	2024-09-15 13:49:59.248174976 +0300
+@@ -15,11 +15,11 @@
+ #LogFile     = @localstatedir@/log/pacman.log
+ #GPGDir      = @sysconfdir@/pacman.d/gnupg/
+ #HookDir     = @sysconfdir@/pacman.d/hooks/
+-HoldPkg     = pacman glibc
+-#XferCommand = /usr/bin/curl -L -C - -f -o %o %u
+-#XferCommand = /usr/bin/wget --passive-ftp -c -O %o %u
++HoldPkg      = pacman
++#XferCommand = @TERMUX_PREFIX@/bin/curl -L -C - -f -o %o %u
++#XferCommand = @TERMUX_PREFIX@/bin/wget --passive-ftp -c -O %o %u
+ #CleanMethod = KeepInstalled
+-Architecture = auto
++Architecture = @TERMUX_ARCH@
+ 
+ # Pacman won't upgrade packages listed in IgnorePkg and members of IgnoreGroup
+ #IgnorePkg   =
+@@ -30,7 +30,7 @@
+ 
+ # Misc options
+ #UseSyslog
+-#Color
++Color
+ #NoProgressBar
+ CheckSpace
+ #VerbosePkgLists
+@@ -38,10 +38,11 @@
+ #DownloadUser = alpm
+ #DisableSandbox
+ 
+-# PGP signature checking
+-#SigLevel = Optional
+-#LocalFileSigLevel = Optional
+-#RemoteFileSigLevel = Optional
++# By default, pacman accepts packages signed by keys that its local keyring
++# trusts (see pacman-key and its man page), as well as unsigned packages.
++SigLevel    = DatabaseRequired
++LocalFileSigLevel = Optional
++#RemoteFileSigLevel = Required
+ 
+ #
+ # REPOSITORIES
+@@ -62,18 +63,23 @@
+ # uncommented to enable the repo.
+ #
+ 
+-# An example of a disabled remote package repository with multiple servers
+-# available. To enable, uncomment the following lines. You can add preferred
+-# servers immediately after the header and they will be used before the
+-# default mirrors.
+-#[core]
+-#SigLevel = Required
+-#Server = ftp://ftp.example.com/foobar/$repo/os/$arch/
+-# The file referenced here should contain a list of 'Server = ' lines.
+-#Include = @sysconfdir@/pacman.d/mirrorlist
+-
+-# An example of a custom package repository.  See the pacman manpage for
+-# tips on creating your own repositories.
+-#[custom]
+-#SigLevel = Optional TrustAll
+-#Server = file:///home/packages
++[main]
++Include = @TERMUX_PREFIX@/etc/pacman.d/mirrorlist
++
++[x11]
++Include = @TERMUX_PREFIX@/etc/pacman.d/mirrorlist
++
++[root]
++Include = @TERMUX_PREFIX@/etc/pacman.d/mirrorlist
++
++[tur]
++Include = @TERMUX_PREFIX@/etc/pacman.d/mirrorlist
++
++[tur-continuous]
++Include = @TERMUX_PREFIX@/etc/pacman.d/mirrorlist
++
++[tur-multilib]
++Include = @TERMUX_PREFIX@/etc/pacman.d/mirrorlist
++
++[gpkg]
++Include = @TERMUX_PREFIX@/etc/pacman.d/mirrorlist

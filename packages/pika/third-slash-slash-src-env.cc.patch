@@ -1,0 +1,11 @@
+--- a/third/slash/slash/src/env.cc
++++ b/third/slash/slash/src/env.cc
+@@ -348,7 +348,7 @@
+ 
+   virtual Status Read(size_t n, Slice* result, char* scratch) override {
+     Status s;
+-    size_t r = fread_unlocked(scratch, 1, n, file_);
++    size_t r = fread(scratch, 1, n, file_);
+ 
+     *result = Slice(scratch, r);
+ 

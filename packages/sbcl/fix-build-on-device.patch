@@ -1,0 +1,129 @@
+Fixes multiple errors in the on-device build of SBCL in Termux
+
+when this command is used on-device:
+
+sh make.sh --xc-host="$PREFIX/bin/ecl --norc" --prefix="$PREFIX" --with-android --fancy --without-gcc-tls
+
+contains some code from https://bugs.launchpad.net/sbcl/+bug/1956852
+
+- make-contrib.lisp: remove block related to cross-compilation imeplementation created by upstream
+- make-config.sh: disable blocks related to upstream's cross-compilation implementation and also
+  disable upstream's Android-specific headers and Android-specific software-version function
+- run-program.lisp: enable the implementation of the software-version function intended for
+  GNU/Linux, but disable the use of /proc/sys/kernel/osrelease and prepend @TERMUX_PREFIX@
+  to /bin/uname absolute path
+- build-order.lisp-expr: treat Android as "Linux" in this file, disabling upstream's
+  Android-specific software-version function
+- android_run.sh: rewrite functions related to upstream's cross-compilation implementation
+- grovel-features.sh: adjust function call related to upstream's cross-compilation implementation
+
+--- a/contrib/make-contrib.lisp
++++ b/contrib/make-contrib.lisp
+@@ -12,11 +12,6 @@
+ 
+ (defun run-defs-to-lisp (inputs output)
+   (flet ((invoke (string &rest args)
+-           #+android
+-           (when (string= string "RUN-C-COMPILER")
+-             (format t "~a ~{~a~^ ~}~%" string args)
+-             (sleep 5) ;; FIXME: should check if the file was compiled
+-             (return-from invoke 0))
+            (apply (find-symbol string "SB-GROVEL") args)))
+     (let ((c-file (merge-pathnames "runme.c" output))
+           (all-headers)
+--- a/make-config.sh
++++ b/make-config.sh
+@@ -384,7 +384,7 @@ echo //ensuring the existence of output/ directory
+ if [ ! -d output ] ; then mkdir output; fi
+ 
+ echo //guessing default target CPU architecture from host architecture
+-if $android
++if false
+ then
+     uname_arch=`adb shell uname -m`
+ else
+@@ -472,7 +477,7 @@ then
+     esac
+     HOST_TAG=$sbcl_os-x86_64
+     TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/$HOST_TAG
+-    export CC=$TOOLCHAIN/bin/$TARGET_TAG$ANDROID_API-clang
++    export CC=$TARGET_TAG-clang
+     echo "CC=$CC; export CC" >> output/build-config
+     echo "NDK=$NDK" > output/ndk-config
+     echo "HOST_TAG=$HOST_TAG" >> output/ndk-config
+@@ -580,7 +585,7 @@ case "$sbcl_os" in
+ 		printf ' :largefile' >> $ltf
+ 		;;
+         esac
+-        if $android
++        if false
+         then
+             link_or_copy Config.$sbcl_arch-android Config
+             link_or_copy $sbcl_arch-android-os.h target-arch-os.h
+--- a/src/code/run-program.lisp
++++ b/src/code/run-program.lisp
+@@ -1363,19 +1363,16 @@ Users Manual for details about the PROCESS structure.
+           (t
+            (fail "invalid option: ~S" object))))))
+ 
+-#+(or (and linux (not android)) sunos haiku)
++#+(or linux sunos haiku)
+ (defun software-version ()
+   "Return a string describing version of the supporting software, or NIL
+   if not available."
+   (or sb-sys::*software-version*
+       (setf sb-sys::*software-version*
+             (possibly-base-stringize
+-             #+linux
+-             (with-open-file (f "/proc/sys/kernel/osrelease") (read-line f))
+-             #-linux
+              (string-trim '(#\newline)
+                           (%with-output-to-string (stream)
+-                           (run-program "/bin/uname"
++                           (run-program "@TERMUX_PREFIX@/bin/uname"
+                                         ;; "-r" on haiku just prints "1"
+                                         ;; but "-v" prints some detail.
+                                         #+haiku '("-v")
+--- a/src/cold/build-order.lisp-expr
++++ b/src/cold/build-order.lisp-expr
+@@ -486,10 +486,9 @@
+  ("src/code/funutils"       :not-host)
+ 
+  #+win32 ("src/code/win32" :not-host)
+- #+android ("src/code/android-os" :not-host)
+  #+sunos ("src/code/sunos-os" :not-host)
+  #+bsd   ("src/code/bsd-os"   :not-host)
+- #+(and linux (not android)) ("src/code/linux-os" :not-host)
++ #+linux ("src/code/linux-os" :not-host)
+  #+haiku ("src/code/haiku-os" :not-host)
+  #+win32 ("src/code/win32-os" :not-host)
+ 
+--- a/tools-for-build/android_run.sh
++++ b/tools-for-build/android_run.sh
+@@ -1,13 +1,7 @@
+ android_run() {
+-    adb push $1 /data/local/tmp/temp.out > /dev/null
+-    adb shell chmod +x /data/local/tmp/temp.out > /dev/null
+-    adb shell ./data/local/tmp/temp.out
+-    adb shell rm /data/local/tmp/temp.out > /dev/null
++    $@
+ }
+ 
+ android_run_for_exit_code() {
+-    adb push $1 /data/local/tmp/$1 > /dev/null
+-    adb shell chmod +x /data/local/tmp/$1 > /dev/null 2>&1
+-    adb shell "echo input | ./data/local/tmp/$1 > /dev/null 2>&1 ; echo \"\$?\"" 2>/dev/null
+-    adb shell rm /data/local/tmp/$1 > /dev/null 2>&1
++    echo input | $@ > /dev/null 2>&1 ; echo "$?"
+ }
+--- a/tools-for-build/grovel-features.sh
++++ b/tools-for-build/grovel-features.sh
+@@ -16,7 +16,7 @@ featurep() {
+     if $android
+     then
+         $CC -I../src/runtime -ldl -o $bin $bin.c > /dev/null 2>&1
+-	exit_code=`android_run_for_exit_code $bin`
++	exit_code=`android_run_for_exit_code ./$bin`
+     else
+         $GNUMAKE $bin -I ../src/runtime > /dev/null 2>&1 && echo "input" | ./$bin> /dev/null 2>&1
+ 	exit_code="$?"

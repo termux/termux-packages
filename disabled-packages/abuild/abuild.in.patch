@@ -1,0 +1,488 @@
+diff -uNr abuild-3.4.0/abuild.in abuild-3.4.0.mod/abuild.in
+--- abuild-3.4.0/abuild.in	2019-06-14 15:13:23.000000000 +0300
++++ abuild-3.4.0.mod/abuild.in	2019-07-21 16:56:56.898285307 +0300
+@@ -1,4 +1,4 @@
+-#!/bin/ash -e
++#!/bin/bash -e
+ 
+ # abuild - build apk packages (light version of makepkg)
+ # Copyright (c) 2008-2015 Natanael Copa <ncopa@alpinelinux.org>
+@@ -21,11 +21,7 @@
+ . "$datadir/functions.sh"
+ 
+ # defaults
+-: ${FAKEROOT:="fakeroot"}
+-: ${SUDO_APK:="abuild-apk"}
+ : ${APK:="apk"}
+-: ${ADDUSER:="abuild-adduser"}
+-: ${ADDGROUP:="abuild-addgroup"}
+ 
+ apk_opt_wait="--wait 30"
+ 
+@@ -438,7 +434,7 @@
+ 	initdcheck || return 1
+ 	mkdir -p "$srcdir"
+ 	local gunzip=$(command -v pigz || echo gunzip)
+-	[ $gunzip = "/usr/bin/pigz" ] && gunzip="$gunzip -d"
++	[ $gunzip = "@TERMUX_PREFIX@/bin/pigz" ] && gunzip="$gunzip -d"
+ 	for u in $source; do
+ 		local s
+ 		if is_remote "$u"; then
+@@ -466,7 +462,7 @@
+ 			*.tar.xz)
+ 				msg "Unpacking $s..."
+ 				local threads_opt
+-				if [ $(readlink -f $(command -v unxz)) != "/bin/busybox" ]; then
++				if [ $(realpath $(command -v unxz)) != "@TERMUX_PREFIX@/bin/busybox" ]; then
+ 					threads_opt="--threads=0"
+ 				fi
+ 				unxz $threads_opt -c "$s" | tar -C "$srcdir" -x || return 1;;
+@@ -554,26 +550,6 @@
+ 	return 0
+ }
+ 
+-mkusers() {
+-	local i
+-	for i in $pkggroups; do
+-		if ! getent group $i >/dev/null; then
+-			msg "Creating group $i"
+-			$ADDGROUP -S $i || return 1
+-		fi
+-	done
+-	for i in $pkgusers; do
+-		if ! getent passwd $i >/dev/null; then
+-			local gopt=
+-			msg "Creating user $i"
+-			if getent group $i >/dev/null; then
+-				gopt="-G $i"
+-			fi
+-			$ADDUSER -S -D -H $gopt $i || return 1
+-		fi
+-	done
+-}
+-
+ # helper to update config.sub to a recent version
+ update_config_sub() {
+ 	find . -name config.sub | (local changed=false; while read f; do
+@@ -687,10 +663,10 @@
+ 		find "$dir" -name '*.la' -type f -delete
+ 	fi
+ 
+-	# look for /usr/lib/charset.alias
+-	if [ -e "$dir"/usr/lib/charset.alias ] \
++	# look for @TERMUX_PREFIX@/lib/charset.alias
++	if [ -e "$dir"/@TERMUX_PREFIX@/lib/charset.alias ] \
+ 			&& ! options_has "charset.alias"; then
+-		error "Found /usr/lib/charset.alias"
++		error "Found @TERMUX_PREFIX@/lib/charset.alias"
+ 		return 1
+ 	fi
+ 	# look for /etc/init.d and /etc/conf.d
+@@ -704,22 +680,15 @@
+ 			warning "Found static archive on ${i##*$dir/} but name doesn't end with -static"
+ 		done
+ 	fi
+-	# look for /usr/share/doc
+-	if [ -e "$dir"/usr/share/doc ] \
++	# look for @TERMUX_PREFIX@/share/doc
++	if [ -e "$dir"/@TERMUX_PREFIX@/share/doc ] \
+ 			&& ! is_doc_pkg "$name"; then
+-		warning "Found /usr/share/doc but package name doesn't end with -doc"
++		warning "Found @TERMUX_PREFIX@/share/doc but package name doesn't end with -doc"
+ 	fi
+-	# look for /usr/share/man
+-	if [ -e "$dir"/usr/share/man ]; then
++	# look for @TERMUX_PREFIX@/share/man
++	if [ -e "$dir"/@TERMUX_PREFIX@/share/man ]; then
+ 		if ! is_doc_pkg "$name"; then
+-			warning "Found /usr/share/man but package name doesn't end with -doc"
+-		fi
+-		# check for uncompressed man pages
+-		i=$(find "$dir"/usr/share/man -name '*.[0-8]' -type f | sed "s|^$dir|\t|")
+-		if [ -n "$i" ]; then
+-			error "Found uncompressed man pages:"
+-			echo "$i"
+-			return 1
++			warning "Found @TERMUX_PREFIX@/share/man but package name doesn't end with -doc"
+ 		fi
+ 	fi
+ 	# check directory permissions
+@@ -780,9 +749,9 @@
+ 			&& postcheck "$pkgbasedir/$subpkgname" "$subpkgname" ) || return 1
+ 	done
+ 	postcheck "$pkgdir" "$pkgname" || return 1
+-	# post check for /usr/share/locale
+-	if [ -d "$pkgdir"/usr/share/locale ]; then
+-		warning "Found /usr/share/locale"
++	# post check for @TERMUX_PREFIX@/share/locale
++	if [ -d "$pkgdir"/@TERMUX_PREFIX@/share/locale ]; then
++		warning "Found @TERMUX_PREFIX@/share/locale"
+ 		warning2 "Maybe add \$pkgname-lang to subpackages?"
+ 	fi
+ }
+@@ -792,7 +761,7 @@
+ 	install_if="$pkgname=$pkgver-r$pkgrel lang"
+ 
+ 	local dir
+-	for dir in ${langdir:-/usr/share/locale}; do
++	for dir in ${langdir:-@TERMUX_PREFIX@/share/locale}; do
+ 		mkdir -p "$subpkgdir"/${dir%/*}
+ 		mv "$pkgdir"/"$dir" "$subpkgdir"/"$dir" || return 1
+ 	done
+@@ -811,7 +780,7 @@
+ 	install_if="$pkgname=$pkgver-r$pkgrel lang-$lang"
+ 
+ 	local dir
+-	for dir in ${langdir:-/usr/share/locale}; do
++	for dir in ${langdir:-@TERMUX_PREFIX@/share/locale}; do
+ 		mkdir -p "$subpkgdir"/$dir
+ 		mv "$pkgdir"/$dir/$lang* \
+ 		"$subpkgdir"/$dir/ \
+@@ -866,7 +835,7 @@
+ 
+ check_license() {
+ 	local ret=0
+-	local license_list=/usr/share/spdx/license.lst
++	local license_list=@TERMUX_PREFIX@/share/spdx/license.lst
+ 	local exclude="AND OR WITH"
+ 	if options_has "!spdx" || ! [ -f "$license_list" ]; then
+ 		return 0
+@@ -939,10 +908,7 @@
+ 	local builddate=$(date -u "+%s")
+ 
+ 	# Fix package size on several filesystems
+-	case "$(df -PT . | awk 'END {print $2}')" in
+-	btrfs|ecryptfs|zfs)
+-		sync;;
+-	esac
++	sync
+ 
+ 	local size=$(du -sk | awk '{print $1 * 1024}')
+ 
+@@ -955,7 +921,7 @@
+ 
+ 	echo "# Generated by $(basename "$abuild_path") $program_version" >"$pkginfo"
+ 	if [ -n "$FAKEROOTKEY" ]; then
+-		echo "# using $($FAKEROOT -v)" >> "$pkginfo"
++		echo "# using $(fakeroot -v)" >> "$pkginfo"
+ 	fi
+ 	echo "# $(date -u)" >> "$pkginfo"
+ 	cat >> "$pkginfo" <<-EOF
+@@ -975,9 +941,9 @@
+ 		for i in $install $triggers; do
+ 			local s=${i%=*}
+ 			[ "$name" != "${s%.*}" ] && continue
+-			if head -n 1 "$startdir/$s" | grep '^#!/bin/sh' >/dev/null ; then
+-				msg "Script found. /bin/sh added as a dependency for $pkg"
+-				deps="$deps /bin/sh"
++			if head -n 1 "$startdir/$s" | grep '^#!@TERMUX_PREFIX@/bin/sh' >/dev/null ; then
++				msg "Script found. @TERMUX_PREFIX@/bin/sh added as a dependency for $pkg"
++				deps="$deps @TERMUX_PREFIX@/bin/sh"
+ 				break
+ 			fi
+ 		done
+@@ -1049,8 +1015,8 @@
+ 	scanelf --quiet --recursive --rpath "$dir" \
+ 		| sed -e 's/[[:space:]].*//' -e 's/:/\n/' | sort -u \
+ 		>"$controldir"/.rpaths
+-	if grep -q -x '/usr/lib' "$controldir"/.rpaths; then
+-		warning "Redundant /usr/lib in rpath found"
++	if grep -q -x '@TERMUX_PREFIX@/lib' "$controldir"/.rpaths; then
++		warning "Redundant @TERMUX_PREFIX@/lib in rpath found"
+ 	fi
+ 	if grep '^/home/' "$controldir"/.rpaths; then
+ 		error "Has /home/... in rpath"
+@@ -1076,12 +1042,12 @@
+ 	local dir="${subpkgdir:-$pkgdir}"
+ 	options_has "!tracedeps" && return 0
+ 	cd "$dir" || return 1
+-	for i in usr/lib/pkgconfig/*.pc; do
++	for i in ./@TERMUX_PREFIX@/lib/pkgconfig/*.pc; do
+ 		if ! [ -e "$i" ]; then
+ 			continue
+ 		fi
+ 		local f=${i##*/}
+-		local v=$(PKG_CONFIG_PATH="$dir"/usr/lib/pkgconfig PKG_CONFIG_MAXIMUM_TRAVERSE_DEPTH=1 pkg-config \
++		local v=$(PKG_CONFIG_PATH="$dir"/@TERMUX_PREFIX@/lib/pkgconfig PKG_CONFIG_MAXIMUM_TRAVERSE_DEPTH=1 pkg-config \
+ 			--modversion ${f%.pc})
+ 		echo "$pcprefix${f%.pc}=${v:-0}" >> "$controldir"/.provides-pc
+ 	done
+@@ -1176,12 +1142,19 @@
+ 	return 1
+ }
+ 
+-# search rpaths and /usr/lib /lib for given so files
++# search rpaths and @TERMUX_PREFIX@/lib for given so files
+ find_so_files() {
++	local android_libs
+ 	local rpaths=$(cat "$1")
+ 	shift
++
++	case ${CTARGET_ARCH} in
++	aarch64|x86_64) android_libs="/system/lib64" ;;
++	*) android_libs="/system/lib" ;;
++	esac
++
+ 	while [ $# -gt 0 ]; do
+-		real_so_path "$1" /usr/lib /lib $rpaths || return 1
++		real_so_path "$1" @TERMUX_PREFIX@/lib $rpaths $android_libs || return 1
+ 		shift
+ 	done
+ 	return 0
+@@ -1219,20 +1192,12 @@
+ 	esac
+ 
+ 	msg "Tracing dependencies..."
+-	# add pkgconfig if usr/lib/pkgconfig is found
+-	if [ -d "$pkgbasedir"/$name/usr/lib/pkgconfig ] \
++	# add pkgconfig if @TERMUX_PREFIX@/lib/pkgconfig is found
++	if [ -d "$pkgbasedir"/$name/@TERMUX_PREFIX@/lib/pkgconfig ] \
+ 			&& ! grep -q '^depend = pkgconfig' "$dir"/.PKGINFO; then
+ 		autodeps="$autodeps pkgconfig"
+ 	fi
+ 
+-	# special case for libpthread: we need depend on libgcc
+-	if [ "$CLIBC" = "uclibc" ] && [ -f "$dir"/.needs-so ] \
+-			&& grep -q -w '^libpthread.so.*' "$dir"/.needs-so \
+-			&& ! grep -q -w "^depend = libgcc" "$dir"/.PKGINFO; then
+-		autodeps="$autodeps libgcc"
+-		msg "  added libgcc (due to libpthread)"
+-	fi
+-
+ 	[ -f "$dir"/.needs-so ] && for i in $(cat "$dir"/.needs-so); do
+ 		# first check if its provided by same apkbuild
+ 		grep -q -w "^$sonameprefix$i" "$dir"/.provides-so 2>/dev/null && continue
+@@ -1249,7 +1214,7 @@
+ 
+ 	# find all packages that holds the so files
+ 	if [ -f "$dir"/.rpaths ]; then
+-		local so_files=$(find_so_files "$dir"/.rpaths $missing) \
++		local so_files=$(find_so_files "$dir"/.rpaths $missing | grep -v /system/lib) \
+ 			|| return 1
+ 		deppkgs=$($APK $apkroot info --quiet --who-owns $so_files) || return 1
+ 	fi
+@@ -1283,7 +1248,7 @@
+ 			autodeps="$autodeps pc:$i"
+ 		else
+ 			warning "Could not find any provider for pc:$i"
+-			local pcfile=/usr/lib/pkgconfig/"${i%%[<>=]*}".pc
++			local pcfile=@TERMUX_PREFIX@/lib/pkgconfig/"${i%%[<>=]*}".pc
+ 			if [ -e "$pcfile" ]; then
+ 				local owner=$($APK $apkroot info --quiet --who-owns $pcfile)
+ 				warning "${owner:-package providing $pcfile} needs to be rebuilt"
+@@ -1315,7 +1280,7 @@
+ 
+ find_scanelf_paths() {
+ 	local datadir="$1"
+-	local paths="$datadir/lib:$datadir/usr/lib" i= rpaths=
++	local paths="$datadir/lib" i= rpaths=
+ 	if [ -n "$ldpath" ]; then
+ 		paths="$paths:$(echo "${datadir}${ldpath}" | sed "s|:|:$datadir|g")"
+ 	fi
+@@ -1461,7 +1426,7 @@
+ 	name="$(pkginfo_val pkgname "$controldir"/.PKGINFO)"
+ 	datadir="$pkgbasedir"/$name
+ 	for i in $(sort -u "$provides_pc"); do
+-		PKG_CONFIG_PATH="$datadir"/usr/lib/pkgconfig pkg-config \
++		PKG_CONFIG_PATH="$datadir"/@TERMUX_PREFIX@/lib/pkgconfig pkg-config \
+ 				--print-requires \
+ 				--print-requires-private ${i%=*} \
+ 				| sed -E 's/\s*([<>=]+)\s*/\1/' \
+@@ -1555,7 +1520,7 @@
+ 		logcmd "building $repo/$pkgname-$pkgver-r$pkgrel"
+ 		local _starttime=$(date --utc +%s)
+ 		msg "Building $repo/$pkgname $pkgver-r$pkgrel (using $program $program_version) started $(date -R)"
+-		for part in sanitycheck builddeps clean fetch unpack prepare mkusers build \
++		for part in sanitycheck builddeps clean fetch unpack prepare build \
+ 				$_check rootpkg; do
+ 			runpart $part
+ 		done
+@@ -1625,14 +1590,14 @@
+ 
+ 	local i
+ 	for i in doc man info html sgml licenses gtk-doc ri help; do
+-		if [ -d "$pkgdir/usr/share/$i" ]; then
+-			mkdir -p "$subpkgdir/usr/share"
+-			mv "$pkgdir/usr/share/$i" "$subpkgdir/usr/share/"
++		if [ -d "$pkgdir/@TERMUX_PREFIX@/share/$i" ]; then
++			mkdir -p "$subpkgdir/@TERMUX_PREFIX@/share"
++			mv "$pkgdir/@TERMUX_PREFIX@/share/$i" "$subpkgdir/@TERMUX_PREFIX@/share/"
+ 		fi
+ 	done
+ 
+ 	# compress man pages
+-	local mandir="$subpkgdir"/usr/share/man
++	local mandir="$subpkgdir"/@TERMUX_PREFIX@/share/man
+ 	[ -d "$mandir" ] && find "$mandir" -type l \
+ 		-a \( -name \*.[0-8n] -o -name \*.[0-8][a-z]* \) \
+ 		-a \! \( -name '*.gz' -o -name '*.bz2' -o -name '*.xz' \) \
+@@ -1664,10 +1629,10 @@
+ 		[ $islink -eq 0 ] && $gzip -9 "$name"
+ 	done
+ 
+-	rm -f "$subpkgdir/usr/share/info/dir"
++	rm -f "$subpkgdir/@TERMUX_PREFIX@/share/info/dir"
+ 
+ 	# remove if empty, ignore error (not empty)
+-	rmdir "$pkgdir/usr/share" "$pkgdir/usr" 2>/dev/null || :
++	rmdir "$pkgdir/@TERMUX_PREFIX@/share" "$pkgdir" 2>/dev/null || :
+ }
+ 
+ doc() {
+@@ -1682,19 +1647,15 @@
+ 	scanelf -R "$pkgdir" | grep ET_DYN | sed "s:$pkgdir\/::g" | sed "s:ET_DYN ::g" | while read f; do
+ 		local ddbg_srcdir=$(dirname "$pkgdir/$f")
+ 		local ddbg_srcfile=$(basename "$pkgdir/$f")
+-		local ddbg_dstdir=$(dirname "$subpkgdir/usr/lib/debug/$f.debug")
+-		local ddbg_dstfile=$(basename "$subpkgdir/usr/lib/debug/$f.debug")
++		local ddbg_dstdir=$(dirname "$subpkgdir/@TERMUX_PREFIX@/lib/debug/$f.debug")
++		local ddbg_dstfile=$(basename "$subpkgdir/@TERMUX_PREFIX@/lib/debug/$f.debug")
+ 		mkdir -p "$ddbg_dstdir"
+ 
+ 		cd "$ddbg_srcdir"
+-		local xattr=$(getfattr --match="" --dump "${ddbg_srcfile}")
+ 		${CROSS_COMPILE}objcopy --only-keep-debug "$ddbg_srcfile" "$ddbg_dstfile"
+ 		${CROSS_COMPILE}objcopy --add-gnu-debuglink="$ddbg_dstfile" "$ddbg_srcdir/$ddbg_srcfile"
+ 		mv "$ddbg_dstfile" "$ddbg_dstdir"
+ 		${CROSS_COMPILE}strip "$ddbg_srcfile"
+-		if [ -n "$xattr" ]; then
+-			echo "$xattr" | setfattr --restore=-
+-		fi
+ 	done
+ 	return 0
+ }
+@@ -1710,14 +1671,14 @@
+ 	pkgdesc="$pkgdesc (development files)"
+ 
+ 	cd "$pkgdir" || return 0
+-	local libdirs=usr/
++	local libdirs=./@TERMUX_PREFIX@/lib
+ 	[ -d lib/ ] && libdirs="lib/ $libdirs"
+-	for i in usr/include usr/lib/pkgconfig usr/share/aclocal\
+-			usr/share/gettext usr/bin/*-config	\
+-			usr/share/vala/vapi usr/share/gir-[0-9]*\
+-			usr/share/qt*/mkspecs			\
+-			usr/lib/qt*/mkspecs			\
+-			usr/lib/cmake				\
++	for i in ./@TERMUX_PREFIX@/lib/pkgconfig ./@TERMUX_PREFIX@/share/aclocal \
++			./@TERMUX_PREFIX@/share/gettext ./@TERMUX_PREFIX@/bin/*-config	\
++			./@TERMUX_PREFIX@/share/vala/vapi ./@TERMUX_PREFIX@/share/gir-[0-9]* \
++			./@TERMUX_PREFIX@/share/qt*/mkspecs \
++			./@TERMUX_PREFIX@/lib/qt*/mkspecs \
++			./@TERMUX_PREFIX@/lib/cmake \
+ 			$(find . -name include -type d)	\
+ 			$([ -z "${subpackages##*$pkgname-static*}" ] && find $libdirs \
+ 				-name '*.a' 2>/dev/null) \
+@@ -1808,27 +1769,11 @@
+ 	type "$1" 2>&1 | head -n 1 | egrep -q "is a (shell )?function"
+ }
+ 
+-do_fakeroot() {
+-	if [ -n "$FAKEROOT" ]; then
+-		$FAKEROOT -- "$@"
+-	else
+-		"$@"
+-	fi
+-}
+-
+-# wrap check() with fakeroot
+-check_fakeroot() {
+-	cd "$startdir"
+-	[ -n "$FAKEROOT" ] && msg "Entering fakeroot..."
+-	do_fakeroot "$abuild_path" $forceroot $color_opt $keep_build check
+-}
+-
+ # build and package in fakeroot
+ rootpkg() {
+ 	cd "$startdir"
+ 	rm -rf "$pkgdir"
+-	[ -n "$FAKEROOT" ] && msg "Entering fakeroot..."
+-	do_fakeroot "$abuild_path" $forceroot $color_opt $keep_build \
++	"$abuild_path" $forceroot $color_opt $keep_build \
+ 		package \
+ 		prepare_subpackages \
+ 		prepare_language_packs \
+@@ -2151,7 +2096,7 @@
+ 			$install_deps $recursive $upgrade $color_opt \
+ 			abuildindex || return 1
+ 	done
+-	$SUDO_APK add --upgrade --repository "$REPODEST/$repo" \
++	$APK add --upgrade --repository "$REPODEST/$repo" \
+ 		$apk_opt_wait \
+ 		--virtual .makedepends-$pkgname $builddeps \
+ 		|| return 1
+@@ -2218,8 +2163,6 @@
+ 
+ 	msg "Preparing build chroot..."
+ 
+-	mkusers
+-
+ 	BUILD_ROOT=$(mktemp -d /var/tmp/abuild.XXXXXXXXXX)
+ 	local aportsgit=${APORTSDIR:-${startdir}}
+ 
+@@ -2260,7 +2203,7 @@
+ 	) < "$repo_template" > "$BUILD_ROOT/etc/apk/repositories"
+ 
+ 	calcdeps
+-	$SUDO_APK add --initdb --root "$BUILD_ROOT" --update \
++	$APK add --initdb --root "$BUILD_ROOT" --update \
+ 		abuild alpine-base build-base git $hostdeps $builddeps
+ 
+ 	local bwrap_opts=""
+@@ -2307,11 +2250,7 @@
+ 		[ -e "$filename" ] || continue
+ 
+ 		[ "$osabi" != "STANDALONE" ] || continue
+-		local XATTR=$(getfattr --match="" --dump "${filename}")
+ 		"${stripcmd}" "${filename}"
+-		if [ -n "$XATTR" ]; then
+-			echo "$XATTR" | setfattr --restore=-
+-		fi
+ 	done
+ }
+ 
+@@ -2401,22 +2340,22 @@
+ 
+ 	local _quiet="$1"
+ 	[ -z "$_quiet" ] && msg "Installing for build:$builddeps"
+-	$SUDO_APK add $_quiet $apk_opt_wait --repository "$REPODEST/$repo" \
++	$APK add $_quiet $apk_opt_wait --repository "$REPODEST/$repo" \
+ 		--virtual .makedepends-$pkgname \
+ 		$builddeps \
+ 		|| return 1
+ 	if [ -n "$CBUILDROOT" ]; then
+ 		[ -z "$_quiet" ] && msg "Installing for host:$hostdeps"
+-		$SUDO_APK add $_quiet --root "$CBUILDROOT" --arch "$CTARGET_ARCH" --repository "$REPODEST/$repo" $apk_opt_wait \
++		$APK add $_quiet --root "$CBUILDROOT" --arch "$CTARGET_ARCH" --repository "$REPODEST/$repo" $apk_opt_wait \
+ 			--no-scripts --virtual .makedepends-$pkgname $hostdeps || return 1
+ 	fi
+ }
+ 
+ undeps() {
+ 	local _quiet="$@"
+-	$SUDO_APK del $_quiet $apk_opt_wait .makedepends-$pkgname || :
++	$APK del $_quiet $apk_opt_wait .makedepends-$pkgname || :
+ 	if [ -n "$CBUILDROOT" ]; then
+-		$SUDO_APK del $_quiet --root "$CBUILDROOT" --arch "$CTARGET_ARCH" $apk_opt_wait \
++		$APK del $_quiet --root "$CBUILDROOT" --arch "$CTARGET_ARCH" $apk_opt_wait \
+ 			--no-scripts .makedepends-$pkgname || :
+ 	fi
+ }
+@@ -2536,7 +2475,7 @@
+ 		  package     Install project into $pkgdir
+ 		  prepare     Apply patches
+ 		  rootbld     Build package in clean chroot
+-		  rootpkg     Run 'package', the split functions and create apks as fakeroot
++		  rootpkg     Run 'package', the split functions and create apks
+ 		  sanitycheck Basic sanity check of APKBUILD
+ 		  snapshot    Create a \$giturl or \$svnurl snapshot and upload to \$disturl
+ 		  sourcecheck Check if remote source package exists upstream
+@@ -2618,7 +2557,7 @@
+ if [ -z "$REPODEST" ]; then
+ 	warning "REPODEST is not set and is now required. Defaulting to ~/packages"
+ 	[ -n "$PKGDEST" ] && die "PKGDEST is no longer supported."
+-	REPODEST="~/packages"
++	REPODEST="$HOME/packages"
+ fi
+ 
+ # for recursive action

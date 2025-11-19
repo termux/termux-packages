@@ -1,0 +1,32 @@
+diff -uNr crunch-3.6/Makefile crunch-3.6.mod/Makefile
+--- crunch-3.6/Makefile	2014-05-03 20:04:11.000000000 +0300
++++ crunch-3.6.mod/Makefile	2019-01-31 00:31:33.642061600 +0200
+@@ -28,7 +28,7 @@
+ # General variables
+ PACKAGE	    = crunch
+ VERSION	    = 3.6
+-PREFIX	    = /usr
++PREFIX	    ?= /usr
+ DISTDIR	    = $(PACKAGE)-$(VERSION)
+ DISTFILES   = crunch.c crunch.1 charset.lst
+ BINDIR	    = $(PREFIX)/bin
+@@ -37,8 +37,8 @@
+ DOCDIR	    = $(PREFIX)/share/doc/$(PACKAGE)
+ MANDIR	    = $(PREFIX)/share/man/man1
+ 
+-INSTALL	    = sudo $(shell which install)
+-CC	    = $(shell which gcc)
++INSTALL	    = $(shell which install)
++CC	    ?= $(shell which gcc)
+ LIBFLAGS    = -lm
+ THREADFLAGS = -pthread
+ OPTFLAGS    = -g -o0
+@@ -56,7 +56,7 @@
+  LFS=""  
+ else
+ #non-mac as you were 
+-  INSTALL_OPTIONS = -g root -o root
++  INSTALL_OPTIONS =
+ endif
+ 
+ # Default target

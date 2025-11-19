@@ -1,0 +1,18 @@
+Do not fail if "/" is not accessible - which it is not on Android starting
+with Android 7.0.
+
+diff -u -r ../mlocate-0.26/src/locate.c ./src/locate.c
+--- ../mlocate-0.26/src/locate.c	2012-09-22 03:48:54.000000000 +0200
++++ ./src/locate.c	2017-09-22 20:57:44.062275402 +0200
+@@ -1026,11 +1027,6 @@
+   uc_obstack_mark = obstack_alloc (&uc_obstack, 0);
+   obstack_init (&check_stack_obstack);
+   res = EXIT_FAILURE;
+-  /* Don't call access ("/", R_OK | X_OK) all the time.  This is too strict,
+-     it is possible to have "/" --x and have a database describing a
+-     subdirectory, but that is just too improbable. */
+-  if (conf_statistics == false && access ("/", R_OK | X_OK) != 0)
+-    goto done;
+   for (i = 0; i < conf_dbpath.len; i++)
+     {
+       if (conf_output_limit_set != false && matches_found >= conf_output_limit)

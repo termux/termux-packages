@@ -1,0 +1,227 @@
+Enables su, disables use of su by non-root users,
+and disables selinux, getenforce, load_policy, restorecon, runcon, setenforce and chcon.
+
+Plus, these commits cherry-picked and slightly rewritten, mainly noted here to serve as documentation
+of landley's strong implication that this su implementation is probably intended for compatibility with Android,
+making it the closest possible thing to an "official" implementation of su on Android there is.
+https://github.com/landley/toybox/commit/0bb61e3aefc32940d8578eb174bf6e39dca17c35
+https://github.com/landley/toybox/commit/20eb4585a140a4bcd7901d4892a3222ff9f0d122
+
+--- a/external/toybox/Android.mk
++++ b/external/toybox/Android.mk
+@@ -65,13 +65,8 @@ common_SRC_FILES := \
+     lib/portability.c \
+     lib/xwrap.c \
+     main.c \
+-    toys/android/getenforce.c \
+-    toys/android/load_policy.c \
+     toys/android/log.c \
+-    toys/android/restorecon.c \
+-    toys/android/runcon.c \
+     toys/android/sendevent.c \
+-    toys/android/setenforce.c \
+     toys/android/setprop.c \
+     toys/android/start.c \
+     toys/lsb/dmesg.c \
+@@ -83,6 +78,7 @@ common_SRC_FILES := \
+     toys/lsb/mount.c \
+     toys/lsb/pidof.c \
+     toys/lsb/seq.c \
++    toys/lsb/su.c \
+     toys/lsb/sync.c \
+     toys/lsb/umount.c \
+     toys/net/ifconfig.c \
+@@ -95,7 +91,6 @@ common_SRC_FILES := \
+     toys/other/base64.c \
+     toys/other/blkid.c \
+     toys/other/blockdev.c \
+-    toys/other/chcon.c \
+     toys/other/chroot.c \
+     toys/other/chrt.c \
+     toys/other/clear.c \
+@@ -234,7 +229,7 @@ common_CFLAGS := \
+     -ffunction-sections -fdata-sections \
+     -fno-asynchronous-unwind-tables \
+ 
+-toybox_libraries := liblog libselinux libcutils libcrypto libz
++toybox_libraries := liblog libcutils libcrypto libz
+ 
+ common_CFLAGS += -DTOYBOX_VENDOR=\"-android\"
+ 
+@@ -251,7 +246,6 @@ ALL_TOOLS := \
+     blockdev \
+     cal \
+     cat \
+-    chcon \
+     chgrp \
+     chmod \
+     chown \
+@@ -282,7 +276,6 @@ ALL_TOOLS := \
+     flock \
+     fmt \
+     free \
+-    getenforce \
+     groups \
+     gunzip \
+     gzip \
+@@ -297,7 +290,6 @@ ALL_TOOLS := \
+     iorenice \
+     kill \
+     killall \
+-    load_policy \
+     ln \
+     log \
+     logname \
+@@ -338,15 +330,12 @@ ALL_TOOLS := \
+     readlink \
+     realpath \
+     renice \
+-    restorecon \
+     rm \
+     rmdir \
+     rmmod \
+-    runcon \
+     sed \
+     sendevent \
+     seq \
+-    setenforce \
+     setprop \
+     setsid \
+     sha1sum \
+@@ -361,6 +350,7 @@ ALL_TOOLS := \
+     stat \
+     stop \
+     strings \
++    su \
+     stty \
+     swapoff \
+     swapon \
+--- a/external/toybox/generated/config.h
++++ b/external/toybox/generated/config.h
+@@ -36,8 +36,8 @@
+ #define USE_TOYBOX_ANDROID_SCHEDPOLICY(...) __VA_ARGS__
+ #define CFG_TOYBOX_PEDANTIC_ARGS 0
+ #define USE_TOYBOX_PEDANTIC_ARGS(...)
+-#define CFG_TOYBOX_SELINUX 1
+-#define USE_TOYBOX_SELINUX(...) __VA_ARGS__
++#define CFG_TOYBOX_SELINUX 0
++#define USE_TOYBOX_SELINUX(...)
+ #define CFG_TOYBOX_SHADOW 0
+ #define USE_TOYBOX_SHADOW(...)
+ #define CFG_TOYBOX_SMACK 0
+@@ -84,8 +84,8 @@
+ #define USE_CD(...)
+ #define CFG_CHATTR 1
+ #define USE_CHATTR(...) __VA_ARGS__
+-#define CFG_CHCON 1
+-#define USE_CHCON(...) __VA_ARGS__
++#define CFG_CHCON 0
++#define USE_CHCON(...)
+ #define CFG_CHGRP 1
+ #define USE_CHGRP(...) __VA_ARGS__
+ #define CFG_CHMOD 1
+@@ -206,8 +206,8 @@
+ #define USE_FTPGET(...)
+ #define CFG_FTPPUT 0
+ #define USE_FTPPUT(...)
+-#define CFG_GETENFORCE 1
+-#define USE_GETENFORCE(...) __VA_ARGS__
++#define CFG_GETENFORCE 0
++#define USE_GETENFORCE(...)
+ #define CFG_GETFATTR 1
+ #define USE_GETFATTR(...) __VA_ARGS__
+ #define CFG_GETPROP 0
+@@ -288,8 +288,8 @@
+ #define USE_LINK(...)
+ #define CFG_LN 1
+ #define USE_LN(...) __VA_ARGS__
+-#define CFG_LOAD_POLICY 1
+-#define USE_LOAD_POLICY(...) __VA_ARGS__
++#define CFG_LOAD_POLICY 0
++#define USE_LOAD_POLICY(...)
+ #define CFG_LOGGER 0
+ #define USE_LOGGER(...)
+ #define CFG_LOGIN 0
+@@ -440,8 +440,8 @@
+ #define USE_RENICE(...) __VA_ARGS__
+ #define CFG_RESET 0
+ #define USE_RESET(...)
+-#define CFG_RESTORECON 1
+-#define USE_RESTORECON(...) __VA_ARGS__
++#define CFG_RESTORECON 0
++#define USE_RESTORECON(...)
+ #define CFG_REV 1
+ #define USE_REV(...) __VA_ARGS__
+ #define CFG_RFKILL 1
+@@ -454,16 +454,16 @@
+ #define USE_RM(...) __VA_ARGS__
+ #define CFG_ROUTE 0
+ #define USE_ROUTE(...)
+-#define CFG_RUNCON 1
+-#define USE_RUNCON(...) __VA_ARGS__
++#define CFG_RUNCON 0
++#define USE_RUNCON(...)
+ #define CFG_SED 1
+ #define USE_SED(...) __VA_ARGS__
+ #define CFG_SENDEVENT 1
+ #define USE_SENDEVENT(...) __VA_ARGS__
+ #define CFG_SEQ 1
+ #define USE_SEQ(...) __VA_ARGS__
+-#define CFG_SETENFORCE 1
+-#define USE_SETENFORCE(...) __VA_ARGS__
++#define CFG_SETENFORCE 0
++#define USE_SETENFORCE(...)
+ #define CFG_SETFATTR 1
+ #define USE_SETFATTR(...) __VA_ARGS__
+ #define CFG_SETPROP 1
+@@ -510,8 +510,8 @@
+ #define USE_STRINGS(...) __VA_ARGS__
+ #define CFG_STTY 1
+ #define USE_STTY(...) __VA_ARGS__
+-#define CFG_SU 0
+-#define USE_SU(...)
++#define CFG_SU 1
++#define USE_SU(...) __VA_ARGS__
+ #define CFG_SULOGIN 0
+ #define USE_SULOGIN(...)
+ #define CFG_SWAPOFF 1
+--- a/external/toybox/toys/lsb/su.c
++++ b/external/toybox/toys/lsb/su.c
+@@ -41,9 +41,8 @@ static char *snapshot_env(char *name)
+ 
+ void su_main()
+ {
+-  char *name, *passhash = 0, **argu, **argv;
++  char *name, **argu, **argv;
+   struct passwd *up;
+-  struct spwd *shp;
+ 
+   if (*toys.optargs && !strcmp("-", *toys.optargs)) {
+     toys.optflags |= FLAG_l;
+@@ -53,13 +52,22 @@ void su_main()
+   if (*toys.optargs) name = *(toys.optargs++);
+   else name = "root";
+ 
+-  if (!(shp = getspnam(name))) perror_exit("no '%s'", name);
+   if (getuid()) {
+-    if (*shp->sp_pwdp != '$') goto deny;
++    // /etc/shadow does not exist on android, so this su implementation can
++    // only be successfully called by root (getuid() returning 0)
++    /*
++    if (!(shadow = get_userline("/etc/shadow", name)))
++      perror_exit("no '%s'", name);
++    if (*shadow[1] != '$') goto deny;
+     if (read_password(toybuf, sizeof(toybuf), "Password: ")) goto deny;
+-    passhash = crypt(toybuf, shp->sp_pwdp);
++    passhash = crypt(toybuf, shadow[1]);
++    if (!passhash || strcmp(passhash, shadow[1])) name = 0;
+     memset(toybuf, 0, sizeof(toybuf));
+-    if (!passhash || strcmp(passhash, shp->sp_pwdp)) goto deny;
++    memset(shadow[1], 0, strlen(shadow[1]));
++    if (passhash) memset(passhash, 0, strlen(passhash));
++    if (!name) goto deny;
++    */
++    goto deny;
+   }
+ 
+   up = xgetpwnam(name);

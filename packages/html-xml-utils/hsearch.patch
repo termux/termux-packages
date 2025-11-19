@@ -1,0 +1,54 @@
+diff -uNr html-xml-utils-7.9/hash.c html-xml-utils-7.9.mod/hash.c
+--- html-xml-utils-7.9/hash.c	2018-02-23 14:29:48.000000000 +0000
++++ html-xml-utils-7.9.mod/hash.c	2020-11-05 23:28:18.967247150 +0000
+@@ -1,4 +1,4 @@
+-#ifndef HAVE_SEARCH_H
++#ifndef DONTHAVE_SEARCH_H
+ /*
+  * hsearch() on Mac OS X 10.1.2 appears to be broken: there is no
+  * search.h; there is a search() in the C library, but it doesn't work
+diff -uNr html-xml-utils-7.9/hxcite.c html-xml-utils-7.9.mod/hxcite.c
+--- html-xml-utils-7.9/hxcite.c	2018-02-23 14:29:48.000000000 +0000
++++ html-xml-utils-7.9.mod/hxcite.c	2020-11-05 23:29:09.671568513 +0000
+@@ -89,11 +89,7 @@
+ # endif
+ #endif
+ 
+-#ifdef HAVE_SEARCH_H
+-#  include <search.h>
+-#else
+ #  include "hash.e"
+-#endif
+ 
+ #include <ctype.h>
+ #include <stdbool.h>
+diff -uNr html-xml-utils-7.9/hxmkbib.c html-xml-utils-7.9.mod/hxmkbib.c
+--- html-xml-utils-7.9/hxmkbib.c	2018-02-23 14:29:48.000000000 +0000
++++ html-xml-utils-7.9.mod/hxmkbib.c	2020-11-05 23:29:04.327113033 +0000
+@@ -88,11 +88,7 @@
+ #include <stdlib.h>
+ #include <assert.h>
+ 
+-#ifdef HAVE_SEARCH_H
+-#  include <search.h>
+-#else
+ #  include "hash.e"		/* Use our own implementation */
+-#endif
+ 
+ #include <ctype.h>
+ #include <stdbool.h>
+diff -uNr html-xml-utils-7.9/hxref.c html-xml-utils-7.9.mod/hxref.c
+--- html-xml-utils-7.9/hxref.c	2018-02-23 14:29:48.000000000 +0000
++++ html-xml-utils-7.9.mod/hxref.c	2020-11-05 23:29:15.588072744 +0000
+@@ -35,11 +35,7 @@
+ #ifdef HAVE_ERRNO_H
+ #  include <errno.h>
+ #endif
+-#ifdef HAVE_SEARCH_H
+-#  include <search.h>
+-#else
+ #  include "hash.e"
+-#endif
+ 
+ #if STDC_HEADERS
+ # include <string.h>

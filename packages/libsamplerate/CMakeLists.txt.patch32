@@ -1,0 +1,15 @@
+libvorbisfile uses some functions that are provided by libm
+in 32-bit builds, while 64-bit builds has them as intrinsics.
+
+diff -u -r ../libsamplerate-0.2.2/CMakeLists.txt ./CMakeLists.txt
+--- ../libsamplerate-0.2.2/CMakeLists.txt	2021-09-05 11:48:12.000000000 +0000
++++ ./CMakeLists.txt	2024-06-02 20:21:49.112629567 +0000
+@@ -67,6 +67,8 @@
+   endif()
+ endif()
+
++link_libraries(m)
++
+ if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID MATCHES "Clang")
+   option(LIBSAMPLERATE_ENABLE_SANITIZERS "Enable ASAN and UBSAN" OFF)
+

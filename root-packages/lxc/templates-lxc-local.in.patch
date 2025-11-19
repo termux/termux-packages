@@ -1,0 +1,12 @@
+diff -uNr lxc-3.1.0/templates/lxc-local.in lxc-3.1.0.mod/templates/lxc-local.in
+--- lxc-3.1.0/templates/lxc-local.in	2018-12-14 01:13:51.000000000 +0200
++++ lxc-3.1.0.mod/templates/lxc-local.in	2019-07-13 19:37:11.128180850 +0300
+@@ -146,7 +146,7 @@
+ 
+ # Create temporary directory to
+ if ! command -V mktemp >/dev/null 2>&1; then
+-  LOCAL_TEMP=/tmp/lxc-local.$$
++  LOCAL_TEMP=@TERMUX_PREFIX@/tmp/lxc-local.$$
+   mkdir -p "${LOCAL_TEMP}"
+ else
+   LOCAL_TEMP=$(mktemp -d)

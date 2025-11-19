@@ -1,0 +1,143 @@
+From 372f7b4b76cde4ca1ec4605353dd17898a99de38 Mon Sep 17 00:00:00 2001
+From: "Timothy B. Terriberry" <tterribe@xiph.org>
+Date: Mon, 15 Apr 2024 11:27:25 -0700
+Subject: [PATCH] Fix compilation errors.
+
+vec_avx.h needs x86cpu.h, and x86cpu.h needs to detect SSE2 (or
+ greater) without the Opus macros.
+Also, nobody was defining OPUS_CLEAR (but several things were
+ including the non-existent os_support.h where it is defined in
+ libopus), so replace those calls with RNN_CLEAR and remove the
+ erroneous includes.
+Take the opportunity to hoist OPUS_GNUC_PREREQ to common.h, too,
+ since it is needed in multiple places now.
+
+Fixes GitHub #222
+---
+ src/common.h     | 8 ++++++++
+ src/vec.h        | 9 ++++-----
+ src/vec_avx.h    | 2 +-
+ src/vec_neon.h   | 5 +++--
+ src/x86/x86cpu.h | 4 ++--
+ 5 files changed, 18 insertions(+), 10 deletions(-)
+
+diff --git a/src/common.h b/src/common.h
+index 5005bff..f9095ca 100644
+--- a/src/common.h
++++ b/src/common.h
+@@ -43,6 +43,14 @@ static RNN_INLINE void rnnoise_free (void *ptr)
+ #define RNN_CLEAR(dst, n) (memset((dst), 0, (n)*sizeof(*(dst))))
+ #endif
+ 
++# if !defined(OPUS_GNUC_PREREQ)
++#  if defined(__GNUC__)&&defined(__GNUC_MINOR__)
++#   define OPUS_GNUC_PREREQ(_maj,_min) \
++ ((__GNUC__<<16)+__GNUC_MINOR__>=((_maj)<<16)+(_min))
++#  else
++#   define OPUS_GNUC_PREREQ(_maj,_min) 0
++#  endif
++# endif
+ 
+ 
+ #endif
+diff --git a/src/vec.h b/src/vec.h
+index 8e96cbf..71b7afb 100644
+--- a/src/vec.h
++++ b/src/vec.h
+@@ -30,6 +30,7 @@
+ #define VEC_H
+ 
+ #include "opus_types.h"
++#include "common.h"
+ #include <math.h>
+ #include "arch.h"
+ #include "x86/x86_arch_macros.h"
+@@ -41,8 +42,6 @@
+ #include "vec_neon.h"
+ #else
+ 
+-#include "os_support.h"
+-
+ #define MAX_INPUTS (2048)
+ 
+ #define NO_OPTIMIZATIONS
+@@ -50,7 +49,7 @@
+ static inline void sgemv16x1(float *out, const float *weights, int rows, int cols, int col_stride, const float *x)
+ {
+    int i, j;
+-   OPUS_CLEAR(out, rows);
++   RNN_CLEAR(out, rows);
+    for (i=0;i<rows;i+=16)
+    {
+       for (j=0;j<cols;j++)
+@@ -84,7 +83,7 @@ static inline void sgemv16x1(float *out, const float *weights, int rows, int col
+ static inline void sgemv8x1(float *out, const float *weights, int rows, int cols, int col_stride, const float *x)
+ {
+    int i, j;
+-   OPUS_CLEAR(out, rows);
++   RNN_CLEAR(out, rows);
+    for (i=0;i<rows;i+=8)
+    {
+       for (j=0;j<cols;j++)
+@@ -124,7 +123,7 @@ static inline void sgemv(float *out, const float *weights, int rows, int cols, i
+ static inline void sparse_sgemv8x4(float *out, const float *w, const int *idx, int rows, const float *x)
+ {
+    int i, j;
+-   OPUS_CLEAR(out, rows);
++   RNN_CLEAR(out, rows);
+    for (i=0;i<rows;i+=8)
+    {
+       int cols;
+diff --git a/src/vec_avx.h b/src/vec_avx.h
+index b73a353..a5040b4 100644
+--- a/src/vec_avx.h
++++ b/src/vec_avx.h
+@@ -34,7 +34,7 @@
+ 
+ #include <immintrin.h>
+ #include <math.h>
+-/*#include "celt/x86/x86cpu.h"*/
++#include "x86/x86cpu.h"
+ 
+ #define MAX_INPUTS (2048)
+ 
+diff --git a/src/vec_neon.h b/src/vec_neon.h
+index e6432e2..31b736c 100644
+--- a/src/vec_neon.h
++++ b/src/vec_neon.h
+@@ -32,7 +32,8 @@
+ #define VEC_NEON_H
+ 
+ #include <arm_neon.h>
+-#include "os_support.h"
++#include "opus_types.h"
++#include "common.h"
+ 
+ #if defined(__arm__) && !defined(__aarch64__) && (__ARM_ARCH < 8 || !defined(__clang__))
+ /* Emulate vcvtnq_s32_f32() for ARMv7 Neon. */
+@@ -302,7 +303,7 @@ static inline void sgemv(float *out, const float *weights, int rows, int cols, i
+ static inline void sparse_sgemv8x4(float *out, const float *w, const int *idx, int rows, const float *x)
+ {
+    int i, j;
+-   OPUS_CLEAR(out, rows);
++   RNN_CLEAR(out, rows);
+    for (i=0;i<rows;i+=8)
+    {
+       int cols;
+diff --git a/src/x86/x86cpu.h b/src/x86/x86cpu.h
+index 97dcdbd..e214aba 100644
+--- a/src/x86/x86cpu.h
++++ b/src/x86/x86cpu.h
+@@ -36,8 +36,8 @@
+ int opus_select_arch(void);
+ # endif
+ 
+-# if defined(OPUS_X86_MAY_HAVE_SSE2)
+-#  include "opus_defines.h"
++# if defined(__SSE2__)
++#  include "common.h"
+ 
+ /*MOVD should not impose any alignment restrictions, but the C standard does,
+    and UBSan will report errors if we actually make unaligned accesses.
+-- 
+GitLab

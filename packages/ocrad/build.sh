@@ -1,0 +1,12 @@
+TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/ocrad/ocrad.html
+TERMUX_PKG_DESCRIPTION="Optical Character Recognition program based on a feature extraction method"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.29"
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/ocrad/ocrad-${TERMUX_PKG_VERSION}.tar.lz
+TERMUX_PKG_SHA256=11200cc6b0b7ba16884a72dccb58ef694f7aa26cd2b2041e555580f064d2d9e9
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libc++, libpng"
+TERMUX_PKG_BREAKS="ocrad-dev"
+TERMUX_PKG_REPLACES="ocrad-dev"

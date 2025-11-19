@@ -1,0 +1,31 @@
+--- a/src/qtxdg/xdgdirs.cpp
++++ b/src/qtxdg/xdgdirs.cpp
+@@ -108,7 +108,7 @@
+     const QString home = QFile::decodeName(qgetenv("HOME"));
+ 
+     if (home.isEmpty())
+-        return QString::fromLatin1("/tmp");
++        return QString::fromLatin1("@TERMUX_PREFIX@/tmp");
+     else if (dir == XdgDirs::Desktop)
+         fallback = QString::fromLatin1("%1/%2").arg(home, QLatin1String("Desktop"));
+     else
+@@ -266,8 +266,8 @@
+     QStringList dirs = d.split(QLatin1Char(':'), Qt::SkipEmptyParts);
+ 
+     if (dirs.isEmpty()) {
+-        dirs.append(QString::fromLatin1("/usr/local/share"));
+-        dirs.append(QString::fromLatin1("/usr/share"));
++        dirs.append(QString::fromLatin1("@TERMUX_PREFIX@/local/share"));
++        dirs.append(QString::fromLatin1("@TERMUX_PREFIX@/share"));
+     } else {
+         QMutableListIterator<QString> it(dirs);
+         while (it.hasNext()) {
+@@ -289,7 +289,7 @@
+     QStringList dirs;
+     const QString env = QFile::decodeName(qgetenv("XDG_CONFIG_DIRS"));
+     if (env.isEmpty())
+-        dirs.append(QString::fromLatin1("/etc/xdg"));
++        dirs.append(QString::fromLatin1("@TERMUX_PREFIX@/etc/xdg"));
+     else
+         dirs = env.split(QLatin1Char(':'), Qt::SkipEmptyParts);
+ 

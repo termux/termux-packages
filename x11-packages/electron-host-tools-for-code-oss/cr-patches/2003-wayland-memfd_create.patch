@@ -1,0 +1,14 @@
+--- a/third_party/wayland/src/cursor/os-compatibility.c
++++ b/third_party/wayland/src/cursor/os-compatibility.c
+@@ -42,6 +42,11 @@
+ 
+ #include "os-compatibility.h"
+ 
++#if defined(__ANDROID__) && __ANDROID_API__ < 26
++#include <sys/syscall.h>
++#define memfd_create(name,flags) syscall(SYS_memfd_create,name,flags)
++#endif
++
+ #ifndef HAVE_MKOSTEMP
+ static int
+ set_cloexec_or_close(int fd)

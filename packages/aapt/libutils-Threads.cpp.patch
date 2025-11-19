@@ -1,0 +1,56 @@
+--- a/core/libutils/Threads.cpp
++++ b/core/libutils/Threads.cpp
+@@ -36,7 +36,7 @@
+ 
+ #include <utils/Log.h>
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #include <processgroup/processgroup.h>
+ #include <processgroup/sched_policy.h>
+ #endif
+@@ -67,7 +67,7 @@
+ 
+ typedef void* (*android_pthread_entry)(void*);
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ struct thread_data_t {
+     thread_func_t   entryFunction;
+     void*           userData;
+@@ -133,7 +133,7 @@
+     pthread_attr_init(&attr);
+     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+ 
+-#if defined(__ANDROID__)  /* valgrind is rejecting RT-priority create reqs */
++#if defined(__ANDROID__) && !defined(__TERMUX__)  /* valgrind is rejecting RT-priority create reqs */
+     if (threadPriority != PRIORITY_DEFAULT || threadName != NULL) {
+         // Now that the pthread_t has a method to find the associated
+         // android_thread_id_t (pid) from pthread_t, it would be possible to avoid
+@@ -177,7 +177,7 @@
+     return 1;
+ }
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ static pthread_t android_thread_id_t_to_pthread(android_thread_id_t thread)
+ {
+     return (pthread_t) thread;
+@@ -303,7 +303,7 @@
+     gCreateThreadFn = func;
+ }
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ int androidSetThreadPriority(pid_t tid, int pri)
+ {
+     int rc = 0;
+@@ -845,7 +845,7 @@
+     return mRunning;
+ }
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ pid_t Thread::getTid() const
+ {
+     // mTid is not defined until the child initializes it, and the caller may need it earlier

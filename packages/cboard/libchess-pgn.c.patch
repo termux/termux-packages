@@ -1,0 +1,20 @@
+diff -u -r ../cboard-0.7.5/libchess/pgn.c ./libchess/pgn.c
+--- ../cboard-0.7.5/libchess/pgn.c	2018-09-17 15:58:48.000000000 +0000
++++ ./libchess/pgn.c	2018-12-19 00:16:27.204984323 +0000
+@@ -883,7 +883,6 @@
+   time_t now;
+   char tbuf[11] = { 0 };
+   struct tm *tp;
+-  struct passwd *pw = getpwuid (getuid ());
+   char host[64] = { 0 };
+ 
+   time (&now);
+@@ -904,7 +903,7 @@
+   if (pgn_tag_add (&g->tag, (char *) "Round", (char *) "-") != E_PGN_OK)
+     warn ("pgn_tag_add()");
+ 
+-  if (pgn_tag_add (&g->tag, (char *) "White", pw->pw_gecos) != E_PGN_OK)
++  if (pgn_tag_add (&g->tag, (char *) "White", (char *) "You") != E_PGN_OK)
+     warn ("pgn_tag_add()");
+ 
+   if (pgn_tag_add (&g->tag, (char *) "Black", (char *) "?") != E_PGN_OK)

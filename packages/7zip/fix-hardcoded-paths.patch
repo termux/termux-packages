@@ -1,0 +1,26 @@
+--- a/CPP/7zip/UI/Console/Main.cpp
++++ b/CPP/7zip/UI/Console/Main.cpp
+@@ -283,7 +283,7 @@ static void ShowProgInfo(CStdOutStream *so)
+     {
+       FString temp;
+       NDir::MyGetTempPath(temp);
+-      if (!temp.IsEqualTo(STRING_PATH_SEPARATOR "tmp" STRING_PATH_SEPARATOR))
++      if (!temp.IsEqualTo("@TERMUX_PREFIX@/tmp/"))
+         *so << " temp_path:" << temp;
+     }
+   }
+--- a/CPP/Windows/FileDir.cpp
++++ b/CPP/Windows/FileDir.cpp
+@@ -748,10 +748,10 @@ bool MyGetTempPath(FString &path)
+   #else  // !_WIN32
+   
+   // FIXME: improve that code
+-  path = STRING_PATH_SEPARATOR "tmp";
++  path = "@TERMUX_PREFIX@/tmp";
+   const char *s;
+   if (NFind::DoesDirExist_FollowLink(path))
+-    s = STRING_PATH_SEPARATOR "tmp" STRING_PATH_SEPARATOR;
++    s = "@TERMUX_PREFIX@/tmp/";
+   else
+     s = "." STRING_PATH_SEPARATOR;
+   path = s;

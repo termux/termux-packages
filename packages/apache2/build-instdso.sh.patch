@@ -1,0 +1,15 @@
+--- ./build/instdso.sh	2011-03-05 00:28:38.000000000 +0530
++++ ./build/instdso.sh.mod	2021-06-22 08:37:42.026266930 +0530
+@@ -59,6 +59,12 @@
+ esac
+ 
+ CMD="$SH_LIBTOOL --mode=install $INSTALL_CMD $DSOARCHIVE $TARGETDIR/"
++# Prefixing with bash below simplifies cross compiling setup where
++# $SH_LIBTOOL may have wrong shebang:
++case "$SH_LIBTOOL" in
++  bash*) ;;
++  *) CMD="bash $CMD" ;;
++esac
+ echo $CMD
+ $CMD || exit $?
+ 

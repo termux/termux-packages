@@ -1,0 +1,22 @@
+diff --git a/src/extra/ipv4.c b/src/extra/ipv4.c
+index 797bab1..37eae7b 100644
+--- a/src/extra/ipv4.c
++++ b/src/extra/ipv4.c
+@@ -20,6 +20,17 @@
+ 
+ #include "internal.h"
+ 
++// on debian linux system netinet/ip.h has this define
++// on ndk-sysroot there are only in linux/ip.h but include it
++// introduce an issue on redifinition
++#define IPTOS_CLASS_MASK	0xe0
++#define IPTOS_CLASS(class)	((class) & IPTOS_CLASS_MASK)
++
++#define IPTOS_PREC(tos)		IPTOS_CLASS(tos)
++
++#define	IPTOS_TOS_MASK		0x1E
++#define	IPTOS_TOS(tos)		((tos) & IPTOS_TOS_MASK)
++
+ /**
+  * \defgroup ipv4 IPv4 helper functions
+  * @{

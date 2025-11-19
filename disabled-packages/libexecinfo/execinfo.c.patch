@@ -1,0 +1,26 @@
+--- a/execinfo.c
++++ b/execinfo.c
+@@ -52,6 +52,8 @@
+     return nptr;
+ }
+ 
++#pragma GCC visibility push(default)
++
+ int
+ backtrace(void **buffer, int size)
+ {
+@@ -78,7 +80,7 @@
+     rval = malloc(clen);
+     if (rval == NULL)
+         return NULL;
+-    (char **)cp = &(rval[size]);
++    cp = &(rval[size]);
+     for (i = 0; i < size; i++) {
+         if (dladdr(buffer[i], &info) != 0) {
+             if (info.dli_sname == NULL)
+@@ -158,3 +160,5 @@
+         write(fd, buf, len - 1);
+     }
+ }
++
++#pragma GCC visibility pop

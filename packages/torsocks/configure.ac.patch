@@ -1,0 +1,11 @@
+diff -u -r ../torsocks-2.2.0/configure.ac ./configure.ac
+--- ../torsocks-2.2.0/configure.ac	2016-10-18 12:44:01.000000000 -0400
++++ ./configure.ac	2016-12-20 23:35:32.966335918 -0500
+@@ -121,6 +121,7 @@
+ AC_MSG_CHECKING(file name of the C library)
+ AS_CASE([$host_os],
+ 	[darwin*], [libc_name="libSystem.dylib"],
++	[*linux-android*], [libc_name="libc.so"],
+ 	[linux*|kfreebsd*-gnu|freebsd*],
+ 	[
+ 		libc_name=`ldd /usr/bin/yes | grep 'libc\.' | cut -d ' ' -f 1 | tr -d '\t'`

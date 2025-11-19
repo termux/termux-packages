@@ -1,0 +1,27 @@
+--- ../cache/imgflo-0.4.2/lib/library.c	2016-08-21 08:46:27.000000000 +0000
++++ ./lib/library.c	2017-05-11 02:57:06.259072817 +0000
+@@ -342,12 +342,12 @@
+     GFile* dir = g_file_get_parent(file);
+     gchar* dir_name = g_file_get_path(dir);
+ 
+-    gchar *stdout = NULL;
+-    gchar *stderr = NULL;
++    //gchar *stdout = NULL;
++    //gchar *stderr = NULL;
+     gint exitcode = 1;
+     GError *err = NULL;
+     gchar **argv = g_new0(gchar *, 10);
+-    argv[0] = g_strdup("/usr/bin/env");
++    argv[0] = g_strdup("@TERMUX_PREFIX@/bin/env");
+     argv[1] = g_strdup("make");
+     argv[2] = g_strdup("component");
+     argv[3] = g_strdup_printf("COMPONENT=%s", component);
+@@ -358,7 +358,7 @@
+  
+     const gboolean success = g_spawn_sync(NULL, argv, NULL,
+                               G_SPAWN_DEFAULT, NULL, NULL,
+-                              &stdout, &stderr, &exitcode, &err);
++                              NULL, NULL, &exitcode, &err);
+     try_print_error(err);
+     if (!success || stderr) {
+         imgflo_message("%s", stderr);

@@ -1,0 +1,21 @@
+--- a/src/core/web_engine_context.cpp
++++ b/src/core/web_engine_context.cpp
+@@ -624,6 +624,10 @@
+ 
+     parsedCommandLine->AppendSwitchASCII(service_manager::switches::kApplicationName, QCoreApplication::applicationName().toUtf8().toPercentEncoding().toStdString());
+ 
++#ifdef __TERMUX__
++    parsedCommandLine->AppendSwitch(sandbox::policy::switches::kNoSandbox);
++    qInfo() << "Sandboxing disabled.";
++#else
+     // Enable sandboxing on OS X and Linux (Desktop / Embedded) by default.
+     bool disable_sandbox = qEnvironmentVariableIsSet(kDisableSandboxEnv);
+     if (!disable_sandbox) {
+@@ -634,6 +638,7 @@
+         parsedCommandLine->AppendSwitch(sandbox::policy::switches::kNoSandbox);
+         qInfo() << "Sandboxing disabled by user.";
+     }
++#endif
+ 
+     parsedCommandLine->AppendSwitch(switches::kEnableThreadedCompositing);
+ 

@@ -1,0 +1,80 @@
+--- a/src/core/hook/hook-url.c
++++ b/src/core/hook/hook-url.c
+@@ -32,6 +32,10 @@
+ #include <errno.h>
+ #include <pthread.h>
+ 
++#ifdef __ANDROID__
++#include <stdatomic.h>
++#endif
++
+ #include "../weechat.h"
+ #include "../core-hashtable.h"
+ #include "../core-hook.h"
+@@ -122,6 +126,24 @@ hook_url_thread_cleanup (void *hook_pointer)
+  * URL transfer (in a separate thread).
+  */
+ 
++static void thread_testcancel (void *args)
++{
++#ifndef __ANDROID__
++    (void) args;
++    pthread_test_cancel ();
++#else
++    if (!atomic_flag_test_and_set ((atomic_flag *) args))
++    {
++        pthread_exit (NULL);
++    }
++#endif
++}
++
++int
++weeurl_download_internal (const char *url, struct t_hashtable *options,
++                 struct t_hashtable *output, void (thread_testcancel_func)(void *args),
++                 void *thread_test_cancel_args);
++
+ void *
+ hook_url_transfer_thread (void *hook_pointer)
+ {
+@@ -133,9 +155,11 @@ hook_url_transfer_thread (void *hook_pointer)
+ 
+     pthread_cleanup_push (&hook_url_thread_cleanup, hook);
+ 
+-    url_rc = weeurl_download (HOOK_URL(hook, url),
++    url_rc = weeurl_download_internal (HOOK_URL(hook, url),
+                               HOOK_URL(hook, options),
+-                              HOOK_URL(hook, output));
++                              HOOK_URL(hook, output),
++                              thread_testcancel,
++                              &HOOK_URL(hook, thread_cancel));
+ 
+     if (url_rc != 0)
+     {
+@@ -205,7 +229,7 @@ hook_url_timer_cb (const void *pointer, void *data, int remaining_calls)
+                 HOOK_URL(hook, url),
+                 ((float)HOOK_URL(hook, timeout)) / 1000);
+         }
+-        pthread_cancel (HOOK_URL(hook, thread_id));
++        atomic_flag_clear(&(HOOK_URL(hook, thread_cancel)));
+         usleep (1000);
+         unhook (hook);
+     }
+@@ -227,6 +251,9 @@ hook_url_transfer (struct t_hook *hook)
+     HOOK_URL(hook, thread_running) = 1;
+ 
+     /* create thread */
++#ifdef __ANDROID__
++    atomic_flag_test_and_set(&(HOOK_URL(hook, thread_cancel)));
++#endif
+     rc = pthread_create (&(HOOK_URL(hook, thread_id)), NULL,
+                          &hook_url_transfer_thread, hook);
+     if (rc != 0)
+@@ -381,7 +408,7 @@ hook_url_free_data (struct t_hook *hook)
+     }
+     if (HOOK_URL(hook, thread_running))
+     {
+-        pthread_cancel (HOOK_URL(hook, thread_id));
++        atomic_flag_clear(&(HOOK_URL(hook, thread_cancel)));
+         HOOK_URL(hook, thread_running) = 0;
+     }
+     if (HOOK_URL(hook, thread_created))

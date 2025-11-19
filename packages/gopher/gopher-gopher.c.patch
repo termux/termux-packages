@@ -1,0 +1,38 @@
+--- a/gopher/gopher.c
++++ b/gopher/gopher.c
+@@ -1056,7 +1056,7 @@
+      FILE    *tmpfile;
+      char    inputline[512];
+      char    *view = NULL;
+-     char    mkstemp_template[] = "/tmp/gopher-XXXXXX";
++     char    mkstemp_template[] = "@TERMUX_PREFIX@/tmp/gopher-XXXXXX";
+      int     mkstemp_fd = -1;
+      boolean WritePipe = FALSE,
+              ForkOff   = FALSE;
+@@ -1109,7 +1109,7 @@
+                tmpfilename = strdup(mkstemp_template);
+                tmpfile = fdopen(mkstemp_fd, "w");
+ #else  /* ! HAVE_MKSTEMP */
+-	       tmpfilename = tempnam("/tmp","gopher");
++	       tmpfilename = tempnam("@TERMUX_PREFIX@/tmp","gopher");
+                tmpfile = fopen(tmpfilename, "w");
+ #endif /* HAVE_MKSTEMP */
+ #endif /* VMS */
+@@ -3060,7 +3060,7 @@
+                          
+ {
+      char *tmpfilename;
+-     char mkstemp_template[] = "/tmp/gopher-XXXXXX";
++     char mkstemp_template[] = "@TERMUX_PREFIX@/tmp/gopher-XXXXXX";
+      int  mkstemp_fd = -1;
+      FILE *tmpfile;
+      Blockobj *bl;
+@@ -3092,7 +3092,7 @@
+      Gopenfile = tmpfilename;
+      tmpfile = fdopen(mkstemp_fd, "w");
+ #else /* ! HAVE_MKSTEMP */
+-     Gopenfile = tmpfilename = tempnam("/tmp", "gopher");
++     Gopenfile = tmpfilename = tempnam("@TERMUX_PREFIX@/tmp", "gopher");
+      tmpfile = fopen(tmpfilename, "w");
+ #endif /* HAVE_MKSTEMP */
+ #endif /* VMS */

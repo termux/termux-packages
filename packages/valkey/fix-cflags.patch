@@ -1,0 +1,30 @@
+Errors this fixes look like, respectively:
+
+fatal error: 'glob.h' file not found
+
+/usr/bin/ld.gold: fatal error:
+/home/builder/.termux-build/_cache/android-r28c-api-24-v1/sysroot
+/usr/lib/aarch64-linux-android/24/crtbegin_dynamic.o:
+unsupported ELF machine number 183
+
+--- a/cmake/Modules/ValkeySetup.cmake
++++ b/cmake/Modules/ValkeySetup.cmake
+@@ -380,7 +380,6 @@ add_custom_target(
+ include(SourceFiles)
+ 
+ # Clear the below variables from the cache
+-unset(CMAKE_C_FLAGS CACHE)
+ unset(VALKEY_SERVER_LDFLAGS CACHE)
+ unset(VALKEY_SERVER_CFLAGS CACHE)
+ unset(PYTHON_EXE CACHE)
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -19,7 +19,7 @@ add_dependencies(valkey-server release_header)
+ 
+ if (VALKEY_RELEASE_BUILD)
+     # Enable LTO for Release build
+-    set_property(TARGET valkey-server PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
++    set_property(TARGET valkey-server PROPERTY INTERPROCEDURAL_OPTIMIZATION FALSE)
+ endif ()
+ 
+ if (DEBUG_FORCE_DEFRAG)

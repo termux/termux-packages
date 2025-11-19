@@ -1,0 +1,229 @@
+diff --git a/doc/mpdconf.example b/doc/mpdconf.example
+index a6976dc24..7e3925238 100644
+--- a/doc/mpdconf.example
++++ b/doc/mpdconf.example
+@@ -11,7 +11,7 @@
+ # file:// protocol) or streaming files over an accepted protocol.
+ #
+ #music_directory		"$XDG_MUSIC_DIR"
+-#music_directory		"~/music"
++music_directory			"/sdcard/Music"
+ #
+ # This setting sets the MPD internal playlist directory. The purpose of this
+ # directory is storage for playlists created by MPD. The server will use
+@@ -19,7 +19,7 @@
+ # format. This setting defaults to playlist saving being disabled.
+ #
+ #playlist_directory		"$XDG_CONFIG_HOME/mpd/playlists"
+-#playlist_directory		"~/.mpd/playlists"
++playlist_directory		"~/.mpd/playlists"
+ #
+ # This setting sets the location of the MPD database. This file is used to
+ # load the database at server start up and store the database while the
+@@ -28,7 +28,7 @@
+ # files over an accepted protocol.
+ #
+ #db_file			"$XDG_CACHE_HOME/mpd/database"
+-#db_file			"~/.mpd/database"
++db_file				"~/.mpd/database"
+ 
+ # These settings are the locations for the daemon log files for the daemon.
+ #
+@@ -39,7 +39,7 @@
+ # defaults to the systemd journal, which is fine.
+ #
+ #log_file			"$XDG_CACHE_HOME/mpd/log"
+-#log_file			"~/.mpd/log"
++log_file			"~/.mpd/log"
+ 
+ # This setting sets the location of the file which stores the process ID
+ # for use of mpd --kill and some init scripts. This setting is disabled by
+@@ -48,7 +48,7 @@
+ # If you use systemd, do not configure a pid_file.
+ #
+ #pid_file			"$XDG_RUNTIME_DIR/mpd/mpd.pid"
+-#pid_file			"~/.mpd/pid"
++pid_file			"~/.mpd/pid"
+ 
+ # This setting sets the location of the file which contains information about
+ # most variables to get MPD back into the same general shape it was in before
+@@ -56,13 +56,13 @@
+ # state will be reset on server start up.
+ #
+ #state_file			"$XDG_RUNTIME_DIR/mpd/state"
+-#state_file			"~/.mpd/state"
++state_file			"~/.mpd/state"
+ #
+ # The location of the sticker database.  This is a database which
+ # manages dynamic information attached to songs.
+ #
+ #sticker_file			"$XDG_CACHE_HOME/sticker.sql"
+-#sticker_file			"~/.mpd/sticker.sql"
++sticker_file			"~/.mpd/sticker.sql"
+ #
+ ###############################################################################
+ 
+@@ -93,12 +93,12 @@
+ #
+ # And for Unix Socket
+ #bind_to_address		"$XDG_RUNTIME_DIR/mpd/socket"
+-#bind_to_address		"~/.mpd/socket"
++bind_to_address			"@TERMUX_PREFIX@/var/run/mpd.socket"
+ #
+ # This setting is the TCP port that is desired for the daemon to get assigned
+-# to.
++# to. Normally this is 6600 but for termux this port needs to be above 8000.
+ #
+-#port				"6600"
++#port				"8600"
+ #
+ # Suppress all messages below the given threshold.  Use "verbose" for
+ # troubleshooting. Available setting arguments are "notice", "info", "verbose",
+@@ -143,12 +143,12 @@
+ # If this setting is set to "yes", MPD will discover audio files by following
+ # symbolic links outside of the configured music_directory.
+ #
+-#follow_outside_symlinks	"yes"
++follow_outside_symlinks		"yes"
+ #
+ # If this setting is set to "yes", MPD will discover audio files by following
+ # symbolic links inside of the configured music_directory.
+ #
+-#follow_inside_symlinks		"yes"
++follow_inside_symlinks		"yes"
+ #
+ ###############################################################################
+ 
+@@ -221,29 +221,6 @@ input {
+ # blocks. Setting this block is optional, though the server will only attempt
+ # autodetection for one sound card.
+ #
+-# An example of an ALSA output:
+-#
+-#audio_output {
+-#	type		"alsa"
+-#	name		"My ALSA Device"
+-##	device		"hw:0,0"	# optional
+-##	mixer_type      "hardware"	# optional
+-##	mixer_device	"default"	# optional
+-##	mixer_control	"PCM"		# optional
+-##	mixer_index	"0"		# optional
+-#}
+-#
+-# An example of an OSS output:
+-#
+-#audio_output {
+-#	type		"oss"
+-#	name		"My OSS Device"
+-##	device		"/dev/dsp"	# optional
+-##	mixer_type      "hardware"	# optional
+-##	mixer_device	"/dev/mixer"	# optional
+-##	mixer_control	"PCM"		# optional
+-#}
+-#
+ # An example of a shout output (for streaming to Icecast):
+ #
+ #audio_output {
+@@ -273,7 +250,8 @@ input {
+ #	type		"recorder"
+ #	name		"My recorder"
+ #	encoder		"vorbis"		# optional, vorbis or lame
+-#	path		"/var/lib/mpd/recorder/mpd.ogg"
++##	for termux changed "path" to somewhere on android that works
++#	path		"~/mpd.ogg"
+ ##	quality		"5.0"			# do not define if bitrate is defined
+ #	bitrate		"128"			# do not define if quality is defined
+ #	format		"44100:16:1"
+@@ -293,6 +271,14 @@ input {
+ #	max_clients	"0"			# optional 0=no limit
+ #}
+ #
++# An example of a pulseaudio output
++#
++audio_output {
++	type		"pulse"
++	name		"PulseAudio Output"
++	enabled		"no"
++}
++#
+ # An example of a pulseaudio output (streaming to a remote pulseaudio server)
+ #
+ #audio_output {
+@@ -303,56 +289,29 @@ input {
+ ##	media_role	"media_role"		#optional
+ #}
+ #
+-# An example of a winmm output (Windows multimedia API).
+-#
+-#audio_output {
+-#	type		"winmm"
+-#	name		"My WinMM output"
+-##	device		"Digital Audio (S/PDIF) (High Definition Audio Device)" # optional
+-#		or
+-##	device		"0"		# optional
+-##	mixer_type	"hardware"	# optional
+-#}
+-#
+-# An example of a wasapi output (Windows multimedia API).
+-#
+-#audio_output {
+-#	type		"wasapi"
+-#	name		"My WASAPI output"
+-##	device		"Digital Audio (S/PDIF) (High Definition Audio Device)" # optional
+-#		or
+-##	device		"0"		# optional
+-##	mixer_type	"hardware"	# optional
+-## Exclusive mode blocks all other audio source, and get best audio quality without resampling.
+-##	exclusive	"no"		# optional
+-## Enumerate all devices in log.
+-##	enumerate	"no"		# optional
+-#}
+-#
++# An example of an opensl android output.
++audio_output {
++	type		"sles"
++	name		"OpenSLES output"
++	mixer_type	"software"
++}
+ # An example of an openal output.
+ #
+-#audio_output {
+-#	type		"openal"
+-#	name		"My OpenAL output"
+-##	device		"Digital Audio (S/PDIF) (High Definition Audio Device)" # optional
+-#}
+-#
+-# An example of an sndio output.
+-#
+-#audio_output {
+-#	type		"sndio"
+-#	name		"sndio output"
+-#	mixer_type	"hardware"
+-#}
+-#
+-# An example of an OS X output:
+-#
+-#audio_output {
+-#	type		"osx"
+-#	name		"My OS X Device"
+-##	device		"Built-in Output"	# optional
+-##	channel_map      "-1,-1,0,1"	# optional
+-#}
++audio_output {
++	type		"openal"
++	name		"OpenAL output"
++	mixer_type	"software"
++	device		"OpenSL"
++	enabled		"no"
++}
++#Fifo output for visualizations in ncmpcpp
++audio_output {
++	type		"fifo"
++	name		"ncmpcpp visualizer"
++	path		"@TERMUX_PREFIX@/var/run/mpd.fifo"
++	format		"44100:16:2"
++	enabled		"no"
++}
+ #
+ ## Example "pipe" output:
+ #

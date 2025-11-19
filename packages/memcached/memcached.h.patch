@@ -1,0 +1,12 @@
+diff -uNr memcached-1.6.1/memcached.h memcached-1.6.1.mod/memcached.h
+--- memcached-1.6.1/memcached.h	2020-03-17 04:49:39.000000000 +0200
++++ memcached-1.6.1.mod/memcached.h	2020-03-20 13:32:32.461293519 +0200
+@@ -27,7 +27,7 @@
+ #include <limits.h>
+ /* FreeBSD 4.x doesn't have IOV_MAX exposed. */
+ #ifndef IOV_MAX
+-#if defined(__FreeBSD__) || defined(__APPLE__) || defined(__GNU__)
++#if defined(__FreeBSD__) || defined(__APPLE__) || defined(__GNU__) || defined(__ANDROID__)
+ # define IOV_MAX 1024
+ /* GNU/Hurd don't set MAXPATHLEN
+  * http://www.gnu.org/software/hurd/hurd/porting/guidelines.html#PATH_MAX_tt_MAX_PATH_tt_MAXPATHL */

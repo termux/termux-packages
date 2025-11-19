@@ -1,0 +1,12 @@
+--- a/src/system_conf/unix.rs
++++ b/src/system_conf/unix.rs
+@@ -27,7 +27,7 @@
+ const DEFAULT_PORT: u16 = 53;
+ 
+ pub fn read_system_conf() -> io::Result<(ResolverConfig, ResolverOpts)> {
+-    read_resolv_conf("/etc/resolv.conf")
++    read_resolv_conf("@TERMUX_PREFIX@/etc/resolv.conf")
+ }
+ 
+ fn read_resolv_conf<P: AsRef<Path>>(path: P) -> io::Result<(ResolverConfig, ResolverOpts)> {
+

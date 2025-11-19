@@ -1,0 +1,21 @@
+--- a/tools/wml/Makefile.in
++++ b/tools/wml/Makefile.in
+@@ -812,15 +812,15 @@
+ 
+ wml-uil.mm: wmluiltok wml UilLexPars.c $(TABLE)
+ 	$(RM) $(WMLTARGETS) wml.report wml-uil.mm
+-	./wmluiltok <$(srcdir)/Uil.y >tokens.dat
++	wmluiltok <$(srcdir)/Uil.y >tokens.dat
+ 	$(RM) wml-uil.mm
+-	./wml $(srcdir)/$(TABLE)
++	wml $(srcdir)/$(TABLE)
+ 	$(RM) tokens.dat
+ 
+ all: motif.wmd
+ 
+ motif.wmd: wmldbcreate
+-	./wmldbcreate -o motif.wmd
++	wmldbcreate -o motif.wmd
+ 
+ clean-local:
+ 	$(RM) $(WMLTARGETS) $(WMDTABLE) $(REPORT) lex.yy.c libwml.a wml \

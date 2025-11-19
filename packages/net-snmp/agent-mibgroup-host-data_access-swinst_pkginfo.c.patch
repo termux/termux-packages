@@ -1,0 +1,11 @@
+--- a/agent/mibgroup/host/data_access/swinst_pkginfo.c
++++ b/agent/mibgroup/host/data_access/swinst_pkginfo.c
+@@ -68,7 +68,7 @@
+ #elif defined(freebsd2) || defined(openbsd)
+     snprintf( pkg_directory, SNMP_MAXPATH, "/var/db/pkg" );
+ #elif defined(linux)
+-    snprintf( pkg_directory, SNMP_MAXPATH, "/var/cache/hrmib" );
++    snprintf( pkg_directory, SNMP_MAXPATH, "@TERMUX_PREFIX@/var/cache/hrmib" );
+ #else
+     pkg_directory[0] = '\0';
+     snmp_log( LOG_ERR, "SWInst: No package directory\n" );

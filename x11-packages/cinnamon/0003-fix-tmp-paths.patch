@@ -1,0 +1,19 @@
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_user.py b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_user.py
+index 3a99188..033a007 100755
+--- a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_user.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_user.py
+@@ -138,12 +138,12 @@ class Module:
+     def _on_face_photo_menuitem_activated(self, menuitem):
+ 
+         # streamer takes -t photos, uses /dev/video0
+-        if 0 != subprocess.call(["streamer", "-j90", "-t8", "-s800x600", "-o", "/tmp/temp-account-pic00.jpeg"]):
++        if 0 != subprocess.call(["streamer", "-j90", "-t8", "-s800x600", "-o", "@TERMUX_PREFIX@/tmp/temp-account-pic00.jpeg"]):
+             print("Error: Webcam not available")
+             return
+ 
+         # Use the 8th frame (the webcam takes a few frames to "lighten up")
+-        path = "/tmp/temp-account-pic07.jpeg"
++        path = "@TERMUX_PREFIX@/tmp/temp-account-pic07.jpeg"
+ 
+         # Crop the image to thumbnail size
+         image = Image.open(path)

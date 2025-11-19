@@ -1,0 +1,22 @@
+--- a/src/jx9_vfs.c
++++ b/src/jx9_vfs.c
+@@ -7284,9 +7284,7 @@
+ static void UnixVfs_TempDir(jx9_context *pCtx)
+ {
+ 	static const char *azDirs[] = {
+-     "/var/tmp", 
+-     "/usr/tmp", 
+-	 "/usr/local/tmp"
++     "@TERMUX_PREFIX@/var/tmp"
+   };
+   unsigned int i;
+   struct stat buf;
+@@ -7307,7 +7305,7 @@
+ 	return;
+   }
+   /* Default temp dir */
+-  jx9_result_string(pCtx, "/tmp", (int)sizeof("/tmp")-1);
++  jx9_result_string(pCtx, "@TERMUX_PREFIX@/tmp", (int)sizeof("@TERMUX_PREFIX@/tmp")-1);
+ }
+ /* unsigned int (*xProcessId)(void) */
+ static unsigned int UnixVfs_ProcessId(void)

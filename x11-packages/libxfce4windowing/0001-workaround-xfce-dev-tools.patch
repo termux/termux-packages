@@ -1,0 +1,32 @@
+XDT_GEN_VISIBILITY has termux python in shebang. This patch overrides that to use host python.
+
+--- a/libxfce4windowing/Makefile.in
++++ b/libxfce4windowing/Makefile.in
+@@ -1503,10 +1503,10 @@
+ 	$(AM_V_GET) glib-genmarshal --prefix=xfw_marshal --body $< >> $@
+ 
+ libxfce4windowing-visibility.h: libxfce4windowing.symbols Makefile
+-	$(AM_V_GEN) $(XDT_GEN_VISIBILITY) --kind=header $< $@
++	$(AM_V_GEN) python $(XDT_GEN_VISIBILITY) --kind=header $< $@
+ 
+ libxfce4windowing-visibility.c: libxfce4windowing.symbols Makefile
+-	$(AM_V_GEN) $(XDT_GEN_VISIBILITY) --kind=source $< $@
++	$(AM_V_GEN) python $(XDT_GEN_VISIBILITY) --kind=source $< $@
+ 
+ # GObject Introspection
+ -include $(INTROSPECTION_MAKEFILE)
+--- a/libxfce4windowingui/Makefile.in
++++ b/libxfce4windowingui/Makefile.in
+@@ -1028,10 +1028,10 @@
+ 
+ 
+ libxfce4windowingui-visibility.h: libxfce4windowingui.symbols Makefile
+-	$(AM_V_GEN) $(XDT_GEN_VISIBILITY) --kind=header $< $@
++	$(AM_V_GEN) python $(XDT_GEN_VISIBILITY) --kind=header $< $@
+ 
+ libxfce4windowingui-visibility.c: libxfce4windowingui.symbols Makefile
+-	$(AM_V_GEN) $(XDT_GEN_VISIBILITY) --kind=source $< $@
++	$(AM_V_GEN) python $(XDT_GEN_VISIBILITY) --kind=source $< $@
+ 
+ # GObject Introspection
+ -include $(INTROSPECTION_MAKEFILE)

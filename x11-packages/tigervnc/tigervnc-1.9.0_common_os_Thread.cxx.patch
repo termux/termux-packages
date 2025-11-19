@@ -1,0 +1,46 @@
+diff -uNr tigervnc-1.9.0/common/os/Thread.cxx tigervnc-1.9.0.mod/common/os/Thread.cxx
+--- tigervnc-1.9.0/common/os/Thread.cxx	2018-07-16 17:08:55.000000000 +0300
++++ tigervnc-1.9.0.mod/common/os/Thread.cxx	2018-09-12 11:14:21.776323226 +0300
+@@ -29,6 +29,14 @@
+ #include <os/Mutex.h>
+ #include <os/Thread.h>
+ 
++#ifdef __ANDROID__
++#include <string.h>
++static void threadSignalHandler(int signum)
++{
++  pthread_exit(0);
++}
++#endif
++
+ using namespace os;
+ 
+ Thread::Thread() : running(false), threadId(NULL)
+@@ -48,7 +56,11 @@
+   delete (HANDLE*)threadId;
+ #else
+   if (isRunning())
++#ifdef __ANDROID__
++    pthread_kill(*(pthread_t*)threadId, SIGUSR2);
++#else
+     pthread_cancel(*(pthread_t*)threadId);
++#endif
+   delete (pthread_t*)threadId;
+ #endif
+ 
+@@ -148,6 +160,15 @@
+ void* Thread::startRoutine(void* data)
+ #endif
+ {
++#ifdef __ANDROID__
++  struct sigaction actions;
++  memset(&actions, 0, sizeof(actions));
++  sigemptyset(&actions.sa_mask);
++  actions.sa_flags = 0;
++  actions.sa_handler = threadSignalHandler;
++  sigaction(SIGUSR2, &actions, NULL);
++#endif
++
+   Thread *self;
+ 
+   self = (Thread*)data;

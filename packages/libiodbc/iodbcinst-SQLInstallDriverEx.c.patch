@@ -1,0 +1,26 @@
+--- a/iodbcinst/SQLInstallDriverEx.c
++++ b/iodbcinst/SQLInstallDriverEx.c
+@@ -155,9 +155,9 @@
+       goto done;
+     }
+ #else
+-  if (access ("/usr/local/lib", R_OK | W_OK | X_OK) == 0)
++  if (access ("@TERMUX_PREFIX@/local/lib", R_OK | W_OK | X_OK) == 0)
+     {
+-      len = STRLEN ("/usr/local/lib");
++      len = STRLEN ("@TERMUX_PREFIX@/local/lib");
+       goto done;
+     }
+ #endif
+@@ -169,9 +169,9 @@
+       goto done;
+     }
+ #else
+-  if (access ("/usr/lib", R_OK | W_OK | X_OK) == 0)
++  if (access ("@TERMUX_PREFIX@/lib", R_OK | W_OK | X_OK) == 0)
+     {
+-      len = STRLEN ("/usr/lib");
++      len = STRLEN ("@TERMUX_PREFIX@/lib");
+       goto done;
+     }
+ #endif

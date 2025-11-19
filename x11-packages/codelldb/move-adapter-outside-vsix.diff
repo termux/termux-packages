@@ -1,0 +1,120 @@
+Moves the codelldb executable binary file and python scripts from inside the VSIX
+package file to outside of it.
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -199,15 +199,5 @@ set(PackagedFilesFull
+     platform.ok
+-    bin/codelldb-launch
+-    bin/codelldb-launch.exe
+-    adapter/codelldb
+-    adapter/codelldb.exe
+-    adapter/*.so
+-    adapter/*.dylib
+-    adapter/*.dll
+-    adapter/scripts/**/*.py
+-    lldb/bin/**/*
+-    lldb/lib/**/*
+-    lldb/DLLs/**/*
++    adapter/scripts/console.py
+     lang_support/**/*.py
+ )
+ 
+--- a/src/codelldb/bin/main.rs
++++ b/src/codelldb/bin/main.rs
+@@ -27,17 +27,13 @@ fn main() -> Result<(), Error> {
+     codelldb_dir.pop();
+     let liblldb_path = match &cli.liblldb {
+         Some(path) => PathBuf::from(path),
+-        None => {
+-            let mut liblldb_path = codelldb_dir.clone();
+-            liblldb_path.pop();
+-            liblldb_path.push("lldb");
+-            liblldb_path.push(DYLIB_SUBDIR);
+-            liblldb_path.push(format!("liblldb.{}", DYLIB_EXTENSION));
+-            liblldb_path
+-        }
++        None => PathBuf::from("@TERMUX_PREFIX@/lib/liblldb.so")
+     };
+ 
+-    lldb_stub::liblldb.load_from(&liblldb_path).unwrap();
++    match lldb_stub::liblldb.load_from(&liblldb_path) {
++        Ok(result) => result,
++        Err(err) => lldb_stub::liblldb.load_from(&PathBuf::from("@TERMUX_PREFIX@/lib/liblldb.so")).unwrap()
++    };
+     match lldb_stub::base.resolve() {
+         Ok(token) => token.mark_permanent(),
+         Err(err) => {
+--- a/src/codelldb/src/python.rs
++++ b/src/codelldb/src/python.rs
+@@ -92,8 +92,7 @@ pub fn initialize(debugger: &SBDebugger, adapter_dir: &Path) -> Result<Arc<Pytho
+     let interpreter = debugger.command_interpreter();
+     let mut command_result = SBCommandReturnObject::new();
+ 
+-    let script = adapter_dir.join("scripts/codelldb");
+-    let command = format!("command script import {}", lldb_quoted_string(script.to_str().unwrap()));
++    let command = format!("command script import {}", lldb_quoted_string("@TERMUX_PYTHON_HOME@/site-packages/codelldb"));
+     interpreter.handle_command(&command, &mut command_result, false);
+     if !command_result.succeeded() {
+         bail!(format!("{:?}", command_result));
+@@ -168,8 +167,7 @@ pub fn initialize(debugger: &SBDebugger, adapter_dir: &Path) -> Result<Arc<Pytho
+     mem::forget(interface.clone());
+ 
+     // Import legacy alias for the codelldb module
+-    let script = adapter_dir.join("scripts/debugger.py");
+-    let command = format!("command script import {}", lldb_quoted_string(script.to_str().unwrap()));
++    let command = format!("command script import {}", lldb_quoted_string("@TERMUX_PYTHON_HOME@/site-packages/codelldb/debugger.py"));
+     interpreter.handle_command(&command, &mut command_result, false);
+ 
+     Ok(interface)
+--- a/extension/novsc/adapter.ts
++++ b/extension/novsc/adapter.ts
+@@ -26,7 +26,7 @@ export interface ProcessSpawnParams {
+ export async function getSpawnParams(
+     options: AdapterStartOptions
+ ): Promise<ProcessSpawnParams> {
+-    let executable = path.join(options.extensionRoot, 'adapter', 'codelldb');
++    let executable = '@TERMUX_PREFIX@/bin/codelldb';
+ 
+     let args: string[] = [];
+     if (options.liblldb) {
+@@ -84,7 +84,7 @@ export async function findLibLLDB(pathHint: string): Promise<string | undefined>
+ 
+     let libDir;
+     let pattern;
+-    if (process.platform == 'linux') {
++    if (process.platform == 'linux' || process.platform == 'android') {
+         libDir = path.join(pathHint, 'lib');
+         pattern = /liblldb.*\.so.*/;
+     } else if (process.platform == 'darwin') {
+--- a/extension/main.ts
++++ b/extension/main.ts
+@@ -263,7 +263,7 @@ class Extension implements DebugAdapterDescriptorFactory {
+     ): Promise<DebugConfiguration | undefined | null> {
+         if (debugConfig.cargo) {
+             let cargo = new Cargo(folder, cancellation);
+-            let launcher = path.join(this.context.extensionPath, 'bin', 'codelldb-launch');
++            let launcher = '@TERMUX_PREFIX@/bin/codelldb-launch';
+             debugConfig = await cargo.resolveCargoConfig(debugConfig, launcher);
+         }
+         if (cancellation?.isCancellationRequested)
+--- a/src/codelldb/src/terminal.rs
++++ b/src/codelldb/src/terminal.rs
+@@ -5,6 +5,7 @@ use adapter_protocol::*;
+ use std::collections::HashMap;
+ use std::net::TcpStream;
+ use std::time::Duration;
++use std::path::PathBuf;
+ use tokio::io::AsyncReadExt;
+ use tokio::io::BufReader;
+ use tokio::net::TcpListener;
+@@ -35,8 +35,7 @@ impl Terminal {
+                 launcher.set_extension(ext);
+             }
+             if !launcher.exists() {
+-                launcher.pop(); // filename
+-                launcher.pop(); // directory
++                launcher = PathBuf::from("@TERMUX_PREFIX@");
+                 launcher.push("bin");
+                 launcher.push("codelldb-launch");
+                 if let Some(ext) = current_exe.extension() {

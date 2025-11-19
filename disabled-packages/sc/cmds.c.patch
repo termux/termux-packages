@@ -1,0 +1,32 @@
+--- cmds.c	2018-02-23 05:38:39.654230131 +0000
++++ src/cmds.c	2018-02-23 05:39:23.222435074 +0000
+@@ -2861,12 +2861,12 @@
+ 	if ((plugin = findplugin(p+1, 'w')) != NULL) {
+ 	    if (!plugin_exists(plugin, strlen(plugin), save + 1)) {
+ 		error("plugin not found");
+-		return;
++		return 1;
+ 	    }
+ 	    *save = '|';
+ 	    if ((strlen(save) + strlen(fname) + 20) > PATHLEN) {
+ 		error("Path too long");
+-		return;
++		return 1;
+ 	    }
+ 	    sprintf(save + strlen(save), " %s%d:", coltoa(c0), r0);
+ 	    sprintf(save + strlen(save), "%s%d \"%s\"", coltoa(cn), rn, fname);
+@@ -2981,12 +2981,12 @@
+ 	if ((plugin = findplugin(p+1, 'r')) != NULL) {
+ 	    if (!(plugin_exists(plugin, strlen(plugin), save + 1))) {
+ 		error("plugin not found");
+-		return;
++		return 1;
+ 	    }
+ 	    *save = '|';
+ 	    if ((strlen(save) + strlen(fname) + 2) > PATHLEN) {
+ 		error("Path too long");
+-		return;
++		return 1;
+ 	    }
+ 	    sprintf(save + strlen(save), " \"%s\"", fname);
+ 	    eraseflg = 0;

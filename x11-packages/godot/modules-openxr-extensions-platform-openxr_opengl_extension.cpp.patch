@@ -1,0 +1,10 @@
++++ ./modules/openxr/extensions/platform/openxr_opengl_extension.cpp
+@@ -171,7 +171,7 @@
+ 		graphics_binding_egl.type = XR_TYPE_GRAPHICS_BINDING_EGL_MNDX;
+ 		graphics_binding_egl.next = p_next_pointer;
+ 
+-		graphics_binding_egl.getProcAddress = eglGetProcAddress;
++		graphics_binding_egl.getProcAddress = (__typeof__(graphics_binding_egl.getProcAddress)) eglGetProcAddress;
+ 		graphics_binding_egl.display = (void *)display_server->window_get_native_handle(DisplayServer::EGL_DISPLAY);
+ 		graphics_binding_egl.config = (void *)display_server->window_get_native_handle(DisplayServer::EGL_CONFIG);
+ 		graphics_binding_egl.context = (void *)display_server->window_get_native_handle(DisplayServer::OPENGL_CONTEXT);

@@ -1,0 +1,22 @@
+diff --git a/generate.c b/generate.c
+index 83d1664..cc96875 100644
+--- a/tgl/generate.c
++++ b/tgl/generate.c
+@@ -26,7 +26,7 @@
+ #include "config.h"
+ #include <stdio.h>
+ #include <signal.h>
+-#ifdef HAVE_EXECINFO_H
++#if defined(HAVE_EXECINFO_H) && !defined(__ANDROID__)
+ #include <execinfo.h>
+ #endif
+ #include <unistd.h>
+@@ -2954,7 +2954,7 @@ void hexdump (int *in_ptr, int *in_end) {
+   printf ("\n");
+ }*/
+ 
+-#ifdef HAVE_EXECINFO_H
++#if defined(HAVE_EXECINFO_H) && !defined(__ANDROID__)
+ void print_backtrace (void) {
+   void *buffer[255];
+   const int calls = backtrace (buffer, sizeof (buffer) / sizeof (void *));

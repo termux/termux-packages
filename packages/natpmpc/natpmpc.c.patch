@@ -1,0 +1,20 @@
+--- a/natpmpc.c
++++ b/natpmpc.c
+@@ -100,7 +100,7 @@
+ 				return 0;
+ 			case 'g':
+ 				forcegw = 1;
+-				if(argc < i + 1) {
++				if(!(argc > i + 1)) {
+ 					fprintf(stderr, "Not enough arguments for option -%c\n", argv[i][1]);
+ 					return 1;
+ 				}
+@@ -108,7 +108,7 @@
+ 				break;
+ 			case 'a':
+ 				command = 'a';
+-				if(argc < i + 4) {
++				if(!(argc > i + 4)) {
+ 					fprintf(stderr, "Not enough arguments for option -%c\n", argv[i][1]);
+ 					return 1;
+ 				}

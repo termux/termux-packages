@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://qalculate.github.io/
+TERMUX_PKG_DESCRIPTION="A multi-purpose cross-platform desktop calculator"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="5.8.2"
+TERMUX_PKG_SRCURL=https://github.com/Qalculate/qalculate-gtk/releases/download/v${TERMUX_PKG_VERSION}/qalculate-gtk-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=20a3d4c4c63f53236cdaa79234e8d51e4deb5b647aff32bc310b920261ce68a3
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libc++, libcairo, pango, qalc"

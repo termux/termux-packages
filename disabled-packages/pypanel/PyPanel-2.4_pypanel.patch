@@ -1,0 +1,26 @@
+diff -uNr PyPanel-2.4/pypanel PyPanel-2.4.mod/pypanel
+--- PyPanel-2.4/pypanel	2005-06-27 02:24:43.000000000 +0300
++++ PyPanel-2.4.mod/pypanel	2017-12-12 17:52:16.987058639 +0200
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python -OO
++#!@TERMUX_PREFIX@/bin/python2
+ """
+ PyPanel v2.4 - Lightweight panel/taskbar for X11 window managers
+ Copyright (c) 2003-2005 Jon Gelo (ziljian@users.sourceforge.net)
+@@ -921,9 +921,13 @@
+     try:
+         src  = None
+         dst  = None
+-        home = pwd.getpwuid(os.getuid())[5]
+-        if os.access("/etc/pypanelrc", os.F_OK|os.R_OK):
+-            src = "/etc/pypanelrc"
++        home = os.getenv("HOME")
++
++        if not home:
++            home = "@TERMUX_HOME@"
++
++        if os.access("@TERMUX_PREFIX@/etc/pypanelrc", os.F_OK|os.R_OK):
++            src = "@TERMUX_PREFIX@/etc/pypanelrc"
+             execfile(src)
+         if not os.access("%s/.pypanelrc" % home, os.F_OK|os.R_OK):
+             # Create ~/.pypanelrc from /etc/pypanelrc if it exists else

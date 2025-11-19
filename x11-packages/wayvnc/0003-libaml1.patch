@@ -1,0 +1,22 @@
+From a00d568437d13c811553b2c24227a355f36048d0 Mon Sep 17 00:00:00 2001
+From: Andri Yngvason <andri@yngvason.is>
+Date: Sun, 27 Jul 2025 14:18:03 +0000
+Subject: [PATCH] meson: Use new pkgconfig for aml1
+
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 789b56a..ac81f18 100644
+--- a/meson.build
++++ b/meson.build
+@@ -69,7 +69,7 @@ aml_project = subproject('aml', required: false, version: aml_version)
+ if aml_project.found()
+ 	aml = aml_project.get_variable('aml_dep')
+ else
+-	aml = dependency('aml', version: aml_version)
++	aml = dependency('aml1', version: aml_version)
+ endif
+ 
+ if neatvnc_project.found()

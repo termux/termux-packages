@@ -1,0 +1,105 @@
+--- a/avahi-daemon/main.c
++++ b/avahi-daemon/main.c
+@@ -135,7 +135,7 @@
+ #endif
+ } DaemonConfig;
+ 
+-#define RESOLV_CONF "/etc/resolv.conf"
++#define RESOLV_CONF "@TERMUX_PREFIX@/etc/resolv.conf"
+ #define BROWSE_DOMAINS_MAX 16
+ 
+ static AvahiSEntryGroup *dns_servers_entry_group = NULL;
+@@ -587,9 +587,9 @@
+     int fd;
+     char buf[32];
+ 
+-    fd = open("/etc/machine-id", O_RDONLY|O_CLOEXEC|O_NOCTTY);
++    fd = open("@TERMUX_PREFIX@/etc/machine-id", O_RDONLY|O_CLOEXEC|O_NOCTTY);
+     if (fd == -1 && errno == ENOENT)
+-        fd = open("/var/lib/dbus/machine-id", O_RDONLY|O_CLOEXEC|O_NOCTTY);
++        fd = open("@TERMUX_PREFIX@/var/lib/dbus/machine-id", O_RDONLY|O_CLOEXEC|O_NOCTTY);
+     if (fd == -1)
+         return NULL;
+ 
+@@ -1338,6 +1338,7 @@
+ 
+ #define set_env(key, value) putenv(avahi_strdup_printf("%s=%s", (key), (value)))
+ 
++#ifndef __ANDROID__
+ static int drop_root(void) {
+     struct passwd *pw;
+     struct group * gr;
+@@ -1400,6 +1401,7 @@
+ 
+     return 0;
+ }
++#endif /* __ANDROID__ */
+ 
+ static const char* pid_file_proc(void) {
+     return AVAHI_DAEMON_RUNTIME_DIR"/pid";
+@@ -1413,6 +1415,7 @@
+     struct group * gr;
+     struct stat st;
+ 
++#ifndef __ANDROID__
+     if (!(pw = getpwnam(AVAHI_USER))) {
+         avahi_log_error( "Failed to find user '"AVAHI_USER"'.");
+         goto fail;
+@@ -1422,6 +1425,7 @@
+         avahi_log_error( "Failed to find group '"AVAHI_GROUP"'.");
+         goto fail;
+     }
++#endif
+ 
+     u = umask(0000);
+     reset_umask = 1;
+@@ -1431,14 +1435,20 @@
+         goto fail;
+     }
+ 
++#ifndef __ANDROID__
+     chown(AVAHI_DAEMON_RUNTIME_DIR, pw->pw_uid, gr->gr_gid);
++#endif
+ 
+     if (stat(AVAHI_DAEMON_RUNTIME_DIR, &st) < 0) {
+         avahi_log_error("stat(): %s\n", strerror(errno));
+         goto fail;
+     }
+ 
++#ifndef __ANDROID__
+     if (!S_ISDIR(st.st_mode) || st.st_uid != pw->pw_uid || st.st_gid != gr->gr_gid) {
++#else
++    if (!S_ISDIR(st.st_mode)) {
++#endif
+         avahi_log_error("Failed to create runtime directory "AVAHI_DAEMON_RUNTIME_DIR".");
+         goto fail;
+     }
+@@ -1594,10 +1604,12 @@
+     else if (config.command == DAEMON_RUN) {
+         pid_t pid;
+ 
++#ifndef __ANDROID__
+         if (getuid() != 0 && config.drop_root) {
+             avahi_log_error("This program is intended to be run as root.");
+             goto finish;
+         }
++#endif
+ 
+         if ((pid = daemon_pid_file_is_running()) >= 0) {
+             avahi_log_error("Daemon already running on PID %u", pid);
+@@ -1641,6 +1653,7 @@
+         if (make_runtime_dir() < 0)
+             goto finish;
+ 
++#ifndef __ANDROID__
+         if (config.drop_root) {
+ #ifdef ENABLE_CHROOT
+             if (config.use_chroot)
+@@ -1657,6 +1670,7 @@
+                     goto finish;
+ #endif
+         }
++#endif /* __ANDROID__ */
+ 
+         if (daemon_pid_file_create() < 0) {
+             avahi_log_error("Failed to create PID file: %s", strerror(errno));

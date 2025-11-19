@@ -1,0 +1,21 @@
+diff -uNr util-macros-1.19.3/xorg-macros.m4.in util-macros-1.19.3.mod/xorg-macros.m4.in
+--- util-macros-1.19.3/xorg-macros.m4.in	2021-01-24 16:41:26.000000000 +0200
++++ util-macros-1.19.3.mod/xorg-macros.m4.in	2021-02-08 17:42:50.860717540 +0200
+@@ -58,7 +58,7 @@
+ AC_DEFUN([XORG_PROG_RAWCPP],[
+ AC_REQUIRE([AC_PROG_CPP])
+ AC_PATH_TOOL(RAWCPP, [cpp], [${CPP}],
+-   [$PATH:/bin:/usr/bin:/usr/lib:/usr/libexec:/usr/ccs/lib:/usr/ccs/lbin:/lib])
++   [$PATH:@TERMUX_PREFIX@/bin:/bin:/usr/bin:/usr/lib:/usr/libexec:/usr/ccs/lib:/usr/ccs/lbin:/lib])
+ 
+ # Check for flag to avoid builtin definitions - assumes unix is predefined,
+ # which is not the best choice for supporting other OS'es, but covers most
+@@ -924,7 +924,7 @@
+        [[$ac_path_M4 -I. /dev/null > /dev/null 2>&1 && \
+          ac_cv_path_M4=$ac_path_M4 ac_path_M4_found=:]],
+    [AC_MSG_ERROR([could not find m4 that supports -I option])],
+-   [$PATH:/usr/gnu/bin])])
++   [$PATH:@TERMUX_PREFIX@/bin:/usr/gnu/bin])])
+ 
+ AC_SUBST([M4], [$ac_cv_path_M4])
+ ]) # XORG_WITH_M4

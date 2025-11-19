@@ -1,0 +1,36 @@
+--- vlc-3.0.17.4.orig/bin/vlc.c	2017-11-24 23:29:17.000000000 +0800
++++ vlc-3.0.17.4/bin/vlc.c	2022-10-06 18:37:13.451050500 +0800
+@@ -41,6 +41,22 @@
+ #endif
+ #include <unistd.h>
+ 
++#ifdef __ANDROID__
++#include <android/fdsan.h>
++#include <dlfcn.h>
++static inline void termux_disable_fdsan() {
++    // For Android 11+.
++    void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++    if (lib_handle) {
++        void (*set_fdsan_error_level)(enum android_fdsan_error_level newlevel) = dlsym(lib_handle, "android_fdsan_set_error_level");
++        if (set_fdsan_error_level) {
++            set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++        }
++        dlclose(lib_handle);
++    }
++}
++#endif
++
+ #ifdef __OS2__
+ # include <iconv.h>
+ 
+@@ -122,6 +138,10 @@
+     /* Restore SIGCHLD in case our parent process ignores it. */
+     signal (SIGCHLD, SIG_DFL);
+ 
++#ifdef __ANDROID__
++    termux_disable_fdsan();
++#endif
++
+ #ifndef NDEBUG
+     /* Activate malloc checking routines to detect heap corruptions. */
+     setenv ("MALLOC_CHECK_", "2", 1);

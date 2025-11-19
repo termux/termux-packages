@@ -1,0 +1,25 @@
+--- a/src/Makefile.in
++++ b/src/Makefile.in
+@@ -50,11 +50,11 @@
+ @LIC_MAKEFILE_INCLUDE@
+ 
+ # Kernel-mode plugin gets installed here.
+-PLUGIN_DIR=/etc/ppp/plugins
++PLUGIN_DIR=@TERMUX_PREFIX@/etc/ppp/plugins
+ PLUGIN_PATH=$(PLUGIN_DIR)/rp-pppoe.so
+ 
+ # Configuration file paths
+-PPPOESERVER_PPPD_OPTIONS=/etc/ppp/pppoe-server-options
++PPPOESERVER_PPPD_OPTIONS=@TERMUX_PREFIX@/etc/ppp/pppoe-server-options
+ 
+ PATHS='-DPPPOE_PATH="$(PPPOE_PATH)"' '-DPPPD_PATH="$(PPPD_PATH)"' \
+ 	'-DPLUGIN_PATH="$(PLUGIN_PATH)"' \
+@@ -156,7 +156,7 @@
+ 			$(install) -m 644 ../man/$$i.8 $(DESTDIR)$(mandir)/man8 || exit 1; \
+ 		fi; \
+ 	done
+-	-mkdir -p $(DESTDIR)/etc/ppp
++	-mkdir -p $(DESTDIR)@TERMUX_PREFIX@/etc/ppp
+ 	-mkdir -p $(DESTDIR)$(PLUGIN_DIR)
+ 	-echo "# Directory created by rp-pppoe for kernel-mode plugin" > $(DESTDIR)$(PLUGIN_DIR)/README
+ 	if test -r rp-pppoe.so; then $(install) -m 755 rp-pppoe.so $(DESTDIR)$(PLUGIN_DIR); fi

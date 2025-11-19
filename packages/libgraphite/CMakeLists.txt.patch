@@ -1,0 +1,13 @@
+Fixes "undefined reference to '__cxa_call_unexpected" on arm.
+
+diff -u -r ../graphite-1.3.9/CMakeLists.txt ./CMakeLists.txt
+--- ../graphite-1.3.9/CMakeLists.txt	2016-11-11 10:53:21.000000000 +0100
++++ ./CMakeLists.txt	2017-01-19 11:54:59.187814558 +0100
+@@ -58,7 +58,6 @@
+ message(STATUS "Using vm machine type: ${GRAPHITE2_VM_TYPE}")
+ 
+ add_subdirectory(src)
+-add_subdirectory(tests)
+ add_subdirectory(doc)
+ if (NOT (GRAPHITE2_NSEGCACHE OR GRAPHITE2_NFILEFACE))
+     add_subdirectory(gr2fonttest)

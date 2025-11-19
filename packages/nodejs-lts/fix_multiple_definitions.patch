@@ -1,0 +1,19 @@
+diff '--color=auto' -uNr node-v18.0.0.orig/deps/uv/src/unix/sysinfo-memory.c node-v18.0.0/deps/uv/src/unix/sysinfo-memory.c
+--- node-v18.0.0.orig/deps/uv/src/unix/sysinfo-memory.c	2022-04-21 15:15:32.611869790 +0530
++++ node-v18.0.0/deps/uv/src/unix/sysinfo-memory.c	2022-04-21 15:46:04.427175110 +0530
+@@ -25,6 +25,7 @@
+ #include <stdint.h>
+ #include <sys/sysinfo.h>
+ 
++#ifndef __ANDROID__
+ uint64_t uv_get_free_memory(void) {
+   struct sysinfo info;
+ 
+@@ -32,6 +33,7 @@
+     return (uint64_t) info.freeram * info.mem_unit;
+   return 0;
+ }
++#endif
+ 
+ uint64_t uv_get_total_memory(void) {
+   struct sysinfo info;

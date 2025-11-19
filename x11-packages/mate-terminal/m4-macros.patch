@@ -1,0 +1,660 @@
+--- /dev/null	2022-07-04 06:26:03.693739920 +0000
++++ ./m4/ax_append_flag.m4	2022-07-04 06:51:31.983864780 +0000
+@@ -0,0 +1,50 @@
++# ===========================================================================
++#      https://www.gnu.org/software/autoconf-archive/ax_append_flag.html
++# ===========================================================================
++#
++# SYNOPSIS
++#
++#   AX_APPEND_FLAG(FLAG, [FLAGS-VARIABLE])
++#
++# DESCRIPTION
++#
++#   FLAG is appended to the FLAGS-VARIABLE shell variable, with a space
++#   added in between.
++#
++#   If FLAGS-VARIABLE is not specified, the current language's flags (e.g.
++#   CFLAGS) is used.  FLAGS-VARIABLE is not changed if it already contains
++#   FLAG.  If FLAGS-VARIABLE is unset in the shell, it is set to exactly
++#   FLAG.
++#
++#   NOTE: Implementation based on AX_CFLAGS_GCC_OPTION.
++#
++# LICENSE
++#
++#   Copyright (c) 2008 Guido U. Draheim <guidod@gmx.de>
++#   Copyright (c) 2011 Maarten Bosmans <mkbosmans@gmail.com>
++#
++#   Copying and distribution of this file, with or without modification, are
++#   permitted in any medium without royalty provided the copyright notice
++#   and this notice are preserved.  This file is offered as-is, without any
++#   warranty.
++
++#serial 8
++
++AC_DEFUN([AX_APPEND_FLAG],
++[dnl
++AC_PREREQ(2.64)dnl for _AC_LANG_PREFIX and AS_VAR_SET_IF
++AS_VAR_PUSHDEF([FLAGS], [m4_default($2,_AC_LANG_PREFIX[FLAGS])])
++AS_VAR_SET_IF(FLAGS,[
++  AS_CASE([" AS_VAR_GET(FLAGS) "],
++    [*" $1 "*], [AC_RUN_LOG([: FLAGS already contains $1])],
++    [
++     AS_VAR_APPEND(FLAGS,[" $1"])
++     AC_RUN_LOG([: FLAGS="$FLAGS"])
++    ])
++  ],
++  [
++  AS_VAR_SET(FLAGS,[$1])
++  AC_RUN_LOG([: FLAGS="$FLAGS"])
++  ])
++AS_VAR_POPDEF([FLAGS])dnl
++])dnl AX_APPEND_FLAG
+--- /dev/null	2022-07-04 06:26:03.693739920 +0000
++++ ./m4/ax_check_compile_flag.m4	2022-07-04 06:51:47.930529478 +0000
+@@ -0,0 +1,53 @@
++# ===========================================================================
++#  https://www.gnu.org/software/autoconf-archive/ax_check_compile_flag.html
++# ===========================================================================
++#
++# SYNOPSIS
++#
++#   AX_CHECK_COMPILE_FLAG(FLAG, [ACTION-SUCCESS], [ACTION-FAILURE], [EXTRA-FLAGS], [INPUT])
++#
++# DESCRIPTION
++#
++#   Check whether the given FLAG works with the current language's compiler
++#   or gives an error.  (Warnings, however, are ignored)
++#
++#   ACTION-SUCCESS/ACTION-FAILURE are shell commands to execute on
++#   success/failure.
++#
++#   If EXTRA-FLAGS is defined, it is added to the current language's default
++#   flags (e.g. CFLAGS) when the check is done.  The check is thus made with
++#   the flags: "CFLAGS EXTRA-FLAGS FLAG".  This can for example be used to
++#   force the compiler to issue an error when a bad flag is given.
++#
++#   INPUT gives an alternative input source to AC_COMPILE_IFELSE.
++#
++#   NOTE: Implementation based on AX_CFLAGS_GCC_OPTION. Please keep this
++#   macro in sync with AX_CHECK_{PREPROC,LINK}_FLAG.
++#
++# LICENSE
++#
++#   Copyright (c) 2008 Guido U. Draheim <guidod@gmx.de>
++#   Copyright (c) 2011 Maarten Bosmans <mkbosmans@gmail.com>
++#
++#   Copying and distribution of this file, with or without modification, are
++#   permitted in any medium without royalty provided the copyright notice
++#   and this notice are preserved.  This file is offered as-is, without any
++#   warranty.
++
++#serial 6
++
++AC_DEFUN([AX_CHECK_COMPILE_FLAG],
++[AC_PREREQ(2.64)dnl for _AC_LANG_PREFIX and AS_VAR_IF
++AS_VAR_PUSHDEF([CACHEVAR],[ax_cv_check_[]_AC_LANG_ABBREV[]flags_$4_$1])dnl
++AC_CACHE_CHECK([whether _AC_LANG compiler accepts $1], CACHEVAR, [
++  ax_check_save_flags=$[]_AC_LANG_PREFIX[]FLAGS
++  _AC_LANG_PREFIX[]FLAGS="$[]_AC_LANG_PREFIX[]FLAGS $4 $1"
++  AC_COMPILE_IFELSE([m4_default([$5],[AC_LANG_PROGRAM()])],
++    [AS_VAR_SET(CACHEVAR,[yes])],
++    [AS_VAR_SET(CACHEVAR,[no])])
++  _AC_LANG_PREFIX[]FLAGS=$ax_check_save_flags])
++AS_VAR_IF(CACHEVAR,yes,
++  [m4_default([$2], :)],
++  [m4_default([$3], :)])
++AS_VAR_POPDEF([CACHEVAR])dnl
++])dnl AX_CHECK_COMPILE_FLAGS
+--- /dev/null	2022-07-04 06:26:03.693739920 +0000
++++ ./m4/ax_check_enable_debug.m4	2022-07-04 06:52:09.523859908 +0000
+@@ -0,0 +1,124 @@
++# ===========================================================================
++#  https://www.gnu.org/software/autoconf-archive/ax_check_enable_debug.html
++# ===========================================================================
++#
++# SYNOPSIS
++#
++#   AX_CHECK_ENABLE_DEBUG([enable by default=yes/info/profile/no], [ENABLE DEBUG VARIABLES ...], [DISABLE DEBUG VARIABLES NDEBUG ...], [IS-RELEASE])
++#
++# DESCRIPTION
++#
++#   Check for the presence of an --enable-debug option to configure, with
++#   the specified default value used when the option is not present.  Return
++#   the value in the variable $ax_enable_debug.
++#
++#   Specifying 'yes' adds '-g -O0' to the compilation flags for all
++#   languages. Specifying 'info' adds '-g' to the compilation flags.
++#   Specifying 'profile' adds '-g -pg' to the compilation flags and '-pg' to
++#   the linking flags. Otherwise, nothing is added.
++#
++#   Define the variables listed in the second argument if debug is enabled,
++#   defaulting to no variables.  Defines the variables listed in the third
++#   argument if debug is disabled, defaulting to NDEBUG.  All lists of
++#   variables should be space-separated.
++#
++#   If debug is not enabled, ensure AC_PROG_* will not add debugging flags.
++#   Should be invoked prior to any AC_PROG_* compiler checks.
++#
++#   IS-RELEASE can be used to change the default to 'no' when making a
++#   release.  Set IS-RELEASE to 'yes' or 'no' as appropriate. By default, it
++#   uses the value of $ax_is_release, so if you are using the AX_IS_RELEASE
++#   macro, there is no need to pass this parameter.
++#
++#     AX_IS_RELEASE([git-directory])
++#     AX_CHECK_ENABLE_DEBUG()
++#
++# LICENSE
++#
++#   Copyright (c) 2011 Rhys Ulerich <rhys.ulerich@gmail.com>
++#   Copyright (c) 2014, 2015 Philip Withnall <philip@tecnocode.co.uk>
++#
++#   Copying and distribution of this file, with or without modification, are
++#   permitted in any medium without royalty provided the copyright notice
++#   and this notice are preserved.
++
++#serial 9
++
++AC_DEFUN([AX_CHECK_ENABLE_DEBUG],[
++    AC_BEFORE([$0],[AC_PROG_CC])dnl
++    AC_BEFORE([$0],[AC_PROG_CXX])dnl
++    AC_BEFORE([$0],[AC_PROG_F77])dnl
++    AC_BEFORE([$0],[AC_PROG_FC])dnl
++
++    AC_MSG_CHECKING(whether to enable debugging)
++
++    ax_enable_debug_default=m4_tolower(m4_normalize(ifelse([$1],,[no],[$1])))
++    ax_enable_debug_is_release=m4_tolower(m4_normalize(ifelse([$4],,
++                                                              [$ax_is_release],
++                                                              [$4])))
++
++    # If this is a release, override the default.
++    AS_IF([test "$ax_enable_debug_is_release" = "yes"],
++      [ax_enable_debug_default="no"])
++
++    m4_define(ax_enable_debug_vars,[m4_normalize(ifelse([$2],,,[$2]))])
++    m4_define(ax_disable_debug_vars,[m4_normalize(ifelse([$3],,[NDEBUG],[$3]))])
++
++    AC_ARG_ENABLE(debug,
++        [AS_HELP_STRING([--enable-debug=]@<:@yes/info/profile/no@:>@,[compile with debugging])],
++        [],enable_debug=$ax_enable_debug_default)
++
++    # empty mean debug yes
++    AS_IF([test "x$enable_debug" = "x"],
++      [enable_debug="yes"])
++
++    # case of debug
++    AS_CASE([$enable_debug],
++      [yes],[
++        AC_MSG_RESULT(yes)
++        CFLAGS="${CFLAGS} -g -O0"
++        CXXFLAGS="${CXXFLAGS} -g -O0"
++        FFLAGS="${FFLAGS} -g -O0"
++        FCFLAGS="${FCFLAGS} -g -O0"
++        OBJCFLAGS="${OBJCFLAGS} -g -O0"
++      ],
++      [info],[
++        AC_MSG_RESULT(info)
++        CFLAGS="${CFLAGS} -g"
++        CXXFLAGS="${CXXFLAGS} -g"
++        FFLAGS="${FFLAGS} -g"
++        FCFLAGS="${FCFLAGS} -g"
++        OBJCFLAGS="${OBJCFLAGS} -g"
++      ],
++      [profile],[
++        AC_MSG_RESULT(profile)
++        CFLAGS="${CFLAGS} -g -pg"
++        CXXFLAGS="${CXXFLAGS} -g -pg"
++        FFLAGS="${FFLAGS} -g -pg"
++        FCFLAGS="${FCFLAGS} -g -pg"
++        OBJCFLAGS="${OBJCFLAGS} -g -pg"
++        LDFLAGS="${LDFLAGS} -pg"
++      ],
++      [
++        AC_MSG_RESULT(no)
++        dnl Ensure AC_PROG_CC/CXX/F77/FC/OBJC will not enable debug flags
++        dnl by setting any unset environment flag variables
++        AS_IF([test "x${CFLAGS+set}" != "xset"],
++          [CFLAGS=""])
++        AS_IF([test "x${CXXFLAGS+set}" != "xset"],
++          [CXXFLAGS=""])
++        AS_IF([test "x${FFLAGS+set}" != "xset"],
++          [FFLAGS=""])
++        AS_IF([test "x${FCFLAGS+set}" != "xset"],
++          [FCFLAGS=""])
++        AS_IF([test "x${OBJCFLAGS+set}" != "xset"],
++          [OBJCFLAGS=""])
++      ])
++
++    dnl Define various variables if debugging is disabled.
++    dnl assert.h is a NOP if NDEBUG is defined, so define it by default.
++    AS_IF([test "x$enable_debug" = "xyes"],
++      [m4_map_args_w(ax_enable_debug_vars, [AC_DEFINE(], [,[1],[Define if debugging is enabled])])],
++      [m4_map_args_w(ax_disable_debug_vars, [AC_DEFINE(], [,[1],[Define if debugging is disabled])])])
++    ax_enable_debug=$enable_debug
++])
+--- /dev/null	2022-07-04 06:26:03.693739920 +0000
++++ ./m4/mate-common.m4	2022-07-04 06:52:40.607188573 +0000
+@@ -0,0 +1,205 @@
++# mate-common.m4
++#
++#   Copyright (C) 2011 Perberos <perberos@gmail.com>
++#
++#   This program is free software: you can redistribute it and/or modify
++#   it under the terms of the GNU General Public License as published by
++#   the Free Software Foundation, either version 3 of the License, or
++#   (at your option) any later version.
++#
++#   This program is distributed in the hope that it will be useful,
++#   but WITHOUT ANY WARRANTY; without even the implied warranty of
++#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++#   GNU General Public License for more details.
++#
++#   You should have received a copy of the GNU General Public License
++#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++dnl MATE_COMMON_INIT
++
++AC_DEFUN([MATE_COMMON_INIT],
++[
++  dnl this macro should come after AC_CONFIG_MACRO_DIR
++  AC_BEFORE([AC_CONFIG_MACRO_DIR], [$0])
++
++  dnl ensure that when the Automake generated makefile calls aclocal,
++  dnl it honours the $ACLOCAL_FLAGS environment variable
++  ACLOCAL_AMFLAGS="\${ACLOCAL_FLAGS}"
++  if test -n "$ac_macro_dir"; then
++    ACLOCAL_AMFLAGS="-I $ac_macro_dir $ACLOCAL_AMFLAGS"
++  fi
++
++  AC_SUBST([ACLOCAL_AMFLAGS])
++])
++
++AC_DEFUN([MATE_DEBUG_CHECK],
++[
++	m4_ifdef([AX_CHECK_ENABLE_DEBUG],[
++		AX_CHECK_ENABLE_DEBUG([
++			m4_default([$1],[no])],[
++			MATE_ENABLE_DEBUG])],[
++		AC_MSG_ERROR([You need to install the autoconf-archive package.])
++	])
++])
++
++dnl MATE_MAINTAINER_MODE_DEFINES ()
++dnl define DISABLE_DEPRECATED
++dnl
++AC_DEFUN([MATE_MAINTAINER_MODE_DEFINES],
++[
++	AC_REQUIRE([AM_MAINTAINER_MODE])
++
++	DISABLE_DEPRECATED=""
++	if test $USE_MAINTAINER_MODE = yes; then
++	        DOMAINS="G ATK PANGO GDK GDK_PIXBUF GTK MATE LIBGLADE VTE WNCK LIBSOUP"
++	        for DOMAIN in $DOMAINS; do
++	               DISABLE_DEPRECATED="$DISABLE_DEPRECATED -D${DOMAIN}_DISABLE_DEPRECATED -D${DOMAIN}_DISABLE_SINGLE_INCLUDES"
++	        done
++	fi
++
++	AC_SUBST(DISABLE_DEPRECATED)
++])
++
++# MATE_COMPILE_WARNINGS
++# Turn on many useful compiler warnings
++# For now, only works on GCC
++#
++#   Copyright (C) 2011 Perberos <perberos@gmail.com>
++#
++#   This program is free software: you can redistribute it and/or modify
++#   it under the terms of the GNU General Public License as published by
++#   the Free Software Foundation, either version 3 of the License, or
++#   (at your option) any later version.
++#
++#   This program is distributed in the hope that it will be useful,
++#   but WITHOUT ANY WARRANTY; without even the implied warranty of
++#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++#   GNU General Public License for more details.
++#
++#   You should have received a copy of the GNU General Public License
++#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++
++AC_DEFUN([MATE_COMPILE_WARNINGS],[
++    dnl ******************************
++    dnl More compiler warnings
++    dnl ******************************
++
++    m4_ifndef([AX_CHECK_COMPILE_FLAG],[
++        AC_MSG_ERROR([You need to install the autoconf-archive package.])
++    ])
++
++    m4_ifndef([AX_APPEND_FLAG],[
++        AC_MSG_ERROR([You need to install the autoconf-archive package.])
++    ])
++
++    AC_ARG_ENABLE(compile-warnings,
++                  AS_HELP_STRING([--enable-compile-warnings=@<:@no/minimum/yes/maximum/error@:>@],
++                                 [Turn on compiler warnings]),,
++                  [enable_compile_warnings="m4_default([$1],[yes])"])
++
++    AC_LANG_PUSH([C])
++
++    case "$enable_compile_warnings" in
++    no)
++	warning_flags=
++	;;
++    minimum)
++	warning_flags="-Wall"
++	;;
++    yes)
++	warning_flags="-Wall -Wmissing-prototypes"
++	;;
++    maximum|error)
++	warning_flags="-Wall -Wmissing-prototypes -Wbad-function-cast -Wcast-align -Wextra -Wno-unused-parameter -Wformat-nonliteral -Wmissing-declarations -Wmissing-field-initializers -Wnested-externs -Wpointer-arith -Wredundant-decls -Wshadow -Wstrict-prototypes -Werror=format-security"
++	if test "$enable_compile_warnings" = "error" ; then
++	    warning_flags="$warning_flags -Werror"
++	fi
++	;;
++    *)
++	AC_MSG_ERROR(Unknown argument '$enable_compile_warnings' to --enable-compile-warnings)
++	;;
++    esac
++
++    # Always pass -Werror=unknown-warning-option to get Clang to fail on bad
++    # flags, otherwise they are always appended to the warn_cflags variable, and
++    # Clang warns on them for every compilation unit.
++    # If this is passed to GCC, it will explode, so the flag must be enabled
++    # conditionally.
++    AX_CHECK_COMPILE_FLAG([-Werror=unknown-warning-option],[
++        compiler_flags_test="-Werror=unknown-warning-option"
++    ],[
++        compiler_flags_test=""
++    ])
++
++    for flag in $warning_flags; do
++         AX_CHECK_COMPILE_FLAG([$flag], [AX_APPEND_FLAG([$flag], [WARN_CFLAGS])], [], [$compiler_flags_test], [])
++    done
++
++    AC_MSG_CHECKING(flags to pass to the C compiler $CC)
++    AC_MSG_RESULT(${WARN_CFLAGS})
++
++    AC_LANG_POP([C])
++    AC_SUBST(WARN_CFLAGS)
++])
++
++dnl For C++, do basically the same thing.
++AC_DEFUN([MATE_CXX_WARNINGS],[
++
++    m4_ifndef([AX_CHECK_COMPILE_FLAG],[
++        AC_MSG_ERROR([You need to install the autoconf-archive package.])
++    ])
++
++    m4_ifndef([AX_APPEND_FLAG],[
++        AC_MSG_ERROR([You need to install the autoconf-archive package.])
++    ])
++
++    AC_ARG_ENABLE(cxx-warnings,
++                  AS_HELP_STRING([--enable-cxx-warnings=@<:@no/minimum/yes/maximum/error@:>@],
++                                 [Turn on compiler warnings.]),,
++                  [enable_cxx_warnings="m4_default([$1],[yes])"])
++
++    AC_LANG_PUSH([C++])
++
++    case "$enable_cxx_warnings" in
++    no)
++	warning_flags=
++	;;
++    minimum)
++	warning_flags="-Wall"
++	;;
++    yes)
++        warning_flags="-Wall -Woverloaded-virtual"
++	;;
++    maximum|error)
++        warning_flags="-Wall -Woverloaded-virtual -Wextra -Wshadow -Wformat-nonliteral -Werror=format-security -Wno-unused-parameter -Wpointer-arith -Wcast-align -Wmissing-declarations -Wredundant-decls"
++	if test "$enable_compile_warnings" = "error" ; then
++	    warning_flags="$warning_flags -Werror"
++	fi
++	;;
++    *)
++	AC_MSG_ERROR(Unknown argument '$enable_cxx_warnings' to --enable-cxx-warnings)
++	;;
++    esac
++
++    # Always pass -Werror=unknown-warning-option to get Clang to fail on bad
++    # flags, otherwise they are always appended to the warn_cflags variable, and
++    # Clang warns on them for every compilation unit.
++    # If this is passed to GCC, it will explode, so the flag must be enabled
++    # conditionally.
++    AX_CHECK_COMPILE_FLAG([-Werror=unknown-warning-option],[
++        compiler_flags_test="-Werror=unknown-warning-option"
++    ],[
++        compiler_flags_test=""
++    ])
++
++    for flag in $warning_flags; do
++         AX_CHECK_COMPILE_FLAG([$flag], [AX_APPEND_FLAG([$flag], [WARN_CXXFLAGS])], [], [$compiler_flags_test], [])
++    done
++
++    AC_MSG_CHECKING(what language compliance flags to pass to the C++ compiler)
++    AC_MSG_RESULT(${WARN_CXXFLAGS})
++
++    AC_LANG_POP([C++])
++    AC_SUBST(WARN_CXXFLAGS)
++])
+--- /dev/null	2022-07-04 06:26:03.693739920 +0000
++++ ./m4/yelp_help_init.m4	2022-07-04 06:50:42.873869753 +0000
+@@ -0,0 +1,213 @@
++AC_DEFUN([YELP_HELP_INIT],
++[
++AC_REQUIRE([AC_PROG_LN_S])
++m4_pattern_allow([AM_V_at])
++m4_pattern_allow([AM_V_GEN])
++m4_pattern_allow([AM_DEFAULT_VERBOSITY])
++
++YELP_LC_MEDIA_LINKS=true
++YELP_LC_DIST=true
++
++for yelpopt in [$1]; do
++  case $yelpopt in
++    lc-media-links)    YELP_LC_MEDIA_LINKS=true ;;
++    no-lc-media-links) YELP_LC_MEDIA_LINKS= ;;
++    lc-dist)           YELP_LC_DIST=true ;;
++    no-lc-dist)        YELP_LC_DIST= ;;
++    *) AC_MSG_ERROR([Unrecognized [YELP_HELP_INIT] option $yelpopt"]) ;;
++  esac
++done;
++AC_SUBST([YELP_LC_MEDIA_LINKS])
++AC_SUBST([YELP_LC_DIST])
++
++AC_ARG_WITH([help-dir],
++            AS_HELP_STRING([--with-help-dir=DIR],
++                           [path where help files are installed]),,
++            [with_help_dir='${datadir}/help'])
++HELP_DIR="$with_help_dir"
++AC_SUBST(HELP_DIR)
++
++AC_ARG_VAR([ITSTOOL], [Path to the `itstool` command])
++AC_CHECK_PROG([ITSTOOL], [itstool], [itstool])
++if test x"$ITSTOOL" = x; then
++  AC_MSG_ERROR([itstool not found])
++fi
++
++AC_ARG_VAR([XMLLINT], [Path to the `xmllint` command])
++AC_CHECK_PROG([XMLLINT], [xmllint], [xmllint])
++if test x"$XMLLINT" = x; then
++  AC_MSG_ERROR([xmllint not found])
++fi
++
++YELP_HELP_RULES='
++HELP_ID ?=
++HELP_POT ?=
++HELP_FILES ?=
++HELP_EXTRA ?=
++HELP_MEDIA ?=
++HELP_LINGUAS ?=
++
++_HELP_LINGUAS = $(if $(filter environment,$(origin LINGUAS)),$(filter $(LINGUAS),$(HELP_LINGUAS)),$(HELP_LINGUAS))
++_HELP_POTFILE = $(if $(HELP_POT),$(HELP_POT),$(if $(HELP_ID),$(HELP_ID).pot))
++_HELP_POFILES = $(if $(HELP_ID),$(foreach lc,$(_HELP_LINGUAS),$(lc)/$(lc).po))
++_HELP_MOFILES = $(patsubst %.po,%.mo,$(_HELP_POFILES))
++_HELP_C_FILES = $(foreach f,$(HELP_FILES),C/$(f))
++_HELP_C_EXTRA = $(foreach f,$(HELP_EXTRA),C/$(f))
++_HELP_C_MEDIA = $(foreach f,$(HELP_MEDIA),C/$(f))
++_HELP_LC_FILES = $(foreach lc,$(_HELP_LINGUAS),$(foreach f,$(HELP_FILES),$(lc)/$(f)))
++_HELP_LC_STAMPS = $(foreach lc,$(_HELP_LINGUAS),$(lc)/$(lc).stamp)
++
++_HELP_DEFAULT_V = $(if $(AM_DEFAULT_VERBOSITY),$(AM_DEFAULT_VERBOSITY),1)
++_HELP_V = $(if $(V),$(V),$(_HELP_DEFAULT_V))
++_HELP_LC_VERBOSE = $(_HELP_LC_VERBOSE_$(_HELP_V))
++_HELP_LC_VERBOSE_ = $(_HELP_LC_VERBOSE_$(_HELP_DEFAULT_V))
++_HELP_LC_VERBOSE_0 = @echo "  GEN    "$(dir [$]@);
++
++all: $(_HELP_C_FILES) $(_HELP_C_EXTRA) $(_HELP_C_MEDIA) $(_HELP_LC_FILES) $(_HELP_POFILES)
++
++.PHONY: pot
++pot: $(_HELP_POTFILE)
++$(_HELP_POTFILE): $(_HELP_C_FILES) $(_HELP_C_EXTRA) $(_HELP_C_MEDIA)
++	$(AM_V_GEN)if test -d "C"; then d=; else d="$(srcdir)/"; fi; \
++	$(ITSTOOL) -o "[$]@" $(foreach f,$(_HELP_C_FILES),"$${d}$(f)")
++
++.PHONY: repo
++repo: $(_HELP_POTFILE)
++	$(AM_V_at)for po in $(_HELP_POFILES); do \
++	  if test "x[$](_HELP_V)" = "x0"; then echo "  GEN    $${po}"; fi; \
++	  msgmerge -q -o "$${po}" "$${po}" "$(_HELP_POTFILE)"; \
++	done
++
++$(_HELP_POFILES):
++	$(AM_V_at)if ! test -d "$(dir [$]@)"; then mkdir "$(dir [$]@)"; fi
++	$(AM_V_at)if test ! -f "[$]@" -a -f "$(srcdir)/[$]@"; then cp "$(srcdir)/[$]@" "[$]@"; fi
++	$(AM_V_GEN)if ! test -f "[$]@"; then \
++	  (cd "$(dir [$]@)" && \
++	    $(ITSTOOL) -o "$(notdir [$]@).tmp" $(_HELP_C_FILES) && \
++	    mv "$(notdir [$]@).tmp" "$(notdir [$]@)"); \
++	else \
++	  (cd "$(dir [$]@)" && \
++	    $(ITSTOOL) -o "$(notdir [$]@).tmp" $(_HELP_C_FILES) && \
++	    msgmerge -o "$(notdir [$]@)" "$(notdir [$]@)" "$(notdir [$]@).tmp" && \
++	    rm "$(notdir [$]@).tmp"); \
++	fi
++
++$(_HELP_MOFILES): %.mo: %.po
++	$(AM_V_at)if ! test -d "$(dir [$]@)"; then mkdir "$(dir [$]@)"; fi
++	$(AM_V_GEN)msgfmt -o "[$]@" "$<"
++
++$(_HELP_LC_FILES): $(_HELP_LINGUAS)
++$(_HELP_LINGUAS): $(_HELP_LC_STAMPS)
++$(_HELP_LC_STAMPS): %.stamp: %.mo
++$(_HELP_LC_STAMPS): $(_HELP_C_FILES) $(_HELP_C_EXTRA)
++	$(AM_V_at)if ! test -d "$(dir [$]@)"; then mkdir "$(dir [$]@)"; fi
++	$(_HELP_LC_VERBOSE)if test -d "C"; then d="../"; else d="$(abs_srcdir)/"; fi; \
++	mo="$(dir [$]@)$(patsubst %/$(notdir [$]@),%,[$]@).mo"; \
++	if test -f "$${mo}"; then mo="../$${mo}"; else mo="$(abs_srcdir)/$${mo}"; fi; \
++	(cd "$(dir [$]@)" && $(ITSTOOL) -m "$${mo}" $(foreach f,$(_HELP_C_FILES),$${d}/$(f))) && \
++	touch "[$]@"
++
++.PHONY: clean-help
++mostlyclean-am: $(if $(HELP_ID),clean-help)
++clean-help:
++	rm -f $(_HELP_LC_FILES) $(_HELP_LC_STAMPS) $(_HELP_MOFILES)
++
++EXTRA_DIST ?=
++EXTRA_DIST += $(_HELP_C_EXTRA) $(_HELP_C_MEDIA)
++EXTRA_DIST += $(if $(YELP_LC_DIST),$(foreach lc,$(HELP_LINGUAS),$(lc)/$(lc).stamp))
++EXTRA_DIST += $(foreach lc,$(HELP_LINGUAS),$(lc)/$(lc).po)
++EXTRA_DIST += $(foreach f,$(HELP_MEDIA),$(foreach lc,$(HELP_LINGUAS),$(wildcard $(lc)/$(f))))
++
++distdir: distdir-help-files
++distdir-help-files: $(_HELP_LC_FILES)
++	@for lc in C $(if $(YELP_LC_DIST),$(HELP_LINGUAS)) ; do \
++	  $(MKDIR_P) "$(distdir)/$$lc"; \
++	  for file in $(HELP_FILES); do \
++	    if test -f "$$lc/$$file"; then d=./; else d=$(srcdir)/; fi; \
++	    cp -p "$$d$$lc/$$file" "$(distdir)/$$lc/" || exit 1; \
++	  done; \
++	done; \
++
++.PHONY: check-help
++check: check-help
++check-help:
++	for lc in C $(_HELP_LINGUAS); do \
++	  if test -d "$$lc"; \
++	    then d=; \
++	    xmlpath="$$lc"; \
++	  else \
++	    d="$(srcdir)/"; \
++	    xmlpath="$$lc:$(srcdir)/$$lc"; \
++	  fi; \
++	  for page in $(HELP_FILES); do \
++	    echo "$(XMLLINT) --nonet --noout --noent --path $$xmlpath --xinclude $$d$$lc/$$page"; \
++	    $(XMLLINT) --nonet --noout --noent --path "$$xmlpath" --xinclude "$$d$$lc/$$page"; \
++	  done; \
++	done
++
++
++.PHONY: install-help
++install-data-am: $(if $(HELP_ID),install-help)
++install-help: $(_HELP_LC_FILES)
++	@for lc in C $(_HELP_LINGUAS); do \
++	  $(mkinstalldirs) "$(DESTDIR)$(HELP_DIR)/$$lc/$(HELP_ID)" || exit 1; \
++	done
++	@for lc in C $(_HELP_LINGUAS); do for f in $(HELP_FILES); do \
++	  if test -f "$$lc/$$f"; then d=; else d="$(srcdir)/"; fi; \
++	  helpdir="$(DESTDIR)$(HELP_DIR)/$$lc/$(HELP_ID)/"; \
++	  if ! test -d "$$helpdir"; then $(mkinstalldirs) "$$helpdir"; fi; \
++	  echo "$(INSTALL_DATA) $$d$$lc/$$f $$helpdir`basename $$f`"; \
++	  $(INSTALL_DATA) "$$d$$lc/$$f" "$$helpdir`basename $$f`" || exit 1; \
++	done; done
++	@for f in $(_HELP_C_EXTRA); do \
++	  lc=`dirname "$$f"`; lc=`basename "$$lc"`; \
++	  if test -f "$$f"; then d=; else d="$(srcdir)/"; fi; \
++	  helpdir="$(DESTDIR)$(HELP_DIR)/$$lc/$(HELP_ID)/"; \
++	  if ! test -d "$$helpdir"; then $(mkinstalldirs) "$$helpdir"; fi; \
++	  echo "$(INSTALL_DATA) $$d$$f $$helpdir`basename $$f`"; \
++	  $(INSTALL_DATA) "$$d$$f" "$$helpdir`basename $$f`" || exit 1; \
++	done
++	@for f in $(HELP_MEDIA); do \
++	  for lc in C $(_HELP_LINGUAS); do \
++	    if test -f "$$lc$$f"; then d=; else d="$(srcdir)/"; fi; \
++	    helpdir="$(DESTDIR)$(HELP_DIR)/$$lc/$(HELP_ID)/"; \
++	    mdir=`dirname "$$f"`; \
++	    if test "x$mdir" = "x."; then mdir=""; fi; \
++	    if ! test -d "$$helpdir$$mdir"; then $(mkinstalldirs) "$$helpdir$$mdir"; fi; \
++	    if test -f "$$d$$lc/$$f"; then \
++	      echo "$(INSTALL_DATA) $$d$$lc/$$f $$helpdir$$f"; \
++	      $(INSTALL_DATA) "$$d$$lc/$$f" "$$helpdir$$f" || exit 1; \
++	    elif test "x$$lc" != "xC"; then \
++	      if test "x$(YELP_LC_MEDIA_LINKS)" != "x"; then \
++	        echo "$(LN_S) -f $(HELP_DIR)/C/$(HELP_ID)/$$f $$helpdir$$f"; \
++	        $(LN_S) -f "$(HELP_DIR)/C/$(HELP_ID)/$$f" "$$helpdir$$f" || exit 1; \
++	      fi; \
++	    fi; \
++	  done; \
++	done
++
++.PHONY: uninstall-help
++uninstall-am: $(if $(HELP_ID),uninstall-help)
++uninstall-help:
++	for lc in C $(_HELP_LINGUAS); do for f in $(HELP_FILES); do \
++	  helpdir="$(DESTDIR)$(HELP_DIR)/$$lc/$(HELP_ID)/"; \
++	  echo "rm -f $$helpdir`basename $$f`"; \
++	  rm -f "$$helpdir`basename $$f`"; \
++	done; done
++	@for f in $(_HELP_C_EXTRA); do \
++	  lc=`dirname "$$f"`; lc=`basename "$$lc"`; \
++	  helpdir="$(DESTDIR)$(HELP_DIR)/$$lc/$(HELP_ID)/"; \
++	  echo "rm -f $$helpdir`basename $$f`"; \
++	  rm -f "$$helpdir`basename $$f`"; \
++	done
++	@for f in $(HELP_MEDIA); do \
++	  for lc in C $(_HELP_LINGUAS); do \
++	    helpdir="$(DESTDIR)$(HELP_DIR)/$$lc/$(HELP_ID)/"; \
++	    echo "rm -f $$helpdir$$f"; \
++	    rm -f "$$helpdir$$f"; \
++	  done; \
++	done;
++'
++AC_SUBST([YELP_HELP_RULES])
++m4_ifdef([_AM_SUBST_NOTMAKE], [_AM_SUBST_NOTMAKE([YELP_HELP_RULES])])
++])

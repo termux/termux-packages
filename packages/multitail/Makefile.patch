@@ -1,0 +1,29 @@
+--- a/Makefile
++++ b/Makefile
+@@ -9,7 +9,7 @@
+ 
+ UTF8_SUPPORT:=yes
+ DESTDIR=
+-PREFIX=/usr/local
++PREFIX=@TERMUX_PREFIX@
+ BINDIR=$(PREFIX)/bin
+ SHAREDIR=$(PREFIX)/share
+ MANDIR=$(SHAREDIR)/man
+@@ -37,7 +37,7 @@
+     LDFLAGS+=-lpanel $(NCURSES_LIB) -lutil -lm
+ else
+ ifeq ($(UTF8_SUPPORT),yes)
+-    LDFLAGS+=-lpanelw -lncursesw -lutil -lm
++    LDFLAGS+=-lpanelw -lncursesw -lm
+     CPPFLAGS+=-DUTF8_SUPPORT
+ else
+     LDFLAGS+=-lpanel -lncurses -lutil -lm
+@@ -70,7 +70,7 @@
+ 	### YOURSELF WITH THE NEW FILE
+ 	#
+ 	$(INSTALL_DIR) $(DESTDIR)$(CONFIG_DIR)
+-	$(INSTALL_DATA) multitail.conf $(DESTDIR)$(CONFIG_FILE).new
++	$(INSTALL_DATA) multitail.conf $(DESTDIR)$(CONFIG_FILE)
+ 	$(INSTALL_EXEC) conversion-scripts/* $(DESTDIR)$(CONFIG_DIR)
+ #rm -f $(DESTDIR)$(MAN1DIR)/multitail.1.gz
+ #gzip -9 $(DESTDIR)$(MAN1DIR)/multitail.1

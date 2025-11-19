@@ -1,0 +1,18 @@
+--- a/src/corelib/global/qlogging.cpp
++++ b/src/corelib/global/qlogging.cpp
+@@ -206,6 +206,7 @@
+ #if defined(Q_OS_LINUX) || defined(Q_OS_DARWIN) || defined(Q_OS_FREEBSD) || defined(Q_OS_NETBSD)
+ static bool qt_append_thread_name_to(QString &message)
+ {
++#ifndef __ANDROID__
+     std::array<char, 16> name{};
+     if (pthread_getname_np(pthread_self(), name.data(), name.size()) == 0) {
+         QUtf8StringView threadName(name.data());
+@@ -214,6 +215,7 @@
+             return true;
+         }
+     }
++#endif
+     return false;
+ }
+ #elif defined(Q_OS_WIN)

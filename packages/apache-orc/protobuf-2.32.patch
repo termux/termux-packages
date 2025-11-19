@@ -1,0 +1,36 @@
+From ab5f21ade37569e42c90efde02b95bfcf4bb031d Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Sun, 6 Jul 2025 17:33:04 +1100
+Subject: [PATCH] add missing include for protobuf types
+
+---
+ c++/src/io/InputStream.hh  | 2 ++
+ c++/src/io/OutputStream.hh | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/c++/src/io/InputStream.hh b/c++/src/io/InputStream.hh
+index 07aa623b5f..f0008e7b20 100644
+--- a/c++/src/io/InputStream.hh
++++ b/c++/src/io/InputStream.hh
+@@ -23,6 +23,8 @@
+ #include "orc/OrcFile.hh"
+ #include "wrap/zero-copy-stream-wrapper.h"
+ 
++#include "google/protobuf/stubs/port.h"
++
+ #include <fstream>
+ #include <iostream>
+ #include <list>
+diff --git a/c++/src/io/OutputStream.hh b/c++/src/io/OutputStream.hh
+index 6319de96d6..328a9e65bb 100644
+--- a/c++/src/io/OutputStream.hh
++++ b/c++/src/io/OutputStream.hh
+@@ -24,6 +24,8 @@
+ #include "orc/OrcFile.hh"
+ #include "wrap/zero-copy-stream-wrapper.h"
+ 
++#include "google/protobuf/stubs/port.h"
++
+ namespace orc {
+ 
+   /**

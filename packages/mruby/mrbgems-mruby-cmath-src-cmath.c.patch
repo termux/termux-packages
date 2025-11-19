@@ -1,0 +1,15 @@
+https://github.com/termux/termux-packages/issues/15852
+
+--- a/mrbgems/mruby-cmath/src/cmath.c
++++ b/mrbgems/mruby-cmath/src/cmath.c
+@@ -17,6 +17,10 @@
+ 
+ #include <complex.h>
+ 
++#if defined __ANDROID__ && __ANDROID_API__ < 26
++double complex clog(double complex);
++#endif
++
+ mrb_value mrb_complex_new(mrb_state *mrb, mrb_float real, mrb_float imag);
+ void mrb_complex_get(mrb_state *mrb, mrb_value cpx, mrb_float*, mrb_float*);
+ 

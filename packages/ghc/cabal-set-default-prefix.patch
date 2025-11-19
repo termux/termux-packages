@@ -1,0 +1,11 @@
+--- ghc-9.12.1/libraries/Cabal/Cabal/src/Distribution/Simple/InstallDirs.hs	2024-12-16 01:00:10.000000000 +0530
++++ ghc-9.12.1.mod/libraries/Cabal/Cabal/src/Distribution/Simple/InstallDirs.hs	2025-01-04 20:05:06.846734461 +0530
+@@ -205,7 +205,7 @@
+           windowsProgramFilesDir <- getWindowsProgramFilesDir
+           return (windowsProgramFilesDir </> "Haskell")
+         Haiku -> return "/boot/system/non-packaged"
+-        _ -> return "/usr/local"
++        _ -> return "@TERMUX_PREFIX@"
+   installLibDir <-
+     case buildOS of
+       Windows -> return "$prefix"

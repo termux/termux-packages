@@ -1,0 +1,18 @@
+diff -uNr openssh-portable-V_9_9_P1/ssh_config openssh-portable-V_9_9_P1.mod/ssh_config
+--- openssh-portable-V_9_9_P1/ssh_config	2024-09-20 01:20:48.000000000 +0300
++++ openssh-portable-V_9_9_P1.mod/ssh_config	2024-09-20 21:21:49.532425487 +0300
+@@ -17,6 +17,8 @@
+ # list of available options, their meanings and defaults, please see the
+ # ssh_config(5) man page.
+ 
++Include /etc/ssh/ssh_config.d/*.conf
++
+ # Host *
+ #   ForwardAgent no
+ #   ForwardX11 no
+@@ -44,3 +46,5 @@
+ #   ProxyCommand ssh -q -W %h:%p gateway.example.com
+ #   RekeyLimit 1G 1h
+ #   UserKnownHostsFile ~/.ssh/known_hosts.d/%k
++
++SendEnv LANG

@@ -1,0 +1,154 @@
+This reverts commit https://github.com/chromium/chromium/commit/4f6cc657b0953fb353111d581c130858e90aec08
+
+diff --git a/base/containers/buffer_iterator.h b/base/containers/buffer_iterator.h
+index 61abd79721..e2d9528a24 100644
+--- a/base/containers/buffer_iterator.h
++++ b/base/containers/buffer_iterator.h
+@@ -80,8 +80,8 @@ class BufferIterator {
+ 
+   // Copies out an object. As compared to using `Object`, this avoids potential
+   // unaligned access which may be undefined behavior.
+-  template <typename T>
+-    requires(std::is_trivially_copyable_v<T>)
++  template <typename T,
++            typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
+   std::optional<T> CopyObject() {
+     std::optional<T> t;
+     if (remaining_.size() >= sizeof(T)) {
+@@ -101,8 +101,8 @@ class BufferIterator {
+   // `CopyObject` as it avoids this problem entirely.
+   // TODO(danakj): We should probably CHECK this instead of allowing UB into
+   // production.
+-  template <typename T>
+-    requires(std::is_trivially_copyable_v<T>)
++  template <typename T,
++            typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
+   const T* Object() {
+     return MutableObject<const T>();
+   }
+@@ -117,8 +117,8 @@ class BufferIterator {
+   // `CopyObject` as it avoids this problem entirely.
+   // TODO(danakj): We should probably CHECK this instead of allowing UB into
+   // production.
+-  template <typename T>
+-    requires(std::is_trivially_copyable_v<T>)
++  template <typename T,
++            typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
+   T* MutableObject() {
+     T* t = nullptr;
+     if (remaining_.size() >= sizeof(T)) {
+@@ -142,8 +142,8 @@ class BufferIterator {
+   // using the span will cause Undefined Behaviour.
+   // TODO(danakj): We should probably CHECK this instead of allowing UB into
+   // production.
+-  template <typename T>
+-    requires(std::is_trivially_copyable_v<T>)
++  template <typename T,
++            typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
+   span<T> MutableSpan(size_t count) {
+     size_t byte_size;
+     if (!CheckMul(sizeof(T), count).AssignIfValid(&byte_size)) {
+@@ -165,9 +165,10 @@ class BufferIterator {
+ 
+   // An overload for when the size is known at compile time. The result will be
+   // a fixed-size span.
+-  template <typename T, size_t N>
+-    requires(N <= std::numeric_limits<size_t>::max() / sizeof(T) &&
+-             std::is_trivially_copyable_v<T>)
++  template <typename T,
++            size_t N,
++            typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
++    requires(N <= std::numeric_limits<size_t>::max() / sizeof(T))
+   std::optional<span<T, N>> MutableSpan() {
+     constexpr size_t byte_size =
+         N * sizeof(T);  // Overflow is checked by `requires`.
+@@ -193,17 +194,18 @@ class BufferIterator {
+   // using the span will cause Undefined Behaviour.
+   // TODO(danakj): We should probably CHECK this instead of allowing UB into
+   // production.
+-  template <typename T>
+-    requires(std::is_trivially_copyable_v<T>)
++  template <typename T,
++            typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
+   span<const T> Span(size_t count) {
+     return MutableSpan<const T>(count);
+   }
+ 
+   // An overload for when the size is known at compile time. The result will be
+   // a fixed-size span.
+-  template <typename T, size_t N>
+-    requires(N <= std::numeric_limits<size_t>::max() / sizeof(T) &&
+-             std::is_trivially_copyable_v<T>)
++  template <typename T,
++            size_t N,
++            typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
++    requires(N <= std::numeric_limits<size_t>::max() / sizeof(T))
+   std::optional<span<const T, N>> Span() {
+     return MutableSpan<const T, N>();
+   }
+diff --git a/base/containers/flat_map.h b/base/containers/flat_map.h
+index 612e15f7ff..25158d4eb9 100644
+--- a/base/containers/flat_map.h
++++ b/base/containers/flat_map.h
+@@ -234,12 +234,13 @@ class flat_map : public ::base::internal::
+   iterator insert_or_assign(const_iterator hint, K&& key, M&& obj);
+ 
+   template <class K, class... Args>
+-    requires(std::is_constructible_v<key_type, K &&>)
+-  std::pair<iterator, bool> try_emplace(K&& key, Args&&... args);
++  std::enable_if_t<std::is_constructible_v<key_type, K&&>,
++                   std::pair<iterator, bool>>
++  try_emplace(K&& key, Args&&... args);
+ 
+   template <class K, class... Args>
+-    requires(std::is_constructible_v<key_type, K &&>)
+-  iterator try_emplace(const_iterator hint, K&& key, Args&&... args);
++  std::enable_if_t<std::is_constructible_v<key_type, K&&>, iterator>
++  try_emplace(const_iterator hint, K&& key, Args&&... args);
+ 
+   // --------------------------------------------------------------------------
+   // General operations.
+@@ -324,12 +325,10 @@ auto flat_map<Key, Mapped, Compare, Container>::insert_or_assign(
+ 
+ template <class Key, class Mapped, class Compare, class Container>
+ template <class K, class... Args>
+-  requires(std::is_constructible_v<
+-           typename flat_map<Key, Mapped, Compare, Container>::key_type,
+-           K &&>)
+ auto flat_map<Key, Mapped, Compare, Container>::try_emplace(K&& key,
+                                                             Args&&... args)
+-    -> std::pair<iterator, bool> {
++    -> std::enable_if_t<std::is_constructible_v<key_type, K&&>,
++                        std::pair<iterator, bool>> {
+   return tree::emplace_key_args(
+       key, std::piecewise_construct,
+       std::forward_as_tuple(std::forward<K>(key)),
+@@ -338,13 +337,10 @@ auto flat_map<Key, Mapped, Compare, Container>::try_emplace(K&& key,
+ 
+ template <class Key, class Mapped, class Compare, class Container>
+ template <class K, class... Args>
+-  requires(std::is_constructible_v<
+-           typename flat_map<Key, Mapped, Compare, Container>::key_type,
+-           K &&>)
+ auto flat_map<Key, Mapped, Compare, Container>::try_emplace(const_iterator hint,
+                                                             K&& key,
+                                                             Args&&... args)
+-    -> iterator {
++    -> std::enable_if_t<std::is_constructible_v<key_type, K&&>, iterator> {
+   return tree::emplace_hint_key_args(
+              hint, key, std::piecewise_construct,
+              std::forward_as_tuple(std::forward<K>(key)),
+diff --git a/base/containers/intrusive_heap.h b/base/containers/intrusive_heap.h
+index d0a60ed748..70ecf19d91 100644
+--- a/base/containers/intrusive_heap.h
++++ b/base/containers/intrusive_heap.h
+@@ -572,8 +572,7 @@ class IntrusiveHeap {
+  private:
+   // Templated version of ToIndex that lets insert/erase/Replace work with all
+   // integral types.
+-  template <typename I>
+-    requires(std::is_integral_v<I>)
++  template <typename I, typename = std::enable_if_t<std::is_integral_v<I>>>
+   size_type ToIndex(I pos) {
+     return static_cast<size_type>(pos);
+   }

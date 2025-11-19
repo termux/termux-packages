@@ -1,0 +1,90 @@
+diff -uNr zig-bootstrap-0.14.0.orig/build zig-bootstrap-0.14.0/build
+--- zig-bootstrap-0.14.0.orig/build	2025-03-06 04:47:21.200134111 +0100
++++ zig-bootstrap-0.14.0/build	2025-03-06 22:34:08.396147070 +0100
+@@ -24,10 +24,12 @@
+ # First build the libraries for Zig to link against, as well as native `llvm-tblgen`.
+ mkdir -p "$ROOTDIR/out/build-llvm-host"
+ cd "$ROOTDIR/out/build-llvm-host"
+-cmake "$ROOTDIR/llvm" \
++cmake -G Ninja "$ROOTDIR/llvm" \
+   -DCMAKE_INSTALL_PREFIX="$ROOTDIR/out/host" \
+   -DCMAKE_PREFIX_PATH="$ROOTDIR/out/host" \
+   -DCMAKE_BUILD_TYPE=Release \
++  -DCMAKE_C_LINKER_DEPFILE_SUPPORTED=FALSE \
++  -DCMAKE_CXX_LINKER_DEPFILE_SUPPORTED=FALSE \
+   -DLLVM_ENABLE_BINDINGS=OFF \
+   -DLLVM_ENABLE_LIBEDIT=OFF \
+   -DLLVM_ENABLE_LIBPFM=OFF \
+@@ -55,18 +57,20 @@
+   -DCLANG_TOOL_ARCMT_TEST_BUILD=OFF \
+   -DCLANG_TOOL_C_ARCMT_TEST_BUILD=OFF \
+   -DCLANG_TOOL_LIBCLANG_BUILD=OFF
+-cmake --build . --target install
++ninja -j"${TERMUX_PKG_MAKE_PROCESSES}" install
+ 
+ # Now we build Zig, still with system C/C++ compiler, linking against LLVM,
+ # Clang, LLD we just built from source.
+ mkdir -p "$ROOTDIR/out/build-zig-host"
+ cd "$ROOTDIR/out/build-zig-host"
+-cmake "$ROOTDIR/zig" \
++cmake -G Ninja "$ROOTDIR/zig" \
+   -DCMAKE_INSTALL_PREFIX="$ROOTDIR/out/host" \
+   -DCMAKE_PREFIX_PATH="$ROOTDIR/out/host" \
+   -DCMAKE_BUILD_TYPE=Release \
++  -DCMAKE_C_LINKER_DEPFILE_SUPPORTED=FALSE \
++  -DCMAKE_CXX_LINKER_DEPFILE_SUPPORTED=FALSE \
+   -DZIG_VERSION="$ZIG_VERSION"
+-cmake --build . --target install
++ninja -j"${TERMUX_PKG_MAKE_PROCESSES}" install
+ 
+ # Now we have Zig as a cross compiler.
+ ZIG="$ROOTDIR/out/host/bin/zig"
+@@ -75,7 +79,7 @@
+ # the final zig binary to have zlib support enabled.
+ mkdir -p "$ROOTDIR/out/build-zlib-$TARGET-$MCPU"
+ cd "$ROOTDIR/out/build-zlib-$TARGET-$MCPU"
+-cmake "$ROOTDIR/zlib" \
++cmake -G Ninja "$ROOTDIR/zlib" \
+   -DCMAKE_INSTALL_PREFIX="$ROOTDIR/out/$TARGET-$MCPU" \
+   -DCMAKE_PREFIX_PATH="$ROOTDIR/out/$TARGET-$MCPU" \
+   -DCMAKE_BUILD_TYPE=Release \
+@@ -86,8 +90,10 @@
+   -DCMAKE_ASM_COMPILER="$ZIG;cc;-fno-sanitize=all;-s;-target;$TARGET;-mcpu=$MCPU" \
+   -DCMAKE_RC_COMPILER="$ROOTDIR/out/host/bin/llvm-rc" \
+   -DCMAKE_AR="$ROOTDIR/out/host/bin/llvm-ar" \
+-  -DCMAKE_RANLIB="$ROOTDIR/out/host/bin/llvm-ranlib"
+-cmake --build . --target install
++  -DCMAKE_RANLIB="$ROOTDIR/out/host/bin/llvm-ranlib" \
++  -DCMAKE_C_LINKER_DEPFILE_SUPPORTED=FALSE \
++  -DCMAKE_CXX_LINKER_DEPFILE_SUPPORTED=FALSE
++ninja -j"${TERMUX_PKG_MAKE_PROCESSES}" install
+ 
+ # Same deal for zstd.
+ # The build system for zstd is whack so I just put all the files here.
+@@ -137,7 +143,7 @@
+ # Rebuild LLVM with Zig.
+ mkdir -p "$ROOTDIR/out/build-llvm-$TARGET-$MCPU"
+ cd "$ROOTDIR/out/build-llvm-$TARGET-$MCPU"
+-cmake "$ROOTDIR/llvm" \
++cmake -G Ninja "$ROOTDIR/llvm" \
+   -DCMAKE_INSTALL_PREFIX="$ROOTDIR/out/$TARGET-$MCPU" \
+   -DCMAKE_PREFIX_PATH="$ROOTDIR/out/$TARGET-$MCPU" \
+   -DCMAKE_BUILD_TYPE=Release \
+@@ -149,6 +155,8 @@
+   -DCMAKE_RC_COMPILER="$ROOTDIR/out/host/bin/llvm-rc" \
+   -DCMAKE_AR="$ROOTDIR/out/host/bin/llvm-ar" \
+   -DCMAKE_RANLIB="$ROOTDIR/out/host/bin/llvm-ranlib" \
++  -DCMAKE_C_LINKER_DEPFILE_SUPPORTED=FALSE \
++  -DCMAKE_CXX_LINKER_DEPFILE_SUPPORTED=FALSE \
+   -DLLVM_ENABLE_BACKTRACES=OFF \
+   -DLLVM_ENABLE_BINDINGS=OFF \
+   -DLLVM_ENABLE_CRASH_OVERRIDES=OFF \
+@@ -188,7 +196,7 @@
+   -DCLANG_TOOL_C_ARCMT_TEST_BUILD=OFF \
+   -DCLANG_TOOL_LIBCLANG_BUILD=OFF \
+   -DLLD_BUILD_TOOLS=OFF
+-cmake --build . --target install
++ninja -j"${TERMUX_PKG_MAKE_PROCESSES}" install
+ 
+ # Finally, we can cross compile Zig itself, with Zig.
+ cd "$ROOTDIR/zig"

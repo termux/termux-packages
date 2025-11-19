@@ -1,0 +1,13 @@
+# This is the culprit that removes `-fPIC` flag for i686 build.
+
+--- ghc-9.12.1/hadrian/src/Settings/Packages.hs	2025-02-24 22:46:43.668323779 +0530
++++ ghc-9.12.1.mod/hadrian/src/Settings/Packages.hs	2025-02-25 23:06:51.153991428 +0530
+@@ -510,7 +510,7 @@
+ speedHack :: Action Bool
+ speedHack = do
+     i386   <- anyTargetArch [ArchX86]
+-    goodOS <- not <$> anyTargetOs [OSSolaris2]
++    goodOS <- not <$> anyTargetOs [OSSolaris2, OSLinux]
+     return $ i386 && goodOS
+ 
+ -- See @rts/ghc.mk@.

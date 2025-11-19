@@ -1,0 +1,11 @@
+#!@TERMUX_PREFIX@/bin/bash
+
+set -e
+
+sort -r | while read -r dir; do
+	[[ ! -d "${dir}" ]] && continue
+	mkfontscale "${dir}"
+	mkfontdir "${dir}"
+	find "${dir}"fonts.{scale,dir} -maxdepth 0 -size -3c -delete
+	rmdir --ignore-fail-on-non-empty "${dir}"
+done

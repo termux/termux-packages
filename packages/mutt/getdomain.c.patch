@@ -1,0 +1,13 @@
+diff -u -r ../mutt-1.7.1/getdomain.c ./getdomain.c
+--- ../mutt-1.7.1/getdomain.c	2016-10-08 15:30:21.000000000 -0400
++++ ./getdomain.c	2016-10-08 17:58:14.895654111 -0400
+@@ -46,7 +46,9 @@
+   hints.ai_family = AF_UNSPEC;
+ 
+   /* A DNS name can actually be only 253 octets, string is 256 */
++#ifdef _SC_HOST_NAME_MAX
+   if ((node_len = sysconf(_SC_HOST_NAME_MAX)) == -1)
++#endif
+     node_len = STRING;
+   node = safe_malloc(node_len + 1);
+   if (gethostname(node, node_len))

@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<dump>
+  <interface name="XdgNotificationsNotifications" get-type="xdg_notifications_notifications_get_type">
+    <property name="inhibited" type="gboolean" flags="227" default-value="FALSE"/>
+    <signal name="handle-notify" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="guint"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="GStrv"/>
+      <param type="GVariant"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="handle-close-notification" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="handle-get-capabilities" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-get-server-information" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-inhibit" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+    </signal>
+    <signal name="handle-un-inhibit" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="notification-closed" return="void" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="action-invoked" return="void" when="last">
+      <param type="guint"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="notification-replied" return="void" when="last">
+      <param type="guint"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="activation-token" return="void" when="last">
+      <param type="guint"/>
+      <param type="gchararray"/>
+    </signal>
+  </interface>
+  <class name="XdgNotificationsNotificationsProxy" get-type="xdg_notifications_notifications_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="XdgNotificationsNotifications"/>
+  </class>
+  <class name="XdgNotificationsNotificationsSkeleton" get-type="xdg_notifications_notifications_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="XdgNotificationsNotifications"/>
+  </class>
+  <interface name="XdgNotificationsObject" get-type="xdg_notifications_object_get_type">
+    <prerequisite name="GDBusObject"/>
+    <property name="notifications" type="XdgNotificationsNotifications" flags="227"/>
+  </interface>
+  <class name="XdgNotificationsObjectProxy" get-type="xdg_notifications_object_proxy_get_type" parents="GDBusObjectProxy,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="XdgNotificationsObject"/>
+  </class>
+  <class name="XdgNotificationsObjectSkeleton" get-type="xdg_notifications_object_skeleton_get_type" parents="GDBusObjectSkeleton,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="XdgNotificationsObject"/>
+  </class>
+  <class name="XdgNotificationsObjectManagerClient" get-type="xdg_notifications_object_manager_client_get_type" parents="GDBusObjectManagerClient,GObject">
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GDBusObjectManager"/>
+  </class>
+</dump>

@@ -1,0 +1,24 @@
+diff -uNr gtk-3.22.30/demos/widget-factory/widget-factory.c gtk-3.22.30.mod/demos/widget-factory/widget-factory.c
+--- gtk-3.22.30/demos/widget-factory/widget-factory.c	2018-04-16 21:06:02.000000000 +0300
++++ gtk-3.22.30.mod/demos/widget-factory/widget-factory.c	2018-06-22 20:55:46.624626257 +0300
+@@ -984,7 +984,7 @@
+   gtk_widget_show (child);
+   gtk_flow_box_insert (GTK_FLOW_BOX (flowbox), child, -1);
+ 
+-  location = "/usr/share/backgrounds/gnome";
++  location = "@TERMUX_PREFIX@/share/backgrounds/gnome";
+   dir = g_dir_open (location, 0, &error);
+   if (error)
+     {
+diff -uNr gtk-3.22.30/modules/printbackends/cups/gtkprintbackendcups.c gtk-3.22.30.mod/modules/printbackends/cups/gtkprintbackendcups.c
+--- gtk-3.22.30/modules/printbackends/cups/gtkprintbackendcups.c	2018-04-16 21:06:02.000000000 +0300
++++ gtk-3.22.30.mod/modules/printbackends/cups/gtkprintbackendcups.c	2018-06-22 20:55:46.614626256 +0300
+@@ -3999,7 +3999,7 @@
+ 
+ /* Ordering matters for default preference */
+ static const char *lpoptions_locations[] = {
+-  "/etc/cups/lpoptions",
++  "@TERMUX_PREFIX@/etc/cups/lpoptions",
+   ".lpoptions",
+   ".cups/lpoptions"
+ };

@@ -1,0 +1,29 @@
+Copied from https://salsa.debian.org/multimedia-team/vlc/-/commit/f0ead348a0d2739c6e097938e7fd20db39c6fc59
+
+From: =?utf-8?q?R=C3=A9mi_Denis-Courmont?= <remi@remlab.net>
+Date: Sat, 5 May 2018 15:28:15 +0300
+Subject: avcodec: avoid signedness mismatch warning
+
+Bitmask should be unsigned, but ffmpeg seems confused with itself.
+
+(cherry picked from commit 8544233e7fde2965435e32a445494898440ecc30)
+---
+ modules/codec/avcodec/audio.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/modules/codec/avcodec/audio.c b/modules/codec/avcodec/audio.c
+index 50a76c7..e5af0ca 100644
+--- a/modules/codec/avcodec/audio.c
++++ b/modules/codec/avcodec/audio.c
+@@ -593,9 +593,9 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
+     uint32_t pi_order_src[i_order_max];
+ 
+     int i_channels_src = 0;
+-    int64_t channel_layout =
++    uint64_t channel_layout =
+         p_sys->p_context->channel_layout ? p_sys->p_context->channel_layout :
+-        av_get_default_channel_layout( p_sys->p_context->channels );
++        (uint64_t)av_get_default_channel_layout( p_sys->p_context->channels );
+ 
+     if( channel_layout )
+     {

@@ -1,0 +1,24 @@
+--- ./lib/configure.orig	2019-01-24 22:44:34.406570275 +0100
++++ ./lib/configure	2019-01-24 22:46:51.853235913 +0100
+@@ -28,7 +28,7 @@
+ echo "LIBS = -ldl \\" >Make.libs
+     
+ rm -f a.out
+-c++ test_readline.cc $CXXFLAGS $CPPFLAGS $LDFLAGS -lreadline
++$CXX test_readline.cc $CXXFLAGS $CPPFLAGS $LDFLAGS -lreadline
+ if [ -f a.out ] ; then
+     echo "using readline"
+     echo "-DHAVE_LIBREADLINE \\" >>Make.ccflags
+@@ -46,10 +46,10 @@
+ cat <<CAT_EOF >Make.sys
+ #------------------------------------------------------------------------
+ VPATH = .:..
+-CCC = c++
++CCC = \$(CXX)
+ TARGET_EXT = .so
+ 
+-LDFLAGS = -shared
++LDFLAGS += -shared
+ 
+ .SUFFIXES:
+ .SUFFIXES: .o .cc

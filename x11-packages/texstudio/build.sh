@@ -1,0 +1,13 @@
+TERMUX_PKG_HOMEPAGE=https://www.texstudio.org/
+TERMUX_PKG_DESCRIPTION="A fully featured LaTeX editor"
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="4.9.0"
+TERMUX_PKG_SRCURL=https://github.com/texstudio-org/texstudio/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=b6facbe29b1387e9a9888cada2b5da6969dc3f1dcd24d171002b746df576b952
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="hunspell, libc++, libx11, poppler-qt, qt6-qtbase, qt6-qtdeclarative, qt6-qtsvg, qt6-qttools, quazip, texstudio-data, zlib"
+TERMUX_PKG_BUILD_DEPENDS="qt6-qtbase-cross-tools, qt6-qtdeclarative-cross-tools, qt6-qttools-cross-tools"
+TERMUX_PKG_RECOMMENDS="ghostscript"
+TERMUX_PKG_SUGGESTS="texlive-installer"
+TERMUX_PKG_BUILD_IN_SRC=true

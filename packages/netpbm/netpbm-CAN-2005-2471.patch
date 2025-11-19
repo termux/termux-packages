@@ -1,0 +1,16 @@
+--- netpbm-10.29/converter/other/pstopnm.c.CAN-2005-2471	2005-08-15 02:39:46.000000000 +0200
++++ netpbm-10.29/converter/other/pstopnm.c	2005-08-16 15:38:15.000000000 +0200
+@@ -818,11 +818,11 @@
+                    ghostscriptProg, arg0,
+                    deviceopt, outfileopt, gopt, ropt, textalphabitsopt,
+                    "-q", "-dNOPAUSE", 
+-                   "-dSAFER", "-");
++                   "-dPARANOIDSAFER", "-");
+     }
+ 
+     execl(ghostscriptProg, arg0, deviceopt, outfileopt, gopt, ropt, 
+-	  textalphabitsopt, "-q", "-dNOPAUSE", "-dSAFER", "-", NULL);
++         textalphabitsopt, "-q", "-dNOPAUSE", "-dPARANOIDSAFER", "-", NULL);
+     
+     pm_error("execl() of Ghostscript ('%s') failed, errno=%d (%s)",
+              ghostscriptProg, errno, strerror(errno));

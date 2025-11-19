@@ -1,0 +1,12 @@
+Allow setting CMAKE_INSTALL_QT6PLUGINDIR option from cmake command
+
+--- a/qt6/platforminputcontext/CMakeLists.txt
++++ b/qt6/platforminputcontext/CMakeLists.txt
+@@ -74,5 +74,7 @@
+ else()
+     message(FATAL_ERROR "QMake Qt6 call failed: ${return_code}")
+ endif()
++if(NOT CMAKE_INSTALL_QT6PLUGINDIR)
+ set(CMAKE_INSTALL_QT6PLUGINDIR ${_QT6PLUGINDIR} CACHE PATH "Qt6 plugin dir")
++endif()
+ install(TARGETS fcitx5platforminputcontextplugin-qt6 DESTINATION ${CMAKE_INSTALL_QT6PLUGINDIR}/platforminputcontexts)

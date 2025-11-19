@@ -1,0 +1,258 @@
+#!/bin/bash
+# shellcheck shell=bash
+
+if [ -z "${BASH_VERSION:-}" ]; then
+    echo "The 'termux-replace-termux-core-src-scripts' script must be run from a 'bash' shell."; return 64 2>/dev/null|| exit 64 # EX__USAGE
+fi
+
+
+
+REGEX__ABSOLUTE_PATH='^(/[^/]+)+$'
+
+function termux_rtcss__log_errors() { echo "$@" 1>&2; }
+
+termux_rtcss__show_help() {
+
+    cat <<'HELP_EOF'
+termux-replace-termux-core-src-scripts replaces inplace the `@<name>@`
+formatted build time placeholders for the termux-core package source
+scripts with their content in the `input_files` supplied.
+
+
+Usage:
+    termux-replace-termux-core-src-scripts <input_files...>
+
+
+The scripts whose placeholders are replaced exist in the
+`packages/termux-core/app/main/scripts` directory of the `termux-package`
+repo. The `<name>` in the `@<name>@` placeholders must be equal to
+uppercased script file name whose content to replace.
+
+
+The following required variables must be exported when executed this
+script, which are defined in the `scripts/properties.sh` file of the
+`termux-package` repo.
+
+- TERMUX_ENV__S_ROOT
+- TERMUX__PREFIX
+- TERMUX_PKGS__REPO_URL
+- TERMUX_CORE_PKG__REPO_URL
+HELP_EOF
+
+}
+
+termux_rtcss__main() {
+
+    local return_value
+
+    if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+        termux_rtcss__show_help || return $?
+        return 0
+    else
+        termux_rtcss__replace_termux_core_src_scripts "$@"
+        return_value=$?
+        if [ $return_value -eq 64 ]; then # EX__USAGE
+            echo ""
+            termux_rtcss__show_help
+        fi
+        return $return_value
+    fi
+
+}
+
+termux_rtcss__replace_termux_core_src_scripts() {
+
+    local return_value
+
+    if [ $# -lt 1 ]; then
+        termux_rtcss__log_errors "input_files not passed."
+        return 64
+    fi
+
+    local exported_variable
+    local input_file
+    local src_script_file
+    local src_script_file_basename
+    local src_script_file_placeholder
+    local src_script_content
+    local src_script_escaped_content
+    local src_script_content_var_name
+    local termux_core__src_srcipts_dir
+
+
+    termux_core__src_srcipts_dir=$(realpath "$(dirname "$TERMUX_RTCSS__ARG_0")/../../app/main/scripts")
+    if [[ ! "$termux_core__src_srcipts_dir" =~ $REGEX__ABSOLUTE_PATH ]]; then
+        termux_rtcss__log_errors "The termux_core__src_srcipts_dir '$termux_core__src_srcipts_dir' with length ${#termux_core__src_srcipts_dir} is invalid."
+        termux_rtcss__log_errors "The termux_core__src_srcipts_dir must be an absolute path for a sub path under rootfs '/'."
+        return 1
+    fi
+
+    if [ ! -d "$termux_core__src_srcipts_dir" ]; then
+        termux_rtcss__log_errors "The termux_core__src_srcipts_dir '$termux_core__src_srcipts_dir' directory does not exist."
+        return 1
+    fi
+
+    # The order matters here. The scripts that have `@*@` placeholders
+    # for other scripts must come before their placeholder scripts,
+    # so that first the caller scripts get replaced in the input
+    # files, and then the placeholders for other scripts get replaced
+    # in the input files.
+    # For example, the `termux_core__bash__termux_apps_info_env_variable` script
+    # has the `@TERMUX_CORE__BASH__TERMUX_SCOPED_ENV_VARIABLE@`
+    # placeholder for the `termux_core__bash__termux_scoped_env_variable`
+    # script and so the `termux_core__bash__termux_apps_info_env_variable` script
+    # comes first.
+    local -a required_src_scripts=(
+        "termux/shell/command/environment/termux_core__bash__termux_apps_info_app_version_name"
+        "termux/shell/command/environment/termux_core__bash__termux_apps_info_env_variable"
+        "termux/shell/command/environment/termux_core__bash__termux_scoped_env_variable"
+        "termux/shell/command/environment/termux_core__sh__termux_apps_info_app_version_name"
+        "termux/shell/command/environment/termux_core__sh__termux_apps_info_env_variable"
+        "termux/shell/command/environment/termux_core__sh__termux_scoped_env_variable"
+    )
+
+    for src_script_file in "${required_src_scripts[@]}"; do
+        if [ ! -f "$termux_core__src_srcipts_dir/$src_script_file" ]; then
+            termux_rtcss__log_errors "The '$src_script_file' source script file \
+not found under the termux_core__src_srcipts_dir '$termux_core__src_srcipts_dir' directory."
+            return 1
+        fi
+    done
+
+
+    local -a required_exported_variables=(
+        "TERMUX_ENV__S_ROOT"
+        "TERMUX__PREFIX"
+        "TERMUX_PKGS__REPO_URL"
+        "TERMUX_CORE_PKG__REPO_URL"
+    )
+
+    for exported_variable in "${required_exported_variables[@]}"; do
+        if [ -z "${!exported_variable}" ]; then
+            termux_rtcss__log_errors "The $exported_variable variable is not set."
+            return 1
+        fi
+    done
+
+
+    for input_file in "$@"; do
+        if [ ! -f "$input_file" ]; then
+            termux_rtcss__log_errors "The input file '$input_file' passed does not exist at path"
+            return 1
+        fi
+    done
+
+
+
+    # For all the required_src_scripts, read their content into local variables.
+    for src_script_file in "${required_src_scripts[@]}"; do
+        # Read the src_script_file and ensure its not empty.
+        src_script_content="$(cat "$termux_core__src_srcipts_dir/$src_script_file")"
+        return_value=$?
+        if [ $return_value -ne 0 ]; then
+            termux_rtcss__log_errors "Failed to read the '$src_script_file' source script file \
+under the termux_core__src_srcipts_dir '$termux_core__src_srcipts_dir' directory."
+            return $return_value
+        elif [ -z "$src_script_content" ]; then
+            termux_rtcss__log_errors "The '$src_script_file' source script file \
+under the termux_core__src_srcipts_dir '$termux_core__src_srcipts_dir' directory is empty."
+            return 1
+        fi
+
+        # Replace placeholder for variables (not scripts) in the src_script_content.
+        src_script_content="$(printf "%s" "$src_script_content" | sed \
+            -e "s%[@]TERMUX_ENV__S_ROOT[@]%$(termux_rtcss__get_sed_replacement_escaped_string "$TERMUX_ENV__S_ROOT")%g" \
+            -e "s%[@]TERMUX__PREFIX[@]%$(termux_rtcss__get_sed_replacement_escaped_string "$TERMUX__PREFIX")%g" \
+            -e "s%[@]TERMUX_PKGS__REPO_URL[@]%$(termux_rtcss__get_sed_replacement_escaped_string "$TERMUX_PKGS__REPO_URL")%g" \
+            -e "s%[@]TERMUX_CORE_PKG__REPO_URL[@]%$(termux_rtcss__get_sed_replacement_escaped_string "$TERMUX_CORE_PKG__REPO_URL")%g"
+        )" || return $?
+
+        # Create a local variable with the same name as its script file name
+        # with `/` replaced with `__` and `__content` appended.
+        src_script_content_var_name="${src_script_file//\//__}__content"
+        local "$src_script_content_var_name"
+        printf -v "$src_script_content_var_name" "%s" "$src_script_content"
+
+        #echo "$src_script_content_var_name:"$'\n```'"${!src_script_content_var_name}"$'\n```'
+    done
+
+
+
+    # For all the required_src_scripts.
+    for src_script_file in "${required_src_scripts[@]}"; do
+        src_script_content_var_name="${src_script_file//\//__}__content"
+        src_script_file_basename="${src_script_file##*/}"
+
+        # Escape the content to be used as a sed replacement string.
+        src_script_escaped_content="$(termux_rtcss__get_sed_replacement_escaped_string \
+            "${!src_script_content_var_name}")" || return $?
+
+        # For all the input_files, replace the first line found that
+        # contains the `@src_script_file@` placeholder with the script content.
+        for input_file in "$@"; do
+            sed -i'' -e "s/.*[@]${src_script_file_basename^^}[@].*/$src_script_escaped_content/" "$input_file"
+            return_value=$?
+            if [ $return_value -ne 0 ]; then
+                termux_rtcss__log_errors "Failed to replace the '$src_script_file' source script \
+placeholder '@${src_script_file_basename^^}@' in the input file '$input_file' with script content."
+                return $return_value
+            fi
+        done
+    done
+
+    return 0
+
+}
+
+##
+# Escape the following characters with a backslash `\` in a string
+# that is to be used as the `replacement` string in a `sed`
+# `s/regexp/replacement/` expression so that the replacement string
+# is literally replaced, even if the string is multiline:
+# - `&` used to reference entire string matched by the regex,
+# - `\` used to reference for capturing groups, like `\1`, `\2`, etc.
+# - `/` used as the delimiter in sed `s/regexp/replacement/` expression.
+# - `\n` characters must be escaped.
+#
+# The escaped replacement string will be echoed to `stdout`.
+#
+# **See Also:**
+# - https://stackoverflow.com/a/29613573/14686958
+#
+# `termux_rtcss__get_sed_replacement_escaped_string` `<string>`
+##
+termux_rtcss__get_sed_replacement_escaped_string() {
+
+    local sed_replacement_escaped_string
+
+    # read is used to preserve trailing newlines that would be lost if a subshell is used, but isn't posix shell compliant.
+    #IFS= read -d '' -r sed_replacement_escaped_string < <(sed -e ':a' -e '$!{N;ba' -e '}' -e 's/[&/\]/\\&/g; s/\n/\\&/g' <<<"$1")
+
+    # Instead of using the `sed -z` option, we manually add everything
+    # to pattern space.
+    # `$!` checks if we are before last line, so if we are not on it,
+    # then we add next line to pattern space.
+    # Then we escape the required characters.
+    # The x is added in subshell to preserve trailing newlines and then removed.
+    sed_replacement_escaped_string="$(printf '%s' "$1" | sed -e '$!{:a;N;$!ba;}; s/[&/\]/\\&/g; s/\n/\\&/g'; printf "%s" x)"
+    sed_replacement_escaped_string="${sed_replacement_escaped_string%x}"
+
+    printf %s "${sed_replacement_escaped_string%$'\n'}"
+
+}
+
+
+
+TERMUX_RTCSS__ARG_0="$0"
+
+# If script is sourced, return with error, otherwise call main function.
+# - https://stackoverflow.com/a/28776166/14686958
+# - https://stackoverflow.com/a/29835459/14686958
+if (return 0 2>/dev/null); then
+    echo "${0##*/} cannot be sourced as '\$0' is required by internal functions, \
+which will be invalid if functions are sourced and called directly." 1>&2
+    return 64 # EX__USAGE
+else
+    termux_rtcss__main "$@"
+    exit $?
+fi

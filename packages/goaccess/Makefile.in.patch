@@ -1,0 +1,15 @@
+diff -uNr goaccess-1.4/Makefile.in goaccess-1.4.mod/Makefile.in
+--- goaccess-1.4/Makefile.in	2020-05-17 18:03:00.000000000 +0300
++++ goaccess-1.4.mod/Makefile.in	2020-05-26 16:40:08.800612064 +0300
+@@ -621,9 +621,9 @@
+ 	@: > src/$(DEPDIR)/$(am__dirstamp)
+ src/bin2c.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+ 
+-bin2c$(EXEEXT): $(bin2c_OBJECTS) $(bin2c_DEPENDENCIES) $(EXTRA_bin2c_DEPENDENCIES) 
++bin2c$(EXEEXT): $(bin2c_SOURCES)
+ 	@rm -f bin2c$(EXEEXT)
+-	$(AM_V_CCLD)$(LINK) $(bin2c_OBJECTS) $(bin2c_LDADD) $(LIBS)
++	$(AM_V_CCLD)gcc $(bin2c_SOURCES) -o bin2c
+ src/base64.$(OBJEXT): src/$(am__dirstamp) \
+ 	src/$(DEPDIR)/$(am__dirstamp)
+ src/browsers.$(OBJEXT): src/$(am__dirstamp) \

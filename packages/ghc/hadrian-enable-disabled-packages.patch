@@ -1,0 +1,18 @@
+--- ghc-9.12.2/hadrian/src/Settings/Default.hs	2025-03-29 15:32:47.000000000 +0530
++++ ghc-9.12.2.mod/hadrian/src/Settings/Default.hs	2025-04-07 15:04:48.724844187 +0530
+@@ -172,13 +172,11 @@
+         , unlit
+         , xhtml
+         , if winTarget then win32 else unix
+-        ]
+-      , when (not cross)
+-        [ haddock
++        , haddock
+         , hpcBin
+         , iserv
+         , runGhc
+-        , ghcToolchainBin
++        , terminfo
+         ]
+       , when (winTarget && not cross)
+         [ -- See Note [Hadrian's ghci-wrapper package]

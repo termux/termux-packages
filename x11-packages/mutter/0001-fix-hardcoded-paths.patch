@@ -1,0 +1,24 @@
+--- a/src/wayland/meta-xwayland.c
++++ b/src/wayland/meta-xwayland.c
+@@ -63,9 +63,9 @@
+ #define XWAYLAND_LISTENFD "-listen"
+ #endif
+ 
+-#define TMP_UNIX_DIR         "/tmp"
+-#define X11_TMP_UNIX_DIR     "/tmp/.X11-unix"
+-#define X11_TMP_UNIX_PATH    "/tmp/.X11-unix/X"
++#define TMP_UNIX_DIR         "@TERMUX_PREFIX@/tmp"
++#define X11_TMP_UNIX_DIR     "@TERMUX_PREFIX@/tmp/.X11-unix"
++#define X11_TMP_UNIX_PATH    "@TERMUX_PREFIX@/tmp/.X11-unix/X"
+ 
+ static int display_number_override = -1;
+ 
+@@ -160,7 +160,7 @@
+   char *filename;
+   int fd;
+ 
+-  filename = g_strdup_printf ("/tmp/.X%d-lock", display);
++  filename = g_strdup_printf ("@TERMUX_PREFIX@/tmp/.X%d-lock", display);
+ 
+  again:
+   fd = open (filename, O_WRONLY | O_CLOEXEC | O_CREAT | O_EXCL, 0444);

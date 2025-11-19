@@ -1,0 +1,39 @@
+--- a/rust/libnewsboat/src/utils.rs
++++ b/rust/libnewsboat/src/utils.rs
+@@ -815,12 +815,15 @@
+ 
+ // On FreeBSD, link with GNU libiconv; the iconv implementation in libc doesn't support //TRANSLIT
+ // and WCHAR_T. This is also why we change the symbol names from "iconv" to "libiconv" below.
++#[cfg_attr(target_os = "android", link(name = "iconv"))]
+ #[cfg_attr(target_os = "freebsd", link(name = "iconv"))]
+ #[cfg_attr(target_os = "openbsd", link(name = "iconv"))]
+ unsafe extern "C" {
++    #[cfg_attr(target_os = "android", link_name = "libiconv_open")]
+     #[cfg_attr(target_os = "freebsd", link_name = "libiconv_open")]
+     #[cfg_attr(target_os = "openbsd", link_name = "libiconv_open")]
+     pub fn iconv_open(tocode: *const c_char, fromcode: *const c_char) -> iconv_t;
++    #[cfg_attr(target_os = "android", link_name = "libiconv")]
+     #[cfg_attr(target_os = "freebsd", link_name = "libiconv")]
+     #[cfg_attr(target_os = "openbsd", link_name = "libiconv")]
+     pub fn iconv(
+@@ -830,6 +833,7 @@
+         outbuf: *mut *mut c_char,
+         outbytesleft: *mut size_t,
+     ) -> size_t;
++    #[cfg_attr(target_os = "android", link_name = "libiconv_close")]
+     #[cfg_attr(target_os = "freebsd", link_name = "libiconv_close")]
+     #[cfg_attr(target_os = "openbsd", link_name = "libiconv_close")]
+     pub fn iconv_close(cd: iconv_t) -> c_int;
+@@ -1014,6 +1018,12 @@
+     result
+ }
+ 
++#[cfg(target_os = "android")]
++fn get_locale_encoding() -> String {
++    String::from("UTF-8")
++}
++
++#[cfg(not(target_os = "android"))]
+ fn get_locale_encoding() -> String {
+     unsafe {
+         use libc::{nl_langinfo, CODESET};

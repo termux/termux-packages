@@ -1,0 +1,15 @@
+--- a/tests/catch.hpp.orig
++++ b/tests/catch.hpp
+@@ -203,9 +203,12 @@
+ ////////////////////////////////////////////////////////////////////////////////
+ // Android somehow still does not support std::to_string
+ #if defined(__ANDROID__)
++#include <sys/cdefs.h>
++#if !defined(__TERMUX__)
+ #    define CATCH_INTERNAL_CONFIG_NO_CPP11_TO_STRING
+ #    define CATCH_INTERNAL_CONFIG_ANDROID_LOGWRITE
+ #endif
++#endif
+ 
+ ////////////////////////////////////////////////////////////////////////////////
+ // Not all Windows environments support SEH properly

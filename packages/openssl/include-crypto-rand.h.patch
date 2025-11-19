@@ -1,0 +1,11 @@
+--- ./include/crypto/rand.h.orig	2022-01-22 19:24:47.338975179 +0530
++++ ./include/crypto/rand.h	2022-01-22 19:25:38.608975159 +0530
+@@ -78,7 +78,7 @@
+  * sockets will be tried in the order listed in case accessing the device
+  * files listed in DEVRANDOM did not return enough randomness.
+  */
+-# define DEVRANDOM_EGD "/var/run/egd-pool", "/dev/egd-pool", "/etc/egd-pool", "/etc/entropy"
++# define DEVRANDOM_EGD "@TERMUX_PREFIX@/var/run/egd-pool", "/dev/egd-pool", "@TERMUX_PREFIX@/etc/egd-pool", "@TERMUX_PREFIX@/etc/entropy"
+ #endif
+ 
+ void ossl_rand_cleanup_int(void);

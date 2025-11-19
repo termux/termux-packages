@@ -1,0 +1,20 @@
+--- a/examples/string-operations.cpp
++++ b/examples/string-operations.cpp
+@@ -76,6 +76,7 @@
+   std::cout << "    Locale: " << std::setlocale(LC_CTYPE, "")
+             << std::endl;
+ 
++#ifndef __ANDROID__
+   if ( isatty(1) && ! std::strcmp(nl_langinfo(CODESET), "ANSI_X3.4-1968") )
+   {
+     // locale C -> switch from 7bit ascii -> latin1
+@@ -83,6 +84,9 @@
+   }
+ 
+   std::cout << "   Codeset: " << nl_langinfo(CODESET) << std::endl;
++#else
++  std::cout << "   Codeset: " << "UTF-8" << std::endl;
++#endif
+   std::cout << "--------------[ FString test ]-----------------"
+             << std::endl;
+ }

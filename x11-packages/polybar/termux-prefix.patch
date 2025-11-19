@@ -1,0 +1,41 @@
++++ ./cmake/02-opts.cmake
+@@ -1,6 +1,6 @@
+ set(SETTING_ALSA_SOUNDCARD "default"
+   CACHE STRING "Name of the ALSA soundcard driver")
+-set(SETTING_BSPWM_SOCKET_PATH "/tmp/bspwm_0_0-socket"
++set(SETTING_BSPWM_SOCKET_PATH "@TERMUX_PREFIX@/tmp/bspwm_0_0-socket"
+   CACHE STRING "Path to bspwm socket")
+ set(SETTING_BSPWM_STATUS_PREFIX "W"
+   CACHE STRING "Prefix prepended to the bspwm status line")
+@@ -16,7 +16,7 @@
+   CACHE STRING "Path to file containing cpu info")
+ set(SETTING_PATH_MEMORY_INFO "/proc/meminfo"
+   CACHE STRING "Path to file containing memory info")
+-set(SETTING_PATH_MESSAGING_FIFO "/tmp/polybar_mqueue.%pid%"
++set(SETTING_PATH_MESSAGING_FIFO "@TERMUX_PREFIX@/tmp/polybar_mqueue.%pid%"
+   CACHE STRING "Path to file containing the current temperature")
+ set(SETTING_PATH_TEMPERATURE_INFO "/sys/class/thermal/thermal_zone%zone%/temp"
+   CACHE STRING "Path to file containing the current temperature")
++++ ./src/utils/file.cpp
+@@ -322,7 +322,7 @@
+       possible_paths.push_back(xdg_config_dir + suffix + ".ini");
+     }
+ 
+-    possible_paths.push_back("/etc" + suffix + ".ini");
++    possible_paths.push_back("@TERMUX_PREFIX@/etc" + suffix + ".ini");
+ 
+     for (const string& p : possible_paths) {
+       if (exists(p)) {
++++ ./src/ipc/util.cpp
+@@ -19,9 +19,9 @@
+     if (env_util::has(XDG_RUNTIME_DIR)) {
+       return env_util::get("XDG_RUNTIME_DIR") + "/polybar";
+     } else {
+-      return "/tmp/polybar-" + to_string(getuid());
++      return "@TERMUX_PREFIX@/tmp/polybar-" + to_string(getuid());
+     }
+-    return env_util::get("XDG_RUNTIME_DIR", "/tmp") + "/polybar";
++    return env_util::get("XDG_RUNTIME_DIR", "@TERMUX_PREFIX@/tmp") + "/polybar";
+   }
+ 
+   string ensure_runtime_path() {

@@ -1,0 +1,31 @@
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -67,8 +67,8 @@
+ dllib=@DLLIB@
+ 
+ # For a cross compile these defines will need to be set accordingly.
+-HOSTCC = @CC@
+-HOSTCFLAGS = @WARNING_FLAGS@ @WARNING_FLAGS_CC@ @CFLAGS@
++HOSTCC = gcc
++HOSTCFLAGS = @WARNING_FLAGS@ @WARNING_FLAGS_CC@
+ 
+ BUILDCC = @CC_FOR_BUILD@
+ BUILDEXT = @BUILD_EXEEXT@
+@@ -130,7 +130,7 @@
+ ifeq (@MINGW32@,yes)
+ all: dosify$(BUILDEXT)
+ dosify$(BUILDEXT): $(srcdir)/dosify.c
+-	$(BUILDCC) $(CFLAGS) -o dosify$(BUILDEXT) $(srcdir)/dosify.c
++	$(BUILDCC) $(CFLAGS_FOR_BUILD) -o dosify$(BUILDEXT) $(srcdir)/dosify.c
+ endif
+ 
+ # This rule rules the compiler in the trivial hello.vl program to make
+@@ -241,7 +241,7 @@
+ endif
+ 
+ version.exe: $(srcdir)/version.c $(srcdir)/version_base.h version_tag.h
+-	$(BUILDCC) $(CFLAGS) -o version.exe -I. -I$(srcdir) $(srcdir)/version.c
++	$(BUILDCC) $(CFLAGS_FOR_BUILD) -o version.exe -I. -I$(srcdir) $(srcdir)/version.c
+ 
+ %.o: %.cc config.h
+ 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) @DEPENDENCY_FLAG@ -c $< -o $*.o

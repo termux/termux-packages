@@ -1,0 +1,30 @@
+diff -uNr e2fsprogs-1.44.4/misc/fsmap.h e2fsprogs-1.44.4.mod/misc/fsmap.h
+--- e2fsprogs-1.44.4/misc/fsmap.h	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/misc/fsmap.h	2018-09-22 15:22:14.819251297 +0300
+@@ -84,6 +84,26 @@
+ #define FMR_OWN_METADATA	FMR_OWNER(0, 3) /* metadata */
+ 
+ #define FS_IOC_GETFSMAP		_IOWR('X', 59, struct fsmap_head)
++#else
++
++#ifdef __ANDROID__
++/* Size of an fsmap_head with room for nr records. */
++static inline size_t
++fsmap_sizeof(
++	unsigned int	nr)
++{
++	return sizeof(struct fsmap_head) + nr * sizeof(struct fsmap);
++}
++
++/* Start the next fsmap query at the end of the current query results. */
++static inline void
++fsmap_advance(
++	struct fsmap_head	*head)
++{
++	head->fmh_keys[0] = head->fmh_recs[head->fmh_entries - 1];
++}
++#endif
++
+ #endif /* FS_IOC_GETFSMAP */
+ 
+ #endif

@@ -1,0 +1,22 @@
+--- a/src/astra/core/spawn.c
++++ b/src/astra/core/spawn.c
+@@ -148,9 +148,7 @@
+ static
+ void perror_s(const char *s)
+ {
+-    const char *msg = "Unknown error";
+-    if (errno < sys_nerr && sys_errlist[errno] != NULL)
+-        msg = sys_errlist[errno];
++    const char *msg = strerror(errno);
+ 
+     size_t slen;
+     ssize_t ret;
+@@ -212,7 +210,7 @@
+         setsid();
+ 
+         /* try to run command */
+-        execle("/bin/sh", "sh", "-c", command, NULL, environ);
++        execle("@TERMUX_PREFIX@/bin/sh", "sh", "-c", command, NULL, environ);
+         perror_s("execle(): /bin/sh");
+         _exit(127);
+     }

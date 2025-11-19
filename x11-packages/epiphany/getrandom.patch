@@ -1,0 +1,14 @@
+--- a/lib/ephy-sync-utils.c
++++ b/lib/ephy-sync-utils.c
+@@ -30,7 +30,10 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <webkit/webkit.h>
+-#if defined(__linux__)
++#if defined __ANDROID__ && __ANDROID_API__ < 28
++#include <syscall.h>
++#define getrandom(buf,buflen,flags) syscall(SYS_getrandom,buf,buflen,flags) 
++#elif defined(__linux__)
+ #include <sys/random.h>
+ #elif defined(__FreeBSD__) || defined(__OpenBSD__)
+ #include <unistd.h>

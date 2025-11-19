@@ -1,0 +1,19 @@
+diff -uNr seccure-0.5/Makefile seccure-0.5.mod/Makefile
+--- seccure-0.5/Makefile	2014-08-11 15:46:47.000000000 +0300
++++ seccure-0.5.mod/Makefile	2019-02-13 02:22:01.521088395 +0200
+@@ -1,5 +1,5 @@
+-CFLAGS = -O2 -Wall -Wextra -std=c89 -pedantic -D_POSIX_C_SOURCE=200112 # -D NOBEEP
+-LIBS = -lgcrypt
++CFLAGS += $(CPPFLAGS) -Wall -Wextra -std=c89 -pedantic -D_POSIX_C_SOURCE=200112 # -D NOBEEP
++LIBS = $(LDFLAGS) -lgcrypt
+ 
+ default: binaries # doc
+ 
+@@ -31,7 +31,6 @@
+ seccure-key: seccure.o numtheory.o ecc.o serialize.o protocol.o curves.o aes256ctr.o
+ 	$(CC) $(CFLAGS) -o seccure-key seccure.o numtheory.o ecc.o \
+ 	curves.o serialize.o protocol.o aes256ctr.o $(LIBS)
+-	strip seccure-key
+ 
+ seccure-encrypt: seccure-key
+ 	ln -f seccure-key seccure-encrypt

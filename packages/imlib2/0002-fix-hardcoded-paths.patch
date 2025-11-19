@@ -1,0 +1,22 @@
+--- a/src/modules/loaders/decompress_load.c
++++ b/src/modules/loaders/decompress_load.c
+@@ -10,7 +10,7 @@
+     ImlibLoader    *loader;
+     int             dest, res;
+     const char     *s, *p, *q;
+-    char            tmp[] = "/tmp/imlib2_loader_dec-XXXXXX";
++    char            tmp[] = "@TERMUX_PREFIX@/tmp/imlib2_loader_dec-XXXXXX";
+     char           *real_ext;
+ 
+     rc = LOAD_FAIL;
+--- a/src/modules/loaders/loader_id3.c
++++ b/src/modules/loaders/loader_id3.c
+@@ -514,7 +514,7 @@
+ 
+     if (loader)
+     {
+-        char            tmp[] = "/tmp/imlib2_loader_id3-XXXXXX";
++        char            tmp[] = "@TERMUX_PREFIX@/tmp/imlib2_loader_id3-XXXXXX";
+         int             dest, res;
+ 
+         if ((dest = mkstemp(tmp)) < 0)

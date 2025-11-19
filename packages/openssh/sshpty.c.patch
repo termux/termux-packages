@@ -1,0 +1,19 @@
+diff -uNr openssh-portable-V_9_5_P1/sshpty.c openssh-portable-V_9_5_P1.mod/sshpty.c
+--- openssh-portable-V_9_5_P1/sshpty.c	2023-10-04 07:34:10.000000000 +0300
++++ openssh-portable-V_9_5_P1.mod/sshpty.c	2023-11-23 16:29:34.267876057 +0200
+@@ -204,6 +204,7 @@
+ 		}
+ 	}
+ 
++#ifndef __ANDROID__
+ 	if ((st.st_mode & (S_IRWXU|S_IRWXG|S_IRWXO)) != mode) {
+ 		if (chmod(tty, mode) == -1) {
+ 			if (errno == EROFS &&
+@@ -215,6 +216,7 @@
+ 				    tty, (u_int)mode, strerror(errno));
+ 		}
+ 	}
++#endif
+ }
+ 
+ /* Disconnect from the controlling tty. */

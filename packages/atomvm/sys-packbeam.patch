@@ -1,0 +1,56 @@
++++ ./CMakeModules/BuildElixir.cmake
+@@ -46,7 +46,7 @@
+     add_custom_target(
+         ${avm_name} ALL
+         DEPENDS ${avm_name}_beams PackBEAM
+-        COMMAND ${CMAKE_BINARY_DIR}/tools/packbeam/PackBEAM -a ${INCLUDE_LINES} ${avm_name}.avm ${BEAMS}
++        COMMAND PackBEAM -a ${INCLUDE_LINES} ${avm_name}.avm ${BEAMS}
+         COMMENT "Packing archive ${avm_name}.avm"
+         VERBATIM
+     )
+@@ -87,7 +87,7 @@
+ 
+     add_custom_target(
+         ${avm_name} ALL
+-        COMMAND ${CMAKE_BINARY_DIR}/tools/packbeam/PackBEAM ${INCLUDE_LINES} ${avm_name}.avm Elixir.${main}.beam ${ARCHIVES}
++        COMMAND PackBEAM ${INCLUDE_LINES} ${avm_name}.avm Elixir.${main}.beam ${ARCHIVES}
+         COMMENT "Packing runnable ${avm_name}.avm"
+         VERBATIM
+     )
++++ ./CMakeModules/BuildErlang.cmake
+@@ -46,7 +46,7 @@
+         ${avm_name} ALL
+         DEPENDS ${avm_name}_beams PackBEAM
+         #DEPENDS ${pack_archive_${avm_name}_beams}
+-        COMMAND ${CMAKE_BINARY_DIR}/tools/packbeam/PackBEAM -a ${INCLUDE_LINES} ${avm_name}.avm ${pack_archive_${avm_name}_beams}
++        COMMAND PackBEAM -a ${INCLUDE_LINES} ${avm_name}.avm ${pack_archive_${avm_name}_beams}
+         COMMENT "Packing archive ${avm_name}.avm"
+         VERBATIM
+     )
+@@ -74,7 +74,7 @@
+ 
+     add_custom_target(
+         ${avm_name} ALL
+-        COMMAND ${CMAKE_BINARY_DIR}/tools/packbeam/PackBEAM -a ${INCLUDE_LINES} ${avm_name}.avm ${pack_lib_${avm_name}_archives}
++        COMMAND PackBEAM -a ${INCLUDE_LINES} ${avm_name}.avm ${pack_lib_${avm_name}_archives}
+         COMMENT "Packing runnable ${avm_name}.avm"
+         VERBATIM
+     )
+@@ -139,7 +139,7 @@
+ 
+     add_custom_target(
+         ${avm_name} ALL
+-        COMMAND ${CMAKE_BINARY_DIR}/tools/packbeam/PackBEAM ${INCLUDE_LINES} ${avm_name}.avm ${main}.beam ${pack_runnable_${avm_name}_archives}
++        COMMAND PackBEAM ${INCLUDE_LINES} ${avm_name}.avm ${main}.beam ${pack_runnable_${avm_name}_archives}
+         COMMENT "Packing runnable ${avm_name}.avm"
+         VERBATIM
+     )
+@@ -200,7 +200,7 @@
+ 
+     add_custom_target(
+         ${avm_name}.avm ALL
+-        COMMAND ${CMAKE_BINARY_DIR}/tools/packbeam/PackBEAM ${avm_name}.avm ${main}.beam ${pack_uf2_${avm_name}_archives}
++        COMMAND PackBEAM ${avm_name}.avm ${main}.beam ${pack_uf2_${avm_name}_archives}
+         COMMENT "Packing runnable ${avm_name}.avm"
+         VERBATIM
+     )

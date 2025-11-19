@@ -1,0 +1,21 @@
+diff -u -r ../gdb-10.1/gdbsupport/pathstuff.cc ./gdbsupport/pathstuff.cc
+--- ../gdb-10.1/gdbsupport/pathstuff.cc	2021-03-16 13:37:23.959547390 +0530
++++ ./gdbsupport/pathstuff.cc	2021-03-16 13:37:41.879547383 +0530
+@@ -262,7 +262,7 @@
+   if (tmp != nullptr)
+     return tmp;
+ 
+-  return "/tmp";
++  return "@TERMUX_PREFIX@/tmp";
+ #endif
+ }
+ 
+@@ -273,7 +273,7 @@
+ {
+   const char *ret = getenv ("SHELL");
+   if (ret == NULL)
+-    ret = "/bin/sh";
++    ret = "@TERMUX_PREFIX@/bin/sh";
+ 
+   return ret;
+ }

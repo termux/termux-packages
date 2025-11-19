@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="GvcChannelMap" get-type="gvc_channel_map_get_type" parents="GObject">
+    <signal name="volume-changed" return="void" when="last">
+      <param type="gboolean"/>
+    </signal>
+  </class>
+  <class name="GvcMixerCard" get-type="gvc_mixer_card_get_type" parents="GObject">
+    <property name="id" type="gulong" flags="11" default-value="0"/>
+    <property name="pa-context" type="gpointer" flags="11"/>
+    <property name="index" type="gulong" flags="11" default-value="0"/>
+    <property name="name" type="gchararray" flags="7" default-value="NULL"/>
+    <property name="icon-name" type="gchararray" flags="7" default-value="NULL"/>
+    <property name="profile" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="human-profile" type="gchararray" flags="1" default-value="NULL"/>
+  </class>
+  <boxed name="GvcMixerStreamPort" get-type="gvc_mixer_stream_port_get_type"/>
+  <class name="GvcMixerStream" get-type="gvc_mixer_stream_get_type" parents="GObject" abstract="1">
+    <property name="id" type="gulong" flags="11" default-value="0"/>
+    <property name="pa-context" type="gpointer" flags="11"/>
+    <property name="channel-map" type="GvcChannelMap" flags="7"/>
+    <property name="index" type="gulong" flags="11" default-value="0"/>
+    <property name="name" type="gchararray" flags="7" default-value="NULL"/>
+    <property name="description" type="gchararray" flags="7" default-value="NULL"/>
+    <property name="application-id" type="gchararray" flags="7" default-value="NULL"/>
+    <property name="icon-name" type="gchararray" flags="7" default-value="NULL"/>
+    <property name="form-factor" type="gchararray" flags="7" default-value="NULL"/>
+    <property name="sysfs-path" type="gchararray" flags="7" default-value="NULL"/>
+    <property name="volume" type="gulong" flags="3" default-value="0"/>
+    <property name="decibel" type="gdouble" flags="7" default-value="0.000000"/>
+    <property name="is-muted" type="gboolean" flags="7" default-value="FALSE"/>
+    <property name="can-decibel" type="gboolean" flags="7" default-value="FALSE"/>
+    <property name="is-event-stream" type="gboolean" flags="7" default-value="FALSE"/>
+    <property name="is-virtual" type="gboolean" flags="7" default-value="FALSE"/>
+    <property name="card-index" type="glong" flags="7" default-value="4294967295"/>
+    <property name="port" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="state" type="GvcMixerStreamState" flags="3" default-value="GVC_STREAM_STATE_INVALID"/>
+    <signal name="monitor-update" return="void" when="last">
+      <param type="gdouble"/>
+    </signal>
+    <signal name="monitor-suspend" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GvcMixerUIDevice" get-type="gvc_mixer_ui_device_get_type" parents="GObject">
+    <property name="description" type="gchararray" flags="3" default-value="no-name-set"/>
+    <property name="origin" type="gchararray" flags="3" default-value="no-name-set"/>
+    <property name="card" type="gpointer" flags="3"/>
+    <property name="port-name" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="stream-id" type="guint" flags="3" default-value="0"/>
+    <property name="type" type="guint" flags="3" default-value="0"/>
+    <property name="port-available" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="icon-name" type="gchararray" flags="7" default-value="NULL"/>
+  </class>
+  <class name="GvcMixerControl" get-type="gvc_mixer_control_get_type" parents="GObject">
+    <property name="name" type="gchararray" flags="11" default-value="NULL"/>
+    <signal name="state-changed" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="stream-added" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="stream-removed" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="stream-changed" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="audio-device-selection-needed" return="void" when="last">
+      <param type="guint"/>
+      <param type="gboolean"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="card-added" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="card-removed" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="default-sink-changed" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="default-source-changed" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="active-output-update" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="active-input-update" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="output-added" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="input-added" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="output-removed" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="input-removed" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+  </class>
+  <class name="GvcMixerEventRole" get-type="gvc_mixer_event_role_get_type" parents="GvcMixerStream,GObject">
+    <property name="device" type="gchararray" flags="7" default-value="NULL"/>
+  </class>
+  <class name="GvcMixerSink" get-type="gvc_mixer_sink_get_type" parents="GvcMixerStream,GObject">
+  </class>
+  <class name="GvcMixerSinkInput" get-type="gvc_mixer_sink_input_get_type" parents="GvcMixerStream,GObject">
+  </class>
+  <class name="GvcMixerSource" get-type="gvc_mixer_source_get_type" parents="GvcMixerStream,GObject">
+  </class>
+  <class name="GvcMixerSourceOutput" get-type="gvc_mixer_source_output_get_type" parents="GvcMixerStream,GObject">
+  </class>
+  <enum name="GvcMixerControlState" get-type="gvc_mixer_control_state_get_type">
+    <member name="GVC_STATE_CLOSED" nick="closed" value="0"/>
+    <member name="GVC_STATE_READY" nick="ready" value="1"/>
+    <member name="GVC_STATE_CONNECTING" nick="connecting" value="2"/>
+    <member name="GVC_STATE_FAILED" nick="failed" value="3"/>
+  </enum>  <flags name="GvcHeadsetPortChoice" get-type="gvc_headset_port_choice_get_type">
+    <member name="GVC_HEADSET_PORT_CHOICE_NONE" nick="none" value="0"/>
+    <member name="GVC_HEADSET_PORT_CHOICE_HEADPHONES" nick="headphones" value="1"/>
+    <member name="GVC_HEADSET_PORT_CHOICE_HEADSET" nick="headset" value="2"/>
+    <member name="GVC_HEADSET_PORT_CHOICE_MIC" nick="mic" value="4"/>
+  </flags>
+  <enum name="GvcMixerStreamState" get-type="gvc_mixer_stream_state_get_type">
+    <member name="GVC_STREAM_STATE_INVALID" nick="invalid" value="0"/>
+    <member name="GVC_STREAM_STATE_RUNNING" nick="running" value="1"/>
+    <member name="GVC_STREAM_STATE_IDLE" nick="idle" value="2"/>
+    <member name="GVC_STREAM_STATE_SUSPENDED" nick="suspended" value="3"/>
+  </enum>  <enum name="GvcMixerUIDeviceDirection" get-type="gvc_mixer_ui_device_direction_get_type">
+    <member name="UIDeviceInput" nick="input" value="0"/>
+    <member name="UIDeviceOutput" nick="output" value="1"/>
+  </enum></dump>

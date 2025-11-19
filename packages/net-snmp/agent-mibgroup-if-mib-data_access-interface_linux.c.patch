@@ -1,0 +1,13 @@
+--- a/agent/mibgroup/if-mib/data_access/interface_linux.c
++++ b/agent/mibgroup/if-mib/data_access/interface_linux.c
+@@ -10,6 +10,10 @@
+ #include <net-snmp/agent/snmp_vars.h>
+ #include "interface_private.h"
+ 
++#ifdef __ANDROID__
++typedef unsigned short ushort;
++#endif
++
+ netsnmp_feature_require(fd_event_manager);
+ netsnmp_feature_require(delete_prefix_info);
+ netsnmp_feature_require(create_prefix_info);

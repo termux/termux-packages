@@ -1,0 +1,47 @@
+--- ./extensions/libxt_cgroup.c.orig	2022-06-07 16:47:06.815050633 +0200
++++ ./extensions/libxt_cgroup.c	2022-06-07 16:47:20.575322792 +0200
+@@ -4,7 +4,7 @@
+ 
+ enum {
+ 	O_CLASSID = 0,
+-	O_PATH = 1,
++	_O_PATH = 1,
+ };
+ 
+ static void cgroup_help_v0(void)
+@@ -36,7 +36,7 @@
+ static const struct xt_option_entry cgroup_opts_v1[] = {
+ 	{
+ 		.name = "path",
+-		.id = O_PATH,
++		.id = _O_PATH,
+ 		.type = XTTYPE_STRING,
+ 		.flags = XTOPT_INVERT | XTOPT_PUT,
+ 		XTOPT_POINTER(struct xt_cgroup_info_v1, path)
+@@ -54,7 +54,7 @@
+ static const struct xt_option_entry cgroup_opts_v2[] = {
+ 	{
+ 		.name = "path",
+-		.id = O_PATH,
++		.id = _O_PATH,
+ 		.type = XTTYPE_STRING,
+ 		.flags = XTOPT_INVERT | XTOPT_PUT,
+ 		XTOPT_POINTER(struct xt_cgroup_info_v2, path)
+@@ -85,7 +85,7 @@
+ 	xtables_option_parse(cb);
+ 
+ 	switch (cb->entry->id) {
+-	case O_PATH:
++	case _O_PATH:
+ 		info->has_path = true;
+ 		if (cb->invert)
+ 			info->invert_path = true;
+@@ -105,7 +105,7 @@
+ 	xtables_option_parse(cb);
+ 
+ 	switch (cb->entry->id) {
+-	case O_PATH:
++	case _O_PATH:
+ 		info->has_path = true;
+ 		if (cb->invert)
+ 			info->invert_path = true;

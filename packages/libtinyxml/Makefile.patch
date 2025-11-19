@@ -1,0 +1,71 @@
+--- ../tinyxml/Makefile	2011-05-15 02:24:57.000000000 +0000
++++ ./Makefile	2022-09-24 20:28:17.224889551 +0000
+@@ -15,15 +15,15 @@
+ 
+ # TINYXML_USE_STL can be used to turn on STL support. NO, then STL
+ # will not be used. YES will include the STL files.
+-TINYXML_USE_STL := NO
++TINYXML_USE_STL :=YES
+ 
+ #****************************************************************************
+ 
+-CC     := gcc
+-CXX    := g++
+-LD     := g++
+-AR     := ar rc
+-RANLIB := ranlib
++CC     ?= gcc
++CXX    ?= g++
++LD     ?= g++
++AR     ?= ar rc
++RANLIB ?= ranlib
+ 
+ DEBUG_CFLAGS     := -Wall -Wno-format -g -DDEBUG
+ RELEASE_CFLAGS   := -Wall -Wno-unknown-pragmas -Wno-format -O3
+@@ -41,9 +41,9 @@
+    CXXFLAGS     := ${DEBUG_CXXFLAGS}
+    LDFLAGS      := ${DEBUG_LDFLAGS}
+ else
+-   CFLAGS       := ${RELEASE_CFLAGS}
+-   CXXFLAGS     := ${RELEASE_CXXFLAGS}
+-   LDFLAGS      := ${RELEASE_LDFLAGS}
++   CFLAGS       += ${RELEASE_CFLAGS}
++   CXXFLAGS     += ${RELEASE_CXXFLAGS}
++   LDFLAGS      += ${RELEASE_LDFLAGS}
+ endif
+ 
+ ifeq (YES, ${PROFILE})
+@@ -83,7 +83,7 @@
+ 
+ OUTPUT := xmltest
+ 
+-all: ${OUTPUT}
++all: ${OUTPUT} libtinyxml.so
+ 
+ 
+ #****************************************************************************
+@@ -102,7 +102,10 @@
+ #****************************************************************************
+ 
+ ${OUTPUT}: ${OBJS}
+-	${LD} -o $@ ${LDFLAGS} ${OBJS} ${LIBS} ${EXTRA_LIBS}
++	${CXX} -o $@ ${LDFLAGS} ${OBJS} ${LIBS} ${EXTRA_LIBS}
++
++libtinyxml.so: ${OBJS}
++	${CXX} -shared -o $@ ${LDFLAGS} ${OBJS} ${LIBS} ${EXTRA_LIBS}
+ 
+ #****************************************************************************
+ # common rules
+@@ -110,10 +113,10 @@
+ 
+ # Rules for compiling source files to object files
+ %.o : %.cpp
+-	${CXX} -c ${CXXFLAGS} ${INCS} $< -o $@
++	${CXX} -fPIC -c ${CXXFLAGS} ${INCS} $< -o $@
+ 
+ %.o : %.c
+-	${CC} -c ${CFLAGS} ${INCS} $< -o $@
++	${CC} -fPIC -c ${CFLAGS} ${INCS} $< -o $@
+ 
+ dist:
+ 	bash makedistlinux

@@ -1,0 +1,25 @@
+--- ./Makefile.android.orig	2022-05-29 07:35:44.708983344 +0000
++++ ./Makefile.android	2022-05-29 10:03:05.522168915 +0000
+@@ -31,7 +31,7 @@
+
+ # options
+
+-C_COMPILER_OPTIONS ?= -fno-strict-aliasing -fwrapv -DHAVE_CHICKEN_CONFIG_H
++C_COMPILER_OPTIONS ?= -fno-strict-aliasing -fwrapv -DHAVE_CHICKEN_CONFIG_H $(CFLAGS)
+ ifdef DEBUGBUILD
+ C_COMPILER_OPTIMIZATION_OPTIONS ?= -g -Wall -Wno-unused
+ else
+@@ -46,11 +46,11 @@
+ LINKER_LINK_SHARED_PROGRAM_OPTIONS = -Wl,-rpath="$(RUNTIME_LINKER_PATH)"
+ # Android NDK build system currently does not understand
+ # versioned sonames, so don't try to embed a soname.
+-#LIBCHICKEN_SO_LINKER_OPTIONS = -Wl,-soname,lib$(PROGRAM_PREFIX)chicken$(PROGRAM_SUFFIX).so.$(BINARYVERSION)
+-LIBRARIES = -lm -ldl -llog
++LIBCHICKEN_SO_LINKER_OPTIONS = -Wl,-soname,lib$(PROGRAM_PREFIX)chicken$(PROGRAM_SUFFIX).so.$(BINARYVERSION)
++LIBRARIES = -lm -ldl
+ NEEDS_RELINKING = yes
+ # See above
+-#USES_SONAME = yes
++USES_SONAME = yes
+
+ # special files

@@ -1,0 +1,54 @@
+https://github.com/chromium/chromium/commit/5e9fb4130a537d1a36ab0f8db705a498abeb5d57
+
+From 5e9fb4130a537d1a36ab0f8db705a498abeb5d57 Mon Sep 17 00:00:00 2001
+From: Ho Cheung <uioptt24@gmail.com>
+Date: Tue, 9 Jan 2024 03:05:37 +0000
+Subject: [PATCH] [ToTLinux] Fix some narrowing errors
+
+The compilation errors mentioned in the issue can be reproduced on the
+local ToT, and the following new errors are found, which will be fixed
+in this CL.
+
+In file included from ../../cc/layers/mirror_layer_impl.cc:5:
+../../cc/layers/mirror_layer_impl.h:59:40: error: non-constant-expressi
+on cannot be narrowed from type 'int' to 'unsigned long' in initializer
+list [-Wc++11-narrowing-const-reference]
+   59 |     return viz::CompositorRenderPassId{mirrored_layer_id()};
+      |                                        ^~~~~~~~~~~~~~~~~~~
+1 error generated.
+
+Fixed: 1513724
+Change-Id: I562534d13f82824dfac0fe3e78a45c8c49d5841a
+Reviewed-on: https://chromium-review.googlesource.com/c/chromium/src/+/5150303
+Reviewed-by: Etienne Pierre-Doray <etiennep@chromium.org>
+Reviewed-by: David Bokan <bokan@chromium.org>
+Commit-Queue: Ho Cheung <uioptt24@gmail.com>
+Cr-Commit-Position: refs/heads/main@{#1244427}
+---
+
+ cc/layers/mirror_layer_impl.h                             | 4 +++-
+ components/power_metrics/energy_metrics_provider_linux.cc | 4 ++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/cc/layers/mirror_layer_impl.h b/cc/layers/mirror_layer_impl.h
+index e68b1f6392a67c..b1355f8d22f8f3 100644
+--- a/cc/layers/mirror_layer_impl.h
++++ b/cc/layers/mirror_layer_impl.h
+@@ -5,6 +5,7 @@
+ #ifndef CC_LAYERS_MIRROR_LAYER_IMPL_H_
+ #define CC_LAYERS_MIRROR_LAYER_IMPL_H_
+ 
++#include <cstdint>
+ #include <memory>
+ 
+ #include "base/memory/ptr_util.h"
+@@ -56,7 +57,8 @@ class CC_EXPORT MirrorLayerImpl : public LayerImpl {
+  private:
+   const char* LayerTypeAsString() const override;
+   viz::CompositorRenderPassId mirrored_layer_render_pass_id() const {
+-    return viz::CompositorRenderPassId{mirrored_layer_id()};
++    return viz::CompositorRenderPassId{
++        static_cast<uint64_t>(mirrored_layer_id())};
+   }
+ 
+   int mirrored_layer_id_ = 0;

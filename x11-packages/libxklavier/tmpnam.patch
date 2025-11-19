@@ -1,0 +1,28 @@
+diff -uNr libxklavier-libxklavier-5.4/libxklavier/xklavier_config_xkb.c libxklavier-libxklavier-5.4.mod/libxklavier/xklavier_config_xkb.c
+--- libxklavier-libxklavier-5.4/libxklavier/xklavier_config_xkb.c	2013-04-24 02:06:51.000000000 +0300
++++ libxklavier-libxklavier-5.4.mod/libxklavier/xklavier_config_xkb.c	2023-04-04 13:46:33.488659059 +0300
+@@ -227,6 +227,15 @@
+ 	g_free(descr);
+ }
+ 
++static char* tmpnam_custom(char* s) {
++  static char buf[L_tmpnam];
++  if (!s) s = buf;
++  const char* dir = getenv("TMPDIR");
++  if (!dir) dir = "@TERMUX_PREFIX@";
++  snprintf(s, L_tmpnam, "%s/tmpnam.XXXXXXXXXX", dir);
++  return mktemp(s);
++}
++
+ static XkbDescPtr
+ xkl_config_get_keyboard(XklEngine * engine,
+ 			XkbComponentNamesPtr component_names_ptr,
+@@ -245,7 +254,7 @@
+ 	gchar *preactivation_group_description = activate ?
+ 	    xkl_config_get_current_group_description(engine) : NULL;
+ 
+-	if (tmpnam(xkm_fn) != NULL && tmpnam(xkb_fn) != NULL) {
++	if (tmpnam_custom(xkm_fn) != NULL && tmpnam_custom(xkb_fn) != NULL) {
+ 		pid_t cpid, pid;
+ 		int status = 0;
+ 		FILE *tmpxkb;

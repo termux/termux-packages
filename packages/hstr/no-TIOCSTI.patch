@@ -1,0 +1,33 @@
+https://github.com/termux/termux-packages/issues/14160
+
+--- a/src/hstr_utils.c
++++ b/src/hstr_utils.c
+@@ -113,7 +113,7 @@
+ 
+ bool is_tiocsti_supported(void)
+ {
+-#if defined(__MS_WSL__) || defined(__CYGWIN__)
++#if defined(__MS_WSL__) || defined(__CYGWIN__) || defined(__ANDROID__)
+     return false;
+ #else
+    int fd;
+@@ -143,7 +143,7 @@
+ #endif
+ }
+ 
+-#if !defined(__MS_WSL__) && !defined(__CYGWIN__)
++#if !defined(__MS_WSL__) && !defined(__CYGWIN__) && !defined(__ANDROID__)
+ void tiocsti(void)
+ {
+     char buf[] = DEFAULT_COMMAND;
+--- a/src/include/hstr_utils.h
++++ b/src/include/hstr_utils.h
+@@ -86,7 +86,7 @@
+ char* hstr_strelide(char* buffer, const char* s, unsigned maxlength);
+ void hstr_chop(char* s);
+ bool is_tiocsti_supported(void);
+-#if !defined(__MS_WSL__) && !defined(__CYGWIN__)
++#if !defined(__MS_WSL__) && !defined(__CYGWIN__) && !defined(__ANDROID__)
+ void tiocsti(void);
+ #endif
+ void fill_terminal_input(char* cmd, bool padding);

@@ -1,0 +1,13 @@
+--- ./apps/Make1.orig	2021-09-12 13:58:56.131980584 +0000
++++ ./apps/Make1	2021-09-12 13:59:54.468571515 +0000
+@@ -119,8 +119,8 @@
+ MAINTAINERCLEANFILES = $(DISTCLEANFILES)
+ #------------------------------------------------------------------------
+ #------------------------------------------------------------------------
+-LIBPATH = `pwd | sed 's/\(.*\)apps/\1lib/'`
+-MODELGEN = `pwd | sed 's/\(.*\)apps/\1modelgen/'`/gnucap-modelgen
++LIBPATH = @TERMUX_PKG_HOSTBUILD_DIR@/lib/O
++MODELGEN = @TERMUX_PKG_HOSTBUILD_DIR@/modelgen/O/gnucap-modelgen
+ #------------------------------------------------------------------------
+ %.h : %.model
+ 	(export LD_LIBRARY_PATH=$(LIBPATH); $(MODELGEN) -h $<)

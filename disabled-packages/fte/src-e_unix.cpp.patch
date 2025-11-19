@@ -1,0 +1,11 @@
+--- a/src/e_unix.cpp
++++ b/src/e_unix.cpp
+@@ -44,7 +44,7 @@
+         word = wordAsk;
+     }
+ 
+-    snprintf(file, sizeof(file)-1, "/tmp/fte%d-man-%s", getpid(), word);
++    snprintf(file, sizeof(file)-1, "@TERMUX_PREFIX@/tmp/fte%d-man-%s", getpid(), word);
+     snprintf(command, sizeof(command)-1, "%s %s %s >'%s' 2>&1", HelpCommand, options, word, file);
+ 
+     /// !!! why is this needed ???

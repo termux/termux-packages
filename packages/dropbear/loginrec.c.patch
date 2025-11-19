@@ -1,0 +1,10 @@
++++ ./src/loginrec.c
+@@ -275,7 +275,7 @@
+ 
+ 	if (username) {
+ 		strlcpy(li->username, username, sizeof(li->username));
+-		pw = getpwnam(li->username);
++		pw = getpwuid(getuid());
+ 		if (pw == NULL)
+ 			dropbear_exit("login_init_entry: Cannot find user \"%s\"",
+ 					li->username);

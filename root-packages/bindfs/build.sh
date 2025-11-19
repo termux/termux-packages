@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE="https://bindfs.org/"
+TERMUX_PKG_DESCRIPTION="A FUSE filesystem for mirroring a directory to another directory."
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.18.3"
+TERMUX_PKG_SRCURL="https://bindfs.org/downloads/bindfs-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=178a723d7039bae3ab1cef2fc93e5e8693c4184f52519c0e9a1deee93b838df1
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libfuse3"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-fuse3"

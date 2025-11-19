@@ -1,0 +1,142 @@
+diff -uNr src.orig/libnetwork/resolvconf/resolvconf.go libnetwork/resolvconf/resolvconf.go
+--- src.orig/libnetwork/resolvconf/resolvconf.go	2023-07-24 12:20:29.000000000 +0300
++++ libnetwork/resolvconf/resolvconf.go	2024-02-01 20:21:43.768677906 +0200
+@@ -16,9 +16,9 @@
+ 
+ const (
+ 	// defaultPath is the default path to the resolv.conf that contains information to resolve DNS. See Path().
+-	defaultPath = "/etc/resolv.conf"
++	defaultPath = "@TERMUX_PREFIX@/etc/resolv.conf"
+ 	// alternatePath is a path different from defaultPath, that may be used to resolve DNS. See Path().
+-	alternatePath = "/run/systemd/resolve/resolv.conf"
++	alternatePath = "/etc/resolv.conf"
+ )
+ 
+ var (
+diff -uNr src.orig/libnetwork/sandbox_dns_unix.go libnetwork/sandbox_dns_unix.go
+--- src.orig/libnetwork/sandbox_dns_unix.go	2023-07-24 12:20:29.000000000 +0300
++++ libnetwork/sandbox_dns_unix.go	2024-02-01 20:22:10.032223768 +0200
+@@ -228,7 +228,7 @@
+ 		// it's ok to continue if /etc/resolv.conf doesn't exist, default resolvers (Google's Public DNS)
+ 		// will be used
+ 		currRC = &resolvconf.File{}
+-		logrus.Infof("/etc/resolv.conf does not exist")
++		logrus.Infof("@TERMUX_PREFIX@/etc/resolv.conf does not exist")
+ 	}
+ 
+ 	if len(sb.config.dnsList) > 0 || len(sb.config.dnsSearchList) > 0 || len(sb.config.dnsOptionsList) > 0 {
+diff -uNr src.orig/libnetwork/vendor/github.com/hashicorp/memberlist/config.go libnetwork/vendor/github.com/hashicorp/memberlist/config.go
+--- src.orig/libnetwork/vendor/github.com/hashicorp/memberlist/config.go	2023-07-24 12:20:29.000000000 +0300
++++ libnetwork/vendor/github.com/hashicorp/memberlist/config.go	2024-02-01 20:20:22.704688868 +0200
+@@ -254,7 +254,7 @@
+ 		SecretKey: nil,
+ 		Keyring:   nil,
+ 
+-		DNSConfigPath: "/etc/resolv.conf",
++		DNSConfigPath: "@TERMUX_PREFIX@/etc/resolv.conf",
+ 
+ 		HandoffQueueDepth: 1024,
+ 		UDPBufferSize:     1400,
+diff -uNr src.orig/moby/daemon/container_operations_unix.go moby/daemon/container_operations_unix.go
+--- src.orig/moby/daemon/container_operations_unix.go	2023-08-29 22:14:17.000000000 +0300
++++ moby/daemon/container_operations_unix.go	2024-02-01 20:35:13.895078933 +0200
+@@ -395,8 +395,8 @@
+ 		// as on the host itself. The container gets a copy of these files.
+ 		*sboxOptions = append(
+ 			*sboxOptions,
+-			libnetwork.OptionOriginHostsPath("/etc/hosts"),
+-			libnetwork.OptionOriginResolvConfPath("/etc/resolv.conf"),
++			libnetwork.OptionOriginHostsPath("@TERMUX_PREFIX@/etc/hosts"),
++			libnetwork.OptionOriginResolvConfPath("@TERMUX_PREFIX@/etc/resolv.conf"),
+ 		)
+ 	case container.HostConfig.NetworkMode.IsUserDefined():
+ 		// The container uses a user-defined network. We use the embedded DNS
+@@ -412,7 +412,7 @@
+ 		// directly, as they can be dynamically reconfigured.
+ 		*sboxOptions = append(
+ 			*sboxOptions,
+-			libnetwork.OptionOriginResolvConfPath("/etc/resolv.conf"),
++			libnetwork.OptionOriginResolvConfPath("@TERMUX_PREFIX@/etc/resolv.conf"),
+ 		)
+ 	default:
+ 		// For other situations, such as the default bridge network, container
+diff -uNr src.orig/moby/plugin/v2/plugin_linux.go moby/plugin/v2/plugin_linux.go
+--- src.orig/moby/plugin/v2/plugin_linux.go	2023-08-29 22:14:17.000000000 +0300
++++ moby/plugin/v2/plugin_linux.go	2024-02-01 20:27:35.648186687 +0200
+@@ -54,18 +54,18 @@
+ 		if p.PluginObj.Config.Network.Type == "host" {
+ 			oci.RemoveNamespace(&s, specs.LinuxNamespaceType("network"))
+ 		}
+-		etcHosts := "/etc/hosts"
+-		resolvConf := "/etc/resolv.conf"
++		etcHosts := "@TERMUX_PREFIX@/etc/hosts"
++		resolvConf := "@TERMUX_PREFIX@/etc/resolv.conf"
+ 		mounts = append(mounts,
+ 			types.PluginMount{
+ 				Source:      &etcHosts,
+-				Destination: etcHosts,
++				Destination: "/etc/hosts",
+ 				Type:        "bind",
+ 				Options:     []string{"rbind", "ro"},
+ 			},
+ 			types.PluginMount{
+ 				Source:      &resolvConf,
+-				Destination: resolvConf,
++				Destination: "/etc/resolv.conf",
+ 				Type:        "bind",
+ 				Options:     []string{"rbind", "ro"},
+ 			})
+diff -uNr src.orig/moby/vendor/github.com/containerd/containerd/oci/spec_opts.go moby/vendor/github.com/containerd/containerd/oci/spec_opts.go
+--- src.orig/moby/vendor/github.com/containerd/containerd/oci/spec_opts.go	2023-08-29 22:14:17.000000000 +0300
++++ moby/vendor/github.com/containerd/containerd/oci/spec_opts.go	2024-02-01 20:37:20.602711636 +0200
+@@ -499,7 +499,7 @@
+ 	s.Mounts = append(s.Mounts, specs.Mount{
+ 		Destination: "/etc/hosts",
+ 		Type:        "bind",
+-		Source:      "/etc/hosts",
++		Source:      "@TERMUX_PREFIX@/etc/hosts",
+ 		Options:     []string{"rbind", "ro"},
+ 	})
+ 	return nil
+@@ -510,7 +510,7 @@
+ 	s.Mounts = append(s.Mounts, specs.Mount{
+ 		Destination: "/etc/resolv.conf",
+ 		Type:        "bind",
+-		Source:      "/etc/resolv.conf",
++		Source:      "@TERMUX_PREFIX@/etc/resolv.conf",
+ 		Options:     []string{"rbind", "ro"},
+ 	})
+ 	return nil
+@@ -521,7 +521,7 @@
+ 	s.Mounts = append(s.Mounts, specs.Mount{
+ 		Destination: "/etc/localtime",
+ 		Type:        "bind",
+-		Source:      "/etc/localtime",
++		Source:      "@TERMUX_PREFIX@/etc/localtime",
+ 		Options:     []string{"rbind", "ro"},
+ 	})
+ 	return nil
+diff -uNr src.orig/moby/vendor/github.com/containerd/containerd/rootfs/init_linux.go moby/vendor/github.com/containerd/containerd/rootfs/init_linux.go
+--- src.orig/moby/vendor/github.com/containerd/containerd/rootfs/init_linux.go	2023-08-29 22:14:17.000000000 +0300
++++ moby/vendor/github.com/containerd/containerd/rootfs/init_linux.go	2024-02-01 20:39:59.123727195 +0200
+@@ -114,7 +114,7 @@
+ 		createDirectory("/proc", uid, gid),
+ 		createDirectory("/sys", uid, gid),
+ 		createDirectory("/etc", uid, gid),
+-		touchFile("/etc/resolv.conf", uid, gid),
++		touchFile("@/etc/resolv.conf", uid, gid),
+ 		touchFile("/etc/hosts", uid, gid),
+ 		touchFile("/etc/hostname", uid, gid),
+ 		symlink("/proc/mounts", "/etc/mtab"),
+diff -uNr src.orig/moby/vendor/github.com/hashicorp/memberlist/config.go moby/vendor/github.com/hashicorp/memberlist/config.go
+--- src.orig/moby/vendor/github.com/hashicorp/memberlist/config.go	2023-08-29 22:14:17.000000000 +0300
++++ moby/vendor/github.com/hashicorp/memberlist/config.go	2024-02-01 20:20:22.708022228 +0200
+@@ -317,7 +317,7 @@
+ 		SecretKey: nil,
+ 		Keyring:   nil,
+ 
+-		DNSConfigPath: "/etc/resolv.conf",
++		DNSConfigPath: "@TERMUX_PREFIX@/etc/resolv.conf",
+ 
+ 		HandoffQueueDepth: 1024,
+ 		UDPBufferSize:     1400,

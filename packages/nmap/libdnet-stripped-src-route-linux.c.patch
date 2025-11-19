@@ -1,0 +1,11 @@
+--- a/libdnet-stripped/src/route-linux.c
++++ b/libdnet-stripped/src/route-linux.c
+@@ -146,7 +146,7 @@
+ 
+ 	memcpy(&rt.rtmsg_dst, &dst.addr_ip6, sizeof(rt.rtmsg_dst));
+ 
+-	if (!IN6_IS_ADDR_UNSPECIFIED(&entry->route_gw.addr_ip6)) {
++	if (!IN6_IS_ADDR_UNSPECIFIED((const struct in6_addr *)&entry->route_gw.addr_ip6)) {
+ 		rt.rtmsg_flags |= RTF_GATEWAY;
+ 		memcpy(&rt.rtmsg_gateway, &entry->route_gw.addr_ip6,
+ 				sizeof(rt.rtmsg_gateway));

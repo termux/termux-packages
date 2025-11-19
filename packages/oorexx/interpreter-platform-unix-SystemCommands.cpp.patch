@@ -1,0 +1,49 @@
+--- a/interpreter/platform/unix/SystemCommands.cpp
++++ b/interpreter/platform/unix/SystemCommands.cpp
+@@ -78,7 +78,7 @@
+ #elif defined(OPSYS_SUN)                        /*  path for AIX        */
+ #define CMDDEFNAME "/bin/sh"                /* Bourne Again Shell is default */
+ #else                                       /* shell for Linux               */
+-#define CMDDEFNAME "/bin/bash"              /* Bourne Again Shell is default */
++#define CMDDEFNAME "@TERMUX_PREFIX@/bin/bash"              /* Bourne Again Shell is default */
+ #endif
+ 
+ #define UNKNOWN_COMMAND 127                 /* unknown command return code    */
+@@ -736,23 +736,23 @@
+         {                                /* run the command in the child      */
+             if (Utilities::strCaselessCompare("sh", envName) == 0)
+             {
+-                execl("/bin/sh", "sh", "-c", cmd, NULL);
++                execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", cmd, NULL);
+             }
+             else if (Utilities::strCaselessCompare("ksh", envName) == 0)
+             {
+-                execl("/bin/ksh", "ksh", "-c", cmd, NULL);
++                execl("@TERMUX_PREFIX@/bin/ksh", "ksh", "-c", cmd, NULL);
+             }
+             else if (Utilities::strCaselessCompare("bsh", envName) == 0)
+             {
+-                execl("/bin/bsh", "bsh", "-c", cmd, NULL);
++                execl("@TERMUX_PREFIX@/bin/bsh", "bsh", "-c", cmd, NULL);
+             }
+             else if (Utilities::strCaselessCompare("csh", envName) == 0)
+             {
+-                execl("/bin/csh", "csh", "-c", cmd, NULL);
++                execl("@TERMUX_PREFIX@/bin/csh", "csh", "-c", cmd, NULL);
+             }
+             else if (Utilities::strCaselessCompare("bash", envName) == 0)
+             {
+-                execl("/bin/bash", "bash", "-c", cmd, NULL);
++                execl("@TERMUX_PREFIX@/bin/bash", "bash", "-c", cmd, NULL);
+             }
+             else if (Utilities::strCaselessCompare("cmd", envName) == 0)
+             {
+@@ -767,7 +767,7 @@
+             }
+             else
+             {
+-                execl("/bin/sh", "sh", "-c", cmd, NULL);
++                execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", cmd, NULL);
+             }
+         }
+     }

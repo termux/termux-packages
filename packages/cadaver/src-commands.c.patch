@@ -1,0 +1,20 @@
+--- a/src/commands.c
++++ b/src/commands.c
+@@ -795,12 +795,14 @@
+     tmp = getenv("PAGER");
+     if (tmp != NULL) {
+ 	return tmp;
++#ifndef __ANDROID__
+     } else if (stat("/usr/bin/less", &st) == 0) {
+ 	return "/usr/bin/less";
+-    } else if (stat("/bin/less", &st) == 0) {
+-	return "/bin/less";
++#endif
++    } else if (stat("@TERMUX_PREFIX@/bin/less", &st) == 0) {
++	return "@TERMUX_PREFIX@/bin/less";
+     } else {
+-	return "/bin/more";
++	return "@TERMUX_PREFIX@/bin/more";
+     }
+ }
+ 

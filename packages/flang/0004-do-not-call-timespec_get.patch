@@ -1,0 +1,11 @@
+--- a/flang-rt/lib/runtime/time-intrinsic.cpp
++++ b/flang-rt/lib/runtime/time-intrinsic.cpp
+@@ -139,7 +139,7 @@
+   return ConvertSecondsNanosecondsToCount(kind, sec, nsec);
+ }
+ 
+-#ifndef _AIX
++#if !defined(_AIX) && !(defined(__ANDROID__) && __ANDROID__ < 29)
+ // More accurate version with nanosecond accuracy
+ template <typename Unused = void>
+ count_t GetSystemClockCount(int kind, fallback_implementation) {

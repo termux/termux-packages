@@ -1,0 +1,29 @@
+https://github.com/termux/termux-packages/issues/19054
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -532,10 +532,11 @@
+ 		AC_MSG_WARN([[******************************************************************]])
+ 	])
+ 
++AUTOGEN_BIN="autogen --writable"
+ AS_IF([test "x$ac_cv_prog_HAVE_AUTOGEN" = "xno"], [
++		AUTOGEN_BIN="touch $@"
+-		AC_MSG_WARN([[Touching files in directory tests/.]])
+-		touch tests/*.c tests/*.h
+ 	])
++AC_SUBST(AUTOGEN_BIN)
+ 
+ dnl ====================================================================================
+ dnl  Settings for the HTML documentation.
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -415,7 +415,7 @@
+ # from calling autogen in tarball releases.
+ .def.c:
+ 	$(MAKE) $(AM_MAKEFLAGS) $<
+-	cd $(top_srcdir)/$(@D) && autogen --writable $(<F)
++	cd $(top_srcdir)/$(@D) && @AUTOGEN_BIN@ $(<F)
+ 
+ # recommended Automake way for multi-output targets:
+ # https://www.gnu.org/software/automake/manual/html_node/Multiple-Outputs.html

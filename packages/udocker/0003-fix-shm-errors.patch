@@ -1,0 +1,12 @@
+diff -ur orig/udocker/engine/proot.py mod/udocker/engine/proot.py
+--- orig/udocker/engine/proot.py	2024-08-28 16:01:10.000000000 +0200
++++ mod/udocker/engine/proot.py	2025-05-12 15:37:28.103523863 +0200
+@@ -166,7 +166,7 @@
+ 
+         if (Config.conf['proot_link2symlink'] and
+                 self._has_option("--link2symlink")):
+-            proot_link2symlink = ["--link2symlink", ]
++            proot_link2symlink = ["--link2symlink", "--sysvipc", "-L", "-p", ]
+         else:
+             proot_link2symlink = []
+ 

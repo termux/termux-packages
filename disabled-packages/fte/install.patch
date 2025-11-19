@@ -1,0 +1,24 @@
+--- a/install
++++ b/install
+@@ -12,10 +12,10 @@
+ # INSTALLATION CODE (do not touch):
+ 
+ BINDIR=$PREFIX/bin
+-LIBDIR=$PREFIX/lib/fte
++LIBDIR=$PREFIX/share/fte
+ CONFIGDIR=$LIBDIR/config
+ 
+-LOCALCONFIGDIR=$LIBDIR/localconfig
++LOCALCONFIGDIR=$PREFIX/etc/fte/localconfig
+ 
+ # To do some of this stuff, you should be root...
+ if [ -z "$INSTALL_NONROOT" ]
+@@ -96,7 +96,7 @@
+ fi
+ 
+ # Set up the system default rc file.
+-(cd $CONFIGDIR; $BINDIR/cfte main.fte $LIBDIR/system.fterc)
++(cd $CONFIGDIR; cfte main.fte $PREFIX/etc/fte/system.fterc)
+ 
+ # Done.
+ exit 0

@@ -1,0 +1,27 @@
+--- ./Makefile.orig	2022-04-17 08:36:38.132700421 +0000
++++ ./Makefile	2022-04-17 19:16:25.686564910 +0000
+@@ -1,5 +1,5 @@
+-CFLAGS  += -std=c99 -Wall -O2 -D_REENTRANT
++CFLAGS  += -std=c99 -Wall -D_REENTRANT
+ LIBS    := -lm -lssl -lcrypto -lpthread
+ 
+ TARGET  := $(shell uname -s | tr '[A-Z]' '[a-z]' 2>/dev/null || echo unknown)
+ 
+@@ -31,7 +31,7 @@
+ LDFLAGS += -L$(ODIR)/lib
+ 
+ ifneq ($(WITH_LUAJIT),)
+-	CFLAGS  += -I$(WITH_LUAJIT)/include
++	CFLAGS  += -I$(WITH_LUAJIT)/include/luajit-2.1
+ 	LDFLAGS += -L$(WITH_LUAJIT)/lib
+ else
+ 	CFLAGS  += -I$(ODIR)/include/luajit-2.1
+@@ -61,7 +61,7 @@
+ 
+ $(ODIR)/bytecode.c: src/wrk.lua $(DEPS)
+ 	@echo LUAJIT $<
+-	@$(SHELL) -c 'PATH="obj/bin:$(PATH)" luajit -b "$(CURDIR)/$<" "$(CURDIR)/$@"'
++	@$(SHELL) -c 'PATH="obj/bin:$(PATH)" luajit -b -a $(_ARCH) "$(CURDIR)/$<" "$(CURDIR)/$@"'
+ 
+ $(ODIR)/version.o:
+ 	@echo 'const char *VERSION="$(VER)";' | $(CC) -xc -c -o $@ -

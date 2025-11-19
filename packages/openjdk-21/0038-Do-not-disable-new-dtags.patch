@@ -1,0 +1,26 @@
+From 983c835c3333bba70e0d99be9e074f0c6575a0e7 Mon Sep 17 00:00:00 2001
+From: Fredrik Fornwall <fredrik@fornwall.net>
+Date: Fri, 11 Jul 2025 14:51:08 +0800
+Subject: [PATCH 38/40] Do not disable new dtags
+
+---
+ make/autoconf/flags-cflags.m4 | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/make/autoconf/flags-cflags.m4 b/make/autoconf/flags-cflags.m4
+index 1b966e2706e..705bd7feca9 100644
+--- a/make/autoconf/flags-cflags.m4
++++ b/make/autoconf/flags-cflags.m4
+@@ -66,9 +66,6 @@ AC_DEFUN([FLAGS_SETUP_SHARED_LIBS],
+       # Default works for linux, might work on other platforms as well.
+       SHARED_LIBRARY_FLAGS='-shared'
+       SET_EXECUTABLE_ORIGIN='-Wl,-rpath,\$$ORIGIN[$]1'
+-      if test "x$OPENJDK_TARGET_OS" = xlinux; then
+-        SET_EXECUTABLE_ORIGIN="$SET_EXECUTABLE_ORIGIN -Wl,--disable-new-dtags"
+-      fi
+       SET_SHARED_LIBRARY_NAME='-Wl,-soname=[$]1'
+       SET_SHARED_LIBRARY_MAPFILE='-Wl,-version-script=[$]1'
+ 
+-- 
+2.50.1
+

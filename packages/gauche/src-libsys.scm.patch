@@ -1,0 +1,11 @@
+--- a/src/libsys.scm
++++ b/src/libsys.scm
+@@ -447,7 +447,7 @@
+ ;; potential security risk.  We mimic it's behavior by mkstemp() if possible.
+ (define-cproc sys-tmpnam ()
+   (.if "HAVE_MKSTEMP"
+-       (let* ([nam::(.array char [*]) "/tmp/fileXXXXXX"] [fd::int])
++       (let* ([nam::(.array char [*]) "@TERMUX_PREFIX@/tmp/fileXXXXXX"] [fd::int])
+          (SCM_SYSCALL fd (mkstemp nam))
+          (when (< fd 0) (Scm_SysError "mkstemp failed"))
+          (close fd)

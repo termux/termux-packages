@@ -1,0 +1,13 @@
+--- ./lib/stdio-impl.h	2021-10-30 16:01:14.636375086 +0530
++++ ./lib/stdio-impl.h.mod	2021-10-30 16:01:32.306375079 +0530
+@@ -26,6 +26,10 @@
+ # include <sys/param.h>
+ #endif
+ 
++#if defined __ANDROID__
++#include <bits/struct_file.h>
++#endif
++
+ #include <errno.h>                             /* For detecting Plan9.  */
+ 
+ #if defined __sferror || defined __DragonFly__ || defined __ANDROID__

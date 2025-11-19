@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<dump>
+  <interface name="PeasActivatable" get-type="peas_activatable_get_type">
+    <property name="object" type="GObject" flags="235"/>
+  </interface>
+  <boxed name="PeasPluginInfo" get-type="peas_plugin_info_get_type"/>
+  <class name="PeasEngine" get-type="peas_engine_get_type" parents="GObject">
+    <property name="plugin-list" type="gpointer" flags="225"/>
+    <property name="loaded-plugins" type="GStrv" flags="227"/>
+    <property name="nonglobal-loaders" type="gboolean" flags="235" default-value="FALSE"/>
+    <signal name="load-plugin" return="void" when="last">
+      <param type="PeasPluginInfo"/>
+    </signal>
+    <signal name="unload-plugin" return="void" when="last">
+      <param type="PeasPluginInfo"/>
+    </signal>
+  </class>
+  <class name="PeasExtensionBase" get-type="peas_extension_base_get_type" parents="GObject" abstract="1">
+    <property name="plugin-info" type="PeasPluginInfo" flags="235"/>
+    <property name="data-dir" type="gchararray" flags="225" default-value="NULL"/>
+  </class>
+  <class name="PeasExtensionSet" get-type="peas_extension_set_get_type" parents="GObject">
+    <implements name="GListModel"/>
+    <property name="engine" type="PeasEngine" flags="235"/>
+    <property name="extension-type" type="GType" flags="235"/>
+    <property name="construct-properties" type="gpointer" flags="234"/>
+    <signal name="extension-added" return="void" when="last">
+      <param type="PeasPluginInfo"/>
+      <param type="GObject"/>
+    </signal>
+    <signal name="extension-removed" return="void" when="last">
+      <param type="PeasPluginInfo"/>
+      <param type="GObject"/>
+    </signal>
+  </class>
+  <class name="PeasObjectModule" get-type="peas_object_module_get_type" parents="GTypeModule,GObject">
+    <implements name="GTypePlugin"/>
+    <property name="module-name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="path" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="symbol" type="gchararray" flags="235" default-value="peas_register_types"/>
+    <property name="resident" type="gboolean" flags="235" default-value="FALSE"/>
+    <property name="local-linkage" type="gboolean" flags="235" default-value="FALSE"/>
+  </class>
+  <error-quark function="peas_plugin_info_error_quark" domain="peas-plugin-info-error"/>
+</dump>

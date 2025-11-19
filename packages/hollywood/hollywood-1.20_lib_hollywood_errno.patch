@@ -1,0 +1,24 @@
+diff -uNr hollywood-1.20/lib/hollywood/errno hollywood-1.20.mod/lib/hollywood/errno
+--- hollywood-1.20/lib/hollywood/errno	2019-06-12 07:07:01.000000000 +0300
++++ hollywood-1.20.mod/lib/hollywood/errno	2020-01-02 15:10:58.776335349 +0200
+@@ -15,10 +15,18 @@
+ # limitations under the License.
+ 
+ command -v errno >/dev/null 2>&1 || exit 1
+-command -v ccze >/dev/null 2>&1 || exit 1
++
++_HAS_CCZE=false
++if command -v ccze >/dev/null 2>&1; then
++	_HAS_CCZE=true
++fi
+ 
+ trap "pkill -f -9 lib/hollywood/ >/dev/null 2>&1; exit" INT
+ while true; do
+-	errno --list | sort -R | ccze -A
++	if ${_HAS_CCZE}; then
++		errno --list | sort -R | ccze -A
++	else
++		errno --list | sort -R
++	fi
+ 	sleep 0.6
+ done

@@ -1,0 +1,28 @@
+--- a/meson.build
++++ b/meson.build
+@@ -157,9 +157,9 @@
+ if host_system == 'windows'
+   build_gir = get_option('introspection').require(get_option('default_library') != 'static' and meson.can_run_host_binaries() and gi_dep.found())
+ else
+-  build_gir = get_option('introspection').require(meson.can_run_host_binaries() and gi_dep.found())
++  build_gir = get_option('introspection').require(gi_dep.found())
+ endif
+-build_vala = get_option('vala').require(meson.can_run_host_binaries() and vapigen_dep.found())
++build_vala = get_option('vala').require(vapigen_dep.found())
+ 
+ build_pixbuf_loader = get_option('pixbuf-loader').require(pixbuf_dep.found())
+ 
+@@ -484,12 +484,7 @@
+   cargo_wrapper_args += ['--release']
+ endif
+ 
+-if target_arg != []
+-  cargo_wrapper_args += target_arg
+-endif
+-if toolchain_arg != []
+-  cargo_wrapper_args += toolchain_arg
+-endif
++cargo_wrapper_args += ['--target', '@BUILD_TRIPLET@']
+ 
+ # avif support with dav1d
+ 

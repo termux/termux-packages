@@ -1,0 +1,12 @@
+diff -u -r ../Python-2.7.10/Lib/subprocess.py ./Lib/subprocess.py
+--- ../Python-2.7.10/Lib/subprocess.py	2015-05-23 12:09:07.000000000 -0400
++++ ./Lib/subprocess.py	2015-09-26 18:01:13.672071916 -0400
+@@ -1206,7 +1206,7 @@
+                 args = list(args)
+ 
+             if shell:
+-                args = ["/bin/sh", "-c"] + args
++                args = ["@TERMUX_PREFIX@/bin/sh", "-c"] + args
+                 if executable:
+                     args[0] = executable
+ 

@@ -1,0 +1,20 @@
+--- a/demos/print-editor/print-editor.c
++++ b/demos/print-editor/print-editor.c
+@@ -854,7 +854,7 @@
+ }
+ 
+ static void
+-open (GApplication  *application,
++open_file (GApplication  *application,
+       GFile        **files,
+       int            n_files,
+       const char    *hint)
+@@ -898,7 +898,7 @@
+ 
+   g_signal_connect (app, "startup", G_CALLBACK (startup), NULL);
+   g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
+-  g_signal_connect (app, "open", G_CALLBACK (open), NULL);
++  g_signal_connect (app, "open", G_CALLBACK (open_file), NULL);
+ 
+   g_application_run (G_APPLICATION (app), argc, argv);
+ 

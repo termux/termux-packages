@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="EvDocumentModel" get-type="ev_document_model_get_type" parents="GObject">
+    <property name="document" type="EvDocument" flags="3"/>
+    <property name="page" type="gint" flags="3" default-value="-1"/>
+    <property name="rotation" type="gint" flags="3" default-value="0"/>
+    <property name="inverted-colors" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="scale" type="gdouble" flags="3" default-value="1.000000"/>
+    <property name="sizing-mode" type="EvSizingMode" flags="3" default-value="EV_SIZING_FIT_WIDTH"/>
+    <property name="continuous" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="dual-page" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="dual-odd-left" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="fullscreen" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="page-layout" type="EvPageLayout" flags="227" default-value="EV_PAGE_LAYOUT_SINGLE"/>
+    <signal name="page-changed" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+  </class>
+  <class name="EvJob" get-type="ev_job_get_type" parents="GObject" abstract="1">
+    <signal name="cancelled" return="void" when="last">
+    </signal>
+    <signal name="finished" return="void" when="first">
+    </signal>
+  </class>
+  <class name="EvJobLinks" get-type="ev_job_links_get_type" parents="EvJob,GObject">
+  </class>
+  <class name="EvJobAttachments" get-type="ev_job_attachments_get_type" parents="EvJob,GObject">
+  </class>
+  <class name="EvJobAnnots" get-type="ev_job_annots_get_type" parents="EvJob,GObject">
+  </class>
+  <class name="EvJobRender" get-type="ev_job_render_get_type" parents="EvJob,GObject">
+  </class>
+  <class name="EvJobPageData" get-type="ev_job_page_data_get_type" parents="EvJob,GObject">
+  </class>
+  <class name="EvJobThumbnail" get-type="ev_job_thumbnail_get_type" parents="EvJob,GObject">
+  </class>
+  <class name="EvJobFonts" get-type="ev_job_fonts_get_type" parents="EvJob,GObject">
+    <signal name="updated" return="void" when="last">
+      <param type="gdouble"/>
+    </signal>
+  </class>
+  <class name="EvJobLoad" get-type="ev_job_load_get_type" parents="EvJob,GObject">
+  </class>
+  <class name="EvJobSave" get-type="ev_job_save_get_type" parents="EvJob,GObject">
+  </class>
+  <class name="EvJobFind" get-type="ev_job_find_get_type" parents="EvJob,GObject">
+    <signal name="updated" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+  </class>
+  <class name="EvJobLayers" get-type="ev_job_layers_get_type" parents="EvJob,GObject">
+  </class>
+  <class name="EvJobExport" get-type="ev_job_export_get_type" parents="EvJob,GObject">
+  </class>
+  <class name="EvJobPrint" get-type="ev_job_print_get_type" parents="EvJob,GObject">
+  </class>
+  <class name="EvPrintOperation" get-type="ev_print_operation_get_type" parents="GObject" abstract="1">
+    <property name="document" type="EvDocument" flags="10"/>
+    <signal name="done" return="void" when="last">
+      <param type="GtkPrintOperationResult"/>
+    </signal>
+    <signal name="begin-print" return="void" when="last">
+    </signal>
+    <signal name="status-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="EvView" get-type="ev_view_get_type" parents="GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkScrollable"/>
+    <property name="is-loading" type="gboolean" flags="225" default-value="FALSE"/>
+    <signal name="scroll" return="void" when="last" action="1">
+      <param type="GtkScrollType"/>
+      <param type="GtkOrientation"/>
+    </signal>
+    <signal name="handle-link" return="void" when="last" action="1">
+      <param type="GObject"/>
+    </signal>
+    <signal name="external-link" return="void" when="last" action="1">
+      <param type="GObject"/>
+    </signal>
+    <signal name="popup" return="void" when="last" action="1">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="selection-changed" return="void" when="last" action="1">
+    </signal>
+    <signal name="sync-source" return="void" when="last" action="1">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="annot-added" return="void" when="last" action="1">
+      <param type="EvAnnotation"/>
+    </signal>
+    <signal name="annot-removed" return="void" when="last" action="1">
+      <param type="EvAnnotation"/>
+    </signal>
+    <signal name="layers-changed" return="void" when="last" action="1">
+    </signal>
+    <signal name="move-cursor" return="gboolean" when="last" action="1">
+      <param type="GtkMovementStep"/>
+      <param type="gint"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="cursor-moved" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+  </class>
+  <class name="EvWebView" get-type="ev_web_view_get_type" parents="WebKitWebView,WebKitWebViewBase,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <class name="EvViewPresentation" get-type="ev_view_presentation_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="document" type="EvDocument" flags="10"/>
+    <property name="current-page" type="guint" flags="6" default-value="0"/>
+    <property name="rotation" type="guint" flags="7" default-value="0"/>
+    <property name="inverted-colors" type="gboolean" flags="10" default-value="FALSE"/>
+    <signal name="finished" return="void" when="last" action="1">
+    </signal>
+    <signal name="external-link" return="void" when="last" action="1">
+      <param type="GObject"/>
+    </signal>
+    <signal name="change-page" return="void" when="last" action="1">
+      <param type="GtkScrollType"/>
+    </signal>
+  </class>
+  <enum name="EvSizingMode" get-type="ev_sizing_mode_get_type">
+    <member name="EV_SIZING_FIT_PAGE" nick="fit-page" value="0"/>
+    <member name="EV_SIZING_BEST_FIT" nick="best-fit" value="0"/>
+    <member name="EV_SIZING_FIT_WIDTH" nick="fit-width" value="1"/>
+    <member name="EV_SIZING_FREE" nick="free" value="2"/>
+    <member name="EV_SIZING_AUTOMATIC" nick="automatic" value="3"/>
+  </enum>  <enum name="EvPageLayout" get-type="ev_page_layout_get_type">
+    <member name="EV_PAGE_LAYOUT_SINGLE" nick="single" value="0"/>
+    <member name="EV_PAGE_LAYOUT_DUAL" nick="dual" value="1"/>
+    <member name="EV_PAGE_LAYOUT_AUTOMATIC" nick="automatic" value="2"/>
+  </enum>  <enum name="EvJobPriority" get-type="ev_job_priority_get_type">
+    <member name="EV_JOB_PRIORITY_URGENT" nick="priority-urgent" value="0"/>
+    <member name="EV_JOB_PRIORITY_HIGH" nick="priority-high" value="1"/>
+    <member name="EV_JOB_PRIORITY_LOW" nick="priority-low" value="2"/>
+    <member name="EV_JOB_PRIORITY_NONE" nick="priority-none" value="3"/>
+    <member name="EV_JOB_N_PRIORITIES" nick="n-priorities" value="4"/>
+  </enum>  <enum name="EvJobRunMode" get-type="ev_job_run_mode_get_type">
+    <member name="EV_JOB_RUN_THREAD" nick="thread" value="0"/>
+    <member name="EV_JOB_RUN_MAIN_LOOP" nick="main-loop" value="1"/>
+  </enum>  <flags name="EvJobPageDataFlags" get-type="ev_job_page_data_flags_get_type">
+    <member name="EV_PAGE_DATA_INCLUDE_NONE" nick="none" value="0"/>
+    <member name="EV_PAGE_DATA_INCLUDE_LINKS" nick="links" value="1"/>
+    <member name="EV_PAGE_DATA_INCLUDE_TEXT" nick="text" value="2"/>
+    <member name="EV_PAGE_DATA_INCLUDE_TEXT_MAPPING" nick="text-mapping" value="4"/>
+    <member name="EV_PAGE_DATA_INCLUDE_TEXT_LAYOUT" nick="text-layout" value="8"/>
+    <member name="EV_PAGE_DATA_INCLUDE_TEXT_ATTRS" nick="text-attrs" value="16"/>
+    <member name="EV_PAGE_DATA_INCLUDE_TEXT_LOG_ATTRS" nick="text-log-attrs" value="32"/>
+    <member name="EV_PAGE_DATA_INCLUDE_IMAGES" nick="images" value="64"/>
+    <member name="EV_PAGE_DATA_INCLUDE_FORMS" nick="forms" value="128"/>
+    <member name="EV_PAGE_DATA_INCLUDE_ANNOTS" nick="annots" value="256"/>
+    <member name="EV_PAGE_DATA_INCLUDE_ALL" nick="all" value="511"/>
+  </flags>
+</dump>

@@ -1,0 +1,73 @@
+--- ./common/rconfiguration.cc.orig	2025-05-26 23:06:42.466781607 +0530
++++ ./common/rconfiguration.cc	2025-05-26 23:08:32.688094520 +0530
+@@ -88,24 +88,22 @@
+ 
+    // store option 'consider recommended packages as dependencies'
+    // to config of apt if we run as root
+-   if (getuid() == 0) {
+-      string aptConfPath = _config->FindDir("Dir::Etc::parts", "/etc/apt/apt.conf.d/")
+-                         + "99synaptic";
+-
+-      int old_umask = umask(0022);
+-      ofstream aptfile(aptConfPath.c_str(), ios::out);
+-      if (!aptfile != 0) {
+-         cerr << "cannot open " << aptConfPath.c_str() <<
+-                 " to write APT::Install-Recommends" << endl;
+-      } else {
+-         if (_config->FindB("APT::Install-Recommends", false))
+-            aptfile << "APT::Install-Recommends \"true\";" << endl;
+-         else
+-            aptfile << "APT::Install-Recommends \"false\";" << endl;
++   string aptConfPath = _config->FindDir("Dir::Etc::parts", "@TERMUX_PREFIX@/etc/apt/apt.conf.d/")
++                     + "99synaptic";
++
++   int old_umask = umask(0022);
++   ofstream aptfile(aptConfPath.c_str(), ios::out);
++   if (!aptfile != 0) {
++      cerr << "cannot open " << aptConfPath.c_str() <<
++              " to write APT::Install-Recommends" << endl;
++   } else {
++      if (_config->FindB("APT::Install-Recommends", false))
++         aptfile << "APT::Install-Recommends \"true\";" << endl;
++      else
++         aptfile << "APT::Install-Recommends \"false\";" << endl;
+          aptfile.close();
+-      }
+-      umask(old_umask);
+    }
++   umask(old_umask);
+    // and backup Install-Recommends to config of synaptic
+    _config->Set("Synaptic::Install-Recommends",
+                 _config->FindB("APT::Install-Recommends",
+@@ -150,7 +148,7 @@
+ 
+    home_dir = string(pwd->pw_dir);
+    xdg_data_dir = home_dir + "/.config";
+-   old_path = home_dir + "/.synaptic";
++   old_path = "@TERMUX_PREFIX@/etc/synaptic";
+    buf = getenv("XDG_CONFIG_HOME");
+ 
+    if (buf) {
+@@ -285,17 +283,10 @@
+ 
+    // read Install-Recommends, preferably from APT:: if we run as root
+    // or from Synaptic:: otherwise
+-   if(getuid() == 0) {
+-      _config->Set("APT::Install-Recommends",
+-                   _config->FindB("APT::Install-Recommends",
+-                   _config->FindB("Synaptic::Install-Recommends",
+-                   false)));
+-   } else {
+-      _config->Set("APT::Install-Recommends",
+-                   _config->FindB("Synaptic::Install-Recommends",
+-                   _config->FindB("APT::Install-Recommends",
+-                   false)));
+-   }
++   _config->Set("APT::Install-Recommends",
++                _config->FindB("APT::Install-Recommends",
++                _config->FindB("Synaptic::Install-Recommends",
++                false)));
+ 
+    return true;
+ }
+

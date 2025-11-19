@@ -1,0 +1,14 @@
+diff -u -r ../libevent-release-2.1.8-stable/evutil_rand.c ./evutil_rand.c
+--- ../libevent-release-2.1.8-stable/evutil_rand.c	2017-01-26 00:37:15.000000000 +0100
++++ ./evutil_rand.c	2017-01-27 23:51:13.124764486 +0100
+@@ -195,8 +195,10 @@
+ void
+ evutil_secure_rng_add_bytes(const char *buf, size_t n)
+ {
++#ifndef __ANDROID__
+ 	arc4random_addrandom((unsigned char*)buf,
+ 	    n>(size_t)INT_MAX ? INT_MAX : (int)n);
++#endif
+ }
+ 
+ void

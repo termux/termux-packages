@@ -1,0 +1,35 @@
+--- mtr/ui/curses.c       2017-06-02 08:54:58.000000000 +0000
++++ ./ui/curses.c         2017-10-21 22:47:23.221332133 +0000
+@@ -383,7 +383,7 @@
+     const char *format,
+     int n)
+ {
+-    if (index(format, 'N')) {
++    if (strchr(format, 'N')) {
+         *dst++ = ' ';
+         format_number(n, 5, dst);
+     } else if (strchr(format, 'f')) {
+
+--- mtr/ui/cmdpipe.c      2017-10-21 22:50:49.843505234 +0000
++++ ./ui/cmdpipe.c        2017-10-21 22:51:08.507344155 +0000
+@@ -736,7 +736,7 @@
+      */
+     while (true) {
+         /*  If no newline is found, our reply isn't yet complete  */
+-        end_of_reply = index(reply_start, '\n');
++        end_of_reply = strchr(reply_start, '\n');
+         if (end_of_reply == NULL) {
+             /*  No complete replies remaining  */
+             break;
+--- mtr/packet/command.c     2017-06-02 08:54:58.000000000 +0000
++++ ./packet/command.c       2017-10-21 22:55:13.321277161 +0000
+@@ -380,7 +380,7 @@
+         buffer->incoming_buffer[buffer->incoming_read_position] = 0;
+ 
+         /*  Find the next newline, which terminates command requests  */
+-        end_of_command = index(buffer->incoming_buffer, '\n');
++        end_of_command = strchr(buffer->incoming_buffer, '\n');
+         if (end_of_command == NULL) {
+             /*
+                No newlines found, so any data we've read so far is
+

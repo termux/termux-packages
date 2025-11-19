@@ -1,0 +1,67 @@
+From 58bc44a397b32153385632d1d5a4d5a2330f76b1 Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <henrik@grimler.se>
+Date: Wed, 17 Sep 2025 07:28:24 +0200
+Subject: [PATCH] Support 32bit systems
+
+On arm (32 bit) gotorrent can run into errors like:
+
+    2025/09/17 05:12:02 strconv.Atoi: parsing "3501713069": value out of range
+    panic: strconv.Atoi: parsing "3501713069": value out of range
+
+    goroutine 1 [running]:
+    log.Panic({0x87d1f6a0, 0x1, 0x1})
+            /home/builder/.termux-build/_cache/go1.25.0-r1/src/log/log.go:451 +0xa8
+    github.com/ismaelpadilla/gotorrent/clients/thepiratebay.pirateBayTorrent.convert({{0x87e839c0, 0x8}, {0x8802a7b0, 0x28}, {0x0, 0x0}, {0x8802a7e0, 0x28}, {0xa8877920, 0x1}, ...})
+            /home/builder/.termux-build/gotorrent/build/src/github.com/ismaelpadilla/gotorrent/clients/thepiratebay/thepiratebay.go:48 +0xc0
+    github.com/ismaelpadilla/gotorrent/clients/thepiratebay.pirateBay.Search({}, {0xbe8eaea3, 0xa})
+            /home/builder/.termux-build/gotorrent/build/src/github.com/ismaelpadilla/gotorrent/clients/thepiratebay/thepiratebay.go:38 +0x2e8
+    github.com/ismaelpadilla/gotorrent/ui.InitialModel({0xbe8eaea3, 0xa}, {{0xa8e241e0, 0xa912c6f8}, 0x0, {0x0, 0x0}, 0x0})
+            /home/builder/.termux-build/gotorrent/build/src/github.com/ismaelpadilla/gotorrent/ui/ui.go:39 +0x188
+    github.com/ismaelpadilla/gotorrent/cmd.init.func1(0xa90cc4b8, {0x87c90708, 0x1, 0x1})
+            /home/builder/.termux-build/gotorrent/build/src/github.com/ismaelpadilla/gotorrent/cmd/root.go:41 +0x250
+    github.com/spf13/cobra.(*Command).execute(0xa90cc4b8, {0x87caa1c8, 0x1, 0x1})
+            /home/builder/.termux-build/gotorrent/build/pkg/mod/github.com/spf13/cobra@v1.5.0/command.go:876 +0x764
+    github.com/spf13/cobra.(*Command).ExecuteC(0xa90cc4b8)
+            /home/builder/.termux-build/gotorrent/build/pkg/mod/github.com/spf13/cobra@v1.5.0/command.go:990 +0x444
+    github.com/spf13/cobra.(*Command).Execute(...)
+            /home/builder/.termux-build/gotorrent/build/pkg/mod/github.com/spf13/cobra@v1.5.0/command.go:918
+    github.com/ismaelpadilla/gotorrent/cmd.Execute()
+            /home/builder/.termux-build/gotorrent/build/src/github.com/ismaelpadilla/gotorrent/cmd/root.go:56 +0x2c
+    main.main()
+            /home/builder/.termux-build/gotorrent/build/src/github.com/ismaelpadilla/gotorrent/main.go:8 +0x14
+
+Fix the issue by making the converted value an Int64 instead.
+---
+ clients/thepiratebay/thepiratebay.go | 2 +-
+ interfaces/torrent.go                | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/clients/thepiratebay/thepiratebay.go b/clients/thepiratebay/thepiratebay.go
+index 3d5c9ec46280..748c5f8511b7 100644
+--- a/clients/thepiratebay/thepiratebay.go
++++ b/clients/thepiratebay/thepiratebay.go
+@@ -43,7 +43,7 @@ func (p pirateBay) Search(a string) []interfaces.Torrent {
+ 
+ func (p pirateBayTorrent) convert() interfaces.Torrent {
+ 	magnetLink := "magnet:?xt=urn:btih:" + p.InfoHash
+-	size, err := strconv.Atoi(p.Size)
++	size, err := strconv.ParseInt(p.Size, 10, 64)
+ 	if err != nil {
+ 		log.Panic(err)
+ 	}
+diff --git a/interfaces/torrent.go b/interfaces/torrent.go
+index 34456e3a6f96..a319ec91a6f8 100644
+--- a/interfaces/torrent.go
++++ b/interfaces/torrent.go
+@@ -10,7 +10,7 @@ type Torrent struct {
+ 	InfoHash    string
+ 	Files       []TorrentFile
+ 	MagnetLink  string
+-	Size        int
++	Size        int64
+ 	Uploaded    string
+ 	Seeders     int
+ 	Leechers    int
+-- 
+2.51.0
+

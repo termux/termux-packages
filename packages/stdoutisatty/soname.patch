@@ -1,0 +1,13 @@
+diff --git a/libstdoutisatty.c b/libstdoutisatty.c
+index 0516cdd..a5f4762 100644
+--- a/libstdoutisatty.c
++++ b/libstdoutisatty.c
+@@ -43,7 +43,7 @@ __attribute__ ((constructor)) static void setup(void) {
+   void *libhdl;
+   char *dlerr;
+ 
+-  if (!(libhdl=dlopen("libc.so.6", RTLD_LAZY)))
++  if (!(libhdl=dlopen("libc.so", RTLD_LAZY)))
+     die("Failed to patch library calls: %s", dlerror());
+ 
+   orig_isatty = dlsym(libhdl, "isatty");

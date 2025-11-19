@@ -1,0 +1,17 @@
+--- a/ntp_io_linux.c
++++ b/ntp_io_linux.c
+@@ -49,6 +49,14 @@
+ #include "sys_linux.h"
+ #include "util.h"
+ 
++// missing in NDK linux/ethtool.h
++#if defined(__ANDROID__)
++static inline __u32 ethtool_cmd_speed(const struct ethtool_cmd *ep)
++{
++	return (ep->speed_hi << 16) | ep->speed;
++}
++#endif
++
+ struct Interface {
+   char name[IF_NAMESIZE];
+   int if_index;

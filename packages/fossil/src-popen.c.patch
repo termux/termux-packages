@@ -1,0 +1,11 @@
+--- ./src/popen.c.orig	2020-03-24 09:01:15.178685700 +0100
++++ ./src/popen.c	2020-03-24 09:03:05.615137701 +0100
+@@ -200,7 +200,7 @@
+     if( bDirect ){
+       execl(zCmd, zCmd, (char*)0);
+     }else{
+-      execl("/bin/sh", "/bin/sh", "-c", zCmd, (char*)0);
++      execl("@TERMUX_PREFIX@/bin/sh", "@TERMUX_PREFIX@/bin/sh", "-c", zCmd, (char*)0);
+     }
+     return 1;
+   }else{

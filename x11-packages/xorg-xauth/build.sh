@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
+TERMUX_PKG_DESCRIPTION="X.Org authorization settings program"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.1.4"
+TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/app/xauth-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=e9318141464ad7b4dc0f8564a580f0d20f977c85a388cc40d5a766206151c690
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libx11, libxau, libxext, libxmu"
+TERMUX_PKG_BUILD_DEPENDS="xorg-util-macros"

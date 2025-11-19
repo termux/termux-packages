@@ -1,0 +1,38 @@
+--- a/gtk2_ardour/ardour.sh.in
++++ b/gtk2_ardour/ardour.sh.in
+@@ -5,10 +5,6 @@
+ # and does a few checks before exec'ing the real executable.
+ # 
+ 
+-export GTK_PATH=@CONFDIR@:@LIBDIR@${GTK_PATH:+:$GTK_PATH}
+-
+-export LD_LIBRARY_PATH=@LIBDIR@${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+-
+ ## Memlock check
+ 
+ MLOCK_LIMIT=$(ulimit -l)
+@@ -21,24 +17,6 @@
+ 
+ fi
+ 
+-## Glib atomic test
+-
+-GLIB=$(ldd @LIBDIR@/ardour-@VERSION@ 2> /dev/null | grep glib-2.0 | sed 's/.*=> \([^ ]*\)/\1/;s/ .*//')
+-
+-if ! type nm >/dev/null 2>&1 || [ "$GLIB" = "" ]; then
+-	echo "WARNING: Could not check your glib-2.0 for mutex locking atomic operations."
+-	echo ""
+-elif [ $(nm -D --radix=dec --defined-only -S $GLIB | grep -w g_atomic_int_add | cut -d ' ' -f 2) -gt 32 ]; then
+-	echo "WARNING: Your system contains a suspect libglib-2.0. Your version might be built"
+-	echo "         to use mutex locking atomic operations. This is a fallback solution to"
+-	echo "         a more robust hardware supported atomicity. It might cause reduced "
+-	echo "         performance and/or deadlocks. Please contact your distribution support"
+-	echo "         about this issue."
+-	echo "         Unfortunately this check is not 100% accurate, so this might not be"
+-	echo "         the case with your system."
+-	echo ""
+-fi
+-
+ #
+ # Running Ardour requires these 3 variables to be set
+ #

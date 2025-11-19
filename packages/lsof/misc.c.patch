@@ -1,0 +1,11 @@
+--- a/lib/misc.c
++++ b/lib/misc.c
+@@ -223,7 +223,7 @@
+     (void)closefrom(low);
+ #else /* !defined(HAS_CLOSEFROM) */
+     /* fallback to SYS_close_range */
+-#    if defined(SYS_close_range)
++#    if defined(SYS_close_range) && !defined(__ANDROID__)
+     if (MaxFd > low && syscall(SYS_close_range, low, MaxFd - 1, 0) == 0)
+         return;
+ #    endif

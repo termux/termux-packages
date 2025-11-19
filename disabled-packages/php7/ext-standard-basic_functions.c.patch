@@ -1,0 +1,13 @@
+diff -u -r ../php-7.3.2/ext/standard/basic_functions.c ./ext/standard/basic_functions.c
+--- ../php-7.3.2/ext/standard/basic_functions.c	2019-02-05 13:10:09.000000000 +0000
++++ ./ext/standard/basic_functions.c	2019-02-16 00:28:53.991218270 +0000
+@@ -3753,9 +3753,6 @@
+ 
+ PHP_MSHUTDOWN_FUNCTION(basic) /* {{{ */
+ {
+-#ifdef HAVE_SYSLOG_H
+-	PHP_MSHUTDOWN(syslog)(SHUTDOWN_FUNC_ARGS_PASSTHRU);
+-#endif
+ #ifdef ZTS
+ 	ts_free_id(basic_globals_id);
+ #ifdef PHP_WIN32

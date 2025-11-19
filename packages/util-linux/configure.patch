@@ -1,0 +1,25 @@
+col is by default only built when using glibc, but we keep
+it in Termux by patching away the configure check.
+
+See https://github.com/termux/termux-packages/issues/21537
+
+--- a/configure
++++ b/configure
+@@ -40869,7 +40869,7 @@ fi
+ else
+ 
+   build_col=yes
+-  enable_col=check
++  enable_col=yes
+ fi
+ 
+ 
+@@ -40909,7 +40909,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+     yes:yes)
+       build_col=yes ;;
+     yes:*)
+-      as_fn_error $? "col selected, but required building for glibc not available" "$LINENO" 5;;
++      build_col=yes ;;
+     check:yes)
+       build_col=yes ;;
+     check:*)

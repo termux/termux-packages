@@ -1,0 +1,25 @@
+diff --git a/Source/Tools/LinuxEmulation/VDSO_Emulation.cpp b/Source/Tools/LinuxEmulation/VDSO_Emulation.cpp
+index 75f05c8..a5b622f 100644
+--- a/Source/Tools/LinuxEmulation/VDSO_Emulation.cpp
++++ b/Source/Tools/LinuxEmulation/VDSO_Emulation.cpp
+@@ -18,6 +18,11 @@
+ #include <sys/time.h>
+ #include <unistd.h>
+ 
++// Add macros which are missing in some versions of <elf.h>
++#ifndef ELF32_ST_VISIBILITY
++#define ELF32_ST_VISIBILITY(o) ((o) & 0x3)
++#endif
++
+ namespace FEX::VDSO {
+   FEXCore::Context::VDSOSigReturn VDSOPointers{};
+   namespace VDSOHandlers {
+@@ -253,7 +258,7 @@ namespace FEX::VDSO {
+           int rv;
+         } *args = reinterpret_cast<ArgsRV_t*>(ArgsRV);
+ 
+-        int Result = ::getcpu(args->cpu, args->node);
++        int Result = FHU::Syscalls::getcpu(args->cpu, args->node);
+         args->rv = SyscallRet(Result);
+       }
+     }

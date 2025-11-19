@@ -1,0 +1,25 @@
+diff --git a/extract.c b/extract.c
+index a0a4929..9ef80b3 100644
+--- a/extract.c
++++ b/extract.c
+@@ -2214,6 +2214,7 @@ static int test_compr_eb(__G__ eb, eb_size, compr_offset, test_uc_ebdata)
+     ulg eb_ucsize;
+     uch *eb_ucptr;
+     int r;
++    ush method;
+ 
+     if (compr_offset < 4)                /* field is not compressed: */
+         return PK_OK;                    /* do nothing and signal OK */
+@@ -2223,6 +2224,12 @@ static int test_compr_eb(__G__ eb, eb_size, compr_offset, test_uc_ebdata)
+          eb_size <= (compr_offset + EB_CMPRHEADLEN)))
+         return IZ_EF_TRUNC;               /* no compressed data! */
+ 
++    method = makeword(eb + (EB_HEADSIZE + compr_offset));
++    if ((method == STORED) && (eb_size != compr_offset + EB_CMPRHEADLEN + eb_ucsize))
++        return PK_ERR;            /* compressed & uncompressed
++                                   * should match in STORED
++                                   * method */
++
+     if (
+ #ifdef INT_16BIT
+         (((ulg)(extent)eb_ucsize) != eb_ucsize) ||

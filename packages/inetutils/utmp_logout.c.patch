@@ -1,0 +1,17 @@
+diff -u -r ../inetutils-1.9.3/libinetutils/utmp_logout.c ./libinetutils/utmp_logout.c
+--- ../inetutils-1.9.3/libinetutils/utmp_logout.c	2015-03-31 11:40:48.000000000 -0400
++++ ./libinetutils/utmp_logout.c	2015-05-12 16:29:06.884147490 -0400
+@@ -68,6 +68,7 @@
+ void
+ utmp_logout (char *line)
+ {
++#ifndef __ANDROID__
+ #ifdef HAVE_UTMPX_H
+   struct utmpx utx;
+   struct utmpx *ut;
+@@ -166,4 +167,5 @@
+     logwtmp (line, "", "");
+ # endif /* HAVE_LOGOUT */
+ #endif
++#endif
+ }

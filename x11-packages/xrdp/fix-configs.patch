@@ -1,0 +1,209 @@
+diff -uNr xrdp-0.9.16/sesman/sesman.ini.in xrdp-0.9.16.mod/sesman/sesman.ini
+--- xrdp-0.9.16/sesman/sesman.ini.in	2021-04-30 12:26:36.000000000 +0000
++++ xrdp-0.9.16.mod/sesman/sesman.ini.in	2021-05-05 22:52:27.069387793 +0000
+@@ -16,6 +19,7 @@
+ MaxLoginRetry=4
+ TerminalServerUsers=tsusers
+ TerminalServerAdmins=tsadmins
++
+ ; When AlwaysGroupCheck=false access will be permitted
+ ; if the group TerminalServerUsers is not defined.
+ AlwaysGroupCheck=false
+@@ -67,7 +71,7 @@
+ ; Note: Log levels can be any of: core, error, warning, info, debug, or trace
+ LogFile=xrdp-sesman.log
+ LogLevel=INFO
+-EnableSyslog=true
++EnableSyslog=false
+ #SyslogLevel=INFO
+ #EnableConsole=false
+ #ConsoleLevel=INFO
+diff -uNr xrdp-0.9.16/sesman/startwm.sh xrdp-0.9.16.mod/sesman/startwm.sh
+--- xrdp-0.9.16/sesman/startwm.sh	2020-12-28 14:03:43.000000000 +0000
++++ xrdp-0.9.16.mod/sesman/startwm.sh	2021-05-05 22:52:27.069387793 +0000
+@@ -25,8 +25,8 @@
+ # END IF
+ pre_start()
+ {
+-  if [ -r /etc/profile ]; then
+-    . /etc/profile
++  if [ -r @TERMUX_PREFIX@/etc/profile ]; then
++    . @TERMUX_PREFIX@/etc/profile
+   fi
+   if [ -r ~/.bash_profile ]; then
+     . ~/.bash_profile
+@@ -58,6 +58,7 @@
+ #start the window manager
+ wm_start()
+ {
++  if ! [ -d "@TERMUX_PREFIX@" ]; then # !Termux
+   if [ -r /etc/default/locale ]; then
+     . /etc/default/locale
+     export LANG LANGUAGE
+@@ -89,26 +90,13 @@
+     . /usr/etc/X11/xdm/Xsession
+     exit 0
+   fi
++  fi # end !Termux
+ 
+   pre_start
+   xterm
+   post_start
+ }
+ 
+-#. /etc/environment
+-#export PATH=$PATH
+-#export LANG=$LANG
+-
+-# change PATH to be what your environment needs usually what is in
+-# /etc/environment
+-#PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games"
+-#export PATH=$PATH
+-
+-# for PATH and LANG from /etc/environment
+-# pam will auto process the environment file if /etc/pam.d/xrdp-sesman
+-# includes
+-# auth       required     pam_env.so readenv=1
+-
+ wm_start
+ 
+ exit 1
+diff -uNr xrdp-0.9.16/xrdp/xrdp.ini.in xrdp-0.9.16.mod/xrdp/xrdp.ini
+--- xrdp-0.9.16/xrdp/xrdp.ini.in	2021-04-30 12:26:36.000000000 +0000
++++ xrdp-0.9.16.mod/xrdp/xrdp.ini.in	2021-05-05 22:54:03.485386615 +0000
+@@ -12,7 +12,7 @@ fork=true
+ ;
+ ; Examples:
+ ;   port=3389
+-;   port=unix://./tmp/xrdp.socket
++;   port=unix://@TERMUX_PREFIX@/tmp/xrdp.socket
+ ;   port=tcp://.:3389                           127.0.0.1:3389
+ ;   port=tcp://:3389                            *:3389
+ ;   port=tcp://<any ipv4 format addr>:3389      192.168.1.1:3389
+@@ -197,7 +197,7 @@ ls_btn_cancel_height=30
+ ; Note: Log levels can be any of: core, error, warning, info, debug, or trace
+ LogFile=xrdp.log
+ LogLevel=INFO
+-EnableSyslog=true
++EnableSyslog=false
+ #SyslogLevel=INFO
+ #EnableConsole=false
+ #ConsoleLevel=INFO
+@@ -231,32 +231,17 @@ rail=true
+ xrdpvr=true
+ 
+ ; for debugging xrdp, in section xrdp1, change port=-1 to this:
+-#port=/tmp/.xrdp/xrdp_display_10
++#port=@TERMUX_PREFIX@/tmp/.xrdp/xrdp_display_10
+ 
+ 
+ ;
+ ; Session types
+ ;
+ 
+-; Some session types such as Xorg and Xvnc start a display server.
+-; Startup command-line parameters for the display server are configured
+-; in sesman.ini. See and configure also sesman.ini.
+-[Xorg]
+-name=Xorg
+-lib=libxup.@lib_extension@
+-username=ask
+-password=ask
+-port=-1
+-code=20
+-; Frame capture interval (milliseconds)
+-h264_frame_interval=16
+-rfx_frame_interval=32
+-normal_frame_interval=40
+-
+ [Xvnc]
+ name=Xvnc
+ lib=libvnc.@lib_extension@
+-username=ask
++username=na
+ password=ask
+ ip=127.0.0.1
+ port=-1
+@@ -265,82 +250,3 @@ port=-1
+ ; Disable requested encodings to support buggy VNC servers
+ ; (1 = ExtendedDesktopSize)
+ #disabled_encodings_mask=0
+-
+-; Generic VNC Proxy
+-; Tailor this to specific hosts and VNC instances by specifying an ip
+-; and port and setting a suitable name.
+-[vnc-any]
+-name=vnc-any
+-lib=libvnc.@lib_extension@
+-ip=ask
+-port=ask5900
+-username=na
+-password=ask
+-#pamusername=asksame
+-#pampassword=asksame
+-#delay_ms=2000
+-; Use one of these to connect to a chansrv instance created outside of sesman
+-; (e.g. as part of an x11vnc console session). Replace 'n' with the
+-; display number of the session, and (if applicable) 'u' with the numeric
+-; UID of the session.
+-;
+-; If 'username' or 'pamusername' is set, you probably don't need to use
+-; the two parameter variant with 'u'.
+-#chansrvport=DISPLAY(n)
+-#chansrvport=DISPLAY(n,u)
+-
+-; Generic RDP proxy using NeutrinoRDP
+-; Tailor this to specific hosts by specifying an ip and port and setting
+-; a suitable name.
+-[neutrinordp-any]
+-name=neutrinordp-any
+-; To use this section, you should build xrdp with configure option
+-; --enable-neutrinordp.
+-lib=libxrdpneutrinordp.@lib_extension@
+-ip=ask
+-port=ask3389
+-username=ask
+-password=ask
+-; Uncomment the following lines to enable PAM authentication for proxy
+-; connections.
+-#pamusername=ask
+-#pampassword=ask
+-; Currently NeutrinoRDP doesn't support dynamic resizing. Uncomment
+-; this line if you're using a client which does.
+-#enable_dynamic_resizing=false
+-; By default, performance settings requested by the RDP client are ignored
+-; and chosen by NeutrinoRDP. Uncomment this line to allow the user to
+-; select performance settings in the RDP client.
+-#perf.allow_client_experiencesettings=true
+-; Override any experience setting by uncommenting one or more of the
+-; following lines.
+-#perf.wallpaper=false
+-#perf.font_smoothing=false
+-#perf.desktop_composition=false
+-#perf.full_window_drag=false
+-#perf.menu_anims=false
+-#perf.themes=false
+-#perf.cursor_blink=false
+-; By default NeutrinoRDP supports cursor shadows. If this is giving
+-; you problems (e.g. cursor is a black rectangle) try disabling cursor
+-; shadows by uncommenting the following line.
+-#perf.cursor_shadow=false
+-; By default, NeutrinoRDP uses the keyboard layout of the remote RDP Server.
+-; If you want to tell the remote the keyboard layout of the RDP Client,
+-; by uncommenting the following line.
+-#neutrinordp.allow_client_keyboardLayout=true
+-; The following options will override the remote keyboard layout settings.
+-; These options are for DEBUG and are not recommended for regular use.
+-#neutrinordp.override_keyboardLayout_mask=0x0000FFFF
+-#neutrinordp.override_kbd_type=0x04
+-#neutrinordp.override_kbd_subtype=0x01
+-#neutrinordp.override_kbd_fn_keys=12
+-#neutrinordp.override_kbd_layout=0x00000409
+-
+-; You can override the common channel settings for each session type
+-#channel.rdpdr=true
+-#channel.rdpsnd=true
+-#channel.drdynvc=true
+-#channel.cliprdr=true
+-#channel.rail=true
+-#channel.xrdpvr=true

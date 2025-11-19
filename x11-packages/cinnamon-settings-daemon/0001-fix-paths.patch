@@ -1,0 +1,379 @@
+diff --git a/data/org.cinnamon.settings-daemon.plugins.xrandr.gschema.xml.in.in b/data/org.cinnamon.settings-daemon.plugins.xrandr.gschema.xml.in.in
+index 15e6f3e..25d9669 100644
+--- a/data/org.cinnamon.settings-daemon.plugins.xrandr.gschema.xml.in.in
++++ b/data/org.cinnamon.settings-daemon.plugins.xrandr.gschema.xml.in.in
+@@ -1,7 +1,7 @@
+ <schemalist>
+   <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.cinnamon.settings-daemon.plugins.xrandr" path="/org/cinnamon/settings-daemon/plugins/xrandr/">
+     <key name="default-configuration-file" type="s">
+-      <default>'/etc/cinnamon-settings-daemon/xrandr/monitors.xml'</default>
++      <default>'@TERMUX_PREFIX@/etc/cinnamon-settings-daemon/xrandr/monitors.xml'</default>
+       <summary>deprecated - handled by muffin</summary>
+     </key>
+     <key name="default-monitors-setup" enum="org.cinnamon.settings-daemon.CsdXrandrBootBehaviour">
+diff --git a/debian/cinnamon-settings-daemon.maintscript b/debian/cinnamon-settings-daemon.maintscript
+index 49d4359..2be9581 100644
+--- a/debian/cinnamon-settings-daemon.maintscript
++++ b/debian/cinnamon-settings-daemon.maintscript
+@@ -1,7 +1,7 @@
+-rm_conffile /etc/dbus-1/system.d/org.cinnamon.SettingsDaemon.DateTimeMechanism.conf 4.6.0~
+-rm_conffile /etc/xdg/autostart/cinnamon-settings-daemon-a11y-keyboard.desktop 5.3.0~
+-rm_conffile /etc/xdg/autostart/cinnamon-settings-daemon-cursor.desktop 5.3.0~
+-rm_conffile /etc/xdg/autostart/cinnamon-settings-daemon-mouse.desktop 5.3.0~
+-rm_conffile /etc/xdg/autostart/cinnamon-settings-daemon-orientation.desktop 5.3.0~
+-rm_conffile /etc/xdg/autostart/cinnamon-settings-daemon-sound.desktop 5.3.0~
+-rm_conffile /etc/xdg/autostart/cinnamon-settings-daemon-xrandr.desktop 5.3.0~
++rm_conffile @TERMUX_PREFIX@/etc/dbus-1/system.d/org.cinnamon.SettingsDaemon.DateTimeMechanism.conf 4.6.0~
++rm_conffile @TERMUX_PREFIX@/etc/xdg/autostart/cinnamon-settings-daemon-a11y-keyboard.desktop 5.3.0~
++rm_conffile @TERMUX_PREFIX@/etc/xdg/autostart/cinnamon-settings-daemon-cursor.desktop 5.3.0~
++rm_conffile @TERMUX_PREFIX@/etc/xdg/autostart/cinnamon-settings-daemon-mouse.desktop 5.3.0~
++rm_conffile @TERMUX_PREFIX@/etc/xdg/autostart/cinnamon-settings-daemon-orientation.desktop 5.3.0~
++rm_conffile @TERMUX_PREFIX@/etc/xdg/autostart/cinnamon-settings-daemon-sound.desktop 5.3.0~
++rm_conffile @TERMUX_PREFIX@/etc/xdg/autostart/cinnamon-settings-daemon-xrandr.desktop 5.3.0~
+diff --git a/debian/rules b/debian/rules
+index 8dd5119..e0eed9b 100755
+--- a/debian/rules
++++ b/debian/rules
+@@ -14,7 +14,7 @@ DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+ 
+ override_dh_auto_configure:
+ 	dh_auto_configure -- \
+-	    --libexecdir=/usr/libexec \
++	    --libexecdir=@TERMUX_PREFIX@/libexec \
+ 	    $(CONFFLAGS)
+ 
+ 
+diff --git a/files/usr/share/icons/hicolor/scalable/apps/csd-color.svg b/files/usr/share/icons/hicolor/scalable/apps/csd-color.svg
+index 0f42fc7..9a1a099 100644
+--- a/files/usr/share/icons/hicolor/scalable/apps/csd-color.svg
++++ b/files/usr/share/icons/hicolor/scalable/apps/csd-color.svg
+@@ -12,7 +12,7 @@
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+    inkscape:export-ydpi="90.000000"
+    inkscape:export-xdpi="90.000000"
+-   inkscape:export-filename="/home/hbons/preferences-color.png"
++   inkscape:export-filename="@TERMUX_HOME@/hbons/preferences-color.png"
+    width="230"
+    height="230"
+    id="svg11300"
+diff --git a/install-scripts/meson_install_schemas.py b/install-scripts/meson_install_schemas.py
+index 6b2bbe2..39fd706 100644
+--- a/install-scripts/meson_install_schemas.py
++++ b/install-scripts/meson_install_schemas.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!@TERMUX_PREFIX@/bin/python3
+ 
+ import os
+ import subprocess
+diff --git a/install-scripts/meson_mk_symlink.py b/install-scripts/meson_mk_symlink.py
+index 32ece1e..feee93a 100644
+--- a/install-scripts/meson_mk_symlink.py
++++ b/install-scripts/meson_mk_symlink.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!@TERMUX_PREFIX@/bin/python3
+ 
+ import os
+ import subprocess
+diff --git a/install-scripts/meson_update_icon_cache.py b/install-scripts/meson_update_icon_cache.py
+index d618191..4f14d5e 100644
+--- a/install-scripts/meson_update_icon_cache.py
++++ b/install-scripts/meson_update_icon_cache.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!@TERMUX_PREFIX@/bin/python3
+ 
+ import os
+ import subprocess
+diff --git a/plugins/color/generate-tz-header.py b/plugins/color/generate-tz-header.py
+index cc1d399..4b53e6a 100755
+--- a/plugins/color/generate-tz-header.py
++++ b/plugins/color/generate-tz-header.py
+@@ -1,11 +1,11 @@
+-#!/usr/bin/python3
++#!@TERMUX_PREFIX@/bin/python3
+ 
+ import re
+ 
+ d = {}
+ 
+ 
+-with open("/usr/share/zoneinfo/zone.tab", "r") as f:
++with open("@TERMUX_PREFIX@/share/zoneinfo/zone.tab", "r") as f:
+     for line in f:
+         if line.startswith("#"):
+             continue
+@@ -47,4 +47,4 @@ header += "};"
+ with open("tz-coords.h", "w") as f:
+     f.write(header)
+ 
+-quit()
+\ No newline at end of file
++quit()
+diff --git a/plugins/datetime/csd-datetime-mechanism-debian.c b/plugins/datetime/csd-datetime-mechanism-debian.c
+index e554881..a4e3b79 100644
+--- a/plugins/datetime/csd-datetime-mechanism-debian.c
++++ b/plugins/datetime/csd-datetime-mechanism-debian.c
+@@ -29,12 +29,12 @@
+ static void
+ _get_using_ntpdate (gboolean *can_use, gboolean *is_using, GError ** error)
+ {
+-        if (!g_file_test ("/usr/sbin/ntpdate-debian", G_FILE_TEST_EXISTS))
++        if (!g_file_test ("@TERMUX_PREFIX@/sbin/ntpdate-debian", G_FILE_TEST_EXISTS))
+                 return;
+ 
+         *can_use = TRUE;
+ 
+-        if (g_file_test ("/etc/network/if-up.d/ntpdate", G_FILE_TEST_EXISTS))
++        if (g_file_test ("@TERMUX_PREFIX@/etc/network/if-up.d/ntpdate", G_FILE_TEST_EXISTS))
+                 *is_using = TRUE;
+ }
+ 
+@@ -44,17 +44,17 @@ _get_using_ntpd (gboolean *can_use, gboolean *is_using, GError ** error)
+         int exit_status;
+         GError *tmp_error = NULL;
+ 
+-        if (!g_file_test ("/usr/sbin/ntpd", G_FILE_TEST_EXISTS))
++        if (!g_file_test ("@TERMUX_PREFIX@/sbin/ntpd", G_FILE_TEST_EXISTS))
+                 return;
+ 
+         *can_use = TRUE;
+ 
+-        if (!g_spawn_command_line_sync ("/usr/sbin/service ntp status",
++        if (!g_spawn_command_line_sync ("@TERMUX_PREFIX@/sbin/service ntp status",
+                                         NULL, NULL, &exit_status, &tmp_error)) {
+                 if (error != NULL && *error == NULL) {
+                         *error = g_error_new (CSD_DATETIME_MECHANISM_ERROR,
+                                               CSD_DATETIME_MECHANISM_ERROR_GENERAL,
+-                                              "Error spawning /usr/sbin/service: %s",
++                                              "Error spawning @TERMUX_PREFIX@/sbin/service: %s",
+                                               tmp_error->message);
+                 }
+                 g_error_free (tmp_error);
+@@ -96,8 +96,8 @@ _set_using_ntpdate (gboolean using_ntp, GError **error)
+         /* Debian uses an if-up.d script to sync network time when an interface
+            comes up.  This is a separate mechanism from ntpd altogether. */
+ 
+-#define NTPDATE_ENABLED  "/etc/network/if-up.d/ntpdate"
+-#define NTPDATE_DISABLED "/etc/network/if-up.d/ntpdate.disabled"
++#define NTPDATE_ENABLED  "@TERMUX_PREFIX@/etc/network/if-up.d/ntpdate"
++#define NTPDATE_DISABLED "@TERMUX_PREFIX@/etc/network/if-up.d/ntpdate.disabled"
+ 
+         if (using_ntp && g_file_test (NTPDATE_DISABLED, G_FILE_TEST_EXISTS))
+                 cmd = "/bin/mv -f "NTPDATE_DISABLED" "NTPDATE_ENABLED;
+@@ -119,12 +119,12 @@ _set_using_ntpdate (gboolean using_ntp, GError **error)
+ 
+         /* Kick start ntpdate to sync time immediately */
+         if (using_ntp &&
+-            !g_spawn_command_line_sync ("/etc/network/if-up.d/ntpdate",
++            !g_spawn_command_line_sync ("@TERMUX_PREFIX@/etc/network/if-up.d/ntpdate",
+                                         NULL, NULL, NULL, &tmp_error)) {
+                 if (error != NULL && *error == NULL) {
+                         *error = g_error_new (CSD_DATETIME_MECHANISM_ERROR,
+                                               CSD_DATETIME_MECHANISM_ERROR_GENERAL,
+-                                              "Error spawning /etc/network/if-up.d/ntpdate: %s",
++                                              "Error spawning @TERMUX_PREFIX@/etc/network/if-up.d/ntpdate: %s",
+                                               tmp_error->message);
+                 }
+                 g_error_free (tmp_error);
+@@ -139,10 +139,10 @@ _set_using_ntpd (gboolean using_ntp, GError **error)
+         int exit_status;
+         char *cmd;
+ 
+-        if (!g_file_test ("/usr/sbin/ntpd", G_FILE_TEST_EXISTS))
++        if (!g_file_test ("@TERMUX_PREFIX@/sbin/ntpd", G_FILE_TEST_EXISTS))
+                 return;
+ 
+-        cmd = g_strconcat ("/usr/sbin/update-rc.d ntp ", using_ntp ? "enable" : "disable", NULL);
++        cmd = g_strconcat ("@TERMUX_PREFIX@/sbin/update-rc.d ntp ", using_ntp ? "enable" : "disable", NULL);
+ 
+         if (!g_spawn_command_line_sync (cmd, NULL, NULL, &exit_status, &tmp_error)) {
+                 if (error != NULL && *error == NULL) {
+@@ -158,7 +158,7 @@ _set_using_ntpd (gboolean using_ntp, GError **error)
+ 
+         g_free (cmd);
+ 
+-        cmd = g_strconcat ("/usr/sbin/service ntp ", using_ntp ? "restart" : "stop", NULL);;
++        cmd = g_strconcat ("@TERMUX_PREFIX@/sbin/service ntp ", using_ntp ? "restart" : "stop", NULL);;
+ 
+         if (!g_spawn_command_line_sync (cmd, NULL, NULL, &exit_status, &tmp_error)) {
+                 if (error != NULL && *error == NULL) {
+diff --git a/plugins/datetime/csd-datetime-mechanism-fedora.c b/plugins/datetime/csd-datetime-mechanism-fedora.c
+index 2a46fa3..886059c 100644
+--- a/plugins/datetime/csd-datetime-mechanism-fedora.c
++++ b/plugins/datetime/csd-datetime-mechanism-fedora.c
+@@ -33,9 +33,9 @@
+ static const char *
+ get_ntp_client ()
+ {
+-        if (g_file_test ("/etc/chrony.conf", G_FILE_TEST_EXISTS))
++        if (g_file_test ("@TERMUX_PREFIX@/etc/chrony.conf", G_FILE_TEST_EXISTS))
+                 return "chronyd";
+-        else if (g_file_test ("/etc/ntp.conf", G_FILE_TEST_EXISTS))
++        else if (g_file_test ("@TERMUX_PREFIX@/etc/ntp.conf", G_FILE_TEST_EXISTS))
+                 return "ntpd";
+         return NULL;
+ }
+diff --git a/plugins/datetime/csd-datetime-mechanism-suse.c b/plugins/datetime/csd-datetime-mechanism-suse.c
+index d25bfec..dea0f18 100644
+--- a/plugins/datetime/csd-datetime-mechanism-suse.c
++++ b/plugins/datetime/csd-datetime-mechanism-suse.c
+@@ -37,7 +37,7 @@ _get_using_ntp_suse (GDBusMethodInvocation *invocation,
+         int exit_status;
+         GError *error = NULL;
+ 
+-        if (g_file_test ("/etc/ntp.conf", G_FILE_TEST_EXISTS)) {
++        if (g_file_test ("@TERMUX_PREFIX@/etc/ntp.conf", G_FILE_TEST_EXISTS)) {
+                 *can_use_ntp = TRUE;
+                 if (!g_spawn_command_line_sync ("/sbin/service ntp status",
+                                                 NULL, NULL, &exit_status, &error)) {
+@@ -125,10 +125,10 @@ _update_etc_sysconfig_clock_suse (GDBusMethodInvocation *invocation,
+         GError *error;
+ 
+         /* On SUSE variants, the /etc/sysconfig/clock file needs to be kept in sync */
+-        if (!g_file_test ("/etc/sysconfig/clock", G_FILE_TEST_EXISTS | G_FILE_TEST_IS_REGULAR)) {
++        if (!g_file_test ("@TERMUX_PREFIX@/etc/sysconfig/clock", G_FILE_TEST_EXISTS | G_FILE_TEST_IS_REGULAR)) {
+                 error = g_error_new (CSD_DATETIME_MECHANISM_ERROR,
+                                       CSD_DATETIME_MECHANISM_ERROR_GENERAL,
+-                                      "Error reading /etc/sysconfig/clock file: %s", "No such file");
++                                      "Error reading @TERMUX_PREFIX@/etc/sysconfig/clock file: %s", "No such file");
+                 g_dbus_method_invocation_return_gerror (invocation, error);
+                 g_error_free (error);
+                 return FALSE;
+@@ -136,11 +136,11 @@ _update_etc_sysconfig_clock_suse (GDBusMethodInvocation *invocation,
+ 
+         error = NULL;
+ 
+-        if (!g_file_get_contents ("/etc/sysconfig/clock", &data, &len, &error)) {
++        if (!g_file_get_contents ("@TERMUX_PREFIX@/etc/sysconfig/clock", &data, &len, &error)) {
+                 GError *error2;
+                 error2 = g_error_new (CSD_DATETIME_MECHANISM_ERROR,
+                                       CSD_DATETIME_MECHANISM_ERROR_GENERAL,
+-                                      "Error reading /etc/sysconfig/clock file: %s", error->message);
++                                      "Error reading @TERMUX_PREFIX@/etc/sysconfig/clock file: %s", error->message);
+                 g_error_free (error);
+                 g_dbus_method_invocation_return_gerror (invocation, error2);
+                 g_error_free (error2);
+@@ -168,11 +168,11 @@ _update_etc_sysconfig_clock_suse (GDBusMethodInvocation *invocation,
+                 }
+                 data = g_string_free (str, FALSE);
+                 len = strlen (data);
+-                if (!g_file_set_contents ("/etc/sysconfig/clock", data, len, &error)) {
++                if (!g_file_set_contents ("@TERMUX_PREFIX@/etc/sysconfig/clock", data, len, &error)) {
+                         GError *error2;
+                         error2 = g_error_new (CSD_DATETIME_MECHANISM_ERROR,
+                                               CSD_DATETIME_MECHANISM_ERROR_GENERAL,
+-                                              "Error updating /etc/sysconfig/clock: %s", error->message);
++                                              "Error updating @TERMUX_PREFIX@/etc/sysconfig/clock: %s", error->message);
+                         g_error_free (error);
+                         g_dbus_method_invocation_return_gerror (invocation, error2);
+                         g_error_free (error2);
+diff --git a/plugins/datetime/csd-datetime-mechanism.c b/plugins/datetime/csd-datetime-mechanism.c
+index 0b040b9..25a4095 100644
+--- a/plugins/datetime/csd-datetime-mechanism.c
++++ b/plugins/datetime/csd-datetime-mechanism.c
+@@ -487,11 +487,11 @@ handle_get_hardware_clock_using_utc (CsdExportedDateTime   *object,
+ 
+         error = NULL;
+ 
+-        if (!g_file_get_contents ("/etc/adjtime", &data, &len, &error)) {
++        if (!g_file_get_contents ("@TERMUX_PREFIX@/etc/adjtime", &data, &len, &error)) {
+                 GError *error2;
+                 error2 = g_error_new (CSD_DATETIME_MECHANISM_ERROR,
+                                       CSD_DATETIME_MECHANISM_ERROR_GENERAL,
+-                                      "Error reading /etc/adjtime file: %s", error->message);
++                                      "Error reading @TERMUX_PREFIX@/etc/adjtime file: %s", error->message);
+                 g_error_free (error);
+                 g_dbus_method_invocation_return_gerror (invocation, error2);
+                 g_error_free (error2);
+@@ -504,7 +504,7 @@ handle_get_hardware_clock_using_utc (CsdExportedDateTime   *object,
+         if (g_strv_length (lines) < 3) {
+                 error = g_error_new (CSD_DATETIME_MECHANISM_ERROR,
+                                      CSD_DATETIME_MECHANISM_ERROR_GENERAL,
+-                                     "Cannot parse /etc/adjtime");
++                                     "Cannot parse @TERMUX_PREFIX@/etc/adjtime");
+                 g_dbus_method_invocation_return_gerror (invocation, error);
+                 g_error_free (error);
+                 g_strfreev (lines);
+@@ -518,7 +518,7 @@ handle_get_hardware_clock_using_utc (CsdExportedDateTime   *object,
+         } else {
+                 error = g_error_new (CSD_DATETIME_MECHANISM_ERROR,
+                                      CSD_DATETIME_MECHANISM_ERROR_GENERAL,
+-                                     "Expected UTC or LOCAL at line 3 of /etc/adjtime; found '%s'", lines[2]);
++                                     "Expected UTC or LOCAL at line 3 of @TERMUX_PREFIX@/etc/adjtime; found '%s'", lines[2]);
+                 g_dbus_method_invocation_return_gerror (invocation, error);
+                 g_error_free (error);
+                 g_strfreev (lines);
+@@ -604,7 +604,7 @@ handle_get_using_ntp  (CsdExportedDateTime   *object,
+ 
+         if (g_file_test ("/etc/redhat-release", G_FILE_TEST_EXISTS)) /* Fedora */
+                 ret = _get_using_ntp_fedora (invocation, &can_use_ntp, &is_using_ntp);
+-        else if (g_file_test ("/usr/sbin/update-rc.d", G_FILE_TEST_EXISTS)) /* Debian */
++        else if (g_file_test ("@TERMUX_PREFIX@/sbin/update-rc.d", G_FILE_TEST_EXISTS)) /* Debian */
+                 ret = _get_using_ntp_debian (invocation, &can_use_ntp, &is_using_ntp);
+         else if (g_file_test ("/etc/SuSE-release", G_FILE_TEST_EXISTS)) /* SUSE variant */
+                 ret = _get_using_ntp_suse (invocation, &can_use_ntp, &is_using_ntp);
+@@ -643,7 +643,7 @@ handle_set_using_ntp  (CsdExportedDateTime   *object,
+ 
+         if (g_file_test ("/etc/redhat-release", G_FILE_TEST_EXISTS)) /* Fedora */
+                 ret = _set_using_ntp_fedora (invocation, using_ntp);
+-        else if (g_file_test ("/usr/sbin/update-rc.d", G_FILE_TEST_EXISTS)) /* Debian */
++        else if (g_file_test ("@TERMUX_PREFIX@/sbin/update-rc.d", G_FILE_TEST_EXISTS)) /* Debian */
+                 ret = _set_using_ntp_debian (invocation, using_ntp);
+         else if (g_file_test ("/etc/SuSE-release", G_FILE_TEST_EXISTS)) /* SUSE variant */
+                 ret = _set_using_ntp_suse (invocation, using_ntp);
+diff --git a/plugins/datetime/system-timezone.c b/plugins/datetime/system-timezone.c
+index bb555fc..7d43241 100644
+--- a/plugins/datetime/system-timezone.c
++++ b/plugins/datetime/system-timezone.c
+@@ -55,12 +55,12 @@
+ #include "system-timezone.h"
+ 
+ /* Files that we look at */
+-#define ETC_TIMEZONE        "/etc/timezone"
+-#define ETC_TIMEZONE_MAJ    "/etc/TIMEZONE"
+-#define ETC_RC_CONF         "/etc/rc.conf"
+-#define ETC_SYSCONFIG_CLOCK "/etc/sysconfig/clock"
+-#define ETC_CONF_D_CLOCK    "/etc/conf.d/clock"
+-#define ETC_LOCALTIME       "/etc/localtime"
++#define ETC_TIMEZONE        "@TERMUX_PREFIX@/etc/timezone"
++#define ETC_TIMEZONE_MAJ    "@TERMUX_PREFIX@/etc/TIMEZONE"
++#define ETC_RC_CONF         "@TERMUX_PREFIX@/etc/rc.conf"
++#define ETC_SYSCONFIG_CLOCK "@TERMUX_PREFIX@/etc/sysconfig/clock"
++#define ETC_CONF_D_CLOCK    "@TERMUX_PREFIX@/etc/conf.d/clock"
++#define ETC_LOCALTIME       "@TERMUX_PREFIX@/etc/localtime"
+ 
+ /* The first 4 characters in a timezone file, from tzfile.h */
+ #define TZ_MAGIC "TZif"
+diff --git a/plugins/datetime/system-timezone.h b/plugins/datetime/system-timezone.h
+index 140b065..05bea10 100644
+--- a/plugins/datetime/system-timezone.h
++++ b/plugins/datetime/system-timezone.h
+@@ -28,9 +28,9 @@
+ G_BEGIN_DECLS
+ 
+ #ifdef HAVE_SOLARIS
+-#define SYSTEM_ZONEINFODIR "/usr/share/lib/zoneinfo/tab"
++#define SYSTEM_ZONEINFODIR "@TERMUX_PREFIX@/share/lib/zoneinfo/tab"
+ #else
+-#define SYSTEM_ZONEINFODIR "/usr/share/zoneinfo"
++#define SYSTEM_ZONEINFODIR "@TERMUX_PREFIX@/share/zoneinfo"
+ #endif
+ 
+ 
+diff --git a/plugins/wacom/csd-wacom-manager.c b/plugins/wacom/csd-wacom-manager.c
+index b1793f0..1eaff3d 100644
+--- a/plugins/wacom/csd-wacom-manager.c
++++ b/plugins/wacom/csd-wacom-manager.c
+@@ -480,8 +480,8 @@ get_machine_id (void)
+         g_free (no_per_machine_file);
+ 
+         if (!per_machine ||
+-            (!g_file_get_contents ("/etc/machine-id", &machine_id, &len, NULL) &&
+-             !g_file_get_contents ("/var/lib/dbus/machine-id", &machine_id, &len, NULL))) {
++            (!g_file_get_contents ("@TERMUX_PREFIX@/etc/machine-id", &machine_id, &len, NULL) &&
++             !g_file_get_contents ("@TERMUX_PREFIX@/var/lib/dbus/machine-id", &machine_id, &len, NULL))) {
+                 return g_strdup ("00000000000000000000000000000000");
+         }
+ 

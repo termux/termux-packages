@@ -1,0 +1,26 @@
++++ ./src/gensignkey.c
+@@ -157,6 +157,16 @@
+ 		goto out;
+ 	}
+ 
++#ifdef __ANDROID__
++	/* Hard links are not possible and renam. */
++	if (skip_exist && access(filename, F_OK) == 0) {
++		/* Ok. */
++	} else if (rename(fn_temp, filename) < 0) {
++		dropbear_log(LOG_ERR, "Failed moving key file to %s: %s", filename,
++			strerror(errno));
++		ret = DROPBEAR_FAILURE;
++	}
++#else
+ 	if (link(fn_temp, filename) < 0) {
+ 		/* If generating keys on connection (skipexist) it's OK to get EEXIST 
+ 		- we probably just lost a race with another connection to generate the key */
+@@ -174,6 +184,7 @@
+ 			goto out;
+ 		}
+ 	}
++#endif
+ 
+ 	/* ensure directory update is flushed to disk, otherwise we can end up
+ 	with zero-byte hostkey files if the power goes off */

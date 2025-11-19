@@ -1,0 +1,26 @@
+Author: Andreas Rönnquist <gusnan@gusnan.se>
+Description: Do not use depreceated libwnck function wnck_class_group_get_res_class
+ This patch makes the source use the wnck_class_group_get_id function instead
+ of the deprecated wnck_class_group_res_class
+--- a/src/actions.c
++++ b/src/actions.c
+@@ -43,7 +43,7 @@
+   g_print(_("Window Title: '%s'; Application Name: '%s'; Class: '%s'; Geometry: %dx%d+%d+%d\n"),
+           wnck_window_get_name (c->window),
+           wnck_application_get_name (wnck_window_get_application (c->window)),
+-          wnck_class_group_get_res_class (wnck_window_get_class_group (c->window)),
++          wnck_class_group_get_id (wnck_window_get_class_group (c->window)),
+           width, height, xoffset, yoffset);
+   
+   return e_sexp_result_new_bool (f, TRUE);
+--- a/src/matchers.c
++++ b/src/matchers.c
+@@ -71,7 +71,7 @@
+ ESExpResult *func_window_class(ESExp *f, int argc, ESExpResult **argv, Context *c) {
+   ESExpResult *r;
+   r = e_sexp_result_new(f, ESEXP_RES_STRING);
+-  r->value.string = g_strdup (wnck_class_group_get_res_class (wnck_window_get_class_group (c->window)));
++  r->value.string = g_strdup (wnck_class_group_get_id (wnck_window_get_class_group (c->window)));
+   if (r->value.string == NULL) r->value.string = g_strdup("");
+   return r;
+ }

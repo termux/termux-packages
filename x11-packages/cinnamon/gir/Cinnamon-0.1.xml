@@ -1,0 +1,350 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="CinnamonKeyringPrompt" get-type="cinnamon_keyring_prompt_get_type" parents="GObject">
+    <implements name="GcrPrompt"/>
+    <property name="password-visible" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="confirm-visible" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="warning-visible" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="choice-visible" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="password-actor" type="ClutterText" flags="1073742051"/>
+    <property name="confirm-actor" type="ClutterText" flags="1073742051"/>
+    <signal name="show-password" return="void">
+    </signal>
+    <signal name="show-confirm" return="void">
+    </signal>
+  </class>
+  <class name="CinnamonSecureTextBuffer" get-type="cinnamon_secure_text_buffer_get_type" parents="ClutterTextBuffer,GObject">
+  </class>
+  <class name="CinnamonApp" get-type="cinnamon_app_get_type" parents="GObject">
+    <property name="state" type="CinnamonAppState" flags="1" default-value="CINNAMON_APP_STATE_STOPPED"/>
+    <signal name="windows-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="CinnamonAppSystem" get-type="cinnamon_app_system_get_type" parents="GObject">
+    <signal name="app-state-changed" return="void" when="last">
+      <param type="CinnamonApp"/>
+    </signal>
+    <signal name="installed-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="CinnamonDocSystem" get-type="cinnamon_doc_system_get_type" parents="GObject">
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="CinnamonEmbeddedWindow" get-type="cinnamon_embedded_window_get_type" parents="GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <boxed name="CinnamonGenericContainerAllocation" get-type="cinnamon_generic_container_allocation_get_type"/>
+  <class name="CinnamonGenericContainer" get-type="cinnamon_generic_container_get_type" parents="StWidget,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <signal name="get-preferred-width" return="void" when="last">
+      <param type="gfloat"/>
+      <param type="CinnamonGenericContainerAllocation"/>
+    </signal>
+    <signal name="get-preferred-height" return="void" when="last">
+      <param type="gfloat"/>
+      <param type="CinnamonGenericContainerAllocation"/>
+    </signal>
+    <signal name="allocate" return="void" when="last">
+      <param type="ClutterActorBox"/>
+      <param type="ClutterAllocationFlags"/>
+    </signal>
+  </class>
+  <class name="CinnamonGLSLEffect" get-type="cinnamon_glsl_effect_get_type" parents="ClutterOffscreenEffect,ClutterEffect,ClutterActorMeta,GInitiallyUnowned,GObject">
+  </class>
+  <class name="CinnamonGtkEmbed" get-type="cinnamon_gtk_embed_get_type" parents="ClutterClone,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="window" type="CinnamonEmbeddedWindow" flags="11"/>
+  </class>
+  <class name="CinnamonScreen" get-type="cinnamon_screen_get_type" parents="GObject">
+    <property name="n-workspaces" type="gint" flags="1" default-value="1"/>
+    <property name="display" type="MetaDisplay" flags="11"/>
+    <signal name="restacked" return="void" when="last">
+    </signal>
+    <signal name="workspace-added" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+    <signal name="workspace-removed" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+    <signal name="workspace-switched" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="MetaMotionDirection"/>
+    </signal>
+    <signal name="window-entered-monitor" return="void" when="last">
+      <param type="gint"/>
+      <param type="MetaWindow"/>
+    </signal>
+    <signal name="window-left-monitor" return="void" when="last">
+      <param type="gint"/>
+      <param type="MetaWindow"/>
+    </signal>
+    <signal name="workareas-changed" return="void" when="last">
+    </signal>
+    <signal name="monitors-changed" return="void" when="last">
+    </signal>
+    <signal name="window-added" return="void" when="last">
+      <param type="MetaWindow"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="window-removed" return="void" when="last">
+      <param type="MetaWindow"/>
+    </signal>
+    <signal name="window-monitor-changed" return="void" when="last">
+      <param type="MetaWindow"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="window-workspace-changed" return="void" when="last">
+      <param type="MetaWindow"/>
+      <param type="MetaWorkspace"/>
+    </signal>
+    <signal name="window-skip-taskbar-changed" return="void" when="last">
+      <param type="MetaWindow"/>
+    </signal>
+    <signal name="in-fullscreen-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="CinnamonGlobal" get-type="cinnamon_global_get_type" parents="GObject">
+    <property name="overlay-group" type="ClutterActor" flags="1"/>
+    <property name="screen" type="CinnamonScreen" flags="1"/>
+    <property name="display" type="MetaDisplay" flags="1"/>
+    <property name="screen-width" type="gint" flags="1" default-value="1"/>
+    <property name="screen-height" type="gint" flags="1" default-value="1"/>
+    <property name="stage" type="ClutterActor" flags="1"/>
+    <property name="stage-input-mode" type="CinnamonStageInputMode" flags="3" default-value="CINNAMON_STAGE_INPUT_MODE_NORMAL"/>
+    <property name="bottom-window-group" type="ClutterActor" flags="1"/>
+    <property name="window-group" type="ClutterActor" flags="1"/>
+    <property name="top-window-group" type="ClutterActor" flags="1"/>
+    <property name="background-actor" type="ClutterActor" flags="1"/>
+    <property name="desklet-container" type="ClutterActor" flags="1"/>
+    <property name="window-manager" type="CinnamonWM" flags="1"/>
+    <property name="settings" type="GSettings" flags="1"/>
+    <property name="datadir" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="imagedir" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="userdatadir" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="focus-manager" type="StFocusManager" flags="1"/>
+    <property name="ui-scale" type="guint" flags="1" default-value="1"/>
+    <property name="session-running" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="workspace-manager" type="MetaWorkspaceManager" flags="225"/>
+    <signal name="notify-error" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="scale-changed" return="void" when="last">
+    </signal>
+    <signal name="shutdown" return="void" when="last">
+    </signal>
+  </class>
+  <class name="CinnamonPerfLog" get-type="cinnamon_perf_log_get_type" parents="GObject">
+  </class>
+  <class name="CinnamonScreenshot" get-type="cinnamon_screenshot_get_type" parents="GObject">
+  </class>
+  <class name="CinnamonSlicer" get-type="cinnamon_slicer_get_type" parents="StBin,StWidget,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+  </class>
+  <class name="CinnamonStack" get-type="cinnamon_stack_get_type" parents="StWidget,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+  </class>
+  <class name="CinnamonToucheggClient" get-type="cinnamon_touchegg_client_get_type" parents="GObject">
+    <signal name="gesture-begin" return="void" when="last" action="1">
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="gdouble"/>
+      <param type="gint"/>
+      <param type="guint"/>
+      <param type="gint64"/>
+    </signal>
+    <signal name="gesture-update" return="void" when="last" action="1">
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="gdouble"/>
+      <param type="gint"/>
+      <param type="guint"/>
+      <param type="gint64"/>
+    </signal>
+    <signal name="gesture-end" return="void" when="last" action="1">
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="gdouble"/>
+      <param type="gint"/>
+      <param type="guint"/>
+      <param type="gint64"/>
+    </signal>
+  </class>
+  <class name="CinnamonTrayIcon" get-type="cinnamon_tray_icon_get_type" parents="CinnamonGtkEmbed,ClutterClone,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="pid" type="guint" flags="1" default-value="0"/>
+    <property name="title" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="wm-class" type="gchararray" flags="1" default-value="NULL"/>
+  </class>
+  <class name="CinnamonTrayManager" get-type="cinnamon_tray_manager_get_type" parents="GObject">
+    <property name="bg-color" type="ClutterColor" flags="11"/>
+    <signal name="tray-icon-added" return="void" when="last">
+      <param type="ClutterActor"/>
+    </signal>
+    <signal name="tray-icon-removed" return="void" when="last">
+      <param type="ClutterActor"/>
+    </signal>
+  </class>
+  <class name="CinnamonWindowTracker" get-type="cinnamon_window_tracker_get_type" parents="GObject">
+    <property name="focus-app" type="CinnamonApp" flags="1"/>
+    <signal name="startup-sequence-changed" return="void" when="last">
+      <param type="MetaStartupSequence"/>
+    </signal>
+    <signal name="window-app-changed" return="void" when="last">
+      <param type="MetaWindow"/>
+    </signal>
+  </class>
+  <class name="CinnamonWM" get-type="cinnamon_wm_get_type" parents="GObject">
+    <signal name="destroy" return="void" when="last">
+      <param type="MetaWindowActor"/>
+    </signal>
+    <signal name="map" return="void" when="last">
+      <param type="MetaWindowActor"/>
+    </signal>
+    <signal name="minimize" return="void" when="last">
+      <param type="MetaWindowActor"/>
+    </signal>
+    <signal name="unminimize" return="void" when="last">
+      <param type="MetaWindowActor"/>
+    </signal>
+    <signal name="size-changed" return="void" when="last">
+      <param type="MetaWindowActor"/>
+    </signal>
+    <signal name="size-change" return="void" when="last">
+      <param type="MetaWindowActor"/>
+      <param type="MetaSizeChange"/>
+      <param type="MetaRectangle"/>
+      <param type="MetaRectangle"/>
+    </signal>
+    <signal name="switch-workspace" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="kill-switch-workspace" return="void" when="last">
+    </signal>
+    <signal name="switch-workspace-complete" return="void" when="last">
+    </signal>
+    <signal name="kill-window-effects" return="void" when="last">
+      <param type="MetaWindowActor"/>
+    </signal>
+    <signal name="show-tile-preview" return="void" when="last">
+      <param type="MetaWindow"/>
+      <param type="MetaRectangle"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="hide-tile-preview" return="void" when="last">
+    </signal>
+    <signal name="show-window-menu" return="void" when="last">
+      <param type="MetaWindow"/>
+      <param type="gint"/>
+      <param type="MetaRectangle"/>
+    </signal>
+    <signal name="filter-keybinding" return="gboolean" when="last">
+      <param type="MetaKeyBinding"/>
+    </signal>
+    <signal name="confirm-display-change" return="void" when="last">
+    </signal>
+    <signal name="create-close-dialog" return="MetaCloseDialog" when="last">
+      <param type="MetaWindow"/>
+    </signal>
+    <signal name="create-inhibit-shortcuts-dialog" return="MetaInhibitShortcutsDialog" when="last">
+      <param type="MetaWindow"/>
+    </signal>
+  </class>
+  <interface name="CinnamonCalendarServer" get-type="cinnamon_calendar_server_get_type">
+    <property name="since" type="gint64" flags="227" default-value="0"/>
+    <property name="status" type="guint" flags="227" default-value="0"/>
+    <property name="until" type="gint64" flags="227" default-value="0"/>
+    <signal name="handle-set-time-range" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gint64"/>
+      <param type="gint64"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="handle-exit" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="events-added-or-updated" return="void" when="last">
+      <param type="GVariant"/>
+    </signal>
+    <signal name="events-removed" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="client-disappeared" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+  </interface>
+  <class name="CinnamonCalendarServerProxy" get-type="cinnamon_calendar_server_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="CinnamonCalendarServer"/>
+  </class>
+  <class name="CinnamonCalendarServerSkeleton" get-type="cinnamon_calendar_server_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="CinnamonCalendarServer"/>
+  </class>
+  <flags name="CinnamonActionMode" get-type="cinnamon_action_mode_get_type">
+    <member name="CINNAMON_ACTION_MODE_NONE" nick="none" value="0"/>
+    <member name="CINNAMON_ACTION_MODE_NORMAL" nick="normal" value="1"/>
+    <member name="CINNAMON_ACTION_MODE_OVERVIEW" nick="overview" value="2"/>
+    <member name="CINNAMON_ACTION_MODE_LOCK_SCREEN" nick="lock-screen" value="4"/>
+    <member name="CINNAMON_ACTION_MODE_UNLOCK_SCREEN" nick="unlock-screen" value="8"/>
+    <member name="CINNAMON_ACTION_MODE_LOGIN_SCREEN" nick="login-screen" value="16"/>
+    <member name="CINNAMON_ACTION_MODE_SYSTEM_MODAL" nick="system-modal" value="32"/>
+    <member name="CINNAMON_ACTION_MODE_LOOKING_GLASS" nick="looking-glass" value="64"/>
+    <member name="CINNAMON_ACTION_MODE_POPUP" nick="popup" value="128"/>
+    <member name="CINNAMON_ACTION_MODE_ALL" nick="all" value="4294967295"/>
+  </flags>
+  <enum name="CinnamonAppState" get-type="cinnamon_app_state_get_type">
+    <member name="CINNAMON_APP_STATE_STOPPED" nick="stopped" value="0"/>
+    <member name="CINNAMON_APP_STATE_STARTING" nick="starting" value="1"/>
+    <member name="CINNAMON_APP_STATE_RUNNING" nick="running" value="2"/>
+  </enum>  <enum name="CinnamonStageInputMode" get-type="cinnamon_stage_input_mode_get_type">
+    <member name="CINNAMON_STAGE_INPUT_MODE_NONREACTIVE" nick="nonreactive" value="0"/>
+    <member name="CINNAMON_STAGE_INPUT_MODE_NORMAL" nick="normal" value="1"/>
+    <member name="CINNAMON_STAGE_INPUT_MODE_FOCUSED" nick="focused" value="2"/>
+    <member name="CINNAMON_STAGE_INPUT_MODE_FULLSCREEN" nick="fullscreen" value="3"/>
+  </enum>  <enum name="CinnamonCursor" get-type="cinnamon_cursor_get_type">
+    <member name="CINNAMON_CURSOR_DND_IN_DRAG" nick="dnd-in-drag" value="0"/>
+    <member name="CINNAMON_CURSOR_DND_UNSUPPORTED_TARGET" nick="dnd-unsupported-target" value="1"/>
+    <member name="CINNAMON_CURSOR_DND_MOVE" nick="dnd-move" value="2"/>
+    <member name="CINNAMON_CURSOR_DND_COPY" nick="dnd-copy" value="3"/>
+    <member name="CINNAMON_CURSOR_POINTING_HAND" nick="pointing-hand" value="4"/>
+    <member name="CINNAMON_CURSOR_RESIZE_BOTTOM" nick="resize-bottom" value="5"/>
+    <member name="CINNAMON_CURSOR_RESIZE_TOP" nick="resize-top" value="6"/>
+    <member name="CINNAMON_CURSOR_RESIZE_LEFT" nick="resize-left" value="7"/>
+    <member name="CINNAMON_CURSOR_RESIZE_RIGHT" nick="resize-right" value="8"/>
+    <member name="CINNAMON_CURSOR_RESIZE_BOTTOM_RIGHT" nick="resize-bottom-right" value="9"/>
+    <member name="CINNAMON_CURSOR_RESIZE_BOTTOM_LEFT" nick="resize-bottom-left" value="10"/>
+    <member name="CINNAMON_CURSOR_RESIZE_TOP_RIGHT" nick="resize-top-right" value="11"/>
+    <member name="CINNAMON_CURSOR_RESIZE_TOP_LEFT" nick="resize-top-left" value="12"/>
+    <member name="CINNAMON_CURSOR_CROSSHAIR" nick="crosshair" value="13"/>
+    <member name="CINNAMON_CURSOR_TEXT" nick="text" value="14"/>
+  </enum>  <enum name="CinnamonSnippetHook" get-type="cinnamon_snippet_hook_get_type">
+    <member name="CINNAMON_SNIPPET_HOOK_VERTEX" nick="vertex" value="0"/>
+    <member name="CINNAMON_SNIPPET_HOOK_VERTEX_TRANSFORM" nick="vertex-transform" value="1"/>
+    <member name="CINNAMON_SNIPPET_HOOK_FRAGMENT" nick="fragment" value="2048"/>
+    <member name="CINNAMON_SNIPPET_HOOK_TEXTURE_COORD_TRANSFORM" nick="texture-coord-transform" value="4096"/>
+    <member name="CINNAMON_SNIPPET_HOOK_LAYER_FRAGMENT" nick="layer-fragment" value="6144"/>
+    <member name="CINNAMON_SNIPPET_HOOK_TEXTURE_LOOKUP" nick="texture-lookup" value="6145"/>
+  </enum></dump>

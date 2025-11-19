@@ -1,0 +1,46 @@
+--- a/jline2/src/main/java/jline/TerminalFactory.java
++++ b/jline2/src/main/java/jline/TerminalFactory.java
+@@ -166,7 +166,6 @@
+     private static final Map<Flavor, Class<? extends Terminal>> FLAVORS = new HashMap<Flavor, Class<? extends Terminal>>();
+ 
+     static {
+-        registerFlavor(Flavor.WINDOWS, AnsiWindowsTerminal.class);
+         registerFlavor(Flavor.UNIX, UnixTerminal.class);
+         registerFlavor(Flavor.OSV, OSvTerminal.class);
+     }
+--- a/jline2/src/main/java/jline/internal/Ansi.java
++++ b/jline2/src/main/java/jline/internal/Ansi.java
+@@ -11,7 +11,12 @@
+ import java.io.ByteArrayOutputStream;
+ import java.io.IOException;
+ 
+-import org.fusesource.jansi.AnsiOutputStream;
++import java.nio.charset.Charset;
++import org.fusesource.jansi.AnsiColors;
++import org.fusesource.jansi.AnsiMode;
++import org.fusesource.jansi.AnsiType;
++import org.fusesource.jansi.io.AnsiOutputStream;
++import org.fusesource.jansi.io.AnsiProcessor;
+ 
+ /**
+  * Ansi support.
+@@ -25,7 +30,18 @@
+         if (str == null) return "";
+         try {
+             ByteArrayOutputStream baos = new ByteArrayOutputStream();
+-            AnsiOutputStream aos = new AnsiOutputStream(baos);
++
++            AnsiOutputStream.WidthSupplier width = new AnsiOutputStream.ZeroWidthSupplier();
++            AnsiMode mode = AnsiMode.Strip;
++            AnsiProcessor processor = null;
++            AnsiType type = AnsiType.Unsupported;
++            AnsiColors colors = AnsiColors.Colors16;
++            Charset cs = Charset.defaultCharset();
++            AnsiOutputStream.IoRunnable installer = null;
++            AnsiOutputStream.IoRunnable uninstaller = null;
++            boolean resetAtUninstall = false;
++
++            AnsiOutputStream aos = new AnsiOutputStream(baos, width, mode, processor, type, colors, cs, installer, uninstaller, resetAtUninstall);
+             aos.write(str.getBytes());
+             aos.close();
+             return baos.toString();

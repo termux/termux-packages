@@ -1,0 +1,13 @@
+--- a/Lib/http/server.py
++++ b/Lib/http/server.py
+@@ -1165,10 +1165,6 @@
+                 return
+             # Child
+             try:
+-                try:
+-                    os.setuid(nobody)
+-                except OSError:
+-                    pass
+                 os.dup2(self.rfile.fileno(), 0)
+                 os.dup2(self.wfile.fileno(), 1)
+                 os.execve(scriptfile, args, env)

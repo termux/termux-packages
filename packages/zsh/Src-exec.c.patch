@@ -1,0 +1,12 @@
+diff -u -r ../zsh-5.6/Src/exec.c ./Src/exec.c
+--- ../zsh-5.6/Src/exec.c	2018-09-03 14:58:01.000000000 +0000
++++ ./Src/exec.c	2018-09-04 21:31:29.499488209 +0000
+@@ -553,7 +553,7 @@
+ 		    if (t0 == ct) {
+ 			argv[-1] = "sh";
+ 			winch_unblock();
+-			execve("/bin/sh", argv - 1, newenvp);
++			execve("@TERMUX_PREFIX@/bin/sh", argv - 1, newenvp);
+ 		    }
+ 		}
+ 	    } else

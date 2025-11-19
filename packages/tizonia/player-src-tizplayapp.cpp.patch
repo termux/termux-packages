@@ -1,0 +1,13 @@
+--- a/player/src/tizplayapp.cpp
++++ b/player/src/tizplayapp.cpp
+@@ -564,8 +564,8 @@
+     if (!bf::exists (home_conf_file))
+     {
+       // Canonical locations of tizonia.conf
+-      const std::string etc_conf_file ("/etc/tizonia/tizonia.conf"); // OLD location
+-      const std::string etc_xdg_conf_file ("/etc/xdg/tizonia/tizonia.conf"); // NEW location
++      const std::string etc_conf_file ("@TERMUX_PREFIX@/etc/tizonia/tizonia.conf"); // OLD location
++      const std::string etc_xdg_conf_file ("@TERMUX_PREFIX@/etc/xdg/tizonia/tizonia.conf"); // NEW location
+ 
+       // STEP 1: Create $HOME/.config/tizonia, if it doesn't exist
+       if (!bf::exists (home_conf_dir))

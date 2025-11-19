@@ -1,0 +1,17 @@
+--- a/src/cmdline/cmdline_prompt.cc
++++ b/src/cmdline/cmdline_prompt.cc
+@@ -62,6 +62,14 @@
+ using aptitude::why::make_cmdline_why_callbacks;
+ using aptitude::why::why_callbacks;
+ 
++// https://github.com/coreutils/gnulib/blob/2a5409cf2ac62ed273589c72bb8ae0031f06a219/lib/rpmatch.c#L126
++int
++rpmatch (const char *response)
++{
++  /* Test against "^[yY]" and "^[nN]", hardcoded to avoid requiring regex */
++  return (*response == 'y' || *response == 'Y' ? 1
++          : *response == 'n' || *response == 'N' ? 0 : -1);
++}
+ 
+ static string reason_string_list(set<reason> &reasons)
+ {

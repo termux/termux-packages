@@ -1,0 +1,86 @@
+diff --git a/src/pipewire/data-loop.c b/src/pipewire/data-loop.c
+index 3cee8a2..e2ea8f5 100644
+--- a/src/pipewire/data-loop.c
++++ b/src/pipewire/data-loop.c
+@@ -276,8 +276,8 @@ int pw_data_loop_stop(struct pw_data_loop *loop)
+ 	if (loop->running) {
+ 		struct spa_thread_utils *utils;
+ 		if (loop->cancel) {
+-			pw_log_debug("%p cancel", loop);
+-			pthread_cancel(loop->thread);
++			pw_log_debug("%p cancel (used pthread_kill as cancel not available on android)", loop);
++			pthread_kill(loop->thread, SIGUSR2);
+ 		} else {
+ 			pw_log_debug("%p signal", loop);
+ 			pw_loop_invoke(loo
+
+--- pipewire-1.2.7/src/pipewire/thread.c	2024-11-26 14:37:54.000000000 +0530
++++ pipewire-1.2.7.mod/src/pipewire/thread.c	2025-01-08 18:24:30.620004636 +0530
+@@ -80,11 +80,44 @@
+ 
+ static int thread_setaffinity(pthread_t thread, const char *affinity)
+ {
+-	cpu_set_t set;
++	cpu_set_t set;
+ 	parse_affinity(affinity, &set);
++#ifdef __ANDROID__
++	return -sched_setaffinity(pthread_gettid_np(thread), sizeof(set), &set);
++#else
+ 	return -pthread_setaffinity_np(thread, sizeof(set), &set);
++#endif
+ }
+ 
++#ifdef __ANDROID__
++typedef struct wrapped_thread_start {
++	void *(*start)(void *);
++	void *arg;
++} wrapped_thread_start_t;
++
++static void thread_signal_handler(int signum) {
++	pthread_exit(0);
++}
++ 
++static void *pthread_create_wrapper(void *wrapped_arg) {
++	wrapped_thread_start_t *wrapped_start = (wrapped_thread_start_t *)wrapped_arg;
++
++	struct sigaction actions;
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = thread_signal_handler;
++	sigaction(SIGUSR2, &actions, NULL);
++
++	void *(*start)(void *) = wrapped_start->start;
++	void *arg = wrapped_start->arg;
++
++	free(wrapped_start);
++
++	return (*start)(arg);
++}
++#endif
++
+ static struct spa_thread *impl_create(void *object,
+ 			const struct spa_dict *props,
+ 			void *(*start)(void*), void *arg)
+@@ -102,7 +135,21 @@
+ 	   sscanf(str, "pointer:%p", &create_func) != 1)
+ 		create_func = pthread_create;
+ 
++#ifdef __ANDROID__
++	if(create_func == pthread_create) {
++		wrapped_thread_start_t *wrapped_start = malloc(sizeof(wrapped_thread_start_t));
++		if (wrapped_start == NULL)
++			return NULL;
++		wrapped_start->start = start;
++		wrapped_start->arg = arg;
++		err = pthread_create(&pt, attr, pthread_create_wrapper, wrapped_start);
++	}
++	else {
++		err = create_func(&pt, attr, start, arg);
++	}
++#else
+ 	err = create_func(&pt, attr, start, arg);
++#endif
+ 
+ 	if (attr)
+ 		pthread_attr_destroy(attr);

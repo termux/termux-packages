@@ -1,0 +1,52 @@
+# Fixes:
+# ld.lld: error: version script assignment of 'local' to symbol '_fini' failed: symbol not defined
+# ld.lld: error: version script assignment of 'local' to symbol '_init' failed: symbol not defined
+
+--- a/src/libpcre2-16.sym
++++ b/src/libpcre2-16.sym
+@@ -80,9 +80,6 @@
+     pcre2_substring_list_get_16;
+     pcre2_substring_nametable_scan_16;
+     pcre2_substring_number_from_name_16;
+-  local:
+-    _fini;
+-    _init;
+ };
+ 
+ # PCRE2_10.48 {} PCRE2_10.47;
+--- a/src/libpcre2-32.sym
++++ b/src/libpcre2-32.sym
+@@ -80,9 +80,6 @@
+     pcre2_substring_list_get_32;
+     pcre2_substring_nametable_scan_32;
+     pcre2_substring_number_from_name_32;
+-  local:
+-    _fini;
+-    _init;
+ };
+ 
+ # PCRE2_10.48 {} PCRE2_10.47;
+--- a/src/libpcre2-8.sym
++++ b/src/libpcre2-8.sym
+@@ -80,9 +80,6 @@
+     pcre2_substring_list_get_8;
+     pcre2_substring_nametable_scan_8;
+     pcre2_substring_number_from_name_8;
+-  local:
+-    _fini;
+-    _init;
+ };
+ 
+ # PCRE2_10.48 {} PCRE2_10.47;
+--- a/src/libpcre2-posix.sym
++++ b/src/libpcre2-posix.sym
+@@ -5,9 +5,6 @@
+     pcre2_regerror;
+     pcre2_regexec;
+     pcre2_regfree;
+-  local:
+-    _fini;
+-    _init;
+ };
+ 
+ # PCRE2_10.48 {} PCRE2_10.47;

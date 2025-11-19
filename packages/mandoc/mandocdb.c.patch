@@ -1,0 +1,20 @@
+--- a/mandocdb.c
++++ b/mandocdb.c
+@@ -2203,7 +2203,7 @@
+ dbwrite(struct dba *dba)
+ {
+ 	struct stat	 sb1, sb2;
+-	char		 tfn[33], *cp1, *cp2;
++	char		 tfn[sizeof("@TERMUX_PREFIX@/tmp/mandocdb.XXXXXXXX")], *cp1, *cp2;
+ 	off_t		 i;
+ 	int		 fd1, fd2;
+ 
+@@ -2238,7 +2238,7 @@
+ 	 * file, but let's at least check whether the data changed.
+ 	 */
+ 
+-	(void)strlcpy(tfn, "/tmp/mandocdb.XXXXXXXX", sizeof(tfn));
++	(void)strlcpy(tfn, "@TERMUX_PREFIX@/tmp/mandocdb.XXXXXXXX", sizeof(tfn));
+ 	if (mkdtemp(tfn) == NULL) {
+ 		exitcode = (int)MANDOCLEVEL_SYSERR;
+ 		say("", "&%s", tfn);

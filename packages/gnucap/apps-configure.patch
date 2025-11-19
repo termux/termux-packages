@@ -1,0 +1,28 @@
+--- ../apps-configure.orig	2019-01-27 08:31:33.269997397 +0000
++++ ./apps/configure	2019-01-27 08:42:21.156659353 +0000
+@@ -25,9 +25,9 @@
+ 
+ #----------------------------------------------------------------
+ echo "CCFLAGS = -fPIC \\" >Make.ccflags
+-echo "-DUNIX -O2 -DNDEBUG -I. -I../include -I../../include -W" >>Make.ccflags
++echo "-DUNIX -O2 -DNDEBUG \$(CPPFLAGS) -I. -I../include -I../../include -W" >>Make.ccflags
+ 
+-echo "LIBS =  \\" >Make.libs
++echo "LIBS = -lgnucap \\" >Make.libs
+ echo "" >>Make.libs
+ echo "PREFIX = " $prefix >>Make.libs
+ echo "" >>Make.libs
+@@ -35,10 +35,11 @@
+ cat <<CAT_EOF >Make.sys
+ #------------------------------------------------------------------------
+ VPATH = .:..
+-CCC = c++
++CCC = \$(CXX)
+ TARGET_EXT = .so
+ 
+-LDFLAGS = -shared
++LDFLAGS += -shared \
++-L../../lib/O
+ 
+ .SUFFIXES:
+ .SUFFIXES: .o .cc

@@ -1,0 +1,89 @@
+Fixes src/core/tools/record.cpp:47:29: error: redefinition of 'pipe' as different kind of symbol
+
+--- a/src/core/tools/record.cpp
++++ b/src/core/tools/record.cpp
+@@ -44,7 +44,7 @@ using Clock         = std::chrono::steady_clock;
+ using TimePoint     = std::chrono::time_point<Clock>;
+ using Seconds       = std::chrono::duration<float>;
+ 
+-FILE*                       pipe = nullptr;
++FILE*                       ffmpeg_pipe = nullptr;
+ std::atomic<bool>           pipe_isRecording;
+ std::thread                 pipe_thread;
+ RecordingSettings           pipe_settings;
+@@ -53,7 +53,7 @@ TimePoint                   pipe_start;
+ TimePoint                   pipe_lastFrame;
+ LockFreeQueue               pipe_frames;
+ 
+-bool recordingPipe() { return (pipe != nullptr && pipe_isRecording.load()); }
++bool recordingPipe() { return (ffmpeg_pipe != nullptr && pipe_isRecording.load()); }
+ 
+ // From https://github.com/tyhenry/ofxFFmpeg
+ bool recordingPipeOpen(const RecordingSettings& _settings, float _start, float _end) {
+@@ -128,12 +128,12 @@ bool recordingPipeOpen(const RecordingSettings& _settings, float _start, float _
+ 
+     // std::cout << cmd << std::endl; 
+ 
+-    if ( pipe != nullptr )
+-        P_CLOSE( pipe );
++    if ( ffmpeg_pipe != nullptr )
++        P_CLOSE( ffmpeg_pipe );
+ 
+-    pipe = P_OPEN( cmd.c_str() );
++    ffmpeg_pipe = P_OPEN( cmd.c_str() );
+ 
+-    if ( !pipe ) {
++    if ( !ffmpeg_pipe ) {
+         // // get error string from 'errno' code
+         // char errmsg[500];
+         // std::strerror_s( errmsg, 500, errno );
+@@ -168,7 +168,7 @@ void processFrame() {
+                 if ( pipe_frames.consume( std::move( pixels ) ) && pixels ) {
+                     std::unique_ptr<unsigned char[]> data = std::move( pixels );
+                     const size_t dataLength = pipe_settings.src_width * pipe_settings.src_height * pipe_settings.src_channels;
+-                    const size_t written = pipe ? fwrite( data.get(), sizeof( char ), dataLength, pipe ) : 0;
++                    const size_t written = ffmpeg_pipe ? fwrite( data.get(), sizeof( char ), dataLength, ffmpeg_pipe ) : 0;
+ 
+                     if ( written <= 0 )
+                         std::cout << "Unable to write the frame." << std::endl;
+@@ -188,9 +188,9 @@ void processFrame() {
+     // close ffmpeg pipe once stopped recording
+     
+     
+-    if ( pipe ) {
++    if ( ffmpeg_pipe ) {
+         console_clear();
+-        if ( P_CLOSE( pipe ) < 0 ) {
++        if ( P_CLOSE( ffmpeg_pipe ) < 0 ) {
+             // // get error string from 'errno' code
+             // char errmsg[500];
+             // strerror_s( errmsg, 500, errno );
+@@ -202,7 +202,7 @@ void processFrame() {
+         console_refresh();
+     }
+     
+-    pipe   = nullptr;
++    ffmpeg_pipe   = nullptr;
+     counter = 0;
+ }
+ 
+@@ -212,7 +212,7 @@ size_t recordingPipeFrame( std::unique_ptr<unsigned char[]>&& _pixels ) {
+         return 0;
+     }
+ 
+-    if ( !pipe ) {
++    if ( !ffmpeg_pipe ) {
+         std::cerr << "Can't add new frame - FFmpeg pipe is invalid!" << std::endl;
+         return 0;
+     }
+@@ -264,8 +264,8 @@ void recordingPipeClose() {
+     if ( pipe_thread.joinable() ) 
+         pipe_thread.join();
+ 
+-    if ( pipe != nullptr )
+-        P_CLOSE( pipe );
++    if ( ffmpeg_pipe != nullptr )
++        P_CLOSE( ffmpeg_pipe );
+ }
+ 
+ #else

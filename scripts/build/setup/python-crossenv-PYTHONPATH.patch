@@ -1,0 +1,21 @@
+--- a/crossenv/__init__.py
++++ b/crossenv/__init__.py
+@@ -707,6 +707,7 @@
+         # Also: 'stdlib' might not be accurate if build-python is in a build
+         # directory.
+         stdlib = os.path.abspath(os.path.dirname(os.__file__))
++        build_site_dir = os.path.join(context.build_env_dir, 'lib', pyver, 'site-packages')
+ 
+         # In python 3.11, the import machinery imports from math, which breaks
+         # in our cross environment.. so we inject lib-dynload to the path also
+--- a/crossenv/scripts/pywrapper.py.tmpl
++++ b/crossenv/scripts/pywrapper.py.tmpl
+@@ -17,7 +17,7 @@
+ os.environ['_PYTHON_SYSCONFIGDATA_NAME']={{repr(sysconfig_name)}}
+ os.environ['PYTHONHOME']={{repr(self.host_home)}}
+ oldpath = os.environ.get('PYTHONPATH')
+-newpath = os.pathsep.join([{{repr(context.lib_path)}}, {{repr(stdlib)}}, {{repr(dynload)}}])
++newpath = os.pathsep.join([{{repr(context.lib_path)}}, {{repr(build_site_dir)}}, {{repr(stdlib)}}, {{repr(dynload)}}])
+ if oldpath:
+     path = os.pathsep.join([newpath, oldpath])
+ else:

@@ -1,0 +1,14 @@
+--- a/tg_owt/src/api/candidate.h
++++ b/tg_owt/src/api/candidate.h
+@@ -105,7 +105,11 @@
+   // cricket::LOCAL_PORT_TYPE). The type should really be an enum rather than a
+   // string, but until we make that change the lifetime attribute helps us lock
+   // things down. See also the `Port` class.
++#ifdef __clang__
++  void set_type(absl::string_view type) {
++#else
+   void set_type(absl::string_view type ABSL_ATTRIBUTE_LIFETIME_BOUND) {
++#endif
+     Assign(type_, type);
+   }
+ 

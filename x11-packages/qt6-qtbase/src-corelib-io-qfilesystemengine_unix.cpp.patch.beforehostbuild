@@ -1,0 +1,38 @@
+--- a/src/corelib/io/qfilesystemengine_unix.cpp
++++ b/src/corelib/io/qfilesystemengine_unix.cpp
+@@ -69,7 +69,7 @@
+ #endif
+ #endif
+ 
+-#if defined(Q_OS_ANDROID)
++#if defined(Q_OS_ANDROID) || defined(__ANDROID__)
+ // statx() is disabled on Android because quite a few systems
+ // come with sandboxes that kill applications that make system calls outside a
+ // whitelist and several Android vendors can't be bothered to update the list.
+@@ -85,7 +85,7 @@
+ using namespace Qt::StringLiterals;
+ 
+ enum {
+-#ifdef Q_OS_ANDROID
++#if defined(Q_OS_ANDROID) || defined(__ANDROID__)
+     // On Android, the link(2) system call has been observed to always fail
+     // with EACCES, regardless of whether there are permission problems or not.
+     SupportsHardlinking = false
+@@ -657,7 +657,7 @@
+     auto freer = qScopeGuard([&] { free(resolved_name); });
+ #endif
+ 
+-# if defined(Q_OS_DARWIN) || defined(Q_OS_ANDROID)
++# if defined(Q_OS_DARWIN) || defined(Q_OS_ANDROID) || defined(__ANDROID__)
+     // On some Android and macOS versions, realpath() will return a path even if
+     // it does not exist. To work around this, we check existence in advance.
+     if (!data.hasFlags(QFileSystemMetaData::ExistsAttribute))
+@@ -787,7 +787,7 @@
+ 
+ #if !defined(Q_OS_INTEGRITY) && !defined(Q_OS_WASM)
+     struct group *gr = nullptr;
+-#if QT_CONFIG(thread) && defined(_POSIX_THREAD_SAFE_FUNCTIONS) && !defined(Q_OS_OPENBSD) && !defined(Q_OS_VXWORKS) && (!defined(Q_OS_ANDROID) || defined(Q_OS_ANDROID) && (__ANDROID_API__ >= 24))
++#if QT_CONFIG(thread) && defined(_POSIX_THREAD_SAFE_FUNCTIONS) && !defined(Q_OS_OPENBSD) && !defined(Q_OS_VXWORKS) && (!defined(Q_OS_ANDROID) || !defined(__ANDROID__) || defined(Q_OS_ANDROID) && (__ANDROID_API__ >= 24))
+     size_max = sysconf(_SC_GETGR_R_SIZE_MAX);
+     if (size_max == -1)
+         size_max = 1024;

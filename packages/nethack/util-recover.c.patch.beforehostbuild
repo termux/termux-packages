@@ -1,0 +1,21 @@
+--- ../NetHack-NetHack-3.6.6_Released/util/recover.c	2020-03-08 18:29:31.000000000 +0100
++++ ./util/recover.c	2020-10-11 16:08:08.285499539 +0200
+@@ -13,7 +13,8 @@
+ #endif
+ 
+ #include "config.h"
+-#if !defined(O_WRONLY) && !defined(LSC) && !defined(AZTEC_C)
++#if (!defined(O_WRONLY) && !defined(LSC) && !defined(AZTEC_C)) \
++    || defined(USE_FCNTL)
+ #include <fcntl.h>
+ #endif
+ 
+@@ -38,7 +39,7 @@
+ #define Close (void) close
+ 
+ #ifdef UNIX
+-#define SAVESIZE (PL_NSIZ + 13) /* save/99999player.e */
++#define SAVESIZE 128
+ #else
+ #ifdef VMS
+ #define SAVESIZE (PL_NSIZ + 22) /* [.save]<uid>player.e;1 */

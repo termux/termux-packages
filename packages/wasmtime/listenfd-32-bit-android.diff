@@ -1,0 +1,38 @@
+--- a/src/unix.rs
++++ b/src/unix.rs
+@@ -7,6 +7,7 @@ use std::os::unix::net::{UnixDatagram, UnixListener};
+ 
+ pub type FdType = RawFd;
+ 
++#[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+ fn is_sock(fd: FdType) -> bool {
+     unsafe {
+         let mut stat: libc::stat = mem::zeroed();
+@@ -15,6 +16,15 @@ fn is_sock(fd: FdType) -> bool {
+     }
+ }
+ 
++#[cfg(all(target_os = "android", target_pointer_width = "32"))]
++fn is_sock(fd: FdType) -> bool {
++    unsafe {
++        let mut stat: libc::stat = mem::zeroed();
++        libc::fstat(fd as libc::c_int, &mut stat);
++        (stat.st_mode as u16 & libc::S_IFMT) == libc::S_IFSOCK
++    }
++}
++
+ fn validate_socket(
+     fd: FdType,
+     sock_fam: libc::c_int,
+@@ -30,9 +40,9 @@ fn validate_socket(
+ 
+     let is_valid = unsafe {
+         let mut ty: libc::c_int = mem::zeroed();
+-        let mut ty_len = mem::size_of_val(&ty) as libc::c_uint;
++        let mut ty_len = mem::size_of_val(&ty) as libc::socklen_t;
+         let mut sockaddr: libc::sockaddr = mem::zeroed();
+-        let mut sockaddr_len = mem::size_of_val(&sockaddr) as libc::c_uint;
++        let mut sockaddr_len = mem::size_of_val(&sockaddr) as libc::socklen_t;
+         libc::getsockname(fd, &mut sockaddr, &mut sockaddr_len) == 0
+             && libc::getsockopt(
+                 fd,

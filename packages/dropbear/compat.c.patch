@@ -1,0 +1,19 @@
++++ ./src/compat.c
+@@ -172,7 +172,7 @@
+ 		return -1;
+ 
+ 	if (!nochdir)
+-		(void)chdir("/");
++		(void)chdir("@TERMUX_PREFIX");
+ 
+ 	if (!noclose && (fd = open(DROPBEAR_PATH_DEVNULL, O_RDWR, 0)) != -1) {
+ 		(void)dup2(fd, STDIN_FILENO);
+@@ -243,7 +243,7 @@
+ 	if (strings != NULL)
+ 		free(strings);
+ 	strings = NULL;
+-	if ((fp = fopen("/etc/shells", "rc")) == NULL)
++	if ((fp = fopen("@TERMUX_PREFIX@/etc/shells", "rc")) == NULL)
+ 		return (char **) okshells;
+ 	if (fstat(fileno(fp), &statb) == -1) {
+ 		(void)fclose(fp);

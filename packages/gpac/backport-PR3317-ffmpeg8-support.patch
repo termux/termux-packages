@@ -1,0 +1,175 @@
+diff --git a/src/filters/ff_avf.c b/src/filters/ff_avf.c
+index 1e32720ba..5dfe0166d 100644
+--- a/src/filters/ff_avf.c
++++ b/src/filters/ff_avf.c
+@@ -722,9 +722,13 @@ static GF_Err ffavf_process(GF_Filter *filter)
+ 					memcpy(buffer + j*opid->stride, frame->data[3] + j*frame->linesize[3], opid->width*opid->bpp);
+ 				}
+ 			}
++#if (LIBAVFORMAT_VERSION_MAJOR < 62)
+ 			if (frame->interlaced_frame)
+ 				gf_filter_pck_set_interlaced(pck, frame->top_field_first ? 1 : 2);
+-
++#else
++			if (frame->flags & AV_FRAME_FLAG_INTERLACED)
++				gf_filter_pck_set_interlaced(pck, frame->flags & AV_FRAME_FLAG_TOP_FIELD_FIRST ? 1 : 2);
++#endif
+ 			gf_filter_pck_set_sap(pck, GF_FILTER_SAP_1);
+ 			gf_filter_pck_set_cts(pck, frame->pts * opid->tb_num);
+ 			gf_filter_pck_send(pck);
+diff --git a/src/filters/ff_dec.c b/src/filters/ff_dec.c
+index 6d2fd7caa..b98cc4188 100644
+--- a/src/filters/ff_dec.c
++++ b/src/filters/ff_dec.c
+@@ -535,8 +535,13 @@ restart:
+ 
+ 	gf_filter_pck_set_seek_flag(dst_pck, GF_FALSE);
+ 
++#if (LIBAVFORMAT_VERSION_MAJOR < 62)
+ 	if (frame->interlaced_frame)
+ 		gf_filter_pck_set_interlaced(dst_pck, frame->top_field_first ? 2 : 1);
++#else
++	if (frame->flags & AV_FRAME_FLAG_INTERLACED)
++		gf_filter_pck_set_interlaced(dst_pck, frame->flags & AV_FRAME_FLAG_TOP_FIELD_FIRST ? 2 : 1);
++#endif
+ 
+ 	gf_filter_pck_send(dst_pck);
+ 
+diff --git a/src/filters/ff_dmx.c b/src/filters/ff_dmx.c
+index fc34177ca..2f0db88c0 100644
+--- a/src/filters/ff_dmx.c
++++ b/src/filters/ff_dmx.c
+@@ -1255,9 +1255,15 @@ GF_Err ffdmx_init_common(GF_Filter *filter, GF_FFDemuxCtx *ctx, u32 grab_type)
+ 		}
+ 		gf_filter_pid_set_property(pid, GF_PROP_PID_MUX_INDEX, &PROP_UINT(i+1));
+ 
++#if (LIBAVFORMAT_VERSION_MAJOR < 62)
+ 		for (j=0; j<(u32) stream->nb_side_data; j++) {
+ 			ffdmx_parse_side_data(&stream->side_data[j], pid);
+ 		}
++#else
++		for (j=0; j<(u32) stream->codecpar->nb_coded_side_data; j++) {
++			ffdmx_parse_side_data(&stream->codecpar->coded_side_data[j], pid);
++		}
++#endif
+ 
+ 		if (ctx->demuxer->nb_chapters) {
+ 			GF_PropertyValue p;
+diff --git a/src/filters/ff_enc.c b/src/filters/ff_enc.c
+index 06dfff8db..541211f10 100644
+--- a/src/filters/ff_enc.c
++++ b/src/filters/ff_enc.c
+@@ -588,12 +588,25 @@ static GF_Err ffenc_process_video(GF_Filter *filter, struct _gf_ffenc_ctx *ctx)
+ 		}
+ 		if (pck) {
+ 			ilaced = gf_filter_pck_get_interlaced(pck);
++#if (LIBAVFORMAT_VERSION_MAJOR < 62)
+ 			if (!ilaced) {
+ 				ctx->frame->interlaced_frame = 0;
+ 			} else {
+ 				ctx->frame->interlaced_frame = 1;
+ 				ctx->frame->top_field_first = (ilaced==2) ? 1 : 0;
+ 			}
++#else
++			if (!ilaced) {
++				ctx->frame->flags &= ~AV_FRAME_FLAG_INTERLACED;
++			} else {
++				ctx->frame->flags |= AV_FRAME_FLAG_INTERLACED;
++				if (ilaced==2) {
++					ctx->frame->flags |= AV_FRAME_FLAG_TOP_FIELD_FIRST;
++				} else {
++					ctx->frame->flags &= ~AV_FRAME_FLAG_TOP_FIELD_FIRST;
++				}
++			}
++#endif
+ 			ctx->frame->pts = ffenc_get_cts(ctx, pck);
+ 			ctx->frame->_avf_dur = gf_filter_pck_get_duration(pck);
+ 		}
+@@ -706,7 +719,7 @@ static GF_Err ffenc_process_video(GF_Filter *filter, struct _gf_ffenc_ctx *ctx)
+ 				ctx->reconfig_pending = GF_FALSE;
+ 				ctx->force_reconfig = GF_FALSE;
+ 				GF_LOG(GF_LOG_DEBUG, GF_LOG_CODEC, ("[FFEnc] codec flush done, triggering reconfiguration\n"));
+-				avcodec_close(ctx->encoder);
++				avcodec_free_context(&ctx->encoder);
+ 				ctx->encoder = NULL;
+ 				ctx->setup_failed = 0;
+ 				e = ffenc_configure_pid_ex(filter, ctx->in_pid, GF_FALSE, GF_TRUE);
+diff --git a/src/filters/ff_mx.c b/src/filters/ff_mx.c
+index 6c704dce2..c727d4ed5 100644
+--- a/src/filters/ff_mx.c
++++ b/src/filters/ff_mx.c
+@@ -1330,7 +1330,14 @@ static GF_Err ffmx_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_r
+ 		u8 *data = av_malloc(sizeof(u32) * 9);
+ 		if (data) {
+ 			memcpy(data, p->value.uint_list.vals, sizeof(u32)*9);
++#if (LIBAVFORMAT_VERSION_MAJOR < 62)
+ 			av_stream_add_side_data(st->stream, AV_PKT_DATA_DISPLAYMATRIX, data, 32*9);
++#else
++			av_packet_side_data_add(&st->stream->codecpar->coded_side_data,
++									&st->stream->codecpar->nb_coded_side_data,
++									AV_PKT_DATA_DISPLAYMATRIX,
++									data, 32 * 9, 0);
++#endif
+ 		}
+ 	}
+ #if (LIBAVCODEC_VERSION_MAJOR>58)
+@@ -1340,7 +1347,14 @@ static GF_Err ffmx_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_r
+ 		u8 *data = av_malloc(p->value.data.size);
+ 		if (data) {
+ 			memcpy(data, p->value.data.ptr, p->value.data.size);
++#if (LIBAVFORMAT_VERSION_MAJOR < 62)
+ 			av_stream_add_side_data(st->stream, AV_PKT_DATA_ICC_PROFILE, data, p->value.data.size);
++#else
++			av_packet_side_data_add(&st->stream->codecpar->coded_side_data,
++									&st->stream->codecpar->nb_coded_side_data,
++									AV_PKT_DATA_ICC_PROFILE,
++									data, p->value.data.size, 0);
++#endif
+ 		}
+ 	}
+ 	//clli
+@@ -1351,7 +1365,14 @@ static GF_Err ffmx_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_r
+ 		if (data) {
+ 			data->MaxCLL = gf_bs_read_u16(bs);
+ 			data->MaxFALL = gf_bs_read_u16(bs);
++#if (LIBAVFORMAT_VERSION_MAJOR < 62)
+ 			av_stream_add_side_data(st->stream, AV_PKT_DATA_CONTENT_LIGHT_LEVEL, (u8*) data, sizeof(AVContentLightMetadata));
++#else
++			av_packet_side_data_add(&st->stream->codecpar->coded_side_data,
++									&st->stream->codecpar->nb_coded_side_data,
++									AV_PKT_DATA_CONTENT_LIGHT_LEVEL,
++									(u8*) data, sizeof(AVContentLightMetadata), 0);
++#endif
+ 		}
+ 		gf_bs_del(bs);
+ 	}
+@@ -1385,7 +1406,14 @@ static GF_Err ffmx_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_r
+ 			data->max_luminance.den = luma_den;
+ 			data->min_luminance.num = gf_bs_read_u32(bs);
+ 			data->min_luminance.den = luma_den;
++#if (LIBAVFORMAT_VERSION_MAJOR < 62)
+ 			av_stream_add_side_data(st->stream, AV_PKT_DATA_MASTERING_DISPLAY_METADATA, (u8*) data, sizeof(AVMasteringDisplayMetadata));
++#else
++			av_packet_side_data_add(&st->stream->codecpar->coded_side_data,
++									&st->stream->codecpar->nb_coded_side_data,
++									AV_PKT_DATA_MASTERING_DISPLAY_METADATA,
++									(u8*) data, sizeof(AVMasteringDisplayMetadata), 0);
++#endif
+     	}
+     	gf_bs_del(bs);
+ 	}
+@@ -1403,7 +1431,14 @@ static GF_Err ffmx_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_r
+ 			data->el_present_flag = gf_bs_read_int(bs, 1);
+ 			data->bl_present_flag = gf_bs_read_int(bs, 1);
+ 			data->dv_bl_signal_compatibility_id = gf_bs_read_int(bs, 4);
++#if (LIBAVFORMAT_VERSION_MAJOR < 62)
+ 			av_stream_add_side_data(st->stream, AV_PKT_DATA_DOVI_CONF, (u8*) data, sizeof(Ref_FFAVDoviRecord));
++#else
++			av_packet_side_data_add(&st->stream->codecpar->coded_side_data,
++									&st->stream->codecpar->nb_coded_side_data,
++									AV_PKT_DATA_DOVI_CONF,
++									(u8*) data, sizeof(Ref_FFAVDoviRecord), 0);
++#endif
+ 		}
+ 		gf_bs_del(bs);
+ 	}

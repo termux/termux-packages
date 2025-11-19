@@ -1,0 +1,57 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 4bdbc736..7ba90b92 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -94,7 +94,7 @@ tracing = { version = "0.1.40", default-features = false, features = ["log"] }
+ tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+ winit = { path = ".", features = ["rwh_05"] }
+ 
+-[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dev-dependencies]
++[target.'cfg(not(any(target_os = "ios")))'.dev-dependencies]
+ softbuffer = { version = "0.4.0", default-features = false, features = [
+     "x11",
+     "x11-dlopen",
+@@ -102,7 +102,7 @@ softbuffer = { version = "0.4.0", default-features = false, features = [
+     "wayland-dlopen",
+ ] }
+ 
+-[target.'cfg(target_os = "android")'.dependencies]
++[target.'cfg(target_os = "dummy")'.dependencies]
+ android-activity = "0.6.0"
+ ndk = { version = "0.9.0", default-features = false }
+ 
+@@ -236,7 +236,7 @@ features = [
+     "Win32_UI_WindowsAndMessaging",
+ ]
+ 
+-[target.'cfg(all(unix, not(any(target_os = "redox", target_family = "wasm", target_os = "android", target_os = "ios", target_os = "macos"))))'.dependencies]
++[target.'cfg(all(unix, not(any(target_os = "redox", target_family = "wasm", target_os = "ios", target_os = "macos"))))'.dependencies]
+ ahash = { version = "0.8.7", features = ["no-rng"], optional = true }
+ bytemuck = { version = "1.13.1", default-features = false, optional = true }
+ calloop = "0.13.0"
+diff --git a/build.rs b/build.rs
+index 6a4528b3..8cb34cc1 100644
+--- a/build.rs
++++ b/build.rs
+@@ -7,7 +7,7 @@ fn main() {
+     // Setup cfg aliases.
+     cfg_aliases! {
+         // Systems.
+-        android_platform: { target_os = "android" },
++        android_platform: { target_os = "dummy" },
+         web_platform: { all(target_family = "wasm", target_os = "unknown") },
+         macos_platform: { target_os = "macos" },
+         ios_platform: { target_os = "ios" },
+diff --git a/src/platform_impl/linux/mod.rs b/src/platform_impl/linux/mod.rs
+index 6cb99fee..bc1c507b 100644
+--- a/src/platform_impl/linux/mod.rs
++++ b/src/platform_impl/linux/mod.rs
+@@ -1013,7 +1013,7 @@ fn min_timeout(a: Option<Duration>, b: Option<Duration>) -> Option<Duration> {
+     a.map_or(b, |a_timeout| b.map_or(Some(a_timeout), |b_timeout| Some(a_timeout.min(b_timeout))))
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "android", target_os = "linux"))]
+ fn is_main_thread() -> bool {
+     rustix::thread::gettid() == rustix::process::getpid()
+ }

@@ -1,0 +1,43 @@
+diff -uNr libx86emu-3.1/Makefile libx86emu-3.1.mod/Makefile
+--- libx86emu-3.1/Makefile	2020-01-28 16:19:00.000000000 +0200
++++ libx86emu-3.1.mod/Makefile	2020-03-20 15:57:59.975825961 +0200
+@@ -11,18 +11,18 @@
+ 
+ MAJOR_VERSION := $(shell $(GIT2LOG) --version VERSION ; cut -d . -f 1 VERSION)
+ 
+-CC	= gcc
+-CFLAGS	= -g -O2 -fPIC -fvisibility=hidden -fomit-frame-pointer -Wall
++CC	?= gcc
++CFLAGS	+= -g -O2 -fPIC -fvisibility=hidden -fomit-frame-pointer -Wall $(CPPFLAGS)
+ LDFLAGS =
+ 
+-LIBDIR = /usr/lib$(shell ldd /bin/sh | grep -q /lib64/ && echo 64)
++LIBDIR = @TERMUX_PREFIX@/lib
+ LIBX86	= libx86emu
+ 
+ CFILES	= $(wildcard *.c)
+ OBJS	= $(CFILES:.c=.o)
+ 
+-LIB_NAME	= $(LIBX86).so.$(VERSION)
+-LIB_SONAME	= $(LIBX86).so.$(MAJOR_VERSION)
++LIB_NAME	= $(LIBX86).so
++LIB_SONAME	= $(LIBX86).so
+ 
+ .PHONY: all shared install test demo clean
+ 
+@@ -38,14 +38,10 @@
+ 
+ install: shared
+ 	install -D $(LIB_NAME) $(DESTDIR)$(LIBDIR)/$(LIB_NAME)
+-	ln -snf $(LIB_NAME) $(DESTDIR)$(LIBDIR)/$(LIB_SONAME)
+-	ln -snf $(LIB_SONAME) $(DESTDIR)$(LIBDIR)/$(LIBX86).so
+-	install -m 644 -D include/x86emu.h $(DESTDIR)/usr/include/x86emu.h
++	install -m 644 -D include/x86emu.h $(DESTDIR)/@TERMUX_PREFIX@/include/x86emu.h
+ 
+ $(LIB_NAME): .depend $(OBJS)
+ 	$(CC) -shared -Wl,-soname,$(LIB_SONAME) $(OBJS) -o $(LIB_NAME) $(LDFLAGS)
+-	@ln -snf $(LIB_NAME) $(LIB_SONAME)
+-	@ln -snf $(LIB_SONAME) $(LIBX86).so
+ 
+ test:
+ 	make -C test

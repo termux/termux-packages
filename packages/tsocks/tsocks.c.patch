@@ -1,0 +1,16 @@
+diff --git a/tsocks.c b/tsocks.c
+index 9cfdfff..5518633 100644
+--- a/tsocks.c
++++ b/tsocks.c
+@@ -682,6 +682,11 @@ int close(CLOSE_SIGNATURE) {
+    int rc;
+    struct connreq *conn;
+ 
++    /*Sometimes this function seems to get called before _init has run*/
++	if (realclose == NULL) {
++        _init();
++    }
++
+ 	if (realclose == NULL) {
+ 		show_msg(MSGERR, "Unresolved symbol: close\n");
+ 		return(-1);

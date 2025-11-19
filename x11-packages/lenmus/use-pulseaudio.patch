@@ -1,0 +1,36 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -357,7 +357,10 @@
+ set( LENMUS_SOURCE_ROOT          "\"${LENMUS_ROOT_DIR}/\"" )
+ 
+ # Audio driver and device to use
+-if(UNIX AND NOT APPLE)
++if(ANDROID)
++    set(LENMUS_AUDIO_DRIVER "pulseaudio")
++    set(LENMUS_PULSEAUDIO_DEVICE "default")
++elseif(UNIX AND NOT APPLE)
+     set(LENMUS_AUDIO_DRIVER "alsa")
+     set(LENMUS_ALSA_DEVICE "default")
+ elseif(WIN32)
+--- a/lenmus_config.h.cmake
++++ b/lenmus_config.h.cmake
+@@ -127,6 +127,7 @@
+ #define LENMUS_ALSA_DEVICE          "@LENMUS_ALSA_DEVICE@"
+ #define LENMUS_DSOUND_DEVICE        "@LENMUS_DSOUND_DEVICE@"
+ #define LENMUS_COREAUDIO_DEVICE     "@LENMUS_COREAUDIO_DEVICE@"
++#define LENMUS_PULSEAUDIO_DEVICE    "@LENMUS_PULSEAUDIO_DEVICE@"
+ #define LENMUS_SOUNDFONT_PATH       "@LENMUS_SOUNDFONT_PATH@"       //Linux only
+ 
+ 
+--- a/src/sound/lenmus_midi_server.cpp
++++ b/src/sound/lenmus_midi_server.cpp
+@@ -162,6 +162,9 @@
+     else if (strcmp(LENMUS_AUDIO_DRIVER, "coreaudio") == 0 && strcmp(LENMUS_COREAUDIO_DEVICE, "default") != 0)
+      	fluid_settings_setstr(m_pSettings, "audio.coreaudio.device", LENMUS_COREAUDIO_DEVICE);
+ 
++    else if (strcmp(LENMUS_AUDIO_DRIVER, "pulseaudio") == 0 && strcmp(LENMUS_PULSEAUDIO_DEVICE, "default") != 0)
++     	fluid_settings_setstr(m_pSettings, "audio.pulseaudio.device", LENMUS_PULSEAUDIO_DEVICE);
++
+ 
+     //create the FluidSynth synthesizer
+     m_pSynth = new_fluid_synth(m_pSettings);

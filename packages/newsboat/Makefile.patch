@@ -1,0 +1,20 @@
+--- a/Makefile
++++ b/Makefile
+@@ -25,7 +25,7 @@
+ WARNFLAGS=-Werror -Wall -Wextra -Wunreachable-code
+ INCLUDES=-Iinclude -Istfl -Ifilter -I. -Irss -I$(CARGO_TARGET_DIR)/cxxbridge/
+ # Keep in sync with c++ version specified in FFI build.rs
+-BARE_CXXFLAGS=-std=c++17 -O2 -ggdb $(INCLUDES)
++BARE_CXXFLAGS=-std=c++17 -O2 $(INCLUDES)
+ LDFLAGS+=-L.
+ 
+ # Constants
+@@ -57,7 +57,7 @@
+ NEWSBOAT=newsboat
+ NEWSBOAT_SRCS:=$(shell cat mk/newsboat.deps)
+ NEWSBOAT_OBJS:=$(patsubst %.cpp,%.o,$(NEWSBOAT_SRCS))
+-NEWSBOAT_LIBS=-lboat -lnewsboat -lfilter -lpthread -lrsspp -ldl
++NEWSBOAT_LIBS=-lboat -lnewsboat -lfilter -lpthread -lrsspp -landroid-glob -ldl
+ 
+ RSSPPLIB_SRCS=$(sort $(wildcard rss/*.cpp))
+ RSSPPLIB_OBJS=$(patsubst rss/%.cpp,rss/%.o,$(RSSPPLIB_SRCS))

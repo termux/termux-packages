@@ -1,0 +1,27 @@
+This patch was created by Ingo Schwarze <schwarze@usta.de>
+and taken from https://marc.info/?l=mandoc-discuss&m=175200050325256&w=2
+
+Fixes https://github.com/termux/termux-packages/issues/25261
+
+--- a/man_validate.c	1 Jul 2025 20:06:13 -0000	1.130
++++ b/man_validate.c	8 Jul 2025 18:34:33 -0000
+@@ -479,7 +479,7 @@ post_TH(CHKARGS)
+ 	/* ->TITLE<- MSEC DATE OS VOL */
+ 
+ 	n = n->child;
+-	if (n != NULL && n->string != NULL) {
++	if (n != NULL && n->string != NULL && *n->string != '\0') {
+ 		for (p = n->string; *p != '\0'; p++) {
+ 			/* Only warn about this once... */
+ 			if (isalpha((unsigned char)*p) &&
+@@ -492,8 +492,8 @@ post_TH(CHKARGS)
+ 		}
+ 		man->meta.title = mandoc_strdup(n->string);
+ 	} else {
+-		man->meta.title = mandoc_strdup("");
+-		mandoc_msg(MANDOCERR_TH_NOTITLE, nb->line, nb->pos, "TH");
++		man->meta.title = mandoc_strdup("UNTITLED");
++		mandoc_msg(MANDOCERR_DT_NOTITLE, nb->line, nb->pos, "TH");
+ 	}
+ 
+ 	/* TITLE ->MSEC<- DATE OS VOL */

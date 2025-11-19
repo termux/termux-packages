@@ -1,0 +1,12 @@
+--- a/contrib/mkpasswd/mkpasswd.c
++++ b/contrib/mkpasswd/mkpasswd.c
+@@ -27,8 +27,7 @@
+ #define FLAG_ROUNDS  0x00000040
+ #define FLAG_EXT     0x00000080
+ 
+-extern char *getpass(const char * prompt);
+-extern char *crypt(const char *key, const char *salt);
++#include <crypt.h>
+ 
+ char *make_des_salt(void);
+ char *make_ext_salt(int);

@@ -1,0 +1,39 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -40,11 +40,11 @@
+ 
+ # startlxqtwayland script
+ set(PREDEF_XDG_DATA_DIRS "$XDG_DATA_HOME")
+-if(NOT("${LXQT_DATA_DIR}" MATCHES "^/usr(/local)?/share$"))
++if(NOT("${LXQT_DATA_DIR}" MATCHES "^@TERMUX_PREFIX@(/local)?/share$"))
+     set(PREDEF_XDG_DATA_DIRS "${PREDEF_XDG_DATA_DIRS}:${LXQT_DATA_DIR}")
+ endif()
+-set(PREDEF_XDG_DATA_DIRS "${PREDEF_XDG_DATA_DIRS}:/usr/local/share:/usr/share")
+-set(PREDEF_XDG_CONFIG_DIRS "/etc:${LXQT_ETC_XDG_DIR}:/usr/share")
++set(PREDEF_XDG_DATA_DIRS "${PREDEF_XDG_DATA_DIRS}:@TERMUX_PREFIX@/local/share:@TERMUX_PREFIX@/share")
++set(PREDEF_XDG_CONFIG_DIRS "@TERMUX_PREFIX@/etc:${LXQT_ETC_XDG_DIR}:@TERMUX_PREFIX@/share")
+ configure_file(startlxqtwayland.in startlxqtwayland @ONLY)
+ install(PROGRAMS
+     "${CMAKE_CURRENT_BINARY_DIR}/startlxqtwayland"
+--- a/configurations/labwc/autostart
++++ b/configurations/labwc/autostart
+@@ -3,7 +3,7 @@
+ # Preferred place for starting wayland-only applications
+ 
+ # Set background color or image (below the desktop):
+-swaybg -i /usr/share/lxqt/wallpapers/origami-dark-labwc.png  >/dev/null 2>&1 &
++swaybg -i @TERMUX_PREFIX@/share/lxqt/wallpapers/origami-dark-labwc.png  >/dev/null 2>&1 &
+ 
+ # Faster startup for GTK apps:
+ dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY > /dev/null 2>&1 &
+--- a/startlxqtwayland.in
++++ b/startlxqtwayland.in
+@@ -80,7 +80,7 @@
+ 
+ export XDG_CURRENT_DESKTOP="LXQt:$COMPOSITOR:wlroots"
+ 
+-valid_layouts=$(grep -A98 '! layout' /usr/share/X11/xkb/rules/base.lst | awk '{print $1}' | grep -v '!')
++valid_layouts=$(grep -A98 '! layout' @TERMUX_PREFIX@/share/X11/xkb/rules/base.lst | awk '{print $1}' | grep -v '!')
+ trylayout=$(echo $LANG | cut -c 1,2)
+ 
+ if  [ -z "$COMPOSITOR" ]; then

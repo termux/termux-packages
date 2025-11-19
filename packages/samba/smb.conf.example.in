@@ -1,0 +1,134 @@
+# vim: filetype=samba
+[global]
+   ; these are very recommended to have, even if maybe superfluous
+   workgroup = WORKGROUP
+   unix password sync = no
+   pam password change = no
+   obey pam restrictions = no
+   passwd program = @TERMUX_PREFIX@/bin/true
+   add user script = @TERMUX_PREFIX@/bin/true
+   add group script = @TERMUX_PREFIX@/bin/true
+   add user to group script = @TERMUX_PREFIX@/bin/true
+   add machine script = @TERMUX_PREFIX@/bin/true
+   delete user script = @TERMUX_PREFIX@/bin/true
+   delete user from group script = @TERMUX_PREFIX@/bin/true
+   delete group script = @TERMUX_PREFIX@/bin/true
+   rename user script = @TERMUX_PREFIX@/bin/true
+   name resolve order = lmhosts host bcast
+   bind interfaces only = yes
+   interfaces = 127.0.0.0/8 wlan0
+
+   ;hosts allow = 192.168.1.5 127.
+   server string = Samba on Termux
+   security = user
+   server role = standalone
+   delete readonly = yes
+   inherit permissions = yes
+
+   ; Make smbd do less and announce nothing
+   ; for automatic discovery, you may need to remove some of these
+   local master = no
+   preferred master = no
+   lm announce = no
+   multicast dns register = no
+   host msdfs = no
+   dns proxy = no
+   allow dns updates = disabled
+   dns update command = @TERMUX_PREFIX@/bin/false
+   server services = smb
+   dcerpc endpoint servers = rpcecho
+
+   ; if you disable NetBIOS, which enables automatic discovery, 1139 can be removed from smb ports
+   ;disable netbios = yes
+   ; remember: ports < 1024 cannot be bound to by non-root processes
+   ; Windows can only see SMB servers on port 445, so if your phone is rooted
+   ; use iptables to redirect requests for port
+   ; 445 to, say, 4445 (capabilities may work instead. no clue)
+   smb ports = 1139 4445
+   max connections = 6
+   max smbd processes = 8
+   deadtime = 15
+
+   ; disable guest access
+   map to guest = Never
+   restrict anonymous = 2
+
+   ; basic attempt at performance tuning for my phone
+   ; change as necessary for your device
+   ;aio read size = 16384 
+   aio write size = 0
+   use sendfile = yes 
+   min receivefile size = 16384
+   socket options = TCP_NODELAY SO_KEEPALIVE
+   oplocks = yes
+   level2 oplocks = yes
+   kernel oplocks = no
+   strict locking = no
+   max stat cache size = 1024
+
+   ; turn off things that cannot be set on sdcardfs and vfat filesystems
+   nt acl support = no
+   unix extensions = no
+   ea support = no
+   store dos attributes = no
+   map archive = no
+   map hidden = no
+   map readonly = no
+   map system = no
+
+   ;log file = @TERMUX_PREFIX@/var/log/samba/log.%m
+   ;log level = 0
+   max log size = 50
+   ;logging = syslog
+   ;syslog only = yes
+   ;syslog = 0
+   enable core files = no
+
+   ; disable printing support as much as possible
+   load printers = no
+   printing = bsd
+   printcap name = /dev/null
+   disable spoolss = yes
+   show add printer wizard = no
+   max print jobs = 0
+   lpq command = @TERMUX_PREFIX@/bin/false
+   lprm command = @TERMUX_PREFIX@/bin/false
+   print command = @TERMUX_PREFIX@/bin/false
+
+#============================ Share Definitions ==============================
+; remember to run termux-setup-storage first
+[internal]
+   comment = Internal storage
+   path = @TERMUX_HOME@/storage/shared
+   vfs objects = aio_pthread
+   aio_pthread:aio open = yes
+   read only = no
+   browseable = no
+   writable = yes
+   guest ok = no
+; these are commented because it seems they're assumed on Android anyway
+;   force user = root
+;   force group = everybody
+;   create mask = 0660
+;   force create mode = 0660
+;   directory mask = 0770
+;   force directory mode = 0770
+;   vfs objects = fake_perms
+
+; replace /storage/ext_sd with the path to your external card in /storage
+; because of the way Android works, you cannot have write access
+; to external storage unless you're running a custom ROM or have
+; the Magisk module that enables it installed
+;[external]
+;   comment = microSD
+;   path = /storage/ext_sd
+;   vfs objects = aio_pthread
+;   aio_pthread:aio open = yes
+;   read only = yes
+;   browseable = no
+;   writable = yes
+;   guest ok = no
+;   fstype = FAT
+;;   force group = media_rw
+;;   create mask = 0770
+;;   force create mode = 0770

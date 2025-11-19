@@ -1,0 +1,22 @@
+diff --git a/tlc.c b/tlc.c
+index cd0300f..5683793 100644
+--- a/tgl/tl-parser/tlc.c
++++ b/tgl/tl-parser/tlc.c
+@@ -38,7 +38,7 @@
+ #include <signal.h>
+ #include "config.h"
+ 
+-#ifdef HAVE_EXECINFO_H
++#if defined(HAVE_EXECINFO_H) && !defined(__ANDROID__)
+ #include <execinfo.h>
+ #endif
+ #include <stdarg.h>
+@@ -77,7 +77,7 @@ void hexdump (int *in_ptr, int *in_end) {
+   printf ("\n");
+ }
+ 
+-#ifdef HAVE_EXECINFO_H
++#if defined(HAVE_EXECINFO_H) && !defined(__ANDROID__)
+ void print_backtrace (void) {
+   void *buffer[255];
+   const int calls = backtrace (buffer, sizeof (buffer) / sizeof (void *));

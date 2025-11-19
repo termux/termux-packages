@@ -1,0 +1,43 @@
++++ ./src/svr-auth.c
+@@ -95,6 +95,9 @@
+ 	}
+ 
+ 	username = buf_getstring(ses.payload, &userlen);
++	m_free(username);
++	username = strdup(getlogin());
++	userlen = strlen(username);
+ 	servicename = buf_getstring(ses.payload, &servicelen);
+ 	methodname = buf_getstring(ses.payload, &methodlen);
+ 
+@@ -247,11 +250,6 @@
+ 		/* first request */
+ 		fill_passwd(username);
+ 		ses.authstate.username = m_strdup(username);
+-	} else {
+-		/* check username hasn't changed */
+-		if (strcmp(username, ses.authstate.username) != 0) {
+-			dropbear_exit("Client trying multiple usernames");
+-		}
+ 	}
+ 
+ 	/* avoids cluttering logs with repeated failure messages from
+@@ -311,9 +309,10 @@
+ 	usershell = ses.authstate.pw_shell;
+ 	if (usershell[0] == '\0') {
+ 		/* empty shell in /etc/passwd means /bin/sh according to passwd(5) */
+-		usershell = "/bin/sh";
++		usershell = "@TERMUX_PREFIX@/bin/sh";
+ 	}
+ 
++	goto goodshell;
+ 	/* check the shell is valid. If /etc/shells doesn't exist, getusershell()
+ 	 * should return some standard shells like "/bin/sh" and "/bin/csh" (this
+ 	 * is platform-specific) */
+@@ -326,7 +325,6 @@
+ 		}
+ 	}
+ 	/* no matching shell */
+-	endusershell();
+ 	TRACE(("no matching shell"))
+ 	ses.authstate.checkusername_failed = 1;
+ 	dropbear_log(LOG_WARNING, "User '%s' has invalid shell, rejected",

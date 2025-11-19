@@ -1,0 +1,41 @@
+--- a/src/unix/linux.c
++++ b/src/unix/linux.c
+@@ -357,7 +357,11 @@ ssize_t uv__getrandom(void* buf, size_t
+ 
+ 
+ int uv__io_uring_setup(int entries, struct uv__io_uring_params* params) {
++#ifdef __ANDROID__
++  return errno = ENOSYS, -1;
++#else
+   return syscall(__NR_io_uring_setup, entries, params);
++#endif
+ }
+ 
+ 
+@@ -365,6 +369,9 @@ int uv__io_uring_enter(int fd,
+                        unsigned to_submit,
+                        unsigned min_complete,
+                        unsigned flags) {
++#ifdef __ANDROID__
++  return errno = ENOSYS, -1;
++#else
+   /* io_uring_enter used to take a sigset_t but it's unused
+    * in newer kernels unless IORING_ENTER_EXT_ARG is set,
+    * in which case it takes a struct io_uring_getevents_arg.
+@@ -376,11 +383,16 @@ int uv__io_uring_enter(int fd,
+                  flags,
+                  NULL,
+                  0L);
++#endif
+ }
+ 
+ 
+ int uv__io_uring_register(int fd, unsigned opcode, void* arg, unsigned nargs) {
++#ifdef __ANDROID__
++  return errno = ENOSYS, -1;
++#else
+   return syscall(__NR_io_uring_register, fd, opcode, arg, nargs);
++#endif
+ }
+ 
+ 

@@ -1,0 +1,80 @@
+--- a/backend/hdfs/fs.go
++++ b/backend/hdfs/fs.go
+@@ -44,7 +44,7 @@
+ func getKerberosClient() (*krb.Client, error) {
+ 	configPath := os.Getenv("KRB5_CONFIG")
+ 	if configPath == "" {
+-		configPath = "/etc/krb5.conf"
++		configPath = "@TERMUX_PREFIX@/etc/krb5.conf"
+ 	}
+ 
+ 	cfg, err := config.Load(configPath)
+--- a/cmd/genautocomplete/genautocomplete_bash.go
++++ b/cmd/genautocomplete/genautocomplete_bash.go
+@@ -27,7 +27,7 @@
+ the generated script will be written to
+ 
+ ` + "```sh" + `
+-/etc/bash_completion.d/rclone
++@TERMUX_PREFIX@/etc/bash_completion.d/rclone
+ ` + "```" + `
+ 
+ and so rclone will probably need to be run as root, or with sudo.
+@@ -51,7 +51,7 @@
+ current shell.`,
+ 	Run: func(command *cobra.Command, args []string) {
+ 		cmd.CheckArgs(0, 1, command, args)
+-		out := "/etc/bash_completion.d/rclone"
++		out := "@TERMUX_PREFIX@/etc/bash_completion.d/rclone"
+ 		if len(args) > 0 {
+ 			if args[0] == "-" {
+ 				err := cmd.Root.GenBashCompletionV2(os.Stdout, false)
+--- a/cmd/genautocomplete/genautocomplete_fish.go
++++ b/cmd/genautocomplete/genautocomplete_fish.go
+@@ -18,7 +18,7 @@
+ 	Short: `Output fish completion script for rclone.`,
+ 	Long: `Generates a fish autocompletion script for rclone.
+ 
+-This writes to /etc/fish/completions/rclone.fish by default so will
++This writes to @TERMUX_PREFIX@/etc/fish/completions/rclone.fish by default so will
+ probably need to be run with sudo or as root, e.g.
+ 
+ ` + "```sh" + `
+@@ -29,7 +29,7 @@
+ them directly
+ 
+ ` + "```sh" + `
+-. /etc/fish/completions/rclone.fish
++. @TERMUX_PREFIX@/etc/fish/completions/rclone.fish
+ ` + "```" + `
+ 
+ If you supply a command line argument the script will be written
+@@ -38,7 +38,7 @@
+ If output_file is "-", then the output will be written to stdout.`,
+ 	Run: func(command *cobra.Command, args []string) {
+ 		cmd.CheckArgs(0, 1, command, args)
+-		out := "/etc/fish/completions/rclone.fish"
++		out := "@TERMUX_PREFIX@/etc/fish/completions/rclone.fish"
+ 		if len(args) > 0 {
+ 			if args[0] == "-" {
+ 				err := cmd.Root.GenFishCompletion(os.Stdout, true)
+--- a/cmd/genautocomplete/genautocomplete_zsh.go
++++ b/cmd/genautocomplete/genautocomplete_zsh.go
+@@ -18,7 +18,7 @@
+ 	Short: `Output zsh completion script for rclone.`,
+ 	Long: `Generates a zsh autocompletion script for rclone.
+ 
+-This writes to /usr/share/zsh/vendor-completions/_rclone by default so will
++This writes to @TERMUX_PREFIX@/share/zsh/vendor-completions/_rclone by default so will
+ probably need to be run with sudo or as root, e.g.
+ 
+ ` + "```sh" + `
+@@ -38,7 +38,7 @@
+ If output_file is "-", then the output will be written to stdout.`,
+ 	Run: func(command *cobra.Command, args []string) {
+ 		cmd.CheckArgs(0, 1, command, args)
+-		out := "/usr/share/zsh/vendor-completions/_rclone"
++		out := "@TERMUX_PREFIX@/share/zsh/vendor-completions/_rclone"
+ 		if len(args) > 0 {
+ 			if args[0] == "-" {
+ 				err := cmd.Root.GenZshCompletion(os.Stdout)

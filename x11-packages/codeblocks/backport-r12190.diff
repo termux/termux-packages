@@ -1,0 +1,3115 @@
+------------------------------------------------------------------------
+r12190 | fuscated | 2020-07-30 06:09:40 +0900 (Thu, 30 Jul 2020) | 3 lines
+
+* build: Fix many -Wsuggest-override warnings for the core and core plugins
+
+> This warning is emitted by GCC starting with version 5.1.
+------------------------------------------------------------------------
+Index: src/plugins/abbreviations/abbreviationsconfigpanel.h
+===================================================================
+--- src/plugins/abbreviations/abbreviationsconfigpanel.h	(revision 12189)
++++ src/plugins/abbreviations/abbreviationsconfigpanel.h	(revision 12190)
+@@ -20,16 +20,16 @@
+ {
+ public:
+     AbbreviationsConfigPanel(wxWindow* parent, Abbreviations* plugin);
+-    virtual ~AbbreviationsConfigPanel();
++    ~AbbreviationsConfigPanel() override;
+ 
+     /// @return the panel's title.
+-    virtual wxString GetTitle() const;
++    wxString GetTitle() const override;
+     /// @return the panel's bitmap base name. You must supply two bitmaps: \<basename\>.png and \<basename\>-off.png...
+-    virtual wxString GetBitmapBaseName() const;
++    wxString GetBitmapBaseName() const override;
+     /// Called when the user chooses to apply the configuration.
+-    virtual void OnApply();
++    void OnApply() override;
+     /// Called when the user chooses to cancel the configuration.
+-    virtual void OnCancel();
++    void OnCancel() override;
+ 
+ private:
+     void InitCompText();
+Index: src/plugins/astyle/astyleconfigdlg.h
+===================================================================
+--- src/plugins/astyle/astyleconfigdlg.h	(revision 12189)
++++ src/plugins/astyle/astyleconfigdlg.h	(revision 12190)
+@@ -22,10 +22,10 @@
+         void OnBreakLineChange(wxCommandEvent& event);
+         void OnBreakBlocksChange(wxCommandEvent& event);
+ 
+-        virtual wxString GetTitle() const { return _("Source formatter"); }
+-        virtual wxString GetBitmapBaseName() const { return _T("astyle-plugin"); }
+-        virtual void OnApply(){ SaveSettings(); }
+-        virtual void OnCancel(){}
++        wxString GetTitle() const  override { return _("Source formatter"); }
++        wxString GetBitmapBaseName() const  override { return _T("astyle-plugin"); }
++        void OnApply() override { SaveSettings(); }
++        void OnCancel() override {}
+ 
+         void LoadSettings();
+         void SaveSettings();
+Index: src/plugins/autosave/autosave.h
+===================================================================
+--- src/plugins/autosave/autosave.h	(revision 12189)
++++ src/plugins/autosave/autosave.h	(revision 12190)
+@@ -22,13 +22,13 @@
+ 
+ 	public:
+ 		Autosave();
+-		~Autosave();
+-		int GetConfigurationPriority() const{ return  50; }
+-		int GetConfigurationGroup() const{ return  cgUnknown; }
+-		void OnAttach(); // fires when the plugin is attached to the application
++		~Autosave() override;
++		int GetConfigurationPriority() const override { return  50; }
++		int GetConfigurationGroup() const override { return  cgUnknown; }
++		void OnAttach() override; // fires when the plugin is attached to the application
+ 		void Start();
+-		void OnRelease(bool appShutDown); // fires when the plugin is released from the application
+-		virtual cbConfigurationPanel* GetConfigurationPanel(wxWindow* parent);
++		void OnRelease(bool appShutDown) override; // fires when the plugin is released from the application
++		cbConfigurationPanel* GetConfigurationPanel(wxWindow* parent) override;
+         void OnTimer(wxTimerEvent& event);
+         void SaveProject(cbProject *p, int method);
+     DECLARE_EVENT_TABLE()
+@@ -43,10 +43,10 @@
+ 		AutosaveConfigDlg(wxWindow* parent, Autosave* plug);
+ 		virtual ~AutosaveConfigDlg(){};
+ 
+-        virtual wxString GetTitle() const { return _("Autosave"); }
+-        virtual wxString GetBitmapBaseName() const { return _T("autosave"); }
+-        virtual void OnApply(){ SaveSettings(); }
+-        virtual void OnCancel(){}
++        wxString GetTitle() const override { return _("Autosave"); }
++        wxString GetBitmapBaseName() const override { return _T("autosave"); }
++        void OnApply() override { SaveSettings(); }
++        void OnCancel() override {}
+ 	private:
+ 	    void OnProjectsChecked(wxCommandEvent &event);
+ 	    void OnSourceChecked(wxCommandEvent &event);
+Index: src/plugins/classwizard/classwizard.h
+===================================================================
+--- src/plugins/classwizard/classwizard.h	(revision 12189)
++++ src/plugins/classwizard/classwizard.h	(revision 12190)
+@@ -12,12 +12,12 @@
+ {
+     public:
+         ClassWizard();
+-        ~ClassWizard();
++        ~ClassWizard() override;
+ 
+-        virtual void OnAttach();
+-        virtual void OnRelease(bool appShutDown);
++        void OnAttach() override;
++        void OnRelease(bool appShutDown) override;
+ 
+-        virtual void BuildMenu(wxMenuBar* menuBar);
++        void BuildMenu(wxMenuBar* menuBar) override;
+ 
+ 		void OnLaunch(wxCommandEvent& event);
+ 
+Index: src/plugins/codecompletion/ccoptionsprjdlg.h
+===================================================================
+--- src/plugins/codecompletion/ccoptionsprjdlg.h	(revision 12189)
++++ src/plugins/codecompletion/ccoptionsprjdlg.h	(revision 12190)
+@@ -18,12 +18,12 @@
+ {
+ public:
+     CCOptionsProjectDlg(wxWindow* parent, cbProject* project, NativeParser* np);
+-    virtual ~CCOptionsProjectDlg();
++    ~CCOptionsProjectDlg() override;
+ 
+-    virtual wxString GetTitle() const          { return _("C/C++ parser options"); }
+-    virtual wxString GetBitmapBaseName() const { return _T("generic-plugin"); }
+-    virtual void OnApply();
+-    virtual void OnCancel(){}
++    wxString GetTitle() const override { return _("C/C++ parser options"); }
++    wxString GetBitmapBaseName() const override { return _T("generic-plugin"); }
++    void OnApply() override;
++    void OnCancel() override {}
+ 
+ protected:
+     void OnAdd(wxCommandEvent& event);
+Index: src/plugins/codecompletion/codecompletion.h
+===================================================================
+--- src/plugins/codecompletion/codecompletion.h	(revision 12189)
++++ src/plugins/codecompletion/codecompletion.h	(revision 12190)
+@@ -82,34 +82,34 @@
+     /** Constructor */
+     CodeCompletion();
+     /** Destructor */
+-    virtual ~CodeCompletion();
++    ~CodeCompletion() override;
+ 
+     // the function below were virtual functions from the base class
+-    virtual void OnAttach();
+-    virtual void OnRelease(bool appShutDown);
+-    virtual int GetConfigurationGroup() const { return cgEditor; }
++    void OnAttach() override;
++    void OnRelease(bool appShutDown) override;
++    int GetConfigurationGroup() const override { return cgEditor; }
+ 
+     /** CC's config dialog */
+-    virtual cbConfigurationPanel* GetConfigurationPanel(wxWindow* parent);
++    cbConfigurationPanel* GetConfigurationPanel(wxWindow* parent) override;
+     /** CC's config dialog which show in the project options panel */
+-    virtual cbConfigurationPanel* GetProjectConfigurationPanel(wxWindow* parent, cbProject* project);
++    cbConfigurationPanel* GetProjectConfigurationPanel(wxWindow* parent, cbProject* project) override;
+     /** build menus in the main frame */
+-    virtual void BuildMenu(wxMenuBar* menuBar);
++    void BuildMenu(wxMenuBar* menuBar) override;
+     /** build context popup menu */
+-    virtual void BuildModuleMenu(const ModuleType type, wxMenu* menu, const FileTreeData* data = 0);
++    void BuildModuleMenu(const ModuleType type, wxMenu* menu, const FileTreeData* data = 0) override;
+     /** build CC Toolbar */
+-    virtual bool BuildToolBar(wxToolBar* toolBar);
++    bool BuildToolBar(wxToolBar* toolBar) override;
+     /** toolbar priority value */
+-    virtual int GetToolBarPriority() { return 10; }
++    int GetToolBarPriority() override { return 10; }
+ 
+     // override virtual functions in cbCodeCompletionPlugin class
+-    virtual CCProviderStatus GetProviderStatusFor(cbEditor* ed);
+-    virtual std::vector<CCToken> GetAutocompList(bool isAuto, cbEditor* ed, int& tknStart, int& tknEnd);
+-    virtual std::vector<CCCallTip> GetCallTips(int pos, int style, cbEditor* ed, int& argsPos);
+-    virtual wxString GetDocumentation(const CCToken& token);
+-    virtual std::vector<CCToken> GetTokenAt(int pos, cbEditor* ed, bool& allowCallTip);
+-    virtual wxString OnDocumentationLink(wxHtmlLinkEvent& event, bool& dismissPopup);
+-    virtual void DoAutocomplete(const CCToken& token, cbEditor* ed);
++    CCProviderStatus GetProviderStatusFor(cbEditor* ed) override;
++    std::vector<CCToken> GetAutocompList(bool isAuto, cbEditor* ed, int& tknStart, int& tknEnd) override;
++    std::vector<CCCallTip> GetCallTips(int pos, int style, cbEditor* ed, int& argsPos) override;
++    wxString GetDocumentation(const CCToken& token) override;
++    std::vector<CCToken> GetTokenAt(int pos, cbEditor* ed, bool& allowCallTip) override;
++    wxString OnDocumentationLink(wxHtmlLinkEvent& event, bool& dismissPopup) override;
++    void DoAutocomplete(const CCToken& token, cbEditor* ed) override;
+ 
+     /** Get the include paths setting (usually set by user for each C::B project).
+      * If it finds some system level include search dirs which haven't been scanned, it will start a
+Index: src/plugins/codecompletion/parser/parser.h
+===================================================================
+--- src/plugins/codecompletion/parser/parser.h	(revision 12189)
++++ src/plugins/codecompletion/parser/parser.h	(revision 12190)
+@@ -125,12 +125,12 @@
+      */
+     Parser(wxEvtHandler* parent, cbProject* project);
+     /** destructor */
+-    virtual ~Parser();
++    ~Parser() override;
+ 
+     /** Add files to batch parse mode, internally. The files will be parsed sequentially.
+      * @param filenames input files name array
+      */
+-    virtual void AddBatchParse(const StringList& filenames);
++    void AddBatchParse(const StringList& filenames) override;
+ 
+     /** Add one file to Batch mode Parsing, this is the bridge between the main thread and the
+      * thread pool, after this function call, the file(Parserthread) will be run from the thread
+@@ -137,70 +137,71 @@
+      * pool.
+      * @param filenames input file name
+      */
+-    virtual void AddParse(const wxString& filename);
++    void AddParse(const wxString& filename) override;
+ 
+     /** set the predefined macro definition string was collected from the GCC command line,
+      *  this function adds the string to an internal m_PredefinedMacros, and switch the ParserState
+      */
+-    virtual void AddPredefinedMacros(const wxString& defs);
++    void AddPredefinedMacros(const wxString& defs) override;
+ 
+     /** clears the list of predefined macros after it has been parsed */
+     virtual void ClearPredefinedMacros();
+ 
+     /** return the predefined macro definition string that has been collected */
+-    virtual const wxString GetPredefinedMacros() const;
++    const wxString GetPredefinedMacros() const override;
+ 
+     /** set the associated C::B project pointer. (only used by one parser for whole workspace)
+      *  @return true if it can do the switch, other wise, return false, and print some debug logs.
+      */
+-    virtual bool UpdateParsingProject(cbProject* project);
++    bool UpdateParsingProject(cbProject* project) override;
+ 
+     /** Must add a locker before call all named ParseBufferXXX functions, ParseBuffer function will
+      * directly run the parsing in the same thread as the caller. So, take care if the time is limited.
+      * this function usually used to parse the function body to fetch the local variable information.
+      */
+-    virtual bool ParseBuffer(const wxString& buffer, bool isLocal, bool bufferSkipBlocks = false,
+-                             bool isTemp = false, const wxString& filename = wxEmptyString,
+-                             int parentIdx = -1, int initLine = 0);
++    bool ParseBuffer(const wxString& buffer, bool isLocal, bool bufferSkipBlocks = false,
++                     bool isTemp = false, const wxString& filename = wxEmptyString,
++                     int parentIdx = -1, int initLine = 0) override;
+ 
+     /** parser the current editor control, this function is used to list all the functions in the
+      * current code editor
+      */
+-    virtual bool ParseBufferForFunctions(const wxString& buffer);
++    bool ParseBufferForFunctions(const wxString& buffer) override;
+ 
+     /** parse the buffer for collecting exposed namespace scopes*/
+-    virtual bool ParseBufferForNamespaces(const wxString& buffer, NameSpaceVec& result);
++    bool ParseBufferForNamespaces(const wxString& buffer, NameSpaceVec& result) override;
+ 
+     /** parse the buffer for collecting using namespace directive*/
+-    virtual bool ParseBufferForUsingNamespace(const wxString& buffer, wxArrayString& result, bool bufferSkipBlocks = true);
++    bool ParseBufferForUsingNamespace(const wxString& buffer, wxArrayString& result,
++                                      bool bufferSkipBlocks = true) override;
+ 
+     /** mark this file to be re-parsed in the TokenTree, tick the reparse timer, note it looks like
+      * the isLocal parameter is not used in Parser::Reparse function.
+      * A better function name could be: MarkFileNeedToBeReParsed()
+      */
+-    virtual bool Reparse(const wxString& filename, bool isLocal = true);
++    bool Reparse(const wxString& filename, bool isLocal = true) override;
+ 
+     /** this usually happens when user adds some files to an existing project, it just use AddParse()
+      * function internally to add the file. and switch the ParserState to ParserCommon::ptAddFileToParser.
+      */
+-    virtual bool AddFile(const wxString& filename, cbProject* project, bool isLocal = true);
++    bool AddFile(const wxString& filename, cbProject* project, bool isLocal = true) override;
+ 
+     /** this usually happens when the user removes a file from the existing project, it will remove
+      * all the tokens belong to the file.
+      */
+-    virtual bool RemoveFile(const wxString& filename);
++    bool RemoveFile(const wxString& filename) override;
+ 
+     /** check to see a file is parsed already, it first check the TokenTree to see whether it has
+      * the specified file, but if a file is already queued (put in m_BatchParseFiles), we regard it
+      * as already parsed.
+      */
+-    virtual bool IsFileParsed(const wxString& filename);
++    bool IsFileParsed(const wxString& filename) override;
+ 
+     /** check to see whether Parser is in Idle mode, there is no work need to be done in the Parser*/
+-    virtual bool     Done();
++    bool Done() override;
+ 
+     /** if the Parser is not in Idle mode, show which need to be done */
+-    virtual wxString NotDoneReason();
++    wxString NotDoneReason() override;
+ 
+ protected:
+     // used for measuring the batch parsing time
+@@ -258,9 +259,9 @@
+     void ProcessParserEvent(ParserCommon::ParserState state, int id, const wxString& info = wxEmptyString);
+ 
+     /** read Parser options from configure file */
+-    virtual void            ReadOptions();
++    void ReadOptions() override;
+     /** write Parse options to configure file */
+-    virtual void            WriteOptions();
++    void WriteOptions() override;
+ 
+ private:
+     /** the only usage of this function is in the Parserthread class, when handling include directives
+@@ -273,7 +274,7 @@
+      * the locked should be set as false, but if you want to recursive parse to an include file
+      * the locked value should be set as true.
+      */
+-    virtual bool ParseFile(const wxString& filename, bool isGlobal, bool locked = false);
++    bool ParseFile(const wxString& filename, bool isGlobal, bool locked = false) override;
+ 
+     /** connect event handlers of the timers and thread pool */
+     void ConnectEvents();
+Index: src/plugins/codecompletion/parser/parserthread.h
+===================================================================
+--- src/plugins/codecompletion/parser/parserthread.h	(revision 12189)
++++ src/plugins/codecompletion/parser/parserthread.h	(revision 12190)
+@@ -185,7 +185,7 @@
+       * often happens when user open a project. Every parserthread task will firstly be added to the thread pool, later
+       * called automatically from the thread pool.
+       */
+-    int Execute()
++    int Execute() override
+     {
+         CC_LOCKER_TRACK_TT_MTX_LOCK(s_TokenTreeMutex)
+ 
+Index: src/plugins/codecompletion/parser/parserthreadedtask.h
+===================================================================
+--- src/plugins/codecompletion/parser/parserthreadedtask.h	(revision 12189)
++++ src/plugins/codecompletion/parser/parserthreadedtask.h	(revision 12190)
+@@ -26,7 +26,7 @@
+     // run sequence parsing jobs in a single thread, those include
+     // 1, parsing predefined macro buffers
+     // 2, parsing project files(mainly the implementation source files)
+-    virtual int Execute();
++    int Execute() override;
+ 
+ private:
+     Parser*  m_Parser; /// a Parser object which contain TokenTree
+@@ -43,7 +43,7 @@
+ public:
+     MarkFileAsLocalThreadedTask(Parser* parser, cbProject* project);
+ 
+-    virtual int Execute();
++    int Execute() override;
+ 
+ private:
+     Parser*    m_Parser;  /// a Parser object which contain TokenTree
+Index: src/plugins/codecompletion/parser/searchtree.h
+===================================================================
+--- src/plugins/codecompletion/parser/searchtree.h	(revision 12189)
++++ src/plugins/codecompletion/parser/searchtree.h	(revision 12190)
+@@ -375,10 +375,10 @@
+ {
+ public:
+     SearchTree();
+-    virtual ~SearchTree();
+-    virtual void clear(); /// Clears the tree
+-    size_t GetCount() const; /// Gets the number of items stored
+-    virtual size_t size() const; /// Same as GetCount
++    ~SearchTree() override;
++    void clear() override; /// Clears the tree
++    size_t GetCount() const override; /// Gets the number of items stored
++    size_t size() const override; /// Same as GetCount
+     bool SaveCacheTo(const wxString& filename); /// Stores the Tree and items into a file
+     bool LoadCacheFrom(const wxString& filename); /// Loads the Tree and items from a file
+     wxString Serialize();
+Index: src/plugins/codecompletion/systemheadersthread.h
+===================================================================
+--- src/plugins/codecompletion/systemheadersthread.h	(revision 12189)
++++ src/plugins/codecompletion/systemheadersthread.h	(revision 12190)
+@@ -35,9 +35,9 @@
+ public:
+     SystemHeadersThread(wxEvtHandler*     parent,     wxCriticalSection*   critSect,
+                         SystemHeadersMap& headersMap, const wxArrayString& incDirs);
+-    virtual ~SystemHeadersThread();
++    ~SystemHeadersThread() override;
+ 
+-    virtual void* Entry();
++    void* Entry() override;
+ 
+ private:
+     wxEvtHandler*      m_Parent; /// this is the target the thread will sent any event to
+Index: src/plugins/compilergcc/advancedcompileroptionsdlg.h
+===================================================================
+--- src/plugins/compilergcc/advancedcompileroptionsdlg.h	(revision 12189)
++++ src/plugins/compilergcc/advancedcompileroptionsdlg.h	(revision 12190)
+@@ -17,7 +17,7 @@
+ {
+     public:
+         AdvancedCompilerOptionsDlg(wxWindow* parent, const wxString& compilerId);
+-        virtual ~AdvancedCompilerOptionsDlg();
++        ~AdvancedCompilerOptionsDlg() override;
+         bool IsDirty() const {return m_bDirty;}
+     private:
+         void OnCommandsChange(wxCommandEvent& event);
+@@ -32,7 +32,7 @@
+         void OnRegexUp(wxSpinEvent& event);
+         void OnRegexDown(wxSpinEvent& event);
+ 
+-        void EndModal(int retCode);
++        void EndModal(int retCode) override;
+         void ReadCompilerOptions();
+         void WriteCompilerOptions();
+         void ReadExtensions(int nr);
+Index: src/plugins/compilergcc/compilerCYGWIN.h
+===================================================================
+--- src/plugins/compilergcc/compilerCYGWIN.h	(revision 12189)
++++ src/plugins/compilergcc/compilerCYGWIN.h	(revision 12190)
+@@ -12,10 +12,10 @@
+ {
+     public:
+         CompilerCYGWIN();
+-        ~CompilerCYGWIN();
+-        virtual AutoDetectResult AutoDetectInstallationDir();
++        ~CompilerCYGWIN() override;
++        AutoDetectResult AutoDetectInstallationDir() override;
+     protected:
+-        virtual Compiler* CreateCopy();
++        Compiler* CreateCopy() override;
+     private:
+ 
+ };
+Index: src/plugins/compilergcc/compilerG95.h
+===================================================================
+--- src/plugins/compilergcc/compilerG95.h	(revision 12189)
++++ src/plugins/compilergcc/compilerG95.h	(revision 12190)
+@@ -13,10 +13,10 @@
+ {
+     public:
+         CompilerG95();
+-        virtual ~CompilerG95();
+-        virtual AutoDetectResult AutoDetectInstallationDir();
++        ~CompilerG95() override;
++        AutoDetectResult AutoDetectInstallationDir() override;
+     protected:
+-        virtual Compiler* CreateCopy();
++        Compiler* CreateCopy() override;
+     private:
+ };
+ 
+Index: src/plugins/compilergcc/compilerGDC.h
+===================================================================
+--- src/plugins/compilergcc/compilerGDC.h	(revision 12189)
++++ src/plugins/compilergcc/compilerGDC.h	(revision 12190)
+@@ -12,10 +12,10 @@
+ {
+     public:
+         CompilerGDC();
+-        virtual ~CompilerGDC();
+-        virtual AutoDetectResult AutoDetectInstallationDir();
++        ~CompilerGDC() override;
++        AutoDetectResult AutoDetectInstallationDir() override;
+     protected:
+-        virtual Compiler* CreateCopy();
++        Compiler* CreateCopy() override;
+     private:
+ };
+ 
+Index: src/plugins/compilergcc/compilerGNUARM.h
+===================================================================
+--- src/plugins/compilergcc/compilerGNUARM.h	(revision 12189)
++++ src/plugins/compilergcc/compilerGNUARM.h	(revision 12190)
+@@ -12,10 +12,10 @@
+ {
+     public:
+         CompilerGNUARM();
+-        virtual ~CompilerGNUARM();
+-        virtual AutoDetectResult AutoDetectInstallationDir();
++        ~CompilerGNUARM() override;
++        AutoDetectResult AutoDetectInstallationDir() override;
+     protected:
+-        virtual Compiler* CreateCopy();
++        Compiler* CreateCopy() override;
+     private:
+ };
+ 
+Index: src/plugins/compilergcc/compilerGNUFortran.h
+===================================================================
+--- src/plugins/compilergcc/compilerGNUFortran.h	(revision 12189)
++++ src/plugins/compilergcc/compilerGNUFortran.h	(revision 12190)
+@@ -12,10 +12,10 @@
+ {
+     public:
+         CompilerGNUFortran();
+-        virtual ~CompilerGNUFortran();
+-        virtual AutoDetectResult AutoDetectInstallationDir();
++        ~CompilerGNUFortran() override;
++        AutoDetectResult AutoDetectInstallationDir() override;
+     protected:
+-        virtual Compiler* CreateCopy();
++        Compiler* CreateCopy() override;
+     private:
+ };
+ 
+Index: src/plugins/compilergcc/compilerIAR.h
+===================================================================
+--- src/plugins/compilergcc/compilerIAR.h	(revision 12189)
++++ src/plugins/compilergcc/compilerIAR.h	(revision 12190)
+@@ -12,10 +12,10 @@
+ {
+     public:
+         CompilerIAR(wxString arch);
+-        virtual ~CompilerIAR();
+-        virtual AutoDetectResult AutoDetectInstallationDir();
++        ~CompilerIAR() override;
++        AutoDetectResult AutoDetectInstallationDir() override;
+     protected:
+-        virtual Compiler* CreateCopy();
++        Compiler* CreateCopy() override;
+         wxString m_Arch;
+     private:
+ };
+Index: src/plugins/compilergcc/compilerICC.h
+===================================================================
+--- src/plugins/compilergcc/compilerICC.h	(revision 12189)
++++ src/plugins/compilergcc/compilerICC.h	(revision 12190)
+@@ -16,10 +16,10 @@
+ {
+     public:
+         CompilerICC();
+-        virtual ~CompilerICC();
+-        virtual AutoDetectResult AutoDetectInstallationDir();
++        ~CompilerICC() override;
++        AutoDetectResult AutoDetectInstallationDir() override;
+     protected:
+-        virtual Compiler* CreateCopy();
++        Compiler* CreateCopy() override;
+     private:
+ };
+ 
+Index: src/plugins/compilergcc/compilerKeilC51.h
+===================================================================
+--- src/plugins/compilergcc/compilerKeilC51.h	(revision 12189)
++++ src/plugins/compilergcc/compilerKeilC51.h	(revision 12190)
+@@ -12,11 +12,11 @@
+ {
+     public:
+         CompilerKeilC51();
+-        virtual ~CompilerKeilC51();
+-        virtual AutoDetectResult AutoDetectInstallationDir();
++        ~CompilerKeilC51() override;
++        AutoDetectResult AutoDetectInstallationDir() override;
+     protected:
+         CompilerKeilC51(const wxString& name, const wxString& ID);
+-        virtual Compiler* CreateCopy();
++        Compiler* CreateCopy() override;
+         AutoDetectResult AutoDetectInstallationDir(bool keilx);
+     private:
+ };
+@@ -25,9 +25,9 @@
+ {
+     public:
+         CompilerKeilCX51();
+-        virtual ~CompilerKeilCX51();
++        ~CompilerKeilCX51() override;
+     protected:
+-        virtual Compiler* CreateCopy();
++        Compiler* CreateCopy() override;
+     private:
+ };
+ 
+Index: src/plugins/compilergcc/compilerLCC.h
+===================================================================
+--- src/plugins/compilergcc/compilerLCC.h	(revision 12189)
++++ src/plugins/compilergcc/compilerLCC.h	(revision 12190)
+@@ -7,14 +7,14 @@
+ {
+     public:
+         CompilerLCC();
+-        virtual ~CompilerLCC();
++        ~CompilerLCC() override;
+ #ifdef __WXMSW__
+-        virtual bool IsValid();
++        bool IsValid() override;
+ #endif // __WXMSW__
+-        virtual void Reset();
+-        virtual AutoDetectResult AutoDetectInstallationDir();
++        void Reset() override;
++        AutoDetectResult AutoDetectInstallationDir() override;
+     protected:
+-        virtual Compiler* CreateCopy();
++        Compiler* CreateCopy() override;
+     private:
+         bool m_RegistryUpdated;
+ };
+Index: src/plugins/compilergcc/compilerMINGW.h
+===================================================================
+--- src/plugins/compilergcc/compilerMINGW.h	(revision 12189)
++++ src/plugins/compilergcc/compilerMINGW.h	(revision 12190)
+@@ -15,12 +15,12 @@
+         // added arguments to ctor so we can derive other gcc-flavours directly
+         // from MinGW (e.g. the cygwin compiler is derived from this one).
+         CompilerMINGW(const wxString& name = _("GNU GCC Compiler"), const wxString& ID = _T("gcc"));
+-        virtual ~CompilerMINGW();
+-        virtual AutoDetectResult AutoDetectInstallationDir();
+-        virtual CompilerCommandGenerator* GetCommandGenerator(cbProject *project);
++        ~CompilerMINGW() override;
++        AutoDetectResult AutoDetectInstallationDir() override;
++        CompilerCommandGenerator* GetCommandGenerator(cbProject *project) override;
+     protected:
+-        virtual Compiler* CreateCopy();
+-        virtual void SetVersionString();
++        Compiler* CreateCopy() override;
++        void SetVersionString() override;
+     private:
+ };
+ 
+Index: src/plugins/compilergcc/compilerMSVC.h
+===================================================================
+--- src/plugins/compilergcc/compilerMSVC.h	(revision 12189)
++++ src/plugins/compilergcc/compilerMSVC.h	(revision 12190)
+@@ -12,10 +12,10 @@
+ {
+ 	public:
+ 		CompilerMSVC();
+-		virtual ~CompilerMSVC();
+-        virtual AutoDetectResult AutoDetectInstallationDir();
++		~CompilerMSVC() override;
++        AutoDetectResult AutoDetectInstallationDir() override;
+ 	protected:
+-        Compiler * CreateCopy();
++        Compiler * CreateCopy() override;
+ 	private:
+ };
+ 
+Index: src/plugins/compilergcc/compilerMSVC10.h
+===================================================================
+--- src/plugins/compilergcc/compilerMSVC10.h	(revision 12189)
++++ src/plugins/compilergcc/compilerMSVC10.h	(revision 12190)
+@@ -12,11 +12,11 @@
+ {
+ public:
+     CompilerMSVC10();
+-    virtual ~CompilerMSVC10();
+-    virtual AutoDetectResult AutoDetectInstallationDir();
++    ~CompilerMSVC10() override;
++    AutoDetectResult AutoDetectInstallationDir() override;
+ 
+ protected:
+-    Compiler* CreateCopy();
++    Compiler* CreateCopy() override;
+ };
+ 
+ #endif // COMPILERMSVC10_H_
+Index: src/plugins/compilergcc/compilerMSVC8.h
+===================================================================
+--- src/plugins/compilergcc/compilerMSVC8.h	(revision 12189)
++++ src/plugins/compilergcc/compilerMSVC8.h	(revision 12190)
+@@ -12,10 +12,10 @@
+ {
+     public:
+         CompilerMSVC8();
+-        virtual ~CompilerMSVC8();
+-        virtual AutoDetectResult AutoDetectInstallationDir();
++        ~CompilerMSVC8() override;
++        AutoDetectResult AutoDetectInstallationDir() override;
+     protected:
+-        Compiler * CreateCopy();
++        Compiler * CreateCopy() override;
+     private:
+ };
+ 
+Index: src/plugins/compilergcc/compilerOW.h
+===================================================================
+--- src/plugins/compilergcc/compilerOW.h	(revision 12189)
++++ src/plugins/compilergcc/compilerOW.h	(revision 12190)
+@@ -12,14 +12,14 @@
+ {
+ 	public:
+ 		CompilerOW();
+-		virtual ~CompilerOW();
+-        virtual AutoDetectResult AutoDetectInstallationDir();
++		~CompilerOW() override;
++        AutoDetectResult AutoDetectInstallationDir() override;
+ 
+-        virtual void LoadSettings(const wxString& baseKey);
+-		virtual void SetMasterPath(const wxString& path);
+-		virtual CompilerCommandGenerator* GetCommandGenerator(cbProject *project);
++        void LoadSettings(const wxString& baseKey) override;
++		void SetMasterPath(const wxString& path) override;
++		CompilerCommandGenerator* GetCommandGenerator(cbProject *project) override;
+ 	protected:
+-        Compiler * CreateCopy();
++        Compiler * CreateCopy() override;
+ 	private:
+ };
+ 
+Index: src/plugins/compilergcc/compilerXML.h
+===================================================================
+--- src/plugins/compilergcc/compilerXML.h	(revision 12189)
++++ src/plugins/compilergcc/compilerXML.h	(revision 12190)
+@@ -9,12 +9,12 @@
+ {
+     public:
+         CompilerXML(const wxString& name, const wxString& ID, const wxString& file);
+-        virtual ~CompilerXML();
++        ~CompilerXML() override;
+ 
+-        virtual AutoDetectResult AutoDetectInstallationDir();
++        AutoDetectResult AutoDetectInstallationDir() override;
+ 
+     protected:
+-        virtual Compiler* CreateCopy();
++        Compiler* CreateCopy() override;
+ 
+     private:
+ 
+Index: src/plugins/compilergcc/compilerflagdlg.h
+===================================================================
+--- src/plugins/compilergcc/compilerflagdlg.h	(revision 12189)
++++ src/plugins/compilergcc/compilerflagdlg.h	(revision 12190)
+@@ -13,9 +13,9 @@
+     public:
+ 
+         CompilerFlagDlg(wxWindow* parent, CompOption* opt, wxArrayString& categ, const wxString &selectedCategory);
+-        virtual ~CompilerFlagDlg();
++        virtual ~CompilerFlagDlg() override;
+ 
+-        void EndModal(int retCode);
++        void EndModal(int retCode) override;
+ 
+     protected:
+ 
+Index: src/plugins/compilergcc/compilermessages.h
+===================================================================
+--- src/plugins/compilergcc/compilermessages.h	(revision 12189)
++++ src/plugins/compilergcc/compilermessages.h	(revision 12190)
+@@ -20,13 +20,13 @@
+         virtual void SetCompilerErrors(CompilerErrors* errors){ m_pErrors = errors; }
+         virtual void FocusError(int nr);
+ 
+-        void AutoFitColumns(int column);
++        void AutoFitColumns(int column) override;
+ 
+-        virtual wxWindow* CreateControl(wxWindow* parent);
++        wxWindow* CreateControl(wxWindow* parent) override;
+         void DestroyControls();
+ 
+-        virtual bool HasFeature(Feature::Enum feature) const;
+-        virtual void AppendAdditionalMenuItems(wxMenu &menu);
++        bool HasFeature(Feature::Enum feature) const override;
++        void AppendAdditionalMenuItems(wxMenu &menu) override;
+     private:
+         void OnClick(wxCommandEvent& event);
+         void OnDoubleClick(wxCommandEvent& event);
+Index: src/plugins/debuggergdb/debuggeroptionsdlg.h
+===================================================================
+--- src/plugins/debuggergdb/debuggeroptionsdlg.h	(revision 12189)
++++ src/plugins/debuggergdb/debuggeroptionsdlg.h	(revision 12190)
+@@ -15,9 +15,9 @@
+     public:
+         explicit DebuggerConfiguration(const ConfigManagerWrapper &config);
+ 
+-        virtual cbDebuggerConfiguration* Clone() const;
+-        virtual wxPanel* MakePanel(wxWindow *parent);
+-        virtual bool SaveChanges(wxPanel *panel);
++        cbDebuggerConfiguration* Clone() const override;
++        wxPanel* MakePanel(wxWindow *parent) override;
++        bool SaveChanges(wxPanel *panel) override;
+     public:
+         enum Flags
+         {
+Index: src/plugins/debuggergdb/debuggeroptionsprjdlg.h
+===================================================================
+--- src/plugins/debuggergdb/debuggeroptionsprjdlg.h	(revision 12189)
++++ src/plugins/debuggergdb/debuggeroptionsprjdlg.h	(revision 12190)
+@@ -21,12 +21,12 @@
+ {
+     public:
+         DebuggerOptionsProjectDlg(wxWindow* parent, DebuggerGDB* debugger, cbProject* project);
+-        virtual ~DebuggerOptionsProjectDlg();
++        ~DebuggerOptionsProjectDlg() override;
+ 
+-        virtual wxString GetTitle() const { return _("Debugger"); }
+-        virtual wxString GetBitmapBaseName() const { return _T("debugger"); }
+-        virtual void OnApply();
+-        virtual void OnCancel(){}
++        wxString GetTitle() const override { return _("Debugger"); }
++        wxString GetBitmapBaseName() const override { return _T("debugger"); }
++        void OnApply() override;
++        void OnCancel() override {}
+     protected:
+         void OnTargetSel(wxCommandEvent& event);
+         void OnAdd(wxCommandEvent& event);
+Index: src/plugins/debuggergdb/editbreakpointdlg.h
+===================================================================
+--- src/plugins/debuggergdb/editbreakpointdlg.h	(revision 12189)
++++ src/plugins/debuggergdb/editbreakpointdlg.h	(revision 12190)
+@@ -13,12 +13,12 @@
+ {
+     public:
+         EditBreakpointDlg(const DebuggerBreakpoint &breakpoint, wxWindow* parent = 0);
+-        virtual ~EditBreakpointDlg();
++        ~EditBreakpointDlg() override;
+ 
+         const DebuggerBreakpoint& GetBreakpoint() const { return m_breakpoint; }
+     protected:
+         void OnUpdateUI(wxUpdateUIEvent& event);
+-        void EndModal(int retCode);
++        void EndModal(int retCode) override;
+ 
+         DebuggerBreakpoint m_breakpoint;
+     private:
+Index: src/plugins/debuggergdb/editwatchdlg.h
+===================================================================
+--- src/plugins/debuggergdb/editwatchdlg.h	(revision 12189)
++++ src/plugins/debuggergdb/editwatchdlg.h	(revision 12190)
+@@ -14,10 +14,10 @@
+ {
+     public:
+         EditWatchDlg(cb::shared_ptr<GDBWatch> w, wxWindow* parent);
+-        virtual ~EditWatchDlg();
++        ~EditWatchDlg() override;
+ 
+     protected:
+-        void EndModal(int retCode);
++        void EndModal(int retCode) override;
+ 
+         cb::shared_ptr<GDBWatch> m_watch;
+ };
+Index: src/plugins/defaultmimehandler/defaultmimehandler.h
+===================================================================
+--- src/plugins/defaultmimehandler/defaultmimehandler.h	(revision 12189)
++++ src/plugins/defaultmimehandler/defaultmimehandler.h	(revision 12190)
+@@ -15,14 +15,14 @@
+ {
+     public:
+         DefaultMimeHandler();
+-        ~DefaultMimeHandler();
+-        int GetConfigurationGroup() const { return cgCorePlugin; }
+-        cbConfigurationPanel* GetConfigurationPanel(wxWindow* parent);
+-        bool HandlesEverything() const { return true; }
+-        bool CanHandleFile(const wxString& filename) const;
+-        int OpenFile(const wxString& filename);
+-        void OnAttach(); // fires when the plugin is attached to the application
+-        void OnRelease(bool appShutDown); // fires when the plugin is released from the application
++        ~DefaultMimeHandler() override;
++        int GetConfigurationGroup() const override { return cgCorePlugin; }
++        cbConfigurationPanel* GetConfigurationPanel(wxWindow* parent) override;
++        bool HandlesEverything() const override { return true; }
++        bool CanHandleFile(const wxString& filename) const override;
++        int OpenFile(const wxString& filename) override;
++        void OnAttach() override; // fires when the plugin is attached to the application
++        void OnRelease(bool appShutDown) override; // fires when the plugin is released from the application
+     private:
+         cbMimeType* FindMimeTypeFor(const wxString& filename);
+         wxString ChooseExternalProgram();
+Index: src/plugins/defaultmimehandler/editmimetypesdlg.h
+===================================================================
+--- src/plugins/defaultmimehandler/editmimetypesdlg.h	(revision 12189)
++++ src/plugins/defaultmimehandler/editmimetypesdlg.h	(revision 12190)
+@@ -14,12 +14,12 @@
+ {
+     public:
+         EditMimeTypesDlg(wxWindow* parent, MimeTypesArray& array);
+-        virtual ~EditMimeTypesDlg();
++        ~EditMimeTypesDlg() override;
+ 
+-        virtual wxString GetTitle() const { return _("Files extension handling"); }
+-        virtual wxString GetBitmapBaseName() const { return _T("extensions"); }
+-        virtual void OnApply();
+-        virtual void OnCancel(){}
++        wxString GetTitle() const override { return _("Files extension handling"); }
++        wxString GetBitmapBaseName() const override { return _T("extensions"); }
++        void OnApply() override;
++        void OnCancel() override {}
+     private:
+         void FillList();
+         void UpdateDisplay();
+Index: src/plugins/occurrenceshighlighting/occurrenceshighlighting.h
+===================================================================
+--- src/plugins/occurrenceshighlighting/occurrenceshighlighting.h	(revision 12189)
++++ src/plugins/occurrenceshighlighting/occurrenceshighlighting.h	(revision 12190)
+@@ -24,19 +24,20 @@
+ {
+     public:
+         OccurrencesHighlighting();
+-        virtual ~OccurrencesHighlighting();
++        ~OccurrencesHighlighting() override;
+ 
+-        virtual void BuildMenu(wxMenuBar* menuBar);
+-        virtual void BuildModuleMenu(const ModuleType type, wxMenu* menu, const FileTreeData* data = 0);
+-        virtual bool BuildToolBar(cb_unused wxToolBar* toolBar){ return false; }
+-        virtual cbConfigurationPanel* GetConfigurationPanel(wxWindow* parent);
+-        virtual int GetConfigurationPriority() const { return 50; }
+-        virtual int GetConfigurationGroup() const { return cgEditor; }
++        void BuildMenu(wxMenuBar* menuBar) override;
++        void BuildModuleMenu(const ModuleType type, wxMenu* menu,
++                             const FileTreeData* data = nullptr) override;
++        bool BuildToolBar(cb_unused wxToolBar* toolBar) override { return false; }
++        cbConfigurationPanel* GetConfigurationPanel(wxWindow* parent) override;
++        int GetConfigurationPriority() const override { return 50; }
++        int GetConfigurationGroup() const override { return cgEditor; }
+ 
+ 
+     protected:
+-        virtual void OnAttach();
+-        virtual void OnRelease(bool appShutDown);
++        void OnAttach() override;
++        void OnRelease(bool appShutDown) override;
+ 
+     private:
+         void OnListKeyDown(wxListEvent &event);
+Index: src/plugins/projectsimporter/devcpploader.h
+===================================================================
+--- src/plugins/projectsimporter/devcpploader.h	(revision 12189)
++++ src/plugins/projectsimporter/devcpploader.h	(revision 12190)
+@@ -15,10 +15,10 @@
+ {
+ 	public:
+ 		DevCppLoader(cbProject* project);
+-		virtual ~DevCppLoader();
++		~DevCppLoader() override;
+ 
+-		bool Open(const wxString& filename);
+-		bool Save(const wxString& filename);
++		bool Open(const wxString& filename) override;
++		bool Save(const wxString& filename) override;
+ 	protected:
+         cbProject* m_pProject;
+ 	private:
+Index: src/plugins/projectsimporter/msvc10loader.h
+===================================================================
+--- src/plugins/projectsimporter/msvc10loader.h	(revision 12189)
++++ src/plugins/projectsimporter/msvc10loader.h	(revision 12190)
+@@ -20,10 +20,10 @@
+         // default %(AdditionalDependencies), not sure if "winmm" and "comctl32" are part of them
+         static const wxString g_AdditionalDependencies;
+         MSVC10Loader(cbProject* project);
+-        virtual ~MSVC10Loader();
++        ~MSVC10Loader() override;
+ 
+-        bool Open(const wxString& filename);
+-        bool Save(const wxString& filename);
++        bool Open(const wxString& filename) override;
++        bool Save(const wxString& filename) override;
+     protected:
+         cbProject* m_pProject;
+         char m_ConvertSwitches;
+Index: src/plugins/projectsimporter/msvc7loader.h
+===================================================================
+--- src/plugins/projectsimporter/msvc7loader.h	(revision 12189)
++++ src/plugins/projectsimporter/msvc7loader.h	(revision 12190)
+@@ -21,10 +21,10 @@
+ {
+     public:
+         MSVC7Loader(cbProject* project);
+-        virtual ~MSVC7Loader();
++        ~MSVC7Loader() override;
+ 
+-        bool Open(const wxString& filename);
+-        bool Save(const wxString& filename);
++        bool Open(const wxString& filename) override;
++        bool Save(const wxString& filename) override;
+     protected:
+         cbProject* m_pProject;
+         bool m_ConvertSwitches;
+Index: src/plugins/projectsimporter/msvc7workspaceloader.h
+===================================================================
+--- src/plugins/projectsimporter/msvc7workspaceloader.h	(revision 12189)
++++ src/plugins/projectsimporter/msvc7workspaceloader.h	(revision 12190)
+@@ -14,10 +14,10 @@
+     public:
+         static wxString g_WorkspacePath; //!< @note : maybe put into ImportersGlobals (importers_globals.h in SDK include, who ever put it there...)
+         MSVC7WorkspaceLoader();
+-        virtual ~MSVC7WorkspaceLoader();
++        ~MSVC7WorkspaceLoader() override;
+ 
+-        bool Open(const wxString& filename, wxString& Title);
+-        bool Save(const wxString& title, const wxString& filename);
++        bool Open(const wxString& filename, wxString& Title) override;
++        bool Save(const wxString& title, const wxString& filename) override;
+ };
+ 
+ #endif // MSVC7WORKSPACELOADER_H
+Index: src/plugins/projectsimporter/msvcloader.h
+===================================================================
+--- src/plugins/projectsimporter/msvcloader.h	(revision 12189)
++++ src/plugins/projectsimporter/msvcloader.h	(revision 12190)
+@@ -20,10 +20,10 @@
+ {
+ 	public:
+ 		MSVCLoader(cbProject* project);
+-		virtual ~MSVCLoader();
++		~MSVCLoader() override;
+ 
+-		bool Open(const wxString& filename);
+-		bool Save(const wxString& filename);
++		bool Open(const wxString& filename) override;
++		bool Save(const wxString& filename) override;
+ 	protected:
+         bool ReadConfigurations();
+         bool ParseConfiguration(int index);
+Index: src/plugins/projectsimporter/msvcworkspaceloader.h
+===================================================================
+--- src/plugins/projectsimporter/msvcworkspaceloader.h	(revision 12189)
++++ src/plugins/projectsimporter/msvcworkspaceloader.h	(revision 12190)
+@@ -13,10 +13,10 @@
+ {
+     public:
+ 		MSVCWorkspaceLoader();
+-		virtual ~MSVCWorkspaceLoader();
++		~MSVCWorkspaceLoader() override;
+ 
+-        bool Open(const wxString& filename, wxString& Title);
+-        bool Save(const wxString& title, const wxString& filename);
++        bool Open(const wxString& filename, wxString& Title) override;
++        bool Save(const wxString& title, const wxString& filename) override;
+ };
+ 
+ #endif // MSVCWORKSPACELOADER_H
+Index: src/plugins/scriptedwizard/projectpathpanel.h
+===================================================================
+--- src/plugins/scriptedwizard/projectpathpanel.h	(revision 12189)
++++ src/plugins/scriptedwizard/projectpathpanel.h	(revision 12190)
+@@ -22,7 +22,7 @@
+     public:
+ 
+         ProjectPathPanel(wxWindow* parent,wxWindowID id = -1);
+-        virtual ~ProjectPathPanel();
++        ~ProjectPathPanel() override;
+ 
+         void SetPath(const wxString& path)
+         {
+@@ -35,7 +35,7 @@
+         //wxString GetName(){ return txtPrjName->GetValue(); }
+ // NOTE (Biplab#1#): This is a temporary fix. This function
+ // need to be renamed according to it's visual representation
+-        wxString GetName() const { return txtPrjTitle->GetValue(); }
++        wxString GetName() const override { return txtPrjTitle->GetValue(); }
+         wxString GetFullFileName() const { return txtFinalDir->GetValue(); }
+         wxString GetTitle() const { return txtPrjTitle->GetValue(); }
+ 
+@@ -54,7 +54,7 @@
+ 
+     private:
+ 
+-        void Update();
++        void Update() override;
+         void UpdateFromResulting();
+         bool m_LockUpdates;
+ 
+Index: src/plugins/scriptedwizard/wizpage.h
+===================================================================
+--- src/plugins/scriptedwizard/wizpage.h	(revision 12189)
++++ src/plugins/scriptedwizard/wizpage.h	(revision 12190)
+@@ -34,7 +34,7 @@
+ {
+     public:
+         WizPageBase(const wxString& pageName, wxWizard* parent, const wxBitmap& bitmap = wxNullBitmap);
+-        ~WizPageBase();
++        ~WizPageBase() override;
+ 
+         virtual bool SkipPage() const { return m_SkipPage; } // default: false
+ 
+@@ -41,8 +41,8 @@
+         virtual void OnPageChanging(wxWizardEvent& event);
+         virtual void OnPageChanged(wxWizardEvent& event);
+ 
+-        virtual wxWizardPage* GetPrev() const;
+-        virtual wxWizardPage* GetNext() const;
++        wxWizardPage* GetPrev() const override;
++        wxWizardPage* GetNext() const override;
+         wxString GetPageName() const {return m_PageName;}
+         bool GetSkipPage() const {return m_SkipPage;}
+         void SetSkipPage(bool skip) {m_SkipPage = skip;}
+@@ -69,9 +69,9 @@
+ {
+     public:
+         WizInfoPanel(const wxString& pageId, const wxString& intro_msg, wxWizard* parent, const wxBitmap& bitmap = wxNullBitmap);
+-        ~WizInfoPanel();
++        ~WizInfoPanel() override;
+ 
+-        virtual void OnPageChanging(wxWizardEvent& event);
++        void OnPageChanging(wxWizardEvent& event) override;
+     private:
+         InfoPanel* m_InfoPanel;
+ };
+@@ -80,7 +80,7 @@
+ {
+     public:
+         WizFilePathPanel(bool showHeaderGuard, wxWizard* parent, const wxBitmap& bitmap = wxNullBitmap);
+-        ~WizFilePathPanel();
++        ~WizFilePathPanel() override;
+ 
+         wxString GetFilename() const { return m_Filename; }
+         wxString GetHeaderGuard() const { return m_HeaderGuard; }
+@@ -88,7 +88,7 @@
+         int GetTargetIndex() const;
+         void SetFilePathSelectionFilter(const wxString& filter);
+ 
+-        void OnPageChanging(wxWizardEvent& event);
++        void OnPageChanging(wxWizardEvent& event) override;
+     private:
+         FilePathPanel* m_pFilePathPanel;
+         wxString m_Filename;
+@@ -100,16 +100,16 @@
+ {
+     public:
+         WizProjectPathPanel(wxWizard* parent, const wxBitmap& bitmap = wxNullBitmap);
+-        ~WizProjectPathPanel();
++        ~WizProjectPathPanel() override;
+ 
+         wxString GetPath() const;
+-        wxString GetName() const;
++        wxString GetName() const override;
+         wxString GetFullFileName() const;
+         wxString GetTitle() const;
+ 
+         void OnButton(wxCommandEvent& event);
+-        virtual void OnPageChanging(wxWizardEvent& event);
+-        virtual void OnPageChanged(wxWizardEvent& event);
++        void OnPageChanging(wxWizardEvent& event) override;
++        void OnPageChanged(wxWizardEvent& event) override;
+     private:
+         ProjectPathPanel* m_pProjectPathPanel;
+ 
+@@ -121,10 +121,10 @@
+     public:
+         WizGenericSelectPathPanel(const wxString& pageId, const wxString& descr, const wxString& label, const wxString& defValue,
+                             wxWizard* parent, const wxBitmap& bitmap = wxNullBitmap);
+-        ~WizGenericSelectPathPanel();
++        ~WizGenericSelectPathPanel() override;
+ 
+         void OnButton(wxCommandEvent& event);
+-        virtual void OnPageChanging(wxWizardEvent& event);
++        void OnPageChanging(wxWizardEvent& event) override;
+     private:
+         GenericSelectPath* m_pGenericSelectPath;
+ 
+@@ -136,7 +136,7 @@
+     public:
+         WizCompilerPanel(const wxString& compilerID, const wxString& validCompilerIDs, wxWizard* parent, const wxBitmap& bitmap = wxNullBitmap,
+                         bool allowCompilerChange = true, bool allowConfigChange = true);
+-        ~WizCompilerPanel();
++        ~WizCompilerPanel() override;
+ 
+         wxString GetCompilerID() const;
+         bool GetWantDebug() const;
+@@ -148,7 +148,7 @@
+         wxString GetReleaseOutputDir() const;
+         wxString GetReleaseObjectOutputDir() const;
+ 
+-        void OnPageChanging(wxWizardEvent& event);
++        void OnPageChanging(wxWizardEvent& event) override;
+     private:
+         CompilerPanel* m_pCompilerPanel;
+         bool m_AllowConfigChange;
+@@ -162,7 +162,7 @@
+                         bool showCompiler = false,
+                         const wxString& compilerID = wxEmptyString, const wxString& validCompilerIDs = _T("*"),
+                         bool allowCompilerChange = true);
+-        ~WizBuildTargetPanel();
++        ~WizBuildTargetPanel() override;
+ 
+         wxString GetCompilerID() const;
+         bool GetEnableDebug() const;
+@@ -170,7 +170,7 @@
+         wxString GetTargetOutputDir() const;
+         wxString GetTargetObjectOutputDir() const;
+ 
+-        void OnPageChanging(wxWizardEvent& event);
++        void OnPageChanging(wxWizardEvent& event) override;
+     private:
+         BuildTargetPanel* m_pBuildTargetPanel;
+ };
+@@ -179,12 +179,12 @@
+ {
+     public:
+         WizGenericSingleChoiceList(const wxString& pageId, const wxString& descr, const wxArrayString& choices, int defChoice, wxWizard* parent, const wxBitmap& bitmap = wxNullBitmap);
+-        ~WizGenericSingleChoiceList();
++        ~WizGenericSingleChoiceList() override;
+ 
+         int GetChoice() const;
+         void SetChoice(int choice);
+ 
+-        void OnPageChanging(wxWizardEvent& event);
++        void OnPageChanging(wxWizardEvent& event) override;
+     private:
+         GenericSingleChoiceList* m_pGenericSingleChoiceList;
+ };
+Index: src/plugins/todo/addtododlg.h
+===================================================================
+--- src/plugins/todo/addtododlg.h	(revision 12189)
++++ src/plugins/todo/addtododlg.h	(revision 12190)
+@@ -37,7 +37,6 @@
+ {
+     public:
+         AddTodoDlg(wxWindow* parent, const wxArrayString& users, const wxArrayString& types, std::bitset<(int)tdctError+1> supportedTdcts);
+-        virtual ~AddTodoDlg() {};
+ 
+         wxString GetText() const;
+         wxString GetUser() const;
+@@ -47,7 +46,7 @@
+         wxString GetType() const;
+         ToDoCommentType GetCommentType() const;
+ 
+-        void EndModal(int retVal);
++        void EndModal(int retVal) override;
+ 
+     private:
+         void OnAddUser(wxCommandEvent&);
+Index: src/plugins/todo/todolist.h
+===================================================================
+--- src/plugins/todo/todolist.h	(revision 12189)
++++ src/plugins/todo/todolist.h	(revision 12190)
+@@ -28,12 +28,13 @@
+ {
+     public:
+         ToDoList();
+-        ~ToDoList();
+-        virtual cbConfigurationPanel* GetConfigurationPanel(wxWindow* parent);
+-        void BuildMenu(wxMenuBar* menuBar);
+-        void BuildModuleMenu(const ModuleType type, wxMenu* menu, const FileTreeData* data = 0);
+-        void OnAttach(); // fires when the plugin is attached to the application
+-        void OnRelease(bool appShutDown); // fires when the plugin is released from the application
++        ~ToDoList() override;
++        cbConfigurationPanel* GetConfigurationPanel(wxWindow* parent) override;
++        void BuildMenu(wxMenuBar* menuBar) override;
++        void BuildModuleMenu(const ModuleType type, wxMenu* menu,
++                             const FileTreeData* data = nullptr) override;
++        void OnAttach() override; // fires when the plugin is attached to the application
++        void OnRelease(bool appShutDown) override; // fires when the plugin is released from the application
+     private:
+         // only parse files when C::B app is already start up
+         void OnAppDoneStartup(CodeBlocksEvent& event);
+Index: src/plugins/todo/todosettingsdlg.h
+===================================================================
+--- src/plugins/todo/todosettingsdlg.h	(revision 12189)
++++ src/plugins/todo/todosettingsdlg.h	(revision 12190)
+@@ -14,12 +14,12 @@
+ {
+ 	public:
+ 		ToDoSettingsDlg(wxWindow* parent);
+-		~ToDoSettingsDlg();
++		~ToDoSettingsDlg() override;
+ 
+-        virtual wxString GetTitle() const { return _("Todo list"); }
+-        virtual wxString GetBitmapBaseName() const { return _T("todo"); }
+-        virtual void OnApply();
+-        virtual void OnCancel(){}
++        wxString GetTitle() const override { return _("Todo list"); }
++        wxString GetBitmapBaseName() const override { return _T("todo"); }
++        void OnApply() override;
++        void OnCancel() override {}
+ };
+ 
+ #endif // TODOSETTINGSDLG_H
+Index: src/src/backtracedlg.h
+===================================================================
+--- src/src/backtracedlg.h	(revision 12189)
++++ src/src/backtracedlg.h	(revision 12190)
+@@ -21,10 +21,10 @@
+     public:
+         BacktraceDlg(wxWindow* parent);
+ 
+-        wxWindow* GetWindow() { return this; }
++        wxWindow* GetWindow() override { return this; }
+ 
+-        void Reload();
+-        void EnableWindow(bool enable);
++        void Reload() override;
++        void EnableWindow(bool enable) override;
+     private:
+         void OnListRightClick(wxListEvent& event);
+         void OnDoubleClick(wxListEvent& event);
+Index: src/src/breakpointsdlg.h
+===================================================================
+--- src/src/breakpointsdlg.h	(revision 12189)
++++ src/src/breakpointsdlg.h	(revision 12190)
+@@ -26,15 +26,15 @@
+     public:
+         BreakpointsDlg();
+ 
+-        wxWindow* GetWindow() { return this; }
++        wxWindow* GetWindow() override { return this; }
+ 
+-        bool AddBreakpoint(cbDebuggerPlugin *plugin, const wxString& filename, int line);
+-        bool RemoveBreakpoint(cbDebuggerPlugin *plugin, const wxString& filename, int line);
+-        void RemoveAllBreakpoints();
+-        void EditBreakpoint(const wxString& filename, int line);
+-        void EnableBreakpoint(const wxString& filename, int line, bool enable);
++        bool AddBreakpoint(cbDebuggerPlugin *plugin, const wxString& filename, int line) override;
++        bool RemoveBreakpoint(cbDebuggerPlugin *plugin, const wxString& filename, int line) override;
++        void RemoveAllBreakpoints() override;
++        void EditBreakpoint(const wxString& filename, int line) override;
++        void EnableBreakpoint(const wxString& filename, int line, bool enable) override;
+ 
+-        void Reload();
++        void Reload() override;
+     private:
+ 
+         void OnRemove(wxCommandEvent& event);
+Index: src/src/compilersettingsdlg.h
+===================================================================
+--- src/src/compilersettingsdlg.h	(revision 12189)
++++ src/src/compilersettingsdlg.h	(revision 12190)
+@@ -15,8 +15,8 @@
+ {
+ 	public:
+ 		CompilerSettingsDlg(wxWindow* parent);
+-		virtual ~CompilerSettingsDlg();
+-		virtual void EndModal(int retCode);
++		~CompilerSettingsDlg() override;
++		void EndModal(int retCode) override;
+ 	protected:
+         void OnPageChanging(wxListbookEvent& event);
+         void OnPageChanged(wxListbookEvent& event);
+Index: src/src/cpuregistersdlg.h
+===================================================================
+--- src/src/cpuregistersdlg.h	(revision 12189)
++++ src/src/cpuregistersdlg.h	(revision 12190)
+@@ -16,11 +16,12 @@
+     public:
+         CPURegistersDlg(wxWindow* parent);
+ 
+-        wxWindow* GetWindow() { return this; }
++        wxWindow* GetWindow() override { return this; }
+ 
+-        void Clear();
+-        void SetRegisterValue(const wxString& reg_name, const wxString& hexValue, const wxString& interpreted);
+-        void EnableWindow(bool enable);
++        void Clear() override;
++        void SetRegisterValue(const wxString& reg_name, const wxString& hexValue,
++                              const wxString& interpreted) override;
++        void EnableWindow(bool enable) override;
+     protected:
+         int RegisterIndex(const wxString& reg_name);
+         void OnRefresh(wxCommandEvent& event);
+Index: src/src/debugger_interface_creator.h
+===================================================================
+--- src/src/debugger_interface_creator.h	(revision 12189)
++++ src/src/debugger_interface_creator.h	(revision 12190)
+@@ -17,31 +17,31 @@
+         ~DebugInterfaceFactory();
+ 
+     public:
+-        virtual cbBacktraceDlg* CreateBacktrace();
+-        virtual void DeleteBacktrace(cbBacktraceDlg *dialog);
++        cbBacktraceDlg* CreateBacktrace() override;
++        void DeleteBacktrace(cbBacktraceDlg *dialog) override;
+ 
+-        virtual cbBreakpointsDlg* CreateBreapoints();
+-        virtual void DeleteBreakpoints(cbBreakpointsDlg *dialog);
++        cbBreakpointsDlg* CreateBreapoints() override;
++        void DeleteBreakpoints(cbBreakpointsDlg *dialog) override;
+ 
+-        virtual cbCPURegistersDlg* CreateCPURegisters();
+-        virtual void DeleteCPURegisters(cbCPURegistersDlg *dialog);
++        cbCPURegistersDlg* CreateCPURegisters() override;
++        void DeleteCPURegisters(cbCPURegistersDlg *dialog) override;
+ 
+-        virtual cbDisassemblyDlg* CreateDisassembly();
+-        virtual void DeleteDisassembly(cbDisassemblyDlg *dialog);
++        cbDisassemblyDlg* CreateDisassembly() override;
++        void DeleteDisassembly(cbDisassemblyDlg *dialog) override;
+ 
+-        virtual cbExamineMemoryDlg* CreateMemory();
+-        virtual void DeleteMemory(cbExamineMemoryDlg *dialog);
++        cbExamineMemoryDlg* CreateMemory() override;
++        void DeleteMemory(cbExamineMemoryDlg *dialog) override;
+ 
+-        virtual cbThreadsDlg* CreateThreads();
+-        virtual void DeleteThreads(cbThreadsDlg *dialog);
++        cbThreadsDlg* CreateThreads() override;
++        void DeleteThreads(cbThreadsDlg *dialog) override;
+ 
+-        virtual cbWatchesDlg* CreateWatches();
+-        virtual void DeleteWatches(cbWatchesDlg *dialog);
++        cbWatchesDlg* CreateWatches() override;
++        void DeleteWatches(cbWatchesDlg *dialog) override;
+ 
+-        virtual bool ShowValueTooltip(const cb::shared_ptr<cbWatch> &watch, const wxRect &rect);
+-        virtual void HideValueTooltip();
+-        virtual bool IsValueTooltipShown();
+-        virtual void UpdateValueTooltip();
++        bool ShowValueTooltip(const cb::shared_ptr<cbWatch> &watch, const wxRect &rect) override;
++        void HideValueTooltip() override;
++        bool IsValueTooltipShown() override;
++        void UpdateValueTooltip() override;
+     private:
+         void OnEditorDeactivate(CodeBlocksEvent &event);
+     private:
+Index: src/src/debuggermenu.h
+===================================================================
+--- src/src/debuggermenu.h	(revision 12189)
++++ src/src/debuggermenu.h	(revision 12190)
+@@ -21,13 +21,13 @@
+         void AppendWindowMenuItems(wxMenu &menu);
+ 
+     public: // derived from cbDebuggerMenuHandler
+-        virtual void SetActiveDebugger(cbDebuggerPlugin *active);
+-        virtual void MarkActiveTargetAsValid(bool valid);
+-        virtual void RebuildMenus();
+-        virtual void BuildContextMenu(wxMenu &menu, const wxString& word_at_caret, bool is_running);
++        void SetActiveDebugger(cbDebuggerPlugin *active) override;
++        void MarkActiveTargetAsValid(bool valid) override;
++        void RebuildMenus() override;
++        void BuildContextMenu(wxMenu &menu, const wxString& word_at_caret, bool is_running) override;
+ 
+-        virtual bool RegisterWindowMenu(const wxString &name, const wxString &help, cbDebuggerWindowMenuItem *item);
+-        virtual void UnregisterWindowMenu(const wxString &name);
++        bool RegisterWindowMenu(const wxString &name, const wxString &help, cbDebuggerWindowMenuItem *item) override;
++        void UnregisterWindowMenu(const wxString &name) override;
+     private:
+         void OnUpdateUI(wxUpdateUIEvent& event);
+         void OnUpdateUIActive(wxUpdateUIEvent &event);
+Index: src/src/disassemblydlg.h
+===================================================================
+--- src/src/disassemblydlg.h	(revision 12189)
++++ src/src/disassemblydlg.h	(revision 12190)
+@@ -20,16 +20,16 @@
+     public:
+         DisassemblyDlg(wxWindow* parent);
+ 
+-        wxWindow* GetWindow() { return this; }
++        wxWindow* GetWindow() override { return this; }
+ 
+-        void Clear(const cbStackFrame& frame);
+-        void AddAssemblerLine(uint64_t addr, const wxString& line);
+-        void AddSourceLine(int lineno, const wxString& line);
+-        bool SetActiveAddress(uint64_t addr);
+-        void CenterLine(int lineno);
+-        void CenterCurrentLine();
+-        bool HasActiveAddr() { return m_HasActiveAddr; }
+-        void EnableWindow(bool enable);
++        void Clear(const cbStackFrame& frame) override;
++        void AddAssemblerLine(uint64_t addr, const wxString& line) override;
++        void AddSourceLine(int lineno, const wxString& line) override;
++        bool SetActiveAddress(uint64_t addr) override;
++        void CenterLine(int lineno) override;
++        void CenterCurrentLine() override;
++        bool HasActiveAddr() override { return m_HasActiveAddr; }
++        void EnableWindow(bool enable) override;
+ 
+     protected:
+         void OnSave(wxCommandEvent& event);
+Index: src/src/printdlg.h
+===================================================================
+--- src/src/printdlg.h	(revision 12189)
++++ src/src/printdlg.h	(revision 12190)
+@@ -13,9 +13,9 @@
+ {
+ 	public:
+ 		PrintDialog(wxWindow* parent);
+-		virtual ~PrintDialog();
++		~PrintDialog() override;
+ 
+-        virtual void EndModal(int retCode);
++        void EndModal(int retCode) override;
+ 
+ 		PrintScope GetPrintScope() const;
+ 		PrintColourMode GetPrintColourMode() const;
+Index: src/src/projectdepsdlg.h
+===================================================================
+--- src/src/projectdepsdlg.h	(revision 12189)
++++ src/src/projectdepsdlg.h	(revision 12190)
+@@ -14,8 +14,8 @@
+ {
+     public:
+         ProjectDepsDlg(wxWindow* parent, cbProject* sel = nullptr);
+-        virtual ~ProjectDepsDlg();
+-        virtual void EndModal(int retCode);
++        ~ProjectDepsDlg() override;
++        void EndModal(int retCode) override;
+     protected:
+         void FillList();
+         bool SaveList();
+Index: src/src/scriptingsettingsdlg.h
+===================================================================
+--- src/src/scriptingsettingsdlg.h	(revision 12189)
++++ src/src/scriptingsettingsdlg.h	(revision 12190)
+@@ -41,9 +41,9 @@
+ {
+     public:
+         ScriptingSettingsDlg(wxWindow* parent);
+-        ~ScriptingSettingsDlg();
++        ~ScriptingSettingsDlg() override;
+ 
+-        void EndModal(int retCode);
++        void EndModal(int retCode) override;
+     protected:
+         void FillScripts();
+         void UpdateState();
+Index: src/src/switcherdlg.h
+===================================================================
+--- src/src/switcherdlg.h	(revision 12189)
++++ src/src/switcherdlg.h	(revision 12190)
+@@ -235,7 +235,7 @@
+     void OnEraseBackground(wxEraseEvent& event);
+ 
+     // Overrides
+-    virtual wxSize DoGetBestSize() const ;
++    wxSize DoGetBestSize() const override;
+ 
+     // Implementation
+ 
+Index: src/src/threadsdlg.h
+===================================================================
+--- src/src/threadsdlg.h	(revision 12189)
++++ src/src/threadsdlg.h	(revision 12190)
+@@ -18,10 +18,10 @@
+     public:
+         ThreadsDlg(wxWindow* parent);
+ 
+-        wxWindow* GetWindow() { return this; }
++        wxWindow* GetWindow() override { return this; }
+ 
+-        void Reload();
+-        void EnableWindow(bool enable);
++        void Reload() override;
++        void EnableWindow(bool enable) override;
+     protected:
+         void OnListRightClick(wxListEvent& event);
+         void OnListDoubleClick(wxListEvent& event);
+Index: src/src/projectmanagerui.h
+===================================================================
+--- src/src/projectmanagerui.h	(revision 12189)
++++ src/src/projectmanagerui.h	(revision 12190)
+@@ -20,43 +20,46 @@
+         ProjectManagerUI();
+         ~ProjectManagerUI();
+ 
+-        cbAuiNotebook* GetNotebook() { return m_pNotebook; }
++        cbAuiNotebook* GetNotebook() override { return m_pNotebook; }
+ 
+         /** Retrieve a pointer to the project manager's tree (GUI).
+           * @return A pointer to a wxTreeCtrl window.
+           */
+-        cbTreeCtrl* GetTree(){ return m_pTree; }
++        cbTreeCtrl* GetTree() override { return m_pTree; }
+ 
+-        wxTreeItemId GetTreeSelection();
++        wxTreeItemId GetTreeSelection() override;
+ 
+-        void RebuildTree();
+-        void FreezeTree();
+-        void UnfreezeTree(bool force = false);
++        void RebuildTree() override;
++        void FreezeTree() override;
++        void UnfreezeTree(bool force = false) override;
+ 
+ 
+-        void UpdateActiveProject(cbProject* oldProject, cbProject* newProject, bool refresh);
+-        void RemoveProject(cbProject* project);
+-        void BeginLoadingWorkspace();
+-        void CloseWorkspace();
+-        void FinishLoadingProject(cbProject* project, bool newAddition, cb_unused FilesGroupsAndMasks* fgam);
+-        void FinishLoadingWorkspace(cbProject* activeProject, const wxString &workspaceTitle);
++        void UpdateActiveProject(cbProject* oldProject, cbProject* newProject,
++                                 bool refresh) override;
++        void RemoveProject(cbProject* project) override;
++        void BeginLoadingWorkspace() override;
++        void CloseWorkspace() override;
++        void FinishLoadingProject(cbProject* project, bool newAddition,
++                                  cb_unused FilesGroupsAndMasks* fgam) override;
++        void FinishLoadingWorkspace(cbProject* activeProject,
++                                    const wxString &workspaceTitle) override;
+ 
+-        void ShowFileInTree(ProjectFile &projectFile);
++        void ShowFileInTree(ProjectFile &projectFile) override;
+ 
+         void CreateMenu(wxMenuBar* menuBar);
+ 
+-        bool QueryCloseAllProjects();
+-        bool QueryCloseProject(cbProject* project, bool dontsavefiles);
+-        bool QueryCloseWorkspace();
++        bool QueryCloseAllProjects() override;
++        bool QueryCloseProject(cbProject* project, bool dontsavefiles) override;
++        bool QueryCloseWorkspace() override;
+ 
+-        int AskForBuildTargetIndex(cbProject* project);
+-        wxArrayInt AskForMultiBuildTargetIndex(cbProject* project);
+-        void ConfigureProjectDependencies(cbProject* base, wxWindow *parent);
++        int AskForBuildTargetIndex(cbProject* project) override;
++        wxArrayInt AskForMultiBuildTargetIndex(cbProject* project) override;
++        void ConfigureProjectDependencies(cbProject* base, wxWindow *parent) override;
+         void CheckForExternallyModifiedProjects();
+ 
+     private:
+         void InitPane();
+-        void SwitchToProjectsPage();
++        void SwitchToProjectsPage() override;
+         void ShowMenu(wxTreeItemId id, const wxPoint& pt);
+         void CreateMenuTreeProps(wxMenu* menu, bool popup);
+ 
+Index: src/src/watchesdlg.h
+===================================================================
+--- src/src/watchesdlg.h	(revision 12189)
++++ src/src/watchesdlg.h	(revision 12190)
+@@ -24,7 +24,7 @@
+     public:
+         WatchesDlg();
+ 
+-        wxWindow* GetWindow() { return this; }
++        wxWindow* GetWindow() override { return this; }
+ 
+         void AddWatch(cb::shared_ptr<cbWatch> watch) override;
+         void AddSpecialWatch(cb::shared_ptr<cbWatch> watch, bool readonly) override;
+@@ -93,7 +93,7 @@
+     protected:
+         virtual void OnDismiss();
+     private:
+-        void Fit();
++        void Fit() override;
+         void ClearWatch();
+     private:
+ 
+Index: src/include/cbauibook.h
+===================================================================
+--- src/include/cbauibook.h	(revision 12189)
++++ src/include/cbauibook.h	(revision 12190)
+@@ -112,7 +112,7 @@
+          * \param The index of the tab to be closed
+          * \return true if successfull
+          */
+-        bool DeletePage(size_t page);
++        bool DeletePage(size_t page) override;
+         /** \brief Remove Page
+          *
+          * Calls the base-class function and after that
+@@ -122,7 +122,7 @@
+          * \param The index of the tab to be closed
+          * \return true if successfull
+          */
+-        bool RemovePage(size_t page);
++        bool RemovePage(size_t page) override;
+         /** \brief Move page
+          *
+          * Moves the tab containing page to new_idx
+Index: src/plugins/abbreviations/abbreviations.h
+===================================================================
+--- src/plugins/abbreviations/abbreviations.h	(revision 12189)
++++ src/plugins/abbreviations/abbreviations.h	(revision 12190)
+@@ -34,19 +34,19 @@
+       * in configuration dialogs. Lower numbers mean the plugin's
+       * configuration is put higher in the list.
+       */
+-    virtual int GetConfigurationPriority() const { return 50; }
++    int GetConfigurationPriority() const override { return 50; }
+ 
+     /** Return the configuration group for this plugin. Default is cgUnknown.
+       * Notice that you can logically OR more than one configuration groups,
+       * so you could set it, for example, as "cgCompiler | cgContribPlugin".
+       */
+-    virtual int GetConfigurationGroup() const { return cgEditor; }
++    int GetConfigurationGroup() const override { return cgEditor; }
+ 
+     /** Return plugin's configuration panel.
+       * @param parent The parent window.
+       * @return A pointer to the plugin's cbConfigurationPanel. It is deleted by the caller.
+       */
+-    virtual cbConfigurationPanel* GetConfigurationPanel(wxWindow* parent);
++    cbConfigurationPanel* GetConfigurationPanel(wxWindow* parent) override;
+ 
+     /** This method is called by Code::Blocks and is used by the plugin
+       * to add any menu items it needs on Code::Blocks's menu bar.\n
+@@ -55,7 +55,7 @@
+       * just do nothing ;)
+       * @param menuBar the wxMenuBar to create items in
+       */
+-    virtual void BuildMenu(wxMenuBar* menuBar);
++    void BuildMenu(wxMenuBar* menuBar) override;
+ 
+ protected:
+     /** Any descendent plugin should override this virtual method and
+@@ -68,7 +68,7 @@
+       * This means that a plugin might be loaded but <b>not</b> activated...\n
+       * Think of this method as the actual constructor...
+       */
+-    virtual void OnAttach();
++    void OnAttach() override;
+ 
+     /** Any descendent plugin should override this virtual method and
+       * perform any necessary de-initialization. This method is called by
+@@ -79,7 +79,7 @@
+       *         case *don't* use Manager::Get()->Get...() functions or the
+       *         behaviour is undefined...
+       */
+-    virtual void OnRelease(bool appShutDown);
++    void OnRelease(bool appShutDown) override;
+ 
+ public:
+     /** Try to auto-complete the current word.
+Index: src/plugins/codecompletion/ccoptionsdlg.h
+===================================================================
+--- src/plugins/codecompletion/ccoptionsdlg.h	(revision 12189)
++++ src/plugins/codecompletion/ccoptionsdlg.h	(revision 12190)
+@@ -19,12 +19,12 @@
+ {
+ public:
+     CCOptionsDlg(wxWindow* parent, NativeParser* np, CodeCompletion* cc, DocumentationHelper* dh);
+-    virtual ~CCOptionsDlg();
++    ~CCOptionsDlg() override;
+ 
+-    virtual wxString GetTitle() const          { return _("Code completion"); }
+-    virtual wxString GetBitmapBaseName() const { return _T("codecompletion"); }
+-    virtual void OnApply();
+-    virtual void OnCancel()                    { ; }
++    wxString GetTitle() const override { return _("Code completion"); }
++    wxString GetBitmapBaseName() const override { return _T("codecompletion"); }
++    void OnApply() override;
++    void OnCancel() override {}
+ 
+ protected:
+     void OnChooseColour(wxCommandEvent& event);
+Index: src/plugins/codecompletion/cctreectrl.h
+===================================================================
+--- src/plugins/codecompletion/cctreectrl.h	(revision 12189)
++++ src/plugins/codecompletion/cctreectrl.h	(revision 12190)
+@@ -105,7 +105,7 @@
+     static int CBLineCompare    (CCTreeCtrlData* lhs, CCTreeCtrlData* rhs);
+     static int CBNoCompare      (CCTreeCtrlData* lhs, CCTreeCtrlData* rhs);
+ 
+-    int OnCompareItems(const wxTreeItemId& item1, const wxTreeItemId& item2);
++    int OnCompareItems(const wxTreeItemId& item1, const wxTreeItemId& item2) override;
+     int (*Compare)(CCTreeCtrlData* lhs, CCTreeCtrlData* rhs);
+ 
+     DECLARE_DYNAMIC_CLASS(CCTreeCtrl)
+Index: src/plugins/codecompletion/classbrowserbuilderthread.h
+===================================================================
+--- src/plugins/codecompletion/classbrowserbuilderthread.h	(revision 12189)
++++ src/plugins/codecompletion/classbrowserbuilderthread.h	(revision 12190)
+@@ -36,7 +36,7 @@
+     ClassBrowserBuilderThread(wxEvtHandler* evtHandler, wxSemaphore& sem);
+ 
+     /** destructor */
+-    virtual ~ClassBrowserBuilderThread();
++    ~ClassBrowserBuilderThread() override;
+ 
+     // Called from external:
+     void Init(NativeParser* np, CCTreeCtrl* treeTop, CCTreeCtrl* treeBottom,
+@@ -68,7 +68,7 @@
+     void RequestTermination(bool terminate = true) { m_TerminationRequested = terminate; }
+ 
+ protected:
+-    virtual void* Entry();
++     void* Entry() override;
+ 
+     // Called from Entry():
+     void BuildTree();
+Index: src/plugins/compilergcc/compilergcc.h
+===================================================================
+--- src/plugins/compilergcc/compilergcc.h	(revision 12189)
++++ src/plugins/compilergcc/compilergcc.h	(revision 12190)
+@@ -89,40 +89,40 @@
+ {
+     public:
+         CompilerGCC();
+-        virtual ~CompilerGCC();
++        ~CompilerGCC() override;
+ 
+-        virtual void OnAttach();
+-        virtual void OnRelease(bool appShutDown);
+-        virtual void BuildMenu(wxMenuBar* menuBar); // offer for menu space by host
+-        virtual void BuildModuleMenu(const ModuleType type, wxMenu* menu, const FileTreeData* data = 0); // offer for menu space by a module
+-        virtual bool BuildToolBar(wxToolBar* toolBar);
+-        virtual int GetToolBarPriority() { return 1; }
++        void OnAttach() override;
++        void OnRelease(bool appShutDown) override;
++        void BuildMenu(wxMenuBar* menuBar) override; // offer for menu space by host
++        void BuildModuleMenu(const ModuleType type, wxMenu* menu, const FileTreeData* data = 0) override; // offer for menu space by a module
++        bool BuildToolBar(wxToolBar* toolBar) override;
++        int GetToolBarPriority() override { return 1; }
+ 
+-        virtual int Run(ProjectBuildTarget* target = 0L);
+-        virtual int Run(const wxString& target);
++        int Run(ProjectBuildTarget* target = 0L) override;
++        int Run(const wxString& target) override;
+         virtual int RunSingleFile(const wxString& filename);
+-        virtual int Clean(const wxString& target);
+-        virtual int Clean(ProjectBuildTarget* target = 0L);
+-        virtual int DistClean(ProjectBuildTarget* target = 0L);
+-        virtual int DistClean(const wxString& target);
+-        virtual int Build(ProjectBuildTarget* target = 0L);
+-        virtual int Build(const wxString& target);
+-        virtual int Rebuild(ProjectBuildTarget* target = 0L);
+-        virtual int Rebuild(const wxString& target);
+-        virtual int CleanWorkspace(const wxString& target = wxEmptyString);
+-        virtual int BuildWorkspace(const wxString& target = wxEmptyString);
+-        virtual int RebuildWorkspace(const wxString& target = wxEmptyString);
+-        virtual int CompileFile(const wxString& file);
++        int Clean(const wxString& target) override;
++        int Clean(ProjectBuildTarget* target = 0L) override;
++        int DistClean(ProjectBuildTarget* target = 0L) override;
++        int DistClean(const wxString& target) override;
++        int Build(ProjectBuildTarget* target = 0L) override;
++        int Build(const wxString& target) override;
++        int Rebuild(ProjectBuildTarget* target = 0L) override;
++        int Rebuild(const wxString& target) override;
++        int CleanWorkspace(const wxString& target = wxEmptyString) override;
++        int BuildWorkspace(const wxString& target = wxEmptyString) override;
++        int RebuildWorkspace(const wxString& target = wxEmptyString) override;
++        int CompileFile(const wxString& file) override;
+         virtual int CompileFileWithoutProject(const wxString& file);
+         virtual int CompileFileDefault(cbProject* project, ProjectFile* pf, ProjectBuildTarget* bt);
+-        virtual int KillProcess();
+-        virtual bool IsRunning() const;
+-        virtual int GetExitCode() const { return m_LastExitCode; }
+-        virtual int Configure(cbProject* project, ProjectBuildTarget* target, wxWindow *parent);
++        int KillProcess() override;
++        bool IsRunning() const override;
++        int GetExitCode() const override { return m_LastExitCode; }
++        int Configure(cbProject* project, ProjectBuildTarget* target, wxWindow *parent) override;
+ 
+-        int GetConfigurationPriority() const { return 0; }
+-        int GetConfigurationGroup() const { return cgCompiler; }
+-        cbConfigurationPanel* GetConfigurationPanel(wxWindow* parent);
++        int GetConfigurationPriority() const override { return 0; }
++        int GetConfigurationGroup() const override { return cgCompiler; }
++        cbConfigurationPanel* GetConfigurationPanel(wxWindow* parent) override;
+ 
+         bool IsValidTarget(const wxString& target) const;
+ 
+Index: src/plugins/compilergcc/compileroptionsdlg.h
+===================================================================
+--- src/plugins/compilergcc/compileroptionsdlg.h	(revision 12189)
++++ src/plugins/compilergcc/compileroptionsdlg.h	(revision 12190)
+@@ -29,12 +29,12 @@
+ {
+     public:
+         CompilerOptionsDlg(wxWindow* parent, CompilerGCC* compiler, cbProject* project = 0L, ProjectBuildTarget* target = 0L);
+-        ~CompilerOptionsDlg();
++        ~CompilerOptionsDlg() override;
+ 
+-        virtual wxString GetTitle() const { return _("Global compiler settings"); }
+-        virtual wxString GetBitmapBaseName() const { return _T("compiler"); }
+-        virtual void OnApply();
+-        virtual void OnCancel(){}
++        wxString GetTitle() const override { return _("Global compiler settings"); }
++        wxString GetBitmapBaseName() const override { return _T("compiler"); }
++        void OnApply() override;
++        void OnCancel() override {}
+     private:
+         enum CustomVarActionType
+         {
+Index: src/plugins/debuggergdb/cdb_commands.h
+===================================================================
+--- src/plugins/debuggergdb/cdb_commands.h	(revision 12189)
++++ src/plugins/debuggergdb/cdb_commands.h	(revision 12190)
+@@ -49,7 +49,7 @@
+         {
+             m_Cmd << _T("directory ") << dir;
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // Output:
+             // Warning: C:\Devel\tmp\console\111: No such file or directory.
+@@ -71,7 +71,7 @@
+         {
+             m_Cmd << _T("file ") << file;
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // Output:
+             // Reading symbols from C:\Devel\tmp\console/console.exe...done.
+@@ -95,7 +95,7 @@
+         {
+             m_Cmd << _T("add-symbol-file ") << file;
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // Output:
+             //
+@@ -123,7 +123,7 @@
+         {
+             m_Cmd << _T("set args ") << args;
+         }
+-        void ParseOutput(cb_unused const wxString& output)
++        void ParseOutput(cb_unused const wxString& output) override
+         {
+             // No output
+         }
+@@ -141,7 +141,7 @@
+         {
+             m_Cmd << _T("|.");
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // Output:
+             // <decimal process num> id: <hex PID> create name: <process name>
+@@ -177,7 +177,7 @@
+         {
+             m_Cmd << _T("attach ") << wxString::Format(_T("%d"), pid);
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // Output:
+             // Attaching to process <pid>
+@@ -214,7 +214,7 @@
+         {
+             m_Cmd << _T(".detach");
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // output any return, usually "Detached"
+             m_pDriver->Log(output);
+@@ -232,7 +232,7 @@
+             : DebuggerContinueBaseCmd(driver,_T("g"))
+         {
+         }
+-        virtual void Action()
++        void Action() override
+         {
+             m_pDriver->NotifyDebuggeeContinued();
+         }
+@@ -269,7 +269,7 @@
+                 bp->alreadySet = true;
+             }
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // possible outputs (only output lines starting with ***):
+             //
+@@ -305,7 +305,7 @@
+             else
+                 m_Cmd << _T("bc ") << wxString::Format(_T("%d"), (int) bp->index);
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // usually no output, so display whatever comes in
+             if (!output.IsEmpty())
+@@ -331,7 +331,7 @@
+             m_Cmd << wxT("?? ") << symbol;
+         }
+ 
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             if(!ParseCDBWatchValue(m_watch, output))
+             {
+@@ -365,7 +365,7 @@
+         {
+             m_Cmd << _T("?? ") << what;
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+ //            struct HWND__ * 0x7ffd8000
+ //
+@@ -407,7 +407,7 @@
+         {
+             m_Cmd << _T("k n");
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // output is:
+             //  # ChildEBP RetAddr
+@@ -486,7 +486,7 @@
+                 m_Cmd = wxString::Format(wxT(".frame %d"), frameNumber);
+         }
+ 
+-        virtual void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             wxArrayString lines = GetArrayFromString(output, wxT('\n'));
+ 
+@@ -529,7 +529,7 @@
+         {
+             m_Cmd << _T("r");
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // output is:
+             //
+@@ -564,7 +564,7 @@
+         {
+             m_Cmd << _T("uf ") << StopAddress;
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // output is a series of:
+             //
+@@ -601,7 +601,7 @@
+             // print stack frame and nearest symbol (start of function)
+             m_Cmd << _T("k n 1; ln");
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+ //            m_pDriver->QueueCommand(new CdbCmd_Disassembly(m_pDriver, m_pDlg, StopAddress)); // chain call
+ 
+Index: src/plugins/debuggergdb/cdb_driver.h
+===================================================================
+--- src/plugins/debuggergdb/cdb_driver.h	(revision 12189)
++++ src/plugins/debuggergdb/cdb_driver.h	(revision 12190)
+@@ -12,60 +12,61 @@
+ {
+     public:
+         CDB_driver(DebuggerGDB* plugin);
+-        virtual ~CDB_driver();
++        ~CDB_driver() override;
+ 
+-        virtual wxString GetCommandLine(const wxString& debugger,
+-                                        const wxString& debuggee,
+-                                        const wxString &userArguments);
+-        virtual wxString GetCommandLine(const wxString& debugger, int pid, const wxString &userArguments);
+-        virtual void SetTarget(ProjectBuildTarget* target);
+-        virtual void Prepare(bool isConsole, int printElements, const RemoteDebugging &remoteDebugging);
+-        virtual void Start(bool breakOnEntry);
+-        virtual void Stop();
++        wxString GetCommandLine(const wxString& debugger, const wxString& debuggee,
++                                const wxString &userArguments) override;
++        wxString GetCommandLine(const wxString& debugger, int pid,
++                                const wxString &userArguments) override;
++        void SetTarget(ProjectBuildTarget* target) override;
++        void Prepare(bool isConsole, int printElements,
++                     const RemoteDebugging &remoteDebugging) override;
++        void Start(bool breakOnEntry) override;
++        void Stop() override;
+ 
+-        virtual void Continue();
+-        virtual void Step();
+-        virtual void StepInstruction();
+-        virtual void StepIntoInstruction();
+-        virtual void StepIn();
+-        virtual void StepOut();
+-        virtual void SetNextStatement(const wxString& filename, int line);
+-        virtual void Backtrace();
+-        virtual void Disassemble();
+-        virtual void CPURegisters();
+-        virtual void SwitchToFrame(size_t number);
+-        virtual void SetVarValue(const wxString& var, const wxString& value);
+-        virtual void SetMemoryRangeValue(uint64_t addr, const wxString& value);
+-        virtual void MemoryDump();
+-        virtual void Attach(int pid);
+-        virtual void Detach();
+-        virtual void RunningThreads();
++        void Continue() override;
++        void Step() override;
++        void StepInstruction() override;
++        void StepIntoInstruction() override;
++        void StepIn() override;
++        void StepOut() override;
++        void SetNextStatement(const wxString& filename, int line) override;
++        void Backtrace() override;
++        void Disassemble() override;
++        void CPURegisters() override;
++        void SwitchToFrame(size_t number) override;
++        void SetVarValue(const wxString& var, const wxString& value) override;
++        void SetMemoryRangeValue(uint64_t addr, const wxString& value) override;
++        void MemoryDump() override;
++        void Attach(int pid) override;
++        void Detach() override;
++        void RunningThreads() override;
+ 
+-        void InfoFrame();
+-        void InfoDLL();
+-        void InfoFiles();
+-        void InfoFPU();
+-        void InfoSignals();
++        void InfoFrame() override;
++        void InfoDLL() override;
++        void InfoFiles() override;
++        void InfoFPU() override;
++        void InfoSignals() override;
+ 
+-        void EnableCatchingThrow(bool enable);
++        void EnableCatchingThrow(bool enable) override;
+ 
+-        virtual void SwitchThread(cb_unused size_t threadIndex){} // not implemented
++        void SwitchThread(cb_unused size_t threadIndex) override {} // not implemented
+ 
+-        virtual void AddBreakpoint(cb::shared_ptr<DebuggerBreakpoint> bp);
+-        virtual void RemoveBreakpoint(cb::shared_ptr<DebuggerBreakpoint> bp);
+-        virtual void EvaluateSymbol(const wxString& symbol, const wxRect& tipRect);
+-        virtual void UpdateWatches(cb::shared_ptr<GDBWatch> localsWatch,
+-                                   cb::shared_ptr<GDBWatch> funcArgsWatch,
+-                                   WatchesContainer &watches, bool ignoreAutoUpdate);
+-        virtual void UpdateWatch(cb::shared_ptr<GDBWatch> const &watch);
+-        virtual void UpdateMemoryRangeWatches(MemoryRangeWatchesContainer &watches,
+-                                              bool ignoreAutoUpdate);
+-        virtual void UpdateMemoryRangeWatch(const cb::shared_ptr<GDBMemoryRangeWatch> &watch);
+-        virtual void UpdateWatchLocalsArgs(cb::shared_ptr<GDBWatch> const &watch, bool locals);
+-        virtual void ParseOutput(const wxString& output);
+-        virtual bool IsDebuggingStarted() const;
++        void AddBreakpoint(cb::shared_ptr<DebuggerBreakpoint> bp) override;
++        void RemoveBreakpoint(cb::shared_ptr<DebuggerBreakpoint> bp) override;
++        void EvaluateSymbol(const wxString& symbol, const wxRect& tipRect) override;
++        void UpdateWatches(cb::shared_ptr<GDBWatch> localsWatch,
++                           cb::shared_ptr<GDBWatch> funcArgsWatch,
++                           WatchesContainer &watches, bool ignoreAutoUpdate) override;
++        void UpdateWatch(cb::shared_ptr<GDBWatch> const &watch) override;
++        void UpdateMemoryRangeWatches(MemoryRangeWatchesContainer &watches,
++                                      bool ignoreAutoUpdate) override;
++        void UpdateMemoryRangeWatch(const cb::shared_ptr<GDBMemoryRangeWatch> &watch) override;
++        void UpdateWatchLocalsArgs(cb::shared_ptr<GDBWatch> const &watch, bool locals) override;
++        void ParseOutput(const wxString& output) override;
++        bool IsDebuggingStarted() const override;
+ #ifdef __WXMSW__
+-        virtual bool UseDebugBreakProcess() { return true; }
++        bool UseDebugBreakProcess() override { return true; }
+ #endif
+     protected:
+     private:
+Index: src/plugins/debuggergdb/debugger_defs.h
+===================================================================
+--- src/plugins/debuggergdb/debugger_defs.h	(revision 12189)
++++ src/plugins/debuggergdb/debugger_defs.h	(revision 12190)
+@@ -95,9 +95,9 @@
+         {
+             m_Cmd = cmd;
+         }
+-        virtual ~DebuggerInfoCmd(){}
++        ~DebuggerInfoCmd() override {}
+ 
+-        virtual void ParseOutput(const wxString& output);
++        void ParseOutput(const wxString& output) override;
+         wxString m_Title;
+ };
+ 
+@@ -110,7 +110,7 @@
+         {
+         }
+ 
+-        bool IsContinueCommand() const { return true; }
++        bool IsContinueCommand() const override { return true; }
+ };
+ 
+ /** Action-only debugger command to signal the watches tree to update. */
+@@ -160,15 +160,15 @@
+     {}
+ 
+     // from cbBreakpoint
+-    virtual void SetEnabled(bool flag);
+-    virtual wxString GetLocation() const;
+-    virtual int GetLine() const;
+-    virtual wxString GetLineString() const;
+-    virtual wxString GetType() const;
+-    virtual wxString GetInfo() const;
+-    virtual bool IsEnabled() const;
+-    virtual bool IsVisibleInEditor() const;
+-    virtual bool IsTemporary() const;
++    void SetEnabled(bool flag) override;
++    wxString GetLocation() const override;
++    int GetLine() const override;
++    wxString GetLineString() const override;
++    wxString GetType() const override;
++    wxString GetInfo() const override;
++    bool IsEnabled() const override;
++    bool IsVisibleInEditor() const override;
++    bool IsTemporary() const override;
+ 
+     BreakpointType type; ///< The type of this breakpoint.
+     wxString filename; ///< The filename for the breakpoint (kept as relative).
+@@ -217,17 +217,17 @@
+ {
+     public:
+         GDBWatch(wxString const &symbol);
+-        virtual ~GDBWatch();
++        ~GDBWatch() override;
+     public:
+ 
+-        virtual void GetSymbol(wxString &symbol) const;
+-        virtual void GetValue(wxString &value) const;
+-        virtual bool SetValue(const wxString &value);
+-        virtual void GetFullWatchString(wxString &full_watch) const;
+-        virtual void GetType(wxString &type) const;
+-        virtual void SetType(const wxString &type);
++        void GetSymbol(wxString &symbol) const override;
++        void GetValue(wxString &value) const override;
++        bool SetValue(const wxString &value) override;
++        void GetFullWatchString(wxString &full_watch) const override;
++        void GetType(wxString &type) const override;
++        void SetType(const wxString &type) override;
+ 
+-        virtual wxString GetDebugString() const;
++        wxString GetDebugString() const override;
+ 
+         wxString MakeSymbolToAddress() const override;
+         bool IsPointerType() const override;
+Index: src/plugins/debuggergdb/debuggergdb.h
+===================================================================
+--- src/plugins/debuggergdb/debuggergdb.h	(revision 12189)
++++ src/plugins/debuggergdb/debuggergdb.h	(revision 12190)
+@@ -34,90 +34,92 @@
+         DebuggerState m_State;
+     public:
+         DebuggerGDB();
+-        ~DebuggerGDB();
++        ~DebuggerGDB() override;
+ 
+-        cbConfigurationPanel* GetProjectConfigurationPanel(wxWindow* parent, cbProject* project);
+-        void OnAttachReal(); // fires when the plugin is attached to the application
+-        void OnReleaseReal(bool appShutDown); // fires when the plugin is released from the application
++        cbConfigurationPanel* GetProjectConfigurationPanel(wxWindow* parent,
++                                                           cbProject* project) override;
++        void OnAttachReal() override; // fires when the plugin is attached to the application
++        void OnReleaseReal(bool appShutDown) override; // fires when the plugin is released from the application
+ 
+-        bool SupportsFeature(cbDebuggerFeature::Flags flag);
++        bool SupportsFeature(cbDebuggerFeature::Flags flag) override;
+ 
+-        cbDebuggerConfiguration* LoadConfig(const ConfigManagerWrapper &config);
++        cbDebuggerConfiguration* LoadConfig(const ConfigManagerWrapper &config) override;
+ 
+         DebuggerConfiguration& GetActiveConfigEx();
+ 
+         void RunCommand(int cmd);
+ 
+-        cb::shared_ptr<cbBreakpoint> AddBreakpoint(const wxString& filename, int line);
+-        cb::shared_ptr<cbBreakpoint> AddDataBreakpoint(const wxString& dataExpression);
+-        int GetBreakpointsCount() const;
+-        cb::shared_ptr<cbBreakpoint> GetBreakpoint(int index);
+-        cb::shared_ptr<const cbBreakpoint> GetBreakpoint(int index) const;
+-        void UpdateBreakpoint(cb::shared_ptr<cbBreakpoint> breakpoint);
+-        void DeleteBreakpoint(cb::shared_ptr<cbBreakpoint> breakpoint);
+-        void DeleteAllBreakpoints();
+-        void ShiftBreakpoint(int index, int lines_to_shift);
+-        void EnableBreakpoint(cb::shared_ptr<cbBreakpoint> breakpoint, bool enable);
++        cb::shared_ptr<cbBreakpoint> AddBreakpoint(const wxString& filename, int line) override;
++        cb::shared_ptr<cbBreakpoint> AddDataBreakpoint(const wxString& dataExpression) override;
++        int GetBreakpointsCount() const override;
++        cb::shared_ptr<cbBreakpoint> GetBreakpoint(int index) override;
++        cb::shared_ptr<const cbBreakpoint> GetBreakpoint(int index) const override;
++        void UpdateBreakpoint(cb::shared_ptr<cbBreakpoint> breakpoint) override;
++        void DeleteBreakpoint(cb::shared_ptr<cbBreakpoint> breakpoint) override;
++        void DeleteAllBreakpoints() override;
++        void ShiftBreakpoint(int index, int lines_to_shift) override;
++        void EnableBreakpoint(cb::shared_ptr<cbBreakpoint> breakpoint, bool enable) override;
+ 
+         // stack frame calls;
+-        int GetStackFrameCount() const;
+-        cb::shared_ptr<const cbStackFrame> GetStackFrame(int index) const;
+-        void SwitchToFrame(int number);
+-        int GetActiveStackFrame() const;
++        int GetStackFrameCount() const override;
++        cb::shared_ptr<const cbStackFrame> GetStackFrame(int index) const override;
++        void SwitchToFrame(int number) override;
++        int GetActiveStackFrame() const override;
+ 
+         // threads
+-        int GetThreadsCount() const;
+-        cb::shared_ptr<const cbThread> GetThread(int index) const;
+-        bool SwitchToThread(int thread_number);
++        int GetThreadsCount() const override;
++        cb::shared_ptr<const cbThread> GetThread(int index) const override;
++        bool SwitchToThread(int thread_number) override;
+ 
+-        bool Debug(bool breakOnEntry);
+-        void Continue();
+-        void Next();
+-        void NextInstruction();
+-        void StepIntoInstruction();
+-        void Step();
+-        void StepOut();
+-        bool RunToCursor(const wxString& filename, int line, const wxString& line_text);
+-        void SetNextStatement(const wxString& filename, int line);
+-        void Break();
+-        void Stop();
++        bool Debug(bool breakOnEntry) override;
++        void Continue() override;
++        void Next() override;
++        void NextInstruction() override;
++        void StepIntoInstruction() override;
++        void Step() override;
++        void StepOut() override;
++        bool RunToCursor(const wxString& filename, int line, const wxString& line_text) override;
++        void SetNextStatement(const wxString& filename, int line) override;
++        void Break() override;
++        void Stop() override;
+         bool Validate(const wxString& line, const char cb);
+-        bool IsRunning() const { return m_pProcess; }
+-        bool IsStopped() const;
+-        bool IsBusy() const;
++        bool IsRunning() const override { return m_pProcess; }
++        bool IsStopped() const override;
++        bool IsBusy() const override;
+         bool IsTemporaryBreak() const {return m_TemporaryBreak;}
+-        int GetExitCode() const { return m_LastExitCode; }
++        int GetExitCode() const override { return m_LastExitCode; }
+ 
+-        cb::shared_ptr<cbWatch> AddWatch(const wxString& symbol, bool update);
++        cb::shared_ptr<cbWatch> AddWatch(const wxString& symbol, bool update) override;
+         cb::shared_ptr<cbWatch> AddMemoryRange(uint64_t address, uint64_t size,
+-                                               const wxString &symbol, bool update);
+-        void DeleteWatch(cb::shared_ptr<cbWatch> watch);
+-        bool HasWatch(cb::shared_ptr<cbWatch> watch);
++                                               const wxString &symbol, bool update) override;
++        void DeleteWatch(cb::shared_ptr<cbWatch> watch) override;
++        bool HasWatch(cb::shared_ptr<cbWatch> watch) override;
+         bool IsMemoryRangeWatch(const cb::shared_ptr<cbWatch> &watch);
+-        void ShowWatchProperties(cb::shared_ptr<cbWatch> watch);
+-        bool SetWatchValue(cb::shared_ptr<cbWatch> watch, const wxString &value);
+-        void ExpandWatch(cb::shared_ptr<cbWatch> watch);
+-        void CollapseWatch(cb::shared_ptr<cbWatch> watch);
+-        void UpdateWatch(cb::shared_ptr<cbWatch> watch);
+-        void UpdateWatches(const std::vector<cb::shared_ptr<cbWatch>> &watches);
++        void ShowWatchProperties(cb::shared_ptr<cbWatch> watch) override;
++        bool SetWatchValue(cb::shared_ptr<cbWatch> watch, const wxString &value) override;
++        void ExpandWatch(cb::shared_ptr<cbWatch> watch) override;
++        void CollapseWatch(cb::shared_ptr<cbWatch> watch) override;
++        void UpdateWatch(cb::shared_ptr<cbWatch> watch) override;
++        void UpdateWatches(const std::vector<cb::shared_ptr<cbWatch>> &watches) override;
+ 
+         void AddWatchNoUpdate(const cb::shared_ptr<GDBWatch> &watch);
+ 
+-        void OnWatchesContextMenu(wxMenu &menu, const cbWatch &watch, wxObject *property, int &disabledMenus);
++        void OnWatchesContextMenu(wxMenu &menu, const cbWatch &watch, wxObject *property,
++                                  int &disabledMenus) override;
+ 
+-        void GetCurrentPosition(wxString &filename, int &line);
+-        void RequestUpdate(DebugWindows window);
++        void GetCurrentPosition(wxString &filename, int &line) override;
++        void RequestUpdate(DebugWindows window) override;
+ 
+-        void AttachToProcess(const wxString& pid);
+-        void DetachFromProcess();
+-        bool IsAttachedToProcess() const;
++        void AttachToProcess(const wxString& pid) override;
++        void DetachFromProcess() override;
++        bool IsAttachedToProcess() const override;
+ 
+-        void SendCommand(const wxString& cmd, bool debugLog);
++        void SendCommand(const wxString& cmd, bool debugLog) override;
+         void DoSendCommand(const wxString& cmd);
+ 
+         DebuggerState& GetState(){ return m_State; }
+ 
+-        void OnConfigurationChange(bool isActive);
++        void OnConfigurationChange(bool isActive) override;
+ 
+         static wxArrayString ParseSearchDirs(const cbProject &project);
+         static void SetSearchDirs(cbProject &project, const wxArrayString &dirs);
+@@ -125,8 +127,8 @@
+         static RemoteDebuggingMap ParseRemoteDebuggingMap(cbProject &project);
+         static void SetRemoteDebuggingMap(cbProject &project, const RemoteDebuggingMap &map);
+ 
+-        void OnValueTooltip(const wxString &token, const wxRect &evalRect);
+-        bool ShowValueTooltip(int style);
++        void OnValueTooltip(const wxString &token, const wxRect &evalRect) override;
++        bool ShowValueTooltip(int style) override;
+ 
+         static void ConvertToGDBFriendly(wxString& str);
+         static void ConvertToGDBFile(wxString& str);
+@@ -138,11 +140,11 @@
+         void DetermineLanguage();
+ 
+     protected:
+-        cbProject* GetProject() { return m_pProject; }
+-        void ResetProject() { m_pProcess = NULL; }
+-        void ConvertDirectory(wxString& str, wxString base, bool relative);
+-        void CleanupWhenProjectClosed(cbProject *project);
+-        bool CompilerFinished(bool compilerFailed, StartType startType);
++        cbProject* GetProject() override { return m_pProject; }
++        void ResetProject() override { m_pProcess = NULL; }
++        void ConvertDirectory(wxString& str, wxString base, bool relative) override;
++        void CleanupWhenProjectClosed(cbProject *project) override;
++        bool CompilerFinished(bool compilerFailed, StartType startType) override;
+     protected:
+         void AddSourceDir(const wxString& dir);
+     private:
+@@ -166,7 +168,7 @@
+         void OnShowFile(wxCommandEvent& event);
+         void OnCursorChanged(wxCommandEvent& event);
+ 
+-        void SetupToolsMenu(wxMenu &menu);
++        void SetupToolsMenu(wxMenu &menu) override;
+         void KillConsole();
+         void CheckIfConsoleIsClosed();
+ 
+Index: src/plugins/debuggergdb/gdb_commands.h
+===================================================================
+--- src/plugins/debuggergdb/gdb_commands.h	(revision 12189)
++++ src/plugins/debuggergdb/gdb_commands.h	(revision 12190)
+@@ -232,7 +232,7 @@
+         {
+             m_Cmd << _T("directory ") << dir;
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // Output:
+             // Warning: C:\Devel\tmp\console\111: No such file or directory.
+@@ -254,7 +254,7 @@
+         {
+             m_Cmd << _T("file ") << file;
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // Output:
+             // Reading symbols from C:\Devel\tmp\console/console.exe...done.
+@@ -278,7 +278,7 @@
+         {
+             m_Cmd << _T("add-symbol-file ") << file;
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // Output:
+             //
+@@ -306,7 +306,7 @@
+         {
+             m_Cmd << _T("set args ") << args;
+         }
+-        void ParseOutput(cb_unused const wxString& output)
++        void ParseOutput(cb_unused const wxString& output) override
+         {
+             // No output
+         }
+@@ -325,7 +325,7 @@
+             m_Cmd << _T("attach ") << wxString::Format(_T("%d"), pid);
+             m_pDriver->Log(wxString::Format(_("Attaching to program with pid: %d"), pid));
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // Output:
+             // Attaching to process <pid>
+@@ -364,7 +364,7 @@
+         {
+             m_Cmd << _T("detach");
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // Output:
+             // Attaching to process <pid>
+@@ -397,7 +397,7 @@
+             if (m_BP->useCondition)
+                 m_Cmd << _T(" ") << m_BP->condition;
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             if (output.StartsWith(_T("No symbol ")))
+             {
+@@ -478,7 +478,7 @@
+                 // condition and ignore count will be set in ParseOutput, where we 'll have the bp number
+             }
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // possible outputs (we 're only interested in 1st and 2nd samples):
+             //
+@@ -564,7 +564,7 @@
+             if (m_BP->enabled)
+                 m_Cmd << _T("output &") << m_BP->breakAddress;
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // Hardware watchpoint 1: expr
+             if (output.StartsWith(_T("No symbol ")) || output.StartsWith(_T("Attempt to ")))
+@@ -605,7 +605,7 @@
+                 m_Cmd << _T("delete breakpoints ") << wxString::Format(_T("%d"), (int) bp->index);
+             }
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             if (!m_BP)
+                 return;
+@@ -643,7 +643,7 @@
+             m_Cmd = wxT("catch ") + type;
+         }
+ 
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             if (m_regExp.Matches(output))
+             {
+@@ -666,7 +666,7 @@
+         {
+         }
+ 
+-        virtual void Action()
++        void Action() override
+         {
+             m_pDriver->NotifyDebuggeeContinued();
+         }
+@@ -680,7 +680,7 @@
+         {
+         }
+ 
+-        virtual void ParseOutput(const wxString &output)
++        void ParseOutput(const wxString &output) override
+         {
+             const wxArrayString &lines = GetArrayFromString(output, _T('\n'));
+             for (size_t ii = 0; ii < lines.GetCount(); ++ii)
+@@ -710,7 +710,7 @@
+         {
+             m_Cmd << _T("info program");
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             wxString pid_str;
+             if (reInfoProgramThread.Matches(output))
+@@ -739,7 +739,7 @@
+         {
+             m_Cmd << _T("info threads");
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             m_pDriver->GetThreads().clear();
+             wxArrayString lines = GetArrayFromString(output, _T('\n'));
+@@ -831,7 +831,7 @@
+                     m_Cmd << symbol;
+             }
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             wxString w = output;
+             w.Trim(true);
+@@ -873,7 +873,7 @@
+             m_Cmd  = wxString(wxT("x /")) << wxString::FromUTF8(tmpSize) << wxT("xb ") << wxString::FromUTF8(tmpAddr);
+         }
+ 
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             wxArrayString lines = GetArrayFromString(output, _T('\n'));
+             wxString addr;
+@@ -915,7 +915,7 @@
+             m_watch->GetSymbol(symbol);
+             m_Cmd << symbol;
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // happens, when wxString is passed as const reference parameter
+             if (m_firstTry && output == wxT("Attempt to take contents of a non-pointer value."))
+@@ -988,7 +988,7 @@
+             m_Cmd << wxT("output ");
+             m_Cmd << m_What;
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             wxString contents = output;
+             contents.Trim(true);
+@@ -1044,7 +1044,7 @@
+                 m_Cmd << _T('&');
+             m_Cmd << m_What;
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // examples:
+             // type = wxString
+@@ -1087,7 +1087,7 @@
+         {
+             singleUsage = false;
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // examples:
+             // type = wxString
+@@ -1119,7 +1119,7 @@
+             else
+                 m_Cmd = wxT("info args");
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             if ((m_doLocals && output == wxT("No locals.")) || (!m_doLocals && output == wxT("No arguments.")))
+             {
+@@ -1158,7 +1158,7 @@
+         {
+             m_Cmd << _T("frame ") << frameno;
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             m_pDriver->Log(output);
+         }
+@@ -1175,7 +1175,7 @@
+         {
+             m_Cmd << _T("bt 30");
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             int validFrameNumber = -1;
+             cbStackFrame validSF;
+@@ -1321,7 +1321,7 @@
+             m_Cmd << _T("info registers");
+         };
+ 
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // output is a series of:
+             //
+@@ -1468,7 +1468,7 @@
+             else
+                 m_Cmd << wxT(" 0x") << hexAddrStr;
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // output for "disassemble" is a series of:
+             //
+@@ -1559,7 +1559,7 @@
+             m_Cmd << _T("info frame\n") << _T("end\n");
+         };
+ 
+-        void ParseOutput(const wxString& p_output)
++        void ParseOutput(const wxString& p_output) override
+         {
+             cbDisassemblyDlg *dialog = Manager::Get()->GetDebuggerManager()->GetDisassemblyDialog();
+ 
+@@ -1652,7 +1652,7 @@
+             const wxString &address = CleanStringValue(dialog->GetBaseAddress());
+             m_Cmd.Printf(_T("x/%dxb %s"), dialog->GetBytes(), address.c_str());
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             cbExamineMemoryDlg *dialog = Manager::Get()->GetDebuggerManager()->GetExamineMemoryDialog();
+ 
+@@ -1693,7 +1693,7 @@
+             m_Cmd << _T("set remotebaud ") << baud;
+             driver->Log(_("Setting serial connection speed to ") + baud);
+         }
+-        void ParseOutput(cb_unused const wxString& output)
++        void ParseOutput(cb_unused const wxString& output) override
+         {
+         }
+ };
+@@ -1738,7 +1738,7 @@
+             else
+                 m_pDriver->Log(_("Invalid settings for remote debugging!"));
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             // This command will either output an error or a breakpoint address info
+             // Connection errors are of the form:
+@@ -1802,7 +1802,7 @@
+         {
+             m_Cmd << command;
+         }
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             DebuggerManager *manager = Manager::Get()->GetDebuggerManager();
+             if (!manager->UpdateDisassembly())
+@@ -1867,7 +1867,7 @@
+         {
+         }
+ 
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             const wxArrayString &lines = GetArrayFromString(output, _T('\n'));
+             if (lines.Count() <= 2)
+@@ -1915,7 +1915,7 @@
+             m_Cmd << _T("show language");
+         }
+ 
+-        void ParseOutput(const wxString& output)
++        void ParseOutput(const wxString& output) override
+         {
+             if (output.Lower().Find(wxT("fortran")) != wxNOT_FOUND)
+                 g_DebugLanguage = dl_Fortran;
+Index: src/plugins/debuggergdb/gdb_driver.h
+===================================================================
+--- src/plugins/debuggergdb/gdb_driver.h	(revision 12189)
++++ src/plugins/debuggergdb/gdb_driver.h	(revision 12190)
+@@ -14,62 +14,62 @@
+ {
+     public:
+         GDB_driver(DebuggerGDB* plugin);
+-        virtual ~GDB_driver();
++        ~GDB_driver() override;
+ 
+-        virtual wxString GetCommandLine(const wxString& debugger,
+-                                        const wxString& debuggee,
+-                                        const wxString &userArguments);
+-        virtual wxString GetCommandLine(const wxString& debugger, int pid, const wxString &userArguments);
+-        virtual void SetTarget(ProjectBuildTarget* target);
+-        virtual void Prepare(bool isConsole, int printElements, const RemoteDebugging &remoteDebugging);
+-        virtual void Start(bool breakOnEntry);
+-        virtual void Stop();
++        wxString GetCommandLine(const wxString& debugger, const wxString& debuggee,
++                                const wxString &userArguments) override;
++        wxString GetCommandLine(const wxString& debugger, int pid,
++                                const wxString &userArguments) override;
++        void SetTarget(ProjectBuildTarget* target) override;
++        void Prepare(bool isConsole, int printElements, const RemoteDebugging &remoteDebugging) override;
++        void Start(bool breakOnEntry) override;
++        void Stop() override;
+ 
+-        virtual void Continue();
+-        virtual void Step();
+-        virtual void StepInstruction();
+-        virtual void StepIntoInstruction();
+-        virtual void StepIn();
+-        virtual void StepOut();
+-        virtual void SetNextStatement(const wxString& filename, int line);
+-        virtual void Backtrace();
+-        virtual void Disassemble();
+-        virtual void CPURegisters();
+-        virtual void SwitchToFrame(size_t number);
+-        virtual void SetVarValue(const wxString& var, const wxString& value);
+-        virtual void SetMemoryRangeValue(uint64_t addr, const wxString& value);
+-        virtual void MemoryDump();
+-        virtual void Attach(int pid);
+-        virtual void Detach();
+-        virtual void RunningThreads();
++        void Continue() override;
++        void Step() override;
++        void StepInstruction() override;
++        void StepIntoInstruction() override;
++        void StepIn() override;
++        void StepOut() override;
++        void SetNextStatement(const wxString& filename, int line) override;
++        void Backtrace() override;
++        void Disassemble() override;
++        void CPURegisters() override;
++        void SwitchToFrame(size_t number) override;
++        void SetVarValue(const wxString& var, const wxString& value) override;
++        void SetMemoryRangeValue(uint64_t addr, const wxString& value) override;
++        void MemoryDump() override;
++        void Attach(int pid) override;
++        void Detach() override;
++        void RunningThreads() override;
+ 
+-        void InfoFrame();
+-        void InfoDLL();
+-        void InfoFiles();
+-        void InfoFPU();
+-        void InfoSignals();
++        void InfoFrame() override;
++        void InfoDLL() override;
++        void InfoFiles() override;
++        void InfoFPU() override;
++        void InfoSignals() override;
+ 
+-        void EnableCatchingThrow(bool enable);
++        void EnableCatchingThrow(bool enable) override;
+ 
+-        virtual void SwitchThread(size_t threadIndex);
++        void SwitchThread(size_t threadIndex) override;
+ 
+-        virtual void AddBreakpoint(cb::shared_ptr<DebuggerBreakpoint> bp);
+-        virtual void RemoveBreakpoint(cb::shared_ptr<DebuggerBreakpoint> bp);
+-        virtual void EvaluateSymbol(const wxString& symbol, const wxRect& tipRect);
+-        virtual void UpdateWatches(cb::shared_ptr<GDBWatch> localsWatch,
+-                                   cb::shared_ptr<GDBWatch> funcArgsWatch,
+-                                   WatchesContainer &watches, bool ignoreAutoUpdate);
+-        virtual void UpdateMemoryRangeWatches(MemoryRangeWatchesContainer &watches,
+-                                              bool ignoreAutoUpdate);
+-        virtual void UpdateWatch(const cb::shared_ptr<GDBWatch> &watch);
+-        virtual void UpdateMemoryRangeWatch(const cb::shared_ptr<GDBMemoryRangeWatch> &watch);
+-        virtual void UpdateWatchLocalsArgs(cb::shared_ptr<GDBWatch> const &watch, bool locals);
+-        virtual void ParseOutput(const wxString& output);
+-        virtual bool IsDebuggingStarted() const { return m_IsStarted; }
++        void AddBreakpoint(cb::shared_ptr<DebuggerBreakpoint> bp) override;
++        void RemoveBreakpoint(cb::shared_ptr<DebuggerBreakpoint> bp) override;
++        void EvaluateSymbol(const wxString& symbol, const wxRect& tipRect) override;
++        void UpdateWatches(cb::shared_ptr<GDBWatch> localsWatch,
++                           cb::shared_ptr<GDBWatch> funcArgsWatch, WatchesContainer &watches,
++                           bool ignoreAutoUpdate) override;
++        void UpdateMemoryRangeWatches(MemoryRangeWatchesContainer &watches,
++                                      bool ignoreAutoUpdate) override;
++        void UpdateWatch(const cb::shared_ptr<GDBWatch> &watch) override;
++        void UpdateMemoryRangeWatch(const cb::shared_ptr<GDBMemoryRangeWatch> &watch) override;
++        void UpdateWatchLocalsArgs(cb::shared_ptr<GDBWatch> const &watch, bool locals) override;
++        void ParseOutput(const wxString& output) override;
++        bool IsDebuggingStarted() const override { return m_IsStarted; }
+ 
+-        virtual void DetermineLanguage();
++        void DetermineLanguage() override;
+ #ifdef __WXMSW__
+-        virtual bool UseDebugBreakProcess();
++        bool UseDebugBreakProcess() override;
+ #endif
+         virtual wxString GetDisassemblyFlavour(void);
+ 
+Index: src/plugins/occurrenceshighlighting/occurrenceshighlightingconfigurationpanel.h
+===================================================================
+--- src/plugins/occurrenceshighlighting/occurrenceshighlightingconfigurationpanel.h	(revision 12189)
++++ src/plugins/occurrenceshighlighting/occurrenceshighlightingconfigurationpanel.h	(revision 12190)
+@@ -17,16 +17,16 @@
+ {
+ public:
+     OccurrencesHighlightingConfigurationPanel(wxWindow* parent);
+-    virtual ~OccurrencesHighlightingConfigurationPanel();
++    ~OccurrencesHighlightingConfigurationPanel() override;
+ 
+     /// @return the panel's title.
+-    virtual wxString GetTitle() const;
++    wxString GetTitle() const override;
+     /// @return the panel's bitmap base name. You must supply two bitmaps: \<basename\>.png and \<basename\>-off.png...
+-    virtual wxString GetBitmapBaseName() const;
++    wxString GetBitmapBaseName() const override;
+     /// Called when the user chooses to apply the configuration.
+-    virtual void OnApply();
++    void OnApply() override;
+     /// Called when the user chooses to cancel the configuration.
+-    virtual void OnCancel();
++    void OnCancel() override;
+ 
+ private:
+     void OnChooseColour(wxCommandEvent& event);
+Index: src/plugins/openfileslist/openfileslistplugin.h
+===================================================================
+--- src/plugins/openfileslist/openfileslistplugin.h	(revision 12189)
++++ src/plugins/openfileslist/openfileslistplugin.h	(revision 12190)
+@@ -38,14 +38,14 @@
+ {
+     public:
+         OpenFilesListPlugin();
+-        virtual ~OpenFilesListPlugin();
++        ~OpenFilesListPlugin() override;
+ 
+-        virtual int GetConfigurationGroup() const { return cgEditor; }
++        int GetConfigurationGroup() const override { return cgEditor; }
+ 
+-        virtual void BuildMenu(wxMenuBar* menuBar);
++        void BuildMenu(wxMenuBar* menuBar) override;
+ 
+-        virtual void OnAttach();
+-        virtual void OnRelease(bool appShutDown);
++        void OnAttach() override;
++        void OnRelease(bool appShutDown) override;
+     protected:
+         int GetOpenFilesListIcon(EditorBase* ed);
+         void RebuildOpenFilesTree();
+Index: src/plugins/projectsimporter/projectsimporter.h
+===================================================================
+--- src/plugins/projectsimporter/projectsimporter.h	(revision 12189)
++++ src/plugins/projectsimporter/projectsimporter.h	(revision 12190)
+@@ -12,11 +12,11 @@
+ {
+     public:
+         ProjectsImporter();
+-        ~ProjectsImporter();
+-        bool HandlesEverything() const { return false; }
+-        bool CanHandleFile(const wxString& filename) const;
+-        int OpenFile(const wxString& filename);
+-        void BuildMenu(wxMenuBar* menuBar);
++        ~ProjectsImporter() override;
++        bool HandlesEverything() const override { return false; }
++        bool CanHandleFile(const wxString& filename) const override;
++        int OpenFile(const wxString& filename) override;
++        void BuildMenu(wxMenuBar* menuBar) override;
+     private:
+         int LoadProject(const wxString& filename);
+         int LoadWorkspace(const wxString& filename);
+Index: src/plugins/scriptedwizard/wiz.h
+===================================================================
+--- src/plugins/scriptedwizard/wiz.h	(revision 12189)
++++ src/plugins/scriptedwizard/wiz.h	(revision 12190)
+@@ -39,7 +39,7 @@
+ {
+ 	public:
+ 		Wiz();
+-		~Wiz();
++		~Wiz() override;
+ 
+         Wiz& operator=(cb_unused const Wiz& rhs)  // prevent assignment operator
+         {
+@@ -47,14 +47,14 @@
+         	return *this;
+ 		}
+ 
+-		int GetCount() const;
+-        TemplateOutputType GetOutputType(int index) const;
+-		wxString GetTitle(int index) const;
+-		wxString GetDescription(int index) const;
+-		wxString GetCategory(int index) const;
+-		const wxBitmap& GetBitmap(int index) const;
+-        wxString GetScriptFilename(int index) const;
+-		CompileTargetBase* Launch(int index, wxString* pFilename = 0);
++		int GetCount() const override;
++        TemplateOutputType GetOutputType(int index) const override;
++		wxString GetTitle(int index) const override;
++		wxString GetDescription(int index) const override;
++		wxString GetCategory(int index) const override;
++		const wxBitmap& GetBitmap(int index) const override;
++        wxString GetScriptFilename(int index) const override;
++		CompileTargetBase* Launch(int index, wxString* pFilename = 0) override;
+ 
+ 		CompileTargetBase* RunProjectWizard(wxString* pFilename); // called by Launch() for otProject wizards
+ 		CompileTargetBase* RunTargetWizard(wxString* pFilename); // called by Launch() for otTarget wizards (always returns NULL)
+@@ -171,7 +171,7 @@
+         void RegisterWizard();
+         wxString FindTemplateFile(const wxString& filename);
+ 	protected:
+-        void OnAttach();
++        void OnAttach() override;
+         void Clear();
+         void CopyFiles(cbProject* theproject, const wxString&  prjdir, const wxString& srcdir);
+         wxString GenerateFile(const wxString& basePath, const wxString& filename, const wxString& contents);
+Index: src/plugins/todo/todolistview.h
+===================================================================
+--- src/plugins/todo/todolistview.h	(revision 12189)
++++ src/plugins/todo/todolistview.h	(revision 12190)
+@@ -76,8 +76,8 @@
+ {
+     public:
+         ToDoListView(const wxArrayString& titles, const wxArrayInt& widths, const wxArrayString& types);
+-        ~ToDoListView();
+-        virtual wxWindow* CreateControl(wxWindow* parent);
++        ~ToDoListView() override;
++        wxWindow* CreateControl(wxWindow* parent) override;
+         void DestroyControls(bool control);
+ 
+         // parse all the sources
+Index: src/src/app.cpp
+===================================================================
+--- src/src/app.cpp	(revision 12189)
++++ src/src/app.cpp	(revision 12190)
+@@ -319,7 +319,7 @@
+ public:
+ 
+ #if wxCHECK_VERSION(3, 0, 0)
+-    virtual void Output(const wxString &str);
++    virtual void Output(const wxString &str) override;
+ #else
+     #ifdef WX_ATTRIBUTE_PRINTF
+     virtual void Printf(const wxChar* format, ...)  WX_ATTRIBUTE_PRINTF_2;
+Index: src/src/app.h
+===================================================================
+--- src/src/app.h	(revision 12189)
++++ src/src/app.h	(revision 12190)
+@@ -107,9 +107,9 @@
+ class CodeBlocksApp : public wxApp
+ {
+     public:
+-        virtual bool OnInit();
+-        virtual int OnExit();
+-        virtual int OnRun();
++        bool OnInit() override;
++        int OnExit() override;
++        int OnRun() override;
+         wxString GetAppPath() const;
+         int ParseCmdLine(MainFrame* handlerFrame, const wxString& CmdLine = wxEmptyString);
+         #if wxCHECK_VERSION(3,0,0)
+@@ -116,8 +116,8 @@
+         void OnCloseBatchBuildWindow(wxCloseEvent& evt);
+         #endif // wxCHECK_VERSION
+         void OnAppActivate(wxActivateEvent& event);
+-        bool OnCmdLineParsed(wxCmdLineParser& parser);
+-        void OnFatalException();
++        bool OnCmdLineParsed(wxCmdLineParser& parser) override;
++        void OnFatalException() override;
+         void LoadDelayedFiles(MainFrame* frame); // command line or DDE (if available) files
+         void SetAutoFile(wxString& file); // method to set m_AutoFile
+         void AttachDebugger();
+Index: src/src/batchbuild.h
+===================================================================
+--- src/src/batchbuild.h	(revision 12189)
++++ src/src/batchbuild.h	(revision 12190)
+@@ -23,7 +23,7 @@
+             size.SetHeight(Manager::Get()->GetConfigManager(_T("message_manager"))->ReadInt(_T("/batch_build_log/height"), wxDefaultSize.GetHeight()));
+             SetSize(size);
+         }
+-        void EndModal(int retCode)
++        void EndModal(int retCode) override
+         {
+             // allowed to close?
+             // find compiler plugin
+Index: src/src/editorconfigurationdlg.h
+===================================================================
+--- src/src/editorconfigurationdlg.h	(revision 12189)
++++ src/src/editorconfigurationdlg.h	(revision 12190)
+@@ -48,7 +48,7 @@
+         void OnCaretStyle(wxCommandEvent& event);
+         void OnUpdateUIFontQuality(wxUpdateUIEvent& event);
+ 
+-        void EndModal(int retCode);
++        void EndModal(int retCode) override;
+     private:
+         void OnPageChanging(wxListbookEvent& event);
+         void OnPageChanged(wxListbookEvent& event);
+Index: src/src/environmentsettingsdlg.h
+===================================================================
+--- src/src/environmentsettingsdlg.h	(revision 12189)
++++ src/src/environmentsettingsdlg.h	(revision 12190)
+@@ -19,8 +19,8 @@
+ {
+     public:
+ 		EnvironmentSettingsDlg(wxWindow* parent, wxAuiDockArt* art);
+-		virtual ~EnvironmentSettingsDlg();
+-		virtual void EndModal(int retCode);
++		~EnvironmentSettingsDlg() override;
++		void EndModal(int retCode) override;
+ 
+     public:
+         // From cbConfigurationPanelColoursInterface
+Index: src/src/examinememorydlg.h
+===================================================================
+--- src/src/examinememorydlg.h	(revision 12189)
++++ src/src/examinememorydlg.h	(revision 12190)
+@@ -16,19 +16,19 @@
+     public:
+         ExamineMemoryDlg(wxWindow* parent);
+ 
+-        wxWindow* GetWindow() { return this; }
++        wxWindow* GetWindow() override { return this; }
+ 
+         // used for Freeze()/Thaw() calls
+-        void Begin();
+-        void End();
++        void Begin() override;
++        void End() override;
+ 
+-        void Clear();
+-        wxString GetBaseAddress();
+-        void SetBaseAddress(const wxString &addr);
+-        int GetBytes();
+-        void AddError(const wxString& err);
+-        void AddHexByte(const wxString& addr, const wxString& hexbyte);
+-        void EnableWindow(bool enable);
++        void Clear() override;
++        wxString GetBaseAddress() override;
++        void SetBaseAddress(const wxString &addr) override;
++        int GetBytes() override;
++        void AddError(const wxString& err) override;
++        void AddHexByte(const wxString& addr, const wxString& hexbyte) override;
++        void EnableWindow(bool enable) override;
+     protected:
+         void OnGo(wxCommandEvent& event);
+ 
+Index: src/src/notebookstyles.h
+===================================================================
+--- src/src/notebookstyles.h	(revision 12189)
++++ src/src/notebookstyles.h	(revision 12190)
+@@ -28,15 +28,15 @@
+ {
+ public:
+     NbStyleVC71();
+-    wxAuiTabArt* Clone();
++    wxAuiTabArt* Clone() override;
+ 
+     void DrawTab(wxDC& dc, wxWindow* wnd, const wxAuiNotebookPage& page,
+                         const wxRect& in_rect, int close_button_state,
+                         wxRect* out_tab_rect, wxRect* out_button_rect,
+-                        int* x_extent);
++                        int* x_extent) override;
+ 
+     int GetBestTabCtrlSize(wxWindow* wnd, const wxAuiNotebookPageArray& pages,
+-                            const wxSize& required_bmp_size);
++                            const wxSize& required_bmp_size) override;
+ };
+ 
+ class NbStyleFF2 : public wxAuiDefaultTabArt
+@@ -43,14 +43,14 @@
+ {
+ public:
+     NbStyleFF2();
+-    wxAuiTabArt* Clone();
++    wxAuiTabArt* Clone() override;
+     void DrawTab(wxDC& dc, wxWindow* wnd, const wxAuiNotebookPage& page,
+                         const wxRect& in_rect, int close_button_state,
+                         wxRect* out_tab_rect, wxRect* out_button_rect,
+-                        int* x_extent);
++                        int* x_extent) override;
+ 
+     int GetBestTabCtrlSize(wxWindow* wnd, const wxAuiNotebookPageArray& pages,
+-                            const wxSize& required_bmp_size);
++                            const wxSize& required_bmp_size) override;
+ };
+ 
+ #if defined(__WXGTK__) && (USE_GTK_NOTEBOOK) && !wxCHECK_VERSION(3, 0, 0)
+Index: src/src/projectoptionsdlg.h
+===================================================================
+--- src/src/projectoptionsdlg.h	(revision 12189)
++++ src/src/projectoptionsdlg.h	(revision 12190)
+@@ -23,9 +23,9 @@
+         // class constructor
+         ProjectOptionsDlg(wxWindow* parent, cbProject* project);
+         // class destructor
+-        ~ProjectOptionsDlg();
++        ~ProjectOptionsDlg() override;
+ 
+-        void EndModal(int retCode);
++        void EndModal(int retCode) override;
+         void OnFileOptionsClick(wxCommandEvent& event);
+         void OnFileToggleMarkClick(wxCommandEvent& event);
+         void OnFileMarkOnClick(wxCommandEvent& event);
+Index: src/src/startherepage.h
+===================================================================
+--- src/src/startherepage.h	(revision 12189)
++++ src/src/startherepage.h	(revision 12190)
+@@ -23,10 +23,10 @@
+     public:
+         StartHerePage(wxEvtHandler* owner, const RecentItemsList &projects,
+                       const RecentItemsList &files, wxWindow* parent);
+-        virtual ~StartHerePage();
++        ~StartHerePage() override;
+ 
+         bool LinkClicked(const wxHtmlLinkInfo& link);
+-        virtual bool VisibleToTree() const { return false; }
++        bool VisibleToTree() const override { return false; }
+         void Reload();
+     private:
+         void RegisterColours();

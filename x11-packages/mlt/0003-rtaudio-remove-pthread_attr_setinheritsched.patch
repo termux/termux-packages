@@ -1,0 +1,34 @@
+diff --git a/src/modules/rtaudio/RtAudio.cpp b/src/modules/rtaudio/RtAudio.cpp
+index bd597ef..dc64863 100644
+--- a/src/modules/rtaudio/RtAudio.cpp
++++ b/src/modules/rtaudio/RtAudio.cpp
+@@ -8636,7 +8636,9 @@ bool RtApiAlsa :: probeDeviceOpen( unsigned int deviceId, StreamMode mode, unsig
+       pthread_attr_setschedpolicy(&attr, SCHED_RR);
+       pthread_attr_setscope (&attr, PTHREAD_SCOPE_SYSTEM);
+       // This is definitely required. Otherwise it fails.
++#if !defined __ANDROID__ || __ANDROID_API__ >= 28
+       pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED);
++#endif
+       pthread_attr_setschedparam(&attr, &param);
+     }
+     else
+@@ -9602,7 +9604,9 @@ bool RtApiPulse::probeDeviceOpen( unsigned int deviceId, StreamMode mode,
+       pthread_attr_setschedpolicy(&attr, SCHED_RR);
+       pthread_attr_setscope (&attr, PTHREAD_SCOPE_SYSTEM);
+       // This is definitely required. Otherwise it fails.
++#if !defined __ANDROID__ || __ANDROID_API__ >= 28
+       pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED);
++#endif
+       pthread_attr_setschedparam(&attr, &param);
+     }
+     else
+@@ -10454,7 +10458,9 @@ bool RtApiOss :: probeDeviceOpen( unsigned int deviceId, StreamMode mode, unsign
+       pthread_attr_setschedpolicy(&attr, SCHED_RR);
+       pthread_attr_setscope (&attr, PTHREAD_SCOPE_SYSTEM);
+       // This is definitely required. Otherwise it fails.
++#if !defined __ANDROID__ || __ANDROID_API__ >= 28
+       pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED);
++#endif
+       pthread_attr_setschedparam(&attr, &param);
+     }
+     else

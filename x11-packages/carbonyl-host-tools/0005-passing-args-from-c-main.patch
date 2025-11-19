@@ -1,0 +1,156 @@
+
+--- a/src/browser/bridge.rs
++++ b/src/browser/bridge.rs
+@@ -44,6 +44,11 @@
+     rect: CRect,
+     color: CColor,
+ }
++#[repr(C)]
++#[derive(Copy, Clone)]
++pub struct InitArg {
++    arg: *const c_char,
++}
+ 
+ #[repr(C)]
+ pub struct RendererBridge {
+@@ -103,8 +108,8 @@
+     post_task: extern "C" fn(extern "C" fn(*mut c_void), *mut c_void),
+ }
+ 
+-fn main() -> io::Result<Option<i32>> {
+-    let cmd = match CommandLineProgram::parse_or_run() {
++fn main(args: Vec<String>) -> io::Result<Option<i32>> {
++    let cmd = match CommandLineProgram::parse_or_run(args) {
+         None => return Ok(Some(0)),
+         Some(cmd) => cmd,
+     };
+@@ -142,8 +147,22 @@
+ }
+ 
+ #[no_mangle]
+-pub extern "C" fn carbonyl_bridge_main() {
+-    if let Some(code) = main().unwrap() {
++pub extern "C" fn carbonyl_bridge_main(
++    args: *const InitArg,
++    argc: size_t,
++) {
++    // Parse Vec<String> from params
++    let args = unsafe { std::slice::from_raw_parts(args, argc) };
++    let args = args.iter()
++        .skip(1)
++        .map(|arg| {
++            let str = unsafe { CStr::from_ptr(arg.arg) };
++
++            str.to_str().unwrap().to_owned()
++        })
++        .collect::<Vec<String>>();
++
++    if let Some(code) = main(args).unwrap() {
+         std::process::exit(code)
+     }
+ }
+--- a/src/cli/cli.rs
++++ b/src/cli/cli.rs
+@@ -1,4 +1,5 @@
+ use std::{env, ffi::OsStr};
++use std::sync::OnceLock;
+ 
+ use super::CommandLineProgram;
+ 
+@@ -35,7 +36,17 @@
+     }
+ }
+ 
++static INIT: OnceLock<Vec<String>> = OnceLock::new();
++
+ impl CommandLine {
++    pub fn set_args(args: Vec<String>) {
++        INIT.get_or_init(|| { args });
++    }
++
++    pub fn get_args() -> Vec<String> {
++        INIT.get_or_init(|| Vec::new()).to_vec()
++    }
++
+     pub fn parse() -> CommandLine {
+         let mut fps = 60.0;
+         let mut zoom = 1.0;
+@@ -43,7 +54,7 @@
+         let mut bitmap = false;
+         let mut shell_mode = false;
+         let mut program = CommandLineProgram::Main;
+-        let args = env::args().skip(1).collect::<Vec<String>>();
++        let args = Self::get_args();
+ 
+         for arg in &args {
+             let split: Vec<&str> = arg.split("=").collect();
+--- a/src/cli/program.rs
++++ b/src/cli/program.rs
+@@ -8,7 +8,8 @@
+ }
+ 
+ impl CommandLineProgram {
+-    pub fn parse_or_run() -> Option<CommandLine> {
++    pub fn parse_or_run(args: Vec<String>) -> Option<CommandLine> {
++        CommandLine::set_args(args);
+         let cmd = CommandLine::parse();
+ 
+         match cmd.program {
+--- a/src/browser/renderer.h
++++ b/src/browser/renderer.h
+@@ -47,7 +47,7 @@
+ 
+ class CARBONYL_RENDERER_EXPORT Renderer {
+ public:
+-    static void Main();
++    static void Main(int argc, const char** argv);
+     static Renderer* GetCurrent();
+ 
+     gfx::Size GetSize();
+--- a/src/browser/renderer.cc
++++ b/src/browser/renderer.cc
+@@ -34,8 +34,14 @@
+     carbonyl_renderer_rect rect;
+     carbonyl_renderer_color color;
+ };
++struct carbonyl_init_arg {
++    const char *arg;
++};
+ 
+-void carbonyl_bridge_main();
++void carbonyl_bridge_main(
++    const struct carbonyl_init_arg* args,
++    size_t argc
++);
+ bool carbonyl_bridge_bitmap_mode();
+ float carbonyl_bridge_get_dpi();
+ 
+@@ -71,8 +77,15 @@
+ 
+ Renderer::Renderer(struct carbonyl_renderer* ptr): ptr_(ptr) {}
+ 
+-void Renderer::Main() {
+-    carbonyl_bridge_main();
++void Renderer::Main(int argc, const char** argv) {
++    if (argc < 0) {
++        argc = 0;
++    }
++    struct carbonyl_init_arg args[argc];
++    for (int i = 0; i < argc; ++i) {
++        args[i].arg = argv[i];
++    }
++    carbonyl_bridge_main(args, (size_t) argc);
+ 
+     Bridge::Configure(
+         carbonyl_bridge_get_dpi(),
+--- a/chromium/src/headless/app/headless_shell_main.cc
++++ b/chromium/src/headless/app/headless_shell_main.cc
+@@ -17,7 +17,7 @@
+ #include "carbonyl/src/browser/renderer.h"
+ 
+ int main(int argc, const char** argv) {
+-  carbonyl::Renderer::Main();
++  carbonyl::Renderer::Main(argc, argv);
+ 
+   content::ContentMainParams params(nullptr);
+ #if BUILDFLAG(IS_WIN)

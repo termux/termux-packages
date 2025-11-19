@@ -1,0 +1,24 @@
+diff '--color=auto' -uNr libmatekbd-1.25.0/libmatekbd/Makefile.am libmatekbd-1.25.0.mod/libmatekbd/Makefile.am
+--- libmatekbd-1.25.0/libmatekbd/Makefile.am	2020-08-18 19:01:05.000000000 +0530
++++ libmatekbd-1.25.0.mod/libmatekbd/Makefile.am	2021-05-18 17:58:05.559082493 +0530
+@@ -103,7 +103,7 @@
+ 
+ DISTCLEANFILES = $(gsettings_SCHEMAS)
+ 
+-GLIB_GENMARSHAL = $(shell pkg-config --variable=glib_genmarshal glib-2.0)
++GLIB_GENMARSHAL = glib-genmarshal
+ 
+ matekbd-indicator-marshal.h: matekbd-indicator-marshal.list
+ 	$(AM_V_GEN)$(GLIB_GENMARSHAL) --prefix=matekbd_indicator $(srcdir)/matekbd-indicator-marshal.list --header > $@
+diff '--color=auto' -uNr libmatekbd-1.25.0/libmatekbd/Makefile.in libmatekbd-1.25.0.mod/libmatekbd/Makefile.in
+--- libmatekbd-1.25.0/libmatekbd/Makefile.in	2020-08-18 19:03:11.000000000 +0530
++++ libmatekbd-1.25.0.mod/libmatekbd/Makefile.in	2021-05-18 17:59:00.295082496 +0530
+@@ -531,7 +531,7 @@
+ 	$(NULL)
+ 
+ DISTCLEANFILES = $(gsettings_SCHEMAS)
+-GLIB_GENMARSHAL = $(shell pkg-config --variable=glib_genmarshal glib-2.0)
++GLIB_GENMARSHAL = glib-genmarshal
+ INTROSPECTION_GIRS = Matekbd-1.0.gir
+ INTROSPECTION_SCANNER_ARGS = --add-include-path=$(srcdir) --warn-all
+ INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)

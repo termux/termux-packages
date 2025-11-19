@@ -1,0 +1,60 @@
+diff --git a/main.c b/main.c
+index 4776f07..f159ee5 100644
+--- a/main.c
++++ b/main.c
+@@ -45,7 +45,7 @@
+ #include <time.h>
+ #include <fcntl.h>
+ 
+-#ifdef HAVE_EXECINFO_H
++#if defined(HAVE_EXECINFO_H) && !defined(__ANDROID__)
+ #include <execinfo.h>
+ #endif
+ #include <signal.h>
+@@ -173,6 +173,8 @@ char *get_home_directory (void) {
+   if (!str_empty (home_directory)) { return home_directory = tstrdup (home_directory); }
+   home_directory = getenv("HOME");
+   if (!str_empty (home_directory)) { return home_directory = tstrdup (home_directory); }
++
++#ifndef __ANDROID__
+   struct passwd *current_passwd;
+   uid_t user_id;
+   setpwent ();
+@@ -185,6 +187,9 @@ char *get_home_directory (void) {
+   }
+   endpwent ();
+   if (str_empty (home_directory)) { home_directory = tstrdup ("."); }
++#else
++  home_directory = tstrdup ("@TERMUX_HOME@");
++#endif
+   return home_directory;
+ }
+ 
+@@ -552,6 +557,9 @@ int accept_any_tcp;
+ char *bot_hash;
+ 
+ int change_user_group () {
++#ifdef __ANDROID__
++  return 0;
++#endif
+   char *username = set_user_name;
+   char *groupname = set_group_name;
+   struct passwd *pw;
+@@ -798,7 +806,7 @@ void args_parse (int argc, char **argv) {
+   }
+ }
+ 
+-#ifdef HAVE_EXECINFO_H
++#if defined(HAVE_EXECINFO_H) && !defined(__ANDROID__)
+ void print_backtrace (void) {
+   void *buffer[255];
+   const int calls = backtrace (buffer, sizeof (buffer) / sizeof (void *));
+@@ -993,7 +1001,7 @@ int main (int argc, char **argv) {
+   #ifdef __FreeBSD__
+   tgl_set_rsa_key (TLS, "/usr/local/etc/" PROG_NAME "/server.pub");
+   #else
+-  tgl_set_rsa_key (TLS, "/etc/" PROG_NAME "/server.pub");
++  tgl_set_rsa_key (TLS, "@TERMUX_PREFIX@/etc/" PROG_NAME "/server.pub");
+   #endif
+   tgl_set_rsa_key (TLS, "tg-server.pub");
+ 

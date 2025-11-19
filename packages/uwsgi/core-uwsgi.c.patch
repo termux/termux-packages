@@ -1,0 +1,12 @@
+diff -uNr uwsgi-2.0.25.1/core/uwsgi.c uwsgi-2.0.25.1.mod/core/uwsgi.c
+--- uwsgi-2.0.25.1/core/uwsgi.c	2024-04-15 22:43:55.000000000 +0300
++++ uwsgi-2.0.25.1.mod/core/uwsgi.c	2024-04-17 13:58:37.488293121 +0300
+@@ -2690,7 +2692,7 @@
+ #ifdef __APPLE__
+ 			uwsgi_string_new_list(&uwsgi.mime_file, "/etc/apache2/mime.types");
+ #else
+-			uwsgi_string_new_list(&uwsgi.mime_file, "/etc/mime.types");
++			uwsgi_string_new_list(&uwsgi.mime_file, "@TERMUX_PREFIX@/etc/mime.types");
+ #endif
+ 		struct uwsgi_string_list *umd = uwsgi.mime_file;
+ 		while (umd) {

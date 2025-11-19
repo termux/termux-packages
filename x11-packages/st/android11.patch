@@ -1,0 +1,30 @@
+diff -uNr st-0.8.4/x.c st-0.8.4.mod/x.c
+--- st-0.8.4/x.c	2020-06-19 12:29:45.000000000 +0300
++++ st-0.8.4.mod/x.c	2021-08-19 22:20:11.807595168 +0300
+@@ -15,6 +15,9 @@
+ #include <X11/Xft/Xft.h>
+ #include <X11/XKBlib.h>
+ 
++#include <stdbool.h>
++#include <dlfcn.h>
++
+ char *argv0;
+ #include "arg.h"
+ #include "st.h"
+@@ -1980,6 +1983,16 @@
+ int
+ main(int argc, char *argv[])
+ {
++	void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++	if (lib_handle) {
++		bool (*android_mallopt)(int opcode, void* arg, size_t arg_size) = dlsym(lib_handle, "android_mallopt");
++		if (android_mallopt) {
++			int android_malloc_tag_level = 0;
++			android_mallopt(8, &android_malloc_tag_level, sizeof(android_malloc_tag_level));
++		}
++		dlclose(lib_handle);
++	}
++
+ 	xw.l = xw.t = 0;
+ 	xw.isfixed = False;
+ 	xsetcursor(cursorshape);

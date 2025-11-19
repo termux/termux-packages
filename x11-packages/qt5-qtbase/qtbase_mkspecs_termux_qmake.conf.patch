@@ -1,0 +1,35 @@
+diff -uNr qtbase/mkspecs/termux/qmake.conf qtbase.mod/mkspecs/termux/qmake.conf
+--- qtbase/mkspecs/termux/qmake.conf	1970-01-01 03:00:00.000000000 +0300
++++ qtbase.mod/mkspecs/termux/qmake.conf	2018-09-21 16:26:18.042253449 +0300
+@@ -0,0 +1,31 @@
++QT_QPA_DEFAULT_PLATFORM = xcb
++
++MAKEFILE_GENERATOR      = UNIX
++CONFIG                 += incremental
++QMAKE_INCREMENTAL_STYLE = sublib
++
++include(../common/linux.conf)
++include(../common/gcc-base-unix.conf)
++include(../common/clang.conf)
++
++QMAKE_CC                = clang
++QMAKE_CXX               = clang++
++QMAKE_LINK              = $${QMAKE_CXX}
++QMAKE_LINK_SHLIB        = $${QMAKE_CXX}
++QMAKE_AR                = ar cqs
++QMAKE_NM                = nm -P
++QMAKE_OBJCOPY           = objcopy
++QMAKE_PKG_CONFIG        = pkg-config
++QMAKE_STRIP             = strip
++
++QMAKE_CFLAGS           += -I@TERMUX_PREFIX@/include
++QMAKE_CXXFLAGS         += -I@TERMUX_PREFIX@/include
++QMAKE_LFLAGS           += -L@TERMUX_PREFIX@/lib
++QMAKE_LFLAGS_SHLIB     += -shared
++QMAKE_LFLAGS_PLUGIN    += -shared
++
++## Should be -lpthread, but Termux does not provide
++## libpthread.so library.
++QMAKE_LIBS_THREAD       =
++
++load(qt_config)

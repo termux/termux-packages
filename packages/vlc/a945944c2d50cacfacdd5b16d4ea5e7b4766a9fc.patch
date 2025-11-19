@@ -1,0 +1,46 @@
+From a945944c2d50cacfacdd5b16d4ea5e7b4766a9fc Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 16 Dec 2024 09:28:55 +0100
+Subject: [PATCH] nfs: fix libnfs API v2 support
+
+Introduced in libnfs 6.0.0.
+
+Co-authored-by: ronnie sahlberg <ronniesahlberg@gmail.com>
+Co-authored-by: Thomas Guillem <thomas@gllm.fr>
+---
+ modules/access/nfs.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/modules/access/nfs.c b/modules/access/nfs.c
+index f164cda86499..3510c3fe1f14 100644
+--- a/modules/access/nfs.c
++++ b/modules/access/nfs.c
+@@ -188,7 +188,8 @@ nfs_read_cb(int i_status, struct nfs_context *p_nfs, void *p_data,
+     else
+     {
+         p_sys->res.read.i_len = i_status;
+-        memcpy(p_sys->res.read.p_buf, p_data, i_status);
++        if (p_sys->res.read.p_buf != NULL && p_data != NULL)
++            memcpy(p_sys->res.read.p_buf, p_data, i_status);
+     }
+ }
+ 
+@@ -208,9 +209,15 @@ FileRead(stream_t *p_access, void *p_buf, size_t i_len)
+         return 0;
+ 
+     p_sys->res.read.i_len = 0;
++#ifdef LIBNFS_API_V2
++    p_sys->res.read.p_buf = NULL;
++    if (nfs_read_async(p_sys->p_nfs, p_sys->p_nfsfh, p_buf, i_len, nfs_read_cb,
++                       p_access) < 0)
++#else
+     p_sys->res.read.p_buf = p_buf;
+     if (nfs_read_async(p_sys->p_nfs, p_sys->p_nfsfh, i_len, nfs_read_cb,
+                        p_access) < 0)
++#endif
+     {
+         msg_Err(p_access, "nfs_read_async failed");
+         return 0;
+-- 
+GitLab
+

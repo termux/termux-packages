@@ -1,0 +1,23 @@
+--- a/zmodem_act.c
++++ b/zmodem_act.c
+@@ -113,6 +113,9 @@
+ char	**av;
+ int	master;
+ {
++   char cmd[10] = "l";
++   strncat(cmd, av[0], sizeof(cmd)-1);
++   if (!sfork(&gl_child_rz))
+    tcsetattr(gl_slave, TCSAFLUSH, &gl_rtt);
+    if (!sfork(&gl_child_rz))
+    {
+@@ -120,8 +123,8 @@
+       signal(SIGWINCH,SIG_DFL);
+       dup2(master,0);
+       dup2(master,1);
+-      execvp(av[0],av);
+-      error("error: execvp %s\n",av[0]);
++      execvp(cmd,av);
++      error("error: execvp %s\n",cmd);
+       exit (1);
+    }
+ #ifdef DEBUG

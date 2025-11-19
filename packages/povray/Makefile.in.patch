@@ -1,0 +1,42 @@
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -429,8 +429,6 @@
+ povlibdir = @datadir@/@PACKAGE@-@VERSION_BASE@
+ povdocdir = @datadir@/doc/@PACKAGE@-@VERSION_BASE@
+ povconfdir = @sysconfdir@/@PACKAGE@/@VERSION_BASE@
+-povuser = $(HOME)/.@PACKAGE@
+-povconfuser = $(povuser)/@VERSION_BASE@
+ povinstall = $(top_builddir)/install.log
+ 
+ # Directories to build.
+@@ -1127,19 +1125,6 @@
+ 	for f in $$filelist ; do \
+ 	  $(INSTALL_DATA) $(top_srcdir)/doc/$$f $(DESTDIR)$(povdocdir)/$$f && echo "$(DESTDIR)$(povdocdir)/$$f" >> $(povinstall); \
+ 	done
+-	@echo "Creating user directories..."; \
+-	for p in $(povuser) $(povconfuser) ; do \
+-	  $(mkdir_p) $$p && chown $(povowner) $$p && chgrp $(povgroup) $$p && printf "%s\n" "$$p" "`cat $(povinstall)`" > $(povinstall); \
+-	done
+-	@echo "Copying user configuration and INI files..."; \
+-	for f in povray.conf povray.ini ; do \
+-	  if test -f $(povconfuser)/$$f; then \
+-	    echo "Creating backup of $(povconfuser)/$$f"; \
+-	    mv -f $(povconfuser)/$$f $(povconfuser)/$$f.bak; \
+-	  fi; \
+-	done; \
+-	$(INSTALL_DATA) $(top_srcdir)/povray.conf $(povconfuser)/povray.conf && chown $(povowner) $(povconfuser)/povray.conf && chgrp $(povgroup) $(povconfuser)/povray.conf  && echo "$(povconfuser)/povray.conf" >> $(povinstall); \
+-	$(INSTALL_DATA) $(top_builddir)/povray.ini $(povconfuser)/povray.ini && chown $(povowner) $(povconfuser)/povray.ini && chgrp $(povgroup) $(povconfuser)/povray.ini  && echo "$(povconfuser)/povray.ini" >> $(povinstall)
+ 
+ # Remove data, config, and empty folders for 'make uninstall'.
+ # Use 'hook' instead of 'local' so as to properly remove *empty* folders (e.g. scripts).
+@@ -1164,10 +1149,6 @@
+ 	  rm -f    $(DESTDIR)$(povconfdir)/povray.ini; \
+ 	  rmdir    $(DESTDIR)$(povconfdir); \
+ 	  rmdir    $(DESTDIR)$(sysconfdir)/@PACKAGE@; \
+-	  rm -f    $(povconfuser)/povray.conf; \
+-	  rm -f    $(povconfuser)/povray.ini; \
+-	  rmdir    $(povconfuser); \
+-	  rmdir    $(povuser); \
+ 	fi; \
+ 	echo "Uninstall finished"
+ 

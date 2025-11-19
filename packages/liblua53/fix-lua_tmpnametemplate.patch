@@ -1,0 +1,15 @@
+--- ./src/loslib.c.orig	2019-06-07 23:19:03.666887235 +0000
++++ ./src/loslib.c	2019-06-07 23:19:47.295164822 +0000
+@@ -112,10 +112,10 @@
+ 
+ #include <unistd.h>
+ 
+-#define LUA_TMPNAMBUFSIZE	32
++#define LUA_TMPNAMBUFSIZE	128
+ 
+ #if !defined(LUA_TMPNAMTEMPLATE)
+-#define LUA_TMPNAMTEMPLATE	"/tmp/lua_XXXXXX"
++#define LUA_TMPNAMTEMPLATE	"@TERMUX_PREFIX@/tmp/lua_XXXXXX"
+ #endif
+ 
+ #define lua_tmpnam(b,e,s) {	       \

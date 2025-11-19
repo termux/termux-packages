@@ -1,0 +1,17 @@
+diff -u -r ../gawk-4.2.1/main.c ./main.c
+--- ../gawk-4.2.1/main.c	2018-02-23 08:44:11.000000000 +0000
++++ ./main.c	2018-10-28 21:59:28.583118833 +0000
+@@ -246,10 +246,12 @@
+ 	if ((cp = getenv("GAWK_LOCALE_DIR")) != NULL)
+ 		locale_dir = cp;
+ 
+-#if defined(F_GETFL) && defined(O_APPEND)
++#if defined(F_GETFL) && defined(O_APPEND) && !defined(__ANDROID__)
+ 	// 1/2018: This is needed on modern BSD systems so that the
+ 	// inplace tests pass. I think it's a bug in those kernels
+ 	// but let's just work around it anyway.
++	// Do not do this for Android as it interferes with SELinux,
++	// see https://github.com/termux/termux-packages/issues/2979
+ 	int flags = fcntl(fileno(stderr), F_GETFL, NULL);
+ 	if (flags >= 0 && (flags & O_APPEND) == 0) {
+ 		flags |= O_APPEND;

@@ -1,0 +1,12 @@
+--- a/libvbisam/isdecimal.c
++++ b/libvbisam/isdecimal.c
+@@ -134,6 +134,9 @@
+ 	int		decpt;
+ 	int		sign;
+ 
++#ifdef __ANDROID__
++	char *ecvt(double, int, int *, int *);
++#endif
+ 	str = (unsigned char *)ecvt (dbl, ndigits, &decpt, &sign);
+ 
+ 	dp->dec_pos = sign ? 0 : 1;

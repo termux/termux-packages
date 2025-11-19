@@ -1,0 +1,13 @@
+This reverts https://github.com/chromium/chromium/commit/fc838e8cc887adbe95110045d146b9d5885bf2a9.
+
+--- a/components/media_router/common/providers/cast/channel/enum_table.h
++++ b/components/media_router/common/providers/cast/channel/enum_table.h
+@@ -368,7 +368,7 @@
+ 
+  private:
+ #ifdef ARCH_CPU_64_BITS
+-  alignas(std::hardware_destructive_interference_size)
++  alignas(64)
+ #endif
+       std::initializer_list<Entry> data_;
+   bool is_sorted_;

@@ -1,0 +1,209 @@
+diff --git a/src/glsl/bezier.c b/src/glsl/bezier.c
+index 84e0367..62996fb 100644
+--- a/src/glsl/bezier.c
++++ b/src/glsl/bezier.c
+@@ -13,7 +13,7 @@
+ #include "glut_wrap.h"
+ #include "shaderutil.h"
+ 
+-static const char *filename = "bezier.geom";
++static const char *filename = DEMOS_DATA_DIR "bezier.geom";
+ 
+ static GLuint fragShader;
+ static GLuint vertShader;
+diff --git a/src/glsl/blinking-teapot.c b/src/glsl/blinking-teapot.c
+index 62451e9..3420066 100644
+--- a/src/glsl/blinking-teapot.c
++++ b/src/glsl/blinking-teapot.c
+@@ -63,8 +63,8 @@ init_opengl (void)
+      exit(1);
+   }     
+ 
+-  vshad_id = CompileShaderFile (GL_VERTEX_SHADER, "blinking-teapot.vert");
+-  fshad_id = CompileShaderFile (GL_FRAGMENT_SHADER, "blinking-teapot.frag");
++  vshad_id = CompileShaderFile (GL_VERTEX_SHADER, DEMOS_DATA_DIR "blinking-teapot.vert");
++  fshad_id = CompileShaderFile (GL_FRAGMENT_SHADER, DEMOS_DATA_DIR "blinking-teapot.frag");
+   prog_id = LinkShaders (vshad_id, fshad_id);
+ 
+   glUseProgram (prog_id);
+diff --git a/src/glsl/brick.c b/src/glsl/brick.c
+index 00d8349..f9f0ec7 100644
+--- a/src/glsl/brick.c
++++ b/src/glsl/brick.c
+@@ -14,8 +14,8 @@
+ #include "shaderutil.h"
+ 
+ 
+-static char *FragProgFile = "CH06-brick.frag";
+-static char *VertProgFile = "CH06-brick.vert";
++static char *FragProgFile = DEMOS_DATA_DIR "CH06-brick.frag";
++static char *VertProgFile = DEMOS_DATA_DIR "CH06-brick.vert";
+ 
+ /* program/shader objects */
+ static GLuint fragShader;
+diff --git a/src/glsl/bump.c b/src/glsl/bump.c
+index 95ad19f..f40cba0 100644
+--- a/src/glsl/bump.c
++++ b/src/glsl/bump.c
+@@ -15,9 +15,9 @@
+ #include "readtex.h"
+ 
+ 
+-static char *FragProgFile = "CH11-bumpmap.frag";
+-static char *FragTexProgFile = "CH11-bumpmaptex.frag";
+-static char *VertProgFile = "CH11-bumpmap.vert";
++static char *FragProgFile = DEMOS_DATA_DIR "CH11-bumpmap.frag";
++static char *FragTexProgFile = DEMOS_DATA_DIR "CH11-bumpmaptex.frag";
++static char *VertProgFile = DEMOS_DATA_DIR "CH11-bumpmap.vert";
+ static char *TextureFile = DEMOS_DATA_DIR "tile.rgb";
+ 
+ /* program/shader objects */
+diff --git a/src/glsl/convolutions.c b/src/glsl/convolutions.c
+index 567b358..4c681dd 100644
+--- a/src/glsl/convolutions.c
++++ b/src/glsl/convolutions.c
+@@ -340,7 +340,7 @@ static void init(void)
+ 
+    menuInit();
+    readTexture(textureLocation);
+-   createProgram("convolution.vert", "convolution.frag");
++   createProgram(DEMOS_DATA_DIR "convolution.vert", DEMOS_DATA_DIR "convolution.frag");
+ 
+    glEnable(GL_TEXTURE_2D);
+    glClearColor(1.0, 1.0, 1.0, 1.0);
+diff --git a/src/glsl/mandelbrot.c b/src/glsl/mandelbrot.c
+index 18b817c..6bbeffd 100644
+--- a/src/glsl/mandelbrot.c
++++ b/src/glsl/mandelbrot.c
+@@ -14,8 +14,8 @@
+ #include "shaderutil.h"
+ 
+ 
+-static char *FragProgFile = "CH18-mandel.frag";
+-static char *VertProgFile = "CH18-mandel.vert";
++static char *FragProgFile = DEMOS_DATA_DIR "CH18-mandel.frag";
++static char *VertProgFile = DEMOS_DATA_DIR "CH18-mandel.vert";
+ 
+ /* program/shader objects */
+ static GLuint fragShader;
+diff --git a/src/glsl/meson.build b/src/glsl/meson.build
+index db8c613..13564a4 100644
+--- a/src/glsl/meson.build
++++ b/src/glsl/meson.build
+@@ -83,3 +83,38 @@ executable(
+   ],
+   install: true
+ )
++
++glsl_data = [
++  'bezier.geom',
++  'blinking-teapot.frag',
++  'blinking-teapot.vert',
++  'brick.shtest',
++  'CH06-brick.frag',
++  'CH06-brick.vert',
++  'CH11-bumpmap.frag',
++  'CH11-bumpmaptex.frag',
++  'CH11-bumpmap.vert',
++  'CH11-toyball.frag',
++  'CH11-toyball.vert',
++  'CH18-mandel.frag',
++  'CH18-mandel.vert',
++  'convolution.frag',
++  'convolution.vert',
++  'cubemap.frag',
++  'mandelbrot.shtest',
++  'multitex.frag',
++  'multitex.shtest',
++  'multitex.vert',
++  'reflect.vert',
++  'shadowtex.frag',
++  'simple.vert',
++  'simplex-noise.glsl',
++  'skinning.frag',
++  'skinning.vert',
++  'toyball.shtest',
++]
++
++install_data(
++  glsl_data,
++  install_dir: get_option('datadir') / 'mesa-demos'
++)
+diff --git a/src/glsl/multitex.c b/src/glsl/multitex.c
+index 2f9a2fa..b51aba3 100644
+--- a/src/glsl/multitex.c
++++ b/src/glsl/multitex.c
+@@ -35,8 +35,8 @@
+ 
+ static const char *Demo = "multitex";
+ 
+-static const char *VertFile = "multitex.vert";
+-static const char *FragFile = "multitex.frag";
++static const char *VertFile = DEMOS_DATA_DIR "multitex.vert";
++static const char *FragFile = DEMOS_DATA_DIR "multitex.frag";
+ 
+ static const char *TexFiles[2] = 
+    {
+diff --git a/src/glsl/simplex-noise.c b/src/glsl/simplex-noise.c
+index a687508..9a2a029 100644
+--- a/src/glsl/simplex-noise.c
++++ b/src/glsl/simplex-noise.c
+@@ -169,7 +169,7 @@ SpecialKey(int key, int x, int y)
+ static void
+ Init(void)
+ {
+-   const char *filename = "simplex-noise.glsl";
++   const char *filename = DEMOS_DATA_DIR "simplex-noise.glsl";
+    char noiseText[10000];
+    FILE *f;
+    int len;
+diff --git a/src/glsl/skinning.c b/src/glsl/skinning.c
+index b451d13..0f4e943 100644
+--- a/src/glsl/skinning.c
++++ b/src/glsl/skinning.c
+@@ -20,8 +20,8 @@
+ #define M_PI 3.1415926535
+ #endif
+ 
+-static char *FragProgFile = "skinning.frag";
+-static char *VertProgFile = "skinning.vert";
++static char *FragProgFile = DEMOS_DATA_DIR "skinning.frag";
++static char *VertProgFile = DEMOS_DATA_DIR "skinning.vert";
+ 
+ /* program/shader objects */
+ static GLuint fragShader;
+diff --git a/src/glsl/texdemo1.c b/src/glsl/texdemo1.c
+index 861d696..42308d1 100644
+--- a/src/glsl/texdemo1.c
++++ b/src/glsl/texdemo1.c
+@@ -35,11 +35,11 @@
+ 
+ static const char *Demo = "texdemo1";
+ 
+-static const char *ReflectVertFile = "reflect.vert";
+-static const char *CubeFragFile = "cubemap.frag";
++static const char *ReflectVertFile = DEMOS_DATA_DIR "reflect.vert";
++static const char *CubeFragFile = DEMOS_DATA_DIR "cubemap.frag";
+ 
+-static const char *SimpleVertFile = "simple.vert";
+-static const char *SimpleTexFragFile = "shadowtex.frag";
++static const char *SimpleVertFile = DEMOS_DATA_DIR "simple.vert";
++static const char *SimpleTexFragFile = DEMOS_DATA_DIR "shadowtex.frag";
+ 
+ static const char *GroundImage = DEMOS_DATA_DIR "tile.rgb";
+ 
+diff --git a/src/glsl/toyball.c b/src/glsl/toyball.c
+index 17aa765..5b1f7d3 100644
+--- a/src/glsl/toyball.c
++++ b/src/glsl/toyball.c
+@@ -14,8 +14,8 @@
+ #include "shaderutil.h"
+ 
+ 
+-static char *FragProgFile = "CH11-toyball.frag";
+-static char *VertProgFile = "CH11-toyball.vert";
++static char *FragProgFile = DEMOS_DATA_DIR "CH11-toyball.frag";
++static char *VertProgFile = DEMOS_DATA_DIR "CH11-toyball.vert";
+ 
+ /* program/shader objects */
+ static GLuint fragShader;

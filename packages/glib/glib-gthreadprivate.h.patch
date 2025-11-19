@@ -1,0 +1,30 @@
++++ ./glib/gthreadprivate.h
+@@ -46,6 +46,10 @@
+ #include <sys/syscall.h>
+ #include <unistd.h>
+ 
++#ifndef __LP64__
++#include <errno.h>
++#endif
++
+ #ifndef FUTEX_WAIT_PRIVATE
+ #define FUTEX_WAIT_PRIVATE FUTEX_WAIT
+ #define FUTEX_WAKE_PRIVATE FUTEX_WAKE
+@@ -73,7 +77,7 @@
+  * This must not be called with a timeout parameter as that differs
+  * in size between the two syscall variants!
+  */
+-#if defined(HAVE_FUTEX) && defined(HAVE_FUTEX_TIME64)
++#if defined(HAVE_FUTEX) && defined(HAVE_FUTEX_TIME64) && !defined(__ANDROID__)
+ #if defined(__ANDROID__)
+ #define g_futex_simple(uaddr, futex_op, ...)                                     \
+   G_STMT_START                                                                   \
+@@ -117,7 +121,7 @@
+   }                                                                              \
+   G_STMT_END
+ #endif /* defined(__ANDROID__) */
+-#elif defined(HAVE_FUTEX_TIME64)
++#elif defined(HAVE_FUTEX_TIME64) && !defined(__ANDROID__)
+ #define g_futex_simple(uaddr, futex_op, ...)                                     \
+   G_STMT_START                                                                   \
+   {                                                                              \

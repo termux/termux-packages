@@ -1,0 +1,158 @@
+##### @TERMUX_CORE__BASH__TERMUX_SCOPED_ENV_VARIABLE@ to be replaced at build time. #####
+
+##### @TERMUX_GTAIEVV_BASH__TERMUX_APPS_INFO_ENV_VARIABLE_VALUE@ replaced at build time. (START) #####
+
+##
+# Source the `termux-apps-info.env` file into the current environment
+# or get variable values of Termux app `TERMUX_APP__`, its plugin apps
+# `TERMUX_*_APP__` and external apps `*_APP__` app scoped environment
+# variables that exist in the `termux-apps-info.env` file, with
+# support for fallback values and validation of values.
+#
+# **See Also:**
+# - @TERMUX_CORE_PKG__REPO_URL@/blob/master/site/pages/en/projects/docs/usage/utils/termux/shell/command/environment/termux-apps-info-env-variable.md
+# - @TERMUX_CORE_PKG__REPO_URL@/blob/master/app/main/scripts/termux/shell/command/environment/termux-apps-info-env-variable.bash.in
+# - @TERMUX_PKGS__REPO_URL@/blob/master/packages/termux-core/app/main/scripts/termux/shell/command/environment/termux_core__bash__termux_apps_info_env_variable
+# .
+# - @TERMUX_CORE_PKG__REPO_URL@/blob/master/site/pages/en/projects/docs/usage/utils/termux/shell/command/environment/termux-scoped-env-variable.md
+# - @TERMUX_CORE_PKG__REPO_URL@/blob/master/app/main/scripts/termux/shell/command/environment/termux-scoped-env-variable.bash.in
+# - @TERMUX_PKGS__REPO_URL@/blob/master/packages/termux-core/app/main/scripts/termux/shell/command/environment/termux_core__bash__termux_scoped_env_variable
+#
+#
+# `termux_core__bash__termux_apps_info_env_variable` `source-env`
+# `termux_core__bash__termux_apps_info_env_variable` `get-value` [`<command_options>`] \
+#     `<output_mode>` \
+#     `<scoped_var_scope_mode>` `<scoped_var_sub_name>` \
+#     `<extended_validator>` [`<default_values...>`]
+##
+termux_core__bash__termux_apps_info_env_variable() {
+
+    local command_type="${1:-}"
+    local command_action="${command_type%%-*}"
+    [ $# -gt 0 ] && shift 1
+
+    if [ "$command_type" = "source-env" ]; then
+        if [ $# -ne 0 ]; then
+            echo "Invalid argument count $# for the 'source-env' command. \
+The 'termux_core__bash__termux_apps_info_env_variable' function expects 0 arguments." 1>&2
+            printf 'Arguments: %s\n' "$*" 1>&2
+            return 64 # EX__USAGE
+        fi
+    elif [ "$command_type" = "get-value" ]; then
+        local skip_sourcing=0
+        local skip_sourcing_if_cur_app_var=0
+        local ensure_sourcing=0
+
+        if [ "${1:-}" = "--skip-sourcing" ]; then
+            skip_sourcing=1
+            shift 1
+        elif [ "${1:-}" = "--skip-sourcing-if-cur-app-var" ]; then
+            skip_sourcing_if_cur_app_var=1
+            shift 1
+        elif [ "${1:-}" = "--ensure-sourcing" ]; then
+            ensure_sourcing=1
+            shift 1
+        fi
+
+        if [ $# -lt 4 ]; then
+            echo "Invalid argument count $# for the 'get-value' command. \
+The 'termux_core__bash__termux_apps_info_env_variable' function expects minimum 4 arguments." 1>&2
+            printf 'Arguments: %s\n' "$*" 1>&2
+            return 64 # EX__USAGE
+        fi
+
+        local scoped_var_scope_mode="${2:-}"
+        local scoped_var_sub_name="${3:-}"
+
+        case "$scoped_var_scope_mode" in
+            's='[A-Z]*'_APP__'|'ss=APP__'|'ss='[A-Z]*'_APP__'|'cn='[a-z]*'-app') :;;
+            *)
+            echo "The scoped_var_scope_mode '$scoped_var_scope_mode' \
+argument for the variable to $command_action passed to \
+'termux_core__bash__termux_apps_info_env_variable' is not valid. \
+It must either be a supported component name starting with \`cn=\` and ending with '-app', \
+or an environment variable scope starting with \`s=\` or \`ss=\` and ending with '_APP__'." 1>&2
+                return 64 # EX__USAGE
+                ;;
+        esac
+    else
+        echo "The command '$command_type' passed to 'termux_core__bash__termux_apps_info_env_variable' is not valid." 1>&2
+        return 64 # EX__USAGE
+    fi
+
+
+    if [ "$command_type" = "source-env" ]; then
+        local termux_core__apps_info_env_file=""
+
+        # Source the `termux-apps-info.env` file.
+        # The path for the file is exported in the `$TERMUX_CORE__APPS_INFO_ENV_FILE`
+        # environment variable by the Termux app running the current shell.
+        termux_core__bash__termux_scoped_env_variable get-value \
+            termux_core__apps_info_env_file cn="termux-core" "APPS_INFO_ENV_FILE" r+='^(()|((/[^/]+)+))$' || return $?
+        if [ -n "$termux_core__apps_info_env_file" ] && [ -f "$termux_core__apps_info_env_file" ]; then
+            # shellcheck disable=SC1090
+            source "$termux_core__apps_info_env_file" || return $?
+            return $?
+        else
+            return 69 # EX__UNAVAILABLE
+        fi
+    elif [ "$command_type" = "get-value" ]; then
+        # Prefix with `app_` to prevent conflict with `termux_core__bash__termux_scoped_env_variable` argument.
+        local app_scoped_var_scope_name=""
+        local termux_core__apps_info_env_file=""
+
+        # If `skip_sourcing` is enabled, then directly get the value from
+        # the current environment.
+        if [ "$skip_sourcing" = "1" ]; then
+            termux_core__bash__termux_scoped_env_variable get-value "$@"
+            return $?
+        # If `skip_sourcing_if_cur_app_var` is enabled and app scope of
+        # the variable to get is the same as the app scope of the current
+        # app, then directly get the value from the current
+        # environment.
+        elif [ "$skip_sourcing_if_cur_app_var" = "1" ] && [ -n "${TERMUX_ENV__S_APP:-}" ]; then
+            # Get app scope of the variable to get. If caller passed
+            # `scoped_var_scope_mode` as `s=*`, then it will be returned
+            # as is, otherwise if `ss=*` or `cn=*` is passed, then full
+            # variable scope including Termux root scope prefix will
+            # be returned. The `scoped_var_sub_name` arg is passed as
+            # an empty string as we only need the app scope name.
+            termux_core__bash__termux_scoped_env_variable get-name \
+                app_scoped_var_scope_name "$scoped_var_scope_mode" "" || return $?
+
+            if [ "$TERMUX_ENV__S_APP" = "$app_scoped_var_scope_name" ]; then
+                termux_core__bash__termux_scoped_env_variable get-value "$@"
+                return $?
+            fi
+        fi
+
+
+        # Unset variable to get before sourcing, otherwise if the
+        # `termux-apps-info.env` file does not explicitly unset it if
+        # variable should not be set, then any value including empty
+        # (for `validator_mode` `*`) that exists in the current environment
+        # may get used.
+        termux_core__bash__termux_scoped_env_variable unset-value \
+            "$scoped_var_scope_mode" "$scoped_var_sub_name" || return $?
+
+
+        # First source the `termux-apps-info.env` file to load the latest
+        # value in the current environment before getting it.
+        # The path for the file is exported in the `$TERMUX_CORE__APPS_INFO_ENV_FILE`
+        # environment variable by the Termux app running the current shell.
+        termux_core__bash__termux_scoped_env_variable get-value \
+            termux_core__apps_info_env_file cn="termux-core" "APPS_INFO_ENV_FILE" r+='^(()|((/[^/]+)+))$' || return $?
+        if [ -n "$termux_core__apps_info_env_file" ] && [ -f "$termux_core__apps_info_env_file" ]; then
+            # shellcheck disable=SC1090
+            source "$termux_core__apps_info_env_file" || return $?
+        elif [ "$ensure_sourcing" = "1" ]; then
+            return 69 # EX__UNAVAILABLE
+        fi
+
+        termux_core__bash__termux_scoped_env_variable get-value "$@"
+        return $?
+    fi
+
+}
+
+##### @TERMUX_GTAIEVV_BASH__TERMUX_APPS_INFO_ENV_VARIABLE_VALUE@ replaced at build time. (END) #####

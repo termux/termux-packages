@@ -1,0 +1,43 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -86,7 +86,7 @@
+ # under msys2 (and all other operating systems) we want pkgconfig. when
+ # building with visual studio, don't require it.
+ if(NOT MSVC)
+-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
++if(CMAKE_SYSTEM_NAME MATCHES "Linux|Android")
+ set(PKGCONFIG_DIR "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+ elseif(APPLE)
+ # surely there's a better way to do this? alas, seems necessary to pull the
+@@ -146,11 +146,11 @@
+ # platform-specific logics
+ if(WIN32)
+   set(LIBRT wsock32 ws2_32 secur32)
+-elseif(NOT APPLE)
++elseif(NOT APPLE AND NOT ANDROID)
+   find_library(LIBM m REQUIRED)
+   find_library(LIBRT rt REQUIRED)
+ endif()
+-if(NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
++if(NOT CMAKE_SYSTEM_NAME MATCHES "Linux|Android")
+   include_directories(/usr/local/include)
+   link_directories(/usr/local/lib)
+   set(CMAKE_REQUIRED_INCLUDES /usr/local/include)
+@@ -222,7 +222,7 @@
+ add_library(notcurses-core-static STATIC EXCLUDE_FROM_ALL ${NCCORESRCS} ${COMPATSRC})
+ endif()
+ # don't want these on freebsd/dragonfly/osx
+-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
++if(CMAKE_SYSTEM_NAME MATCHES "Linux|Android")
+ target_compile_definitions(notcurses-core
+   PUBLIC
+    _XOPEN_SOURCE=700 # wcwidth(3) requires _XOPEN_SOURCE, and is in our headers
+@@ -417,7 +417,7 @@
+ target_compile_options(notcurses-ffi PUBLIC -fkeep-inline-functions)
+ target_compile_definitions(notcurses-ffi PUBLIC NOTCURSES_FFI)
+ # don't want these on freebsd/dragonfly/osx
+-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
++if(CMAKE_SYSTEM_NAME MATCHES "Linux|Android")
+ target_compile_definitions(notcurses-ffi
+   PUBLIC
+    _XOPEN_SOURCE=700 # wcwidth(3) requires _XOPEN_SOURCE, and is in our headers

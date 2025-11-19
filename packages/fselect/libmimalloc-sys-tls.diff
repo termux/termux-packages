@@ -1,0 +1,15 @@
+diff '--color=auto' -uNr a/build.rs b/build.rs
+--- a/build.rs	2024-12-19 11:49:10.952717802 +0800
++++ b/build.rs	2024-12-19 11:49:50.486010280 +0800
+@@ -25,7 +25,10 @@
+ 
+     let dynamic_tls = env::var("CARGO_FEATURE_LOCAL_DYNAMIC_TLS").is_ok();
+ 
+-    if target_family == "unix" && target_os != "haiku" {
++    if target_family == "unix" && target_os == "android" {
++        build.flag_if_supported("-femulated-tls");
++    }
++    else if target_family == "unix" && target_os != "haiku" {
+         if dynamic_tls {
+             build.flag_if_supported("-ftls-model=local-dynamic");
+         } else {

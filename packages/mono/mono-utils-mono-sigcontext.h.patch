@@ -1,0 +1,15 @@
+--- a/mono/utils/mono-sigcontext.h
++++ b/mono/utils/mono-sigcontext.h
+@@ -496,10 +496,10 @@
+ 
+ #ifndef UCONTEXT_REG_SET_PC
+ #define UCONTEXT_REG_SET_PC(ctx, val) do { \
+-	UCONTEXT_REG_PC (ctx) = (val); \
++	UCONTEXT_REG_PC (ctx) = ((__u64)(val)); \
+ 	 } while (0)
+ #define UCONTEXT_REG_SET_SP(ctx, val) do { \
+-	UCONTEXT_REG_SP (ctx) = (val); \
++	UCONTEXT_REG_SP (ctx) = ((__u64)(val)); \
+ 	 } while (0)
+ #endif
+ 

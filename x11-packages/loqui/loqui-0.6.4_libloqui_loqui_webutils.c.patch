@@ -1,0 +1,30 @@
+diff -uNr loqui-0.6.4/libloqui/loqui_webutils.c loqui-0.6.4.mod/libloqui/loqui_webutils.c
+--- loqui-0.6.4/libloqui/loqui_webutils.c	2015-11-15 15:04:43.000000000 +0200
++++ loqui-0.6.4.mod/libloqui/loqui_webutils.c	2018-10-09 01:26:57.549143238 +0300
+@@ -48,7 +48,7 @@
+ void
+ loqui_webutils_get(gchar *url, GList *header_list, LoquiWebUtilsGetType get_type, LoquiWebCallback cb, gpointer data)
+ {
+-	gint stdout = -1;
++	gint _stdout = -1;
+ 	GError *error = NULL;
+ 	GIOChannel *ioch;
+ 	GClosure *closure;
+@@ -90,7 +90,7 @@
+ 				      
+ 				      NULL,
+ 				      NULL,
+-				      &stdout,
++				      &_stdout,
+ 				      NULL,
+ 
+ 				      &error)) {
+@@ -100,7 +100,7 @@
+ 
+ 	closure = g_cclosure_new((GCallback) cb, data, NULL);
+ 
+-	ioch = g_io_channel_unix_new(stdout);
++	ioch = g_io_channel_unix_new(_stdout);
+         g_io_channel_set_encoding(ioch, NULL, NULL);
+ 
+ 	g_io_add_watch(ioch, G_IO_IN | G_IO_PRI | G_IO_ERR | G_IO_HUP | G_IO_NVAL, curl_readable_cb, closure);

@@ -1,0 +1,15 @@
+Fix NDK r27 clang++: error: unknown argument: '-export-dynamic'
+
+--- a/Xfce-Theme-Manager/app/Makefile.am
++++ b/Xfce-Theme-Manager/app/Makefile.am
+@@ -7,8 +7,8 @@
+ 
+ xfcethememanager_SOURCES = $(COMMONSRC)
+ 
+-xfcethememanager_CFLAGS = -O3 -export-dynamic
+-xfcethememanager_CXXFLAGS = -O3 -export-dynamic
++xfcethememanager_CFLAGS = -O3 -Wl,-export-dynamic
++xfcethememanager_CXXFLAGS = -O3 -Wl,-export-dynamic
+ 
+ docfilesdir = $(pkgdatadir)/docs
+ docfiles_DATA = ../resources/docs/*

@@ -1,0 +1,28 @@
+--- a/makefile
++++ b/makefile
+@@ -1488,11 +1488,12 @@
+ #	$(CC) -o ck_off_t ck_off_t.$(EXT)
+ 
+ wart: ckwart.$(EXT)
+-	$(CC) $(LNKFLAGS) -o wart ckwart.$(EXT) $(LIBS)
++	$(CC_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o wart ckwart.$(EXT) $(LIBS)
+ 
+ ckcmdb.$(EXT): ckcmdb.c ckcdeb.h ckcsym.h ckclib.h
+ 
+ ckwart.$(EXT): ckwart.c
++	$(CC_FOR_BUILD) -c $<
+ 
+ ckudia.$(EXT): ckudia.c ckcker.h ckcdeb.h ckucmd.h ckcasc.h ckcsym.h ckcsig.h \
+ 		ckcnet.h ckctel.h ckclib.h
+@@ -6051,8 +6052,9 @@
+ 	@echo 'Making C-Kermit $(CKVER) for Linux 1.2 or later...'
+ 	@echo 'IMPORTANT: Read the comments in the linux section of the'
+ 	@echo 'makefile if you have trouble.'
+-	$(MAKE) xermit KTARGET=$${KTARGET:-$(@)} "CC = gcc" "CC2 = gcc" \
+-	"CFLAGS = -O -DLINUX -pipe -funsigned-char -DFNFLOAT -DCK_POSIX_SIG \
++	$(MAKE) xermit KTARGET=$${KTARGET:-$(@)} "CC = $(CC)" "CC2 = $(CC)" \
++	"CFLAGS = $(CFLAGS) $(CPPFLAGS) -DLINUX -pipe \
++	-funsigned-char -DFNFLOAT -DCK_POSIX_SIG \
+ 	-DCK_NEWTERM -DTCPSOCKET -DLINUXFSSTND -DNOCOTFMC -DPOSIX \
+ 	-DUSE_STRERROR $(KFLAGS)" "LNKFLAGS = $(LNKFLAGS)" \
+ 	"LIBS = $(LIBS) -lm"

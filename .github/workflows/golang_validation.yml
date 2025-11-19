@@ -1,0 +1,41 @@
+name: Golang validation
+
+permissions:
+  contents: read
+  actions: write
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+    - 'packages/golang/build.sh'
+    - 'scripts/build/setup/termux_setup_golang.sh'
+
+jobs:
+  golang_validation:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target_arch: [aarch64, arm, i686, x86_64]
+      fail-fast: false
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+    - name: Set process id limit for 32-bit builds depending on aosp-libs
+      run: echo 65535 | sudo tee /proc/sys/kernel/pid_max
+    - name: Prepare environment
+      run: |
+        ./scripts/setup-ubuntu.sh
+        ./scripts/setup-android-sdk.sh
+        sudo apt install ninja-build
+        ./scripts/free-space.sh
+    - name: Golang validation
+      run: ./scripts/bin/golang-validation "${{ matrix.target_arch }}" || exit 1
+    - name: Upload report artifact
+      if: always()
+      uses: actions/upload-artifact@v5
+      with:
+        name: report-${{ matrix.target_arch }}
+        path: /tmp/golang-validation-report.txt

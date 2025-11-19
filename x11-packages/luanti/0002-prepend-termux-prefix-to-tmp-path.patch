@@ -1,0 +1,30 @@
+Fixes "An error occurred: Failed to download 'Minetest Game'"
+when trying to download any gamemode through the builtin browser,
+as described here: https://github.com/termux-user-repository/tur/issues/1325
+
+Lua portion adapted from https://github.com/termux/termux-packages/blob/master/packages/liblua52/lua-5.2.4_src_loslib.c.patch
+--- a/lib/lua/src/luaconf.h
++++ b/lib/lua/src/luaconf.h
+@@ -653,9 +653,9 @@ union luai_Cast { double l_d; long l_l; };
+ 
+ #if defined(LUA_USE_MKSTEMP)
+ #include <unistd.h>
+-#define LUA_TMPNAMBUFSIZE	32
++#define LUA_TMPNAMBUFSIZE	512
+ #define lua_tmpnam(b,e)	{ \
+-	strcpy(b, "/tmp/lua_XXXXXX"); \
++	strcpy(b, "@TERMUX_PREFIX@/tmp/lua_XXXXXX"); \
+ 	e = mkstemp(b); \
+ 	if (e != -1) close(e); \
+ 	e = (e == -1); }
+--- a/src/filesys.cpp
++++ b/src/filesys.cpp
+@@ -439,7 +439,7 @@ std::string TempPath()
+ #ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
+ 	return porting::path_cache;
+ #else
+-	return DIR_DELIM "tmp";
++	return "@TERMUX_PREFIX@" DIR_DELIM "tmp";
+ #endif
+ }
+ 

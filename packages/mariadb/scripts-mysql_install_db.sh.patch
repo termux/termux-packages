@@ -1,0 +1,50 @@
+--- a/scripts/mysql_install_db.sh
++++ b/scripts/mysql_install_db.sh
+@@ -492,47 +492,8 @@
+     fi
+     chmod 700 "$dir"
+   fi
+-  if test -n "$user"
+-  then
+-    if test -z "$group"
+-    then
+-      chown $user $dir
+-    else
+-      chown $user:$group $dir
+-    fi
+-    if test $? -ne 0
+-    then
+-      echo "Cannot change ownership of the database directories to the '$user'"
+-      echo "user.  Check that you have the necessary permissions and try again."
+-      exit 1
+-    fi
+-  fi
+ done
+ 
+-if test -n "$user"
+-then
+-  if test -z "$srcdir" -a "$in_rpm" -eq 0 -a -d "$pamtooldir/auth_pam_tool_dir"
+-  then
+-    chown 0 "$pamtooldir/auth_pam_tool_dir/auth_pam_tool" && \
+-    chmod 04755 "$pamtooldir/auth_pam_tool_dir/auth_pam_tool"
+-    if test $? -ne 0
+-    then
+-        echo "Couldn't set an owner to '$pamtooldir/auth_pam_tool_dir/auth_pam_tool'."
+-        echo "It must be root, the PAM authentication plugin doesn't work otherwise.."
+-        echo
+-    fi
+-    chown $user "$pamtooldir/auth_pam_tool_dir" && \
+-    chmod 0700 "$pamtooldir/auth_pam_tool_dir"
+-    if test $? -ne 0
+-    then
+-        echo "Cannot change ownership of the '$pamtooldir/auth_pam_tool_dir' directory"
+-        echo "to the '$user' user. Check that you have the necessary permissions and try again."
+-        echo
+-    fi
+-  fi
+-  args="$args --user=$user"
+-fi
+-
+ #To be enabled if/when we enable --group as an option to mariadbd
+ #if test -n "$group"
+ #then

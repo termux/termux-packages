@@ -1,0 +1,14 @@
+--- a/src/plugins/clangformat/clangformatbaseindenter.cpp
++++ b/src/plugins/clangformat/clangformatbaseindenter.cpp
+@@ -73,7 +73,11 @@
+ 
+ llvm::StringRef clearExtraNewline(llvm::StringRef text)
+ {
++#if LLVM_VERSION_MAJOR >= 19
++    while (text.starts_with("\n\n"))
++#else
+     while (text.startswith("\n\n"))
++#endif
+         text = text.drop_front();
+     return text;
+ }

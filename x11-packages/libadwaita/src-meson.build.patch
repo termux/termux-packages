@@ -1,0 +1,12 @@
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -442,7 +442,8 @@
+      '--quiet',
+      '-DADWAITA_COMPILATION',
+    ]
+-   if gi_scanner.version().version_compare('>=1.83.2')
++   # TODO: Remove this after gobject-introspection 1.84.0 update in host system
++   if false and gi_scanner.version().version_compare('>=1.83.2')
+      libadwaita_gir_extra_args += [
+        '--doc-format=gi-docgen',
+      ]

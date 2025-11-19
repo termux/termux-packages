@@ -1,0 +1,203 @@
+Description: Make code 64-bit clean.
+Author: Guillem Jover <guillem@debian.org>
+Origin: vendor
+Bug-Debian: https://bugs.debian.org/339815
+Forwarded: no
+Last-Update: 2005-11-24
+
+Index: b/arj_arcv.c
+===================================================================
+--- a/arj_arcv.c	2005-06-21 22:53:12.000000000 +0300
++++ b/arj_arcv.c	2008-06-16 08:25:43.000000000 +0300
+@@ -59,27 +59,27 @@ static char idxid_fault[]="?";
+ #define setup_hput(ptr) (tmp_hptr=(ptr))
+ 
+ #define hget_byte() (*(tmp_hptr++)&0xFF)
+-#define hput_byte(c) (*(tmp_hptr++)=(char) (c))
++#define hput_byte(c) (*(tmp_hptr++)=(uint8_t) (c))
+ 
+ /* Reads two bytes from the header, incrementing the pointer */
+ 
+-static unsigned int hget_word()
++static uint16_t hget_word()
+ {
+- unsigned int result;
++ uint16_t result;
+ 
+  result=mget_word(tmp_hptr);
+- tmp_hptr+=sizeof(short);
++ tmp_hptr+=sizeof(uint16_t);
+  return result;
+ }
+ 
+ /* Reads four bytes from the header, incrementing the pointer */
+ 
+-static unsigned long hget_longword()
++static uint32_t hget_longword()
+ {
+- unsigned long result;
++ uint32_t result;
+ 
+  result=mget_dword(tmp_hptr);
+- tmp_hptr+=sizeof(unsigned long);
++ tmp_hptr+=sizeof(uint32_t);
+  return result;
+ }
+ 
+@@ -87,18 +87,18 @@ static unsigned long hget_longword()
+ 
+ /* Writes two bytes to the header, incrementing the pointer */
+ 
+-static void hput_word(unsigned int w)
++static void hput_word(uint16_t w)
+ {
+  mput_word(w,tmp_hptr); 
+- tmp_hptr+=sizeof(unsigned short);
++ tmp_hptr+=sizeof(uint16_t);
+ }
+ 
+ /* Writes four bytes to the header, incrementing the pointer */
+ 
+-static void hput_longword(unsigned long l)
++static void hput_longword(uint32_t l)
+ {
+  mput_dword(l,tmp_hptr);
+- tmp_hptr+=sizeof(unsigned long);
++ tmp_hptr+=sizeof(uint32_t);
+ }
+ 
+ /* Calculates and stores the basic header size */
+Index: b/arj_proc.c
+===================================================================
+--- a/arj_proc.c	2008-06-16 08:25:28.000000000 +0300
++++ b/arj_proc.c	2008-06-16 08:25:43.000000000 +0300
+@@ -585,7 +585,7 @@ int search_for_extension(char *name, cha
+ /* Returns the exact amount of data that could be safely written to the
+    destination volume */
+ 
+-unsigned long get_volfree(unsigned int increment)
++unsigned long get_volfree(unsigned long increment)
+ {
+  unsigned long pvol;
+  unsigned int arjsec_overhead;
+@@ -605,7 +605,7 @@ unsigned long get_volfree(unsigned int i
+  remain=volume_limit-ftell(aostream)-pvol-(long)arjsec_overhead-
+         (long)out_bytes-(long)cpos-(long)ext_voldata-
+         MULTIVOLUME_RESERVE-t_volume_offset;
+- return((unsigned long)min(remain, (unsigned long)increment));
++ return((unsigned long)min(remain, increment));
+ }
+ 
+ /* Performs various checks when multivolume data is packed to predict an
+@@ -2466,14 +2466,14 @@ static int get_str_from_jq()
+     *tsptr='\0';
+   endptr=tsptr;
+   tsptr=sptr;
+-  while((unsigned int)tsptr<(unsigned int)endptr&&patterns<SEARCH_STR_MAX)
++  while((intptr_t)tsptr<(intptr_t)endptr&&patterns<SEARCH_STR_MAX)
+   {
+    while(*tsptr=='\0')
+     tsptr++;
+-   if((unsigned int)tsptr<(unsigned int)endptr)
++   if((intptr_t)tsptr<(intptr_t)endptr)
+    {
+     search_str[patterns++]=tsptr;
+-    while(*tsptr!='\0'&&(unsigned int)tsptr<(unsigned int)endptr)
++    while(*tsptr!='\0'&&(intptr_t)tsptr<(intptr_t)endptr)
+      tsptr++;
+    }
+   }
+@@ -2901,9 +2901,9 @@ char *ltrim(char *str)
+ #if (defined(WORDS_BIGENDIAN) || defined(ALIGN_POINTERS)) && !defined(ARJDISP) && !defined(REGISTER)
+ /* Model-independent routine to get 2 bytes from far RAM */
+ 
+-unsigned int mget_word(char FAR *p)
++uint16_t mget_word(char FAR *p)
+ {
+- unsigned int b0, b1;
++ uint16_t b0, b1;
+ 
+  b0=mget_byte(p);
+  b1=mget_byte(p+1);
+@@ -2912,9 +2912,9 @@ unsigned int mget_word(char FAR *p)
+ 
+ /* Model-independent routine to get 4 bytes from far RAM */
+ 
+-unsigned long mget_dword(char FAR *p)
++uint32_t mget_dword(char FAR *p)
+ {
+- unsigned long w0, w1;
++ uint32_t w0, w1;
+ 
+  w0=mget_word(p);
+  w1=mget_word(p+2);
+@@ -2923,7 +2923,7 @@ unsigned long mget_dword(char FAR *p)
+ 
+ /* Model-independent routine to store 2 bytes in far RAM */
+ 
+-void mput_word(unsigned int w, char FAR *p)
++void mput_word(uint16_t w, char FAR *p)
+ {
+  mput_byte(w&0xFF, p);
+  mput_byte(w>>8  , p+1);
+@@ -2931,7 +2931,7 @@ void mput_word(unsigned int w, char FAR 
+ 
+ /* Model-independent routine to store 4 bytes in far RAM */
+ 
+-void mput_dword(unsigned long d, char FAR *p)
++void mput_dword(uint32_t d, char FAR *p)
+ {
+  mput_word(d&0xFFFF, p);
+  mput_word(d>>16   , p+2);
+Index: b/arj_proc.h
+===================================================================
+--- a/arj_proc.h	2008-06-16 08:25:28.000000000 +0300
++++ b/arj_proc.h	2008-06-16 08:25:43.000000000 +0300
+@@ -8,15 +8,17 @@
+ #ifndef ARJ_PROC_INCLUDED
+ #define ARJ_PROC_INCLUDED
+ 
++#include <stdint.h>
++
+ /* Helper macros */
+ 
+-#define mget_byte(p) (*(unsigned char FAR *)(p)&0xFF)
+-#define mput_byte(c, p) *(unsigned char FAR *)(p)=(unsigned char)(c)
++#define mget_byte(p) (*(uint8_t FAR *)(p)&0xFF)
++#define mput_byte(c, p) *(uint8_t FAR *)(p)=(uint8_t)(c)
+ #if !defined(ALIGN_POINTERS) && !defined(WORDS_BIGENDIAN)
+-#define mget_word(p) (*(unsigned short *)(p)&0xFFFF)
+-#define mput_word(w,p) (*(unsigned short *)(p)=(unsigned short)(w))
+-#define mget_dword(p) (*(unsigned long *)(p))
+-#define mput_dword(w,p) (*(unsigned long *)(p)=(unsigned long)(w))
++#define mget_word(p) (*(uint16_t *)(p)&0xFFFF)
++#define mput_word(w,p) (*(uint16_t *)(p)=(uint16_t)(w))
++#define mget_dword(p) (*(uint32_t *)(p))
++#define mput_dword(w,p) (*(uint32_t *)(p)=(uint32_t)(w))
+ #endif
+ 
+ /* Prototypes */
+@@ -31,7 +33,7 @@ void copy_bytes(unsigned long nbytes);
+ int translate_path(char *name);
+ void restart_proc(char *dest);
+ int search_for_extension(char *name, char *ext_list);
+-unsigned long get_volfree(unsigned int increment);
++unsigned long get_volfree(unsigned long increment);
+ unsigned int check_multivolume(unsigned int increment);
+ void store();
+ void hollow_encode();
+@@ -61,10 +63,10 @@ void unpack_mem(struct mempack *mempack)
+ void strip_lf(char *str);
+ char *ltrim(char *str);
+ #if defined(ALIGN_POINTERS) || defined(WORDS_BIGENDIAN)
+-unsigned int mget_word(char FAR *p);
+-unsigned long mget_dword(char FAR *p);
+-void mput_word(unsigned int w, char FAR *p);
+-void mput_dword(unsigned long d, char FAR *p);
++uint16_t mget_word(char FAR *p);
++uint32_t mget_dword(char FAR *p);
++void mput_word(uint16_t w, char FAR *p);
++void mput_dword(uint32_t d, char FAR *p);
+ #endif
+ 
+ #endif

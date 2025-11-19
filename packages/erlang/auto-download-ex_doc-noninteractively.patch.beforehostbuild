@@ -1,0 +1,29 @@
+Autoaccepts the interactive prompt:
+"Could not find ex_doc! Do you want to download latest ex_doc from github? (y/n)?"
+when building docs.
+
+--- a/make/ex_doc_wrapper.in
++++ b/make/ex_doc_wrapper.in
+@@ -10,21 +10,12 @@ if [ ! -f "${EX_DOC}" ]; then
+ fi
+ 
+ if [ -z "${EX_DOC}" ]; then
+-    echo -n "Could not find ex_doc! "
+-    read -p "Do you want to download latest ex_doc from github? (y/n)? " -n 1 -r
+-    echo
+-    if [[ $REPLY =~ ^[Yy]$ ]]
+-    then
++    echo -n "Could not find ex_doc! Downloading the latest ex_doc from github..."
+         if $ERL_TOP/otp_build download_ex_doc; then
+-            read -p "Press any key to continue..." -n 1 -r
+-            echo "continuing"
+             EX_DOC=$(command -v ex_doc || true)
+         else
+             exit 1
+         fi
+-    else
+-        exit 1
+-    fi
+ fi
+ 
+ ## The below bash magic captures the output of stderr into OUTPUT while still printing

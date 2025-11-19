@@ -1,0 +1,10 @@
+--- ./iptables/Makefile.in.orig	2022-06-07 17:03:53.776982817 +0200
++++ ./iptables/Makefile.in	2022-06-07 17:03:58.407070989 +0200
+@@ -1597,7 +1597,6 @@
+ 
+ # Using if..fi avoids an ugly "error (ignored)" message :)
+ install-exec-hook:
+-	-if test -z "${DESTDIR}"; then /sbin/ldconfig; fi;
+ 	${INSTALL} -dm0755 "${DESTDIR}${bindir}";
+ 	for i in ${vx_bin_links}; do ${LN_S} -f "${sbindir}/xtables-legacy-multi" "${DESTDIR}${bindir}/$$i"; done;
+ 	for i in ${v4_sbin_links}; do ${LN_S} -f xtables-legacy-multi "${DESTDIR}${sbindir}/$$i"; done;

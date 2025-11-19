@@ -1,0 +1,20 @@
+--- a/libtd/tdutils/td/utils/logging.cpp
++++ b/libtd/tdutils/td/utils/logging.cpp
+@@ -17,7 +17,7 @@
+ #include <limits>
+ #include <mutex>
+ 
+-#if TD_ANDROID
++#if TD_ANDROID && !defined(__TERMUX__)
+ #include <android/log.h>
+ #define ALOG_TAG "DLTD"
+ #elif TD_TIZEN
+@@ -152,7 +152,7 @@
+ 
+ class DefaultLog final : public LogInterface {
+   void do_append(int log_level, CSlice slice) final {
+-#if TD_ANDROID
++#if TD_ANDROID && !defined(__TERMUX__)
+     switch (log_level) {
+       case VERBOSITY_NAME(FATAL):
+         __android_log_write(ANDROID_LOG_FATAL, ALOG_TAG, slice.c_str());

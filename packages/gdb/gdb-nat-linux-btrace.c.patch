@@ -1,0 +1,120 @@
+See https://android-developers.googleblog.com/2024/08/adding-16-kb-page-size-to-android.html
+
+diff -u -r ../cache/gdb-16.3/gdb/nat/linux-btrace.c ./gdb/nat/linux-btrace.c
+--- ../cache/gdb-16.3/gdb/nat/linux-btrace.c	2025-04-20 17:22:05.000000000 +0000
++++ ./gdb/nat/linux-btrace.c	2025-09-14 10:00:21.872932567 +0000
+@@ -39,6 +39,17 @@
+ #include <sys/types.h>
+ #include <signal.h>
+ 
++static long read_page_size()
++{
++  long page_size = sysconf(_SC_PAGESIZE);
++  if (page_size == -1) {
++    perror_with_name(_("sysconf(_SC_PAGESIZE) failed"));
++    exit(1);
++  }
++  return page_size;
++}
++
++
+ /* A branch trace record in perf_event.  */
+ struct perf_event_bts
+ {
+@@ -545,9 +556,11 @@
+   if (fd.get () < 0)
+     diagnose_perf_event_open_fail ();
+ 
++  long page_size = read_page_size();
++
+   /* Convert the requested size in bytes to pages (rounding up).  */
+-  pages = ((size_t) conf->size / PAGE_SIZE
+-	   + ((conf->size % PAGE_SIZE) == 0 ? 0 : 1));
++  pages = ((size_t) conf->size / page_size
++	   + ((conf->size % page_size) == 0 ? 0 : 1));
+   /* We need at least one page.  */
+   if (pages == 0)
+     pages = 1;
+@@ -566,17 +579,17 @@
+       size_t length;
+       __u64 data_size;
+ 
+-      data_size = (__u64) pages * PAGE_SIZE;
++      data_size = (__u64) pages * (__u64) page_size;
+ 
+       /* Don't ask for more than we can represent in the configuration.  */
+       if ((__u64) UINT_MAX < data_size)
+ 	continue;
+ 
+       size = (size_t) data_size;
+-      length = size + PAGE_SIZE;
++      length = size + (size_t) page_size;
+ 
+       /* Check for overflows.  */
+-      if ((__u64) length != data_size + PAGE_SIZE)
++      if ((__u64) length != data_size + (__u64) page_size)
+ 	continue;
+ 
+       errno = 0;
+@@ -591,7 +604,7 @@
+ 
+   struct perf_event_mmap_page *header = (struct perf_event_mmap_page *)
+     data.get ();
+-  data_offset = PAGE_SIZE;
++  data_offset = (__u64) page_size;
+ 
+ #if defined (PERF_ATTR_SIZE_VER5)
+   if (offsetof (struct perf_event_mmap_page, data_size) <= header->size)
+@@ -702,8 +715,10 @@
+   if (fd.get () < 0)
+     diagnose_perf_event_open_fail ();
+ 
++  long page_size = read_page_size();
++
+   /* Allocate the configuration page. */
+-  scoped_mmap data (nullptr, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED,
++  scoped_mmap data (nullptr, (size_t) page_size, PROT_READ | PROT_WRITE, MAP_SHARED,
+ 		    fd.get (), 0);
+   if (data.get () == MAP_FAILED)
+     error (_("Failed to map trace user page: %s."), safe_strerror (errno));
+@@ -714,8 +729,8 @@
+   header->aux_offset = header->data_offset + header->data_size;
+ 
+   /* Convert the requested size in bytes to pages (rounding up).  */
+-  pages = ((size_t) conf->size / PAGE_SIZE
+-	   + ((conf->size % PAGE_SIZE) == 0 ? 0 : 1));
++  pages = ((size_t) conf->size / page_size
++	   + ((conf->size % page_size) == 0 ? 0 : 1));
+   /* We need at least one page.  */
+   if (pages == 0)
+     pages = 1;
+@@ -734,7 +749,7 @@
+       size_t length;
+       __u64 data_size;
+ 
+-      data_size = (__u64) pages * PAGE_SIZE;
++      data_size = (__u64) pages * (__u64) page_size;
+ 
+       /* Don't ask for more than we can represent in the configuration.  */
+       if ((__u64) UINT_MAX < data_size)
+@@ -805,7 +820,8 @@
+ static void
+ linux_disable_bts (struct linux_btrace_target_info *tinfo)
+ {
+-  munmap ((void *) tinfo->header, tinfo->pev.size + PAGE_SIZE);
++  long page_size = read_page_size();
++  munmap ((void *) tinfo->header, tinfo->pev.size + page_size);
+   close (tinfo->file);
+ }
+ 
+@@ -814,8 +830,9 @@
+ static void
+ linux_disable_pt (struct linux_btrace_target_info *tinfo)
+ {
++  long page_size = read_page_size();
+   munmap ((void *) tinfo->pev.mem, tinfo->pev.size);
+-  munmap ((void *) tinfo->header, PAGE_SIZE);
++  munmap ((void *) tinfo->header, (size_t) page_size);
+   close (tinfo->file);
+ }
+ 

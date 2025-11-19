@@ -1,0 +1,47 @@
+diff -u -r ../openssl-1.1.1-pre9/Configurations/15-android.conf ./Configurations/15-android.conf
+--- ../openssl-1.1.1-pre9/Configurations/15-android.conf	2018-08-21 12:14:11.000000000 +0000
++++ ./Configurations/15-android.conf	2018-08-22 09:48:30.506584421 +0000
+@@ -130,10 +130,10 @@
+         # systems are perfectly capable of executing binaries targeting
+         # Froyo. Keep in mind that in the nutshell Android builds are
+         # about JNI, i.e. shared libraries, not applications.
+-        cflags           => add(sub { android_ndk()->{cflags} }),
+-        cppflags         => add(sub { android_ndk()->{cppflags} }),
+-        cxxflags         => add(sub { android_ndk()->{cflags} }),
+-        bn_ops           => sub { android_ndk()->{bn_ops} },
++        #cflags           => add(sub { android_ndk()->{cflags} }),
++        #cppflags         => add(sub { android_ndk()->{cppflags} }),
++        #cxxflags         => add(sub { android_ndk()->{cflags} }),
++        #bn_ops           => sub { android_ndk()->{bn_ops} },
+         bin_cflags       => "-pie",
+         enable           => [ ],
+     },
+@@ -166,11 +166,11 @@
+         # Newer NDK versions reportedly require additional -latomic.
+         #
+         inherit_from     => [ "android", asm("armv4_asm") ],
+-        bn_ops           => add("RC4_CHAR"),
++        bn_ops           => "BN_LLONG RC4_CHAR",
+     },
+     "android-arm64" => {
+         inherit_from     => [ "android", asm("aarch64_asm") ],
+-        bn_ops           => add("RC4_CHAR"),
++        bn_ops           => "SIXTY_FOUR_BIT_LONG RC4_CHAR",
+         perlasm_scheme   => "linux64",
+     },
+ 
+@@ -197,12 +197,12 @@
+     "android-x86" => {
+         inherit_from     => [ "android", asm("x86_asm") ],
+         CFLAGS           => add(picker(release => "-fomit-frame-pointer")),
+-        bn_ops           => add("RC4_INT"),
++        bn_ops           => "BN_LLONG RC4_INT",
+         perlasm_scheme   => "android",
+     },
+     "android-x86_64" => {
+         inherit_from     => [ "android", asm("x86_64_asm") ],
+-        bn_ops           => add("RC4_INT"),
++        bn_ops           => "SIXTY_FOUR_BIT_LONG RC4_INT",
+         perlasm_scheme   => "elf",
+     },
+ 

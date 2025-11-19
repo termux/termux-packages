@@ -1,0 +1,21 @@
+--- a/sshd-session.c
++++ b/sshd-session.c
+@@ -1074,7 +1074,18 @@
+ 
+ 	/* Store privilege separation user for later use if required. */
+ 	privsep_chroot = (getuid() == 0 || geteuid() == 0);
++#ifdef __ANDROID__
++	/* Let the privilege separation user be Termux on Android */
++	do {
++		struct stat st;
++		if (stat("@TERMUX_PREFIX@", &st) != -1) {
++			privsep_pw = getpwuid(st.st_uid);
++		}
++	} while (0);
++	if (privsep_pw == NULL) {
++#else
+ 	if ((privsep_pw = getpwnam(SSH_PRIVSEP_USER)) == NULL) {
++#endif
+ 		if (privsep_chroot || options.kerberos_authentication)
+ 			fatal("Privilege separation user %s does not exist",
+ 			    SSH_PRIVSEP_USER);

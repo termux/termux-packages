@@ -1,0 +1,14 @@
+--- a/final/font/unicodemap.h
++++ b/final/font/unicodemap.h
+@@ -8,7 +8,11 @@
+ #endif
+ 
+ #if defined(__linux__)
++#ifndef __ANDROID__
+   #include <sys/kd.h>
++#else
++  #include <linux/kd.h>
++#endif
+ #endif
+ 
+ #include <array>

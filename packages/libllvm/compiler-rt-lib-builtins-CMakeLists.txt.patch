@@ -1,0 +1,17 @@
+Something changed between clang 9 in NDK 21d and clang 12 in NDK 23, where we have to pass
+this flag now.
+
+diff --git a/compiler-rt/lib/builtins/CMakeLists.txt b/compiler-rt/lib/builtins/CMakeLists.txt
+index 0d7fc65cfd3e9..ee8ac43c41dbc 100644
+--- a/compiler-rt/lib/builtins/CMakeLists.txt
++++ b/compiler-rt/lib/builtins/CMakeLists.txt
+@@ -958,6 +958,9 @@ else ()
+       if (COMPILER_RT_HAS_${arch}_ARMHF)
+         list(APPEND BUILTIN_CFLAGS_${arch} -fomit-frame-pointer -DCOMPILER_RT_ARMHF_TARGET)
+       endif()
++      if (${arch} STREQUAL "arm")
++        list(APPEND BUILTIN_CFLAGS_${arch} -fomit-frame-pointer)
++      endif()
+ 
+       # For RISCV32, we must force enable int128 for compiling long
+       # double routines.

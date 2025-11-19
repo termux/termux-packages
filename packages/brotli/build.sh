@@ -1,0 +1,32 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/google/brotli
+TERMUX_PKG_DESCRIPTION="lossless compression algorithm and format (command line utility)"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.2.0"
+TERMUX_PKG_SRCURL=https://github.com/google/brotli/archive/v$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=816c96e8e8f193b40151dad7e8ff37b1221d019dbcb9c35cd3fadbfe6477dfec
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_BREAKS="brotli-dev"
+TERMUX_PKG_REPLACES="brotli-dev"
+TERMUX_PKG_FORCE_CMAKE=true
+
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=1
+
+	local _ABI_CURRENT="$(grep -E '^#define\s+BROTLI_ABI_CURRENT\s+' \
+			c/common/version.h | awk '{ print $3 }')"
+	local _ABI_AGE="$(grep -E '^#define\s+BROTLI_ABI_AGE\s+' \
+			c/common/version.h | awk '{ print $3 }')"
+	local v=$(( _ABI_CURRENT - _ABI_AGE ))
+	if [ ! "${_ABI_CURRENT}" ] || [ ! "${_ABI_AGE}" ] || [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
+termux_step_post_make_install() {
+	mkdir -p $TERMUX_PREFIX/share/man/man{1,3}
+	cp "$TERMUX_PKG_SRCDIR/docs/brotli.1" "$TERMUX_PREFIX/share/man/man1/"
+	cp "$TERMUX_PKG_SRCDIR"/docs/*.3 "$TERMUX_PREFIX/share/man/man3/"
+}

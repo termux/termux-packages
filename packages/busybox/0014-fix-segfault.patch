@@ -1,0 +1,15 @@
+https://github.com/termux/termux-packages/issues/21522
+
+--- a/include/libbb.h
++++ b/include/libbb.h
+@@ -382,6 +382,10 @@
+ #ifndef BB_GLOBAL_CONST
+ # define BB_GLOBAL_CONST const
+ #endif
++#ifdef __clang__
++# undef BB_GLOBAL_CONST
++# define BB_GLOBAL_CONST
++#endif
+ 
+ #if defined(errno)
+ /* If errno is a define, assume it's "define errno (*__errno_location())"

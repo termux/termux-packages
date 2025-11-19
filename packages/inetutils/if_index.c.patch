@@ -1,0 +1,57 @@
+diff -u -r ../inetutils-1.9.3/libinetutils/if_index.c ./libinetutils/if_index.c
+--- ../inetutils-1.9.3/libinetutils/if_index.c	2015-03-31 11:40:48.000000000 -0400
++++ ./libinetutils/if_index.c	2015-05-12 15:32:45.660145151 -0400
+@@ -36,10 +36,22 @@
+ #include <net/if.h>
+ 
+ #ifndef HAVE_STRUCT_IF_NAMEINDEX
++
++#ifdef __ANDROID__
++struct if_nameindex {
++	unsigned int if_index;
++       char    *if_name;
++};
++# define ifr_ifindex     ifr_ifru.ifru_ivalue    /* interface index      */
++#endif
++
+ unsigned int
+ if_nametoindex (const char *ifname)
+ {
+   int result = 0;
++#ifdef __ANDROID__
++  return result;
++#else
+ # ifdef SIOCGIFINDEX
+   {
+     int fd = socket (AF_INET, SOCK_DGRAM, 0);
+@@ -74,11 +86,13 @@
+       }
+     return result;
+   }
++#endif
+ }
+ 
+ void
+ if_freenameindex (struct if_nameindex *ifn)
+ {
++#ifndef __ANDROID__
+   struct if_nameindex *ptr = ifn;
+   if (!ifn)
+     return;
+@@ -88,6 +102,7 @@
+       ++ptr;
+     }
+   free (ifn);
++#endif
+ }
+ 
+ struct if_nameindex *
+@@ -161,7 +176,7 @@
+ 	  return NULL;
+ 	}
+ 
+-#  if defined SIOCGIFINDEX
++#  if defined SIOCGIFINDEX && !defined(__ANDROID__)
+       if (ioctl (fd, SIOCGIFINDEX, cur) >= 0)
+ 	idx[i].if_index = cur->ifr_index;
+       else

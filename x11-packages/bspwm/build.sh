@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE="https://github.com/baskerville/bspwm"
+TERMUX_PKG_DESCRIPTION="A tiling window manager based on binary space partitioning"
+TERMUX_PKG_LICENSE="BSD 2-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.9.12"
+TERMUX_PKG_SRCURL="https://github.com/baskerville/bspwm/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
+TERMUX_PKG_SHA256=ca3be808e3d0c785955f1613e6e860fc51b5db086b821b48707466da1a06392c
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_DEPENDS="libxcb, sxhkd, xcb-util, xcb-util-keysyms, xcb-util-wm"
+TERMUX_PKG_BUILD_IN_SRC=true

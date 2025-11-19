@@ -1,0 +1,669 @@
+<?xml version="1.0"?>
+<dump>
+  <boxed name="GnmCellPos" get-type="gnm_cell_pos_get_type"/>
+  <boxed name="GnmEvalPos" get-type="gnm_eval_pos_get_type"/>
+  <boxed name="GnmParsePos" get-type="gnm_parse_pos_get_type"/>
+  <boxed name="GnmCellRef" get-type="gnm_cellref_get_type"/>
+  <boxed name="GnmRangeRef" get-type="gnm_rangeref_get_type"/>
+  <boxed name="GnmLexerItem" get-type="gnm_lexer_item_get_type"/>
+  <boxed name="GnmParseError" get-type="gnm_parse_error_get_type"/>
+  <boxed name="GnmConventions" get-type="gnm_conventions_get_type"/>
+  <boxed name="GnmValue" get-type="gnm_value_get_type"/>
+  <class name="GnmDataCacheSource" get-type="gnm_data_cache_source_get_type" parents="GObject">
+    <implements name="GODataCacheSource"/>
+    <property name="src-sheet" type="GnmSheet" flags="227"/>
+    <property name="src-range" type="GnmRange" flags="227"/>
+    <property name="src-name" type="gchararray" flags="227" default-value="NULL"/>
+  </class>
+  <class name="GnmSheetSlicer" get-type="gnm_sheet_slicer_get_type" parents="GODataSlicer,GObject">
+    <property name="sheet" type="GnmSheet" flags="227"/>
+    <property name="range" type="GnmRange" flags="227"/>
+    <property name="first-header-row" type="guint" flags="227" default-value="0"/>
+    <property name="first-data-col" type="guint" flags="227" default-value="0"/>
+    <property name="first-data-row" type="guint" flags="227" default-value="0"/>
+    <property name="show-headers-col" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="show-headers-row" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="show-stripes-col" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="show-stripes-row" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="show-last-col" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="show-last-row" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="layout" type="GnmSheetSlicerLayout" flags="227" default-value="GSS_LAYOUT_XL_OUTLINE"/>
+  </class>
+  <enum name="GnmSheetSlicerLayout" get-type="gnm_sheet_slicer_layout_get_type">
+    <member name="GSS_LAYOUT_XL_OUTLINE" nick="xl-outline" value="0"/>
+    <member name="GSS_LAYOUT_XL_COMPACT" nick="xl-compact" value="1"/>
+    <member name="GSS_LAYOUT_XL_TABULAR" nick="xl-tabular" value="2"/>
+  </enum>  <enum name="GnmSOAnchorMode" get-type="gnm_sheet_object_anchor_mode_get_type">
+    <member name="GNM_SO_ANCHOR_TWO_CELLS" nick="two-cells" value="0"/>
+    <member name="GNM_SO_ANCHOR_ONE_CELL" nick="one-cell" value="1"/>
+    <member name="GNM_SO_ANCHOR_ABSOLUTE" nick="absolute" value="2"/>
+  </enum>  <boxed name="SheetObjectAnchor" get-type="sheet_object_anchor_get_type"/>
+  <class name="SheetObject" get-type="sheet_object_get_type" parents="GObject">
+    <property name="name" type="gchararray" flags="227" default-value="NULL"/>
+    <signal name="bounds-changed" return="void" when="last">
+    </signal>
+    <signal name="unrealized" return="void" when="last">
+    </signal>
+  </class>
+  <interface name="SheetObjectImageable" get-type="sheet_object_imageable_get_type">
+  </interface>
+  <interface name="SheetObjectExportable" get-type="sheet_object_exportable_get_type">
+  </interface>
+  <class name="SheetObjectView" get-type="sheet_object_view_get_type" parents="GocGroup,GocItem,GObject">
+  </class>
+  <class name="GnmCellCombo" get-type="gnm_cell_combo_get_type" parents="SheetObject,GObject" abstract="1">
+    <property name="sheet-view" type="SheetView" flags="227"/>
+  </class>
+  <class name="GnmSheetSlicerCombo" get-type="gnm_sheet_slicer_combo_get_type" parents="GnmCellCombo,SheetObject,GObject">
+    <property name="field" type="GODataSlicerField" flags="227"/>
+  </class>
+  <class name="GnmPane" get-type="gnm_pane_get_type" parents="GnmSimpleCanvas,GocCanvas,GtkLayout,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkScrollable"/>
+  </class>
+  <class name="GnmSimpleCanvas" get-type="gnm_simple_canvas_get_type" parents="GocCanvas,GtkLayout,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkScrollable"/>
+  </class>
+  <class name="GnmPreviewGrid" get-type="gnm_preview_grid_get_type" parents="GocGroup,GocItem,GObject">
+    <property name="render-gridlines" type="gboolean" flags="226" default-value="FALSE"/>
+    <property name="default-col-width" type="guint" flags="226" default-value="0"/>
+    <property name="default-row-height" type="guint" flags="226" default-value="0"/>
+    <property name="default-style" type="GnmStyle" flags="226"/>
+    <property name="default-value" type="GnmValue" flags="226"/>
+  </class>
+  <class name="GnmApp" get-type="gnm_app_get_type" parents="GObject">
+    <property name="file-history-list" type="gpointer" flags="225"/>
+    <property name="shutting-down" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="initial-open-complete" type="gboolean" flags="227" default-value="FALSE"/>
+    <signal name="workbook-added" return="void" when="last">
+      <param type="Workbook"/>
+    </signal>
+    <signal name="workbook-removed" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="window-list-changed" return="void" when="last">
+    </signal>
+    <signal name="custom-ui-added" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="custom-ui-removed" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="clipboard-modified" return="void" when="last">
+    </signal>
+    <signal name="recalc-finished" return="void" when="last">
+    </signal>
+    <signal name="recalc-clear-caches" return="void" when="last">
+    </signal>
+  </class>
+  <boxed name="GnmAction" get-type="gnm_action_get_type"/>
+  <boxed name="GnmAppExtraUI" get-type="gnm_app_extra_ui_get_type"/>
+  <boxed name="GnmCell" get-type="gnm_cell_get_type"/>
+  <boxed name="CellSpanInfo" get-type="cell_span_info_get_type"/>
+  <boxed name="GnmCellCopy" get-type="gnm_cell_copy_get_type"/>
+  <boxed name="GnmPasteTarget" get-type="gnm_paste_target_get_type"/>
+  <boxed name="GnmCellRegion" get-type="gnm_cell_region_get_type"/>
+  <boxed name="ColRowInfo" get-type="col_row_info_get_type"/>
+  <class name="GnmCmdContextStderr" get-type="gnm_cmd_context_stderr_get_type" parents="GObject">
+    <implements name="GOCmdContext"/>
+  </class>
+  <boxed name="GnmStyle" get-type="gnm_style_get_type"/>
+  <enum name="GnmHAlign" get-type="gnm_align_h_get_type">
+    <member name="GNM_HALIGN_GENERAL" nick="general" value="1"/>
+    <member name="GNM_HALIGN_LEFT" nick="left" value="2"/>
+    <member name="GNM_HALIGN_RIGHT" nick="right" value="4"/>
+    <member name="GNM_HALIGN_CENTER" nick="center" value="8"/>
+    <member name="GNM_HALIGN_FILL" nick="fill" value="16"/>
+    <member name="GNM_HALIGN_JUSTIFY" nick="justify" value="32"/>
+    <member name="GNM_HALIGN_CENTER_ACROSS_SELECTION" nick="across-selection" value="64"/>
+    <member name="GNM_HALIGN_DISTRIBUTED" nick="distributed" value="128"/>
+  </enum>  <enum name="GnmVAlign" get-type="gnm_align_v_get_type">
+    <member name="GNM_VALIGN_TOP" nick="top" value="1"/>
+    <member name="GNM_VALIGN_BOTTOM" nick="bottom" value="2"/>
+    <member name="GNM_VALIGN_CENTER" nick="center" value="4"/>
+    <member name="GNM_VALIGN_JUSTIFY" nick="justify" value="8"/>
+    <member name="GNM_VALIGN_DISTRIBUTED" nick="distributed" value="16"/>
+  </enum>  <boxed name="GnmColor" get-type="gnm_color_get_type"/>
+  <boxed name="GnmBorder" get-type="gnm_border_get_type"/>
+  <class name="GnmGODataScalar" get-type="gnm_go_data_scalar_get_type" parents="GODataScalar,GOData,GObject">
+  </class>
+  <class name="GnmGODataVector" get-type="gnm_go_data_vector_get_type" parents="GODataVector,GOData,GObject">
+  </class>
+  <class name="GnmGODataMatrix" get-type="gnm_go_data_matrix_get_type" parents="GODataMatrix,GOData,GObject">
+  </class>
+  <class name="GnmComplete" get-type="gnm_complete_get_type" parents="GObject">
+  </class>
+  <class name="GnmCompleteSheet" get-type="gnm_complete_sheet_get_type" parents="GnmComplete,GObject">
+  </class>
+  <boxed name="GnmConsolidate" get-type="gnm_consolidate_get_type"/>
+  <boxed name="GnmSheetSize" get-type="gnm_sheet_size_get_type"/>
+  <enum name="GnmSheetType" get-type="gnm_sheet_type_get_type">
+    <member name="GNM_SHEET_DATA" nick="data" value="0"/>
+    <member name="GNM_SHEET_OBJECT" nick="object" value="1"/>
+    <member name="GNM_SHEET_XLM" nick="xlm" value="2"/>
+  </enum>  <enum name="GnmSheetVisibility" get-type="gnm_sheet_visibility_get_type">
+    <member name="GNM_SHEET_VISIBILITY_VISIBLE" nick="visible" value="0"/>
+    <member name="GNM_SHEET_VISIBILITY_HIDDEN" nick="hidden" value="1"/>
+    <member name="GNM_SHEET_VISIBILITY_VERY_HIDDEN" nick="very-hidden" value="2"/>
+  </enum>  <class name="GnmSheet" get-type="gnm_sheet_get_type" parents="GObject">
+    <property name="sheet-type" type="GnmSheetType" flags="235" default-value="GNM_SHEET_DATA"/>
+    <property name="workbook" type="Workbook" flags="235"/>
+    <property name="name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="text-is-rtl" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="visibility" type="GnmSheetVisibility" flags="227" default-value="GNM_SHEET_VISIBILITY_VISIBLE"/>
+    <property name="display-formulas" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="display-zeros" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="display-grid" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="display-column-header" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="display-row-header" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="display-outlines" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="display-outlines-below" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="display-outlines-right" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="protected" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-edit-objects" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-edit-scenarios" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-cell-formatting" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-column-formatting" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-row-formatting" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-insert-columns" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-insert-rows" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-insert-hyperlinks" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-delete-columns" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-delete-rows" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-select-locked-cells" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="protected-allow-sort-ranges" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-edit-auto-filters" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-edit-pivottable" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-select-unlocked-cells" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="conventions" type="GnmConventions" flags="227"/>
+    <property name="use-r1c1" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="tab-foreground" type="GnmColor" flags="227"/>
+    <property name="tab-background" type="GnmColor" flags="227"/>
+    <property name="zoom-factor" type="gdouble" flags="231" default-value="1.000000"/>
+    <property name="columns" type="gint" flags="235" default-value="256"/>
+    <property name="rows" type="gint" flags="235" default-value="65536"/>
+    <signal name="detached-from-workbook" return="void" when="last">
+      <param type="Workbook"/>
+    </signal>
+  </class>
+  <class name="Workbook" get-type="workbook_get_type" parents="GODoc,GObject">
+    <property name="recalc-mode" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="being-loaded" type="gboolean" flags="227" default-value="TRUE"/>
+    <signal name="sheet-order-changed" return="void" when="last">
+    </signal>
+    <signal name="sheet-added" return="void" when="last">
+    </signal>
+    <signal name="sheet-deleted" return="void" when="last">
+    </signal>
+  </class>
+  <boxed name="WorkbookSheetState" get-type="workbook_sheet_state_get_type"/>
+  <boxed name="GnmCriteria" get-type="gnm_criteria_get_type"/>
+  <boxed name="GnmExpr" get-type="gnm_expr_get_type"/>
+  <boxed name="GnmExprArrayCorner" get-type="gnm_expr_array_corner_get_type"/>
+  <boxed name="GnmExprTop" get-type="gnm_expr_top_get_type"/>
+  <boxed name="GnmExprSharer" get-type="gnm_expr_sharer_get_type"/>
+  <boxed name="GnmExprDeriv" get-type="gnm_expr_deriv_info_get_type"/>
+  <boxed name="GnmNamedExpr" get-type="gnm_named_expr_get_type"/>
+  <boxed name="GnmNamedExprCollection" get-type="gnm_named_expr_collection_get_type"/>
+  <boxed name="GnmFT" get-type="gnm_ft_get_type"/>
+  <boxed name="GnmFuncGroup" get-type="gnm_func_group_get_type"/>
+  <class name="GnmFunc" get-type="gnm_func_get_type" parents="GObject">
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="translation-domain" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="in-use" type="gboolean" flags="225" default-value="FALSE"/>
+    <signal name="load-stub" return="void" when="last">
+    </signal>
+    <signal name="link-dep" return="gint" when="last">
+      <param type="gpointer"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="derivative" return="GnmExpr" when="last">
+      <param type="GnmExpr"/>
+      <param type="GnmEvalPos"/>
+      <param type="GnmExprDeriv"/>
+    </signal>
+  </class>
+  <class name="GnmCommand" get-type="gnm_command_get_type" parents="GObject">
+  </class>
+  <class name="GnmGraphWindow" get-type="gnm_graph_window_get_type" parents="GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <enum name="GnmValidationType" get-type="gnm_validation_type_get_type">
+    <member name="GNM_VALIDATION_TYPE_ANY" nick="any" value="0"/>
+    <member name="GNM_VALIDATION_TYPE_AS_INT" nick="int" value="1"/>
+    <member name="GNM_VALIDATION_TYPE_AS_NUMBER" nick="number" value="2"/>
+    <member name="GNM_VALIDATION_TYPE_IN_LIST" nick="list" value="3"/>
+    <member name="GNM_VALIDATION_TYPE_AS_DATE" nick="date" value="4"/>
+    <member name="GNM_VALIDATION_TYPE_AS_TIME" nick="time" value="5"/>
+    <member name="GNM_VALIDATION_TYPE_TEXT_LENGTH" nick="length" value="6"/>
+    <member name="GNM_VALIDATION_TYPE_CUSTOM" nick="custom" value="7"/>
+  </enum>  <enum name="GnmValidationStyle" get-type="gnm_validation_style_get_type">
+    <member name="GNM_VALIDATION_STYLE_NONE" nick="none" value="0"/>
+    <member name="GNM_VALIDATION_STYLE_STOP" nick="stop" value="1"/>
+    <member name="GNM_VALIDATION_STYLE_WARNING" nick="warning" value="2"/>
+    <member name="GNM_VALIDATION_STYLE_INFO" nick="info" value="3"/>
+    <member name="GNM_VALIDATION_STYLE_PARSE_ERROR" nick="parse-error" value="4"/>
+  </enum>  <enum name="GnmValidationOp" get-type="gnm_validation_op_get_type">
+    <member name="GNM_VALIDATION_OP_NONE" nick="none" value="-1"/>
+    <member name="GNM_VALIDATION_OP_BETWEEN" nick="between" value="0"/>
+    <member name="GNM_VALIDATION_OP_NOT_BETWEEN" nick="not-between" value="1"/>
+    <member name="GNM_VALIDATION_OP_EQUAL" nick="equal" value="2"/>
+    <member name="GNM_VALIDATION_OP_NOT_EQUAL" nick="not-equal" value="3"/>
+    <member name="GNM_VALIDATION_OP_GT" nick="gt" value="4"/>
+    <member name="GNM_VALIDATION_OP_LT" nick="lt" value="5"/>
+    <member name="GNM_VALIDATION_OP_GTE" nick="gte" value="6"/>
+    <member name="GNM_VALIDATION_OP_LTE" nick="lte" value="7"/>
+  </enum>  <boxed name="GnmValidation" get-type="gnm_validation_get_type"/>
+  <class name="WorkbookControl" get-type="workbook_control_get_type" parents="GODocControl,GObject">
+    <implements name="GOCmdContext"/>
+    <property name="view" type="WorkbookView" flags="227"/>
+  </class>
+  <class name="GnmExprEntry" get-type="gnm_expr_entry_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="GtkCellEditable"/>
+    <implements name="GogDataEditor"/>
+    <property name="update-policy" type="GnmUpdateType" flags="227" default-value="GNM_UPDATE_CONTINUOUS"/>
+    <property name="with-icon" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="text" type="gchararray" flags="227" default-value=""/>
+    <property name="flags" type="guint" flags="227" default-value="0"/>
+    <property name="scg" type="SheetControlGUI" flags="227"/>
+    <property name="wbcg" type="WBCGtk" flags="227"/>
+    <property name="constant-format" type="GOFormat" flags="227"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+    <signal name="update" return="void" when="last">
+      <param type="gboolean"/>
+    </signal>
+    <signal name="activate" return="void" when="last" action="1">
+    </signal>
+  </class>
+  <enum name="GnmUpdateType" get-type="gnm_update_type_get_type">
+    <member name="GNM_UPDATE_CONTINUOUS" nick="continuous" value="0"/>
+    <member name="GNM_UPDATE_DISCONTINUOUS" nick="discontinuous" value="1"/>
+    <member name="GNM_UPDATE_DELAYED" nick="delayed" value="2"/>
+  </enum>  <class name="WBCGtk" get-type="wbc_gtk_get_type" parents="WorkbookControl,GODocControl,GObject">
+    <implements name="GOCmdContext"/>
+    <implements name="GogDataAllocator"/>
+    <property name="autosave-prompt" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="autosave-time" type="gint" flags="227" default-value="0"/>
+    <signal name="markup-changed" return="void" when="last">
+    </signal>
+  </class>
+  <enum name="GnmSolverStatus" get-type="gnm_solver_status_get_type">
+    <member name="GNM_SOLVER_STATUS_READY" nick="ready" value="0"/>
+    <member name="GNM_SOLVER_STATUS_PREPARING" nick="preparing" value="1"/>
+    <member name="GNM_SOLVER_STATUS_PREPARED" nick="prepared" value="2"/>
+    <member name="GNM_SOLVER_STATUS_RUNNING" nick="running" value="3"/>
+    <member name="GNM_SOLVER_STATUS_DONE" nick="done" value="4"/>
+    <member name="GNM_SOLVER_STATUS_ERROR" nick="error" value="5"/>
+    <member name="GNM_SOLVER_STATUS_CANCELLED" nick="cancelled" value="6"/>
+  </enum>  <enum name="GnmSolverProblemType" get-type="gnm_solver_problem_type_get_type">
+    <member name="GNM_SOLVER_MINIMIZE" nick="minimize" value="0"/>
+    <member name="GNM_SOLVER_MAXIMIZE" nick="maximize" value="1"/>
+  </enum>  <boxed name="GnmSolverConstraint" get-type="gnm_solver_constraint_get_type"/>
+  <class name="GnmSolverParameters" get-type="gnm_solver_param_get_type" parents="GObject">
+    <property name="sheet" type="GnmSheet" flags="235"/>
+    <property name="problem-type" type="GnmSolverProblemType" flags="227" default-value="GNM_SOLVER_MAXIMIZE"/>
+  </class>
+  <class name="GnmSolverResult" get-type="gnm_solver_result_get_type" parents="GObject">
+  </class>
+  <class name="GnmSolverSensitivity" get-type="gnm_solver_sensitivity_get_type" parents="GObject">
+    <property name="solver" type="GnmSolver" flags="235"/>
+  </class>
+  <class name="GnmSolver" get-type="gnm_solver_get_type" parents="GObject">
+    <property name="status" type="GnmSolverStatus" flags="227" default-value="GNM_SOLVER_STATUS_READY"/>
+    <property name="reason" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="params" type="GnmSolverParameters" flags="235"/>
+    <property name="result" type="GnmSolverResult" flags="227"/>
+    <property name="sensitivity" type="GnmSolverSensitivity" flags="227"/>
+    <property name="starttime" type="gdouble" flags="227" default-value="-1.000000"/>
+    <property name="endtime" type="gdouble" flags="227" default-value="-1.000000"/>
+    <property name="flip-sign" type="gboolean" flags="227" default-value="FALSE"/>
+    <signal name="prepare" return="gboolean" when="last">
+      <param type="GObject"/>
+      <param type="gpointer"/>
+    </signal>
+    <signal name="start" return="gboolean" when="last">
+      <param type="GObject"/>
+      <param type="gpointer"/>
+    </signal>
+    <signal name="stop" return="gboolean" when="last">
+      <param type="gpointer"/>
+    </signal>
+  </class>
+  <class name="GnmSubSolver" get-type="gnm_sub_solver_get_type" parents="GnmSolver,GObject">
+    <signal name="child-exit" return="void" when="last">
+      <param type="gboolean"/>
+      <param type="gint"/>
+    </signal>
+  </class>
+  <class name="GnmSolverIterator" get-type="gnm_solver_iterator_get_type" parents="GObject">
+    <signal name="iterate" return="gboolean" when="last">
+    </signal>
+  </class>
+  <class name="GnmSolverIteratorCompound" get-type="gnm_solver_iterator_compound_get_type" parents="GnmSolverIterator,GObject">
+    <property name="cycles" type="guint" flags="227" default-value="4294967295"/>
+  </class>
+  <class name="GnmIterSolver" get-type="gnm_iter_solver_get_type" parents="GnmSolver,GObject">
+  </class>
+  <class name="GnmSolverFactory" get-type="gnm_solver_factory_get_type" parents="GObject">
+  </class>
+  <class name="GnmPluginLoaderModule" get-type="gnm_plugin_loader_module_get_type" parents="GOPluginLoaderModule,GObject">
+    <implements name="GOPluginLoader"/>
+  </class>
+  <class name="GnmPluginServiceFunctionGroup" get-type="gnm_plugin_service_function_group_get_type" parents="GOPluginServiceSimple,GOPluginService,GObject">
+  </class>
+  <class name="PluginServiceUI" get-type="gnm_plugin_service_ui_get_type" parents="GOPluginServiceSimple,GOPluginService,GObject">
+  </class>
+  <class name="PluginServiceSolver" get-type="gnm_plugin_service_solver_get_type" parents="GOPluginService,GObject">
+  </class>
+  <class name="GnmSOFilled" get-type="gnm_so_filled_get_type" parents="SheetObject,GObject">
+    <property name="style" type="GOStyle" flags="227"/>
+    <property name="is-oval" type="gboolean" flags="235" default-value="FALSE"/>
+    <property name="text" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="markup" type="PangoAttrList" flags="227"/>
+    <property name="document" type="GODoc" flags="225"/>
+  </class>
+  <class name="GnmSOLine" get-type="gnm_so_line_get_type" parents="SheetObject,GObject">
+    <property name="style" type="GOStyle" flags="227"/>
+    <property name="start-arrow" type="GOArrow" flags="227"/>
+    <property name="end-arrow" type="GOArrow" flags="227"/>
+  </class>
+  <class name="GnmSOPath" get-type="gnm_so_path_get_type" parents="SheetObject,GObject">
+    <property name="style" type="GOStyle" flags="227"/>
+    <property name="path" type="GOPath" flags="227"/>
+    <property name="text" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="markup" type="PangoAttrList" flags="227"/>
+    <property name="paths" type="GPtrArray" flags="227"/>
+    <property name="viewbox" type="gchararray" flags="225" default-value="NULL"/>
+  </class>
+  <class name="GnmSOPolygon" get-type="gnm_so_polygon_get_type" parents="SheetObject,GObject">
+    <property name="style" type="GOStyle" flags="227"/>
+    <property name="points" type="gpointer" flags="227"/>
+    <property name="document" type="GODoc" flags="225"/>
+  </class>
+  <enum name="GnmStfTransliterateMode" get-type="gnm_stf_transliterate_mode_get_type">
+    <member name="GNM_STF_TRANSLITERATE_MODE_TRANS" nick="transliterate" value="0"/>
+    <member name="GNM_STF_TRANSLITERATE_MODE_ESCAPE" nick="escape" value="1"/>
+  </enum>  <enum name="GnmStfFormatMode" get-type="gnm_stf_format_mode_get_type">
+    <member name="GNM_STF_FORMAT_AUTO" nick="automatic" value="0"/>
+    <member name="GNM_STF_FORMAT_RAW" nick="raw" value="1"/>
+    <member name="GNM_STF_FORMAT_PRESERVE" nick="preserve" value="2"/>
+  </enum>  <class name="GnmStfExport" get-type="gnm_stf_export_get_type" parents="GsfOutputCsv,GsfOutput,GObject">
+    <property name="charset" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="locale" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="transliterate-mode" type="GnmStfTransliterateMode" flags="227" default-value="GNM_STF_TRANSLITERATE_MODE_ESCAPE"/>
+    <property name="format" type="GnmStfFormatMode" flags="227" default-value="GNM_STF_FORMAT_AUTO"/>
+  </class>
+  <class name="GnmHLink" get-type="gnm_hlink_get_type" parents="GObject" abstract="1">
+    <property name="sheet" type="GnmSheet" flags="234"/>
+  </class>
+  <class name="GnmHLinkCurWB" get-type="gnm_hlink_cur_wb_get_type" parents="GnmHLink,GObject">
+  </class>
+  <class name="GnmHLinkURL" get-type="gnm_hlink_url_get_type" parents="GnmHLink,GObject">
+  </class>
+  <class name="GnmHLinkEMail" get-type="gnm_hlink_email_get_type" parents="GnmHLinkURL,GnmHLink,GObject">
+  </class>
+  <class name="GnmHLinkExternal" get-type="gnm_hlink_external_get_type" parents="GnmHLink,GObject">
+  </class>
+  <class name="GnmInputMsg" get-type="gnm_input_msg_get_type" parents="GObject">
+  </class>
+  <class name="GnmItemBar" get-type="gnm_item_bar_get_type" parents="GocItem,GObject">
+    <property name="pane" type="GnmPane" flags="226"/>
+    <property name="IsColHeader" type="gboolean" flags="226" default-value="FALSE"/>
+  </class>
+  <class name="GnmItemCursor" get-type="gnm_item_cursor_get_type" parents="GocItem,GObject">
+    <property name="SheetControlGUI" type="SheetControlGUI" flags="226"/>
+    <property name="style" type="gint" flags="226" default-value="0"/>
+    <property name="button" type="gint" flags="226" default-value="0"/>
+    <property name="color" type="guint" flags="226" default-value="255"/>
+  </class>
+  <class name="GnmItemEdit" get-type="gnm_item_edit_get_type" parents="GocItem,GObject">
+    <property name="SheetControlGUI" type="SheetControlGUI" flags="226"/>
+  </class>
+  <class name="GnmItemGrid" get-type="gnm_item_grid_get_type" parents="GocItem,GObject">
+    <property name="SheetControlGUI" type="SheetControlGUI" flags="226"/>
+    <property name="bound" type="gpointer" flags="226"/>
+  </class>
+  <boxed name="GnmMatrix" get-type="gnm_matrix_get_type"/>
+  <enum name="GnmPrintRange" get-type="gnm_print_range_get_type">
+    <member name="GNM_PRINT_SAVED_INFO" nick="as-saved" value="-1"/>
+    <member name="GNM_PRINT_ACTIVE_SHEET" nick="active-sheet" value="0"/>
+    <member name="GNM_PRINT_ALL_SHEETS" nick="all-sheets" value="1"/>
+    <member name="GNM_PRINT_ALL_SHEETS_INCLUDING_HIDDEN" nick="all-sheets-incl-hidden" value="2"/>
+    <member name="GNM_PRINT_SHEET_RANGE" nick="sheet-range" value="3"/>
+    <member name="GNM_PRINT_SHEET_SELECTION" nick="sheet-selection" value="4"/>
+    <member name="GNM_PRINT_IGNORE_PRINTAREA" nick="ignore-print-area" value="5"/>
+    <member name="GNM_PRINT_SHEET_SELECTION_IGNORE_PRINTAREA" nick="sheet-selection-ignore-printarea" value="6"/>
+  </enum>  <enum name="GnmPrintCommentPlacementType" get-type="gnm_print_comment_placement_get_type">
+    <member name="GNM_PRINT_COMMENTS_NONE" nick="none" value="0"/>
+    <member name="GNM_PRINT_COMMENTS_IN_PLACE" nick="in-place" value="1"/>
+    <member name="GNM_PRINT_COMMENTS_AT_END" nick="at-end" value="2"/>
+  </enum>  <enum name="GnmPrintErrorsType" get-type="gnm_print_errors_get_type">
+    <member name="GNM_PRINT_ERRORS_AS_DISPLAYED" nick="as-displayed" value="0"/>
+    <member name="GNM_PRINT_ERRORS_AS_BLANK" nick="as-blank" value="1"/>
+    <member name="GNM_PRINT_ERRORS_AS_DASHES" nick="as-dashes" value="2"/>
+    <member name="GNM_PRINT_ERRORS_AS_NA" nick="as-na" value="3"/>
+  </enum>  <boxed name="GnmPrintInformation" get-type="gnm_print_information_get_type"/>
+  <boxed name="GnmPrintHF" get-type="gnm_print_hf_get_type"/>
+  <boxed name="GnmPrintHFRenderInfo" get-type="gnm_print_hf_render_info_get_type"/>
+  <boxed name="GnmPageBreaks" get-type="gnm_page_breaks_get_type"/>
+  <boxed name="GnmRange" get-type="gnm_range_get_type"/>
+  <boxed name="GnmSheetRange" get-type="gnm_sheet_range_get_type"/>
+  <enum name="GnmSearchReplaceScope" get-type="gnm_search_replace_scope_get_type">
+    <member name="GNM_SRS_WORKBOOK" nick="workbook" value="0"/>
+    <member name="GNM_SRS_SHEET" nick="sheet" value="1"/>
+    <member name="GNM_SRS_RANGE" nick="range" value="2"/>
+  </enum>  <class name="GnmSearchReplace" get-type="gnm_search_replace_get_type" parents="GOSearchReplace,GObject">
+    <property name="is-number" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="search-strings" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="search-other-values" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="search-expressions" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="search-expression-results" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="search-comments" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="search-scripts" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="invert" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="by-row" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="query" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="replace-keep-strings" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="sheet" type="GnmSheet" flags="227"/>
+    <property name="scope" type="GnmSearchReplaceScope" flags="227" default-value="GNM_SRS_SHEET"/>
+    <property name="range-text" type="gchararray" flags="227" default-value="NULL"/>
+  </class>
+  <class name="SheetControl" get-type="sheet_control_get_type" parents="GObject">
+  </class>
+  <class name="SheetControlGUI" get-type="sheet_control_gui_get_type" parents="SheetControl,GObject">
+  </class>
+  <class name="GnmFilterCombo" get-type="gnm_filter_combo_get_type" parents="SheetObject,GObject">
+    <signal name="cond-changed" return="void" when="last">
+    </signal>
+  </class>
+  <boxed name="GnmFilterCondition" get-type="gnm_filter_condition_get_type"/>
+  <boxed name="GnmFilter" get-type="gnm_filter_get_type"/>
+  <class name="GnmComment" get-type="cell_comment_get_type" parents="SheetObject,GObject">
+    <property name="text" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="author" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="markup" type="PangoAttrList" flags="227"/>
+  </class>
+  <class name="SheetObjectComponent" get-type="sheet_object_component_get_type" parents="SheetObject,GObject">
+    <implements name="SheetObjectImageable"/>
+    <implements name="SheetObjectExportable"/>
+  </class>
+  <class name="SheetObjectGraph" get-type="sheet_object_graph_get_type" parents="SheetObject,GObject">
+    <implements name="SheetObjectImageable"/>
+    <implements name="SheetObjectExportable"/>
+  </class>
+  <class name="SheetObjectImage" get-type="sheet_object_image_get_type" parents="SheetObject,GObject">
+    <implements name="SheetObjectImageable"/>
+    <property name="image-type" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="image" type="GOImage" flags="225"/>
+    <property name="pixbuf" type="GdkPixbuf" flags="225"/>
+  </class>
+  <class name="SheetObjectWidget" get-type="sheet_object_widget_get_type" parents="SheetObject,GObject">
+  </class>
+  <class name="SheetWidgetAdjustment" get-type="sheet_widget_adjustment_get_type" parents="SheetObjectWidget,SheetObject,GObject">
+    <property name="horizontal" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <class name="SheetWidgetFrame" get-type="sheet_widget_frame_get_type" parents="SheetObjectWidget,SheetObject,GObject">
+    <property name="text" type="gchararray" flags="227" default-value="NULL"/>
+  </class>
+  <class name="SheetWidgetButton" get-type="sheet_widget_button_get_type" parents="SheetObjectWidget,SheetObject,GObject">
+    <property name="text" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="markup" type="PangoAttrList" flags="227"/>
+  </class>
+  <class name="SheetWidgetCheckbox" get-type="sheet_widget_checkbox_get_type" parents="SheetObjectWidget,SheetObject,GObject">
+    <property name="active" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="text" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="markup" type="PangoAttrList" flags="227"/>
+  </class>
+  <class name="SheetWidgetToggleButton" get-type="sheet_widget_toggle_button_get_type" parents="SheetWidgetCheckbox,SheetObjectWidget,SheetObject,GObject">
+  </class>
+  <class name="SheetWidgetRadioButton" get-type="sheet_widget_radio_button_get_type" parents="SheetObjectWidget,SheetObject,GObject">
+    <property name="active" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="text" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="markup" type="PangoAttrList" flags="227"/>
+    <property name="value" type="GnmValue" flags="227"/>
+  </class>
+  <class name="SheetWidgetList" get-type="sheet_widget_list_get_type" parents="SheetWidgetListBase,SheetObjectWidget,SheetObject,GObject">
+  </class>
+  <class name="SheetWidgetCombo" get-type="sheet_widget_combo_get_type" parents="SheetWidgetListBase,SheetObjectWidget,SheetObject,GObject">
+  </class>
+  <class name="SheetWidgetScrollbar" get-type="sheet_widget_scrollbar_get_type" parents="SheetWidgetAdjustment,SheetObjectWidget,SheetObject,GObject">
+  </class>
+  <class name="SheetWidgetSlider" get-type="sheet_widget_slider_get_type" parents="SheetWidgetAdjustment,SheetObjectWidget,SheetObject,GObject">
+  </class>
+  <class name="SheetWidgetSpinbutton" get-type="sheet_widget_spinbutton_get_type" parents="SheetWidgetAdjustment,SheetObjectWidget,SheetObject,GObject">
+  </class>
+  <boxed name="GnmStyleRegion" get-type="gnm_style_region_get_type"/>
+  <class name="SheetView" get-type="gnm_sheet_view_get_type" parents="GObject">
+  </class>
+  <boxed name="GnmSortData" get-type="gnm_sort_data_get_type"/>
+  <boxed name="StfParseOptions_t" get-type="stf_parse_options_get_type"/>
+  <boxed name="GnmStyleCond" get-type="gnm_style_cond_get_type"/>
+  <class name="GnmStyleConditions" get-type="gnm_style_conditions_get_type" parents="GObject">
+  </class>
+  <boxed name="GnmFont" get-type="gnm_font_get_type"/>
+  <class name="GnmUndoColrowRestoreStateGroup" get-type="gnm_undo_colrow_restore_state_group_get_type" parents="GOUndo,GObject">
+  </class>
+  <class name="GnmUndoColrowSetSizes" get-type="gnm_undo_colrow_set_sizes_get_type" parents="GOUndo,GObject">
+  </class>
+  <class name="GnmUndoFilterSetCondition" get-type="gnm_undo_filter_set_condition_get_type" parents="GOUndo,GObject">
+  </class>
+  <class name="GnmValidationCombo" get-type="gnm_validation_combo_get_type" parents="GnmCellCombo,SheetObject,GObject">
+  </class>
+  <class name="GnmNotebookButton" get-type="gnm_notebook_button_get_type" parents="GtkLabel,GtkMisc,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="background-color" type="GdkRGBA" flags="2"/>
+    <property name="text-color" type="GdkRGBA" flags="2"/>
+  </class>
+  <class name="GnmNotebook" get-type="gnm_notebook_get_type" parents="GtkNotebook,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <class name="WorkbookView" get-type="workbook_view_get_type" parents="GoView,GObject">
+    <property name="auto-expr-func" type="GnmFunc" flags="227"/>
+    <property name="auto-expr-descr" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="auto-expr-max-precision" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="auto-expr-value" type="GnmValue" flags="227"/>
+    <property name="auto-expr-eval-pos" type="GnmEvalPos" flags="226"/>
+    <property name="show-horizontal-scrollbar" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="show-vertical-scrollbar" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="show-notebook-tabs" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="show-function-cell-markers" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="show-extension-markers" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="do-auto-completion" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="preferred-width" type="gint" flags="227" default-value="1024"/>
+    <property name="preferred-height" type="gint" flags="227" default-value="768"/>
+    <property name="workbook" type="Workbook" flags="235"/>
+  </class>
+  <boxed name="GnmScenarioItem" get-type="gnm_scenario_item_get_type"/>
+  <class name="GnmScenario" get-type="gnm_scenario_get_type" parents="GObject">
+  </class>
+  <class name="GnmDao" get-type="gnm_dao_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <signal name="activate" return="void" when="last" action="1">
+    </signal>
+    <signal name="readiness-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GnmFontButton" get-type="gnm_font_button_get_type" parents="GtkButton,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <implements name="GtkActivatable"/>
+    <implements name="GtkFontChooser"/>
+    <property name="title" type="gchararray" flags="3" default-value="Pick a Font"/>
+    <property name="font-name" type="gchararray" flags="3" default-value="Sans 12"/>
+    <property name="use-font" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="use-size" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="show-style" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="show-size" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="dialog-type" type="GType" flags="3"/>
+    <signal name="font-set" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GnmRadioButton" get-type="gnm_radiobutton_get_type" parents="GtkRadioButton,GtkCheckButton,GtkToggleButton,GtkButton,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <implements name="GtkActivatable"/>
+  </class>
+  <class name="GnmCComboView" get-type="gnm_ccombo_view_get_type" parents="SheetObjectView,GocGroup,GocItem,GObject">
+  </class>
+  <class name="GnmFilterComboView" get-type="gnm_filter_combo_view_get_type" parents="GnmCComboView,SheetObjectView,GocGroup,GocItem,GObject">
+  </class>
+  <class name="GnmValidationComboView" get-type="gnm_validation_combo_view_get_type" parents="GnmCComboView,SheetObjectView,GocGroup,GocItem,GObject">
+  </class>
+  <class name="GnmWorkbookSel" get-type="gnm_workbook_sel_get_type" parents="GOOptionMenu,GtkButton,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <implements name="GtkActivatable"/>
+    <property name="workbook" type="Workbook" flags="227"/>
+  </class>
+  <class name="GnmSheetSel" get-type="gnm_sheet_sel_get_type" parents="GOOptionMenu,GtkButton,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <implements name="GtkActivatable"/>
+    <property name="sheet" type="GnmSheet" flags="227"/>
+  </class>
+  <class name="GnmSheetSlicerComboView" get-type="gnm_sheet_slicer_combo_view_get_type" parents="GnmCComboView,SheetObjectView,GocGroup,GocItem,GObject">
+  </class>
+  <class name="GnmSOAnchorModeChooser" get-type="gnm_so_anchor_mode_chooser_get_type" parents="GtkComboBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkCellLayout"/>
+    <implements name="GtkCellEditable"/>
+  </class>
+  <class name="GnmCellRendererText" get-type="gnm_cell_renderer_text_get_type" parents="GtkCellRendererText,GtkCellRenderer,GInitiallyUnowned,GObject">
+  </class>
+  <class name="GnmCellRendererExprEntry" get-type="gnm_cell_renderer_expr_entry_get_type" parents="GnmCellRendererText,GtkCellRendererText,GtkCellRenderer,GInitiallyUnowned,GObject">
+  </class>
+  <class name="GnmCellRendererToggle" get-type="gnm_cell_renderer_toggle_get_type" parents="GtkCellRendererToggle,GtkCellRenderer,GInitiallyUnowned,GObject">
+    <property name="pixbuf" type="GdkPixbuf" flags="227"/>
+  </class>
+  <class name="GnmDashedCanvasLine" get-type="gnm_dashed_canvas_line_get_type" parents="GocLine,GocStyledItem,GocItem,GObject">
+    <implements name="GOStyledObject"/>
+  </class>
+  <class name="GnmTextView" get-type="gnm_text_view_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="text" type="gchararray" flags="227" default-value=""/>
+    <property name="wrap" type="GtkWrapMode" flags="227" default-value="GTK_WRAP_WORD"/>
+    <property name="attributes" type="PangoAttrList" flags="227"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+</dump>

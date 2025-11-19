@@ -1,0 +1,11 @@
+--- a/third_party/blink/renderer/platform/fonts/palette_interpolation.cc
++++ b/third_party/blink/renderer/platform/fonts/palette_interpolation.cc
+@@ -31,7 +31,7 @@
+         color_interpolation_space, hue_interpolation_method, start_color,
+         end_color, percentage, alpha_multiplier);
+ 
+-    FontPalette::FontPaletteOverride result_color_record(i, result_color);
++    FontPalette::FontPaletteOverride result_color_record{static_cast<uint16_t>(i), result_color};
+     result_color_records.push_back(result_color_record);
+   }
+   return result_color_records;

@@ -1,0 +1,11 @@
+--- a/src/system.c
++++ b/src/system.c
+@@ -419,7 +419,7 @@
+     const char *s;
+     if ((s = Scm_GetEnv("TMPDIR")) != NULL) return SCM_MAKE_STR_COPYING(s);
+     if ((s = Scm_GetEnv("TMP")) != NULL) return SCM_MAKE_STR_COPYING(s);
+-    else return SCM_MAKE_STR("/tmp"); /* fallback */
++    else return SCM_MAKE_STR("@TERMUX_PREFIX@/tmp"); /* fallback */
+ #endif /*!GAUCHE_WINDOWS*/
+ }
+ 

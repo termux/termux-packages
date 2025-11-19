@@ -1,0 +1,15 @@
+--- ./src/jobs.c.orig	2022-03-02 09:45:43.327156557 +0100
++++ ./src/jobs.c	2022-03-02 09:47:08.592008372 +0100
+@@ -128,6 +128,12 @@
+ static void xtcsetpgrp(int, pid_t);
+ #endif
+ 
++STATIC pid_t
++wait3(int* status, int options, struct rusage* rusage)
++{
++	return wait4(-1, status, options, rusage);
++}
++
+ STATIC void
+ set_curjob(struct job *jp, unsigned mode)
+ {

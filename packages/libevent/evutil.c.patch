@@ -1,0 +1,11 @@
+diff -u -r ../libevent-release-2.1.8-stable/evutil.c ./evutil.c
+--- ../libevent-release-2.1.8-stable/evutil.c	2017-01-26 00:37:15.000000000 +0100
++++ ./evutil.c	2017-07-07 01:04:14.746540880 +0200
+@@ -47,6 +47,7 @@
+ #include <sys/socket.h>
+ #endif
+ #ifdef EVENT__HAVE_UNISTD_H
++#define __USE_GNU 1 /* For pipe2(). */
+ #include <unistd.h>
+ #endif
+ #ifdef EVENT__HAVE_FCNTL_H

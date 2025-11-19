@@ -1,0 +1,11 @@
+--- ./sdk/runtime/bin/directory_linux.cc
++++ ./sdk/runtime/bin/directory_linux.cc
+@@ -425,7 +425,7 @@ const char* Directory::SystemTemp(Namespace* namespc) {
+   }
+   if (temp_dir == nullptr) {
+ #if defined(DART_HOST_OS_ANDROID)
+-    temp_dir = "/data/local/tmp";
++    temp_dir = "@TERMUX_PREFIX@/tmp";
+ #else
+     temp_dir = "/tmp";
+ #endif

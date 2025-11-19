@@ -1,0 +1,11 @@
+--- a/s3270/Makefile.obj.in
++++ b/s3270/Makefile.obj.in
+@@ -69,7 +69,7 @@
+ 	./mkfb -c -o $@ $(filter-out mkfb,$^)
+ 
+ mkfb: mkfb.c
+-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(filter %.c,$^)
++	$(CC_FOR_BUILD) $(XCPPFLAGS) -o $@ $(filter %.c,$^)
+ 
+ s3270: $(OBJS1) $(DEP3270) $(DEP32XX) $(DEP3270STUBS)
+ 	$(CC) -o $@ $(OBJS1) $(LDFLAGS) $(LD3270) $(LD32XX) $(LD3270STUBS) $(LIBS)

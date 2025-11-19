@@ -1,0 +1,45 @@
+Send logs to logcat instead of /dev/log used in regular Linux systems.
++++ ./src/logger.c
+@@ -48,9 +48,14 @@
+ # include "logprio.h"
+ #endif
+ 
++#include <android/log.h>
++#undef PATH_LOG
++#define PATH_LOG "logcat"
++
+ #define MAKE_PRI(fac,pri) (((fac) & LOG_FACMASK) | ((pri) & LOG_PRIMASK))
+ 
+-static char *tag = NULL;
++static int logcat = 0;
++static char *tag = "termux";
+ static int logflags = 0;
+ static int pri = MAKE_PRI (LOG_USER, LOG_NOTICE);  /* Cf. parse_level */
+ /* Only one of `host' and `unixsock' will be non-NULL
+@@ -140,6 +145,11 @@
+   int family;
+   int ret;
+ 
++  if (host != NULL && !strcmp(host, PATH_LOG)) {
++    logcat = 1;
++    return;
++  }
++
+   /* A UNIX socket name can be specified in two ways.
+    * Zero length of `unixsock' is handled automatically.  */
+   if ((host != NULL && strchr (host, '/')) || unixsock != NULL)
+@@ -306,6 +316,14 @@
+   size_t len;
+   ssize_t rc;
+ 
++  if (logcat) {
++    if (logflags & LOG_PID)
++      __android_log_print(ANDROID_LOG_INFO, tag, "<%d>[%d]: %s", pri, pidstr, msg);
++    else
++      __android_log_print(ANDROID_LOG_INFO, tag, "<%d>: %s", pri, msg);
++    return;
++  }
++
+   if (logflags & LOG_PID)
+     rc = asprintf (&pbuf, "<%d>%.15s %s[%s]: %s",
+ 		   pri, ctime (&now) + 4, tag, pidstr, msg);

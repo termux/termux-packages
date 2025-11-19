@@ -1,0 +1,20 @@
+Handle EROFS.  This is since path_remove_tree() will be called with
+       '/data.dpkg-tmp'
+       '/data/data.dpkg-tmp'
+       '/data/data/com.termux.dpkg-tmp'
+       '/data/data/com.termux/files.dpkg-tmp'
+       '/data/data/com.termux/files/usr.dpkg-tmp'
+and the first call will get a EROFS, read-only file system error.
+
+diff -u -r ../dpkg-1.18.2/lib/dpkg/path-remove.c ./lib/dpkg/path-remove.c
+--- ../dpkg-1.18.2/lib/dpkg/path-remove.c	2015-07-30 00:39:24.000000000 -0400
++++ ./lib/dpkg/path-remove.c	2015-08-25 18:04:31.391421421 -0400
+@@ -126,7 +126,7 @@
+ 	debug(dbg_eachfile, "%s '%s'", __func__, pathname);
+ 	if (!rmdir(pathname))
+ 		return; /* Deleted it OK, it was a directory. */
+-	if (errno == ENOENT || errno == ELOOP)
++	if (errno == ENOENT || errno == ELOOP || errno == EROFS)
+ 		return;
+ 	if (errno == ENOTDIR) {
+ 		/* Either it's a file, or one of the path components is. If

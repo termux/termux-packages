@@ -1,0 +1,60 @@
+After https://github.com/termux/termux-x11/pull/768, Termux:X11 now supports
+Backspace Key (in both hardware and software keyboards), but this would not work
+in certain specific games like Luanti and SuperTux (neither in Termux:X11 nor in
+other X11 server implementations like the $PREFIX/bin/Xvnc program from the
+tigervnc package) because there is something bugged about their keymaps when
+they are built for Termux that causes the registered keyboard inputs to be
+scrambled to incorrect values, specifically regarding the Backspace, Space and 9
+keys.
+
+The true root cause shared by both games is not yet known.
+This patch works around the problem as it manifests in Luanti.
+
+- Globally (to Luanti) swaps the internal keycodes of KEY_SPACE and KEY_KEY_9
+  to produce the desired practical default result for both software and hardware keyboards.
+  In-game there IS a GUI that allows rebinding the keys without this patch, but since
+  the default behavior is always incorrect, swapping them at build-time with a patch
+  delivers a more convenient workaround to users than having to always reconfigure these
+  two keybinds manually.
+
+- Globally (to Luanti) replaces the internal keycode of KEY_BACK with 0x9E, which is a value
+  that has an unknown origination point, but is now detected by debuggers inside the scancode
+  handling functions of Luanti's code after Backspace support was added to Termux:X11,
+  for both hardware and software keyboards
+
+- No other keys are currently known to be affected by these problems
+
+More information:
+https://github.com/termux/termux-x11/pull/768#issuecomment-2692202601
+https://github.com/termux-user-repository/tur/pull/1585
+
+
+--- a/irr/include/Keycodes.h
++++ b/irr/include/Keycodes.h
+@@ -16,7 +16,7 @@ enum EKEY_CODE
+ 	KEY_MBUTTON = 0x04,           // Middle mouse button (three-button mouse)
+ 	KEY_XBUTTON1 = 0x05,          // Windows 2000/XP: X1 mouse button
+ 	KEY_XBUTTON2 = 0x06,          // Windows 2000/XP: X2 mouse button
+-	KEY_BACK = 0x08,              // BACKSPACE key
++	KEY_BACK = 0x9E,              // BACKSPACE key
+ 	KEY_TAB = 0x09,               // TAB key
+ 	KEY_CLEAR = 0x0C,             // CLEAR key
+ 	KEY_RETURN = 0x0D,            // ENTER key
+@@ -37,7 +37,7 @@ enum EKEY_CODE
+ 	KEY_NONCONVERT = 0x1D,        // IME nonconvert
+ 	KEY_ACCEPT = 0x1E,            // IME accept
+ 	KEY_MODECHANGE = 0x1F,        // IME mode change request
+-	KEY_SPACE = 0x20,             // SPACEBAR
++	KEY_SPACE = 0x39,             // SPACEBAR
+ 	KEY_PRIOR = 0x21,             // PAGE UP key
+ 	KEY_NEXT = 0x22,              // PAGE DOWN key
+ 	KEY_END = 0x23,               // END key
+@@ -62,7 +62,7 @@ enum EKEY_CODE
+ 	KEY_KEY_6 = 0x36,             // 6 key
+ 	KEY_KEY_7 = 0x37,             // 7 key
+ 	KEY_KEY_8 = 0x38,             // 8 key
+-	KEY_KEY_9 = 0x39,             // 9 key
++	KEY_KEY_9 = 0x20,             // 9 key
+ 	KEY_KEY_A = 0x41,             // A key
+ 	KEY_KEY_B = 0x42,             // B key
+ 	KEY_KEY_C = 0x43,             // C key

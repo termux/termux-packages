@@ -1,0 +1,11 @@
+--- a/src/network/net_addons.cc
++++ b/src/network/net_addons.cc
+@@ -180,7 +180,7 @@
+ 			const std::string msg = next_word(output);
+ 			const std::string v = next_word(output);
+ 			const uint32_t t = next_number(output);
+-			info.user_comments.push_back(AddOnComment{name, msg, string_to_version(v), t});
++			info.user_comments.push_back(AddOnComment{name, msg, string_to_version(v), static_cast<time_t>(t)});
+ 		}
+ 
+ 		info.version = string_to_version(next_word(output));

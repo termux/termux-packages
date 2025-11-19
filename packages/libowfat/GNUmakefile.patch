@@ -1,0 +1,25 @@
+--- a/GNUmakefile
++++ b/GNUmakefile
+@@ -41,8 +41,8 @@
+ 
+ DEFINE=-D_REENTRANT
+ 
+-CFLAGS=-pipe $(WARN) $(DEFINE) $(OPT_REG)
+-CFLAGS_OPT=-pipe $(WARN) $(DEFINE) $(OPT_PLUS)
++CFLAGS+=-pipe $(WARN) $(DEFINE)
++CFLAGS_OPT=$(CFLAGS)
+ 
+ #CFLAGS=-pipe -Os -march=pentiumpro -mcpu=pentiumpro -fomit-frame-pointer -fschedule-insns2 -Wall
+ 
+@@ -68,9 +68,9 @@
+ endif
+ gcc_path = $(foreach dir,$(path),$(wildcard $(dir)/gcc))
+ ifeq ($(strip $(gcc_path)),)
+-CC=clang
++CC?=clang
+ else
+-CC=gcc
++CC?=gcc
+ endif
+ 
+ ifneq ($(DIET),)

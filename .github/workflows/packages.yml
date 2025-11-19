@@ -1,0 +1,463 @@
+name: Packages
+
+on:
+  push:
+    branches:
+    - master
+    - dev
+    - 'dev/**'
+    paths:
+    - 'packages/**'
+    - 'root-packages/**'
+    - 'x11-packages/**'
+  pull_request:
+    paths:
+    - 'packages/**'
+    - 'root-packages/**'
+    - 'x11-packages/**'
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: "A space-separated names of packages selected for rebuilding"
+        required: true
+
+permissions: {} # none
+
+concurrency:
+  # if this is a PR event, group = "pr-<number>", otherwise group = run_id so it never collides with other runs
+  group: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.run_id }}
+  # only cancel in-progress when it’s a PR
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    permissions:
+      contents: read # actions/upload-artifact doesn't need contents: write
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        target_arch: [aarch64, arm, i686, x86_64]
+      fail-fast: false
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+      with:
+        fetch-depth: 1000
+    - name: Set process id limit for 32-bit builds depending on aosp-libs
+      run: echo 65535 | sudo tee /proc/sys/kernel/pid_max
+    - name: Gather build summary
+      id: build-info
+      env:
+        MANUAL_INPUT_PACKAGES: ${{ github.event.inputs.packages }}
+      run: |
+        # We are intentionally not using .commits[0].id and .commits[-1].id as github seems to
+        # only send 20 commits in the payload for github action runs instead of the 2048 documented
+        # limit. Perhaps 2048 is the limit just for webhooks, where they haven't documented
+        # properly that the limit for github actions is only 20:
+        #
+        # https://docs.github.com/en/webhooks/webhook-events-and-payloads#push
+        OLD_COMMIT="${{ github.event.before }}"
+        HEAD_COMMIT="${{ github.event.after }}"
+        if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+          BASE_REF="${{ github.event.pull_request.base.ref }}"
+          git fetch origin "${BASE_REF:-master}" 2>/dev/null
+          BASE_COMMIT="$(git merge-base "origin/${BASE_REF:-master}" "HEAD")"
+          if [ -z "${{ github.event.pull_request.base.sha }}" ]; then
+            if ! git log "$OLD_COMMIT" > /dev/null; then
+              if [ "$(git branch --show-current)" = "master" ]; then
+                echo "Force push detected on master branch. Unable to proceed."
+                exit 1
+              else
+                OLD_COMMIT=$(git fetch origin master >&2; git merge-base origin/master $HEAD_COMMIT)
+              fi
+            fi
+            echo "Processing commit range: ${OLD_COMMIT}..${HEAD_COMMIT}"
+            CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${OLD_COMMIT}" "${HEAD_COMMIT}")
+          else
+            # Pull requests.
+            echo "Processing pull request #${{ github.event.pull_request.number }}: ${BASE_COMMIT}..HEAD"
+            CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${BASE_COMMIT}" "HEAD")
+          fi
+        fi
+        mkdir -p ./artifacts ./debs
+        touch ./debs/.placeholder
+
+        if [[ "${{ github.event_name }}" == "pull_request" && -n "$(git rev-list --merges "$(git fetch origin master >&2; git merge-base origin/master $HEAD_COMMIT)..$HEAD_COMMIT")" ]]; then
+          # Github does not allow multiline errors, but it will interpret the escape sequence %0A as a line break.
+          echo "::error ::Merge commits are not allowed in pull requests.%0AYou should rebase your commits or squash them.%0Ahttps://docs.github.com/en/get-started/using-git/using-git-rebase-on-the-command-line"
+          exit 1
+        fi
+
+        OLD_COMMIT="$OLD_COMMIT" HEAD_COMMIT="$HEAD_COMMIT" GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" scripts/utils/termux_reuse_pr_build_artifacts.sh "${{ github.event_name }}" "${{ matrix.target_arch }}" || true
+
+        if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+          # GitHub sometimes add merge commits at the end
+          # To prevent user confusion, filter them with --no-merges
+          # Process tag '%ci:no-build' that may be added as line to commit message.
+          # Forces CI to cancel current build with status 'passed'
+          if grep -qiP '^\s*%ci:no-build\s*$' <(git log --format="%B" -n 1 --no-merges "HEAD"); then
+            tar cf artifacts/debs-${{ matrix.target_arch }}.tar debs
+            echo "docker-build=true" >> $GITHUB_OUTPUT
+            echo "[!] Force exiting as tag '%ci:no-build' was applied to HEAD commit message."
+            exit 0
+          fi
+
+          for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
+            repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
+            # Parse changed files and identify new packages and deleted packages.
+            # Create lists of those packages that will be passed to upload job for
+            # further processing.
+            while read -r file; do
+              if ! [[ $file == ${repo_path}/* ]]; then
+                # This file does not belong to a package, so ignore it
+                continue
+              fi
+              if [[ $file =~ ^${repo_path}/([.a-z0-9+-]*)/([.a-z0-9+-]*).subpackage.sh$ ]]; then
+                # A subpackage was modified, check if it was deleted or just updated
+                pkg=${BASH_REMATCH[1]}
+                subpkg=${BASH_REMATCH[2]}
+                if [ ! -f "${repo_path}/${pkg}/${subpkg}.subpackage.sh" ]; then
+                  echo "$subpkg" >> ./deleted_${repo}_packages.txt
+                fi
+              elif [[ $file =~ ^${repo_path}/([.a-z0-9+-]*)/.*$ ]]; then
+                # package, check if it was deleted or updated
+                pkg=${BASH_REMATCH[1]}
+                if [ -d "${repo_path}/${pkg}" ]; then
+                  echo "$pkg" >> ./built_${repo}_packages.txt
+                  # If there are subpackages we want to create a list of those
+                  # as well
+                  for file in $(find "${repo_path}/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
+                    echo "$(basename "${file%%.subpackage.sh}")" >> ./built_${repo}_subpackages.txt
+                  done
+                else
+                  echo "$pkg" >> ./deleted_${repo}_packages
+                fi
+              fi
+            done<<<${CHANGED_FILES}
+          done
+        else
+          # Ensure MANUAL_INPUT_PACKAGES is newline free, and put it
+          # into an array
+          read -a PACKAGES <<< "${MANUAL_INPUT_PACKAGES//$'\n'/ }"
+          for pkg in "${PACKAGES[@]}"; do
+            repo_paths=$(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json)
+            found=false
+            for repo_path in $repo_paths; do
+              repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
+              if [ -d "${repo_path}/${pkg}" ]; then
+                found=true
+                echo "$pkg" >> ./built_${repo}_packages.txt
+                for subpkg in $(find "${repo_path}/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
+                  echo "$(basename "${subpkg%%.subpackage.sh}")" >> ./built_${repo}_subpackages.txt
+                done
+              fi
+            done
+            if [ "$found" != true ]; then
+              echo "Package '${pkg}' not found in any of the repo"
+              exit 1
+            fi
+          done
+        fi
+
+        for repo in $(jq --raw-output 'del(.pkg_format) | .[].name' repo.json); do
+          # Fix so that lists do not contain duplicates
+          if [ -f ./built_${repo}_packages.txt ]; then
+            sort ./built_${repo}_packages.txt | uniq > ./built_${repo}_packages.txt.tmp
+            mv ./built_${repo}_packages.txt.tmp ./built_${repo}_packages.txt
+          fi
+          if [ -f ./built_${repo}_subpackages.txt ]; then
+            sort ./built_${repo}_subpackages.txt | uniq > ./built_${repo}_subpackages.txt.tmp
+            mv ./built_${repo}_subpackages.txt.tmp ./built_${repo}_subpackages.txt
+          fi
+          if [ -f ./deleted_${repo}_packages.txt ]; then
+            sort ./deleted_${repo}_packages.txt | uniq > ./deleted_${repo}_packages.txt.tmp
+            mv ./deleted_${repo}_packages.txt.tmp ./deleted_${repo}_packages.txt
+          fi
+        done
+
+        declare -a packages=()
+        for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
+          repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
+          if [ -f "./built_${repo}_packages.txt" ]; then
+            packages+=($(cat "./built_${repo}_packages.txt"))
+          fi
+        done
+
+        echo "packages: ${packages[*]}"
+
+        docker='true'
+        if [[ "${#packages[@]}" -gt 0 ]]; then
+          for pkg in "${packages[@]}"; do
+            if grep -qFx "$pkg" ./scripts/big-pkgs.list; then
+              docker='false'
+              break
+            fi
+          done
+        fi
+
+        echo "docker-build=$docker" >> $GITHUB_OUTPUT
+        if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+          # Build local Docker image if setup scripts were changed.
+          # Useful for pull requests submitting changes for both build environment and packages.
+          if grep -qP '^scripts/(Dockerfile|properties\.sh|setup-android-sdk\.sh|setup-ubuntu\.sh)$' <<< "$CHANGED_FILES"; then
+            echo "Detected changes for environment setup scripts. Building custom Docker image now."
+            if [ $docker == 'false' ]; then
+              echo "Skipping due to building large packages."
+              exit 0
+            fi
+            cd ./scripts
+            docker build -t ghcr.io/termux/package-builder:latest .
+            cd ..
+          fi
+        fi
+
+    - name: Lint packages
+      run: |
+        declare -a package_recipes=()
+        for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
+          repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
+          if [ -f "./built_${repo}_packages.txt" ]; then
+            package_recipes+=($(cat "./built_${repo}_packages.txt" | repo_path="${repo_path}" awk '{print ENVIRON["repo_path"]"/"$1"/build.sh"}'))
+          fi
+        done
+
+        if [[ "${#package_recipes[@]}" -gt 0 ]]; then
+          ./scripts/lint-packages.sh "${package_recipes[@]}"
+        fi
+
+    - name: Free additional disk space (if needed)
+      if: ${{ steps.build-info.outputs.docker-build == 'false' && steps.build-info.outputs.skip-building != 'true' }}
+      run: |
+        ./scripts/setup-ubuntu.sh
+        # need to unset these for setup-android-sdk.sh.
+        unset NDK ANDROID_HOME
+        ./scripts/setup-android-sdk.sh
+        rm -f ${HOME}/lib/ndk-*.zip ${HOME}/lib/sdk-*.zip
+        sudo apt install ninja-build
+        ./scripts/free-space.sh
+
+    - name: Build packages
+      if: ${{ steps.build-info.outputs.skip-building != 'true' }}
+      env:
+        DOCKER_BUILD: ${{ steps.build-info.outputs.docker-build }}
+        TERMUX_DOCKER__CONTAINER_EXEC_COMMAND__PRE_CHECK_IF_WILL_BUILD_PACKAGES: "true"
+      run: |
+        declare -a packages=()
+        for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
+          repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
+          if [ -f "./built_${repo}_packages.txt" ]; then
+            packages+=($(cat "./built_${repo}_packages.txt"))
+          fi
+        done
+
+        echo "packages: ${packages[*]}"
+
+        if [[ "${#packages[@]}" -gt 0 ]]; then
+          if [ "$DOCKER_BUILD" == 'false' ]; then
+            # these need to be unset a second time again for ./build-package.sh
+            # when it is run outside of Docker, because GitHub Actions does not
+            # support permanently unsetting variables at time of writing.
+            # https://github.com/actions/runner/issues/1126
+            unset NDK ANDROID_HOME
+            ./build-package.sh -I -C -a "${{ matrix.target_arch }}" "${packages[@]}"
+          else
+            ./scripts/run-docker.sh ./build-package.sh -I -C -a "${{ matrix.target_arch }}" "${packages[@]}"
+          fi
+        fi
+
+    - name: Generate build artifacts
+      if: always()
+      run: |
+        test -d termux-packages/output && mv termux-packages/output/* ./output/
+
+        for repo in $(jq --raw-output 'del(.pkg_format) | .[].name' repo.json); do
+          # Put package lists into directory with *.deb files so they will be transferred to
+          # upload job.
+          test -f ./built_${repo}_packages.txt && mv ./built_${repo}_packages.txt ./debs/
+          test -f ./built_${repo}_subpackages.txt && cat ./built_${repo}_subpackages.txt >> ./debs/built_${repo}_packages.txt \
+            && rm ./built_${repo}_subpackages.txt
+          test -f ./deleted_${repo}_packages.txt && mv ./deleted_${repo}_packages.txt ./debs/
+
+          # Move only debs from built_packages into debs/ folder before
+          # creating an archive.
+          if [ -f "./debs/built_${repo}_packages.txt" ] && [ -d "output" ]; then
+            while read -r pkg; do
+              # Match both $pkg.deb and $pkg-static.deb.
+              find output \( -name "$pkg_*.deb" -o -name "$pkg-static_*.deb" \) -type f -print0 | xargs -0r mv -t debs/
+            done < <(cat "./debs/built_${repo}_packages.txt")
+          fi
+        done
+
+        # Files containing certain symbols (e.g. ":") will cause failure in actions/upload-artifact.
+        # Archiving *.deb files in a tarball to avoid issues with uploading.
+        tar cf artifacts/debs-${{ matrix.target_arch }}-${{ github.sha }}.tar debs
+    - name: Checksums for built *.deb files
+      if: always()
+      run: |
+        find debs -type f -name "*.deb" -exec sha256sum "{}" \; | sort -k2 | tee checksum-${{ matrix.target_arch }}-${{ github.sha }}.txt
+    - name: Store checksums for built *.deb files
+      if: always()
+      uses: actions/upload-artifact@v5
+      with:
+        name: checksum-${{ matrix.target_arch }}-${{ github.sha }}
+        path: checksum-${{ matrix.target_arch }}-${{ github.sha }}.txt
+    - name: Store *.deb files
+      if: always()
+      uses: actions/upload-artifact@v5
+      with:
+        name: debs-${{ matrix.target_arch }}-${{ github.sha }}
+        path: ./artifacts
+
+  test-buildorder-random:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+    - name: Randomise buildorder.py test
+      run: ./scripts/bin/test-buildorder-random
+    - name: Randomise buildorder.py test (aarch64)
+      env:
+        TERMUX_ARCH: aarch64
+      run: ./scripts/bin/test-buildorder-random
+    - name: Randomise buildorder.py test (arm)
+      env:
+        TERMUX_ARCH: arm
+      run: ./scripts/bin/test-buildorder-random
+    - name: Randomise buildorder.py test (i686)
+      env:
+        TERMUX_ARCH: i686
+      run: ./scripts/bin/test-buildorder-random
+    - name: Randomise buildorder.py test (x86_64)
+      env:
+        TERMUX_ARCH: x86_64
+      run: ./scripts/bin/test-buildorder-random
+
+  upload-test:
+    permissions:
+      contents: read
+    if: github.repository == 'termux/termux-packages' && github.ref != 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+    - name: Get *.deb files
+      uses: actions/download-artifact@v6
+      with:
+        path: ./
+    - name: Check packages using Packages.bz2
+      run: |
+        if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+          # GitHub sometimes add merge commits at the end
+          # To prevent user confusion, filter them with --no-merges
+          # Process tag '%ci:no-build' that may be added as line to commit message.
+          # Forces CI to cancel current build with status 'passed'
+          if grep -qiP '^\s*%ci:no-build\s*$' <(git log --format="%B" -n 1 --no-merges "HEAD"); then
+            echo "[!] Force exiting as tag '%ci:no-build' was applied to HEAD commit message."
+            exit 0
+          fi
+        fi
+
+        for archive in debs-*/debs-{aarch64,arm,i686,x86_64}-${{ github.sha }}.tar; do
+          tar xf "$archive"
+        done
+
+        error=0
+        for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
+          name=$(jq --raw-output '.["'${repo}'"].name' repo.json)
+          distribution=$(jq --raw-output '.["'${repo}'"].distribution' repo.json)
+          component=$(jq --raw-output '.["'${repo}'"].component' repo.json)
+          url=$(jq --raw-output '.["'${repo}'"].url' repo.json)
+
+          if [ ! -f debs/built_${name}_packages.txt ]; then
+            continue
+          fi
+          if [ -z "$(cat debs/built_${name}_packages.txt)" ]; then
+            continue
+          fi
+
+          for arch in aarch64 arm i686 x86_64; do
+            if [ ! -f "Packages-${repo}-${arch}" ]; then
+              echo "[*] Downloading ${url}/dists/${distribution}/${component}/binary-${arch}/Packages.bz2"
+              curl -s \
+                --user-agent 'Termux-Packages/1.0\ (https://github.com/termux/termux-packages)' \
+                "${url}/dists/${distribution}/${component}/binary-${arch}/Packages.bz2" \
+                -o "Packages-${repo}-${arch}.bz2"
+              7z x "Packages-${repo}-${arch}.bz2" > /dev/null
+            fi
+            result=$(find debs -maxdepth 1 -type f | cut -d"/" -f2 | xargs -P$(nproc) -i{} grep "^Filename:.*/{}$" -nH "Packages-${repo}-${arch}" || true)
+            if [ -n "$result" ]; then
+              echo "$result" | grep -E "${arch}|all" || true
+              error=1
+            fi
+          done
+        done
+        if [ "$error" != 0 ]; then
+          echo "[!] Found local files same name with server files!"
+          echo "[!] Please revbump package, rebase or tag commit with '%ci:no-build'"
+          exit 1
+        fi
+
+  upload:
+    concurrency: ${{ github.workflow }}
+    permissions:
+      contents: read
+    if: github.repository == 'termux/termux-packages' && github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+    - name: Get *.deb files
+      uses: actions/download-artifact@v6
+      with:
+        path: ./
+    - name: Upload to packages.termux.dev
+      env:
+        REPOSITORY_URL: https://packages.termux.dev/aptly-api
+        GITHUB_SHA: ${{ github.sha }}
+        APTLY_API_AUTH: ${{ secrets.APTLY_API_AUTH }}
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      run: |
+        source scripts/aptly_api.sh
+
+        for archive in debs-*/debs-{aarch64,arm,i686,x86_64}-${{ github.sha }}.tar; do
+          tar xf "$archive"
+        done
+
+        for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
+          export REPOSITORY_NAME=$(jq --raw-output '.["'$repo'"].name' repo.json)
+          export REPOSITORY_DISTRIBUTION=$(jq --raw-output '.["'$repo'"].distribution' repo.json)
+
+          # Upload file to temporary directory.
+          uploaded_files=false
+          shopt -s nullglob
+
+          if [ -f debs/built_${REPOSITORY_NAME}_packages.txt ]; then
+            for filename in $(cat debs/built_${REPOSITORY_NAME}_packages.txt | sed -E 's/(..*)/debs\/\1_\*.deb debs\/\1-static_\*.deb/g'); do
+              if ! aptly_upload_file "$filename"; then
+                exit 1
+              fi
+
+              uploaded_files=true
+            done
+            shopt -u nullglob
+
+            # Publishing repository changes.
+            if [ "$uploaded_files" = "true" ]; then
+              if ! aptly_add_to_repo; then
+                exit 1
+              fi
+
+              # Usually temporary directory is deleted automatically, but in certain cases it is left.
+              aptly_delete_dir
+
+              # Final part to make changes appear in web root.
+              if ! aptly_publish_repo; then
+                exit 1
+              fi
+            fi
+          fi
+        done

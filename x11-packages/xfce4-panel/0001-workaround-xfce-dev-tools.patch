@@ -1,0 +1,17 @@
+# XDT_GEN_VISIBILITY has termux python in shebang. This patch overrides that to use host python.
+
+--- a/libxfce4panel/Makefile.am
++++ b/libxfce4panel/Makefile.am
+@@ -85,10 +85,10 @@
+ 	&& glib-genmarshal --prefix=_libxfce4panel_marshal --body $< >> $@
+ 
+ libxfce4panel-visibility.h: libxfce4panel.symbols Makefile
+-	$(AM_V_GEN) $(XDT_GEN_VISIBILITY) --kind=header $< $@
++	$(AM_V_GEN) python $(XDT_GEN_VISIBILITY) --kind=header $< $@
+ 
+ libxfce4panel-visibility.c: libxfce4panel.symbols Makefile
+-	$(AM_V_GEN) $(XDT_GEN_VISIBILITY) --kind=source $< $@
++	$(AM_V_GEN) python $(XDT_GEN_VISIBILITY) --kind=source $< $@
+ 
+ libxfce4panel-enum-types.h: $(libxfce4panel_headers) Makefile
+ 	$(AM_V_GEN) ( cd $(srcdir) && glib-mkenums \

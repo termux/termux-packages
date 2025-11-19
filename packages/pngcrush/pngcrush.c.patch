@@ -1,0 +1,14 @@
+diff -u -r ../pngcrush-1.8.13-nolib/pngcrush.c ./pngcrush.c
+--- ../pngcrush-1.8.13-nolib/pngcrush.c	2017-08-21 22:28:52.000000000 +0000
++++ ./pngcrush.c	2024-05-15 15:47:53.214734503 +0000
+@@ -5520,8 +5520,10 @@
+                      * they were already checked in the pngcrush_measure_idat
+                      * function
+                      */
++# ifdef PNG_IGNORE_ADLER32
+                     png_set_option(read_ptr, PNG_IGNORE_ADLER32,
+                         PNG_OPTION_ON);
++# endif
+                     png_set_crc_action(read_ptr, PNG_CRC_QUIET_USE,
+                                        PNG_CRC_QUIET_USE);
+                 }

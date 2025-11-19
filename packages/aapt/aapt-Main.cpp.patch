@@ -1,0 +1,29 @@
+--- a/base/tools/aapt/Main.cpp
++++ b/base/tools/aapt/Main.cpp
+@@ -6,7 +6,6 @@
+ #include "Main.h"
+ #include "Bundle.h"
+ 
+-#include <build/version.h>
+ #include <utils/Compat.h>
+ #include <utils/Log.h>
+ #include <utils/threads.h>
+@@ -29,7 +28,7 @@
+     if (bundle->getFileSpecCount() != 0) {
+         printf("(ignoring extra arguments)\n");
+     }
+-    printf("Android Asset Packaging Tool, v0.2-%s\n", android::build::GetBuildNumber().c_str());
++    printf("Android Asset Packaging Tool, v0.2\n");
+ 
+     return 0;
+ }
+@@ -284,6 +283,9 @@
+     /* default to compression */
+     bundle.setCompressionMethod(ZipEntry::kCompressDeflated);
+ 
++    // Convenience when using aapt in termux.
++    bundle.addPackageInclude("@TERMUX_PREFIX@/share/aapt/android.jar");
++
+     if (argc < 2) {
+         wantUsage = true;
+         goto bail;

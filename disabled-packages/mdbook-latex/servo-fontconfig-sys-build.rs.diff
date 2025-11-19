@@ -1,0 +1,11 @@
+--- a/build.rs
++++ b/build.rs
+@@ -9,7 +9,7 @@
+ 
+ fn main() {
+     let target = env::var("TARGET").unwrap();
+-    if !target.contains("android") {
++    if true {
+         // If the system version of fontconfig isgat least 2.11.1, use it.
+         if let Ok(lib) = pkg_config::Config::new().atleast_version("2.11.1").find("fontconfig") {
+             println!("cargo:incdir={}", lib.include_paths[0].clone().into_os_string().into_string().unwrap());

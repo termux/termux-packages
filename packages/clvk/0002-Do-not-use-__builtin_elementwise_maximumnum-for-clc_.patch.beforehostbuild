@@ -1,0 +1,73 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <licy183@termux.dev>
+Date: Thu, 18 Sep 2025 15:27:12 +0000
+Subject: [PATCH] Do not use `__builtin_elementwise_maximumnum` for
+ `clc_fmax`
+
+---
+ libclc/clc/lib/generic/math/clc_fmax.cl | 47 +++++++++++++++++++++++--
+ 1 file changed, 45 insertions(+), 2 deletions(-)
+
+diff --git a/external/clspv/third_party/llvm/libclc/clc/lib/generic/math/clc_fmax.cl b/external/clspv/third_party/llvm/libclc/clc/lib/generic/math/clc_fmax.cl
+index b33420736..5ebbf1b28 100644
+--- a/external/clspv/third_party/llvm/libclc/clc/lib/generic/math/clc_fmax.cl
++++ b/external/clspv/third_party/llvm/libclc/clc/lib/generic/math/clc_fmax.cl
+@@ -6,10 +6,53 @@
+ //
+ //===----------------------------------------------------------------------===//
+ 
++#include <clc/clcmacro.h>
+ #include <clc/internal/clc.h>
++#include <clc/relational/clc_isnan.h>
+ 
++#define __FLOAT_ONLY
++#define __CLC_MIN_VECSIZE 1
+ #define FUNCTION __clc_fmax
+-#define __IMPL_FUNCTION(x) __builtin_elementwise_maximumnum
+-#define __CLC_BODY <clc/shared/binary_def.inc>
++#define __IMPL_FUNCTION __builtin_fmaxf
++#define __CLC_BODY <clc/shared/binary_def_scalarize.inc>
++#include <clc/math/gentype.inc>
++#undef __CLC_MIN_VECSIZE
++#undef FUNCTION
++#undef __IMPL_FUNCTION
++
++#ifdef cl_khr_fp64
++
++#pragma OPENCL EXTENSION cl_khr_fp64 : enable
++
++#define __DOUBLE_ONLY
++#define __CLC_MIN_VECSIZE 1
++#define FUNCTION __clc_fmax
++#define __IMPL_FUNCTION __builtin_fmax
++#define __CLC_BODY <clc/shared/binary_def_scalarize.inc>
++#include <clc/math/gentype.inc>
++#undef __CLC_MIN_VECSIZE
++#undef FUNCTION
++#undef __IMPL_FUNCTION
+ 
++#endif
++
++#ifdef cl_khr_fp16
++
++#pragma OPENCL EXTENSION cl_khr_fp16 : enable
++
++_CLC_DEF _CLC_OVERLOAD half __clc_fmax(half x, half y) {
++  if (__clc_isnan(x))
++    return y;
++  if (__clc_isnan(y))
++    return x;
++  return (x < y) ? y : x;
++}
++
++#define __HALF_ONLY
++#define __CLC_SUPPORTED_VECSIZE_OR_1 2
++#define FUNCTION __clc_fmax
++#define __CLC_BODY <clc/shared/binary_def_scalarize.inc>
+ #include <clc/math/gentype.inc>
++#undef FUNCTION
++
++#endif
+-- 
+2.43.0
+

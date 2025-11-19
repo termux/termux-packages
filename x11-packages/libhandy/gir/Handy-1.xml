@@ -1,0 +1,414 @@
+<?xml version="1.0"?>
+<dump>
+  <enum name="HdyDeckTransitionType" get-type="hdy_deck_transition_type_get_type">
+    <member name="HDY_DECK_TRANSITION_TYPE_OVER" nick="over" value="0"/>
+    <member name="HDY_DECK_TRANSITION_TYPE_UNDER" nick="under" value="1"/>
+    <member name="HDY_DECK_TRANSITION_TYPE_SLIDE" nick="slide" value="2"/>
+  </enum>  <enum name="HdyFlapFoldPolicy" get-type="hdy_flap_fold_policy_get_type">
+    <member name="HDY_FLAP_FOLD_POLICY_NEVER" nick="never" value="0"/>
+    <member name="HDY_FLAP_FOLD_POLICY_ALWAYS" nick="always" value="1"/>
+    <member name="HDY_FLAP_FOLD_POLICY_AUTO" nick="auto" value="2"/>
+  </enum>  <enum name="HdyFlapTransitionType" get-type="hdy_flap_transition_type_get_type">
+    <member name="HDY_FLAP_TRANSITION_TYPE_OVER" nick="over" value="0"/>
+    <member name="HDY_FLAP_TRANSITION_TYPE_UNDER" nick="under" value="1"/>
+    <member name="HDY_FLAP_TRANSITION_TYPE_SLIDE" nick="slide" value="2"/>
+  </enum>  <enum name="HdyCenteringPolicy" get-type="hdy_centering_policy_get_type">
+    <member name="HDY_CENTERING_POLICY_LOOSE" nick="loose" value="0"/>
+    <member name="HDY_CENTERING_POLICY_STRICT" nick="strict" value="1"/>
+  </enum>  <enum name="HdyHeaderGroupChildType" get-type="hdy_header_group_child_type_get_type">
+    <member name="HDY_HEADER_GROUP_CHILD_TYPE_HEADER_BAR" nick="header-bar" value="0"/>
+    <member name="HDY_HEADER_GROUP_CHILD_TYPE_GTK_HEADER_BAR" nick="gtk-header-bar" value="1"/>
+    <member name="HDY_HEADER_GROUP_CHILD_TYPE_HEADER_GROUP" nick="header-group" value="2"/>
+  </enum>  <enum name="HdyLeafletTransitionType" get-type="hdy_leaflet_transition_type_get_type">
+    <member name="HDY_LEAFLET_TRANSITION_TYPE_OVER" nick="over" value="0"/>
+    <member name="HDY_LEAFLET_TRANSITION_TYPE_UNDER" nick="under" value="1"/>
+    <member name="HDY_LEAFLET_TRANSITION_TYPE_SLIDE" nick="slide" value="2"/>
+  </enum>  <enum name="HdyNavigationDirection" get-type="hdy_navigation_direction_get_type">
+    <member name="HDY_NAVIGATION_DIRECTION_BACK" nick="back" value="0"/>
+    <member name="HDY_NAVIGATION_DIRECTION_FORWARD" nick="forward" value="1"/>
+  </enum>  <enum name="HdySqueezerTransitionType" get-type="hdy_squeezer_transition_type_get_type">
+    <member name="HDY_SQUEEZER_TRANSITION_TYPE_NONE" nick="none" value="0"/>
+    <member name="HDY_SQUEEZER_TRANSITION_TYPE_CROSSFADE" nick="crossfade" value="1"/>
+  </enum>  <enum name="HdyColorScheme" get-type="hdy_color_scheme_get_type">
+    <member name="HDY_COLOR_SCHEME_DEFAULT" nick="default" value="0"/>
+    <member name="HDY_COLOR_SCHEME_FORCE_LIGHT" nick="force-light" value="1"/>
+    <member name="HDY_COLOR_SCHEME_PREFER_LIGHT" nick="prefer-light" value="2"/>
+    <member name="HDY_COLOR_SCHEME_PREFER_DARK" nick="prefer-dark" value="3"/>
+    <member name="HDY_COLOR_SCHEME_FORCE_DARK" nick="force-dark" value="4"/>
+  </enum>  <enum name="HdyViewSwitcherPolicy" get-type="hdy_view_switcher_policy_get_type">
+    <member name="HDY_VIEW_SWITCHER_POLICY_AUTO" nick="auto" value="0"/>
+    <member name="HDY_VIEW_SWITCHER_POLICY_NARROW" nick="narrow" value="1"/>
+    <member name="HDY_VIEW_SWITCHER_POLICY_WIDE" nick="wide" value="2"/>
+  </enum>  <class name="HdyPreferencesRow" get-type="hdy_preferences_row_get_type" parents="GtkListBoxRow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value=""/>
+    <property name="use-underline" type="gboolean" flags="1073741827" default-value="FALSE"/>
+  </class>
+  <class name="HdyActionRow" get-type="hdy_action_row_get_type" parents="HdyPreferencesRow,GtkListBoxRow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <property name="icon-name" type="gchararray" flags="1073742051" default-value=""/>
+    <property name="activatable-widget" type="GtkWidget" flags="3"/>
+    <property name="subtitle" type="gchararray" flags="1073742051" default-value=""/>
+    <property name="use-underline" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="title-lines" type="gint" flags="1073741827" default-value="1"/>
+    <property name="subtitle-lines" type="gint" flags="1073741827" default-value="1"/>
+    <signal name="activated" return="void" when="last">
+    </signal>
+  </class>
+  <class name="HdyApplicationWindow" get-type="hdy_application_window_get_type" parents="GtkApplicationWindow,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GActionGroup"/>
+    <implements name="GActionMap"/>
+  </class>
+  <class name="HdyAvatar" get-type="hdy_avatar_get_type" parents="GtkDrawingArea,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="icon-name" type="gchararray" flags="1073741827" default-value="NULL"/>
+    <property name="text" type="gchararray" flags="1073741827" default-value="NULL"/>
+    <property name="show-initials" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="size" type="gint" flags="1073741827" default-value="-1"/>
+    <property name="loadable-icon" type="GLoadableIcon" flags="1073741827"/>
+  </class>
+  <class name="HdyCarousel" get-type="hdy_carousel_get_type" parents="GtkEventBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="HdySwipeable"/>
+    <property name="n-pages" type="guint" flags="1073741825" default-value="0"/>
+    <property name="position" type="gdouble" flags="1073741825" default-value="0.000000"/>
+    <property name="interactive" type="gboolean" flags="1073741827" default-value="TRUE"/>
+    <property name="spacing" type="guint" flags="1073741827" default-value="0"/>
+    <property name="animation-duration" type="guint" flags="1073741827" default-value="250"/>
+    <property name="allow-mouse-drag" type="gboolean" flags="1073741827" default-value="TRUE"/>
+    <property name="allow-scroll-wheel" type="gboolean" flags="1073741827" default-value="TRUE"/>
+    <property name="allow-long-swipes" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="reveal-duration" type="guint" flags="1073741827" default-value="0"/>
+    <signal name="page-changed" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+  </class>
+  <class name="HdyCarouselIndicatorDots" get-type="hdy_carousel_indicator_dots_get_type" parents="GtkDrawingArea,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="carousel" type="HdyCarousel" flags="1073741827"/>
+  </class>
+  <class name="HdyCarouselIndicatorLines" get-type="hdy_carousel_indicator_lines_get_type" parents="GtkDrawingArea,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="carousel" type="HdyCarousel" flags="1073741827"/>
+  </class>
+  <class name="HdyClamp" get-type="hdy_clamp_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="maximum-size" type="gint" flags="1073741827" default-value="600"/>
+    <property name="tightening-threshold" type="gint" flags="1073741827" default-value="400"/>
+  </class>
+  <class name="HdyEnumValueObject" get-type="hdy_enum_value_object_get_type" parents="GObject">
+  </class>
+  <class name="HdyComboRow" get-type="hdy_combo_row_get_type" parents="HdyActionRow,HdyPreferencesRow,GtkListBoxRow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <property name="selected-index" type="gint" flags="1073741827" default-value="-1"/>
+    <property name="use-subtitle" type="gboolean" flags="1073741827" default-value="FALSE"/>
+  </class>
+  <class name="HdyDeck" get-type="hdy_deck_get_type" parents="GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="HdySwipeable"/>
+    <property name="hhomogeneous" type="gboolean" flags="1073741827" default-value="TRUE"/>
+    <property name="vhomogeneous" type="gboolean" flags="1073741827" default-value="TRUE"/>
+    <property name="visible-child" type="GtkWidget" flags="1073741827"/>
+    <property name="visible-child-name" type="gchararray" flags="1073741827" default-value="NULL"/>
+    <property name="transition-type" type="HdyDeckTransitionType" flags="1073741827" default-value="HDY_DECK_TRANSITION_TYPE_OVER"/>
+    <property name="transition-duration" type="guint" flags="1073741827" default-value="200"/>
+    <property name="transition-running" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="interpolate-size" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="can-swipe-back" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="can-swipe-forward" type="gboolean" flags="1073741827" default-value="FALSE"/>
+  </class>
+  <class name="HdyExpanderRow" get-type="hdy_expander_row_get_type" parents="HdyPreferencesRow,GtkListBoxRow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <property name="subtitle" type="gchararray" flags="1073742051" default-value=""/>
+    <property name="use-underline" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="icon-name" type="gchararray" flags="1073742051" default-value=""/>
+    <property name="expanded" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="enable-expansion" type="gboolean" flags="1073741827" default-value="TRUE"/>
+    <property name="show-enable-switch" type="gboolean" flags="1073741827" default-value="FALSE"/>
+  </class>
+  <class name="HdyFlap" get-type="hdy_flap_get_type" parents="GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="HdySwipeable"/>
+    <property name="content" type="GtkWidget" flags="1073741827"/>
+    <property name="flap" type="GtkWidget" flags="1073741827"/>
+    <property name="separator" type="GtkWidget" flags="1073741827"/>
+    <property name="flap-position" type="GtkPackType" flags="1073741827" default-value="GTK_PACK_START"/>
+    <property name="reveal-flap" type="gboolean" flags="1073741827" default-value="TRUE"/>
+    <property name="reveal-duration" type="guint" flags="1073741827" default-value="250"/>
+    <property name="reveal-progress" type="gdouble" flags="1" default-value="1.000000"/>
+    <property name="fold-policy" type="HdyFlapFoldPolicy" flags="1073741827" default-value="HDY_FLAP_FOLD_POLICY_AUTO"/>
+    <property name="fold-duration" type="guint" flags="1073741827" default-value="250"/>
+    <property name="folded" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="locked" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="transition-type" type="HdyFlapTransitionType" flags="1073741827" default-value="HDY_FLAP_TRANSITION_TYPE_OVER"/>
+    <property name="modal" type="gboolean" flags="1073741827" default-value="TRUE"/>
+    <property name="swipe-to-open" type="gboolean" flags="1073741827" default-value="TRUE"/>
+    <property name="swipe-to-close" type="gboolean" flags="1073741827" default-value="TRUE"/>
+  </class>
+  <class name="HdyHeaderBar" get-type="hdy_header_bar_get_type" parents="GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="title" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="subtitle" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="has-subtitle" type="gboolean" flags="1073741827" default-value="TRUE"/>
+    <property name="custom-title" type="GtkWidget" flags="227"/>
+    <property name="spacing" type="gint" flags="1073741827" default-value="6"/>
+    <property name="show-close-button" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="decoration-layout" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="decoration-layout-set" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="centering-policy" type="HdyCenteringPolicy" flags="1073741827" default-value="HDY_CENTERING_POLICY_LOOSE"/>
+    <property name="transition-duration" type="guint" flags="1073741827" default-value="200"/>
+    <property name="transition-running" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="interpolate-size" type="gboolean" flags="1073741827" default-value="FALSE"/>
+  </class>
+  <class name="HdyHeaderGroupChild" get-type="hdy_header_group_child_get_type" parents="GObject">
+  </class>
+  <class name="HdyHeaderGroup" get-type="hdy_header_group_get_type" parents="GObject">
+    <implements name="GtkBuildable"/>
+    <property name="decorate-all" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <signal name="update-decoration-layouts" return="void" when="last">
+    </signal>
+  </class>
+  <class name="HdyKeypad" get-type="hdy_keypad_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="row-spacing" type="guint" flags="1073741827" default-value="6"/>
+    <property name="column-spacing" type="guint" flags="1073741827" default-value="6"/>
+    <property name="letters-visible" type="gboolean" flags="1073741827" default-value="TRUE"/>
+    <property name="symbols-visible" type="gboolean" flags="1073741827" default-value="TRUE"/>
+    <property name="entry" type="GtkEntry" flags="1073741827"/>
+    <property name="end-action" type="GtkWidget" flags="1073741827"/>
+    <property name="start-action" type="GtkWidget" flags="1073741827"/>
+  </class>
+  <class name="HdyLeaflet" get-type="hdy_leaflet_get_type" parents="GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="HdySwipeable"/>
+    <property name="folded" type="gboolean" flags="1073741825" default-value="FALSE"/>
+    <property name="hhomogeneous-folded" type="gboolean" flags="1073741827" default-value="TRUE"/>
+    <property name="vhomogeneous-folded" type="gboolean" flags="1073741827" default-value="TRUE"/>
+    <property name="hhomogeneous-unfolded" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="vhomogeneous-unfolded" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="visible-child" type="GtkWidget" flags="1073741827"/>
+    <property name="visible-child-name" type="gchararray" flags="1073741827" default-value="NULL"/>
+    <property name="transition-type" type="HdyLeafletTransitionType" flags="1073741827" default-value="HDY_LEAFLET_TRANSITION_TYPE_OVER"/>
+    <property name="mode-transition-duration" type="guint" flags="1073741827" default-value="250"/>
+    <property name="child-transition-duration" type="guint" flags="1073741827" default-value="200"/>
+    <property name="child-transition-running" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="interpolate-size" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="can-swipe-back" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="can-swipe-forward" type="gboolean" flags="1073741827" default-value="FALSE"/>
+  </class>
+  <class name="HdyPreferencesGroup" get-type="hdy_preferences_group_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="description" type="gchararray" flags="227" default-value=""/>
+    <property name="title" type="gchararray" flags="227" default-value=""/>
+    <property name="use-markup" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <class name="HdyPreferencesPage" get-type="hdy_preferences_page_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="icon-name" type="gchararray" flags="1073742051" default-value=""/>
+    <property name="title" type="gchararray" flags="1073742051" default-value=""/>
+  </class>
+  <class name="HdyWindow" get-type="hdy_window_get_type" parents="GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <class name="HdyPreferencesWindow" get-type="hdy_preferences_window_get_type" parents="HdyWindow,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="search-enabled" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="can-swipe-back" type="gboolean" flags="1073741827" default-value="FALSE"/>
+  </class>
+  <class name="HdySearchBar" get-type="hdy_search_bar_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="search-mode-enabled" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="show-close-button" type="gboolean" flags="1073741831" default-value="FALSE"/>
+  </class>
+  <class name="HdySqueezer" get-type="hdy_squeezer_get_type" parents="GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="homogeneous" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="visible-child" type="GtkWidget" flags="1073741825"/>
+    <property name="transition-duration" type="guint" flags="1073741827" default-value="200"/>
+    <property name="transition-type" type="HdySqueezerTransitionType" flags="1073741827" default-value="HDY_SQUEEZER_TRANSITION_TYPE_NONE"/>
+    <property name="transition-running" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="interpolate-size" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="xalign" type="gfloat" flags="1073741827" default-value="0.500000"/>
+    <property name="yalign" type="gfloat" flags="1073741827" default-value="0.500000"/>
+  </class>
+  <class name="HdyStatusPage" get-type="hdy_status_page_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="icon-name" type="gchararray" flags="1073741827" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="1073741827" default-value=""/>
+    <property name="description" type="gchararray" flags="1073741827" default-value=""/>
+  </class>
+  <class name="HdyStyleManager" get-type="hdy_style_manager_get_type" parents="GObject">
+    <property name="display" type="GdkDisplay" flags="11"/>
+    <property name="color-scheme" type="HdyColorScheme" flags="1073741827" default-value="HDY_COLOR_SCHEME_DEFAULT"/>
+    <property name="system-supports-color-schemes" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="dark" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="high-contrast" type="gboolean" flags="1" default-value="FALSE"/>
+  </class>
+  <interface name="HdySwipeable" get-type="hdy_swipeable_get_type">
+    <prerequisite name="GtkWidget"/>
+    <signal name="child-switched" return="void" when="first">
+      <param type="guint"/>
+      <param type="gint64"/>
+    </signal>
+  </interface>
+  <class name="HdySwipeGroup" get-type="hdy_swipe_group_get_type" parents="GObject">
+    <implements name="GtkBuildable"/>
+  </class>
+  <class name="HdySwipeTracker" get-type="hdy_swipe_tracker_get_type" parents="GObject">
+    <implements name="GtkOrientable"/>
+    <property name="swipeable" type="HdySwipeable" flags="11"/>
+    <property name="enabled" type="gboolean" flags="1073741827" default-value="TRUE"/>
+    <property name="reversed" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="allow-mouse-drag" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="allow-long-swipes" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <signal name="begin-swipe" return="void" when="first">
+      <param type="HdyNavigationDirection"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="update-swipe" return="void" when="first">
+      <param type="gdouble"/>
+    </signal>
+    <signal name="end-swipe" return="void" when="first">
+      <param type="gint64"/>
+      <param type="gdouble"/>
+    </signal>
+  </class>
+  <class name="HdyTabPage" get-type="hdy_tab_page_get_type" parents="GObject">
+    <property name="child" type="GtkWidget" flags="11"/>
+    <property name="parent" type="HdyTabPage" flags="1073741835"/>
+    <property name="selected" type="gboolean" flags="1073741825" default-value="FALSE"/>
+    <property name="pinned" type="gboolean" flags="1073741825" default-value="FALSE"/>
+    <property name="title" type="gchararray" flags="1073741827" default-value="NULL"/>
+    <property name="tooltip" type="gchararray" flags="1073741827" default-value="NULL"/>
+    <property name="icon" type="GIcon" flags="1073741827"/>
+    <property name="loading" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="indicator-icon" type="GIcon" flags="1073741827"/>
+    <property name="indicator-activatable" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="needs-attention" type="gboolean" flags="1073741827" default-value="FALSE"/>
+  </class>
+  <class name="HdyTabView" get-type="hdy_tab_view_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="n-pages" type="gint" flags="1073741825" default-value="0"/>
+    <property name="n-pinned-pages" type="gint" flags="1073741825" default-value="0"/>
+    <property name="is-transferring-page" type="gboolean" flags="1073741825" default-value="FALSE"/>
+    <property name="selected-page" type="HdyTabPage" flags="1073741827"/>
+    <property name="default-icon" type="GIcon" flags="1073741827"/>
+    <property name="menu-model" type="GMenuModel" flags="1073741827"/>
+    <property name="shortcut-widget" type="GtkWidget" flags="1073741827"/>
+    <signal name="page-attached" return="void" when="last">
+      <param type="HdyTabPage"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="page-detached" return="void" when="last">
+      <param type="HdyTabPage"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="page-reordered" return="void" when="last">
+      <param type="HdyTabPage"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="close-page" return="gboolean" when="last">
+      <param type="HdyTabPage"/>
+    </signal>
+    <signal name="setup-menu" return="void" when="last">
+      <param type="HdyTabPage"/>
+    </signal>
+    <signal name="create-window" return="HdyTabView" when="last">
+    </signal>
+    <signal name="indicator-activated" return="void" when="last">
+      <param type="HdyTabPage"/>
+    </signal>
+  </class>
+  <class name="HdyTabBar" get-type="hdy_tab_bar_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="view" type="HdyTabView" flags="1073741827"/>
+    <property name="start-action-widget" type="GtkWidget" flags="1073741827"/>
+    <property name="end-action-widget" type="GtkWidget" flags="1073741827"/>
+    <property name="autohide" type="gboolean" flags="1073741827" default-value="TRUE"/>
+    <property name="tabs-revealed" type="gboolean" flags="1073741825" default-value="FALSE"/>
+    <property name="expand-tabs" type="gboolean" flags="1073741827" default-value="TRUE"/>
+    <property name="inverted" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="extra-drag-dest-targets" type="GtkTargetList" flags="1073741827"/>
+    <property name="is-overflowing" type="gboolean" flags="1" default-value="FALSE"/>
+    <signal name="extra-drag-data-received" return="void" when="last">
+      <param type="HdyTabPage"/>
+      <param type="GdkDragContext"/>
+      <param type="GtkSelectionData"/>
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+  </class>
+  <class name="HdyTitleBar" get-type="hdy_title_bar_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="selection-mode" type="gboolean" flags="-1073741821" default-value="FALSE"/>
+  </class>
+  <class name="HdyValueObject" get-type="hdy_value_object_get_type" parents="GObject">
+    <property name="value" type="GValue" flags="235"/>
+  </class>
+  <class name="HdyViewSwitcher" get-type="hdy_view_switcher_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="policy" type="HdyViewSwitcherPolicy" flags="1073742051" default-value="HDY_VIEW_SWITCHER_POLICY_AUTO"/>
+    <property name="narrow-ellipsize" type="PangoEllipsizeMode" flags="1073741827" default-value="PANGO_ELLIPSIZE_NONE"/>
+    <property name="stack" type="GtkStack" flags="1073742051"/>
+  </class>
+  <class name="HdyViewSwitcherBar" get-type="hdy_view_switcher_bar_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="policy" type="HdyViewSwitcherPolicy" flags="1073742051" default-value="HDY_VIEW_SWITCHER_POLICY_NARROW"/>
+    <property name="stack" type="GtkStack" flags="1073742051"/>
+    <property name="reveal" type="gboolean" flags="1073742051" default-value="FALSE"/>
+  </class>
+  <class name="HdyViewSwitcherTitle" get-type="hdy_view_switcher_title_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="policy" type="HdyViewSwitcherPolicy" flags="1073742051" default-value="HDY_VIEW_SWITCHER_POLICY_AUTO"/>
+    <property name="stack" type="GtkStack" flags="1073742051"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="subtitle" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="view-switcher-enabled" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="title-visible" type="gboolean" flags="1073742049" default-value="TRUE"/>
+  </class>
+  <class name="HdyWindowHandle" get-type="hdy_window_handle_get_type" parents="GtkEventBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+  </class>
+</dump>

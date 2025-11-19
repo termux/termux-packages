@@ -1,0 +1,105 @@
+Description: Support nostrip build option.
+ By changing the upstrem build system to optionally strip the binaries
+ after the linking stage and before their preprocessing.
+Author: Guillem Jover <guillem@debian.org>
+Origin: vendor
+Bug-Debian: https://bugs.debian.org/436473
+Forwarded: no
+Last-Update: 2013-05-10
+
+---
+ gnu/makefile.in |   18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
+
+--- a/gnu/makefile.in
++++ b/gnu/makefile.in
+@@ -50,10 +50,15 @@ endif
+ 
+ ifdef DEBUG
+ DEBUG_SM = d
+-ALL_CFLAGS += -g -DDEBUG
++ALL_CFLAGS += -DDEBUG
+ else
+ DEBUG_SM = r
+-ADD_LDFLAGS = -s @LD_STRIP@
++endif
++
++ifdef BUILD_STRIP
++STRIP = strip --strip-unneeded --remove-section=.comment --remove-section=.note
++else
++STRIP = :
+ endif
+ 
+ ALL_CFLAGS += @CPPFLAGS@ $(CPPFLAGS) @CFLAGS@ $(CFLAGS)
+@@ -269,6 +274,7 @@ ARJCRYPT_OBJS = $(patsubst %,$(ARJCRYPT_
+ 
+ $(ARJCRYPT_DIR)/arjcrypt$d: $(ARJCRYPT_OBJS) $(TOOLS_DIR)/postproc$x
+ 	$(CC) $(ALL_CFLAGS) $(DLL_FLAGS) -o $@ $(ARJCRYPT_OBJS) $(ARJCRYPT_DEF) $(LIBS)
++	$(STRIP) $@
+ 	$(TOOLS_DIR)/postproc $@
+ 
+ $(BASEDIR)/nmsg_crp.c $(BASEDIR)/msg_crp.h: $(TOOLS_DIR)/msgbind$x $(RESFILE)
+@@ -283,6 +289,7 @@ SFXSTUB_OBJS = $(patsubst %,$(SFXSTUB_DI
+ 
+ $(SFXSTUB_DIR)/sfxstub$x: $(SFXSTUB_OBJS) $(TOOLS_DIR)/postproc$x
+ 	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(SFXSTUB_OBJS) $(LIBS)
++	$(STRIP) $@
+ 	$(TOOLS_DIR)/postproc$x $@ -sfx
+ 
+ $(BASEDIR)/nmsg_stb.c $(BASEDIR)/msg_stb.h: $(TOOLS_DIR)/msgbind$x $(RESFILE)
+@@ -301,6 +308,7 @@ ARJSFXV_OBJS = $(patsubst %,$(ARJSFXV_DI
+ 
+ $(ARJSFXV_DIR)/arjsfxv$x: $(ARJSFXV_OBJS) $(TOOLS_DIR)/postproc$x
+ 	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(ARJSFXV_OBJS) $(LIBS) $(DYN_LIBS)
++	$(STRIP) $@
+ 	$(TOOLS_DIR)/postproc$x $@ -sfx
+ 
+ $(BASEDIR)/fmsg_sfv.c $(BASEDIR)/imsg_sfv.c $(BASEDIR)/nmsg_sfv.c \
+@@ -319,6 +327,7 @@ ARJSFX_OBJS = $(patsubst %,$(ARJSFX_DIR)
+ 
+ $(ARJSFX_DIR)/arjsfx$x: $(ARJSFX_OBJS) $(TOOLS_DIR)/postproc$x
+ 	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(ARJSFX_OBJS) $(LIBS)
++	$(STRIP) $@
+ 	$(TOOLS_DIR)/postproc$x $@ -sfx
+ 
+ $(BASEDIR)/fmsg_sfx.c $(BASEDIR)/imsg_sfx.c $(BASEDIR)/nmsg_sfx.c \
+@@ -335,6 +344,7 @@ ARJSFXJR_OBJS = $(patsubst %,$(ARJSFXJR_
+ 
+ $(ARJSFXJR_DIR)/arjsfxjr$x: $(ARJSFXJR_OBJS) $(TOOLS_DIR)/postproc$x
+ 	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(ARJSFXJR_OBJS) $(LIBS)
++	$(STRIP) $@
+ 	$(TOOLS_DIR)/postproc$x $@ -sfx
+ 
+ $(BASEDIR)/fmsg_sfj.c $(BASEDIR)/imsg_sfj.c $(BASEDIR)/nmsg_sfj.c \
+@@ -364,6 +374,7 @@ $(ARJ_DIR)/arj$x: $(ARJ_OBJS) \
+ 		  $(ARJSFX_DIR)/arjsfx$x \
+ 		  $(ARJSFXJR_DIR)/arjsfxjr$x
+ 	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(ARJ_OBJS) $(LIBS) $(DYN_LIBS)
++	$(STRIP) $@
+ 	$(TOOLS_DIR)/join $(ARJ_DIR)/arj$x $(ARJSFXJR_DIR)/arjsfxjr$x
+ 	$(TOOLS_DIR)/join $(ARJ_DIR)/arj$x $(ARJSFX_DIR)/arjsfx$x
+ 	$(TOOLS_DIR)/join $(ARJ_DIR)/arj$x $(ARJSFXV_DIR)/arjsfxv$x
+@@ -390,6 +401,7 @@ REARJ_OBJS = $(patsubst %,$(REARJ_DIR)/%
+ $(REARJ_DIR)/rearj$x: $(REARJ_OBJS) \
+ 		      $(TOOLS_DIR)/postproc$x
+ 	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(REARJ_OBJS) $(LIBS)
++	$(STRIP) $@
+ 	$(TOOLS_DIR)/postproc $@
+ 
+ $(BASEDIR)/fmsg_rej.c $(BASEDIR)/imsg_rej.c $(BASEDIR)/nmsg_rej.c \
+@@ -407,6 +419,7 @@ REGISTER_OBJS = $(patsubst %,$(REGISTER_
+ $(REGISTER_DIR)/$(REGISTER)$x: $(REGISTER_OBJS) \
+ 		            $(TOOLS_DIR)/postproc$x
+ 	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(REGISTER_OBJS) $(LIBS)
++	$(STRIP) $@
+ 	$(TOOLS_DIR)/postproc $@ -sfx
+ 
+ $(BASEDIR)/fmsg_reg.c $(BASEDIR)/imsg_reg.c $(BASEDIR)/nmsg_reg.c \
+@@ -423,6 +436,7 @@ ARJDISP_OBJS = $(patsubst %,$(ARJDISP_DI
+ 
+ $(ARJDISP_DIR)/arjdisp$x: $(ARJDISP_OBJS)
+ 	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(ARJDISP_OBJS) $(LIBS)
++	$(STRIP) $@
+ 
+ $(BASEDIR)/fmsg_adi.c $(BASEDIR)/imsg_adi.c $(BASEDIR)/nmsg_adi.c \
+ $(BASEDIR)/msg_adi.h: $(TOOLS_DIR)/msgbind$x $(RESFILE)

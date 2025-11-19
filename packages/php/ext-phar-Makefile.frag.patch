@@ -1,0 +1,24 @@
+--- ./ext/phar/Makefile.frag.orig	2019-12-28 21:58:16.963934498 +0000
++++ ./ext/phar/Makefile.frag	2019-12-28 21:58:32.664200997 +0000
+@@ -9,20 +9,7 @@
+ pharcmd: $(builddir)/phar.php $(builddir)/phar.phar
+ 
+ PHP_PHARCMD_SETTINGS = -n -d 'open_basedir=' -d 'output_buffering=0' -d 'memory_limit=-1' -d phar.readonly=0
+-PHP_PHARCMD_EXECUTABLE = ` \
+-	if test -x "$(top_builddir)/$(SAPI_CLI_PATH)"; then \
+-		$(top_srcdir)/build/shtool echo -n -- "$(top_builddir)/$(SAPI_CLI_PATH) -n"; \
+-		if test "x$(PHP_MODULES)" != "x"; then \
+-		$(top_srcdir)/build/shtool echo -n -- " -d extension_dir=$(top_builddir)/modules"; \
+-		for i in bz2 zlib phar; do \
+-			if test -f "$(top_builddir)/modules/$$i.la"; then \
+-				. $(top_builddir)/modules/$$i.la; $(top_srcdir)/build/shtool echo -n -- " -d extension=$$dlname"; \
+-			fi; \
+-		done; \
+-		fi; \
+-	else \
+-		$(top_srcdir)/build/shtool echo -n -- "$(PHP_EXECUTABLE)"; \
+-	fi;`
++PHP_PHARCMD_EXECUTABLE = $(NATIVE_PHP_EXECUTABLE)
+ PHP_PHARCMD_BANG = `$(top_srcdir)/build/shtool echo -n -- "$(INSTALL_ROOT)$(bindir)/$(program_prefix)php$(program_suffix)$(EXEEXT)";`
+ 
+ $(builddir)/phar/phar.inc: $(srcdir)/phar/phar.inc

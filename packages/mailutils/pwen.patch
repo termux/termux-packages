@@ -1,0 +1,35 @@
+diff -uNr mh_alias_gram2.y mh_alias_gram.y
+--- ./mh/mh_alias_gram.y    2021-05-05 08:36:12.159978816 +0530
++++ ./mh/mh_alias_gram.y     2021-05-05 08:52:30.847978875 +0530
+@@ -470,6 +470,7 @@
+   if (grp)
+     {
+       struct passwd *pw;
++     #ifndef __ANDROID__
+       setpwent();
+       while ((pw = getpwent ()))
+        {
+@@ -477,6 +478,7 @@
+            mu_list_append (lst, mu_strdup (pw->pw_name));
+        }
+       endpwent();
++     #endif
+     }
+   return lst;
+ }
+@@ -486,7 +488,7 @@
+ {
+   mu_list_t lst = list_create_or_die ();
+   struct passwd *pw;
+-
++#ifndef __ANDROID__
+   setpwent();
+   while ((pw = getpwent ()))
+     {
+@@ -494,6 +496,7 @@
+        mu_list_append (lst, mu_strdup (pw->pw_name));
+     }
+   endpwent();
++#endif
+   return lst;
+ }

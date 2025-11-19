@@ -1,0 +1,11 @@
+--- a/cfg/checks/video.mk
++++ b/cfg/checks/video.mk
+@@ -8,7 +8,7 @@ else
+ endif
+ 
+ # Check if we can build video support
+-CHECK_VIDEO_LIBS = $(shell $(PKG_CONFIG) --exists $(VIDEO_LIBS) || echo -n "error")
++CHECK_VIDEO_LIBS = $(shell echo -n "error")
+ ifneq ($(CHECK_VIDEO_LIBS), error)
+     LIBS += $(VIDEO_LIBS)
+     CFLAGS += $(VIDEO_CFLAGS)

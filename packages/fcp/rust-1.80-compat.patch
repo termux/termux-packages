@@ -1,0 +1,106 @@
+From 1988f88be54a507b804b037cb3887fecf11bb571 Mon Sep 17 00:00:00 2001
+From: Rui Chen <rui@chenrui.dev>
+Date: Thu, 1 Aug 2024 17:54:59 -0400
+Subject: [PATCH 2/3] add type info
+
+Signed-off-by: Rui Chen <rui@chenrui.dev>
+---
+ src/main.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/main.rs b/src/main.rs
+index 74e0cbf..2384de5 100644
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -24,7 +24,7 @@ OPTIONS:
+ static VERSION: &str = env!("CARGO_PKG_VERSION");
+ 
+ fn main() {
+-    let args: Box<_> = env::args().skip(1).collect();
++    let args: Box<Vec<String>> = Box::new(env::args().skip(1).collect());
+     for arg in args.iter() {
+         match arg.as_str() {
+             "-h" | "--help" => fatal(HELP),
+
+From 89bcfc9aa1055dcf541da7a6477ffd3107023f48 Mon Sep 17 00:00:00 2001
+From: Rui Chen <rui@chenrui.dev>
+Date: Thu, 1 Aug 2024 17:55:11 -0400
+Subject: [PATCH 3/3] run clippy fixes
+
+Signed-off-by: Rui Chen <rui@chenrui.dev>
+---
+ benches/fcp_benchmark.rs |  4 ++--
+ tests/tests.rs           | 10 +++++-----
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/benches/fcp_benchmark.rs b/benches/fcp_benchmark.rs
+index 1736cdb..8047532 100644
+--- a/benches/fcp_benchmark.rs
++++ b/benches/fcp_benchmark.rs
+@@ -27,7 +27,7 @@ fn fcp_benchmark(mut group: BenchmarkGroup<WallTime>, fixture_file: &str) {
+                 || {
+                     remove(&dest_path);
+                     let mut command = Command::new("cp");
+-                    command.args(&["-R", source, dest]);
++                    command.args(["-R", source, dest]);
+                     command
+                 },
+                 run_command,
+@@ -42,7 +42,7 @@ fn fcp_benchmark(mut group: BenchmarkGroup<WallTime>, fixture_file: &str) {
+                 || {
+                     remove(&dest_path);
+                     let mut command = Command::new(executable_path);
+-                    command.args(&[source, dest]);
++                    command.args([source, dest]);
+                     command
+                 },
+                 run_command,
+diff --git a/tests/tests.rs b/tests/tests.rs
+index 6f7e8ec..851e940 100644
+--- a/tests/tests.rs
++++ b/tests/tests.rs
+@@ -33,7 +33,7 @@ const DIR_MODE: u32 = 0o755;
+ fn diff(filename: &str) -> ExitStatus {
+     let filename = filename.strip_suffix(".json").unwrap();
+     Command::new("diff")
+-        .args(&[
++        .args([
+             "-rq",
+             "--no-dereference",
+             HYDRATED_DIR.join(filename).to_str().unwrap(),
+@@ -126,7 +126,7 @@ fn character_device() {
+     remove(&destination);
+     let contents = "Hello world\r";
+     let result = Command::new("tests/character_device.exp")
+-        .args(&[
++        .args([
+             fcp_executable_path().to_str().unwrap(),
+             destination.to_str().unwrap(),
+             contents,
+@@ -178,7 +178,7 @@ fn partial_directory() {
+     assert!(result.stderr.contains("partial_directory/two.txt"));
+     for file in ["one.txt", "three.txt"] {
+         let result = Command::new("diff")
+-            .args(&[
++            .args([
+                 "-q",
+                 HYDRATED_DIR
+                     .join("partial_directory")
+@@ -225,7 +225,7 @@ fn copy_into_symlink() {
+     assert!(result.success);
+     assert_eq!(result.stderr, "");
+     let result = Command::new("diff")
+-        .args(&[
++        .args([
+             "-rq",
+             source.to_str().unwrap(),
+             destination
+@@ -302,7 +302,7 @@ fn copy_many_into_permissions_error() {
+     assert!(result.stderr.contains("two.txt"));
+     for file in ["one.txt", "three.txt"] {
+         let result = Command::new("diff")
+-            .args(&[
++            .args([
+                 "-q",
+                 HYDRATED_DIR.join(fixture_name).join(file).to_str().unwrap(),
+                 COPIES_DIR.join(fixture_name).join(file).to_str().unwrap(),

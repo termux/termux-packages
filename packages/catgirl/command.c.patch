@@ -1,0 +1,11 @@
+--- a/command.c
++++ b/command.c
+@@ -494,7 +494,7 @@
+ 	dup2(execPipe[1], STDOUT_FILENO);
+ 	dup2(utilPipe[1], STDERR_FILENO);
+ 
+-	const char *shell = getenv("SHELL") ?: "/bin/sh";
++	const char *shell = getenv("SHELL") ?: "@TERMUX_PREFIX@/bin/sh";
+ 	execl(shell, shell, "-c", params, NULL);
+ 	warn("%s", shell);
+ 	_exit(EX_UNAVAILABLE);

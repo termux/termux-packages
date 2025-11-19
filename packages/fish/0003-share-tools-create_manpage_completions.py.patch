@@ -1,0 +1,24 @@
+diff --git a/share/tools/create_manpage_completions.py b/share/tools/create_manpage_completions.py
+index 1fc26a846..5c3d078e3 100755
+--- a/share/tools/create_manpage_completions.py
++++ b/share/tools/create_manpage_completions.py
+@@ -1019,7 +1019,7 @@ def get_paths_from_man_locations():
+     # Fallback: With mandoc (OpenBSD, embedded Linux) and NetBSD man, the only way to get the default manpath is by reading /etc.
+     if not parent_paths:
+         try:
+-            with open("/etc/man.conf", "r") as file:
++            with open("@TERMUX_PREFIX@/etc/man.conf", "r") as file:
+                 data = file.read()
+                 for key in ["MANPATH", "_default"]:
+                     for match in re.findall(r"^%s\s+(.*)$" % key, data, re.I | re.M):
+@@ -1027,8 +1027,9 @@ def get_paths_from_man_locations():
+         except FileNotFoundError:
+             pass
+     # Fallback: hard-code some common paths. These should be likely for FHS Linux distros, BSDs, and macOS.
++    # We need to patch this to work properly on Termux.
+     if not parent_paths:
+-        parent_paths = ["/usr/share/man", "/usr/local/man", "/usr/local/share/man"]
++        parent_paths = ["@TERMUX_PREFIX@/share/man"]
+         print(
+             "Unable to get the manpath, falling back to %s." % ":".join(parent_paths),
+             "Explictly set $MANPATH to fix this error.",

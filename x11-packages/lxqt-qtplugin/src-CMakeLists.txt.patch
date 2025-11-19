@@ -1,0 +1,15 @@
+Fix libqtlxqt.so path after cross compile in builder container.
+Otherwise, it is installed in PREFIX/opt/qt6/cross/ directory.
+
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -39,7 +39,9 @@
+     Qt6XdgIconLoader
+ )
+ 
++if(NOT CMAKE_CROSSCOMPILING)
+ lxqt_query_qt(_QT_PLUGINS_DIR QT_INSTALL_PLUGINS)
++endif()
+ 
+ if (NOT _QT_PLUGINS_DIR)
+     message(FATAL_ERROR "Qt6 plugin directory cannot be detected.")

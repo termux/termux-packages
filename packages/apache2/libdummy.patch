@@ -1,0 +1,113 @@
+--- a/libdummy/Makefile
++++ b/libdummy/Makefile
+@@ -0,0 +1,10 @@
++
++libdummy-%.so: dummy-%.c
++	$(CC) $< -shared -nostdlib -Wl,-soname=$*.so -o $@
++
++all: $(patsubst %,libdummy-mod_%.so,cache dav proxy session watchdog)
++
++install:
++
++clean:
++	$(RM) *.so
+--- a/libdummy/dummy-mod_cache.c
++++ b/libdummy/dummy-mod_cache.c
+@@ -0,0 +1,3 @@
++void ap_cache_cacheable_headers_in(void){}
++void ap_cache_cacheable_headers_out(void){}
++void ap_cache_generate_name(void){}
+--- a/libdummy/dummy-mod_dav.c
++++ b/libdummy/dummy-mod_dav.c
+@@ -0,0 +1,18 @@
++void dav_add_response(void){}
++void dav_buffer_append(void){}
++void dav_buffer_init(void){}
++void dav_buffer_place(void){}
++void dav_buffer_place_mem(void){}
++void dav_check_bufsize(void){}
++void dav_do_find_liveprop(void){}
++void dav_get_liveprop_info(void){}
++void dav_hook_find_liveprop(void){}
++void dav_hook_gather_propsets(void){}
++void dav_hook_insert_all_liveprops(void){}
++void dav_lock_query(void){}
++void dav_new_error(void){}
++void dav_push_error(void){}
++void dav_register_liveprop_group(void){}
++void dav_register_provider(void){}
++void dav_set_bufsize(void){}
++void dav_xmlns_add(void){}
+--- a/libdummy/dummy-mod_proxy.c
++++ b/libdummy/dummy-mod_proxy.c
+@@ -0,0 +1,58 @@
++void ap_proxy_acquire_connection(void){}
++void ap_proxy_backend_broke(void){}
++void ap_proxy_buckets_lifetime_transform(void){}
++void ap_proxy_canon_netloc(void){}
++void ap_proxy_canonenc(void){}
++void ap_proxy_check_connection(void){}
++void ap_proxy_checkproxyblock2(void){}
++void ap_proxy_conn_is_https(void){}
++void ap_proxy_connect_backend(void){}
++void ap_proxy_connect_to_backend(void){}
++void ap_proxy_connect_uds(void){}
++void ap_proxy_connection_create(void){}
++void ap_proxy_connection_create_ex(void){}
++void ap_proxy_connection_reusable(void){}
++void ap_proxy_cookie_reverse_map(void){}
++void ap_proxy_create_hdrbrgd(void){}
++void ap_proxy_define_worker(void){}
++void ap_proxy_determine_connection(void){}
++void ap_proxy_find_balancershm(void){}
++void ap_proxy_find_workershm(void){}
++void ap_proxy_get_balancer(void){}
++void ap_proxy_get_worker(void){}
++void ap_proxy_hashfunc(void){}
++void ap_proxy_hex2c(void){}
++void ap_proxy_initialize_balancer(void){}
++void ap_proxy_initialize_worker(void){}
++void ap_proxy_location_reverse_map(void){}
++void ap_proxy_parse_wstatus(void){}
++void ap_proxy_pass_brigade(void){}
++void ap_proxy_port_of_scheme(void){}
++void ap_proxy_pre_http_request(void){}
++void ap_proxy_prefetch_input(void){}
++void ap_proxy_read_input(void){}
++void ap_proxy_release_connection(void){}
++void ap_proxy_set_wstatus(void){}
++void ap_proxy_share_balancer(void){}
++void ap_proxy_share_worker(void){}
++void ap_proxy_should_override(void){}
++void ap_proxy_show_hcmethod(void){}
++void ap_proxy_spool_input(void){}
++void ap_proxy_ssl_engine(void){}
++void ap_proxy_ssl_val(void){}
++void ap_proxy_strncpy(void){}
++void ap_proxy_sync_balancer(void){}
++void ap_proxy_transfer_between_connections(void){}
++void ap_proxy_tunnel_create(void){}
++void ap_proxy_tunnel_run(void){}
++void ap_proxy_worker_can_upgrade(void){}
++void ap_proxy_worker_name(void){}
++void ap_proxyerror(void){}
++void proxy_hcmethods(void){}
++void proxy_hook_canon_handler(void){}
++void proxy_hook_check_trans(void){}
++void proxy_hook_post_request(void){}
++void proxy_hook_pre_request(void){}
++void proxy_hook_scheme_handler(void){}
++void proxy_module(void){}
++void proxy_run_create_req(void){}
+--- a/libdummy/dummy-mod_session.c
++++ b/libdummy/dummy-mod_session.c
+@@ -0,0 +1,2 @@
++void ap_hook_session_load(void){}
++void ap_hook_session_save(void){}
+--- a/libdummy/dummy-mod_watchdog.c
++++ b/libdummy/dummy-mod_watchdog.c
+@@ -0,0 +1,4 @@
++void ap_hook_watchdog_exit(void){}
++void ap_hook_watchdog_init(void){}
++void ap_hook_watchdog_need(void){}
++void ap_hook_watchdog_step(void){}

@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/kiwix/kiwix-tools
+TERMUX_PKG_DESCRIPTION="A collection of Kiwix related command line tools"
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="3.8.0"
+TERMUX_PKG_SRCURL=https://github.com/kiwix/kiwix-tools/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=1c7495b30b58826629d1bad647084ed84f0d03687fe45c5ee6ab2129c8307190
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="docopt, libc++, libkiwix, libzim"

@@ -1,0 +1,25 @@
+--- a/src/corelib/io/qstorageinfo_linux.cpp
++++ b/src/corelib/io/qstorageinfo_linux.cpp
+@@ -32,12 +32,11 @@
+ #  define ST_RDONLY             0x0001  /* mount read-only */
+ #endif
+
+-#if defined(Q_OS_ANDROID)
++#if defined(Q_OS_ANDROID) || defined(__ANDROID__)
+ // statx() is disabled on Android because quite a few systems
+ // come with sandboxes that kill applications that make system calls outside a
+ // whitelist and several Android vendors can't be bothered to update the list.
+ #  undef STATX_BASIC_STATS
+-#include <private/qjnihelpers_p.h>
+ #endif
+
+ QT_BEGIN_NAMESPACE
+@@ -432,7 +431,7 @@
+
+ void QStorageInfoPrivate::doStat()
+ {
+-#ifdef Q_OS_ANDROID
++#if 0
+     if (QtAndroidPrivate::isUncompressedNativeLibs()) {
+         // We need to pass the actual file path on the file system to statfs64
+         QString possibleApk = QtAndroidPrivate::resolveApkPath(rootPath);

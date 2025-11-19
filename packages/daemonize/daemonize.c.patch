@@ -1,0 +1,23 @@
+diff -u -r ../daemonize-release-1.7.7/daemonize.c ./daemonize.c
+--- ../daemonize-release-1.7.7/daemonize.c	2015-12-11 23:54:43.000000000 +0100
++++ ./daemonize.c	2017-07-07 00:33:39.931635851 +0200
+@@ -24,6 +24,7 @@
+ #include <fcntl.h>
+ #include <sys/stat.h>
+ #include <sys/file.h>
++#include <grp.h> /* For initgroups(3). */
+ #include "config.h"
+ #include "version.h"
+ 
+@@ -38,7 +39,10 @@
+ static bool         be_verbose = FALSE;
+ static const char  *user       = NULL;
+ static char       **cmd        = NULL;
+-static const char  *cwd        = "/";
++/* Termux patch: Use a readable directory for e.g. runsvdir to work,
++   as / is not readable starting from Android 7:
++   https://github.com/termux/termux-packages/issues/614 */
++static const char  *cwd        = "@TERMUX_PREFIX@";
+ static int          null_fd    = -1;
+ static int          out_fd     = -1;
+ static int          err_fd     = -1;

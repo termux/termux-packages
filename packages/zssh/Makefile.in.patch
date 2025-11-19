@@ -1,0 +1,21 @@
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -71,13 +71,13 @@
+ 
+ ztelnet : $(NAME)
+ 	@-rm $@ > /dev/null 2>&1
+-	ln $(NAME) $@
++	ln -s $(NAME) $@
+ 
+ install :
+-	strip $(NAME)
+-	$(INSTALL) -m 0711 zssh @bindir@
+-	ln -f @bindir@/zssh  @bindir@/ztelnet
+-	$(INSTALL) -m 0644 $(MANS) @mandir@/man1
++	$(STRIP) $(NAME)
++	$(INSTALL) -Dm 0711 -t @bindir@ zssh
++	ln -fs @bindir@/zssh  @bindir@/ztelnet
++	$(INSTALL) -Dm 0644 -t @mandir@/man1 $(MANS) 
+ 
+ uninstall :
+ 	-cd @bindir@      && rm $(PRGS)

@@ -1,0 +1,30 @@
+swi-prolog cannot currently continue in Termux on 32-bit ARM architecture without this patch.
+https://github.com/termux/termux-packages/issues/22737
+--- a/src/pl-init.c
++++ b/src/pl-init.c
+@@ -256,11 +256,21 @@ check_home(const char *dir)
+   Ssnprintf(abi_file_name, sizeof(abi_file_name),
+ 	    "%s/ABI", dir);
+   if ( (fd = Sopen_file(abi_file_name, "r")) )
+-  { char *abi_string = Sfgets(abi_buf, sizeof(abi_buf), fd);
++  { char *build_time_abi_string = Sfgets(abi_buf, sizeof(abi_buf), fd);
+     Sclose(fd);
+-    if ( abi_string )
+-    { remove_trailing_whitespace(abi_string);
+-      return match_abi_version(abi_version(), abi_string);
++    if ( build_time_abi_string )
++    { remove_trailing_whitespace(build_time_abi_string);
++      const char *run_time_abi_string = abi_version();
++      if (match_abi_version(run_time_abi_string, build_time_abi_string) == 1)
++      { return true;
++      } else
++      { printf("WARNING: ABI mismatch!\n");
++        printf("build time ABI found in %s: %s\n", abi_file_name, build_time_abi_string);
++        printf("run time ABI returned by abi_version(): %s\n", run_time_abi_string);
++        printf("attempting to continue for workaround purposes...\n");
++        // returning true to force the error into a warning
++        return true;
++      }
+     } else
+     { return BAD_HOME_BAD_ABI;
+     }

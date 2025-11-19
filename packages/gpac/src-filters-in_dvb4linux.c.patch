@@ -1,0 +1,11 @@
+--- a/src/filters/in_dvb4linux.c
++++ b/src/filters/in_dvb4linux.c
+@@ -126,7 +126,7 @@
+ 			if (line[0]=='\n') continue;
+ 
+ #ifndef GPAC_SIM_LINUX_DVB
+-			strncpy(chan_name_t, line, index(line, ':')-line);
++			strncpy(chan_name_t, line, strchr(line, ':')-line);
+ 			chan_name_t[254] = 0;
+ 
+ 			if (strncmp(chan_name,chan_name_t,strlen(chan_name))==0) {

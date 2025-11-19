@@ -1,0 +1,51 @@
+--- a/src/main.zig
++++ b/src/main.zig
+@@ -38,7 +38,7 @@
+ }
+ 
+ // "Custom" allocator that wraps the libc allocator and calls ui.oom() on error.
+-// This allocator never returns an error, it either succeeds or causes ncdu to quit.
++// This allocator never returns an error, it either succeeds or causes ncdu2 to quit.
+ // (Which means you'll find a lot of "catch unreachable" sprinkled through the code,
+ // they look scarier than they are)
+ fn wrapAlloc(_: *anyopaque, len: usize, ptr_alignment: std.mem.Alignment, return_address: usize) ?[*]u8 {
+@@ -371,13 +371,13 @@
+ }
+ 
+ fn version() noreturn {
+-    stdout.writeAll("ncdu " ++ program_version ++ "\n") catch {};
++    stdout.writeAll("ncdu2 " ++ program_version ++ "\n") catch {};
+     std.process.exit(0);
+ }
+ 
+ fn help() noreturn {
+     stdout.writeAll(
+-    \\ncdu <options> <directory>
++    \\ncdu2 <options> <directory>
+     \\
+     \\Mode selection:
+     \\  -h, --help                 This help message
+@@ -422,12 +422,12 @@
+     \\  --sort COLUMN-(asc/desc)   disk-usage / name / apparent-size / itemcount / mtime
+     \\  --enable-natsort           Use natural order when sorting by name
+     \\  --group-directories-first  Sort directories before files
+-    \\  --confirm-quit             Ask confirmation before quitting ncdu
++    \\  --confirm-quit             Ask confirmation before quitting ncdu2
+     \\  --no-confirm-delete        Don't ask confirmation before deletion
+     \\  --delete-command CMD       Command to run for file deletion
+     \\  --color SCHEME             off / dark / dark-bg
+     \\
+-    \\Refer to `man ncdu` for more information.
++    \\Refer to `man ncdu2` for more information.
+     \\
+     ) catch {};
+     std.process.exit(0);
+@@ -511,7 +511,7 @@
+         while (args.next() catch unreachable) |opt| {
+             if (!opt.opt) {
+                 // XXX: ncdu 1.x doesn't error, it just silently ignores all but the last argument.
+-                if (scan_dir != null) ui.die("Multiple directories given, see ncdu -h for help.\n", .{});
++                if (scan_dir != null) ui.die("Multiple directories given, see ncdu2 -h for help.\n", .{});
+                 scan_dir = allocator.dupeZ(u8, opt.val) catch unreachable;
+                 continue;
+             }

@@ -1,0 +1,12 @@
+TERMUX_PKG_HOMEPAGE=http://www.catb.org/~esr/greed/
+TERMUX_PKG_DESCRIPTION="Game where you try to eat as much as possible of the board before munching yourself into a corner"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="4.3"
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=http://www.catb.org/~esr/greed/greed-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=8ea3b9a22e9cf3789a9103d38ac0bf88fd6179763fffe36e3b607946b7449acf
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="ncurses"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_GROUPS="games"

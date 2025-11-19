@@ -1,0 +1,43 @@
+https://salsa.debian.org/debian/chntpw/-/blob/e00c8dd756fdb6a04d6dd27e7bedf19981a398f8/debian/patches/09_improve_robustness
+
+--- a/ntreg.c
++++ b/ntreg.c
+@@ -227,14 +227,18 @@ char *mem_str( const char *str, int len )
+ 
+ int fmyinput(char *prmpt, char *ibuf, int maxlen)
+ {
+-   
++   int len;
+    printf("%s",prmpt);
+    
+    fgets(ibuf,maxlen+1,stdin);
+-   
+-   ibuf[strlen(ibuf)-1] = 0;
+-   
+-   return(strlen(ibuf));
++   len = strlen(ibuf);
++
++   if (len) {
++      ibuf[len-1] = 0;
++      --len;
++   }
++
++   return len;
+ }
+ 
+ /* Print len number of hexbytes */
+@@ -4251,6 +4255,14 @@ struct hive *openHive(char *filename, int mode)
+     return(NULL);
+   }
+ 
++  if (r < sizeof (*hdesc)) {
++    fprintf(stderr,
++	    "file is too small; got %d bytes while expecting %d or more\n",
++	    r, sizeof (*hdesc));
++    closeHive(hdesc);
++    return(NULL);
++  }
++
+   /* Now run through file, tallying all pages */
+   /* NOTE/KLUDGE: Assume first page starts at offset 0x1000 */
+ 

@@ -1,0 +1,35 @@
+--- a/meson.build
++++ b/meson.build
+@@ -117,10 +117,17 @@
+ giounix = dependency('gio-unix-2.0', version : '>= 2.45.8')
+ lcms = dependency('lcms2', version : '>= 2.6')
+ sqlite = dependency('sqlite3')
+-gusb = dependency('gusb', version : '>= 0.2.7')
+-gudev = dependency('gudev-1.0')
+ libm = cc.find_library('m', required: false)
+-libudev = dependency('libudev')
++if get_option('daemon')
++  gusb = dependency('gusb', version : '>= 0.2.7')
++  gudev = dependency('gudev-1.0')
++  libudev = dependency('libudev')
++else 
++  null_dep = dependency('', required : false)
++  gusb = null_dep
++  gudev = null_dep
++  libudev = null_dep
++endif
+ 
+ if get_option('udev_rules')
+   udev = dependency('udev')
+--- a/lib/colord/cd-edid.c
++++ b/lib/colord/cd-edid.c
+@@ -25,7 +25,9 @@
+ #include <string.h>
+ #include <glib-object.h>
+ #include <math.h>
++#ifndef PNP_IDS
+ #include <libudev.h>
++#endif
+ 
+ #include "cd-edid.h"
+ #include "cd-quirk.h"

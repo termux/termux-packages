@@ -1,0 +1,11 @@
+--- ./src/setproctitle.c.orig	2021-05-01 14:35:04.385944179 +0000
++++ ./src/setproctitle.c	2021-05-01 14:36:32.979189534 +0000
+@@ -232,7 +232,7 @@
+ 	if (!(SPT.arg0 = strdup(argv[0])))
+ 		goto syerr;
+ 
+-#if __linux__
++#if defined(__linux__) && !defined(__ANDROID__)
+ 	if (!(tmp = strdup(program_invocation_name)))
+ 		goto syerr;
+ 

@@ -1,0 +1,525 @@
+diff --git a/cinnamon-session/csm-consolekit.c b/cinnamon-session/csm-consolekit.c
+index c947778..0c1f519 100644
+--- a/cinnamon-session/csm-consolekit.c
++++ b/cinnamon-session/csm-consolekit.c
+@@ -28,6 +28,8 @@
+ #include <glib.h>
+ #include <glib-object.h>
+ #include <glib/gi18n.h>
++
++#ifndef FAKE_CONSOLEKIT
+ #include <gio/gio.h>
+ #include <gio/gunixfdlist.h>
+ 
+@@ -35,6 +37,7 @@
+ #define UPOWER_ENABLE_DEPRECATED 1
+ #include <upower.h>
+ #endif
++#endif
+ 
+ #include "csm-system.h"
+ #include "csm-consolekit.h"
+@@ -49,6 +52,7 @@
+ 
+ struct _CsmConsolekitPrivate
+ {
++#ifndef FAKE_CONSOLEKIT
+         GDBusProxy      *ck_proxy;
+         GDBusProxy      *ck_session_proxy;
+ #ifdef HAVE_OLD_UPOWER
+@@ -56,14 +60,19 @@ struct _CsmConsolekitPrivate
+ #endif
+         char            *session_id;
+         gchar           *session_path;
++#endif
+ 
+         GSList          *inhibitors;
++#ifndef FAKE_CONSOLEKIT
+         gint             inhibit_fd;
++#endif
+ 
+         gboolean         is_active;
+ 
++#ifndef FAKE_CONSOLEKIT
+         gint             delay_inhibit_fd;
+         gboolean         prepare_for_shutdown_expected;
++#endif
+ };
+ 
+ enum {
+@@ -77,6 +86,7 @@ G_DEFINE_TYPE_WITH_CODE (CsmConsolekit, csm_consolekit, G_TYPE_OBJECT,
+                          G_IMPLEMENT_INTERFACE (CSM_TYPE_SYSTEM,
+                                                 csm_consolekit_system_init))
+ 
++#ifndef FAKE_CONSOLEKIT
+ static void
+ drop_system_inhibitor (CsmConsolekit *manager)
+ {
+@@ -96,25 +106,31 @@ drop_delay_inhibitor (CsmConsolekit *manager)
+                 manager->priv->delay_inhibit_fd = -1;
+         }
+ }
++#endif
+ 
+ static void
+ csm_consolekit_finalize (GObject *object)
+ {
+         CsmConsolekit *consolekit = CSM_CONSOLEKIT (object);
+ 
++#ifndef FAKE_CONSOLEKIT
+         g_clear_object (&consolekit->priv->ck_proxy);
+         g_clear_object (&consolekit->priv->ck_session_proxy);
+         free (consolekit->priv->session_id);
+         g_free (consolekit->priv->session_path);
++#endif
+ 
+         if (consolekit->priv->inhibitors != NULL) {
+                 g_slist_free_full (consolekit->priv->inhibitors, g_free);
+         }
++
++#ifndef FAKE_CONSOLEKIT
+         drop_system_inhibitor (consolekit);
+         drop_delay_inhibitor (consolekit);
+ 
+ #ifdef HAVE_OLD_UPOWER
+-        g_clear_object (&manager->priv->up_client);
++        g_clear_object (&consolekit->priv->up_client);
++#endif
+ #endif
+ 
+         G_OBJECT_CLASS (csm_consolekit_parent_class)->finalize (object);
+@@ -171,6 +187,7 @@ csm_consolekit_class_init (CsmConsolekitClass *manager_class)
+         g_type_class_add_private (manager_class, sizeof (CsmConsolekitPrivate));
+ }
+ 
++#ifndef FAKE_CONSOLEKIT
+ static void ck_session_proxy_signal_cb (GDBusProxy  *proxy,
+                                         const gchar *sender_name,
+                                         const gchar *signal_name,
+@@ -214,18 +231,22 @@ ck_pid_get_session (CsmConsolekit *manager,
+         g_variant_get (res, "(o)", session_id);
+         g_variant_unref (res);
+ }
++#endif
+ 
+ static void
+ csm_consolekit_init (CsmConsolekit *manager)
+ {
++#ifndef FAKE_CONSOLEKIT
+         GError *error = NULL;
+         GDBusConnection *bus;
+         GVariant *res;
++#endif
+ 
+         manager->priv = G_TYPE_INSTANCE_GET_PRIVATE (manager,
+                                                      CSM_TYPE_CONSOLEKIT,
+                                                      CsmConsolekitPrivate);
+ 
++#ifndef FAKE_CONSOLEKIT
+         manager->priv->inhibit_fd = -1;
+         manager->priv->delay_inhibit_fd = -1;
+ 
+@@ -286,6 +307,12 @@ csm_consolekit_init (CsmConsolekit *manager)
+ #endif
+ 
+         g_object_unref (bus);
++#else
++        g_debug ("CsmConsolekit: Termux dummy implementation initialized");
++        
++        /* In Termux, we're always "active" since there's no session switching */
++        manager->priv->is_active = TRUE;
++#endif
+ }
+ 
+ static void
+@@ -332,6 +359,7 @@ emit_stop_complete (CsmConsolekit *manager,
+         }
+ }
+ 
++#ifndef FAKE_CONSOLEKIT
+ static void
+ restart_done (GObject      *source,
+               GAsyncResult *result,
+@@ -353,12 +381,14 @@ restart_done (GObject      *source,
+                 g_variant_unref (res);
+         }
+ }
++#endif
+ 
+ static void
+ csm_consolekit_attempt_restart (CsmSystem *system)
+ {
+         CsmConsolekit *manager = CSM_CONSOLEKIT (system);
+ 
++#ifndef FAKE_CONSOLEKIT
+         /* Use Restart instead of Reboot because it will work on
+          * both CK and CK2 */
+         g_dbus_proxy_call (manager->priv->ck_proxy,
+@@ -369,8 +399,21 @@ csm_consolekit_attempt_restart (CsmSystem *system)
+                            NULL,
+                            restart_done,
+                            manager);
++#else
++        GError *error;
++
++        g_debug ("CsmConsolekit: Termux restart attempt - not supported");
++        
++        /* In Termux, we can't actually restart the system, so we just signal completion */
++        error = g_error_new_literal (CSM_SYSTEM_ERROR,
++                                     CSM_SYSTEM_ERROR_RESTARTING,
++                                     "System restart not supported in Termux");
++        emit_restart_complete (manager, error);
++        g_error_free (error);
++#endif
+ }
+ 
++#ifndef FAKE_CONSOLEKIT
+ static void
+ stop_done (GObject      *source,
+            GAsyncResult *result,
+@@ -392,13 +435,15 @@ stop_done (GObject      *source,
+                 g_variant_unref (res);
+         }
+ }
++#endif
+ 
+ static void
+ csm_consolekit_attempt_stop (CsmSystem *system)
+ {
+         CsmConsolekit *manager = CSM_CONSOLEKIT (system);
+ 
+-        /* Use Stop insetad of PowerOff because it will work with
++#ifndef FAKE_CONSOLEKIT
++        /* Use Stop instead of PowerOff because it will work with
+          * Ck and CK2. */
+         g_dbus_proxy_call (manager->priv->ck_proxy,
+                            "Stop",
+@@ -408,14 +453,27 @@ csm_consolekit_attempt_stop (CsmSystem *system)
+                            NULL,
+                            stop_done,
+                            manager);
++#else
++        GError *error;
++
++        g_debug ("CsmConsolekit: Termux stop attempt - not supported");
++        
++        /* In Termux, we can't actually stop the system, so we just signal completion */
++        error = g_error_new_literal (CSM_SYSTEM_ERROR,
++                                     CSM_SYSTEM_ERROR_STOPPING,
++                                     "System shutdown not supported in Termux");
++        emit_stop_complete (manager, error);
++        g_error_free (error);
++#endif
+ }
+ 
+ static void
+ csm_consolekit_set_session_idle (CsmSystem *system,
+-                              gboolean   is_idle)
++                                 gboolean   is_idle)
+ {
+         CsmConsolekit *manager = CSM_CONSOLEKIT (system);
+ 
++#ifndef FAKE_CONSOLEKIT
+         g_debug ("Updating consolekit idle status: %d", is_idle);
+         g_dbus_proxy_call_sync (manager->priv->ck_session_proxy,
+                                 "SetIdleHint",
+@@ -423,8 +481,13 @@ csm_consolekit_set_session_idle (CsmSystem *system,
+                                 0,
+                                 G_MAXINT,
+                                 NULL, NULL);
++#else
++        g_debug ("CsmConsolekit: Termux session idle status: %d (no-op)", is_idle);
++        /* In Termux, session idle state doesn't need to be tracked */
++#endif
+ }
+ 
++#ifndef FAKE_CONSOLEKIT
+ static void
+ ck_session_get_seat (CsmConsolekit *manager,
+                      gchar        **seat)
+@@ -482,10 +545,12 @@ ck_seat_can_multi_session (CsmConsolekit *manager,
+ 
+         return can_activate == TRUE ? 1 : 0;
+ }
++#endif
+ 
+ static gboolean
+ csm_consolekit_can_switch_user (CsmSystem *system)
+ {
++#ifndef FAKE_CONSOLEKIT
+         CsmConsolekit *manager = CSM_CONSOLEKIT (system);
+         gchar *seat;
+         gint ret;
+@@ -495,11 +560,17 @@ csm_consolekit_can_switch_user (CsmSystem *system)
+         free (seat);
+ 
+         return ret > 0;
++#else
++        g_debug ("CsmConsolekit: Termux can_switch_user - FALSE");
++        /* User switching is not relevant in Termux */
++        return FALSE;
++#endif
+ }
+ 
+ static gboolean
+ csm_consolekit_can_restart (CsmSystem *system)
+ {
++#ifndef FAKE_CONSOLEKIT
+         CsmConsolekit *manager = CSM_CONSOLEKIT (system);
+         GVariant *res;
+         gboolean can_restart;
+@@ -521,11 +592,17 @@ csm_consolekit_can_restart (CsmSystem *system)
+         g_variant_unref (res);
+ 
+         return can_restart;
++#else
++        g_debug ("CsmConsolekit: Termux can_restart - FALSE");
++        /* System restart is not supported in Termux */
++        return FALSE;
++#endif
+ }
+ 
+ static gboolean
+ csm_consolekit_can_stop (CsmSystem *system)
+ {
++#ifndef FAKE_CONSOLEKIT
+         CsmConsolekit *manager = CSM_CONSOLEKIT (system);
+         GVariant *res;
+         gboolean can_stop;
+@@ -547,8 +624,14 @@ csm_consolekit_can_stop (CsmSystem *system)
+         g_variant_unref (res);
+ 
+         return can_stop;
++#else
++        g_debug ("CsmConsolekit: Termux can_stop - FALSE");
++        /* System shutdown is not supported in Termux */
++        return FALSE;
++#endif
+ }
+ 
++#ifndef FAKE_CONSOLEKIT
+ /* returns -1 on failure, 0 on success */
+ static gint
+ ck_session_get_class (CsmConsolekit *manager,
+@@ -574,10 +657,12 @@ ck_session_get_class (CsmConsolekit *manager,
+ 
+         return 0;
+ }
++#endif
+ 
+ static gboolean
+ csm_consolekit_is_login_session (CsmSystem *system)
+ {
++#ifndef FAKE_CONSOLEKIT
+         CsmConsolekit *manager = CSM_CONSOLEKIT (system);
+         int res;
+         gboolean ret;
+@@ -598,11 +683,17 @@ csm_consolekit_is_login_session (CsmSystem *system)
+         g_free (session_class);
+ 
+         return ret;
++#else
++        g_debug ("CsmConsolekit: Termux is_login_session - FALSE");
++        /* We're never in a login session in Termux */
++        return FALSE;
++#endif
+ }
+ 
+ static gboolean
+ csm_consolekit_can_suspend (CsmSystem *system)
+ {
++#ifndef FAKE_CONSOLEKIT
+ #ifdef HAVE_OLD_UPOWER
+         CsmConsolekit *consolekit = CSM_CONSOLEKIT (system);
+         return up_client_get_can_suspend (consolekit->priv->up_client);
+@@ -635,11 +726,17 @@ csm_consolekit_can_suspend (CsmSystem *system)
+ 
+         return can_suspend;
+ #endif
++#else
++        g_debug ("CsmConsolekit: Termux can_suspend - FALSE");
++        /* Suspend is not supported in Termux */
++        return FALSE;
++#endif
+ }
+ 
+ static gboolean
+ csm_consolekit_can_hibernate (CsmSystem *system)
+ {
++#ifndef FAKE_CONSOLEKIT
+ #ifdef HAVE_OLD_UPOWER
+         CsmConsolekit *consolekit = CSM_CONSOLEKIT (system);
+         return up_client_get_can_hibernate (consolekit->priv->up_client);
+@@ -672,8 +769,14 @@ csm_consolekit_can_hibernate (CsmSystem *system)
+ 
+         return can_hibernate;
+ #endif
++#else
++        g_debug ("CsmConsolekit: Termux can_hibernate - FALSE");
++        /* Hibernate is not supported in Termux */
++        return FALSE;
++#endif
+ }
+ 
++#ifndef FAKE_CONSOLEKIT
+ static void
+ suspend_done (GObject      *source,
+               GAsyncResult *result,
+@@ -711,10 +814,12 @@ hibernate_done (GObject      *source,
+                 g_variant_unref (res);
+         }
+ }
++#endif
+ 
+ static void
+ csm_consolekit_suspend (CsmSystem *system, gboolean suspend_then_hibernate)
+ {
++#ifndef FAKE_CONSOLEKIT
+ #ifdef HAVE_OLD_UPOWER
+         CsmConsolekit *consolekit = CSM_CONSOLEKIT (system);
+         GError *error = NULL;
+@@ -728,11 +833,11 @@ csm_consolekit_suspend (CsmSystem *system, gboolean suspend_then_hibernate)
+ #else
+         CsmConsolekit *manager = CSM_CONSOLEKIT (system);
+ 
+-	gchar *method = "Suspend";
+-	if (suspend_then_hibernate && csm_consolekit_can_suspend (system) && csm_consolekit_can_hibernate (system)) {
+-		method = "SuspendThenHibernate";
+-	}
+-	g_debug ("Suspend using: %s", method);
++        gchar *method = "Suspend";
++        if (suspend_then_hibernate && csm_consolekit_can_suspend (system) && csm_consolekit_can_hibernate (system)) {
++                method = "SuspendThenHibernate";
++        }
++        g_debug ("Suspend using: %s", method);
+ 
+         g_dbus_proxy_call (manager->priv->ck_proxy,
+                            method,
+@@ -743,11 +848,16 @@ csm_consolekit_suspend (CsmSystem *system, gboolean suspend_then_hibernate)
+                            suspend_done,
+                            manager);
+ #endif
++#else
++        g_debug ("CsmConsolekit: Termux suspend attempt - not supported");
++        g_warning ("Suspend not supported in Termux environment");
++#endif
+ }
+ 
+ static void
+ csm_consolekit_hibernate (CsmSystem *system)
+ {
++#ifndef FAKE_CONSOLEKIT
+ #ifdef HAVE_OLD_UPOWER
+         CsmConsolekit *consolekit = CSM_CONSOLEKIT (system);
+         GError *error = NULL;
+@@ -770,8 +880,13 @@ csm_consolekit_hibernate (CsmSystem *system)
+                            hibernate_done,
+                            manager);
+ #endif
++#else
++        g_debug ("CsmConsolekit: Termux hibernate attempt - not supported");
++        g_warning ("Hibernate not supported in Termux environment");
++#endif
+ }
+ 
++#ifndef FAKE_CONSOLEKIT
+ static void
+ inhibit_done (GObject      *source,
+               GAsyncResult *result,
+@@ -805,6 +920,7 @@ inhibit_done (GObject      *source,
+                 drop_system_inhibitor (manager);
+         }
+ }
++#endif
+ 
+ static void
+ csm_consolekit_add_inhibitor (CsmSystem        *system,
+@@ -816,6 +932,7 @@ csm_consolekit_add_inhibitor (CsmSystem        *system,
+         if ((flag & CSM_INHIBITOR_FLAG_SUSPEND) == 0)
+                 return;
+ 
++#ifndef FAKE_CONSOLEKIT
+         if (manager->priv->inhibitors == NULL) {
+                 g_debug ("Adding system inhibitor");
+                 g_dbus_proxy_call_with_unix_fd_list (manager->priv->ck_proxy,
+@@ -832,6 +949,10 @@ csm_consolekit_add_inhibitor (CsmSystem        *system,
+                                                      inhibit_done,
+                                                      manager);
+         }
++#else
++        g_debug ("CsmConsolekit: Termux adding inhibitor '%s' (dummy)", id);
++        /* We still track inhibitors for interface compliance, but they don't do anything */
++#endif
+         manager->priv->inhibitors = g_slist_prepend (manager->priv->inhibitors, g_strdup (id));
+ }
+ 
+@@ -848,15 +969,26 @@ csm_consolekit_remove_inhibitor (CsmSystem   *system,
+ 
+         g_free (l->data);
+         manager->priv->inhibitors = g_slist_delete_link (manager->priv->inhibitors, l);
++
++#ifndef FAKE_CONSOLEKIT
+         if (manager->priv->inhibitors == NULL) {
+                 drop_system_inhibitor (manager);
+         }
++#else
++        g_debug ("CsmConsolekit: Termux removing inhibitor '%s' (dummy)", id);
++#endif
+ }
+ 
+ static gboolean
+ csm_consolekit_is_last_session_for_user (CsmSystem *system)
+ {
++#ifndef FAKE_CONSOLEKIT
+         return FALSE;
++#else
++        g_debug ("CsmConsolekit: Termux is_last_session_for_user - TRUE");
++        /* In Termux, we only have one session per user */
++        return TRUE;
++#endif
+ }
+ 
+ static void
+@@ -883,11 +1015,15 @@ csm_consolekit_new (void)
+ {
+         CsmConsolekit *manager;
+ 
++#ifdef FAKE_CONSOLEKIT
++        g_debug ("CsmConsolekit: Creating new Termux dummy instance");
++#endif
+         manager = g_object_new (CSM_TYPE_CONSOLEKIT, NULL);
+ 
+         return manager;
+ }
+ 
++#ifndef FAKE_CONSOLEKIT
+ static void
+ ck_proxy_signal_cb (GDBusProxy  *proxy,
+                     const gchar *sender_name,
+@@ -942,3 +1078,4 @@ ck_session_proxy_signal_cb (GDBusProxy  *proxy,
+                 g_object_notify (G_OBJECT (consolekit), "active");
+         }
+ }
++#endif
+diff --git a/meson.build b/meson.build
+index 70e5d37..25754da 100644
+--- a/meson.build
++++ b/meson.build
+@@ -87,6 +87,8 @@ else
+ endif
+ conf.set10('HAVE_XTRANS', xtrans.found())
+ 
++conf.set10('FAKE_CONSOLEKIT', get_option('fake-consolekit'))
++
+ # Check whether IPv6 is enabled on the system...
+ have_ipv6 = false
+ ipv6_libs = []
+diff --git a/meson_options.txt b/meson_options.txt
+index 4066751..bf1815e 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -1,3 +1,4 @@
+ option('frequent_warnings',  type: 'boolean', value: false)
+ option('ipv6',               type: 'boolean', value: true)
+ option('xtrans',             type: 'boolean', value: true)
++option('fake-consolekit',    type: 'boolean', value: false)

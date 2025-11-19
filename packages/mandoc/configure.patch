@@ -1,0 +1,50 @@
+--- a/configure
++++ b/configure
+@@ -35,18 +35,15 @@
+ 
+ SOURCEDIR=`dirname "${0}"`
+ 
+-MANPATH_BASE="/usr/share/man:/usr/X11R6/man"
+-MANPATH_DEFAULT="/usr/share/man:/usr/X11R6/man:/usr/local/man"
++MANPATH_BASE="@TERMUX_PREFIX@/share/man"
++MANPATH_DEFAULT="@TERMUX_PREFIX@/share/man"
+ OSENUM=
+ OSNAME=
+ UTF8_LOCALE=
+ 
+ AR=ar
+-CC=cc
+-CFLAGS=
+ FATAL=0
+ LDADD=
+-LDFLAGS=
+ LD_NANOSLEEP=
+ LD_OHASH=
+ LD_RECVMSG=
+@@ -121,7 +118,7 @@
+ BINM_MAN="man"
+ BINM_SOELIM="soelim"
+ BINM_WHATIS="whatis"
+-BINM_PAGER=
++BINM_PAGER="pager"
+ MANM_MAN="man"
+ MANM_MANCONF="man.conf"
+ MANM_MDOC="mdoc"
+@@ -134,7 +131,7 @@
+ INSTALL_LIB=
+ INSTALL_MAN=
+ INSTALL_DATA=
+-LN="ln -f"
++LN="ln -s -f"
+ 
+ # --- manual settings from configure.local -----------------------------
+ 
+@@ -458,7 +455,7 @@
+ [ ${HAVE_GETLINE} -eq 0 ] && echo "#include <stdio.h>"
+ 
+ echo
+-echo "#define MAN_CONF_FILE \"/etc/${MANM_MANCONF}\""
++echo "#define MAN_CONF_FILE \"@TERMUX_PREFIX@/etc/${MANM_MANCONF}\""
+ echo "#define MANPATH_BASE \"${MANPATH_BASE}\""
+ echo "#define MANPATH_DEFAULT \"${MANPATH_DEFAULT}\""
+ echo "#define OSENUM ${OSENUM}"

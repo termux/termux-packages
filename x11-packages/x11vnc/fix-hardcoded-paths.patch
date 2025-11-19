@@ -1,0 +1,1115 @@
+diff -uNr x11vnc-0.9.16/misc/Xdummy.c x11vnc-0.9.16.mod/misc/Xdummy.c
+--- x11vnc-0.9.16/misc/Xdummy.c	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/misc/Xdummy.c	2020-11-13 22:54:07.244496654 +0200
+@@ -127,7 +127,7 @@
+ 	}
+ 	s = getenv("XDUMMY_TMPDIR");
+ 	if (! s) {
+-		s = "/tmp";
++		s = "@TERMUX_PREFIX@/tmp";
+ 	}
+ 	tmpdir[0] = '\0';
+ 	strcat(tmpdir, s);
+@@ -225,7 +225,7 @@
+ 		return(real_rename(oldpath, newpath));
+ 	}
+ 
+-	if (strstr(oldpath, "/var/log") == oldpath) {
++	if (strstr(oldpath, "@TERMUX_PREFIX@/var/log") == oldpath) {
+ 		if (debug) fprintf(stderr, "RENAME: returning 0\n");
+ 		return 0;
+ 	}
+@@ -270,7 +270,7 @@
+ 	}
+ 
+ 	str = (char *) pathname;
+-	if (strstr(pathname, "/var/log") == pathname) {
++	if (strstr(pathname, "@TERMUX_PREFIX@/var/log") == pathname) {
+ 		str = tmpdir_path(pathname);
+ 		if (debug) fprintf(stderr, "FOPEN: %s -> %s\n", pathname, str);
+ 	}
+diff -uNr x11vnc-0.9.16/src/appshare.c x11vnc-0.9.16.mod/src/appshare.c
+--- x11vnc-0.9.16/src/appshare.c	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/appshare.c	2020-11-13 22:45:15.221910136 +0200
+@@ -84,7 +84,7 @@
+ "      -display dpy   X DISPLAY to use.\n"
+ "      -trackdir dir  Set tracking directory to 'dir'. x11vnc -appshare does\n"
+ "                     better if it can communicate with the x11vnc's via a\n"
+-"                     file channel. By default a dir in /tmp is used, -trackdir\n"
++"                     file channel. By default a dir in @TERMUX_PREFIX@/tmp is used, -trackdir\n"
+ "                     specifies another directory, or use 'none' to disable.\n"
+ "      -args 'string' Pass options 'string' to x11vnc (e.g. -scale 3/4,\n"
+ "                     -viewonly, -wait, -once, etc.)\n"
+@@ -271,7 +271,7 @@
+ static char *x11vnc = "x11vnc";
+ static char *control = NULL;
+ static char *trackdir = "unset";
+-static char *trackpre = "/tmp/x11vnc-appshare-trackdir-tmp";
++static char *trackpre = "@TERMUX_PREFIX@/tmp/x11vnc-appshare-trackdir-tmp";
+ static char *tracktmp = NULL;
+ static char unique_tag[100];
+ static int use_forever = 1;
+@@ -1660,7 +1660,7 @@
+ 		sprintf(tracktmp, "%s/0xprop.cmd", trackdir);
+ 		file = strdup(tracktmp);
+ 	} else {
+-		char tmp[] = "/tmp/x11vnc-appshare.cmd.XXXXXX";
++		char tmp[] = "@TERMUX_PREFIX@/tmp/x11vnc-appshare.cmd.XXXXXX";
+ 		int fd = mkstemp(tmp);
+ 		if (fd < 0) {
+ 			return;
+diff -uNr x11vnc-0.9.16/src/cleanup.c x11vnc-0.9.16.mod/src/cleanup.c
+--- x11vnc-0.9.16/src/cleanup.c	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/cleanup.c	2020-11-13 22:49:11.185647908 +0200
+@@ -445,10 +445,10 @@
+ 	crash_stack_command2 = (char *) malloc(buffer_size);
+ 	crash_debug_command =  (char *) malloc(buffer_size);
+ 
+-	snprintf(crash_stack_command1, buffer_size, "echo where > /tmp/gdb.%d;"
+-	    " env PATH=$PATH:/usr/local/bin:/usr/sfw/bin:/usr/bin"
+-	    " gdb -x /tmp/gdb.%d -batch -n %s %d;"
+-	    " rm -f /tmp/gdb.%d", pid, pid, program_name, pid, pid);
++	snprintf(crash_stack_command1, buffer_size, "echo where > @TERMUX_PREFIX@/tmp/gdb.%d;"
++	    " env PATH=$PATH:@TERMUX_PREFIX@/bin"
++	    " gdb -x @TERMUX_PREFIX@/tmp/gdb.%d -batch -n %s %d;"
++	    " rm -f @TERMUX_PREFIX@/tmp/gdb.%d", pid, pid, program_name, pid, pid);
+ 	snprintf(crash_stack_command2, buffer_size, "pstack %d", program_pid);
+ 	
+ 	snprintf(crash_debug_command, buffer_size, "gdb %s %d", program_name, pid);
+diff -uNr x11vnc-0.9.16/src/connections.c x11vnc-0.9.16.mod/src/connections.c
+--- x11vnc-0.9.16/src/connections.c	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/connections.c	2020-11-13 22:55:28.411245968 +0200
+@@ -632,7 +632,7 @@
+ 		FILE *ph;
+ 		char line[1024];
+ 		char *cmd2 = NULL;
+-		char tmp[] = "/tmp/x11vnc-tmp.XXXXXX";
++		char tmp[] = "@TERMUX_PREFIX@/tmp/x11vnc-tmp.XXXXXX";
+ 		int deltmp = 0;
+ 
+ 		if (input != NULL) {
+@@ -645,7 +645,7 @@
+ 			close(tmp_fd);
+ 			deltmp = 1;
+ 			cmd2 = (char *) malloc(100 + strlen(tmp) + strlen(cmd));
+-			sprintf(cmd2, "/bin/cat %s | %s", tmp, cmd);
++			sprintf(cmd2, "@TERMUX_PREFIX@/bin/cat %s | %s", tmp, cmd);
+ 			
+ 			ph = popen(cmd2, "r");
+ 		} else {
+@@ -740,7 +740,7 @@
+ 				setpgrp();
+ #endif
+ 			}
+-			execlp("/bin/sh", "/bin/sh", "-c", cmd, (char *) NULL);
++			execlp("@TERMUX_PREFIX@/bin/sh", "@TERMUX_PREFIX@/bin/sh", "-c", cmd, (char *) NULL);
+ 			exit(1);
+ 		}
+ 	}
+diff -uNr x11vnc-0.9.16/src/enc.h x11vnc-0.9.16.mod/src/enc.h
+--- x11vnc-0.9.16/src/enc.h	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/enc.h	2020-11-13 22:55:33.235109244 +0200
+@@ -2153,7 +2153,7 @@
+ 
+ /*
+ 
+-#!/usr/bin/perl
++#!@TERMUX_PREFIX@/bin/perl
+ #
+ # md5_to_rc4key.pl
+ #
+@@ -2180,7 +2180,7 @@
+ # n.b. this is not super secure against bad locals...
+ 
+ $pw = shift;
+-$tmp = "/tmp/md5out.$$";
++$tmp = "@TERMUX_PREFIX@/tmp/md5out.$$";
+ 
+ open(MD5, "| md5sum > $tmp");
+ print MD5 $pw;
+diff -uNr x11vnc-0.9.16/src/gui.c x11vnc-0.9.16.mod/src/gui.c
+--- x11vnc-0.9.16/src/gui.c	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/gui.c	2020-11-13 22:55:58.542524287 +0200
+@@ -263,8 +263,7 @@
+ 
+ /* Most of the following mess is for wish on Solaris: */
+ 
+-static char *extra_path = ":/usr/local/bin:/usr/bin/X11:/usr/sfw/bin"
+-	    ":/usr/X11R6/bin:/usr/openwin/bin:/usr/dt/bin:/opt/sfw/bin";
++static char *extra_path = ":@TERMUX_PREFIX@/bin";
+ static char *wishes[] = {"wish8.4", "wish", "wish8.3", "wish8.5", "wish8.6", "wish8.7", "wishx", "wish8.0", NULL};
+ 
+ static void run_gui(char *gui_xdisplay, int connect_to_x11vnc, int start_x11vnc,
+@@ -407,7 +406,7 @@
+ 
+ 	orig_path = getenv("PATH");
+ 	if (! orig_path) {
+-		orig_path = strdup("/bin:/usr/bin:/usr/bin/X11");
++		orig_path = strdup("@TERMUX_PREFIX@/bin");
+ 	}
+ 	full_path = (char *) malloc(strlen(orig_path)+strlen(extra_path)+1);
+ 	strcpy(full_path, orig_path);
+@@ -715,8 +714,8 @@
+ #endif
+ 	if (portprompt) {
+ 		char *cmd, *p, *p2, *p1, *p0 = getenv("PATH");
+-		char tf1[] = "/tmp/x11vnc_port_prompt.2XXXXXX";
+-		char tf2[] = "/tmp/x11vnc_port_prompt.1XXXXXX";
++		char tf1[] = "@TERMUX_PREFIX@/tmp/x11vnc_port_prompt.2XXXXXX";
++		char tf2[] = "@TERMUX_PREFIX@/tmp/x11vnc_port_prompt.1XXXXXX";
+ 		int fd;
+ 		char *dstr = "", *wish = NULL;
+ 		char line[128];
+@@ -872,7 +871,7 @@
+ 		pid_t parent = getpid();
+ 
+ 		if (icon_mode) {
+-			char tf[] = "/tmp/x11vnc.tray.XXXXXX"; 
++			char tf[] = "@TERMUX_PREFIX@/tmp/x11vnc.tray.XXXXXX"; 
+ 			int fd;
+ 
+ 			fd = mkstemp(tf);
+diff -uNr x11vnc-0.9.16/src/help.c x11vnc-0.9.16.mod/src/help.c
+--- x11vnc-0.9.16/src/help.c	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/help.c	2020-11-13 23:03:57.623128067 +0200
+@@ -302,7 +302,7 @@
+ "                       around transient popup menus (but not for the menu\n"
+ "                       itself): a workaround is to disable SaveUnders\n"
+ "                       by passing the \"-su\" argument to Xsun (in\n"
+-"                       /etc/dt/config/Xservers).\n"
++"                       @TERMUX_PREFIX@/etc/dt/config/Xservers).\n"
+ "\n"
+ "                       Use -overlay as a workaround for situations like these:\n"
+ "                       Some legacy applications require the default visual to\n"
+@@ -565,7 +565,7 @@
+ "                       where the Java vncviewer applet is, have x11vnc try\n"
+ "                       to *guess* where the directory is by looking relative\n"
+ "                       to the program location and in standard locations\n"
+-"                       (/usr/local/share/x11vnc/classes, etc).  Under -ssl or\n"
++"                       (@TERMUX_PREFIX@/share/x11vnc/classes, etc).  Under -ssl or\n"
+ "                       -stunnel the ssl classes subdirectory is sought.\n"
+ "-http_ssl              As -http, but force lookup for ssl classes subdir.\n"
+ "\n"
+@@ -1196,7 +1196,7 @@
+ "                       not correct.)  Here is an example script (note it has\n"
+ "                       a hardwired bogus password \"abc\"!)\n"
+ "\n"
+-"                         #!/bin/sh\n"
++"                         #!@TERMUX_PREFIX@/bin/sh\n"
+ "                         # Example x11vnc -unixpw_cmd script.\n"
+ "                         # Read the first two lines of stdin (user and passwd)\n"
+ "                         read user\n"
+@@ -1423,7 +1423,7 @@
+ "\n"
+ "                       A more interesting case is like this:\n"
+ "\n"
+-"                            WAIT:cmd=/usr/local/bin/find_display\n"
++"                            WAIT:cmd=@TERMUX_PREFIX@/bin/find_display\n"
+ "\n"
+ "                       in which case the command after \"cmd=\" is run to\n"
+ "                       dynamically work out the DISPLAY and optionally the\n"
+@@ -1574,7 +1574,7 @@
+ "                       port 5800 and allow the Java vncviewer to be downloaded\n"
+ "                       by client web browsers.  For example:\n"
+ "\n"
+-"                        5815 stream tcp nowait root /usr/sbin/tcpd /.../x11vnc \\\n"
++"                        5815 stream tcp nowait root @TERMUX_PREFIX@/bin/tcpd /.../x11vnc \\\n"
+ "                          -inetd -q -http_ssl -prog /.../x11vnc \\\n"
+ "                          -display WAIT:cmd=HTTPONCE\n"
+ "\n"
+@@ -1645,7 +1645,7 @@
+ "\n"
+ "                       To troubleshoot the FINDCREATEDISPLAY mechanism,\n"
+ "                       set the following env. var. to an output log file,\n"
+-"                       e.g -env CREATE_DISPLAY_OUTPUT=/tmp/mydebug.txt\n"
++"                       e.g -env CREATE_DISPLAY_OUTPUT=@TERMUX_PREFIX@/tmp/mydebug.txt\n"
+ "\n"
+ "                       So this is a somewhat odd mode for x11vnc in that it\n"
+ "                       will start up and poll virtual X servers!  This can\n"
+@@ -1653,7 +1653,7 @@
+ "                       definitely getting a desktop (either real or virtual)\n"
+ "                       on the machine.  E.g. a desktop service:\n"
+ "\n"
+-"                         5900 stream tcp nowait root /usr/sbin/tcpd /.../x11vnc\n"
++"                         5900 stream tcp nowait root @TERMUX_PREFIX@/bin/tcpd /.../x11vnc\n"
+ "                          -inetd -q -http -ssl SAVE -unixpw -users unixpw=\\\n"
+ "                          -passwd secret -prog /.../x11vnc \\\n"
+ "                          -display WAIT:cmd=FINDCREATEDISPLAY\n"
+@@ -1990,7 +1990,7 @@
+ "                       Another use is if ~/.vnc/cert is on an NFS share you\n"
+ "                       might want your certificates and keys to be on a local\n"
+ "                       filesystem to prevent network snooping (for example\n"
+-"                       -ssldir /var/lib/x11vnc-certs).\n"
++"                       -ssldir @TERMUX_PREFIX@/var/lib/x11vnc-certs).\n"
+ "\n"
+ "                       -ssldir affects nearly all of the other -ssl* options,\n"
+ "                       e.g. -ssl SAVE, -sslGenCert, etc..\n"
+@@ -2418,7 +2418,7 @@
+ "                       Set -env STUNNEL_DEBUG=1 for more debugging printout.\n"
+ "\n"
+ "                       Set -env STUNNEL_PROG=xxx to the full path of stunnel\n"
+-"                       program you want to be used (e.g. /usr/bin/stunnel4).\n"
++"                       program you want to be used (e.g. @TERMUX_PREFIX@/bin/stunnel4).\n"
+ "\n"
+ "                       Set -env STUNNEL_LISTEN=xxx to the address of the\n"
+ "                       network interface to listen on (the default is to listen\n"
+@@ -4380,8 +4380,8 @@
+ "                       Examples:\n"
+ "                           -rawfb shm:210337933@800x600x32:ff/ff00/ff0000\n"
+ "                           -rawfb map:/dev/fb0@1024x768x32\n"
+-"                           -rawfb map:/tmp/Xvfb_screen0@640x480x8+3232\n"
+-"                           -rawfb file:/tmp/my.pnm@250x200x24+37\n"
++"                           -rawfb map:@TERMUX_PREFIX@/tmp/Xvfb_screen0@640x480x8+3232\n"
++"                           -rawfb file:@TERMUX_PREFIX@/tmp/my.pnm@250x200x24+37\n"
+ "                           -rawfb file:/dev/urandom@128x128x8\n"
+ "                           -rawfb snap:/dev/video0@320x240x24 -24to32\n"
+ "                           -rawfb video0\n"
+@@ -4679,7 +4679,7 @@
+ "                       use the data in file.  For stations that are not\n"
+ "                       numeric, e.g. SE20, they are placed above the highest\n"
+ "                       numbered station in the order they are found.  Example:\n"
+-"                       \"-freqtab /usr/X11R6/share/xawtv/europe-west.list\"\n"
++"                       \"-freqtab @TERMUX_PREFIX@/share/xawtv/europe-west.list\"\n"
+ "                       You can make your own freqtab by copying the xawtv\n"
+ "                       format.\n"
+ "\n"
+@@ -4690,7 +4690,7 @@
+ "                       events.  If you prefix \"cmd\" with \"tee:\" it will\n"
+ "                       both send them to the pipe command and process them.\n"
+ "                       For a description of the format run \"-pipeinput\n"
+-"                       tee:/bin/cat\".  Another prefix is \"reopen\" which\n"
++"                       tee:@TERMUX_PREFIX@/bin/cat\".  Another prefix is \"reopen\" which\n"
+ "                       means to reopen pipe if it exits.  Separate multiple\n"
+ "                       prefixes with commas.\n"
+ "\n"
+@@ -5937,9 +5937,9 @@
+ 	fprintf(stderr, " - You can explicitly indicate which MIT-MAGIC-COOKIE"
+ 	    " file should be used\n");
+ 	fprintf(stderr, "   by the -auth option, e.g.:\n");
+-	fprintf(stderr, "       x11vnc -auth /home/someuser/.Xauthority"
++	fprintf(stderr, "       x11vnc -auth @TERMUX_HOME@/.Xauthority"
+ 	    " -display :0\n");
+-	fprintf(stderr, "       x11vnc -auth /tmp/.gdmzndVlR"
++	fprintf(stderr, "       x11vnc -auth @TERMUX_PREFIX@/tmp/.gdmzndVlR"
+ 	    " -display :0\n");
+ 	fprintf(stderr, "   you must have read permission for the auth file.\n");
+ 	fprintf(stderr, "   See also '-auth guess' and '-findauth' discussed below.\n");
+@@ -5952,12 +5952,12 @@
+ 	    " MIT-MAGIC-COOKIE file.\n");
+ 	fprintf(stderr, "   Some examples for various display managers:\n");
+ 	fprintf(stderr, "\n");
+-	fprintf(stderr, "     gdm:     -auth /var/gdm/:0.Xauth\n");
+-	fprintf(stderr, "              -auth /var/lib/gdm/:0.Xauth\n");
+-	fprintf(stderr, "     kdm:     -auth /var/lib/kdm/A:0-crWk72\n");
+-	fprintf(stderr, "              -auth /var/run/xauth/A:0-crWk72\n");
+-	fprintf(stderr, "     xdm:     -auth /var/lib/xdm/authdir/authfiles/A:0-XQvaJk\n");
+-	fprintf(stderr, "     dtlogin: -auth /var/dt/A:0-UgaaXa\n");
++	fprintf(stderr, "     gdm:     -auth @TERMUX_PREFIX@/var/gdm/:0.Xauth\n");
++	fprintf(stderr, "              -auth @TERMUX_PREFIX@/var/lib/gdm/:0.Xauth\n");
++	fprintf(stderr, "     kdm:     -auth @TERMUX_PREFIX@/var/lib/kdm/A:0-crWk72\n");
++	fprintf(stderr, "              -auth @TERMUX_PREFIX@/var/run/xauth/A:0-crWk72\n");
++	fprintf(stderr, "     xdm:     -auth @TERMUX_PREFIX@/var/lib/xdm/authdir/authfiles/A:0-XQvaJk\n");
++	fprintf(stderr, "     dtlogin: -auth @TERMUX_PREFIX@/var/dt/A:0-UgaaXa\n");
+ 	fprintf(stderr, "\n");
+ 	fprintf(stderr, "   Sometimes the command \"ps wwwwaux | grep auth\""
+ 	    " can reveal the file location.\n");
+diff -uNr x11vnc-0.9.16/src/nox11_funcs.h x11vnc-0.9.16.mod/src/nox11_funcs.h
+--- x11vnc-0.9.16/src/nox11_funcs.h	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/nox11_funcs.h	2020-11-13 22:56:51.177947445 +0200
+@@ -2,7 +2,7 @@
+ generated by util script makekeysyms.pl:
+ 
+ -----
+-#!/usr/bin/perl
++#!@TERMUX_PREFIX@/bin/perl
+ 
+ print "#if 0\n";
+ print "generated by util script makekeysyms.pl:\n\n";
+diff -uNr x11vnc-0.9.16/src/pointer.c x11vnc-0.9.16.mod/src/pointer.c
+--- x11vnc-0.9.16/src/pointer.c	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/pointer.c	2020-11-13 23:04:57.462254872 +0200
+@@ -1179,7 +1179,7 @@
+ "#\n"
+ "# <keysym-name> is the corresponding Keysym name.\n"
+ "#\n"
+-"# See the file /usr/include/X11/keysymdef.h for the mappings.\n"
++"# See the file @TERMUX_PREFIX@/include/X11/keysymdef.h for the mappings.\n"
+ "# You basically remove the leading 'XK_' prefix from the macro name in\n"
+ "# that file to get the Keysym name.\n"
+ "#\n"
+diff -uNr x11vnc-0.9.16/src/remote.c x11vnc-0.9.16.mod/src/remote.c
+--- x11vnc-0.9.16/src/remote.c	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/remote.c	2020-11-13 23:04:48.621783265 +0200
+@@ -437,13 +437,11 @@
+ 			int i;
+ 			char **use;
+ 			char *list[] = {
+-				"/usr/local/share/x11vnc/classes",
+-				"/usr/share/x11vnc/classes",
++				"@TERMUX_PREFIX@/share/x11vnc/classes",
+ 				NULL
+ 			};
+ 			char *ssllist[] = {
+-				"/usr/local/share/x11vnc/classes/ssl",
+-				"/usr/share/x11vnc/classes/ssl",
++				"@TERMUX_PREFIX@/share/x11vnc/classes/ssl",
+ 				NULL
+ 			};
+ 			if (use_stunnel && http_ssl) {
+diff -uNr x11vnc-0.9.16/src/screen.c x11vnc-0.9.16.mod/src/screen.c
+--- x11vnc-0.9.16/src/screen.c	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/screen.c	2020-11-13 22:44:49.513239400 +0200
+@@ -1750,7 +1750,7 @@
+ 	}
+ 	if (strstr(rstr, "solid=") == rstr) {
+ 		char *n = rstr + strlen("solid=");
+-		char tmp[] = "/tmp/rawfb_solid.XXXXXX";
++		char tmp[] = "@TERMUX_PREFIX@/tmp/rawfb_solid.XXXXXX";
+ 		char str[100];
+ 		unsigned int vals[1024], val;
+ 		int x, y, fd, w = 1024, h = 768;
+diff -uNr x11vnc-0.9.16/src/solid.c x11vnc-0.9.16.mod/src/solid.c
+--- x11vnc-0.9.16/src/solid.c	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/solid.c	2020-11-13 22:57:26.661979368 +0200
+@@ -56,7 +56,7 @@
+ static void usr_bin_path(int restore) {
+ 	static char *oldpath = NULL;
+ 	char *newpath;
+-	char addpath[] = "/usr/bin:/bin:";
++	char addpath[] = "@TERMUX_PREFIX@/bin:";
+ 
+ 	if (restore) {
+ 		if (oldpath) {
+@@ -70,7 +70,7 @@
+ 	if (getenv("PATH")) {
+ 		oldpath = strdup(getenv("PATH"));
+ 	} else {
+-		oldpath = strdup("/usr/bin");
++		oldpath = strdup("@TERMUX_PREFIX@/bin");
+ 	}
+ 	newpath = (char *) malloc(strlen(oldpath) + strlen(addpath) + 1);
+ 	newpath[0] = '\0';
+@@ -1218,7 +1218,7 @@
+ 			close(fd);
+ 			sprintf(num, "%d", (int) parent);
+ 			set_env("SS_WATCH_PID", num);
+-			execlp("/bin/sh", "/bin/sh", tmp, (char *) NULL);
++			execlp("@TERMUX_PREFIX@/bin/sh", "@TERMUX_PREFIX@/bin/sh", tmp, (char *) NULL);
+ 		}
+ 		exit(1);
+ 	}
+diff -uNr x11vnc-0.9.16/src/sslcmds.c x11vnc-0.9.16.mod/src/sslcmds.c
+--- x11vnc-0.9.16/src/sslcmds.c	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/sslcmds.c	2020-11-13 23:02:16.702281523 +0200
+@@ -89,7 +89,7 @@
+ 
+ int start_stunnel(int stunnel_port, int x11vnc_port, int hport, int x11vnc_hport) {
+ #ifdef SSLCMDS
+-	char extra[] = ":/usr/sbin:/usr/local/sbin:/dist/sbin";
++	char extra[] = ":@TERMUX_PREFIX@/bin";
+ 	char *path, *p, *exe;
+ 	char *stunnel_path = NULL;
+ 	struct stat verify_buf;
+@@ -598,8 +598,8 @@
+ 		exit(1);
+ 	}
+ 
+-	cmd = (char *)malloc(strlen("/bin/sh ") + strlen(scr) + 1);
+-	sprintf(cmd, "/bin/sh %s", scr);
++	cmd = (char *)malloc(strlen("@TERMUX_PREFIX@/bin/sh ") + strlen(scr) + 1);
++	sprintf(cmd, "@TERMUX_PREFIX@/bin/sh %s", scr);
+ 
+ 	system(cmd);
+ 	unlink(scr);
+@@ -615,8 +615,8 @@
+ 		exit(1);
+ 	}
+ 
+-	cmd = (char *)malloc(strlen("/bin/sh ") + strlen(scr) + 1);
+-	sprintf(cmd, "/bin/sh %s", scr);
++	cmd = (char *)malloc(strlen("@TERMUX_PREFIX@/bin/sh ") + strlen(scr) + 1);
++	sprintf(cmd, "@TERMUX_PREFIX@/bin/sh %s", scr);
+ 
+ 	if (! ty) {
+ 		set_env("TYPE", "");
+@@ -647,7 +647,7 @@
+ void sslEncKey(char *path, int mode) {
+ 	char *openssl = find_openssl_bin();
+ 	char *scr, *cert = NULL, *tca, *cdir = NULL;
+-	char line[1024], tmp[] = "/tmp/x11vnc-tmp.XXXXXX";
++	char line[1024], tmp[] = "@TERMUX_PREFIX@/tmp/x11vnc-tmp.XXXXXX";
+ 	int tmp_fd, incert, info_only = 0, delete_only = 0, listlong = 0;
+ 	struct stat sbuf;
+ 	FILE *file;
+@@ -744,8 +744,8 @@
+ 		write(tmp_fd, genCert, strlen(genCert));
+ 		close(tmp_fd);
+ 
+-		scr = (char *) malloc(strlen("/bin/sh ") + strlen(tmp) + 1);
+-		sprintf(scr, "/bin/sh %s", tmp);
++		scr = (char *) malloc(strlen("@TERMUX_PREFIX@/bin/sh ") + strlen(tmp) + 1);
++		sprintf(scr, "@TERMUX_PREFIX@/bin/sh %s", tmp);
+ 
+ 		set_env("BASE_DIR", cdir);
+ 		set_env("OPENSSL", openssl);
+@@ -855,8 +855,8 @@
+ 	write(tmp_fd, genCert, strlen(genCert));
+ 	close(tmp_fd);
+ 
+-        scr = (char *) malloc(strlen("/bin/sh ") + strlen(tmp) + 1);
+-	sprintf(scr, "/bin/sh %s", tmp);
++        scr = (char *) malloc(strlen("@TERMUX_PREFIX@/bin/sh ") + strlen(tmp) + 1);
++	sprintf(scr, "@TERMUX_PREFIX@/bin/sh %s", tmp);
+ 
+ 	set_env("BASE_DIR", "/no/such/dir");
+ 	set_env("OPENSSL", openssl);
+diff -uNr x11vnc-0.9.16/src/sslhelper.c x11vnc-0.9.16.mod/src/sslhelper.c
+--- x11vnc-0.9.16/src/sslhelper.c	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/sslhelper.c	2020-11-13 22:58:15.638488787 +0200
+@@ -195,8 +195,7 @@
+ 	char *path, *exe, *p, *gp;
+ 	struct stat sbuf;
+ 	int found_openssl = 0;
+-	char extra[] = ":/usr/bin:/bin:/usr/sbin:/usr/local/bin"
+-	    ":/usr/local/sbin:/usr/sfw/bin";
++	char extra[] = ":@TERMUX_PREFIX@/bin";
+ 	
+ 	gp = getenv("PATH");
+ 	if (! gp) {
+@@ -238,8 +237,8 @@
+ char *create_tmp_pem(char *pathin, int prompt) {
+ 	pid_t pid, pidw;
+ 	FILE *in, *out;
+-	char cnf[] = "/tmp/x11vnc-cnf.XXXXXX";
+-	char pem[] = "/tmp/x11vnc-pem.XXXXXX";
++	char cnf[] = "@TERMUX_PREFIX@/tmp/x11vnc-cnf.XXXXXX";
++	char pem[] = "@TERMUX_PREFIX@/tmp/x11vnc-pem.XXXXXX";
+ 	char str[8*1024], line[1024], *exe;
+ 	int cnf_fd, pem_fd, status, show_cert = 1;
+ 	char *days;
+@@ -1445,7 +1444,7 @@
+ 
+ static int add_anon_dh(void) {
+ 	pid_t pid, pidw;
+-	char cnf[] = "/tmp/x11vnc-dh.XXXXXX";
++	char cnf[] = "@TERMUX_PREFIX@/tmp/x11vnc-dh.XXXXXX";
+ 	char *infile = NULL;
+ 	int status, cnf_fd;
+ 	DH *dh;
+@@ -2626,7 +2625,7 @@
+ #define MSZ 4096
+ static void init_prng(void) {
+ 	int db = 0, bytes, ubytes, fd;
+-	char file[MSZ], dtmp[100];
++	char file[MSZ], dtmp[1024];
+ 	unsigned int sr;
+ 
+ 	RAND_file_name(file, MSZ);
+@@ -2641,7 +2640,7 @@
+ 	if (db) fprintf(stderr, "bytes read: %d / %d\n", bytes, ubytes);
+ 
+ 	/* mix in more predictable stuff as well for fallback */
+-	sprintf(dtmp, "/tmp/p%.8f.XXXXXX", dnow());
++	sprintf(dtmp, "@TERMUX_PREFIX@/tmp/p%.8f.XXXXXX", dnow());
+ 	fd = mkstemp(dtmp);
+ 	RAND_add(dtmp, strlen(dtmp), 0);
+ 	if (fd >= 0) {
+@@ -3511,7 +3510,7 @@
+ 		free(certret_str);
+ 		certret_str = NULL;
+ 	}
+-	certret = strdup("/tmp/x11vnc-certret.XXXXXX");
++	certret = strdup("@TERMUX_PREFIX@/tmp/x11vnc-certret.XXXXXX");
+ 	omode = umask(077);
+ 	certret_fd = mkstemp(certret);
+ 	umask(omode);
+@@ -3528,7 +3527,7 @@
+ 		free(dhret_str);
+ 		dhret_str = NULL;
+ 	}
+-	dhret = strdup("/tmp/x11vnc-dhret.XXXXXX");
++	dhret = strdup("@TERMUX_PREFIX@/tmp/x11vnc-dhret.XXXXXX");
+ 	omode = umask(077);
+ 	dhret_fd = mkstemp(dhret);
+ 	umask(omode);
+diff -uNr x11vnc-0.9.16/src/ssltools.h x11vnc-0.9.16.mod/src/ssltools.h
+--- x11vnc-0.9.16/src/ssltools.h	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/ssltools.h	2020-11-13 23:04:28.264709513 +0200
+@@ -37,7 +37,7 @@
+ 
+ 
+ char genCA[] = 
+-"#!/bin/sh\n"
++"#!@TERMUX_PREFIX@/bin/sh\n"
+ "\n"
+ "DIR=$BASE_DIR\n"
+ "if [ \"x$DIR\" = \"x\" ]; then\n"
+@@ -50,7 +50,7 @@
+ "        DIR=\"`pwd`/$DIR\"\n"
+ "fi\n"
+ "\n"
+-"PATH=/usr/bin:/bin:/usr/sbin:$PATH; export PATH\n"
++"PATH=@TERMUX_PREFIX@/bin:$PATH; export PATH\n"
+ "if [ \"x$OPENSSL\" = \"x\" ]; then\n"
+ "	OPENSSL=\"openssl\"\n"
+ "fi\n"
+@@ -302,7 +302,7 @@
+ ;
+ 
+ char genCert[] = 
+-"#!/bin/sh\n"
++"#!@TERMUX_PREFIX@/bin/sh\n"
+ "\n"
+ "direrror() {\n"
+ "	echo \"\"\n"
+@@ -623,7 +623,7 @@
+ "	exit\n"
+ "fi\n"
+ "\n"
+-"PATH=/usr/bin:/bin:/usr/sbin:$PATH; export PATH\n"
++"PATH=@TERMUX_PREFIX@/bin:$PATH; export PATH\n"
+ "if [ \"x$OPENSSL\" = \"x\" ]; then\n"
+ "        OPENSSL=\"openssl\"\n"
+ "fi\n"
+@@ -746,7 +746,7 @@
+ ;
+ 
+ char find_display[] = 
+-"#!/bin/sh\n"
++"#!@TERMUX_PREFIX@/bin/sh\n"
+ "#\n"
+ "# Script for use in -display WAIT:cmd=FINDDISPLAY -unixpw mode.\n"
+ "# Attempts to find 1) DISPLAY and 2) XAUTH data for the user and\n"
+@@ -758,7 +758,7 @@
+ "#\n"
+ "# If not called with -unixpw, root, etc. uses current $USER.\n"
+ "\n"
+-"#FIND_DISPLAY_OUTPUT=/tmp/fdo.$USER.txt\n"
++"#FIND_DISPLAY_OUTPUT=@TERMUX_PREFIX@/tmp/fdo.$USER.txt\n"
+ "\n"
+ "if [ \"X$FIND_DISPLAY_OUTPUT\" != \"X\" ]; then\n"
+ "	if [ \"X$FIND_DISPLAY_EXEC\" = \"X\" ]; then\n"
+@@ -767,9 +767,9 @@
+ "		# we rerun ourselves with verbose output to a file:\n"
+ "		#\n"
+ "		if [ \"X$FIND_DISPLAY_OUTPUT\" != \"X\" ]; then\n"
+-"			/bin/sh $0 \"$@\" 2> $FIND_DISPLAY_OUTPUT\n"
++"			@TERMUX_PREFIX@/bin/sh $0 \"$@\" 2> $FIND_DISPLAY_OUTPUT\n"
+ "		else\n"
+-"			/bin/sh $0 \"$@\" 2> /dev/null\n"
++"			@TERMUX_PREFIX@/bin/sh $0 \"$@\" 2> /dev/null\n"
+ "		fi\n"
+ "		exit $?\n"
+ "	fi\n"
+@@ -790,7 +790,7 @@
+ "fi\n"
+ "\n"
+ "# Set PATH to pick up utilities we use below.\n"
+-"PATH=$PATH:/bin:/usr/bin:/usr/X11R6/bin:/usr/bin/X11:/usr/openwin/bin:/usr/ucb\n"
++"PATH=$PATH:@TERMUX_PREFIX@/bin\n"
+ "export PATH\n"
+ "\n"
+ "# This is to try to trick ps(1) into writing wide lines: \n"
+@@ -910,8 +910,8 @@
+ "	psout=`ps aux 2>/dev/null              | grep -wv PID | grep -v grep`\n"
+ "elif [ \"X$uname\" = \"XLinux\" -o \"X$is_bsd\" = \"X1\" ]; then\n"
+ "	psout=`ps wwaux 2>/dev/null           | grep -wv PID | grep -v grep`\n"
+-"elif [ \"X$uname\" = \"XSunOS\" -a -x /usr/ucb/ps ]; then\n"
+-"	psout=`/usr/ucb/ps wwaux 2>/dev/null  | grep -wv PID | grep -v grep`\n"
++"elif [ \"X$uname\" = \"XSunOS\" -a -x @TERMUX_PREFIX@/bin/ps ]; then\n"
++"	psout=`@TERMUX_PREFIX@/bin/ps wwaux 2>/dev/null  | grep -wv PID | grep -v grep`\n"
+ "else\n"
+ "	psout=`ps -ef 2>/dev/null | grep -wv PID | grep -v grep`\n"
+ "fi\n"
+@@ -1108,11 +1108,11 @@
+ "						xtf=$HOME/.xat.$$\n"
+ "						xtf=`mytmp \"$xtf\"`\n"
+ "						if [ ! -f $xtf ]; then\n"
+-"							xtf=/tmp/.xat.$$\n"
++"							xtf=@TERMUX_PREFIX@/tmp/.xat.$$\n"
+ "							xtf=`mytmp \"$xtf\"`\n"
+ "						fi\n"
+ "						if [ ! -f $xtf ]; then\n"
+-"							xtf=/tmp/.xatb.$$\n"
++"							xtf=@TERMUX_PREFIX@/tmp/.xatb.$$\n"
+ "							rm -f $xtf\n"
+ "							if [ -f $xtf ]; then\n"
+ "								exit 1\n"
+@@ -1165,15 +1165,15 @@
+ "	# do a normal xauth list:\n"
+ "	list=\"$list \"`xauth list | awk '{print $1}' | grep /unix | grep \"^${host}\" | sed -e 's/^.*:/:/' | sort -n | uniq`\n"
+ "\n"
+-"	# check for gdm and kdm non-NFS cookies in /tmp: (and now /var/run/gdm)\n"
+-"	for xa in /tmp/.gdm* /tmp/.Xauth* /var/run/gdm*/auth-for-*/database /var/run/gdm*/auth-cookie-*-for-*\n"
++"	# check for gdm and kdm non-NFS cookies in @TERMUX_PREFIX@/tmp: (and now @TERMUX_PREFIX@/var/run/gdm)\n"
++"	for xa in @TERMUX_PREFIX@/tmp/.gdm* @TERMUX_PREFIX@/tmp/.Xauth* @TERMUX_PREFIX@/var/run/gdm*/auth-for-*/database @TERMUX_PREFIX@/var/run/gdm*/auth-cookie-*-for-*\n"
+ "	do\n"
+ "		# try to be somewhat careful about the real owner of the file:\n"
+ "		if [ \"X$am_root\" = \"X1\" ]; then\n"
+ "			break\n"
+ "		fi\n"
+ "		if [ -f $xa -a -r $xa ]; then\n"
+-"			if ls -l \"$xa\" | sed -e 's,/tmp.*$,,' -e 's,/var.*$,,' | grep -w \"$user\" > /dev/null; then\n"
++"			if ls -l \"$xa\" | sed -e 's,@TERMUX_PREFIX@/tmp.*$,,' -e 's,@TERMUX_PREFIX@/var.*$,,' | grep -w \"$user\" > /dev/null; then\n"
+ "				# append these too:\n"
+ "				if find \"$xa\" -user \"$user\" -perm 600 > /dev/null; then\n"
+ "					:\n"
+@@ -1207,7 +1207,7 @@
+ "\n"
+ "# try the items in the list:\n"
+ "#\n"
+-"nsout_trim=`echo \"$nsout\" | grep \"/tmp/.X11-unix/\"`\n"
++"nsout_trim=`echo \"$nsout\" | grep \"@TERMUX_PREFIX@/tmp/.X11-unix/\"`\n"
+ "#\n"
+ "for p in $list\n"
+ "do\n"
+@@ -1220,16 +1220,16 @@
+ "	fi\n"
+ "\n"
+ "	# check for the local X11 files:\n"
+-"	xd=\"/tmp/.X11-unix/X$d\"\n"
++"	xd=\"@TERMUX_PREFIX@/tmp/.X11-unix/X$d\"\n"
+ "	if [ -r \"$xd\" -o -w \"$xd\" -o -x \"$xd\" ]; then\n"
+-"		if echo \"$nsout_trim\" | grep \"/tmp/.X11-unix/X$d[  ]*\\$\" > /dev/null; then\n"
++"		if echo \"$nsout_trim\" | grep \"@TERMUX_PREFIX@/tmp/.X11-unix/X$d[  ]*\\$\" > /dev/null; then\n"
+ "			ok=1\n"
+ "		fi\n"
+ "	fi\n"
+ "	if [ \"X$ok\" = \"X\" ]; then\n"
+ "		# instead check for the lock:\n"
+-"		if [ -f \"/tmp/.X$d-lock\" ]; then\n"
+-"			pid=`cat \"/tmp/.X$d-lock\" | sed -e 's/[ 	]//g'`\n"
++"		if [ -f \"@TERMUX_PREFIX@/tmp/.X$d-lock\" ]; then\n"
++"			pid=`cat \"@TERMUX_PREFIX@/tmp/.X$d-lock\" | sed -e 's/[ 	]//g'`\n"
+ "			if echo \"$pid\" | grep '^[0-9][0-9]*$' > /dev/null; then\n"
+ "				if [ \"X$uname\" = \"XLinux\" -o \"X$uname\" = \"XSunOS\" ]; then\n"
+ "					if [ -d \"/proc/$pid\" ]; then\n"
+@@ -1451,12 +1451,12 @@
+ ;
+ 
+ char create_display[] = 
+-"#!/bin/sh\n"
++"#!@TERMUX_PREFIX@/bin/sh\n"
+ "\n"
+-"#CREATE_DISPLAY_OUTPUT=/tmp/cdo.txt\n"
++"#CREATE_DISPLAY_OUTPUT=@TERMUX_PREFIX@/tmp/cdo.txt\n"
+ "\n"
+ "if echo \"$USER\" | egrep 'runge' > /dev/null ; then\n"
+-"	CREATE_DISPLAY_OUTPUT=/tmp/cdo.$USER.txt\n"
++"	CREATE_DISPLAY_OUTPUT=@TERMUX_PREFIX@/tmp/cdo.$USER.txt\n"
+ "	if [ -f $CREATE_DISPLAY_OUTPUT -a ! -w $CREATE_DISPLAY_OUTPUT ]; then\n"
+ "		CREATE_DISPLAY_OUTPUT=$CREATE_DISPLAY_OUTPUT.$$\n"
+ "	fi\n"
+@@ -1466,9 +1466,9 @@
+ "		CREATE_DISPLAY_EXEC=1\n"
+ "		export CREATE_DISPLAY_EXEC\n"
+ "		if [ \"X$CREATE_DISPLAY_OUTPUT\" != \"X\" ]; then\n"
+-"			/bin/sh $0 \"$@\" 2> $CREATE_DISPLAY_OUTPUT\n"
++"			@TERMUX_PREFIX@/bin/sh $0 \"$@\" 2> $CREATE_DISPLAY_OUTPUT\n"
+ "		else\n"
+-"			/bin/sh $0 \"$@\" 2> /dev/null\n"
++"			@TERMUX_PREFIX@/bin/sh $0 \"$@\" 2> /dev/null\n"
+ "		fi\n"
+ "		exit $?\n"
+ "	fi\n"
+@@ -1477,7 +1477,7 @@
+ "	CREATE_DISPLAY_PERL_SETPGRP=1\n"
+ "	export CREATE_DISPLAY_PERL_SETPGRP\n"
+ "	if type perl >/dev/null 2>&1; then\n"
+-"		perl -e \"setpgrp(0,0); exec '/bin/sh $0 $*'\";\n"
++"		perl -e \"setpgrp(0,0); exec '@TERMUX_PREFIX@/bin/sh $0 $*'\";\n"
+ "		exit $?\n"
+ "	fi\n"
+ "fi\n"
+@@ -1509,12 +1509,12 @@
+ "	if [ \"X$have_netstat\" != \"X\" ]; then\n"
+ "		nsout=`$have_netstat -an`\n"
+ "	fi\n"
+-"	nsout_trim=`echo \"$nsout\" | grep \"/tmp/.X11-unix/\"`\n"
++"	nsout_trim=`echo \"$nsout\" | grep \"@TERMUX_PREFIX@/tmp/.X11-unix/\"`\n"
+ "	while [ $try -lt $sry ]\n"
+ "	do\n"
+-"		tlock=\"/tmp/.X${try}-lock\"\n"
++"		tlock=\"@TERMUX_PREFIX@/tmp/.X${try}-lock\"\n"
+ "		if [ -r $tlock ]; then\n"
+-"			if echo \"$nsout_trim\" | grep \"/tmp/.X11-unix/X${try}[ 	]*\\$\" > /dev/null; then\n"
++"			if echo \"$nsout_trim\" | grep \"@TERMUX_PREFIX@/tmp/.X11-unix/X${try}[ 	]*\\$\" > /dev/null; then\n"
+ "				:\n"
+ "			else\n"
+ "				pid=`head -n 1 $tlock 2>/dev/null | sed -e 's/[ 	]//g' | grep '^[0-9][0-9]*$'`\n"
+@@ -1532,7 +1532,7 @@
+ "			fi\n"
+ "		fi\n"
+ "		if [ ! -f $tlock ]; then\n"
+-"			if echo \"$nsout_trim\" | grep \"/tmp/.X11-unix/X${try}[ 	]*\\$\" > /dev/null; then\n"
++"			if echo \"$nsout_trim\" | grep \"@TERMUX_PREFIX@/tmp/.X11-unix/X${try}[ 	]*\\$\" > /dev/null; then\n"
+ "				:\n"
+ "			else\n"
+ "				n=$try\n"
+@@ -1741,7 +1741,7 @@
+ "		fi\n"
+ "		csr=`echo \"$FD_CUPS\" | awk -F: '{print $1}'`\n"
+ "		ipp=`echo \"$FD_CUPS\" | awk -F: '{print $2}'`\n"
+-"		old=`strings -a /usr/sbin/cupsd 2>/dev/null | grep 'CUPS.v1\\.[01]'`\n"
++"		old=`strings -a @TERMUX_PREFIX@/bin/cupsd 2>/dev/null | grep 'CUPS.v1\\.[01]'`\n"
+ "		if [ \"X$old\" != \"X\" ]; then\n"
+ "			FD_CUPS=`echo \"$FD_CUPS\" | sed -e 's/:.*$//'`\n"
+ "		fi\n"
+@@ -1875,12 +1875,12 @@
+ "\n"
+ "	rmf=\"/nosuch\"\n"
+ "	if echo \"$sess\" | grep '[ 	]' > /dev/null; then\n"
+-"		stmp=/tmp/.cd$$`random`\n"
++"		stmp=@TERMUX_PREFIX@/tmp/.cd$$`random`\n"
+ "		stmp=`mytmp \"$stmp\"`\n"
+ "		touch $stmp\n"
+ "		chmod 755 $stmp || exit 1\n"
+-"		echo \"#!/bin/sh\" > $stmp\n"
+-"		#echo \"(id; env; env | grep XAUTHORITY | sed -e 's/XAUTHORITY=//' | xargs ls -l) > /tmp/ENV.OUT.$$\" >> $stmp\n"
++"		echo \"#!@TERMUX_PREFIX@/bin/sh\" > $stmp\n"
++"		#echo \"(id; env; env | grep XAUTHORITY | sed -e 's/XAUTHORITY=//' | xargs ls -l) > @TERMUX_PREFIX@/tmp/ENV.OUT.$$\" >> $stmp\n"
+ "		if [ \"X$SAVE_PATH\" != \"X\" ]; then\n"
+ "			echo \"PATH=\\\"$SAVE_PATH\\\"\" >> $stmp\n"
+ "			echo \"export PATH\" >> $stmp\n"
+@@ -1896,9 +1896,9 @@
+ "	fi\n"
+ "\n"
+ "	if [ \"X$have_root\" != \"X\" -a \"X$USER\" != \"Xroot\" ]; then\n"
+-"		ctmp1=/tmp/.xat1_$$`random`\n"
++"		ctmp1=@TERMUX_PREFIX@/tmp/.xat1_$$`random`\n"
+ "		ctmp1=`mytmp \"$ctmp1\"`\n"
+-"		ctmp2=/tmp/.xat2_$$`random`\n"
++"		ctmp2=@TERMUX_PREFIX@/tmp/.xat2_$$`random`\n"
+ "		ctmp2=`mytmp \"$ctmp2\"`\n"
+ "		touch $ctmp1 $ctmp2\n"
+ "		$have_xauth -f $authfile nextract -           :$N > $ctmp1\n"
+@@ -1909,7 +1909,7 @@
+ "		rm -f $ctmp1 $ctmp2\n"
+ "		XAUTHORITY=$authfile\n"
+ "		export XAUTHORITY\n"
+-"		sess=\"/bin/su - $USER -c $sess\"\n"
++"		sess=\"@TERMUX_PREFIX@/bin/su - $USER -c $sess\"\n"
+ "	else\n"
+ "		$have_xauth -f $authfile nextract -           :$N | $have_xauth nmerge -\n"
+ "		$have_xauth -f $authfile nextract - `hostname`:$N | $have_xauth nmerge -\n"
+@@ -2013,7 +2013,7 @@
+ "	do\n"
+ "		t=`expr $t + 1`\n"
+ "		sleep $ns2\n"
+-"		pid2=`head -n 1 \"/tmp/.X$N-lock\" 2>/dev/null | sed -e 's/[ 	]//g' | grep '^[0-9][0-9]*$'`\n"
++"		pid2=`head -n 1 \"@TERMUX_PREFIX@/tmp/.X$N-lock\" 2>/dev/null | sed -e 's/[ 	]//g' | grep '^[0-9][0-9]*$'`\n"
+ "		if [ \"X$pid2\" = \"X\" ]; then\n"
+ "			pid2=9999999\n"
+ "		fi\n"
+@@ -2035,7 +2035,7 @@
+ "			result=0\n"
+ "		fi\n"
+ "		if [ \"X$have_netstat\" != \"X\" ]; then\n"
+-"			if $have_netstat -an | grep \"/tmp/.X11-unix/X$N\\$\" > /dev/null; then\n"
++"			if $have_netstat -an | grep \"@TERMUX_PREFIX@/tmp/.X11-unix/X$N\\$\" > /dev/null; then\n"
+ "				result=1\n"
+ "			fi\n"
+ "		fi\n"
+@@ -2229,7 +2229,7 @@
+ "	if [ \"X$have_xauth\" = \"X\" ]; then\n"
+ "		exit 1\n"
+ "	fi\n"
+-"	tmp=/tmp/.xas$$`random`\n"
++"	tmp=@TERMUX_PREFIX@/tmp/.xas$$`random`\n"
+ "	tmp=`mytmp \"$tmp\"`\n"
+ "	touch $tmp\n"
+ "	chmod 600 $tmp || exit 1\n"
+@@ -2332,7 +2332,7 @@
+ "\n"
+ "# Set PATH to have a better chance of finding things:\n"
+ "SAVE_PATH=$PATH\n"
+-"PATH=$PATH:/usr/X11R6/bin:/usr/bin/X11:/usr/openwin/bin:/usr/dt/bin:/opt/kde4/bin:/opt/kde3/bin:/opt/gnome/bin:/usr/bin:/bin:/usr/sfw/bin:/usr/local/bin\n"
++"PATH=$PATH:@TERMUX_PREFIX@/bin\n"
+ "\n"
+ "have_root=\"\"\n"
+ "id0=`id`\n"
+@@ -2341,7 +2341,7 @@
+ "fi\n"
+ "\n"
+ "p_ok=0\n"
+-"if [ \"`type -p /bin/sh`\" = \"/bin/sh\" ]; then\n"
++"if [ \"`type -p @TERMUX_PREFIX@/bin/sh`\" = \"@TERMUX_PREFIX@/bin/sh\" ]; then\n"
+ "	p_ok=1\n"
+ "fi\n"
+ "\n"
+@@ -2443,7 +2443,7 @@
+ ;
+ 
+ char macosx_solid_background[] = 
+-"#!/bin/sh\n"
++"#!@TERMUX_PREFIX@/bin/sh\n"
+ "\n"
+ "#set -xv\n"
+ "\n"
+@@ -2455,7 +2455,7 @@
+ "	exit\n"
+ "fi\n"
+ "\n"
+-"PATH=/bin:/usr/bin:$PATH; export PATH\n"
++"PATH=@TERMUX_PREFIX@/bin:$PATH; export PATH\n"
+ "\n"
+ "# Check to see if our tarball has already been unpacked.  If it has been\n"
+ "# we don't unpack it again.  This lets the user overwrite the png with\n"
+diff -uNr x11vnc-0.9.16/src/tkx11vnc.h x11vnc-0.9.16.mod/src/tkx11vnc.h
+--- x11vnc-0.9.16/src/tkx11vnc.h	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/tkx11vnc.h	2020-11-13 22:59:47.188596158 +0200
+@@ -9,7 +9,7 @@
+  * ...edit tkx11vnc instead.
+  */
+ 	char gui_code[] =
+-"#!/bin/sh\n"
++"#!@TERMUX_PREFIX@/bin/sh\n"
+ "# the next line restarts using wish. \\\n"
+ "exec wish \"$0\" \"$@\"\n"
+ "catch {rename send {}}\n"
+@@ -6808,7 +6808,7 @@
+ "		puts stderr \"failure in restart_everything.\"\n"
+ "		exit 1;\n"
+ "	}\n"
+-"	set tmp \"/tmp/x11vnc[pid]\"\n"
++"	set tmp \"@TERMUX_PREFIX@/tmp/x11vnc[pid]\"\n"
+ "	append tmp [clock clicks]\n"
+ "	set tmp2 \"\"\n"
+ "	catch {set tmp2 [exec mktemp $tmp.XXXXXX 2>/dev/null]}\n"
+diff -uNr x11vnc-0.9.16/src/uinput.c x11vnc-0.9.16.mod/src/uinput.c
+--- x11vnc-0.9.16/src/uinput.c	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/uinput.c	2020-11-13 22:59:53.068773894 +0200
+@@ -1464,7 +1464,7 @@
+ 
+ Here is a little script to make it easier:
+ 
+-#!/usr/bin/perl
++#!@TERMUX_PREFIX@/bin/perl
+ while (<>) {
+ 	$_ =~ s/-XK_/XK_/;
+ 	next unless /^XK_/;
+diff -uNr x11vnc-0.9.16/src/unixpw.c x11vnc-0.9.16.mod/src/unixpw.c
+--- x11vnc-0.9.16/src/unixpw.c	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/unixpw.c	2020-11-13 23:00:53.902856481 +0200
+@@ -996,28 +996,28 @@
+ 	if (0) {
+ 		;
+ #endif
+-	} else if (stat("/bin/su", &sbuf) == 0) {
+-		bin_su = "/bin/su";
+-	} else if (stat("/usr/bin/su", &sbuf) == 0) {
+-		bin_su = "/usr/bin/su";
++	} else if (stat("@TERMUX_PREFIX@/bin/su", &sbuf) == 0) {
++		bin_su = "@TERMUX_PREFIX@/bin/su";
++	} else if (stat("@TERMUX_PREFIX@/bin/su", &sbuf) == 0) {
++		bin_su = "@TERMUX_PREFIX@/bin/su";
+ 	}
+ 	if (bin_su == NULL) {
+-		rfbLogPerror("existence /bin/su");
++		rfbLogPerror("existence @TERMUX_PREFIX@/bin/su");
+ 		fflush(stderr);
+ 		return 0;
+ 	}
+ 
+-	if (stat("/bin/true", &sbuf) == 0) {
+-		bin_true = "/bin/true";
+-	} if (stat("/usr/bin/true", &sbuf) == 0) {
+-		bin_true = "/usr/bin/true";
++	if (stat("@TERMUX_PREFIX@/bin/true", &sbuf) == 0) {
++		bin_true = "@TERMUX_PREFIX@/bin/true";
++	} if (stat("@TERMUX_PREFIX@/bin/true", &sbuf) == 0) {
++		bin_true = "@TERMUX_PREFIX@/bin/true";
+ 	}
+ 	if (cmd != NULL && cmd[0] != '\0') {
+ 		/* this is for ext. cmd su -c "my cmd" after login */
+ 		bin_true = cmd;
+ 	}
+ 	if (bin_true == NULL) {
+-		rfbLogPerror("existence /bin/true");
++		rfbLogPerror("existence @TERMUX_PREFIX@/bin/true");
+ 		fflush(stderr);
+ 		return 0;
+ 	}
+@@ -1111,11 +1111,11 @@
+ 
+ 		if (db > 2) {
+ 			char nam[256];
+-			unlink("/tmp/isatty");
+-			tfd = open("/tmp/isatty", O_CREAT|O_WRONLY, 0600);
++			unlink("@TERMUX_PREFIX@/tmp/isatty");
++			tfd = open("@TERMUX_PREFIX@/tmp/isatty", O_CREAT|O_WRONLY, 0600);
+ 			if (isatty(sfd)) {
+ 				close(tfd);
+-				sprintf(nam, "stty -a < %s > /tmp/isatty 2>&1",
++				sprintf(nam, "stty -a < %s > @TERMUX_PREFIX@/tmp/isatty 2>&1",
+ 				    slave);
+ 				system(nam);
+ 			} else {
+@@ -1137,7 +1137,7 @@
+ 
+ 		set_env("LC_ALL", "C");
+ 		set_env("LANG", "C");
+-		set_env("SHELL", "/bin/sh");
++		set_env("SHELL", "@TERMUX_PREFIX@/bin/sh");
+ 		if (nodisp) {
+ 			/* this will cause timeout problems with pam_xauth */
+ 			int k;
+diff -uNr x11vnc-0.9.16/src/user.c x11vnc-0.9.16.mod/src/user.c
+--- x11vnc-0.9.16/src/user.c	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/user.c	2020-11-13 23:01:28.844228893 +0200
+@@ -1897,7 +1897,7 @@
+ 		clean_up_exit(0);
+ 	}
+ 	if (!strcmp(cmd, "FINDDISPLAY-run")) {
+-		char tmp[] = "/tmp/fd.XXXXXX";
++		char tmp[] = "@TERMUX_PREFIX@/tmp/fd.XXXXXX";
+ 		char com[100];
+ 		int fd = mkstemp(tmp);
+ 		if (fd >= 0) {
+@@ -1905,7 +1905,7 @@
+ 			write(fd, find_display, strlen(find_display));
+ 			close(fd);
+ 			set_env("FINDDISPLAY_run", "1");
+-			sprintf(com, "/bin/sh %s -n", tmp);
++			sprintf(com, "@TERMUX_PREFIX@/bin/sh %s -n", tmp);
+ 			ret = system(com);
+ 			if (WIFEXITED(ret) && WEXITSTATUS(ret) != 0) {
+ 				if (got_findauth && !getenv("FD_XDM")) {
+@@ -2190,7 +2190,7 @@
+ 		    + strlen("FD_TAG='' ")
+ 		    + strlen("FD_XDMCP_IF='' ")
+ 		    + strlen("FD_XDUMMY_RUN_AS_ROOT='' ")
+-		    + strlen("FD_SESS='' /bin/sh ")
++		    + strlen("FD_SESS='' @TERMUX_PREFIX@/bin/sh ")
+ 		    + strlen(uu) + 1
+ 		    + strlen(fdgeom) + 1
+ 		    + strlen(fdopts) + 1
+@@ -2210,13 +2210,13 @@
+ 		sprintf(create_cmd, "env USER='%s' FD_GEOM='%s' FD_SESS='%s' "
+ 		    "FD_OPTS='%s' FD_EXTRA='%s' FD_PROG='%s' FD_XSRV='%s' FD_CUPS='%s' "
+ 		    "FD_ESD='%s' FD_NAS='%s' FD_SMB='%s' FD_TAG='%s' FD_XDMCP_IF='%s' "
+-		    "FD_XDUMMY_RUN_AS_ROOT='%s' %s /bin/sh %s %s",
++		    "FD_XDUMMY_RUN_AS_ROOT='%s' %s @TERMUX_PREFIX@/bin/sh %s %s",
+ 		    uu, fdgeom, fdsess, fdopts, fdextra, fdprog, fdxsrv,
+ 		    fdcups, fdesd, fdnas, fdsmb, fdtag, fdxdmcpif, fdxdum, cdout, tmp, opts);
+ 	} else {
+ 		create_cmd = (char *) malloc(strlen(tmp)
+-		    + strlen("/bin/sh ") + 1 + strlen(opts) + 1);
+-		sprintf(create_cmd, "/bin/sh %s %s", tmp, opts);
++		    + strlen("@TERMUX_PREFIX@/bin/sh ") + 1 + strlen(opts) + 1);
++		sprintf(create_cmd, "@TERMUX_PREFIX@/bin/sh %s %s", tmp, opts);
+ 	}
+ 	return create_cmd;
+ }
+@@ -2423,7 +2423,7 @@
+ 
+ static void path_lookup(char *prog) {
+ 	/* see create_display script */
+-	char *create_display_extra = "/usr/X11R6/bin:/usr/bin/X11:/usr/openwin/bin:/usr/dt/bin:/opt/kde4/bin:/opt/kde3/bin:/opt/gnome/bin:/usr/bin:/bin:/usr/sfw/bin:/usr/local/bin";
++	char *create_display_extra = "@TERMUX_PREFIX@/bin";
+ 	char *path, *try, *p;
+ 	int found = 0, len = strlen(create_display_extra);
+ 
+@@ -2462,7 +2462,7 @@
+ }
+ 
+ static int do_run_cmd(char *cmd, char *create_cmd, char *users_list_save, int created_disp, int db) {
+-	char tmp[] = "/tmp/x11vnc-find_display.XXXXXX";
++	char tmp[] = "@TERMUX_PREFIX@/tmp/x11vnc-find_display.XXXXXX";
+ 	char line1[1024], line2[16384];
+ 	char *q, *usslpeer = NULL;
+ 	int n, nodisp = 0, saw_xdmcp = 0;
+@@ -2507,7 +2507,7 @@
+ 		}
+ 		chmod(tmp, 0644);
+ 		if (getenv("X11VNC_FINDDISPLAY_ALWAYS_FAILS")) {
+-			char *s = "#!/bin/sh\necho _FAIL_\nexit 1\n";
++			char *s = "#!@TERMUX_PREFIX@/bin/sh\necho _FAIL_\nexit 1\n";
+ 			write(tmp_fd, s, strlen(s));
+ 		} else {
+ 			write(tmp_fd, find_display, strlen(find_display));
+@@ -2530,12 +2530,12 @@
+ 		}
+ 
+ 		cmd = (char *) malloc(strlen("env X11VNC_SKIP_DISPLAY='' ")
+-		    + strlen(nd) + strlen(" FD_TAG='' ") + strlen(tag) + strlen(tmp) + strlen("/bin/sh ") + strlen(fdout) + 1);
++		    + strlen(nd) + strlen(" FD_TAG='' ") + strlen(tag) + strlen(tmp) + strlen("@TERMUX_PREFIX@/bin/sh ") + strlen(fdout) + 1);
+ 
+ 		if (strcmp(tag, "")) {
+-			sprintf(cmd, "env X11VNC_SKIP_DISPLAY='%s' FD_TAG='%s' %s /bin/sh %s", nd, tag, fdout, tmp);
++			sprintf(cmd, "env X11VNC_SKIP_DISPLAY='%s' FD_TAG='%s' %s @TERMUX_PREFIX@/bin/sh %s", nd, tag, fdout, tmp);
+ 		} else {
+-			sprintf(cmd, "env X11VNC_SKIP_DISPLAY='%s' %s /bin/sh %s", nd, fdout, tmp);
++			sprintf(cmd, "env X11VNC_SKIP_DISPLAY='%s' %s @TERMUX_PREFIX@/bin/sh %s", nd, fdout, tmp);
+ 		}
+ 	}
+ 
+diff -uNr x11vnc-0.9.16/src/util.c x11vnc-0.9.16.mod/src/util.c
+--- x11vnc-0.9.16/src/util.c	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/util.c	2020-11-13 23:01:36.760555400 +0200
+@@ -327,7 +327,7 @@
+ 	if (shell) {
+ 		return(strdup(shell));
+ 	} else {
+-		return(strdup("/bin/sh"));
++		return(strdup("@TERMUX_PREFIX@/bin/sh"));
+ 	}
+ }
+ 
+diff -uNr x11vnc-0.9.16/src/v4l.c x11vnc-0.9.16.mod/src/v4l.c
+--- x11vnc-0.9.16/src/v4l.c	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/v4l.c	2020-11-13 22:47:22.545559970 +0200
+@@ -1163,7 +1163,7 @@
+ 
+ static char *guess_via_v4l_info(char *dev, int *fd) {
+ 	char *atparms, *cmd;
+-	char line[1024], tmp[] = "/tmp/x11vnc-tmp.XXXXXX";
++	char line[1024], tmp[] = "@TERMUX_PREFIX@/tmp/x11vnc-tmp.XXXXXX";
+ 	FILE *out;
+ 	int tmp_fd, len, rc, curr = 0;
+ 	int g_w = 0, g_h = 0, g_b = 0, mask_rev = 0;
+diff -uNr x11vnc-0.9.16/src/x11vnc.c x11vnc-0.9.16.mod/src/x11vnc.c
+--- x11vnc-0.9.16/src/x11vnc.c	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/x11vnc.c	2020-11-13 23:01:45.048903003 +0200
+@@ -4169,7 +4169,7 @@
+ 
+ 	if (getenv("PATH") == NULL || !strcmp(getenv("PATH"), "")) {
+ 		/* set a minimal PATH, usually only null in inetd. */
+-		set_env("PATH", "/bin:/usr/bin");
++		set_env("PATH", "@TERMUX_PREFIX@/bin");
+ 	}
+ 
+ 	/* handle -findauth case now that cmdline has been read */
+@@ -5515,7 +5515,7 @@
+ 			rfbLog("If your system has disabled it by default, you can\n");
+ 			rfbLog("enable it to get a nice x11vnc performance speedup\n");
+ 			rfbLog("for scrolling by putting this into the \"Module\" section\n");
+-			rfbLog("of /etc/X11/xorg.conf or /etc/X11/XF86Config:\n");
++			rfbLog("of @TERMUX_PREFIX@/etc/X11/xorg.conf or @TERMUX_PREFIX@/etc/X11/XF86Config:\n");
+ 			rfbLog("\n");
+ 			rfbLog("  Section \"Module\"\n");
+ 			rfbLog("  ...\n");
+diff -uNr x11vnc-0.9.16/src/xevents.c x11vnc-0.9.16.mod/src/xevents.c
+--- x11vnc-0.9.16/src/xevents.c	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/xevents.c	2020-11-13 23:01:50.617139759 +0200
+@@ -2009,7 +2009,7 @@
+ 	} else if (pid == 0) {
+ 		char *args[4];
+ 		int d;
+-		args[0] = "/bin/sh";
++		args[0] = "@TERMUX_PREFIX@/bin/sh";
+ 		args[1] = "-c";
+ 		/* "ssvnc -cmd VNC://fd=0 -chatonly"; not working */
+ 		args[2] = cmd;
+diff -uNr x11vnc-0.9.16/src/xwrappers.c x11vnc-0.9.16.mod/src/xwrappers.c
+--- x11vnc-0.9.16/src/xwrappers.c	2019-01-05 15:22:11.000000000 +0200
++++ x11vnc-0.9.16.mod/src/xwrappers.c	2020-11-13 22:44:42.617244976 +0200
+@@ -1403,7 +1403,7 @@
+ 
+ 
+ int xauth_raw(int on) {
+-	char tmp[] = "/tmp/x11vnc-xauth.XXXXXX";
++	char tmp[] = "@TERMUX_PREFIX@/tmp/x11vnc-xauth.XXXXXX";
+ 	int tmp_fd = -1;
+ 	static char *old_xauthority = NULL;
+ 	static char *old_tmp = NULL;

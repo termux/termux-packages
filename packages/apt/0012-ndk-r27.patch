@@ -1,0 +1,18 @@
+Just to make libcxx happy
+
+--- a/apt-pkg/cacheset.h
++++ b/apt-pkg/cacheset.h
+@@ -218,11 +218,11 @@
+ 	operator container_iterator(void) const { return _iter; }
+ 	inline iterator_type& operator++() { ++_iter; return static_cast<iterator_type&>(*this); }
+ 	inline iterator_type operator++(int) { iterator_type tmp(*this); operator++(); return tmp; }
+-	inline iterator_type operator+(typename container_iterator::difference_type const &n) { return iterator_type(_iter + n); }
++	inline iterator_type operator+(typename container_iterator::difference_type const &n) const { return iterator_type(_iter + n); }
+ 	inline iterator_type operator+=(typename container_iterator::difference_type const &n) { _iter += n; return static_cast<iterator_type&>(*this); }
+ 	inline iterator_type& operator--() { --_iter;; return static_cast<iterator_type&>(*this); }
+ 	inline iterator_type operator--(int) { iterator_type tmp(*this); operator--(); return tmp; }
+-	inline iterator_type operator-(typename container_iterator::difference_type const &n) { return iterator_type(_iter - n); }
++	inline iterator_type operator-(typename container_iterator::difference_type const &n) const { return iterator_type(_iter - n); }
+ 	inline typename container_iterator::difference_type operator-(iterator_type const &b) { return (_iter - b._iter); }
+ 	inline iterator_type operator-=(typename container_iterator::difference_type const &n) { _iter -= n; return static_cast<iterator_type&>(*this); }
+ 	inline bool operator!=(iterator_type const &i) const { return _iter != i._iter; }

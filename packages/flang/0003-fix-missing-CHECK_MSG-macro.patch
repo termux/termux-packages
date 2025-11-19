@@ -1,0 +1,11 @@
+--- a/flang/include/flang/Common/idioms.h
++++ b/flang/include/flang/Common/idioms.h
+@@ -89,6 +89,8 @@
+ #define CHECK(x) ((x) || (DIE("CHECK(" #x ") failed"), false))
+ // Same as above, but with a custom error message.
+ #define CHECK_MSG(x, y) ((x) || (DIE("CHECK(" #x ") failed: " #y), false))
++#elif !defined(CHECK_MSG)
++#define CHECK_MSG(x, y) CHECK(x)
+ #endif
+ 
+ // User-defined type traits that default to false:

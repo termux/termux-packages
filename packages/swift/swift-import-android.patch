@@ -1,0 +1,101 @@
+diff --git a/swift-argument-parser/Sources/ArgumentParser/Utilities/Platform.swift b/swift-argument-parser/Sources/ArgumentParser/Utilities/Platform.swift
+index b7fa046..a94e3b8 100644
+--- a/swift-argument-parser/Sources/ArgumentParser/Utilities/Platform.swift
++++ b/swift-argument-parser/Sources/ArgumentParser/Utilities/Platform.swift
+@@ -19,6 +19,8 @@ import Darwin
+ import CRT
+ #elseif canImport(WASILibc)
+ import WASILibc
++#elseif canImport(Android)
++import Android
+ #endif
+ 
+ enum Platform {}
+@@ -88,6 +90,8 @@ extension Platform {
+     ucrt._exit(code)
+ #elseif canImport(WASILibc)
+     WASILibc.exit(code)
++#elseif canImport(Android)
++    Android.exit(code)
+ #endif
+   }
+ }
+@@ -108,7 +112,7 @@ extension Platform {
+ 
+ // MARK: Terminal size
+ 
+-#if canImport(Glibc)
++#if canImport(Glibc) || canImport(Android)
+ func ioctl(_ a: Int32, _ b: Int32, _ p: UnsafeMutableRawPointer) -> Int32 {
+   ioctl(CInt(a), UInt(b), p)
+ }
+diff --git a/swift-certificates/Sources/X509/Verifier/RFC5280/URIConstraints.swift b/swift-certificates/Sources/X509/Verifier/RFC5280/URIConstraints.swift
+--- a/swift-certificates/Sources/X509/Verifier/RFC5280/URIConstraints.swift
++++ b/swift-certificates/Sources/X509/Verifier/RFC5280/URIConstraints.swift
+@@ -21,6 +21,9 @@
+ #elseif canImport(Musl)
+ import Musl
+ import CoreFoundation
++#elseif canImport(Android)
++import Android
++import CoreFoundation
+ #elseif canImport(Darwin)
+ import Darwin
+ #endif
+diff --git "a/swift-crypto/Sources/Crypto/Key Derivation/HKDF.swift" "b/swift-crypto/Sources/Crypto/Key Derivation/HKDF.swift"
+index 5f47c2f..4b5579e 100644
+--- "a/swift-crypto/Sources/Crypto/Key Derivation/HKDF.swift"
++++ "b/swift-crypto/Sources/Crypto/Key Derivation/HKDF.swift"
+@@ -15,6 +15,9 @@
+ @_exported import CryptoKit
+ #else
+ import Foundation
++#if canImport(Android)
++import Android
++#endif
+ 
+ /// A standards-based implementation of an HMAC-based Key Derivation Function
+ /// (HKDF).
+diff --git a/swift-docc/Sources/SwiftDocC/Infrastructure/Diagnostics/TerminalHelper.swift b/swift-docc/Sources/SwiftDocC/Infrastructure/Diagnostics/TerminalHelper.swift
+index dc3e33f5..a354d3ba 100644
+--- a/swift-docc/Sources/SwiftDocC/Infrastructure/Diagnostics/TerminalHelper.swift
++++ b/swift-docc/Sources/SwiftDocC/Infrastructure/Diagnostics/TerminalHelper.swift
+@@ -14,6 +14,8 @@ import Darwin.C
+ import Glibc
+ #elseif canImport(Musl)
+ import Musl
++#elseif canImport(Android)
++import Android
+ #elseif os(Windows)
+ import CRT
+ #endif
+diff --git a/swift-docc/Sources/SwiftDocC/Utility/LMDB/LMDB.swift b/swift-docc/Sources/SwiftDocC/Utility/LMDB/LMDB.swift
+index 66795d87..05d40a31 100644
+--- a/swift-docc/Sources/SwiftDocC/Utility/LMDB/LMDB.swift
++++ b/swift-docc/Sources/SwiftDocC/Utility/LMDB/LMDB.swift
+@@ -11,6 +11,10 @@
+ public import Foundation
+ import CLMDB
+ 
++#if canImport(Android)
++import Android
++#endif
++
+ /**
+     A general utility class for LMDB.
+  
+diff --git a/swiftpm/Sources/swift-build-prebuilts/BuildPrebuilts.swift b/swiftpm/Sources/swift-build-prebuilts/BuildPrebuilts.swift
+index ffa6b7f3f..abe453232 100644
+--- a/swiftpm/Sources/swift-build-prebuilts/BuildPrebuilts.swift
++++ b/swiftpm/Sources/swift-build-prebuilts/BuildPrebuilts.swift
+@@ -24,6 +24,10 @@ import struct TSCBasic.ByteString
+ import struct TSCBasic.SHA256
+ import Workspace
+ 
++#if canImport(Android)
++import Android
++#endif
++
+ // Format for the .zip.json files.
+ struct Artifact: Codable {
+     var platform: Workspace.PrebuiltsManifest.Platform

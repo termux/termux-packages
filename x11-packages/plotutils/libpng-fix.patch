@@ -1,0 +1,31 @@
+fix building with libpng-1.5
+
+--- a/libplot/z_write.c
++++ b/libplot/z_write.c
+@@ -164,7 +164,7 @@
+     }
+ 
+   /* cleanup after libpng errors (error handler does a longjmp) */
+-  if (setjmp (png_ptr->jmpbuf))
++  if (setjmp (png_jmpbuf (png_ptr)))
+     {
+       png_destroy_write_struct (&png_ptr, (png_info **)NULL);
+       return -1;
+@@ -444,7 +444,7 @@
+ #endif
+     }
+ 
+-  longjmp (png_ptr->jmpbuf, 1);
++  png_longjmp (png_ptr, 1);
+ }
+ 
+ static void 
+@@ -515,7 +515,7 @@
+ #endif
+     }
+ 
+-  longjmp (png_ptr->jmpbuf, 1);
++  png_longjmp (png_ptr, 1);
+ }
+ 
+ static void 

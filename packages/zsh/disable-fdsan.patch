@@ -1,0 +1,28 @@
+diff -uNr zsh-5.8/Src/main.c zsh-5.8.mod/Src/main.c
+--- zsh-5.8/Src/main.c	2019-12-14 00:41:30.000000000 +0200
++++ zsh-5.8.mod/Src/main.c	2021-04-05 23:17:04.559840264 +0300
+@@ -30,6 +30,9 @@
+ #include "zsh.mdh"
+ #include "main.pro"
+ 
++#include <android/fdsan.h>
++#include <dlfcn.h>
++
+ /*
+  * Support for Cygwin binary/text mode filesystems.
+  * Peter A. Castro <doctor@fruitbat.org>
+@@ -90,5 +93,14 @@
+ int
+ main(int argc, char **argv)
+ {
++    // For Android 11+.
++    void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++    if (lib_handle) {
++        void (*set_fdsan_error_level)(enum android_fdsan_error_level newlevel) = dlsym(lib_handle, "android_fdsan_set_error_level");
++        if (set_fdsan_error_level) {
++            set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++        }
++        dlclose(lib_handle);
++    }
+     return (zsh_main(argc, argv));
+ }

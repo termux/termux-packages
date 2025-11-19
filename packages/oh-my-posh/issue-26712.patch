@@ -1,0 +1,12 @@
+https://github.com/termux/termux-packages/issues/26712
+
+--- a/src/runtime/terminal_unix.go
++++ b/src/runtime/terminal_unix.go
+@@ -171,6 +171,7 @@
+ 	swapStat, err := mem.SwapMemory()
+ 	if err != nil {
+ 		log.Error(err)
++		return m, nil
+ 	}
+ 
+ 	m.SwapTotalMemory = swapStat.Total

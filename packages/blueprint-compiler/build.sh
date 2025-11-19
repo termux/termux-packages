@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://gnome.pages.gitlab.gnome.org/blueprint-compiler/
+TERMUX_PKG_DESCRIPTION="Markup language for GTK user interfaces"
+TERMUX_PKG_LICENSE="LGPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.18.0"
+TERMUX_PKG_SRCURL=https://download.gnome.org/sources/blueprint-compiler/${TERMUX_PKG_VERSION%.*}/blueprint-compiler-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=4142b9017151a347ccdc2907ac033b18508363476b44a76d0420b4af420bd866
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="gobject-introspection, python, pygobject"

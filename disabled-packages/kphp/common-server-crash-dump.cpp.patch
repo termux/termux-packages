@@ -1,0 +1,11 @@
+--- a/common/server/crash-dump.cpp
++++ b/common/server/crash-dump.cpp
+@@ -116,6 +116,8 @@
+   crash_dump_write_reg(LITERAL_WITH_LENGTH("R15=0x"), uc->uc_mcontext.gregs[REG_R15], buffer);
+   
+ #elif defined(__aarch64__)
++  const auto *uc = static_cast<ucontext_t *>(ucontext);
++
+   crash_dump_write_reg(LITERAL_WITH_LENGTH("SP=0x"), uc->uc_mcontext.sp, buffer);
+   crash_dump_write_reg(LITERAL_WITH_LENGTH("PC=0x"), uc->uc_mcontext.pc, buffer);
+   crash_dump_write_reg(LITERAL_WITH_LENGTH("PSTATE=0x"), uc->uc_mcontext.pstate, buffer);

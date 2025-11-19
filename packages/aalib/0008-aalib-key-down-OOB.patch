@@ -1,0 +1,23 @@
+diff -Naur a/src/aalinuxkbd.c b/src/aalinuxkbd.c
+--- a/src/aalinuxkbd.c	2016-12-19 12:40:26.660039735 +0100
++++ b/src/aalinuxkbd.c	2016-12-19 12:42:21.692045971 +0100
+@@ -114,6 +114,7 @@
+ static int vtswitch_allowed;
+ 
+ static char key_down[128];
++static size_t key_down_size = 128;
+ static int closed = 1;
+ static int mypid;
+ 
+@@ -165,10 +166,7 @@
+ 
+ static void blank_key_down(void)
+ {
+-    int f;
+-
+-    for (f = 0; f < NR_KEYS; f++)
+-	key_down[f] = 0;
++    memset(key_down, 0, key_down_size);
+ }
+ 
+ 

@@ -1,0 +1,38 @@
+--- a/uwsgiconfig.py
++++ b/uwsgiconfig.py
+@@ -730,7 +730,7 @@
+             if not self.include_path:
+                 raise 
+         except:
+-            self.include_path = ['/usr/include', '/usr/local/include']
++            self.include_path = []
+ 
+         additional_include_paths = self.get('additional_include_paths')
+         if additional_include_paths:
+@@ -1085,13 +1085,13 @@
+ 
+         required_pcre = self.get('pcre')
+         if required_pcre:
+-            pcre_libs = spcall('pcre2-config --libs8')
++            pcre_libs = spcall('sh @TERMUX_PREFIX@/bin/pcre2-config --libs8')
+             if pcre_libs:
+-                pcre_cflags = spcall("pcre2-config --cflags")
++                pcre_cflags = spcall("sh @TERMUX_PREFIX@/bin/pcre2-config --cflags")
+                 pcre_define = "-DUWSGI_PCRE2"
+             else:
+-                pcre_libs = spcall('pcre-config --libs')
+-                pcre_cflags = spcall("pcre-config --cflags")
++                pcre_libs = spcall('sh @TERMUX_PREFIX@/bin/pcre-config --libs')
++                pcre_cflags = spcall("sh @TERMUX_PREFIX@/bin/pcre-config --cflags")
+                 pcre_define = "-DUWSGI_PCRE"
+         else:
+             pcre_libs = None
+@@ -1130,7 +1130,7 @@
+ 
+         if self.has_include('uuid/uuid.h'):
+             self.cflags.append("-DUWSGI_UUID")
+-            if uwsgi_os in ('Linux', 'GNU', 'GNU/kFreeBSD') or uwsgi_os.startswith('CYGWIN') or os.path.exists('/usr/lib/libuuid.so') or os.path.exists('/usr/local/lib/libuuid.so') or os.path.exists('/usr/lib64/libuuid.so') or os.path.exists('/usr/local/lib64/libuuid.so'):
++            if uwsgi_os in ('Linux', 'GNU', 'GNU/kFreeBSD') or uwsgi_os.startswith('CYGWIN') or os.path.exists('@TERMUX_PREFIX@/lib/libuuid.so'):
+                 self.libs.append('-luuid')
+ 
+         if self.get('append_version'):

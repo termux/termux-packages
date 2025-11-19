@@ -1,0 +1,66 @@
++++ ./hw/xwayland/xwayland-shm.c
+@@ -35,6 +35,7 @@
+ #include <errno.h>
+ #include <string.h>
+ #include <stdlib.h>
++#include <sys/ioctl.h>
+ 
+ #include "fb.h"
+ #include "pixmapstr.h"
+@@ -93,6 +94,46 @@
+     return os_move_fd(fd);
+ }
+ 
++#define HAVE_MEMFD_CREATE
++static inline int memfd_create(const char *name, unsigned int flags) {
++#ifndef __NR_memfd_create
++#if defined __i386__
++#define __NR_memfd_create 356
++#elif defined __x86_64__
++#define __NR_memfd_create 319
++#elif defined __arm__
++#define __NR_memfd_create 385
++#elif defined __aarch64__
++#define __NR_memfd_create 279
++#endif
++#endif
++#ifdef __NR_memfd_create
++    return syscall(__NR_memfd_create, name, flags);
++#else
++    errno = ENOSYS;
++       return -1;
++#endif
++}
++
++static inline int ashmem_create_region(off_t size) {
++    int ret, flags, fd = open("/dev/ashmem", O_RDWR | O_CLOEXEC);
++    if (fd < 0)
++        return fd;
++    ret = ioctl(fd, /** ASHMEM_SET_SIZE */ _IOW(0x77, 3, size_t), size);
++    if (ret < 0)
++        goto err;
++    flags = fcntl(fd, F_GETFD);
++    if (flags == -1)
++        goto err;
++    if (fcntl(fd, F_SETFD, flags | FD_CLOEXEC) == -1)
++        goto err;
++
++    return fd;
++    err:
++    close(fd);
++    return ret;
++}
++
+ /*
+  * Create a new, unique, anonymous file of the given size, and
+  * return the file descriptor for it. The file descriptor is set
+@@ -142,6 +183,9 @@
+         fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK);
+     } else
+ #endif
++    if ((fd = ashmem_create_region(size)) >= 0) {
++        return fd;
++    } else
+     {
+         path = getenv("XDG_RUNTIME_DIR");
+         if (!path) {

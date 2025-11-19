@@ -1,0 +1,31 @@
+--- a/lib/gauche/configure.scm
++++ b/lib/gauche/configure.scm
+@@ -305,16 +305,16 @@
+   (cf-define 'PACKAGE_BUGREPORT (S (~ p'bug-report)))
+   (cf-define 'PACKAGE_URL (S (~ p'url)))
+ 
+-  (cf-subst 'SHELL (or (sys-getenv "CONFIG_SHELL") "/bin/sh"))
++  (cf-subst 'SHELL (or (sys-getenv "CONFIG_SHELL") "@TERMUX_PREFIX@/bin/sh"))
+   (cf-subst 'LIBOBJS "")
+   (cf-subst 'MFLAGS "")
+   (cf-subst 'MAKEFLAGS "")
+ 
+-  (cf-subst 'default_prefix "/usr/local")
++  (cf-subst 'default_prefix "@TERMUX_PREFIX@")
+   (cf-subst 'prefix "NONE")       ;will be replaced by cf-output
+   (cf-subst 'exec_prefix "NONE")  ;will be replaced by cf-output
+   (cf-subst 'bindir "${exec_prefix}/bin")
+-  (cf-subst 'sbindir "${exec_prefix}/sbin")
++  (cf-subst 'sbindir "${exec_prefix}/bin")
+   (cf-subst 'libexecdir "${exec_prefix}/libexec")
+   (cf-subst 'datarootdir "${prefix}/share")
+   (cf-subst 'datadir "${datarootdir}")
+@@ -322,7 +322,7 @@
+   (cf-subst 'sharedstatedir "${prefix}/com")
+   (cf-subst 'localstatedir "${prefix}/var")
+   (cf-subst 'includedir "${prefix}/include")
+-  (cf-subst 'oldincludedir "/usr/include")
++  (cf-subst 'oldincludedir "@TERMUX_PREFIX@/include")
+   (cf-subst 'docdir "${datarootdir}/doc/${PACKAGE_TARNAME}")
+   (cf-subst 'infodir "${datarootdir}/info")
+   (cf-subst 'htmldir "${docdir}")

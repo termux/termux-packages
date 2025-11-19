@@ -1,0 +1,333 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="StAdjustment" get-type="st_adjustment_get_type" parents="GObject">
+    <implements name="ClutterAnimatable"/>
+    <property name="lower" type="gdouble" flags="1073742055" default-value="0.000000"/>
+    <property name="upper" type="gdouble" flags="1073742055" default-value="0.000000"/>
+    <property name="value" type="gdouble" flags="1073742055" default-value="0.000000"/>
+    <property name="step-increment" type="gdouble" flags="1073742055" default-value="0.000000"/>
+    <property name="page-increment" type="gdouble" flags="1073742055" default-value="0.000000"/>
+    <property name="page-size" type="gdouble" flags="1073742055" default-value="0.000000"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="StBackgroundBlurEffect" get-type="st_background_blur_effect_get_type" parents="ClutterOffscreenEffect,ClutterEffect,ClutterActorMeta,GInitiallyUnowned,GObject">
+  </class>
+  <class name="StBackgroundBumpmapEffect" get-type="st_background_bumpmap_effect_get_type" parents="ClutterOffscreenEffect,ClutterEffect,ClutterActorMeta,GInitiallyUnowned,GObject">
+  </class>
+  <class name="StBorderImage" get-type="st_border_image_get_type" parents="GObject">
+  </class>
+  <boxed name="StIconColors" get-type="st_icon_colors_get_type"/>
+  <boxed name="StShadow" get-type="st_shadow_get_type"/>
+  <boxed name="StShadowHelper" get-type="st_shadow_helper_get_type"/>
+  <class name="StThemeNode" get-type="st_theme_node_get_type" parents="GObject">
+  </class>
+  <class name="StTheme" get-type="st_theme_get_type" parents="GObject">
+    <property name="application-stylesheet" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="theme-stylesheet" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="default-stylesheet" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="fallback-stylesheet" type="gchararray" flags="11" default-value="NULL"/>
+    <signal name="custom-stylesheets-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="StWidget" get-type="st_widget_get_type" parents="ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="theme" type="StTheme" flags="227"/>
+    <property name="pseudo-class" type="gchararray" flags="227" default-value=""/>
+    <property name="style-class" type="gchararray" flags="227" default-value=""/>
+    <property name="style" type="gchararray" flags="227" default-value=""/>
+    <property name="track-hover" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="hover" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="can-focus" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="label-actor" type="ClutterActor" flags="227"/>
+    <property name="important" type="gboolean" flags="231" default-value="FALSE"/>
+    <property name="accessible-role" type="AtkRole" flags="3" default-value="ATK_ROLE_INVALID"/>
+    <property name="accessible-name" type="gchararray" flags="227" default-value="NULL"/>
+    <signal name="style-changed" return="void" when="last">
+    </signal>
+    <signal name="popup-menu" return="void" when="last">
+    </signal>
+  </class>
+  <class name="StBin" get-type="st_bin_get_type" parents="StWidget,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="child" type="ClutterActor" flags="227"/>
+    <property name="x-align" type="StAlign" flags="227" default-value="ST_ALIGN_MIDDLE"/>
+    <property name="y-align" type="StAlign" flags="227" default-value="ST_ALIGN_MIDDLE"/>
+    <property name="x-fill" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="y-fill" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <class name="StViewport" get-type="st_viewport_get_type" parents="StWidget,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <implements name="StScrollable"/>
+  </class>
+  <class name="StBoxLayout" get-type="st_box_layout_get_type" parents="StViewport,StWidget,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <implements name="StScrollable"/>
+    <property name="vertical" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="pack-start" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <flags name="StButtonMask" get-type="st_button_mask_get_type">
+    <member name="ST_BUTTON_ONE" nick="one" value="1"/>
+    <member name="ST_BUTTON_TWO" nick="two" value="2"/>
+    <member name="ST_BUTTON_THREE" nick="three" value="4"/>
+  </flags>
+  <enum name="StClipboardType" get-type="st_clipboard_type_get_type">
+    <member name="ST_CLIPBOARD_TYPE_PRIMARY" nick="primary" value="0"/>
+    <member name="ST_CLIPBOARD_TYPE_CLIPBOARD" nick="clipboard" value="1"/>
+  </enum>  <enum name="StPolicyType" get-type="st_policy_type_get_type">
+    <member name="ST_POLICY_ALWAYS" nick="always" value="0"/>
+    <member name="ST_POLICY_AUTOMATIC" nick="automatic" value="1"/>
+    <member name="ST_POLICY_NEVER" nick="never" value="2"/>
+    <member name="ST_POLICY_EXTERNAL" nick="external" value="3"/>
+  </enum>  <flags name="StTableChildOptions" get-type="st_table_child_options_get_type">
+    <member name="ST_KEEP_ASPECT_RATIO" nick="keep-aspect-ratio" value="1"/>
+    <member name="ST_X_EXPAND" nick="x-expand" value="2"/>
+    <member name="ST_Y_EXPAND" nick="y-expand" value="4"/>
+    <member name="ST_X_FILL" nick="x-fill" value="8"/>
+    <member name="ST_Y_FILL" nick="y-fill" value="16"/>
+  </flags>
+  <enum name="StTextureCachePolicy" get-type="st_texture_cache_policy_get_type">
+    <member name="ST_TEXTURE_CACHE_POLICY_NONE" nick="none" value="0"/>
+    <member name="ST_TEXTURE_CACHE_POLICY_FOREVER" nick="forever" value="1"/>
+  </enum>  <enum name="StSide" get-type="st_side_get_type">
+    <member name="ST_SIDE_TOP" nick="top" value="0"/>
+    <member name="ST_SIDE_RIGHT" nick="right" value="1"/>
+    <member name="ST_SIDE_BOTTOM" nick="bottom" value="2"/>
+    <member name="ST_SIDE_LEFT" nick="left" value="3"/>
+  </enum>  <enum name="StCorner" get-type="st_corner_get_type">
+    <member name="ST_CORNER_TOPLEFT" nick="topleft" value="0"/>
+    <member name="ST_CORNER_TOPRIGHT" nick="topright" value="1"/>
+    <member name="ST_CORNER_BOTTOMRIGHT" nick="bottomright" value="2"/>
+    <member name="ST_CORNER_BOTTOMLEFT" nick="bottomleft" value="3"/>
+  </enum>  <flags name="StTextDecoration" get-type="st_text_decoration_get_type">
+    <member name="ST_TEXT_DECORATION_UNDERLINE" nick="underline" value="1"/>
+    <member name="ST_TEXT_DECORATION_OVERLINE" nick="overline" value="2"/>
+    <member name="ST_TEXT_DECORATION_LINE_THROUGH" nick="line-through" value="4"/>
+    <member name="ST_TEXT_DECORATION_BLINK" nick="blink" value="8"/>
+  </flags>
+  <enum name="StTextAlign" get-type="st_text_align_get_type">
+    <member name="ST_TEXT_ALIGN_LEFT" nick="left" value="0"/>
+    <member name="ST_TEXT_ALIGN_CENTER" nick="center" value="1"/>
+    <member name="ST_TEXT_ALIGN_RIGHT" nick="right" value="2"/>
+    <member name="ST_TEXT_ALIGN_JUSTIFY" nick="justify" value="3"/>
+  </enum>  <enum name="StGradientType" get-type="st_gradient_type_get_type">
+    <member name="ST_GRADIENT_NONE" nick="none" value="0"/>
+    <member name="ST_GRADIENT_VERTICAL" nick="vertical" value="1"/>
+    <member name="ST_GRADIENT_HORIZONTAL" nick="horizontal" value="2"/>
+    <member name="ST_GRADIENT_RADIAL" nick="radial" value="3"/>
+  </enum>  <enum name="StIconStyle" get-type="st_icon_style_get_type">
+    <member name="ST_ICON_STYLE_REQUESTED" nick="requested" value="0"/>
+    <member name="ST_ICON_STYLE_REGULAR" nick="regular" value="1"/>
+    <member name="ST_ICON_STYLE_SYMBOLIC" nick="symbolic" value="2"/>
+  </enum>  <enum name="StAlign" get-type="st_align_get_type">
+    <member name="ST_ALIGN_START" nick="start" value="0"/>
+    <member name="ST_ALIGN_MIDDLE" nick="middle" value="1"/>
+    <member name="ST_ALIGN_END" nick="end" value="2"/>
+  </enum>  <enum name="StIconType" get-type="st_icon_type_get_type">
+    <member name="ST_ICON_SYMBOLIC" nick="symbolic" value="0"/>
+    <member name="ST_ICON_FULLCOLOR" nick="fullcolor" value="1"/>
+    <member name="ST_ICON_APPLICATION" nick="application" value="2"/>
+    <member name="ST_ICON_DOCUMENT" nick="document" value="3"/>
+  </enum>  <enum name="StBackgroundSize" get-type="st_background_size_get_type">
+    <member name="ST_BACKGROUND_SIZE_AUTO" nick="auto" value="0"/>
+    <member name="ST_BACKGROUND_SIZE_CONTAIN" nick="contain" value="1"/>
+    <member name="ST_BACKGROUND_SIZE_COVER" nick="cover" value="2"/>
+    <member name="ST_BACKGROUND_SIZE_FIXED" nick="fixed" value="3"/>
+  </enum>  <enum name="StTextDirection" get-type="st_text_direction_get_type">
+    <member name="ST_TEXT_DIRECTION_NONE" nick="none" value="0"/>
+    <member name="ST_TEXT_DIRECTION_LTR" nick="ltr" value="1"/>
+    <member name="ST_TEXT_DIRECTION_RTL" nick="rtl" value="2"/>
+  </enum>  <class name="StBoxLayoutChild" get-type="st_box_layout_child_get_type" parents="ClutterChildMeta,GObject">
+    <property name="expand" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="x-fill" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="y-fill" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="x-align" type="StAlign" flags="227" default-value="ST_ALIGN_MIDDLE"/>
+    <property name="y-align" type="StAlign" flags="227" default-value="ST_ALIGN_MIDDLE"/>
+  </class>
+  <class name="StButton" get-type="st_button_get_type" parents="StBin,StWidget,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="label" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="button-mask" type="StButtonMask" flags="3" default-value="ST_BUTTON_ONE"/>
+    <property name="toggle-mode" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="checked" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="pressed" type="gboolean" flags="1" default-value="FALSE"/>
+    <signal name="clicked" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+  </class>
+  <class name="StClipboard" get-type="st_clipboard_get_type" parents="GObject">
+  </class>
+  <class name="StDrawingArea" get-type="st_drawing_area_get_type" parents="StWidget,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <signal name="repaint" return="void" when="last">
+    </signal>
+  </class>
+  <class name="StEntry" get-type="st_entry_get_type" parents="StWidget,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="clutter-text" type="ClutterText" flags="1"/>
+    <property name="hint-text" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="hint-actor" type="ClutterActor" flags="3"/>
+    <property name="text" type="gchararray" flags="3" default-value="NULL"/>
+    <signal name="primary-icon-clicked" return="void" when="last">
+    </signal>
+    <signal name="secondary-icon-clicked" return="void" when="last">
+    </signal>
+  </class>
+  <class name="StFocusManager" get-type="st_focus_manager_get_type" parents="GObject">
+  </class>
+  <class name="StGroup" get-type="st_group_get_type" parents="StWidget,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+  </class>
+  <class name="StIcon" get-type="st_icon_get_type" parents="StWidget,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="gicon" type="GIcon" flags="227"/>
+    <property name="icon-name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="icon-type" type="StIconType" flags="227" default-value="ST_ICON_SYMBOLIC"/>
+    <property name="icon-size" type="gint" flags="227" default-value="-1"/>
+  </class>
+  <class name="StLabel" get-type="st_label_get_type" parents="StWidget,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="clutter-text" type="ClutterText" flags="1"/>
+    <property name="text" type="gchararray" flags="3" default-value="NULL"/>
+  </class>
+  <class name="StImageContent" get-type="st_image_content_get_type" parents="ClutterImage,GObject">
+    <implements name="ClutterContent"/>
+    <property name="preferred-width" type="gint" flags="235" default-value="-1"/>
+    <property name="preferred-height" type="gint" flags="235" default-value="-1"/>
+  </class>
+  <class name="StPasswordEntry" get-type="st_password_entry_get_type" parents="StEntry,StWidget,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="password-visible" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="show-peek-icon" type="gboolean" flags="227" default-value="TRUE"/>
+  </class>
+  <class name="StPolygon" get-type="st_polygon_get_type" parents="ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="ulc-x" type="gfloat" flags="231" default-value="0.000000"/>
+    <property name="ulc-y" type="gfloat" flags="231" default-value="0.000000"/>
+    <property name="llc-x" type="gfloat" flags="231" default-value="0.000000"/>
+    <property name="llc-y" type="gfloat" flags="231" default-value="0.000000"/>
+    <property name="urc-x" type="gfloat" flags="231" default-value="0.000000"/>
+    <property name="urc-y" type="gfloat" flags="231" default-value="0.000000"/>
+    <property name="lrc-x" type="gfloat" flags="231" default-value="0.000000"/>
+    <property name="lrc-y" type="gfloat" flags="231" default-value="0.000000"/>
+    <property name="debug" type="gboolean" flags="231" default-value="FALSE"/>
+    <signal name="repaint" return="void" when="last">
+    </signal>
+  </class>
+  <interface name="StScrollable" get-type="st_scrollable_get_type">
+    <property name="hadjustment" type="StAdjustment" flags="3"/>
+    <property name="vadjustment" type="StAdjustment" flags="3"/>
+  </interface>
+  <class name="StScrollBar" get-type="st_scroll_bar_get_type" parents="StWidget,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="adjustment" type="StAdjustment" flags="227"/>
+    <property name="vertical" type="gboolean" flags="227" default-value="FALSE"/>
+    <signal name="scroll-start" return="void" when="last">
+    </signal>
+    <signal name="scroll-stop" return="void" when="last">
+    </signal>
+  </class>
+  <class name="StScrollView" get-type="st_scroll_view_get_type" parents="StBin,StWidget,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="hscroll" type="StScrollBar" flags="225"/>
+    <property name="vscroll" type="StScrollBar" flags="225"/>
+    <property name="hscrollbar-policy" type="StPolicyType" flags="227" default-value="ST_POLICY_AUTOMATIC"/>
+    <property name="vscrollbar-policy" type="StPolicyType" flags="227" default-value="ST_POLICY_AUTOMATIC"/>
+    <property name="hscrollbar-visible" type="gboolean" flags="225" default-value="TRUE"/>
+    <property name="vscrollbar-visible" type="gboolean" flags="225" default-value="TRUE"/>
+    <property name="enable-mouse-scrolling" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="overlay-scrollbars" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="enable-auto-scrolling" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <class name="StScrollViewFade" get-type="st_scroll_view_fade_get_type" parents="ClutterShaderEffect,ClutterOffscreenEffect,ClutterEffect,ClutterActorMeta,GInitiallyUnowned,GObject">
+    <property name="vfade-offset" type="gfloat" flags="227" default-value="68.000000"/>
+    <property name="hfade-offset" type="gfloat" flags="227" default-value="68.000000"/>
+    <property name="fade-edges" type="gboolean" flags="227" default-value="TRUE"/>
+  </class>
+  <class name="StSettings" get-type="st_settings_get_type" parents="GObject">
+    <property name="font-name" type="gchararray" flags="1" default-value=""/>
+    <property name="gtk-icon-theme" type="gchararray" flags="225" default-value=""/>
+    <property name="magnifier-active" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="slow-down-factor" type="gdouble" flags="227" default-value="1.000000"/>
+  </class>
+  <class name="StTable" get-type="st_table_get_type" parents="StWidget,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="homogeneous" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="row-count" type="gint" flags="225" default-value="0"/>
+    <property name="column-count" type="gint" flags="225" default-value="0"/>
+  </class>
+  <class name="StTableChild" get-type="st_table_child_get_type" parents="ClutterChildMeta,GObject">
+    <property name="col" type="gint" flags="227" default-value="0"/>
+    <property name="row" type="gint" flags="227" default-value="0"/>
+    <property name="col-span" type="gint" flags="227" default-value="1"/>
+    <property name="row-span" type="gint" flags="227" default-value="1"/>
+    <property name="x-expand" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="y-expand" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="x-align" type="StAlign" flags="227" default-value="ST_ALIGN_MIDDLE"/>
+    <property name="y-align" type="StAlign" flags="227" default-value="ST_ALIGN_MIDDLE"/>
+    <property name="x-fill" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="y-fill" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="allocate-hidden" type="gboolean" flags="227" default-value="TRUE"/>
+  </class>
+  <class name="StTextureCache" get-type="st_texture_cache_get_type" parents="GObject">
+    <signal name="icon-theme-changed" return="void" when="last">
+    </signal>
+    <signal name="texture-file-changed" return="void" when="last">
+      <param type="GFile"/>
+    </signal>
+  </class>
+  <class name="StThemeContext" get-type="st_theme_context_get_type" parents="GObject">
+    <property name="scale-factor" type="gint" flags="3" default-value="1"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="StWidgetAccessible" get-type="st_widget_accessible_get_type" parents="CallyActor,AtkGObjectAccessible,AtkObject,GObject">
+    <implements name="AtkComponent"/>
+    <implements name="AtkAction"/>
+  </class>
+</dump>

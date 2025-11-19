@@ -1,0 +1,18 @@
+diff --git a/src/nvim/CMakeLists.txt b/src/nvim/CMakeLists.txt
+index 2a60eefe7c..98bbc7e5f2 100644
+--- a/src/nvim/CMakeLists.txt
++++ b/src/nvim/CMakeLists.txt
+@@ -515,11 +515,11 @@ add_custom_command(
+     "${NVIM_VERSION_DEF_H}"
+   DEPENDS "${PROJECT_BINARY_DIR}/cmake.config/auto/versiondef-$<CONFIG>.h")
+ 
+-set(LUA_GEN ${LUA_GEN_PRG} ${GENERATOR_PRELOAD} ${PROJECT_SOURCE_DIR} $<TARGET_FILE:nlua0> ${PROJECT_BINARY_DIR})
++set(LUA_GEN ${LUA_GEN_PRG} ${GENERATOR_PRELOAD} ${PROJECT_SOURCE_DIR} "${PROJECT_BINARY_DIR}/../host-build/libnlua0.so" ${PROJECT_BINARY_DIR})
+ set(LUA_GEN_DEPS ${GENERATOR_PRELOAD} $<TARGET_FILE:nlua0>)
+ 
+ # Like LUA_GEN but includes also vim.fn, vim.api, vim.uv, etc
+-set(NVIM_LUA $<TARGET_FILE:nvim_bin> -u NONE -l ${NVIM_LUA_PRELOAD} ${PROJECT_SOURCE_DIR})
++set(NVIM_LUA "${PROJECT_BINARY_DIR}/../host-build/bin/nvim" -u NONE -l ${NVIM_LUA_PRELOAD} ${PROJECT_SOURCE_DIR})
+ 
+ # NVIM_GENERATED_FOR_HEADERS: generated headers to be included in headers
+ # NVIM_GENERATED_FOR_SOURCES: generated headers to be included in sources

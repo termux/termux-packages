@@ -1,0 +1,37 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -232,7 +232,7 @@
+ endif()
+ 
+ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+-  wl_add_flag(WL_COMPILE_DIAGNOSTICS "-Weverything")
++  wl_add_flag(WL_COMPILE_DIAGNOSTICS "-Wall")
+ 
+   # Disabled warnings that are overly verbose right now or just do not make sense.
+   wl_add_flag(WL_COMPILE_DIAGNOSTICS "-Wno-c++98-compat")
+@@ -255,8 +255,8 @@
+   wl_add_flag(WL_COMPILE_DIAGNOSTICS "-Wno-unreachable-code")
+   wl_add_flag(WL_COMPILE_DIAGNOSTICS "-Wno-documentation")
+ 
+-  wl_add_flag(WL_COMPILE_DIAGNOSTICS "-Werror=deprecated")
+-  wl_add_flag(WL_COMPILE_DIAGNOSTICS "-Werror=non-pod-varargs")
++  wl_add_flag(WL_COMPILE_DIAGNOSTICS "-Wdeprecated")
++  wl_add_flag(WL_COMPILE_DIAGNOSTICS "-Wnon-pod-varargs")
+ 
+   wl_add_flag(WL_COMPILE_DIAGNOSTICS "-Qunused-arguments")
+ 
+@@ -311,10 +311,10 @@
+ 
+ if(NOT MSVC)
+   # Turn some warnings into errors.
+-  wl_add_flag(WL_COMPILE_DIAGNOSTICS "-Werror=format-security")
+-  wl_add_flag(WL_COMPILE_DIAGNOSTICS "-Werror=return-type")
+-  wl_add_flag(WL_COMPILE_DIAGNOSTICS "-Werror=shadow")
+-  wl_add_flag(WL_COMPILE_DIAGNOSTICS "-Werror=uninitialized")
++  wl_add_flag(WL_COMPILE_DIAGNOSTICS "-Wformat-security")
++  wl_add_flag(WL_COMPILE_DIAGNOSTICS "-Wreturn-type")
++  wl_add_flag(WL_COMPILE_DIAGNOSTICS "-Wshadow")
++  wl_add_flag(WL_COMPILE_DIAGNOSTICS "-Wuninitialized")
+ 
+   wl_add_flag(WL_GENERIC_CXX_FLAGS "-std=c++11")
+ endif()

@@ -1,0 +1,20 @@
+--- a/mh/show.c
++++ b/mh/show.c
+@@ -253,7 +253,7 @@
+   */
+ 
+   if (!use_showproc)
+-    showproc = "/bin/cat";
++    showproc = "@TERMUX_PREFIX@/bin/cat";
+   else
+     showproc = mh_global_profile_get ("showproc", NULL);
+ 
+@@ -338,7 +338,7 @@
+     {
+       showproc = getenv ("PAGER");
+       if (!showproc)
+-	showproc = "/usr/bin/more";
++	showproc = "@TERMUX_PREFIX@/bin/more";
+     }
+   finisarg ();
+   execvp (showproc, showargv);
