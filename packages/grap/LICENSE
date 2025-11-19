@@ -1,0 +1,96 @@
+This is grap, an implementation of Kernighan and Bentley's grap
+language for typesetting graphs.  I got sick of groff not having a
+version of grap, so I built one.
+
+The code is distributed under the FreeBSD-style copyright:
+
+Copyright 1998-2009
+Ted Faber
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+
+	Redistributions of source code must retain the above
+	copyright notice, this list of conditions and the
+	following disclaimer.
+
+	Redistributions in binary form must reproduce the
+	above copyright notice, this list of conditions and the
+	following disclaimer in the documentation and/or other
+	materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE FREEBSD PROJECT ``AS IS'' AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS
+BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+That text is reproduced in the COPYRIGHT file, too.  Changes are in
+CHANGES.
+
+The code was all written by me, based on K&B's _Grap-A Language for
+Typesetting Graphs, Tutorial and User Manual_ by Jon L. Bentley and
+Brian W. Kernighan, revised May 1991.  That paper is available from
+http://www.kohala.com/start/troff/troff.html as
+http://www.kohala.com/start/troff/cstr114.ps .  You should check out
+the paper for a complete understanding of grap's power.  grap is a pic
+preprocessor, so any typesetting language that can use pic can use
+grap.  I believe that TeX can use pic, but I wouldn't be surprised if
+grap.defines needs to be fooled with.  If you use TeX and find a set
+of grap.defines that work, please let me know.  Some people have used
+the given grap.tex.defines.  Modifications always welcome.
+
+If you want to generate a GNU makefile when the system make command is
+not GNU make, use the --enable-force-gnu-make option to configure.
+configure does it's best to tell if you have GNU make and create an
+appropriate make file, but can be confused.
+
+The man page uses the BSD macros.  If your system doesn't, there's an
+ASCII version in grap.man, and a postscript version in grap.ps.
+
+Check out the examples in the examples directory.
+
+So far I've compiled the code on Sunos 4.1.3, Solaris 5.5.1, FreeBSD
+2.2.7-4.2, and an unknown RedHat Linux 6.1.  It may run under other
+systems, and your c++ compiler and yacc/lex versions are probably more
+important than the type of Unix you run.  Flex 2.5.4 and the yacc on
+FreeBSD 2.2.7 are known to work as well as later versions of bison.
+g++ 2.7.2.1, 2.8.1 2.95.1 and 2.95.2 have all worked.  grap uses the
+standard template library, so that may also be a factor.  The STL
+included with g++ works.  grap has successfully compiled under UWIN
+(http://www.research.att.com/sw/tools/uwin/) under Windows NT with g++
+2.95.1. (Yeah, it surprised me, too.)  Grap has been reported to build
+and install correctly on OpenBSD as well.
+
+The distribution uses GNU configure.  ./configure should create a
+viable set of makefiles.  After running configure, you should be able
+to use make directly (specifically, make depend && make).  The
+resulting makefile should run under most versions of make, including
+GNU make and FreeBSD's pmake.
+
+If you want to run the GNU autoconf tools yourself, well, $DIETY help
+you, but I found:
+
+$ aclocal && autoheader && automake --add-missing && autoconf
+
+is a good starting point.
+
+If you try to compile grap on a new system and have problems, let me
+know and I'll try to help.  If you succeed, let me know.
+
+Bug reports or other correspondence to faber@lunabase.org.  This
+program is a hobby, so understand that bug reports will be handled as
+I have time.  The most recent stable version should always be
+available at http://www.lunabase.org/~faber/Vault/software/grap/ .  If
+you're having a problem, don't hesitate to mail, because I often have
+a slightly pre-release version with in-progress bug fixes too.
+
