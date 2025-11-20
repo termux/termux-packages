@@ -764,13 +764,11 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 			export PATH="/usr/bin:$PATH"
 		fi
 		cd "$TERMUX_PKG_MASSAGEDIR"
-		if [ "$TERMUX_PACKAGE_FORMAT" = "debian" ]; then
-			termux_step_create_debian_package
-		elif [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
-			termux_step_create_pacman_package
-		else
-			termux_error_exit "Unknown packaging format '$TERMUX_PACKAGE_FORMAT'."
-		fi
+		case "$TERMUX_PACKAGE_FORMAT" in
+			debian) termux_step_create_debian_package;;
+			pacman) termux_step_create_pacman_package;;
+			*) termux_error_exit "Unknown package format '$TERMUX_PACKAGE_FORMAT'.";;
+		esac
 		# Saving a list of compiled packages for further work with it
 		if termux_check_package_in_building_packages_list "${TERMUX_PKG_BUILDER_DIR#${TERMUX_SCRIPTDIR}/}"; then
 			sed -i "\|^${TERMUX_PKG_BUILDER_DIR#${TERMUX_SCRIPTDIR}/}$|d" "$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH"
