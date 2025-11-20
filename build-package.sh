@@ -600,9 +600,10 @@ if [ "$TERMUX_REPO_APP__PACKAGE_NAME" != "$TERMUX_APP_PACKAGE" ]; then
 	TERMUX_INSTALL_DEPS=false
 fi
 
-if [ "$TERMUX_REPO_PKG_FORMAT" != "debian" ] && [ "$TERMUX_REPO_PKG_FORMAT" != "pacman" ]; then
-	termux_error_exit "'pkg_format' is incorrectly specified in repo.json file. Only 'debian' and 'pacman' formats are supported"
-fi
+case "$TERMUX_REPO_PKG_FORMAT" in
+	debian|pacman) :;;
+	*) termux_error_exit "'pkg_format' is incorrectly specified in repo.json file. Only 'debian' and 'pacman' formats are supported";;
+esac
 
 if [ -n "${TERMUX_PACKAGE_FORMAT-}" ]; then
 	case "${TERMUX_PACKAGE_FORMAT-}" in
