@@ -6,6 +6,7 @@ _LLVM_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo "${TERMUX_PK
 _LLVM_MAJOR_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo "${LLVM_MAJOR_VERSION}")
 _LLVM_MAJOR_VERSION_NEXT=$((_LLVM_MAJOR_VERSION + 1))
 TERMUX_PKG_VERSION="21.1.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8c91542b579a3b27b7aeae1db12004eb412c9ed9bdff0a29ee862c3551cadfe3
 TERMUX_PKG_DEPENDS="libc++, libllvm (<< ${_LLVM_MAJOR_VERSION_NEXT})"
