@@ -98,7 +98,7 @@ termux_pkg_upgrade_version() {
 	# Update checksum
 	if [[ "${TERMUX_PKG_SHA256[*]}" != "SKIP_CHECKSUM" ]] && [[ "${TERMUX_PKG_SRCURL:0:4}" != "git+" ]]; then
 		echo n | "${TERMUX_SCRIPTDIR}/scripts/bin/update-checksum" "${TERMUX_PKG_NAME}" || {
-			git checkout -- "${TERMUX_PKG_BUILDER_DIR}"
+			git checkout -- "${TERMUX_SCRIPTDIR}"
 			git pull --rebase --autostash
 			termux_error_exit "failed to update checksum."
 		}
@@ -132,7 +132,7 @@ termux_pkg_upgrade_version() {
 
 	if ! "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./build-package.sh -C -a "${TERMUX_ARCH}" -i "${TERMUX_PKG_NAME}"; then
 		_termux_should_cleanup "${big_package}" && "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
-		git checkout -- "${TERMUX_PKG_BUILDER_DIR}"
+		git checkout -- "${TERMUX_SCRIPTDIR}"
 		termux_error_exit "failed to build."
 	fi
 
