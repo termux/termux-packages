@@ -1,26 +1,14 @@
 --- a/src/Mayaqua/Unix.c
 +++ b/src/Mayaqua/Unix.c
-@@ -239,9 +239,9 @@
- 	return &t;
- }
+@@ -310,7 +310,7 @@ bool UnixIsInVmMain()
+ #endif
  
--static void *signal_received_for_ignore(int sig, siginfo_t *info, void *ucontext) 
-+static void signal_received_for_ignore(int sig, siginfo_t *info, void *ucontext) 
- {
--	return NULL;
-+	return;
- }
- 
- // Ignore the signal flew to the thread
-@@ -298,7 +298,7 @@
- 	char *vm_str_list = "Hypervisor detected,VMware Virtual Platform,VMware Virtual USB,qemu,xen,paravirtualized,virtual hd,virtualhd,virtual pc,virtualpc,kvm,oracle vm,oraclevm,parallels,xvm,bochs";
- 
- #ifdef	UNIX_LINUX
+ #if defined(UNIX_LINUX)
 -	t = UnixExec("/bin/dmesg");
 +	t = UnixExec("@TERMUX_PREFIX@/bin/dmesg");
- 
- 	if (t != NULL)
- 	{
+ #elif defined(__FreeBSD__)
+ 	t = UnixExec("/sbin/sysctl -n kern.vm_guest");
+ #endif
 @@ -363,11 +363,11 @@
  		// Mac OS X
  		if (b)
