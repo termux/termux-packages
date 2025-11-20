@@ -35,8 +35,8 @@ source "$TERMUX_SCRIPTDIR/scripts/utils/termux/package/termux_package.sh"
 
 export SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH:-$(git -c log.showSignature=false log -1 --pretty=%ct 2>/dev/null || date "+%s")}
 
-if [ "$(uname -o)" = "Android" ] || [ -e "/system/bin/app_process" ]; then
-	if [ "$(id -u)" = "0" ]; then
+if [[ "$(uname -o)" == "Android" || -e "/system/bin/app_process" ]]; then
+	if [[ "$(id -u)" == "0" ]]; then
 		echo "On-device execution of this script as root is disabled."
 		exit 1
 	fi
@@ -51,13 +51,13 @@ fi
 # Automatically enable offline set of sources and build tools.
 # Offline termux-packages bundle can be created by executing
 # script ./scripts/setup-offline-bundle.sh.
-if [ -f "${TERMUX_SCRIPTDIR}/build-tools/.installed" ]; then
+if [[ -f "${TERMUX_SCRIPTDIR}/build-tools/.installed" ]]; then
 	export TERMUX_PACKAGES_OFFLINE=true
 fi
 
 # Lock file to prevent parallel running in the same environment.
 TERMUX_BUILD_LOCK_FILE="${TMPDIR}/.termux-build.lck"
-if [ ! -e "$TERMUX_BUILD_LOCK_FILE" ]; then
+if [[ ! -e "$TERMUX_BUILD_LOCK_FILE" ]]; then
 	touch "$TERMUX_BUILD_LOCK_FILE"
 fi
 
@@ -419,7 +419,7 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_finish_build.sh"
 # shellcheck source=scripts/properties.sh
 source "$TERMUX_SCRIPTDIR/scripts/properties.sh"
 
-if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
 	# Setup TERMUX_APP_PACKAGE_MANAGER
 	# shellcheck source=/dev/null
 	source "$TERMUX_PREFIX/bin/termux-setup-package-manager"
@@ -479,10 +479,10 @@ termux_run_base_and_multilib_build_step() {
 		*) termux_error_exit "Unsupported function '${1}'."
 	esac
 	cd "$TERMUX_PKG_BUILDDIR"
-	if [ "$TERMUX_PKG_BUILD_ONLY_MULTILIB" = "false" ]; then
+	if [[ "$TERMUX_PKG_BUILD_ONLY_MULTILIB" == "false" ]]; then
 		"${func}"
 	fi
-	if [ "$TERMUX_PKG_BUILD_MULTILIB" = "true" ]; then
+	if [[ "$TERMUX_PKG_BUILD_MULTILIB" == "true" ]]; then
 		(
 			termux_step_setup_multilib_environment
 			"${func}_multilib"
@@ -502,14 +502,14 @@ _show_usage() {
 	echo "Build a package by creating a .deb file in the debs/ folder."
 	echo
 	echo "Available options:"
-	[ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
+	[[ "$TERMUX_ON_DEVICE_BUILD" = "false" ]] && echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
 	echo "  -c Continue previous build."
 	echo "  -C Cleanup already built packages on low disk space."
 	echo "  -d Build with debug symbols."
 	echo "  -D Build a disabled package in disabled-packages/."
 	echo "  -f Force build even if package has already been built."
 	echo "  -F Force build even if package and its dependencies have already been built."
-	[ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && echo "  -i Download and extract dependencies instead of building them."
+	[[ "$TERMUX_ON_DEVICE_BUILD" = "false" ]] && echo "  -i Download and extract dependencies instead of building them."
 	echo "  -I Download and extract dependencies instead of building them, keep existing $TERMUX_BASE_DIR files."
 	echo "  -L The package and its dependencies will be based on the same library."
 	echo "  -q Quiet build."
@@ -595,7 +595,7 @@ unset -f _show_usage
 
 # Dependencies should be used from repo only if they are built for
 # same package name.
-if [ "$TERMUX_REPO_APP__PACKAGE_NAME" != "$TERMUX_APP_PACKAGE" ]; then
+if [[ "$TERMUX_REPO_APP__PACKAGE_NAME" != "$TERMUX_APP_PACKAGE" ]]; then
 	echo "Ignoring -i option to download dependencies since repo package name ($TERMUX_REPO_APP__PACKAGE_NAME) does not equal app package name ($TERMUX_APP_PACKAGE)"
 	TERMUX_INSTALL_DEPS=false
 fi
@@ -605,21 +605,21 @@ case "$TERMUX_REPO_PKG_FORMAT" in
 	*) termux_error_exit "'pkg_format' is incorrectly specified in repo.json file. Only 'debian' and 'pacman' formats are supported";;
 esac
 
-if [ -n "${TERMUX_PACKAGE_FORMAT-}" ]; then
+if [[ -n "${TERMUX_PACKAGE_FORMAT-}" ]]; then
 	case "${TERMUX_PACKAGE_FORMAT-}" in
 		debian|pacman) :;;
 		*) termux_error_exit "Unsupported package format \"${TERMUX_PACKAGE_FORMAT-}\". Only 'debian' and 'pacman' formats are supported";;
 	esac
 fi
 
-if [ -n "${TERMUX_PACKAGE_LIBRARY-}" ]; then
+if [[ -n "${TERMUX_PACKAGE_LIBRARY-}" ]]; then
 	case "${TERMUX_PACKAGE_LIBRARY-}" in
 		bionic|glibc) :;;
 		*) termux_error_exit "Unsupported library \"${TERMUX_PACKAGE_LIBRARY-}\". Only 'bionic' and 'glibc' library are supported";;
 	esac
 fi
 
-if [ "${TERMUX_INSTALL_DEPS-false}" = "true" ] || [ "${TERMUX_PACKAGE_LIBRARY-bionic}" = "glibc" ]; then
+if [[ "${TERMUX_INSTALL_DEPS-false}" = "true" || "${TERMUX_PACKAGE_LIBRARY-bionic}" = "glibc" ]]; then
 	# Setup PGP keys for verifying integrity of dependencies.
 	# Keys are obtained from our keyring package.
 	gpg --list-keys 2C7F29AE97891F6419A9E2CDB0076E490B71616B > /dev/null 2>&1 || {
@@ -643,7 +643,7 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 	# To provide sane environment for each package, builds are done
 	# in subshell.
 	(
-		if ! $TERMUX_BUILD_IGNORE_LOCK; then
+		if [[ "$TERMUX_BUILD_IGNORE_LOCK" != "true" ]]; then
 			flock -n 5 || termux_error_exit "Another build is already running within same environment."
 		fi
 
@@ -676,25 +676,25 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		export TERMUX_PKG_BUILDER_DIR=
 		if [[ ${PACKAGE_LIST[i]} == *"/"* ]]; then
 			# Path to directory which may be outside this repo:
-			if [ ! -d "${PACKAGE_LIST[i]}" ]; then termux_error_exit "'${PACKAGE_LIST[i]}' seems to be a path but is not a directory"; fi
-			export TERMUX_PKG_BUILDER_DIR=$(realpath "${PACKAGE_LIST[i]}")
+			if [[ ! -d "${PACKAGE_LIST[i]}" ]]; then termux_error_exit "'${PACKAGE_LIST[i]}' seems to be a path but is not a directory"; fi
+			TERMUX_PKG_BUILDER_DIR="$(realpath "${PACKAGE_LIST[i]}")"
 		else
 			# Package name:
 			for package_directory in $TERMUX_PACKAGES_DIRECTORIES; do
-				if [ -d "${TERMUX_SCRIPTDIR}/${package_directory}/${TERMUX_PKG_NAME}" ]; then
-					export TERMUX_PKG_BUILDER_DIR=${TERMUX_SCRIPTDIR}/$package_directory/$TERMUX_PKG_NAME
+				if [[ -d "${TERMUX_SCRIPTDIR}/${package_directory}/${TERMUX_PKG_NAME}" ]]; then
+					export TERMUX_PKG_BUILDER_DIR="${TERMUX_SCRIPTDIR}/$package_directory/$TERMUX_PKG_NAME"
 					break
-				elif [ -n "${TERMUX_IS_DISABLED=""}" ] && [ -d "${TERMUX_SCRIPTDIR}/disabled-packages/${TERMUX_PKG_NAME}" ]; then
-					export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/disabled-packages/$TERMUX_PKG_NAME
+				elif [[ -n "${TERMUX_IS_DISABLED=""}" && -d "${TERMUX_SCRIPTDIR}/disabled-packages/${TERMUX_PKG_NAME}" ]]; then
+					export TERMUX_PKG_BUILDER_DIR="$TERMUX_SCRIPTDIR/disabled-packages/$TERMUX_PKG_NAME"
 					break
 				fi
 			done
-			if [ -z "${TERMUX_PKG_BUILDER_DIR}" ]; then
+			if [[ -z "${TERMUX_PKG_BUILDER_DIR}" ]]; then
 				termux_error_exit "No package $TERMUX_PKG_NAME found in any of the enabled repositories. Are you trying to set up a custom repository?"
 			fi
 		fi
 		TERMUX_PKG_BUILDER_SCRIPT=$TERMUX_PKG_BUILDER_DIR/build.sh
-		if test ! -f "$TERMUX_PKG_BUILDER_SCRIPT"; then
+		if [[ ! -f "$TERMUX_PKG_BUILDER_SCRIPT" ]]; then
 			termux_error_exit "No build.sh script at package dir $TERMUX_PKG_BUILDER_DIR!"
 		fi
 
@@ -708,9 +708,9 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 			echo "${TERMUX_PKG_BUILDER_DIR#${TERMUX_SCRIPTDIR}/}" >> $TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH
 		fi
 
-		if [ "$TERMUX_CONTINUE_BUILD" == "false" ]; then
+		if [[ "$TERMUX_CONTINUE_BUILD" == "false" ]]; then
 			termux_step_get_dependencies
-			if [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
+			if [[ "$TERMUX_PACKAGE_LIBRARY" == "glibc" ]]; then
 				termux_step_setup_cgct_environment
 			fi
 			termux_step_override_config_scripts
@@ -718,7 +718,7 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 
 		termux_step_create_timestamp_file
 
-		if [ "$TERMUX_CONTINUE_BUILD" == "false" ]; then
+		if [[ "$TERMUX_CONTINUE_BUILD" == "false" ]]; then
 			cd "$TERMUX_PKG_CACHEDIR"
 			termux_step_get_source
 			cd "$TERMUX_PKG_SRCDIR"
@@ -728,7 +728,7 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 
 		termux_step_setup_toolchain
 
-		if [ "$TERMUX_CONTINUE_BUILD" == "false" ]; then
+		if [[ "$TERMUX_CONTINUE_BUILD" == "false" ]]; then
 			termux_step_get_dependencies_python
 			termux_step_patch_package
 			termux_step_replace_guess_scripts
@@ -740,7 +740,7 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		# to tools so need to run part of configure step
 		termux_run_base_and_multilib_build_step termux_step_configure
 
-		if [ "$TERMUX_CONTINUE_BUILD" == "false" ]; then
+		if [[ "$TERMUX_CONTINUE_BUILD" == "false" ]]; then
 			cd "$TERMUX_PKG_BUILDDIR"
 			termux_step_post_configure
 		fi
@@ -760,7 +760,7 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL"
 		termux_step_post_massage
 		# At the final stage (when the package is archiving) it is better to use commands from the system
-		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+		if [[ "$TERMUX_ON_DEVICE_BUILD" = "false" ]]; then
 			export PATH="/usr/bin:$PATH"
 		fi
 		cd "$TERMUX_PKG_MASSAGEDIR"
@@ -779,7 +779,7 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 done
 
 # Removing a file to store a list of compiled packages
-if [ "$TERMUX_BUILD_PACKAGE_CALL_DEPTH" = "0" ]; then
+if (( ! TERMUX_BUILD_PACKAGE_CALL_DEPTH )); then
 	rm "$TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH"
 	rm "$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH"
 fi
