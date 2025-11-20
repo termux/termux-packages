@@ -25,9 +25,12 @@ TERMUX_SCRIPTDIR=$(pwd)
 export TERMUX_SCRIPTDIR
 
 # Store pid of current process in a file for docker__run_docker_exec_trap
-source "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"; docker__create_docker_exec_pid_file
+# shellcheck source=scripts/utils/docker/docker.sh
+source "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"
+docker__create_docker_exec_pid_file
 
 # Source the `termux_package` library.
+# shellcheck source=scripts/utils/termux/package/termux_package.sh
 source "$TERMUX_SCRIPTDIR/scripts/utils/termux/package/termux_package.sh"
 
 export SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH:-$(git -c log.showSignature=false log -1 --pretty=%ct 2>/dev/null || date "+%s")}
@@ -77,7 +80,7 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_download.sh"
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_proot.sh"
 
 # Utility function to setup blueprint-compiler (may be used by gnome-calculator and epiphany).
-# shellcheck source=scripts/build/setup/termux_setup_bpc.sh.
+# shellcheck source=scripts/build/setup/termux_setup_bpc.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_bpc.sh"
 
 # Installing packages if necessary for the full operation of CGCT.
@@ -85,7 +88,7 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_bpc.sh"
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_setup_cgct_environment.sh"
 
 # Utility function to setup capnproto (may be used by bitcoin).
-# shellcheck source=scripts/build/setup/termux_setup_capnp.sh.
+# shellcheck source=scripts/build/setup/termux_setup_capnp.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_capnp.sh"
 
 # Utility function for setting up Cargo C-ABI helpers.
@@ -117,7 +120,7 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ghc.sh"
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ghc_iserv.sh"
 
 # Utility function to setup cabal-install (may be used by ghc toolchain).
-# shellcheck source=scripts/build/setup/termux_setup_cabal.sh.
+# shellcheck source=scripts/build/setup/termux_setup_cabal.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_cabal.sh"
 
 # Utility function to setup jailbreak-cabal. It is used to remove version constraints
@@ -414,10 +417,11 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_finish_build.sh"
 ################################################################################
 
 # shellcheck source=scripts/properties.sh
-. "$TERMUX_SCRIPTDIR/scripts/properties.sh"
+source "$TERMUX_SCRIPTDIR/scripts/properties.sh"
 
 if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 	# Setup TERMUX_APP_PACKAGE_MANAGER
+	# shellcheck source=/dev/null
 	source "$TERMUX_PREFIX/bin/termux-setup-package-manager"
 
 	# For on device builds cross compiling is not supported.
