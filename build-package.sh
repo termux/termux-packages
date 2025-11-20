@@ -648,23 +648,25 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		fi
 
 		# Handle 'all' arch:
-		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && [ -n "${TERMUX_ARCH+x}" ] && [ "${TERMUX_ARCH}" = 'all' ]; then
+		if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" && -n "${TERMUX_ARCH+x}" && "${TERMUX_ARCH}" == 'all' ]]; then
+			_SELF_ARGS=()
+			[[ "${TERMUX_CLEANUP_BUILT_PACKAGES_ON_LOW_DISK_SPACE:-}" == "true" ]] && _SELF_ARGS+=("-C")
+			[[ "${TERMUX_DEBUG_BUILD:-}" == "true" ]] && _SELF_ARGS+=("-d")
+			[[ "${TERMUX_IS_DISABLED:-}" == "true" ]] && _SELF_ARGS+=("-D")
+			[[ "${TERMUX_FORCE_BUILD:-}" == "true" && "${TERMUX_FORCE_BUILD_DEPENDENCIES:-}" != "true" ]] && _SELF_ARGS+=("-f")
+			[[ "${TERMUX_FORCE_BUILD:-}" == "true" && "${TERMUX_FORCE_BUILD_DEPENDENCIES:-}" == "true" ]] && _SELF_ARGS+=("-F")
+			[[ "${TERMUX_INSTALL_DEPS:-}" == "true" && "${TERMUX_PKGS__BUILD__RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES:-}" != "false" ]] && _SELF_ARGS+=("-i")
+			[[ "${TERMUX_INSTALL_DEPS:-}" == "true" && "${TERMUX_PKGS__BUILD__RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES:-}" == "false" ]] && _SELF_ARGS+=("-I")
+			[[ "${TERMUX_GLOBAL_LIBRARY:-}" == "true" ]] && _SELF_ARGS+=("-L")
+			[[ -n "${TERMUX_OUTPUT_DIR:-}" ]] && _SELF_ARGS+=("-o" "$TERMUX_OUTPUT_DIR")
+			[[ "${TERMUX_PKGS__BUILD__RM_ALL_PKG_BUILD_DEPENDENT_DIRS:-}" == "true" ]] && _SELF_ARGS+=("-r")
+			[[ "${TERMUX_WITHOUT_DEPVERSION_BINDING:-}" == "true" ]] && _SELF_ARGS+=("-w")
+			[[ -n "${TERMUX_PACKAGE_FORMAT:-}" ]] && _SELF_ARGS+=("--format" "$TERMUX_PACKAGE_FORMAT")
+			[[ -n "${TERMUX_PACKAGE_LIBRARY:-}" ]] && _SELF_ARGS+=("--library" "$TERMUX_PACKAGE_LIBRARY")
+
 			for arch in 'aarch64' 'arm' 'i686' 'x86_64'; do
 				env TERMUX_ARCH="$arch" TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh \
-					 $(test "${TERMUX_CLEANUP_BUILT_PACKAGES_ON_LOW_DISK_SPACE:-}" = "true" && echo "-C") \
-					 $(test "${TERMUX_DEBUG_BUILD:-}" = "true" && echo "-d") \
-					 $(test "${TERMUX_IS_DISABLED:-}" = "true" && echo "-D") \
-					 $({ test "${TERMUX_FORCE_BUILD:-}" = "true" && test "${TERMUX_FORCE_BUILD_DEPENDENCIES:-}" != "true"; } && echo "-f") \
-					 $({ test "${TERMUX_FORCE_BUILD:-}" = "true" && test "${TERMUX_FORCE_BUILD_DEPENDENCIES:-}" = "true"; } && echo "-F") \
-					 $({ test "${TERMUX_INSTALL_DEPS:-}" = "true" && test "${TERMUX_PKGS__BUILD__RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES:-}" != "false"; } && echo "-i") \
-					 $({ test "${TERMUX_INSTALL_DEPS:-}" = "true" && test "${TERMUX_PKGS__BUILD__RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES:-}" = "false"; } && echo "-I") \
-					 $(test "${TERMUX_GLOBAL_LIBRARY:-}" = "true" && echo "-L") \
-					 $(test -n "${TERMUX_OUTPUT_DIR:-}" && echo "-o $TERMUX_OUTPUT_DIR") \
-					 $(test "${TERMUX_PKGS__BUILD__RM_ALL_PKG_BUILD_DEPENDENT_DIRS:-}" = "true" && echo "-r") \
-					 $(test "${TERMUX_WITHOUT_DEPVERSION_BINDING:-}" = "true" && echo "-w") \
-					 $(test -n "${TERMUX_PACKAGE_FORMAT:-}" && echo "--format $TERMUX_PACKAGE_FORMAT") \
-					 $(test -n "${TERMUX_PACKAGE_LIBRARY:-}" && echo "--library $TERMUX_PACKAGE_LIBRARY") \
-					"${PACKAGE_LIST[i]}"
+					"${_SELF_ARGS[@]}" "${PACKAGE_LIST[i]}"
 			done
 			exit
 		fi
