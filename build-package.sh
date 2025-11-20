@@ -528,63 +528,49 @@ _show_usage() {
 
 declare -a PACKAGE_LIST=()
 
-if [ "$#" -lt 1 ]; then _show_usage; fi
-while (($# >= 1)); do
+(( $# )) || _show_usage
+while (( $# )); do
 	case "$1" in
 		--) shift 1; break;;
 		-h|--help) _show_usage;;
 		--format)
-			if [ $# -ge 2 ]; then
-				shift 1
-				if [ -z "$1" ]; then
-					termux_error_exit "./build-package.sh: argument to '--format' should not be empty"
-				fi
-				export TERMUX_PACKAGE_FORMAT="$1"
-			else
+			if [[ -z "${2-}" ]]; then
 				termux_error_exit "./build-package.sh: option '--format' requires an argument"
 			fi
-			;;
+			shift 1
+			export TERMUX_PACKAGE_FORMAT="$1"
+		;;
 		--library)
-			if [ $# -ge 2 ]; then
-				shift
-				if [ -z "$1" ]; then
-					termux_error_exit "./build-package.sh: argument to '--library' should not be empty"
-				fi
-				export TERMUX_PACKAGE_LIBRARY="$1"
-			else
+			if [[ -z "${2-}" ]]; then
 				termux_error_exit "./build-package.sh: option '--library' requires an argument"
 			fi
-			;;
+			shift 1
+			export TERMUX_PACKAGE_LIBRARY="$1"
+		;;
 		-a)
-			if [ $# -ge 2 ]; then
-				shift 1
-				if [ -z "$1" ]; then
-					termux_error_exit "Argument to '-a' should not be empty."
-				fi
-				if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
-					termux_error_exit "./build-package.sh: option '-a' is not available for on-device builds"
-				else
-					export TERMUX_ARCH="$1"
-				fi
-			else
+			if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
+				termux_error_exit "./build-package.sh: option '-a' is not available for on-device builds"
+			fi
+			if [[ -z "${2-}" ]]; then
 				termux_error_exit "./build-package.sh: option '-a' requires an argument"
 			fi
-			;;
+			shift 1
+			export TERMUX_ARCH="$1"
+		;;
 		-d) export TERMUX_DEBUG_BUILD=true;;
 		-D) TERMUX_IS_DISABLED=true;;
 		-f) TERMUX_FORCE_BUILD=true;;
 		-F) TERMUX_FORCE_BUILD_DEPENDENCIES=true && TERMUX_FORCE_BUILD=true;;
 		-i)
-			if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+			if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
 				termux_error_exit "./build-package.sh: option '-i' is not available for on-device builds"
-			else
-				export TERMUX_INSTALL_DEPS=true
 			fi
-			;;
+			export TERMUX_INSTALL_DEPS=true
+		;;
 		-I)
 			export TERMUX_INSTALL_DEPS=true
 			export TERMUX_PKGS__BUILD__RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES=false
-			;;
+		;;
 		-L) export TERMUX_GLOBAL_LIBRARY=true;;
 		-q) export TERMUX_QUIET_BUILD=true;;
 		-Q) export PS4='+$0 \[\e[32m\]${FUNCNAME[0]:-<global scope>}${FUNCNAME[*]:+()}:$LINENO\[\e[0m\] '; set -x;;
@@ -592,16 +578,12 @@ while (($# >= 1)); do
 		-w) export TERMUX_WITHOUT_DEPVERSION_BINDING=true;;
 		-s) export TERMUX_SKIP_DEPCHECK=true;;
 		-o)
-			if [ $# -ge 2 ]; then
-				shift 1
-				if [ -z "$1" ]; then
-					termux_error_exit "./build-package.sh: argument to '-o' should not be empty"
-				fi
-				TERMUX_OUTPUT_DIR=$(realpath -m "$1")
-			else
+			if [[ -z "${2-}" ]]; then
 				termux_error_exit "./build-package.sh: option '-o' requires an argument"
 			fi
-			;;
+			shift 1
+			TERMUX_OUTPUT_DIR="$(realpath -m "$1")"
+		;;
 		-c) TERMUX_CONTINUE_BUILD=true;;
 		-C) TERMUX_CLEANUP_BUILT_PACKAGES_ON_LOW_DISK_SPACE=true;;
 		-*) termux_error_exit "./build-package.sh: illegal option '$1'";;
