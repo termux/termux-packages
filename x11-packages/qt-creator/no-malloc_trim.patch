@@ -1,0 +1,13 @@
+diff --git a/src/plugins/coreplugin/icore.cpp b/src/plugins/coreplugin/icore.cpp
+index e1416f31..235e6d27 100644
+--- a/src/plugins/coreplugin/icore.cpp
++++ b/src/plugins/coreplugin/icore.cpp
+@@ -1494,7 +1494,7 @@ void ICorePrivate::init()
+         using namespace std::chrono_literals;
+         m_trimTimer.setInterval(60s);
+         // glibc may not actually free memory in free().
+-#ifdef Q_OS_LINUX
++#if defined(Q_OS_LINUX) && !defined(__ANDROID__)
+         connect(&m_trimTimer, &QTimer::timeout, this, [] { malloc_trim(0); });
+ #endif
+     }

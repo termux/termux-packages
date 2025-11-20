@@ -1,0 +1,11 @@
+--- a/src/libs/nanotrace/nanotracehr.cpp
++++ b/src/libs/nanotrace/nanotracehr.cpp
+@@ -104,7 +104,7 @@ std::string getThreadName()
+ {
+     std::array<char, 200> buffer;
+     buffer[0] = 0;
+-#ifdef Q_OS_UNIX
++#if (defined(Q_OS_UNIX) && !defined(__ANDROID__)) || (defined(__ANDROID__) && __ANDROID_API__ >= 26)
+     auto rc = pthread_getname_np(pthread_self(), buffer.data(), buffer.size());
+     if (rc != 0)
+         return {};

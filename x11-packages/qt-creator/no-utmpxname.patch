@@ -1,0 +1,13 @@
+diff --git a/src/libs/3rdparty/libptyqt/unixptyprocess.cpp b/src/libs/3rdparty/libptyqt/unixptyprocess.cpp
+index d76349a4..85cfd3f9 100644
+--- a/src/libs/3rdparty/libptyqt/unixptyprocess.cpp
++++ b/src/libs/3rdparty/libptyqt/unixptyprocess.cpp
+@@ -323,7 +323,7 @@ void ShellProcess::configChildProcess()
+     ioctl(m_handleSlave, TIOCSCTTY, 0);
+     tcsetpgrp(m_handleSlave, sid);
+ 
+-#if !defined(Q_OS_ANDROID) && !defined(Q_OS_FREEBSD)
++#if !defined(Q_OS_ANDROID) && !defined(Q_OS_FREEBSD) && !defined(__ANDROID__)
+     // on Android imposible to put record to the 'utmp' file
+     struct utmpx utmpxInfo;
+     memset(&utmpxInfo, 0, sizeof(utmpxInfo));
