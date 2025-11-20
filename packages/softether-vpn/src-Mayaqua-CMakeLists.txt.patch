@@ -1,0 +1,13 @@
+Avoids https://github.com/open-quantum-safe/liboqs/issues/2324
+
+--- a/src/Mayaqua/3rdparty/liboqs/.CMake/alg_support.cmake
++++ b/src/Mayaqua/3rdparty/liboqs/.CMake/alg_support.cmake
+@@ -105,7 +105,7 @@ cmake_dependent_option(OQS_ENABLE_KEM_frodokem_976_shake "" ON "OQS_ENABLE_KEM_F
+ cmake_dependent_option(OQS_ENABLE_KEM_frodokem_1344_aes "" ON "OQS_ENABLE_KEM_FRODOKEM" OFF)
+ cmake_dependent_option(OQS_ENABLE_KEM_frodokem_1344_shake "" ON "OQS_ENABLE_KEM_FRODOKEM" OFF)
+ 
+-option(OQS_ENABLE_KEM_NTRUPRIME "Enable ntruprime algorithm family" ON)
++option(OQS_ENABLE_KEM_NTRUPRIME "Enable ntruprime algorithm family" OFF)
+ cmake_dependent_option(OQS_ENABLE_KEM_ntruprime_sntrup761 "" ON "OQS_ENABLE_KEM_NTRUPRIME" OFF)
+ if(CMAKE_SYSTEM_NAME MATCHES "Linux|Darwin")
+ if(OQS_DIST_X86_64_BUILD OR (OQS_USE_AVX2_INSTRUCTIONS))
