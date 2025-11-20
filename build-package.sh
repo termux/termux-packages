@@ -1,5 +1,4 @@
 #!/bin/bash
-# shellcheck disable=SC1117
 
 # Setting the TMPDIR variable
 : "${TMPDIR:=/tmp}"
