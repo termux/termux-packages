@@ -18,7 +18,7 @@ else
 	touch "$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH"
 fi
 
-set -e -o pipefail -u
+set -euo pipefail
 
 cd "$(realpath "$(dirname "$0")")"
 TERMUX_SCRIPTDIR=$(pwd)
@@ -41,8 +41,8 @@ if [[ "$(uname -o)" == "Android" || -e "/system/bin/app_process" ]]; then
 		exit 1
 	fi
 
-	# This variable tells all parts of build system that build
-	# is performed on device.
+	# This variable tells all parts of build system that
+	# the build is being performed on device.
 	export TERMUX_ON_DEVICE_BUILD=true
 else
 	export TERMUX_ON_DEVICE_BUILD=false
@@ -61,7 +61,8 @@ if [[ ! -e "$TERMUX_BUILD_LOCK_FILE" ]]; then
 	touch "$TERMUX_BUILD_LOCK_FILE"
 fi
 
-export TERMUX_REPO_PKG_FORMAT=$(jq --raw-output '.pkg_format // "debian"' ${TERMUX_SCRIPTDIR}/repo.json)
+TERMUX_REPO_PKG_FORMAT="$(jq --raw-output '.pkg_format // "debian"' "${TERMUX_SCRIPTDIR}/repo.json")"
+export TERMUX_REPO_PKG_FORMAT
 
 # Special variable for internal use. It forces script to ignore
 # lock file.
@@ -461,7 +462,7 @@ termux_check_package_in_building_packages_list() {
 # Configure variables (TERMUX_ARCH, TERMUX__PREFIX__INCLUDE_DIR, TERMUX__PREFIX__LIB_DIR) for multilib-compilation
 termux_conf_multilib_vars() {
 	# Change the 64-bit architecture type to its 32-bit counterpart in the `TERMUX_ARCH` variable
-	case $TERMUX_ARCH in
+	case "$TERMUX_ARCH" in
 		"aarch64") TERMUX_ARCH="arm";;
 		"x86_64") TERMUX_ARCH="i686";;
 		*) termux_error_exit "It is impossible to set multilib arch for ${TERMUX_ARCH} arch."
@@ -499,7 +500,7 @@ sudo() {
 _show_usage() {
 	echo "Usage: ./build-package.sh [options] PACKAGE_1 PACKAGE_2 ..."
 	echo
-	echo "Build a package by creating a .deb file in the debs/ folder."
+	echo "Build a package by creating a .deb file in the output/ folder."
 	echo
 	echo "Available options:"
 	[[ "$TERMUX_ON_DEVICE_BUILD" = "false" ]] && echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
@@ -520,7 +521,7 @@ _show_usage() {
 	echo "     flags are not passed."
 	echo "  -w Install dependencies without version binding."
 	echo "  -s Skip dependency check."
-	echo "  -o Specify directory where to put built packages. Default: output/."
+	echo "  -o Specify directory where to put built packages. Default: output/"
 	echo "  --format Specify package output format (debian, pacman)."
 	echo "  --library Specify library of package (bionic, glibc)."
 	exit 1
@@ -624,24 +625,25 @@ if [[ "${TERMUX_INSTALL_DEPS-false}" = "true" || "${TERMUX_PACKAGE_LIBRARY-bioni
 	# Keys are obtained from our keyring package.
 	gpg --list-keys 2C7F29AE97891F6419A9E2CDB0076E490B71616B > /dev/null 2>&1 || {
 		gpg --import "$TERMUX_SCRIPTDIR/packages/termux-keyring/grimler.gpg"
-		gpg --no-tty --command-file <(echo -e "trust\n5\ny")  --edit-key 2C7F29AE97891F6419A9E2CDB0076E490B71616B
+		gpg --no-tty --command-file <(echo -e "trust\n5\ny") --edit-key 2C7F29AE97891F6419A9E2CDB0076E490B71616B
 	}
 	gpg --list-keys CC72CF8BA7DBFA0182877D045A897D96E57CF20C > /dev/null 2>&1 || {
 		gpg --import "$TERMUX_SCRIPTDIR/packages/termux-keyring/termux-autobuilds.gpg"
-		gpg --no-tty --command-file <(echo -e "trust\n5\ny")  --edit-key CC72CF8BA7DBFA0182877D045A897D96E57CF20C
+		gpg --no-tty --command-file <(echo -e "trust\n5\ny") --edit-key CC72CF8BA7DBFA0182877D045A897D96E57CF20C
 	}
 	gpg --list-keys 998DE27318E867EA976BA877389CEED64573DFCA > /dev/null 2>&1 || {
 		gpg --import "$TERMUX_SCRIPTDIR/packages/termux-keyring/termux-pacman.gpg"
-		gpg --no-tty --command-file <(echo -e "trust\n5\ny")  --edit-key 998DE27318E867EA976BA877389CEED64573DFCA
+		gpg --no-tty --command-file <(echo -e "trust\n5\ny") --edit-key 998DE27318E867EA976BA877389CEED64573DFCA
 	}
 fi
 
-for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
+for (( i=0; i < ${#PACKAGE_LIST[@]}; i++ )); do
 	# Following commands must be executed under lock to prevent running
 	# multiple instances of "./build-package.sh".
 	#
-	# To provide sane environment for each package, builds are done
-	# in subshell.
+	# To provide a sane environment for each package,
+	# builds are done in an explicit subshell for each.
+	# shellcheck disable=SC2031
 	(
 		if [[ "$TERMUX_BUILD_IGNORE_LOCK" != "true" ]]; then
 			flock -n 5 || termux_error_exit "Another build is already running within same environment."
@@ -672,14 +674,15 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		fi
 
 		# Check the package to build:
-		TERMUX_PKG_NAME=$(basename "${PACKAGE_LIST[i]}")
-		export TERMUX_PKG_BUILDER_DIR=
+		TERMUX_PKG_NAME="$(basename "${PACKAGE_LIST[i]}")"
+		TERMUX_PKG_BUILDER_DIR=""
 		if [[ ${PACKAGE_LIST[i]} == *"/"* ]]; then
 			# Path to directory which may be outside this repo:
 			if [[ ! -d "${PACKAGE_LIST[i]}" ]]; then termux_error_exit "'${PACKAGE_LIST[i]}' seems to be a path but is not a directory"; fi
 			TERMUX_PKG_BUILDER_DIR="$(realpath "${PACKAGE_LIST[i]}")"
 		else
 			# Package name:
+			# FIXME: TERMUX_PACKAGES_DIRECTORIES should be made into an array.
 			for package_directory in $TERMUX_PACKAGES_DIRECTORIES; do
 				if [[ -d "${TERMUX_SCRIPTDIR}/${package_directory}/${TERMUX_PKG_NAME}" ]]; then
 					export TERMUX_PKG_BUILDER_DIR="${TERMUX_SCRIPTDIR}/$package_directory/$TERMUX_PKG_NAME"
@@ -693,6 +696,7 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 				termux_error_exit "No package $TERMUX_PKG_NAME found in any of the enabled repositories. Are you trying to set up a custom repository?"
 			fi
 		fi
+		export TERMUX_PKG_BUILDER_DIR
 		TERMUX_PKG_BUILDER_SCRIPT=$TERMUX_PKG_BUILDER_DIR/build.sh
 		if [[ ! -f "$TERMUX_PKG_BUILDER_SCRIPT" ]]; then
 			termux_error_exit "No build.sh script at package dir $TERMUX_PKG_BUILDER_DIR!"
@@ -704,8 +708,8 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		termux_step_cleanup_packages
 		termux_step_start_build
 
-		if ! termux_check_package_in_building_packages_list "${TERMUX_PKG_BUILDER_DIR#${TERMUX_SCRIPTDIR}/}"; then
-			echo "${TERMUX_PKG_BUILDER_DIR#${TERMUX_SCRIPTDIR}/}" >> $TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH
+		if ! termux_check_package_in_building_packages_list "${TERMUX_PKG_BUILDER_DIR#"${TERMUX_SCRIPTDIR}/"}"; then
+			echo "${TERMUX_PKG_BUILDER_DIR#"${TERMUX_SCRIPTDIR}/"}" >> "$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH"
 		fi
 
 		if [[ "$TERMUX_CONTINUE_BUILD" == "false" ]]; then
@@ -769,9 +773,9 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 			pacman) termux_step_create_pacman_package;;
 			*) termux_error_exit "Unknown package format '$TERMUX_PACKAGE_FORMAT'.";;
 		esac
-		# Saving a list of compiled packages for further work with it
-		if termux_check_package_in_building_packages_list "${TERMUX_PKG_BUILDER_DIR#${TERMUX_SCRIPTDIR}/}"; then
-			sed -i "\|^${TERMUX_PKG_BUILDER_DIR#${TERMUX_SCRIPTDIR}/}$|d" "$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH"
+		# Save a list of compiled packages for further work with it
+		if termux_check_package_in_building_packages_list "${TERMUX_PKG_BUILDER_DIR#"${TERMUX_SCRIPTDIR}/"}"; then
+			sed -i "\|^${TERMUX_PKG_BUILDER_DIR#"${TERMUX_SCRIPTDIR}/"}$|d" "$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH"
 		fi
 		termux_add_package_to_built_packages_list "$TERMUX_PKG_NAME"
 		termux_step_finish_build
