@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/schollz/croc
 TERMUX_PKG_DESCRIPTION="Easily and securely send things from one computer to another"
 TERMUX_PKG_LICENSE=MIT
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1:10.2.7"
+TERMUX_PKG_VERSION="1:10.3.0"
 TERMUX_PKG_SRCURL=https://github.com/schollz/croc/archive/refs/tags/v${TERMUX_PKG_VERSION:2}.tar.gz
-TERMUX_PKG_SHA256=eea957c840041e11cc214b5f9c31801b0f8b51621d6629b89ba5743788d8e7c6
+TERMUX_PKG_SHA256=ca0ee9694ddc98ca55f77cf9d8eb123af10bf8674fec8e356c2edc43f5705532
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
