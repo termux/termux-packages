@@ -9,6 +9,8 @@ TERMUX_PKG_DEPENDS="bash, bzip2, coreutils, curl, file, findutils, gzip, ncurses
 TERMUX_PKG_SUGGESTS="bash-completion, termux-api"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 termux_step_make_install() {
 	env TERMUX_APP_PACKAGE="$TERMUX_APP_PACKAGE" \
