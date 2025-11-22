@@ -106,6 +106,16 @@
     <member name="WEBKIT_JAVASCRIPT_ERROR_INVALID_RESULT" nick="invalid-result" value="601"/>
   </enum>  <enum name="WebKitSnapshotError" get-type="webkit_snapshot_error_get_type">
     <member name="WEBKIT_SNAPSHOT_ERROR_FAILED_TO_CREATE" nick="create" value="799"/>
+  </enum>  <enum name="WebKitWebExtensionError" get-type="webkit_web_extension_error_get_type">
+    <member name="WEBKIT_WEB_EXTENSION_ERROR_UNKNOWN" nick="unknown" value="899"/>
+    <member name="WEBKIT_WEB_EXTENSION_ERROR_RESOURCE_NOT_FOUND" nick="resource-not-found" value="800"/>
+    <member name="WEBKIT_WEB_EXTENSION_ERROR_INVALID_RESOURCE_CODE_SIGNATURE" nick="invalid-resource-code-signature" value="801"/>
+    <member name="WEBKIT_WEB_EXTENSION_ERROR_INVALID_MANIFEST" nick="invalid-manifest" value="802"/>
+    <member name="WEBKIT_WEB_EXTENSION_ERROR_UNSUPPORTED_MANIFEST_VERSION" nick="unsupported-manifest-version" value="803"/>
+    <member name="WEBKIT_WEB_EXTENSION_ERROR_INVALID_MANIFEST_ENTRY" nick="invalid-manifest-entry" value="804"/>
+    <member name="WEBKIT_WEB_EXTENSION_ERROR_INVALID_DECLARATIVE_NET_REQUEST_ENTRY" nick="invalid-declarative-net-request-entry" value="805"/>
+    <member name="WEBKIT_WEB_EXTENSION_ERROR_INVALID_BACKGROUND_PERSISTENCE" nick="invalid-background-persistence" value="806"/>
+    <member name="WEBKIT_WEB_EXTENSION_ERROR_INVALID_ARCHIVE" nick="invalid-archive" value="807"/>
   </enum>  <enum name="WebKitWebExtensionMatchPatternError" get-type="webkit_web_extension_match_pattern_error_get_type">
     <member name="WEBKIT_WEB_EXTENSION_MATCH_PATTERN_ERROR_UNKNOWN" nick="unknown" value="899"/>
     <member name="WEBKIT_WEB_EXTENSION_MATCH_PATTERN_ERROR_INVALID_SCHEME" nick="invalid-scheme" value="808"/>
@@ -266,7 +276,20 @@
     <member name="WEBKIT_AUTOPLAY_ALLOW" nick="allow" value="0"/>
     <member name="WEBKIT_AUTOPLAY_ALLOW_WITHOUT_SOUND" nick="allow-without-sound" value="1"/>
     <member name="WEBKIT_AUTOPLAY_DENY" nick="deny" value="2"/>
-  </enum>  <boxed name="WebKitApplicationInfo" get-type="webkit_application_info_get_type"/>
+  </enum>  <enum name="WebKitXRSessionMode" get-type="webkit_xr_session_mode_get_type">
+    <member name="WEBKIT_XR_SESSION_MODE_INLINE" nick="inline" value="0"/>
+    <member name="WEBKIT_XR_SESSION_MODE_IMMERSIVE_VR" nick="immersive-vr" value="1"/>
+    <member name="WEBKIT_XR_SESSION_MODE_IMMERSIVE_AR" nick="immersive-ar" value="2"/>
+  </enum>  <flags name="WebKitXRSessionFeatures" get-type="webkit_xr_session_features_get_type">
+    <member name="WEBKIT_XR_SESSION_FEATURES_VIEWER" nick="viewer" value="1"/>
+    <member name="WEBKIT_XR_SESSION_FEATURES_LOCAL" nick="local" value="2"/>
+    <member name="WEBKIT_XR_SESSION_FEATURES_LOCAL_FLOOR" nick="local-floor" value="4"/>
+    <member name="WEBKIT_XR_SESSION_FEATURES_BOUNDED_FLOOR" nick="bounded-floor" value="8"/>
+    <member name="WEBKIT_XR_SESSION_FEATURES_UNBOUNDED" nick="unbounded" value="16"/>
+    <member name="WEBKIT_XR_SESSION_FEATURES_HAND_TRACKING" nick="hand-tracking" value="32"/>
+    <member name="WEBKIT_XR_SESSION_FEATURES_HIT_TEST" nick="hit-test" value="64"/>
+  </flags>
+  <boxed name="WebKitApplicationInfo" get-type="webkit_application_info_get_type"/>
   <boxed name="WebKitCredential" get-type="webkit_credential_get_type"/>
   <boxed name="WebKitSecurityOrigin" get-type="webkit_security_origin_get_type"/>
   <class name="WebKitAuthenticationRequest" get-type="webkit_authentication_request_get_type" parents="GObject" final="1">
@@ -390,6 +413,13 @@
     <property name="image-uri" type="gchararray" flags="235" default-value="NULL"/>
     <property name="media-uri" type="gchararray" flags="235" default-value="NULL"/>
   </class>
+  <class name="WebKitImage" get-type="webkit_image_get_type" parents="GObject" final="1">
+    <implements name="GIcon"/>
+    <implements name="GLoadableIcon"/>
+    <property name="width" type="gint" flags="235" default-value="1"/>
+    <property name="height" type="gint" flags="235" default-value="1"/>
+    <property name="stride" type="guint" flags="235" default-value="4"/>
+  </class>
   <class name="WebKitInputMethodContext" get-type="webkit_input_method_context_get_type" parents="GObject" abstract="1">
     <property name="input-purpose" type="WebKitInputPurpose" flags="227" default-value="WEBKIT_INPUT_PURPOSE_FREE_FORM"/>
     <property name="input-hints" type="WebKitInputHints" flags="227" default-value="WEBKIT_INPUT_HINT_NONE"/>
@@ -458,7 +488,7 @@
     <property name="enable-html5-local-storage" type="gboolean" flags="231" default-value="TRUE"/>
     <property name="enable-html5-database" type="gboolean" flags="231" default-value="TRUE"/>
     <property name="javascript-can-open-windows-automatically" type="gboolean" flags="231" default-value="FALSE"/>
-    <property name="enable-hyperlink-auditing" type="gboolean" flags="231" default-value="TRUE"/>
+    <property name="enable-hyperlink-auditing" type="gboolean" flags="-2147483417" default-value="TRUE"/>
     <property name="default-font-family" type="gchararray" flags="231" default-value="sans-serif"/>
     <property name="monospace-font-family" type="gchararray" flags="231" default-value="monospace"/>
     <property name="serif-font-family" type="gchararray" flags="231" default-value="serif"/>
@@ -466,6 +496,7 @@
     <property name="cursive-font-family" type="gchararray" flags="231" default-value="serif"/>
     <property name="fantasy-font-family" type="gchararray" flags="231" default-value="serif"/>
     <property name="pictograph-font-family" type="gchararray" flags="231" default-value="serif"/>
+    <property name="math-font-family" type="gchararray" flags="231" default-value="NULL"/>
     <property name="default-font-size" type="guint" flags="231" default-value="16"/>
     <property name="default-monospace-font-size" type="guint" flags="231" default-value="13"/>
     <property name="minimum-font-size" type="guint" flags="231" default-value="0"/>
@@ -496,7 +527,7 @@
     <property name="enable-spatial-navigation" type="gboolean" flags="231" default-value="FALSE"/>
     <property name="enable-mediasource" type="gboolean" flags="231" default-value="TRUE"/>
     <property name="enable-encrypted-media" type="gboolean" flags="231" default-value="FALSE"/>
-    <property name="enable-media-capabilities" type="gboolean" flags="231" default-value="FALSE"/>
+    <property name="enable-media-capabilities" type="gboolean" flags="231" default-value="TRUE"/>
     <property name="allow-file-access-from-file-urls" type="gboolean" flags="231" default-value="FALSE"/>
     <property name="allow-universal-access-from-file-urls" type="gboolean" flags="231" default-value="FALSE"/>
     <property name="allow-top-navigation-to-data-urls" type="gboolean" flags="231" default-value="FALSE"/>
@@ -573,7 +604,6 @@
       <param type="WebKitUserMessage"/>
     </signal>
   </class>
-  <boxed name="WebKitWebExtensionMatchPattern" get-type="webkit_web_extension_match_pattern_get_type"/>
   <class name="WebKitWebResource" get-type="webkit_web_resource_get_type" parents="GObject" final="1">
     <property name="uri" type="gchararray" flags="225" default-value="NULL"/>
     <property name="response" type="WebKitURIResponse" flags="225"/>
@@ -655,6 +685,8 @@
     <property name="display-capture-state" type="WebKitMediaCaptureState" flags="227" default-value="WEBKIT_MEDIA_CAPTURE_STATE_NONE"/>
     <property name="web-extension-mode" type="WebKitWebExtensionMode" flags="235" default-value="WEBKIT_WEB_EXTENSION_MODE_NONE"/>
     <property name="default-content-security-policy" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="theme-color" type="GdkRGBA" flags="225"/>
+    <property name="is-immersive-mode-enabled" type="gboolean" flags="225" default-value="FALSE"/>
     <signal name="close" return="void" when="last">
     </signal>
     <signal name="user-message-received" return="gboolean" when="last">
@@ -743,6 +775,9 @@
   <class name="WebKitWebsiteDataAccessPermissionRequest" get-type="webkit_website_data_access_permission_request_get_type" parents="GObject" final="1">
     <implements name="WebKitPermissionRequest"/>
   </class>
+  <class name="WebKitXRPermissionRequest" get-type="webkit_xr_permission_request_get_type" parents="GObject" final="1">
+    <implements name="WebKitPermissionRequest"/>
+  </class>
   <class name="WebKitPointerLockPermissionRequest" get-type="webkit_pointer_lock_permission_request_get_type" parents="GObject" final="1">
     <implements name="WebKitPermissionRequest"/>
   </class>
@@ -756,12 +791,35 @@
       <param type="GError"/>
     </signal>
   </class>
+  <boxed name="WebKitWebExtensionMatchPattern" get-type="webkit_web_extension_match_pattern_get_type"/>
+  <class name="WebKitWebExtension" get-type="webkit_web_extension_get_type" parents="GObject" final="1">
+    <implements name="GInitable"/>
+    <property name="path" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="manifest-version" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="default-locale" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="display-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="display-short-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="display-version" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="display-description" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="display-action-label" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="version" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="requested-permissions" type="GStrv" flags="225"/>
+    <property name="optional-permissions" type="GStrv" flags="225"/>
+    <property name="has-background-content" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="has-persistent-background-content" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="has-injected-content" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="has-options-page" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="has-override-new-tab-page" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="has-commands" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="has-content-modification-rules" type="gboolean" flags="225" default-value="FALSE"/>
+  </class>
   <error-quark function="webkit_network_error_quark" domain="WebKitNetworkError"/>
   <error-quark function="webkit_policy_error_quark" domain="WebKitPolicyError"/>
   <error-quark function="webkit_download_error_quark" domain="WebKitDownloadError"/>
   <error-quark function="webkit_print_error_quark" domain="WebKitPrintError"/>
   <error-quark function="webkit_javascript_error_quark" domain="WebKitJavascriptError"/>
   <error-quark function="webkit_snapshot_error_quark" domain="WebKitSnapshotError"/>
+  <error-quark function="webkit_web_extension_error_quark" domain="WebKitWebExtensionError"/>
   <error-quark function="webkit_web_extension_match_pattern_error_quark" domain="WebKitWebExtensionMatchPatternError"/>
   <error-quark function="webkit_user_content_filter_error_quark" domain="WebKitUserContentFilterError"/>
   <error-quark function="webkit_media_error_quark" domain="WebKitMediaError"/>
