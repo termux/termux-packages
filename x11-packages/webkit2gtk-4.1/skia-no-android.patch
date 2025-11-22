@@ -1,33 +1,16 @@
-+++ ./Source/ThirdParty/skia/CMakeLists.txt
-@@ -789,7 +789,7 @@
-     modules/skcms/src/skcms_TransformSkx.cc
- )
+--- a/Source/ThirdParty/skia/CMakeLists.txt
++++ b/Source/ThirdParty/skia/CMakeLists.txt
+@@ -820,7 +820,7 @@ else ()
+     )
+     target_link_libraries(Skia PRIVATE Freetype::Freetype)
  
--if (ANDROID)
-+if (FALSE)
-     target_sources(Skia PRIVATE
-         src/ports/SkDebug_android.cpp
-         src/ports/SkFontMgr_android.cpp
-+++ ./Source/WebCore/platform/graphics/skia/FontCacheSkia.cpp
-@@ -38,7 +38,7 @@
- #include "SystemSettings.h"
- #endif
- 
--#if defined(__ANDROID__) || defined(ANDROID)
-+#if 0
- #include <skia/ports/SkFontMgr_android.h>
- #elif PLATFORM(WIN)
- #include <dwrite.h>
-@@ -56,7 +56,7 @@
- SkFontMgr& FontCache::fontManager() const
- {
-     if (!m_fontManager) {
--#if defined(__ANDROID__) || defined(ANDROID)
-+#if 0
-         m_fontManager = SkFontMgr_New_Android(nullptr);
- #elif OS(WINDOWS)
-         auto result = createDWriteFactory();
-+++ ./Source/ThirdParty/skia/src/ports/SkDebug_stdio.cpp
+-    if (ANDROID)
++    if (FALSE)
+         target_sources(Skia PRIVATE
+             src/ports/SkDebug_android.cpp
+             src/ports/SkFontMgr_android.cpp
+--- a/Source/ThirdParty/skia/src/ports/SkDebug_stdio.cpp
++++ b/Source/ThirdParty/skia/src/ports/SkDebug_stdio.cpp
 @@ -9,7 +9,7 @@
  #include "include/private/base/SkFeatures.h"
  #include "include/private/base/SkLoadUserConfig.h"
