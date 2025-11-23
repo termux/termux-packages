@@ -1,0 +1,21 @@
+--- a/src/3rdparty/chromium/third_party/crashpad/crashpad/util/file/file_io_posix.cc
++++ b/src/3rdparty/chromium/third_party/crashpad/crashpad/util/file/file_io_posix.cc
+@@ -19,6 +19,7 @@
+ #include <sys/file.h>
+ #include <sys/mman.h>
+ #include <sys/stat.h>
++#include <sys/syscall.h>
+ #include <unistd.h>
+ 
+ #include <algorithm>
+@@ -33,6 +34,10 @@
+ #include "build/build_config.h"
+ #include "util/misc/random_string.h"
+ 
++#if defined(__ANDROID__) && __ANDROID_API__ < 30
++#define memfd_create(name,flags) syscall(SYS_memfd_create,name,flags)
++#endif
++
+ namespace crashpad {
+ 
+ namespace {
