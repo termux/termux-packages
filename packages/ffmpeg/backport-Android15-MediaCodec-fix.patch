@@ -1,0 +1,236 @@
+From 4531cc1b325b50a77fa22981f44a25fbce025a5e Mon Sep 17 00:00:00 2001
+From: Dmitrii Okunev <xaionaro@dx.center>
+Date: Sat, 22 Nov 2025 19:57:19 +0000
+Subject: [PATCH] fftools: Fix MediaCodec on Android15+
+
+On Android15+ MediaCodec HAL backend was switched from HIDL to AIDL.
+As a result, MediaCodec operations started to hang, see:
+
+    https://trac.ffmpeg.org/ticket/11363
+    https://github.com/termux/termux-packages/issues/21264
+    https://issuetracker.google.com/issues/382831999
+
+To fix that it is necessary to initialize binder thread pool.
+
+Signed-off-by: Dmitrii Okunev <xaionaro@dx.center>
+---
+ compat/android/binder.c | 114 ++++++++++++++++++++++++++++++++++++++++
+ compat/android/binder.h |  31 +++++++++++
+ configure               |   3 +-
+ fftools/Makefile        |   1 +
+ fftools/ffmpeg.c        |   7 +++
+ 5 files changed, 155 insertions(+), 1 deletion(-)
+ create mode 100644 compat/android/binder.c
+ create mode 100644 compat/android/binder.h
+
+diff --git a/compat/android/binder.c b/compat/android/binder.c
+new file mode 100644
+index 0000000000..a214d977cc
+--- /dev/null
++++ b/compat/android/binder.c
+@@ -0,0 +1,114 @@
++/*
++ * Android Binder handler
++ *
++ * Copyright (c) 2025 Dmitrii Okunev
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++
++#if defined(__ANDROID__)
++
++#include <dlfcn.h>
++#include <stdint.h>
++#include <stdlib.h>
++
++#include "libavutil/log.h"
++#include "binder.h"
++
++#define THREAD_POOL_SIZE 1
++
++static void *dlopen_libbinder_ndk(void)
++{
++    /*
++     * libbinder_ndk.so often does not contain the functions we need, so making
++     * this dependency optional, thus using dlopen/dlsym instead of linking.
++     *
++     * See also: https://source.android.com/docs/core/architecture/aidl/aidl-backends
++     */
++
++    void *h = dlopen("libbinder_ndk.so", RTLD_NOW | RTLD_LOCAL);
++    if (h != NULL)
++        return h;
++
++    av_log(NULL, AV_LOG_WARNING,
++           "android/binder: unable to load libbinder_ndk.so: '%s'; skipping binder threadpool init (MediaCodec likely won't work)\n",
++           dlerror());
++    return NULL;
++}
++
++static void android_binder_threadpool_init(void)
++{
++    typedef int (*set_thread_pool_max_fn)(uint32_t);
++    typedef void (*start_thread_pool_fn)(void);
++
++    set_thread_pool_max_fn set_thread_pool_max = NULL;
++    start_thread_pool_fn start_thread_pool = NULL;
++
++    void *h = dlopen_libbinder_ndk();
++    if (h == NULL)
++        return;
++
++    unsigned thead_pool_size = THREAD_POOL_SIZE;
++
++    set_thread_pool_max =
++        (set_thread_pool_max_fn) dlsym(h,
++                                       "ABinderProcess_setThreadPoolMaxThreadCount");
++    start_thread_pool =
++        (start_thread_pool_fn) dlsym(h, "ABinderProcess_startThreadPool");
++
++    if (start_thread_pool == NULL) {
++        av_log(NULL, AV_LOG_WARNING,
++               "android/binder: ABinderProcess_startThreadPool not found; skipping threadpool init (MediaCodec likely won't work)\n");
++        return;
++    }
++
++    if (set_thread_pool_max != NULL) {
++        int ok = set_thread_pool_max(thead_pool_size);
++        av_log(NULL, AV_LOG_DEBUG,
++               "android/binder: ABinderProcess_setThreadPoolMaxThreadCount(%u) => %s\n",
++               thead_pool_size, ok ? "ok" : "fail");
++    } else {
++        av_log(NULL, AV_LOG_DEBUG,
++               "android/binder: ABinderProcess_setThreadPoolMaxThreadCount is unavailable; using the library default\n");
++    }
++
++    start_thread_pool();
++    av_log(NULL, AV_LOG_DEBUG,
++           "android/binder: ABinderProcess_startThreadPool() called\n");
++}
++
++void android_binder_threadpool_init_if_required(void)
++{
++#if __ANDROID_API__ >= 24
++    if (android_get_device_api_level() < 35) {
++        // the issue with the thread pool was introduced in Android 15 (API 35)
++        av_log(NULL, AV_LOG_DEBUG,
++               "android/binder: API<35, thus no need to initialize a thread pool\n");
++        return;
++    }
++    android_binder_threadpool_init();
++#else
++    // android_get_device_api_level was introduced in API 24, so we cannot use it
++    // to detect the API level in API<24. For simplicity we just assume
++    // libbinder_ndk.so on the system running this code would have API level < 35;
++    av_log(NULL, AV_LOG_DEBUG,
++           "android/binder: is built with API<24, assuming this is not Android 15+\n");
++#endif
++}
++
++#endif                          /* __ANDROID__ */
+diff --git a/compat/android/binder.h b/compat/android/binder.h
+new file mode 100644
+index 0000000000..2b1ca53fe8
+--- /dev/null
++++ b/compat/android/binder.h
+@@ -0,0 +1,31 @@
++/*
++ * Android Binder handler
++ *
++ * Copyright (c) 2025 Dmitrii Okunev
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#ifndef COMPAT_ANDROID_BINDER_H
++#define COMPAT_ANDROID_BINDER_H
++
++/**
++ * Initialize Android Binder thread pool.
++ */
++void android_binder_threadpool_init_if_required(void);
++
++#endif                          // COMPAT_ANDROID_BINDER_H
+diff --git a/configure b/configure
+index af125bc115..098fe12f39 100755
+--- a/configure
++++ b/configure
+@@ -7312,7 +7312,8 @@ enabled mbedtls           && { check_pkg_config mbedtls mbedtls mbedtls/x509_crt
+                                check_pkg_config mbedtls mbedtls mbedtls/ssl.h mbedtls_ssl_init ||
+                                check_lib mbedtls mbedtls/ssl.h mbedtls_ssl_init -lmbedtls -lmbedx509 -lmbedcrypto ||
+                                die "ERROR: mbedTLS not found"; }
+-enabled mediacodec        && { enabled jni || die "ERROR: mediacodec requires --enable-jni"; }
++enabled mediacodec        && { enabled jni || die "ERROR: mediacodec requires --enable-jni"; } &&
++                               add_compat android/binder.o
+ enabled mmal              && { check_lib mmal interface/mmal/mmal.h mmal_port_connect -lmmal_core -lmmal_util -lmmal_vc_client -lbcm_host ||
+                                { ! enabled cross_compile &&
+                                  add_cflags -isystem/opt/vc/include/ -isystem/opt/vc/include/interface/vmcs_host/linux -isystem/opt/vc/include/interface/vcos/pthreads -fgnu89-inline &&
+diff --git a/fftools/Makefile b/fftools/Makefile
+index bdb44fc5ce..01b16fa8f4 100644
+--- a/fftools/Makefile
++++ b/fftools/Makefile
+@@ -51,6 +51,7 @@ OBJS-ffprobe +=                       \
+     fftools/textformat/tw_buffer.o    \
+     fftools/textformat/tw_stdout.o    \
+ 
++OBJS-ffmpeg += $(COMPAT_OBJS:%=compat/%)
+ OBJS-ffplay += fftools/ffplay_renderer.o
+ 
+ define DOFFTOOL
+diff --git a/fftools/ffmpeg.c b/fftools/ffmpeg.c
+index 444d027c15..c2c85d46bd 100644
+--- a/fftools/ffmpeg.c
++++ b/fftools/ffmpeg.c
+@@ -78,6 +78,9 @@
+ #include "libavdevice/avdevice.h"
+ 
+ #include "cmdutils.h"
++#if CONFIG_MEDIACODEC
++#include "compat/android/binder.h"
++#endif
+ #include "ffmpeg.h"
+ #include "ffmpeg_sched.h"
+ #include "ffmpeg_utils.h"
+@@ -1019,6 +1022,10 @@ int main(int argc, char **argv)
+         goto finish;
+     }
+ 
++#if CONFIG_MEDIACODEC
++    android_binder_threadpool_init_if_required();
++#endif
++
+     current_time = ti = get_benchmark_time_stamps();
+     ret = transcode(sch);
+     if (ret >= 0 && do_benchmark) {
+-- 
+2.49.1
+
