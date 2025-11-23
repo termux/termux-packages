@@ -1,0 +1,24 @@
+--- a/src/3rdparty/chromium/build/config/compiler/BUILD.gn
++++ b/src/3rdparty/chromium/build/config/compiler/BUILD.gn
+@@ -1306,8 +1306,8 @@
+       }
+     } else if (current_cpu == "arm") {
+       if (is_clang && !is_android && !is_nacl && !is_chromeos_device) {
+-        cflags += [ "--target=arm-linux-gnueabihf" ]
+-        ldflags += [ "--target=arm-linux-gnueabihf" ]
++        cflags += [ "--target=armv7a-linux-androideabi24" ]
++        ldflags += [ "--target=armv7a-linux-androideabi24" ]
+       }
+       if (!is_nacl) {
+         cflags += ["-mfloat-abi=$arm_float_abi"]
+@@ -1324,8 +1324,8 @@
+     } else if (current_cpu == "arm64") {
+       if (is_clang && !is_android && !is_nacl && !is_fuchsia &&
+           !is_chromeos_device) {
+-        cflags += [ "--target=aarch64-linux-gnu" ]
+-        ldflags += [ "--target=aarch64-linux-gnu" ]
++        cflags += [ "--target=aarch64-linux-android24" ]
++        ldflags += [ "--target=aarch64-linux-android24" ]
+       }
+     } else if (current_cpu == "mipsel" && !is_nacl) {
+       ldflags += [ "-Wl,--hash-style=sysv" ]
