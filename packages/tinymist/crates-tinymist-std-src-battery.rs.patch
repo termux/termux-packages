@@ -1,0 +1,31 @@
+diff --git a/crates/tinymist-std/src/battery.rs b/crates/tinymist-std/src/battery.rs
+index 31046f0..ca3a7ba 100644
+--- a/crates/tinymist-std/src/battery.rs
++++ b/crates/tinymist-std/src/battery.rs
+@@ -1,6 +1,6 @@
+ //! Battery-related utilities.
+ 
+-#[cfg(feature = "system")]
++#[cfg(not(target_os = "android"))]
+ mod system {
+     /// Detects if the system is currently in power saving mode.
+     pub fn is_power_saving() -> bool {
+@@ -20,15 +20,15 @@ mod system {
+             .unwrap_or(false)
+     }
+ }
+-#[cfg(feature = "system")]
++#[cfg(not(target_os = "android"))]
+ pub use system::*;
+ 
+-#[cfg(not(feature = "system"))]
++#[cfg(target_os = "android")]
+ mod other {
+     /// Detects if the system is currently in power saving mode.
+     pub fn is_power_saving() -> bool {
+         false
+     }
+ }
+-#[cfg(not(feature = "system"))]
++#[cfg(target_os = "android")]
+ pub use other::*;
