@@ -1,6 +1,7 @@
 TERMUX_SUBPKG_INCLUDE="lib/python*"
 TERMUX_SUBPKG_DESCRIPTION="Python bindings for OpenCV"
 TERMUX_SUBPKG_DEPENDS="python, python-numpy"
+TERMUX_SUBPKG_RECOMMENDS="python-opencv-python"
 
 termux_step_create_subpkg_debscripts() {
 	_NUMPY_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python-numpy/build.sh; echo $TERMUX_PKG_VERSION)
