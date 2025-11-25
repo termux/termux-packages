@@ -1,0 +1,23 @@
+This forces github.com/opencv/opencv-python to only install the
+files that don't exist in the other preexisting
+termux opencv and opencv-python packages, i.e. *dist-info folders.
+
+--- a/setup.py
++++ b/setup.py
+@@ -271,7 +271,7 @@ def main():
+         description="Wrapper package for OpenCV python bindings.",
+         long_description=long_description,
+         long_description_content_type="text/markdown",
+-        packages=packages,
++        packages={},
+         package_data=package_data,
+         maintainer="OpenCV Team",
+         ext_modules=EmptyListWithLength(),
+@@ -378,6 +378,7 @@ class RearrangeCMakeOutput:
+                     subpackage\
+                         etc.
+         """
++        return
+ 
+         cls = self.__class__
+ 
