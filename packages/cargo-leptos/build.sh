@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Build tool for the Rust framework Leptos"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.3.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/leptos-rs/cargo-leptos/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f22cd9e89266006bc9d0aeeb9d6152cf6d5f126d96a5ea3434283dfdd227979f
 TERMUX_PKG_AUTO_UPDATE=true
