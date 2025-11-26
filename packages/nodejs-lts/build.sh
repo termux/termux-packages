@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environme
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
 # Also update version in termux_setup_nodejs.sh when updating this package
-TERMUX_PKG_VERSION=22.20.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=22.21.1
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=ff7a6a6e8a1312af5875e40058351c4f890d28ab64c32f12b2cc199afa22002d
+TERMUX_PKG_SHA256=487d73fd4db00dc2420d659a8221b181a7937fbc5bc73f31c30b1680ad6ded6a
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
@@ -32,16 +31,16 @@ termux_step_host_build() {
 	######
 	# Do host-build of ICU, which is required for nodejs
 	######
-	local ICU_VERSION=76.1
-	local ICU_TAR=icu4c-${ICU_VERSION//./_}-src.tgz
-	local ICU_DOWNLOAD=https://github.com/unicode-org/icu/releases/download/release-${ICU_VERSION//./-}/$ICU_TAR
+	local ICU_VERSION=78.1
+	local ICU_TAR=icu4c-${ICU_VERSION}-sources.tgz
+	local ICU_DOWNLOAD=https://github.com/unicode-org/icu/releases/download/release-${ICU_VERSION}/$ICU_TAR
 	export CC="$TERMUX_HOST_LLVM_BASE_DIR/bin/clang"
 	export CXX="$TERMUX_HOST_LLVM_BASE_DIR/bin/clang++"
 	export LD="$TERMUX_HOST_LLVM_BASE_DIR/bin/clang++"
 	termux_download \
 		$ICU_DOWNLOAD\
 		$TERMUX_PKG_CACHEDIR/$ICU_TAR \
-		dfacb46bfe4747410472ce3e1144bf28a102feeaa4e3875bac9b4c6cf30f4f3e
+		6217f58ca39b23127605cfc6c7e0d3475fe4b0d63157011383d716cb41617886
 	tar xf $TERMUX_PKG_CACHEDIR/$ICU_TAR
 	cd icu/source
 	if [ "$TERMUX_ARCH_BITS" = 32 ]; then
