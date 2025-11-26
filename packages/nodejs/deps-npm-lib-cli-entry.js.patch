@@ -1,11 +1,11 @@
-diff -u -r ../node-v20.14.0/deps/npm/lib/cli/entry.js ./deps/npm/lib/cli/entry.js
---- ../node-v20.14.0/deps/npm/lib/cli/entry.js	2024-05-28 04:57:54.000000000 +0000
-+++ ./deps/npm/lib/cli/entry.js	2024-05-30 19:57:14.804332523 +0000
-@@ -64,13 +64,6 @@
+Disable update check for npm
+--- ./deps/npm/lib/cli/entry.js.orig	2025-11-13 23:01:06.006769023 +0530
++++ ./deps/npm/lib/cli/entry.js	2025-11-13 23:01:09.000312729 +0530
+@@ -57,13 +57,6 @@
  
      const execPromise = npm.exec(command, args)
  
--    // this is async but we dont await it, since its ok if it doesnt
+-    // this is async but we don't await it, since its ok if it doesnt
 -    // finish before the command finishes running. it uses command and argv
 -    // so it must be initiated here, after the command name is set
 -    const updateNotifier = require('./update-notifier.js')
@@ -13,5 +13,5 @@ diff -u -r ../node-v20.14.0/deps/npm/lib/cli/entry.js ./deps/npm/lib/cli/entry.j
 -    updateNotifier(npm).then((msg) => (npm.updateNotification = msg))
 -
      await execPromise
-     return exitHandler()
+     return exitHandler.exit()
    } catch (err) {
