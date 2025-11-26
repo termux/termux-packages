@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE, NOTICE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.5.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/skylot/jadx/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=db7434e881bdebe4b7eae60805ce9d92cde5beeaf07b7bf14239621cb45a3047
 TERMUX_PKG_DEPENDS="openjdk-21"
@@ -15,7 +16,11 @@ termux_step_make() {
 	export JADX_VERSION="$TERMUX_PKG_VERSION"
 	./gradlew clean dist
 
-	sed -i "s#CLASSPATH=\$APP_HOME/lib/jadx-$TERMUX_PKG_VERSION-all.jar#CLASSPATH=$TERMUX_PREFIX/share/java/jadx-$TERMUX_PKG_VERSION-all.jar#g" "$TERMUX_PKG_SRCDIR"/build/jadx/bin/jadx
+	local exe
+	for exe in jadx jadx-gui; do
+		sed -i "s#CLASSPATH=\$APP_HOME/lib#CLASSPATH=$TERMUX_PREFIX/share/java#g" \
+			"$TERMUX_PKG_SRCDIR/build/jadx/bin/$exe"
+	done
 }
 
 termux_step_make_install() {
