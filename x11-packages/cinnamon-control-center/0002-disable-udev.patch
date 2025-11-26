@@ -7,10 +7,10 @@ index a0e558c..ce88137 100644
  glib        = dependency('glib-2.0',        version: '>=2.44.0')
  gio_unix    = dependency('gio-unix-2.0',    version: '>=2.44.0')
 -gudev_dep   = dependency('gudev-1.0',       version: '>= 232')
- libgnomekbd = dependency('libgnomekbd',     version: '>=3.0.0')
- libgnomekbdui=dependency('libgnomekbdui',   version: '>=3.0.0')
  libnotify   = dependency('libnotify',       version: '>=0.7.3')
-@@ -43,6 +42,14 @@ else
+ libx11      = dependency('x11')
+ upower_glib_dep = dependency('upower-glib', version: '>= 0.99.8')
+@@ -40,6 +39,14 @@ else
  endif
  config.set10('HAVE_POLKIT', have_polkit)
  
@@ -20,12 +20,12 @@ index a0e558c..ce88137 100644
 +else
 +  gudev_dep = dependency('', required: false)
 +endif
-+config.set('HAVE_UDEV', have_udev) 
++config.set('HAVE_UDEV', have_udev)
 +
  config.set('HAVE_X11_EXTENSIONS_XKB_H', cc.has_header('X11/extensions/XKB.h'))
  
  ###############################################################################
-@@ -187,6 +194,7 @@ final_message = [ '',
+@@ -178,6 +185,7 @@ final_message = [ '',
    '** Colord support (Color management panel)         : @0@'.format(colord.found()),
    '** Wacom support (Wacom panel)                     : @0@'.format(libwacom.found()),
    '** Polkit support                                  : @0@'.format(have_polkit),
@@ -163,7 +163,7 @@ diff --git a/panels/common/meson.build b/panels/common/meson.build
 index 0cf7b69..c95d332 100644
 --- a/panels/common/meson.build
 +++ b/panels/common/meson.build
-@@ -60,7 +60,11 @@ csd_sources = [
+@@ -36,7 +36,11 @@ csd_sources = [
  
  sources = common_sources + files(csd_sources)
  

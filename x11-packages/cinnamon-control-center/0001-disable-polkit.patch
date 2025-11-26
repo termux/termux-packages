@@ -2,12 +2,11 @@ diff --git a/meson.build b/meson.build
 index 992b5a3..a0e558c 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -33,9 +33,15 @@ libgnomekbd = dependency('libgnomekbd',     version: '>=3.0.0')
- libgnomekbdui=dependency('libgnomekbdui',   version: '>=3.0.0')
+@@ -31,8 +31,14 @@ gio_unix    = dependency('gio-unix-2.0',    version: '>=2.44.0')
+ gudev_dep   = dependency('gudev-1.0',       version: '>= 232')
  libnotify   = dependency('libnotify',       version: '>=0.7.3')
  libx11      = dependency('x11')
 -polkit_gobj = dependency('polkit-gobject-1',version: '>=0.103')
- libxklavier = dependency('libxklavier',     version: '>=5.1')
  upower_glib_dep = dependency('upower-glib', version: '>= 0.99.8')
 +have_polkit = get_option('polkit')
 +if have_polkit
@@ -19,7 +18,7 @@ index 992b5a3..a0e558c 100644
  
  config.set('HAVE_X11_EXTENSIONS_XKB_H', cc.has_header('X11/extensions/XKB.h'))
  
-@@ -180,6 +186,7 @@ final_message = [ '',
+@@ -171,6 +177,7 @@ final_message = [ '',
    '** ModemManager support                            : @0@'.format(modemmanager.found()),
    '** Colord support (Color management panel)         : @0@'.format(colord.found()),
    '** Wacom support (Wacom panel)                     : @0@'.format(libwacom.found()),
