@@ -90,27 +90,21 @@ diff --git a/plugins/color/generate-tz-header.py b/plugins/color/generate-tz-hea
 index cc1d399..4b53e6a 100755
 --- a/plugins/color/generate-tz-header.py
 +++ b/plugins/color/generate-tz-header.py
-@@ -1,11 +1,11 @@
--#!/usr/bin/python3
-+#!@TERMUX_PREFIX@/bin/python3
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python3
++#!@TERMUX_PREFIX@/bin/env python3
  
  import re
+ from argparse import ArgumentParser
+@@ -10,7 +10,7 @@ d = {}
  
- d = {}
+ parser = ArgumentParser(prog='generate-tz-header',
+                         description='Generate tz-coords.h header from timezone-data')
+-parser.add_argument('-i', '--zone_tab', nargs='?', default='/usr/share/zoneinfo/zone.tab', type=Path)
++parser.add_argument('-i', '--zone_tab', nargs='?', default='@TERMUX_PREFIX@/share/zoneinfo/zone.tab', type=Path)
+ parser.add_argument('-o', '--out_file', nargs='?', default='tz-coords.h', type=Path)
+ args = parser.parse_args()
  
- 
--with open("/usr/share/zoneinfo/zone.tab", "r") as f:
-+with open("@TERMUX_PREFIX@/share/zoneinfo/zone.tab", "r") as f:
-     for line in f:
-         if line.startswith("#"):
-             continue
-@@ -47,4 +47,4 @@ header += "};"
- with open("tz-coords.h", "w") as f:
-     f.write(header)
- 
--quit()
-\ No newline at end of file
-+quit()
 diff --git a/plugins/datetime/csd-datetime-mechanism-debian.c b/plugins/datetime/csd-datetime-mechanism-debian.c
 index e554881..a4e3b79 100644
 --- a/plugins/datetime/csd-datetime-mechanism-debian.c
