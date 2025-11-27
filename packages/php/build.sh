@@ -32,7 +32,7 @@ php_cv_lib_gd_gdImageCreateFromTga=yes
 --enable-calendar
 --enable-exif
 --enable-mbstring
---enable-opcache
+--with-capstone
 --enable-pcntl
 --enable-sockets
 --mandir=$TERMUX_PREFIX/share/man
