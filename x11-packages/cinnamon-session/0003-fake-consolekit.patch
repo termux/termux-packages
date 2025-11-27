@@ -2,23 +2,20 @@ diff --git a/cinnamon-session/csm-consolekit.c b/cinnamon-session/csm-consolekit
 index c947778..0c1f519 100644
 --- a/cinnamon-session/csm-consolekit.c
 +++ b/cinnamon-session/csm-consolekit.c
-@@ -28,6 +28,8 @@
+@@ -25,11 +25,13 @@
+ #include <sys/types.h>
+ #include <pwd.h>
+ 
++#ifndef FAKE_CONSOLEKIT
  #include <glib.h>
  #include <glib-object.h>
  #include <glib/gi18n.h>
-+
-+#ifndef FAKE_CONSOLEKIT
  #include <gio/gio.h>
  #include <gio/gunixfdlist.h>
- 
-@@ -35,6 +37,7 @@
- #define UPOWER_ENABLE_DEPRECATED 1
- #include <upower.h>
- #endif
 +#endif
  
+ 
  #include "csm-system.h"
- #include "csm-consolekit.h"
 @@ -49,6 +52,7 @@
  
  struct _CsmConsolekitPrivate
@@ -55,7 +52,7 @@ index c947778..0c1f519 100644
  static void
  drop_system_inhibitor (CsmConsolekit *manager)
  {
-@@ -96,25 +106,31 @@ drop_delay_inhibitor (CsmConsolekit *manager)
+@@ -98,22 +99,27 @@ drop_delay_inhibitor (CsmConsolekit *manager)
                  manager->priv->delay_inhibit_fd = -1;
          }
  }
@@ -76,16 +73,11 @@ index c947778..0c1f519 100644
          if (consolekit->priv->inhibitors != NULL) {
                  g_slist_free_full (consolekit->priv->inhibitors, g_free);
          }
-+
 +#ifndef FAKE_CONSOLEKIT
          drop_system_inhibitor (consolekit);
          drop_delay_inhibitor (consolekit);
- 
- #ifdef HAVE_OLD_UPOWER
--        g_clear_object (&manager->priv->up_client);
-+        g_clear_object (&consolekit->priv->up_client);
 +#endif
- #endif
+ 
  
          G_OBJECT_CLASS (csm_consolekit_parent_class)->finalize (object);
 @@ -171,6 +187,7 @@ csm_consolekit_class_init (CsmConsolekitClass *manager_class)
@@ -314,7 +306,7 @@ index c947778..0c1f519 100644
          CsmConsolekit *manager = CSM_CONSOLEKIT (system);
          int res;
          gboolean ret;
-@@ -598,11 +683,17 @@ csm_consolekit_is_login_session (CsmSystem *system)
+@@ -662,11 +668,17 @@ csm_consolekit_is_login_session (CsmSystem *system)
          g_free (session_class);
  
          return ret;
@@ -329,13 +321,13 @@ index c947778..0c1f519 100644
  csm_consolekit_can_suspend (CsmSystem *system)
  {
 +#ifndef FAKE_CONSOLEKIT
- #ifdef HAVE_OLD_UPOWER
-         CsmConsolekit *consolekit = CSM_CONSOLEKIT (system);
-         return up_client_get_can_suspend (consolekit->priv->up_client);
-@@ -635,11 +726,17 @@ csm_consolekit_can_suspend (CsmSystem *system)
+         CsmConsolekit *manager = CSM_CONSOLEKIT (system);
+         gchar *rv;
+         GVariant *res;
+@@ -694,11 +706,17 @@ csm_consolekit_can_suspend (CsmSystem *system)
+         g_free (rv);
  
          return can_suspend;
- #endif
 +#else
 +        g_debug ("CsmConsolekit: Termux can_suspend - FALSE");
 +        /* Suspend is not supported in Termux */
@@ -347,13 +339,13 @@ index c947778..0c1f519 100644
  csm_consolekit_can_hibernate (CsmSystem *system)
  {
 +#ifndef FAKE_CONSOLEKIT
- #ifdef HAVE_OLD_UPOWER
-         CsmConsolekit *consolekit = CSM_CONSOLEKIT (system);
-         return up_client_get_can_hibernate (consolekit->priv->up_client);
-@@ -672,8 +769,14 @@ csm_consolekit_can_hibernate (CsmSystem *system)
+         CsmConsolekit *manager = CSM_CONSOLEKIT (system);
+         gchar *rv;
+         GVariant *res;
+@@ -726,8 +744,14 @@ csm_consolekit_can_hibernate (CsmSystem *system)
+         g_free (rv);
  
          return can_hibernate;
- #endif
 +#else
 +        g_debug ("CsmConsolekit: Termux can_hibernate - FALSE");
 +        /* Hibernate is not supported in Termux */
@@ -365,7 +357,7 @@ index c947778..0c1f519 100644
  static void
  suspend_done (GObject      *source,
                GAsyncResult *result,
-@@ -711,10 +814,12 @@ hibernate_done (GObject      *source,
+@@ -765,10 +789,12 @@ hibernate_done (GObject      *source,
                  g_variant_unref (res);
          }
  }
@@ -375,9 +367,9 @@ index c947778..0c1f519 100644
  csm_consolekit_suspend (CsmSystem *system, gboolean suspend_then_hibernate)
  {
 +#ifndef FAKE_CONSOLEKIT
- #ifdef HAVE_OLD_UPOWER
-         CsmConsolekit *consolekit = CSM_CONSOLEKIT (system);
-         GError *error = NULL;
+         CsmConsolekit *manager = CSM_CONSOLEKIT (system);
+ 
+         gchar *method = "Suspend";
 @@ -728,11 +833,11 @@ csm_consolekit_suspend (CsmSystem *system, gboolean suspend_then_hibernate)
  #else
          CsmConsolekit *manager = CSM_CONSOLEKIT (system);
@@ -395,10 +387,10 @@ index c947778..0c1f519 100644
  
          g_dbus_proxy_call (manager->priv->ck_proxy,
                             method,
-@@ -743,11 +848,16 @@ csm_consolekit_suspend (CsmSystem *system, gboolean suspend_then_hibernate)
+@@ -785,11 +811,16 @@ csm_consolekit_suspend (CsmSystem *system, gboolean suspend_then_hibernate)
+                            NULL,
                             suspend_done,
                             manager);
- #endif
 +#else
 +        g_debug ("CsmConsolekit: Termux suspend attempt - not supported");
 +        g_warning ("Suspend not supported in Termux environment");
@@ -409,13 +401,13 @@ index c947778..0c1f519 100644
  csm_consolekit_hibernate (CsmSystem *system)
  {
 +#ifndef FAKE_CONSOLEKIT
- #ifdef HAVE_OLD_UPOWER
-         CsmConsolekit *consolekit = CSM_CONSOLEKIT (system);
-         GError *error = NULL;
-@@ -770,8 +880,13 @@ csm_consolekit_hibernate (CsmSystem *system)
+         CsmConsolekit *manager = CSM_CONSOLEKIT (system);
+ 
+         g_dbus_proxy_call (manager->priv->ck_proxy,
+@@ -800,8 +832,13 @@ csm_consolekit_hibernate (CsmSystem *system)
+                            NULL,
                             hibernate_done,
                             manager);
- #endif
 +#else
 +        g_debug ("CsmConsolekit: Termux hibernate attempt - not supported");
 +        g_warning ("Hibernate not supported in Termux environment");
