@@ -11,6 +11,12 @@ TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
+# NOTE:
+# Most of Thunderbird's patches are shared with Firefox.
+# To avoid issues and reduce duplication the shared 00XX-${topic}.patch files
+# are symlinks to the patches in x11-packages/firefox
+# Thunderbird specific patches should start at 1001-${topic}.patch
+
 termux_pkg_auto_update() {
 	# https://archive.mozilla.org/pub/thunderbird/releases/latest/README.txt
 	local e=0
