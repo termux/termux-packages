@@ -15,6 +15,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_SKIP_DEPCHECK:="false"}"
 	: "${TERMUX_GLOBAL_LIBRARY:="false"}"
 	: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
+	: "${TERMUX_DEPENDENCY_DOWNLOAD_PARALLELIZING:=true}"
 	: "${TERMUX_PACMAN_PACKAGE_COMPRESSION:="xz"}"
 
 	if [ -z "${TERMUX_PACKAGE_FORMAT-}" ]; then
