@@ -1,0 +1,40 @@
+--- a/compiler/rustc_codegen_ssa/src/back/linker.rs
++++ b/compiler/rustc_codegen_ssa/src/back/linker.rs
+@@ -18,7 +18,7 @@
+ use rustc_session::Session;
+ use rustc_session::config::{self, CrateType, DebugInfo, LinkerPluginLto, Lto, OptLevel, Strip};
+ use rustc_span::sym;
+-use rustc_target::spec::{Cc, LinkOutputKind, LinkerFlavor, Lld};
++use rustc_target::spec::{Cc, LinkOutputKind, LinkerFlavor, Lld, TlsModel};
+ use tracing::{debug, warn};
+ 
+ use super::command::Command;
+@@ -857,6 +857,14 @@
+                         writeln!(f, "    {sym};")?;
+                     }
+                 }
++                if matches!(self.sess.target.tls_model, TlsModel::Emulated) {
++                    // always export the symbol from compiler-builtins
++                    if symbols.is_empty() {
++                        writeln!(f, "  global:")?;
++                    }
++                    debug!("    __emutls_get_address;");
++                    writeln!(f, "    __emutls_get_address;")?;
++                }
+                 writeln!(f, "\n  local:\n    *;\n}};")?;
+             };
+             if let Err(error) = res {
+@@ -864,6 +872,13 @@
+             }
+             if self.sess.target.is_like_solaris {
+                 self.link_arg("-M").link_arg(path);
++            } else if matches!(self.sess.target.tls_model, TlsModel::Emulated) {
++                // https://github.com/rust-lang/rustc_codegen_cranelift/issues/1296
++                // nightly rustc_codegen_cranelift does not support emutls
++                // so --undefined-version is used
++                let mut arg = OsString::from("--version-script=");
++                arg.push(path);
++                self.link_arg(arg).link_arg("--undefined-version");
+             } else {
+                 let mut arg = OsString::from("--version-script=");
+                 arg.push(path);
