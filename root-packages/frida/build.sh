@@ -13,6 +13,7 @@ TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_CONFFILES="var/service/frida-server/run var/service/frida-server/down"
 TERMUX_PKG_RM_AFTER_INSTALL="share/gir-1.0/G*"
+TERMUX_PKG_BUILD_DEPENDS="libandroid-support, python, python-pip"
 TERMUX_PKG_CONFLICTS="frida-tools (<< 15.1.24-1)"
 TERMUX_PKG_BREAKS="frida-server (<< 15.1.24)"
 TERMUX_PKG_REPLACES="frida-tools (<< 15.1.24-1), frida-server (<< 15.1.24)"

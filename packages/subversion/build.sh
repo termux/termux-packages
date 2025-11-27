@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://downloads.apache.org/subversion/subversion-${TERMUX_PK
 TERMUX_PKG_SHA256=e78a29e7766b8b7b354497d08f71a55641abc53675ce1875584781aae35644a1
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="apr, apr-util, serf, libexpat, libsqlite, liblz4, utf8proc, zlib"
+TERMUX_PKG_BUILD_DEPENDS="perl"
 TERMUX_PKG_BREAKS="subversion-dev"
 TERMUX_PKG_REPLACES="subversion-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

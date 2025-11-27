@@ -8,7 +8,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://launchpad.net/libdbusmenu/${_MAJOR_VERSION}/${TERMUX_PKG_VERSION}/+download/libdbusmenu-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=b9cc4a2acd74509435892823607d966d424bd9ad5d0b00938f27240a1bfa878a
 TERMUX_PKG_DEPENDS="glib, json-glib"
-TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, valac"
+TERMUX_PKG_BUILD_DEPENDS="atk, gdk-pixbuf, g-ir-scanner, gtk3, harfbuzz, libcairo, pango, valac, zlib"
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-dumper

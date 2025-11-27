@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://calcurse.org/files/calcurse-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=849ba852c7f37b6772365cb0c42a94cde0fe75efba91363e96a0e7ef797ba565
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses"
+TERMUX_PKG_BUILD_DEPENDS="python, python-pip"
 TERMUX_PKG_RECOMMENDS="calcurse-caldav"
 
 termux_step_pre_configure() {

@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/dbry/WavPack/releases/download/${TERMUX_PKG
 TERMUX_PKG_SHA256=7322775498602c8850afcfc1ae38f99df4cbcd51386e873d6b0f8047e55c0c26
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-glob"
+TERMUX_PKG_BUILD_DEPENDS="libiconv"
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob"

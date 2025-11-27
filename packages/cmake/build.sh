@@ -9,6 +9,7 @@ TERMUX_PKG_SRCURL=https://www.cmake.org/files/v${TERMUX_PKG_VERSION:0:3}/cmake-$
 TERMUX_PKG_SHA256=4104e94657d247c811cb29985405a360b78130b5d51e7f6daceb2447830bd579
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libarchive, libc++, libcurl, libexpat, jsoncpp, libuv, rhash, zlib"
+TERMUX_PKG_BUILD_DEPENDS="ncurses-ui-libs"
 TERMUX_PKG_RECOMMENDS="clang, make"
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

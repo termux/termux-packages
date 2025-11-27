@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/vergoh/vnstat/releases/download/v${TERMUX_P
 TERMUX_PKG_SHA256=c9fe19312d1ec3ddfbc4672aa951cf9e61ca98dc14cad3d3565f7d9803a6b187
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libsqlite"
+TERMUX_PKG_BUILD_DEPENDS="libgd"
 TERMUX_PKG_SERVICE_SCRIPT=("vnstat" "exec su -c \"PATH=\$PATH $TERMUX_PREFIX/bin/vnstatd -n 2>&1\"")
 
 # from docker root package: https://github.com/termux/termux-packages/blob/master/root-packages/docker/build.sh

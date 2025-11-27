@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://breakfastquay.com/files/releases/rubberband-${TERMUX_P
 TERMUX_PKG_SHA256=af050313ee63bc18b35b2e064e5dce05b276aaf6d1aa2b8a82ced1fe2f8028e9
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="fftw, libc++, libsamplerate, libsndfile"
+TERMUX_PKG_BUILD_DEPENDS="ladspa-sdk, lv2, vamp-plugin-sdk"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dfft=fftw
 -Dresampler=libsamplerate

@@ -7,6 +7,7 @@ _VERSION=$(echo "${TERMUX_PKG_VERSION}" | sed 's/\./-/2')
 TERMUX_PKG_SRCURL=https://github.com/tsduck/tsduck/archive/refs/tags/v${_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4e8549967b25cbdc247c27297ef8bfa84a27f291553849fd721680c675822ec5
 TERMUX_PKG_DEPENDS="libandroid-glob, libc++, libcurl, libedit"
+TERMUX_PKG_BUILD_DEPENDS="openjdk-21, python"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true

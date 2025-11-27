@@ -17,7 +17,7 @@ lib/libiomp5.a
 share/man/man1/lit.1
 "
 TERMUX_PKG_DEPENDS="libc++, libffi, libxml2, ncurses, zlib, zstd"
-TERMUX_PKG_BUILD_DEPENDS="binutils-libs"
+TERMUX_PKG_BUILD_DEPENDS="binutils-gold, binutils-libs, libandroid-spawn, libedit, ncurses-ui-libs, ndk-sysroot, python"
 # Replace gcc since gcc is deprecated by google on android and is not maintained upstream.
 # Conflict with clang versions earlier than 3.9.1-3 since they bundled llvm.
 TERMUX_PKG_CONFLICTS="gcc, clang (<< 3.9.1-3)"

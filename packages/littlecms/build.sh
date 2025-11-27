@@ -8,5 +8,6 @@ TERMUX_PKG_SRCURL=https://github.com/mm2/Little-CMS/archive/refs/tags/lcms${TERM
 TERMUX_PKG_SHA256=6e6f6411db50e85ae8ff7777f01b2da0614aac13b7b9fcbea66dc56a1bc71418
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_METHOD=repology
+TERMUX_PKG_BUILD_DEPENDS="libjpeg-turbo, libtiff"
 TERMUX_PKG_BREAKS="littlecms-dev"
 TERMUX_PKG_REPLACES="littlecms-dev"

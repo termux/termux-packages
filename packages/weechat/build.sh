@@ -8,6 +8,7 @@ TERMUX_PKG_VERSION="4.7.1"
 TERMUX_PKG_SRCURL=https://www.weechat.org/files/src/weechat-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=e83fb71ca251c5dd74bd9c5a6bd3f85dc2eb8ecec0955f43c07f3e0911edb7d3
 TERMUX_PKG_DEPENDS="libandroid-support, libcurl, libgcrypt, libgnutls, libiconv, ncurses, zlib, zstd"
+TERMUX_PKG_BUILD_DEPENDS="liblua53, perl, python, ruby"
 TERMUX_PKG_BREAKS="weechat-dev"
 TERMUX_PKG_REPLACES="weechat-dev"
 TERMUX_PKG_AUTO_UPDATE=true

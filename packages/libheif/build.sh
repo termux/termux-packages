@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/strukturag/libheif/releases/download/v${TER
 TERMUX_PKG_SHA256=68ac9084243004e0ef3633f184eeae85d615fe7e4444373a0a21cebccae9d12a
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, libaom, libc++, libdav1d, libde265, librav1e, libx265"
+TERMUX_PKG_BUILD_DEPENDS="libjpeg-turbo, libpng"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLE_PLUGIN_LOADING=OFF
 "

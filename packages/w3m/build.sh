@@ -13,6 +13,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_METHOD=repology
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="libgc, ncurses, openssl, zlib"
+TERMUX_PKG_BUILD_DEPENDS="imlib2, libx11"
 TERMUX_PKG_SUGGESTS="libsixel, perl"
 
 # ac_cv_func_bcopy=yes to avoid w3m defining it's own bcopy function, which

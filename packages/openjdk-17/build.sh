@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/openjdk/jdk17u/archive/refs/tags/jdk-${TERM
 TERMUX_PKG_SHA256=e2d1d92a4a593d9a87054ea54f76fcb6119f782c57945506a2ec4adff6ddc123
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-shmem, libandroid-spawn, libiconv, libjpeg-turbo, zlib, littlecms, alsa-plugins"
-TERMUX_PKG_BUILD_DEPENDS="cups, fontconfig, libxrandr, libxt, xorgproto, alsa-lib"
+TERMUX_PKG_BUILD_DEPENDS="cups, fontconfig, freetype, giflib, libpng, libx11, libxrandr, libxt, libxext, libxi, libxrender, libxtst, xorgproto, alsa-lib"
 # openjdk-17-x is recommended because X11 separation is still very experimental.
 TERMUX_PKG_RECOMMENDS="ca-certificates-java, openjdk-17-x, resolv-conf"
 TERMUX_PKG_SUGGESTS="cups"

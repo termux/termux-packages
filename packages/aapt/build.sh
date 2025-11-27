@@ -26,7 +26,7 @@ TERMUX_PKG_SHA256=(SKIP_CHECKSUM
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="fmt, libc++, libexpat, libpng, libzopfli, zlib"
-TERMUX_PKG_BUILD_DEPENDS="googletest"
+TERMUX_PKG_BUILD_DEPENDS="abseil-cpp, googletest, libprotobuf"
 
 termux_step_post_get_source() {
 	# FIXME: We would like to enable checksums when downloading

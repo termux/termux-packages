@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://mosquitto.org/files/source/mosquitto-${TERMUX_PKG_VERS
 TERMUX_PKG_SHA256=2f752589ef7db40260b633fbdb536e9a04b446a315138d64a7ff3c14e2de6b68
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="c-ares, libc++, openssl"
+TERMUX_PKG_BUILD_DEPENDS="libwebsockets"
 TERMUX_PKG_BREAKS="libmosquitto-dev"
 TERMUX_PKG_REPLACES="libmosquitto-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

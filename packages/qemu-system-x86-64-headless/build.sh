@@ -7,8 +7,8 @@ TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-${TERMUX_PKG_VERSION:2}.tar.xz
 TERMUX_PKG_SHA256=37b4a643da8ed6015eef35f5d7f06e7259d9c95359965a0a98e9667c621ab2bb
 TERMUX_PKG_DEPENDS="alsa-lib, dtc, glib, jack2, libbz2, libcurl, libdw, libgmp, libgnutls, libiconv, libjpeg-turbo, liblzo, libnettle, libpixman, libpng, libslirp, libspice-server, libssh, libusb, libusbredir, ncurses, pulseaudio, qemu-common, resolv-conf, zlib, zstd"
 
-# Required by configuration script, but I can't find any binary that uses it.
-TERMUX_PKG_BUILD_DEPENDS="libtasn1"
+# Leonid Pliushch: libtasn1 is required by configuration script, but I can't find any binary that uses it.
+TERMUX_PKG_BUILD_DEPENDS="libandroid-shmem, libcap-ng, libnfs, libtasn1"
 
 TERMUX_PKG_CONFLICTS="qemu-system-x86_64-headless"
 TERMUX_PKG_REPLACES="qemu-system-x86_64-headless"

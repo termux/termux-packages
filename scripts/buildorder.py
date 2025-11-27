@@ -38,7 +38,7 @@ def remove_nl_and_quotes(var):
     return var
 
 def parse_build_file_dependencies_with_vars(path, vars):
-    "Extract the dependencies specified in the given variables of a build.sh or *.subpackage.sh file."
+    "Extract the dependencies specified in the given variables of a build.sh file."
     dependencies = []
 
     with open(path, encoding="utf-8") as build_script:
@@ -62,8 +62,8 @@ def parse_build_file_dependencies_with_vars(path, vars):
     return set(dependencies)
 
 def parse_build_file_dependencies(path):
-    "Extract the dependencies of a build.sh or *.subpackage.sh file."
-    return parse_build_file_dependencies_with_vars(path, ('TERMUX_PKG_DEPENDS', 'TERMUX_PKG_BUILD_DEPENDS', 'TERMUX_SUBPKG_DEPENDS', 'TERMUX_PKG_DEVPACKAGE_DEPENDS'))
+    "Extract the dependencies of a build.sh file."
+    return parse_build_file_dependencies_with_vars(path, ('TERMUX_PKG_DEPENDS', 'TERMUX_PKG_BUILD_DEPENDS', 'TERMUX_PKG_DEVPACKAGE_DEPENDS'))
 
 def parse_build_file_antidependencies(path):
     "Extract the antidependencies of a build.sh file."
@@ -122,7 +122,6 @@ class TermuxPackage(object):
         self.antideps = parse_build_file_antidependencies(build_sh_path)
         self.excluded_arches = parse_build_file_excluded_arches(build_sh_path)
         self.only_installing = parse_build_file_variable_bool(build_sh_path, 'TERMUX_PKG_ONLY_INSTALLING')
-        self.separate_subdeps = parse_build_file_variable_bool(build_sh_path, 'TERMUX_PKG_SEPARATE_SUB_DEPENDS')
         self.accept_dep_scr = parse_build_file_variable_bool(build_sh_path, 'TERMUX_PKG_ACCEPT_PKG_IN_DEP')
 
         if os.getenv('TERMUX_ON_DEVICE_BUILD') == "true" and termux_pkg_library == "bionic":
@@ -157,15 +156,13 @@ class TermuxPackage(object):
         is_root = dir_root == None
         if is_root:
             dir_root = self.dir
-        if is_root or not self.fast_build_mode or not self.separate_subdeps:
-            for subpkg in self.subpkgs:
-                if f"{self.name}-static" != subpkg.name:
-                    self.deps.add(subpkg.name)
-                    self.deps |= subpkg.deps
-            self.deps -= self.antideps
-            self.deps.discard(self.name)
-            if not self.fast_build_mode or self.dir == dir_root:
-                self.deps.difference_update([subpkg.name for subpkg in self.subpkgs])
+        for subpkg in self.subpkgs:
+            if f"{self.name}-static" != subpkg.name:
+                self.deps.add(subpkg.name)
+        self.deps -= self.antideps
+        self.deps.discard(self.name)
+        if not self.fast_build_mode or self.dir == dir_root:
+            self.deps.difference_update([subpkg.name for subpkg in self.subpkgs])
         for dependency_name in sorted(self.deps):
             if termux_global_library == "true" and termux_pkg_library == "glibc" and not has_prefix_glibc(dependency_name):
                 mod_dependency_name = add_prefix_glibc_to_pkgname(dependency_name)
@@ -195,7 +192,6 @@ class TermuxSubPackage:
         self.accept_dep_scr = parent.accept_dep_scr
         self.excluded_arches = set()
         if not virtual:
-            self.deps |= parse_build_file_dependencies(subpackage_file_path)
             self.excluded_arches |= parse_build_file_excluded_arches(subpackage_file_path)
         self.dir = parent.dir
 

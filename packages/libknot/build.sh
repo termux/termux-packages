@@ -7,6 +7,7 @@ TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://secure.nic.cz/files/knot-dns/knot-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=299e8de918f9fc7ecbe625b41cb085e47cdda542612efbd51cd5ec60deb9dd13
 TERMUX_PKG_DEPENDS="libgnutls, liblmdb"
+TERMUX_PKG_BUILD_DEPENDS="libedit, libidn2, libnghttp2, resolv-conf"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-daemon
 --disable-modules

@@ -10,7 +10,7 @@ TERMUX_PKG_SHA256=b14a116d2d805debc5b5b2aac505a279e69b217dae2fae2dfcb62400471a99
 # We can not update it automatically because tigervnc server version must be aligned with xorg-server.
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="libandroid-shmem, libdrm, libpciaccess, libpixman, libx11, libxau, libxcvt, libxfont2, libxinerama, libxkbfile, libxshmfence, opengl, openssl, xkeyboard-config, xorg-protocol-txt, xorg-xkbcomp"
-TERMUX_PKG_BUILD_DEPENDS="mesa-dev"
+TERMUX_PKG_BUILD_DEPENDS="libxcb, libxdmcp, mesa-dev"
 
 # Needed for Xephyr
 TERMUX_PKG_BUILD_DEPENDS="xcb-util, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil, xcb-util-wm"

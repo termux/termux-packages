@@ -14,7 +14,7 @@ TERMUX_PKG_SHA256=(
 )
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="abseil-cpp, ffmpeg, libc++, libjpeg-turbo, libopenblas, libpng, libprotobuf, libtiff, libwebp, openjpeg, openjpeg-tools, qt6-qtbase, qt6-qt5compat, zlib"
-TERMUX_PKG_BUILD_DEPENDS="python-numpy-static"
+TERMUX_PKG_BUILD_DEPENDS="python, python-numpy, python-numpy-static"
 TERMUX_PKG_PYTHON_COMMON_DEPS="Cython, wheel"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DANDROID_NO_TERMUX=OFF

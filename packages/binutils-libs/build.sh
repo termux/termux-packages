@@ -7,6 +7,7 @@ TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/binutils/binutils-with-gold-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=67be9198476cc37436e2801de649f4ad80bf0d02430d86aff63c6b59b6e23987
 TERMUX_PKG_DEPENDS="zlib, zstd"
+TERMUX_PKG_BUILD_DEPENDS="libc++"
 TERMUX_PKG_BREAKS="binutils (<< 2.39), binutils-dev"
 TERMUX_PKG_REPLACES="binutils (<< 2.39), binutils-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

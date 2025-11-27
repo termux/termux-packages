@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/openjdk/jdk25u/archive/refs/tags/jdk-${TERM
 TERMUX_PKG_SHA256=99864b94b65a9d8e180ec55b8e53a9ab39b0eaebd3ba4438388bf7ea7d5e079a
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-shmem, libandroid-spawn, libiconv, libjpeg-turbo, zlib, littlecms, alsa-plugins"
-TERMUX_PKG_BUILD_DEPENDS="cups, fontconfig, libxrandr, libxt, xorgproto, alsa-lib"
+TERMUX_PKG_BUILD_DEPENDS="cups, fontconfig, freetype, giflib, libpng, libx11, libxrandr, libxt, libxext, libxi, libxrender, libxtst, xorgproto, alsa-lib"
 # openjdk-25-x is recommended because X11 separation is still very experimental.
 TERMUX_PKG_RECOMMENDS="ca-certificates-java, openjdk-25-x, resolv-conf"
 # openjdk no longer officially supports 32-bit x86

@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=872e4b134e5df29c8933dff12350785054d2fd2839b5ae6b5587b14db1465d
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_DEPENDS="abseil-cpp, libandroid-support, libc++, libprotobuf, ncurses, openssl, openssh"
+TERMUX_PKG_BUILD_DEPENDS="perl"
 TERMUX_PKG_SUGGESTS="mosh-perl"
 
 termux_step_pre_configure() {

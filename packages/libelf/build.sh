@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL="https://sourceware.org/elfutils/ftp/${TERMUX_PKG_VERSION}/elf
 TERMUX_PKG_SHA256=7857f44b624f4d8d421df851aaae7b1402cfe6bcdd2d8049f15fc07d3dde7635
 # libandroid-support for langinfo.
 TERMUX_PKG_DEPENDS="libandroid-support, zlib, zstd, json-c"
+TERMUX_PKG_BUILD_DEPENDS="argp, libarchive, libbz2, libc++, libcurl, liblzma, libmicrohttpd, libsqlite"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_c99=yes --disable-symbol-versioning"
 TERMUX_PKG_CONFLICTS="libelf-dev"
 TERMUX_PKG_REPLACES="libelf-dev"

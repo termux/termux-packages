@@ -9,6 +9,7 @@ TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/gpgme/gpgme-${TERMUX_PKG_VERS
 TERMUX_PKG_SHA256=bfc17f5bd1b178c8649fdd918956d277080f33df006a2dc40acdecdce68c50dd
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="gnupg (>= 2.2.9-1), libassuan, libgpg-error"
+TERMUX_PKG_BUILD_DEPENDS="libc++"
 TERMUX_PKG_BREAKS="gpgme-dev"
 TERMUX_PKG_REPLACES="gpgme-dev"
 # Use "--disable-gpg-test" to avoid "No rule to make target `../../src/libgpgme-pthread.la":

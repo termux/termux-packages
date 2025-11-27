@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="1.86.0"
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/gobject-introspection/${TERMUX_PKG_VERSION%.*}/gobject-introspection-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=920d1a3fcedeadc32acff95c2e203b319039dd4b4a08dd1a2dfd283d19c0b9ae
 TERMUX_PKG_DEPENDS="glib, libffi"
+TERMUX_PKG_BUILD_DEPENDS="ldd, python"
 TERMUX_PKG_SUGGESTS="g-ir-scanner"
 TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false

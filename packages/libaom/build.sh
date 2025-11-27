@@ -13,6 +13,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_INSTALL_LIBDIR=$TERMUX__PREFIX__LIB_SUBDIR
 -DCMAKE_INSTALL_INCLUDEDIR=$TERMUX__PREFIX__INCLUDE_SUBDIR
 "
+TERMUX_PKG_BUILD_DEPENDS="libc++"
 
 termux_step_pre_configure() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them

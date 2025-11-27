@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="2.7.0"
 TERMUX_PKG_SRCURL=https://github.com/elfmz/far2l/archive/refs/tags/v_${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=712ab8e5b40482ddd68e33f870e4c3d7e8f8c44b90fb9fe91288a00cb27dff48
 TERMUX_PKG_DEPENDS="libarchive, libc++, libuchardet"
+TERMUX_PKG_BUILD_DEPENDS="libneon, libnfs, libssh, libx11, libxi, libxml2, openssl, samba"
 TERMUX_PKG_SUGGESTS="chafa, exiftool, htop, timg"
 TERMUX_PKG_RM_AFTER_INSTALL="share/icons share/applications"
 TERMUX_PKG_AUTO_UPDATE=true
