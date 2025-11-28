@@ -8,7 +8,7 @@ TERMUX_PKG_VERSION=(
 	"0.44.0"
 	"15.0.7"
 )
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=(
 	"https://github.com/numba/llvmlite/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.tar.gz"
 	"https://github.com/llvm/llvm-project/releases/download/llvmorg-${TERMUX_PKG_VERSION[1]}/llvm-project-${TERMUX_PKG_VERSION[1]}.src.tar.xz"
@@ -17,7 +17,7 @@ TERMUX_PKG_SHA256=(
 	71ec10b77a813e9ceec5f0bdf072a89c838135e6ba182cc1d3a391a59aef37b8
 	8b5fcb24b4128cf04df1b0b9410ce8b1a729cb3c544e6da885d234280dedeac6
 )
-TERMUX_PKG_DEPENDS="libc++, libffi, python, python-pip"
+TERMUX_PKG_DEPENDS="libc++, libffi, python"
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true

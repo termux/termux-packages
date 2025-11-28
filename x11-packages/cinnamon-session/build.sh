@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The Cinnamon session manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.6.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/linuxmint/cinnamon-session/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=94f21b3d82b899373a7376d467e2a30f38fd0cfb04b8e1cbdfb4e09735293312
 TERMUX_PKG_AUTO_UPDATE=true
@@ -36,12 +37,4 @@ termux_step_pre_configure() {
 	termux_setup_glib_cross_pkg_config_wrapper
 
 	export TERMUX_MESON_ENABLE_SOVERSION=1
-}
-
-termux_step_create_debscripts() {
-	cat <<-EOF >./postinst
-		#!$TERMUX_PREFIX/bin/sh
-		echo "Installing dependencies through pip..."
-		pip3 install ${TERMUX_PKG_PYTHON_TARGET_DEPS//, / }
-	EOF
 }

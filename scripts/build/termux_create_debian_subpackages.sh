@@ -34,6 +34,7 @@ termux_create_debian_subpackages() {
 		local TERMUX_SUBPKG_CONFFILES=""
 		local TERMUX_SUBPKG_DEPEND_ON_PARENT=""
 		local TERMUX_SUBPKG_EXCLUDED_ARCHES=""
+		local TERMUX_SUBPKG_PYTHON_RUNTIME_DEPS=""
 		local SUB_PKG_MASSAGE_DIR=$SUB_PKG_DIR/massage/$TERMUX_PREFIX_CLASSICAL
 		local SUB_PKG_PACKAGE_DIR=$SUB_PKG_DIR/package
 		mkdir -p "$SUB_PKG_MASSAGE_DIR" "$SUB_PKG_PACKAGE_DIR"
@@ -122,6 +123,10 @@ termux_create_debian_subpackages() {
 			[[ -n "$TERMUX_SUBPKG_SUGGESTS"   ]] && TERMUX_SUBPKG_SUGGESTS=$(termux_package__add_prefix_glibc_to_package_list "$TERMUX_SUBPKG_SUGGESTS")
 		}
 
+		# Allow packages to create arbitrary control files.
+		termux_step_create_subpkg_debscripts
+		termux_step_create_python_debscripts
+
 		{ # add control fields to subpackage
 		[[ "$TERMUX_SUBPKG_ESSENTIAL" == "true" ]] && echo "Essential: yes"
 		[[ -n "$TERMUX_SUBPKG_DEPENDS"          ]] && echo "Depends: ${TERMUX_SUBPKG_DEPENDS/#, /}"
@@ -135,9 +140,6 @@ termux_create_debian_subpackages() {
 		} >> control
 
 		for f in $TERMUX_SUBPKG_CONFFILES; do echo "$TERMUX_PREFIX_CLASSICAL/$f" >> conffiles; done
-
-		# Allow packages to create arbitrary control files.
-		termux_step_create_subpkg_debscripts
 
 		# Create control.tar.xz
 		tar --sort=name \
