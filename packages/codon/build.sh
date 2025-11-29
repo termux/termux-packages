@@ -4,15 +4,15 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 _LLVM_VERSION=20.1.7
-TERMUX_PKG_VERSION="0.19.3"
+TERMUX_PKG_VERSION="0.19.4"
 TERMUX_PKG_SRCURL=(
 	https://github.com/exaloop/codon/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
 	https://github.com/exaloop/codon/releases/download/v$TERMUX_PKG_VERSION/codon-linux-x86_64.tar.gz
 	https://github.com/exaloop/llvm-project/archive/refs/tags/codon-$_LLVM_VERSION.tar.gz
 )
 TERMUX_PKG_SHA256=(
-	a910effbca49f61af3cbd6d809dbd3efa1d85ae40181899a65e5a543335de019
-	f27abda792c0c9f9a42d529c2e0a1b2113ec6964eec23d6f62acef9ed42c3de6
+	04e0b03bdd3d25993471150839b92ff2a65baa52577315dbf5a35464181e6b87
+	f715f414fc93d834f1f2368f0b0dcf86bc5ce89e1106d834be229691672832e6
 	09df072c95628d9f59f67e0ad309bd3f4387f8cb06ae115f78c496c34f2c1e98
 )
 TERMUX_PKG_DEPENDS="libc++, libxml2, zlib, zstd"
