@@ -1,13 +1,13 @@
 Workaround [error] [file_utils.cpp:50] Error opening directory '/sys/class/hwmon/': Permission denied
 
---- a/src/overlay.cpp
-+++ b/src/overlay.cpp
-@@ -112,8 +112,6 @@
- 
+diff -uNr a/src/overlay.cpp b/src/overlay.cpp
+--- a/src/overlay.cpp	2025-11-28 21:19:22.000000000 +0530
++++ b/src/overlay.cpp	2025-11-29 15:09:26.713626767 +0530
+@@ -102,8 +102,6 @@
  void update_hw_info(const struct overlay_params& params, uint32_t vendorID)
  {
--   if (params.enabled[OVERLAY_PARAM_ENABLED_fan])
+    auto real_params = get_params();
+-   if (real_params->enabled[OVERLAY_PARAM_ENABLED_fan])
 -      update_fan();
-    if (params.enabled[OVERLAY_PARAM_ENABLED_cpu_stats] || logger->is_active()) {
+    if (real_params->enabled[OVERLAY_PARAM_ENABLED_cpu_stats] || logger->is_active()) {
        cpuStats.UpdateCPUData();
- 
