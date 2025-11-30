@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An advanced audio player"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.5.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SRCURL=https://distfiles.audacious-media-player.org/audacious-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=7194743a0a41b1d8f582c071488b77f7b917be47ca5e142dd76af5d81d36f9cd
@@ -18,8 +19,3 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-gtk
 QTBINPATH=${TERMUX_PREFIX}/opt/qt6/cross/lib/qt6
 "
-
-termux_step_pre_configure() {
-	CFLAGS+=" -Wno-enum-constexpr-conversion"
-	CXXFLAGS+=" -Wno-enum-constexpr-conversion"
-}
