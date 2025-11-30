@@ -5,7 +5,7 @@ TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=ca23e1745e6e2ba235550360e1def1457e2f3857
 TERMUX_PKG_VERSION=2022.10.04
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="git+https://github.com/poljar/weechat-matrix-rs"
 TERMUX_PKG_SHA256=61d4d307167f274c1ee165a7021d5cda330a2331eb89e8add2f027becf8cae0c
 TERMUX_PKG_AUTO_UPDATE=false
@@ -46,6 +46,12 @@ termux_step_pre_configure() {
 	patch --silent -p1 \
 		-d "$TERMUX_PKG_SRCDIR" \
 		< "$TERMUX_PKG_BUILDER_DIR"/patch-root-Cargo.diff
+
+	export BINDGEN_EXTRA_CLANG_ARGS="--sysroot ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot"
+	case "${TERMUX_ARCH}" in
+		arm) BINDGEN_EXTRA_CLANG_ARGS+=" --target=arm-linux-androideabi${TERMUX_PKG_API_LEVEL}" ;;
+		*) BINDGEN_EXTRA_CLANG_ARGS+=" --target=${TERMUX_ARCH}-linux-android${TERMUX_PKG_API_LEVEL}" ;;
+	esac
 }
 
 termux_step_make() {
