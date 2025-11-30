@@ -3,11 +3,15 @@ TERMUX_PKG_DESCRIPTION="Reference implementation of a wayland compositor"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.9.1"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/kennylevinsen/seatd/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=819979c922a0be258aed133d93920bce6a3d3565a60588d6d372ce9db2712cd3
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+# -Dman-pages=disabled prevents
+# Exec format error: '/data/data/com.termux/files/usr/bin/scdoc'
+# if scdoc package was installed in the same container before cross-compiling
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Ddefaultpath=$TERMUX_PREFIX/var/run/seatd.sock
+-Dman-pages=disabled
 "
