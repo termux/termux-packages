@@ -1,0 +1,82 @@
+--- a/interfaces/conversationmessage.h     2025-09-09 09:49:04.000000000 +0530
++++ b/interfaces/conversationmessage.h   2025-10-09 12:30:57.763914086 +0530
+@@ -12,7 +12,39 @@
+ #include "kdeconnectinterfaces_export.h"
+
+ class ConversationAddress;
+-class Attachment;
++//class Attachment;
++
++class KDECONNECTINTERFACES_EXPORT Attachment
++{
++public:
++    Attachment()
++    {
++    }
++    Attachment(qint64 prtID, QString mimeType, QString base64EncodedFile, QString uniqueIdentifier);
++
++    qint64 partID() const
++    {
++        return m_partID;
++    }
++    QString mimeType() const
++    {
++        return m_mimeType;
++    }
++    QString base64EncodedFile() const
++    {
++        return m_base64EncodedFile;
++    }
++    QString uniqueIdentifier() const
++    {
++        return m_uniqueIdentifier;
++    }
++
++private:
++    qint64 m_partID; // Part ID of the attachment of the message
++    QString m_mimeType; // Type of attachment (image, video, audio etc.)
++    QString m_base64EncodedFile; // Base64 encoded string of a file
++    QString m_uniqueIdentifier; // unique name of the attachment
++};
+
+ class KDECONNECTINTERFACES_EXPORT ConversationMessage
+ {
+@@ -193,38 +225,6 @@
+     QString m_address;
+ };
+
+-class KDECONNECTINTERFACES_EXPORT Attachment
+-{
+-public:
+-    Attachment()
+-    {
+-    }
+-    Attachment(qint64 prtID, QString mimeType, QString base64EncodedFile, QString uniqueIdentifier);
+-
+-    qint64 partID() const
+-    {
+-        return m_partID;
+-    }
+-    QString mimeType() const
+-    {
+-        return m_mimeType;
+-    }
+-    QString base64EncodedFile() const
+-    {
+-        return m_base64EncodedFile;
+-    }
+-    QString uniqueIdentifier() const
+-    {
+-        return m_uniqueIdentifier;
+-    }
+-
+-private:
+-    qint64 m_partID; // Part ID of the attachment of the message
+-    QString m_mimeType; // Type of attachment (image, video, audio etc.)
+-    QString m_base64EncodedFile; // Base64 encoded string of a file
+-    QString m_uniqueIdentifier; // unique name of the attachment
+-};
+-
+ inline QDBusArgument &operator<<(QDBusArgument &argument, const ConversationMessage &message)
+ {
+     argument.beginStructure();
