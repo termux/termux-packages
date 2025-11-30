@@ -1,0 +1,104 @@
+From c972794d853a024874624fecfd99d21940e11363 Mon Sep 17 00:00:00 2001
+From: crivella <davide.grassano@epfl.ch>
+Date: Tue, 4 Nov 2025 10:54:45 +0100
+Subject: [PATCH] missing strdupa
+
+---
+ cvmfs/authz/authz_fetch.cc       | 7 +++++++
+ cvmfs/authz/helper_util.cc       | 7 +++++++
+ cvmfs/crypto/signature.cc        | 6 ++++++
+ cvmfs/util/posix.cc              | 6 ++++++
+ test/unittests/t_fs_traversal.cc | 7 +++++++
+ 5 files changed, 33 insertions(+)
+
+diff --git a/cvmfs/authz/authz_fetch.cc b/cvmfs/authz/authz_fetch.cc
+index 4d956e75a..be7a611a2 100644
+--- a/cvmfs/authz/authz_fetch.cc
++++ b/cvmfs/authz/authz_fetch.cc
+@@ -123,6 +123,13 @@ void AuthzExternalFetcher::EnterFailState() {
+   fail_state_ = true;
+ }
+ 
++#ifdef __ANDROID__
++#include <cstring>
++#define strdupa(s)                    \
++  std::strcpy(/* NOLINT(runtime/printf) */ \
++         reinterpret_cast<char *>(alloca(strlen((s)) + 1)), (s))
++#endif
++
+ 
+ /**
+  * Uses execve to start progname_.  The started program has stdin and stdout
+diff --git a/cvmfs/authz/helper_util.cc b/cvmfs/authz/helper_util.cc
+index 48a7f7828..53efd9eaf 100644
+--- a/cvmfs/authz/helper_util.cc
++++ b/cvmfs/authz/helper_util.cc
+@@ -24,6 +24,13 @@ typedef struct json_value JSON;
+          reinterpret_cast<char *>(alloca(strlen((s)) + 1)), (s))
+ #endif
+ 
++#ifdef __ANDROID__
++#include <cstring>
++#define strdupa(s)                    \
++  std::strcpy(/* NOLINT(runtime/printf) */ \
++         reinterpret_cast<char *>(alloca(strlen((s)) + 1)), (s))
++#endif
++
+ using namespace std;  // NOLINT
+ 
+ /**
+diff --git a/cvmfs/crypto/signature.cc b/cvmfs/crypto/signature.cc
+index d5cfe0f1e..571676c49 100644
+--- a/cvmfs/crypto/signature.cc
++++ b/cvmfs/crypto/signature.cc
+@@ -176,6 +176,12 @@ bool SignatureManager::LoadPrivateMasterKeyMem(const string &key) {
+   return (private_master_key_ != NULL);
+ }
+ 
++#ifdef __ANDROID__
++#include <cstring>
++#define strdupa(s)                    \
++  std::strcpy(/* NOLINT(runtime/printf) */ \
++         reinterpret_cast<char *>(alloca(strlen((s)) + 1)), (s))
++#endif
+ 
+ /**
+  * @param[in] file_pem File name of the PEM key file
+diff --git a/cvmfs/util/posix.cc b/cvmfs/util/posix.cc
+index 59d1d24c2..0c84f9102 100644
+--- a/cvmfs/util/posix.cc
++++ b/cvmfs/util/posix.cc
+@@ -1028,6 +1028,12 @@ void UnlockFile(const int filedes) {
+   close(filedes);
+ }
+ 
++#ifdef __ANDROID__
++#include <cstring>
++#define strdupa(s)                    \
++  std::strcpy(/* NOLINT(runtime/printf) */ \
++         reinterpret_cast<char *>(alloca(strlen((s)) + 1)), (s))
++#endif
+ 
+ /**
+  * Wrapper around mkstemp.
+diff --git a/test/unittests/t_fs_traversal.cc b/test/unittests/t_fs_traversal.cc
+index 0b292d12c..fb79c41d4 100644
+--- a/test/unittests/t_fs_traversal.cc
++++ b/test/unittests/t_fs_traversal.cc
+@@ -19,6 +19,13 @@
+ #include "util/platform.h"
+ #include "util/posix.h"
+ 
++#ifdef __ANDROID__
++#include <cstring>
++#define strdupa(s)                    \
++  std::strcpy(/* NOLINT(runtime/printf) */ \
++         reinterpret_cast<char *>(alloca(strlen((s)) + 1)), (s))
++#endif
++
+ class T_FsTraversal : public ::testing::Test {
+  public:
+   struct Checklist {
+-- 
+2.34.1
+
