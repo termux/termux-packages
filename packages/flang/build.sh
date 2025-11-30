@@ -54,6 +54,17 @@ TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_HAS_DEBUG=false
 TERMUX_PKG_NO_STATICSPLIT=true
 
+# shellcheck disable=SC2030,2031
+termux_step_post_get_source() {
+	# Version guard to keep flang in sync
+	local llvm_version llvm_revision
+	llvm_version="$(. "$TERMUX_SCRIPTDIR/packages/libllvm/build.sh"; echo "${TERMUX_PKG_VERSION}")"
+	llvm_revision="$(TERMUX_PKG_REVISION=0; . "$TERMUX_SCRIPTDIR/packages/libllvm/build.sh"; echo "${TERMUX_PKG_REVISION}")"
+	if [[ "${llvm_version}-${llvm_revision}" != "${TERMUX_PKG_VERSION}-${TERMUX_PKG_REVISION:-0}" ]]; then
+		termux_error_exit "Version mismatch between libllvm and flang. flang=$TERMUX_PKG_VERSION-$TERMUX_PKG_REVISION, libllvm=$llvm_version-$llvm_revision"
+	fi
+}
+
 termux_step_host_build() {
 	termux_setup_cmake
 	termux_setup_ninja
