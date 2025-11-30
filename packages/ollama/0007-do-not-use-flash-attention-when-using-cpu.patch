@@ -1,0 +1,14 @@
+It introduces a significant overhead on Android.
+
+--- a/ml/device.go
++++ b/ml/device.go
+@@ -479,8 +479,7 @@
+ // For each GPU, check if it does NOT support flash attention
+ func FlashAttentionSupported(l []DeviceInfo) bool {
+ 	for _, gpu := range l {
+-		supportsFA := gpu.Library == "cpu" ||
+-			gpu.Name == "Metal" || gpu.Library == "Metal" ||
++		supportsFA := gpu.Name == "Metal" || gpu.Library == "Metal" ||
+ 			(gpu.Library == "CUDA" && gpu.DriverMajor >= 7 && !(gpu.ComputeMajor == 7 && gpu.ComputeMinor == 2)) ||
+ 			gpu.Library == "ROCm" ||
+ 			gpu.Library == "Vulkan"
