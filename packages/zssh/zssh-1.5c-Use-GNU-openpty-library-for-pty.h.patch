@@ -1,0 +1,53 @@
+From: Ben Wong <ben@wongs.net>
+Date: Tue, 25 Sep 2007 01:48:30 -0700
+Subject: Use GNU openpty library for pty.h
+
+---
+ configure.in | 11 +++++++++--
+ openpty.c    |  4 ++++
+ 2 files changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index a8f1441..af2cad0 100644
+--- a/configure.in
++++ b/configure.in
+@@ -57,7 +57,7 @@ AC_CONFIG_HEADER(config.h)
+ AC_HEADER_STDC
+ AC_HEADER_SYS_WAIT
+ AC_CHECK_HEADERS(fcntl.h paths.h sys/ioctl.h sys/time.h termios.h unistd.h \
+-	err.h sys/cdefs.h sys/param.h util.h stropts.h)
++	err.h sys/cdefs.h sys/param.h util.h stropts.h pty.h)
+ 
+ 
+ 
+@@ -97,7 +97,14 @@ AC_CHECK_FUNCS(strdup getpt isastream tcsetpgrp)
+ 
+ 
+ dnl Check what is available for tty/pty allocation 
+-AC_CHECK_FUNCS(_getpty getpseudotty openpty grantpt unlockpt)
++AC_CHECK_FUNCS(_getpty getpseudotty grantpt unlockpt)
++AC_CHECK_FUNCS(openpty,,
++	[AC_CHECK_LIB(util,openpty,
++		[AC_DEFINE(HAVE_OPENPTY)
++		LIBS="$LIBS -lutil"]
++	)])
++
++
+ AC_MSG_CHECKING(for pseudo ttys)
+ if test -c /dev/getpty && test $ac_cv_func_getpseudotty = yes
+ then
+diff --git a/openpty.c b/openpty.c
+index 42cb203..0b8a642 100644
+--- a/openpty.c
++++ b/openpty.c
+@@ -25,6 +25,10 @@ static char	gl_slavename[GL_SLAVENAMELEN + 1] = {0};
+ #include <util.h>
+ #endif
+ 
++#ifdef HAVE_PTY_H
++#include <pty.h>
++#endif
++
+ void	getmaster()
+ {
+ #ifdef DEBUG
