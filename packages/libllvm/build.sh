@@ -4,8 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_LICENSE_FILE="llvm/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@finagolfin"
 # Keep flang version and revision in sync when updating (enforced by check in termux_step_pre_configure).
-LLVM_MAJOR_VERSION=21
-TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.1.6
+TERMUX_PKG_VERSION=21.1.6
 TERMUX_PKG_SHA256=ae67086eb04bed7ca11ab880349b5f1ab6f50e1b88cda376eaf8a845b935762b
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-${TERMUX_PKG_VERSION}.src.tar.xz
@@ -131,11 +130,11 @@ termux_step_post_make_install() {
 	cd $TERMUX_PREFIX/bin
 
 	for tool in clang clang++ cc c++ cpp gcc g++; do
-		ln -f -s clang-${LLVM_MAJOR_VERSION} $tool
+		ln -f -s "clang-${TERMUX_PKG_VERSION%%.*}" "$tool"
 	done
 
-	ln -f -s clang++ clang++-${LLVM_MAJOR_VERSION}
-	ln -f -s ${LLVM_MAJOR_VERSION} $TERMUX_PREFIX/lib/clang/latest
+	ln -f -s clang++ "clang++-${TERMUX_PKG_VERSION%%.*}"
+	ln -f -s "${TERMUX_PKG_VERSION%%.*}" "$TERMUX_PREFIX/lib/clang/latest"
 
 	# Instead of symlinks, for executables named after target triplets, create the same type of
 	# wrapper that the cross-compiling NDK uses to choose the correct target, including the API level
@@ -162,5 +161,5 @@ termux_step_post_make_install() {
 
 termux_step_pre_massage() {
 	[[ "$TERMUX_PACKAGE_FORMAT" != "pacman" ]] && return
-	sed -i "s|@LLVM_MAJOR_VERSION@|${LLVM_MAJOR_VERSION}|g" ./share/libalpm/scripts/update-libcompiler-rt
+	sed -i "s|@LLVM_MAJOR_VERSION@|${TERMUX_PKG_VERSION%%.*}|g" ./share/libalpm/scripts/update-libcompiler-rt
 }
