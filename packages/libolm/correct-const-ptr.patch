@@ -1,0 +1,13 @@
+https://github.com/chimera-linux/cports/blob/2cf50ccb2185c772de927fb3daf5e1dc1787ce0a/main/olm/patches/build.patch#L1C1-L11C25
+
+--- a/include/olm/list.hh
++++ b/include/olm/list.hh
+@@ -99,7 +99,7 @@ public:
+             return *this;
+         }
+         T * this_pos = _data;
+-        T * const other_pos = other._data;
++        T const * other_pos = other._data;
+         while (other_pos != other._end) {
+             *this_pos = *other;
+             ++this_pos;

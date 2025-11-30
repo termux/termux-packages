@@ -1,0 +1,22 @@
+From: YuanQing Su <syq@debian.org>
+Date: Mon, 21 Jul 2014 08:22:29 +0000
+Subject: replace CPPFunction call with rl_completion_func_t
+
+This closes #741761.
+---
+ completion.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/completion.c b/completion.c
+index 98e714a..de44329 100644
+--- a/completion.c
++++ b/completion.c
+@@ -53,7 +53,7 @@ void	initialize_readline()
+     so that if zssh_completion() fails nothing is completed */
+    rl_completion_entry_function = fake_generator;
+    /* Tell the completer that we want a crack first. */
+-   rl_attempted_completion_function = (CPPFunction *) zssh_completion;
++   rl_attempted_completion_function = (rl_completion_func_t *) zssh_completion;
+    
+ }
+ 
