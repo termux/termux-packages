@@ -22,20 +22,12 @@ TERMUX_PKG_CONFLICTS="gcc, clang (<< 3.9.1-3)"
 TERMUX_PKG_BREAKS="libclang, libclang-dev, libllvm-dev"
 TERMUX_PKG_REPLACES="gcc, libclang, libclang-dev, libllvm-dev"
 TERMUX_PKG_GROUPS="base-devel"
-LLVM_PROJECTS="clang;clang-tools-extra;compiler-rt;lld;lldb;mlir;openmp;polly"
 
-if [ "$TERMUX__PREFIX" = "$TERMUX__ROOTFS" ]; then
-	DEFAULT_SYSROOT=".."
-else
-	DEFAULT_SYSROOT="../.."
-fi
-
-# See http://llvm.org/docs/CMake.html:
+# See https://llvm.org/docs/CMake.html:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DANDROID_PLATFORM_LEVEL=$TERMUX_PKG_API_LEVEL
--DPYTHON_EXECUTABLE=$(command -v python${TERMUX_PYTHON_VERSION})
+-DPYTHON_EXECUTABLE=$(command -v "python${TERMUX_PYTHON_VERSION}")
 -DLLVM_ENABLE_PIC=ON
--DLLVM_ENABLE_PROJECTS=$LLVM_PROJECTS
 -DLLVM_ENABLE_LIBEDIT=OFF
 -DLLVM_INCLUDE_TESTS=OFF
 -DCLANG_DEFAULT_CXX_STDLIB=libc++
@@ -43,7 +35,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCLANG_INCLUDE_TESTS=OFF
 -DCLANG_TOOL_C_INDEX_TEST_BUILD=OFF
 -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON
--DDEFAULT_SYSROOT=$DEFAULT_SYSROOT
 -DLLVM_LINK_LLVM_DYLIB=ON
 -DLLDB_ENABLE_PYTHON=ON
 -DLLDB_PYTHON_RELATIVE_PATH=lib/python${TERMUX_PYTHON_VERSION}/site-packages
@@ -65,7 +56,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DMLIR_INSTALL_AGGREGATE_OBJECTS=OFF
 "
 
-if [ x$TERMUX_ARCH_BITS = x32 ]; then
+if (( TERMUX_ARCH_BITS == 32 )); then
 	# Do not set _FILE_OFFSET_BITS=64
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_FORCE_SMALLFILE_FOR_ANDROID=on"
 fi
@@ -97,29 +88,40 @@ termux_step_host_build() {
 		lldb-tblgen llvm-tblgen mlir-tblgen mlir-linalg-ods-yaml-gen
 }
 
+# shellcheck disable=SC2031
 termux_step_pre_configure() {
 	# Add unknown vendor, otherwise it screws with the default LLVM triple
 	# detection.
-	export LLVM_DEFAULT_TARGET_TRIPLE=${CCTERMUX_HOST_PLATFORM/-/-unknown-}
-	export LLVM_TARGET_ARCH
-	if [ $TERMUX_ARCH = "arm" ]; then
-		LLVM_TARGET_ARCH=ARM
-	elif [ $TERMUX_ARCH = "aarch64" ]; then
-		LLVM_TARGET_ARCH=AArch64
-	elif [ $TERMUX_ARCH = "i686" ] || [ $TERMUX_ARCH = "x86_64" ]; then
-		LLVM_TARGET_ARCH=X86
+	local llvm_default_target_triple="${CCTERMUX_HOST_PLATFORM/-/-unknown-}"
+	local llvm_target_arch
+	case "$TERMUX_ARCH" in
+		"aarch64") llvm_target_arch="AArch64";;
+		"arm") llvm_target_arch="ARM";;
+		"i686"|"x86_64") llvm_target_arch="X86";;
+		*) termux_error_exit "Invalid arch: $TERMUX_ARCH";;
+	esac
+
+	local default_sysroot
+	if [[ "$TERMUX__PREFIX" == "$TERMUX__ROOTFS" ]]; then
+		default_sysroot=".."
 	else
-		termux_error_exit "Invalid arch: $TERMUX_ARCH"
+		default_sysroot="../.."
 	fi
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DDEFAULT_SYSROOT=$default_sysroot"
+
+	local llvm_projects="clang;clang-tools-extra;compiler-rt;lld;lldb;mlir;openmp;polly"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_ENABLE_PROJECTS=$llvm_projects"
+
 	# see CMakeLists.txt and tools/clang/CMakeLists.txt
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGET_ARCH=$LLVM_TARGET_ARCH"
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_HOST_TRIPLE=$LLVM_DEFAULT_TARGET_TRIPLE"
-	export TERMUX_SRCDIR_SAVE=$TERMUX_PKG_SRCDIR
-	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/llvm
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGET_ARCH=$llvm_target_arch"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_HOST_TRIPLE=$llvm_default_target_triple"
+	export TERMUX_SRCDIR_SAVE="$TERMUX_PKG_SRCDIR"
+	TERMUX_PKG_SRCDIR="$TERMUX_PKG_SRCDIR/llvm"
 }
 
 termux_step_post_configure() {
-	TERMUX_PKG_SRCDIR=$TERMUX_SRCDIR_SAVE
+	TERMUX_PKG_SRCDIR="$TERMUX_SRCDIR_SAVE"
+	unset TERMUX_SRCDIR_SAVE
 }
 
 termux_step_post_make_install() {
