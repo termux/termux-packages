@@ -1,20 +1,20 @@
 diff --git a/Cargo.toml b/Cargo.toml
-index 34a0c5be..00d6e17b 100644
+index d439ffc..aa245fa 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
-@@ -161,7 +161,9 @@ strip-ansi-escapes = "0.2.1"
+@@ -177,7 +177,9 @@ strip-ansi-escapes = "0.2.1"
  strum = "0.26"
- strum_macros = "0.26"
+ strum_macros = "0.27"
  syn = "2.0"
--sysinfo = "0.36"
+-sysinfo = "0.37.2"
 +# Starting from 0.36, the `user` feature uses `getpwent`, etc.
 +# These were added to Android in API 26, but termux currently targets API 24.
-+sysinfo = { version = "0.36", default-features = false, features = ["component", "disk", "network", "system"] }
++sysinfo = { version = "0.37.2", default-features = false, features = ["component", "disk", "network", "system"] }
  tabled = { version = "0.20", default-features = false }
- tempfile = "3.20"
+ tempfile = "3.23"
  thiserror = "2.0.12"
 diff --git a/crates/nu-command/src/system/sys/users.rs b/crates/nu-command/src/system/sys/users.rs
-index ffc84f05..985ea1f1 100644
+index 88b22f7..35ccd31 100644
 --- a/crates/nu-command/src/system/sys/users.rs
 +++ b/crates/nu-command/src/system/sys/users.rs
 @@ -1,6 +1,4 @@
