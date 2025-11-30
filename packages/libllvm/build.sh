@@ -5,9 +5,10 @@ TERMUX_PKG_LICENSE_FILE="llvm/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@finagolfin"
 # Keep flang version and revision in sync when updating (enforced by check in termux_step_pre_configure).
 TERMUX_PKG_VERSION=21.1.6
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=ae67086eb04bed7ca11ab880349b5f1ab6f50e1b88cda376eaf8a845b935762b
 TERMUX_PKG_AUTO_UPDATE=false
-TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-${TERMUX_PKG_VERSION}.src.tar.xz
+TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-${TERMUX_PKG_VERSION}/llvm-project-${TERMUX_PKG_VERSION}.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/ld64.lld.darwin*
@@ -78,13 +79,14 @@ termux_step_post_get_source() {
 	fi
 }
 
+# shellcheck disable=SC2031
 termux_step_host_build() {
 	termux_setup_cmake
 	termux_setup_ninja
 
 	cmake -G Ninja -DCMAKE_BUILD_TYPE=Release \
-		-DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;lldb;mlir' $TERMUX_PKG_SRCDIR/llvm
-	ninja -j $TERMUX_PKG_MAKE_PROCESSES clang-tblgen clang-tidy-confusable-chars-gen \
+		-DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;lldb;mlir' "$TERMUX_PKG_SRCDIR/llvm"
+	ninja -j "$TERMUX_PKG_MAKE_PROCESSES" clang-tblgen clang-tidy-confusable-chars-gen \
 		lldb-tblgen llvm-tblgen mlir-tblgen mlir-linalg-ods-yaml-gen
 }
 
@@ -124,16 +126,18 @@ termux_step_post_configure() {
 	unset TERMUX_SRCDIR_SAVE
 }
 
+# shellcheck disable=SC2031
 termux_step_post_make_install() {
-	if [ "$TERMUX_CMAKE_BUILD" = Ninja ]; then
-		ninja -j $TERMUX_PKG_MAKE_PROCESSES docs-{llvm,clang}-man
+	if [[ "$TERMUX_CMAKE_BUILD" == "Ninja" ]]; then
+		ninja -j "$TERMUX_PKG_MAKE_PROCESSES" docs-{llvm,clang}-man
 	else
-		make -j $TERMUX_PKG_MAKE_PROCESSES docs-{llvm,clang}-man
+		make -j "$TERMUX_PKG_MAKE_PROCESSES" docs-{llvm,clang}-man
 	fi
 
-	cp docs/man/* $TERMUX_PREFIX/share/man/man1
-	cp tools/clang/docs/man/{clang,diagtool}.1 $TERMUX_PREFIX/share/man/man1
-	cd $TERMUX_PREFIX/bin
+	cp docs/man/* "$TERMUX_PREFIX/share/man/man1"
+	cp tools/clang/docs/man/{clang,diagtool}.1 "$TERMUX_PREFIX/share/man/man1"
+	cd "$TERMUX_PREFIX/bin" || termux_error_exit "failed to change into 'bin' directory"
+
 
 	for tool in clang clang++ cc c++ cpp gcc g++; do
 		ln -f -s "clang-${TERMUX_PKG_VERSION%%.*}" "$tool"
@@ -155,16 +159,17 @@ termux_step_post_make_install() {
 		cat <<- EOF > "$wrapper"
 		#!$TERMUX_PREFIX/bin/bash
 		if [ "\$1" != "-cc1" ]; then
-			\`dirname \$0\`/$tool --target=$target "\$@"
+			"\$(dirname \$0)/$tool" --target="$target" "\$@"
 		else
 			# Target is already an argument.
-			\`dirname \$0\`/$tool "\$@"
+			"\$(dirname \$0)/$tool" "\$@"
 		fi
 		EOF
 		chmod u+x "$wrapper"
 	done
 }
 
+# shellcheck disable=SC2031
 termux_step_pre_massage() {
 	[[ "$TERMUX_PACKAGE_FORMAT" != "pacman" ]] && return
 	sed -i "s|@LLVM_MAJOR_VERSION@|${TERMUX_PKG_VERSION%%.*}|g" ./share/libalpm/scripts/update-libcompiler-rt
