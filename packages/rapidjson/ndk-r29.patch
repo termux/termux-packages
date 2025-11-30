@@ -1,0 +1,45 @@
+From 3b2441b87f99ab65f37b141a7b548ebadb607b96 Mon Sep 17 00:00:00 2001
+From: Janusz Chorko <janusz.chorko@apdu.pl>
+Date: Fri, 26 Aug 2016 21:17:38 +0200
+Subject: [PATCH 1/2] Removed non-compiling assignment operator. Fixed #718
+
+---
+ include/rapidjson/document.h | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/include/rapidjson/document.h b/include/rapidjson/document.h
+index e3e20dfbd..b0f1f70be 100644
+--- a/include/rapidjson/document.h
++++ b/include/rapidjson/document.h
+@@ -316,8 +316,6 @@ struct GenericStringRef {
+ 
+     GenericStringRef(const GenericStringRef& rhs) : s(rhs.s), length(rhs.length) {}
+ 
+-    GenericStringRef& operator=(const GenericStringRef& rhs) { s = rhs.s; length = rhs.length; }
+-
+     //! implicit conversion to plain CharType pointer
+     operator const Ch *() const { return s; }
+ 
+
+From 862c39be371278a45a88d4d1d75164be57bb7e2d Mon Sep 17 00:00:00 2001
+From: Janusz Chorko <janusz.chorko@apdu.pl>
+Date: Fri, 26 Aug 2016 21:26:50 +0200
+Subject: [PATCH 2/2] Explicitly disable copy assignment operator
+
+---
+ include/rapidjson/document.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/rapidjson/document.h b/include/rapidjson/document.h
+index b0f1f70be..19f5a6a5f 100644
+--- a/include/rapidjson/document.h
++++ b/include/rapidjson/document.h
+@@ -326,6 +326,8 @@ struct GenericStringRef {
+     //! Disallow construction from non-const array
+     template<SizeType N>
+     GenericStringRef(CharType (&str)[N]) /* = delete */;
++    //! Copy assignment operator not permitted - immutable type
++    GenericStringRef& operator=(const GenericStringRef& rhs) /* = delete */;
+ };
+ 
+ //! Mark a character pointer as constant string
