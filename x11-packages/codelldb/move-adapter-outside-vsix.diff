@@ -69,15 +69,15 @@ package file to outside of it.
      Ok(interface)
 --- a/extension/novsc/adapter.ts
 +++ b/extension/novsc/adapter.ts
-@@ -26,7 +26,7 @@ export interface ProcessSpawnParams {
- export async function getSpawnParams(
-     options: AdapterStartOptions
- ): Promise<ProcessSpawnParams> {
--    let executable = path.join(options.extensionRoot, 'adapter', 'codelldb');
-+    let executable = '@TERMUX_PREFIX@/bin/codelldb';
+@@ -19,7 +19,7 @@ export interface AdapterStartOptions {
+ }
  
+ export async function start(options: AdapterStartOptions): Promise<async.cp.ChildProcess> {
+-    let executable = path.join(options.extensionPath, 'adapter', 'codelldb');
++    let executable = '@TERMUX_PREFIX@/bin/codelldb';
      let args: string[] = [];
      if (options.liblldb) {
+         args.push('--liblldb', options.liblldb);
 @@ -84,7 +84,7 @@ export async function findLibLLDB(pathHint: string): Promise<string | undefined>
  
      let libDir;

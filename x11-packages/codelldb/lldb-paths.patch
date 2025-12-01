@@ -1,17 +1,26 @@
 Direct the extension to search for LLDB in $TERMUX_PREFIX/bin and $TERMUX_PREFIX/lib instead
 of in the extension's own installation folder
 
---- a/extension/main.ts
-+++ b/extension/main.ts
-@@ -383,7 +383,7 @@ class Extension implements DebugAdapterDescriptorFactory {
-             if (library) {
-                 this.liblldbPath = await adapter.findLibLLDB(library)
-             } else {
--                this.liblldbPath = await adapter.findLibLLDB(path.join(this.context.extensionPath, 'lldb'));
-+                this.liblldbPath = await adapter.findLibLLDB('@TERMUX_PREFIX@');
-             }
-         }
-         return this.liblldbPath;
+--- a/extension/adapterUtils.ts
++++ b/extension/adapterUtils.ts
+@@ -19,7 +19,7 @@ export async function alternateBackend(extensionPath: string) {
+                 let lldbDir = path.resolve(path.join(dirs.supportExeDir, '..'));
+                 let libraryPath = await adapter.findLibLLDB(lldbDir);
+                 let serverPath;
+-                if (process.platform == 'linux') {
++                if (process.platform == 'linux' || process.platform == 'android') {
+                     serverPath = await adapter.findFileByPattern(dirs.supportExeDir, /lldb-server(-.*)?/);
+                     if (serverPath) {
+                         let stats = await async.fs.stat(serverPath).catch(_ => null);
+@@ -40,7 +40,7 @@ export async function alternateBackend(extensionPath: string) {
+                     let message = `Located liblldb at: ${libraryPath}`;
+                     if (serverPath)
+                         message += `\r\nand lldb server at: ${serverPath}`;
+-                    else if (process.platform == 'linux')
++                    else if (process.platform == 'linux' || process.platform == 'android')
+                         message += '\r\nbut did not find lldb server.';
+ 
+                     let choice;
 --- a/cargo_config.unix.toml
 +++ b/cargo_config.unix.toml
 @@ -10,6 +10,6 @@ CXX_${LLVM_TRIPLE} = "${CMAKE_CXX_COMPILER}"
