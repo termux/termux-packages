@@ -1,27 +1,27 @@
 diff -uNr qemu-8.2.0/linux-user/elfload.c qemu-8.2.0.mod/linux-user/elfload.c
 --- qemu-8.2.0/linux-user/elfload.c	2023-12-19 23:24:34.000000000 +0200
 +++ qemu-8.2.0.mod/linux-user/elfload.c	2024-06-12 18:12:21.007126338 +0300
-@@ -3074,7 +3074,7 @@
+@@ -3096,7 +3096,7 @@ void probe_guest_base(const char *image_name, abi_ulong guest_loaddr,
                        abi_ulong guest_hiaddr)
  {
      /* In order to use host shmat, we must be able to honor SHMLBA.  */
--    uintptr_t align = MAX(SHMLBA, qemu_host_page_size);
-+    uintptr_t align = MAX(/* SHMLBA */ getpagesize(), qemu_host_page_size);
+-    uintptr_t align = MAX(SHMLBA, TARGET_PAGE_SIZE);
++    uintptr_t align = MAX(/* SHMLBA */ getpagesize(), TARGET_PAGE_SIZE);
  
      /* Sanity check the guest binary. */
      if (reserved_va) {
 diff -uNr qemu-8.2.0/linux-user/mmap.c qemu-8.2.0.mod/linux-user/mmap.c
 --- qemu-8.2.0/linux-user/mmap.c	2024-06-12 18:21:01.768575000 +0300
 +++ qemu-8.2.0.mod/linux-user/mmap.c	2024-06-12 18:21:30.340658216 +0300
-@@ -1097,7 +1097,7 @@
+@@ -1310,7 +1310,7 @@ abi_ulong target_shmat(CPUArchState *cpu_env, int shmid,
+      */
+     t_shmlba = target_shmlba(cpu_env);
+     h_pagesize = qemu_real_host_page_size();
+-    h_shmlba = (HOST_FORCE_SHMLBA ? SHMLBA : h_pagesize);
++    h_shmlba = (HOST_FORCE_SHMLBA ? /* SHMLBA */ getpagesize() : h_pagesize);
+     m_shmlba = MAX(t_shmlba, h_shmlba);
  
-             /* In order to use the host shmat, we need to honor host SHMLBA.  */
-             mmap_start = mmap_find_vma(0, shm_info.shm_segsz,
--                                       MAX(SHMLBA, shmlba));
-+                                       MAX(/* SHMLBA */ getpagesize(), shmlba));
- 
-             if (mmap_start == -1) {
-                 return -TARGET_ENOMEM;
+     if (shmaddr) {
 diff -uNr qemu-8.2.0/linux-user/syscall.c qemu-8.2.0.mod/linux-user/syscall.c
 --- qemu-8.2.0/linux-user/syscall.c	2024-06-12 18:10:51.058895969 +0300
 +++ qemu-8.2.0.mod/linux-user/syscall.c	2024-06-12 18:12:21.011126348 +0300

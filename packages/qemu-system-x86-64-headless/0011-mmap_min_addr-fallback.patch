@@ -8,9 +8,9 @@ diff -uNr qemu-5.2.0/linux-user/main.c qemu-5.2.0.mod/linux-user/main.c
 +#ifdef __ANDROID__
 +        // Go with 8 pages (32768 bytes) as default value for Android (Termux).
 +        // Issue https://github.com/termux/termux-packages/issues/6172.
-+        mmap_min_addr = qemu_host_page_size * 8;
++        mmap_min_addr = host_page_size * 8;
 +#else
-         mmap_min_addr = qemu_host_page_size;
+         mmap_min_addr = host_page_size;
 +#endif
          qemu_log_mask(CPU_LOG_PAGE,
                        "host mmap_min_addr=0x%lx (fallback)\n",
