@@ -1,0 +1,37 @@
+--- src.orig/src/ext/exe.rs	2025-11-26 19:18:39.815506321 +0000
++++ src/src/ext/exe.rs	2025-11-26 20:52:30.853579353 +0000
+@@ -225,7 +225,11 @@
+         } else if cfg!(feature = "no_downloads") {
+             bail!("{} is required but was not found. Please install it using your OS's tool of choice", &meta.name);
+         } else {
+-            meta.cached().await.wrap_err(meta.manual)?
++            if meta.url.is_empty() {
++                bail!("{} is required but was not found. {}", &meta.name, &meta.manual);
++            } else {
++                meta.cached().await.wrap_err(meta.manual)?
++            }
+         };
+ 
+         debug!(
+@@ -587,6 +591,10 @@
+ 
+     /// Tool binary download url for the given OS and platform arch
+     fn download_url(&self, target_os: &str, target_arch: &str, version: &str) -> Result<String> {
++        if target_os == "android" {
++            return Ok(String::new());
++        }
++
+         // https://github.com/wasm-bindgen/wasm-bindgen/releases/download/0.2.104/wasm-bindgen-0.2.104-aarch64-apple-darwin.tar.gz - ✅
+         // https://github.com/wasm-bindgen/wasm-bindgen/releases/download/0.2.104/wasm-bindgen-0.2.104-aarch64-unknown-linux-gnu.tar.gz - ✅
+         // https://github.com/wasm-bindgen/wasm-bindgen/releases/download/0.2.104/wasm-bindgen-0.2.104-aarch64-unknown-linux-musl.tar.gz - ✅
+@@ -624,6 +632,10 @@
+     }
+ 
+     fn executable_name(&self, target_os: &str, target_arch: &str, version: &str) -> Result<String> {
++        if target_os == "android" {
++            return Ok(String::new());
++        }
++
+         let use_musl = is_linux_musl_env();
+         let base_name = format_args!("wasm-bindgen-{version}");
+         match (target_os, target_arch) {
