@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/fmang/opustags
 TERMUX_PKG_DESCRIPTION="Ogg Opus tags editor"
-TERMUX_PKG_LICENSE="BSD-3-Clause"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.10.1"
 TERMUX_PKG_SRCURL=https://github.com/fmang/opustags/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
