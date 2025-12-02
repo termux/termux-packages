@@ -15,6 +15,89 @@
 #define LIB "/system/lib/libmediandk.so"
 #endif
 
+#if __ANDROID_API__ >= 26
+#define AImage_API26_FUNCTIONS_1(f) \
+    f(AImage_deleteAsync) \
+    f(AImage_getHardwareBuffer)
+#else
+#define AImage_API26_FUNCTIONS_1(f)
+#endif
+
+#if __ANDROID_API__ >= 26
+#define AImageReader_API26_FUNCTIONS_1(f) \
+    f(AImageReader_newWithUsage) \
+    f(AImageReader_acquireNextImageAsync) \
+    f(AImageReader_acquireLatestImageAsync) \
+    f(AImageReader_setBufferRemovedListener)
+#else
+#define AImageReader_API26_FUNCTIONS_1(f)
+#endif
+
+#if __ANDROID_API__ >= 26
+#define AMediaCodec_API26_FUNCTIONS_1(f) \
+    f(AMediaCodec_createInputSurface) \
+    f(AMediaCodec_createPersistentInputSurface) \
+    f(AMediaCodec_setInputSurface) \
+    f(AMediaCodec_setParameters) \
+    f(AMediaCodec_signalEndOfInputStream)
+#else
+#define AMediaCodec_API26_FUNCTIONS_1(f)
+#endif
+
+#if __ANDROID_API__ >= 28
+#define AMediaCodec_API28_FUNCTIONS_1(f) \
+    f(AMediaCodec_getBufferFormat) \
+    f(AMediaCodec_getName) \
+    f(AMediaCodec_releaseName) \
+    f(AMediaCodec_setAsyncNotifyCallback) \
+    f(AMediaCodec_releaseCrypto) \
+    f(AMediaCodec_getInputFormat) \
+    f(AMediaCodecActionCode_isRecoverable) \
+    f(AMediaCodecActionCode_isTransient)
+#else
+#define AMediaCodec_API28_FUNCTIONS_1(f)
+#endif
+
+#if __ANDROID_API__ >= 28
+#define AMediaDataSource_API28_FUNCTIONS_1(f) \
+    f(AMediaDataSource_new) \
+    f(AMediaDataSource_delete) \
+    f(AMediaDataSource_setUserdata) \
+    f(AMediaDataSource_setReadAt) \
+    f(AMediaDataSource_setGetSize) \
+    f(AMediaDataSource_setClose)
+#else
+#define AMediaDataSource_API28_FUNCTIONS_1(f)
+#endif
+
+#if __ANDROID_API__ >= 28
+#define AMediaExtractor_API28_FUNCTIONS_1(f) \
+    f(AMediaExtractor_setDataSourceCustom)
+#else
+#define AMediaExtractor_API28_FUNCTIONS_1(f)
+#endif
+
+#if __ANDROID_API__ >= 28
+#define AMediaExtractor_API28_FUNCTIONS_2(f) \
+    f(AMediaExtractor_getFileFormat) \
+    f(AMediaExtractor_getSampleSize) \
+    f(AMediaExtractor_getCachedDuration) \
+    f(AMediaExtractor_getSampleFormat)
+#else
+#define AMediaExtractor_API28_FUNCTIONS_2(f)
+#endif
+
+#if __ANDROID_API__ >= 28
+#define AMediaFormat_API28_FUNCTIONS_1(f) \
+    f(AMediaFormat_getDouble) \
+    f(AMediaFormat_getRect) \
+    f(AMediaFormat_setDouble) \
+    f(AMediaFormat_setSize) \
+    f(AMediaFormat_setRect)
+#else
+#define AMediaFormat_API28_FUNCTIONS_1(f)
+#endif
+
 #define FUNCTIONS(f) \
     f(AImage_delete) \
     f(AImage_getWidth) \
@@ -26,8 +109,7 @@
     f(AImage_getPlanePixelStride) \
     f(AImage_getPlaneRowStride) \
     f(AImage_getPlaneData) \
-    f(AImage_deleteAsync) \
-    f(AImage_getHardwareBuffer) \
+    AImage_API26_FUNCTIONS_1(f) \
     f(AImageReader_new) \
     f(AImageReader_delete) \
     f(AImageReader_getWindow) \
@@ -38,10 +120,7 @@
     f(AImageReader_acquireNextImage) \
     f(AImageReader_acquireLatestImage) \
     f(AImageReader_setImageListener) \
-    f(AImageReader_newWithUsage) \
-    f(AImageReader_acquireNextImageAsync) \
-    f(AImageReader_acquireLatestImageAsync) \
-    f(AImageReader_setBufferRemovedListener) \
+    AImageReader_API26_FUNCTIONS_1(f) \
     f(AMediaCodec_createCodecByName) \
     f(AMediaCodec_createDecoderByType) \
     f(AMediaCodec_createEncoderByType) \
@@ -60,19 +139,8 @@
     f(AMediaCodec_releaseOutputBuffer) \
     f(AMediaCodec_setOutputSurface) \
     f(AMediaCodec_releaseOutputBufferAtTime) \
-    f(AMediaCodec_createInputSurface) \
-    f(AMediaCodec_createPersistentInputSurface) \
-    f(AMediaCodec_setInputSurface) \
-    f(AMediaCodec_setParameters) \
-    f(AMediaCodec_signalEndOfInputStream) \
-    f(AMediaCodec_getBufferFormat) \
-    f(AMediaCodec_getName) \
-    f(AMediaCodec_releaseName) \
-    f(AMediaCodec_setAsyncNotifyCallback) \
-    f(AMediaCodec_releaseCrypto) \
-    f(AMediaCodec_getInputFormat) \
-    f(AMediaCodecActionCode_isRecoverable) \
-    f(AMediaCodecActionCode_isTransient) \
+    AMediaCodec_API26_FUNCTIONS_1(f) \
+    AMediaCodec_API28_FUNCTIONS_1(f) \
     f(AMediaCodecCryptoInfo_new) \
     f(AMediaCodecCryptoInfo_delete) \
     f(AMediaCodecCryptoInfo_setPattern) \
@@ -86,12 +154,7 @@
     f(AMediaCrypto_requiresSecureDecoderComponent) \
     f(AMediaCrypto_new) \
     f(AMediaCrypto_delete) \
-    f(AMediaDataSource_new) \
-    f(AMediaDataSource_delete) \
-    f(AMediaDataSource_setUserdata) \
-    f(AMediaDataSource_setReadAt) \
-    f(AMediaDataSource_setGetSize) \
-    f(AMediaDataSource_setClose) \
+    AMediaDataSource_API28_FUNCTIONS_1(f) \
     f(AMediaDrm_isCryptoSchemeSupported) \
     f(AMediaDrm_createByUUID) \
     f(AMediaDrm_release) \
@@ -119,7 +182,7 @@
     f(AMediaExtractor_delete) \
     f(AMediaExtractor_setDataSourceFd) \
     f(AMediaExtractor_setDataSource) \
-    f(AMediaExtractor_setDataSourceCustom) \
+    AMediaExtractor_API28_FUNCTIONS_1(f) \
     f(AMediaExtractor_getTrackCount) \
     f(AMediaExtractor_getTrackFormat) \
     f(AMediaExtractor_selectTrack) \
@@ -132,10 +195,7 @@
     f(AMediaExtractor_seekTo) \
     f(AMediaExtractor_getPsshInfo) \
     f(AMediaExtractor_getSampleCryptoInfo) \
-    f(AMediaExtractor_getFileFormat) \
-    f(AMediaExtractor_getSampleSize) \
-    f(AMediaExtractor_getCachedDuration) \
-    f(AMediaExtractor_getSampleFormat) \
+    AMediaExtractor_API28_FUNCTIONS_2(f) \
     f(AMediaFormat_new) \
     f(AMediaFormat_delete) \
     f(AMediaFormat_toString) \
@@ -150,11 +210,7 @@
     f(AMediaFormat_setFloat) \
     f(AMediaFormat_setString) \
     f(AMediaFormat_setBuffer) \
-    f(AMediaFormat_getDouble) \
-    f(AMediaFormat_getRect) \
-    f(AMediaFormat_setDouble) \
-    f(AMediaFormat_setSize) \
-    f(AMediaFormat_setRect) \
+    AMediaFormat_API28_FUNCTIONS_1(f) \
     f(AMediaMuxer_new) \
     f(AMediaMuxer_delete) \
     f(AMediaMuxer_setLocation) \
@@ -222,6 +278,7 @@ media_status_t AImage_getPlaneData(const AImage* image, int planeIdx, /*out*/uin
     CALL(AImage_getPlaneData, 0, image, planeIdx, data, dataLength);
 }
 
+#if __ANDROID_API__ >= 26
 void AImage_deleteAsync(AImage* image, int releaseFenceFd) {
     CALL(AImage_deleteAsync,, image, releaseFenceFd);
 }
@@ -229,6 +286,7 @@ void AImage_deleteAsync(AImage* image, int releaseFenceFd) {
 media_status_t AImage_getHardwareBuffer(const AImage* image, /*out*/AHardwareBuffer** buffer) {
     CALL(AImage_getHardwareBuffer, 0, image, buffer);
 }
+#endif
 
 media_status_t AImageReader_new(int32_t width, int32_t height, int32_t format, int32_t maxImages, /*out*/AImageReader** reader) {
     CALL(AImageReader_new, 0, width, height, format, maxImages, reader);
@@ -270,6 +328,7 @@ media_status_t AImageReader_setImageListener(AImageReader* reader, AImageReader_
     CALL(AImageReader_setImageListener, 0, reader, listener);
 }
 
+#if __ANDROID_API__ >= 26
 media_status_t AImageReader_newWithUsage(int32_t width, int32_t height, int32_t format, uint64_t usage, int32_t maxImages, /*out*/ AImageReader** reader) {
     CALL(AImageReader_newWithUsage, 0, width, height, format, usage, maxImages, reader);
 }
@@ -285,6 +344,7 @@ media_status_t AImageReader_acquireLatestImageAsync(AImageReader* reader, /*out*
 media_status_t AImageReader_setBufferRemovedListener(AImageReader* reader, AImageReader_BufferRemovedListener* listener) {
     CALL(AImageReader_setBufferRemovedListener, 0, reader, listener);
 }
+#endif
 
 AMediaCodec* AMediaCodec_createCodecByName(const char *name) {
     CALL(AMediaCodec_createCodecByName, NULL, name);
@@ -366,6 +426,7 @@ media_status_t AMediaCodec_releaseOutputBufferAtTime(AMediaCodec *mData, size_t 
     CALL(AMediaCodec_releaseOutputBufferAtTime, 0, mData, idx, timestampNs);
 }
 
+#if __ANDROID_API__ >= 26
 media_status_t AMediaCodec_createInputSurface(AMediaCodec *mData, ANativeWindow **surface) {
     CALL(AMediaCodec_createInputSurface, 0, mData, surface);
 }
@@ -385,7 +446,9 @@ media_status_t AMediaCodec_setParameters(AMediaCodec *mData, const AMediaFormat*
 media_status_t AMediaCodec_signalEndOfInputStream(AMediaCodec *mData) {
     CALL(AMediaCodec_signalEndOfInputStream, 0, mData);
 }
+#endif
 
+#if __ANDROID_API__ >= 28
 AMediaFormat* AMediaCodec_getBufferFormat(AMediaCodec* mData, size_t index) {
     CALL(AMediaCodec_getBufferFormat, 0, mData, index);
 }
@@ -417,6 +480,7 @@ bool AMediaCodecActionCode_isRecoverable(int32_t actionCode) {
 bool AMediaCodecActionCode_isTransient(int32_t actionCode) {
     CALL(AMediaCodecActionCode_isTransient, false, actionCode);
 }
+#endif
 
 AMediaCodecCryptoInfo *AMediaCodecCryptoInfo_new(int numsubsamples, uint8_t key[16], uint8_t iv[16], cryptoinfo_mode_t mode, size_t *clearbytes, size_t *encryptedbytes) {
     CALL(AMediaCodecCryptoInfo_new, NULL, numsubsamples, key, iv, mode, clearbytes, encryptedbytes);
@@ -470,6 +534,7 @@ void AMediaCrypto_delete(AMediaCrypto* crypto) {
     CALL(AMediaCrypto_delete,, crypto);
 }
 
+#if __ANDROID_API__ >= 28
 AMediaDataSource* AMediaDataSource_new() {
     CALL(AMediaDataSource_new, NULL);
 }
@@ -493,6 +558,7 @@ void AMediaDataSource_setGetSize(AMediaDataSource* source, AMediaDataSourceGetSi
 void AMediaDataSource_setClose(AMediaDataSource* source, AMediaDataSourceClose cb) {
     CALL(AMediaDataSource_setClose,, source, cb);
 }
+#endif
 
 bool AMediaDrm_isCryptoSchemeSupported(const uint8_t *uuid, const char *mimeType) {
     CALL(AMediaDrm_isCryptoSchemeSupported, false, uuid, mimeType);
@@ -602,9 +668,11 @@ media_status_t AMediaExtractor_setDataSource(AMediaExtractor* ex, const char *lo
     CALL(AMediaExtractor_setDataSource, 0, ex, location);
 }
 
+#if __ANDROID_API__ >= 28
 media_status_t AMediaExtractor_setDataSourceCustom(AMediaExtractor* ex, AMediaDataSource *src) {
     CALL(AMediaExtractor_setDataSourceCustom, 0, ex, src);
 }
+#endif
 
 size_t AMediaExtractor_getTrackCount(AMediaExtractor* ex) {
     CALL(AMediaExtractor_getTrackCount, 0, ex);
@@ -654,6 +722,7 @@ AMediaCodecCryptoInfo *AMediaExtractor_getSampleCryptoInfo(AMediaExtractor *ex) 
     CALL(AMediaExtractor_getSampleCryptoInfo, NULL, ex);
 }
 
+#if __ANDROID_API__ >= 28
 AMediaFormat* AMediaExtractor_getFileFormat(AMediaExtractor* ex) {
     CALL(AMediaExtractor_getFileFormat, NULL, ex);
 }
@@ -669,6 +738,7 @@ int64_t AMediaExtractor_getCachedDuration(AMediaExtractor* ex) {
 media_status_t AMediaExtractor_getSampleFormat(AMediaExtractor *ex, AMediaFormat *fmt) {
     CALL(AMediaExtractor_getSampleFormat, 0, ex, fmt);
 }
+#endif
 
 AMediaFormat *AMediaFormat_new() {
     CALL(AMediaFormat_new, NULL);
@@ -726,6 +796,7 @@ void AMediaFormat_setBuffer(AMediaFormat* mData, const char* name, const void* d
     CALL(AMediaFormat_setBuffer,, mData, name, data, size);
 }
 
+#if __ANDROID_API__ >= 28
 bool AMediaFormat_getDouble(AMediaFormat* mData, const char *name, double *out) {
     CALL(AMediaFormat_getDouble, false, mData, name, out);
 }
@@ -745,6 +816,7 @@ void AMediaFormat_setSize(AMediaFormat* mData, const char* name, size_t value) {
 void AMediaFormat_setRect(AMediaFormat* mData, const char* name, int32_t left, int32_t top, int32_t right, int32_t bottom) {
     CALL(AMediaFormat_setRect,, mData, name, left, top, right, bottom);
 }
+#endif
 
 AMediaMuxer* AMediaMuxer_new(int fd, OutputFormat format) {
     CALL(AMediaMuxer_new, NULL, fd, format);

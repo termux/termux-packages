@@ -26,6 +26,99 @@
 #define LIB "/system/lib/libandroid.so"
 #endif
 
+#if __ANDROID_API__ >= 26
+#define AHardwareBuffer_API26_FUNCTIONS_1(f) \
+    f(AHardwareBuffer_fromHardwareBuffer) \
+    f(AHardwareBuffer_toHardwareBuffer) \
+    f(AHardwareBuffer_allocate) \
+    f(AHardwareBuffer_acquire) \
+    f(AHardwareBuffer_release) \
+    f(AHardwareBuffer_describe) \
+    f(AHardwareBuffer_lock) \
+    f(AHardwareBuffer_unlock) \
+    f(AHardwareBuffer_sendHandleToUnixSocket) \
+    f(AHardwareBuffer_recvHandleFromUnixSocket)
+#else
+#define AHardwareBuffer_API26_FUNCTIONS_1(f)
+#endif
+
+#if __ANDROID_API__ >= 26
+#define ANativeWindow_API26_FUNCTIONS_1(f) \
+    f(ANativeWindow_toSurface)
+#else
+#define ANativeWindow_API26_FUNCTIONS_1(f)
+#endif
+
+#if __ANDROID_API__ >= 26
+#define ANativeWindow_API26_FUNCTIONS_2(f) \
+    f(ANativeWindow_setBuffersTransform)
+#else
+#define ANativeWindow_API26_FUNCTIONS_2(f)
+#endif
+
+#if __ANDROID_API__ >= 28
+#define ANativeWindow_API28_FUNCTIONS_1(f) \
+    f(ANativeWindow_setBuffersDataSpace) \
+    f(ANativeWindow_getBuffersDataSpace)
+#else
+#define ANativeWindow_API28_FUNCTIONS_1(f)
+#endif
+
+#if __ANDROID_API__ >= 26
+#define ASensorManager_API26_FUNCTIONS_1(f) \
+    f(ASensorManager_getInstanceForPackage)
+#else
+#define ASensorManager_API26_FUNCTIONS_1(f)
+#endif
+
+#if __ANDROID_API__ >= 26
+#define ASensorManager_API26_FUNCTIONS_2(f) \
+    f(ASensorManager_createSharedMemoryDirectChannel) \
+    f(ASensorManager_createHardwareBufferDirectChannel) \
+    f(ASensorManager_destroyDirectChannel) \
+    f(ASensorManager_configureDirectReport)
+#else
+#define ASensorManager_API26_FUNCTIONS_2(f)
+#endif
+
+#if __ANDROID_API__ >= 26
+#define ASensor_API26_FUNCTIONS_1(f) \
+    f(ASensor_isDirectChannelTypeSupported) \
+    f(ASensor_getHighestDirectReportRateLevel)
+#else
+#define ASensor_API26_FUNCTIONS_1(f)
+#endif
+
+#if __ANDROID_API__ >= 27
+#define ASharedMemory_API27_FUNCTIONS_1(f) \
+    f(ASharedMemory_dupFromJava)
+#else
+#define ASharedMemory_API27_FUNCTIONS_1(f)
+#endif
+
+#if __ANDROID_API__ >= 26
+#define ASharedMemory_API26_FUNCTIONS_1(f) \
+    f(ASharedMemory_create) \
+    f(ASharedMemory_getSize) \
+    f(ASharedMemory_setProt)
+#else
+#define ASharedMemory_API26_FUNCTIONS_1(f)
+#endif
+
+#if __ANDROID_API__ >= 28
+#define ASurfaceTexture_API28_FUNCTIONS_1(f) \
+    f(ASurfaceTexture_fromSurfaceTexture) \
+    f(ASurfaceTexture_release) \
+    f(ASurfaceTexture_acquireANativeWindow) \
+    f(ASurfaceTexture_attachToGLContext) \
+    f(ASurfaceTexture_detachFromGLContext) \
+    f(ASurfaceTexture_updateTexImage) \
+    f(ASurfaceTexture_getTransformMatrix) \
+    f(ASurfaceTexture_getTimestamp)
+#else
+#define ASurfaceTexture_API28_FUNCTIONS_1(f)
+#endif
+
 #define FUNCTIONS(f) \
     f(AAssetManager_openDir) \
     f(AAssetManager_open) \
@@ -96,16 +189,7 @@
     f(AConfiguration_diff) \
     f(AConfiguration_match) \
     f(AConfiguration_isBetterThan) \
-    f(AHardwareBuffer_fromHardwareBuffer) \
-    f(AHardwareBuffer_toHardwareBuffer) \
-    f(AHardwareBuffer_allocate) \
-    f(AHardwareBuffer_acquire) \
-    f(AHardwareBuffer_release) \
-    f(AHardwareBuffer_describe) \
-    f(AHardwareBuffer_lock) \
-    f(AHardwareBuffer_unlock) \
-    f(AHardwareBuffer_sendHandleToUnixSocket) \
-    f(AHardwareBuffer_recvHandleFromUnixSocket) \
+    AHardwareBuffer_API26_FUNCTIONS_1(f) \
     f(AInputEvent_getType) \
     f(AInputEvent_getDeviceId) \
     f(AInputEvent_getSource) \
@@ -177,7 +261,7 @@
     f(ANativeActivity_showSoftInput) \
     f(ANativeActivity_hideSoftInput) \
     f(ANativeWindow_fromSurface) \
-    f(ANativeWindow_toSurface) \
+    ANativeWindow_API26_FUNCTIONS_1(f) \
     f(ANativeWindow_acquire) \
     f(ANativeWindow_release) \
     f(ANativeWindow_getWidth) \
@@ -186,25 +270,21 @@
     f(ANativeWindow_setBuffersGeometry) \
     f(ANativeWindow_lock) \
     f(ANativeWindow_unlockAndPost) \
-    f(ANativeWindow_setBuffersTransform) \
-    f(ANativeWindow_setBuffersDataSpace) \
-    f(ANativeWindow_getBuffersDataSpace) \
+    ANativeWindow_API26_FUNCTIONS_2(f) \
+    ANativeWindow_API28_FUNCTIONS_1(f) \
     f(AObbScanner_getObbInfo) \
     f(AObbInfo_delete) \
     f(AObbInfo_getPackageName) \
     f(AObbInfo_getVersion) \
     f(AObbInfo_getFlags) \
     f(ASensorManager_getInstance) \
-    f(ASensorManager_getInstanceForPackage) \
+    ASensorManager_API26_FUNCTIONS_1(f) \
     f(ASensorManager_getSensorList) \
     f(ASensorManager_getDefaultSensor) \
     f(ASensorManager_getDefaultSensorEx) \
     f(ASensorManager_createEventQueue) \
     f(ASensorManager_destroyEventQueue) \
-    f(ASensorManager_createSharedMemoryDirectChannel) \
-    f(ASensorManager_createHardwareBufferDirectChannel) \
-    f(ASensorManager_destroyDirectChannel) \
-    f(ASensorManager_configureDirectReport) \
+    ASensorManager_API26_FUNCTIONS_2(f) \
     f(ASensorEventQueue_registerSensor) \
     f(ASensorEventQueue_enableSensor) \
     f(ASensorEventQueue_disableSensor) \
@@ -221,26 +301,16 @@
     f(ASensor_getStringType) \
     f(ASensor_getReportingMode) \
     f(ASensor_isWakeUpSensor) \
-    f(ASensor_isDirectChannelTypeSupported) \
-    f(ASensor_getHighestDirectReportRateLevel) \
-    f(ASharedMemory_dupFromJava) \
-    f(ASharedMemory_create) \
-    f(ASharedMemory_getSize) \
-    f(ASharedMemory_setProt) \
+    ASensor_API26_FUNCTIONS_1(f) \
+    ASharedMemory_API27_FUNCTIONS_1(f) \
+    ASharedMemory_API26_FUNCTIONS_1(f) \
     f(AStorageManager_new) \
     f(AStorageManager_delete) \
     f(AStorageManager_mountObb) \
     f(AStorageManager_unmountObb) \
     f(AStorageManager_isObbMounted) \
     f(AStorageManager_getMountedObbPath) \
-    f(ASurfaceTexture_fromSurfaceTexture) \
-    f(ASurfaceTexture_release) \
-    f(ASurfaceTexture_acquireANativeWindow) \
-    f(ASurfaceTexture_attachToGLContext) \
-    f(ASurfaceTexture_detachFromGLContext) \
-    f(ASurfaceTexture_updateTexImage) \
-    f(ASurfaceTexture_getTransformMatrix) \
-    f(ASurfaceTexture_getTimestamp) \
+    ASurfaceTexture_API28_FUNCTIONS_1(f) \
     f(ATrace_isEnabled) \
     f(ATrace_beginSection) \
     f(ATrace_endSection) \
@@ -542,6 +612,7 @@ int32_t AConfiguration_isBetterThan(AConfiguration* base, AConfiguration* test, 
     CALL(AConfiguration_isBetterThan, 0, base, test, requested);
 }
 
+#if __ANDROID_API__ >= 26
 AHardwareBuffer* AHardwareBuffer_fromHardwareBuffer(JNIEnv* env, jobject hardwareBufferObj) {
     CALL(AHardwareBuffer_fromHardwareBuffer, NULL, env, hardwareBufferObj);
 }
@@ -581,6 +652,7 @@ int AHardwareBuffer_sendHandleToUnixSocket(const AHardwareBuffer* _Nonnull buffe
 int AHardwareBuffer_recvHandleFromUnixSocket(int socketFd, AHardwareBuffer* _Nullable* _Nonnull outBuffer) {
     CALL(AHardwareBuffer_recvHandleFromUnixSocket, 0, socketFd, outBuffer);
 }
+#endif
 
 int32_t AInputEvent_getType(const AInputEvent* event) {
     CALL(AInputEvent_getType, 0, event);
@@ -866,9 +938,11 @@ ANativeWindow* ANativeWindow_fromSurface(JNIEnv* env, jobject surface) {
     CALL(ANativeWindow_fromSurface, NULL, env, surface);
 }
 
+#if __ANDROID_API__ >= 26
 jobject ANativeWindow_toSurface(JNIEnv* env, ANativeWindow* window) {
     CALL(ANativeWindow_toSurface, NULL, env, window);
 }
+#endif
 
 void ANativeWindow_acquire(ANativeWindow* window) {
     CALL(ANativeWindow_acquire,, window);
@@ -902,10 +976,13 @@ int32_t ANativeWindow_unlockAndPost(ANativeWindow* window) {
     CALL(ANativeWindow_unlockAndPost, 0, window);
 }
 
+#if __ANDROID_API__ >= 26
 int32_t ANativeWindow_setBuffersTransform(ANativeWindow* window, int32_t transform) {
     CALL(ANativeWindow_setBuffersTransform, 0, window, transform);
 }
+#endif
 
+#if __ANDROID_API__ >= 28
 int32_t ANativeWindow_setBuffersDataSpace(ANativeWindow* window, int32_t dataSpace) {
     CALL(ANativeWindow_setBuffersDataSpace, 0, window, dataSpace);
 }
@@ -913,6 +990,7 @@ int32_t ANativeWindow_setBuffersDataSpace(ANativeWindow* window, int32_t dataSpa
 int32_t ANativeWindow_getBuffersDataSpace(ANativeWindow* window) {
     CALL(ANativeWindow_getBuffersDataSpace, 0, window);
 }
+#endif
 
 AObbInfo* AObbScanner_getObbInfo(const char* filename) {
     CALL(AObbScanner_getObbInfo, NULL, filename);
@@ -938,9 +1016,11 @@ ASensorManager* ASensorManager_getInstance() {
     CALL(ASensorManager_getInstance, NULL);
 }
 
+#if __ANDROID_API__ >= 26
 ASensorManager* ASensorManager_getInstanceForPackage(const char* packageName) {
     CALL(ASensorManager_getInstanceForPackage, NULL, packageName);
 }
+#endif
 
 int ASensorManager_getSensorList(ASensorManager* manager, ASensorList* list) {
     CALL(ASensorManager_getSensorList, 0, manager, list);
@@ -962,6 +1042,7 @@ int ASensorManager_destroyEventQueue(ASensorManager* manager, ASensorEventQueue*
     CALL(ASensorManager_destroyEventQueue, 0, manager, queue);
 }
 
+#if __ANDROID_API__ >= 26
 int ASensorManager_createSharedMemoryDirectChannel(ASensorManager* manager, int fd, size_t size) {
     CALL(ASensorManager_createSharedMemoryDirectChannel, 0, manager, fd, size);
 }
@@ -977,6 +1058,7 @@ void ASensorManager_destroyDirectChannel(ASensorManager* manager, int channelId)
 int ASensorManager_configureDirectReport(ASensorManager* manager, ASensor const* sensor, int channelId, int rate) {
     CALL(ASensorManager_configureDirectReport, 0, manager, sensor, channelId, rate);
 }
+#endif
 
 int ASensorEventQueue_registerSensor(ASensorEventQueue* queue, ASensor const* sensor, int32_t samplingPeriodUs, int64_t maxBatchReportLatencyUs) {
     CALL(ASensorEventQueue_registerSensor, 0, queue, sensor, samplingPeriodUs, maxBatchReportLatencyUs);
@@ -1042,6 +1124,7 @@ bool ASensor_isWakeUpSensor(ASensor const* sensor) {
     CALL(ASensor_isWakeUpSensor, false, sensor);
 }
 
+#if __ANDROID_API__ >= 26
 bool ASensor_isDirectChannelTypeSupported(ASensor const* sensor, int channelType) {
     CALL(ASensor_isDirectChannelTypeSupported, false, sensor, channelType);
 }
@@ -1049,11 +1132,15 @@ bool ASensor_isDirectChannelTypeSupported(ASensor const* sensor, int channelType
 int ASensor_getHighestDirectReportRateLevel(ASensor const* sensor) {
     CALL(ASensor_getHighestDirectReportRateLevel, 0, sensor);
 }
+#endif
 
+#if __ANDROID_API__ >= 27
 int ASharedMemory_dupFromJava(JNIEnv* env, jobject sharedMemory) {
     CALL(ASharedMemory_dupFromJava, 0, env, sharedMemory);
 }
+#endif
 
+#if __ANDROID_API__ >= 26
 int ASharedMemory_create(const char *name, size_t size) {
     CALL(ASharedMemory_create, -1, name, size);
 }
@@ -1065,6 +1152,7 @@ size_t ASharedMemory_getSize(int fd) {
 int ASharedMemory_setProt(int fd, int prot) {
     CALL(ASharedMemory_setProt, 0, fd, prot);
 }
+#endif
 
 AStorageManager* AStorageManager_new() {
     CALL(AStorageManager_new, NULL);
@@ -1090,6 +1178,7 @@ const char* AStorageManager_getMountedObbPath(AStorageManager* mgr, const char* 
     CALL(AStorageManager_getMountedObbPath, NULL, mgr, filename);
 }
 
+#if __ANDROID_API__ >= 28
 ASurfaceTexture* ASurfaceTexture_fromSurfaceTexture(JNIEnv* env, jobject surfacetexture) {
     CALL(ASurfaceTexture_fromSurfaceTexture, NULL, env, surfacetexture);
 }
@@ -1121,6 +1210,7 @@ void ASurfaceTexture_getTransformMatrix(ASurfaceTexture* st, float mtx[16]) {
 int64_t ASurfaceTexture_getTimestamp(ASurfaceTexture* st) {
     CALL(ASurfaceTexture_getTimestamp, 0, st);
 }
+#endif
 
 bool ATrace_isEnabled() {
     CALL(ATrace_isEnabled, false);
