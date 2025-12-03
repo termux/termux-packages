@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="C implementations of functions for use within SABnzbd"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="9.1.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/sabnzbd/sabctools/releases/download/v${TERMUX_PKG_VERSION}/sabctools-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4f944bcd34b3844102ec073f6ae2eb7837b9d95825906b25c0dce7a95a8714a5
 TERMUX_PKG_AUTO_UPDATE=true
