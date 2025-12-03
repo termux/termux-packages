@@ -27,10 +27,9 @@ termux_pkg_auto_update() {
 
 termux_step_post_get_source() {
 	# match "clang -print-resource-dir"
-	local LLVM_MAJOR_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $LLVM_MAJOR_VERSION)
 	local p="${TERMUX_PKG_BUILDER_DIR}/0001-move-clang-resource-dir.diff"
 	echo "Applying patch: $(basename "${p}")"
-	sed "s|@LLVM_MAJOR_VERSION@|${LLVM_MAJOR_VERSION}|g" "${p}" \
+	sed "s|@LLVM_MAJOR_VERSION@|${TERMUX_LLVM_MAJOR_VERSION}|g" "${p}" \
 		| patch -p1 --silent
 }
 
@@ -70,11 +69,11 @@ termux_step_host_build() {
 	mv -v "${TERMUX_PKG_HOSTBUILD_DIR}"/install/share/cmake/Platform/*.cmake "${TERMUX_PREFIX}/share/cmake/Platform/"
 	mv -v "${TERMUX_PKG_HOSTBUILD_DIR}"/install/share/cmake/*.cmake "${TERMUX_PREFIX}/share/cmake/"
 
-	local LLVM_MAJOR_VERSION_UPSTREAM=$(grep llvm-version "${TERMUX_PREFIX}/share/wasi-sysroot/VERSION" | cut -d" " -f2 | cut -d"." -f1)
-	local LLVM_MAJOR_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $LLVM_MAJOR_VERSION)
+	local LLVM_MAJOR_VERSION_UPSTREAM
+	LLVM_MAJOR_VERSION_UPSTREAM="$(grep llvm-version "${TERMUX_PREFIX}/share/wasi-sysroot/VERSION" | cut -d" " -f2 | cut -d"." -f1)"
 	echo "INFO: LLVM_MAJOR_VERSION_UPSTREAM = $LLVM_MAJOR_VERSION_UPSTREAM"
-	echo "INFO: LLVM_MAJOR_VERSION          = $LLVM_MAJOR_VERSION"
-	if [[ "${LLVM_MAJOR_VERSION_UPSTREAM}" != "${LLVM_MAJOR_VERSION}" ]]; then
+	echo "INFO: LLVM_MAJOR_VERSION          = $TERMUX_LLVM_MAJOR_VERSION"
+	if [[ "${LLVM_MAJOR_VERSION_UPSTREAM}" != "${TERMUX_LLVM_MAJOR_VERSION}" ]]; then
 		echo "WARN: Version mismatch! Termux clang may not work with wasi-libc sysroot!" 1>&2
 	fi
 }

@@ -7,9 +7,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/mstorsjo/llvm-mingw/releases/download/${TERMUX_PKG_VERSION}/llvm-mingw-${TERMUX_PKG_VERSION}-ucrt-ubuntu-22.04-x86_64.tar.xz
 TERMUX_PKG_SHA256=ee1c1f3e4a584f231b1d664eb1f4b9d9f7cae133b64b55dae749f50969cef958
 TERMUX_PKG_AUTO_UPDATE=false
-_LLVM_MAJOR_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $LLVM_MAJOR_VERSION)
-_LLVM_MAJOR_VERSION_NEXT=$((_LLVM_MAJOR_VERSION + 1))
-TERMUX_PKG_DEPENDS="clang (<< ${_LLVM_MAJOR_VERSION_NEXT}), llvm (<< ${_LLVM_MAJOR_VERSION_NEXT}), llvm-tools (<< ${_LLVM_MAJOR_VERSION_NEXT})"
+TERMUX_PKG_DEPENDS="clang (<< $TERMUX_LLVM_NEXT_MAJOR_VERSION), llvm (<< $TERMUX_LLVM_NEXT_MAJOR_VERSION), llvm-tools (<< $TERMUX_LLVM_NEXT_MAJOR_VERSION)"
 TERMUX_PKG_RECOMMENDS="llvm-mingw-w64-tools"
 TERMUX_PKG_CONFLICTS="mingw-w64"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -23,9 +21,9 @@ termux_step_configure() {
 
 termux_step_make_install() {
 	# Install compier-rt libraries
-	rm -rf "$TERMUX_PREFIX/lib/clang/$_LLVM_MAJOR_VERSION/lib/windows"
-	mkdir -p "$TERMUX_PREFIX/lib/clang/$_LLVM_MAJOR_VERSION/lib/windows"
-	mv "$TERMUX_PKG_SRCDIR/lib/clang/$_LLVM_MAJOR_VERSION/lib/windows" "$TERMUX_PREFIX/lib/clang/$_LLVM_MAJOR_VERSION/lib/"
+	rm -rf "$TERMUX_PREFIX/lib/clang/${TERMUX_LLVM_MAJOR_VERSION}/lib/windows"
+	mkdir -p "$TERMUX_PREFIX/lib/clang/${TERMUX_LLVM_MAJOR_VERSION}/lib/windows"
+	mv "$TERMUX_PKG_SRCDIR/lib/clang/${TERMUX_LLVM_MAJOR_VERSION}/lib/windows" "$TERMUX_PREFIX/lib/clang/${TERMUX_LLVM_MAJOR_VERSION}/lib/"
 
 	# Install ucrt libraries
 	mkdir -p "$TERMUX_PREFIX/opt/llvm-mingw-w64"

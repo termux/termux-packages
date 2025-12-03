@@ -19,10 +19,8 @@ termux_step_override_config_scripts() {
 			"x86_64") LLVM_TARGET_ARCH=X86;;
 		esac
 
-		local libllvm_version
-		libllvm_version="$(. "$TERMUX_SCRIPTDIR/packages/libllvm/build.sh"; echo "$TERMUX_PKG_VERSION")"
 		sed "$TERMUX_SCRIPTDIR/packages/libllvm/llvm-config.in" \
-			-e "s|@TERMUX_PKG_VERSION@|$libllvm_version|g" \
+			-e "s|@TERMUX_PKG_VERSION@|$TERMUX_LLVM_VERSION|g" \
 			-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
 			-e "s|@LLVM_TARGET_ARCH@|$LLVM_TARGET_ARCH|g" \
 			-e "s|@LLVM_DEFAULT_TARGET_TRIPLE@|$LLVM_DEFAULT_TARGET_TRIPLE|g" \
@@ -44,7 +42,7 @@ termux_step_override_config_scripts() {
 		chmod 755 "$TERMUX_PREFIX/bin/pg_config"
 	fi
 
-	# Does this package or its build depend on 'protobuf' or 'protobuf-static'?
+	# Does this package or its build depend on 'libprotobuf' or 'protobuf-static'?
 	if [[ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/libprotobuf/}" ]]; then
 		rm -f "$TERMUX_PREFIX/lib/cmake/protobuf"/protobuf-targets{,-release}.cmake
 		cp "$TERMUX_PREFIX/opt/protobuf-cmake/shared"/protobuf-targets{,-release}.cmake "$TERMUX_PREFIX/lib/cmake/protobuf/"

@@ -169,12 +169,29 @@ termux_step_setup_variables() {
 	TERMUX_PKG_GROUPS="" # https://wiki.archlinux.org/title/Pacman#Installing_package_groups
 	TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=false # if the package does not support compilation on a device, then this package should not be compiled on devices
 	TERMUX_PKG_SETUP_PYTHON=false # setting python to compile a package
-	TERMUX_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/$(test "${TERMUX_PACKAGE_LIBRARY}" = "bionic" && echo "packages" || echo "gpkg")/python/build.sh; echo $_MAJOR_VERSION) # get the latest version of python
+	TERMUX_PYTHON_VERSION="$( # get the latest version of python
+		if [[ "${TERMUX_PACKAGE_LIBRARY}" == "bionic" ]]; then
+			. "$TERMUX_SCRIPTDIR/packages/python/build.sh"
+		else # glibc
+			. "$TERMUX_SCRIPTDIR/gpkg/python/build.sh"
+		fi
+		echo "$_MAJOR_VERSION"
+	)"
 	TERMUX_PKG_PYTHON_TARGET_DEPS="" # python modules to be installed via pip3
 	TERMUX_PKG_PYTHON_BUILD_DEPS="" # python modules to be installed via build-pip
 	TERMUX_PKG_PYTHON_COMMON_DEPS="" # python modules to be installed via pip3 or build-pip
 	TERMUX_PYTHON_CROSSENV_PREFIX="$TERMUX_TOPDIR/python${TERMUX_PYTHON_VERSION}-crossenv-prefix-$TERMUX_PACKAGE_LIBRARY-$TERMUX_ARCH" # python modules dependency location (only used in non-devices)
 	TERMUX_PYTHON_HOME=$TERMUX__PREFIX__LIB_DIR/python${TERMUX_PYTHON_VERSION} # location of python libraries
+	TERMUX_LLVM_VERSION="$( # get the latest version of LLVM
+		if [[ "${TERMUX_PACKAGE_LIBRARY}" == "bionic" ]]; then
+			. "$TERMUX_SCRIPTDIR/packages/libllvm/build.sh"
+		else # glibc
+			. "$TERMUX_SCRIPTDIR/gpkg/llvm/build.sh"
+		fi
+		echo "$TERMUX_PKG_VERSION"
+	)"
+	TERMUX_LLVM_MAJOR_VERSION="${TERMUX_LLVM_VERSION%%.*}"
+	TERMUX_LLVM_NEXT_MAJOR_VERSION="$((TERMUX_LLVM_MAJOR_VERSION + 1))"
 	TERMUX_PKG_MESON_NATIVE=false
 	TERMUX_PKG_CMAKE_CROSSCOMPILING=true
 	TERMUX_PROOT_EXTRA_ENV_VARS="" # Extra environvent variables for proot command in termux_setup_proot
