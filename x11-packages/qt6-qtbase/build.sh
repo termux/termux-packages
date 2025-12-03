@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-3.0-only"
 TERMUX_PKG_LICENSE_FILE="LICENSES/GPL-3.0-only.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.10.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtbase-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=5a6226f7e23db51fdc3223121eba53f3f5447cf0cc4d6cb82a3a2df7a65d265d
 TERMUX_PKG_DEPENDS="brotli, double-conversion, freetype, glib, harfbuzz, libandroid-posix-semaphore, libandroid-shmem, libc++, libdrm, libice, libicu, libjpeg-turbo, libpng, libsm, libsqlite, libuuid, libx11, libxcb, libxi, libxkbcommon, libwayland, opengl, openssl, pcre2, vulkan-loader, xcb-util-cursor, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil, xcb-util-wm, zlib, zstd"
@@ -109,7 +109,7 @@ termux_step_host_build() {
 		-exec sed -e "s|^${TERMUX_PREFIX}/opt/qt6/cross|..|g" -i "{}" \;
 
 	while read -r target link; do
-		ln -sv "$target" "$TERMUX_PREFIX/opt/qt6/cross/$link"
+		ln -sfv "$target" "$TERMUX_PREFIX/opt/qt6/cross/$link"
 	done < "$PWD/user_facing_tool_links.txt"
 
 	find ${TERMUX_PREFIX}/opt/qt6/cross -type f -name target_qt.conf \
@@ -137,7 +137,7 @@ termux_step_post_make_install() {
 		-exec cat "{}" \;
 
 	while read -r target link; do
-		ln -sv "$target" "$TERMUX_PREFIX/$link"
+		ln -sfv "$target" "$TERMUX_PREFIX/$link"
 	done < "$PWD/user_facing_tool_links.txt"
 
 	find ${TERMUX_PREFIX}/lib/qt6 -type f -name target_qt.conf \

@@ -1,0 +1,51 @@
+--- a/src/corelib/time/qtimezone.cpp
++++ b/src/corelib/time/qtimezone.cpp
+@@ -29,7 +29,7 @@ static QTimeZonePrivate *newBackendTimeZone()
+     return new QMacTimeZonePrivate();
+ #elif defined(Q_OS_ANDROID)
+     return new QAndroidTimeZonePrivate();
+-#elif defined(Q_OS_UNIX) && !defined(Q_OS_VXWORKS)
++#elif defined(Q_OS_UNIX) && !defined(Q_OS_VXWORKS) && !defined(__ANDROID__)
+     return new QTzTimeZonePrivate();
+ #elif QT_CONFIG(icu)
+     return new QIcuTimeZonePrivate();
+@@ -50,7 +50,7 @@ static QTimeZonePrivate *newBackendTimeZone(const QByteArray &ianaId)
+     return new QMacTimeZonePrivate(ianaId);
+ #elif defined(Q_OS_ANDROID)
+     return new QAndroidTimeZonePrivate(ianaId);
+-#elif defined(Q_OS_UNIX) && !defined(Q_OS_VXWORKS)
++#elif defined(Q_OS_UNIX) && !defined(Q_OS_VXWORKS) && !defined(__ANDROID__)
+     return new QTzTimeZonePrivate(ianaId);
+ #elif QT_CONFIG(icu)
+     return new QIcuTimeZonePrivate(ianaId);
+--- a/src/corelib/time/qtimezoneprivate_p.h
++++ b/src/corelib/time/qtimezoneprivate_p.h
+@@ -384,7 +384,7 @@ private:
+ 
+     QJniObject androidTimeZone;
+ };
+-#elif defined(Q_OS_UNIX) && !defined(Q_OS_VXWORKS)
++#elif defined(Q_OS_UNIX) && !defined(Q_OS_VXWORKS) && !defined(__ANDROID__)
+ struct QTzTransitionTime
+ {
+     qint64 atMSecsSinceEpoch;
+--- a/src/corelib/CMakeLists.txt
++++ b/src/corelib/CMakeLists.txt
+@@ -988,7 +988,7 @@ qt_internal_extend_target(Core
+ 
+ qt_internal_extend_target(Core
+     CONDITION
+-        QT_FEATURE_timezone AND UNIX AND NOT VXWORKS
++        QT_FEATURE_timezone AND UNIX AND NOT VXWORKS AND NOT QT_FEATURE_icu
+         AND NOT ANDROID AND NOT APPLE AND NOT QT_FEATURE_timezone_tzdb
+     SOURCES
+         time/qtimezoneprivate_tz.cpp
+@@ -997,7 +997,7 @@ qt_internal_extend_target(Core
+ qt_internal_extend_target(Core
+     CONDITION
+         QT_FEATURE_icu AND QT_FEATURE_timezone
+-        AND (VXWORKS OR NOT UNIX) AND NOT QT_FEATURE_timezone_tzdb
++        AND NOT QT_FEATURE_timezone_tzdb
+     SOURCES
+         time/qtimezoneprivate_icu.cpp
+ )
