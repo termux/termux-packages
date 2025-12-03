@@ -1,0 +1,11 @@
+--- a/src/yencode/common.h
++++ b/src/yencode/common.h
+@@ -44,7 +44,7 @@
+ 	// len needs to be a multiple of alignment, although it sometimes works if it isn't...
+ 	#define ALIGN_ALLOC(buf, len, align) *(void**)&(buf) = aligned_alloc(align, ((len) + (align)-1) & ~((align)-1))
+ 	#define ALIGN_FREE free
+-#elif defined(__cplusplus) && __cplusplus >= 201700
++#elif defined(__cplusplus) && __cplusplus >= 201700 && (!defined(__ANDROID__) || (defined(__ANDROID__) && __ANDROID_API__ >= 26))
+ 	// C++17 method
+ 	#include <cstdlib>
+ 	#define ALIGN_ALLOC(buf, len, align) *(void**)&(buf) = std::aligned_alloc(align, ((len) + (align)-1) & ~((align)-1))
