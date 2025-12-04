@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Just-In-Time Compiler for Lua"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1:2.1.1763148144"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/LuaJIT/LuaJIT.git
 TERMUX_PKG_GIT_BRANCH=v${TERMUX_PKG_VERSION:2:3}
 TERMUX_PKG_AUTO_UPDATE=true
@@ -25,6 +26,7 @@ termux_pkg_auto_update() {
 	)"
 	latest_version="$(jq -r '.results[0].pkgver' <<< "$response")"
 	unix_timestamp_latest="${latest_version##*.}"
+	unix_timestamp_latest="${unix_timestamp_latest%+*}"
 
 	if ! date -d "@${unix_timestamp_latest}" &> /dev/null; then
 		local summary
