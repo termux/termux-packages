@@ -2,13 +2,12 @@ TERMUX_PKG_HOMEPAGE=http://www.gnu.org/software/guile/
 TERMUX_PKG_DESCRIPTION="Portable, embeddable Scheme implementation written in C"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.0.10
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=3.0.11
 # Tip: Guile official source code contains hardlinks and cannot be built by default if "$TERMUX_ON_DEVICE_BUILD" == "true".
 # To build if "$TERMUX_ON_DEVICE_BUILD" == "true", follow a guide like this to prepare for it:
 # https://unix.stackexchange.com/questions/265024/unpacking-tarball-with-hard-links-on-a-file-system-that-doesnt-support-hard-lin
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/guile/guile-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=2dbdbc97598b2faf31013564efb48e4fed44131d28e996c26abe8a5b23b56c2a
+TERMUX_PKG_SHA256=3c9c16972a73bb792752f2e4f1cce7212d7638d5494b5f7e8e19f3819dbf3a19
 TERMUX_PKG_DEPENDS="libandroid-spawn, libandroid-support, libffi, libgc, libgmp, libiconv, libunistring, ncurses, readline"
 TERMUX_PKG_BUILD_DEPENDS="libtool"
 TERMUX_PKG_BREAKS="guile-dev"
