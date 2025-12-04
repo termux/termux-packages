@@ -54,15 +54,16 @@ termux_pkg_auto_update() {
 		return 0
 	fi
 
+	termux_pkg_upgrade_version "${latest_version}"
+
 	# If this isn't a dry-run add a human readable (ISO 8601)
 	# version of the timestamp as a comment to the version.
-	if [[ "${BUILD_PACKAGES}" != "false" && "$current_version" != "$latest_version" ]]; then
+	if [[ "$GIT_COMMIT_PACKAGES" == "true" && "$(git log -1 --format=%s)" == "bump(main/$TERMUX_PKG_NAME): $latest_version" ]]; then
 		sed \
 			-e "s|^\(TERMUX_PKG_VERSION=.*\"\).*|\1 # $(date -d "@${unix_timestamp_latest}" --utc '+%Y-%m-%dT%H:%M:%SZ')|" \
 			-i "$TERMUX_PKG_BUILDER_DIR/build.sh"
+		git commit --amend "$TERMUX_PKG_BUILDER_DIR/build.sh" -m "bump(main/$TERMUX_PKG_NAME): $latest_version"
 	fi
-
-	termux_pkg_upgrade_version "${latest_version}"
 }
 
 termux_step_post_get_source() {
