@@ -1,0 +1,14 @@
+Prevents OSError: dlopen failed: library "libc.so.6" not found
+(at runtime)
+
+--- a/torch/distributed/elastic/multiprocessing/redirects.py
++++ b/torch/distributed/elastic/multiprocessing/redirects.py
+@@ -31,7 +31,7 @@ def get_libc():
+         )
+         return None
+     else:
+-        return ctypes.CDLL("libc.so.6")
++        return ctypes.CDLL("libc.so")
+ 
+ 
+ libc = get_libc()

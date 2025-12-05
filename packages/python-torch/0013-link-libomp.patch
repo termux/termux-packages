@@ -1,0 +1,14 @@
+Prevents ld.lld: error: unable to find library -lgomp
+(at runtime)
+
+--- a/torch/_inductor/cpp_builder.py
++++ b/torch/_inductor/cpp_builder.py
+@@ -1311,7 +1311,7 @@ def _get_openmp_args(
+             if _is_clang(cpp_compiler):
+                 # TODO: fix issue, can't find omp.h
+                 cflags.append("fopenmp")
+-                libs.append("gomp")
++                libs.append("omp")
+             elif _is_intel_compiler(cpp_compiler):
+                 cflags.append("fiopenmp")
+             else:
