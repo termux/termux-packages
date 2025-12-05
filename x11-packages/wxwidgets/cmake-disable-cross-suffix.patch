@@ -1,0 +1,46 @@
+--- ./build/cmake/functions.cmake
++++ ./build/cmake/functions.cmake
+@@ -275,7 +275,6 @@
+ 
+     set(cross_target)
+     if (CMAKE_CROSSCOMPILING)
+-        set(cross_target "-${CMAKE_SYSTEM_NAME}")
+     endif()
+ 
+     set(lib_prefix "lib")
+--- a/build/cmake/config.cmake
++++ b/build/cmake/config.cmake
+@@ -124,12 +124,6 @@ function(wx_write_config)
+         set(SHARED 0)
+     endif()
+     set(lib_unicode_suffix u)
+-    if(CMAKE_CROSSCOMPILING)
+-        set(cross_compiling yes)
+-        set(host_alias ${CMAKE_SYSTEM_NAME})
+-    else()
+-        set(cross_compiling no)
+-    endif()
+ 
+     set(BUILT_WX_LIBS)
+     set(STD_BASE_LIBS)
+@@ -179,8 +173,8 @@ function(wx_write_config)
+ 
+     set(CC ${CMAKE_C_COMPILER})
+     set(CXX ${CMAKE_CXX_COMPILER})
+-    set(WXCONFIG_CFLAGS ${CMAKE_THREAD_LIBS_INIT})
+-    set(WXCONFIG_LDFLAGS ${CMAKE_THREAD_LIBS_INIT})
++    set(WXCONFIG_CFLAGS)
++    set(WXCONFIG_LDFLAGS)
+     set(WXCONFIG_CPPFLAGS)
+     if(wxBUILD_SHARED)
+         wx_string_append(WXCONFIG_CPPFLAGS " -DWXUSINGDLL")
+--- a/wx-config.in
++++ b/wx-config.in
+@@ -423,7 +423,6 @@ this_linkage=`[ "x@SHARED@" = "x1" ] || echo 'static'`
+ 
+ 
+ # Extract the user specification from the options parsed.
+-m_host=${input_option_host:+"${input_option_host}-?"}
+ m_host=${m_host:-$this_host}
+ m_toolkit=${input_option_toolkit:-'[^-]+'}
+ m_widgetset=${input_option_widgetset-'(univ)?'}

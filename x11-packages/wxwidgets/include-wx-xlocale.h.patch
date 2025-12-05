@@ -11,17 +11,17 @@
      #define wxCRT_Strtod_lA wxXLOCALE_IDENT(strtod_l)
      #define wxCRT_Strtol_lA wxXLOCALE_IDENT(strtol_l)
      #define wxCRT_Strtoul_lA wxXLOCALE_IDENT(strtoul_l)
-@@ -297,6 +301,13 @@
+@@ -296,6 +296,13 @@ extern WXDLLIMPEXP_DATA_BASE(wxXLocale) wxNullXLocale;
  
-         // stdlib functions for numeric <-> string conversion
-         // (see notes above about missing functions)
+     // stdlib functions for numeric <-> string conversion
+     // (see notes above about missing functions)
 +
-+        #if defined __ANDROID__ && __ANDROID_API__ < 26
-+            #define wcstod_l(nptr,endptr,loc) wcstod(nptr,endptr)
-+            #define wcstol_l(nptr,endptr,base,loc) wcstol(nptr,endptr,base)
-+            #define wcstoul_l(nptr,endptr,base,loc) wcstoul(nptr,endptr,base)
-+        #endif
++    #if defined __ANDROID__ && __ANDROID_API__ < 26
++        #define wcstod_l(nptr,endptr,loc) wcstod(nptr,endptr)
++        #define wcstol_l(nptr,endptr,base,loc) wcstol(nptr,endptr,base)
++        #define wcstoul_l(nptr,endptr,base,loc) wcstoul(nptr,endptr,base)
++    #endif
 +
-         #define wxCRT_Strtod_lW wxXLOCALE_IDENT(wcstod_l)
-         #define wxCRT_Strtol_lW wxXLOCALE_IDENT(wcstol_l)
-         #define wxCRT_Strtoul_lW wxXLOCALE_IDENT(wcstoul_l)
+     #define wxCRT_Strtod_lW wxXLOCALE_IDENT(wcstod_l)
+     #define wxCRT_Strtol_lW wxXLOCALE_IDENT(wcstol_l)
+     #define wxCRT_Strtoul_lW wxXLOCALE_IDENT(wcstoul_l)
