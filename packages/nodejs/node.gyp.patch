@@ -1,6 +1,15 @@
---- ./node.gyp.orig	2025-09-25 20:13:15.000000000 +0530
-+++ ./node.gyp	2025-09-29 10:45:45.364950564 +0530
-@@ -548,7 +548,8 @@
+--- ./node.gyp.orig	2025-11-26 23:46:03.696854242 +0530
++++ ./node.gyp	2025-12-03 21:00:02.566150699 +0530
+@@ -527,7 +527,7 @@
+           '-Wl,-bnoerrmsg',
+         ],
+       }],
+-      ['OS=="linux" and clang==1', {
++      ['(OS=="linux" or OS=="android") and clang==1', {
+         'libraries': ['-latomic'],
+       }],
+     ],
+@@ -568,7 +568,8 @@
        ],
  
        'sources': [
@@ -10,7 +19,7 @@
        ],
  
        'dependencies': [
-@@ -1045,314 +1046,6 @@
+@@ -1063,314 +1064,6 @@
          },
        ],
      }, # node_lib_target_name
@@ -325,80 +334,3 @@
      {
        'target_name': 'node_js2c',
        'type': 'executable',
-@@ -1389,76 +1082,6 @@
-         }],
-       ]
-     },
--    {
--      'target_name': 'node_mksnapshot',
--      'type': 'executable',
--
--      'dependencies': [
--        '<(node_lib_target_name)',
--        'deps/histogram/histogram.gyp:histogram',
--        'deps/nbytes/nbytes.gyp:nbytes',
--      ],
--
--      'includes': [
--        'node.gypi'
--      ],
--
--      'include_dirs': [
--        'src',
--        'tools/msvs/genfiles',
--        'deps/v8/include',
--        'deps/cares/include',
--        'deps/uv/include',
--      ],
--
--      'defines': [ 'NODE_WANT_INTERNALS=1' ],
--
--      'sources': [
--        'src/node_snapshot_stub.cc',
--        'tools/snapshot/node_mksnapshot.cc',
--      ],
--
--      'msvs_settings': {
--        'VCLinkerTool': {
--          'EnableCOMDATFolding': '1', # /OPT:NOICF
--        },
--      },
--
--      'conditions': [
--        ['node_write_snapshot_as_array_literals=="true"', {
--          'defines': [ 'NODE_MKSNAPSHOT_USE_ARRAY_LITERALS=1' ],
--        }],
--        [ 'node_use_openssl=="true"', {
--          'dependencies': [
--            'deps/ncrypto/ncrypto.gyp:ncrypto',
--          ],
--          'defines': [
--            'HAVE_OPENSSL=1',
--          ],
--        }],
--        [ 'node_use_node_code_cache=="true"', {
--          'defines': [
--            'NODE_USE_NODE_CODE_CACHE=1',
--          ],
--        }],
--        ['v8_enable_inspector==1', {
--          'defines': [
--            'HAVE_INSPECTOR=1',
--          ],
--        }],
--        ['OS=="win"', {
--          'libraries': [
--            'Dbghelp.lib',
--            'winmm.lib',
--            'Ws2_32.lib',
--          ],
--        }],
--        # Avoid excessive LTO
--        ['enable_lto=="true"', {
--          'ldflags': [ '-fno-lto' ],
--        }],
--      ],
--    }, # node_mksnapshot
-   ], # end targets
- 
-   'conditions': [
