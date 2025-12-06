@@ -12,14 +12,26 @@
 # Expected output:-
 # processing crate: issue_25360, module: issue-25360/src/main.rs
 # diagnostic scan complete
-set -e
+set -e -u
 
-pkg install -y rust-analyzer
-#pkg install -y rust
+echo_and_run() {
+	echo "> $*"
+	bash -c "$*"
+}
+
+echo_and_run pkg install -y rust-analyzer
+#echo_and_run pkg install -y rust
+
+command -v rust-analyzer || (echo "rust-analyzer is not installed" && exit 1)
+rust-analyzer -V
+command -v cargo || (echo "cargo is not installed" && exit 1)
+cargo -V
+command -v rustc || (echo "rustc is not installed" && exit 1)
+rustc -V
 
 tmpdir=$(mktemp -d)
 pushd "$tmpdir"
-cargo new issue-25360
+echo_and_run cargo new issue-25360
 pushd issue-25360
 echo
 
@@ -51,17 +63,8 @@ echo "${PWD}/src/main.rs"
 cat "${PWD}/src/main.rs"
 echo
 
-echo "rust-analyzer diagnostics ."
-rust-analyzer diagnostics .
+echo_and_run rust-analyzer diagnostics .
 
 popd
 popd
 rm -fr "$tmpdir"
-echo
-
-command -v rust-analyzer
-rust-analyzer -V
-command -v cargo
-cargo -V
-command -v rustc
-rustc -V
