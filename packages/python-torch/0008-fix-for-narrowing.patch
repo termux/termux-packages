@@ -12,3 +12,17 @@
    auto iter = src.iter();
  
    size_t i = 0;
+--- a/torch/csrc/distributed/c10d/TCPStore.cpp
++++ b/torch/csrc/distributed/c10d/TCPStore.cpp
+@@ -177,7 +177,11 @@ void TCPClient::setTimeout(std::chrono::milliseconds value) {
+       static_cast<long>((value.count() % 1000) * 1000)};
+ #else
+   struct timeval timeoutTV = {
++#ifndef __LP64__
++      .tv_sec = static_cast<time_t>(value.count() / 1000),
++#else
+       .tv_sec = value.count() / 1000,
++#endif
+       .tv_usec = static_cast<suseconds_t>((value.count() % 1000) * 1000),
+   };
+ #endif

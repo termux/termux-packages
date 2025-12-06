@@ -1,0 +1,76 @@
+Prevents
+GlooDeviceFactory.cpp:31:2: error: "Expected the tcp transport to be available on Linux."
+when USE_DISTRIBUTED=ON is set
+
+--- a/third_party/gloo/gloo/CMakeLists.txt
++++ b/third_party/gloo/gloo/CMakeLists.txt
+@@ -74,7 +74,7 @@ if(USE_ROCM)
+ endif()
+ 
+ # Compile TCP transport only on Linux (it uses epoll(2))
+-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
++if(TRUE)
+   set(GLOO_HAVE_TRANSPORT_TCP 1)
+   if(${USE_TCP_OPENSSL_LINK} OR ${USE_TCP_OPENSSL_LOAD})
+     find_package(OpenSSL 1.1 REQUIRED EXACT)
+--- a/third_party/gloo/gloo/common/CMakeLists.txt
++++ b/third_party/gloo/gloo/common/CMakeLists.txt
+@@ -13,7 +13,7 @@ set(GLOO_COMMON_HDRS
+   "${CMAKE_CURRENT_SOURCE_DIR}/utils.h"
+   )
+ 
+-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
++if(TRUE)
+   list(APPEND GLOO_COMMON_SRCS
+     "${CMAKE_CURRENT_SOURCE_DIR}/linux.cc"
+     )
+--- a/third_party/gloo/gloo/transport/tcp/CMakeLists.txt
++++ b/third_party/gloo/gloo/transport/tcp/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-if(NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
++if(FALSE)
+     message(WARNING "Gloo TCP transport is supported only on Linux(uses epoll API)")
+ else()
+     list(APPEND GLOO_TRANSPORT_SRCS
+--- a/third_party/gloo/gloo/transport/tcp/tls/CMakeLists.txt
++++ b/third_party/gloo/gloo/transport/tcp/tls/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-if (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
++if (FALSE)
+   message(WARNING "Gloo TCP-TLS transport is supported only on Linux(uses epoll API)")
+ else ()
+   list(APPEND GLOO_TRANSPORT_SRCS
+--- a/third_party/gloo/gloo/common/linux.cc
++++ b/third_party/gloo/gloo/common/linux.cc
+@@ -30,6 +30,13 @@
+ 
+ #include "gloo/common/logging.h"
+ 
++#if defined(__ANDROID__)
++static inline __u32 ethtool_cmd_speed(const struct ethtool_cmd *ep)
++{
++  return (ep->speed_hi << 16) | ep->speed;
++}
++#endif
++
+ #ifndef SPEED_UNKNOWN
+ /* SPEED_UNKOWN is sometimes undefined, c.f.
+  * https://github.com/facebookincubator/gloo/pull/127
+@@ -198,7 +198,7 @@ static int getInterfaceSpeedGLinkSettings(int sock, struct ifreq* ifr) {
+   } ecmd;
+   int rv;
+ 
+-  ifr->ifr_data = (__caddr_t)&ecmd;
++  ifr->ifr_data = &ecmd;
+   memset(&ecmd, 0, sizeof(ecmd));
+   ecmd.req.cmd = ETHTOOL_GLINKSETTINGS;
+ 
+@@ -226,7 +226,7 @@ static int getInterfaceSpeedGSet(int sock, struct ifreq* ifr) {
+   struct ethtool_cmd edata;
+   int rv;
+ 
+-  ifr->ifr_data = (__caddr_t)&edata;
++  ifr->ifr_data = &edata;
+   memset(&edata, 0, sizeof(edata));
+   edata.cmd = ETHTOOL_GSET;
+ 

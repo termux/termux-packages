@@ -1,0 +1,14 @@
+Prevents g++: error: unknown argument: '-fno-tree-loop-vectorize'
+(at runtime)
+
+--- a/torch/_inductor/config.py
++++ b/torch/_inductor/config.py
+@@ -1107,7 +1107,7 @@ class cpp:
+ 
+     cxx: tuple[Literal[None], str] = (
+         None,  # download gcc12 from conda-forge if conda is installed
+-        os.environ.get("CXX", "clang++" if sys.platform == "darwin" else "g++"),
++        os.environ.get("CXX", "clang++"),
+     )  # type: ignore[assignment]
+ 
+     # Allow kernel performance profiling via PyTorch profiler
