@@ -1,0 +1,18 @@
+The reason why INS_RBASE is patched out here
+is because this is the only active location in the source
+code where INS_RBASE is prepended to /etc at the exclusion of absolute /etc,
+so it is disabled here so that a global bulk prependment
+of @TERMUX_PREFIX@ to /etc can be done dynamically in build.sh
+without duplicating @TERMUX_PREFIX@ before the path to etc/default/star.
+
+--- a/star/defaults.c
++++ b/star/defaults.c
+@@ -79,7 +79,7 @@ get_stardefaults(name)
+ 	 * don't contribute work and don't give support, they are causing extra
+ 	 * work for me and this way slow down the star development.
+ 	 */
+-#if defined(PROTOTYPES) && defined(INS_RBASE)
++#if 0
+ 	ret = INS_RBASE "/etc/default/star";
+ 	while (ret[0] == '/' && ret[1] == '/')
+ 		ret++;
