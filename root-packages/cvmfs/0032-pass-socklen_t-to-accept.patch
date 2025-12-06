@@ -1,0 +1,20 @@
+Fixes error
+mount/mount.cvmfs.cc:222:24: error: no matching function for call to 'accept'
+note: candidate function not viable: no known conversion from 'unsigned int *'
+to 'socklen_t * _Nullable' (aka 'int *') for 3rd argument
+when building for 32-bit Android
+
+Thanks to @robertkirkman for making this patch
+https://github.com/termux/termux-packages/pull/27139#issuecomment-3501649407
+
+--- a/mount/mount.cvmfs.cc
++++ b/mount/mount.cvmfs.cc
+@@ -218,7 +218,7 @@ static int GetExistingFuseFd(const string &fqrn, const string &workspace,
+   int fuse_fd = -1;
+   if (result == "OK") {
+     struct sockaddr_un addr;
+-    unsigned int len = sizeof(addr);
++    socklen_t len = sizeof(addr);
+     const int con_fd = accept(recv_sock_fd,
+                               reinterpret_cast<struct sockaddr *>(&addr), &len);
+     fuse_fd = RecvFdFromSocket(con_fd);
