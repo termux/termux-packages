@@ -1,0 +1,13 @@
+diff --git a/Makefile.flags b/Makefile.flags
+index 97cb4dc..b2a4291 100644
+--- a/Makefile.flags
++++ b/Makefile.flags
+@@ -178,7 +178,7 @@ LDLIBS += pam pam_misc
+ endif
+ 
+ ifeq ($(CONFIG_SELINUX),y)
+-SELINUX_PC_MODULES = libselinux libsepol
++SELINUX_PC_MODULES = libandroid-selinux
+ $(eval $(call pkg_check_modules,SELINUX,$(SELINUX_PC_MODULES)))
+ CPPFLAGS += $(SELINUX_CFLAGS)
+ LDLIBS += $(if $(SELINUX_LIBS),$(SELINUX_LIBS:-l%=%),$(SELINUX_PC_MODULES:lib%=%))
