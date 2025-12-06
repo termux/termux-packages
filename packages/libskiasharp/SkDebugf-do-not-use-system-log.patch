@@ -1,0 +1,35 @@
+--- a/src/ports/SkDebug_android.cpp
++++ b/src/ports/SkDebug_android.cpp
+@@ -6,7 +6,7 @@
+  */
+ 
+ #include "include/core/SkTypes.h"
+-#if defined(SK_BUILD_FOR_ANDROID)
++#if defined(SK_BUILD_FOR_ANDROID) && !defined(__TERMUX__)
+ 
+ #include <stdio.h>
+ 
+@@ -36,4 +36,4 @@ void SkDebugf(const char format[], ...) {
+     va_end(args1);
+ }
+ 
+-#endif//defined(SK_BUILD_FOR_ANDROID)
++#endif//defined(SK_BUILD_FOR_ANDROID) && !defined(__TERMUX__)
+--- a/src/ports/SkDebug_stdio.cpp
++++ b/src/ports/SkDebug_stdio.cpp
+@@ -8,7 +8,8 @@
+ #include "include/private/base/SkFeatures.h"
+ #include "include/private/base/SkLoadUserConfig.h"
++#include <sys/cdefs.h>
+ 
+-#if !defined(SK_BUILD_FOR_WIN) && !defined(SK_BUILD_FOR_ANDROID)
++#if (!defined(SK_BUILD_FOR_WIN) && !defined(SK_BUILD_FOR_ANDROID)) || defined(__TERMUX__)
+ 
+ #include <stdarg.h>
+ #include <stdio.h>
+@@ -22,4 +23,4 @@ void SkDebugf(const char format[], ...) {
+ #pragma GCC diagnostic pop
+     va_end(args);
+ }
+-#endif//!defined(SK_BUILD_FOR_WIN) && !defined(SK_BUILD_FOR_ANDROID)
++#endif//(!defined(SK_BUILD_FOR_WIN) && !defined(SK_BUILD_FOR_ANDROID)) || defined(__TERMUX__)
