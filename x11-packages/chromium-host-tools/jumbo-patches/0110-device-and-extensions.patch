@@ -548,7 +548,7 @@ index fed6a52eae..545ee29486 100644
 +#undef kLargeBlobKey
 +#undef kLargeBlobSizeKey
 diff --git a/device/fido/get_assertion_request_handler.cc b/device/fido/get_assertion_request_handler.cc
-index 3b5657b5d4..4a5c915e35 100644
+index 2d31a4f425..c06fe27f0e 100644
 --- a/device/fido/get_assertion_request_handler.cc
 +++ b/device/fido/get_assertion_request_handler.cc
 @@ -49,6 +49,8 @@
@@ -560,14 +560,14 @@ index 3b5657b5d4..4a5c915e35 100644
  namespace device {
  
  namespace {
-@@ -784,3 +786,5 @@ void GetAssertionRequestHandler::DispatchRequestWithToken(
+@@ -765,3 +767,5 @@ void GetAssertionRequestHandler::DispatchRequestWithToken(
  }
  
  }  // namespace device
 +
 +#undef AtLeastUVPreferred
 diff --git a/device/fido/make_credential_request_handler.cc b/device/fido/make_credential_request_handler.cc
-index 388dc9bdfd..f4b7a95e62 100644
+index e847fe023b..ce469550ea 100644
 --- a/device/fido/make_credential_request_handler.cc
 +++ b/device/fido/make_credential_request_handler.cc
 @@ -39,6 +39,8 @@
@@ -579,7 +579,7 @@ index 388dc9bdfd..f4b7a95e62 100644
  namespace device {
  
  using PINUVDisposition = FidoAuthenticator::PINUVDisposition;
-@@ -1071,3 +1073,5 @@ void MakeCredentialRequestHandler::SpecializeRequestForAuthenticator(
+@@ -1069,3 +1071,5 @@ void MakeCredentialRequestHandler::SpecializeRequestForAuthenticator(
  }
  
  }  // namespace device
@@ -687,13 +687,13 @@ index 18e75b6da2..4a96501954 100644
    sources = [
      "browser/api/declarative/test_rules_registry.cc",
 diff --git a/extensions/browser/BUILD.gn b/extensions/browser/BUILD.gn
-index fb3bd346b4..2954accbe9 100644
+index cbd17bcd83..c9e3d9839d 100644
 --- a/extensions/browser/BUILD.gn
 +++ b/extensions/browser/BUILD.gn
-@@ -4,6 +4,7 @@
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
  
  import("//build/config/chromeos/ui_mode.gni")
- import("//build/config/features.gni")
 +import("//build/config/jumbo.gni")
  import("//components/guest_view/buildflags/buildflags.gni")
  import("//extensions/buildflags/buildflags.gni")
@@ -857,10 +857,10 @@ index 22b273b1a1..ba85ff21e1 100644
 +
 +#undef g_factory
 diff --git a/extensions/browser/api/web_request/extension_web_request_event_router.cc b/extensions/browser/api/web_request/extension_web_request_event_router.cc
-index c70fc41499..c1031df8e6 100644
+index 625019070d..a6181d82d4 100644
 --- a/extensions/browser/api/web_request/extension_web_request_event_router.cc
 +++ b/extensions/browser/api/web_request/extension_web_request_event_router.cc
-@@ -71,7 +71,8 @@ namespace {
+@@ -72,7 +72,8 @@ namespace {
  namespace activity_log = web_request_activity_log_constants;
  namespace declarative_keys = declarative_webrequest_constants;
  namespace helpers = extension_web_request_api_helpers;
@@ -870,7 +870,7 @@ index c70fc41499..c1031df8e6 100644
  namespace web_request = api::web_request;
  
  // Describes the action taken by the Web Request API for a given stage of a web
-@@ -2706,3 +2707,5 @@ void WebRequestEventRouter::ClearSignaled(
+@@ -2707,3 +2708,5 @@ void WebRequestEventRouter::ClearSignaled(
  }
  
  }  // namespace extensions
@@ -986,7 +986,7 @@ index 9142401889..3f870514a4 100644
      return std::nullopt;
    }
 diff --git a/extensions/browser/api/web_request/web_request_proxying_url_loader_factory.cc b/extensions/browser/api/web_request/web_request_proxying_url_loader_factory.cc
-index 6708b4100f..939cd241e5 100644
+index 11867009b7..6564f92131 100644
 --- a/extensions/browser/api/web_request/web_request_proxying_url_loader_factory.cc
 +++ b/extensions/browser/api/web_request/web_request_proxying_url_loader_factory.cc
 @@ -73,6 +73,8 @@
@@ -1024,7 +1024,7 @@ index ee783e1828..d56d597f92 100644
 +
 +#undef ShutdownNotifierFactory
 diff --git a/extensions/browser/guest_view/app_view/app_view_guest.cc b/extensions/browser/guest_view/app_view/app_view_guest.cc
-index 3b1fe9ef59..e9a6851754 100644
+index af80323215..68c8e72d0a 100644
 --- a/extensions/browser/guest_view/app_view/app_view_guest.cc
 +++ b/extensions/browser/guest_view/app_view/app_view_guest.cc
 @@ -219,7 +219,7 @@ void AppViewGuest::CreateInnerPage(
@@ -1087,7 +1087,7 @@ index 0bba776af6..a8a6f355ba 100644
 +
 +#undef g_test_observer
 diff --git a/extensions/browser/script_injection_tracker.cc b/extensions/browser/script_injection_tracker.cc
-index 09e5575f67..7e85c1005c 100644
+index 8331e06da9..6f1728e6d9 100644
 --- a/extensions/browser/script_injection_tracker.cc
 +++ b/extensions/browser/script_injection_tracker.cc
 @@ -45,6 +45,8 @@
@@ -1106,10 +1106,10 @@ index 09e5575f67..7e85c1005c 100644
 +
 +#undef BoolToCrashKeyValue
 diff --git a/extensions/browser/service_worker/service_worker_task_queue.cc b/extensions/browser/service_worker/service_worker_task_queue.cc
-index ba14d50b58..cdfc551129 100644
+index be7abd0dfc..71107ad6e2 100644
 --- a/extensions/browser/service_worker/service_worker_task_queue.cc
 +++ b/extensions/browser/service_worker/service_worker_task_queue.cc
-@@ -53,6 +53,9 @@
+@@ -55,6 +55,9 @@
  
  using content::BrowserContext;
  
@@ -1119,7 +1119,7 @@ index ba14d50b58..cdfc551129 100644
  namespace extensions {
  
  namespace {
-@@ -1199,3 +1202,6 @@ void ServiceWorkerTaskQueue::ActivateIncognitoSplitModeExtensions(
+@@ -1271,3 +1274,6 @@ void ServiceWorkerTaskQueue::ActivateIncognitoSplitModeExtensions(
  }
  
  }  // namespace extensions
@@ -1148,18 +1148,18 @@ index 37f8079c0f..17d77505b0 100644
 +#undef g_allow_multiple_workers_per_extension
 +#undef BoolToCrashKeyValue
 diff --git a/extensions/common/BUILD.gn b/extensions/common/BUILD.gn
-index 5c2c4d67d6..ba5f52a8ab 100644
+index 8ceaffc975..450845ba32 100644
 --- a/extensions/common/BUILD.gn
 +++ b/extensions/common/BUILD.gn
-@@ -4,6 +4,7 @@
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
  
  import("//build/config/chromeos/ui_mode.gni")
- import("//build/config/features.gni")
 +import("//build/config/jumbo.gni")
  import("//components/guest_view/buildflags/buildflags.gni")
  import("//extensions/buildflags/buildflags.gni")
  import("//mojo/public/tools/bindings/mojom.gni")
-@@ -251,7 +252,7 @@ mojom("mojom") {
+@@ -250,7 +251,7 @@ mojom("mojom") {
  # This must be a static library because extensions common depends on
  # GetTrustedICAPublicKey in extensions/browser which isn't always linked
  # in. TODO(brettw): This reverse dependency should be fixed.
@@ -1168,7 +1168,7 @@ index 5c2c4d67d6..ba5f52a8ab 100644
    sources = [
      "alias.h",
      "api/bluetooth/bluetooth_manifest_data.cc",
-@@ -548,6 +549,11 @@ static_library("common") {
+@@ -547,6 +548,11 @@ static_library("common") {
    # from mojom/permission_set_mojom_traits.cc.
    allow_circular_includes_from = [ ":mojom" ]
  
@@ -1205,7 +1205,7 @@ index 3956794554..a83c464da5 100644
 +
 +#undef Feature
 diff --git a/extensions/common/manifest_handlers/icon_variants_handler.cc b/extensions/common/manifest_handlers/icon_variants_handler.cc
-index 8e34249fd9..0ffd0e5b00 100644
+index 903cb111f4..aae1db5cd5 100644
 --- a/extensions/common/manifest_handlers/icon_variants_handler.cc
 +++ b/extensions/common/manifest_handlers/icon_variants_handler.cc
 @@ -38,7 +38,9 @@ IconVariantsHandler::~IconVariantsHandler() = default;
@@ -1285,18 +1285,18 @@ index 91231ee29a..98362a843e 100644
 +
 +#undef ManifestKeys
 diff --git a/extensions/renderer/BUILD.gn b/extensions/renderer/BUILD.gn
-index 189a7d3f48..5187ae7142 100644
+index 5dce52a17e..46aecd9be8 100644
 --- a/extensions/renderer/BUILD.gn
 +++ b/extensions/renderer/BUILD.gn
-@@ -3,6 +3,7 @@
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
  # found in the LICENSE file.
  
- import("//build/config/features.gni")
 +import("//build/config/jumbo.gni")
  import("//components/guest_view/buildflags/buildflags.gni")
  import("//extensions/buildflags/buildflags.gni")
  import("//pdf/features.gni")
-@@ -12,7 +13,7 @@ assert(enable_extensions_core)
+@@ -11,7 +12,7 @@ assert(enable_extensions_core)
  # If enable_extensions is true then enable_guest_view must also be true.
  assert(!enable_extensions || enable_guest_view)
  
@@ -1305,7 +1305,7 @@ index 189a7d3f48..5187ae7142 100644
    sources = [
      "activity_log_converter_strategy.cc",
      "activity_log_converter_strategy.h",
-@@ -319,7 +320,7 @@ source_set("renderer") {
+@@ -318,7 +319,7 @@ source_set("renderer") {
    }
  }
  
@@ -1315,7 +1315,7 @@ index 189a7d3f48..5187ae7142 100644
    # top-level extensions renderer unit tests.
    testonly = true
 diff --git a/extensions/renderer/extension_localization_throttle.cc b/extensions/renderer/extension_localization_throttle.cc
-index abe98687a9..72a9a50e5a 100644
+index 5aa569e30c..3266a36566 100644
 --- a/extensions/renderer/extension_localization_throttle.cc
 +++ b/extensions/renderer/extension_localization_throttle.cc
 @@ -30,6 +30,8 @@
