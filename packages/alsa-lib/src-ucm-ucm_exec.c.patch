@@ -1,0 +1,11 @@
+--- a/src/ucm/ucm_exec.c
++++ b/src/ucm/ucm_exec.c
+@@ -259,7 +259,7 @@
+ 
+ 		close(f);
+ 
+-#if defined(_GNU_SOURCE)
++#if defined(_GNU_SOURCE) && !defined(__ANDROID__)
+ 		close_range(3, maxfd, 0);
+ #else
+ 		for (f = 3; f < maxfd; f++)
