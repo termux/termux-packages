@@ -501,6 +501,8 @@ lint_package() {
 						# If it's in archive/ anyway then it's probably a tag with the incorrect download path.
 						elif [[ "$ref_path" == archive/* ]]; then
 							tarball_type="can-fix"
+							# Get the unexpanded version of the SRCURL for the suggestion
+							url="$(grep -oe "$protocol//$host/$user/$repo/archive.*" "$package_script")"
 							printf -v lint_msg '%s\n' \
 								"PARTIAL PASS - Tag with potential ref confusion." \
 								"WARNING: GitHub tarball URLs should use /archive/refs/tags/ instead of /archive/" \
@@ -551,16 +553,6 @@ lint_package() {
 						echo "PASS - (${tarball_type+"${tarball_type}/"}${protocol_type}) ${host}/${user}/${repo}"
 					;;
 				esac
-			# Additional debug output
-				# printf '%s\n' \
-				# 	"  URL: $url" \
-				# 	"PROTO: $protocol" \
-				# 	"   _: " \
-				# 	" HOST: $host" \
-				# 	" USER: $user" \
-				# 	" REPO: $repo" \
-				# 	" PATH: $ref_path"
-
 			done
 			unset i url protocol host user repo ref_path protocol_type tarball_type lint_msg
 
