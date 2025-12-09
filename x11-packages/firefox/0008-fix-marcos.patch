@@ -53,17 +53,6 @@
  #  define MOZ_CUBEB_REMOTING
  #endif
  
---- a/mozglue/misc/ConditionVariable_posix.cpp
-+++ b/mozglue/misc/ConditionVariable_posix.cpp
-@@ -23,7 +23,7 @@
- // Android 4.4 or earlier & macOS 10.12 has the clock functions, but not
- // pthread_condattr_setclock.
- #if defined(HAVE_CLOCK_MONOTONIC) && \
--    !(defined(__ANDROID__) && __ANDROID_API__ < 21) && !defined(__APPLE__)
-+    defined(__TERMUX__)
- #  define CV_USE_CLOCK_API
- #endif
- 
 --- a/mozglue/misc/StackWalk.cpp
 +++ b/mozglue/misc/StackWalk.cpp
 @@ -692,7 +692,7 @@
