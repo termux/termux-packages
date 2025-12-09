@@ -139,7 +139,9 @@ check_indentation() {
 	else
 		origin_url="unknown"
 	fi
-	base_commit="HEAD~$(git rev-list --count FETCH_HEAD.. -- || printf 1)"
+	if ! base_commit="$(git rev-list "origin/master.." --exclude-first-parent-only --reverse | head -n1)"; then
+		base_commit="HEAD~1"
+	fi
 } 2> /dev/null
 
 # Also figure out if we have a `%ci:no-build` trailer in the commit range,
@@ -799,7 +801,7 @@ time_elapsed() {
 }
 
 echo "[INFO]: Starting build script linter ($(date -d "@$start_time" --utc '+%Y-%m-%dT%H:%M:%SZ' 2>&1))"
-echo "[INFO]: Base commit: $base_commit ($(git rev-parse "$base_commit"))"
+git -P log "$base_commit" -n1 --pretty=format:"[INFO]: Base commit    - %h%n[INFO]: Commit message - %s%n"
 echo "[INFO]: Origin URL: ${origin_url}"
 trap 'time_elapsed "$start_time"' EXIT
 
