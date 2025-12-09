@@ -18,16 +18,15 @@ termux_pkg_auto_update() {
 		fi
 	fi
 
-	local _err_msg="ERROR: source url's hostname is not ${TERMUX_PKG_UPDATE_METHOD}.com, but has been
-configured to use ${TERMUX_PKG_UPDATE_METHOD}'s method."
-
 	case "${TERMUX_PKG_UPDATE_METHOD}" in
-	github)
-		if [[ "${project_host}" != "${TERMUX_PKG_UPDATE_METHOD}.com" ]]; then
-			termux_error_exit "${_err_msg}"
-		else
+		github)
+			if [[ "${project_host}" != "${TERMUX_PKG_UPDATE_METHOD}.com" ]]; then
+				termux_error_exit <<-EndOfError
+					source url's hostname is not ${TERMUX_PKG_UPDATE_METHOD}.com, but has been
+					configured to use ${TERMUX_PKG_UPDATE_METHOD}'s method.
+				EndOfError
+			fi
 			termux_github_auto_update
-		fi
 		;;
 		gitlab)
 			termux_gitlab_auto_update
