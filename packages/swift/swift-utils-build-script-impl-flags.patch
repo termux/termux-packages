@@ -2,7 +2,7 @@ diff --git a/swift/utils/build-script-impl b/swift/utils/build-script-impl
 index b1d060328bc..218c9215260 100755
 --- a/swift/utils/build-script-impl
 +++ b/swift/utils/build-script-impl
-@@ -1726,6 +1726,7 @@
+@@ -1648,6 +1648,7 @@
                      )
                  fi
  
@@ -10,7 +10,7 @@ index b1d060328bc..218c9215260 100755
                  if [[ ! "${SKIP_BUILD_ANDROID}" ]] ||
                     [[ $(is_cross_tools_host ${host}) && "${host}" == "android-"* ]]; then
                      cmake_options=(
-@@ -1733,6 +1734,8 @@
+@@ -1656,6 +1657,8 @@
                          -DSWIFT_ANDROID_DEPLOY_DEVICE_PATH:STRING="${ANDROID_DEPLOY_DEVICE_PATH}"
                          -DSWIFT_SDK_ANDROID_ARCHITECTURES:STRING="${ANDROID_ARCH}"
                      )
@@ -18,8 +18,8 @@ index b1d060328bc..218c9215260 100755
 +                    call ln -sf "$(build_directory ${host} swift)/lib/swift" "${ANDROID_NDK}/sysroot/usr/lib"
                  fi
  
-                 if [[ ! "${SKIP_BUILD_WASM}" ]]; then
-@@ -1785,6 +1788,9 @@
+                 if [[ $(is_cross_tools_host ${host}) && "${host}" == "openbsd-"* && -n "${OPENBSD_USE_TOOLCHAIN_FILE}" ]]; then
+@@ -1716,6 +1719,9 @@
                          -DLLVM_TABLEGEN=$(build_directory "${LOCAL_HOST}" llvm)/bin/llvm-tblgen
                          -DSWIFT_INCLUDE_TEST_BINARIES:BOOL=FALSE
                          -DSWIFT_INCLUDE_TOOLS:BOOL=$(true_false "${CROSS_COMPILE_BUILD_SWIFT_TOOLS}")
@@ -27,9 +27,9 @@ index b1d060328bc..218c9215260 100755
 +                        -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
 +                        -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY
                      )
-                 fi
- 
-@@ -1800,6 +1806,13 @@
+                 else
+                     cmake_options=(
+@@ -1736,6 +1742,13 @@
                      native_swift_tools_path="${NATIVE_SWIFT_TOOLS_PATH}"
                  fi
  
@@ -43,7 +43,7 @@ index b1d060328bc..218c9215260 100755
                  if [ "${BUILD_LLVM}" == "0" ] ; then
                      cmake_options=(
                          "${cmake_options[@]}"
-@@ -1820,8 +1833,8 @@
+@@ -1756,8 +1769,8 @@
  
                  cmake_options=(
                      "${cmake_options[@]}"
@@ -54,7 +54,7 @@ index b1d060328bc..218c9215260 100755
                      -DCMAKE_C_FLAGS_RELWITHDEBINFO="-O2 -DNDEBUG"
                      -DCMAKE_CXX_FLAGS_RELWITHDEBINFO="-O2 -DNDEBUG"
                      -DCMAKE_BUILD_TYPE:STRING="${SWIFT_BUILD_TYPE}"
-@@ -1878,6 +1891,7 @@
+@@ -1815,6 +1828,7 @@
                      -DSWIFT_PATH_TO_SWIFT_SYNTAX_SOURCE:PATH="${SWIFT_SYNTAX_SOURCE_DIR}"
                      -DSWIFT_ENABLE_BACKTRACING:BOOL=$(true_false "${SWIFT_ENABLE_BACKTRACING}")
                      -DSWIFT_STDLIB_OVERRIDABLE_RETAIN_RELEASE:BOOL=$(true_false "${SWIFT_STDLIB_OVERRIDABLE_RETAIN_RELEASE}")
@@ -62,7 +62,16 @@ index b1d060328bc..218c9215260 100755
                      "${swift_cmake_options[@]}"
                  )
  
-@@ -2045,6 +2045,8 @@ for host in "${ALL_HOSTS[@]}"; do
+@@ -2218,8 +2232,6 @@
+                     "${llbuild_cmake_options[@]}"
+ 
+                     -DCMAKE_BUILD_TYPE:STRING="${LLBUILD_BUILD_TYPE}"
+-                    -DCMAKE_C_COMPILER:PATH="${CLANG_BIN}/clang"
+-                    -DCMAKE_CXX_COMPILER:PATH="${CLANG_BIN}/clang++"
+                     -DCMAKE_INSTALL_PREFIX:PATH="$(get_host_install_prefix ${host})"
+                     -DCMAKE_Swift_COMPILER:PATH=${SWIFTC_BIN}
+                     -DCMAKE_Swift_FLAGS:STRING="$(common_swift_flags)"
+@@ -2251,6 +2263,8 @@
                      cmake_options+=(
                          -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"
                          -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
@@ -71,7 +80,16 @@ index b1d060328bc..218c9215260 100755
                      )
                  fi
  
-@@ -2388,7 +2404,8 @@
+@@ -2319,8 +2333,6 @@
+                   cmake_options=(
+                     ${cmake_options[@]}
+                     -DCMAKE_BUILD_TYPE:STRING="${XCTEST_BUILD_TYPE}"
+-                    -DCMAKE_C_COMPILER:PATH="${CLANG_BIN}/clang"
+-                    -DCMAKE_CXX_COMPILER:PATH="${CLANG_BIN}/clang++"
+                     -DCMAKE_Swift_COMPILER:PATH=${SWIFTC_BIN}
+                     -DCMAKE_Swift_FLAGS:STRING="$(common_swift_flags)"
+                     -DCMAKE_INSTALL_PREFIX:PATH="$(get_host_install_prefix ${host})"
+@@ -2339,7 +2351,8 @@
                      -DENABLE_TESTING=YES
                    )
                    if [[ $(is_cross_tools_host ${host}) ]] ; then
@@ -81,7 +99,16 @@ index b1d060328bc..218c9215260 100755
                    fi
                  ;;
                  esac
-@@ -2537,6 +2554,10 @@
+@@ -2461,8 +2474,6 @@
+                 cmake_options=(
+                   ${cmake_options[@]}
+                   -DCMAKE_BUILD_TYPE:STRING=${FOUNDATION_BUILD_TYPE}
+-                  -DCMAKE_C_COMPILER:PATH=${CLANG_BIN}/clang
+-                  -DCMAKE_CXX_COMPILER:PATH=${CLANG_BIN}/clang++
+                   -DCMAKE_SWIFT_COMPILER:PATH=${SWIFTC_BIN}
+                   -DCMAKE_Swift_COMPILER:PATH=${SWIFTC_BIN}
+                   -DCMAKE_Swift_FLAGS:STRING="$(common_swift_flags)"
+@@ -2503,6 +2514,10 @@
                      # https://cmake.org/cmake/help/latest/command/find_package.html
                      cmake_options+=(
                          -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"
@@ -91,8 +118,17 @@ index b1d060328bc..218c9215260 100755
 +                        -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS --target=$CCTERMUX_HOST_PLATFORM"
                      )
                  fi
-                 if [[ "${host}" == "android-"* ]]; then
-@@ -2583,6 +2603,11 @@
+                 ;;
+@@ -2530,8 +2545,6 @@
+                     ${cmake_options[@]}
+ 
+                     -DCMAKE_BUILD_TYPE:STRING="${LIBDISPATCH_BUILD_TYPE}"
+-                    -DCMAKE_C_COMPILER:PATH="${CLANG_BIN}/clang"
+-                    -DCMAKE_CXX_COMPILER:PATH="${CLANG_BIN}/clang++"
+                     -DCMAKE_C_FLAGS="$(swift_c_flags ${host})"
+                     -DCMAKE_SWIFT_COMPILER:PATH="${SWIFTC_BIN}"
+                     -DCMAKE_Swift_COMPILER:PATH="${SWIFTC_BIN}"
+@@ -2546,6 +2559,11 @@
                    )
                    if [[ $(is_cross_tools_host ${host}) ]] ; then
                        cmake_options+=("${SWIFT_TARGET_CMAKE_OPTIONS[@]}")
@@ -104,7 +140,7 @@ index b1d060328bc..218c9215260 100755
                    fi
                  ;;
                  esac
-@@ -3106,7 +3131,14 @@ for host in "${ALL_HOSTS[@]}"; do
+@@ -2910,7 +2928,14 @@
                  if [[ -z "${INSTALL_LLBUILD}" ]] ; then
                      continue
                  fi

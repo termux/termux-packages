@@ -78,6 +78,99 @@ index b05080bbf3a..ebec19d9e53 100644
    constexpr explicit operator size_t() const { return size_t(kind); }
  
    static constexpr unsigned getNumFeatures() {
+commit a5644b19d9dd69e0fe1c1330a235c3f413a90b81
+Author: Max Desiatov
+Date:   Fri Jul 17 10:43:52 2026 +0100
+
+    Make compiler's data structures 32-bit-safe (#90326)
+    
+    `include/swift/Basic/SwiftObjectHeader.h` is also updated to use `intptr_t`.
+
+diff --git a/swift/SwiftCompilerSources/Sources/SIL/Utilities/SmallProjectionPath.swift b/swift/SwiftCompilerSources/Sources/SIL/Utilities/SmallProjectionPath.swift
+index 9ce289094e4..61b949ddb7f 100644
+--- a/swift/SwiftCompilerSources/Sources/SIL/Utilities/SmallProjectionPath.swift
++++ b/swift/SwiftCompilerSources/Sources/SIL/Utilities/SmallProjectionPath.swift
+@@ -936,9 +936,9 @@ extension SmallProjectionPath {
+       let (k2, _, s2) = p2.pop()
+       assert(k2 == .anything && s2.isEmpty)
+ 
+-      let p3 = SmallProjectionPath(.indexedElement, index: 0xfffffffffffff)
++      let p3 = SmallProjectionPath(.indexedElement, index: Int.max >> 12)
+       let (k3, i3, s3) = p3.pop()
+-      assert(k3 == .indexedElement && i3 == 0xfffffffffffff && s3.isEmpty)
++      assert(k3 == .indexedElement && i3 == Int.max >> 12 && s3.isEmpty)
+ 
+       let p4 = p3.push(.indexedElement, index: Int.max)
+       let (k4, _, s4) = p4.pop()
+diff --git a/swift/include/swift/AST/ProtocolConformanceRef.h b/swift/include/swift/AST/ProtocolConformanceRef.h
+index 3884b14f096..0cedf52c90c 100644
+--- a/swift/include/swift/AST/ProtocolConformanceRef.h
++++ b/swift/include/swift/AST/ProtocolConformanceRef.h
+@@ -42,7 +42,7 @@ public:
+   static inline swift::AbstractConformance *getFromVoidPointer(void *ptr) {
+     return (swift::AbstractConformance *)ptr;
+   }
+-  enum { NumLowBitsAvailable = swift::TypeAlignInBits };
++  enum { NumLowBitsAvailable = swift::ConformanceAlignInBits };
+ };
+ }
+ 
+diff --git a/swift/include/swift/AST/TypeAlignments.h b/swift/include/swift/AST/TypeAlignments.h
+index c9b5d49b8f7..1d18349c400 100644
+--- a/swift/include/swift/AST/TypeAlignments.h
++++ b/swift/include/swift/AST/TypeAlignments.h
+@@ -74,6 +74,7 @@ namespace swift {
+   constexpr size_t ExprAlignInBits = 3;
+   constexpr size_t StmtAlignInBits = 3;
+   constexpr size_t TypeAlignInBits = 3;
++  constexpr size_t ConformanceAlignInBits = 3;
+   constexpr size_t PatternAlignInBits = 3;
+   constexpr size_t TypeReprAlignInBits = 3;
+ 
+diff --git a/swift/include/swift/Basic/BridgedSwiftObject.h b/swift/include/swift/Basic/BridgedSwiftObject.h
+index e79613464ae..1e17908c17b 100644
+--- a/swift/include/swift/Basic/BridgedSwiftObject.h
++++ b/swift/include/swift/Basic/BridgedSwiftObject.h
+@@ -40,7 +40,7 @@ typedef const void * _Nonnull SwiftMetatype;
+ /// It must be layout compatible with the Swift object header.
+ struct BridgedSwiftObject {
+   SwiftMetatype metatype;
+-  int64_t refCounts;
++  intptr_t refCounts;
+ };
+ 
+ typedef struct BridgedSwiftObject * _Nonnull SwiftObject;
+diff --git a/swift/include/swift/Basic/SwiftObjectHeader.h b/swift/include/swift/Basic/SwiftObjectHeader.h
+index 8e6361a2188..943f6a60f21 100644
+--- a/swift/include/swift/Basic/SwiftObjectHeader.h
++++ b/swift/include/swift/Basic/SwiftObjectHeader.h
+@@ -25,7 +25,7 @@
+ struct SwiftObjectHeader : BridgedSwiftObject {
+   SwiftObjectHeader(SwiftMetatype metatype) {
+     this->metatype = metatype;
+-    this->refCounts = ~(uint64_t)0;
++    this->refCounts = ~(uintptr_t)0;
+   }
+ 
+   bool isBridged() const { return metatype != nullptr; }
+diff --git a/swift/lib/AST/AbstractConformance.h b/swift/lib/AST/AbstractConformance.h
+index e305d7c0403..9bc5a892288 100644
+--- a/swift/lib/AST/AbstractConformance.h
++++ b/swift/lib/AST/AbstractConformance.h
+@@ -19,10 +19,12 @@
+ #define SWIFT_AST_ABSTRACT_CONFORMANCE_H
+ 
+ #include "swift/AST/Type.h"
++#include "swift/AST/TypeAlignments.h"
+ #include "llvm/ADT/FoldingSet.h"
+ 
+ namespace swift {
+-class AbstractConformance final : public llvm::FoldingSetNode {
++class alignas(1 << ConformanceAlignInBits) AbstractConformance final
++    : public llvm::FoldingSetNode {
+   Type conformingType;
+   ProtocolDecl *requirement;
+ 
 diff --git a/swift-build/Sources/SWBUtil/FSProxy.swift b/swift-build/Sources/SWBUtil/FSProxy.swift
 index b446d21..f88f3c3 100644
 --- a/swift-build/Sources/SWBUtil/FSProxy.swift
