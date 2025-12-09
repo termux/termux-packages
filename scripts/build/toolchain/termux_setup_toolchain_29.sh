@@ -151,6 +151,7 @@ termux_setup_toolchain_29() {
 	elif [ "$TERMUX_ARCH" = "i686" ]; then
 		_NDK_ARCHNAME=x86
 	fi
+	cp $NDK/source.properties $TERMUX_STANDALONE_TOOLCHAIN/
 	# Remove android-support header wrapping not needed on android-21:
 	rm -Rf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/local
 
