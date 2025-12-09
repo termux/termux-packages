@@ -110,7 +110,7 @@ _BINARYEN_BUILD_ARGS="
 # based on scripts/updates/internal/termux_github_auto_update.sh
 termux_pkg_auto_update() {
 	local latest_tag
-	latest_tag=$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")
+	latest_tag=$(termux_github_api_get_tag)
 
 	if [[ -z "${latest_tag}" ]]; then
 		termux_error_exit "Unable to get tag from ${TERMUX_PKG_SRCURL}"
@@ -142,6 +142,11 @@ termux_pkg_auto_update() {
 	_LLVM_COMMIT     ${llvm_commit} = ${llvm_tgz_sha256}
 	_BINARYEN_COMMIT ${binaryen_commit} = ${binaryen_tgz_sha256}
 	EOL
+
+	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
+		echo "INFO: package needs to be updated to ${latest_tag}."
+		return
+	fi
 
 	sed \
 		-e "s|^_LLVM_COMMIT=.*|_LLVM_COMMIT=${llvm_commit}|" \

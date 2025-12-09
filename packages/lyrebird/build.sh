@@ -8,6 +8,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/lyrebird/-/archive/lyrebird-$TERMUX_PKG_VERSION/lyrebird-lyrebird-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=387f3ea59024523b698ec6d714a6c7e259561d5fb85e9bde466d40b671b3af71
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE=newest-tag
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_BREAKS="obfs4proxy"
 TERMUX_PKG_PROVIDES="obfs4proxy"

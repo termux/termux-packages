@@ -7,7 +7,8 @@ TERMUX_PKG_SRCURL=https://github.com/phpredis/phpredis/archive/${TERMUX_PKG_VERS
 TERMUX_PKG_SHA256=86867bb5214f058cfb0e1abb07524d7f9bfd097ce06e23286993308b1b281082
 TERMUX_PKG_DEPENDS=php
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+\.\d+'
+
 
 termux_step_pre_configure() {
 	$TERMUX_PREFIX/bin/phpize

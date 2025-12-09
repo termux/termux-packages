@@ -6,7 +6,6 @@ TERMUX_PKG_VERSION="2.13"
 TERMUX_PKG_SRCURL=https://github.com/tibirna/qgit/archive/qgit-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9fa64b011963b7b876b8634b140ec5339a81a422317df71b619fcee5740a364a
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_SED_REGEXP='s/.*-//'
 TERMUX_PKG_DEPENDS="git, libc++, qt6-qtbase, qt6-qt5compat"
 TERMUX_PKG_RECOMMENDS="hicolor-icon-theme"
 TERMUX_PKG_BUILD_DEPENDS="qt6-qtbase-cross-tools"

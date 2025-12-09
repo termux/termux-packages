@@ -8,7 +8,6 @@ TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/libsdl-org/SDL_mixer/releases/download/release-${TERMUX_PKG_VERSION}/SDL2_mixer-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=cb760211b056bfe44f4a1e180cc7cb201137e4d1572f2002cc1be728efd22660
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_SED_REGEXP='s/.*-//'
 TERMUX_PKG_DEPENDS="fluidsynth, libflac, libmodplug, libvorbis, libmpg123, opusfile, sdl2 | sdl2-compat"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="sdl2-compat"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

@@ -7,6 +7,7 @@ TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://gitlab.gnome.org/World/gedit/libgedit-tepl/-/archive/$TERMUX_PKG_VERSION/libgedit-tepl-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=39d97a69c6f75a1e86f72976159a4ec3f51996971d1cc5b7289df1315a7d6bab
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE=newest-tag
 TERMUX_PKG_DEPENDS="glib, gsettings-desktop-schemas, gtk3, libcairo, libgedit-amtk, libgedit-gfls, libgedit-gtksourceview, libhandy, libicu, pango"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross"
 TERMUX_PKG_VERSIONED_GIR=false

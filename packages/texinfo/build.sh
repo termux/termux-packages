@@ -71,6 +71,11 @@ termux_pkg_auto_update() {
 		return
 	fi
 
+	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
+		echo "INFO: package needs to be updated to ${latest_version}."
+		return
+	fi
+
 	sed \
 		-e "s|^_DEBIAN_REVISION=.*|_DEBIAN_REVISION=\"${debian_revision}\"|" \
 		-e "s|^\t${TERMUX_PKG_SHA256[0]}.*|\t${texinfo_txz_sha256}|" \

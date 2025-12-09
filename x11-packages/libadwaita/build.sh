@@ -8,6 +8,9 @@ TERMUX_PKG_SHA256=6c9e6c7b1326f9b62e0c5afbc39febedc87a9358e5adde3312de38c9c68021
 TERMUX_PKG_DEPENDS="appstream, fribidi, glib, graphene, gtk4, pango"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, valac"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE=latest-regex
+# libadwaita sometimes releases tags for older versions with newer tag dates.
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

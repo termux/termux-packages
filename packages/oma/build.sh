@@ -7,22 +7,13 @@ TERMUX_PKG_SRCURL="https://github.com/AOSC-Dev/oma/archive/refs/tags/v${TERMUX_P
 TERMUX_PKG_SHA256=ffbe9974cef869c50744def69a0d5f85ef6e9c8bb96d87c13dd4f354a3ff5a75
 TERMUX_PKG_DEPENDS="libnettle, apt"
 TERMUX_PKG_RECOMMENDS="ripgrep"
-TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+$"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --no-default-features
 --features nice-setup
 "
-
-termux_pkg_auto_update() {
-	local latest_tag
-	latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" latest-regex "${TERMUX_PKG_UPDATE_VERSION_REGEXP}")"
-	if [[ -z "${latest_tag}" ]]; then
-		termux_error_exit "Unable to get tag from ${TERMUX_PKG_SRCURL}"
-	fi
-	termux_pkg_upgrade_version "${latest_tag}"
-}
 
 termux_step_pre_configure() {
 	termux_setup_rust

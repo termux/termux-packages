@@ -9,22 +9,7 @@ TERMUX_PKG_SHA256=eaec8435bfb5ccd89f7b4dd09385b6be25c2ff00aa25417cb82c88a59d4ccd
 TERMUX_PKG_BUILD_DEPENDS='openssl'
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+\.\d+'
-
-termux_pkg_auto_update() {
-	local latest_release
-	latest_release="$(git ls-remote --tags https://github.com/tamasfe/taplo.git \
-	| grep -oP "refs/tags/release-taplo-cli-\K${TERMUX_PKG_UPDATE_VERSION_REGEXP}$" \
-	| sort -V \
-	| tail -n1)"
-
-	if [[ "${latest_release}" == "${TERMUX_PKG_VERSION}" ]]; then
-		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
-		return
-	fi
-
-	termux_pkg_upgrade_version "${latest_release}"
-}
+TERMUX_PKG_UPDATE_VERSION_REGEXP='release-taplo-cli-\K\d+\.\d+\.\d+'
 
 termux_step_pre_configure() {
 	termux_setup_rust

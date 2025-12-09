@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/go-jira/jira/archive/refs/tags/v${TERMUX_PK
 TERMUX_PKG_SHA256=179abe90458281175a482cbd2e1ad662bdf563ef5acfc2cadf215ae32e0bd1e6
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE=newest-tag
 
 termux_step_pre_configure() {
 	termux_setup_golang

@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION="6.6.1"
 TERMUX_PKG_SRCURL="https://github.com/linuxmint/cinnamon-settings-daemon/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=65ad417d6f10db02e7d8a9dc27e88c7c8f11b9784b0ab0b78354bb5e10a36d57
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+$"
 TERMUX_PKG_DEPENDS="glib, cinnamon-desktop, libcanberra, libcolord, fontconfig, libgnomekbd, gtk3, libnotify, pango, libxfixes, pulseaudio-glib, upower, libx11, libxklavier, littlecms"
 TERMUX_PKG_BUILD_DEPENDS="glib-cross"
 TERMUX_PKG_VERSIONED_GIR=false
@@ -20,21 +20,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Duse_smartcard=disabled
 -Duse_wacom=disabled
 "
-
-termux_pkg_auto_update() {
-	local latest_release
-	latest_release="$(git ls-remote --tags "$TERMUX_PKG_HOMEPAGE.git" \
-		| grep -oP "refs/tags/\K${TERMUX_PKG_UPDATE_VERSION_REGEXP}$" \
-		| sort -V \
-		| tail -n1)"
-
-	if [[ "${latest_release}" == "${TERMUX_PKG_VERSION}" ]]; then
-		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
-		return
-	fi
-
-	termux_pkg_upgrade_version "${latest_release}"
-}
 
 termux_step_pre_configure() {
 	termux_setup_glib_cross_pkg_config_wrapper

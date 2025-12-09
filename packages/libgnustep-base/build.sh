@@ -7,7 +7,6 @@ TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL="https://github.com/gnustep/libs-base/releases/download/base-${TERMUX_PKG_VERSION//./_}/gnustep-base-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=e7546f1c978a7c75b676953a360194a61e921cb45a4804497b4f346a460545cd
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP='(?<=-).+'
 TERMUX_PKG_DEPENDS="gnustep-make, libcurl, libc++, libffi, libgmp, libgnutls, libiconv, libicu, libxml2, libxslt, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
