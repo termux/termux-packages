@@ -33,7 +33,7 @@ termux_github_api_get_tag() {
 		-H "X-GitHub-Api-Version: 2022-11-28"
 		-H "Accept: application/vnd.github.v3+json"
 		-H "Authorization: token ${GITHUB_TOKEN}"
-		-A "Termux update checker 1.0 (github.com/termux/termux-packages)"
+		-A "Termux update checker 1.1 (github.com/termux/termux-packages)"
 		--silent
 		--location
 		--retry 10
