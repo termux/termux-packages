@@ -7,3 +7,4 @@ TERMUX_PKG_SRCURL=https://gitlab.freedesktop.org/xdg/default-icon-theme/-/archiv
 TERMUX_PKG_SHA256=9227ec70c6b59a715a18dcedbed590cb08edc9eadb73fb2b0a57034e15c18f36
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE=newest-tag

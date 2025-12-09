@@ -8,7 +8,6 @@ TERMUX_PKG_SHA256=aeb951964c2f7ecc08174cb5517962d157595e9e3f38fc4a130b91dc2f9fec
 TERMUX_PKG_DEPENDS="libxcb, libxml2, libwayland, xkeyboard-config"
 TERMUX_PKG_BUILD_DEPENDS="libwayland-protocols, xorg-util-macros"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP='(?<=-).+'
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Denable-docs=false
 -Denable-wayland=true

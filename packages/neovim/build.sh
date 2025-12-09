@@ -7,7 +7,7 @@ TERMUX_PKG_VERSION="0.11.5"
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c63450dfb42bb0115cd5e959f81c77989e1c8fd020d5e3f1e6d897154ce8b771
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP="^\d+\.\d+\.\d+$"
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+$"
 TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libvterm (>= 1:0.3-0), libluajit, libunibilium, libandroid-support, lua51-lpeg, tree-sitter, tree-sitter-parsers, utf8proc"
 TERMUX_PKG_HOSTBUILD=true
 
@@ -22,14 +22,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCOMPILE_LUA=OFF
 "
 TERMUX_PKG_CONFFILES="share/nvim/sysinit.vim"
-
-termux_pkg_auto_update() {
-	# Get the latest release tag:
-	local tag
-	tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" \
-		latest-regex "${TERMUX_PKG_UPDATE_VERSION_REGEXP}")"
-	termux_pkg_upgrade_version "$tag"
-}
 
 _patch_luv() {
 	# git submodule update --init deps/lua-compat-5.3 failed

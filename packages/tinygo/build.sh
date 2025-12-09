@@ -83,6 +83,11 @@ termux_pkg_auto_update() {
 		cut -d" " -f1 | LC_ALL=C sort | sha256sum | cut -d" " -f1
 	)
 
+	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
+		echo "INFO: package needs to be updated to ${latest_tag}."
+		return
+	fi
+
 	sed \
 		-e "s|^TERMUX_PKG_SHA256=.*|TERMUX_PKG_SHA256=${s}|" \
 		-i "${TERMUX_PKG_BUILDER_DIR}/build.sh"

@@ -13,6 +13,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP='1\.\d+(\.\d+)?'
 
+# test if removable
 termux_pkg_auto_update() {
 	local latest_release
 	latest_release="$(git ls-remote --tags https://code.blicky.net/yorhel/ncdu.git \

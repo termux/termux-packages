@@ -5,10 +5,9 @@ TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.OLD, COPYING.LIB"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="11.0~rc1"
 TERMUX_PKG_REVISION=1
-_REAL_VERSION="${TERMUX_PKG_VERSION/\~/-}"
 TERMUX_PKG_SRCURL=(
-	https://github.com/AndreRH/wine/archive/refs/tags/hangover-$_REAL_VERSION.tar.gz
-	https://github.com/AndreRH/hangover/releases/download/hangover-$_REAL_VERSION/hangover_${_REAL_VERSION}_ubuntu2004_focal_arm64.tar
+	"https://github.com/AndreRH/wine/archive/refs/tags/hangover-${TERMUX_PKG_VERSION/\~/-}.tar.gz"
+	"https://github.com/AndreRH/hangover/releases/download/hangover-${TERMUX_PKG_VERSION/\~/-}/hangover_${TERMUX_PKG_VERSION/\~/-}_ubuntu2004_focal_arm64.tar"
 )
 TERMUX_PKG_SHA256=(
 	96cb92827e6067a4a533d59def1fc82410a71b4139986a17ec976f3362dc9e67
@@ -19,7 +18,7 @@ TERMUX_PKG_ANTI_BUILD_DEPENDS="vulkan-loader"
 TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn-static, vulkan-loader-generic"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686, x86_64"
 
 TERMUX_PKG_HOSTBUILD=true
@@ -87,29 +86,6 @@ enable_tools=yes
 # TODO: `--enable-archs=arm` doesn't build with option `--with-mingw=clang`, but
 # TODO: `arm64ec` doesn't build with option `--with-mingw` (arm64ec-w64-mingw32-clang)
 
-termux_pkg_auto_update() {
-	local latest_tag
-	latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL[1]}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")"
-	(( ${#latest_tag} )) || {
-		printf '%s\n' \
-		'WARN: Auto update failure!' \
-		"latest_tag=${latest_tag}"
-	return
-	} >&2
-
-	latest_tag="${latest_tag#*-}"
-	if [[ "${latest_tag}" == "${_REAL_VERSION}" ]]; then
-		echo "INFO: No update needed. Already at version '${_REAL_VERSION}'."
-		return
-	fi
-
-	if [ "${latest_tag/-/\~}" != "${latest_tag}" ]; then
-		latest_tag="${latest_tag/-/\~}"
-	fi
-
-	termux_pkg_upgrade_version "${latest_tag}"
-}
-
 _setup_llvm_mingw_toolchain() {
 	# LLVM-mingw's version number must not be the same as the NDK's.
 	local _llvm_mingw_version=21
@@ -176,7 +152,7 @@ termux_step_post_make_install() {
 	for _type in wowbox64 libwow64fex libarm64ecfex; do
 		mkdir -p $_type
 		cd $_type
-		ar -x "$TERMUX_PKG_SRCDIR"/hangover-${_type}_${_REAL_VERSION}_arm64.deb
+		ar -x "$TERMUX_PKG_SRCDIR"/hangover-${_type}_${TERMUX_PKG_VERSION/\~/-}_arm64.deb
 		tar xf data.tar.xz
 		install -Dm644 usr/lib/wine/aarch64-windows/$_type.dll \
 			"$TERMUX_PREFIX"/opt/hangover-wine/lib/wine/aarch64-windows/$_type.dll
@@ -188,6 +164,6 @@ termux_step_post_make_install() {
 	# Install LICENSE file for hangover
 	mkdir -p "$TERMUX_PREFIX"/share/doc/hangover
 	rm -f "$TERMUX_PREFIX"/share/doc/hangover/copyright
-	curl -L https://raw.githubusercontent.com/AndreRH/hangover/refs/tags/hangover-${_REAL_VERSION}/LICENSE \
+	curl -L https://raw.githubusercontent.com/AndreRH/hangover/refs/tags/hangover-${TERMUX_PKG_VERSION/\~/-}/LICENSE \
 		-o "$TERMUX_PREFIX"/share/doc/hangover/copyright
 }
