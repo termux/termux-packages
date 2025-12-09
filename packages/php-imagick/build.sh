@@ -9,20 +9,7 @@ TERMUX_PKG_SRCURL=https://github.com/Imagick/imagick/archive/refs/tags/${TERMUX_
 TERMUX_PKG_SHA256=b0e9279ddf6e75a8c6b4068e16daec0475427dbca7ce2e144e30a51a88aa5ddc
 TERMUX_PKG_DEPENDS="php, imagemagick"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+\.\d+'
-TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
-
-termux_pkg_auto_update() {
-	local latest_release
-	latest_release="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")"
-
-	if ! grep -P "^${TERMUX_PKG_UPDATE_VERSION_REGEXP}\$" <<<"$latest_release"; then
-		echo "WARN: '$latest_release' did not match the regex exclusively. Not updating."
-		return
-	fi
-
-	termux_pkg_upgrade_version "${latest_release}"
-}
+TERMUX_PKG_UPDATE_VERSION_REGEXP='^\d+\.\d+\.\d+$'
 
 termux_step_pre_configure() {
 	$TERMUX_PREFIX/bin/phpize

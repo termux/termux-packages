@@ -6,26 +6,11 @@ TERMUX_PKG_VERSION="2.3.5"
 TERMUX_PKG_SRCURL=https://github.com/linuxmint/mint-themes/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=0f16795f1a1c367118aa4c339e80f3435c9f5b2402b0deaae269ba7b8de1fb9a
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+$"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_PYTHON_BUILD_DEPS="pysass"
 TERMUX_PKG_BUILD_DEPENDS="python-libsass"
 TERMUX_PKG_SUGGESTS="mint-x-icon-theme, mint-y-icon-theme"
-
-termux_pkg_auto_update() {
-	local latest_release
-	latest_release="$(git ls-remote --tags "$TERMUX_PKG_HOMEPAGE.git" \
-		| grep -oP "refs/tags/\K${TERMUX_PKG_UPDATE_VERSION_REGEXP}$" \
-		| sort -V \
-		| tail -n1)"
-
-	if [[ "${latest_release}" == "${TERMUX_PKG_VERSION}" ]]; then
-		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
-		return
-	fi
-
-	termux_pkg_upgrade_version "${latest_release}"
-}
 
 termux_step_pre_configure() {
 	# allow use of GNU/Linux pysass (TERMUX_PKG_PYTHON_BUILD_DEPS="pysass") during cross-compilation

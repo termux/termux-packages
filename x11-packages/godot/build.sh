@@ -9,7 +9,7 @@ TERMUX_PKG_DEPENDS="brotli, ca-certificates, fontconfig, freetype, glu, libandro
 TERMUX_PKG_BUILD_DEPENDS="pulseaudio, yasm"
 TERMUX_PKG_PYTHON_COMMON_DEPS="scons"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+(\.\d+)?'
+TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+(\.\d+)?(?=-stable)'
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {

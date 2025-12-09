@@ -8,18 +8,6 @@ TERMUX_PKG_SHA256=c223293463c98039a930cb604d6ff04caff5cd6a3d45e7394cda1f11d8cfc0
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 
-termux_pkg_auto_update() {
-	# Get the newest tag:
-	local tag
-	tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")"
-	# check if this is not a release:
-	if grep -qP "^gopls/v${TERMUX_PKG_UPDATE_VERSION_REGEXP}\$" <<<"$tag"; then
-		termux_pkg_upgrade_version "$tag"
-	else
-		echo "WARNING: Skipping auto-update: Not a release($tag)"
-	fi
-}
-
 termux_step_make() {
 	termux_setup_golang
 

@@ -5,10 +5,12 @@ TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="10.2p1"
 TERMUX_PKG_SRCURL=https://github.com/openssh/openssh-portable/archive/refs/tags/V_$(sed 's/\./_/g; s/p/_P/g' <<< $TERMUX_PKG_VERSION).tar.gz
 TERMUX_PKG_SHA256=8d3083bca4864cbc760bfcc3e67d86d401e27faa5eaafa1482c2316f5d5186b3
-TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="krb5, ldns, libandroid-support, libedit, openssh-sftp-server, openssl, termux-auth, zlib"
 TERMUX_PKG_SUGGESTS="termux-services"
 TERMUX_PKG_CONFLICTS="dropbear"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE=newest-tag
+TERMUX_PKG_UPDATE_VERSION_SED_REGEXP="s/([0-9]+)_([0-9]+)_P([0-9]+)/\1.\2p\3/"
 # Certain packages are not safe to build on device because their
 # build.sh script deletes specific files in $TERMUX_PREFIX.
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
@@ -52,14 +54,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="PATH_PASSWD_PROG=${TERMUX_PREFIX}/bin/passwd"
 TERMUX_PKG_MAKE_INSTALL_TARGET="install-nokeys"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/slogin share/man/man1/slogin.1"
 TERMUX_PKG_CONFFILES="etc/ssh/ssh_config etc/ssh/sshd_config"
-
-termux_pkg_auto_update() {
-	local latest_tag version
-	latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" newest-tag)"
-	[[ -z "${latest_tag}" ]] && termux_error_exit "Unable to get tag from ${TERMUX_PKG_SRCURL}"
-	version="$(sed -E 's/V_([0-9]+)_([0-9]+)_P([0-9]+)/\1.\2p\3/' <<< "${latest_tag}")"
-	termux_pkg_upgrade_version "$version"
-}
 
 termux_step_pre_configure() {
 	autoreconf

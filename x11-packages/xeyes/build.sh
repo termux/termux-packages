@@ -9,6 +9,7 @@ TERMUX_PKG_DEPENDS="libx11, libxcb, libxext, libxi, libxmu, libxrender, libxt"
 TERMUX_PKG_BUILD_DEPENDS="libxfixes, xorg-util-macros"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE=newest-tag
 
 termux_step_pre_configure() {
 	autoreconf -fi

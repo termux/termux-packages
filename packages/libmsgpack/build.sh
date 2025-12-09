@@ -7,7 +7,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/msgpack/msgpack-c/releases/download/c-${TERMUX_PKG_VERSION}/msgpack-c-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=674119f1a85b5f2ecc4c7d5c2859edf50c0b05e0c10aa0df85eefa2c8c14b796
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
+TERMUX_PKG_UPDATE_VERSION_REGEXP="^c-\K\d+\.\d+\.\d+$"
 TERMUX_PKG_BREAKS="libmsgpack-dev"
 TERMUX_PKG_REPLACES="libmsgpack-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -15,18 +15,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DMSGPACK_BUILD_EXAMPLES=OFF
 -DMSGPACK_BUILD_TESTS=OFF
 "
-
-termux_pkg_auto_update() {
-	# Get latest release tag:
-	local tag
-	tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}")"
-	# check if this is not a c++ release:
-	if grep -qP "^c-${TERMUX_PKG_UPDATE_VERSION_REGEXP}\$" <<<"$tag"; then
-		termux_pkg_upgrade_version "$tag"
-	else
-		echo "WARNING: Skipping auto-update: Not a C release($tag)"
-	fi
-}
 
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them

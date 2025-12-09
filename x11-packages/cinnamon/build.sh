@@ -21,28 +21,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dpolkit=false
 "
 
-termux_pkg_auto_update() {
-	local latest_release
-	latest_release="$(git ls-remote --tags "$TERMUX_PKG_HOMEPAGE.git" \
-		| grep -oP "refs/tags/\K${TERMUX_PKG_UPDATE_VERSION_REGEXP}$" \
-		| sort -V \
-		| tail -n1)"
-
-	if [[ "${latest_release}" == "${TERMUX_PKG_VERSION}" ]]; then
-		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
-		return
-	fi
-
-	termux_pkg_upgrade_version "${latest_release}"
-}
-
-termux_step_post_get_source() {
-	find "$TERMUX_PKG_SRCDIR" -type f | \
-		xargs -n 1 sed -i \
-		-e "s|/usr|$TERMUX_PREFIX|g" \
-		-e "s|#!$TERMUX_PREFIX|#!/usr|g"
-}
-
 termux_step_pre_configure() {
 	termux_setup_gir
 	termux_setup_glib_cross_pkg_config_wrapper

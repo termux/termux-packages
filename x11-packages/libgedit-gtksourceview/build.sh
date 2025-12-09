@@ -7,6 +7,7 @@ TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://gitlab.gnome.org/World/gedit/libgedit-gtksourceview/-/archive/${TERMUX_PKG_VERSION}/libgedit-gtksourceview-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=49b66fe7e2d33dbf643107ae16fe324edf91bb21e86a927b2c5981f63f4cbb12
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE=newest-tag
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libxml2, pango"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross"
 TERMUX_PKG_VERSIONED_GIR=false

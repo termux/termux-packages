@@ -9,12 +9,17 @@ TERMUX_PKG_SHA256=ad5040537537012b16ef6e1210a572b927c7cdc2b99d1ee88d44a7dcdc3ff4
 TERMUX_PKG_BREAKS="libtreesitter"
 TERMUX_PKG_REPLACES="libtreesitter"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP="^\d+\.\d+\.\d+$"
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+$"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_pkg_auto_update() {
 	local latest_release
-	latest_release="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" newest-tag)"
+	latest_release="$(termux_github_api_get_tag)"
+
+	if ! latest_release="$(grep --max-count=1 -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<< "${latest_release}")"; then
+		echo "INFO: Tag '${latest_release}' does not look like a stable version."
+		return
+	fi
 
 	# Is there a new release?
 	if [[ "${latest_release}" == "${TERMUX_PKG_VERSION}" ]]; then
@@ -22,8 +27,8 @@ termux_pkg_auto_update() {
 		return
 	fi
 
-	if ! grep -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<< "${latest_release}"; then
-		echo "INFO: Tag '${latest_release}' does not look like a stable version."
+	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
+		echo "INFO: package needs to be updated to ${latest_release}."
 		return
 	fi
 
@@ -37,12 +42,17 @@ termux_pkg_auto_update() {
 		termux_error_exit "SOVERSION guard check failed."
 	fi
 
+	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
+		echo "INFO: package needs to be updated to ${latest_release}."
+		return
+	fi
+
 	# Figure out the new SHA256 for the `termux_setup_treesitter` function
 	local TS_BIN_URL TS_TMPFILE NEW_TS_SHA256
 	TS_BIN_URL="https://github.com/tree-sitter/tree-sitter/releases/download/v${latest_release}/tree-sitter-linux-x64.gz"
 	TS_TMPFILE="$(mktemp)"
 	curl -sL "$TS_BIN_URL" -o "$TS_TMPFILE"
-	NEW_TS_SHA256=$(sha256sum "$TS_TMPFILE" | cut -d' ' -f1)
+	NEW_TS_SHA256="$(sha256sum "$TS_TMPFILE" | cut -d' ' -f1)"
 
 	sed \
 		-e "s|\(^\s*\)local TERMUX_TREE_SITTER_SHA256=[0-9a-f]*|\1local TERMUX_TREE_SITTER_SHA256=${NEW_TS_SHA256}|" \

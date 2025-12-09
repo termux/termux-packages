@@ -28,14 +28,3 @@ termux_step_make_install() {
 	install -Dm600 "$TERMUX_PKG_SRCDIR"/pkg/cli/dnote-completion.zsh \
 		"$TERMUX_PREFIX"/share/zsh/site-functions/_dnote
 }
-
-termux_pkg_auto_update() {
-	# Get latest release tag:
-	local tag
-	tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}")"
-	if grep -qP "^cli-v${TERMUX_PKG_UPDATE_VERSION_REGEXP}\$" <<<"$tag"; then
-		termux_pkg_upgrade_version "$tag"
-	else
-		echo "WARNING: Skipping auto-update: Not a CLI release($tag)"
-	fi
-}
