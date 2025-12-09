@@ -11,7 +11,7 @@ termux_pkg_auto_update() {
 	if [[ -z "${TERMUX_PKG_UPDATE_METHOD}" ]]; then
 		if [[ "${project_host}" == "github.com" ]]; then
 			TERMUX_PKG_UPDATE_METHOD="github"
-		elif [[ "${project_host}" == "gitlab.com" ]]; then
+		elif [[ "$TERMUX_PKG_SRCURL" == *"/-/archive/"* ]]; then
 			TERMUX_PKG_UPDATE_METHOD="gitlab"
 		else
 			TERMUX_PKG_UPDATE_METHOD="repology"
@@ -29,12 +29,8 @@ configured to use ${TERMUX_PKG_UPDATE_METHOD}'s method."
 			termux_github_auto_update
 		fi
 		;;
-	gitlab)
-		if [[ "${project_host}" != "${TERMUX_PKG_UPDATE_METHOD}.com" ]]; then
-			termux_error_exit "${_err_msg}"
-		else
+		gitlab)
 			termux_gitlab_auto_update
-		fi
 		;;
 	repology)
 		termux_repology_auto_update
