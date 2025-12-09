@@ -30,7 +30,7 @@ termux_gitlab_api_get_tag() {
 	# for unauthenticated users and non-protected paths which should be more than enough for our needs.
 	# see: https://docs.gitlab.com/administration/settings/rate_limits_on_raw_endpoints/
 	local -a curl_opts=(
-		-A "Termux update checker 1.0 (github.com/termux/termux-packages)"
+		-A "Termux update checker 1.1 (github.com/termux/termux-packages)"
 		--silent
 		--location
 		--retry 10
