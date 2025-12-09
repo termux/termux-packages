@@ -17,11 +17,11 @@ termux_repology_api_get_latest_version() {
 
 	if [[ ! -s "${TERMUX_REPOLOGY_DATA_FILE}" ]]; then
 		# We should not install them in the case if python packages are externally managed.
-		find /usr/lib/python3.* -name EXTERNALLY-MANAGED -print -quit | grep -q . || 
+		find /usr/lib/python3.* -name EXTERNALLY-MANAGED -print -quit | grep -q . || \
 			pip3 install bs4 requests >/dev/null # Install python dependencies.
 		python3 "${TERMUX_SCRIPTDIR}"/scripts/updates/api/dump-repology-data \
 			"${TERMUX_REPOLOGY_DATA_FILE}" >/dev/null || \
-   				echo "{}" > ${TERMUX_REPOLOGY_DATA_FILE}
+				echo "{}" > "${TERMUX_REPOLOGY_DATA_FILE}"
 	fi
 
 	# Why `--arg`? See: https://stackoverflow.com/a/54674832/15086226; `sub` strips the leading 'v'
