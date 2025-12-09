@@ -1,12 +1,18 @@
 # shellcheck shell=bash
 termux_pkg_auto_update() {
 	if [[ -n "${__CACHED_TAG:-}" ]]; then
-		termux_pkg_upgrade_version ${__CACHED_TAG}
+		termux_pkg_upgrade_version "${__CACHED_TAG}"
 		return $?
 	fi
 
+	# Example:
+	# https://github.com/vim/vim/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+	#            _="https:"
+	#            _=""
+	# project_host="github.com"
+	#            _="vim/vim/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 	local project_host
-	project_host="$(echo "${TERMUX_PKG_SRCURL}" | cut -d"/" -f3)"
+	IFS='/' read -r _ _ project_host _ <<< "${TERMUX_PKG_SRCURL}"
 
 	if [[ -z "${TERMUX_PKG_UPDATE_METHOD}" ]]; then
 		if [[ "${project_host}" == "github.com" ]]; then
@@ -31,14 +37,14 @@ termux_pkg_auto_update() {
 		gitlab)
 			termux_gitlab_auto_update
 		;;
-	repology)
-		termux_repology_auto_update
+		repology)
+			termux_repology_auto_update
 		;;
-	*)
-		termux_error_exit <<-EndOfError
-			ERROR: wrong value '${TERMUX_PKG_UPDATE_METHOD}' for TERMUX_PKG_UPDATE_METHOD.
-			Can be 'github', 'gitlab' or 'repology'
-		EndOfError
+		*)
+			termux_error_exit <<-EndOfError
+				wrong value '${TERMUX_PKG_UPDATE_METHOD}' for TERMUX_PKG_UPDATE_METHOD.
+				Can be 'github', 'gitlab' or 'repology'
+			EndOfError
 		;;
 	esac
 }
