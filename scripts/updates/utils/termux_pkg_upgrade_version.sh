@@ -37,7 +37,7 @@ termux_pkg_upgrade_version() {
 	if [[ -n "${TERMUX_PKG_UPDATE_VERSION_REGEXP:-}" ]]; then
 		# Extract version numbers.
 		local OLD_LATEST_VERSION="${LATEST_VERSION}"
-		LATEST_VERSION="$(grep -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<< "${LATEST_VERSION}" || true)"
+		LATEST_VERSION="$(grep --max-count=1 -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<< "${LATEST_VERSION}" || true)"
 		if [[ -z "${LATEST_VERSION:-}" ]]; then
 			termux_error_exit <<-EndOfError
 				ERROR: failed to filter version numbers using regexp '${TERMUX_PKG_UPDATE_VERSION_REGEXP}'.
@@ -45,6 +45,9 @@ termux_pkg_upgrade_version() {
 			EndOfError
 		fi
 		unset OLD_LATEST_VERSION
+	else # Otherwise remove any leading non-digits as that would not be a valid version.
+		# shellcheck disable=SC2001 # This is something parameter expansion can't handle well, so we use sed.
+		LATEST_VERSION="$(sed -e "s/^[^0-9]*//" <<< "$LATEST_VERSION")"
 	fi
 
 	# If needed, filter version numbers using sed regexp.
@@ -67,9 +70,9 @@ termux_pkg_upgrade_version() {
 
 	# Translate "-suffix" into "~suffix": "X.Y.Z-suffix" is considered later
 	# than X.Y.Z. for it to be considered earlier use "X.Y.Z~suffix".
-	LATEST_VERSION="${LATEST_VERSION//-rc/~rc}"
-	LATEST_VERSION="${LATEST_VERSION//-alpha/~alpha}"
-	LATEST_VERSION="${LATEST_VERSION//-beta/~beta}"
+	for suffix in "rc" "alpha" "beta"; do
+		LATEST_VERSION="$(sed -E "s/[-.]?(${suffix}[0-9]*)/~\1/ig" <<< "$LATEST_VERSION")"
+	done
 
 	if [[ "${SKIP_VERSION_CHECK}" != "--skip-version-check" ]]; then
 		if ! termux_pkg_is_update_needed \
@@ -96,7 +99,7 @@ termux_pkg_upgrade_version() {
 		-i "${TERMUX_PKG_BUILDER_DIR}/build.sh"
 
 	# Update checksum
-	if [[ "${TERMUX_PKG_SHA256[*]}" != "SKIP_CHECKSUM" ]] && [[ "${TERMUX_PKG_SRCURL:0:4}" != "git+" ]]; then
+	if [[ "${TERMUX_PKG_SHA256[*]}" != "SKIP_CHECKSUM" && "${TERMUX_PKG_SRCURL:0:4}" != "git+" ]]; then
 		echo n | "${TERMUX_SCRIPTDIR}/scripts/bin/update-checksum" "${TERMUX_PKG_NAME}" || {
 			git checkout -- "${TERMUX_SCRIPTDIR}"
 			git pull --rebase --autostash
