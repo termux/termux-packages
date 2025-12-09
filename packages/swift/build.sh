@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://swift.org/
 TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_MAINTAINER="@finagolfin"
-TERMUX_PKG_VERSION=6.2.1
+TERMUX_PKG_VERSION=6.2.2
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SRCURL=https://github.com/swiftlang/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
-TERMUX_PKG_SHA256=39825af3b1ab523ed4970e1315a14b5379fb5f8046170c27a330a179d982fe2a
+TERMUX_PKG_SHA256=86f1fb1eec1eaacbd303e5d4857a52c3ec52197cf5fa8ab918e2ca772158fd79
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_DEPENDS="clang, libandroid-execinfo, libandroid-glob, libandroid-posix-semaphore, libandroid-shmem, libandroid-spawn, libandroid-spawn-static, libandroid-sysv-semaphore, libcurl, libuuid, libxml2, libdispatch, llbuild, pkg-config, swift-sdk-${TERMUX_ARCH/_/-}"
@@ -35,36 +35,36 @@ termux_step_post_get_source() {
 	mv .temp swift
 
 	declare -A library_checksums
-	library_checksums[swift-cmark]=4f54c388f9a98527cf751ffedb35898c2198b4f23cf16d109203f9ba54a62379
-	library_checksums[llvm-project]=c0bd5b4bc69dceda1dda5aabee6f24e42e87ec2ccb0ee5f002448ab3c4769fdf
-	library_checksums[swift-experimental-string-processing]=a0055310ebc885ba4781edbcc9aaf44f7ae0cdbc633846bc0a9a6b3f53b29029
-	library_checksums[swift-syntax]=c407424ca6da371425fbbe2a3f097f9df25118764a45b4a3af5e6d0ca4abc14a
-	library_checksums[swift-corelibs-libdispatch]=18c6d5945e6668c1928deb72f524dfa26ad9d1b226c7d618cdf766885ccc433c
-	library_checksums[swift-corelibs-foundation]=c395a3ca39291bda0f03946c2c4b5730ed02d629a3539adaf90184300228ea72
-	library_checksums[swift-foundation]=411b967971eaa6c6ab4a1ba84fd145c17f4cb053515277bb903f18bf0183edb0
-	library_checksums[swift-foundation-icu]=6e8ce5b8491821e840ea720b795264b5dcc98ad38ea122bc016593ac2be1f520
-	library_checksums[swift-corelibs-xctest]=b0d7922af89146ab5a12d9744e965ca3bf587c9bbda2f435ab56a6dad86004a5
+	library_checksums[swift-cmark]=cb568729047467f540cf08537cfcff37117594c90250352b848cd03d557326fc
+	library_checksums[llvm-project]=32b20dd90d81273b5f44eba04669b85d9dd57054e457f6e08754ec18065212f4
+	library_checksums[swift-experimental-string-processing]=71cc6a63ac28661fb0e29c5392ed273fef1baf8ff50afe0cb6d5ef02b6c20b8d
+	library_checksums[swift-syntax]=eb38e0c57f2823be3e86808779d60ada8a75b9fcdaf8d7ada136522bf739ba0a
+	library_checksums[swift-corelibs-libdispatch]=edb2bf809dd2239d357834b0c63a1011b145152cd6b0f2d9310a9cc5259b4da6
+	library_checksums[swift-corelibs-foundation]=4796981d7a67ae351e5f78f15ae1978376e3572e2ab26decacfacd07b84a6789
+	library_checksums[swift-foundation]=c96ef30fb4b04cadf46a9336bb6f7feab3902e0790e4cdef315de71f88bab53e
+	library_checksums[swift-foundation-icu]=f9cc2ffdb8c999c65e612177db24d3897ec47a57d54ea978ea12ca2e7cddcc2b
+	library_checksums[swift-corelibs-xctest]=6cd342ab93ef295c934582bdf80c257edea5a9fe7a5bc5c4e7c66301d28d5fbc
 	library_checksums[swift-toolchain-sqlite]=c8704e70c4847a8dbd47aafb25d293fbe1e1bafade16cfa64e04f751e33db0ca
-	library_checksums[swift-llbuild]=fdc26af47b53779776f1294f674886c774636ef0b0b1b2c2ed90f9626bd018ed
-	library_checksums[swift-testing]=871e4eb07c1467dcac331f2bfa591cbd0a46dc2fee953f67f9b1402941fbd681
+	library_checksums[swift-llbuild]=422fb8a3d73c8e33f74b3c1318cefdd89b87d4def6eb89f0a587c2aaa4b1de3d
+	library_checksums[swift-testing]=a3a39c2af5e21944680340ca905fc528995414f025032b8f25e5d98c5e69f1e1
 	library_checksums[swift-argument-parser]=d5bad3a1da66d9f4ceb0a347a197b8fdd243a91ff6b2d72b78efb052b9d6dd33
 	library_checksums[swift-collections]=7e5e48d0dc2350bed5919be5cf60c485e72a30bd1f2baf718a619317677b91db
 	library_checksums[swift-crypto]=5c860c0306d0393ff06268f361aaf958656e1288353a0e23c3ad20de04319154
 	library_checksums[swift-system]=4bf5d5db04d48f484289371b63dd7bdced0db1ab1307c49127b9f894341a521d
 	library_checksums[swift-asn1]=e0da995ae53e6fcf8251887f44d4030f6600e2f8f8451d9c92fcaf52b41b6c35
 	library_checksums[swift-certificates]=fcaca458aab45ee69b0f678b72c2194b15664cc5f6f5e48d0e3f62bc5d1202ca
-	library_checksums[swift-driver]=004db94c753b437c7ec8260a27f0b79509389503e661dacd244547fdfa1edc23
-	library_checksums[swift-tools-support-core]=a1783534192eaef6de498c10ac02fab70aa64cbc9750252b30ff856046962530
-	library_checksums[swift-build]=6284de0771da435c99af96aa1109029ffa47c18a3fb507d1c3266c42e9e7b0f1
-	library_checksums[swift-package-manager]=b8f9d96ec4095e46d021dce896d47991ab30d7a487511054a9e630aff4303e42
-	library_checksums[indexstore-db]=d13695451dfdbb5719527ec66f588da1f5b350553c231655d5dc1e4e84105cec
-	library_checksums[swift-docc]=954dcba69da56c63e1636f0dece60d4c8c1250e6bc2b97e20f72e50b068fdd1d
-	library_checksums[swift-docc-symbolkit]=47e9b732a3e03a803e962333f6934d2648e6685f17328dad7c56874047366b1d
-	library_checksums[swift-lmdb]=0e60fb6e3ff82253c529f1e0e902f556e8749c963ceb4db8305d2af152da465e
-	library_checksums[swift-markdown]=2cdb1751c22a22eb16b92cd12bb7c7d27d7af103173df1893c2c813dc2098a9e
+	library_checksums[swift-driver]=56a313d0bb6d3a41c936cea4924b54e7f82a64fda7ec65a7dc3ffe524a597c54
+	library_checksums[swift-tools-support-core]=ca7ac32015be4e6c33676fc7e13ee29e943688cbe6bd684d05be1206f2146394
+	library_checksums[swift-build]=ffbf5652242170f19cc57461710d65553787bd0604974928f6ce51fbc5591814
+	library_checksums[swift-package-manager]=25db1e565712be0c8117cb7fabdd533213a885881e8ece5950b694741904fb13
+	library_checksums[indexstore-db]=1bbf1c79b7331a0bc18bc5bef9008c14a85b7a33a312950d31e22e4dbcce0b1d
+	library_checksums[swift-docc]=31b5a68c3a3dacfa1301f23a021ec151509445c7b34c60c8f059e632e0918b72
+	library_checksums[swift-docc-symbolkit]=37c53dc17bc058eac92897f4d3df4c8d9a33371123180c5928120ae16a5efead
+	library_checksums[swift-lmdb]=da4e5814a94c3d792923cb49a6ca11a6a4d2fabe6f5d27d6ae72f55a20fb3707
+	library_checksums[swift-markdown]=d4af4aebea55ef5cdc132748b1b59f44e955c691a6727833b95d7205023c8a40
 	library_checksums[swift-nio]=feb16b6d0e6d010be14c6732d7b02ddbbdc15a22e3912903f08ef5d73928f90d
 	library_checksums[swift-atomics]=33d9f4fbaeddee4bda3af2be126791ee8acf3d3c24a2244457641a20d39aec12
-	library_checksums[sourcekit-lsp]=0ff9f6f2547b6585512193ee6d87980bc45b71051e19a74d3f09ba257b8123fe
+	library_checksums[sourcekit-lsp]=0b00e39df888a5bcd6eb071b4712e3095ffd7d41270eefc41e02b8adbdab895a
 
 	for library in "${!library_checksums[@]}"; do \
 		GH_ORG="apple"
@@ -163,7 +163,7 @@ termux_step_make() {
 
 	SWIFT_BUILD_ROOT=$TERMUX_PKG_BUILDDIR $TERMUX_PKG_SRCDIR/swift/utils/build-script \
 	$SWIFT_BUILD_FLAGS --xctest --swift-testing -b -p --swift-driver --sourcekit-lsp \
-	--android-api-level $TERMUX_PKG_API_LEVEL --build-swift-static-stdlib \
+	--android-api-level $TERMUX_PKG_API_LEVEL --build-swift-static-stdlib --enable-experimental-cxx-interop=False \
 	--swift-install-components=$SWIFT_COMPONENTS --llvm-install-components=IndexStore \
 	--install-llvm --install-swift --install-libdispatch --install-foundation \
 	--install-xctest --install-llbuild --install-swift-testing --install-swiftpm \
