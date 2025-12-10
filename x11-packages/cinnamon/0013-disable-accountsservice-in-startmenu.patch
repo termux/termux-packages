@@ -1,0 +1,37 @@
+Prevents:
+[menu@cinnamon.org]: Requiring AccountsService, version none: Typelib file for namespace 'AccountsService' (any version) not found
+and start menu failing to load
+
+--- a/files/usr/share/cinnamon/applets/menu@cinnamon.org/applet.js
++++ b/files/usr/share/cinnamon/applets/menu@cinnamon.org/applet.js
+@@ -12,7 +12,6 @@ const Gtk = imports.gi.Gtk;
+ const Atk = imports.gi.Atk;
+ const Gio = imports.gi.Gio;
+ const XApp = imports.gi.XApp;
+-const AccountsService = imports.gi.AccountsService;
+ const GnomeSession = imports.misc.gnomeSession;
+ const ScreenSaver = imports.misc.screenSaver;
+ const FileUtils = imports.misc.fileUtils;
+@@ -2429,7 +2428,7 @@ class CinnamonMenuApplet extends Applet.TextIconApplet {
+             reactive: false
+         });
+ 
+-        let user = AccountsService.UserManager.get_default().get_user(GLib.get_user_name());
++        let user = null;
+         this.userIcon = new UserWidget.UserWidget(user, Clutter.Orientation.VERTICAL, false);
+         this.userIcon.set_reactive(true);
+         this.userIcon.connect('button-press-event', () => {
+diff --git a/js/ui/userWidget.js b/js/ui/userWidget.js
+index 0c7e244..b57b93c 100644
+--- a/js/ui/userWidget.js
++++ b/js/ui/userWidget.js
+@@ -158,6 +158,9 @@ class UserWidget extends St.BoxLayout {
+         this._label.y_align = Clutter.ActorAlign.CENTER;
+         this.add_child(this._label);
+ 
++        if (!this._user)
++            return
++
+         this._userLoadedId = this._user.connect('notify::is-loaded', this._updateUser.bind(this));
+         this._userChangedId = this._user.connect('changed', this._updateUser.bind(this));
+ 

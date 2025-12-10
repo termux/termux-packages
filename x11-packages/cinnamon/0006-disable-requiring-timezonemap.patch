@@ -39,15 +39,6 @@ index 2557d07..5254441 100755
  
              self.tz_selector = TimeZoneSelector()
              settings.add_row(self.tz_selector)
-@@ -57,7 +66,7 @@ class Module:
-             days = [[7, _("Use locale default")], [0, _("Sunday")], [1, _("Monday")]]
-             settings.add_row(GSettingsComboBox(_("First day of week"), "org.cinnamon.desktop.interface", "first-day-of-week", days, valtype=int))
- 
--            if os.path.exists('/usr/sbin/ntpd'):
-+            if os.path.exists('@TERMUX_PREFIX@/sbin/ntpd'):
-                 print('using csd backend')
-                 self.proxy_handler = CsdDBusProxyHandler(self._on_proxy_ready)
-             else:
 @@ -69,11 +78,13 @@ class Module:
      def _on_proxy_ready(self):
          self.zone = self.proxy_handler.get_timezone()
