@@ -2,13 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://github.com/linuxmint/cinnamon
 TERMUX_PKG_DESCRIPTION="Cinnamon shell"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.4.13"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="6.6.0"
 TERMUX_PKG_SRCURL="https://github.com/linuxmint/cinnamon/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=32de89ebd195ea27d9a220715e70c65664058d3e89a380f83addc07c81692d2d
+TERMUX_PKG_SHA256=0fa3bd798b444847b24a8adad04247f3b0346828dee18dae58b6bac76e410c4a
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
-TERMUX_PKG_DEPENDS="atk, cinnamon-control-center, cinnamon-menus, cinnamon-session, cinnamon-settings-daemon, cjs, clutter, clutter-gtk, cogl, dbus, gcr, gdk-pixbuf, gettext, glib, gnome-backgrounds, gobject-introspection, gsound, gtk3, libadapta, libx11, libxml2, mint-themes, mint-y-icon-theme, muffin, nemo, opengl, pango, python-pillow, python-xapp, sassc, xapp"
+TERMUX_PKG_DEPENDS="atk, cinnamon-control-center, cinnamon-menus, cinnamon-session, cinnamon-settings-daemon, cjs, clutter, clutter-gtk, cogl, dbus, gcr, gdk-pixbuf, gettext, glib, gnome-backgrounds, gobject-introspection, gsound, gtk3, ibus, libadapta, libx11, libxml2, mint-themes, mint-y-icon-theme, muffin, nemo, opengl, pango, python-pillow, python-xapp, sassc, xapp"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross, intltool, python-libsass"
 TERMUX_PKG_SUGGESTS="gnome-terminal, gnome-screenshot"
 TERMUX_PKG_PYTHON_BUILD_DEPS="pysass"
@@ -16,7 +15,7 @@ TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Ddocs=false
 -Dbuild_recorder=false
--Ddisable_networkmanager=true
+-Dnm_agent=disabled
 -Dpy3modules_dir="$TERMUX_PYTHON_HOME/site-packages"
 -Dwayland=false
 -Dpolkit=false
@@ -37,6 +36,13 @@ termux_pkg_auto_update() {
 	termux_pkg_upgrade_version "${latest_release}"
 }
 
+termux_step_post_get_source() {
+	find "$TERMUX_PKG_SRCDIR" -type f | \
+		xargs -n 1 sed -i \
+		-e "s|/usr|$TERMUX_PREFIX|g" \
+		-e "s|#!$TERMUX_PREFIX|#!/usr|g"
+}
+
 termux_step_pre_configure() {
 	termux_setup_gir
 	termux_setup_glib_cross_pkg_config_wrapper
@@ -48,15 +54,6 @@ termux_step_pre_configure() {
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
 		export PYTHONPATH="${TERMUX_PYTHON_CROSSENV_PREFIX}/cross/lib/python${TERMUX_PYTHON_VERSION}/site-packages"
 	fi
-
-	# @TERMUX_PYTHON_VERSION@ and @TERMUX_PYTHON_HOME@ do not get
-	# automatically applied by termux_step_patch_package(), so it must be a .diff
-	patch="$TERMUX_PKG_BUILDER_DIR/fix-user-paths.diff"
-	echo "Applying patch: $(basename "$patch")"
-	test -f "$patch" && sed \
-		-e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
-		-e "s%\@TERMUX_PYTHON_HOME\@%${TERMUX_PYTHON_HOME}%g" \
-		"$patch" | patch --silent -p1 -d"$TERMUX_PKG_SRCDIR"
 }
 
 termux_step_post_make_install() {

@@ -1,0 +1,56 @@
+diff --git a/js/ui/main.js b/js/ui/main.js
+index 1b1069e..d640b53 100644
+--- a/js/ui/main.js
++++ b/js/ui/main.js
+@@ -97,7 +97,7 @@ var AppletManager = imports.ui.appletManager;
+ const SearchProviderManager = imports.ui.searchProviderManager;
+ const DeskletManager = imports.ui.deskletManager;
+ const ExtensionSystem = imports.ui.extensionSystem;
+-const VirtualKeyboard = imports.ui.virtualKeyboard;
++// const VirtualKeyboard = imports.ui.virtualKeyboard;
+ const MessageTray = imports.ui.messageTray;
+ const OsdWindow = imports.ui.osdWindow;
+ const Overview = imports.ui.overview;
+@@ -175,7 +175,7 @@ var magnifier = null;
+ var locatePointer = null;
+ var xdndHandler = null;
+ var statusIconDispatcher = null;
+-var virtualKeyboardManager = null;
++// var virtualKeyboardManager = null;
+ var inputMethod = null;
+ var layoutManager = null;
+ var networkAgent = null;
+@@ -520,13 +520,13 @@ function start() {
+     keyboardManager = new KeyboardManager();
+     inputMethod = new InputMethod.InputMethod();
+     Clutter.get_default_backend().set_input_method(inputMethod);
+-    virtualKeyboardManager = new VirtualKeyboard.VirtualKeyboardManager();
+-    virtualKeyboardManager.connect("enabled-changed", () => {
+-        if (runDialog !== null) {
+-            runDialog.destroy();
+-            runDialog = null;
+-        }
+-    });
++    // virtualKeyboardManager = new VirtualKeyboard.VirtualKeyboardManager();
++    // virtualKeyboardManager.connect("enabled-changed", () => {
++    //     if (runDialog !== null) {
++    //         runDialog.destroy();
++    //         runDialog = null;
++    //     }
++    // });
+ 
+     Promise.all([
+         AppletManager.init(),
+diff --git a/js/ui/popupMenu.js b/js/ui/popupMenu.js
+index a12bcbb..1262d6d 100644
+--- a/js/ui/popupMenu.js
++++ b/js/ui/popupMenu.js
+@@ -3667,7 +3667,7 @@ var PopupMenuManager = class PopupMenuManager {
+         if (!this.grabbed)
+             return false;
+ 
+-        if (Main.virtualKeyboardManager.shouldTakeEvent(event))
++        if (Main.virtualKeyboardManager && Main.virtualKeyboardManager.shouldTakeEvent(event))
+             return Clutter.EVENT_PROPAGATE;
+ 
+         if (this._owner.menuEventFilter &&
