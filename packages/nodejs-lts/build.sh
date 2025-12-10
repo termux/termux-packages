@@ -140,7 +140,16 @@ termux_step_configure() {
 		export CXX_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project-build/bin/clang++ -m32"
 		export LINK_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project-build/bin/clang++ -m32"
 	fi
-	LDFLAGS+=" -ldl"
+	# Although without any configuration at all GYP builds both out/Release/ and out/Debug/
+	# with build.ninja, it is incorrect to use the other directory as configure.py passes
+	# a build_type variable to GYP which it uses to detect release/debug builds which is
+	# used in some places to do some debug build specific stuff.
+	# An example of such errors is the builds failing due to undefined symbols of some
+	# generated source files that happen only in debug builds
+	local _DEBUG=()
+	if [ "${TERMUX_DEBUG_BUILD}" = "true" ]; then
+		_DEBUG+=("--debug")
+	fi
 	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv.
 	# When building with ninja, build.ninja is generated for both Debug and Release builds.
 	./configure \
@@ -153,7 +162,8 @@ termux_step_configure() {
 		--shared-zlib \
 		--with-intl=system-icu \
 		--cross-compiling \
-		--ninja
+		--ninja \
+		"${_DEBUG[@]}"
 
 	export LD_LIBRARY_PATH=$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/lib
 	sed -i \
