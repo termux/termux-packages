@@ -1,15 +1,15 @@
---- ./tools/v8_gypfiles/v8.gyp.orig	2025-02-11 11:15:11.000000000 +0530
-+++ ./tools/v8_gypfiles/v8.gyp	2025-03-02 23:52:00.451978901 +0530
-@@ -1290,7 +1290,7 @@
-         }],
+--- ./tools/v8_gypfiles/v8.gyp.orig	2025-05-08 13:56:23.000000000 +0530
++++ ./tools/v8_gypfiles/v8.gyp	2025-05-09 19:46:24.096599118 +0530
+@@ -1309,7 +1309,7 @@
          # Platforms that don't have Compare-And-Swap (CAS) support need to link atomic library
-         # to implement atomic memory access
--        ['v8_current_cpu in ["mips64", "mips64el", "ppc", "arm", "riscv64", "loong64"]', {
-+        ['((OS=="linux" or OS=="android") and clang==1) or (v8_current_cpu in ["mips64", "mips64el", "ppc", "arm", "riscv64", "loong64"])', {
+         # to implement atomic memory access.
+         # Clang needs it for some atomic operations (https://clang.llvm.org/docs/Toolchain.html#atomics-library).
+-        ['(OS=="linux" and clang==1) or (v8_current_cpu in ["mips64", "mips64el", "arm", "riscv64", "loong64"])', {
++        ['((OS=="linux" or OS=="android") and clang==1) or (v8_current_cpu in ["mips64", "mips64el", "arm", "riscv64", "loong64"])', {
            'link_settings': {
              'libraries': ['-latomic', ],
            },
-@@ -1434,6 +1434,7 @@
+@@ -1448,6 +1448,7 @@
              '<(V8_ROOT)/src/base/platform/platform-posix.h',
              '<(V8_ROOT)/src/base/platform/platform-posix-time.cc',
              '<(V8_ROOT)/src/base/platform/platform-posix-time.h',

@@ -1,0 +1,20 @@
+diff --git a/test/sequential/test-fs-watch.js b/test/sequential/test-fs-watch.js
+index 8db27a79e3..12622db443 100644
+--- a/test/sequential/test-fs-watch.js
++++ b/test/sequential/test-fs-watch.js
+@@ -26,6 +26,7 @@ if (common.isIBMi)
+ 
+ const assert = require('assert');
+ const fs = require('fs');
++const platform = require('os');
+ const path = require('path');
+ 
+ const tmpdir = require('../common/tmpdir');
+@@ -37,6 +38,7 @@ if (!isMainThread) {
+ 
+ const expectFilePath = common.isWindows ||
+                        common.isLinux ||
++                       platform() == 'android' ||
+                        common.isMacOS ||
+                        common.isAIX;
+ 

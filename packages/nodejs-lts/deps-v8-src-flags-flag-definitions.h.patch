@@ -1,12 +1,20 @@
-diff '--color=auto' -uNr node-v18.0.0.orig/deps/v8/src/flags/flag-definitions.h node-v18.0.0/deps/v8/src/flags/flag-definitions.h
---- node-v18.0.0.orig/deps/v8/src/flags/flag-definitions.h	2022-04-21 15:15:34.881869789 +0530
-+++ node-v18.0.0/deps/v8/src/flags/flag-definitions.h	2022-04-21 15:43:52.827175160 +0530
-@@ -2091,7 +2091,7 @@
+--- ./deps/v8/src/flags/flag-definitions.h.orig	2024-02-16 18:11:37.252847521 +0530
++++ ./deps/v8/src/flags/flag-definitions.h	2024-02-16 18:32:55.354489365 +0530
+@@ -2594,7 +2594,7 @@
+ #define DEFAULT_PERF_BASIC_PROF_PATH "/data/local/tmp"
+ #define DEFAULT_PERF_PROF_PATH DEFAULT_PERF_BASIC_PROF_PATH
+ #else
+-#define DEFAULT_PERF_BASIC_PROF_PATH "/tmp"
++#define DEFAULT_PERF_BASIC_PROF_PATH "@TERMUX_PREFIX@/tmp"
+ #define DEFAULT_PERF_PROF_PATH "."
+ #endif
+ 
+@@ -2639,7 +2639,7 @@
  #undef DEFINE_PERF_PROF_BOOL
  #undef DEFINE_PERF_PROF_IMPLICATION
  
 -DEFINE_STRING(gc_fake_mmap, "/tmp/__v8_gc__",
 +DEFINE_STRING(gc_fake_mmap, "@TERMUX_PREFIX@/tmp/__v8_gc__",
                "Specify the name of the file for fake gc mmap used in ll_prof")
- DEFINE_BOOL(log_internal_timer_events, false, "Time internal events.")
- DEFINE_IMPLICATION(log_internal_timer_events, prof)
+ 
+ DEFINE_BOOL(redirect_code_traces, false,
