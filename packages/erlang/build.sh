@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="General-purpose concurrent functional programming langua
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="28.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/erlang/otp/archive/refs/tags/OTP-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=a91e10dbde8781a4c4126af2f7b65dcf677ece64f506381120e79cf5872f2da6
 TERMUX_PKG_AUTO_UPDATE=true
@@ -22,6 +23,18 @@ erl_xcomp_sysroot=${TERMUX_PREFIX}
 TERMUX_PKG_RM_AFTER_INSTALL="
 lib/erlang/man
 "
+# were present in erlang 26
+# were not present in erlang 27 through erlang 28.2
+# reappeared in erlang 28.3
+# https://github.com/erlang/otp/pull/10237
+# conflict with zlib
+# conflict with perl
+TERMUX_PKG_RM_AFTER_INSTALL+="
+share/man/man3/zlib.3
+share/man/man3/re.3
+"
+# will overwrite man pages of perl and zlib
+TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
 termux_pkg_auto_update() {
 	# Get latest release tag:
