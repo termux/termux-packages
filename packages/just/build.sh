@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://just.systems
 TERMUX_PKG_DESCRIPTION="A handy way to save and run project-specific commands"
 TERMUX_PKG_LICENSE="CC0-1.0"
 TERMUX_PKG_MAINTAINER="@flipee"
-TERMUX_PKG_VERSION="1.44.1"
+TERMUX_PKG_VERSION="1.45.0"
 TERMUX_PKG_SRCURL=https://github.com/casey/just/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=ad93602b25c87de0f3cb90c5970a5b8f5ccca6fb87ae393be7e85477d6bbd268
+TERMUX_PKG_SHA256=e43dfa0f541fd8a115fb61de7c30d949d2f169d155fb1776abeaba9be7eb0e07
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
