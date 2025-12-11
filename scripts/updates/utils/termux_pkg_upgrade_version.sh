@@ -74,6 +74,10 @@ termux_pkg_upgrade_version() {
 		LATEST_VERSION="$(sed -E "s/[-.]?(${suffix}[0-9]*)/~\1/g" <<< "$LATEST_VERSION")"
 	done
 
+	# Report back the fully parsed $LATEST_VERSION for the summary.
+	# Or send it straight into /dev/null if no sidechannel was provided.
+	echo "$LATEST_VERSION" > "${_IPC_FIFO:-/dev/null}"
+
 	if [[ "${SKIP_VERSION_CHECK}" != "--skip-version-check" ]]; then
 		if ! termux_pkg_is_update_needed \
 			"${TERMUX_PKG_VERSION#*:}" "${LATEST_VERSION}"; then
