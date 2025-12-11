@@ -104,7 +104,7 @@ _update() {
 	export TERMUX_PKG_BUILDER_DIR
 	TERMUX_PKG_BUILDER_DIR="$(realpath "$1")" # Directory containing build.sh.
 
-	IFS="," read -r -a EXCLUDED_ARCH <<<"${TERMUX_PKG_EXCLUDED_ARCHES:-}"
+	IFS="," read -r -a EXCLUDED_ARCH <<< "${TERMUX_PKG_EXCLUDED_ARCHES:-}"
 	export TERMUX_ARCH="" # Arch to test updates.
 	for arch in aarch64 arm i686 x86_64; do
 		# shellcheck disable=SC2076
@@ -128,7 +128,7 @@ _update() {
 
 declare -A _LATEST_TAGS=()
 declare -A _FAILED_UPDATES=()
-declare -a _ALREADY_SEEN=() # Array of packages successfully updated or skipped.
+declare -A _ALREADY_SEEN=() # Array of successful or packages and their old/new version.
 
 # _fetch_and_cache_tags fetches all possible tags using termux_pkg_auto_update, but using Ninja build system.
 # The key difference is that we make the process concurrent, allowing us to fetch tags simultaneously rather than one at a time.
@@ -193,7 +193,7 @@ _fetch_and_cache_tags() {
 
 	# This is called indirectly in subshell
 	# So silence shellcheck's unreachable code warning
-	# shellcheck disable=SC2317
+	# shellcheck disable=SC2329
 	__main__() {
 		cd "${TERMUX_SCRIPTDIR}"
 		export TERMUX_PKG_NAME="${1##*/}" TERMUX_PKG_BUILDER_DIR=${1}
@@ -258,7 +258,7 @@ _fetch_and_cache_tags() {
 		_LATEST_TAGS["${pkg:-_}"]="$version"
 		if [[ "${type}" == "SKIP" ]] || [[ "${type}" == "GIT" && "${__GITHUB_CURRENT_TAGS["${pkg:-}"]:-}" == "${version}" ]]; then
 			echo "INFO: Skipping ${pkg}: already at version ${version}"
-			_ALREADY_SEEN+=("${pkg}")
+			: "${_ALREADY_SEEN["${pkg}"]:=""}"
 		fi
 	done < <(printf '%s\n' "$LATEST_TAGS" "$LATEST_TAGS_GITHUB")
 	[[ "${CI-false}" == "true" ]] && echo "::endgroup::" || :
@@ -280,7 +280,7 @@ _check_updated() {
 		)
 		local _ANSWER=$?
 		if (( _ANSWER == 0 )) ; then
-			_ALREADY_SEEN+=("$(basename "${1}")")
+			: "${_ALREADY_SEEN["$(basename "${1}")"]:=""}"
 		fi
 		return $_ANSWER
 	fi
@@ -288,19 +288,34 @@ _check_updated() {
 }
 
 _run_update() {
-	local pkg_dir="$1"
+	# PS4='+$0 \[\e[32m\]${FUNCNAME[0]:-<global scope>}${FUNCNAME[*]:+()}:$LINENO\[\e[0m\] '
+	# set -x
+	local pkg_dir="$1" pkg_name
+	pkg_name="$(basename "${pkg_dir}")"
 	# Run each package update in separate process since we include their environment variables.
-	local output=""
-	if output=$(
+	local output="" _CURRENT_VERSION _NEWEST_VERSION
+	: > "$LATEST_VERSION_TEMP_FILE" # flush the sidechannel
+	# shellcheck disable=SC1091 # Ignore shellcheck's inability to follow the source
+	_CURRENT_VERSION="$(set +eu; . "$(realpath "$pkg_dir")/build.sh"; echo "${TERMUX_PKG_VERSION#*:}")"
+
+	if output="$(
 		set -euo pipefail
 		# Pass cached tag we obtained earlier
 		[[ -n "${_LATEST_TAGS[${pkg_dir##*/}]:-}" ]] && export __CACHED_TAG="${_LATEST_TAGS[${pkg_dir##*/}]}" || :
-		exec > >(tee /dev/fd/2) 2>&1 # output everything to stdout as well.
+		exec > >(tee /dev/fd/2) 2>&1 # output everything on stderr to stdout as well.
 		_update "${pkg_dir}"
-	); then
-		_ALREADY_SEEN+=("$(basename "${pkg_dir}")")
+	)"; then
+		_NEWEST_VERSION="$(< "$LATEST_VERSION_TEMP_FILE")"
+		: "${_NEWEST_VERSION:="$_CURRENT_VERSION"}"
+		if dpkg --compare-versions "${_CURRENT_VERSION}" lt "${_NEWEST_VERSION}"; then
+			_ALREADY_SEEN["$pkg_name"]="${pkg_name} ${_CURRENT_VERSION} => ${_NEWEST_VERSION}"
+		elif dpkg --compare-versions "${_CURRENT_VERSION}" gt "${_NEWEST_VERSION}"; then
+			_ALREADY_SEEN["$pkg_name"]="${pkg_name} ${_CURRENT_VERSION} => ${_NEWEST_VERSION} (Error? current version is larger than latest fetched version)"
+		else
+			_ALREADY_SEEN["$pkg_name"]=""
+		fi
 	else
-		_FAILED_UPDATES["$(basename "${pkg_dir}")"]="${output}"
+		_FAILED_UPDATES["$pkg_name"]="${output}"
 	fi
 }
 
@@ -311,14 +326,14 @@ _gh_check_issue_exists() {
 	if [[ -z "${_CACHED_ISSUE_TITLES[*]}" ]]; then
 		while read -r title; do
 			_CACHED_ISSUE_TITLES+=("'${title}'") # An extra quote ('') is added to avoid false positive matches.
-		done <<<"$(
+		done < <(
 			gh issue list \
 				--limit 10000 \
 				--label "auto update failing" --label "bot" \
 				--state open \
 				--search "Auto update failing for in:title type:issue" \
 				--json title | jq -r '.[] | .title' | sort | uniq
-		)"
+		)
 	fi
 	# shellcheck disable=SC2076 # We want literal match here, not regex based.
 	if [[ "${_CACHED_ISSUE_TITLES[*]}" =~ "'Auto update failing for ${pkg_name}'" ]]; then
@@ -339,11 +354,11 @@ _should_update() {
 	# it is needed to pre-fetch and filter packages as fast as possible (it is 6.5 times faster than `grep`)
 	case "${PACKAGES_OPT_OUT:-}" in
 		"true") [[ $'\n'"$(<"$pkg_dir/build.sh")"$'\n' != *$'\n'TERMUX_PKG_AUTO_UPDATE=false$'\n'* ]] || return 1 ;; # Skip.
-		     *) [[ $'\n'"$(<"$pkg_dir/build.sh")"$'\n' == *$'\n'TERMUX_PKG_AUTO_UPDATE=true$'\n'* ]] || return 1 ;; # Skip.
+			*) [[ $'\n'"$(<"$pkg_dir/build.sh")"$'\n' == *$'\n'TERMUX_PKG_AUTO_UPDATE=true$'\n'* ]] || return 1 ;; # Skip.
 	esac
 
 	# shellcheck disable=SC2076
-	if [[ " ${_ALREADY_SEEN[*]} ${!_FAILED_UPDATES[*]} " =~ " $(basename "${pkg_dir}") " ]]; then
+	if [[ " ${!_ALREADY_SEEN[*]} ${!_FAILED_UPDATES[*]} " =~ " $(basename "${pkg_dir}") " ]]; then
 		return 1 # Skip.
 	fi
 	if [[ "${BUILD_PACKAGES}${GITHUB_ACTIONS:-}" == "truetrue" ]] && _gh_check_issue_exists "$(basename "${pkg_dir}")"; then
@@ -374,6 +389,12 @@ _update_dependencies() {
 }
 
 echo "INFO: Running update for: $*"
+
+_start_time="$(date +%10s%3N)"
+# Remove any left over temp files that may not have been cleaned up.
+rm "${TMPDIR:-/tmp}"/termux_ipc_*.fifo &> /dev/null
+# Set up a side channel for reporting parsed latest versions
+export LATEST_VERSION_TEMP_FILE="${TMPDIR:-/tmp}/termux_ipc_$$.fifo"
 
 if [[ "$1" == "@all" ]]; then
 	_fetch_and_cache_tags
@@ -411,7 +432,22 @@ else
 		echo "termux - took $(ms_to_human_readable $(( $(date +%10s%3N) - _unix_millis )))"
 	done
 fi
-unset _unix_millis
+
+# Remove temp file
+rm "${TMPDIR:-/tmp}"/termux_ipc_*.fifo
+
+#################################################REPORT CHANGES##################################################
+
+echo ""
+echo "INFO: Checked ${#_ALREADY_SEEN[*]} packages - took $(ms_to_human_readable $(( $(date +%10s%3N) - _start_time ))) in total."
+for _pkg in "${_ALREADY_SEEN[@]}"; do
+	[[ -n "$_pkg" ]] && echo "$_pkg"
+done
+echo ""
+echo "INFO: ${#_FAILED_UPDATES[*]} failed updates."
+echo "${!_FAILED_UPDATES[@]}"
+
+unset LATEST_VERSION_TEMP_FILE _unix_millis _start_time _pkg
 
 ################################################FAILURE HANDLING#################################################
 

@@ -19,6 +19,8 @@ termux_pkg_upgrade_version() {
 	if [[ "$#" -lt 1 ]]; then
 		termux_error_exit <<-EndUsage
 			Usage: ${FUNCNAME[0]} LATEST_VERSION [--skip-version-check]
+			Also reports the fully parsed LATEST_VERSION
+			to \$LATEST_VERSION_TEMP_FILE if provided.
 		EndUsage
 	fi
 
@@ -73,6 +75,10 @@ termux_pkg_upgrade_version() {
 	for suffix in "rc" "alpha" "beta"; do
 		LATEST_VERSION="$(sed -E "s/[-.]?(${suffix}[0-9]*)/~\1/ig" <<< "$LATEST_VERSION")"
 	done
+
+	# Report back the fully parsed $LATEST_VERSION for the summary.
+	# Or discard it straight into /dev/null if no tempfile was provided.
+	echo "$LATEST_VERSION" > "${LATEST_VERSION_TEMP_FILE:-/dev/null}"
 
 	if [[ "${SKIP_VERSION_CHECK}" != "--skip-version-check" ]]; then
 		if ! termux_pkg_is_update_needed \
