@@ -42,14 +42,3 @@ termux_step_install_license() {
 	install -Dm600 -t "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
 		"${TERMUX_PKG_SRCDIR}/LICENSE"
 }
-
-termux_pkg_auto_update() {
-	# Get latest release tag:
-	local tag
-	tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}")"
-	if grep -qP "^server-v${TERMUX_PKG_UPDATE_VERSION_REGEXP}\$" <<<"$tag"; then
-		termux_pkg_upgrade_version "$tag"
-	else
-		echo "WARNING: Skipping auto-update: Not a SERVER release($tag)"
-	fi
-}

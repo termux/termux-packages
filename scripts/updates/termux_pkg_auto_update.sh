@@ -1,49 +1,50 @@
 # shellcheck shell=bash
 termux_pkg_auto_update() {
 	if [[ -n "${__CACHED_TAG:-}" ]]; then
-		termux_pkg_upgrade_version ${__CACHED_TAG}
+		termux_pkg_upgrade_version "${__CACHED_TAG}"
 		return $?
 	fi
 
+	# Example:
+	# https://github.com/vim/vim/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+	#            _="https:"
+	#            _=""
+	# project_host="github.com"
+	#            _="vim/vim/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 	local project_host
-	project_host="$(echo "${TERMUX_PKG_SRCURL}" | cut -d"/" -f3)"
+	IFS='/' read -r _ _ project_host _ <<< "${TERMUX_PKG_SRCURL}"
 
 	if [[ -z "${TERMUX_PKG_UPDATE_METHOD}" ]]; then
 		if [[ "${project_host}" == "github.com" ]]; then
 			TERMUX_PKG_UPDATE_METHOD="github"
-		elif [[ "${project_host}" == "gitlab.com" ]]; then
+		elif [[ "$TERMUX_PKG_SRCURL" == *"/-/archive/"* ]]; then
 			TERMUX_PKG_UPDATE_METHOD="gitlab"
 		else
 			TERMUX_PKG_UPDATE_METHOD="repology"
 		fi
 	fi
 
-	local _err_msg="ERROR: source url's hostname is not ${TERMUX_PKG_UPDATE_METHOD}.com, but has been
-configured to use ${TERMUX_PKG_UPDATE_METHOD}'s method."
-
 	case "${TERMUX_PKG_UPDATE_METHOD}" in
-	github)
-		if [[ "${project_host}" != "${TERMUX_PKG_UPDATE_METHOD}.com" ]]; then
-			termux_error_exit "${_err_msg}"
-		else
+		github)
+			if [[ "${project_host}" != "${TERMUX_PKG_UPDATE_METHOD}.com" ]]; then
+				termux_error_exit <<-EndOfError
+					source url's hostname is not ${TERMUX_PKG_UPDATE_METHOD}.com, but has been
+					configured to use ${TERMUX_PKG_UPDATE_METHOD}'s method.
+				EndOfError
+			fi
 			termux_github_auto_update
-		fi
 		;;
-	gitlab)
-		if [[ "${project_host}" != "${TERMUX_PKG_UPDATE_METHOD}.com" ]]; then
-			termux_error_exit "${_err_msg}"
-		else
+		gitlab)
 			termux_gitlab_auto_update
-		fi
 		;;
-	repology)
-		termux_repology_auto_update
+		repology)
+			termux_repology_auto_update
 		;;
-	*)
-		termux_error_exit <<-EndOfError
-			ERROR: wrong value '${TERMUX_PKG_UPDATE_METHOD}' for TERMUX_PKG_UPDATE_METHOD.
-			Can be 'github', 'gitlab' or 'repology'
-		EndOfError
+		*)
+			termux_error_exit <<-EndOfError
+				wrong value '${TERMUX_PKG_UPDATE_METHOD}' for TERMUX_PKG_UPDATE_METHOD.
+				Can be 'github', 'gitlab' or 'repology'
+			EndOfError
 		;;
 	esac
 }

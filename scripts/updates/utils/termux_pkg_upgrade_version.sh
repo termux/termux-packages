@@ -37,7 +37,7 @@ termux_pkg_upgrade_version() {
 	if [[ -n "${TERMUX_PKG_UPDATE_VERSION_REGEXP:-}" ]]; then
 		# Extract version numbers.
 		local OLD_LATEST_VERSION="${LATEST_VERSION}"
-		LATEST_VERSION="$(grep -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<< "${LATEST_VERSION}" || true)"
+		LATEST_VERSION="$(grep --max-count=1 -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<< "${LATEST_VERSION}" || true)"
 		if [[ -z "${LATEST_VERSION:-}" ]]; then
 			termux_error_exit <<-EndOfError
 				ERROR: failed to filter version numbers using regexp '${TERMUX_PKG_UPDATE_VERSION_REGEXP}'.
@@ -45,6 +45,9 @@ termux_pkg_upgrade_version() {
 			EndOfError
 		fi
 		unset OLD_LATEST_VERSION
+	else # Otherwise remove any leading non-digits as that would not be a valid version.
+		# shellcheck disable=SC2001 # This is something parameter expansion can't handle well, so we use sed.
+		LATEST_VERSION="$(sed -e "s/^[^0-9]*//" <<< "$LATEST_VERSION")"
 	fi
 
 	# If needed, filter version numbers using sed regexp.
@@ -67,9 +70,13 @@ termux_pkg_upgrade_version() {
 
 	# Translate "-suffix" into "~suffix": "X.Y.Z-suffix" is considered later
 	# than X.Y.Z. for it to be considered earlier use "X.Y.Z~suffix".
-	LATEST_VERSION="${LATEST_VERSION//-rc/~rc}"
-	LATEST_VERSION="${LATEST_VERSION//-alpha/~alpha}"
-	LATEST_VERSION="${LATEST_VERSION//-beta/~beta}"
+	for suffix in "rc" alpha"" "beta"; do
+		LATEST_VERSION="$(sed -E "s/[-.]?(${suffix}[0-9]*)/~\1/g" <<< "$LATEST_VERSION")"
+	done
+
+	# Report back the fully parsed $LATEST_VERSION for the summary.
+	# Or send it straight into /dev/null if no sidechannel was provided.
+	echo "$LATEST_VERSION" > "${_IPC_FIFO:-/dev/null}"
 
 	if [[ "${SKIP_VERSION_CHECK}" != "--skip-version-check" ]]; then
 		if ! termux_pkg_is_update_needed \
@@ -106,9 +113,9 @@ termux_pkg_upgrade_version() {
 
 	echo "INFO: Trying to build package."
 
-	for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' ${TERMUX_SCRIPTDIR}/repo.json); do
+	for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
 		_buildsh_path="${TERMUX_SCRIPTDIR}/${repo_path}/${TERMUX_PKG_NAME}/build.sh"
-		repo=$(jq --raw-output ".\"${repo_path}\".name" ${TERMUX_SCRIPTDIR}/repo.json)
+		repo=$(jq --raw-output ".\"${repo_path}\".name" "${TERMUX_SCRIPTDIR}/repo.json")
 		repo=${repo#"termux-"}
 
 		if [[ -f "${_buildsh_path}" ]]; then

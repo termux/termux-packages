@@ -78,6 +78,11 @@ termux_pkg_auto_update() {
 		"
 	fi
 
+	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
+		echo "INFO: package needs to be updated to ${latest_version}."
+		return
+	fi
+
 	sed \
 		-e "s|^_COMMIT=.*|_COMMIT=${latest_commit}|" \
 		-e "s|^_COMMIT_DATE=.*|_COMMIT_DATE=${latest_commit_date}|" \

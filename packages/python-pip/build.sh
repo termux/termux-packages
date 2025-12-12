@@ -15,17 +15,6 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PYTHON_COMMON_DEPS="docutils, myst_parser, sphinx_copybutton, sphinx_inline_tabs, sphinxcontrib.towncrier, completion"
 
-termux_pkg_auto_update() {
-	local tag
-	tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")"
-
-	if grep -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<< "${tag}"; then
-		termux_pkg_upgrade_version "${tag}"
-	else
-		echo "INFO: No update needed, tag '${tag}' is not a stable release."
-	fi
-}
-
 termux_step_post_make_install() {
 	if [ ! -e "$TERMUX_PYTHON_HOME/site-packages/pip-$TERMUX_PKG_VERSION.dist-info" ]; then
 		termux_error_exit "Package ${TERMUX_PKG_NAME} doesn't build properly."

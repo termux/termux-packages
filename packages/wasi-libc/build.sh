@@ -14,17 +14,6 @@ TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+"
 
-termux_pkg_auto_update() {
-	local api_url="https://api.github.com/repos/WebAssembly/wasi-sdk/git/refs/tags"
-	local latest_refs_tags=$(curl -s "${api_url}" | jq .[].ref | grep -oP wasi-sdk-${TERMUX_PKG_UPDATE_VERSION_REGEXP})
-	if [[ -z "${latest_refs_tags}" ]]; then
-		echo "WARN: Unable to get latest refs tags from upstream. Try again later." >&2
-		return
-	fi
-	local latest_version=$(echo "${latest_refs_tags}" | sort -V | tail -n1)
-	termux_pkg_upgrade_version "${latest_version}"
-}
-
 termux_step_post_get_source() {
 	# match "clang -print-resource-dir"
 	local p="${TERMUX_PKG_BUILDER_DIR}/0001-move-clang-resource-dir.diff"

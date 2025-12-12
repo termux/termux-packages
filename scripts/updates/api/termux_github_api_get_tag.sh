@@ -1,160 +1,141 @@
 # shellcheck shell=bash
 termux_github_api_get_tag() {
-	if [[ -z "$1" ]]; then
-		termux_error_exit <<-EndOfUsage
-			Usage: ${FUNCNAME[0]} PKG_SRCURL [TAG_TYPE [FILTER_REGEX]]
-			Returns the latest tag of the given package.
-		EndOfUsage
-	fi
-
 	if [[ -z "${GITHUB_TOKEN:-}" ]]; then
-		# Needed to use graphql API.
+		# Needed to use GraphQL API.
 		termux_error_exit "GITHUB_TOKEN environment variable not set."
 	fi
 
-	local PKG_SRCURL="$1"
-	local TAG_TYPE="${2:-}"
-	local FILTER_REGEX="${3:-}"
+	local user repo project tag_type
+	tag_type="$TERMUX_PKG_UPDATE_TAG_TYPE"
 
-	local project
-	project="$(echo "${PKG_SRCURL}" | cut -d'/' -f4-5)"
-	project="${project#git+}"
+	# Example:
+	# https://github.com/vim/vim/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+	#        _="https:"
+	#        _=""
+	#        _="github.com"
+	#     user="vim"
+	#     repo="vim"
+	#        _="archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+	IFS='/' read -r _ _ _ user repo _ <<< "${TERMUX_PKG_SRCURL}"
+	project="${user}/${repo}"
 
-	if [[ -z "${TAG_TYPE}" ]]; then # If not set, then decide on the basis of url.
-		if [[ "${PKG_SRCURL:0:4}" == "git+" ]]; then
-			# Get newest tag.
-			TAG_TYPE="newest-tag"
+	if [[ -z "${tag_type}" ]]; then # If not set, then decide on the basis of url.
+		if [[ "${TERMUX_PKG_SRCURL:0:4}" == "git+" ]]; then
+			tag_type="newest-tag" # Get newest tag.
+		elif [[ -n "$TERMUX_PKG_UPDATE_VERSION_REGEXP" ]]; then
+			tag_type="latest-regex" # Get the latest release tag.
 		else
-			# Get the latest release tag.
-			TAG_TYPE="latest-release-tag"
+			tag_type="latest-release-tag" # Get the latest release tag.
 		fi
 	fi
-	if [[ -n "${FILTER_REGEX}" && "${TAG_TYPE}" != "latest-regex" ]]; then
-		termux_error_exit <<-EndOfError
-		ERROR: You can only specify a regex with TAG_TYPE="latest-regex"
-		EndOfError
-	fi
 
-	local jq_filter
-	local api_url="https://api.github.com"
 	local -a curl_opts=(
+		-H "X-GitHub-Api-Version: 2022-11-28"
+		-H "Accept: application/vnd.github.v3+json"
+		-H "Authorization: token ${GITHUB_TOKEN}"
+		-A "Termux update checker 1.1 (github.com/termux/termux-packages)"
 		--silent
 		--location
 		--retry 10
 		--retry-delay 1
-		-H "Authorization: token ${GITHUB_TOKEN}"
-		-H "Accept: application/vnd.github.v3+json"
 		--write-out '|%{http_code}'
 	)
-
-	if [[ "${TAG_TYPE}" == "newest-tag" ]]; then
-		# We use graphql intensively so we should slowdown our requests to avoid hitting github ratelimits.
-		sleep 1
-
-		api_url="${api_url}/graphql"
-		jq_filter='.data.repository.refs.edges[0].node.name'
-		curl_opts+=(-X POST)
-		curl_opts+=(
-			-d "$(
-				cat <<-EOF | tr '\n' ' '
-					{
-						"query": "query {
-							repository(owner: \"${project%/*}\", name: \"${project##*/}\") {
-								refs(refPrefix: \"refs/tags/\", first: 1, orderBy: {
-									field: TAG_COMMIT_DATE, direction: DESC
-								})
-								{
-									edges {
-										node {
-											name
-										}
+	local -a graphql_request=(
+		-X POST
+		-d "$(
+			cat <<-EOF | tr '\n' ' '
+				{
+					"query": "query {
+						repository(owner: \"${project%/*}\", name: \"${project##*/}\") {
+							refs(refPrefix: \"refs/tags/\", first: 1, orderBy: {
+								field: TAG_COMMIT_DATE, direction: DESC
+							})
+							{
+								edges {
+									node {
+										name
 									}
 								}
 							}
-						}"
-					}
-				EOF
-			)"
-		)
+						}
+					}"
+				}
+			EOF
+		)"
+	)
 
-	elif [[ "${TAG_TYPE}" == "latest-release-tag" ]]; then
-		api_url="${api_url}/repos/${project}/releases/latest"
-		jq_filter=".tag_name"
-	elif [[ "${TAG_TYPE}" == "latest-regex" ]]; then
-		api_url="${api_url}/repos/${project}/releases"
-		jq_filter=".[].tag_name"
-	else
-		termux_error_exit <<-EndOfError
-			ERROR: Invalid TAG_TYPE: '${TAG_TYPE}'.
-			Allowed values: 'newest-tag', 'latest-release-tag'.
-		EndOfError
-	fi
+	local jq_filter api_path
+	case "${tag_type}" in
+		newest-tag)
+			# We use graphql intensively so we should slowdown our requests to avoid hitting github ratelimits.
+			sleep 1
+			curl_opts+=("${graphql_request[@]}")
+			api_path="graphql"
+			jq_filter='.data.repository.refs.edges[0].node.name'
+		;;
+		latest-release-tag)
+			api_path="repos/${project}/releases/latest"
+			jq_filter=".tag_name"
+		;;
+		latest-regex)
+			# We use graphql intensively so we should slowdown our requests to avoid hitting github ratelimits.
+			sleep 1
+			curl_opts+=("${graphql_request[@]}")
+			# Get the 20 latest tags by tag commit date
+			curl_opts[-1]="${curl_opts[-1]/first: 1/first: 20}"
+			api_path="graphql"
+			jq_filter='.data.repository.refs.edges[].node.name'
+		;;
+		*)
+			termux_error_exit <<-EndOfError
+				ERROR: Invalid TERMUX_PKG_UPDATE_TAG_TYPE: '${tag_type}'.
+				Allowed values: 'newest-tag', 'latest-release-tag', 'latest-regex'.
+			EndOfError
+		;;
+	esac
 
-
-	local response
+	# Assemble the complete URL for the API request
+	local api_url="https://api.github.com/${api_path}"
+	local http_code response
 	response="$(curl "${curl_opts[@]}" "${api_url}")"
 
-	local http_code
 	http_code="${response##*|}"
-	# Why printf "%s\n"? Because echo interpolates control characters, which jq does not like.
+	# echo interpolates control characters, which jq does not like.
 	response="$(printf "%s\n" "${response%|*}")"
 
-	local tag_name
-	if [[ "${http_code}" == "200" ]]; then
-		if [[ "${FILTER_REGEX}" ]]; then
-			if jq --exit-status --raw-output "${jq_filter}" <<<"${response}" >/dev/null; then
-				tag_name="$(jq --exit-status --raw-output "${jq_filter}" <<<"${response}" \
-					| sed 's/^v//' | grep -P "${FILTER_REGEX}" | head -n 1)"
-				if [[ -z "${tag_name}" ]]; then
-					termux_error_exit "No tags matched regex '${FILTER_REGEX}' in '${response}'"
-				fi
-			else
-				termux_error_exit "Failed to parse tag name from: '${response}'"
-			fi
-		else
-			if jq --exit-status --raw-output "${jq_filter}" <<<"${response}" >/dev/null; then
-				tag_name="$(jq --exit-status --raw-output "${jq_filter}" <<<"${response}")"
-			else
-				termux_error_exit "Failed to parse tag name from: '${response}'"
-			fi
-		fi
-	elif [[ "${http_code}" == "404" ]]; then
-		if jq --exit-status "has(\"message\") and .message == \"Not Found\"" <<<"${response}"; then
+	local tag_name=""
+	case "${http_code}" in
+		200)
+			tag_name="$(jq --exit-status --raw-output "${jq_filter}" <<< "${response}")"
+		;;
+		404)
 			termux_error_exit <<-EndOfError
-				ERROR: No '${TAG_TYPE}' found (${api_url}).
-					Try using '$(
-					if [ "${TAG_TYPE}" = "newest-tag" ]; then
+				No '${tag_type}' found. (${api_url})
+				HTTP code: ${http_code}
+				Try using '$(
+					if [[ "${tag_type}" == "newest-tag" ]]; then
 						echo "latest-release-tag"
 					else
 						echo "newest-tag"
 					fi
 				)'.
 			EndOfError
-		else
-			termux_error_exit <<-EndOfError
-				ERROR: Failed to get '${TAG_TYPE}'(${api_url})'.
-				Response:
-				${response}
-			EndOfError
-		fi
-	else
-		termux_error_exit <<-EndOfError
-			ERROR: Failed to get '${TAG_TYPE}'(${api_url})'.
-			HTTP code: ${http_code}
-			Response:
-			${response}
-		EndOfError
-	fi
-
-	# If program control reached here and still no tag_name, then something went wrong.
-	if [[ -z "${tag_name:-}" ]] || [[ "${tag_name}" == "null" ]]; then
-		termux_error_exit <<-EndOfError
-			ERROR: JQ could not find '${TAG_TYPE}'(${api_url})'.
-			Response:
-			${response}
-			Please report this as bug.
-		EndOfError
-	fi
-
-	echo "${tag_name#v}" # Remove leading 'v' which is common in version tag.
+		;;
+		*)
+			if jq --exit-status "has(\"message\") and .message == \"Not Found\"" <<< "${response}"; then
+				termux_error_exit <<-EndOfError
+					No '${tag_type}' found. (${api_url})
+					HTTP code: ${http_code}
+					Try using '$(
+						if [[ "${tag_type}" == "newest-tag" ]]; then
+							echo "latest-release-tag"
+						else
+							echo "newest-tag"
+						fi
+					)'.
+				EndOfError
+			fi
+		;;
+	esac
+	echo "${tag_name}"
 }

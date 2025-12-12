@@ -11,23 +11,7 @@ TERMUX_PKG_PYTHON_COMMON_DEPS="Cython"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --disable-x86-asm"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP='\d{2}'
-
-termux_pkg_auto_update() {
-	local latest_release
-	latest_release="$(git ls-remote --tags https://github.com/vapoursynth/vapoursynth.git \
-	| grep -oP "refs/tags/R\K${TERMUX_PKG_UPDATE_VERSION_REGEXP}$" \
-	| sort -V \
-	| tail -n1)"
-
-	if [[ "${latest_release}" == "${TERMUX_PKG_VERSION}" ]]; then
-		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
-		return
-	fi
-
-	termux_pkg_upgrade_version "${latest_release}"
-}
-
+TERMUX_PKG_UPDATE_VERSION_REGEXP='R\K\d{2}$'
 
 termux_step_pre_configure() {
 	rm -f "$TERMUX_PKG_SRCDIR/setup.py"

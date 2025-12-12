@@ -8,7 +8,6 @@ TERMUX_PKG_SRCURL=https://github.com/imr/ngspice/archive/refs/tags/ngspice-${TER
 TERMUX_PKG_SHA256=3e2a436fb12c5d47d10033ce5b2e2b09b79cde757f9277db350d25071e8e6f86
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
-TERMUX_PKG_UPDATE_VERSION_SED_REGEXP="s/ngspice-//"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-cider
 --enable-openmp

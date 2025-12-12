@@ -7,7 +7,8 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/OpenSC/libp11/releases/download/libp11-${TERMUX_PKG_VERSION}/libp11-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=97777640492fa9e5831497e5892e291dfbf39a7b119d9cb6abb3ec8c56d17553
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_SED_REGEXP='s/.*-//'
+# Make sure we strip off the entire `libp11-` prefix from the tag name.
+TERMUX_PKG_UPDATE_VERSION_REGEXP='libp11-\K\d+\.\d+\.\d+$'
 TERMUX_PKG_DEPENDS="openssl"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-static

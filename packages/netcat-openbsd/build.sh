@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=https://salsa.debian.org/debian/netcat-openbsd/-/archive/debia
 TERMUX_PKG_SHA256=54586351a3eb8b11fb95752d7efb42aabd06e7e30e7946cb6369d341e258db2f
 TERMUX_PKG_PROVIDES="nc, ncat, netcat"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_SED_REGEXP="s/_/-/"
+TERMUX_PKG_UPDATE_TAG_TYPE=newest-tag
 TERMUX_PKG_DEPENDS="libbsd"
 TERMUX_PKG_BUILD_IN_SRC=true
 
