@@ -3,15 +3,19 @@ TERMUX_PKG_DESCRIPTION="A hand note taking software"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE, copyright.txt"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.2.10"
+TERMUX_PKG_VERSION="1.3.0"
 TERMUX_PKG_SRCURL=https://github.com/xournalpp/xournalpp/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=92189df9239db719adc41227f8c808f6fbb83449227067d20ca78a2f015804a4
+TERMUX_PKG_SHA256=fd80fb4935e82dcc01b8373569ffd0eda286df1d3ea45a46f36969bef5ee8933
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, gtksourceview4, libandroid-execinfo, libc++, libcairo, librsvg, libsndfile, libx11, libxi, libxml2, libzip, pango, poppler, portaudio, zlib"
+TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, gtksourceview4, libandroid-execinfo, libc++, libcairo, librsvg, libsndfile, libx11, libxi, libxml2, libzip, pango, poppler, portaudio, qpdf, zlib"
 TERMUX_PKG_REPLACES="xournal"
 # Lua 5.4 would be a dependency if plugins were wanted
 # Explicitly disable plugins for now to avoid prefix pollution
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--DHELP2MAN=NO
+-DWITH_MAN=OFF
 -DENABLE_PLUGINS=OFF
 "
+
+termux_step_pre_configure() {
+	CXXFLAGS+=" -Wno-c++11-narrowing"
+}
