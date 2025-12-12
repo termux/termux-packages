@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://mailutils.org/
 TERMUX_PKG_DESCRIPTION="Mailutils is a swiss army knife of electronic mail handling. "
 TERMUX_PKG_LICENSE="LGPL-3.0, GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.20"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="3.21"
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/mailutils/mailutils-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=a8f3faab1edda5188bb5ca3e4e9c0c5bc72cd0dadf4e1f4799d27fa75c6ae829
+TERMUX_PKG_SHA256=e47c1edc699b8d6675fdbc77db3a84ae837f18e1f2094fe29d48bb58a97ef5e9
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="gdbm, libandroid-glob, libcrypt, libiconv, libltdl, libunistring, ncurses, readline"
 # Most of these configure arguments are for avoiding automagic dependencies.
