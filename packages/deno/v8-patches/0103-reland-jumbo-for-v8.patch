@@ -55,7 +55,7 @@ diff --git a/v8/BUILD.gn b/v8/BUILD.gn
 index 047283a2..58ce611c 100644
 --- a/v8/BUILD.gn
 +++ b/v8/BUILD.gn
-@@ -7,6 +7,7 @@ import("//build/config/arm.gni")
+@@ -7,6 +7,7 @@
  import("//build/config/coverage/coverage.gni")
  import("//build/config/dcheck_always_on.gni")
  import("//build/config/host_byteorder.gni")
@@ -63,7 +63,7 @@ index 047283a2..58ce611c 100644
  import("//build/config/mips.gni")
  import("//build/config/riscv.gni")
  import("//build/config/rust.gni")
-@@ -3093,26 +3094,54 @@ v8_source_set("v8_initializers") {
+@@ -3142,26 +3143,54 @@
      }
    }
  
@@ -118,7 +118,7 @@ index 047283a2..58ce611c 100644
    } else if (v8_current_cpu == "mips64" || v8_current_cpu == "mips64el") {
      sources += [
        ### gcmole(mips64el) ###
-@@ -5193,6 +5222,24 @@ v8_compiler_sources = [
+@@ -5275,6 +5304,24 @@
    "src/compiler/zone-stats.cc",
  ]
  
@@ -143,7 +143,7 @@ index 047283a2..58ce611c 100644
  if (!v8_enable_maglev) {
    # When Maglev is not enabled, Turboshaft still needs Maglev's graph builder.
    v8_compiler_sources += [
-@@ -5218,6 +5265,11 @@ if (v8_current_cpu == "x86") {
+@@ -5301,6 +5348,11 @@
      "src/compiler/backend/ia32/instruction-scheduler-ia32.cc",
      "src/compiler/backend/ia32/instruction-selector-ia32.cc",
    ]
@@ -155,7 +155,7 @@ index 047283a2..58ce611c 100644
  } else if (v8_current_cpu == "x64") {
    v8_compiler_sources += [
      ### gcmole(x64) ###
-@@ -5226,6 +5278,9 @@ if (v8_current_cpu == "x86") {
+@@ -5309,6 +5361,9 @@
      "src/compiler/backend/x64/instruction-selector-x64.cc",
      "src/compiler/backend/x64/unwinding-info-writer-x64.cc",
    ]
@@ -165,7 +165,7 @@ index 047283a2..58ce611c 100644
  } else if (v8_current_cpu == "arm") {
    v8_compiler_sources += [
      ### gcmole(arm) ###
-@@ -5234,6 +5289,9 @@ if (v8_current_cpu == "x86") {
+@@ -5317,6 +5372,9 @@
      "src/compiler/backend/arm/instruction-selector-arm.cc",
      "src/compiler/backend/arm/unwinding-info-writer-arm.cc",
    ]
@@ -175,7 +175,7 @@ index 047283a2..58ce611c 100644
  } else if (v8_current_cpu == "arm64") {
    v8_compiler_sources += [
      ### gcmole(arm64) ###
-@@ -5242,6 +5300,9 @@ if (v8_current_cpu == "x86") {
+@@ -5325,6 +5383,9 @@
      "src/compiler/backend/arm64/instruction-selector-arm64.cc",
      "src/compiler/backend/arm64/unwinding-info-writer-arm64.cc",
    ]
@@ -185,7 +185,18 @@ index 047283a2..58ce611c 100644
  } else if (v8_current_cpu == "mips64" || v8_current_cpu == "mips64el") {
    v8_compiler_sources += [
      ### gcmole(mips64el) ###
-@@ -5333,6 +5394,7 @@ v8_source_set("v8_compiler_for_mksnapshot_source_set") {
+@@ -5399,6 +5460,10 @@
+     "src/wasm/turboshaft-graph-interface.cc",
+     "src/wasm/wrappers.cc",
+   ]
++  v8_compiler_sources_jumbo_excluded += [
++      "src/wasm/turboshaft-graph-interface.cc",
++      "src/wasm/wrappers.cc",
++  ]
+ }
+ 
+ if (v8_enable_wasm_simd256_revec) {
+@@ -5419,6 +5484,7 @@
    visibility = [ ":*" ]  # Only targets in this file can depend on this.
  
    sources = v8_compiler_sources
@@ -193,7 +204,7 @@ index 047283a2..58ce611c 100644
  
    public_deps = [
      ":generate_bytecode_builtins_list",
-@@ -5368,6 +5430,7 @@ v8_source_set("v8_compiler") {
+@@ -5454,6 +5520,7 @@
  
    if (v8_enable_turbofan) {
      sources = v8_compiler_sources
@@ -201,7 +212,7 @@ index 047283a2..58ce611c 100644
    } else {
      # With Turbofan disabled, we only include the stubbed-out API.
      sources = [ "src/compiler/turbofan-disabled.cc" ]
-@@ -5925,6 +5988,8 @@ v8_source_set("v8_base_without_compiler") {
+@@ -6016,6 +6083,8 @@
      ]
    }
  
@@ -210,7 +221,7 @@ index 047283a2..58ce611c 100644
    if (v8_enable_maglev) {
      sources += [
        "src/maglev/maglev-assembler.cc",
-@@ -5957,6 +6022,10 @@ v8_source_set("v8_base_without_compiler") {
+@@ -6049,6 +6118,10 @@
          "src/maglev/arm64/maglev-assembler-arm64.cc",
          "src/maglev/arm64/maglev-ir-arm64.cc",
        ]
@@ -221,7 +232,7 @@ index 047283a2..58ce611c 100644
      } else if (v8_current_cpu == "riscv64") {
        sources += [
          "src/maglev/riscv/maglev-assembler-riscv.cc",
-@@ -5967,6 +6036,10 @@ v8_source_set("v8_base_without_compiler") {
+@@ -6059,6 +6132,10 @@
          "src/maglev/x64/maglev-assembler-x64.cc",
          "src/maglev/x64/maglev-ir-x64.cc",
        ]
@@ -232,9 +243,9 @@ index 047283a2..58ce611c 100644
      } else if (v8_current_cpu == "s390x") {
        sources += [
          "src/maglev/s390/maglev-assembler-s390.cc",
-@@ -6047,6 +6120,15 @@ v8_source_set("v8_base_without_compiler") {
+@@ -6138,6 +6215,14 @@
+       "src/wasm/wasm-tracing.cc",
        "src/wasm/well-known-imports.cc",
-       "src/wasm/wrappers.cc",
      ]
 +    jumbo_excluded_sources += [
 +      # Too many marco conflictions
@@ -242,13 +253,12 @@ index 047283a2..58ce611c 100644
 +      "src/asmjs/asm-parser.cc",
 +      "src/asmjs/asm-scanner.cc",
 +      "src/wasm/baseline/liftoff-compiler.cc",
-+      "src/wasm/turboshaft-graph-interface.cc",
 +      "src/wasm/wasm-module.cc",
 +    ]
      if (v8_wasm_random_fuzzers) {
        sources += [
          ### gcmole(all) ###
-@@ -6081,6 +6163,26 @@ v8_source_set("v8_base_without_compiler") {
+@@ -6172,6 +6257,26 @@
      sources += [ "src/heap/reference-summarizer.cc" ]
    }
  
@@ -275,7 +285,7 @@ index 047283a2..58ce611c 100644
    if (v8_current_cpu == "x86") {
      sources += [
        ### gcmole(ia32) ###
-@@ -6187,6 +6288,11 @@ v8_source_set("v8_base_without_compiler") {
+@@ -6279,6 +6384,11 @@
      if (is_win) {
        sources += [ "src/diagnostics/unwinding-info-win64.cc" ]
      }
@@ -998,14 +1008,12 @@ index 2be79a9d..faa205ef 100644
  #undef V8_WITH_SANITIZER
  #undef RESET_THREAD_IN_WASM_FLAG_FOR_ASAN_ON_WINDOWS
 +#undef kSuccess
-diff --git a/v8/src/wasm/wrappers.cc b/v8/src/wasm/wrappers.cc
-index f6185c3f..98f71562 100644
---- a/v8/src/wasm/wrappers.cc
-+++ b/v8/src/wasm/wrappers.cc
-@@ -1283,4 +1283,6 @@ void BuildWasmWrapper(compiler::turboshaft::PipelineData* data,
-   }
- }
+--- a/v8/src/compiler/turboshaft/turbolev-graph-builder.cc
++++ b/v8/src/compiler/turboshaft/turbolev-graph-builder.cc
+@@ -6655,4 +6655,6 @@
  
-+#include "src/compiler/turboshaft/undef-assembler-macros.inc"
+ #include "src/compiler/turboshaft/undef-assembler-macros.inc"
+ 
++#undef TRACE
 +
- }  // namespace v8::internal::wasm
+ }  // namespace v8::internal::compiler::turboshaft
