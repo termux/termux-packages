@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE="https://github.com/KDAB/KDDockWidgets"
+TERMUX_PKG_DESCRIPTION="Dock Widget Framework for Qt"
+TERMUX_PKG_LICENSE="GPL-2.0, GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="2.4.0"
+TERMUX_PKG_SRCURL="https://github.com/KDAB/KDDockWidgets/releases/download/v${TERMUX_PKG_VERSION}/kddockwidgets-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=51dbf24fe72e43dd7cb9a289d3cab47112010f1a2ed69b6fc8ac0dff31991ed2
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="fmt, libc++, libspdlog, qt6-qtbase, qt6-qtdeclarative"
+TERMUX_BUILD_DEPENDS="nlohmann-json"
