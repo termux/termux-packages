@@ -1,0 +1,14 @@
+Most uses of /tmp in lesspipe check the TMPDIR environment variable first,
+but this one doesn't
+
+--- a/vimcolor
++++ b/vimcolor
+@@ -157,7 +157,7 @@ sub do_markup {
+ 	(my $filename = $file) =~s/"/\\"/g;
+ 
+ 	# Create a temp file to put the output in.
+-	my $out_file = File::Temp->new(TEMPLATE => 'vimcXXXX', DIR => '/tmp');
++	my $out_file = File::Temp->new(TEMPLATE => 'vimcXXXX', DIR => '@TERMUX_PREFIX@/tmp');
+ 	# Create a temp file for the 'script', which is given to vim
+ 	# with the -s option.
+ 	my $script_file = "$tdir/scriptfile";
