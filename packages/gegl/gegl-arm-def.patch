@@ -1,0 +1,39 @@
+Fixes error
+
+Problem found in gegl/gegl.def
+  the following symbols are in the library,
+  but are not listed in the .def-file:
+     + gegl_downscale_2x2_arm_neon
+     + gegl_downscale_2x2_get_fun_arm_neon
+     + gegl_downscale_2x2_nearest_arm_neon
+     + gegl_resample_bilinear_arm_neon
+     + gegl_resample_boxfilter_arm_neon
+     + gegl_resample_nearest_arm_neon
+
+in build for 32-bit ARM
+after commit
+https://gitlab.gnome.org/GNOME/gegl/-/commit/5055e2418558aacca7341aba7b3145f482433da0
+
+diff --git a/gegl/gegl-arm.def b/gegl/gegl-arm.def
+new file mode 100644
+index 0000000..cb8277c
+--- /dev/null
++++ b/gegl/gegl-arm.def
+@@ -0,0 +1,6 @@
++  gegl_downscale_2x2_arm_neon
++  gegl_downscale_2x2_get_fun_arm_neon
++  gegl_downscale_2x2_nearest_arm_neon
++  gegl_resample_bilinear_arm_neon
++  gegl_resample_boxfilter_arm_neon
++  gegl_resample_nearest_arm_neon
+--- a/gegl/meson.build
++++ b/gegl/meson.build
+@@ -102,7 +102,7 @@ if host_cpu_family == 'x86_64'
+   simd_extra_def = ['gegl-x86_64.def']
+ elif host_cpu_family == 'arm'
+   simd_extra = [lib_gegl_arm_neon]
+-  simd_extra_def = []
++  simd_extra_def = ['gegl-arm.def']
+ else
+   simd_extra = []
+   simd_extra_def = []
