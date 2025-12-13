@@ -1,0 +1,28 @@
+Cherry-pick https://github.com/zeronet-conservancy/zeronet-conservancy/commit/dc8e4c55eff253a19b77b0c685fa63a3a98171c2
+with modification
+
+NOTE: when rebasing, Keep this patch, and do not delete it! Instead, turn it into a replcement of
+upstream instance of /data/data/com.termux/files/usr with @TERMUX_PREFIX@
+
+--- a/src/Config.py
++++ b/src/Config.py
+@@ -12,6 +12,7 @@ import time
+ class Config(object):
+ 
+     def __init__(self, argv):
++        self.is_android = hasattr(sys, 'getandroidapilevel')
+         self.version = "0.7.10"
+         self.user_agent = "conservancy"
+         # DEPRECATED ; replace with git-generated commit
+--- a/src/Crypt/CryptConnection.py
++++ b/src/Crypt/CryptConnection.py
+@@ -17,6 +17,9 @@ def __init__(self):
+             self.openssl_bin = "tools\\openssl\\openssl.exe"
+         elif config.dist_type.startswith("bundle_linux"):
+             self.openssl_bin = "../runtime/bin/openssl"
++        elif config.is_android:
++            # assuming termux, TODO: android build, android-nix
++            self.openssl_bin = '@TERMUX_PREFIX@/bin/openssl'
+         else:
+             self.openssl_bin = "openssl"
+ 
