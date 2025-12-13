@@ -1,0 +1,13 @@
+diff --git a/externals/vjson/src/Makefile b/externals/vjson/src/Makefile
+index 9aec29909..349faf385 100644
+--- a/externals/vjson/src/Makefile
++++ b/externals/vjson/src/Makefile
+@@ -1,6 +1,6 @@
+ all: json.cpp block_allocator.cpp
+-	g++ $(CVMFS_BASE_CXX_FLAGS) -I. -fPIC -c -o json.o json.cpp
+-	g++ $(CVMFS_BASE_CXX_FLAGS) -I. -fPIC -c -o block_allocator.o block_allocator.cpp
++	clang $(CVMFS_BASE_CXX_FLAGS) --target=${CLANG_TARGET_TRIPLE} -I. -fPIC -c -o json.o json.cpp
++	clang $(CVMFS_BASE_CXX_FLAGS) --target=${CLANG_TARGET_TRIPLE} -I. -fPIC -c -o block_allocator.o block_allocator.cpp
+ 	ar cru libvjson.a json.o block_allocator.o
+ 	ranlib libvjson.a
+ 
