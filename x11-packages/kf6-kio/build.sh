@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE='https://community.kde.org/Frameworks'
 TERMUX_PKG_DESCRIPTION='Resource and network access abstraction'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.20.0"
+TERMUX_PKG_VERSION="6.21.0"
 _KF6_MINOR_VERSION="${TERMUX_PKG_VERSION%.*}"
 TERMUX_PKG_SRCURL=https://download.kde.org/stable/frameworks/${_KF6_MINOR_VERSION}/kio-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=7e67d471fc10b7df3d76e6ce859480be5d6e675d316592e7a8419b97f01bd649
+TERMUX_PKG_SHA256=b2f73a33b802cb52bb9e7c3535d315d5c616d554e3ed07ca711ca251db3105c6
 TERMUX_PKG_DEPENDS="kf6-karchive (>= ${_KF6_MINOR_VERSION}), kf6-kauth (>= ${_KF6_MINOR_VERSION}), kf6-kbookmarks (>= ${_KF6_MINOR_VERSION}), kf6-kcolorscheme (>= ${_KF6_MINOR_VERSION}), kf6-kcompletion (>= ${_KF6_MINOR_VERSION}), kf6-kconfig (>= ${_KF6_MINOR_VERSION}), kf6-kcoreaddons (>= ${_KF6_MINOR_VERSION}), kf6-kdbusaddons (>= ${_KF6_MINOR_VERSION}), kf6-kguiaddons (>= ${_KF6_MINOR_VERSION}), kf6-ki18n (>= ${_KF6_MINOR_VERSION}), kf6-kiconthemes (>= ${_KF6_MINOR_VERSION}), kf6-kitemviews (>= ${_KF6_MINOR_VERSION}), kf6-kjobwidgets (>= ${_KF6_MINOR_VERSION}), kf6-kservice (>= ${_KF6_MINOR_VERSION}), kf6-kwallet (>= ${_KF6_MINOR_VERSION}), kf6-kwidgetsaddons (>= ${_KF6_MINOR_VERSION}), kf6-kwindowsystem (>= ${_KF6_MINOR_VERSION}), kf6-solid (>= ${_KF6_MINOR_VERSION}), libacl, libandroid-shmem, libc++, libmount, libxml2, libxslt, qt6-qtbase, util-linux"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${_KF6_MINOR_VERSION}), qt6-qttools"
 TERMUX_PKG_AUTO_UPDATE=true
