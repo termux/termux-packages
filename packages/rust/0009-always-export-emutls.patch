@@ -1,15 +1,15 @@
 --- a/compiler/rustc_codegen_ssa/src/back/linker.rs
 +++ b/compiler/rustc_codegen_ssa/src/back/linker.rs
-@@ -18,7 +18,7 @@
+@@ -17,7 +17,7 @@
+ use rustc_middle::ty::TyCtxt;
  use rustc_session::Session;
  use rustc_session::config::{self, CrateType, DebugInfo, LinkerPluginLto, Lto, OptLevel, Strip};
- use rustc_span::sym;
 -use rustc_target::spec::{Cc, LinkOutputKind, LinkerFlavor, Lld};
 +use rustc_target::spec::{Cc, LinkOutputKind, LinkerFlavor, Lld, TlsModel};
  use tracing::{debug, warn};
  
  use super::command::Command;
-@@ -857,6 +857,14 @@
+@@ -869,6 +869,14 @@
                          writeln!(f, "    {sym};")?;
                      }
                  }
@@ -24,7 +24,7 @@
                  writeln!(f, "\n  local:\n    *;\n}};")?;
              };
              if let Err(error) = res {
-@@ -864,6 +872,13 @@
+@@ -876,6 +884,13 @@
              }
              if self.sess.target.is_like_solaris {
                  self.link_arg("-M").link_arg(path);
