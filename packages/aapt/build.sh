@@ -2,11 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://elinux.org/Android_aapt
 TERMUX_PKG_DESCRIPTION="Android Asset Packaging Tool"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-_TAG_VERSION=13.0.0
-_TAG_REVISION=6
+_TAG_VERSION=15.0.0
+_TAG_REVISION=23
 TERMUX_PKG_VERSION=${_TAG_VERSION}.${_TAG_REVISION}
 TERMUX_PKG_REVISION=23
 TERMUX_PKG_SRCURL=(https://android.googlesource.com/platform/frameworks/base
+                   https://android.googlesource.com/platform/frameworks/native
                    https://android.googlesource.com/platform/system/core
                    https://android.googlesource.com/platform/system/libbase
                    https://android.googlesource.com/platform/system/libziparchive
@@ -16,6 +17,7 @@ TERMUX_PKG_SRCURL=(https://android.googlesource.com/platform/frameworks/base
                    https://android.googlesource.com/platform/system/tools/aidl)
 TERMUX_PKG_GIT_BRANCH=android-${_TAG_VERSION}_r${_TAG_REVISION}
 TERMUX_PKG_SHA256=(SKIP_CHECKSUM
+                   SKIP_CHECKSUM
                    SKIP_CHECKSUM
                    SKIP_CHECKSUM
                    SKIP_CHECKSUM
@@ -67,7 +69,7 @@ termux_step_pre_configure() {
 	export PATH=$TERMUX_PKG_HOSTBUILD_DIR/_prefix/bin:$PATH
 
 	CFLAGS+=" -fPIC"
-	CXXFLAGS+=" -fPIC -std=c++17"
+	CXXFLAGS+=" -fPIC -std=gnu++2b"
 	CPPFLAGS+=" -DNDEBUG -D__ANDROID_SDK_VERSION__=__ANDROID_API__"
 	CPPFLAGS+=" -DPROTOBUF_USE_DLLS"
 
@@ -84,6 +86,8 @@ termux_step_pre_configure() {
 termux_step_make() {
 	. $TERMUX_PKG_BUILDER_DIR/sources.sh
 
+	termux_setup_protobuf
+
 	local CORE_INCDIR=$TERMUX_PKG_SRCDIR/core/include
 	local LIBLOG_INCDIR=$TERMUX_PKG_SRCDIR/logging/liblog/include
 	local LIBBASE_SRCDIR=$TERMUX_PKG_SRCDIR/libbase
@@ -98,6 +102,7 @@ termux_step_make() {
 	local AAPT2_SRCDIR=$TERMUX_PKG_SRCDIR/base/tools/aapt2
 	local ZIPALIGN_SRCDIR=$TERMUX_PKG_SRCDIR/build/tools/zipalign
 	local AIDL_SRCDIR=$TERMUX_PKG_SRCDIR/aidl
+	local FTL_INCDIR=$TERMUX_PKG_SRCDIR/native/include
 
 	CPPFLAGS+=" -I. -I./include
 		-I$LIBBASE_SRCDIR/include
@@ -135,7 +140,7 @@ termux_step_make() {
 	# Build libziparchive:
 	cd $LIBZIPARCHIVE_SRCDIR
 	for f in $libziparchive_sources; do
-		$CXX $CXXFLAGS -std=c++20 $CPPFLAGS -I$INCFS_SUPPORT_INCDIR $f -c
+		$CXX $CXXFLAGS $CPPFLAGS -I$INCFS_SUPPORT_INCDIR $f -c
 	done
 	$CXX $CXXFLAGS *.o -shared $LDFLAGS \
 		-landroid-base \
@@ -146,7 +151,11 @@ termux_step_make() {
 
 	CPPFLAGS+=" -I$INCFS_UTIL_SRCDIR/include"
 
+	CPPFLAGS+=" -I$FTL_INCDIR"
+
 	# Build libandroidfw:
+	CPPFLAGS+=" -I$ANDROIDFW_SRCDIR/include_pathutils"
+
 	cd $ANDROIDFW_SRCDIR
 	for f in $androidfw_sources $INCFS_UTIL_SRCDIR/map_ptr.cpp; do
 		$CXX $CXXFLAGS $CPPFLAGS $f -c
@@ -156,10 +165,15 @@ termux_step_make() {
 		-landroid-cutils \
 		-landroid-utils \
 		-landroid-ziparchive \
+		-lpng \
 		-lz \
 		-o $_TMP_LIBDIR/libandroid-fw.so
 
 	CPPFLAGS+=" -I$ANDROIDFW_SRCDIR/include"
+
+	# Build libandroidfw_pathutils:
+	$CXX $CXXFLAGS $CPPFLAGS PathUtils.cpp -c -o PathUtils.o
+	$AR rcs $_TMP_LIBDIR/libandroidfw_pathutils.a PathUtils.o
 
 	# Build aapt:
 	cd $AAPT_SRCDIR
@@ -172,6 +186,7 @@ termux_step_make() {
 		-lexpat \
 		-lpng \
 		-lz \
+		-l:libandroidfw_pathutils.a \
 		-o $_TMP_BINDIR/aapt
 
 	# Build aapt2:
@@ -183,6 +198,7 @@ termux_step_make() {
 		$CXX $CXXFLAGS $CPPFLAGS -I$LIBIDMAP2_POLICIES_INCDIR \
 			$f -c -o ${f%.*}.o
 	done
+
 	$CXX $CXXFLAGS $(find . -name '*.o') $LDFLAGS \
 		-landroid-base \
 		-landroid-fw \
@@ -190,6 +206,7 @@ termux_step_make() {
 		-landroid-ziparchive \
 		-lexpat \
 		-lpng \
+		-lfmt \
 		-lprotobuf \
 		$($TERMUX_SCRIPTDIR/packages/libprotobuf/interface_link_libraries.sh) \
 		-o $_TMP_BINDIR/aapt2
@@ -197,7 +214,8 @@ termux_step_make() {
 	# Build zipalign:
 	cd $ZIPALIGN_SRCDIR
 	for f in *.cpp; do
-		$CXX $CXXFLAGS $CPPFLAGS -I$TERMUX_PKG_SRCDIR/zopfli/src $f -c
+		$CXX $CXXFLAGS $CPPFLAGS -I$TERMUX_PKG_SRCDIR/zopfli/src \
+			-D_FILE_OFFSET_BITS=64 $f -c
 	done
 	$CXX $CXXFLAGS *.o $LDFLAGS \
 		-landroid-utils \
