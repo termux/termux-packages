@@ -1,52 +1,41 @@
 # shellcheck shell=bash
 termux_gitlab_api_get_tag() {
-	if [[ -z "$1" ]]; then
-		termux_error_exit <<-EndOfUsage
-			Usage: ${FUNCNAME[0]} PKG_SRCURL [TAG_TYPE] [API_HOST]
-			Returns the latest tag of the given package.
-		EndOfUsage
+	local api_host project tag_type
 
-	fi
-	local PKG_SRCURL="$1"
-	local TAG_TYPE="${2:-}"
-	local API_HOST="${3:-gitlab.com}"
+	api_host="$(cut -d'/' -f3 <<<"${TERMUX_PKG_SRCURL}")"
+	project="$(cut -d'/' -f4-5 <<<"${TERMUX_PKG_SRCURL}")"
 
-	local project
-	project="$(echo "${PKG_SRCURL}" | cut -d'/' -f4-5)"
-	project="${project#git+}"
+	tag_type="$TERMUX_PKG_UPDATE_TAG_TYPE"
 
-	if [[ -z "${TAG_TYPE}" ]]; then # If not set, then decide on the basis of url.
-		if [[ "${PKG_SRCURL:0:4}" == "git+" ]]; then
-			# Get newest tag.
-			TAG_TYPE="newest-tag"
+	if [[ -z "${tag_type}" ]]; then # If not set, then decide on the basis of url.
+		if [[ "${TERMUX_PKG_SRCURL:0:4}" == "git+" ]]; then
+			tag_type="newest-tag" # Get newest tag.
 		else
-			# Get the latest release tag.
-			TAG_TYPE="latest-release-tag"
+			tag_type="latest-release-tag" # Get the latest release tag.
 		fi
 	fi
 
-	local jq_filter
-	local api_path
+	local jq_filter api_path
 
-	case "${TAG_TYPE}" in
+	case "${tag_type}" in
 	latest-release-tag)
-		api_path="/releases"
+		api_path="releases"
 		jq_filter=".[0].tag_name"
 		;;
 	newest-tag)
-		api_path="/repository/tags"
+		api_path="repository/tags"
 		jq_filter=".[0].name"
 		;;
 	*)
 		termux_error_exit <<-EndOfError
-			ERROR: Invalid TAG_TYPE: '${TAG_TYPE}'.
+			ERROR: Invalid TERMUX_PKG_UPDATE_TAG_TYPE: '${tag_type}'.
 			Allowed values: 'newest-tag', 'latest-release-tag'.
 		EndOfError
 		;;
 	esac
 
 	# Replace slash '/' with '%2F' in project name. It is required for Gitlab API.
-	local api_url="https://${API_HOST}/api/v4/projects/${project//\//%2F}${api_path}"
+	local api_url="https://${api_host}/api/v4/projects/${project//\//%2F}/${api_path}"
 	# Api can be accessed without authentication if the repository is publicly accessible.
 	# Default rate limit for gitlab.com is 300 requests per minute for unauthenticated users
 	# and non-protected paths which should be enough for most use cases.
@@ -64,49 +53,46 @@ termux_gitlab_api_get_tag() {
 	response="$(printf "%s\n" "${response%|*}")"
 
 	local tag_name
-	if [[ "${http_code}" == "200" ]]; then
+
+	case "${http_code}" in
+	200)
 		if jq --exit-status --raw-output "${jq_filter}" <<<"${response}" >/dev/null; then
 			tag_name="$(jq --exit-status --raw-output "${jq_filter}" <<<"${response}")"
+			tag_name="${tag_name#v}" # Strip leading 'v' which is common in version tags.
 		else
 			termux_error_exit "Failed to parse tag name from: '${response}'"
 		fi
-	elif [[ "${http_code}" == "404" ]]; then
+		;;
+	404)
 		if jq --exit-status "has(\"message\") and .message == \"Not Found\"" <<<"${response}"; then
-			termux_error_exit <<-EndOfError
-				ERROR: No '${TAG_TYPE}' found. (${api_url})
-				Try using '$(
-					if [ ${TAG_TYPE} = "newest-tag" ]; then
-						echo "latest-release-tag"
-					else
-						echo "newest-tag"
-					fi
-				)'.
-			EndOfError
+			termux_error_exit "No '${tag_type}' found (${api_url}). Try using other options."
 		else
 			termux_error_exit <<-EndOfError
-				ERROR: Failed to get '${TAG_TYPE}' (${api_url}).
+				ERROR: Failed to get '${tag_type}' (${api_url}).
 				Response:
 				${response}
 			EndOfError
 		fi
-	else
+		;;
+	*)
 		termux_error_exit <<-EndOfError
-			ERROR: Failed to get '${TAG_TYPE}' (${api_url}).
+			ERROR: Failed to get '${tag_type}' (${api_url}).
 			HTTP code: ${http_code}
 			Response:
 			${response}
 		EndOfError
-	fi
+		;;
+	esac
 
 	# If program control reached here and still no tag_name, then something is not right.
 	if [[ -z "${tag_name:-}" ]] || [[ "${tag_name}" == "null" ]]; then
 		termux_error_exit <<-EndOfError
-			ERROR: JQ could not find '${TAG_TYPE}' (${api_url}).
+			ERROR: JQ could not find '${tag_type}' (${api_url}).
 			Response:
 			${response}
 			Please report this as bug.
 		EndOfError
 	fi
 
-	echo "${tag_name#v}" # Strip leading 'v'.
+	echo "${tag_name}"
 }
