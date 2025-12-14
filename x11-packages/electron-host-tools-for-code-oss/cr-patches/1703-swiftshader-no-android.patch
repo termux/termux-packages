@@ -220,7 +220,7 @@ diff -uNr a/third_party/swiftshader/src/Vulkan/libVulkan.cpp b/third_party/swift
  	{ { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_SURFACE_SPEC_VERSION } },
  	{ { VK_EXT_SURFACE_MAINTENANCE_1_EXTENSION_NAME, VK_EXT_SURFACE_MAINTENANCE_1_SPEC_VERSION } },
  	{ { VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME, VK_KHR_GET_SURFACE_CAPABILITIES_2_SPEC_VERSION } },
-@@ -376,7 +376,7 @@
+@@ -378,7 +378,7 @@
  	// Only 1.1 core version of this is supported. The extension has additional requirements
  	//{{ VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME, VK_KHR_VARIABLE_POINTERS_SPEC_VERSION }},
  	{ { VK_EXT_QUEUE_FAMILY_FOREIGN_EXTENSION_NAME, VK_EXT_QUEUE_FAMILY_FOREIGN_SPEC_VERSION } },
@@ -229,16 +229,16 @@ diff -uNr a/third_party/swiftshader/src/Vulkan/libVulkan.cpp b/third_party/swift
  	// We fully support the KHR_swapchain v70 additions, so just track the spec version.
  	{ { VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_KHR_SWAPCHAIN_SPEC_VERSION } },
  #else
-@@ -449,7 +449,7 @@
- 	{ { VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME, VK_KHR_VULKAN_MEMORY_MODEL_SPEC_VERSION } },
+@@ -458,7 +458,7 @@
  	{ { VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME, VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_SPEC_VERSION } },
  	{ { VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME, VK_KHR_PIPELINE_LIBRARY_SPEC_VERSION } },
+ 	{ { VK_KHR_UNIFIED_IMAGE_LAYOUTS_EXTENSION_NAME, VK_KHR_UNIFIED_IMAGE_LAYOUTS_SPEC_VERSION } },
 -#ifndef __ANDROID__
 +#if !(defined(__ANDROID__) && !defined(__TERMUX__))
  	{ { VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME, VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_SPEC_VERSION } },
  	{ { VK_EXT_SWAPCHAIN_MAINTENANCE_1_EXTENSION_NAME, VK_EXT_SWAPCHAIN_MAINTENANCE_1_SPEC_VERSION } },
  #endif
-@@ -2038,7 +2038,7 @@
+@@ -2066,7 +2066,7 @@
  
  	const VkBaseInStructure *extensionCreateInfo = reinterpret_cast<const VkBaseInStructure *>(pCreateInfo->pNext);
  
@@ -247,7 +247,7 @@ diff -uNr a/third_party/swiftshader/src/Vulkan/libVulkan.cpp b/third_party/swift
  	vk::BackingMemory backmem;
  	bool swapchainImage = false;
  #endif
-@@ -2049,7 +2049,7 @@
+@@ -2077,7 +2077,7 @@
  		// VK_STRUCTURE_TYPE_NATIVE_BUFFER_ANDROID, are not enumerated in the official Vulkan headers.
  		switch((int)(extensionCreateInfo->sType))
  		{
@@ -256,7 +256,7 @@ diff -uNr a/third_party/swiftshader/src/Vulkan/libVulkan.cpp b/third_party/swift
  		case VK_STRUCTURE_TYPE_SWAPCHAIN_IMAGE_CREATE_INFO_ANDROID:
  			{
  				const VkSwapchainImageCreateInfoANDROID *swapImageCreateInfo = reinterpret_cast<const VkSwapchainImageCreateInfoANDROID *>(extensionCreateInfo);
-@@ -2109,7 +2109,7 @@
+@@ -2137,7 +2137,7 @@
  
  	VkResult result = vk::Image::Create(pAllocator, pCreateInfo, pImage, vk::Cast(device));
  
@@ -265,7 +265,7 @@ diff -uNr a/third_party/swiftshader/src/Vulkan/libVulkan.cpp b/third_party/swift
  	if(swapchainImage)
  	{
  		if(result != VK_SUCCESS)
-@@ -2147,7 +2147,7 @@
+@@ -2175,7 +2175,7 @@
  	TRACE("(VkDevice device = %p, VkImage image = %p, const VkAllocationCallbacks* pAllocator = %p)",
  	      device, static_cast<void *>(image), pAllocator);
  
@@ -274,7 +274,7 @@ diff -uNr a/third_party/swiftshader/src/Vulkan/libVulkan.cpp b/third_party/swift
  	vk::Image *img = vk::Cast(image);
  	if(img && img->hasExternalMemory())
  	{
-@@ -3573,7 +3573,7 @@
+@@ -3615,7 +3615,7 @@
  				/* Do nothing */
  				break;
  
@@ -283,7 +283,7 @@ diff -uNr a/third_party/swiftshader/src/Vulkan/libVulkan.cpp b/third_party/swift
  			case VK_STRUCTURE_TYPE_BIND_IMAGE_MEMORY_SWAPCHAIN_INFO_KHR:
  				{
  					const auto *swapchainInfo = reinterpret_cast<const VkBindImageMemorySwapchainInfoKHR *>(extInfo);
-@@ -3783,7 +3783,7 @@
+@@ -3825,7 +3825,7 @@
  				vk::Cast(physicalDevice)->getProperties(properties);
  			}
  			break;
@@ -292,7 +292,7 @@ diff -uNr a/third_party/swiftshader/src/Vulkan/libVulkan.cpp b/third_party/swift
  		case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENTATION_PROPERTIES_ANDROID:
  			{
  				auto *properties = reinterpret_cast<VkPhysicalDevicePresentationPropertiesANDROID *>(extensionProperties);
-@@ -4002,7 +4002,7 @@
+@@ -4044,7 +4044,7 @@
  
  	VkBaseOutStructure *extensionProperties = reinterpret_cast<VkBaseOutStructure *>(pImageFormatProperties->pNext);
  
@@ -301,7 +301,7 @@ diff -uNr a/third_party/swiftshader/src/Vulkan/libVulkan.cpp b/third_party/swift
  	bool hasAHBUsage = false;
  #endif
  
-@@ -4036,7 +4036,7 @@
+@@ -4078,7 +4078,7 @@
  				properties->identicalMemoryLayout = VK_TRUE;
  			}
  			break;
@@ -310,7 +310,7 @@ diff -uNr a/third_party/swiftshader/src/Vulkan/libVulkan.cpp b/third_party/swift
  		case VK_STRUCTURE_TYPE_ANDROID_HARDWARE_BUFFER_USAGE_ANDROID:
  			{
  				auto *properties = reinterpret_cast<VkAndroidHardwareBufferUsageANDROID *>(extensionProperties);
-@@ -4066,7 +4066,7 @@
+@@ -4108,7 +4108,7 @@
  
  	vk::Cast(physicalDevice)->getImageFormatProperties(format, type, tiling, usage, flags, &pImageFormatProperties->imageFormatProperties);
  
@@ -319,7 +319,7 @@ diff -uNr a/third_party/swiftshader/src/Vulkan/libVulkan.cpp b/third_party/swift
  	if(hasAHBUsage)
  	{
  		// AHardwareBuffer_lock may only be called with a single layer.
-@@ -4189,7 +4189,7 @@
+@@ -4231,7 +4231,7 @@
  	{
  		switch(extInfo->sType)
  		{
@@ -328,7 +328,7 @@ diff -uNr a/third_party/swiftshader/src/Vulkan/libVulkan.cpp b/third_party/swift
  		case VK_STRUCTURE_TYPE_EXTERNAL_FORMAT_ANDROID:
  			break;
  #endif
-@@ -4703,7 +4703,7 @@
+@@ -4745,7 +4745,7 @@
  	return vk::HeadlessSurfaceKHR::Create(pAllocator, pCreateInfo, pSurface);
  }
  
@@ -337,7 +337,7 @@ diff -uNr a/third_party/swiftshader/src/Vulkan/libVulkan.cpp b/third_party/swift
  VKAPI_ATTR void VKAPI_CALL vkDestroySurfaceKHR(VkInstance instance, VkSurfaceKHR surface, const VkAllocationCallbacks *pAllocator)
  {
  	TRACE("(VkInstance instance = %p, VkSurfaceKHR surface = %p, const VkAllocationCallbacks* pAllocator = %p)",
-@@ -4921,7 +4921,7 @@
+@@ -4971,7 +4971,7 @@
  
  #endif  // ! __ANDROID__
  

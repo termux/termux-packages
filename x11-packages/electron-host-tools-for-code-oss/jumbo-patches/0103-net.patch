@@ -486,21 +486,23 @@ diff --git a/net/quic/dedicated_web_transport_http3_client.cc b/net/quic/dedicat
 index 9879fd4203..0bf1ff4aec 100644
 --- a/net/quic/dedicated_web_transport_http3_client.cc
 +++ b/net/quic/dedicated_web_transport_http3_client.cc
-@@ -32,6 +32,8 @@
+@@ -32,6 +32,9 @@
  #include "net/url_request/url_request_context.h"
  #include "url/scheme_host_port.h"
  
-+#define HostsFromOrigins HostsFromOrigins_DedicatedWebTransportHTTP3Client
++#define HostsFromOrigins         HostsFromOrigins_DedicatedWebTransportHTTP3Client
++#define HostsFromSchemeHostPorts HostsFromSchemeHostPorts_DedicatedWebTransportHTTP3Client
 +
  namespace net {
  
  namespace {
-@@ -991,3 +993,5 @@ void DedicatedWebTransportHttp3Client::OnDatagramProcessed(
+@@ -1025,3 +1028,6 @@
  }
  
  }  // namespace net
 +
 +#undef HostsFromOrigins
++#undef HostsFromSchemeHostPorts
 diff --git a/net/quic/quic_chromium_client_stream.cc b/net/quic/quic_chromium_client_stream.cc
 index f6becb91d0..ceaf3d57b0 100644
 --- a/net/quic/quic_chromium_client_stream.cc
@@ -698,3 +700,136 @@ index 41ba26fe48..55f5657768 100644
  }  // namespace net
 +
 +#undef ValidateStatus
+diff --git a/net/http/http_cache.cc b/net/http/http_cache.cc
+index 5ec129a9ea..de23b6d50b 100644
+--- a/net/http/http_cache.cc
++++ b/net/http/http_cache.cc
+@@ -63,6 +63,8 @@
+ #include <unistd.h>
+ #endif
+ 
++#define TaskRunner TaskRunner_HttpCache
++
+ namespace net {
+ 
+ namespace {
+@@ -1751,3 +1753,5 @@ void HttpCache::OnNoVarySearchCacheLoadComplete(
+ }
+ 
+ }  // namespace net
++
++#undef TaskRunner
+diff --git a/net/http/http_proxy_connect_job.cc b/net/http/http_proxy_connect_job.cc
+index a34459b3f3..e2d7f0102c 100644
+--- a/net/http/http_proxy_connect_job.cc
++++ b/net/http/http_proxy_connect_job.cc
+@@ -54,6 +54,8 @@
+ #include "url/gurl.h"
+ #include "url/scheme_host_port.h"
+ 
++#define TaskRunner TaskRunner_HttpProxyConnectJob
++
+ namespace net {
+ 
+ namespace {
+@@ -1008,3 +1010,5 @@ void HttpProxyConnectJob::EmitConnectLatency(NextProto http_version,
+ }
+ 
+ }  // namespace net
++
++#undef TaskRunner
+diff --git a/net/http/http_stream_factory_job.cc b/net/http/http_stream_factory_job.cc
+index f274d6791d..aa7e92fd8f 100644
+--- a/net/http/http_stream_factory_job.cc
++++ b/net/http/http_stream_factory_job.cc
+@@ -56,6 +56,8 @@
+ #include "url/scheme_host_port.h"
+ #include "url/url_constants.h"
+ 
++#define TaskRunner TaskRunner_HttpStreamFactoryJob
++
+ namespace net {
+ 
+ namespace {
+@@ -1348,3 +1350,5 @@ void HttpStreamFactory::Job::RecordCompletionHistograms(int result) {
+ }
+ 
+ }  // namespace net
++
++#undef TaskRunner
+diff --git a/net/http/http_stream_factory_job_controller.cc b/net/http/http_stream_factory_job_controller.cc
+index a4551d4bfd..c6664ea64f 100644
+--- a/net/http/http_stream_factory_job_controller.cc
++++ b/net/http/http_stream_factory_job_controller.cc
+@@ -45,6 +45,8 @@
+ #include "url/scheme_host_port.h"
+ #include "url/url_constants.h"
+ 
++#define TaskRunner TaskRunner_HttpStreamFactoryJobController
++
+ namespace net {
+ 
+ namespace {
+@@ -1565,3 +1567,5 @@ void HttpStreamFactory::JobController::OnPoolPreconnectsComplete(int rv) {
+ }
+ 
+ }  // namespace net
++
++#undef TaskRunner
+diff --git a/net/url_request/url_request_error_job.cc b/net/url_request/url_request_error_job.cc
+index 6d9a7d4394..5f58a96b9c 100644
+--- a/net/url_request/url_request_error_job.cc
++++ b/net/url_request/url_request_error_job.cc
+@@ -12,6 +12,8 @@
+ #include "net/base/net_errors.h"
+ #include "net/base/task/task_runner.h"
+ 
++#define TaskRunner TaskRunner_URLRequestErrorJob
++
+ namespace net {
+ 
+ namespace {
+@@ -46,3 +48,5 @@ void URLRequestErrorJob::StartAsync() {
+ }
+ 
+ }  // namespace net
++
++#undef TaskRunner
+diff --git a/net/url_request/url_request_job.cc b/net/url_request/url_request_job.cc
+index ff36f3719d..b4a2ac28a9 100644
+--- a/net/url_request/url_request_job.cc
++++ b/net/url_request/url_request_job.cc
+@@ -40,6 +40,8 @@
+ #include "net/url_request/redirect_util.h"
+ #include "net/url_request/url_request_context.h"
+ 
++#define TaskRunner TaskRunner_URLRequestJob
++
+ namespace net {
+ 
+ namespace {
+@@ -775,3 +777,5 @@ void URLRequestJob::RecordBytesRead(int bytes_read) {
+ }
+ 
+ }  // namespace net
++
++#undef TaskRunner
+diff --git a/net/url_request/url_request_redirect_job.cc b/net/url_request/url_request_redirect_job.cc
+index 270cbfcf40..19f5805390 100644
+--- a/net/url_request/url_request_redirect_job.cc
++++ b/net/url_request/url_request_redirect_job.cc
+@@ -27,6 +27,8 @@
+ #include "net/url_request/url_request.h"
+ #include "net/url_request/url_request_job.h"
+ 
++#define TaskRunner TaskRunner_URLRequestRedirectJob
++
+ namespace net {
+ 
+ namespace {
+@@ -117,3 +119,5 @@ void URLRequestRedirectJob::StartAsync() {
+ }
+ 
+ }  // namespace net
++
++#undef TaskRunner

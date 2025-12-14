@@ -29,12 +29,13 @@
  // TODO(crbug.com/40188745): Implement crash reporter integration for Fuchsia.
 --- a/chrome/browser/ui/startup/bad_flags_prompt.cc
 +++ b/chrome/browser/ui/startup/bad_flags_prompt.cc
-@@ -67,10 +67,12 @@
+@@ -74,11 +74,13 @@
      switches::kHostRules,
  
      // These flags disable sandbox-related security.
 +#ifndef __TERMUX__
      sandbox::policy::switches::kDisableGpuSandbox,
+     sandbox::policy::switches::kDisableLandlockSandbox,
      sandbox::policy::switches::kDisableSeccompFilterSandbox,
      sandbox::policy::switches::kDisableSetuidSandbox,
      sandbox::policy::switches::kNoSandbox,

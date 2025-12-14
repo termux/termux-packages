@@ -747,17 +747,17 @@ diff --git a/third_party/webrtc/pc/webrtc_sdp.cc b/third_party/webrtc/pc/webrtc_
 index 6e434676f9..464aa79184 100644
 --- a/third_party/webrtc/pc/webrtc_sdp.cc
 +++ b/third_party/webrtc/pc/webrtc_sdp.cc
-@@ -69,6 +69,9 @@
+@@ -67,6 +67,9 @@
  #include "rtc_base/string_encode.h"
  #include "rtc_base/strings/string_builder.h"
  
-+#define kDummyAddress kDummyAddress_WebRTCSDP
-+#define kDummyPort    kDummyPort_WebRTCSDP
++#define kDummyAddress kDummyAddress_WebRTCRDP
++#define kDummyPort    kDummyPort_WebRTCRDP
 +
- // TODO(deadbeef): Switch to using anonymous namespace rather than declaring
- // everything "static".
  namespace webrtc {
-@@ -3761,3 +3764,6 @@
+ 
+ namespace {
+@@ -3619,3 +3622,6 @@ bool ParseFmtpParameterSet(absl::string_view line_params,
  }
  
  }  // namespace webrtc
@@ -806,95 +806,49 @@ index 103983dec4..58bbffea9c 100644
    }
    target(target_type, target_name) {
      forward_variables_from(invoker,
-diff --git a/third_party/webrtc/modules/audio_processing/aec3/fullband_erle_estimator.cc b/third_party/webrtc/modules/audio_processing/aec3/fullband_erle_estimator.cc
-index 498c21b568..b375d805ba 100644
---- a/third_party/webrtc/modules/audio_processing/aec3/fullband_erle_estimator.cc
-+++ b/third_party/webrtc/modules/audio_processing/aec3/fullband_erle_estimator.cc
-@@ -21,6 +21,10 @@
- #include "rtc_base/checks.h"
- #include "rtc_base/numerics/safe_minmax.h"
- 
-+#define kX2BandEnergyThreshold kX2BandEnergyThreshold_FullBandErleEstimator
-+#define kPointsToAccumulate    kPointsToAccumulate_FullBandErleEstimator
-+#define kBlocksToHoldErle      kBlocksToHoldErle_FullBandErleEstimator
-+
- namespace webrtc {
- 
- namespace {
-@@ -189,3 +193,7 @@ void FullBandErleEstimator::ErleInstantaneous::UpdateQualityEstimate() {
- }
- 
- }  // namespace webrtc
-+
-+#undef kX2BandEnergyThreshold
-+#undef kPointsToAccumulate
-+#undef kBlocksToHoldErle
 diff --git a/third_party/webrtc/modules/audio_processing/aec3/subband_erle_estimator.cc b/third_party/webrtc/modules/audio_processing/aec3/subband_erle_estimator.cc
-index 6208d26388..906e9a4dfc 100644
+index 8db40a2579..f2ab34a5e7 100644
 --- a/third_party/webrtc/modules/audio_processing/aec3/subband_erle_estimator.cc
 +++ b/third_party/webrtc/modules/audio_processing/aec3/subband_erle_estimator.cc
-@@ -18,6 +18,10 @@
+@@ -26,6 +26,10 @@
  #include "rtc_base/checks.h"
  #include "rtc_base/numerics/safe_minmax.h"
  
 +#define kX2BandEnergyThreshold kX2BandEnergyThreshold_SubbandErleEstimator
-+#define kPointsToAccumulate    kPointsToAccumulate_SubbandErleEstimator
 +#define kBlocksToHoldErle      kBlocksToHoldErle_SubbandErleEstimator
++#define kPointsToAccumulate    kPointsToAccumulate_SubbandErleEstimator
 +
  namespace webrtc {
  
  namespace {
-@@ -251,3 +255,7 @@ void SubbandErleEstimator::UpdateAccumulatedSpectra(
+@@ -259,3 +263,7 @@ void SubbandErleEstimator::UpdateAccumulatedSpectra(
  }
  
  }  // namespace webrtc
 +
 +#undef kX2BandEnergyThreshold
-+#undef kPointsToAccumulate
 +#undef kBlocksToHoldErle
-diff --git a/third_party/webrtc/modules/rtp_rtcp/source/rtp_packetizer_av1.cc b/third_party/webrtc/modules/rtp_rtcp/source/rtp_packetizer_av1.cc
-index e5293a90e2..3bd33d102a 100644
---- a/third_party/webrtc/modules/rtp_rtcp/source/rtp_packetizer_av1.cc
-+++ b/third_party/webrtc/modules/rtp_rtcp/source/rtp_packetizer_av1.cc
-@@ -25,6 +25,10 @@
- #include "rtc_base/checks.h"
- #include "rtc_base/logging.h"
- 
-+#define ObuHasExtension    ObuHasExtension_RTPPacketizerAV1
-+#define ObuHasSize         ObuHasSize_RTPPacketizerAV1
-+#define kObuSizePresentBit kObuSizePresentBit_RTPPacketizerAV1
-+
- namespace webrtc {
- namespace {
- constexpr int kAggregationHeaderSize = 1;
-@@ -456,3 +460,7 @@ bool RtpPacketizerAv1::NextPacket(RtpPacketToSend* packet) {
- }
- 
- }  // namespace webrtc
-+
-+#undef ObuHasExtension
-+#undef ObuHasSize
-+#undef kObuSizePresentBit
++#undef kPointsToAccumulate
 diff --git a/third_party/webrtc/modules/rtp_rtcp/source/video_rtp_depacketizer_av1.cc b/third_party/webrtc/modules/rtp_rtcp/source/video_rtp_depacketizer_av1.cc
-index fd8d647045..3695dad955 100644
+index ed7434e88d..ff050ca340 100644
 --- a/third_party/webrtc/modules/rtp_rtcp/source/video_rtp_depacketizer_av1.cc
 +++ b/third_party/webrtc/modules/rtp_rtcp/source/video_rtp_depacketizer_av1.cc
-@@ -34,6 +34,10 @@
+@@ -33,6 +33,10 @@
  #include "rtc_base/logging.h"
  #include "rtc_base/numerics/safe_conversions.h"
  
-+#define ObuHasExtension    ObuHasExtension_VideoRTPDepacketizerAV1
-+#define ObuHasSize         ObuHasSize_VideoRTPDepacketizerAV1
-+#define kObuSizePresentBit kObuSizePresentBit_VideoRTPDepacketizerAV1
++#define kObuSizePresentBit kObuSizePresentBit_AV1
++#define ObuHasExtension    ObuHasExtension_AV1
++#define ObuHasSize         ObuHasSize_AV1
 +
  namespace webrtc {
  namespace {
  // AV1 format:
-@@ -404,3 +408,7 @@ VideoRtpDepacketizerAv1::Parse(CopyOnWriteBuffer rtp_payload) {
+@@ -403,3 +407,7 @@ VideoRtpDepacketizerAv1::Parse(CopyOnWriteBuffer rtp_payload) {
  }
  
  }  // namespace webrtc
 +
++#undef kObuSizePresentBit
 +#undef ObuHasExtension
 +#undef ObuHasSize
-+#undef kObuSizePresentBit
