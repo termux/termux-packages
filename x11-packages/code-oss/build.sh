@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/microsoft/vscode
 TERMUX_PKG_DESCRIPTION="Visual Studio Code - OSS"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION="1.106.3"
+TERMUX_PKG_VERSION="1.107.0"
 TERMUX_PKG_SRCURL=git+https://github.com/microsoft/vscode
 TERMUX_PKG_GIT_BRANCH="$TERMUX_PKG_VERSION"
 TERMUX_PKG_DEPENDS="electron-for-code-oss, libx11, libxkbfile, libsecret, ripgrep"
@@ -19,7 +19,7 @@ TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
 _setup_nodejs_22() {
-	local NODEJS_VERSION=22.17.0
+	local NODEJS_VERSION=22.21.1
 	local NODEJS_FOLDER=${TERMUX_PKG_CACHEDIR}/build-tools/nodejs-${NODEJS_VERSION}
 
 	if [ ! -x "$NODEJS_FOLDER/bin/node" ]; then
@@ -27,7 +27,7 @@ _setup_nodejs_22() {
 		local NODEJS_TAR_FILE=$TERMUX_PKG_TMPDIR/nodejs-$NODEJS_VERSION.tar.xz
 		termux_download https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.xz \
 			"$NODEJS_TAR_FILE" \
-			325c0f1261e0c61bcae369a1274028e9cfb7ab7949c05512c5b1e630f7e80e12
+			680d3f30b24a7ff24b98db5e96f294c0070f8f9078df658da1bce1b9c9873c88
 		tar -xf "$NODEJS_TAR_FILE" -C "$NODEJS_FOLDER" --strip-components=1
 	fi
 	export PATH="$NODEJS_FOLDER/bin:$PATH"
@@ -95,6 +95,7 @@ termux_step_make() {
 	export npm_config_nodedir=$TERMUX_PREFIX/lib/code-oss/node_headers
 
 	export CXX="$CXX -v -L$TERMUX_PREFIX/lib"
+	export CXXFLAGS="$CXXFLAGS -DSPDLOG_USE_STD_FORMAT=1"
 
 	export DISABLE_V8_COMPILE_CACHE=1
 	npm install

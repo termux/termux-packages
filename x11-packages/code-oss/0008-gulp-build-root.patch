@@ -1,33 +1,32 @@
---- a/build/gulpfile.vscode.js
-+++ b/build/gulpfile.vscode.js
-@@ -36,6 +36,8 @@
- const glob = promisify(require('glob'));
- const rcedit = promisify(require('rcedit'));
- 
+--- a/build/gulpfile.vscode.ts
++++ b/build/gulpfile.vscode.ts
+@@ -40,6 +40,7 @@
+ const root = path.dirname(import.meta.dirname);
+ const commit = getVersion(root);
+ const versionedResourcesFolder = (product as typeof product & { quality?: string })?.quality === 'insider' ? commit!.substring(0, 10) : '';
 +const buildRoot = path.join(root, "package-build-root");
-+
+ 
  // Build
  const vscodeEntryPoints = [
- 	buildfile.workerEditor,
-@@ -223,7 +225,7 @@
- function packageTask(platform, arch, sourceFolderName, destinationFolderName, opts) {
- 	opts = opts || {};
+@@ -213,7 +214,7 @@
+ }
  
+ function packageTask(platform: string, arch: string, sourceFolderName: string, destinationFolderName: string, _opts?: { stats?: boolean }) {
 -	const destination = path.join(path.dirname(root), destinationFolderName);
 +	const destination = path.join(buildRoot, destinationFolderName);
  	platform = platform || process.platform;
  
- 	return () => {
-@@ -437,7 +439,7 @@
+ 	const task = () => {
+@@ -467,7 +468,7 @@
  }
  
- function patchWin32DependenciesTask(destinationFolderName) {
+ function patchWin32DependenciesTask(destinationFolderName: string) {
 -	const cwd = path.join(path.dirname(root), destinationFolderName);
 +	const cwd = path.join(buildRoot, destinationFolderName);
  
  	return async () => {
  		const deps = await glob('**/*.node', { cwd, ignore: 'extensions/node_modules/@parcel/watcher/**' });
-@@ -465,8 +467,6 @@
+@@ -495,8 +496,6 @@
  	};
  }
  
