@@ -31,13 +31,15 @@ Enable jumbo build for the following component(s)/source_set(s):
  .../quiche/src/quiche/quic/core/http/web_transport_http3.cc | 2 ++
  net/third_party/quiche/src/quiche/quic/core/quic_stream.cc  | 2 ++
  .../quiche/src/quiche/quic/core/quic_stream_id_manager.cc   | 2 ++
+ .../quiche/src/quiche/quic/core/quic_stream_send_buffer.cc  | 4 ++++
+ .../quiche/quic/core/quic_stream_send_buffer_inlining.cc    | 4 ++++
  .../quiche/src/quiche/quic/core/tls_handshaker.cc           | 2 ++
  third_party/inspector_protocol/BUILD.gn                     | 4 +++-
  third_party/leveldatabase/BUILD.gn                          | 3 ++-
- 23 files changed, 99 insertions(+), 3 deletions(-)
+ 25 files changed, 107 insertions(+), 3 deletions(-)
 
 diff --git a/net/third_party/quiche/BUILD.gn b/net/third_party/quiche/BUILD.gn
-index a48a70817a..731253b8f0 100644
+index 2ece3e2bcf..e9f96d694d 100644
 --- a/net/third_party/quiche/BUILD.gn
 +++ b/net/third_party/quiche/BUILD.gn
 @@ -24,6 +24,7 @@
@@ -392,10 +394,10 @@ index 86d60860f9..24d911aa87 100644
 +
 +#undef ENDPOINT
 diff --git a/net/third_party/quiche/src/quiche/quic/core/quic_stream.cc b/net/third_party/quiche/src/quiche/quic/core/quic_stream.cc
-index 92df3832f8..d9f92fc4f4 100644
+index 63e4253524..8dbff1af7b 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/quic_stream.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/quic_stream.cc
-@@ -1646,3 +1646,5 @@ QuicByteCount QuicStream::CalculateSendWindowSize() const {
+@@ -1676,3 +1676,5 @@ QuicByteCount QuicStream::CalculateSendWindowSize() const {
  }
  
  }  // namespace quic
@@ -411,6 +413,44 @@ index 0129beaec4..e3f0d88d57 100644
  }  // namespace quic
 +
 +#undef ENDPOINT
+diff --git a/net/third_party/quiche/src/quiche/quic/core/quic_stream_send_buffer.cc b/net/third_party/quiche/src/quiche/quic/core/quic_stream_send_buffer.cc
+index ad78782500..fecbd8006d 100644
+--- a/net/third_party/quiche/src/quiche/quic/core/quic_stream_send_buffer.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/quic_stream_send_buffer.cc
+@@ -22,6 +22,8 @@
+ #include "quiche/common/quiche_buffer_allocator.h"
+ #include "quiche/common/quiche_mem_slice.h"
+ 
++#define CompareOffset CompareOffset_BufferedSlice
++
+ namespace quic {
+ 
+ namespace {
+@@ -194,3 +196,5 @@ QuicByteCount QuicStreamSendBuffer::TotalDataBufferedForTest() {
+ }
+ 
+ }  // namespace quic
++
++#undef CompareOffset
+diff --git a/net/third_party/quiche/src/quiche/quic/core/quic_stream_send_buffer_inlining.cc b/net/third_party/quiche/src/quiche/quic/core/quic_stream_send_buffer_inlining.cc
+index bd4924e44a..d775d98c9a 100644
+--- a/net/third_party/quiche/src/quiche/quic/core/quic_stream_send_buffer_inlining.cc
++++ b/net/third_party/quiche/src/quiche/quic/core/quic_stream_send_buffer_inlining.cc
+@@ -22,6 +22,8 @@
+ #include "quiche/common/quiche_buffer_allocator.h"
+ #include "quiche/common/quiche_mem_slice.h"
+ 
++#define CompareOffset CompareOffset_BufferedSliceInlining
++
+ namespace quic {
+ 
+ namespace {
+@@ -230,3 +232,5 @@ QuicByteCount QuicStreamSendBufferInlining::TotalDataBufferedForTest() {
+ }
+ 
+ }  // namespace quic
++
++#undef CompareOffset
 diff --git a/net/third_party/quiche/src/quiche/quic/core/tls_handshaker.cc b/net/third_party/quiche/src/quiche/quic/core/tls_handshaker.cc
 index 9529230d94..b80e76f7e9 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/tls_handshaker.cc
