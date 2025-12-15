@@ -1,0 +1,20 @@
+--- a/libschily/movebytes.c
++++ b/libschily/movebytes.c
+@@ -56,7 +56,7 @@
+ 		 *	move bytes forwards
+ 		 */
+ 		if (n >= (ssize_t)(8 * sizeof (long))) {
+-			if (l2aligned(from, to)) {
++			if ((((long)from | (long)to) & (sizeof(long) - 1)) == 0) {
+ 				register const long *froml = (const long *)from;
+ 				register long *tol = (long *)to;
+ 				register ssize_t rem = n % (8 * sizeof (long));
+@@ -92,7 +92,7 @@
+ 		from += n;
+ 		ep = to;
+ 		if (n >= (ssize_t)(8 * sizeof (long))) {
+-			if (l2aligned(from, to)) {
++			if ((((long)from | (long)to) & (sizeof(long) - 1)) == 0) {
+ 				register const long *froml = (const long *)from;
+ 				register long *tol = (long *)to;
+ 				register ssize_t rem = n % (8 * sizeof (long));

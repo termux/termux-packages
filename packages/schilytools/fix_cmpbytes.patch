@@ -1,0 +1,20 @@
+--- a/libschily/cmpbytes.c
++++ b/libschily/cmpbytes.c
+@@ -56,14 +56,14 @@
+ 	/*
+ 	 * Compare byte-wise until properly aligned for a long pointer.
+ 	 */
+ 	i = sizeof (long) - 1;
+-	while (--n >= 0 && --i >= 0 && !l2aligned(from, to)) {
++	while (--n >= 0 && --i >= 0 && (((long)from | (long)to) & (sizeof(long) - 1)) != 0) {
+ 		if (*to++ != *from++)
+ 			goto cdiff;
+ 	}
+ 	n++;
+ 
+ 	if (n >= (ssize_t)(8 * sizeof (long))) {
+-		if (l2aligned(from, to)) {
++		if ((((long)from | (long)to) & (sizeof(long) - 1)) == 0) {
+ 			register const long *froml = (const long *)from;
+ 			register const long *tol   = (const long *)to;
+ 			register ssize_t rem = n % (8 * sizeof (long));

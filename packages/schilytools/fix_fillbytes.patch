@@ -1,0 +1,9 @@
+--- a/libschily/fillbytes.c
++++ b/libschily/fillbytes.c
+@@ -1,3 +1,6 @@
++#if !defined(laligned)
++#define laligned(p) ((((long)(p)) & (sizeof(long) - 1)) == 0)
++#endif
+ /* @(#)fillbytes.c	1.18 10/08/21 Copyright 1987, 1995-2010 J. Schilling */
+ /*
+  *	fill memory with data

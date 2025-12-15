@@ -1,0 +1,15 @@
+--- a/libschily/findbytes.c
++++ b/libschily/findbytes.c
+@@ -1,3 +1,12 @@
++#if !defined(laligned)
++#define laligned(p) ((((long)(p)) & (sizeof(long) - 1)) == 0)
++#endif
++/*
++ * The original code relies on SIZE_LONG, which may not be defined during
++ * cross-compilation. We define it here safely using the sizeof() operator,
++ * which the compiler will evaluate for the TARGET architecture.
++ */
++#define SIZE_LONG sizeof(long)
+ /* @(#)findbytes.c	1.7 10/08/23 Copyright 2000-2009 J. Schilling */
+ /*
+  *	Find a byte with specific value in memory.
