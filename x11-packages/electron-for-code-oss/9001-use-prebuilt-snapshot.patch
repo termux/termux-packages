@@ -32,7 +32,7 @@
 +}
 --- a/electron/BUILD.gn
 +++ b/electron/BUILD.gn
-@@ -1460,6 +1460,8 @@
+@@ -1508,6 +1517,8 @@
    outputs = [ "$root_build_dir/chromedriver.zip" ]
  }
  
@@ -41,7 +41,7 @@
  mksnapshot_deps = [
    ":licenses",
    "//v8:mksnapshot($v8_snapshot_toolchain)",
-@@ -1479,6 +1481,8 @@
+@@ -1537,6 +1548,8 @@
    outputs = [ "$root_build_dir/mksnapshot.zip" ]
  }
  
@@ -50,7 +50,25 @@
  copy("hunspell_dictionaries") {
    sources = hunspell_dictionaries + hunspell_licenses
    outputs = [ "$target_gen_dir/electron_hunspell/{{source_file_part}}" ]
-@@ -1663,7 +1663,9 @@
+@@ -1658,6 +1671,8 @@
+   public_deps = [ ":tar_node_headers" ]
+ }
+ 
++if (false) {
++
+ group("testing_build") {
+   public_deps = [
+     ":electron_dist_zip",
+@@ -1681,6 +1696,8 @@
+   }
+ }
+ 
++}
++
+ if (is_linux && is_official_build) {
+   strip_binary("strip_electron_binary") {
+     binary_input = "$root_out_dir/$electron_project_name"
+@@ -1730,7 +1747,9 @@
      compress_debug_sections = true
      deps = [ "//third_party/swiftshader/src/Vulkan:swiftshader_libvulkan" ]
    }
