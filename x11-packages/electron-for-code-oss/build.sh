@@ -2,8 +2,8 @@ TERMUX_PKG_HOMEPAGE=https://github.com/electron/electron
 TERMUX_PKG_DESCRIPTION="Build cross-platform desktop apps with JavaScript, HTML, and CSS"
 TERMUX_PKG_LICENSE="MIT, BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
-_CHROMIUM_VERSION=138.0.7204.251
-TERMUX_PKG_VERSION=37.7.0
+_CHROMIUM_VERSION=142.0.7444.175
+TERMUX_PKG_VERSION=39.2.3
 TERMUX_PKG_SRCURL=git+https://github.com/electron/electron
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="electron-host-tools-for-code-oss, libnotify, libffi-static"
@@ -48,6 +48,9 @@ termux_step_get_source() {
 }
 
 termux_step_post_get_source() {
+	# Remove all the .git folders to save space
+	find . -type d -name ".git" -exec rm -rf {} +
+
 	# Apply patches related to chromium
 	local f
 	for f in $(find "$TERMUX_PKG_BUILDER_DIR/../electron-host-tools-for-code-oss/cr-patches" -maxdepth 1 -type f -name *.patch | sort); do
@@ -210,6 +213,7 @@ use_bundled_fontconfig = false
 use_system_freetype = false
 use_custom_libcxx = false
 use_custom_libcxx_for_host = true
+use_clang_modules = false
 use_allocator_shim = false
 use_partition_alloc_as_malloc = false
 enable_backup_ref_ptr_slow_checks = false
@@ -220,22 +224,22 @@ enable_backup_ref_ptr_support = false
 enable_pointer_compression_support = false
 use_nss_certs = true
 use_udev = false
-use_alsa = false
-use_libpci = false
-use_pulseaudio = true
 use_ozone = true
 ozone_auto_platforms = false
 ozone_platform = \"x11\"
 ozone_platform_x11 = true
+# TODO: Enable wayland
 ozone_platform_wayland = false
 ozone_platform_headless = true
 angle_enable_vulkan = true
 angle_enable_swiftshader = true
 angle_enable_abseil = false
+use_libpci = false
+use_alsa = false
+use_pulseaudio = true
 rtc_use_pipewire = false
 use_vaapi = false
 # See comments on Chromium package
-enable_nacl = false
 is_cfi = false
 use_cfi_icall = false
 use_thin_lto = false
@@ -244,7 +248,7 @@ build_tflite_with_opencl = false
 build_tflite_with_nnapi = true
 # Enable rust
 custom_target_rust_abi_target = \"$CARGO_TARGET_NAME\"
-llvm_android_mainline = true
+clang_warning_suppression_file = \"\"
 exclude_unwind_tables = false
 # Enable jumbo build (unified build)
 use_jumbo_build = true
