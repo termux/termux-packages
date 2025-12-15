@@ -1,13 +1,12 @@
 # Contributor: @PeroSar
-TERMUX_PKG_HOMEPAGE=https://github.com/extrawurst/gitui
+TERMUX_PKG_HOMEPAGE=https://github.com/gitui-org/gitui
 TERMUX_PKG_DESCRIPTION="Blazing fast terminal-ui for git written in rust"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE.md"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.27.0"
-TERMUX_PKG_REVISION=3
-TERMUX_PKG_SRCURL=https://github.com/extrawurst/gitui/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=55a85f4a3ce97712b618575aa80f3c15ea4004d554e8899669910d7fb4ff6e4b
+TERMUX_PKG_VERSION="0.28.0"
+TERMUX_PKG_SRCURL=https://github.com/gitui-org/gitui/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=3d7d1deef84b8cb3f59882b57b9a70d39ddd6491bd4539504d69b2b3924c044f
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libgit2, libssh2, openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
