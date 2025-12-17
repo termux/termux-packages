@@ -60,15 +60,10 @@ jobs:
             tag_rev=1
           fi
           new_tag="${new_tag}-r${tag_rev}+apt.android-7"
-          git tag "$new_tag"
-          git push --tags
           echo "tag_name=$new_tag" >> $GITHUB_OUTPUT
       - name: Publish bootstrap zips to GitHub release
-        uses: termux/upload-release-action@v4.2.0
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: "*.zip"
-          file_glob: true
-          release_name: "Bootstrap archives for Termux application (apt.android-7)"
-          tag: ${{ steps.get_tag.outputs.tag_name }}
-          checksums: sha256,sha512,md5
+        run: |
+          gh release create ${{ steps.get_tag.outputs.tag_name }} --title "Bootstrap archives for Termux application (apt.android-7)"
+          for file in *.zip; do
+            gh release upload ${{ steps.get_tag.outputs.tag_name }} "$file"
+          done
