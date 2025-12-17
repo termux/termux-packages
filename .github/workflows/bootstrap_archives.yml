@@ -62,6 +62,8 @@ jobs:
           new_tag="${new_tag}-r${tag_rev}+apt.android-7"
           echo "tag_name=$new_tag" >> $GITHUB_OUTPUT
       - name: Publish bootstrap zips to GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh release create ${{ steps.get_tag.outputs.tag_name }} --title "Bootstrap archives for Termux application (apt.android-7)"
           for file in *.zip; do
