@@ -297,13 +297,13 @@ jobs:
         find debs -type f -name "*.deb" -exec sha256sum "{}" \; | sort -k2 | tee checksum-${{ matrix.target_arch }}-${{ github.sha }}.txt
     - name: Store checksums for built *.deb files
       if: always()
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: checksum-${{ matrix.target_arch }}-${{ github.sha }}
         path: checksum-${{ matrix.target_arch }}-${{ github.sha }}.txt
     - name: Store *.deb files
       if: always()
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: debs-${{ matrix.target_arch }}-${{ github.sha }}
         path: ./artifacts
