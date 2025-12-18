@@ -41,6 +41,7 @@ echo_and_run cargo build --target x86_64-linux-android
 echo_and_run cargo build --target wasm32-unknown-unknown
 echo_and_run cargo build --target wasm32-wasip1
 echo_and_run cargo build --target wasm32-wasip2
+echo_and_run cargo build --target wasm32-wasip3
 echo_and_run cargo build --release
 echo_and_run cargo build --target aarch64-linux-android --release
 echo_and_run cargo build --target armv7-linux-androideabi --release
@@ -49,6 +50,7 @@ echo_and_run cargo build --target x86_64-linux-android --release
 echo_and_run cargo build --target wasm32-unknown-unknown --release
 echo_and_run cargo build --target wasm32-wasip1 --release
 echo_and_run cargo build --target wasm32-wasip2 --release
+echo_and_run cargo build --target wasm32-wasip3 --release
 echo_and_run cargo run
 echo_and_run file target/*/rusthello
 echo_and_run file target/*/*/rusthello
