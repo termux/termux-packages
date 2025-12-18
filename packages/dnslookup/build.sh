@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/ameshkov/dnslookup
 TERMUX_PKG_DESCRIPTION="Simple command line utility to make DNS lookups. Supports all known DNS protocols: plain DNS, DoH, DoT, DoQ, DNSCrypt."
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="CHIZI-0618 <kay9925@outlook.com>"
-TERMUX_PKG_VERSION="1.11.1"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="1.11.2"
 TERMUX_PKG_SRCURL="https://github.com/ameshkov/dnslookup/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=31967c89406aa6da5f69c563815e58478b530c8e55f0d995065a363f68d5e535
+TERMUX_PKG_SHA256=0f4b74a4ac8c967b089eebc62fbf65334e76d42da4c4524e8182bb8400aa119d
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
