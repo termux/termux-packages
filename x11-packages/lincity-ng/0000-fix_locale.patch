@@ -1,0 +1,48 @@
+diff -ur orig/data/locale/CMakeLists.txt mod/data/locale/CMakeLists.txt
+--- orig/data/locale/CMakeLists.txt	2025-09-23 03:23:26.000000000 +0200
++++ mod/data/locale/CMakeLists.txt	2025-12-16 16:14:36.734769568 +0100
+@@ -4,25 +4,25 @@
+   ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+ 
+ 
+-file(GLOB_RECURSE TRANSLATABLE_SOURCES CONFIGURE_DEPENDS
+-  ${CMAKE_SOURCE_DIR}/src/gui/*.cpp
+-  ${CMAKE_SOURCE_DIR}/src/gui/*.hpp
+-  ${CMAKE_SOURCE_DIR}/src/gui/*.h
+-  ${CMAKE_SOURCE_DIR}/src/lincity/*.cpp
+-  ${CMAKE_SOURCE_DIR}/src/lincity/*.hpp
+-  ${CMAKE_SOURCE_DIR}/src/lincity/*.h
+-  ${CMAKE_SOURCE_DIR}/src/lincity-ng/*.cpp
+-  ${CMAKE_SOURCE_DIR}/src/lincity-ng/*.hpp
+-  ${CMAKE_SOURCE_DIR}/src/lincity-ng/*.h
+-)
+-add_custom_command(
+-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/messages.pot
+-  COMMAND ${GETTEXT_XGETTEXT} --keyword='_:1' --keyword='N_:1' -o ${CMAKE_CURRENT_BINARY_DIR}/messages.pot ${TRANSLATABLE_SOURCES}
+-  DEPENDS ${TRANSLATABLE_SOURCES}
+-  COMMENT "generating ${CURRENT_BINARY_DIR_REL}/messages.pot"
+-)
+-add_custom_target(messages-pot.target
+-  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/messages.pot)
++#file(GLOB_RECURSE TRANSLATABLE_SOURCES CONFIGURE_DEPENDS
++#  ${CMAKE_SOURCE_DIR}/src/gui/*.cpp
++#  ${CMAKE_SOURCE_DIR}/src/gui/*.hpp
++#  ${CMAKE_SOURCE_DIR}/src/gui/*.h
++#  ${CMAKE_SOURCE_DIR}/src/lincity/*.cpp
++#  ${CMAKE_SOURCE_DIR}/src/lincity/*.hpp
++#  ${CMAKE_SOURCE_DIR}/src/lincity/*.h
++#  ${CMAKE_SOURCE_DIR}/src/lincity-ng/*.cpp
++#  ${CMAKE_SOURCE_DIR}/src/lincity-ng/*.hpp
++#  ${CMAKE_SOURCE_DIR}/src/lincity-ng/*.h
++#)
++#add_custom_command(
++#  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/messages.pot
++#  COMMAND ${GETTEXT_XGETTEXT} --keyword='_:1' --keyword='N_:1' -o ${CMAKE_CURRENT_BINARY_DIR}/messages.pot ${TRANSLATABLE_SOURCES}
++#  DEPENDS ${TRANSLATABLE_SOURCES}
++#  COMMENT "generating ${CURRENT_BINARY_DIR_REL}/messages.pot"
++#)
++#add_custom_target(messages-pot.target
++#  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/messages.pot)
+ 
+ 
+ file(GLOB_RECURSE TRANSLATABLE_GUI RELATIVE ${CMAKE_SOURCE_DIR}/data/gui CONFIGURE_DEPENDS
