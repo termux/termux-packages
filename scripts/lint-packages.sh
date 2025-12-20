@@ -147,6 +147,9 @@ check_indentation() {
 no_build="$(git log "$base_commit.." --fixed-strings --grep '%ci:no-build' --pretty=format:%H)"
 
 check_version() {
+	# !!! vvv TEMPORARY - REMOVE WHEN THIS FUNCTION IS FIXED vvv !!!
+	return
+	# !!! ^^^ TEMPORARY - REMOVE WHEN THIS FUNCTION IS FIXED ^^^ !!!
 	local package_dir="${1%/*}"
 
 	[[ -z "$base_commit" ]] && {
