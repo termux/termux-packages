@@ -24,30 +24,6 @@ TERMUX_PKG_UNDEF_SYMBOLS_FILES="all"
 TERMUX_PKG_BREAKS="bionic-host"
 TERMUX_PKG_REPLACES="bionic-host"
 
-# Function to obtain the .deb URL
-obtain_deb_url() {
-	# jammy is last known Ubuntu distro which contains `libncurses.so.5` in packages
-	local url="https://packages.ubuntu.com/jammy/amd64/$1/download"
-	local attempt retries=5 wait=5
-	local PAGE deb_url
-
-	for ((attempt=1; attempt<=retries; attempt++)); do
-		PAGE="$(curl -s "$url")"
-		>&2 echo page
-		>&2 echo "$PAGE"
-		deb_url="$(grep -oE 'https?://.*\.deb' <<< "$PAGE" | head -n1)"
-		if [[ -n "$deb_url" ]]; then
-				echo "$deb_url"
-				return 0
-		else
-			>&2 echo "Attempt $attempt: Failed to obtain URL. Retrying in $wait seconds..."
-		fi
-		sleep "$wait"
-	done
-
-	termux_error_exit "Failed to obtain URL after $retries attempts."
-}
-
 termux_step_get_source() {
 	if $TERMUX_ON_DEVICE_BUILD; then
 		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
@@ -62,22 +38,20 @@ termux_step_get_source() {
 	export LD_LIBRARY_PATH="${TERMUX_PKG_SRCDIR}/prefix/lib/x86_64-linux-gnu:${TERMUX_PKG_SRCDIR}/prefix/usr/lib/x86_64-linux-gnu"
 	export PATH="${TERMUX_PKG_SRCDIR}/prefix/usr/bin:${PATH//$HOME\/.cargo\/bin/}"
 
-	mkdir -p "${TERMUX_PKG_SRCDIR}/prefix"
-	cd "${TERMUX_PKG_SRCDIR}" || termux_error_exit "Couldn't enter source code directory: ${TERMUX_PKG_SRCDIR}"
+	local ubuntu_packages
+	ubuntu_packages+="libtinfo5,"
+	ubuntu_packages+="libncurses5,"
+	ubuntu_packages+="openssh-client,"
 
-	local URL DEB_NAME
-	for i in libtinfo5 libncurses5 openssh-client; do
-		URL="$(obtain_deb_url "$i")"
-		DEB_NAME="${URL##*/}"
-		termux_download "$URL" "${TERMUX_PKG_CACHEDIR}/${DEB_NAME}" SKIP_CHECKSUM
-
-		mkdir -p "${TERMUX_PKG_TMPDIR}/${DEB_NAME}"
-		ar x "${TERMUX_PKG_CACHEDIR}/${DEB_NAME}" --output="${TERMUX_PKG_TMPDIR}/${DEB_NAME}"
-		tar xf "${TERMUX_PKG_TMPDIR}/${DEB_NAME}/data.tar.zst" -C "${TERMUX_PKG_SRCDIR}/prefix"
-	done
+	termux_download_ubuntu_packages "$ubuntu_packages" \
+		"${TERMUX_PKG_SRCDIR}/prefix" \
+		amd64 \
+		https://packages.ubuntu.com/jammy
 
 	termux_download https://storage.googleapis.com/git-repo-downloads/repo "${TERMUX_PKG_CACHEDIR}/repo" SKIP_CHECKSUM
 	chmod +x "${TERMUX_PKG_CACHEDIR}/repo"
+
+	cd "${TERMUX_PKG_SRCDIR}" || termux_error_exit "Couldn't enter source code directory: ${TERMUX_PKG_SRCDIR}"
 
 	# Repo requires us to have a Git user name and email set.
 	# The GitHub workflow does this, but the local build container doesn't

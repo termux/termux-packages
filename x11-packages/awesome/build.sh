@@ -32,50 +32,6 @@ termux_step_post_get_source() {
 	fi
 }
 
-# Function to obtain the .deb URL
-obtain_deb_url() {
-	local url attempt retries wait PAGE deb_url
-	url="https://packages.ubuntu.com/noble/amd64/$1/download"
-	retries=50
-	wait=50
-	>&2 echo "url: $url"
-	for ((attempt=1; attempt<=retries; attempt++)); do
-		PAGE="$(curl -s "$url")"
-		deb_url="$(grep -oE 'https?://.*\.deb' <<< "$PAGE" | head -n1)"
-		if [[ -n "$deb_url" ]]; then
-				echo "$deb_url"
-				return 0
-		else
-			>&2 echo "Attempt $attempt: Failed to obtain deb URL. Retrying in $wait seconds..."
-		fi
-		sleep "$wait"
-	done
-	termux_error_exit "Failed to obtain URL after $retries attempts."
-}
-
-_install_ubuntu_packages() {
-	# install Ubuntu packages, like in the aosp-libs build.sh
-	export HOSTBUILD_ROOTFS="${TERMUX_PKG_HOSTBUILD_DIR}/ubuntu_packages"
-	mkdir -p "${HOSTBUILD_ROOTFS}"
-	local URL DEB_NAME DEB_LIST
-	DEB_LIST="$@"
-	for i in $DEB_LIST; do
-		echo "deb: $i"
-		URL="$(obtain_deb_url "$i")"
-		DEB_NAME="${URL##*/}"
-		termux_download "$URL" "${TERMUX_PKG_CACHEDIR}/${DEB_NAME}" SKIP_CHECKSUM
-		mkdir -p "${TERMUX_PKG_TMPDIR}/${DEB_NAME}"
-		ar x "${TERMUX_PKG_CACHEDIR}/${DEB_NAME}" --output="${TERMUX_PKG_TMPDIR}/${DEB_NAME}"
-		tar xf "${TERMUX_PKG_TMPDIR}/${DEB_NAME}"/data.tar.* \
-			-C "${HOSTBUILD_ROOTFS}"
-	done
-	find "${HOSTBUILD_ROOTFS}" -type f -name '*.pc' | \
-		xargs -n 1 sed -i -e "s|/usr|${HOSTBUILD_ROOTFS}/usr|g"
-	find "${HOSTBUILD_ROOTFS}/usr/lib/x86_64-linux-gnu" -xtype l \
-		-exec sh -c "ln -snvf /usr/lib/x86_64-linux-gnu/\$(readlink \$1) \$1" sh {} \;
-	ln -sf convert-im6.q16 "${HOSTBUILD_ROOTFS}/usr/bin/convert"
-}
-
 _load_ubuntu_packages() {
 	local hostbuild_lua_version="$(echo 'print(_VERSION)' | lua - | cut -d' ' -f2)"
 	export HOSTBUILD_ROOTFS="${TERMUX_PKG_HOSTBUILD_DIR}/ubuntu_packages"
@@ -94,66 +50,79 @@ termux_step_host_build() {
 	fi
 
 	local hostbuild_lua_version="$(echo 'print(_VERSION)' | lua - | cut -d' ' -f2)"
-	_install_ubuntu_packages lua-lgi \
-							lua-any \
-							lua-expat \
-							lua-filesystem \
-							lua-ldoc \
-							lua-penlight \
-							imagemagick \
-							imagemagick-6-common \
-							imagemagick-6.q16 \
-							libaom3 libde265-0 \
-							libdjvulibre-text \
-							libdjvulibre21 \
-							libfftw3-double3 \
-							libheif-plugin-aomdec \
-							libheif-plugin-aomenc \
-							libheif-plugin-libde265 \
-							libheif1 \
-							libjxr-tools \
-							libjxr0t64 \
-							liblqr-1-0 \
-							libmagickcore-6.q16-7-extra \
-							libmagickcore-6.q16-7t64 \
-							libmagickwand-6.q16-7t64 \
-							libwmflite-0.2-7 \
-							liblua"$hostbuild_lua_version"-0 \
-							liblua"$hostbuild_lua_version"-dev \
-							libstartup-notification0 \
-							libstartup-notification0-dev \
-							libx11-xcb-dev \
-							libxcb-cursor-dev \
-							libxcb-cursor0 \
-							libxcb-icccm4 \
-							libxcb-icccm4-dev \
-							libxcb-image0 \
-							libxcb-image0-dev \
-							libxcb-keysyms1 \
-							libxcb-keysyms1-dev \
-							libxcb-randr0-dev \
-							libxcb-render-util0 \
-							libxcb-render-util0-dev \
-							libxcb-shape0 \
-							libxcb-shape0-dev \
-							libxcb-util-dev \
-							libxcb-util0-dev \
-							libxcb-util1 \
-							libxcb-xinerama0 \
-							libxcb-xinerama0-dev \
-							libxcb-xkb-dev \
-							libxcb-xkb1 \
-							libxcb-xrm-dev \
-							libxcb-xrm0 \
-							libxcb-xtest0 \
-							libxcb-xtest0-dev \
-							libxdg-basedir-dev \
-							libxdg-basedir1 \
-							libxkbcommon-x11-0 \
-							libxkbcommon-x11-dev \
-							libxcb-shape0 \
-							libxcb-shape0-dev \
-							libxcb-xfixes0-dev
+	local ubuntu_packages
+
+	ubuntu_packages+="lua-lgi,"
+	ubuntu_packages+="lua-any,"
+	ubuntu_packages+="lua-expat,"
+	ubuntu_packages+="lua-filesystem,"
+	ubuntu_packages+="lua-ldoc,"
+	ubuntu_packages+="lua-penlight,"
+	ubuntu_packages+="imagemagick,"
+	ubuntu_packages+="imagemagick-6-common,"
+	ubuntu_packages+="imagemagick-6.q16,"
+	ubuntu_packages+="libaom3 libde265-0,"
+	ubuntu_packages+="libdjvulibre-text,"
+	ubuntu_packages+="libdjvulibre21,"
+	ubuntu_packages+="libfftw3-double3,"
+	ubuntu_packages+="libheif-plugin-aomdec,"
+	ubuntu_packages+="libheif-plugin-aomenc,"
+	ubuntu_packages+="libheif-plugin-libde265,"
+	ubuntu_packages+="libheif1,"
+	ubuntu_packages+="libjxr-tools,"
+	ubuntu_packages+="libjxr0t64,"
+	ubuntu_packages+="liblqr-1-0,"
+	ubuntu_packages+="libmagickcore-6.q16-7-extra,"
+	ubuntu_packages+="libmagickcore-6.q16-7t64,"
+	ubuntu_packages+="libmagickwand-6.q16-7t64,"
+	ubuntu_packages+="libwmflite-0.2-7,"
+	ubuntu_packages+="liblua$hostbuild_lua_version-0,"
+	ubuntu_packages+="liblua$hostbuild_lua_version-dev,"
+	ubuntu_packages+="libstartup-notification0,"
+	ubuntu_packages+="libstartup-notification0-dev,"
+	ubuntu_packages+="libx11-xcb-dev,"
+	ubuntu_packages+="libxcb-cursor-dev,"
+	ubuntu_packages+="libxcb-cursor0,"
+	ubuntu_packages+="libxcb-icccm4,"
+	ubuntu_packages+="libxcb-icccm4-dev,"
+	ubuntu_packages+="libxcb-image0,"
+	ubuntu_packages+="libxcb-image0-dev,"
+	ubuntu_packages+="libxcb-keysyms1,"
+	ubuntu_packages+="libxcb-keysyms1-dev,"
+	ubuntu_packages+="libxcb-randr0-dev,"
+	ubuntu_packages+="libxcb-render-util0,"
+	ubuntu_packages+="libxcb-render-util0-dev,"
+	ubuntu_packages+="libxcb-shape0,"
+	ubuntu_packages+="libxcb-shape0-dev,"
+	ubuntu_packages+="libxcb-util-dev,"
+	ubuntu_packages+="libxcb-util0-dev,"
+	ubuntu_packages+="libxcb-util1,"
+	ubuntu_packages+="libxcb-xinerama0,"
+	ubuntu_packages+="libxcb-xinerama0-dev,"
+	ubuntu_packages+="libxcb-xkb-dev,"
+	ubuntu_packages+="libxcb-xkb1,"
+	ubuntu_packages+="libxcb-xrm-dev,"
+	ubuntu_packages+="libxcb-xrm0,"
+	ubuntu_packages+="libxcb-xtest0,"
+	ubuntu_packages+="libxcb-xtest0-dev,"
+	ubuntu_packages+="libxdg-basedir-dev,"
+	ubuntu_packages+="libxdg-basedir1,"
+	ubuntu_packages+="libxkbcommon-x11-0,"
+	ubuntu_packages+="libxkbcommon-x11-dev,"
+	ubuntu_packages+="libxcb-shape0,"
+	ubuntu_packages+="libxcb-shape0-dev,"
+	ubuntu_packages+="libxcb-xfixes0-dev,"
+
+	termux_download_ubuntu_packages "$ubuntu_packages"
+
+	local HOSTBUILD_ROOTFS="${TERMUX_PKG_HOSTBUILD_DIR}/ubuntu_packages"
+
+	find "${HOSTBUILD_ROOTFS}" -type f -name '*.pc' | \
+		xargs -n 1 sed -i -e "s|/usr|${HOSTBUILD_ROOTFS}/usr|g"
+	find "${HOSTBUILD_ROOTFS}/usr/lib/x86_64-linux-gnu" -xtype l \
+		-exec sh -c "ln -snvf /usr/lib/x86_64-linux-gnu/\$(readlink \$1) \$1" sh {} \;
+	ln -sf convert-im6.q16 "${HOSTBUILD_ROOTFS}/usr/bin/convert"
+
 	_load_ubuntu_packages
 
 	termux_setup_cmake

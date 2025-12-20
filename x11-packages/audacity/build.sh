@@ -37,38 +37,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DUSE_MIDI=OFF
 "
 
-# Function to obtain the .deb URL
-obtain_deb_url() {
-	local url="https://packages.ubuntu.com/noble/amd64/$1/download"
-	local retries=5
-	local wait=5
-	local attempt
-	local deb_url
-
-	for ((attempt=1; attempt<=retries; attempt++)); do
-		local PAGE="$(curl -s "$url")"
-		>&2 echo page
-		>&2 echo "$PAGE"
-		if deb_url=$(echo "$PAGE" | grep -Eo 'http://.*\.deb' | head -n 1); then
-			if [[ -n "$deb_url" ]]; then
-				echo "$deb_url"
-				return 0
-			else
-				# deb_url is empty or server answered with `internal server error`, retry
-				>&2 echo "Attempt $attempt: Received empty URL or server answered with `Internal server error` page. Retrying in $wait seconds..."
-			fi
-		else
-			# The command failed, retry
-			>&2 echo "Attempt $attempt: Command failed. Retrying in $wait seconds..."
-		fi
-		sleep "$wait"
-	done
-
-	# Failed after retries, output error to stderr and exit with code 1
-	>&2 echo "Failed to obtain URL after $retries attempts."
-	exit 1
-}
-
 termux_step_host_build() {
 	termux_setup_cmake
 	termux_setup_ninja
@@ -81,14 +49,14 @@ termux_step_host_build() {
 		# Building both gtk2.0 and alsa only for building host-side tool seems to be excessive.
 		# Let's download them from ubuntu repos.
 		# To avoid messing with `apt update` and `apt download` we will get download links directly from ubuntu servers.
-		mkdir "$_PREFIX"
-		for i in libgtk2.0-0t64 libgtk2.0-dev libasound2-dev; do
-			wget "$(obtain_deb_url $i)" -O "$TERMUX_PKG_HOSTBUILD_DIR/tmp.deb"
-			dpkg-deb -R "$TERMUX_PKG_HOSTBUILD_DIR/tmp.deb" "$TERMUX_PKG_HOSTBUILD_DIR/tmp"
-			cp -rf "$TERMUX_PKG_HOSTBUILD_DIR"/tmp/* "$_PREFIX"
-			rm -rf "$TERMUX_PKG_HOSTBUILD_DIR/tmp.deb" "$TERMUX_PKG_HOSTBUILD_DIR/tmp"
-			unset _URL
-		done
+
+		local ubuntu_packages
+
+		ubuntu_packages+="libgtk2.0-0t64,"
+		ubuntu_packages+="libgtk2.0-dev,"
+		ubuntu_packages+="libasound2-dev,"
+
+		termux_download_ubuntu_packages "$ubuntu_packages" "$_PREFIX"
 
 		for i in "$_PREFIX"/usr/lib/x86_64-linux-gnu/pkgconfig/*.pc; do
 			# patch pkg-config files to match new prefix

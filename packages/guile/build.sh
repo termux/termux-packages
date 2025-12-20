@@ -45,68 +45,36 @@ _load_ubuntu_packages() {
 	LD_LIBRARY_PATH+=":${HOSTBUILD_ROOTFS}/usr/lib"
 }
 
-# Function to obtain the .deb URL
-obtain_deb_url() {
-	local url attempt retries wait PAGE deb_url
-	url="https://packages.ubuntu.com/noble/$HOSTBUILD_ARCH/$1/download"
-	retries=50
-	wait=50
-	>&2 echo "url: $url"
-	for ((attempt=1; attempt<=retries; attempt++)); do
-		PAGE="$(curl -s "$url")"
-		deb_url="$(grep -oE 'https?://.*\.deb' <<< "$PAGE" | head -n1)"
-		if [[ -n "$deb_url" ]]; then
-				echo "$deb_url"
-				return 0
-		else
-			>&2 echo "Attempt $attempt: Failed to obtain deb URL. Retrying in $wait seconds..."
-		fi
-		sleep "$wait"
-	done
-	termux_error_exit "Failed to obtain URL after $retries attempts."
-}
-
-_install_ubuntu_packages() {
-	# install Ubuntu packages, like in the aosp-libs build.sh
-	export HOSTBUILD_ROOTFS="${TERMUX_PKG_HOSTBUILD_DIR}/ubuntu_packages"
-	mkdir -p "${HOSTBUILD_ROOTFS}"
-	local URL DEB_NAME DEB_LIST
-	DEB_LIST="$@"
-	for i in $DEB_LIST; do
-		echo "deb: $i"
-		URL="$(obtain_deb_url "$i")"
-		DEB_NAME="${URL##*/}"
-		termux_download "$URL" "${TERMUX_PKG_CACHEDIR}/${DEB_NAME}" SKIP_CHECKSUM
-		mkdir -p "${TERMUX_PKG_TMPDIR}/${DEB_NAME}"
-		ar x "${TERMUX_PKG_CACHEDIR}/${DEB_NAME}" --output="${TERMUX_PKG_TMPDIR}/${DEB_NAME}"
-		tar xf "${TERMUX_PKG_TMPDIR}/${DEB_NAME}"/data.tar.* \
-			-C "${HOSTBUILD_ROOTFS}"
-	done
-	find "${HOSTBUILD_ROOTFS}" -type f -name '*.pc' | \
-		xargs -n 1 sed -i -e "s|/usr|${HOSTBUILD_ROOTFS}/usr|g"
-}
-
 termux_step_host_build() {
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
 		return
 	fi
 
 	_load_ubuntu_packages
-	_install_ubuntu_packages libffi8 \
-							libffi-dev \
-							libgc1 \
-							libgc-dev \
-							libgmp10 \
-							libgmp-dev \
-							libreadline8t64 \
-							libreadline-dev \
-							libgpm2 \
-							libtinfo6 \
-							libncurses6 \
-							libncursesw6 \
-							libncurses-dev \
-							libunistring5 \
-							libunistring-dev
+
+	local ubuntu_packages
+	ubuntu_packages+="libffi8,"
+	ubuntu_packages+="libffi-dev,"
+	ubuntu_packages+="libgc1,"
+	ubuntu_packages+="libgc-dev,"
+	ubuntu_packages+="libgmp10,"
+	ubuntu_packages+="libgmp-dev,"
+	ubuntu_packages+="libreadline8t64,"
+	ubuntu_packages+="libreadline-dev,"
+	ubuntu_packages+="libgpm2,"
+	ubuntu_packages+="libtinfo6,"
+	ubuntu_packages+="libncurses6,"
+	ubuntu_packages+="libncursesw6,"
+	ubuntu_packages+="libncurses-dev,"
+	ubuntu_packages+="libunistring5,"
+	ubuntu_packages+="libunistring-dev,"
+
+	termux_download_ubuntu_packages "$ubuntu_packages" \
+		"$HOSTBUILD_ROOTFS" \
+		"$HOSTBUILD_ARCH"
+
+	find "${HOSTBUILD_ROOTFS}" -type f -name '*.pc' | \
+		xargs -n 1 sed -i -e "s|/usr|${HOSTBUILD_ROOTFS}/usr|g"
 
 	export CFLAGS="-I${HOSTBUILD_ARCH_INCLUDEDIR} -I${HOSTBUILD_ROOTFS}${HOSTBUILD_ARCH_INCLUDEDIR}"
 	export LDFLAGS="-L${HOSTBUILD_ARCH_LIBDIR} -L${HOSTBUILD_ROOTFS}${HOSTBUILD_ARCH_LIBDIR}"
