@@ -1,0 +1,25 @@
+From e8d639cc48764dc548f36aedd5cd687c503bfee8 Mon Sep 17 00:00:00 2001
+From: alexytomi <60690056+alexytomi@users.noreply.github.com>
+Date: Sun, 29 Mar 2026 19:42:29 +0800
+Subject: [PATCH 2/3] Disable Tauri auto-update
+
+We can't have the user auto-updating
+---
+ src-tauri/src/lib.rs | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src-tauri/src/lib.rs b/src-tauri/src/lib.rs
+index f9592b48..0ce7f1f7 100644
+--- a/src-tauri/src/lib.rs
++++ b/src-tauri/src/lib.rs
+@@ -25,7 +25,6 @@ use tracing_subscriber::{Layer, Registry, fmt, layer::SubscriberExt, util::Subsc
+ pub fn run() {
+     tauri::Builder::default()
+         .plugin(tauri_plugin_process::init())
+-        .plugin(tauri_plugin_updater::Builder::new().build())
+         .plugin(tauri_plugin_opener::init())
+         .plugin(tauri_plugin_dialog::init())
+         .plugin(tauri_plugin_store::Builder::new().build())
+-- 
+2.53.0
+
