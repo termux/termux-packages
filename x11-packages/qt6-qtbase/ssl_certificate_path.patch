@@ -1,0 +1,23 @@
+--- a/src/network/ssl/qsslsocket.cpp
++++ b/src/network/ssl/qsslsocket.cpp
+@@ -2973,6 +2973,7 @@
+         ba("/etc/openssl/certs/"), // BlackBerry
+         ba("/opt/openssl/certs/"), // HP-UX
+         ba("/etc/ssl/"), // OpenBSD
++        ba("@TERMUX_PREFIX@/etc/tls/"), // Termux
+     };
+     QList<QByteArray> result = QList<QByteArray>::fromReadOnlyData(dirs);
+     if constexpr (isVxworks) {
+
+--- a/src/plugins/tls/openssl/qtlsbackend_openssl.cpp
++++ b/src/plugins/tls/openssl/qtlsbackend_openssl.cpp
+@@ -391,7 +391,8 @@
+         QSet<QString> certFiles = {
+             QStringLiteral("/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"), // Red Hat 2013+
+             QStringLiteral("/etc/pki/tls/certs/ca-bundle.crt"), // Red Hat older, Mandriva
+-            QStringLiteral("/usr/local/share/certs/ca-root-nss.crt") // FreeBSD's ca_root_nss
++            QStringLiteral("/usr/local/share/certs/ca-root-nss.crt"), // FreeBSD's ca_root_nss
++            QStringLiteral("@TERMUX_PREFIX@/etc/tls/cert.pem") // Termux ca-certificates
+         };
+
+         static const size_t extLen = strlen(".pem"); // or strlen(".crt")
