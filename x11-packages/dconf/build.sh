@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="dconf is a simple key/value storage system that is heavi
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.49.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/dconf/${TERMUX_PKG_VERSION%.*}/dconf-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=16a47e49a58156dbb96578e1708325299e4c19eea9be128d5bd12fd0963d6c36
 TERMUX_PKG_DEPENDS="dbus, glib"
