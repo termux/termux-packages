@@ -1,0 +1,30 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -311,6 +311,7 @@ endif()
+ 
+ if(NOT ANDROID_NO_TERMUX)
+   find_package(Boost 1.74 REQUIRED)
++  add_compile_definitions(HAS_OPENSL)
+ else()
+   find_package(oboe REQUIRED CONFIG)
+   find_package(flac REQUIRED CONFIG)
+--- a/client/CMakeLists.txt
++++ b/client/CMakeLists.txt
+@@ -97,6 +97,8 @@ if(ANDROID_NO_TERMUX)
+   list(APPEND CLIENT_LIBRARIES OpenSLES)
+ 
+ else()
++  list(APPEND CLIENT_SOURCES player/opensl_player.cpp)
++  list(APPEND CLIENT_LIBRARIES OpenSLES)
+   # Tremor (fixed-point) or libvorbis (floating-point)
+   if(TREMOR_FOUND)
+     list(APPEND CLIENT_LIBRARIES ${TREMOR_LIBRARIES})
+@@ -141,7 +143,7 @@ if(ANDROID_NO_TERMUX)
+   target_link_libraries(libsnapclient.so ${CLIENT_LIBRARIES} log OpenSLES)
+ else()
+   add_executable(snapclient ${CLIENT_SOURCES})
+-  target_link_libraries(snapclient ${CLIENT_LIBRARIES})
++  target_link_libraries(snapclient ${CLIENT_LIBRARIES} OpenSLES)
+ 
+   install(
+     TARGETS snapclient
