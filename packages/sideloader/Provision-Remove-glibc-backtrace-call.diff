@@ -1,0 +1,40 @@
+From bfa2cb1ed5e9a4cd51fd00963f6d65139ccb9f9a Mon Sep 17 00:00:00 2001
+From: alexytomi <60690056+alexytomi@users.noreply.github.com>
+Date: Wed, 10 Dec 2025 13:24:19 +0800
+Subject: [PATCH] [Provision] Remove glibc backtrace call
+
+For some reason, putting Android first isn't enough, the linux block
+needs deleting.
+---
+ lib/provision/androidlibrary.d | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/lib/provision/androidlibrary.d b/lib/provision/androidlibrary.d
+index 485a168..c048312 100644
+--- a/lib/provision/androidlibrary.d
++++ b/lib/provision/androidlibrary.d
+@@ -378,13 +378,14 @@ AndroidLibrary memoryOwner(size_t address) {
+     return null;
+ }
+ 
+-version (linux) {
+-    import core.sys.linux.execinfo;
+-    pragma(inline, true) AndroidLibrary rootLibrary() {
+-        enum MAXFRAMES = 4;
+-        void*[MAXFRAMES] callstack;
+-        auto numframes = backtrace(callstack.ptr, MAXFRAMES);
+-        return memoryOwner(cast(size_t) callstack[numframes - 1]);
++version(Android) {
++    pragma(LDC_intrinsic, "llvm.returnaddress")
++    ubyte* return_address(int);
++
++    import core.sys.windows.stacktrace;
++    pragma(inline, true) AndroidLibrary rootLibrary(ubyte* address = return_address(0)) {
++        assert(address != null);
++        return memoryOwner(cast(size_t) address);
+     }
+ } else version (LDC) { // Seems to work consistently, but LLVM only.
+     pragma(LDC_intrinsic, "llvm.returnaddress")
+-- 
+2.51.2
+
