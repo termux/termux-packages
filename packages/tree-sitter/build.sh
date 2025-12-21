@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://tree-sitter.github.io/
 TERMUX_PKG_DESCRIPTION="An incremental parsing system for programming tools"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
-TERMUX_PKG_VERSION="0.25.10"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="0.26.3"
 TERMUX_PKG_SRCURL=https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=ad5040537537012b16ef6e1210a572b927c7cdc2b99d1ee88d44a7dcdc3ff44c
+TERMUX_PKG_SHA256=7f4a7cf0a2cd217444063fe2a4d800bc9d21ed609badc2ac20c0841d67166550
 TERMUX_PKG_BREAKS="libtreesitter"
 TERMUX_PKG_REPLACES="libtreesitter"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -16,9 +15,13 @@ termux_pkg_auto_update() {
 	local latest_release
 	latest_release="$(termux_github_api_get_tag)"
 
+	# Since we specify a 'TERMUX_PKG_UPDATE_VERSION_REGEXP' we get back a range of tags.
+	# We should only return the first match against the RegEx for further checking.
 	if ! latest_release="$(grep --max-count=1 -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<< "${latest_release}")"; then
-		echo "INFO: Tag '${latest_release}' does not look like a stable version."
-		return
+		termux_error_exit <<- EOF
+			Failed to parse returned tag range.
+			$latest_release
+		EOF
 	fi
 
 	# Is there a new release?
@@ -27,33 +30,32 @@ termux_pkg_auto_update() {
 		return
 	fi
 
-	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
-		echo "INFO: package needs to be updated to ${latest_release}."
-		return
-	fi
-
-	# Do not forget to bump revision of reverse dependencies and rebuild them
-	# after SOVERSION is changed.
-	local _SOVERSION=0.25
+	# Do not forget to bump revision of reverse dependencies
+	# and rebuild them after SOVERSION has changed.
+	local _SOVERSION=0.26
 
 	# This blocks auto-updates to an incompatible SO version.
 	if [[ "${latest_release}" != "${_SOVERSION}".* ]]; then
-		echo "Latest release is '${latest_release}'" >&2
-		termux_error_exit "SOVERSION guard check failed."
+		termux_error_exit <<- EOF
+			SOVERSION guard check failed.
+			Latest release (${latest_release}) seems to contain breaking ABI changes.
+			'${latest_release}' != '${_SOVERSION}'
+		EOF
 	fi
 
+	# Bail here if we're not building packages
+	# since the step below modifies a setup script.
 	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
 		echo "INFO: package needs to be updated to ${latest_release}."
 		return
 	fi
 
-	# Figure out the new SHA256 for the `termux_setup_treesitter` function
-	local TS_BIN_URL TS_TMPFILE NEW_TS_SHA256
+	# Figure out the new SHA256 for the `termux_setup_treesitter` function.
+	local TS_BIN_URL NEW_TS_SHA256
 	TS_BIN_URL="https://github.com/tree-sitter/tree-sitter/releases/download/v${latest_release}/tree-sitter-linux-x64.gz"
-	TS_TMPFILE="$(mktemp)"
-	curl -sL "$TS_BIN_URL" -o "$TS_TMPFILE"
-	NEW_TS_SHA256="$(sha256sum "$TS_TMPFILE" | cut -d' ' -f1)"
+	NEW_TS_SHA256="$(curl -sL "$TS_BIN_URL" | sha256sum | cut -d' ' -f1)"
 
+	# Replace the SHA256 sum for the `tree-sitter` binary in `termux_setup_treesitter.sh`
 	sed \
 		-e "s|\(^\s*\)local TERMUX_TREE_SITTER_SHA256=[0-9a-f]*|\1local TERMUX_TREE_SITTER_SHA256=${NEW_TS_SHA256}|" \
 		-i "${TERMUX_SCRIPTDIR}/scripts/build/setup/termux_setup_treesitter.sh"
@@ -66,6 +68,10 @@ termux_step_pre_configure() {
 	# clash with rust host build
 	# causes 32bit builds to fail if set
 	unset CFLAGS
+
+	# error: function-like macro '__GLIBC_USE' is not defined
+	# solution borrowed from packages/oma/build.sh
+	export BINDGEN_EXTRA_CLANG_ARGS_${CARGO_TARGET_NAME//-/_}="--sysroot ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot --target=${CARGO_TARGET_NAME}"
 }
 
 termux_step_post_make_install() {
