@@ -4,16 +4,15 @@ TERMUX_PKG_LICENSE="PHP-3.01"
 TERMUX_PKG_LICENSE_FILE=LICENSE
 TERMUX_PKG_MAINTAINER="@termux"
 # Please revbump php-* extensions along with "minor" bump (e.g. 8.1.x to 8.2.0)
-TERMUX_PKG_VERSION="8.4.2"
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_VERSION="8.5.1"
 TERMUX_PKG_SRCURL=https://github.com/php/php-src/archive/php-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=5adb0def4110fcba4b84ab11d960e4dc58cab78b2d4e0a59bbef340a5c819f14
+TERMUX_PKG_SHA256=846f7c5bdb8c2ebb313c4ec25d92339bcbaf733743c9f6a7646e9a5134b90a8e
 TERMUX_PKG_AUTO_UPDATE=false
 # Build native php for phar to build (see pear-Makefile.frag.patch):
 TERMUX_PKG_HOSTBUILD=true
 # Build the native php without xml support as we only need phar:
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-libxml --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear --disable-sqlite3 --without-libxml --without-sqlite3 --without-pdo-sqlite"
-TERMUX_PKG_DEPENDS="libandroid-glob, libandroid-support, libbz2, libc++, libcurl, libffi, libgmp, libiconv, libicu, libresolv-wrapper, libsqlite, libxml2, libxslt, libzip, oniguruma, openssl, pcre2, readline, tidy, zlib"
+TERMUX_PKG_DEPENDS="capstone, libandroid-glob, libandroid-support, libbz2, libc++, libcurl, libffi, libgmp, libiconv, libicu, libresolv-wrapper, libsqlite, libxml2, libxslt, libzip, oniguruma, openssl, pcre2, readline, tidy, zlib"
 TERMUX_PKG_BUILD_DEPENDS="postgresql"
 TERMUX_PKG_CONFLICTS="php-mysql, php-dev"
 TERMUX_PKG_REPLACES="php-mysql, php-dev"
@@ -33,7 +32,7 @@ php_cv_lib_gd_gdImageCreateFromTga=yes
 --enable-calendar
 --enable-exif
 --enable-mbstring
---enable-opcache
+--with-capstone
 --enable-pcntl
 --enable-sockets
 --mandir=$TERMUX_PREFIX/share/man
@@ -162,7 +161,7 @@ termux_step_post_make_install() {
 	# Shared extensions for PHP/Apache
 	mkdir -p $TERMUX_PREFIX/lib/php-apache
 	local f
-	for f in opcache ldap pdo_pgsql pgsql sodium; do
+	for f in ldap pdo_pgsql pgsql sodium; do
 		local so=$TERMUX_PREFIX/lib/php-apache/${f}.so
 		rm -f ${so}
 		cp -T $TERMUX_PREFIX/lib/php/${f}.so ${so}
