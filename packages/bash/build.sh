@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/bash/
 TERMUX_PKG_DESCRIPTION="A sh-compatible shell that incorporates useful features from the Korn shell (ksh) and C shell (csh)"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
-TERMUX_PKG_VERSION=5.3.8
+TERMUX_PKG_VERSION=5.3.9
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/bash/bash-${TERMUX_PKG_VERSION%.*}.tar.gz
 TERMUX_PKG_SHA256=0d5cd86965f869a26cf64f4b71be7b96f90a3ba8b3d74e27e8e9d9d5550f31ba
 TERMUX_PKG_AUTO_UPDATE=false
@@ -47,6 +47,7 @@ termux_step_pre_configure() {
 	PATCH_CHECKSUMS[006]=29119addefed8eff91ae37fd51822c31780ee30d4a28376e96002706c995ff10
 	PATCH_CHECKSUMS[007]=c0976bbfffa1453c7cfdd62058f206a318568ff2d690f5d4fa048793fa3eb299
 	PATCH_CHECKSUMS[008]=097cd723cbfb8907674ac32214063a3fd85282657ec5b4e544d2c0f719653fb4
+	PATCH_CHECKSUMS[009]=eee30fe78a4b0cb2fe20e010e00308899cfc613e0774ebb3c8557a1552f24f8c
 
 	for PATCH_NUM in $(seq -f '%03g' "${_PATCH_VERSION}"); do
 		PATCHFILE=$TERMUX_PKG_CACHEDIR/bash_patch_${PATCH_NUM}.patch
