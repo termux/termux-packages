@@ -1,0 +1,27 @@
+From 02bb9aa64df706c756eedb1338883e084a7ae10d Mon Sep 17 00:00:00 2001
+From: alexytomi <60690056+alexytomi@users.noreply.github.com>
+Date: Sun, 21 Dec 2025 15:00:26 +0800
+Subject: [PATCH 2/5] [Sideloader] Remove glibc getpass call
+
+This is jank but it works
+---
+ frontends/cli/source/cli_frontend.d | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/frontends/cli/source/cli_frontend.d b/frontends/cli/source/cli_frontend.d
+index 8cc3968..ea3fc74 100644
+--- a/frontends/cli/source/cli_frontend.d
++++ b/frontends/cli/source/cli_frontend.d
+@@ -94,6 +94,9 @@ string readPasswordLine(string prompt) {
+     version (Windows) {
+         write(prompt.toStringz(), " [/!\\ The password will appear in clear text in the terminal]: ");
+         return readln().chomp();
++    } else version (Android){
++        write(prompt.toStringz(), " [/!\\ The password will appear in clear text in the terminal]: ");
++        return readln().chomp();
+     } else {
+         return fromStringz(cast(immutable) getpass(prompt.toStringz()));
+     }
+-- 
+2.51.2
+
