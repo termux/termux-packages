@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="TS query grammar for tree-sitter"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="0.8.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/tree-sitter-grammars/tree-sitter-query/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c2b23b9a54cffcc999ded4a5d3949daf338bebb7945dece229f832332e6e6a7d
 TERMUX_PKG_AUTO_UPDATE=true
@@ -15,6 +16,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	termux_setup_treesitter
+	export TREE_SITTER_ABI_VERSION=15
 }
 
 termux_step_post_make_install() {
