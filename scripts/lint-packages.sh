@@ -139,14 +139,16 @@ check_indentation() {
 	else
 		origin_url="unknown"
 	fi
-	if ! base_commit="$(git rev-list "origin/master.." --exclude-first-parent-only --reverse | head -n1)"; then
-		base_commit="HEAD~1"
-	fi
+
+	base_commit="$(git rev-list "origin/master.." --exclude-first-parent-only --reverse | head -n1)"
+	# On the master branch or failure `git rev-list "origin/master.."`
+	# won't return a commit, so set "HEAD" as a default value.
+	: "${base_commit:="HEAD"}"
 } 2> /dev/null
 
 # Also figure out if we have a `%ci:no-build` trailer in the commit range,
 # we may skip some checks later if yes.
-no_build="$(git log "$base_commit.." --fixed-strings --grep '%ci:no-build' --pretty=format:%H)"
+no_build="$(git log --fixed-strings --grep '%ci:no-build' --pretty=format:%H "$base_commit..")"
 
 check_version() {
 	local package_dir="${1%/*}"
