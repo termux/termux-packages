@@ -1,6 +1,6 @@
 termux_setup_gn() {
 	termux_setup_ninja
-	local GN_COMMIT=3ef7da38dcfb63212d97a987d5c60374134e1007
+	local GN_COMMIT=64d35867ca0a1088f13de8f4ccaf1a5687d7f1ce
 	local GN_TARFILE=$TERMUX_COMMON_CACHEDIR/gn_$GN_COMMIT.tar.gz
 	local GN_SOURCE=https://gn.googlesource.com/gn/+archive/$GN_COMMIT.tar.gz
 
@@ -25,14 +25,17 @@ termux_setup_gn() {
 			cd $GN_FOLDER
 			(
 				unset CC CXX CFLAGS CXXFLAGS LD LDFLAGS AR AS CPP OBJCOPY OBJDUMP RANLIB READELF STRIP
+				export CC="clang-${TERMUX_HOST_LLVM_MAJOR_VERSION}"
+				export CXX="clang++-${TERMUX_HOST_LLVM_MAJOR_VERSION}"
+				export LD="clang++-${TERMUX_HOST_LLVM_MAJOR_VERSION}"
 				export PATH="/usr/bin:$(echo -n $(tr ':' '\n' <<< "$PATH" | grep -v "^$TERMUX_PREFIX/bin$") | tr ' ' ':')"
 				./build/gen.py \
 					--no-last-commit-position
 				cat <<-EOF >./out/last_commit_position.h
 					#ifndef OUT_LAST_COMMIT_POSITION_H_
 					#define OUT_LAST_COMMIT_POSITION_H_
-					#define LAST_COMMIT_POSITION_NUM 2245
-					#define LAST_COMMIT_POSITION "2245 ${GN_COMMIT:0:12}"
+					#define LAST_COMMIT_POSITION_NUM 2311
+					#define LAST_COMMIT_POSITION "2311 ${GN_COMMIT:0:12}"
 					#endif  // OUT_LAST_COMMIT_POSITION_H_
 				EOF
 				ninja -C out/
