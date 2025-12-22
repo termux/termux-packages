@@ -10,7 +10,7 @@ TERMUX_PKG_AUTO_UPDATE=false
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
-TERMUX_PKG_DEPENDS="libc++, openssl, c-ares, libicu, libsqlite, zlib"
+TERMUX_PKG_DEPENDS="libc++, openssl, c-ares, libicu, libsqlite, zlib, python"
 TERMUX_PKG_CONFLICTS="nodejs-lts, nodejs-current"
 TERMUX_PKG_BREAKS="nodejs-dev"
 TERMUX_PKG_REPLACES="nodejs-current, nodejs-dev"
@@ -195,11 +195,65 @@ termux_step_make_install() {
 		_BUILD_DIR+="/Release/"
 	fi
 	python tools/install.py install --dest-dir="" --prefix "${TERMUX_PREFIX}" --build-dir "$_BUILD_DIR"
+
+	# Install helper script to check node-gyp build dependencies
+	mkdir -p $TERMUX_PREFIX/share/nodejs
+	cat <<- 'CHECKSCRIPT' > $TERMUX_PREFIX/share/nodejs/check-gyp-deps.sh
+#!/data/data/com.termux/files/usr/bin/sh
+# Check for node-gyp build dependencies in Termux
+# Usage: $PREFIX/share/nodejs/check-gyp-deps.sh
+
+MISSING=""
+
+check_pkg() {
+	if ! command -v "$1" > /dev/null 2>&1; then
+		MISSING="$MISSING $2"
+	fi
+}
+
+check_pkg python3 python
+check_pkg clang clang
+check_pkg make make
+check_pkg pkg-config pkg-config
+
+if [ -n "$MISSING" ]; then
+	echo "\033[1;33m[node-gyp] Missing build dependencies:\033[0m"
+	echo "  Run: pkg install$MISSING"
+	echo ""
+	exit 1
+fi
+
+echo "\033[1;32m[node-gyp] All build dependencies installed.\033[0m"
+exit 0
+CHECKSCRIPT
+	chmod 755 $TERMUX_PREFIX/share/nodejs/check-gyp-deps.sh
 }
 
 termux_step_create_debscripts() {
+	# Determine npm architecture from TERMUX_ARCH
+	local NPM_ARCH
+	case $TERMUX_ARCH in
+		aarch64) NPM_ARCH="arm64" ;;
+		arm) NPM_ARCH="arm" ;;
+		x86_64) NPM_ARCH="x64" ;;
+		i686) NPM_ARCH="ia32" ;;
+	esac
+
 	cat <<- EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
+	# Configure npm for Termux environment
 	npm config set foreground-scripts true
+
+	# Configure node-gyp paths for native module compilation
+	# Python interpreter for node-gyp
+	npm config set python $TERMUX_PREFIX/bin/python3
+
+	# Node.js headers location
+	npm config set nodedir $TERMUX_PREFIX
+
+	# Target architecture and platform
+	npm config set arch $NPM_ARCH
+	npm config set platform android
 	EOF
 }
+
