@@ -45,6 +45,28 @@ jobs:
         fetch-depth: 1000
     - name: Set process id limit for 32-bit builds depending on aosp-libs
       run: echo 65535 | sudo tee /proc/sys/kernel/pid_max
+    - name: Setup zram for packages that need more memory
+      run: |
+        LINUX_CHECKOUT_DIR=$(mktemp -d)
+        cd "$LINUX_CHECKOUT_DIR"
+        GIT_KERNEL_VERSION="$(uname -r | grep -o "^[0-9\\.]*")"
+        GIT_KERNEL_VERSION="${GIT_KERNEL_VERSION%%\.0}"
+        git clone https://kernel.googlesource.com/pub/scm/linux/kernel/git/stable/linux.git \
+          --branch "v${GIT_KERNEL_VERSION}" \
+          --depth 1 \
+          --single-branch
+        cd linux/drivers/block/zram
+
+        # We are basically doing a out-of-tree build for a module which is in-tree
+        # See docs: https://www.kernel.org/doc/html/latest/kbuild/modules.html
+        make -C /lib/modules/$(uname -r)/build/ M=$PWD
+        sudo make -C /lib/modules/$(uname -r)/build/ M=$PWD modules_install
+        sudo depmod
+        sudo modprobe zram
+        sudo zramctl /dev/zram0 --algorithm zstd --size 16G
+        sudo mkswap -U clear /dev/zram0
+        sudo swapon --discard --priority 100 /dev/zram0
+        rm -r "$LINUX_CHECKOUT_DIR"
     - name: Gather build summary
       id: build-info
       env:
