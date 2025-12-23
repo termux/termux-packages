@@ -49,18 +49,25 @@ jobs:
       run: |
         LINUX_CHECKOUT_DIR=$(mktemp -d)
         cd "$LINUX_CHECKOUT_DIR"
-        GIT_KERNEL_VERSION="$(uname -r | grep -o "^[0-9\\.]*")"
-        GIT_KERNEL_VERSION="${GIT_KERNEL_VERSION%%\.0}"
-        git clone https://kernel.googlesource.com/pub/scm/linux/kernel/git/stable/linux.git \
-          --branch "v${GIT_KERNEL_VERSION}" \
-          --depth 1 \
-          --single-branch
-        cd linux/drivers/block/zram
+        KERNEL_VERSION="$(uname -r | grep -o "^[0-9\\.]*")"
+        TAR_KERNEL_VERSION="${KERNEL_VERSION%\.0}"
+
+        curl -OL "https://cdn.kernel.org/pub/linux/kernel/v${KERNEL_VERSION%%\.*}.x/linux-${TAR_KERNEL_VERSION}.tar.xz"
+        curl -OL "https://cdn.kernel.org/pub/linux/kernel/v${KERNEL_VERSION%%\.*}.x/linux-${TAR_KERNEL_VERSION}.tar.sign"
+
+        gpg --import ${{ github.workspace }}/scripts/linux-kernel-signing-keys.gpg
+        unxz "linux-${TAR_KERNEL_VERSION}.tar.xz"
+        gpg --verify "linux-${TAR_KERNEL_VERSION}.tar.sign"
+        tar --extract -f "linux-${TAR_KERNEL_VERSION}.tar"
+        cd "linux-${TAR_KERNEL_VERSION}/"
 
         # We are basically doing a out-of-tree build for a module which is in-tree
         # See docs: https://www.kernel.org/doc/html/latest/kbuild/modules.html
-        make -C /lib/modules/$(uname -r)/build/ M=$PWD
-        sudo make -C /lib/modules/$(uname -r)/build/ M=$PWD modules_install
+        cd drivers/block/zram/
+        make -C /lib/modules/$(uname -r)/build/ M=$PWD -j$(nproc)
+        zstd zram.ko
+        sudo cp zram.ko.zst /lib/modules/$(uname -r)/kernel/
+
         sudo depmod
         sudo modprobe zram
         sudo zramctl /dev/zram0 --algorithm zstd --size 16G
