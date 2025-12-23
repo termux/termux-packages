@@ -48,6 +48,7 @@ jobs:
     - name: Extract VM kernel version for module compilation
       id: kernel-info
       run: |
+        set -euo pipefail
         KERNEL_VERSION="$(uname -r | grep -o "^[0-9\\.]*")"
         TAR_KERNEL_VERSION="${KERNEL_VERSION%\.0}"
 
@@ -65,6 +66,7 @@ jobs:
     - name: Build zram kernel module
       if: steps.cache-zram.outputs.cache-hit != 'true'
       run: |
+        set -euo pipefail
         KERNEL_VERSION=${{ steps.kernel-info.outputs.kernel_version }}
         TAR_KERNEL_VERSION=${{ steps.kernel-info.outputs.tar_version}}
         MODULES_DIR=${{ steps.kernel-info.outputs.modules_dir }}
@@ -93,6 +95,7 @@ jobs:
 
     - name: Enable zram kernel module
       run: |
+        set -euo pipefail
         sudo cp scripts/zram.ko.zst ${{ steps.kernel-info.outputs.modules_dir }}/kernel/
         sudo depmod
         sudo modprobe zram
