@@ -1,14 +1,13 @@
-TERMUX_PKG_HOMEPAGE=https://www.kde.org/
+TERMUX_PKG_HOMEPAGE="https://invent.kde.org/frameworks/kitemmodels"
 TERMUX_PKG_DESCRIPTION="Set of item models extending the Qt model-view framework (KDE)"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.21.0"
-_KF6_MINOR_VERSION="${TERMUX_PKG_VERSION%.*}"
-TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${_KF6_MINOR_VERSION}/kitemmodels-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=59390b6ca4cf4a305e39b11080e1aef72c536be572f00f428d1d961ad250bdee
+TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kitemmodels-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SHA256="59390b6ca4cf4a305e39b11080e1aef72c536be572f00f428d1d961ad250bdee"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, qt6-qtbase, qt6-qtdeclarative"
-TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${_KF6_MINOR_VERSION}), qt6-qttools"
+TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION%.*}), qt6-qttools"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_SYSTEM_NAME=Linux
 -DKDE_INSTALL_QMLDIR=lib/qt6/qml
