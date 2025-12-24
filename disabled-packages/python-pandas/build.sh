@@ -18,11 +18,3 @@ termux_step_pre_configure() {
 termux_step_make_install() {
 	pip install --no-deps --no-build-isolation . --prefix $TERMUX_PREFIX
 }
-
-termux_step_create_debscripts() {
-	cat <<- EOF > ./postinst
-	#!$TERMUX_PREFIX/bin/sh
-	echo "Installing dependencies through pip..."
-	pip3 install ${TERMUX_PKG_PYTHON_TARGET_DEPS//, / }
-	EOF
-}

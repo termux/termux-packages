@@ -15,6 +15,7 @@ LICENSE/LICENSE_STIX
 LICENSE/LICENSE_YORICK"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.10.8"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/matplotlib/matplotlib/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=dbc50c7b15bb8d7dbe51a27a58322ed73f09291772d9e3184f03f11c576693f7
 TERMUX_PKG_AUTO_UPDATE=true
@@ -57,12 +58,4 @@ termux_step_make_install() {
 	local _pyv="${TERMUX_PYTHON_VERSION/./}"
 	local _whl="matplotlib-$TERMUX_PKG_VERSION-cp$_pyv-cp$_pyv-linux_$TERMUX_ARCH.whl"
 	pip install --no-deps --prefix=$TERMUX_PREFIX --force-reinstall $TERMUX_PKG_SRCDIR/dist/$_whl
-}
-
-termux_step_create_debscripts() {
-	cat <<- EOF > ./postinst
-	#!$TERMUX_PREFIX/bin/sh
-	echo "Installing dependencies through pip. This may take a while..."
-	MATHLIB="m" pip3 install matplotlib
-	EOF
 }
