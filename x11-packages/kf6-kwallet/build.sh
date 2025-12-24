@@ -1,13 +1,12 @@
-TERMUX_PKG_HOMEPAGE='https://community.kde.org/Frameworks'
+TERMUX_PKG_HOMEPAGE='https://invent.kde.org/frameworks/kwallet'
 TERMUX_PKG_DESCRIPTION='Secure and unified container for user passwords'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.21.0"
-_KF6_MINOR_VERSION="${TERMUX_PKG_VERSION%.*}"
-TERMUX_PKG_SRCURL=https://download.kde.org/stable/frameworks/${_KF6_MINOR_VERSION}/kwallet-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=040d9eae74ec5164c0c20e59469f74c25b0139c9e55eef3e9f3bfa5a2e087f48
-TERMUX_PKG_DEPENDS="gpgme, gpgmepp, kf6-kcolorscheme (>= ${_KF6_MINOR_VERSION}), kf6-kconfig (>= ${_KF6_MINOR_VERSION}), kf6-kcoreaddons (>= ${_KF6_MINOR_VERSION}), kf6-kcrash (>= ${_KF6_MINOR_VERSION}), kf6-kdbusaddons (>= ${_KF6_MINOR_VERSION}), kf6-ki18n (>= ${_KF6_MINOR_VERSION}), kf6-knotifications (>= ${_KF6_MINOR_VERSION}), kf6-kwidgetsaddons (>= ${_KF6_MINOR_VERSION}), kf6-kwindowsystem (>= ${_KF6_MINOR_VERSION}), libc++, libgcrypt, libsecret, qca, qt6-qtbase"
-TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${_KF6_MINOR_VERSION}), kf6-kservice (>= ${_KF6_MINOR_VERSION}), qt6-qttools"
+TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kwallet-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SHA256="040d9eae74ec5164c0c20e59469f74c25b0139c9e55eef3e9f3bfa5a2e087f48"
+TERMUX_PKG_DEPENDS="gpgme, gpgmepp, kf6-kcolorscheme (>= ${TERMUX_PKG_VERSION%.*}), kf6-kconfig (>= ${TERMUX_PKG_VERSION%.*}), kf6-kcoreaddons (>= ${TERMUX_PKG_VERSION%.*}), kf6-kcrash (>= ${TERMUX_PKG_VERSION%.*}), kf6-kdbusaddons (>= ${TERMUX_PKG_VERSION%.*}), kf6-ki18n (>= ${TERMUX_PKG_VERSION%.*}), kf6-knotifications (>= ${TERMUX_PKG_VERSION%.*}), kf6-kwidgetsaddons (>= ${TERMUX_PKG_VERSION%.*}), kf6-kwindowsystem (>= ${TERMUX_PKG_VERSION%.*}), libc++, libgcrypt, libsecret, qca, qt6-qtbase"
+TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION%.*}), kf6-kservice (>= ${TERMUX_PKG_VERSION%.*}), qt6-qttools"
 # TERMUX_PKG_RECOMMENDS="kwalletmanager"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
