@@ -5,12 +5,12 @@ TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=523f7004dce885fe38b4f80e34a8f76dc8ea98b5
 _COMMIT_DATE=20250201
 TERMUX_PKG_VERSION=1.1.1-p${_COMMIT_DATE}
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=git+https://github.com/libimobiledevice/usbmuxd
 TERMUX_PKG_SHA256=7943adb00031c05a6db3b7e822b5147e32988c9b79d29fd4656a2e1f733181de
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libimobiledevice-glue, libplist, libusb"
+TERMUX_PKG_DEPENDS="libimobiledevice-glue, libplist, libusb, termux-api, jq"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-preflight
 --without-systemd
@@ -36,4 +36,10 @@ termux_step_post_get_source() {
 
 termux_step_pre_configure() {
 	autoreconf -fi
+}
+
+termux_step_post_make_install() {
+	mv "$TERMUX_PREFIX/bin/usbmuxd" "$TERMUX_PREFIX/bin/usbmuxd-bin"
+	$CC $CFLAGS $CPPFLAGS $LDFLAGS $TERMUX_PKG_BUILDER_DIR/usbmuxd-helper/usbmuxd-helper.c -lusb-1.0 -o "$TERMUX_PREFIX/libexec/usbmuxd-helper"
+	install -Dm755 "$TERMUX_PKG_BUILDER_DIR/usbmuxd-helper/usbmuxd" -t "$TERMUX_PREFIX/bin"
 }

@@ -1,0 +1,103 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -euo pipefail
+handle_sigint() {
+	echo -e "\nShutting down usbmuxd"
+	usbmuxd-bin -X
+	exit 130 # SIGINT
+}
+trap handle_sigint SIGINT
+loop_refresh_usb_fd() {
+	local cmd_once="$1"
+	local cmd_repeat="$2"
+	[[ -z $cmd_once || -z $cmd_repeat ]] && {
+		printf 'Usage: loop_refresh_usb_fd "cmd_once" "cmd_repeat" \n' >&2
+		return 2
+	}
+	if ! eval "$cmd_once" &> /dev/null; then
+		echo "Failed to start usbmuxd..retrying"
+		return
+	fi
+	sleep 3 # Give it some time to boot up
+	# First time checks to see if it really launched
+	if ! eval "$cmd_repeat" &> /dev/null; then
+		if ! eval pgrep -x usbmuxd-bin &> /dev/null; then
+			# Should never happen unless it somehow took too long to start or got killed
+			# We supress log output so have the user troubleshoot it by manually starting
+			echo "usbmuxd failed to run. Please try running it manually using \'termux-api-start && $cmd_once\'"
+			usbmuxd-bin -X
+			exit 1
+		else
+      # Possibly remove this and just swap out the repeat command with idevicepair pair.
+
+      # Imitates what happens on desktop, requesting trust as soon as plugged in. Some
+      # programs that rely on usbmuxd don't handle when a device is not paired (LOCKDOWN_E_INVALID_HOST_ID)
+      # so it is best to pair them upon connection.
+			echo "Can't connect to iDevice. Assuming unpaired. Please press \"trust\" on the iDevice."
+			idevicepair pair &> /dev/null || true
+			echo "Press any key after trusting to continue starting usbmuxd"
+			read -r -n1
+			idevicepair pair &> /dev/null || true
+		fi
+	fi
+	echo "USB device connected! usbmuxd running. Ctrl+c to stop"
+	while true; do
+		if ! eval "$cmd_repeat" &> /dev/null; then
+			echo "USB device disconnected!"
+			break
+		fi
+		sleep 0.5
+	done
+}
+# Make sure Termux:API is accessable first
+echo "Notice: We can currently only interact with one device at a time due to termux-usb limitations"
+echo "Starting Termux:API for requesting USB access, please make sure your iDevice is plugged in and unlocked and the Termux:API plugin app is installed."
+termux-api-start >/dev/null || exit_code=$?
+exit_code=${exit_code:-0}
+if [[ $exit_code != 0 ]]; then
+	echo "Failed to start Termux:API service. Is companion app installed?"
+	exit "$exit_code"
+fi
+
+while true; do
+	# TODO: Adapt to https://github.com/termux/termux-api/pull/759
+	# Rewrite the script to target vendorId when requesting permission once the PR is merged so we target only iDevices.
+	while true; do
+		readarray -t deviceArray < <(
+			termux-api-start &> /dev/null || :
+			termux-usb -l | jq -r '.[]'
+		)
+		if [ "${#deviceArray[@]}" -eq 0 ]; then
+			echo -ne "\033[2K\rNo USB devices found. Please make sure the iDevice is the USB host."
+			sleep 0.5
+		else
+			echo -ne "\033[2K\r${#deviceArray[@]} USB device(s) found! Starting usbmuxd... \n"
+			break
+		fi
+	done
+	for dev in "${deviceArray[@]}"; do
+		echo "Requesting USB permission. If prompted for the iDevice, please allow... "
+		exit_code=0
+		usb_info=$(termux-usb -r -e "$PREFIX"/libexec/usbmuxd-helper "$dev") || exit_code=$?
+		if [[ $exit_code != 0 ]]; then
+			echo "Permission denied. Continuing to next device."
+			continue
+		fi
+		read -r vid pid product manufacturer <<<"$usb_info"
+		if [[ $vid == "05ac" ]]; then # Apple's vendorId
+			usbmuxd-bin -X # Kill any running usbmuxd's
+			sleep 0.5      # Give it some time to die
+			loop_refresh_usb_fd "termux-usb -r -E -e usbmuxd-bin $dev" "idevicename"
+			rescan=true # Rescan devices upon disconnect
+			continue
+		else
+			echo "Not an iDevice:" "$vid":"$pid" "$product" "$manufacturer"". Continuing to the next device."
+			continue
+		fi
+	done
+	if [[ $rescan == "true" ]]; then
+		rescan=false
+		continue
+	fi
+	echo "No more devices found. Either no iDevice was found or it was not given permission. Run \"usbmuxd\" again to retry"
+	exit 2
+done
