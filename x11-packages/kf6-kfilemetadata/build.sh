@@ -1,13 +1,12 @@
-TERMUX_PKG_HOMEPAGE='https://community.kde.org/Frameworks'
+TERMUX_PKG_HOMEPAGE='https://invent.kde.org/frameworks/kfilemetadata'
 TERMUX_PKG_DESCRIPTION='A library for extracting file metadata'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.21.0"
-_KF6_MINOR_VERSION="${TERMUX_PKG_VERSION%.*}"
-TERMUX_PKG_SRCURL=https://download.kde.org/stable/frameworks/${_KF6_MINOR_VERSION}/kfilemetadata-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=d8fdfcc5434200b26ca2e46e13c422d415b77ad86213d561526da816f653f0a4
-TERMUX_PKG_DEPENDS="attr, ebook-tools, exiv2, ffmpeg, kf6-karchive (>= ${_KF6_MINOR_VERSION}), kf6-kcodecs (>= ${_KF6_MINOR_VERSION}), kf6-kconfig (>= ${_KF6_MINOR_VERSION}), kf6-kcoreaddons (>= ${_KF6_MINOR_VERSION}), kf6-ki18n (>= ${_KF6_MINOR_VERSION}), libc++, poppler-qt, qt6-qtbase, taglib"
-TERMUX_PKG_BUILD_DEPENDS="catdoc, extra-cmake-modules (>= ${_KF6_MINOR_VERSION}), kdegraphics-mobipocket, qt6-qttools"
+TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kfilemetadata-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SHA256="d8fdfcc5434200b26ca2e46e13c422d415b77ad86213d561526da816f653f0a4"
+TERMUX_PKG_DEPENDS="attr, ebook-tools, exiv2, ffmpeg, kf6-karchive (>= ${TERMUX_PKG_VERSION%.*}), kf6-kcodecs (>= ${TERMUX_PKG_VERSION%.*}), kf6-kconfig (>= ${TERMUX_PKG_VERSION%.*}), kf6-kcoreaddons (>= ${TERMUX_PKG_VERSION%.*}), kf6-ki18n (>= ${TERMUX_PKG_VERSION%.*}), libc++, poppler-qt, qt6-qtbase, taglib"
+TERMUX_PKG_BUILD_DEPENDS="catdoc, extra-cmake-modules (>= ${TERMUX_PKG_VERSION%.*}), kdegraphics-mobipocket, qt6-qttools"
 TERMUX_PKG_RECOMMENDS="catdoc, kdegraphics-mobipocket"
 TERMUX_PKG_AUTO_UPDATE=true
 # libappimage can be added to TERMUX_PKG_BUILD_DEPENDS and TERMUX_PKG_RECOMMENDS when available
