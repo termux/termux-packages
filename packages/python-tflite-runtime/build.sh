@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="TensorFlow Lite Python bindings"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.20.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/tensorflow/tensorflow
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="python, python-numpy, python-pip"
@@ -40,7 +41,7 @@ termux_step_pre_configure() {
 	local BUILD_DIR="$TFLITE_BUILD_DIR"
 	local PYTHON="$(command -v python)"
 	local PYBIND11_INCLUDE=$($PYTHON -c "import pybind11; print (pybind11.get_include())")
-	CPPFLAGS+=" -I$PYTHON_SITE_PKG/numpy/_core/include"
+	CPPFLAGS+=" -I$TERMUX_PYTHON_HOME/site-packages/numpy/_core/include"
 	CPPFLAGS+=" -I$PYBIND11_INCLUDE"
 	CPPFLAGS+=" -I$TERMUX_PREFIX/include/python$TERMUX_PYTHON_VERSION"
 	CPPFLAGS+=" $TF_CXX_FLAGS"
@@ -81,5 +82,5 @@ termux_step_make() {
 termux_step_make_install() {
 	local _pyver="${TERMUX_PYTHON_VERSION//./}"
 	local _wheel="tflite_runtime-${TERMUX_PKG_VERSION}-cp${_pyver}-cp${_pyver}-linux_${TERMUX_ARCH}.whl"
-	pip install --no-deps --prefix="$TERMUX_PREFIX" "$TFLITE_BUILD_DIR/dist/${_wheel}"
+	pip install --force-reinstall --no-deps --prefix="$TERMUX_PREFIX" "$TFLITE_BUILD_DIR/dist/${_wheel}"
 }
