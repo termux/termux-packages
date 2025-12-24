@@ -397,6 +397,10 @@ termux_step_post_massage() {
 # shellcheck source=scripts/build/termux_step_create_debscripts.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_debscripts.sh"
 
+# Function to generate debscripts for python packages.
+# shellcheck source=scripts/build/termux_step_create_python_debscripts.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_python_debscripts.sh"
+
 # Convert Debian maintainer scripts into pacman-compatible installation hooks.
 # This is used only when creating pacman packages.
 # shellcheck source=scripts/build/termux_step_create_pacman_install_hook.sh

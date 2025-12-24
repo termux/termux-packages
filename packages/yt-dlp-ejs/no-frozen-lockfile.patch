@@ -1,0 +1,14 @@
+Avoids error:
+ERR_PNPM_OUTDATED_LOCKFILE Cannot install with "frozen-lockfile" because pnpm-lock.yaml is not up to date with <ROOT>/package.json
+
+--- a/pnpm.py
++++ b/pnpm.py
+@@ -21,7 +21,7 @@ class CustomBuildHook(BuildHookInterface):
+             )
+         print(f"Building with {name}...")
+ 
+-        pnpm(["install", "--frozen-lockfile"])
++        pnpm(["install"])
+         pnpm(["run", "bundle"])
+ 
+         build_data["force_include"].update(

@@ -1,0 +1,203 @@
+diff --git a/debpython/debpython/__init__.py b/debpython/debpython/__init__.py
+index fa6b667..b3b63e1 100644
+--- a/debpython/debpython/__init__.py
++++ b/debpython/debpython/__init__.py
+@@ -8,7 +8,7 @@ from subprocess import PIPE, Popen
+ from pickle import dumps
+ 
+ log = logging.getLogger(__name__)
+-PUBLIC_DIR_RE = re.compile(r'.*?/usr/lib/python(\d(?:.\d+)?)/(site|dist)-packages')
++PUBLIC_DIR_RE = re.compile(r'.*?@TERMUX_PREFIX@/lib/python(\d(?:.\d+)?)/(site|dist)-packages')
+ 
+ 
+ class memoize:
+diff --git a/debpython/debpython/files.py b/debpython/debpython/files.py
+index 39ef978..5899a7a 100644
+--- a/debpython/debpython/files.py
++++ b/debpython/debpython/files.py
+@@ -48,7 +48,20 @@ def from_package(package_name, extensions=('.py',)):
+     extensions = tuple(extensions)  # .endswith doesn't like list
+     env = environ.copy()
+     env["LC_ALL"] = "C.UTF-8"
+-    process = Popen(('/usr/bin/dpkg', '-L', package_name), stdout=PIPE,
++    env["LD_PRELOAD"] = ""
++    process = Popen(['@TERMUX_PREFIX@/bin/bash', '-c',
++        'source @TERMUX_PREFIX_CLASSICAL@/bin/termux-setup-package-manager && echo ${TERMUX_APP_PACKAGE_MANAGER}'],
++        stdout=PIPE)
++    termux_app_package_manager = process.communicate()[0].decode()[0:-1]
++    if termux_app_package_manager == "apt":
++        package_manager = "@TERMUX_PREFIX_CLASSICAL@/bin/dpkg"
++        package_manager_list_argument = "-L"
++    elif termux_app_package_manager == "pacman":
++        package_manager = "@TERMUX_PREFIX_CLASSICAL@/bin/pacman"
++        package_manager_list_argument = "-Qql"
++    else:
++        raise Exception(f"cannot determine system package manager ({termux_app_package_manager})!")
++    process = Popen((package_manager, package_manager_list_argument, package_name), stdout=PIPE,
+                          stderr=PIPE, env=env)
+     stdout, stderr = process.communicate()
+     if process.returncode != 0:
+diff --git a/debpython/debpython/interpreter.py b/debpython/debpython/interpreter.py
+index 45b14db..6334661 100644
+--- a/debpython/debpython/interpreter.py
++++ b/debpython/debpython/interpreter.py
+@@ -171,16 +171,16 @@ class Interpreter:
+         #if not version:
+         #    version = Version(DEFAULT)
+         if self.impl == 'pypy':
+-            path = '/usr/lib/pypy/dist-packages/'
++            path = '@TERMUX_PREFIX@/lib/pypy/dist-packages/'
+         elif version << Version('2.6'):
+-            path = "/usr/lib/python%s/site-packages/" % version
++            path = "@TERMUX_PREFIX@/lib/python%s/site-packages/" % version
+         elif version << Version('3.0'):
+-            path = "/usr/lib/python%s/dist-packages/" % version
++            path = "@TERMUX_PREFIX@/lib/python%s/dist-packages/" % version
+         else:
+-            path = '/usr/lib/python3/dist-packages/'
++            path = '@TERMUX_PREFIX@/lib/python@TERMUX_PYTHON_VERSION@/site-packages/'
+ 
+         if gdb:
+-            path = "/usr/lib/debug%s" % path
++            path = "@TERMUX_PREFIX@/lib/debug%s" % path
+         if package:
+             path = "debian/%s%s" % (package, path)
+ 
+diff --git a/debpython/debpython/version.py b/debpython/debpython/version.py
+index 2d7ed69..f4abf31 100644
+--- a/debpython/debpython/version.py
++++ b/debpython/debpython/version.py
+@@ -42,13 +42,8 @@ log = logging.getLogger(__name__)
+ _supported = environ.get('DEBPYTHON3_SUPPORTED')
+ _default = environ.get('DEBPYTHON3_DEFAULT')
+ if not _supported or not _default:
+-    _config = ConfigParser()
+-    _config.read('/usr/share/python3/debian_defaults')
+-    if not _default:
+-        _default = _config.get('DEFAULT', 'default-version')[6:]
+-    if not _supported:
+-        _supported = _config.get('DEFAULT', 'supported-versions')\
+-            .replace('python', '')
++    _supported = "@TERMUX_PYTHON_VERSION@"
++    _default = _supported
+ try:
+     DEFAULT = tuple(int(i) for i in _default.split('.'))
+ except Exception:
+@@ -257,10 +252,10 @@ def get_requested_versions(vrange=None, available=None):
+ 
+     if available:
+         versions = set(v for v in versions
+-                       if exists("/usr/bin/python%d.%d" % v))
++                       if exists("@TERMUX_PREFIX@/bin/python%d.%d" % v))
+     elif available is False:
+         versions = set(v for v in versions
+-                       if not exists("/usr/bin/python%d.%d" % v))
++                       if not exists("@TERMUX_PREFIX@/bin/python%d.%d" % v))
+ 
+     return versions
+ 
+diff --git a/debpython/py3clean b/debpython/py3clean
+index 8e7c3f3..62edeb5 100755
+--- a/debpython/py3clean
++++ b/debpython/py3clean
+@@ -1,4 +1,4 @@
+-#! /usr/bin/python3
++#! @TERMUX_PREFIX@/bin/python@TERMUX_PYTHON_VERSION@
+ # vim: et ts=4 sw=4
+ 
+ # Copyright © 2010-2012 Piotr Ożarowski <piotr@debian.org>
+@@ -27,7 +27,7 @@ import sys
+ from glob import glob
+ from os import environ, remove, rmdir
+ from os.path import dirname, basename, exists, join, splitext
+-sys.path.insert(1, '/usr/share/python3/')
++sys.path.insert(1, '@TERMUX_PREFIX@/lib/python@TERMUX_PYTHON_VERSION@/')
+ from debpython import files as dpf
+ from debpython.interpreter import Interpreter
+ from debpython.version import SUPPORTED, getver, vrepr
+@@ -156,13 +156,13 @@ def destroyer(magic_tag=None):  # ;-)
+ 
+ def main():
+     usage = '%prog [-V VERSION] [-p PACKAGE] [DIR_OR_FILE]'
+-    parser = optparse.OptionParser(usage, version='%prog DEVELV')
++    parser = optparse.OptionParser(usage, version='%prog @TERMUX_PKG_FULLVERSION@')
+     parser.add_option('-v', '--verbose', action='store_true', dest='verbose',
+                       help='turn verbose mode on')
+     parser.add_option('-q', '--quiet', action='store_false', dest='verbose',
+                       default=False, help='be quiet')
+     parser.add_option('-p', '--package',
+-                      help='specify Debian package name to clean')
++                      help='specify Termux package name to clean')
+     parser.add_option('-V', dest='version',
+                       help='specify Python version to clean')
+ 
+diff --git a/debpython/py3compile b/debpython/py3compile
+index 14cbf4e..f2b0fed 100755
+--- a/debpython/py3compile
++++ b/debpython/py3compile
+@@ -1,4 +1,4 @@
+-#! /usr/bin/python3
++#! @TERMUX_PREFIX@/bin/python@TERMUX_PYTHON_VERSION@
+ # vim: et ts=4 sw=4
+ 
+ # Copyright © 2010-2012 Piotr Ożarowski <piotr@debian.org>
+@@ -30,7 +30,7 @@ import sys
+ from os import environ, listdir, mkdir
+ from os.path import dirname, exists, isdir, join
+ from subprocess import PIPE, Popen
+-sys.path.insert(1, '/usr/share/python3/')
++sys.path.insert(1, '@TERMUX_PREFIX@/lib/python@TERMUX_PYTHON_VERSION@/')
+ from debpython.version import SUPPORTED, debsorted, vrepr, \
+     get_requested_versions, parse_vrange, getver
+ from debpython import files as dpf, PUBLIC_DIR_RE, memoize
+@@ -56,7 +56,7 @@ Examples:
+ 
+ ### EXCLUDES ###################################################
+ @memoize
+-def get_exclude_patterns_from_dir(name='/usr/share/python3/bcep/'):
++def get_exclude_patterns_from_dir(name='@TERMUX_PREFIX@/share/python3/bcep/'):
+     """Return patterns for files that shouldn't be bytecompiled."""
+     if not isdir(name):
+         return []
+@@ -156,7 +156,7 @@ def filter_files(files, e_patterns, compile_versions):
+ def py_compile(version, optimize, workers):
+     if not isinstance(version, str):
+         version = vrepr(version)
+-    cmd = ["/usr/bin/python" + version]
++    cmd = ["@TERMUX_PREFIX@/bin/python" + version]
+     if optimize:
+         cmd.append("-O")
+     cmd += ["-m", "py_compile",  "-"]
+@@ -224,7 +224,7 @@ def compile(files, versions, force, optimize, e_patterns=None):
+ def main():
+     usage = '%prog [-V [X.Y][-][A.B]] DIR_OR_FILE [-X REGEXPR]\n' +\
+         '       %prog -p PACKAGE'
+-    parser = optparse.OptionParser(usage, version='%prog DEVELV',
++    parser = optparse.OptionParser(usage, version='%prog @TERMUX_PKG_FULLVERSION@',
+                                    option_class=Option)
+     parser.add_option('-v', '--verbose', action='store_true', dest='verbose',
+                       help='turn verbose mode on')
+@@ -236,7 +236,7 @@ def main():
+     parser.add_option('-O', action='store_true', dest='optimize',
+                       default=False, help="byte-compile to .pyo files")
+     parser.add_option('-p', '--package',
+-                      help='specify Debian package name whose files should be bytecompiled')
++                      help='specify Termux package name whose files should be bytecompiled')
+     parser.add_option('-V', type='version_range', dest='vrange',
+                       help="""force private modules to be bytecompiled
+ with Python version from given range, regardless of the default Python version
+@@ -262,12 +262,12 @@ You may use this option multiple times to build up a list of things to exclude.'
+ 
+     if options.regexpr and not args:
+         parser.error('--exclude option works with private directories '
+-                     'only, please use /usr/share/python3/bcep to specify '
++                     'only, please use @TERMUX_PREFIX@/share/python3/bcep to specify '
+                      'public modules to skip')
+ 
+     if options.vrange and options.vrange[0] == options.vrange[1] and\
+             options.vrange != (None, None) and\
+-            exists("/usr/bin/python%d.%d" % options.vrange[0]):
++            exists("@TERMUX_PREFIX@/bin/python%d.%d" % options.vrange[0]):
+         # specific version requested, use it even if it's not in SUPPORTED
+         versions = {options.vrange[0]}
+     else:

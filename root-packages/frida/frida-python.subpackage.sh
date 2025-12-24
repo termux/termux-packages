@@ -22,9 +22,4 @@ share/fish
 TERMUX_SUBPKG_DEPENDS="libandroid-support, python, python-pip"
 TERMUX_SUBPKG_CONFLICTS="frida-tools (<< 15.1.24)"
 TERMUX_SUBPKG_REPLACES="frida-tools (<< 15.1.24)"
-
-# See install_requires in https://github.com/frida/frida-tools/blob/main/setup.py
-termux_step_create_subpkg_debscripts() {
-	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
-	echo "pip${TERMUX_PYTHON_VERSION} install 'prompt-toolkit>=2.0.0,<4.0.0' 'colorama>=0.2.7,<1.0.0' 'pygments>=2.0.2,<3.0.0' 'websockets>=13.0.0,<14.0.0'" >> postinst
-}
+TERMUX_SUBPKG_PYTHON_RUNTIME_DEPS="'prompt-toolkit>=2.0.0,<4.0.0', 'colorama>=0.2.7,<1.0.0', 'pygments>=2.0.2,<3.0.0', 'websockets>=13.0.0,<14.0.0'"
