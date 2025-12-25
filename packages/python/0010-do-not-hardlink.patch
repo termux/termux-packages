@@ -1,15 +1,17 @@
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index a7dc9709d62..d6b84dc8905 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -817,7 +817,7 @@ $(LIBRARY): $(LIBRARY_OBJS)
- libpython$(LDVERSION).so: $(LIBRARY_OBJS) $(DTRACE_OBJS)
- 	if test $(INSTSONAME) != $(LDLIBRARY); then \
- 		$(BLDSHARED) -Wl,-h$(INSTSONAME) -o $(INSTSONAME) $(LIBRARY_OBJS) $(MODLIBS) $(SHLIBS) $(LIBC) $(LIBM); \
--		$(LN) -f $(INSTSONAME) $@; \
-+		$(LN) -sf $(INSTSONAME) $@; \
- 	else \
+@@ -917,7 +917,7 @@ libpython$(LDVERSION).so: $(LIBRARY_OBJS) $(DTRACE_OBJS)
  		$(BLDSHARED) -o $@ $(LIBRARY_OBJS) $(MODLIBS) $(SHLIBS) $(LIBC) $(LIBM); \
  	fi
-@@ -1971,7 +1971,7 @@ altbininstall: $(BUILDPYTHON) @FRAMEWORKPYTHONW@
+ 	if test $(INSTSONAME) != $@; then \
+-		$(LN) -f $(INSTSONAME) $@; \
++		$(LN) -sf $(INSTSONAME) $@; \
+ 	fi
+ 
+ libpython3.so:	libpython$(LDVERSION).so
+@@ -2202,7 +2202,7 @@ altbininstall: $(BUILDPYTHON) @FRAMEWORKPYTHONW@
  		if test -f $(DESTDIR)$(BINDIR)/python$(VERSION)$(EXE) -o -h $(DESTDIR)$(BINDIR)/python$(VERSION)$(EXE); \
  		then rm -f $(DESTDIR)$(BINDIR)/python$(VERSION)$(EXE); \
  		fi; \
