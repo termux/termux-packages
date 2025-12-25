@@ -26,9 +26,6 @@ TERMUX_PKG_PROVIDES="python3"
 # Python build is a 2-step process. Requiring host build and cross build
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
-# https://github.com/termux/termux-packages/issues/15908
-TERMUX_PKG_MAKE_PROCESSES=1
-
 _MAJOR_VERSION="${TERMUX_PKG_VERSION%.*}"
 
 # Set ac_cv_func_wcsftime=no to avoid errors such as "character U+ca0025 is not in range [U+0000; U+10ffff]"
