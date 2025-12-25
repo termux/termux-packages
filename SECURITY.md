@@ -4,7 +4,7 @@ The Termux team takes all security vulnerabilities seriously and we encourage ex
 
 # Reporting a Bug or Security Vulnerability
 
-The Termux team and community take all security vulnerabilities seriously. We will acknowledge the report, if valid, within 3 buisness days.
+The Termux team and community take all security vulnerabilities seriously. We will acknowledge the report, if valid, within 3 business days.
 
 Security issues with one of termux's packages, or with termux's infrastructure, should be reported in termux/termux-packages, while security issues in the apps should be reported in [termux/termux-app](https://github.com/termux/termux-app).
 
@@ -19,7 +19,7 @@ To report a vulnerability ([see also the docs](https://docs.github.com/en/code-s
 
 ## Reporting via Email
 
-Send an email, preferably gpg encrypted, to the maintainers that seem to be responsible for the affected component, as per git history. You can find our public gpg keys in the [termux-keyring package](https://github.com/termux/termux-packages/tree/master/packages/termux-keyring). Please include all relevant details directly in the email, and send to multiple maintainers. We will aim at getting back within 3 buisness days, and provide updates on the progress and may request additional details.
+Send an email, preferably gpg encrypted, to the maintainers that seem to be responsible for the affected component, as per git history. You can find our public gpg keys in the [termux-keyring package](https://github.com/termux/termux-packages/tree/master/packages/termux-keyring). Please include all relevant details directly in the email, and send to multiple maintainers. We will aim at getting back within 3 business days, and provide updates on the progress and may request additional details.
 
 ## Issues in packages and forks
 
