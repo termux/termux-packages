@@ -106,6 +106,13 @@ jobs:
           token: ${{ secrets.TERMUXBOT2_TOKEN }}
       - name: Set process id limit for 32-bit builds depending on aosp-libs
         run: echo 65535 | sudo tee /proc/sys/kernel/pid_max
+      - name: Enable zram
+        uses: ./.github/actions/zram
+        with:
+          algorithm: zstd
+          size: 16G
+          priority: 100
+          device_name: /dev/zram0
       - name: Free additional disk space
         run: CLEAN_DOCKER_IMAGES=false ./scripts/free-space.sh
       - name: Process package updates

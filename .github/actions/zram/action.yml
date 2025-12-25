@@ -1,0 +1,85 @@
+name: zram
+description: Enable zram module on GitHub hosted runner
+inputs:
+  algorithm:
+    description: The compression algorithm to use with zram
+    default: zstd
+  size:
+    description: Maximum amount of memory to store in compressed form
+    default: 16G
+  priority:
+    description: Priority of swap device (0-32767)
+    default: '100'
+  device_name:
+    description: Name of swap device
+    default: '/dev/zram0'
+runs:
+  using: composite
+  steps:
+    - name: Extract VM kernel version for module compilation
+      id: kernel-info
+      shell: bash
+      run: |
+        set -euo pipefail
+        KERNEL_VERSION="$(uname -r | grep -o "^[0-9\\.]*")"
+        TAR_KERNEL_VERSION="${KERNEL_VERSION%\.0}"
+
+        echo "kernel_version=${KERNEL_VERSION}" >> "$GITHUB_OUTPUT"
+        echo "tar_version=${TAR_KERNEL_VERSION}" >> "$GITHUB_OUTPUT"
+        echo "modules_dir=/lib/modules/$(uname -r)" >> "$GITHUB_OUTPUT"
+
+    - name: Restore cached zram kernel module
+      id: cache-zram
+      uses: actions/cache/restore@v5
+      with:
+        path: scripts/zram.ko.zst
+        key: ${{ steps.kernel-info.outputs.kernel_version }}-${{ hashFiles('scripts/linux-kernel-signing-keys.gpg') }}-${{ hashFiles('.github/actions/zram/action.yml') }}
+
+    - name: Build zram kernel module
+      if: steps.cache-zram.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        set -euo pipefail
+        KERNEL_VERSION=${{ steps.kernel-info.outputs.kernel_version }}
+        TAR_KERNEL_VERSION=${{ steps.kernel-info.outputs.tar_version }}
+        MODULES_DIR=${{ steps.kernel-info.outputs.modules_dir }}
+
+        LINUX_CHECKOUT_DIR=$(mktemp -d)
+        cd "$LINUX_CHECKOUT_DIR"
+        curl -OL "https://cdn.kernel.org/pub/linux/kernel/v${KERNEL_VERSION%%\.*}.x/linux-${TAR_KERNEL_VERSION}.tar.xz"
+        curl -OL "https://cdn.kernel.org/pub/linux/kernel/v${KERNEL_VERSION%%\.*}.x/linux-${TAR_KERNEL_VERSION}.tar.sign"
+
+        gpg --import ${{ github.workspace }}/scripts/linux-kernel-signing-keys.gpg
+        unxz "linux-${TAR_KERNEL_VERSION}.tar.xz"
+        gpg --verify "linux-${TAR_KERNEL_VERSION}.tar.sign"
+        tar --extract -f "linux-${TAR_KERNEL_VERSION}.tar"
+        cd "linux-${TAR_KERNEL_VERSION}/"
+
+        # We are basically doing a out-of-tree build for a module which is in-tree
+        # See docs: https://www.kernel.org/doc/html/latest/kbuild/modules.html
+        cd drivers/block/zram/
+        make -C "${MODULES_DIR}/build/" M="$PWD" -j$(nproc)
+        zstd zram.ko
+        # Copy back compiled module into scripts/ as actions/cache doesn't support absolute paths:
+        # See https://github.com/actions/cache/issues/1540
+        # Additionally restoring cache in /lib/modules/ would require running actions/cache/restore as root
+        cp zram.ko.zst ${{ github.workspace }}/scripts/
+        rm -r "$LINUX_CHECKOUT_DIR"
+
+    - name: Enable zram kernel module
+      shell: bash
+      run: |
+        set -euo pipefail
+        sudo cp scripts/zram.ko.zst ${{ steps.kernel-info.outputs.modules_dir }}/kernel/
+        sudo depmod
+        sudo modprobe zram
+        sudo zramctl ${{ inputs.device_name }} --algorithm ${{ inputs.algorithm }} --size ${{ inputs.size }}
+        sudo mkswap -U clear ${{ inputs.device_name }}
+        sudo swapon --discard --priority ${{ inputs.priority }} ${{ inputs.device_name }}
+
+    - name: Save built zram kernel module
+      if: steps.cache-zram.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v5
+      with:
+        path: scripts/zram.ko.zst
+        key: ${{ steps.cache-zram.outputs.cache-primary-key }}
