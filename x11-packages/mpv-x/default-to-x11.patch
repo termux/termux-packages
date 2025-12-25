@@ -4,25 +4,28 @@ Error opening/initializing the selected video_out (--vo) device.
 Video: no video
 ```
 This patch forces it to choose X11 by default.
-+++ ./video/out/vo.c
-@@ -69,8 +69,8 @@
- 
- static const struct vo_driver *const video_out_drivers[] =
- {
+diff --git a/video/out/vo.c b/video/out/vo.c
+index c9cde30478..44b132b6c7 100644
+--- a/video/out/vo.c
++++ b/video/out/vo.c
+@@ -85,8 +85,8 @@ static const struct vo_driver *const video_out_drivers[] =
+ #if HAVE_XV
+     &video_out_xv,
+ #endif
 -#if HAVE_ANDROID
 -    &video_out_mediacodec_embed,
 +#if HAVE_X11
 +    &video_out_x11,
  #endif
-     &video_out_gpu,
-     &video_out_gpu_next,
-@@ -95,9 +95,6 @@
+ #if HAVE_SDL2_VIDEO
+     &video_out_sdl,
+@@ -96,9 +96,6 @@ static const struct vo_driver *const video_out_drivers[] =
+ #endif
  #if HAVE_VAAPI_X11 && HAVE_GPL
      &video_out_vaapi,
- #endif
+-#endif
 -#if HAVE_X11
 -    &video_out_x11,
--#endif
+ #endif
      &video_out_libmpv,
      &video_out_null,
-     // should not be auto-selected
