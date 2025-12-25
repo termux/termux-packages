@@ -33,14 +33,6 @@ _patch_luv() {
 termux_step_host_build() {
 	termux_setup_cmake
 
-	TERMUX_ORIGINAL_CMAKE="$(command -v cmake)"
-	if [ ! -f "$TERMUX_ORIGINAL_CMAKE.orig" ]; then
-		mv "$TERMUX_ORIGINAL_CMAKE" "$TERMUX_ORIGINAL_CMAKE.orig"
-	fi
-	cp "$TERMUX_PKG_BUILDER_DIR/custom-bin/cmake" "$TERMUX_ORIGINAL_CMAKE"
-	chmod +x "$TERMUX_ORIGINAL_CMAKE"
-	export TERMUX_ORIGINAL_CMAKE="$TERMUX_ORIGINAL_CMAKE.orig"
-
 	mkdir -p "$TERMUX_PKG_HOSTBUILD_DIR/deps"
 	cd "$TERMUX_PKG_HOSTBUILD_DIR/deps" || termux_error_exit "failed to perform host build for nvim"
 	cmake "$TERMUX_PKG_SRCDIR/cmake.deps"
