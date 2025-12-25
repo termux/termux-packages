@@ -4,15 +4,14 @@ TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear p
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.12.12
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="3.13.11"
 _DEBPYTHON_COMMIT=f358ab52bf2932ad55b1a72a29c9762169e6ac47
 TERMUX_PKG_SRCURL=(
 	https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 	https://salsa.debian.org/cpython-team/python3-defaults/-/archive/${_DEBPYTHON_COMMIT}/python3-defaults-${_DEBPYTHON_COMMIT}.tar.gz
 )
 TERMUX_PKG_SHA256=(
-	fb85a13414b028c49ba18bbd523c2d055a30b56b18b92ce454ea2c51edc656c4
+	16ede7bb7cdbfa895d11b0642fa0e523f291e6487194d53cf6d3b338c3a17ea2
 	3b7a76c144d39f5c4a2c7789fd4beb3266980c2e667ad36167e1e7a357c684b0
 )
 TERMUX_PKG_AUTO_UPDATE=false
@@ -24,6 +23,8 @@ TERMUX_PKG_BREAKS="python2 (<= 2.7.15), python-dev"
 TERMUX_PKG_REPLACES="python-dev"
 # Let "python3" will be alias to this package.
 TERMUX_PKG_PROVIDES="python3"
+# Python build is a 2-step process. Requiring host build and cross build
+TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
 # https://github.com/termux/termux-packages/issues/15908
 TERMUX_PKG_MAKE_PROCESSES=1
@@ -58,6 +59,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_shm_unlink=yes"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_working_tzset=yes"
 # prevents 'configure: error: Cross compiling requires --with-build-python' (even during on-device build)
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-build-python=python$_MAJOR_VERSION"
+# https://github.com/termux/termux-packages/issues/16879
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_header_sys_xattr_h=no"
 
 TERMUX_PKG_RM_AFTER_INSTALL="
 lib/python${_MAJOR_VERSION}/test
@@ -165,9 +168,9 @@ termux_step_create_debscripts() {
 		echo
 	fi
 
-	if [ -d $TERMUX_PREFIX/lib/python3.11/site-packages ]; then
+	if [[ -d $TERMUX_PREFIX/lib/python3.11/site-packages || -d $TERMUX_PREFIX/lib/python3.12/site-packages ]]; then
 		echo
-		echo "NOTE: The system python package has been updated to 3.12."
+		echo "NOTE: The system python package has been updated to 3.13."
 		echo "NOTE: Run 'pkg upgrade' to update system python packages."
 		echo "NOTE: Packages installed using pip needs to be re-installed."
 		echo
