@@ -23,13 +23,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 TERMUX_PKG_CONFFILES="share/nvim/sysinit.vim"
 
-_patch_luv() {
-	# git submodule update --init deps/lua-compat-5.3 failed
-	cp -r "$1/build/src/lua-compat-5.3"/* "$1/build/src/luv/deps/lua-compat-5.3/"
-	cp -r "$1/build/src/luajit"/* "$1/build/src/luv/deps/luajit/"
-	cp -r "$1/build/src/libuv"/* "$1/build/src/luv/deps/libuv/"
-}
-
 termux_step_host_build() {
 	termux_setup_cmake
 
@@ -37,13 +30,11 @@ termux_step_host_build() {
 	cd "$TERMUX_PKG_HOSTBUILD_DIR/deps" || termux_error_exit "failed to perform host build for nvim"
 	cmake "$TERMUX_PKG_SRCDIR/cmake.deps"
 
-	make -j 1 \
-		|| (_patch_luv "$TERMUX_PKG_HOSTBUILD_DIR/deps" && make -j 1)
+	make -j 1
 
 	cd "$TERMUX_PKG_SRCDIR" || termux_error_exit "failed to perform host build for nvim"
 
-	make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install ||
-		(_patch_luv "$TERMUX_PKG_SRCDIR/.deps" && make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install)
+	make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install
 
 	# Copy away host-built libnlua0.so used by src/nvim/generators/preload.lua.
 	# We patch src/nvim/CMakeLists.txt to use this instead of the cross-compiled one.
@@ -51,8 +42,6 @@ termux_step_host_build() {
 
 	make distclean
 	rm -Rf build/
-
-	cd "$TERMUX_PKG_HOSTBUILD_DIR" || termux_error_exit "failed to perform host build for nvim"
 }
 
 termux_step_pre_configure() {
