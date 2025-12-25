@@ -46,14 +46,6 @@ jobs:
     - name: Set process id limit for 32-bit builds depending on aosp-libs
       run: echo 65535 | sudo tee /proc/sys/kernel/pid_max
 
-    - name: Enable zram
-      uses: ./.github/actions/zram
-      with:
-        algorithm: zstd
-        size: 16G
-        priority: 100
-        device_name: /dev/zram0
-
     - name: Gather build summary
       id: build-info
       env:
@@ -233,6 +225,15 @@ jobs:
         if [[ "${#package_recipes[@]}" -gt 0 ]]; then
           ./scripts/lint-packages.sh "${package_recipes[@]}"
         fi
+
+    - name: Enable zram
+      if: ${{ steps.build-info.outputs.skip-building != 'true' }}
+      uses: ./.github/actions/zram
+      with:
+        algorithm: zstd
+        size: 16G
+        priority: 100
+        device_name: /dev/zram0
 
     - name: Free additional disk space (if needed)
       if: ${{ steps.build-info.outputs.docker-build == 'false' && steps.build-info.outputs.skip-building != 'true' }}
