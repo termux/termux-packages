@@ -330,7 +330,7 @@ $SUDO dpkg --add-architecture i386
 
 # Install jq first, then source properties.sh
 $SUDO env DEBIAN_FRONTEND=noninteractive \
-	apt-get install -yq --no-install-recommends
+	apt-get install -yq --no-install-recommends jq
 
 . $(dirname "$(realpath "$0")")/properties.sh
 
