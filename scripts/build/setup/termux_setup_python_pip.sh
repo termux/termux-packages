@@ -54,7 +54,7 @@ termux_setup_python_pip() {
 
 		if [ ! -d "$TERMUX_PYTHON_CROSSENV_PREFIX" ]; then
 			cd "$TERMUX_PYTHON_CROSSENV_SRCDIR"
-			/usr/bin/python${TERMUX_PYTHON_VERSION} -m crossenv \
+			"$TERMUX_BUILD_PYTHON_DIR/host-build-prefix/bin/python${TERMUX_PYTHON_VERSION}" -m crossenv \
                 		"$TERMUX_PREFIX/bin/python${TERMUX_PYTHON_VERSION}" \
 				"${TERMUX_PYTHON_CROSSENV_PREFIX}"
 		fi
