@@ -67,7 +67,6 @@ termux_setup_build_python() {
 				CXX="clang++-${TERMUX_HOST_LLVM_MAJOR_VERSION} -fuse-ld=lld" \
 				PATH="/usr/bin" \
 				../configure \
-					--host="$(../config.guess)" \
 					--with-ensurepip=install \
 					--prefix="$_PYTHON_FOLDER/host-build-prefix"
 			env -i \
