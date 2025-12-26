@@ -71,6 +71,7 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
+	termux_setup_build_python
 	# -O3 gains some additional performance on at least aarch64.
 	CFLAGS="${CFLAGS/-Oz/-O3}"
 
