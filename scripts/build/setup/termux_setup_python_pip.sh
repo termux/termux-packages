@@ -1,4 +1,10 @@
+# This script setups host python and crossenv for cross-compilation of python
+# packages. Requires python package to be built before this script is called.
+#
+# It is highly recommended checking out documentation of
+# termux_setup_build_python before using this script
 termux_setup_python_pip() {
+	termux_setup_build_python
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 		if [[ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" && "$(dpkg-query -W -f '${db:Status-Status}\n' python-pip 2>/dev/null)" != "installed" ]] ||
 		[[ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" && ! "$(pacman -Q python-pip 2>/dev/null)" ]]; then
