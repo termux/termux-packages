@@ -17,7 +17,7 @@ TERMUX_PKG_REPLACES="python-dev"
 # Let "python3" will be alias to this package.
 TERMUX_PKG_PROVIDES="python3"
 # Python build is a 2-step process. Requiring host build and cross build
-TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=false
+TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
 _MAJOR_VERSION="${TERMUX_PKG_VERSION%.*}"
 
