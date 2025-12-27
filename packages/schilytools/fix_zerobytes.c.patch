@@ -1,0 +1,9 @@
+--- a/libschily/zerobytes.c
++++ b/libschily/zerobytes.c
+@@ -1,3 +1,6 @@
++#if !defined(laligned)
++#define laligned(p) ((((long)(p)) & (sizeof(long) - 1)) == 0)
++#endif
+ /* @(#)zerobytes.c	1.2 11/07/30 Copyright Copyright 1987, 1995-2011 J. Schilling */
+ /*
+  *	fill memory with null bytes
