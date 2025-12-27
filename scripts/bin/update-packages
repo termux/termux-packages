@@ -301,7 +301,6 @@ _run_update() {
 	pkg_name="$(basename "${pkg_dir}")"
 	# Run each package update in separate process since we include their environment variables.
 	local output="" _CURRENT_VERSION _NEWEST_VERSION
-	: > "$LATEST_VERSION_TEMP_FILE" # flush the sidechannel
 	# shellcheck disable=SC1091 # Ignore shellcheck's inability to follow the source
 	_CURRENT_VERSION="$(set +eu; . "$(realpath "$pkg_dir")/build.sh"; echo "${TERMUX_PKG_VERSION#*:}")"
 
@@ -312,8 +311,9 @@ _run_update() {
 		exec > >(tee /dev/fd/2) 2>&1 # output everything on stderr to stdout as well.
 		_update "${pkg_dir}"
 	)"; then
-		_NEWEST_VERSION="$(< "$LATEST_VERSION_TEMP_FILE")"
-		: "${_NEWEST_VERSION:="$_CURRENT_VERSION"}"
+		_NEWEST_VERSION="$(tail -n1 "$LATEST_VERSION_TEMP_FILE")"
+		: "${_NEWEST_VERSION:="$_CURRENT_VERSION"}" # If we didn't get a version back treat it as current.
+		_NEWEST_VERSION="${_NEWEST_VERSION% #*}" # Remove potential debug comment.
 		if dpkg --compare-versions "${_CURRENT_VERSION}" lt "${_NEWEST_VERSION}"; then
 			_ALREADY_SEEN["$pkg_name"]="${pkg_name} ${_CURRENT_VERSION} => ${_NEWEST_VERSION}"
 		elif dpkg --compare-versions "${_CURRENT_VERSION}" gt "${_NEWEST_VERSION}"; then

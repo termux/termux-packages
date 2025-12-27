@@ -78,7 +78,7 @@ termux_pkg_upgrade_version() {
 
 	# Report back the fully parsed $LATEST_VERSION for the summary.
 	# Or discard it straight into /dev/null if no tempfile was provided.
-	echo "$LATEST_VERSION" > "${LATEST_VERSION_TEMP_FILE:-/dev/null}"
+	echo "$LATEST_VERSION # ${TERMUX_PKG_NAME}" >> "${LATEST_VERSION_TEMP_FILE:-/dev/null}"
 
 	if [[ "${SKIP_VERSION_CHECK}" != "--skip-version-check" ]]; then
 		if ! termux_pkg_is_update_needed \
