@@ -273,25 +273,26 @@ _fetch_and_cache_tags() {
 }
 
 _check_updated() {
-	if [[ -n "${_LATEST_TAGS[${1##*/}]:-}" ]]; then
-		(
-			set +eu
-			quiet source "${1}/build.sh"
-			set -eu
-			export TERMUX_PKG_UPGRADE_VERSION_DRY_RUN=1
-			if quiet termux_pkg_upgrade_version "${_LATEST_TAGS[${1##*/}]}"; then
-				echo "INFO: Skipping ${1##*/}: already at version ${TERMUX_PKG_VERSION#*:}"
-				return 0
-			fi
-			return 1
-		)
-		local _ANSWER=$?
-		if (( _ANSWER == 0 )) ; then
-			: "${_ALREADY_SEEN["$(basename "${1}")"]:=""}"
-		fi
-		return $_ANSWER
+	local latest_tag="${_LATEST_TAGS[${1##*/}]:-}"
+
+	if [[ -z "${latest_tag}" ]]; then
+		return 1
+	fi
+
+	(
+	set +eu
+	quiet source "${1}/build.sh"
+	TERMUX_PKG_NAME="${1##*/}"
+	export TERMUX_PKG_UPGRADE_VERSION_DRY_RUN=1
+	# The call to `termux_pkg_upgrade_version` is delibrately
+	# not wrapped by `quiet` to let warnings on stderr bubble up.
+	if termux_pkg_upgrade_version "${latest_tag}" > /dev/null; then
+		echo "INFO: Skipping ${1##*/}: already at version ${TERMUX_PKG_VERSION}"
+		: "${_ALREADY_SEEN["${TERMUX_PKG_NAME}"]:=""}"
+		return 0
 	fi
 	return 1
+	)
 }
 
 _run_update() {
