@@ -16,7 +16,7 @@ _termux_should_cleanup() {
 }
 
 termux_pkg_upgrade_version() {
-	if [[ "$#" -lt 1 ]]; then
+	if (( $# < 1 )); then
 		termux_error_exit <<-EndUsage
 			Usage: ${FUNCNAME[0]} LATEST_VERSION [--skip-version-check]
 			Also reports the fully parsed LATEST_VERSION
@@ -38,33 +38,34 @@ termux_pkg_upgrade_version() {
 	# If needed, filter version numbers using grep regexp.
 	if [[ -n "${TERMUX_PKG_UPDATE_VERSION_REGEXP:-}" ]]; then
 		# Extract version numbers.
-		local OLD_LATEST_VERSION="${LATEST_VERSION}"
-		LATEST_VERSION="$(grep --max-count=1 -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<< "${LATEST_VERSION}" || true)"
+		local ORIGINAL_LATEST_VERSION="${LATEST_VERSION}"
+		LATEST_VERSION="$(grep --max-count=1 -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<< "${LATEST_VERSION}" || :)"
 		if [[ -z "${LATEST_VERSION:-}" ]]; then
 			termux_error_exit <<-EndOfError
-				ERROR: failed to filter version numbers using regexp '${TERMUX_PKG_UPDATE_VERSION_REGEXP}'.
-				Ensure that it works correctly with ${OLD_LATEST_VERSION}.
+				ERROR: Failed to filter version numbers for '${TERMUX_PKG_NAME}'.
+				Ensure that '${TERMUX_PKG_UPDATE_VERSION_REGEXP}' works correctly to match '${ORIGINAL_LATEST_VERSION}'.
 			EndOfError
 		fi
-		unset OLD_LATEST_VERSION
-	else # Otherwise remove any leading non-digits as that would not be a valid version.
-		# shellcheck disable=SC2001 # This is something parameter expansion can't handle well, so we use sed.
-		LATEST_VERSION="$(sed -e "s/^[^0-9]*//" <<< "$LATEST_VERSION")"
+		unset ORIGINAL_LATEST_VERSION
 	fi
 
 	# If needed, filter version numbers using sed regexp.
 	if [[ -n "${TERMUX_PKG_UPDATE_VERSION_SED_REGEXP:-}" ]]; then
 		# Extract version numbers.
-		local OLD_LATEST_VERSION="${LATEST_VERSION}"
-		LATEST_VERSION="$(sed -E "${TERMUX_PKG_UPDATE_VERSION_SED_REGEXP}" <<< "${LATEST_VERSION}" || true)"
+		local ORIGINAL_LATEST_VERSION="${LATEST_VERSION}"
+		LATEST_VERSION="$(sed -E "${TERMUX_PKG_UPDATE_VERSION_SED_REGEXP}" <<< "${LATEST_VERSION}" || :)"
 		if [[ -z "${LATEST_VERSION:-}" ]]; then
 			termux_error_exit <<-EndOfError
-				ERROR: failed to filter version numbers using regexp '${TERMUX_PKG_UPDATE_VERSION_SED_REGEXP}'.
-				Ensure that it works correctly with ${OLD_LATEST_VERSION}.
+				ERROR: Failed to filter version numbers for '${TERMUX_PKG_NAME}'.
+				Ensure that '${TERMUX_PKG_UPDATE_VERSION_SED_REGEXP}' works correctly to match '${ORIGINAL_LATEST_VERSION}'.
 			EndOfError
 		fi
-		unset OLD_LATEST_VERSION
+		unset ORIGINAL_LATEST_VERSION
 	fi
+
+	# Remove any leading non-digits as that would not be a valid version.
+	# shellcheck disable=SC2001 # This is something parameter expansion can't handle well, so we use sed.
+	LATEST_VERSION="$(sed -e "s/^[^0-9]*//" <<< "$LATEST_VERSION")"
 
 	# Translate "_" into ".": some packages use underscores to separate
 	# version numbers, but we require them to be separated by dots.
