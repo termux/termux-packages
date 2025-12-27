@@ -17,53 +17,59 @@
 
 set -e
 
-if [ "${#}" = "0" ]; then
+(( $# )) || {
 	echo "Usage: update-checksum [package name] ..."
 	echo
 	echo "Update TERMUX_PKG_SHA256 of package and optionally commit changes."
 	echo
 	exit 1
-fi
+}
 
-REPO_ROOT=$(realpath "$(dirname "$0")/../../")
+REPO_ROOT="$(realpath "$(dirname "$0")/../../")"
 IS_GIT_REPOSITORY=false
 
 if git status >/dev/null 2>&1; then
 	IS_GIT_REPOSITORY=true
 fi
 
-for package in "${@}"; do
+# We'll need these later when sourcing build scripts.
+# shellcheck source=scripts/properties.sh
+source "$REPO_ROOT/scripts/properties.sh"
+
+for package_dir in "$@"; do
 	buildsh_path=
 	repo=
-	if [ -d "${package}" ] && [ -f "${package}/build.sh" ]; then
-		buildsh_path="${package}/build.sh"
-		package=$(basename ${package})
-	else
-		for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' $REPO_ROOT/repo.json); do
-			if [ -d "${repo_path}/${package}" ] && [ -f "${repo_path}/${package}/build.sh" ]; then
-				repo=$(jq --raw-output '.["'$repo_path'"].name' $REPO_ROOT/repo.json)
-				repo=${repo#"termux-"}
-				buildsh_path="${repo_path}/${package}/build.sh"
-				package=$(basename ${package})
+	# Did we get the package in the form of ${channel}/${package_dir}?
+	if [[ -d "${package_dir}" && -f "${package_dir}/build.sh" ]]; then
+		repo="${package_dir%\/*}"
+		buildsh_path="${package_dir}/build.sh"
+		package_dir="$(basename "${package_dir}")"
+	else # If we did not, search each channel listed in repo.json for that package directory.
+		for channel in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "$REPO_ROOT/repo.json"); do
+			if [[ -d "${channel}/${package_dir}" && -f "${channel}/${package_dir}/build.sh" ]]; then
+				repo="$(jq --raw-output ".[\"$channel\"].name | sub(\"^termux-\")" "$REPO_ROOT/repo.json")"
+				buildsh_path="${channel}/${package_dir}/build.sh"
+				package_dir="$(basename "${package_dir}")"
 			fi
 		done
 	fi
 
-	if [ ! -f "${buildsh_path}" ]; then
-		echo "${package}: skipping as no build.sh found"
+	if [[ ! -f "${buildsh_path}" ]]; then
+		echo "${package_dir}: skipping as no build.sh found"
 		continue
 	fi
 
-	# Command substitution create a subshell, we want to do this
+	# Process substitution creates a subshell, we want to do this
 	# to not effect the main scope's variables by sourcing the build script
-	new_checksum=($(
+	mapfile -t new_checksum < <(
+		# shellcheck source=/dev/null
 		source "${buildsh_path}" 2>/dev/null
 		for url in "${TERMUX_PKG_SRCURL[@]}"; do
-			echo "Downloading ${url}" >&2
-			dl_tmpdir=$(mktemp -d "${TMPDIR-/tmp}/termux.src.dl.XXXXXXXX")
+			echo "Downloading ${url}" &>/dev/null
+			dl_tmpdir="$(mktemp -d "${TMPDIR-/tmp}/termux.src.dl.XXXXXXXX")"
 
 			if [[ -d "${dl_tmpdir}" ]]; then
-				if ! curl --fail --location --retry 3 --output "${dl_tmpdir}/source-bundle" "$url"; then
+				if ! curl --fail --location --retry 3 --output "${dl_tmpdir}/source-bundle" "$url" 2>/dev/null; then
 					rm -rf "${dl_tmpdir}"
 				fi
 
@@ -74,48 +80,63 @@ for package in "${@}"; do
 				rm -rf "${dl_tmpdir}"
 			fi
 		done
-	))
+	)
 
-	if (( ${#new_checksum[@]} )); then
-		# Replace old SHA-256.
-		if (( ${#new_checksum[@]} > 1 )); then
-			checksum="(\n$(printf '\\t%s\\n' "${new_checksum[@]}"))"
-		else
-			checksum="${new_checksum[0]}"
-		fi
-		if grep -qPz "TERMUX_PKG_SHA256=\([^)]*\)" "${buildsh_path}"; then
-			sed -zi "s/\(TERMUX_PKG_SHA256=\)([^)]*)/\1${checksum}/g" "${buildsh_path}"
-		else
-			sed -i "s/\(TERMUX_PKG_SHA256=\).*/\1${checksum}/g" "${buildsh_path}"
-		fi
-
-		# Delete revision as it shouldn't be present if package was updated.
-		sed -i "/TERMUX_PKG_REVISION=/d" "${buildsh_path}"
-
-		# If we are on Git repository, prompt for committing changes.
-		if ${IS_GIT_REPOSITORY}; then
-			echo
-			echo "You are about to commit these changes:"
-			echo
-			echo "--------------------"
-			git --no-pager diff --patch "${buildsh_path}"
-			echo "--------------------"
-			echo
-			echo "bump(${repo}/${package}): $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
-			echo
-			read -re -p "Do you want to commit changes ? (y/n) " CHOICE
-			echo
-			if [[ ${CHOICE} =~ (Y|y) ]]; then
-				git add "${buildsh_path}"
-				git commit -m "bump(${repo}/${package}): $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
-			else
-				echo "Not committing to Git!"
-			fi
-			echo
-		fi
-	else
+	# Did we manage to calculate new checksums?
+	(( ${#new_checksum[@]} )) || {
 		echo
-		echo "${package}: failed to calculate the new checksum"
+		echo "${package_dir}: failed to calculate the new checksum"
+		continue
 		exit 1
+	}
+
+	# Replace old SHA-256.
+	if (( ${#new_checksum[@]} > 1 )); then
+		# If there's more than 1 it's an array.
+		# Meaning it's probably multi-line, so use -z
+		checksum="(\n$(printf '\\t%s\\n' "${new_checksum[@]}"))"
+		sed -zi "s/\(TERMUX_PKG_SHA256=\)([^)]*)/\1${checksum}/g" "${buildsh_path}"
+	else
+		# Otherwise it's a standard string
+		checksum="${new_checksum[0]}"
+		sed -i "s/\(TERMUX_PKG_SHA256=\).*/\1${checksum}/g" "${buildsh_path}"
+	fi
+
+	# Delete the revision as it shouldn't be present if the package was updated.
+	sed -i "/TERMUX_PKG_REVISION=/d" "${buildsh_path}"
+
+	# If we are on Git repository, prompt for committing changes.
+	if [[ "${IS_GIT_REPOSITORY}" == "true" ]]; then
+		echo
+		echo "You are about to commit these changes:"
+		echo
+		echo "--------------------"
+		git --no-pager diff --patch "${buildsh_path}"
+		echo "--------------------"
+		echo
+		echo "bump(${repo}/${package_dir}): $(
+			# shellcheck source=/dev/null
+			source "${buildsh_path}"
+			# $TERMUX_PKG_VERSION may be an array.
+			# Make it explicit that we are basing the version in the commit message
+			# on the first version in the variable.
+			# ${TERMUX_PKG_VERSION[0]} also works fine on non-array variables.
+			echo "${TERMUX_PKG_VERSION[0]}" | cut -d: -f2-
+		)"
+		echo
+		read -re -p "Do you want to commit changes ? (y/n) " CHOICE
+		echo
+		case "${CHOICE}" in
+			y|Y)
+				git add "${buildsh_path}"
+				git commit -m "bump(${repo}/${package_dir}): $(
+					# shellcheck source=/dev/null
+					source "${buildsh_path}"
+					echo "${TERMUX_PKG_VERSION[0]}" | cut -d: -f2-
+				)"
+			;;
+			*) echo "Not committing to Git!";;
+		esac
+		echo
 	fi
 done
