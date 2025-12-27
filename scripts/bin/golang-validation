@@ -1,8 +1,174 @@
 #!/bin/bash
 cd "$(realpath "$(dirname "$0")")/../.." || { echo "cd failed"; exit 1; }
 readarray -t TERMUX_PACKAGE_DIRECTORIES < <(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json)
-readarray -t PACKAGES < <(grep -rl termux_setup_golang --include=build.sh "${TERMUX_PACKAGE_DIRECTORIES[@]}" | cut -d/ -f2 | sort -u || :) || :
-ARCH="${1?"Usage: $0 [aarch64|arm|x86_64|i686]"}"
+
+usage() {
+	echo "USAGE: $0 ARCH PACKAGES [list|batch_number]"
+	echo
+	echo "OPTIONS:"
+	echo "  ARCH     - aarch64, arm, i686, x86_64"
+	echo "  PACKAGES - golang"
+	echo
+	echo "EXAMPLES:"
+	echo "  $0 aarch64 golang         Build all aarch64 golang based packages"
+	echo "  $0 aarch64 golang list    Split aarch64 golang based package list"
+	echo "  $0 aarch64 golang 2       Build 2nd batch of said list"
+}
+
+case "${1}" in
+	aarch64|arm|i686|x86_64)
+		ARCH="${1}"
+		;;
+	*)
+		echo "ERROR: Invalid args: $*" 1>&2
+		usage
+		exit 1
+		;;
+esac
+
+STRATEGY=(50 50)
+EXCLUDE_BIG_PACKAGES=false
+BIG_PACKAGES_IN_SEPARATE_BATCH=false
+
+case "${2}" in
+	golang)
+		readarray -t PACKAGES < <(grep -rl termux_setup_golang --include=build.sh --exclude-dir=golang "${TERMUX_PACKAGE_DIRECTORIES[@]}" | cut -d/ -f1,2 | sort -u | cut -d/ -f2 || :) || :
+		STRATEGY=(100)
+		EXCLUDE_BIG_PACKAGES=true
+		BIG_PACKAGES_IN_SEPARATE_BATCH=true
+		;;
+	*)
+		echo "ERROR: Invalid args: $*" 1>&2
+		usage
+		exit 1
+		;;
+esac
+
+SUM_PERCENT=0
+for PERCENT in "${STRATEGY[@]}"; do
+	SUM_PERCENT=$((SUM_PERCENT+PERCENT))
+done
+if [[ "${SUM_PERCENT}" != 100 ]]; then
+	echo "ERROR: STRATEGY = $(echo "${STRATEGY[@]}" | tr " " "+") = ${SUM_PERCENT} != 100" 1>&2
+	exit 1
+fi
+
+split_build_job() {
+	local PACKAGE_RATIO=()
+	local CUM_PACKAGE_RATIO=()
+	local BATCHES=${#STRATEGY[@]}
+	local PREV_RATIO=0
+	local BATCH
+	for BATCH in $(seq 0 $((BATCHES-1))); do
+		PACKAGE_RATIO[BATCH]=$((STRATEGY[BATCH]*${#PACKAGES[@]}/100))
+		CUM_PACKAGE_RATIO[BATCH]=$((STRATEGY[BATCH]*${#PACKAGES[@]}/100+PREV_RATIO))
+		PREV_RATIO=${CUM_PACKAGE_RATIO[BATCH]}
+	done
+	local REMAINDER=$((${#PACKAGES[@]}-CUM_PACKAGE_RATIO[-1]))
+	if [[ "${REMAINDER}" != 0 ]]; then
+		PACKAGE_RATIO[-1]=$((PACKAGE_RATIO[-1]+REMAINDER))
+		CUM_PACKAGE_RATIO[-1]=${#PACKAGES[@]}
+	fi
+
+	unset BIG_PACKAGES
+	BIG_PACKAGES=()
+	local PACKAGE
+	for PACKAGE in "${PACKAGES[@]}"; do
+		while IFS= read -r PKG; do
+			if [[ "${PKG}" == "${PACKAGE}" ]]; then
+				BIG_PACKAGES+=("${PACKAGE}")
+				break
+			fi
+		done < scripts/big-pkgs.list
+	done
+
+	local PACKAGES1=()
+	local BATCH_NO=0
+	local OLD_MIDPOINT=0
+	for MIDPOINT in "${CUM_PACKAGE_RATIO[@]}"; do
+		local COUNT=0
+		for PACKAGE in "${PACKAGES[@]}"; do
+			COUNT=$((COUNT+1))
+			if [[ "${EXCLUDE_BIG_PACKAGES}" == "true" ]]; then
+				local PKG
+				local BIG_PACKAGE=false
+				while IFS= read -r PKG; do
+					if [[ "${PKG}" == "${PACKAGE}" ]]; then
+						BIG_PACKAGE=true
+						break
+					fi
+				done < <(echo "${BIG_PACKAGES[@]}" | tr " " "\n")
+				if [[ "${BIG_PACKAGE}" == true ]]; then
+					continue
+				fi
+			fi
+			if (( "${COUNT}" <= "${OLD_MIDPOINT}" )); then
+				continue
+			elif (( "${COUNT}" <= "${MIDPOINT}" )); then
+				PACKAGES1+=("${BATCH_NO}:${PACKAGE}")
+			else
+				break
+			fi
+		done
+		OLD_MIDPOINT=${MIDPOINT}
+		BATCH_NO=$((BATCH_NO+1))
+	done
+	local BATCH=0
+	local PACKAGE_NO=0
+	local NEW_PACKAGE_RATIO=()
+	for PACKAGE in "${PACKAGES1[@]}"; do
+		if [[ "${EXCLUDE_BIG_PACKAGES}" == "true" ]]; then
+			local PKG
+			local BIG_PACKAGE=false
+			while IFS= read -r PKG; do
+				if [[ "${PKG}" == "${PACKAGE%:*}" ]]; then
+					BIG_PACKAGE=true
+					break
+				fi
+			done < <(echo "${BIG_PACKAGES[@]}" | tr " " "\n")
+			if [[ "${BIG_PACKAGE}" == true ]]; then
+				continue
+			fi
+		fi
+		if [[ "${BATCH}" != "${PACKAGE%:*}" ]]; then
+			printf "\n"
+			BATCH=$((BATCH+1))
+			PACKAGE_NO=0
+		fi
+		if [[ "${PACKAGE_NO}" == 0 ]]; then
+			printf "%s" "${PACKAGE#*:}"
+			NEW_PACKAGE_RATIO[BATCH]=1
+		else
+			printf " %s" "${PACKAGE#*:}"
+			NEW_PACKAGE_RATIO[BATCH]=$((NEW_PACKAGE_RATIO[BATCH]+1))
+		fi
+		PACKAGE_NO=$((PACKAGE_NO+1))
+	done
+	if [[ "${BIG_PACKAGES_IN_SEPARATE_BATCH}" == "true" ]]; then
+		printf "\n%s" "$(echo "${BIG_PACKAGES[@]}" | tr "\n" " " | sed "s| $||")"
+		NEW_PACKAGE_RATIO+=("${#BIG_PACKAGES[@]}")
+	fi
+	printf "\n\n"
+	echo "Number of packages:            ${#PACKAGES[@]}"
+	echo "Number of big packages:        ${#BIG_PACKAGES[@]}"
+	echo "Batches (expected):            ${#STRATEGY[@]}"
+	echo "Packages per batch (expected): ${PACKAGE_RATIO[*]}"
+	echo "Batches (actual):              ${#NEW_PACKAGE_RATIO[*]}"
+	echo "Packages per batch (actual):   ${NEW_PACKAGE_RATIO[*]}"
+}
+
+if [[ "${3}" == "list" ]]; then
+	split_build_job
+	exit
+elif (( "${3}" )); then
+	readarray -t SPLIT_PACKAGES < <(split_build_job 2>/dev/null | head -n "${3}" | tail -n1 | tr " " "\n")
+	unset PACKAGES
+	PACKAGES=("${SPLIT_PACKAGES[@]}")
+elif [[ -n "${3}" ]]; then
+	echo "ERROR: Invalid args: $*" 1>&2
+	usage
+	exit 1
+fi
 
 # Converts milliseconds to human-readable format.
 # Example: `ms_to_human_readable 123456789` => 34h 17m 36s 789ms
