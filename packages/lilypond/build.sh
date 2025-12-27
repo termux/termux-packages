@@ -13,7 +13,8 @@ TERMUX_PKG_BUILD_DEPENDS="flex"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-documentation
 GUILE_FLAVOR=guile-3.0
-PYTHON=python${TERMUX_PYTHON_VERSION}
+PYTHON=/usr/bin/python3
+TARGET_PYTHON=$TERMUX_PREFIX/bin/python3
 "
 
 termux_step_post_make_install() {
