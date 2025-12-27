@@ -313,11 +313,12 @@ _run_update() {
 	)"; then
 		_NEWEST_VERSION="$(tail -n1 "$LATEST_VERSION_TEMP_FILE")"
 		: "${_NEWEST_VERSION:="$_CURRENT_VERSION"}" # If we didn't get a version back treat it as current.
+		local debug_copy="$_NEWEST_VERSION"
 		_NEWEST_VERSION="${_NEWEST_VERSION% #*}" # Remove potential debug comment.
-        if termux_pkg_is_update_needed "${_CURRENT_VERSION}" "${_NEWEST_VERSION}"; then
-			_ALREADY_SEEN["$pkg_name"]="${pkg_name} ${_CURRENT_VERSION} => ${_NEWEST_VERSION}"
+		if termux_pkg_is_update_needed "${_CURRENT_VERSION}" "${_NEWEST_VERSION}"; then
+			_ALREADY_SEEN["$pkg_name"]="${pkg_name} ${_CURRENT_VERSION} => ${debug_copy}"
 		elif termux_pkg_is_update_needed "${_NEWEST_VERSION}" "${_CURRENT_VERSION}"; then
-			_ALREADY_SEEN["$pkg_name"]="${pkg_name} ${_CURRENT_VERSION} => ${_NEWEST_VERSION} (Error? current version is larger than latest fetched version)"
+			_ALREADY_SEEN["$pkg_name"]="${pkg_name} ${_CURRENT_VERSION} => ${debug_copy} (Error? current version is larger than latest fetched version)"
 		else
 			_ALREADY_SEEN["$pkg_name"]=""
 		fi
@@ -401,6 +402,9 @@ _start_time="$(date +%10s%3N)"
 rm "${TMPDIR:-/tmp}"/termux_ipc_*.fifo &> /dev/null
 # Set up a side channel for reporting parsed latest versions
 export LATEST_VERSION_TEMP_FILE="${TMPDIR:-/tmp}/termux_ipc_$$.fifo"
+
+# DO NOT MERGE - testing only
+set -- @all
 
 if [[ "$1" == "@all" ]]; then
 	_fetch_and_cache_tags
