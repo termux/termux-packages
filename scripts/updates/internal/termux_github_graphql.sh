@@ -5,6 +5,8 @@ termux_github_graphql() {
 
 	# Batch size for fetching tags, 100 seems to work consistently.
 	local BATCH BATCH_SIZE=100
+	# echo "# vim: ft=graphql" > /tmp/query-12345 # Uncomment for debugging GraphQL queries
+	# echo "# $(date -Iseconds)" >> /tmp/query-12345
 	for (( BATCH = 0; ${#GITHUB_GRAPHQL_QUERIES[@]} >= BATCH_SIZE * BATCH ; BATCH++ )); do
 
 		echo "Starting batch $BATCH at: ${GITHUB_GRAPHQL_QUERIES[$BATCH * $BATCH_SIZE]//\\/}" >&2
@@ -14,7 +16,9 @@ termux_github_graphql() {
 		local QUERY
 
 		# Start the GraphQL query with our two fragments for getting the latest tag from a release, and from refs/tags
-		# These are defined only if needed, so this one is for '_latest_release_tag'
+		# These are defined only if needed.
+
+		# _latest_release_tag returns latestRelease.tagName from the repo its querying
 		grep -q '_latest_release_tag' <<< "${GITHUB_GRAPHQL_QUERIES[@]:$BATCH * $BATCH_SIZE:$BATCH_SIZE}" && {
 			QUERY+="$(printf '%s\n' \
 			'fragment _latest_release_tag on Repository {' \
@@ -22,6 +26,17 @@ termux_github_graphql() {
 			'}')"
 		}
 
+		# _latest_regex returns the (20) latest tags by commit date
+		grep -q '_latest_regex' <<< "${GITHUB_GRAPHQL_QUERIES[@]:$BATCH * $BATCH_SIZE:$BATCH_SIZE}" && {
+			QUERY+="$(printf '%s\n' \
+			'fragment _latest_regex on Repository {' \
+			'  refs( refPrefix: \"refs/tags/\" first: 20 orderBy: {field: TAG_COMMIT_DATE, direction: DESC}) {' \
+			'    nodes { name }' \
+			'  }' \
+			'}')"
+		}
+
+		# _newest_tag returns the (1) newest tag by commit date
 		grep -q '_newest_tag' <<< "${GITHUB_GRAPHQL_QUERIES[@]:$BATCH * $BATCH_SIZE:$BATCH_SIZE}" && {
 			QUERY+="$(printf '%s\n' \
 			'fragment _newest_tag on Repository {' \
@@ -41,7 +56,7 @@ termux_github_graphql() {
 				'ratelimit: rateLimit { cost limit remaining used resetAt }' \
 				'}' \
 
-		# echo "// Batch: $BATCH" >> /tmp/query-12345 # Uncomment for debugging GraphQL queries
+		# echo "# Batch: $BATCH" >> /tmp/query-12345 # Uncomment for debugging GraphQL queries
 		# printf '%s' "${QUERY}"  >> /tmp/query-12345 # Uncomment for debugging GraphQL queries
 
 		# We use graphql intensively so we should slowdown our requests to avoid hitting github ratelimits.
@@ -59,20 +74,24 @@ termux_github_graphql() {
 		)" || termux_error_exit "ERR - termux_github_graphql: $response"
 
 		unset QUERY
-		jq -r --argjson pkgs "$pkg_json" '
-			.data                                                 # From the data: table
-			| del(.ratelimit)                                     # Remove the ratelimit: table
-			| to_entries[]                                        # Convert the remaining entries to an array
-			| .key as $alias                                      # Save key to variable
-			| ($alias | ltrimstr("_") | tonumber) as $idx         # Extract iterator from bash array
-			| .value | (                                          # For each .value
-				.latestRelease?.tagName                           # Print out the tag name of the latest release
-				// .refs.nodes[0]?.name                           # or of the latest tag
-				// empty                                          # If neither exists print nothing
-			) | sub("^v"; "")   as $tag                           # Strip leading `v` from tag name
-			| select($tag != "")                                  # Filter out empty strings
-			| ($pkgs[$idx] | split("/")[-1]) as $pkgName          # Get package name from bash array
-			| "GIT|\($pkgName)|\($tag)"                           # Print results
-		' <<<"$response"
+		ret="$(jq -r --argjson pkgs "$pkg_json" '
+			.data                                         # From the data: table
+			| del(.ratelimit)                             # Remove the ratelimit: table
+			| to_entries[]                                # Convert the remaining entries to an array
+			| .key as $alias                              # Save key to variable
+			| ($alias | ltrimstr("_") | tonumber) as $idx # Extract iterator from bash array
+			| .value | (                                  # For each .value
+				.latestRelease?.tagName                   # Print out the tag name of the latest release
+				// (.refs.nodes | map(.name) | join("\n")) # or of the tags
+				// empty                                  # If neither exists print nothing
+			) as $tag                                     # Save to variable
+			| select($tag != "")                          # Filter out empty strings
+			| ($pkgs[$idx] | split("/")[-1]) as $pkgName  # Get package name from bash array
+			| "GIT|\($pkgName)|\($tag)"                   # Print results
+			' <<< "$response")"
+		# # Uncomment for debugging GraphQL queries
+		# jq '.' <<< "$response" >> /tmp/query-12345
+		# echo "$ret" >> /tmp/query-12345
+		echo "$ret"
 	done
 }
