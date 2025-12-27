@@ -402,6 +402,9 @@ rm "${TMPDIR:-/tmp}"/termux_ipc_*.fifo &> /dev/null
 # Set up a side channel for reporting parsed latest versions
 export LATEST_VERSION_TEMP_FILE="${TMPDIR:-/tmp}/termux_ipc_$$.fifo"
 
+# DO NOT MERGE - testing only
+set -- @all
+
 if [[ "$1" == "@all" ]]; then
 	_fetch_and_cache_tags
 	for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
