@@ -3,15 +3,15 @@ TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility 
 TERMUX_PKG_LICENSE="Apache-2.0, VIM License"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
-TERMUX_PKG_VERSION="0.11.5"
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=c63450dfb42bb0115cd5e959f81c77989e1c8fd020d5e3f1e6d897154ce8b771
+TERMUX_PKG_VERSION="0.12.0~dev-1895+g1cde71233f"
+TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/${TERMUX_PKG_VERSION##*+g}.tar.gz
+TERMUX_PKG_SHA256=e9b2c88f0f5d2a51b19a3a09a6d6321c410cb9b27398940dbfcac8ac110d435c
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+$"
+TERMUX_PKG_UPDATE_VERSION_REGEXP="v.*-dev.*\+g[0-9a-f]*"
+TERMUX_PKG_UPDATE_VERSION_SED_REGEXP="s/-/~/"
 TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libvterm (>= 1:0.3-0), libluajit, libunibilium, libandroid-support, lua51-lpeg, tree-sitter, tree-sitter-parsers, utf8proc"
-TERMUX_PKG_CONFLICTS="neovim-nightly"
-TERMUX_PKG_REPLACES="neovim-nightly"
+TERMUX_PKG_CONFLICTS="neovim"
+TERMUX_PKG_REPLACES="neovim"
 TERMUX_PKG_HOSTBUILD=true
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -25,6 +25,35 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCOMPILE_LUA=OFF
 "
 TERMUX_PKG_CONFFILES="share/nvim/sysinit.vim"
+
+termux_pkg_auto_update() {
+	local response commit latest_nightly
+	response="$(curl -sL \
+		-H "Accept: application/vnd.github+json" \
+		-H "X-GitHub-Api-Version: 2022-11-28" \
+		https://api.github.com/repos/neovim/neovim/releases/tags/nightly
+	)"
+
+	commit="$(jq -r '.target_commitish' <<< "$response")"
+	if [[ -z "${commit:-}" ]]; then
+		{
+			echo "WARN: Couldn't fetch latest nightly tag from "
+			echo "https://api.github.com/repos/neovim/neovim/releases/tags/nightly"
+			echo "curl response:"
+			jq '.' <<< "$response"
+		} >&2
+		return
+	elif [[ "${commit::10}" == "${TERMUX_PKG_VERSION##*+g}" ]]; then
+		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+		return
+	fi
+
+	latest_nightly="$(grep --max-count=1 -oP "$TERMUX_PKG_UPDATE_VERSION_REGEXP" < <(jq -r '.body' <<< "$response"))"
+	# We already filtered the version, so unset the regex to avoid reapplying it.
+	unset TERMUX_PKG_UPDATE_VERSION_REGEXP
+
+	termux_pkg_upgrade_version "${latest_nightly}"
+}
 
 termux_step_host_build() {
 	termux_setup_cmake
