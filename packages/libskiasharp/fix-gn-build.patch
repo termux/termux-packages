@@ -1,0 +1,35 @@
+Modifies the gn build to use correct NDK paths and compiler options
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -1532,15 +1532,7 @@ skia_component("skia") {
+ 
+   if (is_android) {
+     deps += [ "//third_party/expat" ]
+-    if (defined(ndk) && ndk != "") {
+-      deps += [ "//third_party/cpu-features" ]
+-    }
+-    sources += [ "src/ports/SkDebug_android.cpp" ]
+-    libs += [
+-      "EGL",
+-      "GLESv2",
+-      "log",
+-    ]
++    sources += [ "src/ports/SkDebug_stdio.cpp" ]
+   }
+ 
+   if (is_linux || is_wasm) {
+--- a/gn/toolchain/BUILD.gn
++++ b/gn/toolchain/BUILD.gn
+@@ -18,9 +18,9 @@ declare_args() {
+       target_cxx =
+           "$_prefix/clang++.exe --target=$ndk_target$ndk_api -fno-addrsig"
+     } else {
+-      target_ar = "$_prefix/llvm-ar"
+-      target_cc = "$_prefix/$ndk_target$ndk_api-clang"
+-      target_cxx = "$_prefix/$ndk_target$ndk_api-clang++"
++      target_ar = ar
++      target_cc = cc
++      target_cxx = cxx
+     }
+   } else if (is_tizen) {
+     if (host_os == "win") {
