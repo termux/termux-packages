@@ -1,0 +1,35 @@
+diff --git a/crossenv/__init__.py b/crossenv/__init__.py
+index a358173..491cdb5 100644
+--- a/crossenv/__init__.py
++++ b/crossenv/__init__.py
+@@ -772,6 +773,7 @@ class CrossEnvBuilder(venv.EnvBuilder):
+             'platform-patch.py',
+             'sysconfig-patch.py',
+             'distutils-sysconfig-patch.py',
++            'shebang_fix-patch.py',
+             'pkg_resources-patch.py',
+         ]
+ 
+diff --git a/crossenv/scripts/shebang_fix-patch.py.tmpl b/crossenv/scripts/shebang_fix-patch.py.tmpl
+new file mode 100644
+index 0000000..bb2ca98
+--- /dev/null
++++ b/crossenv/scripts/shebang_fix-patch.py.tmpl
+@@ -0,0 +1,5 @@
++def _build_shebang(self, executable, post_interp):
++    result = b'#!' + executable + post_interp + b'\n'
++    return result
++
++ScriptMaker._build_shebang = _build_shebang
+diff --git a/crossenv/scripts/site.py.tmpl b/crossenv/scripts/site.py.tmpl
+index 63e4d6e..6d969c4 100644
+--- a/crossenv/scripts/site.py.tmpl
++++ b/crossenv/scripts/site.py.tmpl
+@@ -109,6 +109,7 @@ class CrossenvFinder(importlib.abc.MetaPathFinder):
+         'distutils.sysconfig_pypy': '{{context.lib_path}}/distutils-sysconfig-patch.py',
+         'platform': '{{context.lib_path}}/platform-patch.py',
+         'pkg_resources': '{{context.lib_path}}/pkg_resources-patch.py',
++        'pip._vendor.distlib.scripts': '{{context.lib_path}}/shebang_fix-patch.py',
+         'pip._vendor.pkg_resources': '{{context.lib_path}}/pkg_resources-patch.py',
+     }
+ 
