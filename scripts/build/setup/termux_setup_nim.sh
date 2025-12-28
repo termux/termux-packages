@@ -20,13 +20,13 @@ termux_setup_nim() {
 		CHOOSENIM_FOLDER=${TERMUX_COMMON_CACHEDIR}/choosenim-$CHOOSENIM_VERSION
 	fi
 
-	local NIM_CPU
+	local NIM_ARCH
 	case "$TERMUX_ARCH" in
-	aarch64) NIM_CPU="arm64" ;;
-	arm) NIM_CPU="arm" ;;
-	i686) NIM_CPU="i386" ;;
-	x86_64) NIM_CPU="amd64" ;;
-	*) NIM_CPU="$TERMUX_ARCH" ;;
+		aarch64) NIM_ARCH="arm64";;
+		arm) NIM_ARCH="arm";;
+		i686) NIM_ARCH="i386";;
+		x86_64) NIM_ARCH="amd64";;
+		*) termux_error_exit "Unknown architecture: '$TERMUX_ARCH'";;
 	esac
 
 	# Cross compile to TERMUX_ARCH, no need to configure `nim.cfg'
