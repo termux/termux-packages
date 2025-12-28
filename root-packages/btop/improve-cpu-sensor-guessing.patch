@@ -8,12 +8,12 @@ index 119dd6a..2ae36e8 100644
  				}
 +
 +				// Android frequently has heterogeneous CPUs. Try to grab the sensor for the BIG cores.
-+				if (s_contains(str_to_lower(name), "big")) {
++				if (str_to_lower(name).contains("big")) {
 +					cpu_sensor = name;
 +					break;
 +				}
 +				// Failing that, grab the first thermal zone so the random pick below doesn't choose the battery or some other chip.
-+				if (s_contains(str_to_lower(name), "thermal0/")) {
++				if (str_to_lower(name).contains("thermal0/")) {
 +					cpu_sensor = name;
 +					break;
 +				}
