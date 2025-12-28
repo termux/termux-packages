@@ -50,8 +50,8 @@ termux_setup_nim() {
 
 		export PATH=$NIM_FOLDER/bin:$PATH
 	else
-		if ([ ! -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/nim" ] ||
-			[ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/nim")" != "$NIM_PKG_VERSION" ]) &&
+		if ([[ ! -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/nim" ||
+			"$(< "$TERMUX_BUILT_PACKAGES_DIRECTORY/nim")" != "$NIM_PKG_VERSION" ]]) &&
 			([[ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" && "$(dpkg-query -W -f '${db:Status-Status}\n' nim 2>/dev/null)" != "installed" ]] ||
 				[[ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" && ! "$(pacman -Q nim 2>/dev/null)" ]]); then
 			echo "Package 'nim' is not installed."
