@@ -6,7 +6,7 @@ termux_setup_nim() {
 
 	local NIM_VERSION
 	local NIM_FOLDER
-	local NIM_PKG_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/nim/build.sh; echo \$TERMUX_PKG_VERSION")
+	local NIM_PKG_VERSION="$(. "$TERMUX_SCRIPTDIR/packages/nim/build.sh"; echo "$TERMUX_PKG_VERSION")"
 
 	if [[ -z "${NIM_VERSION-}" ]]; then
 		NIM_VERSION=${NIM_PKG_VERSION}
