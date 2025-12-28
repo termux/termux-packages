@@ -38,7 +38,7 @@ termux_setup_nim() {
                        --cpu:${NIM_CPU} "
 
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
-		if [[ ! -x "${NIM_FOLDER}/bin/nim" ]] && [[ -z "$(command -v nim)" ]]; then
+		if [[ ! -x "${NIM_FOLDER}/bin/nim" && -z "$(command -v nim)" ]]; then
 			termux_download "${CHOOSENIM_URL}" "${CHOOSENIM_FILE}" "${CHOOSENIM_SHA256}"
 			chmod +x ${CHOOSENIM_FILE}
 			"${CHOOSENIM_FILE}" ${NIM_PKG_VERSION} --choosenimDir:"${CHOOSENIM_FOLDER}" --nimbleDir:"${NIM_FOLDER}"
