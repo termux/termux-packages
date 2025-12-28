@@ -31,6 +31,24 @@ termux_setup_nim() {
 		export CHOOSENIM_CHOOSE_VERSION=${TERMUX_NIM_VERSION}
 		curl https://nim-lang.org/choosenim/init.sh -sSf | bash -s -- -y
 		local NIM_PATH="$HOME/.nimble/bin"
+		export PATH=$NIM_PATH:$PATH
+                
+		local NIM_CPU
+		case "$TERMUX_ARCH" in
+		aarch64) NIM_CPU="arm64" ;;
+		arm) NIM_CPU="arm" ;;
+		i686) NIM_CPU="i386" ;;
+		x86_64) NIM_CPU="amd64" ;;
+		*) NIM_CPU="$TERMUX_ARCH" ;;
+		esac
+
+		# Cross compile to TERMUX_ARCH, no need to configure `nim.cfg'
+		# Directly compile : nim c ${NIM_FLAGS} *.nim
+		export NIM_FLAGS=" --cc:clang \
+                       --clang.exe=${CC} \
+                       --clang.linkerexe=${CC} \
+                       --os:android \
+                       --cpu:${NIM_CPU} "
 
 	fi
 
