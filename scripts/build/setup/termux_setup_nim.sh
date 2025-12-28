@@ -31,11 +31,12 @@ termux_setup_nim() {
 
 	# Cross compile to TERMUX_ARCH, no need to configure `nim.cfg'
 	# Directly compile : nim c ${NIM_FLAGS} *.nim
-	export NIM_FLAGS=" --cc:clang \
-                       --clang.exe=${CC} \
-                       --clang.linkerexe=${CC} \
-                       --os:android \
-                       --cpu:${NIM_CPU} "
+	NIM_FLAGS=" --cc:clang"
+	NIM_FLAGS+=" --clang.exe=${CC}"
+	NIM_FLAGS+=" --clang.linkerexe=${CC}"
+	NIM_FLAGS+=" --os:android"
+	NIM_FLAGS+=" --cpu:${NIM_ARCH}"
+	export NIM_FLAGS
 
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
 		if [[ ! -x "${NIM_FOLDER}/bin/nim" && -z "$(command -v nim)" ]]; then
