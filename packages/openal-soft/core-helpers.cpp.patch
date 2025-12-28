@@ -1,11 +1,11 @@
 --- a/core/helpers.cpp
 +++ b/core/helpers.cpp
-@@ -338,7 +338,7 @@
-         DirectorySearch(std::filesystem::path{*homepath}/".local/share"/path, ext, &results);
+@@ -343,7 +343,7 @@
  
      /* Search global data dirs */
--    std::string datadirs{al::getenv("XDG_DATA_DIRS").value_or("/usr/local/share/:/usr/share/")};
-+    std::string datadirs{al::getenv("XDG_DATA_DIRS").value_or("@TERMUX_PREFIX@/share/")};
+     const auto datadirs = std::string{al::getenv("XDG_DATA_DIRS")
+-        .value_or("/usr/local/share/:/usr/share/")};
++        .value_or("@TERMUX_PREFIX@/share/")};
  
-     size_t curpos{0u};
+     auto curpos = 0_uz;
      while(curpos < datadirs.size())
