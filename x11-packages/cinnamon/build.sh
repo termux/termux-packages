@@ -21,6 +21,13 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dpolkit=false
 "
 
+termux_step_post_get_source() {
+	find "$TERMUX_PKG_SRCDIR" -type f -print0 | \
+		xargs -0 -n 1 sed -i \
+		-e "s|/usr|$TERMUX_PREFIX|g" \
+		-e "s|#!$TERMUX_PREFIX|#!/usr|g"
+}
+
 termux_step_pre_configure() {
 	termux_setup_gir
 	termux_setup_glib_cross_pkg_config_wrapper

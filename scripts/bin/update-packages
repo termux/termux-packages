@@ -84,16 +84,18 @@ TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'del(.pkg_format) | keys | .[]' "$
 # Converts milliseconds to human-readable format.
 # Example: `ms_to_human_readable 123456789` => 34h 17m 36s 789ms
 ms_to_human_readable() {
-	echo "$(($1/3600000))h $(($1%3600000/60000))m $(($1%60000/1000))s $(($1%1000))ms" | sed 's/0h //;s/0m //;s/0s //'
+	local t="$1" hrs=0 mins=0 secs=0 ms=0
+	(( ms = t%1000, t /= 1000, secs = t%60, t /= 60, mins = t%60, hrs = t/60 ))
+	echo "${hrs}h ${mins}m ${secs}s ${ms}ms" | sed 's/0h //;s/0m //;s/0s //'
 }
 
 # Runs a command without displaying its output in the case if trace is disabled and displays output in the case if it is enabled.
 # Needed only for debugging
 quiet() {
-	if [[ "$-" =~ x ]]; then
+	if [[ "$-" == *"x"* ]]; then
 		"$@"
 	else
-		&>/dev/null "$@"
+		"$@" &> /dev/null
 	fi
 	return $?
 }
@@ -107,8 +109,7 @@ _update() {
 	IFS="," read -r -a EXCLUDED_ARCH <<< "${TERMUX_PKG_EXCLUDED_ARCHES:-}"
 	export TERMUX_ARCH="" # Arch to test updates.
 	for arch in aarch64 arm i686 x86_64; do
-		# shellcheck disable=SC2076
-		if [[ ! " ${EXCLUDED_ARCH[*]} " =~ " ${arch} " ]]; then
+		if [[ " ${EXCLUDED_ARCH[*]} " != *" ${arch} "* ]]; then
 			TERMUX_ARCH="${arch}"
 			break
 		fi
@@ -165,30 +166,29 @@ _fetch_and_cache_tags() {
 	# Ignore non-constant sources
 	# shellcheck disable=SC1091
 	for pkg_dir in "${__GITHUB_PACKAGES[@]}"; do
-		local PKG_SRCURL TAG_TYPE OWNER REPO
-		read -r PKG_SRCURL TAG_TYPE < <(
-			set +u
+		local PKG_SRCURL="" TAG_TYPE="" REGEXP=""
+		read -r PKG_SRCURL TAG_TYPE REGEXP < <(
+			set +eu
 			source "${pkg_dir}/build.sh"
-			echo "${TERMUX_PKG_SRCURL} ${TERMUX_PKG_UPDATE_TAG_TYPE}"
+			echo "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE:-"none"}" "${TERMUX_PKG_UPDATE_VERSION_REGEXP:-}"
 		)
 
-		IFS=/ read -r OWNER REPO _ <<< "${PKG_SRCURL#*://github.com/}"
+		local user="" repo=""
+		IFS=/ read -r user repo _ <<< "${PKG_SRCURL#*://github.com/}"
 
-		if [[ -z "${TAG_TYPE}" ]]; then # If not set, then decide on the basis of url.
+		if [[ "${TAG_TYPE}" == "none" ]]; then # If not set, then decide on the basis of url.
 			if [[ "${PKG_SRCURL:0:4}" == "git+" ]]; then
-				# Get newest tag.
-				TAG_TYPE="newest-tag"
+				TAG_TYPE="newest-tag" # Get newest tag.
+			elif [[ -n "$REGEXP" ]]; then
+				TAG_TYPE="latest-regex" # Get the latest release tag.
 			else
-				# Get the latest release tag.
-				TAG_TYPE="latest-release-tag"
+				TAG_TYPE="latest-release-tag" # Get the latest release tag.
 			fi
 		fi
 
 		# We prepare the query snippets for `termux_github_graphql` here
 		# since we already have the needed information available.
-		GITHUB_GRAPHQL_QUERIES+=( "_$((COUNTER++)): repository(owner: \\\"${OWNER}\\\", name: \\\"${REPO}\\\") { ..._${TAG_TYPE//-/_} }" )
-
-		unset PKG_SRCURL TAG_TYPE OWNER REPO
+		GITHUB_GRAPHQL_QUERIES+=( "_$((COUNTER++)): repository(owner: \\\"${user}\\\", name: \\\"${repo}\\\") { ..._${TAG_TYPE//-/_} }" )
 	done
 
 	# This is called indirectly in subshell
@@ -210,7 +210,7 @@ _fetch_and_cache_tags() {
 
 		termux_github_api_get_tag() {
 			local ver="${TERMUX_PKG_VERSION#*:}"
-			echo "LOCAL|${TERMUX_PKG_NAME}|${ver#v}"
+			echo "LOCAL|${TERMUX_PKG_NAME}|${ver}"
 			exit 0
 		}
 		termux_pkg_upgrade_version() {
@@ -248,53 +248,59 @@ _fetch_and_cache_tags() {
 	)"
 	unset -f __main__
 
-	declare -A __GITHUB_CURRENT_TAGS=()
+	local -A __GITHUB_CURRENT_TAGS=()
 	[[ "${CI-false}" == "true" ]] && echo "::group::INFO: Skipping the following up-to-date packages" || :
-	while IFS='|' read -r type pkg version; do
-		if [[ "${type}" == "LOCAL" ]]; then # Current git-originated package version
-			__GITHUB_CURRENT_TAGS["${pkg:-_}"]="$version"
-			continue
-		fi
-		_LATEST_TAGS["${pkg:-_}"]="$version"
-		if [[ "${type}" == "SKIP" ]] || [[ "${type}" == "GIT" && "${__GITHUB_CURRENT_TAGS["${pkg:-}"]:-}" == "${version}" ]]; then
-			echo "INFO: Skipping ${pkg}: already at version ${version}"
-			: "${_ALREADY_SEEN["${pkg}"]:=""}"
-		fi
+	local pkg_type pkg_name version
+	while IFS='|' read -r pkg_type pkg_name version; do
+		case "${pkg_type}" in
+			"LOCAL") # Local package version for a GitHub GraphQL request.
+				__GITHUB_CURRENT_TAGS["${pkg_name:-_}"]="$version"
+				continue
+			;;
+			"GIT") # GitHub GraphQL results, can be skipped if it matches the local version.
+				if [[ "${__GITHUB_CURRENT_TAGS["${pkg_name:-}"]:-}" == "${version}" ]]; then
+					echo "INFO: Skipping ${pkg_name}: already at version ${version}"
+					: "${_ALREADY_SEEN["${pkg_name}"]:=""}"
+				fi
+			;;
+			"SKIP") # SKIP means we know package is up to date and we can safely skip checks.
+				: "${_ALREADY_SEEN["${pkg_name}"]:=""}"
+				echo "INFO: Skipping ${pkg_name}: already at version ${version}"
+			;;
+		esac
+		_LATEST_TAGS["${pkg_name:-_}"]="$version"
 	done < <(printf '%s\n' "$LATEST_TAGS" "$LATEST_TAGS_GITHUB")
 	[[ "${CI-false}" == "true" ]] && echo "::endgroup::" || :
-	unset __GITHUB_CURRENT_TAGS
 }
 
 _check_updated() {
-	if [[ -n "${_LATEST_TAGS[${1##*/}]:-}" ]]; then
-		(
-			set +eu
-			quiet source "${1}/build.sh"
-			set -eu
-			export TERMUX_PKG_UPGRADE_VERSION_DRY_RUN=1
-			if quiet termux_pkg_upgrade_version "${_LATEST_TAGS[${1##*/}]}"; then
-				echo "INFO: Skipping ${1##*/}: already at version ${TERMUX_PKG_VERSION#*:}"
-				return 0
-			fi
-			return 1
-		)
-		local _ANSWER=$?
-		if (( _ANSWER == 0 )) ; then
-			: "${_ALREADY_SEEN["$(basename "${1}")"]:=""}"
-		fi
-		return $_ANSWER
+	local latest_tag="${_LATEST_TAGS[${1##*/}]:-}"
+
+	if [[ -z "${latest_tag}" ]]; then
+		return 1
+	fi
+
+	(
+	set +eu
+	quiet source "${1}/build.sh"
+	TERMUX_PKG_NAME="${1##*/}"
+	export TERMUX_PKG_UPGRADE_VERSION_DRY_RUN=1
+	# The call to `termux_pkg_upgrade_version` is delibrately
+	# not wrapped by `quiet` to let warnings on stderr bubble up.
+	if termux_pkg_upgrade_version "${latest_tag}" > /dev/null; then
+		echo "INFO: Skipping ${1##*/}: already at version ${TERMUX_PKG_VERSION}"
+		: "${_ALREADY_SEEN["${TERMUX_PKG_NAME}"]:=""}"
+		return 0
 	fi
 	return 1
+	)
 }
 
 _run_update() {
-	# PS4='+$0 \[\e[32m\]${FUNCNAME[0]:-<global scope>}${FUNCNAME[*]:+()}:$LINENO\[\e[0m\] '
-	# set -x
 	local pkg_dir="$1" pkg_name
 	pkg_name="$(basename "${pkg_dir}")"
 	# Run each package update in separate process since we include their environment variables.
 	local output="" _CURRENT_VERSION _NEWEST_VERSION
-	: > "$LATEST_VERSION_TEMP_FILE" # flush the sidechannel
 	# shellcheck disable=SC1091 # Ignore shellcheck's inability to follow the source
 	_CURRENT_VERSION="$(set +eu; . "$(realpath "$pkg_dir")/build.sh"; echo "${TERMUX_PKG_VERSION#*:}")"
 
@@ -305,11 +311,12 @@ _run_update() {
 		exec > >(tee /dev/fd/2) 2>&1 # output everything on stderr to stdout as well.
 		_update "${pkg_dir}"
 	)"; then
-		_NEWEST_VERSION="$(< "$LATEST_VERSION_TEMP_FILE")"
-		: "${_NEWEST_VERSION:="$_CURRENT_VERSION"}"
-		if dpkg --compare-versions "${_CURRENT_VERSION}" lt "${_NEWEST_VERSION}"; then
+		_NEWEST_VERSION="$(tail -n1 "$LATEST_VERSION_TEMP_FILE")"
+		: "${_NEWEST_VERSION:="$_CURRENT_VERSION"}" # If we didn't get a version back treat it as current.
+		_NEWEST_VERSION="${_NEWEST_VERSION% #*}" # Remove potential debug comment.
+        if termux_pkg_is_update_needed "${_CURRENT_VERSION}" "${_NEWEST_VERSION}"; then
 			_ALREADY_SEEN["$pkg_name"]="${pkg_name} ${_CURRENT_VERSION} => ${_NEWEST_VERSION}"
-		elif dpkg --compare-versions "${_CURRENT_VERSION}" gt "${_NEWEST_VERSION}"; then
+		elif termux_pkg_is_update_needed "${_NEWEST_VERSION}" "${_CURRENT_VERSION}"; then
 			_ALREADY_SEEN["$pkg_name"]="${pkg_name} ${_CURRENT_VERSION} => ${_NEWEST_VERSION} (Error? current version is larger than latest fetched version)"
 		else
 			_ALREADY_SEEN["$pkg_name"]=""
@@ -357,8 +364,7 @@ _should_update() {
 			*) [[ $'\n'"$(<"$pkg_dir/build.sh")"$'\n' == *$'\n'TERMUX_PKG_AUTO_UPDATE=true$'\n'* ]] || return 1 ;; # Skip.
 	esac
 
-	# shellcheck disable=SC2076
-	if [[ " ${!_ALREADY_SEEN[*]} ${!_FAILED_UPDATES[*]} " =~ " $(basename "${pkg_dir}") " ]]; then
+	if [[ " ${!_ALREADY_SEEN[*]} ${!_FAILED_UPDATES[*]} " == *" $(basename "${pkg_dir}") "* ]]; then
 		return 1 # Skip.
 	fi
 	if [[ "${BUILD_PACKAGES}${GITHUB_ACTIONS:-}" == "truetrue" ]] && _gh_check_issue_exists "$(basename "${pkg_dir}")"; then
@@ -379,12 +385,12 @@ _update_dependencies() {
 	fi
 	# shellcheck disable=SC2086 # Allow splitting of TERMUX_PACKAGES_DIRECTORIES.
 	while read -r dep dep_dir; do
-		if [[ -z $dep ]]; then
+		if [[ -z "${dep}" ]]; then
 			continue
 		elif [[ "${dep}" == "ERROR" ]]; then
 			termux_error_exit "Obtaining update order failed for $(basename "${pkg_dir}")"
 		fi
-		_should_update "${dep_dir}"  && ! _check_updated "${dep_dir}" && _run_update "${dep_dir}"
+		_should_update "${dep_dir}" && ! _check_updated "${dep_dir}" && _run_update "${dep_dir}"
 	done < <("${TERMUX_SCRIPTDIR}"/scripts/buildorder.py "${pkg_dir}" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
 }
 
@@ -395,6 +401,9 @@ _start_time="$(date +%10s%3N)"
 rm "${TMPDIR:-/tmp}"/termux_ipc_*.fifo &> /dev/null
 # Set up a side channel for reporting parsed latest versions
 export LATEST_VERSION_TEMP_FILE="${TMPDIR:-/tmp}/termux_ipc_$$.fifo"
+
+# DO NOT MERGE - testing only
+set -- @all
 
 if [[ "$1" == "@all" ]]; then
 	_fetch_and_cache_tags
@@ -417,7 +426,7 @@ if [[ "$1" == "@all" ]]; then
 else
 	for pkg in "$@"; do
 		_unix_millis="$(date +%10s%3N)"
-		if [ ! -d "${pkg}" ]; then # If only package name is given, try to find it's directory.
+		if [[ ! -d "${pkg}" ]]; then # If only package name is given, try to find it's directory.
 			for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
 				if [ -d "${repo_dir}/${pkg}" ]; then
 					pkg="${repo_dir}/${pkg}"
@@ -440,9 +449,7 @@ rm "${TMPDIR:-/tmp}"/termux_ipc_*.fifo
 
 echo ""
 echo "INFO: Checked ${#_ALREADY_SEEN[*]} packages - took $(ms_to_human_readable $(( $(date +%10s%3N) - _start_time ))) in total."
-for _pkg in "${_ALREADY_SEEN[@]}"; do
-	[[ -n "$_pkg" ]] && echo "$_pkg"
-done
+printf '%s\n' "${_ALREADY_SEEN[@]}" | grep -ve '^$' | sort
 echo ""
 echo "INFO: ${#_FAILED_UPDATES[*]} failed updates."
 echo "${!_FAILED_UPDATES[@]}"

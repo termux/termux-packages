@@ -16,7 +16,17 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 TERMUX_PKG_AUTO_UPDATE=true
 # Official `less` release tags are marked with a `-rel` suffix
-TERMUX_PKG_UPDATE_VERSION_REGEXP='\d{3}(?=-rel)$'
+TERMUX_PKG_UPDATE_VERSION_REGEXP='\d{3}(?=-rel)'
+
+termux_pkg_auto_update() {
+	local latest_tags
+	latest_tags="$(
+		TERMUX_PKG_SRCURL="https://github.com/gwsw/less" \
+		termux_github_api_get_tag
+	)"
+
+	termux_pkg_upgrade_version "${latest_tags}"
+}
 
 termux_step_pre_configure() {
 	autoreconf -fi
