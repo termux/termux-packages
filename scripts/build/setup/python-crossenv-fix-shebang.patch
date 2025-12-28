@@ -1,35 +1,23 @@
-diff --git a/crossenv/__init__.py b/crossenv/__init__.py
-index a358173..491cdb5 100644
---- a/crossenv/__init__.py
-+++ b/crossenv/__init__.py
-@@ -772,6 +773,7 @@ class CrossEnvBuilder(venv.EnvBuilder):
-             'platform-patch.py',
-             'sysconfig-patch.py',
-             'distutils-sysconfig-patch.py',
-+            'shebang_fix-patch.py',
-             'pkg_resources-patch.py',
-         ]
- 
-diff --git a/crossenv/scripts/shebang_fix-patch.py.tmpl b/crossenv/scripts/shebang_fix-patch.py.tmpl
-new file mode 100644
-index 0000000..bb2ca98
---- /dev/null
-+++ b/crossenv/scripts/shebang_fix-patch.py.tmpl
-@@ -0,0 +1,5 @@
-+def _build_shebang(self, executable, post_interp):
+diff --git a/crossenv/scripts/pip-_vendor-distlib-scripts-patch.py.tmpl b/crossenv/scripts/pip-_vendor-distlib-scripts-patch.py.tmpl
+index 7893cc4..63ae992 100644
+--- a/crossenv/scripts/pip-_vendor-distlib-scripts-patch.py.tmpl
++++ b/crossenv/scripts/pip-_vendor-distlib-scripts-patch.py.tmpl
+@@ -1,17 +1,5 @@
+ def _build_shebang(self, executable, post_interp):
+-    """
+-    Build a shebang line. The default pip behavior will use a "simple" shim
+-    if the path to the wrapped Python binary is < 127 chars long, and doesn't
+-    contain a space. However, the host python binary isn't actually a binary -
+-    it's a shell script that does additional environment modifications - and
+-    os.execv() raises "OSError [Errno 8] Exec format error" if the shebang
+-    of a script isn't a literal binary.
+-
+-    So - patch the script writer so that it *always* uses a shim.
+-    """
+-    result = b"#!/bin/sh\n"
+-    result += b"'''exec' " + executable + post_interp + b' "$0" "$@"\n'
+-    result += b"' '''\n"
 +    result = b'#!' + executable + post_interp + b'\n'
-+    return result
-+
-+ScriptMaker._build_shebang = _build_shebang
-diff --git a/crossenv/scripts/site.py.tmpl b/crossenv/scripts/site.py.tmpl
-index 63e4d6e..6d969c4 100644
---- a/crossenv/scripts/site.py.tmpl
-+++ b/crossenv/scripts/site.py.tmpl
-@@ -109,6 +109,7 @@ class CrossenvFinder(importlib.abc.MetaPathFinder):
-         'distutils.sysconfig_pypy': '{{context.lib_path}}/distutils-sysconfig-patch.py',
-         'platform': '{{context.lib_path}}/platform-patch.py',
-         'pkg_resources': '{{context.lib_path}}/pkg_resources-patch.py',
-+        'pip._vendor.distlib.scripts': '{{context.lib_path}}/shebang_fix-patch.py',
-         'pip._vendor.pkg_resources': '{{context.lib_path}}/pkg_resources-patch.py',
-     }
+     return result
+ 
  

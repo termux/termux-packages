@@ -28,7 +28,7 @@ termux_setup_python_pip() {
 
 		pip install 'setuptools==78.1.0' 'wheel==0.46.1'
 	else
-		local _CROSSENV_VERSION=1.4.0
+		local _CROSSENV_VERSION=1.6.1
 		local _CROSSENV_TAR=crossenv-$_CROSSENV_VERSION.tar.gz
 		local _CROSSENV_FOLDER
 
@@ -43,7 +43,7 @@ termux_setup_python_pip() {
 			termux_download \
 				https://github.com/benfogle/crossenv/archive/refs/tags/v$_CROSSENV_VERSION.tar.gz \
 				$TERMUX_PKG_TMPDIR/$_CROSSENV_TAR \
-				28da6260fafd85b05fa539793c45ef804c700a0bb71172fadef429796d49ac4e
+				f85bfbfbfea3567427daa56693c28c75e69fb6ae78c508565f7ae54a26fe407d
 
 			rm -Rf "$TERMUX_PKG_TMPDIR/crossenv-$_CROSSENV_VERSION"
 			tar xf $TERMUX_PKG_TMPDIR/$_CROSSENV_TAR -C $TERMUX_PKG_TMPDIR
