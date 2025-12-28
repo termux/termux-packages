@@ -14,8 +14,10 @@ termux_setup_nim() {
 
 	if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
 		NIM_FOLDER=${TERMUX_SCRIPTDIR}/build-tools/nim-${NIM_VERSION}
+		CHOOSENIM_FOLDER=${TERMUX_SCRIPTDIR}/build-tools/choosenim-${CHOOSENIM_VERSION}
 	else
 		NIM_FOLDER=${TERMUX_COMMON_CACHEDIR}/nim-$NIM_VERSION
+		CHOOSENIM_FOLDER=${TERMUX_COMMON_CACHEDIR}/choosenim-$CHOOSENIM_VERSION
 	fi
 
 	local NIM_CPU
@@ -39,7 +41,10 @@ termux_setup_nim() {
 		if [[ ! -x "${NIM_FOLDER}/bin/nim" ]] && [[ -z "$(command -v nim)" ]]; then
 			termux_download "${CHOOSENIM_URL}" "${CHOOSENIM_FILE}" "${CHOOSENIM_SHA256}"
 			chmod +x ${CHOOSENIM_FILE}
-			"${CHOOSENIM_FILE}" ${NIM_PKG_VERSION} ----nimbleDir:"${NIM_FOLDER}"
+			"${CHOOSENIM_FILE}" ${NIM_PKG_VERSION} --choosenimDir:"${CHOOSENIM_FOLDER}" --nimbleDir:"${NIM_FOLDER}"
+			if [[ "$(readlink "${HOME}/.choosenim")" != "$(realpath ${CHOOSENIM_FOLDER})" ]]; then
+				ln -sfn "${CHOOSENIM_FOLDER}" "${HOME}/.choosenim"
+			fi
 		fi
 
 		export PATH=$NIM_FOLDER/bin:$PATH
