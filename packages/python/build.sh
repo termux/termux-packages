@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear p
 # License: PSF-2.0
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
-TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
 TERMUX_PKG_VERSION="3.13.11"
 _DEBPYTHON_COMMIT=f358ab52bf2932ad55b1a72a29c9762169e6ac47
 TERMUX_PKG_SRCURL=(
