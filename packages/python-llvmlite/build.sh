@@ -8,6 +8,7 @@ TERMUX_PKG_VERSION=(
 	"0.46.0"
 	"20.1.8"
 )
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
 	"https://github.com/numba/llvmlite/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.tar.gz"
 	"https://github.com/llvm/llvm-project/releases/download/llvmorg-${TERMUX_PKG_VERSION[1]}/llvm-project-${TERMUX_PKG_VERSION[1]}.src.tar.xz"
@@ -21,7 +22,6 @@ TERMUX_PKG_PYTHON_COMMON_DEPS="wheel"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_HOSTBUILD=true
-TERMUX_PKG_RM_AFTER_INSTALL="include"
 
 # See http://llvm.org/docs/CMake.html:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -101,6 +101,8 @@ __llvmlite_build_llvm() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGET_ARCH=$LLVM_TARGET_ARCH"
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_HOST_TRIPLE=$LLVM_DEFAULT_TARGET_TRIPLE"
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_INSTALL_PREFIX=$_LLVMLITE_LLVM_INSTALL_DIR"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_INSTALL_INCLUDEDIR=$_LLVMLITE_LLVM_INSTALL_DIR/include"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_INSTALL_LIBDIR=$_LLVMLITE_LLVM_INSTALL_DIR/lib"
 
 	# Backup dirs and envs
 	local __old_ldflags="$LDFLAGS"
@@ -174,4 +176,11 @@ termux_step_make_install() {
 
 	export LLVMLITE_SKIP_BUILD_LIBRARY=1
 	pip install . --prefix="$TERMUX_PREFIX" -vv --no-build-isolation --no-deps
+}
+
+termux_step_post_massage() {
+	local dir="include"
+	if [[ -d "${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/$dir" ]]; then
+		termux_error_exit "$dir should not exist in $TERMUX_PKG_NAME!"
+	fi
 }
