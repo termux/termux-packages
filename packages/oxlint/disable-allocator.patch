@@ -1,0 +1,43 @@
+Sourced from https://github.com/oxc-project/oxc/pull/17473
+
+commit b781e5aeefac0afe77460861ab70c4cec562c1ee
+Author: Yaksh Bariya <yakshbari4@gmail.com>
+Date:   Tue Dec 30 08:12:44 2025 +0530
+
+    fix(oxfmt,oxlint): builds for arm
+    
+    This makes the condition for enabling mimalloc the same across the
+    entire codebase. The condition for enabling mimalloc dependency was the
+    same across all the projects, but wasn't the same when actually enabling
+    it.
+
+diff --git a/apps/oxfmt/src/lib.rs b/apps/oxfmt/src/lib.rs
+index 733c392a6..238a06054 100644
+--- a/apps/oxfmt/src/lib.rs
++++ b/apps/oxfmt/src/lib.rs
+@@ -9,6 +9,9 @@ pub mod stdin;
+ #[cfg(feature = "napi")]
+ pub use main_napi::*;
+ 
+-#[cfg(all(feature = "allocator", not(miri), not(target_family = "wasm")))]
++#[cfg(all(
++    feature = "allocator",
++    not(any(target_arch = "arm", miri, target_os = "freebsd", target_family = "wasm"))
++))]
+ #[global_allocator]
+ static GLOBAL: mimalloc_safe::MiMalloc = mimalloc_safe::MiMalloc;
+diff --git a/apps/oxlint/src/lib.rs b/apps/oxlint/src/lib.rs
+index 4d890e30f..2c4744b69 100644
+--- a/apps/oxlint/src/lib.rs
++++ b/apps/oxlint/src/lib.rs
+@@ -38,6 +38,9 @@ mod js_plugins;
+ // Use Mimalloc as the global allocator if `--features allocator` is enabled.
+ // Mimalloc has better performance, but this is feature-gated because it's slow to compile.
+ // `--features allocator` is only used in release builds.
+-#[cfg(all(feature = "allocator", not(miri), not(target_family = "wasm")))]
++#[cfg(all(
++    feature = "allocator",
++    not(any(target_arch = "arm", miri, target_os = "freebsd", target_family = "wasm"))
++))]
+ #[global_allocator]
+ static GLOBAL: mimalloc_safe::MiMalloc = mimalloc_safe::MiMalloc;
