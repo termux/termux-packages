@@ -2,34 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://github.com/vi/websocat
 TERMUX_PKG_DESCRIPTION="Command-line client for WebSockets, like netcat (or curl) for ws:// with advanced socat-like functions"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.14.0"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="1.14.1"
 TERMUX_PKG_SRCURL=https://github.com/vi/websocat/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=919ee83c961074c176a129874a77c02889401f3548c2536a84c4427f97cfeb26
+TERMUX_PKG_SHA256=5c976c535800ca635b72839fe49d0fe4ad2479db8744c5a00f0cf911e4832e2d
 TERMUX_PKG_DEPENDS="openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-
-termux_step_pre_configure() {
-	termux_setup_rust
-
-	: "${CARGO_HOME:=$HOME/.cargo}"
-	export CARGO_HOME
-
-	cargo vendor
-	find ./vendor \
-		-mindepth 1 -maxdepth 1 -type d \
-		! -wholename ./vendor/traitobject \
-		-exec rm -rf '{}' \;
-
-	patch --silent -p1 \
-		-d ./vendor/traitobject/ \
-		< "$TERMUX_PKG_BUILDER_DIR"/traitobject-rust-1.87.diff
-
-	echo "" >> Cargo.toml
-	echo '[patch.crates-io]' >> Cargo.toml
-	echo 'traitobject = { path = "./vendor/traitobject" }' >> Cargo.toml
-}
 
 termux_step_make() {
 	termux_setup_rust
