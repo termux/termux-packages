@@ -42,7 +42,7 @@ error[E0425]: cannot find value `MNT_LOCAL` in crate `libc`
      {
 -        let mut buf = MaybeUninit::uninit();
 -        if unsafe { libc::statfs(narrow.as_ptr(), buf.as_mut_ptr()) } < 0 {
--            return DirRemoteness::unknown;
+-            return DirRemoteness::Unknown;
 -        }
 -        let buf = unsafe { buf.assume_init() };
 -        // statfs::f_flags types differ.
@@ -50,9 +50,9 @@ error[E0425]: cannot find value `MNT_LOCAL` in crate `libc`
 -        let flags = buf.f_flags as u64;
 -        #[allow(clippy::unnecessary_cast)]
 -        if flags & (libc::MNT_LOCAL as u64) != 0 {
--            DirRemoteness::local
+-            DirRemoteness::Local
 -        } else {
--            DirRemoteness::remote
+-            DirRemoteness::Remote
 +        fn remoteness_via_statfs<StatFS, Flags>(
 +            statfn: unsafe extern "C" fn(*const libc::c_char, *mut StatFS) -> libc::c_int,
 +            flagsfn: fn(&StatFS) -> Flags,
@@ -63,20 +63,20 @@ error[E0425]: cannot find value `MNT_LOCAL` in crate `libc`
 +            u64: From<Flags>,
 +        {
 +            if is_local_flag == 0 {
-+                return DirRemoteness::unknown;
++                return DirRemoteness::Unknown;
 +            }
 +            let mut buf = MaybeUninit::uninit();
 +            if unsafe { (statfn)(path.as_ptr(), buf.as_mut_ptr()) } < 0 {
-+                return DirRemoteness::unknown;
++                return DirRemoteness::Unknown;
 +            }
 +            let buf = unsafe { buf.assume_init() };
 +            // statfs::f_flag is hard-coded as 64-bits on 32/64-bit FreeBSD but it's a (4-byte)
 +            // long on 32-bit NetBSD.. and always 4-bytes on macOS (even on 64-bit builds).
 +            #[allow(clippy::useless_conversion)]
 +            if u64::from((flagsfn)(&buf)) & is_local_flag != 0 {
-+                DirRemoteness::local
++                DirRemoteness::Local
 +            } else {
-+                DirRemoteness::remote
++                DirRemoteness::Remote
 +            }
          }
 +        let remoteness = remoteness_via_statfs(

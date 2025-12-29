@@ -1,0 +1,51 @@
+This fixes https://github.com/termux/termux-packages/issues/24741
+
+--- a/src/wildcard.rs
++++ b/src/wildcard.rs
+@@ -885,6 +885,9 @@ mod expander {
+             // Ensure we don't fall into a symlink loop.
+             // Ideally we would compare both devices and inodes, but devices require a stat call, so we
+             // use inodes exclusively.
++            #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++            let mut visited_inodes: HashSet<u64> = HashSet::new();
++            #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+             let mut visited_inodes: HashSet<libc::ino_t> = HashSet::new();
+ 
+             loop {
+--- a/src/wutil/dir_iter.rs
++++ b/src/wutil/dir_iter.rs
+@@ -35,6 +35,9 @@ pub struct DirEntry {
+     pub name: WString,
+ 
+     /// inode of this entry.
++    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++    pub inode: u64,
++    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+     pub inode: libc::ino_t,
+ 
+     // Device, inode pair for this entry, or none if not yet computed.
+@@ -152,6 +155,24 @@ fn dirent_type_to_entry_type(dt: u8) -> Option<DirEntryType> {
+     }
+ }
+ 
++#[cfg(all(target_os = "android", target_pointer_width = "32"))]
++fn stat_mode_to_entry_type(m: u32) -> Option<DirEntryType> {
++    match m & S_IFMT as u32 {
++        val if val == S_IFIFO as u32 => Some(DirEntryType::Fifo),
++        val if val == S_IFCHR as u32 => Some(DirEntryType::Chr),
++        val if val == S_IFDIR as u32 => Some(DirEntryType::Dir),
++        val if val == S_IFBLK as u32 => Some(DirEntryType::Blk),
++        val if val == S_IFREG as u32 => Some(DirEntryType::Reg),
++        val if val == S_IFLNK as u32 => Some(DirEntryType::Lnk),
++        val if val == S_IFSOCK as u32 => Some(DirEntryType::Sock),
++        _ => {
++            // todo!("whiteout")
++            None
++        }
++    }
++}
++
++#[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+ fn stat_mode_to_entry_type(m: libc::mode_t) -> Option<DirEntryType> {
+     match m & S_IFMT {
+         S_IFIFO => Some(DirEntryType::Fifo),
