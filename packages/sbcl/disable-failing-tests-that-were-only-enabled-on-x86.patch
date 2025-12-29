@@ -19,10 +19,10 @@ effects that this test failing implies would be:
  (exit :code 2) ; otherwise skip the test
 --- a/tests/elfcore.test.sh
 +++ b/tests/elfcore.test.sh
-@@ -18,7 +18,7 @@
+@@ -16,7 +16,7 @@
+ . ./subr.sh
+ 
  run_sbcl <<EOF
-   (when (member :sb-cover-for-internals sb-impl::+internal-features+)
-     (exit :code 2)) ; breaks static linkage somehow. lp#2131956
 -  #+(and linux elf sb-thread)
 +  #+(and linux elf sb-thread (not android))
    (let ((s (find-symbol "IMMOBILE-SPACE-OBJ-P" "SB-KERNEL")))
