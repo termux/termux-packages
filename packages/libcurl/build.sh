@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION="8.17.0"
 TERMUX_PKG_SRCURL=https://github.com/curl/curl/releases/download/curl-${TERMUX_PKG_VERSION//./_}/curl-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=955f6e729ad6b3566260e8fef68620e76ba3c31acf0a18524416a185acf77992
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP="^\d+.\d+.\d+$"
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+_\d+_\d+$"
 TERMUX_PKG_DEPENDS="libnghttp2, libnghttp3, libssh2, openssl (>= 1:3.2.1-1), zlib"
 TERMUX_PKG_BREAKS="libcurl-dev"
 TERMUX_PKG_REPLACES="libcurl-dev"
