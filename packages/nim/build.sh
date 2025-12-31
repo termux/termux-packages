@@ -3,11 +3,10 @@ TERMUX_PKG_DESCRIPTION="Nim programming language compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="copying.txt"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.2.4
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=2.2.6
 TERMUX_PKG_SRCURL=https://nim-lang.org/download/nim-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=f82b419750fcce561f3f897a0486b180186845d76fb5d99f248ce166108189c7
-TERMUX_PKG_DEPENDS="clang, git, libandroid-glob, openssl"
+TERMUX_PKG_SHA256=657b0e3d5def788148d2a87fa6123fa755b2d92cad31ef60fd261e451785528b
+TERMUX_PKG_DEPENDS="clang, git, libandroid-glob, openssl, libandroid-spawn"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -35,7 +34,7 @@ termux_step_make() {
 	else
 		export NIM_ARCH=arm
 	fi
-	LDFLAGS+=" -landroid-glob"
+	LDFLAGS+=" -landroid-glob -landroid-spawn"
 	sed -i "s%\@CC\@%${CC}%g"  config/nim.cfg
 	sed -i "s%\@CFLAGS\@%${CFLAGS}%g" config/nim.cfg
 	sed -i "s%\@LDFLAGS\@%${LDFLAGS}%g" config/nim.cfg
