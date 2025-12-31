@@ -40,19 +40,24 @@ termux_setup_nim() {
 	NIM_FLAGS+=" --cpu:${NIM_ARCH}"
 	export NIM_FLAGS
 
+	[[ -n "${TERMUX_BUILT_PACKAGES_DIRECTORY}" ]] &&
+		[[ -e "${TERMUX_BUILT_PACKAGES_DIRECTORY}/nim" ]] &&
+		[[ "$(<"${TERMUX_BUILT_PACKAGES_DIRECTORY}/nim")" == "${NIM_PKG_VERSION}" ]] &&
+		return
+
+	[[ ! -x "${NIM_FOLDER}/bin/nim" ]] && export PATH=$NIM_FOLDER/bin:$PATH
+
+	if command -v nim &>/dev/null; then
+		local LOCAL_NIM_VERSION=$(nim --version 2>/dev/null | head -n 1 | awk '{print $4}')
+		if [[ "${LOCAL_NIM_VERSION}" != "${NIM_VERSION}" ]]; then
+			echo "WARN: On device build with old nim version may not possible!"
+			echo "LOCAL_NIM_VERSION = ${LOCAL_NIM_VERSION}"
+			echo "TERMUX_NIM_VERSION = ${NIM_VERSION}"
+		fi
+		return
+	fi
+
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "true" ]]; then
-		[[ -n "${TERMUX_BUILT_PACKAGES_DIRECTORY}" ]] &&
-			[[ -e "${TERMUX_BUILT_PACKAGES_DIRECTORY}/nim" ]] &&
-			[[ "$(<"${TERMUX_BUILT_PACKAGES_DIRECTORY}/nim")" == "${NIM_PKG_VERSION}" ]] &&
-			return
-
-		[[ "$TERMUX_APP_PACKAGE_MANAGER" == "apt" ]] &&
-			[[ "$(dpkg-query -W -f '${db:Status-Status}\n' nim 2>/dev/null)" == "installed" ]] &&
-			return
-
-		[[ "$TERMUX_APP_PACKAGE_MANAGER" == "pacman" ]] &&
-			[[ "$(pacman -Q nim 2>/dev/null)" ]] &&
-			return
 
 		echo "Package 'nim' is not installed."
 		echo "You can install it with"
@@ -68,19 +73,6 @@ termux_setup_nim() {
 		exit 1
 
 	else
-		export PATH=$NIM_FOLDER/bin:$PATH
-
-		[[ -x "${NIM_FOLDER}/bin/nim" ]] && return
-
-		if command -v nim &>/dev/null; then
-			local LOCAL_NIM_VERSION=$(nim --version 2>/dev/null | head -n 1 | awk '{print $4}')
-			if [[ "${LOCAL_NIM_VERSION}" != "${NIM_VERSION}" ]]; then
-				echo "WARN: On device build with old nim version may not possible!"
-				echo "LOCAL_NIM_VERSION = ${LOCAL_NIM_VERSION}"
-				echo "TERMUX_NIM_VERSION = ${NIM_VERSION}"
-			fi
-			return
-		fi
 
 		termux_download "${CHOOSENIM_URL}" "${CHOOSENIM_FILE}" "${CHOOSENIM_SHA256}"
 		chmod +x ${CHOOSENIM_FILE}
