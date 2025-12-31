@@ -4,7 +4,6 @@ termux_setup_nim() {
 	local CHOOSENIM_FILE=${TERMUX_PKG_TMPDIR}/choosenim
 	local CHOOSENIM_SHA256="1034e03564b3e5b5321646f9ce290cc4d3cdff0cf0e9b523d43f0db8b9a45c74"
 
-	local NIM_VERSION
 	local NIM_FOLDER
 	local NIM_PKG_VERSION="$(
 		. "$TERMUX_SCRIPTDIR/packages/nim/build.sh"
