@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/mandiant/goresym/archive/refs/tags/v$TERMUX
 TERMUX_PKG_SHA256=5ed82506ca6d79968c6dfe3ac721a14ca886a19394228c2dce71ef69941aea90
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_DEPENDS=golang
+TERMUX_PKG_BUILD_DEPENDS=golang
 
 termux_step_make() {
 	go build -o goresym
