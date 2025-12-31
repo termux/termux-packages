@@ -6,7 +6,10 @@ termux_setup_nim() {
 
 	local NIM_VERSION
 	local NIM_FOLDER
-	local NIM_PKG_VERSION="$(. "$TERMUX_SCRIPTDIR/packages/nim/build.sh"; echo "$TERMUX_PKG_VERSION")"
+	local NIM_PKG_VERSION="$(
+		. "$TERMUX_SCRIPTDIR/packages/nim/build.sh"
+		echo "$TERMUX_PKG_VERSION"
+	)"
 
 	if [[ -z "${NIM_VERSION-}" ]]; then
 		NIM_VERSION=${NIM_PKG_VERSION}
@@ -22,11 +25,11 @@ termux_setup_nim() {
 
 	local NIM_ARCH
 	case "$TERMUX_ARCH" in
-		aarch64) NIM_ARCH="arm64";;
-		arm) NIM_ARCH="arm";;
-		i686) NIM_ARCH="i386";;
-		x86_64) NIM_ARCH="amd64";;
-		*) termux_error_exit "Unknown architecture: '$TERMUX_ARCH'";;
+	aarch64) NIM_ARCH="arm64" ;;
+	arm) NIM_ARCH="arm" ;;
+	i686) NIM_ARCH="i386" ;;
+	x86_64) NIM_ARCH="amd64" ;;
+	*) termux_error_exit "Unknown architecture: '$TERMUX_ARCH'" ;;
 	esac
 
 	# Cross compile to TERMUX_ARCH, no need to configure `nim.cfg'
@@ -38,35 +41,55 @@ termux_setup_nim() {
 	NIM_FLAGS+=" --cpu:${NIM_ARCH}"
 	export NIM_FLAGS
 
-	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
-		if [[ ! -x "${NIM_FOLDER}/bin/nim" && -z "$(command -v nim)" ]]; then
-			termux_download "${CHOOSENIM_URL}" "${CHOOSENIM_FILE}" "${CHOOSENIM_SHA256}"
-			chmod +x ${CHOOSENIM_FILE}
-			"${CHOOSENIM_FILE}" ${NIM_PKG_VERSION} --choosenimDir:"${CHOOSENIM_FOLDER}" --nimbleDir:"${NIM_FOLDER}"
-			if [[ "$(readlink "${HOME}/.choosenim")" != "$(realpath ${CHOOSENIM_FOLDER})" ]]; then
-				ln -sfn "${CHOOSENIM_FOLDER}" "${HOME}/.choosenim"
+	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "true" ]]; then
+		[[ -n "${TERMUX_BUILT_PACKAGES_DIRECTORY}" ]] &&
+			[[ -e "${TERMUX_BUILT_PACKAGES_DIRECTORY}/nim" ]] &&
+			[[ "$(<"${TERMUX_BUILT_PACKAGES_DIRECTORY}/nim")" == "${NIM_PKG_VERSION}" ]] &&
+			return
+
+		[[ "$TERMUX_APP_PACKAGE_MANAGER" == "apt" ]] &&
+			[[ "$(dpkg-query -W -f '${db:Status-Status}\n' nim 2>/dev/null)" == "installed" ]] &&
+			return
+
+		[[ "$TERMUX_APP_PACKAGE_MANAGER" == "pacman" ]] &&
+			[[ "$(pacman -Q nim 2>/dev/null)" ]] &&
+			return
+
+		echo "Package 'nim' is not installed."
+		echo "You can install it with"
+		echo
+		echo "  pkg install nim"
+		echo
+		echo "  pacman -S nim"
+		echo
+		echo "or build it from source with"
+		echo
+		echo "  ./build-package.sh nim"
+		echo
+		exit 1
+
+	else
+		export PATH=$NIM_FOLDER/bin:$PATH
+
+		[[ -x "${NIM_FOLDER}/bin/nim" ]] && return
+
+		if [[ -z "$(command -v nim)" ]]; then
+			local LOCAL_NIM_VERSION=$(nim --version 2>/dev/null | head -n 1 | awk '{print $4}')
+			if [[ "${LOCAL_NIM_VERSION}" != "${NIM_VERSION}" ]]; then
+				echo "WARN: On device build with old nim version may not possible!"
+				echo "LOCAL_NIM_VERSION = ${LOCAL_NIM_VERSION}"
+				echo "TERMUX_NIM_VERSION = ${NIM_VERSION}"
 			fi
+			return
 		fi
 
-		export PATH=$NIM_FOLDER/bin:$PATH
-	else
-		if ([[ ! -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/nim" ||
-			"$(< "$TERMUX_BUILT_PACKAGES_DIRECTORY/nim")" != "$NIM_PKG_VERSION" ]]) &&
-			([[ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" && "$(dpkg-query -W -f '${db:Status-Status}\n' nim 2>/dev/null)" != "installed" ]] ||
-				[[ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" && ! "$(pacman -Q nim 2>/dev/null)" ]]); then
-			echo "Package 'nim' is not installed."
-			echo "You can install it with"
-			echo
-			echo "  pkg install nim"
-			echo
-			echo "  pacman -S nim"
-			echo
-			echo "or build it from source with"
-			echo
-			echo "  ./build-package.sh nim"
-			echo
-			exit 1
+		termux_download "${CHOOSENIM_URL}" "${CHOOSENIM_FILE}" "${CHOOSENIM_SHA256}"
+		chmod +x ${CHOOSENIM_FILE}
+		"${CHOOSENIM_FILE}" ${NIM_PKG_VERSION} --choosenimDir:"${CHOOSENIM_FOLDER}" --nimbleDir:"${NIM_FOLDER}"
+		if [[ "$(readlink "${HOME}/.choosenim")" != "$(realpath ${CHOOSENIM_FOLDER})" ]]; then
+			ln -sfn "${CHOOSENIM_FOLDER}" "${HOME}/.choosenim"
 		fi
+
 		return
 	fi
 }
