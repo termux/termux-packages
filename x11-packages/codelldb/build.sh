@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://github.com/vadimcn/codelldb
 TERMUX_PKG_DESCRIPTION="A native debugger extension for VSCode based on LLDB"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.12.0"
+TERMUX_PKG_VERSION="1.12.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/vadimcn/codelldb/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=9dbeed978470d2c503a704f0ec90c2b28ad3e1a7ea6a6a7c4dae6a579f485dd7
+TERMUX_PKG_SHA256=5d6dbf96ca5b030a2f011de84148953d8527eaba5d38cb16e56d68905b9a2f67
 TERMUX_PKG_AUTO_UPDATE=true
 # codelldb does not work properly on 32-bit Android
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
