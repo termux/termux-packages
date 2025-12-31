@@ -45,7 +45,7 @@ termux_setup_nim() {
 		[[ "$(<"${TERMUX_BUILT_PACKAGES_DIRECTORY}/nim")" == "${NIM_PKG_VERSION}" ]] &&
 		return
 
-	[[ ! -x "${NIM_FOLDER}/bin/nim" ]] && export PATH=$NIM_FOLDER/bin:$PATH
+	export PATH=$NIM_FOLDER/bin:$PATH
 
 	if command -v nim &>/dev/null; then
 		local LOCAL_NIM_VERSION=$(nim --version 2>/dev/null | head -n 1 | awk '{print $4}')
