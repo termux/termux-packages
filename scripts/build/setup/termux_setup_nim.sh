@@ -57,23 +57,7 @@ termux_setup_nim() {
 		return
 	fi
 
-	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "true" ]]; then
-
-		echo "Package 'nim' is not installed."
-		echo "You can install it with"
-		echo
-		echo "  pkg install nim"
-		echo
-		echo "  pacman -S nim"
-		echo
-		echo "or build it from source with"
-		echo
-		echo "  ./build-package.sh nim"
-		echo
-		exit 1
-
-	else
-
+	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
 		termux_download "${CHOOSENIM_URL}" "${CHOOSENIM_FILE}" "${CHOOSENIM_SHA256}"
 		chmod +x ${CHOOSENIM_FILE}
 		"${CHOOSENIM_FILE}" ${NIM_PKG_VERSION} --choosenimDir:"${CHOOSENIM_FOLDER}" --nimbleDir:"${NIM_FOLDER}"
@@ -83,4 +67,18 @@ termux_setup_nim() {
 
 		return
 	fi
+
+	echo "Package 'nim' is not installed."
+	echo "You can install it with"
+	echo
+	echo "  pkg install nim"
+	echo
+	echo "  pacman -S nim"
+	echo
+	echo "or build it from source with"
+	echo
+	echo "  ./build-package.sh nim"
+	echo
+	exit 1
+
 }
