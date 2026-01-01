@@ -16,11 +16,11 @@ termux_setup_nim() {
 
 	if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
 		NIM_FOLDER=${TERMUX_SCRIPTDIR}/build-tools/nim-${NIM_VERSION}
-		CHOOSENIM_FOLDER=${TERMUX_SCRIPTDIR}/build-tools/choosenim-${CHOOSENIM_VERSION}
 	else
 		NIM_FOLDER=${TERMUX_COMMON_CACHEDIR}/nim-$NIM_VERSION
-		CHOOSENIM_FOLDER=${TERMUX_COMMON_CACHEDIR}/choosenim-$CHOOSENIM_VERSION
 	fi
+
+	local CHOOSENIM_FOLDER=${NIM_FOLDER}/choosenim-${CHOOSENIM_VERSION}
 
 	local NIM_ARCH
 	case "$TERMUX_ARCH" in
@@ -46,21 +46,27 @@ termux_setup_nim() {
 		return
 
 	export PATH=$NIM_FOLDER/bin:$PATH
+	if [[ -x "${CHOOSENIM_FOLDER}/choosenim" ]]; then
+		"${CHOOSENIM_FOLDER}/choosenim" ${NIM_VERSION} --choosenimDir:"${CHOOSENIM_FOLDER}" --nimbleDir:"${NIM_FOLDER}"
+	fi
 
 	if command -v nim &>/dev/null; then
 		local LOCAL_NIM_VERSION=$(nim --version 2>/dev/null | head -n 1 | awk '{print $4}')
 		if [[ "${LOCAL_NIM_VERSION}" != "${NIM_VERSION}" ]]; then
-			echo "WARN: On device build with old nim version may not possible!"
-			echo "LOCAL_NIM_VERSION = ${LOCAL_NIM_VERSION}"
-			echo "TERMUX_NIM_VERSION = ${NIM_VERSION}"
+			echo "WARN: On device build with local nim version may not possible!"
+			echo "LOCAL_NIM_VERSION   = ${LOCAL_NIM_VERSION}"
+			echo "Request NIM_VERSION = ${NIM_VERSION}"
 		fi
 		return
 	fi
 
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
 		termux_download "${CHOOSENIM_URL}" "${CHOOSENIM_FILE}" "${CHOOSENIM_SHA256}"
-		chmod +x ${CHOOSENIM_FILE}
-		"${CHOOSENIM_FILE}" ${NIM_PKG_VERSION} --choosenimDir:"${CHOOSENIM_FOLDER}" --nimbleDir:"${NIM_FOLDER}"
+		mkdir -p "${CHOOSENIM_FOLDER}"
+		mv "${CHOOSENIM_FILE}" "${CHOOSENIM_FOLDER}/choosenim"
+		chmod +x "${CHOOSENIM_FOLDER}/choosenim"
+
+		"${CHOOSENIM_FOLDER}/choosenim" ${NIM_VERSION} --choosenimDir:"${CHOOSENIM_FOLDER}" --nimbleDir:"${NIM_FOLDER}"
 		if [[ "$(readlink "${HOME}/.choosenim")" != "$(realpath ${CHOOSENIM_FOLDER})" ]]; then
 			ln -sfn "${CHOOSENIM_FOLDER}" "${HOME}/.choosenim"
 		fi
