@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="The Movie Player"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.5
-TERMUX_PKG_REVISION=12
+TERMUX_PKG_REVISION=13
 TERMUX_PKG_SRCURL=https://mplayerhq.hu/MPlayer/releases/MPlayer-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=650cd55bb3cb44c9b39ce36dac488428559799c5f18d16d98edb2b7256cbbf85
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, fribidi, liba52, libass, libbluray, libdvdnav, libdvdread, libiconv, libjpeg-turbo, liblzo, libmad, libmp3lame, libogg, libpng, libtheora, libtwolame, libvorbis, libx11, libx264, libxext, libxss, libxv, libmpg123, ncurses, openal-soft, pulseaudio, xvidcore, zlib"
@@ -33,6 +33,12 @@ termux_step_post_get_source() {
 	mkdir ffmpeg
 	cd ffmpeg
 	tar xf $FFMPEG_TARFILE --strip-components=1
+}
+
+termux_step_pre_configure() {
+	# prevents [ALSOFT] (WW) Failed to load libOpenSLES.so
+	# https://github.com/kcat/openal-soft/issues/1111
+	export LDFLAGS+=" -Wl,--no-as-needed,-lOpenSLES,--as-needed"
 }
 
 termux_step_configure_autotools() {
