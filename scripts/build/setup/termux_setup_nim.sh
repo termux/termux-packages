@@ -32,7 +32,7 @@ termux_setup_nim() {
 	esac
 
 	# Cross compile to TERMUX_ARCH, no need to configure `nim.cfg'
-	# Directly compile : nim c ${NIM_FLAGS} *.nim
+	# Directly compile : `nim c ${NIM_FLAGS} *.nim' or `nimble build ${NIM_FLAGS}'
 	NIM_FLAGS=" --cc:clang"
 	NIM_FLAGS+=" --clang.exe=${CC}"
 	NIM_FLAGS+=" --clang.linkerexe=${CC}"
