@@ -10,7 +10,7 @@ TERMUX_PKG_SRCURL=git+https://github.com/libimobiledevice/usbmuxd
 TERMUX_PKG_SHA256=7943adb00031c05a6db3b7e822b5147e32988c9b79d29fd4656a2e1f733181de
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libimobiledevice-glue, libplist, libusb, termux-api, jq"
+TERMUX_PKG_DEPENDS="libimobiledevice, libplist, libusb, termux-api, jq"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-preflight
 --without-systemd
