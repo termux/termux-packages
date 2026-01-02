@@ -1,0 +1,13 @@
+Prevents errpr:
+Android: The API specified by CMAKE_SYSTEM_VERSION='' is not an integer.
+
+--- a/builder/cmake_builder.rs
++++ b/builder/cmake_builder.rs
+@@ -233,6 +233,7 @@ impl CmakeBuilder {
+         } else {
+             emit_warning("ANDROID_STANDALONE_TOOLCHAIN not set.");
+         }
++        _cmake_cfg.define("CMAKE_SYSTEM_VERSION", "@TERMUX_PKG_API_LEVEL@");
+     }
+ 
+     fn configure_windows(&self, cmake_cfg: &mut cmake::Config) {
