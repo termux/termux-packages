@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://inkscape.org/
 TERMUX_PKG_DESCRIPTION="Free and open source vector graphics editor"
-TERMUX_PKG_LICENSE="GPL-2.0, GPL-2.0-or-later, GPL-3.0, GPL-3.0-or-later, LGPL-2.1, LGPL-2.1-or-later, LGPL-3.0, LGPL-3.0-or-later, Mozilla-1.1, Openfont-1.1"
+TERMUX_PKG_LICENSE="GPL-2.0, GPL-2.0-or-later, GPL-3.0, GPL-3.0-or-later, LGPL-2.1, LGPL-2.1-or-later, LGPL-3.0, LGPL-3.0-or-later, Mozilla-1.1, OFL-1.1"
 TERMUX_PKG_LICENSE_FILE="
 LICENSES/GPL-2.0.txt,
 LICENSES/GPL-2.0-or-later.txt,
@@ -15,6 +15,7 @@ LICENSES/OFL-1.1.txt
 "
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.4.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://media.inkscape.org/dl/resources/file/inkscape-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=e83a2c3db570b6c5a1ff0fccfe7098837b3f6bd74b133567937c8a91710ed1d1
 TERMUX_PKG_AUTO_UPDATE=true
