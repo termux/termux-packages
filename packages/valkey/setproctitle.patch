@@ -9,12 +9,12 @@
  	int i, error, envc;
  
  	if (!(base = argv[0]))
-@@ -232,7 +232,7 @@
+@@ -232,7 +232,7 @@ void spt_init(int argc, char *argv[]) {
  	if (!(SPT.arg0 = strdup(argv[0])))
  		goto syerr;
  
--#if __linux__
-+#if defined(__linux__) && !defined(__ANDROID__)
+-#if defined __linux__
++#if defined __linux__ && !defined __ANDROID__
  	if (!(tmp = strdup(program_invocation_name)))
  		goto syerr;
  
