@@ -1,0 +1,15 @@
+Fixes:
+error: trailing semicolon in macro used in expression position
+  --> src/filesystem.rs:47:66
+
+--- a/src/filesystem.rs
++++ b/src/filesystem.rs
+@@ -44,7 +44,7 @@ wrap2!(copy, fs, u64);
+ 
+ macro_rules! make_error_message {
+     ($path:ident) => {
+-        |err| Error::new(format!("{}: {}", $path.display(), err));
++        |err| Error::new(format!("{}: {}", $path.display(), err))
+     };
+ }
+ 
