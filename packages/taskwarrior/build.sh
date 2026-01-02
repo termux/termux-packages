@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Utility for managing your TODO list"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.4.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/GothenburgBitFactory/taskwarrior/releases/download/v${TERMUX_PKG_VERSION}/task-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=d302761fcd1268e4a5a545613a2b68c61abd50c0bcaade3b3e68d728dd02e716
 TERMUX_PKG_AUTO_UPDATE=true
@@ -22,14 +22,31 @@ termux_step_pre_configure() {
 	export CMAKE_POLICY_VERSION_MINIMUM=3.5
 	export BINDGEN_EXTRA_CLANG_ARGS="--sysroot ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot"
 	case "${TERMUX_ARCH}" in
-	arm) BINDGEN_EXTRA_CLANG_ARGS+=" --target=arm-linux-androideabi -isystem ${TERMUX_STANDALONE_TOOLCHAIN}/include/c++/v1 -isystem ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot/usr/include/arm-linux-androideabi" ;;
-	*) BINDGEN_EXTRA_CLANG_ARGS+=" --target=${TERMUX_ARCH}-linux-android -isystem ${TERMUX_STANDALONE_TOOLCHAIN}/include/c++/v1 -isystem ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot/usr/include/${TERMUX_ARCH}-linux-android" ;;
+	arm) BINDGEN_EXTRA_CLANG_ARGS+=" --target=arm-linux-androideabi" ;;
+	*) BINDGEN_EXTRA_CLANG_ARGS+=" --target=${TERMUX_ARCH}-linux-android" ;;
 	esac
 
 	if [ "$TERMUX_ARCH" = "arm" ]; then
 		# See https://cmake.org/cmake/help/latest/variable/CMAKE_ANDROID_ARM_MODE.html
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_ANDROID_ARM_MODE=ON"
 	fi
+
+	cargo vendor
+	find ./vendor \
+		-mindepth 1 -maxdepth 1 -type d \
+		! -wholename ./vendor/aws-lc-sys \
+		-exec rm -rf '{}' \;
+
+	local patch="$TERMUX_PKG_BUILDER_DIR/aws-lc-sys-cmake-system-version.diff"
+	local dir="vendor/aws-lc-sys"
+	echo "Applying patch: $patch"
+	test -f "$patch" && sed \
+		-e "s%\@TERMUX_PKG_API_LEVEL\@%${TERMUX_PKG_API_LEVEL}%g" \
+		"$patch" | patch --silent -p1 -d "${dir}"
+
+	echo "" >> Cargo.toml
+	echo '[patch.crates-io]' >> Cargo.toml
+	echo 'aws-lc-sys = { path = "./vendor/aws-lc-sys" }' >> Cargo.toml
 }
 
 termux_step_post_make_install() {
