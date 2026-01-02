@@ -1,0 +1,13 @@
+Prevents:
+error: variable 'letParameter' set but not used
+
+--- a/src/wiz/compiler/compiler.cpp
++++ b/src/wiz/compiler/compiler.cpp
+@@ -5311,6 +5311,7 @@ namespace wiz {
+                         auto& argument = arguments[i];
+ 
+                         if (auto letParameter = parameter->tryGet<Definition::Let>()) {
++                            (void)letParameter;
+                             if (argument->info->context == EvaluationContext::RunTime) {
+                                 report->error("argument `" + parameter->name.toString() + "` is a `let` expression, so it cannot accept a run-time expression", argument->location);
+                             }
