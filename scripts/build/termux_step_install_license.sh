@@ -51,7 +51,7 @@ termux_step_install_license() {
 				# These licenses contain copyright information,
 				# so we cannot use a generic license file
 				'BSD'|'BSD 2-Clause'|'BSD 3-Clause'|'BSD Simplified'\
-				|'curl'|'HPND'|'ISC'|'Libpng'|'MIT'|'Openfont-1.1'\
+				|'curl'|'HPND'|'ISC'|'Libpng'|'MIT'|'OFL-1.1'\
 				|'PythonPL'|'X11'|'ZLIB')
 					# We only want to include the license files from the source files once
 					if (( ! FROM_SOURCES )); then
