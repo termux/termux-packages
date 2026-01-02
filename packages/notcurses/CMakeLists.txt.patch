@@ -1,3 +1,7 @@
+removing target_link_directories(notcurses-static...
+avoids error:
+Found relative path while evaluating link directories of "notcurses-static": "lib"
+
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -86,7 +86,7 @@
@@ -32,7 +36,22 @@
  target_compile_definitions(notcurses-core
    PUBLIC
     _XOPEN_SOURCE=700 # wcwidth(3) requires _XOPEN_SOURCE, and is in our headers
-@@ -417,7 +417,7 @@
+@@ -411,14 +411,6 @@ target_link_directories(notcurses
+     "${SWSCALE_LIBRARY_DIRS}"
+     "${AVUTIL_LIBRARY_DIRS}"
+ )
+-target_link_directories(notcurses-static
+-  PRIVATE
+-    "${AVCODEC_STATIC_LIBRARY_DIRS}"
+-    "${AVDEVICE_STATIC_LIBRARY_DIRS}"
+-    "${AVFORMAT_STATIC_LIBRARY_DIRS}"
+-    "${SWSCALE_STATIC_LIBRARY_DIRS}"
+-    "${AVUTIL_STATIC_LIBRARY_DIRS}"
+-)
+ elseif(${USE_OIIO})
+ target_include_directories(notcurses PUBLIC "${OIIO_INCLUDE_DIRS}")
+ target_include_directories(notcurses-static PUBLIC "${OIIO_STATIC_INCLUDE_DIRS}")
+@@ -436,7 +428,7 @@ add_library(notcurses-ffi SHARED ${NCFFISRCS})
  target_compile_options(notcurses-ffi PUBLIC -fkeep-inline-functions)
  target_compile_definitions(notcurses-ffi PUBLIC NOTCURSES_FFI)
  # don't want these on freebsd/dragonfly/osx
