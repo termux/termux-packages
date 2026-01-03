@@ -1,33 +1,28 @@
-Disable cargo commands
-
 --- a/meson.build
 +++ b/meson.build
-@@ -1,6 +1,6 @@
- project(
-     'rnote',
--    ['rust', 'cpp'],
-+    ['cpp'],
-     version: '0.11.0',
-     meson_version: '>= 1.0',
- )
-@@ -70,7 +70,6 @@
- dependency('gio-2.0', version: '>= 2.76')
- dependency('cairo', version: '>= 1.18')
+@@ -1,4 +1,4 @@
+-project('rnote', ['rust', 'cpp'], version: '0.13.1', meson_version: '>= 1.0')
++project('rnote', ['cpp'], version: '0.13.1', meson_version: '>= 1.0')
+ # add a patch suffix for alpha or beta versions in format '-<alpha|beta>.<x>'.
+ patch = ''
+ 
+@@ -63,7 +63,6 @@ dependency('cairo', version: '>= 1.18')
+ dependency('poppler', version: '>= 20.09')
+ # UI/CLI specific dependencies are declared below
  
 -cargo = find_program('cargo', required: true)
  # cmake is needed by the "ink-stroke-modeler-rs" bindings crate to build the C++ library
  find_program('cmake', required: true)
  find_program('glib-compile-resources', required: true)
-@@ -108,7 +107,7 @@
- subdir('crates/rnote-compose')
+@@ -91,6 +90,7 @@ subdir('crates/rnote-compose')
  subdir('crates/rnote-engine')
  
--
-+if false
  # cargo fmt check
++if false
  run_target(
      'cargo-fmt-check',
-@@ -157,6 +156,7 @@
+     command: [
+@@ -132,6 +132,7 @@ run_target(
      ],
      env: cargo_env,
  )
@@ -35,7 +30,7 @@ Disable cargo commands
  
  # build/install the ui
  if build_ui == true
-@@ -198,6 +198,7 @@
+@@ -173,6 +174,7 @@ if build_ui == true
          ui_output = app_name
      endif
  
@@ -43,7 +38,7 @@ Disable cargo commands
      # ui cargo check
      run_target(
          'ui-cargo-check',
-@@ -251,6 +252,7 @@
+@@ -214,6 +216,7 @@ if build_ui == true
              meson.project_build_root() / '@OUTPUT@',
          ],
      )
@@ -51,7 +46,7 @@ Disable cargo commands
  
      meson.add_install_script(
          'build-aux/meson_post_install.py',
-@@ -263,7 +265,7 @@
+@@ -226,7 +229,7 @@ if build_ui == true
          glib_compile_schemas: true,
          gtk_update_icon_cache: true,
          update_desktop_database: true,
@@ -60,3 +55,12 @@ Disable cargo commands
      )
  
      # Windows installer
+@@ -288,7 +288,7 @@ endif
+ endif
+ 
+ # build/install the cli
+-if build_cli == true
++if false
+     # cli crate
+     subdir('crates/rnote-cli')
+ 
