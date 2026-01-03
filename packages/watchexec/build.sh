@@ -2,15 +2,31 @@ TERMUX_PKG_HOMEPAGE=https://github.com/watchexec/watchexec
 TERMUX_PKG_DESCRIPTION="Executes commands in response to file modifications"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.3.0"
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://github.com/watchexec/watchexec/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=bf508d3662fe85294a61ab39a3fbfb0a76f79202448fb3c038a3003ae3e18245
+TERMUX_PKG_VERSION="2.3.2"
+TERMUX_PKG_SRCURL="https://github.com/watchexec/watchexec/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=52201822ab00bfaf6757f953f667870b3aada52f887813e94b4f322f239ff8fb
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_make_install() {
+termux_step_pre_configure() {
 	termux_setup_rust
+	cargo vendor
+	find ./vendor \
+		-mindepth 1 -maxdepth 1 -type d \
+		! -wholename ./vendor/notify-rust \
+		-exec rm -rf '{}' \;
+
+	local patch="$TERMUX_PKG_BUILDER_DIR/notify-rust-bump-zbus.diff"
+	local dir="vendor/notify-rust"
+	echo "Applying patch: $patch"
+	patch -p1 -d "$dir" < "${patch}"
+
+	echo "" >> Cargo.toml
+	echo '[patch.crates-io]' >> Cargo.toml
+	echo 'notify-rust = { path = "./vendor/notify-rust" }' >> Cargo.toml
+}
+
+termux_step_make_install() {
 	cargo install \
 		--jobs $TERMUX_PKG_MAKE_PROCESSES \
 		--path crates/cli \
