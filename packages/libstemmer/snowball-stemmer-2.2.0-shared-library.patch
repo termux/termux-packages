@@ -24,13 +24,13 @@ index 98eb1fa..9b539ec 100644
  ifeq ($(OS),Windows_NT)
  EXEEXT = .exe
  endif
-@@ -170,12 +172,17 @@ C_OTHER_OBJECTS = $(C_OTHER_SOURCES:.c=.o)
+@@ -192,12 +192,17 @@ C_OTHER_OBJECTS = $(C_OTHER_SOURCES:.c=.o)
  JAVA_CLASSES = $(JAVA_SOURCES:.java=.class)
  JAVA_RUNTIME_CLASSES=$(JAVARUNTIME_SOURCES:.java=.class)
  
--CFLAGS=-O2 -W -Wall -Wmissing-prototypes -Wmissing-declarations
+-CFLAGS=-g -O2 -W -Wall -Wmissing-prototypes -Wmissing-declarations -Wshadow $(WERROR)
 -CPPFLAGS=
-+CFLAGS+=-fPIC -W -Wall -Wmissing-prototypes -Wmissing-declarations
++CFLAGS=-fPIC -W -Wall -Wmissing-prototypes -Wmissing-declarations -Wshadow $(WERROR)
 +CPPFLAGS+=
  
  INCLUDES=-Iinclude
