@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Intelligent Input Bus for Linux/Unix"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.5.33"
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://github.com/ibus/ibus/releases/download/$TERMUX_PKG_VERSION/ibus-$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=58941c9b8285891c776b67fb2039eebe0d61d63a51578519febfc5481b91e831
 TERMUX_PKG_DEPENDS="dconf, glib, gobject-introspection, gtk3, gtk4, ibus-data, libdbusmenu, libnotify, libwayland, libx11, libxfixes, libxi, libxkbcommon"
@@ -15,7 +16,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-introspection
 --disable-vala
 --disable-gtk2
---disable-dconf
+--enable-dconf
 --enable-gtk4
 --disable-memconf
 --enable-ui
@@ -42,5 +43,8 @@ termux_step_pre_configure() {
 		HERE
 		chmod +x "$TERMUX_PKG_TMPDIR"/host-pkg-config/pkg-config
 		export PKG_CONFIG_FOR_BUILD="$TERMUX_PKG_TMPDIR"/host-pkg-config/pkg-config
+
+		termux_download_ubuntu_packages dconf-cli "$TERMUX_PKG_TMPDIR/prefix"
+		export PATH="$TERMUX_PKG_TMPDIR/prefix/usr/bin:$PATH"
 	fi
 }
