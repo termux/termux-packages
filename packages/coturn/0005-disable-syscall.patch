@@ -1,0 +1,11 @@
+--- a/src/apps/relay/mainrelay.c
++++ b/src/apps/relay/mainrelay.c
+@@ -2813,7 +2813,7 @@
+ }
+ 
+ static void drop_privileges(void) {
+-#if defined(WINDOWS)
++#if defined(WINDOWS) || defined(__ANDROID__)
+   // TODO: implement it!!!
+ #else
+   setgroups(0, NULL);
