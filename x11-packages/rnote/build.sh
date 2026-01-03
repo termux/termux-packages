@@ -2,59 +2,39 @@ TERMUX_PKG_HOMEPAGE="https://github.com/flxzt/rnote"
 TERMUX_PKG_DESCRIPTION="An infinite canvas vector-based drawing application for handwritten notes"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@EDLLT"
-TERMUX_PKG_VERSION="0.11.0"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION="0.13.1"
 TERMUX_PKG_SRCURL="https://github.com/flxzt/rnote/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=b133d4331963d3c09d3a7477f60fc4c5072471dcbf459379a593ca1724164af4
+TERMUX_PKG_SHA256=1d281a17ff8b9dce325ae5b0613a0cd7db5d717319f4899f2ce758e615572256
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="gdk-pixbuf, gettext, glib, graphene, gtk4, hicolor-icon-theme, libadwaita, libcairo, pipewire, pango, poppler"
+TERMUX_PKG_DEPENDS="alsa-lib, gdk-pixbuf, gettext, glib, graphene, gtk4, hicolor-icon-theme, libadwaita, libcairo, pipewire, pango, poppler"
 TERMUX_PKG_BUILD_DEPENDS="libiconv"
 TERMUX_PKG_PYTHON_BUILD_DEPS="toml2json"
-
-__fetch_gettext_rs() {
-	# Latest version of gettext-sys, provided by the gettext-rs crate
-	local crate_version=0.21.4
-	local -a crate=(
-		"https://github.com/gettext-rs/gettext-rs/archive/refs/tags/gettext-sys-$crate_version.tar.gz" # Upstream URL
-		"$TERMUX_PKG_CACHEDIR/gettext-v$crate_version.tar.gz"                                          # Local save path
-		'211773408ab61880b94a0ea680785fc21fad307cd42594d547cf5a056627fcda'                             # SHA256 checksum
-	)
-
-	# Fetch latest gettext from upstream
-	local -a upstream=(
-		"$(. "$TERMUX_SCRIPTDIR/packages/gettext/build.sh"; echo ${TERMUX_PKG_SRCURL})"   # Upstream URL (from gettext's build script)
-		"$TERMUX_PKG_SRCDIR/gettext-source/gettext-sys/gettext-latest.tar.xz"             # Local save path
-		"$(. "$TERMUX_SCRIPTDIR/packages/gettext/build.sh"; echo ${TERMUX_PKG_SHA256})"   # SHA256 checksum (from gettext's build script)
-	)
-
-	termux_download "${crate[@]}"
-
-	tar xf "${crate[1]}" -C "$TERMUX_PKG_SRCDIR"
-	mv "gettext-rs-gettext-sys-$crate_version" "gettext-source"
-
-	termux_download "${upstream[@]}"
-}
-
-__patch_gettext_rs() {
-	# Patch gettext-rs crate to use a newer gettext version because the old one doesn't compile properly with clang
-	patch -p1 -d "$TERMUX_PKG_SRCDIR/gettext-source" -i "$TERMUX_PKG_BUILDER_DIR"/gettext-rs-crate.diff
-}
 
 termux_step_pre_configure() {
 	termux_setup_cmake
 	termux_setup_glib_cross_pkg_config_wrapper
-
-	# Fetch and patch the crate to use a newer upstream gettext version
-	__fetch_gettext_rs
-	__patch_gettext_rs
 }
 
 termux_step_make() {
 	termux_setup_rust
+
 	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
 	export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=-liconv"
 
 	cd "${TERMUX_PKG_SRCDIR}" || termux_error_exit "Failed to enter source directory, aborting build."
+	cargo vendor
+	find ./vendor \
+		-mindepth 1 -maxdepth 1 -type d \
+		! -wholename ./vendor/cpal \
+		-exec rm -rf '{}' \;
+
+	find vendor/cpal -type f -print0 | \
+		xargs -0 sed -i \
+		-e 's|"android"|"disabling_this_because_it_is_for_building_an_apk"|g' \
+		-e 's|"linux"|"android"|g'
+
+	sed -i '/\[patch.crates-io\]/a cpal = { path = "./vendor/cpal" }' Cargo.toml
+
 	local target
 	for target in 'rnote-cli' 'rnote'; do
 		cargo build \
