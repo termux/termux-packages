@@ -21,7 +21,7 @@ termux_download_ubuntu_packages() {
 	mkdir -p "$DESTINATION"
 
 	local package
-	while read -r -d ' ' package; do
+	for package in $PACKAGES; do
 		local summary_url
 
 		echo "termux_download_ubuntu_packages(): Downloading summary page for '$package'"
@@ -61,7 +61,7 @@ termux_download_ubuntu_packages() {
 		mkdir -p "${TERMUX_PKG_TMPDIR}/${deb_name}"
 		ar x "${TERMUX_COMMON_CACHEDIR}/${deb_name}" --output="${TERMUX_PKG_TMPDIR}/${deb_name}"
 		tar xf "${TERMUX_PKG_TMPDIR}/${deb_name}"/data.tar.* -C "${DESTINATION}"
-	done <<< "$PACKAGES"
+	done
 
 	return 0
 }
