@@ -3,12 +3,15 @@ TERMUX_PKG_DESCRIPTION="SQLCipher is an SQLite extension that provides 256 bit A
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.12.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/sqlcipher/sqlcipher/archive/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=151a1c618c7ae175dfd0f862a8d52e8abd4c5808d548072290e8656032bb0f12
 TERMUX_PKG_DEPENDS="libedit, openssl"
 TERMUX_PKG_BUILD_DEPENDS="tcl"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+# will overwrite libsqlite during installation
+TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 # --enable-editline --disable-readline
 # prevents
 # error: 'regparm' is not valid on this platform
@@ -39,5 +42,22 @@ termux_step_configure() {
 		--libdir="$TERMUX__PREFIX__LIB_DIR" \
 		--includedir="$TERMUX__PREFIX__INCLUDE_DIR" \
 		--sbindir="$TERMUX_PREFIX/bin" \
+		--disable-static \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
+}
+
+termux_step_post_massage() {
+	# Rename files from sqlite3 to sqlcipher to prevent file collisons
+	# based on the precedent being set by LigurOS, NixOS
+	# https://gitlab.com/liguros/liguros-repo/-/blob/2406209f428ab349fc33209834caf1a7a0477fda/dev-db/sqlcipher/sqlcipher-4.12.0.ebuild#L70
+	local sql_version="$(cat "$TERMUX_PKG_SRCDIR"/VERSION)"
+	mv bin/{sqlite3,sqlcipher}
+	mv include/{sqlite3,sqlcipher}.h
+	mv include/{sqlite3ext,sqlcipherext}.h
+	mv lib/lib{sqlite3,sqlcipher}.so
+	mv lib/lib{sqlite3,sqlcipher}.so.0
+	mv lib/lib{sqlite3,sqlcipher}.so."$sql_version"
+	mv lib/pkgconfig/{sqlite3,sqlcipher}.pc
+	mv share/man/man1/{sqlite3,sqlcipher}.1.gz
+	sed -i s/-lsqlite3/-lsqlcipher/ lib/pkgconfig/sqlcipher.pc
 }
