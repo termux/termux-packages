@@ -10,17 +10,17 @@ diff -u -r ../gmic-3.4.3/src/Makefile ./src/Makefile
  ifdef IS_GCC
  MANDATORY_CFLAGS += -Wall -Wextra -Wfatal-errors -Werror=unknown-pragmas -Werror=unused-label
  GCC_VER_GTEQ5 = $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 5)
-@@ -357,8 +357,8 @@
- GMIC_STD_CFLAGS = -Dgmic_community $(MANDATORY_CFLAGS) $(ABORT_CFLAGS) $(PARALLEL_CFLAGS) $(FFTW_CFLAGS) $(CURL_CFLAGS) $(PNG_CFLAGS) $(JPEG_CFLAGS) $(TIFF_CFLAGS)
- GMIC_STD_LIBS = $(MANDATORY_LIBS) $(PARALLEL_LIBS) $(FFTW_LIBS) $(CURL_LIBS) $(PNG_LIBS) $(JPEG_LIBS) $(TIFF_LIBS)
+@@ -378,8 +378,8 @@ endif
+ GMIC_STD_CFLAGS = $(MANDATORY_CFLAGS) $(DISPLAY_CFLAGS) $(ABORT_CFLAGS) $(PARALLEL_CFLAGS) $(FFTW_CFLAGS) $(CURL_CFLAGS) $(PNG_CFLAGS) $(JPEG_CFLAGS) $(TIFF_CFLAGS)
+ GMIC_STD_LIBS = $(MANDATORY_LIBS) $(DISPLAY_LIBS) $(PARALLEL_LIBS) $(FFTW_LIBS) $(CURL_LIBS) $(PNG_LIBS) $(JPEG_LIBS) $(TIFF_LIBS)
  ifeq ($(OS),Unix) # Unix
--GMIC_STD_CFLAGS += $(OPENMP_CFLAGS) $(X11_CFLAGS) $(OPENEXR_CFLAGS) $(WEBP_CFLAGS)
--GMIC_STD_LIBS += $(OPENMP_LIBS) $(X11_LIBS) $(OPENEXR_LIBS) $(WEBP_LIBS)
-+GMIC_STD_CFLAGS += $(X11_CFLAGS) $(OPENEXR_CFLAGS) $(WEBP_CFLAGS)
-+GMIC_STD_LIBS += $(X11_LIBS) $(OPENEXR_LIBS) $(WEBP_LIBS)
+-GMIC_STD_CFLAGS += $(OPENMP_CFLAGS) $(OPENEXR_CFLAGS) $(WEBP_CFLAGS)
+-GMIC_STD_LIBS += $(OPENMP_LIBS) $(OPENEXR_LIBS) $(WEBP_LIBS)
++GMIC_STD_CFLAGS += $(OPENEXR_CFLAGS) $(WEBP_CFLAGS)
++GMIC_STD_LIBS += $(OPENEXR_LIBS) $(WEBP_LIBS)
  else
  ifeq ($(OS),Darwin) # MacOSX
- GMIC_STD_CFLAGS += $(X11_CFLAGS) $(OPENEXR_CFLAGS)
+ GMIC_STD_CFLAGS += $(OPENEXR_CFLAGS)
 @@ -434,6 +434,10 @@
  	$(MAKE) "CFLAGS+=$(GMIC_STD_CFLAGS) $(OPT_CFLAGS)" "LIBS+=gmic.o $(GMIC_STD_LIBS) $(OPT_LIBS)" gmic.o _cli
  	$(STRIP) gmic$(EXE)
@@ -32,7 +32,7 @@ diff -u -r ../gmic-3.4.3/src/Makefile ./src/Makefile
  opencv: # Default: With OpenCV support
  	$(MAKE) "CFLAGS+=$(GMIC_STD_CFLAGS) $(OPT_CFLAGS) $(OPENCV_CFLAGS)" "LIBS+=gmic.o $(GMIC_STD_LIBS) $(OPT_LIBS) $(OPENCV_LIBS)" gmic.o _cli
  	$(STRIP) gmic$(EXE)
-@@ -462,13 +466,20 @@
+@@ -489,13 +489,20 @@ gprof: # With optimization enabled, symbols kept and gprof enabled, for code pro
  	$(MAKE) "CFLAGS+=$(GMIC_STD_CFLAGS) $(OPT_CFLAGS) -g -pg" "LIBS+=gmic.o $(GMIC_STD_LIBS) $(OPT_LIBS)" gmic.o _cli
  
  _cli: gmic$(EXE)
@@ -51,6 +51,6 @@ diff -u -r ../gmic-3.4.3/src/Makefile ./src/Makefile
 +gmic_gm.o: gmic.cpp gmic.h gmic_stdlib_community.h CImg.h
 +	$(CXX) -o gmic_gm.o -c gmic.cpp -Dgmic_core $(CFLAGS) $(MAGICK_CFLAGS)
 +
- # CLI (shared)
- #--------------
- cli_shared:
+ # Testing builds.
+ #
+ cli_sdl3:

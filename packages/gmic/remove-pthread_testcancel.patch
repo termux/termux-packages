@@ -1,0 +1,14 @@
+The program no longer contains any instances of pthread_cancel(),
+and pthread_testcancel() does not do anything if pthread_cancel()
+was never used
+
+--- a/src/CImg.h
++++ b/src/CImg.h
+@@ -10164,7 +10164,6 @@ namespace cimg_library {
+           X11_attr.unlock();
+           cimg::sleep(8);
+         }
+-        pthread_testcancel();
+       }
+       return 0;
+     }
