@@ -1,0 +1,14 @@
+Prevents:
+ld.lld: error: unable to find library -lresolv
+
+--- a/libfreshclam/CMakeLists.txt
++++ b/libfreshclam/CMakeLists.txt
+@@ -53,7 +53,7 @@ if(ENABLE_SHARED_LIB)
+             PUBLIC
+                 network )
+     elseif(UNIX AND NOT AIX)
+-        if(HAVE_RESOLV_H AND NOT C_BSD) # BSD appears to have libresolv inside libc
++        if(HAVE_RESOLV_H AND NOT C_BSD AND NOT ANDROID) # BSD and Android appear to have libresolv inside libc
+             target_link_libraries( freshclam
+                 PUBLIC
+                     resolv )
