@@ -17,6 +17,7 @@ jobs:
     strategy:
       matrix:
         target_arch: [aarch64, arm, i686, x86_64]
+        batch: [1, 2]
       fail-fast: false
     steps:
     - name: Clone repository
@@ -25,6 +26,14 @@ jobs:
         fetch-depth: 0
     - name: Set process id limit for 32-bit builds depending on aosp-libs
       run: echo 65535 | sudo tee /proc/sys/kernel/pid_max
+    - name: Enable zram
+      if: ${{ steps.build-info.outputs.skip-building != 'true' }}
+      uses: ./.github/actions/zram
+      with:
+        algorithm: zstd
+        size: 16G
+        priority: 100
+        device_name: /dev/zram0
     - name: Prepare environment
       run: |
         ./scripts/setup-ubuntu.sh
@@ -32,10 +41,10 @@ jobs:
         sudo apt install ninja-build
         ./scripts/free-space.sh
     - name: Golang validation
-      run: ./scripts/bin/golang-validation "${{ matrix.target_arch }}" || exit 1
+      run: ./scripts/bin/validation ${{ matrix.target_arch }} golang ${{ matrix.batch }} || exit 1
     - name: Upload report artifact
       if: always()
       uses: actions/upload-artifact@v6
       with:
-        name: report-${{ matrix.target_arch }}
+        name: report-${{ matrix.target_arch }}-${{ matrix.batch }}
         path: /tmp/golang-validation-report.txt
