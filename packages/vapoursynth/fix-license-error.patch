@@ -1,0 +1,19 @@
+Prevents:
+setuptools.errors.InvalidConfigError: No configuration found for dynamic 'license'.
+Seems to be OK to do because not only does
+$TERMUX_PREFIX/lib/python3.12/site-packages/vapoursynth-0.0.0.dist-info/licenses/COPYING.LESSER
+still appear, but also Termux still adds
+$TERMUX_PREFIX/share/doc/vapoursynth/copyright
+to the package anyway
+
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -10,7 +10,7 @@ authors = [
+ requires-python = ">=3.8"
+ description = "A frameserver for the 21st century"
+ keywords = ["frameserver", "video", "audio"]
+-dynamic = ["version", "license"]
++dynamic = ["version"]
+ readme = "README.md"
+ 
+ [project.urls]
