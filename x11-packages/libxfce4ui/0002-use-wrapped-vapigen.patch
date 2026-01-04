@@ -1,0 +1,15 @@
+prefer the wrapped vapigen created by termux_setup_gir, to avoid:
+/bin/bash: line 1: /data/data/com.termux/files/usr/bin/vapigen-0.56: cannot execute: required file not found
+if valac is installed in $TERMUX_PREFIX in the cross-compilation container before building libxfce4ui
+
+--- a/configure
++++ b/configure
+@@ -23116,7 +23116,7 @@ printf %s "checking for vapigen... " >&6; }
+   case $enable_vala in #(
+   yes) :
+ 
+-      VAPIGEN=`$PKG_CONFIG --variable=vapigen $vapigen_pkg_name`
++      VAPIGEN="$(command -v vapigen)"
+       VAPIGEN_MAKEFILE=`$PKG_CONFIG --variable=datadir $vapigen_pkg_name`/vala/Makefile.vapigen
+       if test "x" = "x"
+ then :
