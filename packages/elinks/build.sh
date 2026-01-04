@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Full-Featured Text WWW Browser"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.19.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/rkd77/elinks/releases/download/v${TERMUX_PKG_VERSION}/elinks-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=a993a4870cadce60abbc724cf6a5c2a80f6be9020243b9e5ce075c16c6665c04
 TERMUX_PKG_DEPENDS="libandroid-execinfo, libexpat, libiconv, libidn, openssl, libbz2, zlib"
