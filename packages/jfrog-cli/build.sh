@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A CLI for JFrog products"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.87.0"
-TERMUX_PKG_SRCURL=https://github.com/jfrog/jfrog-cli/archive/v$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SRCURL=https://github.com/jfrog/jfrog-cli/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=56c7a2b12d4f4f506962c10ba5f0e437875d2fb7f873d0a41272d7d7a5180827
 TERMUX_PKG_AUTO_UPDATE=true
 

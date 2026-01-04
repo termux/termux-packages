@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Function (graph) tracer for user-space"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.18.1"
-TERMUX_PKG_SRCURL=https://github.com/namhyung/uftrace/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SRCURL=https://github.com/namhyung/uftrace/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c089e7f38dab8d17346d41cee0ec69dc60699d5527b54e6765712235577da0db
 # Hardcoded libpython${TERMUX_PYTHON_VERSION}.so is dlopen(3)ed by uftrace.
 # Please revbump and rebuild when bumping TERMUX_PYTHON_VERSION.

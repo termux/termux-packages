@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Krishna kanhaiya @kcubeterm"
 TERMUX_PKG_VERSION="1.17.0"
 TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://github.com/msoap/shell2http/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SRCURL=https://github.com/msoap/shell2http/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=17fab67e34e767accfbc59ab504971c704f54d79b57a023e6b5efa5556994624
 TERMUX_PKG_AUTO_UPDATE=true
 

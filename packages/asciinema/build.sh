@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1:3.0.1"
 : "${TERMUX_PKG_VERSION:2}" # We need to remove both the epoch and the '~' from the version
-TERMUX_PKG_SRCURL=https://github.com/asciinema/asciinema/archive/v${_//\~/-}.tar.gz
+TERMUX_PKG_SRCURL=https://github.com/asciinema/asciinema/archive/refs/tags/v${_//\~/-}.tar.gz
 TERMUX_PKG_SHA256=612ecb265ccb316f07c9825bacd7301fd21f03a72b516edd370b0d3aa1adf2bb
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true

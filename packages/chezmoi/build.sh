@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Manage your dotfiles across multiple machines"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION="2.68.1"
-TERMUX_PKG_SRCURL=https://github.com/twpayne/chezmoi/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SRCURL=https://github.com/twpayne/chezmoi/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=472640951ffdeedec45d444a35c373e18a4620fbf6b59151171b2bf86b74a90d
 TERMUX_PKG_AUTO_UPDATE=true
 
