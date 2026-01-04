@@ -1,0 +1,74 @@
+diff --git a/externals/libcrypto/src/configureHook.sh b/externals/libcrypto/src/configureHook.sh
+index b60ae1689..386f9eecb 100755
+--- a/externals/libcrypto/src/configureHook.sh
++++ b/externals/libcrypto/src/configureHook.sh
+@@ -18,9 +18,12 @@ case "$ISA" in
+ esac
+ ############################
+ 
++patch -p1 < syslog.patch
++
+ mkdir build && cd build
+-CFLAGS="${CVMFS_BASE_C_FLAGS} -fPIC" ../configure \
++CFLAGS="${CVMFS_BASE_C_FLAGS} -fPIC -Wno-error=implicit-function-declaration" ../configure \
+   --enable-static \
+   --disable-shared \
+   --disable-tests $DISABLE_ASM \
+-  --prefix=${EXTERNALS_INSTALL_LOCATION}/crypto
++  --prefix=${EXTERNALS_INSTALL_LOCATION}/crypto \
++  --host=${CLANG_TARGET_TRIPLE}
+diff --git a/externals/libcrypto/src/makeHook.sh b/externals/libcrypto/src/makeHook.sh
+index badf186bb..2634ae5b4 100755
+--- a/externals/libcrypto/src/makeHook.sh
++++ b/externals/libcrypto/src/makeHook.sh
+@@ -2,5 +2,5 @@
+ 
+ cd build
+ make clean
+-make -C crypto install -j ${CVMFS_BUILD_EXTERNAL_NJOBS}
++make -C crypto install -j ${CVMFS_BUILD_EXTERNAL_NJOBS} CFLAGS="${CFLAGS} --target=${CLANG_TARGET_TRIPLE}" && \
+ make -C include install -j ${CVMFS_BUILD_EXTERNAL_NJOBS}
+diff --git a/externals/libcrypto/src/syslog.patch b/externals/libcrypto/src/syslog.patch
+new file mode 100644
+index 000000000..ced546d53
+--- /dev/null
++++ b/externals/libcrypto/src/syslog.patch
+@@ -0,0 +1,38 @@
++diff --git a/crypto/compat/syslog_r.c b/crypto/compat/syslog_r.c
++index d68169d..7761ece 100644
++--- a/crypto/compat/syslog_r.c
+++++ b/crypto/compat/syslog_r.c
++@@ -1,19 +1 @@
++ #include <syslog.h>
++-
++-void
++-syslog_r(int pri, struct syslog_data *data, const char *fmt, ...)
++-{
++-    va_list ap;
++-
++-    va_start(ap, fmt);
++-    vsyslog_r(pri, data, fmt, ap);
++-    va_end(ap);
++-}
++-
++-void
++-vsyslog_r(int pri, struct syslog_data *data, const char *fmt, va_list ap)
++-{
++-#ifdef HAVE_SYSLOG
++-	vsyslog(pri, fmt, ap);
++-#endif
++-}
++diff --git a/include/compat/syslog.h b/include/compat/syslog.h
++index f400ff6..bdf9170 100644
++--- a/include/compat/syslog.h
+++++ b/include/compat/syslog.h
++@@ -29,9 +29,6 @@ struct syslog_data {
++ 
++ #define SYSLOG_DATA_INIT {0, (const char *)0, LOG_USER, 0xff}
++ 
++-void syslog_r(int, struct syslog_data *, const char *, ...);
++-void vsyslog_r(int, struct syslog_data *, const char *, va_list);
++-
++ #endif
++ 
++ #endif
