@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="SQLCipher is an SQLite extension that provides 256 bit A
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.12.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://github.com/sqlcipher/sqlcipher/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=151a1c618c7ae175dfd0f862a8d52e8abd4c5808d548072290e8656032bb0f12
 TERMUX_PKG_DEPENDS="libedit, openssl"
@@ -19,6 +19,11 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-tempstore=yes
 --enable-editline
 --disable-readline
+--enable-fts3
+--enable-fts4
+--enable-fts5
+--enable-rtree
+--enable-session
 --with-tcl=${TERMUX__PREFIX__LIB_DIR}
 TCLLIBDIR=${TERMUX__PREFIX__LIB_DIR}/tcl8.6/sqlite
 "
