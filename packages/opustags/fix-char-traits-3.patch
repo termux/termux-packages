@@ -1,0 +1,244 @@
+From 82a5124f14142b63b99ba3716d8c677e721bb900 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Mangano?= <fmang@mg0.fr>
+Date: Sun, 22 Jun 2025 15:35:58 +0900
+Subject: [PATCH] Eliminate std::basic_string<uint8_t>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+They’ve been removed in LLVM.
+https://github.com/llvm/llvm-project/commit/e30a148b098d462d0267c479cd9e4783363c2761
+---
+ src/base64.cc  |  4 ++--
+ src/opus.cc    | 10 +++++-----
+ src/opustags.h | 11 +++++------
+ src/system.cc  | 12 +-----------
+ t/base64.cc    | 32 ++++++++++++++++----------------
+ t/opus.cc      | 12 ++++++------
+ t/system.cc    |  2 +-
+ 7 files changed, 36 insertions(+), 47 deletions(-)
+
+diff --git a/src/base64.cc b/src/base64.cc
+index c562fa9..9b275d7 100644
+--- a/src/base64.cc
++++ b/src/base64.cc
+@@ -27,7 +27,7 @@ std::u8string ot::encode_base64(ot::byte_string_view src)
+ 	std::u8string out;
+ 	out.resize(olen);
+ 
+-	const uint8_t* in = src.data();
++	const uint8_t* in = reinterpret_cast<const uint8_t*>(src.data());
+ 	const uint8_t* end = in + len;
+ 	char8_t* pos = out.data();
+ 	while (end - in >= 3) {
+@@ -68,7 +68,7 @@ ot::byte_string ot::decode_base64(std::u8string_view src)
+ 
+ 	ot::byte_string out;
+ 	out.resize(olen);
+-	uint8_t* pos = out.data();
++	uint8_t* pos = reinterpret_cast<uint8_t*>(out.data());
+ 
+ 	unsigned char dtable[256];
+ 	memset(dtable, 0x80, 256);
+diff --git a/src/opus.cc b/src/opus.cc
+index 692cb9a..482b388 100644
+--- a/src/opus.cc
++++ b/src/opus.cc
+@@ -77,7 +77,7 @@ ot::opus_tags ot::parse_tags(const ogg_packet& packet)
+ 	}
+ 
+ 	// Extra data
+-	my_tags.extra_data = byte_string(data + pos, size - pos);
++	my_tags.extra_data = byte_string(reinterpret_cast<const char*>(data + pos), size - pos);
+ 
+ 	return my_tags;
+ }
+@@ -200,16 +200,16 @@ std::optional<ot::picture> ot::extract_cover(const ot::opus_tags& tags)
+ static ot::byte_string_view detect_mime_type(ot::byte_string_view data)
+ {
+ 	static std::initializer_list<std::pair<ot::byte_string_view, ot::byte_string_view>> magic_numbers = {
+-		{ "\xff\xd8\xff"_bsv, "image/jpeg"_bsv },
+-		{ "\x89PNG"_bsv, "image/png"_bsv },
+-		{ "GIF8"_bsv, "image/gif"_bsv },
++		{ "\xff\xd8\xff"sv, "image/jpeg"sv },
++		{ "\x89PNG"sv, "image/png"sv },
++		{ "GIF8"sv, "image/gif"sv },
+ 	};
+ 	for (auto [magic, mime] : magic_numbers) {
+ 		if (data.starts_with(magic))
+ 			return mime;
+ 	}
+ 	fputs("warning: Could not identify the MIME type of the picture; defaulting to application/octet-stream.\n", stderr);
+-	return "application/octet-stream"_bsv;
++	return "application/octet-stream"sv;
+ }
+ 
+ std::u8string ot::make_cover(ot::byte_string_view picture_data)
+diff --git a/src/opustags.h b/src/opustags.h
+index 320aa23..520ffa1 100644
+--- a/src/opustags.h
++++ b/src/opustags.h
+@@ -111,8 +111,11 @@ struct status {
+ 	std::string message;
+ };
+ 
+-using byte_string = std::basic_string<uint8_t>;
+-using byte_string_view = std::basic_string_view<uint8_t>;
++/**
++ * Alias for binary data strings. Concretely the same as regular strings but reflect the intent.
++ */
++using byte_string = std::string;
++using byte_string_view = std::string_view;
+ 
+ /***********************************************************************************************//**
+  * \defgroup system System
+@@ -584,7 +587,3 @@ void run(const options& opt);
+ /** \} */
+ 
+ }
+-
+-/** Handy literal suffix for building byte strings. */
+-ot::byte_string operator""_bs(const char* data, size_t size);
+-ot::byte_string_view operator""_bsv(const char* data, size_t size);
+diff --git a/src/system.cc b/src/system.cc
+index 40dad53..f8a0992 100644
+--- a/src/system.cc
++++ b/src/system.cc
+@@ -19,16 +19,6 @@
+ #include <sys/wait.h>
+ #include <unistd.h>
+ 
+-ot::byte_string operator""_bs(const char* data, size_t size)
+-{
+-	return ot::byte_string(reinterpret_cast<const uint8_t*>(data), size);
+-}
+-
+-ot::byte_string_view operator""_bsv(const char* data, size_t size)
+-{
+-	return ot::byte_string_view(reinterpret_cast<const uint8_t*>(data), size);
+-}
+-
+ void ot::close_file(FILE* file)
+ {
+ 	fclose(file);
+@@ -129,7 +119,7 @@ ot::byte_string ot::slurp_binary_file(const char* filename)
+ 	long file_size = get_file_size(f.get());
+ 	if (file_size < 0) {
+ 		// Read the input stream block by block and resize the output byte string as needed.
+-		uint8_t buffer[4096];
++		char buffer[4096];
+ 		while (!feof(f.get())) {
+ 			size_t read_len = fread(buffer, 1, sizeof(buffer), f.get());
+ 			content.append(buffer, read_len);
+diff --git a/t/base64.cc b/t/base64.cc
+index d29d525..3ef62e3 100644
+--- a/t/base64.cc
++++ b/t/base64.cc
+@@ -3,26 +3,26 @@
+ 
+ static void check_encode_base64()
+ {
+-	opaque_is(ot::encode_base64(""_bsv), u8"", "empty");
+-	opaque_is(ot::encode_base64("a"_bsv), u8"YQ==", "1 character");
+-	opaque_is(ot::encode_base64("aa"_bsv), u8"YWE=", "2 characters");
+-	opaque_is(ot::encode_base64("aaa"_bsv), u8"YWFh", "3 characters");
+-	opaque_is(ot::encode_base64("aaaa"_bsv), u8"YWFhYQ==", "4 characters");
+-	opaque_is(ot::encode_base64("\xFF\xFF\xFE"_bsv), u8"///+", "RFC alphabet");
+-	opaque_is(ot::encode_base64("\0x"_bsv), u8"AHg=", "embedded null bytes");
++	opaque_is(ot::encode_base64(""sv), u8"", "empty");
++	opaque_is(ot::encode_base64("a"sv), u8"YQ==", "1 character");
++	opaque_is(ot::encode_base64("aa"sv), u8"YWE=", "2 characters");
++	opaque_is(ot::encode_base64("aaa"sv), u8"YWFh", "3 characters");
++	opaque_is(ot::encode_base64("aaaa"sv), u8"YWFhYQ==", "4 characters");
++	opaque_is(ot::encode_base64("\xFF\xFF\xFE"sv), u8"///+", "RFC alphabet");
++	opaque_is(ot::encode_base64("\0x"sv), u8"AHg=", "embedded null bytes");
+ }
+ 
+ static void check_decode_base64()
+ {
+-	opaque_is(ot::decode_base64(u8""), ""_bsv, "empty");
+-	opaque_is(ot::decode_base64(u8"YQ=="), "a"_bsv, "1 character");
+-	opaque_is(ot::decode_base64(u8"YWE="), "aa"_bsv, "2 characters");
+-	opaque_is(ot::decode_base64(u8"YQ"), "a"_bsv, "padless 1 character");
+-	opaque_is(ot::decode_base64(u8"YWE"), "aa"_bsv, "padless 2 characters");
+-	opaque_is(ot::decode_base64(u8"YWFh"), "aaa"_bsv, "3 characters");
+-	opaque_is(ot::decode_base64(u8"YWFhYQ=="), "aaaa"_bsv, "4 characters");
+-	opaque_is(ot::decode_base64(u8"///+"), "\xFF\xFF\xFE"_bsv, "RFC alphabet");
+-	opaque_is(ot::decode_base64(u8"AHg="), "\0x"_bsv, "embedded null bytes");
++	opaque_is(ot::decode_base64(u8""), ""sv, "empty");
++	opaque_is(ot::decode_base64(u8"YQ=="), "a"sv, "1 character");
++	opaque_is(ot::decode_base64(u8"YWE="), "aa"sv, "2 characters");
++	opaque_is(ot::decode_base64(u8"YQ"), "a"sv, "padless 1 character");
++	opaque_is(ot::decode_base64(u8"YWE"), "aa"sv, "padless 2 characters");
++	opaque_is(ot::decode_base64(u8"YWFh"), "aaa"sv, "3 characters");
++	opaque_is(ot::decode_base64(u8"YWFhYQ=="), "aaaa"sv, "4 characters");
++	opaque_is(ot::decode_base64(u8"///+"), "\xFF\xFF\xFE"sv, "RFC alphabet");
++	opaque_is(ot::decode_base64(u8"AHg="), "\0x"sv, "embedded null bytes");
+ 
+ 	try {
+ 		ot::decode_base64(u8"Y===");
+diff --git a/t/opus.cc b/t/opus.cc
+index cc4c9c7..09552f0 100644
+--- a/t/opus.cc
++++ b/t/opus.cc
+@@ -123,7 +123,7 @@ static void recode_padding()
+ 	op.packet = (unsigned char*) padded_OpusTags.data();
+ 
+ 	ot::opus_tags tags = ot::parse_tags(op);
+-	if (tags.extra_data != "\0hello"_bsv)
++	if (tags.extra_data != "\0hello"sv)
+ 		throw failure("corrupted extra data");
+ 	// recode the packet and ensure it's exactly the same
+ 	auto packet = ot::render_tags(tags);
+@@ -137,7 +137,7 @@ static void recode_padding()
+ 
+ static void extract_cover()
+ {
+-	ot::byte_string_view picture_data = ""_bsv
++	ot::byte_string_view picture_data = ""sv
+ 		"\x00\x00\x00\x03" // Picture type 3.
+ 		"\x00\x00\x00\x09" "image/foo" // MIME type.
+ 		"\x00\x00\x00\x00" "" // Description.
+@@ -152,9 +152,9 @@ static void extract_cover()
+ 	std::optional<ot::picture> cover = ot::extract_cover(tags);
+ 	if (!cover)
+ 		throw failure("could not extract the cover");
+-	if (cover->mime_type != "image/foo"_bsv)
++	if (cover->mime_type != "image/foo"sv)
+ 		throw failure("bad extracted MIME type");
+-	if (cover->picture_data != "Picture data"_bsv)
++	if (cover->picture_data != "Picture data"sv)
+ 		throw failure("bad extracted picture data");
+ 
+ 	ot::byte_string_view truncated_data = picture_data.substr(0, picture_data.size() - 1);
+@@ -167,7 +167,7 @@ static void extract_cover()
+ 
+ static void make_cover()
+ {
+-	ot::byte_string_view picture_block = ""_bsv
++	ot::byte_string_view picture_block = ""sv
+ 		"\x00\x00\x00\x03" // Picture type 3.
+ 		"\x00\x00\x00\x09" "image/png" // MIME type.
+ 		"\x00\x00\x00\x00" "" // Description.
+@@ -178,7 +178,7 @@ static void make_cover()
+ 		"\x00\x00\x00\x11" "\x89PNG Picture data";
+ 
+ 	std::u8string expected = u8"METADATA_BLOCK_PICTURE=" + ot::encode_base64(picture_block);
+-	opaque_is(ot::make_cover("\x89PNG Picture data"_bsv), expected, "build the picture tag");
++	opaque_is(ot::make_cover("\x89PNG Picture data"sv), expected, "build the picture tag");
+ }
+ 
+ int main()
+diff --git a/t/system.cc b/t/system.cc
+index 5106c24..2184e99 100644
+--- a/t/system.cc
++++ b/t/system.cc
+@@ -36,7 +36,7 @@ void check_partial_files()
+ 
+ void check_slurp()
+ {
+-	static const ot::byte_string_view pixel = ""_bsv
++	static const ot::byte_string_view pixel = ""sv
+ 		"\x89\x50\x4e\x47\x0d\x0a\x1a\x0a\x00\x00\x00\x0d"
+ 		"\x49\x48\x44\x52\x00\x00\x00\x01\x00\x00\x00\x01"
+ 		"\x08\x02\x00\x00\x00\x90\x77\x53\xde\x00\x00\x00"
