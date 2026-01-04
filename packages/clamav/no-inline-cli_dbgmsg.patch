@@ -1,0 +1,26 @@
+Prevents:
+ld.lld: error: version script assignment of 'CLAMAV_PRIVATE'
+to symbol 'cli_dbgmsg' failed: symbol not defined
+
+--- a/libclamav/others.h
++++ b/libclamav/others.h
+@@ -898,7 +898,7 @@ void cli_logg_unsetup(void);
+ #ifdef __GNUC__
+ inline void cli_dbgmsg(const char *str, ...) __attribute__((format(printf, 1, 2)));
+ #else
+-inline void cli_dbgmsg(const char *str, ...);
++void cli_dbgmsg(const char *str, ...);
+ #endif
+ 
+ #ifdef __GNUC__
+--- a/libclamav/others_common.c
++++ b/libclamav/others_common.c
+@@ -172,7 +172,7 @@ void cli_infomsg_simple(const char *str, ...)
+     msg_callback(CL_MSG_INFO_VERBOSE, buff, buff + len, NULL);
+ }
+ 
+-inline void cli_dbgmsg(const char *str, ...)
++void cli_dbgmsg(const char *str, ...)
+ {
+     if (UNLIKELY(cli_get_debug_flag())) {
+         MSGCODE(buff, len, "LibClamAV debug: ");
