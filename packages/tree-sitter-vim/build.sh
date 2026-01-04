@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Vimscript grammar for tree-sitter"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="0.7.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/tree-sitter-grammars/tree-sitter-vim/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=44eabc31127c4feacda19f2a05a5788272128ff561ce01093a8b7a53aadcc7b2
 TERMUX_PKG_AUTO_UPDATE=true
@@ -14,6 +14,7 @@ termux_step_pre_configure() {
 	# these need to be removed for this one, hell if I know why
 	rm setup.py pyproject.toml
 	termux_setup_treesitter
+	export TREE_SITTER_ABI_VERSION=15
 }
 
 termux_step_post_make_install() {
