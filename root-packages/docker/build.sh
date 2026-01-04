@@ -6,8 +6,8 @@ TERMUX_PKG_VERSION=1:24.0.6
 TERMUX_PKG_REVISION=4
 LIBNETWORK_COMMIT=67e0588f1ddfaf2faf4c8cae8b7ea2876434d91c
 DOCKER_GITCOMMIT=ed223bc
-TERMUX_PKG_SRCURL=(https://github.com/moby/moby/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
-                   https://github.com/docker/cli/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
+TERMUX_PKG_SRCURL=(https://github.com/moby/moby/archive/refs/tags/v${TERMUX_PKG_VERSION:2}.tar.gz
+                   https://github.com/docker/cli/archive/refs/tags/v${TERMUX_PKG_VERSION:2}.tar.gz
                    https://github.com/moby/libnetwork/archive/${LIBNETWORK_COMMIT}.tar.gz)
 TERMUX_PKG_DEPENDS="containerd, libdevmapper, resolv-conf"
 TERMUX_PKG_SHA256=(29a8ee54e9ea008b40eebca42dec8b67ab257eb8ac175f67e79c110e4187d7d2

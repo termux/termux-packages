@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Update this and the clang version below when libllvm is updated:
 TERMUX_PKG_VERSION="0.25"
 TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://github.com/include-what-you-use/include-what-you-use/archive/$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SRCURL=https://github.com/include-what-you-use/include-what-you-use/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=2e8381368ec0a6ecb770834bce00fc62efa09a2b2f9710ed569acbb823ead9cc
 TERMUX_PKG_AUTO_UPDATE=false # can't be auto-updated since release correspond to clang version.
 TERMUX_PKG_DEPENDS="clang (>= 21), clang (<< 22), libc++, python"

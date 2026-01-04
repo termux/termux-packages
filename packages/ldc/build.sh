@@ -10,8 +10,8 @@ TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
                    https://github.com/ldc-developers/llvm-project/releases/download/ldc-v${TERMUX_PKG_VERSION[1]}/llvm-${TERMUX_PKG_VERSION[1]}.src.tar.xz
                    https://github.com/llvm/llvm-project/releases/download/llvmorg-${TERMUX_PKG_VERSION[1]}/libunwind-${TERMUX_PKG_VERSION[1]}.src.tar.xz
-                   https://github.com/dlang/tools/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
-                   https://github.com/dlang/dub/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz
+                   https://github.com/dlang/tools/archive/refs/tags/v${TERMUX_PKG_VERSION[2]}.tar.gz
+                   https://github.com/dlang/dub/archive/refs/tags/v${TERMUX_PKG_VERSION[3]}.tar.gz
                    https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz)
 TERMUX_PKG_SHA256=(fdbb376f08242d917922a6a22a773980217fafa310046fc5d6459490af23dacd
                    9638d8d0b6a43d9cdc53699bec19e6bc9bef98f5950b99e6b8c1ec373aee4fa7

@@ -6,7 +6,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # updating the package.
 TERMUX_PKG_VERSION=3.0.1
 TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://github.com/termux/termux-elf-cleaner/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SRCURL=https://github.com/termux/termux-elf-cleaner/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=1c3c6fb33ad8d1fdfe035eee3a5419f54442b93b1a97c4151b31b82c5626a06a
 TERMUX_PKG_DEPENDS="libc++"
 
