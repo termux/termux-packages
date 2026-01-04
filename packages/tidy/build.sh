@@ -7,7 +7,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Please revbump revdeps to rebuild when bumping version.
 TERMUX_PKG_VERSION=5.9.14-next
 TERMUX_PKG_REVISION=3
-TERMUX_PKG_SRCURL=https://github.com/htacg/tidy-html5/archive/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SRCURL=https://github.com/htacg/tidy-html5/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=83cc9d9cdfa59bfe400dc745dea14eb1e1be4ca088facfb911eac8b78e75f2b4
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="libxslt"

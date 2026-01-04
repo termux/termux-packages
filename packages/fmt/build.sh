@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1:11.2.0
-TERMUX_PKG_SRCURL=https://github.com/fmtlib/fmt/archive/${TERMUX_PKG_VERSION#*:}.tar.gz
+TERMUX_PKG_SRCURL=https://github.com/fmtlib/fmt/archive/refs/tags/${TERMUX_PKG_VERSION#*:}.tar.gz
 TERMUX_PKG_SHA256=bc23066d87ab3168f27cef3e97d545fa63314f5c79df5ea444d41d56f962c6af
 # Avoid silently breaking build of revdeps:
 TERMUX_PKG_AUTO_UPDATE=false

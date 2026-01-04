@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.12.3
 TERMUX_PKG_REVISION=9
-TERMUX_PKG_SRCURL=https://github.com/petervanderdoes/gitflow/archive/$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SRCURL=https://github.com/petervanderdoes/gitflow/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=54e9fd81aa1aa8215c865503dc6377da205653c784d6c97baad3dafd20728e06
 TERMUX_PKG_DEPENDS="dash, git"
 TERMUX_PKG_EXTRA_MAKE_ARGS="prefix=$TERMUX_PREFIX"

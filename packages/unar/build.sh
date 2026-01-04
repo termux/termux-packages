@@ -6,8 +6,8 @@ TERMUX_PKG_VERSION=()
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_VERSION+=(1.10.8)
 TERMUX_PKG_VERSION+=(1.1)
-TERMUX_PKG_SRCURL=(https://github.com/MacPaw/XADMaster/archive/v${TERMUX_PKG_VERSION}/XADMaster-${TERMUX_PKG_VERSION}.tar.gz
-                   https://github.com/MacPaw/universal-detector/archive/${TERMUX_PKG_VERSION[1]}/universal-detector-${TERMUX_PKG_VERSION[1]}.tar.gz)
+TERMUX_PKG_SRCURL=(https://github.com/MacPaw/XADMaster/archive/refs/tags/v${TERMUX_PKG_VERSION}/XADMaster-${TERMUX_PKG_VERSION}.tar.gz
+                   https://github.com/MacPaw/universal-detector/archive/refs/tags/${TERMUX_PKG_VERSION[1]}/universal-detector-${TERMUX_PKG_VERSION[1]}.tar.gz)
 TERMUX_PKG_SHA256=(652953d7988b3c33f4f52b61c357afd1a7c2fc170e5e6e2219f4432b0c4cd39f
                    8e8532111d0163628eb828a60d67b53133afad3f710b1967e69d3b8eee28a811)
 TERMUX_PKG_AUTO_UPDATE=false

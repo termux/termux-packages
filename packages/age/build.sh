@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A simple, modern and secure encryption tool with small e
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1:1.3.1"
-TERMUX_PKG_SRCURL=https://github.com/FiloSottile/age/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
+TERMUX_PKG_SRCURL=https://github.com/FiloSottile/age/archive/refs/tags/v${TERMUX_PKG_VERSION:2}.tar.gz
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SHA256=396007bc0bc53de253391493bda1252757ba63af1a19db86cfb60a35cb9d290a
 
