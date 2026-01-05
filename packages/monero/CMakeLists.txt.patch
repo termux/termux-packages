@@ -1,3 +1,9 @@
+Disabling stack trace for x86 avoids these two errors when building for Android-x86:
+CMake Error: The following variables are used in this project, but they are set to NOTFOUND.
+Please set them or make sure they are set and tested correctly in the CMake files:
+LIBUNWIND_LIBRARIES (ADVANCED)
+src/common/stack_trace.cpp:155:19: error: invalid operands to binary expression ('Writer' and '__iom_t6')
+
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -244,7 +244,7 @@
@@ -9,6 +15,15 @@
    forbid_undefined_symbols()
  endif()
  
+@@ -541,7 +541,7 @@ elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU" AND NOT MINGW)
+   set(DEFAULT_STACK_TRACE ON)
+   set(STACK_TRACE_LIB "easylogging++") # for diag output only
+   set(LIBUNWIND_LIBRARIES "")
+-elseif (ARM)
++elseif (ARM OR ANDROID)
+   set(DEFAULT_STACK_TRACE OFF)
+   set(LIBUNWIND_LIBRARIES "")
+ else()
 @@ -993,7 +993,7 @@
    endif(ARM)
  
