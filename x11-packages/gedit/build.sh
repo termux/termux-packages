@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://gedit-technology.github.io/apps/gedit/
 TERMUX_PKG_DESCRIPTION="GNOME Text Editor"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="48.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="49.0"
 # for submodules https://gitlab.gnome.org/World/gedit/gedit/-/issues/611
 TERMUX_PKG_SRCURL="git+https://gitlab.gnome.org/World/gedit/gedit"
-TERMUX_PKG_SHA256=fb13faeda36b2c79dff47e5ebcb84981b7f08fbbef866123a64f63b2ead8bb33
+TERMUX_PKG_SHA256=1714f0774f648fb9cde8697c491cedf9bfb31a0f8b5ca81ee323e4196dcd41c7
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gobject-introspection, gsettings-desktop-schemas, gspell, gtk3, libcairo, libgedit-amtk, libgedit-gfls, libgedit-gtksourceview, libgedit-tepl, libpeas, pango"
