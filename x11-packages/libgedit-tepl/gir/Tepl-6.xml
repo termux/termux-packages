@@ -1,5 +1,9 @@
 <?xml version="1.0"?>
 <dump>
+  <class name="TeplCodeCommentView" get-type="tepl_code_comment_view_get_type" parents="GObject">
+    <property name="source-view" type="GtkSourceView" flags="235"/>
+    <property name="code-comment-is-supported" type="gboolean" flags="225" default-value="FALSE"/>
+  </class>
   <enum name="TeplSelectionType" get-type="tepl_selection_type_get_type">
     <member name="TEPL_SELECTION_TYPE_NO_SELECTION" nick="no-selection" value="0"/>
     <member name="TEPL_SELECTION_TYPE_ON_SAME_LINE" nick="on-same-line" value="1"/>
@@ -35,6 +39,8 @@
   <class name="TeplPrefsDialog" get-type="tepl_prefs_dialog_get_type" parents="GtkDialog,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="AtkImplementorIface"/>
     <implements name="GtkBuildable"/>
+    <signal name="reset-all" return="void" when="first">
+    </signal>
   </class>
   <class name="TeplMetadata" get-type="tepl_metadata_get_type" parents="GObject">
   </class>
@@ -183,6 +189,11 @@
     </signal>
   </class>
   <class name="TeplSpaceDrawerPrefs" get-type="tepl_space_drawer_prefs_get_type" parents="GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+  </class>
+  <class name="TeplStatusbar" get-type="tepl_statusbar_get_type" parents="GtkStatusbar,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="AtkImplementorIface"/>
     <implements name="GtkBuildable"/>
     <implements name="GtkOrientable"/>
