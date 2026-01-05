@@ -5,12 +5,12 @@
 
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -37,7 +37,7 @@
+@@ -38,7 +38,7 @@
  option(enable_lex_debug "Enable debugging info for lexical scanners in release builds [development]" OFF)
  
  if(CMAKE_BUILD_TYPE STREQUAL "Release")
--  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
-+  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION FALSE)
- endif()
- 
- include(CheckCXXCompilerFlag)
+-  if (CYGWIN OR MINGW OR NOT "${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
++  if (CYGWIN OR MINGW OR NOT "${CMAKE_TOOLCHAIN_FILE}" STREQUAL "" OR CMAKE_CROSSCOMPILING)
+     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION FALSE)
+   else()
+     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
