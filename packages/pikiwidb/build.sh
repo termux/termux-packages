@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(3.5.6
 					1.0.7)
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=("https://github.com/OpenAtomFoundation/pikiwidb/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.tar.gz"
 					"https://github.com/pikiwidb/rediscache/archive/refs/tags/v${TERMUX_PKG_VERSION[1]}.tar.gz")
 TERMUX_PKG_SHA256=(b8081375426d1769ecc4a5fe70c5109589ef374f5d9030ea0adc4ea5a1dab9fa
