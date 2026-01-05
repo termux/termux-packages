@@ -1,23 +1,21 @@
 # Always return true for libintl check.
 
---- a/mesonbuild/dependencies/misc.py
-+++ b/mesonbuild/dependencies/misc.py
-@@ -494,7 +494,7 @@
+diff -u -r ../meson-1.10.0/mesonbuild/dependencies/misc.py ./mesonbuild/dependencies/misc.py
+--- ../meson-1.10.0/mesonbuild/dependencies/misc.py	2025-12-08 16:48:52.000000000 +0000
++++ ./mesonbuild/dependencies/misc.py	2026-01-05 10:35:47.446355609 +0000
+@@ -434,7 +434,7 @@
          self.feature_since = ('0.59.0', "consider checking for `ngettext` with and without `find_library('intl')`")
          code = '''#include <libintl.h>\n\nint main() {\n    gettext("Hello world");\n}'''
  
--        if self.clib_compiler.links(code, env)[0]:
+-        if self.clib_compiler.links(code)[0]:
 +        if True:
              self.is_found = True
  
  
-@@ -503,10 +503,7 @@
-         super().__init__(name, env, kwargs)
-         self.feature_since = ('0.59.0', "consider checking for `ngettext` with and without `find_library('intl')`")
+@@ -446,7 +446,7 @@
+         h = self.clib_compiler.has_header('libintl.h', '')
+         self.link_args = self.clib_compiler.find_library('intl', [], self.libtype)
  
--        h = self.clib_compiler.has_header('libintl.h', '', env)
--        self.link_args = self.clib_compiler.find_library('intl', env, [], self.libtype)
--
 -        if h[0] and self.link_args:
 +        if True:
              self.is_found = True
