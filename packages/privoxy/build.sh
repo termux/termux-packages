@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0-or-later"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.GPLv3"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.0.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/ijbswa/Sources/$TERMUX_PKG_VERSION%20%28stable%29/privoxy-$TERMUX_PKG_VERSION-stable-src.tar.gz
 TERMUX_PKG_SHA256=c08e2ba0049307017bf9d8a63dd2a0dfb96aa0cdeb34ae007776e63eba62a26f
 # Termux-services adds the run scripts to TERMUX_PKG_CONFFILES. Those ones can
@@ -18,10 +19,9 @@ etc/privoxy/default.action
 etc/privoxy/default.filter"
 TERMUX_PKG_CONFFILES=$DEFAULT_CONFFILES
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
-ac_cv_lib_pcreposix_regcomp=no
 --sysconfdir=$TERMUX_PREFIX/etc/privoxy
 "
-TERMUX_PKG_DEPENDS="pcre, libpcreposix, zlib"
+TERMUX_PKG_DEPENDS="pcre2, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SERVICE_SCRIPT=("privoxy"
 "if [ -f \"$TERMUX_ANDROID_HOME/.config/privoxy/config\" ]; then \
