@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="A C++ library that implements commandline flags processi
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="COPYING.txt"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.2.2
-TERMUX_PKG_REVISION=11
-TERMUX_PKG_SRCURL=https://github.com/gflags/gflags/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=34af2f15cf7367513b352bdcd2493ab14ce43692d2dcd9dfc499492966c64dcf
+TERMUX_PKG_VERSION="2.3.0"
+TERMUX_PKG_SRCURL="https://github.com/gflags/gflags/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
+TERMUX_PKG_SHA256=f619a51371f41c0ad6837b2a98af9d4643b3371015d873887f7e8d3237320b2f
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BREAKS="gflags-dev"
@@ -16,14 +15,13 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_SHARED_LIBS=ON
 -DBUILD_STATIC_LIBS=ON
 -DBUILD_gflags_LIBS=ON
--DCMAKE_POLICY_VERSION_MINIMUM=3.5
 -DINSTALL_HEADERS=ON
 "
 
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	local _SOVERSION=2.2
+	local _SOVERSION=2.3
 
 	local _MAJOR=$(echo ${TERMUX_PKG_VERSION#*:} | cut -d . -f 1)
 	local _MINOR=$(echo ${TERMUX_PKG_VERSION#*:} | cut -d . -f 2)
