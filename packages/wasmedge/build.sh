@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="A lightweight, high-performance, and extensible WebAssem
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.spdx"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.16.0"
+TERMUX_PKG_VERSION="0.16.1"
 # Use source tarball from release assets to get VERSION file for proper version number
 TERMUX_PKG_SRCURL=https://github.com/WasmEdge/WasmEdge/releases/download/${TERMUX_PKG_VERSION}/WasmEdge-${TERMUX_PKG_VERSION}-src.tar.gz
-TERMUX_PKG_SHA256=6a12152c1d7fd27e4f4fb6486c63e4c2f2663bb0c6be0edb287ef5796ed32610
+TERMUX_PKG_SHA256=fc256b8be022eb0487549cc2119c57fd12ad402e4130a05263b7aa85e2df89b9
 TERMUX_PKG_DEPENDS="libc++, libspdlog"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
