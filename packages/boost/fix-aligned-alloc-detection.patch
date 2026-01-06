@@ -1,0 +1,17 @@
+Fixes:
+/data/data/com.termux/files/usr/include/boost/asio/detail/memory.hpp:107:20:
+error: reference to unresolved using declaration
+  107 |   void* ptr = std::aligned_alloc(align, size);
+in reverse dependency botan3
+
+--- a/boost/asio/detail/config.hpp
++++ b/boost/asio/detail/config.hpp
+@@ -377,7 +377,7 @@
+ #      if defined(__FreeBSD__) || defined(__Fuchsia__) || defined(__wasi__) \
+          || defined(__NetBSD__) || defined(__OpenBSD__)
+ #       define BOOST_ASIO_HAS_STD_ALIGNED_ALLOC 1
+-#      elif defined(__linux__)
++#      elif defined(__linux__) && !defined(__ANDROID__)
+ #       if defined(_LIBCPP_HAS_MUSL_LIBC)
+ #        define BOOST_ASIO_HAS_STD_ALIGNED_ALLOC 1
+ #       else // !defined(_LIBCPP_HAS_MUSL_LIBC)

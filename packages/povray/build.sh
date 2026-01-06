@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.povray.org/
 TERMUX_PKG_DESCRIPTION="The Persistence of Vision Raytracer"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
-_POVRAY_VERSION_BASE=3.8
-TERMUX_PKG_VERSION=${_POVRAY_VERSION_BASE}.0-beta.2
-TERMUX_PKG_REVISION=17
-TERMUX_PKG_SRCURL=https://github.com/POV-Ray/povray/releases/download/v${TERMUX_PKG_VERSION}/povunix-v${TERMUX_PKG_VERSION}-src.tar.gz
+TERMUX_PKG_VERSION="3.8.0-beta.2"
+TERMUX_PKG_REVISION=18
+TERMUX_PKG_SRCURL="https://github.com/POV-Ray/povray/releases/download/v${TERMUX_PKG_VERSION}/povunix-v${TERMUX_PKG_VERSION}-src.tar.gz"
 TERMUX_PKG_SHA256=4717c9bed114deec47cf04a8175cc4060dafc159f26e7896480a60f4411ca5ad
 TERMUX_PKG_DEPENDS="boost, imath, libc++, libjpeg-turbo, libpng, libtiff, openexr, povray-data, zlib"
 TERMUX_PKG_BUILD_DEPENDS="boost-headers"
@@ -39,6 +38,8 @@ termux_step_pre_configure() {
 }
 
 termux_step_create_debscripts() {
+	local _POVRAY_VERSION_BASE="${TERMUX_PKG_VERSION%-*}"
+	_POVRAY_VERSION_BASE="${_POVRAY_VERSION_BASE%.*}"
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
 	echo "povconfuser=\$HOME/.povray/${_POVRAY_VERSION_BASE}" >> postinst
 	echo "mkdir -p \$povconfuser/" >> postinst
