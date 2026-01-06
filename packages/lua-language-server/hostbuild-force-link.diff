@@ -4,17 +4,17 @@
  build $obj/source_bee/format.obj: cxx_source_bee_1 bee.lua/3rd/fmt/format.cc
  rule cxx_source_bee_2
    command = $cc -MMD -MT $out -MF $out.d -std=c++17 -fno-rtti -O2 -Wall $
--    -fvisibility=hidden -Ibee.lua -Ibee.lua/3rd/lua54 -DNDEBUG -fPIC -o $
-+    -fvisibility=hidden -Ibee.lua -Ibee.lua/3rd/lua54 -I@TERMUX_PKG_HOSTBUILD_DIR@/ubuntu_packages/usr/include -I@TERMUX_PKG_HOSTBUILD_DIR@/ubuntu_packages/usr/include/x86_64-linux-gnu -DNDEBUG -fPIC -o $
+-    -fvisibility=hidden -Ibee.lua -Ibee.lua/3rd/lua55 -DNDEBUG -fPIC -o $
++    -fvisibility=hidden -Ibee.lua -Ibee.lua/3rd/lua55 -I@TERMUX_PKG_HOSTBUILD_DIR@/ubuntu_packages/usr/include -I@TERMUX_PKG_HOSTBUILD_DIR@/ubuntu_packages/usr/include/x86_64-linux-gnu -DNDEBUG -fPIC -o $
      $out -c $in
    description = Compile C++ $out
    deps = gcc
-@@ -145,7 +145,7 @@ rule test
+@@ -139,7 +139,7 @@ rule test
    description = Run test.
    pool = console
  rule link_luamake
--  command = $cc $in -o $out -lstdc++fs -lunwind -lbfd -pthread -lm -ldl $
-+  command = $cc $in -o $out -lstdc++fs -lunwind -lbfd -pthread -lm -ldl -L@TERMUX_PKG_HOSTBUILD_DIR@/ubuntu_packages/usr/lib/x86_64-linux-gnu $
-     -lstdc++ -s
+-  command = $cc $in -o $out -lstdc++fs -pthread -lm -ldl -lstdc++ -s
++  command = $cc $in -o $out -lstdc++fs -pthread -lm -ldl -lstdc++ -s -L@TERMUX_PKG_HOSTBUILD_DIR@/ubuntu_packages/usr/lib/x86_64-linux-gnu
    description = Link    Exe $out
  rule build_luamake_test
+   command = $bin/luamake bee.lua/test/test.lua
