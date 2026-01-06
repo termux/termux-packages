@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE="https://github.com/sumneko/lua-language-server"
 TERMUX_PKG_DESCRIPTION="Sumneko Lua Language Server coded in Lua"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
-TERMUX_PKG_VERSION="3.16.1"
+TERMUX_PKG_VERSION="3.16.4"
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"
 TERMUX_PKG_SRCURL="git+https://github.com/sumneko/lua-language-server"
-TERMUX_PKG_DEPENDS="libandroid-spawn, libc++"
-TERMUX_PKG_BUILD_DEPENDS="binutils-libs"
+TERMUX_PKG_DEPENDS="libandroid-spawn, binutils-libs, libc++"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -81,7 +80,7 @@ termux_step_make() {
 	echo "Applying patch: $(basename "$patch")"
 	test -f "$patch" && {
 		patch --silent -p1 -d "$TERMUX_PKG_SRCDIR/3rd/bee.lua/bee/crash/linux" < "$patch"
-		patch --silent -p1 -d "$TERMUX_PKG_SRCDIR/3rd/luamake/bee.lua/bee/crash" < "$patch"
+		patch --silent -p1 -d "$TERMUX_PKG_SRCDIR/3rd/luamake/bee.lua/bee/crash/linux" < "$patch"
 	}
 
 	"${TERMUX_PKG_HOSTBUILD_DIR}"/3rd/luamake/luamake \
