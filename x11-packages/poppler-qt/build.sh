@@ -4,11 +4,8 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Please align the version with `poppler` package.
 TERMUX_PKG_VERSION="24.05.0"
-TERMUX_PKG_REVISION=5
-# Do not forget to bump revision of reverse dependencies and rebuild them
-# when SOVERSION is changed.
-_POPPLER_SOVERSION=137
-TERMUX_PKG_SRCURL=https://poppler.freedesktop.org/poppler-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_REVISION=6
+TERMUX_PKG_SRCURL="https://poppler.freedesktop.org/poppler-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=d8c5eb30b50285ad9f0af8c6335cc2d3b9597fca475cbc2598a5479fa379f779
 # The package must be updated at the same time as poppler, auto updater script does not support that.
 TERMUX_PKG_AUTO_UPDATE=false
@@ -31,6 +28,9 @@ termux_step_pre_configure() {
 		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
 	fi
 
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# when SOVERSION is changed.
+	local _POPPLER_SOVERSION=137
 	if ! test "${_POPPLER_SOVERSION}"; then
 		termux_error_exit "Please set _POPPLER_SOVERSION variable."
 	fi
