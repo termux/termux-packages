@@ -12,7 +12,7 @@ error[E0432]: unresolved import `libc::confstr`
 @@ -557,13 +557,14 @@ fn setup_user(vars: &EnvStack) {
  }
  
- pub(crate) static FALLBACK_PATH: Lazy<&[WString]> = Lazy::new(|| {
+ pub(crate) static FALLBACK_PATH: LazyLock<&[WString]> = LazyLock::new(|| {
 +    use crate::libc::confstr;
      // _CS_PATH: colon-separated paths to find POSIX utilities. Same as USER_CS_PATH.
      let cs_path = libc::_CS_PATH;

@@ -12,7 +12,7 @@ error[E0425]: cannot find value `_CS_PATH` in crate `libc`
 @@ -557,14 +557,12 @@ fn setup_user(vars: &EnvStack) {
  }
  
- pub(crate) static FALLBACK_PATH: Lazy<&[WString]> = Lazy::new(|| {
+ pub(crate) static FALLBACK_PATH: LazyLock<&[WString]> = LazyLock::new(|| {
 -    use crate::libc::confstr;
 +    use crate::libc::{confstr,_CS_PATH};
      // _CS_PATH: colon-separated paths to find POSIX utilities. Same as USER_CS_PATH.
