@@ -65,11 +65,9 @@ termux_setup_build_python() {
 			env -i \
 				CC="clang-${TERMUX_HOST_LLVM_MAJOR_VERSION} -fuse-ld=lld" \
 				CXX="clang++-${TERMUX_HOST_LLVM_MAJOR_VERSION} -fuse-ld=lld" \
-				LDFLAGS="-Wl,-rpath=$_PYTHON_FOLDER/host-build-prefix/lib" \
 				PATH="/usr/bin" \
 				../configure \
 					--with-ensurepip=install \
-					--enable-shared \
 					--prefix="$_PYTHON_FOLDER/host-build-prefix"
 			env -i \
 				make -j "$(nproc)" install
