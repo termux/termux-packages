@@ -1,0 +1,47 @@
+diff --git a/crossenv/scripts/packaging-tags-patch.py.tmpl b/crossenv/scripts/packaging-tags-patch.py.tmpl
+index 9cb4a14..73eb6e4 100644
+--- a/crossenv/scripts/packaging-tags-patch.py.tmpl
++++ b/crossenv/scripts/packaging-tags-patch.py.tmpl
+@@ -19,3 +19,42 @@ def _linux_platforms():
+     archs = {"armv8l": ["armv8l", "armv7l"]}.get(arch, [arch])
+     for arch in archs:
+         yield f"linux_{arch}"
++
++
++
++def android_platforms(
++    api_level: int | None = None, abi: str | None = None
++) -> Iterator[str]:
++    """
++    Yields the :attr:`~Tag.platform` tags for Android. If this function is invoked on
++    non-Android platforms, the ``api_level`` and ``abi`` arguments are required.
++
++    :param int api_level: The maximum `API level
++        <https://developer.android.com/tools/releases/platforms>`__ to return. Defaults
++        to the current system's version, as returned by ``platform.android_ver``.
++    :param str abi: The `Android ABI <https://developer.android.com/ndk/guides/abis>`__,
++        e.g. ``arm64_v8a``. Defaults to the current system's ABI , as returned by
++        ``sysconfig.get_platform``. Hyphens and periods will be replaced with
++        underscores.
++    """
++    if platform.system() != "Android" and (api_level is None or abi is None):
++        raise TypeError(
++            "on non-Android platforms, the api_level and abi arguments are required"
++        )
++
++    if api_level is None:
++        # Python 3.13 was the first version to return platform.system() == "Android",
++        # and also the first version to define platform.android_ver().
++        api_level = @@TERMUX_PKG_API_LEVEL@@  # type: ignore[attr-defined]
++
++    if abi is None:
++        abi = sysconfig.get_platform().split("-")[-1]
++    abi = _normalize_string(abi)
++
++    # 16 is the minimum API level known to have enough features to support CPython
++    # without major patching. Yield every API level from the maximum down to the
++    # minimum, inclusive.
++    min_api_level = 16
++    for ver in range(api_level, min_api_level - 1, -1):
++        yield f"android_{ver}_{abi}"
++
