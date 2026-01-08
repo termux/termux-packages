@@ -53,7 +53,7 @@ termux_setup_python_pip() {
 			local f
 			for f in "$TERMUX_SCRIPTDIR"/scripts/build/setup/python-crossenv-*.patch; do
 				echo "[${FUNCNAME[0]}]: Applying $(basename "$f")"
-				patch --silent -p1 -d "$_CROSSENV_FOLDER" < "$f"
+				cat "$f" | sed -e "s|@@TERMUX_PKG_API_LEVEL@@|${TERMUX_PKG_API_LEVEL}|g" | patch --silent -p1 -d "$_CROSSENV_FOLDER"
 			done
 			shopt -u nullglob
 		fi
