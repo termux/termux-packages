@@ -1,11 +1,12 @@
---- a/configure
-+++ b/configure
-@@ -6939,6 +6939,8 @@
- { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for multiarch" >&5
- printf %s "checking for multiarch... " >&6; }
- case $ac_sys_system in #(
-+  Linux-android) :
-+    MULTIARCH="" ;; #(
-   Darwin*) :
-     MULTIARCH="" ;; #(
-   FreeBSD*) :
+diff --git a/configure.ac b/configure.ac
+index 597a44b331a..fa78e09c192 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1134,6 +1134,7 @@ dnl architecture. PLATFORM_TRIPLET will be a pair or single value for these
+ dnl platforms.
+ AC_MSG_CHECKING([for multiarch])
+ AS_CASE([$ac_sys_system],
++  [Linux-android], [MULTIARCH=""],
+   [Darwin*], [MULTIARCH=""],
+   [iOS], [MULTIARCH=""],
+   [FreeBSD*], [MULTIARCH=""],

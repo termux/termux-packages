@@ -1,0 +1,16 @@
+Needed for proper substitution of @LIBPYTHON@ in python3.pc.in
+
+The former style of substitution is fine in Makefiles where variables are expanded, not in static generated files.
+diff --git a/configure.ac b/configure.ac
+index 043ec957f40..53bed63310e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -6424,7 +6424,7 @@ LIBPYTHON=''
+ # On Android and Cygwin the shared libraries must be linked with libpython.
+ if test "$PY_ENABLE_SHARED" = "1" && ( test -n "$ANDROID_API_LEVEL" || test "$MACHDEP" = "cygwin"); then
+   MODULE_DEPS_SHARED="$MODULE_DEPS_SHARED \$(LDLIBRARY)"
+-  LIBPYTHON="\$(BLDLIBRARY)"
++  LIBPYTHON="$(BLDLIBRARY)"
+ fi
+ 
+ # On iOS the shared libraries must be linked with the Python framework
