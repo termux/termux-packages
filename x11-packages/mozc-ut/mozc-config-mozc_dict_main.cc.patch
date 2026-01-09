@@ -1,0 +1,234 @@
+--- a/mozc-config/mozc_dict_main.cc
++++ b/mozc-config/mozc_dict_main.cc
+@@ -15,10 +15,12 @@
+ #include <sstream>
+ #include <string>
+ #include <unistd.h>
++#include <iconv.h>
+ 
+ using namespace std;
+ 
+ #include "base/util.h"
++#include "base/random.h"
+ #include "dictionary/user_dictionary.h"
+ #include "dictionary/user_dictionary_util.h"
+ #include "dictionary/user_dictionary_storage.h"
+@@ -27,6 +29,7 @@ using namespace std;
+ //#undef MOZC_DICTIONARY_POS_MAP_H_
+ //#define kPOSMap kPOSMap2
+ //#define MOZC_DICTIONARY_POS_MAP_H_
++#define arraysize(f) (sizeof(f) / sizeof(*f))
+ 
+ class MozcDict {
+   public:
+@@ -59,7 +62,7 @@ MozcDict::MozcDict() {
+ mozc::UserDictionaryStorage::UserDictionary* MozcDict::get_dic(string name) {
+     for (int i = 0; i < dic_num(); i++) {
+         mozc::UserDictionaryStorage::UserDictionary* dic =
+-                stor->mutable_dictionaries(i);
++                stor->GetProto().mutable_dictionaries(i);
+         if (dic->name() == name) return dic;
+     }
+     return NULL;
+@@ -68,17 +71,18 @@ mozc::UserDictionaryStorage::UserDictionary* MozcDict::get_dic(string name) {
+ void MozcDict::set_entry_with_dic(string dic_name, string key, string value, string pos, string comment) {
+     mozc::UserDictionaryStorage::UserDictionary* dic = get_dic(dic_name);//NULL;
+ //    for (int i = 0; i < dic_num(); i++) {
+-//        dic = stor->mutable_dictionaries(i);
++//        dic = stor->GetProto().mutable_dictionaries(i);
+ //        if (dic->name() == dic_name) break;
+ //    }
+     if (dic == NULL) {
+         if (new_dic(dic_name)) return;
+         dic = get_dic(dic_name);
+     }
+-    mozc::UserDictionaryStorage::UserDictionaryEntry from, to;
+-    from.set_key(key);
+-    from.set_value(value);
+-    from.set_pos(pos);
++    mozc::UserDictionaryImporter::RawEntry from;
++    mozc::UserDictionaryStorage::UserDictionaryEntry to;
++    from.key = key;
++    from.value = value;
++    from.pos = pos;
+     if (!mozc::UserDictionaryImporter::ConvertEntry(from, &to)) {
+         cerr << "Invalid POS Error - " << pos << endl;
+         return;
+@@ -95,20 +99,21 @@ void MozcDict::set_entry_with_dic(string dic_name, string key, string value, str
+ void MozcDict::set_entry(string key, string value, string pos, string comment) {
+     string dic_name = "ユーザー辞書 1";
+     if (dic_num() >= 1)
+-        dic_name = stor->mutable_dictionaries(0)->name();
++        dic_name = stor->GetProto().mutable_dictionaries(0)->name();
+     set_entry_with_dic(dic_name, key, value, pos, comment);
+     return;
+     if (dic_num() < 1)
+         if (new_dic("ユーザー辞書 1")) return;
+ 
+     mozc::UserDictionaryStorage::UserDictionary* dic =
+-            stor->mutable_dictionaries(0);
++            stor->GetProto().mutable_dictionaries(0);
+     if (dic == NULL) return;
+ 
+-    mozc::UserDictionaryStorage::UserDictionaryEntry from, to;
+-    from.set_key(key);
+-    from.set_value(value);
+-    from.set_pos(pos);
++    mozc::UserDictionaryImporter::RawEntry from;
++    mozc::UserDictionaryStorage::UserDictionaryEntry to;
++    from.key = key;
++    from.value = value;
++    from.pos = pos;
+     if (!mozc::UserDictionaryImporter::ConvertEntry(from, &to)) {
+         cerr << "Invalid POS Error - " << pos << endl;
+         return;
+@@ -123,16 +128,14 @@ void MozcDict::set_entry(string key, string value, string pos, string comment) {
+ }
+ 
+ namespace {
+-uint64 CreateID() {
+-  uint64 id = 0;
++uint64_t CreateID() {
++  uint64_t id = 0;
++  mozc::Random random;
+ 
+   // dic_id == 0 is used as a magic number
+   while (id == 0) {
+-    if (!mozc::Util::GetSecureRandomSequence(
+-            reinterpret_cast<char *>(&id), sizeof(id))) {
+-      LOG(ERROR) << "GetSecureRandomSequence() failed. use rand()";
+-      id = static_cast<uint64>(rand());
+-    }
++    const std::string buf = random.ByteString(sizeof(id));
++    memcpy(reinterpret_cast<char *>(&id), buf.data(), sizeof(id));
+   }
+ 
+   return id;
+@@ -142,7 +145,7 @@ uint64 CreateID() {
+ void MozcDict::debug_print() {
+     for (int i = 0; i < dic_num(); i++) {
+         mozc::UserDictionaryStorage::UserDictionary* dic =
+-                stor->mutable_dictionaries(i);
++                stor->GetProto().mutable_dictionaries(i);
+         if (dic == NULL) continue;
+         cout << "name = " << dic->name() << endl;
+         for (int j = 0; j < dic->entries_size(); j ++) {
+@@ -150,13 +153,13 @@ void MozcDict::debug_print() {
+                     dic->mutable_entries(j);
+             if (entry == NULL) continue;
+             cout << "\t" << entry->key() << "\t" << entry->value()
+-                 << "\t" << entry->pos() << "\t" << entry->comment() << endl;
++                 << "\t" << mozc::UserDictionaryUtil::GetStringPosType(entry->pos()) << "\t" << entry->comment() << endl;
+         }
+     }
+ }
+ 
+ int MozcDict::new_dic(string name) {
+-    mozc::UserDictionaryStorage::UserDictionary* dic = stor->add_dictionaries();
++    mozc::UserDictionaryStorage::UserDictionary* dic = stor->GetProto().add_dictionaries();
+     if (dic == NULL) return 1;
+     dic->set_name(name);
+     dic->set_id(CreateID());
+@@ -173,12 +176,21 @@ bool MozcDict::save() {
+ }
+ 
+ int reboot() {
++#ifdef NO_IBUS
++    const char *path = "@TERMUX_PREFIX@/bin/killall";
++    char *const argv[] = {
++        (char *)"@TERMUX_PREFIX/bin/killall",
++        (char *)"mozc_server",
++        (char *)NULL
++    };
++#else
+     const char *path = "/usr/bin/ibus-daemon";
+     char *const argv[] = {
+         (char *)"/usr/bin/ibus-daemon",
+         (char *)"-xrd",
+         (char *)NULL
+     };
++#endif
+ 
+     return execv(path, argv);
+ }
+@@ -209,12 +221,24 @@ int MozcDict::import(string name, char* file_name) {
+     is.close();
+ 
+     mozc::UserDictionaryImporter::EncodingType type =
+-            mozc::UserDictionaryImporter::GuessEncodingType(input, len);
++            mozc::UserDictionaryImporter::GuessEncodingType(string(input, len));
+     string output;
+     if (type == mozc::UserDictionaryImporter::UTF8) {
+         output += input;
+     } else if (type == mozc::UserDictionaryImporter::SHIFT_JIS) {
+-        mozc::Util::SJISToUTF8(input, &output);
++        iconv_t ic = iconv_open("UTF-8", "CP932");
++        if (ic != (iconv_t)-1) {
++            char *inbuf = input;
++            size_t inbytes = len;
++            size_t outbytes = inbytes*3; // UTF-8はCP932から最大3倍
++            char *outbuf = new char[outbytes];
++            char *p = outbuf;
++            size_t s = iconv(ic, &inbuf, &inbytes, &p, &outbytes);
++            if (s != (size_t)-1)
++                output.append(outbuf, s);
++            iconv_close(ic);
++            delete[] outbuf;
++        }
+         if (output == "") {
+             cerr << "Convert Error" << endl;
+             delete[] input;
+@@ -226,8 +250,7 @@ int MozcDict::import(string name, char* file_name) {
+         return -1;
+     }
+ 
+-    istringstream ss(output);
+-    mozc::UserDictionaryImporter::IStreamTextLineIterator iter(&ss);
++    mozc::UserDictionaryImporter::StringTextLineIterator iter(output);
+     mozc::UserDictionaryImporter::ErrorType error =
+     mozc::UserDictionaryImporter::ImportFromTextLineIterator(
+             mozc::UserDictionaryImporter::IME_AUTO_DETECT, &iter, dic);
+@@ -239,7 +262,7 @@ int MozcDict::import(string name, char* file_name) {
+ int MozcDict::delete_dic(string name) {
+     for (int i = 0; i < dic_num(); i++) {
+         mozc::UserDictionaryStorage::UserDictionary* dic =
+-                stor->mutable_dictionaries(i);
++                stor->GetProto().mutable_dictionaries(i);
+         if (dic->name() == name) {
+             if (dic->id() == 0)
+                 dic->set_id(CreateID());
+@@ -253,7 +276,7 @@ int MozcDict::delete_dic(string name) {
+ int MozcDict::export_dic(string name, const string file_name) {
+     for (int i = 0; i < dic_num(); i++) {
+         mozc::UserDictionaryStorage::UserDictionary* dic =
+-                stor->mutable_dictionaries(i);
++                stor->GetProto().mutable_dictionaries(i);
+         if (dic->name() == name) {
+             if (dic->id() == 0)
+                 dic->set_id(CreateID());
+@@ -284,19 +307,19 @@ void print_help() {
+ }
+ 
+ namespace {
+-struct POSMap {
++struct PosMap {
+     const char *a;
+-    const char *b;
++    mozc::user_dictionary::UserDictionary::PosType b;
+ };
+-#include "dictionary/pos_map.h"
++#include "dictionary/pos_map.inc"
+ }
+ #include <set>
+ 
+ void list_pos() {
+     set<string> ss;
+-    for (int i = 0; i < arraysize(kPOSMap); i++)
+-        if (kPOSMap[i].b != NULL)
+-            ss.insert(kPOSMap[i].b);
++    for (int i = 0; i < arraysize(kPosMap); i++)
++        if (kPosMap[i].b != static_cast<mozc::user_dictionary::UserDictionary::PosType>(-1))
++            ss.insert(string(mozc::UserDictionaryUtil::GetStringPosType(kPosMap[i].b)));
+ 
+     set<string>::iterator it;
+     for (it = ss.begin(); it != ss.end(); it++)
