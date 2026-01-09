@@ -1,0 +1,31 @@
+diff -uNr lua-5.5.0/src/loslib.c lua-5.5.0.mod/src/loslib.c
+--- lua-5.5.0/src/loslib.c	2025-12-15 16:14:40.000000000 +0530
++++ lua-5.5.0.mod/src/loslib.c	2026-01-09 10:32:18.245098428 +0530
+@@ -106,14 +106,14 @@
+ 
+ #include <unistd.h>
+ 
+-#define LUA_TMPNAMBUFSIZE	32
++#define LUA_TMPNAMBUFSIZE	256
+ 
+ #if !defined(LUA_TMPNAMTEMPLATE)
+-#define LUA_TMPNAMTEMPLATE	"/tmp/lua_XXXXXX"
++#define LUA_TMPNAMTEMPLATE	"@TERMUX_PREFIX@/tmp/lua_XXXXXX"
+ #endif
+ 
+-#define lua_tmpnam(b,e) { \
+-        strcpy(b, LUA_TMPNAMTEMPLATE); \
++#define lua_tmpnam(b,e,s) { \
++        strncpy(b, LUA_TMPNAMTEMPLATE, s); \
+         e = mkstemp(b); \
+         if (e != -1) close(e); \
+         e = (e == -1); }
+@@ -172,7 +172,7 @@
+ static int os_tmpname (lua_State *L) {
+   char buff[LUA_TMPNAMBUFSIZE];
+   int err;
+-  lua_tmpnam(buff, err);
++  lua_tmpnam(buff, err, LUA_TMPNAMBUFSIZE - 1);
+   if (l_unlikely(err))
+     return luaL_error(L, "unable to generate a unique filename");
+   lua_pushstring(L, buff);
