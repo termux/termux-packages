@@ -117,6 +117,7 @@ termux_step_pre_configure() {
 	sed -i -e "s|@TERMUX_PYTHON_VERSION@|${_MAJOR_VERSION}|g" \
 		-e "s|@TERMUX_PKG_FULLVERSION@|$(test ${TERMUX_PACKAGE_FORMAT} = pacman && echo ${TERMUX_PKG_FULLVERSION_FOR_PACMAN} || echo ${TERMUX_PKG_FULLVERSION})|g" \
 		$(find "$TERMUX_PKG_SRCDIR/debpython" -type f)
+	autoreconf -fi
 }
 
 termux_step_post_make_install() {
