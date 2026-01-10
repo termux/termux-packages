@@ -6,16 +6,7 @@ diff -u -r ../libtorrent-rasterbar-2.0.10/bindings/python/CMakeLists.txt ./bindi
  function(_get_compatible_python_versions _ret)
  	if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 20)
 -		list(APPEND _tmp 3.6 3.7 3.8 3.9 3.10 3.11)
-+		list(APPEND _tmp 3.6 3.7 3.8 3.9 3.10 3.11 3.12)
++		list(APPEND _tmp 3.6 3.7 3.8 3.9 3.10 3.11 3.12 3.13)
  	endif()
  	set(${_ret} ${_tmp} PARENT_SCOPE)
  endfunction()
-@@ -95,7 +95,7 @@
- else()
- 	execute_process(
- 		COMMAND "${Python3_EXECUTABLE}" -c [=[
--import distutils.sysconfig
-+from setuptools import distutils
- print(distutils.sysconfig.get_python_lib(prefix='', plat_specific=True))
- ]=]
- 		OUTPUT_VARIABLE _PYTHON3_SITE_ARCH
