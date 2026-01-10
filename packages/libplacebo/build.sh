@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="7.360.0"
 TERMUX_PKG_SRCURL="https://code.videolan.org/videolan/libplacebo/-/archive/v${TERMUX_PKG_VERSION}/libplacebo-v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=7f4e182526b738805ff793717c67a256bc3f6bc10025017f0b10193f2c79abb9
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_DEPENDS="littlecms, glslang, python, vulkan-icd"
 TERMUX_PKG_BUILD_DEPENDS="libglvnd-dev, vulkan-headers"
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="glad2"
