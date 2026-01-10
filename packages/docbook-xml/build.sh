@@ -12,19 +12,19 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 
 termux_step_get_source() {
-	termux_download "https://docbook.org/xml/4.1.2/docbkx412.zip" \
+	termux_download "https://archive.docbook.org/xml/4.1.2/docbkx412.zip" \
 		$TERMUX_PKG_CACHEDIR/docbkx412.zip \
 		30f0644064e0ea71751438251940b1431f46acada814a062870f486c772e7772
-	termux_download "https://docbook.org/xml/4.2/docbook-xml-4.2.zip" \
+	termux_download "https://archive.docbook.org/xml/4.2/docbook-xml-4.2.zip" \
 		$TERMUX_PKG_CACHEDIR/docbook-xml-4.2.zip \
 		acc4601e4f97a196076b7e64b368d9248b07c7abf26b34a02cca40eeebe60fa2
-	termux_download "https://docbook.org/xml/4.3/docbook-xml-4.3.zip" \
+	termux_download "https://archive.docbook.org/xml/4.3/docbook-xml-4.3.zip" \
 		$TERMUX_PKG_CACHEDIR/docbook-xml-4.3.zip \
 		23068a94ea6fd484b004c5a73ec36a66aa47ea8f0d6b62cc1695931f5c143464
-	termux_download "https://docbook.org/xml/4.4/docbook-xml-4.4.zip" \
+	termux_download "https://archive.docbook.org/xml/4.4/docbook-xml-4.4.zip" \
 		$TERMUX_PKG_CACHEDIR/docbook-xml-4.4.zip \
 		02f159eb88c4254d95e831c51c144b1863b216d909b5ff45743a1ce6f5273090
-	termux_download "https://docbook.org/xml/4.5/docbook-xml-4.5.zip" \
+	termux_download "https://archive.docbook.org/xml/4.5/docbook-xml-4.5.zip" \
 		$TERMUX_PKG_CACHEDIR/docbook-xml-4.5.zip \
 		4e4e037a2b83c98c6c94818390d4bdd3f6e10f6ec62dd79188594e26190dc7b4
 	mkdir -p $TERMUX_PKG_SRCDIR
