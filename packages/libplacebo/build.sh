@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Reusable library for GPU-accelerated video/image renderi
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="7.351.0"
+TERMUX_PKG_REVISION=1
 _FASTFLOAT_VERSION="8.1.0"
 _FASTFLOAT_URL="https://github.com/fastfloat/fast_float/releases/download/v$_FASTFLOAT_VERSION/fast_float.h"
 _FASTFLOAT_SHA256=bfa4f3e3ee72e10d833533ffffdbcff19e9f49e89ae98d95c9b03e1610253169
