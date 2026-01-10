@@ -3,10 +3,11 @@ TERMUX_PKG_DESCRIPTION="Just-In-Time Compiler for Lua"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1:2.1.1767980792+g707c12b"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/LuaJIT/LuaJIT.git
 TERMUX_PKG_GIT_BRANCH=v${TERMUX_PKG_VERSION:2:3}
-TERMUX_PKG_BREAKS="libluajit-dev"
-TERMUX_PKG_REPLACES="libluajit-dev"
+TERMUX_PKG_BREAKS="libluajit-dev, libluajit"
+TERMUX_PKG_REPLACES="libluajit-dev, libluajit"
 TERMUX_PKG_EXTRA_MAKE_ARGS="amalg PREFIX=$TERMUX_PREFIX"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -54,16 +55,8 @@ termux_step_pre_configure() {
 	# luajit wants same pointer size for host and target build
 	export HOST_CC="gcc"
 	if (( TERMUX_ARCH_BITS == 32 )); then
-		case "$(uname)" in
-			"Linux") # NOTE: "apt install libc6-dev-i386" for 32-bit headers
-				export HOST_CFLAGS="-m32"
-				export HOST_LDFLAGS="-m32"
-			;;
-			"Darwin")
-				export HOST_CFLAGS="-m32 -arch i386"
-				export HOST_LDFLAGS="-arch i386"
-			;;
-		esac
+		export HOST_CFLAGS="-m32"
+		export HOST_LDFLAGS="-m32"
 	fi
 	export TARGET_FLAGS="$CFLAGS $CPPFLAGS $LDFLAGS"
 	export TARGET_SYS=Linux
@@ -92,9 +85,7 @@ termux_step_make_install () {
 	install -Dm700 "$TERMUX_PKG_SRCDIR/src/luajit" "$TERMUX_PREFIX/bin/luajit"
 
 	# Files needed for the -b option (http://luajit.org/running.html) to work.
-	# Note that they end up in the 'luajit' subpackage, not the 'libluajit' one.
 	local TERMUX_LUAJIT_DIR="$TERMUX_PREFIX/share/luajit-${LUAJIT_MINOR_VERSION}/jit"
-	rm -rf "$TERMUX_LUAJIT_DIR"
 	mkdir -p "$TERMUX_LUAJIT_DIR"
-	cp "$TERMUX_PKG_SRCDIR"/src/jit/*lua "$TERMUX_LUAJIT_DIR"
+	cp -v "$TERMUX_PKG_SRCDIR"/src/jit/*lua "$TERMUX_LUAJIT_DIR"
 }
