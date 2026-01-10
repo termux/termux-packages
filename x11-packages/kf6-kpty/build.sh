@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE='https://invent.kde.org/frameworks/kpty'
 TERMUX_PKG_DESCRIPTION='Pty abstraction'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.21.0"
+TERMUX_PKG_VERSION="6.22.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kpty-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256="3abbb4b9cde8935d709a5dc90ebdf371d89e8dd5fa24d243c44dfede7877ebb8"
+TERMUX_PKG_SHA256=e974ae36e609d1fb485782139f8c6aa260fcee8f651da3dd0d175dad1c0b9663
 TERMUX_PKG_DEPENDS="kf6-kcoreaddons (>= ${TERMUX_PKG_VERSION%.*}), kf6-ki18n (>= ${TERMUX_PKG_VERSION%.*}), libc++, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION%.*}), qt6-qttools"
 TERMUX_PKG_AUTO_UPDATE=true
