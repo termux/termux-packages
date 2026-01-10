@@ -7,9 +7,9 @@ TERMUX_PKG_LICENSE_FILE="../LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 # Never forget to always bump revision of reverse dependencies and rebuild them
 # when bumping "major" version.
-TERMUX_PKG_VERSION="78.1"
+TERMUX_PKG_VERSION="78.2"
 TERMUX_PKG_SRCURL=https://github.com/unicode-org/icu/releases/download/release-${TERMUX_PKG_VERSION}/icu4c-${TERMUX_PKG_VERSION}-sources.tgz
-TERMUX_PKG_SHA256=6217f58ca39b23127605cfc6c7e0d3475fe4b0d63157011383d716cb41617886
+TERMUX_PKG_SHA256=3e99687b5c435d4b209630e2d2ebb79906c984685e78635078b672e03c89df35
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_METHOD=repology
 TERMUX_PKG_DEPENDS="libc++"
