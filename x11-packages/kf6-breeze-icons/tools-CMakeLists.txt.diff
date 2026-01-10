@@ -10,12 +10,12 @@
 +function(ecm_mark_nongui_executable)
 +endfunction()
 
- # takes light theme icons and makes modified copies of them with dark theme stylesheets
- add_executable(generate-symbolic-dark generate-symbolic-dark.cpp)
-@@ -9,3 +15,6 @@
- add_executable(qrcAlias qrcAlias.cpp)
- target_link_libraries(qrcAlias PRIVATE Qt6::Core)
- ecm_mark_nongui_executable(qrcAlias)
+ if (CMAKE_CROSSCOMPILING AND KF6_HOST_TOOLING)
+     find_program(GENERATE_SYMBOLIC_DARK generate-symbolic-dark PATHS ${KF6_HOST_TOOLING} NO_CACHE NO_CMAKE_FIND_ROOT_PATH)
+@@ -38,3 +44,6 @@
+         install(TARGETS qrcAlias ${KF_INSTALL_TARGETS_DEFAULT_ARGS})
+     endif()
+ endif ()
 +
 +install(TARGETS qrcAlias DESTINATION bin)
 +install(TARGETS generate-symbolic-dark DESTINATION bin)
