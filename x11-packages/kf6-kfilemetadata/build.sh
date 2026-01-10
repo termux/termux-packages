@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE='https://invent.kde.org/frameworks/kfilemetadata'
 TERMUX_PKG_DESCRIPTION='A library for extracting file metadata'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.21.0"
+TERMUX_PKG_VERSION="6.22.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kfilemetadata-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256="d8fdfcc5434200b26ca2e46e13c422d415b77ad86213d561526da816f653f0a4"
+TERMUX_PKG_SHA256=58e594fdb77883d684bd699731ed57ff24e8970c13c2a1bdb470f5dca84fb2bd
 TERMUX_PKG_DEPENDS="attr, ebook-tools, exiv2, ffmpeg, kf6-karchive (>= ${TERMUX_PKG_VERSION%.*}), kf6-kcodecs (>= ${TERMUX_PKG_VERSION%.*}), kf6-kconfig (>= ${TERMUX_PKG_VERSION%.*}), kf6-kcoreaddons (>= ${TERMUX_PKG_VERSION%.*}), kf6-ki18n (>= ${TERMUX_PKG_VERSION%.*}), libc++, poppler-qt, qt6-qtbase, taglib"
 TERMUX_PKG_BUILD_DEPENDS="catdoc, extra-cmake-modules (>= ${TERMUX_PKG_VERSION%.*}), kdegraphics-mobipocket, qt6-qttools"
 TERMUX_PKG_RECOMMENDS="catdoc, kdegraphics-mobipocket"
