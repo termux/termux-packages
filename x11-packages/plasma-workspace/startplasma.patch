@@ -1,0 +1,11 @@
+--- a/startkde/startplasma.cpp
++++ b/startkde/startplasma.cpp
+@@ -364,7 +364,7 @@ void setupPlasmaEnvironment()
+     // Add kdedefaults dir to allow config defaults overriding from a writable location
+     QByteArray currentConfigDirs = qgetenv("XDG_CONFIG_DIRS");
+     if (currentConfigDirs.isEmpty()) {
+-        currentConfigDirs = "/etc/xdg";
++        currentConfigDirs = "@TERMUX_PREFIX@/etc/xdg";
+     }
+     const QString extraConfigDir = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + QLatin1String("/kdedefaults");
+     QDir().mkpath(extraConfigDir);
