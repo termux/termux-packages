@@ -3,12 +3,13 @@ TERMUX_PKG_DESCRIPTION="Function (graph) tracer for user-space"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.18.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/namhyung/uftrace/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c089e7f38dab8d17346d41cee0ec69dc60699d5527b54e6765712235577da0db
 # Hardcoded libpython${TERMUX_PYTHON_VERSION}.so is dlopen(3)ed by uftrace.
 # Please revbump and rebuild when bumping TERMUX_PYTHON_VERSION.
 # libandroid-{execinfo,spawn} are dlopen(3)ed.
-TERMUX_PKG_DEPENDS="capstone, libandroid-execinfo, libandroid-glob, libandroid-spawn, libc++, libdw, libelf, libluajit, ncurses, python"
+TERMUX_PKG_DEPENDS="capstone, libandroid-execinfo, libandroid-glob, libandroid-spawn, libc++, libdw, libelf, luajit, ncurses, python"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 # See https://github.com/termux/termux-packages/pull/21712 about arm build failure:
