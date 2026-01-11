@@ -1,0 +1,25 @@
+From 62ff47beafd88848312fc09416f0bea6eba4d1c1 Mon Sep 17 00:00:00 2001
+From: cnjhb <hikariz@qq.com>
+Date: Sun, 11 Jan 2026 22:00:00 +0800
+Subject: [PATCH] fix i18n
+
+---
+ ui/gtk2/i18n.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup/i18n.py b/setup/i18n.py
+index af14efc6..254c8376 100644
+--- a/setup/i18n.py
++++ b/setup/i18n.py
+@@ -43,7 +43,7 @@ def init_textdomain(domainname):
+     try:
+         locale.bindtextdomain(domainname, LOCALEDIR)
+         locale.bind_textdomain_codeset(domainname, 'UTF-8')
+-    except AttributeError:
++    except (AttributeError,OSError):
+         pass
+     gettext.bindtextdomain(domainname, LOCALEDIR)
+     # https://docs.python.org/3/library/gettext.html#gettext.lgettext
+-- 
+2.52.0
+
