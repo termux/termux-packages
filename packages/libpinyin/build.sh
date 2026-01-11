@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/libpinyin/libpinyin
+TERMUX_PKG_DESCRIPTION="Library to deal with pinyin."
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=2.10.3
+TERMUX_PKG_SRCURL=https://github.com/libpinyin/libpinyin/releases/download/$TERMUX_PKG_VERSION/libpinyin-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=3fe786ff2c2059bdbdf9d8d752db691a516a941a977521955fe0af3f0b4db299
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_DEPENDS="glib"
