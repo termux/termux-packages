@@ -1,0 +1,16 @@
+TERMUX_PKG_HOMEPAGE="https://invent.kde.org/plasma/ocean-sound-theme"
+TERMUX_PKG_DESCRIPTION="Ocean Sound Theme for Plasma"
+TERMUX_PKG_LICENSE="LGPL-2.0-or-later"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="6.5.4"
+TERMUX_PKG_SRCURL="https://download.kde.org/stable/plasma/${TERMUX_PKG_VERSION}/ocean-sound-theme-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SHA256="c04cc94f70047baa3ac850434915a118872d576307c8a1ea6ed6334fe8acbee4"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libc++"
+TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, qt6-qtbase"
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_SYSTEM_NAME=Linux
+-DKDE_INSTALL_QMLDIR=lib/qt6/qml
+-DKDE_INSTALL_QTPLUGINDIR=lib/qt6/plugins
+"
