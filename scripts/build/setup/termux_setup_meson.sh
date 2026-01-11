@@ -29,7 +29,7 @@ termux_setup_meson() {
 	fi
 	TERMUX_MESON="${MESON_FOLDER}/meson.py"
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
-		TERMUX_MESON="/usr/bin/python${TERMUX_PYTHON_VERSION} ${TERMUX_MESON}"
+		TERMUX_MESON="/usr/bin/python3 ${TERMUX_MESON}"
 	fi
 	TERMUX_MESON_CROSSFILE=$TERMUX_PKG_TMPDIR/meson-crossfile-$TERMUX_ARCH.txt
 	local MESON_CPU MESON_CPU_FAMILY
