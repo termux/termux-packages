@@ -502,6 +502,9 @@ lint_package() {
 						# Is it a tag tarball?
 						elif [[ "$ref_path" == archive/refs/tags/* ]]; then
 							tarball_type="Tag"
+						# Is it a branch tarball?
+						elif [[ "$ref_path" == archive/refs/heads/* ]]; then
+							tarball_type="Branch"
 						# Is it an untagged commit tarball?
 						elif [[ "$ref_path" =~ archive/[0-9a-f]{7,64} ]]; then
 							tarball_type="Commit"
