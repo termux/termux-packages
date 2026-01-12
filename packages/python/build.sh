@@ -82,6 +82,8 @@ termux_step_pre_configure() {
 	# if extension modules should be built (specifically, the
 	# zlib extension module is not built without this):
 	CPPFLAGS+=" -I$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include"
+	# Without this all symbols are removed from the built libpython3.so
+	LDFLAGS="${LDFLAGS/-Wl,--as-needed/}"
 	LDFLAGS+=" -L$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib"
 	if [ $TERMUX_ARCH = x86_64 ]; then LDFLAGS+=64; fi
 
