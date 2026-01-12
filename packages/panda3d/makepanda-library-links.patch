@@ -1,0 +1,35 @@
+diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
+index ad6230f0ed..3e6f8910ec 100755
+--- a/makepanda/makepanda.py
++++ b/makepanda/makepanda.py
+@@ -1257,7 +1257,6 @@ if (COMPILER=="GCC"):
+         LibName("GL", "-dylib_file /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib")
+ 
+     if GetTarget() == 'android':
+-        LibName("ALWAYS", '-llog')
+         LibName("ANDROID", '-landroid')
+         LibName("JNIGRAPHICS", '-ljnigraphics')
+ 
+@@ -2124,22 +2123,6 @@ def CompileLink(dll, obj, opts):
+             if "ANDROID_GCC_TOOLCHAIN" in SDK:
+                 cmd += ' -gcc-toolchain ' + SDK["ANDROID_GCC_TOOLCHAIN"].replace('\\', '/')
+             cmd += " -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now"
+-            if arch == 'armv7a':
+-                cmd += ' -target armv7-none-linux-androideabi'
+-                cmd += " -march=armv7-a -Wl,--fix-cortex-a8"
+-            elif arch == 'arm':
+-                cmd += ' -target armv5te-none-linux-androideabi'
+-            elif arch == 'aarch64':
+-                cmd += ' -target aarch64-none-linux-android'
+-            elif arch == 'mips':
+-                cmd += ' -target mipsel-none-linux-android'
+-                cmd += ' -mips32'
+-            elif arch == 'mips64':
+-                cmd += ' -target mips64el-none-linux-android'
+-            elif arch == 'x86':
+-                cmd += ' -target i686-none-linux-android'
+-            elif arch == 'x86_64':
+-                cmd += ' -target x86_64-none-linux-android'
+             cmd += ' -lc -lm'
+         else:
+             cmd += " -pthread"
