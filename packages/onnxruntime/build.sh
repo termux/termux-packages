@@ -63,6 +63,6 @@ termux_step_make_install() {
 	ln -sf libonnxruntime.pc "$TERMUX_PREFIX/lib/pkgconfig/onnxruntime.pc"
 
 	local _pyver="${TERMUX_PYTHON_VERSION//./}"
-	local _wheel="onnxruntime-${TERMUX_PKG_VERSION}-cp${_pyver}-cp${_pyver}-linux_${TERMUX_ARCH}.whl"
-	pip install --force-reinstall --no-deps --prefix="$TERMUX_PREFIX" "$TERMUX_PKG_SRCDIR/dist/${_wheel}"
+	local _wheel="onnxruntime-${TERMUX_PKG_VERSION}-cp${_pyver}-cp${_pyver}-android_${TERMUX_ARCH}.whl"
+	pip install --no-deps --prefix="$TERMUX_PREFIX" "$TERMUX_PKG_SRCDIR/dist/${_wheel}"
 }
