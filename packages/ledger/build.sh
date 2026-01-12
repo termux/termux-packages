@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Powerful, double-entry accounting system"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.4.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://github.com/ledger/ledger/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=1cf012cdc8445cab0efc445064ef9b2d3f46ed0165dae803c40fe3d2b23fdaad
 TERMUX_PKG_AUTO_UPDATE=true
@@ -17,8 +17,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	sed $TERMUX_PKG_BUILDER_DIR/CMakeLists.diff \
-		-e "s%@TERMUX_PREFIX@%${TERMUX_PREFIX}%g" \
-		-e "s%@PYTHON_VERSION@%${TERMUX_PYTHON_VERSION}%g" \
-		| patch --silent -p1
+	termux_setup_python_pip
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DPython3_EXECUTABLE=$(command -v cross-python)"
 }
