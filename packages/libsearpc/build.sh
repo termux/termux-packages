@@ -15,5 +15,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_post_get_source() {
 	./autogen.sh
-	export PYTHON="python${TERMUX_PYTHON_VERSION}"
+}
+
+termux_step_pre_configure() {
+	termux_setup_python_pip
+	export PYTHON="cross-python"
 }
