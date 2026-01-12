@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Cross-platform, fast, feature-rich, GPU based terminal"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.45.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/kovidgoyal/kitty/releases/download/v${TERMUX_PKG_VERSION}/kitty-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=93fcba4984a97ccb7d811f487a818d406e681912b6bbb8f0ca426103ddce7ca5
 # fontconfig is dlopen(3)ed:
