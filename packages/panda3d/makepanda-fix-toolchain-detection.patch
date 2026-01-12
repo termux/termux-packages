@@ -1,0 +1,42 @@
+--- a/makepanda/makepandacore.py
++++ b/makepanda/makepandacore.py
+@@ -497,27 +497,36 @@ def GetCXX():
+     else:
+         return os.environ.get('CXX', TOOLCHAIN_PREFIX + 'g++')
+ 
+-def GetStrip():
++def _GetStrip():
+     # Hack
+     if TARGET == 'android':
+         return TOOLCHAIN_PREFIX + 'strip'
+     else:
+         return 'strip'
+ 
+-def GetAR():
++def GetStrip():
++    return os.environ.get('STRIP', _GetStrip())
++
++def _GetAR():
+     # Hack
+     if TARGET == 'android':
+         return TOOLCHAIN_PREFIX + 'ar'
+     else:
+         return 'ar'
+ 
+-def GetRanlib():
++def GetAR():
++    return os.environ.get('AR', _GetAR())
++
++def _GetRanlib():
+     # Hack
+     if TARGET == 'android':
+         return TOOLCHAIN_PREFIX + 'ranlib'
+     else:
+         return 'ranlib'
+ 
++def GetRanlib():
++    return os.environ.get('RANLIB', _GetRanlib())
++
+ BISON = None
+ def GetBison():
+     global BISON
