@@ -43,6 +43,10 @@ jobs:
       uses: actions/checkout@v6
       with:
         fetch-depth: 1000
+    - name: Disable binfmt to stop autotools cross-compilations from failing when aosp-libs is installed
+      run: |
+          sudo /usr/lib/systemd/systemd-binfmt --unregister
+          ./conftest
     - name: Set process id limit for 32-bit builds depending on aosp-libs
       run: echo 65535 | sudo tee /proc/sys/kernel/pid_max
 
