@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Intelligent Input Bus for Linux/Unix"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.5.33"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL="https://github.com/ibus/ibus/releases/download/$TERMUX_PKG_VERSION/ibus-$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=58941c9b8285891c776b67fb2039eebe0d61d63a51578519febfc5481b91e831
 TERMUX_PKG_DEPENDS="dconf, glib, gobject-introspection, gtk3, gtk4, ibus-data, libdbusmenu, libnotify, libwayland, libx11, libxfixes, libxi, libxkbcommon"
@@ -32,19 +32,21 @@ termux_step_pre_configure() {
 	termux_setup_gir
 	termux_setup_glib_cross_pkg_config_wrapper
 
-	if [[ "$TERMUX_ON_DEVICE_BUILD" = "false" ]]; then
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
 		# Create host pkg-config wrapper
 		mkdir -p "$TERMUX_PKG_TMPDIR"/host-pkg-config
-		cat > "$TERMUX_PKG_TMPDIR"/host-pkg-config/pkg-config <<-HERE
+		cat > "$TERMUX_PKG_TMPDIR"/host-pkg-config/pkg-config <<-EOF
 			#!/bin/sh
 			unset PKG_CONFIG_DIR
 			unset PKG_CONFIG_LIBDIR
 			exec /usr/bin/pkg-config "\$@"
-		HERE
+		EOF
 		chmod +x "$TERMUX_PKG_TMPDIR"/host-pkg-config/pkg-config
 		export PKG_CONFIG_FOR_BUILD="$TERMUX_PKG_TMPDIR"/host-pkg-config/pkg-config
 
-		termux_download_ubuntu_packages dconf-cli "$TERMUX_PKG_TMPDIR/prefix"
+		DESTINATION="$TERMUX_PKG_TMPDIR/prefix" \
+		termux_download_ubuntu_packages dconf-cli
+
 		export PATH="$TERMUX_PKG_TMPDIR/prefix/usr/bin:$PATH"
 	fi
 }

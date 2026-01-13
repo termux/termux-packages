@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Sumneko Lua Language Server coded in Lua"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="3.16.4"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"
 TERMUX_PKG_SRCURL="git+https://github.com/sumneko/lua-language-server"
 TERMUX_PKG_DEPENDS="libandroid-spawn, binutils-libs, libc++"
@@ -35,20 +36,21 @@ termux_step_host_build() {
 	cp -a "${TERMUX_PKG_SRCDIR}"/3rd/luamake 3rd/
 
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
-		local ubuntu_packages
-		ubuntu_packages+="libunwind-dev,"
-		ubuntu_packages+="libunwind8,"
-		ubuntu_packages+="binutils,"
-		ubuntu_packages+="binutils-common,"
-		ubuntu_packages+="binutils-x86-64-linux-gnu,"
-		ubuntu_packages+="libbinutils,"
-		ubuntu_packages+="libctf-nobfd0,"
-		ubuntu_packages+="libctf0,"
-		ubuntu_packages+="libgprofng0,"
-		ubuntu_packages+="libsframe1,"
-		ubuntu_packages+="binutils-dev,"
+		local -a ubuntu_packages=(
+			"binutils"
+			"binutils-common"
+			"binutils-dev"
+			"binutils-x86-64-linux-gnu"
+			"libbinutils"
+			"libctf-nobfd0"
+			"libctf0"
+			"libgprofng0"
+			"libsframe1"
+			"libunwind-dev"
+			"libunwind8"
+		)
 
-		termux_download_ubuntu_packages "$ubuntu_packages"
+		termux_download_ubuntu_packages "${ubuntu_packages[@]}"
 
 		_load_ubuntu_packages
 
