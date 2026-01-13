@@ -14,7 +14,7 @@ external/iputils/NOTICE
 "
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="9.0.0-r76"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
@@ -38,15 +38,15 @@ termux_step_get_source() {
 	export LD_LIBRARY_PATH="${TERMUX_PKG_SRCDIR}/prefix/lib/x86_64-linux-gnu:${TERMUX_PKG_SRCDIR}/prefix/usr/lib/x86_64-linux-gnu"
 	export PATH="${TERMUX_PKG_SRCDIR}/prefix/usr/bin:${PATH//$HOME\/.cargo\/bin/}"
 
-	local ubuntu_packages
-	ubuntu_packages+="libtinfo5,"
-	ubuntu_packages+="libncurses5,"
-	ubuntu_packages+="openssh-client,"
+	local -a ubuntu_packages=(
+		"libncurses5"
+		"libtinfo5"
+		"openssh-client"
+	)
 
-	termux_download_ubuntu_packages "$ubuntu_packages" \
-		"${TERMUX_PKG_SRCDIR}/prefix" \
-		amd64 \
-		https://packages.ubuntu.com/jammy
+	DESTINATION="${TERMUX_PKG_SRCDIR}/prefix" \
+	UBUNTU_RELEASE=jammy \
+	termux_download_ubuntu_packages "${ubuntu_packages[@]}"
 
 	termux_download https://storage.googleapis.com/git-repo-downloads/repo "${TERMUX_PKG_CACHEDIR}/repo" SKIP_CHECKSUM
 	chmod +x "${TERMUX_PKG_CACHEDIR}/repo"

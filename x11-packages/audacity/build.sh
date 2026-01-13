@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An easy-to-use, multi-track audio editor and recorder"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.7.7"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/audacity/audacity/archive/refs/tags/Audacity-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=aa6ea8530de5bb77cf61ae92f2b63e3a6f46af08c392d917b198b6ab9dc9b861
 TERMUX_PKG_DEPENDS="ffmpeg, gdk-pixbuf, glib, gtk3, libc++, libexpat, libflac, libid3tag, libogg, libopus, libsndfile, libsoundtouch, libsoxr, libuuid, libvorbis, libwavpack, libmpg123, opusfile, portaudio, portmidi, wxwidgets"
@@ -50,13 +51,14 @@ termux_step_host_build() {
 		# Let's download them from ubuntu repos.
 		# To avoid messing with `apt update` and `apt download` we will get download links directly from ubuntu servers.
 
-		local ubuntu_packages
+		local ubuntu_packages=(
+			"libgtk2.0-0t64"
+			"libgtk2.0-dev"
+			"libasound2-dev"
+		)
 
-		ubuntu_packages+="libgtk2.0-0t64,"
-		ubuntu_packages+="libgtk2.0-dev,"
-		ubuntu_packages+="libasound2-dev,"
-
-		termux_download_ubuntu_packages "$ubuntu_packages" "$_PREFIX"
+		DESTINATION="$_PREFIX" \
+		termux_download_ubuntu_packages "${ubuntu_packages[@]}"
 
 		for i in "$_PREFIX"/usr/lib/x86_64-linux-gnu/pkgconfig/*.pc; do
 			# patch pkg-config files to match new prefix

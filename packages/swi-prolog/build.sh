@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Most popular and complete prolog implementation"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="10.1.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.swi-prolog.org/download/devel/src/swipl-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4bbb31f684749bbe3af2e75d726e5453ea26a656d6b2b1299f5633d5f37af851
 TERMUX_PKG_DEPENDS="libandroid-execinfo, libarchive, libcrypt, libdb, libedit, libgmp, libyaml, ncurses, openssl, ossp-uuid, pcre2, python, unixodbc, zlib"
@@ -58,31 +59,31 @@ termux_pkg_auto_update() {
 termux_step_host_build() {
 	# make build dependencies of hostbuild exactly match build dependencies of target build
 	# prevents possible errors that can otherwise occur
-	local ubuntu_packages
+	local -a ubuntu_packages=(
+		"libacl1-dev"
+		"libarchive-dev"
+		"libattr1-dev"
+		"libbsd-dev"
+		"libdb-dev"
+		"libdb5.3-dev"
+		"libedit-dev"
+		"libext2fs-dev"
+		"liblz4-dev"
+		"libmd-dev"
+		"libodbccr2"
+		"libodbcinst2"
+		"libossp-uuid-dev"
+		"libossp-uuid16"
+		"libpython3-dev"
+		"libpython3.12-dev"
+		"nettle-dev"
+		"python3-dev"
+		"python3.12-dev"
+		"unixodbc-common"
+		"unixodbc-dev"
+	)
 
-	ubuntu_packages+="libacl1-dev,"
-	ubuntu_packages+="libarchive-dev,"
-	ubuntu_packages+="libattr1-dev,"
-	ubuntu_packages+="libext2fs-dev,"
-	ubuntu_packages+="liblz4-dev,"
-	ubuntu_packages+="nettle-dev,"
-	ubuntu_packages+="libpython3-dev,"
-	ubuntu_packages+="libpython3.12-dev,"
-	ubuntu_packages+="python3-dev,"
-	ubuntu_packages+="python3.12-dev,"
-	ubuntu_packages+="libbsd-dev,"
-	ubuntu_packages+="libedit-dev,"
-	ubuntu_packages+="libmd-dev,"
-	ubuntu_packages+="libossp-uuid-dev,"
-	ubuntu_packages+="libossp-uuid16,"
-	ubuntu_packages+="libdb-dev,"
-	ubuntu_packages+="libdb5.3-dev,"
-	ubuntu_packages+="libodbccr2,"
-	ubuntu_packages+="libodbcinst2,"
-	ubuntu_packages+="unixodbc-common,"
-	ubuntu_packages+="unixodbc-dev,"
-
-	termux_download_ubuntu_packages "$ubuntu_packages"
+	termux_download_ubuntu_packages "${ubuntu_packages[@]}"
 
 	local HOSTBUILD_ROOTFS="${TERMUX_PKG_HOSTBUILD_DIR}/ubuntu_packages"
 

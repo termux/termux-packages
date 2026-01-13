@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A package manager for Lua, similar to luarocks"
 TERMUX_PKG_LICENSE="LGPL-3.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.23.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/nvim-neorocks/lux/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=387725a418717a805e4872f806b5938943750004013d781a791dcc3be160a144
 TERMUX_PKG_DEPENDS="bzip2, gpgme, libgit2, libgpg-error, lua54, openssl, xz-utils"
@@ -48,25 +49,25 @@ termux_step_host_build() {
 		return
 	fi
 
-	local ubuntu_packages
-
 	# libgpgme-dev and any dependencies that aren't in the ubuntu builder at time of writing
-	ubuntu_packages+="dirmngr,"
-	ubuntu_packages+="gnupg,"
-	ubuntu_packages+="gnupg-l10n,"
-	ubuntu_packages+="gnupg-utils,"
-	ubuntu_packages+="gpg,"
-	ubuntu_packages+="gpg-agent,"
-	ubuntu_packages+="gpg-wks-client,"
-	ubuntu_packages+="gpgconf,"
-	ubuntu_packages+="gpgsm,"
-	ubuntu_packages+="gpgv,"
-	ubuntu_packages+="keyboxd,"
-	ubuntu_packages+="libassuan-dev,"
-	ubuntu_packages+="libgpgme-dev,"
-	ubuntu_packages+="libgpgme11t64,"
+	local -a ubuntu_packages=(
+		"dirmngr"
+		"gnupg"
+		"gnupg-l10n"
+		"gnupg-utils"
+		"gpg"
+		"gpg-agent"
+		"gpg-wks-client"
+		"gpgconf"
+		"gpgsm"
+		"gpgv"
+		"keyboxd"
+		"libassuan-dev"
+		"libgpgme-dev"
+		"libgpgme11t64"
+	)
 
-	termux_download_ubuntu_packages "$ubuntu_packages"
+	termux_download_ubuntu_packages "${ubuntu_packages[@]}"
 
 	PKG_CONFIG_PATH_x86_64_unknown_linux_gnu="${TERMUX_PKG_HOSTBUILD_DIR}/ubuntu_packages/usr/lib/x86_64-linux-gnu/pkgconfig"
 	RUSTFLAGS="-L${TERMUX_PKG_HOSTBUILD_DIR}/ubuntu_packages/usr/lib/x86_64-linux-gnu"

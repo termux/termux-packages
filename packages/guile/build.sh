@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Portable, embeddable Scheme implementation written in C"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.0.11
+TERMUX_PKG_REVISION=1
 # Tip: Guile official source code contains hardlinks and cannot be built by default if "$TERMUX_ON_DEVICE_BUILD" == "true".
 # To build if "$TERMUX_ON_DEVICE_BUILD" == "true", follow a guide like this to prepare for it:
 # https://unix.stackexchange.com/questions/265024/unpacking-tarball-with-hard-links-on-a-file-system-that-doesnt-support-hard-lin
@@ -52,29 +53,30 @@ termux_step_host_build() {
 
 	_load_ubuntu_packages
 
-	local ubuntu_packages
-	ubuntu_packages+="libffi8,"
-	ubuntu_packages+="libffi-dev,"
-	ubuntu_packages+="libgc1,"
-	ubuntu_packages+="libgc-dev,"
-	ubuntu_packages+="libgmp10,"
-	ubuntu_packages+="libgmp-dev,"
-	ubuntu_packages+="libreadline8t64,"
-	ubuntu_packages+="libreadline-dev,"
-	ubuntu_packages+="libgpm2,"
-	ubuntu_packages+="libtinfo6,"
-	ubuntu_packages+="libncurses6,"
-	ubuntu_packages+="libncursesw6,"
-	ubuntu_packages+="libncurses-dev,"
-	ubuntu_packages+="libunistring5,"
-	ubuntu_packages+="libunistring-dev,"
+	local -a ubuntu_packages=(
+		"libffi-dev"
+		"libffi8"
+		"libgc-dev"
+		"libgc1"
+		"libgmp-dev"
+		"libgmp10"
+		"libgpm2"
+		"libncurses-dev"
+		"libncurses6"
+		"libncursesw6"
+		"libreadline-dev"
+		"libreadline8t64"
+		"libtinfo6"
+		"libunistring-dev"
+		"libunistring5"
+	)
 
-	termux_download_ubuntu_packages "$ubuntu_packages" \
-		"$HOSTBUILD_ROOTFS" \
-		"$HOSTBUILD_ARCH"
+	DESTINATION="$HOSTBUILD_ROOTFS" \
+	ARCHITECTURE="$HOSTBUILD_ARCH" \
+	termux_download_ubuntu_packages "${ubuntu_packages[@]}"
 
-	find "${HOSTBUILD_ROOTFS}" -type f -name '*.pc' | \
-		xargs -n 1 sed -i -e "s|/usr|${HOSTBUILD_ROOTFS}/usr|g"
+	find "${HOSTBUILD_ROOTFS}" -type f -name '*.pc' -print0 | \
+		xargs -0 -n 1 sed -i -e "s|/usr|${HOSTBUILD_ROOTFS}/usr|g"
 
 	export CFLAGS="-I${HOSTBUILD_ARCH_INCLUDEDIR} -I${HOSTBUILD_ROOTFS}${HOSTBUILD_ARCH_INCLUDEDIR}"
 	export LDFLAGS="-L${HOSTBUILD_ARCH_LIBDIR} -L${HOSTBUILD_ROOTFS}${HOSTBUILD_ARCH_LIBDIR}"
