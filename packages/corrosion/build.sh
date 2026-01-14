@@ -1,0 +1,22 @@
+TERMUX_PKG_HOMEPAGE="https://github.com/corrosion-rs/corrosion"
+TERMUX_PKG_DESCRIPTION="Tool for integrating Rust into an existing CMake project"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.6.0"
+TERMUX_PKG_SRCURL="https://github.com/corrosion-rs/corrosion/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256="0b53fe8ec121391890fdded39cd306ef18b853b49b60b81789aee66ccf27f789"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libc++"
+TERMUX_PKG_RECOMMENDS="cmake, rust"
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
+-DCORROSION_BUILD_TESTS=OFF
+"
+
+termux_step_pre_configure() {
+	termux_setup_rust
+
+	[[ "${TERMUX_ARCH}" == "arm" ]] && TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_ANDROID_ARM_MODE=ON"
+
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DRust_CARGO_TARGET=$CARGO_TARGET_NAME"
+}
