@@ -262,9 +262,6 @@ PACKAGES+=" libxft-dev"
 PACKAGES+=" libxt-dev"
 PACKAGES+=" xbitmaps"
 
-# Needed by pypy
-PACKAGES+=" qemu-user-static"
-
 # Required by cava
 PACKAGES+=" xxd"
 

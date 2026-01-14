@@ -239,6 +239,7 @@ jobs:
       if: ${{ steps.build-info.outputs.docker-build == 'false' && steps.build-info.outputs.skip-building != 'true' }}
       run: |
         ./scripts/setup-ubuntu.sh
+        ./conftest
         # need to unset these for setup-android-sdk.sh.
         unset NDK ANDROID_HOME
         ./scripts/setup-android-sdk.sh
