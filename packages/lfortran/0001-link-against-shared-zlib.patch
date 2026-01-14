@@ -18,25 +18,48 @@ Index: lfortran-0.43.0/src/lfortran/CMakeLists.txt
  target_include_directories(lfortran_lib BEFORE PUBLIC ${lfortran_SOURCE_DIR}/src)
 Index: lfortran-0.43.0/cmake/FindStaticZLIB.cmake
 ===================================================================
---- lfortran-0.43.0.orig/cmake/FindStaticZLIB.cmake
-+++ lfortran-0.43.0/cmake/FindStaticZLIB.cmake
-@@ -1,12 +1,9 @@
+--- lfortran-0.43.0.orig/cmake/FindLFortranZLIB.cmake
++++ lfortran-0.43.0/cmake/FindLFortranZLIB.cmake
+@@ -8,36 +8,10 @@
+ # If USE_DYNAMIC_ZLIB is OFF but no static library is available, fall back to
+ # a default search so builds work on systems that do not ship static zlib.
+ 
 -# Backup the original value of the requested library suffixes
 -set(_CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
--# Static libraries end with .a on Unix and .lib on Windows
--set(CMAKE_FIND_LIBRARY_SUFFIXES .a .lib)
+-
+-if (USE_DYNAMIC_ZLIB)
+-    if(WIN32)
+-        set(CMAKE_FIND_LIBRARY_SUFFIXES .dll .lib .a)
+-    elseif(APPLE)
+-        set(CMAKE_FIND_LIBRARY_SUFFIXES .dylib .so .a .lib)
+-    else()
+-        set(CMAKE_FIND_LIBRARY_SUFFIXES .so .a .lib)
+-    endif()
+-else()
+-    # Prefer static libraries first
+-    set(CMAKE_FIND_LIBRARY_SUFFIXES .a .lib)
+-endif()
+-
+-find_package(ZLIB QUIET)
+-
+-# Reset the library suffixes to the original value
+-set(CMAKE_FIND_LIBRARY_SUFFIXES ${_CMAKE_FIND_LIBRARY_SUFFIXES})
+-# Unset the temporary to not pollute the global namespace
+-unset(_CMAKE_FIND_LIBRARY_SUFFIXES)
+-
+-if (NOT ZLIB_FOUND OR NOT ZLIB_LIBRARY)
+-    unset(ZLIB_FOUND)
+-    unset(ZLIB_LIBRARY CACHE)
+-    unset(ZLIB_LIBRARIES CACHE)
+-    find_package(ZLIB REQUIRED)
+-endif()
+-
 +find_path(ZLIB_HEADER zlib.h)
- 
--# Now use CMake's built-in ZLIB finder
--find_package(ZLIB REQUIRED)
-+include(FindPackageHandleStandardArgs)
+ include(FindPackageHandleStandardArgs)
+-find_package_handle_standard_args(LFortranZLIB DEFAULT_MSG ZLIB_LIBRARY
+-    ZLIB_INCLUDE_DIRS)
 +find_package_handle_standard_args(ZLIB DEFAULT_MSG ZLIB_HEADER)
 +
 +add_library(p::z INTERFACE IMPORTED)
 +set_property(TARGET p::z PROPERTY INTERFACE_INCLUDE_DIRECTORIES
 +    ${ZLIB_HEADER})
- 
--# Reset the library suffixes to the original value
--set(CMAKE_FIND_LIBRARY_SUFFIXES ${_CMAKE_FIND_LIBRARY_SUFFIXES})
--# Unset the temporary to not pollute the global namespace
--unset(_CMAKE_FIND_LIBRARY_SUFFIXES)
