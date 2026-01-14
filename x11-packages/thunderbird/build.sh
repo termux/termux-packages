@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.thunderbird.net
 TERMUX_PKG_DESCRIPTION="Unofficial Thunderbird email client"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="146.0.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="147.0"
 TERMUX_PKG_SRCURL="https://archive.mozilla.org/pub/thunderbird/releases/${TERMUX_PKG_VERSION}/source/thunderbird-${TERMUX_PKG_VERSION}.source.tar.xz"
-TERMUX_PKG_SHA256=816c7add658c208ef6057ef86643ed9ecc0f4daafcae592a1ffe38d1a2108b38
+TERMUX_PKG_SHA256=6de1b024123e16b2c3d62c5677b2843e7163c6f2358fe3d7e60b845104458121
 TERMUX_PKG_DEPENDS="botan3, ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libotr, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -92,6 +91,22 @@ termux_step_pre_configure() {
 		# For symbol android_getCpuFeatures
 		LDFLAGS+=" -l:libndk_compat.a"
 	fi
+
+	# vendor crates that otherwise cause 'error: failed to calculate checksum of... .gitmodules'
+	# when '--frozen' is removed because the thunderbird archive doesn't contain any .gitmodules files,
+	# then vendor the cc crate last so that the CFLAGS-related patch can be applied to it
+	local crate dir crate_src_dir crate_dest_dir patch
+	for crate in minimal-lexical cubeb-sys sfv glslopt cc; do
+		dir="$TERMUX_PKG_SRCDIR/comm/third_party/rust"
+		crate_src_dir="$dir/$crate"
+		crate_dest_dir="$crate_src_dir-custom"
+		cp -r "$crate_src_dir" "$crate_dest_dir"
+		sed -i "/\[patch.crates-io\]/a $crate = { path = \"$crate_dest_dir\" }" "$TERMUX_PKG_SRCDIR/comm/rust/Cargo.toml"
+	done
+
+	patch="$TERMUX_PKG_BUILDER_DIR/0029-rust-cc-do-not-concatenates-all-the-CFLAGS.patch"
+	echo "Applying patch: $patch"
+	patch -p4 -d "$crate_dest_dir" < "$patch"
 }
 
 termux_step_configure() {
