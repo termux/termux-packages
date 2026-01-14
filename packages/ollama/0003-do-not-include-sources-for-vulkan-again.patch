@@ -1,12 +1,12 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -140,7 +140,9 @@
- 
- find_package(Vulkan)
- if(Vulkan_FOUND)
-+    if(NOT GGML_VULKAN)
-     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ml/backend/ggml/ggml/src/ggml-vulkan)
-+    endif()
-     install(TARGETS ggml-vulkan
-         RUNTIME DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT Vulkan
-         LIBRARY DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT Vulkan
+ if(NOT APPLE)
+     find_package(Vulkan)
+     if(Vulkan_FOUND)
++        if(NOT GGML_VULKAN)
+         add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ml/backend/ggml/ggml/src/ggml-vulkan)
++        endif()
+         install(TARGETS ggml-vulkan
+             RUNTIME DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT Vulkan
+             LIBRARY DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT Vulkan

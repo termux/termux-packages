@@ -10,12 +10,12 @@
      LIBRARY DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT CPU
      FRAMEWORK DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT CPU
 @@ -144,9 +142,6 @@
- if(Vulkan_FOUND)
-     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ml/backend/ggml/ggml/src/ggml-vulkan)
-     install(TARGETS ggml-vulkan
--        RUNTIME_DEPENDENCIES
--            PRE_INCLUDE_REGEXES vulkan
--            PRE_EXCLUDE_REGEXES ".*"
-         RUNTIME DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT Vulkan
-         LIBRARY DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT Vulkan
-     )
+     if(Vulkan_FOUND)
+         add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ml/backend/ggml/ggml/src/ggml-vulkan)
+         install(TARGETS ggml-vulkan
+-            RUNTIME_DEPENDENCIES
+-                PRE_INCLUDE_REGEXES vulkan
+-                PRE_EXCLUDE_REGEXES ".*"
+             RUNTIME DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT Vulkan
+             LIBRARY DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT Vulkan
+         )
