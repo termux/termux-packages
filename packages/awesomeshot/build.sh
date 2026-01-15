@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A command-line screenshot tool written in bash"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.1.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/mayTermux/awesomeshot/archive/refs/tags/v.${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=5daefb4c02743503e08764fb604e6a811e4ce09a301fafe7cd00a43418a687b1
 TERMUX_PKG_DEPENDS="bash, bc, imagemagick, inotify-tools, termux-api"
