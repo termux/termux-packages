@@ -78,7 +78,6 @@ Enable jumbo build for the following component(s)/source_set(s):
 - //ui/shell_dialogs:shell_dialogs
 - //ui/snapshot:snapshot
 - //ui/snapshot:snapshot_export
-- //ui/surface:surface
 - //ui/touch_selection:touch_selection
 - //ui/views/controls/webview:webview
 - //ui/views:views
@@ -315,7 +314,7 @@ index 1428a0aa8d..e9786252fb 100644
    sources = [
      "data_transfer_policy/mock_data_transfer_policy_controller.cc",
 diff --git a/ui/base/clipboard/BUILD.gn b/ui/base/clipboard/BUILD.gn
-index 1634846811..c9b2eeba1e 100644
+index c375288ca4..427fcf5408 100644
 --- a/ui/base/clipboard/BUILD.gn
 +++ b/ui/base/clipboard/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -335,7 +334,7 @@ index 1634846811..c9b2eeba1e 100644
    output_name = "ui_base_clipboard_types"
    sources = [
      "clipboard_buffer.h",
-@@ -80,7 +81,7 @@ component("file_info") {
+@@ -77,7 +78,7 @@ component("file_info") {
  
  # This is a source set because it needs to be included only on the Mac for the
  # final executable, but needs to be included on any platform for the fuzzer.
@@ -344,7 +343,7 @@ index 1634846811..c9b2eeba1e 100644
    sources = [
      "url_file_parser.cc",
      "url_file_parser.h",
-@@ -89,7 +90,7 @@ source_set("url_file_parser") {
+@@ -86,7 +87,7 @@ source_set("url_file_parser") {
    deps = [ "//base" ]
  }
  
@@ -353,7 +352,7 @@ index 1634846811..c9b2eeba1e 100644
    output_name = "ui_base_clipboard"
  
    sources = [
-@@ -202,7 +203,7 @@ component("clipboard") {
+@@ -199,7 +200,7 @@ component("clipboard") {
    }
  }
  
@@ -770,7 +769,7 @@ index 4e36a91093..afa2c62546 100644
    sources = [
      "display_color_management.cc",
 diff --git a/ui/display/util/BUILD.gn b/ui/display/util/BUILD.gn
-index 7c5aeb4491..452260a776 100644
+index 2cfbccde69..86fc4bec33 100644
 --- a/ui/display/util/BUILD.gn
 +++ b/ui/display/util/BUILD.gn
 @@ -2,10 +2,11 @@
@@ -1757,22 +1756,6 @@ index e9dbc8b20e..fbfa37b342 100644
    sources = [ "snapshot_export.h" ]
    visibility = [ ":*" ]
  }
-diff --git a/ui/surface/BUILD.gn b/ui/surface/BUILD.gn
-index dace1de6c0..e7f68805e9 100644
---- a/ui/surface/BUILD.gn
-+++ b/ui/surface/BUILD.gn
-@@ -2,9 +2,10 @@
- # Use of this source code is governed by a BSD-style license that can be
- # found in the LICENSE file.
- 
-+import("//build/config/jumbo.gni")
- import("//build/config/ui.gni")
- 
--component("surface") {
-+jumbo_component("surface") {
-   sources = [
-     "surface_export.h",
-     "transport_dib.cc",
 diff --git a/ui/touch_selection/BUILD.gn b/ui/touch_selection/BUILD.gn
 index 5043429e94..83a1accb6f 100644
 --- a/ui/touch_selection/BUILD.gn
@@ -1916,7 +1899,7 @@ index 50bb38a38d..cf7c4610f3 100644
      "unhandled_keyboard_event_handler.cc",
      "unhandled_keyboard_event_handler.h",
 diff --git a/ui/views/examples/BUILD.gn b/ui/views/examples/BUILD.gn
-index dba6a80b86..8d98bb7a76 100644
+index a4564d98d6..bcd069a3e0 100644
 --- a/ui/views/examples/BUILD.gn
 +++ b/ui/views/examples/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -1936,7 +1919,7 @@ index dba6a80b86..8d98bb7a76 100644
    testonly = true
  
    sources = [
-@@ -400,7 +401,7 @@ if (is_mac) {
+@@ -398,7 +399,7 @@ if (is_mac) {
    }
  }
  
@@ -1949,13 +1932,15 @@ diff --git a/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc b/ui/vie
 index 47adf1b694..518d77e164 100644
 --- a/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc
 +++ b/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc
-@@ -634,7 +634,7 @@ void DesktopNativeWidgetAura::InitNativeWidget(Widget::InitParams params) {
+@@ -634,8 +634,8 @@ void DesktopNativeWidgetAura::InitNativeWidget(Widget::InitParams params) {
            std::unique_ptr<wm::NativeCursorManager>(native_cursor_manager_));
        cursor_manager_->SetDisplay(
            display::Screen::Get()->GetDisplayNearestWindow(host_->window()));
--      if (features::IsSystemCursorSizeSupported()) {
-+      if (::features::IsSystemCursorSizeSupported()) {
-         native_cursor_manager_->InitCursorSizeObserver(cursor_manager_);
+-      if (features::IsSystemCursorSizeSupported() ||
+-          features::ShouldUseCursorEventHook()) {
++      if (::features::IsSystemCursorSizeSupported() ||
++          ::features::ShouldUseCursorEventHook()) {
+         native_cursor_manager_->InitSystemCursorObservers(cursor_manager_);
        }
      }
 diff --git a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc

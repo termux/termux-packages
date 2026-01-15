@@ -24,18 +24,16 @@ Enable jumbo build for the following template(s):
  base/task/single_thread_task_runner.cc            |  4 ++++
  base/threading/platform_thread_metrics_linux.cc   |  4 ++++
  cc/cc.gni                                         |  5 +++--
- cc/metrics/scroll_jank_v4_histogram_emitter.cc    |  8 ++++++++
- components/viz/service/BUILD.gn                   |  8 ++++++++
  .../viz/service/display/occlusion_culler.cc       |  4 ++++
  .../service/display/overlay_candidate_factory.cc  |  4 ++++
  components/viz/service/display/skia_renderer.cc   |  4 ++++
  .../viz/service/display/software_renderer.cc      |  4 ++++
  .../service/frame_sinks/frame_sink_manager_impl.h |  3 +++
  components/viz/viz.gni                            |  7 ++++---
- 15 files changed, 83 insertions(+), 9 deletions(-)
+ 13 files changed, 67 insertions(+), 9 deletions(-)
 
 diff --git a/base/BUILD.gn b/base/BUILD.gn
-index a78287ca73..d0af87dabc 100644
+index f73ed42f84..f9e71f34c7 100644
 --- a/base/BUILD.gn
 +++ b/base/BUILD.gn
 @@ -28,6 +28,7 @@ import("//build/config/cast.gni")
@@ -55,7 +53,7 @@ index a78287ca73..d0af87dabc 100644
    sources = [
      "allocator/allocator_check.cc",
      "allocator/allocator_check.h",
-@@ -1007,6 +1008,10 @@ component("base") {
+@@ -985,6 +986,10 @@ component("base") {
      ]
    }
  
@@ -66,7 +64,7 @@ index a78287ca73..d0af87dabc 100644
    if (is_linux || is_chromeos) {
      sources += [
        "debug/proc_maps_linux.cc",
-@@ -1026,6 +1031,7 @@ component("base") {
+@@ -1004,6 +1009,7 @@ component("base") {
        "threading/thread_type_delegate.cc",
        "threading/thread_type_delegate.h",
      ]
@@ -74,7 +72,7 @@ index a78287ca73..d0af87dabc 100644
    }
  
    if (is_chromeos) {
-@@ -1958,6 +1964,11 @@ component("base") {
+@@ -1944,6 +1950,11 @@ component("base") {
        "win/wrapped_window_proc.h",
      ]
  
@@ -86,7 +84,7 @@ index a78287ca73..d0af87dabc 100644
      deps += [ "//base/win:base_win_buildflags" ]
  
      if (com_init_check_hook_disabled) {
-@@ -2872,7 +2883,7 @@ if (enable_rust_translit) {
+@@ -2838,7 +2849,7 @@ if (enable_rust_translit) {
    }
  }
  
@@ -96,10 +94,10 @@ index a78287ca73..d0af87dabc 100644
    sources = [
      "i18n/base_i18n_export.h",
 diff --git a/base/sampling_heap_profiler/poisson_allocation_sampler.cc b/base/sampling_heap_profiler/poisson_allocation_sampler.cc
-index 7beeac0b7a..69e07d11ad 100644
+index c093e98ee2..2f5a25fb44 100644
 --- a/base/sampling_heap_profiler/poisson_allocation_sampler.cc
 +++ b/base/sampling_heap_profiler/poisson_allocation_sampler.cc
-@@ -19,6 +19,8 @@
+@@ -20,6 +20,8 @@
  #include "base/rand_util.h"
  #include "build/build_config.h"
  
@@ -108,7 +106,7 @@ index 7beeac0b7a..69e07d11ad 100644
  namespace base {
  
  namespace {
-@@ -60,7 +62,7 @@ struct ThreadLocalData {
+@@ -65,7 +67,7 @@ struct ThreadLocalData {
  // Returns an object storing thread-local state. This does NOT use
  // base::ThreadLocalStorage, so it's safe to call from hooks in the
  // base::ThreadLocalStorage implementation.
@@ -117,7 +115,7 @@ index 7beeac0b7a..69e07d11ad 100644
  #if USE_LOCAL_TLS_EMULATION()
    // If available, use ThreadLocalStorage to bypass dependencies introduced by
    // Clang's implementation of thread_local.
-@@ -96,6 +98,8 @@ ThreadLocalData* GetThreadLocalData() {
+@@ -101,6 +103,8 @@ ThreadLocalData* GetThreadLocalData() {
  
  }  // namespace
  
@@ -126,7 +124,7 @@ index 7beeac0b7a..69e07d11ad 100644
  PoissonAllocationSamplerStats::PoissonAllocationSamplerStats(
      size_t address_cache_hits,
      size_t address_cache_misses,
-@@ -517,3 +521,6 @@ void PoissonAllocationSampler::RemoveSamplesObserver(
+@@ -505,3 +509,6 @@ void PoissonAllocationSampler::RemoveSamplesObserver(
  }
  
  }  // namespace base
@@ -191,7 +189,7 @@ index 16bd753e47..d6c6178311 100644
 +
 +#undef current_default_handle
 diff --git a/base/task/single_thread_task_runner.cc b/base/task/single_thread_task_runner.cc
-index 514c9ff38b..911c17b1e8 100644
+index 651267a81a..179bdf2010 100644
 --- a/base/task/single_thread_task_runner.cc
 +++ b/base/task/single_thread_task_runner.cc
 @@ -15,6 +15,8 @@
@@ -203,8 +201,8 @@ index 514c9ff38b..911c17b1e8 100644
  namespace base {
  
  namespace {
-@@ -148,3 +150,5 @@ SingleThreadTaskRunner::ScopedCanOverrideMainThreadDefaultHandle::
- }
+@@ -100,3 +102,5 @@ SingleThreadTaskRunner::CurrentHandleOverrideForTesting::
+     ~CurrentHandleOverrideForTesting() = default;
  
  }  // namespace base
 +
@@ -229,7 +227,7 @@ index 13f0eb30a8..3935f876c5 100644
 +
 +#undef ParseTotalCPUTimeFromStats
 diff --git a/cc/cc.gni b/cc/cc.gni
-index 4ba9871f4a..2aaa530b47 100644
+index 090420c902..6b0e76bf21 100644
 --- a/cc/cc.gni
 +++ b/cc/cc.gni
 @@ -2,6 +2,7 @@
@@ -258,6 +256,154 @@ index 4ba9871f4a..2aaa530b47 100644
      forward_variables_from(invoker, "*", [ "configs" ])
      if (defined(invoker.configs)) {
        configs += invoker.configs
+diff --git a/components/viz/service/display/occlusion_culler.cc b/components/viz/service/display/occlusion_culler.cc
+index 10d1bba2ce..b895d3a63f 100644
+--- a/components/viz/service/display/occlusion_culler.cc
++++ b/components/viz/service/display/occlusion_culler.cc
+@@ -26,6 +26,8 @@
+ #include "ui/gfx/geometry/rect_conversions.h"
+ #include "ui/gfx/geometry/rect_f.h"
+ 
++#define kEpsilon kEpsilon_OcclusionCuller
++
+ namespace viz {
+ namespace {
+ 
+@@ -536,3 +538,5 @@ bool OcclusionCuller::CanSplitDrawQuad(
+ }
+ 
+ }  // namespace viz
++
++#undef kEpsilon
+diff --git a/components/viz/service/display/overlay_candidate_factory.cc b/components/viz/service/display/overlay_candidate_factory.cc
+index 898652d4d8..696a784ff1 100644
+--- a/components/viz/service/display/overlay_candidate_factory.cc
++++ b/components/viz/service/display/overlay_candidate_factory.cc
+@@ -95,6 +95,8 @@ gfx::OverlayTransform GetOverlayTransform(const gfx::Transform& quad_transform,
+   }
+ }
+ 
++#define kEpsilon kEpsilon_OverlayCandidate
++
+ constexpr double kEpsilon = 0.0001;
+ 
+ // Determine why the transformation isn't axis aligned. A transform with z
+@@ -834,3 +836,5 @@ gfx::RectF OverlayCandidateFactory::GetDamageRect(const DrawQuad* quad) const {
+ }
+ 
+ }  // namespace viz
++
++#undef kEpsilon
+diff --git a/components/viz/service/display/skia_renderer.cc b/components/viz/service/display/skia_renderer.cc
+index 16de85a38b..2e699dd26e 100644
+--- a/components/viz/service/display/skia_renderer.cc
++++ b/components/viz/service/display/skia_renderer.cc
+@@ -110,6 +110,8 @@
+ #include "components/viz/service/display/overlay_processor_surface_control.h"
+ #endif
+ 
++#define MakeOpacityFilter MakeOpacityFilter_SkiaRenderer
++
+ namespace viz {
+ 
+ namespace {
+@@ -4500,3 +4502,5 @@ bool SkiaRenderer::OverlayLockKeyEqual::operator()(
+ #endif
+ 
+ }  // namespace viz
++
++#undef MakeOpacityFilter
+diff --git a/components/viz/service/display/software_renderer.cc b/components/viz/service/display/software_renderer.cc
+index 2d952f903f..fab2724532 100644
+--- a/components/viz/service/display/software_renderer.cc
++++ b/components/viz/service/display/software_renderer.cc
+@@ -53,6 +53,8 @@
+ #include "ui/gfx/geometry/skia_conversions.h"
+ #include "ui/gfx/geometry/transform.h"
+ 
++#define MakeOpacityFilter MakeOpacityFilter_SoftwareRenderer
++
+ namespace viz {
+ namespace {
+ 
+@@ -1087,3 +1089,5 @@ gfx::Rect SoftwareRenderer::GetRenderPassBackingDrawnRect(
+ }
+ 
+ }  // namespace viz
++
++#undef MakeOpacityFilter
+diff --git a/components/viz/service/frame_sinks/frame_sink_manager_impl.h b/components/viz/service/frame_sinks/frame_sink_manager_impl.h
+index 3ebefa4b63..1350f5c75f 100644
+--- a/components/viz/service/frame_sinks/frame_sink_manager_impl.h
++++ b/components/viz/service/frame_sinks/frame_sink_manager_impl.h
+@@ -5,6 +5,9 @@
+ #ifndef COMPONENTS_VIZ_SERVICE_FRAME_SINKS_FRAME_SINK_MANAGER_IMPL_H_
+ #define COMPONENTS_VIZ_SERVICE_FRAME_SINKS_FRAME_SINK_MANAGER_IMPL_H_
+ 
++// Macro 'Status' from X11/Xlib.h will cause confliction
++#undef Status
++
+ #include <stdint.h>
+ 
+ #include <list>
+diff --git a/components/viz/viz.gni b/components/viz/viz.gni
+index 191ddca368..a4008193b5 100644
+--- a/components/viz/viz.gni
++++ b/components/viz/viz.gni
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/jumbo.gni")
+ import("//gpu/vulkan/features.gni")
+ import("//skia/features.gni")
+ import("//testing/test.gni")
+@@ -33,7 +34,7 @@ if (!is_debug) {
+ }
+ 
+ template("viz_source_set") {
+-  source_set(target_name) {
++  jumbo_source_set(target_name) {
+     forward_variables_from(invoker, "*", [ "configs" ])
+     if (defined(invoker.configs)) {
+       configs += invoker.configs
+@@ -44,7 +45,7 @@ template("viz_source_set") {
+ }
+ 
+ template("viz_component") {
+-  component(target_name) {
++  jumbo_component(target_name) {
+     forward_variables_from(invoker, "*", [ "configs" ])
+     if (defined(invoker.configs)) {
+       configs += invoker.configs
+@@ -55,7 +56,7 @@ template("viz_component") {
+ }
+ 
+ template("viz_static_library") {
+-  static_library(target_name) {
++  jumbo_static_library(target_name) {
+     forward_variables_from(invoker, "*", [ "configs" ])
+     if (defined(invoker.configs)) {
+       configs += invoker.configs
+diff --git a/components/viz/service/BUILD.gn b/components/viz/service/BUILD.gn
+index 9f18a00af5..870c7dbae4 100644
+--- a/components/viz/service/BUILD.gn
++++ b/components/viz/service/BUILD.gn
+@@ -273,6 +273,14 @@ viz_component("service") {
+     "transitions/transferable_resource_tracker.cc",
+     "transitions/transferable_resource_tracker.h",
+   ]
++  jumbo_excluded_sources = [
++    # `gpu/GLES2/gl2chromium_autogen.h` and `gpu/GLES2/gl2chromium.h` has macro confliction,
++    #  and it is included by `layers/layer_context_impl.cc`
++    # - components/viz/client/client_resource_provider.h
++    # - third_party/khronos/GLES2/gl2.h
++    # - gpu/GLES2/gl2chromium.h
++    "layers/layer_context_impl.cc"
++  ]
+ 
+   defines = [ "VIZ_SERVICE_IMPLEMENTATION" ]
+ 
 diff --git a/cc/metrics/scroll_jank_v4_histogram_emitter.cc b/cc/metrics/scroll_jank_v4_histogram_emitter.cc
 index cbb688f8a2..64b5aedb8d 100644
 --- a/cc/metrics/scroll_jank_v4_histogram_emitter.cc
@@ -281,151 +427,3 @@ index cbb688f8a2..64b5aedb8d 100644
 +#undef kVsyncCountsMin
 +#undef kVsyncCountsMax
 +#undef kVsyncCountsBuckets
-diff --git a/components/viz/service/BUILD.gn b/components/viz/service/BUILD.gn
-index da33fa857f..d99831a241 100644
---- a/components/viz/service/BUILD.gn
-+++ b/components/viz/service/BUILD.gn
-@@ -277,6 +277,14 @@ viz_component("service") {
-     "transitions/transferable_resource_tracker.cc",
-     "transitions/transferable_resource_tracker.h",
-   ]
-+  jumbo_excluded_sources = [
-+    # `gpu/GLES2/gl2chromium_autogen.h` and `gpu/GLES2/gl2chromium.h` has macro confliction,
-+    #  and it is included by `layers/layer_context_impl.cc`
-+    # - components/viz/client/client_resource_provider.h
-+    # - third_party/khronos/GLES2/gl2.h
-+    # - gpu/GLES2/gl2chromium.h
-+    "layers/layer_context_impl.cc"
-+  ]
- 
-   defines = [ "VIZ_SERVICE_IMPLEMENTATION" ]
- 
-diff --git a/components/viz/service/display/occlusion_culler.cc b/components/viz/service/display/occlusion_culler.cc
-index a2170d1ae6..9312cc65b3 100644
---- a/components/viz/service/display/occlusion_culler.cc
-+++ b/components/viz/service/display/occlusion_culler.cc
-@@ -26,6 +26,8 @@
- #include "ui/gfx/geometry/rect_conversions.h"
- #include "ui/gfx/geometry/rect_f.h"
- 
-+#define kEpsilon kEpsilon_OcclusionCuller
-+
- namespace viz {
- namespace {
- 
-@@ -566,3 +568,5 @@ bool OcclusionCuller::CanSplitDrawQuad(
- }
- 
- }  // namespace viz
-+
-+#undef kEpsilon
-diff --git a/components/viz/service/display/overlay_candidate_factory.cc b/components/viz/service/display/overlay_candidate_factory.cc
-index 8b7be6f68b..c8aba4afa9 100644
---- a/components/viz/service/display/overlay_candidate_factory.cc
-+++ b/components/viz/service/display/overlay_candidate_factory.cc
-@@ -94,6 +94,8 @@ gfx::OverlayTransform GetOverlayTransform(const gfx::Transform& quad_transform,
-   }
- }
- 
-+#define kEpsilon kEpsilon_OverlayCandidate
-+
- constexpr double kEpsilon = 0.0001;
- 
- // Determine why the transformation isn't axis aligned. A transform with z
-@@ -833,3 +835,5 @@ gfx::RectF OverlayCandidateFactory::GetDamageRect(const DrawQuad* quad) const {
- }
- 
- }  // namespace viz
-+
-+#undef kEpsilon
-diff --git a/components/viz/service/display/skia_renderer.cc b/components/viz/service/display/skia_renderer.cc
-index b0db884eca..5b1ae8feea 100644
---- a/components/viz/service/display/skia_renderer.cc
-+++ b/components/viz/service/display/skia_renderer.cc
-@@ -109,6 +109,8 @@
- #include "components/viz/service/display/overlay_processor_surface_control.h"
- #endif
- 
-+#define MakeOpacityFilter MakeOpacityFilter_SkiaRenderer
-+
- namespace viz {
- 
- namespace {
-@@ -4448,3 +4450,5 @@ bool SkiaRenderer::OverlayLockKeyEqual::operator()(
- #endif
- 
- }  // namespace viz
-+
-+#undef MakeOpacityFilter
-diff --git a/components/viz/service/display/software_renderer.cc b/components/viz/service/display/software_renderer.cc
-index 8f7f2fdc21..5d4f2e449d 100644
---- a/components/viz/service/display/software_renderer.cc
-+++ b/components/viz/service/display/software_renderer.cc
-@@ -55,6 +55,8 @@
- #include "ui/gfx/geometry/skia_conversions.h"
- #include "ui/gfx/geometry/transform.h"
- 
-+#define MakeOpacityFilter MakeOpacityFilter_SoftwareRenderer
-+
- namespace viz {
- namespace {
- 
-@@ -1119,3 +1121,5 @@ gfx::Rect SoftwareRenderer::GetRenderPassBackingDrawnRect(
- }
- 
- }  // namespace viz
-+
-+#undef MakeOpacityFilter
-diff --git a/components/viz/service/frame_sinks/frame_sink_manager_impl.h b/components/viz/service/frame_sinks/frame_sink_manager_impl.h
-index 4c47d654f9..f9ad7474d0 100644
---- a/components/viz/service/frame_sinks/frame_sink_manager_impl.h
-+++ b/components/viz/service/frame_sinks/frame_sink_manager_impl.h
-@@ -5,6 +5,9 @@
- #ifndef COMPONENTS_VIZ_SERVICE_FRAME_SINKS_FRAME_SINK_MANAGER_IMPL_H_
- #define COMPONENTS_VIZ_SERVICE_FRAME_SINKS_FRAME_SINK_MANAGER_IMPL_H_
- 
-+// Macro 'Status' from X11/Xlib.h will cause confliction
-+#undef Status
-+
- #include <stdint.h>
- 
- #include <list>
-diff --git a/components/viz/viz.gni b/components/viz/viz.gni
-index 38764bf6c4..970db42556 100644
---- a/components/viz/viz.gni
-+++ b/components/viz/viz.gni
-@@ -2,6 +2,7 @@
- # Use of this source code is governed by a BSD-style license that can be
- # found in the LICENSE file.
- 
-+import("//build/config/jumbo.gni")
- import("//gpu/vulkan/features.gni")
- import("//skia/features.gni")
- import("//testing/test.gni")
-@@ -33,7 +34,7 @@ if (!is_debug) {
- }
- 
- template("viz_source_set") {
--  source_set(target_name) {
-+  jumbo_source_set(target_name) {
-     forward_variables_from(invoker, "*", [ "configs" ])
-     if (defined(invoker.configs)) {
-       configs += invoker.configs
-@@ -48,7 +49,7 @@ template("viz_source_set") {
- }
- 
- template("viz_component") {
--  component(target_name) {
-+  jumbo_component(target_name) {
-     forward_variables_from(invoker, "*", [ "configs" ])
-     if (defined(invoker.configs)) {
-       configs += invoker.configs
-@@ -59,7 +60,7 @@ template("viz_component") {
- }
- 
- template("viz_static_library") {
--  static_library(target_name) {
-+  jumbo_static_library(target_name) {
-     forward_variables_from(invoker, "*", [ "configs" ])
-     if (defined(invoker.configs)) {
-       configs += invoker.configs

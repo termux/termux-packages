@@ -1,0 +1,40 @@
+--- a/ui/gfx/paint_vector_icon.cc
++++ b/ui/gfx/paint_vector_icon.cc
+@@ -235,7 +235,7 @@
+         break;
+ 
+       case H_LINE_TO: {
+-        const SkPoint last_point = path.getLastPt().value_or({0, 0});
++        const SkPoint last_point = path.getLastPt().value_or(SkPoint{0, 0});
+         path.lineTo(arg(0), last_point.fY);
+         break;
+       }
+@@ -245,7 +245,7 @@
+         break;
+ 
+       case V_LINE_TO: {
+-        const SkPoint last_point = path.getLastPt().value_or({0, 0});
++        const SkPoint last_point = path.getLastPt().value_or(SkPoint{0, 0});
+         path.lineTo(last_point.fX, arg(0));
+         break;
+       }
+@@ -273,7 +273,7 @@
+         // details.
+         // Note that |x1| and |y1| will correspond to the sole control point if
+         // calculating a quadratic curve.
+-        const SkPoint last_point = path.getLastPt().value_or({0, 0});
++        const SkPoint last_point = path.getLastPt().value_or(SkPoint{0, 0});
+         SkScalar delta_x = 0;
+         SkScalar delta_y = 0;
+         if (IsCommandTypeCurve(previous_command_type)) {
+--- a/components/autofill/core/browser/payments/full_card_request.cc
++++ b/components/autofill/core/browser/payments/full_card_request.cc
+@@ -124,7 +124,7 @@
+   request_->card = std::move(card);
+   request_->last_committed_primary_main_frame_origin =
+       last_committed_primary_main_frame_origin;
+-  request_->context_token = std::move(context_token).value_or({});
++  request_->context_token = std::move(context_token).value_or(std::string{});
+   request_->selected_challenge_option = std::move(selected_challenge_option);
+ 
+   should_unmask_card_ = request_->card.masked() ||

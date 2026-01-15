@@ -24,7 +24,7 @@ Enable jumbo build for the following template(s):
  third_party/skia/src/core/SkMemset_opts.cpp   |  5 +++
  .../skia/src/core/SkMemset_opts_avx.cpp       |  2 +
  third_party/skia/src/core/SkOpts.cpp          |  5 +++
- third_party/skia/src/core/SkPath_editing.cpp  |  9 ++++
+ third_party/skia/src/core/SkPath_editing.cpp  | 10 +++++
  third_party/skia/src/core/SkRecordCanvas.cpp  |  2 +
  third_party/skia/src/core/SkScalerContext.cpp |  4 ++
  third_party/skia/src/core/SkScan_Antihair.cpp |  4 ++
@@ -76,10 +76,10 @@ Enable jumbo build for the following template(s):
  .../sksl/codegen/SkSLMetalCodeGenerator.cpp   | 10 +++++
  .../skia/src/utils/SkCustomTypeface.cpp       |  4 ++
  third_party/skia/src/utils/SkParsePath.cpp    | 14 ++++++
- 64 files changed, 321 insertions(+), 9 deletions(-)
+ 64 files changed, 322 insertions(+), 9 deletions(-)
 
 diff --git a/skia/BUILD.gn b/skia/BUILD.gn
-index 86abae02e1..8ab139416f 100644
+index d0260eb23d..2ad7fc2c0b 100644
 --- a/skia/BUILD.gn
 +++ b/skia/BUILD.gn
 @@ -7,6 +7,7 @@ import("//build/config/avx512.gni")
@@ -102,7 +102,7 @@ index 86abae02e1..8ab139416f 100644
  }
  
  # Internal-facing config for Skia library code.
-@@ -237,8 +243,9 @@ source_set("skia_core_public_headers") {
+@@ -244,8 +250,9 @@ source_set("skia_core_public_headers") {
    public += skia_pathops_public
  }
  
@@ -113,7 +113,7 @@ index 86abae02e1..8ab139416f 100644
    public = [
      "ext/benchmarking_canvas.h",
      "ext/cicp.h",
-@@ -292,6 +299,13 @@ component("skia") {
+@@ -297,6 +304,13 @@ component("skia") {
      "ext/skia_trace_memory_dump_impl.cc",
      "ext/skia_utils_base.cc",
    ]
@@ -127,7 +127,7 @@ index 86abae02e1..8ab139416f 100644
    if (is_ios) {
      public += [ "ext/skia_utils_ios.h" ]
      sources += [ "ext/skia_utils_ios.mm" ]
-@@ -372,6 +386,11 @@ component("skia") {
+@@ -376,6 +390,11 @@ component("skia") {
    sources += skia_encode_rust_png_srcs
    sources += skia_encode_webp_srcs
  
@@ -139,7 +139,7 @@ index 86abae02e1..8ab139416f 100644
    sources += [
      "//third_party/skia/src/sfnt/SkOTTable_name.cpp",
      "//third_party/skia/src/sfnt/SkOTUtils.cpp",
-@@ -672,7 +691,12 @@ source_set("rust_png_ffi_cpp") {
+@@ -676,7 +695,12 @@ source_set("rust_png_ffi_cpp") {
  # These are all opted out of check_includes, due to (logically) being part of
  # skia.
  template("skia_source_set") {
@@ -153,7 +153,7 @@ index 86abae02e1..8ab139416f 100644
      forward_variables_from(invoker, "*")
  
      check_includes = false
-@@ -724,6 +748,18 @@ skia_source_set("skia_core_and_effects") {
+@@ -766,6 +790,18 @@ skia_source_set("skia_core_and_effects") {
    sources += skia_effects_sources
    sources += skia_effects_imagefilter_sources
    sources += skia_pathops_sources
@@ -169,10 +169,10 @@ index 86abae02e1..8ab139416f 100644
 +    "//third_party/skia/src/core/SkSwizzler_opts_hsw.cpp",
 +    "//third_party/skia/src/core/SkSwizzler_opts_ssse3.cpp",
 +  ]
+   deps = []
    if (skia_support_gpu) {
-     deps = [ "//gpu/config:workaround_list" ]
-   }
-@@ -937,6 +973,11 @@ if (skia_support_gpu) {
+     deps += [ "//gpu/config:workaround_list" ]
+@@ -941,6 +977,11 @@ if (skia_support_gpu) {
    skia_source_set("skia_graphite_private") {
      sources = skia_graphite_sources + skia_graphite_precompile_sources +
                skia_sksl_graphite_modules_sources
@@ -380,7 +380,7 @@ index 6b48eb6357..74888510bb 100644
 +#undef SK_OPTS_TARGET
 +#undef init
 diff --git a/third_party/skia/src/core/SkPath_editing.cpp b/third_party/skia/src/core/SkPath_editing.cpp
-index 9601b72078..dfbdcc06db 100644
+index b4f67d7cde..5bb540858b 100644
 --- a/third_party/skia/src/core/SkPath_editing.cpp
 +++ b/third_party/skia/src/core/SkPath_editing.cpp
 @@ -38,6 +38,11 @@
@@ -392,13 +392,14 @@ index 9601b72078..dfbdcc06db 100644
 +#define build_arc_conics       build_arc_conics_SkPath_editing
 +#define subdivide_cubic_to     subdivide_cubic_to_SkPath_editing
 +
- class SkAutoAddSimpleShape {
+ class [[nodiscard]] SkAutoAddSimpleShape {
  public:
      SkAutoAddSimpleShape(SkPath* path, SkPathDirection dir)
-@@ -1078,3 +1083,7 @@ void SkPath::transform(const SkMatrix& matrix, SkPath* dst) const {
-     }
+@@ -988,3 +993,8 @@ SkPath& SkPath::dirtyAfterEdit() {
  }
  
+ #endif
++
 +#undef arc_is_lone_point
 +#undef angles_to_unit_vectors
 +#undef build_arc_conics
@@ -414,7 +415,7 @@ index a74175be55..c78789cd5e 100644
 +
 +#undef INHERITED
 diff --git a/third_party/skia/src/core/SkScalerContext.cpp b/third_party/skia/src/core/SkScalerContext.cpp
-index 30fa6dfa96..80fc24710c 100644
+index e9089a234d..a0879304da 100644
 --- a/third_party/skia/src/core/SkScalerContext.cpp
 +++ b/third_party/skia/src/core/SkScalerContext.cpp
 @@ -49,6 +49,8 @@
@@ -533,10 +534,10 @@ index a2c7491699..91e04a5128 100644
 +#pragma clang diagnostic pop
 +#endif
 diff --git a/third_party/skia/src/gpu/ganesh/Device.cpp b/third_party/skia/src/gpu/ganesh/Device.cpp
-index b79bd00809..f884736eed 100644
+index c96024cd9a..3dc727f666 100644
 --- a/third_party/skia/src/gpu/ganesh/Device.cpp
 +++ b/third_party/skia/src/gpu/ganesh/Device.cpp
-@@ -1458,3 +1458,5 @@ void Device::drawSlug(SkCanvas* canvas, const sktext::gpu::Slug* slug, const SkP
+@@ -1456,3 +1456,5 @@ void Device::drawSlug(SkCanvas* canvas, const sktext::gpu::Slug* slug, const SkP
  }
  
  }  // namespace skgpu::ganesh
@@ -626,7 +627,7 @@ index 9ed45eba99..c7580ea869 100644
 +
 +#undef ASSERT_SINGLE_OWNER
 diff --git a/third_party/skia/src/gpu/ganesh/GrResourceProvider.cpp b/third_party/skia/src/gpu/ganesh/GrResourceProvider.cpp
-index a58524b4b6..d3594a1db6 100644
+index 7536f94310..ccae63c750 100644
 --- a/third_party/skia/src/gpu/ganesh/GrResourceProvider.cpp
 +++ b/third_party/skia/src/gpu/ganesh/GrResourceProvider.cpp
 @@ -930,3 +930,5 @@ sk_sp<GrTexture> GrResourceProvider::writePixels(sk_sp<GrTexture> texture,
@@ -683,7 +684,7 @@ index daf554c55d..912128627e 100644
 +
  #endif // SK_ENABLE_OPTIMIZE_SIZE
 diff --git a/third_party/skia/src/gpu/ganesh/geometry/GrTriangulator.cpp b/third_party/skia/src/gpu/ganesh/geometry/GrTriangulator.cpp
-index e42fd1d8b9..10c1a079c0 100644
+index 5628e67cea..0073458f8b 100644
 --- a/third_party/skia/src/gpu/ganesh/geometry/GrTriangulator.cpp
 +++ b/third_party/skia/src/gpu/ganesh/geometry/GrTriangulator.cpp
 @@ -1856,4 +1856,7 @@ int GrTriangulator::polysToTriangles(Poly* polys, GrEagerVertexAllocator* vertex
@@ -796,7 +797,7 @@ index e5c2dcb43b..07c95fb08b 100644
 +
 +#undef VK_CALL
 diff --git a/third_party/skia/src/gpu/ganesh/vk/GrVkGpu.cpp b/third_party/skia/src/gpu/ganesh/vk/GrVkGpu.cpp
-index 55910cf03e..ec40ce620e 100644
+index 3f757df998..6f6a34b5fb 100644
 --- a/third_party/skia/src/gpu/ganesh/vk/GrVkGpu.cpp
 +++ b/third_party/skia/src/gpu/ganesh/vk/GrVkGpu.cpp
 @@ -2755,3 +2755,6 @@ void GrVkGpu::storeVkPipelineCacheData(size_t maxSize) {
@@ -826,20 +827,20 @@ index 8d822c4d7b..4270c4faa6 100644
 +
 +#undef kSKSL_Tag
 diff --git a/third_party/skia/src/gpu/graphite/Context.cpp b/third_party/skia/src/gpu/graphite/Context.cpp
-index 17212999af..c7a2e7c652 100644
+index 0c4f66ed79..b0d91d6f1f 100644
 --- a/third_party/skia/src/gpu/graphite/Context.cpp
 +++ b/third_party/skia/src/gpu/graphite/Context.cpp
-@@ -1054,3 +1054,5 @@ std::unique_ptr<Context> ContextCtorAccessor::MakeContext(
+@@ -1043,3 +1043,5 @@ std::unique_ptr<Context> ContextCtorAccessor::MakeContext(
  }
  
  } // namespace skgpu::graphite
 +
 +#undef ASSERT_SINGLE_OWNER
 diff --git a/third_party/skia/src/gpu/graphite/Device.cpp b/third_party/skia/src/gpu/graphite/Device.cpp
-index 1d81077131..b278c28abe 100644
+index 1bc1f0d517..ea65898918 100644
 --- a/third_party/skia/src/gpu/graphite/Device.cpp
 +++ b/third_party/skia/src/gpu/graphite/Device.cpp
-@@ -2351,3 +2351,5 @@ bool Device::drawBlurredRRect(const SkRRect& rrect, const SkPaint& paint, float
+@@ -2252,3 +2252,5 @@ bool Device::drawBlurredRRect(const SkRRect& rrect, const SkPaint& paint, float
  }
  
  } // namespace skgpu::graphite
@@ -856,10 +857,10 @@ index 4838c32ac3..d8660830ab 100644
 +
 +#undef ASSERT_SINGLE_OWNER
 diff --git a/third_party/skia/src/gpu/graphite/Recorder.cpp b/third_party/skia/src/gpu/graphite/Recorder.cpp
-index 1356467d53..d506c48694 100644
+index 856b364aa4..5f163121df 100644
 --- a/third_party/skia/src/gpu/graphite/Recorder.cpp
 +++ b/third_party/skia/src/gpu/graphite/Recorder.cpp
-@@ -71,6 +71,8 @@
+@@ -69,6 +69,8 @@
  
  enum SkColorType : int;
  
@@ -868,7 +869,7 @@ index 1356467d53..d506c48694 100644
  namespace skgpu::graphite {
  
  #define ASSERT_SINGLE_OWNER SKGPU_ASSERT_SINGLE_OWNER(this->singleOwner())
-@@ -766,3 +768,7 @@ void RecorderPriv::issueFlushToken() {
+@@ -693,3 +695,7 @@ void RecorderPriv::issueFlushToken() {
  #endif
  
  } // namespace skgpu::graphite
@@ -877,7 +878,7 @@ index 1356467d53..d506c48694 100644
 +#undef ASSERT_SINGLE_OWNER_PRIV
 +#undef next_id
 diff --git a/third_party/skia/src/gpu/graphite/ResourceCache.cpp b/third_party/skia/src/gpu/graphite/ResourceCache.cpp
-index 4c3098ef8c..b6455529cd 100644
+index 005f29792d..3fa471ce0b 100644
 --- a/third_party/skia/src/gpu/graphite/ResourceCache.cpp
 +++ b/third_party/skia/src/gpu/graphite/ResourceCache.cpp
 @@ -888,3 +888,5 @@ void ResourceCache::visitTextures(
@@ -906,7 +907,7 @@ index 5ef36c2f60..b04da80966 100644
 +
 +#undef ShaderInfo
 diff --git a/third_party/skia/src/gpu/graphite/render/AnalyticRRectRenderStep.cpp b/third_party/skia/src/gpu/graphite/render/AnalyticRRectRenderStep.cpp
-index 67429c0962..092b6c0144 100644
+index 7bf89bf48f..9225e42193 100644
 --- a/third_party/skia/src/gpu/graphite/render/AnalyticRRectRenderStep.cpp
 +++ b/third_party/skia/src/gpu/graphite/render/AnalyticRRectRenderStep.cpp
 @@ -37,6 +37,15 @@
@@ -925,7 +926,7 @@ index 67429c0962..092b6c0144 100644
  // This RenderStep is flexible and can draw filled rectangles, filled quadrilaterals with per-edge
  // AA, filled rounded rectangles with arbitrary corner radii, stroked rectangles with any join,
  // stroked lines with any cap, stroked rounded rectangles with circular corners (each corner can be
-@@ -646,3 +655,12 @@ void AnalyticRRectRenderStep::writeUniformsAndTextures(const DrawParams&,
+@@ -645,3 +654,12 @@ void AnalyticRRectRenderStep::writeUniformsAndTextures(const DrawParams&,
  }
  
  }  // namespace skgpu::graphite
@@ -1118,10 +1119,10 @@ index 44680506aa..cdf31426b5 100644
 +#undef start_element_handler
 +#undef end_element_handler
 diff --git a/third_party/skia/src/ports/SkTypeface_fontations.cpp b/third_party/skia/src/ports/SkTypeface_fontations.cpp
-index 3e356d5d1a..a8ac765db2 100644
+index 6822afe8fe..4f97211207 100644
 --- a/third_party/skia/src/ports/SkTypeface_fontations.cpp
 +++ b/third_party/skia/src/ports/SkTypeface_fontations.cpp
-@@ -24,6 +24,11 @@
+@@ -23,6 +23,11 @@
  #include "src/ports/SkTypeface_fontations_priv.h"
  #include "src/ports/fontations/src/skpath_bridge.h"
  
@@ -1133,7 +1134,7 @@ index 3e356d5d1a..a8ac765db2 100644
  namespace {
  
  template <typename T> rust::Slice<T> toSlice(SkSpan<T> span) {
-@@ -1710,3 +1715,8 @@ void BoundsPainter::fill_glyph_sweep(uint16_t glyph_id,
+@@ -1709,3 +1714,8 @@ void BoundsPainter::fill_glyph_sweep(uint16_t glyph_id,
  }
  
  }  // namespace sk_fontations
