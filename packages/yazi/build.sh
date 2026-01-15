@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Blazing fast terminal file manager written in Rust, base
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26.1.4"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/sxyazi/yazi/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=17839410a2865dc6ddb40da4b034dbf2729602fc325d07ad4df7dbc354c94c9e
 TERMUX_PKG_BUILD_DEPENDS='aosp-libs, imagemagick'
