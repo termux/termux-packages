@@ -56,7 +56,6 @@ Enable jumbo build for the following component(s)/source_set(s):
  .../wrapped_graphite_texture_backing.cc       |  6 ++++++
  .../wrapped_sk_image_backing_factory.cc       |  4 ++++
  gpu/config/BUILD.gn                           |  3 ++-
- gpu/config/webgpu_blocklist_impl.cc           |  3 +++
  gpu/config/webgpu_blocklist_impl.h            |  3 +++
  gpu/ipc/service/BUILD.gn                      |  3 ++-
  gpu/vulkan/BUILD.gn                           |  3 ++-
@@ -96,7 +95,7 @@ Enable jumbo build for the following component(s)/source_set(s):
  .../frame_timing_details_mojom_traits.cc      |  4 ++++
  services/webnn/BUILD.gn                       |  3 ++-
  storage/browser/BUILD.gn                      |  5 +++--
- 55 files changed, 255 insertions(+), 42 deletions(-)
+ 54 files changed, 252 insertions(+), 42 deletions(-)
 
 diff --git a/gpu/BUILD.gn b/gpu/BUILD.gn
 index a1a3c18d27..697a067c80 100644
@@ -120,7 +119,7 @@ index a1a3c18d27..697a067c80 100644
    sources = [
      "command_buffer/client/client_test_helper.cc",
 diff --git a/gpu/command_buffer/client/BUILD.gn b/gpu/command_buffer/client/BUILD.gn
-index d4e1de4da9..8d19e4a6dc 100644
+index c23ae139b6..e9127464e4 100644
 --- a/gpu/command_buffer/client/BUILD.gn
 +++ b/gpu/command_buffer/client/BUILD.gn
 @@ -2,6 +2,7 @@
@@ -149,7 +148,7 @@ index d4e1de4da9..8d19e4a6dc 100644
    sources = gles2_implementation_source_files
  
    defines = [ "GLES2_IMPL_IMPLEMENTATION" ]
-@@ -325,7 +326,7 @@ source_set("webgpu_sources") {
+@@ -326,7 +327,7 @@ source_set("webgpu_sources") {
  }
  
  # Library emulates GLES2 using command_buffers.
@@ -158,7 +157,7 @@ index d4e1de4da9..8d19e4a6dc 100644
    sources = gles2_implementation_source_files
  
    defines = [ "GLES2_IMPL_IMPLEMENTATION" ]
-@@ -349,7 +350,7 @@ component("gles2_implementation_no_check") {
+@@ -350,7 +351,7 @@ component("gles2_implementation_no_check") {
    ]
  }
  
@@ -242,7 +241,7 @@ index f7518d6b59..05d4365d98 100644
 +#undef ReadPixelsContext
 +#undef OnReadPixelsDone
 diff --git a/gpu/command_buffer/service/shared_image/angle_vulkan_image_backing_factory.cc b/gpu/command_buffer/service/shared_image/angle_vulkan_image_backing_factory.cc
-index ca9f0afda2..7b1e1e285d 100644
+index a1a43c9b34..9146a39148 100644
 --- a/gpu/command_buffer/service/shared_image/angle_vulkan_image_backing_factory.cc
 +++ b/gpu/command_buffer/service/shared_image/angle_vulkan_image_backing_factory.cc
 @@ -14,6 +14,8 @@
@@ -254,7 +253,7 @@ index ca9f0afda2..7b1e1e285d 100644
  namespace gpu {
  namespace {
  
-@@ -179,3 +181,5 @@ SharedImageBackingType AngleVulkanImageBackingFactory::GetBackingType() {
+@@ -181,3 +183,5 @@ SharedImageBackingType AngleVulkanImageBackingFactory::GetBackingType() {
  }
  
  }  // namespace gpu
@@ -299,7 +298,7 @@ index 1bd77ff1e1..af9d74bf32 100644
 +
 +#undef ToSharedImageAccessGLMode
 diff --git a/gpu/command_buffer/service/shared_image/egl_image_backing_factory.cc b/gpu/command_buffer/service/shared_image/egl_image_backing_factory.cc
-index 63badd17b0..f6fc41e8dd 100644
+index bfab5558d4..1317f3370a 100644
 --- a/gpu/command_buffer/service/shared_image/egl_image_backing_factory.cc
 +++ b/gpu/command_buffer/service/shared_image/egl_image_backing_factory.cc
 @@ -18,6 +18,8 @@
@@ -311,14 +310,14 @@ index 63badd17b0..f6fc41e8dd 100644
  namespace gpu {
  namespace {
  
-@@ -165,3 +167,5 @@ SharedImageBackingType EGLImageBackingFactory::GetBackingType() {
+@@ -168,3 +170,5 @@ SharedImageBackingType EGLImageBackingFactory::GetBackingType() {
  }
  
  }  // namespace gpu
 +
 +#undef kSupportedUsage
 diff --git a/gpu/command_buffer/service/shared_image/gl_texture_image_backing_factory.cc b/gpu/command_buffer/service/shared_image/gl_texture_image_backing_factory.cc
-index 869034e97f..5188cfa786 100644
+index 546b9c0e11..740d89d506 100644
 --- a/gpu/command_buffer/service/shared_image/gl_texture_image_backing_factory.cc
 +++ b/gpu/command_buffer/service/shared_image/gl_texture_image_backing_factory.cc
 @@ -17,6 +17,8 @@
@@ -330,14 +329,14 @@ index 869034e97f..5188cfa786 100644
  namespace gpu {
  namespace {
  
-@@ -214,3 +216,5 @@ SharedImageBackingType GLTextureImageBackingFactory::GetBackingType() {
+@@ -229,3 +231,5 @@ SharedImageBackingType GLTextureImageBackingFactory::GetBackingType() {
  }
  
  }  // namespace gpu
 +
 +#undef kSupportedUsage
 diff --git a/gpu/command_buffer/service/shared_image/ozone_image_backing_factory.cc b/gpu/command_buffer/service/shared_image/ozone_image_backing_factory.cc
-index f9441a25f9..272f3928b2 100644
+index 887f26bf30..5734be912b 100644
 --- a/gpu/command_buffer/service/shared_image/ozone_image_backing_factory.cc
 +++ b/gpu/command_buffer/service/shared_image/ozone_image_backing_factory.cc
 @@ -36,6 +36,8 @@
@@ -349,7 +348,7 @@ index f9441a25f9..272f3928b2 100644
  namespace gpu {
  namespace {
  
-@@ -447,3 +449,5 @@ SharedImageBackingType OzoneImageBackingFactory::GetBackingType() {
+@@ -448,3 +450,5 @@ SharedImageBackingType OzoneImageBackingFactory::GetBackingType() {
  }
  
  }  // namespace gpu
@@ -391,7 +390,7 @@ index b835e11e2f..4e169678f1 100644
 +#undef ReadPixelsContext
 +#undef OnReadPixelsDone
 diff --git a/gpu/command_buffer/service/shared_image/wrapped_sk_image_backing_factory.cc b/gpu/command_buffer/service/shared_image/wrapped_sk_image_backing_factory.cc
-index ab9659c784..5157369e26 100644
+index 49387f6995..d714e55f22 100644
 --- a/gpu/command_buffer/service/shared_image/wrapped_sk_image_backing_factory.cc
 +++ b/gpu/command_buffer/service/shared_image/wrapped_sk_image_backing_factory.cc
 @@ -25,6 +25,8 @@
@@ -403,14 +402,14 @@ index ab9659c784..5157369e26 100644
  namespace gpu {
  namespace {
  // NOTE: WrappedSkImage cannot be used with raster-over-GLES2 as it doesn't
-@@ -251,3 +253,5 @@ SharedImageBackingType WrappedSkImageBackingFactory::GetBackingType() {
+@@ -255,3 +257,5 @@ SharedImageBackingType WrappedSkImageBackingFactory::GetBackingType() {
  }
  
  }  // namespace gpu
 +
 +#undef kSupportedUsage
 diff --git a/gpu/config/BUILD.gn b/gpu/config/BUILD.gn
-index 09bedb08fc..30a5c0b9f7 100644
+index 2f59e71352..61b3af4dff 100644
 --- a/gpu/config/BUILD.gn
 +++ b/gpu/config/BUILD.gn
 @@ -4,6 +4,7 @@
@@ -430,20 +429,6 @@ index 09bedb08fc..30a5c0b9f7 100644
    sources = [
      "device_perf_info.cc",
      "device_perf_info.h",
-diff --git a/gpu/config/webgpu_blocklist_impl.cc b/gpu/config/webgpu_blocklist_impl.cc
-index eefa79d1bc..dff6b44e7c 100644
---- a/gpu/config/webgpu_blocklist_impl.cc
-+++ b/gpu/config/webgpu_blocklist_impl.cc
-@@ -2,6 +2,9 @@
- // Use of this source code is governed by a BSD-style license that can be
- // found in the LICENSE file.
- 
-+// Macro 'None' from X11/X.h will cause confliction
-+#undef None
-+
- #include "gpu/config/webgpu_blocklist_impl.h"
- 
- #include <array>
 diff --git a/gpu/config/webgpu_blocklist_impl.h b/gpu/config/webgpu_blocklist_impl.h
 index b46255234c..82873c4f2f 100644
 --- a/gpu/config/webgpu_blocklist_impl.h
@@ -965,7 +950,7 @@ index 2e73f3b94e..52158ac426 100644
 +
 +#undef Decoder
 diff --git a/media/media_options.gni b/media/media_options.gni
-index 8ab0afdf23..51274e2af1 100644
+index 5f0318f651..c5cfcafb2c 100644
 --- a/media/media_options.gni
 +++ b/media/media_options.gni
 @@ -6,6 +6,7 @@ import("//build/config/cast.gni")
@@ -1086,7 +1071,7 @@ index ffc6bdc4ab..28ab85355d 100644
      "cert_net_fetcher_url_loader.cc",
      "cert_net_fetcher_url_loader.h",
 diff --git a/services/network/BUILD.gn b/services/network/BUILD.gn
-index 73e08f7ce5..b1df6e6ac3 100644
+index 2052dac91b..245b1fd835 100644
 --- a/services/network/BUILD.gn
 +++ b/services/network/BUILD.gn
 @@ -3,12 +3,13 @@
@@ -1104,7 +1089,7 @@ index 73e08f7ce5..b1df6e6ac3 100644
    sources = [
      "accept_ch_frame_interceptor.cc",
      "accept_ch_frame_interceptor.h",
-@@ -637,7 +638,7 @@ source_set("tests") {
+@@ -638,7 +639,7 @@ source_set("tests") {
    configs += [ "//build/config/compiler:no_exit_time_destructors" ]
  }
  
@@ -1152,7 +1137,7 @@ index 188783cc42..7918267eee 100644
 +
 +#undef kPrefPath
 diff --git a/services/network/public/cpp/BUILD.gn b/services/network/public/cpp/BUILD.gn
-index 883895db2f..2dd601c94e 100644
+index 2732eb3f88..69688009b2 100644
 --- a/services/network/public/cpp/BUILD.gn
 +++ b/services/network/public/cpp/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1181,7 +1166,7 @@ index 883895db2f..2dd601c94e 100644
    output_name = "network_cpp"
  
    sources = [
-@@ -200,7 +201,7 @@ component("cpp") {
+@@ -201,7 +202,7 @@ component("cpp") {
  
  # These interfaces are put in their own target so that modules that only
  # need to depend on mojom_ip_address does not depend on the entire cpp_base.
@@ -1190,7 +1175,7 @@ index 883895db2f..2dd601c94e 100644
    sources = [
      "address_family_mojom_traits.cc",
      "address_family_mojom_traits.h",
-@@ -405,7 +406,7 @@ component("is_potentially_trustworthy") {
+@@ -388,7 +389,7 @@ component("is_potentially_trustworthy") {
    defines = [ "IS_NETWORK_CPP_IS_POTENTIALLY_TRUSTWORTHY_IMPL" ]
  }
  
@@ -1199,7 +1184,7 @@ index 883895db2f..2dd601c94e 100644
    sources = [
      "client_hints.cc",
      "client_hints.h",
-@@ -577,7 +578,7 @@ component("schemeful_site_mojom_support") {
+@@ -560,7 +561,7 @@ component("schemeful_site_mojom_support") {
  
  # This component is separate from cpp_base as it is a dependency of
  # //services/network/public/mojom:cookies_mojom.
@@ -1208,7 +1193,7 @@ index 883895db2f..2dd601c94e 100644
    sources = [
      "first_party_sets_mojom_traits.cc",
      "first_party_sets_mojom_traits.h",
-@@ -607,7 +608,7 @@ component("storage_access_api_mojom_support") {
+@@ -590,7 +591,7 @@ component("storage_access_api_mojom_support") {
    defines = [ "IS_STORAGE_ACCESS_API_MOJOM_TRAITS_IMPL" ]
  }
  
@@ -1217,7 +1202,7 @@ index 883895db2f..2dd601c94e 100644
    output_name = "network_cpp_base"
  
    sources = [
-@@ -665,6 +666,7 @@ component("cpp_base") {
+@@ -648,6 +649,7 @@ component("cpp_base") {
      "web_transport_error_mojom_traits.cc",
      "web_transport_error_mojom_traits.h",
    ]
@@ -1225,7 +1210,7 @@ index 883895db2f..2dd601c94e 100644
  
    configs += [ "//build/config/compiler:wexit_time_destructors" ]
  
-@@ -712,6 +714,9 @@ component("cpp_base") {
+@@ -694,6 +696,9 @@ component("cpp_base") {
        "p2p_param_traits.h",
        "p2p_socket_type.h",
      ]
@@ -1339,7 +1324,7 @@ index 863c20cdd2..a77aa0f7fb 100644
 +
 +#undef Traits
 diff --git a/services/webnn/BUILD.gn b/services/webnn/BUILD.gn
-index 2e93f70158..a50b79b30d 100644
+index e31ae38392..bf98171d22 100644
 --- a/services/webnn/BUILD.gn
 +++ b/services/webnn/BUILD.gn
 @@ -3,6 +3,7 @@
@@ -1385,3 +1370,38 @@ index 880d4b22f5..489e8783ce 100644
    testonly = true
  
    sources = [
+diff --git a/gpu/config/webgpu_blocklist_impl.cc b/gpu/config/webgpu_blocklist_impl.cc
+index eefa79d1bc..dff6b44e7c 100644
+--- a/gpu/config/webgpu_blocklist_impl.cc
++++ b/gpu/config/webgpu_blocklist_impl.cc
+@@ -2,6 +2,9 @@
+ // Use of this source code is governed by a BSD-style license that can be
+ // found in the LICENSE file.
+ 
++// Macro 'None' from X11/X.h will cause confliction
++#undef None
++
+ #include "gpu/config/webgpu_blocklist_impl.h"
+ 
+ #include <array>
+diff --git a/gpu/command_buffer/service/gpu_persistent_cache.cc b/gpu/command_buffer/service/gpu_persistent_cache.cc
+index afa5209484..5bb5c6861d 100644
+--- a/gpu/command_buffer/service/gpu_persistent_cache.cc
++++ b/gpu/command_buffer/service/gpu_persistent_cache.cc
+@@ -29,6 +29,9 @@
+ #include "gpu/command_buffer/service/memory_cache.h"
+ #include "ui/gl/gl_bindings.h"
+ 
++#define GLBlobCacheGetCallback GLBlobCacheGetCallback_GpuPersistentCache
++#define GLBlobCacheSetCallback GLBlobCacheSetCallback_GpuPersistentCache
++
+ namespace gpu {
+ 
+ namespace {
+@@ -698,3 +701,6 @@ void UnbindCacheFromCurrentOpenGLContext() {
+ }
+ 
+ }  // namespace gpu
++
++#undef GLBlobCacheGetCallback
++#undef GLBlobCacheSetCallback

@@ -23,13 +23,13 @@ Enable jumbo build for the following template(s):
  .../absl/time/internal/cctz/src/time_zone_posix.cc     |  4 ++++
  third_party/abseil-cpp/absl/time/time.cc               |  4 ++++
  third_party/perfetto/gn/perfetto_component.gni         | 10 +++++++++-
- third_party/perfetto/src/shared_lib/BUILD.gn           |  4 +++-
+ third_party/perfetto/src/shared_lib/BUILD.gn           |  3 ++-
  .../src/trace_processor/importers/common/BUILD.gn      |  3 ++-
  .../trace_processor/importers/memory_tracker/BUILD.gn  |  3 ++-
  .../src/trace_processor/importers/proto/BUILD.gn       |  3 ++-
  third_party/perfetto/src/tracing/BUILD.gn              |  3 ++-
  third_party/perfetto/src/tracing/service/BUILD.gn      |  3 ++-
- 11 files changed, 35 insertions(+), 8 deletions(-)
+ 11 files changed, 34 insertions(+), 8 deletions(-)
 
 diff --git a/third_party/abseil-cpp/absl.gni b/third_party/abseil-cpp/absl.gni
 index 48e1ce7838..1ae51fc0f5 100644
@@ -53,10 +53,10 @@ index 48e1ce7838..1ae51fc0f5 100644
        not_needed(invoker, "*")
      } else {
 diff --git a/third_party/abseil-cpp/absl/strings/numbers.cc b/third_party/abseil-cpp/absl/strings/numbers.cc
-index 01caf78f57..97b686a72c 100644
+index a83fd2ca84..cbaff818f4 100644
 --- a/third_party/abseil-cpp/absl/strings/numbers.cc
 +++ b/third_party/abseil-cpp/absl/strings/numbers.cc
-@@ -677,6 +677,7 @@ size_t numbers_internal::SixDigitsToBuffer(double d,
+@@ -673,6 +673,7 @@ size_t numbers_internal::SixDigitsToBuffer(double d,
  }
  
  namespace {
@@ -64,7 +64,7 @@ index 01caf78f57..97b686a72c 100644
  // Represents integer values of digits.
  // Uses 36 to indicate an invalid character since we support
  // bases up to 36.
-@@ -1090,6 +1091,8 @@ inline bool safe_uint_internal(absl::string_view text,
+@@ -1086,6 +1087,8 @@ inline bool safe_uint_internal(absl::string_view text,
    }
    return safe_parse_positive_int(text, base, value_p);
  }
@@ -93,7 +93,7 @@ index efea080470..d6480bce97 100644
 +
 +#undef kDigits
 diff --git a/third_party/abseil-cpp/absl/time/time.cc b/third_party/abseil-cpp/absl/time/time.cc
-index faef864e8c..314df6ea4a 100644
+index d983c12bb5..37d87ca0fe 100644
 --- a/third_party/abseil-cpp/absl/time/time.cc
 +++ b/third_party/abseil-cpp/absl/time/time.cc
 @@ -46,6 +46,8 @@
@@ -140,7 +140,7 @@ index 3c40d5d03c..59dd9563a7 100644
      if (perfetto_component_type == "static_library") {
        # Mangle the name of the library putting the full path in it. In component
 diff --git a/third_party/perfetto/src/shared_lib/BUILD.gn b/third_party/perfetto/src/shared_lib/BUILD.gn
-index 6086f28900..e567767602 100644
+index ee0aa497d0..2be9d78a9e 100644
 --- a/third_party/perfetto/src/shared_lib/BUILD.gn
 +++ b/third_party/perfetto/src/shared_lib/BUILD.gn
 @@ -12,6 +12,8 @@
@@ -152,7 +152,7 @@ index 6086f28900..e567767602 100644
  source_set("for_testing") {
    deps = [
      "../../gn:default_deps",
-@@ -21,7 +23,7 @@ source_set("for_testing") {
+@@ -21,7 +23,7 @@
    defines = [ "PERFETTO_SHLIB_SDK_IMPLEMENTATION" ]
  }
  
@@ -162,7 +162,7 @@ index 6086f28900..e567767602 100644
      ":for_testing",
      "../../gn:default_deps",
 diff --git a/third_party/perfetto/src/trace_processor/importers/common/BUILD.gn b/third_party/perfetto/src/trace_processor/importers/common/BUILD.gn
-index e19df99a12..46d80fc7c7 100644
+index 3be2a5d292..be9ca2a672 100644
 --- a/third_party/perfetto/src/trace_processor/importers/common/BUILD.gn
 +++ b/third_party/perfetto/src/trace_processor/importers/common/BUILD.gn
 @@ -12,9 +12,10 @@
@@ -195,7 +195,7 @@ index 0fc30b806f..9e4922399d 100644
    public_deps = [
      "../../../../include/perfetto/base",
 diff --git a/third_party/perfetto/src/trace_processor/importers/proto/BUILD.gn b/third_party/perfetto/src/trace_processor/importers/proto/BUILD.gn
-index 5b39bd358e..3f3b4eb9e3 100644
+index ed254e5a67..215ac02e98 100644
 --- a/third_party/perfetto/src/trace_processor/importers/proto/BUILD.gn
 +++ b/third_party/perfetto/src/trace_processor/importers/proto/BUILD.gn
 @@ -12,9 +12,10 @@
@@ -232,7 +232,7 @@ index 4bbfdf75a8..5529a09872 100644
      "../../include/perfetto/tracing/core",
      "../../protos/perfetto/common:zero",
 diff --git a/third_party/perfetto/src/tracing/service/BUILD.gn b/third_party/perfetto/src/tracing/service/BUILD.gn
-index 0dc0b22551..4a865aac74 100644
+index 24d894d709..933cfffdc4 100644
 --- a/third_party/perfetto/src/tracing/service/BUILD.gn
 +++ b/third_party/perfetto/src/tracing/service/BUILD.gn
 @@ -12,11 +12,12 @@
