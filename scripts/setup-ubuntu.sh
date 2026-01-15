@@ -262,9 +262,6 @@ PACKAGES+=" libxft-dev"
 PACKAGES+=" libxt-dev"
 PACKAGES+=" xbitmaps"
 
-# Needed by pypy
-PACKAGES+=" qemu-user-static"
-
 # Required by cava
 PACKAGES+=" xxd"
 
@@ -363,7 +360,10 @@ $SUDO chown -R "$(whoami)" "$TERMUX__PREFIX"
 $SUDO mkdir -p "$TERMUX_APP__DATA_DIR"
 $SUDO chown -R "$(whoami)" "${TERMUX_APP__DATA_DIR%"${TERMUX_APP__DATA_DIR#/*/}"}" # Get `/path/` from `/path/to/app__data_dir`.
 
-$SUDO ln -sf /data/data/com.termux/files/usr/opt/aosp /system
+# Initial symbolic link in the symbolic link chain for packages
+# that have a build dependency on 'aosp-libs'; see scripts/build/termux_step_override_config_scripts.sh
+# and scripts/build/setup/termux_setup_proot.sh for more information
+$SUDO ln -sf "$TERMUX_APP__DATA_DIR/aosp" /system
 
 # Install newer pkg-config then what ubuntu provides, as the stock
 # ubuntu version has performance problems with at least protobuf:

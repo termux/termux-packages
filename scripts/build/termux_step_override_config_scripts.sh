@@ -41,4 +41,22 @@ termux_step_override_config_scripts() {
 			> "$TERMUX_PREFIX/bin/pg_config"
 		chmod 755 "$TERMUX_PREFIX/bin/pg_config"
 	fi
+
+	# Does this package or its build depend on 'aosp-libs' or 'aosp-utils'?
+	# if so, complete the symbolic link chain from /system to $TERMUX_PREFIX/opt/aosp,
+	# otherwise break the symbolic link /system, to prevent the i686 and x86_64 builds of packages
+	# that use purely traditional Autotools cross-compilation, like guile, from having
+	# "checking whether we are cross compiling... no"
+	# followed by
+	# "configure: error: No iconv support.  Please recompile libunistring with iconv enabled."
+	# if the Autotools cross-compilation temporary conftest binary manages to run
+	# in Ubuntu due to the presence of /system/lib(64)/libc.so and /system/bin/linker(64)
+	# that are intended only for use with packages that have a build dependency on 'aosp-libs'.
+	# See scripts/setup-ubuntu.sh and scripts/build/setup/termux_setup_proot.sh for more information.
+	rm -f "$TERMUX_APP__DATA_DIR/aosp"
+	case "$TERMUX_PKG_DEPENDS $TERMUX_PKG_BUILD_DEPENDS" in
+		*aosp-libs*|*aosp-utils*)
+			ln -sf "$TERMUX_PREFIX/opt/aosp" "$TERMUX_APP__DATA_DIR/aosp"
+		;;
+	esac
 }
