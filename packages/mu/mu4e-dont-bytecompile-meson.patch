@@ -1,11 +1,10 @@
 # Patch meson to copy mu4e source files even if emacs was not found.
 # Also disable dbus since we are not building emacs with dbus support
 
-diff --git a/meson.build b/meson.build
-index c64f23e9..bad6e202 100644
---- a/meson.build
-+++ b/meson.build
-@@ -365,9 +365,7 @@ subdir('mu')
+diff -uNr a/meson.build b/meson.build
+--- a/meson.build	2026-01-16 01:29:15.000000000 +0530
++++ b/meson.build	2026-01-16 10:25:54.391552150 +0530
+@@ -365,9 +365,7 @@
  emacs_name=get_option('emacs')
  emacs_min_version='26.3'
  emacs=find_program([emacs_name], version: '>=' + emacs_min_version, required:false)
@@ -16,35 +15,37 @@ index c64f23e9..bad6e202 100644
    subdir('mu4e')
  else
    message('emacs not found; not pre-compiling mu4e / generating man-pages')
-diff --git a/mu4e/meson.build b/mu4e/meson.build
-index 5f0da4d3..9cea3b29 100644
---- a/mu4e/meson.build
-+++ b/mu4e/meson.build
-@@ -76,13 +76,12 @@ mu4e_srcs=[
- # emacs 28 is guaranteed to have transient
+diff -uNr a/mu4e/meson.build b/mu4e/meson.build
+--- a/mu4e/meson.build	2026-01-16 01:29:15.000000000 +0530
++++ b/mu4e/meson.build	2026-01-16 10:29:59.896162690 +0530
+@@ -80,7 +80,7 @@
  # not very elegant, but
  # https://stackoverflow.com/questions/49221792/byte-compile-file-only-when-library-is-found
+ mu4e_srcs += 'mu4e-transient.el'
 -if emacs28.found()
 +if true
-   mu4e_srcs += 'mu4e-transient.el'
- endif
+   mu4e_bc_srcs += 'mu4e-transient.el'
+ else
+   message('mu4e-transient.el cannot be byte-compiled')
+@@ -88,8 +88,7 @@
  
  # do have we have dbus support?
+ mu4e_srcs += 'mu4e-dbus.el'
 -emacs_dbus = run_command(emacs, '--batch', '--eval', '(kill-emacs (if (featurep \'dbusbind) 0 1))',
 -                         check: false)
 +emacs_dbus = run_command('false')
  if emacs_dbus.returncode() == 0
-   mu4e_srcs += 'mu4e-dbus.el'
- endif
-@@ -94,6 +93,7 @@ endif
- #
- #... so let's not do that!
+   mu4e_bc_srcs += 'mu4e-dbus.el'
+ else
+@@ -105,6 +104,7 @@
  
+ # byte compile the sources that can be byte-compiled. This may exclude mu4e-transient.el and
+ # mu4e-dbus.el
 +if false
- foreach src : mu4e_srcs
+ foreach src : mu4e_bc_srcs
    target_name= '@BASENAME@.elc'
    target_path = join_paths(meson.current_build_dir(), target_name)
-@@ -136,6 +136,7 @@ mu4e_autoloads = configure_file(
+@@ -149,6 +149,7 @@
              '--load', 'package',
              '--eval', '(package-generate-autoloads "mu4e" "' +
                        meson.current_build_dir() + '" )'])
