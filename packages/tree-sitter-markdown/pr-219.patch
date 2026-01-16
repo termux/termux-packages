@@ -1,0 +1,22 @@
+From 40e7ad7b1ae05a1ea1848cedfe8f3bd853f27ff2 Mon Sep 17 00:00:00 2001
+From: Konstantin Podsvirov <konstantin@podsvirov.su>
+Date: Sun, 11 Jan 2026 21:26:17 +0300
+Subject: [PATCH] fix: cmake --install
+
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5d8b4c1..561fdfb 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -52,7 +52,7 @@ macro(add_parser name)
+     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/bindings/c/tree-sitter-${name}.pc.in"
+                    "${CMAKE_CURRENT_BINARY_DIR}/tree-sitter-${name}.pc" @ONLY)
+ 
+-    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/bindings/c/tree-sitter-${name}.h"
++    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/bindings/c/tree-sitter/tree-sitter-${name}.h"
+             DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/tree_sitter")
+     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/tree-sitter-${name}.pc"
+             DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
