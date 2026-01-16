@@ -76,7 +76,12 @@ for package in "${@}"; do
 		done
 	))
 
-	if (( ${#new_checksum[@]} )); then
+	old_checksum_arraysize=($(
+		source "${buildsh_path}" 2>/dev/null
+		echo "${#TERMUX_PKG_SRCURL[@]}"
+	))
+
+	if (( ${#new_checksum[@]} )) && (( ${#new_checksum[@]} == ${old_checksum_arraysize} )); then
 		# Replace old SHA-256.
 		if (( ${#new_checksum[@]} > 1 )); then
 			checksum="(\n$(printf '\\t%s\\n' "${new_checksum[@]}"))"
