@@ -405,41 +405,42 @@ rm "${TMPDIR:-/tmp}"/termux_ipc_*.fifo &> /dev/null
 export LATEST_VERSION_TEMP_FILE="${TMPDIR:-/tmp}/termux_ipc_$$.fifo"
 
 if [[ "$1" == "@all" ]]; then
+	declare -a PACKAGE_LIST=()
+	# To conserve API limits and speed up update checking,
+	# pre-cache the latest tags and eliminate packages without updates
+	# when it is possible to determine that from the API response alone.
 	_fetch_and_cache_tags
-	for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
-		for pkg_dir in "${repo_dir}"/*; do
-			_unix_millis="$(date +%10s%3N)"
-			! _should_update "${pkg_dir}" && continue # Skip if not needed.
-			_check_updated "${pkg_dir}" && continue # Skip if already up-to-date.
-			_update_dependencies "${pkg_dir}" # Update all its dependencies first.
-			# NOTE: We are not checking whether dependencies were updated successfully or not.
-			# There is no way to know whether this package will build with current
-			# available versions of its dependencies or needs new ones.
-			# So, whatever the case may be. We just need packages to be updated in order
-			# and not care about anything else in between. If something fails to update,
-			# it will be reported by failure handling code, so no worries.
-			_run_update "${pkg_dir}"
-			echo "termux - took $(ms_to_human_readable $(( $(date +%10s%3N) - _unix_millis )))"
+	for channel in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
+		for pkg_dir in "${channel}"/*; do
+			# Check if we should be putting this package into the list.
+			# Skip it if:
+			# - it doesn't have auto-updates enabled
+			# - it was already cached by _fetch_and_cache_tags
+			# - or there is an open auto-update issue for it
+			_should_update "${pkg_dir}" || continue
+			PACKAGE_LIST+=("$pkg_dir")
 		done
 	done
-else
-	for pkg in "$@"; do
-		_unix_millis="$(date +%10s%3N)"
-		if [ ! -d "${pkg}" ]; then # If only package name is given, try to find it's directory.
-			for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
-				if [ -d "${repo_dir}/${pkg}" ]; then
-					pkg="${repo_dir}/${pkg}"
-					break
-				fi
-			done
-		fi
-		# Here `pkg` is a directory.
-		! _should_update "${pkg}" && continue
-		_update_dependencies "${pkg}"
-		_run_update "${pkg}"
-		echo "termux - took $(ms_to_human_readable $(( $(date +%10s%3N) - _unix_millis )))"
-	done
+	set -- "${PACKAGE_LIST[@]}"
+	unset PACKAGE_LIST
 fi
+
+for pkg_dir in "$@"; do
+	_unix_millis="$(date +%10s%3N)"
+	if [[ ! -d "${pkg_dir}" ]]; then # If only package name is given, try to find it's directory.
+		for channel in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
+			if [[ -d "${channel}/${pkg_dir}" ]]; then
+				pkg_dir="${channel}/${pkg_dir}"
+				break
+			fi
+		done
+	fi
+
+	! _should_update "${pkg_dir}" && continue
+	_update_dependencies "${pkg_dir}"
+	_run_update "${pkg_dir}"
+	echo "termux - took $(ms_to_human_readable $(( $(date +%10s%3N) - _unix_millis )))"
+done
 
 # Remove temp file
 rm "${TMPDIR:-/tmp}"/termux_ipc_*.fifo
@@ -447,10 +448,8 @@ rm "${TMPDIR:-/tmp}"/termux_ipc_*.fifo
 #################################################REPORT CHANGES##################################################
 
 echo ""
-echo "INFO: Checked ${#_ALREADY_SEEN[*]} packages - took $(ms_to_human_readable $(( $(date +%10s%3N) - _start_time ))) in total."
-for _pkg in "${_ALREADY_SEEN[@]}"; do
-	[[ -n "$_pkg" ]] && echo "$_pkg"
-done
+echo "INFO: Checked $# packages - took $(ms_to_human_readable $(( $(date +%10s%3N) - _start_time ))) in total."
+printf '%s\n' "${_ALREADY_SEEN[@]}" | grep -ve '^$' | sort
 echo ""
 echo "INFO: ${#_FAILED_UPDATES[*]} failed updates."
 echo "${!_FAILED_UPDATES[@]}"
