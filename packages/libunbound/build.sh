@@ -3,10 +3,11 @@ TERMUX_PKG_DESCRIPTION="A validating, recursive, caching DNS resolver"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.24.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://nlnetlabs.nl/downloads/unbound/unbound-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=44e7b53e008a6dcaec03032769a212b46ab5c23c105284aa05a4f3af78e59cdb
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libevent, libnghttp2, openssl, resolv-conf"
+TERMUX_PKG_DEPENDS="libevent, libnghttp2, libngtcp2, openssl, resolv-conf"
 TERMUX_PKG_BUILD_DEPENDS="python, swig"
 TERMUX_PKG_BREAKS="unbound (<< 1.17.1-1)"
 TERMUX_PKG_REPLACES="unbound (<< 1.17.1-1)"
@@ -30,6 +31,7 @@ ac_cv_func_getpwnam=no
 --with-pyunbound
 --without-pythonmodule
 --with-libnghttp2=$TERMUX_PREFIX
+--with-libngtcp2=$TERMUX_PREFIX
 --with-ssl=$TERMUX_PREFIX
 --with-pidfile=$TERMUX_PREFIX/var/run/unbound.pid
 --with-username=
