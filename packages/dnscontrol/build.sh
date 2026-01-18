@@ -9,13 +9,13 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
-        termux_setup_golang
+	termux_setup_golang
 
-        export CGO_ENABLED=1
+	export CGO_ENABLED=1
 
-        go build -ldflags "-X main.VersionString=v${TERMUX_PKG_VERSION}" -o "${TERMUX_PKG_NAME}"
+	go build -ldflags "-X main.VersionString=v${TERMUX_PKG_VERSION}" -o "${TERMUX_PKG_NAME}"
 }
 
 termux_step_make_install() {
-        install -Dm700 "${TERMUX_PKG_NAME}" "${TERMUX_PREFIX}/bin"
+	install -Dm700 "${TERMUX_PKG_NAME}" "${TERMUX_PREFIX}/bin"
 }
