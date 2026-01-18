@@ -12,7 +12,7 @@ TERMUX_PKG_DEPENDS="openssl, python, python-pip"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, maturin"
-TERMUX_PKG_PYTHON_BUILD_DEPS="'cffi>=1.12'"
+TERMUX_PKG_PYTHON_CROSS_BUILD_DEPS="'cffi>=1.12'"
 TERMUX_PKG_PYTHON_TARGET_DEPS="'cffi>=1.12'"
 
 termux_step_configure() {
