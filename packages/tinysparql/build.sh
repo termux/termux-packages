@@ -17,8 +17,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dtests=false
 -Doverride_sqlite_version_check=true
 "
-# Temporary - remove after the merge of https://github.com/termux/termux-packages/pull/23652
-TERMUX_PKG_RM_AFTER_INSTALL="lib/python$TERMUX_PYTHON_VERSION/site-packages/asciidoc/__pycache__"
 
 termux_step_post_get_source() {
 	rm -f subprojects/*.wrap
