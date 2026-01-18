@@ -1,12 +1,13 @@
-diff -uNr apt-2.1.11/apt-private/private-cmndline.cc apt-2.1.11.mod/apt-private/private-cmndline.cc
---- apt-2.1.11/apt-private/private-cmndline.cc	2020-10-21 12:53:18.000000000 +0300
-+++ apt-2.1.11.mod/apt-private/private-cmndline.cc	2020-11-05 17:01:40.119381470 +0200
-@@ -473,7 +473,7 @@
-       _config->CndSet("Binary::apt::APT::Get::Upgrade-Allow-New", true);
-       _config->CndSet("Binary::apt::APT::Cmd::Show-Update-Stats", true);
-       _config->CndSet("Binary::apt::DPkg::Progress-Fancy", true);
--      _config->CndSet("Binary::apt::APT::Keep-Downloaded-Packages", false);
-+      _config->CndSet("Binary::apt::APT::Keep-Downloaded-Packages", true);
-       _config->CndSet("Binary::apt::APT::Get::Update::InteractiveReleaseInfoChanges", true);
-       _config->CndSet("Binary::apt::APT::Cmd::Pattern-Only", true);
- 
+diff --git a/apt-private/private-cmndline.cc b/apt-private/private-cmndline.cc
+index c26a3f7f4..bfd42d84f 100644
+--- a/apt-private/private-cmndline.cc
++++ b/apt-private/private-cmndline.cc
+@@ -512,7 +512,7 @@ static void BinarySpecificConfiguration(char const * const Binary)	/*{{{*/
+    _config->CndSet("Version::1.1::APT::Get::Upgrade-Allow-New", true);
+    _config->CndSet("Version::1.1::APT::Cmd::Show-Update-Stats", true);
+    _config->CndSet("Version::1.2::DPkg::Progress-Fancy", true);
+-   _config->CndSet("Version::1.2::APT::Keep-Downloaded-Packages", false);
++   _config->CndSet("Version::1.2::APT::Keep-Downloaded-Packages", true);
+    _config->CndSet("Version::1.5::APT::Get::Update::InteractiveReleaseInfoChanges", true);
+    _config->CndSet("Version::2.0::APT::Cmd::Pattern-Only", true);
+    _config->CndSet("Version::3.0::Pager", true);
