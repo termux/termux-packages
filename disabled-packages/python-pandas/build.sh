@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/pandas-dev/pandas/archive/refs/tags/v${TERM
 TERMUX_PKG_SHA256=d8abf9c2bf33cac75b28f32c174c29778414eb249e5e2ccb69b1079b97a8fc66
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, python, python-numpy, python-pip"
-TERMUX_PKG_PYTHON_COMMON_DEPS="Cython, numpy, wheel"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="Cython, numpy, wheel"
 TERMUX_PKG_PYTHON_TARGET_DEPS="python-dateutil, pytz"
 TERMUX_PKG_BUILD_IN_SRC=true
 

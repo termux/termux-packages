@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/hexchat/hexchat/archive/v${TERMUX_PKG_VERSI
 TERMUX_PKG_SHA256=486d73cdb6a89fa91cfbe242107901d06e777bea25956a7786c4a831a2caa0e3
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk2, liblua53, libx11, openssl, pango, python"
 TERMUX_PKG_BUILD_DEPENDS="glib-cross"
-TERMUX_PKG_PYTHON_COMMON_DEPS="cffi"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="cffi"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dlibcanberra=disabled

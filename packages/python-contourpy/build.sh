@@ -7,7 +7,7 @@ TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=git+https://github.com/contourpy/contourpy
 TERMUX_PKG_DEPENDS="python, python-numpy, python-pip"
 TERMUX_PKG_BUILD_DEPENDS="pybind11"
-TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, meson-python, build"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel, meson-python, build"
 _NUMPY_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python-numpy/build.sh; echo $TERMUX_PKG_VERSION)
 TERMUX_PKG_PYTHON_CROSS_BUILD_DEPS="'numpy==$_NUMPY_VERSION'"
 TERMUX_PKG_AUTO_UPDATE=true

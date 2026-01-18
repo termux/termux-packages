@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/rogerbinns/apsw/releases/download/${TERMUX_
 TERMUX_PKG_SHA256=15b69c57358624d8fef1c37ecaa536691cbb39db824fd41a11021c2f3197a7fb
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libsqlite, python"
-TERMUX_PKG_PYTHON_COMMON_DEPS="wheel"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_get_source() {

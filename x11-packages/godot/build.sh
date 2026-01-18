@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/godotengine/godot/archive/refs/tags/$TERMUX
 TERMUX_PKG_SHA256=c62a6eafc4a2de44fda3ad2db6dbe989726cd4c37537e0af119eeb6886fe49f2
 TERMUX_PKG_DEPENDS="brotli, ca-certificates, fontconfig, freetype, glu, libandroid-execinfo, libc++, libenet, libgraphite, libjpeg-turbo, libogg, libtheora, libvorbis, libvpx, libwebp, libwslay, libxcursor, libxi, libxinerama, libxkbcommon, libxrandr, mbedtls, miniupnpc, opengl, opusfile, pcre2, sdl3, speechd, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="pulseaudio, yasm"
-TERMUX_PKG_PYTHON_COMMON_DEPS="scons"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="scons"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+(\.\d+)?(?=-stable)'
 TERMUX_PKG_BUILD_IN_SRC=true

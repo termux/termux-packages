@@ -9,7 +9,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, python"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_PYTHON_COMMON_DEPS="wheel"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel"
 
 termux_step_pre_configure() {
 	export CXXFLAGS+=" -fPIC -I$TERMUX_PREFIX/include/ndk_compat"

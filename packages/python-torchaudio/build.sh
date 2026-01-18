@@ -7,7 +7,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/pytorch/audio/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=590492c90552959b3df6f601eb733135064bf2d9e53c516adcf6845a4e545662
 TERMUX_PKG_DEPENDS="libc++, python, python-pip, python-torch, python-torchcodec"
-TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, setuptools"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel, setuptools"
 
 termux_step_pre_configure() {
 	termux_setup_cmake

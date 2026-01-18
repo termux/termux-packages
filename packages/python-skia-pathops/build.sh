@@ -8,7 +8,7 @@ _SUFFIX='post1'
 TERMUX_PKG_SRCURL=https://github.com/fonttools/skia-pathops/archive/refs/tags/v${TERMUX_PKG_VERSION}.${_SUFFIX}.tar.gz
 TERMUX_PKG_SHA256=88bd5872bb96e19108ff7265cae2e1708f5e7f335b39ebfdd023940970e1d54c
 TERMUX_PKG_DEPENDS="libc++, python, python-pip"
-TERMUX_PKG_PYTHON_COMMON_DEPS="setuptools, wheel, setuptools_scm, 'Cython>=0.28.4'"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="setuptools, wheel, setuptools_scm, 'Cython>=0.28.4'"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 _SKIA_REPO_URL=git+https://skia.googlesource.com/skia.git

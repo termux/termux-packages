@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION="1.23.2"
 TERMUX_PKG_SRCURL=git+https://github.com/microsoft/onnxruntime
 TERMUX_PKG_DEPENDS="abseil-cpp, libc++, protobuf, libre2, python, python-numpy, python-pip"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, build, packaging"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel, build, packaging"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 

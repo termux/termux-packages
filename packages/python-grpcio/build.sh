@@ -9,7 +9,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 TERMUX_PKG_DEPENDS="abseil-cpp, c-ares, ca-certificates, libc++, libre2, openssl, python, python-pip, zlib"
 TERMUX_PKG_BUILD_DEPENDS="gflags, gflags-static"
-TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, setuptools, 'Cython>=3.0.0'"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel, setuptools, 'Cython>=3.0.0'"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {

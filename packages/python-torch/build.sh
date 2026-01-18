@@ -9,7 +9,7 @@ TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 TERMUX_PKG_DEPENDS="abseil-cpp, libc++, libopenblas, libprotobuf, python, python-numpy, python-pip"
 TERMUX_PKG_BUILD_DEPENDS="vulkan-headers, vulkan-loader-android"
 TERMUX_PKG_HOSTBUILD=true
-TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, pyyaml, typing_extensions"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel, pyyaml, typing_extensions"
 TERMUX_PKG_PYTHON_CROSS_BUILD_DEPS="numpy"
 # USE_DISTRIBUTED=ON fixes
 # ModuleNotFoundError: No module named 'torch._C._distributed_c10d'; 'torch._C' is not a package

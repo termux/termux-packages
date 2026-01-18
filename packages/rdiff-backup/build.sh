@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/rdiff-backup/rdiff-backup/releases/download
 TERMUX_PKG_SHA256=d0778357266bc6513bb7f75a4570b29b24b2760348bbf607babfc3a6f09458cf
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="librsync, python, python-pip"
-TERMUX_PKG_PYTHON_COMMON_DEPS="wheel"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
