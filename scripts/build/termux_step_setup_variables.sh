@@ -178,7 +178,7 @@ termux_step_setup_variables() {
 		echo "$_MAJOR_VERSION"
 	)"
 	TERMUX_PKG_PYTHON_TARGET_DEPS="" # python modules to be installed via pip3
-	TERMUX_PKG_PYTHON_BUILD_DEPS="" # python modules to be installed via build-pip
+	TERMUX_PKG_PYTHON_CROSS_BUILD_DEPS="" # python modules to be installed via build-pip
 	TERMUX_PKG_PYTHON_COMMON_DEPS="" # python modules to be installed via pip3 or build-pip
 	TERMUX_PKG_PYTHON_RUNTIME_DEPS="" # python modules to be installed via pip3 in debscriptps
 	TERMUX_PYTHON_CROSSENV_PREFIX="$TERMUX_TOPDIR/python${TERMUX_PYTHON_VERSION}-crossenv-prefix-$TERMUX_PACKAGE_LIBRARY-$TERMUX_ARCH" # python modules dependency location (only used in non-devices)

@@ -12,7 +12,7 @@ TERMUX_PKG_DEPENDS="atk, cinnamon-control-center, cinnamon-menus, cinnamon-sessi
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross, intltool, python-libsass"
 TERMUX_PKG_PYTHON_RUNTIME_DEPS="pytz, tinycss2, requests"
 TERMUX_PKG_SUGGESTS="gnome-terminal, gnome-screenshot"
-TERMUX_PKG_PYTHON_BUILD_DEPS="pysass"
+TERMUX_PKG_PYTHON_CROSS_BUILD_DEPS="pysass"
 TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Ddocs=false
@@ -36,7 +36,7 @@ termux_step_pre_configure() {
 
 	export TERMUX_MESON_ENABLE_SOVERSION=1
 
-	# allow use of GNU/Linux pysass (TERMUX_PKG_PYTHON_BUILD_DEPS="pysass") during cross-compilation
+	# allow use of GNU/Linux pysass (TERMUX_PKG_PYTHON_CROSS_BUILD_DEPS="pysass") during cross-compilation
 	# but bionic-libc pysass (TERMUX_PKG_BUILD_DEPENDS="python-sass") during on-device build
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
 		export PYTHONPATH="${TERMUX_PYTHON_CROSSENV_PREFIX}/cross/lib/python${TERMUX_PYTHON_VERSION}/site-packages"

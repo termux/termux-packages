@@ -12,7 +12,7 @@ termux_step_get_dependencies_python() {
 			pip_pkgs+="$TERMUX_PKG_PYTHON_TARGET_DEPS"
 		else
 			pip="build-pip"
-			pip_pkgs+="$TERMUX_PKG_PYTHON_BUILD_DEPS"
+			pip_pkgs+="$TERMUX_PKG_PYTHON_CROSS_BUILD_DEPS"
 		fi
 		for i in ${pip_pkgs//, / } ; do
 			local name_python_module=$(sed "s/<=/ /; s/>=/ /; s/</ /; s/>/ /; s/'//g" <<< "$i" | awk '{printf $1}')

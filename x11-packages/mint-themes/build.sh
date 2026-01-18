@@ -8,12 +8,12 @@ TERMUX_PKG_SHA256=0f16795f1a1c367118aa4c339e80f3435c9f5b2402b0deaae269ba7b8de1fb
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+$"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
-TERMUX_PKG_PYTHON_BUILD_DEPS="pysass"
+TERMUX_PKG_PYTHON_CROSS_BUILD_DEPS="pysass"
 TERMUX_PKG_BUILD_DEPENDS="python-libsass"
 TERMUX_PKG_SUGGESTS="mint-x-icon-theme, mint-y-icon-theme"
 
 termux_step_pre_configure() {
-	# allow use of GNU/Linux pysass (TERMUX_PKG_PYTHON_BUILD_DEPS="pysass") during cross-compilation
+	# allow use of GNU/Linux pysass (TERMUX_PKG_PYTHON_CROSS_BUILD_DEPS="pysass") during cross-compilation
 	# but bionic-libc pysass (TERMUX_PKG_BUILD_DEPENDS="python-sass") during on-device build
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
 		export PYTHONPATH="${TERMUX_PYTHON_CROSSENV_PREFIX}/cross/lib/python${TERMUX_PYTHON_VERSION}/site-packages"

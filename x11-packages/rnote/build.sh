@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=1d281a17ff8b9dce325ae5b0613a0cd7db5d717319f4899f2ce758e6155722
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="alsa-lib, gdk-pixbuf, gettext, glib, graphene, gtk4, hicolor-icon-theme, libadwaita, libcairo, pipewire, pango, poppler"
 TERMUX_PKG_BUILD_DEPENDS="libiconv"
-TERMUX_PKG_PYTHON_BUILD_DEPS="toml2json"
+TERMUX_PKG_PYTHON_CROSS_BUILD_DEPS="toml2json"
 
 termux_step_pre_configure() {
 	termux_setup_cmake
