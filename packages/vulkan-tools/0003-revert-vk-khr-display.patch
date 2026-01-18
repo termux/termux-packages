@@ -1,0 +1,21 @@
+VK_KHR_display does not work on Android
+Partially reverts https://github.com/KhronosGroup/Vulkan-Tools/commit/f5ba3301bdd000d925b4bf277a18ac0fa69c1fd2
+
+Fixes:
+WARNING: [../src/src/freedreno/vulkan/tu_knl_kgsl.cc:1716] Code 0 :
+I can't KHR_display (VK_ERROR_INITIALIZATION_FAILED)
+ERROR: [Loader Message] Code 0 : setup_loader_term_phys_devs: Call to 'vkEnumeratePhysicalDevices'
+in ICD /data/data/com.termux/files/usr/lib/libvulkan_freedreno.so failed with error code -3
+WARNING: [Loader Message] Code 0 : ICD for selected physical device does not export vkGetPhysicalDeviceDisplayPlanePropertiesKHR!
+WARNING: [Loader Message] Code 0 : ICD for selected physical device does not export vkGetPhysicalDeviceDisplayPropertiesKHR!
+
+--- a/vulkaninfo/CMakeLists.txt
++++ b/vulkaninfo/CMakeLists.txt
+@@ -93,7 +93,6 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux|BSD|GNU")
+         target_compile_definitions(vulkaninfo PRIVATE VK_USE_PLATFORM_DIRECTFB_EXT)
+         target_link_libraries(vulkaninfo PRIVATE PkgConfig::DirectFB)
+     endif()
+-    target_compile_definitions(vulkaninfo PRIVATE VK_USE_PLATFORM_DISPLAY)
+ endif()
+ 
+ if(APPLE)
