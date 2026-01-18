@@ -9,7 +9,7 @@ TERMUX_PKG_SRCURL=https://pypi.org/packages/source/m/msgpack/msgpack-${TERMUX_PK
 TERMUX_PKG_SHA256=3b60763c1373dd60f398488069bcdc703cd08a711477b5d480eecc9f9626f47e
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, python"
-TERMUX_PKG_PYTHON_COMMON_DEPS="build, Cython, setuptools, wheel"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="build, Cython, setuptools, wheel"
 
 termux_step_make() {
 	PYTHONPATH='' python -m build -w -n -x "$TERMUX_PKG_SRCDIR"

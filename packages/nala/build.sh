@@ -11,7 +11,7 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
-TERMUX_PKG_PYTHON_COMMON_DEPS="poetry"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="poetry"
 TERMUX_PKG_PYTHON_TARGET_DEPS="anyio, httpx, jsbeautifier, pexpect, python-debian, rich, tomli, typer, typing-extensions"
 TERMUX_PKG_PYTHON_RUNTIME_DEPS="nala, python-debian"
 

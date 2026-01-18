@@ -9,7 +9,7 @@ TERMUX_PKG_SHA256=8a95e6c7b9bec2bc0058feb73efe38ad6cfd49a0c7094db29b37ecaa8ab160
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="abseil-cpp, apache-orc, libandroid-execinfo, libc++, liblz4, libprotobuf, libre2, libsnappy, thrift, utf8proc, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers, rapidjson"
-TERMUX_PKG_PYTHON_COMMON_DEPS="build, 'Cython>=3.1', numpy, setuptools, setuptools-scm, wheel"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="build, 'Cython>=3.1', numpy, setuptools, setuptools-scm, wheel"
 TERMUX_PKG_BREAKS="libarrow-python (<< ${TERMUX_PKG_VERSION})"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DARROW_BUILD_STATIC=OFF

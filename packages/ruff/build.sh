@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL="https://github.com/charliermarsh/ruff/archive/refs/tags/$TERM
 TERMUX_PKG_SHA256=9294a2ff12994e710aa01fe37d22159b4d6d45ed309af7a9d10e71ca7313e0b8
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_PYTHON_COMMON_DEPS="maturin"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="maturin"
 
 termux_step_pre_configure() {
 	termux_setup_rust

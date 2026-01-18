@@ -7,7 +7,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/scipy/scipy
 TERMUX_PKG_DEPENDS="libc++, libopenblas, python, python-numpy, python-pip"
 TERMUX_PKG_BUILD_DEPENDS="python-numpy-static, pybind11"
-TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, 'Cython>=3.0.8', meson-python, build"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel, 'Cython>=3.0.8', meson-python, build"
 _NUMPY_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python-numpy/build.sh; echo $TERMUX_PKG_VERSION)
 TERMUX_PKG_PYTHON_CROSS_BUILD_DEPS="pythran, 'numpy==$_NUMPY_VERSION'"
 TERMUX_PKG_AUTO_UPDATE=true

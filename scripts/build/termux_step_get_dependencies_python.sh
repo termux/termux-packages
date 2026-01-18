@@ -6,7 +6,7 @@ termux_step_get_dependencies_python() {
 		# installing python modules
 		LDFLAGS+=" -Wl,--as-needed,-lpython${TERMUX_PYTHON_VERSION}"
 		local pip
-		local pip_pkgs="$TERMUX_PKG_PYTHON_COMMON_DEPS, "
+		local pip_pkgs="$TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS, "
 		if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 			pip="pip3"
 			pip_pkgs+="$TERMUX_PKG_PYTHON_TARGET_DEPS"

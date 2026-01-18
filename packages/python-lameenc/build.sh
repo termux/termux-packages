@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/chrisstaite/lameenc/archive/refs/tags/v${TE
 TERMUX_PKG_SHA256=3f1994d4b14680a186b6f2b92af4bff30b0e262d043774fe411ddf3481547750
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-support, libmp3lame, python"
-TERMUX_PKG_PYTHON_COMMON_DEPS="setuptools-scm, wheel"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="setuptools-scm, wheel"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {

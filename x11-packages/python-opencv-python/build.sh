@@ -8,7 +8,7 @@ TERMUX_PKG_REPOLOGY_METADATA_VERSION="$(. "$TERMUX_SCRIPTDIR/x11-packages/opencv
 TERMUX_PKG_SRCURL="https://github.com/opencv/opencv-python/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=c1cfdef91a45468b1c4404af594e2286ce2bcd343fe318aae287997a395a6c90
 TERMUX_PKG_DEPENDS="opencv, opencv-python, python, python-pip"
-TERMUX_PKG_PYTHON_COMMON_DEPS="scikit-build"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="scikit-build"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 

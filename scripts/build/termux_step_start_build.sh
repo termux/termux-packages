@@ -18,7 +18,7 @@ termux_step_start_build() {
 		exit 0
 	fi
 
-	if [ -n "$TERMUX_PKG_PYTHON_COMMON_DEPS" ] || [[ "$TERMUX_ON_DEVICE_BUILD" = "false" && -n "$TERMUX_PKG_PYTHON_CROSS_BUILD_DEPS" ]] || [[ "$TERMUX_ON_DEVICE_BUILD" = "true" && -n "$TERMUX_PKG_PYTHON_TARGET_DEPS" ]]; then
+	if [ -n "$TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS" ] || [[ "$TERMUX_ON_DEVICE_BUILD" = "false" && -n "$TERMUX_PKG_PYTHON_CROSS_BUILD_DEPS" ]] || [[ "$TERMUX_ON_DEVICE_BUILD" = "true" && -n "$TERMUX_PKG_PYTHON_TARGET_DEPS" ]]; then
 		# Enable python setting
 		TERMUX_PKG_SETUP_PYTHON=true
 	fi

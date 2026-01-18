@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://files.pythonhosted.org/packages/source/P/PyQtWebEngine
 TERMUX_PKG_SHA256=f121ac6e4a2f96ac289619bcfc37f64e68362f24a346553f5d6c42efa4228a4d
 TERMUX_PKG_DEPENDS="libc++, pyqt5, python, python-pip, qt5-qtbase, qt5-qtwebengine"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools"
-TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, PyQt-builder"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel, PyQt-builder"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="
 --verbose

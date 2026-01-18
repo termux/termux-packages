@@ -9,7 +9,7 @@ TERMUX_PKG_SHA256=0f85dc21be1266daccfbba903819ca8935ebdbe002b1e0305bfda258af44fd
 TERMUX_PKG_DEPENDS="python"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_PYTHON_COMMON_DEPS="wheel"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel"
 
 termux_step_post_make_install() {
 	install -Dm600 -t $TERMUX_PREFIX/share/man/man1 doc/2ping.1

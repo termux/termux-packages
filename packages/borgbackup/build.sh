@@ -7,7 +7,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/borgbackup/borg/releases/download/${TERMUX_PKG_VERSION}/borgbackup-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=79bbfa745d1901d685973584bd2d16a350686ddd176f6a2244490fb01996441f
 TERMUX_PKG_DEPENDS="libacl, liblz4, openssl, python, python-pip, xxhash, zstd"
-TERMUX_PKG_PYTHON_COMMON_DEPS="build, Cython, pkgconfig, setuptools, setuptools-scm, wheel"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="build, Cython, pkgconfig, setuptools, setuptools-scm, wheel"
 TERMUX_PKG_PYTHON_TARGET_DEPS="'msgpack==1.0.8', packaging"
 TERMUX_PKG_AUTO_UPDATE=true
 

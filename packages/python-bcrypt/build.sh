@@ -9,7 +9,7 @@ TERMUX_PKG_SHA256=f748f7c2d6fd375cc93d3fba7ef4a9e3a092421b8dbf34d8d4dc06be9492df
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="python, python-pip"
 TERMUX_PKG_BUILD_DEPENDS="openssl"
-TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, setuptools-rust"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel, setuptools-rust"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {

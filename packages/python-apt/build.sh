@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=daf46b0ed85061ccee64c3aa3004c695b33047f9f62f0de7863966c287731d
 TERMUX_PKG_DEPENDS="apt, libandroid-support, libc++, python"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_PYTHON_COMMON_DEPS="wheel"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel"
 
 termux_pkg_auto_update() {
 	# based on scripts/updates/api/termux_repology_api_get_latest_version.sh

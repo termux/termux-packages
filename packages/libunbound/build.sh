@@ -12,7 +12,7 @@ TERMUX_PKG_BUILD_DEPENDS="python, swig"
 TERMUX_PKG_BREAKS="unbound (<< 1.17.1-1)"
 TERMUX_PKG_REPLACES="unbound (<< 1.17.1-1)"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_PYTHON_COMMON_DEPS="wheel"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel"
 TERMUX_PKG_PYTHON_CROSS_BUILD_DEPS="swig"
 
 # `pythonmodule` makes core lib/libunbound.so depend on python. Do not enable it.

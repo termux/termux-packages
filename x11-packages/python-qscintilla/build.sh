@@ -9,7 +9,7 @@ TERMUX_PKG_SRCURL=https://www.riverbankcomputing.com/static/Downloads/QScintilla
 TERMUX_PKG_SHA256=dfe13c6acc9d85dfcba76ccc8061e71a223957a6c02f3c343b30a9d43a4cdd4d
 TERMUX_PKG_DEPENDS="libc++, pyqt5, python, python-pip, qscintilla (>= ${TERMUX_PKG_VERSION}), qt5-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools"
-TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, PyQt-builder"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel, PyQt-builder"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="
 --verbose
