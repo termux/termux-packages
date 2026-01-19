@@ -23,10 +23,12 @@ termux_step_post_get_source() {
 termux_step_host_build() {
 	# This package should use the Android NDK toolchain to compile, not
 	# our custom toolchain, so I'd like to compile it in the hostbuild step.
-	export PATH="$NDK/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH"
-	export CCTERMUX_HOST_PLATFORM=$TERMUX_HOST_PLATFORM$TERMUX_PKG_API_LEVEL
-	if [ $TERMUX_ARCH = arm ]; then
-		CCTERMUX_HOST_PLATFORM=armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
+		export PATH="$NDK/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH"
+		export CCTERMUX_HOST_PLATFORM="$TERMUX_HOST_PLATFORM$TERMUX_PKG_API_LEVEL"
+		if [[ "$TERMUX_ARCH" == "arm" ]]; then
+			CCTERMUX_HOST_PLATFORM="armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL"
+		fi
 	fi
 
 	local _INSTALL_PREFIX=$TERMUX_PREFIX/opt/$TERMUX_PKG_NAME
@@ -42,8 +44,13 @@ termux_step_host_build() {
 	chmod +x $PKG_CONFIG
 
 	AR=$(command -v llvm-ar)
-	CC=$(command -v $CCTERMUX_HOST_PLATFORM-clang)
-	CXX=$(command -v $CCTERMUX_HOST_PLATFORM-clang++)
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
+		CC=$(command -v "$CCTERMUX_HOST_PLATFORM-clang")
+		CXX=$(command -v "$CCTERMUX_HOST_PLATFORM-clang++")
+	else
+		CC=$(command -v "$TERMUX_HOST_PLATFORM-clang")
+		CXX=$(command -v "$TERMUX_HOST_PLATFORM-clang++")
+	fi
 	LD=$(command -v ld.lld)
 	CFLAGS=""
 	CPPFLAGS=""

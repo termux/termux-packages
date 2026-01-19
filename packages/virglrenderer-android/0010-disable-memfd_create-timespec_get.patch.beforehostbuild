@@ -1,0 +1,21 @@
+Android 7 does not have memfd_create or timespec_get,
+so do not allow them to be activated through detection
+in /system/lib64/libc.so via meson's has_function() method
+if virglrenderer-android is being compiled on an Android 14
+device that does not have the 'ndk-multilib' package installed.
+This virglrenderer-specific Meson code is used to compile
+some mesa-derived code, so here is a link to the solution currently in
+upstream mesa, the patch for which does not apply cleanly here:
+https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/37630
+
+--- a/meson.build
++++ b/meson.build
+@@ -228,7 +228,7 @@ foreach a : supported_function_attributes
+   endif
+ endforeach
+ 
+-foreach f : ['memfd_create', 'strtok_r', 'timespec_get']
++foreach f : ['strtok_r']
+   if cc.has_function(f)
+     conf_data.set('HAVE_@0@'.format(f.to_upper()), 1)
+   endif
