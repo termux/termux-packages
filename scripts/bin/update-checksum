@@ -47,7 +47,7 @@ for package_dir in "$@"; do
 	else # If we did not, search each channel listed in repo.json for that package directory.
 		for channel in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "$REPO_ROOT/repo.json"); do
 			if [[ -d "${channel}/${package_dir}" && -f "${channel}/${package_dir}/build.sh" ]]; then
-				repo="$(jq --raw-output ".[\"$channel\"].name | sub(\"^termux-\")" "$REPO_ROOT/repo.json")"
+				repo="$(jq --raw-output ".[\"$channel\"].name | sub(\"^termux-\"; \"\")" "$REPO_ROOT/repo.json")"
 				buildsh_path="${channel}/${package_dir}/build.sh"
 				package_dir="$(basename "${package_dir}")"
 			fi
@@ -65,11 +65,11 @@ for package_dir in "$@"; do
 		# shellcheck source=/dev/null
 		source "${buildsh_path}" 2>/dev/null
 		for url in "${TERMUX_PKG_SRCURL[@]}"; do
-			echo "Downloading ${url}" &>/dev/null
+			echo "Downloading ${url}" >&2
 			dl_tmpdir="$(mktemp -d "${TMPDIR-/tmp}/termux.src.dl.XXXXXXXX")"
 
 			if [[ -d "${dl_tmpdir}" ]]; then
-				if ! curl --fail --location --retry 3 --output "${dl_tmpdir}/source-bundle" "$url" 2>/dev/null; then
+				if ! curl --fail --location --retry 3 --output "${dl_tmpdir}/source-bundle" "$url" >&2; then
 					rm -rf "${dl_tmpdir}"
 				fi
 
