@@ -1,0 +1,150 @@
+#!/usr/bin/env bash
+#
+# TDOC — Termux Doctor
+#
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+export TDOC_ROOT="${PREFIX}/lib/tdoc"
+export TDOC_STATE_FILE="${PREFIX}/var/lib/tdoc/state.env"
+
+# Sanity check
+if [[ ! -d "$TDOC_ROOT/core" ]]; then
+  echo "TDOC installation corrupted: $TDOC_ROOT/core not found" >&2
+  exit 127
+fi
+
+# Init
+source "$TDOC_ROOT/core/init.sh"
+
+cmd="${1:-help}"
+
+# -----------------------
+# Helpers: header for help
+# -----------------------
+print_help() {
+  local BORDER="━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo -e "\033[36m$BORDER\033[0m"
+  echo -e "\033[36m🛰 Termux Doctor — Help Menu${RESET}"
+  echo -e "\033[36m$BORDER\033[0m"
+  echo
+  echo -e "Usage:"
+  echo -e "  \033[32mtdoc scan\033[0m              Run system scan only"
+  echo -e "  \033[32mtdoc status\033[0m            Show last scan status"
+  echo -e "  \033[32mtdoc version\033[0m           Show TDOC version"
+  echo -e "  \033[32mtdoc explain\033[0m           Explain broken items"
+  echo -e "  \033[32mtdoc fix\033[0m               Run fixes"
+  echo -e "  \033[32mtdoc fix --preview\033[0m     Preview fixes"
+  echo -e "  \033[32mtdoc fix --auto\033[0m        Apply fixes automatically"
+  echo -e "  \033[32mtdoc report\033[0m            Raw state report"
+  echo -e "  \033[32mtdoc doctor --json\033[0m     Full doctor report (JSON)"
+  echo -e "  \033[32mtdoc security\033[0m          Security checks UI"
+  echo -e "  \033[32mtdoc security --json\033[0m   Security checks JSON"
+  echo -e "  \033[32mtdoc update\033[0m            Update TDOC via pkg"
+  echo -e "  \033[32mtdoc help\033[0m              Show this help"
+  echo
+  echo -e "\033[36m$BORDER\033[0m"
+}
+
+# -----------------------
+# Ensure state directory exists
+# -----------------------
+mkdir -p "$(dirname "$TDOC_STATE_FILE")"
+
+# -----------------------
+# Command routing
+# -----------------------
+case "$cmd" in
+
+  version|-v|--version)
+    source "$TDOC_ROOT/core/ui_version.sh"
+    tdoc_version_ui
+    ;;
+
+  scan)
+    source "$TDOC_ROOT/core/scan.sh"
+    ;;
+
+  status)
+    if [[ ! -f "$TDOC_STATE_FILE" ]]; then
+      echo "State file not found, run 'tdoc scan' first."
+      exit 1
+    fi
+    source "$TDOC_ROOT/core/status.sh"
+    ;;
+
+  fix)
+    source "$TDOC_ROOT/core/scan.sh"
+    case "${2:-}" in
+      --preview)
+        source "$TDOC_ROOT/core/fix_preview.sh"
+        ;;
+      --auto)
+        source "$TDOC_ROOT/core/fix_auto.sh"
+        ;;
+      *)
+        source "$TDOC_ROOT/core/fix.sh"
+        ;;
+    esac
+    ;;
+
+  doctor)
+    case "${2:-}" in
+      --json)
+        source "$TDOC_ROOT/core/scan.sh" >/dev/null 2>&1
+        source "$TDOC_ROOT/core/doctor_json.sh"
+        ;;
+      *)
+        echo "Usage: tdoc doctor --json"
+        ;;
+    esac
+    ;;
+
+  explain)
+    if [[ ! -f "$TDOC_STATE_FILE" ]]; then
+      echo "State file not found, run 'tdoc scan' first."
+      exit 1
+    fi
+    source "$TDOC_ROOT/core/scan.sh"
+    source "$TDOC_ROOT/core/explain.sh"
+    ;;
+
+  report)
+    if [[ ! -f "$TDOC_STATE_FILE" ]]; then
+      echo "State file not found, run 'tdoc scan' first."
+      exit 1
+    fi
+    cat "$TDOC_STATE_FILE"
+    ;;
+
+  update)
+    echo "TDOC is updated via Termux package manager."
+    echo
+    echo "Run:"
+    echo "  pkg update"
+    echo "  pkg upgrade tdoc"
+    ;;
+
+  security)
+    case "${2:-}" in
+      --json)
+        source "$TDOC_ROOT/core/repo_security_json.sh"
+        ;;
+      *)
+        source "$TDOC_ROOT/core/repo_security_ui.sh"
+        ;;
+    esac
+    ;;
+
+  help|-h|--help|"")
+    print_help
+    ;;
+
+  *)
+    echo "Unknown command: tdoc $cmd" >&2
+    echo "Run: tdoc help" >&2
+    exit 1
+    ;;
+esac
