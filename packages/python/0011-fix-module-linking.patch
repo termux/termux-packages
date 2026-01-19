@@ -1,0 +1,14 @@
+Based off https://github.com/msys2-contrib/cpython-mingw/commit/e719663e07d6655e042f9c48910c65606cc4ae5e
+diff --git a/Modules/makesetup b/Modules/makesetup
+index 8bb971b152a..e6cf14460aa 100755
+--- a/Modules/makesetup
++++ b/Modules/makesetup
+@@ -274,7 +274,7 @@ sed -e 's/[ 	]*#.*//' -e '/^[ 	]*$/d' |
+ 				;;
+ 			esac
+ 			rule="$file: $objs"
+-			rule="$rule; \$(BLDSHARED) $objs $libs \$(LIBPYTHON) -o $file"
++			rule="$rule; \$(BLDSHARED) $objs $libs \$(BLDLIBRARY) -o $file"
+ 			echo "$rule" >>$rulesf
+ 		done
+ 	done
