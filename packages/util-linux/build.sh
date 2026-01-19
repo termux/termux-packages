@@ -11,9 +11,18 @@ TERMUX_PKG_LICENSE_FILE="
 "
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.41.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/utils/util-linux/v${TERMUX_PKG_VERSION:0:4}/util-linux-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=6062a1d89b571a61932e6fc0211f36060c4183568b81ee866cf363bce9f6583e
-# libcrypt is required for only newgrp and sulogin, which are not built anyways
+# <dependency>: <binaries linking to that dependency>
+# libandroid-glob: lsclocks
+# libandroid-posix-semaphore: lsipc and the lib{blkid,smartcols,uuid} subpackages
+# libcap-ng: setpriv
+# libsmartcols: cal, column, fincore, irqtop, losetup, lsclocks, lscpu, lsfd, lsipc, lsirq, prlimit, wdctl, zramctl
+# ncurses: cal, dmesg, hexdump, irqtop, setterm, ul
+# zlib: fsck.cramfs
+#
+# libcrypt would be required for newgrp and sulogin, which we are not building
 TERMUX_PKG_DEPENDS="libandroid-glob, libandroid-posix-semaphore, libcap-ng, libsmartcols, ncurses, zlib"
 TERMUX_PKG_ESSENTIAL=true
 TERMUX_PKG_BREAKS="util-linux-dev"
