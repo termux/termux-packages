@@ -78,40 +78,22 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
 --- a/irr/src/CMakeLists.txt
 +++ b/irr/src/CMakeLists.txt
 @@ -66,7 +66,7 @@ if(WIN32)
+ 	add_compile_definitions(_IRR_WINDOWS_ _IRR_WINDOWS_API_)
  elseif(APPLE)
  	add_compile_definitions(_IRR_OSX_PLATFORM_)
- 	set(DEVICE "OSX")
 -elseif(ANDROID)
 +elseif(DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK)
  	add_compile_definitions(_IRR_ANDROID_PLATFORM_)
- 	if(NOT USE_SDL2)
- 		message(FATAL_ERROR "The Android build requires SDL2")
-@@ -231,7 +231,7 @@ if(USE_SDL2)
- 	if(NOT USE_SDL2_STATIC)
- 		set(USE_SDL2_SHARED TRUE)
- 	endif()
--	if(NOT ANDROID)
-+	if(NOT DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK)
- 		find_package(SDL2 REQUIRED)
- 	else()
- 		# provided by AndroidLibs.cmake
-@@ -278,7 +278,7 @@ endif()
- 
- # Platform-specific libs
- 
--if(ANDROID)
-+if(DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK)
- 	enable_language(C)
- elseif(APPLE)
- 	find_library(COCOA_LIB Cocoa REQUIRED)
-@@ -513,7 +513,6 @@ target_link_libraries(IrrlichtMt PRIVATE
+ elseif(EMSCRIPTEN)
+ 	add_compile_definitions(_IRR_EMSCRIPTEN_PLATFORM_ _IRR_COMPILE_WITH_EGL_MANAGER_)
+@@ -519,7 +519,6 @@ target_link_libraries(IrrlichtMt PRIVATE
  	${EGL_LIBRARY}
  
  	# incl. transitive SDL2 dependencies for static linking
 -	"$<$<PLATFORM_ID:Android>:-landroid -llog -lGLESv2 -lGLESv1_CM -lOpenSLES>"
- 	${COCOA_LIB}
- 	${IOKIT_LIB}
- 	"$<$<PLATFORM_ID:Windows>:gdi32>"
+ )
+ 
+ if(WIN32)
 @@ -528,6 +527,6 @@ endif()
  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
  	target_compile_definitions(IrrlichtMt INTERFACE _DEBUG)
@@ -188,24 +170,6 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  elseif (USE_GETTEXT)
 --- a/src/client/game.cpp
 +++ b/src/client/game.cpp
-@@ -703,7 +703,7 @@ class Game {
- 		return input->wasKeyReleased(k);
- 	}
- 
--#ifdef __ANDROID__
-+#ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
- 	void handleAndroidChatInput();
- #endif
- 
-@@ -850,7 +850,7 @@ class Game {
- 		return g_touchcontrols && g_touchcontrols->isShootlineAvailable() &&
- 				camera->getCameraMode() == CAMERA_MODE_FIRST;
- 	}
--#ifdef __ANDROID__
-+#ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
- 	bool m_android_chat_open;
- #endif
- 
 @@ -1018,7 +1018,7 @@ void Game::run()
  	const bool initial_window_maximized = !g_settings->getBool("fullscreen") &&
  			g_settings->getBool("window_maximized");
@@ -379,15 +343,15 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  	float x_inches = (float) porting::getDisplaySize().X /
 --- a/src/filesys.cpp
 +++ b/src/filesys.cpp
-@@ -436,7 +436,7 @@ std::string TempPath()
- 		configuration hardcodes mkstemp("/tmp/lua_XXXXXX").
- 	*/
+@@ -421,7 +421,7 @@ bool DeleteSingleFileOrEmptyDirectory(const std::string &path, bool log_error)
  
+ std::string TempPath()
+ {
 -#ifdef __ANDROID__
 +#ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
  	return porting::path_cache;
  #else
- 	return DIR_DELIM "tmp";
+ 	const char *env_tmpdir = getenv("TMPDIR");
 --- a/src/gui/guiEngine.cpp
 +++ b/src/gui/guiEngine.cpp
 @@ -381,7 +381,7 @@ void GUIEngine::run()
@@ -494,10 +458,10 @@ For maintainers - how to bump this patch checklist, for avoiding bitrot:
  	// No dialog is shown
 --- a/src/gui/modalMenu.h
 +++ b/src/gui/modalMenu.h
-@@ -9,7 +9,7 @@
+@@ -8,7 +8,7 @@
+ #include "irrlichttypes_bloated.h"
  #include "irr_ptr.h"
  
- #include "util/string.h"
 -#ifdef __ANDROID__
 +#ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
  	#include <porting_android.h>
