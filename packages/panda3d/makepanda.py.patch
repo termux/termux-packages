@@ -1,5 +1,5 @@
 diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
-index ad6230f0ed..2acd7bf0e2 100755
+index ad6230f0ed..c1eb0538c1 100755
 --- a/makepanda/makepanda.py
 +++ b/makepanda/makepanda.py
 @@ -1257,7 +1257,6 @@ if (COMPILER=="GCC"):
@@ -10,16 +10,54 @@ index ad6230f0ed..2acd7bf0e2 100755
          LibName("ANDROID", '-landroid')
          LibName("JNIGRAPHICS", '-ljnigraphics')
  
-@@ -1596,8 +1595,6 @@ def CompileCxx(obj,src,opts):
+@@ -1584,10 +1583,6 @@ def CompileCxx(obj,src,opts):
+         if "SYSROOT" in SDK:
+             if GetTarget() != "android":
+                 cmd += ' --sysroot=%s' % (SDK["SYSROOT"])
+-            else:
+-                ndk_dir = SDK["ANDROID_NDK"].replace('\\', '/')
+-                cmd += ' -isystem %s/sysroot/usr/include' % (ndk_dir)
+-                cmd += ' -isystem %s/sysroot/usr/include/%s' % (ndk_dir, SDK["ANDROID_TRIPLE"])
+             cmd += ' -no-canonical-prefixes'
+ 
+         # Android-specific flags.
+@@ -1596,35 +1591,7 @@ def CompileCxx(obj,src,opts):
          if GetTarget() == "android":
              # Most of the specific optimization flags here were
              # just copied from the default Android Makefiles.
 -            if "ANDROID_API" in SDK:
 -                cmd += ' -D__ANDROID_API__=' + str(SDK["ANDROID_API"])
-             if "ANDROID_GCC_TOOLCHAIN" in SDK:
-                 cmd += ' -gcc-toolchain ' + SDK["ANDROID_GCC_TOOLCHAIN"].replace('\\', '/')
+-            if "ANDROID_GCC_TOOLCHAIN" in SDK:
+-                cmd += ' -gcc-toolchain ' + SDK["ANDROID_GCC_TOOLCHAIN"].replace('\\', '/')
              cmd += ' -ffunction-sections -funwind-tables'
-@@ -2124,22 +2121,6 @@ def CompileLink(dll, obj, opts):
+-            if arch == 'armv7a':
+-                cmd += ' -target armv7-none-linux-androideabi'
+-                cmd += ' -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16'
+-                cmd += ' -fno-integrated-as'
+-            elif arch == 'arm':
+-                cmd += ' -target armv5te-none-linux-androideabi'
+-                cmd += ' -march=armv5te -mtune=xscale -msoft-float'
+-                cmd += ' -fno-integrated-as'
+-            elif arch == 'aarch64':
+-                cmd += ' -target aarch64-none-linux-android'
+-            elif arch == 'mips':
+-                cmd += ' -target mipsel-none-linux-android'
+-                cmd += ' -mips32'
+-            elif arch == 'mips64':
+-                cmd += ' -target mips64el-none-linux-android'
+-                cmd += ' -fintegrated-as'
+-            elif arch == 'x86':
+-                cmd += ' -target i686-none-linux-android'
+-                cmd += ' -march=i686 -mtune=intel -mssse3 -mfpmath=sse -m32'
+-                cmd += ' -mstackrealign'
+-            elif arch == 'x86_64':
+-                cmd += ' -target x86_64-none-linux-android'
+-                cmd += ' -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel'
+-
+             cmd += " -Wa,--noexecstack"
+ 
+             # Do we want thumb or arm instructions?
+@@ -2124,22 +2091,6 @@ def CompileLink(dll, obj, opts):
              if "ANDROID_GCC_TOOLCHAIN" in SDK:
                  cmd += ' -gcc-toolchain ' + SDK["ANDROID_GCC_TOOLCHAIN"].replace('\\', '/')
              cmd += " -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now"
@@ -42,7 +80,7 @@ index ad6230f0ed..2acd7bf0e2 100755
              cmd += ' -lc -lm'
          else:
              cmd += " -pthread"
-@@ -5546,7 +5527,7 @@ if (not RTDIST and not RUNTIME and PkgSkip("PVIEW")==0):
+@@ -5546,7 +5497,7 @@ if (not RTDIST and not RUNTIME and PkgSkip("PVIEW")==0):
  # DIRECTORY: panda/src/android/
  #
  

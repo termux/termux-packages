@@ -40,3 +40,16 @@
  BISON = None
  def GetBison():
      global BISON
+@@ -3086,12 +3098,6 @@ def SetupBuildEnvironment(compiler):
+ 
+         # Now extract the preprocessor's include directories.
+         cmd = GetCXX() + " -x c++ -v -E " + os.devnull
+-        if "ANDROID_NDK" in SDK:
+-            ndk_dir = SDK["ANDROID_NDK"].replace('\\', '/')
+-            cmd += ' -isystem %s/sysroot/usr/include' % (ndk_dir)
+-            cmd += ' -isystem %s/sysroot/usr/include/%s' % (ndk_dir, SDK["ANDROID_TRIPLE"])
+-        else:
+-            cmd += sysroot_flag
+ 
+         null = open(os.devnull, 'w')
+         handle = subprocess.Popen(cmd, stdout=null, stderr=subprocess.PIPE, shell=True)
