@@ -19,7 +19,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	python makepanda/makepanda.py --nothing
+	python makepanda/makepanda.py --nothing --threads "${TERMUX_PKG_MAKE_PROCESSES}"
 }
 
 termux_step_make_install() {
