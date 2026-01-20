@@ -19,7 +19,14 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	python makepanda/makepanda.py --nothing --threads "${TERMUX_PKG_MAKE_PROCESSES}"
+	local PANDA_ARCH="${TERMUX_ARCH}"
+	if [[ "${TERMUX_ARCH}" == "i686" ]]; then
+		PANDA_ARCH="x86"
+	fi
+	python makepanda/makepanda.py \
+		--arch "$PANDA_ARCH" \
+		--nothing \
+		--threads "${TERMUX_PKG_MAKE_PROCESSES}"
 }
 
 termux_step_make_install() {
