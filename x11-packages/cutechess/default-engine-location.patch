@@ -1,0 +1,39 @@
+For convenience so that stockfish shows up immediately in the "add engine" dialog
+
+--- a/projects/gui/src/enginemanagementwidget.cpp
++++ b/projects/gui/src/enginemanagementwidget.cpp
+@@ -75,6 +75,9 @@ EngineManagementWidget::EngineManagementWidget(QWidget* parent)
+ 
+ 	// Default location for new engines
+ 	QString dir = QSettings().value("ui/default_engine_location").toString();
++	if (dir.length() == 0) {
++		dir.append("@TERMUX_PREFIX@/bin");
++	}
+ 	ui->m_defaultLocationEdit->setText(dir);
+ 	connect(ui->m_browseDefaultLocationBtn, SIGNAL(clicked()),
+ 		this, SLOT(browseDefaultLocation()));
+--- a/projects/gui/src/engineconfigurationdlg.cpp
++++ b/projects/gui/src/engineconfigurationdlg.cpp
+@@ -197,7 +197,7 @@ void EngineConfigurationDialog::browseCommand()
+ 	#ifdef Q_OS_WIN32
+ 	const QString filter = tr("Executables (*.exe *.bat *.cmd);;All Files (*.*)");
+ 	#else
+-	const QString filter = tr("All Files (*)");
++	const QString filter = tr("Termux Engines (stockfish);;All Files (*)");
+ 	#endif
+ 
+ 	// Try to open the dialog in a directory that best matches the
+@@ -216,8 +216,12 @@ void EngineConfigurationDialog::browseCommand()
+ 			defaultDir = dir.absoluteFilePath(relFilePath);
+ 		else if (!wdir.isEmpty() && dir.exists())
+ 			defaultDir = dir.absolutePath();
+-		else
++		else {
+ 			defaultDir = QSettings().value("ui/default_engine_location").toString();
++			if (defaultDir.length() == 0) {
++				defaultDir.append("@TERMUX_PREFIX@/bin");
++			}
++		}
+ 	}
+ 
+ 	auto dlg = new QFileDialog(
