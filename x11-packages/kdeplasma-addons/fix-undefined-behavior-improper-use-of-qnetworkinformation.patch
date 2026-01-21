@@ -1,0 +1,101 @@
+diff --git a/applets/comic/engine/comic.cpp b/applets/comic/engine/comic.cpp
+index 4c6ae71..5074a94 100644
+--- a/applets/comic/engine/comic.cpp
++++ b/applets/comic/engine/comic.cpp
+@@ -28,7 +28,10 @@ ComicEngine::ComicEngine(QObject *parent)
+     , mEmptySuffix(false)
+     , mIsCheckingForUpdates(false)
+ {
+-    QNetworkInformation::instance()->loadBackendByFeatures(QNetworkInformation::Feature::Reachability);
++    if (!QNetworkInformation::instance()->loadBackendByFeatures(QNetworkInformation::Feature::Reachability)) {
++        qWarning() << "QNetworkInformation is not supported on this device.";
++        m_qNetworkInformationHasBackend = false;
++    }
+     loadProviders();
+ }
+ 
+@@ -278,5 +281,8 @@ QString ComicEngine::lastCachedIdentifier(const QString &identifier) const
+ 
+ bool ComicEngine::isOnline() const
+ {
++    if (!m_qNetworkInformationHasBackend) {
++        return true;
++    }
+     return QNetworkInformation::instance()->reachability() == QNetworkInformation::Reachability::Online;
+ }
+diff --git a/applets/comic/engine/comic.h b/applets/comic/engine/comic.h
+index e6cf0cb..48c528d 100644
+--- a/applets/comic/engine/comic.h
++++ b/applets/comic/engine/comic.h
+@@ -60,6 +60,7 @@ private:
+ private:
+     bool mEmptySuffix;
+     bool mIsCheckingForUpdates;
++    bool m_qNetworkInformationHasBackend = true;
+     QString mIdentifierError;
+     QHash<QString, ComicProvider *> m_jobs;
+     QSet<QString> mProviders;
+diff --git a/applets/weather/ioncontrol_p.cpp b/applets/weather/ioncontrol_p.cpp
+index 57f486f..fffff5c 100644
+--- a/applets/weather/ioncontrol_p.cpp
++++ b/applets/weather/ioncontrol_p.cpp
+@@ -17,7 +17,10 @@ IonControl::IonControl(const QString &name, const std::shared_ptr<Ion> &ion, con
+     , m_fetchThread(ionThread)
+     , m_ionName(name)
+ {
+-    QNetworkInformation::loadBackendByFeatures(QNetworkInformation::Feature::Reachability);
++    if (!QNetworkInformation::loadBackendByFeatures(QNetworkInformation::Feature::Reachability)) {
++        qWarning() << "QNetworkInformation is not supported on this device.";
++        m_qNetworkInformationHasBackend = false;
++    }
+     connect(QNetworkInformation::instance(), &QNetworkInformation::reachabilityChanged, this, &IonControl::onOnlineStateChanged);
+ 
+     qCDebug(WEATHER::CONTROLLER) << "IonControl " << m_ionName << ": The worker thread is: " << m_fetchThread.get();
+@@ -61,7 +64,7 @@ void IonControl::updateLocations(const std::shared_ptr<LocationsData> &locationD
+     qCDebug(WEATHER::CONTROLLER) << "IonControl " << m_ionName << ": get locations request";
+ 
+     // skip update and add locations to the queue if the network is offline
+-    if (QNetworkInformation::instance()->reachability() != QNetworkInformation::Reachability::Online) {
++    if (m_qNetworkInformationHasBackend && QNetworkInformation::instance()->reachability() != QNetworkInformation::Reachability::Online) {
+         qCDebug(WEATHER::CONTROLLER) << "IonControl " << m_ionName << ": Network connection is unavailable. Skip update forecast";
+         auto errorLocations = std::make_shared<Locations>();
+         errorLocations->setError();
+@@ -154,7 +157,7 @@ void IonControl::updateForecast(const std::shared_ptr<ForecastData> &forecastDat
+     qCDebug(WEATHER::CONTROLLER) << "IonControl " << m_ionName << ": get forecast request";
+ 
+     // skip update and add forecast to the queue if the network is offline
+-    if (QNetworkInformation::instance()->reachability() != QNetworkInformation::Reachability::Online) {
++    if (m_qNetworkInformationHasBackend && QNetworkInformation::instance()->reachability() != QNetworkInformation::Reachability::Online) {
+         qCDebug(WEATHER::CONTROLLER) << "IonControl " << m_ionName << ": Network connection is unavailable. Skip update forecast";
+         auto errorForecast = std::make_shared<Forecast>();
+         errorForecast->setError();
+@@ -216,7 +219,7 @@ void IonControl::onFetchForecastEnded()
+ 
+     m_isBusy = false;
+ 
+-    if (QNetworkInformation::instance()->reachability() == QNetworkInformation::Reachability::Online) {
++    if (!m_qNetworkInformationHasBackend || QNetworkInformation::instance()->reachability() == QNetworkInformation::Reachability::Online) {
+         checkQueues();
+     }
+ }
+@@ -229,7 +232,7 @@ void IonControl::onFetchForecastCancelled()
+ 
+     m_isBusy = false;
+ 
+-    if (QNetworkInformation::instance()->reachability() == QNetworkInformation::Reachability::Online) {
++    if (!m_qNetworkInformationHasBackend || QNetworkInformation::instance()->reachability() == QNetworkInformation::Reachability::Online) {
+         checkQueues();
+     }
+ }
+diff --git a/applets/weather/ioncontrol_p.h b/applets/weather/ioncontrol_p.h
+index 6e07d69..d204b8d 100644
+--- a/applets/weather/ioncontrol_p.h
++++ b/applets/weather/ioncontrol_p.h
+@@ -107,5 +107,7 @@ private:
+ 
+     bool m_isBusy = false;
+ 
++    bool m_qNetworkInformationHasBackend = true;
++
+     QString m_ionName;
+ };
