@@ -1,0 +1,49 @@
+From 3293647e8f09fdfb1a294eb4a1aa0f855165a2a1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Mangano?= <fmang@mg0.fr>
+Date: Fri, 1 Nov 2024 10:20:49 +0900
+Subject: [PATCH] Wrap fclose to avoid compiler warnings
+
+---
+ src/opustags.h | 7 +++++--
+ src/system.cc  | 5 +++++
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/src/opustags.h b/src/opustags.h
+index 93c323b..320aa23 100644
+--- a/src/opustags.h
++++ b/src/opustags.h
+@@ -119,13 +119,16 @@ using byte_string_view = std::basic_string_view<uint8_t>;
+  * \{
+  */
+ 
++/** fclose wrapper for std::unique_ptr’s deleter. */
++void close_file(FILE*);
++
+ /**
+  * Smart auto-closing FILE* handle.
+  *
+  * It implictly converts from an already opened FILE*.
+  */
+-struct file : std::unique_ptr<FILE, decltype(&fclose)> {
+-	file(FILE* f = nullptr) : std::unique_ptr<FILE, decltype(&fclose)>(f, &fclose) {}
++struct file : std::unique_ptr<FILE, decltype(&close_file)> {
++	file(FILE* f = nullptr) : std::unique_ptr<FILE, decltype(&close_file)>(f, &close_file) {}
+ };
+ 
+ /**
+diff --git a/src/system.cc b/src/system.cc
+index a93acd3..b04cb9e 100644
+--- a/src/system.cc
++++ b/src/system.cc
+@@ -29,6 +29,11 @@ ot::byte_string_view operator""_bsv(const char* data, size_t size)
+ 	return ot::byte_string_view(reinterpret_cast<const uint8_t*>(data), size);
+ }
+ 
++void ot::close_file(FILE* file)
++{
++	fclose(file);
++}
++
+ void ot::partial_file::open(const char* destination)
+ {
+ 	final_name = destination;
