@@ -141,14 +141,12 @@ diff --git a/src/java.base/unix/native/libjava/TimeZone_md.c b/src/java.base/uni
 index eaf00fa1027..0e68b57b0b5 100644
 --- a/src/java.base/unix/native/libjava/TimeZone_md.c
 +++ b/src/java.base/unix/native/libjava/TimeZone_md.c
-@@ -61,9 +61,9 @@ static char *isFileIdentical(char* buf, size_t size, char *pathname);
- #endif
+@@ -46,8 +46,8 @@
+ #define fileclose       fclose
  
  #if defined(__linux__) || defined(_ALLBSD_SOURCE)
--static const char *ETC_TIMEZONE_FILE = "/etc/timezone";
 -static const char *ZONEINFO_DIR = "/usr/share/zoneinfo";
 -static const char *DEFAULT_ZONEINFO_FILE = "/etc/localtime";
-+static const char *ETC_TIMEZONE_FILE = "@TERMUX_PREFIX@/etc/timezone";
 +static const char *ZONEINFO_DIR = "@TERMUX_PREFIX@/share/zoneinfo";
 +static const char *DEFAULT_ZONEINFO_FILE = "@TERMUX_PREFIX@/etc/localtime";
  #else

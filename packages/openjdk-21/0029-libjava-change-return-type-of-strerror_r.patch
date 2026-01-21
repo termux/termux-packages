@@ -28,20 +28,21 @@ diff --git a/src/java.base/unix/native/libjava/ProcessImpl_md.c b/src/java.base/
 index e41fd8f9b2b..922ce0c3187 100644
 --- a/src/java.base/unix/native/libjava/ProcessImpl_md.c
 +++ b/src/java.base/unix/native/libjava/ProcessImpl_md.c
-@@ -329,10 +329,9 @@ throwIOException(JNIEnv *env, int errnum, const char *defaultDetail)
-     char tmpbuf[1024];
+@@ -340,12 +340,8 @@ throwIOExceptionImpl(JNIEnv *env, int errnum, const char *externalDetail, const
      jstring s;
  
--    if (errnum != 0) {
+     if (errnum != 0) {
 -        int ret = getErrorString(errnum, tmpbuf, sizeof(tmpbuf));
--        if (ret != EINVAL)
--            detail = tmpbuf;
-+    if (errnum != EINVAL) {
+-        if (ret != EINVAL) {
+-            errorDetail = tmpbuf;
+-        } else {
+-            errorDetail = "unknown";
+-        }
 +        getErrorString(errnum, tmpbuf, sizeof(tmpbuf));
-+        detail = tmpbuf;
++        errorDetail = tmpbuf;
+     } else {
+         errorDetail = "none";
      }
-     /* ASCII Decimal representation uses 2.4 times as many bits as binary. */
-     fmtsize = sizeof(IOE_FORMAT) + strlen(detail) + 3 * sizeof(errnum);
 diff --git a/src/java.base/unix/native/libjava/jni_util_md.c b/src/java.base/unix/native/libjava/jni_util_md.c
 index 06d5501a807..a494ccc3c38 100644
 --- a/src/java.base/unix/native/libjava/jni_util_md.c
