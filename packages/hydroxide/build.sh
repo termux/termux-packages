@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/emersion/hydroxide
 TERMUX_PKG_DESCRIPTION="A third-party, open-source ProtonMail CardDAV, IMAP and SMTP bridge"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.2.30"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="0.2.31"
 TERMUX_PKG_SRCURL=https://github.com/emersion/hydroxide/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=752c88bdedd1d35a66f7dccb37ba7a392469f6570788d4ef70ecf7ca87a6bbd2
+TERMUX_PKG_SHA256=b4948ba32a3bebca1857b78aabd356a261d1f34b72ab0b36b11e2ce03a748184
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
