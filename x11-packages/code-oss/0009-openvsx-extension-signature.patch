@@ -3,20 +3,20 @@ https://github.com/termux/termux-packages/issues/24739
 
 --- a/package.json
 +++ b/package.json
-@@ -107,6 +107,7 @@
-     "native-is-elevated": "0.7.0",
+@@ -108,6 +108,7 @@
+     "native-is-elevated": "0.8.0",
      "native-keymap": "file:./node-native-keymap-src",
      "native-watchdog": "^1.4.1",
 +    "node-ovsx-sign": "^1.2.0",
-     "node-pty": "1.1.0-beta35",
+     "node-pty": "^1.1.0-beta43",
      "open": "^10.1.2",
-     "tas-client-umd": "0.2.0",
+     "tas-client": "0.3.1",
 --- a/src/vs/platform/extensionManagement/node/extensionSignatureVerificationService.ts
 +++ b/src/vs/platform/extensionManagement/node/extensionSignatureVerificationService.ts
 @@ -35,7 +35,7 @@
  }
  
- declare module vsceSign {
+ declare namespace vsceSign {
 -	export function verify(vsixFilePath: string, signatureArchiveFilePath: string, verbose: boolean): Promise<ExtensionSignatureVerificationResult>;
 +	export function verify(vsixFilePath: string, signatureArchiveFilePath: string, verbose: boolean): Promise<boolean>;
  }
