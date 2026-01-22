@@ -1,0 +1,13 @@
+--- a/src/kcrash.cpp
++++ b/src/kcrash.cpp
+@@ -762,10 +762,6 @@ static pid_t startDirectly(const char *argv[])
+         fprintf(stderr, "KCrash failed to fork(), errno = %d\n", errno);
+         return 0;
+     case 0:
+-        setgroups(0, nullptr); // Remove any extraneous groups
+-        if (setgid(getgid()) < 0 || setuid(getuid()) < 0) {
+-            _exit(253); // This cannot happen. Theoretically.
+-        }
+ #ifndef Q_OS_OSX
+         closeAllFDs(); // We are in the child now. Close FDs unconditionally.
+ #endif
