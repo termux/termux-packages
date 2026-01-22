@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/microsoft/vscode
 TERMUX_PKG_DESCRIPTION="Visual Studio Code - OSS"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION="1.107.1"
+TERMUX_PKG_VERSION="1.108.1"
 TERMUX_PKG_SRCURL=git+https://github.com/microsoft/vscode
 TERMUX_PKG_GIT_BRANCH="$TERMUX_PKG_VERSION"
 TERMUX_PKG_DEPENDS="electron-for-code-oss, libx11, libxkbfile, libsecret, ripgrep"
@@ -58,9 +58,6 @@ termux_step_post_get_source() {
 
 	# Replace package.json
 	jq ".dependencies.\"native-keymap\" = \"file:./node-native-keymap-src\"" package.json > package.json.tmp && mv package.json.tmp package.json
-
-	# Remove `--max-old-space-size=8192` from package.json
-	sed -i "s/--max-old-space-size=8192 / /g" package.json
 }
 
 termux_step_host_build() {
