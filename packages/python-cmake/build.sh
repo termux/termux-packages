@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Python wrapper for CMake"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.2.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/scikit-build/cmake-python-distributions/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=6d563b85888e26789d1dbf0ecf1df142cabe6bf4bac9d134cadc0e638a3f2638
 TERMUX_PKG_DEPENDS="cmake, cmake-curses-gui, python, python-pip"
