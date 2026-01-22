@@ -6,7 +6,7 @@ _MAJOR_VERSION=17
 _MINOR_VERSION=2
 _MICRO_VERSION=14
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}.${_MICRO_VERSION}
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_SRCURL=git+https://github.com/frida/frida
 TERMUX_PKG_AUTO_UPDATE=false
@@ -43,6 +43,12 @@ termux_step_host_build() {
 termux_step_pre_configure() {
 	termux_setup_meson
 	termux_setup_nodejs
+	# This is needed specifically as frida looks for same version of python on the host
+	# We are specifically not using crossenv as it could cause other unwanted troubles which we would like to keep away from
+	termux_setup_build_python
+	python3 -m venv .venv
+	export PATH="$PWD/.venv/bin:$PATH"
+	pip install 'setuptools==80.9.0' 'wheel==0.46.1'
 	export PATH="$TERMUX_PKG_HOSTBUILD_DIR":"$PATH"
 	export ANDROID_NDK_ROOT="${NDK}"
 
@@ -146,11 +152,6 @@ termux_step_post_configure() {
 }
 
 termux_step_post_make_install () {
-	# Fixup installation location..
-	rm -rf "$TERMUX_PREFIX"/lib/python"${TERMUX_PYTHON_VERSION}"/site-packages/frida*
-	mv "$TERMUX_PREFIX"/lib/python3/dist-packages/frida* \
-		"$TERMUX_PREFIX"/lib/python"${TERMUX_PYTHON_VERSION}"/site-packages/
-
 	# Setup termux-services scripts
 	mkdir -p $TERMUX_PREFIX/var/service/frida-server/log
 	{
