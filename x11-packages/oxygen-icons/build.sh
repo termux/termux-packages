@@ -1,0 +1,14 @@
+TERMUX_PKG_HOMEPAGE="https://invent.kde.org/frameworks/oxygen-icons"
+TERMUX_PKG_DESCRIPTION="The Oxygen Icon Theme"
+TERMUX_PKG_LICENSE="LGPL-2.1-or-later"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="6.1.0"
+TERMUX_PKG_SRCURL="https://download.kde.org/stable/oxygen-icons/oxygen-icons-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SHA256="16ca971079c5067c4507cabf1b619dc87dd6b326fd5c2dd9f5d43810f2174d68"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libc++"
+TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, qt6-qttools"
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_SYSTEM_NAME=Linux
+"
