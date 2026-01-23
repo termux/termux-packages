@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Python library for calculating contours in 2D quadrilate
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.3.3"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=git+https://github.com/contourpy/contourpy
 TERMUX_PKG_DEPENDS="python, python-numpy, python-pip"
 TERMUX_PKG_BUILD_DEPENDS="pybind11"
@@ -37,6 +37,6 @@ termux_step_make() {
 
 termux_step_make_install() {
 	local _pyv="${TERMUX_PYTHON_VERSION/./}"
-	local _whl="contourpy-$TERMUX_PKG_VERSION-cp$_pyv-cp$_pyv-linux_$TERMUX_ARCH.whl"
+	local _whl="contourpy-$TERMUX_PKG_VERSION-cp$_pyv-cp$_pyv-android_$TERMUX_ARCH.whl"
 	pip install --force-reinstall --no-deps --prefix=$TERMUX_PREFIX $TERMUX_PKG_SRCDIR/dist/$_whl
 }
