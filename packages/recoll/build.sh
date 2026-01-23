@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.43.13"
 TERMUX_PKG_SRCURL="https://www.recoll.org/recoll-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=140bf1e4fc51299f60dad580dffd64733e1d06fb14c6f752e2a34d4d70540c19
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="aspell, file, jsoncpp,  libc++, libiconv, libxapian, libxml2, libxslt, zlib"
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel"
