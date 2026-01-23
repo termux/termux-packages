@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="BamfView" get-type="bamf_view_get_type" parents="GInitiallyUnowned,GObject">
+    <property name="path" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="starting" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="running" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="active" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="user-visible" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="urgent" type="gboolean" flags="1" default-value="FALSE"/>
+    <signal name="active-changed" return="void" when="first">
+      <param type="gboolean"/>
+    </signal>
+    <signal name="closed" return="void" when="last">
+    </signal>
+    <signal name="child-added" return="void" when="first">
+      <param type="BamfView"/>
+    </signal>
+    <signal name="child-removed" return="void" when="first">
+      <param type="BamfView"/>
+    </signal>
+    <signal name="child-moved" return="void" when="first">
+      <param type="BamfView"/>
+    </signal>
+    <signal name="starting-changed" return="void" when="first">
+      <param type="gboolean"/>
+    </signal>
+    <signal name="running-changed" return="void" when="first">
+      <param type="gboolean"/>
+    </signal>
+    <signal name="urgent-changed" return="void" when="first">
+      <param type="gboolean"/>
+    </signal>
+    <signal name="user-visible-changed" return="void" when="first">
+      <param type="gboolean"/>
+    </signal>
+    <signal name="name-changed" return="void">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="icon-changed" return="void">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="BamfWindow" get-type="bamf_window_get_type" parents="BamfView,GInitiallyUnowned,GObject">
+    <signal name="monitor-changed" return="void" when="first">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="maximized-changed" return="void" when="first">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+  </class>
+  <class name="BamfApplication" get-type="bamf_application_get_type" parents="BamfView,GInitiallyUnowned,GObject">
+    <signal name="desktop-file-updated" return="void">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="window-added" return="void">
+      <param type="BamfWindow"/>
+    </signal>
+    <signal name="window-removed" return="void">
+      <param type="BamfWindow"/>
+    </signal>
+  </class>
+  <class name="BamfControl" get-type="bamf_control_get_type" parents="GObject">
+  </class>
+  <class name="BamfMatcher" get-type="bamf_matcher_get_type" parents="GObject">
+    <signal name="view-opened" return="void">
+      <param type="BamfView"/>
+    </signal>
+    <signal name="view-closed" return="void">
+      <param type="BamfView"/>
+    </signal>
+    <signal name="active-application-changed" return="void">
+      <param type="BamfApplication"/>
+      <param type="BamfApplication"/>
+    </signal>
+    <signal name="active-window-changed" return="void">
+      <param type="BamfWindow"/>
+      <param type="BamfWindow"/>
+    </signal>
+    <signal name="stacking-order-changed" return="void">
+    </signal>
+  </class>
+  <class name="BamfTab" get-type="bamf_tab_get_type" parents="BamfView,GInitiallyUnowned,GObject">
+    <property name="location" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="desktop-id" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="xid" type="guint64" flags="1" default-value="0"/>
+    <property name="is-foreground-tab" type="gboolean" flags="1" default-value="FALSE"/>
+  </class>
+</dump>
