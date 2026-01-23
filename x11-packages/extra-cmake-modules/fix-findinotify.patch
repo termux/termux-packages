@@ -1,0 +1,16 @@
+Fixes FindInotify.cmake for Android
+which fixes kf6-baloo's detection of inotify
+which causes kf6-baloo to generate a 'tags.so'
+which fixes the error "Unknown protocol: tags" when right clicking on any file
+in Dolphin file manager.
+
+--- a/find-modules/FindInotify.cmake
++++ b/find-modules/FindInotify.cmake
+@@ -37,6 +37,7 @@ cmake_policy(VERSION 3.16)
+ unset(Inotify_INCLUDE_DIRS CACHE)
+ find_path(Inotify_INCLUDE_DIRS sys/inotify.h PATHS /usr/include NO_DEFAULT_PATH)
+ find_path(Inotify_INCLUDE_DIRS sys/inotify.h)
++set(Inotify_INCLUDE_DIRS "UNUSED TEMPORARY STRING")
+ 
+ if(Inotify_INCLUDE_DIRS)
+     # On OSes with a kernel implementation, there is no library to link against.
