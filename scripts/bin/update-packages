@@ -86,7 +86,9 @@ TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'del(.pkg_format) | keys | .[]' "$
 # Converts milliseconds to human-readable format.
 # Example: `ms_to_human_readable 123456789` => 34h 17m 36s 789ms
 ms_to_human_readable() {
-	echo "$(($1/3600000))h $(($1%3600000/60000))m $(($1%60000/1000))s $(($1%1000))ms" | sed 's/0h //;s/0m //;s/0s //'
+	local t="$1" hrs=0 mins=0 secs=0 ms=0
+	(( ms = t%1000, t /= 1000, secs = t%60, t /= 60, mins = t%60, hrs = t/60 ))
+	echo "${hrs}h ${mins}m ${secs}s ${ms}ms" | sed 's/0h //;s/0m //;s/0s //'
 }
 
 # Runs a command without displaying its output in the case if trace is disabled and displays output in the case if it is enabled.
@@ -511,14 +513,23 @@ rm "$IPC_FIFO" "$TERMUX_REPOLOGY_DATA_FILE"
 
 #################################################REPORT CHANGES##################################################
 
+total="${#_ALREADY_SEEN[*]}"
+direct="$#"
+indirect="$(( total - direct ))"
+
 echo ""
-echo "INFO: Checked $# packages - took $(ms_to_human_readable $(( $(date +%10s%3N) - _start_time ))) in total."
+echo "SUMMARY: Checked ${total} packages - took $(ms_to_human_readable $(( $(date +%10s%3N) - _start_time ))) in total."
+echo "SUMMARY: ${direct} (Directly passed), ${indirect} (Dependencies)"
+echo ""
+echo "=================================================="
+echo ""
+echo "SUMMARY: Detected updates"
 printf '%s\n' "${_ALREADY_SEEN[@]}" | grep -ve '^$' | sort
 echo ""
-echo "INFO: ${#_FAILED_UPDATES[*]} failed updates."
+echo "SUMMARY: ${#_FAILED_UPDATES[*]} failed updates."
 echo "${!_FAILED_UPDATES[@]}"
 
-unset IPC_FIFO IPC_FIFO_FD _unix_millis _start_time _pkg
+unset IPC_FIFO IPC_FIFO_FD _unix_millis _start_time _pkg total direct indirect
 
 ################################################FAILURE HANDLING#################################################
 
