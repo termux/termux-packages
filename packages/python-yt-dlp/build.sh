@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A youtube-dl fork with additional features and fixes"
 TERMUX_PKG_LICENSE="Unlicense"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="2026.02.04"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/yt-dlp/yt-dlp/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=dc846a0c10b7c44c3cc10533bd2c453c9c467f7732dc12ea04f3e606c900572a
 TERMUX_PKG_DEPENDS="libc++, libexpat, openssl, python, python-brotli, python-pip, python-pycryptodomex"
