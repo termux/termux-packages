@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A framework for searching and managing metadata"
 TERMUX_PKG_LICENSE="LGPL-2.0-only, LGPL-3.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.22.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/baloo-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=57b2ac1ae953d499b7364125fe3e7aa5857fb532456ecf0bda2635e875a66d2a
 TERMUX_PKG_AUTO_UPDATE=true
