@@ -20,6 +20,8 @@ export TERMUX_PKG_AUTO_UPDATE=false            # Whether to auto-update or not. 
 export TERMUX_PKG_UPDATE_VERSION_REGEXP=""     # Regexp to extract version with `grep -oP`.
 export TERMUX_PKG_UPDATE_VERSION_SED_REGEXP="" # Regexp to extract version with `sed`.
 export TERMUX_REPOLOGY_DATA_FILE
+# Clean up any old repology data files
+rm "${TMPDIR:-/tmp}/termux-repology".* &> /dev/null
 TERMUX_REPOLOGY_DATA_FILE="$(mktemp -t termux-repology.XXXXXX)" # File to store repology data.
 
 export TERMUX_SCRIPTDIR
@@ -123,7 +125,10 @@ _update() {
 
 	echo # Newline.
 	echo "INFO: Updating ${TERMUX_PKG_NAME} [Current version: ${TERMUX_PKG_VERSION}]"
-	termux_pkg_auto_update
+	# Throw FD 3 into the FIFO for reporting
+	exec {IPC_FIFO_FD}<>"$IPC_FIFO"
+	termux_pkg_auto_update 3>& "${IPC_FIFO_FD}"
+	exec {IPC_FIFO_FD}>&-
 }
 
 declare -A _LATEST_TAGS=()
@@ -295,14 +300,40 @@ _check_updated() {
 	)
 }
 
+declare -A _CACHED_ISSUES=()
+# Check if an issue with same title already exists and is open.
+_gh_check_issue_exists() {
+	local pkg_name="$1" number title
+	if [[ -z "${_CACHED_ISSUE_TITLES[*]}" ]]; then
+		while read -r number title; do
+			_CACHED_ISSUES["$number"]="'${title}'" # An extra quote ('') is added to avoid false positive matches.
+		done < <(
+			gh issue list \
+				--limit 10000 \
+				--label "auto update failing" --label "bot" \
+				--state open \
+				--search "Auto update failing for in:title type:issue" \
+				--json number,title | jq -r '.[] | "\(.number) \(.title)"' | sort | uniq
+		)
+	fi
+
+	for number in "${!_CACHED_ISSUES[@]}"; do
+		# shellcheck disable=SC2076 # We want literal match here, not regex based.
+		if [[ "${_CACHED_ISSUES[$number]}" =~ "'Auto update failing for ${pkg_name}'" ]]; then
+				echo "$number"
+				return 0
+		fi
+	done
+	return 1
+}
+
 _run_update() {
 	# PS4='+$0 \[\e[32m\]${FUNCNAME[0]:-<global scope>}${FUNCNAME[*]:+()}:$LINENO\[\e[0m\] '
 	# set -x
 	local pkg_dir="$1" pkg_name
 	pkg_name="$(basename "${pkg_dir}")"
 	# Run each package update in separate process since we include their environment variables.
-	local output="" _CURRENT_VERSION _NEWEST_VERSION
-	: > "$LATEST_VERSION_TEMP_FILE" # flush the sidechannel
+	local output="" _CURRENT_VERSION _NEWEST_VERSION _ISSUE
 	# shellcheck disable=SC1091 # Ignore shellcheck's inability to follow the source
 	_CURRENT_VERSION="$(set +eu; . "$(realpath "$pkg_dir")/build.sh"; echo "${TERMUX_PKG_VERSION#*:}")"
 
@@ -313,41 +344,31 @@ _run_update() {
 		exec > >(tee /dev/fd/2) 2>&1 # output everything on stderr to stdout as well.
 		_update "${pkg_dir}"
 	)"; then
-		_NEWEST_VERSION="$(< "$LATEST_VERSION_TEMP_FILE")"
-		: "${_NEWEST_VERSION:="$_CURRENT_VERSION"}"
-		if dpkg --compare-versions "${_CURRENT_VERSION}" lt "${_NEWEST_VERSION}"; then
-			_ALREADY_SEEN["$pkg_name"]="${pkg_name} ${_CURRENT_VERSION} => ${_NEWEST_VERSION}"
-		elif dpkg --compare-versions "${_CURRENT_VERSION}" gt "${_NEWEST_VERSION}"; then
-			_ALREADY_SEEN["$pkg_name"]="${pkg_name} ${_CURRENT_VERSION} => ${_NEWEST_VERSION} (Error? current version is larger than latest fetched version)"
+		# For whatever reason reads from the FIFO are not instant even if there is data.
+		# So put a 1ms timeout on it that way it doesn't wait infinitely if there's nothing in the FIFO,
+		# since it only receives new data if `termux_pkg_upgrade_version()` ran.
+		read -rt0.001 _NEWEST_VERSION < "$IPC_FIFO"
+		# If we didn't get a version back treat it as current.
+		# This mainly happens when Repology doesn't report a newer version for a package.
+		# Which is returned as `null` in the API response, and which we treat as a skip.
+		# See: scripts/updates/internal/termux_repology_auto_update.sh
+		: "${_NEWEST_VERSION:="${_CURRENT_VERSION}"}"
+
+		# Check associated issues if able.
+		if [[ -n "$GITHUB_TOKEN" ]] && command -v gh &> /dev/null; then
+			_ISSUE="$(_gh_check_issue_exists "${pkg_name}")"
+		fi
+
+		if termux_pkg_is_update_needed "${_CURRENT_VERSION}" "${_NEWEST_VERSION}"; then
+			_ALREADY_SEEN["$pkg_name"]="${pkg_name} ${_CURRENT_VERSION} => ${_NEWEST_VERSION}${_ISSUE:+" - Open issue: #${_ISSUE}"}"
+		elif termux_pkg_is_update_needed "${_NEWEST_VERSION}" "${_CURRENT_VERSION}"; then
+			_ALREADY_SEEN["$pkg_name"]="${pkg_name} ${_CURRENT_VERSION} => ${_NEWEST_VERSION}${_ISSUE:+" - Open issue: #${_ISSUE}"} (Error? current version is larger than latest fetched version)"
 		else
 			_ALREADY_SEEN["$pkg_name"]=""
 		fi
 	else
 		_FAILED_UPDATES["$pkg_name"]="${output}"
 	fi
-}
-
-declare -a _CACHED_ISSUE_TITLES=()
-# Check if an issue with same title already exists and is open.
-_gh_check_issue_exists() {
-	local pkg_name="$1"
-	if [[ -z "${_CACHED_ISSUE_TITLES[*]}" ]]; then
-		while read -r title; do
-			_CACHED_ISSUE_TITLES+=("'${title}'") # An extra quote ('') is added to avoid false positive matches.
-		done < <(
-			gh issue list \
-				--limit 10000 \
-				--label "auto update failing" --label "bot" \
-				--state open \
-				--search "Auto update failing for in:title type:issue" \
-				--json title | jq -r '.[] | .title' | sort | uniq
-		)
-	fi
-	# shellcheck disable=SC2076 # We want literal match here, not regex based.
-	if [[ "${_CACHED_ISSUE_TITLES[*]}" =~ "'Auto update failing for ${pkg_name}'" ]]; then
-		return 0
-	fi
-	return 1
 }
 
 _should_update() {
@@ -369,8 +390,10 @@ _should_update() {
 	if [[ " ${!_ALREADY_SEEN[*]} ${!_FAILED_UPDATES[*]} " =~ " $(basename "${pkg_dir}") " ]]; then
 		return 1 # Skip.
 	fi
-	if [[ "${BUILD_PACKAGES}${GITHUB_ACTIONS:-}" == "truetrue" ]] && _gh_check_issue_exists "$(basename "${pkg_dir}")"; then
-		echo "INFO: Skipping '$(basename "${pkg_dir}")', an update issue for it hasn't been resolved yet."
+
+	local _ISSUE
+	if [[ "${BUILD_PACKAGES}${GITHUB_ACTIONS:-}" == "truetrue" ]] && _ISSUE="$(_gh_check_issue_exists "${pkg_dir##*/}")"; then
+		echo "INFO: Skipping '${pkg_dir##*/}', an update issue (#${_ISSUE}) for it hasn't been resolved yet."
 		return 1
 	fi
 
@@ -399,10 +422,13 @@ _update_dependencies() {
 echo "INFO: Running update for: $*"
 
 _start_time="$(date +%10s%3N)"
-# Remove any left over temp files that may not have been cleaned up.
-rm "${TMPDIR:-/tmp}"/termux_ipc_*.fifo &> /dev/null
-# Set up a side channel for reporting parsed latest versions
-export LATEST_VERSION_TEMP_FILE="${TMPDIR:-/tmp}/termux_ipc_$$.fifo"
+
+# Remove any leftover FIFOs that may not have been cleaned up.
+rm "${TMPDIR:-/tmp}/termux_ipc_"*.fifo &> /dev/null
+# Set up a side channel FIFO for reporting parsed latest versions
+export IPC_FIFO="${TMPDIR:-/tmp}/termux_ipc_$$.fifo"
+mkfifo "$IPC_FIFO"
+exec {IPC_FIFO_FD}<>"$IPC_FIFO"
 
 if [[ "$1" == "@all" ]]; then
 	declare -a PACKAGE_LIST=()
@@ -442,8 +468,9 @@ for pkg_dir in "$@"; do
 	echo "termux - took $(ms_to_human_readable $(( $(date +%10s%3N) - _unix_millis )))"
 done
 
-# Remove temp file
-rm "${TMPDIR:-/tmp}"/termux_ipc_*.fifo
+exec {IPC_FIFO_FD}<&- # close the FIFO
+# Clean up our FIFO and repology data file
+rm "$IPC_FIFO" "$TERMUX_REPOLOGY_DATA_FILE"
 
 #################################################REPORT CHANGES##################################################
 
@@ -454,7 +481,7 @@ echo ""
 echo "INFO: ${#_FAILED_UPDATES[*]} failed updates."
 echo "${!_FAILED_UPDATES[@]}"
 
-unset LATEST_VERSION_TEMP_FILE _unix_millis _start_time _pkg
+unset IPC_FIFO IPC_FIFO_FD _unix_millis _start_time _pkg
 
 ################################################FAILURE HANDLING#################################################
 

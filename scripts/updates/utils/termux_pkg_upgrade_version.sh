@@ -19,8 +19,7 @@ termux_pkg_upgrade_version() {
 	if [[ "$#" -lt 1 ]]; then
 		termux_error_exit <<-EndUsage
 			Usage: ${FUNCNAME[0]} LATEST_VERSION [--skip-version-check]
-			Also reports the fully parsed LATEST_VERSION
-			to \$LATEST_VERSION_TEMP_FILE if provided.
+			Also reports the fully parsed LATEST_VERSION on file descriptor 3
 		EndUsage
 	fi
 
@@ -47,9 +46,6 @@ termux_pkg_upgrade_version() {
 			EndOfError
 		fi
 		unset OLD_LATEST_VERSION
-	else # Otherwise remove any leading non-digits as that would not be a valid version.
-		# shellcheck disable=SC2001 # This is something parameter expansion can't handle well, so we use sed.
-		LATEST_VERSION="$(sed -e "s/^[^0-9]*//" <<< "$LATEST_VERSION")"
 	fi
 
 	# If needed, filter version numbers using sed regexp.
@@ -66,6 +62,10 @@ termux_pkg_upgrade_version() {
 		unset OLD_LATEST_VERSION
 	fi
 
+	# Remove any leading non-digits as that would not be a valid version.
+	# shellcheck disable=SC2001 # This is something parameter expansion can't handle well, so we use sed.
+	LATEST_VERSION="$(sed -e "s/^[^0-9]*//" <<< "$LATEST_VERSION")"
+
 	# Translate "_" into ".": some packages use underscores to separate
 	# version numbers, but we require them to be separated by dots.
 	LATEST_VERSION="${LATEST_VERSION//_/.}"
@@ -76,9 +76,10 @@ termux_pkg_upgrade_version() {
 		LATEST_VERSION="$(sed -E "s/[-.]?(${suffix}[0-9]*)/~\1/ig" <<< "$LATEST_VERSION")"
 	done
 
-	# Report back the fully parsed $LATEST_VERSION for the summary.
-	# Or discard it straight into /dev/null if no tempfile was provided.
-	echo "$LATEST_VERSION" > "${LATEST_VERSION_TEMP_FILE:-/dev/null}"
+	# If FD 3 is open, use it for reporting the fully parsed $LATEST_VERSION
+	# If it's not open use the brace group to be able to
+	# discard the `3: Bad file descriptor` error silently.
+	{ echo "$LATEST_VERSION" >&3; } 2> /dev/null
 
 	if [[ "${SKIP_VERSION_CHECK}" != "--skip-version-check" ]]; then
 		if ! termux_pkg_is_update_needed \
