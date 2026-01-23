@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE="https://github.com/charliermarsh/ruff"
 TERMUX_PKG_DESCRIPTION="An extremely fast Python linter, written in Rust"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.14.10"
+TERMUX_PKG_VERSION="0.14.11"
 TERMUX_PKG_SRCURL="https://github.com/charliermarsh/ruff/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=9294a2ff12994e710aa01fe37d22159b4d6d45ed309af7a9d10e71ca7313e0b8
+TERMUX_PKG_SHA256=391386261e2dbc62877fb3c8c37a5d36dca6f6d1b34e2a96d5fe9fa2bd4ab5dd
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="maturin"
@@ -21,6 +21,8 @@ termux_step_pre_configure() {
 
 	local env_host="$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)"
 	export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$TERMUX_PKG_BUILDDIR/_lib/libctermid.a"
+
+	export ANDROID_API_LEVEL="$TERMUX_PKG_API_LEVEL"
 }
 
 termux_step_make() {
@@ -35,16 +37,22 @@ termux_step_make_install() {
 
 	# ERROR: ruff-0.11.9-py3-none-linux_armv7l.whl is not a supported wheel on this platform.
 	# seems to be resolved by renaming the .whl file in this way
-	if [[ "${TERMUX_ARCH}" == "arm" ]]; then
-		local _whl_arch="armv7l"
-	else
-		local _whl_arch="$TERMUX_ARCH"
-	fi
-	local _whl="ruff-$TERMUX_PKG_VERSION-py3-none-linux_$_whl_arch.whl"
-	if [[ "${TERMUX_ARCH}" == "arm" ]]; then
-		local _dest_whl="ruff-$TERMUX_PKG_VERSION-py3-none-linux_$TERMUX_ARCH.whl"
-		mv "target/wheels/$_whl" "target/wheels/$_dest_whl"
-		_whl="$_dest_whl"
-	fi
-	pip install --no-deps --prefix=$TERMUX_PREFIX --force-reinstall "target/wheels/$_whl"
+	local _pyver="${TERMUX_PYTHON_VERSION/./}"
+	local _tag="py3-none"
+
+	local wheel_arch
+	case "$TERMUX_ARCH" in
+		aarch64) wheel_arch=arm64_v8a ;;
+		arm)     wheel_arch=armeabi_v7a ;;
+		x86_64)  wheel_arch=x86_64 ;;
+		i686)    wheel_arch=x86 ;;
+		*)
+			echo "ERROR: Unknown architecture: $TERMUX_ARCH"
+			return 1 ;;
+	esac
+
+	mv "target/wheels/ruff-${TERMUX_PKG_VERSION}-${_tag}-android_${TERMUX_PKG_API_LEVEL}_${wheel_arch}.whl" \
+		"target/wheels/ruff-${TERMUX_PKG_VERSION}-py${_pyver}-none-any.whl"
+
+	pip install --no-deps --prefix="$TERMUX_PREFIX" --force-reinstall target/wheels/*.whl
 }
