@@ -1,0 +1,19 @@
+--- a/meson.build
++++ b/meson.build
+@@ -262,16 +262,6 @@ run_env = environment()
+ run_env.set('GSETTINGS_SCHEMA_DIR', meson.current_build_dir() / 'data')
+ run_env.set('PLANK_DOCKLET_DIRS', meson.current_build_dir() / 'docklets')
+ 
+-run_target(
+-  'run',
+-  command: [plank_bin, '-v'],
+-  env: run_env,
+-  depends: [
+-    plank_bin,
+-    plank_gschema_compile,
+-  ],
+-)
+-
+ gdb = find_program('gdb', required: false)
+ if gdb.found()
+   run_target(
