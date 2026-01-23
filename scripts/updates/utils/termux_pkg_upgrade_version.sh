@@ -16,7 +16,7 @@ _termux_should_cleanup() {
 }
 
 termux_pkg_upgrade_version() {
-	if [[ "$#" -lt 1 ]]; then
+	if (( $# < 1 )); then
 		termux_error_exit <<-EndUsage
 			Usage: ${FUNCNAME[0]} LATEST_VERSION [--skip-version-check]
 			Also reports the fully parsed LATEST_VERSION on file descriptor 3
@@ -37,29 +37,29 @@ termux_pkg_upgrade_version() {
 	# If needed, filter version numbers using grep regexp.
 	if [[ -n "${TERMUX_PKG_UPDATE_VERSION_REGEXP:-}" ]]; then
 		# Extract version numbers.
-		local OLD_LATEST_VERSION="${LATEST_VERSION}"
-		LATEST_VERSION="$(grep --max-count=1 -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<< "${LATEST_VERSION}" || true)"
+		local ORIGINAL_LATEST_VERSION="${LATEST_VERSION}"
+		LATEST_VERSION="$(grep --max-count=1 -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<< "${LATEST_VERSION}" || :)"
 		if [[ -z "${LATEST_VERSION:-}" ]]; then
 			termux_error_exit <<-EndOfError
-				ERROR: failed to filter version numbers using regexp '${TERMUX_PKG_UPDATE_VERSION_REGEXP}'.
-				Ensure that it works correctly with ${OLD_LATEST_VERSION}.
+				ERROR: Failed to filter version numbers for '${TERMUX_PKG_NAME}'.
+				Ensure that '${TERMUX_PKG_UPDATE_VERSION_REGEXP}' works correctly to match '${ORIGINAL_LATEST_VERSION}'.
 			EndOfError
 		fi
-		unset OLD_LATEST_VERSION
+		unset ORIGINAL_LATEST_VERSION
 	fi
 
 	# If needed, filter version numbers using sed regexp.
 	if [[ -n "${TERMUX_PKG_UPDATE_VERSION_SED_REGEXP:-}" ]]; then
 		# Extract version numbers.
-		local OLD_LATEST_VERSION="${LATEST_VERSION}"
-		LATEST_VERSION="$(sed -E "${TERMUX_PKG_UPDATE_VERSION_SED_REGEXP}" <<< "${LATEST_VERSION}" || true)"
+		local ORIGINAL_LATEST_VERSION="${LATEST_VERSION}"
+		LATEST_VERSION="$(sed -E "${TERMUX_PKG_UPDATE_VERSION_SED_REGEXP}" <<< "${LATEST_VERSION}" || :)"
 		if [[ -z "${LATEST_VERSION:-}" ]]; then
 			termux_error_exit <<-EndOfError
-				ERROR: failed to filter version numbers using regexp '${TERMUX_PKG_UPDATE_VERSION_SED_REGEXP}'.
-				Ensure that it works correctly with ${OLD_LATEST_VERSION}.
+				ERROR: Failed to filter version numbers for '${TERMUX_PKG_NAME}'.
+				Ensure that '${TERMUX_PKG_UPDATE_VERSION_SED_REGEXP}' works correctly to match '${ORIGINAL_LATEST_VERSION}'.
 			EndOfError
 		fi
-		unset OLD_LATEST_VERSION
+		unset ORIGINAL_LATEST_VERSION
 	fi
 
 	# Remove any leading non-digits as that would not be a valid version.
@@ -118,8 +118,8 @@ termux_pkg_upgrade_version() {
 
 	for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
 		_buildsh_path="${TERMUX_SCRIPTDIR}/${repo_path}/${TERMUX_PKG_NAME}/build.sh"
-		repo=$(jq --raw-output ".\"${repo_path}\".name" "${TERMUX_SCRIPTDIR}/repo.json")
-		repo=${repo#"termux-"}
+		repo="$(jq --raw-output ".\"${repo_path}\".name" "${TERMUX_SCRIPTDIR}/repo.json")"
+		repo="${repo#"termux-"}"
 
 		if [[ -f "${_buildsh_path}" ]]; then
 			echo "INFO: Package ${TERMUX_PKG_NAME} exists in ${repo} repo."
@@ -128,8 +128,7 @@ termux_pkg_upgrade_version() {
 		fi
 	done
 
-	local force_cleanup="false"
-
+	# check cleanup conditions
 	local big_package=false
 	while IFS= read -r p; do
 		if [[ "${p}" == "${TERMUX_PKG_NAME}" ]]; then
