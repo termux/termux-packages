@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="TensorFlow Lite Python bindings"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.20.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=git+https://github.com/tensorflow/tensorflow
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="python, python-numpy, python-pip"
@@ -81,6 +81,6 @@ termux_step_make() {
 
 termux_step_make_install() {
 	local _pyver="${TERMUX_PYTHON_VERSION//./}"
-	local _wheel="tflite_runtime-${TERMUX_PKG_VERSION}-cp${_pyver}-cp${_pyver}-linux_${TERMUX_ARCH}.whl"
+	local _wheel="tflite_runtime-${TERMUX_PKG_VERSION}-cp${_pyver}-cp${_pyver}-android_${TERMUX_ARCH}.whl"
 	pip install --force-reinstall --no-deps --prefix="$TERMUX_PREFIX" "$TFLITE_BUILD_DIR/dist/${_wheel}"
 }
