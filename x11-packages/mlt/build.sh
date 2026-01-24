@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Multimedia Framework. Author, manage, and run multitrack
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_VERSION="7.36.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/mltframework/mlt/releases/download/v${TERMUX_PKG_VERSION}/mlt-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=0d2b956864ba2ff58bb4e2b2779aa36870bd2a3a835e2dbfda33faa5fc6f4d3a
 TERMUX_PKG_DEPENDS="alsa-lib, ffmpeg, fftw, fontconfig, frei0r-plugins, gdk-pixbuf, glib, jack, movit, libebur128, libepoxy, libexif, libsamplerate, libvidstab, libvorbis, libx11, libxml2, qt6-qt5compat, qt6-qtbase, qt6-qtsvg, opengl, pango, python, rubberband, sdl, sdl2 | sdl2-compat, sox, zlib"
@@ -19,6 +20,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
+	termux_setup_python_pip
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 		-DCMAKE_CXX_COMPILER_CLANG_SCAN_DEPS=${TERMUX_STANDALONE_TOOLCHAIN}/bin/clang-scan-deps
 	"
