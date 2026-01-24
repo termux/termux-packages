@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=0.5.3
 _MINOR_VERSION=20230121
-TERMUX_PKG_VERSION="0.5.5"
+TERMUX_PKG_VERSION="0.5.6"
 # The upstream w3m project is dead, but every linux distribution uses
 # this maintained fork in debian:
 TERMUX_PKG_SRCURL=https://github.com/tats/w3m/archive/refs/tags/v${_MAJOR_VERSION}+git${_MINOR_VERSION}.tar.gz
