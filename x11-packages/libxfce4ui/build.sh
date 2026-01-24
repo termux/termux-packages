@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Commonly used XFCE widgets among XFCE applications"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.20.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/xfce/libxfce4ui/${TERMUX_PKG_VERSION%.*}/libxfce4ui-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=5d3d67b1244a10cee0e89b045766c05fe1035f7938f0410ac6a3d8222b5df907
 TERMUX_PKG_AUTO_UPDATE=true
@@ -20,6 +20,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-vendor-info=Termux
 --disable-debug
+--disable-static
 --enable-introspection=yes
 --enable-epoxy
 --enable-vala=yes
