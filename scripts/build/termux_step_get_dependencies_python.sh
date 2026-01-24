@@ -18,7 +18,7 @@ termux_step_get_dependencies_python() {
 			local name_python_module=$(sed "s/<=/ /; s/>=/ /; s/</ /; s/>/ /; s/'//g" <<< "$i" | awk '{printf $1}')
 			local name_python_module_termux=$(grep 'python-' <<< "$name_python_module" || echo "python-$name_python_module")
 			[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "Installing the dependency python module $i if necessary..."
-			if $pip show "$name_python_module" &>/dev/null && ([ "$TERMUX_FORCE_BUILD_DEPENDENCIES" = "false" ] || termux_check_package_in_built_packages_list "$name_python_module_termux"); then
+			if $pip show "$i" &>/dev/null && ([ "$TERMUX_FORCE_BUILD_DEPENDENCIES" = "false" ] || termux_check_package_in_built_packages_list "$name_python_module_termux"); then
 				[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "Skipping the already installed dependency python module $i"
 				continue
 			fi
