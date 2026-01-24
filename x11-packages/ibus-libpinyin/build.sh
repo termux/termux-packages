@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Intelligent Pinyin engine based on libpinyin for IBus"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.16.5
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/libpinyin/ibus-libpinyin/releases/download/$TERMUX_PKG_VERSION/ibus-libpinyin-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=cc652d48e68b8b03afc5e9e08509676aee89f9d492b9a3897cd028bcc800ce31
 TERMUX_PKG_BUILD_IN_SRC=true
