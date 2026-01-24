@@ -1,0 +1,166 @@
+https://github.com/v8/v8/commit/182d9c05e78b1ddb1cb8242cd3628a7855a0336f
+From 182d9c05e78b1ddb1cb8242cd3628a7855a0336f Mon Sep 17 00:00:00 2001
+From: Andrey Kosyakov <caseq@chromium.org>
+Date: Thu, 17 Aug 2023 13:50:11 -0700
+Subject: [PATCH] Define UChar as char16_t
+
+We used to have UChar defined as uint16_t which does not go along
+with STL these days if you try to have an std::basic_string<> of it,
+as there are no standard std::char_traits<> specialization for uint16_t.
+
+This switches UChar to char16_t where practical, introducing a few
+compatibility shims to keep CL size small, as (1) this would likely
+have to be back-ported and (2) crdtp extensively uses uint16_t for
+wide chars.
+
+Bug: b:296390693
+Change-Id: I66a32d8f0050915225b187de56896c26dd76163d
+Reviewed-on: https://chromium-review.googlesource.com/c/v8/v8/+/4789966
+Reviewed-by: Jaroslav Sevcik <jarin@chromium.org>
+Commit-Queue: Jaroslav Sevcik <jarin@chromium.org>
+Auto-Submit: Andrey Kosyakov <caseq@chromium.org>
+Cr-Commit-Position: refs/heads/main@{#89559}
+---
+ src/inspector/string-16.cc                             |  8 +++++++-
+ src/inspector/string-16.h                              | 10 ++++++++--
+ src/inspector/v8-string-conversions.cc                 |  6 +++---
+ src/inspector/v8-string-conversions.h                  |  6 ++++--
+ .../inspector_protocol/crdtp/test_platform_v8.cc       |  9 ++++++---
+ 5 files changed, 28 insertions(+), 11 deletions(-)
+
+diff --git a/chromium/src/v8/src/inspector/string-16.cc b/chromium/src/v8/src/inspector/string-16.cc
+index a8b786a8166d..6df9963e970e 100644
+--- a/chromium/src/v8/src/inspector/string-16.cc
++++ b/chromium/src/v8/src/inspector/string-16.cc
+@@ -27,7 +27,7 @@ bool isSpaceOrNewLine(UChar c) {
+   return isASCII(c) && c <= ' ' && (c == ' ' || (c <= 0xD && c >= 0x9));
+ }
+ 
+-int64_t charactersToInteger(const UChar* characters, size_t length,
++int64_t charactersToInteger(const uint16_t* characters, size_t length,
+                             bool* ok = nullptr) {
+   std::vector<char> buffer;
+   buffer.reserve(length + 1);
+@@ -50,6 +50,8 @@ int64_t charactersToInteger(const UChar* characters, size_t length,
+ 
+ String16::String16(const UChar* characters, size_t size)
+     : m_impl(characters, size) {}
++String16::String16(const uint16_t* characters, size_t size)
++    : m_impl(reinterpret_cast<const UChar*>(characters), size) {}
+ 
+ String16::String16(const UChar* characters) : m_impl(characters) {}
+ 
+@@ -241,6 +243,10 @@ String16 String16::fromUTF16LE(const UChar* stringStart, size_t length) {
+ #endif  // V8_TARGET_BIG_ENDIAN
+ }
+ 
++String16 String16::fromUTF16LE(const uint16_t* stringStart, size_t length) {
++  return fromUTF16LE(reinterpret_cast<const UChar*>(stringStart), length);
++}
++
+ std::string String16::utf8() const {
+   return UTF16ToUTF8(m_impl.data(), m_impl.size());
+ }
+diff --git a/chromium/src/v8/src/inspector/string-16.h b/chromium/src/v8/src/inspector/string-16.h
+index 1678ffb2e1e9..d9f6c466ab17 100644
+--- a/chromium/src/v8/src/inspector/string-16.h
++++ b/chromium/src/v8/src/inspector/string-16.h
+@@ -6,6 +6,7 @@
+ #define V8_INSPECTOR_STRING_16_H_
+ 
+ #include <stdint.h>
++#include <uchar.h>
+ 
+ #include <cctype>
+ #include <climits>
+@@ -18,7 +19,7 @@
+ 
+ namespace v8_inspector {
+ 
+-using UChar = uint16_t;
++using UChar = char16_t;
+ 
+ class String16 {
+  public:
+@@ -28,6 +29,7 @@ class String16 {
+   String16(const String16&) V8_NOEXCEPT = default;
+   String16(String16&&) V8_NOEXCEPT = default;
+   String16(const UChar* characters, size_t size);
++  String16(const uint16_t* characters, size_t size);
+   V8_EXPORT String16(const UChar* characters);
+   V8_EXPORT String16(const char* characters);
+   String16(const char* characters, size_t size);
+@@ -49,7 +51,9 @@ class String16 {
+   int toInteger(bool* ok = nullptr) const;
+   std::pair<size_t, size_t> getTrimmedOffsetAndLength() const;
+   String16 stripWhiteSpace() const;
+-  const UChar* characters16() const { return m_impl.c_str(); }
++  const uint16_t* characters16() const {
++    return reinterpret_cast<const uint16_t*>(m_impl.c_str());
++  }
+   size_t length() const { return m_impl.length(); }
+   bool isEmpty() const { return !m_impl.length(); }
+   UChar operator[](size_t index) const { return m_impl[index]; }
+@@ -79,6 +83,8 @@ class String16 {
+   // On Big endian architectures, byte order needs to be flipped.
+   V8_EXPORT static String16 fromUTF16LE(const UChar* stringStart,
+                                         size_t length);
++  V8_EXPORT static String16 fromUTF16LE(const uint16_t* stringStart,
++                                        size_t length);
+ 
+   std::size_t hash() const {
+     if (!hash_code) {
+diff --git a/chromium/src/v8/src/inspector/v8-string-conversions.cc b/chromium/src/v8/src/inspector/v8-string-conversions.cc
+index 0c75e66b9722..8cf19be816c2 100644
+--- a/chromium/src/v8/src/inspector/v8-string-conversions.cc
++++ b/chromium/src/v8/src/inspector/v8-string-conversions.cc
+@@ -12,7 +12,7 @@
+ 
+ namespace v8_inspector {
+ namespace {
+-using UChar = uint16_t;
++using UChar = char16_t;
+ using UChar32 = uint32_t;
+ 
+ bool isASCII(UChar c) { return !(c & ~0x7F); }
+@@ -386,7 +386,7 @@ std::string UTF16ToUTF8(const UChar* stringStart, size_t length) {
+ 
+ std::basic_string<UChar> UTF8ToUTF16(const char* stringStart, size_t length) {
+   if (!stringStart || !length) return std::basic_string<UChar>();
+-  std::vector<uint16_t> buffer(length);
++  std::vector<UChar> buffer(length);
+   UChar* bufferStart = buffer.data();
+ 
+   UChar* bufferCurrent = bufferStart;
+@@ -395,7 +395,7 @@ std::basic_string<UChar> UTF8ToUTF16(const char* stringStart, size_t length) {
+                          reinterpret_cast<const char*>(stringStart + length),
+                          &bufferCurrent, bufferCurrent + buffer.size(), nullptr,
+                          true) != conversionOK)
+-    return std::basic_string<uint16_t>();
++    return std::basic_string<UChar>();
+   size_t utf16Length = bufferCurrent - bufferStart;
+   return std::basic_string<UChar>(bufferStart, bufferStart + utf16Length);
+ }
+diff --git a/chromium/src/v8/src/inspector/v8-string-conversions.h b/chromium/src/v8/src/inspector/v8-string-conversions.h
+index eb33c6816a58..1126255dac23 100644
+--- a/chromium/src/v8/src/inspector/v8-string-conversions.h
++++ b/chromium/src/v8/src/inspector/v8-string-conversions.h
+@@ -5,14 +5,16 @@
+ #ifndef V8_INSPECTOR_V8_STRING_CONVERSIONS_H_
+ #define V8_INSPECTOR_V8_STRING_CONVERSIONS_H_
+ 
++#include <uchar.h>
++
+ #include <cstdint>
+ #include <string>
+ 
+ // Conversion routines between UT8 and UTF16, used by string-16.{h,cc}. You may
+ // want to use string-16.h directly rather than these.
+ namespace v8_inspector {
+-std::basic_string<uint16_t> UTF8ToUTF16(const char* stringStart, size_t length);
+-std::string UTF16ToUTF8(const uint16_t* stringStart, size_t length);
++std::basic_string<char16_t> UTF8ToUTF16(const char* stringStart, size_t length);
++std::string UTF16ToUTF8(const char16_t* stringStart, size_t length);
+ }  // namespace v8_inspector
+ 
+ #endif  // V8_INSPECTOR_V8_STRING_CONVERSIONS_H_

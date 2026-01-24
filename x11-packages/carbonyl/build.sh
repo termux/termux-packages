@@ -5,11 +5,15 @@ TERMUX_PKG_LICENSE_FILE="license.md"
 TERMUX_PKG_MAINTAINER="@licy183"
 _CHROMIUM_VERSION=111.0.5563.146
 TERMUX_PKG_VERSION=0.0.3
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=(https://github.com/fathyb/carbonyl/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
-					https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$_CHROMIUM_VERSION.tar.xz)
-TERMUX_PKG_SHA256=(bf421b9498a084a7cf2238a574d37d31b498d3e271fdb3dcf466e7ed6c80013d
-					1e701fa31b55fa0633c307af8537b4dbf67e02d8cad1080c57d845ed8c48b5fe)
+TERMUX_PKG_REVISION=3
+TERMUX_PKG_SRCURL=(
+	https://github.com/fathyb/carbonyl/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
+	https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$_CHROMIUM_VERSION.tar.xz
+)
+TERMUX_PKG_SHA256=(
+	bf421b9498a084a7cf2238a574d37d31b498d3e271fdb3dcf466e7ed6c80013d
+	1e701fa31b55fa0633c307af8537b4dbf67e02d8cad1080c57d845ed8c48b5fe
+)
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libdrm, libevdev, libxkbcommon, libminizip, libnss, libwayland, libx11, mesa, openssl, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="carbonyl-host-tools, libnotify, libffi-static"
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
@@ -186,7 +190,7 @@ use_udev = false
 use_gnome_keyring = false
 use_alsa = false
 use_libpci = false
-use_pulseaudio = false
+use_pulseaudio = true
 use_ozone = true
 use_qt = false
 ozone_auto_platforms = false
@@ -244,8 +248,6 @@ use_jumbo_build = true
 	mkdir -p $TERMUX_PKG_BUILDDIR/out/Release
 	cat $_common_args_file > $TERMUX_PKG_BUILDDIR/out/Release/args.gn
 	gn gen $TERMUX_PKG_BUILDDIR/out/Release --export-compile-commands
-
-	export cr_v8_toolchain="$_v8_toolchain_name"
 }
 
 termux_step_make() {
