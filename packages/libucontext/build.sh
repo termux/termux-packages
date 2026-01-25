@@ -7,4 +7,4 @@ TERMUX_PKG_SRCURL=https://github.com/kaniini/libucontext/archive/refs/tags/libuc
 TERMUX_PKG_SHA256=b3ca8d7d3e5c926a90ddb691f8a52ccb364069a745304a40c29f3b0d39b80c93
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-Dfreestanding=true"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+$"
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+(.\d+)?"
