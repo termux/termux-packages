@@ -2,8 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.gimp.org/
 TERMUX_PKG_DESCRIPTION="GNU Image Manipulation Program"
 TERMUX_PKG_LICENSE="GPL-3.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.0.6"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="3.0.8"
 TERMUX_PKG_SRCURL=git+https://gitlab.gnome.org/GNOME/gimp
 TERMUX_PKG_GIT_BRANCH="GIMP_${TERMUX_PKG_VERSION//./_}"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -39,7 +38,7 @@ termux_step_pre_configure() {
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		# Gimp requires using cross-compiled or prebuilt gimp during cross-compilation which is hard to achive here
 		# gimp is required only to generate splash image, so it will be fine to use official appimage.
-		termux_download https://download.gimp.org/gimp/v${TERMUX_PKG_VERSION%.*}/linux/GIMP-${TERMUX_PKG_VERSION}-x86_64.AppImage "$TERMUX_PKG_CACHEDIR/gimp.appimage" 095c8a29d0a8dd48d7b09cdda7d4e1b69ba677036f4db3bd2e7d90c3f91e62d9
+		termux_download https://download.gimp.org/gimp/v${TERMUX_PKG_VERSION%.*}/linux/GIMP-${TERMUX_PKG_VERSION}-x86_64.AppImage "$TERMUX_PKG_CACHEDIR/gimp.appimage" d19a8f83e06f9ec6a00927d895b822c7c8490ec19a6cb9f369498fdfdbcbea34
 		chmod +x "$TERMUX_PKG_CACHEDIR/gimp.appimage"
 		[ -d $TERMUX_PKG_CACHEDIR/squashfs-root ] || (cd "$TERMUX_PKG_CACHEDIR"; "$TERMUX_PKG_CACHEDIR/gimp.appimage" --appimage-extract)
 
