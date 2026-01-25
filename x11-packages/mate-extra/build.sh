@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://mate-desktop.org/
+TERMUX_PKG_DESCRIPTION="A metapackage that installs various utilities and programs for the MATE desktop environment"
+TERMUX_PKG_LICENSE="Public Domain"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.28.0"
+TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_SKIP_SRC_EXTRACT=true
+TERMUX_PKG_DEPENDS="atril, caja-actions, caja-extensions, engrampa, eom, mate-applets, mate-calc, mate-icon-theme-faenza, mate-media, mate-netbook, mate-screensaver, mate-system-monitor, mate-terminal, mate-utils, mozo, pluma"
+TERMUX_PKG_METAPACKAGE=true
+TERMUX_PKG_PLATFORM_INDEPENDENT=true

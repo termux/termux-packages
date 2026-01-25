@@ -1,0 +1,14 @@
+If a configuration file with valid data does not exist in this location,
+mate-system-log will crash on launch
+
+--- a/logview/src/logview-app.c
++++ b/logview/src/logview-app.c
+@@ -99,7 +99,7 @@ parse_syslog (void)
+   FILE *cf;
+   GSList *logfiles = NULL;
+ 
+-  if ((cf = fopen ("/etc/syslog.conf", "r")) == NULL) {
++  if ((cf = fopen ("@TERMUX_PREFIX@/etc/mate-system-log.conf", "r")) == NULL) {
+     return NULL;
+   }
+ 

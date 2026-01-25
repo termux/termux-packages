@@ -1,0 +1,88 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -106,7 +106,6 @@ COMMON_MODULES="gtk+-3.0 >= $GTK_REQUIRED dnl
+  gio-2.0 dnl
+  gio-unix-2.0 dnl
+  libxml-2.0 dnl
+- udisks2 dnl
+  libgtop-2.0 dnl
+  mate-desktop-2.0 >= $MATE_DESKTOP_REQUIRED"
+ PKG_CHECK_MODULES(CAPPLET, $COMMON_MODULES)
+@@ -113,14 +113,12 @@ PKG_CHECK_MODULES(CAPPLET, $COMMON_MODULES)
+ PKG_CHECK_MODULES(MATECC, $COMMON_MODULES libmate-menu >= 1.21.0)
+ PKG_CHECK_MODULES(MATECC_SHELL, $COMMON_MODULES libmate-menu librsvg-2.0 pango)
+ 
+-PKG_CHECK_MODULES(POLKIT, polkit-gobject-1)
+ PKG_CHECK_MODULES(MATE_DESKTOP, mate-desktop-2.0 >= $MATE_DESKTOP_REQUIRED)
+ PKG_CHECK_MODULES(DEFAULT_APPLICATIONS_CAPPLET, libxml-2.0)
+ PKG_CHECK_MODULES(MARCO, libmarco-private >= $MARCO_REQUIRED)
+ PKG_CHECK_MODULES(TYPING, $GMODULE_ADD glib-2.0 >= $GLIB_REQUIRED gio-2.0 gtk+-3.0 >= $GTK_REQUIRED)
+ PKG_CHECK_MODULES(GIO, gio-2.0)
+ PKG_CHECK_MODULES(GLIBTOP, libgtop-2.0)
+-PKG_CHECK_MODULES(UDISKS, udisks2)
+ 
+ PKG_CHECK_MODULES([DCONF], [dconf >= 0.13.4])
+ AC_SUBST(DCONF_CFLAGS)
+--- a/capplets/system-info/mate-system-info.c
++++ b/capplets/system-info/mate-system-info.c
+@@ -26,7 +26,6 @@
+ #include <glibtop/mountlist.h>
+ #include <glibtop/mem.h>
+ #include <glibtop/sysinfo.h>
+-#include <udisks/udisks.h>
+ #include <sys/utsname.h>
+ 
+ #ifdef GDK_WINDOWING_WAYLAND
+@@ -374,7 +373,6 @@ get_graphics_hardware_string (void)
+ static char *
+ get_primary_disk_size (void)
+ {
+-    g_autoptr(UDisksClient) client = NULL;
+     GDBusObjectManager *manager;
+     g_autolist(GDBusObject) objects = NULL;
+     GList *l;
+@@ -384,42 +382,13 @@ get_primary_disk_size (void)
+ 
+     total_size = 0;
+ 
+-    client = udisks_client_new_sync (NULL, &error);
+-    if (client == NULL)
++    error = g_error_new(G_FILE_ERROR, G_FILE_ERROR_NOSYS, "Unsupported system");
++    if (TRUE)
+     {
+         g_warning ("Unable to get UDisks client: %s. Disk information will not be available.",
+                    error->message);
+         return g_strdup ("Unknown");
+     }
+-
+-    manager = udisks_client_get_object_manager (client);
+-    objects = g_dbus_object_manager_get_objects (manager);
+-
+-    for (l = objects; l != NULL; l = l->next)
+-    {
+-        UDisksDrive *drive;
+-        drive = udisks_object_peek_drive (UDISKS_OBJECT (l->data));
+-
+-        /* Skip removable devices */
+-        if (drive == NULL ||
+-          udisks_drive_get_removable (drive) ||
+-          udisks_drive_get_ejectable (drive))
+-        {
+-            continue;
+-        }
+-
+-        total_size += udisks_drive_get_size (drive);
+-    }
+-    if (total_size > 0)
+-    {
+-        size = g_format_size (total_size);
+-    }
+-    else
+-    {
+-        size = g_strdup ("Unknown");
+-    }
+-
+-    return size;
+ }
+ 
+ static char *

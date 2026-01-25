@@ -1,0 +1,27 @@
+--- a/src/disks.cpp
++++ b/src/disks.cpp
+@@ -17,6 +17,24 @@
+ #include "interface.h"
+ #include "iconthemewrapper.h"
+ 
++#if defined __ANDROID__ && __ANDROID_API__ < 26
++#include <dlfcn.h>
++static char *hasmntopt(const struct mntent *__entry, const char *__option)
++{
++	static int initialized = 0;
++	static char *(*libc_impl)(const struct mntent *, const char *) = NULL;
++	if (!initialized) {
++		void *libc_handle = dlopen("libc.so", RTLD_NOW);
++		if (libc_handle != NULL)
++			libc_impl = (char *(*)(const struct mntent *, const char *))dlsym(libc_handle, "hasmntopt");
++		initialized = 1;
++	}
++	if (libc_impl != NULL)
++		return libc_impl(__entry, __option);
++	return NULL;
++}
++#endif
++
+ namespace
+ {
+   const unsigned DISK_ICON_SIZE = 24;
