@@ -1,0 +1,280 @@
+--- a/mate-tweak
++++ b/mate-tweak
+@@ -96,7 +96,7 @@ __MENU_TRADITIONAL_BUTTONS__ = "menu:minimize,maximize,close"
+ __MENU_CONTEMPORARY_BUTTONS__ = "close,minimize,maximize:menu"
+ 
+ # i18n
+-gettext.install('mate-tweak', os.path.join('/','usr','share','locale'))
++gettext.install('mate-tweak', os.path.join('@TERMUX_PREFIX@','share','locale'))
+ 
+ class SidePage:
+     def __init__(self, notebook_index, name, icon):
+@@ -295,7 +295,7 @@ class MateTweak:
+ 
+     def create_autostart(self, filename, content):
+         # Create a local autostart only if it is missing from the system path.
+-        if not os.path.exists(os.path.join('/','usr','share','mate','autostart',filename)):
++        if not os.path.exists(os.path.join('@TERMUX_PREFIX@','share','mate','autostart',filename)):
+             config_dir = GLib.get_user_config_dir()
+             self.mkdir_p(os.path.join(config_dir, 'autostart/'))
+             if not os.path.exists(os.path.join(config_dir, 'autostart',filename)):
+@@ -309,8 +309,8 @@ class MateTweak:
+             os.remove(autostart_file)
+ 
+         # Make sure any system desktop files are also removed
+-        mate_tweak_helper = os.path.join('/','usr', 'lib', 'mate-tweak', 'mate-tweak-helper')
+-        subprocess.call(['pkexec', mate_tweak_helper, 'autostop', filename], stdout=DEVNULL, stderr=DEVNULL)
++        mate_tweak_helper = os.path.join('@TERMUX_PREFIX@', 'lib', 'mate-tweak', 'mate-tweak-helper')
++        subprocess.call([mate_tweak_helper, 'autostop', filename], stdout=DEVNULL, stderr=DEVNULL)
+ 
+     def check_wm_features(self):
+         screen = Gdk.Screen.get_default()
+@@ -447,7 +447,7 @@ class MateTweak:
+         if self.hud_available and not self.process_running('mate-hud'):
+             if self.schema_has_key('org.mate.hud', 'enabled'):
+                 self.set_bool('org.mate.hud', None, 'enabled', True)
+-            pid = subprocess.Popen(['/usr/lib/mate-hud/mate-hud'], stdout=DEVNULL, stderr=DEVNULL).pid
++            pid = subprocess.Popen(['@TERMUX_PREFIX@/lib/mate-hud/mate-hud'], stdout=DEVNULL, stderr=DEVNULL).pid
+             self.hud_enabled = True
+ 
+     def disable_hud(self):
+@@ -555,7 +555,7 @@ class MateTweak:
+         """
+         self.kill_process('mate-volume-control-applet')
+         self.remove_autostart('mate-volume-control-applet.desktop')
+-        if os.path.exists('/usr/libexec/ayatana-indicator-power/ayatana-indicator-power-service'):
++        if os.path.exists('@TERMUX_PREFIX@/libexec/ayatana-indicator-power/ayatana-indicator-power-service'):
+             self.set_string('org.mate.power-manager', None, 'icon-policy', 'never')
+             self.set_bool('org.mate.power-manager', None, 'notify-low-capacity', False)
+ 
+@@ -568,10 +568,10 @@ class MateTweak:
+         When indicators are disabled some MATE applets need enabling
+         or showing.
+         """
+-        pid = subprocess.Popen(['mate-volume-control-applet'], stdout=DEVNULL, stderr=DEVNULL).pid
++        pid = subprocess.Popen(['@TERMUX_PREFIX@/libexec/mate-volume-control-applet'], stdout=DEVNULL, stderr=DEVNULL).pid
+         self.remove_autostart('mate-volume-control-applet.desktop')
+         self.create_autostart('mate-volume-control-applet.desktop', __APPLET_SOUND__)
+-        if os.path.exists('/usr/libexec/ayatana-indicator-power/ayatana-indicator-power-service'):
++        if os.path.exists('@TERMUX_PREFIX@/libexec/ayatana-indicator-power/ayatana-indicator-power-service'):
+             self.set_string('org.mate.power-manager', None, 'icon-policy', 'present')
+             self.set_bool('org.mate.power-manager', None, 'notify-low-capacity', True)
+ 
+@@ -591,7 +591,7 @@ class MateTweak:
+ 
+     def panel_layout_uses(self, applet, panel_layout):
+         try:
+-            with open(os.path.join('/','usr','share','mate-panel','layouts', panel_layout + '.layout'), 'rb', 0) as layout, \
++            with open(os.path.join('@TERMUX_PREFIX@','share','mate-panel','layouts', panel_layout + '.layout'), 'rb', 0) as layout, \
+                 mmap.mmap(layout.fileno(), 0, access=mmap.ACCESS_READ) as data:
+                 if data.find(applet.encode('utf-8')) != -1:
+                     return True
+@@ -622,7 +622,7 @@ class MateTweak:
+         settings = {}
+         if self.panel_layout_uses(section, panel_layout):
+             try:
+-                with open(os.path.join('/','usr','share','mate-panel','layouts', panel_layout + '.layout'), 'rb', 0) as layout, \
++                with open(os.path.join('@TERMUX_PREFIX@','share','mate-panel','layouts', panel_layout + '.layout'), 'rb', 0) as layout, \
+                     mmap.mmap(layout.fileno(), 0, access=mmap.ACCESS_READ) as data:
+ 
+                     section_pos = data.find(section.encode('utf-8'))
+@@ -791,12 +791,12 @@ class MateTweak:
+                 self.set_enum('com.solus-project.brisk-menu', None, 'window-type', 1)
+ 
+         # If we have a custom panel layout just replace the dconf dump.
+-        if os.path.exists(os.path.join('/','usr','share','mate-panel','layouts', new_layout + '.panel')):
++        if os.path.exists(os.path.join('@TERMUX_PREFIX@','share','mate-panel','layouts', new_layout + '.panel')):
+             # Reset panel configuration to defaults.
+             self.reset_dconf_path('/org/mate/panel/objects/')
+             self.reset_dconf_path('/org/mate/panel/toplevels/')
+             print('Loading additional panel configuration for ' + new_layout)
+-            cmd = 'dconf load /org/mate/panel/ < /usr/share/mate-panel/layouts/' + new_layout + '.panel'
++            cmd = 'dconf load /org/mate/panel/ < @TERMUX_PREFIX@/share/mate-panel/layouts/' + new_layout + '.panel'
+             subprocess.call(cmd, shell=True, stdout=DEVNULL, stderr=DEVNULL)
+         else:
+             # Set the new layout
+@@ -828,7 +828,7 @@ class MateTweak:
+                 self.maximus_decorate()
+ 
+         # Determine if the dock should be enabled
+-        if os.path.exists(os.path.join('/','usr','share','mate-panel','layouts', new_layout + '.dock')) and self.dock is not None:
++        if os.path.exists(os.path.join('@TERMUX_PREFIX@','share','mate-panel','layouts', new_layout + '.dock')) and self.dock is not None:
+             print('Found dock hint for ' + new_layout)
+             mate_theme = self.get_string('org.mate.interface', None, 'gtk-theme')
+             if not new_layout.startswith('mutiny'):
+@@ -930,7 +930,7 @@ class MateTweak:
+             self.disable_keyboard_led()
+ 
+     def panel_layout_exists(self, panel_layout):
+-        return os.path.exists('/usr/share/mate-panel/layouts/' + panel_layout + '.layout')
++        return os.path.exists('@TERMUX_PREFIX@/share/mate-panel/layouts/' + panel_layout + '.layout')
+ 
+     def check_glx_features(self):
+         if self.find_on_path('glxinfo'):
+@@ -1061,7 +1061,7 @@ class MateTweak:
+     def check_dock_features(self):
+         # Order matters. Plank is preferred.
+         if self.find_on_path('plank') and \
+-            os.path.exists(os.path.join('/','usr','share','applications', 'plank.desktop')):
++            os.path.exists(os.path.join('@TERMUX_PREFIX@','share','applications', 'net.launchpad.plank.desktop')):
+             self.dock = 'plank'
+         else:
+             self.dock = None
+@@ -1085,7 +1085,7 @@ class MateTweak:
+             self.pulldown_terminal_enabled = False
+ 
+     def check_hud_features(self):
+-        if os.path.exists('/usr/lib/mate-hud/mate-hud'):
++        if os.path.exists('@TERMUX_PREFIX@/lib/mate-hud/mate-hud'):
+             self.hud_available = True
+             if self.schema_has_key('org.mate.hud', 'enabled'):
+                 self.hud_enabled = self.get_bool('org.mate.hud', None, 'enabled')
+@@ -1107,38 +1107,38 @@ class MateTweak:
+         self.brisk_menu_available = False
+         self.appmenu_applet_available = False
+ 
+-        if os.path.exists('/usr/libexec/ayatana-indicator-application/ayatana-indicator-application-service') and \
+-            os.path.exists('/usr/share/mate-panel/applets/org.mate.applets.Indicator.mate-panel-applet'):
++        if os.path.exists('@TERMUX_PREFIX@/libexec/ayatana-indicator-application/ayatana-indicator-application-service') and \
++            os.path.exists('@TERMUX_PREFIX@/share/mate-panel/applets/org.mate.applets.Indicator.mate-panel-applet'):
+                 self.indicators_available = True
+ 
+-        if os.path.exists('/usr/share/applications/mageia-drakconf.desktop'):
++        if os.path.exists('@TERMUX_PREFIX@/share/applications/mageia-drakconf.desktop'):
+             self.mageia_cc_available = True
+ 
+-        if os.path.exists('/usr/lib/mate-applets/mate-dock-applet/dock.py'):
++        if os.path.exists('@TERMUX_PREFIX@/lib/mate-applets/mate-dock-applet/dock.py'):
+             self.mate_dock_available = True
+ 
+-        if os.path.exists('/usr/lib/mate-menu/mate-menu.py'):
++        if os.path.exists('@TERMUX_PREFIX@/lib/mate-menu/mate-menu.py'):
+             self.mate_menu_available = True
+ 
+-        if os.path.exists('/usr/lib/' + self.multiarch + '/brisk-menu/brisk-menu') or \
+-            os.path.exists('/usr/lib/brisk-menu/brisk-menu') or \
+-             os.path.exists('/usr/libexec/brisk-menu'):
+-             if os.path.exists('/usr/share/mate-panel/applets/com.solus_project.brisk.BriskMenu.mate-panel-applet'):
++        if os.path.exists('@TERMUX_PREFIX@/lib/' + self.multiarch + '/brisk-menu/brisk-menu') or \
++            os.path.exists('@TERMUX_PREFIX@/lib/brisk-menu/brisk-menu') or \
++             os.path.exists('@TERMUX_PREFIX@/libexec/brisk-menu'):
++             if os.path.exists('@TERMUX_PREFIX@/share/mate-panel/applets/com.solus_project.brisk.BriskMenu.mate-panel-applet'):
+               self.brisk_menu_available = True
+ 
+-        if os.path.exists('/usr/lib/' + self.multiarch + '/mate-panel/libappmenu-mate.so') and \
+-            os.path.exists('/usr/share/mate-panel/applets/org.vala-panel.appmenu.mate-panel-applet'):
++        if os.path.exists('@TERMUX_PREFIX@/lib/mate-panel/libappmenu-mate.so') and \
++            os.path.exists('@TERMUX_PREFIX@/share/mate-panel/applets/org.vala-panel.appmenu.mate-panel-applet'):
+             self.appmenu_applet_available = True
+ 
+-        if os.path.exists('/usr/bin/mate-maximus') and \
+-           os.path.exists('/usr/lib/mate-netbook/mate-window-picker-applet'):
++        if os.path.exists('@TERMUX_PREFIX@/bin/mate-maximus') and \
++           os.path.exists('@TERMUX_PREFIX@/lib/mate-netbook/mate-window-picker-applet'):
+             self.maximus_available = True
+ 
+-        if os.path.exists('/usr/lib/linuxmint/mintMenu/mintMenu.py'):
++        if os.path.exists('@TERMUX_PREFIX@/lib/linuxmint/mintMenu/mintMenu.py'):
+             self.mint_menu_available = True
+ 
+         config_dir = GLib.get_user_config_dir()
+-        if os.path.exists('/etc/xdg/autostart/mate-volume-control-applet.desktop') or \
++        if os.path.exists('@TERMUX_PREFIX@/etc/xdg/autostart/mate-volume-control-applet.desktop') or \
+            os.path.exists(os.path.join(config_dir, 'autostart/') + 'mate-volume-control-applet.desktop'):
+             self.volume_applet_enabled = True
+ 
+@@ -1161,7 +1161,7 @@ class MateTweak:
+             # Use 'ldd' to determine which Marco compositor is enabled.
+             compositor = "Xrender"
+             try:
+-                ldd = subprocess.Popen('ldd /usr/bin/marco', shell=True, stdout=subprocess.PIPE)
++                ldd = subprocess.Popen('ldd @TERMUX_PREFIX@/bin/marco', shell=True, stdout=subprocess.PIPE)
+                 for line in ldd.stdout:
+                     if "libXpresent" in str(line):
+                         compositor = "Xpresent"
+@@ -1291,7 +1291,7 @@ class MateTweak:
+         print(self.system_installed_panel_layouts)
+ 
+         # Add any saved panel layouts to the start.
+-        layouts = os.path.join('/','usr','share','mate-panel','layouts','*-tweak.layout')
++        layouts = os.path.join('@TERMUX_PREFIX@','share','mate-panel','layouts','*-tweak.layout')
+         for layout in glob.glob(layouts):
+             list_entry = self.get_custom_panel_list_entry(layout)
+             panels.prepend([list_entry['displayname'], list_entry['codename']])
+@@ -1305,7 +1305,7 @@ class MateTweak:
+             self.system_installed_panel_layouts.append(item_code_name)
+ 
+     def get_custom_panel_list_entry(self, layout_full_name):
+-        layout_code_name = layout_full_name.replace('.layout','').replace('/usr/share/mate-panel/layouts/', '')
++        layout_code_name = layout_full_name.replace('.layout','').replace('@TERMUX_PREFIX@/share/mate-panel/layouts/', '')
+         layout_display_name = layout_code_name
+ 
+         custom_layout_prefix = self.get_custom_layout_file_prefix(layout_code_name)
+@@ -1372,8 +1372,8 @@ class MateTweak:
+             text = _('<b>Deleting this custom layout will also return your layout to the system default.</b>\n\nAre you sure you want to permanently delete this custom layout?')
+ 
+             if self.confirm_dialog(title, text):
+-                mate_tweak_helper = os.path.join('/','usr', 'lib', 'mate-tweak', 'mate-tweak-helper')
+-                delete = subprocess.call(['pkexec', mate_tweak_helper, 'delete', old_layout], stdout=DEVNULL, stderr=DEVNULL)
++                mate_tweak_helper = os.path.join('@TERMUX_PREFIX@', 'lib', 'mate-tweak', 'mate-tweak-helper')
++                delete = subprocess.call([mate_tweak_helper, 'delete', old_layout], stdout=DEVNULL, stderr=DEVNULL)
+                 Notify.init(_('MATE Tweak'))
+                 delete_panel_notify=Notify.Notification.new (_('Panel Layout Deleted'),_('Your panel layout has been deleted: ') + old_layout.replace('-tweak','') , 'dialog-information')
+                 delete_panel_notify.show()
+@@ -1403,11 +1403,11 @@ class MateTweak:
+             if self.panel_layout_exists(layoutname):
+                 print('Layout exists. Ignoring that for now and over writting it.')
+ 
+-            mate_tweak_helper = os.path.join('/','usr', 'lib', 'mate-tweak', 'mate-tweak-helper')
++            mate_tweak_helper = os.path.join('@TERMUX_PREFIX@', 'lib', 'mate-tweak', 'mate-tweak-helper')
+             backup = subprocess.call([mate_tweak_helper, 'backup', layoutname], stdout=DEVNULL, stderr=DEVNULL)
+             if self.dock_enabled:
+                 dock = subprocess.call([mate_tweak_helper, 'dock', layoutname], stdout=DEVNULL, stderr=DEVNULL)
+-            install = subprocess.call(['pkexec', mate_tweak_helper, 'install', layoutname], stdout=DEVNULL, stderr=DEVNULL)
++            install = subprocess.call([mate_tweak_helper, 'install', layoutname], stdout=DEVNULL, stderr=DEVNULL)
+             Notify.init(_('MATE Tweak'))
+             save_panels_notify=Notify.Notification.new (_('Panel Layout Saved'),_('Your panel layout has been saved as ') + layoutname.replace('-tweak',''), 'dialog-information')
+             save_panels_notify.show()
+@@ -1472,7 +1472,7 @@ class MateTweak:
+             print('Development mode.')
+             self.builder.add_from_file('./data/mate-tweak.ui')
+         else:
+-            self.builder.add_from_file('/usr/lib/mate-tweak/mate-tweak.ui')
++            self.builder.add_from_file('@TERMUX_PREFIX@/lib/mate-tweak/mate-tweak.ui')
+ 
+         self.window = self.builder.get_object( "main_window" )
+         self.builder.get_object("main_window").connect("destroy", Gtk.main_quit)
+--- a/util/mate-tweak-helper
++++ b/util/mate-tweak-helper
+@@ -28,7 +28,7 @@ from subprocess import PIPE
+ 
+ 
+ def autostop(filename):
+-    desktopfile = os.path.join('/','etc','xdg','autostart', filename)
++    desktopfile = os.path.join('@TERMUX_PREFIX@','etc','xdg','autostart', filename)
+     if os.path.exists(desktopfile):
+         os.remove(desktopfile)
+ 
+@@ -36,18 +36,18 @@ def autostop(filename):
+ def install_layout(filename):
+     if os.path.exists(os.path.join(tempfile.gettempdir(),filename)):
+         shutil.copy2(os.path.join(tempfile.gettempdir(),filename),
+-                     os.path.join('/','usr','share','mate-panel','layouts',filename))
++                     os.path.join('@TERMUX_PREFIX@','share','mate-panel','layouts',filename))
+         os.remove(os.path.join(tempfile.gettempdir(),filename))
+     else:
+         # If a .dock hint is not found but is installed, remove it.
+-        if filename.endswith('dock') and os.path.exists(os.path.join('/','usr','share','mate-panel','layouts',filename)):
+-            os.remove(os.path.join('/','usr','share','mate-panel','layouts',filename))
++        if filename.endswith('dock') and os.path.exists(os.path.join('@TERMUX_PREFIX@','share','mate-panel','layouts',filename)):
++            os.remove(os.path.join('@TERMUX_PREFIX@','share','mate-panel','layouts',filename))
+         print('Unable to find ' + os.path.join(tempfile.gettempdir(),filename))
+ 
+ 
+ def delete_layout(filename):
+     if 'tweak' in filename:
+-        layout = os.path.join('/','usr','share','mate-panel','layouts',filename)
++        layout = os.path.join('@TERMUX_PREFIX@','share','mate-panel','layouts',filename)
+         if os.path.exists(layout):
+             os.remove(layout)
+         else:

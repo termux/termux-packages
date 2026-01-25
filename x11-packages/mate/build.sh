@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://mate-desktop.org/
+TERMUX_PKG_DESCRIPTION="A metapackage that installs all parts of the MATE desktop environment"
+TERMUX_PKG_LICENSE="Public Domain"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.28.0"
+TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_SKIP_SRC_EXTRACT=true
+TERMUX_PKG_DEPENDS="caja, marco, mate-backgrounds, mate-control-center, mate-desktop, mate-icon-theme, mate-menus, mate-notification-daemon, mate-panel, mate-session-manager, mate-settings-daemon, mate-themes"
+TERMUX_PKG_METAPACKAGE=true
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
