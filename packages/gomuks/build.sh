@@ -6,6 +6,8 @@ TERMUX_PKG_VERSION="25.11"
 TERMUX_PKG_SRCURL=https://github.com/gomuks/gomuks/archive/refs/tags/v0.${TERMUX_PKG_VERSION/.}.0.tar.gz
 TERMUX_PKG_SHA256=b581393db960fd91d22942317af11e869821a14fca716e446cf2b9eaacfccf7e
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="0\.\K\d+(?=\.0)"
+TERMUX_PKG_UPDATE_VERSION_SED_REGEXP="s/([0-9][0-9])([0-9][0-9])/\1.\2/"
 TERMUX_PKG_DEPENDS="libolm, resolv-conf"
 TERMUX_PKG_BUILD_IN_SRC=true
 # i686 fails to compile:
