@@ -1,0 +1,35 @@
+--- a/src/kcm/ui/Global.qml   2026-01-13 18:35:16.000000000 +0530
++++ b/src/kcm/ui/Global.qml 2026-01-25 15:24:42.579671450 +0530
+@@ -22,7 +22,7 @@
+
+     footerLeadingComponent: Kirigami.UrlButton {
+         text: i18nc("@action:button", "CUPS Print Server Admin")
+-        url: "http://localhost:631/admin"
++        url: "http://localhost:8631/admin"
+         padding: Kirigami.Units.largeSpacing
+     }
+
+
+--- a/src/kcm/ui/PrinterSettings.qml  2026-01-13 18:35:16.000000000 +0530
++++ b/src/kcm/ui/PrinterSettings.qml        2026-01-25 15:25:06.051671452 +0530
+@@ -78,7 +78,7 @@
+
+         Kirigami.UrlButton {
+             text: i18nc("@action:button", "CUPS Printers Overview Help")
+-            url: "http://localhost:631/help/overview.html"
++            url: "http://localhost:8631/help/overview.html"
+             padding: Kirigami.Units.largeSpacing
+         }
+
+
+--- a/src/libkcups/KCupsConnection.cpp        2026-01-13 18:35:16.000000000 +0530
++++ b/src/libkcups/KCupsConnection.cpp      2026-01-25 15:26:29.847671457 +0530
+@@ -197,7 +197,7 @@
+         if (m_serverUrl.port() < 0) {
+             // TODO find out if there's a better way of hardcoding
+             // the CUPS port
+-            m_serverUrl.setPort(631);
++            m_serverUrl.setPort(8631);
+         }
+
+         cupsSetServer(qUtf8Printable(m_serverUrl.authority()));
