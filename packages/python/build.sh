@@ -67,6 +67,13 @@ lib/python${_MAJOR_VERSION}/site-packages/*/
 "
 
 termux_step_post_get_source() {
+	patch="$TERMUX_PKG_BUILDER_DIR/0012-hardcode-android-api-level.diff"
+	echo "Applying patch: $(basename "$patch")"
+	test -f "$patch" && sed \
+		-e "s%\@TERMUX_PKG_API_LEVEL\@%${TERMUX_PKG_API_LEVEL}%g" \
+		"$patch" | patch --silent -p1
+
+
 	mv "$TERMUX_PKG_SRCDIR/python3-defaults-$_DEBPYTHON_COMMIT" "$TERMUX_PKG_SRCDIR/debpython"
 }
 
