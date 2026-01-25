@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE="https://codeberg.org/derat/xsettingsd"
+TERMUX_PKG_DESCRIPTION="Provides settings to X11 applications via the XSETTINGS specification"
+TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_LICENSE_FILE="COPYING"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.0.2"
+TERMUX_PKG_SRCURL="https://codeberg.org/derat/xsettingsd/archive/v${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256="f751c7ff3f93ab088f3d31a4cb70ec415c22ec1bf832647d650b2b383cb1bf5d"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libc++, libx11"
