@@ -10,7 +10,7 @@ TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BREAKS="libvpx-dev"
 TERMUX_PKG_REPLACES="libvpx-dev"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+$"
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+(?!-)"
 
 termux_step_post_get_source() {
 	# Check whether it is ABI compatible with previous version

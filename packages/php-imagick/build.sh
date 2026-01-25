@@ -10,7 +10,7 @@ TERMUX_PKG_SRCURL=https://github.com/Imagick/imagick/archive/refs/tags/${TERMUX_
 TERMUX_PKG_SHA256=b0e9279ddf6e75a8c6b4068e16daec0475427dbca7ce2e144e30a51a88aa5ddc
 TERMUX_PKG_DEPENDS="php, imagemagick"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP='^\d+\.\d+\.\d+$'
+TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+\.\d+(?!RC)'
 
 termux_step_pre_configure() {
 	$TERMUX_PREFIX/bin/phpize

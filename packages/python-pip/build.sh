@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/pypa/pip/archive/refs/tags/$TERMUX_PKG_VERS
 TERMUX_PKG_SHA256=6f4d5c31324f7f998ec7c626c3a1543b5db5fb82c941c2b2952eeee183340d8f
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
-TERMUX_PKG_UPDATE_VERSION_REGEXP='^\d+\.\d+(\.\d+)?$'
+TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+(?:\.\d+){1,2}(?!b)' # matches '25.3', '25.3.1' but not '26.0b1'
 TERMUX_PKG_DEPENDS="clang, make, pkg-config, python (>= 3.11.1-1)"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="clang"
 TERMUX_PKG_BREAKS="python (<< 3.11.1-1)"
