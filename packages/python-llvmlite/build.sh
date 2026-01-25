@@ -29,7 +29,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DPYTHON_EXECUTABLE=$(command -v python3)
 -DLLVM_ENABLE_PIC=ON
 -DLLVM_INCLUDE_TESTS=OFF
--DDEFAULT_SYSROOT=$(dirname $TERMUX_PREFIX)
+-DDEFAULT_SYSROOT=$(dirname "$TERMUX_PREFIX")
 -DLLVM_NATIVE_TOOL_DIR=$TERMUX_PKG_HOSTBUILD_DIR/bin
 -DCROSS_TOOLCHAIN_FLAGS_LLVM_NATIVE=-DLLVM_NATIVE_TOOL_DIR=$TERMUX_PKG_HOSTBUILD_DIR/bin
 -DLIBOMP_ENABLE_SHARED=FALSE
@@ -57,7 +57,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_OPTIMIZED_TABLEGEN=ON
 "
 
-if [ $TERMUX_ARCH_BITS = 32 ]; then
+if (( TERMUX_ARCH_BITS == 32 )); then
 	# Do not set _FILE_OFFSET_BITS=64
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_FORCE_SMALLFILE_FOR_ANDROID=on"
 fi
@@ -72,13 +72,13 @@ termux_step_host_build() {
 
 	cmake -G Ninja "-DCMAKE_BUILD_TYPE=Release" \
 					"-DLLVM_ENABLE_PROJECTS=clang" \
-					$TERMUX_PKG_SRCDIR/llvm-project/llvm
-	ninja -j $TERMUX_PKG_MAKE_PROCESSES llvm-tblgen clang-tblgen
+					"$TERMUX_PKG_SRCDIR/llvm-project/llvm"
+	ninja -j "$TERMUX_PKG_MAKE_PROCESSES" llvm-tblgen clang-tblgen
 }
 
 __llvmlite_build_llvm() {
 	export _LLVMLITE_LLVM_INSTALL_DIR="$TERMUX_PKG_BUILDDIR"/llvm-install
-	if [ -f "$_LLVMLITE_LLVM_INSTALL_DIR"/.llvmlite-llvm-built ]; then
+	if [[ -f "$_LLVMLITE_LLVM_INSTALL_DIR"/.llvmlite-llvm-built ]]; then
 		return
 	fi
 
@@ -87,17 +87,14 @@ __llvmlite_build_llvm() {
 
 	# Add unknown vendor, otherwise it screws with the default LLVM triple
 	# detection.
-	export LLVM_DEFAULT_TARGET_TRIPLE=${CCTERMUX_HOST_PLATFORM/-/-unknown-}
+	export LLVM_DEFAULT_TARGET_TRIPLE="${CCTERMUX_HOST_PLATFORM/-/-unknown-}"
 	export LLVM_TARGET_ARCH
-	if [ $TERMUX_ARCH = "arm" ]; then
-		LLVM_TARGET_ARCH=ARM
-	elif [ $TERMUX_ARCH = "aarch64" ]; then
-		LLVM_TARGET_ARCH=AArch64
-	elif [ $TERMUX_ARCH = "i686" ] || [ $TERMUX_ARCH = "x86_64" ]; then
-		LLVM_TARGET_ARCH=X86
-	else
-		termux_error_exit "Invalid arch: $TERMUX_ARCH"
-	fi
+	case "$TERMUX_ARCH" in
+		"aarch64") LLVM_TARGET_ARCH=AArch64;;
+		"arm") LLVM_TARGET_ARCH=ARM;;
+		"i686"|"x86_64") LLVM_TARGET_ARCH=X86;;
+		*) termux_error_exit "Invalid arch: $TERMUX_ARCH"
+	esac
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGET_ARCH=$LLVM_TARGET_ARCH"
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_HOST_TRIPLE=$LLVM_DEFAULT_TARGET_TRIPLE"
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_INSTALL_PREFIX=$_LLVMLITE_LLVM_INSTALL_DIR"
@@ -114,12 +111,12 @@ __llvmlite_build_llvm() {
 
 	# Configure
 	mkdir -p "$TERMUX_PKG_BUILDDIR"
-	cd "$TERMUX_PKG_BUILDDIR"
+	cd "$TERMUX_PKG_BUILDDIR" && \
 	termux_step_configure_cmake
 
 	# Cross-compile & install LLVM
-	cd "$TERMUX_PKG_BUILDDIR"
-	ninja -j $TERMUX_PKG_MAKE_PROCESSES install
+	cd "$TERMUX_PKG_BUILDDIR" && \
+	ninja -j "$TERMUX_PKG_MAKE_PROCESSES" install
 
 	# Recover dirs and envs
 	LDFLAGS="$__old_ldflags"
@@ -146,12 +143,12 @@ __llvmlite_build_lib() {
 
 	# Configure
 	mkdir -p "$TERMUX_PKG_BUILDDIR"
-	cd "$TERMUX_PKG_BUILDDIR"
+	cd "$TERMUX_PKG_BUILDDIR" && \
 	termux_step_configure_cmake
 
 	# Cross-compile llvmlite
-	cd "$TERMUX_PKG_BUILDDIR"
-	ninja -j $TERMUX_PKG_MAKE_PROCESSES
+	cd "$TERMUX_PKG_BUILDDIR" && \
+	ninja -j "$TERMUX_PKG_MAKE_PROCESSES"
 
 	# Recover dirs and envs
 	TERMUX_PKG_SRCDIR="$__old_srcdir"
