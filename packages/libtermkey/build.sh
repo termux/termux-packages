@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library for processing of keyboard entry for terminal-ba
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.22
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=http://www.leonerd.org.uk/code/libtermkey/libtermkey-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=6945bd3c4aaa83da83d80a045c5563da4edd7d0374c62c0d35aec09eb3014600
 TERMUX_PKG_DEPENDS="libunibilium"
@@ -28,6 +28,7 @@ termux_step_make_install() {
 	install -Dm600 -t $TERMUX_PREFIX/lib libtermkey.so
 	chmod u+w termkey.h
 	install -Dm600 termkey.h $TERMUX_PREFIX/include/
+	mkdir -p "$TERMUX_PREFIX/share/pkgconfig"
 	LIBDIR=$TERMUX_PREFIX/lib INCDIR=$TERMUX_PREFIX/include VERSION=$TERMUX_PKG_VERSION sh termkey.pc.sh > \
-			$PKG_CONFIG_LIBDIR/termkey.pc
+			"$TERMUX_PREFIX/share/pkgconfig/termkey.pc"
 }
