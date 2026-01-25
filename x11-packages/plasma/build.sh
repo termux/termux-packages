@@ -1,0 +1,12 @@
+TERMUX_PKG_HOMEPAGE="https://kde.org/plasma-desktop/"
+TERMUX_PKG_DESCRIPTION="Meta package to install KDE Plasma"
+TERMUX_PKG_LICENSE="Public Domain"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=6.5
+TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_SKIP_SRC_EXTRACT=true
+TERMUX_PKG_DEPENDS="aurorae, breeze, breeze-gtk, kactivitymanagerd, kde-cli-tools, kde-gtk-config, kdecoration, kglobalacceld, kinfocenter, kmenuedit, knighttime, kpipewire, kscreen, ksystemstats, kwayland, kwin-x11, layer-shell-qt, libkscreen, libksysguard, libplasma, milou, ocean-sound-theme, oxygen, oxygen-sounds, plasma-activities, plasma-activities-stats, plasma-browser-integration, plasma-desktop, plasma-integration, plasma-pa, plasma-systemmonitor, plasma-welcome, plasma-workspace, plasma-workspace-wallpapers, print-manager, spectacle, systemsettings"
+TERMUX_PKG_RECOMMENDS="kdeplasma-addons"
+TERMUX_PKG_SUGGESTS="plasma-sdk"
+TERMUX_PKG_METAPACKAGE=true
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
