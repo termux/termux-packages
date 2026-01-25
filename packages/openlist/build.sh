@@ -22,6 +22,7 @@ TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 termux_pkg_auto_update() {
 	local latest_tag
 	latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL[0]}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")"
+	latest_tag="${latest_tag#v}"
 	(( ${#latest_tag} )) || {
 		printf '%s\n' \
 		'WARN: Auto update failure!' \
@@ -44,7 +45,8 @@ termux_pkg_auto_update() {
 	curl -sLo "${tmpdir}/openlist-linux-amd64.tar.gz" "https://github.com/OpenListTeam/OpenList/releases/download/v${latest_tag}/openlist-linux-amd64.tar.gz"
 	tar -C "${tmpdir}" -xf "${tmpdir}/openlist-linux-amd64.tar.gz"
 	chmod +x "${tmpdir}/openlist"
-	local latest_web_version="$("${tmpdir}"/openlist version | grep "WebVersion:" | cut -d ' ' -f 2 | sed 's/^v//')"
+	local latest_web_version
+	latest_web_version="$("${tmpdir}"/openlist version | grep "WebVersion:" | cut -d ' ' -f 2 | sed 's/^v//')"
 
 	curl -sLo "${tmpdir}/src" "https://github.com/OpenListTeam/OpenList/archive/refs/tags/v${latest_tag}.tar.gz"
 	curl -sLo "${tmpdir}/web" "https://github.com/OpenListTeam/OpenList-Frontend/releases/download/v${latest_web_version}/openlist-frontend-dist-v${latest_web_version}.tar.gz"
