@@ -20,15 +20,22 @@ TERMUX_PKG_EXCLUDED_ARCHES="arm"
 
 termux_pkg_auto_update() {
 	local api_url="https://api.github.com/repos/dotnet/core/git/refs/tags"
-	local latest_refs_tags=$(curl -s "${api_url}" | jq .[].ref | sed -ne "s|.*v\(9.0.*\)\"|\1|p")
+	local latest_refs_tags
+	latest_refs_tags="$(curl -s "${api_url}" | jq .[].ref | sed -ne "s|.*v\(9.0.*\)\"|\1|p")"
 	if [[ -z "${latest_refs_tags}" ]]; then
 		echo "WARN: Unable to get latest refs tags from upstream. Try again later." >&2
 		return
 	fi
 
-	local latest_version=$(echo "${latest_refs_tags}" | sort -V | tail -n1)
+	local latest_version
+	latest_version=$(echo "${latest_refs_tags}" | sort -V | tail -n1)
 	if [[ "${latest_version}" == "${TERMUX_PKG_VERSION}" ]]; then
 		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+		return
+	fi
+
+	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
+		echo "INFO: package needs to be updated to ${latest_version}."
 		return
 	fi
 
