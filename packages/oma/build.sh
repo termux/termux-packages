@@ -9,7 +9,7 @@ TERMUX_PKG_DEPENDS="libnettle, apt"
 TERMUX_PKG_RECOMMENDS="ripgrep"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+$"
+TERMUX_PKG_UPDATE_VERSION_REGEXP="v\d+\.\d+\.\d+(?!-)"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --no-default-features
 --features nice-setup
