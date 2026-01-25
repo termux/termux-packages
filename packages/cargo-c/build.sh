@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION="0.10.20"
 TERMUX_PKG_SRCURL=https://github.com/lu-zero/cargo-c/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9bdf7c10b44466a7c01dc4ed152da5031793cca9e0c8009d73223a32522cf2c3
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+(\.\d+)?$'
+TERMUX_PKG_UPDATE_VERSION_REGEXP='v\d+\.\d+\.\d+(?!-)'
 TERMUX_PKG_DEPENDS="libcurl, libgit2, libssh2, openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 
