@@ -8,4 +8,4 @@ TERMUX_PKG_SRCURL="https://github.com/msgpack/msgpack-c/releases/download/cpp-${
 TERMUX_PKG_SHA256=7504b7af7e7b9002ce529d4f941e1b7fb1fb435768780ce7da4abaac79bb156f
 TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP="^cpp-\K\d+\.\d+\.\d+$"
+TERMUX_PKG_UPDATE_VERSION_REGEXP="cpp-\d+\.\d+\.\d+"
