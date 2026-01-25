@@ -9,7 +9,7 @@ TERMUX_PKG_SHA256=ea1e0574f76c0541b014eab3fc32bf0bdda845a0e917175a5013f7920bea67
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="openssl, resolv-conf"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
+TERMUX_PKG_UPDATE_VERSION_REGEXP="lychee-v\d+\.\d+\.\d+"
 
 termux_step_pre_configure() {
 	termux_setup_rust

@@ -9,8 +9,7 @@ TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://gitlab.inria.fr/gf2x/gf2x/-/archive/gf2x-$TERMUX_PKG_VERSION/gf2x-gf2x-$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=11bcf98b620c60c2ee3b4460b02b7be741f14cfdc26b542f22c92950926575e0
 TERMUX_PKG_AUTO_UPDATE=true
-# Make sure we strip off the entire `gf2x-` prefix from the tag name.
-TERMUX_PKG_UPDATE_VERSION_REGEXP='gf2x-\K\d+\.\d+\.\d+$'
+TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+\.\d+(?!rc)'
 
 termux_step_pre_configure() {
 	autoreconf -fi
