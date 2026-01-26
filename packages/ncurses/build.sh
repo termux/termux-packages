@@ -8,16 +8,15 @@ TERMUX_PKG_MAINTAINER="@termux"
 # is checked in termux_step_pre_configure(), so the build will fail on a mistake.
 # Using this simplifies things (no need to avoid downloading and applying patches manually),
 # and uses github is a high available hosting.
-_SNAPSHOT_COMMIT=a480458efb0662531287f0c75116c0e91fe235cb
+_SNAPSHOT_COMMIT=607c49f34cc52dd88203c15ea09b0505c87a41b8
 
 # The subshell leaving the value in the outer scope unchanged is the point here.
 # shellcheck disable=SC2031
-TERMUX_PKG_VERSION=(6.5.20240831
+TERMUX_PKG_VERSION=(6.6.20260124
                     9.31
                     "$(. "$TERMUX_SCRIPTDIR/x11-packages/kitty/build.sh"; echo "$TERMUX_PKG_VERSION")"
                     "$(. "$TERMUX_SCRIPTDIR/x11-packages/alacritty/build.sh"; echo "$TERMUX_PKG_VERSION")"
                     "$(. "$TERMUX_SCRIPTDIR/x11-packages/foot/build.sh"; echo "$TERMUX_PKG_VERSION")")
-TERMUX_PKG_REVISION=3
 # shellcheck disable=SC2031
 TERMUX_PKG_SRCURL=("https://github.com/ThomasDickey/ncurses-snapshots/archive/${_SNAPSHOT_COMMIT}.tar.gz"
                    "https://dist.schmorp.de/rxvt-unicode/Attic/rxvt-unicode-${TERMUX_PKG_VERSION[1]}.tar.bz2"
@@ -25,7 +24,7 @@ TERMUX_PKG_SRCURL=("https://github.com/ThomasDickey/ncurses-snapshots/archive/${
                    "$(. "$TERMUX_SCRIPTDIR/x11-packages/alacritty/build.sh"; echo "$TERMUX_PKG_SRCURL")"
                    "$(. "$TERMUX_SCRIPTDIR/x11-packages/foot/build.sh"; echo "$TERMUX_PKG_SRCURL")")
 # shellcheck disable=SC2031
-TERMUX_PKG_SHA256=(ec6122c3b8ab930d1477a1dbfd90299e9f715555a98b6e6805d5ae1b0d72becd
+TERMUX_PKG_SHA256=(2c32b07ac7397ce19aefb9f38fe159cfdb18d5321d68e6fd93b03ccaf15b8f09
                    aaa13fcbc149fe0f3f391f933279580f74a96fd312d6ed06b8ff03c2d46672e8
                    "$(. "$TERMUX_SCRIPTDIR/x11-packages/kitty/build.sh"; echo "$TERMUX_PKG_SHA256")"
                    "$(. "$TERMUX_SCRIPTDIR/x11-packages/alacritty/build.sh"; echo "$TERMUX_PKG_SHA256")"
