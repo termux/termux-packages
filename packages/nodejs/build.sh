@@ -201,9 +201,13 @@ termux_step_make_install() {
 }
 
 termux_step_create_debscripts() {
-	cat <<- EOF > ./postinst
+	cat <<- EOF > ./preinst
 	#!$TERMUX_PREFIX/bin/sh
-	echo "Starting with nodejs v25.3.0-1, npm is no longer bundled with nodejs package."
-	echo "You might want to install npm package separately if you need it."
+	if [ "\$#" = "3" ] && dpkg --compare-versions "\$2" le "25.3.0"; then
+		echo "Starting with nodejs v25.3.0-1, npm is no longer bundled with nodejs package."
+		echo "You might want to install npm package separately if you need it."
+		echo "You can install it by running: pkg install npm"
+		echo "It should not be needed unless you are using --no-install-recommends with apt."
+	fi
 	EOF
 }
