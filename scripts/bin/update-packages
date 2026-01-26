@@ -238,43 +238,80 @@ _fetch_and_cache_tags() {
 	}
 
 	echo "$([[ "${CI-false}" == "true" ]] && echo "::group::" || :)INFO: Fetching GitHub packages via GraphQL API"
-	LATEST_TAGS_GITHUB="$(
-		termux_github_graphql "${GITHUB_GRAPHQL_QUERIES[@]}"
-	)"
+
+	local line
+	local -a LATEST_TAGS=() LATEST_TAGS_GITHUB=()
+
+	while IFS='' read -r line; do
+		case "$line" in
+			# The entries can be single or multi-line
+			# but each new entry starts with 'GIT|'
+			'GIT|'*) LATEST_TAGS_GITHUB+=("$line");;
+			# If the line didn't start a new entry, append it to the previous entry.
+			*)       LATEST_TAGS_GITHUB[-1]+=$'\n'"$line";;
+		esac
+	done < <(termux_github_graphql "${GITHUB_GRAPHQL_QUERIES[@]}")
+
 	[[ "${CI-false}" == "true" ]] && echo "::endgroup::" || :
 
 	echo "INFO: Fetching non-GitHub packages"
-	local LATEST_TAGS=''
-	LATEST_TAGS="$(
+	while read -r line; do
+		case "$line" in
+			# The entries can be single or multi-line
+			# but each new entry starts with 'GIT|'
+			'LOCAL|'*|'SKIP|'*|'PKG|'*) LATEST_TAGS+=("$line");;
+			# If the line didn't start a new entry, append it to the previous entry.
+			*)       LATEST_TAGS[-1]+=$'\n'"$line";;
+		esac
+		# Provide a running tally for local runs.
+		# Don't do this in the CI since that would spam the logs
+		[[ -z "${CI:-}" ]] && printf '\rINFO: Caching tags - %s' "${#LATEST_TAGS[*]}"
+	done < <(
 		export -f __main__
 		export TERMUX_SCRIPTDIR GITHUB_TOKEN TERMUX_REPOLOGY_DATA_FILE
 		printf '%s\0' "${__PACKAGES[@]}" | xargs -0 -n1 -P"$(nproc)" bash -c '__main__ "$@"' _ |& grep -E '^(LOCAL|PKG|SKIP)\|'
-	)"
+	)
+	# make sure the running tally gets a proper newline on local runs
+	[[ -z "${CI:-}" ]] && echo
+
 	unset -f __main__
 
 	local -A __GITHUB_CURRENT_TAGS=()
 	[[ "${CI-false}" == "true" ]] && echo "::group::INFO: Skipping the following up-to-date packages" || :
-	local pkg_type pkg_name version
-	while read -rd'|' pkg_type pkg_name version; do
+	local pkg pkg_type pkg_name pkg_version
+	for pkg in "${LATEST_TAGS[@]}" "${LATEST_TAGS_GITHUB[@]}"; do
+		# local -
+		# PS4='+$0 \[\e[32m\]${FUNCNAME[0]:-<global scope>}${FUNCNAME[*]:+()}:$LINENO\[\e[0m\] '; set -x
+
+		pkg_type="${pkg%%|*}"
+		pkg_name="${pkg#*|}"; pkg_name="${pkg_name%|*}"
+		pkg_version="${pkg##*|}"
 		case "${pkg_type}" in
 			"LOCAL") # Local package version for a GitHub GraphQL request.
-				__GITHUB_CURRENT_TAGS["${pkg_name:-_}"]="$version"
+				__GITHUB_CURRENT_TAGS["${pkg_name:-_}"]="$pkg_version"
 				continue
 			;;
 			"GIT") # GitHub GraphQL results, can be skipped if it matches the local version.
-				if [[ "${__GITHUB_CURRENT_TAGS["${pkg_name:-}"]:-}" == "${version}" ]]; then
-					echo "INFO: Skipping ${pkg_name}: already at version ${version}"
+				if [[ "${__GITHUB_CURRENT_TAGS["${pkg_name:-}"]:-}" == "${pkg_version}" ]]; then
+					echo "INFO: Skipping ${pkg_name}: already at version ${pkg_version}"
 					: "${_ALREADY_SEEN["${pkg_name}"]:=""}"
 				fi
 			;;
 			"SKIP") # SKIP means we know package is up to date and we can safely skip checks.
 				: "${_ALREADY_SEEN["${pkg_name}"]:=""}"
-				echo "INFO: Skipping ${pkg_name}: already at version ${version}"
+				echo "INFO: Skipping ${pkg_name}: already at version ${pkg_version}"
 			;;
 		esac
-		_LATEST_TAGS["${pkg_name:-_}"]="$version"
-	done < <(printf '%s\n' "$LATEST_TAGS" "$LATEST_TAGS_GITHUB")
+		_LATEST_TAGS["${pkg_name:-_}"]="$pkg_version"
+	done
+
 	[[ "${CI-false}" == "true" ]] && echo "::endgroup::" || :
+
+	# Sum up results
+	echo "INFO: Fetched ${#LATEST_TAGS[*]} tags."
+	echo "INFO: GitHub - ${#LATEST_TAGS_GITHUB[*]}"
+	echo "INFO: Other  - $(( ${#LATEST_TAGS[*]} - ${#LATEST_TAGS_GITHUB[*]} ))"
+	echo "INFO: Cached - ${#_ALREADY_SEEN[*]}"
 }
 
 _check_updated() {
