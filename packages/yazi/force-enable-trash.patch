@@ -1,0 +1,29 @@
+--- a/yazi-fs/Cargo.toml
++++ b/yazi-fs/Cargo.toml
+@@ -45,5 +45,5 @@ windows-sys = { version = "0.61.2", features = [ "Win32_Storage_FileSystem" ] }
+ core-foundation-sys = { workspace = true }
+ objc2               = { workspace = true }
+ 
+-[target.'cfg(not(target_os = "android"))'.dependencies]
++[target.'cfg(not(target_os = "disabling_this_because_it_is_for_building_an_apk"))'.dependencies]
+ trash = "5.2.5"
+--- a/yazi-fs/src/provider/local/local.rs
++++ b/yazi-fs/src/provider/local/local.rs
+@@ -189,7 +189,7 @@ impl<'a> Provider for Local<'a> {
+ 	async fn trash(&self) -> io::Result<()> {
+ 		let path = self.path.to_owned();
+ 		tokio::task::spawn_blocking(move || {
+-			#[cfg(target_os = "android")]
++			#[cfg(target_os = "disabling_this_because_it_is_for_building_an_apk")]
+ 			{
+ 				Err(io::Error::new(io::ErrorKind::Unsupported, "Unsupported OS for trash operation"))
+ 			}
+@@ -200,7 +200,7 @@ impl<'a> Provider for Local<'a> {
+ 				ctx.set_delete_method(DeleteMethod::NsFileManager);
+ 				ctx.delete(path).map_err(io::Error::other)
+ 			}
+-			#[cfg(all(not(target_os = "macos"), not(target_os = "android")))]
++			#[cfg(all(not(target_os = "macos"), not(target_os = "disabling_this_because_it_is_for_building_an_apk")))]
+ 			{
+ 				trash::delete(path).map_err(io::Error::other)
+ 			}
