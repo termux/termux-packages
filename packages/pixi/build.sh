@@ -7,6 +7,28 @@ TERMUX_PKG_VERSION="0.63.2"
 TERMUX_PKG_SKIP_SRC_ARCHIVE=true
 TERMUX_PKG_AUTO_UPDATE=true
 
+# Provide a dummy SRCURL for auto-update functionality
+TERMUX_PKG_SRCURL=https://github.com/prefix-dev/pixi/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+
+termux_pkg_auto_update() {
+	# Fetch latest release information from GitHub API
+	local api_url="https://api.github.com/repos/prefix-dev/pixi/releases/latest"
+	local latest_version=$(curl -s "${api_url}" | jq -r .tag_name | sed 's/^v//')
+
+	if [[ -z "${latest_version}" ]] || [[ "${latest_version}" == "null" ]]; then
+		echo "WARN: Unable to fetch latest version from GitHub API"
+		return
+	fi
+
+	if [[ "${latest_version}" == "${TERMUX_PKG_VERSION}" ]]; then
+		echo "INFO: Already at latest version ${TERMUX_PKG_VERSION}"
+		return
+	fi
+
+	echo "INFO: Updating pixi from ${TERMUX_PKG_VERSION} to ${latest_version}"
+	termux_pkg_upgrade_version "${latest_version}"
+}
+
 termux_step_pre_configure() {
 	# Download pre-built static binaries based on architecture
 	case "$TERMUX_ARCH" in
