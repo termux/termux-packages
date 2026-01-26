@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Text editor for your terminal: easy, powerful and fast"
 TERMUX_PKG_LICENSE="GPL-2.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.1.90"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/sinelaw/fresh/releases/download/v$TERMUX_PKG_VERSION/fresh-editor-$TERMUX_PKG_VERSION-source.tar.gz"
 TERMUX_PKG_SHA256=c55087ac14256965aa41dbfff1f4df2632d10dd6a12f0f7a5bfa1a3870e71375
 TERMUX_PKG_AUTO_UPDATE=true
@@ -27,6 +28,11 @@ termux_step_pre_configure() {
 
 	local patch="$TERMUX_PKG_BUILDER_DIR/rust-cc-do-not-concatenate-all-the-CFLAGS.diff"
 	local dir="vendor/cc"
+	echo "Applying patch: $patch"
+	patch -p1 -d "$dir" < "$patch"
+
+	patch="$TERMUX_PKG_BUILDER_DIR/trash-rs-implement-get_mount_points-android.diff"
+	dir="vendor/trash"
 	echo "Applying patch: $patch"
 	patch -p1 -d "$dir" < "$patch"
 
