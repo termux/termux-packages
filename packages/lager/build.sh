@@ -1,0 +1,13 @@
+TERMUX_PKG_HOMEPAGE='https://sinusoid.es/lager'
+TERMUX_PKG_DESCRIPTION='C++ library for value-oriented design using the unidirectional data-flow architecture'
+TERMUX_PKG_LICENSE="BSL-1.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=0.1.1
+TERMUX_PKG_SRCURL=https://github.com/arximboldi/lager/archive/v${TERMUX_PKG_VERSION}/lager-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=9e4743c3fe2c95c1653c3fd088a2200108f09d758725697831852dc91d15d174
+TERMUX_PKG_DEPENDS="cmake"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-Dlager_BUILD_EXAMPLES=OFF
+-Dlager_BUILD_TESTS=OFF
+"

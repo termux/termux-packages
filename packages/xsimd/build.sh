@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE='https://github.com/QuantStack/xsimd'
+TERMUX_PKG_DESCRIPTION='QuantStack tools library - Multi-dimensional arrays with broadcasting and lazy computing'
+TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=13.0.0
+TERMUX_PKG_SRCURL=git+https://github.com/QuantStack/xsimd
+TERMUX_PKG_GIT_BRANCH="$TERMUX_PKG_VERSION"
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_BUILD_DEPENDS="googletest"
+TERMUX_PKG_AUTO_UPDATE=true
