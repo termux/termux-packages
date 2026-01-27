@@ -1,14 +1,27 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
 # DMETA - Professional Project Metadata Tool
-# Features: Path detection, SHA-256 Validation, KB Suggestion
+# v2.0 - DESS-STATION OFFICIAL TOOL
 
 set -e
 
-# --- Core Functions ---
-
 get_sha256() {
     sha256sum "$1" | cut -d' ' -f1
+}
+
+show_menu() {
+    clear
+    echo -e "\e[1;36m██████  ███    ███ ███████ ████████  █████ \e[0m"
+    echo -e "\e[1;36m██   ██ ████  ████ ██         ██    ██   ██\e[0m"
+    echo -e "\e[1;36m██   ██ ██ ████ ██ █████      ██    ███████\e[0m"
+    echo -e "\e[1;36m██   ██ ██  ██  ██ ██         ██    ██   ██\e[0m"
+    echo -e "\e[1;36m██████  ██      ██ ███████    ██    ██   ██\e[0m"
+    echo "--------------------------------------------------"
+    echo " USAGE INSTRUCTIONS:"
+    echo "  dmeta --create <path>      - Create interactive .dmeta"
+    echo "  dmeta --validate <file>    - Verify integrity & tag"
+    echo "--------------------------------------------------"
+    echo "v2.0 - DESS-STATION OFFICIAL TOOL"
 }
 
 validate_binary() {
@@ -20,56 +33,45 @@ validate_binary() {
         exit 1
     fi
 
-    echo -e "\e[1;34m[*] Reading binary ID from metadata...\e[0m"
-    # Extract the validate-id from the file
-    SAVED_ID=$(grep -oP 'validate-id="\K[^"]+' "$meta_file" || echo "not_found")
+    echo -e "\e[1;34m[*] Checking binary integrity...\e[0m"
+    SAVED_ID=$(grep -oP 'validate-id="\K[^"]+' "$meta_file" || echo "none")
     CURRENT_ID=$(get_sha256 "$target")
 
     if [[ "$SAVED_ID" == "$CURRENT_ID" ]]; then
-        echo -e "\e[1;32m[✓] VALID: Binary matches stored hash.\e[0m"
-        # Adds the check-id tag as requested
+        echo -e "\e[1;32m[✓] VALID: Official binary detected.\e[0m"
+        # Edit the dmeta code and add the tag: <check-id="official binary code">
         sed -i "/<\/security-layer>/i \        <check-id=\"$CURRENT_ID\">" "$meta_file"
-        echo "[*] Tag <check-id> added to metadata."
+        echo "[*] Security tag <check-id> appended to metadata."
     else
-        echo -e "\e[1;31m[!] WARNING: INVALID BINARY! Hash mismatch detected.\e[0m"
-        echo "Expected: $SAVED_ID"
-        echo "Found:    $CURRENT_ID"
+        echo -e "\e[1;31m[!] WARNING: INVALID BINARY! Potential tampering detected.\e[0m"
     fi
 }
-
-# --- Main Logic ---
 
 if [[ "$1" == "--validate" && -n "$2" ]]; then
     validate_binary "$2"
     exit 0
-elif [[ -z "$1" || "$1" == "--help" ]]; then
-    echo "Usage: dmeta [file_path]           (To generate)"
-    echo "       dmeta --validate [file_path] (To check integrity)"
-    exit 0
-fi
+elif [[ "$1" == "--create" && -n "$2" ]]; then
+    TARGET_PATH="$2"
+    if [[ ! -e "$TARGET_PATH" ]]; then
+        echo -e "\e[1;31mError: Path '$TARGET_PATH' not found.\e[0m"
+        exit 1
+    fi
 
-TARGET_PATH="$1"
+    echo -e "\e[1;34m--- GENERATING METADATA ---\e[0m"
+    read -p "Project Name: " PROJECT_NAME
+    read -p "Version: " VERSION
+    echo "Type: [apk / game / mod]"
+    read -p "Enter Type: " TYPE
+    read -p "Description: " DESCRIPTION
 
-if [[ ! -e "$TARGET_PATH" ]]; then
-    echo -e "\e[1;31mError: Path '$TARGET_PATH' not found.\e[0m"
-    exit 1
-fi
+    # Security suggestions: Date and Size in KB
+    FILE_SIZE_KB=$(du -k "$TARGET_PATH" | cut -f1)
+    FILE_DATE=$(date +"%Y-%m-%d %H:%M:%S")
+    BINARY_CODE=$(get_sha256 "$TARGET_PATH")
 
-echo -e "\e[1;34m--- DMETA GENERATOR ---\e[0m"
-read -p "Project Name: " PROJECT_NAME
-read -p "Version: " VERSION
-echo "Select Type: [apk/game/mod]"
-read -p "Type: " TYPE
-read -p "Description: " DESCRIPTION
+    OUTPUT_FILE="${TARGET_PATH}.dmeta"
 
-# Professional Security Suggestion
-FILE_SIZE_KB=$(du -k "$TARGET_PATH" | cut -f1)
-FILE_DATE=$(date +"%Y-%m-%d %H:%M:%S")
-BINARY_CODE=$(get_sha256 "$TARGET_PATH")
-
-OUTPUT_FILE="${TARGET_PATH}.dmeta"
-
-cat <<DATA > "$OUTPUT_FILE"
+    cat <<DATA > "$OUTPUT_FILE"
 <dmeta-header>
     <project-info>
         <name>$PROJECT_NAME</name>
@@ -84,5 +86,7 @@ cat <<DATA > "$OUTPUT_FILE"
     </security-layer>
 </dmeta-header>
 DATA
-
-echo -e "\e[1;32m[✓] Metadata generated: $OUTPUT_FILE\e[0m"
+    echo -e "\e[1;32m[✓] Metadata created at: $OUTPUT_FILE\e[0m"
+else
+    show_menu
+fi
