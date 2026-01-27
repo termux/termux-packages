@@ -341,20 +341,9 @@ _check_updated() {
 declare -A _CACHED_ISSUES=()
 # Check if an issue with same title already exists and is open.
 _gh_check_issue_exists() {
-	local pkg_name="$1" number title
-	if [[ -z "${_CACHED_ISSUE_TITLES[*]}" ]]; then
-		while read -r number title; do
-			_CACHED_ISSUES["$number"]="'${title}'" # An extra quote ('') is added to avoid false positive matches.
-		done < <(
-			gh issue list \
-				--limit 10000 \
-				--label "auto update failing" --label "bot" \
-				--state open \
-				--search "Auto update failing for in:title type:issue" \
-				--json number,title | jq -r '.[] | "\(.number) \(.title)"' | sort | uniq
-		)
-	fi
+	local pkg_name="$1" number
 
+	# Check the cache.
 	for number in "${!_CACHED_ISSUES[@]}"; do
 		# shellcheck disable=SC2076 # We want literal match here, not regex based.
 		if [[ "${_CACHED_ISSUES[$number]}" =~ "'Auto update failing for ${pkg_name}'" ]]; then
@@ -391,7 +380,7 @@ _run_update() {
 		: "${_NEWEST_VERSION:="${_CURRENT_VERSION}"}"
 
 		# Check associated issues if able.
-		if [[ -n "$GITHUB_TOKEN" ]] && command -v gh &> /dev/null; then
+		if (( ${#_CACHED_ISSUES[*]} )); then
 			_ISSUE="$(_gh_check_issue_exists "${pkg_name}")"
 		fi
 
@@ -454,8 +443,27 @@ _update_dependencies() {
 	done < <("${TERMUX_SCRIPTDIR}"/scripts/buildorder.py "${pkg_dir}" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
 }
 
-echo "INFO: Running update for: $*"
+echo "INFO: Running updates for: $*"
 
+# If we have `gh` and a GitHub token,
+# cache the open auto-update issues for `_gh_check_issue_exists`
+if [[ -n "$GITHUB_TOKEN" ]] && command -v gh &> /dev/null; then
+	_start_time="$(date +%10s%3N)"
+
+	while read -r number title; do
+		_CACHED_ISSUES["$number"]="'${title}'" # An extra quote ('') is added to avoid false positive matches.
+	done < <(
+		gh issue list \
+			--limit 10000 \
+			--label "auto update failing" --label "bot" \
+			--state open \
+			--search "Auto update failing for in:title type:issue" \
+			--json number,title | jq -r '.[] | "\(.number) \(.title)"' | sort | uniq
+	)
+	printf "Cached %s existing issues - took %s\n" \
+		"${#_CACHED_ISSUES[*]}" \
+		"$(ms_to_human_readable $(( $(date +%10s%3N) - _start_time )))"
+fi
 _start_time="$(date +%10s%3N)"
 
 # Remove any leftover FIFOs that may not have been cleaned up.
