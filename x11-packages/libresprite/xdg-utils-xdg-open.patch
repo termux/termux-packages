@@ -1,0 +1,20 @@
+--- a/src/base/launcher.cpp
++++ b/src/base/launcher.cpp
+@@ -98,7 +98,7 @@ bool open_file(const std::string& file)
+ 
+ #else
+ 
+-  ret = std::system(("xdg-open \"" + file + "\"").c_str());
++  ret = std::system(("xdg-utils-xdg-open \"" + file + "\"").c_str());
+ 
+ #endif
+ 
+@@ -138,7 +138,7 @@ bool open_folder(const std::string& _file)
+   if (!base::is_directory(file))
+     file = base::get_file_path(file);
+ 
+-  int ret = std::system(("xdg-open \"" + file + "\"").c_str());
++  int ret = std::system(("xdg-utils-xdg-open \"" + file + "\"").c_str());
+   return (ret == 0);
+ 
+ #endif
