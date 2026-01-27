@@ -1,19 +1,50 @@
 #!/data/data/com.termux/files/usr/bin/bash
+
+# DAP - Dess Archive Protect
+# v2.0 - DESS-STATION OFFICIAL TOOL
+
 set -e
-show_help() {
-    echo "DAP - Asset Encryption Tool"
-    echo "Usage: dap [encrypt/decrypt] [file_path]"
+
+show_menu() {
+    clear
+    echo -e "\e[1;36m██████   █████  ██████ "
+    echo -e "██   ██ ██   ██ ██   ██"
+    echo -e "██   ██ ███████ ██████ "
+    echo -e "██   ██ ██   ██ ██     "
+    echo -e "██████  ██   ██ ██           DESS ARCHIVE PROTECT\e[0m"
+    echo "--------------------------------------------------"
+    echo " USAGE INSTRUCTIONS:"
+    echo "  dap --encrypt <file>       - Inject Binary5 Security"
+    echo "  dap --decrypt <file>       - Restore Original Asset"
+    echo ""
+    echo " ADVANCED (Requires License):"
+    echo "  dap --copyright <file>     - Add Digital Signature"
+    echo "--------------------------------------------------"
+    echo "v2.0 - DESS-STATION OFFICIAL TOOL"
 }
-if [[ -z "$1" || -z "$2" ]]; then show_help; exit 1; fi
-ACTION="$1"
-TARGET_FILE="$2"
-if [[ ! -f "$TARGET_FILE" ]]; then echo "Error: File not found."; exit 1; fi
-if [[ "$ACTION" == "encrypt" ]]; then
-    openssl enc -aes-256-cbc -salt -in "$TARGET_FILE" -out "${TARGET_FILE}.dess"
-    echo -e "\e[1;32m[✓] Protected: ${TARGET_FILE}.dess generated.\e[0m"
-elif [[ "$ACTION" == "decrypt" ]]; then
-    openssl enc -aes-256-cbc -d -salt -in "$TARGET_FILE" -out "${TARGET_FILE%.dess}"
-    echo -e "\e[1;32m[✓] Decrypted: ${TARGET_FILE%.dess} restored.\e[0m"
+
+# Funções de Criptografia Profissional
+encrypt_file() {
+    local target=$1
+    echo -e "\e[1;34m[*] Injecting Binary5 Security Block...\e[0m"
+    openssl enc -aes-256-cbc -salt -in "$target" -out "${target}.dess"
+    echo -e "\e[1;32m[✓] Success: ${target}.dess protected.\e[0m"
+}
+
+decrypt_file() {
+    local target=$1
+    echo -e "\e[1;34m[*] Restoring Original Asset...\e[0m"
+    openssl enc -aes-256-cbc -d -salt -in "$target" -out "${target%.dess}"
+    echo -e "\e[1;32m[✓] Success: Binary restored.\e[0m"
+}
+
+# Lógica de Argumentos
+if [[ "$1" == "--encrypt" && -n "$2" ]]; then
+    encrypt_file "$2"
+elif [[ "$1" == "--decrypt" && -n "$2" ]]; then
+    decrypt_file "$2"
+elif [[ "$1" == "--copyright" ]]; then
+    echo -e "\e[1;31m[!] Error: DESS SERVICES License Required.\e[0m"
 else
-    show_help
+    show_menu
 fi
