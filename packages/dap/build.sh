@@ -14,3 +14,4 @@ termux_step_make_install() {
     install -m 755 $TERMUX_PKG_SRCDIR/dmeta $TERMUX_PREFIX/bin/dmeta
     install -m 755 $TERMUX_PKG_SRCDIR/dap-error-info $TERMUX_PREFIX/bin/dap-error-info
 }
+# Technical update for CI trigger
