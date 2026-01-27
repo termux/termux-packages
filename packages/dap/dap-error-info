@@ -1,0 +1,23 @@
+#!/data/data/com.termux/files/usr/bin/bash
+clear
+echo -e "\e[1;36m██████   █████  ██████ "
+echo -e "██   ██ ██   ██ ██   ██"
+echo -e "██   ██ ███████ ██████ "
+echo -e "██   ██ ██   ██ ██     "
+echo -e "██████  ██   ██ ██           \e[1;31mDAP-ERROR-INFO v1.1\e[0m"
+echo "--------------------------------------------------"
+echo -e "\e[1;33m>>> SYSTEM SCAN RESULTS <<<\e[0m"
+FREE_SPACE=$(df -h $PREFIX | awk 'NR==2 {print $4}')
+echo -e "[*] Storage:   \e[1;32m$FREE_SPACE Free\e[0m"
+echo -ne "[*] Network:   "; ping -c 1 8.8.8.8 &>/dev/null && echo -e "\e[1;32mConnected\e[0m" || echo -e "\e[1;31mDisconnected\e[0m"
+echo -ne "[*] Sec-Core:  "; command -v openssl &>/dev/null && echo -e "\e[1;32mFound\e[0m" || echo -e "\e[1;31mMissing\e[0m"
+echo "--------------------------------------------------"
+echo -e "\e[1;33m>>> ENCYCLOPEDIA OF SOLUTIONS <<<\e[0m"
+echo -e "\e[1;32m[A] SYSTEM INITIALIZATION ERROR\e[0m"
+echo "    - Run: pkg update && pkg upgrade"
+echo -e "\n\e[1;32m[B] STORAGE ACCESS DENIED\e[0m"
+echo "    - Run: termux-setup-storage"
+echo -e "\n\e[1;32m[C] REPOSITORY CORRUPTION\e[0m"
+echo "    - Run: termux-change-repo"
+echo "--------------------------------------------------"
+echo -e "\e[1;37mDESS-STATION OFFICIAL SUPPORT - 2026\e[0m"
