@@ -1,8 +1,8 @@
-These two tests only fail in termux-proot-run, not in an actual Termux App,
+This test only fails in termux-proot-run, not in an actual Termux App,
 because of different behavior of the proot environment, and it doesn't
-seem easy or straightforward to somehow fix them specifically for termux-proot-run.
+seem easy or straightforward to somehow fix it specifically for termux-proot-run.
 
-Builds of SBCL produced by 'termux-proot-run sh make.sh' still pass these tests when
+Builds of SBCL produced by 'termux-proot-run sh make.sh' still pass this test when
 the build directory is copied to a real Termux App and the test suite is run there.
 
 run-program-test.sh all envrionment variables comparison test:
@@ -69,18 +69,6 @@ SBCL_RUNTIME=/home/builder/.termux-build/sbcl/src/tests/../src/runtime/sbcl
 SBCL_PWD=/home/builder/.termux-build/sbcl/src/tests
 ".
 
-malloc-failure:
-This test essentially behaves similarly to a fork bomb or zip bomb
-in some environments, like termux-proot-run.
-It is an intentional, aggressive memory leak, sometimes.
-It repeatedly calls malloc() in a loop until the system memory is
-full, and it registers as a failure on systems that have an OOM killer daemon
-running because the OOM killer will kill the lisp process before the test can
-complete.
-This is noted in the comment by upstream, and it is explained that this test
-is expected to fail and have to be disabled in some situations.
-https://github.com/sbcl/sbcl/blob/b46a61a4fd23f4e3954771eb9c9914dd26a21048/tests/alien.impure.lisp#L373-L381
-
 --- a/tests/run-program.test.sh
 +++ b/tests/run-program.test.sh
 @@ -101,7 +101,7 @@ run_sbcl --eval "(defvar *exit-ok* $EXIT_LISP_WIN)" <<'EOF'
@@ -92,14 +80,3 @@ https://github.com/sbcl/sbcl/blob/b46a61a4fd23f4e3954771eb9c9914dd26a21048/tests
    (let* ((sb-impl::*default-external-format* :latin-1)
           (sb-alien::*default-c-string-external-format* :latin-1)   
           (string (with-output-to-string (stream)
---- a/tests/alien.impure.lisp
-+++ b/tests/alien.impure.lisp
-@@ -382,7 +382,7 @@
- #+64-bit (unless (>= (integer-length array-total-size-limit) 45)
-            (push :skip-malloc-test *features*))
- (with-test (:name :malloc-failure ; for lp#891268
--                  :skipped-on (or :ubsan :msan :skip-malloc-test))
-+                  :skipped-on (or :ubsan :msan :skip-malloc-test :android))
-   (assert (eq :enomem
-               (handler-case
-                   (loop repeat 128
