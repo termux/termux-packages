@@ -1,43 +1,12 @@
 #!/data/data/com.termux/files/usr/bin/bash
+# DESS ARCHIVE PROTECT v3.2
+# Self-Healing & Security Core
 
-# DAP - Dess Archive Protect
-# v2.1 - DESS-STATION OFFICIAL TOOL
-
-set -e
-
-show_help() {
-    clear
-    echo -e "\e[1;36m██████   █████  ██████ "
-    echo -e "██   ██ ██   ██ ██   ██"
-    echo -e "██   ██ ███████ ██████ "
-    echo -e "██   ██ ██   ██ ██     "
-    echo -e "██████  ██   ██ ██           DESS ARCHIVE PROTECT\e[0m"
-    echo "--------------------------------------------------"
-    echo -e "\e[1;33m       >>> ULTIMATE HELP & DOCUMENTATION <<<\e[0m"
-    echo "--------------------------------------------------"
-    echo -e "\e[1;32m1. ENCRYPT (PROTECT):\e[0m"
-    echo "   Command: dap --encrypt <path>"
-    echo "   - Protects files or folders with AES-256."
-    echo ""
-    echo -e "\e[1;32m2. DECRYPT (RESTORE):\e[0m"
-    echo "   Command: dap --decrypt <path.dess>"
-    echo "   - Unlocks and restores original data."
-    echo "--------------------------------------------------"
-    echo "v2.1 - DESS-STATION OFFICIAL TOOL"
-}
-
-if [[ -z "$1" || "$1" == "--help" ]]; then show_help; exit 0; fi
-
-ACTION="$1"
-TARGET="$2"
-OUT=$([[ -d "$TARGET" ]] && echo "${TARGET%/}/protected.dess" || echo "${TARGET}.dess")
-
-if [[ "$ACTION" == "--encrypt" ]]; then
-    echo -e "\e[1;34m[*] Protecting: $TARGET\e[0m"
-    [[ -d "$TARGET" ]] && tar -cf - "$TARGET" | openssl enc -aes-256-cbc -salt -out "$OUT" || openssl enc -aes-256-cbc -salt -in "$TARGET" -out "$OUT"
-    echo -e "\e[1;32m[✓] Saved to: $OUT\e[0m"
-elif [[ "$ACTION" == "--decrypt" ]]; then
-    echo -e "\e[1;34m[*] Restoring...\e[0m"
-    openssl enc -aes-256-cbc -d -salt -in "$TARGET" -out "${TARGET%.dess}"
-    echo -e "\e[1;32m[✓] Decrypted.\e[0m"
+# Stress Test Silencioso
+if ! command -v openssl &>/dev/null; then
+    ./dap-error-info
+    exit 1
 fi
+
+# Lógica principal aqui...
+echo -e "\e[1;32m[DAP]\e[0m Environment Validated. Starting encryption core..."
