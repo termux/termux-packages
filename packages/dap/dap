@@ -1,0 +1,19 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -e
+show_help() {
+    echo "DAP - Asset Encryption Tool"
+    echo "Usage: dap [encrypt/decrypt] [file_path]"
+}
+if [[ -z "$1" || -z "$2" ]]; then show_help; exit 1; fi
+ACTION="$1"
+TARGET_FILE="$2"
+if [[ ! -f "$TARGET_FILE" ]]; then echo "Error: File not found."; exit 1; fi
+if [[ "$ACTION" == "encrypt" ]]; then
+    openssl enc -aes-256-cbc -salt -in "$TARGET_FILE" -out "${TARGET_FILE}.dess"
+    echo -e "\e[1;32m[✓] Protected: ${TARGET_FILE}.dess generated.\e[0m"
+elif [[ "$ACTION" == "decrypt" ]]; then
+    openssl enc -aes-256-cbc -d -salt -in "$TARGET_FILE" -out "${TARGET_FILE%.dess}"
+    echo -e "\e[1;32m[✓] Decrypted: ${TARGET_FILE%.dess} restored.\e[0m"
+else
+    show_help
+fi

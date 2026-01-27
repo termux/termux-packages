@@ -1,0 +1,88 @@
+#!/data/data/com.termux/files/usr/bin/bash
+
+# DMETA - Professional Project Metadata Tool
+# Features: Path detection, SHA-256 Validation, KB Suggestion
+
+set -e
+
+# --- Core Functions ---
+
+get_sha256() {
+    sha256sum "$1" | cut -d' ' -f1
+}
+
+validate_binary() {
+    local target=$1
+    local meta_file="${target}.dmeta"
+
+    if [[ ! -f "$meta_file" ]]; then
+        echo -e "\e[1;31m[!] Error: Metadata file (.dmeta) not found.\e[0m"
+        exit 1
+    fi
+
+    echo -e "\e[1;34m[*] Reading binary ID from metadata...\e[0m"
+    # Extract the validate-id from the file
+    SAVED_ID=$(grep -oP 'validate-id="\K[^"]+' "$meta_file" || echo "not_found")
+    CURRENT_ID=$(get_sha256 "$target")
+
+    if [[ "$SAVED_ID" == "$CURRENT_ID" ]]; then
+        echo -e "\e[1;32m[✓] VALID: Binary matches stored hash.\e[0m"
+        # Adds the check-id tag as requested
+        sed -i "/<\/security-layer>/i \        <check-id=\"$CURRENT_ID\">" "$meta_file"
+        echo "[*] Tag <check-id> added to metadata."
+    else
+        echo -e "\e[1;31m[!] WARNING: INVALID BINARY! Hash mismatch detected.\e[0m"
+        echo "Expected: $SAVED_ID"
+        echo "Found:    $CURRENT_ID"
+    fi
+}
+
+# --- Main Logic ---
+
+if [[ "$1" == "--validate" && -n "$2" ]]; then
+    validate_binary "$2"
+    exit 0
+elif [[ -z "$1" || "$1" == "--help" ]]; then
+    echo "Usage: dmeta [file_path]           (To generate)"
+    echo "       dmeta --validate [file_path] (To check integrity)"
+    exit 0
+fi
+
+TARGET_PATH="$1"
+
+if [[ ! -e "$TARGET_PATH" ]]; then
+    echo -e "\e[1;31mError: Path '$TARGET_PATH' not found.\e[0m"
+    exit 1
+fi
+
+echo -e "\e[1;34m--- DMETA GENERATOR ---\e[0m"
+read -p "Project Name: " PROJECT_NAME
+read -p "Version: " VERSION
+echo "Select Type: [apk/game/mod]"
+read -p "Type: " TYPE
+read -p "Description: " DESCRIPTION
+
+# Professional Security Suggestion
+FILE_SIZE_KB=$(du -k "$TARGET_PATH" | cut -f1)
+FILE_DATE=$(date +"%Y-%m-%d %H:%M:%S")
+BINARY_CODE=$(get_sha256 "$TARGET_PATH")
+
+OUTPUT_FILE="${TARGET_PATH}.dmeta"
+
+cat <<DATA > "$OUTPUT_FILE"
+<dmeta-header>
+    <project-info>
+        <name>$PROJECT_NAME</name>
+        <version>$VERSION</version>
+        <type>$TYPE</type>
+        <description>$DESCRIPTION</description>
+        <creation-date>$FILE_DATE</creation-date>
+        <file-size>${FILE_SIZE_KB}kb</file-size>
+    </project-info>
+    <security-layer>
+        <validate-id="$BINARY_CODE">
+    </security-layer>
+</dmeta-header>
+DATA
+
+echo -e "\e[1;32m[✓] Metadata generated: $OUTPUT_FILE\e[0m"
