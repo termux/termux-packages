@@ -5,6 +5,14 @@
 
 set -e
 
+get_sha256() {
+    if [[ -d "$1" ]]; then
+        find "$1" -type f -not -name "*.dmeta" -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1
+    else
+        sha256sum "$1" | cut -d' ' -f1
+    fi
+}
+
 show_help() {
     clear
     echo -e "\e[1;36m██████  ███    ███ ███████ ████████  █████ \e[0m"
@@ -19,16 +27,67 @@ show_help() {
     echo "   Command: dmeta --create <folder_path>"
     echo "   - Scans all files and folders recursively."
     echo "   - Generates 'metadata.dmeta' INSIDE the folder."
-    echo "   - Records SHA-256 ID, file counts, and sizes."
     echo ""
     echo -e "\e[1;32m2. VALIDATE INTEGRITY:\e[0m"
     echo "   Command: dmeta --validate <folder_path>"
     echo "   - Compares current files with the stored ID."
-    echo "   - Detects if any file was modified or deleted."
     echo "   - Appends <check-id> tag for official approval."
     echo "--------------------------------------------------"
     echo "v2.7 - DESS-STATION OFFICIAL TOOL"
 }
 
-# (Restante do script v2.6 mantido com as correções de path e lógica)
-# ... [Lógica de Create e Validate aqui] ...
+validate_binary() {
+    local target=$1
+    local meta_file=$([[ -d "$target" ]] && echo "${target%/}/metadata.dmeta" || echo "${target}.dmeta")
+    if [[ ! -f "$meta_file" ]]; then echo -e "\e[1;31m[!] Metadata not found.\e[0m"; exit 1; fi
+    echo -e "\e[1;34m[*] Performing Deep Integrity Check...\e[0m"
+    SAVED_ID=$(grep -oP 'validate-id="\K[^"]+' "$meta_file" || echo "none")
+    CURRENT_ID=$(get_sha256 "$target")
+    if [[ "$SAVED_ID" == "$CURRENT_ID" ]]; then
+        echo -e "\e[1;32m[✓] VALIDATION SUCCESSFUL.\e[0m"
+        sed -i "/<\/security-layer>/i \        <check-id=\"$CURRENT_ID\">" "$meta_file"
+    else
+        echo -e "\e[1;31m[!] WARNING: INVALID! Tampering detected.\e[0m"
+    fi
+}
+
+if [[ -z "$1" || "$1" == "--help" ]]; then show_help; exit 0; fi
+
+if [[ "$1" == "--validate" && -n "$2" ]]; then
+    validate_binary "$2"
+elif [[ "$1" == "--create" && -n "$2" ]]; then
+    TARGET="$2"
+    OUT=$([[ -d "$TARGET" ]] && echo "${TARGET%/}/metadata.dmeta" || echo "${TARGET}.dmeta")
+    echo -e "\e[1;34m--- FORMULATING DEEP METADATA ---\e[0m"
+    read -p "Project Name: " NAME
+    read -p "Version: " VER
+    read -p "Type: " TYPE
+    read -p "Description: " DESC
+    F_COUNT=$(find "$TARGET" -type f | wc -l); D_COUNT=$(find "$TARGET" -type d | wc -l)
+    SIZE=$(du -sk "$TARGET" | cut -f1); DATE=$(date +"%Y-%m-%d %H:%M:%S")
+    ID=$(get_sha256 "$TARGET")
+    TREE=$(find "$TARGET" -maxdepth 2 -not -path '*/.*' | sed 's|^|        |')
+    cat <<DATA > "$OUT"
+<dmeta-header>
+    <project-info>
+        <name>$NAME</name>
+        <version>$VER</version>
+        <type>$TYPE</type>
+        <description>$DESC</description>
+        <creation-date>$DATE</creation-date>
+        <total-size>${SIZE}kb</total-size>
+    </project-info>
+    <content-analysis>
+        <total-files>$F_COUNT</total-files>
+        <total-folders>$D_COUNT</total-folders>
+        <structure-preview>
+$TREE
+        </structure-preview>
+    </content-analysis>
+    <security-layer>
+        <validate-id="$ID">
+    </security-layer>
+</dmeta-header>
+DATA
+    echo -e "\e[1;32m[✓] Metadata created: $OUT\e[0m"
+fi

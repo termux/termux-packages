@@ -17,17 +17,27 @@ show_help() {
     echo "--------------------------------------------------"
     echo -e "\e[1;32m1. ENCRYPT (PROTECT):\e[0m"
     echo "   Command: dap --encrypt <path>"
-    echo "   - Uses AES-256-CBC Industry Standard."
-    echo "   - If it's a folder, it creates a protected archive."
-    echo "   - Generates '.dess' secure files."
+    echo "   - Protects files or folders with AES-256."
     echo ""
     echo -e "\e[1;32m2. DECRYPT (RESTORE):\e[0m"
     echo "   Command: dap --decrypt <path.dess>"
-    echo "   - Unlocks and restores your original data."
-    echo "   - Requires the same password used in encryption."
+    echo "   - Unlocks and restores original data."
     echo "--------------------------------------------------"
     echo "v2.1 - DESS-STATION OFFICIAL TOOL"
 }
 
-# (Restante da lógica v2.0 mantida)
-# ... [Lógica de Encrypt e Decrypt aqui] ...
+if [[ -z "$1" || "$1" == "--help" ]]; then show_help; exit 0; fi
+
+ACTION="$1"
+TARGET="$2"
+OUT=$([[ -d "$TARGET" ]] && echo "${TARGET%/}/protected.dess" || echo "${TARGET}.dess")
+
+if [[ "$ACTION" == "--encrypt" ]]; then
+    echo -e "\e[1;34m[*] Protecting: $TARGET\e[0m"
+    [[ -d "$TARGET" ]] && tar -cf - "$TARGET" | openssl enc -aes-256-cbc -salt -out "$OUT" || openssl enc -aes-256-cbc -salt -in "$TARGET" -out "$OUT"
+    echo -e "\e[1;32m[✓] Saved to: $OUT\e[0m"
+elif [[ "$ACTION" == "--decrypt" ]]; then
+    echo -e "\e[1;34m[*] Restoring...\e[0m"
+    openssl enc -aes-256-cbc -d -salt -in "$TARGET" -out "${TARGET%.dess}"
+    echo -e "\e[1;32m[✓] Decrypted.\e[0m"
+fi
