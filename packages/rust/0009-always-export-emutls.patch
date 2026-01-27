@@ -1,15 +1,16 @@
---- a/compiler/rustc_codegen_ssa/src/back/linker.rs
-+++ b/compiler/rustc_codegen_ssa/src/back/linker.rs
-@@ -17,7 +17,7 @@
+diff -u -r ../cache/rustc-1.93.0-src/compiler/rustc_codegen_ssa/src/back/linker.rs ./compiler/rustc_codegen_ssa/src/back/linker.rs
+--- ../cache/rustc-1.93.0-src/compiler/rustc_codegen_ssa/src/back/linker.rs	2026-01-19 16:34:28.000000000 +0000
++++ ./compiler/rustc_codegen_ssa/src/back/linker.rs	2026-01-25 21:16:31.635516508 +0000
+@@ -18,7 +18,7 @@
  use rustc_middle::ty::TyCtxt;
  use rustc_session::Session;
  use rustc_session::config::{self, CrateType, DebugInfo, LinkerPluginLto, Lto, OptLevel, Strip};
--use rustc_target::spec::{Cc, LinkOutputKind, LinkerFlavor, Lld};
-+use rustc_target::spec::{Cc, LinkOutputKind, LinkerFlavor, Lld, TlsModel};
+-use rustc_target::spec::{Abi, Arch, Cc, LinkOutputKind, LinkerFlavor, Lld, Os};
++use rustc_target::spec::{Abi, Arch, Cc, LinkOutputKind, LinkerFlavor, Lld, Os, TlsModel};
  use tracing::{debug, warn};
  
  use super::command::Command;
-@@ -869,6 +869,14 @@
+@@ -870,6 +870,14 @@
                          writeln!(f, "    {sym};")?;
                      }
                  }
@@ -24,7 +25,7 @@
                  writeln!(f, "\n  local:\n    *;\n}};")?;
              };
              if let Err(error) = res {
-@@ -876,6 +884,13 @@
+@@ -877,6 +885,13 @@
              }
              if self.sess.target.is_like_solaris {
                  self.link_arg("-M").link_arg(path);
