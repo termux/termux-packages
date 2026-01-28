@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Cross-platform, high performance ML inferencing and trai
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.23.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/microsoft/onnxruntime
 TERMUX_PKG_DEPENDS="abseil-cpp, libc++, protobuf, libre2, python, python-numpy, python-pip"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -56,6 +57,6 @@ termux_step_make() {
 
 termux_step_make_install() {
 	local _pyver="${TERMUX_PYTHON_VERSION//./}"
-	local _wheel="onnxruntime-${TERMUX_PKG_VERSION}-cp${_pyver}-cp${_pyver}-linux_${TERMUX_ARCH}.whl"
-	pip install --force-reinstall --no-deps --prefix="$TERMUX_PREFIX" "$TERMUX_PKG_SRCDIR/dist/${_wheel}"
+	local _wheel="onnxruntime-${TERMUX_PKG_VERSION}-cp${_pyver}-cp${_pyver}-android_${TERMUX_ARCH}.whl"
+	pip install --no-deps --prefix="$TERMUX_PREFIX" "$TERMUX_PKG_SRCDIR/dist/${_wheel}"
 }
