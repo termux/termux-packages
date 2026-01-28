@@ -144,9 +144,6 @@ declare -A _ALREADY_SEEN=() # Array of successful or packages and their old/new 
 _fetch_and_cache_tags() {
 	echo "INFO: Fetching and caching tags"
 
-	# First invocation of termux_repology_api_get_latest_version fetches and caches repology metadata.
-	quiet termux_repology_api_get_latest_version ' '
-
 	local __PACKAGES=()
 	local __GITHUB_PACKAGES=()
 
@@ -472,6 +469,24 @@ rm "${TMPDIR:-/tmp}/termux_ipc_"*.fifo &> /dev/null
 export IPC_FIFO="${TMPDIR:-/tmp}/termux_ipc_$$.fifo"
 mkfifo "$IPC_FIFO"
 exec {IPC_FIFO_FD}<>"$IPC_FIFO"
+
+# If the dependencies for the 'dump-repology-data' script are not yet present,
+# create a venv, activate the venv, and install them in the venv before running the
+# 'dump-repology-data' script
+if ! python3 -c "import requests" 2>/dev/null; then
+	dump_repology_data_venv_dir="$(mktemp -d)"
+	python3 -m venv --system-site-packages "$dump_repology_data_venv_dir"
+	source "$dump_repology_data_venv_dir/bin/activate"
+	echo "INFO: Installing the dependencies of the 'dump-repology-data' script"
+	pip3 install requests
+fi
+echo "INFO: Running the 'dump-repology-data' script"
+if python3 "${TERMUX_SCRIPTDIR}"/scripts/updates/api/dump-repology-data "${TERMUX_REPOLOGY_DATA_FILE}"; then
+	echo "INFO: The 'dump-repology-data' script was successful"
+else
+	echo "INFO: The 'dump-repology-data' script was unsuccessful, so an empty json is being placed in \${TERMUX_REPOLOGY_DATA_FILE}"
+	echo "{}" > "${TERMUX_REPOLOGY_DATA_FILE}"
+fi
 
 if [[ "$1" == "@all" ]]; then
 	declare -a PACKAGE_LIST=()
