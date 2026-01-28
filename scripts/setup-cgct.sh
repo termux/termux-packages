@@ -16,10 +16,10 @@ if [ "$ARCH" != "$(uname -m)" ]; then
 fi
 
 declare -A CGCT=(
-	["cbt"]="2.44-1" # Cross Binutils for Termux
-	["cgt"]="15.1.0-0" # Cross GCCs for Termux
-	["glibc-cgct"]="2.41-0" # Glibc for CGCT
- 	["cgct-headers"]="6.14.3-0" # Headers for CGCT
+	["cbt"]="2.45.1-0" # Cross Binutils for Termux
+	["cgt"]="15.2.0-0" # Cross GCCs for Termux
+	["glibc-cgct"]="2.42-0" # Glibc for CGCT
+ 	["cgct-headers"]="6.18.6-0" # Headers for CGCT
 )
 
 : "${TERMUX_PKG_TMPDIR:="/tmp"}"
