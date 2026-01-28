@@ -3,16 +3,15 @@ TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear p
 # License: PSF-2.0
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
-TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.12.12
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
+TERMUX_PKG_VERSION="3.13.11"
 _DEBPYTHON_COMMIT=f358ab52bf2932ad55b1a72a29c9762169e6ac47
 TERMUX_PKG_SRCURL=(
 	https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 	https://salsa.debian.org/cpython-team/python3-defaults/-/archive/${_DEBPYTHON_COMMIT}/python3-defaults-${_DEBPYTHON_COMMIT}.tar.gz
 )
 TERMUX_PKG_SHA256=(
-	fb85a13414b028c49ba18bbd523c2d055a30b56b18b92ce454ea2c51edc656c4
+	16ede7bb7cdbfa895d11b0642fa0e523f291e6487194d53cf6d3b338c3a17ea2
 	3b7a76c144d39f5c4a2c7789fd4beb3266980c2e667ad36167e1e7a357c684b0
 )
 TERMUX_PKG_AUTO_UPDATE=false
@@ -24,9 +23,8 @@ TERMUX_PKG_BREAKS="python2 (<= 2.7.15), python-dev"
 TERMUX_PKG_REPLACES="python-dev"
 # Let "python3" will be alias to this package.
 TERMUX_PKG_PROVIDES="python3"
-
-# https://github.com/termux/termux-packages/issues/15908
-TERMUX_PKG_MAKE_PROCESSES=1
+# Python build is a 2-step process. Requiring host build and cross build
+TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
 _MAJOR_VERSION="${TERMUX_PKG_VERSION%.*}"
 
@@ -58,6 +56,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_shm_unlink=yes"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_working_tzset=yes"
 # prevents 'configure: error: Cross compiling requires --with-build-python' (even during on-device build)
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-build-python=python$_MAJOR_VERSION"
+# https://github.com/termux/termux-packages/issues/16879
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_header_sys_xattr_h=no"
 
 TERMUX_PKG_RM_AFTER_INSTALL="
 lib/python${_MAJOR_VERSION}/test
@@ -67,10 +67,18 @@ lib/python${_MAJOR_VERSION}/site-packages/*/
 "
 
 termux_step_post_get_source() {
+	patch="$TERMUX_PKG_BUILDER_DIR/0012-hardcode-android-api-level.diff"
+	echo "Applying patch: $(basename "$patch")"
+	test -f "$patch" && sed \
+		-e "s%\@TERMUX_PKG_API_LEVEL\@%${TERMUX_PKG_API_LEVEL}%g" \
+		"$patch" | patch --silent -p1
+
+
 	mv "$TERMUX_PKG_SRCDIR/python3-defaults-$_DEBPYTHON_COMMIT" "$TERMUX_PKG_SRCDIR/debpython"
 }
 
 termux_step_pre_configure() {
+	termux_setup_build_python
 	# -O3 gains some additional performance on at least aarch64.
 	CFLAGS="${CFLAGS/-Oz/-O3}"
 
@@ -79,6 +87,8 @@ termux_step_pre_configure() {
 	# if extension modules should be built (specifically, the
 	# zlib extension module is not built without this):
 	CPPFLAGS+=" -I$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include"
+	# Without this all symbols are removed from the built libpython3.so
+	LDFLAGS="${LDFLAGS/-Wl,--as-needed/}"
 	LDFLAGS+=" -L$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib"
 	if [ $TERMUX_ARCH = x86_64 ]; then LDFLAGS+=64; fi
 
@@ -114,6 +124,7 @@ termux_step_pre_configure() {
 	sed -i -e "s|@TERMUX_PYTHON_VERSION@|${_MAJOR_VERSION}|g" \
 		-e "s|@TERMUX_PKG_FULLVERSION@|$(test ${TERMUX_PACKAGE_FORMAT} = pacman && echo ${TERMUX_PKG_FULLVERSION_FOR_PACMAN} || echo ${TERMUX_PKG_FULLVERSION})|g" \
 		$(find "$TERMUX_PKG_SRCDIR/debpython" -type f)
+	autoreconf -fi
 }
 
 termux_step_post_make_install() {
@@ -165,9 +176,9 @@ termux_step_create_debscripts() {
 		echo
 	fi
 
-	if [ -d $TERMUX_PREFIX/lib/python3.11/site-packages ]; then
+	if [[ -d $TERMUX_PREFIX/lib/python3.11/site-packages || -d $TERMUX_PREFIX/lib/python3.12/site-packages ]]; then
 		echo
-		echo "NOTE: The system python package has been updated to 3.12."
+		echo "NOTE: The system python package has been updated to 3.13."
 		echo "NOTE: Run 'pkg upgrade' to update system python packages."
 		echo "NOTE: Packages installed using pip needs to be re-installed."
 		echo
