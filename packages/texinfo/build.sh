@@ -24,21 +24,14 @@ texinfo_cv_sys_iconv_converts_euc_cn=no
 "
 
 termux_pkg_auto_update() {
-	# based on scripts/updates/api/termux_repology_api_get_latest_version.sh
-	local TERMUX_REPOLOGY_DATA_FILE=$(mktemp)
-	python3 "${TERMUX_SCRIPTDIR}"/scripts/updates/api/dump-repology-data \
-		"${TERMUX_REPOLOGY_DATA_FILE}" "${TERMUX_PKG_NAME}" >/dev/null || \
-		echo "{}" > "${TERMUX_REPOLOGY_DATA_FILE}"
-	local latest_version=$(jq -r --arg packageName "${TERMUX_PKG_NAME}" '.[$packageName]' < "${TERMUX_REPOLOGY_DATA_FILE}")
+	local latest_version=$(termux_repology_api_get_latest_version "${TERMUX_PKG_NAME}")
 	if [[ "${latest_version}" == "null" ]]; then
 		latest_version="${TERMUX_PKG_VERSION}"
 	fi
 	if [[ "${latest_version}" == "${TERMUX_PKG_VERSION}" ]]; then
 		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
-		rm -f "${TERMUX_REPOLOGY_DATA_FILE}"
 		return
 	fi
-	rm -f "${TERMUX_REPOLOGY_DATA_FILE}"
 
 	local api_url=https://deb.debian.org/debian/pool/main/t/texinfo/
 	local api_url_r=$(curl -sL "${api_url}")
