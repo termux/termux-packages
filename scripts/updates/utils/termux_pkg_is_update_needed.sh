@@ -11,7 +11,8 @@ termux_pkg_is_update_needed() {
 
 	# Is this even a validly formatted version number?
 	if ! dpkg --validate-version "${LATEST_VERSION}" &> /dev/null; then
-		termux_error_exit "::warning::${TERMUX_PKG_NAME:-}: $(dpkg --validate-version "${LATEST_VERSION}" &> /dev/stdout)"
+		echo "::warning::${TERMUX_PKG_NAME:-}: $(dpkg --validate-version "${LATEST_VERSION}" &> /dev/stdout)" >&2
+		return 1
 	fi
 
 	# Compare versions.
