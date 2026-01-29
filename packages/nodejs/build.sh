@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environme
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
 TERMUX_PKG_VERSION=25.3.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=97939099edd035a0c1a2d1fc849cac018ec2a38c0c28dd8e8246fd883cdb9e9e
 # thunder-coding: don't try to autoupdate nodejs, that thing takes 2 whole hours to build for a single arch, and requires a lot of patch updates everytime. Also I run tests everytime I update it to ensure least bugs
@@ -11,6 +12,7 @@ TERMUX_PKG_AUTO_UPDATE=false
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
 TERMUX_PKG_DEPENDS="libc++, openssl, c-ares, libicu, libsqlite, zlib"
+TERMUX_PKG_RECOMMENDS="npm"
 TERMUX_PKG_CONFLICTS="nodejs-lts, nodejs-current"
 TERMUX_PKG_BREAKS="nodejs-dev"
 TERMUX_PKG_REPLACES="nodejs-current, nodejs-dev"
@@ -155,6 +157,7 @@ termux_step_configure() {
 		--prefix=$TERMUX_PREFIX \
 		--dest-cpu=$DEST_CPU \
 		--dest-os=android \
+		--without-npm \
 		--shared-cares \
 		--shared-openssl \
 		--shared-sqlite \
@@ -198,8 +201,13 @@ termux_step_make_install() {
 }
 
 termux_step_create_debscripts() {
-	cat <<- EOF > ./postinst
+	cat <<- EOF > ./preinst
 	#!$TERMUX_PREFIX/bin/sh
-	npm config set foreground-scripts true
+	if [ "\$#" = "3" ] && dpkg --compare-versions "\$2" le "25.3.0"; then
+		echo "Starting with nodejs v25.3.0-1, npm is no longer bundled with nodejs package."
+		echo "You might want to install npm package separately if you need it."
+		echo "You can install it by running: pkg install npm"
+		echo "It should not be needed unless you are using --no-install-recommends with apt."
+	fi
 	EOF
 }
