@@ -354,6 +354,8 @@ _gh_check_issue_exists() {
 _run_update() {
 	local pkg_dir="$1" pkg_name
 	pkg_name="$(basename "${pkg_dir}")"
+	# needed for 'termux_pkg_is_update_needed'
+	export TERMUX_PKG_NAME="${pkg_name}"
 	# Run each package update in separate process since we include their environment variables.
 	local output="" _CURRENT_VERSION _NEWEST_VERSION _ISSUE
 	# shellcheck disable=SC1091 # Ignore shellcheck's inability to follow the source
