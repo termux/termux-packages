@@ -1,0 +1,17 @@
+Successful workaround for these errors and invisible characters in Termux:
+Mesa: error: GL_INVALID_OPERATION in glTexStorage2D(texture object 0)
+Mesa: error: GL_INVALID_OPERATION in glTexSubImage2D(invalid texture level 0)
+
+root cause unknown
+
+--- a/window/src/egl.rs
++++ b/window/src/egl.rs
+@@ -493,6 +493,8 @@ impl GlState {
+         display: Option<ffi::EGLNativeDisplayType>,
+         window: ffi::EGLNativeWindowType,
+     ) -> anyhow::Result<Self> {
++        std::env::set_var("MESA_NO_ERROR", "true");
++        std::env::set_var("LIBGL_ALWAYS_SOFTWARE", "true");
+         Self::with_egl_lib(|egl| {
+             let egl_display = egl.get_display(display)?;
+ 
