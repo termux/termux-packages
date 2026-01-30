@@ -18,12 +18,3 @@
      Q_D(QThread);
      QMutexLocker locker(&d->mutex);
  
-@@ -787,7 +787,7 @@
-                "Current thread was not started with QThread.");
- 
-     Q_UNUSED(thr);
--#if defined(Q_OS_ANDROID)
-+#if defined(Q_OS_ANDROID) || defined(__ANDROID__)
-     Q_UNUSED(enabled);
- #else
-     pthread_setcancelstate(enabled ? PTHREAD_CANCEL_ENABLE : PTHREAD_CANCEL_DISABLE, nullptr);
