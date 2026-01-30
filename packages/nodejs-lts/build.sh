@@ -202,5 +202,41 @@ termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
 	npm config set foreground-scripts true
+
+	# --- Configure npm/node-gyp for Termux ---
+	# Set architecture and platform for npm/node-gyp
+	npm config set arch "\$(dpkg --print-architecture)" --global
+	npm config set platform android --global
+	npm config set nodedir "\$PREFIX/lib/nodejs" --global
+
+	# Explicitly tell npm/node-gyp where to find Python, CC, CXX, AR, STRIP
+	# Using direct paths to ensure consistency and avoid relying on PATH discovery
+	npm config set python "\$PREFIX/bin/python" --global
+	npm config set cc "\$PREFIX/bin/clang" --global
+	npm config set cxx "\$PREFIX/bin/clang++" --global
+	npm config set ar "\$PREFIX/bin/llvm-ar" --global
+	npm config set strip "\$PREFIX/bin/llvm-strip" --global
+
+	# Inform user about build tool dependencies if they are missing
+	_missing_tools=""
+	for _tool in clang python make; do
+	    if ! command -v "\$_tool" >/dev/null 2>&1; then
+	        _missing_tools+=" \$_tool"
+	    fi
+	done
+
+	if [ -n "\$_missing_tools" ]; then
+	    echo ""
+	    echo "--------------------------------------------------------------------------------"
+	    echo "NOTICE: Some Termux packages required for building native Node.js addons (e.g., C/C++ modules)"
+	    echo "appear to be missing. If you encounter errors like 'node-gyp not found' or 'No C++ compiler found',"
+	    echo "please install the following:"
+	    echo ""
+	    echo "  pkg install \$_missing_tools"
+	    echo ""
+	    echo "These tools are suggested, not required for basic Node.js functionality."
+	    echo "--------------------------------------------------------------------------------"
+	    echo ""
+	fi
 	EOF
 }
