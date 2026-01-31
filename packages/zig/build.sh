@@ -3,9 +3,11 @@ TERMUX_PKG_DESCRIPTION="General-purpose programming language and toolchain"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="zig/LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.15.1"
-TERMUX_PKG_SRCURL=https://github.com/ziglang/zig/releases/download/${TERMUX_PKG_VERSION}/zig-bootstrap-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=4c0cfbcf12da144955761ca43f89e3c74956bce978694fc1d0a63555f5c0a199
+TERMUX_PKG_VERSION="0.15.2"
+TERMUX_PKG_SRCURL=https://ziglang.org/download/${TERMUX_PKG_VERSION}/zig-bootstrap-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=a6845459501df3c3264ebc587b02a7094ad14f4f3f7287c48f04457e784d0d85
+TERMUX_PKG_DEPENDS="proot"
+TERMUX_PKG_ANTI_BUILD_DEPENDS="proot"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
@@ -36,8 +38,23 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
+	rm -fr "${TERMUX_PREFIX}/lib/zig"
+	mkdir -p "${TERMUX_PREFIX}/lib"
 	cp -fr "out/zig-${ZIG_TARGET_NAME}-baseline" "${TERMUX_PREFIX}/lib/zig"
-	ln -fsv "../lib/zig/zig" "${TERMUX_PREFIX}/bin/zig"
+	#ln -fsv "../lib/zig/zig" "${TERMUX_PREFIX}/bin/zig"
+
+	# https://github.com/ziglang/zig/issues/14146
+	# https://github.com/termux/termux-packages/issues/20294
+	# Revert to symlink once fixed in upstream
+	cat <<- EOL > "${TERMUX_PREFIX}/bin/zig"
+	#!${TERMUX_PREFIX}/bin/sh
+	if command -v proot >/dev/null; then
+	proot -b "${TERMUX_PREFIX}/bin/env:/usr/bin/env" "${TERMUX_PREFIX}/lib/zig/zig" "\$@"
+	else
+	"${TERMUX_PREFIX}/lib/zig/zig" "\$@"
+	fi
+	EOL
+	chmod 700 "${TERMUX_PREFIX}/bin/zig"
 }
 
 termux_step_post_massage() {
@@ -46,7 +63,18 @@ termux_step_post_massage() {
 
 	( # self test
 		cd "${TERMUX_PKG_TMPDIR}" || termux_error_exit "Failed to perform selftest for Zig $TERMUX_PKG_VERSION"
-		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL/bin/zig" version
-		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL/bin/zig" init
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL/lib/zig/zig" version
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL/lib/zig/zig" init
 	)
+}
+
+termux_step_create_debscripts() {
+	cat <<- EOL > postinst
+	#!${TERMUX_PREFIX}/bin/sh
+	echo "NOTE:"
+	echo "${TERMUX_PREFIX}/bin/zig is now a proot wrapper script to"
+	echo "${TERMUX_PREFIX}/lib/zig/zig to workaround issue:"
+	echo "error: warning: Encountered error: FileNotFound, falling back to default ABI and dynamic linker"
+	EOL
+	chmod 700 postinst
 }
