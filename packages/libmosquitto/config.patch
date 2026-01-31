@@ -1,11 +1,11 @@
---- mosquitto-2.0.11/config.h	2021-06-09 18:06:55.000000000 +0530
-+++ mosquitto-2.0.11-patch/config.h	2021-08-30 23:54:41.977999900 +0530
-@@ -78,7 +78,7 @@
+--- a/config.h
++++ b/config.h
+@@ -73,7 +73,7 @@
  #define UNUSED(A) (void)(A)
  
  /* Android Bionic libpthread implementation doesn't have pthread_cancel */
--#ifndef ANDROID
-+#ifndef __ANDROID__
+-#if !defined(ANDROID) && !defined(WIN32)
++#if !defined(__ANDROID__) && !defined(WIN32)
  #  define HAVE_PTHREAD_CANCEL
  #endif
  
