@@ -1,0 +1,372 @@
+From 705664ef5394beb4eb9ab948935a85e9b9e75527 Mon Sep 17 00:00:00 2001
+From: Md Arif <111168803+sabamdarif@users.noreply.github.com>
+Date: Thu, 10 Jul 2025 12:00:00 +0530
+Subject: [PATCH] fix paths
+
+---
+ docs/reference/build.py                 |  2 +-
+ examples/flatpak/example-app.py         |  2 +-
+ examples/python/query-async.py          |  2 +-
+ examples/python/query-sync.py           |  2 +-
+ gitlog-to-changelog                     |  2 +-
+ meson_integration_commands.sh           |  2 +-
+ run-uninstalled.in                      |  2 +-
+ src/cli/tracker-sandbox.in              |  2 +-
+ src/create-miner-symlinks.sh            |  2 +-
+ src/extractor/calculate-hash.sh         |  2 +-
+ src/extractor/setup-extract-rules.sh    |  2 +-
+ src/install-generated-header.sh         |  2 +-
+ tests/common/tracker-file-utils-test.c  | 46 ++++++++++++-------------
+ tests/estress/abstract_engine.py        |  2 +-
+ tests/estress/abstract_text_engine.py   |  2 +-
+ tests/estress/client.py                 |  2 +-
+ tests/estress/mock_engine.py            |  2 +-
+ tests/estress/options.py                |  2 +-
+ tests/estress/rss_engine.py             |  2 +-
+ tests/estress/wh_engine.py              |  2 +-
+ tests/functional-tests/configuration.py |  2 +-
+ utils/trackertestutils/__main__.py      |  6 ++--
+ 22 files changed, 46 insertions(+), 46 deletions(-)
+
+diff --git a/docs/reference/build.py b/docs/reference/build.py
+index 62bdd4a..293ab14 100755
+--- a/docs/reference/build.py
++++ b/docs/reference/build.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python3
++#!@TERMUX_PREFIX@/bin/python3
+ # Tracker website build script.
+ #
+ # Copyright 2020, Sam Thursfield <sam@afuera.me.uk>
+diff --git a/examples/flatpak/example-app.py b/examples/flatpak/example-app.py
+index ec6e1d8..bf4efce 100644
+--- a/examples/flatpak/example-app.py
++++ b/examples/flatpak/example-app.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python3
++#!@TERMUX_PREFIX@/bin/python3
+ 
+ """A simple search app that works inside Flatpak."""
+ 
+diff --git a/examples/python/query-async.py b/examples/python/query-async.py
+index e96933d..6737ca5 100755
+--- a/examples/python/query-async.py
++++ b/examples/python/query-async.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python3
++#!@TERMUX_PREFIX@/bin/python3
+ # Copyright (C) 2020, Sam Thursfield <sam@afuera.me.uk>
+ #
+ # This program is free software; you can redistribute it and/or
+diff --git a/examples/python/query-sync.py b/examples/python/query-sync.py
+index f7b26e3..3af54f4 100755
+--- a/examples/python/query-sync.py
++++ b/examples/python/query-sync.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python3
++#!@TERMUX_PREFIX@/bin/python3
+ # Copyright (C) 2020, Sam Thursfield <sam@afuera.me.uk>
+ #
+ # This program is free software; you can redistribute it and/or
+diff --git a/gitlog-to-changelog b/gitlog-to-changelog
+index 1f0216a..3a59aa0 100755
+--- a/gitlog-to-changelog
++++ b/gitlog-to-changelog
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env perl
++#!@TERMUX_PREFIX@/bin/perl
+ # Convert git log output to ChangeLog format.
+ 
+ my $VERSION = '2023-10-19 07:20'; # UTC
+diff --git a/meson_integration_commands.sh b/meson_integration_commands.sh
+index 34a526f..3897df9 100644
+--- a/meson_integration_commands.sh
++++ b/meson_integration_commands.sh
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!@TERMUX_PREFIX@/bin/sh
+ 
+ # Post install triggers.
+ #
+diff --git a/run-uninstalled.in b/run-uninstalled.in
+index 795ab3e..560ddfb 100755
+--- a/run-uninstalled.in
++++ b/run-uninstalled.in
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python3
++#!@TERMUX_PREFIX@/bin/python3
+ #
+ # Copyright (C) 2019 Sam Thursfield <sam@afuera.me.uk>
+ #
+diff --git a/src/cli/tracker-sandbox.in b/src/cli/tracker-sandbox.in
+index b75ceb6..5ef31a6 100755
+--- a/src/cli/tracker-sandbox.in
++++ b/src/cli/tracker-sandbox.in
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!@TERMUX_PREFIX@/bin/sh
+ 
+ export GI_TYPELIB_PATH=@typelibdir@/:$GI_TYPELIB_PATH
+ export PYTHONPATH=@testutils_dir@:$PYTHONPATH
+diff --git a/src/create-miner-symlinks.sh b/src/create-miner-symlinks.sh
+index c46f9c0..20e4bb3 100644
+--- a/src/create-miner-symlinks.sh
++++ b/src/create-miner-symlinks.sh
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!@TERMUX_PREFIX@/bin/sh
+ # Post-install script for install stuff that Meson doesn't support directly.
+ #
+ # We can't pass the necessary variables directly to the script, so we
+diff --git a/src/extractor/calculate-hash.sh b/src/extractor/calculate-hash.sh
+index 223d9b0..79de190 100755
+--- a/src/extractor/calculate-hash.sh
++++ b/src/extractor/calculate-hash.sh
+@@ -1,2 +1,2 @@
+-#!/bin/sh
++#!@TERMUX_PREFIX@/bin/sh
+ cat $@ | sha256sum | cut -f 1 -d ' '
+diff --git a/src/extractor/setup-extract-rules.sh b/src/extractor/setup-extract-rules.sh
+index b681ab6..34736a3 100644
+--- a/src/extractor/setup-extract-rules.sh
++++ b/src/extractor/setup-extract-rules.sh
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!@TERMUX_PREFIX@/bin/sh
+ # Create a directory of enabled extract rules inside the build tree, for
+ # use when running tracker-extract from the build tree.
+ 
+diff --git a/src/install-generated-header.sh b/src/install-generated-header.sh
+index 0078aaf..47cc625 100644
+--- a/src/install-generated-header.sh
++++ b/src/install-generated-header.sh
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!@TERMUX_PREFIX@/bin/sh
+ 
+ # Script to install generated .h files. This only exists to workaround
+ # a Meson bug: https://github.com/mesonbuild/meson/issues/705
+diff --git a/tests/common/tracker-file-utils-test.c b/tests/common/tracker-file-utils-test.c
+index 78fa6f2..dd4f3f4 100644
+--- a/tests/common/tracker-file-utils-test.c
++++ b/tests/common/tracker-file-utils-test.c
+@@ -81,11 +81,11 @@ string_in_list (GSList *list, const gchar *string)
+ static void
+ test_path_list_filter_duplicates (void)
+ {
+-	const gchar *input_roots [] = {"/home/ivan",
+-                                       "/home",
+-                                       "/tmp",
+-                                       "/usr/",
+-                                       "/usr/share/local", NULL};
++	const gchar *input_roots [] = {"@TERMUX_HOME@/ivan",
++                                       "@TERMUX_HOME@",
++                                       "@TERMUX_PREFIX@/tmp",
++                                       "@TERMUX_PREFIX@",
++                                       "@TERMUX_PREFIX@/share/local", NULL};
+ 
+ 	GSList *input_as_list = NULL;
+ 	GSList *result;
+@@ -95,9 +95,9 @@ test_path_list_filter_duplicates (void)
+ 	result = tracker_path_list_filter_duplicates (input_as_list, ".", TRUE);
+ 	g_assert_cmpint (3, ==, g_slist_length (result));
+ 
+-	g_assert_true (string_in_list (result, "/home"));
+-	g_assert_true (string_in_list (result, "/tmp"));
+-	g_assert_true (string_in_list (result, "/usr"));
++	g_assert_true (string_in_list (result, "@TERMUX_HOME@"));
++	g_assert_true (string_in_list (result, "@TERMUX_PREFIX@/tmp"));
++	g_assert_true (string_in_list (result, "@TERMUX_PREFIX@"));
+ 
+ 	g_slist_foreach (input_as_list, (GFunc) g_free, NULL);
+ 	g_slist_foreach (result, (GFunc) g_free, NULL);
+@@ -106,25 +106,25 @@ test_path_list_filter_duplicates (void)
+ static void
+ test_path_list_filter_duplicates_with_exceptions ()
+ {
+-        const gchar *input_roots [] = { "/home/user/MyDocs",
+-                                        "/home/user/MyDocs/.sounds",
+-                                        "/home/user/MyDocs/visible",
++        const gchar *input_roots [] = { "@TERMUX_HOME@/user/MyDocs",
++                                        "@TERMUX_HOME@/user/MyDocs/.sounds",
++                                        "@TERMUX_HOME@/user/MyDocs/visible",
+                                         NULL};
+         GSList *input_as_list = NULL, *result = NULL;
+ 
+         input_as_list = array_as_list (input_roots);
+ 
+-        result = tracker_path_list_filter_duplicates (input_as_list, "/home/user/MyDocs", FALSE);
++        result = tracker_path_list_filter_duplicates (input_as_list, "@TERMUX_HOME@/user/MyDocs", FALSE);
+         g_assert_cmpint (g_slist_length (result), ==, 3);
+-	g_assert_true (string_in_list (result, "/home/user/MyDocs"));
+-	g_assert_true (string_in_list (result, "/home/user/MyDocs/.sounds"));
+-	g_assert_true (string_in_list (result, "/home/user/MyDocs/visible"));
++	g_assert_true (string_in_list (result, "@TERMUX_HOME@/user/MyDocs"));
++	g_assert_true (string_in_list (result, "@TERMUX_HOME@/user/MyDocs/.sounds"));
++	g_assert_true (string_in_list (result, "@TERMUX_HOME@/user/MyDocs/visible"));
+ 	g_slist_foreach (result, (GFunc) g_free, NULL);
+ 
+ 
+-        result = tracker_path_list_filter_duplicates (input_as_list, "/home/user/MyDocs", TRUE);
++        result = tracker_path_list_filter_duplicates (input_as_list, "@TERMUX_HOME@/user/MyDocs", TRUE);
+         g_assert_cmpint (g_slist_length (result), ==, 1);
+-	g_assert_true (string_in_list (result, "/home/user/MyDocs"));
++	g_assert_true (string_in_list (result, "@TERMUX_HOME@/user/MyDocs"));
+ 	g_slist_foreach (result, (GFunc) g_free, NULL);
+ 
+ 	g_slist_foreach (input_as_list, (GFunc) g_free, NULL);
+@@ -144,15 +144,15 @@ test_path_evaluate_name (void)
+ 	g_setenv ("TEST_TRACKER_DIR", test, TRUE);
+ 
+ 
+-	result = tracker_path_evaluate_name ("/home/user/all/ok");
+-	g_assert_cmpstr (result, ==, "/home/user/all/ok");
++	result = tracker_path_evaluate_name ("@TERMUX_HOME@/user/all/ok");
++	g_assert_cmpstr (result, ==, "@TERMUX_HOME@/user/all/ok");
+ 	g_free (result);
+ 
+ 	/* The result of this test and the next one are not consistent!
+ 	 * Must it remove the end '/' or not?
+ 	 */
+-	result = tracker_path_evaluate_name ("/home/user/all/dir/");
+-	g_assert_cmpstr (result, ==, "/home/user/all/dir");
++	result = tracker_path_evaluate_name ("@TERMUX_HOME@/user/all/dir/");
++	g_assert_cmpstr (result, ==, "@TERMUX_HOME@/user/all/dir");
+ 	g_free (result);
+ 
+ 
+@@ -343,7 +343,7 @@ test_file_system_get_remaining_space ()
+ {
+         guint64 space;
+ 
+-        space = tracker_file_system_get_remaining_space ("/home");
++        space = tracker_file_system_get_remaining_space ("@TERMUX_HOME@");
+         g_assert_cmpint (space, >, 0);
+ 
+         // This is a critical (aborts the process)
+@@ -355,7 +355,7 @@ test_file_system_get_remaining_space_percentage ()
+ {
+         gdouble space;
+ 
+-        space = tracker_file_system_get_remaining_space_percentage ("/home");
++        space = tracker_file_system_get_remaining_space_percentage ("@TERMUX_HOME@");
+         g_assert_cmpfloat (space, >=, 0);
+         g_assert_cmpfloat (space, <=, 100);
+ 
+diff --git a/tests/estress/abstract_engine.py b/tests/estress/abstract_engine.py
+index fb35baa..99663d8 100644
+--- a/tests/estress/abstract_engine.py
++++ b/tests/estress/abstract_engine.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python3
++#!@TERMUX_PREFIX@/bin/python3
+ #
+ # Copyright (C) 2009, Nokia <ivan.frade@nokia.com>
+ #
+diff --git a/tests/estress/abstract_text_engine.py b/tests/estress/abstract_text_engine.py
+index a506457..72f2d6c 100644
+--- a/tests/estress/abstract_text_engine.py
++++ b/tests/estress/abstract_text_engine.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python3
++#!@TERMUX_PREFIX@/bin/python3
+ #
+ # Copyright (C) 2009, Nokia <ivan.frade@nokia.com>
+ #
+diff --git a/tests/estress/client.py b/tests/estress/client.py
+index 19aabe7..ca12c35 100755
+--- a/tests/estress/client.py
++++ b/tests/estress/client.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python3
++#!@TERMUX_PREFIX@/bin/python3
+ #
+ # Copyright (C) 2009, Nokia <ivan.frade@nokia.com>
+ #
+diff --git a/tests/estress/mock_engine.py b/tests/estress/mock_engine.py
+index 72976fe..f2859c8 100644
+--- a/tests/estress/mock_engine.py
++++ b/tests/estress/mock_engine.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python3
++#!@TERMUX_PREFIX@/bin/python3
+ #
+ # Copyright (C) 2009, Nokia <ivan.frade@nokia.com>
+ #
+diff --git a/tests/estress/options.py b/tests/estress/options.py
+index 828f9a2..62a696b 100644
+--- a/tests/estress/options.py
++++ b/tests/estress/options.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python3
++#!@TERMUX_PREFIX@/bin/python3
+ #
+ # Copyright (C) 2009, Nokia <ivan.frade@nokia.com>
+ #
+diff --git a/tests/estress/rss_engine.py b/tests/estress/rss_engine.py
+index ed40edd..43078aa 100755
+--- a/tests/estress/rss_engine.py
++++ b/tests/estress/rss_engine.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python3
++#!@TERMUX_PREFIX@/bin/python3
+ #
+ # Copyright (C) 2009, Nokia <ivan.frade@nokia.com>
+ #
+diff --git a/tests/estress/wh_engine.py b/tests/estress/wh_engine.py
+index 1787e24..10e74e5 100755
+--- a/tests/estress/wh_engine.py
++++ b/tests/estress/wh_engine.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python3
++#!@TERMUX_PREFIX@/bin/python3
+ #
+ # Copyright (C) 2009, Nokia <ivan.frade@nokia.com>
+ #
+diff --git a/tests/functional-tests/configuration.py b/tests/functional-tests/configuration.py
+index 193dc0a..f180601 100644
+--- a/tests/functional-tests/configuration.py
++++ b/tests/functional-tests/configuration.py
+@@ -74,7 +74,7 @@ def tap_protocol_enabled():
+ # 'filter-hidden' property of TrackerIndexingTree is hardwired to be True at
+ # present :/
+ _TEST_MONITORED_TMP_DIR = os.path.join(config["TEST_ROOT"], "tracker-tests")
+-if _TEST_MONITORED_TMP_DIR.startswith("/tmp"):
++if _TEST_MONITORED_TMP_DIR.startswith("@TERMUX_PREFIX@/tmp"):
+     if "REAL_HOME" in os.environ:
+         _TEST_MONITORED_TMP_DIR = os.path.join(os.environ["REAL_HOME"], "tracker-tests")
+     else:
+diff --git a/utils/trackertestutils/__main__.py b/utils/trackertestutils/__main__.py
+index bec5b45..04337fa 100644
+--- a/utils/trackertestutils/__main__.py
++++ b/utils/trackertestutils/__main__.py
+@@ -49,7 +49,7 @@ script_about = "Tracker Sandbox developer tool."
+ prog = os.path.basename(getattr(sys, 'orig_argv', ['python'])[0])
+ script_name = "tracker-sandbox" if prog.startswith("python") else prog
+ 
+-default_store_location = '/tmp/tracker-sandbox'
++default_store_location = '@TERMUX_PREFIX@/tmp/tracker-sandbox'
+ 
+ store_pid = -1
+ store_proc = None
+@@ -118,7 +118,7 @@ def create_sandbox(store_location, prefix=None, use_session_dirs=False,
+         extra_env['XDG_RUNTIME_DIR'] = '%s/run/' % store_location
+ 
+     # Prefix - only set if non-standard
+-    if prefix and prefix != '/usr':
++    if prefix and prefix != '@TERMUX_PREFIX@':
+         environment_set_and_add_path(extra_env, 'PATH', prefix, 'bin')
+         environment_set_and_add_path(extra_env, 'LD_LIBRARY_PATH', prefix, 'lib')
+         environment_set_and_add_path(extra_env, 'LD_LIBRARY_PATH', prefix, 'lib64')
+@@ -214,7 +214,7 @@ def argument_parser():
+     parser.add_argument('-p', '--prefix', metavar='DIR', action=expand_path,
+                         help="run Tracker from the given install prefix. You "
+                              "can run the system version of Tracker by "
+-                             "specifying --prefix=/usr")
++                             "specifying --prefix=@TERMUX_PREFIX@")
+     parser.add_argument('--use-session-dirs', action='store_true',
+                         help=f"update the real Tracker index (use with care!)")
+     store_group = parser.add_mutually_exclusive_group()
+-- 
+2.48.1
+

@@ -1,0 +1,109 @@
+diff --git a/meson.build b/meson.build
+index 5b2a3af..9dea0a9 100644
+--- a/meson.build
++++ b/meson.build
+@@ -342,8 +342,6 @@ config_h.set('HAVE_WACOM', host_is_linux_not_s390,
+              description: 'Define to 1 if Wacom is supportted')
+ config_h.set('BUILD_THUNDERBOLT', host_is_linux_not_s390,
+              description: 'Define to 1 to build the Thunderbolt panel')
+-config_h.set('HAVE__COLORD', colord_dep.found(),
+-             description: 'Build with color management in panel')
+ 
+ gnome = import('gnome')
+ i18n = import('i18n')
+diff --git a/panels/system/cc-system-panel.c b/panels/system/cc-system-panel.c
+index bf58e46..58b33a1 100644
+--- a/panels/system/cc-system-panel.c
++++ b/panels/system/cc-system-panel.c
+@@ -31,7 +31,6 @@
+ #include "about/cc-about-page.h"
+ #include "datetime/cc-datetime-page.h"
+ #include "region/cc-region-page.h"
+-#include "remote-desktop/cc-remote-desktop-page.h"
+ #ifndef __ANDROID__
+ #include "secure-shell/cc-secure-shell-page.h"
+ #include "users/cc-users-page.h"
+@@ -44,7 +43,6 @@ struct _CcSystemPanel
+   AdwActionRow *about_row;
+   AdwActionRow *datetime_row;
+   AdwActionRow *region_row;
+-  AdwActionRow *remote_desktop_row;
+ #ifndef __ANDROID__
+   AdwActionRow *users_row;
+ 
+@@ -146,7 +144,6 @@ cc_system_panel_class_init (CcSystemPanelClass *klass)
+   gtk_widget_class_bind_template_child (widget_class, CcSystemPanel, about_row);
+   gtk_widget_class_bind_template_child (widget_class, CcSystemPanel, datetime_row);
+   gtk_widget_class_bind_template_child (widget_class, CcSystemPanel, region_row);
+-  gtk_widget_class_bind_template_child (widget_class, CcSystemPanel, remote_desktop_row);
+ #ifndef __ANDROID__
+   gtk_widget_class_bind_template_child (widget_class, CcSystemPanel, users_row);
+ #endif
+@@ -161,7 +158,6 @@ cc_system_panel_class_init (CcSystemPanelClass *klass)
+   g_type_ensure (CC_TYPE_DATE_TIME_PAGE);
+   g_type_ensure (CC_TYPE_LIST_ROW);
+   g_type_ensure (CC_TYPE_REGION_PAGE);
+-  g_type_ensure (CC_TYPE_REMOTE_DESKTOP_PAGE);
+ #ifndef __ANDROID__
+   g_type_ensure (CC_TYPE_SECURE_SHELL_PAGE);
+   g_type_ensure (CC_TYPE_USERS_PAGE);
+@@ -176,16 +172,11 @@ cc_system_panel_init (CcSystemPanel *self)
+   g_resources_register (cc_system_get_resource ());
+   gtk_widget_init_template (GTK_WIDGET (self));
+ 
+-  service_state = cc_get_service_state (REMOTE_DESKTOP_SERVICE, G_BUS_TYPE_SYSTEM);
+-  /* Hide the remote-desktop page if the g-r-d service is either "masked", "static", or "not-found". */
+-  gtk_widget_set_visible (GTK_WIDGET (self->remote_desktop_row), service_state == CC_SERVICE_STATE_ENABLED ||
+-                                                                 service_state == CC_SERVICE_STATE_DISABLED);
+   gtk_widget_set_visible (GTK_WIDGET (self->software_updates_group), show_software_updates_group (self));
+ 
+   cc_panel_add_static_subpage (CC_PANEL (self), "about", CC_TYPE_ABOUT_PAGE);
+   cc_panel_add_static_subpage (CC_PANEL (self), "datetime", CC_TYPE_DATE_TIME_PAGE);
+   cc_panel_add_static_subpage (CC_PANEL (self), "region", CC_TYPE_REGION_PAGE);
+-  cc_panel_add_static_subpage (CC_PANEL (self), "remote-desktop", CC_TYPE_REMOTE_DESKTOP_PAGE);
+ #ifndef __ANDROID__
+   cc_panel_add_static_subpage (CC_PANEL (self), "users", CC_TYPE_USERS_PAGE);
+ #endif
+diff --git a/panels/system/meson.build b/panels/system/meson.build
+index b8b06b9..d63007e 100644
+--- a/panels/system/meson.build
++++ b/panels/system/meson.build
+@@ -1,6 +1,7 @@
+ panels_list += cappletname
+ desktop = 'gnome-@0@-panel.desktop'.format(cappletname)
+ 
++if build_with_polkit
+ i18n.merge_file(
+   type: 'desktop',
+   input: desktop + '.in',
+@@ -18,6 +19,7 @@ i18n.merge_file(
+   install: true,
+   install_dir: join_paths(control_center_datadir, 'polkit-1', 'actions')
+ )
++endif
+ 
+ sources = files(
+   'cc-password-utils.c',
+@@ -35,13 +37,7 @@ sources = files(
+   'region/cc-region-page.c',
+   'region/cc-format-chooser.c',
+   'region/cc-format-preview.c',
+-  'remote-desktop/cc-desktop-sharing-page.c',
+-  'remote-desktop/cc-encryption-fingerprint-dialog.c',
+-  'remote-desktop/cc-gnome-remote-desktop.c',
+-  'remote-desktop/cc-remote-desktop-page.c',
+-  'remote-desktop/cc-remote-login-page.c',
+-  'remote-desktop/cc-tls-certificate.c',
+-  )
++   )
+ 
+ sources += gnome.compile_resources(
+   'cc-' + cappletname + '-resources',
+@@ -115,7 +111,6 @@ subdir('about')
+ subdir('datetime')
+ subdir('icons')
+ subdir('region')
+-subdir('remote-desktop')
+ if host_is_linux
+ subdir('secure-shell')
+ subdir('users')
