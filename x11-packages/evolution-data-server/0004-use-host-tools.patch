@@ -1,0 +1,22 @@
+--- a/src/camel/CMakeLists.txt
++++ b/src/camel/CMakeLists.txt
+@@ -20,7 +20,7 @@
+ 
+ add_custom_command(
+ 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/camel-mime-tables.c
+-	COMMAND ${CMAKE_CURRENT_BINARY_DIR}/camel-gen-tables >${CMAKE_CURRENT_BINARY_DIR}/camel-mime-tables.c
++	COMMAND camel-gen-tables >${CMAKE_CURRENT_BINARY_DIR}/camel-mime-tables.c
+ 	DEPENDS camel-gen-tables
+ )
+ 
+--- a/src/addressbook/libebook-contacts/CMakeLists.txt
++++ b/src/addressbook/libebook-contacts/CMakeLists.txt
+@@ -25,7 +25,7 @@
+ 
+ add_custom_command(
+ 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/e-name-western-tables.h
+-	COMMAND ${CMAKE_CURRENT_BINARY_DIR}/gen-western-table "${CMAKE_CURRENT_SOURCE_DIR}/e-name-western-tables.h.in" >${CMAKE_CURRENT_BINARY_DIR}/e-name-western-tables.h
++	COMMAND gen-western-table "${CMAKE_CURRENT_SOURCE_DIR}/e-name-western-tables.h.in" >${CMAKE_CURRENT_BINARY_DIR}/e-name-western-tables.h
+ 	DEPENDS gen-western-table e-name-western-tables.h.in
+ )
+ 
