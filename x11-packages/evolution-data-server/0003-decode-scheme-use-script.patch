@@ -1,0 +1,20 @@
+--- a/data/CMakeLists.txt
++++ b/data/CMakeLists.txt
+@@ -35,10 +35,17 @@
+ 	set(CMAKE_REQUIRED_LIBRARIES ${DATA_SERVER_LDFLAGS})
+ 	list(APPEND CMAKE_REQUIRED_DEFINITIONS -DG_LOG_DOMAIN=\"oauth2-value-helper\" -DBUILDING_VALUE_HELPER=1)
+ 	file(TO_NATIVE_PATH "${CMAKE_BINARY_DIR}/oauth2-google-client-id" _binary_dir_to_file)
++if(CMAKE_CROSSCOMPILING)
++	execute_process(
++		COMMAND "$ENV{GOOGLE_OAUTH2_SCHEME_SCRIPT}" "${WITH_GOOGLE_CLIENT_ID}" "${_binary_dir_to_file}"
++	)
++	set(_decoded 1)
++else()
+ 	CHECK_C_SOURCE_RUNS("#define DECODE_KEY \"${WITH_GOOGLE_CLIENT_ID}\"
+ 			     #define DECODE_TO_FILE \"${_binary_dir_to_file}\"
+ 			     #define DECODE_REVERSED 1
+ 			     #include \"${CMAKE_SOURCE_DIR}/src/libedataserver/e-oauth2-service.c\"" _decoded)
++endif()
+ 	file(READ ${_binary_dir_to_file} _google_oauth2_scheme)
+ 	unset(_binary_dir_to_file)
+ 	unset(_decoded)

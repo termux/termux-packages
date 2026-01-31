@@ -1,0 +1,40 @@
+--- a/gnome-tweaks
++++ b/gnome-tweaks
+@@ -14,7 +14,6 @@ import gi
+ gi.require_version("Gtk", "4.0")
+ gi.require_version("Adw", "1")
+ gi.require_version("GDesktopEnums", "3.0")
+-gi.require_version('GUdev', '1.0')
+ 
+ import gtweak
+ from gtweak.defs import VERSION, APP_ID, GSETTINGS_SCHEMA_DIR, TWEAK_DIR, DATA_DIR, \
+@@ -28,7 +27,7 @@ def set_internationalization(domain, locale_dir):
+     try:
+         locale.bindtextdomain(domain, locale_dir)
+         locale.textdomain(domain)
+-    except AttributeError as e:
++    except (AttributeError,OSError) as e:
+         # Python built without gettext support does not have
+         # bindtextdomain() and textdomain().
+         logging.error(
+@@ -49,9 +49,8 @@ def setup_defs_for_prefix(prefix: str):
+     gtweak.LOCALE_DIR = os.path.join(prefix, "share", "locale")
+     gtweak.GSETTINGS_SCHEMA_DIR = os.path.join(prefix, "share", "glib-2.0", "schemas")
+ 
+-    me = os.path.abspath(os.path.dirname(__file__))
+-    gtweak.TWEAK_DIR = os.path.join(me, "gtweak", "tweaks")
+-    gtweak.PKG_DATA_DIR = os.path.join(me, "data")
++    gtweak.TWEAK_DIR = "@TERMUX_PYTHON_HOME@/site-packages/gtweak/tweaks"
++    gtweak.PKG_DATA_DIR = "@TERMUX_PREFIX@/share/gnome-tweaks"
+ 
+ 
+ def setup_defs(prefix: str | None = None):
+@@ -84,7 +83,7 @@ if __name__ == '__main__':
+     parser.add_option("--gapplication-service", action="store_true")
+     options, args = parser.parse_args()
+ 
+-    setup_defs(options.prefix or None)
++    setup_defs(options.prefix or "@TERMUX_PREFIX@")
+ 
+     gtweak.VERBOSE = options.verbose
+ 

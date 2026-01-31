@@ -1,0 +1,23 @@
+It is much difficult to port packagekit to Termux
+
+--- a/js/ui/endSessionDialog.js
++++ b/js/ui/endSessionDialog.js
+@@ -240,10 +240,14 @@
+         this._user = this._userManager.get_user(GLib.get_user_name());
+         this._updatesPermission = null;
+ 
+-        this._pkOfflineProxy = new PkOfflineProxy(Gio.DBus.system,
+-            'org.freedesktop.PackageKit',
+-            '/org/freedesktop/PackageKit',
+-            this._onPkOfflineProxyCreated.bind(this));
++        try {
++            this._pkOfflineProxy = new PkOfflineProxy(Gio.DBus.system,
++                'org.freedesktop.PackageKit',
++                '/org/freedesktop/PackageKit',
++                this._onPkOfflineProxyCreated.bind(this));
++        } catch (error) {
++            log(`Failed to connect to PackageKit: ${error.message}`);
++        }
+ 
+         this._powerProxy = new UPowerProxy(Gio.DBus.system,
+             'org.freedesktop.UPower',

@@ -13,11 +13,11 @@
  #define PRIVATE_OWNER_FROM_FIELD(TypeName, field_ptr, field_name) \
          (TypeName *)((guint8 *)(field_ptr) - G_PRIVATE_OFFSET (TypeName, field_name))
  
---- a/src/core/meta-anonymous-file.h
-+++ b/src/core/meta-anonymous-file.h
-@@ -22,6 +22,13 @@
- #include "meta/common.h"
- #include "core/util-private.h"
+--- a/mtk/mtk/mtk-anonymous-file.h
++++ b/mtk/mtk/mtk-anonymous-file.h
+@@ -24,6 +24,13 @@
+ 
+ #include "mtk/mtk-macros.h"
  
 +#if defined(__ANDROID__) && __ANDROID_API__ < 30
 +#include <linux/memfd.h>
@@ -26,6 +26,6 @@
 +#define HAVE_MEMFD_CREATE
 +#endif
 +
- typedef struct _MetaAnonymousFile MetaAnonymousFile;
+ typedef struct _MtkAnonymousFile MtkAnonymousFile;
  
- typedef enum _MetaAnonymousFileMapmode
+ typedef enum _MtkAnonymousFileMapmode
