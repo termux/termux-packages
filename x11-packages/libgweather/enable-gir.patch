@@ -1,0 +1,13 @@
+diff --git a/meson.build b/meson.build
+index f8cc5d5..a17c2ac 100644
+--- a/meson.build
++++ b/meson.build
+@@ -51,7 +51,7 @@ py = import('python').find_installation('python3', modules: ['gi'])
+ gen_locations_variant = find_program('build-aux/meson/gen_locations_variant.py')
+ 
+ g_ir_scanner = find_program('g-ir-scanner', required: get_option('introspection'))
+-build_gir = get_option('introspection') and g_ir_scanner.found() and not meson.is_cross_build()
++build_gir = get_option('introspection') and g_ir_scanner.found()
+ build_docs = get_option('gtk_doc') and build_gir
+ 
+ schemas_srcdir = meson.project_source_root() / 'schemas'

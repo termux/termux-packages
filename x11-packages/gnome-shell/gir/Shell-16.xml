@@ -1,0 +1,216 @@
+<?xml version="1.0"?>
+<dump>
+  <flags name="ShellActionMode" get-type="shell_action_mode_get_type">
+    <member name="SHELL_ACTION_MODE_NONE" nick="none" value="0"/>
+    <member name="SHELL_ACTION_MODE_NORMAL" nick="normal" value="1"/>
+    <member name="SHELL_ACTION_MODE_OVERVIEW" nick="overview" value="2"/>
+    <member name="SHELL_ACTION_MODE_LOCK_SCREEN" nick="lock-screen" value="4"/>
+    <member name="SHELL_ACTION_MODE_UNLOCK_SCREEN" nick="unlock-screen" value="8"/>
+    <member name="SHELL_ACTION_MODE_LOGIN_SCREEN" nick="login-screen" value="16"/>
+    <member name="SHELL_ACTION_MODE_SYSTEM_MODAL" nick="system-modal" value="32"/>
+    <member name="SHELL_ACTION_MODE_LOOKING_GLASS" nick="looking-glass" value="64"/>
+    <member name="SHELL_ACTION_MODE_POPUP" nick="popup" value="128"/>
+    <member name="SHELL_ACTION_MODE_ALL" nick="all" value="4294967295"/>
+  </flags>
+  <enum name="ShellAppState" get-type="shell_app_state_get_type">
+    <member name="SHELL_APP_STATE_STOPPED" nick="stopped" value="0"/>
+    <member name="SHELL_APP_STATE_STARTING" nick="starting" value="1"/>
+    <member name="SHELL_APP_STATE_RUNNING" nick="running" value="2"/>
+  </enum>  <enum name="ShellAppLaunchGpu" get-type="shell_app_launch_gpu_get_type">
+    <member name="SHELL_APP_LAUNCH_GPU_APP_PREF" nick="app-pref" value="0"/>
+    <member name="SHELL_APP_LAUNCH_GPU_DISCRETE" nick="discrete" value="1"/>
+    <member name="SHELL_APP_LAUNCH_GPU_DEFAULT" nick="default" value="2"/>
+  </enum>  <enum name="ShellBlurMode" get-type="shell_blur_mode_get_type">
+    <member name="SHELL_BLUR_MODE_ACTOR" nick="actor" value="0"/>
+    <member name="SHELL_BLUR_MODE_BACKGROUND" nick="background" value="1"/>
+  </enum>  <class name="ShellApp" get-type="shell_app_get_type" parents="GObject">
+    <property name="state" type="ShellAppState" flags="225" default-value="SHELL_APP_STATE_STOPPED"/>
+    <property name="busy" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="id" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="action-group" type="GActionGroup" flags="225"/>
+    <property name="icon" type="GIcon" flags="225"/>
+    <property name="app-info" type="GDesktopAppInfo" flags="235"/>
+    <signal name="windows-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="ShellAppSystem" get-type="shell_app_system_get_type" parents="GObject" final="1">
+    <signal name="app-state-changed" return="void" when="last">
+      <param type="ShellApp"/>
+    </signal>
+    <signal name="installed-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="ShellWindowTracker" get-type="shell_window_tracker_get_type" parents="GObject">
+    <property name="focus-app" type="ShellApp" flags="225"/>
+    <signal name="startup-sequence-changed" return="void" when="last">
+      <param type="MetaStartupSequence"/>
+    </signal>
+    <signal name="tracked-windows-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="ShellAppUsage" get-type="shell_app_usage_get_type" parents="GObject">
+  </class>
+  <class name="ShellBlurEffect" get-type="shell_blur_effect_get_type" parents="ClutterEffect,ClutterActorMeta,GInitiallyUnowned,GObject">
+    <property name="radius" type="gint" flags="1073742051" default-value="0"/>
+    <property name="brightness" type="gfloat" flags="1073742051" default-value="1.000000"/>
+    <property name="mode" type="ShellBlurMode" flags="1073742051" default-value="SHELL_BLUR_MODE_ACTOR"/>
+  </class>
+  <class name="ShellCameraMonitor" get-type="shell_camera_monitor_get_type" parents="GObject">
+    <property name="cameras-in-use" type="gboolean" flags="225" default-value="FALSE"/>
+  </class>
+  <class name="ShellGLSLEffect" get-type="shell_glsl_effect_get_type" parents="ClutterOffscreenEffect,ClutterEffect,ClutterActorMeta,GInitiallyUnowned,GObject">
+  </class>
+  <class name="ShellWM" get-type="shell_wm_get_type" parents="GObject">
+    <signal name="minimize" return="void" when="last">
+      <param type="MetaWindowActor"/>
+    </signal>
+    <signal name="unminimize" return="void" when="last">
+      <param type="MetaWindowActor"/>
+    </signal>
+    <signal name="size-changed" return="void" when="last">
+      <param type="MetaWindowActor"/>
+    </signal>
+    <signal name="size-change" return="void" when="last">
+      <param type="MetaWindowActor"/>
+      <param type="MetaSizeChange"/>
+      <param type="MtkRectangle"/>
+      <param type="MtkRectangle"/>
+    </signal>
+    <signal name="map" return="void" when="last">
+      <param type="MetaWindowActor"/>
+    </signal>
+    <signal name="destroy" return="void" when="last">
+      <param type="MetaWindowActor"/>
+    </signal>
+    <signal name="switch-workspace" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="kill-switch-workspace" return="void" when="last">
+    </signal>
+    <signal name="kill-window-effects" return="void" when="last">
+      <param type="MetaWindowActor"/>
+    </signal>
+    <signal name="show-tile-preview" return="void" when="last">
+      <param type="MetaWindow"/>
+      <param type="MtkRectangle"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="hide-tile-preview" return="void" when="last">
+    </signal>
+    <signal name="show-window-menu" return="void" when="last">
+      <param type="MetaWindow"/>
+      <param type="gint"/>
+      <param type="MtkRectangle"/>
+    </signal>
+    <signal name="filter-keybinding" return="gboolean" when="last">
+      <param type="MetaKeyBinding"/>
+    </signal>
+    <signal name="confirm-display-change" return="void" when="last">
+    </signal>
+    <signal name="create-close-dialog" return="MetaCloseDialog" when="last">
+      <param type="MetaWindow"/>
+    </signal>
+    <signal name="create-inhibit-shortcuts-dialog" return="MetaInhibitShortcutsDialog" when="last">
+      <param type="MetaWindow"/>
+    </signal>
+  </class>
+  <class name="ShellGlobal" get-type="shell_global_get_type" parents="GObject">
+    <property name="session-mode" type="gchararray" flags="235" default-value="user"/>
+    <property name="backend" type="MetaBackend" flags="225"/>
+    <property name="context" type="MetaContext" flags="225"/>
+    <property name="display" type="MetaDisplay" flags="225"/>
+    <property name="compositor" type="MetaCompositor" flags="225"/>
+    <property name="workspace-manager" type="MetaWorkspaceManager" flags="225"/>
+    <property name="screen-width" type="gint" flags="225" default-value="1"/>
+    <property name="screen-height" type="gint" flags="225" default-value="1"/>
+    <property name="stage" type="ClutterStage" flags="225"/>
+    <property name="window-group" type="ClutterActor" flags="225"/>
+    <property name="top-window-group" type="ClutterActor" flags="225"/>
+    <property name="window-manager" type="ShellWM" flags="225"/>
+    <property name="settings" type="GSettings" flags="225"/>
+    <property name="datadir" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="userdatadir" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="focus-manager" type="StFocusManager" flags="225"/>
+    <property name="frame-timestamps" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="frame-finish-timestamp" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="switcheroo-control" type="GDBusProxy" flags="225"/>
+    <property name="force-animations" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="automation-script" type="GFile" flags="235"/>
+    <signal name="notify-error" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="locate-pointer" return="void" when="last">
+    </signal>
+    <signal name="shutdown" return="void" when="last">
+    </signal>
+  </class>
+  <class name="ShellInvertLightnessEffect" get-type="shell_invert_lightness_effect_get_type" parents="ClutterOffscreenEffect,ClutterEffect,ClutterActorMeta,GInitiallyUnowned,GObject">
+  </class>
+  <class name="ShellMountOperation" get-type="shell_mount_operation_get_type" parents="GMountOperation,GObject" final="1">
+    <signal name="show-processes-2" return="void" when="last">
+    </signal>
+  </class>
+  <class name="ShellPerfLog" get-type="shell_perf_log_get_type" parents="GObject">
+  </class>
+  <class name="ShellScreenshot" get-type="shell_screenshot_get_type" parents="GObject" final="1">
+    <signal name="screenshot-taken" return="void" when="last">
+      <param type="MtkRectangle"/>
+    </signal>
+  </class>
+  <class name="ShellSquareBin" get-type="shell_square_bin_get_type" parents="StBin,StWidget,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+  </class>
+  <class name="ShellStack" get-type="shell_stack_get_type" parents="StWidget,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+  </class>
+  <class name="ShellWindowPreview" get-type="shell_window_preview_get_type" parents="StWidget,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="window-container" type="ClutterActor" flags="1073742059"/>
+  </class>
+  <class name="ShellWindowPreviewLayout" get-type="shell_window_preview_layout_get_type" parents="ClutterLayoutManager,GInitiallyUnowned,GObject">
+    <property name="bounding-box" type="ClutterActorBox" flags="225"/>
+  </class>
+  <class name="ShellWorkspaceBackground" get-type="shell_workspace_background_get_type" parents="StWidget,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="monitor-index" type="gint" flags="235" default-value="0"/>
+    <property name="state-adjustment-value" type="gdouble" flags="1073742051" default-value="0.000000"/>
+  </class>
+  <class name="ShellTrayIcon" get-type="shell_tray_icon_get_type" parents="ClutterClone,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="pid" type="guint" flags="225" default-value="0"/>
+    <property name="title" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="wm-class" type="gchararray" flags="225" default-value="NULL"/>
+  </class>
+  <class name="ShellTrayManager" get-type="shell_tray_manager_get_type" parents="GObject" final="1">
+    <property name="bg-color" type="CoglColor" flags="11"/>
+    <signal name="tray-icon-added" return="void" when="last">
+      <param type="ClutterActor"/>
+    </signal>
+    <signal name="tray-icon-removed" return="void" when="last">
+      <param type="ClutterActor"/>
+    </signal>
+  </class>
+  <class name="ShellKeyringPrompt" get-type="shell_keyring_prompt_get_type" parents="GObject">
+    <implements name="GcrPrompt"/>
+    <property name="password-visible" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="confirm-visible" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="warning-visible" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="choice-visible" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="password-actor" type="ClutterText" flags="1073742051"/>
+    <property name="confirm-actor" type="ClutterText" flags="1073742051"/>
+    <signal name="show-password" return="void">
+    </signal>
+    <signal name="show-confirm" return="void">
+    </signal>
+  </class>
+  <class name="ShellSecureTextBuffer" get-type="shell_secure_text_buffer_get_type" parents="ClutterTextBuffer,GObject">
+  </class>
+</dump>
