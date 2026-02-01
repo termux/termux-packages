@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 # Revbump revdeps after updating
 TERMUX_PKG_VERSION="2.2.5"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=git+https://github.com/numpy/numpy
 TERMUX_PKG_DEPENDS="libc++, libopenblas, python"
 TERMUX_PKG_AUTO_UPDATE=false
@@ -73,6 +73,6 @@ termux_step_make() {
 
 termux_step_make_install() {
 	local _pyv="${TERMUX_PYTHON_VERSION/./}"
-	local _whl="numpy-$TERMUX_PKG_VERSION-cp$_pyv-cp$_pyv-linux_$TERMUX_ARCH.whl"
+	local _whl="numpy-$TERMUX_PKG_VERSION-cp$_pyv-cp$_pyv-android_$TERMUX_ARCH.whl"
 	pip install --no-deps --prefix=$TERMUX_PREFIX --force-reinstall $TERMUX_PKG_SRCDIR/dist/$_whl
 }

@@ -1,0 +1,22 @@
+This was introduced in https://github.com/python/cpython/commit/1f8b24ef69896680d6ba6005e75e1cc79a744f9e but breaks our builds as we need directories from other paths as well
+
+diff --git a/Lib/ctypes/util.py b/Lib/ctypes/util.py
+index 117bf06cb01..12d7428fe9a 100644
+--- a/Lib/ctypes/util.py
++++ b/Lib/ctypes/util.py
+@@ -89,15 +89,6 @@ def find_library(name):
+ 
+     from ctypes._aix import find_library
+ 
+-elif sys.platform == "android":
+-    def find_library(name):
+-        directory = "/system/lib"
+-        if "64" in os.uname().machine:
+-            directory += "64"
+-
+-        fname = f"{directory}/lib{name}.so"
+-        return fname if os.path.isfile(fname) else None
+-
+ elif os.name == "posix":
+     # Andreas Degert's find functions, using gcc, /sbin/ldconfig, objdump
+     import re, tempfile
