@@ -1,23 +1,23 @@
-diff -uNr ncurses-6.1-20181117/progs/tic.c ncurses-6.1-20181117.mod/progs/tic.c
---- ncurses-6.1-20181117/progs/tic.c	2018-03-18 02:05:10.000000000 +0200
-+++ ncurses-6.1-20181117.mod/progs/tic.c	2019-03-01 20:40:56.193173489 +0200
-@@ -386,7 +386,7 @@
+diff -u -r ../cache/ncurses-snapshots-607c49f34cc52dd88203c15ea09b0505c87a41b8/progs/tic.c ./progs/tic.c
+--- ../cache/ncurses-snapshots-607c49f34cc52dd88203c15ea09b0505c87a41b8/progs/tic.c	2026-01-25 02:08:31.000000000 +0000
++++ ./progs/tic.c	2026-01-26 22:16:55.806606776 +0000
+@@ -390,7 +390,7 @@
  {
-     FILE *result = 0;
+     FILE *result = NULL;
  
 -    _nc_STRCPY(filename, "/tmp/XXXXXX", PATH_MAX);
 +    _nc_STRCPY(filename, "@TERMUX_PREFIX@/tmp/XXXXXX", PATH_MAX);
  #if HAVE_MKSTEMP
      {
  	int oldmask = (int) umask(077);
-@@ -900,7 +900,7 @@
+@@ -923,7 +923,7 @@
      } else {
  	if (infodump == TRUE) {
  	    /* captoinfo's no-argument case */
 -	    source_file = "/etc/termcap";
 +	    source_file = "@TERMUX_PREFIX@/etc/termcap";
- 	    if ((termcap = getenv("TERMCAP")) != 0
- 		&& (namelst = make_namelist(getenv("TERM"))) != 0) {
+ 	    if ((termcap = getenv("TERMCAP")) != NULL
+ 		&& (namelst = make_namelist(getenv("TERM"))) != NULL) {
  		if (access(termcap, F_OK) == 0) {
 diff -uNr ncurses-6.1-20181117/progs/tset.c ncurses-6.1-20181117.mod/progs/tset.c
 --- ncurses-6.1-20181117/progs/tset.c	2017-10-08 03:01:29.000000000 +0300
