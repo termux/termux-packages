@@ -1,0 +1,167 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+
+# This script was adapted from Alpine Linux's `abuild-tree-sitter` helper.
+# https://gitlab.alpinelinux.org/alpine/aports/-/blob/bc02d9d1/community/tree-sitter/abuild-tree-sitter
+
+# The current Licensing situation for Alpine Linux packaging contributions is unclear,
+# and no agreed upon official consensus yet exists on the topic.
+# Alpine packaging upstream issue discussing the topic:
+# https://gitlab.alpinelinux.org/alpine/aports/-/issues/9074
+
+# In accordance to our own build system Licensing policy[^1] this script
+# will be licensed under the upstream `tree-sitter` projects MIT License[^2],
+# until and unless the Alpine Linux discussion resolves it otherwise.
+# I believe this to be a good faith, best effort attempt to resolve the licensing of this script.
+#
+# [^1]: https://github.com/termux/termux-packages/blob/master/LICENSE.md#license-for-package-patches
+# [^2]: https://github.com/tree-sitter/tree-sitter/blob/master/LICENSE
+
+set -eu
+
+PROGNAME='termux-tree-sitter'
+
+usage() {
+	printf '%s\n' \
+		"Usage:" \
+		"$PROGNAME build" \
+		"$PROGNAME install" \
+		"$PROGNAME (-h | --help)" \
+		"" \
+		"-q <querydir> Location of directory with queries (.scm files) to be" \
+		"              installed (defaults to ./queries)." \
+		"" \
+		"-s <srcdir>   Location of the source directory with grammar.json and C/C++" \
+		"              sources (defaults to ./src)." \
+		"" \
+		"-n <name>     Name of the grammar (defaults to name specified in grammar.json)."
+	exit 0
+}
+
+die() {
+	if (( $# )); then
+		printf "$PROGNAME: %s\n" "$@"
+	else # Read from stdin.
+		printf '%s\n' "$(cat -)"
+	fi
+	exit 1
+} >&2
+
+subcmd=''
+case "${1:-}" in
+	'' | -h | --help) usage;;
+	build|generate|install) subcmd="$1";;
+	-*) die 'missing subcommand';;
+	*) die "invalid subcommand '$1'";;
+esac
+shift
+
+querydir='./queries'
+srcdir="./src"
+name=''
+while (( $# )); do
+	case "$1" in
+		-q|--query-dir) querydir="$2";;
+		-s|--srcdir)    srcdir="$2";;
+		-n|--name)      name="$2";;
+		-h|--help)      usage;;
+		*) die "unknown option: '$1'";;
+	esac
+	shift 2
+done
+
+# If the name wasn't overridden try to determine it from the grammar.json
+: "${name:="$(jq --exit-status -r '.name' "$srcdir"/grammar.json)"}"
+
+# Default CFLAGS, CXXFLAGS and LDFLAGS additions for builds
+: "${CFLAGS_BASE:="-fPIC -Wall -I ./"}"
+: "${CXXFLAGS_BASE:="-fPIC -Wall -I ./ -fno-exceptions"}"
+: "${LDFLAGS_BASE:="-shared"}"
+
+case "$subcmd" in
+	build)
+		# shellcheck disable=SC2086
+		(
+		cd "$srcdir"
+
+		$CC $CFLAGS_BASE $CFLAGS -c ./*.c
+		if find . -name '*.cc' | grep -q .; then
+			$CXX $CXXFLAGS_BASE $CXXFLAGS -c ./*.cc
+			$CXX $LDFLAGS_BASE $LDFLAGS -o "$name.so.${TREE_SITTER_ABI_VERSION}.0" ./*.o
+		else
+			$CC $LDFLAGS_BASE $LDFLAGS -o "$name.so.${TREE_SITTER_ABI_VERSION}.0" ./*.o
+		fi
+		)
+	;;
+	generate)
+		if [[ -e "$srcdir"/grammar.json ]]; then
+			tree-sitter generate --abi="${TREE_SITTER_ABI_VERSION}" "$srcdir"/grammar.json
+		else
+			tree-sitter generate --abi="${TREE_SITTER_ABI_VERSION}" "$srcdir"/../grammar.js
+		fi
+	;;
+	install)
+
+		# Install the parser and set up the soversion symlink chain all the way
+		install -D -v -m755 "$srcdir/$name.so.${TREE_SITTER_ABI_VERSION}.0" \
+			"$TERMUX_PREFIX/lib/libtree-sitter-$name.so.${TREE_SITTER_ABI_VERSION}.0"
+		ln -sfv "libtree-sitter-$name.so.${TREE_SITTER_ABI_VERSION}.0" \
+			"$TERMUX_PREFIX/lib/libtree-sitter-$name.so.${TREE_SITTER_ABI_VERSION}"
+		ln -sfv "libtree-sitter-$name.so.${TREE_SITTER_ABI_VERSION}" \
+			"$TERMUX_PREFIX/lib/libtree-sitter-$name.so"
+
+		# Add a symlink to the parser into lib/tree_sitter as well
+		[[ -d "$TERMUX_PREFIX/lib/tree_sitter" ]] || mkdir "$TERMUX_PREFIX/lib/tree_sitter"
+		ln -sfv "../libtree-sitter-$name.so" "$TERMUX_PREFIX/lib/tree_sitter/$name.so"
+
+
+		# Install queries if they exist
+		if [[ -d "$querydir" ]]; then
+			find "$querydir" -name '*.scm' -exec \
+			install -vD -m755 -t "$TERMUX_PREFIX/share/tree-sitter/queries/$name/" '{}' \;
+		fi
+
+		# Install C bindings if they exist
+		if [[ -d "bindings/c" ]]; then
+			# Parser header files should be in bindings/c/tree_sitter/$parser_name.h
+			# But some slightly older parsers may have them in another location,
+			# use `find` to ensure we install them.
+			find bindings/c -name '*.h' -exec \
+			install -vD -m644 -t "$TERMUX_PREFIX/include/tree_sitter/" '{}' \;
+			mkdir -p "$TERMUX_PREFIX/lib/pkgconfig"
+			# shellcheck disable=SC2016
+			sed -e "s|@ADDITIONAL_LIBS@||" \
+				-e 's|@CMAKE_INSTALL_INCLUDEDIR@|${prefix}/include|' \
+				-e 's|@CMAKE_INSTALL_LIBDIR@|${prefix}/lib|' \
+				-e "s|@CMAKE_INSTALL_PREFIX@|$TERMUX_PREFIX|" \
+				-e "s|@CMAKE_PROJECT_HOMEPAGE_URL@|$TERMUX_PKG_HOMEPAGE|" \
+				-e "s|@CMAKE_PROJECT_VERSION@|$TERMUX_PKG_VERSION|" \
+				-e 's|@INCLUDEDIR@|${prefix}/include|' \
+				-e 's|@LIBDIR@|${prefix}/lib|' \
+				-e "s|@PREFIX@|$TERMUX_PREFIX|" \
+				-e "s|@PROJECT_DESCRIPTION@|$TERMUX_PKG_DESCRIPTION|" \
+				-e "s|@PROJECT_HOMEPAGE_URL@|$TERMUX_PKG_HOMEPAGE|" \
+				-e "s|@PROJECT_VERSION@|$TERMUX_PKG_VERSION|" \
+				-e "s|@REQUIRES@||" \
+				-e "s|@TS_REQUIRES@||" \
+				-e "s|@URL@|$TERMUX_PKG_HOMEPAGE|" \
+				-e "s|@VERSION@|$TERMUX_PKG_VERSION|" \
+				"bindings/c/tree-sitter-$name.pc.in" \
+			> "$TERMUX_PREFIX/lib/pkgconfig/tree-sitter-$name.pc"
+
+			# Check that we got all the placeholders.
+			if grep -q '@.*@' "$TERMUX_PREFIX/lib/pkgconfig/tree-sitter-$name.pc"; then
+				die <<- EOF
+
+					ERROR:
+					Leftover placeholders in pkgconfig file
+					File: $TERMUX_PREFIX/lib/pkgconfig/tree-sitter-$name.pc
+					$(<"$TERMUX_PREFIX/lib/pkgconfig/tree-sitter-$name.pc")
+
+					Add the appropriate replacement to '$(realpath "$0")'
+				EOF
+			fi
+		fi
+	;;
+esac
+# vim: set noet ts=4 sw=4 ff=unix
