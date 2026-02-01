@@ -8,3 +8,17 @@
 +            let file_name = format!("@TERMUX_PREFIX@/tmp/.X11-unix/X{}", display);
              targets.push(ConnectAddress::Socket(file_name));
          }
+
+diff --git b/lib.rs.orig a/lib.rs
+index c653bc5bd2..c885551099 100644
+--- b/src/lib.rs.orig
++++ a/src/lib.rs
+@@ -45,8 +45,6 @@
+ #![deny(
+     // Contains unreachable_code and "?" generates an #[allow] for this
+     unused,
+-    // #[derive] generates an #[allow] for this; not part of "unused"
+-    unused_qualifications,
+     // serde's Deserialize/Serialize impls add allows for this
+     rust_2018_idioms,
+     // Not everything in x11rb_protocol::protocol has doc comments
