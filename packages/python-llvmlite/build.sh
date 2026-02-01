@@ -8,7 +8,7 @@ TERMUX_PKG_VERSION=(
 	"0.46.0"
 	"20.1.8"
 )
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=(
 	"https://github.com/numba/llvmlite/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.tar.gz"
 	"https://github.com/llvm/llvm-project/releases/download/llvmorg-${TERMUX_PKG_VERSION[1]}/llvm-project-${TERMUX_PKG_VERSION[1]}.src.tar.xz"
