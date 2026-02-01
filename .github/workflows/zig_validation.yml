@@ -1,0 +1,68 @@
+name: Zig validation
+
+permissions:
+  contents: read
+  actions: write
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+    - 'packages/zig/build.sh'
+    - 'scripts/build/setup/termux_setup_zig.sh'
+
+jobs:
+  planning:
+    runs-on: ubuntu-slim
+    strategy:
+      matrix:
+        target_arch: [aarch64, arm, i686, x86_64]
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 1
+    - name: Generate test matrix list
+      run: ./scripts/bin/validation ${{ matrix.target_arch }} zig list | tee list.txt
+    - name: Get test matrix batch
+      id: list
+      run: |
+        echo "batch=$(grep -Po '^Batches \(actual\):\s*\K(\d+)' list.txt | python3 -c 'import json,sys;num = int(sys.stdin.readline().rstrip());print(json.dumps([i for i in range(1, num+1)]))')" | tee -a "$GITHUB_OUTPUT"
+    outputs:
+      batch: ${{ steps.list.outputs.batch }}
+  zig_validation:
+    needs: planning
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target_arch: [aarch64, arm, i686, x86_64]
+        batch: ${{ fromJson(needs.planning.outputs.batch) }}
+      fail-fast: false
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 1
+    - name: Set process id limit for 32-bit builds depending on aosp-libs
+      run: echo 65535 | sudo tee /proc/sys/kernel/pid_max
+    - name: Enable zram
+      if: ${{ steps.build-info.outputs.skip-building != 'true' }}
+      uses: ./.github/actions/zram
+      with:
+        algorithm: zstd
+        size: 16G
+        priority: 100
+        device_name: /dev/zram0
+    - name: Prepare environment
+      run: |
+        ./scripts/setup-ubuntu.sh
+        ./scripts/setup-android-sdk.sh
+        ./scripts/free-space.sh
+    - name: Zig validation
+      run: ./scripts/bin/validation ${{ matrix.target_arch }} zig ${{ matrix.batch }} || exit 1
+    - name: Upload report artifact
+      if: always()
+      uses: actions/upload-artifact@v6
+      with:
+        name: report-${{ matrix.target_arch }}-${{ matrix.batch }}
+        path: /tmp/zig-validation-report.txt

@@ -7,7 +7,7 @@ usage() {
 	echo
 	echo "OPTIONS:"
 	echo "  ARCH     - aarch64, arm, i686, x86_64"
-	echo "  PACKAGES - golang"
+	echo "  PACKAGES - golang, zig"
 	echo
 	echo "EXAMPLES:"
 	echo "  $0 aarch64 golang         Build all aarch64 golang based packages"
@@ -36,6 +36,10 @@ case "${2}" in
 		STRATEGY=(100)
 		EXCLUDE_BIG_PACKAGES=true
 		BIG_PACKAGES_IN_SEPARATE_BATCH=true
+		;;
+	zig)
+		readarray -t PACKAGES < <(grep -rl termux_setup_zig --include=build.sh --exclude-dir=zig "${TERMUX_PACKAGE_DIRECTORIES[@]}" | cut -d/ -f1,2 | sort -u | cut -d/ -f2 || :) || :
+		STRATEGY=(100)
 		;;
 	*)
 		echo "ERROR: Invalid args: $*" 1>&2
