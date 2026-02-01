@@ -1,0 +1,124 @@
+--- a/CMakeLists.txt   2026-01-13 18:28:39.000000000 +0530
++++ b/CMakeLists.txt 2026-01-28 10:28:29.946267481 +0530
+@@ -54,12 +54,6 @@
+ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+
+ if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+-    find_package(Sensors)
+-    set_package_properties(Sensors PROPERTIES
+-            TYPE REQUIRED
+-            PURPOSE "Used for reading hardware sensors that aren't covered by other plugins."
+-            URL "https://github.com/lm-sensors/lm-sensors"
+-        )
+
+     find_package(NL)
+     set_package_properties(NL PROPERTIES
+
+--- a/src/daemon.cpp   2026-01-13 18:28:39.000000000 +0530
++++ b/src/daemon.cpp 2026-01-28 10:42:22.299552197 +0530
+@@ -25,10 +25,6 @@
+ #include <KPluginMetaData>
+ #include <KPluginFactory>
+
+-#ifdef Q_OS_LINUX
+-#include <sensors/sensors.h>
+-#endif
+-
+ #include "ksystemstats1adaptor.h"
+
+ #include "client.h"
+@@ -64,16 +60,10 @@
+     for (Client* c : m_clients) {
+         delete c;
+     }
+-#ifdef Q_OS_LINUX
+-    sensors_cleanup();
+-#endif
+ }
+
+ bool Daemon::init(ReplaceIfRunning replaceIfRunning)
+ {
+-#ifdef Q_OS_LINUX
+-    sensors_init(nullptr);
+-#endif
+     loadProviders();
+
+     QDBusConnection::sessionBus().registerObject(KSysGuard::SystemStats::ObjectPath, this, QDBusConnection::ExportAdaptors);
+--- a/plugins/cpu/linuxcpu.cpp
++++ b/plugins/cpu/linuxcpu.cpp
+@@ -8,7 +8,6 @@
+ 
+ #include <QFile>
+ 
+-#include <sensors/sensors.h>
+ #include <systemstats/SensorsFeatureSensor.h>
+ 
+ static double readCpuFreq(const QString &cpuId, const QString &attribute, bool &ok)
+@@ -30,7 +30,9 @@ LinuxCpuObject::LinuxCpuObject(const QString &id, const QString &name, double in
+ 
+ void LinuxCpuObject::makeTemperatureSensor(const sensors_chip_name * const chipName, const sensors_feature * const feature)
+ {
++#ifndef __ANDROID__
+     m_temperature = KSysGuard::makeSensorsFeatureSensor(QStringLiteral("temperature"), chipName, feature, this);
++#endif
+ }
+ 
+ void LinuxCpuObject::initialize()
+--- a/plugins/cpu/linuxcpuplugin.cpp
++++ b/plugins/cpu/linuxcpuplugin.cpp
+@@ -12,7 +12,6 @@
+ 
+ #include <systemstats/SensorContainer.h>
+ 
+-#include <sensors/sensors.h>
+ 
+ #include "debug.h"
+ #include "linuxcpu.h"
+@@ -188,6 +188,7 @@ void LinuxCpuPluginPrivate::update()
+ void LinuxCpuPluginPrivate::addSensors()
+ {
+     int number = 0;
++#ifndef __ANDROID__
+     while (const sensors_chip_name * const chipName = sensors_get_detected_chips(nullptr, &number)) {
+         char name[100];
+         sensors_snprintf_chip_name(name, 100, chipName);
+@@ -197,6 +198,7 @@ void LinuxCpuPluginPrivate::addSensors()
+             addSensorsAmd(chipName);
+         }
+     }
++#endif
+ }
+ 
+ // Documentation: https://www.kernel.org/doc/html/latest/hwmon/coretemp.html
+@@ -207,6 +207,7 @@ void LinuxCpuPluginPrivate::addSensorsIntel(const sensors_chip_name * const chip
+     int featureNumber = 0;
+     QHash<std::pair<unsigned int, unsigned int>,  sensors_feature const *> coreFeatures;
+     int physicalId = 0;
++#ifndef __ANDROID__
+     while (sensors_feature const * feature = sensors_get_features(chipName, &featureNumber)) {
+         if (feature->type != SENSORS_FEATURE_TEMP) {
+             continue;
+@@ -221,6 +222,7 @@ void LinuxCpuPluginPrivate::addSensorsIntel(const sensors_chip_name * const chip
+         }
+         free(sensorLabel);
+     }
++#endif
+ 
+     for (auto feature = coreFeatures.cbegin(); feature != coreFeatures.cend(); ++feature) {
+         if (m_cpusBySystemIds.contains(feature.key())) {
+@@ -246,6 +246,7 @@ void LinuxCpuPluginPrivate::addSensorsAmd(const sensors_chip_name * const chipNa
+     sensors_feature const * tctl = nullptr;
+     sensors_feature const * tdie = nullptr;
+     sensors_feature const * tccd[8] = {nullptr};
++#ifndef __ANDROID__
+     while (sensors_feature const * feature = sensors_get_features(chipName, &featureNumber)) {
+         const QByteArray name (feature->name);
+         if (feature->type != SENSORS_FEATURE_TEMP || !name.startsWith("temp")) {
+@@ -266,6 +267,7 @@ void LinuxCpuPluginPrivate::addSensorsAmd(const sensors_chip_name * const chipNa
+         }
+         free(label);
+     }
++#endif
+     // TODO How to map CCD temperatures to cores?
+ 
+     auto setSingleSensor = [this, chipName] (const sensors_feature * const feature) {
