@@ -2,13 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://mega.io/
 TERMUX_PKG_DESCRIPTION="Provides non UI access to MEGA services"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.3.0"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="2.4.0"
 TERMUX_PKG_SRCURL=git+https://github.com/meganz/MEGAcmd
-TERMUX_PKG_SHA256=7570093a085379840a903ce56b3ea201be5b460ea3191bb8a8f3a903e2685c14
-TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}_Win"
+TERMUX_PKG_SHA256=00ab150e6f030a6cd1a30d87851a7592b565cf146bf605bf223339cf43f8b00a
+TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}_Linux"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+_Linux"
+TERMUX_PKG_UPDATE_VERSION_SED_REGEXP='s/_Linux//'
+
 # dbus is required for $PREFIX/var/lib/dbus/machine-id
 TERMUX_PKG_DEPENDS="c-ares, cryptopp, dbus, ffmpeg, freeimage, libandroid-glob, libc++, libcurl, libicu, libsodium, libsqlite, libuv, mediainfo, openssl, pcre, readline, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
