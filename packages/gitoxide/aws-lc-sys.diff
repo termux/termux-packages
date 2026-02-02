@@ -1,0 +1,15 @@
+Prevents error:
+gitoxide/src/vendor/aws-lc-sys/aws-lc/crypto/rand_extra/getentropy.c:35:9: error: call to undeclared function 'getentropy'
+
+--- a/aws-lc/crypto/rand_extra/internal.h
++++ b/aws-lc/crypto/rand_extra/internal.h
+@@ -13,7 +13,8 @@
+ #elif defined(OPENSSL_MACOS) || defined(OPENSSL_OPENBSD) || \
+     defined(OPENSSL_FREEBSD)  || defined(OPENSSL_NETBSD) || \
+     defined(OPENSSL_SOLARIS) || \
+-    (defined(OPENSSL_LINUX) && !defined(HAVE_LINUX_RANDOM_H))
++    (defined(OPENSSL_LINUX) && !defined(HAVE_LINUX_RANDOM_H) && \
++    !defined(__ANDROID__) || __ANDROID_API__ >= 28)
+ #define OPENSSL_RAND_GETENTROPY
+ #elif defined(OPENSSL_IOS)
+ #define OPENSSL_RAND_CCRANDOMGENERATEBYTES
