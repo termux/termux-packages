@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Rust implementation of Git"
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE-APACHE, LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.49.0"
-TERMUX_PKG_SRCURL=https://github.com/Byron/gitoxide/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=190d8708ddcd27ca6c1df264286a1115343bc324d210f07eeadcc3a110abfa8c
+TERMUX_PKG_VERSION="0.50.0"
+TERMUX_PKG_SRCURL="https://github.com/Byron/gitoxide/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=8ad0fdcfa465fedac7c4bafaae2349ad0db7daf48a80d9cb2bd70dd36fa567aa
 TERMUX_PKG_DEPENDS="resolv-conf"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -16,16 +16,28 @@ termux_step_pre_configure() {
 	termux_setup_cmake
 	termux_setup_rust
 
-	: "${CARGO_HOME:=$HOME/.cargo}"
-	export CARGO_HOME
+	cargo vendor
+	find ./vendor \
+		-mindepth 1 -maxdepth 1 -type d \
+		! -wholename ./vendor/aws-lc-sys \
+		! -wholename ./vendor/hickory-resolver \
+		-exec rm -rf '{}' \;
 
-	cargo fetch --target "${CARGO_TARGET_NAME}"
+	local patch="$TERMUX_PKG_BUILDER_DIR/aws-lc-sys.diff"
+	local dir="vendor/aws-lc-sys"
+	echo "Applying patch: $patch"
+	patch --silent -p1 -d "${dir}" < "$patch"
 
-	for d in $CARGO_HOME/registry/src/*/trust-dns-resolver-*; do
-		sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" \
-			$TERMUX_PKG_BUILDER_DIR/trust-dns-resolver.diff \
-			| patch --silent -p1 -d ${d} || :
-	done
+	patch="$TERMUX_PKG_BUILDER_DIR/hickory-resolver.diff"
+	dir="vendor/hickory-resolver"
+	echo "Applying patch: $patch"
+	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" \
+		"$patch" | patch --silent -p1 -d "${dir}"
+
+	echo "" >> Cargo.toml
+	echo '[patch.crates-io]' >> Cargo.toml
+	echo 'aws-lc-sys = { path = "./vendor/aws-lc-sys" }' >> Cargo.toml
+	echo 'hickory-resolver = { path = "./vendor/hickory-resolver" }' >> Cargo.toml
 
 	if [ "$TERMUX_ARCH" == "x86_64" ]; then
 		local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
