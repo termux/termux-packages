@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/golang/tools/archive/refs/tags/gopls/v${TER
 TERMUX_PKG_SHA256=c223293463c98039a930cb604d6ff04caff5cd6a3d45e7394cda1f11d8cfc0b5
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
+TERMUX_PKG_UPDATE_TAG_TYPE=latest-release-tag
 
 termux_step_make() {
 	termux_setup_golang
