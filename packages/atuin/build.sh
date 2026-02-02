@@ -3,15 +3,16 @@ TERMUX_PKG_DESCRIPTION="Magical shell history"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="../../LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="18.10.0"
+TERMUX_PKG_VERSION="18.11.0"
 TERMUX_PKG_SRCURL=https://github.com/ellie/atuin/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=02228929976142f63b4464a35b8b29b29155e1814cf03e99c95381954c5d9e37
+TERMUX_PKG_SHA256=9d47c1b176be1c0d4a4c16e94dcb55df9c893ee9d2ad6dbc09b4719d5b557645
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	termux_setup_protobuf
 	termux_setup_rust
+	termux_setup_cmake
 	TERMUX_PKG_SRCDIR+="/crates/atuin"
 	TERMUX_PKG_BUILDDIR="$TERMUX_PKG_SRCDIR"
 
@@ -23,6 +24,28 @@ termux_step_pre_configure() {
 
 	# clash with rust host build
 	unset CFLAGS
+
+	cargo vendor
+	find ./vendor \
+		-mindepth 1 -maxdepth 1 -type d \
+		! -wholename ./vendor/aws-lc-sys \
+		-exec rm -rf '{}' \;
+
+	local patch="$TERMUX_PKG_BUILDER_DIR/aws-lc-sys-cmake-system-version.diff"
+	local dir="vendor/aws-lc-sys"
+	local target="$CCTERMUX_HOST_PLATFORM"
+	if [[ "$TERMUX_ARCH" == "arm" ]]; then
+		target="armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL"
+	fi
+	echo "Applying patch: $patch"
+	sed -e "s%\@TERMUX_STANDALONE_TOOLCHAIN\@%${TERMUX_STANDALONE_TOOLCHAIN}%g" \
+		-e "s%\@TERMUX_PKG_API_LEVEL\@%${TERMUX_PKG_API_LEVEL}%g" \
+		-e "s%\@TARGET\@%$target%g" \
+		"$patch" | patch --silent -p1 -d "${dir}"
+
+	echo "" >> Cargo.toml
+	echo '[patch.crates-io]' >> Cargo.toml
+	echo 'aws-lc-sys = { path = "./vendor/aws-lc-sys" }' >> Cargo.toml
 }
 
 termux_step_post_make_install() {

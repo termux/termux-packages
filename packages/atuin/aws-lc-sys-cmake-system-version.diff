@@ -1,0 +1,21 @@
+Prevents error:
+Android: Neither the NDK or a standalone toolchain was found.
+and
+Android: The API specified by CMAKE_SYSTEM_VERSION='' is not an integer.
+and
+The C compiler
+"/home/builder/.termux-build/_cache/android-r29-api-24-v3/bin/aarch64-linux-android-clang"
+is not able to compile a simple test program.
+
+--- a/builder/cmake_builder.rs
++++ b/builder/cmake_builder.rs
+@@ -233,6 +233,9 @@ impl CmakeBuilder {
+         } else {
+             emit_warning("ANDROID_STANDALONE_TOOLCHAIN not set.");
+         }
++        _cmake_cfg.define("CMAKE_ANDROID_STANDALONE_TOOLCHAIN", "@TERMUX_STANDALONE_TOOLCHAIN@");
++        _cmake_cfg.define("CMAKE_SYSTEM_VERSION", "@TERMUX_PKG_API_LEVEL@");
++        _cmake_cfg.define("CMAKE_C_FLAGS", "--target=@TARGET@");
+     }
+ 
+     fn configure_windows(&self, cmake_cfg: &mut cmake::Config) {
