@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/wolfSSL/wolfssl/archive/refs/tags/v${TERMUX
 TERMUX_PKG_SHA256=2b702b7a66b0067bfd284408827b1e59288b357b0dd758d0089c062395f2a522
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
+TERMUX_PKG_UPDATE_TAG_TYPE=latest-release-tag
 
 termux_step_pre_configure() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
