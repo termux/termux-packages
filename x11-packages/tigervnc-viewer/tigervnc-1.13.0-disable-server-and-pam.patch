@@ -4,23 +4,23 @@ See https://bugs.gentoo.org/852830
 
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -234,6 +234,7 @@
+@@ -260,6 +260,7 @@ if(BUILD_JAVA)
    add_subdirectory(java)
  endif()
  
 +option(BUILD_SERVER "Build TigerVNC server" ON)
- option(BUILD_VIEWER "Build TigerVNC viewer" ON)
+ trioption(BUILD_VIEWER "Build TigerVNC viewer")
  if(BUILD_VIEWER)
    # Check for FLTK
-@@ -276,7 +277,7 @@
+@@ -341,7 +341,7 @@ if (ENABLE_NETTLE)
  endif()
  
  # Check for PAM library
 -if(UNIX AND NOT APPLE)
-+if(BUILD_SERVER AND UNIX AND NOT APPLE)
-   check_include_files(security/pam_appl.h HAVE_PAM_H)
-   set(CMAKE_REQUIRED_LIBRARIES -lpam)
-   check_function_exists(pam_start HAVE_PAM_START)
++if(FALSE)
+   find_package(PAM REQUIRED)
+ endif()
+ 
 @@ -315,9 +316,6 @@
    add_subdirectory(media)
  endif()
@@ -33,15 +33,15 @@ See https://bugs.gentoo.org/852830
  endif()
 --- a/common/rfb/CMakeLists.txt
 +++ b/common/rfb/CMakeLists.txt
-@@ -75,7 +75,7 @@
+@@ -76,7 +76,7 @@ if(WIN32)
    target_sources(rfb PRIVATE WinPasswdValidator.cxx)
  endif(WIN32)
  
 -if(UNIX AND NOT APPLE)
-+if(BUILD_SERVER AND UNIX AND NOT APPLE)
-   target_sources(rfb PRIVATE UnixPasswordValidator.cxx pam.c)
-   target_link_libraries(rfb ${PAM_LIBS})
- endif()
++if(FALSE)
+   target_sources(rfb PRIVATE UnixPasswordValidator.cxx)
+   target_include_directories(rfb SYSTEM PRIVATE ${PAM_INCLUDE_DIRS})
+   target_link_libraries(rfb ${PAM_LIBRARIES})
 --- a/unix/CMakeLists.txt
 +++ b/unix/CMakeLists.txt
 @@ -1,6 +1,8 @@
