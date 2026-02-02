@@ -1,0 +1,20 @@
+From ed07479782f8ae9ea7e97b0c0945efb8b6686b34 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ball=C3=B3=20Gy=C3=B6rgy?= <ballogyor@gmail.com>
+Date: Thu, 22 Jan 2026 23:04:48 +0100
+Subject: [PATCH] Set window icon
+
+This is commonly used by desktop environments on Xorg.
+---
+ src/main.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -41,6 +41,7 @@ int main(int argc, char *argv[])
+ 
+ int launchGui(int argc, char *argv[])
+ {
++    QGuiApplication::setWindowIcon(QIcon::fromTheme(QStringLiteral(APPLICATION_ID)));
+ #if defined(Q_OS_WIN)
+     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+ #endif
