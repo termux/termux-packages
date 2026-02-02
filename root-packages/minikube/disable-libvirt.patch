@@ -1,0 +1,24 @@
+Prevents this build error when building for 64-bit x86 Termux:
+
+# libvirt.org/go/libvirt
+# [/home/builder/.termux-build/_cache/android-r29-api-24-v3/bin/pkg-config --cflags
+-- libvirt-admin libvirt-admin libvirt libvirt libvirt libvirt libvirt libvirt libvirt
+libvirt libvirt libvirt libvirt libvirt libvirt libvirt-admin libvirt libvirt libvirt
+libvirt libvirt libvirt libvirt libvirt libvirt libvirt libvirt libvirt libvirt
+libvirt libvirt-lxc libvirt-qemu libvirt libvirt libvirt libvirt libvirt libvirt
+libvirt libvirt libvirt libvirt libvirt libvirt libvirt libvirt libvirt libvirt
+libvirt libvirt libvirt libvirt libvirt libvirt]
+Package libvirt-admin was not found in the pkg-config search path.
+Perhaps you should add the directory containing `libvirt-admin.pc'
+to the PKG_CONFIG_PATH environment variable
+
+--- a/pkg/minikube/registry/drvs/init.go
++++ b/pkg/minikube/registry/drvs/init.go
+@@ -22,7 +22,6 @@ import (
+ 	_ "k8s.io/minikube/pkg/minikube/registry/drvs/hyperkit"
+ 	_ "k8s.io/minikube/pkg/minikube/registry/drvs/hyperv"
+ 	_ "k8s.io/minikube/pkg/minikube/registry/drvs/krunkit"
+-	_ "k8s.io/minikube/pkg/minikube/registry/drvs/kvm2"
+ 	_ "k8s.io/minikube/pkg/minikube/registry/drvs/none"
+ 	_ "k8s.io/minikube/pkg/minikube/registry/drvs/parallels"
+ 	_ "k8s.io/minikube/pkg/minikube/registry/drvs/podman"
