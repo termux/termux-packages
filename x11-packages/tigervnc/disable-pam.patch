@@ -1,13 +1,13 @@
 +++ ./CMakeLists.txt	2018-09-12 11:14:21.772989769 +0300
-@@ -288,7 +288,7 @@
+@@ -341,7 +341,7 @@ if (ENABLE_NETTLE)
  endif()
  
  # Check for PAM library
 -if(UNIX AND NOT APPLE)
 +if(FALSE)
-   check_include_files(security/pam_appl.h HAVE_PAM_H)
-   set(CMAKE_REQUIRED_LIBRARIES -lpam)
-   check_function_exists(pam_start HAVE_PAM_START)
+   find_package(PAM REQUIRED)
+ endif()
+ 
 @@ -351,7 +351,6 @@
    add_subdirectory(media)
  endif()
@@ -17,15 +17,15 @@
  
  if(BUILD_VIEWER)
 +++ ./common/rfb/CMakeLists.txt
-@@ -92,7 +92,7 @@
+@@ -76,7 +76,7 @@ if(WIN32)
    target_sources(rfb PRIVATE WinPasswdValidator.cxx)
  endif(WIN32)
  
 -if(UNIX AND NOT APPLE)
 +if(FALSE)
-   target_sources(rfb PRIVATE UnixPasswordValidator.cxx pam.c)
-   target_link_libraries(rfb ${PAM_LIBS})
- endif()
+   target_sources(rfb PRIVATE UnixPasswordValidator.cxx)
+   target_include_directories(rfb SYSTEM PRIVATE ${PAM_INCLUDE_DIRS})
+   target_link_libraries(rfb ${PAM_LIBRARIES})
 +++ ./unix/CMakeLists.txt
 @@ -6,5 +6,4 @@
  add_subdirectory(common)
@@ -35,14 +35,46 @@
  add_subdirectory(x0vncserver)
 
 +++ ./common/rfb/UnixPasswordValidator.h
-@@ -28,7 +28,7 @@
-   class UnixPasswordValidator: public PasswordValidator {
-   protected:
-     bool validateInternal(SConnection * sc, const char *username,
--			   const char *password) override;
-+			   const char *password) override { return false; }
-   };
- }
+@@ -35,7 +35,7 @@ namespace rfb
+     bool validateInternal(SConnection *sc,
+                           const char *username,
+                           const char *password,
+-                          std::string &msg) override;
++                          std::string &msg) override { return false; }
  
-
-
+   private:
+     static std::string displayName;
+--- a/unix/x0vncserver/x0vncserver.cxx
++++ b/unix/x0vncserver/x0vncserver.cxx
+@@ -39,7 +39,6 @@
+ #include <rdr/FdInStream.h>
+ #include <rdr/FdOutStream.h>
+ 
+-#include <rfb/UnixPasswordValidator.h>
+ #include <rfb/VNCServerST.h>
+ 
+ #include <network/TcpSocket.h>
+@@ -343,7 +342,6 @@ int main(int argc, char** argv)
+             programName, displayName);
+     exit(1);
+   }
+-  rfb::UnixPasswordValidator::setDisplayName(displayName);
+ 
+   signal(SIGHUP, CleanupSignalHandler);
+   signal(SIGINT, CleanupSignalHandler);
+--- a/unix/xserver/hw/vnc/RFBGlue.cc
++++ b/unix/xserver/hw/vnc/RFBGlue.cc
+@@ -32,7 +32,6 @@
+ 
+ #include <network/TcpSocket.h>
+ 
+-#include <rfb/UnixPasswordValidator.h>
+ 
+ #include "RFBGlue.h"
+ 
+@@ -241,5 +240,4 @@ void vncSetDisplayName(const char *displayNumStr)
+ {
+   std::string displayName(":");
+   displayName += displayNumStr;
+-  rfb::UnixPasswordValidator::setDisplayName(displayName);
+ }
