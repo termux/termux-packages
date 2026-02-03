@@ -149,6 +149,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ldc.sh"
 # shellcheck source=scripts/build/setup/termux_setup_no_integrated_as.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_no_integrated_as.sh"
 
+# Utility function for setting up build-python for cross-compilation of Python and crossenv
+# shellcheck source=scripts/build/setup/termux_setup_build_python.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_build_python.sh"
+
 # Utility function for python packages to setup a python.
 # shellcheck source=scripts/build/setup/termux_setup_python_pip.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_python_pip.sh"
