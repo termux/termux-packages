@@ -11,16 +11,16 @@ diff --git a/build/config/compiler/BUILD.gn b/build/config/compiler/BUILD.gn
 index c9a67656..01eb5811 100644
 --- a/build/config/compiler/BUILD.gn
 +++ b/build/config/compiler/BUILD.gn
-@@ -2078,6 +2078,12 @@ config("default_warnings") {
+@@ -2285,6 +2285,12 @@ config("default_warnings") {
+   if (is_apple) {
      ldflags += [ "-Wl,-no_warn_duplicate_libraries" ]
    }
- 
++
 +  cflags += [
 +    # Treat macro redefined as error
 +    # In jumbo build, it may cause undefined behavior
 +    "-Werror=macro-redefined",
 +  ]
-+
-   # Rust warnings
+ }
  
-   # Require `unsafe` blocks even in `unsafe` fns. This is intended to become
+ # prevent_unsafe_narrowing ----------------------------------------------------
