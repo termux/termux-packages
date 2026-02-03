@@ -1,4 +1,10 @@
+# This script setups host python and crossenv for cross-compilation of python
+# packages. Requires python package to be built before this script is called.
+#
+# It is highly recommended checking out documentation of
+# termux_setup_build_python before using this script
 termux_setup_python_pip() {
+	termux_setup_build_python
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 		if [[ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" && "$(dpkg-query -W -f '${db:Status-Status}\n' python-pip 2>/dev/null)" != "installed" ]] ||
 		[[ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" && ! "$(pacman -Q python-pip 2>/dev/null)" ]]; then
@@ -20,9 +26,9 @@ termux_setup_python_pip() {
 		python${TERMUX_PYTHON_VERSION} -m venv --system-site-packages "$_VENV_DIR"
 		. "$_VENV_DIR/bin/activate"
 
-		pip install 'setuptools==78.1.0' 'wheel==0.46.1'
+		pip install 'setuptools==80.9.0' 'wheel==0.46.1'
 	else
-		local _CROSSENV_VERSION=1.4.0
+		local _CROSSENV_VERSION=1.6.1
 		local _CROSSENV_TAR=crossenv-$_CROSSENV_VERSION.tar.gz
 		local _CROSSENV_FOLDER
 
@@ -37,7 +43,7 @@ termux_setup_python_pip() {
 			termux_download \
 				https://github.com/benfogle/crossenv/archive/refs/tags/v$_CROSSENV_VERSION.tar.gz \
 				$TERMUX_PKG_TMPDIR/$_CROSSENV_TAR \
-				28da6260fafd85b05fa539793c45ef804c700a0bb71172fadef429796d49ac4e
+				f85bfbfbfea3567427daa56693c28c75e69fb6ae78c508565f7ae54a26fe407d
 
 			rm -Rf "$TERMUX_PKG_TMPDIR/crossenv-$_CROSSENV_VERSION"
 			tar xf $TERMUX_PKG_TMPDIR/$_CROSSENV_TAR -C $TERMUX_PKG_TMPDIR
@@ -47,14 +53,14 @@ termux_setup_python_pip() {
 			local f
 			for f in "$TERMUX_SCRIPTDIR"/scripts/build/setup/python-crossenv-*.patch; do
 				echo "[${FUNCNAME[0]}]: Applying $(basename "$f")"
-				patch --silent -p1 -d "$_CROSSENV_FOLDER" < "$f"
+				cat "$f" | sed -e "s|@@TERMUX_PKG_API_LEVEL@@|${TERMUX_PKG_API_LEVEL}|g" | patch --silent -p1 -d "$_CROSSENV_FOLDER"
 			done
 			shopt -u nullglob
 		fi
 
 		if [ ! -d "$TERMUX_PYTHON_CROSSENV_PREFIX" ]; then
 			cd "$TERMUX_PYTHON_CROSSENV_SRCDIR"
-			/usr/bin/python${TERMUX_PYTHON_VERSION} -m crossenv \
+			"$TERMUX_BUILD_PYTHON_DIR/host-build-prefix/bin/python${TERMUX_PYTHON_VERSION}" -m crossenv \
                 		"$TERMUX_PREFIX/bin/python${TERMUX_PYTHON_VERSION}" \
 				"${TERMUX_PYTHON_CROSSENV_PREFIX}"
 		fi
@@ -62,8 +68,8 @@ termux_setup_python_pip() {
 
 		# Since 3.12, distutils is removed from python, but setuptools>=60 provides it
 		# Since wheel 0.46, setuptools>=70 is required to provide bdist_wheel
-		build-pip install 'setuptools==78.1.0' 'wheel==0.46.1'
-		cross-pip install 'setuptools==78.1.0' 'wheel==0.46.1'
+		build-pip install 'setuptools==80.9.0' 'wheel==0.46.1'
+		cross-pip install 'setuptools==80.9.0' 'wheel==0.46.1'
 
 		export PATH="${TERMUX_PYTHON_CROSSENV_PREFIX}/build/bin:${PATH}"
 		local _CROSS_PATH="${TERMUX_PYTHON_CROSSENV_PREFIX}/cross/bin"

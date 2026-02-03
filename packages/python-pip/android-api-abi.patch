@@ -1,0 +1,14 @@
+Allow installing without specifying abi version. Needed for crossenv specifically.
+May not be needed for on-device, but let's just keep it just in case in case there is some psycho who is doing this already
+diff --git a/src/pip/_vendor/packaging/tags.py b/src/pip/_vendor/packaging/tags.py
+index 8522f59c4..ef55342fb 100644
+--- a/src/pip/_vendor/packaging/tags.py
++++ b/src/pip/_vendor/packaging/tags.py
+@@ -563,6 +563,7 @@ def android_platforms(
+     # without major patching. Yield every API level from the maximum down to the
+     # minimum, inclusive.
+     min_api_level = 16
++    yield f"android_{abi}"
+     for ver in range(api_level, min_api_level - 1, -1):
+         yield f"android_{ver}_{abi}"
+ 
