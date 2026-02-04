@@ -1,26 +1,3 @@
---- a/Lib/aifc.py
-+++ b/Lib/aifc.py
-@@ -920,7 +920,7 @@
- if __name__ == '__main__':
-     import sys
-     if not sys.argv[1:]:
--        sys.argv.append('/usr/demos/data/audio/bach.aiff')
-+        sys.argv.append('@TERMUX_PREFIX@/demos/data/audio/bach.aiff')
-     fn = sys.argv[1]
-     with open(fn, 'r') as f:
-         print("Reading", fn)
---- a/Lib/mailcap.py
-+++ b/Lib/mailcap.py
-@@ -55,7 +55,8 @@
-             # Don't bother with getpwuid()
-             home = '.' # Last resort
-         mailcaps = [home + '/.mailcap', '/etc/mailcap',
--                '/usr/etc/mailcap', '/usr/local/etc/mailcap']
-+                '/usr/etc/mailcap', '/usr/local/etc/mailcap',
-+                '@TERMUX_PREFIX@/etc/mailcap']
-     return mailcaps
- 
- 
 --- a/Lib/mimetypes.py
 +++ b/Lib/mimetypes.py
 @@ -49,6 +49,7 @@
