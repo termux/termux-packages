@@ -1,0 +1,11 @@
+--- a/build.rs
++++ b/build.rs
+@@ -352,7 +352,7 @@
+   // cross-compilation setup
+   if target_arch == "aarch64" {
+     gn_args.push(r#"target_cpu="arm64""#.to_string());
+-    if target_os == "linux" {
++    if target_os == "linux" || target_os == "android" {
+       gn_args.push("use_sysroot=true".to_string());
+       maybe_install_sysroot("arm64");
+       maybe_install_sysroot("amd64");

@@ -790,19 +790,14 @@ diff --git a/v8/src/objects/js-atomics-synchronization.h b/v8/src/objects/js-ato
 index 73a03828..8b458f2f 100644
 --- a/v8/src/objects/js-atomics-synchronization.h
 +++ b/v8/src/objects/js-atomics-synchronization.h
-@@ -29,11 +29,11 @@ template <typename T>
- class AsyncWaiterQueueNode;
+@@ -27,8 +27,8 @@ template <typename T>
+ class WaiterQueueNode;
  }  // namespace detail
  
 -using detail::WaiterQueueLockGuard;
 -using detail::WaiterQueueNode;
--using LockAsyncWaiterQueueNode = detail::AsyncWaiterQueueNode<JSAtomicsMutex>;
 +using internal::detail::WaiterQueueLockGuard;
 +using internal::detail::WaiterQueueNode;
-+using LockAsyncWaiterQueueNode = internal::detail::AsyncWaiterQueueNode<JSAtomicsMutex>;
- using WaitAsyncWaiterQueueNode =
--    detail::AsyncWaiterQueueNode<JSAtomicsCondition>;
-+    internal::detail::AsyncWaiterQueueNode<JSAtomicsCondition>;
  
  // JSSynchronizationPrimitive is the base class for JSAtomicsMutex and
  // JSAtomicsCondition. It contains a 32-bit state field and a pointer to a
@@ -1017,3 +1012,61 @@ index 2be79a9d..faa205ef 100644
 +#undef TRACE
 +
  }  // namespace v8::internal::compiler::turboshaft
+--- a/v8/src/objects/call-site-info.h
++++ b/v8/src/objects/call-site-info.h
+@@ -23,7 +23,7 @@
+ 
+ #include "torque-generated/src/objects/call-site-info-tq.inc"
+ 
+-V8_OBJECT class CallSiteInfo : public StructLayout {
++V8_OBJECT class CallSiteInfo : public v8::internal::StructLayout {
+  public:
+   DEFINE_TORQUE_GENERATED_CALL_SITE_INFO_FLAGS()
+ 
+--- a/v8/src/objects/property-descriptor-object.h
++++ b/v8/src/objects/property-descriptor-object.h
+@@ -16,7 +16,7 @@
+ 
+ #include "torque-generated/src/objects/property-descriptor-object-tq.inc"
+ 
+-V8_OBJECT class PropertyDescriptorObject : public StructLayout {
++V8_OBJECT class PropertyDescriptorObject : public v8::internal::StructLayout {
+  public:
+   DEFINE_TORQUE_GENERATED_PROPERTY_DESCRIPTOR_OBJECT_FLAGS()
+ 
+--- a/v8/src/objects/template-objects.h
++++ b/v8/src/objects/template-objects.h
+@@ -24,7 +24,7 @@
+ // TemplateObjectDescription is a tuple of raw strings and cooked strings for
+ // tagged template literals. Used to communicate with the runtime for template
+ // object creation within the {Runtime_GetTemplateObject} method.
+-V8_OBJECT class TemplateObjectDescription final : public StructLayout {
++V8_OBJECT class TemplateObjectDescription final : public v8::internal::StructLayout {
+  public:
+   static DirectHandle<JSArray> GetTemplateObject(
+       Isolate* isolate, DirectHandle<NativeContext> native_context,
+--- a/v8/src/maglev/maglev-known-node-aspects.cc
++++ b/v8/src/maglev/maglev-known-node-aspects.cc
+@@ -13,6 +13,8 @@
+ #include "src/maglev/maglev-ir-inl.h"
+ #include "src/zone/zone-containers.h"
+ 
++#define DestructivelyIntersect DestructivelyIntersect_KnownNodeAspects
++
+ namespace v8 {
+ namespace internal {
+ namespace maglev {
+@@ -524,3 +526,5 @@
+ }  // namespace maglev
+ }  // namespace internal
+ }  // namespace v8
++
++#undef DestructivelyIntersect
+--- a/v8/src/compiler/turboshaft/wasm-shuffle-reducer.cc
++++ b/v8/src/compiler/turboshaft/wasm-shuffle-reducer.cc
+@@ -521,3 +521,5 @@
+ }
+ 
+ }  // namespace v8::internal::compiler::turboshaft
++
++#undef TRACE
