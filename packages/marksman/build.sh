@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="LSP language server for editing Markdown files"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="2026.01.28"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/artempyanykh/marksman/archive/refs/tags/${TERMUX_PKG_VERSION//\./-}.tar.gz"
 TERMUX_PKG_SHA256=e6f1b96f8c43447ed4fb408d54b350441f1c5da843d22e0e2acbc2cda320ca74
 TERMUX_PKG_DEPENDS="dotnet-host, dotnet-runtime-9.0"

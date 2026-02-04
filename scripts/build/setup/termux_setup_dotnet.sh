@@ -82,7 +82,7 @@ termux_setup_dotnet() {
 	local latest_dotnet8_version=$(echo "${dotnet_runtime_versions}" | grep "^8.0." | tail -n1)
 	local latest_dotnet9_version=$(echo "${dotnet_runtime_versions}" | grep "^9.0." | tail -n1)
 	for targeting_pack in "${HOME}"/.dotnet/packs/*; do
-		if [[ -d "$(basename "${targeting_pack}")" ]]; then
+		if [[ -d "$(basename "${targeting_pack}")" && ! "$(realpath "${targeting_pack}")" =~ "$TERMUX_PREFIX" ]]; then
 			pushd "$(basename "${targeting_pack}")"
 			for version in "${targeting_pack}"/*; do
 				if [[ "$(basename "${version}")" == "8.0."* ]]; then
