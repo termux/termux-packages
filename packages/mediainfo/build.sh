@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Command-line utility for reading information from media 
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_LICENSE_FILE="../../../LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="25.10"
+TERMUX_PKG_VERSION="26.01"
 TERMUX_PKG_SRCURL=https://github.com/MediaArea/MediaInfo/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=2edaff16dfad9ee372d17d6d01eb2e3d2f8ee8dd4af606b1ee6f045c9b009662
+TERMUX_PKG_SHA256=cec53d8aa143376965d8da72cfaaed4e1e432e23a19ed26cbdf8e69a14e93365
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-support, libc++, libmediainfo, libzen"
 
