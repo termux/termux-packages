@@ -4,14 +4,16 @@ TERMUX_PKG_LICENSE="Apache-2.0, VIM License"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="0.11.6"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=d1c8e3f484ed1e231fd5f48f53b7345b628e52263d5eef489bb8b73ca8d90fca
-TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
-TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libvterm (>= 1:0.3-0), luajit, libunibilium, libandroid-support, lua51-lpeg, tree-sitter, tree-sitter-parsers, utf8proc"
+TERMUX_PKG_DEPENDS="libandroid-support, libiconv, libmsgpack, libunibilium, libuv, libvterm (>= 1:0.3-0), lua51-lpeg, luajit, luv, tree-sitter, tree-sitter-parsers, utf8proc"
 TERMUX_PKG_BREAKS="neovim-nightly"
 TERMUX_PKG_CONFLICTS="neovim-nightly"
 TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_CONFFILES="share/nvim/sysinit.vim"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLE_JEMALLOC=OFF
@@ -23,7 +25,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLPEG_LIBRARY=$TERMUX_PREFIX/lib/liblpeg-5.1.so
 -DCOMPILE_LUA=OFF
 "
-TERMUX_PKG_CONFFILES="share/nvim/sysinit.vim"
 
 termux_step_host_build() {
 	termux_setup_cmake
@@ -66,7 +67,6 @@ termux_step_pre_configure() {
 termux_step_post_make_install() {
 	local _CONFIG_DIR=$TERMUX_PREFIX/share/nvim
 	mkdir -p "$_CONFIG_DIR"
-	cp "$TERMUX_PKG_BUILDER_DIR/sysinit.vim" "$_CONFIG_DIR/"
 
 	# Tree-sitter grammars are packaged separately and installed into TERMUX_PREFIX/lib/tree_sitter.
 	ln -sf "${TERMUX_PREFIX}"/lib/tree_sitter "${TERMUX_PREFIX}"/share/nvim/runtime/parser
@@ -80,6 +80,11 @@ termux_step_post_make_install() {
 		"$TERMUX_PKG_BUILDER_DIR/nvim-shim.sh" \
 		> "${TERMUX_PREFIX}/bin/nvim"
 	chmod 700 "${TERMUX_PREFIX}/bin/nvim"
+
+	# Add termux specific configuration
+	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+		"$TERMUX_PKG_BUILDER_DIR/sysinit.vim" \
+		> "$_CONFIG_DIR/sysinit.vim"
 
 	{ # Set up a wrapper script for `ex` to be called by `update-alternatives`
 		echo "#!$TERMUX_PREFIX/bin/sh"
