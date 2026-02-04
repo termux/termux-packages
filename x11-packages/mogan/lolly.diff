@@ -1,3 +1,7 @@
+file.cpp: prepend @TERMUX_PREFIX@ to /tmp path
+
+hashtree.ipp: https://github.com/MoganLab/lolly/pull/346
+
 --- a/System/Files/file.cpp
 +++ b/System/Files/file.cpp
 @@ -290,7 +290,7 @@
@@ -9,3 +13,14 @@
  #endif
    static url tmp_dir= main_tmp_dir * url (as_string (get_process_id ()));
    return (tmp_dir);
+--- a/Kernel/Containers/hashtree.ipp
++++ b/Kernel/Containers/hashtree.ipp
+@@ -102,7 +102,7 @@ hashtree<K, V>::operator->(void) {
+ template <class K, class V>
+ inline hashtree<K, V>
+ hashtree<K, V>::operator[] (K key) {
+-  if (*this->contains (key)) return *this->children (key);
++  if ((*this)->contains (key)) return (*this)->children (key);
+   else TM_FAILED ("read-access to non-existent node requested");
+ }
+ 
