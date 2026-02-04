@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=(
 	10.11.5
 	7.1.3.1
 )
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
 	"https://github.com/jellyfin/jellyfin/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.tar.gz"
 	"https://github.com/jellyfin/jellyfin-web/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.zip"
