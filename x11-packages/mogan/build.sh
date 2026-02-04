@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A structure editor forked from GNU TeXmacs"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.2.9.8"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/XmacsLabs/mogan/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=70af74dad16816a8097b877dc4cd94202f35517468ab54f6ae6f84ede32746fb
 TERMUX_PKG_DEPENDS="freetype, ghostscript, libandroid-complex-math, libandroid-execinfo, libandroid-spawn, libandroid-wordexp, libc++, libcurl, libgit2, libiconv, libjpeg-turbo, libpng, qt6-qtbase, qt6-qtsvg, zlib"
@@ -33,6 +33,8 @@ termux_step_post_get_source() {
 		> "${TERMUX_PKG_SRCDIR}"/xmake/packages/l/lolly/lolly.diff
 	cp -f "${TERMUX_PKG_BUILDER_DIR}"/s7.diff \
 		"${TERMUX_PKG_SRCDIR}"/xmake/packages/s/s7/s7.diff
+	cp -f "${TERMUX_PKG_BUILDER_DIR}"/moebius.diff \
+		"${TERMUX_PKG_SRCDIR}"/xmake/packages/m/moebius/moebius.diff
 }
 
 termux_step_pre_configure() {
@@ -44,6 +46,22 @@ termux_step_pre_configure() {
 
 	# xmake tests -ldl wrongly?
 	LD="${CXX}"
+
+	# allows 'scripts/run-docker.sh ./build-package,sh -I -f -a all mogan' to work
+	# without causing 'ld.lld: error: /home/builder/.xmake/packages/s/s7/
+	# 20241122/2613d5544f43431dad530be0c61b8a28/lib/libs7.a(s7.c.o)
+	# is incompatible with armelf_linux_eabi'
+	export XMAKE_GLOBALDIR="$TERMUX_PKG_TMPDIR"
+
+	# for some reason building mogan can corrupt $TERMUX_PREFIX/lib/libcurl.so
+	# and /home/builder/.termux-build/_cache/xmake-2.9.5/bin/xmake ,
+	# but if they are backed up, then restored when the build completes, the chance
+	# of ruining the builds of other packages after mogan (including repeated builds of mogan)
+	# is reduced.
+	mkdir -p "$TERMUX_PKG_TMPDIR/backup_dir"
+	export XMAKE_ORIG=$(command -v xmake)
+	cp "$TERMUX_PREFIX/lib/libcurl.so" "$TERMUX_PKG_TMPDIR/backup_dir/libcurl.so"
+	cp "$XMAKE_ORIG" "$TERMUX_PKG_TMPDIR/backup_dir/xmake"
 
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
 		install -Dm755 "${TERMUX_PKG_BUILDER_DIR}/qmake.sh" "${TERMUX_PKG_TMPDIR}/qmake"
@@ -92,4 +110,9 @@ termux_step_make_install() {
 		--diagnosis \
 		-o "${TERMUX_PREFIX}" \
 		research
+}
+
+termux_step_post_make_install() {
+	cp "$TERMUX_PKG_TMPDIR/backup_dir/libcurl.so" "$TERMUX_PREFIX/lib/libcurl.so"
+	cp "$TERMUX_PKG_TMPDIR/backup_dir/xmake" "$XMAKE_ORIG"
 }
