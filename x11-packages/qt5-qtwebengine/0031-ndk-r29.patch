@@ -1,0 +1,434 @@
+From 64a4e25b9e579161f169d3a6afd59aba492ce91a Mon Sep 17 00:00:00 2001
+From: Victor Gomes <victorgomes@chromium.org>
+Date: Wed, 28 Aug 2024 09:20:48 +0200
+Subject: [PATCH] [cleanup] Fix UB in BitField::kMax
+
+It is UB to cast integers to enums outside of the valid range
+of the enum.
+
+Clang will turn `-Wenum-constexpr-conversion` into a hard error:
+https://github.com/llvm/llvm-project/issues/59036
+
+This CL changes BitField::kMax to be the unsigned representation
+integer type.
+
+And all checks "Enum::kA <= BitField::kMax" to
+"BitField::is_valid(Enum::kA)"
+
+Change-Id: I2b0094c72b16fdde3bb2a90901f83e5a6e7d8176
+Reviewed-on: https://chromium-review.googlesource.com/c/v8/v8/+/5816333
+Commit-Queue: Victor Gomes <victorgomes@chromium.org>
+Reviewed-by: Igor Sheludko <ishell@chromium.org>
+Auto-Submit: Victor Gomes <victorgomes@chromium.org>
+Cr-Commit-Position: refs/heads/main@{#95845}
+---
+ src/base/bit-field.h                      | 11 ++------
+ src/codegen/source-position.h             |  4 ---
+ src/objects/code-inl.h                    |  2 +-
+ src/objects/feedback-vector.h             |  4 +--
+ src/objects/js-date-time-format.h         | 34 +++++++++++------------
+ src/objects/js-display-names-inl.h        |  6 ++--
+ src/objects/js-display-names.h            | 14 +++++-----
+ src/objects/js-duration-format-inl.h      |  2 +-
+ src/objects/js-list-format-inl.h          |  4 +--
+ src/objects/js-list-format.h              | 12 ++++----
+ src/objects/js-plural-rules-inl.h         |  2 +-
+ src/objects/js-plural-rules.h             |  4 +--
+ src/objects/js-relative-time-format-inl.h |  2 +-
+ src/objects/js-relative-time-format.h     |  5 ++--
+ src/objects/js-segment-iterator-inl.h     |  2 +-
+ src/objects/js-segment-iterator.h         |  6 ++--
+ src/objects/js-segmenter-inl.h            |  2 +-
+ src/objects/js-segmenter.h                |  6 ++--
+ src/objects/js-segments-inl.h             |  2 +-
+ src/objects/js-segments.h                 |  6 ++--
+ src/objects/module-inl.h                  |  2 +-
+ src/objects/scope-info.h                  |  2 +-
+ src/objects/shared-function-info.h        | 10 +++----
+ 23 files changed, 67 insertions(+), 77 deletions(-)
+
+diff --git a/src/3rdparty/chromium/v8/src/base/bit-field.h b/src/3rdparty/chromium/v8/src/base/bit-field.h
+index 59e786bdd1f2..d64d361e0f59 100644
+--- a/src/3rdparty/chromium/v8/src/base/bit-field.h
++++ b/src/3rdparty/chromium/v8/src/base/bit-field.h
+@@ -39,15 +39,15 @@ class BitField final {
+   static constexpr int kLastUsedBit = kShift + kSize - 1;
+   static constexpr U kNumValues = U{1} << kSize;
+ 
+   // Value for the field with all bits set.
+-  static constexpr T kMax = static_cast<T>(kNumValues - 1);
++  static constexpr U kMax = kNumValues - 1;
+ 
+   template <class T2, int size2>
+   using Next = BitField<T2, kShift + kSize, size2, U>;
+ 
+   // Tells whether the provided value fits into the bit field.
+   static constexpr bool is_valid(T value) {
+-    return (static_cast<U>(value) & ~static_cast<U>(kMax)) == 0;
++    return (static_cast<U>(value) & ~kMax) == 0;
+   }
+ 
+   // Returns a type U with the bit field value encoded.
+diff --git a/src/3rdparty/chromium/v8/src/codegen/source-position.h b/src/3rdparty/chromium/v8/src/codegen/source-position.h
+index 46c330fe3737..27938ad69636 100644
+--- a/src/3rdparty/chromium/v8/src/codegen/source-position.h
++++ b/src/3rdparty/chromium/v8/src/codegen/source-position.h
+@@ -99,23 +99,19 @@ class SourcePosition final {
+   }
+   void SetExternalLine(int line) {
+     DCHECK(IsExternal());
+-    DCHECK(line <= ExternalLineField::kMax - 1);
+     value_ = ExternalLineField::update(value_, line);
+   }
+   void SetExternalFileId(int file_id) {
+     DCHECK(IsExternal());
+-    DCHECK(file_id <= ExternalFileIdField::kMax - 1);
+     value_ = ExternalFileIdField::update(value_, file_id);
+   }
+ 
+   void SetScriptOffset(int script_offset) {
+     DCHECK(IsJavaScript());
+-    DCHECK(script_offset <= ScriptOffsetField::kMax - 2);
+     DCHECK_GE(script_offset, kNoSourcePosition);
+     value_ = ScriptOffsetField::update(value_, script_offset + 1);
+   }
+   void SetInliningId(int inlining_id) {
+-    DCHECK(inlining_id <= InliningIdField::kMax - 2);
+     DCHECK_GE(inlining_id, kNotInlined);
+     value_ = InliningIdField::update(value_, inlining_id + 1);
+   }
+diff --git a/src/3rdparty/chromium/v8/src/objects/code-inl.h b/src/3rdparty/chromium/v8/src/objects/code-inl.h
+index 6bbb5797c8a5..af35d6572ddf 100644
+--- a/src/3rdparty/chromium/v8/src/objects/code-inl.h
++++ b/src/3rdparty/chromium/v8/src/objects/code-inl.h
+@@ -342,7 +342,7 @@ CodeKind Code::kind() const {
+ void Code::initialize_flags(CodeKind kind, bool has_unwinding_info,
+                             bool is_turbofanned, int stack_slots,
+                             bool is_off_heap_trampoline) {
+-  CHECK(0 <= stack_slots && stack_slots < StackSlotsField::kMax);
++  CHECK(StackSlotsField::is_valid(stack_slots));
+   DCHECK(!CodeKindIsInterpretedJSFunction(kind));
+   uint32_t flags = HasUnwindingInfoField::encode(has_unwinding_info) |
+                    KindField::encode(kind) |
+diff --git a/src/3rdparty/chromium/v8/src/objects/js-date-time-format.h b/src/3rdparty/chromium/v8/src/objects/js-date-time-format.h
+index 6f582d7274d8..1dd2119f423c 100644
+--- a/src/3rdparty/chromium/v8/src/objects/js-date-time-format.h
++++ b/src/3rdparty/chromium/v8/src/objects/js-date-time-format.h
+@@ -104,23 +104,23 @@ class JSDateTimeFormat
+   // Bit positions in |flags|.
+   DEFINE_TORQUE_GENERATED_JS_DATE_TIME_FORMAT_FLAGS()
+ 
+-  STATIC_ASSERT(HourCycle::kUndefined <= HourCycleBits::kMax);
+-  STATIC_ASSERT(HourCycle::kH11 <= HourCycleBits::kMax);
+-  STATIC_ASSERT(HourCycle::kH12 <= HourCycleBits::kMax);
+-  STATIC_ASSERT(HourCycle::kH23 <= HourCycleBits::kMax);
+-  STATIC_ASSERT(HourCycle::kH24 <= HourCycleBits::kMax);
+-
+-  STATIC_ASSERT(DateTimeStyle::kUndefined <= DateStyleBits::kMax);
+-  STATIC_ASSERT(DateTimeStyle::kFull <= DateStyleBits::kMax);
+-  STATIC_ASSERT(DateTimeStyle::kLong <= DateStyleBits::kMax);
+-  STATIC_ASSERT(DateTimeStyle::kMedium <= DateStyleBits::kMax);
+-  STATIC_ASSERT(DateTimeStyle::kShort <= DateStyleBits::kMax);
+-
+-  STATIC_ASSERT(DateTimeStyle::kUndefined <= TimeStyleBits::kMax);
+-  STATIC_ASSERT(DateTimeStyle::kFull <= TimeStyleBits::kMax);
+-  STATIC_ASSERT(DateTimeStyle::kLong <= TimeStyleBits::kMax);
+-  STATIC_ASSERT(DateTimeStyle::kMedium <= TimeStyleBits::kMax);
+-  STATIC_ASSERT(DateTimeStyle::kShort <= TimeStyleBits::kMax);
++  STATIC_ASSERT(HourCycleBits::is_valid(HourCycle::kUndefined));
++  STATIC_ASSERT(HourCycleBits::is_valid(HourCycle::kH11));
++  STATIC_ASSERT(HourCycleBits::is_valid(HourCycle::kH12));
++  STATIC_ASSERT(HourCycleBits::is_valid(HourCycle::kH23));
++  STATIC_ASSERT(HourCycleBits::is_valid(HourCycle::kH24));
++
++  STATIC_ASSERT(DateStyleBits::is_valid(DateTimeStyle::kUndefined));
++  STATIC_ASSERT(DateStyleBits::is_valid(DateTimeStyle::kFull));
++  STATIC_ASSERT(DateStyleBits::is_valid(DateTimeStyle::kLong));
++  STATIC_ASSERT(DateStyleBits::is_valid(DateTimeStyle::kMedium));
++  STATIC_ASSERT(DateStyleBits::is_valid(DateTimeStyle::kShort));
++
++  STATIC_ASSERT(TimeStyleBits::is_valid(DateTimeStyle::kUndefined));
++  STATIC_ASSERT(TimeStyleBits::is_valid(DateTimeStyle::kFull));
++  STATIC_ASSERT(TimeStyleBits::is_valid(DateTimeStyle::kLong));
++  STATIC_ASSERT(TimeStyleBits::is_valid(DateTimeStyle::kMedium));
++  STATIC_ASSERT(TimeStyleBits::is_valid(DateTimeStyle::kShort));
+ 
+   DECL_ACCESSORS(icu_locale, Managed<icu::Locale>)
+   DECL_ACCESSORS(icu_simple_date_format, Managed<icu::SimpleDateFormat>)
+diff --git a/src/3rdparty/chromium/v8/src/objects/js-display-names-inl.h b/src/3rdparty/chromium/v8/src/objects/js-display-names-inl.h
+index edca4571a309..a42a201413ba 100644
+--- a/src/3rdparty/chromium/v8/src/objects/js-display-names-inl.h
++++ b/src/3rdparty/chromium/v8/src/objects/js-display-names-inl.h
+@@ -25,7 +25,7 @@ ACCESSORS(JSDisplayNames, internal, Tagged<Managed<DisplayNamesInternal>>,
+ TQ_OBJECT_CONSTRUCTORS_IMPL(JSDisplayNames)
+ 
+ inline void JSDisplayNames::set_style(Style style) {
+-  DCHECK_GE(StyleBits::kMax, style);
++  DCHECK(StyleBits::is_valid(style));
+   set_flags(StyleBits::update(flags(), style));
+ }
+ 
+@@ -32,7 +32,7 @@ inline JSDisplayNames::Style JSDisplayNames::style() const {
+ }
+ 
+ inline void JSDisplayNames::set_fallback(Fallback fallback) {
+-  DCHECK_GE(FallbackBit::kMax, fallback);
++  DCHECK(FallbackBit::is_valid(fallback));
+   int hints = flags();
+   hints = FallbackBit::update(hints, fallback);
+   set_flags(hints);
+diff --git a/src/3rdparty/chromium/v8/src/objects/js-display-names.h b/src/3rdparty/chromium/v8/src/objects/js-display-names.h
+index 9573104f0d0f..9d816072b2eb 100644
+--- a/src/3rdparty/chromium/v8/src/objects/js-display-names.h
++++ b/src/3rdparty/chromium/v8/src/objects/js-display-names.h
+@@ -81,11 +81,11 @@ class JSDisplayNames
+   // Bit positions in |flags|.
+   DEFINE_TORQUE_GENERATED_JS_DISPLAY_NAMES_FLAGS()
+ 
+-  STATIC_ASSERT(Style::kLong <= StyleBits::kMax);
+-  STATIC_ASSERT(Style::kShort <= StyleBits::kMax);
+-  STATIC_ASSERT(Style::kNarrow <= StyleBits::kMax);
+-  STATIC_ASSERT(Fallback::kCode <= FallbackBit::kMax);
+-  STATIC_ASSERT(Fallback::kNone <= FallbackBit::kMax);
++  STATIC_ASSERT(StyleBits::is_valid(Style::kLong));
++  STATIC_ASSERT(StyleBits::is_valid(Style::kShort));
++  STATIC_ASSERT(StyleBits::is_valid(Style::kNarrow));
++  STATIC_ASSERT(FallbackBit::is_valid(Fallback::kCode));
++  STATIC_ASSERT(FallbackBit::is_valid(Fallback::kNone));
+ 
+   DECL_ACCESSORS(internal, Tagged<Managed<DisplayNamesInternal>>)
+ 
+diff --git a/src/3rdparty/chromium/v8/src/objects/js-list-format-inl.h b/src/3rdparty/chromium/v8/src/objects/js-list-format-inl.h
+index d494ebcf21fa..498d1352f8bf 100644
+--- a/src/3rdparty/chromium/v8/src/objects/js-list-format-inl.h
++++ b/src/3rdparty/chromium/v8/src/objects/js-list-format-inl.h
+@@ -27,7 +27,7 @@ ACCESSORS(JSListFormat, icu_formatter, Tagged<Managed<icu::ListFormatter>>,
+           kIcuFormatterOffset)
+ 
+ inline void JSListFormat::set_style(Style style) {
+-  DCHECK_GE(StyleBits::kMax, style);
++  DCHECK(StyleBits::is_valid(style));
+   int hints = flags();
+   hints = StyleBits::update(hints, style);
+   set_flags(hints);
+@@ -38,7 +38,7 @@ inline JSListFormat::Style JSListFormat::style() const {
+ }
+ 
+ inline void JSListFormat::set_type(Type type) {
+-  DCHECK_GE(TypeBits::kMax, type);
++  DCHECK(TypeBits::is_valid(type));
+   int hints = flags();
+   hints = TypeBits::update(hints, type);
+   set_flags(hints);
+diff --git a/src/3rdparty/chromium/v8/src/objects/js-list-format.h b/src/3rdparty/chromium/v8/src/objects/js-list-format.h
+index a40e394bbdf4..2808b7b8b816 100644
+--- a/src/3rdparty/chromium/v8/src/objects/js-list-format.h
++++ b/src/3rdparty/chromium/v8/src/objects/js-list-format.h
+@@ -84,12 +84,12 @@ class JSListFormat
+   // Bit positions in |flags|.
+   DEFINE_TORQUE_GENERATED_JS_LIST_FORMAT_FLAGS()
+ 
+-  STATIC_ASSERT(Style::LONG <= StyleBits::kMax);
+-  STATIC_ASSERT(Style::SHORT <= StyleBits::kMax);
+-  STATIC_ASSERT(Style::NARROW <= StyleBits::kMax);
+-  STATIC_ASSERT(Type::CONJUNCTION <= TypeBits::kMax);
+-  STATIC_ASSERT(Type::DISJUNCTION <= TypeBits::kMax);
+-  STATIC_ASSERT(Type::UNIT <= TypeBits::kMax);
++  STATIC_ASSERT(StyleBits::is_valid(Style::LONG));
++  STATIC_ASSERT(StyleBits::is_valid(Style::SHORT));
++  STATIC_ASSERT(StyleBits::is_valid(Style::NARROW));
++  STATIC_ASSERT(TypeBits::is_valid(Type::CONJUNCTION));
++  STATIC_ASSERT(TypeBits::is_valid(Type::DISJUNCTION));
++  STATIC_ASSERT(TypeBits::is_valid(Type::UNIT));
+ 
+   DECL_PRINTER(JSListFormat)
+ 
+diff --git a/src/3rdparty/chromium/v8/src/objects/js-plural-rules-inl.h b/src/3rdparty/chromium/v8/src/objects/js-plural-rules-inl.h
+index 0c78418cb0e6..96c146de45f9 100644
+--- a/src/3rdparty/chromium/v8/src/objects/js-plural-rules-inl.h
++++ b/src/3rdparty/chromium/v8/src/objects/js-plural-rules-inl.h
+@@ -30,7 +30,7 @@ ACCESSORS(JSPluralRules, icu_number_formatter,
+           kIcuNumberFormatterOffset)
+ 
+ inline void JSPluralRules::set_type(Type type) {
+-  DCHECK_LE(type, TypeBit::kMax);
++  DCHECK(TypeBit::is_valid(type));
+   int hints = flags();
+   hints = TypeBit::update(hints, type);
+   set_flags(hints);
+diff --git a/src/3rdparty/chromium/v8/src/objects/js-plural-rules.h b/src/3rdparty/chromium/v8/src/objects/js-plural-rules.h
+index d747cc8a3fe7..c8d4a0353d8b 100644
+--- a/src/3rdparty/chromium/v8/src/objects/js-plural-rules.h
++++ b/src/3rdparty/chromium/v8/src/objects/js-plural-rules.h
+@@ -68,8 +68,8 @@ class JSPluralRules
+   // Bit positions in |flags|.
+   DEFINE_TORQUE_GENERATED_JS_PLURAL_RULES_FLAGS()
+ 
+-  STATIC_ASSERT(Type::CARDINAL <= TypeBit::kMax);
+-  STATIC_ASSERT(Type::ORDINAL <= TypeBit::kMax);
++  STATIC_ASSERT(TypeBit::is_valid(Type::CARDINAL));
++  STATIC_ASSERT(TypeBit::is_valid(Type::ORDINAL));
+ 
+   DECL_ACCESSORS(icu_plural_rules, Tagged<Managed<icu::PluralRules>>)
+   DECL_ACCESSORS(icu_number_formatter,
+diff --git a/src/3rdparty/chromium/v8/src/objects/js-relative-time-format-inl.h b/src/3rdparty/chromium/v8/src/objects/js-relative-time-format-inl.h
+index 953ba584e55d..9ad5ee0bb5a5 100644
+--- a/src/3rdparty/chromium/v8/src/objects/js-relative-time-format-inl.h
++++ b/src/3rdparty/chromium/v8/src/objects/js-relative-time-format-inl.h
+@@ -27,7 +27,7 @@ ACCESSORS(JSRelativeTimeFormat, icu_formatter,
+           Tagged<Managed<icu::RelativeDateTimeFormatter>>, kIcuFormatterOffset)
+ 
+ inline void JSRelativeTimeFormat::set_numeric(Numeric numeric) {
+-  DCHECK_GE(NumericBit::kMax, numeric);
++  DCHECK(NumericBit::is_valid(numeric));
+   int hints = flags();
+   hints = NumericBit::update(hints, numeric);
+   set_flags(hints);
+diff --git a/src/3rdparty/chromium/v8/src/objects/js-relative-time-format.h b/src/3rdparty/chromium/v8/src/objects/js-relative-time-format.h
+index 8b8aa42aff4b..87e0d4e851c8 100644
+--- a/src/3rdparty/chromium/v8/src/objects/js-relative-time-format.h
++++ b/src/3rdparty/chromium/v8/src/objects/js-relative-time-format.h
+@@ -2,6 +2,7 @@
+ // Use of this source code is governed by a BSD-style license that can be
+ // found in the LICENSE file.
+ 
++#include "src/common/globals.h"
+ #ifndef V8_INTL_SUPPORT
+ #error Internationalization is expected to be enabled.
+ #endif  // V8_INTL_SUPPORT
+@@ -77,8 +78,8 @@ class JSRelativeTimeFormat
+   // Bit positions in |flags|.
+   DEFINE_TORQUE_GENERATED_JS_RELATIVE_TIME_FORMAT_FLAGS()
+ 
+-  STATIC_ASSERT(Numeric::AUTO <= NumericBit::kMax);
+-  STATIC_ASSERT(Numeric::ALWAYS <= NumericBit::kMax);
++  STATIC_ASSERT(NumericBit::is_valid(Numeric::AUTO));
++  STATIC_ASSERT(NumericBit::is_valid(Numeric::ALWAYS));
+ 
+   DECL_PRINTER(JSRelativeTimeFormat)
+ 
+diff --git a/src/3rdparty/chromium/v8/src/objects/js-segment-iterator-inl.h b/src/3rdparty/chromium/v8/src/objects/js-segment-iterator-inl.h
+index 6547bcc4a205..383b0449797b 100644
+--- a/src/3rdparty/chromium/v8/src/objects/js-segment-iterator-inl.h
++++ b/src/3rdparty/chromium/v8/src/objects/js-segment-iterator-inl.h
+@@ -32,7 +32,7 @@ ACCESSORS(JSSegmentIterator, unicode_string,
+ 
+ inline void JSSegmentIterator::set_granularity(
+     JSSegmenter::Granularity granularity) {
+-  DCHECK_GE(GranularityBits::kMax, granularity);
++  DCHECK(GranularityBits::is_valid(granularity));
+   int hints = flags();
+   hints = GranularityBits::update(hints, granularity);
+   set_flags(hints);
+diff --git a/src/3rdparty/chromium/v8/src/objects/js-segment-iterator.h b/src/3rdparty/chromium/v8/src/objects/js-segment-iterator.h
+index 7ab22a6002d1..705e41c8b2b8 100644
+--- a/src/3rdparty/chromium/v8/src/objects/js-segment-iterator.h
++++ b/src/3rdparty/chromium/v8/src/objects/js-segment-iterator.h
+@@ -58,9 +58,9 @@ class JSSegmentIterator
+   // Bit positions in |flags|.
+   DEFINE_TORQUE_GENERATED_JS_SEGMENT_ITERATOR_FLAGS()
+ 
+-  STATIC_ASSERT(JSSegmenter::Granularity::GRAPHEME <= GranularityBits::kMax);
+-  STATIC_ASSERT(JSSegmenter::Granularity::WORD <= GranularityBits::kMax);
+-  STATIC_ASSERT(JSSegmenter::Granularity::SENTENCE <= GranularityBits::kMax);
++  STATIC_ASSERT(GranularityBits::is_valid(JSSegmenter::Granularity::GRAPHEME));
++  STATIC_ASSERT(GranularityBits::is_valid(JSSegmenter::Granularity::WORD));
++  STATIC_ASSERT(GranularityBits::is_valid(JSSegmenter::Granularity::SENTENCE));
+ 
+   TQ_OBJECT_CONSTRUCTORS(JSSegmentIterator)
+ };
+diff --git a/src/3rdparty/chromium/v8/src/objects/js-segmenter-inl.h b/src/3rdparty/chromium/v8/src/objects/js-segmenter-inl.h
+index 527d95e89472..f18a773358a4 100644
+--- a/src/3rdparty/chromium/v8/src/objects/js-segmenter-inl.h
++++ b/src/3rdparty/chromium/v8/src/objects/js-segmenter-inl.h
+@@ -26,7 +26,7 @@ ACCESSORS(JSSegmenter, icu_break_iterator, Tagged<Managed<icu::BreakIterator>>,
+           kIcuBreakIteratorOffset)
+ 
+ inline void JSSegmenter::set_granularity(Granularity granularity) {
+-  DCHECK_GE(GranularityBits::kMax, granularity);
++  DCHECK(GranularityBits::is_valid(granularity));
+   int hints = flags();
+   hints = GranularityBits::update(hints, granularity);
+   set_flags(hints);
+diff --git a/src/3rdparty/chromium/v8/src/objects/js-segmenter.h b/src/3rdparty/chromium/v8/src/objects/js-segmenter.h
+index 9b851e630e94..ee75946fe66b 100644
+--- a/src/3rdparty/chromium/v8/src/objects/js-segmenter.h
++++ b/src/3rdparty/chromium/v8/src/objects/js-segmenter.h
+@@ -65,9 +65,9 @@ class JSSegmenter : public TorqueGeneratedJSSegmenter<JSSegmenter, JSObject> {
+   // Bit positions in |flags|.
+   DEFINE_TORQUE_GENERATED_JS_SEGMENTER_FLAGS()
+ 
+-  STATIC_ASSERT(Granularity::GRAPHEME <= GranularityBits::kMax);
+-  STATIC_ASSERT(Granularity::WORD <= GranularityBits::kMax);
+-  STATIC_ASSERT(Granularity::SENTENCE <= GranularityBits::kMax);
++  STATIC_ASSERT(GranularityBits::is_valid(Granularity::GRAPHEME));
++  STATIC_ASSERT(GranularityBits::is_valid(Granularity::WORD));
++  STATIC_ASSERT(GranularityBits::is_valid(Granularity::SENTENCE));
+ 
+   DECL_PRINTER(JSSegmenter)
+ 
+diff --git a/src/3rdparty/chromium/v8/src/objects/js-segments-inl.h b/src/3rdparty/chromium/v8/src/objects/js-segments-inl.h
+index 68d9f110e17a..2682adc59192 100644
+--- a/src/3rdparty/chromium/v8/src/objects/js-segments-inl.h
++++ b/src/3rdparty/chromium/v8/src/objects/js-segments-inl.h
+@@ -29,7 +29,7 @@ ACCESSORS(JSSegments, unicode_string, Tagged<Managed<icu::UnicodeString>>,
+           kUnicodeStringOffset)
+ 
+ inline void JSSegments::set_granularity(JSSegmenter::Granularity granularity) {
+-  DCHECK_GE(GranularityBits::kMax, granularity);
++  DCHECK(GranularityBits::is_valid(granularity));
+   int hints = flags();
+   hints = GranularityBits::update(hints, granularity);
+   set_flags(hints);
+diff --git a/src/3rdparty/chromium/v8/src/objects/js-segments.h b/src/3rdparty/chromium/v8/src/objects/js-segments.h
+index 91f2b8457ca7..acb0c94dd734 100644
+--- a/src/3rdparty/chromium/v8/src/objects/js-segments.h
++++ b/src/3rdparty/chromium/v8/src/objects/js-segments.h
+@@ -64,9 +64,9 @@ class JSSegments : public TorqueGeneratedJSSegments<JSSegments, JSObject> {
+   // Bit positions in |flags|.
+   DEFINE_TORQUE_GENERATED_JS_SEGMENT_ITERATOR_FLAGS()
+ 
+-  STATIC_ASSERT(JSSegmenter::Granularity::GRAPHEME <= GranularityBits::kMax);
+-  STATIC_ASSERT(JSSegmenter::Granularity::WORD <= GranularityBits::kMax);
+-  STATIC_ASSERT(JSSegmenter::Granularity::SENTENCE <= GranularityBits::kMax);
++  STATIC_ASSERT(GranularityBits::is_valid(JSSegmenter::Granularity::GRAPHEME));
++  STATIC_ASSERT(GranularityBits::is_valid(JSSegmenter::Granularity::WORD));
++  STATIC_ASSERT(GranularityBits::is_valid(JSSegmenter::Granularity::SENTENCE));
+ 
+   TQ_OBJECT_CONSTRUCTORS(JSSegments)
+ };
+diff --git a/src/3rdparty/chromium/v8/src/objects/scope-info.h b/src/3rdparty/chromium/v8/src/objects/scope-info.h
+index 19385ebafdd3..2b9a48d915fb 100644
+--- a/src/3rdparty/chromium/v8/src/objects/scope-info.h
++++ b/src/3rdparty/chromium/v8/src/objects/scope-info.h
+@@ -268,7 +268,7 @@ class ScopeInfo : public FixedArray {
+   static const int kFlagsOffset = OffsetOfElementAt(Fields::kFlags);
+ 
+   STATIC_ASSERT(LanguageModeSize == 1 << LanguageModeBit::kSize);
+-  STATIC_ASSERT(kLastFunctionKind <= FunctionKindBits::kMax);
++  STATIC_ASSERT(FunctionKindBits::is_valid(kLastFunctionKind));
+ 
+  private:
+   // The layout of the variable part of a ScopeInfo is as follows:
+diff --git a/src/3rdparty/chromium/v8/src/objects/shared-function-info.h b/src/3rdparty/chromium/v8/src/objects/shared-function-info.h
+index 6bb46361963f..f561d645b29d 100644
+--- a/src/3rdparty/chromium/v8/src/objects/shared-function-info.h
++++ b/src/3rdparty/chromium/v8/src/objects/shared-function-info.h
+@@ -770,12 +770,12 @@ class SharedFunctionInfo
+   class BodyDescriptor;
+ 
+   // Bailout reasons must fit in the DisabledOptimizationReason bitfield.
+-  STATIC_ASSERT(BailoutReason::kLastErrorMessage <=
+-                DisabledOptimizationReasonBits::kMax);
++  STATIC_ASSERT(DisabledOptimizationReasonBits::is_valid(
++      BailoutReason::kLastErrorMessage));
+ 
+-  STATIC_ASSERT(kLastFunctionKind <= FunctionKindBits::kMax);
+-  STATIC_ASSERT(FunctionSyntaxKind::kLastFunctionSyntaxKind <=
+-                FunctionSyntaxKindBits::kMax);
++  STATIC_ASSERT(FunctionKindBits::is_valid(kLastFunctionKind));
++  STATIC_ASSERT(FunctionSyntaxKindBits::is_valid(
++      FunctionSyntaxKind::kLastFunctionSyntaxKind));
+ 
+   // Sets the bytecode in {shared}'s DebugInfo as the bytecode to
+   // be returned by following calls to GetActiveBytecodeArray. Stores a
