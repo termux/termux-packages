@@ -1,0 +1,144 @@
+--- a/mozc-config/mozc_config_main.cc
++++ b/mozc-config/mozc_config_main.cc
+@@ -18,8 +18,8 @@
+ 
+ using namespace std;
+ 
+-#include "session/config.pb.h"
+-#include "session/config_handler.h"
++#include "protocol/config.pb.h"
++#include "config/config_handler.h"
+ #include "google/protobuf/descriptor.h"
+ #include "google/protobuf/message.h"
+ 
+@@ -94,7 +94,7 @@ void group_to_inner(string& s) {
+     }
+ }
+ 
+-void get(string name) {
++void get_prop(string name) {
+     mozc::config::Config conf;
+     mozc::config::ConfigHandler::GetConfig(&conf);
+ 
+@@ -109,7 +109,10 @@ void get(string name) {
+     value << name << ": ";
+ 
+     const int type = field->type();
+-    if (type == 4) {
++    const int label = field->label();
++    if (label == 3 /*LABEL_REPEATED*/) {
++        value << "/* Not Impl Error!! */";
++    } else if (type == 4) {
+         value << ref->GetUInt64(conf, field);
+     } else if (type == 5) {
+         value << ref->GetInt32(conf, field);
+@@ -148,7 +151,9 @@ void get(string name) {
+ }
+ 
+ void set_character_form_rules(string name, string group, string preedit, string conversion) {
+-    mozc::config::Config conf = mozc::config::ConfigHandler::GetConfig();
++    mozc::config::Config conf;
++    mozc::config::ConfigHandler::GetConfig(&conf);
++    //mozc::config::Config conf = mozc::config::ConfigHandler::DefaultConfig();
+ 
+     const google::protobuf::FieldDescriptor* field =
+             mozc::config::Config::descriptor()->FindFieldByName(name);
+@@ -201,7 +206,7 @@ void set_character_form_rules(string name, string group, string preedit, string
+     mozc::config::ConfigHandler::SetConfig(conf);
+ }
+ 
+-void set(string name, string value) {
++void set_prop(string name, string value) {
+     if (is_ignore(name)) return;
+ 
+     mozc::config::Config conf;
+@@ -214,6 +219,11 @@ void set(string name, string value) {
+     if (field == NULL) return;
+ 
+     const int type = field->type();
++    const int label = field->label();
++    if (label == 3 /*LABEL_REPEATED*/) {
++        cout << "/* Not Impl Error!! */" << endl;
++        return;
++    }
+     if (type == 4) {
+         if (!is_num_str(value)) return;
+         ref->SetUInt64(&conf, field, atol(value));
+@@ -246,10 +256,10 @@ void set(string name, string value) {
+ void clear(string name) {
+     if (is_ignore(name)) return;
+ 
+-//    mozc::config::Config conf;
+-  //  mozc::config::ConfigHandler::GetConfig(&conf);
++    mozc::config::Config conf;
++    mozc::config::ConfigHandler::GetConfig(&conf);
+ 
+-    mozc::config::Config conf = mozc::config::ConfigHandler::GetConfig();
++    //mozc::config::Config conf = mozc::config::ConfigHandler::Config();
+ 
+     const google::protobuf::FieldDescriptor* field =
+             conf.GetDescriptor()->FindFieldByName(name);
+@@ -263,12 +273,21 @@ void clear(string name) {
+ }
+ 
+ int reboot() {
++#ifdef WITHOUT_IBUS
++    const char *path = "@TERMUX_PREFIX@/bin/killall";
++    char *const argv[] = {
++        (char *)"@TERMUX_PREFIX/bin/killall",
++        (char *)"mozc_server",
++        (char *)NULL
++    };
++#else
+     const char *path = "/usr/bin/ibus-daemon";
+     char *const argv[] = {
+         (char *)"/usr/bin/ibus-daemon",
+         (char *)"-xrd",
+         (char *)NULL
+     };
++#endif
+ 
+     return execv(path, argv);
+ }
+@@ -288,10 +307,10 @@ void print_modifier() {
+ }
+ 
+ void print_all() {
+-//    mozc::config::Config conf;
+-//    mozc::config::ConfigHandler::GetConfig(&conf);
++    mozc::config::Config conf;
++    mozc::config::ConfigHandler::GetConfig(&conf);
+ 
+-    mozc::config::Config conf = mozc::config::ConfigHandler::GetConfig();
++    //mozc::config::Config conf = mozc::config::ConfigHandler::GetConfig();
+ 
+     const google::protobuf::Descriptor* desc = conf.GetDescriptor();//mozc::config::Config::descriptor();
+     const google::protobuf::Reflection* ref = conf.GetReflection();
+@@ -305,7 +324,10 @@ void print_all() {
+         value << name << ": ";
+ 
+         const int type = field->type();
+-        if (type == 4) {
++        const int label = field->label();
++        if (label == 3 /*LABEL_REPEATED*/) {
++            value << "/* Not Impl Error!! */";
++        } else if (type == 4) {
+             value << ref->GetUInt64(conf, field);
+         } else if (type == 5) {
+             value << ref->GetInt32(conf, field);
+@@ -460,13 +482,13 @@ int main(int argc, char **argv) {
+         print_modifier();
+     } else if (flg == "-g") {
+         if (argc > 2)
+-            get((string)argv[2]);
++            get_prop((string)argv[2]);
+     } else if (flg == "-s") {
+         if ((string)argv[2] == "character_form_rules" && argc > 5) {
+             set_character_form_rules((string)argv[2], (string)argv[3],
+                                      (string)argv[4], (string)argv[5]);
+         } else if (argc > 3) {
+-            set((string)argv[2], (string)argv[3]);
++            set_prop((string)argv[2], (string)argv[3]);
+         }
+     } else if (flg == "-c") {
+         if (argc > 2)
