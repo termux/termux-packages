@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE-APACHE, LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.50.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/Byron/gitoxide/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=8ad0fdcfa465fedac7c4bafaae2349ad0db7daf48a80d9cb2bd70dd36fa567aa
 TERMUX_PKG_DEPENDS="resolv-conf"
@@ -21,6 +22,7 @@ termux_step_pre_configure() {
 		-mindepth 1 -maxdepth 1 -type d \
 		! -wholename ./vendor/aws-lc-sys \
 		! -wholename ./vendor/hickory-resolver \
+		! -wholename ./vendor/rustls-platform-verifier \
 		-exec rm -rf '{}' \;
 
 	local patch="$TERMUX_PKG_BUILDER_DIR/aws-lc-sys.diff"
@@ -34,10 +36,17 @@ termux_step_pre_configure() {
 	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" \
 		"$patch" | patch --silent -p1 -d "${dir}"
 
+	find vendor/rustls-platform-verifier -type f -print0 | \
+		xargs -0 sed -i \
+		-e 's|"android"|"disabling_this_because_it_is_for_building_an_apk"|g' \
+		-e "s|ANDROID|DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK|g" \
+		-e 's|"linux"|"android"|g'
+
 	echo "" >> Cargo.toml
 	echo '[patch.crates-io]' >> Cargo.toml
 	echo 'aws-lc-sys = { path = "./vendor/aws-lc-sys" }' >> Cargo.toml
 	echo 'hickory-resolver = { path = "./vendor/hickory-resolver" }' >> Cargo.toml
+	echo 'rustls-platform-verifier = { path = "./vendor/rustls-platform-verifier" }' >> Cargo.toml
 
 	if [ "$TERMUX_ARCH" == "x86_64" ]; then
 		local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
