@@ -10,7 +10,6 @@ TERMUX_PKG_SHA256=870ba21409cdf66697dc4db15ebdb13bc67037d76c7cc63756c81471d8f173
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-spawn, libc++, libcurl, sdl2, ffmpeg"
 TERMUX_PKG_BUILD_DEPENDS="vulkan-headers, opencl-headers, ocl-icd, shaderc, libopenblas, glslang"
-TERMUX_PKG_SUGGESTS="llama-cpp-backend-vulkan, llama-cpp-backend-opencl"
 TERMUX_PKG_CONFLICTS="llama-cpp"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_SHARED_LIBS=ON
