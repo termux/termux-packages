@@ -1,9 +1,9 @@
 --- a/build/gulpfile.vscode.ts
 +++ b/build/gulpfile.vscode.ts
 @@ -40,6 +40,7 @@
- const root = path.dirname(import.meta.dirname);
  const commit = getVersion(root);
- const versionedResourcesFolder = (product as typeof product & { quality?: string })?.quality === 'insider' ? commit!.substring(0, 10) : '';
+ const useVersionedUpdate = process.platform === 'win32' && (product as typeof product & { win32VersionedUpdate?: boolean })?.win32VersionedUpdate;
+ const versionedResourcesFolder = useVersionedUpdate ? commit!.substring(0, 10) : '';
 +const buildRoot = path.join(root, "package-build-root");
  
  // Build
