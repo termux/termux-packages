@@ -1,0 +1,14 @@
+asymptote's GUI has dependency on PySide6, but this asymptote package is minimal
+and is not in the x11-packages folder.
+
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -134,7 +134,7 @@ endif
+ 
+ export prefix docdir exampledir mandir infodir INSTALL MAKE DESTDIR TEXI2DVI
+ 
+-asy: base/version.asy $(FILES:=.o) $(XNAME) revision.o $(GCLIB) @LSPLIB@ @GLEW@
++asy: base/version.asy $(FILES:=.o) revision.o $(GCLIB) @LSPLIB@ @GLEW@
+ 	$(CXX) $(OPTS) -o $(NAME) $(FILES:=.o) revision.o $(LIBS)
+ 
+ $(XNAME): $(PYFILES)
