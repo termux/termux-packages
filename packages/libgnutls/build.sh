@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Secure communications library implementing the SSL, TLS 
 TERMUX_PKG_LICENSE="LGPL-2.1, GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.8.11"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/gnutls/v${TERMUX_PKG_VERSION%.*}/gnutls-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=91bd23c4a86ebc6152e81303d20cf6ceaeb97bc8f84266d0faec6e29f17baa20
 TERMUX_PKG_DEPENDS="libc++, libgmp, libnettle, ca-certificates, libidn2, libunbound, libunistring, zlib"
