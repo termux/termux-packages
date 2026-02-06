@@ -3,9 +3,24 @@ TERMUX_PKG_DESCRIPTION="Cryptographic library that is designed to fit easily in 
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/nettle/nettle-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=3addbc00da01846b232fb3bc453538ea5468da43033f21bb345cb1e9073f5094
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libgmp"
 TERMUX_PKG_BREAKS="libnettle-dev"
 TERMUX_PKG_REPLACES="libnettle-dev"
+
+termux_step_post_massage() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION_GUARD_FILES=(
+		'lib/libhogweed.so.7'
+		'lib/libnettle.so.9'
+	)
+
+	local f
+	for f in "${_SOVERSION_GUARD_FILES[@]}"; do
+		[ -e "${f}" ] || termux_error_exit "SOVERSION guard check failed."
+	done
+}
