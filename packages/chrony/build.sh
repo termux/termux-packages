@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="chrony is an implementation of the Network Time Protocol
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.8"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://chrony-project.org/releases/chrony-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=33ea8eb2a4daeaa506e8fcafd5d6d89027ed6f2f0609645c6f149b560d301706
 TERMUX_PKG_AUTO_UPDATE=true
