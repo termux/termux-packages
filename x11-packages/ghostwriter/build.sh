@@ -13,9 +13,9 @@ LICENSES/OFL-1.1.txt
 LICENSES/CC-BY-SA-4.0.txt
 "
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="25.12.1"
+TERMUX_PKG_VERSION="25.12.2"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/ghostwriter-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=dc8b24cd488dbbc7ed3c2d7ecc37ab475e69ac0d65c4cfdd833a29f41799792c
+TERMUX_PKG_SHA256=365fdea7669152f224271ede68c7c50f5b220cce26e4310482fed7e8c420de95
 TERMUX_PKG_DEPENDS="libc++, kf6-kconfigwidgets, kf6-kcoreaddons, kf6-kwidgetsaddons, kf6-kxmlgui, kf6-sonnet, qt6-qtwebchannel, qt6-qtwebengine, qt6-qtbase, qt6-qtpositioning"
 TERMUX_PKG_SUGGESTS="cmake, pandoc"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, kf6-kdoctools, kf6-kdoctools-cross-tools, qt6-qttools, qt6-qttools-cross-tools"
