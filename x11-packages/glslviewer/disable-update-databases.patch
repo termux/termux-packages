@@ -2,7 +2,7 @@ Fixes ERROR: MIME cache found in package. Please disable 'update-mime-database'.
 
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -167,10 +166,6 @@ else()
+@@ -168,10 +168,6 @@ else()
              install(CODE "execute_process(COMMAND ${XDG-MIME_EXECUTABLE} default ${CMAKE_INSTALL_FULL_DATAROOTDIR}/applications/glslViewer.desktop model/obj)")
              install(CODE "execute_process(COMMAND ${XDG-MIME_EXECUTABLE} default ${CMAKE_INSTALL_FULL_DATAROOTDIR}/applications/glslViewer.desktop model/gltf-binary)")
              install(CODE "execute_process(COMMAND ${XDG-MIME_EXECUTABLE} default ${CMAKE_INSTALL_FULL_DATAROOTDIR}/applications/glslViewer.desktop model/gltf+json)")
@@ -10,7 +10,6 @@ Fixes ERROR: MIME cache found in package. Please disable 'update-mime-database'.
 -            install(CODE "execute_process(COMMAND ${UPDATE_MIME_DATABASE} ${CMAKE_INSTALL_FULL_DATAROOTDIR}/mime )")
 -            find_program(UPDATE_DESKTOP_DATABASE update-desktop-database)
 -            install(CODE "execute_process(COMMAND ${UPDATE_DESKTOP_DATABASE} ${CMAKE_INSTALL_FULL_DATAROOTDIR}/applications)")
-             
+ 
              # Add a thumbnailer for 3D Models
-             install(FILES "${PROJECT_SOURCE_DIR}/assets/glslViewer.thumbnailer" DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/thumbnailers)
-
+             install(FILES "${PROJECT_SOURCE_DIR}/assets/desktop/glslViewer.thumbnailer" DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/thumbnailers)
