@@ -1,9 +1,9 @@
-TERMUX_PKG_HOMEPAGE=https://nvim-neorocks.github.io/
+TERMUX_PKG_HOMEPAGE=https://lux.lumen-labs.org
 TERMUX_PKG_DESCRIPTION="A package manager for Lua, similar to luarocks"
 TERMUX_PKG_LICENSE="LGPL-3.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.25.2"
-TERMUX_PKG_SRCURL="https://github.com/nvim-neorocks/lux/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SRCURL="https://github.com/lumen-oss/lux/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=9b9b9ad11f22bf666ec48092126a352d752cd16c579e7713fdcb8da3a215fc5a
 TERMUX_PKG_DEPENDS="bzip2, gpgme, libgit2, libgpg-error, lua54, openssl, xz-utils"
 TERMUX_PKG_PROVIDES="lx"
@@ -18,7 +18,7 @@ termux_pkg_auto_update() {
 	newest_tags="$(curl -d "$(cat <<-EOF | tr '\n' ' '
 	{
 		"query": "query {
-			repository(owner: \"nvim-neorocks\", name: \"lux\") {
+			repository(owner: \"lumen-oss\", name: \"lux\") {
 				refs(refPrefix: \"refs/tags/\", first: 20, orderBy: {
 					field: TAG_COMMIT_DATE, direction: DESC
 				})
@@ -91,7 +91,7 @@ termux_step_host_build() {
 
 termux_step_pre_configure() {
 	# software does not officially support cross-compilation, but for some reason, it appears to work anyway
-	# https://github.com/nvim-neorocks/lux/blob/c794f476cb459df5bcb6e971c0c6f76e6a2a4dd4/lux-lib/src/lua_rockspec/platform.rs#L72
+	# https://github.com/lumen-oss/lux/blob/c794f476cb459df5bcb6e971c0c6f76e6a2a4dd4/lux-lib/src/lua_rockspec/platform.rs#L72
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
 		echo "WARNING: $TERMUX_PKG_NAME's upstream project does not officially support cross-compilation!"
 	fi
