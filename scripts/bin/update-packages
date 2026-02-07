@@ -492,24 +492,18 @@ fi
 
 if [[ "$1" == "@all" ]]; then
 	declare -a PACKAGE_LIST=()
-	# To conserve API limits and speed up update checking,
-	# pre-cache the latest tags and eliminate packages without updates
-	# when it is possible to determine that from the API response alone.
-	_fetch_and_cache_tags
 	for channel in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
 		for pkg_dir in "${channel}"/*; do
-			# Check if we should be putting this package into the list.
-			# Skip it if:
-			# - it doesn't have auto-updates enabled
-			# - it was already cached by _fetch_and_cache_tags
-			# - or there is an open auto-update issue for it
-			_should_update "${pkg_dir}" || continue
 			PACKAGE_LIST+=("$pkg_dir")
 		done
 	done
 	set -- "${PACKAGE_LIST[@]}"
 	unset PACKAGE_LIST
 fi
+
+# To conserve API limits and speed up update checking,
+# pre-cache the latest tags
+_fetch_and_cache_tags
 
 for pkg_dir in "$@"; do
 	_unix_millis="$(date +%10s%3N)"
@@ -522,7 +516,14 @@ for pkg_dir in "$@"; do
 		done
 	fi
 
-	! _should_update "${pkg_dir}" && continue
+	# eliminate packages without updates
+	# when it is possible to determine that from the API response alone.
+	# Check if we should be updating this package.
+	# Skip it if:
+	# - it doesn't have auto-updates enabled
+	# - it was already cached by _fetch_and_cache_tags
+	# - or there is an open auto-update issue for it
+	_should_update "${pkg_dir}" || continue
 	_update_dependencies "${pkg_dir}"
 	_run_update "${pkg_dir}"
 	echo "termux - took $(ms_to_human_readable $(( $(date +%10s%3N) - _unix_millis )))"
