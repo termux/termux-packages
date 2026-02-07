@@ -3,6 +3,12 @@ termux_github_graphql() {
 	local -a GITHUB_GRAPHQL_QUERIES=( "$@" )
 	local pkg_json; pkg_json="$(jq -c -n '$ARGS.positional' --args "${__GITHUB_PACKAGES[@]}")"
 
+	# if there are no github graphql queries to make, do nothing because otherwise this error would happen:
+	# termux_github_graphql.sh: line 12: GITHUB_GRAPHQL_QUERIES[$BATCH * $BATCH_SIZE]: unbound variable
+	if (( ${#GITHUB_GRAPHQL_QUERIES[@]} == 0 )); then
+		return
+	fi
+
 	# Batch size for fetching tags, 100 seems to work consistently.
 	local BATCH BATCH_SIZE=100
 	# echo "# vim: ft=graphql" > /tmp/query-12345 # Uncomment for debugging GraphQL queries
