@@ -267,7 +267,7 @@ _fetch_and_cache_tags() {
 	done < <(
 		export -f __main__
 		export TERMUX_SCRIPTDIR GITHUB_TOKEN TERMUX_REPOLOGY_DATA_FILE
-		printf '%s\0' "${__PACKAGES[@]}" | xargs -0 -n1 -P"$(nproc)" bash -c '__main__ "$@"' _ |& grep -E '^(LOCAL|PKG|SKIP)\|'
+		printf '%s\0' "${__PACKAGES[@]}" | xargs -0 -n1 -P"$(nproc)" bash -c '__main__ "$@"' _
 	)
 	# make sure the running tally gets a proper newline on local runs
 	[[ -z "${CI:-}" ]] && echo
