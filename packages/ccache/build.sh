@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://ccache.samba.org
 TERMUX_PKG_DESCRIPTION="Compiler cache for fast recompilation of C/C++ code"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.12.2"
+TERMUX_PKG_VERSION="4.12.3"
 TERMUX_PKG_SRCURL=https://github.com/ccache/ccache/releases/download/v$TERMUX_PKG_VERSION/ccache-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=96ad53c76ecdb9c7a78e28a9bfdf2c95d7eece28546510fde7e16e5a13e2f7f8
+TERMUX_PKG_SHA256=c8e3ef79531966ecfa05bd1666c483b473df9af00896935cc468cb5ed573c16e
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="fmt, libandroid-spawn, libc++, libhiredis, xxhash, zlib, zstd"
 
