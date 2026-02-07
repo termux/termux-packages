@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/latex-lsp/tree-sitter-latex
 TERMUX_PKG_DESCRIPTION="LaTeX grammar for tree-sitter"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="0.6.0"
 TERMUX_PKG_SRCURL=https://github.com/latex-lsp/tree-sitter-latex/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=90d2085c9a46f5da0918ead2fa9b764defd57c34d493f06160f796014d2fd16a

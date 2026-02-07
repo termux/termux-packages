@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://myriad-dreamin.github.io/tinymist
 TERMUX_PKG_DESCRIPTION="An integrated language service for Typst"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="0.14.10"
 TERMUX_PKG_SRCURL=https://github.com/Myriad-Dreamin/tinymist/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=215c08d8a10ff51e15711f0684eafc85d119dc98db57f4f47ec7bf5987ea681e

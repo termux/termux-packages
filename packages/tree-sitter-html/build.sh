@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/tree-sitter/tree-sitter-html
 TERMUX_PKG_DESCRIPTION="HTML grammar for tree-sitter"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="0.23.2"
 TERMUX_PKG_SRCURL=https://github.com/tree-sitter/tree-sitter-html/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=21fa4f2d4dcb890ef12d09f4979a0007814f67f1c7294a9b17b0108a09e45ef7

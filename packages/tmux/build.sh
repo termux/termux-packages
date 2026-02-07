@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://tmux.github.io/
 TERMUX_PKG_DESCRIPTION="Terminal multiplexer"
 TERMUX_PKG_LICENSE="ISC"
-TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="3.6a"
 TERMUX_PKG_SRCURL=https://github.com/tmux/tmux/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=cd8d97f344cd2faa89e41358428b3ada883e4c72fd7d4f43ccac93daec1442eb

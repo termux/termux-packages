@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/MilesCranmer/rip2
 TERMUX_PKG_DESCRIPTION="A safe and ergonomic alternative to rm"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="0.9.6"
 TERMUX_PKG_SRCURL="https://github.com/MilesCranmer/rip2/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=657ded2ee364e0d548697c0de28ae4e8d9564c0b5c63fd16b6718edba9a33554

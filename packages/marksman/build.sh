@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE="https://github.com/artempyanykh/marksman"
 TERMUX_PKG_DESCRIPTION="LSP language server for editing Markdown files"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="2026.01.28"
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/artempyanykh/marksman/archive/refs/tags/${TERMUX_PKG_VERSION//\./-}.tar.gz"

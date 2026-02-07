@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/scop/bash-completion
 TERMUX_PKG_DESCRIPTION="Programmable completion for the bash shell"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="2.17.0"
 TERMUX_PKG_REVISION="1"
 TERMUX_PKG_SRCURL=https://github.com/scop/bash-completion/releases/download/${TERMUX_PKG_VERSION}/bash-completion-${TERMUX_PKG_VERSION}.tar.xz

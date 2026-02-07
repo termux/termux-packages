@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://rsync.samba.org/
 TERMUX_PKG_DESCRIPTION="Fast incremental file transfer utility"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION=3.4.1
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://rsync.samba.org/ftp/rsync/src/rsync-${TERMUX_PKG_VERSION}.tar.gz

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.qbittorrent.org/
 TERMUX_PKG_DESCRIPTION="A Qt6 based BitTorrent client"
 TERMUX_PKG_LICENSE="GPL-2.0, GPL-3.0"
-TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="5.1.4"
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/qbittorrent/qBittorrent/archive/refs/tags/release-${TERMUX_PKG_VERSION}.tar.gz"

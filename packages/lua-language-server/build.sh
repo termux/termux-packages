@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE="https://github.com/sumneko/lua-language-server"
 TERMUX_PKG_DESCRIPTION="Sumneko Lua Language Server coded in Lua"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="3.17.1"
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"
 TERMUX_PKG_SRCURL="git+https://github.com/sumneko/lua-language-server"

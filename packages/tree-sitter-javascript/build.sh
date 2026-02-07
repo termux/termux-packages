@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/tree-sitter/tree-sitter-javascript
 TERMUX_PKG_DESCRIPTION="JavaScript grammar for tree-sitter"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="0.25.0"
 TERMUX_PKG_SRCURL=https://github.com/tree-sitter/tree-sitter-javascript/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9712fc283d3dc01d996d20b6392143445d05867a7aad76fdd723824468428b86
