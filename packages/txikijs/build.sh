@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/saghul/txiki.js
 TERMUX_PKG_DESCRIPTION="A small and powerful JavaScript runtime"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1:24.12.0
+TERMUX_PKG_VERSION=1:26.2.0
 TERMUX_PKG_SRCURL=git+https://github.com/saghul/txiki.js
 TERMUX_PKG_DEPENDS="libcurl, libffi"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -16,14 +16,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_HOSTBUILD=true
 
-# Build failure for i686:
-#   [...]/txikijs/src/deps/wasm3/source/./extra/wasi_core.h:46:1:
-#   fatal error: static_assert failed due to requirement
-#   '__alignof(long long) == 8' "non-wasi data layout"
-#   _Static_assert(_Alignof(int64_t) == 8, "non-wasi data layout");
-#   ^              ~~~~~~~~~~~~~~~~~~~~~~
-TERMUX_PKG_EXCLUDED_ARCHES="i686"
-
 termux_step_host_build() {
 	find "$TERMUX_PKG_SRCDIR" -mindepth 1 -maxdepth 1 ! -name '.git*' \
 		-exec cp -a \{\} ./ \;
@@ -32,6 +24,20 @@ termux_step_host_build() {
 
 	cmake . -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 	make -j "$TERMUX_PKG_MAKE_PROCESSES"
+}
+
+termux_step_pre_configure() {
+	if [ "$TERMUX_ARCH" = "aarch64" ]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DWAMR_BUILD_TARGET=AARCH64"
+	elif [ "$TERMUX_ARCH" = "arm" ]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DWAMR_BUILD_TARGET=THUMB"
+	elif [ "$TERMUX_ARCH" = "i686" ]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DWAMR_BUILD_TARGET=X86_32"
+	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DWAMR_BUILD_TARGET=X86_64"
+	else
+		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
+	fi
 }
 
 termux_step_post_configure() {
