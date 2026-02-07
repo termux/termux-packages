@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/derekstride/tree-sitter-sql
 TERMUX_PKG_DESCRIPTION="SQL grammar for tree-sitter"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="0.3.11"
 TERMUX_PKG_SRCURL=https://github.com/derekstride/tree-sitter-sql/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=1fe13cb1e50dd9da9f22aed3cb9430fc9dae05a734a6049926fc12f6d8ecd3ae

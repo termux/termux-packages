@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Terminal pager program used to view the contents of a te
 # less has both the GPLv3 and its own "less license" which is a variation of a BSD 2-Clause license
 TERMUX_PKG_LICENSE="GPL-3.0, custom"
 TERMUX_PKG_LICENSE_FILE='COPYING, LICENSE'
-TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="691"
 TERMUX_PKG_SRCURL=https://www.greenwoodsoftware.com/less/less-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=88b480eda1bb4f92009f7968b23189eaf1329211f5a3515869e133d286154d25

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/termux/termux-packages
 TERMUX_PKG_DESCRIPTION="A metapackage that provides commonly used treesitter parsers"
 TERMUX_PKG_LICENSE="Public Domain"
-TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION=0.1.0
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true

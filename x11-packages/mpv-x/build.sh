@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://mpv.io/
 TERMUX_PKG_DESCRIPTION="Command-line media player"
 TERMUX_PKG_LICENSE="GPL-2.0-or-later"
-TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 # Update both mpv and mpv-x to the same version in one PR.
 TERMUX_PKG_VERSION="0.41.0"
 TERMUX_PKG_REVISION=1

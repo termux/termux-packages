@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE="https://dandavison.github.io/delta/"
 TERMUX_PKG_DESCRIPTION="A syntax-highlighter for git and diff output"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="0.18.2"
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/dandavison/delta/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz

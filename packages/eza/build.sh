@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/eza-community/eza
 TERMUX_PKG_DESCRIPTION="A modern replacement for ls"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="0.23.4"
 TERMUX_PKG_SRCURL=https://github.com/eza-community/eza/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9fbcad518b8a2095206ac385329ca62d216bf9fdc652dde2d082fcb37c309635

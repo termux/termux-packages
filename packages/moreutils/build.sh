@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://joeyh.name/code/moreutils/
 TERMUX_PKG_DESCRIPTION="A growing collection of the unix tools that nobody thought to write thirty years ago"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="0.70"
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_GIT_BRANCH=master

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/tree-sitter/tree-sitter-rust
 TERMUX_PKG_DESCRIPTION="Rust grammar for tree-sitter"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="0.24.0"
 TERMUX_PKG_SRCURL=https://github.com/tree-sitter/tree-sitter-rust/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=79c9eb05af4ebcce8c40760fc65405e0255e2d562702314b813a5dec1273b9a2
