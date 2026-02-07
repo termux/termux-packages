@@ -6,7 +6,7 @@ diff -uNr oma-1.22.1/apt-auth-config/src/lib.rs oma-1.22.1.mod/apt-auth-config/s
  
  impl AuthConfig {
 -    /// Read system auth.conf.d config (/etc/apt/auth.conf.d)
-+    /// Read system auth.conf.d config ($TERMUX_PREFIX/etc/apt/auth.conf.d)
++    /// Read system auth.conf.d config (@TERMUX_PREFIX@/etc/apt/auth.conf.d)
      pub fn system(sysroot: impl AsRef<Path>) -> Result<Self, AuthConfigError> {
          Self::from_path(sysroot.as_ref().join("etc/apt"))
      }
@@ -17,8 +17,8 @@ diff -uNr oma-1.22.1/i18n/en-US/oma.ftl oma-1.22.1.mod/i18n/en-US/oma.ftl
  can-not-checksum = Failed to parse SHA256 checksum.
  failed-to-open-to-checksum = BUG: Failed to open { $path } for checksum verification. Please report this issue at https://github.com/AOSC-Dev/oma.
  # config
--config-invalid = oma configuration file appears to be broken (/etc/oma.toml)! Falling back to default configuration.
-+config-invalid = oma configuration file appears to be broken ($TERMUX_PREFIX/etc/oma.toml)! Falling back to default configuration.
+-config-invalid = oma configuration file appears to be missing or broken (/etc/oma.toml)! Falling back to default configuration ...
++config-invalid = oma configuration file appears to be missing or broken (@TERMUX_PREFIX@/etc/oma.toml)! Falling back to default configuration.
  cleaning = Clearing packages cache ...
  download-failed-with-len = { $len } package(s) failed to download.
  download-failed = Failed to download { $filename }!
@@ -27,7 +27,7 @@ diff -uNr oma-1.22.1/i18n/en-US/oma.ftl oma-1.22.1.mod/i18n/en-US/oma.ftl
  failed-check-dbus-tips-1 = In this state, oma is unable to check the status of critical systems such as power supplies and user sessions, and continued operation may result in system failure!
  failed-check-dbus-tips-2 = If you are trying to repair the system using, for example, chroot, please add the --no-check-dbus parameter after the oma command.
 -failed-check-dbus-tips-3 = If your system is permanently running in a container or chroot environment, modify the value of the `no_check_dbus' option in oma's configuration file (/etc/oma.toml) to `true'.
-+failed-check-dbus-tips-3 = If your system is permanently running in a container or chroot environment, modify the value of the `no_check_dbus' option in oma's configuration file ($TERMUX_PREFIX/etc/oma.toml) to `true'.
++failed-check-dbus-tips-3 = If your system is permanently running in a container or chroot environment, modify the value of the `no_check_dbus' option in oma's configuration file (@TERMUX_PREFIX@/etc/oma.toml) to `true'.
  no-check-dbus-tips = oma is configured to ignore system operational status, which means that oma will not detect critical system states such as power supplies and user sessions. System failures may occur.
  oma-history-is-empty = oma history is empty.
  tui-pending = Pending
@@ -38,8 +38,8 @@ diff -uNr oma-1.22.1/i18n/zh-CN/oma.ftl oma-1.22.1.mod/i18n/zh-CN/oma.ftl
  can-not-checksum = 无法解析 SHA256 校验和。
  failed-to-open-to-checksum = BUG：无法打开用于验证校验和的路径 { $path }，请于 https://github.com/AOSC-Dev/oma 报告问题。
  # config
--config-invalid = oma 配置文件 (/etc/oma.toml) 似乎已损坏！将使用默认配置。
-+config-invalid = oma 配置文件 ($TERMUX_PREFIX/etc/oma.toml) 似乎已损坏！将使用默认配置。
+-config-invalid = oma 配置文件 (/etc/oma.toml) 缺失或已损坏！将使用默认配置 ...
++config-invalid = oma 配置文件 (@TERMUX_PREFIX@/etc/oma.toml) 缺失或已损坏！将使用默认配置 ...
  cleaning = 正在清理本地软件包缓存 ...
  download-failed-with-len = { $len } 个软件包下载失败。
  download-failed = 下载 { $filename } 文件失败！
@@ -48,7 +48,7 @@ diff -uNr oma-1.22.1/i18n/zh-CN/oma.ftl oma-1.22.1.mod/i18n/zh-CN/oma.ftl
  failed-check-dbus-tips-1 = 在此状态下，oma 无法检查电源及用户会话等关键系统状态，如继续操作可能会导致系统故障！
  failed-check-dbus-tips-2 = 如果您正尝试用 chroot 等方式修复系统，请在 oma 命令后加 --no-check-dbus 参数。
 -failed-check-dbus-tips-3 = 如果您的系统是长期在容器或 chroot 环境下运行的，请修改 oma 配置文件 (/etc/oma.toml) 下的 `no_check_dbus' 选项为 `true' 。
-+failed-check-dbus-tips-3 = 如果您的系统是长期在容器或 chroot 环境下运行的，请修改 oma 配置文件 ($TERMUX_PREFIX/etc/oma.toml) 下的 `no_check_dbus' 选项为 `true' 。
++failed-check-dbus-tips-3 = 如果您的系统是长期在容器或 chroot 环境下运行的，请修改 oma 配置文件 (@TERMUX_PREFIX@/etc/oma.toml) 下的 `no_check_dbus' 选项为 `true' 。
  no-check-dbus-tips = 目前 oma 已被配置为不探测系统运行状态，将忽略电源及用户会话等关键系统状态；如继续操作可能会导致系统故障。
  oma-history-is-empty = oma 历史记录为空。
  tui-pending = 待办事项
@@ -59,8 +59,8 @@ diff -uNr oma-1.22.1/i18n/zh-TW/oma.ftl oma-1.22.1.mod/i18n/zh-TW/oma.ftl
  can-not-checksum = 無法解析 SHA256 雜湊值。
  failed-to-open-to-checksum = BUG：無法打開用於驗證雜湊值的路徑 { $path }，請於 https://github.com/AOSC-Dev/oma 報告問題。
  # config
--config-invalid = oma 設定檔 (/etc/oma.toml) 似乎已損壞！將使用預設設定。
-+config-invalid = oma 設定檔 ($TERMUX_PREFIX/etc/oma.toml) 似乎已損壞！將使用預設設定。
+-config-invalid = oma 設定檔 (/etc/oma.toml) 缺失或已損壞！將使用預設設定 ...
++config-invalid = oma 設定檔 (@TERMUX_PREFIX@/etc/oma.toml) 缺失或已損壞！將使用預設設定 ...
  cleaning = 正在清理本機軟體套件快取……
  download-failed-with-len = { $len } 個軟體套件下載失敗。
  download-failed = 下載 { $filename } 檔案失敗！
@@ -69,7 +69,7 @@ diff -uNr oma-1.22.1/i18n/zh-TW/oma.ftl oma-1.22.1.mod/i18n/zh-TW/oma.ftl
  failed-check-dbus-tips-1 = 在此狀態下，oma 無法檢查電源及使用者工作階段等關鍵系統狀態，如繼續操作可能會導致系統故障！
  failed-check-dbus-tips-2 = 如果您正嘗試用 chroot 等方式修復系統，請在 oma 指令後加 --no-check-dbus 參數。
 -failed-check-dbus-tips-3 = 如果您的系統是長期在容器或 chroot 環境下執行的，請更改 oma 設定檔 (/etc/oma.toml) 下的 `no_check_dbus' 選項為 `true' 。
-+failed-check-dbus-tips-3 = 如果您的系統是長期在容器或 chroot 環境下執行的，請更改 oma 設定檔 ($TERMUX_PREFIX/etc/oma.toml) 下的 `no_check_dbus' 選項為 `true' 。
++failed-check-dbus-tips-3 = 如果您的系統是長期在容器或 chroot 環境下執行的，請更改 oma 設定檔 (@TERMUX_PREFIX@/etc/oma.toml) 下的 `no_check_dbus' 選項為 `true' 。
  no-check-dbus-tips = 目前 oma 已被設定為不探測系統執行狀態，將忽略電源及使用者工作階段等關鍵系統狀態；如繼續操作可能會導致系統故障。
  oma-history-is-empty = oma 歷史記錄為空。
  tui-pending = 待辦事項
@@ -81,7 +81,7 @@ diff -uNr oma-1.22.1/oma-contents/examples/list_files.rs oma-1.22.1.mod/oma-cont
  
  fn main() {
 -    pure_search("/var/lib/apt/lists", Mode::Files, "apt", |(pkg, file)| {
-+    pure_search("$TERMUX_PREFIX/var/lib/apt/lists", Mode::Files, "apt", |(pkg, file)| {
++    pure_search("@TERMUX_PREFIX@/var/lib/apt/lists", Mode::Files, "apt", |(pkg, file)| {
          println!("{pkg}: {file}")
      })
      .unwrap();
@@ -93,7 +93,7 @@ diff -uNr oma-1.22.1/oma-contents/examples/list_files_rg.rs oma-1.22.1.mod/oma-c
  
  fn main() {
 -    ripgrep_search("/var/lib/apt/lists", Mode::Files, "apt", |(pkg, file)| {
-+    ripgrep_search("$TERMUX_PREFIX/var/lib/apt/lists", Mode::Files, "apt", |(pkg, file)| {
++    ripgrep_search("@TERMUX_PREFIX@/var/lib/apt/lists", Mode::Files, "apt", |(pkg, file)| {
          println!("{pkg}: {file}")
      })
      .unwrap();
@@ -105,13 +105,13 @@ diff -uNr oma-1.22.1/oma-contents/src/parser.rs oma-1.22.1.mod/oma-contents/src/
  #[test]
  fn test_single_line_file_multi_space() {
 -    let s = "/etc/i have multi space foo/bar/abc\n";
-+    let s = "$TERMUX_PREFIX/etc/i have multi space foo/bar/abc\n";
++    let s = "@TERMUX_PREFIX@/etc/i have multi space foo/bar/abc\n";
      let res = parse_contents_single_line(s);
  
      assert_eq!(
          res.unwrap(),
 -        ("/etc/i have multi space", vec!["foo/bar/abc"])
-+        ("$TERMUX_PREFIX/etc/i have multi space", vec!["foo/bar/abc"])
++        ("@TERMUX_PREFIX@/etc/i have multi space", vec!["foo/bar/abc"])
      )
  }
 diff -uNr oma-1.22.1/oma-history/examples/last_upgrade_date.rs oma-1.22.1.mod/oma-history/examples/last_upgrade_date.rs
@@ -122,7 +122,7 @@ diff -uNr oma-1.22.1/oma-history/examples/last_upgrade_date.rs oma-1.22.1.mod/om
  
  fn main() {
 -    let conn = connect_db("/var/lib/oma/history.db", false).unwrap();
-+    let conn = connect_db("$TERMUX_PREFIX/var/lib/oma/history.db", false).unwrap();
++    let conn = connect_db("@TERMUX_PREFIX@/var/lib/oma/history.db", false).unwrap();
      let n = last_upgrade_timestamp(&conn).unwrap();
  
      println!(
@@ -134,7 +134,7 @@ diff -uNr oma-1.22.1/oma-history/src/migrations.rs oma-1.22.1.mod/oma-history/sr
              r#"oma ran into unexpected issues whilst migrating the history database, some entries were not migrated. Please consider sharing your oma history database file at:
  
 -  `/var/lib/oma/history.db'
-+  `$TERMUX_PREFIX/var/lib/oma/history.db'
++  `@TERMUX_PREFIX@/var/lib/oma/history.db'
  
  with us to help with debugging."#
          );
@@ -146,7 +146,7 @@ diff -uNr oma-1.22.1/oma-refresh/src/db.rs oma-1.22.1.mod/oma-refresh/src/db.rs
              IndexTargetConfig::new(self.manifest_config.clone(), vec![], &self.arch);
  
 -        let archs_from_file = fs::read_to_string("/var/lib/dpkg/arch").await;
-+        let archs_from_file = fs::read_to_string("$TERMUX_PREFIX/var/lib/dpkg/arch").await;
++        let archs_from_file = fs::read_to_string("@TERMUX_PREFIX@/var/lib/dpkg/arch").await;
  
          let archs_from_file = if let Ok(file) = archs_from_file {
              let res = file.lines().map(|x| x.to_string()).collect::<Vec<_>>();
@@ -158,7 +158,7 @@ diff -uNr oma-1.22.1/src/config.rs oma-1.22.1.mod/src/config.rs
  impl Config {
      pub fn read() -> Self {
 -        let Ok(s) = std::fs::read_to_string("/etc/oma.toml") else {
-+        let Ok(s) = std::fs::read_to_string("$TERMUX_PREFIX/etc/oma.toml") else {
++        let Ok(s) = std::fs::read_to_string("@TERMUX_PREFIX@/etc/oma.toml") else {
              warn!("{}", fl!("config-invalid"));
              return toml::from_str::<Self>(DEFAULT_CONFIG).unwrap();
          };
@@ -170,7 +170,7 @@ diff -uNr oma-1.22.1/src/main.rs oma-1.22.1.mod/src/main.rs
  
      let log_dir = if is_root() {
 -        PathBuf::from("/var/log/oma")
-+        PathBuf::from("$TERMUX_PREFIX/var/log/oma")
++        PathBuf::from("@TERMUX_PREFIX@/var/log/oma")
      } else {
          dirs::state_dir()
              .expect("Failed to get state dir")
