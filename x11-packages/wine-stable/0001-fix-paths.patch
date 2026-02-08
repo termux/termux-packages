@@ -70,12 +70,12 @@ diff -uNr a/dlls/msvcrt/tests/environ.c b/dlls/msvcrt/tests/environ.c
 diff -uNr a/dlls/ntdll/unix/server.c b/dlls/ntdll/unix/server.c
 --- a/dlls/ntdll/unix/server.c
 +++ b/dlls/ntdll/unix/server.c
-@@ -1237,10 +1237,10 @@
+@@ -1233,10 +1233,10 @@
  {
      char *dir = NULL;
  
 -#ifdef __ANDROID__  /* there's no /tmp dir on Android */
-+#if defined(__ANDROID__) && !defined(__TERMUX__)  /* there's no /tmp dir on Android */
++#if defined(__ANDROID__) && ! defined(__TERMUX__)  /* there's no /tmp dir on Android */
      asprintf( &dir, "%s/.wineserver/server-%llx-%llx", config_dir, (unsigned long long)dev, (unsigned long long)ino );
  #else
 -    asprintf( &dir, "/tmp/.wine-%u/server-%llx-%llx", getuid(), (unsigned long long)dev, (unsigned long long)ino );
@@ -83,14 +83,6 @@ diff -uNr a/dlls/ntdll/unix/server.c b/dlls/ntdll/unix/server.c
  #endif
      return dir;
  }
-@@ -1298,6 +1298,7 @@
-     {
-         mkdir( "drive_c", 0777 );
-         symlink( "../drive_c", "dosdevices/c:" );
-+        symlink( "@TERMUX_BASE_DIR@/", "dosdevices/y:" );
-         symlink( "/", "dosdevices/z:" );
-     }
-     else if (errno != EEXIST) fatal_perror( "cannot create %s/dosdevices", config_dir );
 diff -uNr a/programs/winebrowser/main.c b/programs/winebrowser/main.c
 --- a/programs/winebrowser/main.c
 +++ b/programs/winebrowser/main.c
@@ -127,12 +119,12 @@ diff -uNr a/programs/winemenubuilder/winemenubuilder.c b/programs/winemenubuilde
 diff -uNr a/server/request.c b/server/request.c
 --- a/server/request.c
 +++ b/server/request.c
-@@ -639,11 +639,11 @@
+@@ -647,12 +647,12 @@
  
      /* create the base directory if needed */
  
 -#ifdef __ANDROID__  /* there's no /tmp dir on Android */
-+#if defined(__ANDROID__) && !defined(__TERMUX__)  /* there's no /tmp dir on Android */
++#if defined(__ANDROID__) && ! defined(__TERMUX__)  /* there's no /tmp dir on Android */
      if (asprintf( &base_dir, "%s/.wineserver", config_dir ) == -1)
          fatal_error( "out of memory\n" );
  #else
@@ -140,4 +132,5 @@ diff -uNr a/server/request.c b/server/request.c
 +    if (asprintf( &base_dir, "@TERMUX_PREFIX@/tmp/.wine-%u", getuid() ) == -1)
          fatal_error( "out of memory\n" );
  #endif
-     create_dir( base_dir, &st2 );
+     create_dir( server_dir, &st2 );
+ 

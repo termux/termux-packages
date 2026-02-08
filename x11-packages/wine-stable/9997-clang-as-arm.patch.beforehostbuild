@@ -1,0 +1,26 @@
+--- a/tools/winebuild/utils.c
++++ b/tools/winebuild/utils.c
+@@ -855,7 +855,10 @@
+         if (global) output( "\t.globl %s\n", name );
+         break;
+     default:
+-        output( "\t.type %s,@function\n", name );
++        if (target.cpu == CPU_ARM)
++            output( "\t.type %s,%%function\n", name );
++        else
++            output( "\t.type %s,@function\n", name );
+         if (global) output( "\t.globl %s\n\t.hidden %s\n", name, name );
+         break;
+     }
+@@ -965,7 +968,10 @@
+     case PLATFORM_APPLE:
+         break;
+     default:
+-        output( "\t.section .note.GNU-stack,\"\",@progbits\n" );
++        if (target.cpu == CPU_ARM)
++            output( "\t.section .note.GNU-stack,\"\",%%progbits\n" );
++        else
++            output( "\t.section .note.GNU-stack,\"\",@progbits\n" );
+         break;
+     }
+ }
