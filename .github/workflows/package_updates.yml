@@ -96,14 +96,14 @@ jobs:
     permissions:
       issues: write
       contents: write
-    if: github.event_name != 'pull_request' && github.event_name != 'push' && github.repository == 'termux/termux-packages'
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     runs-on: ubuntu-24.04
     steps:
       - name: Clone repository
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          token: ${{ secrets.TERMUXBOT2_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Set process id limit for 32-bit builds depending on aosp-libs
         run: echo 65535 | sudo tee /proc/sys/kernel/pid_max
       - name: Enable zram
@@ -117,7 +117,7 @@ jobs:
         run: CLEAN_DOCKER_IMAGES=false ./scripts/free-space.sh
       - name: Process package updates
         env:
-          GITHUB_TOKEN: ${{ secrets.TERMUXBOT2_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BUILD_PACKAGES: "true"
           TERMUX_DOCKER__CONTAINER_EXEC_COMMAND__PRE_CHECK_IF_WILL_BUILD_PACKAGES: "true"
           CREATE_ISSUE: "true"
@@ -134,14 +134,5 @@ jobs:
             read -a PACKAGES <<< "${MANUAL_INPUT_PACKAGES//$'\n'/ }"
             ./scripts/bin/update-packages "${PACKAGES[@]}"
           else
-            ./scripts/bin/update-packages "@all"
+            ./scripts/bin/update-packages neovim-nightly
           fi
-      - name: Trigger repology metadata generation
-        if: always()
-        run: |
-          curl \
-            -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: Bearer ${{ secrets.TERMUXBOT2_TOKEN }}" \
-            -X POST \
-            --data '{"ref":"master"}' \
-            "https://api.github.com/repos/termux/repology-metadata/actions/workflows/repology_metadata.yml/dispatches"

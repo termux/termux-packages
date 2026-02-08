@@ -418,12 +418,6 @@ _should_update() {
 		return 1 # Skip.
 	fi
 
-	local _ISSUE
-	if [[ "${BUILD_PACKAGES}${GITHUB_ACTIONS:-}" == "truetrue" ]] && _ISSUE="$(_gh_check_issue_exists "${pkg_dir##*/}")"; then
-		echo "INFO: Skipping '${pkg_dir##*/}', an update issue (#${_ISSUE}) for it hasn't been resolved yet."
-		return 1
-	fi
-
 	return 0
 }
 
@@ -559,6 +553,9 @@ printf '%s\n' "${_ALREADY_SEEN[@]}" | grep -ve '^$' | sort
 echo ""
 echo "SUMMARY: ${#_FAILED_UPDATES[*]} failed updates."
 echo "${!_FAILED_UPDATES[@]}"
+
+
+cat /home/runner/log.txt
 
 unset IPC_FIFO IPC_FIFO_FD _unix_millis _start_time _pkg total direct indirect
 

@@ -59,6 +59,12 @@ for package_dir in "$@"; do
 		continue
 	fi
 
+	echo "SOURCING ${buildsh_path}" >> /home/runner/log.txt
+	ret=$(source "${buildsh_path}" >> /home/runner/log.txt)
+	echo "$?"
+	source "${buildsh_path}" >> /home/runner/log.txt 2>&1
+	echo "${TERMUX_PKG_SRCURL[@]}" >> /home/runner/log.txt
+
 	# Process substitution creates a subshell, we want to do this
 	# to not effect the main scope's variables by sourcing the build script
 	mapfile -t new_checksum < <(
