@@ -8,11 +8,11 @@ TERMUX_PKG_MAINTAINER="@termux"
 # is checked in termux_step_pre_configure(), so the build will fail on a mistake.
 # Using this simplifies things (no need to avoid downloading and applying patches manually),
 # and uses github is a high available hosting.
-_SNAPSHOT_COMMIT=607c49f34cc52dd88203c15ea09b0505c87a41b8
+_SNAPSHOT_COMMIT=5f58399b2de47ed14bdfe3a0cb149293b27893d5
 
 # The subshell leaving the value in the outer scope unchanged is the point here.
 # shellcheck disable=SC2031
-TERMUX_PKG_VERSION=(6.6.20260124
+TERMUX_PKG_VERSION=(6.6.20260124+really6.5.20250830
                     9.31
                     "$(. "$TERMUX_SCRIPTDIR/x11-packages/kitty/build.sh"; echo "$TERMUX_PKG_VERSION")"
                     "$(. "$TERMUX_SCRIPTDIR/x11-packages/alacritty/build.sh"; echo "$TERMUX_PKG_VERSION")"
@@ -24,7 +24,7 @@ TERMUX_PKG_SRCURL=("https://github.com/ThomasDickey/ncurses-snapshots/archive/${
                    "$(. "$TERMUX_SCRIPTDIR/x11-packages/alacritty/build.sh"; echo "$TERMUX_PKG_SRCURL")"
                    "$(. "$TERMUX_SCRIPTDIR/x11-packages/foot/build.sh"; echo "$TERMUX_PKG_SRCURL")")
 # shellcheck disable=SC2031
-TERMUX_PKG_SHA256=(2c32b07ac7397ce19aefb9f38fe159cfdb18d5321d68e6fd93b03ccaf15b8f09
+TERMUX_PKG_SHA256=(28cd102efe6a2610e830cc79cf270da6ff0427b2022900a9a36d2761522f9576
                    aaa13fcbc149fe0f3f391f933279580f74a96fd312d6ed06b8ff03c2d46672e8
                    "$(. "$TERMUX_SCRIPTDIR/x11-packages/kitty/build.sh"; echo "$TERMUX_PKG_SHA256")"
                    "$(. "$TERMUX_SCRIPTDIR/x11-packages/alacritty/build.sh"; echo "$TERMUX_PKG_SHA256")"
@@ -71,6 +71,7 @@ termux_step_pre_configure() {
 	PATCH_VERSION="$(cut -f 3 VERSION)"
 	ACTUAL_VERSION="${MAIN_VERSION}.${PATCH_VERSION}"
 	EXPECTED_VERSION="${TERMUX_PKG_VERSION[0]}"
+	EXPECTED_VERSION="${EXPECTED_VERSION#*really}"
 	if [[ "${ACTUAL_VERSION}" != "${EXPECTED_VERSION}" ]]; then
 		termux_error_exit "Version mismatch - expected ${EXPECTED_VERSION}, was ${ACTUAL_VERSION}. Check https://github.com/ThomasDickey/ncurses-snapshots/commit/${_SNAPSHOT_COMMIT}"
 	fi
@@ -81,20 +82,23 @@ termux_step_pre_configure() {
 termux_step_post_make_install() {
 	cd "$TERMUX_PREFIX/lib" || termux_error_exit "Prefix 'lib' directory does not exist."
 
+	local version="${TERMUX_PKG_VERSION[0]}"
+	version="${version#*really}"
+
 	# Ncursesw/Ncurses compatibility symlinks.
 	for lib in form menu ncurses panel; do
-		ln -sfr "lib${lib}w.so.${TERMUX_PKG_VERSION:0:3}" "lib${lib}.so.${TERMUX_PKG_VERSION:0:3}"
-		ln -sfr "lib${lib}w.so.${TERMUX_PKG_VERSION:0:3}" "lib${lib}.so.${TERMUX_PKG_VERSION:0:1}"
-		ln -sfr "lib${lib}w.so.${TERMUX_PKG_VERSION:0:3}" "lib${lib}.so"
+		ln -sfr "lib${lib}w.so.${version:0:3}" "lib${lib}.so.${version:0:3}"
+		ln -sfr "lib${lib}w.so.${version:0:3}" "lib${lib}.so.${version:0:1}"
+		ln -sfr "lib${lib}w.so.${version:0:3}" "lib${lib}.so"
 		ln -sfr "lib${lib}w.a" "lib${lib}.a"
 		(cd pkgconfig; ln -sf "${lib}w.pc" "$lib.pc") || termux_error_exit "Failed to install comatibility symlink for '${lib}'"
 	done
 
 	# Legacy compatibility symlinks (libcurses, libtermcap, libtic, libtinfo).
 	for lib in curses termcap tic tinfo; do
-		ln -sfr "libncursesw.so.${TERMUX_PKG_VERSION:0:3}" "lib${lib}.so.${TERMUX_PKG_VERSION:0:3}"
-		ln -sfr "libncursesw.so.${TERMUX_PKG_VERSION:0:3}" "lib${lib}.so.${TERMUX_PKG_VERSION:0:1}"
-		ln -sfr "libncursesw.so.${TERMUX_PKG_VERSION:0:3}" "lib${lib}.so"
+		ln -sfr "libncursesw.so.${version:0:3}" "lib${lib}.so.${version:0:3}"
+		ln -sfr "libncursesw.so.${version:0:3}" "lib${lib}.so.${version:0:1}"
+		ln -sfr "libncursesw.so.${version:0:3}" "lib${lib}.so"
 		ln -sfr libncursesw.a "lib${lib}.a"
 		(cd pkgconfig; ln -sfr ncursesw.pc "${lib}.pc") || termux_error_exit "Failed to install legacy comatibility symlink for '${lib}'"
 	done
