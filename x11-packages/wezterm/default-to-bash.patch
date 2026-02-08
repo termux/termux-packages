@@ -1,0 +1,17 @@
+like kitty, it's possible to configure wezterm to have a specific shell separately from the system,
+so set the default shell to @TERMUX_PREFIX@/bin/bash, and if the user wants a different shell they can
+configure wezterm to select it.
+(if get_shell() isn't intercepted, then wezterm will default to /system/bin/sh,
+which works, but is not typically considered preferable in Termux)
+
+--- a/pty/src/cmdbuilder.rs
++++ b/pty/src/cmdbuilder.rs
+@@ -43,6 +43,8 @@ fn get_shell() -> String {
+     use std::ffi::CStr;
+     use std::str;
+ 
++    return "@TERMUX_PREFIX@/bin/bash".into();
++
+     let ent = unsafe { libc::getpwuid(libc::getuid()) };
+     if !ent.is_null() {
+         let shell = unsafe { CStr::from_ptr((*ent).pw_shell) };
