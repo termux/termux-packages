@@ -146,41 +146,4 @@ termux_pkg_upgrade_version() {
 	fi
 
 	_termux_should_cleanup "${big_package}" && "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
-
-	if [[ "${GIT_COMMIT_PACKAGES}" == "true" ]]; then
-		echo "INFO: Committing package."
-		stderr="$(
-			git add \
-				"${TERMUX_PKG_BUILDER_DIR}" \
-				"${TERMUX_SCRIPTDIR}/scripts/build/setup/" \
-				2>&1 >/dev/null
-			git commit \
-				-m "bump(${repo}/${TERMUX_PKG_NAME}): ${LATEST_VERSION}" \
-				-m "This commit has been automatically submitted by Github Actions." \
-				2>&1 >/dev/null
-		)" || {
-			git reset HEAD --hard
-			termux_error_exit <<-EndOfError
-			ERROR: git commit failed. See below for details.
-			${stderr}
-			EndOfError
-		}
-	fi
-
-	if [[ "${GIT_PUSH_PACKAGES}" == "true" ]]; then
-		echo "INFO: Pushing package."
-		stderr="$(
-			# Fetch and pull before attempting to push to avoid a situation
-			# where a long running auto update fails because a later faster
-			# autoupdate got committed first and now the git history is out of date.
-			git fetch 2>&1 >/dev/null
-			git pull --rebase --autostash 2>&1 >/dev/null
-			git push 2>&1 >/dev/null
-		)" || {
-			termux_error_exit <<-EndOfError
-			ERROR: git push failed. See below for details.
-			${stderr}
-			EndOfError
-		}
-	fi
 }
