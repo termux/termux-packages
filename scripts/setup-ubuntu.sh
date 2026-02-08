@@ -175,9 +175,6 @@ PACKAGES+=" bc"
 # needed by ovmf
 PACKAGES+=" libarchive-tools"
 
-# Needed by cavif-rs
-PACKAGES+=" nasm"
-
 # Needed by debianutils
 PACKAGES+=" po4a"
 
