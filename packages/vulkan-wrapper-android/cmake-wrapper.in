@@ -1,0 +1,16 @@
+#!/bin/sh
+
+if [ -e CMakeLists.txt ]; then
+	sed -i '1s|^|project(foo LANGUAGES C CXX)\n|' CMakeLists.txt
+fi
+
+for f in "$@"; do
+	case "${f}" in
+		-DCMAKE_TOOLCHAIN_FILE=* )
+			sed -i "${f#-DCMAKE_TOOLCHAIN_FILE=}" \
+				-e 's|\(set(CMAKE_SYSTEM_NAME\) "Android")|\1 "Linux")|g'
+			;;
+	esac
+done
+
+exec @CMAKE@ "$@"
