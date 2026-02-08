@@ -1,0 +1,37 @@
+diff --git a/ksmserver/server.cpp b/ksmserver/server.cpp
+index 66debcd..dfe7e25 100644
+--- a/ksmserver/server.cpp
++++ b/ksmserver/server.cpp
+@@ -71,7 +71,6 @@
+ #include <KIO/DesktopExecParser>
+ #include <KService>
+ 
+-#include <KScreenLocker/KsldApp>
+ 
+ #include <krandom.h>
+ #include <qstandardpaths.h>
+@@ -513,13 +513,6 @@ KSMServer::KSMServer(InitFlags flags)
+     , m_kwinInterface(new OrgKdeKWinSessionInterface(QStringLiteral("org.kde.KWin"), QStringLiteral("/Session"), QDBusConnection::sessionBus(), this))
+     , sockets{-1, -1}
+ {
+-    if (!flags.testFlag(InitFlag::NoLockScreen)) {
+-        ScreenLocker::KSldApp::self()->initialize();
+-        if (flags.testFlag(InitFlag::ImmediateLockScreen)) {
+-            ScreenLocker::KSldApp::self()->lock(ScreenLocker::EstablishLock::Immediate);
+-        }
+-    }
+-
+     if (::socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, sockets) != 0) {
+         qFatal("Could not create socket pair, error %d (%s)", errno, strerror(errno));
+     }
+@@ -1113,9 +1106,7 @@ void KSMServer::startupDone()
+ 
+ void KSMServer::openSwitchUserDialog()
+ {
+-    // this method exists only for compatibility. Users should ideally call this directly
+-    OrgKdeScreensaverInterface iface(QStringLiteral("org.freedesktop.ScreenSaver"), QStringLiteral("/ScreenSaver"), QDBusConnection::sessionBus());
+-    iface.SwitchUser();
++    return;
+ }
+ 
+ #include "moc_server.cpp"

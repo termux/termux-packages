@@ -1,0 +1,15 @@
+# This patch forces EGL on KWin X11.
+# It is required to avoid many invisible UI elements on
+# Samsung Galaxy A70 (SM-A705FN) when using zink + turnip.
+
+--- a/src/options.h
++++ b/src/options.h
+@@ -877,7 +877,7 @@ public:
+     }
+     static OpenGLPlatformInterface defaultGlPlatformInterface()
+     {
+-        return kwinApp()->shouldUseWaylandForCompositing() ? EglPlatformInterface : GlxPlatformInterface;
++        return EglPlatformInterface;
+     }
+     static XwaylandCrashPolicy defaultXwaylandCrashPolicy()
+     {

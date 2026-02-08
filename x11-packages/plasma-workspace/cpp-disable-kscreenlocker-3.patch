@@ -1,0 +1,136 @@
+diff --git a/components/sessionsprivate/sessionsmodel.cpp b/components/sessionsprivate/sessionsmodel.cpp
+index 0da6080..a1ca437 100644
+--- a/components/sessionsprivate/sessionsmodel.cpp
++++ b/components/sessionsprivate/sessionsmodel.cpp
+@@ -12,30 +12,10 @@
+ #include <KLocalizedString>
+ #include <KUser>
+ 
+-#include "kscreensaversettings.h"
+-
+ SessionsModel::SessionsModel(QObject *parent)
+     : QAbstractListModel(parent)
+-    , m_screensaverInterface(
+-          new org::freedesktop::ScreenSaver(QStringLiteral("org.freedesktop.ScreenSaver"), QStringLiteral("/ScreenSaver"), QDBusConnection::sessionBus(), this))
+ {
+     reload();
+-
+-    // wait for the screen locker to be ready before actually switching
+-    connect(m_screensaverInterface, &org::freedesktop::ScreenSaver::ActiveChanged, this, [this](bool active) {
+-        if (active) {
+-            if (m_pendingVt) {
+-                m_displayManager.switchVT(m_pendingVt);
+-                Q_EMIT switchedUser(m_pendingVt);
+-            } else if (m_pendingReserve) {
+-                m_displayManager.startReserve();
+-                Q_EMIT startedNewSession();
+-            }
+-
+-            m_pendingVt = 0;
+-            m_pendingReserve = false;
+-        }
+-    });
+ }
+ 
+ bool SessionsModel::canSwitchUser() const
+@@ -80,25 +60,8 @@ void SessionsModel::switchUser(int vt, bool shouldLock)
+         return;
+     }
+ 
+-    if (!shouldLock) {
+-        m_displayManager.switchVT(vt);
+-        Q_EMIT switchedUser(vt);
+-        return;
+-    }
+-
+-    checkScreenLocked([this, vt](bool locked) {
+-        if (locked) {
+-            // already locked, switch right away
+-            m_displayManager.switchVT(vt);
+-            Q_EMIT switchedUser(vt);
+-        } else {
+-            m_pendingReserve = false;
+-            m_pendingVt = vt;
+-
+-            Q_EMIT aboutToLockScreen();
+-            m_screensaverInterface->Lock();
+-        }
+-    });
++    m_displayManager.switchVT(vt);
++    Q_EMIT switchedUser(vt);
+ }
+ 
+ void SessionsModel::startNewSession(bool shouldLock)
+@@ -107,36 +70,15 @@ void SessionsModel::startNewSession(bool shouldLock)
+         return;
+     }
+ 
+-    if (!shouldLock) {
+-        m_displayManager.startReserve();
+-        Q_EMIT startedNewSession();
+-        return;
+-    }
+-
+-    checkScreenLocked([this](bool locked) {
+-        if (locked) {
+-            // already locked, switch right away
+-            m_displayManager.startReserve();
+-            Q_EMIT startedNewSession();
+-        } else {
+-            m_pendingReserve = true;
+-            m_pendingVt = 0;
+-
+-            Q_EMIT aboutToLockScreen();
+-            m_screensaverInterface->Lock();
+-        }
+-    });
++    m_displayManager.startReserve();
++    Q_EMIT startedNewSession();
+ }
+ 
+ void SessionsModel::reload()
+ {
+     static QHash<QString, KUser> kusers;
+ 
+-    const bool oldShouldLock = m_shouldLock;
+-    m_shouldLock = KAuthorized::authorizeAction(QStringLiteral("lock_screen")) && KScreenSaverSettings::autolock();
+-    if (m_shouldLock != oldShouldLock) {
+-        Q_EMIT shouldLockChanged();
+-    }
++    m_shouldLock = false;
+ 
+     SessList sessions;
+     m_displayManager.localSessions(sessions);
+@@ -185,19 +127,6 @@ void SessionsModel::reload()
+     }
+ }
+ 
+-void SessionsModel::checkScreenLocked(std::function<void(bool)> &&cb)
+-{
+-    auto reply = m_screensaverInterface->GetActive();
+-    QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(reply, this);
+-    QObject::connect(watcher, &QDBusPendingCallWatcher::finished, this, [cb = std::move(cb)](QDBusPendingCallWatcher *watcher) {
+-        QDBusPendingReply<bool> reply = *watcher;
+-        if (!reply.isError()) {
+-            cb(reply.value());
+-        }
+-        watcher->deleteLater();
+-    });
+-}
+-
+ void SessionsModel::setShowNewSessionEntry(bool showNewSessionEntry)
+ {
+     if (!canStartNewSession()) {
+diff --git a/components/sessionsprivate/sessionsmodel.h b/components/sessionsprivate/sessionsmodel.h
+index bc580d7..ab25f84 100644
+--- a/components/sessionsprivate/sessionsmodel.h
++++ b/components/sessionsprivate/sessionsmodel.h
+@@ -91,8 +91,6 @@ Q_SIGNALS:
+     void aboutToLockScreen();
+ 
+ private:
+-    void checkScreenLocked(std::function<void(bool)> &&cb);
+-
+     KDisplayManager m_displayManager;
+ 
+     QList<SessionEntry> m_data;
