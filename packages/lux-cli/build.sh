@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A package manager for Lua, similar to luarocks"
 TERMUX_PKG_LICENSE="LGPL-3.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.25.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/lumen-oss/lux/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=9b9b9ad11f22bf666ec48092126a352d752cd16c579e7713fdcb8da3a215fc5a
 TERMUX_PKG_DEPENDS="bzip2, gpgme, libgit2, libgpg-error, lua54, openssl, xz-utils"
@@ -107,11 +108,6 @@ termux_step_pre_configure() {
 	fi
 
 	cargo fetch --locked --target "$CARGO_TARGET_NAME"
-
-	# software does not officially support android, so treat android as linux
-	find "$TERMUX_PKG_SRCDIR" -type f | \
-		xargs -n 1 sed -i \
-		-e 's|target_os = "linux"|target_os = "android"|g'
 }
 
 termux_step_make() {
