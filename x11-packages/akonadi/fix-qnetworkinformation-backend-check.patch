@@ -1,0 +1,48 @@
+--- a/src/agentbase/agentbase.cpp
++++ b/src/agentbase/agentbase.cpp
+@@ -721,7 +721,7 @@
+ void AgentBasePrivate::slotResumedFromSuspend()
+ {
+     if (mNeedsNetwork) {
+-        slotNetworkStatusChange(QNetworkInformation::instance()->reachability() != QNetworkInformation::Reachability::Online);
++        slotNetworkStatusChange((QNetworkInformation::instance() && QNetworkInformation::instance()->reachability() != QNetworkInformation::Reachability::Online));
+     }
+ }
+
+@@ -904,10 +904,23 @@
+     }
+
+     d->mNeedsNetwork = needsNetwork;
+-    QNetworkInformation::loadBackendByFeatures(QNetworkInformation::Feature::Reachability);
+-    connect(QNetworkInformation::instance(), &QNetworkInformation::reachabilityChanged, this, [d](auto reachability) {
+-        d->slotNetworkStatusChange(reachability == QNetworkInformation::Reachability::Online);
+-    });
++
++    const bool hasBackend =
++        QNetworkInformation::loadBackendByFeatures(
++            QNetworkInformation::Feature::Reachability);
++
++    if (!hasBackend) {
++        qWarning() << "QNetworkInformation backend not available. Assuming always online.";
++        return;
++    }
++
++    connect(QNetworkInformation::instance(),
++            &QNetworkInformation::reachabilityChanged,
++            this,
++            [d](auto reachability) {
++                d->slotNetworkStatusChange(
++                    reachability == QNetworkInformation::Reachability::Online);
++            });
+ }
+
+ void AgentBase::setOnline(bool state)
+@@ -951,7 +964,7 @@
+ {
+     Q_D(AgentBase);
+     if (state && d->mNeedsNetwork) {
+-        if (QNetworkInformation::instance()->reachability() != QNetworkInformation::Reachability::Online) {
++        if ((QNetworkInformation::instance() && QNetworkInformation::instance()->reachability() != QNetworkInformation::Reachability::Online)) {
+             // Don't go online if the resource needs network but there is none
+             state = false;
+         }
