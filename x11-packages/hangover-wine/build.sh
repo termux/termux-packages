@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.OLD, COPYING.LIB"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="11.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
 	"https://github.com/AndreRH/wine/archive/refs/tags/hangover-${TERMUX_PKG_VERSION/\~/-}.tar.gz"
 	"https://github.com/AndreRH/hangover/releases/download/hangover-${TERMUX_PKG_VERSION/\~/-}/hangover_${TERMUX_PKG_VERSION/\~/-}_ubuntu2004_focal_arm64.tar"
@@ -127,6 +128,9 @@ termux_step_pre_configure() {
 	LDFLAGS="${LDFLAGS/-Wl,-z,relro,-z,now/}"
 
 	LDFLAGS+=" -landroid-spawn"
+
+	# https://github.com/termux-user-repository/tur/commit/9388bf3599bba33d7bd052cab0679fe9cd5917d2#commitcomment-176464300
+	LDFLAGS+=" -Wl,--rosegment"
 }
 
 termux_step_make() {
