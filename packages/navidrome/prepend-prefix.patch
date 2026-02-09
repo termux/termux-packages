@@ -1,0 +1,16 @@
+--- a/release/linux/navidrome.toml
++++ b/release/linux/navidrome.toml
+@@ -1,2 +1,2 @@
+-DataFolder = "/var/lib/navidrome"
+-MusicFolder = "/opt/navidrome/music"
++DataFolder = "@TERMUX_PREFIX@/var/lib/navidrome"
++MusicFolder = "@TERMUX_PREFIX@/opt/navidrome/music"
+--- a/conf/configuration.go
++++ b/conf/configuration.go
+@@ -759,5 +759,5 @@ func getConfigFile(cfgFile string) string {
+ 			return cfgFile
+ 		}
+ 	}
+-	return ""
++	return "@TERMUX_PREFIX@/etc/navidrome/navidrome.toml"
+ }
