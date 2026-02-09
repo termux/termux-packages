@@ -1,9 +1,20 @@
+--- a/src/monitors/mediamonitor.cpp
++++ b/src/monitors/mediamonitor.cpp
+@@ -157,7 +157,6 @@ void MediaMonitor::connectToCore()
+         m_pwCore = PipeWireCore::fetch(0);
+     }
+     if (!m_pwCore->error().isEmpty()) {
+-        qDebug() << "received error while creating the stream" << m_pwCore->error() << "Media monitor will not work.";
+         m_pwCore.clear();
+         m_reconnectTimer.start();
+         return;
 --- a/src/pipewirecore.cpp
 +++ b/src/pipewirecore.cpp
-@@ -122,7 +122,6 @@
+@@ -122,7 +122,6 @@ bool PipeWireCore::init_core()
      }
      if (!m_pwCore) {
          m_error = i18n("Failed to connect to PipeWire");
 -        qCWarning(PIPEWIRE_LOGGING) << "error:" << m_error << m_fd;
          return false;
      }
+ 
