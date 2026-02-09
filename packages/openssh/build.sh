@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="10.2p1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/openssh/openssh-portable/archive/refs/tags/V_$(sed 's/\./_/g; s/p/_P/g' <<< $TERMUX_PKG_VERSION).tar.gz
 TERMUX_PKG_SHA256=8d3083bca4864cbc760bfcc3e67d86d401e27faa5eaafa1482c2316f5d5186b3
 TERMUX_PKG_DEPENDS="krb5, ldns, libandroid-support, libedit, openssh-sftp-server, openssl, termux-auth, zlib"
@@ -47,6 +48,7 @@ ac_cv_header_sys_un_h=yes
 ac_cv_lib_crypt_crypt=no
 ac_cv_search_getrrsetbyname=no
 ac_cv_func_bzero=yes
+ac_cv_member_struct_passwd_pw_gecos=no
 "
 # Configure script requires this variable to set prefixed path to program 'passwd'
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="PATH_PASSWD_PROG=${TERMUX_PREFIX}/bin/passwd"
