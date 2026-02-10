@@ -1,14 +1,15 @@
 https://github.com/termux/termux-packages/issues/15852
-
+diff --git a/src/hostid.c b/src/hostid.c
+index e20c686..07476f1 100644
 --- a/src/hostid.c
 +++ b/src/hostid.c
-@@ -73,6 +73,9 @@
+@@ -70,6 +70,9 @@ main (int argc, char **argv)
        usage (EXIT_FAILURE);
      }
  
 +#ifdef __ANDROID__
 +# define gethostid() (0L)
 +#endif
-   id = gethostid ();
- 
    /* POSIX says gethostid returns a "32-bit identifier" but is silent
+      whether it's sign-extended.  Turn off any sign-extension.  This
+      is a no-op unless unsigned int is wider than 32 bits.  */

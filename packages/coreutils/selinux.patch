@@ -1,8 +1,8 @@
 diff --git a/src/cp.c b/src/cp.c
-index a0ec06714..da3f6a8a7 100644
+index e17484b..aabaa95 100644
 --- a/src/cp.c
 +++ b/src/cp.c
-@@ -993,7 +993,7 @@ main (int argc, char **argv)
+@@ -1045,7 +1045,7 @@ main (int argc, char **argv)
  
    atexit (close_stdin);
  
@@ -10,8 +10,8 @@ index a0ec06714..da3f6a8a7 100644
 +  selinux_enabled = (0 < is_selinux_enabled () && geteuid () == 0);
    cp_option_init (&x);
  
-   while ((c = getopt_long (argc, argv, "abdfHilLnprst:uvxPRS:TZ",
-@@ -1174,7 +1174,7 @@ main (int argc, char **argv)
+   int c;
+@@ -1227,7 +1227,7 @@ main (int argc, char **argv)
              {
                error (0, 0,
                       _("warning: ignoring --context; "
@@ -20,7 +20,7 @@ index a0ec06714..da3f6a8a7 100644
              }
            break;
  
-@@ -1253,7 +1253,7 @@ main (int argc, char **argv)
+@@ -1306,7 +1306,7 @@ main (int argc, char **argv)
    if (x.require_preserve_context && ! selinux_enabled)
      error (EXIT_FAILURE, 0,
             _("cannot preserve security context "
@@ -30,13 +30,13 @@ index a0ec06714..da3f6a8a7 100644
    /* FIXME: This handles new files.  But what about existing files?
       I.e., if updating a tree, new files would have the specified context,
 diff --git a/src/install.c b/src/install.c
-index b3b26abdb..11caa873b 100644
+index 359eb65..5c48b90 100644
 --- a/src/install.c
 +++ b/src/install.c
-@@ -325,6 +325,10 @@ setdefaultfilecon (char const *file)
-   struct stat st;
-   char *scontext_raw = nullptr;
- 
+@@ -319,6 +319,10 @@ get_labeling_handle (void)
+ static void
+ setdefaultfilecon (char const *file)
+ {
 +  /* NOTE: Return early, before `install`'s selinux logic,
 +   * because we do not have suitable workaround for it */
 +  return;
@@ -44,16 +44,16 @@ index b3b26abdb..11caa873b 100644
    if (selinux_enabled != 1)
      {
        /* Indicate no context found. */
-@@ -789,7 +793,7 @@ main (int argc, char **argv)
+@@ -845,7 +849,7 @@ main (int argc, char **argv)
    bool strip_program_specified = false;
-   char const *scontext = nullptr;
+   char const *scontext = NULL;
    /* set iff kernel has extra selinux system calls */
 -  selinux_enabled = (0 < is_selinux_enabled ());
 +  selinux_enabled = (0 < is_selinux_enabled () && geteuid () == 0);
  
    initialize_main (&argc, &argv);
    set_program_name (argv[0]);
-@@ -876,7 +880,7 @@ main (int argc, char **argv)
+@@ -933,7 +937,7 @@ main (int argc, char **argv)
            if (! selinux_enabled)
              {
                error (0, 0, _("WARNING: ignoring --preserve-context; "
@@ -62,7 +62,7 @@ index b3b26abdb..11caa873b 100644
                break;
              }
            x.preserve_security_context = true;
-@@ -902,7 +906,7 @@ main (int argc, char **argv)
+@@ -959,7 +963,7 @@ main (int argc, char **argv)
              {
                error (0, 0,
                       _("warning: ignoring --context; "
@@ -72,10 +72,10 @@ index b3b26abdb..11caa873b 100644
            break;
          case_GETOPT_HELP_CHAR;
 diff --git a/src/mkdir.c b/src/mkdir.c
-index df4c81976..7225c21b7 100644
+index d52a498..4e92e3f 100644
 --- a/src/mkdir.c
 +++ b/src/mkdir.c
-@@ -228,7 +228,7 @@ main (int argc, char **argv)
+@@ -239,7 +239,7 @@ main (int argc, char **argv)
                /* We don't yet support -Z to restore context with SMACK.  */
                scontext = optarg;
              }
@@ -84,7 +84,7 @@ index df4c81976..7225c21b7 100644
              {
                if (optarg)
                  scontext = optarg;
-@@ -244,7 +244,7 @@ main (int argc, char **argv)
+@@ -255,7 +255,7 @@ main (int argc, char **argv)
              {
                error (0, 0,
                       _("warning: ignoring --context; "
@@ -94,10 +94,10 @@ index df4c81976..7225c21b7 100644
            break;
          case_GETOPT_HELP_CHAR;
 diff --git a/src/mkfifo.c b/src/mkfifo.c
-index 52bfa566a..fad605386 100644
+index 12d9a42..5b8b5aa 100644
 --- a/src/mkfifo.c
 +++ b/src/mkfifo.c
-@@ -102,7 +102,7 @@ main (int argc, char **argv)
+@@ -105,7 +105,7 @@ main (int argc, char **argv)
                /* We don't yet support -Z to restore context with SMACK.  */
                scontext = optarg;
              }
@@ -106,7 +106,7 @@ index 52bfa566a..fad605386 100644
              {
                if (optarg)
                  scontext = optarg;
-@@ -118,7 +118,7 @@ main (int argc, char **argv)
+@@ -121,7 +121,7 @@ main (int argc, char **argv)
              {
                error (0, 0,
                       _("warning: ignoring --context; "
@@ -116,10 +116,10 @@ index 52bfa566a..fad605386 100644
            break;
          case_GETOPT_HELP_CHAR;
 diff --git a/src/mknod.c b/src/mknod.c
-index 6bfa0f7f7..6ff36f21c 100644
+index 59b844f..f5dcc50 100644
 --- a/src/mknod.c
 +++ b/src/mknod.c
-@@ -119,7 +119,7 @@ main (int argc, char **argv)
+@@ -121,7 +121,7 @@ main (int argc, char **argv)
                /* We don't yet support -Z to restore context with SMACK.  */
                scontext = optarg;
              }
@@ -128,7 +128,7 @@ index 6bfa0f7f7..6ff36f21c 100644
              {
                if (optarg)
                  scontext = optarg;
-@@ -135,7 +135,7 @@ main (int argc, char **argv)
+@@ -137,7 +137,7 @@ main (int argc, char **argv)
              {
                error (0, 0,
                       _("warning: ignoring --context; "
@@ -138,7 +138,7 @@ index 6bfa0f7f7..6ff36f21c 100644
            break;
          case_GETOPT_HELP_CHAR;
 diff --git a/src/mv.c b/src/mv.c
-index cf1ac56e8..4b68574e0 100644
+index cd6aab4..5a65027 100644
 --- a/src/mv.c
 +++ b/src/mv.c
 @@ -120,7 +120,7 @@ rm_option_init (struct rm_options *x)
@@ -150,20 +150,20 @@ index cf1ac56e8..4b68574e0 100644
  
    cp_options_default (x);
    x->copy_as_regular = false;  /* FIXME: maybe make this an option */
-@@ -326,7 +326,7 @@ main (int argc, char **argv)
+@@ -349,7 +349,7 @@ main (int argc, char **argv)
+   bool remove_trailing_slashes = false;
+   char const *target_directory = NULL;
    bool no_target_directory = false;
-   int n_files;
-   char **file;
 -  bool selinux_enabled = (0 < is_selinux_enabled ());
 +  bool selinux_enabled = (0 < is_selinux_enabled () && geteuid () == 0);
  
    initialize_main (&argc, &argv);
    set_program_name (argv[0]);
 diff --git a/src/runcon.c b/src/runcon.c
-index 32c419427..b62538a41 100644
+index 272f4b5..96e730a 100644
 --- a/src/runcon.c
 +++ b/src/runcon.c
-@@ -190,8 +190,8 @@ main (int argc, char **argv)
+@@ -200,8 +200,8 @@ main (int argc, char **argv)
        usage (EXIT_CANCELED);
      }
  
