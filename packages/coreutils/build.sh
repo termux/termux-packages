@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/coreutils/
 TERMUX_PKG_DESCRIPTION="Basic file, shell and text manipulation utilities from the GNU project"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=9.9
+TERMUX_PKG_VERSION=9.10
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/coreutils/coreutils-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=19bcb6ca867183c57d77155eae946c5eced88183143b45ca51ad7d26c628ca75
+TERMUX_PKG_SHA256=16535a9adf0b10037364e2d612aad3d9f4eca3a344949ced74d12faf4bd51d25
 TERMUX_PKG_DEPENDS="libandroid-selinux, libandroid-support, libgmp, libiconv, openssl (>= 1:3.5.0-1)"
 TERMUX_PKG_BREAKS="chroot, busybox (<< 1.30.1-4)"
 TERMUX_PKG_REPLACES="chroot, busybox (<< 1.30.1-4)"
