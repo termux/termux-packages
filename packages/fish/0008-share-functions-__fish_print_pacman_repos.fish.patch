@@ -1,0 +1,10 @@
+diff --git a/share/functions/__fish_print_pacman_repos.fish b/share/functions/__fish_print_pacman_repos.fish
+index a317b50..8e88447 100644
+--- a/share/functions/__fish_print_pacman_repos.fish
++++ b/share/functions/__fish_print_pacman_repos.fish
+@@ -1,4 +1,4 @@
+ # localization: skip(private)
+ function __fish_print_pacman_repos --description "Print the repositories configured for arch's pacman package manager"
+-    string match -er "\[.*\]" </etc/pacman.conf | string match -r -v "^#|options" | string replace -ra "\[|\]" ""
++    string match -er "\[.*\]" <@TERMUX_PREFIX@/etc/pacman.conf | string match -r -v "^#|options" | string replace -ra "\[|\]" ""
+ end
