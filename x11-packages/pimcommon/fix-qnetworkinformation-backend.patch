@@ -1,0 +1,17 @@
+diff --git a/src/pimcommonakonadi/addressline/addresslineedit/addresseelineeditmanager.cpp b/src/pimcommonakonadi/addressline/addresslineedit/addresseelineeditmanager.cpp
+index 8f70480..e607c30 100644
+--- a/src/pimcommonakonadi/addressline/addresslineedit/addresseelineeditmanager.cpp
++++ b/src/pimcommonakonadi/addressline/addresslineedit/addresseelineeditmanager.cpp
+@@ -124,7 +124,11 @@ bool AddresseeLineEditManager::isOnline() const
+             && !QNetworkInformation::instance()->isBehindCaptivePortal();
+     } else {
+         qCWarning(PIMCOMMONAKONADI_LOG) << "Couldn't find a working backend for QNetworkInformation";
++#ifdef __TERMUX__
++        return true;
++#else
+         return false;
++#endif
+     }
+ }
+ 
+
