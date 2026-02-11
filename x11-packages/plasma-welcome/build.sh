@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="https://invent.kde.org/plasma/plasm-welcome"
+TERMUX_PKG_HOMEPAGE="https://invent.kde.org/plasma/plasma-welcome"
 TERMUX_PKG_DESCRIPTION="A friendly onboarding wizard for Plasma"
 TERMUX_PKG_LICENSE="LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
