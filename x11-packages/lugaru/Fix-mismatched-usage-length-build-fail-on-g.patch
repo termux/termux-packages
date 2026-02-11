@@ -1,0 +1,53 @@
+From dd685fe9080c2853422d8272792691358ea07dfc Mon Sep 17 00:00:00 2001
+From: Martin Erik Werner <martinerikwerner@gmail.com>
+Date: Wed, 8 Mar 2017 22:51:16 +0100
+Subject: [PATCH] Fix mismatched usage length, build fail on g++
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The length of const option::Descriptor usage[] is intended to be
+inferred based on the initialisation in Source/main.cpp, however, the
+extern declaration in Source/Game.hpp hard-codes it to 13.
+
+Remove the hard-coded 13 in the extern declaration, in favour of the
+inferred length.
+
+This also fixes the following build failure with g++ (Debian 4.9.2-10)
+4.9.2:
+(...)/Source/main.cpp:602:5: error: uninitialized const member ‘option::Descriptor::index’
+     };
+     ^
+(...)/Source/main.cpp:602:5: warning: missing initializer for member ‘option::Descriptor::index’ [-Wmissing-field-initializers]
+(...)/Source/main.cpp:602:5: error: uninitialized const member ‘option::Descriptor::type’
+(...)/Source/main.cpp:602:5: warning: missing initializer for member ‘option::Descriptor::type’ [-Wmissing-field-initializers]
+(...)/Source/main.cpp:602:5: error: uninitialized const member ‘option::Descriptor::shortopt’
+(...)/Source/main.cpp:602:5: warning: missing initializer for member ‘option::Descriptor::shortopt’ [-Wmissing-field-initializers]
+(...)/Source/main.cpp:602:5: error: uninitialized const member ‘option::Descriptor::longopt’
+(...)/Source/main.cpp:602:5: warning: missing initializer for member ‘option::Descriptor::longopt’ [-Wmissing-field-initializers]
+(...)/Source/main.cpp:602:5: error: uninitialized const member ‘option::Descriptor::check_arg’
+(...)/Source/main.cpp:602:5: warning: missing initializer for member ‘option::Descriptor::check_arg’ [-Wmissing-field-initializers]
+(...)/Source/main.cpp:602:5: warning: missing initializer for member ‘option::Descriptor::help’ [-Wmissing-field-initializers]
+CMakeFiles/lugaru.dir/build.make:54: recipe for target 'CMakeFiles/lugaru.dir/Source/main.cpp.o' failed
+
+Signed-off-by: Martin Erik Werner <martinerikwerner@gmail.com>
+---
+ Source/Game.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Source/Game.hpp b/Source/Game.hpp
+index 51232cc..9bb6adb 100644
+--- a/Source/Game.hpp
++++ b/Source/Game.hpp
+@@ -234,7 +234,7 @@ enum optionIndex
+ /* Number of options + 1 */
+ const int commandLineOptionsNumber = 10;
+ 
+-extern const option::Descriptor usage[13];
++extern const option::Descriptor usage[];
+ 
+ extern option::Option commandLineOptions[commandLineOptionsNumber];
+ extern option::Option* commandLineOptionsBuffer;
+-- 
+2.1.4
+
