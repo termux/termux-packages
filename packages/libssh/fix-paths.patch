@@ -10,33 +10,12 @@ diff -uNr libssh-0.9.0/src/dh-gex.c libssh-0.9.0.mod/src/dh-gex.c
  /* 2     "Safe" prime; (p-1)/2 is also prime. */
  #define SAFE_PRIME 2
  /* 0x04  Probabilistic Miller-Rabin primality tests. */
-diff -uNr libssh-0.9.0/src/options.c libssh-0.9.0.mod/src/options.c
---- libssh-0.9.0/src/options.c	2019-06-27 11:34:16.000000000 +0300
-+++ libssh-0.9.0.mod/src/options.c	2019-06-29 17:28:52.049933003 +0300
-@@ -666,7 +666,7 @@
-             SAFE_FREE(session->opts.global_knownhosts);
-             if (v == NULL) {
-                 session->opts.global_knownhosts =
--                    strdup("/etc/ssh/ssh_known_hosts");
-+                    strdup("@TERMUX_PREFIX@/etc/ssh/ssh_known_hosts");
-                 if (session->opts.global_knownhosts == NULL) {
-                     ssh_set_error_oom(session);
-                     return -1;
-@@ -1449,7 +1449,7 @@
- 
-     if ((session->opts.exp_flags & SSH_OPT_EXP_FLAG_GLOBAL_KNOWNHOSTS) == 0) {
-         if (session->opts.global_knownhosts == NULL) {
--            tmp = strdup("/etc/ssh/ssh_known_hosts");
-+            tmp = strdup("@TERMUX_PREFIX@/etc/ssh/ssh_known_hosts");
-         } else {
-             tmp = ssh_path_expand_escape(session,
-                                          session->opts.global_knownhosts);
 diff -uNr libssh-0.9.0/src/socket.c libssh-0.9.0.mod/src/socket.c
 --- libssh-0.9.0/src/socket.c	2019-06-27 11:34:16.000000000 +0300
 +++ libssh-0.9.0.mod/src/socket.c	2019-06-29 17:26:21.278467080 +0300
-@@ -925,11 +925,11 @@
+@@ -1149,11 +1149,11 @@
      if (shell == NULL || shell[0] == '\0') {
-         /* Fall back to the /bin/sh only if the bash is not available. But there are 
+         /* Fall back to the /bin/sh only if the bash is not available. But there are
           * issues with dash or whatever people tend to link to /bin/sh */
 -        rc = access("/bin/bash", 0);
 +        rc = access("@TERMUX_PREFIX@/bin/bash", 0);
@@ -49,3 +28,14 @@ diff -uNr libssh-0.9.0/src/socket.c libssh-0.9.0.mod/src/socket.c
          }
      }
      args[0] = shell;
+--- a/DefineOptions.cmake
++++ b/DefineOptions.cmake
+@@ -71,7 +71,7 @@
+     set(WITH_SYMBOL_VERSIONING ON)
+ endif (WITH_ABI_BREAK)
+ 
+-set(GLOBAL_CONF_DIR "/etc/ssh")
++set(GLOBAL_CONF_DIR "@TERMUX_PREFIX@/etc/ssh")
+ if (WIN32)
+     # Use PROGRAMDATA on Windows
+     if (DEFINED ENV{PROGRAMDATA})
