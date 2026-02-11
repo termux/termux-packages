@@ -1,3 +1,6 @@
+CMakeLists.txt patch is similar to https://github.com/libjxl/libjxl/commit/192294e15e1d27660d887bc3b9b5ead8e5aa6a93
+Prevents: error: out of range pc-relative fixup value
+
 --- a/tools/CMakeLists.txt
 +++ b/tools/CMakeLists.txt
 @@ -250,7 +250,7 @@
@@ -9,6 +12,17 @@
    target_link_libraries(benchmark_xl jxl_gauss_blur) # for ssimulacra
    if(MINGW)
    # MINGW doesn't support glob.h.
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -335,7 +335,7 @@ else ()
+ 
+   # Machine flags.
+   add_compile_options(-funwind-tables)
+-  if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
++  if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT CMAKE_SYSTEM_PROCESSOR MATCHES "arm")
+     add_compile_options("SHELL:-Xclang -mrelax-all")
+   endif()
+   if (CXX_CONSTRUCTOR_ALIASES_SUPPORTED)
 --- a/third_party/sjpeg/CMakeLists.txt
 +++ b/third_party/sjpeg/CMakeLists.txt
 @@ -44,20 +44,7 @@
