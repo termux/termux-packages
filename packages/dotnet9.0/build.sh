@@ -2,8 +2,8 @@ TERMUX_PKG_HOMEPAGE=https://dotnet.microsoft.com/en-us/
 TERMUX_PKG_DESCRIPTION=".NET 9.0"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
-TERMUX_PKG_VERSION="9.0.12"
-_DOTNET_SDK_VERSION="9.0.113"
+TERMUX_PKG_VERSION="9.0.13"
+_DOTNET_SDK_VERSION="9.0.114"
 TERMUX_PKG_SRCURL=git+https://github.com/dotnet/dotnet
 TERMUX_PKG_GIT_BRANCH="v${_DOTNET_SDK_VERSION}"
 TERMUX_PKG_BUILD_DEPENDS="krb5, libicu, openssl, zlib"
@@ -183,7 +183,8 @@ termux_step_make() {
 		-- \
 		/p:Configuration=${CONFIG} \
 		/p:TargetArchitecture=${arch} \
-		/p:TargetRid=linux-bionic-${arch}; then
+		/p:TargetRid=linux-bionic-${arch} \
+		/p:FeatureEventTrace=0; then
 		echo "ERROR: Build failed" >&2
 		termux_dotnet_kill
 		termux_step_post_make_install
