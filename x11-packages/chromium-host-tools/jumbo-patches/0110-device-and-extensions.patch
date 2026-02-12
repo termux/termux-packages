@@ -1352,3 +1352,89 @@ index fa5a6c1c2f..5c0681f071 100644
  }  // namespace extensions
 +
 +#undef kCancelReason
+--- a/chrome/browser/extensions/api/developer_private/developer_private_functions.cc
++++ b/chrome/browser/extensions/api/developer_private/developer_private_functions.cc
+@@ -2297,10 +2297,10 @@
+ 
+   // Directory url is non empty only for syncfilesystem.
+   if (!directory_url_str.empty()) {
+-    storage::FileSystemURL directory_url =
++    ::storage::FileSystemURL directory_url =
+         context_->CrackURLInFirstPartyContext(GURL(directory_url_str));
+     if (!directory_url.is_valid() ||
+-        directory_url.type() != storage::kFileSystemTypeSyncable) {
++        directory_url.type() != ::storage::kFileSystemTypeSyncable) {
+       return RespondNow(Error("DirectoryEntry of unsupported filesystem."));
+     }
+     return LoadByFileSystemAPI(directory_url);
+@@ -2318,19 +2318,19 @@
+   // points to a non-native local directory.
+   std::string filesystem_id;
+   bool cracked =
+-      storage::CrackIsolatedFileSystemName(filesystem_name, &filesystem_id);
++      ::storage::CrackIsolatedFileSystemName(filesystem_name, &filesystem_id);
+   CHECK(cracked);
+   base::FilePath virtual_path =
+-      storage::IsolatedContext::GetInstance()
++      ::storage::IsolatedContext::GetInstance()
+           ->CreateVirtualRootPath(filesystem_id)
+           .Append(base::FilePath::FromUTF8Unsafe(filesystem_path));
+-  storage::FileSystemURL directory_url = context_->CreateCrackedFileSystemURL(
++  ::storage::FileSystemURL directory_url = context_->CreateCrackedFileSystemURL(
+       blink::StorageKey::CreateFirstParty(extension()->origin()),
+-      storage::kFileSystemTypeIsolated, virtual_path);
++      ::storage::kFileSystemTypeIsolated, virtual_path);
+ 
+   if (directory_url.is_valid() &&
+-      directory_url.type() != storage::kFileSystemTypeLocal &&
+-      directory_url.type() != storage::kFileSystemTypeDragged) {
++      directory_url.type() != ::storage::kFileSystemTypeLocal &&
++      directory_url.type() != ::storage::kFileSystemTypeDragged) {
+     return LoadByFileSystemAPI(directory_url);
+   }
+ 
+@@ -2340,7 +2340,7 @@
+ 
+ ExtensionFunction::ResponseAction
+ DeveloperPrivateLoadDirectoryFunction::LoadByFileSystemAPI(
+-    const storage::FileSystemURL& directory_url) {
++    const ::storage::FileSystemURL& directory_url) {
+   std::string directory_url_str = directory_url.ToGURL().spec();
+ 
+   size_t pos = 0;
+@@ -2396,7 +2396,7 @@
+     const base::FilePath& project_path,
+     const base::FilePath& destination_path) {
+   GURL project_url = GURL(project_base_url_ + destination_path.AsUTF8Unsafe());
+-  storage::FileSystemURL url =
++  ::storage::FileSystemURL url =
+       context_->CrackURLInFirstPartyContext(project_url);
+ 
+   context_->operation_runner()->ReadDirectory(
+@@ -2409,7 +2409,7 @@
+     const base::FilePath& project_path,
+     const base::FilePath& destination_path,
+     base::File::Error status,
+-    storage::FileSystemOperation::FileEntryList file_list,
++    ::storage::FileSystemOperation::FileEntryList file_list,
+     bool has_more) {
+   if (status != base::File::FILE_OK) {
+     DLOG(ERROR) << "Error in copying files from sync filesystem.";
+@@ -2434,7 +2434,7 @@
+ 
+     GURL project_url = GURL(project_base_url_ +
+                             destination_path.Append(file.name).AsUTF8Unsafe());
+-    storage::FileSystemURL url =
++    ::storage::FileSystemURL url =
+         context_->CrackURLInFirstPartyContext(project_url);
+ 
+     base::FilePath target_path = project_path;
+@@ -2466,7 +2466,7 @@
+     base::File::Error result,
+     const base::File::Info& file_info,
+     const base::FilePath& src_path,
+-    scoped_refptr<storage::ShareableFileReference> file_ref) {
++    scoped_refptr<::storage::ShareableFileReference> file_ref) {
+   if (result != base::File::FILE_OK) {
+     error_ = "Error in copying files from sync filesystem.";
+     success_ = false;
