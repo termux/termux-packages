@@ -73,7 +73,11 @@ runs:
         sudo cp scripts/zram.ko.zst ${{ steps.kernel-info.outputs.modules_dir }}/kernel/
         sudo depmod
         sudo modprobe zram
-        sudo zramctl ${{ inputs.device_name }} --algorithm ${{ inputs.algorithm }} --size ${{ inputs.size }}
+        set +e
+        sudo swapoff ${{ inputs.device_name }} || true
+        sudo zramctl --reset ${{ inputs.device_name }} || true
+        set -e
+        sudo zramctl --find --algorithm ${{ inputs.algorithm }} --size ${{ inputs.size }}
         sudo mkswap -U clear ${{ inputs.device_name }}
         sudo swapon --discard --priority ${{ inputs.priority }} ${{ inputs.device_name }}
 
