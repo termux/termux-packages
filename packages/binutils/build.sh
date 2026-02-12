@@ -55,26 +55,19 @@ export LEXLIB=
 
 termux_step_pre_configure() {
 	export CPPFLAGS="$CPPFLAGS -Wno-c++11-narrowing"
-	# llvm upgraded a warning to an error, which caused this build (and some
-	# others, including the rust toolchain) to fail like so:
-	#
-	# ld.lld: error: version script assignment of 'LIBCTF_1.0' to symbol 'ctf_label_set' failed: symbol not defined
-	# ld.lld: error: version script assignment of 'LIBCTF_1.0' to symbol 'ctf_label_get' failed: symbol not defined
-	# These flags restore it to a warning.
-	# https://reviews.llvm.org/D135402
-	export LDFLAGS="$LDFLAGS -Wl,--undefined-version"
 
-	if (( TERMUX_ARCH_BITS == 32 )); then
-		export LIB_PATH="${TERMUX_PREFIX}/lib:/system/lib"
-	else
-		export LIB_PATH="${TERMUX_PREFIX}/lib:/system/lib64"
+	LIB_PATH="${TERMUX_PREFIX}/lib:/system/lib"
+	if (( TERMUX_ARCH_BITS == 64 )); then
+		LIB_PATH+="64"
 	fi
+
+	export LIB_PATH
 }
 
 termux_step_post_make_install() {
-	local d=$TERMUX_PREFIX/share/binutils
-	mkdir -p "$d"
-	touch "$d/.placeholder"
+	local dir="$TERMUX_PREFIX/share/binutils"
+	mkdir -p "$dir"
+	touch "$dir/.placeholder"
 
 	mkdir -p "$TERMUX_PREFIX/bin"
 	cd "$TERMUX_PREFIX/libexec/binutils" || termux_error_exit "failed to change into 'libexec/binutils' directory"
@@ -83,17 +76,18 @@ termux_step_post_make_install() {
 	ln -sf ld{,.bfd}
 	ln -sfr "$TERMUX_PREFIX/libexec/binutils/ld" "$TERMUX_PREFIX/bin/ld.bfd"
 
-	for b in ./*; do
-		ln -sfr "$TERMUX_PREFIX/libexec/binutils/$b" \
-			"$TERMUX_PREFIX/bin/$b"
+	local bin
+	for bin in ./*; do
+		ln -sfr "$TERMUX_PREFIX/libexec/binutils/$bin" \
+			"$TERMUX_PREFIX/bin/$bin"
 	done
 
 	# Setup symlinks as these are used when building, so used by
 	# system setup in e.g. python, perl and libtool:
 	local -a _TOOLS_WITH_HOST_PREFIX=("ar" "ld" "nm" "objdump" "ranlib" "readelf" "strip")
-	for b in "${_TOOLS_WITH_HOST_PREFIX[@]}"; do
-		ln -sfr "$TERMUX_PREFIX/libexec/binutils/$b" \
-			"$TERMUX_PREFIX/bin/$TERMUX_HOST_PLATFORM-$b"
+	for bin in "${_TOOLS_WITH_HOST_PREFIX[@]}"; do
+		ln -sfr "$TERMUX_PREFIX/libexec/binutils/$bin" \
+			"$TERMUX_PREFIX/bin/$TERMUX_HOST_PLATFORM-$bin"
 	done
 }
 
