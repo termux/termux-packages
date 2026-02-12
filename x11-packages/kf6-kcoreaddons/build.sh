@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Utilities for core application functionality and accessi
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.23.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kcoreaddons-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=2d04a92df724571735d6afcb3bbd90bf3102a071c12e302a98ace3d9c49c323d
 TERMUX_PKG_AUTO_UPDATE=true
