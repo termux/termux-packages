@@ -7,7 +7,7 @@ https://gitlab.freedesktop.org/mesa/mesa/-/issues/13036
 
 --- a/src/freedreno/common/freedreno_devices.py
 +++ b/src/freedreno/common/freedreno_devices.py
-@@ -1065,6 +1065,42 @@ add_gpus([
+@@ -1171,6 +1171,46 @@ add_gpus([
          raw_magic_regs = a730_raw_magic_regs,
      ))
  
@@ -20,6 +20,8 @@ https://gitlab.freedesktop.org/mesa/mesa/-/issues/13036
 +        num_ccu = 4,
 +        tile_align_w = 64,
 +        tile_align_h = 32,
++        tile_max_w = 1024,
++        tile_max_h = 1024,
 +        num_vsc_pipes = 32,
 +        cs_shared_mem_size = 32 * 1024,
 +        wave_granularity = 2,
@@ -38,6 +40,8 @@ https://gitlab.freedesktop.org/mesa/mesa/-/issues/13036
 +        num_ccu = 4,
 +        tile_align_w = 64,
 +        tile_align_h = 32,
++        tile_max_w = 1024,
++        tile_max_h = 1024,
 +        num_vsc_pipes = 32,
 +        cs_shared_mem_size = 32 * 1024,
 +        wave_granularity = 2,
@@ -52,9 +56,9 @@ https://gitlab.freedesktop.org/mesa/mesa/-/issues/13036
          GPUId(chip_id=0xffff07030001, name="FD730"), # Default no-speedbin fallback
 --- a/src/freedreno/drm-shim/freedreno_noop.c
 +++ b/src/freedreno/drm-shim/freedreno_noop.c
-@@ -237,6 +237,16 @@ static const struct msm_device_info device_infos[] = {
-       .chip_id = CHIPID(6, 6, 0, 0xff),
-       .gmem_size = 1024 * 1024 + 512 * 1024,
+@@ -261,6 +261,16 @@ static const struct msm_device_info device_infos[] = {
+       .chip_id = 0x00b207002000,
+       .gmem_size = 128 * 1024,
     },
 +   {
 +      .gpu_id = 710
