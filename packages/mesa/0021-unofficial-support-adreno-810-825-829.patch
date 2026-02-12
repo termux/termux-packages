@@ -1,0 +1,168 @@
+freedreno: enable Adreno 810+825+829
+
+The source code is from whitebelyash:
+https://github.com/whitebelyash/mesa-tu8/commit/cce699c8b5423adf1ad60335356408767c6971aa
+https://github.com/whitebelyash/mesa-tu8/commit/6422f965fa26c384a139aa8e070ac37e5a4b3e96
+https://github.com/whitebelyash/mesa-tu8/commit/16ada8f7816b9dcfb678136f48036880699027b3
+
+diff --git a/src/freedreno/common/freedreno_devices.py b/src/freedreno/common/freedreno_devices.py
+index 5cbd5d11504..ebeaab440a4 100644
+--- a/src/freedreno/common/freedreno_devices.py
++++ b/src/freedreno/common/freedreno_devices.py
+@@ -1505,6 +1505,62 @@ a8xx_gen2 = GPUProps(
+         has_salu_int_narrowing_quirk = True
+ )
+ 
++a8xx_825 = GPUProps(
++        sysmem_vpc_attr_buf_size = 131072,
++        sysmem_vpc_pos_buf_size = 65536,
++        sysmem_vpc_bv_pos_buf_size = 32768,
++        sysmem_ccu_color_cache_fraction = CCUColorCacheFraction.FULL.value,
++        sysmem_per_ccu_color_cache_size = 128 * 1024,
++        sysmem_ccu_depth_cache_fraction = CCUColorCacheFraction.THREE_QUARTER.value,
++        sysmem_per_ccu_depth_cache_size = 96 * 1024, # TODO: check if 128 works too
++        gmem_vpc_attr_buf_size = 49152,
++        gmem_vpc_pos_buf_size = 24576,
++        gmem_vpc_bv_pos_buf_size = 32768,
++        gmem_ccu_color_cache_fraction = CCUColorCacheFraction.EIGHTH.value,
++        gmem_per_ccu_color_cache_size = 16 * 1024,
++        gmem_ccu_depth_cache_fraction = CCUColorCacheFraction.FULL.value,
++        gmem_per_ccu_depth_cache_size = 127 * 1024,
++)
++
++a8xx_810 = GPUProps(
++        sysmem_vpc_attr_buf_size = 131072,
++        sysmem_vpc_pos_buf_size = 65536,
++        sysmem_vpc_bv_pos_buf_size = 32768,
++        # These values are maximum size of depth/color cache for current A8XX Gen2 sysmem configuration
++        # Bigger values cause an integer underflow in freedreno gmem calculations
++        sysmem_ccu_color_cache_fraction = CCUColorCacheFraction.FULL.value,
++        sysmem_per_ccu_color_cache_size = 32 * 1024,
++        sysmem_ccu_depth_cache_fraction = CCUColorCacheFraction.THREE_QUARTER.value,
++        sysmem_per_ccu_depth_cache_size = 32 * 1024,
++        gmem_vpc_attr_buf_size = 49152,
++        gmem_vpc_pos_buf_size = 24576,
++        gmem_vpc_bv_pos_buf_size = 32768,
++        gmem_ccu_color_cache_fraction = CCUColorCacheFraction.EIGHTH.value,
++        gmem_per_ccu_color_cache_size = 16 * 1024,
++        gmem_ccu_depth_cache_fraction = CCUColorCacheFraction.FULL.value,
++        gmem_per_ccu_depth_cache_size = 64 * 1024,
++        # FD810 does not support ray tracing
++        has_ray_intersection = False,
++        has_sw_fuse = False,
++)
++
++a8xx_829 = GPUProps(
++        sysmem_vpc_attr_buf_size = 131072,
++        sysmem_vpc_pos_buf_size = 65536,
++        sysmem_vpc_bv_pos_buf_size = 32768,
++        sysmem_ccu_color_cache_fraction = CCUColorCacheFraction.FULL.value,
++        sysmem_per_ccu_color_cache_size = 128 * 1024,
++        sysmem_ccu_depth_cache_fraction = CCUColorCacheFraction.THREE_QUARTER.value,
++        sysmem_per_ccu_depth_cache_size = 96 * 1024,
++        gmem_vpc_attr_buf_size = 49152,
++        gmem_vpc_pos_buf_size = 24576,
++        gmem_vpc_bv_pos_buf_size = 32768,
++        gmem_ccu_color_cache_fraction = CCUColorCacheFraction.EIGHTH.value,
++        gmem_per_ccu_color_cache_size = 16 * 1024,
++        gmem_ccu_depth_cache_fraction = CCUColorCacheFraction.FULL.value,
++        gmem_per_ccu_depth_cache_size = 127 * 1024,
++)
++
+ # For a8xx, the chicken bit and most other non-ctx reg
+ # programming moves into the kernel, and what remains
+ # should be easier to share between devices
+@@ -1563,6 +1619,72 @@ add_gpus([
+         raw_magic_regs = a8xx_gen2_raw_magic_regs,
+     ))
+ 
++# gen8_6_0
++add_gpus([
++        GPUId(chip_id=0x44030000, name="FD825"),
++    ], A6xxGPUInfo(
++        CHIP.A8XX,
++        [a7xx_base, a7xx_gen3, a8xx_base, a8xx_825],
++        num_ccu = 4,
++        num_slices = 2,
++        tile_align_w = 64,
++        tile_align_h = 32,
++        tile_max_w = 16384,
++        tile_max_h = 16384,
++        num_vsc_pipes = 32,
++        cs_shared_mem_size = 32 * 1024,
++        wave_granularity = 2,
++        fibers_per_sp = 128 * 2 * 16,
++        magic_regs = dict(
++        ),
++        raw_magic_regs = a8xx_gen2_raw_magic_regs,
++    ))
++
++# gen8_3_0
++add_gpus([
++        GPUId(chip_id=0x44010000, name="FD810"),
++    ], A6xxGPUInfo(
++        CHIP.A8XX,
++        [a7xx_base, a7xx_gen3, a8xx_base, a8xx_810],
++        num_ccu = 2,
++        num_slices = 1,
++        tile_align_w = 64,
++        tile_align_h = 32,
++        tile_max_w = 16384,
++        tile_max_h = 16384,
++        num_vsc_pipes = 32,
++        cs_shared_mem_size = 32 * 1024,
++        wave_granularity = 2,
++        fibers_per_sp = 128 * 2 * 16,
++        magic_regs = dict(
++        ),
++        raw_magic_regs = a8xx_gen2_raw_magic_regs,
++    ))
++
++# TODO: Properly fill all values for this GPU
++# Very weird GPU, ugh..
++add_gpus([
++    GPUId(chip_id=0x44030A00, name="FD829"), # kgsl id???
++    GPUId(chip_id=0x44030A20, name="FD829"), # found by testing
++    GPUId(chip_id=0xffff44030A00, name="FD829"),
++    ], A6xxGPUInfo(
++        CHIP.A8XX,
++        [a7xx_base, a7xx_gen3, a8xx_base, a8xx_829,],
++        num_ccu = 4,
++        num_slices = 2,
++        tile_align_w = 64,
++        tile_align_h = 32,
++        tile_max_w = 16384,
++        tile_max_h = 16384,
++        num_vsc_pipes = 32,
++        cs_shared_mem_size = 32 * 1024,
++        wave_granularity = 2,
++        fibers_per_sp = 128 * 2 * 16,
++        magic_regs = dict(
++        ),
++        raw_magic_regs = a8xx_gen2_raw_magic_regs,
++    ))
++
+ add_gpus([
+         GPUId(chip_id=0xffff44050A31, name="Adreno (TM) 840"),
+     ], A6xxGPUInfo(
+diff --git a/src/freedreno/drm-shim/freedreno_noop.c b/src/freedreno/drm-shim/freedreno_noop.c
+index 73ac6162a04..8bc1dbde164 100644
+--- a/src/freedreno/drm-shim/freedreno_noop.c
++++ b/src/freedreno/drm-shim/freedreno_noop.c
+@@ -291,6 +291,16 @@ static const struct msm_device_info device_infos[] = {
+       .chip_id = 0x44050001,
+       .gmem_size = 12 * 1024 * 1024,
+    },
++   {
++      .gpu_id = 810,
++      .chip_id = 0x44010000,
++      .gmem_size = 576 * 1024,
++   },
++   {
++      .gpu_id = 829,
++      .chip_id = 0x44030A20,
++      .gmem_size = 2 * 1024 * 1024,
++   },
+ };
+ 
+ static void
