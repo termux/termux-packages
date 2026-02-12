@@ -1,0 +1,10 @@
+#!@TERMUX_PREFIX@/bin/env bash
+
+main="@MAIN@"
+
+mods="@TERMUX_PREFIX@/share/languagetool"
+for jar in "@TERMUX_PREFIX@/share/java/langugetool"/*.jar; do
+	mods=$mods:$jar
+done
+
+exec "${JAVA_HOME}/bin/java" -cp "$mods" "$main" "$@"
