@@ -1,0 +1,85 @@
+Modified based on Adreno 840, most features should work.
+
+--- a/src/freedreno/common/freedreno_devices.py
++++ b/src/freedreno/common/freedreno_devices.py
+@@ -1499,28 +1499,6 @@ a8xx_gen2 = GPUProps(
+         has_fs_tex_prefetch = False,
+ )
+ 
+-# Totally fake, just to get cffdump to work:
+-add_gpus([
+-        GPUId(chip_id=0x44050000, name="FD830"),
+-    ], A6xxGPUInfo(
+-        CHIP.A8XX,
+-        [a7xx_base, a7xx_gen3, a8xx_base],
+-        num_ccu = 6,
+-        num_slices = 3,
+-        tile_align_w = 64,
+-        tile_align_h = 32,
+-        tile_max_w = 16384,
+-        tile_max_h = 16384,
+-        num_vsc_pipes = 32,
+-        cs_shared_mem_size = 32 * 1024,
+-        wave_granularity = 2,
+-        fibers_per_sp = 128 * 2 * 16,
+-        magic_regs = dict(
+-        ),
+-        raw_magic_regs = [
+-        ],
+-    ))
+-
+ # For a8xx, the chicken bit and most other non-ctx reg
+ # programming moves into the kernel, and what remains
+ # should be easier to share between devices
+@@ -1555,6 +1533,29 @@ a8xx_gen2_raw_magic_regs = [
+         [A6XXRegs.REG_A8XX_PC_MODE_CNTL,    0x00003f00],
+     ]
+ 
++# Modified based on Adreno 840, most features should work
++add_gpus([
++        GPUId(chip_id=0x44050000, name="FD830"),
++        GPUId(chip_id=0xffff44050001, name="Adreno (TM) 830"),
++    ], A6xxGPUInfo(
++        CHIP.A8XX,
++        [a7xx_base, a7xx_gen3, a8xx_base, a8xx_gen2,
++         GPUProps(shading_rate_matches_vk = True)],
++        num_ccu = 6,
++        num_slices = 3,
++        tile_align_w = 96,
++        tile_align_h = 32,
++        tile_max_w = 16416,
++        tile_max_h = 16384,
++        num_vsc_pipes = 32,
++        cs_shared_mem_size = 32 * 1024,
++        wave_granularity = 2,
++        fibers_per_sp = 128 * 2 * 16,
++        magic_regs = dict(
++        ),
++        raw_magic_regs = a8xx_gen2_raw_magic_regs,
++    ))
++
+ add_gpus([
+         GPUId(chip_id=0xffff44050A31, name="Adreno (TM) 840"),
+     ], A6xxGPUInfo(
+--- a/src/freedreno/drm-shim/freedreno_noop.c
++++ b/src/freedreno/drm-shim/freedreno_noop.c
+@@ -288,7 +288,7 @@ static const struct msm_device_info device_infos[] = {
+    },
+    {
+       .gpu_id = 830,
+-      .chip_id = 0x44050000,
++      .chip_id = 0x44050001,
+       .gmem_size = 12 * 1024 * 1024,
+    },
+ };
+--- a/src/freedreno/ir3/tests/disasm.c
++++ b/src/freedreno/ir3/tests/disasm.c
+@@ -33,7 +33,7 @@
+ #define INSTR_6XX_RAW(i, d, ...) { .gpu_id = 630, .instr = NULL, .instr_raw = i, .expected = d, __VA_ARGS__ }
+ #define INSTR_7XX(i, d, ...) { .chip_id = 0x07030001, .instr = #i, .instr_raw = 0, .expected = d, __VA_ARGS__ }
+ #define INSTR_7XX_RAW(i, d, ...) { .chip_id = 0x07030001, .instr = NULL, .instr_raw = i, .expected = d, __VA_ARGS__ }
+-#define INSTR_8XX(i, d, ...) { .chip_id = 0x44050000, .instr = #i, .instr_raw = 0, .expected = d, __VA_ARGS__ }
++#define INSTR_8XX(i, d, ...) { .chip_id = 0x44050001, .instr = #i, .instr_raw = 0, .expected = d, __VA_ARGS__ }
+ /* clang-format on */
+ 
+ static const struct test {
