@@ -1,0 +1,21 @@
+`pthread_mutexattr_setprotocol` is introduced in Android 28.
+
+--- a/dlls/winepulse.drv/pulse.c
++++ b/dlls/winepulse.drv/pulse.c
+@@ -217,12 +217,16 @@
+ 
+ static NTSTATUS pulse_process_attach(void *args)
+ {
++#ifdef __ANDROID__
++    if (1)
++#else
+     pthread_mutexattr_t attr;
+ 
+     pthread_mutexattr_init(&attr);
+     pthread_mutexattr_setprotocol(&attr, PTHREAD_PRIO_INHERIT);
+ 
+     if (pthread_mutex_init(&pulse_mutex, &attr) != 0)
++#endif
+         pthread_mutex_init(&pulse_mutex, NULL);
+ 
+     return STATUS_SUCCESS;
