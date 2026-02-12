@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://mate-desktop.org/
-TERMUX_PKG_DESCRIPTION="Set of backgrounds packaged with the MATE desktop"
+TERMUX_PKG_DESCRIPTION="Utilities to configure the MATE desktop"
 TERMUX_PKG_LICENSE="GPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.28.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://github.com/mate-desktop/mate-control-center/releases/download/v$TERMUX_PKG_VERSION/mate-control-center-$TERMUX_PKG_VERSION.tar.xz"
 TERMUX_PKG_SHA256=e12d34c1c1f11e3d0a2ba2dd41bc1c997bf0d1d56486896756f6edaac5f9a9b2
 TERMUX_PKG_AUTO_UPDATE=true
