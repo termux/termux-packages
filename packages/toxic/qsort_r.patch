@@ -1,0 +1,29 @@
+diff --git a/src/misc_tools.c b/src/misc_tools.c
+index fcf0292..8479dee 100644
+--- a/src/misc_tools.c
++++ b/src/misc_tools.c
+@@ -307,6 +307,13 @@ static int qsort_r_compar_apple(void *thunk, const void *a, const void *b)
+     return data->compar(a, b, data->arg);
+ }
+ 
++#endif
++#ifdef __ANDROID__
++static struct qsort_r_data android_data;
++static int qsort_r_compar_android(const void *a,const void *b)
++{
++	return android_data.compar(a, b, android_data.arg);
++}
+ #endif
+ 
+ void toxic_qsort_r(void *base, size_t nmemb, size_t size,
+@@ -316,6 +323,10 @@ void toxic_qsort_r(void *base, size_t nmemb, size_t size,
+ #if defined(__APPLE__)
+     struct qsort_r_data data = { arg, compar };
+     qsort_r(base, nmemb, size, &data, qsort_r_compar_apple);
++#elif defined(__ANDROID__)
++    android_data.arg = arg;
++    android_data.compar = compar;
++    qsort(base, nmemb, size, qsort_r_compar_android);
+ #else
+     qsort_r(base, nmemb, size, compar, arg);
+ #endif
