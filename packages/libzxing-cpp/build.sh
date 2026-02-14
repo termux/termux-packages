@@ -12,3 +12,15 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DZXING_EXAMPLES=ON
 -DZXING_BLACKBOX_TESTS=OFF
 "
+
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=3
+
+	local _ver=$(sed -En 's/^set \(ZXING_SONAME\s+([0-9]+).*/\1/p' "$TERMUX_PKG_SRCDIR"/core/CMakeLists.txt)
+
+	if [[ ! "${_ver}" ]] || [[ "${_ver}" != "${_SOVERSION}" ]]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
