@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE='https://invent.kde.org/frameworks/kglobalaccel'
 TERMUX_PKG_DESCRIPTION='Add support for global workspace shortcuts'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.22.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="6.23.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kglobalaccel-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=332e3be3d0ac2aec8e786419c1e875a1b33ae84b8aada3283639deccc6ffd4d8
+TERMUX_PKG_SHA256=5760330e8aeb81542c44c94c26c109f74b7857c7c6b953d68d34e7079b6df70c
 TERMUX_PKG_DEPENDS="qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION%.*}), libc++, qt6-qttools"
 TERMUX_PKG_AUTO_UPDATE=true
