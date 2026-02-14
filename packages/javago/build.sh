@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=1.0
 TERMUX_PKG_SRCURL=https://github.com/GokuXZI/javago/archive/refs/tags/v1.0.tar.gz
 TERMUX_PKG_SHA256=SKIP_CHECKSUM
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_DEPENDS="openjdk"
 
 termux_step_make_install() {
     install -Dm700 javago $TERMUX_PREFIX/bin/javago
