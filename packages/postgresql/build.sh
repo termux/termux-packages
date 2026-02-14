@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Object-relational SQL database"
 TERMUX_PKG_LICENSE="PostgreSQL"
 TERMUX_PKG_LICENSE_FILE="COPYRIGHT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="18.1"
+TERMUX_PKG_VERSION="18.2"
 TERMUX_PKG_SRCURL=https://ftp.postgresql.org/pub/source/v$TERMUX_PKG_VERSION/postgresql-$TERMUX_PKG_VERSION.tar.bz2
-TERMUX_PKG_SHA256=ff86675c336c46e98ac991ebb306d1b67621ece1d06787beaade312c2c915d54
+TERMUX_PKG_SHA256=5245bd1b79700d55b8e0575be0325ef61e7bbef627e6a616e4cf36ad4687be36
 TERMUX_PKG_DEPENDS="libandroid-execinfo, libandroid-shmem, libicu, libuuid, libxml2, openssl, readline, zlib"
 # - pgac_cv_prog_cc_LDFLAGS_EX_BE__Wl___export_dynamic: Needed to fix PostgreSQL 16 that
 #   causes initdb failure: cannot locate symbol
