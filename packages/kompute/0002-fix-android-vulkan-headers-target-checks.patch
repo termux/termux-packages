@@ -1,0 +1,22 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 8805e84..3ec6e4e 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -90,7 +90,7 @@ if(KOMPUTE_OPT_BUILD_PYTHON)
+     target_link_libraries(kompute PRIVATE pybind11::headers ${PYTHON_LIBRARIES})
+ endif()
+ 
+-if(KOMPUTE_OPT_USE_BUILT_IN_VULKAN_HEADER)
++if(NOT KOMPUTE_OPT_ANDROID_BUILD AND KOMPUTE_OPT_USE_BUILT_IN_VULKAN_HEADER)
+     target_link_libraries(kompute PUBLIC Vulkan-Headers)
+ endif()
+ 
+@@ -104,7 +104,7 @@ if(KOMPUTE_OPT_INSTALL)
+         # include dir of kompute, which will fail definitely. Add EXCLUDE_FROM_ALL to avoid this bug.
+     endif ()
+ 
+-    if(KOMPUTE_OPT_USE_BUILT_IN_VULKAN_HEADER)
++    if(NOT KOMPUTE_OPT_ANDROID_BUILD AND KOMPUTE_OPT_USE_BUILT_IN_VULKAN_HEADER)
+         # We can't export Vulkan::Headers because it's alias target, so we unwrap the alias and install it.
+         get_target_property(vk_header_target Vulkan::Headers ALIASED_TARGET)
+ 

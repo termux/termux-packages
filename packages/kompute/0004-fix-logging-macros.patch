@@ -1,0 +1,40 @@
+diff --git a/src/include/kompute/logger/Logger.hpp b/src/include/kompute/logger/Logger.hpp
+index 451f28f..a84f68b 100644
+--- a/src/include/kompute/logger/Logger.hpp
++++ b/src/include/kompute/logger/Logger.hpp
+@@ -55,7 +55,7 @@
+       ANDROID_LOG_VERBOSE, KOMPUTE_LOG_TAG, fmt::format(__VA_ARGS__).c_str()))
+ #else
+ #if KOMPUTE_BUILD_PYTHON
+-#define KP_LOG_DEBUG(...) kp_trace(fmt::format(__VA_ARGS__))
++#define KP_LOG_TRACE(...) kp_trace(fmt::format(__VA_ARGS__))
+ #else
+ #define KP_LOG_TRACE(...)                                                      \
+     fmt::print("[{} {}] [trace] [{}:{}] {}\n",                                 \
+@@ -113,7 +113,7 @@
+       ANDROID_LOG_INFO, KOMPUTE_LOG_TAG, fmt::format(__VA_ARGS__).c_str()))
+ #else
+ #if KOMPUTE_BUILD_PYTHON
+-#define KP_LOG_DEBUG(...) kp_info(fmt::format(__VA_ARGS__))
++#define KP_LOG_INFO(...) kp_info(fmt::format(__VA_ARGS__))
+ #else
+ #define KP_LOG_INFO(...)                                                       \
+     fmt::print("[{} {}] [info] [{}:{}] {}\n",                                  \
+@@ -137,7 +137,7 @@
+       ANDROID_LOG_WARN, KOMPUTE_LOG_TAG, fmt::format(__VA_ARGS__).c_str()))
+ #else
+ #if KOMPUTE_BUILD_PYTHON
+-#define KP_LOG_DEBUG(...) kp_warning(fmt::format(__VA_ARGS__))
++#define KP_LOG_WARN(...) kp_warning(fmt::format(__VA_ARGS__))
+ #else
+ #define KP_LOG_WARN(...)                                                       \
+     fmt::print("[{} {}] [warn] [{}:{}] {}\n",                                  \
+@@ -161,7 +161,7 @@
+       ANDROID_LOG_ERROR, KOMPUTE_LOG_TAG, fmt::format(__VA_ARGS__).c_str()))
+ #else
+ #if KOMPUTE_BUILD_PYTHON
+-#define KP_LOG_DEBUG(...) kp_error(fmt::format(__VA_ARGS__))
++#define KP_LOG_ERROR(...) kp_error(fmt::format(__VA_ARGS__))
+ #else
+ #define KP_LOG_ERROR(...)                                                      \
+     fmt::print("[{} {}] [error] [{}:{}] {}\n",                                 \
