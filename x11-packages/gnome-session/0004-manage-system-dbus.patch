@@ -1,0 +1,26 @@
+--- a/gnome-session/main.c
++++ b/gnome-session/main.c
+@@ -518,6 +518,23 @@ main (int argc, char **argv)
+                 gsm_util_init_error (TRUE, "%s", error->message);
+         }
+ 
++        /* Termux gnome-session: Start dbus-daemon --system first before anything */
++        {
++            const char *pid_file = "@TERMUX_PREFIX@/var/run/dbus/pid";
++            FILE *f = fopen (pid_file, "r");
++            if (f) {
++                int pid = 0;
++                if (fscanf (f, "%d", &pid) == 1 && pid > 0) {
++                     g_message ("Termux gnome-session: Killing stale system dbus-daemon (pid %d)", pid);
++                     kill (pid, SIGTERM);
++                }
++                fclose (f);
++            }
++            remove (pid_file);
++            g_message ("Termux gnome-session: starting system dbus-daemon...");
++            system ("dbus-daemon --system --fork");
++        }
++
+         /* From 3.14 GDM sets XDG_CURRENT_DESKTOP. For compatibility with
+          * older versions of GDM,  other display managers, and startx,
+          * set a fallback value if we don't find it set.

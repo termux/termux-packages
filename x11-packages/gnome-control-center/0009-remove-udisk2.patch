@@ -1,0 +1,64 @@
+diff --git a/panels/system/about/cc-system-details-window.c b/panels/system/about/cc-system-details-window.c
+index 05c87f5..f8a3f96 100644
+--- a/panels/system/about/cc-system-details-window.c
++++ b/panels/system/about/cc-system-details-window.c
+@@ -33,7 +33,11 @@
+ #include <glibtop/mountlist.h>
+ #include <glibtop/mem.h>
+ #include <glibtop/sysinfo.h>
++
++#ifdef HAVE__UDISK2
+ #include <udisks/udisks.h>
++#endif
++
+ #ifdef HAVE_UDEV
+ #include <gudev/gudev.h>
+ #endif
+@@ -351,12 +355,13 @@ get_os_type (void)
+ {
+   if (GLIB_SIZEOF_VOID_P == 8)
+     /* translators: This is the type of architecture for the OS */
+-    return g_strdup_printf (_("64-bit"));
++    return g_strdup_printf ("%s", _("64-bit"));
+   else
+     /* translators: This is the type of architecture for the OS */
+-    return g_strdup_printf (_("32-bit"));
++    return g_strdup_printf ("%s", _("32-bit"));
+ }
+ 
++#ifdef HAVE__UDISK2
+ char *
+ get_primary_disk_info (void)
+ {
+@@ -401,6 +406,15 @@ get_primary_disk_info (void)
+ 
+   return NULL;
+ }
++#else
++char *
++get_primary_disk_info (void)
++{
++  /* UDisks2 not available, return NULL or some default value */
++  g_warning("UDisks2 is not available. Disk information will not be available.");
++  return NULL;
++}
++#endif
+ 
+ char *
+ get_hardware_model_string (void)
+diff --git a/panels/system/meson.build b/panels/system/meson.build
+index b8b06b9..bbc7b8b 100644
+--- a/panels/system/meson.build
++++ b/panels/system/meson.build
+@@ -64,8 +64,9 @@ sources += gnome.mkenums_simple(
+ libsecret_dep = dependency('libsecret-1')
+ gnutls_dep = dependency('gnutls')
+ libgtop2 = dependency('libgtop-2.0')
+-udisks2 = dependency('udisks2', version: '>= 2.8.2')
+-
++udisks2 = dependency('udisks2', version: '>= 2.8.2', required: false)
++config_h.set('HAVE__UDISK2', udisks2.found(),
++             description: 'Build with udisk2')
+ # Kerberos support
+ krb_dep = dependency('krb5', required: false)
+ assert(krb_dep.found(), 'kerberos libraries not found in your path')

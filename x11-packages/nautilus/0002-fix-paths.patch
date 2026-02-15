@@ -1,0 +1,186 @@
+From 27516506261ce834974e6efa54fcfa5b42685a0b Mon Sep 17 00:00:00 2001
+From: Md Arif <111168803+sabamdarif@users.noreply.github.com>
+Date: Thu, 10 Jul 2025 12:42:34 +0530
+Subject: [PATCH] fix paths
+
+---
+ data/check-potfiles.sh                         |  2 +-
+ data/lineup-parameters                         |  2 +-
+ .../display/test-nautilus-directory-async.c    |  2 +-
+ test/automated/displayless/test-directory.c    | 14 +++++++-------
+ .../automated/displayless/test-file-metadata.c |  2 +-
+ ...file-utilities-get-common-filename-prefix.c |  2 +-
+ test/automated/displayless/test-file.c         | 18 +++++++++---------
+ 7 files changed, 21 insertions(+), 21 deletions(-)
+
+--- a/build-aux/check-potfiles.sh
++++ b/build-aux/check-potfiles.sh
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env bash
++#!@TERMUX_PREFIX@/bin/bash
+ 
+ srcdirs="eel extensions src libnautilus-extension"
+ uidirs="src/resources/ui src/gtk"
+--- a/build-aux/lineup-parameters
++++ b/build-aux/lineup-parameters
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python3
++#!@TERMUX_PREFIX@/bin/python3
+ #
+ # Copyright © 2019 Michael Catanzaro <mcatanzaro@gnome.org>
+ #
+diff --git a/test/automated/display/test-nautilus-directory-async.c b/test/automated/display/test-nautilus-directory-async.c
+index a4dc24e..4f27c78 100644
+--- a/test/automated/display/test-nautilus-directory-async.c
++++ b/test/automated/display/test-nautilus-directory-async.c
+@@ -68,7 +68,7 @@ main (int    argc,
+ 
+     if (argv[1] == NULL)
+     {
+-        uri = "file:///tmp";
++        uri = "file://@TERMUX_PREFIX@/tmp";
+     }
+     else
+     {
+diff --git a/test/automated/displayless/test-directory.c b/test/automated/displayless/test-directory.c
+index 886bad7..ef3b22d 100644
+--- a/test/automated/displayless/test-directory.c
++++ b/test/automated/displayless/test-directory.c
+@@ -12,19 +12,19 @@ static int data_dummy;
+ static void
+ test_directory_duplicate_pointers (void)
+ {
+-    g_autoptr (NautilusDirectory) directory = nautilus_directory_get_by_uri ("file:///etc");
+-    g_autoptr (NautilusFile) file = nautilus_file_get_by_uri ("file:///etc/passwd");
++    g_autoptr (NautilusDirectory) directory = nautilus_directory_get_by_uri ("file://@TERMUX_PREFIX@/etc");
++    g_autoptr (NautilusFile) file = nautilus_file_get_by_uri ("file://@TERMUX_PREFIX@/etc/passwd");
+ 
+     /* Assert that the NautilusFile reuses the existing NautilusDirectory instance.. */
+     g_assert_cmpuint (nautilus_directory_number_outstanding (), ==, 1);
+ 
+-    g_assert_true (nautilus_directory_get_by_uri ("file:///etc") == directory);
++    g_assert_true (nautilus_directory_get_by_uri ("file://@TERMUX_PREFIX@/etc") == directory);
+     nautilus_directory_unref (directory);
+ 
+-    g_assert_true (nautilus_directory_get_by_uri ("file:///etc/") == directory);
++    g_assert_true (nautilus_directory_get_by_uri ("file://@TERMUX_PREFIX@/etc/") == directory);
+     nautilus_directory_unref (directory);
+ 
+-    g_assert_true (nautilus_directory_get_by_uri ("file:///etc////") == directory);
++    g_assert_true (nautilus_directory_get_by_uri ("file://@TERMUX_PREFIX@/etc////") == directory);
+     nautilus_directory_unref (directory);
+ }
+ 
+@@ -32,7 +32,7 @@ test_directory_duplicate_pointers (void)
+ static void
+ test_directory_hash_table_cleanup (void)
+ {
+-    NautilusDirectory *directory = nautilus_directory_get_by_uri ("file:///etc");
++    NautilusDirectory *directory = nautilus_directory_get_by_uri ("file://@TERMUX_PREFIX@/etc");
+ 
+     g_assert_cmpuint (nautilus_directory_number_outstanding (), ==, 1);
+ 
+@@ -68,7 +68,7 @@ got_files_callback (NautilusDirectory *directory,
+ static void
+ test_directory_call_when_ready (void)
+ {
+-    g_autoptr (NautilusDirectory) directory = nautilus_directory_get_by_uri ("file:///etc");
++    g_autoptr (NautilusDirectory) directory = nautilus_directory_get_by_uri ("file://@TERMUX_PREFIX@/etc");
+     g_assert_cmpuint (nautilus_directory_number_outstanding (), ==, 1);
+ 
+     got_files_flag = FALSE;
+diff --git a/test/automated/displayless/test-file-metadata.c b/test/automated/displayless/test-file-metadata.c
+index 86aadc8..342cbe1 100644
+--- a/test/automated/displayless/test-file-metadata.c
++++ b/test/automated/displayless/test-file-metadata.c
+@@ -4,7 +4,7 @@
+ #include <nautilus-file-utilities.h>
+ #include <nautilus-metadata.h>
+ 
+-static const char *TEST_FILE = "file:///etc/passwd";
++static const char *TEST_FILE = "file://@TERMUX_PREFIX@/etc/passwd";
+ static const char *KEY_BOOL = NAUTILUS_METADATA_KEY_ICON_VIEW_SORT_REVERSED;
+ static const char *KEY_STR = NAUTILUS_METADATA_KEY_ICON_VIEW_SORT_BY;
+ 
+diff --git a/test/automated/displayless/test-file-utilities-get-common-filename-prefix.c b/test/automated/displayless/test-file-utilities-get-common-filename-prefix.c
+index 186ec91..4c15efa 100644
+--- a/test/automated/displayless/test-file-utilities-get-common-filename-prefix.c
++++ b/test/automated/displayless/test-file-utilities-get-common-filename-prefix.c
+@@ -363,7 +363,7 @@ get_files_for_names (const GStrv files_names)
+     for (gsize i = 0; i < len; i++)
+     {
+         gchar *name = files_names[i];
+-        g_autofree gchar *uri = g_strconcat ("file:///", name, NULL);
++        g_autofree gchar *uri = g_strconcat ("file://@TERMUX_PREFIX@/", name, NULL);
+         NautilusFile *file = nautilus_file_get_by_uri (uri);
+ 
+         if (name[strlen (name) - 1] == G_DIR_SEPARATOR)
+diff --git a/test/automated/displayless/test-file.c b/test/automated/displayless/test-file.c
+index 1dfba7f..01c2516 100644
+--- a/test/automated/displayless/test-file.c
++++ b/test/automated/displayless/test-file.c
+@@ -11,7 +11,7 @@ test_file_refcount_single_file (void)
+ {
+     g_assert_cmpint (nautilus_directory_number_outstanding (), ==, 0);
+ 
+-    NautilusFile *file = nautilus_file_get_by_uri ("file:///home/");
++    NautilusFile *file = nautilus_file_get_by_uri ("file://@TERMUX_HOME@/");
+ 
+     g_assert_cmpint (G_OBJECT (file)->ref_count, ==, 1);
+     g_assert_cmpint (G_OBJECT (file->details->directory)->ref_count, ==, 1);
+@@ -25,7 +25,7 @@ test_file_refcount_single_file (void)
+ static void
+ test_file_check_name_bland (void)
+ {
+-    g_autoptr (NautilusFile) file = nautilus_file_get_by_uri ("file:///home");
++    g_autoptr (NautilusFile) file = nautilus_file_get_by_uri ("file://@TERMUX_HOME@/");
+     const char *name = nautilus_file_get_name (file);
+     g_assert_cmpstr (name, ==, "home");
+ }
+@@ -33,7 +33,7 @@ test_file_check_name_bland (void)
+ static void
+ test_file_check_name_trailing_slash (void)
+ {
+-    g_autoptr (NautilusFile) file = nautilus_file_get_by_uri ("file:///home/");
++    g_autoptr (NautilusFile) file = nautilus_file_get_by_uri ("file://@TERMUX_HOME@/");
+     const char *name = nautilus_file_get_name (file);
+     g_assert_cmpstr (name, ==, "home");
+ }
+@@ -41,20 +41,20 @@ test_file_check_name_trailing_slash (void)
+ static void
+ test_file_duplicate_pointers (void)
+ {
+-    g_autoptr (NautilusFile) file = nautilus_file_get_by_uri ("file:///home/");
++    g_autoptr (NautilusFile) file = nautilus_file_get_by_uri ("file://@TERMUX_HOME@/");
+ 
+-    g_assert_true (nautilus_file_get_by_uri ("file:///home/") == file);
++    g_assert_true (nautilus_file_get_by_uri ("file://@TERMUX_HOME@/") == file);
+     nautilus_file_unref (file);
+ 
+-    g_assert_true (nautilus_file_get_by_uri ("file:///home") == file);
++    g_assert_true (nautilus_file_get_by_uri ("file://@TERMUX_HOME@") == file);
+     nautilus_file_unref (file);
+ }
+ 
+ static void
+ test_file_sort_order (void)
+ {
+-    g_autoptr (NautilusFile) file_1 = nautilus_file_get_by_uri ("file:///etc");
+-    g_autoptr (NautilusFile) file_2 = nautilus_file_get_by_uri ("file:///usr");
++    g_autoptr (NautilusFile) file_1 = nautilus_file_get_by_uri ("file://@TERMUX_PREFIX@/etc");
++    g_autoptr (NautilusFile) file_2 = nautilus_file_get_by_uri ("file://@TERMUX_PREFIX@");
+     NautilusFileSortType sort_type = NAUTILUS_FILE_SORT_BY_DISPLAY_NAME;
+ 
+     g_assert_cmpint (G_OBJECT (file_1)->ref_count, ==, 1);
+@@ -70,7 +70,7 @@ test_file_sort_order (void)
+ static void
+ test_file_sort_with_self (void)
+ {
+-    g_autoptr (NautilusFile) file_1 = nautilus_file_get_by_uri ("file:///etc");
++    g_autoptr (NautilusFile) file_1 = nautilus_file_get_by_uri ("file://@TERMUX_PREFIX@/etc");
+     NautilusFileSortType sort_type = NAUTILUS_FILE_SORT_BY_DISPLAY_NAME;
+     int order;
+ 
+-- 
+2.48.1
+
