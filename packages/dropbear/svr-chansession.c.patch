@@ -1,5 +1,5 @@
 +++ ./src/svr-chansession.c
-@@ -608,7 +608,7 @@
+@@ -612,7 +612,7 @@
  		dropbear_exit("Out of memory"); /* TODO disconnect */
  	}
  
@@ -8,7 +8,7 @@
  	if (!pw)
  		dropbear_exit("getpwnam failed after succeeding previously");
  	pty_setowner(pw, chansess->tty);
-@@ -965,6 +965,8 @@
+@@ -973,6 +973,8 @@
  #endif
  
  	/* clear environment if -e was not set */
@@ -17,16 +17,14 @@
  	/* if we're debugging using valgrind etc, we need to keep the LD_PRELOAD
  	 * etc. This is hazardous, so should only be used for debugging. */
  	if ( !svr_opts.pass_on_env) {
-@@ -979,6 +981,7 @@
+@@ -987,11 +989,14 @@
  #endif /* HAVE_CLEARENV */
  #endif /* DEBUG_VALGRIND */
  	}
 +#endif /* 0 */
  
- #if DROPBEAR_SVR_MULTIUSER
- 	/* We can only change uid/gid as root ... */
-@@ -1006,6 +1009,8 @@
- 	}
+ #if !DROPBEAR_SVR_DROP_PRIVS
+ 	svr_switch_user();
  #endif
  
 +	/* termux: do not modify environment since we did not clean it */
@@ -34,7 +32,7 @@
  	/* set env vars */
  	addnewvar("USER", ses.authstate.pw_name);
  	addnewvar("LOGNAME", ses.authstate.pw_name);
-@@ -1016,6 +1021,7 @@
+@@ -1002,6 +1007,7 @@
  	} else {
  		addnewvar("PATH", DEFAULT_PATH);
  	}

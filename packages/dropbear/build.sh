@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://matt.ucc.asn.au/dropbear/dropbear.html
 TERMUX_PKG_DESCRIPTION="Small SSH server and client"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2025.88"
+TERMUX_PKG_VERSION="2025.89"
 TERMUX_PKG_SRCURL=https://matt.ucc.asn.au/dropbear/releases/dropbear-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=783f50ea27b17c16da89578fafdb6decfa44bb8f6590e5698a4e4d3672dc53d4
+TERMUX_PKG_SHA256=0d1f7ca711cfc336dc8a85e672cab9cfd8223a02fe2da0a4a7aeb58c9e113634
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="termux-auth, zlib"
 TERMUX_PKG_SUGGESTS="openssh-sftp-server"
@@ -16,6 +16,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-syslog --disable-utmp --disable-utmpx
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_lib_crypt_crypt=no"
 # BIonic is special case, as usuas.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_htole64=yes"
+# setresgid() is blocked by Android for non-root users, so disable it
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_setresgid=no"
 # build a multi-call binary & enable progress info in 'scp'
 TERMUX_PKG_EXTRA_MAKE_ARGS="MULTI=1 SCPPROGRESS=1"
 
