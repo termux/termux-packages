@@ -1,0 +1,19 @@
+--- a/src/Manager.cpp
++++ b/src/Manager.cpp
+@@ -10,8 +10,8 @@
+ 
+ #ifndef KOMPUTE_DISABLE_VK_DEBUG_LAYERS
+ static VKAPI_ATTR VkBool32 VKAPI_CALL
+-debugMessageCallback(VkDebugReportFlagsEXT /*flags*/,
+-                     VkDebugReportObjectTypeEXT /*objectType*/,
++debugMessageCallback(vk::DebugReportFlagsEXT /*flags*/,
++                     vk::DebugReportObjectTypeEXT /*objectType*/,
+                      uint64_t /*object*/,
+                      size_t /*location*/,
+                      int32_t /*messageCode*/,
+@@ -263,3 +263,2 @@
+         vk::DebugReportCallbackCreateInfoEXT debugCreateInfo = {};
+-        debugCreateInfo.pfnCallback =
+-          (PFN_vkDebugReportCallbackEXT)debugMessageCallback;
++        debugCreateInfo.pfnCallback = debugMessageCallback;
+         debugCreateInfo.flags = debugFlags;

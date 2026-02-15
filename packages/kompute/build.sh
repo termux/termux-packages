@@ -1,0 +1,48 @@
+TERMUX_PKG_HOMEPAGE=https://kompute.cc
+TERMUX_PKG_DESCRIPTION="General purpose GPU compute framework built on Vulkan"
+TERMUX_PKG_LICENSE="Apache-2.0"
+TERMUX_PKG_MAINTAINER=@termux
+TERMUX_PKG_VERSION="0.9.0"
+TERMUX_PKG_SRCURL=https://github.com/KomputeProject/kompute/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=901f609029033f1b97de8189228229d25508408c9f7f1dda0e75b2fa632f3521
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_DEPENDS="libc++, vulkan-loader, python, pybind11, fmt, vulkan-headers"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_BUILD_TYPE=Release
+-DPYBIND11_FINDPYTHON=ON
+-DKOMPUTE_OPT_BUILD_TESTS=OFF
+-DKOMPUTE_OPT_BUILD_DOCS=OFF
+-DKOMPUTE_OPT_BUILD_PYTHON=ON
+-DKOMPUTE_OPT_BUILD_SINGLE_HEADER=OFF
+-DKOMPUTE_OPT_INSTALL=ON
+-DKOMPUTE_OPT_ANDROID_BUILD=OFF
+-DKOMPUTE_OPT_DISABLE_VK_DEBUG_LAYERS=OFF
+-DKOMPUTE_OPT_DISABLE_VULKAN_VERSION_CHECK=ON
+-DKOMPUTE_OPT_USE_BUILT_IN_VULKAN_HEADER=OFF
+-DKOMPUTE_OPT_USE_BUILT_IN_FMT=OFF
+-DKOMPUTE_OPT_USE_BUILT_IN_SPDLOG=OFF
+-DKOMPUTE_OPT_SPDLOG_ASYNC_MODE=ON
+-DKOMPUTE_OPT_USE_BUILT_IN_PYBIND11=OFF
+-DKOMPUTE_OPT_LOG_LEVEL=Info
+-DKOMPUTE_OPT_USE_SPDLOG=OFF
+-DKOMPUTE_OPT_BUILD_SHADERS=ON
+-DCMAKE_POLICY_VERSION_MINIMUM=3.5
+"
+
+termux_step_pre_configure() {
+        export PATH="$NDK/shader-tools/linux-x86_64:$PATH"
+        export CXXFLAGS="-Wno-deprecated-literal-operator -include pthread.h $CXXFLAGS"
+        
+        # Set Vulkan library and include paths
+	# Use prefix path for on-device builds, sysroot for cross-compilation
+	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "true" ]]; then
+		local _libvulkan="${TERMUX_PREFIX}/lib/libvulkan.so"
+	else
+		local _libvulkan="${TERMUX_STANDALONE_TOOLCHAIN}/sysroot/usr/lib/${TERMUX_HOST_PLATFORM}/${TERMUX_PKG_API_LEVEL}/libvulkan.so"
+	fi
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DVulkan_LIBRARY=${_libvulkan}"
+	
+    # Set Vulkan include directory for Android build
+    TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DVULKAN_INCLUDE_DIR=${TERMUX_PREFIX}/include"
+}
