@@ -1,13 +1,13 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/binutils/
-TERMUX_PKG_DESCRIPTION="GNU Binutils libraries"
+TERMUX_PKG_DESCRIPTION="A GNU collection of binary utilities"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.45.1"
+TERMUX_PKG_VERSION="2.46.0"
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/binutils/binutils-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=5fe101e6fe9d18fdec95962d81ed670fdee5f37e3f48f0bef87bddf862513aa5
-TERMUX_PKG_DEPENDS="zlib, zstd"
-TERMUX_PKG_BREAKS="binutils (<< 2.39), binutils-dev"
-TERMUX_PKG_REPLACES="binutils (<< 2.39), binutils-dev"
+TERMUX_PKG_SHA256=d75a94f4d73e7a4086f7513e67e439e8fcdcbb726ffe63f4661744e6256b2cf2
+TERMUX_PKG_DEPENDS="binutils-bin, zlib, zstd"
+TERMUX_PKG_BREAKS="binutils (<< 2.46), binutils-dev"
+TERMUX_PKG_REPLACES="binutils (<< 2.46), binutils-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --bindir=$TERMUX_PREFIX/libexec/binutils
 --disable-gprofng
@@ -55,26 +55,19 @@ export LEXLIB=
 
 termux_step_pre_configure() {
 	export CPPFLAGS="$CPPFLAGS -Wno-c++11-narrowing"
-	# llvm upgraded a warning to an error, which caused this build (and some
-	# others, including the rust toolchain) to fail like so:
-	#
-	# ld.lld: error: version script assignment of 'LIBCTF_1.0' to symbol 'ctf_label_set' failed: symbol not defined
-	# ld.lld: error: version script assignment of 'LIBCTF_1.0' to symbol 'ctf_label_get' failed: symbol not defined
-	# These flags restore it to a warning.
-	# https://reviews.llvm.org/D135402
-	export LDFLAGS="$LDFLAGS -Wl,--undefined-version"
 
-	if (( TERMUX_ARCH_BITS == 32 )); then
-		export LIB_PATH="${TERMUX_PREFIX}/lib:/system/lib"
-	else
-		export LIB_PATH="${TERMUX_PREFIX}/lib:/system/lib64"
+	LIB_PATH="${TERMUX_PREFIX}/lib:/system/lib"
+	if (( TERMUX_ARCH_BITS == 64 )); then
+		LIB_PATH+="64"
 	fi
+
+	export LIB_PATH
 }
 
 termux_step_post_make_install() {
-	local d=$TERMUX_PREFIX/share/binutils
-	mkdir -p "$d"
-	touch "$d/.placeholder"
+	local dir="$TERMUX_PREFIX/share/binutils"
+	mkdir -p "$dir"
+	touch "$dir/.placeholder"
 
 	mkdir -p "$TERMUX_PREFIX/bin"
 	cd "$TERMUX_PREFIX/libexec/binutils" || termux_error_exit "failed to change into 'libexec/binutils' directory"
@@ -83,17 +76,18 @@ termux_step_post_make_install() {
 	ln -sf ld{,.bfd}
 	ln -sfr "$TERMUX_PREFIX/libexec/binutils/ld" "$TERMUX_PREFIX/bin/ld.bfd"
 
-	for b in ./*; do
-		ln -sfr "$TERMUX_PREFIX/libexec/binutils/$b" \
-			"$TERMUX_PREFIX/bin/$b"
+	local bin
+	for bin in ./*; do
+		ln -sfr "$TERMUX_PREFIX/libexec/binutils/$bin" \
+			"$TERMUX_PREFIX/bin/$bin"
 	done
 
 	# Setup symlinks as these are used when building, so used by
 	# system setup in e.g. python, perl and libtool:
 	local -a _TOOLS_WITH_HOST_PREFIX=("ar" "ld" "nm" "objdump" "ranlib" "readelf" "strip")
-	for b in "${_TOOLS_WITH_HOST_PREFIX[@]}"; do
-		ln -sfr "$TERMUX_PREFIX/libexec/binutils/$b" \
-			"$TERMUX_PREFIX/bin/$TERMUX_HOST_PLATFORM-$b"
+	for bin in "${_TOOLS_WITH_HOST_PREFIX[@]}"; do
+		ln -sfr "$TERMUX_PREFIX/libexec/binutils/$bin" \
+			"$TERMUX_PREFIX/bin/$TERMUX_HOST_PLATFORM-$bin"
 	done
 }
 
