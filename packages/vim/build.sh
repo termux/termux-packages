@@ -11,6 +11,7 @@ TERMUX_PKG_BREAKS="vim-python, vim-runtime"
 TERMUX_PKG_REPLACES="vim-python, vim-runtime"
 TERMUX_PKG_PROVIDES="vim-python"
 TERMUX_PKG_VERSION="9.2.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=9c60fc4488d78bbca9069e74e9cfafd006bdfcece5bb0971eac6268531f1b51f
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -45,12 +46,6 @@ vi_cv_var_python3_version=${TERMUX_PYTHON_VERSION}
 --enable-tclinterp=dynamic
 --enable-gui=no
 --without-x
-"
-
-TERMUX_PKG_RM_AFTER_INSTALL="
-share/vim/vim91/spell/en.ascii*
-share/vim/vim91/print
-share/vim/vim91/tools
 "
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag" # Vim doesn't use release tags
@@ -107,13 +102,19 @@ termux_step_pre_configure() {
 		"$patch" | patch --silent -p1
 }
 
+# shellcheck disable=SC2031
 termux_step_post_make_install() {
 	sed -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$TERMUX_PKG_BUILDER_DIR/vimrc" \
 		> "$TERMUX_PREFIX/share/vim/vimrc"
 
-	# shellcheck disable=SC2031
 	local _VIM_VERSION="${TERMUX_PKG_VERSION%.*}"
 	_VIM_VERSION="${_VIM_VERSION/.}"
+
+	export TERMUX_PKG_RM_AFTER_INSTALL="
+	share/vim/vim${_VIM_VERSION}/spell/en.ascii*
+	share/vim/vim${_VIM_VERSION}/print
+	share/vim/vim${_VIM_VERSION}/tools
+	"
 
 	### Remove most tutor files:
 	# Make a directory to temporarily hold the ones we want to keep
