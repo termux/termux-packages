@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://kompute.cc
 TERMUX_PKG_DESCRIPTION="General purpose GPU compute framework built on Vulkan"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_MAINTAINER=@termux
+TERMUX_PKG_MAINTAINER="@codingWiz-rick"
 TERMUX_PKG_VERSION="0.9.0"
 TERMUX_PKG_SRCURL=https://github.com/KomputeProject/kompute/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=901f609029033f1b97de8189228229d25508408c9f7f1dda0e75b2fa632f3521
