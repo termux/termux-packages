@@ -1,0 +1,23 @@
+diff --git a/crossenv/scripts/pip-_vendor-distlib-scripts-patch.py.tmpl b/crossenv/scripts/pip-_vendor-distlib-scripts-patch.py.tmpl
+index 7893cc4..63ae992 100644
+--- a/crossenv/scripts/pip-_vendor-distlib-scripts-patch.py.tmpl
++++ b/crossenv/scripts/pip-_vendor-distlib-scripts-patch.py.tmpl
+@@ -1,17 +1,5 @@
+ def _build_shebang(self, executable, post_interp):
+-    """
+-    Build a shebang line. The default pip behavior will use a "simple" shim
+-    if the path to the wrapped Python binary is < 127 chars long, and doesn't
+-    contain a space. However, the host python binary isn't actually a binary -
+-    it's a shell script that does additional environment modifications - and
+-    os.execv() raises "OSError [Errno 8] Exec format error" if the shebang
+-    of a script isn't a literal binary.
+-
+-    So - patch the script writer so that it *always* uses a shim.
+-    """
+-    result = b"#!/bin/sh\n"
+-    result += b"'''exec' " + executable + post_interp + b' "$0" "$@"\n'
+-    result += b"' '''\n"
++    result = b'#!' + executable + post_interp + b'\n'
+     return result
+ 
+ 
