@@ -1,7 +1,7 @@
-diff --git coreutils-9.9/lib/tmpdir.c coreutils-9.9/lib/tmpdir.c
-index db1f1e4..36a8541 100644
---- coreutils-9.9/lib/tmpdir.c
-+++ coreutils-9.9/lib/tmpdir.c
+diff --git a/lib/tmpdir.c b/lib/tmpdir.c
+index a1473e2..19267bd 100644
+--- a/lib/tmpdir.c
++++ b/lib/tmpdir.c
 @@ -35,7 +35,7 @@
  # ifdef _P_tmpdir /* native Windows */
  #  define P_tmpdir _P_tmpdir
@@ -11,7 +11,7 @@ index db1f1e4..36a8541 100644
  # endif
  #endif
  
-@@ -135,8 +135,8 @@ path_search (char *tmpl, size_t tmpl_len, const char *dir, const char *pfx,
+@@ -131,8 +131,8 @@ path_search (char *tmpl, size_t tmpl_len, const char *dir, const char *pfx,
  #endif
        if (direxists (P_tmpdir))
          dir = P_tmpdir;
@@ -22,29 +22,29 @@ index db1f1e4..36a8541 100644
        else
          {
            __set_errno (ENOENT);
-diff --git coreutils-9.9/src/mktemp.c coreutils-9.9/src/mktemp.c
-index 706c651..4004876 100644
---- coreutils-9.9/src/mktemp.c
-+++ coreutils-9.9/src/mktemp.c
-@@ -83,7 +83,7 @@ Files are created u+rw, and directories u+rwx, minus umask restrictions.\n\
- "), stdout);
-       fputs (_("\
-   -p DIR, --tmpdir[=DIR]  interpret TEMPLATE relative to DIR; if DIR is not\n\
--                        specified, use $TMPDIR if set, else /tmp.  With\n\
-+                        specified, use $TMPDIR if set, else @TERMUX_PREFIX@/tmp.  With\n\
-                         this option, TEMPLATE must not be an absolute name;\n\
-                         unlike with -t, TEMPLATE may contain slashes, but\n\
-                         mktemp creates only the final component\n\
-@@ -91,7 +91,7 @@ Files are created u+rw, and directories u+rwx, minus umask restrictions.\n\
-       fputs (_("\
-   -t                  interpret TEMPLATE as a single file name component,\n\
-                         relative to a directory: $TMPDIR, if set; else the\n\
--                        directory specified via -p; else /tmp [deprecated]\n\
-+                        directory specified via -p; else @TERMUX_PREFIX@/tmp [deprecated]\n\
- "), stdout);
-       fputs (HELP_OPTION_DESCRIPTION, stdout);
-       fputs (VERSION_OPTION_DESCRIPTION, stdout);
-@@ -273,7 +273,7 @@ main (int argc, char **argv)
+diff --git a/src/mktemp.c b/src/mktemp.c
+index 72523be..94e0f08 100644
+--- a/src/mktemp.c
++++ b/src/mktemp.c
+@@ -92,7 +92,7 @@ Files are created u+rw, and directories u+rwx, minus umask restrictions.\n\
+       oputs (_("\
+   -p DIR, --tmpdir[=DIR]\n\
+          interpret TEMPLATE relative to DIR;\n\
+-         if DIR is not specified, use $TMPDIR if set, else /tmp.\n\
++         if DIR is not specified, use $TMPDIR if set, else @TERMUX_PREFIX@/tmp.\n\
+          With this option, TEMPLATE must not be an absolute name;\n\
+          unlike with -t, TEMPLATE may contain slashes,\n\
+          but mktemp creates only the final component\n\
+@@ -101,7 +101,7 @@ Files are created u+rw, and directories u+rwx, minus umask restrictions.\n\
+   -t\n\
+          interpret TEMPLATE as a single file name component,\n\
+          relative to a directory: $TMPDIR, if set;\n\
+-         else the directory specified via -p; else /tmp [deprecated]\n\
++         else the directory specified via -p; else @TERMUX_PREFIX@/tmp [deprecated]\n\
+ "));
+       oputs (HELP_OPTION_DESCRIPTION);
+       oputs (VERSION_OPTION_DESCRIPTION);
+@@ -283,7 +283,7 @@ main (int argc, char **argv)
            else if (dest_dir_arg && *dest_dir_arg)
              dest_dir = dest_dir_arg;
            else
@@ -53,7 +53,7 @@ index 706c651..4004876 100644
  
            if (last_component (template) != template)
              error (EXIT_FAILURE, 0,
-@@ -287,7 +287,7 @@ main (int argc, char **argv)
+@@ -297,7 +297,7 @@ main (int argc, char **argv)
            else
              {
                char *env = getenv ("TMPDIR");
@@ -62,11 +62,11 @@ index 706c651..4004876 100644
              }
            if (IS_ABSOLUTE_FILE_NAME (template))
              error (EXIT_FAILURE, 0,
-diff --git coreutils-9.9/src/sort.c coreutils-9.9/src/sort.c
-index 05d00cc..dec6516 100644
---- coreutils-9.9/src/sort.c
-+++ coreutils-9.9/src/sort.c
-@@ -93,9 +93,7 @@ struct rlimit { size_t rlim_cur; };
+diff --git a/src/sort.c b/src/sort.c
+index eaf06d2..99f9a9d 100644
+--- a/src/sort.c
++++ b/src/sort.c
+@@ -81,9 +81,7 @@ struct rlimit { size_t rlim_cur; };
  
  #define UCHAR_LIM (UCHAR_MAX + 1)
  
@@ -77,16 +77,38 @@ index 05d00cc..dec6516 100644
  
  /* Maximum number of lines to merge every time a NODE is taken from
     the merge queue.  Node is at LEVEL in the binary merge tree,
-diff --git coreutils-9.9/src/split.c coreutils-9.9/src/split.c
-index 3d15091..eea9cbd 100644
---- coreutils-9.9/src/split.c
-+++ coreutils-9.9/src/split.c
-@@ -551,7 +551,7 @@ create (char const *name)
+diff --git a/src/split.c b/src/split.c
+index aca6432..de989ae 100644
+--- a/src/split.c
++++ b/src/split.c
+@@ -308,7 +308,7 @@ CHUNKS may be:\n\
+   r/K/N   likewise but only output Kth of N to standard output\n\
+ "), stdout);
+       fputs (_("\n\
+--n (except -nr) will buffer to $TMPDIR, defaulting to /tmp,\n\
++-n (except -nr) will buffer to $TMPDIR, defaulting to @TERMUX_PREFIX@/tmp,\n\
+ if the input size cannot easily be determined.\n\
+ "), stdout);
+       emit_ancillary_info (PROGRAM_NAME);
+@@ -593,7 +593,7 @@ create (char const *name)
  
        char const *shell_prog = getenv ("SHELL");
-       if (shell_prog == nullptr)
+       if (shell_prog == NULL)
 -        shell_prog = "/bin/sh";
 +        shell_prog = "@TERMUX_PREFIX@/bin/sh";
        char const *const argv[] = { last_component (shell_prog), "-c",
-                                    filter_command, nullptr };
+                                    filter_command, NULL };
  
+diff --git a/src/tac.c b/src/tac.c
+index 161a5ea..5436f42 100644
+--- a/src/tac.c
++++ b/src/tac.c
+@@ -138,7 +138,7 @@ Write each FILE to standard output, last line first.\n\
+       oputs (HELP_OPTION_DESCRIPTION);
+       oputs (VERSION_OPTION_DESCRIPTION);
+       fputs (_("\n\
+-Non-seekable input is buffered to $TMPDIR, defaulting to /tmp.\n\
++Non-seekable input is buffered to $TMPDIR, defaulting to @TERMUX_PREFIX@/tmp.\n\
+ "), stdout);
+       emit_ancillary_info (PROGRAM_NAME);
+     }
