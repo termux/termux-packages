@@ -1,0 +1,52 @@
+Since LLVM 19, `std::char_traits<>` is only provided for `char`, `char8_t`,
+`char16_t`, `char32_t`, and `wchar_t`. Any instantiation with other types
+will result in a compilation error.
+
+This patch replace all usages of `std::basic_string_view<unsigned char>`
+with a custom `ByteView` implementation.
+
+--- a/apt-pkg/contrib/hashes.cc
++++ b/apt-pkg/contrib/hashes.cc
+@@ -33,6 +33,24 @@
+ #include <openssl/evp.h>
+ 									/*}}}*/
+ 
++#if defined(__clang__) && __clang_major__ >= 19
++class ByteView {
++public:
++    constexpr ByteView() noexcept : data_(nullptr), size_(0) {}
++    constexpr ByteView(const unsigned char* data, std::size_t size) noexcept
++        : data_(data), size_(size) {}
++
++    constexpr std::size_t size() const noexcept { return size_; }
++    constexpr const unsigned char& operator[](std::size_t i) const noexcept { return data_[i]; }
++
++private:
++   const unsigned char* data_;
++   std::size_t size_;
++};
++#else
++using ByteView = std::basic_string_view<unsigned char>;
++#endif
++
+ const char * HashString::_SupportedHashes[] =
+ {
+    "SHA512", "SHA256", "SHA1", "MD5Sum", "Checksum-FileSize", NULL
+@@ -296,7 +314,7 @@
+    return !(*this == other);
+ }
+ 									/*}}}*/
+-static APT_PURE std::string HexDigest(std::basic_string_view<unsigned char> const &Sum)
++static APT_PURE std::string HexDigest(ByteView const &Sum)
+ {
+    char Conv[16] =
+       {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b',
+@@ -360,7 +378,7 @@
+       EVP_DigestFinal_ex(tmpContext, Sum, nullptr);
+       EVP_MD_CTX_destroy(tmpContext);
+ 
+-      return ::HexDigest(std::basic_string_view<unsigned char>(Sum, Size));
++      return ::HexDigest(ByteView(Sum, Size));
+    }
+ 
+    bool Enable(HashAlgo const &algo)

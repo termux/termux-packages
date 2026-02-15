@@ -1,0 +1,160 @@
+Since LLVM 19, referencing non-existent methods inside templates
+is no longer allowed, even if the template is never instantiated.
+
+Remove the use of `std::forward_list` in `apt-pkg/cacheset.h`, as
+`std::forward_list` does not provide a `size()` method.
+
+See [1] for details.
+
+[1]: https://github.com/llvm/llvm-project/pull/90152
+
+--- a/apt-pkg/cacheset.h
++++ b/apt-pkg/cacheset.h
+@@ -13,7 +13,9 @@
+ #include <map>
+ #include <set>
+ #if __cplusplus >= 201103L
++#if 0
+ #include <forward_list>
++#endif
+ #include <initializer_list>
+ #include <unordered_set>
+ #endif
+@@ -540,11 +542,13 @@
+ 		_cont.push_back(*p);
+ }
+ #if __cplusplus >= 201103L
++#if 0
+ template<> template<class Cont> void PackageContainer<std::forward_list<pkgCache::PkgIterator> >::insert(PackageContainer<Cont> const &pkgcont) {
+ 	for (typename PackageContainer<Cont>::const_iterator p = pkgcont.begin(); p != pkgcont.end(); ++p)
+ 		_cont.push_front(*p);
+ }
+ #endif
++#endif
+ template<> template<class Cont> void PackageContainer<std::deque<pkgCache::PkgIterator> >::insert(PackageContainer<Cont> const &pkgcont) {
+ 	for (typename PackageContainer<Cont>::const_iterator p = pkgcont.begin(); p != pkgcont.end(); ++p)
+ 		_cont.push_back(*p);
+@@ -562,6 +566,7 @@
+ 	return true;
+ }
+ #if __cplusplus >= 201103L
++#if 0
+ template<> inline bool PackageContainer<std::forward_list<pkgCache::PkgIterator> >::insert(pkgCache::PkgIterator const &P) {
+ 	if (P.end() == true)
+ 		return false;
+@@ -569,6 +574,7 @@
+ 	return true;
+ }
+ #endif
++#endif
+ template<> inline bool PackageContainer<std::deque<pkgCache::PkgIterator> >::insert(pkgCache::PkgIterator const &P) {
+ 	if (P.end() == true)
+ 		return false;
+@@ -586,11 +592,13 @@
+ 		_cont.push_back(*p);
+ }
+ #if __cplusplus >= 201103L
++#if 0
+ template<> inline void PackageContainer<std::forward_list<pkgCache::PkgIterator> >::insert(const_iterator begin, const_iterator end) {
+ 	for (const_iterator p = begin; p != end; ++p)
+ 		_cont.push_front(*p);
+ }
+ #endif
++#endif
+ template<> inline void PackageContainer<std::deque<pkgCache::PkgIterator> >::insert(const_iterator begin, const_iterator end) {
+ 	for (const_iterator p = begin; p != end; ++p)
+ 		_cont.push_back(*p);
+@@ -618,11 +626,13 @@
+ 	return true;
+ }
+ #if __cplusplus >= 201103L
++#if 0
+ template<> template<class Compare> inline bool PackageContainer<std::forward_list<pkgCache::PkgIterator> >::sort(Compare Comp) {
+ 	_cont.sort(Comp);
+ 	return true;
+ }
+ #endif
++#endif
+ template<> template<class Compare> inline bool PackageContainer<std::deque<pkgCache::PkgIterator> >::sort(Compare Comp) {
+ 	std::sort(_cont.begin(), _cont.end(), Comp);
+ 	return true;
+@@ -687,8 +697,10 @@
+ typedef PackageContainer<std::set<pkgCache::PkgIterator> > PackageSet;
+ #if __cplusplus >= 201103L
+ typedef PackageContainer<std::unordered_set<pkgCache::PkgIterator> > PackageUnorderedSet;
++#if 0
+ typedef PackageContainer<std::forward_list<pkgCache::PkgIterator> > PackageForwardList;
+ #endif
++#endif
+ typedef PackageContainer<std::list<pkgCache::PkgIterator> > PackageList;
+ typedef PackageContainer<std::deque<pkgCache::PkgIterator> > PackageDeque;
+ typedef PackageContainer<std::vector<pkgCache::PkgIterator> > PackageVector;
+@@ -977,11 +989,13 @@
+ 		_cont.push_back(*v);
+ }
+ #if __cplusplus >= 201103L
++#if 0
+ template<> template<class Cont> void VersionContainer<std::forward_list<pkgCache::VerIterator> >::insert(VersionContainer<Cont> const &vercont) {
+ 	for (typename VersionContainer<Cont>::const_iterator v = vercont.begin(); v != vercont.end(); ++v)
+ 		_cont.push_front(*v);
+ }
+ #endif
++#endif
+ template<> template<class Cont> void VersionContainer<std::deque<pkgCache::VerIterator> >::insert(VersionContainer<Cont> const &vercont) {
+ 	for (typename VersionContainer<Cont>::const_iterator v = vercont.begin(); v != vercont.end(); ++v)
+ 		_cont.push_back(*v);
+@@ -999,6 +1013,7 @@
+ 	return true;
+ }
+ #if __cplusplus >= 201103L
++#if 0
+ template<> inline bool VersionContainer<std::forward_list<pkgCache::VerIterator> >::insert(pkgCache::VerIterator const &V) {
+ 	if (V.end() == true)
+ 		return false;
+@@ -1006,6 +1021,7 @@
+ 	return true;
+ }
+ #endif
++#endif
+ template<> inline bool VersionContainer<std::deque<pkgCache::VerIterator> >::insert(pkgCache::VerIterator const &V) {
+ 	if (V.end() == true)
+ 		return false;
+@@ -1023,11 +1039,13 @@
+ 		_cont.push_back(*v);
+ }
+ #if __cplusplus >= 201103L
++#if 0
+ template<> inline void VersionContainer<std::forward_list<pkgCache::VerIterator> >::insert(const_iterator begin, const_iterator end) {
+ 	for (const_iterator v = begin; v != end; ++v)
+ 		_cont.push_front(*v);
+ }
+ #endif
++#endif
+ template<> inline void VersionContainer<std::deque<pkgCache::VerIterator> >::insert(const_iterator begin, const_iterator end) {
+ 	for (const_iterator v = begin; v != end; ++v)
+ 		_cont.push_back(*v);
+@@ -1055,11 +1073,13 @@
+ 	return true;
+ }
+ #if __cplusplus >= 201103L
++#if 0
+ template<> template<class Compare> inline bool VersionContainer<std::forward_list<pkgCache::VerIterator> >::sort(Compare Comp) {
+ 	_cont.sort(Comp);
+ 	return true;
+ }
+ #endif
++#endif
+ template<> template<class Compare> inline bool VersionContainer<std::deque<pkgCache::VerIterator> >::sort(Compare Comp) {
+ 	std::sort(_cont.begin(), _cont.end(), Comp);
+ 	return true;
+@@ -1069,8 +1089,10 @@
+ typedef VersionContainer<std::set<pkgCache::VerIterator> > VersionSet;
+ #if __cplusplus >= 201103L
+ typedef VersionContainer<std::unordered_set<pkgCache::VerIterator> > VersionUnorderedSet;
++#if 0
+ typedef VersionContainer<std::forward_list<pkgCache::VerIterator> > VersionForwardList;
+ #endif
++#endif
+ typedef VersionContainer<std::list<pkgCache::VerIterator> > VersionList;
+ typedef VersionContainer<std::deque<pkgCache::VerIterator> > VersionDeque;
+ typedef VersionContainer<std::vector<pkgCache::VerIterator> > VersionVector;

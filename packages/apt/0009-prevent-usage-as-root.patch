@@ -1,0 +1,48 @@
+diff --git a/cmdline/apt-get.cc b/cmdline/apt-get.cc
+index ae2356325..fdde111f3 100644
+--- a/cmdline/apt-get.cc
++++ b/cmdline/apt-get.cc
+@@ -440,6 +440,11 @@ static std::vector<aptDispatchWithHelp> GetCommands()			/*{{{*/
+ 									/*}}}*/
+ int main(int argc,const char *argv[])					/*{{{*/
+ {
++   if (getuid() == 0) {
++      std::cout << "Ability to run this command as root has been disabled permanently for safety purposes." << std::endl;
++      return 1;
++   }
++
+    // Parse the command line and initialize the package library
+    CommandLine CmdL;
+    auto const Cmds = ParseCommandLine(CmdL, APT_CMD::APT_GET, &_config, &_system, argc, argv, &ShowHelp, &GetCommands);
+diff --git a/cmdline/apt-mark.cc b/cmdline/apt-mark.cc
+index 180247cd0..e3f24ec8b 100644
+--- a/cmdline/apt-mark.cc
++++ b/cmdline/apt-mark.cc
+@@ -432,6 +432,11 @@ static std::vector<aptDispatchWithHelp> GetCommands()			/*{{{*/
+ 									/*}}}*/
+ int main(int argc,const char *argv[])					/*{{{*/
+ {
++   if (getuid() == 0) {
++      std::cout << "Ability to run this command as root has been disabled permanently for safety purposes." << std::endl;
++      return 1;
++   }
++
+    CommandLine CmdL;
+    auto const Cmds = ParseCommandLine(CmdL, APT_CMD::APT_MARK, &_config, &_system, argc, argv, &ShowHelp, &GetCommands);
+ 
+diff --git a/cmdline/apt.cc b/cmdline/apt.cc
+index af8a95fa5..88c2692ad 100644
+--- a/cmdline/apt.cc
++++ b/cmdline/apt.cc
+@@ -105,6 +105,11 @@ static std::vector<aptDispatchWithHelp> GetCommands()			/*{{{*/
+ 									/*}}}*/
+ int main(int argc, const char *argv[])					/*{{{*/
+ {
++   if (getuid() == 0) {
++      std::cout << "Ability to run this command as root has been disabled permanently for safety purposes." << std::endl;
++      return 1;
++   }
++
+    CommandLine CmdL;
+    auto const Cmds = ParseCommandLine(CmdL, APT_CMD::APT, &_config, &_system, argc, argv, &ShowHelp, &GetCommands);
+ 
