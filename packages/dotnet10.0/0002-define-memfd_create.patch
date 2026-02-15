@@ -1,0 +1,30 @@
+Always provide memfd_create syscall fallback on Linux/Android.
+
+The iltools/cdac host build in .NET 10 compiles doublemapping.cpp with
+TARGET_LINUX defined but not TARGET_ANDROID. When the host glibc defines
+MFD_CLOEXEC (glibc 2.27+), the original fallback branch doesn't fire,
+and memfd_create may not be available as a function if the build uses
+the Bionic sysroot. This ensures the syscall wrapper is always provided.
+
+diff --git a/src/runtime/src/coreclr/minipal/Unix/doublemapping.cpp b/src/runtime/src/coreclr/minipal/Unix/doublemapping.cpp
+index 205a2cac7..973a696b3 100644
+--- a/src/runtime/src/coreclr/minipal/Unix/doublemapping.cpp
++++ b/src/runtime/src/coreclr/minipal/Unix/doublemapping.cpp
+@@ -16,13 +16,12 @@
+ #include <limits.h>
+ #include <errno.h>
+ #include <sys/resource.h>
+-#if defined(TARGET_LINUX) && !defined(MFD_CLOEXEC)
++#if defined(TARGET_LINUX) || defined(TARGET_ANDROID)
++#if !defined(MFD_CLOEXEC)
+ #include <linux/memfd.h>
++#endif
+ #include <sys/syscall.h> // __NR_memfd_create
+ #define memfd_create(...) syscall(__NR_memfd_create, __VA_ARGS__)
+-#elif defined(TARGET_ANDROID)
+-#include <sys/syscall.h> // __NR_memfd_create
+-#define memfd_create(...) syscall(__NR_memfd_create, __VA_ARGS__)
+-#endif // TARGET_LINUX && !MFD_CLOEXEC
++#endif // TARGET_LINUX || TARGET_ANDROID
+ #include "minipal.h"
+ #include "minipal/cpufeatures.h"

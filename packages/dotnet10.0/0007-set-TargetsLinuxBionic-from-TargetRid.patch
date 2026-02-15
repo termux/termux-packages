@@ -1,0 +1,35 @@
+Description: Set TargetsLinuxBionic from TargetRid and override DefaultSubsets for source-build
+ When building for linux-bionic via the VMR, TargetOS is 'linux' (not
+ 'linux-bionic'), so TargetsLinuxBionic is never set. This causes two
+ problems: (1) The Mono native build uses cross/toolchain.cmake which
+ targets linux-gnu instead of the Android NDK toolchain, causing CRT
+ link failures (Scrt1.o, crti.o, -lgcc_s not found). (2) The default
+ subset includes NativeAOT components that set RuntimeFlavor=CoreCLR,
+ mismatching PrimaryRuntimeFlavor=Mono and breaking tarball packaging.
+ Fix by deriving TargetsLinuxBionic from TargetRid and adding a
+ source-build override that uses mono+libs+host+packs (no NativeAOT).
+
+diff --git a/src/runtime/eng/Subsets.props b/src/runtime/eng/Subsets.props
+index 5770eec31..a1b2c3d4e 100644
+--- a/src/runtime/eng/Subsets.props
++++ b/src/runtime/eng/Subsets.props
+@@ -26,6 +26,10 @@
+        platforms (like s390x) where only Mono is supported. The primary runtime
+        flavor is used to decide when to build the hosts and installers. -->
+   <PropertyGroup>
++    <!-- When building from the VMR, TargetOS is 'linux' but TargetRid is 'linux-bionic-*'.
++         Ensure TargetsLinuxBionic is set so the correct subset defaults are used. -->
++    <TargetsLinuxBionic Condition="'$(TargetsLinuxBionic)' != 'true' and $(TargetRid.StartsWith('linux-bionic'))">true</TargetsLinuxBionic>
++
+     <!-- Determine if the CoreCLR runtime can build/run for the specified target. -->
+     <_CoreCLRSupportedOS Condition="'$(TargetsMobile)' != 'true' and '$(TargetsLinuxBionic)' != 'true'">true</_CoreCLRSupportedOS>
+
+@@ -77,6 +81,8 @@
+     <DefaultSubsets Condition="'$(TargetsLinuxBionic)' == 'true' and '$(MonoSupported)' != 'true'">clr.nativeaotruntime+clr.nativeaotlibs+libs+packs</DefaultSubsets>
+     <!-- In source build, mono is only supported as primary runtime flavor. -->
+     <DefaultSubsets Condition="'$(DotNetBuildSourceOnly)' == 'true' and '$(PrimaryRuntimeFlavor)' != 'Mono'">clr+libs+tools+host+packs</DefaultSubsets>
++    <!-- For linux-bionic source-build with Mono, skip NativeAOT subsets to keep RuntimeFlavor=Mono. -->
++    <DefaultSubsets Condition="'$(DotNetBuildSourceOnly)' == 'true' and '$(TargetsLinuxBionic)' == 'true' and '$(PrimaryRuntimeFlavor)' == 'Mono'">mono+libs+tools.illink+host+packs</DefaultSubsets>
+     <DefaultSubsets Condition="'$(DotNetBuildMonoCrossAOT)' == 'true'">mono+packs</DefaultSubsets>
+
+     <!-- In the Win-x86 BuildPass2 job in the VMR, we want to build the cross-OS DACs and pack them. -->
