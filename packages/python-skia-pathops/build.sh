@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/fonttools/skia-pathops
 TERMUX_PKG_DESCRIPTION="Python bindings for the Skia library's Path Ops"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Nguyen Khanh @nguynkhn"
-TERMUX_PKG_VERSION=0.9.1
+TERMUX_PKG_VERSION="0.9.2"
 TERMUX_PKG_SRCURL=https://github.com/fonttools/skia-pathops/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=95d3b195147f80a9ae8baaa72c28bed359857d90e1930a8274169c6d05396323
+TERMUX_PKG_SHA256=4f696a24c83e5bf93b809cbe2a01e55810ec3b05bd88b54a0fdbdc16e2d40eaa
 TERMUX_PKG_DEPENDS="libc++, python, python-pip"
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="setuptools, wheel, setuptools_scm, 'Cython>=3.2.0'"
 TERMUX_PKG_AUTO_UPDATE=true
