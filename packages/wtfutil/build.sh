@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://wtfutil.com/
 TERMUX_PKG_DESCRIPTION="The personal information dashboard for your terminal"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.48.0"
+TERMUX_PKG_VERSION="0.49.0"
 # Need metadata in Git repository
 TERMUX_PKG_SRCURL=git+https://github.com/wtfutil/wtf
 TERMUX_PKG_AUTO_UPDATE=true
