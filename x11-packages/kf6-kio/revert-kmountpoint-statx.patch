@@ -1,0 +1,25 @@
+Reverts https://invent.kde.org/frameworks/kio/-/commit/4709688aa80d7fc2cac7bce7285f6830e4cbcf21
+statx is unavailable in Android until API level 30
+
+Prevents:
+kmountpoint.cpp:375:56: error: cannot initialize a member subobject of type '__u32'
+(aka 'unsigned int') with an rvalue of type 'const char *'
+
+--- a/src/core/kmountpoint.cpp
++++ b/src/core/kmountpoint.cpp
+@@ -372,8 +371,13 @@ KMountPoint::List KMountPoint::currentMountPoints(DetailsNeededFlags infoNeeded)
+                 }
+ #endif
+ 
+-                if (struct statx buff; statx(AT_FDCWD, mnt_fs_get_target(fs), AT_STATX_DONT_SYNC, STATX_INO, &buff) == 0) {
+-                    mp->d->m_deviceId = makedev(buff.stx_dev_major, buff.stx_dev_minor);
++                // handle bind mounts
++                if (mp->d->m_mountedFrom != mp->d->m_mountPoint) {
++                    if (QT_STATBUF buff; QT_LSTAT(mnt_fs_get_target(fs), &buff) == 0) {
++                        mp->d->m_deviceId = buff.st_dev;
++                    }
++                } else {
++                    mp->d->m_deviceId = mnt_fs_get_devno(fs);
+                 }
+ 
+                 if (infoNeeded & NeedMountOptions) {
