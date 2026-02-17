@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="GNU Octave is a high-level language, primarily intended 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2:10.3.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://ftpmirror.gnu.org/octave/octave-${TERMUX_PKG_VERSION#*:}.tar.xz"
 TERMUX_PKG_SHA256=92ae9bf2edcd288bd2df9fd0b4f7aa719b49d3940fceb154c5fdcd846f254da1
 TERMUX_PKG_DEPENDS="arpack-ng, clang, fftw, fltk, fontconfig, freetype, ghostscript, glpk, glu, graphicsmagick, libandroid-complex-math, libbz2, libc++, libcurl, libhdf5, libiconv, libopenblas, libsndfile, libx11, libxcursor, libxext, libxfixes, libxft, libxinerama, libxrender, make, opengl, openssl, pcre2, portaudio, qhull, qrupdate-ng, qscintilla-qt6, qt6-qt5compat, qt6-qtbase, qt6-qttools, readline, suitesparse, sundials, zlib"
