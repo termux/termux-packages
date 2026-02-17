@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION=".NET 9.0"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
 TERMUX_PKG_VERSION="9.0.12"
+TERMUX_PKG_REVISION=1
 _DOTNET_SDK_VERSION="9.0.113"
 TERMUX_PKG_SRCURL=git+https://github.com/dotnet/dotnet
 TERMUX_PKG_GIT_BRANCH="v${_DOTNET_SDK_VERSION}"
@@ -190,6 +191,7 @@ termux_step_make() {
 		termux_error_exit
 	fi
 	"${TERMUX_PKG_BUILDDIR}/.dotnet/dotnet" build-server shutdown
+	termux_dotnet_kill
 }
 
 termux_step_make_install() {

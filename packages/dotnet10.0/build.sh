@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=git+https://github.com/dotnet/dotnet
 TERMUX_PKG_GIT_BRANCH="v${_DOTNET_SDK_VERSION}"
 TERMUX_PKG_BUILD_DEPENDS="krb5, libicu, openssl, zlib"
 TERMUX_PKG_SUGGESTS="dotnet-sdk-10.0"
-TERMUX_PKG_CONFLICTS="dotnet9.0"
+TERMUX_PKG_CONFLICTS="dotnet8.0, dotnet9.0"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -194,6 +194,7 @@ termux_step_make() {
 		termux_error_exit
 	fi
 	"${TERMUX_PKG_BUILDDIR}/.dotnet/dotnet" build-server shutdown
+	termux_dotnet_kill
 }
 
 termux_step_make_install() {
@@ -349,16 +350,16 @@ termux_step_make_install() {
 		\( -type f -o -type l \) | sort \
 		> "${TERMUX_PKG_TMPDIR}"/dotnet-templates.txt
 
-	if [ ! -d lib/dotnet/packs/NETStandard.Library.Ref ]; then
+	if [[ ! -d lib/dotnet/packs/NETStandard.Library.Ref ]]; then
 		echo "WARNING: NETStandard.Library.Ref not found in SDK tarball, extracting from nupkg"
 		local _nupkg
-		_nupkg=$(find "${TERMUX_PKG_BUILDDIR}/prereqs/packages/reference" \
-			-iname 'netstandard.library.ref.2.1.0.nupkg' -print -quit 2>/dev/null)
-		if [ -z "${_nupkg}" ]; then
-			_nupkg=$(find "${TERMUX_PKG_BUILDDIR}" -maxdepth 5 \
-				-iname 'netstandard.library.ref.2.1.0.nupkg' -print -quit 2>/dev/null)
+		_nupkg="$(find "${TERMUX_PKG_BUILDDIR}/prereqs/packages/reference" \
+			-iname 'netstandard.library.ref.2.1.0.nupkg' -print -quit 2>/dev/null)"
+		if [[ -z "${_nupkg}" ]]; then
+			_nupkg="$(find "${TERMUX_PKG_BUILDDIR}" -maxdepth 5 \
+				-iname 'netstandard.library.ref.2.1.0.nupkg' -print -quit 2>/dev/null)"
 		fi
-		if [ -n "${_nupkg}" ]; then
+		if [[ -n "${_nupkg}" ]]; then
 			mkdir -p lib/dotnet/packs/NETStandard.Library.Ref/2.1.0
 			unzip -qo "${_nupkg}" -d lib/dotnet/packs/NETStandard.Library.Ref/2.1.0
 			rm -rf lib/dotnet/packs/NETStandard.Library.Ref/2.1.0/{_rels,package,'[Content_Types].xml'} \
