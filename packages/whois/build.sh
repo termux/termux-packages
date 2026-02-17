@@ -14,7 +14,7 @@ HAVE_ICONV=1
 "
 
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_UPDATE_VERSION_REGEXP='v\d+\.\d+\.\d+'
 
 termux_step_pre_configure() {
 	CPPFLAGS+=" -DHAVE_CRYPT_H"
