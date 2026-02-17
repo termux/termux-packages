@@ -2,15 +2,15 @@ diff --git a/CMake/dcmtkMacros.cmake b/CMake/dcmtkMacros.cmake
 index bd35469..23016c8 100644
 --- a/CMake/dcmtkMacros.cmake
 +++ b/CMake/dcmtkMacros.cmake
-@@ -11,8 +11,6 @@ function(DCMTK_ADD_TESTS MODULE)
+@@ -11,7 +11,7 @@ function(DCMTK_ADD_TESTS MODULE)
              if(WIN32)
                  WINE_COMMAND(TEST_COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${MODULE}_tests${CMAKE_EXECUTABLE_SUFFIX}")
                  string(REPLACE "\\" "\\\\" TEST_COMMAND "${TEST_COMMAND}")
 -            elseif(ANDROID)
--                set(TEST_COMMAND "${ANDROID_TEMPORARY_FILES_LOCATION}/${MODULE}_tests")
-             else()
-                 # not reachable, handled by not defining DCMTK_RUN_CTEST_SCRIPT
-             endif()
++            elseif(FALSE)
+                 set(TEST_COMMAND "${ANDROID_TEMPORARY_FILES_LOCATION}/${MODULE}_tests")
+                 set(MODULE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${MODULE}_tests${CMAKE_EXECUTABLE_SUFFIX}")
+                 list(APPEND DCMTK_TEST_EXECUTABLE_PATH "${MODULE_PATH}")
 diff --git a/CMake/dcmtkPrepare.cmake b/CMake/dcmtkPrepare.cmake
 index cfcfa44..ef94021 100644
 --- a/CMake/dcmtkPrepare.cmake
@@ -81,28 +81,12 @@ index d6c8ad9..663f2b7 100644
    elseif(NOT CMAKE_CROSSCOMPILING_EMULATOR)
      message(WARNING "Emulation for your target platform is not available, CTest will not be able to execute the unit tests!")
    endif()
-@@ -122,24 +122,6 @@ if(CMAKE_CROSSCOMPILING)
+@@ -120,7 +120,7 @@ if(CMAKE_CROSSCOMPILING)
      configure_file("${DCMTK_SOURCE_DIR}/CMake/CTest/dcmtkCTestRunWine.cmake.in"
        "${DCMTK_RUN_CTEST_SCRIPT}" ESCAPE_QUOTES @ONLY
      )
 -  elseif(ANDROID)
--    DCMTK_ANDROID_STOP_EMULATOR(DCMTK_ANDROID_EMULATOR_INSTANCE)
--    # Prepare setting environment variable DCMDICTPATH
--    set(DICTIONARIES ${DCMTK_DICOM_DICTIONARIES})
--    list(GET DICTIONARIES 0 DCMDICTPATH)
--    list(REMOVE_AT DICTIONARIES 0)
--    get_filename_component(DCMDICTPATH "${DCMDICTPATH}" NAME)
--    set(DCMDICTPATH "${ANDROID_TEMPORARY_FILES_LOCATION}/${DCMDICTPATH}")
--    foreach(DICTIONARY ${DICTIONARIES})
--      get_filename_component(FILE "${DICTIONARY}" NAME)
--      set(DCMDICTPATH "${DCMDICTPATH}:${ANDROID_TEMPORARY_FILES_LOCATION}/${FILE}")
--    endforeach()
--    configure_file("${DCMTK_SOURCE_DIR}/CMake/CTest/CTestCustomAndroid.cmake.in"
--      "${DCMTK_BINARY_DIR}/CTestCustom.cmake" ESCAPE_QUOTES @ONLY
--    )
--    configure_file("${DCMTK_SOURCE_DIR}/CMake/CTest/dcmtkCTestRunAndroid.cmake.in"
--      "${DCMTK_RUN_CTEST_SCRIPT}" ESCAPE_QUOTES @ONLY
--    )
-   else()
-     # Nothing to do
-   endif()
++  elseif(FALSE)
+     DCMTK_ANDROID_STOP_EMULATOR(DCMTK_ANDROID_EMULATOR_INSTANCE)
+     # Prepare setting environment variable DCMDICTPATH
+     set(DICTIONARIES ${DCMTK_DICOM_DICTIONARIES})

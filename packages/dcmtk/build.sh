@@ -4,10 +4,9 @@ TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="COPYRIGHT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.6.9"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="3.7.0"
 TERMUX_PKG_SRCURL="https://github.com/DCMTK/dcmtk/archive/refs/tags/DCMTK-$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=7f240eac06c45af5b17a6d2f7e41c54269274646aa348f44809e805ceef5d2e9
+TERMUX_PKG_SHA256=5bb3ec8317dc465788bed2ca789e76d03ae5848c9381cce3b14c1a3f8b6aca56
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="libc++, libiconv, libpng, libtiff, libxml2, openssl, zlib"
 # As of 3.6.9, libsndfile and openjpeg are detected but not linked against
@@ -31,5 +30,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	cp $TERMUX_PKG_BUILDER_DIR/arith.h/$TERMUX_ARCH.h $TERMUX_PKG_SRCDIR/config/include/dcmtk/config/arith.h
+	cp "$TERMUX_PKG_BUILDER_DIR/arith.h/$TERMUX_ARCH.h" "$TERMUX_PKG_SRCDIR/config/include/dcmtk/config/arith.h"
 }
