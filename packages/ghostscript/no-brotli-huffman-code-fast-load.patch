@@ -1,0 +1,23 @@
+Prevents this error when building for 32-bit ARM:
+
+./brotli/c/dec/decode.c:440:3: error: mixing declarations and code is incompatible
+with standards before C99 [-Werror,-Wdeclaration-after-statement]
+  440 |   BROTLI_HC_MARK_TABLE_FOR_FAST_LOAD(table);
+      |   ^
+./brotli/c/dec/huffman.h:83:56: note: expanded from macro 'BROTLI_HC_MARK_TABLE_FOR_FAST_LOAD'
+   83 | #define BROTLI_HC_MARK_TABLE_FOR_FAST_LOAD(H) uint32_t __fastload_##H = (*H)
+      |                                                        ^
+<scratch space>:185:1: note: expanded from here
+  185 | __fastload_table
+      | ^
+
+--- a/brotli/c/dec/huffman.h
++++ b/brotli/c/dec/huffman.h
+@@ -30,7 +30,6 @@ extern "C" {
+ 
+ #if ((defined(BROTLI_TARGET_ARMV7) || defined(BROTLI_TARGET_ARMV8_32)) && \
+   BROTLI_GNUC_HAS_ATTRIBUTE(aligned, 2, 7, 0))
+-#define BROTLI_HUFFMAN_CODE_FAST_LOAD
+ #endif
+ 
+ #if !defined(BROTLI_HUFFMAN_CODE_FAST_LOAD)
