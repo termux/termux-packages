@@ -31,7 +31,9 @@ RUN apt-get update && \
 	# Removed unused parts to make a smaller Docker image:
 	apt-get remove -yq --autoremove lsb-release software-properties-common && \
 	apt-get clean && \
-	rm -rf /var/lib/apt/lists/*
+	rm -rf /var/lib/apt/lists/* && \
+	su - builder -c "rm ~/lib/*.zip" && \
+	su - builder -c "rm -r ~/.android/cache/"
 
 # Switch User
 USER builder:builder
