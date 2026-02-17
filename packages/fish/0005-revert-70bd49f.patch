@@ -9,13 +9,17 @@ error[E0432]: unresolved import `libc::confstr`
 
 --- a/src/env/environment.rs
 +++ b/src/env/environment.rs
-@@ -557,13 +557,14 @@ fn setup_user(vars: &EnvStack) {
+@@ -516,6 +516,7 @@ fn setup_user(global_exported_mode: EnvSetMode, vars: &EnvStack) {
  }
  
  pub(crate) static FALLBACK_PATH: LazyLock<&[WString]> = LazyLock::new(|| {
 +    use crate::libc::confstr;
      // _CS_PATH: colon-separated paths to find POSIX utilities. Same as USER_CS_PATH.
-     let cs_path = libc::_CS_PATH;
+     // Fix until rust-lang/libc#4956 is merged
+     cfg_if::cfg_if!(
+@@ -527,10 +528,10 @@ pub(crate) static FALLBACK_PATH: LazyLock<&[WString]> = LazyLock::new(|| {
+         }
+     );
  
 -    let buf_size = unsafe { libc::confstr(cs_path, std::ptr::null_mut(), 0) };
 +    let buf_size = unsafe { confstr(cs_path, std::ptr::null_mut(), 0) };
