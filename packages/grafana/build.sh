@@ -2,8 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://grafana.com/
 TERMUX_PKG_DESCRIPTION="The open-source platform for monitoring and observability"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1:11.6.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1:12.3.3"
 TERMUX_PKG_SRCURL=git+https://github.com/grafana/grafana
 TERMUX_PKG_BUILD_DEPENDS="yarn"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -11,6 +10,11 @@ TERMUX_PKG_EXTRA_MAKE_ARGS="SPEC_TARGET= MERGED_SPEC_TARGET="
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_UPDATE_TAG_TYPE=latest-release-tag
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
+
+termux_step_post_get_source() {
+	termux_setup_golang
+	go work vendor
+}
 
 termux_step_pre_configure() {
 	termux_setup_nodejs
@@ -31,11 +35,6 @@ termux_step_pre_configure() {
 
 	NODE_OPTIONS+=" --max-old-space-size=6000"
 	NODE_OPTIONS+=" --openssl-legacy-provider"
-}
-
-termux_step_post_get_source() {
-	termux_setup_golang
-	go work vendor
 }
 
 termux_step_make() {
