@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/GothenburgBitFactory/taskwarrior/releases/d
 TERMUX_PKG_SHA256=d302761fcd1268e4a5a545613a2b68c61abd50c0bcaade3b3e68d728dd02e716
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-glob, libc++, libgnutls, libuuid"
-TERMUX_CMAKE_BUILD="Unix Makefiles"
+TERMUX_PKG_CMAKE_BUILD="Unix Makefiles"
 
 termux_step_pre_configure() {
 	termux_setup_rust

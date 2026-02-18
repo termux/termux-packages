@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=git+https://github.com/tie/oneko
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="libx11,libxext,xorgproto"
-TERMUX_CMAKE_BUILD="Unix Makefiles"
+TERMUX_PKG_CMAKE_BUILD="Unix Makefiles"
 TERMUX_PKG_GROUPS="games"
 TERMUX_PKG_BUILD_IN_SRC=true
 

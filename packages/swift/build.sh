@@ -17,7 +17,7 @@ TERMUX_PKG_NO_STATICSPLIT=true
 # TERMUX_PKG_FORCE_CMAKE to make the build system aware that CMake is
 # needed.
 TERMUX_PKG_FORCE_CMAKE=true
-TERMUX_CMAKE_BUILD=Ninja
+TERMUX_PKG_CMAKE_BUILD=Ninja
 
 SWIFT_COMPONENTS="autolink-driver;compiler;clang-resource-dir-symlink;swift-remote-mirror;license;sourcekit-inproc;static-mirror-lib;stdlib;sdk-overlay"
 SWIFT_TOOLCHAIN_FLAGS="-RA --llvm-targets-to-build='X86;ARM;AArch64' -j $TERMUX_PKG_MAKE_PROCESSES --install-prefix=$TERMUX_PREFIX"

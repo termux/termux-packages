@@ -127,7 +127,7 @@ termux_step_post_configure() {
 
 # shellcheck disable=SC2031
 termux_step_post_make_install() {
-	if [[ "$TERMUX_CMAKE_BUILD" == "Ninja" ]]; then
+	if [[ "$TERMUX_PKG_CMAKE_BUILD" == "Ninja" ]]; then
 		ninja -j "$TERMUX_PKG_MAKE_PROCESSES" docs-{llvm,clang}-man
 	else
 		make -j "$TERMUX_PKG_MAKE_PROCESSES" docs-{llvm,clang}-man

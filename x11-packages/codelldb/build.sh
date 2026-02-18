@@ -10,7 +10,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 # codelldb does not work properly on 32-bit Android
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 TERMUX_PKG_DEPENDS="lldb"
-TERMUX_CMAKE_BUILD="Unix Makefiles"
+TERMUX_PKG_CMAKE_BUILD="Unix Makefiles"
 TERMUX_PKG_EXTRA_MAKE_ARGS="vsix_full"
 
 termux_step_pre_configure() {

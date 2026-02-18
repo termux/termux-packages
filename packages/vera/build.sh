@@ -18,7 +18,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_post_configure() {
-	if [ "$TERMUX_CMAKE_BUILD" = "Ninja" ]; then
+	if [ "$TERMUX_PKG_CMAKE_BUILD" = "Ninja" ]; then
 		sed -i 's:[^ ]*/src/vera++ :true :g' build.ninja
 	fi
 }
