@@ -23,8 +23,23 @@
 # SOFTWARE.
 
 
-from requests import get as requests_get
-from time import sleep as sleep
+import json
+import urllib.request
+from time import sleep
+
+
+class _Response:
+    def __init__(self, resp):
+        self._resp = resp
+
+    def json(self):
+        return json.loads(self._resp.read().decode("utf-8"))
+
+
+def requests_get(url, timeout=None, headers=None):
+    req = urllib.request.Request(url, headers=headers or {}, method="GET")
+    resp = urllib.request.urlopen(req, timeout=timeout)
+    return _Response(resp)
 
 
 def get_repology_data(last_project, project):
