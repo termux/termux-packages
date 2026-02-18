@@ -483,17 +483,6 @@ export IPC_FIFO="${TMPDIR:-/tmp}/termux_ipc_$$.fifo"
 mkfifo "$IPC_FIFO"
 exec {IPC_FIFO_FD}<>"$IPC_FIFO"
 
-# If the dependencies for the 'dump-repology-data' script are not yet present,
-# create a venv, activate the venv, and install them in the venv before running the
-# 'dump-repology-data' script
-if ! python3 -c "import requests" 2>/dev/null; then
-	dump_repology_data_venv_dir="$(mktemp -d)"
-	python3 -m venv --system-site-packages "$dump_repology_data_venv_dir"
-	# shellcheck disable=SC1091
-	source "$dump_repology_data_venv_dir/bin/activate"
-	echo "INFO: Installing the dependencies of the 'dump-repology-data' script"
-	pip3 install requests
-fi
 echo "INFO: Running the 'dump-repology-data' script"
 if python3 "${TERMUX_SCRIPTDIR}"/scripts/updates/api/dump-repology-data "${TERMUX_REPOLOGY_DATA_FILE}"; then
 	echo "INFO: The 'dump-repology-data' script was successful"
