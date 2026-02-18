@@ -13,7 +13,7 @@ termux_step_configure() {
 		termux_step_configure_autotools
 	elif [ "$TERMUX_PKG_FORCE_CMAKE" = "true" ] || [ -f "$TERMUX_PKG_SRCDIR/CMakeLists.txt" ]; then
 		termux_setup_cmake
-		if [ "$TERMUX_CMAKE_BUILD" = Ninja ]; then
+		if [ "$TERMUX_PKG_CMAKE_BUILD" = Ninja ]; then
 			termux_setup_ninja
 		fi
 

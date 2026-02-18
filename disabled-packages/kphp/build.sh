@@ -40,7 +40,7 @@ termux_step_pre_configure() {
 
 termux_step_post_configure() {
 	local f
-	if [ "$TERMUX_CMAKE_BUILD" == "Ninja" ]; then
+	if [ "$TERMUX_PKG_CMAKE_BUILD" == "Ninja" ]; then
 		f=build.ninja
 	else
 		f=CMakeFiles/kphp2cpp.dir/link.txt

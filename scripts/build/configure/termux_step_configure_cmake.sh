@@ -1,5 +1,5 @@
 termux_step_configure_cmake() {
-	if [ "$TERMUX_CMAKE_BUILD" = Ninja ]; then
+	if [ "$TERMUX_PKG_CMAKE_BUILD" = Ninja ]; then
 		MAKE_PROGRAM_PATH=$(command -v ninja)
 	else
 		MAKE_PROGRAM_PATH=$(command -v make)
@@ -33,7 +33,7 @@ termux_step_configure_cmake() {
 
 	# XXX: CMAKE_{AR,RANLIB} needed for at least jsoncpp build to not
 	# pick up cross compiled binutils tool in $TERMUX_PREFIX/bin:
-	cmake -G "$TERMUX_CMAKE_BUILD" "$TERMUX_PKG_SRCDIR" \
+	cmake -G "$TERMUX_PKG_CMAKE_BUILD" "$TERMUX_PKG_SRCDIR" \
 		-DCMAKE_AR="$(command -v $AR)" \
 		-DCMAKE_UNAME="$(command -v uname)" \
 		-DCMAKE_RANLIB="$(command -v $RANLIB)" \
