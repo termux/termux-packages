@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT, Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE-APACHE, LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.39.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/ipfs/kubo/releases/download/v${TERMUX_PKG_VERSION}/kubo-source.tar.gz
 TERMUX_PKG_SHA256=a86a89d866f4058718ef2c6e9c014382e73c220cc320ff7af34fad2ab285bec6
 TERMUX_PKG_AUTO_UPDATE=true
@@ -22,6 +23,10 @@ termux_step_make() {
 	cp -a "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/github.com/ipfs/kubo"
 	cd "${GOPATH}/src/github.com/ipfs/kubo"
 
+	# TODO: remove this once the upstream package is updated to suport go 1.26
+	go mod edit -replace github.com/cockroachdb/swiss=github.com/cockroachdb/swiss@b0f6560
+	go mod tidy
+	go mod vendor
 	make build
 
 	# Fix folders without write permissions preventing which fails repeating builds:
