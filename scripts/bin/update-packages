@@ -326,6 +326,7 @@ _check_updated() {
 	(
 	set +eu
 	quiet source "${1}/build.sh"
+	# shellcheck disable=SC2030
 	TERMUX_PKG_NAME="${1##*/}"
 	export TERMUX_PKG_UPGRADE_VERSION_DRY_RUN=1
 	# The call to `termux_pkg_upgrade_version` is delibrately
@@ -359,12 +360,18 @@ _run_update() {
 	local pkg_dir="$1" pkg_name
 	pkg_name="$(basename "${pkg_dir}")"
 	# needed for 'termux_pkg_is_update_needed'
+	# shellcheck disable=SC2031
 	export TERMUX_PKG_NAME="${pkg_name}"
-	# Run each package update in separate process since we include their environment variables.
+
 	local output="" _CURRENT_VERSION _NEWEST_VERSION _ISSUE
 	# shellcheck disable=SC1091 # Ignore shellcheck's inability to follow the source
 	_CURRENT_VERSION="$(set +eu; . "$(realpath "$pkg_dir")/build.sh"; echo "${TERMUX_PKG_VERSION#*:}")"
 
+	# Ensure the FIFO is empty at the start of each update.
+	# This clears stale data from dependency checks, to prevent
+	# stale/incorrect version numbers in the summary.
+	read -rt0.001 _ < "$IPC_FIFO"
+	# Run each package update in separate process since we include their environment variables.
 	if output="$(
 		set -euo pipefail
 		# Pass cached tag we obtained earlier
@@ -482,6 +489,7 @@ exec {IPC_FIFO_FD}<>"$IPC_FIFO"
 if ! python3 -c "import requests" 2>/dev/null; then
 	dump_repology_data_venv_dir="$(mktemp -d)"
 	python3 -m venv --system-site-packages "$dump_repology_data_venv_dir"
+	# shellcheck disable=SC1091
 	source "$dump_repology_data_venv_dir/bin/activate"
 	echo "INFO: Installing the dependencies of the 'dump-repology-data' script"
 	pip3 install requests
