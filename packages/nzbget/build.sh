@@ -1,14 +1,13 @@
-TERMUX_PKG_HOMEPAGE=https://nzbget.net/
+TERMUX_PKG_HOMEPAGE=https://nzbget.com/
 TERMUX_PKG_DESCRIPTION="The most efficient usenet downloader"
 # License: GPL-2.0-with-OpenSSL-exception
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=21.1
-TERMUX_PKG_REVISION=8
-TERMUX_PKG_SRCURL=https://github.com/nzbget/nzbget/releases/download/v${TERMUX_PKG_VERSION}/nzbget-${TERMUX_PKG_VERSION}-src.tar.gz
-TERMUX_PKG_SHA256=4e8fc1beb80dc2af2d6a36a33a33f44dedddd4486002c644f4c4793043072025
+TERMUX_PKG_VERSION="26.0"
+TERMUX_PKG_SRCURL="https://github.com/nzbgetcom/nzbget/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
+TERMUX_PKG_SHA256=9b683ce96d7a2e5e702a169e3fbfd16824cfe0ce8ed887c76cc25a574f69c9cd
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libc++, libxml2, ncurses, openssl, p7zip, zlib"
+TERMUX_PKG_DEPENDS="boost, libc++, libxml2, ncurses, openssl, 7zip, zlib"
 TERMUX_PKG_RECOMMENDS="unrar"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SERVICE_SCRIPT=("nzbget" 'exec nzbget -s 2>&1')
