@@ -1,11 +1,13 @@
 TERMUX_PKG_HOMEPAGE=https://www.getdnote.com/
 TERMUX_PKG_DESCRIPTION="This package contains the Dnote server. It comprises of the web interface, the web API, and the background jobs."
-TERMUX_PKG_LICENSE="AGPL-V3"
+TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Ravener <ravener.anime@gmail.com>"
-TERMUX_PKG_VERSION=2.1.1
+TERMUX_PKG_VERSION="2.1.1"
 TERMUX_PKG_REVISION=3
-TERMUX_PKG_SRCURL=https://github.com/dnote/dnote/archive/refs/tags/server-v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SRCURL="https://github.com/dnote/dnote/archive/refs/tags/server-v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=5326694dd4c1721e52b871cebc3b99f9172d5e27c8eb71234cdf529bdcd14eee
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="server-v\d+\.\d+\.\d+(?!-)"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SUGGESTS="postgresql"
 
@@ -34,11 +36,4 @@ termux_step_make() {
 
 termux_step_make_install() {
 	install -Dm700 $TERMUX_PKG_SRCDIR/dnote-server $TERMUX_PREFIX/bin/dnote-server
-}
-
-termux_step_install_license() {
-	install -Dm600 -t "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
-		"${TERMUX_PKG_SRCDIR}/licenses/AGPLv3.txt"
-	install -Dm600 -t "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
-		"${TERMUX_PKG_SRCDIR}/LICENSE"
 }
