@@ -4145,7 +4145,7 @@ diff --git a/third_party/blink/renderer/platform/image-decoders/BUILD.gn b/third
 index 31f8b57c43..8137a8ab59 100644
 --- a/third_party/blink/renderer/platform/image-decoders/BUILD.gn
 +++ b/third_party/blink/renderer/platform/image-decoders/BUILD.gn
-@@ -2,13 +2,14 @@
+@@ -2,12 +2,13 @@
  # Use of this source code is governed by a BSD-style license that can be
  # found in the LICENSE file.
  
@@ -4153,7 +4153,6 @@ index 31f8b57c43..8137a8ab59 100644
  import("//build/config/sanitizers/sanitizers.gni")
  import("//media/media_options.gni")
  import("//testing/test.gni")
- import("//third_party/blink/renderer/config.gni")
  import("//third_party/blink/renderer/platform/platform.gni")
  
 -component("image_decoders") {
@@ -4824,28 +4823,3 @@ index 8238b11bef..5abb967f85 100644
 +#undef HasNoStyleInformation
 +#undef SetAttributes
 +#undef kMaxXMLTreeDepth
---- a/third_party/blink/renderer/core/dom/subscriber.cc
-+++ b/third_party/blink/renderer/core/dom/subscriber.cc
-@@ -22,8 +22,6 @@
- 
- namespace blink {
- 
--using PassKey = base::PassKey<Subscriber>;
--
- class Subscriber::ConsumerAbortSubscriptionAlgorithm final
-     : public AbortSignal::Algorithm {
-  public:
---- a/third_party/blink/renderer/modules/xr/xr_rigid_transform.h
-+++ b/third_party/blink/renderer/modules/xr/xr_rigid_transform.h
-@@ -11,10 +11,7 @@
- #include "third_party/blink/renderer/core/typed_arrays/dom_typed_array.h"
- #include "third_party/blink/renderer/modules/modules_export.h"
- #include "third_party/blink/renderer/platform/bindings/script_wrappable.h"
--
--namespace gfx {
--class Transform;
--}
-+#include "ui/gfx/geometry/transform.h"
- 
- namespace blink {
- 

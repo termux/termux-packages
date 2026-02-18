@@ -48,8 +48,10 @@ Enable jumbo build for the following component(s)/source_set(s):
 - //ui/gfx/codec:codec
 - //ui/gfx/geometry:geometry
 - //ui/gfx/geometry:geometry_skia
+- //ui/gfx/ipc/buffer_types:buffer_types
 - //ui/gfx/ipc/color:color
 - //ui/gfx/ipc/geometry:geometry
+- //ui/gfx/ipc/skia:skia
 - //ui/gfx/ipc:ipc
 - //ui/gfx/range:range
 - //ui/gfx/x:x
@@ -127,8 +129,10 @@ Enable jumbo build for the following component(s)/source_set(s):
  ui/gfx/geometry/BUILD.gn                          |  6 ++++--
  ui/gfx/geometry/transform_operations.cc           |  4 ++++
  ui/gfx/ipc/BUILD.gn                               |  4 +++-
+ ui/gfx/ipc/buffer_types/BUILD.gn                  |  4 +++-
  ui/gfx/ipc/color/BUILD.gn                         |  4 +++-
  ui/gfx/ipc/geometry/BUILD.gn                      |  4 +++-
+ ui/gfx/ipc/skia/BUILD.gn                          |  4 +++-
  ui/gfx/range/BUILD.gn                             |  4 +++-
  ui/gfx/x/BUILD.gn                                 |  3 ++-
  ui/gfx/x/randr_output_manager.cc                  | 10 ++++++++++
@@ -1228,6 +1232,21 @@ index 83f5cd0b14..44f4ad493c 100644
    output_name = "gfx_ipc"
  
    sources = [
+diff --git a/ui/gfx/ipc/buffer_types/BUILD.gn b/ui/gfx/ipc/buffer_types/BUILD.gn
+index 550b4f0ed6..957f9d9e66 100644
+--- a/ui/gfx/ipc/buffer_types/BUILD.gn
++++ b/ui/gfx/ipc/buffer_types/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-component("buffer_types") {
++import("//build/config/jumbo.gni")
++
++jumbo_component("buffer_types") {
+   output_name = "gfx_ipc_buffer_types"
+ 
+   sources = [
 diff --git a/ui/gfx/ipc/color/BUILD.gn b/ui/gfx/ipc/color/BUILD.gn
 index 38a069456f..9bbf354122 100644
 --- a/ui/gfx/ipc/color/BUILD.gn
@@ -1256,6 +1275,21 @@ index 4d0a150406..bd24a217e1 100644
 +
 +jumbo_component("geometry") {
    output_name = "gfx_ipc_geometry"
+ 
+   sources = [
+diff --git a/ui/gfx/ipc/skia/BUILD.gn b/ui/gfx/ipc/skia/BUILD.gn
+index b96b1c7548..d6178dcba4 100644
+--- a/ui/gfx/ipc/skia/BUILD.gn
++++ b/ui/gfx/ipc/skia/BUILD.gn
+@@ -2,7 +2,9 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-component("skia") {
++import("//build/config/jumbo.gni")
++
++jumbo_component("skia") {
+   output_name = "gfx_ipc_skia"
  
    sources = [
 diff --git a/ui/gfx/range/BUILD.gn b/ui/gfx/range/BUILD.gn

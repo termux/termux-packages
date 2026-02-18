@@ -497,20 +497,3 @@ index db16e21024..dbf02f0dee 100644
    sources = leveldb_sources
  
    configs -= [ "//build/config/compiler:chromium_code" ]
---- a/net/third_party/quiche/src/quiche/oblivious_http/oblivious_http_gateway.cc
-+++ b/net/third_party/quiche/src/quiche/oblivious_http/oblivious_http_gateway.cc
-@@ -23,6 +23,8 @@
- #include "quiche/oblivious_http/common/oblivious_http_chunk_handler.h"
- #include "quiche/oblivious_http/common/oblivious_http_header_key_config.h"
- 
-+#define kFinalChunkIndicator kFinalChunkIndicator_ObliviousHttpGateway
-+
- namespace quiche {
- namespace {
- constexpr uint64_t kFinalChunkIndicator = 0;
-@@ -356,3 +358,5 @@
- }
- 
- }  // namespace quiche
-+
-+#undef kFinalChunkIndicator
