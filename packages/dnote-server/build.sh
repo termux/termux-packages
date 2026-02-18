@@ -4,10 +4,12 @@ TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="Ravener <ravener.anime@gmail.com>"
 TERMUX_PKG_VERSION=2.1.1
 TERMUX_PKG_REVISION=3
-TERMUX_PKG_SRCURL=https://github.com/dnote/dnote/archive/refs/tags/server-v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SRCURL="https://github.com/dnote/dnote/archive/refs/tags/server-v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=5326694dd4c1721e52b871cebc3b99f9172d5e27c8eb71234cdf529bdcd14eee
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SUGGESTS="postgresql"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="server-v\d+\.\d+\.\d+$"
 
 termux_step_pre_configure() {
 	termux_setup_nodejs
