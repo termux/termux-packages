@@ -3,11 +3,12 @@ TERMUX_PKG_DESCRIPTION="A GNU collection of binary utilities"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.46.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/binutils/binutils-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=d75a94f4d73e7a4086f7513e67e439e8fcdcbb726ffe63f4661744e6256b2cf2
 TERMUX_PKG_DEPENDS="binutils-bin, zlib, zstd"
-TERMUX_PKG_BREAKS="binutils (<< 2.46), binutils-dev"
-TERMUX_PKG_REPLACES="binutils (<< 2.46), binutils-dev"
+TERMUX_PKG_BREAKS="binutils (<< 2.46), binutils-libs, binutils-dev"
+TERMUX_PKG_REPLACES="binutils (<< 2.46), binutils-libs, binutils-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --bindir=$TERMUX_PREFIX/libexec/binutils
 --disable-gprofng
