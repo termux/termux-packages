@@ -45,7 +45,10 @@ termux_step_get_dependencies() {
 				fi
 			fi
 			if [[ "$cyclic_dependence" == "false" ]]; then
-				[[ "$build_dependency" == "true" ]] && termux_run_build-package && continue
+				if [[ "$build_dependency" == "true" ]]; then
+					termux_run_build-package
+					continue
+				fi
 				termux_add_package_to_built_packages_list "$PKG"
 			fi
 			if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
