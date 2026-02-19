@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Basic file, shell and text manipulation utilities from t
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=9.10
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/coreutils/coreutils-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=16535a9adf0b10037364e2d612aad3d9f4eca3a344949ced74d12faf4bd51d25
 TERMUX_PKG_DEPENDS="libandroid-selinux, libandroid-support, libgmp, libiconv, openssl (>= 1:3.5.0-1)"
@@ -22,7 +23,8 @@ gl_cv_host_operating_system=Android
 ac_cv_func_getpass=yes
 --disable-xattr
 --with-packager=Termux
---enable-no-install-program=pinky,df,users,who,uptime
+--enable-no-install-program=pinky,df,users,who
+--enable-install-program=kill
 --enable-single-binary=symlinks
 --with-gmp
 "
