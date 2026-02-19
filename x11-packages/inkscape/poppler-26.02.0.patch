@@ -1,0 +1,210 @@
+From 47e20c0503ab1464d528f2cc7dd5e6a6a85b70dc Mon Sep 17 00:00:00 2001
+From: KrIr17 <elendil.krir17@gmail.com>
+Date: Thu, 12 Feb 2026 20:58:50 +0100
+Subject: [PATCH] Fix building with Poppler 0.26.02
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Adapted from [1] with changes to make it backwards-compatible with older
+versions of Poppler.
+
+[1] github.com/OpenMandrivaAssociation/inkscape/blob/master/inkscape-poppler-26.02.patch#L29
+
+Credits: Bernhard Rosenkränzer <bero@lindev.ch>
+
+Fixes https://gitlab.com/inkscape/inkscape/-/issues/6054
+---
+ .../internal/pdfinput/pdf-parser.cpp          | 39 +++++++++++++++++--
+ .../pdfinput/poppler-transition-api.h         | 10 +++++
+ .../internal/pdfinput/svg-builder.cpp         | 10 ++---
+ 3 files changed, 50 insertions(+), 9 deletions(-)
+
+diff --git a/src/extension/internal/pdfinput/pdf-parser.cpp b/src/extension/internal/pdfinput/pdf-parser.cpp
+index 96e475786c..1a7a470c21 100644
+--- a/src/extension/internal/pdfinput/pdf-parser.cpp
++++ b/src/extension/internal/pdfinput/pdf-parser.cpp
+@@ -657,7 +657,11 @@ void PdfParser::opSetFlat(Object args[], int /*numArgs*/)
+ void PdfParser::opSetLineJoin(Object args[], int /*numArgs*/)
+ {
+   builder->beforeStateChange(state);
++#if POPPLER_CHECK_VERSION(26,2,0)
++  state->setLineJoin((GfxState::LineJoinStyle) args[0].getInt());
++#else
+   state->setLineJoin(args[0].getInt());
++#endif
+   builder->updateStyle(state);
+ }
+ 
+@@ -665,7 +669,11 @@ void PdfParser::opSetLineJoin(Object args[], int /*numArgs*/)
+ void PdfParser::opSetLineCap(Object args[], int /*numArgs*/)
+ {
+   builder->beforeStateChange(state);
++#if POPPLER_CHECK_VERSION(26,2,0)
++  state->setLineCap((GfxState::LineCapStyle) args[0].getInt());
++#else
+   state->setLineCap(args[0].getInt());
++#endif
+   builder->updateStyle(state);
+ }
+ 
+@@ -1537,7 +1545,13 @@ void PdfParser::doShadingPatternFillFallback(GfxShadingPattern *sPat,
+ 
+   // restore graphics state
+   restoreState();
++#if POPPLER_CHECK_VERSION(26, 2, 0)
++  state->clearPath();
++  GfxPath *currPath = const_cast<GfxPath*>(state->getPath());
++  currPath->append(savedPath);
++#else
+   state->setPath(savedPath);
++#endif
+ }
+ 
+ // TODO not good that numArgs is ignored but args[] is used:
+@@ -1600,7 +1614,13 @@ void PdfParser::opShFill(Object args[], int /*numArgs*/)
+   // restore graphics state
+   if (savedState) {
+     restoreState();
++#if POPPLER_CHECK_VERSION(26, 2, 0)
++    state->clearPath();
++    GfxPath *currPath = const_cast<GfxPath*>(state->getPath());
++    currPath->append(savedPath);
++#else
+     state->setPath(savedPath);
++#endif
+   }
+ }
+ 
+@@ -2232,7 +2252,7 @@ void PdfParser::opShowSpaceText(Object args[], int /*numArgs*/)
+ {
+   Array *a = nullptr;
+   Object obj;
+-  int wMode = 0; // Writing mode (horizontal/vertical).
++  _POPPLER_WMODE wMode = _POPPLER_WMODE_HORIZONTAL; // Writing mode (horizontal/vertical).
+ 
+   if (!state->getFont()) {
+     error(errSyntaxError, getPos(), "No font in show/space");
+@@ -2246,7 +2266,7 @@ void PdfParser::opShowSpaceText(Object args[], int /*numArgs*/)
+     if (obj.isNum()) {
+       // this uses the absolute value of the font size to match
+       // Acrobat's behavior
+-      if (wMode) {
++      if (wMode != _POPPLER_WMODE_HORIZONTAL) {
+ 	state->textShift(0, -obj.getNum() * 0.001 *
+ 			    fabs(state->getFontSize()));
+       } else {
+@@ -2273,7 +2293,7 @@ void PdfParser::doShowText(const GooString *s) {
+ void PdfParser::doShowText(GooString *s) {
+ #endif
+     auto font = state->getFont();
+-    int wMode = font->getWMode(); // Vertical/Horizontal/Invalid
++    _POPPLER_WMODE wMode = font->getWMode(); // Vertical/Horizontal/Invalid
+ 
+     builder->beginString(state, get_goostring_length(*s));
+ 
+@@ -2308,7 +2328,7 @@ void PdfParser::doShowText(GooString *s) {
+         auto ax = dx;
+         auto ay = dy;
+ 
+-        if (wMode != 0) {
++        if (wMode != _POPPLER_WMODE_HORIZONTAL) {
+             // Vertical text (or invalid value).
+             dy += state->getCharSpace();
+             if (n == 1 && *p == ' ') {
+@@ -2975,7 +2995,11 @@ Stream *PdfParser::buildImageStream() {
+   // make stream
+ #if defined(POPPLER_NEW_OBJECT_API)
+   str = new EmbedStream(parser->getStream(), dict.copy(), gFalse, 0);
++#if POPPLER_CHECK_VERSION(26, 2, 0)
++  str = str->addFilters(std::unique_ptr<Stream>(str), dict.getDict()).release();
++#else
+   str = str->addFilters(dict.getDict());
++#endif
+ #else
+   str = new EmbedStream(parser->getStream(), &dict, gFalse, 0);
+   str = str->addFilters(&dict);
+@@ -3161,10 +3161,17 @@ void PdfParser::loadOptionalContentLayers(Dict *resources)
+             auto visible = true;
+             // Normally we'd use poppler optContentIsVisible, but these dict
+             // objects don't retain their references so can't be used directly.
++#if POPPLER_CHECK_VERSION(26, 2, 0)
++            for (auto &[ref, ocg] : ocgs->getOCGs()) {
++                if (ocg->getName()->toStr() == label)
++                    visible = ocg->getState() == OptionalContentGroup::On;
++            }
++#else
+             for (auto &[ref, ocg] : ocgs->getOCGs()) {
+                 if (ocg->getName()->cmp(label) == 0)
+                     visible = ocg->getState() == OptionalContentGroup::On;
+             }
++#endif
+             builder->addOptionalGroup(dict->getKey(j), label, visible);
+         }
+     }
+diff --git a/src/extension/internal/pdfinput/poppler-transition-api.h b/src/extension/internal/pdfinput/poppler-transition-api.h
+index 6f2b97c509..5dfac7594f 100644
+--- a/src/extension/internal/pdfinput/poppler-transition-api.h
++++ b/src/extension/internal/pdfinput/poppler-transition-api.h
+@@ -15,6 +15,16 @@
+ #include <glib/poppler-features.h>
+ #include <poppler/UTF.h>
+ 
++#if POPPLER_CHECK_VERSION(26, 2, 0)
++#define _POPPLER_WMODE GfxFont::WritingMode
++#define _POPPLER_WMODE_HORIZONTAL GfxFont::WritingMode::Horizontal
++#define _POPPLER_WMODE_VERTICAL GfxFont::WritingMode::Vertical
++#else
++#define _POPPLER_WMODE int
++#define _POPPLER_WMODE_HORIZONTAL 0
++#define _POPPLER_WMODE_VERTICAL 1
++#endif
++
+ #if POPPLER_CHECK_VERSION(25, 7, 0)
+ #define _POPPLER_TEXT_SHIFT_WITH_USER_COORDS(dx, dy) textShiftWithUserCoords(dx, dy)
+ #define _POPPLER_FOFI_TRUETYPE_MAKE(font_data, faceIndex) FoFiTrueType::make(std::span(font_data), faceIndex)
+diff --git a/src/extension/internal/pdfinput/svg-builder.cpp b/src/extension/internal/pdfinput/svg-builder.cpp
+index a8a73b08bb..add36d904e 100644
+--- a/src/extension/internal/pdfinput/svg-builder.cpp
++++ b/src/extension/internal/pdfinput/svg-builder.cpp
+@@ -1434,7 +1434,7 @@ void SvgBuilder::updateFont(GfxState *state, std::shared_ptr<CairoFont> cairo_fo
+     sp_repr_css_set_property(_css_font, "font-variant", "normal");
+ 
+     // Writing mode
+-    if ( font->getWMode() == 0 ) {
++    if ( font->getWMode() == _POPPLER_WMODE_HORIZONTAL ) {
+         sp_repr_css_set_property(_css_font, "writing-mode", "lr");
+     } else {
+         sp_repr_css_set_property(_css_font, "writing-mode", "tb");
+@@ -1446,7 +1446,7 @@ void SvgBuilder::updateFont(GfxState *state, std::shared_ptr<CairoFont> cairo_fo
+  */
+ void SvgBuilder::updateTextShift(GfxState *state, double shift) {
+     double shift_value = -shift * 0.001 * fabs(state->getFontSize());
+-    if (state->getFont()->getWMode()) {
++    if (state->getFont()->getWMode() != _POPPLER_WMODE_HORIZONTAL) {
+         _text_position[1] += shift_value;
+     } else {
+         _text_position[0] += shift_value;
+@@ -1500,7 +1500,7 @@ Inkscape::XML::Node* SvgBuilder::_flushTextText(GfxState *state, double text_sca
+ 
+     // Text direction is a property of the <text> element.
+     auto font = state->getFont();
+-    if (font->getWMode() == 1) {
++    if (font->getWMode() == _POPPLER_WMODE_VERTICAL) {
+         // Only set if vertical.
+         auto css_text = sp_repr_css_attr_new();
+         sp_repr_css_set_property(css_text, "writing-mode", "tb");
+@@ -1594,8 +1594,8 @@ Inkscape::XML::Node* SvgBuilder::_flushTextText(GfxState *state, double text_sca
+         bool output_tspan =
+             next_it == _glyphs.end() ||
+             next_it->style_changed   ||
+-            (writing_mode == 0 && std::abs(glyph.text_position[1] - next_it->text_position[1]) > 0.1) ||
+-            (writing_mode == 1 && std::abs(glyph.text_position[0] - next_it->text_position[0]) > 0.1);
++            (writing_mode == _POPPLER_WMODE_HORIZONTAL && std::abs(glyph.text_position[1] - next_it->text_position[1]) > 0.1) ||
++            (writing_mode == _POPPLER_WMODE_VERTICAL   && std::abs(glyph.text_position[0] - next_it->text_position[0]) > 0.1);
+ 
+         if (output_tspan) {
+ 
+-- 
+GitLab
+

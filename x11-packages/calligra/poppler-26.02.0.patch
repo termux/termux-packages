@@ -1,0 +1,86 @@
+From c8e2fab05cea73b6b74755ab3eb02478625c419c Mon Sep 17 00:00:00 2001
+From: Heiko Becker <heiko.becker@kde.org>
+Date: Sat, 7 Feb 2026 00:15:21 +0100
+Subject: [PATCH] Fix build with poppler 26.02.0
+
+...and adapt to the changes introduced with
+https://gitlab.freedesktop.org/poppler/poppler/-/commit/99433381912d2d5963646cc54ddd22e3c5db071b
+
+BUG: 515875
+
+(cherry picked from commit 209d2995df95657c044064d2fa72ab3a6e8eb13f)
+---
+ filters/karbon/pdf/SvgOutputDev.cpp | 12 ++++++++++++
+ filters/karbon/pdf/SvgOutputDev.h   |  8 ++++++++
+ 2 files changed, 20 insertions(+)
+
+diff --git a/filters/karbon/pdf/SvgOutputDev.cpp b/filters/karbon/pdf/SvgOutputDev.cpp
+index 178631e02af..94a5e91087d 100644
+--- a/filters/karbon/pdf/SvgOutputDev.cpp
++++ b/filters/karbon/pdf/SvgOutputDev.cpp
+@@ -210,7 +210,11 @@ QString SvgOutputDev::convertMatrix(const QTransform &matrix)
+     return QString("matrix(%1 %2 %3 %4 %5 %6)").arg(matrix.m11()).arg(matrix.m12()).arg(matrix.m21()).arg(matrix.m22()).arg(matrix.dx()).arg(matrix.dy());
+ }
+ 
++#if POPPLER_VERSION_MACRO < QT_VERSION_CHECK(26, 2, 0)
+ QString SvgOutputDev::convertMatrix(const double *matrix)
++#else
++QString SvgOutputDev::convertMatrix(const std::array<double, 6> &matrix)
++#endif
+ {
+     return QString("matrix(%1 %2 %3 %4 %5 %6)").arg(matrix[0]).arg(matrix[1]).arg(matrix[2]).arg(matrix[3]).arg(matrix[4]).arg(matrix[5]);
+ }
+@@ -434,7 +438,11 @@ void SvgOutputDev::drawString(GfxState *state, const GooString *s)
+     double x = state->getCurX();
+     double y = state->getCurY();
+ 
++#if POPPLER_VERSION_MACRO < QT_VERSION_CHECK(26, 2, 0)
+     const double *ctm = state->getCTM();
++#else
++    const std::array<double, 6> &ctm = state->getCTM();
++#endif
+     QTransform transform(ctm[0], ctm[1], ctm[2], ctm[3], ctm[4], ctm[5]);
+ 
+     QTransform mirror;
+@@ -539,7 +547,11 @@ void SvgOutputDev::drawImage(GfxState *state,
+         return;
+     }
+ 
++#if POPPLER_VERSION_MACRO < QT_VERSION_CHECK(26, 2, 0)
+     const double *ctm = state->getCTM();
++#else
++    const std::array<double, 6> &ctm = state->getCTM();
++#endif
+     QTransform m(ctm[0] / width, ctm[1] / width, -ctm[2] / height, -ctm[3] / height, ctm[2] + ctm[4], ctm[3] + ctm[5]);
+ 
+     QByteArray ba;
+diff --git a/filters/karbon/pdf/SvgOutputDev.h b/filters/karbon/pdf/SvgOutputDev.h
+index e2a78285332..721894b1de6 100644
+--- a/filters/karbon/pdf/SvgOutputDev.h
++++ b/filters/karbon/pdf/SvgOutputDev.h
+@@ -12,6 +12,10 @@
+ 
+ #include <QString>
+ 
++#include <poppler-version.h>
++
++#define POPPLER_VERSION_MACRO ((POPPLER_VERSION_MAJOR << 16) | (POPPLER_VERSION_MINOR << 8) | (POPPLER_VERSION_MICRO))
++
+ class GfxPath;
+ class QTransform;
+ class GooString;
+@@ -69,7 +73,11 @@ public:
+ private:
+     QString convertPath(const GfxPath *path);
+     QString convertMatrix(const QTransform &matrix);
++#if POPPLER_VERSION_MACRO < QT_VERSION_CHECK(26, 2, 0)
+     QString convertMatrix(const double *matrix);
++#else
++    QString convertMatrix(const std::array<double, 6> &matrix);
++#endif
+     QString printFill();
+     QString printStroke();
+ 
+-- 
+GitLab
+
