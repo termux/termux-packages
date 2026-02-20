@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Universal Command Line Interface for Amazon Web Services
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.33.25"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/aws/aws-cli/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=e5ac917891277cc3ad419449b079d56268970bdaa4f904c3996b423da557d57e
 TERMUX_PKG_AUTO_UPDATE=true
@@ -16,6 +17,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 PYTHON=$TERMUX_PREFIX/bin/python
 "
 
+# shellcheck disable=SC2115
 termux_step_pre_configure() {
 	export LDFLAGS+=" -lm"
 	export PIP_NO_BINARY=awscrt
@@ -27,15 +29,53 @@ termux_step_pre_configure() {
 
 	local PYTHON_INCLUDE="$TERMUX_PREFIX/include/python$TERMUX_PYTHON_VERSION"
 
+	[[ -n "$TERMUX_PKG_TMPDIR" ]] || termux_error_exit "TERMUX_PKG_TMPDIR is unset"
+	rm -rf "${TERMUX_PKG_TMPDIR}/bin"
+	mkdir -p "$TERMUX_PKG_TMPDIR/bin"
+
+	local -A tools=(
+		[as]=AS
+		[cc]=CC
+		[cpp]=CPP
+		[c++]=CXX
+		[ld]=LD
+		[ar]=AR
+		[objcopy]=OBJCOPY
+		[objdump]=OBJDUMP
+		[ranlib]=RANLIB
+		[readelf]=READELF
+		[strip]=STRIP
+		[nm]=NM
+		[cxxfilt]=CXXFILT
+	)
+
+	local target cmd path
+	for target in "${!tools[@]}"; do
+		# indirection syntax e.g. target=nm, cmd=$NM
+		cmd="${!tools[$target]}"
+		path="$(command -v "$cmd")" || continue
+		ln -sf "$path" "$TERMUX_PKG_TMPDIR/bin/$target"
+	done
+
 	TERMUX_PROOT_EXTRA_ENV_VARS=" \
 	LD_PRELOAD= LD_LIBRARY_PATH= \
 	PIP_NO_BINARY=$PIP_NO_BINARY \
 	AWS_CRT_BUILD_FORCE_STATIC_LIBS=$AWS_CRT_BUILD_FORCE_STATIC_LIBS \
 	PIP_NO_INDEX=1 \
+	PIP_VERBOSE=1 \
+	AS=$AS \
 	CC=$CC \
+	CPP=$CPP \
 	CXX=$CXX \
+	LD=$LD \
 	AR=$AR \
+	OBJCOPY=$OBJCOPY \
+	OBJDUMP=$OBJDUMP \
 	RANLIB=$RANLIB \
+	READELF=$READELF \
+	STRIP=$STRIP \
+	NM=$NM \
+	CXXFILT=$CXXFILT \
 	CFLAGS='$CFLAGS -I$PYTHON_INCLUDE' \
 	CPPFLAGS='$CPPFLAGS -I$PYTHON_INCLUDE' \
 	CXXFLAGS='$CXXFLAGS' \
@@ -51,9 +91,8 @@ termux_step_configure() {
 
 	termux_setup_proot
 
-	termux-proot-run "$TERMUX_PKG_SRCDIR/configure" \
-		--prefix="$TERMUX_PREFIX" \
-		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
+	termux-proot-run env PATH="$TERMUX_PKG_TMPDIR/bin:$TERMUX_PREFIX/bin:$PATH" \
+		"$TERMUX_PKG_SRCDIR/configure" --prefix="$TERMUX_PREFIX" $TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 }
 
 termux_step_make() {
@@ -79,7 +118,7 @@ termux_step_make() {
 
 	termux-proot-run \
 		-b "$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include/android:$TERMUX__PREFIX__INCLUDE_DIR/android" \
-		env PIP_FIND_LINKS="file://$WHEELHOUSE" \
+		env PIP_FIND_LINKS="file://$WHEELHOUSE" PATH="$TERMUX_PKG_TMPDIR/bin:$TERMUX_PREFIX/bin:$PATH" \
 		make
 }
 
@@ -89,5 +128,6 @@ termux_step_make_install() {
 		return
 	fi
 
-	termux-proot-run make install
+	termux-proot-run env PATH="$TERMUX_PKG_TMPDIR/bin:$TERMUX_PREFIX/bin:$PATH" \
+		make install
 }
