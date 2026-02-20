@@ -29,14 +29,22 @@ termux_step_make() {
 	termux_dotnet_kill
 }
 
+# The concern about preventing `rm -rf "${TERMUX_PREFIX}/lib"` from expanding to
+# `rm -rf "/lib/"` is valid, but the suggested remedy of `${var:?}` is not how we
+# prefer to handle null value errors.
+# shellcheck disable=SC2115
 termux_step_make_install() {
-	rm -fr "${TERMUX_PREFIX}/lib/${TERMUX_PKG_NAME}"
+	# Sanity check the variables used in the `rm`'s below, just in case.
+	[[ -n "$TERMUX_PREFIX" ]] || termux_error_exit "TERMUX_PREFIX is unset, this shouldn't even be possible."
+	[[ -n "$TERMUX_PKG_NAME" ]] || termux_error_exit "TERMUX_PKG_NAME is unset, this shouldn't even be possible."
+
+	rm -rf "${TERMUX_PREFIX}/lib/${TERMUX_PKG_NAME}"
 	mkdir -p "${TERMUX_PREFIX}/lib/${TERMUX_PKG_NAME}"
 	cp -r "out/shared/Git-Credential-Manager/bin/Release/net${TERMUX_DOTNET_VERSION}/${DOTNET_TARGET_NAME}/publish"/* "${TERMUX_PREFIX}/lib/${TERMUX_PKG_NAME}"
 	ln -sf "${TERMUX_PREFIX}/lib/${TERMUX_PKG_NAME}/git-credential-manager" "$TERMUX_PREFIX/bin"
 
 	# Remove translations
-	rm -rf "${TERMUX_PREFIX:?}/lib/${TERMUX_PKG_NAME:?}"/*/
+	rm -rf "${TERMUX_PREFIX}/lib/${TERMUX_PKG_NAME}"/*/
 	# Remove debug files
 	rm "${TERMUX_PREFIX}/lib/${TERMUX_PKG_NAME}"/*.pdb
 	# Remove duplicate license
