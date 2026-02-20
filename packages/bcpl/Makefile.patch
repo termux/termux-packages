@@ -1,0 +1,35 @@
+--- a/cintcode/Makefile
++++ b/cintcode/Makefile
+@@ -177,7 +177,7 @@
+ 
+ # For Pentium Linux without any graphics libraries or joystick
+ #CC = gcc -O3 -DforLinux -DSOUND -DCALLC -DEXTavail
+-CC = gcc -O4 -DforLinux -DSOUND -DCALLC -DEXTavail \
++#CC = gcc -O4 -DforLinux -DSOUND -DCALLC -DEXTavail \
+      -march=native -mfpmath=sse -Wpedantic
+ 
+ # For Pentium Linux without any graphics libraries but with a joystick
+@@ -196,7 +196,11 @@
+ #LDFLAGS+=`sdl-config --libs` -lGL -lGLU
+ 
+ # For 32 bit Pentium Linux compiling a 64-bit Cintcode interpreter.
+-#CC = gcc -O3 -DforLinux64
++ifeq ($(MACHTYPE), $(filter $(MACHTYPE), aarch64 x86_64))
++  CC = clang -O3 -DforLinux64
++else
++  CC = clang -O3 -DforLinux
++endif
+ 
+ # The following works under Cygwin on Pentiums and AMD 64 Athlon machines.
+ #CC = gcc -O3 -DforCYGWIN
+@@ -216,10 +220,8 @@
+ 
+ 
+ run:	bcplready
+-	bin/cintsys
+ 
+ run64:	bcplready64
+-	bin/cintsys64
+ 
+ sys:	bin/cintsys $(ENDER)
+ 	@echo "bin/cintsys is up to date"
