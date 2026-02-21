@@ -1,0 +1,11 @@
+--- a/contrib/plugins/uftrace.c
++++ b/contrib/plugins/uftrace.c
+@@ -115,7 +115,7 @@ static CpuOps arch_ops;
+ 
+ static uint64_t gettime_ns(void)
+ {
+-#ifdef _WIN32
++#if defined(_WIN32) || (defined(__ANDROID__) && __ANDROID_API__ < 29)
+     /*
+      * On Windows, timespec_get is available only with UCRT, but not with
+      * MinGW64 environment. Simplify by using only gettimeofday on this
