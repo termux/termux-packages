@@ -47,14 +47,17 @@ lib/libLLVMXRay.a
 termux_pkg_auto_update() {
 	local e=0
 	local latest_tag
-	latest_tag=$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")
+	latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")"
+	# shellcheck disable=SC2001 # We need to manually strip the tag prefix from the tag.
+	latest_tag="$(sed -e "s/^[^0-9]*//" <<< "${latest_tag}")"
 	if [[ "${latest_tag}" == "${TERMUX_PKG_VERSION}" ]]; then
 		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
 		return
 	fi
 	[[ -z "${latest_tag}" ]] && e=1
 
-	local uptime_now=$(cat /proc/uptime)
+	local uptime_now
+	uptime_now="$(< /proc/uptime)"
 	local uptime_s="${uptime_now//.*}"
 	local uptime_h_limit=1
 	local uptime_s_limit=$((uptime_h_limit*60*60))
@@ -73,14 +76,16 @@ termux_pkg_auto_update() {
 		return
 	fi
 
-	local tmpdir=$(mktemp -d)
+	local tmpdir
+	tmpdir="$(mktemp -d)"
 	git clone --branch "v${latest_tag}" --depth=1 --recursive \
 		"${TERMUX_PKG_SRCURL#git+}" "${tmpdir}"
 	make -C "${tmpdir}" llvm-source GO=:
-	local s=$(
+	local s
+	s="$(
 		find "${tmpdir}" -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | \
 		cut -d" " -f1 | LC_ALL=C sort | sha256sum | cut -d" " -f1
-	)
+	)"
 
 	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
 		echo "INFO: package needs to be updated to ${latest_tag}."
