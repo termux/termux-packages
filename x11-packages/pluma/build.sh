@@ -2,12 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://mate-desktop.org/
 TERMUX_PKG_DESCRIPTION="Powerful text editor for MATE"
 TERMUX_PKG_LICENSE="GPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.28.0"
+TERMUX_PKG_VERSION="1.28.1"
 TERMUX_PKG_SRCURL="https://github.com/mate-desktop/pluma/releases/download/v$TERMUX_PKG_VERSION/pluma-$TERMUX_PKG_VERSION.tar.xz"
-TERMUX_PKG_SHA256=aa8adf9589345093a50e30b27ede4a78a2421d1727c27f465fc87c435965a1d4
-# version 1.28.1 has a build failure not only in Termux, but also the same error in upstream's own CI;
-# wait for them to fix it
-TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_SHA256=27137ff1bb1c53a90d2308b8a6b203e5d07f13a644a0d950f3ead7bb9cf1e241
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="iso-codes, mate-desktop, zenity, gtksourceview4, glib, gobject-introspection, libpeas, gettext, enchant, libsm"
 TERMUX_PKG_SUGGESTS="pygobject"
 TERMUX_PKG_BUILD_DEPENDS="autoconf-archive, mate-common"
@@ -27,4 +25,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_pre_configure() {
 	termux_setup_gir
 	termux_setup_glib_cross_pkg_config_wrapper
+
+	autoreconf -fi
 }

@@ -1,0 +1,248 @@
+<?xml version="1.0"?>
+<dump>
+  <boxed name="PlumaEncoding" get-type="pluma_encoding_get_type"/>
+  <class name="PlumaDocument" get-type="pluma_document_get_type" parents="GtkSourceBuffer,GtkTextBuffer,GObject">
+    <property name="uri" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="shortname" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="content-type" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="mime-type" type="gchararray" flags="225" default-value="text/plain"/>
+    <property name="read-only" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="encoding" type="PlumaEncoding" flags="225"/>
+    <property name="can-search-again" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="enable-search-highlighting" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="newline-type" type="PlumaDocumentNewlineType" flags="163" default-value="PLUMA_DOCUMENT_NEWLINE_TYPE_LF"/>
+    <signal name="cursor-moved" return="void" when="last">
+    </signal>
+    <signal name="load" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="PlumaEncoding"/>
+      <param type="gint"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="loading" return="void" when="last">
+      <param type="guint64"/>
+      <param type="guint64"/>
+    </signal>
+    <signal name="loaded" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="save" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="PlumaEncoding"/>
+      <param type="PlumaDocumentSaveFlags"/>
+    </signal>
+    <signal name="saving" return="void" when="last">
+      <param type="guint64"/>
+      <param type="guint64"/>
+    </signal>
+    <signal name="saved" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="search-highlight-updated" return="void" when="last">
+      <param type="GtkTextIter"/>
+      <param type="GtkTextIter"/>
+    </signal>
+  </class>
+  <class name="PlumaView" get-type="pluma_view_get_type" parents="GtkSourceView,GtkTextView,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkScrollable"/>
+    <signal name="start-interactive-search" return="gboolean" when="last" action="1">
+    </signal>
+    <signal name="start-interactive-goto-line" return="gboolean" when="last" action="1">
+    </signal>
+    <signal name="reset-searched-text" return="gboolean" when="last" action="1">
+    </signal>
+    <signal name="drop-uris" return="void" when="last" action="1">
+      <param type="GStrv"/>
+    </signal>
+  </class>
+  <class name="PlumaTab" get-type="pluma_tab_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="state" type="PlumaTabState" flags="225" default-value="PLUMA_TAB_STATE_NORMAL"/>
+    <property name="autosave" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="autosave-interval" type="gint" flags="227" default-value="0"/>
+  </class>
+  <class name="PlumaPanel" get-type="pluma_panel_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="panel-orientation" type="GtkOrientation" flags="235" default-value="GTK_ORIENTATION_VERTICAL"/>
+    <signal name="item-added" return="void" when="first">
+      <param type="GtkWidget"/>
+    </signal>
+    <signal name="item-removed" return="void" when="first">
+      <param type="GtkWidget"/>
+    </signal>
+    <signal name="close" return="void" when="last" action="1">
+    </signal>
+    <signal name="focus-document" return="void" when="last" action="1">
+    </signal>
+  </class>
+  <class name="PlumaMessage" get-type="pluma_message_get_type" parents="GObject">
+    <property name="object-path" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="method" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="type" type="PlumaMessageType" flags="235"/>
+  </class>
+  <boxed name="PlumaMessageType" get-type="pluma_message_type_get_type"/>
+  <class name="PlumaMessageBus" get-type="pluma_message_bus_get_type" parents="GObject">
+    <signal name="dispatch" return="void" when="last">
+      <param type="PlumaMessage"/>
+    </signal>
+    <signal name="registered" return="void" when="last">
+      <param type="PlumaMessageType"/>
+    </signal>
+    <signal name="unregistered" return="void" when="last">
+      <param type="PlumaMessageType"/>
+    </signal>
+  </class>
+  <class name="PlumaWindow" get-type="pluma_window_get_type" parents="GtkApplicationWindow,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GActionGroup"/>
+    <implements name="GActionMap"/>
+    <property name="state" type="PlumaWindowState" flags="225" default-value="PLUMA_WINDOW_STATE_NORMAL"/>
+    <signal name="tab-added" return="void" when="first">
+      <param type="PlumaTab"/>
+    </signal>
+    <signal name="tab-removed" return="void" when="first">
+      <param type="PlumaTab"/>
+    </signal>
+    <signal name="tabs-reordered" return="void" when="first">
+    </signal>
+    <signal name="active-tab-changed" return="void" when="first">
+      <param type="PlumaTab"/>
+    </signal>
+    <signal name="active-tab-state-changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="PlumaApp" get-type="pluma_app_get_type" parents="GObject">
+    <property name="lockdown" type="PlumaLockdownMask" flags="225" default-value="0"/>
+  </class>
+  <interface name="PlumaAppActivatable" get-type="pluma_app_activatable_get_type">
+    <property name="app" type="PlumaApp" flags="235"/>
+  </interface>
+  <class name="PlumaApplication" get-type="pluma_application_get_type" parents="GtkApplication,GApplication,GObject">
+    <implements name="GActionGroup"/>
+    <implements name="GActionMap"/>
+  </class>
+  <class name="PlumaEncodingsComboBox" get-type="pluma_encodings_combo_box_get_type" parents="GtkComboBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkCellLayout"/>
+    <implements name="GtkCellEditable"/>
+    <property name="save-mode" type="gboolean" flags="231" default-value="FALSE"/>
+  </class>
+  <class name="PlumaNotebook" get-type="pluma_notebook_get_type" parents="GtkNotebook,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <signal name="tab-added" return="void" when="first">
+      <param type="PlumaTab"/>
+    </signal>
+    <signal name="tab-removed" return="void" when="first">
+      <param type="PlumaTab"/>
+    </signal>
+    <signal name="tabs-reordered" return="void" when="first">
+    </signal>
+    <signal name="tab-detached" return="void" when="first">
+      <param type="PlumaTab"/>
+    </signal>
+    <signal name="tab-close-request" return="void" when="last">
+      <param type="PlumaTab"/>
+    </signal>
+  </class>
+  <class name="PlumaProgressMessageArea" get-type="pluma_progress_message_area_get_type" parents="GtkInfoBar,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="has-cancel-button" type="gboolean" flags="234" default-value="TRUE"/>
+  </class>
+  <class name="PlumaStatusbar" get-type="pluma_statusbar_get_type" parents="GtkStatusbar,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+  </class>
+  <class name="PlumaStatusComboBox" get-type="pluma_status_combo_box_get_type" parents="GtkEventBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="label" type="gchararray" flags="3" default-value="NULL"/>
+    <signal name="changed" return="void" when="last">
+      <param type="GtkMenuItem"/>
+    </signal>
+  </class>
+  <interface name="PlumaViewActivatable" get-type="pluma_view_activatable_get_type">
+    <property name="view" type="PlumaView" flags="235"/>
+  </interface>
+  <interface name="PlumaWindowActivatable" get-type="pluma_window_activatable_get_type">
+    <property name="window" type="PlumaWindow" flags="235"/>
+  </interface>
+  <flags name="PlumaLockdownMask" get-type="pluma_lockdown_mask_get_type">
+    <member name="PLUMA_LOCKDOWN_COMMAND_LINE" nick="command-line" value="1"/>
+    <member name="PLUMA_LOCKDOWN_PRINTING" nick="printing" value="2"/>
+    <member name="PLUMA_LOCKDOWN_PRINT_SETUP" nick="print-setup" value="4"/>
+    <member name="PLUMA_LOCKDOWN_SAVE_TO_DISK" nick="save-to-disk" value="8"/>
+    <member name="PLUMA_LOCKDOWN_ALL" nick="all" value="15"/>
+  </flags>
+  <flags name="PlumaDebugSection" get-type="pluma_debug_section_get_type">
+    <member name="PLUMA_NO_DEBUG" nick="no-debug" value="0"/>
+    <member name="PLUMA_DEBUG_VIEW" nick="debug-view" value="1"/>
+    <member name="PLUMA_DEBUG_SEARCH" nick="debug-search" value="2"/>
+    <member name="PLUMA_DEBUG_PRINT" nick="debug-print" value="4"/>
+    <member name="PLUMA_DEBUG_PREFS" nick="debug-prefs" value="8"/>
+    <member name="PLUMA_DEBUG_PLUGINS" nick="debug-plugins" value="16"/>
+    <member name="PLUMA_DEBUG_TAB" nick="debug-tab" value="32"/>
+    <member name="PLUMA_DEBUG_DOCUMENT" nick="debug-document" value="64"/>
+    <member name="PLUMA_DEBUG_COMMANDS" nick="debug-commands" value="128"/>
+    <member name="PLUMA_DEBUG_APP" nick="debug-app" value="256"/>
+    <member name="PLUMA_DEBUG_SESSION" nick="debug-session" value="512"/>
+    <member name="PLUMA_DEBUG_UTILS" nick="debug-utils" value="1024"/>
+    <member name="PLUMA_DEBUG_METADATA" nick="debug-metadata" value="2048"/>
+    <member name="PLUMA_DEBUG_WINDOW" nick="debug-window" value="4096"/>
+    <member name="PLUMA_DEBUG_LOADER" nick="debug-loader" value="8192"/>
+    <member name="PLUMA_DEBUG_SAVER" nick="debug-saver" value="16384"/>
+  </flags>
+  <enum name="PlumaDocumentNewlineType" get-type="pluma_document_newline_type_get_type">
+    <member name="PLUMA_DOCUMENT_NEWLINE_TYPE_LF" nick="lf" value="0"/>
+    <member name="PLUMA_DOCUMENT_NEWLINE_TYPE_CR" nick="cr" value="1"/>
+    <member name="PLUMA_DOCUMENT_NEWLINE_TYPE_CR_LF" nick="cr-lf" value="2"/>
+  </enum>  <flags name="PlumaSearchFlags" get-type="pluma_search_flags_get_type">
+    <member name="PLUMA_SEARCH_DONT_SET_FLAGS" nick="dont-set-flags" value="1"/>
+    <member name="PLUMA_SEARCH_ENTIRE_WORD" nick="entire-word" value="2"/>
+    <member name="PLUMA_SEARCH_CASE_SENSITIVE" nick="case-sensitive" value="4"/>
+    <member name="PLUMA_SEARCH_PARSE_ESCAPES" nick="parse-escapes" value="8"/>
+    <member name="PLUMA_SEARCH_MATCH_REGEX" nick="match-regex" value="16"/>
+  </flags>
+  <flags name="PlumaDocumentSaveFlags" get-type="pluma_document_save_flags_get_type">
+    <member name="PLUMA_DOCUMENT_SAVE_IGNORE_MTIME" nick="ignore-mtime" value="1"/>
+    <member name="PLUMA_DOCUMENT_SAVE_IGNORE_BACKUP" nick="ignore-backup" value="2"/>
+    <member name="PLUMA_DOCUMENT_SAVE_PRESERVE_BACKUP" nick="preserve-backup" value="4"/>
+  </flags>
+  <enum name="PlumaTabState" get-type="pluma_tab_state_get_type">
+    <member name="PLUMA_TAB_STATE_NORMAL" nick="state-normal" value="0"/>
+    <member name="PLUMA_TAB_STATE_LOADING" nick="state-loading" value="1"/>
+    <member name="PLUMA_TAB_STATE_REVERTING" nick="state-reverting" value="2"/>
+    <member name="PLUMA_TAB_STATE_SAVING" nick="state-saving" value="3"/>
+    <member name="PLUMA_TAB_STATE_PRINTING" nick="state-printing" value="4"/>
+    <member name="PLUMA_TAB_STATE_PRINT_PREVIEWING" nick="state-print-previewing" value="5"/>
+    <member name="PLUMA_TAB_STATE_SHOWING_PRINT_PREVIEW" nick="state-showing-print-preview" value="6"/>
+    <member name="PLUMA_TAB_STATE_GENERIC_NOT_EDITABLE" nick="state-generic-not-editable" value="7"/>
+    <member name="PLUMA_TAB_STATE_LOADING_ERROR" nick="state-loading-error" value="8"/>
+    <member name="PLUMA_TAB_STATE_REVERTING_ERROR" nick="state-reverting-error" value="9"/>
+    <member name="PLUMA_TAB_STATE_SAVING_ERROR" nick="state-saving-error" value="10"/>
+    <member name="PLUMA_TAB_STATE_GENERIC_ERROR" nick="state-generic-error" value="11"/>
+    <member name="PLUMA_TAB_STATE_CLOSING" nick="state-closing" value="12"/>
+    <member name="PLUMA_TAB_STATE_EXTERNALLY_MODIFIED_NOTIFICATION" nick="state-externally-modified-notification" value="13"/>
+    <member name="PLUMA_TAB_NUM_OF_STATES" nick="num-of-states" value="14"/>
+  </enum>  <flags name="PlumaWindowState" get-type="pluma_window_state_get_type">
+    <member name="PLUMA_WINDOW_STATE_NORMAL" nick="normal" value="0"/>
+    <member name="PLUMA_WINDOW_STATE_SAVING" nick="saving" value="2"/>
+    <member name="PLUMA_WINDOW_STATE_PRINTING" nick="printing" value="4"/>
+    <member name="PLUMA_WINDOW_STATE_LOADING" nick="loading" value="8"/>
+    <member name="PLUMA_WINDOW_STATE_ERROR" nick="error" value="16"/>
+    <member name="PLUMA_WINDOW_STATE_SAVING_SESSION" nick="saving-session" value="32"/>
+  </flags>
+  <error-quark function="pluma_document_error_quark" domain="pluma_io_load_error"/>
+</dump>
