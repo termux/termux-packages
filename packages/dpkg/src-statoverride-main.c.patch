@@ -1,15 +1,16 @@
-diff --color -uNr ../dpkg-1.21.8/src/statoverride/main.c ./src/statoverride/main.c
---- ../dpkg-1.21.8/src/statoverride/main.c	2022-05-24 14:36:59.000000000 -0300
-+++ ./src/statoverride/main.c	2022-05-31 07:39:44.829552700 -0300
-@@ -188,9 +188,11 @@
+diff --git a/src/statoverride/main.c b/src/statoverride/main.c
+index 1c3097c19..acc222899 100644
+--- a/src/statoverride/main.c
++++ b/src/statoverride/main.c
+@@ -174,9 +174,11 @@ statdb_node_apply(const char *filename, struct file_stat *filestat)
  {
  	int rc;
  
-+#ifndef __ANDROID__
++	#ifndef __ANDROID__
  	rc = chown(filename, filestat->uid, filestat->gid);
  	if (forcible_nonroot_error(rc) < 0)
- 		ohshite(_("error setting ownership of '%.255s'"), filename);
-+#endif
+ 		ohshite(_("error setting ownership of '%s'"), filename);
++	#endif
  	rc = chmod(filename, filestat->mode & ~S_IFMT);
  	if (forcible_nonroot_error(rc) < 0)
- 		ohshite(_("error setting permissions of '%.255s'"), filename);
+ 		ohshite(_("error setting permissions of '%s'"), filename);
