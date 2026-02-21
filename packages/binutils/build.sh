@@ -39,8 +39,13 @@ ZSTD_LIBS=-l:libzstd.a
 "
 
 termux_step_post_get_source() {
-	# Remove this marker all the time, as binutils is architecture-specific.
+	# Remove the marker every time, as binutils is architecture-specific.
 	rm -rf "$TERMUX_HOSTBUILD_MARKER"
+
+	# https://gitlab.archlinux.org/archlinux/packaging/packages/binutils/-/blob/2.46-1/PKGBUILD#L76-77
+	# Turn off development mode (-Werror, gas run-time checks, date in sonames)
+	sed -i '/^development=/s/true/false/' "$TERMUX_PKG_SRCDIR/bfd/development.sh"
+
 }
 
 termux_step_host_build() {
@@ -73,8 +78,8 @@ termux_step_post_make_install() {
 	mkdir -p "$TERMUX_PREFIX/bin"
 	cd "$TERMUX_PREFIX/libexec/binutils" || termux_error_exit "failed to change into 'libexec/binutils' directory"
 
-	mv ld{.bfd,}
-	ln -sf ld{,.bfd}
+	mv ld.bfd ld
+	ln -sf ld ld.bfd
 	ln -sfr "$TERMUX_PREFIX/libexec/binutils/ld" "$TERMUX_PREFIX/bin/ld.bfd"
 
 	local bin
