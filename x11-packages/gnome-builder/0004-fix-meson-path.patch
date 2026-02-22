@@ -1,0 +1,35 @@
+diff --git a/src/plugins/meson/gbp-meson-build-system.c b/src/plugins/meson/gbp-meson-build-system.c
+index 3cbd52cf0..483a3f09a 100644
+--- a/src/plugins/meson/gbp-meson-build-system.c
++++ b/src/plugins/meson/gbp-meson-build-system.c
+@@ -827,7 +827,7 @@ gbp_meson_build_system_prepare_tooling_cb (IdeRunContext       *run_context,
+ 
+   g_string_append (argv0, "\n");
+ 
+-  ide_run_context_set_argv (run_context, IDE_STRV_INIT ("/bin/sh", "-c", argv0->str));
++  ide_run_context_set_argv (run_context, IDE_STRV_INIT ("@TERMUX_PREFIX@/bin/sh", "-c", argv0->str));
+ 
+   IDE_RETURN (TRUE);
+ }
+diff --git a/src/plugins/meson/gbp-meson-introspection.c b/src/plugins/meson/gbp-meson-introspection.c
+index 461f95a20..284d9fd55 100644
+--- a/src/plugins/meson/gbp-meson-introspection.c
++++ b/src/plugins/meson/gbp-meson-introspection.c
+@@ -340,7 +340,7 @@ gbp_meson_introspection_load_targets (GbpMesonIntrospection *self,
+ 
+               /* Ignore custom unless it's installed to somewhere/bin/ */
+               if (ide_str_equal0 (type, "custom") &&
+-                  (install_dir == NULL || !g_str_has_suffix (install_dir, "/bin")))
++                  (install_dir == NULL || !g_str_has_suffix (install_dir, "@TERMUX_PREFIX@/bin")))
+                 continue;
+ 
+               run_command = ide_run_command_new ();
+@@ -360,7 +360,7 @@ gbp_meson_introspection_load_targets (GbpMesonIntrospection *self,
+                 ide_run_command_set_argv (run_command, IDE_STRV_INIT (filename[0]));
+ 
+               /* Lower priority for any executable not installed to somewhere/bin/ */
+-              if (install_dir != NULL && g_str_has_suffix (install_dir, "/bin"))
++              if (install_dir != NULL && g_str_has_suffix (install_dir, "@TERMUX_PREFIX@/bin"))
+                 ide_run_command_set_priority (run_command, 0);
+               else
+                 ide_run_command_set_priority (run_command, 1000);

@@ -1,0 +1,19 @@
+diff --git a/src/plugins/cmake/gbp-cmake-run-command-provider.c b/src/plugins/cmake/gbp-cmake-run-command-provider.c
+index 7f2834048..39b09bbce 100644
+--- a/src/plugins/cmake/gbp-cmake-run-command-provider.c
++++ b/src/plugins/cmake/gbp-cmake-run-command-provider.c
+@@ -67,10 +67,10 @@ parse_manifest_text (char  *contents,
+        */
+       line[line_length] = 0;
+ 
+-      if ((binary_path = strstr (line, "/bin/")))
+-        name = binary_path + strlen ("/bin/");
+-      else if ((binary_path = strstr (line, "/libexec/")))
+-        name = binary_path + strlen ("/libexec/");
++      if ((binary_path = strstr (line, "@TERMUX_PREFIX@/bin/")))
++        name = binary_path + strlen ("@TERMUX_PREFIX@/bin/");
++      else if ((binary_path = strstr (line, "@TERMUX_PREFIX@/libexec/")))
++        name = binary_path + strlen ("@TERMUX_PREFIX@/libexec/");
+       else
+         continue;
+ 

@@ -1,0 +1,13 @@
+diff --git a/src/plugins/gdb/gbp-gdb-debugger.c b/src/plugins/gdb/gbp-gdb-debugger.c
+index 585f9dcd4..149bbcdd4 100644
+--- a/src/plugins/gdb/gbp-gdb-debugger.c
++++ b/src/plugins/gdb/gbp-gdb-debugger.c
+@@ -2394,7 +2394,7 @@ gbp_gdb_debugger_run_context_handler_cb (IdeRunContext       *run_context,
+                                          gpointer             user_data,
+                                          GError             **error)
+ {
+-  static const char * const allowed_shells[] = { "/bin/sh", "sh", "/bin/bash", "bash", NULL };
++  static const char * const allowed_shells[] = { "@TERMUX_PREFIX@/bin/sh", "sh", "@TERMUX_PREFIX@/bin/bash", "bash", NULL };
+   GbpGdbDebugger *self = user_data;
+   g_autoptr(GIOStream) io_stream = NULL;
+   int pty_source_fd;
