@@ -1,0 +1,11 @@
+--- a/bin/csh/misc.c
++++ b/bin/csh/misc.c
+@@ -235,7 +235,7 @@
+     nofile = FOLDSTD + 1;
+     if (fcntl(nofile, F_CLOSEM, 0) == -1)
+ #endif
+-	nofile = NOFILE;
++	nofile = FOPEN_MAX;
+ 
+     for (f = 0; f < nofile; f++)
+ 	if (f != SHIN && f != SHOUT && f != SHERR && f != OLDSTD &&
