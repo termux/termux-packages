@@ -1,5 +1,14 @@
 --- a/bus/activation-helper.c
 +++ b/bus/activation-helper.c
+@@ -171,7 +171,7 @@ clear_environment (DBusError *error)
+ static dbus_bool_t
+ check_permissions (const char *dbus_user, DBusError *error)
+ {
+-#ifndef ACTIVATION_LAUNCHER_TEST
++#if !defined ACTIVATION_LAUNCHER_TEST && !defined __ANDROID__
+   uid_t uid, euid;
+   struct passwd *pw;
+ 
 @@ -294,7 +294,8 @@
  static dbus_bool_t
  switch_user (char *user, DBusError *error)

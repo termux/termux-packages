@@ -1,0 +1,65 @@
+diff --git a/panels/keyboard/meson.build b/panels/keyboard/meson.build
+index cd1b54e..d742787 100644
+--- a/panels/keyboard/meson.build
++++ b/panels/keyboard/meson.build
+@@ -47,8 +47,8 @@ endforeach
+ libkeyboard_shortcuts = static_library(
+   'keyboard-shortcuts',
+   sources: 'keyboard-shortcuts.c',
+-  include_directories: [top_inc],
+-  dependencies: deps,
++  include_directories: [top_inc, common_inc],
++  dependencies: deps + [generates_sources_dep],
+ )
+ 
+ keyboard_shortcuts_dep = declare_dependency(
+diff --git a/panels/meson.build b/panels/meson.build
+index 07c7733..fc37f02 100644
+--- a/panels/meson.build
++++ b/panels/meson.build
+@@ -12,9 +12,6 @@ panels = [
+   'mouse',
+   'multitasking',
+   'notifications',
+-  'online-accounts',
+-  'power',
+-  'printers',
+   'privacy',
+   'search',
+   'sharing',
+diff --git a/shell/cc-panel-loader.c b/shell/cc-panel-loader.c
+index 28a1671..85482e5 100644
+--- a/shell/cc-panel-loader.c
++++ b/shell/cc-panel-loader.c
+@@ -47,9 +47,15 @@ extern GType cc_network_panel_get_type (void);
+ extern GType cc_wifi_panel_get_type (void);
+ #endif /* BUILD_NETWORK */
+ extern GType cc_notifications_panel_get_type (void);
++#ifdef BUILD_ONLINE_ACCOUNTS
+ extern GType cc_online_accounts_panel_get_type (void);
++#endif /* BUILD_ONLINE_ACCOUNTS */
++#ifdef BUILD_POWER
+ extern GType cc_power_panel_get_type (void);
++#endif /* BUILD_POWER */
++#ifdef BUILD_PRINTERS
+ extern GType cc_printers_panel_get_type (void);
++#endif /* BUILD_PRINTERS */
+ extern GType cc_privacy_panel_get_type (void);
+ extern GType cc_search_panel_get_type (void);
+ extern GType cc_sharing_panel_get_type (void);
+@@ -101,9 +107,15 @@ static CcPanelLoaderVtable default_panels[] =
+   PANEL_TYPE("wifi",             cc_wifi_panel_get_type,                 cc_wifi_panel_static_init_func),
+ #endif
+   PANEL_TYPE("notifications",    cc_notifications_panel_get_type,        NULL),
++#ifdef BUILD_ONLINE_ACCOUNTS
+   PANEL_TYPE("online-accounts",  cc_online_accounts_panel_get_type,      NULL),
++#endif
++#ifdef BUILD_POWER
+   PANEL_TYPE("power",            cc_power_panel_get_type,                NULL),
++#endif
++#ifdef BUILD_PRINTERS
+   PANEL_TYPE("printers",         cc_printers_panel_get_type,             NULL),
++#endif
+   PANEL_TYPE("privacy",          cc_privacy_panel_get_type,              NULL),
+   PANEL_TYPE("search",           cc_search_panel_get_type,               NULL),
+   PANEL_TYPE("sharing",          cc_sharing_panel_get_type,              cc_sharing_panel_static_init_func),

@@ -53,17 +53,6 @@
  #  define MOZ_CUBEB_REMOTING
  #endif
  
---- a/mozglue/misc/ConditionVariable_posix.cpp
-+++ b/mozglue/misc/ConditionVariable_posix.cpp
-@@ -23,7 +23,7 @@
- // Android 4.4 or earlier & macOS 10.12 has the clock functions, but not
- // pthread_condattr_setclock.
- #if defined(HAVE_CLOCK_MONOTONIC) && \
--    !(defined(__ANDROID__) && __ANDROID_API__ < 21) && !defined(__APPLE__)
-+    defined(__TERMUX__)
- #  define CV_USE_CLOCK_API
- #endif
- 
 --- a/mozglue/misc/StackWalk.cpp
 +++ b/mozglue/misc/StackWalk.cpp
 @@ -692,7 +692,7 @@
@@ -77,12 +66,13 @@
    pthread_getattr_np(pthread_self(), &sattr);
 --- a/nsprpub/pr/src/pthreads/ptsynch.c
 +++ b/nsprpub/pr/src/pthreads/ptsynch.c
-@@ -953,7 +953,7 @@
- #if (defined(__GNU_LIBRARY__) && !defined(_SEM_SEMUN_UNDEFINED)) \
-     || (defined(FREEBSD) && __FreeBSD_version < 1200059) \
-     || defined(OPENBSD) || defined(BSDI) \
--    || defined(DARWIN)
-+    || defined(DARWIN) || defined(__TERMUX__)
+@@ -864,7 +864,7 @@
+  */
+ #    if (defined(__GNU_LIBRARY__) && !defined(_SEM_SEMUN_UNDEFINED)) || \
+         (defined(FREEBSD) && __FreeBSD_version < 1200059) ||            \
+-        defined(OPENBSD) || defined(DARWIN)
++        defined(OPENBSD) || defined(DARWIN) || defined(__TERMUX__)
  /* union semun is defined by including <sys/sem.h> */
- #else
+ #    else
  /* according to X/OPEN we have to define it ourselves */
+

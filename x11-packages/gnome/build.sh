@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://www.gnome.org/
+TERMUX_PKG_DESCRIPTION="A metapackage that installs all parts of the GNOME desktop environment"
+TERMUX_PKG_LICENSE="Public Domain"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="49.0"
+TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_SKIP_SRC_EXTRACT=true
+TERMUX_PKG_DEPENDS="epiphany, gnome-backgrounds, gnome-calculator, gnome-clocks, gnome-console, gnome-control-center, gnome-keyring, gnome-menus, gnome-session, gnome-settings-daemon, gnome-shell, gvfs, nautilus, orca"
+TERMUX_PKG_METAPACKAGE=true
+TERMUX_PKG_PLATFORM_INDEPENDENT=true

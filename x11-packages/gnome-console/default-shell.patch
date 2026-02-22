@@ -1,0 +1,33 @@
+--- a/data/org.gnome.Console.gschema.xml.in
++++ b/data/org.gnome.Console.gschema.xml.in
+@@ -23,7 +23,7 @@
+       <default>true</default>
+     </key>
+     <key name="shell" type="as">
+-      <default>[]</default>
++      <default>['@TERMUX_PREFIX@/bin/bash']</default>
+     </key>
+     <key name="ignore-scrollback-limit" type="b">
+       <default>false</default>
+--- a/src/kgx-settings.c
++++ b/src/kgx-settings.c
+@@ -638,7 +638,7 @@ kgx_settings_get_shell (KgxSettings *self)
+ 
+   /* We could probably do something other than /bin/sh */
+   shell = g_new0 (char *, 2);
+-  shell[0] = g_strdup ("/bin/sh");
++  shell[0] = g_strdup ("@TERMUX_PREFIX@/bin/bash");
+   shell[1] = NULL;
+   g_warning ("No Shell! Defaulting to “%s”", shell[0]);
+ 
+--- a/src/kgx-utils.c
++++ b/src/kgx-utils.c
+@@ -54,7 +54,7 @@ process_single_arg (const char *const raw_arg)
+     g_set_str (&argv[0], bin);
+   } else {
+     argv = g_new0 (char *, 4);
+-    g_set_str (&argv[0], "/bin/sh");
++    g_set_str (&argv[0], "@TERMUX_PREFIX@/bin/sh");
+     g_set_str (&argv[1], "-c");
+     g_set_str (&argv[2], bin);
+   }

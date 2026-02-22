@@ -57,6 +57,7 @@ PYTHON_PACKAGES+=" pygments"     # necessary to build mesa (dependency of mako t
 PYTHON_PACKAGES+=" mako"         # necessary to build mesa
 PYTHON_PACKAGES+=" pyyaml"       # necessary to build mesa
 PYTHON_PACKAGES+=" setuptools"   # necessary to build mesa (explicitly 'system'-wide unlike the setuptools in termux_setup_python_pip)
+PYTHON_PACKAGES+=" docutils"     # necesary to build gnome-shell
 # More 'system-wide' python packages should be added here if working towards the goal
 # of setup-termux.sh for on-device building having closer behavior
 # to setup-ubuntu.sh for cross-compilation. If adding packages here, please add a comment

@@ -1,0 +1,165 @@
+From 151cb704db837b1a5d59b6c146bf42e42c0c2dbc Mon Sep 17 00:00:00 2001
+From: Md Arif <111168803+sabamdarif@users.noreply.github.com>
+Date: Wed, 9 Jul 2025 14:56:31 +0530
+Subject: [PATCH] no udev 3.9.0
+
+---
+ meson.build                               |  1 -
+ src/common/tracker-enums.h                | 18 +++++++++---------
+ src/indexer/meson.build                   |  1 -
+ src/indexer/tracker-miner-files-methods.c | 17 +++++------------
+ src/indexer/tracker-miner-files.c         |  8 --------
+ src/indexer/tracker-miner-files.h         |  2 --
+ 6 files changed, 14 insertions(+), 33 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index a5820e3..2f38233 100644
+--- a/meson.build
++++ b/meson.build
+@@ -23,7 +23,6 @@ gexiv2 = dependency('gexiv2', required: get_option('raw'))
+ gio = dependency('gio-2.0', version: '>=' + glib_required)
+ gio_unix = dependency('gio-unix-2.0', version: '>=' + glib_required)
+ glib = dependency('glib-2.0', version: '>=' + glib_required)
+-gudev = dependency('gudev-1.0')
+ gmodule = dependency('gmodule-2.0', version: '>=' + glib_required)
+ gobject = dependency('gobject-2.0', version: '>=' + glib_required)
+ gobject_introspection = dependency('gobject-introspection-1.0')
+diff --git a/src/common/tracker-enums.h b/src/common/tracker-enums.h
+index acd6493..6f69244 100644
+--- a/src/common/tracker-enums.h
++++ b/src/common/tracker-enums.h
+@@ -23,18 +23,18 @@
+ G_BEGIN_DECLS
+ 
+ typedef enum {
+-	TRACKER_SERIALIZATION_FORMAT_SPARQL,
+-	TRACKER_SERIALIZATION_FORMAT_TURTLE,
+-	/* JSON and JSON_LD are treated as the same thing right now, but we could
+-	 * treat them differently if we wanted. also it's nice to be able to pass
+-	 * both 'json' and 'json-ld' to `tracker extract --output-format=`.
+-	 */
+-	TRACKER_SERIALIZATION_FORMAT_JSON,
+-	TRACKER_SERIALIZATION_FORMAT_JSON_LD,
++    TRACKER_SERIALIZATION_FORMAT_SPARQL,
++    TRACKER_SERIALIZATION_FORMAT_TURTLE,
++    /* JSON and JSON_LD are treated as the same thing right now, but we could
++     * treat them differently if we wanted. also it's nice to be able to pass
++     * both 'json' and 'json-ld' to `tracker extract --output-format=`.
++     */
++    TRACKER_SERIALIZATION_FORMAT_JSON,
++    TRACKER_SERIALIZATION_FORMAT_JSON_LD
+ } TrackerSerializationFormat;
+ 
+ typedef enum {
+-	TRACKER_INDEX_LOCATION_FLAGS_NONE = 0,
++    TRACKER_INDEX_LOCATION_FLAGS_NONE = 0
+ } TrackerIndexLocationFlags;
+ 
+ G_END_DECLS
+diff --git a/src/indexer/meson.build b/src/indexer/meson.build
+index 95baf5b..21663e5 100644
+--- a/src/indexer/meson.build
++++ b/src/indexer/meson.build
+@@ -56,7 +56,6 @@ sources = [
+ tracker_miner_fs_deps = [
+     tracker_miners_common_dep,
+     tracker_miner_dep,
+-    gudev,
+ ]
+ 
+ executable('localsearch-@0@'.format(tracker_api_major),
+diff --git a/src/indexer/tracker-miner-files-methods.c b/src/indexer/tracker-miner-files-methods.c
+index 403c971..501e429 100644
+--- a/src/indexer/tracker-miner-files-methods.c
++++ b/src/indexer/tracker-miner-files-methods.c
+@@ -412,9 +412,8 @@ static gchar *
+ lookup_filesystem_id (TrackerMinerFiles *files,
+                       GFile             *file)
+ {
+-	const gchar *id = NULL, *devname = NULL;
+-	GUdevClient *udev_client;
+-	g_autoptr (GUdevDevice) udev_device = NULL;
++	const gchar *id = NULL;
++	const char *devname = NULL;
+ 	MountData *mount_data = NULL;
+ 	const char *path;
+ 	int path_len;
+@@ -455,15 +454,9 @@ lookup_filesystem_id (TrackerMinerFiles *files,
+ 		}
+ 	}
+ 
+-	if (devname) {
+-		udev_client = tracker_miner_files_get_udev_client (files);
+-		udev_device = g_udev_client_query_by_device_file (udev_client, devname);
+-		if (udev_device) {
+-			id = g_udev_device_get_property (udev_device, "ID_FS_UUID_SUB");
+-			if (!id)
+-				id = g_udev_device_get_property (udev_device, "ID_FS_UUID");
+-		}
+-	}
++	// Without udev, just return the device path as a fallback or NULL
++	if (devname)
++		id = devname;
+ 
+ 	return g_strdup (id);
+ }
+diff --git a/src/indexer/tracker-miner-files.c b/src/indexer/tracker-miner-files.c
+index 25e1d1a..b559ff4 100644
+--- a/src/indexer/tracker-miner-files.c
++++ b/src/indexer/tracker-miner-files.c
+@@ -79,7 +79,6 @@ struct _TrackerMinerFilesPrivate {
+ 	gboolean low_battery_pause;
+ 	gboolean initial_index;
+ 
+-	GUdevClient *udev_client;
+ #ifdef HAVE_POWER
+ 	TrackerPower *power;
+ #endif /* HAVE_POWER) */
+@@ -309,7 +308,6 @@ tracker_miner_files_init (TrackerMinerFiles *mf)
+ 	priv->finished_handler = g_signal_connect_after (mf, "finished",
+ 	                                                 G_CALLBACK (miner_finished_cb),
+ 	                                                 NULL);
+-	priv->udev_client = g_udev_client_new (NULL);
+ }
+ 
+ static void
+@@ -429,7 +427,6 @@ miner_files_finalize (GObject *object)
+ #endif /* HAVE_POWER */
+ 
+ 	tracker_domain_ontology_unref (priv->domain_ontology);
+-	g_clear_pointer (&priv->udev_client, g_object_unref);
+ 
+ 	if (priv->storage) {
+ 		g_object_unref (priv->storage);
+@@ -1221,8 +1218,3 @@ tracker_miner_files_check_allowed_text_file (TrackerMinerFiles *mf,
+ 	return FALSE;
+ }
+ 
+-GUdevClient *
+-tracker_miner_files_get_udev_client (TrackerMinerFiles *mf)
+-{
+-	return mf->private->udev_client;
+-}
+diff --git a/src/indexer/tracker-miner-files.h b/src/indexer/tracker-miner-files.h
+index 96acf01..e9ed27a 100644
+--- a/src/indexer/tracker-miner-files.h
++++ b/src/indexer/tracker-miner-files.h
+@@ -21,7 +21,6 @@
+ #define __TRACKER_MINER_FS_FILES_H__
+ 
+ #include <gio/gio.h>
+-#include <gudev/gudev.h>
+ 
+ #include "tracker-config.h"
+ 
+@@ -45,7 +44,6 @@ TrackerStorage * tracker_miner_files_get_storage (TrackerMinerFiles *mf);
+ gboolean tracker_miner_files_check_allowed_text_file (TrackerMinerFiles *mf,
+                                                       GFile             *file);
+ 
+-GUdevClient * tracker_miner_files_get_udev_client (TrackerMinerFiles *mf);
+ 
+ G_END_DECLS
+ 
+-- 
+2.48.1
+
