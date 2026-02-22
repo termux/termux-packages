@@ -1,0 +1,46 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index bd72356..ccda233 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -2,6 +2,7 @@
+ 
+ cmake_minimum_required(VERSION 3.20)
+ project(kompute VERSION 0.9.0 LANGUAGES CXX)
++cmake_policy(SET CMP0148 NEW)
+ 
+ set(CMAKE_CXX_STANDARD 14)
+ 
+@@ -224,6 +225,8 @@ endif()
+ 
+ # pybind11
+ if(KOMPUTE_OPT_BUILD_PYTHON)
++    find_package(Python 3.8 COMPONENTS Interpreter Development REQUIRED)
++    
+     if(KOMPUTE_OPT_USE_BUILT_IN_PYBIND11)
+         FetchContent_Declare(pybind GIT_REPOSITORY https://github.com/pybind/pybind11.git
+             GIT_TAG v3.0.0
+@@ -232,8 +235,6 @@ if(KOMPUTE_OPT_BUILD_PYTHON)
+     else()
+         find_package(pybind11 REQUIRED)
+     endif()
+-
+-    find_package(PythonLibs REQUIRED)
+ endif()
+ 
+ # ####################################################
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 8805e84..d818c60 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -87,9 +87,9 @@ if(KOMPUTE_OPT_LOG_LEVEL_DISABLED)
+ endif()
+ 
+ if(KOMPUTE_OPT_BUILD_PYTHON)
+-    include_directories(${PYTHON_INCLUDE_DIRS})
++    include_directories(${Python_INCLUDE_DIRS})
+ 
+-    target_link_libraries(kompute PRIVATE pybind11::headers ${PYTHON_LIBRARIES})
++    target_link_libraries(kompute PRIVATE pybind11::headers ${Python_LIBRARIES})
+ endif()
+ 
+ if(NOT KOMPUTE_OPT_ANDROID_BUILD AND KOMPUTE_OPT_USE_BUILT_IN_VULKAN_HEADER)
