@@ -1,6 +1,26 @@
---- ../cache/tmp-checkout/shell/tsu.sh	2024-06-17 17:38:19.114615657 +0000
-+++ ./shell/tsu.sh	2024-06-17 17:40:57.729881388 +0000
-@@ -288,42 +288,24 @@
+--- tsu.sh	2026-02-13 14:37:35.895000000 +0800
++++ ./shell/tsu.sh	2026-02-13 14:22:05.220999797 +0800
+@@ -64,7 +84,7 @@
+ TERMUX_PATH="$TERMUX_PREFIX/bin:$TERMUX_PREFIX/bin/applets"
+ ROOT_HOME="$TERMUX_FS/home/.suroot"
+ ANDROID_SYSPATHS="/system/bin:/system/xbin"
+-EXTRA_SYSPATHS="/sbin:/sbin/bin"
++EXTRA_SYSPATHS="/sbin:/sbin/bin:/debug_ramdisk"
+ #ANDROID_ASROOT_SYSPATHS="/bin:/xbin"
+ 
+ # Some constants that may change in future.
+@@ -267,6 +287,10 @@
+ 	SKIP_SBIN=1
+ fi
+ 
++if [[ -x "/debug_ramdisk" ]]; then
++        SU_BINARY_SEARCH+=("/debug_ramdisk/su")
++fi
++
+ # Unset all Termux LD_* enviroment variables to prevent symbols missing , dlopen()ing of wrong libs.
+ if [[ -n "$ENVIRONMENT_PRESERVE" ]]; then
+ 	EXP_ENV[LD_PRELOAD]="$LD_PRELOAD"
+@@ -288,42 +312,24 @@
  
  ### TODO: Implement this cleanly.
  
