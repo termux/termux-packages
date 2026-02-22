@@ -11,7 +11,6 @@ PACKAGES+=" python"				# Used buildorder.py core script.
 PACKAGES+=" python-pip" # Necessary to install 'itstool' for on-device-building (since Ubuntu gets it from 'apt')
 PACKAGES+=" unzip"				# Used to extract *.zip source archives.
 PACKAGES+=" jq"					# Used for parsing repo.json.
-PACKAGES+=" binutils-is-llvm"			# Used for checking symbols.
 
 # Tier 2: requirements for building many other packages.
 PACKAGES+=" asciidoc"

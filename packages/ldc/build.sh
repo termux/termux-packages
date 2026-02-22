@@ -6,22 +6,25 @@ TERMUX_PKG_VERSION=(1.30.0)
 TERMUX_PKG_VERSION+=(14.0.3)  # LLVM version
 TERMUX_PKG_VERSION+=(2.100.1) # TOOLS version
 TERMUX_PKG_VERSION+=(1.30.0)  # DUB version
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION+=(14.0.21)  # SPIRV-LLVM-Translator version
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
                    https://github.com/ldc-developers/llvm-project/releases/download/ldc-v${TERMUX_PKG_VERSION[1]}/llvm-${TERMUX_PKG_VERSION[1]}.src.tar.xz
                    https://github.com/llvm/llvm-project/releases/download/llvmorg-${TERMUX_PKG_VERSION[1]}/libunwind-${TERMUX_PKG_VERSION[1]}.src.tar.xz
                    https://github.com/dlang/tools/archive/refs/tags/v${TERMUX_PKG_VERSION[2]}.tar.gz
                    https://github.com/dlang/dub/archive/refs/tags/v${TERMUX_PKG_VERSION[3]}.tar.gz
-                   https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz)
+                   https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz
+                   https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/refs/tags/v${TERMUX_PKG_VERSION[4]}.tar.gz)
 TERMUX_PKG_SHA256=(fdbb376f08242d917922a6a22a773980217fafa310046fc5d6459490af23dacd
                    9638d8d0b6a43d9cdc53699bec19e6bc9bef98f5950b99e6b8c1ec373aee4fa7
                    301137841d1e3401f59b3828d2a9ac86a1b826b89265d55541a2fd6ca2a595eb
                    54bde9a979d70952690a517f90de8d76631fa9a2f7252af7278dafbcaaa42d54
                    840cd65bf5f0dd06ca688f63b94d71fccd92b526bbf1d3892fe5535b1e85c10e
-                   5784d4cc47d0845af0897d3b7473a08dd0281a4cdabac0a486740840d014fde1)
+                   5784d4cc47d0845af0897d3b7473a08dd0281a4cdabac0a486740840d014fde1
+                   47951817c2fcc1bb8911d288d42d7ddda1771fe58c29ffd6cf6671056145be22)
 TERMUX_PKG_AUTO_UPDATE=false
 # dub dlopen()s libcurl.so:
-TERMUX_PKG_DEPENDS="binutils-bin, binutils-is-llvm | binutils, clang, libc++, libcurl, zlib"
+TERMUX_PKG_DEPENDS="binutils, clang, libc++, libcurl, zlib"
 TERMUX_PKG_BUILD_DEPENDS="binutils-cross"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
@@ -55,6 +58,12 @@ termux_step_post_get_source() {
 	mv tools-${TERMUX_PKG_VERSION[2]} dlang-tools
 	mv dub-${TERMUX_PKG_VERSION[3]} dub
 
+	# replace SPIRV-LLVM-Translator with more updated version to prevent:
+	# spirv_internal.hpp:185:28: error: constexpr variable
+	# 'MemoryAccessAliasScopeINTELMask' must be initialized by a constant expression
+	rm -rf llvm/projects/SPIRV-LLVM-Translator
+	mv "SPIRV-LLVM-Translator-${TERMUX_PKG_VERSION[4]}" llvm/projects/SPIRV-LLVM-Translator
+
 	# Exclude MLIR
 	rm -Rf llvm/projects/mlir
 
@@ -62,8 +71,35 @@ termux_step_post_get_source() {
 	if [ $TERMUX_ARCH = arm ]; then LLVM_TRIPLE=${LLVM_TRIPLE/arm-/armv7a-}; fi
 }
 
+_setup_cmake_3() {
+	local TERMUX_CMAKE_VERSION=3.31.10
+	local TERMUX_CMAKE_SHA256=3cb3dd247b6a1de2d0f4b20c6fd4326c9024e894cebc9dc8699758887e566ca7
+	local TERMUX_CMAKE_MAJORVERSION="${TERMUX_CMAKE_VERSION%.*}"
+	local TERMUX_CMAKE_TARNAME="cmake-${TERMUX_CMAKE_VERSION}-linux-x86_64.tar.gz"
+	local TERMUX_CMAKE_URL="https://github.com/Kitware/CMake/releases/download/v${TERMUX_CMAKE_VERSION}/${TERMUX_CMAKE_TARNAME}"
+	local TERMUX_CMAKE_TARFILE="${TERMUX_PKG_TMPDIR}/${TERMUX_CMAKE_TARNAME}"
+	local TERMUX_CMAKE_FOLDER="${TERMUX_PKG_TMPDIR}/cmake-${TERMUX_CMAKE_VERSION}"
+
+	local TERMUX_CMAKE_NAME="cmake"
+
+	if [[ ! -d "${TERMUX_CMAKE_FOLDER}" ]]; then
+		termux_download "${TERMUX_CMAKE_URL}" \
+			"${TERMUX_CMAKE_TARFILE}" \
+			"${TERMUX_CMAKE_SHA256}"
+		rm -Rf "${TERMUX_PKG_TMPDIR}/cmake-${TERMUX_CMAKE_VERSION}-linux-x86_64"
+		tar xf "${TERMUX_CMAKE_TARFILE}" -C "${TERMUX_PKG_TMPDIR}"
+		mv "${TERMUX_PKG_TMPDIR}/cmake-${TERMUX_CMAKE_VERSION}-linux-x86_64" \
+			"${TERMUX_CMAKE_FOLDER}"
+	fi
+
+	export CMAKE_INSTALL_ALWAYS=1
+
+	export PATH="${TERMUX_CMAKE_FOLDER}/bin:${PATH}"
+}
+
 termux_step_host_build() {
-	termux_setup_cmake
+	# LDC for Android is stuck at version 1.30.0, which is hardcoded to require CMake 3
+	_setup_cmake_3
 	termux_setup_ninja
 
 	# Build native llvm-tblgen, a prerequisite for cross-compiling LLVM
@@ -79,10 +115,15 @@ termux_step_host_build() {
 
 # Just before CMake invokation for LLVM:
 termux_step_pre_configure() {
+	# LDC for Android is stuck at version 1.30.0, which is hardcoded to require CMake 3
+	_setup_cmake_3
+	termux_setup_ninja
 	export PATH="$TERMUX_PREFIX/opt/binutils/cross/$TERMUX_HOST_PLATFORM/bin:$PATH"
 
 	LLVM_INSTALL_DIR=$TERMUX_PKG_BUILDDIR/llvm-install
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_INSTALL_PREFIX=$LLVM_INSTALL_DIR"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_INSTALL_INCLUDEDIR=$LLVM_INSTALL_DIR/include"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_INSTALL_LIBDIR=$LLVM_INSTALL_DIR/lib"
 
 	if [ "$TERMUX_ARCH" == "arm" ]; then
 		# [...]/ldc/src/llvm/projects/compiler-rt/lib/builtins/clear_cache.c:85:20:
@@ -123,6 +164,11 @@ termux_step_pre_configure() {
 	OLD_TERMUX_PKG_BUILDDIR=$TERMUX_PKG_BUILDDIR
 	TERMUX_PKG_BUILDDIR=$TERMUX_PKG_BUILDDIR/llvm
 	mkdir "$TERMUX_PKG_BUILDDIR"
+}
+
+termux_step_configure() {
+	# skip termux_setup_cmake which would install cmake 4 into $PATH
+	termux_step_configure_cmake
 }
 
 # CMake for LLVM has been run:
