@@ -1,0 +1,457 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -57,7 +57,6 @@ find_package(PlasmaActivities ${PROJECT_DEP_VERSION} REQUIRED)
+ find_package(KF6Screen CONFIG REQUIRED)
+ find_package(LibKWorkspace ${PROJECT_DEP_VERSION} REQUIRED)
+ 
+-find_package(UDev REQUIRED)
+ 
+ find_package(XCB REQUIRED COMPONENTS XCB RANDR DPMS)
+ 
+--- a/daemon/controllers/udevqt_p.h
++++ b/daemon/controllers/udevqt_p.h
+@@ -6,10 +6,6 @@
+ 
+ #pragma once
+ 
+-extern "C" {
+-#define LIBUDEV_I_KNOW_THE_API_IS_SUBJECT_TO_CHANGE
+-#include <libudev.h>
+-}
+ 
+ class QByteArray;
+ class QSocketNotifier;
+@@ -15,13 +15,12 @@ namespace UdevQt
+ class DevicePrivate
+ {
+ public:
+-    explicit DevicePrivate(struct udev_device *udev_, bool ref = true);
++    explicit DevicePrivate(bool ref = true);
+     ~DevicePrivate();
+     DevicePrivate &operator=(const DevicePrivate &other);
+ 
+     QString decodePropertyValue(const QByteArray &encoded) const;
+ 
+-    struct udev_device *udev;
+ };
+ 
+ class Client;
+@@ -39,24 +38,17 @@ public:
+     void init(const QStringList &subsystemList, ListenToWhat what);
+     void setWatchedSubsystems(const QStringList &subsystemList);
+     void _uq_monitorReadyRead(int fd);
+-    DeviceList deviceListFromEnumerate(struct udev_enumerate *en);
++    DeviceList deviceListFromEnumerate(void);
+ 
+-    struct udev *udev;
+-    struct udev_monitor *monitor;
+     Client *q;
+     QSocketNotifier *monitorNotifier;
+     QStringList watchedSubsystems;
+ };
+ 
+-inline QStringList listFromListEntry(struct udev_list_entry *list)
++inline QStringList listFromListEntry(void)
+ {
+     QStringList ret;
+-    struct udev_list_entry *entry;
+ 
+-    udev_list_entry_foreach(entry, list)
+-    {
+-        ret << QString::fromLatin1(udev_list_entry_get_name(entry));
+-    }
+     return ret;
+ }
+ 
+--- a/daemon/controllers/udevqtclient.cpp
++++ b/daemon/controllers/udevqtclient.cpp
+@@ -15,9 +15,7 @@
+ namespace UdevQt
+ {
+ ClientPrivate::ClientPrivate(Client *q_)
+-    : udev(nullptr)
+-    , monitor(nullptr)
+-    , q(q_)
++    : q(q_)
+     , monitorNotifier(nullptr)
+ {
+ }
+@@ -24,17 +24,11 @@ ClientPrivate::ClientPrivate(Client *q_)
+ 
+ ClientPrivate::~ClientPrivate()
+ {
+-    udev_unref(udev);
+     delete monitorNotifier;
+-
+-    if (monitor)
+-        udev_monitor_unref(monitor);
+ }
+ 
+ void ClientPrivate::init(const QStringList &subsystemList, ListenToWhat what)
+ {
+-    udev = udev_new();
+-
+     if (what != ListenToNone) {
+         setWatchedSubsystems(subsystemList);
+     }
+@@ -43,13 +37,11 @@ void ClientPrivate::init(const QStringList &subsystemList, ListenToWhat what)
+ void ClientPrivate::setWatchedSubsystems(const QStringList &subsystemList)
+ {
+     // create a listener
+-    struct udev_monitor *newM = udev_monitor_new_from_netlink(udev, "udev");
+-
+-    if (!newM) {
++    if (true) {
+         qCWarning(POWERDEVIL, "UdevQt: unable to create udev monitor connection");
+         return;
+     }
+-
++#ifndef __ANDROID__
+     // apply our filters; an empty list means listen to everything
+     for (const QString &subsysDevtype : subsystemList) {
+         int ix = subsysDevtype.indexOf(u'/');
+@@ -77,17 +69,18 @@ void ClientPrivate::setWatchedSubsystems(const QStringList &subsystemList)
+     monitor = newM;
+     monitorNotifier = sn;
+     watchedSubsystems = subsystemList;
++#endif
+ }
+ 
+ void ClientPrivate::_uq_monitorReadyRead(int fd)
+ {
+     Q_UNUSED(fd);
+     monitorNotifier->setEnabled(false);
+-    struct udev_device *dev = udev_monitor_receive_device(monitor);
+     monitorNotifier->setEnabled(true);
+ 
+-    if (!dev)
++    if (true)
+         return;
++#ifndef __ANDROID__
+ 
+     Device device(new DevicePrivate(dev, false));
+ 
+@@ -105,11 +98,13 @@ void ClientPrivate::_uq_monitorReadyRead(int fd)
+     } else {
+         qCWarning(POWERDEVIL, "UdevQt: unhandled device action \"%s\"", action.constData());
+     }
++#endif
+ }
+ 
+-DeviceList ClientPrivate::deviceListFromEnumerate(struct udev_enumerate *en)
++DeviceList ClientPrivate::deviceListFromEnumerate(void)
+ {
+     DeviceList ret;
++#ifndef __ANDROID__
+     struct udev_list_entry *list, *entry;
+ 
+     udev_enumerate_scan_devices(en);
+@@ -126,6 +121,7 @@ DeviceList ClientPrivate::deviceListFromEnumerate(struct udev_enumerate *en)
+ 
+     udev_enumerate_unref(en);
+ 
++#endif
+     return ret;
+ }
+ 
+@@ -155,9 +151,8 @@ QStringList Client::watchedSubsystems() const
+         return d->watchedSubsystems;
+ 
+     // we're not watching anything
+-    if (!d->monitor)
+-        return QStringList();
+-
++    return QStringList();
++#ifndef __ANDROID__
+     // we're watching everything: figure out what "everything" currently is
+     // we don't cache it, since it may be subject to change, depending on hotplug
+     struct udev_enumerate *en = udev_enumerate_new(d->udev);
+@@ -165,6 +160,7 @@ QStringList Client::watchedSubsystems() const
+     QStringList s = listFromListEntry(udev_enumerate_get_list_entry(en));
+     udev_enumerate_unref(en);
+     return s;
++#endif
+ }
+ 
+ void Client::setWatchedSubsystems(const QStringList &subsystemList)
+@@ -174,69 +170,32 @@ void Client::setWatchedSubsystems(const QStringList &subsystemList)
+ 
+ DeviceList Client::devicesByProperty(const QString &property, const QVariant &value)
+ {
+-    struct udev_enumerate *en = udev_enumerate_new(d->udev);
+-
+-    if (value.isValid()) {
+-        udev_enumerate_add_match_property(en, property.toLatin1().constData(), value.toString().toLatin1().constData());
+-    } else {
+-        udev_enumerate_add_match_property(en, property.toLatin1().constData(), nullptr);
+-    }
+-
+-    return d->deviceListFromEnumerate(en);
++    return d->deviceListFromEnumerate();
+ }
+ 
+ DeviceList Client::allDevices()
+ {
+-    struct udev_enumerate *en = udev_enumerate_new(d->udev);
+-    return d->deviceListFromEnumerate(en);
++    return d->deviceListFromEnumerate();
+ }
+ 
+ DeviceList Client::devicesBySubsystem(const QString &subsystem)
+ {
+-    struct udev_enumerate *en = udev_enumerate_new(d->udev);
+-
+-    udev_enumerate_add_match_subsystem(en, subsystem.toLatin1().constData());
+-    return d->deviceListFromEnumerate(en);
++    return d->deviceListFromEnumerate();
+ }
+ 
+ Device Client::deviceByDeviceFile(const QString &deviceFile)
+ {
+-    QT_STATBUF sb;
+-
+-    if (QT_STAT(deviceFile.toLatin1().constData(), &sb) != 0)
+-        return Device();
+-
+-    struct udev_device *ud = nullptr;
+-
+-    if (S_ISBLK(sb.st_mode))
+-        ud = udev_device_new_from_devnum(d->udev, 'b', sb.st_rdev);
+-    else if (S_ISCHR(sb.st_mode))
+-        ud = udev_device_new_from_devnum(d->udev, 'c', sb.st_rdev);
+-
+-    if (!ud)
+-        return Device();
+-
+-    return Device(new DevicePrivate(ud, false));
++    return Device();
+ }
+ 
+ Device Client::deviceBySysfsPath(const QString &sysfsPath)
+ {
+-    struct udev_device *ud = udev_device_new_from_syspath(d->udev, sysfsPath.toLatin1().constData());
+-
+-    if (!ud)
+-        return Device();
+-
+-    return Device(new DevicePrivate(ud, false));
++    return Device();
+ }
+ 
+ Device Client::deviceBySubsystemAndName(const QString &subsystem, const QString &name)
+ {
+-    struct udev_device *ud = udev_device_new_from_subsystem_sysname(d->udev, subsystem.toLatin1().constData(), name.toLatin1().constData());
+-
+-    if (!ud)
+-        return Device();
+-
+-    return Device(new DevicePrivate(ud, false));
++    return Device();
+ }
+ 
+ }
+--- a/daemon/controllers/udevqtdevice.cpp
++++ b/daemon/controllers/udevqtdevice.cpp
+@@ -11,22 +11,16 @@
+ 
+ namespace UdevQt
+ {
+-DevicePrivate::DevicePrivate(struct udev_device *udev_, bool ref)
+-    : udev(udev_)
++DevicePrivate::DevicePrivate(bool ref)
+ {
+-    if (ref)
+-        udev_device_ref(udev);
+ }
+ 
+ DevicePrivate::~DevicePrivate()
+ {
+-    udev_device_unref(udev);
+ }
+ 
+ DevicePrivate &DevicePrivate::operator=(const DevicePrivate &other)
+ {
+-    udev_device_unref(udev);
+-    udev = udev_device_ref(other.udev);
+     return *this;
+ }
+ 
+@@ -67,7 +61,7 @@ Device::Device()
+ Device::Device(const Device &other)
+ {
+     if (other.d) {
+-        d = new DevicePrivate(other.d->udev);
++        d = new DevicePrivate();
+     } else {
+         d = nullptr;
+     }
+@@ -93,7 +87,7 @@ Device &Device::operator=(const Device &other)
+         return *this;
+     }
+     if (!d) {
+-        d = new DevicePrivate(other.d->udev);
++        d = new DevicePrivate();
+     } else {
+         *d = *other.d;
+     }
+@@ -108,148 +102,77 @@ bool Device::isValid() const
+ 
+ QString Device::subsystem() const
+ {
+-    if (!d)
+-        return QString();
+-
+-    return QString::fromLatin1(udev_device_get_subsystem(d->udev));
++    return QString();
+ }
+ 
+ QString Device::devType() const
+ {
+-    if (!d)
+-        return QString();
+-
+-    return QString::fromLatin1(udev_device_get_devtype(d->udev));
++    return QString();
+ }
+ 
+ QString Device::name() const
+ {
+-    if (!d)
+-        return QString();
+-
+-    return QString::fromLatin1(udev_device_get_sysname(d->udev));
++    return QString();
+ }
+ 
+ QString Device::sysfsPath() const
+ {
+-    if (!d)
+-        return QString();
+-
+-    return QString::fromLatin1(udev_device_get_syspath(d->udev));
++    return QString();
+ }
+ 
+ int Device::sysfsNumber() const
+ {
+-    if (!d)
+-        return -1;
+-
+-    QString value = QString::fromLatin1(udev_device_get_sysnum(d->udev));
+-    bool success = false;
+-    int number = value.toInt(&success);
+-    if (success)
+-        return number;
+     return -1;
+ }
+ 
+ QString Device::driver() const
+ {
+-    if (!d)
+-        return QString();
+-
+-    return QString::fromLatin1(udev_device_get_driver(d->udev));
++    return QString();
+ }
+ 
+ QString Device::primaryDeviceFile() const
+ {
+-    if (!d)
+-        return QString();
+-
+-    return QString::fromLatin1(udev_device_get_devnode(d->udev));
++    return QString();
+ }
+ 
+ QStringList Device::alternateDeviceSymlinks() const
+ {
+-    if (!d)
+-        return QStringList();
+-
+-    return listFromListEntry(udev_device_get_devlinks_list_entry(d->udev));
++    return QStringList();
+ }
+ 
+ QStringList Device::deviceProperties() const
+ {
+-    if (!d)
+-        return QStringList();
+-
+-    return listFromListEntry(udev_device_get_properties_list_entry(d->udev));
++    return QStringList();
+ }
+ 
+ QStringList Device::sysfsProperties() const
+ {
+-    if (!d)
+-        return QStringList();
+-
+-    return listFromListEntry(udev_device_get_sysattr_list_entry(d->udev));
++    return QStringList();
+ }
+ 
+ Device Device::parent() const
+ {
+-    if (!d)
+-        return Device();
+-
+-    struct udev_device *p = udev_device_get_parent(d->udev);
+-
+-    if (!p)
+-        return Device();
+-
+-    return Device(new DevicePrivate(p));
++    return Device();
+ }
+ 
+ QVariant Device::deviceProperty(const QString &name) const
+ {
+-    if (!d)
+-        return QVariant();
+-
+-    QByteArray propName = name.toLatin1();
+-    QString propValue = QString::fromLatin1(udev_device_get_property_value(d->udev, propName.constData()));
+-    if (!propValue.isEmpty()) {
+-        return QVariant::fromValue(propValue);
+-    }
+     return QVariant();
+ }
+ 
+ QString Device::decodedDeviceProperty(const QString &name) const
+ {
+-    if (!d)
+-        return QString();
+-
+-    QByteArray propName = name.toLatin1();
+-    return d->decodePropertyValue(udev_device_get_property_value(d->udev, propName.constData()));
++    return QString();
+ }
+ 
+ QVariant Device::sysfsProperty(const QString &name) const
+ {
+-    if (!d)
+-        return QVariant();
+-
+-    QByteArray propName = name.toLatin1();
+-    QString propValue = QString::fromLatin1(udev_device_get_sysattr_value(d->udev, propName.constData()));
+-    if (!propValue.isEmpty()) {
+-        return QVariant::fromValue(propValue);
+-    }
+     return QVariant();
+ }
+ 
+ Device Device::ancestorOfType(const QString &subsys, const QString &devtype) const
+ {
+-    if (!d)
+-        return Device();
+-
+-    struct udev_device *p = udev_device_get_parent_with_subsystem_devtype(d->udev, subsys.toLatin1().constData(), devtype.toLatin1().constData());
+-
+-    if (!p)
+-        return Device();
+-
+-    return Device(new DevicePrivate(p));
++    return Device();
+ }
+ 
+ }

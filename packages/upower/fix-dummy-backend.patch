@@ -1,0 +1,126 @@
+diff --git a/src/dummy/up-backend.c b/src/dummy/up-backend.c
+index 419da7c..c42dfe0 100644
+--- a/src/dummy/up-backend.c
++++ b/src/dummy/up-backend.c
+@@ -34,15 +34,18 @@
+ static void	up_backend_class_init	(UpBackendClass	*klass);
+ static void	up_backend_init	(UpBackend		*backend);
+ static void	up_backend_finalize	(GObject		*object);
++#ifdef __TERMUX__
++static gboolean termux_update_device (gpointer user_data);
++#endif
+ 
+ struct UpBackendPrivate
+ {
+ 	UpDaemon		*daemon;
+-#ifdef EGG_TEST
++#if defined(EGG_TEST) || defined(__TERMUX__)
+ 	UpDevice		*device;
+ #endif
+ 	UpDeviceList		*device_list; /* unused */
+-#ifdef EGG_TEST
++#if defined(EGG_TEST) || defined(__TERMUX__)
+ 	GObject			*native;
+ #endif
+ };
+@@ -117,7 +120,30 @@ up_backend_coldplug (UpBackend *backend, UpDaemon *daemon)
+ 	backend->priv->daemon = g_object_ref (daemon);
+ 	backend->priv->device_list = up_daemon_get_device_list (daemon);
+ 
+-#ifdef EGG_TEST
++#if defined(__TERMUX__)
++
++    backend->priv->native = g_object_new (G_TYPE_OBJECT, NULL);
++    backend->priv->device = up_device_new (daemon, backend->priv->native);
++
++    g_object_set (backend->priv->device,
++                  "native-path", "/org/termux/BAT0",
++                  "vendor", "Android",
++                  "model", "Battery",
++                  "type", UP_DEVICE_KIND_BATTERY,
++                  "power-supply", TRUE,
++                  "is-present", TRUE,
++                  "is-rechargeable", TRUE,
++                  "has-history", FALSE,
++                  "has-statistics", FALSE,
++                  NULL);
++
++    g_initable_init (G_INITABLE (backend->priv->device), NULL, NULL);
++    g_signal_emit (backend, signals[SIGNAL_DEVICE_ADDED], 0, backend->priv->device);
++
++    termux_update_device (backend->priv->device);
++    g_timeout_add_seconds (5, termux_update_device, backend->priv->device);
++
++#elif defined(EGG_TEST)
+ 	/* small delay until first device is added */
+ 	g_timeout_add_seconds (1, (GSourceFunc) up_backend_add_cb, backend);
+ #endif
+@@ -214,6 +240,68 @@ up_backend_class_init (UpBackendClass *klass)
+ /**
+  * up_backend_init:
+  **/
++#ifdef __TERMUX__
++
++static gboolean
++termux_update_device (gpointer user_data)
++{
++    UpDevice *device = UP_DEVICE (user_data);
++    FILE *fp;
++    char buffer[4096];
++    float percentage = 0.0f;
++    char status[64] = {0};
++    char plugged[64] = {0};
++    UpDeviceState state = UP_DEVICE_STATE_UNKNOWN;
++    gboolean online = FALSE;
++
++    fp = popen ("@TERMUX_PREFIX@/bin/termux-battery-status", "r");
++    if (!fp)
++        return TRUE;
++
++    size_t len = fread (buffer, 1, sizeof(buffer)-1, fp);
++    buffer[len] = '\0';
++    pclose (fp);
++
++    char *p;
++
++    p = strstr (buffer, "\"percentage\"");
++    if (p)
++        sscanf (p, "\"percentage\": %f", &percentage);
++
++    p = strstr (buffer, "\"status\"");
++    if (p)
++        sscanf (p, "\"status\": \"%63[^\"]\"", status);
++
++    p = strstr (buffer, "\"plugged\"");
++    if (p)
++        sscanf (p, "\"plugged\": \"%63[^\"]\"", plugged);
++
++    if (g_strcmp0 (status, "CHARGING") == 0)
++        state = UP_DEVICE_STATE_CHARGING;
++    else if (g_strcmp0 (status, "NOT_CHARGING") == 0)
++        state = UP_DEVICE_STATE_DISCHARGING;
++    else if (g_strcmp0 (status, "FULL") == 0)
++        state = UP_DEVICE_STATE_FULLY_CHARGED;
++
++    if (g_strcmp0 (plugged, "AC") == 0 ||
++        g_strcmp0 (plugged, "USB") == 0 ||
++        g_strcmp0 (plugged, "WIRELESS") == 0)
++        online = TRUE;
++    else
++        online = FALSE;
++
++    g_object_set (device,
++                  "percentage", percentage,
++                  "state", state,
++                  "online", online,
++                  "update-time", (guint64) g_get_real_time () / G_USEC_PER_SEC,
++                  NULL);
++
++    return TRUE;
++}
++
++#endif
++
+ static void
+ up_backend_init (UpBackend *backend)
+ {
