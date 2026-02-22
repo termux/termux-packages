@@ -1,15 +1,14 @@
 TERMUX_PKG_HOMEPAGE=https://dotnet.microsoft.com/en-us/
-TERMUX_PKG_DESCRIPTION=".NET 9.0"
+TERMUX_PKG_DESCRIPTION=".NET 10.0"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
-TERMUX_PKG_VERSION="9.0.12"
-TERMUX_PKG_REVISION=1
-_DOTNET_SDK_VERSION="9.0.113"
+TERMUX_PKG_VERSION="10.0.3"
+_DOTNET_SDK_VERSION="10.0.103"
 TERMUX_PKG_SRCURL=git+https://github.com/dotnet/dotnet
 TERMUX_PKG_GIT_BRANCH="v${_DOTNET_SDK_VERSION}"
 TERMUX_PKG_BUILD_DEPENDS="krb5, libicu, openssl, zlib"
-TERMUX_PKG_SUGGESTS="dotnet-sdk-9.0"
-TERMUX_PKG_CONFLICTS="dotnet8.0"
+TERMUX_PKG_SUGGESTS="dotnet-sdk-10.0"
+TERMUX_PKG_CONFLICTS="dotnet8.0, dotnet9.0"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -21,7 +20,7 @@ TERMUX_PKG_EXCLUDED_ARCHES="arm"
 termux_pkg_auto_update() {
 	local api_url="https://api.github.com/repos/dotnet/core/git/refs/tags"
 	local latest_refs_tags
-	latest_refs_tags="$(curl -s "${api_url}" | jq .[].ref | sed -ne "s|.*v\(9.0.*\)\"|\1|p")"
+	latest_refs_tags="$(curl -s "${api_url}" | jq .[].ref | sed -ne "s|.*v\(10.0.*\)\"|\1|p")"
 	if [[ -z "${latest_refs_tags}" ]]; then
 		echo "WARN: Unable to get latest refs tags from upstream. Try again later." >&2
 		return
@@ -39,9 +38,8 @@ termux_pkg_auto_update() {
 		return
 	fi
 
-	# happened since 9.0.9
 	sed \
-		-e "s|^_DOTNET_SDK_VERSION=.*|_DOTNET_SDK_VERSION=\"9.0.$((100 + ${latest_version##*.} - 1))\"|" \
+		-e "s|^_DOTNET_SDK_VERSION=.*|_DOTNET_SDK_VERSION=\"10.0.$((100 + ${latest_version##*.}))\"|" \
 		-i "${TERMUX_PKG_BUILDER_DIR}/build.sh"
 
 	termux_pkg_upgrade_version "${latest_version}"
@@ -57,7 +55,7 @@ termux_step_post_get_source() {
 
 termux_step_pre_configure() {
 	# this is a workaround for build-all.sh
-	TERMUX_PKG_DEPENDS="aspnetcore-runtime-9.0, dotnet-host, dotnet-runtime-9.0"
+	TERMUX_PKG_DEPENDS="aspnetcore-runtime-10.0, dotnet-host, dotnet-runtime-10.0"
 
 	termux_setup_cmake
 	termux_setup_ninja
@@ -159,6 +157,8 @@ termux_step_configure() {
 	# https://github.com/dotnet/runtime/issues/57784
 	# Android has no liblttng-ust, Linux also has different issue
 	set(FEATURE_EVENT_TRACE 0)
+	# .NET 10 changed lttng check to use FEATURE_EVENTSOURCE_XPLAT
+	set(FEATURE_EVENTSOURCE_XPLAT 0)
 	EOL
 
 	echo "INFO: ${TERMUX_PKG_TMPDIR}/build/cmake/android.toolchain.cmake"
@@ -167,7 +167,9 @@ termux_step_configure() {
 
 	export EXTRA_CFLAGS="${CFLAGS}"
 	export EXTRA_CXXFLAGS="${CXXFLAGS}"
-	export EXTRA_LDFLAGS="${LDFLAGS}"
+	# Strip -rpath from LDFLAGS; the 0012 CMake patch adds it correctly.
+	# Keeping it here causes duplicate RUNPATH entries.
+	export EXTRA_LDFLAGS="$(echo "${LDFLAGS}" | sed 's/-Wl,-rpath[=,][^ ]*//')"
 
 	unset CC CFLAGS CXX CXXFLAGS LD LDFLAGS PKGCONFIG PKG_CONFIG PKG_CONFIG_DIR PKG_CONFIG_LIBDIR
 }
@@ -184,7 +186,8 @@ termux_step_make() {
 		-- \
 		/p:Configuration=${CONFIG} \
 		/p:TargetArchitecture=${arch} \
-		/p:TargetRid=linux-bionic-${arch}; then
+		/p:TargetRid=linux-bionic-${arch} \
+		/p:SkipErrorOnPrebuilts=true; then
 		echo "ERROR: Build failed" >&2
 		termux_dotnet_kill
 		termux_step_post_make_install
@@ -226,7 +229,7 @@ termux_step_make_install() {
 	EOL
 	chmod 0755 "${TERMUX_PREFIX}/bin/dotnet"
 
-	# https://src.fedoraproject.org/rpms/dotnet9.0/raw/rawhide/f/dotnet.sh.in
+	# https://src.fedoraproject.org/rpms/dotnet10.0/raw/rawhide/f/dotnet.sh.in
 	mkdir -p "${TERMUX_PREFIX}/etc/profile.d"
 	sed \
 		-e "s|@LIBDIR@|${TERMUX_PREFIX}/lib|g" \
@@ -275,22 +278,22 @@ termux_step_make_install() {
 
 	# special handling subpackage files
 	find \
-		lib/dotnet/shared/Microsoft.AspNetCore.App/9.0.* \
+		lib/dotnet/shared/Microsoft.AspNetCore.App/10.0.* \
 		\( -type f -o -type l \) ! -name "*.pdb" | sort \
 		> "${TERMUX_PKG_TMPDIR}"/aspnetcore-runtime.txt
 
 	find \
-		lib/dotnet/shared/Microsoft.AspNetCore.App/9.0.* \
+		lib/dotnet/shared/Microsoft.AspNetCore.App/10.0.* \
 		\( -type f -o -type l \) -name "*.pdb" | sort \
 		> "${TERMUX_PKG_TMPDIR}"/aspnetcore-runtime-dbg.txt
 
 	find \
-		lib/dotnet/packs/Microsoft.AspNetCore.App.Ref/9.0.* \
+		lib/dotnet/packs/Microsoft.AspNetCore.App.Ref/10.0.* \
 		\( -type f -o -type l \) | sort \
 		> "${TERMUX_PKG_TMPDIR}"/aspnetcore-targeting-pack.txt
 
 	find \
-		lib/dotnet/packs/Microsoft.NETCore.App.Host.linux-bionic-${arch}/9.0.* \
+		lib/dotnet/packs/Microsoft.NETCore.App.Host.linux-bionic-${arch}/10.0.* \
 		\( -type f -o -type l \) | sort \
 		> "${TERMUX_PKG_TMPDIR}"/dotnet-apphost-pack.txt
 
@@ -307,46 +310,64 @@ termux_step_make_install() {
 	echo "share/man/man1" >> "${TERMUX_PKG_TMPDIR}"/dotnet-host.txt
 
 	find \
-		lib/dotnet/host/fxr/9.0.* \
+		lib/dotnet/host/fxr/10.0.* \
 		\( -type f -o -type l \) | sort \
 		> "${TERMUX_PKG_TMPDIR}"/dotnet-hostfxr.txt
 
 	find \
-		lib/dotnet/shared/Microsoft.NETCore.App/9.0.* \
+		lib/dotnet/shared/Microsoft.NETCore.App/10.0.* \
 		\( -type f -o -type l \) ! -name "*.pdb" | sort \
 		> "${TERMUX_PKG_TMPDIR}"/dotnet-runtime.txt
 
 	find \
-		lib/dotnet/shared/Microsoft.NETCore.App/9.0.* \
+		lib/dotnet/shared/Microsoft.NETCore.App/10.0.* \
 		\( -type f -o -type l \) -name "*.pdb" | sort \
 		> "${TERMUX_PKG_TMPDIR}"/dotnet-runtime-dbg.txt
 
 	find \
-		lib/dotnet/metadata/workloads/9.0.* \
-		lib/dotnet/packs/Microsoft.AspNetCore.App.Runtime.linux-bionic-${arch}/9.0.* \
-		lib/dotnet/packs/Microsoft.NETCore.App.Runtime.linux-bionic-${arch}/9.0.* \
-		lib/dotnet/sdk/9.0.* \
+		lib/dotnet/metadata/workloads/10.0.* \
+		lib/dotnet/packs/Microsoft.AspNetCore.App.Runtime.linux-bionic-${arch}/10.0.* \
+		lib/dotnet/packs/Microsoft.NETCore.App.Runtime.linux-bionic-${arch}/10.0.* \
+		lib/dotnet/sdk/10.0.* \
 		lib/dotnet/sdk-manifests \
 		\( -type f -o -type l \) ! -name "*.pdb" | sort \
 		> "${TERMUX_PKG_TMPDIR}"/dotnet-sdk.txt
 
 	find \
-		lib/dotnet/packs/Microsoft.AspNetCore.App.Runtime.linux-bionic-${arch}/9.0.* \
-		lib/dotnet/packs/Microsoft.NETCore.App.Runtime.linux-bionic-${arch}/9.0.* \
-		lib/dotnet/sdk/9.0.* \
+		lib/dotnet/packs/Microsoft.AspNetCore.App.Runtime.linux-bionic-${arch}/10.0.* \
+		lib/dotnet/packs/Microsoft.NETCore.App.Runtime.linux-bionic-${arch}/10.0.* \
+		lib/dotnet/sdk/10.0.* \
 		\( -type f -o -type l \) -name "*.pdb" | sort \
 		> "${TERMUX_PKG_TMPDIR}"/dotnet-sdk-dbg.txt
 
 	find \
-		lib/dotnet/packs/Microsoft.NETCore.App.Ref/9.0.* \
+		lib/dotnet/packs/Microsoft.NETCore.App.Ref/10.0.* \
 		\( -type f -o -type l \) | sort \
 		> "${TERMUX_PKG_TMPDIR}"/dotnet-targeting-pack.txt
 
 	find \
-		lib/dotnet/templates/9.0.* \
+		lib/dotnet/templates/10.0.* \
 		\( -type f -o -type l \) | sort \
 		> "${TERMUX_PKG_TMPDIR}"/dotnet-templates.txt
 
+	if [[ ! -d lib/dotnet/packs/NETStandard.Library.Ref ]]; then
+		echo "WARNING: NETStandard.Library.Ref not found in SDK tarball, extracting from nupkg"
+		local _nupkg
+		_nupkg="$(find "${TERMUX_PKG_BUILDDIR}/prereqs/packages/reference" \
+			-iname 'netstandard.library.ref.2.1.0.nupkg' -print -quit 2>/dev/null)"
+		if [[ -z "${_nupkg}" ]]; then
+			_nupkg="$(find "${TERMUX_PKG_BUILDDIR}" -maxdepth 5 \
+				-iname 'netstandard.library.ref.2.1.0.nupkg' -print -quit 2>/dev/null)"
+		fi
+		if [[ -n "${_nupkg}" ]]; then
+			mkdir -p lib/dotnet/packs/NETStandard.Library.Ref/2.1.0
+			unzip -qo "${_nupkg}" -d lib/dotnet/packs/NETStandard.Library.Ref/2.1.0
+			rm -rf lib/dotnet/packs/NETStandard.Library.Ref/2.1.0/{_rels,package,'[Content_Types].xml'} \
+				lib/dotnet/packs/NETStandard.Library.Ref/2.1.0/*.nuspec
+		else
+			termux_error_exit "NETStandard.Library.Ref.2.1.0.nupkg not found"
+		fi
+	fi
 	find \
 		lib/dotnet/packs/NETStandard.Library.Ref \
 		\( -type f -o -type l \) | sort \
@@ -399,8 +420,8 @@ termux_step_post_massage() {
 # References:
 # https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core
 # https://learn.microsoft.com/en-us/dotnet/core/distribution-packaging
-# https://git.alpinelinux.org/aports/tree/community/dotnet9-stage0/APKBUILD
-# https://git.alpinelinux.org/aports/tree/community/dotnet9-runtime/APKBUILD
-# https://git.alpinelinux.org/aports/tree/community/dotnet9-sdk/APKBUILD
-# https://src.fedoraproject.org/rpms/dotnet9.0/blob/rawhide/f/dotnet9.0.spec
-# https://git.launchpad.net/ubuntu/+source/dotnet9/tree/debian/rules
+# https://git.alpinelinux.org/aports/tree/community/dotnet10-stage0/APKBUILD
+# https://git.alpinelinux.org/aports/tree/community/dotnet10-runtime/APKBUILD
+# https://git.alpinelinux.org/aports/tree/community/dotnet10-sdk/APKBUILD
+# https://src.fedoraproject.org/rpms/dotnet10.0/blob/rawhide/f/dotnet10.0.spec
+# https://git.launchpad.net/ubuntu/+source/dotnet10/tree/debian/rules
