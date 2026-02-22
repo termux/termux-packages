@@ -1,4 +1,23 @@
 TERMUX_SUBPKG_INCLUDE="
+bin/*-linux-android*-ar
+bin/*-linux-android*-ld
+bin/*-linux-android*-nm
+bin/*-linux-android*-objdump
+bin/*-linux-android*-ranlib
+bin/*-linux-android*-readelf
+bin/*-linux-android*-strip
+bin/addr2line
+bin/ar
+bin/c++filt
+bin/ld
+bin/nm
+bin/objcopy
+bin/objdump
+bin/ranlib
+bin/readelf
+bin/size
+bin/strings
+bin/strip
 bin/bugpoint
 bin/dsymutil
 bin/llc
@@ -15,10 +34,22 @@ share/man/man1/dsymutil.1.gz
 share/man/man1/llc.1.gz
 share/man/man1/lli.1.gz
 share/man/man1/llvm!(-test-mustache-spec)
+share/man/man1/ar.1.gz
+share/man/man1/addr2line.1.gz
+share/man/man1/c++filt.1.gz
+share/man/man1/nm.1.gz
+share/man/man1/objcopy.1.gz
+share/man/man1/objdump.1.gz
+share/man/man1/ranlib.1.gz
+share/man/man1/readelf.1.gz
+share/man/man1/size.1.gz
+share/man/man1/strings.1.gz
+share/man/man1/strip.1.gz
 share/man/man1/opt.1.gz
 share/man/man1/*tblgen.1.gz
 share/opt-viewer
 "
 TERMUX_SUBPKG_DESCRIPTION="LLVM modular compiler and toolchain executables"
-TERMUX_SUBPKG_BREAKS="libllvm (<< 11.0.0-1)"
-TERMUX_SUBPKG_REPLACES="libllvm (<< 11.0.0-1)"
+TERMUX_SUBPKG_BREAKS="binutils-is-llvm, libllvm (<< 11.0.0-1)"
+TERMUX_SUBPKG_CONFLICTS="binutils-is-llvm"
+TERMUX_SUBPKG_REPLACES="binutils-is-llvm, libllvm (<< 11.0.0-1)"

@@ -21,7 +21,7 @@ TERMUX_PKG_SHA256=(fdbb376f08242d917922a6a22a773980217fafa310046fc5d6459490af23d
                    5784d4cc47d0845af0897d3b7473a08dd0281a4cdabac0a486740840d014fde1)
 TERMUX_PKG_AUTO_UPDATE=false
 # dub dlopen()s libcurl.so:
-TERMUX_PKG_DEPENDS="binutils-bin, binutils-is-llvm | binutils, clang, libc++, libcurl, zlib"
+TERMUX_PKG_DEPENDS="binutils, clang, libc++, libcurl, zlib"
 TERMUX_PKG_BUILD_DEPENDS="binutils-cross"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true

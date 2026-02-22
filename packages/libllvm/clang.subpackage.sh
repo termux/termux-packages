@@ -12,7 +12,11 @@ bin/gcc
 bin/git-clang-format
 bin/hmaptool
 bin/intercept-build
-bin/*-linux-android*
+bin/*-linux-android*-clang
+bin/*-linux-android*-clang++
+bin/*-linux-android*-cpp
+bin/*-linux-android*-g++
+bin/*-linux-android*-gcc
 bin/modularize
 bin/nvptx-arch
 bin/offload-arch
