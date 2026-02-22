@@ -1,0 +1,131 @@
+From e28ac3aed72a82f10f25b8b6a407361bb54649ce Mon Sep 17 00:00:00 2001
+From: xingguangcuican6666 <xingguangcuican666@foxmail.com>
+Date: Tue, 20 Jan 2026 15:31:22 +0800
+Subject: [PATCH] fix_align.h
+
+---
+ include/schily/align.h | 111 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 111 insertions(+)
+
+diff --git a/include/schily/align.h b/include/schily/align.h
+index 455d7ec..810ac67 100644
+--- a/include/schily/align.h
++++ b/include/schily/align.h
+@@ -171,3 +171,114 @@ extern "C" {
+ #endif
+ 
+ #endif /* _SCHILY_ALIGN_H */
++/*
++ * This file has been generated automatically
++ * by @(#)align_test.c	1.31 15/11/30 Copyright 1995-2015 J. Schilling
++ * do not edit by hand.
++ */
++#ifndef	__ALIGN_H
++#define	__ALIGN_H
++
++typedef uintptr_t UIntptr_t;
++#if defined(__LP64__) || defined(_LP64) || defined(__x86_64__) || defined(__aarch64__)
++    #define ALIGN_LONG    8
++    #define ALIGN_LMASK   7
++    #define SIZE_LONG     8
++
++    #define ALIGN_PTR     8
++    #define ALIGN_PMASK   7
++    #define SIZE_PTR      8
++
++    #define ALIGN_TMAX    16
++    #define ALIGN_TMMASK  15
++    #define SIZE_TMAX     16
++#else
++    #define ALIGN_LONG    4
++    #define ALIGN_LMASK   3
++    #define SIZE_LONG     4
++
++    #define ALIGN_PTR     4
++    #define ALIGN_PMASK   3
++    #define SIZE_PTR      4
++
++    #define ALIGN_TMAX    8
++    #define ALIGN_TMMASK  7
++    #define SIZE_TMAX     8
++#endif
++
++#define ALIGN_SHORT   2
++#define ALIGN_SMASK   1
++#define SIZE_SHORT    2
++
++#define ALIGN_INT     4
++#define ALIGN_IMASK   3
++#define SIZE_INT      4
++
++#define ALIGN_LLONG   8
++#define ALIGN_LLMASK  7
++#define SIZE_LLONG    8
++
++#define ALIGN_FLOAT   4
++#define ALIGN_FMASK   3
++#define SIZE_FLOAT    4
++
++#define ALIGN_DOUBLE  8
++#define ALIGN_DMASK   7
++#define SIZE_DOUBLE   8
++
++/*
++ * There used to be a cast to an int but we get a warning from GCC.
++ * This warning message from GCC is wrong.
++ * Believe me that this macro would even be usable if I would cast to short.
++ * In order to avoid this warning, we are now using UIntptr_t
++ */
++#define	xaligned(a, s)		((((UIntptr_t)(a)) & (s)) == 0)
++#define	x2aligned(a, b, s)	(((((UIntptr_t)(a)) | ((UIntptr_t)(b))) & (s)) == 0)
++
++#define	saligned(a)		xaligned(a, ALIGN_SMASK)
++#define	s2aligned(a, b)		x2aligned(a, b, ALIGN_SMASK)
++
++#define	ialigned(a)		xaligned(a, ALIGN_IMASK)
++#define	i2aligned(a, b)		x2aligned(a, b, ALIGN_IMASK)
++
++#define	laligned(a)		xaligned(a, ALIGN_LMASK)
++#define	l2aligned(a, b)		x2aligned(a, b, ALIGN_LMASK)
++
++#define	llaligned(a)		xaligned(a, ALIGN_LLMASK)
++#define	ll2aligned(a, b)	x2aligned(a, b, ALIGN_LLMASK)
++
++#define	faligned(a)		xaligned(a, ALIGN_FMASK)
++#define	f2aligned(a, b)		x2aligned(a, b, ALIGN_FMASK)
++
++#define	daligned(a)		xaligned(a, ALIGN_DMASK)
++#define	d2aligned(a, b)		x2aligned(a, b, ALIGN_DMASK)
++
++#define	ldaligned(a)		xaligned(a, ALIGN_LDMASK)
++#define	ld2aligned(a, b)	x2aligned(a, b, ALIGN_LDMASK)
++
++#define	paligned(a)		xaligned(a, ALIGN_PMASK)
++#define	p2aligned(a, b)		x2aligned(a, b, ALIGN_PMASK)
++
++#define	maligned(a)		xaligned(a, ALIGN_TMMASK)
++#define	m2aligned(a, b)		x2aligned(a, b, ALIGN_TMMASK)
++
++
++/*
++ * There used to be a cast to an int but we get a warning from GCC.
++ * This warning message from GCC is wrong.
++ * Believe me that this macro would even be usable if I would cast to short.
++ * In order to avoid this warning, we are now using UIntptr_t
++ */
++#define	xalign(x, a, m)		(((char *)(x)) + ((a) - 1 - ((((UIntptr_t)(x))-1)&(m))))
++
++#define	salign(x)		xalign((x), ALIGN_SHORT, ALIGN_SMASK)
++#define	ialign(x)		xalign((x), ALIGN_INT, ALIGN_IMASK)
++#define	lalign(x)		xalign((x), ALIGN_LONG, ALIGN_LMASK)
++#define	llalign(x)		xalign((x), ALIGN_LLONG, ALIGN_LLMASK)
++#define	falign(x)		xalign((x), ALIGN_FLOAT, ALIGN_FMASK)
++#define	dalign(x)		xalign((x), ALIGN_DOUBLE, ALIGN_DMASK)
++#define	ldalign(x)		xalign((x), ALIGN_LDOUBLE, ALIGN_LDMASK)
++#define	palign(x)		xalign((x), ALIGN_PTR, ALIGN_PMASK)
++#define	malign(x)		xalign((x), ALIGN_TMAX, ALIGN_TMMASK)
++
++#endif	/* __ALIGN_H */
+-- 
+2.52.0
+

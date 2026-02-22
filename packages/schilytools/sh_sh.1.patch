@@ -1,0 +1,162 @@
+--- a/sh/sh.1.orig	2022-10-16 15:57:08 UTC
++++ b/sh/sh.1
+@@ -61,32 +61,25 @@
+ .if n .ds s sz
+ .TH sh 1 "2022/10/06" "Schily Bourne Shell" "User Commands"
+ .SH NAME
+-sh, bosh, jsh \- standard and job control shell and command interpreter
++sh, bosh, jbosh \- standard and job control shell and command interpreter
+ .SH SYNOPSIS
+ .LP
+ .nf
+-.B /usr/bin/sh\c
+-.RB "   [" \(miabCcefhikmnprstuvxP "] ["\c
+-.IR argument ]...
+-.fi
+-
+-.LP
+-.nf
+-.B /usr/bin/bosh\c
++.B bosh\c
+ .RB " [" \(miabCcefhikmnprstuvxP "] ["\c
+ .IR argument ]...
+ .fi
+ 
+ .LP
+ .nf
+-.B /usr/bin/pbosh\c
++.B pbosh\c
+ .RB " [" \(miabCcefhikmnprstuvxP "] ["\c
+ .IR argument ]...
+ .fi
+ 
+ .LP
+ .nf
+-.B /usr/bin/jsh\c
++.B jbosh\c
+ .RB "  [" \(miabCcefhikmnprstuvxP "] ["\c
+ .IR argument ]...
+ .fi
+@@ -95,18 +88,18 @@ sh, bosh, jsh \- standard and job control shell and co
+ .sp
+ .LP
+ The
+-.B /usr/bin/sh
++.B bosh
+ utility is a command programming language that
+ executes commands read from a terminal or a file.
+ .LP
+ The name
+ .B bosh
+ permits to call this implementation even when
+-.B /usr/bin/sh
++.B sh
+ has been linked to another shell.
+ .LP
+ The
+-.B jsh
++.B jbosh
+ utility is an interface to the shell that provides all of the
+ functionality of
+ .B sh
+@@ -121,7 +114,7 @@ or
+ Since
+ .B POSIX
+ requires that job control is auto-enabled for interactive shells,
+-.B jsh
++.B jbosh
+ can be seen as an artefact from the historic Bourne Shell, but is kept for
+ compatibility.
+ .LP
+@@ -180,7 +173,7 @@ if the file exists (by default this is the file
+ .BR $HOME/.shrc ).
+ Thereafter, commands are read as described below, which is also the case
+ when the shell is invoked as
+-.BR /usr/bin/sh .
++.BR bosh .
+ 
+ .SH OPTIONS
+ The options below are
+@@ -5827,7 +5820,7 @@ those that precede the command name.
+ Switch job control mode on.
+ All jobs are run in their own process groups. 
+ See section
+-.B "Job Control (jsh)"
++.B "Job Control (jbosh)"
+ below.
+ On systems with job control, this flag is turned on automatically
+ for interactive shells.
+@@ -7516,7 +7509,7 @@ termination status.
+ The process identifier
+ .I n
+ may either be a UNIX process id or a shell job id. See
+-.B "Job Control (jsh)"
++.B "Job Control (jbosh)"
+ section below for information on shell job ids. 
+ .sp
+ The return code of
+@@ -7544,11 +7537,11 @@ in the section
+ .B Parameter Substitution
+ above.
+ 
+-.SS "Job Control (jsh)"
++.SS "Job Control (jbosh)"
+ .sp
+ .LP
+ When the shell is invoked as
+-.BR jsh ,
++.BR jbosh ,
+ when the shell is invoked as interactive shell
+ or after
+ .B set -m
+@@ -8362,7 +8355,7 @@ See
+ for an extended description of the behavior of
+ .B sh
+ and
+-.B jsh
++.B jbosh
+ when encountering files greater than or equal to 2 Gbyte ( 2^31 bytes).
+ .SH EXIT STATUS
+ .sp
+@@ -8373,11 +8366,11 @@ execution of the shell file is abandoned. Otherwise, t
+ exit status of the last command executed (see also the
+ .B exit
+ command above).
+-.SS "jsh Only"
++.SS "jbosh Only"
+ .sp
+ .LP
+ If the shell is invoked as
+-.B jsh
++.B jbosh
+ and an attempt is made to exit the
+ shell while there are stopped jobs, the shell issues one warning:
+ .sp
+@@ -8476,7 +8469,7 @@ The location of the restricted Bourne Shell binary.
+ See
+ .BR attributes (7)
+ for descriptions of the following attributes:
+-.SS "/usr/bin/sh, /usr/bin/jsh"
++.SS "bosh, jbosh"
+ .sp
+ 
+ .sp
+@@ -8509,9 +8502,6 @@ CSIEnabled
+ .BR ksh93 (1),
+ .BR login (1),
+ .BR newgrp (1),
+-.BR pfsh (1),
+-.BR pfexec (1),
+-.BR privileges (7),
+ .BR ps (1),
+ .BR pwd (1),
+ .BR set (1),
+@@ -8541,8 +8531,6 @@ CSIEnabled
+ .BR profile (5),
+ .BR attributes (7),
+ .BR environ (7),
+-.BR largefile (7),
+-.BR XPG4 (7)
+ .hy 1
+ .SH WARNINGS
+ .sp
