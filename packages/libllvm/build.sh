@@ -4,10 +4,11 @@ TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_LICENSE_FILE="llvm/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@finagolfin"
 # Keep flang version and revision in sync when updating (enforced by check in termux_step_pre_configure).
-TERMUX_PKG_VERSION=21.1.8
+TERMUX_PKG_VERSION="21.1.8"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142
 TERMUX_PKG_AUTO_UPDATE=false
-TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-${TERMUX_PKG_VERSION}/llvm-project-${TERMUX_PKG_VERSION}.src.tar.xz
+TERMUX_PKG_SRCURL="https://github.com/llvm/llvm-project/releases/download/llvmorg-${TERMUX_PKG_VERSION}/llvm-project-${TERMUX_PKG_VERSION}.src.tar.xz"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/ld64.lld.darwin*
@@ -53,6 +54,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_ENABLE_FFI=ON
 -DLLVM_ENABLE_RTTI=ON
 -DLLVM_INSTALL_UTILS=ON
+-DLLVM_INSTALL_BINUTILS_SYMLINKS=ON
 -DMLIR_INSTALL_AGGREGATE_OBJECTS=OFF
 "
 
@@ -165,6 +167,46 @@ termux_step_post_make_install() {
 		fi
 		EOF
 		chmod u+x "$wrapper"
+	done
+
+	# Make lld provide ld
+	ln -sf ld.lld "${TERMUX_PREFIX}/bin/ld"
+	# https://bugs.llvm.org/show_bug.cgi?id=42455
+	install -Dm644 -t "${TERMUX_PREFIX}/share/man/man1" "$TERMUX_PKG_SRCDIR/lld/docs/ld.lld.1"
+	ln -sf ld.lld.1.gz "${TERMUX_PREFIX}/share/man/man1/ld.1.gz"
+
+	# Make llvm provide manpages for binutils that -DLLVM_INSTALL_BINUTILS_SYMLINKS=ON installed
+	local -a _BINUTILS_CONFLICTING_WITH_LLVM=(
+		"ar"
+		"addr2line"
+		"c++filt"
+		"nm"
+		"objcopy"
+		"objdump"
+		"ranlib"
+		"readelf"
+		"size"
+		"strings"
+		"strip"
+	)
+	local binutil
+	for binutil in "${_BINUTILS_CONFLICTING_WITH_LLVM[@]}"; do
+		ln -sf "llvm-${binutil//+/x}.1.gz" "${TERMUX_PREFIX}/share/man/man1/${binutil}.1.gz"
+	done
+
+	# Make llvm provide triplet-prefixed symbolic links which are used by some tools,
+	# like python, perl and libtool:
+	local -a _BINUTILS_WITH_HOST_PREFIX=(
+		"ar"
+		"ld"
+		"nm"
+		"objdump"
+		"ranlib"
+		"readelf"
+		"strip"
+	)
+	for binutil in "${_BINUTILS_WITH_HOST_PREFIX[@]}"; do
+		ln -sf "${binutil}" "${TERMUX_PREFIX}/bin/${TERMUX_HOST_PLATFORM}-${binutil}"
 	done
 }
 
