@@ -1,0 +1,32 @@
+diff --git a/glutin_glx_sys/build.rs b/glutin_glx_sys/build.rs
+index c9ce54b..47b7ad2 100644
+--- a/build.rs
++++ b/build.rs
+@@ -10,6 +10,7 @@ fn main() {
+     println!("cargo:rerun-if-changed=build.rs");
+ 
+     if target.contains("linux")
++        || target.contains("android")
+         || target.contains("dragonfly")
+         || target.contains("freebsd")
+         || target.contains("netbsd")
+diff --git a/glutin_glx_sys/src/lib.rs b/glutin_glx_sys/src/lib.rs
+index 48c4b25..5a80c3f 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -1,4 +1,5 @@
+ #![cfg(any(
++    target_os = "android",
+     target_os = "linux",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+diff --git a/glutin_glx_sys/Cargo.toml b/glutin_glx_sys/Cargo.toml
+--- a/Cargo.toml 	2025-07-03 00:40:38.209739251 +0200
++++ b/Cargo.toml	2025-07-03 00:41:20.535386026 +0200
+@@ -33,5 +33,5 @@
+ [build-dependencies.gl_generator]
+ version = "0.14"
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os="dragonfly", target_os="netbsd", target_os="openbsd"))'.dependencies.x11-dl]
++[target.'cfg(any(target_os = "android", target_os = "linux", target_os = "freebsd", target_os="dragonfly", target_os="netbsd", target_os="openbsd"))'.dependencies.x11-dl]
+ version = "2.18.3"
