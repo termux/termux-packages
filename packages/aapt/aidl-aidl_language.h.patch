@@ -1,0 +1,278 @@
+--- a/aidl/aidl_language.h
++++ b/aidl/aidl_language.h
+@@ -396,6 +396,137 @@ class AidlAnnotatable : public AidlCommentable {
+   vector<std::unique_ptr<AidlAnnotation>> annotations_;
+ };
+ 
++class AidlUnaryConstExpression;
++class AidlBinaryConstExpression;
++class AidlConstantReference;
++
++class AidlConstantValue : public AidlNode {
++ public:
++  enum class Type {
++    // WARNING: Don't change this order! The order is used to determine type
++    // promotion during a binary expression.
++    BOOLEAN,
++    INT8,
++    INT32,
++    INT64,
++    ARRAY,
++    CHARACTER,
++    STRING,
++    REF,
++    FLOATING,
++    UNARY,
++    BINARY,
++    ERROR,
++  };
++
++  // Returns the evaluated value. T> should match to the actual type.
++  template <typename T>
++  T EvaluatedValue() const {
++    is_evaluated_ || (CheckValid() && evaluate());
++    AIDL_FATAL_IF(!is_valid_, this);
++
++    if constexpr (is_vector<T>::value) {
++      AIDL_FATAL_IF(final_type_ != Type::ARRAY, this);
++      T result;
++      for (const auto& v : values_) {
++        result.push_back(v->EvaluatedValue<typename T::value_type>());
++      }
++      return result;
++    } else if constexpr (is_one_of<T, float, double>::value) {
++      AIDL_FATAL_IF(final_type_ != Type::FLOATING, this);
++      T result;
++      AIDL_FATAL_IF(!ParseFloating(value_, &result), this);
++      return result;
++    } else if constexpr (std::is_same<T, std::string>::value) {
++      AIDL_FATAL_IF(final_type_ != Type::STRING, this);
++      return final_string_value_.substr(1, final_string_value_.size() - 2);  // unquote "
++    } else if constexpr (is_one_of<T, int8_t, int32_t, int64_t>::value) {
++      AIDL_FATAL_IF(final_type_ < Type::INT8 && final_type_ > Type::INT64, this);
++      return static_cast<T>(final_value_);
++    } else if constexpr (std::is_same<T, char16_t>::value) {
++      AIDL_FATAL_IF(final_type_ != Type::CHARACTER, this);
++      return final_string_value_.at(1);  // unquote '
++    } else if constexpr (std::is_same<T, bool>::value) {
++      static_assert(std::is_same<T, bool>::value, "..");
++      AIDL_FATAL_IF(final_type_ != Type::BOOLEAN, this);
++      return final_value_ != 0;
++    } else {
++      static_assert(unsupported_type<T>::value);
++    }
++  }
++
++  virtual ~AidlConstantValue() = default;
++
++  // non-copyable, non-movable
++  AidlConstantValue(const AidlConstantValue&) = delete;
++  AidlConstantValue(AidlConstantValue&&) = delete;
++  AidlConstantValue& operator=(const AidlConstantValue&) = delete;
++  AidlConstantValue& operator=(AidlConstantValue&&) = delete;
++
++  // creates default value, when one isn't specified
++  // nullptr if no default available
++  static AidlConstantValue* Default(const AidlTypeSpecifier& specifier);
++
++  static AidlConstantValue* Boolean(const AidlLocation& location, bool value);
++  static AidlConstantValue* Character(const AidlLocation& location, const std::string& value);
++  // example: 123, -5498, maybe any size
++  static AidlConstantValue* Integral(const AidlLocation& location, const std::string& value);
++  static AidlConstantValue* Floating(const AidlLocation& location, const std::string& value);
++  static AidlConstantValue* Array(const AidlLocation& location,
++                                  std::unique_ptr<vector<unique_ptr<AidlConstantValue>>> values);
++  // example: "\"asdf\""
++  static AidlConstantValue* String(const AidlLocation& location, const string& value);
++
++  Type GetType() const { return final_type_; }
++  const std::string& Literal() const { return value_; }
++
++  bool Evaluate() const;
++  virtual bool CheckValid() const;
++
++  // Raw value of type (currently valid in C++ and Java). Empty string on error.
++  string ValueString(const AidlTypeSpecifier& type, const ConstantValueDecorator& decorator) const;
++
++  void TraverseChildren(std::function<void(const AidlNode&)> traverse) const override {
++    if (type_ == Type::ARRAY) {
++      for (const auto& v : values_) {
++        traverse(*v);
++      }
++    }
++  }
++  void DispatchVisit(AidlVisitor& visitor) const override { visitor.Visit(*this); }
++  size_t Size() const { return values_.size(); }
++  const AidlConstantValue& ValueAt(size_t index) const { return *values_.at(index); }
++  static string ToString(Type type);
++
++ private:
++  AidlConstantValue(const AidlLocation& location, Type parsed_type, int64_t parsed_value,
++                    const string& checked_value);
++  AidlConstantValue(const AidlLocation& location, Type type, const string& checked_value);
++  AidlConstantValue(const AidlLocation& location, Type type,
++                    std::unique_ptr<vector<unique_ptr<AidlConstantValue>>> values,
++                    const std::string& value);
++  static bool ParseIntegral(const string& value, int64_t* parsed_value, Type* parsed_type);
++  static bool IsHex(const string& value);
++
++  virtual bool evaluate() const;
++  bool IsLiteral() const;
++
++  const Type type_ = Type::ERROR;
++  const vector<unique_ptr<AidlConstantValue>> values_;  // if type_ == ARRAY
++  const string value_;                                  // otherwise
++
++  // State for tracking evaluation of expressions
++  mutable bool is_valid_ = false;      // cache of CheckValid, but may be marked false in evaluate
++  mutable bool is_evaluated_ = false;  // whether evaluate has been called
++  mutable Type final_type_;
++  mutable int64_t final_value_;
++  mutable string final_string_value_ = "";
++
++  friend AidlUnaryConstExpression;
++  friend AidlBinaryConstExpression;
++  friend AidlConstantReference;
++};
++
+ // Represents `[]`
+ struct DynamicArray {};
+ // Represents `[N][M]..`
+@@ -613,137 +744,6 @@ struct ArgumentAspect {
+   std::set<AidlArgument::Direction> possible_directions;
+ };
+ 
+-class AidlUnaryConstExpression;
+-class AidlBinaryConstExpression;
+-class AidlConstantReference;
+-
+-class AidlConstantValue : public AidlNode {
+- public:
+-  enum class Type {
+-    // WARNING: Don't change this order! The order is used to determine type
+-    // promotion during a binary expression.
+-    BOOLEAN,
+-    INT8,
+-    INT32,
+-    INT64,
+-    ARRAY,
+-    CHARACTER,
+-    STRING,
+-    REF,
+-    FLOATING,
+-    UNARY,
+-    BINARY,
+-    ERROR,
+-  };
+-
+-  // Returns the evaluated value. T> should match to the actual type.
+-  template <typename T>
+-  T EvaluatedValue() const {
+-    is_evaluated_ || (CheckValid() && evaluate());
+-    AIDL_FATAL_IF(!is_valid_, this);
+-
+-    if constexpr (is_vector<T>::value) {
+-      AIDL_FATAL_IF(final_type_ != Type::ARRAY, this);
+-      T result;
+-      for (const auto& v : values_) {
+-        result.push_back(v->EvaluatedValue<typename T::value_type>());
+-      }
+-      return result;
+-    } else if constexpr (is_one_of<T, float, double>::value) {
+-      AIDL_FATAL_IF(final_type_ != Type::FLOATING, this);
+-      T result;
+-      AIDL_FATAL_IF(!ParseFloating(value_, &result), this);
+-      return result;
+-    } else if constexpr (std::is_same<T, std::string>::value) {
+-      AIDL_FATAL_IF(final_type_ != Type::STRING, this);
+-      return final_string_value_.substr(1, final_string_value_.size() - 2);  // unquote "
+-    } else if constexpr (is_one_of<T, int8_t, int32_t, int64_t>::value) {
+-      AIDL_FATAL_IF(final_type_ < Type::INT8 && final_type_ > Type::INT64, this);
+-      return static_cast<T>(final_value_);
+-    } else if constexpr (std::is_same<T, char16_t>::value) {
+-      AIDL_FATAL_IF(final_type_ != Type::CHARACTER, this);
+-      return final_string_value_.at(1);  // unquote '
+-    } else if constexpr (std::is_same<T, bool>::value) {
+-      static_assert(std::is_same<T, bool>::value, "..");
+-      AIDL_FATAL_IF(final_type_ != Type::BOOLEAN, this);
+-      return final_value_ != 0;
+-    } else {
+-      static_assert(unsupported_type<T>::value);
+-    }
+-  }
+-
+-  virtual ~AidlConstantValue() = default;
+-
+-  // non-copyable, non-movable
+-  AidlConstantValue(const AidlConstantValue&) = delete;
+-  AidlConstantValue(AidlConstantValue&&) = delete;
+-  AidlConstantValue& operator=(const AidlConstantValue&) = delete;
+-  AidlConstantValue& operator=(AidlConstantValue&&) = delete;
+-
+-  // creates default value, when one isn't specified
+-  // nullptr if no default available
+-  static AidlConstantValue* Default(const AidlTypeSpecifier& specifier);
+-
+-  static AidlConstantValue* Boolean(const AidlLocation& location, bool value);
+-  static AidlConstantValue* Character(const AidlLocation& location, const std::string& value);
+-  // example: 123, -5498, maybe any size
+-  static AidlConstantValue* Integral(const AidlLocation& location, const std::string& value);
+-  static AidlConstantValue* Floating(const AidlLocation& location, const std::string& value);
+-  static AidlConstantValue* Array(const AidlLocation& location,
+-                                  std::unique_ptr<vector<unique_ptr<AidlConstantValue>>> values);
+-  // example: "\"asdf\""
+-  static AidlConstantValue* String(const AidlLocation& location, const string& value);
+-
+-  Type GetType() const { return final_type_; }
+-  const std::string& Literal() const { return value_; }
+-
+-  bool Evaluate() const;
+-  virtual bool CheckValid() const;
+-
+-  // Raw value of type (currently valid in C++ and Java). Empty string on error.
+-  string ValueString(const AidlTypeSpecifier& type, const ConstantValueDecorator& decorator) const;
+-
+-  void TraverseChildren(std::function<void(const AidlNode&)> traverse) const override {
+-    if (type_ == Type::ARRAY) {
+-      for (const auto& v : values_) {
+-        traverse(*v);
+-      }
+-    }
+-  }
+-  void DispatchVisit(AidlVisitor& visitor) const override { visitor.Visit(*this); }
+-  size_t Size() const { return values_.size(); }
+-  const AidlConstantValue& ValueAt(size_t index) const { return *values_.at(index); }
+-  static string ToString(Type type);
+-
+- private:
+-  AidlConstantValue(const AidlLocation& location, Type parsed_type, int64_t parsed_value,
+-                    const string& checked_value);
+-  AidlConstantValue(const AidlLocation& location, Type type, const string& checked_value);
+-  AidlConstantValue(const AidlLocation& location, Type type,
+-                    std::unique_ptr<vector<unique_ptr<AidlConstantValue>>> values,
+-                    const std::string& value);
+-  static bool ParseIntegral(const string& value, int64_t* parsed_value, Type* parsed_type);
+-  static bool IsHex(const string& value);
+-
+-  virtual bool evaluate() const;
+-  bool IsLiteral() const;
+-
+-  const Type type_ = Type::ERROR;
+-  const vector<unique_ptr<AidlConstantValue>> values_;  // if type_ == ARRAY
+-  const string value_;                                  // otherwise
+-
+-  // State for tracking evaluation of expressions
+-  mutable bool is_valid_ = false;      // cache of CheckValid, but may be marked false in evaluate
+-  mutable bool is_evaluated_ = false;  // whether evaluate has been called
+-  mutable Type final_type_;
+-  mutable int64_t final_value_;
+-  mutable string final_string_value_ = "";
+-
+-  friend AidlUnaryConstExpression;
+-  friend AidlBinaryConstExpression;
+-  friend AidlConstantReference;
+-};
+-
+ // Represents "<type>.<field>" which resolves to a constant which is one of
+ // - constant declaration
+ // - enumerator
