@@ -1,0 +1,29 @@
+--- a/absl/log/internal/log_sink_set.cc
++++ b/absl/log/internal/log_sink_set.cc
+@@ -19,7 +19,7 @@
+ #include <pthread.h>
+ #endif
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #include <android/log.h>
+ #endif
+ 
+@@ -116,7 +116,7 @@
+   }
+ };
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ class AndroidLogSink final : public LogSink {
+  public:
+   ~AndroidLogSink() override = default;
+@@ -172,7 +172,7 @@
+     static absl::NoDestructor<StderrLogSink> stderr_log_sink;
+     AddLogSink(stderr_log_sink.get());
+ #endif
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+     static absl::NoDestructor<AndroidLogSink> android_log_sink;
+     AddLogSink(android_log_sink.get());
+ #endif
