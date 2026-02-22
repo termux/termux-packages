@@ -241,6 +241,9 @@ _fetch_and_cache_tags() {
 
 	echo "$([[ "${CI-false}" == "true" ]] && echo "::group::" || :)INFO: Fetching GitHub packages via GraphQL API"
 
+	local -
+	PS4='+$0 \[\e[32m\]${FUNCNAME[0]:-<global scope>}${FUNCNAME[*]:+()}:$LINENO\[\e[0m\] '
+	set -x
 	local line
 	local -a LATEST_TAGS=() LATEST_TAGS_GITHUB=()
 
