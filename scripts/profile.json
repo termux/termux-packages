@@ -1,5 +1,5 @@
 {
-    "description": "This is a custom seccomp profile which allows the personality system call, based on https://github.com/moby/moby/blob/e258d66f176a4447931edfd9398c55b3e8ee4a07/profiles/seccomp/default.json.",
+    "description": "This is a custom seccomp profile which allows the personality, mount and umount2 system calls, based on https://github.com/moby/moby/blob/e258d66f176a4447931edfd9398c55b3e8ee4a07/profiles/seccomp/default.json.",
     "defaultAction": "SCMP_ACT_ERRNO",
     "defaultErrnoRet": 1,
     "archMap": [
@@ -579,30 +579,8 @@
         },
         {
             "names": [
-                "bpf",
-                "clone",
-                "clone3",
-                "fanotify_init",
-                "fsconfig",
-                "fsmount",
-                "fsopen",
-                "fspick",
-                "lookup_dcookie",
                 "mount",
-                "mount_setattr",
-                "move_mount",
-                "name_to_handle_at",
-                "open_tree",
-                "perf_event_open",
-                "quotactl",
-                "quotactl_fd",
-                "setdomainname",
-                "sethostname",
-                "setns",
-                "syslog",
-                "umount",
-                "umount2",
-                "unshare"
+                "umount2"
             ],
             "action": "SCMP_ACT_ALLOW",
             "includes": {
@@ -624,9 +602,6 @@
                 }
             ],
             "excludes": {
-                "caps": [
-                    "CAP_SYS_ADMIN"
-                ],
                 "arches": [
                     "s390",
                     "s390x"
@@ -653,9 +628,6 @@
                 ]
             },
             "excludes": {
-                "caps": [
-                    "CAP_SYS_ADMIN"
-                ]
             }
         },
         {
@@ -665,9 +637,6 @@
             "action": "SCMP_ACT_ERRNO",
             "errnoRet": 38,
             "excludes": {
-                "caps": [
-                    "CAP_SYS_ADMIN"
-                ]
             }
         },
         {
