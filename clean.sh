@@ -93,6 +93,13 @@ fi
 		rm -Rf "/data/data/.built-packages"
 	fi
 
+	# unmount overlayfs before we remove the parent directory
+	[ -d "$TERMUX_TOPDIR" ] && for dir in $(find "$TERMUX_TOPDIR" -type d); do
+		if mountpoint -q "$dir"; then
+			umount "$dir"
+		fi
+	done
+
 	# We can't use rm -Rf "$TERMUX_TOPDIR" in case the "$TERMUX_TOPDIR" is mounted as a Docker volume
 	if [ -d "$TERMUX_TOPDIR" ]; then
 		find "$TERMUX_TOPDIR" -type f,l -delete
