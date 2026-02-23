@@ -1,0 +1,92 @@
+From c512cd5ca7f36fc7b2972ed3db6df97831ebd7af Mon Sep 17 00:00:00 2001
+From: botantony <antonsm21@gmail.com>
+Date: Mon, 23 Feb 2026 15:32:05 +0100
+Subject: [PATCH] fix: define `prefs_changes_print` outside of `prefs_changes`
+
+This causes build failures on macOS runners in Homebrew, see:
+https://github.com/Homebrew/homebrew-core/pull/268970
+https://github.com/Homebrew/homebrew-core/actions/runs/22305120219/job/64538952484?pr=268970
+
+I didn't run `make format` because it modified other unrelated files
+(guess they were not formatted before) but I assume this PR follow the
+style guides
+
+Signed-off-by: botantony <antonsm21@gmail.com>
+---
+ src/config/preferences.c | 28 +++++++++++++++-------------
+ 1 file changed, 15 insertions(+), 13 deletions(-)
+
+diff --git a/src/config/preferences.c b/src/config/preferences.c
+index e2ad7168b..4b8e8f965 100644
+--- a/src/config/preferences.c
++++ b/src/config/preferences.c
+@@ -70,6 +70,8 @@
+ 
+ #define INPBLOCK_DEFAULT 1000
+ 
++#define PREFS_CHANGES_FORMAT_STRING "%-32s | %-20s | %-20s"
++
+ static prof_keyfile_t prefs_prof_keyfile;
+ static GKeyFile* prefs;
+ gint log_maxsize = 0;
+@@ -287,6 +289,16 @@ prefs_load(const char* config_file)
+     _prefs_load();
+ }
+ 
++void
++prefs_changes_print(const char* key, const char* newval, const char* oldval, gboolean* banner_shown)
++{
++    if (!*banner_shown) {
++        cons_show(PREFS_CHANGES_FORMAT_STRING, "Key", "New value", "Old value");
++        *banner_shown = TRUE;
++    }
++    cons_show(PREFS_CHANGES_FORMAT_STRING, key, newval, oldval);
++}
++
+ void
+ prefs_changes(void)
+ {
+@@ -297,16 +309,6 @@ prefs_changes(void)
+     gsize ngroups, nsavedgroups, g;
+     auto_gcharv gchar** groups = g_key_file_get_groups(prefs_prof_keyfile.keyfile, &ngroups);
+     gboolean banner_shown = FALSE;
+-    void prefs_changes_print(const char* key, const char* newval, const char* oldval)
+-    {
+-#define PREFS_CHANGES_FORMAT_STRING "%-32s | %-20s | %-20s"
+-        if (!banner_shown) {
+-            cons_show(PREFS_CHANGES_FORMAT_STRING, "Key", "New value", "Old value");
+-            banner_shown = TRUE;
+-        }
+-        cons_show(PREFS_CHANGES_FORMAT_STRING, key, newval, oldval);
+-#undef PREFS_CHANGES_FORMAT_STRING
+-    }
+     for (g = 0; g < ngroups; ++g) {
+         gsize nkeys, k;
+         gboolean saved_has_group = g_key_file_has_group(saved.keyfile, groups[g]);
+@@ -321,7 +323,7 @@ prefs_changes(void)
+             }
+             if (!saved_has_group
+                 || !g_key_file_has_key(saved.keyfile, groups[g], keys[k], NULL)) {
+-                prefs_changes_print(full_key, new_value, undef);
++                prefs_changes_print(full_key, new_value, undef, &banner_shown);
+                 continue;
+             }
+             auto_gchar gchar* old_value = g_key_file_get_value(saved.keyfile, groups[g], keys[k], &err);
+@@ -330,7 +332,7 @@ prefs_changes(void)
+                 continue;
+             }
+             if (!g_str_equal(old_value, new_value)) {
+-                prefs_changes_print(full_key, new_value, old_value);
++                prefs_changes_print(full_key, new_value, old_value, &banner_shown);
+             }
+         }
+     }
+@@ -348,7 +350,7 @@ prefs_changes(void)
+                 cons_show_error("%s: Old value (%s) error: %s", full_key, STR_MAYBE_NULL(old_value), PROF_GERROR_MESSAGE(err));
+                 continue;
+             }
+-            prefs_changes_print(full_key, undef, old_value);
++            prefs_changes_print(full_key, undef, old_value, &banner_shown);
+         }
+     }
+     free_keyfile(&saved);
