@@ -2,6 +2,8 @@
 set -e -u
 
 TERMUX_SCRIPTDIR=$(cd "$(realpath "$(dirname "$0")")"; cd ..; pwd)
+: ${TERMUX_BUILDER_IMAGE_NAME:=ghcr.io/termux/package-builder}
+: ${CONTAINER_NAME:=termux-package-builder}
 
 BUILDSCRIPT_NAME="build-package.sh"
 
@@ -39,7 +41,7 @@ if [ "$UNAME" = Darwin ]; then
 	SEC_OPT=""
 else
 	REPOROOT="$(dirname $(readlink -f $0))/../"
-	SEC_OPT=" --security-opt seccomp=$REPOROOT/scripts/profile.json"
+	SEC_OPT=" --security-opt seccomp=$REPOROOT/scripts/profile.json --security-opt apparmor=_custom-termux-package-builder-$CONTAINER_NAME --cap-add CAP_SYS_ADMIN --device /dev/fuse"
 fi
 
 if [ "${CI:-}" = "true" ]; then
@@ -56,9 +58,6 @@ if [ -n "$(command -v getenforce)" ] && [ "$(getenforce)" = Enforcing ]; then
 else
 	VOLUME=$REPOROOT:$CONTAINER_HOME_DIR/termux-packages
 fi
-
-: ${TERMUX_BUILDER_IMAGE_NAME:=ghcr.io/termux/package-builder}
-: ${CONTAINER_NAME:=termux-package-builder}
 
 USER=builder
 
@@ -77,6 +76,11 @@ else
 	DOCKER_TTY=""
 fi
 
+# Log AppArmor audits (blocks), so that it is easier for maintenance
+$SUDO bash -c 'echo -n noquiet >/sys/module/apparmor/parameters/audit'
+# Load the relaxed AppArmor profile first as we might need to change permissions
+cat ./scripts/profile-relaxed.apparmor | sed -e "s/{{CONTAINER_NAME}}/$CONTAINER_NAME/g" | $SUDO apparmor_parser -rK
+
 $SUDO docker start $CONTAINER_NAME >/dev/null 2>&1 || {
 	echo "Creating new container..."
 	$SUDO docker run \
@@ -90,15 +94,19 @@ $SUDO docker start $CONTAINER_NAME >/dev/null 2>&1 || {
 	if [ "$UNAME" != Darwin ]; then
 		if [ $(id -u) -ne 1001 -a $(id -u) -ne 0 ]; then
 			echo "Changed builder uid/gid... (this may take a while)"
-			$SUDO docker exec $DOCKER_TTY $CONTAINER_NAME sudo chown -R $(id -u) $CONTAINER_HOME_DIR
-			$SUDO docker exec $DOCKER_TTY $CONTAINER_NAME sudo chown -R $(id -u) /data
+			$SUDO docker exec $DOCKER_TTY $CONTAINER_NAME sudo chown -R $(id -u):$(id -g) $CONTAINER_HOME_DIR/
+			$SUDO docker exec $DOCKER_TTY $CONTAINER_NAME sudo chown -R $(id -u):$(id -g) /data
 			$SUDO docker exec $DOCKER_TTY $CONTAINER_NAME sudo usermod -u $(id -u) builder
 			$SUDO docker exec $DOCKER_TTY $CONTAINER_NAME sudo groupmod -g $(id -g) builder
 		fi
 	fi
 }
 
-# Set traps to ensure that the process started with docker exec and all its children are killed. 
+# stop the container and load restricted apparmor profile
+echo "Loading restricted AppArmor profile..."
+cat ./scripts/profile-restricted.apparmor | sed -e "s/{{CONTAINER_NAME}}/$CONTAINER_NAME/g" | $SUDO apparmor_parser -rK
+
+# Set traps to ensure that the process started with docker exec and all its children are killed.
 . "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"; docker__setup_docker_exec_traps
 
 if [ "$#" -eq "0" ]; then

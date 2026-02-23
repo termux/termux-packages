@@ -93,5 +93,12 @@ fi
 		rm -Rf "/data/data/.built-packages"
 	fi
 
+	# unmount overlayfs before we remove the parent directory
+	[ -d "$TERMUX_TOPDIR" ] && for dir in $(find "$TERMUX_TOPDIR" -type d); do
+		if mountpoint -q "$dir"; then
+			umount "$dir"
+		fi
+	done
+
 	rm -Rf "$TERMUX_TOPDIR"
 } 5< "$TERMUX_BUILD_LOCK_FILE"

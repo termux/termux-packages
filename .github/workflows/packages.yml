@@ -317,6 +317,10 @@ jobs:
       with:
         name: debs-${{ matrix.target_arch }}-${{ github.sha }}
         path: ./artifacts
+    - name: AppArmor Logs
+      if: always()
+      run: |
+        sudo dmesg | grep apparmor
 
   test-buildorder-random:
     permissions:
