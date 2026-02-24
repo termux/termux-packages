@@ -410,12 +410,63 @@ jobs:
           exit 1
         fi
 
+  upload-queue:
+    needs: build
+    runs-on: ubuntu-slim
+    steps:
+    - name: Queue upload
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        # get run ID of the job this code is currently running in
+        current_queued_id=${{ github.run_id }}
+        # start with the assumption that another upload might be in progress
+        uploads_in_progress=1
+        # start with the assumption that this upload might not be first in the queue
+        smallest_queued_id=0
+        # busy-wait until there are no uploads in progress and this job is first in the queue
+        while [[ $uploads_in_progress -gt 0 || $current_queued_id -gt $smallest_queued_id ]]; do
+          sleep 5
+          # get jobs URLs of runs currently in progress
+          run_jobs_urls="$(curl \
+              -H "Accept: application/vnd.github.v3+json" \
+              -H "Authorization: Bearer ${{ env.GH_TOKEN }}" \
+              https://api.github.com/repos/termux/termux-packages/actions/runs?status=in_progress | \
+              jq -r '.workflow_runs[].jobs_url')"
+          # count uploads currently in progress
+          # and check whether there is any upload in queue with a smaller id than this one
+          uploads_in_progress=0
+          smallest_queued_id=$current_queued_id
+          for run_jobs_url in $run_jobs_urls; do
+            # for some reason '?status=in_progress' works on the runs URL, but not the jobs URL
+            run_jobs_response="$(curl \
+              -H "Accept: application/vnd.github.v3+json" \
+              -H "Authorization: Bearer ${{ env.GH_TOKEN }}" \
+              "$run_jobs_url")"
+            uploads_in_progress_in_run=$(echo "$run_jobs_response" | jq 'def count(stream): reduce stream as $i (0; .+1); count(.jobs[] | select ( .name == "upload" and .status == "in_progress" ))')
+            if [[ $uploads_in_progress_in_run -gt 0 ]]; then
+              uploads_in_progress=$(($uploads_in_progress+$uploads_in_progress_in_run))
+            fi
+            uploads_queued_in_run=$(echo "$run_jobs_response" | jq 'def count(stream): reduce stream as $i (0; .+1); count(.jobs[] | select ( .name == "upload-queue" and .status == "in_progress" ))')
+            if [[ $uploads_queued_in_run -gt 0 ]]; then
+              queued_id=$(basename "$(dirname "$run_jobs_url")")
+              if [[ $queued_id -lt $smallest_queued_id ]]; then
+                smallest_queued_id=$queued_id
+              fi
+            fi
+          done
+          echo "Uploads currently in progress: $uploads_in_progress"
+          echo "ID of the run of the upload job first in queue: $smallest_queued_id"
+          echo "ID of the run of this upload job: $current_queued_id"
+        done
+        echo "No uploads currently in progress and this upload is first in the queue - starting upload"
+
   upload:
     concurrency: ${{ github.workflow }}
     permissions:
       contents: read
     if: github.repository == 'termux/termux-packages' && github.ref == 'refs/heads/master'
-    needs: build
+    needs: upload-queue
     runs-on: ubuntu-slim
     steps:
     - name: Clone repository
