@@ -1,0 +1,20 @@
+--- a/src/xdp-sealed-fd.c       2025-05-20 22:37:14.000000000 +0530
++++ b/src/xdp-sealed-fd.c     2026-01-17 18:49:02.071301264 +0530
+@@ -22,6 +22,17 @@
+
+ #include "config.h"
+
++#if defined(__ANDROID__) && __ANDROID_API__ < 30
++#include <linux/memfd.h>
++#include <sys/syscall.h>
++
++#ifndef MFD_ALLOW_SEALING
++#define MFD_ALLOW_SEALING 0x0002
++#endif
++
++#define memfd_create(name, flags) syscall(SYS_memfd_create, name, flags)
++#endif
++
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <gio/gunixfdlist.h>
