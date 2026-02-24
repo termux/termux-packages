@@ -39,7 +39,7 @@ termux_get_repo_files() {
 			for attempt in {1..6}; do
 				if termux_download "${RELEASE_FILE_URL}" "${RELEASE_FILE}" SKIP_CHECKSUM \
 						&& termux_download "${RELEASE_FILE_SIG_URL}" "${RELEASE_FILE}.gpg" SKIP_CHECKSUM; then
-					if ! gpg --verify "${RELEASE_FILE}.gpg" "${RELEASE_FILE}"; then
+					if ! gpg --verify "${RELEASE_FILE}.gpg" "${RELEASE_FILE}" 2>/dev/null; then
 						echo "GPG verification failed, probably we downloaded corrupted metadata. Retrying in $delay seconds."
 						sleep "$delay"
 						continue

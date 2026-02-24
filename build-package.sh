@@ -523,7 +523,8 @@ _show_usage() {
 	echo "  -f Force build even if package has already been built."
 	echo "  -F Force build even if package and its dependencies have already been built."
 	[[ "$TERMUX_ON_DEVICE_BUILD" = "false" ]] && echo "  -i Download and extract dependencies instead of building them."
-	echo "  -I Download and extract dependencies instead of building them, keep existing $TERMUX_BASE_DIR files."
+	echo "  -I Download and extract dependencies instead of building them, keep existing $TERMUX_BASE_DIR files. build dependency if download fail  [ for auto build system ]"
+	echo "  -I2 same as -I but never build dependency  [ for manual build off device ] "
 	echo "  -L The package and its dependencies will be based on the same library."
 	echo "  -q Quiet build."
 	echo "  -Q Loud build -- set -x debug output and function tracing."
@@ -579,14 +580,21 @@ while (( $# )); do
 				termux_error_exit "./build-package.sh: option '-i' is not available for on-device builds"
 			fi
 			export TERMUX_INSTALL_DEPS=true
+			TERMUX_BUILD_DEPS=true
 		;;
 		-I)
 			export TERMUX_INSTALL_DEPS=true
 			export TERMUX_PKGS__BUILD__RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES=false
+			TERMUX_BUILD_DEPS=true
+		;;
+		-I2)
+			export TERMUX_INSTALL_DEPS=true
+			export TERMUX_PKGS__BUILD__RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES=false
+			TERMUX_BUILD_DEPS=false
 		;;
 		-L) export TERMUX_GLOBAL_LIBRARY=true;;
 		-q) export TERMUX_QUIET_BUILD=true;;
-		-Q) export PS4='+$0 \[\e[32m\]${FUNCNAME[0]:-<global scope>}${FUNCNAME[*]:+()}:$LINENO\[\e[0m\] '; set -x;;
+		-Q) TERMUX_LOUD_BUILD=true;;
 		-r) export TERMUX_PKGS__BUILD__RM_ALL_PKG_BUILD_DEPENDENT_DIRS=true;;
 		-w) export TERMUX_WITHOUT_DEPVERSION_BINDING=true;;
 		-s) export TERMUX_SKIP_DEPCHECK=true;;
@@ -605,6 +613,11 @@ while (( $# )); do
 	shift 1
 done
 unset -f _show_usage
+
+if ${TERMUX_LOUD_BUILD:=false}; then
+	export PS4='+$0 \[\e[32m\]${FUNCNAME[0]:-<global scope>}${FUNCNAME[*]:+()}:$LINENO\[\e[0m\] '
+	set -x
+fi
 
 # Dependencies should be used from repo only if they are built for
 # same package name.
