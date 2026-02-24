@@ -76,10 +76,22 @@ else
 	DOCKER_TTY=""
 fi
 
-# Log AppArmor audits (blocks), so that it is easier for maintenance
-$SUDO bash -c 'echo -n noquiet >/sys/module/apparmor/parameters/audit'
+APPARMOR_PARSER="$(command -v apparmor_parser)"
+if [ -z "$APPARMOR_PARSER" ] || ! $SUDO aa-status --enabled; then
+	echo "WARNING: apparmor_parser not found, AppArmor profiles will not be loaded!"
+	echo "         This is not recommended, as it may cause security issues and unexpected behavior"
+	echo "         Avoid executing untrusted code in the container"
+	APPARMOR_PARSER=""
+fi
+
+load_apparmor_profile() {
+	if [ -n "$APPARMOR_PARSER" ]; then
+		cat "$1" | sed -e "s/{{CONTAINER_NAME}}/$CONTAINER_NAME/g" | $SUDO "$APPARMOR_PARSER" -rK
+	fi
+}
+
 # Load the relaxed AppArmor profile first as we might need to change permissions
-cat ./scripts/profile-relaxed.apparmor | sed -e "s/{{CONTAINER_NAME}}/$CONTAINER_NAME/g" | $SUDO apparmor_parser -rK
+load_apparmor_profile ./scripts/profile-relaxed.apparmor
 
 $SUDO docker start $CONTAINER_NAME >/dev/null 2>&1 || {
 	echo "Creating new container..."
@@ -104,7 +116,7 @@ $SUDO docker start $CONTAINER_NAME >/dev/null 2>&1 || {
 
 # stop the container and load restricted apparmor profile
 echo "Loading restricted AppArmor profile..."
-cat ./scripts/profile-restricted.apparmor | sed -e "s/{{CONTAINER_NAME}}/$CONTAINER_NAME/g" | $SUDO apparmor_parser -rK
+load_apparmor_profile ./scripts/profile-restricted.apparmor
 
 # Set traps to ensure that the process started with docker exec and all its children are killed.
 . "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"; docker__setup_docker_exec_traps
