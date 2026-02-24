@@ -86,7 +86,7 @@ fi
 
 load_apparmor_profile() {
 	if [ -n "$APPARMOR_PARSER" ]; then
-		cat "$1" | sed -e "s/{{CONTAINER_NAME}}/$CONTAINER_NAME/g" | $SUDO "$APPARMOR_PARSER" -rK
+		cat "$1" | sed -e "s/{{CONTAINER_NAME}}/$CONTAINER_NAME/g" | sudo "$APPARMOR_PARSER" -rK
 	fi
 }
 
