@@ -1,38 +1,31 @@
---- a/tests/util/server/src/servers/mod.rs
-+++ b/tests/util/server/src/servers/mod.rs
-@@ -1493,8 +1493,7 @@
+--- a/tests/util/lib/consts.rs
++++ b/tests/util/lib/consts.rs
+@@ -21,8 +21,7 @@
    ));
  }
  
--const TSGO_PLATFORM: &str = tsgo_platform();
+-pub const TSGO_PLATFORM: &str = tsgo_platform();
 -const fn tsgo_platform() -> &'static str {
 +pub fn tsgo_platform() -> &'static str {
    match (
      std::env::consts::OS.as_bytes(),
      std::env::consts::ARCH.as_bytes(),
-@@ -1509,6 +1508,7 @@
-     }
-   }
- }
-+
- pub fn tsgo_prebuilt_path() -> PathRef {
-   if let Ok(path) = std::env::var("DENO_TSGO_PATH") {
-     return PathRef::new(path);
-@@ -1522,7 +1522,7 @@
-   prebuilt_path().join(folder).join(format!(
+@@ -52,6 +51,6 @@
+   crate::prebuilt_path().join(folder).join(format!(
      "tsgo-{}-{}",
      tsgo::VERSION,
 -    TSGO_PLATFORM
 +    tsgo_platform()
    ))
  }
+--- a/tests/util/server/servers/mod.rs
++++ b/tests/util/server/servers/mod.rs
+@@ -1482,7 +1482,7 @@
+   let archive_name = format!(
+     "typescript-go-{}-{}.zip",
+     crate::consts::tsgo::VERSION,
+-    crate::consts::TSGO_PLATFORM
++    crate::consts::tsgo_platform()
+   );
  
-@@ -1533,7 +1533,7 @@
-   }
- 
-   let archive_name =
--    format!("typescript-go-{}-{}.zip", tsgo::VERSION, TSGO_PLATFORM);
-+    format!("typescript-go-{}-{}.zip", tsgo::VERSION, tsgo_platform());
- 
-   let url = format!("{}/{archive_name}", tsgo::DOWNLOAD_BASE_URL);
- 
+   let url =
