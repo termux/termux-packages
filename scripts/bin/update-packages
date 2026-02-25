@@ -151,7 +151,7 @@ _fetch_and_cache_tags() {
 	local pkg_dir
 	for pkg_dir in "$@"; do
 		# Skip packages with custom termux_pkg_auto_update() functions
-		if [[ "$(<"$pkg_dir/build.sh")" =~ ^termux_pkg_auto_update ]]; then
+		if [[ "$(<"$pkg_dir/build.sh")" == *$'\ntermux_pkg_auto_update'* ]]; then
 			continue
 		fi
 
@@ -269,9 +269,11 @@ _fetch_and_cache_tags() {
 		# Don't do this in the CI since that would spam the logs
 		[[ -z "${CI:-}" ]] && printf '\rINFO: Caching tags - %s' "${#LATEST_TAGS[*]}"
 	done < <(
+	if (( ${#__PACKAGES[@]} )); then
 		export -f __main__
 		export TERMUX_SCRIPTDIR GITHUB_TOKEN TERMUX_REPOLOGY_DATA_FILE
 		printf '%s\0' "${__PACKAGES[@]}" | xargs -0 -n1 -P"$(nproc)" bash -c '__main__ "$@"' _
+	fi
 	)
 	# make sure the running tally gets a proper newline on local runs
 	[[ -z "${CI:-}" ]] && echo
@@ -282,9 +284,6 @@ _fetch_and_cache_tags() {
 	[[ "${CI-false}" == "true" ]] && echo "::group::INFO: Skipping the following up-to-date packages" || :
 	local pkg pkg_type pkg_name pkg_version
 	for pkg in "${LATEST_TAGS[@]}" "${LATEST_TAGS_GITHUB[@]}"; do
-		# local -
-		# PS4='+$0 \[\e[32m\]${FUNCNAME[0]:-<global scope>}${FUNCNAME[*]:+()}:$LINENO\[\e[0m\] '; set -x
-
 		pkg_type="${pkg%%|*}"
 		pkg_name="${pkg#*|}"; pkg_name="${pkg_name%|*}"
 		pkg_version="${pkg##*|}"
