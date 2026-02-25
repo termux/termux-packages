@@ -246,6 +246,20 @@ jobs:
         sudo apt install ninja-build
         ./scripts/free-space.sh
 
+    - name: Load Docker image
+      if: ${{ steps.build-info.outputs.docker-build == 'true' && steps.build-info.outputs.skip-building != 'true' }}
+      env:
+        DOCKER_BUILD: ${{ steps.build-info.outputs.docker-build }}
+        TERMUX_DOCKER__CONTAINER_EXEC_COMMAND__PRE_CHECK_IF_WILL_BUILD_PACKAGES: "true"
+      run: |
+        ./scripts/run-docker.sh echo ""
+
+    # Docker has already deflated them so the compressed parts are just collecting junk on the disk
+    - name: Clean compressed docker images
+      if: ${{ steps.build-info.outputs.docker-build == 'true' && steps.build-info.outputs.skip-building != 'true' }}
+      run: |
+        sudo rm -r /var/lib/containerd/io.containerd.content.v1.content/
+
     - name: Build packages
       if: ${{ steps.build-info.outputs.skip-building != 'true' }}
       env:
