@@ -144,14 +144,15 @@ declare -A _ALREADY_SEEN=() # Array of successful or packages and their old/new 
 _fetch_and_cache_tags() {
 	echo "INFO: Fetching and caching tags"
 
-	local __PACKAGES=()
-	local __GITHUB_PACKAGES=()
+	local -a __PACKAGES=() __GITHUB_PACKAGES=() __UNCACHED_PACKAGES=()
 
 	# Find all packages to be processed that don't have custom termux_pkg_auto_update() functions
 	local pkg_dir
 	for pkg_dir in "$@"; do
 		# Skip packages with custom termux_pkg_auto_update() functions
 		if [[ "$(<"$pkg_dir/build.sh")" == *$'\ntermux_pkg_auto_update'* ]]; then
+			# Save these for the summary but don't try to do any caching.
+			__UNCACHED_PACKAGES+=("$pkg_dir")
 			continue
 		fi
 
@@ -313,6 +314,13 @@ _fetch_and_cache_tags() {
 	echo "INFO: GitHub - ${#LATEST_TAGS_GITHUB[*]}"
 	echo "INFO: Other  - $(( ${#LATEST_TAGS[*]} - ${#LATEST_TAGS_GITHUB[*]} ))"
 	echo "INFO: Cached - ${#_ALREADY_SEEN[*]}"
+	if (( ${#__UNCACHED_PACKAGES[@]} )); then
+	printf '%s\n' \
+		"$([[ "${CI-false}" == "true" ]] && echo "::group::" || :)INFO: Uncached - ${#__UNCACHED_PACKAGES[*]}" \
+		"Not cacheable due to custom \`termux_pkg_auto_update()\`" \
+		"${__UNCACHED_PACKAGES[@]##*/}" \
+		"$([[ "${CI-false}" == "true" ]] && echo "::endgroup::" || :)"
+	fi
 }
 
 _check_updated() {
