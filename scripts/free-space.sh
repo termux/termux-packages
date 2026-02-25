@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# This script clears about ~22G of space.
+# This script clears about ~36G of space.
 
 # Test:
 # echo "Listing 100 largest packages after"
@@ -12,11 +12,11 @@ if [ "${CI-false}" != "true" ]; then
 	exit 1
 else
 	# shellcheck disable=SC2046
-	sudo apt purge -yq $(
+	sudo apt purge -yq --allow-remove-essential $(
 		dpkg -l |
 			grep '^ii' |
 			awk '{ print $2 }' |
-			grep -P '(mecab|linux-azure-tools-|aspnetcore|liblldb-|netstandard-|clang-tidy|clang-format|gfortran-|mysql-|google-cloud-cli|postgresql-|cabal-|dotnet-|ghc-|mongodb-|libmono|llvm-16|llvm-17)'
+			grep -P '(mecab|linux-azure-tools-|aspnetcore|liblldb-|netstandard-|llvm|clang|gcc-12|gcc-13|cpp-|g\+\+-|temurin-|gfortran-|mysql-|google-cloud-cli|postgresql-|cabal-|dotnet-|ghc-|mongodb-|libmono|temurin-|mesa-|ant|liblua|python3|grub2-|grub-|shim-signed)'
 	)
 
 	sudo apt purge -yq \
@@ -33,13 +33,15 @@ else
 		azure-cli \
 		powershell \
 		shellcheck \
-		firefox \
-		google-chrome-stable \
-		microsoft-edge-stable
+		firefox
+		# google-chrome-stable
+		# microsoft-edge-stable already removed by the deps in the above apt purge
 
 	# Directories
-	sudo rm -fr /opt/ghc /opt/hostedtoolcache /usr/share/dotnet /usr/share/swift
-	sudo rm -rf /usr/local
+	sudo rm -rf /opt/ghc /opt/az /opt/hostedtoolcache /opt/actionarchivecache /opt/runner-cache
+	sudo rm -rf /opt/pipx /usr/share/dotnet /usr/share/swift /usr/share/miniconda /usr/share/az_* /usr/share/gradle-* /usr/share/java /home/runner/.rustup
+	sudo rm -rf /etc/skel /home/packer /home/linuxbrew
+	sudo rm -rf /usr/local /usr/src/
 
 	# https://github.com/actions/runner-images/issues/709#issuecomment-612569242
 	sudo rm -rf "$AGENT_TOOLSDIRECTORY"
@@ -53,4 +55,5 @@ else
 
 	sudo apt autoremove -yq
 	sudo apt clean
+	sudo rm -rf /var/lib/{apt,dpkg}
 fi
