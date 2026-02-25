@@ -52,4 +52,12 @@ profile _custom-termux-package-builder-{{CONTAINER_NAME}} flags=(attach_disconne
   # Deal with privilege escalation
 	deny capability setuid,
 	deny capability setgid,
+
+	# Do not allow the container to modify trusted scripts
+	deny /home/builder/termux-packages/[^o]** wlk,
+	# Explicitly allow storing built debs
+	allow /home/builder/termux-packages/output/** rw,
+
+  # Do not allow the container to modify the build toolchain
+	deny /home/builder/lib/** wlk,
 }
