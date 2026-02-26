@@ -46,13 +46,6 @@ else
 	# https://github.com/actions/runner-images/issues/709#issuecomment-612569242
 	sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
-	# We shouldn't remove docker & it's images when running from `package_updates` workflow.
-	if [ "${CLEAN_DOCKER_IMAGES-true}" = "true" ]; then
-		sudo docker image prune --all --force
-		sudo docker builder prune -a
-		sudo apt purge -yq containerd.io
-	fi
-
 	sudo apt autoremove -yq
 	sudo apt clean
 	sudo rm -rf /var/lib/{apt,dpkg}
