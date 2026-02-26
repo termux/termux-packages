@@ -1,14 +1,24 @@
 This dirty implementation of get_mount_points() for trash-rs for Android
 has been tested and confirmed to work good enough to suceessfully move files to trash
 in reverse dependency Yazi on Samsung Galaxy A70 SM-A705FN with LineageOS 20 Android 13 SELinux Enabled
+"linux" will get replaced with "android" in the bulk-patch and vice versa
 
 --- a/src/freedesktop.rs
 +++ b/src/freedesktop.rs
+@@ -728,7 +728,7 @@ fn get_sorted_mount_points() -> Result<Vec<MountPoint>, Error> {
+     Ok(mount_points)
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(target_os = "android")]
+ fn get_mount_points() -> Result<Vec<MountPoint>, Error> {
+     use once_cell::sync::Lazy;
+     use scopeguard::defer;
 @@ -784,6 +784,28 @@ fn get_mount_points() -> Result<Vec<MountPoint>, Error> {
      Ok(result)
  }
  
-+#[cfg(target_os = "android")]
++#[cfg(target_os = "linux")]
 +fn get_mount_points() -> Result<Vec<MountPoint>, Error> {
 +    // assume '/data' and '/strorage/emulated/0' are mounted
 +    // for some reason, 'getmntent()' is not available in Rust on Android,
@@ -39,7 +49,7 @@ in reverse dependency Yazi on Samsung Galaxy A70 SM-A705FN with LineageOS 20 And
      target_os = "openbsd",
 -    target_os = "netbsd"
 +    target_os = "netbsd",
-+    target_os = "android"
++    target_os = "linux"
  )))]
  fn get_mount_points() -> Result<Vec<MountPoint>, Error> {
      // On platforms that don't have support yet, return an error

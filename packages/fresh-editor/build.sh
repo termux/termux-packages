@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://getfresh.dev/
 TERMUX_PKG_DESCRIPTION="Text editor for your terminal: easy, powerful and fast"
 TERMUX_PKG_LICENSE="GPL-2.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.2.5"
+TERMUX_PKG_VERSION="0.2.9"
 TERMUX_PKG_SRCURL="https://github.com/sinelaw/fresh/releases/download/v$TERMUX_PKG_VERSION/fresh-editor-$TERMUX_PKG_VERSION-source.tar.gz"
-TERMUX_PKG_SHA256=4d1764b7ecde7cf2a14e129d0f053b08e279b1158beb5cb3c2f9b536bc6fa87b
+TERMUX_PKG_SHA256=cd4a96ca721796a61df49124e6bb95d478862d6a080789314fa6a19178cf3bc4
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -18,12 +18,12 @@ termux_step_pre_configure() {
 		! -wholename ./vendor/arboard \
 		! -wholename ./vendor/x11rb-protocol \
 		! -wholename ./vendor/cc \
+		! -wholename ./vendor/winit \
+		! -wholename ./vendor/x11rb-protocol \
+		! -wholename ./vendor/xkbcommon-dl \
+		! -wholename ./vendor/wayland-cursor \
+		! -wholename ./vendor/smithay-client-toolkit \
 		-exec rm -rf '{}' \;
-
-	find vendor/{trash,arboard,x11rb-protocol} -type f -print0 | \
-		xargs -0 sed -i \
-		-e 's|"android"|"disabling_this_because_it_is_for_building_an_apk"|g' \
-		-e "s|/tmp|$TERMUX_PREFIX/tmp|g"
 
 	local patch="$TERMUX_PKG_BUILDER_DIR/rust-cc-do-not-concatenate-all-the-CFLAGS.diff"
 	local dir="vendor/cc"
@@ -35,12 +35,30 @@ termux_step_pre_configure() {
 	echo "Applying patch: $patch"
 	patch -p1 -d "$dir" < "$patch"
 
+	patch="$TERMUX_PKG_BUILDER_DIR/wayland-cursor-no-shm.diff"
+	dir="vendor/wayland-cursor"
+	echo "Applying patch: $patch"
+	patch -p1 -d "$dir" < "$patch"
+
+	patch="$TERMUX_PKG_BUILDER_DIR/smithay-client-toolkit-no-shm.diff"
+	dir="vendor/smithay-client-toolkit"
+	echo "Applying patch: $patch"
+	patch -p1 -d "$dir" < "${patch}"
+
+	find vendor/{trash,arboard,x11rb-protocol,xkbcommon-dl,winit,wayland-cursor,smithay-client-toolkit} -type f -print0 | \
+		xargs -0 sed -i \
+		-e 's|"android"|"disabling_this_because_it_is_for_building_an_apk"|g' \
+		-e 's|"linux"|"android"|g' \
+		-e "s|libxkbcommon.so.0|libxkbcommon.so|g" \
+		-e "s|libxkbcommon-x11.so.0|libxkbcommon-x11.so|g" \
+		-e "s|libxcb.so.1|libxcb.so|g" \
+		-e "s|/tmp|$TERMUX_PREFIX/tmp|g"
+
 	echo "" >> Cargo.toml
 	echo '[patch.crates-io]' >> Cargo.toml
-	echo 'trash = { path = "./vendor/trash" }' >> Cargo.toml
-	echo 'arboard = { path = "./vendor/arboard" }' >> Cargo.toml
-	echo 'x11rb-protocol = { path = "./vendor/x11rb-protocol" }' >> Cargo.toml
-	echo 'cc = { path = "./vendor/cc" }' >> Cargo.toml
+	for crate in trash arboard cc winit x11rb-protocol xkbcommon-dl wayland-cursor smithay-client-toolkit; do
+		echo "$crate = { path = \"./vendor/$crate\" }" >> Cargo.toml
+	done
 
 	# error: function-like macro '__GLIBC_USE' is not defined
 	export BINDGEN_EXTRA_CLANG_ARGS="--sysroot ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot"
@@ -59,8 +77,9 @@ termux_step_make() {
 	else
 		# for some reason, this is required only for 32-bit Android targets to prevent
 		# "error[E0422]: cannot find struct, variant or union type `JSValueUnion` in this scope"
-		# issue has been reported, but for the other person, for some reason it affected
-		# a 64-bit Android target, but does not for the case of fresh-editor
+		# issue has been reported, but for the other person, they were actually trying to build
+		# for a 64-bit target, but their problem was that they were stuck building for 32-bit
+		# and that's why they had that error
 		# https://github.com/DelSkayn/rquickjs/issues/600
 		cargo build \
 			--jobs "$TERMUX_PKG_MAKE_PROCESSES" \
