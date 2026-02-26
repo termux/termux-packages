@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.thunderbird.net
 TERMUX_PKG_DESCRIPTION="Unofficial Thunderbird email client"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="147.0.2"
+TERMUX_PKG_VERSION="148.0"
 TERMUX_PKG_SRCURL="https://archive.mozilla.org/pub/thunderbird/releases/${TERMUX_PKG_VERSION}/source/thunderbird-${TERMUX_PKG_VERSION}.source.tar.xz"
-TERMUX_PKG_SHA256=32f5147ce80bfac9a602833c56e90a1320b060f4542c86dbbfe12c03c013c4e4
+TERMUX_PKG_SHA256=9ea77f583695a898c225baa065b3db5a0d196f4e1da8bacba994e4a8c564b0c3
 TERMUX_PKG_DEPENDS="botan3, ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libotr, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -127,6 +127,14 @@ ac_add_options --enable-debug-symbols
 ac_add_options --disable-install-strip
 END
 	fi
+
+	_TERMUX_BOTAN_VERSION="$(
+		. "$TERMUX_SCRIPTDIR/packages/botan3/build.sh"
+		echo "$TERMUX_PKG_VERSION"
+	)"
+
+	echo "Applying patch: 1008-botan-version-detection.diff"
+	cat "$TERMUX_PKG_BUILDER_DIR/1008-botan-version-detection.diff" | sed "s/@TERMUX_BOTAN_VERSION@/$_TERMUX_BOTAN_VERSION/g" | patch -p1 -d "$TERMUX_PKG_SRCDIR/"
 
 	./mach configure
 }
