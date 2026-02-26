@@ -235,23 +235,15 @@ jobs:
         docker build -t ghcr.io/termux/package-builder:latest scripts/
         docker buildx prune -af
 
+    - name: Load Docker image
+      if: ${{ steps.build-info.outputs.free-space == 'true' && steps.build-info.outputs.skip-building != 'true' }}
+      run: |
+        ./scripts/run-docker.sh echo ""
+
     - name: Free additional disk space (if needed)
       if: ${{ steps.build-info.outputs.free-space == 'true' && steps.build-info.outputs.skip-building != 'true' }}
       run: |
         ./scripts/free-space.sh
-
-    - name: Load Docker image
-      if: ${{ steps.build-info.outputs.free-space == 'true' && steps.build-info.outputs.skip-building != 'true' }}
-      env:
-        TERMUX_DOCKER__CONTAINER_EXEC_COMMAND__PRE_CHECK_IF_WILL_BUILD_PACKAGES: "true"
-      run: |
-        ./scripts/run-docker.sh echo ""
-
-    # Docker has already deflated them so the compressed parts are just collecting junk on the disk
-    - name: Clean compressed docker images
-      if: ${{ steps.build-info.outputs.free-space == 'true' && steps.build-info.outputs.skip-building != 'true' }}
-      run: |
-        sudo rm -r /var/lib/containerd/io.containerd.content.v1.content/
 
     - name: Build packages
       if: ${{ steps.build-info.outputs.skip-building != 'true' }}
