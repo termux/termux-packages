@@ -196,16 +196,15 @@ jobs:
         fi
         echo "free-space=$free_space" >> $GITHUB_OUTPUT
 
+        needs_docker_build=false
         if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
           # Build local Docker image if setup scripts were changed.
           # Useful for pull requests submitting changes for both build environment and packages.
           if grep -qP '^scripts/(Dockerfile|properties\.sh|setup-android-sdk\.sh|setup-ubuntu\.sh)$' <<< "$CHANGED_FILES"; then
-            echo "Detected changes for environment setup scripts. Building custom Docker image now."
-            cd ./scripts
-            docker build -t ghcr.io/termux/package-builder:latest .
-            cd ..
+            needs_docker_build=true
           fi
         fi
+        echo "needs-docker-build=$needs_docker_build" >> $GITHUB_OUTPUT
 
     - name: Lint packages
       run: |
@@ -229,6 +228,12 @@ jobs:
         size: 16G
         priority: 100
         device_name: /dev/zram0
+
+    - name: Build docker image
+      if: ${{ steps.build-info.needs-docker-build == 'true' }}
+      run: |
+        docker build -t ghcr.io/termux/package-builder:latest scripts/
+        docker buildx prune -af
 
     - name: Free additional disk space (if needed)
       if: ${{ steps.build-info.outputs.free-space == 'true' && steps.build-info.outputs.skip-building != 'true' }}
