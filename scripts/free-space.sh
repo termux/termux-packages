@@ -46,6 +46,11 @@ else
 	# https://github.com/actions/runner-images/issues/709#issuecomment-612569242
 	sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
+	# Clean compressed docker images
+	# Docker has already deflated them before free-space.sh was called in CI, so
+	# the compressed parts are just collecting junk on the disk
+	sudo rm -r /var/lib/containerd/io.containerd.content.v1.content/
+
 	sudo apt autoremove -yq
 	sudo apt clean
 	sudo rm -rf /var/lib/{apt,dpkg}
