@@ -162,15 +162,3 @@ diff -uNr oma-1.22.1/src/config.rs oma-1.22.1.mod/src/config.rs
              warn!("{}", fl!("config-invalid"));
              return toml::from_str::<Self>(DEFAULT_CONFIG).unwrap();
          };
-diff -uNr oma-1.22.1/src/main.rs oma-1.22.1.mod/src/main.rs
---- oma-1.22.1/src/main.rs	2025-10-15 18:03:09.000000000 +0800
-+++ oma-1.22.1.mod/src/main.rs	2025-10-15 22:42:16.963625463 +0800
-@@ -306,7 +306,7 @@
-     let dry_run = oma.global.dry_run;
- 
-     let log_dir = if is_root() {
--        PathBuf::from("/var/log/oma")
-+        PathBuf::from("@TERMUX_PREFIX@/var/log/oma")
-     } else {
-         dirs::state_dir()
-             .expect("Failed to get state dir")
