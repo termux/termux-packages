@@ -1,0 +1,13 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/luqmaan1007-collab/termux-packages
+TERMUX_PKG_DESCRIPTION="Nano Project Builder – create projects, edit in X11 terminal, build APKs"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_VERSION=1.0
+TERMUX_PKG_SRCURL=https://github.com/luqmaan1007-collab/termux-packages/archive/refs/tags/v1.0.tar.gz
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
+TERMUX_PKG_DEPENDS="x11-repo, libx11, clang, openjdk-17, nova-sdk"
+TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_step_make_install() {
+    # Install script globally
+    install -Dm700 nano_project_builder.sh "$TERMUX_PREFIX/bin/nano-project-builder"
+}
