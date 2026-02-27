@@ -79,6 +79,40 @@ else
 	DOCKER_TTY=""
 fi
 
+if [ "$#" -eq 1 ] && ( [ "$1" = "-h" ] || [ "$1" = "--help" ] ); then
+	echo "Usage: $0 [OPTIONS] [COMMAND]"
+	echo ""
+	echo "Run a command in the Termux package builder container. If no command is given, an interactive shell will be started."
+	echo ""
+	echo "Options:"
+	echo "  -h, --help                        Show this help message and exit"
+	echo "                                    Run 'build-package-dry-run-simulation.sh' to check if the given command would build any packages, and if not, exit with code 0 without running the command in docker. This is useful for CI to skip unnecessary docker runs."
+	echo "  -m, --mount-termux-dirs           Mount /data and ~/.termux-build into the container. This is useful for building locally for development with host IDE and editors."
+	echo ""
+	echo "Supported environment variables:"
+	echo "  TERMUX_BUILDER_IMAGE_NAME         The name of the Docker image to use (default: 'ghcr.io/termux/package-builder')"
+	echo "  CONTAINER_NAME                    The name of the Docker container to create/use (default: 'termux-package-builder')"
+	echo "  TERMUX_DOCKER_RUN_EXTRA_ARGS      Extra arguments to pass to 'docker run' while creating the container (default: '')"
+	echo "  TERMUX_DOCKER_EXEC_EXTRA_ARGS     Extra arguments to pass to 'docker exec' while running the command in the container (default: '')"
+	echo "  TERMUX_DOCKER_USE_SUDO            If set to any non-empty value, 'sudo' will be used to run 'docker' commands (default: '')"
+	echo ""
+	echo "Note that command line option -m will only be considered if it is the first argument passed to this script."
+	echo "Help message is only shown if the first and only argument passed to this script is -h or --help."
+	echo ""
+	echo "TERMUX_DOCKER_RUN_EXTRA_ARGS is only considered when creating the container, and will not be applied when running the command in the container if the container already exists."
+	echo "To apply new TERMUX_DOCKER_RUN_EXTRA_ARGS, the existing container needs to be removed first."
+	echo "Similar rule applies for the -m/--mount-termux-dirs option."
+	exit 0
+fi
+
+
+if [ "$#" -ge 1 ]; then
+	if [ "$1" = "--mount-termux-dirs" ] || [ "$1" = "-m" ]; then
+		TERMUX_DOCKER_RUN_EXTRA_ARGS="--volume /data:/data --volume $HOME/.termux-build:$CONTAINER_HOME_DIR/.termux-build $TERMUX_DOCKER_RUN_EXTRA_ARGS"
+		shift 1
+	fi
+fi
+
 $SUDO docker start $CONTAINER_NAME >/dev/null 2>&1 || {
 	echo "Creating new container..."
 	$SUDO docker run \
