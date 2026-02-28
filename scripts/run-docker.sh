@@ -76,7 +76,11 @@ else
 	DOCKER_TTY=""
 fi
 
-APPARMOR_PARSER="$(command -v apparmor_parser)"
+APPARMOR_PARSER=""
+if command -v apparmor_parser > /dev/null; then
+	APPARMOR_PARSER="apparmor_parser"
+fi
+
 if [ -z "$APPARMOR_PARSER" ] || ! $SUDO aa-status --enabled; then
 	echo "WARNING: apparmor_parser not found, AppArmor profiles will not be loaded!"
 	echo "         This is not recommended, as it may cause security issues and unexpected behavior"
