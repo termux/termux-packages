@@ -1,0 +1,76 @@
+Necessary to avoid error:
+No Git repository found.
+Ensure the gitProperties.dotGitDirectory property points to the correct .git directory.
+
+--- a/gradle/libs.versions.toml
++++ b/gradle/libs.versions.toml
+@@ -10,7 +10,6 @@ batik               = "1.19"
+ elk                 = "0.10.0"
+ fop                 = "2.11"
+ glytching-junit-ext = "2.6.0"
+-gorylenko-gradle-git-properties = "2.5.7"
+ graalvm-native      = "0.11.4"
+ jdepend             = "2.9.1"
+ jlatexmath          = "1.0.7"
+@@ -47,6 +46,5 @@ teavm-jso-apis              = { module = "org.teavm:teavm-jso-apis", version.ref
+ 
+ [plugins]
+ adarshr-test-logger = { id = "com.adarshr.test-logger", version.ref = "adarshr-test-logger" }
+-gorylenko-gradle-git-properties = { id = "com.gorylenko.gradle-git-properties", version.ref = "gorylenko-gradle-git-properties" }
+ graalvm-native = { id = "org.graalvm.buildtools.native", version.ref = "graalvm-native" }
+ teavm = { id = "org.teavm", version.ref = "teavm" }
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -20,7 +20,6 @@ plugins {
+ 	signing
+ 	eclipse
+ 	jacoco
+-	alias(libs.plugins.gorylenko.gradle.git.properties)
+ //	alias(libs.plugins.adarshr.test.logger)
+ 	alias(libs.plugins.teavm)
+ }
+@@ -566,43 +566,16 @@ tasks.named("siteAssemble") {
+ // CompilationInfo - Git commit & timestamp injection
+ // ============================================
+ 
+-gitProperties {
+-	dateFormat = "yyyy-MM-dd'T'HH:mm:ssX"
+-}
+-
+-tasks.named("generateGitProperties") {
+-	doLast {
+-		val propsFile = layout.buildDirectory.file("resources/main/git.properties").get().asFile
+-		if (propsFile.exists()) {
+-      println("::group::[Git Properties]")
+-			println("----- git.properties -----")
+-			propsFile.readLines()
+-				.sorted()
+-				.forEach { println(it) }
+-			println("--------------------------")
+-      println("::endgroup::")
+-		} else {
+-			println("git.properties not found")
+-      println("::warning file=git.properties,title=File not found::")
+-		}
+-	}
+-}
+-
+ val filteredSrcDir = layout.buildDirectory.dir("generated/sources/git-filtered")
+ 
+ val filterSourcesWithBuildInfo by tasks.registering {
+-	dependsOn("generateGitProperties")
+ 	mustRunAfter("processResources")
+ 
+ 	inputs.dir("src/main/java")
+ 	outputs.dir(filteredSrcDir)
+ 
+ 	doLast {
+-		// 1) Read git.properties
+-		val propsFile = layout.buildDirectory.file("resources/main/git.properties").get().asFile
+-		val props = Properties().apply { propsFile.inputStream().use { load(it) } }
+-		val commitId = props.getProperty("git.commit.id.abbrev")
+-			?: error("git.commit.id.abbrev not found in ${propsFile.absolutePath}")
++		val commitId = "N/A"
+ 
+ 		// 2) Compute compile timestamp (epoch millis)
+ 		val compileTs = System.currentTimeMillis().toString()
