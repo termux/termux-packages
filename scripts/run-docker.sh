@@ -56,10 +56,10 @@ while (( $# != 0 )); do
 		-h|--help) shift 1; _show_usage;;
 		-d|--dry-run)
 			dry_run="true"
-			shift 1; break;;
+			shift 1;;
 		-m|--mount-termux-dirs)
 			TERMUX_DOCKER_RUN_EXTRA_ARGS="--volume /data:/data --volume $HOME/.termux-build:$CONTAINER_HOME_DIR/.termux-build $TERMUX_DOCKER_RUN_EXTRA_ARGS"
-			shift 1; break;;
+			shift 1;;
 		--) shift 1; break;;
 		-*) echo "Error: Unknown option '$1'" 1>&2; shift 1; exit 1;;
 		*) break;;
