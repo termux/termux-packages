@@ -94,6 +94,8 @@ fi
 	fi
 
 	# We can't use rm -Rf "$TERMUX_TOPDIR" in case the "$TERMUX_TOPDIR" is mounted as a Docker volume
-	find "$TERMUX_TOPDIR" -type f,l -delete
-	find "$TERMUX_TOPDIR" -type d ! -path "$TERMUX_TOPDIR" -delete
+	if [ -d "$TERMUX_TOPDIR" ]; then
+		find "$TERMUX_TOPDIR" -type f,l -delete
+		find "$TERMUX_TOPDIR" -type d ! -path "$TERMUX_TOPDIR" -delete
+	fi
 } 5< "$TERMUX_BUILD_LOCK_FILE"
