@@ -139,7 +139,7 @@ termux_pkg_upgrade_version() {
 
 	_termux_should_cleanup "${big_package}" && "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
 
-	if ! "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./build-package.sh -C -a "${TERMUX_ARCH}" -i "${TERMUX_PKG_NAME}"; then
+	if ! "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" -d ./build-package.sh -C -a "${TERMUX_ARCH}" -i "${TERMUX_PKG_NAME}"; then
 		_termux_should_cleanup "${big_package}" && "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
 		git checkout -- "${TERMUX_SCRIPTDIR}"
 		termux_error_exit "failed to build."

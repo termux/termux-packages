@@ -16,36 +16,51 @@ _show_usage() {
 	echo "Run a command in the Termux package builder container. If no command is given, an interactive shell will be started."
 	echo ""
 	echo "Options:"
-	echo "  -h, --help                        Show this help message and exit"
-	echo "                                    Run 'build-package-dry-run-simulation.sh' to check if the given command would build any packages, and if not, exit with code 0 without running the command in docker. This is useful for CI to skip unnecessary docker runs."
-	echo "  -m, --mount-termux-dirs           Mount /data and ~/.termux-build into the container. This is useful for building locally for development with host IDE and editors."
-	echo ""
+	echo "  -h, --help                 Show this help message and exit"
+	echo "  -d, --dry-run              Run 'build-package-dry-run-simulation.sh' before"
+	echo "                             building any package. This is useful for CI to"
+	echo "                             skip unnecessary docker runs."
+	echo "  -m, --mount-termux-dirs    Mount /data and ~/.termux-build into the container."
+	echo "                             This is useful for building locally for development"
+	echo "                             with host IDE and editors."
 	echo "Supported environment variables:"
-	echo "  TERMUX_BUILDER_IMAGE_NAME         The name of the Docker image to use (default: 'ghcr.io/termux/package-builder')"
-	echo "  CONTAINER_NAME                    The name of the Docker container to create/use (default: 'termux-package-builder')"
-	echo "  TERMUX_DOCKER_RUN_EXTRA_ARGS      Extra arguments to pass to 'docker run' while creating the container (default: '')"
-	echo "  TERMUX_DOCKER_EXEC_EXTRA_ARGS     Extra arguments to pass to 'docker exec' while running the command in the container (default: '')"
-	echo "  TERMUX_DOCKER_USE_SUDO            If set to any non-empty value, 'sudo' will be used to run 'docker' commands (default: '')"
+	echo "  TERMUX_BUILDER_IMAGE_NAME     The name of the Docker image to use"
+	echo "  CONTAINER_NAME                The name of the Docker container to create/use"
+	echo "  TERMUX_DOCKER_RUN_EXTRA_ARGS  Extra arguments to pass to 'docker run' while"
+	echo "                                creating the container"
+	echo "  TERMUX_DOCKER_EXEC_EXTRA_ARGS Extra arguments to pass to 'docker exec' while"
+	echo "                                running the command in the container"
+	echo "  TERMUX_DOCKER_USE_SUDO        If set to any non-empty value, 'sudo' will be"
+	echo "                                used to run 'docker' commands"
 	echo ""
-	echo "Note that command line option -m will only be considered if it is the first argument passed to this script."
-	echo "Help message is only shown if the first and only argument passed to this script is -h or --help."
 	echo ""
-	echo "TERMUX_DOCKER_RUN_EXTRA_ARGS is only considered when creating the container, and will not be applied when running the command in the container if the container already exists."
-	echo "To apply new TERMUX_DOCKER_RUN_EXTRA_ARGS, the existing container needs to be removed first."
-	echo "Similar rule applies for the -m/--mount-termux-dirs option."
+	echo "Kindly note that:"
+	echo "- TERMUX_DOCKER_RUN_EXTRA_ARGS is only considered when creating the container,"
+	echo "  and will not be applied when running the command in the container if the"
+	echo "  container already exists."
+	echo "- To apply new TERMUX_DOCKER_RUN_EXTRA_ARGS, the existing container needs to be"
+	echo "  removed first."
+	echo "- The above rules also apply to -m/--mount-termux-dirs option as it adds the"
+	echo "  mount arguments to TERMUX_DOCKER_RUN_EXTRA_ARGS."
+	echo "- The dry-run option will only work if the first argument passed to this script"
+	echo "  which runs docker contains '$BUILDSCRIPT_NAME', and it will run"
+	echo "  'build-package-dry-run-simulation.sh' with arguments passed to this script."
 	exit 0
 }
+
+dry_run="false"
 
 while (( $# != 0 )); do
 	case "$1" in
 		-h|--help) shift 1; _show_usage;;
-		-p|--pre-check-if-will-build-packages)
-			TERMUX_DOCKER__CONTAINER_EXEC_COMMAND__PRE_CHECK_IF_WILL_BUILD_PACKAGES="true"
+		-d|--dry-run)
+			dry_run="true"
 			shift 1; break;;
 		-m|--mount-termux-dirs)
 			TERMUX_DOCKER_RUN_EXTRA_ARGS="--volume /data:/data --volume $HOME/.termux-build:$CONTAINER_HOME_DIR/.termux-build $TERMUX_DOCKER_RUN_EXTRA_ARGS"
 			shift 1; break;;
 		--) shift 1; break;;
+		-*) echo "Error: Unknown option '$1'" 1>&2; shift 1; exit 1;;
 		*) break;;
 	esac
 done
@@ -54,7 +69,7 @@ done
 # $1 (the first argument passed to this script which runs docker) does not contain
 # $BUILDSCRIPT_NAME, this condition will evaluate false and this script which
 # runs docker will continue.
-if [ "${TERMUX_DOCKER__CONTAINER_EXEC_COMMAND__PRE_CHECK_IF_WILL_BUILD_PACKAGES:-}" = "true" ]; then
+if [ "${dry_run}" = "true" ]; then
 	case "${1:-}" in
 		*"/$BUILDSCRIPT_NAME")
 			RETURN_VALUE=0
