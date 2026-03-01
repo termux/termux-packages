@@ -1,0 +1,143 @@
+diff --git a/src/libide/foundry/ide-pipeline.c b/src/libide/foundry/ide-pipeline.c
+index 5de4e7303..a853ee4b1 100644
+--- a/src/libide/foundry/ide-pipeline.c
++++ b/src/libide/foundry/ide-pipeline.c
+@@ -1096,7 +1096,7 @@ register_build_commands_stage (IdePipeline *self,
+       g_autofree char *title = NULL;
+ 
+       run_command = ide_run_command_new ();
+-      ide_run_command_set_argv (run_command, IDE_STRV_INIT ("/bin/sh", "-c", build_commands[i]));
++      ide_run_command_set_argv (run_command, IDE_STRV_INIT ("@TERMUX_PREFIX@/bin/sh", "-c", build_commands[i]));
+ 
+       if (rundir_path != NULL)
+         ide_run_command_set_cwd (run_command, rundir_path);
+@@ -1141,7 +1141,7 @@ register_post_install_commands_stage (IdePipeline *self,
+       g_autofree char *title = NULL;
+ 
+       run_command = ide_run_command_new ();
+-      ide_run_command_set_argv (run_command, IDE_STRV_INIT ("/bin/sh", "-c", post_install_commands[i]));
++      ide_run_command_set_argv (run_command, IDE_STRV_INIT ("@TERMUX_PREFIX@/bin/sh", "-c", post_install_commands[i]));
+       ide_run_command_set_cwd (run_command, ide_pipeline_get_builddir (self));
+ 
+       /* translators: %s is replaced with the post-install shell command */
+diff --git a/src/libide/foundry/ide-run-context.c b/src/libide/foundry/ide-run-context.c
+index 6acab30a8..111f1acc6 100644
+--- a/src/libide/foundry/ide-run-context.c
++++ b/src/libide/foundry/ide-run-context.c
+@@ -458,7 +458,7 @@ ide_run_context_push_shell (IdeRunContext      *self,
+   g_return_if_fail (IDE_IS_RUN_CONTEXT (self));
+ 
+   state = g_slice_new0 (Shell);
+-  state->shell = g_strdup ("/bin/sh");
++  state->shell = g_strdup ("@TERMUX_PREFIX@/bin/sh");
+   state->kind = shell;
+ 
+   ide_run_context_push (self, ide_run_context_shell_handler, state, shell_free);
+@@ -476,7 +476,7 @@ ide_run_context_push_user_shell (IdeRunContext      *self,
+   user_shell = ide_get_user_shell ();
+ 
+   if (!ide_shell_supports_dash_c (user_shell))
+-    user_shell = "/bin/sh";
++    user_shell = "@TERMUX_PREFIX@/bin/sh";
+ 
+   switch (shell)
+     {
+@@ -486,7 +486,7 @@ ide_run_context_push_user_shell (IdeRunContext      *self,
+ 
+     case IDE_RUN_CONTEXT_SHELL_LOGIN:
+       if (!ide_shell_supports_dash_login (user_shell))
+-        user_shell = "/bin/sh";
++        user_shell = "@TERMUX_PREFIX@/bin/sh";
+       break;
+ 
+     case IDE_RUN_CONTEXT_SHELL_INTERACTIVE:
+diff --git a/src/libide/foundry/ide-runtime.c b/src/libide/foundry/ide-runtime.c
+index 91da20904..f34efab27 100644
+--- a/src/libide/foundry/ide-runtime.c
++++ b/src/libide/foundry/ide-runtime.c
+@@ -149,8 +149,8 @@ ide_runtime_flatpak_translate_file (IdeRuntime *self,
+    * as that is where flatpak 0.10.1 and greater will mount them
+    * when --filesystem=host.
+    */
+-  if (g_str_has_prefix (path, "/usr/") || g_str_has_prefix (path, "/etc/"))
+-    return g_file_new_build_filename ("/run/host/", path, NULL);
++  if (g_str_has_prefix (path, "@TERMUX_PREFIX@/") || g_str_has_prefix (path, "@TERMUX_PREFIX@/etc/"))
++    return g_file_new_build_filename ("@TERMUX_PREFIX@/var/run/host/", path, NULL);
+ 
+   return NULL;
+ }
+@@ -526,7 +526,7 @@ ide_runtime_translate_file (IdeRuntime *self,
+ gchar **
+ ide_runtime_get_system_include_dirs (IdeRuntime *self)
+ {
+-  static const gchar *basic[] = { "/usr/include", NULL };
++  static const gchar *basic[] = { "@TERMUX_PREFIX@/include", NULL };
+ 
+   g_return_val_if_fail (IDE_IS_RUNTIME (self), NULL);
+ 
+diff --git a/src/libide/io/ide-gfile.c b/src/libide/io/ide-gfile.c
+index a83cd6d67..80be98180 100644
+--- a/src/libide/io/ide-gfile.c
++++ b/src/libide/io/ide-gfile.c
+@@ -1099,7 +1099,7 @@ _ide_path_query_exists_on_host (const char *path)
+     return g_file_test (path, G_FILE_TEST_EXISTS);
+ 
+   /* First try via /var/run/host */
+-  locally = g_build_filename ("/var/run/host", path, NULL);
++  locally = g_build_filename ("@TERMUX_PREFIX@/var/run/host", path, NULL);
+   if (g_file_test (locally, G_FILE_TEST_EXISTS))
+     return TRUE;
+ 
+diff --git a/src/libide/io/ide-shell.c b/src/libide/io/ide-shell.c
+index 79d535c24..14217ac95 100644
+--- a/src/libide/io/ide-shell.c
++++ b/src/libide/io/ide-shell.c
+@@ -26,7 +26,7 @@
+ 
+ #include "ide-shell-private.h"
+ 
+-static const char *user_shell = "/bin/sh";
++static const char *user_shell = "@TERMUX_PREFIX@/bin/sh";
+ static const char *user_default_path = SAFE_PATH;
+ 
+ gboolean
+@@ -225,7 +225,7 @@ _ide_guess_user_path (GCancellable        *cancellable,
+   else
+     {
+       ide_subprocess_launcher_push_args (launcher,
+-                                         IDE_STRV_INIT ("/bin/sh", "-l", "-c", "echo $PATH"));
++                                         IDE_STRV_INIT ("@TERMUX_PREFIX@/bin/sh", "-l", "-c", "echo $PATH"));
+     }
+ 
+   if (!(subprocess = ide_subprocess_launcher_spawn (launcher, NULL, &error)))
+diff --git a/src/libide/terminal/ide-terminal-run-command.c b/src/libide/terminal/ide-terminal-run-command.c
+index 8d4277817..19b0b0fd8 100644
+--- a/src/libide/terminal/ide-terminal-run-command.c
++++ b/src/libide/terminal/ide-terminal-run-command.c
+@@ -70,7 +70,7 @@ ide_terminal_run_command_prepare_to_run (IdeRunCommand *run_command,
+        *
+        * See #2207
+        */
+-      if (g_str_has_prefix (workdir_path, "/run/"))
++      if (g_str_has_prefix (workdir_path, "@TERMUX_PREFIX@/var/run/"))
+         g_set_str (&workdir_path, g_get_home_dir ());
+     }
+ 
+@@ -95,7 +95,7 @@ ide_terminal_run_command_prepare_to_run (IdeRunCommand *run_command,
+         }
+       else
+         {
+-          ide_run_context_append_argv (run_context, "/bin/sh");
++          ide_run_context_append_argv (run_context, "@TERMUX_PREFIX@/bin/sh");
+           ide_run_context_append_argv (run_context, "-l");
+         }
+       break;
+@@ -120,7 +120,7 @@ ide_terminal_run_command_prepare_to_run (IdeRunCommand *run_command,
+           }
+ 
+         if (!ide_runtime_contains_program_in_path (runtime, user_shell, NULL))
+-          user_shell = "/bin/sh";
++          user_shell = "@TERMUX_PREFIX@/bin/sh";
+ 
+         if (self->locality == IDE_TERMINAL_RUN_IN_PIPELINE)
+           ide_pipeline_prepare_run_context (pipeline, run_context);
