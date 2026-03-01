@@ -9,6 +9,7 @@ BUILDSCRIPT_NAME="build-package.sh"
 : ${CONTAINER_NAME:=termux-package-builder}
 : ${TERMUX_DOCKER_RUN_EXTRA_ARGS:=}
 : ${TERMUX_DOCKER_EXEC_EXTRA_ARGS:=}
+CONTAINER_HOME_DIR=/home/builder
 
 _show_usage() {
 	echo "Usage: $0 [OPTIONS] [COMMAND]"
@@ -86,7 +87,6 @@ if [ "${dry_run}" = "true" ]; then
 	esac
 fi
 
-CONTAINER_HOME_DIR=/home/builder
 UNAME=$(uname)
 if [ "$UNAME" = Darwin ]; then
 	# Workaround for mac readlink not supporting -f.
