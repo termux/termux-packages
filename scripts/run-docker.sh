@@ -144,8 +144,13 @@ if [ -z "$APPARMOR_PARSER" ] || ! $SUDO aa-status --enabled; then
 fi
 
 load_apparmor_profile() {
+	local profile_path="$1"
+	local msg="${2:-}"
 	if [ -n "$APPARMOR_PARSER" ]; then
-		cat "$1" | sed -e "s/{{CONTAINER_NAME}}/$CONTAINER_NAME/g" | sudo "$APPARMOR_PARSER" -rK
+		if [ -n "$msg" ]; then
+			echo "$msg..."
+		fi
+		cat "$profile_path" | sed -e "s/{{CONTAINER_NAME}}/$CONTAINER_NAME/g" | sudo "$APPARMOR_PARSER" -rK
 	fi
 }
 
@@ -174,9 +179,7 @@ $SUDO docker start $CONTAINER_NAME >/dev/null 2>&1 || {
 	fi
 }
 
-# stop the container and load restricted apparmor profile
-echo "Loading restricted AppArmor profile..."
-load_apparmor_profile ./scripts/profile-restricted.apparmor
+load_apparmor_profile ./scripts/profile-restricted.apparmor "Loading restricted AppArmor profile"
 
 # Set traps to ensure that the process started with docker exec and all its children are killed.
 . "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"; docker__setup_docker_exec_traps
