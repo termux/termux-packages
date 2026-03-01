@@ -56,8 +56,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_working_tzset=yes"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-build-python=python$_MAJOR_VERSION"
 # https://github.com/termux/termux-packages/issues/16879
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_header_sys_xattr_h=no"
-# Prevent autotools from detecting functions which we don't have during on-device builds
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_getlogin_r=no"
 
 TERMUX_PKG_RM_AFTER_INSTALL="
 lib/python${_MAJOR_VERSION}/test
@@ -96,6 +94,7 @@ termux_step_pre_configure() {
 	# on devices that have API levels newer than $TERMUX_PKG_API_LEVEL
 	if [[ "$TERMUX_PKG_API_LEVEL" -lt 28 ]]; then
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_fexecve=no"
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_getlogin_r=no"
 	fi
 
 	if [[ "$TERMUX_PKG_API_LEVEL" -lt 29 ]]; then
