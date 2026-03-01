@@ -20,6 +20,10 @@ on:
       packages:
         description: "A space-separated names of packages selected for rebuilding"
         required: true
+      free-space:
+        description: "Free space even if not building large package (useful when building a large number of packages)"
+        type: boolean
+        default: false
 
 permissions: {} # none
 
@@ -186,6 +190,13 @@ jobs:
         echo "packages: ${packages[*]}"
 
         free_space='false'
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          free_space=${{ github.event.inputs.free-space }}
+        else
+          if grep -qiP '^\s*%ci:free-disk\s*$' <(git log --format="%B" -n 1 --no-merges "HEAD"); then
+            free_space=true
+          fi
+        fi
         if [[ "${#packages[@]}" -gt 0 ]]; then
           for pkg in "${packages[@]}"; do
             if grep -qFx "$pkg" ./scripts/big-pkgs.list; then
