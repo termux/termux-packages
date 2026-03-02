@@ -1,0 +1,20 @@
+--- a/lib-src/libnyquist/nyquist/cmt/midifns.c	2026-02-11 01:02:14.000000000 -0500
++++ b/lib-src/libnyquist/nyquist/cmt/midifns.c	2026-02-11 15:13:49.881928729 -0500
+@@ -117,9 +117,15 @@
+ #else
+ #ifdef UNIX
+ #ifndef UNIX_IRIX
+-#include "sys/time.h"
+-#include "sys/timeb.h"
++#include <sys/time.h>
++#if !defined(__ANDROID__)
++#include <sys/timeb.h>
++#endif
+ #include "cmtio.h"
++#if defined(__ANDROID__)
++#undef HAS_FTIME
++#define HAS_FTIME 0
++#endif
+ #else
+ #include <sys/types.h>
+ #include <sys/time.h>

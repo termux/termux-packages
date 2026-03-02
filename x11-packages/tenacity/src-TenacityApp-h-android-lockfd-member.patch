@@ -1,0 +1,13 @@
+--- a/src/TenacityApp.h	2026-02-11 00:08:39.000000000 -0500
++++ b/src/TenacityApp.h	2026-02-14 10:26:12.952034038 -0500
+@@ -99,6 +99,10 @@
+ 
+    wxTimer mTimer;
+ 
++#if defined(__ANDROID__)
++   int mSingleInstanceLockFd{-1};
++#endif
++
+    void InitCommandHandler();
+ 
+    bool InitTempDir();

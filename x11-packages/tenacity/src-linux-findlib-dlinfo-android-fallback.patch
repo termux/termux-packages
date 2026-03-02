@@ -1,0 +1,28 @@
+--- a/linux/findlib.c	2026-02-11 00:08:39.000000000 -0500
++++ b/linux/findlib.c	2026-02-11 16:44:41.333926649 -0500
+@@ -49,14 +49,23 @@
+         return 1;
+     }
+ 
+-    struct link_map * map;
++#if defined(RTLD_DI_LINKMAP)
++    struct link_map *map;
+ 
+     // dlinfo can return information about objects loaded with dlopen
+     if (dlinfo(lib, RTLD_DI_LINKMAP, &map) == -1) {
+-        fprintf(lib, "%s: %s\n", basename(argv[0]), dlerror());
++        fprintf(stderr, "%s: %s\n", basename(argv[0]), dlerror());
+         return 2;
+     }
+ 
+     printf("%s\n", map->l_name);
++#else
++    /*
++     * dlinfo()/RTLD_DI_LINKMAP are GNU/glibc extensions and are not available on
++     * all libcs (e.g. Android/bionic). We can still verify the library is
++     * loadable; print the given name.
++     */
++    printf("%s\n", argv[1]);
++#endif
+     return 0;
+ }
