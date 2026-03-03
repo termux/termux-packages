@@ -270,6 +270,10 @@ termux_step_make_install() {
 	fi
 
 	pushd "${TERMUX_PREFIX}"
+	# https://github.com/dotnet/sdk/pull/50354
+	# NETStandard.Library.Ref is no longer shipped in .NET 10 SDK
+	rm -fr lib/dotnet/packs/NETStandard.Library.Ref
+
 	# remove unused targeting packs pdb files
 	find \
 		lib/dotnet/packs/Microsoft.AspNetCore.App.Ref \
@@ -350,28 +354,6 @@ termux_step_make_install() {
 		\( -type f -o -type l \) | sort \
 		> "${TERMUX_PKG_TMPDIR}"/dotnet-templates.txt
 
-	if [[ ! -d lib/dotnet/packs/NETStandard.Library.Ref ]]; then
-		echo "WARNING: NETStandard.Library.Ref not found in SDK tarball, extracting from nupkg"
-		local _nupkg
-		_nupkg="$(find "${TERMUX_PKG_BUILDDIR}/prereqs/packages/reference" \
-			-iname 'netstandard.library.ref.2.1.0.nupkg' -print -quit 2>/dev/null)"
-		if [[ -z "${_nupkg}" ]]; then
-			_nupkg="$(find "${TERMUX_PKG_BUILDDIR}" -maxdepth 5 \
-				-iname 'netstandard.library.ref.2.1.0.nupkg' -print -quit 2>/dev/null)"
-		fi
-		if [[ -n "${_nupkg}" ]]; then
-			mkdir -p lib/dotnet/packs/NETStandard.Library.Ref/2.1.0
-			unzip -qo "${_nupkg}" -d lib/dotnet/packs/NETStandard.Library.Ref/2.1.0
-			rm -rf lib/dotnet/packs/NETStandard.Library.Ref/2.1.0/{_rels,package,'[Content_Types].xml'} \
-				lib/dotnet/packs/NETStandard.Library.Ref/2.1.0/*.nuspec
-		else
-			termux_error_exit "NETStandard.Library.Ref.2.1.0.nupkg not found"
-		fi
-	fi
-	find \
-		lib/dotnet/packs/NETStandard.Library.Ref \
-		\( -type f -o -type l \) | sort \
-		> "${TERMUX_PKG_TMPDIR}"/netstandard-targeting-pack-2.1.txt
 	popd
 
 	local txt

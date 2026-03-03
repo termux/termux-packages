@@ -1,6 +1,6 @@
 TERMUX_SUBPKG_DESCRIPTION=".NET 10.0 SDK"
 TERMUX_SUBPKG_DEPEND_ON_PARENT=false
-TERMUX_SUBPKG_DEPENDS="aspnetcore-runtime-10.0, aspnetcore-targeting-pack-10.0, dotnet-apphost-pack-10.0, dotnet-runtime-10.0, dotnet-targeting-pack-10.0, dotnet-templates-10.0, netstandard-targeting-pack-2.1"
+TERMUX_SUBPKG_DEPENDS="aspnetcore-runtime-10.0, aspnetcore-targeting-pack-10.0, dotnet-apphost-pack-10.0, dotnet-runtime-10.0, dotnet-targeting-pack-10.0, dotnet-templates-10.0"
 TERMUX_SUBPKG_INCLUDE=$(cat "${TERMUX_PKG_TMPDIR}"/dotnet-sdk.txt)
 
 termux_step_create_subpkg_debscripts() {
