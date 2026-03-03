@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/saghul/txiki.js
 TERMUX_PKG_DESCRIPTION="A small and powerful JavaScript runtime"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1:26.2.1"
+TERMUX_PKG_VERSION="1:26.3.0"
 TERMUX_PKG_SRCURL=git+https://github.com/saghul/txiki.js
 TERMUX_PKG_DEPENDS="libcurl, libffi"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -17,8 +17,9 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
-	find "$TERMUX_PKG_SRCDIR" -mindepth 1 -maxdepth 1 ! -name '.git*' \
-		-exec cp -a \{\} ./ \;
+	rm -rf "$TERMUX_PKG_HOSTBUILD_DIR"
+	cp -r "$TERMUX_PKG_SRCDIR" "$TERMUX_PKG_HOSTBUILD_DIR"
+	cd "$TERMUX_PKG_HOSTBUILD_DIR"
 
 	termux_setup_cmake
 
@@ -41,7 +42,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_configure() {
-	export PATH=$TERMUX_PKG_HOSTBUILD_DIR:$PATH
+	export PATH="$TERMUX_PKG_HOSTBUILD_DIR:$PATH"
 }
 
 termux_step_make_install() {
