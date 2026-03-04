@@ -5,6 +5,7 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
 TERMUX_PKG_VERSION="3.13.12"
+TERMUX_PKG_REVISION=1
 _DEBPYTHON_COMMIT=f358ab52bf2932ad55b1a72a29c9762169e6ac47
 TERMUX_PKG_SRCURL=(
 	https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
@@ -56,6 +57,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_working_tzset=yes"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-build-python=python$_MAJOR_VERSION"
 # https://github.com/termux/termux-packages/issues/16879
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_header_sys_xattr_h=no"
+# https://github.com/termux/termux-packages/issues/28684 (termux has inline getgrent stub in grp.h header patch)
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_getgrent=yes"
 
 TERMUX_PKG_RM_AFTER_INSTALL="
 lib/python${_MAJOR_VERSION}/test
