@@ -53,5 +53,4 @@ else
 
 	sudo apt autoremove -yq
 	sudo apt clean
-	sudo rm -rf /var/lib/apt /var/lib/dpkg
 fi
