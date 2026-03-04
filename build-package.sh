@@ -660,7 +660,7 @@ for (( i=0; i < ${#PACKAGE_LIST[@]}; i++ )); do
 		if [[ "$TERMUX_BUILD_IGNORE_LOCK" != "true" ]]; then
 			flock -n 5 || termux_error_exit "Another build is already running within same environment."
 		fi
-
+		(
 		# Handle 'all' arch:
 		if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" && -n "${TERMUX_ARCH+x}" && "${TERMUX_ARCH}" == 'all' ]]; then
 			_SELF_ARGS=()
@@ -791,6 +791,7 @@ for (( i=0; i < ${#PACKAGE_LIST[@]}; i++ )); do
 		fi
 		termux_add_package_to_built_packages_list "$TERMUX_PKG_NAME"
 		termux_step_finish_build
+		) 5>&-
 	) 5< "$TERMUX_BUILD_LOCK_FILE"
 done
 
