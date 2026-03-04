@@ -13,7 +13,7 @@
        fi
      fi
 -    python_libs=`${python_prog} ${srcdir}/python/python-config.py --ldflags`
-+    python_libs=`@TERMUX_PREFIX@/bin/python-config --ldflags`
++    python_libs="$(@TERMUX_PREFIX@/bin/python-config --ldflags) -lpython@TERMUX_PYTHON_VERSION@"
      if test $? != 0; then
        have_python_config=failed
        if test "${with_python}" != auto; then
