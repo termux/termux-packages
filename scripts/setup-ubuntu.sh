@@ -25,10 +25,6 @@ PACKAGES+=" lzop"
 PACKAGES+=" lz4"
 PACKAGES+=" zstd"
 
-# userspace overlayfs implementation for rootless containers
-# Used to setup NDK toolchain without having to copy the whole toolchain to save some disk space
-PACKAGES+=" fuse-overlayfs"
-
 # Used by common build systems.
 PACKAGES+=" autoconf"
 PACKAGES+=" autogen"

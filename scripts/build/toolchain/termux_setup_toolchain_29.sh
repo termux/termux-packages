@@ -128,22 +128,14 @@ termux_setup_toolchain_29() {
 		return
 	fi
 
-	[ -d "$TERMUX_STANDALONE_TOOLCHAIN" ] || mkdir -p "$TERMUX_STANDALONE_TOOLCHAIN"
-	[ -d "${TERMUX_STANDALONE_TOOLCHAIN}-upper" ] || mkdir -p "${TERMUX_STANDALONE_TOOLCHAIN}-upper"
-	[ -d "${TERMUX_STANDALONE_TOOLCHAIN}-work" ] || mkdir -p "${TERMUX_STANDALONE_TOOLCHAIN}-work"
-
-
-	if ! mountpoint -q "${TERMUX_STANDALONE_TOOLCHAIN}"; then
-		fuse-overlayfs \
-			"${TERMUX_STANDALONE_TOOLCHAIN}" \
-			-o lowerdir="${NDK}/toolchains/llvm/prebuilt/linux-x86_64" \
-			-o upperdir="${TERMUX_STANDALONE_TOOLCHAIN}-upper" \
-			-o workdir="${TERMUX_STANDALONE_TOOLCHAIN}-work"
-	fi
-
-	if [ -f "${TERMUX_STANDALONE_TOOLCHAIN}/.termux-standalone-toolchain" ]; then
+	if [ -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 		return
 	fi
+
+	# Do not put toolchain in place until we are done with setup, to avoid having a half setup
+	# toolchain left in place if something goes wrong (or process is just aborted):
+	local _TERMUX_TOOLCHAIN_TMPDIR=${TERMUX_STANDALONE_TOOLCHAIN}-tmp
+	rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR
 
 	local _NDK_ARCHNAME=$TERMUX_ARCH
 	if [ "$TERMUX_ARCH" = "aarch64" ]; then
@@ -151,52 +143,55 @@ termux_setup_toolchain_29() {
 	elif [ "$TERMUX_ARCH" = "i686" ]; then
 		_NDK_ARCHNAME=x86
 	fi
+	cp $NDK/toolchains/llvm/prebuilt/linux-x86_64 $_TERMUX_TOOLCHAIN_TMPDIR -r
+	cp $NDK/source.properties $_TERMUX_TOOLCHAIN_TMPDIR
+
 	# Remove android-support header wrapping not needed on android-21:
-	rm -Rf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/local
+	rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/local
 
 	for HOST_PLAT in aarch64-linux-android armv7a-linux-androideabi i686-linux-android x86_64-linux-android; do
-		cp $TERMUX_STANDALONE_TOOLCHAIN/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang \
-			$TERMUX_STANDALONE_TOOLCHAIN/bin/$HOST_PLAT-clang
-		cp $TERMUX_STANDALONE_TOOLCHAIN/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang++ \
-			$TERMUX_STANDALONE_TOOLCHAIN/bin/$HOST_PLAT-clang++
+		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang \
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang
+		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang++ \
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang++
 
-		cp $TERMUX_STANDALONE_TOOLCHAIN/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang \
-			$TERMUX_STANDALONE_TOOLCHAIN/bin/$HOST_PLAT-cpp
+		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang \
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-cpp
 		sed -i 's|"$bin_dir/clang"|& -E|' \
-			$TERMUX_STANDALONE_TOOLCHAIN/bin/$HOST_PLAT-cpp
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-cpp
 
-		cp $TERMUX_STANDALONE_TOOLCHAIN/bin/$HOST_PLAT-clang \
-			$TERMUX_STANDALONE_TOOLCHAIN/bin/$HOST_PLAT-gcc
-		cp $TERMUX_STANDALONE_TOOLCHAIN/bin/$HOST_PLAT-clang++ \
-			$TERMUX_STANDALONE_TOOLCHAIN/bin/$HOST_PLAT-g++
+		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang \
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-gcc
+		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang++ \
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-g++
 	done
 
-	cp $TERMUX_STANDALONE_TOOLCHAIN/bin/armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL-clang \
-		$TERMUX_STANDALONE_TOOLCHAIN/bin/arm-linux-androideabi-clang
-	cp $TERMUX_STANDALONE_TOOLCHAIN/bin/armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL-clang++ \
-		$TERMUX_STANDALONE_TOOLCHAIN/bin/arm-linux-androideabi-clang++
-	cp $TERMUX_STANDALONE_TOOLCHAIN/bin/armv7a-linux-androideabi-cpp \
-		$TERMUX_STANDALONE_TOOLCHAIN/bin/arm-linux-androideabi-cpp
+	cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL-clang \
+		$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang
+	cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL-clang++ \
+		$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang++
+	cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi-cpp \
+		$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-cpp
 
 	# rust 1.75.0+ expects this directory to be present
-	rm -fr "${TERMUX_STANDALONE_TOOLCHAIN}"/toolchains
-	mkdir -p "${TERMUX_STANDALONE_TOOLCHAIN}"/toolchains/llvm/prebuilt
-	ln -fs ../../.. "${TERMUX_STANDALONE_TOOLCHAIN}"/toolchains/llvm/prebuilt/linux-x86_64
+	rm -fr "${_TERMUX_TOOLCHAIN_TMPDIR}"/toolchains
+	mkdir -p "${_TERMUX_TOOLCHAIN_TMPDIR}"/toolchains/llvm/prebuilt
+	ln -fs ../../.. "${_TERMUX_TOOLCHAIN_TMPDIR}"/toolchains/llvm/prebuilt/linux-x86_64
 
 	# Create a pkg-config wrapper. We use path to host pkg-config to
 	# avoid picking up a cross-compiled pkg-config later on.
 	local _HOST_PKGCONFIG
 	_HOST_PKGCONFIG=$(command -v pkg-config)
 	mkdir -p "$PKG_CONFIG_LIBDIR"
-	cat > $TERMUX_STANDALONE_TOOLCHAIN/bin/pkg-config <<-HERE
+	cat > $_TERMUX_TOOLCHAIN_TMPDIR/bin/pkg-config <<-HERE
 		#!/bin/sh
 		export PKG_CONFIG_DIR=
 		export PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR
 		exec $_HOST_PKGCONFIG "\$@"
 	HERE
-	chmod +x "$TERMUX_STANDALONE_TOOLCHAIN"/bin/pkg-config
+	chmod +x "$_TERMUX_TOOLCHAIN_TMPDIR"/bin/pkg-config
 
-	cd $TERMUX_STANDALONE_TOOLCHAIN/sysroot
+	cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
 	for f in $TERMUX_SCRIPTDIR/ndk-patches/$TERMUX_NDK_VERSION/*.patch; do
 		echo "Applying ndk-patch: $(basename $f)"
 		sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$f" | \
@@ -231,7 +226,6 @@ termux_setup_toolchain_29() {
 		echo 'INPUT(-lunwind)' > $dir/libgcc.a
 	done
 
-	grep -lrw $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include/c++/v1 -e 'include <version>' | xargs -n 1 sed -i 's/include <version>/include \"version\"/g'
-
-	touch ${TERMUX_STANDALONE_TOOLCHAIN}/.termux-standalone-toolchain
+	grep -lrw $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include/c++/v1 -e 'include <version>' | xargs -n 1 sed -i 's/include <version>/include \"version\"/g'
+	mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
 }
