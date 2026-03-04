@@ -118,6 +118,13 @@ jobs:
           ./scripts/run-docker.sh echo ""
       - name: Free additional disk space
         run: ./scripts/free-space.sh
+      - name: Install needed dependencies for package updates
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            curl \
+            python3 \
+            jq
       - name: Process package updates
         env:
           GITHUB_TOKEN: ${{ secrets.TERMUXBOT2_TOKEN }}
