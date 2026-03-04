@@ -116,5 +116,5 @@ termux_dotnet_kill() {
 	dotnet_process="$(pgrep -a dotnet)" || return 0
 	echo "WARN: Dangling process, forcibly killing"
 	echo "${dotnet_process}"
-	pkill dotnet || :
+	pkill -9 dotnet || :
 }
