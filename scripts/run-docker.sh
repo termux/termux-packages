@@ -29,6 +29,21 @@ _detect_runtime() {
 	fi
 }
 
+# Detect superuser command.
+# If running as root, no sudo is needed. Otherwise, check for sudo.
+_detect_sudo() {
+	if [ "$(id -u)" = "0" ]; then
+		echo ""
+	elif command -v sudo >/dev/null 2>&1; then
+		echo "sudo"
+	elif command -v doas >/dev/null 2>&1; then
+		echo "doas"
+	else
+		echo "Error: This script must be run as root or with sudo/doas available in PATH" 1>&2
+		exit 1
+	fi
+}
+
 _show_usage() {
 	echo "Usage: $0 [OPTIONS] [COMMAND]"
 	echo ""
@@ -153,9 +168,10 @@ else
 fi
 
 USER=builder
+REAL_SUDO=$(_detect_sudo) || exit 1
 
 if [ -n "${TERMUX_DOCKER_USE_SUDO-}" ]; then
-	SUDO="sudo"
+	SUDO=$REAL_SUDO
 else
 	SUDO=""
 fi
@@ -190,7 +206,7 @@ if [ "$RUNTIME" = "docker" ]; then
 			if [ -n "$msg" ]; then
 				echo "$msg..."
 			fi
-			cat "$profile_path" | sed -e "s/{{CONTAINER_NAME}}/$CONTAINER_NAME/g" | sudo "$APPARMOR_PARSER" -rK
+			cat "$profile_path" | sed -e "s/{{CONTAINER_NAME}}/$CONTAINER_NAME/g" | $REAL_SUDO "$APPARMOR_PARSER" -rK
 		fi
 	}
 
