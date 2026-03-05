@@ -9,6 +9,26 @@ TERMUX_SCRIPTDIR=$(cd "$(realpath "$(dirname "$0")")"; cd ..; pwd)
 BUILDSCRIPT_NAME=build-package.sh
 CONTAINER_HOME_DIR=/home/builder
 
+# Detect container runtime.
+# Explicit choice via TERMUX_CONTAINER_RUNTIME takes priority.
+# Otherwise, auto-detect: prefer docker if available, fall back to podman.
+_detect_runtime() {
+	if [ -n "${TERMUX_CONTAINER_RUNTIME:-}" ]; then
+		case "$TERMUX_CONTAINER_RUNTIME" in
+			docker|podman) echo "$TERMUX_CONTAINER_RUNTIME"; return;;
+			*) echo "Error: TERMUX_CONTAINER_RUNTIME must be 'docker' or 'podman'" 1>&2; exit 1;;
+		esac
+	fi
+	if command -v docker >/dev/null 2>&1; then
+		echo "docker"
+	elif command -v podman >/dev/null 2>&1; then
+		echo "podman"
+	else
+		echo "Error: Neither docker nor podman found in PATH" 1>&2
+		exit 1
+	fi
+}
+
 _show_usage() {
 	echo "Usage: $0 [OPTIONS] [COMMAND]"
 	echo ""
@@ -22,9 +42,11 @@ _show_usage() {
 	echo "  -m, --mount-termux-dirs    Mount /data and ~/.termux-build into the container."
 	echo "                             This is useful for building locally for development"
 	echo "                             with host IDE and editors."
+	echo ""
 	echo "Supported environment variables:"
 	echo "  TERMUX_BUILDER_IMAGE_NAME     The name of the Docker image to use"
 	echo "  CONTAINER_NAME                The name of the Docker container to create/use"
+	echo "  TERMUX_CONTAINER_RUNTIME      Set to 'docker' or 'podman' to override auto-detection"
 	echo "  TERMUX_DOCKER_RUN_EXTRA_ARGS  Extra arguments to pass to 'docker run' while"
 	echo "                                creating the container"
 	echo "  TERMUX_DOCKER_EXEC_EXTRA_ARGS Extra arguments to pass to 'docker exec' while"
@@ -44,6 +66,10 @@ _show_usage() {
 	echo "- The dry-run option will only work if the first argument passed to this script"
 	echo "  which runs docker contains '$BUILDSCRIPT_NAME', and it will run"
 	echo "  'build-package-dry-run-simulation.sh' with arguments passed to this script."
+	echo "- When using Podman (via TERMUX_CONTAINER_RUNTIME=podman),"
+	echo "  the container runs rootless. No sudo is required, and host file"
+	echo "  permissions are never altered. Container runs as root in the user namespace"
+	echo "  (which maps to your unprivileged host user)."
 	exit 0
 }
 
@@ -63,6 +89,8 @@ while (( $# != 0 )); do
 		*) break;;
 	esac
 done
+
+RUNTIME=$(_detect_runtime) || exit 1
 
 # If 'build-package-dry-run-simulation.sh' does not return 85 (EX_C__NOOP), or if
 # $1 (the first argument passed to this script which runs docker) does not contain
@@ -86,13 +114,27 @@ if [ "${dry_run}" = "true" ]; then
 fi
 
 UNAME=$(uname)
-if [ "$UNAME" = Darwin ]; then
-	# Workaround for mac readlink not supporting -f.
-	REPOROOT=$PWD
-	SEC_OPT=""
-else
+if [ "$RUNTIME" = "podman" ]; then
 	REPOROOT="$(dirname $(readlink -f $0))/../"
-	SEC_OPT=" --security-opt seccomp=$REPOROOT/scripts/profile.json --security-opt apparmor=_custom-termux-package-builder-$CONTAINER_NAME --cap-add CAP_SYS_ADMIN --device /dev/fuse"
+	# No custom seccomp profile: Docker's profile.json blocks chmod/fchmodat
+	# in rootless Podman's user-namespace context.  Podman's default seccomp
+	# profile already allows the needed syscalls (personality, mount, umount2)
+	# when CAP_SYS_ADMIN is granted.
+	# CAP_SYS_ADMIN (within user namespace) and /dev/fuse are needed for
+	# fuse-overlayfs mounts used by the build system.
+	SEC_OPT=" --cap-add CAP_SYS_ADMIN --device /dev/fuse"
+elif [ "$RUNTIME" = "docker" ]; then
+	if [ "$UNAME" = Darwin ]; then
+		# Workaround for mac readlink not supporting -f.
+		REPOROOT=$PWD
+		SEC_OPT=""
+	else
+		REPOROOT="$(dirname $(readlink -f $0))/../"
+		SEC_OPT=" --security-opt seccomp=$REPOROOT/scripts/profile.json --security-opt apparmor=_custom-termux-package-builder-$CONTAINER_NAME --cap-add CAP_SYS_ADMIN --device /dev/fuse"
+	fi
+else
+	echo "Error: Unsupported runtime '$RUNTIME'" 1>&2
+	exit 1
 fi
 
 if [ "${CI:-}" = "true" ]; then
@@ -118,7 +160,7 @@ else
 	SUDO=""
 fi
 
-echo "Running container '$CONTAINER_NAME' from image '$TERMUX_BUILDER_IMAGE_NAME'..."
+echo "Running container '$CONTAINER_NAME' from image '$TERMUX_BUILDER_IMAGE_NAME' (runtime: $RUNTIME)..."
 
 # Check whether attached to tty and adjust docker flags accordingly.
 if [ -t 1 ]; then
@@ -127,40 +169,43 @@ else
 	DOCKER_TTY=""
 fi
 
-APPARMOR_PARSER=""
-if command -v apparmor_parser > /dev/null; then
-	APPARMOR_PARSER="apparmor_parser"
-fi
-
-if [ -z "$APPARMOR_PARSER" ] || ! $SUDO aa-status --enabled; then
-	echo "WARNING: apparmor_parser not found, AppArmor profiles will not be loaded!"
-	echo "         This is not recommended, as it may cause security issues and unexpected behavior"
-	echo "         Avoid executing untrusted code in the container"
+# AppArmor (Docker only)
+if [ "$RUNTIME" = "docker" ]; then
 	APPARMOR_PARSER=""
-fi
-
-load_apparmor_profile() {
-	local profile_path="$1"
-	local msg="${2:-}"
-	if [ -n "$APPARMOR_PARSER" ]; then
-		if [ -n "$msg" ]; then
-			echo "$msg..."
-		fi
-		cat "$profile_path" | sed -e "s/{{CONTAINER_NAME}}/$CONTAINER_NAME/g" | sudo "$APPARMOR_PARSER" -rK
+	if command -v apparmor_parser > /dev/null; then
+		APPARMOR_PARSER="apparmor_parser"
 	fi
-}
 
-# Load the relaxed AppArmor profile first as we might need to change permissions
-load_apparmor_profile ./scripts/profile-relaxed.apparmor
+	if [ -z "$APPARMOR_PARSER" ] || ! $SUDO aa-status --enabled; then
+		echo "WARNING: apparmor_parser not found, AppArmor profiles will not be loaded!"
+		echo "         This is not recommended, as it may cause security issues and unexpected behavior"
+		echo "         Avoid executing untrusted code in the container"
+		APPARMOR_PARSER=""
+	fi
+
+	load_apparmor_profile() {
+		local profile_path="$1"
+		local msg="${2:-}"
+		if [ -n "$APPARMOR_PARSER" ]; then
+			if [ -n "$msg" ]; then
+				echo "$msg..."
+			fi
+			cat "$profile_path" | sed -e "s/{{CONTAINER_NAME}}/$CONTAINER_NAME/g" | sudo "$APPARMOR_PARSER" -rK
+		fi
+	}
+
+	# Load the relaxed AppArmor profile first as we might need to change permissions
+	load_apparmor_profile ./scripts/profile-relaxed.apparmor
+fi
 
 __change_builder_uid_gid() {
 	if [ "$UNAME" != Darwin ]; then
 		if [ $(id -u) -ne 1001 -a $(id -u) -ne 0 ]; then
 			echo "Changed builder uid/gid... (this may take a while)"
-			$SUDO docker exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo chown -R $(id -u):$(id -g) $CONTAINER_HOME_DIR
-			$SUDO docker exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo chown -R $(id -u):$(id -g) /data
-			$SUDO docker exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo usermod -u $(id -u) builder
-			$SUDO docker exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo groupmod -g $(id -g) builder
+			$SUDO $RUNTIME exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo chown -R $(id -u):$(id -g) $CONTAINER_HOME_DIR
+			$SUDO $RUNTIME exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo chown -R $(id -u):$(id -g) /data
+			$SUDO $RUNTIME exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo usermod -u $(id -u) builder
+			$SUDO $RUNTIME exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo groupmod -g $(id -g) builder
 		fi
 	fi
 }
@@ -168,13 +213,13 @@ __change_builder_uid_gid() {
 __change_container_pid_max() {
 	if [ "$UNAME" != Darwin ]; then
 		echo "Changing /proc/sys/kernel/pid_max to 65535 for packages that need to run native executables using proot (for 32-bit architectures)"
-		if [[ "$($SUDO docker exec $CONTAINER_NAME cat /proc/sys/kernel/pid_max)" -le 65535 ]]; then
-			echo "No need to change /proc/sys/kernel/pid_max, current value is $($SUDO docker exec $DOCKER_TTY $CONTAINER_NAME cat /proc/sys/kernel/pid_max)"
+		if [[ "$($SUDO $RUNTIME exec $CONTAINER_NAME cat /proc/sys/kernel/pid_max)" -le 65535 ]]; then
+			echo "No need to change /proc/sys/kernel/pid_max, current value is $($SUDO $RUNTIME exec $DOCKER_TTY $CONTAINER_NAME cat /proc/sys/kernel/pid_max)"
 		else
 			# On kernel versions >= 6.14, the pid_max value is pid namespaced, so we need to set it in the container namespace instead of host.
 			# But some distributions may backport the pid namespacing to older kernels, so we check whether it's effective by checking the value in the container after setting it.
-			$SUDO docker run --privileged --pid="container:$CONTAINER_NAME" --rm "$TERMUX_BUILDER_IMAGE_NAME" sh -c "echo 65535 | sudo tee /proc/sys/kernel/pid_max > /dev/null" || :
-			if [[ "$($SUDO docker exec $CONTAINER_NAME cat /proc/sys/kernel/pid_max)" -eq 65535 ]]; then
+			$SUDO $RUNTIME run --privileged --pid="container:$CONTAINER_NAME" --rm "$TERMUX_BUILDER_IMAGE_NAME" sh -c "echo 65535 | sudo tee /proc/sys/kernel/pid_max > /dev/null" || :
+			if [[ "$($SUDO $RUNTIME exec $CONTAINER_NAME cat /proc/sys/kernel/pid_max)" -eq 65535 ]]; then
 				echo "Successfully changed /proc/sys/kernel/pid_max for container namespace"
 			else
 				echo "Failed to change /proc/sys/kernel/pid_max for container, falling back to setting it on host..."
@@ -188,28 +233,56 @@ __change_container_pid_max() {
 	fi
 }
 
-
-if ! $SUDO docker container inspect $CONTAINER_NAME > /dev/null 2>&1; then
+if ! $SUDO $RUNTIME container inspect $CONTAINER_NAME > /dev/null 2>&1; then
 	echo "Creating new container..."
-	$SUDO docker run \
-		--detach \
-		--init \
-		--name $CONTAINER_NAME \
-		--volume $VOLUME \
-		$SEC_OPT \
-		--tty \
-		$TERMUX_DOCKER_RUN_EXTRA_ARGS \
-		$TERMUX_BUILDER_IMAGE_NAME
-	__change_builder_uid_gid
+	if [ "$RUNTIME" = "podman" ]; then
+		# In rootless Podman the default user-namespace mapping is:
+		#   container root (0)  →  host user ($UID)
+		#   container 1-N       →  host subuid range
+		#
+		# We run as root *inside* the container so that:
+		#   • chmod/chown (used by tar, dpkg, etc.) work within the userns
+		#   • the image's builder-owned toolchain files are accessible (root can read all)
+		#   • files written to the bind-mounted repo volume land as the host user on disk
+		#
+		# This is safe — "root" in a rootless container is the unprivileged host user;
+		# the user namespace already provides the sandbox.  No host permissions are altered.
+		$SUDO $RUNTIME run \
+			--detach \
+			--init \
+			--pids-limit=-1 \
+			--name $CONTAINER_NAME \
+			--volume $VOLUME \
+			--user root \
+			--env HOME=$CONTAINER_HOME_DIR \
+			$SEC_OPT \
+			--tty \
+			$TERMUX_DOCKER_RUN_EXTRA_ARGS \
+			$TERMUX_BUILDER_IMAGE_NAME
+	else
+		$SUDO $RUNTIME run \
+			--detach \
+			--init \
+			--name $CONTAINER_NAME \
+			--volume $VOLUME \
+			$SEC_OPT \
+			--tty \
+			$TERMUX_DOCKER_RUN_EXTRA_ARGS \
+			$TERMUX_BUILDER_IMAGE_NAME
+		__change_builder_uid_gid
+	fi
 	__change_container_pid_max
 fi
 
-if [[ "$($SUDO docker container inspect -f '{{ .State.Running }}' $CONTAINER_NAME)" == "false" ]]; then
-	$SUDO docker start $CONTAINER_NAME >/dev/null 2>&1
+if [[ "$($SUDO $RUNTIME container inspect -f '{{ .State.Running }}' $CONTAINER_NAME)" == "false" ]]; then
+	$SUDO $RUNTIME start $CONTAINER_NAME >/dev/null 2>&1
 	__change_container_pid_max
 fi
 
-load_apparmor_profile ./scripts/profile-restricted.apparmor "Loading restricted AppArmor profile"
+# Load restricted AppArmor profile (Docker only)
+if [ "$RUNTIME" = "docker" ]; then
+	load_apparmor_profile ./scripts/profile-restricted.apparmor "Loading restricted AppArmor profile"
+fi
 
 # Set traps to ensure that the process started with docker exec and all its children are killed.
 . "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"; docker__setup_docker_exec_traps
@@ -218,4 +291,21 @@ if [ "$#" -eq "0" ]; then
 	set -- bash
 fi
 
-$SUDO docker exec $CI_OPT --env "DOCKER_EXEC_PID_FILE_PATH=$DOCKER_EXEC_PID_FILE_PATH" --interactive $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME "$@"
+# Execute command in container
+if [ "$RUNTIME" = "podman" ]; then
+	$SUDO $RUNTIME exec $CI_OPT \
+		--user root \
+		--env HOME=$CONTAINER_HOME_DIR \
+		--env "DOCKER_EXEC_PID_FILE_PATH=$DOCKER_EXEC_PID_FILE_PATH" \
+		--interactive $DOCKER_TTY \
+		$TERMUX_DOCKER_EXEC_EXTRA_ARGS \
+		$CONTAINER_NAME \
+		"$@"
+else
+	$SUDO $RUNTIME exec $CI_OPT \
+		--env "DOCKER_EXEC_PID_FILE_PATH=$DOCKER_EXEC_PID_FILE_PATH" \
+		--interactive $DOCKER_TTY \
+		$TERMUX_DOCKER_EXEC_EXTRA_ARGS \
+		$CONTAINER_NAME \
+		"$@"
+fi
