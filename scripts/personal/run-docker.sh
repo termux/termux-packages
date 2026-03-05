@@ -39,9 +39,9 @@ if ! mountpoint -q ./output; then
 fi
 
 TERMUX_DOCKER_RUN_EXTRA_ARGS+=" --volume $HOME/termux-apt-repo:/apt:ro"
-TERMUX_DOCKER_RUN_EXTRA_ARGS+=" --volume $PWD/output/${CONTAINER_NAME}/home:/home/builder/"
+TERMUX_DOCKER_RUN_EXTRA_ARGS+=" --volume $PWD/output/_builder/${CONTAINER_NAME}/home:/home/builder/"
 TERMUX_DOCKER_RUN_EXTRA_ARGS+=" --volume $PWD/scripts/personal/lib/${TERMUX_BUILDER_IMAGE_NAME//\//_}/lib:/home/builder/lib"
-TERMUX_DOCKER_RUN_EXTRA_ARGS+=" --volume $PWD/output/${CONTAINER_NAME}/data:/data" \
+TERMUX_DOCKER_RUN_EXTRA_ARGS+=" --volume $PWD/output/_builder/${CONTAINER_NAME}/data:/data" \
 
 env \
 	CONTAINER_NAME="$CONTAINER_NAME" \
