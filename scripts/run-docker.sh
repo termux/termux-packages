@@ -4,13 +4,9 @@ set -e -u
 TERMUX_SCRIPTDIR=$(cd "$(realpath "$(dirname "$0")")"; cd ..; pwd)
 : ${TERMUX_BUILDER_IMAGE_NAME:=ghcr.io/termux/package-builder}
 : ${CONTAINER_NAME:=termux-package-builder}
-
-BUILDSCRIPT_NAME="build-package.sh"
-
-: ${TERMUX_BUILDER_IMAGE_NAME:=ghcr.io/termux/package-builder}
-: ${CONTAINER_NAME:=termux-package-builder}
 : ${TERMUX_DOCKER_RUN_EXTRA_ARGS:=}
 : ${TERMUX_DOCKER_EXEC_EXTRA_ARGS:=}
+BUILDSCRIPT_NAME=build-package.sh
 CONTAINER_HOME_DIR=/home/builder
 
 _show_usage() {
