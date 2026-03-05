@@ -46,5 +46,6 @@ termux_step_post_make_install() {
 	install -Dm600 "$TERMUX_PKG_BUILDER_DIR"/hb-info.1 "$TERMUX_PREFIX"/share/man/man1/hb-info.1
 	install -Dm600 "$TERMUX_PKG_BUILDER_DIR"/hb-shape.1 "$TERMUX_PREFIX"/share/man/man1/hb-shape.1
 	install -Dm600 "$TERMUX_PKG_BUILDER_DIR"/hb-subset.1 "$TERMUX_PREFIX"/share/man/man1/hb-subset.1
+	install -Dm600 "$TERMUX_PKG_BUILDER_DIR"/hb-vector.1 "$TERMUX_PREFIX"/share/man/man1/hb-vector.1
 	install -Dm600 "$TERMUX_PKG_BUILDER_DIR"/hb-view.1 "$TERMUX_PREFIX"/share/man/man1/hb-view.1
 }
