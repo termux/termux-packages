@@ -60,4 +60,11 @@ profile _custom-termux-package-builder-{{CONTAINER_NAME}} flags=(attach_disconne
 
   # Do not allow the container to modify the build toolchain
 	deny /home/builder/lib/** wlk,
+
+	# Also deny everything to the scripts/personal/ stuff cause we store secrets there
+	# as well as trusted copy of the NDK
+	deny /home/builder/termux-packages/scripts/personal/** rwklx,
+
+  # Although we are mounting /apt as read-only, we should also explicitly deny write access to it
+	deny /apt/** wklx,
 }
