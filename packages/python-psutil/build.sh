@@ -1,0 +1,12 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/giampaolo/psutil
+TERMUX_PKG_DESCRIPTION="Cross-platform process and system utilities module for Python"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="7.2.2"
+TERMUX_PKG_SRCURL="https://github.com/giampaolo/psutil/archive/refs/tags/release-$TERMUX_PKG_VERSION.tar.gz"
+TERMUX_PKG_SHA256=38f406bf21acc67e45f414b7980463b2e6e6270ba3616ffd41995d997078cbe6
+TERMUX_PKG_DEPENDS="python, python-pip"
+TERMUX_PKG_SETUP_PYTHON=true
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
