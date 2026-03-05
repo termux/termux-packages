@@ -1,6 +1,6 @@
---- ./node.gyp.orig	2025-11-26 23:46:03.696854242 +0530
-+++ ./node.gyp	2025-12-03 21:00:02.566150699 +0530
-@@ -527,7 +527,7 @@
+--- ./node.gyp.orig	2026-03-03 06:58:35.000000000 +0530
++++ ./node.gyp	2026-03-05 23:52:39.019007688 +0530
+@@ -543,7 +543,7 @@
            '-Wl,-bnoerrmsg',
          ],
        }],
@@ -9,7 +9,7 @@
          'libraries': ['-latomic'],
        }],
      ],
-@@ -568,7 +568,8 @@
+@@ -584,7 +584,8 @@
        ],
  
        'sources': [
@@ -18,8 +18,8 @@
 +        'src/getaddrinfo.c'
        ],
  
-       'dependencies': [
-@@ -1063,314 +1064,6 @@
+       'msvs_settings': {
+@@ -1115,419 +1116,6 @@
          },
        ],
      }, # node_lib_target_name
@@ -28,7 +28,6 @@
 -      'type': 'executable',
 -      'dependencies': [
 -        '<(node_lib_target_name)',
--        'deps/histogram/histogram.gyp:histogram',
 -      ],
 -
 -      'includes': [
@@ -53,6 +52,11 @@
 -        'test/fuzzers/fuzz_env.cc',
 -      ],
 -      'conditions': [
+-        [ 'node_shared_hdr_histogram=="false"', {
+-          'dependencies': [
+-            'deps/histogram/histogram.gyp:histogram',
+-          ],
+-        }],
 -        ['OS=="linux" or OS=="openharmony"', {
 -          'ldflags': [ '-fsanitize=fuzzer' ]
 -        }],
@@ -71,7 +75,6 @@
 -      'type': 'executable',
 -      'dependencies': [
 -        '<(node_lib_target_name)',
--        'deps/histogram/histogram.gyp:histogram',
 -      ],
 -      'includes': [
 -        'node.gypi'
@@ -94,6 +97,11 @@
 -        'test/fuzzers/fuzz_ClientHelloParser.cc',
 -      ],
 -      'conditions': [
+-        [ 'node_shared_hdr_histogram=="false"', {
+-          'dependencies': [
+-            'deps/histogram/histogram.gyp:histogram',
+-          ],
+-        }],
 -        [ 'node_shared_uvwasi=="false"', {
 -          'dependencies': [ 'deps/uvwasi/uvwasi.gyp:uvwasi' ],
 -          'include_dirs': [ 'deps/uvwasi/include' ],
@@ -116,9 +124,6 @@
 -      'type': 'executable',
 -      'dependencies': [
 -        '<(node_lib_target_name)',
--        'deps/googletest/googletest.gyp:gtest_prod',
--        'deps/histogram/histogram.gyp:histogram',
--        'deps/nbytes/nbytes.gyp:nbytes',
 -      ],
 -      'includes': [
 -        'node.gypi'
@@ -141,6 +146,21 @@
 -        'test/fuzzers/fuzz_strings.cc',
 -      ],
 -      'conditions': [
+-        [ 'node_shared_gtest=="false"', {
+-          'dependencies': [
+-            'deps/googletest/googletest.gyp:gtest_prod',
+-          ],
+-        }],
+-        [ 'node_shared_hdr_histogram=="false"', {
+-          'dependencies': [
+-            'deps/histogram/histogram.gyp:histogram',
+-          ],
+-        }],
+-        [ 'node_shared_nbytes=="false"', {
+-          'dependencies': [
+-            'deps/nbytes/nbytes.gyp:nbytes',
+-          ],
+-        }],
 -        [ 'node_shared_uvwasi=="false"', {
 -          'dependencies': [ 'deps/uvwasi/uvwasi.gyp:uvwasi' ],
 -          'include_dirs': [ 'deps/uvwasi/include' ],
@@ -164,10 +184,6 @@
 -
 -      'dependencies': [
 -        '<(node_lib_target_name)',
--        'deps/googletest/googletest.gyp:gtest',
--        'deps/googletest/googletest.gyp:gtest_main',
--        'deps/histogram/histogram.gyp:histogram',
--        'deps/nbytes/nbytes.gyp:nbytes',
 -        'tools/v8_gypfiles/abseil.gyp:abseil',
 -      ],
 -
@@ -193,6 +209,25 @@
 -      'sources': [ '<@(node_cctest_sources)' ],
 -
 -      'conditions': [
+-        [ 'node_shared_gtest=="false"', {
+-          'dependencies': [
+-            'deps/googletest/googletest.gyp:gtest',
+-            'deps/googletest/googletest.gyp:gtest_main',
+-          ],
+-        }],
+-        [ 'node_shared_gtest=="true"', {
+-          'libraries': [ '-lgtest_main' ],
+-        }],
+-        [ 'node_shared_hdr_histogram=="false"', {
+-          'dependencies': [
+-            'deps/histogram/histogram.gyp:histogram',
+-          ],
+-        }],
+-        [ 'node_shared_nbytes=="false"', {
+-          'dependencies': [
+-            'deps/nbytes/nbytes.gyp:nbytes',
+-          ],
+-        }],
 -        [ 'node_use_openssl=="true"', {
 -          'defines': [
 -            'HAVE_OPENSSL=1',
@@ -202,6 +237,13 @@
 -          ],
 -        }, {
 -          'sources!': [ '<@(node_cctest_openssl_sources)' ],
+-        }],
+-        [ 'node_use_quic=="true"', {
+-          'defines': [
+-            'HAVE_QUIC=1',
+-          ],
+-        }, {
+-          'sources!': [ '<@(node_cctest_quic_sources)' ],
 -        }],
 -        ['v8_enable_inspector==1', {
 -          'defines': [
@@ -253,8 +295,6 @@
 -
 -      'dependencies': [
 -        '<(node_lib_target_name)',
--        'deps/histogram/histogram.gyp:histogram',
--        'deps/nbytes/nbytes.gyp:nbytes',
 -      ],
 -
 -      'includes': [
@@ -289,6 +329,16 @@
 -            'OTHER_LDFLAGS': [ '-Wl,-rpath,@loader_path', ],
 -          },
 -        }],
+-        [ 'node_shared_hdr_histogram=="false"', {
+-          'dependencies': [
+-            'deps/histogram/histogram.gyp:histogram',
+-          ],
+-        }],
+-        [ 'node_shared_nbytes=="false"', {
+-          'dependencies': [
+-            'deps/nbytes/nbytes.gyp:nbytes',
+-          ],
+-        }],
 -        ['OS=="win"', {
 -          'libraries': [
 -            'Dbghelp.lib',
@@ -302,6 +352,61 @@
 -        }],
 -      ],
 -    }, # embedtest
+-
+-    {
+-      'target_name': 'shared_embedtest',
+-      'type': 'executable',
+-
+-      'dependencies': [
+-        '<(node_lib_target_name)',
+-      ],
+-
+-      # Don't depend on node.gypi - it otherwise links to
+-      # the static libraries and resolve symbols at build time.
+-      'include_dirs': [
+-        'deps/v8/include',
+-      ],
+-
+-      'sources': [
+-        'test/embedding/shared_embedtest.cc',
+-      ],
+-      'conditions': [
+-        [ 'node_shared=="true"', {
+-          'defines': [
+-            'USING_V8_SHARED',
+-            'USING_V8_PLATFORM_SHARED',
+-          ],
+-          'defines!': [
+-            'BUILDING_V8_PLATFORM_SHARED=1',
+-            'BUILDING_V8_SHARED=1',
+-          ],
+-        }, {
+-          # Only test shared embedding when Node is built as shared library.
+-          'type': 'none',
+-        }],
+-        # Only test platforms known to work.
+-        ['OS not in "mac win linux"', {
+-          'type': 'none',
+-        }],
+-        ['OS=="win"', {
+-          'libraries': [
+-            'Dbghelp.lib',
+-            'winmm.lib',
+-            'Ws2_32.lib',
+-          ],
+-        }],
+-        ['OS=="mac"', {
+-          'xcode_settings': {
+-            'OTHER_LDFLAGS': [ '-Wl,-rpath,@loader_path', ],
+-          }
+-        }],
+-        ['OS=="linux"', {
+-          'ldflags': [
+-            '-Wl,-rpath,\\$$ORIGIN'
+-          ],
+-        }],
+-      ],
+-    }, # shared_embedtest
 -
 -    {
 -      'target_name': 'overlapped-checker',
