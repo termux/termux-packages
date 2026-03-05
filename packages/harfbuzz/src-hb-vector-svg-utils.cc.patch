@@ -1,0 +1,13 @@
+# error: use of undeclared identifier 'localeconv_l'
+
+--- a/src/hb-vector-svg-utils.cc
++++ b/src/hb-vector-svg-utils.cc
+@@ -53,7 +53,7 @@
+     p->value[1] = '\0';
+ 
+ #ifndef HB_NO_SETLOCALE
+-#if defined(HAVE_XLOCALE_H)
++#if defined(HAVE_XLOCALE_H) && !defined(__ANDROID__)
+     lconv *lc = nullptr;
+     hb_locale_t current_locale = hb_uselocale ((hb_locale_t) 0);
+     if (current_locale)
