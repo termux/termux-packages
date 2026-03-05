@@ -1,0 +1,25 @@
+From 34a14decb6732c8abf01e6135a9a1dd55b58e33a Mon Sep 17 00:00:00 2001
+From: Brad Smith <brad@comstyle.com>
+Date: Sat, 24 Jan 2026 22:05:01 -0500
+Subject: [PATCH] fix(svt): Fix building with SVT-AV1 4.0
+
+---
+ src/codec_svt.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/codec_svt.c b/src/codec_svt.c
+index 3c7751333a..e81b30cf3c 100644
+--- a/src/codec_svt.c
++++ b/src/codec_svt.c
+@@ -170,7 +170,11 @@ static avifResult svtCodecEncodeImage(avifCodec * codec,
+ #else
+         svt_config->logical_processors = encoder->maxThreads;
+ #endif
++#if SVT_AV1_CHECK_VERSION(4, 0, 0)
++        svt_config->aq_mode = 2;
++#else
+         svt_config->enable_adaptive_quantization = 2;
++#endif
+         // disable 2-pass
+ #if SVT_AV1_CHECK_VERSION(0, 9, 0)
+         svt_config->rc_stats_buffer = (SvtAv1FixedBuf) { NULL, 0 };
