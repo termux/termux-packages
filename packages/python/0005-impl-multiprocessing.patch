@@ -1,3 +1,19 @@
+sem_open() and sem_unlink() are implemented in Termux by libandroid-posix-semaphore
+https://github.com/termux/termux-packages/issues/28777
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -5197,10 +5197,6 @@ if test "$ac_sys_system" = "Linux-android"; then
+   blocked_funcs="chroot initgroups setegid seteuid setgid sethostname
+     setregid setresgid setresuid setreuid setuid"
+ 
+-  # These functions are unimplemented and always return an error
+-  # (https://android.googlesource.com/platform/system/sepolicy/+/refs/heads/android13-release/public/domain.te#1044)
+-  blocked_funcs="$blocked_funcs sem_open sem_unlink"
+-
+   # Before API level 23, when fchmodat is called with the unimplemented flag
+   # AT_SYMLINK_NOFOLLOW, instead of returning ENOTSUP as it should, it actually
+   # follows the symlink.
 --- a/Lib/multiprocessing/heap.py
 +++ b/Lib/multiprocessing/heap.py
 @@ -70,7 +70,7 @@
