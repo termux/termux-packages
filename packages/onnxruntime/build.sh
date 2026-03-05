@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Cross-platform, high performance ML inferencing and trai
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.24.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/microsoft/onnxruntime
 TERMUX_PKG_DEPENDS="abseil-cpp, libc++, protobuf, libre2"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -64,5 +65,15 @@ termux_step_make_install() {
 
 	local _pyver="${TERMUX_PYTHON_VERSION//./}"
 	local _wheel="onnxruntime-${TERMUX_PKG_VERSION}-cp${_pyver}-cp${_pyver}-android_${TERMUX_ARCH}.whl"
-	pip install --no-deps --prefix="$TERMUX_PREFIX" "$TERMUX_PKG_SRCDIR/dist/${_wheel}"
+	pip install --force-reinstall --no-deps --prefix="$TERMUX_PREFIX" "$TERMUX_PKG_SRCDIR/dist/${_wheel}"
+}
+
+termux_step_post_make_install() {
+	# for some reason in python 3.13, these are no longer getting installed automatically
+	install -Dm644 onnxruntime_pybind11_state.so \
+		-t "$TERMUX_PYTHON_HOME/site-packages/onnxruntime/capi"
+	ln -sf "$TERMUX_PREFIX/lib/libonnxruntime.so" \
+		"$TERMUX_PYTHON_HOME/site-packages/onnxruntime/capi/libonnxruntime.so"
+	ln -sf "$TERMUX_PREFIX/lib/libonnxruntime_providers_shared.so" \
+		"$TERMUX_PYTHON_HOME/site-packages/onnxruntime/capi/libonnxruntime_providers_shared.so"
 }
