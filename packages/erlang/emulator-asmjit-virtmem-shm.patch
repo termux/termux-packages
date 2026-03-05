@@ -2,12 +2,12 @@ diff --git a/erts/emulator/asmjit/core/virtmem.cpp b/erts/emulator/asmjit/core/v
 index a1b0f95..d1eb1ad 100644
 --- a/erts/emulator/asmjit/core/virtmem.cpp
 +++ b/erts/emulator/asmjit/core/virtmem.cpp
-@@ -388,7 +396,7 @@ static ASMJIT_INLINE int VirtMem_appleSpecificMMapFlags(uint32_t flags) noexcept
+@@ -518,7 +518,7 @@ enum class AnonymousMemoryStrategy : uint32_t {
  #if !defined(SHM_ANON)
- static const char* VirtMem_getTmpDir() noexcept {
-   const char* tmpDir = getenv("TMPDIR");
--  return tmpDir ? tmpDir : "/tmp";
-+  return tmpDir ? tmpDir : "@TERMUX_PREFIX@/tmp";
+ static const char* get_tmp_dir() noexcept {
+   const char* tmp_dir = getenv("TMPDIR");
+-  return tmp_dir ? tmp_dir : "/tmp";
++  return tmp_dir ? tmp_dir : "@TERMUX_PREFIX@/tmp";
  }
  #endif
  
