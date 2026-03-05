@@ -1,6 +1,6 @@
---- ./entr.c	2021-07-02 20:20:26.000000000 +0530
-+++ ./entr.c.mod	2021-07-26 20:02:28.474638318 +0530
-@@ -183,10 +183,10 @@
+--- a/entr.c
++++ b/entr.c
+@@ -181,11 +181,11 @@
  		fprintf(stderr, "open_max: %d\n", open_max);
  
  	/* prevent interactive utilities from paging output */
@@ -8,8 +8,18 @@
 +	setenv("PAGER", "@TERMUX_PREFIX@/bin/cat", 0);
  
  	/* ensure a shell is available to use */
--	setenv("SHELL", "/bin/sh", 0);
-+	setenv("SHELL", "@TERMUX_PREFIX@/bin/sh", 0);
+ 	if ((shell = getenv("SHELL")) == NULL)
+-		shell = "/bin/sh";
++		shell = "@TERMUX_PREFIX@/bin/sh";
+ 	shell_base = strdup(shell);
+ 	shell_base = basename(shell_base);
  
- 	/* sequential scan may depend on a 0 at the end */
- 	files = calloc(open_max+1, sizeof(WatchFile *));
+@@ -571,7 +571,7 @@
+ 		new_argv = calloc(argc + 1, sizeof(char *));
+ 		if (new_argv == NULL)
+ 			err(1, "calloc");
+-		new_argv[0] = "/bin/false";
++		new_argv[0] = "@TERMUX_PREFIX@/bin/false";
+ 		for (m = 0, i = 0, p = arg_buf; i < argc; i++) {
+ 			remaining = ARG_MAX - (p - arg_buf);
+ 			new_argv[i] = p;
