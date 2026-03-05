@@ -4,4 +4,3 @@ bin
 lib/python*
 "
 TERMUX_SUBPKG_DEPENDS="python, python-numpy, python-pip"
-TERMUX_SUBPKG_DEPEND_ON_PARENT=deps
