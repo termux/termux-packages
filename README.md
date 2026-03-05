@@ -8,6 +8,7 @@ Things not to expect:
 - Documentation of any sort. The code is the documentation. Good luck with that. Since I expect no one else to use this, I don't care about making it readable. If you want to use it, you'll have to figure it out yourself.
 - Any sort of support. If you have questions, you can try your luck asking me, but I don't owe you an answer.
 - Although the below documentation exists, don't expect it to be up to date in any way whatsoever
+- Linear git history. This branch will be rebased against master, whenever I please. If you wanna deal with your copy, good luck, know some Git-Fu, and be prepared to deal with merge conflicts. I don't care about your copy, so I won't care about merge conflicts.
 
 
 ## Current features
