@@ -16,7 +16,7 @@ else
 		dpkg -l |
 			grep '^ii' |
 			awk '{ print $2 }' |
-			grep -P '(mecab|linux-azure-tools-|aspnetcore|liblldb-|netstandard-|llvm|clang|gcc-12|gcc-13|cpp-|g\+\+-|temurin-|gfortran-|mysql-|google-cloud-cli|postgresql-|cabal-|dotnet-|ghc-|mongodb-|libmono|temurin-|mesa-|ant|liblua|python3|grub2-|grub-|shim-signed)'
+			grep -P '(mecab|linux-azure-tools-|aspnetcore|liblldb-|netstandard-|llvm|clang|gcc-12|gcc-13|cpp-|g\+\+-|temurin-|gfortran-|mysql-|google-cloud-cli|postgresql-|cabal-|dotnet-|ghc-|mongodb-|libmono|mesa-|ant|liblua|python3|grub2-|grub-|shim-signed)'
 	)
 
 	sudo apt purge -yq \
