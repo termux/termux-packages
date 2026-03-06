@@ -694,8 +694,7 @@ for (( i=0; i < ${#PACKAGE_LIST[@]}; i++ )); do
 			TERMUX_PKG_BUILDER_DIR="$(realpath "${PACKAGE_LIST[i]}")"
 		else
 			# Package name:
-			# FIXME: TERMUX_PACKAGES_DIRECTORIES should be made into an array.
-			for package_directory in $TERMUX_PACKAGES_DIRECTORIES; do
+			for package_directory in "${TERMUX_PACKAGES_DIRECTORIES[@]}"; do
 				if [[ -d "${TERMUX_SCRIPTDIR}/${package_directory}/${TERMUX_PKG_NAME}" ]]; then
 					export TERMUX_PKG_BUILDER_DIR="${TERMUX_SCRIPTDIR}/$package_directory/$TERMUX_PKG_NAME"
 					break
