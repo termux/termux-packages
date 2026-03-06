@@ -1,16 +1,48 @@
-Needed for proper substitution of @LIBPYTHON@ in python3.pc.in
+commit 480c0f118613dde8fd28eca1b959469903986ae0
+Author: Yaksh Bariya <yakshbari4@gmail.com>
+Date:   Sat Mar 7 01:49:19 2026 +0530
 
-The former style of substitution is fine in Makefiles where variables are expanded, not in static generated files.
-diff --git a/configure.ac b/configure.ac
-index 043ec957f40..53bed63310e 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -6424,7 +6424,7 @@ LIBPYTHON=''
+    GH-138800: fix variable substitution in python3.pc for Android
+    
+    Essentially a revert of the part where LIBPYTHON is made to use
+    BLDLIBRARY in 7f5e3f04f838686d65f1053a5e47f5d3faf0b228.
+    
+    We can't use BLDLIBRARY as it adds `-L.`, which is not expected
+    behaviour.
+    
+    Part of downstream distribution of Termux porting Python 3.13 to Termux
+    (Android). This is the revised version after proper review and fixes
+
+diff --git a/Misc/NEWS.d/next/Build/2026-03-07-02-09-57.gh-issue-138800.VD8qbz.rst b/Misc/NEWS.d/next/Build/2026-03-07-02-09-57.gh-issue-138800.VD8qbz.rst
+new file mode 100644
+index 00000000000..b04da2e2c68
+--- /dev/null
++++ b/Misc/NEWS.d/next/Build/2026-03-07-02-09-57.gh-issue-138800.VD8qbz.rst
+@@ -0,0 +1 @@
++fix LIBPYTHON substitution in python3.pc on Android
+diff --git a/configure b/configure
+index eca5f03cdcf..0fac5a47f46 100755
+--- a/configure
++++ b/configure
+@@ -27085,7 +27085,7 @@ LIBPYTHON=''
  # On Android and Cygwin the shared libraries must be linked with libpython.
  if test "$PY_ENABLE_SHARED" = "1" && ( test -n "$ANDROID_API_LEVEL" || test "$MACHDEP" = "cygwin"); then
    MODULE_DEPS_SHARED="$MODULE_DEPS_SHARED \$(LDLIBRARY)"
 -  LIBPYTHON="\$(BLDLIBRARY)"
-+  LIBPYTHON="$(BLDLIBRARY)"
++  LIBPYTHON="-lpython${VERSION}${ABIFLAGS}"
+ fi
+ 
+ # On iOS the shared libraries must be linked with the Python framework
+diff --git a/configure.ac b/configure.ac
+index c21024a1e77..8e7c741f3d3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -6488,7 +6488,7 @@ LIBPYTHON=''
+ # On Android and Cygwin the shared libraries must be linked with libpython.
+ if test "$PY_ENABLE_SHARED" = "1" && ( test -n "$ANDROID_API_LEVEL" || test "$MACHDEP" = "cygwin"); then
+   MODULE_DEPS_SHARED="$MODULE_DEPS_SHARED \$(LDLIBRARY)"
+-  LIBPYTHON="\$(BLDLIBRARY)"
++  LIBPYTHON="-lpython${VERSION}${ABIFLAGS}"
  fi
  
  # On iOS the shared libraries must be linked with the Python framework
