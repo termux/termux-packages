@@ -1,0 +1,52 @@
+The first two hunks of patch are applied directly to the pregenerated documentation files.
+This means it must be (re)created from the release tarballs if it needs to be regenerated!
+
+Modifying `src/nvim/eval.lua` and then recreating the documentation files with `make doc`
+would in principle be possible as part of the `termux_step_host_build()` function.
+However as of time of writing, March 6. 2026 (Neovim version 0.11.6) I have not been able
+to successfully produce modified docs for Neovim at build time.
+
+Please make sure to retain this header comment if you regenerating this patch.
+diff --git a/runtime/doc/vimfn.txt b/runtime/doc/vimfn.txt
+index 8f52e14..7c35094 100644
+--- a/runtime/doc/vimfn.txt
++++ b/runtime/doc/vimfn.txt
+@@ -4624,6 +4624,10 @@ has({feature})                                                           *has()*
+ 			win32		Windows system (32 or 64 bit).
+ 			win64		Windows system (64 bit).
+ 			wsl		WSL (Windows Subsystem for Linux) system.
++			android		Alias for has('termux')
++			termux		Termux environment (The *termux* and *android*
++					feature flags are {included additionally}
++					in Termux's Neovim package.)
+ 
+ 							*has-patch*
+ 		3.  Vim patch. For example the "patch123" feature means that
+diff --git a/runtime/lua/vim/_meta/vimfn.lua b/runtime/lua/vim/_meta/vimfn.lua
+index 1a13885..491a48b 100644
+--- a/runtime/lua/vim/_meta/vimfn.lua
++++ b/runtime/lua/vim/_meta/vimfn.lua
+@@ -4175,6 +4175,10 @@ function vim.fn.globpath(path, expr, nosuf, list, allinks) end
+ ---   win32    Windows system (32 or 64 bit).
+ ---   win64    Windows system (64 bit).
+ ---   wsl    WSL (Windows Subsystem for Linux) system.
++---   android    Alias for has('termux')
++---   termux    Termux environment (The *termux* and *android*
++---             feature flags are {included additionally}
++---             in Termux's Neovim package.)
+ ---
+ ---           *has-patch*
+ --- 3.  Vim patch. For example the "patch123" feature means that
+diff --git a/src/nvim/eval/funcs.c b/src/nvim/eval/funcs.c
+index 752b367..349b7c3 100644
+--- a/src/nvim/eval/funcs.c
++++ b/src/nvim/eval/funcs.c
+@@ -3087,6 +3087,8 @@ static void f_has(typval_T *argvars, typval_T *rettv, EvalFuncData fptr)
+ #ifdef _WIN64
+     "win64",
+ #endif
++    "android",
++    "termux",
+ #ifndef CASE_INSENSITIVE_FILENAME
+     "fname_case",
+ #endif
