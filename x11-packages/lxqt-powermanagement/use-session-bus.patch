@@ -1,0 +1,55 @@
+--- a/src/PowerProfiles.cpp
++++ b/src/PowerProfiles.cpp
+@@ -59,7 +59,7 @@
+     PowerProfiles::PowerProfiles(QObject * parent/* = nullptr*/)
+         : QObject{parent}
+         , mThread{new QThread}
+-        , mPropGetter{new DBusPropAsyncGetter{msDBusPPService, msDBusPPPath, msDBusPPInterface, QDBusConnection::systemBus()}}
++        , mPropGetter{new DBusPropAsyncGetter{msDBusPPService, msDBusPPPath, msDBusPPInterface, QDBusConnection::sessionBus()}}
+         , mMenuAction{new QAction}
+         , mMenu{new QMenu}
+ 
+--- a/src/lid.cpp
++++ b/src/lid.cpp
+@@ -39,14 +39,14 @@
+     mUPowerInterface = new QDBusInterface(QL1S("org.freedesktop.UPower"),
+                                           QL1S("/org/freedesktop/UPower"),
+                                           QL1S("org.freedesktop.UPower"),
+-                                          QDBusConnection::systemBus(), this);
++                                          QDBusConnection::sessionBus(), this);
+ 
+     mUPowerPropertiesInterface = new QDBusInterface(QL1S("org.freedesktop.UPower"),
+                                                     QL1S("/org/freedesktop/UPower"),
+                                                     QL1S("org.freedesktop.DBus.Properties"),
+-                                                    QDBusConnection::systemBus(), this);
++                                                    QDBusConnection::sessionBus(), this);
+ 
+-    if (!QDBusConnection::systemBus().connect(QL1S("org.freedesktop.UPower"),
++    if (!QDBusConnection::sessionBus().connect(QL1S("org.freedesktop.UPower"),
+                                         QL1S("/org/freedesktop/UPower"),
+                                         QL1S("org.freedesktop.DBus.Properties"),
+                                         QL1S("PropertiesChanged"),
+
+--- a/src/lidwatcher.cpp
++++ b/src/lidwatcher.cpp
+@@ -114,7 +114,7 @@
+     QDBusInterface manager(QSL("org.freedesktop.login1"),
+                            QSL("/org/freedesktop/login1"),
+                            QSL("org.freedesktop.login1.Manager"),
+-                           QDBusConnection::systemBus(), this);
++                           QDBusConnection::sessionBus(), this);
+     QDBusReply<QDBusUnixFileDescriptor> reply = manager.call(QSL("Inhibit"), QSL("handle-lid-switch"), QSL("lxqt-powermanagment"), QSL("LidWatcher is in da house!"), QSL("block"));
+     if (reply.isValid())
+     {
+
+--- a/src/powerbutton.cpp
++++ b/src/powerbutton.cpp
+@@ -45,7 +45,7 @@
+     QDBusInterface manager(QSL("org.freedesktop.login1"),
+                            QSL("/org/freedesktop/login1"),
+                            QSL("org.freedesktop.login1.Manager"),
+-                           QDBusConnection::systemBus(), this);
++                           QDBusConnection::sessionBus(), this);
+ 
+ 
+     // QString powerKeyAction = mLogindInterface->property("HandlePowerKey").toString();
