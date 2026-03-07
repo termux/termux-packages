@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Converts between different systems of units"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.26"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/units/units-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4c43f7a49fe2212ee433d3c0755a0a1935db35497c4a56bf9f68c5f718873c54
 TERMUX_PKG_DEPENDS="readline, libandroid-support"
