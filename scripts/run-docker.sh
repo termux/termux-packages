@@ -16,15 +16,15 @@ _detect_runtime() {
 	if [ -n "${TERMUX_CONTAINER_RUNTIME:-}" ]; then
 		case "$TERMUX_CONTAINER_RUNTIME" in
 			docker|podman) echo "$TERMUX_CONTAINER_RUNTIME"; return;;
-			*) echo "Error: TERMUX_CONTAINER_RUNTIME must be 'docker' or 'podman'" 1>&2; exit 1;;
+			*) echo "Error: TERMUX_CONTAINER_RUNTIME must be 'docker' or 'podman'" >&2; exit 1;;
 		esac
 	fi
-	if command -v docker >/dev/null 2>&1; then
+	if command -v docker &>/dev/null; then
 		echo "docker"
-	elif command -v podman >/dev/null 2>&1; then
+	elif command -v podman &>/dev/null; then
 		echo "podman"
 	else
-		echo "Error: Neither docker nor podman found in PATH" 1>&2
+		echo "Error: Neither docker nor podman found in PATH" >&2
 		exit 1
 	fi
 }
@@ -34,12 +34,12 @@ _detect_runtime() {
 _detect_sudo() {
 	if [ "$(id -u)" = "0" ]; then
 		echo ""
-	elif command -v sudo >/dev/null 2>&1; then
+	elif command -v sudo &>/dev/null; then
 		echo "sudo"
-	elif command -v doas >/dev/null 2>&1; then
+	elif command -v doas &>/dev/null; then
 		echo "doas"
 	else
-		echo "Error: This script must be run as root or with sudo/doas available in PATH" 1>&2
+		echo "Error: This script must be run as root or with sudo/doas available in PATH" >&2
 		exit 1
 	fi
 }
@@ -100,7 +100,7 @@ while (( $# != 0 )); do
 			TERMUX_DOCKER_RUN_EXTRA_ARGS="--volume /data:/data --volume $HOME/.termux-build:$CONTAINER_HOME_DIR/.termux-build $TERMUX_DOCKER_RUN_EXTRA_ARGS"
 			shift 1;;
 		--) shift 1; break;;
-		-*) echo "Error: Unknown option '$1'" 1>&2; shift 1; exit 1;;
+		-*) echo "Error: Unknown option '$1'" >&2; shift 1; exit 1;;
 		*) break;;
 	esac
 done
@@ -117,7 +117,7 @@ if [ "${dry_run}" = "true" ]; then
 			RETURN_VALUE=0
 			OUTPUT="$("$TERMUX_SCRIPTDIR/scripts/bin/build-package-dry-run-simulation.sh" "$@" 2>&1)" || RETURN_VALUE=$?
 			if [ $RETURN_VALUE -ne 0 ]; then
-				echo "$OUTPUT" 1>&2
+				echo "$OUTPUT" >&2
 				if [ $RETURN_VALUE -eq 85 ]; then # EX_C__NOOP
 					echo "$0: Exiting since '$BUILDSCRIPT_NAME' would not have built any packages"
 					exit 0
@@ -148,7 +148,7 @@ elif [ "$RUNTIME" = "docker" ]; then
 		SEC_OPT=" --security-opt seccomp=$REPOROOT/scripts/profile.json --security-opt apparmor=_custom-termux-package-builder-$CONTAINER_NAME --cap-add CAP_SYS_ADMIN --device /dev/fuse"
 	fi
 else
-	echo "Error: Unsupported runtime '$RUNTIME'" 1>&2
+	echo "Error: Unsupported runtime '$RUNTIME'" >&2
 	exit 1
 fi
 
@@ -168,10 +168,10 @@ else
 fi
 
 USER=builder
-REAL_SUDO=$(_detect_sudo) || exit 1
+SUDO_CMD=$(_detect_sudo) || exit 1
 
 if [ -n "${TERMUX_DOCKER_USE_SUDO-}" ]; then
-	SUDO=$REAL_SUDO
+	SUDO=$SUDO_CMD
 else
 	SUDO=""
 fi
@@ -206,7 +206,7 @@ if [ "$RUNTIME" = "docker" ]; then
 			if [ -n "$msg" ]; then
 				echo "$msg..."
 			fi
-			cat "$profile_path" | sed -e "s/{{CONTAINER_NAME}}/$CONTAINER_NAME/g" | $REAL_SUDO "$APPARMOR_PARSER" -rK
+			cat "$profile_path" | sed -e "s/{{CONTAINER_NAME}}/$CONTAINER_NAME/g" | $SUDO_CMD "$APPARMOR_PARSER" -rK
 		fi
 	}
 
@@ -249,7 +249,7 @@ __change_container_pid_max() {
 	fi
 }
 
-if ! $SUDO $RUNTIME container inspect $CONTAINER_NAME > /dev/null 2>&1; then
+if ! $SUDO $RUNTIME container inspect $CONTAINER_NAME &>/dev/null; then
 	echo "Creating new container..."
 	if [ "$RUNTIME" = "podman" ]; then
 		# In rootless Podman the default user-namespace mapping is:
@@ -275,7 +275,7 @@ if ! $SUDO $RUNTIME container inspect $CONTAINER_NAME > /dev/null 2>&1; then
 			--tty \
 			$TERMUX_DOCKER_RUN_EXTRA_ARGS \
 			$TERMUX_BUILDER_IMAGE_NAME
-	else
+	elif [ "$RUNTIME" = "docker" ]; then
 		$SUDO $RUNTIME run \
 			--detach \
 			--init \
@@ -286,12 +286,15 @@ if ! $SUDO $RUNTIME container inspect $CONTAINER_NAME > /dev/null 2>&1; then
 			$TERMUX_DOCKER_RUN_EXTRA_ARGS \
 			$TERMUX_BUILDER_IMAGE_NAME
 		__change_builder_uid_gid
+	else
+		echo "Error: Unsupported runtime '$RUNTIME'" >&2
+		exit 1
 	fi
 	__change_container_pid_max
 fi
 
 if [[ "$($SUDO $RUNTIME container inspect -f '{{ .State.Running }}' $CONTAINER_NAME)" == "false" ]]; then
-	$SUDO $RUNTIME start $CONTAINER_NAME >/dev/null 2>&1
+	$SUDO $RUNTIME start $CONTAINER_NAME &>/dev/null
 	__change_container_pid_max
 fi
 
@@ -317,11 +320,14 @@ if [ "$RUNTIME" = "podman" ]; then
 		$TERMUX_DOCKER_EXEC_EXTRA_ARGS \
 		$CONTAINER_NAME \
 		"$@"
-else
+elif [ "$RUNTIME" = "docker" ]; then
 	$SUDO $RUNTIME exec $CI_OPT \
 		--env "DOCKER_EXEC_PID_FILE_PATH=$DOCKER_EXEC_PID_FILE_PATH" \
 		--interactive $DOCKER_TTY \
 		$TERMUX_DOCKER_EXEC_EXTRA_ARGS \
 		$CONTAINER_NAME \
 		"$@"
+else
+	echo "Error: Unsupported runtime '$RUNTIME'" >&2
+	exit 1
 fi
