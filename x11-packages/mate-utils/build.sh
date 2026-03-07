@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Common MATE utilities for viewing disk usage, logs and f
 TERMUX_PKG_LICENSE="GPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.28.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/mate-desktop/mate-utils/releases/download/v$TERMUX_PKG_VERSION/mate-utils-$TERMUX_PKG_VERSION.tar.xz"
 TERMUX_PKG_SHA256=58449d7a0d1d900ff03b78ca9f7e98c21e97f47fc26bee7ff1c61834f22f88d3
 TERMUX_PKG_AUTO_UPDATE=true

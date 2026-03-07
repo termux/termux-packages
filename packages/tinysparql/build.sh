@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Desktop-neutral metadata-based search framework"
 TERMUX_PKG_LICENSE="LGPL-2.1-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.10.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/GNOME/tinysparql/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=37a987a4b59dd20b671eb21791a8d37d3c6d1172906f70edcee7889547986956
 TERMUX_PKG_DEPENDS="libicu, dbus, pygobject, python, json-glib, libxml2, sqlite"
