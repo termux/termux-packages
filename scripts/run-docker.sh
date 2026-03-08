@@ -38,6 +38,8 @@ _detect_sudo() {
 		echo "sudo"
 	elif command -v doas &>/dev/null; then
 		echo "doas"
+	elif command -v run0 &>/dev/null; then
+		echo "run0"
 	else
 		echo "Error: This script must be run as root or with sudo/doas available in PATH" >&2
 		exit 1
