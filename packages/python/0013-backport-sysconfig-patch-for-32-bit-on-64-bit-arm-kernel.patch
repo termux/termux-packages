@@ -1,0 +1,59 @@
+This is yet to receive any comments/reviews from core Python developers
+at the time of backport, but let's do this cause we need this.
+
+Patch source: https://github.com/python/cpython/pull/145617
+From 1b7a79208bc9d2f80373a2e0b9d018b4bc3fae66 Mon Sep 17 00:00:00 2001
+From: Robert Kirkman <rkirkman@termux.dev>
+Date: Fri, 6 Mar 2026 20:32:05 -0600
+Subject: [PATCH 1/2] gh-145616: Detect Android sysconfig ABI correctly on
+ 32-bit ARM Android on 64-bit ARM kernel
+
+- When Python is running on 32-bit ARM Android on a 64-bit ARM kernel, `os.uname().machine` is `armv8l`. Such devices run the same userspace code as `armv7l` devices, so apply the same `armeabi_v7a` Android ABI to them, which works.
+
+- Issue: https://github.com/python/cpython/issues/145616
+---
+ Lib/sysconfig/__init__.py | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/Lib/sysconfig/__init__.py b/Lib/sysconfig/__init__.py
+index 8ff9c99435bb1a..de3cea07b4f645 100644
+--- a/Lib/sysconfig/__init__.py
++++ b/Lib/sysconfig/__init__.py
+@@ -696,11 +696,15 @@ def get_platform():
+         release = get_config_var("ANDROID_API_LEVEL")
+ 
+         # Wheel tags use the ABI names from Android's own tools.
++        # When Python is running on 32-bit ARM Android on a 64-bit ARM kernel,
++        # 'os.uname().machine' is 'armv8l'. Such devices run the same userspace
++        # code as 'armv7l' devices.
+         machine = {
+             "x86_64": "x86_64",
+             "i686": "x86",
+             "aarch64": "arm64_v8a",
+             "armv7l": "armeabi_v7a",
++            "armv8l": "armeabi_v7a",
+         }[machine]
+     elif osname == "linux":
+         # At least on Linux/Intel, 'machine' is the processor --
+
+From eb6936691cfc0a1aa5cbc726dbce82d219434768 Mon Sep 17 00:00:00 2001
+From: "blurb-it[bot]" <43283697+blurb-it[bot]@users.noreply.github.com>
+Date: Sat, 7 Mar 2026 02:44:53 +0000
+Subject: [PATCH 2/2] =?UTF-8?q?=F0=9F=93=9C=F0=9F=A4=96=20Added=20by=20blu?=
+ =?UTF-8?q?rb=5Fit.?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../next/Library/2026-03-07-02-44-52.gh-issue-145616.x8Mf23.rst  | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 Misc/NEWS.d/next/Library/2026-03-07-02-44-52.gh-issue-145616.x8Mf23.rst
+
+diff --git a/Misc/NEWS.d/next/Library/2026-03-07-02-44-52.gh-issue-145616.x8Mf23.rst b/Misc/NEWS.d/next/Library/2026-03-07-02-44-52.gh-issue-145616.x8Mf23.rst
+new file mode 100644
+index 00000000000000..131570a0e03daa
+--- /dev/null
++++ b/Misc/NEWS.d/next/Library/2026-03-07-02-44-52.gh-issue-145616.x8Mf23.rst
+@@ -0,0 +1 @@
++Detect Android sysconfig ABI correctly on 32-bit ARM Android on 64-bit ARM kernel
