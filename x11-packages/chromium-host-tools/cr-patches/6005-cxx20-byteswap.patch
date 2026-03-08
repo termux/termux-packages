@@ -1,0 +1,554 @@
+This reverts the following commit(s).
+
+https://github.com/chromium/chromium/commit/5869e7145d6e89fe0bcdb699161bdf5a105ab79c
+
+diff --git a/base/numerics/basic_ops_impl.h b/base/numerics/basic_ops_impl.h
+index aee6a401d4..f0937d2768 100644
+--- a/base/numerics/basic_ops_impl.h
++++ b/base/numerics/basic_ops_impl.h
+@@ -29,6 +29,75 @@ using MathType = std::conditional_t<
+     T,
+     std::conditional_t<std::is_signed_v<T>, int, unsigned int>>;
+ 
++// Reverses the byte order of the integer.
++template <class T>
++  requires(std::is_unsigned_v<T> && std::is_integral_v<T>)
++inline constexpr T SwapBytes(T value) {
++  // MSVC intrinsics are not constexpr, so we provide our own constexpr
++  // implementation. We provide it unconditionally so we can test it on all
++  // platforms for correctness.
++  if (std::is_constant_evaluated()) {
++    if constexpr (sizeof(T) == 1u) {
++      return value;
++    } else if constexpr (sizeof(T) == 2u) {
++      MathType<T> a = (MathType<T>(value) >> 0) & MathType<T>{0xff};
++      MathType<T> b = (MathType<T>(value) >> 8) & MathType<T>{0xff};
++      return static_cast<T>((a << 8) | (b << 0));
++    } else if constexpr (sizeof(T) == 4u) {
++      T a = (value >> 0) & T{0xff};
++      T b = (value >> 8) & T{0xff};
++      T c = (value >> 16) & T{0xff};
++      T d = (value >> 24) & T{0xff};
++      return (a << 24) | (b << 16) | (c << 8) | (d << 0);
++    } else {
++      static_assert(sizeof(T) == 8u);
++      T a = (value >> 0) & T{0xff};
++      T b = (value >> 8) & T{0xff};
++      T c = (value >> 16) & T{0xff};
++      T d = (value >> 24) & T{0xff};
++      T e = (value >> 32) & T{0xff};
++      T f = (value >> 40) & T{0xff};
++      T g = (value >> 48) & T{0xff};
++      T h = (value >> 56) & T{0xff};
++      return (a << 56) | (b << 48) | (c << 40) | (d << 32) |  //
++             (e << 24) | (f << 16) | (g << 8) | (h << 0);
++    }
++  }
++
++#if _MSC_VER
++  if constexpr (sizeof(T) == 1u) {
++    return value;
++  } else if constexpr (sizeof(T) == sizeof(unsigned short)) {
++    using U = unsigned short;
++    return _byteswap_ushort(U{value});
++  } else if constexpr (sizeof(T) == sizeof(unsigned long)) {
++    using U = unsigned long;
++    return _byteswap_ulong(U{value});
++  } else {
++    static_assert(sizeof(T) == 8u);
++    return _byteswap_uint64(value);
++  }
++#else
++  if constexpr (sizeof(T) == 1u) {
++    return value;
++  } else if constexpr (sizeof(T) == 2u) {
++    return __builtin_bswap16(uint16_t{value});
++  } else if constexpr (sizeof(T) == 4u) {
++    return __builtin_bswap32(value);
++  } else {
++    static_assert(sizeof(T) == 8u);
++    return __builtin_bswap64(value);
++  }
++#endif
++}
++
++// Signed values are byte-swapped as unsigned values.
++template <class T>
++  requires(std::is_signed_v<T> && std::is_integral_v<T>)
++inline constexpr T SwapBytes(T value) {
++  return static_cast<T>(SwapBytes(static_cast<std::make_unsigned_t<T>>(value)));
++}
++
+ // Converts from a byte array to an integer.
+ template <class T>
+   requires(std::is_unsigned_v<T> && std::is_integral_v<T>)
+diff --git a/base/numerics/byte_conversions.h b/base/numerics/byte_conversions.h
+index 2b7898e146..b66f022b13 100644
+--- a/base/numerics/byte_conversions.h
++++ b/base/numerics/byte_conversions.h
+@@ -19,6 +19,14 @@ static_assert(std::endian::native == std::endian::little);
+ 
+ namespace base {
+ 
++// Returns a value with all bytes in |x| swapped, i.e. reverses the endianness.
++// TODO(pkasting): Once C++23 is available, replace with std::byteswap.
++template <class T>
++  requires(std::is_integral_v<T>)
++[[nodiscard]] inline constexpr T ByteSwap(T value) {
++  return numerics_internal::SwapBytes(value);
++}
++
+ // Returns a uint8_t with the value in `bytes` interpreted as the native endian
+ // encoding of the integer for the machine.
+ //
+@@ -288,7 +296,7 @@ inline constexpr uint8_t U8FromBigEndian(std::span<const uint8_t, 1u> bytes) {
+ // that were always in memory, such as when stored in shared-memory (or through
+ // IPC) as a byte buffer.
+ inline constexpr uint16_t U16FromBigEndian(std::span<const uint8_t, 2u> bytes) {
+-  return std::byteswap(numerics_internal::FromLittleEndian<uint16_t>(bytes));
++  return ByteSwap(numerics_internal::FromLittleEndian<uint16_t>(bytes));
+ }
+ // Returns a uint32_t with the value in `bytes` interpreted as a big-endian
+ // encoding of the integer.
+@@ -298,7 +306,7 @@ inline constexpr uint16_t U16FromBigEndian(std::span<const uint8_t, 2u> bytes) {
+ // that were always in memory, such as when stored in shared-memory (or through
+ // IPC) as a byte buffer.
+ inline constexpr uint32_t U32FromBigEndian(std::span<const uint8_t, 4u> bytes) {
+-  return std::byteswap(numerics_internal::FromLittleEndian<uint32_t>(bytes));
++  return ByteSwap(numerics_internal::FromLittleEndian<uint32_t>(bytes));
+ }
+ // Returns a uint64_t with the value in `bytes` interpreted as a big-endian
+ // encoding of the integer.
+@@ -308,7 +316,7 @@ inline constexpr uint32_t U32FromBigEndian(std::span<const uint8_t, 4u> bytes) {
+ // that were always in memory, such as when stored in shared-memory (or through
+ // IPC) as a byte buffer.
+ inline constexpr uint64_t U64FromBigEndian(std::span<const uint8_t, 8u> bytes) {
+-  return std::byteswap(numerics_internal::FromLittleEndian<uint64_t>(bytes));
++  return ByteSwap(numerics_internal::FromLittleEndian<uint64_t>(bytes));
+ }
+ // Returns a int8_t with the value in `bytes` interpreted as a big-endian
+ // encoding of the integer.
+@@ -332,7 +340,7 @@ inline constexpr int8_t I8FromBigEndian(std::span<const uint8_t, 1u> bytes) {
+ // that were always in memory, such as when stored in shared-memory (or through
+ // IPC) as a byte buffer.
+ inline constexpr int16_t I16FromBigEndian(std::span<const uint8_t, 2u> bytes) {
+-  return std::byteswap(numerics_internal::FromLittleEndian<int16_t>(bytes));
++  return ByteSwap(numerics_internal::FromLittleEndian<int16_t>(bytes));
+ }
+ // Returns a int32_t with the value in `bytes` interpreted as a big-endian
+ // encoding of the integer.
+@@ -342,7 +350,7 @@ inline constexpr int16_t I16FromBigEndian(std::span<const uint8_t, 2u> bytes) {
+ // that were always in memory, such as when stored in shared-memory (or through
+ // IPC) as a byte buffer.
+ inline constexpr int32_t I32FromBigEndian(std::span<const uint8_t, 4u> bytes) {
+-  return std::byteswap(numerics_internal::FromLittleEndian<int32_t>(bytes));
++  return ByteSwap(numerics_internal::FromLittleEndian<int32_t>(bytes));
+ }
+ // Returns a int64_t with the value in `bytes` interpreted as a big-endian
+ // encoding of the integer.
+@@ -352,7 +360,7 @@ inline constexpr int32_t I32FromBigEndian(std::span<const uint8_t, 4u> bytes) {
+ // that were always in memory, such as when stored in shared-memory (or through
+ // IPC) as a byte buffer.
+ inline constexpr int64_t I64FromBigEndian(std::span<const uint8_t, 8u> bytes) {
+-  return std::byteswap(numerics_internal::FromLittleEndian<int64_t>(bytes));
++  return ByteSwap(numerics_internal::FromLittleEndian<int64_t>(bytes));
+ }
+ // Returns a float with the value in `bytes` interpreted as a big-endian
+ // encoding of the integer.
+@@ -608,7 +616,7 @@ inline constexpr std::array<uint8_t, 1u> U8ToBigEndian(uint8_t val) {
+ // IPC) as a byte buffer. Use the little-endian encoding for storing and reading
+ // from storage.
+ inline constexpr std::array<uint8_t, 2u> U16ToBigEndian(uint16_t val) {
+-  return numerics_internal::ToLittleEndian(std::byteswap(val));
++  return numerics_internal::ToLittleEndian(ByteSwap(val));
+ }
+ // Returns a byte array holding the value of a uint32_t encoded as the
+ // big-endian encoding of the integer.
+@@ -619,7 +627,7 @@ inline constexpr std::array<uint8_t, 2u> U16ToBigEndian(uint16_t val) {
+ // IPC) as a byte buffer. Use the little-endian encoding for storing and reading
+ // from storage.
+ inline constexpr std::array<uint8_t, 4u> U32ToBigEndian(uint32_t val) {
+-  return numerics_internal::ToLittleEndian(std::byteswap(val));
++  return numerics_internal::ToLittleEndian(ByteSwap(val));
+ }
+ // Returns a byte array holding the value of a uint64_t encoded as the
+ // big-endian encoding of the integer.
+@@ -630,7 +638,7 @@ inline constexpr std::array<uint8_t, 4u> U32ToBigEndian(uint32_t val) {
+ // IPC) as a byte buffer. Use the little-endian encoding for storing and reading
+ // from storage.
+ inline constexpr std::array<uint8_t, 8u> U64ToBigEndian(uint64_t val) {
+-  return numerics_internal::ToLittleEndian(std::byteswap(val));
++  return numerics_internal::ToLittleEndian(ByteSwap(val));
+ }
+ // Returns a byte array holding the value of a int8_t encoded as the big-endian
+ // encoding of the integer.
+@@ -652,7 +660,7 @@ inline constexpr std::array<uint8_t, 1u> I8ToBigEndian(int8_t val) {
+ // IPC) as a byte buffer. Use the little-endian encoding for storing and reading
+ // from storage.
+ inline constexpr std::array<uint8_t, 2u> I16ToBigEndian(int16_t val) {
+-  return numerics_internal::ToLittleEndian(std::byteswap(val));
++  return numerics_internal::ToLittleEndian(ByteSwap(val));
+ }
+ // Returns a byte array holding the value of a int32_t encoded as the
+ // big-endian encoding of the integer.
+@@ -663,7 +671,7 @@ inline constexpr std::array<uint8_t, 2u> I16ToBigEndian(int16_t val) {
+ // IPC) as a byte buffer. Use the little-endian encoding for storing and reading
+ // from storage.
+ inline constexpr std::array<uint8_t, 4u> I32ToBigEndian(int32_t val) {
+-  return numerics_internal::ToLittleEndian(std::byteswap(val));
++  return numerics_internal::ToLittleEndian(ByteSwap(val));
+ }
+ // Returns a byte array holding the value of a int64_t encoded as the
+ // big-endian encoding of the integer.
+@@ -674,7 +682,7 @@ inline constexpr std::array<uint8_t, 4u> I32ToBigEndian(int32_t val) {
+ // IPC) as a byte buffer. Use the little-endian encoding for storing and reading
+ // from storage.
+ inline constexpr std::array<uint8_t, 8u> I64ToBigEndian(int64_t val) {
+-  return numerics_internal::ToLittleEndian(std::byteswap(val));
++  return numerics_internal::ToLittleEndian(ByteSwap(val));
+ }
+ // Returns a byte array holding the value of a float encoded as the big-endian
+ // encoding of the number.
+@@ -686,7 +694,7 @@ inline constexpr std::array<uint8_t, 8u> I64ToBigEndian(int64_t val) {
+ // from storage.
+ inline constexpr std::array<uint8_t, 4u> FloatToBigEndian(float val) {
+   return numerics_internal::ToLittleEndian(
+-      std::byteswap(std::bit_cast<uint32_t>(val)));
++      ByteSwap(std::bit_cast<uint32_t>(val)));
+ }
+ // Returns a byte array holding the value of a double encoded as the big-endian
+ // encoding of the number.
+@@ -698,7 +706,7 @@ inline constexpr std::array<uint8_t, 4u> FloatToBigEndian(float val) {
+ // from storage.
+ inline constexpr std::array<uint8_t, 8u> DoubleToBigEndian(double val) {
+   return numerics_internal::ToLittleEndian(
+-      std::byteswap(std::bit_cast<uint64_t>(val)));
++      ByteSwap(std::bit_cast<uint64_t>(val)));
+ }
+ 
+ }  // namespace base
+diff --git a/base/sys_byteorder.h b/base/sys_byteorder.h
+index 9196171e4c..86a89aa622 100644
+--- a/base/sys_byteorder.h
++++ b/base/sys_byteorder.h
+@@ -2,8 +2,9 @@
+ // Use of this source code is governed by a BSD-style license that can be
+ // found in the LICENSE file.
+ 
+-// This header defines cross-platform NetToHostXX() / HostToNextXX() functions
+-// equivalent to the traditional ntohX() and htonX() functions.
++// This header defines cross-platform ByteSwap() implementations for 16, 32 and
++// 64-bit values, and NetToHostXX() / HostToNextXX() functions equivalent to
++// the traditional ntohX() and htonX() functions.
+ // Use the functions defined here rather than using the platform-specific
+ // functions directly.
+ 
+@@ -12,8 +13,7 @@
+ 
+ #include <stdint.h>
+ 
+-#include <bit>
+-
++#include "base/numerics/byte_conversions.h"
+ #include "build/build_config.h"
+ 
+ #if defined(COMPILER_MSVC)
+@@ -26,21 +26,21 @@ namespace base {
+ // returns the result.
+ inline constexpr uint16_t NetToHost16(uint16_t x) {
+ #if defined(ARCH_CPU_LITTLE_ENDIAN)
+-  return std::byteswap(x);
++  return ByteSwap(x);
+ #else
+   return x;
+ #endif
+ }
+ inline constexpr uint32_t NetToHost32(uint32_t x) {
+ #if defined(ARCH_CPU_LITTLE_ENDIAN)
+-  return std::byteswap(x);
++  return ByteSwap(x);
+ #else
+   return x;
+ #endif
+ }
+ inline constexpr uint64_t NetToHost64(uint64_t x) {
+ #if defined(ARCH_CPU_LITTLE_ENDIAN)
+-  return std::byteswap(x);
++  return ByteSwap(x);
+ #else
+   return x;
+ #endif
+@@ -50,21 +50,21 @@ inline constexpr uint64_t NetToHost64(uint64_t x) {
+ // returns the result.
+ inline constexpr uint16_t HostToNet16(uint16_t x) {
+ #if defined(ARCH_CPU_LITTLE_ENDIAN)
+-  return std::byteswap(x);
++  return ByteSwap(x);
+ #else
+   return x;
+ #endif
+ }
+ inline constexpr uint32_t HostToNet32(uint32_t x) {
+ #if defined(ARCH_CPU_LITTLE_ENDIAN)
+-  return std::byteswap(x);
++  return ByteSwap(x);
+ #else
+   return x;
+ #endif
+ }
+ inline constexpr uint64_t HostToNet64(uint64_t x) {
+ #if defined(ARCH_CPU_LITTLE_ENDIAN)
+-  return std::byteswap(x);
++  return ByteSwap(x);
+ #else
+   return x;
+ #endif
+diff --git a/content/child/font_warmup_win.cc b/content/child/font_warmup_win.cc
+index 5b17346712..b01fc8b2c6 100644
+--- a/content/child/font_warmup_win.cc
++++ b/content/child/font_warmup_win.cc
+@@ -7,7 +7,6 @@
+ #include <dwrite.h>
+ #include <stdint.h>
+ 
+-#include <bit>
+ #include <map>
+ #include <string>
+ #include <utility>
+@@ -292,7 +291,7 @@ DWORD WINAPI GetFontDataPatch(HDC dc_handle,
+   // the correct answer for emulating GDI. |table_tag| must also have its
+   // byte order swapped to counter the swap which occurs in the called method.
+   size_t length =
+-      typeface->getTableData(std::byteswap(uint32_t{table_tag}), table_offset,
++      typeface->getTableData(base::ByteSwap(uint32_t{table_tag}), table_offset,
+                              buffer ? buffer_length : INT32_MAX, buffer);
+   // We can't distinguish between an empty table and an error.
+   if (length == 0)
+diff --git a/media/formats/webm/webm_cluster_parser.cc b/media/formats/webm/webm_cluster_parser.cc
+index 98074f209f..7634ba06a9 100644
+--- a/media/formats/webm/webm_cluster_parser.cc
++++ b/media/formats/webm/webm_cluster_parser.cc
+@@ -4,7 +4,6 @@
+ 
+ #include "media/formats/webm/webm_cluster_parser.h"
+ 
+-#include <bit>
+ #include <memory>
+ #include <utility>
+ #include <vector>
+@@ -365,7 +364,7 @@ bool WebMClusterParser::OnBinary(int id, const uint8_t* data_ptr, int size) {
+       return true;
+ 
+     case kWebMIdBlockAdditional: {
+-      uint64_t block_add_id = std::byteswap(block_add_id_);
++      uint64_t block_add_id = base::ByteSwap(block_add_id_);
+       if (block_additional_data_) {
+         // TODO(vigneshv): Technically, more than 1 BlockAdditional is allowed
+         // as per matroska spec. But for now we don't have a use case to
+diff --git a/media/renderers/paint_canvas_video_renderer_unittest.cc b/media/renderers/paint_canvas_video_renderer_unittest.cc
+index a5e2e01440..4fabc192d2 100644
+--- a/media/renderers/paint_canvas_video_renderer_unittest.cc
++++ b/media/renderers/paint_canvas_video_renderer_unittest.cc
+@@ -13,7 +13,6 @@
+ #include <stdint.h>
+ 
+ #include <array>
+-#include <bit>
+ 
+ #include "base/containers/heap_array.h"
+ #include "base/containers/span.h"
+@@ -516,7 +515,7 @@ uint32_t MaybeConvertABGRToARGB(uint32_t abgr) {
+     SK_A32_SHIFT == 24
+   return abgr;
+ #else
+-  return (std::byteswap(abgr & 0x00FFFFFF) >> 8) | (abgr & 0xFF000000);
++  return (base::ByteSwap(abgr & 0x00FFFFFF) >> 8) | (abgr & 0xFF000000);
+ #endif
+ }
+ 
+diff --git a/styleguide/c++/c++-features.md b/styleguide/c++/c++-features.md
+index 9a0706d4f1..75c304b80a 100644
+--- a/styleguide/c++/c++-features.md
++++ b/styleguide/c++/c++-features.md
+@@ -1781,22 +1781,6 @@ if (str.contains("foo")) ...
+ [Discussion thread](https://groups.google.com/a/chromium.org/g/cxx/c/2RuNgRdeeYg)
+ ***
+ 
+-### std::byteswap <sup>[allowed]</sup>
+-
+-```c++
+-auto x = std::byteswap(y);
+-```
+-
+-**Description:** Reverses the bytes of an integer.
+-
+-**Documentation:**
+-[std::byteswap](https://en.cppreference.com/w/cpp/numeric/byteswap)
+-
+-**Notes:**
+-*** promo
+-[Discussion thread](https://groups.google.com/a/chromium.org/g/cxx/c/U2zUF-xOj6A/m/ZiRRZdr7AwAJ)
+-***
+-
+ ### std::to_underlying <sup>[allowed]</sup>
+ 
+ ```c++
+@@ -2221,6 +2205,22 @@ std::move_only_function<void()> f = [x = std::make_unique<int>(1)] {};
+ Overlaps with `base::OnceCallback`.
+ ***
+ 
++### std::byteswap <sup>[tbd]</sup>
++
++```c++
++auto x = std::byteswap(y);
++```
++
++**Description:** Reverses the bytes of an integer.
++
++**Documentation:**
++[std::byteswap](https://en.cppreference.com/w/cpp/numeric/byteswap)
++
++**Notes:**
++*** promo
++Overlaps with `base::ByteSwap`.
++***
++
+ ### std::unreachable <sup>[tbd]</sup>
+ 
+ ```c++
+diff --git a/third_party/blink/renderer/bindings/core/v8/serialization/trailer_reader.cc b/third_party/blink/renderer/bindings/core/v8/serialization/trailer_reader.cc
+index 81a6ef3c69..4b46c93947 100644
+--- a/third_party/blink/renderer/bindings/core/v8/serialization/trailer_reader.cc
++++ b/third_party/blink/renderer/bindings/core/v8/serialization/trailer_reader.cc
+@@ -5,7 +5,6 @@
+ #include "third_party/blink/renderer/bindings/core/v8/serialization/trailer_reader.h"
+ 
+ #include <algorithm>
+-#include <bit>
+ 
+ #include "base/numerics/byte_conversions.h"
+ #include "base/numerics/clamped_math.h"
+@@ -105,11 +104,10 @@ base::expected<void, TrailerReader::Error> TrailerReader::Read() {
+       return base::unexpected(Error::kInvalidTrailer);
+ 
+     uint32_t num_exposed = 0;
+-    if (auto num_exposed_raw = iterator_.CopyObject<uint32_t>()) {
+-      num_exposed = std::byteswap(*num_exposed_raw);  // Big-endian.
+-    } else {
++    if (auto num_exposed_raw = iterator_.CopyObject<uint32_t>())
++      num_exposed = base::ByteSwap(*num_exposed_raw);  // Big-endian.
++    else
+       return base::unexpected(Error::kInvalidTrailer);
+-    }
+ 
+     auto exposed_raw = iterator_.Span<uint8_t>(num_exposed);
+     if (exposed_raw.size() != num_exposed)
+diff --git a/third_party/blink/renderer/platform/fonts/opentype/open_type_types.h b/third_party/blink/renderer/platform/fonts/opentype/open_type_types.h
+index 76c6948106..3e766e1bb4 100644
+--- a/third_party/blink/renderer/platform/fonts/opentype/open_type_types.h
++++ b/third_party/blink/renderer/platform/fonts/opentype/open_type_types.h
+@@ -25,8 +25,6 @@
+ #ifndef THIRD_PARTY_BLINK_RENDERER_PLATFORM_FONTS_OPENTYPE_OPEN_TYPE_TYPES_H_
+ #define THIRD_PARTY_BLINK_RENDERER_PLATFORM_FONTS_OPENTYPE_OPEN_TYPE_TYPES_H_
+ 
+-#include <bit>
+-
+ #include "base/compiler_specific.h"
+ #include "base/numerics/byte_conversions.h"
+ #include "third_party/blink/renderer/platform/wtf/vector.h"
+@@ -36,29 +34,29 @@ namespace open_type {
+ 
+ struct Int16 {
+   DISALLOW_NEW();
+-  Int16(int16_t u) : v(std::byteswap(u)) {}
+-  operator int16_t() const { return std::byteswap(v); }
++  Int16(int16_t u) : v(base::ByteSwap(u)) {}
++  operator int16_t() const { return base::ByteSwap(v); }
+   int16_t v;  // in BigEndian
+ };
+ 
+ struct UInt16 {
+   DISALLOW_NEW();
+-  UInt16(uint16_t u) : v(std::byteswap(u)) {}
+-  operator uint16_t() const { return std::byteswap(v); }
++  UInt16(uint16_t u) : v(base::ByteSwap(u)) {}
++  operator uint16_t() const { return base::ByteSwap(v); }
+   uint16_t v;  // in BigEndian
+ };
+ 
+ struct Int32 {
+   DISALLOW_NEW();
+-  Int32(int32_t u) : v(std::byteswap(u)) {}
+-  operator int32_t() const { return std::byteswap(v); }
++  Int32(int32_t u) : v(base::ByteSwap(u)) {}
++  operator int32_t() const { return base::ByteSwap(v); }
+   int32_t v;  // in BigEndian
+ };
+ 
+ struct UInt32 {
+   DISALLOW_NEW();
+-  UInt32(uint32_t u) : v(std::byteswap(u)) {}
+-  operator uint32_t() const { return std::byteswap(v); }
++  UInt32(uint32_t u) : v(base::ByteSwap(u)) {}
++  operator uint32_t() const { return base::ByteSwap(v); }
+   uint32_t v;  // in BigEndian
+ };
+ 
+diff --git a/third_party/blink/renderer/platform/fonts/simple_font_data.cc b/third_party/blink/renderer/platform/fonts/simple_font_data.cc
+index 01968c9658..2aa996a638 100644
+--- a/third_party/blink/renderer/platform/fonts/simple_font_data.cc
++++ b/third_party/blink/renderer/platform/fonts/simple_font_data.cc
+@@ -32,12 +32,12 @@
+ #include <unicode/utf16.h>
+ 
+ #include <algorithm>
+-#include <bit>
+ #include <memory>
+ #include <utility>
+ 
+ #include "base/compiler_specific.h"
+ #include "base/memory/ptr_util.h"
++#include "base/numerics/byte_conversions.h"
+ #include "build/build_config.h"
+ #include "skia/ext/font_utils.h"
+ #include "third_party/blink/renderer/platform/font_family_names.h"
+@@ -367,7 +367,8 @@ static std::pair<int16_t, int16_t> TypoAscenderAndDescender(
+                                        sizeof(buffer), buffer);
+   if (size == sizeof(buffer)) {
+     // The buffer values are in big endian.
+-    return std::make_pair(std::byteswap(buffer[0]), -std::byteswap(buffer[1]));
++    return std::make_pair(base::ByteSwap(buffer[0]),
++                          -base::ByteSwap(buffer[1]));
+   }
+   return std::make_pair(0, 0);
+ }
+diff --git a/third_party/blink/renderer/platform/wtf/text/text_codec_utf16.cc b/third_party/blink/renderer/platform/wtf/text/text_codec_utf16.cc
+index f83e2824d8..85358f0e95 100644
+--- a/third_party/blink/renderer/platform/wtf/text/text_codec_utf16.cc
++++ b/third_party/blink/renderer/platform/wtf/text/text_codec_utf16.cc
+@@ -27,7 +27,6 @@
+ 
+ #include <unicode/utf16.h>
+ 
+-#include <bit>
+ #include <memory>
+ 
+ #include "base/numerics/byte_conversions.h"
+@@ -133,7 +132,7 @@ String TextCodecUtf16::Decode(base::span<const uint8_t> bytes,
+     UChar c = lead_byte_ | (in_span.take_first_elem() << 8);
+ 
+     if (!little_endian_) {
+-      c = std::byteswap(c);
++      c = base::ByteSwap(c);
+     }
+ 
+     have_lead_byte_ = false;
+@@ -144,7 +143,7 @@ String TextCodecUtf16::Decode(base::span<const uint8_t> bytes,
+   for (wtf_size_t i = 0; i < num_chars_in; ++i) {
+     UChar c = base::U16FromLittleEndian(in_span.take_first<2ul>());
+     if (!little_endian_) {
+-      c = std::byteswap(c);
++      c = base::ByteSwap(c);
+     }
+     decode(c);
+   }

@@ -379,31 +379,6 @@ index 6b48eb6357..74888510bb 100644
 +
 +#undef SK_OPTS_TARGET
 +#undef init
-diff --git a/third_party/skia/src/core/SkPath_editing.cpp b/third_party/skia/src/core/SkPath_editing.cpp
-index b4f67d7cde..5bb540858b 100644
---- a/third_party/skia/src/core/SkPath_editing.cpp
-+++ b/third_party/skia/src/core/SkPath_editing.cpp
-@@ -38,6 +38,11 @@
- #include <limits.h>
- #include <utility>
- 
-+#define arc_is_lone_point      arc_is_lone_point_SkPath_editing
-+#define angles_to_unit_vectors angles_to_unit_vectors_SkPath_editing
-+#define build_arc_conics       build_arc_conics_SkPath_editing
-+#define subdivide_cubic_to     subdivide_cubic_to_SkPath_editing
-+
- class [[nodiscard]] SkAutoAddSimpleShape {
- public:
-     SkAutoAddSimpleShape(SkPath* path, SkPathDirection dir)
-@@ -988,3 +993,8 @@ SkPath& SkPath::dirtyAfterEdit() {
- }
- 
- #endif
-+
-+#undef arc_is_lone_point
-+#undef angles_to_unit_vectors
-+#undef build_arc_conics
-+#undef subdivide_cubic_to
 diff --git a/third_party/skia/src/core/SkRecordCanvas.cpp b/third_party/skia/src/core/SkRecordCanvas.cpp
 index a74175be55..c78789cd5e 100644
 --- a/third_party/skia/src/core/SkRecordCanvas.cpp

@@ -322,15 +322,15 @@ index 548abd4a68..1b7675f724 100644
        "devtools/protocol/visual_debugger_handler.cc",
        "devtools/protocol/visual_debugger_handler.h",
      ]
-@@ -3008,6 +3058,9 @@ source_set("browser") {
+@@ -2985,6 +3035,9 @@ source_set("browser") {
+         "media/capture/desktop_capture_device.cc",
+         "media/capture/desktop_capture_device.h",
        ]
-       public_deps += [ "//ui/base/cursor" ]
-       deps += [ "//third_party/webrtc_overrides:webrtc_component" ]
 +      jumbo_excluded_sources += [
 +        "media/capture/desktop_capture_device.cc",
 +      ]
      }
-     if (use_aura) {
+     if (!is_android && !is_ios) {
        sources += [
 @@ -3411,6 +3464,12 @@ source_set("browser") {
        "web_contents/web_contents_view_android.h",
@@ -641,15 +641,26 @@ diff --git a/content/browser/gpu/gpu_process_host.cc b/content/browser/gpu/gpu_p
 index 18306de948..a6fba3dad6 100644
 --- a/content/browser/gpu/gpu_process_host.cc
 +++ b/content/browser/gpu/gpu_process_host.cc
-@@ -541,7 +541,7 @@ void BindDiscardableMemoryReceiverOnUI(
+@@ -540,8 +540,8 @@
+ // src/content/browser/browser_main_loop.cc once the persistent cache is used
  // for all cache types.
  void InitGpuPersistentCacheFileFactoryOnce() {
- #if BUILDFLAG(SKIA_USE_DAWN)
--  if (features::kSkiaGraphiteDawnUsePersistentCache.Get() &&
-+  if (::features::kSkiaGraphiteDawnUsePersistentCache.Get() &&
+-  if ((features::kSkiaGraphiteDawnUsePersistentCache.Get() ||
+-       base::FeatureList::IsEnabled(features::kGpuPersistentCache)) &&
++  if ((::features::kSkiaGraphiteDawnUsePersistentCache.Get() ||
++       base::FeatureList::IsEnabled(::features::kGpuPersistentCache)) &&
        !viz::PersistentCacheSandboxedFileFactory::GetInstance()) {
      base::FilePath cache_root_dir =
-         GetContentClient()->browser()->GetShaderDiskCacheDirectory();
+         GetContentClient()->browser()->GetGPUPersistentCacheDirectory();
+@@ -939,7 +939,7 @@
+       viz_main_pending_remote.InitWithNewPipeAndPassReceiver());
+   viz::GpuHostImpl::InitParams params;
+   params.restart_id = host_id_;
+-  params.disable_gpu_shader_disk_cache = !features::IsShaderDiskCacheEnabled(
++  params.disable_gpu_shader_disk_cache = !::features::IsShaderDiskCacheEnabled(
+       base::CommandLine::ForCurrentProcess());
+   params.product = GetContentClient()->browser()->GetProduct();
+   params.deadline_to_synchronize_surfaces =
 diff --git a/content/browser/guest_page_holder_impl.cc b/content/browser/guest_page_holder_impl.cc
 index 6c8c488087..fb301afbf5 100644
 --- a/content/browser/guest_page_holder_impl.cc
@@ -1056,33 +1067,6 @@ index 8fdcc5bb2c..2b7f2f86aa 100644
            return FeatureState::kWarningOnly;
          }
          return FeatureState::kEnabled;
-@@ -141,7 +141,7 @@ Policy DerivePolicyForNonSecureContext(
-       // because it is unclear why they happen in the first place. The goal is
-       // to reduce instances of this happening before enabling this feature.
-       return base::FeatureList::IsEnabled(
--                 features::kBlockInsecurePrivateNetworkRequestsFromUnknown)
-+                 ::features::kBlockInsecurePrivateNetworkRequestsFromUnknown)
-                  ? Policy::kBlock
-                  : Policy::kAllow;
-     case AddressSpace::kLocal:
-@@ -150,7 +150,7 @@ Policy DerivePolicyForNonSecureContext(
-       // This is controlled separately because private network websites face
-       // additional hurdles compared to public websites. See crbug.com/1234044.
-       return base::FeatureList::IsEnabled(
--                 features::kBlockInsecurePrivateNetworkRequestsFromPrivate)
-+                 ::features::kBlockInsecurePrivateNetworkRequestsFromPrivate)
-                  ? Policy::kBlock
-                  : Policy::kWarn;
-     case AddressSpace::kPublic:
-@@ -163,7 +163,7 @@ Policy DerivePolicyForNonSecureContext(
-       // are never considered private network requests - they cannot target
-       // more-private address spaces.
-       return base::FeatureList::IsEnabled(
--                 features::kBlockInsecurePrivateNetworkRequests)
-+                 ::features::kBlockInsecurePrivateNetworkRequests)
-                  ? Policy::kBlock
-                  : Policy::kWarn;
-   }
 diff --git a/content/browser/renderer_host/randomized_confidence_utils.cc b/content/browser/renderer_host/randomized_confidence_utils.cc
 index 4297ff2a1a..a0a2f4bc1c 100644
 --- a/content/browser/renderer_host/randomized_confidence_utils.cc
@@ -1655,15 +1639,6 @@ index 22932fcb2b..3b127c32a9 100644
  namespace content {
  
  namespace {
-@@ -538,7 +540,7 @@ void RenderFrameProxyHost::RouteMessageEvent(
-   // origins once rollout is complete.
-   bool should_verify_source_origin =
-       base::FeatureList::IsEnabled(
--          features::kAdditionalOpaqueOriginEnforcements) ||
-+          ::features::kAdditionalOpaqueOriginEnforcements) ||
-       !source_origin.opaque();
-   if (should_verify_source_origin) {
-     auto* policy = ChildProcessSecurityPolicyImpl::GetInstance();
 @@ -1011,3 +1013,5 @@ base::SafeRef<RenderFrameProxyHost> RenderFrameProxyHost::GetSafeRef() {
  }
  
@@ -2320,7 +2295,7 @@ index 9ede7978ef..af987bb146 100644
  
  import("//build/config/chromeos/ui_mode.gni")
 +import("//build/config/jumbo.gni")
- import("//components/services/on_device_translation/buildflags/features.gni")
+ import("//components/on_device_translation/buildflags/features.gni")
  import("//device/vr/buildflags/buildflags.gni")
  import("//media/gpu/args.gni")
 @@ -12,7 +13,7 @@ import("//printing/buildflags/buildflags.gni")
@@ -2345,21 +2320,6 @@ index 1a1f75e042..1298066f86 100644
        // TODO(crbug.com/41268960): This might cancel an unrelated
        // NavigationRequest. Maybe check if the navigation request uses the
        // speculative RFH first?
-diff --git a/content/browser/renderer_host/render_process_host_impl.cc b/content/browser/renderer_host/render_process_host_impl.cc
-index a48f3472d8..bf38bbf6bd 100644
---- a/content/browser/renderer_host/render_process_host_impl.cc
-+++ b/content/browser/renderer_host/render_process_host_impl.cc
-@@ -3480,8 +3480,8 @@ bool RenderProcessHostImpl::ShouldPauseChannelUntilProcessLaunched() {
-   }
- 
-   if (base::FeatureList::IsEnabled(
--          features::kSkipIPCChannelPausingForNonGuests)) {
--    if (features::skip_channel_pausing_for_internal_webui_only.Get()) {
-+          ::features::kSkipIPCChannelPausingForNonGuests)) {
-+    if (::features::skip_channel_pausing_for_internal_webui_only.Get()) {
- #if !BUILDFLAG(IS_ANDROID)
-       return IsForInitialWebUI();
- #else
 diff --git a/content/browser/webid/delegation/email_verifier_network_request_manager.cc b/content/browser/webid/delegation/email_verifier_network_request_manager.cc
 index b921c4c52d..6f5877fdb7 100644
 --- a/content/browser/webid/delegation/email_verifier_network_request_manager.cc
@@ -2434,16 +2394,7 @@ diff --git a/content/browser/renderer_host/render_process_host_impl.cc b/content
 index 5d35444a51..bda9911884 100644
 --- a/content/browser/renderer_host/render_process_host_impl.cc
 +++ b/content/browser/renderer_host/render_process_host_impl.cc
-@@ -302,7 +302,7 @@ BASE_FEATURE(kSkipIPCChannelPausingForNonGuests,
-              base::FEATURE_DISABLED_BY_DEFAULT);
- 
- const base::FeatureParam<bool> skip_channel_pausing_for_internal_webui_only{
--    &features::kSkipIPCChannelPausingForNonGuests, "internal_webui_only",
-+    &::features::kSkipIPCChannelPausingForNonGuests, "internal_webui_only",
-     false};
- 
- #if BUILDFLAG(IS_ANDROID)
-@@ -1767,7 +1767,7 @@ RenderProcessHostImpl::~RenderProcessHostImpl() {
+@@ -1756,7 +1756,7 @@
    UnregisterHost(GetID());
  
    // Remove the cache handles for the client at teardown if relevant.
@@ -2452,7 +2403,7 @@ index 5d35444a51..bda9911884 100644
            base::CommandLine::ForCurrentProcess())) {
      if (GetGpuDiskCacheFactorySingleton()) {
          gpu_client_->RemoveDiskCacheHandles();
-@@ -1834,7 +1834,7 @@ bool RenderProcessHostImpl::Init() {
+@@ -1823,7 +1823,7 @@
    // stored on the channels. Note that we also check if the factory is
    // initialized because in tests the factory may never have been initialized.
    if (!GetBrowserContext()->IsOffTheRecord() &&
@@ -2461,7 +2412,18 @@ index 5d35444a51..bda9911884 100644
            base::CommandLine::ForCurrentProcess())) {
      if (auto* cache_factory = GetGpuDiskCacheFactorySingleton()) {
        for (const gpu::GpuDiskCacheType type : gpu::kGpuDiskCacheTypes) {
-@@ -5924,7 +5924,7 @@ bool RenderProcessHostImpl::CanUseWarmUpConnection() {
+@@ -3522,8 +3522,8 @@
+   }
+ 
+   if (base::FeatureList::IsEnabled(
+-          features::kSkipIPCChannelPausingForNonGuests)) {
+-    if (features::kSkipIPCChannelPausingForNonGuestsInternalWebUiOnly.Get()) {
++          ::features::kSkipIPCChannelPausingForNonGuests)) {
++    if (::features::kSkipIPCChannelPausingForNonGuestsInternalWebUiOnly.Get()) {
+ #if !BUILDFLAG(IS_ANDROID)
+       // Skip pausing if we're on initial WebUI, so return false in that case.
+       return !IsForInitialWebUI();
+@@ -5933,7 +5933,7 @@
    // TODO(crbug.com/455620851): Remove the function after finishing the
    // holdback experiment.
    return base::FeatureList::IsEnabled(
@@ -2497,16 +2459,16 @@ index 99f590d854..016c264e0e 100644
 --- a/content/browser/renderer_host/render_widget_host_view_base.cc
 +++ b/content/browser/renderer_host/render_widget_host_view_base.cc
 @@ -179,7 +179,7 @@ void RenderWidgetHostViewBase::CopyMainAndPopupFromSurface(
-         callback) {
+     base::OnceCallback<void(const content::CopyFromSurfaceResult&)> callback) {
    if (!main_host || !main_frame_host) {
      if (base::FeatureList::IsEnabled(
 -            features::kCopyFromSurfaceAlwaysCallCallback)) {
 +            ::features::kCopyFromSurfaceAlwaysCallCallback)) {
-       viz::CopyOutputBitmapWithMetadata empty;
-       std::move(callback).Run(empty);
+       std::move(callback).Run(base::unexpected<content::CopyFromSurfaceError>(
+           content::CopyFromSurfaceError::kFrameGone));
      }
 @@ -229,7 +229,7 @@ void RenderWidgetHostViewBase::CopyMainAndPopupFromSurface(
-          const viz::CopyOutputBitmapWithMetadata& main_result) {
+          const content::CopyFromSurfaceResult& main_result) {
          if (!popup_frame_host) {
            if (base::FeatureList::IsEnabled(
 -                  features::kCopyFromSurfaceAlwaysCallCallback)) {
@@ -2585,14 +2547,42 @@ index 77571a37e4..1d8906af14 100644
            base::CommandLine::ForCurrentProcess())) {
      base::FilePath compositor_cache_dir =
          GetContentClient()->browser()->GetShaderDiskCacheDirectory();
---- a/content/browser/gpu/gpu_process_host.cc
-+++ b/content/browser/gpu/gpu_process_host.cc
-@@ -947,7 +947,7 @@
-       viz_main_pending_remote.InitWithNewPipeAndPassReceiver());
-   viz::GpuHostImpl::InitParams params;
-   params.restart_id = host_id_;
--  params.disable_gpu_shader_disk_cache = !features::IsShaderDiskCacheEnabled(
-+  params.disable_gpu_shader_disk_cache = !::features::IsShaderDiskCacheEnabled(
-       base::CommandLine::ForCurrentProcess());
-   params.product = GetContentClient()->browser()->GetProduct();
-   params.deadline_to_synchronize_surfaces =
+--- a/content/browser/renderer_host/page_lifecycle_state_manager.cc
++++ b/content/browser/renderer_host/page_lifecycle_state_manager.cc
+@@ -27,7 +27,7 @@
+ constexpr base::TimeDelta kBackForwardCacheTimeout = base::Seconds(3);
+ #endif
+ base::TimeDelta GetBackForwardCacheEntryTimeout() {
+-  if (base::FeatureList::IsEnabled(features::kBackForwardCacheEntryTimeout)) {
++  if (base::FeatureList::IsEnabled(::features::kBackForwardCacheEntryTimeout)) {
+     return kBackForwardCacheTimeout;
+   } else {
+     return base::TimeDelta::Max();
+@@ -151,14 +151,14 @@
+               ->controller()
+               .GetBrowserContext(),
+           *navigation_request_url) &&
+-      !features::kSkipPagehideInCommitForDSENavigationDelay.Get().is_zero()) {
++      !::features::kSkipPagehideInCommitForDSENavigationDelay.Get().is_zero()) {
+     base::SingleThreadTaskRunner::GetCurrentDefault()->PostDelayedTask(
+         FROM_HERE,
+         base::BindOnce(
+             &PageLifecycleStateManager::SendUpdatesToRendererIfNeeded,
+             weak_ptr_factory_.GetWeakPtr(), std::move(page_restore_params),
+             base::NullCallback()),
+-        features::kSkipPagehideInCommitForDSENavigationDelay.Get());
++        ::features::kSkipPagehideInCommitForDSENavigationDelay.Get());
+   } else {
+     SendUpdatesToRendererIfNeeded(std::move(page_restore_params),
+                                   base::NullCallback());
+--- a/content/browser/site_info.cc
++++ b/content/browser/site_info.cc
+@@ -59,7 +59,7 @@
+   }
+ 
+ #if !BUILDFLAG(IS_ANDROID)
+-  if (features::kInitialWebUIUseSeparateProcess.Get() &&
++  if (::features::kInitialWebUIUseSeparateProcess.Get() &&
+       GetContentClient()->browser()->IsInitialWebUIURL(url)) {
+     // If initial WebUIs need to use a different process separate from other
+     // WebUIs, use the full URL for process lock instead of just the TLD.
