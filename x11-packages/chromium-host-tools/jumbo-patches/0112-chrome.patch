@@ -865,17 +865,6 @@ index 6591f1d31a..24a418ca6f 100644
    configs += [
      "//build/config:precompiled_headers",
      "//build/config/compiler:wexit_time_destructors",
-@@ -815,6 +817,10 @@ source_set("extensions") {
-       "webstore_install_with_prompt.cc",
-       "webstore_install_with_prompt.h",
-     ]
-+    jumbo_excluded_sources += [
-+      # FIXME: Too many conflicts, namespace storage should be replaced with ::storage
-+      "api/developer_private/developer_private_functions_desktop.cc",
-+    ]
- 
-     if (safe_browsing_mode != 0) {
-       sources += [
 diff --git a/chrome/browser/extensions/api/image_writer_private/tar_extractor.cc b/chrome/browser/extensions/api/image_writer_private/tar_extractor.cc
 index 6b72ac5f05..f8effd5f09 100644
 --- a/chrome/browser/extensions/api/image_writer_private/tar_extractor.cc
@@ -941,46 +930,37 @@ diff --git a/chrome/browser/extensions/api/tabs/tabs_event_router.cc b/chrome/br
 index 40d4b95610..90c039852d 100644
 --- a/chrome/browser/extensions/api/tabs/tabs_event_router.cc
 +++ b/chrome/browser/extensions/api/tabs/tabs_event_router.cc
-@@ -307,7 +307,7 @@ void TabsEventRouter::OnTabGroupChanged(const TabGroupChange& change) {
-       change.GetCreateChange()->reason() ==
-           TabGroupChange::TabGroupCreationReason::
-               kInsertedFromAnotherTabstrip) {
--    for (tabs::TabInterface* tab :
-+    for (::tabs::TabInterface* tab :
-          change.GetCreateChange()->GetDetachedTabs()) {
-       std::set<std::string> changed_property_names;
-       changed_property_names.insert(kGroupIdKey);
-@@ -318,7 +318,7 @@ void TabsEventRouter::OnTabGroupChanged(const TabGroupChange& change) {
-              change.GetCloseChange()->reason() ==
-                  TabGroupChange::TabGroupClosureReason::
-                      kDetachedToAnotherTabstrip) {
--    for (tabs::TabInterface* tab : change.GetCloseChange()->GetDetachedTabs()) {
-+    for (::tabs::TabInterface* tab : change.GetCloseChange()->GetDetachedTabs()) {
-       std::set<std::string> changed_property_names;
-       changed_property_names.insert(kGroupIdKey);
-       DispatchTabUpdatedEvent(tab->GetContents(),
-@@ -356,7 +356,7 @@ void TabsEventRouter::TabGroupedStateChanged(
-     TabStripModel* tab_strip_model,
-     std::optional<tab_groups::TabGroupId> old_group,
-     std::optional<tab_groups::TabGroupId> new_group,
--    tabs::TabInterface* tab,
-+    ::tabs::TabInterface* tab,
-     int index) {
-   std::set<std::string> changed_property_names;
-   changed_property_names.insert(kGroupIdKey);
+@@ -102,7 +102,7 @@
+     : WebContentsObserver(&contents),
+       router_(router) {
+   // We should only get here for WebContents that are tabs.
+-  tabs::TabInterface* tab = tabs::TabInterface::GetFromContents(&contents);
++  ::tabs::TabInterface* tab = ::tabs::TabInterface::GetFromContents(&contents);
+   CHECK(tab);
+ 
+   pinned_state_subscription_ =
+@@ -186,7 +186,7 @@
+   router_->TabUpdated(this, {kAudibleKey});
+ }
+ 
+-void TabsEventRouter::TabEntry::OnPinnedStateChanged(tabs::TabInterface* tab,
++void TabsEventRouter::TabEntry::OnPinnedStateChanged(::tabs::TabInterface* tab,
+                                                      bool new_pinned_state) {
+   router_->TabUpdated(this, {kPinnedKey});
+ }
 diff --git a/chrome/browser/extensions/api/tabs/tabs_event_router.h b/chrome/browser/extensions/api/tabs/tabs_event_router.h
 index 59694ff4ee..28963e4c18 100644
 --- a/chrome/browser/extensions/api/tabs/tabs_event_router.h
 +++ b/chrome/browser/extensions/api/tabs/tabs_event_router.h
-@@ -75,7 +75,7 @@ class TabsEventRouter : public TabStripModelObserver,
-   void TabGroupedStateChanged(TabStripModel* tab_strip_model,
-                               std::optional<tab_groups::TabGroupId> old_group,
-                               std::optional<tab_groups::TabGroupId> new_group,
--                              tabs::TabInterface* tab,
-+                              ::tabs::TabInterface* tab,
-                               int index) override;
-   void OnTabGroupChanged(const TabGroupChange& change) override;
-   void OnSplitTabChanged(const SplitTabChange& change) override;
+@@ -99,7 +99,7 @@
+     void OnRecentlyAudibleStateChanged(bool was_recently_audible);
+ 
+     // Called when the pin state has changed for the given tab.
+-    void OnPinnedStateChanged(tabs::TabInterface* tab, bool new_pinned_state);
++    void OnPinnedStateChanged(::tabs::TabInterface* tab, bool new_pinned_state);
+ 
+     // Whether we are waiting to fire the 'complete' status change. This will
+     // occur the first time the WebContents stops loading after the
 diff --git a/chrome/browser/extensions/browser_extension_window_controller.cc b/chrome/browser/extensions/browser_extension_window_controller.cc
 index ffdd3f3216..f66fc4de62 100644
 --- a/chrome/browser/extensions/browser_extension_window_controller.cc
@@ -1471,25 +1451,6 @@ index 4c23b850dd..91dae57e25 100644
  }
 +
 +#undef HISTOGRAM_PREFIX
-+#undef IsSameSite
-diff --git a/chrome/browser/page_load_metrics/observers/third_party_cookie_deprecation_page_load_metrics_observer.cc b/chrome/browser/page_load_metrics/observers/third_party_cookie_deprecation_page_load_metrics_observer.cc
-index 689b92fb64..9711e9f0e7 100644
---- a/chrome/browser/page_load_metrics/observers/third_party_cookie_deprecation_page_load_metrics_observer.cc
-+++ b/chrome/browser/page_load_metrics/observers/third_party_cookie_deprecation_page_load_metrics_observer.cc
-@@ -22,6 +22,8 @@
- #include "third_party/blink/public/mojom/use_counter/metrics/web_feature.mojom.h"
- #include "url/gurl.h"
- 
-+#define IsSameSite IsSameSite_ThirdPartyCookieDeprecationMetricsObserver
-+
- namespace {
- using CookieSettingsBase = content_settings::CookieSettingsBase;
- using ThirdPartyCookieAllowMechanism =
-@@ -434,3 +436,5 @@ bool ThirdPartyCookieDeprecationMetricsObserver::
-              OnboardingStatus::kOnboarded;
-   ;
- }
-+
 +#undef IsSameSite
 diff --git a/chrome/browser/password_manager/account_password_store_factory.cc b/chrome/browser/password_manager/account_password_store_factory.cc
 index 4254a1f4e3..e3f4be6048 100644
@@ -2100,6 +2061,17 @@ index b96bea1dd7..fa8cb0b546 100644
  
    if (enable_session_service) {
      sources += [
+@@ -1399,6 +1399,10 @@
+       "webui/webui_util_desktop.cc",
+       "webui/webui_util_desktop.h",
+     ]
++    jumbo_excluded_sources += [
++      # Conflict with //chrome/browser/ui/read_anything:read_anything
++      "read_anything/read_anything_prefs.cc",
++    ]
+ 
+     if (is_chrome_branded) {
+       sources += [
 @@ -2842,6 +2844,10 @@ static_library("ui") {
        "views/profiles/signin_view_controller_delegate_views.cc",
        "views/profiles/signin_view_controller_delegate_views.h",
@@ -3047,25 +3019,6 @@ index 546d1c612d..dbf9faeebd 100644
    sources = [
      "bookmarks/bookmarks_side_panel_coordinator.cc",
      "bookmarks/bookmarks_side_panel_coordinator.h",
-diff --git a/chrome/browser/ui/views/side_panel/glic/glic_side_panel_coordinator.cc b/chrome/browser/ui/views/side_panel/glic/glic_side_panel_coordinator.cc
-index e1c0efd437..40cc896916 100644
---- a/chrome/browser/ui/views/side_panel/glic/glic_side_panel_coordinator.cc
-+++ b/chrome/browser/ui/views/side_panel/glic/glic_side_panel_coordinator.cc
-@@ -28,6 +28,8 @@
- #include "ui/actions/actions.h"
- #include "ui/views/layout/fill_layout.h"
- 
-+#define GetGlicActionItem GetGlicActionItem_GlicSiderPanelCoordinator
-+
- namespace glic {
- DEFINE_USER_DATA(GlicSidePanelCoordinator);
- 
-@@ -197,3 +199,5 @@ void GlicSidePanelCoordinator::NotifyStateChanged() {
- }
- 
- }  // namespace glic
-+
-+#undef GetGlicActionItem
 diff --git a/chrome/browser/ui/views/site_data/related_app_row_view.cc b/chrome/browser/ui/views/site_data/related_app_row_view.cc
 index 55b85e0ed5..dc518bba22 100644
 --- a/chrome/browser/ui/views/site_data/related_app_row_view.cc
@@ -3885,3 +3838,89 @@ index 94b7d51199..82e6e35682 100644
      deps += [
        "//chrome/browser:browser_process",
        "//chrome/browser/profiles:profile",
+--- a/chrome/browser/extensions/api/tabs/tabs_event_router_platform_delegate_non_android.cc
++++ b/chrome/browser/extensions/api/tabs/tabs_event_router_platform_delegate_non_android.cc
+@@ -165,7 +165,7 @@
+       change.GetCreateChange()->reason() ==
+           TabGroupChange::TabGroupCreationReason::
+               kInsertedFromAnotherTabstrip) {
+-    for (tabs::TabInterface* tab :
++    for (::tabs::TabInterface* tab :
+          change.GetCreateChange()->GetDetachedTabs()) {
+       std::set<std::string> changed_property_names;
+       changed_property_names.insert(kGroupIdKey);
+@@ -176,7 +176,7 @@
+              change.GetCloseChange()->reason() ==
+                  TabGroupChange::TabGroupClosureReason::
+                      kDetachedToAnotherTabstrip) {
+-    for (tabs::TabInterface* tab : change.GetCloseChange()->GetDetachedTabs()) {
++    for (::tabs::TabInterface* tab : change.GetCloseChange()->GetDetachedTabs()) {
+       std::set<std::string> changed_property_names;
+       changed_property_names.insert(kGroupIdKey);
+       router_->DispatchTabUpdatedEvent(tab->GetContents(),
+@@ -190,7 +190,7 @@
+   if (change.type == SplitTabChange::Type::kAdded &&
+       change.GetAddedChange()->reason() !=
+           SplitTabChange::SplitTabAddReason::kInsertedFromAnotherTabstrip) {
+-    for (const std::pair<tabs::TabInterface*, int>& tab :
++    for (const std::pair<::tabs::TabInterface*, int>& tab :
+          change.GetAddedChange()->tabs()) {
+       std::set<std::string> changed_property_names;
+       changed_property_names.insert(kSplitIdKey);
+@@ -201,7 +201,7 @@
+   if (change.type == SplitTabChange::Type::kRemoved &&
+       change.GetRemovedChange()->reason() !=
+           SplitTabChange::SplitTabRemoveReason::kDetachedToAnotherTabstrip) {
+-    for (const std::pair<tabs::TabInterface*, int>& tab :
++    for (const std::pair<::tabs::TabInterface*, int>& tab :
+          change.GetRemovedChange()->tabs()) {
+       std::set<std::string> changed_property_names;
+       changed_property_names.insert(kSplitIdKey);
+@@ -215,7 +215,7 @@
+     TabStripModel* tab_strip_model,
+     std::optional<tab_groups::TabGroupId> old_group,
+     std::optional<tab_groups::TabGroupId> new_group,
+-    tabs::TabInterface* tab,
++    ::tabs::TabInterface* tab,
+     int index) {
+   std::set<std::string> changed_property_names;
+   changed_property_names.insert(kGroupIdKey);
+@@ -373,7 +373,7 @@
+     const ui::ListSelectionModel& old_model) {
+   base::Value::List all_tabs;
+ 
+-  for (tabs::TabInterface* tab :
++  for (::tabs::TabInterface* tab :
+        tab_strip_model->selection_model().selected_tabs()) {
+     WebContents* contents = tab->GetContents();
+     if (!contents) {
+--- a/chrome/browser/extensions/api/tabs/tabs_event_router_platform_delegate_non_android.h
++++ b/chrome/browser/extensions/api/tabs/tabs_event_router_platform_delegate_non_android.h
+@@ -65,7 +65,7 @@
+   void TabGroupedStateChanged(TabStripModel* tab_strip_model,
+                               std::optional<tab_groups::TabGroupId> old_group,
+                               std::optional<tab_groups::TabGroupId> new_group,
+-                              tabs::TabInterface* tab,
++                              ::tabs::TabInterface* tab,
+                               int index) override;
+   void OnTabGroupChanged(const TabGroupChange& change) override;
+   void OnSplitTabChanged(const SplitTabChange& change) override;
+--- a/chrome/browser/signin/bound_session_credentials/unexportable_key_obsolete_profile_garbage_collector.cc
++++ b/chrome/browser/signin/bound_session_credentials/unexportable_key_obsolete_profile_garbage_collector.cc
+@@ -32,6 +32,9 @@
+ #include "components/unexportable_keys/features.h"
+ #include "components/unexportable_keys/unexportable_key_service.h"
+ 
++#define GetApplicationTag       GetApplicationTag_UnexportableKeyObsoleteProfileGarbageCollector
++#define kGarbageCollectionDelay kGarbageCollectionDelay_UnexportableKeyObsoleteProfileGarbageCollector
++
+ namespace unexportable_keys {
+ 
+ namespace {
+@@ -171,3 +174,6 @@
+ }
+ 
+ }  // namespace unexportable_keys
++
++#undef GetApplicationTag
++#undef kGarbageCollectionDelay

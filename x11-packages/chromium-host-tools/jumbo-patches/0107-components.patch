@@ -1344,6 +1344,25 @@ index 5595ff65ed..464377c744 100644
    sources = [
      "browser/reporting/browser_report_generator.cc",
      "browser/reporting/browser_report_generator.h",
+@@ -54,6 +54,7 @@
+     "browser/reporting/user_security_signals_service.cc",
+     "browser/reporting/user_security_signals_service.h",
+   ]
++  jumbo_excluded_sources = []
+ 
+   if (!is_chromeos) {
+     sources += [
+@@ -71,6 +72,10 @@
+       "browser/promotion/promotion_eligibility_checker.cc",
+       "browser/promotion/promotion_eligibility_checker.h",
+     ]
++    jumbo_excluded_sources += [
++      # Conflict with //components/enterprise/browser/promotion:promotion
++      "browser/promotion/promotion_eligibility_checker.cc",
++    ]
+   }
+ 
+   configs += [
 diff --git a/components/favicon/core/BUILD.gn b/components/favicon/core/BUILD.gn
 index a60f3430c5..1cd0f66525 100644
 --- a/components/favicon/core/BUILD.gn
@@ -3300,9 +3319,9 @@ index 779d69ac44..396310c9fa 100644
  # found in the LICENSE file.
  
 +import("//build/config/jumbo.gni")
+ import("//components/optimization_guide/features.gni")
  import("//components/safe_browsing/buildflags.gni")
  
- # NOTE: This target is separated from :browser as
 @@ -68,7 +69,7 @@ if (safe_browsing_mode > 0) {
    }
  }
@@ -4439,3 +4458,20 @@ index f0627214df..2e326bef47 100644
  }  // namespace policy
 +
 +#undef kExtensionInstallPolicyCacheFile
+--- a/components/sync/service/device_statistics_tracker.cc
++++ b/components/sync/service/device_statistics_tracker.cc
+@@ -24,6 +24,8 @@
+ #include "services/network/public/cpp/shared_url_loader_factory.h"
+ #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
+ 
++#define GenerateCacheGUID GenerateCacheGUID_DeviceStatisticsTracker
++
+ namespace syncer {
+ 
+ namespace {
+@@ -375,3 +377,5 @@
+ }
+ 
+ }  // namespace syncer
++
++#undef GenerateCacheGUID
