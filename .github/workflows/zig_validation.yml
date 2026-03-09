@@ -44,7 +44,6 @@ jobs:
       with:
         fetch-depth: 1
     - name: Enable zram
-      if: ${{ steps.build-info.outputs.skip-building != 'true' }}
       uses: ./.github/actions/zram
       with:
         algorithm: zstd
@@ -52,11 +51,9 @@ jobs:
         priority: 100
         device_name: /dev/zram0
     - name: Load Docker image
-      if: ${{ steps.build-info.outputs.free-space == 'true' && steps.build-info.outputs.skip-building != 'true' }}
       run: |
         ./scripts/run-docker.sh echo ""
-    - name: Free additional disk space (if needed)
-      if: ${{ steps.build-info.outputs.free-space == 'true' && steps.build-info.outputs.skip-building != 'true' }}
+    - name: Free additional disk space
       run: |
         ./scripts/free-space.sh
     - name: Zig validation
