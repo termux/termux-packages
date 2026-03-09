@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Plasma applet for audio volume management using PulseAud
 TERMUX_PKG_LICENSE="LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.6.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/plasma/${TERMUX_PKG_VERSION}/plasma-pa-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=9452255cbca5eecb545fb17417b1abe6471103f0e2aeac7eb7c0022bcaa19754
 TERMUX_PKG_AUTO_UPDATE=true
