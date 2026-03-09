@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-set -eou pipefail
+set -euo pipefail
 
 cd "$(dirname "$0")"
 rm -rf lib/
