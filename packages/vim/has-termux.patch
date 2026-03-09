@@ -1,0 +1,65 @@
+diff --git a/runtime/doc/builtin.txt b/runtime/doc/builtin.txt
+index d95f459a9..4ddd8099d 100644
+--- a/runtime/doc/builtin.txt
++++ b/runtime/doc/builtin.txt
+@@ -13104,6 +13104,7 @@ acl			Compiled with |ACL| support.
+ all_builtin_terms	Compiled with all builtin terminals enabled. (always
+ 			true)
+ amiga			Amiga version of Vim.
++android			Android version of Vim. *+android*
+ arabic			Compiled with Arabic support |Arabic|.
+ arp			Compiled with ARP support (Amiga).
+ autocmd			Compiled with autocommand support. (always true)
+@@ -13274,6 +13275,7 @@ termguicolors		Compiled with true color in terminal support.
+ terminal		Compiled with |terminal| support.
+ terminfo		Compiled with terminfo instead of termcap.
+ termresponse		Compiled with support for |t_RV| and |v:termresponse|.
++termux			Termux version of Vim. *+termux*
+ textobjects		Compiled with support for |text-objects|.
+ textprop		Compiled with support for |text-properties|.
+ tgetent			Compiled with tgetent support, able to use a termcap
+diff --git a/runtime/doc/tags b/runtime/doc/tags
+index a881c0acf..cc1977134 100644
+--- a/runtime/doc/tags
++++ b/runtime/doc/tags
+@@ -1403,6 +1403,7 @@ $quote	eval.txt	/*$quote*
+ +GUI_neXtaw	various.txt	/*+GUI_neXtaw*
+ +X11	various.txt	/*+X11*
+ +acl	various.txt	/*+acl*
+++android	builtin.txt	/*+android*
+ +arabic	various.txt	/*+arabic*
+ +autochdir	various.txt	/*+autochdir*
+ +autocmd	various.txt	/*+autocmd*
+@@ -1530,6 +1531,7 @@ $quote	eval.txt	/*$quote*
+ +terminal	various.txt	/*+terminal*
+ +terminfo	various.txt	/*+terminfo*
+ +termresponse	various.txt	/*+termresponse*
+++termux	builtin.txt	/*+termux*
+ +textobjects	various.txt	/*+textobjects*
+ +textprop	various.txt	/*+textprop*
+ +tgetent	various.txt	/*+tgetent*
+diff --git a/src/evalfunc.c b/src/evalfunc.c
+index 3c872af56..ff37f8902 100644
+--- a/src/evalfunc.c
++++ b/src/evalfunc.c
+@@ -6791,6 +6791,20 @@ f_has(typval_T *argvars, typval_T *rettv)
+ 		1
+ #else
+ 		0
++#endif
++		},
++	{"android",
++#ifdef __ANDROID__
++		1
++#else
++		0
++#endif
++		},
++	{"termux",
++#ifdef __TERMUX__
++		1
++#else
++		0
+ #endif
+ 		},
+ 	{"ebcdic", 0 },
