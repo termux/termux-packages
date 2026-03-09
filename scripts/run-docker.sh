@@ -177,7 +177,7 @@ __change_container_pid_max() {
 			if [[ "$($SUDO docker exec $CONTAINER_NAME cat /proc/sys/kernel/pid_max)" -eq 65535 ]]; then
 				echo "Successfully changed /proc/sys/kernel/pid_max for container namespace"
 			else
-				echo "Failed to change /proc/sys/kernel/pid_max for container, failing back to setting it on host..."
+				echo "Failed to change /proc/sys/kernel/pid_max for container, falling back to setting it on host..."
 				if ( echo 65535 | sudo tee /proc/sys/kernel/pid_max >/dev/null ); then
 					echo "Successfully changed /proc/sys/kernel/pid_max on host, but it may affect other processes on the host system"
 				else
