@@ -38,15 +38,19 @@ index 1a13885..491a48b 100644
  ---           *has-patch*
  --- 3.  Vim patch. For example the "patch123" feature means that
 diff --git a/src/nvim/eval/funcs.c b/src/nvim/eval/funcs.c
-index 752b367..349b7c3 100644
+index 752b367..76a3327 100644
 --- a/src/nvim/eval/funcs.c
 +++ b/src/nvim/eval/funcs.c
-@@ -3087,6 +3087,8 @@ static void f_has(typval_T *argvars, typval_T *rettv, EvalFuncData fptr)
+@@ -3087,6 +3087,12 @@ static void f_has(typval_T *argvars, typval_T *rettv, EvalFuncData fptr)
  #ifdef _WIN64
      "win64",
  #endif
++#ifdef __ANDROID__
 +    "android",
++#endif
++#ifdef __TERMUX__
 +    "termux",
++#endif
  #ifndef CASE_INSENSITIVE_FILENAME
      "fname_case",
  #endif
