@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-set -eou pipefail
+set -euo pipefail
 TERMUX_SCRIPTDIR=$(cd "$(realpath "$(dirname "$0")")"; cd ../..; pwd)
 
 if [ -n "${TERMUX_DOCKER_USE_SUDO-}" ]; then
