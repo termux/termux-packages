@@ -51,11 +51,13 @@ jobs:
         size: 16G
         priority: 100
         device_name: /dev/zram0
-    - name: Prepare environment
+    - name: Load Docker image
+      if: ${{ steps.build-info.outputs.free-space == 'true' && steps.build-info.outputs.skip-building != 'true' }}
       run: |
-        ./scripts/setup-ubuntu.sh
-        ./scripts/setup-android-sdk.sh
-        sudo apt install ninja-build
+        ./scripts/run-docker.sh echo ""
+    - name: Free additional disk space (if needed)
+      if: ${{ steps.build-info.outputs.free-space == 'true' && steps.build-info.outputs.skip-building != 'true' }}
+      run: |
         ./scripts/free-space.sh
     - name: Golang validation
       run: ./scripts/bin/validation ${{ matrix.target_arch }} golang ${{ matrix.batch }} || exit 1
