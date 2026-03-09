@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eou pipefail
+set -euo pipefail
 
 TERMUX_SCRIPTDIR=$(cd "$(realpath "$(dirname "$0")")"; cd ..; pwd)
 : ${TERMUX_BUILDER_IMAGE_NAME:=ghcr.io/termux/package-builder}
@@ -153,17 +153,7 @@ load_apparmor_profile() {
 # Load the relaxed AppArmor profile first as we might need to change permissions
 load_apparmor_profile ./scripts/profile-relaxed.apparmor
 
-$SUDO docker start $CONTAINER_NAME >/dev/null 2>&1 || {
-	echo "Creating new container..."
-	$SUDO docker run \
-		--detach \
-		--init \
-		--name $CONTAINER_NAME \
-		--volume $VOLUME \
-		$SEC_OPT \
-		--tty \
-		$TERMUX_DOCKER_RUN_EXTRA_ARGS \
-		$TERMUX_BUILDER_IMAGE_NAME
+__change_builder_uid_gid() {
 	if [ "$UNAME" != Darwin ]; then
 		if [ $(id -u) -ne 1001 -a $(id -u) -ne 0 ]; then
 			echo "Changed builder uid/gid... (this may take a while)"
@@ -172,6 +162,11 @@ $SUDO docker start $CONTAINER_NAME >/dev/null 2>&1 || {
 			$SUDO docker exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo usermod -u $(id -u) builder
 			$SUDO docker exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo groupmod -g $(id -g) builder
 		fi
+	fi
+}
+
+__change_container_pid_max() {
+	if [ "$UNAME" != Darwin ]; then
 		echo "Changing /proc/sys/kernel/pid_max to 65535 for packages that need to run native executables using proot (for 32-bit architectures)"
 		if [[ "$($SUDO docker exec $CONTAINER_NAME cat /proc/sys/kernel/pid_max)" -le 65535 ]]; then
 			echo "No need to change /proc/sys/kernel/pid_max, current value is $($SUDO docker exec $DOCKER_TTY $CONTAINER_NAME cat /proc/sys/kernel/pid_max)"
@@ -192,6 +187,27 @@ $SUDO docker start $CONTAINER_NAME >/dev/null 2>&1 || {
 		fi
 	fi
 }
+
+
+if ! $SUDO docker container inspect $CONTAINER_NAME > /dev/null 2>&1; then
+	echo "Creating new container..."
+	$SUDO docker run \
+		--detach \
+		--init \
+		--name $CONTAINER_NAME \
+		--volume $VOLUME \
+		$SEC_OPT \
+		--tty \
+		$TERMUX_DOCKER_RUN_EXTRA_ARGS \
+		$TERMUX_BUILDER_IMAGE_NAME
+	__change_builder_uid_gid
+	__change_container_pid_max
+fi
+
+if [[ "$($SUDO docker container inspect -f '{{ .State.Running }}' $CONTAINER_NAME)" == "false" ]]; then
+	$SUDO docker start $CONTAINER_NAME >/dev/null 2>&1
+	__change_container_pid_max
+fi
 
 load_apparmor_profile ./scripts/profile-restricted.apparmor "Loading restricted AppArmor profile"
 
