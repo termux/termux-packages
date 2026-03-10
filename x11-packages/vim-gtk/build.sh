@@ -2,15 +2,16 @@ TERMUX_PKG_HOMEPAGE=https://www.vim.org
 TERMUX_PKG_DESCRIPTION="Vi IMproved - enhanced vi editor"
 TERMUX_PKG_LICENSE="VIM License"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
-TERMUX_PKG_BUILD_DEPENDS="luajit, perl, python, ruby, tcl"
+TERMUX_PKG_BUILD_DEPENDS="libwayland, luajit, perl, python, ruby, tcl"
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libcanberra, libice, libiconv, libsm, libsodium, libx11, libxt, ncurses, pango"
 TERMUX_PKG_SUGGESTS="luajit, perl, python, ruby, tcl"
-TERMUX_PKG_RECOMMENDS="diffutils, xxd"
+TERMUX_PKG_RECOMMENDS="diffutils, libwayland, xxd"
 TERMUX_PKG_CONFLICTS="vim"
 TERMUX_PKG_BREAKS="vim-python"
 TERMUX_PKG_REPLACES="vim-python"
 TERMUX_PKG_PROVIDES="vim-python"
 TERMUX_PKG_VERSION="9.2.0192"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=96108375ce605418f3c752da41cc2eea007f2d56aea49aef254df10c9fa4a8b7
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -45,6 +46,7 @@ vi_cv_var_python3_version=${TERMUX_PYTHON_VERSION}
 --enable-rubyinterp=dynamic
 --enable-tclinterp=dynamic
 --enable-gui=gtk3
+--with-wayland
 --with-x
 "
 TERMUX_PKG_AUTO_UPDATE=true
@@ -78,6 +80,7 @@ termux_pkg_auto_update() {
 }
 
 termux_step_pre_configure() {
+	termux_setup_wayland_cross_pkg_config_wrapper
 	LDFLAGS+=" -landroid-shmem"
 
 	make distclean
