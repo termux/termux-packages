@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL="https://github.com/simplex-chat/simplexmq/archive/refs/tags/v
 TERMUX_PKG_SHA256=b3643ade5a4dd2dbf78f19ce662c23ad8083397dabcdfbfe277d97ef30a340fb
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="cabal-install, ghc"
+TERMUX_PKG_DEPENDS="cabal, ghc"
 
 termux_step_make() {
 	export BOOTSTRAP_HASKELL_GHC_VERSION=9.6.3
