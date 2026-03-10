@@ -1,5 +1,5 @@
---- ./test/parallel/test-fs-readfile-pipe-large.js.orig	2024-02-20 18:49:29.737449292 +0530
-+++ ./test/parallel/test-fs-readfile-pipe-large.js	2024-02-20 18:55:06.563112174 +0530
+--- ./test/parallel/test-fs-readfile-pipe-large.js.orig	2026-02-24 11:43:38.000000000 +0530
++++ ./test/parallel/test-fs-readfile-pipe-large.js	2026-03-10 23:25:40.618187487 +0530
 @@ -4,13 +4,13 @@
  // Simulate `cat readfile.js | node readfile.js`
  
@@ -11,8 +11,8 @@
  const fs = require('fs');
  
  if (process.argv[2] === 'child') {
--  fs.readFile('/dev/stdin', function(er, data) {
-+  fs.readFile('/proc/self/fd/0', function(er, data) {
-     assert.ifError(er);
+-  fs.readFile('/dev/stdin', common.mustSucceed((data) => {
++  fs.readFile('/proc/self/fd/0', common.mustSucceed((data) => {
      process.stdout.write(data);
-   });
+   }));
+   return;
