@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/simplex-chat/simplexmq
 TERMUX_PKG_DESCRIPTION="SimpleX Messaging Protocol"
-TERMUX_PKG_LICENSE="AGPL-3.0"
+TERMUX_PKG_LICENSE="AGPL v3"
 TERMUX_PKG_MAINTAINER="Izumi Sena Sora <info@unordinary.eu.org>"
 TERMUX_PKG_VERSION="6.4.4"
 TERMUX_PKG_SRCURL="https://github.com/simplex-chat/simplexmq/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
