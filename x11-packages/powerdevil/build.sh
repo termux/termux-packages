@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Manages the power consumption settings of a Plasma Shell
 TERMUX_PKG_LICENSE="LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.6.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/plasma/${TERMUX_PKG_VERSION}/powerdevil-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=73e9b85dbf9791fcf22c01d67b3cf024e23fea170476f09ff8fd91b4034480e9
 TERMUX_PKG_AUTO_UPDATE=true
