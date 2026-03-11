@@ -1,25 +1,3 @@
---- a/gtk2_ardour/ardour_http.cc
-+++ b/gtk2_ardour/ardour_http.cc
-@@ -84,6 +84,7 @@
- 	 */
- 	assert (!ca_path && !ca_info); // call once
- 
-+#ifndef __ANDROID__
- 	if (Glib::file_test ("/etc/pki/tls/certs/ca-bundle.crt", Glib::FILE_TEST_IS_REGULAR)) {
- 		// Fedora / RHEL, Arch
- 		ca_info = "/etc/pki/tls/certs/ca-bundle.crt";
-@@ -96,6 +97,11 @@
- 		// GNU/TLS can keep extra stuff here
- 		ca_info = "/etc/pki/tls/cert.pem";
- 	}
-+#else // __ANDROID__
-+	if (Glib::file_test ("@TERMUX_PREFIX@/etc/tls/cert.pem", Glib::FILE_TEST_IS_REGULAR)) {
-+		ca_info = "@TERMUX_PREFIX@/etc/tls/cert.pem";
-+	}
-+#endif
- 	// else NULL: use default (currently) "/etc/ssl/certs/ca-certificates.crt" if it exists
- 
- 	/* If we don't set anything defaults are used. at the time of writing we compile bundled curl on debian
 --- a/gtk2_ardour/bundle_env_linux.cc
 +++ b/gtk2_ardour/bundle_env_linux.cc
 @@ -104,9 +104,9 @@
