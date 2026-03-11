@@ -1,0 +1,14 @@
+diff --git a/components/named_mojo_ipc_server/named_mojo_server_endpoint_connector_linux.cc b/components/named_mojo_ipc_
+server/named_mojo_server_endpoint_connector_linux.cc
+index 1cfa150c7b..ed692100a5 100644
+--- a/components/named_mojo_ipc_server/named_mojo_server_endpoint_connector_linux.cc
++++ b/components/named_mojo_ipc_server/named_mojo_server_endpoint_connector_linux.cc
+@@ -116,7 +116,7 @@ bool NamedMojoServerEndpointConnectorLinux::TryStart() {
+   if (!options_.require_same_peer_user) {
+     // Allow any user to write to the UDS. fchmod doesn't work after bind(), so
+     // we need to call chmod on the socket filename, which is the server name.
+-    if (chmod(options_.server_name.c_str(), 0o666) != 0) {
++    if (chmod(options_.server_name.c_str(), 0666) != 0) {
+       PLOG(ERROR) << "chmod failed";
+       return false;
+     }

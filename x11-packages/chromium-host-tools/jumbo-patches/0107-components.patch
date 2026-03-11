@@ -654,27 +654,6 @@ index 6a80ced135..8df9523718 100644
  }  // namespace autofill
 +
 +#undef CreateUndoOrClearFormSuggestion
-diff --git a/components/autofill/core/browser/suggestions/payments/payments_suggestion_generator.cc b/components/autofill/core/browser/suggestions/payments/payments_suggestion_generator.cc
-index 0d1824459c..ec1e955b52 100644
---- a/components/autofill/core/browser/suggestions/payments/payments_suggestion_generator.cc
-+++ b/components/autofill/core/browser/suggestions/payments/payments_suggestion_generator.cc
-@@ -64,6 +64,9 @@
- #include "ui/base/l10n/l10n_util.h"
- #include "ui/base/resource/resource_bundle.h"
- 
-+#define CreateSeparator                 CreateSeparator_Payments
-+#define CreateUndoOrClearFormSuggestion CreateUndoOrClearFormSuggestion_Payments
-+
- namespace autofill {
- 
- namespace {
-@@ -1827,3 +1830,6 @@ std::vector<CreditCard> GetOrderedCardsToSuggest(
- }
- 
- }  // namespace autofill
-+
-+#undef CreateSeparator
-+#undef CreateUndoOrClearFormSuggestion
 diff --git a/components/autofill/core/browser/suggestions/valuables/valuable_suggestion_generator.cc b/components/autofill/core/browser/suggestions/valuables/valuable_suggestion_generator.cc
 index 9357fd40f8..18f6988490 100644
 --- a/components/autofill/core/browser/suggestions/valuables/valuable_suggestion_generator.cc
@@ -905,23 +884,27 @@ diff --git a/components/autofill/core/browser/webdata/valuables/valuables_table.
 index 8fce76f4b3..f64c5ffcce 100644
 --- a/components/autofill/core/browser/webdata/valuables/valuables_table.cc
 +++ b/components/autofill/core/browser/webdata/valuables/valuables_table.cc
-@@ -17,6 +17,9 @@
+@@ -18,6 +18,11 @@
  #include "sql/statement.h"
  #include "sql/transaction.h"
  
 +#define GetKey GetKey_WebDatabaseTable
 +#define kMerchantDomain kMerchantDomain_WebDatabaseTable
++#define kUseCount kUseCount_WebDatabaseTable
++#define kUseDate kUseDate_WebDatabaseTable
 +
  namespace autofill {
  
  namespace {
-@@ -274,3 +277,6 @@ bool ValuablesTable::AddOrUpdateLoyaltyCard(const LoyaltyCard& card) {
+@@ -377,3 +382,8 @@
  }
  
  }  // namespace autofill
 +
 +#undef GetKey
 +#undef kMerchantDomain
++#undef kUseCount
++#undef kUseDate
 diff --git a/components/autofill/core/common/BUILD.gn b/components/autofill/core/common/BUILD.gn
 index 7fb02cb952..1f35782a61 100644
 --- a/components/autofill/core/common/BUILD.gn
@@ -4475,3 +4458,41 @@ index f0627214df..2e326bef47 100644
  }  // namespace syncer
 +
 +#undef GenerateCacheGUID
+diff --git a/components/policy/core/common/cloud/cloud_policy_client_types.cc b/components/policy/core/common/cloud/cloud_policy_client_types.cc
+index a76e20bbfc..df3dc9f2aa 100644
+--- a/components/policy/core/common/cloud/cloud_policy_client_types.cc
++++ b/components/policy/core/common/cloud/cloud_policy_client_types.cc
+@@ -8,6 +8,8 @@
+ #include "base/strings/stringprintf.h"
+ #include "components/policy/core/common/cloud/cloud_policy_constants.h"
+ 
++#define IsExtensionInstallPolicyType IsExtensionInstallPolicyType_cloud_policy_client_types
++
+ namespace policy {
+ 
+ namespace {
+@@ -90,3 +92,5 @@ std::set<ExtensionIdAndVersion> PolicyTypeToFetch::extension_ids_and_version()
+ }
+ 
+ }  // namespace policy
++
++#undef IsExtensionInstallPolicyType
+diff --git a/components/policy/core/common/cloud/user_cloud_policy_store.cc b/components/policy/core/common/cloud/user_cloud_policy_store.cc
+index 19c12769fe..1d13789e98 100644
+--- a/components/policy/core/common/cloud/user_cloud_policy_store.cc
++++ b/components/policy/core/common/cloud/user_cloud_policy_store.cc
+@@ -24,6 +24,8 @@
+ #include "components/policy/proto/policy_signing_key.pb.h"
+ #include "google_apis/gaia/gaia_auth_util.h"
+ 
++#define kExtensionInstallKeyCacheFile kExtensionInstallKeyCacheFile_user_cloud_policy_store
++
+ namespace em = enterprise_management;
+ 
+ namespace policy {
+@@ -588,3 +590,5 @@ void UserCloudPolicyStore::ValidateImpl(
+ }
+ 
+ }  // namespace policy
++
++#undef kExtensionInstallKeyCacheFile

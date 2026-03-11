@@ -48,7 +48,6 @@ Enable jumbo build for the following component(s)/source_set(s):
 - //ui/gfx/codec:codec
 - //ui/gfx/geometry:geometry
 - //ui/gfx/geometry:geometry_skia
-- //ui/gfx/ipc/color:color
 - //ui/gfx/ipc/geometry:geometry
 - //ui/gfx/ipc:ipc
 - //ui/gfx/range:range
@@ -521,10 +520,10 @@ diff --git a/ui/base/x/BUILD.gn b/ui/base/x/BUILD.gn
 index c238a1b0cf..dc880044dd 100644
 --- a/ui/base/x/BUILD.gn
 +++ b/ui/base/x/BUILD.gn
-@@ -2,6 +2,7 @@
- # Use of this source code is governed by a BSD-style license that can be
+@@ -3,6 +3,7 @@
  # found in the LICENSE file.
  
+ import("//build/config/features.gni")
 +import("//build/config/jumbo.gni")
  import("//build/config/linux/gtk/gtk.gni")
  import("//build/config/ozone.gni")
@@ -1226,21 +1225,6 @@ index 83f5cd0b14..44f4ad493c 100644
 +
 +jumbo_component("ipc") {
    output_name = "gfx_ipc"
- 
-   sources = [
-diff --git a/ui/gfx/ipc/color/BUILD.gn b/ui/gfx/ipc/color/BUILD.gn
-index 38a069456f..9bbf354122 100644
---- a/ui/gfx/ipc/color/BUILD.gn
-+++ b/ui/gfx/ipc/color/BUILD.gn
-@@ -2,7 +2,9 @@
- # Use of this source code is governed by a BSD-style license that can be
- # found in the LICENSE file.
- 
--component("color") {
-+import("//build/config/jumbo.gni")
-+
-+jumbo_component("color") {
-   output_name = "gfx_ipc_color"
  
    sources = [
 diff --git a/ui/gfx/ipc/geometry/BUILD.gn b/ui/gfx/ipc/geometry/BUILD.gn
