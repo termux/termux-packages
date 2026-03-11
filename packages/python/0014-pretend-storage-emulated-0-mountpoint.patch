@@ -1,0 +1,39 @@
+In some Termux packages, a fake mountpoint at /storage/emulated/0
+is mocked because it successfully causes Trashing files from /storage/emulated/0
+and subfolders to go to a new or existing .Trash-$(id -u) folder in /storage/emulated/0 instead of
+/storage/emulated being detected as the real mountpoint (it is) and causing
+permission denied errors because Termux only has permission for /storage/emulated/0,
+not /storage/emulated.
+Doing that also reportedly allows Termux to detect and manage .Trash folders
+created in /storage/emulated/0 by desktop PCs when the Android
+device was plugged into them and files were then Trashed from the PC file browser,
+because there, that location does technically use a real mountpoint.
+While such a behavior of special-casing /storage/emulated/0 when it's not
+actually a real mountpoint is not part of the XDG Trash specification,
+it has been reported that the most natural expected behavior for users trying to
+use XDG Trash tools in Termux is for them to treat /storage/emulated/0 as though
+it were a mountpoint that should be calculated as a valid directory for .Trash-$(id -u) folders.
+
+This is like https://github.com/termux/termux-packages/pull/28186, but for
+python trash-cli instead of rust trash-rs
+
+This makes this series of commands work on Termux:
+
+pip install trash-cli
+termux-setup-storage
+cd /storage/emulated/0
+touch tempfile
+trash-put tempfile
+
+--- a/Lib/posixpath.py
++++ b/Lib/posixpath.py
+@@ -199,6 +199,9 @@ def ismount(path):
+         if stat.S_ISLNK(s1.st_mode):
+             return False
+ 
++    if path == "/storage/emulated/0":
++        return True
++
+     path = os.fspath(path)
+     if isinstance(path, bytes):
+         parent = join(path, b'..')
