@@ -11,3 +11,59 @@ https://github.com/giampaolo/psutil/issues/2743
  MACOS = sys.platform.startswith("darwin")
  OSX = MACOS  # deprecated alias
  FREEBSD = sys.platform.startswith(("freebsd", "midnightbsd"))
+--- a/psutil/_pslinux.py
++++ b/psutil/_pslinux.py
+@@ -672,7 +672,13 @@ if os.path.exists("/sys/devices/system/cpu/cpufreq/policy0") or os.path.exists(
+                     msg = "can't find current frequency file"
+                     raise NotImplementedError(msg)
+             curr = int(curr) / 1000
+-            max_ = int(bcat(pjoin(path, "scaling_max_freq"))) / 1000
++            max_ = bcat(pjoin(path, "scaling_max_freq"), fallback=None)
++            if max_ is None:
++                max_ = bcat(pjoin(path, "cpuinfo_max_freq"), fallback=None)
++                if max_ is None:
++                    msg = "can't find max frequency file"
++                    raise NotImplementedError(msg)
++            max_ = int(max_) / 1000
+             min_ = int(bcat(pjoin(path, "scaling_min_freq"))) / 1000
+             ret.append(ntp.scpufreq(curr, min_, max_))
+         return ret
+@@ -1209,17 +1209,28 @@ def disk_partitions(all=False):
+     """Return mounted disk partitions as a list of namedtuples."""
+     fstypes = set()
+     procfs_path = get_procfs_path()
++    proc_filesystems_path = procfs_path + "/filesystems"
++    proc_self_mountinfo_path = procfs_path + "/self/mountinfo"
+     if not all:
+-        with open_text(f"{procfs_path}/filesystems") as f:
+-            for line in f:
+-                line = line.strip()
+-                if not line.startswith("nodev"):
+-                    fstypes.add(line.strip())
+-                else:
+-                    # ignore all lines starting with "nodev" except "nodev zfs"
+-                    fstype = line.split("\t")[1]
+-                    if fstype == "zfs":
+-                        fstypes.add("zfs")
++        if os.access(proc_filesystems_path, os.R_OK):
++            with open_text(proc_filesystems_path) as f:
++                for line in f:
++                    line = line.strip()
++                    if not line.startswith("nodev"):
++                        fstypes.add(line.strip())
++                    else:
++                        # ignore all lines starting with "nodev" except "nodev zfs"
++                        fstype = line.split("\t")[1]
++                        if fstype == "zfs":
++                            fstypes.add("zfs")
++        else:
++            with open_text(proc_self_mountinfo_path) as f:
++                for line in f:
++                    line = line.strip().split()
++                    if len(line) > 1:
++                        for i in range(len(line) - 1):
++                             if line[i] == "-":
++                                  fstypes.add(line[i + 1])
+ 
+     # See: https://github.com/giampaolo/psutil/issues/1307
+     if procfs_path == "/proc" and os.path.isfile('/etc/mtab'):
