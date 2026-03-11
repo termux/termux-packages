@@ -9,7 +9,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
-	trap 'cat /home/builder/.ghcup/logs' EXIT
+	trap 'ls -A /home/builder/.ghcup/logs' EXIT
 	export BOOTSTRAP_HASKELL_GHC_VERSION=9.6.3
 	export BOOTSTRAP_HASKELL_CABAL_VERSION=3.10.3.0
 	curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 sh
