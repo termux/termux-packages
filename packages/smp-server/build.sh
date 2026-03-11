@@ -5,10 +5,12 @@ TERMUX_PKG_MAINTAINER="Izumi Sena Sora <info@unordinary.eu.org>"
 TERMUX_PKG_VERSION="6.4.4"
 TERMUX_PKG_SRCURL="https://github.com/simplex-chat/simplexmq/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=b3643ade5a4dd2dbf78f19ce662c23ad8083397dabcdfbfe277d97ef30a340fb
+TERMUX_PKG_BUILD_DEPENDS="libffi-dev, libffi7, libgmp3-dev, libgmp10, libncurses-dev, libncurses5, libtinfo5, pkg-config, zlib1g-dev, libnuma-dev, libssl-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
+	trap 'cat /home/builder/.ghcup/logs' EXIT
 	export BOOTSTRAP_HASKELL_GHC_VERSION=9.6.3
 	export BOOTSTRAP_HASKELL_CABAL_VERSION=3.10.3.0
 	curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 sh
