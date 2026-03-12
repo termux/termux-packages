@@ -17,7 +17,7 @@ fi
 
 ARCH="$1"
 TERMUX_DOCKER_CONTAINER_PREFIX="termux-docker-container-"
-TERMUX_DOCKER_IMAGE_NAME="termux/termux-docker:$ARCH-base"
+: ${TERMUX_DOCKER_IMAGE_NAME:="termux/termux-docker:$ARCH-base"}
 CONTAINER_NAME="${TERMUX_DOCKER_CONTAINER_PREFIX}$2"
 
 __change_container_pid_max() {
@@ -46,8 +46,7 @@ $SUDO docker run \
 	--volume $HOME/termux-apt-repo:/apt:ro \
 	--volume $PWD:/data/data/com.termux/files/usr/termux-packages:rw \
 	--name "$CONTAINER_NAME" \
-	"$TERMUX_DOCKER_IMAGE_NAME" \
-	/entrypoint_root.sh
+	"$TERMUX_DOCKER_IMAGE_NAME"
 
 __change_container_pid_max
 
