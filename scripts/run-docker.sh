@@ -253,6 +253,16 @@ __change_container_pid_max() {
 
 if ! $SUDO $RUNTIME container inspect $CONTAINER_NAME &>/dev/null; then
 	echo "Creating new container..."
+
+	RUNTIME_RUN_ARGS=" \
+		--detach \
+		--init \
+		--name $CONTAINER_NAME \
+		--volume $VOLUME \
+		$SEC_OPT \
+		--tty \
+		$TERMUX_DOCKER_RUN_EXTRA_ARGS"
+
 	if [ "$RUNTIME" = "podman" ]; then
 		# In rootless Podman the default user-namespace mapping is:
 		#   container root (0)  →  host user ($UID)
@@ -266,26 +276,14 @@ if ! $SUDO $RUNTIME container inspect $CONTAINER_NAME &>/dev/null; then
 		# This is safe — "root" in a rootless container is the unprivileged host user;
 		# the user namespace already provides the sandbox.  No host permissions are altered.
 		$SUDO $RUNTIME run \
-			--detach \
-			--init \
+			$RUNTIME_RUN_ARGS \
 			--pids-limit=-1 \
-			--name $CONTAINER_NAME \
-			--volume $VOLUME \
 			--user root \
 			--env HOME=$CONTAINER_HOME_DIR \
-			$SEC_OPT \
-			--tty \
-			$TERMUX_DOCKER_RUN_EXTRA_ARGS \
 			$TERMUX_BUILDER_IMAGE_NAME
 	elif [ "$RUNTIME" = "docker" ]; then
 		$SUDO $RUNTIME run \
-			--detach \
-			--init \
-			--name $CONTAINER_NAME \
-			--volume $VOLUME \
-			$SEC_OPT \
-			--tty \
-			$TERMUX_DOCKER_RUN_EXTRA_ARGS \
+			$RUNTIME_RUN_ARGS \
 			$TERMUX_BUILDER_IMAGE_NAME
 		__change_builder_uid_gid
 	else
@@ -313,20 +311,22 @@ if [ "$#" -eq "0" ]; then
 fi
 
 # Execute command in container
+RUNTIME_EXEC_ARGS=" \
+	$CI_OPT \
+	--env \"DOCKER_EXEC_PID_FILE_PATH=$DOCKER_EXEC_PID_FILE_PATH\" \
+	--interactive $DOCKER_TTY \
+	$TERMUX_DOCKER_EXEC_EXTRA_ARGS"
+
 if [ "$RUNTIME" = "podman" ]; then
-	$SUDO $RUNTIME exec $CI_OPT \
+	$SUDO $RUNTIME exec \
+		$RUNTIME_EXEC_ARGS \
 		--user root \
 		--env HOME=$CONTAINER_HOME_DIR \
-		--env "DOCKER_EXEC_PID_FILE_PATH=$DOCKER_EXEC_PID_FILE_PATH" \
-		--interactive $DOCKER_TTY \
-		$TERMUX_DOCKER_EXEC_EXTRA_ARGS \
 		$CONTAINER_NAME \
 		"$@"
 elif [ "$RUNTIME" = "docker" ]; then
-	$SUDO $RUNTIME exec $CI_OPT \
-		--env "DOCKER_EXEC_PID_FILE_PATH=$DOCKER_EXEC_PID_FILE_PATH" \
-		--interactive $DOCKER_TTY \
-		$TERMUX_DOCKER_EXEC_EXTRA_ARGS \
+	$SUDO $RUNTIME exec \
+		$RUNTIME_EXEC_ARGS \
 		$CONTAINER_NAME \
 		"$@"
 else
