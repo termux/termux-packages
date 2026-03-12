@@ -24,3 +24,5 @@ $SUDO docker run \
 	--volume $PWD:/data/data/com.termux/files/home/termux-packages:rw \
 	--name "$CONTAINER_NAME" \
 	"$TERMUX_DOCKER_IMAGE_NAME"
+
+$SUDO docker container stop "$CONTAINER_NAME"
