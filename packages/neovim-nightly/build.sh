@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility 
 TERMUX_PKG_LICENSE="Apache-2.0, VIM License"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
-TERMUX_PKG_VERSION="0.12.0~dev-2536+gb897e81b30"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="0.12.0~dev-2550+gf847aa6208"
 TERMUX_PKG_SRCURL="https://github.com/neovim/neovim/archive/${TERMUX_PKG_VERSION##*+g}.tar.gz"
-TERMUX_PKG_SHA256=990dcb829240e6cb6d9b9f76bd8b7a70507dab23e4d68688b23bef5684f25315
+TERMUX_PKG_SHA256=1fc22e4c7ad96eaaeca3171636d093e1510e4a8063708e33b85c50605a161130
 TERMUX_PKG_REPOLOGY_METADATA_VERSION="${TERMUX_PKG_VERSION%%~*}"
 TERMUX_PKG_DEPENDS="libandroid-support, libiconv, libmsgpack, libunibilium, libuv, libvterm (>= 1:0.3-0), lua51-lpeg, luajit, luv, tree-sitter, tree-sitter-parsers, utf8proc"
 TERMUX_PKG_BREAKS="neovim"
@@ -26,6 +25,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 # Available since 0.12.0~dev-2459+g62135f5a57
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 -DNLUA0_HOST_PRG=$TERMUX_PKG_HOSTBUILD_DIR/libnlua0.so
+-DNVIM_HOST_PRG=$TERMUX_PKG_HOSTBUILD_DIR/nvim
 "
 
 termux_pkg_auto_update() {
@@ -70,9 +70,11 @@ termux_step_host_build() {
 
 	make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install
 
-	# Copy away host-built libnlua0.so used by src/nvim/generators/preload.lua.
-	# We patch src/nvim/CMakeLists.txt to use this instead of the cross-compiled one.
-	cp ./build/lib/libnlua0.so "$TERMUX_PKG_HOSTBUILD_DIR/"
+	# Copy away host-built libnlua0.so for use as -DNLUA0_HOST_PRG
+	cp -vf ./build/lib/libnlua0.so "$TERMUX_PKG_HOSTBUILD_DIR/"
+
+	# Copy away host-built nvim for use as -DNVIM_HOST_PRG
+	cp -vf ./build/bin/nvim "$TERMUX_PKG_HOSTBUILD_DIR/"
 
 	make distclean
 	rm -Rf build/
