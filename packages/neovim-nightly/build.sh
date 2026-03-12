@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0, VIM License"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="0.12.0~dev-2536+gb897e81b30"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/neovim/neovim/archive/${TERMUX_PKG_VERSION##*+g}.tar.gz"
 TERMUX_PKG_SHA256=990dcb829240e6cb6d9b9f76bd8b7a70507dab23e4d68688b23bef5684f25315
 TERMUX_PKG_REPOLOGY_METADATA_VERSION="${TERMUX_PKG_VERSION%%~*}"
@@ -17,7 +18,6 @@ TERMUX_PKG_UPDATE_VERSION_REGEXP="v.*-dev.*\+g[0-9a-f]*"
 TERMUX_PKG_UPDATE_VERSION_SED_REGEXP="s/-/~/"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--DENABLE_JEMALLOC=OFF
 -DLUAJIT_INCLUDE_DIR=$TERMUX_PREFIX/include/luajit-2.1
 -DLPEG_LIBRARY=$TERMUX_PREFIX/lib/liblpeg-5.1.so
 -DCOMPILE_LUA=OFF
@@ -79,17 +79,6 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
-	# msgfmt etc. need to be set here rather than globally, because if set globally,
-	# scripts/bin/update-checksum would fail to source this build.sh during the auto update
-	# workflow that doesn't have those commands present since it hasn't run setup-ubuntu.sh
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
-	-DLUA_MATH_LIBRARY=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libm.so
-	-DGETTEXT_MSGFMT_EXECUTABLE=$(command -v msgfmt)
-	-DGETTEXT_MSGMERGE_EXECUTABLE=$(command -v msgmerge)
-	-DPKG_CONFIG_EXECUTABLE=$(command -v pkg-config)
-	-DXGETTEXT_PRG=$(command -v xgettext)
-	"
-
 	# neovim has a weird CMake file that attempts to preprocess generated headers
 	# using the NDK Clang, but without ever adding the necessary --target argument
 	# to its commands for cross-preprocessing, so that must be done manually
