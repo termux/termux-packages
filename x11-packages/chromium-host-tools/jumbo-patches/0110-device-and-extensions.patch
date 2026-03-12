@@ -753,7 +753,7 @@ index 676a3a6166..baa24d545a 100644
      const base::Value& condition,
      std::string* error) {
 +  namespace keys = declarative_webrequest_constants;
-   const base::Value::Dict* condition_dict = condition.GetIfDict();
+   const base::DictValue* condition_dict = condition.GetIfDict();
    if (!condition_dict) {
      *error = kExpectedDictionary;
 diff --git a/extensions/browser/api/declarative_webrequest/webrequest_condition_attribute.cc b/extensions/browser/api/declarative_webrequest/webrequest_condition_attribute.cc
@@ -938,10 +938,10 @@ index 262048f73d..cf68c564eb 100644
  
 @@ -1801,6 +1800,7 @@ void ClearCacheOnNavigation() {
  // dictionary.
- base::Value::Dict CreateHeaderDictionary(const std::string& name,
-                                          const std::string& value) {
-+  namespace keys = extension_web_request_api_constants; 
-   base::Value::Dict header;
+ base::DictValue CreateHeaderDictionary(const std::string& name,
+                                        const std::string& value) {
++  namespace keys = extension_web_request_api_constants;
+   base::DictValue header;
    header.Set(keys::kHeaderNameKey, name);
    if (base::IsStringUTF8(value)) {
 diff --git a/extensions/browser/api/web_request/web_request_event_details.cc b/extensions/browser/api/web_request/web_request_event_details.cc
@@ -1029,19 +1029,19 @@ index af80323215..68c8e72d0a 100644
 +++ b/extensions/browser/guest_view/app_view/app_view_guest.cc
 @@ -219,7 +219,7 @@ void AppViewGuest::CreateInnerPage(
      scoped_refptr<content::SiteInstance> site_instance,
-     const base::Value::Dict& create_params,
+     const base::DictValue& create_params,
      GuestPageCreatedCallback callback) {
 -  const std::string* app_id = create_params.FindString(appview::kAppID);
 +  const std::string* app_id = create_params.FindString(::appview::kAppID);
    if (!app_id) {
      RejectGuestCreation(std::move(owned_this), std::move(callback));
      return;
-@@ -230,7 +230,7 @@ void AppViewGuest::CreateInnerPage(
+@@ -230,7 +230,7 @@
      return;
    }
  
--  const base::Value::Dict* data = create_params.FindDict(appview::kData);
-+  const base::Value::Dict* data = create_params.FindDict(::appview::kData);
+-  const base::DictValue* data = create_params.FindDict(appview::kData);
++  const base::DictValue* data = create_params.FindDict(::appview::kData);
    if (!data) {
      RejectGuestCreation(std::move(owned_this), std::move(callback));
      return;
@@ -1057,7 +1057,7 @@ index af80323215..68c8e72d0a 100644
 @@ -359,9 +359,9 @@ void AppViewGuest::LaunchAppAndFireEvent(
                                       std::move(callback))));
  
-   base::Value::Dict embed_request;
+   base::DictValue embed_request;
 -  embed_request.Set(appview::kGuestInstanceID, guest_instance_id());
 -  embed_request.Set(appview::kEmbedderID, owner_host());
 -  embed_request.Set(appview::kData, std::move(data));

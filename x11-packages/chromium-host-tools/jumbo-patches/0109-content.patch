@@ -296,11 +296,14 @@ index 548abd4a68..1b7675f724 100644
      "about_url_loader_factory.cc",
      "about_url_loader_factory.h",
      "accessibility/accessibility_tree_formatter_blink.cc",
-@@ -2539,6 +2592,7 @@ source_set("browser") {
+@@ -2537,6 +2590,10 @@ source_set("browser") {
      "worker_host/worker_script_loader_factory.cc",
      "worker_host/worker_script_loader_factory.h",
    ]
-+  jumbo_excluded_sources = []
++  jumbo_excluded_sources = [
++    # It requires CloneTraits<std::vector<bool>>
++    "webid/document_metadata.cc",
++  ]
  
    if (is_android) {
      sources += [
@@ -435,25 +438,6 @@ index b32d9d850e..19577278fc 100644
 +
 +#undef kDatabasePath
 +#undef kUnsetRecordId
-diff --git a/content/browser/btm/btm_page_visit_observer.cc b/content/browser/btm/btm_page_visit_observer.cc
-index 92b72a5bbc..90e9ec5edd 100644
---- a/content/browser/btm/btm_page_visit_observer.cc
-+++ b/content/browser/btm/btm_page_visit_observer.cc
-@@ -55,6 +55,8 @@ BtmPageVisitObserver::~BtmPageVisitObserver() {
-   }
- }
- 
-+#define NavigationState NavigationState_PageVisit
-+
- namespace {
- 
- inline bool IsWrite(BtmDataAccessType t) {
-@@ -347,3 +349,5 @@ void BtmPageVisitObserver::WebAuthnAssertionRequestSucceeded(
- }
- 
- }  // namespace content
-+
-+#undef NavigationState
 diff --git a/content/browser/devtools/BUILD.gn b/content/browser/devtools/BUILD.gn
 index 4cecc088a0..5e5894fd4d 100644
 --- a/content/browser/devtools/BUILD.gn
@@ -738,25 +722,6 @@ index 771736dea6..dbcbb60703 100644
  }  // namespace content
 +
 +#undef kFramingHeaderSize
-diff --git a/content/browser/interest_group/bidding_and_auction_serializer.cc b/content/browser/interest_group/bidding_and_auction_serializer.cc
-index fec434fced..508e4a4529 100644
---- a/content/browser/interest_group/bidding_and_auction_serializer.cc
-+++ b/content/browser/interest_group/bidding_and_auction_serializer.cc
-@@ -41,6 +41,8 @@
- #include "third_party/blink/public/mojom/interest_group/interest_group_types.mojom.h"
- #include "third_party/zlib/google/compression_utils.h"
- 
-+#define kFramingHeaderSize kFramingHeaderSize_BiddingAndAuctionSerializer
-+
- namespace content {
- 
- namespace {
-@@ -1218,3 +1220,5 @@ BiddingAndAuctionSerializer::BuildRequestFromMessage(const url::Origin& seller,
- }
- 
- }  // namespace content
-+
-+#undef kFramingHeaderSize
 diff --git a/content/browser/interest_group/interest_group_manager_impl.cc b/content/browser/interest_group/interest_group_manager_impl.cc
 index 5b7e8b41e5..514c312d56 100644
 --- a/content/browser/interest_group/interest_group_manager_impl.cc
@@ -1008,65 +973,6 @@ index 4afbec12cb..2c312d1e6a 100644
  }  // namespace content
 +
 +#undef GotSaltAndOrigin
-diff --git a/content/browser/renderer_host/private_network_access_util.cc b/content/browser/renderer_host/private_network_access_util.cc
-index 8fdcc5bb2c..2b7f2f86aa 100644
---- a/content/browser/renderer_host/private_network_access_util.cc
-+++ b/content/browser/renderer_host/private_network_access_util.cc
-@@ -42,22 +42,22 @@ FeatureState FeatureStateForContext(RequestContext request_context) {
- 
-       case RequestContext::kWorker:
-         if (!base::FeatureList::IsEnabled(
--                features::kLocalNetworkAccessForWorkers)) {
-+                ::features::kLocalNetworkAccessForWorkers)) {
-           return FeatureState::kDisabled;
-         }
-         if (base::FeatureList::IsEnabled(
--                features::kLocalNetworkAccessForWorkersWarningOnly)) {
-+                ::features::kLocalNetworkAccessForWorkersWarningOnly)) {
-           return FeatureState::kWarningOnly;
-         }
-         return FeatureState::kEnabled;
- 
-       case RequestContext::kSubframeNavigation:
-         if (!base::FeatureList::IsEnabled(
--                features::kLocalNetworkAccessForSubframeNavigations)) {
-+                ::features::kLocalNetworkAccessForSubframeNavigations)) {
-           return FeatureState::kDisabled;
-         }
-         if (base::FeatureList::IsEnabled(
--                features::
-+                ::features::
-                     kLocalNetworkAccessForSubframeNavigationsWarningOnly)) {
-           return FeatureState::kWarningOnly;
-         }
-@@ -65,11 +65,11 @@ FeatureState FeatureStateForContext(RequestContext request_context) {
- 
-       case RequestContext::kFencedFrameNavigation:
-         if (!base::FeatureList::IsEnabled(
--                features::kLocalNetworkAccessForFencedFrameNavigations)) {
-+                ::features::kLocalNetworkAccessForFencedFrameNavigations)) {
-           return FeatureState::kDisabled;
-         }
-         if (base::FeatureList::IsEnabled(
--                features::
-+                ::features::
-                     kLocalNetworkAccessForFencedFrameNavigationsWarningOnly)) {
-           return FeatureState::kWarningOnly;
-         }
-@@ -77,11 +77,11 @@ FeatureState FeatureStateForContext(RequestContext request_context) {
- 
-       case RequestContext::kMainFrameNavigation:
-         if (!base::FeatureList::IsEnabled(
--                features::kLocalNetworkAccessForNavigations)) {
-+                ::features::kLocalNetworkAccessForNavigations)) {
-           return FeatureState::kDisabled;
-         }
-         if (base::FeatureList::IsEnabled(
--                features::kLocalNetworkAccessForNavigationsWarningOnly)) {
-+                ::features::kLocalNetworkAccessForNavigationsWarningOnly)) {
-           return FeatureState::kWarningOnly;
-         }
-         return FeatureState::kEnabled;
 diff --git a/content/browser/renderer_host/randomized_confidence_utils.cc b/content/browser/renderer_host/randomized_confidence_utils.cc
 index 4297ff2a1a..a0a2f4bc1c 100644
 --- a/content/browser/renderer_host/randomized_confidence_utils.cc
@@ -1136,15 +1042,6 @@ index ce1e5c6577..03f0edaa26 100644
      CreateBrokerHolder();
    }
  
-@@ -2557,7 +2559,7 @@
-       GetLocalRenderWidgetHost()->SetIntersectsViewport(true);
-     }
-     GetLocalRenderWidgetHost()->SetFrameDepth(depth_);
--    if (base::FeatureList::IsEnabled(features::kSubframePriorityContribution)) {
-+    if (base::FeatureList::IsEnabled(::features::kSubframePriorityContribution)) {
-       GetLocalRenderWidgetHost()->SetShouldContributePriorityToProcess(
-           ShouldContributePriorityToProcess(lifecycle_state_));
-     }
 @@ -2636,7 +2638,7 @@
    MaybeResetBoostRenderProcessForLoading();
  
@@ -1307,15 +1204,6 @@ index ce1e5c6577..03f0edaa26 100644
      if (params->insecure_request_policy !=
          frame_tree_node_->current_replication_state().insecure_request_policy) {
        bad_message::ReceivedBadMessage(
-@@ -16431,7 +16433,7 @@
-   // TODO(crbug.com/40205612): Remove the kill switch for this check.
-   bool should_block_storage_access_for_pdf =
-       GetSiteInstance()->GetSiteInfo().is_pdf() &&
--      base::FeatureList::IsEnabled(features::kPdfEnforcements);
-+      base::FeatureList::IsEnabled(::features::kPdfEnforcements);
- 
-   // Make sure the origin of the isolation info and origin to commit match,
-   // otherwise the cookie manager will crash. Sending the cookie manager here
 @@ -16701,7 +16703,7 @@
    }
  
@@ -1361,15 +1249,6 @@ index ce1e5c6577..03f0edaa26 100644
      return;
    }
  #endif
-@@ -18437,7 +18439,7 @@
-   LifecycleStateImpl old_state = lifecycle_state_;
-   lifecycle_state_ = new_state;
- 
--  if (base::FeatureList::IsEnabled(features::kSubframePriorityContribution)) {
-+  if (base::FeatureList::IsEnabled(::features::kSubframePriorityContribution)) {
-     auto* local_render_widget_host = GetLocalRenderWidgetHost();
-     if (local_render_widget_host) {
-       // The priority contribution of the main frame is controlled also by
 @@ -18794,14 +18796,14 @@
    // the new functionality for swapping BrowsingContext on cross
    // BrowsingInstance navigations, the BrowsingContextState is the only field
@@ -1798,15 +1677,6 @@ diff --git a/content/browser/renderer_host/render_widget_host_impl.cc b/content/
 index 16c3a86ec4..71f2c45d53 100644
 --- a/content/browser/renderer_host/render_widget_host_impl.cc
 +++ b/content/browser/renderer_host/render_widget_host_impl.cc
-@@ -2107,7 +2107,7 @@ RenderProcessHostPriorityClient::Priority RenderWidgetHostImpl::GetPriority() {
- #endif
-   };
-   bool should_contribute = false;
--  if (base::FeatureList::IsEnabled(features::kSubframePriorityContribution)) {
-+  if (base::FeatureList::IsEnabled(::features::kSubframePriorityContribution)) {
-     should_contribute = should_contribute_priority_to_process_;
-     if (owner_delegate_ && !owner_delegate_->IsMainFrameActive()) {
-       // If this RenderWidgetHost is owned by a RenderViewHost which does not
 @@ -2172,7 +2172,7 @@ void RenderWidgetHostImpl::GetSnapshotFromBrowser(
    if (from_surface) {
      pending_surface_browser_snapshots_.insert(
@@ -2512,7 +2382,7 @@ index 77571a37e4..1d8906af14 100644
 @@ -372,7 +372,7 @@
    add_load_time_data_defaults_ = false;
    std::string locale = GetContentClient()->browser()->GetApplicationLocale();
-   base::Value::Dict defaults;
+   base::DictValue defaults;
 -  webui::SetLoadTimeDataDefaults(locale, &defaults);
 +  ::webui::SetLoadTimeDataDefaults(locale, &defaults);
    AddLocalizedStrings(defaults);
@@ -2586,3 +2456,59 @@ index 77571a37e4..1d8906af14 100644
        GetContentClient()->browser()->IsInitialWebUIURL(url)) {
      // If initial WebUIs need to use a different process separate from other
      // WebUIs, use the full URL for process lock instead of just the TLD.
+diff --git a/content/browser/preloading/prefetch/prefetch_serving_handle.cc b/content/browser/preloading/prefetch/prefetch_serving_handle.cc
+index 11b2a226ba..dbcb301e99 100644
+--- a/content/browser/preloading/prefetch/prefetch_serving_handle.cc
++++ b/content/browser/preloading/prefetch/prefetch_serving_handle.cc
+@@ -22,6 +22,8 @@
+ #include "content/public/browser/storage_partition.h"
+ #include "url/gurl.h"
+ 
++#define BindOnceForRvalueMemberMethod BindOnceForRvalueMemberMethod_prefetch_serving_handle
++
+ namespace content {
+ namespace {
+ 
+@@ -432,3 +434,5 @@ PrefetchStatus PrefetchServingHandle::GetPrefetchStatus() const {
+ }
+ 
+ }  // namespace content
++
++#undef BindOnceForRvalueMemberMethod
+diff --git a/content/browser/preloading/prefetch/prefetch_url_loader_helper.cc b/content/browser/preloading/prefetch/prefetch_url_loader_helper.cc
+index 20fcc2890d..e73463b834 100644
+--- a/content/browser/preloading/prefetch/prefetch_url_loader_helper.cc
++++ b/content/browser/preloading/prefetch/prefetch_url_loader_helper.cc
+@@ -25,6 +25,8 @@
+ // TODO(https://crbug.com/437416134): Move this file's contents to
+ // `prefetch_serving_handle.cc`.
+ 
++#define BindOnceForRvalueMemberMethod BindOnceForRvalueMemberMethod_prefetch_url_loader_helper
++
+ namespace content {
+ namespace {
+ 
+@@ -385,3 +387,5 @@ void PrefetchServingHandle::OnGotPrefetchToServe(
+ }
+ 
+ }  // namespace content
++
++#undef BindOnceForRvalueMemberMethod
+diff --git a/content/browser/webid/document_metadata.cc b/content/browser/webid/document_metadata.cc
+index 5d94445e34..f1073136d1 100644
+--- a/content/browser/webid/document_metadata.cc
++++ b/content/browser/webid/document_metadata.cc
+@@ -9,6 +9,13 @@
+ #include "content/public/browser/render_frame_host.h"
+ #include "services/service_manager/public/cpp/interface_provider.h"
+ 
++template <>
++struct mojo::CloneTraits<std::vector<bool>> {
++  static std::vector<bool> Clone(const std::vector<bool>& input) {
++    return input;
++  }
++};
++
+ namespace content::webid {
+ 
+ namespace {

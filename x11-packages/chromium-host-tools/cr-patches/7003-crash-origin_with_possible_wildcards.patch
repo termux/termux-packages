@@ -1,0 +1,17 @@
+https://github.com/android/ndk/issues/2226
+
+diff --git a/services/network/public/cpp/permissions_policy/origin_with_possible_wildcards.cc b/services/network/public/cpp/permissions_policy/origin_with_possible_wildcards.cc
+index e14d79aa57..12c57ce39f 100644
+--- a/services/network/public/cpp/permissions_policy/origin_with_possible_wildcards.cc
++++ b/services/network/public/cpp/permissions_policy/origin_with_possible_wildcards.cc
+@@ -94,7 +94,9 @@ bool OriginWithPossibleWildcards::DoesMatchOrigin(
+ }
+ 
+ bool operator==(const OriginWithPossibleWildcards& lhs,
+-                const OriginWithPossibleWildcards& rhs) = default;
++                const OriginWithPossibleWildcards& rhs) {
++  return (lhs <=> rhs) == 0;
++}
+ 
+ std::strong_ordering operator<=>(const OriginWithPossibleWildcards& lhs,
+                                  const OriginWithPossibleWildcards& rhs) {

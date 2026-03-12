@@ -58,7 +58,7 @@ index 05490a65a0..b759021b2a 100644
  import("//build/config/mips.gni")
  import("//build/config/riscv.gni")
  import("//build/config/rust.gni")
-@@ -3101,26 +3102,54 @@ v8_source_set("v8_initializers") {
+@@ -3101,26 +3102,55 @@ v8_source_set("v8_initializers") {
      }
    }
  
@@ -76,6 +76,7 @@ index 05490a65a0..b759021b2a 100644
 +    "src/ic/binary-op-assembler.cc",
 +    "src/ic/unary-op-assembler.cc",
 +    "src/interpreter/interpreter-generator.cc",
++    "src/compiler/turboshaft/builtin-compiler.cc",
 +  ]
 +
    if (v8_current_cpu == "x86") {
@@ -113,7 +114,7 @@ index 05490a65a0..b759021b2a 100644
    } else if (v8_current_cpu == "mips64" || v8_current_cpu == "mips64el") {
      sources += [
        ### gcmole(mips64el) ###
-@@ -5200,6 +5229,24 @@ v8_compiler_sources = [
+@@ -5200,6 +5229,25 @@ v8_compiler_sources = [
    "src/compiler/zone-stats.cc",
  ]
  
@@ -133,6 +134,7 @@ index 05490a65a0..b759021b2a 100644
 +  "src/compiler/turboshaft/csa-load-elimination-phase.cc",
 +  "src/compiler/turboshaft/csa-memory-optimization-phase.cc",
 +  "src/compiler/turboshaft/pipelines.cc",
++  "src/compiler/turboshaft/turbolev-frontend-pipeline.cc",
 +]
 +
  if (!v8_enable_maglev) {
@@ -860,14 +862,14 @@ diff --git a/v8/src/sandbox/testing.cc b/v8/src/sandbox/testing.cc
 index 52d7395145..d96f56f433 100644
 --- a/v8/src/sandbox/testing.cc
 +++ b/v8/src/sandbox/testing.cc
-@@ -20,6 +20,7 @@
+@@ -29,6 +29,7 @@
  #include <sys/mman.h>
  #include <sys/ucontext.h>
  #include <unistd.h>
 +#undef MAP_TYPE
- #endif  // V8_OS_LINUX
  
- #ifdef V8_USE_ADDRESS_SANITIZER
+ #include "src/base/platform/platform-linux.h"
+ #endif  // V8_OS_LINUX
 diff --git a/v8/src/snapshot/read-only-deserializer.cc b/v8/src/snapshot/read-only-deserializer.cc
 index 24e770f1ab..3568071acb 100644
 --- a/v8/src/snapshot/read-only-deserializer.cc
@@ -1009,3 +1011,25 @@ index 68e56a28b8..d025caf4cb 100644
  }  // namespace v8::internal::compiler::turboshaft
 +
 +#undef TRACE
+diff --git a/v8/src/regexp/regexp-compiler-tonode.cc b/v8/src/regexp/regexp-compiler-tonode.cc
+index 24ff99c950..0a3a077905 100644
+--- a/v8/src/regexp/regexp-compiler-tonode.cc
++++ b/v8/src/regexp/regexp-compiler-tonode.cc
+@@ -2329,4 +2329,6 @@ RegExpNode* RegExpQuantifier::ToNode(int min, int max, bool is_greedy,
+ }  // namespace internal
+ }  // namespace v8
+ 
++#undef TRACE
++#undef TRACE_WITH_NODE
+ #undef kMaxCodePoint
+diff --git a/v8/src/regexp/regexp-compiler.cc b/v8/src/regexp/regexp-compiler.cc
+index a3e7c170d4..9d511b6972 100644
+--- a/v8/src/regexp/regexp-compiler.cc
++++ b/v8/src/regexp/regexp-compiler.cc
+@@ -4106,3 +4106,6 @@ void RegExpCompiler::set_diagnostics(
+ #endif
+ 
+ }  // namespace v8::internal
++
++#undef TRACE
++#undef TRACE_WITH_NODE
