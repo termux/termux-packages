@@ -84,9 +84,9 @@ _show_usage() {
 	echo "  which runs docker contains '$BUILDSCRIPT_NAME', and it will run"
 	echo "  'build-package-dry-run-simulation.sh' with arguments passed to this script."
 	echo "- When using Podman (via TERMUX_CONTAINER_RUNTIME=podman),"
-	echo "  the container runs rootless. No sudo is required, and host file"
-	echo "  permissions are never altered. Container runs as root in the user namespace"
-	echo "  (which maps to your unprivileged host user)."
+	echo "  the container runs rootless as the image's 'builder' user (uid 1001)."
+	echo "  No sudo is required and host file permissions are never altered."
+	echo "  Your host uid is mapped to builder via explicit uidmap/gidmap."
 	exit 0
 }
 
@@ -270,22 +270,19 @@ if ! $SUDO $RUNTIME container inspect $CONTAINER_NAME &>/dev/null; then
 		$TERMUX_DOCKER_RUN_EXTRA_ARGS"
 
 	if [ "$RUNTIME" = "podman" ]; then
-		# In rootless Podman the default user-namespace mapping is:
-		#   container root (0)  →  host user ($UID)
-		#   container 1-N       →  host subuid range
-		#
-		# We run as root *inside* the container so that:
-		#   • chmod/chown (used by tar, dpkg, etc.) work within the userns
-		#   • the image's builder-owned toolchain files are accessible (root can read all)
-		#   • files written to the bind-mounted repo volume land as the host user on disk
-		#
-		# This is safe — "root" in a rootless container is the unprivileged host user;
-		# the user namespace already provides the sandbox.  No host permissions are altered.
+		# Map the host user (parent-ns uid 0) to the image's "builder"
+		# account (container uid/gid 1001) via explicit id mappings.
+		# This gives us:
+		#   • bind-mounted repo files appear as builder-owned  → writable
+		#   • /home/builder and /data are builder-owned         → accessible
+		#   • we run as non-root (uid 1001)                     → compatible with
+		#     proot-based builds that invoke Termux's apt (which refuses uid 0)
+		#   • host file permissions are never altered (rootless user namespace)
 		$SUDO $RUNTIME run \
 			$RUNTIME_RUN_ARGS \
 			--pids-limit=-1 \
-			--user root \
-			--env HOME=$CONTAINER_HOME_DIR \
+			--uidmap "0:1:1001" --uidmap "1001:0:1" --uidmap "1002:1002:64535" \
+			--gidmap "0:1:1001" --gidmap "1001:0:1" --gidmap "1002:1002:64535" \
 			$TERMUX_BUILDER_IMAGE_NAME
 	elif [ "$RUNTIME" = "docker" ]; then
 		$SUDO $RUNTIME run \
@@ -323,19 +320,7 @@ RUNTIME_EXEC_ARGS=" \
 	--interactive $DOCKER_TTY \
 	$TERMUX_DOCKER_EXEC_EXTRA_ARGS"
 
-if [ "$RUNTIME" = "podman" ]; then
-	$SUDO $RUNTIME exec \
-		$RUNTIME_EXEC_ARGS \
-		--user root \
-		--env HOME=$CONTAINER_HOME_DIR \
-		$CONTAINER_NAME \
-		"$@"
-elif [ "$RUNTIME" = "docker" ]; then
-	$SUDO $RUNTIME exec \
-		$RUNTIME_EXEC_ARGS \
-		$CONTAINER_NAME \
-		"$@"
-else
-	echo "Error: Unsupported runtime '$RUNTIME'" >&2
-	exit 1
-fi
+$SUDO $RUNTIME exec \
+	$RUNTIME_EXEC_ARGS \
+	$CONTAINER_NAME \
+	"$@"
