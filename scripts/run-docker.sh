@@ -133,25 +133,31 @@ fi
 UNAME=$(uname)
 if [ "$RUNTIME" = "podman" ]; then
 	REPOROOT="$(dirname $(readlink -f $0))/../"
-	# No custom seccomp profile: Docker's profile.json blocks chmod/fchmodat
-	# in rootless Podman's user-namespace context.  Podman's default seccomp
-	# profile already allows the needed syscalls (personality, mount, umount2)
-	# when CAP_SYS_ADMIN is granted.
-	# CAP_SYS_ADMIN (within user namespace) and /dev/fuse are needed for
-	# fuse-overlayfs mounts used by the build system.
-	SEC_OPT=" --cap-add CAP_SYS_ADMIN --device /dev/fuse"
 elif [ "$RUNTIME" = "docker" ]; then
 	if [ "$UNAME" = Darwin ]; then
 		# Workaround for mac readlink not supporting -f.
 		REPOROOT=$PWD
-		SEC_OPT=""
 	else
 		REPOROOT="$(dirname $(readlink -f $0))/../"
-		SEC_OPT=" --security-opt seccomp=$REPOROOT/scripts/profile.json --security-opt apparmor=_custom-termux-package-builder-$CONTAINER_NAME --cap-add CAP_SYS_ADMIN --device /dev/fuse"
 	fi
 else
 	echo "Error: Unsupported runtime '$RUNTIME'" >&2
 	exit 1
+fi
+
+# Custom seccomp profile (profile.json) is required: the default profiles of
+# Docker and Podman do not unconditionally allow personality(), which breaks
+# proot-based cross-compilation (qemu-arm).  The profile also includes
+# fchmodat2 for modern glibc compat.
+# CAP_SYS_ADMIN and /dev/fuse are needed for fuse-overlayfs mounts used by
+# the build system.
+if [ "$UNAME" = Darwin ]; then
+	SEC_OPT=""
+else
+	SEC_OPT=" --security-opt seccomp=$REPOROOT/scripts/profile.json --cap-add CAP_SYS_ADMIN --device /dev/fuse"
+	if [ "$RUNTIME" = "docker" ]; then
+		SEC_OPT+=" --security-opt apparmor=_custom-termux-package-builder-$CONTAINER_NAME"
+	fi
 fi
 
 if [ "${CI:-}" = "true" ]; then
