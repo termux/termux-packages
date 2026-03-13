@@ -3,14 +3,14 @@ TERMUX_PKG_DESCRIPTION="Fake ldd command"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.3"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
-TERMUX_PKG_DEPENDS="bash, llvm"
+TERMUX_PKG_DEPENDS="bash, binutils"
 TERMUX_PKG_CONFLICTS="binutils (<< 2.39-1)"
 
 termux_step_make_install() {
-	local _READELF="$TERMUX_PREFIX/bin/readelf"
+	local _READELF="$TERMUX_PREFIX/bin/greadelf"
 
 	local ldd="$TERMUX_PREFIX/bin/ldd"
 	mkdir -p "$(dirname "${ldd}")"
