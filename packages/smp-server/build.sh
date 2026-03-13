@@ -9,16 +9,14 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
-	trap 'cat /home/builder/.ghcup/logs/*' EXIT
 	export BOOTSTRAP_HASKELL_GHC_VERSION=9.6.3
 	export BOOTSTRAP_HASKELL_CABAL_VERSION=3.10.3.0
-	#curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 sh
 	mkdir -p ~/.ghcup/bin && curl https://downloads.haskell.org/~ghcup/$(uname -m)-linux-ghcup -o ~/.ghcup/bin/ghcup && chmod +x ~/.ghcup/bin/ghcup
 	export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$PATH"
 	ghcup install ghc "${BOOTSTRAP_HASKELL_GHC_VERSION}"
 	ghcup set ghc "${BOOTSTRAP_HASKELL_GHC_VERSION}"
+	ghcup install cabal "${BOOTSTRAP_HASKELL_CABAL_VERSION}"
 	ghcup set cabal "${BOOTSTRAP_HASKELL_CABAL_VERSION}"
-	source ~/.ghcup/env
 	cabal update
 	cabal build exe:"${TERMUX_PKG_NAME}"
 }
