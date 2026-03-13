@@ -15,6 +15,7 @@ termux_step_make() {
 	#curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 sh
 	mkdir -p ~/.ghcup/bin && curl https://downloads.haskell.org/~ghcup/$(uname -m)-linux-ghcup -o ~/.ghcup/bin/ghcup && chmod +x ~/.ghcup/bin/ghcup
 	export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$PATH"
+	ghcup install ghc "${BOOTSTRAP_HASKELL_GHC_VERSION}"
 	ghcup set ghc "${BOOTSTRAP_HASKELL_GHC_VERSION}"
 	ghcup set cabal "${BOOTSTRAP_HASKELL_CABAL_VERSION}"
 	source ~/.ghcup/env
