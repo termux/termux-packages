@@ -1,5 +1,10 @@
 #!/bin/bash
 
+[[ -n "${DEBUG+y}" ]] && {
+    PS4='+$0 \[\e[32m\]${FUNCNAME[0]:-<global scope>}${FUNCNAME[*]:+()}:$LINENO\[\e[0m\] '
+    set -x
+}
+
 KLIBPATH=lib@ARCH_SUFFIX@
 
 system_libs=(libEGL.so libGLESv1_CM.so libGLESv2.so libGLESv3.so libOpenMAXAL.so libOpenSLES.so libaaudio.so libandroid.so libc.so libcamera2ndk.so libdl.so libjnigraphics.so liblog.so libm.so libmediandk.so libstdc++.so libvulkan.so libz.so)
