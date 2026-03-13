@@ -1,0 +1,11 @@
+--- a/src/libcxathrow/shared.cpp
++++ b/src/libcxathrow/shared.cpp
+@@ -18,7 +18,7 @@
+   if (demangled) {
+     free(demangled);
+   }
+-#ifndef __APPLE__
++#ifndef _LIBCPP_VERSION
+   const auto *exc =
+       dynamic_cast<const abi::__class_type_info *>(&typeid(std::exception));
+   const auto *cti = dynamic_cast<const abi::__class_type_info *>(typeinfo);
