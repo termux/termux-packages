@@ -1,0 +1,14 @@
+# ProcStatusThreads() was added in this commit
+# https://github.com/MusicPlayerDaemon/MPD/commit/2741885a95f0085e7f3ebcc03a555e64c19549c6
+
+--- a/src/Main.cxx
++++ b/src/Main.cxx
+@@ -695,7 +695,7 @@
+ int
+ main(int argc, char *argv[]) noexcept
+ try {
+-#ifdef __linux__
++#if defined (__linux__) && !defined(__ANDROID__)
+ 	if (ProcStatusThreads() > 1)
+ 		/* threads created by libraries before main() can
+ 		   cause all sorts of bugs that are difficult to
