@@ -78,4 +78,4 @@ PACKAGES+=("htop" "tree" "ripgrep" "ripgrep-all" "bat" "apt-file" "file")
 $SUDO docker exec -it $CONTAINER_NAME /entrypoint.sh bash -c "apt-get install -y ${PACKAGES[*]}"
 $SUDO docker exec -it $CONTAINER_NAME /entrypoint.sh bash -c "apt-file update"
 # Change default shell to fish
-$SUDO docker exec -it $CONTAINER_NAME /entrypoint.sh bash -c "chsh -s fish"
+$SUDO docker exec -it $CONTAINER_NAME /entrypoint.sh bash -c "echo 'exec fish\$@' >> ~/.bashrc"
