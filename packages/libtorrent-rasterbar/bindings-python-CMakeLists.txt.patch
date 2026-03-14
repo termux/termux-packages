@@ -1,12 +1,20 @@
-diff -u -r ../libtorrent-rasterbar-2.0.10/bindings/python/CMakeLists.txt ./bindings/python/CMakeLists.txt
---- ../libtorrent-rasterbar-2.0.10/bindings/python/CMakeLists.txt	2024-02-19 12:16:53.000000000 +0000
-+++ ./bindings/python/CMakeLists.txt	2024-10-04 21:47:58.878498289 +0000
-@@ -19,7 +19,7 @@
- # See https://devguide.python.org/#status-of-python-branches for supported python versions
- function(_get_compatible_python_versions _ret)
- 	if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 20)
--		list(APPEND _tmp 3.6 3.7 3.8 3.9 3.10 3.11)
-+		list(APPEND _tmp 3.6 3.7 3.8 3.9 3.10 3.11 3.12 3.13)
- 	endif()
- 	set(${_ret} ${_tmp} PARENT_SCOPE)
- endfunction()
+# Fixes cmake install error: file cannot create directory: /lib/python3.13/site-packages.
+
+--- a/bindings/python/CMakeLists.txt
++++ b/bindings/python/CMakeLists.txt
+@@ -106,7 +106,7 @@
+ message(STATUS "Python 3 site packages: ${_PYTHON3_SITE_ARCH}")
+ message(STATUS "Python 3 extension suffix: ${Python3_SOABI}")
+ 
+-install(TARGETS python-libtorrent DESTINATION "${_PYTHON3_SITE_ARCH}")
++install(TARGETS python-libtorrent DESTINATION "${CMAKE_INSTALL_PREFIX}${_PYTHON3_SITE_ARCH}")
+ 
+ if (python-egg-info)
+ 	set(SETUP_PY_IN "${CMAKE_CURRENT_SOURCE_DIR}/setup.py.cmake.in")
+@@ -124,5 +124,5 @@
+ 
+ 	add_custom_target(python_bindings ALL DEPENDS ${OUTPUT})
+ 
+-	install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/libtorrent.egg-info" DESTINATION "${_PYTHON3_SITE_ARCH}")
++	install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/libtorrent.egg-info" DESTINATION "${CMAKE_INSTALL_PREFIX}${_PYTHON3_SITE_ARCH}")
+ endif()
