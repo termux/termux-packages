@@ -7,17 +7,21 @@ kmountpoint.cpp:375:56: error: cannot initialize a member subobject of type '__u
 
 --- a/src/core/kmountpoint.cpp
 +++ b/src/core/kmountpoint.cpp
-@@ -372,8 +371,13 @@ KMountPoint::List KMountPoint::currentMountPoints(DetailsNeededFlags infoNeeded)
-                 }
+@@ -450,13 +450,13 @@ KMountPoint::List KMountPoint::currentMountPoints(DetailsNeededFlags infoNeeded)
+                 mask_mnt_id = STATX_MNT_ID;
  #endif
  
--                if (struct statx buff; statx(AT_FDCWD, mnt_fs_get_target(fs), AT_STATX_DONT_SYNC, STATX_INO, &buff) == 0) {
+-                if (struct statx buff; statx(AT_FDCWD, target, AT_STATX_DONT_SYNC | AT_NO_AUTOMOUNT, STATX_INO | mask_mnt_id, &buff) == 0) {
 -                    mp->d->m_deviceId = makedev(buff.stx_dev_major, buff.stx_dev_minor);
+-#if HAVE_STATX_MNT_ID
+-                    if (buff.stx_mask & mask_mnt_id) {
+-                        mp->d->m_mountId = (quint64)buff.stx_mnt_id;
 +                // handle bind mounts
 +                if (mp->d->m_mountedFrom != mp->d->m_mountPoint) {
 +                    if (QT_STATBUF buff; QT_LSTAT(mnt_fs_get_target(fs), &buff) == 0) {
 +                        mp->d->m_deviceId = buff.st_dev;
-+                    }
+                     }
+-#endif
 +                } else {
 +                    mp->d->m_deviceId = mnt_fs_get_devno(fs);
                  }
