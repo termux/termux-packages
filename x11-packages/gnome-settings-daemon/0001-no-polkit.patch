@@ -1,0 +1,67 @@
+diff --git a/meson.build b/meson.build
+index d2900f6..d44251c 100644
+--- a/meson.build
++++ b/meson.build
+@@ -111,7 +111,6 @@ libgeoclue_dep = dependency('libgeoclue-2.0', version: '>= 2.3.1')
+ libnotify_dep = dependency('libnotify', version: '>= 0.7.3')
+ libpulse_mainloop_glib_dep = dependency('libpulse-mainloop-glib', version: '>= 2.0')
+ pango_dep = dependency('pango', version: '>= 1.20.0')
+-polkit_gobject_dep = dependency('polkit-gobject-1', version: '>= 0.114')
+ upower_glib_dep = dependency('upower-glib', version: '>= 0.99.12')
+ x11_dep = dependency('x11')
+ xfixes_dep = dependency('xfixes', version: '>= 6.0')
+diff --git a/plugins/datetime/meson.build b/plugins/datetime/meson.build
+index 0562a3e..4a5254f 100644
+--- a/plugins/datetime/meson.build
++++ b/plugins/datetime/meson.build
+@@ -24,8 +24,7 @@ deps = plugins_deps + [
+   gweather_dep,
+   libgeoclue_dep,
+   libnotify_dep,
+-  m_dep,
+-  polkit_gobject_dep
++  m_dep
+ ]
+ 
+ cflags += ['-DGNOMECC_DATA_DIR="@0@"'.format(gsd_pkgdatadir)]
+diff --git a/plugins/wwan/meson.build b/plugins/wwan/meson.build
+index a81ce41..7e149d0 100644
+--- a/plugins/wwan/meson.build
++++ b/plugins/wwan/meson.build
+@@ -5,7 +5,7 @@ sources = files(
+ )
+ sources += main_helper_sources
+ 
+-deps = plugins_deps + [gio_dep, gcr_dep, mm_glib_dep, polkit_gobject_dep]
++deps = plugins_deps + [gio_dep, gcr_dep, mm_glib_dep]
+ 
+ cflags += ['-DGNOMECC_DATA_DIR="@0@"'.format(gsd_pkgdatadir)]
+ 
+diff --git a/plugins/datetime/gsd-timezone-monitor.c b/plugins/datetime/gsd-timezone-monitor.c
+index a6e8a48..464ccdf 100644
+--- a/plugins/datetime/gsd-timezone-monitor.c
++++ b/plugins/datetime/gsd-timezone-monitor.c
+@@ -27,7 +27,6 @@
+ 
+ #include <geoclue.h>
+ #include <geocode-glib/geocode-glib.h>
+-#include <polkit/polkit.h>
+ 
+ #define DESKTOP_ID "gnome-datetime-panel"
+ #define SET_TIMEZONE_PERMISSION "org.freedesktop.timedate1.set-timezone"
+@@ -434,6 +433,7 @@ gsd_timezone_monitor_init (GsdTimezoneMonitor *self)
+ 
+         g_debug ("Starting timezone monitor");
+ 
++#ifndef __ANDROID__
+         priv->permission = polkit_permission_new_sync (SET_TIMEZONE_PERMISSION,
+                                                        NULL, NULL,
+                                                        &error);
+@@ -449,6 +449,7 @@ gsd_timezone_monitor_init (GsdTimezoneMonitor *self)
+                 g_debug ("No permission to set timezone");
+                 return;
+         }
++#endif
+ 
+         priv->cancellable = g_cancellable_new ();
+         priv->dtm = timedate1_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,

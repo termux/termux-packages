@@ -1,0 +1,202 @@
+diff --git a/js/misc/dependencies.js b/js/misc/dependencies.js
+index 88997a9..b820a39 100644
+--- a/js/misc/dependencies.js
++++ b/js/misc/dependencies.js
+@@ -4,7 +4,6 @@ import gi from 'gi';
+  * Required dependencies
+  */
+ 
+-import 'gi://AccountsService?version=1.0';
+ import 'gi://Atk?version=1.0';
+ import 'gi://Atspi?version=2.0';
+ import 'gi://Gcr?version=4';
+diff --git a/js/misc/systemActions.js b/js/misc/systemActions.js
+index cdf020d..13ee439 100644
+--- a/js/misc/systemActions.js
++++ b/js/misc/systemActions.js
+@@ -1,4 +1,3 @@
+-import AccountsService from 'gi://AccountsService';
+ import Clutter from 'gi://Clutter';
+ import Gdm from 'gi://Gdm';
+ import Gio from 'gi://Gio';
+@@ -159,17 +158,6 @@ const SystemActions = GObject.registerClass({
+         this._loginManager = LoginManager.getLoginManager();
+         this._monitorManager = global.backend.get_monitor_manager();
+ 
+-        this._userManager = AccountsService.UserManager.get_default();
+-
+-        this._userManager.connect('notify::is-loaded',
+-            () => this._updateMultiUser());
+-        this._userManager.connect('notify::has-multiple-users',
+-            () => this._updateMultiUser());
+-        this._userManager.connect('user-added',
+-            () => this._updateMultiUser());
+-        this._userManager.connect('user-removed',
+-            () => this._updateMultiUser());
+-
+         this._lockdownSettings.connect(`changed::${DISABLE_USER_SWITCH_KEY}`,
+             () => this._updateSwitchUser());
+         this._lockdownSettings.connect(`changed::${DISABLE_LOG_OUT_KEY}`,
+@@ -381,7 +369,7 @@ const SystemActions = GObject.registerClass({
+ 
+     _updateSwitchUser() {
+         let allowSwitch = !this._lockdownSettings.get_boolean(DISABLE_USER_SWITCH_KEY);
+-        let multiUser = this._userManager.can_switch() && this._userManager.has_multiple_users;
++        let multiUser = false;
+         let shouldShowInMode = !Main.sessionMode.isLocked && !Main.sessionMode.isGreeter;
+ 
+         let visible = allowSwitch && multiUser && shouldShowInMode;
+@@ -392,13 +380,11 @@ const SystemActions = GObject.registerClass({
+     }
+ 
+     _updateLogout() {
+-        let user = this._userManager.get_user(GLib.get_user_name());
+-
+         let allowLogout = !this._lockdownSettings.get_boolean(DISABLE_LOG_OUT_KEY);
+         let alwaysShow = global.settings.get_boolean(ALWAYS_SHOW_LOG_OUT_KEY);
+-        let systemAccount = user.system_account;
+-        let localAccount = user.local_account;
+-        let multiUser = this._userManager.has_multiple_users;
++        let systemAccount = true;
++        let localAccount = true;
++        let multiUser = false;
+         let multiSession = Gdm.get_session_ids().length > 1;
+         let shouldShowInMode = !Main.sessionMode.isLocked && !Main.sessionMode.isGreeter;
+ 
+diff --git a/js/ui/endSessionDialog.js b/js/ui/endSessionDialog.js
+index 9369d99..2e56da7 100644
+--- a/js/ui/endSessionDialog.js
++++ b/js/ui/endSessionDialog.js
+@@ -15,7 +15,6 @@
+  * along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+-import AccountsService from 'gi://AccountsService';
+ import Clutter from 'gi://Clutter';
+ import Gio from 'gi://Gio';
+ import GLib from 'gi://GLib';
+@@ -235,8 +234,6 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
+         this._canRebootToBootLoaderMenu = false;
+         this._getCanRebootToBootLoaderMenu().catch(logError);
+ 
+-        this._userManager = AccountsService.UserManager.get_default();
+-        this._user = this._userManager.get_user(GLib.get_user_name());
+         this._updatesPermission = null;
+ 
+         try {
+@@ -271,10 +268,6 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
+ 
+         this.connect('opened', this._onOpened.bind(this));
+ 
+-        this._user.connectObject(
+-            'notify::is-loaded', this._sync.bind(this),
+-            'changed', this._sync.bind(this), this);
+-
+         this._messageDialogContent = new Dialog.MessageDialogContent();
+ 
+         this._checkBox = new CheckBox.CheckBox();
+@@ -654,20 +647,14 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
+                 continue;
+ 
+             const session = {
+-                user: this._userManager.get_user(userName),
+                 username: userName,
+                 type: proxy.Type,
+                 remote: proxy.Remote,
+             };
+             const nSessions = this._sessions.push(session);
+ 
+-            let userAvatar = new UserWidget.Avatar(session.user, {
+-                iconSize: _ITEM_ICON_SIZE,
+-            });
+-            userAvatar.update();
+-
+             const displayUserName =
+-                session.user.get_real_name() ?? session.username;
++                session.username;
+ 
+             let userLabelText;
+             if (session.remote)
+@@ -680,7 +667,6 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
+                 userLabelText = userName;
+ 
+             let listItem = new Dialog.ListSectionItem({
+-                icon_actor: userAvatar,
+                 title: userLabelText,
+             });
+             this._sessionSection.list.add_child(listItem);
+diff --git a/js/ui/screenShield.js b/js/ui/screenShield.js
+index 733346f..96a1cad 100644
+--- a/js/ui/screenShield.js
++++ b/js/ui/screenShield.js
+@@ -1,4 +1,3 @@
+-import AccountsService from 'gi://AccountsService';
+ import Clutter from 'gi://Clutter';
+ import Gio from 'gi://Gio';
+ import GLib from 'gi://GLib';
+@@ -672,14 +671,10 @@ export class ScreenShield extends Signals.EventEmitter {
+         St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, '');
+         St.Clipboard.get_default().set_text(St.ClipboardType.PRIMARY, '');
+ 
+-        let userManager = AccountsService.UserManager.get_default();
+-        let user = userManager.get_user(GLib.get_user_name());
+ 
+         this.activate(animate);
+ 
+-        const lock = this._isGreeter
+-            ? true
+-            : user.password_mode !== AccountsService.UserPasswordMode.NONE;
++        const lock = false;
+         this._setLocked(lock);
+     }
+ 
+diff --git a/js/ui/unlockDialog.js b/js/ui/unlockDialog.js
+index f94f2ec..a162fa9 100644
+--- a/js/ui/unlockDialog.js
++++ b/js/ui/unlockDialog.js
+@@ -1,4 +1,3 @@
+-import AccountsService from 'gi://AccountsService';
+ import Atk from 'gi://Atk';
+ import Clutter from 'gi://Clutter';
+ import Gdm from 'gi://Gdm';
+@@ -553,9 +552,7 @@ export const UnlockDialog = GObject.registerClass({
+         Main.layoutManager.connectObject('monitors-changed',
+             this._updateBackgrounds.bind(this), this);
+ 
+-        this._userManager = AccountsService.UserManager.get_default();
+         this._userName = GLib.get_user_name();
+-        this._user = this._userManager.get_user(this._userName);
+ 
+         // Authentication & Clock stack
+         this._stack = new Shell.Stack();
+@@ -603,11 +600,6 @@ export const UnlockDialog = GObject.registerClass({
+         this._lockdownSettings.connect('changed::disable-user-switching',
+             this._updateUserSwitchVisibility.bind(this));
+ 
+-        this._user.connectObject(
+-            'notify::is-loaded', () => this._updateUserSwitchVisibility(),
+-            'notify::has-multiple-users', () => this._updateUserSwitchVisibility(),
+-            this);
+-
+         this._updateUserSwitchVisibility();
+ 
+         // Main Box
+@@ -807,7 +799,6 @@ export const UnlockDialog = GObject.registerClass({
+     _onReset(authPrompt, beginRequest) {
+         let userName;
+         if (beginRequest === AuthPrompt.BeginRequestType.PROVIDE_USERNAME) {
+-            this._authPrompt.setUser(this._user);
+             userName = this._userName;
+         } else {
+             userName = null;
+@@ -876,8 +867,8 @@ export const UnlockDialog = GObject.registerClass({
+     }
+ 
+     _updateUserSwitchVisibility() {
+-        this._otherUserButton.visible = this._userManager.can_switch() &&
+-            this._userManager.has_multiple_users &&
++        this._otherUserButton.visible =
++            false &&
+             this._screenSaverSettings.get_boolean('user-switch-enabled') &&
+             !this._lockdownSettings.get_boolean('disable-user-switching');
+     }
