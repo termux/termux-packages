@@ -1,0 +1,108 @@
+--- a/Makefile
++++ b/Makefile
+@@ -38,17 +38,17 @@ endif
+ ifeq ($(origin USE_FAAD), undefined)
+ 
+   # Check if we're in Termux environment
+-  ifneq ($(wildcard @HARDCODED_TERMUX_PREFIX@),)
++  ifneq ($(wildcard @TERMUX_PREFIX@),)
+     # Termux environment - check common installation paths
+     USE_FAAD = $(shell [ -f "$(PREFIX)/lib/libfaad.so" ] || \
+                        [ -f "$(PREFIX)/lib/libfaad2.so" ] || \
+                        [ -f "$(PREFIX)/local/lib/libfaad.so" ] || \
+                        [ -f "$(PREFIX)/local/lib/libfaad2.so" ] || \
+-                       [ -f "@HARDCODED_TERMUX_PREFIX@/lib/libfaad.so" ] || \
+-                       [ -f "@HARDCODED_TERMUX_PREFIX@/bin/faad" ] || \
+-                       [ -f "@HARDCODED_TERMUX_PREFIX@/lib/libfaad2.so" ] || \
+-                       [ -f "@HARDCODED_TERMUX_PREFIX@/local/lib/libfaad.so" ] || \
+-                       [ -f "@HARDCODED_TERMUX_PREFIX@/local/lib/libfaad2.so" ] && echo 1 || echo 0)
++                       [ -f "@TERMUX_PREFIX@/lib/libfaad.so" ] || \
++                       [ -f "@TERMUX_PREFIX@/bin/faad" ] || \
++                       [ -f "@TERMUX_PREFIX@/lib/libfaad2.so" ] || \
++                       [ -f "@TERMUX_PREFIX@/local/lib/libfaad.so" ] || \
++                       [ -f "@TERMUX_PREFIX@/local/lib/libfaad2.so" ] && echo 1 || echo 0)
+   else
+     # Non-Android build - try pkg-config first
+     USE_FAAD = $(shell $(PKG_CONFIG) --exists faad && echo 1 || echo 0)
+@@ -94,7 +94,7 @@ COMMONFLAGS += -fstack-protector-strong -Wformat -Wno-format-security -fPIE -D_F
+ COMMONFLAGS += -Wall -Wextra -Wpointer-arith
+ 
+   # Check if we're in Termux environment
+-ifneq ($(wildcard @HARDCODED_TERMUX_PREFIX@),)
++ifeq (1,0)
+   # Termux environment
+   COMMONFLAGS += -D__ANDROID__
+ endif
+@@ -114,7 +114,7 @@ ifeq ($(UNAME_S), Linux)
+   CFLAGS += -fPIE -fstack-clash-protection
+   CXXFLAGS += -fPIE -fstack-clash-protection
+   LDFLAGS += -pie -Wl,-z,relro
+-  ifneq (,$(filter $(ARCH), x86_64 i386))
++  ifneq (,$(filter $(TERMUX_ARCH), x86_64 i386))
+         CFLAGS += -fcf-protection
+         CXXFLAGS += -fcf-protection
+   endif
+@@ -137,7 +137,7 @@ ifeq ($(USE_FAAD), 1)
+   ifeq ($(ARCH), arm64)
+     CFLAGS += -I/opt/homebrew/opt/faad2/include
+     LIBS += -L/opt/homebrew/opt/faad2/lib -lfaad
+-  else ifeq ($(UNAME_O),Android)
++  else ifeq (1,1)
+     CFLAGS += -I$(PREFIX)/include
+     LIBS += -L$(PREFIX)/lib -lfaad
+   else
+--- a/src/ui/termbox2_input.h
++++ b/src/ui/termbox2_input.h
+@@ -2634,15 +2634,15 @@ static int load_terminfo(void)
+ #ifdef TB_TERMINFO_DIR
+         if_ok_return(rv, load_terminfo_from_path(TB_TERMINFO_DIR, term));
+ #endif
+-        if_ok_return(rv, load_terminfo_from_path("/usr/local/etc/terminfo", term));
++        if_ok_return(rv, load_terminfo_from_path("@TERMUX_PREFIX@/local/etc/terminfo", term));
+         if_ok_return(rv,
+-                     load_terminfo_from_path("/usr/local/share/terminfo", term));
+-        if_ok_return(rv, load_terminfo_from_path("/usr/local/lib/terminfo", term));
+-        if_ok_return(rv, load_terminfo_from_path("/etc/terminfo", term));
+-        if_ok_return(rv, load_terminfo_from_path("/usr/share/terminfo", term));
+-        if_ok_return(rv, load_terminfo_from_path("/usr/lib/terminfo", term));
+-        if_ok_return(rv, load_terminfo_from_path("/usr/share/lib/terminfo", term));
+-        if_ok_return(rv, load_terminfo_from_path("/lib/terminfo", term));
++                     load_terminfo_from_path("@TERMUX_PREFIX@/local/share/terminfo", term));
++        if_ok_return(rv, load_terminfo_from_path("@TERMUX_PREFIX@/local/lib/terminfo", term));
++        if_ok_return(rv, load_terminfo_from_path("@TERMUX_PREFIX@/etc/terminfo", term));
++        if_ok_return(rv, load_terminfo_from_path("@TERMUX_PREFIX@/share/terminfo", term));
++        if_ok_return(rv, load_terminfo_from_path("@TERMUX_PREFIX@/lib/terminfo", term));
++        if_ok_return(rv, load_terminfo_from_path("@TERMUX_PREFIX@/share/lib/terminfo", term));
++        if_ok_return(rv, load_terminfo_from_path("/system/system_ext/etc/terminfo", term));
+ 
+         return TB_ERR;
+ }
+--- a/src/utils/file.c
++++ b/src/utils/file.c
+@@ -44,7 +44,7 @@ const char *get_temp_dir()
+         }
+ 
+         // Fallback to /tmp on Unix-like systems
+-        return "/tmp";
++        return "@TERMUX_PREFIX@/tmp";
+ }
+ 
+ void get_directory_from_path(const char *path, char *directory)
+@@ -402,7 +402,7 @@ int is_in_temp_dir(const char *path)
+         static char tmpdir_buf[PATH_MAX + 2];
+ 
+         if (tmp_dir == NULL || strnlen(tmp_dir, PATH_MAX) >= PATH_MAX)
+-                tmp_dir = "/tmp";
++                tmp_dir = "@TERMUX_PREFIX@/tmp";
+ 
+         size_t len = strlen(tmp_dir);
+         strncpy(tmpdir_buf, tmp_dir, PATH_MAX);
+@@ -420,7 +420,7 @@ void generate_temp_file_path(char *file_path, const char *prefix, const char *su
+ {
+         const char *tmp_dir = getenv("TMPDIR");
+         if (tmp_dir == NULL || strnlen(tmp_dir, PATH_MAX) >= PATH_MAX) {
+-                tmp_dir = "/tmp";
++                tmp_dir = "@TERMUX_PREFIX@/tmp";
+         }
+ 
+         struct passwd *pw = getpwuid(getuid());
