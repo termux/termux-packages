@@ -9,7 +9,7 @@
 # python of the same version is required. For pip package cross compilation,
 # ideally same version of python is recommended by crossenv.
 termux_setup_build_python() {
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
 		if [[ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" && "$(dpkg-query -W -f '${db:Status-Status}\n' python 2>/dev/null)" != "installed" ]] ||
 		[[ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" && ! "$(pacman -Q python 2>/dev/null)" ]]; then
 			echo "Package 'python is not installed."
@@ -38,7 +38,8 @@ termux_setup_build_python() {
 		export TERMUX_BUILD_PYTHON_DIR=$_PYTHON_FOLDER
 
 		if [[ ! -d "$_PYTHON_FOLDER" ]]; then
-			local LAST_PWD="$(pwd)"
+			[[ "${CI-false}" == "true" ]] && echo "::group::INFO: [${FUNCNAME[0]}] Building minimal host Python $_PYTHON_VERSION" || :
+
 			termux_download \
 				"$_PYTHON_SRCURL" "python-$_PYTHON_VERSION.tar.xz" "$_PYTHON_SHA256"
 			mkdir "$_PYTHON_FOLDER"
@@ -55,9 +56,10 @@ termux_setup_build_python() {
 			done
 
 			# Perform a hostbuild of python. We are kind of doing a minimal build, which
-			# may break some stuff that rely on an extended python release
-			mkdir host-build/
-			cd host-build/
+			# may break some stuff that rely on an extended python release.
+			# Do this in a subshell to avoid side effects like the directory change
+			# from propagating back into the build environment.
+			(
 			# We are using env -i as there are a lot of environment variable that need
 			# to be unset, so better just start from scratch
 			# Also whoever on crack wrote the build scripts for python, didn't think of
@@ -68,6 +70,8 @@ termux_setup_build_python() {
 			# hardcoded to "$(CC) -shared" and "$(CXX) -shared"
 			# Whoever that person is needs to stop writing build scripts and instead
 			# question his impact on his mere existence on the world
+			mkdir host-build/
+			cd host-build/ && \
 			env -i \
 				CC="clang-${TERMUX_HOST_LLVM_MAJOR_VERSION} -fuse-ld=lld" \
 				CXX="clang++-${TERMUX_HOST_LLVM_MAJOR_VERSION} -fuse-ld=lld" \
@@ -79,7 +83,9 @@ termux_setup_build_python() {
 					--prefix="$_PYTHON_FOLDER/host-build-prefix"
 			env -i \
 				make -j "$(nproc)" install
-			cd "$LAST_PWD"
+			)
+
+			[[ "${CI-false}" == "true" ]] && echo "::endgroup::" || :
 		fi
 		# Add our own built python to path
 		export PATH="$_PYTHON_FOLDER/host-build-prefix/bin:$PATH"
