@@ -3,8 +3,8 @@ termux_setup_golang() {
 	export GOPATH="${TERMUX_COMMON_CACHEDIR}/go-path" GOCACHE="${TERMUX_COMMON_CACHEDIR}/go-build"
 	mkdir -p "$GOPATH" "$GOCACHE"
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-		local TERMUX_GO_VERSION=go1.26.0
-		local TERMUX_GO_SHA256=aac1b08a0fb0c4e0a7c1555beb7b59180b05dfc5a3d62e40e9de90cd42f88235
+		local TERMUX_GO_VERSION=go1.26.1
+		local TERMUX_GO_SHA256=031f088e5d955bab8657ede27ad4e3bc5b7c1ba281f05f245bcc304f327c987a
 		local TERMUX_GO_PLATFORM=linux-amd64
 
 		local TERMUX_BUILDGO_FOLDER
@@ -14,7 +14,7 @@ termux_setup_golang() {
 			TERMUX_BUILDGO_FOLDER=${TERMUX_COMMON_CACHEDIR}/${TERMUX_GO_VERSION}
 		fi
 
-		TERMUX_BUILDGO_FOLDER+="-r2"
+		TERMUX_BUILDGO_FOLDER+="-r1"
 
 		export GOROOT=$TERMUX_BUILDGO_FOLDER
 		export PATH=${GOROOT}/bin:${PATH}
