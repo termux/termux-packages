@@ -1,0 +1,19 @@
+`pthread_mutexattr_setprotocol` is introduced in Android 28.
+
+diff --git a/spa/plugins/support/loop.c b/spa/plugins/support/loop.c
+index e5e49849f..aca44c98a 100644
+--- a/spa/plugins/support/loop.c
++++ b/spa/plugins/support/loop.c
+@@ -1384,8 +1384,12 @@ impl_init(const struct spa_handle_factory *factory,
+ 	CHECK(pthread_mutexattr_init(&attr), error_exit);
+ 	CHECK(pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE), error_exit_free_attr);
+ 	if (impl->prio_inherit)
++		#ifdef __ANDROID__
++			if (1)
++		#else
+ 		CHECK(pthread_mutexattr_setprotocol(&attr, PTHREAD_PRIO_INHERIT),
+ 					error_exit_free_attr)
++		#endif
+ 	CHECK(pthread_mutex_init(&impl->lock, &attr), error_exit_free_attr);
+ 	pthread_mutexattr_destroy(&attr);
+ 
