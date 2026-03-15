@@ -281,7 +281,7 @@ lint_package() {
 
 	echo -n "Layout: "
 	local channel in_dir=''
-	for channel in $TERMUX_PACKAGES_DIRECTORIES; do
+	for channel in "${TERMUX_PACKAGES_DIRECTORIES[@]}"; do
 		[[ -d "$TERMUX_SCRIPTDIR/$channel/$package_name" ]] && {
 			in_dir="$TERMUX_SCRIPTDIR/$channel/$package_name"
 			break
@@ -818,7 +818,7 @@ if (( $# )); then
 	linter_main "$@"
 	unset package_counter
 else
-	for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "$TERMUX_SCRIPTDIR/repo.json"); do
+	for repo_dir in "${TERMUX_PACKAGES_DIRECTORIES[@]}"; do
 		linter_main "$repo_dir"/*/build.sh
 	done
 	unset package_counter
