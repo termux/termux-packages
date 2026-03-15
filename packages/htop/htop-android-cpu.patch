@@ -1,0 +1,198 @@
+diff --git a/linux/LinuxMachine.c b/linux/LinuxMachine.c
+index 46a3c81c..700befc6 100644
+--- a/linux/LinuxMachine.c
++++ b/linux/LinuxMachine.c
+@@ -22,6 +22,7 @@ in the source distribution for its full text.
+ #include <strings.h>
+ #include <unistd.h>
+ #include <time.h>
++#include <sys/time.h>
+
+ #include "CRT.h"
+ #include "Macros.h"
+@@ -405,8 +406,109 @@ static void LinuxMachine_scanCPUTime(LinuxMachine* this) {
+    LinuxMachine_updateCPUcount(this);
+
+    FILE* file = fopen(PROCSTATFILE, "r");
+-   if (!file)
+-      CRT_fatalError("Cannot open " PROCSTATFILE);
++   if (!file) {
++      struct timeval currUpdate;
++      gettimeofday(&currUpdate, NULL);
++      double dt = (currUpdate.tv_sec - this->lastUpdate.tv_sec) + (currUpdate.tv_usec - this->lastUpdate.tv_usec) / 1000000.0;
++      double hz_dt = dt * this->jiffies;
++      this->lastUpdate = currUpdate;
++
++      unsigned long long core_user_diffs[super->existingCPUs + 1];
++      memset(core_user_diffs, 0, sizeof(core_user_diffs));
++
++      DIR* proc_dir = opendir(PROCDIR);
++      if (proc_dir) {
++         struct dirent* proc_entry;
++         while ((proc_entry = readdir(proc_dir))) {
++            if (proc_entry->d_name[0] < '0' || proc_entry->d_name[0] > '9') continue;
++
++            char task_path[256];
++            xSnprintf(task_path, sizeof(task_path), PROCDIR "/%s/task", proc_entry->d_name);
++            DIR* task_dir = opendir(task_path);
++            if (!task_dir) continue;
++
++            struct dirent* task_entry;
++            while ((task_entry = readdir(task_dir))) {
++                if (task_entry->d_name[0] < '0' || task_entry->d_name[0] > '9') continue;
++
++                char stat_path[512];
++                xSnprintf(stat_path, sizeof(stat_path), "%s/%s/stat", task_path, task_entry->d_name);
++
++                int fd = open(stat_path, O_RDONLY);
++                if (fd != -1) {
++                    char buf[2048];
++                    ssize_t n = read(fd, buf, sizeof(buf) - 1);
++                    close(fd);
++                    if (n > 0) {
++                        buf[n] = '\0';
++                        char* last_paren = strrchr(buf, ')');
++                        if (last_paren) {
++                            unsigned long long utime = 0, stime = 0;
++                            int processor = -1;
++                            int field = 1;
++                            char* p = last_paren + 2;
++                            char* saveptr;
++                            char* token = strtok_r(p, " ", &saveptr);
++                            while (token) {
++                                if (field == 12) utime = strtoull(token, NULL, 10);
++                                else if (field == 13) stime = strtoull(token, NULL, 10);
++                                else if (field == 37) {
++                                    processor = atoi(token);
++                                    break;
++                                }
++                                token = strtok_r(NULL, " ", &saveptr);
++                                field++;
++                            }
++
++                            if (processor >= 0 && (unsigned int)processor < super->existingCPUs) {
++                                unsigned int pid = (unsigned int)atoi(proc_entry->d_name);
++                                unsigned int tid = (unsigned int)atoi(task_entry->d_name);
++                                ht_key_t key = (ht_key_t)(pid ^ (tid << 5));
++                                unsigned long long total_ticks = utime + stime;
++                                unsigned long long* last_ticks_ptr = Hashtable_get(this->taskTicks, key);
++                                if (last_ticks_ptr) {
++                                    unsigned long long diff = saturatingSub(total_ticks, *last_ticks_ptr);
++                                    core_user_diffs[processor + 1] += diff;
++                                    core_user_diffs[0] += diff;
++                                    *last_ticks_ptr = total_ticks;
++                                } else {
++                                    unsigned long long* new_ticks = xMalloc(sizeof(unsigned long long));
++                                    *new_ticks = total_ticks;
++                                    Hashtable_put(this->taskTicks, key, new_ticks);
++                                }
++                            }
++                        }
++                    }
++                }
++            }
++            closedir(task_dir);
++         }
++         closedir(proc_dir);
++      }
++
++      for (unsigned int i = 0; i <= super->existingCPUs; i++) {
++         CPUData* cpuData = &(this->cpuData[i]);
++         cpuData->totalPeriod = (unsigned long long)hz_dt;
++         cpuData->userPeriod = core_user_diffs[i];
++         if (cpuData->userPeriod > cpuData->totalPeriod) cpuData->userPeriod = cpuData->totalPeriod;
++         cpuData->nicePeriod = 0;
++         cpuData->systemPeriod = 0;
++         cpuData->systemAllPeriod = 0;
++         cpuData->idleAllPeriod = saturatingSub(cpuData->totalPeriod, cpuData->userPeriod);
++         cpuData->idlePeriod = cpuData->idleAllPeriod;
++         cpuData->ioWaitPeriod = 0;
++         cpuData->irqPeriod = 0;
++         cpuData->softIrqPeriod = 0;
++         cpuData->stealPeriod = 0;
++         cpuData->guestPeriod = 0;
++         cpuData->userTime += cpuData->userPeriod;
++         cpuData->totalTime += cpuData->totalPeriod;
++         cpuData->idleTime += cpuData->idlePeriod;
++         cpuData->idleAllTime += cpuData->idleAllPeriod;
++      }
++      this->period = (double)this->cpuData[0].totalPeriod / super->activeCPUs;
++      return;
++   }
+
+    // Add an extra phantom thread for a later loop
+    bool adjCpuIdProcessed[super->existingCPUs+2];
+@@ -771,25 +873,26 @@ Machine* Machine_new(UsersTable* usersTable, uid_t userId) {
+
+    // Read btime (the kernel boot time, as number of seconds since the epoch)
+    FILE* statfile = fopen(PROCSTATFILE, "r");
+-   if (statfile == NULL)
+-      CRT_fatalError("Cannot open " PROCSTATFILE);
+-
+    this->boottime = -1;
+-
+-   while (true) {
+-      char buffer[PROC_LINE_LENGTH + 1];
+-      if (fgets(buffer, sizeof(buffer), statfile) == NULL)
+-         break;
+-      if (String_startsWith(buffer, "btime ") == false)
+-         continue;
+-      if (sscanf(buffer, "btime %lld\n", &this->boottime) == 1)
+-         break;
+-      CRT_fatalError("Failed to parse btime from " PROCSTATFILE);
++   if (statfile) {
++      while (true) {
++         char buffer[PROC_LINE_LENGTH + 1];
++         if (fgets(buffer, sizeof(buffer), statfile) == NULL)
++            break;
++         if (String_startsWith(buffer, "btime ") == false)
++            continue;
++         if (sscanf(buffer, "btime %lld\n", &this->boottime) == 1)
++            break;
++         // CRT_fatalError("Failed to parse btime from " PROCSTATFILE);
++      }
++      fclose(statfile);
+    }
+-   fclose(statfile);
+
+    if (this->boottime == -1)
+-      CRT_fatalError("No btime in " PROCSTATFILE);
++      this->boottime = (long long)time(NULL);
++
++   this->taskTicks = Hashtable_new(1024, true);
++   gettimeofday(&this->lastUpdate, NULL);
+
+    // Initialize CPU count
+    LinuxMachine_updateCPUcount(this);
+@@ -817,6 +920,9 @@ void Machine_delete(Machine* super) {
+       gpuEngineData = next;
+    }
+
++   if (this->taskTicks)
++      Hashtable_delete(this->taskTicks);
++
+    free(this->cpuData);
+    free(this);
+ }
+diff --git a/linux/LinuxMachine.h b/linux/LinuxMachine.h
+index c575a4fd..38590e8f 100644
+--- a/linux/LinuxMachine.h
++++ b/linux/LinuxMachine.h
+@@ -11,6 +11,7 @@ in the source distribution for its full text.
+ #include <stddef.h>
+
+ #include "Machine.h"
++#include "Hashtable.h"
+ #include "linux/ZramStats.h"
+ #include "linux/ZswapStats.h"
+ #include "zfs/ZfsArcStats.h"
+@@ -99,6 +100,9 @@ typedef struct LinuxMachine_ {
+    ZfsArcStats zfs;
+    ZramStats zram;
+    ZswapStats zswap;
++
++   Hashtable* taskTicks;
++   struct timeval lastUpdate;
+ } LinuxMachine;
+
+ #ifndef PROCDIR
