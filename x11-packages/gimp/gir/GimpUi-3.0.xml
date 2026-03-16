@@ -50,6 +50,8 @@
       <param type="gchararray"/>
       <param type="gint"/>
     </signal>
+    <signal name="stop-search" return="void" when="last">
+    </signal>
   </class>
   <class name="GimpBusyBox" get-type="gimp_busy_box_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="AtkImplementorIface"/>
@@ -217,7 +219,7 @@
     <property name="value" type="gdouble" flags="227" default-value="1.000000"/>
     <property name="lower" type="gdouble" flags="231" default-value="0.000000"/>
     <property name="upper" type="gdouble" flags="231" default-value="1.000000"/>
-    <property name="digits" type="gint" flags="227" default-value="-1"/>
+    <property name="digits" type="gint" flags="231" default-value="-1"/>
     <signal name="value-changed" return="void" when="first">
     </signal>
   </class>
@@ -227,6 +229,18 @@
     <implements name="GtkOrientable"/>
   </class>
   <class name="GimpColorScaleEntry" get-type="gimp_color_scale_entry_get_type" parents="GimpScaleEntry,GimpLabelSpin,GimpLabeled,GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+  </class>
+  <class name="GimpColorScales" get-type="gimp_color_scales_get_type" parents="GimpColorSelector,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="show-rgb-u8" type="gboolean" flags="231" default-value="FALSE"/>
+    <property name="show-hsv" type="gboolean" flags="231" default-value="FALSE"/>
+  </class>
+  <class name="GimpColorSelect" get-type="gimp_color_select_get_type" parents="GimpColorSelector,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="AtkImplementorIface"/>
     <implements name="GtkBuildable"/>
     <implements name="GtkOrientable"/>
@@ -552,11 +566,28 @@
     <implements name="GtkBuildable"/>
     <implements name="GtkOrientable"/>
   </class>
+  <class name="GimpImageChooser" get-type="gimp_image_chooser_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="title" type="gchararray" flags="235" default-value="Image Selection"/>
+    <property name="label" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="image" type="GimpImage" flags="1073742051"/>
+  </class>
   <class name="GimpImageComboBox" get-type="gimp_image_combo_box_get_type" parents="GimpIntComboBox,GtkComboBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="AtkImplementorIface"/>
     <implements name="GtkBuildable"/>
     <implements name="GtkCellLayout"/>
     <implements name="GtkCellEditable"/>
+  </class>
+  <class name="GimpItemChooser" get-type="gimp_item_chooser_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="title" type="gchararray" flags="235" default-value="Item Selection"/>
+    <property name="label" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="item" type="GimpItem" flags="1073742051"/>
+    <property name="item-type" type="GType" flags="235"/>
   </class>
   <class name="GimpDrawableComboBox" get-type="gimp_drawable_combo_box_get_type" parents="GimpIntComboBox,GtkComboBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="AtkImplementorIface"/>
