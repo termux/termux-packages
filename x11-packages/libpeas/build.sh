@@ -20,4 +20,20 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_pre_configure() {
 	termux_setup_gir
 	termux_setup_glib_cross_pkg_config_wrapper
+
+	export TERMUX_MESON_ENABLE_SOVERSION=1
+}
+
+termux_step_post_massage() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION_GUARD_FILES=(
+		'lib/libpeas-1.0.so.0'
+		'lib/libpeas-gtk-1.0.so.0'
+	)
+
+	local f
+	for f in "${_SOVERSION_GUARD_FILES[@]}"; do
+		[ -e "${f}" ] || termux_error_exit "SOVERSION guard check failed."
+	done
 }
