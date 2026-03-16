@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE="https://github.com/so-fancy/diff-so-fancy"
 TERMUX_PKG_DESCRIPTION="Good-lookin' diffs. Actually... nah... The best-lookin' diffs"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_VERSION="1.4.4"
+TERMUX_PKG_VERSION="1.4.6"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL="https://github.com/so-fancy/diff-so-fancy/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256="3eac2cfb3b1de9d14b6a712941985d6b240b7f3726c94a5e337317c7161e869d"
+TERMUX_PKG_SHA256=50db311c9444b080361d3bfc0cf0180715fae4c682316673f707179ee9718f93
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="perl"
 TERMUX_PKG_RECOMMENDS="git"
