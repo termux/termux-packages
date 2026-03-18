@@ -15,4 +15,10 @@ termux_step_pre_configure() {
 
 	TERMUX_PKG_SRCDIR+="/crates/jql"
 	TERMUX_PKG_BUILDDIR="$TERMUX_PKG_SRCDIR"
+
+	# ld.lld: error: undefined symbol: __atomic_load
+	if [[ "${TERMUX_ARCH}" == "i686" ]]; then
+		local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
+		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$(${CC} -print-libgcc-file-name)"
+	fi
 }
