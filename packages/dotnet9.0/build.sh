@@ -40,7 +40,7 @@ termux_pkg_auto_update() {
 
 	# happened since 9.0.9
 	sed \
-		-e "s|^_DOTNET_SDK_VERSION=.*|_DOTNET_SDK_VERSION=\"9.0.$((100 + ${latest_version##*.} - 1))\"|" \
+		-e "s|^_DOTNET_SDK_VERSION=.*|_DOTNET_SDK_VERSION=\"9.0.$((100 + ${latest_version##*.} + 1))\"|" \
 		-i "${TERMUX_PKG_BUILDER_DIR}/build.sh"
 
 	termux_pkg_upgrade_version "${latest_version}"
