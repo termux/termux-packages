@@ -2,15 +2,16 @@ TERMUX_PKG_HOMEPAGE=https://www.vim.org
 TERMUX_PKG_DESCRIPTION="Vi IMproved - enhanced vi editor"
 TERMUX_PKG_LICENSE="VIM License"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
-TERMUX_PKG_BUILD_DEPENDS="luajit, perl, python, ruby, tcl"
+TERMUX_PKG_BUILD_DEPENDS="libwayland, luajit, perl, python, ruby, tcl"
 TERMUX_PKG_DEPENDS="libiconv, libsodium, ncurses"
-TERMUX_PKG_SUGGESTS="luajit, perl, python, ruby, tcl"
+TERMUX_PKG_SUGGESTS="libwayland, luajit, perl, python, ruby, tcl"
 TERMUX_PKG_RECOMMENDS="diffutils, xxd"
 TERMUX_PKG_CONFLICTS="vim-gtk"
 TERMUX_PKG_BREAKS="vim-python, vim-runtime"
 TERMUX_PKG_REPLACES="vim-python, vim-runtime"
 TERMUX_PKG_PROVIDES="vim-python"
 TERMUX_PKG_VERSION="9.2.0192"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=96108375ce605418f3c752da41cc2eea007f2d56aea49aef254df10c9fa4a8b7
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -45,8 +46,10 @@ vi_cv_var_python3_version=${TERMUX_PYTHON_VERSION}
 --enable-rubyinterp=dynamic
 --enable-tclinterp=dynamic
 --enable-gui=no
+--with-wayland
 --without-x
 "
+# --with-wayland only enables wayland protocol support, not windowing
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag" # Vim doesn't use release tags
 
@@ -78,6 +81,7 @@ termux_pkg_auto_update() {
 }
 
 termux_step_pre_configure() {
+	termux_setup_wayland_cross_pkg_config_wrapper
 	make distclean
 
 	# Remove eventually existing symlinks from previous builds so that they get re-created.
