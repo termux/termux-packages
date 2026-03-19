@@ -1,0 +1,96 @@
+diff --git a/submodules/base/libs/androidfw/ConfigDescription.cpp b/submodules/base/libs/androidfw/ConfigDescription.cpp
+index e08030c4..7ee5457b 100644
+--- a/submodules/base/libs/androidfw/ConfigDescription.cpp
++++ b/submodules/base/libs/androidfw/ConfigDescription.cpp
+@@ -51,7 +51,7 @@ static bool parseMcc(const char* name, ResTable_config* out) {
+   while (*c >= '0' && *c <= '9') {
+     c++;
+   }
+-  if (*c != 0) return false;
++  if (*c != 0 && c - val != 4) return false;
+   if (c - val != 3) return false;
+ 
+   int d = atoi(val);
+@@ -82,7 +82,7 @@ static bool parseMnc(const char* name, ResTable_config* out) {
+     c++;
+   }
+   if (*c != 0) return false;
+-  if (c - val == 0 || c - val > 3) return false;
++  if (c - val == 0 || c - val > 4) return false;
+ 
+   if (out) {
+     out->mnc = atoi(val);
+@@ -887,7 +887,10 @@ void ConfigDescription::ApplyVersionForCompatibility(
+   }
+ 
+   if (min_sdk > config->sdkVersion) {
+-    config->sdkVersion = min_sdk;
++    // Apktool: We are skipping this entirely in apktool, because the application has
++    // already been built once. Doing this changes the application with implicit
++    // version information, which may not have been in the original.
++    //config->sdkVersion = min_sdk;
+   }
+ }
+ 
+diff --git a/submodules/base/libs/androidfw/ResourceTypes.cpp b/submodules/base/libs/androidfw/ResourceTypes.cpp
+index a3dd9833..ec9706b3 100644
+--- a/submodules/base/libs/androidfw/ResourceTypes.cpp
++++ b/submodules/base/libs/androidfw/ResourceTypes.cpp
+@@ -5647,7 +5647,7 @@ bool ResTable::stringToFloat(const char16_t* s, size_t len, Res_value* outValue)
+     return false;
+ }
+ 
+-bool ResTable::stringToValue(Res_value* outValue, String16* outString,
++bool ResTable::stringToValue(const ssize_t FORCED_PACKAGE_ID, Res_value* outValue, String16* outString,
+                              const char16_t* s, size_t len,
+                              bool preserveSpaces, bool coerceType,
+                              uint32_t attrID,
+@@ -5801,7 +5801,7 @@ bool ResTable::stringToValue(Res_value* outValue, String16* outString,
+                 }
+ 
+                 uint32_t packageId = Res_GETPACKAGE(rid) + 1;
+-                if (packageId != APP_PACKAGE_ID && packageId != SYS_PACKAGE_ID) {
++                if (packageId != APP_PACKAGE_ID && packageId != SYS_PACKAGE_ID && packageId != (uint32_t)FORCED_PACKAGE_ID) {
+                     outValue->dataType = Res_value::TYPE_DYNAMIC_REFERENCE;
+                 }
+                 outValue->data = rid;
+@@ -5822,7 +5822,7 @@ bool ResTable::stringToValue(Res_value* outValue, String16* outString,
+                         outValue->data = rid;
+                         outValue->dataType = Res_value::TYPE_DYNAMIC_REFERENCE;
+                         return true;
+-                    } else if (packageId == APP_PACKAGE_ID || packageId == SYS_PACKAGE_ID) {
++                    } else if (packageId == APP_PACKAGE_ID || packageId == SYS_PACKAGE_ID || packageId == (uint32_t)FORCED_PACKAGE_ID) {
+                         // We accept packageId's generated as 0x01 in order to support
+                         // building the android system resources
+                         outValue->data = rid;
+@@ -5968,7 +5968,7 @@ bool ResTable::stringToValue(Res_value* outValue, String16* outString,
+             }
+ 
+             uint32_t packageId = Res_GETPACKAGE(rid) + 1;
+-            if (packageId != APP_PACKAGE_ID && packageId != SYS_PACKAGE_ID) {
++            if (packageId != APP_PACKAGE_ID && packageId != SYS_PACKAGE_ID && packageId != (uint32_t)FORCED_PACKAGE_ID) {
+                 outValue->dataType = Res_value::TYPE_DYNAMIC_ATTRIBUTE;
+             }
+             outValue->data = rid;
+@@ -5983,7 +5983,7 @@ bool ResTable::stringToValue(Res_value* outValue, String16* outString,
+                     outValue->data = rid;
+                     outValue->dataType = Res_value::TYPE_DYNAMIC_ATTRIBUTE;
+                     return true;
+-                } else if (packageId == APP_PACKAGE_ID || packageId == SYS_PACKAGE_ID) {
++                } else if (packageId == APP_PACKAGE_ID || packageId == SYS_PACKAGE_ID || packageId == (uint32_t)FORCED_PACKAGE_ID) {
+                     // We accept packageId's generated as 0x01 in order to support
+                     // building the android system resources
+                     outValue->data = rid;
+diff --git a/submodules/base/libs/androidfw/include/androidfw/ResourceTypes.h b/submodules/base/libs/androidfw/include/androidfw/ResourceTypes.h
+index c2648909..3b850fac 100644
+--- a/submodules/base/libs/androidfw/include/androidfw/ResourceTypes.h
++++ b/submodules/base/libs/androidfw/include/androidfw/ResourceTypes.h
+@@ -2214,7 +2214,7 @@ public:
+     // resolve resources that do not exist in this ResTable.  If 'attrType' is
+     // supplied, the value will be type checked for this format if 'attrID'
+     // is not supplied or found.
+-    bool stringToValue(Res_value* outValue, String16* outString,
++    bool stringToValue(const ssize_t FORCED_PACKAGE_ID, Res_value* outValue, String16* outString,
+                        const char16_t* s, size_t len,
+                        bool preserveSpaces, bool coerceType,
+                        uint32_t attrID = 0,
