@@ -150,15 +150,15 @@ diff -uNr oma-1.22.1/oma-refresh/src/db.rs oma-1.22.1.mod/oma-refresh/src/db.rs
  
          let archs_from_file = if let Ok(file) = archs_from_file {
              let res = file.lines().map(|x| x.to_string()).collect::<Vec<_>>();
-diff -uNr oma-1.22.1/src/config.rs oma-1.22.1.mod/src/config.rs
---- oma-1.22.1/src/config.rs	2025-10-15 18:03:09.000000000 +0800
-+++ oma-1.22.1.mod/src/config.rs	2025-10-15 22:43:25.895625437 +0800
-@@ -122,7 +122,7 @@
+diff -uNr oma-1.22.1/src/config_file.rs oma-1.22.1.mod/src/config_file.rs
+--- oma-1.22.1/src/config_file.rs	2025-10-15 18:03:09.000000000 +0800
++++ oma-1.22.1.mod/src/config_file.rs	2025-10-15 22:43:25.895625437 +0800
+@@ -155,7 +155,7 @@
  
- impl Config {
+ impl ConfigFile {
      pub fn read() -> Self {
 -        let Ok(s) = std::fs::read_to_string("/etc/oma.toml") else {
 +        let Ok(s) = std::fs::read_to_string("@TERMUX_PREFIX@/etc/oma.toml") else {
              warn!("{}", fl!("config-invalid"));
-             return toml::from_str::<Self>(DEFAULT_CONFIG).unwrap();
+             return Self::default();
          };
