@@ -1,0 +1,19 @@
+--- a/chrome/browser/contextual_tasks/contextual_tasks_ui_service.cc
++++ b/chrome/browser/contextual_tasks/contextual_tasks_ui_service.cc
+@@ -5,6 +5,7 @@
+ #include "chrome/browser/contextual_tasks/contextual_tasks_ui_service.h"
+ 
+ #include "base/containers/adapters.h"
++#include "base/containers/contains.h"
+ #include "base/logging.h"
+ #include "base/metrics/histogram_functions.h"
+ #include "base/metrics/user_metrics.h"
+@@ -699,7 +700,7 @@
+   if (is_nav_to_ai &&
+       net::GetValueForKeyInQuery(url_params.url, kDebugParam,
+                                  &debug_param_value) &&
+-      debug_param_value.contains(kDebugNoCobrowseValue)) {
++      base::Contains(debug_param_value, kDebugNoCobrowseValue)) {
+     if (original_url_is_virtual) {
+       base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
+           FROM_HERE,
