@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://aws.amazon.com/cli
 TERMUX_PKG_DESCRIPTION="Universal Command Line Interface for Amazon Web Services"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.34.0"
+TERMUX_PKG_VERSION="2.34.13"
 TERMUX_PKG_SRCURL="https://github.com/aws/aws-cli/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=c51f72d6272f6748c874ae395c66b06433922f7399e6b9e4f4aa4ed5806d5331
+TERMUX_PKG_SHA256=6be5320647cacab2ec80ce716cf9d40e477641dcfed88bb4909b074170dec94b
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+.\d+.\d+"
 TERMUX_PKG_DEPENDS="libandroid-posix-semaphore, libandroid-support, libbz2, libexpat, libffi, liblzma, libsqlite, mandoc, openssl, readline, zlib"
@@ -21,6 +21,15 @@ termux_step_pre_configure() {
 	export LDFLAGS+=" -lm"
 	export PIP_NO_BINARY=awscrt
 	export AWS_CRT_BUILD_FORCE_STATIC_LIBS=1
+
+	case "$TERMUX_ARCH" in
+		aarch64|x86_64) PYI_PLATFORM=Android-64bit ;;
+		arm|i686)       PYI_PLATFORM=Android-32bit ;;
+		*)
+			echo "ERROR: Unknown architecture: $TERMUX_ARCH"
+			return 1 ;;
+	esac
+	export PYI_PLATFORM
 
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
 		return
@@ -62,6 +71,7 @@ termux_step_pre_configure() {
 	AWS_CRT_BUILD_FORCE_STATIC_LIBS=$AWS_CRT_BUILD_FORCE_STATIC_LIBS \
 	PIP_NO_INDEX=1 \
 	PIP_VERBOSE=1 \
+	PIP_NO_CACHE_DIR=1 \
 	AS=$AS \
 	CC=$CC \
 	CPP=$CPP \
@@ -79,6 +89,8 @@ termux_step_pre_configure() {
 	CPPFLAGS='$CPPFLAGS -I$PYTHON_INCLUDE' \
 	CXXFLAGS='$CXXFLAGS' \
 	LDFLAGS='$LDFLAGS' \
+	PYTHON='$TERMUX_PREFIX/bin/python' \
+	PYI_PLATFORM=$PYI_PLATFORM \
 	"
 }
 
@@ -95,7 +107,28 @@ termux_step_configure() {
 }
 
 termux_step_make() {
+	pushd "$TERMUX_PKG_SRCDIR"
+
+	# Workaround for https://github.com/aws/aws-cli/issues/10145
+	pushd "$TERMUX_PKG_TMPDIR"
+	python3 -m venv venv
+	source venv/bin/activate
+	python3 -m pip install pip-tools
+	popd
+	echo hatchling >>requirements/bootstrap.txt
+	pip-compile \
+		--allow-unsafe \
+		--generate-hashes \
+		--output-file=requirements/download-deps/bootstrap-lock.txt \
+		--unsafe-package=flit-core \
+		--unsafe-package=pip \
+		--unsafe-package=setuptools \
+		--unsafe-package=wheel \
+		requirements/download-deps/bootstrap.txt
+	deactivate
+
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
+		popd
 		make
 		return
 	fi
@@ -103,17 +136,30 @@ termux_step_make() {
 	local WHEELHOUSE="$TERMUX_PKG_BUILDDIR/wheelhouse"
 	mkdir -p "$WHEELHOUSE"
 
+	local wheel_arch
+	case "$TERMUX_ARCH" in
+		aarch64) wheel_arch=arm64_v8a ;;
+		arm)     wheel_arch=armeabi_v7a ;;
+		x86_64)  wheel_arch=x86_64 ;;
+		i686)    wheel_arch=x86 ;;
+		*)
+			echo "ERROR: Unknown architecture: $TERMUX_ARCH"
+			return 1 ;;
+	esac
+
 	python3 -m pip download \
 		--dest "$WHEELHOUSE" \
-		--platform "linux_$TERMUX_ARCH" \
+		--platform "android_${TERMUX_PKG_API_LEVEL}_${wheel_arch}" \
 		--python-version "$TERMUX_PYTHON_VERSION" \
 		--implementation cp \
 		--abi cp"${TERMUX_PYTHON_VERSION//.}" \
 		--abi abi3 \
 		--abi none \
 		--no-deps \
-		-r "$TERMUX_PKG_SRCDIR/requirements/download-deps/bootstrap-lock.txt" \
-		-r "$TERMUX_PKG_SRCDIR/requirements/download-deps/portable-exe-lock.txt"
+		-r requirements/download-deps/bootstrap-lock.txt \
+		-r requirements/download-deps/portable-exe-lock.txt
+
+	popd
 
 	termux-proot-run \
 		-b "$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include/android:$TERMUX__PREFIX__INCLUDE_DIR/android" \
