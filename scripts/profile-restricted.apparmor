@@ -57,6 +57,9 @@ profile _custom-termux-package-builder-{{CONTAINER_NAME}} flags=(attach_disconne
 	deny /home/builder/termux-packages/[^o]** wlk,
 	# Explicitly allow storing built debs
 	allow /home/builder/termux-packages/output/** rw,
+	# Do not allow the container to peek into itself and other containers
+	deny /home/builder/termux-packages/output/_builder/** rwklx,
+	deny /home/builder/termux-packages/output/_builder rwklx,
 
   # Do not allow the container to modify the build toolchain
 	deny /home/builder/lib/** wlk,
