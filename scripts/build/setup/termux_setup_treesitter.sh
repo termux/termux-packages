@@ -6,7 +6,7 @@ termux_setup_treesitter() {
 
 	local TERMUX_TREE_SITTER_GZNAME="tree-sitter-linux-x64.gz"
 	local TERMUX_TREE_SITTER_URL="https://github.com/tree-sitter/tree-sitter/releases/download/v${TERMUX_TREE_SITTER_VERSION}/${TERMUX_TREE_SITTER_GZNAME}"
-	TERMUX_TREE_SITTER_DIR="${TERMUX_SCRIPTDIR}/build-tools/tree-sitter-${TERMUX_TREE_SITTER_VERSION}"
+	TERMUX_TREE_SITTER_DIR="${TERMUX_COMMON_CACHEDIR}/tree-sitter-${TERMUX_TREE_SITTER_VERSION}"
 
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "true" ]]; then
 		local TREE_SITTER_INSTALL_COMMAND=""
@@ -35,25 +35,25 @@ termux_setup_treesitter() {
 		return
 	fi
 
-	if [[ ! "$( "${TERMUX_TREE_SITTER_DIR}/bin/tree-sitter" --version | cut -f2 -d' ')" == "$TERMUX_TREE_SITTER_VERSION" ]]; then
+	if [[ "$( "${TERMUX_TREE_SITTER_DIR}/bin/tree-sitter" --version | cut -f2 -d' ')" != "$TERMUX_TREE_SITTER_VERSION" ]]; then
 		echo "termux_step_setup_treesitter: installing tree-sitter $TERMUX_TREE_SITTER_VERSION"
 		termux_download "${TERMUX_TREE_SITTER_URL}" \
 			"${TERMUX_PKG_TMPDIR}/${TERMUX_TREE_SITTER_GZNAME}" \
 			"${TERMUX_TREE_SITTER_SHA256}"
 
 		gunzip "$TERMUX_PKG_TMPDIR/${TERMUX_TREE_SITTER_GZNAME}"
-		mv -v "$TERMUX_PKG_TMPDIR"/{tree-sitter-linux-x64,tree-sitter}
-		install -Dm700 "$TERMUX_PKG_TMPDIR/tree-sitter" "$TERMUX_TREE_SITTER_DIR/bin/tree-sitter"
+		install -v -Dm700 "$TERMUX_PKG_TMPDIR/tree-sitter-linux-x64" "$TERMUX_TREE_SITTER_DIR/tree-sitter"
 	else
 		echo "termux_step_setup_treesitter: tree-sitter $TERMUX_TREE_SITTER_VERSION is already installed"
-		echo "$TERMUX_TREE_SITTER_DIR/bin/tree-sitter"
+		ls -lh "$TERMUX_TREE_SITTER_DIR/tree-sitter"
 	fi
 
 	# Default to the latest ABI version, can be overridden per package as necessary.
 	: "${TREE_SITTER_ABI_VERSION:=15}"
 
-	ln -sf "$TERMUX_SCRIPTDIR/packages/tree-sitter/termux-tree-sitter" "${TERMUX_TREE_SITTER_DIR}/bin"
-	export PATH="${TERMUX_TREE_SITTER_DIR}/bin:${PATH}"
+	# Symlink in the parser build helper as well.
+	ln -sf "$TERMUX_SCRIPTDIR/packages/tree-sitter/termux-tree-sitter" "${TERMUX_TREE_SITTER_DIR}"
+	export PATH="${TERMUX_TREE_SITTER_DIR}:${PATH}"
 
 	# ABI version to build the parser against.
 	export TREE_SITTER_ABI_VERSION
