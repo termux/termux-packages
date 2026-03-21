@@ -1,0 +1,18 @@
+--- a/ml/backend/ggml/ggml/src/ggml-vulkan/ggml-vulkan.cpp
++++ b/ml/backend/ggml/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+@@ -4851,12 +4851,9 @@
+ #endif
+         device->name = GGML_VK_NAME + std::to_string(idx);
+ 
+-        device_create_info = {
+-            vk::DeviceCreateFlags(),
+-            device_queue_create_infos,
+-            {},
+-            device_extensions
+-        };
++        device_create_info.setFlags(vk::DeviceCreateFlags());
++        device_create_info.setQueueCreateInfos(device_queue_create_infos);
++        device_create_info.setPEnabledExtensionNames(device_extensions);
+         device_create_info.setPNext(&device_features2);
+         device->device = device->physical_device.createDevice(device_create_info);
+ 
