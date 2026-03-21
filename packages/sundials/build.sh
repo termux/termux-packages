@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://computing.llnl.gov/projects/sundials
 TERMUX_PKG_DESCRIPTION="SUite of Nonlinear and DIfferential/ALgebraic equation Solvers."
 TERMUX_PKG_LICENSE="BSD 3-Clause"
-TERMUX_PKG_MAINTAINER="@termux-user-repository"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2:7.6.0"
 TERMUX_PKG_SRCURL=https://github.com/LLNL/sundials/releases/download/v${TERMUX_PKG_VERSION#*:}/sundials-${TERMUX_PKG_VERSION#*:}.tar.gz
 TERMUX_PKG_SHA256=0cb6f4bebd2ec13a42714a0654a58431d2cc473b759898b8e5fd8e1797c22712
