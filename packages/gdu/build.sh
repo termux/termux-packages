@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/dundee/gdu
 TERMUX_PKG_DESCRIPTION="Fast disk usage analyzer with console interface written in Go"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="5.34.1"
+TERMUX_PKG_VERSION="5.34.2"
 TERMUX_PKG_SRCURL=https://github.com/dundee/gdu/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=d6231f0411a4550b5aab5dd10691fe1c2a3f8ad2911f13706e2b79a0bff281ea
+TERMUX_PKG_SHA256=3b120d232d9039d10f771cae4f61f4c0c5a8212f0b074cdd69ac55c28fa6ba9a
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
