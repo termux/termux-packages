@@ -4,9 +4,8 @@ TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_LICENSE_FILE="llvm/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@finagolfin"
 # Keep flang version and revision in sync when updating (enforced by check in termux_step_pre_configure).
-TERMUX_PKG_VERSION="21.1.8"
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SHA256=4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142
+TERMUX_PKG_VERSION="22.1.8"
+TERMUX_PKG_SHA256=922f1817a0df7b1489272d18134ee0087a8b068828f87ac63b9861b1a9965888
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_SRCURL="https://github.com/llvm/llvm-project/releases/download/llvmorg-${TERMUX_PKG_VERSION}/llvm-project-${TERMUX_PKG_VERSION}.src.tar.xz"
 TERMUX_PKG_HOSTBUILD=true
