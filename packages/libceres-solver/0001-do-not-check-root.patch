@@ -1,0 +1,21 @@
+Fixes this error when building blender 5.1 on devices which do not allow
+permission to access the '/' folder:
+
+CMake Error at /data/data/com.termux/files/usr/lib/cmake/Ceres/CeresConfig.cmake:85 (message):
+  Failed to find Ceres - Ceres install root: /, determined from relative path
+  from CeresConfig.cmake install location:
+  /data/data/com.termux/files/usr/lib/cmake/Ceres, does not exist.  Either
+  the install directory was deleted, or the install tree was only partially
+  relocated outside of CMake after Ceres was built. 
+
+--- a/cmake/CeresConfig.cmake.in
++++ b/cmake/CeresConfig.cmake.in
+@@ -143,7 +143,7 @@ if (CERES_WAS_INSTALLED)
+   get_filename_component(CURRENT_ROOT_INSTALL_DIR
+     "${CERES_CURRENT_CONFIG_DIR}/@INSTALL_ROOT_REL_CONFIG_INSTALL_DIR@"
+     ABSOLUTE)
+-  if (NOT EXISTS ${CURRENT_ROOT_INSTALL_DIR})
++  if (NOT EXISTS ${CURRENT_ROOT_INSTALL_DIR} AND NOT ANDROID)
+     ceres_report_not_found(
+       "Ceres install root: ${CURRENT_ROOT_INSTALL_DIR}, "
+       "determined from relative path from CeresConfig.cmake install location: "
