@@ -1,0 +1,43 @@
+From c9361c6e8f6b101c78aa7ca5ea8ca8d86176bcd0 Mon Sep 17 00:00:00 2001
+From: Victoria Lacroix <victoria@vtrlx.ca>
+Date: Wed, 4 Feb 2026 14:12:03 -0500
+Subject: [PATCH] ffi: conform load_enum to GLib 2.87.0
+
+GLib 2.87.0 includes a fix
+(https://gitlab.gnome.org/GNOME/glib/-/merge_requests/4803) to how enum
+values are handled, causing the value to be read as a Lua table instead
+of a GLib array. This requires some slightly tweaked code when loading
+an enum.
+---
+ lgi/ffi.lua | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+--- a/lgi/ffi.lua
++++ b/lgi/ffi.lua
+@@ -76,16 +76,22 @@ end
+ 
+ -- Creates new enum/flags table with all values from specified gtype.
+ function ffi.load_enum(gtype, name)
+-   local GObject = core.repo.GObject
++   local GLib, GObject = core.repo.GLib, core.repo.GObject
+    local is_flags = GObject.Type.is_a(gtype, GObject.Type.FLAGS)
+    local enum_component = component.create(
+       gtype, is_flags and enum.bitflags_mt or enum.enum_mt, name)
+    local type_class = GObject.TypeClass.get(gtype)
+    local enum_class = core.record.cast(
+       type_class, is_flags and GObject.FlagsClass or GObject.EnumClass)
+-   for i = 0, enum_class.n_values - 1 do
+-      local val = core.record.fromarray(enum_class.values, i)
+-      enum_component[core.upcase(val.value_nick):gsub('%-', '_')] = val.value
++   if GLib.check_version(2, 87, 0) then
++      for i = 0, enum_class.n_values - 1 do
++         local val = core.record.fromarray(enum_class.values, i)
++         enum_component[core.upcase(val.value_nick):gsub('%-', '_')] = val.value
++      end
++   else
++      for _, val in ipairs(enum_class.values) do
++         enum_component[core.upcase(val.value_nick):gsub('%-', '_')] = val.value
++      end
+    end
+    return enum_component
+ end
