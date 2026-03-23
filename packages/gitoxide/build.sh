@@ -1,11 +1,11 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/Byron/gitoxide
+TERMUX_PKG_HOMEPAGE=https://github.com/GitoxideLabs/gitoxide
 TERMUX_PKG_DESCRIPTION="Rust implementation of Git"
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE-APACHE, LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.51.0"
-TERMUX_PKG_SRCURL="https://github.com/Byron/gitoxide/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=22da356497d22eabb598233cfba61db3674e234792df1def55212ea7d2793e5d
+TERMUX_PKG_VERSION="0.52.0"
+TERMUX_PKG_SRCURL="https://github.com/GitoxideLabs/gitoxide/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=8c4edd66f19e9c672040f8a4f76de5f3feafff5c443fc54554ae142a36bc10af
 TERMUX_PKG_DEPENDS="resolv-conf"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
