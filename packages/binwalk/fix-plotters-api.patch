@@ -1,0 +1,20 @@
+--- a/src/entropy.rs
++++ b/src/entropy.rs
+@@ -101,7 +101,7 @@
+         }
+ 
+         // Use the BitMapBackend to create a PNG, make the background black
+-        let root_area = BitMapBackend::new(&png_path, (IMAGE_PIXEL_WIDTH, IMAGE_PIXEL_HEIGHT))
++        let root_area = plotters::prelude::BitMapBackend::new(&png_path, (IMAGE_PIXEL_WIDTH, IMAGE_PIXEL_HEIGHT))
+             .into_drawing_area();
+         root_area.fill(&BLACK).unwrap();
+ 
+@@ -125,7 +125,7 @@
+             .unwrap();
+ 
+         // Line plot of the entropy points
+-        ctx.draw_series(LineSeries::new(
++        ctx.draw_series(plotters::prelude::LineSeries::new(
+             points, //.into_iter().map(|(x, y)| (x, y)),
+             &YELLOW,
+         ))

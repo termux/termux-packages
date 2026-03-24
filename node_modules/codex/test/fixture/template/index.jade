@@ -1,0 +1,17 @@
+extends layout
+
+block header
+  h1= file.title
+
+block content
+  article!= file.prepared
+  - if (files.posts)
+    .widget#recent-posts
+      h3 Recent Posts
+      ul
+        - var len = (files.posts.length > 5) ? 5 : files.posts.length
+        - for (var i = 0; i < len; i++)
+          - var post = files.posts[i]
+          li 
+            h4: a(href=post.href) #{post.title}
+            .summary= post.summary

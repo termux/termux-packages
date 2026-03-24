@@ -1,0 +1,41 @@
+extends layout
+
+block header
+  h1= file.title
+
+block content
+  for comment in file.prepared
+    unless comment.ignore
+      article.codeblock(id=comment.anchor + '-section')
+        .header!= comment.description.summary
+        - if (comment.ctx && comment.ctx.string)
+          .ctx
+            h3= comment.ctx.string
+        - if (comment.tags.length)
+          .tags
+            each tag in comment.tags
+              - if (tag.type == 'api')
+                .tag
+                  span.type &#64;#{tag.type}
+                  span.visibility #{tag.visibility}
+              - else if (tag.type == 'param')
+                -var types = tag.types.join(' | ')
+                .tag
+                  span.type &#64;#{tag.type}
+                  span.types &#123; #{types} &#125;
+                  span.name #{tag.name}
+                  span.desc #{tag.description}
+              - else if (tag.type == 'see')
+                .tag
+                  span.type &#64;#{tag.type}
+                  span.name #{tag.local}
+              - else if (tag.type == 'name')
+                // ignroing this
+              - else
+                - console.log('unknown tag in file: ' + file.title)
+                - console.log(tag)
+        .description!= comment.description.body
+        .view-source View Source
+        .code-wrap
+          pre.source.prettyprint
+            code= comment.code 

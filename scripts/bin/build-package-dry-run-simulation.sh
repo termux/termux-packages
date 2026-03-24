@@ -8,10 +8,7 @@ DRY_RUN_SCRIPT_NAME=$(basename "$0")
 BUILDSCRIPT_NAME="build-package.sh"
 TERMUX_ARCH="aarch64"
 TERMUX_DEBUG_BUILD="false"
-TERMUX_PACKAGES_DIRECTORIES=()
-for channel in $(jq -r 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
-	TERMUX_PACKAGES_DIRECTORIES+=("$channel")
-done
+TERMUX_PACKAGES_DIRECTORIES=("packages" "root-packages" "x11-packages")
 
 # Please keep synchronized with the logic of lines 468-547 of 'build-package.sh'.
 declare -a PACKAGE_LIST=()

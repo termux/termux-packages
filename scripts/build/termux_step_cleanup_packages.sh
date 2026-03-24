@@ -2,7 +2,8 @@ termux_step_cleanup_packages() {
 	[[ "${TERMUX_CLEANUP_BUILT_PACKAGES_ON_LOW_DISK_SPACE:=false}" == "true" ]] || return 0
 	[[ -d "$TERMUX_TOPDIR" ]] || return 0
 
-	local AVAILABLE TERMUX_PACKAGES_DIRECTORIES PKGS PKG_REGEX
+	local AVAILABLE PKGS PKG_REGEX
+	local -a TERMUX_PACKAGES_DIRECTORIES
 
 	# Extract available disk space in bytes
 	AVAILABLE="$(df "$TERMUX_TOPDIR" | awk 'NR==2 {print $4 * 1024}')"
@@ -10,10 +11,11 @@ termux_step_cleanup_packages() {
 	# No need to cleanup if there is enough disk space
 	(( AVAILABLE <= TERMUX_CLEANUP_BUILT_PACKAGES_THRESHOLD )) || return 0
 
-	TERMUX_PACKAGES_DIRECTORIES="$(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}"/repo.json)"
+	readarray -t TERMUX_PACKAGES_DIRECTORIES < <(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}"/repo.json)
+	[[ ${#TERMUX_PACKAGES_DIRECTORIES[@]} -eq 0 ]] && return 0
 
 	# Build package name regex to be used with `find`, avoiding loops.
-	PKGS="$(find ${TERMUX_PACKAGES_DIRECTORIES} -mindepth 1 -maxdepth 1 -type d -printf '%f\n')"
+	PKGS="$(find "${TERMUX_PACKAGES_DIRECTORIES[@]}" -mindepth 1 -maxdepth 1 -type d -printf '%f\n')"
 	[[ -z "$PKGS" ]] && return 0
 
 	# Exclude current package from the list.
