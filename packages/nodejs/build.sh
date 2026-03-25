@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environment"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
-TERMUX_PKG_VERSION=25.8.1
+TERMUX_PKG_VERSION=25.8.2
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=0b25b2b5fab80ea8b43fdaa7451f50065571e0bfda2524ca42bde8b98fe4d2d9
+TERMUX_PKG_SHA256=3efb19e757dc59bb21632507200d2de782369d5226a68955e9372c925fdf2471
 # thunder-coding: don't try to autoupdate nodejs, that thing takes 2 whole hours to build for a single arch, and requires a lot of patch updates everytime. Also I run tests everytime I update it to ensure least bugs
 TERMUX_PKG_AUTO_UPDATE=false
 # Note that we do not use a shared libuv to avoid an issue with the Android
@@ -72,14 +72,14 @@ termux_step_host_build() {
 	#  'bucket': 'chromium-browser-clang',
 	#  'objects': [
 	#    {
-	#      'object_name': 'Linux_x64/clang-llvmorg-21-init-9266-g09006611-1.tar.xz',
-	#      'sha256sum': '2cccd3a5b04461f17a2e78d2f8bd18b448443a9dd4d6dfac50e8e84b4d5176f1',
-	#      'size_bytes': 54517328,
-	#      'generation': 1742541959624765,
+	#      'object_name': 'Linux_x64/clang-llvmorg-21-init-16348-gbd809ffb-17.tar.xz',
+	#      'sha256sum': 'a9f5af449672a239366199c17441427c2c4433a120cace9ffd32397e15224c64',
+	#      'size_bytes': 55087424,
+	#      'generation': 1754486730635359,
 	#      'condition': 'host_os == "linux"',
 	#    },
 	#
-	# then the LLVM_COMMIT is 52cd27e6. The g before the hash is not part of the
+	# then the LLVM_COMMIT is bd809ffb. The g before the hash is not part of the
 	# hash, weird that they decided to include a 'g' for no reason, but 'g' isn't
 	# a part of the hexadecimal characters so anyways.. Also v8 project only
 	# stores the short-hash in the DEPS file, but we are using full hash here for
@@ -88,8 +88,8 @@ termux_step_host_build() {
 	# llvm-project directory.
 	#
 	# Also the sha256sum is the hash of the tarball, which we can directly use
-	local LLVM_TAR="clang-llvmorg-21-init-9266-g09006611-1.tar.xz"
-	local LLVM_TAR_HASH=2cccd3a5b04461f17a2e78d2f8bd18b448443a9dd4d6dfac50e8e84b4d5176f1
+	local LLVM_TAR="clang-llvmorg-21-init-16348-gbd809ffb-17.tar.xz"
+	local LLVM_TAR_HASH=a9f5af449672a239366199c17441427c2c4433a120cace9ffd32397e15224c64
 	cd $TERMUX_PKG_HOSTBUILD_DIR
 	mkdir llvm-project-build
 	termux_download \
