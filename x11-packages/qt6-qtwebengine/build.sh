@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.qt.io/
 TERMUX_PKG_DESCRIPTION="Qt 6 WebEngine Library"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION="6.10.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="6.11.0"
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtwebengine-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=856eddf292a69a88618567deea67711b4ec720e69bcb575ed7bb539c9023961e
-TERMUX_PKG_DEPENDS="dbus, fontconfig, libc++, libexpat, libjpeg-turbo, libminizip, libnspr, libnss, libopus, libpng, libsnappy, libvpx, libwebp, libx11, libxkbfile, pulseaudio, qt6-qtbase (>= ${TERMUX_PKG_VERSION}), qt6-qtdeclarative (>= ${TERMUX_PKG_VERSION}), qt6-qtwebchannel (>= ${TERMUX_PKG_VERSION}), zlib"
+TERMUX_PKG_SHA256=63b921c8b2dd59152ced9a796676010166df044588ee00ef9429dc2fd2146736
+TERMUX_PKG_DEPENDS="dbus, fontconfig, libc++, libexpat, libjpeg-turbo, libminizip, libnspr, libnss, libopus, libpng, libsnappy, libvpx, libwebp, libx11, libxkbfile, mesa, pulseaudio, qt6-qtbase (>= ${TERMUX_PKG_VERSION}), qt6-qtdeclarative (>= ${TERMUX_PKG_VERSION}), qt6-qtwebchannel (>= ${TERMUX_PKG_VERSION}), zlib"
 TERMUX_PKG_BUILD_DEPENDS="qt6-qtbase-cross-tools, qt6-qtdeclarative-cross-tools"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_NO_STATICSPLIT=true
