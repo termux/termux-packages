@@ -1,17 +1,25 @@
---- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp	2026-03-26 11:58:35.579786395 +0000
-+++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp	2026-03-26 11:58:35.591786516 +0000
-@@ -5107,12 +5107,12 @@
+diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+index 7092361d..8bd58dc1 100644
+--- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
++++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+@@ -5367,13 +5367,13 @@ static vk_device ggml_vk_get_device(size_t idx) {
  #endif
          device->name = GGML_VK_NAME + std::to_string(idx);
  
 -        device_create_info = {
-+        device_create_info = vk::DeviceCreateInfo(
-             vk::DeviceCreateFlags(),
-             device_queue_create_infos,
-             {},
-             device_extensions
+-            vk::DeviceCreateFlags(),
+-            device_queue_create_infos,
+-            {},
+-            device_extensions
 -        };
-+        );
-         device_create_info.setPNext(&device_features2);
+-        device_create_info.setPNext(&device_features2);
++        device_create_info = vk::DeviceCreateInfo{};
++        device_create_info
++            .setFlags(vk::DeviceCreateFlags())
++            .setQueueCreateInfos(device_queue_create_infos)
++            .setPEnabledExtensionNames(device_extensions)
++            .setPNext(&device_features2);
++
          device->device = device->physical_device.createDevice(device_create_info);
  
+         // Queues
