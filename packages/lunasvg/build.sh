@@ -1,0 +1,13 @@
+TERMUX_PKG_HOMEPAGE="https://github.com/sammycage/lunasvg"
+TERMUX_PKG_DESCRIPTION="SVG rendering and manipulation library in C++"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="3.5.0"
+TERMUX_PKG_SRCURL="https://github.com/sammycage/lunasvg/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=1abf1472ee6c4d19797916e8cc3c2e4b628e0d81178ffac60bdb0d457e32c690
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_SUBPKG_DEPENDS="libc++, plutovg"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DBUILD_SHARED_LIBS=ON
+-DUSE_SYSTEM_PLUTOVG=ON
+"
