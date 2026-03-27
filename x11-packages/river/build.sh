@@ -7,7 +7,6 @@ TERMUX_PKG_SRCURL="https://codeberg.org/river/river/releases/download/v${TERMUX_
 TERMUX_PKG_SHA256=49d8a2b679597cf5dff07008a1215892cc05525fb4085b5226b51611666335e5
 TERMUX_PKG_BUILD_DEPENDS="libevdev, libpixman, libwayland, wlroots, libxkbcommon, xwayland"
 TERMUX_PKG_BUILD_DEPENDS="libwayland-protocols, libwayland-cross-scanner, scdoc, zig-wlroots, zig-pixman, zig-wayland, zig-xkbcommon"
-TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_ZIG_VERSION=0.14.1
 
 termux_step_pre_configure() {
@@ -16,12 +15,15 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	zig build --system ${TERMUX_PREFIX}/lib/zig/packages \
+	zig build \
+		--build-file ${TERMUX_PKG_SRCDIR}/build.zig \
+		--prefix ${TERMUX_PKG_BUILDDIR} \
+		--release=small \
+		--system ${TERMUX_PREFIX}/lib/zig/packages \
 		-Dtarget=${ZIG_TARGET_NAME} \
-		-Doptimize=ReleaseSafe \
 		-Dxwayland
 }
 
 termux_step_make_install() {
-	install -Dm700 -t ${TERMUX_PREFIX}/bin zig-out/bin/*
+	install -Dm700 -t ${TERMUX_PREFIX}/bin ${TERMUX_PKG_BUILDDIR}/bin/*
 }
