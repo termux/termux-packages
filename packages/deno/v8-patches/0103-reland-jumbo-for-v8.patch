@@ -392,19 +392,6 @@ index 8aa1fe07..19ca3805 100644
  }  // namespace v8
 +
 +#undef Is64
-diff --git a/v8/src/compiler/revectorizer.cc b/v8/src/compiler/revectorizer.cc
-index 1d332c42..2f47c7d4 100644
---- a/v8/src/compiler/revectorizer.cc
-+++ b/v8/src/compiler/revectorizer.cc
-@@ -1456,6 +1456,8 @@ void Revectorizer::PrintStores(ZoneMap<Node*, StoreNodeSet>* store_chains) {
-   }
- }
- 
-+#undef TRACE
-+
- }  // namespace compiler
- }  // namespace internal
- }  // namespace v8
 diff --git a/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc b/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc
 index cc5b406f..9fac2172 100644
 --- a/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc
@@ -989,24 +976,6 @@ index 4b1d2bd4..f55c0b4a 100644
 +
 +#undef ror
 +#undef shr
-diff --git a/v8/src/wasm/wasm-external-refs.cc b/v8/src/wasm/wasm-external-refs.cc
-index 2be79a9d..faa205ef 100644
---- a/v8/src/wasm/wasm-external-refs.cc
-+++ b/v8/src/wasm/wasm-external-refs.cc
-@@ -715,6 +715,8 @@ V ReadAndIncrementOffset(Address data, size_t* offset) {
-   return result;
- }
- 
-+#define kSuccess kSuccess_WASMExternalRefs
-+
- constexpr int32_t kSuccess = 1;
- constexpr int32_t kOutOfBounds = 0;
- }  // namespace
-@@ -1122,3 +1124,4 @@ Address load_old_fp(Isolate* isolate) {
- 
- #undef V8_WITH_SANITIZER
- #undef RESET_THREAD_IN_WASM_FLAG_FOR_ASAN_ON_WINDOWS
-+#undef kSuccess
 --- a/v8/src/compiler/turboshaft/turbolev-graph-builder.cc
 +++ b/v8/src/compiler/turboshaft/turbolev-graph-builder.cc
 @@ -6655,4 +6655,6 @@
@@ -1084,3 +1053,21 @@ index 2be79a9d..faa205ef 100644
 +#undef TRACE
 +#undef TRACE_WITH_NODE
 +#undef REGISTER_NODE
+--- a/v8/src/codegen/arm64/instructions-arm64.cc
++++ b/v8/src/codegen/arm64/instructions-arm64.cc
+@@ -9,6 +9,8 @@
+ #include "src/codegen/arm64/assembler-arm64-inl.h"
+ #include "src/common/code-memory-access-inl.h"
+ 
++#define RotateRight RotateRight_InstructionsARM64
++
+ namespace v8 {
+ namespace internal {
+ 
+@@ -415,4 +417,6 @@
+ }  // namespace internal
+ }  // namespace v8
+ 
++#undef RotateRight
++
+ #endif  // V8_TARGET_ARCH_ARM64
