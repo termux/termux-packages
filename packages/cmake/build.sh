@@ -4,9 +4,9 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="LICENSE.rst"
 TERMUX_PKG_MAINTAINER="@termux"
 # When updating version here, please update termux_setup_cmake.sh as well.
-TERMUX_PKG_VERSION="4.3.0"
+TERMUX_PKG_VERSION="4.3.1"
 TERMUX_PKG_SRCURL="https://www.cmake.org/files/v${TERMUX_PKG_VERSION:0:3}/cmake-${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=f51b3c729f85d8dde46a92c071d2826ea6afb77d850f46894125de7cc51baa77
+TERMUX_PKG_SHA256=0798f4be7a1a406a419ac32db90c2956936fecbf50db3057d7af47d69a2d7edb
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libarchive, libc++, libcurl, libexpat, jsoncpp, libuv, rhash, zlib"
 TERMUX_PKG_RECOMMENDS="clang, make"
