@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Integrated Development Environment for Qt"
 TERMUX_PKG_LICENSE="GPL-3.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="19.0.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qtcreator/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/qt-creator-opensource-src-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=092695d38ece9f1c82440a7a63040e34fcd73f1272e7177e7217ad97b22587c1
 TERMUX_PKG_AUTO_UPDATE=true
@@ -18,9 +18,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_INSTALL_INCLUDEDIR=include
 -DBUILD_WITH_PCH=OFF
 "
-
-# Starting with version 19.0.0 32-bit builds fails due to using __int128:
-TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 termux_step_pre_configure() {
 	termux_setup_golang
