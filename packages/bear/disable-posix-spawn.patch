@@ -1,0 +1,110 @@
+Prevents:
+error[E0425]: cannot find function `posix_spawnattr_init` in crate `libc`
+
+--- a/intercept-preload/src/c/shim.c
++++ b/intercept-preload/src/c/shim.c
+@@ -25,7 +25,9 @@
+ #include <stdarg.h>
+ #include <stddef.h>
+ #include <stdio.h>
++#if defined(has_symbol_posix_spawn)
+ #include <spawn.h>
++#endif
+ #include <unistd.h>
+ 
+ // Ensure symbols are exported from the shared library
+@@ -61,6 +63,7 @@ extern int rust_execvpe(const char *file, char *const argv[], char *const envp[]
+ extern int rust_execvp(const char *file, char *const argv[]);
+ extern int rust_execvP(const char *file, const char *search_path, char *const argv[]);
+ extern int rust_exect(const char *path, char *const argv[], char *const envp[]);
++#if defined(has_symbol_posix_spawn)
+ extern int rust_posix_spawn(pid_t *pid, const char *path,
+                             const posix_spawn_file_actions_t *file_actions,
+                             const posix_spawnattr_t *attrp,
+@@ -72,6 +75,7 @@ extern int rust_posix_spawnp(pid_t *pid, const char *file,
+ extern FILE *rust_popen(const char *command, const char *mode);
+ extern int rust_pclose(FILE *stream);
+ extern int rust_system(const char *command);
++#endif
+ 
+ // Library constructor
+ //
+@@ -313,7 +317,7 @@ EXPORT int posix_spawnp(pid_t *pid, const char *file,
+ //
+ // popen - open a pipe to a process
+ //
+-#if defined(has_symbol_popen)
++#if defined(has_symbol_popen) && defined(has_symbol_posix_spawn)
+ EXPORT FILE *popen(const char *command, const char *mode)
+ {
+     return rust_popen(command, mode);
+@@ -328,9 +332,9 @@ EXPORT int pclose(FILE *stream)
+ //
+ // system - execute a shell command
+ //
+-#if defined(has_symbol_system)
++#if defined(has_symbol_system) && defined(has_symbol_posix_spawn)
+ EXPORT int system(const char *command)
+ {
+     return rust_system(command);
+ }
+ #endif
+--- a/platform-checks/src/lib.rs
++++ b/platform-checks/src/lib.rs
+@@ -146,27 +146,10 @@ pub fn perform_system_checks() -> HashSet<String> {
+ 
+     check_include_file("spawn.h", "spawn_h");
+ 
+-    // posix_spawn family
+-    for symbol in &["posix_spawn", "posix_spawnp"] {
+-        if check_symbol_exists(symbol, "spawn.h") {
+-            detected_symbols.insert(symbol.to_string());
+-        }
+-    }
+-
+     check_include_file("stdio.h", "stdio_h");
+ 
+-    // popen
+-    if check_symbol_exists("popen", "stdio.h") {
+-        detected_symbols.insert("popen".to_string());
+-    }
+-
+     check_include_file("stdlib.h", "stdlib_h");
+ 
+-    // system
+-    if check_symbol_exists("system", "stdlib.h") {
+-        detected_symbols.insert("system".to_string());
+-    }
+-
+     detected_symbols
+ }
+ 
+--- a/intercept-preload/src/implementation.rs
++++ b/intercept-preload/src/implementation.rs
+@@ -504,7 +504,7 @@ pub unsafe extern "C" fn rust_posix_spawnp(
+ /// - Returns a raw pointer to a FILE structure
+ ///
+ /// The caller must ensure that `command` and `mode` are valid null-terminated C strings.
+-#[cfg(has_symbol_popen)]
++#[cfg(all(has_symbol_popen, has_symbol_posix_spawn))]
+ #[unsafe(no_mangle)]
+ pub unsafe extern "C" fn rust_popen(command: *const c_char, mode: *const c_char) -> *mut libc::FILE {
+     if command.is_null() || mode.is_null() {
+@@ -667,7 +667,7 @@ pub unsafe extern "C" fn rust_popen(command: *const c_char, mode: *const c_char)
+ ///
+ /// # Safety
+ /// This function is unsafe because it dereferences a raw FILE pointer.
+-#[cfg(has_symbol_popen)]
++#[cfg(all(has_symbol_popen, has_symbol_posix_spawn))]
+ #[unsafe(no_mangle)]
+ pub unsafe extern "C" fn rust_pclose(stream: *mut libc::FILE) -> c_int {
+     if stream.is_null() {
+@@ -725,7 +725,7 @@ pub unsafe extern "C" fn rust_pclose(stream: *mut libc::FILE) -> c_int {
+ /// - Spawns child processes and manipulates signal masks
+ ///
+ /// The caller must ensure that `command` is a valid null-terminated C string.
+-#[cfg(has_symbol_system)]
++#[cfg(all(has_symbol_system, has_symbol_posix_spawn))]
+ #[unsafe(no_mangle)]
+ pub unsafe extern "C" fn rust_system(command: *const c_char) -> c_int {
+     // system(NULL) returns non-zero to indicate a command processor is available
