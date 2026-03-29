@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Markdown grammar for tree-sitter"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="0.5.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/tree-sitter-grammars/tree-sitter-markdown/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=df845b1ab7c7c163ec57d7fa17170c92b04be199bddab02523636efec5224ab6
 TERMUX_PKG_AUTO_UPDATE=true
