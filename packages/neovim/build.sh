@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility 
 TERMUX_PKG_LICENSE="Apache-2.0, VIM License"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
-TERMUX_PKG_VERSION="0.11.7"
+TERMUX_PKG_VERSION="0.12.0"
 TERMUX_PKG_SRCURL="https://github.com/neovim/neovim/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=b550b0e4cd2a0f9558bc6b278d27e47b528f7684efa2a46def438fcd64ee9822
+TERMUX_PKG_SHA256=76b4875fc1a4805a807a9fa53ff0c8fb081620137a40fb879b32436e375aeb65
 TERMUX_PKG_DEPENDS="libandroid-support, libiconv, libmsgpack, libunibilium, libuv, libvterm (>= 1:0.3-0), lua51-lpeg, luajit, luv, tree-sitter, tree-sitter-parsers, utf8proc"
 TERMUX_PKG_BREAKS="neovim-nightly"
 TERMUX_PKG_CONFLICTS="neovim-nightly"
@@ -18,6 +18,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLUAJIT_INCLUDE_DIR=$TERMUX_PREFIX/include/luajit-2.1
 -DLPEG_LIBRARY=$TERMUX_PREFIX/lib/liblpeg-5.1.so
 -DCOMPILE_LUA=OFF
+-DNLUA0_HOST_PRG=$TERMUX_PKG_HOSTBUILD_DIR/libnlua0.so
+-DNVIM_HOST_PRG=$TERMUX_PKG_HOSTBUILD_DIR/nvim
 "
 
 termux_step_host_build() {
@@ -33,27 +35,14 @@ termux_step_host_build() {
 
 	make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install
 
-	# Copy away host-built libnlua0.so used by src/nvim/generators/preload.lua.
-	# We patch src/nvim/CMakeLists.txt to use this instead of the cross-compiled one.
-	cp ./build/lib/libnlua0.so "$TERMUX_PKG_HOSTBUILD_DIR/"
+	# Copy away host-built libnlua0.so for use as -DNLUA0_HOST_PRG
+	cp -vf ./build/lib/libnlua0.so "$TERMUX_PKG_HOSTBUILD_DIR/"
+
+	# Copy away host-built nvim for use as -DNVIM_HOST_PRG
+	cp -vf ./build/bin/nvim "$TERMUX_PKG_HOSTBUILD_DIR/"
 
 	make distclean
 	rm -Rf build/
-}
-
-termux_step_pre_configure() {
-	# neovim has a weird CMake file that attempts to preprocess generated headers
-	# using the NDK Clang, but without ever adding the necessary --target argument
-	# to its commands for cross-preprocessing, so that must be done manually
-	local target="$CCTERMUX_HOST_PLATFORM"
-	if [[ "$TERMUX_ARCH" == "arm" ]]; then
-		target="armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL"
-	fi
-	patch="$TERMUX_PKG_BUILDER_DIR/add-target-to-gen-preprocessing.diff"
-	echo "Applying patch: $(basename "$patch")"
-	test -f "$patch" && sed \
-		-e "s%\@TARGET\@%${target}%g" \
-		"$patch" | patch --silent -p1
 }
 
 termux_step_post_make_install() {
