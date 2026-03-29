@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Lua grammar for tree-sitter"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="0.5.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/tree-sitter-grammars/tree-sitter-lua/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=cf01b93f4b61b96a6d27942cf28eeda4cbce7d503c3bef773a8930b3d778a2d9
 TERMUX_PKG_AUTO_UPDATE=true
