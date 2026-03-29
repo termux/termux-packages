@@ -1,0 +1,93 @@
+diff --git a/src/treesit.c b/src/treesit.c
+index e2986c186b8..f87f4654209 100644
+--- a/src/treesit.c
++++ b/src/treesit.c
+@@ -34,7 +34,11 @@ along with GNU Emacs.  If not, see <https://www.gnu.org/licenses/>.  */
+ # include "w32common.h"
+ 
+ /* In alphabetical order.  */
++#if TREE_SITTER_LANGUAGE_VERSION >= 15
++#undef ts_language_abi_version
++#else
+ #undef ts_language_version
++#endif
+ #undef ts_node_child
+ #undef ts_node_child_by_field_name
+ #undef ts_node_child_count
+@@ -89,7 +93,11 @@ along with GNU Emacs.  If not, see <https://www.gnu.org/licenses/>.  */
+ #undef ts_tree_get_changed_ranges
+ #undef ts_tree_root_node
+ 
++#if TREE_SITTER_LANGUAGE_VERSION >= 15
++DEF_DLL_FN (uint32_t, ts_language_abi_version, (const TSLanguage *));
++#else
+ DEF_DLL_FN (uint32_t, ts_language_version, (const TSLanguage *));
++#endif
+ DEF_DLL_FN (TSNode, ts_node_child, (TSNode, uint32_t));
+ DEF_DLL_FN (TSNode, ts_node_child_by_field_name,
+ 	    (TSNode, const char *, uint32_t));
+@@ -166,7 +174,11 @@ init_treesit_functions (void)
+   if (!library)
+     return false;
+ 
++#if TREE_SITTER_LANGUAGE_VERSION >= 15
++  LOAD_DLL_FN (library, ts_language_abi_version);
++#else
+   LOAD_DLL_FN (library, ts_language_version);
++#endif
+   LOAD_DLL_FN (library, ts_node_child);
+   LOAD_DLL_FN (library, ts_node_child_by_field_name);
+   LOAD_DLL_FN (library, ts_node_child_count);
+@@ -224,7 +236,11 @@ init_treesit_functions (void)
+   return true;
+ }
+ 
++#if TREE_SITTER_LANGUAGE_VERSION >= 15
++#define ts_language_abi_version fn_ts_language_abi_version
++#else
+ #define ts_language_version fn_ts_language_version
++#endif
+ #define ts_node_child fn_ts_node_child
+ #define ts_node_child_by_field_name fn_ts_node_child_by_field_name
+ #define ts_node_child_count fn_ts_node_child_count
+@@ -632,6 +648,22 @@ treesit_load_language_push_for_each_suffix (Lisp_Object lib_base_name,
+     }
+ }
+ 
++/* This function is a compatibility shim.  Tree-sitter 0.25 introduced
++   ts_language_abi_version as a replacement for ts_language_version, and
++   tree-sitter 0.26 removed ts_language_version.  Here we use the fact
++   that 0.25 bumped TREE_SITTER_LANGUAGE_VERSION to 15, to use the new
++   function instead of the old one, when Emacs is compiled against
++   tree-sitter version 0.25 or newer.  */
++static uint32_t
++treesit_language_abi_version (const TSLanguage *ts_lang)
++{
++#if TREE_SITTER_LANGUAGE_VERSION >= 15
++  return ts_language_abi_version (ts_lang);
++#else
++  return ts_language_version (ts_lang);
++#endif
++}
++
+ /* Load the dynamic library of LANGUAGE_SYMBOL and return the pointer
+    to the language definition.
+ 
+@@ -746,7 +778,7 @@ treesit_load_language (Lisp_Object language_symbol,
+     {
+       *signal_symbol = Qtreesit_load_language_error;
+       *signal_data = list2 (Qversion_mismatch,
+-			    make_fixnum (ts_language_version (lang)));
++			    make_fixnum (treesit_language_abi_version (lang)));
+       return NULL;
+     }
+   return lang;
+@@ -817,7 +849,7 @@ Return nil if a grammar library for LANGUAGE is not available.  */)
+ 						       &signal_data);
+       if (ts_language == NULL)
+ 	return Qnil;
+-      uint32_t version =  ts_language_version (ts_language);
++      uint32_t version =  treesit_language_abi_version (ts_language);
+       return make_fixnum((ptrdiff_t) version);
+     }
+ }
