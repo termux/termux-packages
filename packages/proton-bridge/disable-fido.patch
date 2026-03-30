@@ -1,6 +1,6 @@
 --- a/internal/frontend/cli/accounts.go
 +++ b/internal/frontend/cli/accounts.go
-@@ -27,7 +27,5 @@ import (
+@@ -27,9 +27,7 @@ import (
  	"github.com/ProtonMail/proton-bridge/v3/internal/bridge"
  	"github.com/ProtonMail/proton-bridge/v3/internal/certs"
  	"github.com/ProtonMail/proton-bridge/v3/internal/constants"
@@ -8,15 +8,18 @@
  	"github.com/ProtonMail/proton-bridge/v3/internal/hv"
 -	"github.com/ProtonMail/proton-bridge/v3/internal/unleash"
  	"github.com/ProtonMail/proton-bridge/v3/internal/vault"
-@@ -176,7 +176,6 @@ func (f *frontendCLI) loginAccount(c *ishell.Context) {
+ 	"github.com/abiosoft/ishell"
+ 	"github.com/sirupsen/logrus"
+@@ -188,8 +186,6 @@ func (f *frontendCLI) loginAccount(c *ishell.Context) {
  		return
  	}
  
 -	u2fLoginEnabled := f.bridge.GetFeatureFlagValue(unleash.InboxBridgeU2FLoginEnabled)
- 
+-
  	switch auth.TwoFA.Enabled {
  	case proton.HasTOTP:
-@@ -187,30 +186,12 @@ func (f *frontendCLI) loginAccount(c *ishell.Context) {
+ 		if err := f.loginTOTP(c, client); err != nil {
+@@ -198,45 +194,12 @@ func (f *frontendCLI) loginAccount(c *ishell.Context) {
  		}
  
  	case proton.HasFIDO2:
@@ -28,23 +31,38 @@
 -
 -		if len(auth.TwoFA.FIDO2.RegisteredKeys) == 0 {
 -			f.printAndLogError("Cannot login: Security key login is required, but no registered keys were provided.")
+-			return
 -		}
 -		if err := fido.AuthWithHardwareKeyCLI(f, client, auth); err != nil {
--			f.printAndLogError("Cannot login: ", err)
+-			if errors.Is(err, fido.ErrorUnsupportedWindowsVersion) {
+-				f.printAndLogError("Hardware keys aren't supported on this version of Windows.\n" +
+-					"To sign in on this device, you'll need to update Windows or add an authenticator app to your account")
+-			} else {
+-				f.printAndLogError("Cannot login: ", err)
+-			}
 -			return
 -		}
 +		f.printAndLogError("Cannot login: Termux does not currently build proton-bridge with FIDO support.")
 +		return
  
  	case proton.HasFIDO2AndTOTP:
--		if u2fLoginEnabled && len(auth.TwoFA.FIDO2.RegisteredKeys) > 0 && f.yesNoQuestion("Do you want to use a security key for Two-factor authentication") {
--			if err := fido.AuthWithHardwareKeyCLI(f, client, auth); err != nil {
+-		useFIDO := u2fLoginEnabled && len(auth.TwoFA.FIDO2.RegisteredKeys) > 0 && f.yesNoQuestion("Do you want to use a security key for Two-factor authentication")
+-		if useFIDO {
+-			err := fido.AuthWithHardwareKeyCLI(f, client, auth)
+-			if errors.Is(err, fido.ErrorUnsupportedWindowsVersion) {
+-				f.printAndLogError("Hardware keys aren't supported on this version of Windows.\n" +
+-					"To continue signing in, use a code from your authenticator app.")
+-				err = f.loginTOTP(c, client)
+-			}
+-			if err != nil {
 -				f.printAndLogError("Cannot login: ", err)
 -				return
 -			}
--		} else if err := f.loginTOTP(c, client); err != nil {
--			f.printAndLogError("Cannot login: ", err)
--			return
+-		} else {
+-			if err := f.loginTOTP(c, client); err != nil {
+-				f.printAndLogError("Cannot login: ", err)
+-				return
+-			}
 -		}
 +		f.printAndLogError("Cannot login: Termux does not currently build proton-bridge with FIDO support.")
 +		return
