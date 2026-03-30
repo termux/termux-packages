@@ -1,0 +1,27 @@
+From 14bc748671879d2269fde3edb693b2f02122866c Mon Sep 17 00:00:00 2001
+From: John Ralls <jralls@ceridwen.us>
+Date: Sun, 29 Mar 2026 10:39:20 -0700
+Subject: [PATCH] Remove inadvertently committed boost-1.90 library list
+ change.
+
+---
+ CMakeLists.txt | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b26fa3ddb10..981e6c06c66 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -605,11 +605,7 @@ if (Boost_FOUND)
+  if (Boost_VERSION VERSION_LESS "1.89.0")
+   find_package(Boost 1.67.0  COMPONENTS date_time filesystem locale program_options regex system)
+  else()
+-  if (Boost_VERSION VERSION_LESS "1.90.0")
+-    find_package(Boost 1.67.0  COMPONENTS date_time filesystem locale program_options regex)
+-  else()
+-    find_package(Boost 1.67.0  COMPONENTS date_time locale program_options regex)
+-  endif()
++  find_package(Boost 1.67.0  COMPONENTS date_time filesystem locale program_options regex)
+  endif()
+ endif()
+ 
