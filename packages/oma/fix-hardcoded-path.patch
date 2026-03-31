@@ -1,6 +1,6 @@
-diff -uNr oma-1.22.1/apt-auth-config/src/lib.rs oma-1.22.1.mod/apt-auth-config/src/lib.rs
---- oma-1.22.1/apt-auth-config/src/lib.rs	2025-10-15 18:03:09.000000000 +0800
-+++ oma-1.22.1.mod/apt-auth-config/src/lib.rs	2025-10-15 22:43:25.891625437 +0800
+diff -uNr oma-1.25.1/apt-auth-config/src/lib.rs oma-1.25.1.mod/apt-auth-config/src/lib.rs
+--- oma-1.25.1/apt-auth-config/src/lib.rs	2026-03-30 17:00:51.000000000 +0800
++++ oma-1.25.1.mod/apt-auth-config/src/lib.rs	2026-03-31 13:49:54.681696922 +0800
 @@ -94,7 +94,7 @@
  pub struct AuthConfig(pub Vec<(AuthUrl, Authenticator)>);
  
@@ -10,10 +10,10 @@ diff -uNr oma-1.22.1/apt-auth-config/src/lib.rs oma-1.22.1.mod/apt-auth-config/s
      pub fn system(sysroot: impl AsRef<Path>) -> Result<Self, AuthConfigError> {
          Self::from_path(sysroot.as_ref().join("etc/apt"))
      }
-diff -uNr oma-1.22.1/i18n/en-US/oma.ftl oma-1.22.1.mod/i18n/en-US/oma.ftl
---- oma-1.22.1/i18n/en-US/oma.ftl	2025-10-15 18:03:09.000000000 +0800
-+++ oma-1.22.1.mod/i18n/en-US/oma.ftl	2025-10-15 22:43:25.895625437 +0800
-@@ -130,7 +130,7 @@
+diff -uNr oma-1.25.1/i18n/en-US/oma.ftl oma-1.25.1.mod/i18n/en-US/oma.ftl
+--- oma-1.25.1/i18n/en-US/oma.ftl	2026-03-30 17:00:51.000000000 +0800
++++ oma-1.25.1.mod/i18n/en-US/oma.ftl	2026-03-31 13:49:54.681696922 +0800
+@@ -133,7 +133,7 @@
  can-not-checksum = Failed to parse SHA256 checksum.
  failed-to-open-to-checksum = BUG: Failed to open { $path } for checksum verification. Please report this issue at https://github.com/AOSC-Dev/oma.
  # config
@@ -22,7 +22,7 @@ diff -uNr oma-1.22.1/i18n/en-US/oma.ftl oma-1.22.1.mod/i18n/en-US/oma.ftl
  cleaning = Clearing packages cache ...
  download-failed-with-len = { $len } package(s) failed to download.
  download-failed = Failed to download { $filename }!
-@@ -157,7 +157,7 @@
+@@ -160,7 +160,7 @@
  failed-check-dbus = oma is unable to detect the status of the currently managed system because it has not yet started up.
  failed-check-dbus-tips-1 = In this state, oma is unable to check the status of critical systems such as power supplies and user sessions, and continued operation may result in system failure!
  failed-check-dbus-tips-2 = If you are trying to repair the system using, for example, chroot, please add the --no-check-dbus parameter after the oma command.
@@ -31,10 +31,10 @@ diff -uNr oma-1.22.1/i18n/en-US/oma.ftl oma-1.22.1.mod/i18n/en-US/oma.ftl
  no-check-dbus-tips = oma is configured to ignore system operational status, which means that oma will not detect critical system states such as power supplies and user sessions. System failures may occur.
  oma-history-is-empty = oma history is empty.
  tui-pending = Pending
-diff -uNr oma-1.22.1/i18n/zh-CN/oma.ftl oma-1.22.1.mod/i18n/zh-CN/oma.ftl
---- oma-1.22.1/i18n/zh-CN/oma.ftl	2025-10-15 18:03:09.000000000 +0800
-+++ oma-1.22.1.mod/i18n/zh-CN/oma.ftl	2025-10-15 22:43:25.895625437 +0800
-@@ -127,7 +127,7 @@
+diff -uNr oma-1.25.1/i18n/zh-CN/oma.ftl oma-1.25.1.mod/i18n/zh-CN/oma.ftl
+--- oma-1.25.1/i18n/zh-CN/oma.ftl	2026-03-30 17:00:51.000000000 +0800
++++ oma-1.25.1.mod/i18n/zh-CN/oma.ftl	2026-03-31 13:49:54.681696922 +0800
+@@ -130,7 +130,7 @@
  can-not-checksum = 无法解析 SHA256 校验和。
  failed-to-open-to-checksum = BUG：无法打开用于验证校验和的路径 { $path }，请于 https://github.com/AOSC-Dev/oma 报告问题。
  # config
@@ -43,7 +43,7 @@ diff -uNr oma-1.22.1/i18n/zh-CN/oma.ftl oma-1.22.1.mod/i18n/zh-CN/oma.ftl
  cleaning = 正在清理本地软件包缓存 ...
  download-failed-with-len = { $len } 个软件包下载失败。
  download-failed = 下载 { $filename } 文件失败！
-@@ -152,7 +152,7 @@
+@@ -155,7 +155,7 @@
  failed-check-dbus = 由于当前管理的系统尚未启动，oma 无法探测系统运行状态。
  failed-check-dbus-tips-1 = 在此状态下，oma 无法检查电源及用户会话等关键系统状态，如继续操作可能会导致系统故障！
  failed-check-dbus-tips-2 = 如果您正尝试用 chroot 等方式修复系统，请在 oma 命令后加 --no-check-dbus 参数。
@@ -52,10 +52,10 @@ diff -uNr oma-1.22.1/i18n/zh-CN/oma.ftl oma-1.22.1.mod/i18n/zh-CN/oma.ftl
  no-check-dbus-tips = 目前 oma 已被配置为不探测系统运行状态，将忽略电源及用户会话等关键系统状态；如继续操作可能会导致系统故障。
  oma-history-is-empty = oma 历史记录为空。
  tui-pending = 待办事项
-diff -uNr oma-1.22.1/i18n/zh-TW/oma.ftl oma-1.22.1.mod/i18n/zh-TW/oma.ftl
---- oma-1.22.1/i18n/zh-TW/oma.ftl	2025-10-15 18:03:09.000000000 +0800
-+++ oma-1.22.1.mod/i18n/zh-TW/oma.ftl	2025-10-15 22:43:25.895625437 +0800
-@@ -123,7 +123,7 @@
+diff -uNr oma-1.25.1/i18n/zh-TW/oma.ftl oma-1.25.1.mod/i18n/zh-TW/oma.ftl
+--- oma-1.25.1/i18n/zh-TW/oma.ftl	2026-03-30 17:00:51.000000000 +0800
++++ oma-1.25.1.mod/i18n/zh-TW/oma.ftl	2026-03-31 13:49:54.681696922 +0800
+@@ -125,7 +125,7 @@
  can-not-checksum = 無法解析 SHA256 雜湊值。
  failed-to-open-to-checksum = BUG：無法打開用於驗證雜湊值的路徑 { $path }，請於 https://github.com/AOSC-Dev/oma 報告問題。
  # config
@@ -64,7 +64,7 @@ diff -uNr oma-1.22.1/i18n/zh-TW/oma.ftl oma-1.22.1.mod/i18n/zh-TW/oma.ftl
  cleaning = 正在清理本機軟體套件快取……
  download-failed-with-len = { $len } 個軟體套件下載失敗。
  download-failed = 下載 { $filename } 檔案失敗！
-@@ -146,7 +146,7 @@
+@@ -148,7 +148,7 @@
  failed-check-dbus = 由於目前管理的系統尚未啟動，oma 無法探測系統執行狀態。
  failed-check-dbus-tips-1 = 在此狀態下，oma 無法檢查電源及使用者工作階段等關鍵系統狀態，如繼續操作可能會導致系統故障！
  failed-check-dbus-tips-2 = 如果您正嘗試用 chroot 等方式修復系統，請在 oma 指令後加 --no-check-dbus 參數。
@@ -73,9 +73,9 @@ diff -uNr oma-1.22.1/i18n/zh-TW/oma.ftl oma-1.22.1.mod/i18n/zh-TW/oma.ftl
  no-check-dbus-tips = 目前 oma 已被設定為不探測系統執行狀態，將忽略電源及使用者工作階段等關鍵系統狀態；如繼續操作可能會導致系統故障。
  oma-history-is-empty = oma 歷史記錄為空。
  tui-pending = 待辦事項
-diff -uNr oma-1.22.1/oma-contents/examples/list_files.rs oma-1.22.1.mod/oma-contents/examples/list_files.rs
---- oma-1.22.1/oma-contents/examples/list_files.rs	2025-10-15 18:03:09.000000000 +0800
-+++ oma-1.22.1.mod/oma-contents/examples/list_files.rs	2025-10-15 22:41:54.855625472 +0800
+diff -uNr oma-1.25.1/oma-contents/examples/list_files.rs oma-1.25.1.mod/oma-contents/examples/list_files.rs
+--- oma-1.25.1/oma-contents/examples/list_files.rs	2026-03-30 17:00:51.000000000 +0800
++++ oma-1.25.1.mod/oma-contents/examples/list_files.rs	2026-03-31 13:49:54.681696922 +0800
 @@ -1,7 +1,7 @@
  use oma_contents::searcher::{Mode, pure_search};
  
@@ -85,9 +85,9 @@ diff -uNr oma-1.22.1/oma-contents/examples/list_files.rs oma-1.22.1.mod/oma-cont
          println!("{pkg}: {file}")
      })
      .unwrap();
-diff -uNr oma-1.22.1/oma-contents/examples/list_files_rg.rs oma-1.22.1.mod/oma-contents/examples/list_files_rg.rs
---- oma-1.22.1/oma-contents/examples/list_files_rg.rs	2025-10-15 18:03:09.000000000 +0800
-+++ oma-1.22.1.mod/oma-contents/examples/list_files_rg.rs	2025-10-15 22:41:26.059625483 +0800
+diff -uNr oma-1.25.1/oma-contents/examples/list_files_rg.rs oma-1.25.1.mod/oma-contents/examples/list_files_rg.rs
+--- oma-1.25.1/oma-contents/examples/list_files_rg.rs	2026-03-30 17:00:51.000000000 +0800
++++ oma-1.25.1.mod/oma-contents/examples/list_files_rg.rs	2026-03-31 13:49:54.681696922 +0800
 @@ -1,7 +1,7 @@
  use oma_contents::searcher::{Mode, ripgrep_search};
  
@@ -97,9 +97,9 @@ diff -uNr oma-1.22.1/oma-contents/examples/list_files_rg.rs oma-1.22.1.mod/oma-c
          println!("{pkg}: {file}")
      })
      .unwrap();
-diff -uNr oma-1.22.1/oma-contents/src/parser.rs oma-1.22.1.mod/oma-contents/src/parser.rs
---- oma-1.22.1/oma-contents/src/parser.rs	2025-10-15 18:03:09.000000000 +0800
-+++ oma-1.22.1.mod/oma-contents/src/parser.rs	2025-10-15 22:43:25.895625437 +0800
+diff -uNr oma-1.25.1/oma-contents/src/parser.rs oma-1.25.1.mod/oma-contents/src/parser.rs
+--- oma-1.25.1/oma-contents/src/parser.rs	2026-03-30 17:00:51.000000000 +0800
++++ oma-1.25.1.mod/oma-contents/src/parser.rs	2026-03-31 13:49:54.681696922 +0800
 @@ -77,11 +77,11 @@
  
  #[test]
@@ -114,9 +114,9 @@ diff -uNr oma-1.22.1/oma-contents/src/parser.rs oma-1.22.1.mod/oma-contents/src/
 +        ("@TERMUX_PREFIX@/etc/i have multi space", vec!["foo/bar/abc"])
      )
  }
-diff -uNr oma-1.22.1/oma-history/examples/last_upgrade_date.rs oma-1.22.1.mod/oma-history/examples/last_upgrade_date.rs
---- oma-1.22.1/oma-history/examples/last_upgrade_date.rs	2025-10-15 18:03:09.000000000 +0800
-+++ oma-1.22.1.mod/oma-history/examples/last_upgrade_date.rs	2025-10-15 22:42:25.627625460 +0800
+diff -uNr oma-1.25.1/oma-history/examples/last_upgrade_date.rs oma-1.25.1.mod/oma-history/examples/last_upgrade_date.rs
+--- oma-1.25.1/oma-history/examples/last_upgrade_date.rs	2026-03-30 17:00:51.000000000 +0800
++++ oma-1.25.1.mod/oma-history/examples/last_upgrade_date.rs	2026-03-31 13:49:54.681696922 +0800
 @@ -1,7 +1,7 @@
  use oma_history::{connect_db, last_upgrade_timestamp};
  
@@ -126,9 +126,9 @@ diff -uNr oma-1.22.1/oma-history/examples/last_upgrade_date.rs oma-1.22.1.mod/om
      let n = last_upgrade_timestamp(&conn).unwrap();
  
      println!(
-diff -uNr oma-1.22.1/oma-history/src/migrations.rs oma-1.22.1.mod/oma-history/src/migrations.rs
---- oma-1.22.1/oma-history/src/migrations.rs	2025-10-15 18:03:09.000000000 +0800
-+++ oma-1.22.1.mod/oma-history/src/migrations.rs	2025-10-15 22:42:40.171625454 +0800
+diff -uNr oma-1.25.1/oma-history/src/migrations.rs oma-1.25.1.mod/oma-history/src/migrations.rs
+--- oma-1.25.1/oma-history/src/migrations.rs	2026-03-30 17:00:51.000000000 +0800
++++ oma-1.25.1.mod/oma-history/src/migrations.rs	2026-03-31 13:49:54.681696922 +0800
 @@ -334,7 +334,7 @@
          println!(
              r#"oma ran into unexpected issues whilst migrating the history database, some entries were not migrated. Please consider sharing your oma history database file at:
@@ -138,10 +138,10 @@ diff -uNr oma-1.22.1/oma-history/src/migrations.rs oma-1.22.1.mod/oma-history/sr
  
  with us to help with debugging."#
          );
-diff -uNr oma-1.22.1/oma-refresh/src/db.rs oma-1.22.1.mod/oma-refresh/src/db.rs
---- oma-1.22.1/oma-refresh/src/db.rs	2025-10-15 18:03:09.000000000 +0800
-+++ oma-1.22.1.mod/oma-refresh/src/db.rs	2025-10-15 22:42:07.691625467 +0800
-@@ -549,7 +549,7 @@
+diff -uNr oma-1.25.1/oma-refresh/src/db.rs oma-1.25.1.mod/oma-refresh/src/db.rs
+--- oma-1.25.1/oma-refresh/src/db.rs	2026-03-30 17:00:51.000000000 +0800
++++ oma-1.25.1.mod/oma-refresh/src/db.rs	2026-03-31 13:49:54.681696922 +0800
+@@ -499,7 +499,7 @@
          let index_target_config =
              IndexTargetConfig::new(self.manifest_config.clone(), vec![], &self.arch);
  
@@ -150,9 +150,9 @@ diff -uNr oma-1.22.1/oma-refresh/src/db.rs oma-1.22.1.mod/oma-refresh/src/db.rs
  
          let archs_from_file = if let Ok(file) = archs_from_file {
              let res = file.lines().map(|x| x.to_string()).collect::<Vec<_>>();
-diff -uNr oma-1.22.1/src/config_file.rs oma-1.22.1.mod/src/config_file.rs
---- oma-1.22.1/src/config_file.rs	2025-10-15 18:03:09.000000000 +0800
-+++ oma-1.22.1.mod/src/config_file.rs	2025-10-15 22:43:25.895625437 +0800
+diff -uNr oma-1.25.1/src/config_file.rs oma-1.25.1.mod/src/config_file.rs
+--- oma-1.25.1/src/config_file.rs	2026-03-30 17:00:51.000000000 +0800
++++ oma-1.25.1.mod/src/config_file.rs	2026-03-31 13:49:54.685696922 +0800
 @@ -155,7 +155,7 @@
  
  impl ConfigFile {
