@@ -9,7 +9,25 @@
    #include <pango/pango.h>
    #include <string.h>
    #include <stdlib.h>
-@@ -1572,28 +1572,7 @@
+@@ -1208,7 +1208,7 @@
+ pygobject_gexiv2_found = false
+ foreach py : py_candidates
+   #Check if PyGobject installation have pycairo (#13105)
+-  python_tmp = pythonmod.find_installation(py, modules: ['gi', 'cairo'], required: false)
++  python_tmp = pythonmod.find_installation(py, required: false)
+   if python_tmp.found() and python_tmp.language_version().version_compare(python3_minver)
+     python = python_tmp
+     #Check if PyGObject installation have minimum version
+@@ -1238,7 +1238,7 @@
+ endif
+ message('Found Python @0@'.format(python.language_version()))
+ 
+-if pygobject_found.returncode() != 0 or not pygobject_found.stdout().strip().version_compare(pygobject_minver) or not pygobject_gexiv2_found
++if not meson.is_cross_build() and (pygobject_found.returncode() != 0 or not pygobject_found.stdout().strip().version_compare(pygobject_minver) or not pygobject_gexiv2_found)
+   error('No suitable PyGObject (with GExiv2 submodule) found. Minimum supported version: @0@'.format(pygobject_minver))
+ endif
+ message('Found PyGObject: @0@'.format(pygobject_found.stdout().strip()))
+@@ -1600,28 +1600,7 @@
  endif
  
  if shmem_choice == 'sysv'
@@ -39,7 +57,7 @@
    conf.set('USE_SYSV_SHM', true)
  elif shmem_choice == 'posix'
    conf.set('USE_POSIX_SHM', true)
-@@ -1994,7 +1973,7 @@
+@@ -2028,7 +2007,7 @@
  endif
  gimp_run_env.set('GIMP_PYTHON_WITH_GI', python.full_path())
  
