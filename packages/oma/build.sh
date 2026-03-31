@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="oma is an attempt at reworking APT's interface"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.25.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/AOSC-Dev/oma/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=eb42353eff8db6d2721285abd1d5c67a6efb9349e7ed20888bbd09e9c9c17171
 TERMUX_PKG_DEPENDS="libnettle, apt"
@@ -49,9 +50,26 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	cargo build --jobs "$TERMUX_PKG_MAKE_PROCESSES" --target "$CARGO_TARGET_NAME" --release
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release $TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 }
 
 termux_step_make_install() {
 	install -Dm700 -t "$TERMUX_PREFIX/bin" "target/${CARGO_TARGET_NAME}/release/oma"
+
+	install -Dm644 "$TERMUX_PKG_SRCDIR/README.md" "$TERMUX_PREFIX/share/doc/oma/README"
+	install -Dm644 "$TERMUX_PKG_SRCDIR/data/apt.conf.d/50oma-debian.conf" "$TERMUX_PREFIX/etc/apt/apt.conf.d/50oma.conf"
+	install -Dm644 "$TERMUX_PKG_SRCDIR/data/config/oma-debian.toml" "$TERMUX_PREFIX/etc/oma.toml"
+
+	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/bash-completion/completions/oma.bash"
+	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/zsh/site-functions/_oma"
+	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/fish/vendor_completions.d/oma.fish"
+}
+
+termux_step_create_debscripts() {
+	cat <<-EOF >./postinst
+		#!${TERMUX_PREFIX}/bin/sh
+		COMPLETE=bash oma > ${TERMUX_PREFIX}/share/bash-completion/completions/oma.bash
+		COMPLETE=zsh oma > ${TERMUX_PREFIX}/share/zsh/site-functions/_oma
+		COMPLETE=fish oma > ${TERMUX_PREFIX}/share/fish/vendor_completions.d/oma.fish
+	EOF
 }
