@@ -2,8 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://librewolf.net/
 TERMUX_PKG_DESCRIPTION="A custom version of Firefox, focused on privacy, security and freedom."
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@3ls-it"
-TERMUX_PKG_VERSION="149.0-1+really148.0.2-3"
-TERMUX_PKG_SRCURL="https://codeberg.org/api/packages/librewolf/generic/librewolf-source/${TERMUX_PKG_VERSION#*really}/librewolf-${TERMUX_PKG_VERSION#*really}.source.tar.gz"
+TERMUX_PKG_VERSION="149.0-1"
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL="https://codeberg.org/api/packages/librewolf/generic/librewolf-source/148.0.2-3/librewolf-148.0.2-3.source.tar.gz"
 TERMUX_PKG_SHA256=e00c0de9330b6655fbfa2e31540d5f02248f6b1959bbece384d4afb1a0d6efa7
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
