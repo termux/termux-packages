@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/rizsotto/Bear
 TERMUX_PKG_DESCRIPTION="Bear is a tool that generates a compilation database for clang tooling."
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Nguyen Khanh @nguynkhn"
-TERMUX_PKG_VERSION="4.1.0"
+TERMUX_PKG_VERSION="4.1.1"
 TERMUX_PKG_SRCURL="https://github.com/rizsotto/Bear/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=c5f90fdcf7e0003a345993f3b69981db20715050a43ff984aad1b1bd5a1b02ea
+TERMUX_PKG_SHA256=58665614e59f3b7f7127e6a6fe4c94ddc64b81e80a4c160ecbd7e44b9171308f
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
