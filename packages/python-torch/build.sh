@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="Tensors and Dynamic neural networks in Python"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.10.0"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=git+https://github.com/pytorch/pytorch
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
-TERMUX_PKG_DEPENDS="abseil-cpp, libc++, libopenblas, libprotobuf, python, python-numpy, python-pip"
+TERMUX_PKG_DEPENDS="abseil-cpp, libandroid-execinfo, libc++, libopenblas, libprotobuf, python, python-numpy, python-pip"
 TERMUX_PKG_BUILD_DEPENDS="vulkan-headers, vulkan-loader-android"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel, pyyaml, typing_extensions"
@@ -15,6 +15,8 @@ TERMUX_PKG_PYTHON_CROSS_BUILD_DEPS="numpy"
 # ModuleNotFoundError: No module named 'torch._C._distributed_c10d'; 'torch._C' is not a package
 # in
 # python -c "from torch.distributed._tensor import DTensor"
+#
+# MI_NO_OPT_ARCH=ON fixes #29202 with architecture specific optimizations disabled
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 -DANDROID_NO_TERMUX=OFF
@@ -43,6 +45,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DANDROID_NDK=${NDK}
 -DANDROID_NDK_HOST_SYSTEM_NAME=linux-$HOSTTYPE
 -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+-DMI_NO_OPT_ARCH=ON
 "
 
 TERMUX_PKG_RM_AFTER_INSTALL="
