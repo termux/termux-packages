@@ -32,11 +32,20 @@ termux_get_repo_files() {
 		esac
 
 		(
-			local attempt delay=5
+			local attempt delay=5 repo_empty=false
 			if [[ "${CI-false}" == "true" ]]; then
 				delay=30
 			fi
 			for attempt in {1..6}; do
+				# Check if repo is empty (404 on Release file)
+				local http_code
+				http_code=$(curl -s -o /dev/null -w "%{http_code}" "${RELEASE_FILE_URL}" || echo "000")
+				if [[ "$http_code" == "404" ]]; then
+					echo "Repository is empty or new (HTTP 404), will build all packages from scratch"
+					repo_empty=true
+					break
+				fi
+
 				if termux_download "${RELEASE_FILE_URL}" "${RELEASE_FILE}" SKIP_CHECKSUM \
 						&& termux_download "${RELEASE_FILE_SIG_URL}" "${RELEASE_FILE}.gpg" SKIP_CHECKSUM; then
 					if ! gpg --verify "${RELEASE_FILE}.gpg" "${RELEASE_FILE}"; then
@@ -59,6 +68,14 @@ termux_get_repo_files() {
 					exit 0
 				fi
 			done
+
+			if [[ "$repo_empty" == "true" ]]; then
+				# Empty repo — create empty Packages file so builds can proceed
+				mkdir -p "${TERMUX_COMMON_CACHEDIR}-${TERMUX_ARCH}"
+				touch "${TERMUX_COMMON_CACHEDIR}-${TERMUX_ARCH}/${dl_prefix}-Packages"
+				exit 0
+			fi
+
 			termux_error_exit "Failed to download package repository metadata. Try to build without -i/-I option."
 		) 2>&1 | (
 			set +e

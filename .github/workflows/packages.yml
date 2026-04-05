@@ -441,33 +441,73 @@ jobs:
           tar xf "$archive"
         done
 
-        # Create debs directory
-        mkdir -p gh-pages/debs
+        # Create standard Debian repository structure
+        mkdir -p gh-pages/dists/stable/main/binary-aarch64
+        mkdir -p gh-pages/dists/stable/main/binary-arm
+        mkdir -p gh-pages/dists/stable/main/binary-i686
+        mkdir -p gh-pages/dists/stable/main/binary-x86_64
+        mkdir -p gh-pages/dists/stable/main/binary-all
+        mkdir -p gh-pages/pool/main
 
-        # Copy all .deb files
-        find debs -name "*.deb" -exec cp {} gh-pages/debs/ \;
+        # Copy all .deb files to pool
+        find debs -name "*.deb" -exec cp {} gh-pages/pool/main/ \;
 
-        # Generate Packages index
-        cd gh-pages/debs
-        dpkg-scanpackages . /dev/null 2>/dev/null > Packages || true
-        gzip -9c < Packages > Packages.gz 2>/dev/null || true
-        bzip2 -9c < Packages > Packages.bz2 2>/dev/null || true
+        # Generate Packages index for each architecture
+        generate_packages_index() {
+          local arch=$1
+          local output_dir="gh-pages/dists/stable/main/binary-${arch}"
+
+          # Scan pool — apt filters architecture automatically
+          # But we include all for simplicity
+          cd gh-pages
+          dpkg-scanpackages pool/main /dev/null 2>/dev/null > "${output_dir}/Packages" || true
+          cd ..
+
+          # Compress
+          gzip -9c < "${output_dir}/Packages" > "${output_dir}/Packages.gz" 2>/dev/null || true
+          bzip2 -9c < "${output_dir}/Packages" > "${output_dir}/Packages.bz2" 2>/dev/null || true
+        }
+
+        for arch in aarch64 arm i686 x86_64 all; do
+          echo "Generating Packages index for ${arch}..."
+          generate_packages_index "${arch}"
+        done
 
         # Generate Release file
+        cd gh-pages/dists/stable
         cat > Release <<'EOF'
-        Origin: My Repository
-        Label: My Repo
+        Origin: Neonide Repository
+        Label: Neonide
         Suite: stable
         Codename: stable
         Architectures: aarch64 arm i686 x86_64 all
         Components: main
-        Description: My package repository
+        Description: Neonide package repository
         EOF
 
-        # Add checksums
-        md5sum Packages Packages.gz Packages.bz2 >> Release 2>/dev/null || true
-        sha256sum Packages Packages.gz Packages.bz2 >> Release 2>/dev/null || true
-        cd ../..
+        # Add checksums for Packages files
+        for arch in aarch64 arm i686 x86_64 all; do
+          for file in main/binary-${arch}/Packages main/binary-${arch}/Packages.gz main/binary-${arch}/Packages.bz2; do
+            if [ -f "$file" ]; then
+              size=$(wc -c < "$file")
+              md5=$(md5sum "$file" | awk '{print $1}')
+              sha256=$(sha256sum "$file" | awk '{print $1}')
+              echo " $md5 $size $file" >> Release.md5
+              echo " $sha256 $size $file" >> Release.sha256
+            fi
+          done
+        done
+
+        # Format Release file properly
+        {
+          echo "MD5Sum:"
+          cat Release.md5 2>/dev/null || true
+          echo "SHA256:"
+          cat Release.sha256 2>/dev/null || true
+        } >> Release
+
+        rm -f Release.md5 Release.sha256
+        cd ../../..
 
         # Commit and push
         cd gh-pages
