@@ -1,0 +1,11 @@
+--- a/src/torchcodec/_internally_replaced_utils.py
++++ b/src/torchcodec/_internally_replaced_utils.py
+@@ -22,7 +22,7 @@ _PYBIND_OPS_MODULE_NAME = "core_pybind_ops"
+ # https://github.com/pytorch/vision/blob/947ae1dc71867f28021d5bc0ff3a19c249236e2a/torchvision/_internally_replaced_utils.py#L25
+ def _get_extension_path(lib_name: str) -> str:
+     extension_suffixes = []
+-    if sys.platform == "linux" or sys.platform.startswith("freebsd"):
++    if sys.platform == "linux" or sys.platform == "android" or sys.platform.startswith("freebsd"):
+         extension_suffixes = importlib.machinery.EXTENSION_SUFFIXES
+     elif sys.platform == "darwin":
+         extension_suffixes = importlib.machinery.EXTENSION_SUFFIXES + [".dylib"]
