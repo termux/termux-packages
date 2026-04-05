@@ -1,0 +1,19 @@
+--- a/video/external/src/decoder/openh264.rs
++++ b/video/external/src/decoder/openh264.rs
+@@ -51,7 +51,7 @@
+         const ARCH: &str = std::env::consts::ARCH;
+ 
+         let local_filenames = match OS {
+-            "linux" => ["libopenh264.so.7", "libopenh264.so.2.4.1", "libopenh264.so"].as_slice(),
++            "linux" | "android" => ["libopenh264.so.7", "libopenh264.so.2.4.1", "libopenh264.so"].as_slice(),
+             // TODO: investigate other OSes
+             _ => [].as_slice(),
+         };
+@@ -90,6 +90,7 @@
+                 "openh264-2.4.1-win64.dll",
+                 "081b0c081480d177cbfddfbc90b1613640e702f875897b30d8de195cde73dd34",
+             ),
++            ("android", _) => ("", ""), // Dummy an URL
+             (os, arch) => return Err(format!("Unsupported OS/arch: {os}/{arch}").into()),
+         };
+ 
