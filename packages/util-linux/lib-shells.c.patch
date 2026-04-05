@@ -1,0 +1,30 @@
+Avoids:
+error: call to undeclared function 'setusershell'
+Android does not have /etc/shells, so 
+Termux chsh only checks if the shell is in /data/data/com.termux/files/usr/bin if relative,
+and if absolute, it only checks if it is executable and not
+/data/data/com.termux/files/usr/bin/login.
+This patch simply stubs is_known_shell() by always returning true.
+print_shells() has no meaningful purpose that can be guessed at on Android, so this stubs it to no-op.
+print_shells() is not used in anything except util-linux chsh, which is not built in Termux.
+
+--- a/lib/shells.c
++++ b/lib/shells.c
+@@ -65,7 +65,7 @@ extern void print_shells(FILE *out, const char *format)
+ 	}
+ 	econf_free(keys);
+ 	econf_free(key_file);
+-#else
++#elif !defined(__ANDROID__)
+ 	char *s;
+ 
+ 	setusershell();
+@@ -107,6 +107,8 @@ extern int is_known_shell(const char *shell_name)
+ 
+ 	free(val);
+ 	econf_free(key_file);
++#elif defined(__ANDROID__)
++	return 1;
+ #else
+ 	char *s;
+ 
