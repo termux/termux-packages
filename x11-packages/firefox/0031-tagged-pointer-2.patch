@@ -1,0 +1,70 @@
+https://github.com/termux/termux-packages/issues/29105
+
+--- a/toolkit/components/uniffi-js/Callbacks.cpp
++++ b/toolkit/components/uniffi-js/Callbacks.cpp
+@@ -4,6 +4,12 @@
+  * License, v. 2.0. If a copy of the MPL was not distributed with this
+  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ 
++#if defined(__TERMUX__) && defined(__aarch64__)
++#include <atomic>
++#include <mutex>
++#include <unordered_map>
++#endif
++
+ #include "nsPrintfCString.h"
+ #include "nsString.h"
+ #include "nsThreadUtils.h"
+@@ -20,6 +26,7 @@
+ namespace mozilla::uniffi {
+ extern mozilla::LazyLogModule gUniffiLogger;
+ 
++#if !defined(__TERMUX__) || !defined(__aarch64__)
+ // Type we'll be using to store callback handle ref counts
+ //
+ // 32-bits should never overflow and ReleaseAcquire is the recommended memory
+@@ -64,6 +71,44 @@
+   return refCount;
+ }
+ 
++#else
++// Because of the presence of tagged pointers on aarch64 Android, it is not possible
++// to use the `new` method mentioned above. Instead, use an atomic value to generate
++// the handle, use a global thread-safe map to store the handle and its refcnt.
++//
++// Even if handle operations were frequent, each one involves a cross-language
++// (Rust FFI -> C++) call whose overhead should far exceed that of a mutex
++// lock/unlock, making the mutex cost negligible in comparison.
++static std::unordered_map<uint64_t, uint32_t> gHandleMap;
++static std::mutex gHandleMapMutex;
++
++uint64_t CallbackHandleCreate() {
++  static std::atomic<uint64_t> nextHandle(1);
++  uint64_t handle = nextHandle.fetch_add(2);  // should be odd number
++  {
++    std::lock_guard lock(gHandleMapMutex);
++    gHandleMap[handle] = 1;
++  }
++  return handle;
++}
++
++uint32_t CallbackHandleAddRef(uint64_t aHandle) {
++  std::lock_guard lock(gHandleMapMutex);
++  return ++(gHandleMap[aHandle]);
++}
++
++uint32_t CallbackHandleRelease(uint64_t aHandle) {
++  std::lock_guard lock(gHandleMapMutex);
++  auto it = gHandleMap.find(aHandle);
++  uint32_t refCount = --(it->second);
++  if (refCount == 0) {
++    gHandleMap.erase(it);
++  }
++  return refCount;
++}
++
++#endif
++
+ void AsyncCallbackMethodHandlerBase::ScheduleAsyncCall(
+     UniquePtr<AsyncCallbackMethodHandlerBase> aHandler,
+     StaticRefPtr<dom::UniFFICallbackHandler>* aJsHandler) {
