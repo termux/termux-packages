@@ -347,7 +347,7 @@ jobs:
   upload-test:
     permissions:
       contents: read
-    if: github.repository == 'termux/termux-packages' && github.ref != 'refs/heads/master'
+    if: github.repository == 'androidstudio-app/apt-repo' && github.ref != 'refs/heads/main'
     needs: build
     runs-on: ubuntu-slim
     steps:
@@ -357,7 +357,7 @@ jobs:
       uses: actions/download-artifact@v7
       with:
         path: ./
-    - name: Check packages using Packages.bz2
+    - name: Check packages
       run: |
         if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
           # GitHub sometimes add merge commits at the end
@@ -391,11 +391,14 @@ jobs:
           for arch in aarch64 arm i686 x86_64; do
             if [ ! -f "Packages-${repo}-${arch}" ]; then
               echo "[*] Downloading ${url}/dists/${distribution}/${component}/binary-${arch}/Packages.bz2"
-              curl -s \
+              http_code=$(curl -s -o "Packages-${repo}-${arch}.bz2" -w "%{http_code}" \
                 --user-agent 'Termux-Packages/1.0\ (https://github.com/termux/termux-packages)' \
-                "${url}/dists/${distribution}/${component}/binary-${arch}/Packages.bz2" \
-                -o "Packages-${repo}-${arch}.bz2"
-              7z x "Packages-${repo}-${arch}.bz2" > /dev/null
+                "${url}/dists/${distribution}/${component}/binary-${arch}/Packages.bz2" || echo "000")
+              if [ "$http_code" = "404" ] || [ "$http_code" = "000" ]; then
+                echo "[*] Repository is empty or unreachable (HTTP $http_code), skipping conflict check for $arch"
+                continue
+              fi
+              7z x "Packages-${repo}-${arch}.bz2" > /dev/null 2>&1 || true
             fi
             result=$(find debs -maxdepth 1 -type f | cut -d"/" -f2 | xargs -P$(nproc) -i{} grep "^Filename:.*/{}$" -nH "Packages-${repo}-${arch}" || true)
             if [ -n "$result" ]; then
@@ -415,7 +418,7 @@ jobs:
     permissions:
       contents: write
       pages: write
-    if: github.repository == 'androidstudio-app/apt-repo' && github.ref == 'refs/heads/main'
+    if: github.repository == 'androidstudio-app/apt-repo' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test')
     needs: build
     runs-on: ubuntu-latest
     steps:
