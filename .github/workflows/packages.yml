@@ -413,10 +413,11 @@ jobs:
   upload:
     concurrency: ${{ github.workflow }}
     permissions:
-      contents: read
-    if: github.repository == 'termux/termux-packages' && github.ref == 'refs/heads/master'
+      contents: write
+      pages: write
+    if: github.repository == 'androidstudio-app/apt-repo' && github.ref == 'refs/heads/main'
     needs: build
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
     - name: Clone repository
       uses: actions/checkout@v6
@@ -424,50 +425,55 @@ jobs:
       uses: actions/download-artifact@v7
       with:
         path: ./
-    - name: Upload to packages.termux.dev
-      env:
-        REPOSITORY_URL: https://packages.termux.dev/aptly-api
-        GITHUB_SHA: ${{ github.sha }}
-        APTLY_API_AUTH: ${{ secrets.APTLY_API_AUTH }}
-        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+    - name: Checkout gh-pages branch
+      uses: actions/checkout@v6
+      with:
+        ref: gh-pages
+        path: gh-pages
+        token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Publish to GitHub Pages
       run: |
-        source scripts/aptly_api.sh
-
+        # Extract .deb files from all architectures
         for archive in debs-*/debs-{aarch64,arm,i686,x86_64}-${{ github.sha }}.tar; do
           tar xf "$archive"
         done
 
-        for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
-          export REPOSITORY_NAME=$(jq --raw-output '.["'$repo'"].name' repo.json)
-          export REPOSITORY_DISTRIBUTION=$(jq --raw-output '.["'$repo'"].distribution' repo.json)
+        # Create debs directory in gh-pages
+        mkdir -p gh-pages/debs
 
-          # Upload file to temporary directory.
-          uploaded_files=false
-          shopt -s nullglob
+        # Copy all .deb files to gh-pages/debs
+        find debs -name "*.deb" -exec cp {} gh-pages/debs/ \;
 
-          if [ -f debs/built_${REPOSITORY_NAME}_packages.txt ]; then
-            for filename in $(cat debs/built_${REPOSITORY_NAME}_packages.txt | sed -E 's/(..*)/debs\/\1_\*.deb debs\/\1-static_\*.deb/g'); do
-              if ! aptly_upload_file "$filename"; then
-                exit 1
-              fi
+        # Generate Packages index files
+        cd gh-pages/debs
+        echo "Generating Packages index..."
+        dpkg-scanpackages . /dev/null | gzip -9c > Packages.gz
+        dpkg-scanpackages . /dev/null | bzip2 -9c > Packages.bz2
+        dpkg-scanpackages . /dev/null > Packages
+        cd ../..
 
-              uploaded_files=true
-            done
-            shopt -u nullglob
+        # Generate Release file
+        cd gh-pages/debs
+        cat > Release <<'EOF'
+        Origin: Termux Repository
+        Label: Termux
+        Suite: stable
+        Codename: main
+        Architectures: aarch64 arm i686 x86_64
+        Components: main
+        Description: Termux package repository
+        EOF
 
-            # Publishing repository changes.
-            if [ "$uploaded_files" = "true" ]; then
-              if ! aptly_add_to_repo; then
-                exit 1
-              fi
+        # Add checksums to Release file
+        md5sum Packages Packages.gz Packages.bz2 >> Release 2>/dev/null || true
+        sha256sum Packages Packages.gz Packages.bz2 >> Release 2>/dev/null || true
+        cd ../..
 
-              # Usually temporary directory is deleted automatically, but in certain cases it is left.
-              aptly_delete_dir
-
-              # Final part to make changes appear in web root.
-              if ! aptly_publish_repo; then
-                exit 1
-              fi
-            fi
-          fi
-        done
+        # Commit and push changes
+        cd gh-pages
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git add -A
+        git commit -m "Update packages - ${{ github.sha }}" || echo "No changes to commit"
+        git push origin gh-pages
+        echo "Successfully published to https://androidstudio-app.github.io/apt-repo/"
