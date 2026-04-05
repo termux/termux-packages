@@ -5,7 +5,7 @@
 # https://github.com/termux/termux-packages/wiki/Common-porting-problems#android-dynamic-linker
 # https://github.com/android/ndk/issues/201
 #
-# Using /data/data/com.termux/files/usr to substitute full path at build time.
+# Using /data/data/com.neonide.studio/files/usr to substitute full path at build time.
 # This avoids a conflict with `pass`.
 # See: https://github.com/termux/termux-packages/issues/23569
 #

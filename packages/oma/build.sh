@@ -35,7 +35,7 @@ termux_step_pre_configure() {
 	echo '[patch.crates-io]' >> Cargo.toml
 	echo 'rustls-platform-verifier = { path = "./vendor/rustls-platform-verifier" }' >> Cargo.toml
 
-	# hardcoded upstream both /data/data/com.termux/files/usr and /data/data/com.termux/cache
+	# hardcoded upstream both /data/data/com.neonide.studio/files/usr and /data/data/com.neonide.studio/cache
 	local original_name_component_one="com."
 	local original_name_component_two="termux"
 	local original_name="${original_name_component_one}${original_name_component_two}"

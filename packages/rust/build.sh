@@ -87,7 +87,7 @@ termux_step_pre_configure() {
 		| patch --silent -p1
 
 	# assist with downstream patch methods that bulk-replace
-	# string 'com.termux' throughout the repository
+	# string 'com.neonide.studio' throughout the repository
 	local original_prefix_component_one="/data/data/com."
 	local original_prefix_component_two="termux/files/usr"
 	local original_prefix="${original_prefix_component_one}${original_prefix_component_two}"

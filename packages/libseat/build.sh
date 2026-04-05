@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=302564d54d8e28191fadfd734f2675ecb0c9e0615a58011b89ef15dfa4dbaa
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 # -Dman-pages=disabled prevents
-# Exec format error: '/data/data/com.termux/files/usr/bin/scdoc'
+# Exec format error: '/data/data/com.neonide.studio/files/usr/bin/scdoc'
 # if scdoc package was installed in the same container before cross-compiling
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Ddefaultpath=$TERMUX_PREFIX/var/run/seatd.sock

@@ -11,7 +11,7 @@ echo_and_run() {
 
 #echo_and_run pkg install -y rust
 
-PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
+PREFIX="${PREFIX:-/data/data/com.neonide.studio/files/usr}"
 ERROR=0
 
 echo_and_run "find $PREFIX/lib -mindepth 1 -maxdepth 1 -name "librustc_*" -xtype l"
