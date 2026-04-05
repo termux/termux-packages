@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        target_arch: [aarch64, arm, i686, x86_64]
+        target_arch: [aarch64]
       fail-fast: false
     steps:
     - name: Clone repository
@@ -297,6 +297,12 @@ jobs:
         # Files containing certain symbols (e.g. ":") will cause failure in actions/upload-artifact.
         # Archiving *.deb files in a tarball to avoid issues with uploading.
         tar cf artifacts/debs-${{ matrix.target_arch }}-${{ github.sha }}.tar debs
+
+        # Also archive ALL .deb files from output (including dependencies) for full repo population
+        mkdir -p artifacts-all-debs
+        if [ -d "output" ]; then
+          find output -name "*.deb" -type f -exec cp {} artifacts-all-debs/ \;
+        fi
     - name: Checksums for built *.deb files
       if: always()
       run: |
@@ -313,6 +319,12 @@ jobs:
       with:
         name: debs-${{ matrix.target_arch }}-${{ github.sha }}
         path: ./artifacts
+    - name: Store ALL built .deb files (including dependencies)
+      if: always()
+      uses: actions/upload-artifact@v6
+      with:
+        name: all-debs-${{ matrix.target_arch }}-${{ github.sha }}
+        path: ./artifacts-all-debs
     - name: AppArmor Logs
       if: always()
       run: |
@@ -428,6 +440,10 @@ jobs:
       uses: actions/download-artifact@v7
       with:
         path: ./
+    - name: Get ALL built .deb files (including dependencies)
+      uses: actions/download-artifact@v7
+      with:
+        path: ./
     - name: Checkout gh-pages branch
       uses: actions/checkout@v6
       with:
@@ -441,6 +457,13 @@ jobs:
           tar xf "$archive"
         done
 
+        # Collect ALL .deb files (both selective and all-debs artifacts)
+        mkdir -p all-merged-debs
+        # From selective artifacts (explicitly built packages)
+        find debs-*/debs-{aarch64,arm,i686,x86_64}-${{ github.sha }}/debs -name "*.deb" -type f -exec cp {} all-merged-debs/ \; 2>/dev/null || true
+        # From all-debs artifacts (all built packages including dependencies)
+        find all-debs-*/ -name "*.deb" -type f -exec cp {} all-merged-debs/ \; 2>/dev/null || true
+
         # Create standard Debian repository structure
         mkdir -p gh-pages/dists/stable/main/binary-aarch64
         mkdir -p gh-pages/dists/stable/main/binary-arm
@@ -449,8 +472,9 @@ jobs:
         mkdir -p gh-pages/dists/stable/main/binary-all
         mkdir -p gh-pages/pool/main
 
-        # Copy all .deb files to pool
-        find debs -name "*.deb" -exec cp {} gh-pages/pool/main/ \;
+        # Copy ALL .deb files to pool (explicit + dependencies)
+        find all-merged-debs -name "*.deb" -exec cp {} gh-pages/pool/main/ \;
+        echo "Total .deb files in pool: $(find gh-pages/pool/main -name "*.deb" | wc -l)"
 
         # Generate Packages index for each architecture
         generate_packages_index() {
