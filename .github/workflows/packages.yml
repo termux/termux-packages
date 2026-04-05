@@ -297,12 +297,6 @@ jobs:
         # Files containing certain symbols (e.g. ":") will cause failure in actions/upload-artifact.
         # Archiving *.deb files in a tarball to avoid issues with uploading.
         tar cf artifacts/debs-${{ matrix.target_arch }}-${{ github.sha }}.tar debs
-
-        # Also archive ALL .deb files from output (including dependencies) for full repo population
-        mkdir -p artifacts-all-debs
-        if [ -d "output" ]; then
-          find output -name "*.deb" -type f -exec cp {} artifacts-all-debs/ \;
-        fi
     - name: Checksums for built *.deb files
       if: always()
       run: |
@@ -319,12 +313,6 @@ jobs:
       with:
         name: debs-${{ matrix.target_arch }}-${{ github.sha }}
         path: ./artifacts
-    - name: Store ALL built .deb files (including dependencies)
-      if: always()
-      uses: actions/upload-artifact@v6
-      with:
-        name: all-debs-${{ matrix.target_arch }}-${{ github.sha }}
-        path: ./artifacts-all-debs
     - name: AppArmor Logs
       if: always()
       run: |
@@ -430,17 +418,13 @@ jobs:
     permissions:
       contents: write
       pages: write
-    if: github.repository == 'androidstudio-app/apt-repo' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test')
+    if: github.repository == 'androidstudio-app/apt-repo' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test' || startsWith(github.ref, 'refs/heads/dev') || github.event_name == 'workflow_dispatch')
     needs: build
     runs-on: ubuntu-latest
     steps:
     - name: Clone repository
       uses: actions/checkout@v6
     - name: Get *.deb files
-      uses: actions/download-artifact@v7
-      with:
-        path: ./
-    - name: Get ALL built .deb files (including dependencies)
       uses: actions/download-artifact@v7
       with:
         path: ./
@@ -454,15 +438,20 @@ jobs:
       run: |
         # Extract .deb files from all architectures
         for archive in debs-*/debs-{aarch64,arm,i686,x86_64}-${{ github.sha }}.tar; do
+          [ -f "$archive" ] || continue
           tar xf "$archive"
         done
 
-        # Collect ALL .deb files (both selective and all-debs artifacts)
+        # Collect all .deb files
         mkdir -p all-merged-debs
-        # From selective artifacts (explicitly built packages)
-        find debs-*/debs-{aarch64,arm,i686,x86_64}-${{ github.sha }}/debs -name "*.deb" -type f -exec cp {} all-merged-debs/ \; 2>/dev/null || true
-        # From all-debs artifacts (all built packages including dependencies)
-        find all-debs-*/ -name "*.deb" -type f -exec cp {} all-merged-debs/ \; 2>/dev/null || true
+        find . -path "./gh-pages" -prune -o -name "*.deb" -type f -print -exec cp {} all-merged-debs/ \; 2>/dev/null || true
+
+        if [ "$(find all-merged-debs -name '*.deb' | wc -l)" -eq 0 ]; then
+          echo "No .deb files found, nothing to upload"
+          exit 0
+        fi
+
+        echo "Total .deb files to upload: $(find all-merged-debs -name '*.deb' | wc -l)"
 
         # Create standard Debian repository structure
         mkdir -p gh-pages/dists/stable/main/binary-aarch64
@@ -472,7 +461,7 @@ jobs:
         mkdir -p gh-pages/dists/stable/main/binary-all
         mkdir -p gh-pages/pool/main
 
-        # Copy ALL .deb files to pool (explicit + dependencies)
+        # Copy .deb files to pool
         find all-merged-debs -name "*.deb" -exec cp {} gh-pages/pool/main/ \;
         echo "Total .deb files in pool: $(find gh-pages/pool/main -name "*.deb" | wc -l)"
 

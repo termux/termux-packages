@@ -1,0 +1,231 @@
+name: Manual Upload to apt-repo
+
+on:
+  workflow_dispatch:
+    inputs:
+      deb_urls:
+        description: "Space-separated or newline-separated URLs to .deb files"
+        required: true
+        type: string
+      skip_existing:
+        description: "Skip .deb files that already exist in pool (by SHA256)"
+        required: false
+        default: true
+        type: boolean
+      branch:
+        description: "Branch to push to"
+        required: false
+        default: "gh-pages"
+        type: string
+
+permissions:
+  contents: write
+  pages: write
+
+jobs:
+  manual-upload:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout gh-pages branch
+      uses: actions/checkout@v6
+      with:
+        ref: ${{ inputs.branch }}
+        path: gh-pages
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Download .deb files
+      run: |
+        mkdir -p downloaded-debs
+        mkdir -p temp-extract
+
+        # Parse URLs (handle spaces and newlines)
+        urls=$(echo "${{ inputs.deb_urls }}" | tr ' \n' '\n' | grep -v '^$' | sort -u)
+
+        echo "Found $(echo "$urls" | wc -l) URLs to process"
+
+        for url in $urls; do
+          echo "Processing: $url"
+          filename=$(basename "$url" | cut -d'?' -f1)
+
+          # Download
+          curl -fSL --retry 3 --retry-delay 5 -o "temp-extract/$filename" "$url"
+          if [ $? -ne 0 ]; then
+            echo "✗ Failed to download: $filename"
+            continue
+          fi
+
+          # Handle different formats
+          case "$filename" in
+            *.tar.gz|*.tgz)
+              echo "Extracting tar.gz..."
+              tar xzf "temp-extract/$filename" -C temp-extract/
+              find temp-extract/ -name "*.deb" -exec cp {} downloaded-debs/ \;
+              ;;
+            *.tar)
+              echo "Extracting tar..."
+              tar xf "temp-extract/$filename" -C temp-extract/
+              find temp-extract/ -name "*.deb" -exec cp {} downloaded-debs/ \;
+              ;;
+            *.zip)
+              echo "Extracting zip..."
+              unzip -o "temp-extract/$filename" -d temp-extract/
+              # If zip contains a tar, extract it
+              find temp-extract/ -name "*.tar" -exec tar xf {} -C temp-extract/ \;
+              find temp-extract/ -name "*.deb" -exec cp {} downloaded-debs/ \;
+              ;;
+            *.deb)
+              echo "Direct .deb file"
+              cp "temp-extract/$filename" downloaded-debs/
+              ;;
+            *)
+              echo "Unknown format, trying as .deb"
+              if file "temp-extract/$filename" | grep -q "Debian binary package"; then
+                cp "temp-extract/$filename" downloaded-debs/
+              else
+                echo "✗ Unknown format for: $filename"
+              fi
+              ;;
+          esac
+
+          echo "✓ Processed: $filename"
+        done
+
+        # Clean up
+        rm -rf temp-extract
+
+        total=$(find downloaded-debs -name '*.deb' | wc -l)
+        echo "Total .deb files extracted: $total"
+        if [ "$total" -gt 0 ]; then
+          echo "Files:"
+          find downloaded-debs -name '*.deb' -exec basename {} \;
+        fi
+
+    - name: Check for existing packages
+      if: inputs.skip_existing
+      run: |
+        mkdir -p filtered-debs
+        total=0
+        skipped=0
+
+        for deb in downloaded-debs/*.deb; do
+          [ -f "$deb" ] || continue
+          total=$((total + 1))
+
+          filename=$(basename "$deb")
+          sha=$(sha256sum "$deb" | awk '{print $1}')
+
+          # Check if file with same SHA256 already exists in pool
+          exists=false
+          if [ -d "gh-pages/pool/main" ]; then
+            for existing in gh-pages/pool/main/*.deb; do
+              [ -f "$existing" ] || continue
+              existing_sha=$(sha256sum "$existing" | awk '{print $1}')
+              if [ "$sha" == "$existing_sha" ]; then
+                echo "Skipping $filename (already exists in pool)"
+                exists=true
+                skipped=$((skipped + 1))
+                break
+              fi
+            done
+          fi
+
+          if [ "$exists" == "false" ]; then
+            cp "$deb" filtered-debs/
+            echo "New: $filename"
+          fi
+        done
+
+        echo "Total: $total | New: $((total - skipped)) | Skipped: $skipped"
+
+    - name: Merge with existing pool
+      run: |
+        # Use filtered or downloaded depending on skip_existing setting
+        source_dir="${{ inputs.skip_existing == true && 'filtered-debs' || 'downloaded-debs' }}"
+
+        # Create pool structure
+        mkdir -p gh-pages/pool/main
+
+        # Copy new .deb files
+        if [ "$(find "$source_dir" -name '*.deb' 2>/dev/null | wc -l)" -gt 0 ]; then
+          find "$source_dir" -name "*.deb" -exec cp {} gh-pages/pool/main/ \;
+          echo "Added $(find "$source_dir" -name '*.deb' | wc -l) .deb files to pool"
+        else
+          echo "No new .deb files to add"
+        fi
+
+        echo "Total in pool: $(find gh-pages/pool/main -name '*.deb' | wc -l)"
+
+    - name: Generate Packages index
+      run: |
+        # Create dist structure
+        mkdir -p gh-pages/dists/stable/main/binary-aarch64
+        mkdir -p gh-pages/dists/stable/main/binary-arm
+        mkdir -p gh-pages/dists/stable/main/binary-i686
+        mkdir -p gh-pages/dists/stable/main/binary-x86_64
+        mkdir -p gh-pages/dists/stable/main/binary-all
+
+        cd gh-pages
+        for arch in aarch64 arm i686 x86_64 all; do
+          echo "Generating Packages for $arch..."
+          dpkg-scanpackages pool/main /dev/null > "dists/stable/main/binary-${arch}/Packages" 2>/dev/null || true
+          gzip -9c < "dists/stable/main/binary-${arch}/Packages" > "dists/stable/main/binary-${arch}/Packages.gz" 2>/dev/null || true
+          bzip2 -9c < "dists/stable/main/binary-${arch}/Packages" > "dists/stable/main/binary-${arch}/Packages.bz2" 2>/dev/null || true
+        done
+        cd ..
+
+    - name: Generate Release file
+      run: |
+        cd gh-pages/dists/stable
+
+        cat > Release <<'EOF'
+        Origin: Neonide Repository
+        Label: Neonide
+        Suite: stable
+        Codename: stable
+        Architectures: aarch64 arm i686 x86_64 all
+        Components: main
+        Description: Neonide package repository
+        EOF
+
+        # Add checksums
+        > Release.md5
+        > Release.sha256
+
+        for arch in aarch64 arm i686 x86_64 all; do
+          for file in main/binary-${arch}/Packages main/binary-${arch}/Packages.gz main/binary-${arch}/Packages.bz2; do
+            if [ -f "$file" ] && [ -s "$file" ]; then
+              size=$(wc -c < "$file")
+              md5=$(md5sum "$file" | awk '{print $1}')
+              sha256=$(sha256sum "$file" | awk '{print $1}')
+              echo " $md5 $size $file" >> Release.md5
+              echo " $sha256 $size $file" >> Release.sha256
+            fi
+          done
+        done
+
+        {
+          echo "MD5Sum:"
+          cat Release.md5 2>/dev/null || true
+          echo "SHA256:"
+          cat Release.sha256 2>/dev/null || true
+        } >> Release
+
+        rm -f Release.md5 Release.sha256
+        cd ../../..
+
+    - name: Commit and push
+      run: |
+        cd gh-pages
+        git config user.name "Neonide Manual Upload"
+        git config user.email "upload@neonide.com"
+        git add -A
+
+        changed=$(git diff --cached --name-only | wc -l)
+        if [ "$changed" -eq 0 ]; then
+          echo "No changes to commit"
+          exit 0
+        fi
+
+        git commit -m "Manual upload: $(find pool/main -name '*.deb' -newer .git 2>/dev/null | wc -l) new packages"
+        git push origin ${{ inputs.branch }}
+        echo "✓ Published to https://androidstudio-app.github.io/apt-repo/"
