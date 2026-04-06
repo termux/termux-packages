@@ -1,0 +1,61 @@
+--- a/src/shm/raw.rs
++++ b/src/shm/raw.rs
+@@ -5,7 +5,6 @@
+ 
+ use rustix::{
+     io::Errno,
+-    shm::{Mode, ShmOFlags},
+ };
+ use std::{
+     fs::File,
+@@ -175,49 +174,11 @@ impl RawPool {
+                 Ok(fd) => return Ok(fd),
+ 
+                 // Not supported, use fallback.
+-                Err(Errno::NOSYS) => (),
++                Err(Errno::NOSYS) => return Err(Errno::NOSYS.into()),
+ 
+                 Err(err) => return Err(Into::<io::Error>::into(err)),
+             };
+         }
+-
+-        let time = SystemTime::now();
+-        let mut mem_file_handle = format!(
+-            "/smithay-client-toolkit-{}",
+-            time.duration_since(UNIX_EPOCH).unwrap().subsec_nanos()
+-        );
+-
+-        loop {
+-            let flags = ShmOFlags::CREATE | ShmOFlags::EXCL | ShmOFlags::RDWR;
+-
+-            let mode = Mode::RUSR | Mode::WUSR;
+-
+-            match rustix::shm::shm_open(mem_file_handle.as_str(), flags, mode) {
+-                Ok(fd) => match rustix::shm::shm_unlink(mem_file_handle.as_str()) {
+-                    Ok(_) => return Ok(fd),
+-
+-                    Err(errno) => {
+-                        return Err(errno.into());
+-                    }
+-                },
+-
+-                Err(Errno::EXIST) => {
+-                    // Change the handle if we happen to be duplicate.
+-                    let time = SystemTime::now();
+-
+-                    mem_file_handle = format!(
+-                        "/smithay-client-toolkit-{}",
+-                        time.duration_since(UNIX_EPOCH).unwrap().subsec_nanos()
+-                    );
+-
+-                    continue;
+-                }
+-
+-                Err(Errno::INTR) => continue,
+-
+-                Err(err) => return Err(err.into()),
+-            }
+-        }
+     }
+ 
+     #[cfg(target_os = "linux")]
