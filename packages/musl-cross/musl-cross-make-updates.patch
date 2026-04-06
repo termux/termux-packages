@@ -1,0 +1,2462 @@
+diff --git a/Makefile b/Makefile
+index 038f77c..1ca1632 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,16 +1,20 @@
+ 
+ SOURCES = sources
+ 
+-CONFIG_SUB_REV = 3d5db9ebe860
+-BINUTILS_VER = 2.44
+-GCC_VER = 9.4.0
++CONFIG_SUB_REV = a2287c3041a3
++BINUTILS_VER = 2.46.0
++GCC_VER = 15.2.0
+ MUSL_VER = 1.2.5
++MUSL_FTS_VER = 1.2.7
++MUSL_OBSTACK_VER = 1.2.3
++QUEUE_H_REV = 03be82a6b173b3c62116b7a186067fed3004dd44
+ GMP_VER = 6.3.0
+ MPC_VER = 1.3.1
+ MPFR_VER = 4.2.2
+-LINUX_VER = headers-4.19.88-2
++ISL_VER = 0.27
++LINUX_VER = 6.19
+ 
+-GNU_SITE = https://ftpmirror.gnu.org/gnu
++GNU_SITE = https://gnu.mirror.constant.com
+ GCC_SITE = $(GNU_SITE)/gcc
+ BINUTILS_SITE = $(GNU_SITE)/binutils
+ GMP_SITE = $(GNU_SITE)/gmp
+@@ -21,6 +25,9 @@ ISL_SITE = https://downloads.sourceforge.net/project/libisl/
+ MUSL_SITE = https://musl.libc.org/releases
+ MUSL_REPO = https://git.musl-libc.org/git/musl
+ 
++MUSL_FTS_SITE = https://github.com/void-linux/musl-fts/archive/refs/tags
++MUSL_OBSTACK_SITE = https://github.com/void-linux/musl-obstack/archive/refs/tags
++
+ LINUX_SITE = https://cdn.kernel.org/pub/linux/kernel
+ LINUX_HEADERS_SITE = https://ftp.barfooze.de/pub/sabotage/tarballs/
+ 
+@@ -42,12 +49,14 @@ SRC_DIRS = gcc-$(GCC_VER) binutils-$(BINUTILS_VER) musl-$(MUSL_VER) \
+ 	$(if $(MPC_VER),mpc-$(MPC_VER)) \
+ 	$(if $(MPFR_VER),mpfr-$(MPFR_VER)) \
+ 	$(if $(ISL_VER),isl-$(ISL_VER)) \
+-	$(if $(LINUX_VER),linux-$(LINUX_VER))
++	$(if $(LINUX_VER),linux-$(LINUX_VER)) \
++	$(if $(MUSL_FTS_VER),musl-fts-$(MUSL_FTS_VER)) \
++	$(if $(MUSL_OBSTACK_VER),musl-obstack-$(MUSL_OBSTACK_VER))
+ 
+ all:
+ 
+ clean:
+-	rm -rf gcc-* binutils-* musl-* gmp-* mpc-* mpfr-* isl-* build build-* linux-*
++	rm -rf gcc-* binutils-* musl-* gmp-* mpc-* mpfr-* isl-* build build-* linux-* musl-fts-* musl-obstack-*
+ 
+ distclean: clean
+ 	rm -rf sources
+@@ -64,7 +73,9 @@ $(patsubst hashes/%.sha1,$(SOURCES)/%,$(wildcard hashes/mpfr*)): SITE = $(MPFR_S
+ $(patsubst hashes/%.sha1,$(SOURCES)/%,$(wildcard hashes/isl*)): SITE = $(ISL_SITE)
+ $(patsubst hashes/%.sha1,$(SOURCES)/%,$(wildcard hashes/binutils*)): SITE = $(BINUTILS_SITE)
+ $(patsubst hashes/%.sha1,$(SOURCES)/%,$(wildcard hashes/gcc*)): SITE = $(GCC_SITE)/$(basename $(basename $(notdir $@)))
+-$(patsubst hashes/%.sha1,$(SOURCES)/%,$(wildcard hashes/musl*)): SITE = $(MUSL_SITE)
++$(patsubst hashes/%.sha1,$(SOURCES)/%,$(wildcard hashes/musl-*)): SITE = $(MUSL_SITE)
++$(patsubst hashes/%.sha1,$(SOURCES)/%,$(wildcard hashes/musl-fts*)): SITE = $(MUSL_FTS_SITE)/v$(MUSL_FTS_VER)
++$(patsubst hashes/%.sha1,$(SOURCES)/%,$(wildcard hashes/musl-obstack*)): SITE = $(MUSL_OBSTACK_SITE)/v$(MUSL_OBSTACK_VER)
+ $(patsubst hashes/%.sha1,$(SOURCES)/%,$(wildcard hashes/linux-6*)): SITE = $(LINUX_SITE)/v6.x
+ $(patsubst hashes/%.sha1,$(SOURCES)/%,$(wildcard hashes/linux-5*)): SITE = $(LINUX_SITE)/v5.x
+ $(patsubst hashes/%.sha1,$(SOURCES)/%,$(wildcard hashes/linux-4*)): SITE = $(LINUX_SITE)/v4.x
+@@ -83,6 +94,14 @@ $(SOURCES)/config.sub: | $(SOURCES)
+ 	mv $@.tmp/$(notdir $@) $@
+ 	rm -rf $@.tmp
+ 
++$(SOURCES)/queue.h: | $(SOURCES)
++	mkdir -p $@.tmp
++	cd $@.tmp && $(DL_CMD) $(notdir $@) "https://raw.githubusercontent.com/NetBSD/src/$(QUEUE_H_REV)/sys/sys/queue.h"
++	cd $@.tmp && touch $(notdir $@)
++	cd $@.tmp && $(SHA1_CMD) $(CURDIR)/hashes/$(notdir $@).$(QUEUE_H_REV).sha1
++	mv $@.tmp/$(notdir $@) $@
++	rm -rf $@.tmp
++
+ $(SOURCES)/%: hashes/%.sha1 | $(SOURCES)
+ 	mkdir -p $@.tmp
+ 	cd $@.tmp && $(DL_CMD) $(notdir $@) $(SITE)/$(notdir $@)
+@@ -147,6 +166,9 @@ $(foreach dir,$(notdir $(basename $(basename $(basename $(wildcard hashes/*)))))
+ 
+ extract_all: | $(SRC_DIRS)
+ 
++download_all: $(SOURCES)/config.sub $(SOURCES)/queue.h \
++	$(foreach dir,$(SRC_DIRS),$(patsubst hashes/%.sha1,$(SOURCES)/%,$(wildcard hashes/$(dir).tar.*.sha1)))
++
+ 
+ # Rules for building.
+ 
+@@ -176,6 +198,10 @@ $(BUILD_DIR)/config.mak: | $(BUILD_DIR)
+ 	$(if $(MPFR_VER),"MPFR_SRCDIR = $(REL_TOP)/mpfr-$(MPFR_VER)") \
+ 	$(if $(ISL_VER),"ISL_SRCDIR = $(REL_TOP)/isl-$(ISL_VER)") \
+ 	$(if $(LINUX_VER),"LINUX_SRCDIR = $(REL_TOP)/linux-$(LINUX_VER)") \
++	$(if $(MUSL_FTS_VER),"MUSL_FTS_SRCDIR = $(REL_TOP)/musl-fts-$(MUSL_FTS_VER)") \
++	$(if $(MUSL_OBSTACK_VER),"MUSL_OBSTACK_SRCDIR = $(REL_TOP)/musl-obstack-$(MUSL_OBSTACK_VER)") \
++	"QUEUE_H = $(REL_TOP)/sources/queue.h" \
++	"CDEFS_H = $(REL_TOP)/cdefs.h" \
+ 	"-include $(REL_TOP)/config.mak"
+ 
+ all: | $(SRC_DIRS) $(BUILD_DIR) $(BUILD_DIR)/Makefile $(BUILD_DIR)/config.mak
+diff --git a/cdefs.h b/cdefs.h
+new file mode 100644
+index 0000000..fb11558
+--- /dev/null
++++ b/cdefs.h
+@@ -0,0 +1,35 @@
++/* Copyright (C) 2016 Yann E. MORIN <yann.morin.1998@free.fr>
++ *
++ * This file is in the Public Domain.
++ *
++ * For jurisdictions in which the Public Domain does not exist
++ * or it is not otherwise applicable, this file is licensed CC0
++ * (Creative Commons Zero).
++ */
++
++#ifndef BUILDROOT_SYS_CDEFS_H
++#define BUILDROOT_SYS_CDEFS_H
++
++/* Function prototypes. */
++#undef __P
++#define __P(arg) arg
++
++/* C declarations in C++ mode. */
++#ifdef __cplusplus
++# define __BEGIN_DECLS extern "C" {
++# define __END_DECLS   }
++#else
++# define __BEGIN_DECLS
++# define __END_DECLS
++#endif
++
++/* Don't throw exceptions in C functions. */
++#ifndef __cplusplus
++# define __THROW  __attribute__ ((__nothrow__))
++# define __NTH(f) __attribute__ ((__nothrow__)) f
++#else
++# define __THROW
++# define __NTH(f) f
++#endif
++
++#endif /* ifndef BUILDROOT_SYS_CDEFS_H */
+diff --git a/hashes/binutils-2.46.0.tar.xz.sha1 b/hashes/binutils-2.46.0.tar.xz.sha1
+new file mode 100644
+index 0000000..7a58531
+--- /dev/null
++++ b/hashes/binutils-2.46.0.tar.xz.sha1
+@@ -0,0 +1 @@
++ca9c3b9f829d4243adfec46108417cec7c6985bb  binutils-2.46.0.tar.xz
+diff --git a/hashes/gcc-15.2.0.tar.xz.sha1 b/hashes/gcc-15.2.0.tar.xz.sha1
+new file mode 100644
+index 0000000..ee0c615
+--- /dev/null
++++ b/hashes/gcc-15.2.0.tar.xz.sha1
+@@ -0,0 +1 @@
++e9265c98ae18a6d952a636749d98c475ba2ca006  gcc-15.2.0.tar.xz
+diff --git a/hashes/linux-6.19.tar.xz.sha1 b/hashes/linux-6.19.tar.xz.sha1
+new file mode 100644
+index 0000000..fd2ebc2
+--- /dev/null
++++ b/hashes/linux-6.19.tar.xz.sha1
+@@ -0,0 +1 @@
++15346e26d517912eb9a2693e6563826d7516d4d0  linux-6.19.tar.xz
+diff --git a/hashes/musl-fts-1.2.7.tar.gz.sha1 b/hashes/musl-fts-1.2.7.tar.gz.sha1
+new file mode 100644
+index 0000000..5d7df49
+--- /dev/null
++++ b/hashes/musl-fts-1.2.7.tar.gz.sha1
+@@ -0,0 +1 @@
++3e048ffc40b6993cc56c287fea65805ba12efcb0  musl-fts-1.2.7.tar.gz
+diff --git a/hashes/musl-obstack-1.2.3.tar.gz.sha1 b/hashes/musl-obstack-1.2.3.tar.gz.sha1
+new file mode 100644
+index 0000000..c816d7b
+--- /dev/null
++++ b/hashes/musl-obstack-1.2.3.tar.gz.sha1
+@@ -0,0 +1 @@
++3d0cc071b3ef152eac576929a81666009eb54b4b  musl-obstack-1.2.3.tar.gz
+diff --git a/hashes/queue.h.03be82a6b173b3c62116b7a186067fed3004dd44.sha1 b/hashes/queue.h.03be82a6b173b3c62116b7a186067fed3004dd44.sha1
+new file mode 100644
+index 0000000..2364b66
+--- /dev/null
++++ b/hashes/queue.h.03be82a6b173b3c62116b7a186067fed3004dd44.sha1
+@@ -0,0 +1 @@
++25bd9544f5c118d9613f0adb1c8dece76b5c6a4d  queue.h
+diff --git a/litecross/Makefile b/litecross/Makefile
+index 79bdbea..332088b 100644
+--- a/litecross/Makefile
++++ b/litecross/Makefile
+@@ -147,8 +147,10 @@ gcc: obj_gcc/.lc_built
+ 
+ binutils: obj_binutils/.lc_built
+ 
++
+ .PHONY: all musl toolchain install-musl install-toolchain clean
+ 
++
+ src_binutils: | $(BINUTILS_SRCDIR)
+ 	ln -sf $(BINUTILS_SRCDIR) $@
+ 
+@@ -256,6 +258,47 @@ install-gcc: | obj_gcc/.lc_built
+ 	cd obj_gcc && $(MAKE) MAKE="$(MAKE) $(LIBTOOL_ARG)" DESTDIR=$(DESTDIR)$(OUTPUT) install
+ 	ln -sf $(TARGET)-gcc $(DESTDIR)$(OUTPUT)/bin/$(TARGET)-cc
+ 
++ifneq ($(MUSL_FTS_SRCDIR),)
++all: musl-fts
++install: install-musl-fts
++musl-fts: obj_musl_fts/.lc_built
++src_musl_fts: | $(MUSL_FTS_SRCDIR)
++	ln -sf "$(MUSL_FTS_SRCDIR)" $@
++obj_musl_fts/.lc_configured: | obj_musl_fts src_musl_fts obj_gcc/.lc_built obj_sysroot/.lc_libs
++	cd src_musl_fts && ( ./bootstrap.sh || ./autogen.sh || autoreconf -fi )
++	cd obj_musl_fts && CC="$(XGCC) --sysroot=$(CURDIR)/obj_sysroot" ../src_musl_fts/configure --host=$(TARGET) --prefix=
++	touch $@
++obj_musl_fts/.lc_built: | obj_musl_fts/.lc_configured
++	cd obj_musl_fts && $(MAKE)
++	touch $@
++install-musl-fts: | obj_musl_fts/.lc_built
++	cd obj_musl_fts && $(MAKE) DESTDIR=$(DESTDIR)$(OUTPUT)$(SYSROOT) install
++endif
++
++ifneq ($(MUSL_OBSTACK_SRCDIR),)
++all: musl-obstack
++install: install-musl-obstack
++musl-obstack: obj_musl_obstack/.lc_built
++src_musl_obstack: | $(MUSL_OBSTACK_SRCDIR)
++	ln -sf "$(MUSL_OBSTACK_SRCDIR)" $@
++obj_musl_obstack/.lc_configured: | obj_musl_obstack src_musl_obstack obj_gcc/.lc_built obj_sysroot/.lc_libs
++	cd src_musl_obstack && ( ./bootstrap.sh || ./autogen.sh || autoreconf -fi )
++	cd obj_musl_obstack && CC="$(XGCC) --sysroot=$(CURDIR)/obj_sysroot" ../src_musl_obstack/configure --host=$(TARGET) --prefix=
++	touch $@
++obj_musl_obstack/.lc_built: | obj_musl_obstack/.lc_configured
++	cd obj_musl_obstack && $(MAKE)
++	touch $@
++install-musl-obstack: | obj_musl_obstack/.lc_built
++	cd obj_musl_obstack && $(MAKE) DESTDIR=$(DESTDIR)$(OUTPUT)$(SYSROOT) install
++endif
++
++install: install-musl-compat-headers
++
++install-musl-compat-headers:
++	mkdir -p $(DESTDIR)$(OUTPUT)$(SYSROOT)/include/sys
++	cp $(QUEUE_H) $(DESTDIR)$(OUTPUT)$(SYSROOT)/include/sys/queue.h
++	cp $(CDEFS_H) $(DESTDIR)$(OUTPUT)$(SYSROOT)/include/sys/cdefs.h
++
+ ifneq ($(LINUX_SRCDIR),)
+ TARGET_ARCH = $(firstword $(subst -, ,$(TARGET)))
+ TARGET_ARCH_MANGLED = $(patsubst or1k,openrisc,$(patsubst i%86,x86,$(patsubst aarch64%,arm64%,$(TARGET_ARCH))))
+diff --git a/patches/binutils-2.46.0/0001-j2.diff b/patches/binutils-2.46.0/0001-j2.diff
+new file mode 100644
+index 0000000..95fde00
+--- /dev/null
++++ b/patches/binutils-2.46.0/0001-j2.diff
+@@ -0,0 +1,586 @@
++diff -ur binutils-2.32.orig/bfd/archures.c binutils-2.32/bfd/archures.c
++--- binutils-2.32.orig/bfd/archures.c	2019-01-19 11:01:32.000000000 -0500
+++++ binutils-2.32/bfd/archures.c	2019-05-26 15:09:15.968501965 -0400
++@@ -298,6 +298,8 @@
++ .#define bfd_mach_sh2a_nofpu_or_sh3_nommu	0x2a2
++ .#define bfd_mach_sh2a_or_sh4			0x2a3
++ .#define bfd_mach_sh2a_or_sh3e			0x2a4
+++.#define bfd_mach_sh2a_nofpu_or_sh3_nommu_or_shj2_nofpu 0x2a5
+++.#define bfd_mach_shj2				0x2c
++ .#define bfd_mach_sh2e				0x2e
++ .#define bfd_mach_sh3				0x30
++ .#define bfd_mach_sh3_nommu			0x31
++Only in binutils-2.32/bfd: archures.c.orig
++Only in binutils-2.32/bfd: archures.c.rej
++diff -ur binutils-2.32.orig/bfd/bfd-in2.h binutils-2.32/bfd/bfd-in2.h
++--- binutils-2.32.orig/bfd/bfd-in2.h	2019-01-19 11:01:32.000000000 -0500
+++++ binutils-2.32/bfd/bfd-in2.h	2019-05-26 15:10:21.005775819 -0400
++@@ -2197,6 +2197,8 @@
++ #define bfd_mach_sh2a_nofpu_or_sh3_nommu       0x2a2
++ #define bfd_mach_sh2a_or_sh4                   0x2a3
++ #define bfd_mach_sh2a_or_sh3e                  0x2a4
+++#define bfd_mach_sh2a_nofpu_or_sh3_nommu_or_shj2_nofpu 0x2a5
+++#define bfd_mach_shj2                          0x2c
++ #define bfd_mach_sh2e                          0x2e
++ #define bfd_mach_sh3                           0x30
++ #define bfd_mach_sh3_nommu                     0x31
++Only in binutils-2.32/bfd: bfd-in2.h.orig
++Only in binutils-2.32/bfd: bfd-in2.h.rej
++diff -ur binutils-2.32.orig/bfd/cpu-sh.c binutils-2.32/bfd/cpu-sh.c
++--- binutils-2.44.orig/bfd/cpu-sh.c
+++++ binutils-2.44/bfd/cpu-sh.c
++@@ -63,7 +63,9 @@
++   N (bfd_mach_sh2a_nofpu_or_sh4_nommu_nofpu, "sh2a-nofpu-or-sh4-nommu-nofpu", false, arch_info_struct + 16),
++   N (bfd_mach_sh2a_nofpu_or_sh3_nommu, "sh2a-nofpu-or-sh3-nommu", false, arch_info_struct + 17),
++   N (bfd_mach_sh2a_or_sh4,  "sh2a-or-sh4",  false, arch_info_struct + 18),
++-  N (bfd_mach_sh2a_or_sh3e, "sh2a-or-sh3e", false, NULL)
+++  N (bfd_mach_sh2a_or_sh3e, "sh2a-or-sh3e", false, arch_info_struct + 19),
+++  N (bfd_mach_shj2,         "j2",           false, arch_info_struct + 20),
+++  N (bfd_mach_sh2a_nofpu_or_sh3_nommu_or_shj2_nofpu, "sh2a-or-sh3e-or-j2", false, NULL),
++ };
++ 
++ const bfd_arch_info_type bfd_sh_arch =
++@@ -99,6 +101,8 @@
++   { bfd_mach_sh4_nofpu,	      arch_sh4_nofpu,	    arch_sh4_nofpu_up },
++   { bfd_mach_sh4_nommu_nofpu, arch_sh4_nommu_nofpu, arch_sh4_nommu_nofpu_up },
++   { bfd_mach_sh4a_nofpu,      arch_sh4a_nofpu,	    arch_sh4a_nofpu_up },
+++  { bfd_mach_shj2,            arch_shj2,            arch_shj2_up },
+++  { bfd_mach_sh2a_nofpu_or_sh3_nommu_or_shj2_nofpu, arch_sh2a_nofpu_or_sh3_nommu_or_shj2_nofpu, arch_sh2a_nofpu_or_sh3_nommu_or_shj2_nofpu_up },
++   { 0, 0, 0 }	/* Terminator.  */
++ };
++ 
++Only in binutils-2.32/bfd: cpu-sh.c.orig
++Only in binutils-2.32/bfd: cpu-sh.c.rej
++diff -ur binutils-2.32.orig/binutils/readelf.c binutils-2.32/binutils/readelf.c
++--- binutils-2.44.orig/binutils/readelf.c
+++++ binutils-2.44/binutils/readelf.c
++@@ -4687,6 +4687,12 @@
++     case EF_SH2A_SH3E:
++       out = stpcpy (out, ", sh2a-or-sh3e");
++       break;
+++    case EF_SHJ2:
+++      out = stpcpy (out, ", j2");
+++      break;
+++    case EF_SH2A_SH3_SHJ2:
+++      out = stpcpy (out, ", sh2a-nofpu-or-sh3-nommu-or-shj2 -nofpu");
+++      break;
++     default:
++       out = stpcpy (out, _(", unknown ISA"));
++       break;
++Only in binutils-2.32/binutils: readelf.c.orig
++diff -ur binutils-2.32.orig/gas/config/tc-sh.c binutils-2.32/gas/config/tc-sh.c
++--- binutils-2.32.orig/gas/config/tc-sh.c	2019-01-19 11:01:33.000000000 -0500
+++++ binutils-2.32/gas/config/tc-sh.c	2019-05-26 15:07:03.567950581 -0400
++@@ -1251,6 +1251,8 @@
++ 		  ptr++;
++ 		}
++ 	      get_operand (&ptr, operand + 2);
+++	      if (strcmp (info->name,"cas") == 0)
+++		operand[2].type = A_IND_0;
++ 	    }
++ 	  else
++ 	    {
++@@ -1790,7 +1792,10 @@
++ 		goto fail;
++ 	      reg_m = 4;
++ 	      break;
++-
+++	    case A_IND_0:
+++	      if (user->reg != 0)
+++		goto fail;
+++	      break;
++ 	    default:
++ 	      printf (_("unhandled %d\n"), arg);
++ 	      goto fail;
++Only in binutils-2.32/gas/config: tc-sh.c.orig
++diff -ur binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh2a-nofpu-or-sh3-nommu.s binutils-2.32/gas/testsuite/gas/sh/arch/sh2a-nofpu-or-sh3-nommu.s
++--- binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh2a-nofpu-or-sh3-nommu.s	2019-01-19 11:01:33.000000000 -0500
+++++ binutils-2.32/gas/testsuite/gas/sh/arch/sh2a-nofpu-or-sh3-nommu.s	2019-05-26 15:07:03.568950585 -0400
++@@ -12,8 +12,6 @@
++ sh2a_nofpu_or_sh3_nommu:
++ ! Instructions introduced into sh2a-nofpu-or-sh3-nommu
++ 	pref @r4                  ;!/* 0000nnnn10000011 pref @<REG_N>       */{"pref",{A_IND_N},{HEX_0,REG_N,HEX_8,HEX_3}, arch_sh2a_nofpu_or_sh3_nommu_up}
++-	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_up}
++-	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_up}
++ 
++ ! Instructions inherited from ancestors: sh sh2
++ 	add #4,r4                 ;!/* 0111nnnni8*1.... add #<imm>,<REG_N>  */{"add",{A_IMM,A_REG_N},{HEX_7,REG_N,IMM0_8}, arch_sh_up}
++diff -ur binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh2a-nofpu-or-sh4-nommu-nofpu.s binutils-2.32/gas/testsuite/gas/sh/arch/sh2a-nofpu-or-sh4-nommu-nofpu.s
++--- binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh2a-nofpu-or-sh4-nommu-nofpu.s	2019-01-19 11:01:33.000000000 -0500
+++++ binutils-2.32/gas/testsuite/gas/sh/arch/sh2a-nofpu-or-sh4-nommu-nofpu.s	2019-05-26 15:07:03.570950593 -0400
++@@ -12,7 +12,7 @@
++ sh2a_nofpu_or_sh4_nommu_nofpu:
++ ! Instructions introduced into sh2a-nofpu-or-sh4-nommu-nofpu
++ 
++-! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu
+++! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh3-nommu-or-sh2j-nofpu
++ 	add #4,r4                 ;!/* 0111nnnni8*1.... add #<imm>,<REG_N>  */{"add",{A_IMM,A_REG_N},{HEX_7,REG_N,IMM0_8}, arch_sh_up}
++ 	add r5,r4                 ;!/* 0011nnnnmmmm1100 add <REG_M>,<REG_N> */{"add",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_C}, arch_sh_up}
++ 	addc r5,r4                ;!/* 0011nnnnmmmm1110 addc <REG_M>,<REG_N>*/{"addc",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_E}, arch_sh_up}
++@@ -119,8 +119,8 @@
++ 	rte                       ;!/* 0000000000101011 rte                 */{"rte",{0},{HEX_0,HEX_0,HEX_2,HEX_B}, arch_sh_up}
++ 	rts                       ;!/* 0000000000001011 rts                 */{"rts",{0},{HEX_0,HEX_0,HEX_0,HEX_B}, arch_sh_up}
++ 	sett                      ;!/* 0000000000011000 sett                */{"sett",{0},{HEX_0,HEX_0,HEX_1,HEX_8}, arch_sh_up}
++-	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_up}
++-	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_up}
+++	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
+++	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
++ 	shal r4                   ;!/* 0100nnnn00100000 shal <REG_N>        */{"shal",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_0}, arch_sh_up}
++ 	shar r4                   ;!/* 0100nnnn00100001 shar <REG_N>        */{"shar",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_1}, arch_sh_up}
++ 	shll r4                   ;!/* 0100nnnn00000000 shll <REG_N>        */{"shll",{A_REG_N},{HEX_4,REG_N,HEX_0,HEX_0}, arch_sh_up}
++diff -ur binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh2a-nofpu.s binutils-2.32/gas/testsuite/gas/sh/arch/sh2a-nofpu.s
++--- binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh2a-nofpu.s	2019-01-19 11:01:33.000000000 -0500
+++++ binutils-2.32/gas/testsuite/gas/sh/arch/sh2a-nofpu.s	2019-05-26 15:07:03.571950597 -0400
++@@ -64,7 +64,7 @@
++ 	movu.b @(2048,r5),r4      ;!/* 0011nnnnmmmm0001 1000dddddddddddd movu.b @(<DISP12>,<REG_M>),<REG_N> */  {"movu.b",{A_DISP_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_1,HEX_8,DISP0_12}, arch_sh2a_nofpu_up | arch_op32}
++ 	movu.w @(2048,r5),r4      ;!/* 0011nnnnmmmm0001 1001dddddddddddd movu.w @(<DISP12>,<REG_M>),<REG_N> */  {"movu.w",{A_DISP_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_1,HEX_9,DISP0_12BY2}, arch_sh2a_nofpu_up | arch_op32}
++ 
++-! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh4-nommu-nofpu
+++! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh3-nommu-or-sh2j-nofpu sh2a-nofpu-or-sh4-nommu-nofpu
++ 	add #4,r4                 ;!/* 0111nnnni8*1.... add #<imm>,<REG_N>  */{"add",{A_IMM,A_REG_N},{HEX_7,REG_N,IMM0_8}, arch_sh_up}
++ 	add r5,r4                 ;!/* 0011nnnnmmmm1100 add <REG_M>,<REG_N> */{"add",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_C}, arch_sh_up}
++ 	addc r5,r4                ;!/* 0011nnnnmmmm1110 addc <REG_M>,<REG_N>*/{"addc",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_E}, arch_sh_up}
++@@ -171,8 +171,8 @@
++ 	rte                       ;!/* 0000000000101011 rte                 */{"rte",{0},{HEX_0,HEX_0,HEX_2,HEX_B}, arch_sh_up}
++ 	rts                       ;!/* 0000000000001011 rts                 */{"rts",{0},{HEX_0,HEX_0,HEX_0,HEX_B}, arch_sh_up}
++ 	sett                      ;!/* 0000000000011000 sett                */{"sett",{0},{HEX_0,HEX_0,HEX_1,HEX_8}, arch_sh_up}
++-	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_up}
++-	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_up}
+++	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
+++	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
++ 	shal r4                   ;!/* 0100nnnn00100000 shal <REG_N>        */{"shal",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_0}, arch_sh_up}
++ 	shar r4                   ;!/* 0100nnnn00100001 shar <REG_N>        */{"shar",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_1}, arch_sh_up}
++ 	shll r4                   ;!/* 0100nnnn00000000 shll <REG_N>        */{"shll",{A_REG_N},{HEX_4,REG_N,HEX_0,HEX_0}, arch_sh_up}
++diff -ur binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh2a-or-sh3e.s binutils-2.32/gas/testsuite/gas/sh/arch/sh2a-or-sh3e.s
++--- binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh2a-or-sh3e.s	2019-01-19 11:01:33.000000000 -0500
+++++ binutils-2.32/gas/testsuite/gas/sh/arch/sh2a-or-sh3e.s	2019-05-26 15:07:03.572950601 -0400
++@@ -13,7 +13,7 @@
++ ! Instructions introduced into sh2a-or-sh3e
++ 	fsqrt fr1                 ;!/* 1111nnnn01101101 fsqrt <F_REG_N>    */{"fsqrt",{F_REG_N},{HEX_F,REG_N,HEX_6,HEX_D}, arch_sh2a_or_sh3e_up}
++ 
++-! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh2e
+++! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh3-nommu-or-sh2j-nofpu sh2e
++ 	add #4,r4                 ;!/* 0111nnnni8*1.... add #<imm>,<REG_N>  */{"add",{A_IMM,A_REG_N},{HEX_7,REG_N,IMM0_8}, arch_sh_up}
++ 	add r5,r4                 ;!/* 0011nnnnmmmm1100 add <REG_M>,<REG_N> */{"add",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_C}, arch_sh_up}
++ 	addc r5,r4                ;!/* 0011nnnnmmmm1110 addc <REG_M>,<REG_N>*/{"addc",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_E}, arch_sh_up}
++@@ -124,8 +124,8 @@
++ 	rte                       ;!/* 0000000000101011 rte                 */{"rte",{0},{HEX_0,HEX_0,HEX_2,HEX_B}, arch_sh_up}
++ 	rts                       ;!/* 0000000000001011 rts                 */{"rts",{0},{HEX_0,HEX_0,HEX_0,HEX_B}, arch_sh_up}
++ 	sett                      ;!/* 0000000000011000 sett                */{"sett",{0},{HEX_0,HEX_0,HEX_1,HEX_8}, arch_sh_up}
++-	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_up}
++-	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_up}
+++	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
+++	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
++ 	shal r4                   ;!/* 0100nnnn00100000 shal <REG_N>        */{"shal",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_0}, arch_sh_up}
++ 	shar r4                   ;!/* 0100nnnn00100001 shar <REG_N>        */{"shar",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_1}, arch_sh_up}
++ 	shll r4                   ;!/* 0100nnnn00000000 shll <REG_N>        */{"shll",{A_REG_N},{HEX_4,REG_N,HEX_0,HEX_0}, arch_sh_up}
++diff -ur binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh2a-or-sh4.s binutils-2.32/gas/testsuite/gas/sh/arch/sh2a-or-sh4.s
++--- binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh2a-or-sh4.s	2019-01-19 11:01:33.000000000 -0500
+++++ binutils-2.32/gas/testsuite/gas/sh/arch/sh2a-or-sh4.s	2019-05-26 15:07:03.574950610 -0400
++@@ -39,7 +39,7 @@
++ 	fsub dr4,dr2              ;!/* 1111nnn0mmm00001 fsub <D_REG_M>,<D_REG_N>*/{"fsub",{D_REG_M,D_REG_N},{HEX_F,REG_N,REG_M,HEX_1}, arch_sh2a_or_sh4_up}
++ 	ftrc dr2,FPUL             ;!/* 1111nnnn00111101 ftrc <D_REG_N>,FPUL*/{"ftrc",{D_REG_N,FPUL_M},{HEX_F,REG_N,HEX_3,HEX_D}, arch_sh2a_or_sh4_up}
++ 
++-! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh4-nommu-nofpu sh2a-or-sh3e sh2e
+++! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh3-nommu-or-sh2j-nofpu sh2a-nofpu-or-sh4-nommu-nofpu sh2a-or-sh3e sh2e
++ 	add #4,r4                 ;!/* 0111nnnni8*1.... add #<imm>,<REG_N>  */{"add",{A_IMM,A_REG_N},{HEX_7,REG_N,IMM0_8}, arch_sh_up}
++ 	add r5,r4                 ;!/* 0011nnnnmmmm1100 add <REG_M>,<REG_N> */{"add",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_C}, arch_sh_up}
++ 	addc r5,r4                ;!/* 0011nnnnmmmm1110 addc <REG_M>,<REG_N>*/{"addc",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_E}, arch_sh_up}
++@@ -150,8 +150,8 @@
++ 	rte                       ;!/* 0000000000101011 rte                 */{"rte",{0},{HEX_0,HEX_0,HEX_2,HEX_B}, arch_sh_up}
++ 	rts                       ;!/* 0000000000001011 rts                 */{"rts",{0},{HEX_0,HEX_0,HEX_0,HEX_B}, arch_sh_up}
++ 	sett                      ;!/* 0000000000011000 sett                */{"sett",{0},{HEX_0,HEX_0,HEX_1,HEX_8}, arch_sh_up}
++-	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_up}
++-	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_up}
+++	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
+++	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
++ 	shal r4                   ;!/* 0100nnnn00100000 shal <REG_N>        */{"shal",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_0}, arch_sh_up}
++ 	shar r4                   ;!/* 0100nnnn00100001 shar <REG_N>        */{"shar",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_1}, arch_sh_up}
++ 	shll r4                   ;!/* 0100nnnn00000000 shll <REG_N>        */{"shll",{A_REG_N},{HEX_4,REG_N,HEX_0,HEX_0}, arch_sh_up}
++diff -ur binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh2a.s binutils-2.32/gas/testsuite/gas/sh/arch/sh2a.s
++--- binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh2a.s	2019-01-19 11:01:33.000000000 -0500
+++++ binutils-2.32/gas/testsuite/gas/sh/arch/sh2a.s	2019-05-26 15:07:03.575950614 -0400
++@@ -16,7 +16,7 @@
++ 	fmov.s fr2,@(2048,r4)     ;!/* 0011nnnnmmmm0001 0011dddddddddddd fmov.s <F_REG_M>,@(<DISP12>,<REG_N>) */  {"fmov.s",{F_REG_M,A_DISP_REG_N},{HEX_3,REG_N,REG_M,HEX_1,HEX_3,DISP1_12BY4}, arch_sh2a_up | arch_op32}
++ 	fmov.s @(2048,r5),fr1     ;!/* 0011nnnnmmmm0001 0111dddddddddddd fmov.s @(<DISP12>,<REG_M>),<F_REG_N> */  {"fmov.s",{A_DISP_REG_M,F_REG_N},{HEX_3,REG_N,REG_M,HEX_1,HEX_7,DISP0_12BY4}, arch_sh2a_up | arch_op32}
++ 
++-! Instructions inherited from ancestors: sh sh2 sh2a-nofpu sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh4-nommu-nofpu sh2a-or-sh3e sh2a-or-sh4 sh2e
+++! Instructions inherited from ancestors: sh sh2 sh2a-nofpu sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh3-nommu-or-sh2j-nofpu sh2a-nofpu-or-sh4-nommu-nofpu sh2a-or-sh3e sh2a-or-sh4 sh2e
++ 	add #4,r4                 ;!/* 0111nnnni8*1.... add #<imm>,<REG_N>  */{"add",{A_IMM,A_REG_N},{HEX_7,REG_N,IMM0_8}, arch_sh_up}
++ 	add r5,r4                 ;!/* 0011nnnnmmmm1100 add <REG_M>,<REG_N> */{"add",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_C}, arch_sh_up}
++ 	addc r5,r4                ;!/* 0011nnnnmmmm1110 addc <REG_M>,<REG_N>*/{"addc",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_E}, arch_sh_up}
++@@ -140,8 +140,8 @@
++ 	rte                       ;!/* 0000000000101011 rte                 */{"rte",{0},{HEX_0,HEX_0,HEX_2,HEX_B}, arch_sh_up}
++ 	rts                       ;!/* 0000000000001011 rts                 */{"rts",{0},{HEX_0,HEX_0,HEX_0,HEX_B}, arch_sh_up}
++ 	sett                      ;!/* 0000000000011000 sett                */{"sett",{0},{HEX_0,HEX_0,HEX_1,HEX_8}, arch_sh_up}
++-	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_up}
++-	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_up}
+++	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
+++	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
++ 	shal r4                   ;!/* 0100nnnn00100000 shal <REG_N>        */{"shal",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_0}, arch_sh_up}
++ 	shar r4                   ;!/* 0100nnnn00100001 shar <REG_N>        */{"shar",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_1}, arch_sh_up}
++ 	shll r4                   ;!/* 0100nnnn00000000 shll <REG_N>        */{"shll",{A_REG_N},{HEX_4,REG_N,HEX_0,HEX_0}, arch_sh_up}
++diff -ur binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh3-dsp.s binutils-2.32/gas/testsuite/gas/sh/arch/sh3-dsp.s
++--- binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh3-dsp.s	2019-01-19 11:01:33.000000000 -0500
+++++ binutils-2.32/gas/testsuite/gas/sh/arch/sh3-dsp.s	2019-05-26 15:07:03.577950622 -0400
++@@ -12,7 +12,7 @@
++ sh3_dsp:
++ ! Instructions introduced into sh3-dsp
++ 
++-! Instructions inherited from ancestors: sh sh-dsp sh2 sh2a-nofpu-or-sh3-nommu sh3 sh3-nommu
+++! Instructions inherited from ancestors: sh sh-dsp sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh3-nommu-or-sh2j-nofpu sh3 sh3-nommu
++ 	add #4,r4                 ;!/* 0111nnnni8*1.... add #<imm>,<REG_N>  */{"add",{A_IMM,A_REG_N},{HEX_7,REG_N,IMM0_8}, arch_sh_up}
++ 	add r5,r4                 ;!/* 0011nnnnmmmm1100 add <REG_M>,<REG_N> */{"add",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_C}, arch_sh_up}
++ 	addc r5,r4                ;!/* 0011nnnnmmmm1110 addc <REG_M>,<REG_N>*/{"addc",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_E}, arch_sh_up}
++@@ -152,8 +152,8 @@
++ 	setrc #4                  ;!/* 10000010i8*1.... setrc #<imm>        */{"setrc",{A_IMM},{HEX_8,HEX_2,IMM0_8}, arch_sh_dsp_up}
++ 	repeat 10 20 r4           ;!/* repeat start end <REG_N>       	*/{"repeat",{A_DISP_PC,A_DISP_PC,A_REG_N},{REPEAT,REG_N,HEX_1,HEX_4}, arch_sh_dsp_up}
++ 	repeat 10 20 #4           ;!/* repeat start end #<imm>        	*/{"repeat",{A_DISP_PC,A_DISP_PC,A_IMM},{REPEAT,HEX_2,IMM0_8,HEX_8}, arch_sh_dsp_up}
++-	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_up}
++-	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_up}
+++	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
+++	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
++ 	shal r4                   ;!/* 0100nnnn00100000 shal <REG_N>        */{"shal",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_0}, arch_sh_up}
++ 	shar r4                   ;!/* 0100nnnn00100001 shar <REG_N>        */{"shar",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_1}, arch_sh_up}
++ 	shll r4                   ;!/* 0100nnnn00000000 shll <REG_N>        */{"shll",{A_REG_N},{HEX_4,REG_N,HEX_0,HEX_0}, arch_sh_up}
++diff -ur binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh3-nommu.s binutils-2.32/gas/testsuite/gas/sh/arch/sh3-nommu.s
++--- binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh3-nommu.s	2019-01-19 11:01:33.000000000 -0500
+++++ binutils-2.32/gas/testsuite/gas/sh/arch/sh3-nommu.s	2019-05-26 15:07:03.578950626 -0400
++@@ -26,7 +26,7 @@
++ 	stc.l SPC,@-r4            ;!/* 0100nnnn01000011 stc.l SPC,@-<REG_N> */{"stc.l",{A_SPC,A_DEC_N},{HEX_4,REG_N,HEX_4,HEX_3}, arch_sh3_nommu_up}
++ 	stc.l r1_bank,@-r4        ;!/* 0100nnnn1xxx0011 stc.l Rn_BANK,@-<REG_N> */{"stc.l",{A_REG_B,A_DEC_N},{HEX_4,REG_N,REG_B,HEX_3}, arch_sh3_nommu_up}
++ 
++-! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu
+++! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh3-nommu-or-sh2j-nofpu
++ 	add #4,r4                 ;!/* 0111nnnni8*1.... add #<imm>,<REG_N>  */{"add",{A_IMM,A_REG_N},{HEX_7,REG_N,IMM0_8}, arch_sh_up}
++ 	add r5,r4                 ;!/* 0011nnnnmmmm1100 add <REG_M>,<REG_N> */{"add",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_C}, arch_sh_up}
++ 	addc r5,r4                ;!/* 0011nnnnmmmm1110 addc <REG_M>,<REG_N>*/{"addc",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_E}, arch_sh_up}
++@@ -133,8 +133,8 @@
++ 	rte                       ;!/* 0000000000101011 rte                 */{"rte",{0},{HEX_0,HEX_0,HEX_2,HEX_B}, arch_sh_up}
++ 	rts                       ;!/* 0000000000001011 rts                 */{"rts",{0},{HEX_0,HEX_0,HEX_0,HEX_B}, arch_sh_up}
++ 	sett                      ;!/* 0000000000011000 sett                */{"sett",{0},{HEX_0,HEX_0,HEX_1,HEX_8}, arch_sh_up}
++-	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_up}
++-	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_up}
+++	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
+++	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
++ 	shal r4                   ;!/* 0100nnnn00100000 shal <REG_N>        */{"shal",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_0}, arch_sh_up}
++ 	shar r4                   ;!/* 0100nnnn00100001 shar <REG_N>        */{"shar",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_1}, arch_sh_up}
++ 	shll r4                   ;!/* 0100nnnn00000000 shll <REG_N>        */{"shll",{A_REG_N},{HEX_4,REG_N,HEX_0,HEX_0}, arch_sh_up}
++diff -ur binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh3.s binutils-2.32/gas/testsuite/gas/sh/arch/sh3.s
++--- binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh3.s	2019-01-19 11:01:33.000000000 -0500
+++++ binutils-2.32/gas/testsuite/gas/sh/arch/sh3.s	2019-05-26 15:07:03.579950630 -0400
++@@ -13,7 +13,7 @@
++ ! Instructions introduced into sh3
++ 	ldtlb                     ;!/* 0000000000111000 ldtlb               */{"ldtlb",{0},{HEX_0,HEX_0,HEX_3,HEX_8}, arch_sh3_up}
++ 
++-! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh3-nommu
+++! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh3-nommu-or-sh2j-nofpu sh3-nommu
++ 	add #4,r4                 ;!/* 0111nnnni8*1.... add #<imm>,<REG_N>  */{"add",{A_IMM,A_REG_N},{HEX_7,REG_N,IMM0_8}, arch_sh_up}
++ 	add r5,r4                 ;!/* 0011nnnnmmmm1100 add <REG_M>,<REG_N> */{"add",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_C}, arch_sh_up}
++ 	addc r5,r4                ;!/* 0011nnnnmmmm1110 addc <REG_M>,<REG_N>*/{"addc",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_E}, arch_sh_up}
++@@ -128,8 +128,8 @@
++ 	rts                       ;!/* 0000000000001011 rts                 */{"rts",{0},{HEX_0,HEX_0,HEX_0,HEX_B}, arch_sh_up}
++ 	sets                      ;!/* 0000000001011000 sets                */{"sets",{0},{HEX_0,HEX_0,HEX_5,HEX_8}, arch_sh3_nommu_up}
++ 	sett                      ;!/* 0000000000011000 sett                */{"sett",{0},{HEX_0,HEX_0,HEX_1,HEX_8}, arch_sh_up}
++-	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_up}
++-	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_up}
+++	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
+++	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
++ 	shal r4                   ;!/* 0100nnnn00100000 shal <REG_N>        */{"shal",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_0}, arch_sh_up}
++ 	shar r4                   ;!/* 0100nnnn00100001 shar <REG_N>        */{"shar",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_1}, arch_sh_up}
++ 	shll r4                   ;!/* 0100nnnn00000000 shll <REG_N>        */{"shll",{A_REG_N},{HEX_4,REG_N,HEX_0,HEX_0}, arch_sh_up}
++diff -ur binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh3e.s binutils-2.32/gas/testsuite/gas/sh/arch/sh3e.s
++--- binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh3e.s	2019-01-19 11:01:33.000000000 -0500
+++++ binutils-2.32/gas/testsuite/gas/sh/arch/sh3e.s	2019-05-26 15:07:03.581950639 -0400
++@@ -12,7 +12,7 @@
++ sh3e:
++ ! Instructions introduced into sh3e
++ 
++-! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh2a-or-sh3e sh2e sh3 sh3-nommu
+++! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh3-nommu-or-sh2j-nofpu sh2a-or-sh3e sh2e sh3 sh3-nommu
++ 	add #4,r4                 ;!/* 0111nnnni8*1.... add #<imm>,<REG_N>  */{"add",{A_IMM,A_REG_N},{HEX_7,REG_N,IMM0_8}, arch_sh_up}
++ 	add r5,r4                 ;!/* 0011nnnnmmmm1100 add <REG_M>,<REG_N> */{"add",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_C}, arch_sh_up}
++ 	addc r5,r4                ;!/* 0011nnnnmmmm1110 addc <REG_M>,<REG_N>*/{"addc",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_E}, arch_sh_up}
++@@ -132,8 +132,8 @@
++ 	rts                       ;!/* 0000000000001011 rts                 */{"rts",{0},{HEX_0,HEX_0,HEX_0,HEX_B}, arch_sh_up}
++ 	sets                      ;!/* 0000000001011000 sets                */{"sets",{0},{HEX_0,HEX_0,HEX_5,HEX_8}, arch_sh3_nommu_up}
++ 	sett                      ;!/* 0000000000011000 sett                */{"sett",{0},{HEX_0,HEX_0,HEX_1,HEX_8}, arch_sh_up}
++-	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_up}
++-	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_up}
+++	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
+++	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
++ 	shal r4                   ;!/* 0100nnnn00100000 shal <REG_N>        */{"shal",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_0}, arch_sh_up}
++ 	shar r4                   ;!/* 0100nnnn00100001 shar <REG_N>        */{"shar",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_1}, arch_sh_up}
++ 	shll r4                   ;!/* 0100nnnn00000000 shll <REG_N>        */{"shll",{A_REG_N},{HEX_4,REG_N,HEX_0,HEX_0}, arch_sh_up}
++diff -ur binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh4-nofpu.s binutils-2.32/gas/testsuite/gas/sh/arch/sh4-nofpu.s
++--- binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh4-nofpu.s	2019-01-19 11:01:33.000000000 -0500
+++++ binutils-2.32/gas/testsuite/gas/sh/arch/sh4-nofpu.s	2019-05-26 15:07:03.582950643 -0400
++@@ -12,7 +12,7 @@
++ sh4_nofpu:
++ ! Instructions introduced into sh4-nofpu
++ 
++-! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh4-nommu-nofpu sh3 sh3-nommu sh4-nommu-nofpu
+++! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh3-nommu-or-sh2j-nofpu sh2a-nofpu-or-sh4-nommu-nofpu sh3 sh3-nommu sh4-nommu-nofpu
++ 	add #4,r4                 ;!/* 0111nnnni8*1.... add #<imm>,<REG_N>  */{"add",{A_IMM,A_REG_N},{HEX_7,REG_N,IMM0_8}, arch_sh_up}
++ 	add r5,r4                 ;!/* 0011nnnnmmmm1100 add <REG_M>,<REG_N> */{"add",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_C}, arch_sh_up}
++ 	addc r5,r4                ;!/* 0011nnnnmmmm1110 addc <REG_M>,<REG_N>*/{"addc",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_E}, arch_sh_up}
++@@ -136,8 +136,8 @@
++ 	rts                       ;!/* 0000000000001011 rts                 */{"rts",{0},{HEX_0,HEX_0,HEX_0,HEX_B}, arch_sh_up}
++ 	sets                      ;!/* 0000000001011000 sets                */{"sets",{0},{HEX_0,HEX_0,HEX_5,HEX_8}, arch_sh3_nommu_up}
++ 	sett                      ;!/* 0000000000011000 sett                */{"sett",{0},{HEX_0,HEX_0,HEX_1,HEX_8}, arch_sh_up}
++-	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_up}
++-	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_up}
+++	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
+++	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
++ 	shal r4                   ;!/* 0100nnnn00100000 shal <REG_N>        */{"shal",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_0}, arch_sh_up}
++ 	shar r4                   ;!/* 0100nnnn00100001 shar <REG_N>        */{"shar",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_1}, arch_sh_up}
++ 	shll r4                   ;!/* 0100nnnn00000000 shll <REG_N>        */{"shll",{A_REG_N},{HEX_4,REG_N,HEX_0,HEX_0}, arch_sh_up}
++diff -ur binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh4-nommu-nofpu.s binutils-2.32/gas/testsuite/gas/sh/arch/sh4-nommu-nofpu.s
++--- binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh4-nommu-nofpu.s	2019-01-19 11:01:33.000000000 -0500
+++++ binutils-2.32/gas/testsuite/gas/sh/arch/sh4-nommu-nofpu.s	2019-05-26 15:07:03.583950647 -0400
++@@ -24,7 +24,7 @@
++ 	stc.l SGR,@-r4            ;!/* 0100nnnn00110010 stc.l SGR,@-<REG_N> */{"stc.l",{A_SGR,A_DEC_N},{HEX_4,REG_N,HEX_3,HEX_2}, arch_sh4_nommu_nofpu_up}
++ 	stc.l DBR,@-r4            ;!/* 0100nnnn11110010 stc.l DBR,@-<REG_N> */{"stc.l",{A_DBR,A_DEC_N},{HEX_4,REG_N,HEX_F,HEX_2}, arch_sh4_nommu_nofpu_up}
++ 
++-! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh4-nommu-nofpu sh3-nommu
+++! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh3-nommu-or-sh2j-nofpu sh2a-nofpu-or-sh4-nommu-nofpu sh3-nommu
++ 	add #4,r4                 ;!/* 0111nnnni8*1.... add #<imm>,<REG_N>  */{"add",{A_IMM,A_REG_N},{HEX_7,REG_N,IMM0_8}, arch_sh_up}
++ 	add r5,r4                 ;!/* 0011nnnnmmmm1100 add <REG_M>,<REG_N> */{"add",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_C}, arch_sh_up}
++ 	addc r5,r4                ;!/* 0011nnnnmmmm1110 addc <REG_M>,<REG_N>*/{"addc",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_E}, arch_sh_up}
++@@ -139,8 +139,8 @@
++ 	rts                       ;!/* 0000000000001011 rts                 */{"rts",{0},{HEX_0,HEX_0,HEX_0,HEX_B}, arch_sh_up}
++ 	sets                      ;!/* 0000000001011000 sets                */{"sets",{0},{HEX_0,HEX_0,HEX_5,HEX_8}, arch_sh3_nommu_up}
++ 	sett                      ;!/* 0000000000011000 sett                */{"sett",{0},{HEX_0,HEX_0,HEX_1,HEX_8}, arch_sh_up}
++-	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_up}
++-	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_up}
+++	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
+++	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
++ 	shal r4                   ;!/* 0100nnnn00100000 shal <REG_N>        */{"shal",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_0}, arch_sh_up}
++ 	shar r4                   ;!/* 0100nnnn00100001 shar <REG_N>        */{"shar",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_1}, arch_sh_up}
++ 	shll r4                   ;!/* 0100nnnn00000000 shll <REG_N>        */{"shll",{A_REG_N},{HEX_4,REG_N,HEX_0,HEX_0}, arch_sh_up}
++diff -ur binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh4.s binutils-2.32/gas/testsuite/gas/sh/arch/sh4.s
++--- binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh4.s	2019-01-19 11:01:33.000000000 -0500
+++++ binutils-2.32/gas/testsuite/gas/sh/arch/sh4.s	2019-05-26 15:07:03.585950655 -0400
++@@ -17,7 +17,7 @@
++ 	fsrra fr1                 ;!/* 1111nnnn01111101 fsrra <F_REG_N>    */{"fsrra",{F_REG_N},{HEX_F,REG_N,HEX_7,HEX_D}, arch_sh4_up}
++ 	ftrv xmtrx,fv0            ;!/* 1111nn0111111101 ftrv XMTRX_M4,<V_REG_n>*/{"ftrv",{XMTRX_M4,V_REG_N},{HEX_F,REG_N_B01,HEX_F,HEX_D}, arch_sh4_up}
++ 
++-! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh4-nommu-nofpu sh2a-or-sh3e sh2a-or-sh4 sh2e sh3 sh3-nommu sh3e sh4-nofpu sh4-nommu-nofpu
+++! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh3-nommu-or-sh2j-nofpu sh2a-nofpu-or-sh4-nommu-nofpu sh2a-or-sh3e sh2a-or-sh4 sh2e sh3 sh3-nommu sh3e sh4-nofpu sh4-nommu-nofpu
++ 	add #4,r4                 ;!/* 0111nnnni8*1.... add #<imm>,<REG_N>  */{"add",{A_IMM,A_REG_N},{HEX_7,REG_N,IMM0_8}, arch_sh_up}
++ 	add r5,r4                 ;!/* 0011nnnnmmmm1100 add <REG_M>,<REG_N> */{"add",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_C}, arch_sh_up}
++ 	addc r5,r4                ;!/* 0011nnnnmmmm1110 addc <REG_M>,<REG_N>*/{"addc",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_E}, arch_sh_up}
++@@ -145,8 +145,8 @@
++ 	rts                       ;!/* 0000000000001011 rts                 */{"rts",{0},{HEX_0,HEX_0,HEX_0,HEX_B}, arch_sh_up}
++ 	sets                      ;!/* 0000000001011000 sets                */{"sets",{0},{HEX_0,HEX_0,HEX_5,HEX_8}, arch_sh3_nommu_up}
++ 	sett                      ;!/* 0000000000011000 sett                */{"sett",{0},{HEX_0,HEX_0,HEX_1,HEX_8}, arch_sh_up}
++-	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_up}
++-	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_up}
+++	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
+++	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
++ 	shal r4                   ;!/* 0100nnnn00100000 shal <REG_N>        */{"shal",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_0}, arch_sh_up}
++ 	shar r4                   ;!/* 0100nnnn00100001 shar <REG_N>        */{"shar",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_1}, arch_sh_up}
++ 	shll r4                   ;!/* 0100nnnn00000000 shll <REG_N>        */{"shll",{A_REG_N},{HEX_4,REG_N,HEX_0,HEX_0}, arch_sh_up}
++diff -ur binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh4a-nofpu.s binutils-2.32/gas/testsuite/gas/sh/arch/sh4a-nofpu.s
++--- binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh4a-nofpu.s	2019-01-19 11:01:33.000000000 -0500
+++++ binutils-2.32/gas/testsuite/gas/sh/arch/sh4a-nofpu.s	2019-05-26 15:07:03.586950659 -0400
++@@ -19,7 +19,7 @@
++ 	prefi @r4                 ;!/* 0000nnnn11010011 prefi @<REG_N>      */{"prefi",{A_IND_N},{HEX_0,REG_N,HEX_D,HEX_3}, arch_sh4a_nofpu_up}
++ 	synco                     ;!/* 0000000010101011 synco               */{"synco",{0},{HEX_0,HEX_0,HEX_A,HEX_B}, arch_sh4a_nofpu_up}
++ 
++-! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh4-nommu-nofpu sh3 sh3-nommu sh4-nofpu sh4-nommu-nofpu
+++! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh3-nommu-or-sh2j-nofpu sh2a-nofpu-or-sh4-nommu-nofpu sh3 sh3-nommu sh4-nofpu sh4-nommu-nofpu
++ 	add #4,r4                 ;!/* 0111nnnni8*1.... add #<imm>,<REG_N>  */{"add",{A_IMM,A_REG_N},{HEX_7,REG_N,IMM0_8}, arch_sh_up}
++ 	add r5,r4                 ;!/* 0011nnnnmmmm1100 add <REG_M>,<REG_N> */{"add",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_C}, arch_sh_up}
++ 	addc r5,r4                ;!/* 0011nnnnmmmm1110 addc <REG_M>,<REG_N>*/{"addc",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_E}, arch_sh_up}
++@@ -143,8 +143,8 @@
++ 	rts                       ;!/* 0000000000001011 rts                 */{"rts",{0},{HEX_0,HEX_0,HEX_0,HEX_B}, arch_sh_up}
++ 	sets                      ;!/* 0000000001011000 sets                */{"sets",{0},{HEX_0,HEX_0,HEX_5,HEX_8}, arch_sh3_nommu_up}
++ 	sett                      ;!/* 0000000000011000 sett                */{"sett",{0},{HEX_0,HEX_0,HEX_1,HEX_8}, arch_sh_up}
++-	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_up}
++-	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_up}
+++	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
+++	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
++ 	shal r4                   ;!/* 0100nnnn00100000 shal <REG_N>        */{"shal",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_0}, arch_sh_up}
++ 	shar r4                   ;!/* 0100nnnn00100001 shar <REG_N>        */{"shar",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_1}, arch_sh_up}
++ 	shll r4                   ;!/* 0100nnnn00000000 shll <REG_N>        */{"shll",{A_REG_N},{HEX_4,REG_N,HEX_0,HEX_0}, arch_sh_up}
++diff -ur binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh4a.s binutils-2.32/gas/testsuite/gas/sh/arch/sh4a.s
++--- binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh4a.s	2019-01-19 11:01:33.000000000 -0500
+++++ binutils-2.32/gas/testsuite/gas/sh/arch/sh4a.s	2019-05-26 15:07:03.588950668 -0400
++@@ -13,7 +13,7 @@
++ ! Instructions introduced into sh4a
++ 	fpchg                     ;!/* 1111011111111101 fpchg               */{"fpchg",{0},{HEX_F,HEX_7,HEX_F,HEX_D}, arch_sh4a_up}
++ 
++-! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh4-nommu-nofpu sh2a-or-sh3e sh2a-or-sh4 sh2e sh3 sh3-nommu sh3e sh4 sh4-nofpu sh4-nommu-nofpu sh4a-nofpu
+++! Instructions inherited from ancestors: sh sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh3-nommu-or-sh2j-nofpu sh2a-nofpu-or-sh4-nommu-nofpu sh2a-or-sh3e sh2a-or-sh4 sh2e sh3 sh3-nommu sh3e sh4 sh4-nofpu sh4-nommu-nofpu sh4a-nofpu
++ 	add #4,r4                 ;!/* 0111nnnni8*1.... add #<imm>,<REG_N>  */{"add",{A_IMM,A_REG_N},{HEX_7,REG_N,IMM0_8}, arch_sh_up}
++ 	add r5,r4                 ;!/* 0011nnnnmmmm1100 add <REG_M>,<REG_N> */{"add",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_C}, arch_sh_up}
++ 	addc r5,r4                ;!/* 0011nnnnmmmm1110 addc <REG_M>,<REG_N>*/{"addc",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_E}, arch_sh_up}
++@@ -147,8 +147,8 @@
++ 	rts                       ;!/* 0000000000001011 rts                 */{"rts",{0},{HEX_0,HEX_0,HEX_0,HEX_B}, arch_sh_up}
++ 	sets                      ;!/* 0000000001011000 sets                */{"sets",{0},{HEX_0,HEX_0,HEX_5,HEX_8}, arch_sh3_nommu_up}
++ 	sett                      ;!/* 0000000000011000 sett                */{"sett",{0},{HEX_0,HEX_0,HEX_1,HEX_8}, arch_sh_up}
++-	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_up}
++-	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_up}
+++	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
+++	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
++ 	shal r4                   ;!/* 0100nnnn00100000 shal <REG_N>        */{"shal",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_0}, arch_sh_up}
++ 	shar r4                   ;!/* 0100nnnn00100001 shar <REG_N>        */{"shar",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_1}, arch_sh_up}
++ 	shll r4                   ;!/* 0100nnnn00000000 shll <REG_N>        */{"shll",{A_REG_N},{HEX_4,REG_N,HEX_0,HEX_0}, arch_sh_up}
++diff -ur binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh4al-dsp.s binutils-2.32/gas/testsuite/gas/sh/arch/sh4al-dsp.s
++--- binutils-2.32.orig/gas/testsuite/gas/sh/arch/sh4al-dsp.s	2019-01-19 11:01:33.000000000 -0500
+++++ binutils-2.32/gas/testsuite/gas/sh/arch/sh4al-dsp.s	2019-05-26 15:07:03.589950672 -0400
++@@ -48,7 +48,7 @@
++ 	dct pswap x1,m0           ;!/* 10011101xx01zzzz pswap <DSP_REG_X>,<DSP_REG_N> */  {"pswap", {DSP_REG_X,DSP_REG_N},{PPI,PPIC,HEX_9,HEX_D,HEX_1}, arch_sh4al_dsp_up}
++ 	dct pswap y0,m0           ;!/* 1011110101yyzzzz pswap <DSP_REG_Y>,<DSP_REG_N> */  {"pswap", {DSP_REG_Y,DSP_REG_N},{PPI,PPIC,HEX_B,HEX_D,HEX_4}, arch_sh4al_dsp_up}
++ 
++-! Instructions inherited from ancestors: sh sh-dsp sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh4-nommu-nofpu sh3 sh3-dsp sh3-nommu sh4-nofpu sh4-nommu-nofpu sh4a-nofpu
+++! Instructions inherited from ancestors: sh sh-dsp sh2 sh2a-nofpu-or-sh3-nommu sh2a-nofpu-or-sh3-nommu-or-sh2j-nofpu sh2a-nofpu-or-sh4-nommu-nofpu sh3 sh3-dsp sh3-nommu sh4-nofpu sh4-nommu-nofpu sh4a-nofpu
++ 	add #4,r4                 ;!/* 0111nnnni8*1.... add #<imm>,<REG_N>  */{"add",{A_IMM,A_REG_N},{HEX_7,REG_N,IMM0_8}, arch_sh_up}
++ 	add r5,r4                 ;!/* 0011nnnnmmmm1100 add <REG_M>,<REG_N> */{"add",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_C}, arch_sh_up}
++ 	addc r5,r4                ;!/* 0011nnnnmmmm1110 addc <REG_M>,<REG_N>*/{"addc",{ A_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_E}, arch_sh_up}
++@@ -202,8 +202,8 @@
++ 	setrc #4                  ;!/* 10000010i8*1.... setrc #<imm>        */{"setrc",{A_IMM},{HEX_8,HEX_2,IMM0_8}, arch_sh_dsp_up}
++ 	repeat 10 20 r4           ;!/* repeat start end <REG_N>       	*/{"repeat",{A_DISP_PC,A_DISP_PC,A_REG_N},{REPEAT,REG_N,HEX_1,HEX_4}, arch_sh_dsp_up}
++ 	repeat 10 20 #4           ;!/* repeat start end #<imm>        	*/{"repeat",{A_DISP_PC,A_DISP_PC,A_IMM},{REPEAT,HEX_2,IMM0_8,HEX_8}, arch_sh_dsp_up}
++-	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_up}
++-	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_up}
+++	shad r5,r4                ;!/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
+++	shld r5,r4                ;!/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_or_sh2j_nofpu_up}
++ 	shal r4                   ;!/* 0100nnnn00100000 shal <REG_N>        */{"shal",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_0}, arch_sh_up}
++ 	shar r4                   ;!/* 0100nnnn00100001 shar <REG_N>        */{"shar",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_1}, arch_sh_up}
++ 	shll r4                   ;!/* 0100nnnn00000000 shll <REG_N>        */{"shll",{A_REG_N},{HEX_4,REG_N,HEX_0,HEX_0}, arch_sh_up}
++diff -ur binutils-2.32.orig/include/elf/sh.h binutils-2.32/include/elf/sh.h
++--- binutils-2.32.orig/include/elf/sh.h	2019-01-19 11:01:33.000000000 -0500
+++++ binutils-2.32/include/elf/sh.h	2019-05-26 15:07:03.590950676 -0400
++@@ -39,6 +39,7 @@
++ #define EF_SH2E            11
++ #define EF_SH4A		   12
++ #define EF_SH2A            13
+++#define EF_SHJ2            14
++ 
++ #define EF_SH4_NOFPU	   16
++ #define EF_SH4A_NOFPU	   17
++@@ -50,6 +51,7 @@
++ #define EF_SH2A_SH3_NOFPU  22
++ #define EF_SH2A_SH4        23
++ #define EF_SH2A_SH3E       24
+++#define EF_SH2A_SH3_SHJ2   25
++ 
++ /* This one can only mix in objects from other EF_SH5 objects.  */
++ #define EF_SH5		  10
++@@ -72,7 +74,8 @@
++ /* EF_SH2E		*/ bfd_mach_sh2e	, \
++ /* EF_SH4A		*/ bfd_mach_sh4a	, \
++ /* EF_SH2A		*/ bfd_mach_sh2a        , \
++-/* 14, 15		*/ 0, 0, \
+++/* EF_SHJ2		*/ bfd_mach_shj2        , \
+++/* 15			*/ 0, \
++ /* EF_SH4_NOFPU		*/ bfd_mach_sh4_nofpu	, \
++ /* EF_SH4A_NOFPU	*/ bfd_mach_sh4a_nofpu	, \
++ /* EF_SH4_NOMMU_NOFPU	*/ bfd_mach_sh4_nommu_nofpu, \
++@@ -81,7 +84,8 @@
++ /* EF_SH2A_SH4_NOFPU    */ bfd_mach_sh2a_nofpu_or_sh4_nommu_nofpu, \
++ /* EF_SH2A_SH3_NOFPU    */ bfd_mach_sh2a_nofpu_or_sh3_nommu, \
++ /* EF_SH2A_SH4          */ bfd_mach_sh2a_or_sh4 , \
++-/* EF_SH2A_SH3E         */ bfd_mach_sh2a_or_sh3e
+++/* EF_SH2A_SH3E         */ bfd_mach_sh2a_or_sh3e, \
+++/* EF_SH2A_SH3_SHJ2_NOFPU */ bfd_mach_sh2a_nofpu_or_sh3_nommu_or_shj2_nofpu
++ 
++ /* Convert arch_sh* into EF_SH*.  */
++ int sh_find_elf_flags (unsigned int arch_set);
++diff -ur binutils-2.32.orig/opcodes/sh-dis.c binutils-2.32/opcodes/sh-dis.c
++--- binutils-2.32.orig/opcodes/sh-dis.c	2019-01-19 11:01:34.000000000 -0500
+++++ binutils-2.32/opcodes/sh-dis.c	2019-05-26 15:07:03.593950688 -0400
++@@ -856,6 +856,9 @@
++ 	    case XMTRX_M4:
++ 	      fprintf_fn (stream, "xmtrx");
++ 	      break;
+++	    case A_IND_0:
+++	      fprintf_fn (stream, "@r0");
+++	      break;
++ 	    default:
++ 	      abort ();
++ 	    }
++Only in binutils-2.32/opcodes: sh-dis.c.orig
++diff -ur binutils-2.32.orig/opcodes/sh-opc.h binutils-2.32/opcodes/sh-opc.h
++--- binutils-2.32.orig/opcodes/sh-opc.h	2019-01-19 11:01:34.000000000 -0500
+++++ binutils-2.32/opcodes/sh-opc.h	2019-05-26 15:07:03.597950705 -0400
++@@ -191,7 +191,8 @@
++     FPUL_N,
++     FPUL_M,
++     FPSCR_N,
++-    FPSCR_M
+++    FPSCR_M,
+++    A_IND_0
++   }
++ sh_arg_type;
++ 
++@@ -215,9 +216,11 @@
++ #define arch_sh4_base	    (1 << 5)
++ #define arch_sh4a_base	    (1 << 6)
++ #define arch_sh2a_base      (1 << 7)
++-#define arch_sh_base_mask   MASK (0, 7)
+++#define arch_shj2_base      (1 << 8)
+++#define arch_sh2a_sh3_shj2_base  (1 << 9)
+++#define arch_sh_base_mask   MASK (0, 9)
++ 
++-/* Bits 8 ... 24 are currently free.  */
+++/* Bits 10 ... 24 are currently free.  */
++ 
++ /* This is an annotation on instruction types, but we
++    abuse the arch field in instructions to denote it.  */
++@@ -255,6 +258,8 @@
++ #define arch_sh2a_nofpu_or_sh3_nommu       (arch_sh2a_sh3_base|arch_sh_no_mmu |arch_sh_no_co)
++ #define arch_sh2a_or_sh3e                  (arch_sh2a_sh4_base|arch_sh_no_mmu |arch_sh_sp_fpu)
++ #define arch_sh2a_or_sh4                   (arch_sh2a_sh4_base|arch_sh_no_mmu |arch_sh_dp_fpu)
+++#define arch_shj2                          (arch_shj2_base    |arch_sh_no_mmu |arch_sh_no_co)
+++#define arch_sh2a_nofpu_or_sh3_nommu_or_shj2_nofpu       (arch_sh2a_sh3_shj2_base|arch_sh_no_mmu |arch_sh_no_co)
++ 
++ #define SH_MERGE_ARCH_SET(SET1, SET2) ((SET1) & (SET2))
++ #define SH_VALID_BASE_ARCH_SET(SET) (((SET) & arch_sh_base_mask) != 0)
++@@ -319,7 +324,8 @@
++ #define arch_sh2_up                            (arch_sh2 \
++ 		| arch_sh2e_up \
++ 		| arch_sh2a_nofpu_or_sh3_nommu_up \
++-		| arch_sh_dsp_up)
+++		| arch_sh_dsp_up \
+++		| arch_shj2_up)
++ #define arch_sh2a_nofpu_or_sh3_nommu_up        (arch_sh2a_nofpu_or_sh3_nommu \
++ 		| arch_sh2a_nofpu_or_sh4_nommu_nofpu_up \
++ 		| arch_sh2a_or_sh3e_up \
++@@ -345,6 +351,12 @@
++ #define arch_sh4a_nofpu_up                     (arch_sh4a_nofpu \
++ 		| arch_sh4a_up \
++ 		| arch_sh4al_dsp_up)
+++#define arch_shj2_up		       	       ( arch_shj2)
+++#define arch_sh2a_nofpu_or_sh3_nommu_or_shj2_nofpu_up (arch_sh2a_nofpu_or_sh3_nommu \
+++		| arch_sh2a_nofpu_or_sh4_nommu_nofpu_up \
+++		| arch_sh2a_or_sh3e_up \
+++		| arch_sh3_nommu_up \
+++		| arch_shj2_up)
++ 
++ /* Right branches.  */
++ #define arch_sh2e_up                           (arch_sh2e \
++@@ -713,9 +725,9 @@
++ 
++ /* repeat start end #<imm>        	*/{"repeat",{A_DISP_PC,A_DISP_PC,A_IMM},{REPEAT,HEX_2,IMM0_8,HEX_8}, arch_sh_dsp_up},
++ 
++-/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_up},
+++/* 0100nnnnmmmm1100 shad <REG_M>,<REG_N>*/{"shad",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_C}, arch_sh2a_nofpu_or_sh3_nommu_or_shj2_nofpu_up},
++ 
++-/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_up},
+++/* 0100nnnnmmmm1101 shld <REG_M>,<REG_N>*/{"shld",{ A_REG_M,A_REG_N},{HEX_4,REG_N,REG_M,HEX_D}, arch_sh2a_nofpu_or_sh3_nommu_or_shj2_nofpu_up},
++ 
++ /* 0100nnnn00100000 shal <REG_N>        */{"shal",{A_REG_N},{HEX_4,REG_N,HEX_2,HEX_0}, arch_sh_up},
++ 
++@@ -1193,7 +1205,7 @@
++ {"movu.b",{A_DISP_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_1,HEX_8,DISP0_12}, arch_sh2a_nofpu_up | arch_op32},
++ /* 0011nnnnmmmm0001 1001dddddddddddd movu.w @(<DISP12>,<REG_M>),<REG_N> */
++ {"movu.w",{A_DISP_REG_M,A_REG_N},{HEX_3,REG_N,REG_M,HEX_1,HEX_9,DISP0_12BY2}, arch_sh2a_nofpu_up | arch_op32},
++-
+++  /* 0010nnnnmmmm0011 cas.l Rm,Rn,@R0 */       {"cas.l", { A_REG_M,A_REG_N,A_IND_0},{HEX_2,REG_N,REG_M,HEX_3}, arch_shj2_up},
++ { 0, {0}, {0}, 0 }
++ };
++ 
++Only in binutils-2.32/opcodes: sh-opc.h.orig
+diff --git a/patches/binutils-2.46.0/0001-sh-conf.patch b/patches/binutils-2.46.0/0001-sh-conf.patch
+new file mode 100644
+index 0000000..66104ca
+--- /dev/null
++++ b/patches/binutils-2.46.0/0001-sh-conf.patch
+@@ -0,0 +1,50 @@
++From 0bf75276c392cac7794e78e1572abcd793d99e4e Mon Sep 17 00:00:00 2001
++From: Romain Naour <romain.naour@gmail.com>
++Date: Fri, 25 Dec 2015 11:38:13 +0100
++Subject: [PATCH] sh-conf
++
++Likewise, binutils has no idea about any of these new targets either, so we
++fix that up too.. now we're able to actually build a real toolchain for
++sh2a_nofpu- and other more ineptly named toolchains (and yes, there are more
++inept targets than that one, really. Go look, I promise).
++
++Upstream: N/A [Buildroot specific]
++
++[Romain: rebase on top of 2.32]
++Signed-off-by: Romain Naour <romain.naour@gmail.com>
++[Thomas: rebase on top of 2.29, in which sh64 support was removed.]
++Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
++---
++ configure    | 2 +-
++ configure.ac | 2 +-
++ 2 files changed, 2 insertions(+), 2 deletions(-)
++
++diff --git a/configure b/configure
++index bbfb5979546..bcd95684ae1 100755
++--- a/configure
+++++ b/configure
++@@ -4056,7 +4056,7 @@ case "${target}" in
++   nvptx*-*-*)
++     noconfigdirs="$noconfigdirs target-libssp target-libstdc++-v3 target-libobjc"
++     ;;
++-  sh-*-*)
+++  sh*-*-*)
++     case "${target}" in
++       sh*-*-elf)
++          ;;
++diff --git a/configure.ac b/configure.ac
++index f9694cdf901..d6a3623ba50 100644
++--- a/configure.ac
+++++ b/configure.ac
++@@ -1278,7 +1278,7 @@ case "${target}" in
++   nvptx*-*-*)
++     noconfigdirs="$noconfigdirs target-libssp target-libstdc++-v3 target-libobjc"
++     ;;
++-  sh-*-*)
+++  sh*-*-*)
++     case "${target}" in
++       sh*-*-elf)
++          ;;
++-- 
++2.51.1
++
+diff --git a/patches/binutils-2.46.0/0002-poison-system-directories.patch b/patches/binutils-2.46.0/0002-poison-system-directories.patch
+new file mode 100644
+index 0000000..fc60b58
+--- /dev/null
++++ b/patches/binutils-2.46.0/0002-poison-system-directories.patch
+@@ -0,0 +1,310 @@
++From 92f4bd0e1713577e30491e99a0226088eaeae740 Mon Sep 17 00:00:00 2001
++From: Romain Naour <romain.naour@gmail.com>
++Date: Fri, 25 Dec 2015 11:45:38 +0100
++Subject: [PATCH] poison-system-directories
++
++Patch adapted to binutils 2.23.2 and extended to use
++BR_COMPILER_PARANOID_UNSAFE_PATH by Thomas Petazzoni.
++
++[Waldemar: rebase on top of 2.43]
++Signed-off-by: Waldemar Brodkorb <wbx@openadk.org>
++[Waldemar: rebase on top of 2.39]
++Signed-off-by: Waldemar Brodkorb <wbx@openadk.org>
++[Romain: rebase on top of 2.33.1]
++Signed-off-by: Romain Naour <romain.naour@gmail.com>
++[Gustavo: adapt to binutils 2.25]
++Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
++Signed-off-by: Gustavo Zacarias <gustavo@zacarias.com.ar>
++
++Upstream-Status: Inappropriate [distribution: codesourcery]
++Upstream: N/A [Buildroot specific]
++
++Patch originally created by Mark Hatle, forward-ported to
++binutils 2.21 by Scott Garman.
++
++purpose:  warn for uses of system directories when cross linking
++
++Code Merged from Sourcery G++ binutils 2.19 - 4.4-277
++
++2008-07-02  Joseph Myers  <joseph@codesourcery.com>
++
++    ld/
++    * ld.h (args_type): Add error_poison_system_directories.
++    * ld.texinfo (--error-poison-system-directories): Document.
++    * ldfile.c (ldfile_add_library_path): Check
++    command_line.error_poison_system_directories.
++    * ldmain.c (main): Initialize
++    command_line.error_poison_system_directories.
++    * lexsup.c (enum option_values): Add
++    OPTION_ERROR_POISON_SYSTEM_DIRECTORIES.
++    (ld_options): Add --error-poison-system-directories.
++    (parse_args): Handle new option.
++
++2007-06-13  Joseph Myers  <joseph@codesourcery.com>
++
++    ld/
++    * config.in: Regenerate.
++    * ld.h (args_type): Add poison_system_directories.
++    * ld.texinfo (--no-poison-system-directories): Document.
++    * ldfile.c (ldfile_add_library_path): Check
++    command_line.poison_system_directories.
++    * ldmain.c (main): Initialize
++    command_line.poison_system_directories.
++    * lexsup.c (enum option_values): Add
++    OPTION_NO_POISON_SYSTEM_DIRECTORIES.
++    (ld_options): Add --no-poison-system-directories.
++    (parse_args): Handle new option.
++
++2007-04-20  Joseph Myers  <joseph@codesourcery.com>
++
++    Merge from Sourcery G++ binutils 2.17:
++
++    2007-03-20  Joseph Myers  <joseph@codesourcery.com>
++    Based on patch by Mark Hatle <mark.hatle@windriver.com>.
++    ld/
++    * configure.ac (--enable-poison-system-directories): New option.
++    * configure, config.in: Regenerate.
++    * ldfile.c (ldfile_add_library_path): If
++    ENABLE_POISON_SYSTEM_DIRECTORIES defined, warn for use of /lib,
++    /usr/lib, /usr/local/lib or /usr/X11R6/lib.
++
++Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
++Signed-off-by: Scott Garman <scott.a.garman@intel.com>
++---
++ ld/config.in    |  3 +++
++ ld/configure    | 14 ++++++++++++++
++ ld/configure.ac | 10 ++++++++++
++ ld/ld.h         |  8 ++++++++
++ ld/ld.texi      | 12 ++++++++++++
++ ld/ldfile.c     | 16 ++++++++++++++++
++ ld/ldlex.h      |  2 ++
++ ld/ldmain.c     |  2 ++
++ ld/lexsup.c     | 21 +++++++++++++++++++++
++ 9 files changed, 88 insertions(+)
++
++diff --git a/ld/config.in b/ld/config.in
++index 790efd336be..2b237bcda5e 100644
++--- a/ld/config.in
+++++ b/ld/config.in
++@@ -86,6 +86,9 @@
++    language is requested. */
++ #undef ENABLE_NLS
++ 
+++/* Define to warn for use of native system library directories */
+++#undef ENABLE_POISON_SYSTEM_DIRECTORIES
+++
++ /* Additional extension a shared object might have. */
++ #undef EXTRA_SHLIB_EXTENSION
++ 
++diff --git a/ld/configure b/ld/configure
++index cd410bd64d1..7e9913949d4 100755
++--- a/ld/configure
+++++ b/ld/configure
++@@ -841,6 +841,7 @@ enable_checking
++ with_lib_path
++ enable_targets
++ with_sysroot
+++enable_poison_system_directories
++ enable_gold
++ enable_got
++ enable_compressed_debug_sections
++@@ -1535,6 +1536,8 @@ Optional Features:
++   --disable-largefile     omit support for large files
++   --enable-checking       enable run-time checks
++   --enable-targets        alternative target configurations
+++  --enable-poison-system-directories
+++                          warn for use of native system library directories
++   --enable-gold[=ARG]     build gold [ARG={default,yes,no}]
++   --enable-got=<type>     GOT handling scheme (target, single, negative,
++                           multigot)
++@@ -15393,7 +15396,18 @@ else
++ fi
++ 
++ 
+++# Check whether --enable-poison-system-directories was given.
+++if test "${enable_poison_system_directories+set}" = set; then :
+++  enableval=$enable_poison_system_directories;
+++else
+++  enable_poison_system_directories=no
+++fi
+++
+++if test "x${enable_poison_system_directories}" = "xyes"; then
++ 
+++$as_echo "#define ENABLE_POISON_SYSTEM_DIRECTORIES 1" >>confdefs.h
+++
+++fi
++ 
++ # Check whether --enable-got was given.
++ if test "${enable_got+set}" = set; then :
++diff --git a/ld/configure.ac b/ld/configure.ac
++index f528ae42ef7..dcf1e17fae6 100644
++--- a/ld/configure.ac
+++++ b/ld/configure.ac
++@@ -115,6 +115,16 @@ AC_SUBST(use_sysroot)
++ AC_SUBST(TARGET_SYSTEM_ROOT)
++ AC_SUBST(TARGET_SYSTEM_ROOT_DEFINE)
++ 
+++AC_ARG_ENABLE([poison-system-directories],
+++         AS_HELP_STRING([--enable-poison-system-directories],
+++                [warn for use of native system library directories]),,
+++         [enable_poison_system_directories=no])
+++if test "x${enable_poison_system_directories}" = "xyes"; then
+++  AC_DEFINE([ENABLE_POISON_SYSTEM_DIRECTORIES],
+++       [1],
+++       [Define to warn for use of native system library directories])
+++fi
+++
++ dnl Use --enable-gold to decide if this linker should be the default.
++ dnl "install_as_default" is set to false if gold is the default linker.
++ dnl "installed_linker" is the installed BFD linker name.
++diff --git a/ld/ld.h b/ld/ld.h
++index c8688153bd4..0b16caf347a 100644
++--- a/ld/ld.h
+++++ b/ld/ld.h
++@@ -166,6 +166,14 @@ typedef struct
++      in the linker script.  */
++   bool force_group_allocation;
++ 
+++  /* If TRUE (the default) warn for uses of system directories when
+++     cross linking.  */
+++  bool poison_system_directories;
+++
+++  /* If TRUE (default FALSE) give an error for uses of system
+++     directories when cross linking instead of a warning.  */
+++  bool error_poison_system_directories;
+++
++   /* Big or little endian as set on command line.  */
++   enum endian_enum endian;
++ 
++diff --git a/ld/ld.texi b/ld/ld.texi
++index cf750d15259..1acaa26f107 100644
++--- a/ld/ld.texi
+++++ b/ld/ld.texi
++@@ -3362,6 +3362,18 @@ bit string identifying the original linked file does not change.
++ Passing @code{none} for @var{style} disables the setting from any
++ @code{--build-id} options earlier on the command line.
++ 
+++@kindex --no-poison-system-directories
+++@item --no-poison-system-directories
+++Do not warn for @option{-L} options using system directories such as
+++@file{/usr/lib} when cross linking.  This option is intended for use
+++in chroot environments when such directories contain the correct
+++libraries for the target system rather than the host.
+++
+++@kindex --error-poison-system-directories
+++@item --error-poison-system-directories
+++Give an error instead of a warning for @option{-L} options using
+++system directories when cross linking.
+++
++ @kindex --package-metadata=@var{JSON}
++ @item --package-metadata=@var{JSON}
++ Request the creation of a @code{.note.package} ELF note section.  The
++diff --git a/ld/ldfile.c b/ld/ldfile.c
++index 75fd360d5e3..3526ea8146c 100644
++--- a/ld/ldfile.c
+++++ b/ld/ldfile.c
++@@ -328,6 +328,22 @@ ldfile_add_library_path (const char *name, bool cmdline)
++     new_dirs->name = concat (ld_sysroot, name + strlen ("$SYSROOT"), (const char *) NULL);
++   else
++     new_dirs->name = xstrdup (name);
+++
+++#ifdef ENABLE_POISON_SYSTEM_DIRECTORIES
+++  if (command_line.poison_system_directories
+++  && ((!strncmp (name, "/lib", 4))
+++      || (!strncmp (name, "/usr/lib", 8))
+++      || (!strncmp (name, "/usr/local/lib", 14))
+++      || (!strncmp (name, "/usr/X11R6/lib", 14))))
+++   {
+++     if (command_line.error_poison_system_directories)
+++       einfo (_("%X%P: error: library search path \"%s\" is unsafe for "
+++            "cross-compilation\n"), name);
+++     else
+++       einfo (_("%P: warning: library search path \"%s\" is unsafe for "
+++            "cross-compilation\n"), name);
+++   }
+++#endif
++ }
++ 
++ static void
++diff --git a/ld/ldlex.h b/ld/ldlex.h
++index c8d61478c60..4b175dca108 100644
++--- a/ld/ldlex.h
+++++ b/ld/ldlex.h
++@@ -172,6 +172,8 @@ enum option_values
++   OPTION_CTF_VARIABLES,
++   OPTION_NO_CTF_VARIABLES,
++   OPTION_CTF_SHARE_TYPES,
+++  OPTION_NO_POISON_SYSTEM_DIRECTORIES,
+++  OPTION_ERROR_POISON_SYSTEM_DIRECTORIES,
++   OPTION_ERROR_EXECSTACK,
++   OPTION_NO_ERROR_EXECSTACK,
++   OPTION_WARN_EXECSTACK_OBJECTS,
++diff --git a/ld/ldmain.c b/ld/ldmain.c
++index 67c60c3f80d..c2365e4006c 100644
++--- a/ld/ldmain.c
+++++ b/ld/ldmain.c
++@@ -671,6 +671,8 @@ main (int argc, char **argv)
++   command_line.warn_mismatch = true;
++   command_line.warn_search_mismatch = true;
++   command_line.check_section_addresses = -1;
+++  command_line.poison_system_directories = true;
+++  command_line.error_poison_system_directories = false;
++ 
++   /* We initialize DEMANGLING based on the environment variable
++      COLLECT_NO_DEMANGLE.  The gcc collect2 program will demangle the
++diff --git a/ld/lexsup.c b/ld/lexsup.c
++index bde20465835..422866f4ea9 100644
++--- a/ld/lexsup.c
+++++ b/ld/lexsup.c
++@@ -652,6 +652,14 @@ static const struct ld_option ld_options[] =
++ 		   "                                <method> is: share-unconflicted (default),\n"
++ 		   "                                             share-duplicated"),
++     TWO_DASHES },
+++  { {"no-poison-system-directories", no_argument, NULL,
+++    OPTION_NO_POISON_SYSTEM_DIRECTORIES},
+++    '\0', NULL, N_("Do not warn for -L options using system directories"),
+++    TWO_DASHES },
+++  { {"error-poison-system-directories", no_argument, NULL,
+++    OPTION_ERROR_POISON_SYSTEM_DIRECTORIES},
+++    '\0', NULL, N_("Give an error for -L options using system directories"),
+++    TWO_DASHES },
++ };
++ 
++ #define OPTION_COUNT ARRAY_SIZE (ld_options)
++@@ -664,6 +672,7 @@ parse_args (unsigned argc, char **argv)
++   int ingroup = 0;
++   char *default_dirlist = NULL;
++   char *shortopts;
+++  char *BR_paranoid_env;
++   struct option *longopts;
++   struct option *really_longopts;
++   int last_optind;
++@@ -1800,6 +1809,14 @@ parse_args (unsigned argc, char **argv)
++ 	  }
++ 	  break;
++ 
+++	case OPTION_NO_POISON_SYSTEM_DIRECTORIES:
+++	  command_line.poison_system_directories = false;
+++	  break;
+++
+++	case OPTION_ERROR_POISON_SYSTEM_DIRECTORIES:
+++	  command_line.error_poison_system_directories = true;
+++	  break;
+++
++ 	case OPTION_PUSH_STATE:
++ 	  input_flags.pushed = xmemdup (&input_flags,
++ 					sizeof (input_flags),
++@@ -1944,6 +1961,10 @@ parse_args (unsigned argc, char **argv)
++       command_line.soname = NULL;
++     }
++ 
+++  BR_paranoid_env = getenv("BR_COMPILER_PARANOID_UNSAFE_PATH");
+++  if (BR_paranoid_env && strlen(BR_paranoid_env) > 0)
+++    command_line.error_poison_system_directories = true;
+++
++   while (ingroup)
++     {
++       einfo (_("%P: missing --end-group; added as last command line option\n"));
++-- 
++2.51.1
++
+diff --git a/patches/binutils-2.46.0/0002-sh-fdpic-pr31619.diff b/patches/binutils-2.46.0/0002-sh-fdpic-pr31619.diff
+new file mode 100644
+index 0000000..9c57f39
+--- /dev/null
++++ b/patches/binutils-2.46.0/0002-sh-fdpic-pr31619.diff
+@@ -0,0 +1,33 @@
++--- binutils-2.33.1/bfd/elf32-sh.c.orig	2024-04-04 23:11:28.739136261 +0900
+++++ binutils-2.33.1/bfd/elf32-sh.c	2024-04-08 23:14:24.496915074 +0900
++@@ -61,7 +61,7 @@
++    not.  If the symbol is protected, we want the local address, but
++    its function descriptor must be assigned by the dynamic linker.  */
++ #define SYMBOL_FUNCDESC_LOCAL(INFO, H) \
++-  (SYMBOL_REFERENCES_LOCAL (INFO, H) \
+++  (!(H) || (H)->dynindx < 0 || (H)->forced_local \
++    || ! elf_hash_table (INFO)->dynamic_sections_created)
++ 
++ #define SH_PARTIAL32 TRUE
++@@ -4405,20 +4405,6 @@
++ 	      /* Undefined weak symbol which will not be dynamically
++ 		 resolved later; leave it at zero.  */
++ 	      goto funcdesc_leave_zero;
++-	    else if (SYMBOL_CALLS_LOCAL (info, h)
++-		     && ! SYMBOL_FUNCDESC_LOCAL (info, h))
++-	      {
++-		/* If the symbol needs a non-local function descriptor
++-		   but binds locally (i.e., its visibility is
++-		   protected), emit a dynamic relocation decayed to
++-		   section+offset.  This is an optimization; the dynamic
++-		   linker would resolve our function descriptor request
++-		   to our copy of the function anyway.  */
++-		dynindx = elf_section_data (h->root.u.def.section
++-					    ->output_section)->dynindx;
++-		relocation += h->root.u.def.section->output_offset
++-		  + h->root.u.def.value;
++-	      }
++ 	    else if (! SYMBOL_FUNCDESC_LOCAL (info, h))
++ 	      {
++ 		/* If the symbol is dynamic and there will be dynamic
++
+diff --git a/patches/gcc-15.2.0/0001-disable-split-stack-for-non-thread-builds.patch b/patches/gcc-15.2.0/0001-disable-split-stack-for-non-thread-builds.patch
+new file mode 100644
+index 0000000..c3b600c
+--- /dev/null
++++ b/patches/gcc-15.2.0/0001-disable-split-stack-for-non-thread-builds.patch
+@@ -0,0 +1,26 @@
++From 7d5f59e035341430e20f47420535d0e987516e55 Mon Sep 17 00:00:00 2001
++From: Waldemar Brodkorb <wbx@openadk.org>
++Date: Mon, 25 Jul 2022 00:29:55 +0200
++Subject: [PATCH] disable split-stack for non-thread builds
++
++Signed-off-by: Waldemar Brodkorb <wbx@openadk.org>
++[Romain: convert to git format]
++Signed-off-by: Romain Naour <romain.naour@smile.fr>
++---
++ libgcc/config/t-stack | 2 ++
++ 1 file changed, 2 insertions(+)
++
++diff --git a/libgcc/config/t-stack b/libgcc/config/t-stack
++index cc0366b4cd8..f3f97e86d60 100644
++--- a/libgcc/config/t-stack
+++++ b/libgcc/config/t-stack
++@@ -1,4 +1,6 @@
++ # Makefile fragment to provide generic support for -fsplit-stack.
++ # This should be used in config.host for any host which supports
++ # -fsplit-stack.
+++ifeq ($(enable_threads),yes)
++ LIB2ADD_ST += $(srcdir)/generic-morestack.c $(srcdir)/generic-morestack-thread.c
+++endif
++-- 
++2.50.1
++
+diff --git a/patches/gcc-15.2.0/0001-ssp_nonshared.diff b/patches/gcc-15.2.0/0001-ssp_nonshared.diff
+new file mode 100644
+index 0000000..b250f15
+--- /dev/null
++++ b/patches/gcc-15.2.0/0001-ssp_nonshared.diff
+@@ -0,0 +1,14 @@
++diff --git a/gcc/gcc.cc b/gcc/gcc.cc
++index 7837553958b..3c81c5798d8 100644
++--- a/gcc/gcc.cc
+++++ b/gcc/gcc.cc
++@@ -980,7 +980,8 @@ proper position among the other output files.  */
++ #ifndef LINK_SSP_SPEC
++ #ifdef TARGET_LIBC_PROVIDES_SSP
++ #define LINK_SSP_SPEC "%{fstack-protector|fstack-protector-all" \
++-		       "|fstack-protector-strong|fstack-protector-explicit:}"
+++		       "|fstack-protector-strong|fstack-protector-explicit" \
+++		       ":-lssp_nonshared}"
++ #else
++ #define LINK_SSP_SPEC "%{fstack-protector|fstack-protector-all" \
++ 		       "|fstack-protector-strong|fstack-protector-explicit" \
+diff --git a/patches/gcc-15.2.0/0002-MicroBlaze-Enhance-support-for-atomics.-Fix-PR118280.patch b/patches/gcc-15.2.0/0002-MicroBlaze-Enhance-support-for-atomics.-Fix-PR118280.patch
+new file mode 100644
+index 0000000..958339b
+--- /dev/null
++++ b/patches/gcc-15.2.0/0002-MicroBlaze-Enhance-support-for-atomics.-Fix-PR118280.patch
+@@ -0,0 +1,286 @@
++From f14e0b13a5abbc15b4b3b4c0c6a125bbb0509465 Mon Sep 17 00:00:00 2001
++From: Gopi Kumar Bulusu <gopi@sankhya.com>
++Date: Thu, 10 Jul 2025 12:44:44 +0530
++Subject: [PATCH] MicroBlaze : Enhance support for atomics. Fix PR118280
++
++Atomic support enhanced to fix existing atomic_compare_and_swapsi pattern
++to handle side effects; new patterns atomic_fetch_op and atomic_test_and_set
++added. As MicroBlaze has no QImode test/set instruction, use shift magic
++to implement atomic_test_and_set. This fixes PR118280.
++
++Files Changed
++
++* gcc/config/microblaze/iterators.md: New
++* microblaze-protos.h/microblaze.cc : Add microblaze_subword_address
++* gcc/config/microblaze/microblaze.md: constants: Add UNSPECV_CAS_BOOL,
++  UNSPECV_CAS_MEM, UNSPECV_CAS_VAL, UNSPECV_ATOMIC_FETCH_OP
++  type: add atomic
++* gcc/config/microblaze/sync.md: Add atomic_fetch_<atomic_optab>si
++  atomic_test_and_set
++
++Fixes: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=118280
++Upstream: https://patchwork.ozlabs.org/project/gcc/list/?series=466193
++
++Signed-off-by: Kirk Meyer <kirk.meyer@sencore.com>
++Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
++Signed-off-by: Gopi Kumar Bulusu <gopi@sankhya.com>
++---
++ gcc/config/microblaze/iterators.md        |  25 +++++
++ gcc/config/microblaze/microblaze-protos.h |   1 +
++ gcc/config/microblaze/microblaze.cc       |  28 ++++++
++ gcc/config/microblaze/microblaze.h        |   2 +-
++ gcc/config/microblaze/microblaze.md       |   7 +-
++ gcc/config/microblaze/sync.md             | 107 ++++++++++++++++++----
++ 6 files changed, 150 insertions(+), 20 deletions(-)
++ create mode 100644 gcc/config/microblaze/iterators.md
++
++diff --git a/gcc/config/microblaze/iterators.md b/gcc/config/microblaze/iterators.md
++new file mode 100644
++index 00000000000..2ffc2422a0a
++--- /dev/null
+++++ b/gcc/config/microblaze/iterators.md
++@@ -0,0 +1,25 @@
+++;; Iterator definitions for GCC MicroBlaze machine description files.
+++;; Copyright (C) 2012-2024 Free Software Foundation, Inc.
+++;;
+++;; This file is part of GCC.
+++;;
+++;; GCC is free software; you can redistribute it and/or modify
+++;; it under the terms of the GNU General Public License as published by
+++;; the Free Software Foundation; either version 3, or (at your option)
+++;; any later version.
+++;;
+++;; GCC is distributed in the hope that it will be useful,
+++;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+++;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+++;; GNU General Public License for more details.
+++;;
+++;; You should have received a copy of the GNU General Public License
+++;; along with GCC; see the file COPYING3.  If not see
+++;; <http://www.gnu.org/licenses/>.
+++
+++; atomics code iterator
+++(define_code_iterator any_atomic [plus ior xor and])
+++
+++; atomics code attribute
+++(define_code_attr atomic_optab
+++  [(plus "add") (ior "or") (xor "xor") (and "and")])
++diff --git a/gcc/config/microblaze/microblaze-protos.h b/gcc/config/microblaze/microblaze-protos.h
++index 90b79cfe716..1cee0b3096c 100644
++--- a/gcc/config/microblaze/microblaze-protos.h
+++++ b/gcc/config/microblaze/microblaze-protos.h
++@@ -62,6 +62,7 @@ extern int symbol_mentioned_p (rtx);
++ extern int label_mentioned_p (rtx);
++ extern bool microblaze_cannot_force_const_mem (machine_mode, rtx);
++ extern void microblaze_eh_return (rtx op0);
+++extern void microblaze_subword_address (rtx, rtx *, rtx *);
++ #endif  /* RTX_CODE */
++ 
++ /* Declare functions in microblaze-c.cc.  */
++diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
++index 4b7f0a1a5e0..78b9428ef3b 100644
++--- a/gcc/config/microblaze/microblaze.cc
+++++ b/gcc/config/microblaze/microblaze.cc
++@@ -1300,6 +1300,34 @@ microblaze_expand_block_move (rtx dest, rtx src, rtx length, rtx align_rtx)
++   return false;
++ }
++ 
+++/* Compute memory address *aligned_mem and corresponding shift value (*shift)
+++   from a QImode memory reference MEM */
+++void
+++microblaze_subword_address (rtx mem, rtx *aligned_mem, rtx *shift)
+++{
+++  /* Align the memory address to a word.  */
+++  rtx addr = force_reg (Pmode, XEXP (mem, 0));
+++
+++  rtx addr_mask = gen_int_mode (-4, Pmode);
+++
+++  rtx aligned_addr = gen_reg_rtx (Pmode);
+++
+++  emit_move_insn (aligned_addr,  gen_rtx_AND (Pmode, addr, addr_mask));
+++
+++  *aligned_mem = change_address (mem, SImode, aligned_addr);
+++
+++  /* Calculate the shift amount.  */
+++  emit_move_insn (*shift, gen_rtx_AND (SImode, addr, gen_int_mode (3, SImode)));
+++
+++  if (TARGET_LITTLE_ENDIAN == 0) {
+++    emit_move_insn (*shift,
+++		    gen_rtx_MINUS (SImode, gen_int_mode (3, SImode), *shift));
+++  }
+++
+++  emit_move_insn (*shift, gen_rtx_ASHIFT (SImode, *shift,
+++					  gen_int_mode (3, SImode)));
+++}
+++
++ static bool
++ microblaze_rtx_costs (rtx x, machine_mode mode, int outer_code ATTRIBUTE_UNUSED,
++ 		      int opno ATTRIBUTE_UNUSED, int *total,
++diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
++index 2390542434b..b2e9ccde363 100644
++--- a/gcc/config/microblaze/microblaze.h
+++++ b/gcc/config/microblaze/microblaze.h
++@@ -57,7 +57,7 @@ extern enum pipeline_type microblaze_pipe;
++ 
++ /* Default target_flags if no switches are specified  */
++ #define TARGET_DEFAULT      (MASK_SOFT_MUL | MASK_SOFT_DIV | MASK_SOFT_FLOAT \
++-                             | TARGET_ENDIAN_DEFAULT)
+++			      | TARGET_ENDIAN_DEFAULT)
++ 
++ /* Do we have CLZ?  */
++ #define TARGET_HAS_CLZ      (TARGET_PATTERN_COMPARE && microblaze_has_clz)
++diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
++index 45c48a71e8d..270df8da0c5 100644
++--- a/gcc/config/microblaze/microblaze.md
+++++ b/gcc/config/microblaze/microblaze.md
++@@ -21,6 +21,7 @@
++ 
++ (include "constraints.md")
++ (include "predicates.md")
+++(include "iterators.md")
++ 
++ ;;----------------------------------------------------
++ ;; Constants
++@@ -43,6 +44,10 @@
++   (UNSPEC_TLS           106)    ;; jump table
++   (UNSPEC_SET_TEXT      107)    ;; set text start
++   (UNSPEC_TEXT          108)    ;; data text relative
+++  (UNSPECV_CAS_BOOL     201)    ;; compare and swap (bool)
+++  (UNSPECV_CAS_VAL      202)    ;; compare and swap (val)
+++  (UNSPECV_CAS_MEM      203)    ;; compare and swap (mem)
+++  (UNSPECV_ATOMIC_FETCH_OP     204)    ;; atomic fetch op
++ ])
++ 
++ (define_c_enum "unspec" [
++@@ -79,7 +84,7 @@
++ ;; bshift 	Shift operations
++ 
++ (define_attr "type"
++-  "unknown,branch,jump,call,load,store,move,arith,darith,imul,idiv,icmp,multi,nop,no_delay_arith,no_delay_load,no_delay_store,no_delay_imul,no_delay_move,bshift,fadd,frsub,fmul,fdiv,fcmp,fsl,fsqrt,fcvt,trap"
+++  "unknown,branch,jump,call,load,store,move,arith,darith,imul,idiv,icmp,multi,nop,no_delay_arith,no_delay_load,no_delay_store,no_delay_imul,no_delay_move,bshift,fadd,frsub,fmul,fdiv,fcmp,fsl,fsqrt,fcvt,trap,atomic"
++   (const_string "unknown"))
++ 
++ ;; Main data type used by the insn
++diff --git a/gcc/config/microblaze/sync.md b/gcc/config/microblaze/sync.md
++index db7b11e5379..6478ab6dcac 100644
++--- a/gcc/config/microblaze/sync.md
+++++ b/gcc/config/microblaze/sync.md
++@@ -18,26 +18,97 @@
++ ;; <http://www.gnu.org/licenses/>.
++ 
++ (define_insn "atomic_compare_and_swapsi"
++-  [(match_operand:SI 0 "register_operand" "=&d")	;; bool output
++-   (match_operand:SI 1 "register_operand" "=&d")	;; val output
++-   (match_operand:SI 2 "nonimmediate_operand" "+Q")	;; memory
++-   (match_operand:SI 3 "register_operand" "d")		;; expected value
++-   (match_operand:SI 4 "register_operand" "d")		;; desired value
++-   (match_operand:SI 5 "const_int_operand" "")		;; is_weak
++-   (match_operand:SI 6 "const_int_operand" "")		;; mod_s
++-   (match_operand:SI 7 "const_int_operand" "")		;; mod_f
+++  [(set (match_operand:SI 0 "register_operand" "=&d")		;; bool output
+++        (unspec_volatile:SI
+++          [(match_operand:SI 2 "nonimmediate_operand" "+Q")	;; memory
+++           (match_operand:SI 3 "register_operand" "d")		;; expected value
+++           (match_operand:SI 4 "register_operand" "d")]		;; desired value
+++          UNSPECV_CAS_BOOL))
+++   (set (match_operand:SI 1 "register_operand" "=&d")		;; val output
+++        (unspec_volatile:SI [(const_int 0)] UNSPECV_CAS_VAL))
+++   (set (match_dup 2)
+++        (unspec_volatile:SI [(const_int 0)] UNSPECV_CAS_MEM))
+++   (match_operand:SI 5 "const_int_operand" "")			;; is_weak
+++   (match_operand:SI 6 "const_int_operand" "")			;; mod_s
+++   (match_operand:SI 7 "const_int_operand" "")			;; mod_f
++    (clobber (match_scratch:SI 8 "=&d"))]
++   ""
++   {
++-    output_asm_insn ("addc \tr0,r0,r0", operands);
++-    output_asm_insn ("lwx  \t%1,%y2,r0", operands);
++-    output_asm_insn ("addic\t%8,r0,0", operands);
++-    output_asm_insn ("bnei \t%8,.-8", operands);
++-    output_asm_insn ("cmp  \t%0,%1,%3", operands);
++-    output_asm_insn ("bnei \t%0,.+16", operands);
++-    output_asm_insn ("swx  \t%4,%y2,r0", operands);
++-    output_asm_insn ("addic\t%8,r0,0", operands);
++-    output_asm_insn ("bnei \t%8,.-28", operands);
++-    return "";
+++    return "add  \t%0,r0,r0\n\t"
+++      "lwx  \t%1,%y2,r0\n\t"
+++      "addic\t%8,r0,0\n\t"
+++      "bnei \t%8,.-8\n\t"
+++      "cmp  \t%8,%1,%3\n\t"
+++      "bnei \t%8,.+20\n\t"
+++      "swx  \t%4,%y2,r0\n\t"
+++      "addic\t%8,r0,0\n\t"
+++      "bnei \t%8,.-28\n\t"
+++      "addi \t%0,r0,1";
++   }
+++  [(set_attr "type"	"atomic")
+++  (set_attr "mode"	"SI")
+++  (set_attr "length"	"40")]
++ )
+++
+++;;
+++;;
+++;;
+++;;
+++(define_insn "atomic_fetch_<atomic_optab>si"
+++  [(set (match_operand:SI 0 "register_operand" "=&d")
+++	(match_operand:SI 1 "memory_operand" "+Q"))
+++   (set (match_dup 1)
+++	(unspec_volatile:SI
+++	  [(any_atomic:SI (match_dup 1)
+++		   (match_operand:SI 2 "register_operand" "d"))
+++	   (match_operand:SI 3 "const_int_operand")] ;; model
+++	 UNSPECV_ATOMIC_FETCH_OP))
+++   (clobber (match_scratch:SI 4 "=&d"))]	  ;; tmp_1
+++  ""
+++  {
+++    return 
+++      "lwx  \t%0,%y1,r0\n\t"
+++      "addic\t%4,r0,0\n\t"
+++      "bnei \t%4,.-8\n\t"
+++      "<atomic_optab>\t%4,%0,%2\n\t"
+++      "swx  \t%4,%y1,r0\n\t"
+++      "addic\t%4,r0,0\n\t"
+++      "bnei \t%4,.-24";
+++  }
+++  [(set_attr "type"	"atomic")
+++  (set_attr "mode"	"SI")
+++  (set_attr "length"	"28")])
+++
+++;;
+++;; MicroBlaze only supports lx/sx instructions for word mode only
+++;;
+++;; Use shift|mask magic to implement atomic_test_and_set using lwx/swx
+++;;
+++(define_expand "atomic_test_and_set"
+++  [(match_operand:QI 0 "register_operand" "")    ;; bool output
+++   (match_operand:QI 1 "memory_operand" "m")    ;; memory
+++   (match_operand:SI 2 "const_int_operand" "")]  ;; model
+++  ""
+++{
+++  rtx old = gen_reg_rtx (SImode);
+++  rtx mem = operands[1];
+++  rtx model = operands[2];
+++  rtx set = gen_reg_rtx (SImode);
+++  rtx aligned_mem = gen_reg_rtx (SImode);
+++  rtx shift = gen_reg_rtx (SImode);
+++
+++  microblaze_subword_address (mem, &aligned_mem, &shift);
+++
+++  emit_move_insn (set, GEN_INT (1));
+++  rtx shifted_set = gen_reg_rtx (SImode);
+++
+++  emit_move_insn (shifted_set, gen_rtx_ASHIFT (SImode, set, shift));
+++
+++  emit_insn (gen_atomic_fetch_orsi (old, aligned_mem, shifted_set, model));
+++
+++  emit_move_insn (old, gen_rtx_ASHIFTRT (SImode, old, shift));
+++
+++  emit_move_insn (operands[0], gen_lowpart (QImode, old));
+++
+++  DONE;
+++})
++-- 
++2.50.1
++
+diff --git a/patches/gcc-15.2.0/0002-posix_memalign.diff b/patches/gcc-15.2.0/0002-posix_memalign.diff
+new file mode 100644
+index 0000000..1d80096
+--- /dev/null
++++ b/patches/gcc-15.2.0/0002-posix_memalign.diff
+@@ -0,0 +1,30 @@
++diff --git a/gcc/config/i386/pmm_malloc.h b/gcc/config/i386/pmm_malloc.h
++index 1b0bfe37852..d7b2b19bb3c 100644
++--- a/gcc/config/i386/pmm_malloc.h
+++++ b/gcc/config/i386/pmm_malloc.h
++@@ -27,12 +27,13 @@
++ #include <stdlib.h>
++ 
++ /* We can't depend on <stdlib.h> since the prototype of posix_memalign
++-   may not be visible.  */
+++   may not be visible and we can't pollute the namespace either.  */
++ #ifndef __cplusplus
++-extern int posix_memalign (void **, size_t, size_t);
+++extern int _mm_posix_memalign (void **, size_t, size_t)
++ #else
++-extern "C" int posix_memalign (void **, size_t, size_t) throw ();
+++extern "C" int _mm_posix_memalign (void **, size_t, size_t) throw ()
++ #endif
+++__asm__("posix_memalign");
++ 
++ static __inline void *
++ _mm_malloc (size_t __size, size_t __alignment)
++@@ -42,7 +43,7 @@ _mm_malloc (size_t __size, size_t __alignment)
++     return malloc (__size);
++   if (__alignment == 2 || (sizeof (void *) == 8 && __alignment == 4))
++     __alignment = sizeof (void *);
++-  if (posix_memalign (&__ptr, __alignment, __size) == 0)
+++  if (_mm_posix_memalign (&__ptr, __alignment, __size) == 0)
++     return __ptr;
++   else
++     return NULL;
+diff --git a/patches/gcc-15.2.0/0003-gcc-config-microblaze-fix-ira-for-GCC15.patch b/patches/gcc-15.2.0/0003-gcc-config-microblaze-fix-ira-for-GCC15.patch
+new file mode 100644
+index 0000000..663aab7
+--- /dev/null
++++ b/patches/gcc-15.2.0/0003-gcc-config-microblaze-fix-ira-for-GCC15.patch
+@@ -0,0 +1,56 @@
++From d2fdbd8c4abe67eea86877dfb3b3b9d8508c165f Mon Sep 17 00:00:00 2001
++From: Romain Naour <romain.naour@gmail.com>
++Date: Wed, 6 Aug 2025 22:32:30 +0200
++Subject: [PATCH] gcc/config/microblaze: fix ira for GCC15
++
++Add new hooks for callee-save on microblaze defined by [1] and
++return 1 to restore the old behavior prior to the commit [3].
++
++Tested with qemu_microblazeel_mmu_defconfig and used to generate
++Microblaze toolchains for the Bootlin toolchains 2025.08-1 [4][5].
++
++Upstream: suggested in the bug report: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=121432#c10
++
++[1] https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=b191e8bdecf881d11c1544c441e38f4c18392a15
++[2] https://gcc.gnu.org/git/?p=gcc.git;a=blob;f=gcc/config/i386/i386.cc;h=3128973ba79cccfc6761f451dcb716b9558cc4da;hb=d3ff498c478acefce35de04402f99171b4f64a1a#l20606
++[3] https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=3b9b8d6cfdf59337f4b7ce10ce92a98044b2657b
++[4] https://lore.kernel.org/buildroot/87sehzndtp.fsf@dell.be.48ers.dk/T/#mce7decd0b3f6a41008d5de577538a8525c91b374
++[5] https://toolchains.bootlin.com/
++
++Signed-off-by: Romain Naour <romain.naour@gmail.com>
++---
++ gcc/config/microblaze/microblaze.cc | 11 +++++++++++
++ 1 file changed, 11 insertions(+)
++
++diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
++index 78b9428ef3b..84ea7e8d55a 100644
++--- a/gcc/config/microblaze/microblaze.cc
+++++ b/gcc/config/microblaze/microblaze.cc
++@@ -3228,6 +3228,14 @@ microblaze_secondary_reload (bool in_p ATTRIBUTE_UNUSED, rtx x ATTRIBUTE_UNUSED,
++   return NO_REGS;
++ }
++ 
+++/* Implement TARGET_CALLEE_SAVE_COST.  */
+++static int
+++microblaze_callee_save_cost (spill_cost_type, unsigned int hard_regno, machine_mode,
+++		       unsigned int, int mem_cost, const HARD_REG_SET &, bool)
+++{
+++  return 1;
+++}
+++
++ static void
++ microblaze_globalize_label (FILE * stream, const char *name)
++ {
++@@ -4066,6 +4074,9 @@ microblaze_starting_frame_offset (void)
++ #undef TARGET_SECONDARY_RELOAD
++ #define TARGET_SECONDARY_RELOAD		microblaze_secondary_reload
++ 
+++#undef TARGET_CALLEE_SAVE_COST
+++#define TARGET_CALLEE_SAVE_COST microblaze_callee_save_cost
+++
++ #undef  TARGET_ASM_OUTPUT_MI_THUNK
++ #define TARGET_ASM_OUTPUT_MI_THUNK      microblaze_asm_output_mi_thunk
++ 
++-- 
++2.50.1
++
+diff --git a/patches/gcc-15.2.0/0003-j2.diff b/patches/gcc-15.2.0/0003-j2.diff
+new file mode 100644
+index 0000000..c378645
+--- /dev/null
++++ b/patches/gcc-15.2.0/0003-j2.diff
+@@ -0,0 +1,346 @@
++diff --git a/gcc/config.gcc b/gcc/config.gcc
++index 357b0bed067..528add999f2 100644
++--- a/gcc/config.gcc
+++++ b/gcc/config.gcc
++@@ -556,7 +556,7 @@ s390*-*-*)
++ 	extra_headers="s390intrin.h htmintrin.h htmxlintrin.h vecintrin.h"
++ 	;;
++ # Note the 'l'; we need to be able to match e.g. "shle" or "shl".
++-sh[123456789lbe]*-*-* | sh-*-*)
+++sh[123456789lbej]*-*-* | sh-*-*)
++ 	cpu_type=sh
++ 	extra_options="${extra_options} fused-madd.opt"
++ 	extra_objs="${extra_objs} sh_treg_combine.o sh-mem.o sh_optimize_sett_clrt.o"
++@@ -3202,18 +3202,18 @@ s390x-ibm-tpf*)
++ 	extra_options="${extra_options} s390/tpf.opt"
++ 	tmake_file="${tmake_file} s390/t-s390"
++ 	;;
++-sh-*-elf* | sh[12346l]*-*-elf* | \
++-  sh-*-linux* | sh[2346lbe]*-*-linux* | \
+++sh-*-elf* | sh[12346lj]*-*-elf* | \
+++  sh-*-linux* | sh[2346lbej]*-*-linux* | \
++   sh-*-netbsdelf* | shl*-*-netbsdelf*)
++ 	tmake_file="${tmake_file} sh/t-sh sh/t-elf"
++ 	if test x${with_endian} = x; then
++ 		case ${target} in
++-		sh[1234]*be-*-* | sh[1234]*eb-*-*) with_endian=big ;;
+++		sh[j1234]*be-*-* | sh[j1234]*eb-*-*) with_endian=big ;;
++ 		shbe-*-* | sheb-*-*)		   with_endian=big,little ;;
++ 		sh[1234]l* | sh[34]*-*-linux*)	   with_endian=little ;;
++ 		shl* | sh*-*-linux* | \
++ 		  sh-superh-elf)		   with_endian=little,big ;;
++-		sh[1234]*-*-*)			   with_endian=big ;;
+++		sh[j1234]*-*-*)			   with_endian=big ;;
++ 		*)				   with_endian=big,little ;;
++ 		esac
++ 	fi
++@@ -3280,6 +3280,7 @@ sh-*-elf* | sh[12346l]*-*-elf* | \
++ 	sh2a_nofpu*)		sh_cpu_target=sh2a-nofpu ;;
++ 	sh2a*)			sh_cpu_target=sh2a ;;
++ 	sh2e*)			sh_cpu_target=sh2e ;;
+++	shj2*)			sh_cpu_target=shj2;;
++ 	sh2*)			sh_cpu_target=sh2 ;;
++ 	*)			sh_cpu_target=sh1 ;;
++ 	esac
++@@ -3301,7 +3302,7 @@ sh-*-elf* | sh[12346l]*-*-elf* | \
++ 	  sh2a-single-only | sh2a-single | sh2a-nofpu | sh2a | \
++ 	  sh4a-single-only | sh4a-single | sh4a-nofpu | sh4a | sh4al | \
++ 	  sh4-single-only | sh4-single | sh4-nofpu | sh4 | sh4-300 | \
++-	  sh3e | sh3 | sh2e | sh2 | sh1) ;;
+++	  sh3e | sh3 | sh2e | sh2 | sh1 | shj2) ;;
++ 	"")	sh_cpu_default=${sh_cpu_target} ;;
++ 	*)	echo "with_cpu=$with_cpu not supported"; exit 1 ;;
++ 	esac
++@@ -3310,9 +3311,9 @@ sh-*-elf* | sh[12346l]*-*-elf* | \
++ 		case ${target} in
++ 		sh[1234]*)	sh_multilibs=${sh_cpu_target} ;;
++ 		sh-superh-*)	sh_multilibs=m4,m4-single,m4-single-only,m4-nofpu ;;
++-		sh*-*-linux*)	sh_multilibs=m1,m2,m2a,m3e,m4 ;;
+++		sh*-*-linux*)	sh_multilibs=m1,m2,m2a,m3e,m4,mj2 ;;
++ 		sh*-*-netbsd*)	sh_multilibs=m3,m3e,m4 ;;
++-		*) sh_multilibs=m1,m2,m2e,m4,m4-single,m4-single-only,m2a,m2a-single ;;
+++		*) sh_multilibs=m1,m2,m2e,m4,m4-single,m4-single-only,m2a,m2a-single,mj2 ;;
++ 		esac
++ 		if test x$with_fp = xno; then
++ 			sh_multilibs="`echo $sh_multilibs|sed -e s/m4/sh4-nofpu/ -e s/,m4-[^,]*//g -e s/,m[23]e// -e s/m2a,m2a-single/m2a-nofpu/ -e s/m5-..m....,//g`"
++@@ -3327,7 +3328,8 @@ sh-*-elf* | sh[12346l]*-*-elf* | \
++ 		m1 | m2 | m2e | m3 | m3e | \
++ 		m4 | m4-single | m4-single-only | m4-nofpu | m4-300 |\
++ 		m4a | m4a-single | m4a-single-only | m4a-nofpu | m4al | \
++-		m2a | m2a-single | m2a-single-only | m2a-nofpu)
+++		m2a | m2a-single | m2a-single-only | m2a-nofpu | \
+++		mj2)
++ 			# TM_MULTILIB_CONFIG is used by t-sh for the non-endian multilib definition
++ 			# It is passed to MULTIILIB_OPTIONS verbatim.
++ 			TM_MULTILIB_CONFIG="${TM_MULTILIB_CONFIG}/${sh_multilib}"
++@@ -3344,7 +3346,7 @@ sh-*-elf* | sh[12346l]*-*-elf* | \
++ 	done
++ 	TM_MULTILIB_CONFIG=`echo $TM_MULTILIB_CONFIG | sed 's:^/::'`
++ 	if test x${enable_incomplete_targets} = xyes ; then
++-		tm_defines="$tm_defines SUPPORT_SH1=1 SUPPORT_SH2E=1 SUPPORT_SH4=1 SUPPORT_SH4_SINGLE=1 SUPPORT_SH2A=1 SUPPORT_SH2A_SINGLE=1"
+++		tm_defines="$tm_defines SUPPORT_SH1=1 SUPPORT_SH2E=1 SUPPORT_SH4=1 SUPPORT_SH4_SINGLE=1 SUPPORT_SH2A=1 SUPPORT_SH2A_SINGLE=1 SUPPORT_SHJ2=1"
++ 	fi
++ 	tm_file="$tm_file ./sysroot-suffix.h"
++ 	tmake_file="$tmake_file t-sysroot-suffix"
++@@ -5175,6 +5177,8 @@ case "${target}" in
++ 			;;
++ 		m4a | m4a-single | m4a-single-only | m4a-nofpu | m4al)
++ 		        ;;
+++		mj2)
+++			;;
++ 		*)
++ 			echo "Unknown CPU used in --with-cpu=$with_cpu, known values:"  1>&2
++ 			echo "m1 m2 m2e m3 m3e m4 m4-single m4-single-only m4-nofpu" 1>&2
++@@ -5385,7 +5389,7 @@ case ${target} in
++ 		tmake_file="${cpu_type}/t-${cpu_type} ${tmake_file}"
++ 		;;
++ 
++-	sh[123456ble]*-*-* | sh-*-*)
+++	sh[123456blej]*-*-* | sh-*-*)
++ 		c_target_objs="${c_target_objs} sh-c.o"
++ 		cxx_target_objs="${cxx_target_objs} sh-c.o"
++ 		;;
++diff --git a/gcc/config/sh/sh.cc b/gcc/config/sh/sh.cc
++index 1564109c942..798c1c1c1a3 100644
++--- a/gcc/config/sh/sh.cc
+++++ b/gcc/config/sh/sh.cc
++@@ -686,6 +686,7 @@ parse_validate_atomic_model_option (const char* str)
++   model_names[sh_atomic_model::hard_llcs] = "hard-llcs";
++   model_names[sh_atomic_model::soft_tcb] = "soft-tcb";
++   model_names[sh_atomic_model::soft_imask] = "soft-imask";
+++  model_names[sh_atomic_model::hard_cas] = "hard-cas";
++ 
++   const char* model_cdef_names[sh_atomic_model::num_models];
++   model_cdef_names[sh_atomic_model::none] = "NONE";
++@@ -693,6 +694,7 @@ parse_validate_atomic_model_option (const char* str)
++   model_cdef_names[sh_atomic_model::hard_llcs] = "HARD_LLCS";
++   model_cdef_names[sh_atomic_model::soft_tcb] = "SOFT_TCB";
++   model_cdef_names[sh_atomic_model::soft_imask] = "SOFT_IMASK";
+++  model_cdef_names[sh_atomic_model::hard_cas] = "HARD_CAS";
++ 
++   sh_atomic_model ret;
++   ret.type = sh_atomic_model::none;
++@@ -771,6 +773,9 @@ got_mode_name:;
++   if (ret.type == sh_atomic_model::soft_imask && TARGET_USERMODE)
++     err_ret ("cannot use atomic model %s in user mode", ret.name);
++ 
+++  if (ret.type == sh_atomic_model::hard_cas && !TARGET_SHJ2)
+++    err_ret ("atomic model %s is only available J2 targets", ret.name);
+++
++   return ret;
++ 
++ #undef err_ret
++@@ -827,6 +832,8 @@ sh_option_override (void)
++     sh_cpu = PROCESSOR_SH2E;
++   if (TARGET_SH2A)
++     sh_cpu = PROCESSOR_SH2A;
+++  if (TARGET_SHJ2)
+++    sh_cpu = PROCESSOR_SHJ2;
++   if (TARGET_SH3)
++     sh_cpu = PROCESSOR_SH3;
++   if (TARGET_SH3E)
++diff --git a/gcc/config/sh/sh.h b/gcc/config/sh/sh.h
++index d2280e2ffe6..3a54a896721 100644
++--- a/gcc/config/sh/sh.h
+++++ b/gcc/config/sh/sh.h
++@@ -85,6 +85,7 @@ extern int code_for_indirect_jump_scratch;
++ #define SUPPORT_SH4_SINGLE 1
++ #define SUPPORT_SH2A 1
++ #define SUPPORT_SH2A_SINGLE 1
+++#define SUPPORT_SHJ2 1
++ #endif
++ 
++ #define TARGET_DIVIDE_CALL_DIV1 (sh_div_strategy == SH_DIV_CALL_DIV1)
++@@ -117,6 +118,7 @@ extern int code_for_indirect_jump_scratch;
++ #define SELECT_SH4A_SINGLE_ONLY  (MASK_SH4A | SELECT_SH4_SINGLE_ONLY)
++ #define SELECT_SH4A		 (MASK_SH4A | SELECT_SH4)
++ #define SELECT_SH4A_SINGLE	 (MASK_SH4A | SELECT_SH4_SINGLE)
+++#define SELECT_SHJ2		 (MASK_SHJ2 | SELECT_SH2)
++ 
++ #if SUPPORT_SH1
++ #define SUPPORT_SH2 1
++@@ -124,6 +126,7 @@ extern int code_for_indirect_jump_scratch;
++ #if SUPPORT_SH2
++ #define SUPPORT_SH3 1
++ #define SUPPORT_SH2A_NOFPU 1
+++#define SUPPORT_SHJ2 1
++ #endif
++ #if SUPPORT_SH3
++ #define SUPPORT_SH4_NOFPU 1
++@@ -156,7 +159,7 @@ extern int code_for_indirect_jump_scratch;
++ #define MASK_ARCH (MASK_SH1 | MASK_SH2 | MASK_SH3 | MASK_SH_E | MASK_SH4 \
++ 		   | MASK_HARD_SH2A | MASK_HARD_SH2A_DOUBLE | MASK_SH4A \
++ 		   | MASK_HARD_SH4 | MASK_FPU_SINGLE \
++-		   | MASK_FPU_SINGLE_ONLY)
+++		   | MASK_FPU_SINGLE_ONLY | MASK_SHJ2)
++ 
++ /* This defaults us to big-endian.  */
++ #ifndef TARGET_ENDIAN_DEFAULT
++@@ -231,7 +234,8 @@ extern int code_for_indirect_jump_scratch;
++ %{m2a-single:--isa=sh2a} \
++ %{m2a-single-only:--isa=sh2a} \
++ %{m2a-nofpu:--isa=sh2a-nofpu} \
++-%{m4al:-dsp}"
+++%{m4al:-dsp} \
+++%{mj2:-isa=j2}"
++ 
++ #define ASM_SPEC SH_ASM_SPEC
++ 
++@@ -347,6 +351,7 @@ struct sh_atomic_model
++     hard_llcs,
++     soft_tcb,
++     soft_imask,
+++    hard_cas,
++ 
++     num_models
++   };
++@@ -390,6 +395,9 @@ extern const sh_atomic_model& selected_atomic_model (void);
++ #define TARGET_ATOMIC_SOFT_IMASK \
++   (selected_atomic_model ().type == sh_atomic_model::soft_imask)
++ 
+++#define TARGET_ATOMIC_HARD_CAS \
+++  (selected_atomic_model ().type == sh_atomic_model::hard_cas)
+++
++ #endif // __cplusplus
++ 
++ #define SUBTARGET_OVERRIDE_OPTIONS (void) 0
++@@ -1484,7 +1492,7 @@ extern bool current_function_interrupt;
++ 
++ /* Nonzero if the target supports dynamic shift instructions
++    like shad and shld.  */
++-#define TARGET_DYNSHIFT (TARGET_SH3 || TARGET_SH2A)
+++#define TARGET_DYNSHIFT (TARGET_SH3 || TARGET_SH2A || TARGET_SHJ2)
++ 
++ /* The cost of using the dynamic shift insns (shad, shld) are the same
++    if they are available.  If they are not available a library function will
++@@ -1747,6 +1755,7 @@ enum processor_type {
++   PROCESSOR_SH2,
++   PROCESSOR_SH2E,
++   PROCESSOR_SH2A,
+++  PROCESSOR_SHJ2,
++   PROCESSOR_SH3,
++   PROCESSOR_SH3E,
++   PROCESSOR_SH4,
++diff --git a/gcc/config/sh/sh.opt b/gcc/config/sh/sh.opt
++index b4755a812f3..0989a1c18da 100644
++--- a/gcc/config/sh/sh.opt
+++++ b/gcc/config/sh/sh.opt
++@@ -65,6 +65,10 @@ m2e
++ Target RejectNegative Condition(SUPPORT_SH2E)
++ Generate SH2e code.
++ 
+++mj2
+++Target RejectNegative Mask(SHJ2) Condition(SUPPORT_SHJ2)
+++Generate J2 code.
+++
++ m3
++ Target RejectNegative Mask(SH3) Condition(SUPPORT_SH3)
++ Generate SH3 code.
++diff --git a/gcc/config/sh/sync.md b/gcc/config/sh/sync.md
++index 2b43f8edb86..118fc5d06db 100644
++--- a/gcc/config/sh/sync.md
+++++ b/gcc/config/sh/sync.md
++@@ -240,6 +240,9 @@
++       || (TARGET_SH4A && <MODE>mode == SImode && !TARGET_ATOMIC_STRICT))
++     atomic_insn = gen_atomic_compare_and_swap<mode>_hard (old_val, mem,
++ 							  exp_val, new_val);
+++  else if (TARGET_ATOMIC_HARD_CAS && <MODE>mode == SImode)
+++    atomic_insn = gen_atomic_compare_and_swap<mode>_cas (old_val, mem,
+++							 exp_val, new_val);
++   else if (TARGET_ATOMIC_SOFT_GUSA)
++     atomic_insn = gen_atomic_compare_and_swap<mode>_soft_gusa (old_val, mem,
++ 		      exp_val, new_val);
++@@ -306,6 +309,57 @@
++ }
++   [(set_attr "length" "14")])
++ 
+++(define_expand "atomic_compare_and_swapsi_cas"
+++  [(set (match_operand:SI 0 "register_operand" "=r")
+++	(unspec_volatile:SI
+++	  [(match_operand:SI 1 "atomic_mem_operand_0" "=Sra")
+++	   (match_operand:SI 2 "register_operand" "r")
+++	   (match_operand:SI 3 "register_operand" "r")]
+++	  UNSPECV_CMPXCHG_1))]
+++  "TARGET_ATOMIC_HARD_CAS"
+++{
+++  rtx mem = gen_rtx_REG (SImode, 0);
+++  emit_move_insn (mem, force_reg (SImode, XEXP (operands[1], 0)));
+++  emit_insn (gen_shj2_cas (operands[0], mem, operands[2], operands[3]));
+++  DONE;
+++})
+++
+++(define_insn "shj2_cas"
+++  [(set (match_operand:SI 0 "register_operand" "=&r")
+++  (unspec_volatile:SI
+++   [(match_operand:SI 1 "register_operand" "=r")
+++   (match_operand:SI 2 "register_operand" "r")
+++   (match_operand:SI 3 "register_operand" "0")]
+++   UNSPECV_CMPXCHG_1))
+++   (set (reg:SI T_REG)
+++	(unspec_volatile:SI [(const_int 0)] UNSPECV_CMPXCHG_3))]
+++  "TARGET_ATOMIC_HARD_CAS"
+++  "cas.l	%2,%0,@%1"
+++  [(set_attr "length" "2")]
+++)
+++
+++(define_expand "atomic_compare_and_swapqi_cas"
+++  [(set (match_operand:SI 0 "arith_reg_dest" "=&r")
+++	(unspec_volatile:SI
+++	  [(match_operand:SI 1 "atomic_mem_operand_0" "=Sra")
+++	   (match_operand:SI 2 "arith_operand" "rI08")
+++	   (match_operand:SI 3 "arith_operand" "rI08")]
+++	  UNSPECV_CMPXCHG_1))]
+++  "TARGET_ATOMIC_HARD_CAS"
+++{FAIL;}
+++)
+++
+++(define_expand "atomic_compare_and_swaphi_cas"
+++  [(set (match_operand:SI 0 "arith_reg_dest" "=&r")
+++	(unspec_volatile:SI
+++	  [(match_operand:SI 1 "atomic_mem_operand_0" "=Sra")
+++	   (match_operand:SI 2 "arith_operand" "rI08")
+++	   (match_operand:SI 3 "arith_operand" "rI08")]
+++	  UNSPECV_CMPXCHG_1))]
+++  "TARGET_ATOMIC_HARD_CAS"
+++{FAIL;}
+++)
+++
++ ;; The QIHImode llcs patterns modify the address register of the memory
++ ;; operand.  In order to express that, we have to open code the memory
++ ;; operand.  Initially the insn is expanded like every other atomic insn
++diff --git a/gcc/config/sh/t-sh b/gcc/config/sh/t-sh
++index 888f8ff7f25..29fd6ae45fd 100644
++--- a/gcc/config/sh/t-sh
+++++ b/gcc/config/sh/t-sh
++@@ -50,7 +50,8 @@ MULTILIB_MATCHES = $(shell \
++              m2e,m3e,m4-single-only,m4-100-single-only,m4-200-single-only,m4-300-single-only,m4a-single-only \
++              m2a-single,m2a-single-only \
++              m4-single,m4-100-single,m4-200-single,m4-300-single,m4a-single \
++-             m4,m4-100,m4-200,m4-300,m4a; do \
+++             m4,m4-100,m4-200,m4-300,m4a \
+++             mj2; do \
++     subst= ; \
++     for lib in `echo $$abi|tr , ' '` ; do \
++       if test "`echo $$multilibs|sed s/$$lib//`" != "$$multilibs"; then \
++@@ -63,9 +64,9 @@ MULTILIB_MATCHES = $(shell \
++ 
++ # SH1 and SH2A support big endian only.
++ ifeq ($(DEFAULT_ENDIAN),ml)
++-MULTILIB_EXCEPTIONS = m1 ml/m1 m2a* ml/m2a* $(TM_MULTILIB_EXCEPTIONS_CONFIG)
+++MULTILIB_EXCEPTIONS = m1 ml/m1 m2a* ml/m2a* ml/mj2 $(TM_MULTILIB_EXCEPTIONS_CONFIG)
++ else
++-MULTILIB_EXCEPTIONS = ml/m1 ml/m2a* $(TM_MULTILIB_EXCEPTIONS_CONFIG)
+++MULTILIB_EXCEPTIONS = ml/m1 ml/m2a* ml/mj2 $(TM_MULTILIB_EXCEPTIONS_CONFIG)
++ endif
++ 
++ MULTILIB_OSDIRNAMES = \
++@@ -87,7 +88,8 @@ MULTILIB_OSDIRNAMES = \
++ 	m4a-single-only=!m4a-single-only $(OTHER_ENDIAN)/m4a-single-only=!$(OTHER_ENDIAN)/m4a-single-only \
++ 	m4a-single=!m4a-single $(OTHER_ENDIAN)/m4a-single=!$(OTHER_ENDIAN)/m4a-single \
++ 	m4a=!m4a $(OTHER_ENDIAN)/m4a=!$(OTHER_ENDIAN)/m4a \
++-	m4al=!m4al $(OTHER_ENDIAN)/m4al=!$(OTHER_ENDIAN)/m4al
+++	m4al=!m4al $(OTHER_ENDIAN)/m4al=!$(OTHER_ENDIAN)/m4al \
+++	mj2=!j2
++ 
++ $(out_object_file): gt-sh.h
++ gt-sh.h : s-gtype ; @true
+diff --git a/patches/gcc-15.2.0/0004-static-pie.diff b/patches/gcc-15.2.0/0004-static-pie.diff
+new file mode 100644
+index 0000000..ec3f06a
+--- /dev/null
++++ b/patches/gcc-15.2.0/0004-static-pie.diff
+@@ -0,0 +1,92 @@
++diff --git a/gcc/common.opt b/gcc/common.opt
++index a75b44ee47e..7c564818b49 100644
++--- a/gcc/common.opt
+++++ b/gcc/common.opt
++@@ -3473,11 +3473,11 @@ Driver
++ 
++ no-pie
++ Driver RejectNegative Negative(shared)
++-Don't create a dynamically linked position independent executable.
+++Don't create a position independent executable.
++ 
++ pie
++ Driver RejectNegative Negative(no-pie)
++-Create a dynamically linked position independent executable.
+++Create a position independent executable.
++ 
++ static-pie
++ Driver RejectNegative Negative(pie)
++diff --git a/gcc/config/gnu-user.h b/gcc/config/gnu-user.h
++index 5ebbf42a13d..bb907d8e89a 100644
++--- a/gcc/config/gnu-user.h
+++++ b/gcc/config/gnu-user.h
++@@ -51,13 +51,12 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
++ #define GNU_USER_TARGET_STARTFILE_SPEC \
++   "%{shared:; \
++      pg|p|profile:%{static-pie:grcrt1.o%s;:gcrt1.o%s}; \
++-     static:crt1.o%s; \
++-     static-pie:rcrt1.o%s; \
+++     static|static-pie:%{" PIE_SPEC ":rcrt1.o%s;:crt1.o%s}; \
++      " PIE_SPEC ":Scrt1.o%s; \
++      :crt1.o%s} " \
++    GNU_USER_TARGET_CRTI " \
++-   %{static:crtbeginT.o%s; \
++-     shared|static-pie|" PIE_SPEC ":crtbeginS.o%s; \
+++   %{shared|" PIE_SPEC ":crtbeginS.o%s; \
+++     static:crtbeginT.o%s; \
++      :crtbegin.o%s} \
++    %{fvtable-verify=none:%s; \
++      fvtable-verify=preinit:vtv_start_preinit.o%s; \
++@@ -73,11 +72,11 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
++    GNU userspace "finalizer" file, `crtn.o'.  */
++ 
++ #define GNU_USER_TARGET_ENDFILE_SPEC \
++-  "%{!static:%{fvtable-verify=none:%s; \
+++  "%{static|static-pie:; \
+++     fvtable-verify=none:%s; \
++      fvtable-verify=preinit:vtv_end_preinit.o%s; \
++-     fvtable-verify=std:vtv_end.o%s}} \
++-   %{static:crtend.o%s; \
++-     shared|static-pie|" PIE_SPEC ":crtendS.o%s; \
+++     fvtable-verify=std:vtv_end.o%s} \
+++   %{shared|" PIE_SPEC ":crtendS.o%s; \
++      :crtend.o%s} " \
++    GNU_USER_TARGET_CRTN " " \
++    CRTOFFLOADEND
++@@ -106,7 +105,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
++ #define LIB_SPEC GNU_USER_TARGET_LIB_SPEC
++ 
++ #if defined(HAVE_LD_EH_FRAME_HDR)
++-#define LINK_EH_SPEC "%{!static|static-pie:--eh-frame-hdr} "
+++#define LINK_EH_SPEC "%{!static|" PIE_SPEC ":--eh-frame-hdr} "
++ #endif
++ 
++ #define GNU_USER_TARGET_LINK_GCC_C_SEQUENCE_SPEC \
++diff --git a/gcc/gcc.cc b/gcc/gcc.cc
++index 3c81c5798d8..cd96eac5d12 100644
++--- a/gcc/gcc.cc
+++++ b/gcc/gcc.cc
++@@ -1010,7 +1010,7 @@ proper position among the other output files.  */
++ #define NO_FPIE_AND_FPIC_SPEC	NO_FPIE_SPEC "|" NO_FPIC_SPEC
++ #define FPIE_OR_FPIC_SPEC	NO_FPIE_AND_FPIC_SPEC ":;"
++ #else
++-#define PIE_SPEC		"pie"
+++#define PIE_SPEC		"pie|static-pie"
++ #define FPIE1_SPEC		"fpie"
++ #define NO_FPIE1_SPEC		FPIE1_SPEC ":;"
++ #define FPIE2_SPEC		"fPIE"
++@@ -1034,12 +1034,12 @@ proper position among the other output files.  */
++ #ifndef LINK_PIE_SPEC
++ #ifdef HAVE_LD_PIE
++ #ifndef LD_PIE_SPEC
++-#define LD_PIE_SPEC "-pie"
+++#define LD_PIE_SPEC "-pie %{static|static-pie:--no-dynamic-linker -z text -Bsymbolic -static}"
++ #endif
++ #else
++ #define LD_PIE_SPEC ""
++ #endif
++-#define LINK_PIE_SPEC "%{static|shared|r:;" PIE_SPEC ":" LD_PIE_SPEC "} "
+++#define LINK_PIE_SPEC "%{shared|r:;" PIE_SPEC ":" LD_PIE_SPEC "} "
++ #endif
++ 
++ #ifndef LINK_BUILDID_SPEC
+diff --git a/patches/gcc-15.2.0/0005-m68k-sqrt.diff b/patches/gcc-15.2.0/0005-m68k-sqrt.diff
+new file mode 100644
+index 0000000..652efb1
+--- /dev/null
++++ b/patches/gcc-15.2.0/0005-m68k-sqrt.diff
+@@ -0,0 +1,20 @@
++diff --git a/gcc/config/m68k/m68k.md b/gcc/config/m68k/m68k.md
++index 59a456cd496..dbfddea41bd 100644
++--- a/gcc/config/m68k/m68k.md
+++++ b/gcc/config/m68k/m68k.md
++@@ -4174,13 +4174,13 @@
++ (define_expand "sqrt<mode>2"
++   [(set (match_operand:FP 0 "nonimmediate_operand" "")
++ 	(sqrt:FP (match_operand:FP 1 "general_operand" "")))]
++-  "TARGET_HARD_FLOAT"
+++  "(TARGET_68881 && TARGET_68040) || TARGET_COLDFIRE_FPU"
++   "")
++ 
++ (define_insn "sqrt<mode>2_68881"
++   [(set (match_operand:FP 0 "nonimmediate_operand" "=f")
++ 	(sqrt:FP (match_operand:FP 1 "general_operand" "f<FP:dreg>m")))]
++-  "TARGET_68881"
+++  "TARGET_68881 && TARGET_68040"
++ {
++   if (FP_REG_P (operands[1]))
++     return "f<FP:round>sqrt%.x %1,%0";
+diff --git a/patches/gcc-15.2.0/0006-cow-libstdc++v3.diff b/patches/gcc-15.2.0/0006-cow-libstdc++v3.diff
+new file mode 100644
+index 0000000..b49b22c
+--- /dev/null
++++ b/patches/gcc-15.2.0/0006-cow-libstdc++v3.diff
+@@ -0,0 +1,8 @@
++--- a/libstdc++-v3/ChangeLog	2024-03-13 18:04:21.050801063 -0400
+++++ b/libstdc++-v3/ChangeLog	2024-03-13 18:04:25.665836804 -0400
++@@ -4068,4 +4068,4 @@
++ 
++ Copying and distribution of this file, with or without modification,
++ are permitted in any medium without royalty provided the copyright
++-notice and this notice are preserved.
+++notice and this notice are preserved.
+diff --git a/patches/gcc-15.2.0/0007-fdpic-unwind.diff b/patches/gcc-15.2.0/0007-fdpic-unwind.diff
+new file mode 100644
+index 0000000..61d3479
+--- /dev/null
++++ b/patches/gcc-15.2.0/0007-fdpic-unwind.diff
+@@ -0,0 +1,11 @@
++--- a/libgcc/unwind-pe.h	2024-03-14 05:59:53.754073149 +0900
+++++ b/libgcc/unwind-pe.h	2024-03-14 06:00:41.226074492 +0900
++@@ -262,7 +262,7 @@
++ 
++       if (result != 0)
++ 	{
++-#if __FDPIC__
+++#if __FDPIC__ && __arm__
++ 	  /* FDPIC relative addresses imply taking the GOT address
++ 	     into account.  */
++ 	  if ((encoding & DW_EH_PE_pcrel) && (encoding & DW_EH_PE_indirect))
+diff --git a/patches/gcc-15.2.0/0008-fdpic-crtstuff-pr114158.diff b/patches/gcc-15.2.0/0008-fdpic-crtstuff-pr114158.diff
+new file mode 100644
+index 0000000..3986eed
+--- /dev/null
++++ b/patches/gcc-15.2.0/0008-fdpic-crtstuff-pr114158.diff
+@@ -0,0 +1,38 @@
++--- a/libgcc/crtstuff.c	2023-05-29 17:46:32.000000000 +0900
+++++ b/libgcc/crtstuff.c	2024-03-14 06:03:42.398079615 +0900
++@@ -441,17 +441,9 @@
++ #ifdef FINI_SECTION_ASM_OP
++ CRT_CALL_STATIC_FUNCTION (FINI_SECTION_ASM_OP, __do_global_dtors_aux)
++ #elif defined (FINI_ARRAY_SECTION_ASM_OP)
++-#if defined(__FDPIC__)
++-__asm__("\t.equ\t__do_global_dtors_aux_alias, __do_global_dtors_aux\n");
++-extern char __do_global_dtors_aux_alias;
++-static void *__do_global_dtors_aux_fini_array_entry[]
++-__attribute__ ((__used__, section(".fini_array"), aligned(sizeof(void *))))
++-     = { &__do_global_dtors_aux_alias };
++-#else /* defined(__FDPIC__) */
++ static func_ptr __do_global_dtors_aux_fini_array_entry[]
++   __attribute__ ((__used__, section(".fini_array"),
++ 		  aligned(__alignof__(func_ptr)))) = { __do_global_dtors_aux };
++-#endif /* defined(__FDPIC__) */
++ #else /* !FINI_SECTION_ASM_OP && !FINI_ARRAY_SECTION_ASM_OP */
++ static void __attribute__((used))
++ __do_global_dtors_aux_1 (void)
++@@ -494,17 +486,9 @@
++ #ifdef __LIBGCC_INIT_SECTION_ASM_OP__
++ CRT_CALL_STATIC_FUNCTION (__LIBGCC_INIT_SECTION_ASM_OP__, frame_dummy)
++ #else /* defined(__LIBGCC_INIT_SECTION_ASM_OP__) */
++-#if defined(__FDPIC__)
++-__asm__("\t.equ\t__frame_dummy_alias, frame_dummy\n");
++-extern char __frame_dummy_alias;
++-static void *__frame_dummy_init_array_entry[]
++-__attribute__ ((__used__, section(".init_array"), aligned(sizeof(void *))))
++-     = { &__frame_dummy_alias };
++-#else /* defined(__FDPIC__) */
++ static func_ptr __frame_dummy_init_array_entry[]
++   __attribute__ ((__used__, section(".init_array"),
++ 		  aligned(__alignof__(func_ptr)))) = { frame_dummy };
++-#endif /* defined(__FDPIC__) */
++ #endif /* !defined(__LIBGCC_INIT_SECTION_ASM_OP__) */
++ #endif /* USE_EH_FRAME_REGISTRY || USE_TM_CLONE_REGISTRY */
++ 
+diff --git a/patches/gcc-15.2.0/0009-sh-fdpic-pr114641.diff b/patches/gcc-15.2.0/0009-sh-fdpic-pr114641.diff
+new file mode 100644
+index 0000000..020422c
+--- /dev/null
++++ b/patches/gcc-15.2.0/0009-sh-fdpic-pr114641.diff
+@@ -0,0 +1,12 @@
++--- gcc-11.4.0/gcc/config/sh/sh.cc.orig	2024-04-04 05:52:42.125373614 +0900
+++++ gcc-11.4.0/gcc/config/sh/sh.cc	2024-04-04 22:54:01.875106654 +0900
++@@ -9147,7 +9147,7 @@
++ 	{
++ 	  /* Weak functions may be NULL which doesn't work with
++ 	     GOTOFFFUNCDESC because the runtime offset is not known.  */
++-	  if (SYMBOL_REF_WEAK (orig))
+++	  if (SYMBOL_REF_WEAK (orig) || (TREE_PUBLIC(SYMBOL_REF_DECL(orig)) && DECL_VISIBILITY (SYMBOL_REF_DECL(orig)) != VISIBILITY_HIDDEN))
++ 	    emit_insn (gen_symGOTFUNCDESC2reg (reg, orig));
++ 	  else
++ 	    emit_insn (gen_symGOTOFFFUNCDESC2reg (reg, orig));
++
+diff --git a/patches/musl-1.2.5/0001-avoid-kernel-if_ether.h.patch b/patches/musl-1.2.5/0001-avoid-kernel-if_ether.h.patch
+new file mode 100644
+index 0000000..8efbcc8
+--- /dev/null
++++ b/patches/musl-1.2.5/0001-avoid-kernel-if_ether.h.patch
+@@ -0,0 +1,30 @@
++From 3984adc4976de7553f51e0cf4de1e18c373b332b Mon Sep 17 00:00:00 2001
++From: Baruch Siach <baruch@tkos.co.il>
++Date: Thu, 15 Dec 2016 15:10:19 +0200
++Subject: [PATCH] Avoid redefinition of struct ethhdr
++
++This is a workaround to the if_ether.h conflict between musl and the kernel.
++Both define struct ethhdr.
++
++Signed-off-by: Baruch Siach <baruch@tkos.co.il>
++---
++ include/netinet/if_ether.h | 3 +++
++ 1 file changed, 3 insertions(+)
++
++diff --git a/include/netinet/if_ether.h b/include/netinet/if_ether.h
++index 11ee65823f93..cfe1949d3371 100644
++--- a/include/netinet/if_ether.h
+++++ b/include/netinet/if_ether.h
++@@ -1,6 +1,9 @@
++ #ifndef _NETINET_IF_ETHER_H
++ #define _NETINET_IF_ETHER_H
++ 
+++/* Suppress kernel if_ether.h header inclusion */
+++#define _LINUX_IF_ETHER_H
+++
++ #include <stdint.h>
++ #include <sys/types.h>
++ 
++-- 
++2.10.2
++
+diff --git a/patches/musl-1.2.5/0002-package-musl-Make-scheduler-functions-Linux-compatib.patch b/patches/musl-1.2.5/0002-package-musl-Make-scheduler-functions-Linux-compatib.patch
+new file mode 100644
+index 0000000..7c3acf9
+--- /dev/null
++++ b/patches/musl-1.2.5/0002-package-musl-Make-scheduler-functions-Linux-compatib.patch
+@@ -0,0 +1,76 @@
++From 407c96fc790d0d11ca9603a2a533216c745b5051 Mon Sep 17 00:00:00 2001
++From: Stefan Nickl <Stefan.Nickl@gmail.com>
++Date: Mon, 13 May 2019 22:33:21 +0200
++Subject: [PATCH] Make scheduler functions Linux-compatible
++
++Let sched_getscheduler(), sched_setscheduler(), sched_getparam(),
++sched_setparam() invoke the Linux syscalls of the same name instead
++of returning -ENOSYS.
++
++Signed-off-by: Stefan Nickl <Stefan.Nickl@gmail.com>
++---
++ src/sched/sched_getparam.c     | 3 +--
++ src/sched/sched_getscheduler.c | 3 +--
++ src/sched/sched_setparam.c     | 3 +--
++ src/sched/sched_setscheduler.c | 3 +--
++ 4 files changed, 4 insertions(+), 8 deletions(-)
++
++diff --git a/src/sched/sched_getparam.c b/src/sched/sched_getparam.c
++index 76f10e4..65be107 100644
++--- a/src/sched/sched_getparam.c
+++++ b/src/sched/sched_getparam.c
++@@ -1,8 +1,7 @@
++ #include <sched.h>
++-#include <errno.h>
++ #include "syscall.h"
++ 
++ int sched_getparam(pid_t pid, struct sched_param *param)
++ {
++-	return __syscall_ret(-ENOSYS);
+++	return syscall(SYS_sched_getparam, pid, param);
++ }
++diff --git a/src/sched/sched_getscheduler.c b/src/sched/sched_getscheduler.c
++index 394e508..4c922f6 100644
++--- a/src/sched/sched_getscheduler.c
+++++ b/src/sched/sched_getscheduler.c
++@@ -1,8 +1,7 @@
++ #include <sched.h>
++-#include <errno.h>
++ #include "syscall.h"
++ 
++ int sched_getscheduler(pid_t pid)
++ {
++-	return __syscall_ret(-ENOSYS);
+++	return syscall(SYS_sched_getscheduler, pid);
++ }
++diff --git a/src/sched/sched_setparam.c b/src/sched/sched_setparam.c
++index 18623ee..f699faf 100644
++--- a/src/sched/sched_setparam.c
+++++ b/src/sched/sched_setparam.c
++@@ -1,8 +1,7 @@
++ #include <sched.h>
++-#include <errno.h>
++ #include "syscall.h"
++ 
++ int sched_setparam(pid_t pid, const struct sched_param *param)
++ {
++-	return __syscall_ret(-ENOSYS);
+++	return syscall(SYS_sched_setparam, pid, param);
++ }
++diff --git a/src/sched/sched_setscheduler.c b/src/sched/sched_setscheduler.c
++index 4435f21..e678221 100644
++--- a/src/sched/sched_setscheduler.c
+++++ b/src/sched/sched_setscheduler.c
++@@ -1,8 +1,7 @@
++ #include <sched.h>
++-#include <errno.h>
++ #include "syscall.h"
++ 
++ int sched_setscheduler(pid_t pid, int sched, const struct sched_param *param)
++ {
++-	return __syscall_ret(-ENOSYS);
+++	return syscall(SYS_sched_setscheduler, pid, sched, param);
++ }
++-- 
++2.21.0
++
+diff --git a/patches/musl-1.2.5/0003-use-hidden-visibility-for-C-entry-point-function-_st.patch b/patches/musl-1.2.5/0003-use-hidden-visibility-for-C-entry-point-function-_st.patch
+new file mode 100644
+index 0000000..6359565
+--- /dev/null
++++ b/patches/musl-1.2.5/0003-use-hidden-visibility-for-C-entry-point-function-_st.patch
+@@ -0,0 +1,42 @@
++From 9c78557af0a5e521cdb46a4ca7630f2987d2523e Mon Sep 17 00:00:00 2001
++From: Rich Felker <dalias@aerifal.cx>
++Date: Sat, 10 Aug 2024 19:49:24 -0400
++Subject: [PATCH] use hidden visibility for C entry point function _start_c
++
++the file-level crt_arch.h asm fragments generally make direct
++(non-PLT) calls from _start to _start_c, which is only valid when
++there is a local, non-interposable definition for _start_c. generally,
++the linker is expected to know that local definitions in a main
++executable (as opposed to shared library) output are non-interposable,
++making this work, but historically there have been linker bugs in this
++area, and microblaze is reportedly still broken, flagging the
++relocation for the call as a textrel.
++
++the equivalent _dlstart_c, called from the same crt_arch.h asm
++fragments, has always used hidden visibility without problem, and
++semantically it should be hidden, so make it hidden. this ensures the
++direct call is always valid regardless of whether the linker properly
++special-cases main executable output.
++
++Upstream: https://git.musl-libc.org/cgit/musl/commit/?id=9c78557af0a5e521cdb46a4ca7630f2987d2523e
++Signed-off-by: J. Neuschäfer <j.neuschaefer@gmx.net>
++---
++ crt/crt1.c | 2 +-
++ 1 file changed, 1 insertion(+), 1 deletion(-)
++
++diff --git a/crt/crt1.c b/crt/crt1.c
++index 8fe8ab5d..10601215 100644
++--- a/crt/crt1.c
+++++ b/crt/crt1.c
++@@ -11,7 +11,7 @@ weak void _fini();
++ int __libc_start_main(int (*)(), int, char **,
++ 	void (*)(), void(*)(), void(*)());
++
++-void _start_c(long *p)
+++hidden void _start_c(long *p)
++ {
++ 	int argc = p[0];
++ 	char **argv = (void *)(p+1);
++--
++2.45.2
++
+diff --git a/patches/musl-1.2.5/0006-m68k-fix-poll.patch b/patches/musl-1.2.5/0006-m68k-fix-poll.patch
+new file mode 100644
+index 0000000..cafee53
+--- /dev/null
++++ b/patches/musl-1.2.5/0006-m68k-fix-poll.patch
+@@ -0,0 +1,26 @@
++From b09e3174a695d1db60b2abc442d29ed3f87f0358 Mon Sep 17 00:00:00 2001
++From: Baruch Siach <baruch@tkos.co.il>
++Date: Wed, 7 Aug 2024 08:51:03 +0300
++Subject: m68k: fix POLLWRNORM and POLLWRBAND
++
++As noted in commit f5011c62c3 ("fix POLLWRNORM and POLLWRBAND on mips")
++m68k uses a different definition.
++
++Signed-off-by: Daniel Palmer <daniel@0x0f.com>
++Upstream: https://git.musl-libc.org/cgit/musl/commit/?id=b09e3174a695d1db60b2abc442d29ed3f87f0358
++---
++ arch/m68k/bits/poll.h | 2 ++
++ 1 file changed, 2 insertions(+)
++ create mode 100644 arch/m68k/bits/poll.h
++
++diff --git a/arch/m68k/bits/poll.h b/arch/m68k/bits/poll.h
++new file mode 100644
++index 00000000..00063f41
++--- /dev/null
+++++ b/arch/m68k/bits/poll.h
++@@ -0,0 +1,2 @@
+++#define POLLWRNORM POLLOUT
+++#define POLLWRBAND 256
++-- 
++cgit v1.2.1
++

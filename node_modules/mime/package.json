@@ -1,0 +1,76 @@
+{
+  "author": {
+    "name": "Robert Kieffer",
+    "url": "http://github.com/broofa",
+    "email": "robert@broofa.com"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=16"
+  },
+  "main": "./dist/src/index.js",
+  "exports": {
+    ".": "./dist/src/index.js",
+    "./lite": "./dist/src/index_lite.js",
+    "./types/standard.js": "./dist/types/standard.js",
+    "./types/other.js": "./dist/types/other.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "bin",
+    "dist/src",
+    "dist/types",
+    "src",
+    "types"
+  ],
+  "bin": {
+    "mime": "bin/cli.js"
+  },
+  "contributors": [],
+  "description": "A comprehensive library for mime-type mapping",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/mime-db": "1.43.6",
+    "@types/mime-types": "3.0.1",
+    "@types/node": "24.3.1",
+    "@typescript-eslint/eslint-plugin": "8.43.0",
+    "@typescript-eslint/parser": "8.43.0",
+    "chalk": "5.6.2",
+    "mime-score": "2.0.4",
+    "mime-types": "3.0.1",
+    "prettier": "3.6.2",
+    "release-please": "17.1.2",
+    "runmd": "1.4.1",
+    "typescript": "5.9.2"
+  },
+  "scripts": {
+    "build": "rm -fr dist && tsc",
+    "build:types": "node dist/scripts/build.js",
+    "build:watch": "npm run build -- --watch",
+    "lint": "prettier -c .",
+    "lint:fix": "prettier -w .",
+    "prepack": "npm run build",
+    "pretest": "npm run build",
+    "prepublishOnly": "npm test",
+    "test": "node --test && ./test/exports_test.sh",
+    "test:watch": "clear && node --enable-source-maps --test --watch test"
+  },
+  "keywords": [
+    "extension",
+    "file",
+    "mime",
+    "mime-db",
+    "mimetypes",
+    "util"
+  ],
+  "name": "mime",
+  "repository": {
+    "url": "https://github.com/broofa/mime",
+    "type": "git"
+  },
+  "version": "4.1.0",
+  "funding": [
+    "https://github.com/sponsors/broofa"
+  ],
+  "packageManager": "npm@11.6.0"
+}

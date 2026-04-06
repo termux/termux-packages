@@ -1,0 +1,25 @@
+!!!5
+html(lang='en')
+  head
+    title= file.title
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js')
+    script(src='/public/js/main.js')
+    link(rel='stylesheet', href='/public/css/main.css', type='text/css', media='all')
+  body
+    nav
+      block nav
+        ul.pages
+          li: a(href="/") Home
+          - if (files.pages)
+            for page in files.pages
+              li: a(href=page.href)= page.title
+    header
+      block header
+    section#content
+      block content
+        .wrap!= file.prepared
+    footer
+      block footer
+        .branding Built by 
+          a.button.branding(href='http://codexjs.com') Codex
+    

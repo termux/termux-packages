@@ -1,0 +1,79 @@
+// Implementign everything as function so that column count and width can change as needed
+// hopefully a use case is if doing reactive layout
+// we shall see
+
+// return user defined if available
+fez-column-count-def(cc = null)
+  if cc is not null
+    out = cc
+  else if columnCount is defined
+    out = columnCount
+  else
+    out = 12
+  out
+
+fez-column-width-def(cw = null)
+  if cw is not null
+    out = cw
+  else if columnWidth is defined
+    out = columnWidth
+  else
+    out = 60px
+  out
+
+fez-gutter-width-def(gwd = null)
+  if gwd is not null
+    out = gwd
+  else if gutterWidth is defined
+    out = gutterWidth
+  else
+    out = 10px
+  out
+
+// Variables
+fez-allColumns(cw = null, ct = null)
+  fez-column-width-def(cw) * fez-column-count-def(ct)
+
+fez-allGutters(gw = null, ct = null)
+  (fez-gutter-width-def(gw) * fez-column-count-def(ct)) * 2
+
+fez-totalWidth(cw = null, gw = null, ct = null)
+  fez-allColumns(cw, ct) + fez-allGutters(gw, ct)
+
+// The calculation
+fez-column-width(co = 1, gu = 0, cw = null, gw = null) 
+  w = (fez-column-width-def(cw) * co) + (fez-gutter-width-def(gw) * gu)
+  min-width unit(w, px)
+  max-width unit(w, px)
+
+fez-column(g) 
+  margin 0 fez-gutter-width-def(g)
+  overflow hidden
+  float left
+  display inline
+
+// Public functions
+fez-grid(cc, cw = null, gw = null)
+  gc = (cc * 2) - 2
+  fez-column-width(cc, gc, cw, gw)
+  fez-column(gw)
+
+fez-row(cw = null, gw = null, ct = null) 
+  width fez-totalWidth(cw, gw, ct)
+  margin 0 auto
+  overflow hidden
+
+fez-rowInside(gw = null) 
+  margin 0 (fez-gutter-width-def(gw) * -1)
+  display inline-block
+
+// aliases
+
+grid(cc, cw = null, gw = null)
+  fez-grid(cc, cw, gw)
+
+row(cw = null, gw = null, ct = null)
+  fez-row(cw, gw, ct)
+
+rowInside(gw = null)
+  fez-rowInside(gw)

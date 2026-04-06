@@ -8,11 +8,7 @@ DRY_RUN_SCRIPT_NAME=$(basename "$0")
 BUILDSCRIPT_NAME="build-package.sh"
 TERMUX_ARCH="aarch64"
 TERMUX_DEBUG_BUILD="false"
-TERMUX_PACKAGES_DIRECTORIES="
-packages
-root-packages
-x11-packages
-"
+TERMUX_PACKAGES_DIRECTORIES=("packages" "root-packages" "x11-packages")
 
 # Please keep synchronized with the logic of lines 468-547 of 'build-package.sh'.
 declare -a PACKAGE_LIST=()
@@ -42,7 +38,7 @@ done
 for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 	TERMUX_PKG_NAME=$(basename "${PACKAGE_LIST[i]}")
 	TERMUX_PKG_BUILDER_DIR=
-	for package_directory in $TERMUX_PACKAGES_DIRECTORIES; do
+	for package_directory in "${TERMUX_PACKAGES_DIRECTORIES[@]}"; do
 		if [ -d "${TERMUX_SCRIPTDIR}/${package_directory}/${TERMUX_PKG_NAME}" ]; then
 			TERMUX_PKG_BUILDER_DIR="${TERMUX_SCRIPTDIR}/$package_directory/$TERMUX_PKG_NAME"
 			break

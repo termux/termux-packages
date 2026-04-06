@@ -27,8 +27,10 @@ TERMUX_REPOLOGY_DATA_FILE="$(mktemp -t termux-repology.XXXXXX)" # File to store 
 export TERMUX_SCRIPTDIR
 TERMUX_SCRIPTDIR=$(realpath "$(dirname "$0")/../..") # Root of repository.
 
-export TERMUX_PACKAGES_DIRECTORIES
-TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}"/repo.json)
+TERMUX_PACKAGES_DIRECTORIES=()
+for channel in $(jq -r 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
+	TERMUX_PACKAGES_DIRECTORIES+=("$channel")
+done
 
 # Define few more variables used by scripts.
 # shellcheck source=scripts/properties.sh
@@ -449,7 +451,6 @@ _update_dependencies() {
 		"${pkg_dir}"/+(build|*.subpackage).sh; then
 		return 0
 	fi
-	# shellcheck disable=SC2086 # Allow splitting of TERMUX_PACKAGES_DIRECTORIES.
 	while read -r dep dep_dir; do
 		if [[ -z "${dep}" ]]; then
 			continue
@@ -457,7 +458,7 @@ _update_dependencies() {
 			termux_error_exit "Obtaining update order failed for ${pkg_dir##*/}"
 		fi
 		_should_update "${dep_dir}" && ! _check_updated "${dep_dir}" && _run_update "${dep_dir}"
-	done < <("${TERMUX_SCRIPTDIR}"/scripts/buildorder.py "${pkg_dir}" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
+	done < <("${TERMUX_SCRIPTDIR}"/scripts/buildorder.py "${pkg_dir}" "${TERMUX_PACKAGES_DIRECTORIES[@]}" || echo "ERROR")
 }
 
 echo "INFO: Running updates for: $*"

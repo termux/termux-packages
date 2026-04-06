@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+
+var program = require('commander');
+var fs = require('fs');
+var hl = require('../');
+
+
+program
+  .version('1.1.0')
+  .option('-l, --lang <lang>', 'Language for syntax highlighting (default: auto)')
+  .usage('[file]')
+
+program.on('--help', function() {
+  console.log('  Examples:');  
+  console.log('');  
+  console.log('    # convert file to html');
+  console.log('    $ hljs common.css > common.html');
+  console.log('');
+  console.log('    # convert specific language to html');
+  console.log('    $ hljs --lang javascript file.js > common.html');
+});
+program.parse(process.argv);
+
+var files = program.args;
+
+if (files.length == 1) {
+  fs.readFile(files[0], 'utf8', function(err, str) {
+    if (err) throw err;
+    var out;
+    if (program.lang)
+      out = hl.highlight(program.lang, str);
+    else
+      out = hl.highlightAuto(str);
+    process.stdout.write('<pre><code>'+out.value+'</code></pre>');
+  });
+} else {
+  process.stdout.write(program.helpInformation());
+  program.emit('--help');
+  process.exit(1);
+}

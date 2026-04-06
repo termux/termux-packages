@@ -1,0 +1,15 @@
+extends layout
+
+block header
+  h1= file.title
+
+block content
+  content!= file.prepared
+  #articles
+    - if (files.posts)
+      ul
+        - for (var i = 0; i < files.posts.length; i++)
+          - var post = files.posts[i]
+          li 
+            h4: a(href=post.href) #{post.title}
+            .summary= post.summary
