@@ -26,7 +26,7 @@
  viaduct = "0.1"
 --- a/toolkit/library/rust/shared/lib.rs
 +++ b/toolkit/library/rust/shared/lib.rs
-@@ -89,20 +89,17 @@
+@@ -95,22 +95,18 @@
  extern crate trust_anchors;
  
  #[cfg(any(
@@ -46,5 +46,15 @@
  
 -#[cfg(not(target_os = "android"))]
  extern crate viaduct;
+-#[cfg(not(target_os = "android"))]
+ extern crate viaduct_necko;
  
  extern crate gecko_logger;
+@@ -170,7 +166,6 @@
+     let _ = GeckoLogger::init();
+     // Initialize tracing.
+     gecko_tracing::initialize_tracing();
+-    #[cfg(not(target_os = "android"))]
+     if let Err(e) = viaduct_necko::init_necko_backend() {
+         log::warn!("Failed to initialize viaduct-necko backend: {:?}", e);
+     }
