@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT, Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE.md"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT_DATE="2026-03-20"
-TERMUX_PKG_VERSION="0.0.1-nightly-$_COMMIT_DATE"
+TERMUX_PKG_VERSION="0.0.1-nightly-2026-03-20"
 TERMUX_PKG_SRCURL=https://github.com/ruffle-rs/ruffle/archive/refs/tags/nightly-${_COMMIT_DATE}.tar.gz
 TERMUX_PKG_SHA256=8a5a6d73acd7cecaa2213cd551313c144c12707d6b6e54ebeb6f446abc6df1fe
 TERMUX_PKG_DEPENDS="alsa-lib, alsa-plugins, fontconfig, gtk3, openh264"
@@ -54,7 +54,7 @@ termux_pkg_auto_update() {
 	fi
 
 	sed \
-		-e "s|^_COMMIT=.*|_COMMIT=${latest_commit}|" \
+		-e "s|^_COMMIT_DATE=.*|_COMMIT_DATE=${latest_commit_date}|" \
 		-i "${TERMUX_PKG_BUILDER_DIR}/build.sh"
 
 	termux_pkg_upgrade_version "${latest_version}" --skip-version-check
