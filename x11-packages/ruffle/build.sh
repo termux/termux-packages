@@ -5,6 +5,7 @@ TERMUX_PKG_LICENSE_FILE="LICENSE.md"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT_DATE=2026-04-06
 TERMUX_PKG_VERSION="0.0.1-nightly-2026-04-06"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/ruffle-rs/ruffle/archive/refs/tags/nightly-${_COMMIT_DATE}.tar.gz
 TERMUX_PKG_SHA256=e884c941b16f1978f849cb428a2da5280bbad42945930ab4f43a88f000d7be01
 TERMUX_PKG_DEPENDS="alsa-lib, alsa-plugins, fontconfig, gtk3, openh264"
@@ -103,6 +104,11 @@ termux_step_pre_configure() {
 		-e "s|libxkbcommon-x11.so.0|libxkbcommon-x11.so|g" \
 		-e "s|libxcb.so.1|libxcb.so|g" \
 		-e "s|/tmp|$TERMUX_PREFIX/tmp|g"
+
+	patch="$TERMUX_PKG_BUILDER_DIR/wgpu-hal-no-khr-display.diff"
+	dir="vendor/wgpu-hal"
+	echo "Applying patch: $patch"
+	patch --silent -p1 -d "$dir" < "${patch}"
 
 	find . -type f -print0 | \
 		xargs -0 sed -i \
