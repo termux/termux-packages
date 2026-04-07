@@ -10,7 +10,7 @@ TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk4, libadwaita, libepoxy, mpv-x"
 
 termux_step_pre_configure() {
 	# Workaround strict compiler error
-	sed -i "s/-Werror/-Wno-error/g" meson.build
+	CFLAGS+=" -Wno-format-nonliteral"
 
 	termux_setup_glib_cross_pkg_config_wrapper
 }
