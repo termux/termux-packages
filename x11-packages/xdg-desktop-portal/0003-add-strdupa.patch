@@ -1,0 +1,26 @@
+--- a/subprojects/libglnx/glnx-fdio.c
++++ b/subprojects/libglnx/glnx-fdio.c
+@@ -42,6 +42,10 @@
+ #include <glnx-local-alloc.h>
+ #include <glnx-missing.h>
+ 
++#if !defined(strdupa)
++#define strdupa(s) strcpy(alloca(strlen(s) + 1), s)
++#endif
++
+ /* The standardized version of BTRFS_IOC_CLONE */
+ #ifndef FICLONE
+ #define FICLONE _IOW(0x94, 9, int)
+--- a/subprojects/libglnx/glnx-shutil.c
++++ b/subprojects/libglnx/glnx-shutil.c
+@@ -28,6 +28,10 @@
+ #include <glnx-fdio.h>
+ #include <glnx-local-alloc.h>
+ 
++#if !defined(strdupa)
++#define strdupa(s) strcpy(alloca(strlen(s) + 1), s)
++#endif
++
+ static gboolean
+ unlinkat_allow_noent (int dfd,
+                       const char *path,
