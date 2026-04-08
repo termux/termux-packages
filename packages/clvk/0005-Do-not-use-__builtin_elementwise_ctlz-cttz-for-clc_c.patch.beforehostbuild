@@ -1,0 +1,135 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <licy183@termux.dev>
+Date: Mon, 6 Apr 2026 23:00:57 +0800
+Subject: [PATCH] Do not use `__builtin_elementwise_ctlz/cttz for `clc_clz/ctz`
+
+---
+ libclc/clc/lib/generic/integer/clc_clz.cl  | 35 +++++++++++++++++++++-
+ libclc/clc/lib/generic/integer/clc_clz.inc | 11 -------
+ libclc/clc/lib/generic/integer/clc_ctz.cl  | 31 ++++++++++++++++++-
+ libclc/clc/lib/generic/integer/clc_ctz.inc | 11 -------
+ 4 files changed, 64 insertions(+), 24 deletions(-)
+ delete mode 100644 libclc/clc/lib/generic/integer/clc_clz.inc
+ delete mode 100644 libclc/clc/lib/generic/integer/clc_ctz.inc
+
+diff --git a/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_clz.cl b/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_clz.cl
+index 48c4400f1..ae98288d5 100644
+--- a/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_clz.cl
++++ b/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_clz.cl
+@@ -9,5 +9,38 @@
+ #include <clc/integer/clc_clz.h>
+ #include <clc/internal/clc.h>
+ 
+-#define __CLC_BODY <clc_clz.inc>
++_CLC_OVERLOAD _CLC_DEF char __clc_clz(char x) {
++  return __clc_clz((ushort)(uchar)x) - 8;
++}
++
++_CLC_OVERLOAD _CLC_DEF uchar __clc_clz(uchar x) {
++  return __clc_clz((ushort)x) - 8;
++}
++
++_CLC_OVERLOAD _CLC_DEF short __clc_clz(short x) {
++  return x ? __builtin_clzs(x) : 16;
++}
++
++_CLC_OVERLOAD _CLC_DEF ushort __clc_clz(ushort x) {
++  return x ? __builtin_clzs(x) : 16;
++}
++
++_CLC_OVERLOAD _CLC_DEF int __clc_clz(int x) {
++  return x ? __builtin_clz(x) : 32;
++}
++
++_CLC_OVERLOAD _CLC_DEF uint __clc_clz(uint x) {
++  return x ? __builtin_clz(x) : 32;
++}
++
++_CLC_OVERLOAD _CLC_DEF long __clc_clz(long x) {
++  return x ? __builtin_clzl(x) : 64;
++}
++
++_CLC_OVERLOAD _CLC_DEF ulong __clc_clz(ulong x) {
++  return x ? __builtin_clzl(x) : 64;
++}
++
++#define __CLC_FUNCTION __clc_clz
++#define __CLC_BODY <clc/shared/unary_def_scalarize.inc>
+ #include <clc/integer/gentype.inc>
+diff --git a/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_clz.inc b/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_clz.inc
+deleted file mode 100644
+index 1972a338f..000000000
+--- a/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_clz.inc
++++ /dev/null
+@@ -1,11 +0,0 @@
+-//===----------------------------------------------------------------------===//
+-//
+-// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+-// See https://llvm.org/LICENSE.txt for license information.
+-// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+-//
+-//===----------------------------------------------------------------------===//
+-
+-_CLC_OVERLOAD _CLC_DEF __CLC_GENTYPE __clc_clz(__CLC_GENTYPE x) {
+-  return __builtin_elementwise_clzg(x, (__CLC_GENTYPE)__CLC_GENSIZE);
+-}
+diff --git a/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_ctz.cl b/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_ctz.cl
+index 42cfa90c3..96afe951d 100644
+--- a/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_ctz.cl
++++ b/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_ctz.cl
+@@ -9,5 +9,34 @@
+ #include <clc/integer/clc_ctz.h>
+ #include <clc/internal/clc.h>
+ 
+-#define __CLC_BODY <clc_ctz.inc>
++_CLC_OVERLOAD _CLC_DEF char __clc_ctz(char x) {
++  return __clc_ctz(__clc_as_uchar(x));
++}
++
++_CLC_OVERLOAD _CLC_DEF uchar __clc_ctz(uchar x) { return __builtin_ctzg(x, 8); }
++
++_CLC_OVERLOAD _CLC_DEF short __clc_ctz(short x) {
++  return __clc_ctz(__clc_as_ushort(x));
++}
++
++_CLC_OVERLOAD _CLC_DEF ushort __clc_ctz(ushort x) {
++  return __builtin_ctzg(x, 16);
++}
++
++_CLC_OVERLOAD _CLC_DEF int __clc_ctz(int x) {
++  return __clc_ctz(__clc_as_uint(x));
++}
++
++_CLC_OVERLOAD _CLC_DEF uint __clc_ctz(uint x) { return __builtin_ctzg(x, 32); }
++
++_CLC_OVERLOAD _CLC_DEF long __clc_ctz(long x) {
++  return __clc_ctz(__clc_as_ulong(x));
++}
++
++_CLC_OVERLOAD _CLC_DEF ulong __clc_ctz(ulong x) {
++  return __builtin_ctzg(x, 64);
++}
++
++#define __CLC_FUNCTION __clc_ctz
++#define __CLC_BODY <clc/shared/unary_def_scalarize.inc>
+ #include <clc/integer/gentype.inc>
+diff --git a/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_ctz.inc b/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_ctz.inc
+deleted file mode 100644
+index b868482fd..000000000
+--- a/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_ctz.inc
++++ /dev/null
+@@ -1,11 +0,0 @@
+-//===----------------------------------------------------------------------===//
+-//
+-// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+-// See https://llvm.org/LICENSE.txt for license information.
+-// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+-//
+-//===----------------------------------------------------------------------===//
+-
+-_CLC_OVERLOAD _CLC_DEF __CLC_GENTYPE __clc_ctz(__CLC_GENTYPE x) {
+-  return __builtin_elementwise_ctzg(x, (__CLC_GENTYPE)__CLC_GENSIZE);
+-}
+-- 
+2.43.0
+
