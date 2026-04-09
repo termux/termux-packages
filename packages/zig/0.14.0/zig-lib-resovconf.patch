@@ -1,0 +1,112 @@
+diff --git a/zig/lib/libc/include/generic-freebsd/resolv.h b/zig/lib/libc/include/generic-freebsd/resolv.h
+index 0d871655..c87a195b 100644
+--- a/zig/lib/libc/include/generic-freebsd/resolv.h
++++ b/zig/lib/libc/include/generic-freebsd/resolv.h
+@@ -104,7 +104,7 @@ __END_DECLS
+  */
+
+ #ifndef _PATH_RESCONF
+-#define	_PATH_RESCONF        "/etc/resolv.conf"
++#define	_PATH_RESCONF        "/data/data/com.termux/files/usr/etc/resolv.conf"
+ #endif
+
+ typedef enum { res_goahead, res_nextns, res_modified, res_done, res_error }
+@@ -502,4 +502,4 @@ int		res_getservers(res_state, union res_sockaddr_union *, int);
+ __END_DECLS
+
+ #endif /* !_RESOLV_H_ */
+-/*! \file */
+\ No newline at end of file
++/*! \file */
+diff --git a/zig/lib/libc/include/generic-glibc/resolv.h b/zig/lib/libc/include/generic-glibc/resolv.h
+index 206ff771..c98434fb 100644
+--- a/zig/lib/libc/include/generic-glibc/resolv.h
++++ b/zig/lib/libc/include/generic-glibc/resolv.h
+@@ -91,7 +91,7 @@
+  */
+
+ #ifndef _PATH_RESCONF
+-#define _PATH_RESCONF        "/etc/resolv.conf"
++#define _PATH_RESCONF        "/data/data/com.termux/files/usr/etc/resolv.conf"
+ #endif
+
+ struct res_sym {
+diff --git a/zig/lib/libc/include/generic-musl/resolv.h b/zig/lib/libc/include/generic-musl/resolv.h
+index a8a2ce20..49fb9038 100644
+--- a/zig/lib/libc/include/generic-musl/resolv.h
++++ b/zig/lib/libc/include/generic-musl/resolv.h
+@@ -64,7 +64,7 @@ typedef struct __res_state {
+ #define	__RES	19960801
+
+ #ifndef _PATH_RESCONF
+-#define _PATH_RESCONF        "/etc/resolv.conf"
++#define _PATH_RESCONF        "/data/data/com.termux/files/usr/etc/resolv.conf"
+ #endif
+
+ struct res_sym {
+@@ -139,4 +139,4 @@ int dn_skipname(const unsigned char *, const unsigned char *);
+ }
+ #endif
+
+-#endif
+\ No newline at end of file
++#endif
+diff --git a/zig/lib/libc/include/generic-netbsd/resolv.h b/zig/lib/libc/include/generic-netbsd/resolv.h
+index eb1a523c..e813f23a 100644
+--- a/zig/lib/libc/include/generic-netbsd/resolv.h
++++ b/zig/lib/libc/include/generic-netbsd/resolv.h
+@@ -108,7 +108,7 @@ __END_DECLS
+  */
+
+ #ifndef _PATH_RESCONF
+-#define _PATH_RESCONF        "/etc/resolv.conf"
++#define _PATH_RESCONF        "/data/data/com.termux/files/usr/etc/resolv.conf"
+ #endif
+
+ typedef enum { res_goahead, res_nextns, res_modified, res_done, res_error }
+@@ -507,4 +507,4 @@ int		res_getservers(res_state,
+ 				    union res_sockaddr_union *, int);
+ __END_DECLS
+
+-#endif /* !_RESOLV_H_ */
+\ No newline at end of file
++#endif /* !_RESOLV_H_ */
+diff --git a/zig/lib/libc/musl/include/resolv.h b/zig/lib/libc/musl/include/resolv.h
+index 8b23ad66..49fb9038 100644
+--- a/zig/lib/libc/musl/include/resolv.h
++++ b/zig/lib/libc/musl/include/resolv.h
+@@ -64,7 +64,7 @@ typedef struct __res_state {
+ #define	__RES	19960801
+
+ #ifndef _PATH_RESCONF
+-#define _PATH_RESCONF        "/etc/resolv.conf"
++#define _PATH_RESCONF        "/data/data/com.termux/files/usr/etc/resolv.conf"
+ #endif
+
+ struct res_sym {
+diff --git a/zig/lib/libc/musl/src/network/resolvconf.c b/zig/lib/libc/musl/src/network/resolvconf.c
+index ceabf080..5c54d5f6 100644
+--- a/zig/lib/libc/musl/src/network/resolvconf.c
++++ b/zig/lib/libc/musl/src/network/resolvconf.c
+@@ -18,7 +18,7 @@ int __get_resolv_conf(struct resolvconf *conf, char *search, size_t search_sz)
+ 	conf->attempts = 2;
+ 	if (search) *search = 0;
+
+-	f = __fopen_rb_ca("/etc/resolv.conf", &_f, _buf, sizeof _buf);
++	f = __fopen_rb_ca("/data/data/com.termux/files/usr/etc/resolv.conf", &_f, _buf, sizeof _buf);
+ 	if (!f) switch (errno) {
+ 	case ENOENT:
+ 	case ENOTDIR:
+diff --git a/lib/std/net.zig b/lib/std/net.zig
+index 03383b0f..cdc4d6cf 100644
+--- a/lib/std/net.zig
++++ b/lib/std/net.zig
+@@ -1606,7 +1606,7 @@ const ResolvConf = struct {
+         };
+         errdefer rc.deinit();
+
+-        const file = fs.openFileAbsoluteZ("/etc/resolv.conf", .{}) catch |err| switch (err) {
++        const file = fs.openFileAbsoluteZ("/data/data/com.termux/files/usr/etc/resolv.conf", .{}) catch |err| switch (err) {
+             error.FileNotFound,
+             error.NotDir,
+             error.AccessDenied,
