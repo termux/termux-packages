@@ -5,6 +5,7 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
 TERMUX_PKG_VERSION="3.13.13"
+TERMUX_PKG_REVISION=1
 _DEBPYTHON_COMMIT=f358ab52bf2932ad55b1a72a29c9762169e6ac47
 TERMUX_PKG_SRCURL=(
 	https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
@@ -34,7 +35,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_ftime=no"
 # Avoid trying to use AT_EACCESS which is not defined:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_faccessat=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --build=$TERMUX_BUILD_TUPLE --with-system-ffi --with-system-expat --without-ensurepip"
-# Hard links does not work on Android 6:
+# Hard links do not work on Android 6:
+# https://github.com/termux/termux-packages/issues/29
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_link=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_linkat=no"
 # Do not assume getaddrinfo is buggy when cross compiling:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_buggy_getaddrinfo=no"
@@ -67,7 +70,7 @@ lib/python${_MAJOR_VERSION}/site-packages/*/
 "
 
 termux_step_post_get_source() {
-	patch="$TERMUX_PKG_BUILDER_DIR/0012-hardcode-android-api-level.diff"
+	patch="$TERMUX_PKG_BUILDER_DIR/hardcode-android-api-level.diff"
 	echo "Applying patch: $(basename "$patch")"
 	test -f "$patch" && sed \
 		-e "s%\@TERMUX_PKG_API_LEVEL\@%${TERMUX_PKG_API_LEVEL}%g" \
@@ -148,7 +151,7 @@ termux_step_post_make_install() {
 
 termux_step_post_massage() {
 	# Verify that desired modules have been included:
-	for module in _bz2 _curses _lzma _sqlite3 _ssl _tkinter zlib; do
+	for module in _bz2 _curses _lzma _multiprocessing _sqlite3 _ssl _tkinter zlib; do
 		if [ ! -f "${TERMUX_PREFIX}/lib/python${_MAJOR_VERSION}/lib-dynload/${module}".*.so ]; then
 			termux_error_exit "Python module library $module not built"
 		fi

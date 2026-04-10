@@ -1,5 +1,20 @@
-diff --git a/configure.ac b/configure.ac
-index 597a44b331a..fa78e09c192 100644
+Important: patch this in both configure and configure.ac,
+because the one that gets used seems to be random when 'autoreconf -fi' is used
+(observed the configure.ac change fail sometimes
+to apply to configure during 'autoreconf -fi')
+https://github.com/termux/termux-packages/issues/29278
+
+--- a/configure
++++ b/configure
+@@ -7006,6 +7006,8 @@ rm -f conftest.out
+ { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for multiarch" >&5
+ printf %s "checking for multiarch... " >&6; }
+ case $ac_sys_system in #(
++  Linux-android) :
++    MULTIARCH="" ;; #(
+   Darwin*) :
+     MULTIARCH="" ;; #(
+   iOS) :
 --- a/configure.ac
 +++ b/configure.ac
 @@ -1134,6 +1134,7 @@ dnl architecture. PLATFORM_TRIPLET will be a pair or single value for these
