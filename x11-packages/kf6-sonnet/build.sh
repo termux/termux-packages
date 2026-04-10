@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE='https://invent.kde.org/frameworks/sonnet'
 TERMUX_PKG_DESCRIPTION='Spelling framework for Qt'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.24.0"
+TERMUX_PKG_VERSION="6.25.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/sonnet-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=f5f107bd4d154c93bbacc717ec3411bcebce3513df103945e202ffa1f0ee9ae7
+TERMUX_PKG_SHA256=510521f1404914943b3141e0b111f2330bbeefdf40405f93c0cf7b84a8c1c589
 TERMUX_PKG_DEPENDS="aspell, hunspell, libc++, libvoikko, qt6-qtbase, qt6-qtdeclarative"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION%.*}), qt6-qttools, qt6-qtbase-cross-tools"
 # hspell can be added to TERMUX_PKG_BUILD_DEPENDS and TERMUX_PKG_RECOMMENDS when available
