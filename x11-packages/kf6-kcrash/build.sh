@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE='https://invent.kde.org/frameworks/kcrash'
 TERMUX_PKG_DESCRIPTION='Support for application crash analysis and bug report from apps'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.24.0"
+TERMUX_PKG_VERSION="6.25.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kcrash-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=4544428c3c96587e46342daf5b1f083dd7950c7bc940d7bc7921300600ef8074
+TERMUX_PKG_SHA256=b1b952c500787e760c0fca3ce20c6ed8cf488ed106e0e72bc604509df84d8fd7
 TERMUX_PKG_DEPENDS="kf6-kcoreaddons (>= ${TERMUX_PKG_VERSION%.*}), libc++, libx11, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION%.*}), qt6-qttools"
 # TERMUX_PKG_RECOMMENDS="drkonqi"
