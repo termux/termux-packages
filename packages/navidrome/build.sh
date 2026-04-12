@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Modern Music Server and Streamer compatible with Subsoni
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="2096779623 <admin@utermux.dev>"
 TERMUX_PKG_VERSION="0.61.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/navidrome/navidrome/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=68273cf2a8938a167d68fd6c6b341f0e06c1f23acfca83698f5673048f9beaae
 TERMUX_PKG_DEPENDS="taglib, ffmpeg"
