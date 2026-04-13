@@ -17,3 +17,22 @@
      if (original_url_is_virtual) {
        base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
            FROM_HERE,
+--- a/chrome/browser/glic/host/context/glic_page_features_manager.cc
++++ b/chrome/browser/glic/host/context/glic_page_features_manager.cc
+@@ -6,6 +6,7 @@
+ 
+ #include <algorithm>
+ 
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/metrics/histogram_functions.h"
+ #include "base/strings/utf_string_conversions.h"
+@@ -122,7 +123,7 @@
+         check_count_ == 0
+             ? YoutubeSummarizeVideoZSS::kButtonFoundOnFirstCheck
+             : YoutubeSummarizeVideoZSS::kButtonFoundOnSecondCheck);
+-    if (!std::ranges::contains(
++    if (!base::Contains(
+             cached_features_,
+             mojom::LightweightPageFeature::kYtAskButtonPresent)) {
+       cached_features_.push_back(
