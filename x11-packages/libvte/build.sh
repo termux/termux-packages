@@ -3,20 +3,25 @@ TERMUX_PKG_DESCRIPTION="Virtual Terminal library"
 TERMUX_PKG_LICENSE="LGPL-3.0, GPL-3.0, MIT"
 TERMUX_PKG_LICENSE_FILE="COPYING.GPL3, COPYING.LGPL3, COPYING.XTERM"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2:0.82.3"
+TERMUX_PKG_VERSION="2:0.84.0"
 TERMUX_PKG_SRCURL=https://gitlab.gnome.org/GNOME/vte/-/archive/${TERMUX_PKG_VERSION:2}/vte-${TERMUX_PKG_VERSION:2}.tar.bz2
 #TERMUX_PKG_SRCURL=https://ftp.gnome.org/pub/GNOME/sources/vte/${_MAJOR_VERSION}/vte-${_VERSION}.tar.xz
-TERMUX_PKG_SHA256=9bfc61cd848345d9176f18e2c167446ca32ab8973f8f0bd9cfc2ec4a8d914c44
+TERMUX_PKG_SHA256=b215d2c8e56fa03e04dfd1b6c5576479484be15227fa49c236271b46d08581d0
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="atk, fribidi, gdk-pixbuf, glib, gtk3, gtk4, libc++, libcairo, libgnutls, libicu, liblz4, pango, pcre2, zlib"
-TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross, valac"
+TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross, valac, libsimdutf"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/locale"
 TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dgir=true
 -Dvapi=true
+-D_systemd=false
 "
+
+termux_step_post_get_source() {
+	rm -f subprojects/simdutf.wrap
+}
 
 termux_step_pre_configure() {
 	termux_setup_gir
