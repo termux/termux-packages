@@ -1,6 +1,6 @@
 --- a/build/gulpfile.vscode.ts
 +++ b/build/gulpfile.vscode.ts
-@@ -43,6 +43,7 @@
+@@ -44,6 +44,7 @@
  const rcedit = promisify(rceditCallback);
  const root = path.dirname(import.meta.dirname);
  const commit = getVersion(root);
@@ -8,7 +8,7 @@
  
  // Build
  const vscodeEntryPoints = [
-@@ -213,7 +214,7 @@
+@@ -321,7 +322,7 @@
  }
  
  function packageTask(platform: string, arch: string, sourceFolderName: string, destinationFolderName: string, _opts?: { stats?: boolean }) {
@@ -17,7 +17,7 @@
  	platform = platform || process.platform;
  
  	const task = () => {
-@@ -467,7 +468,7 @@
+@@ -655,7 +656,7 @@
  }
  
  function patchWin32DependenciesTask(destinationFolderName: string) {
@@ -25,8 +25,17 @@
 +	const cwd = path.join(buildRoot, destinationFolderName);
  
  	return async () => {
- 		const deps = await glob('**/*.node', { cwd, ignore: 'extensions/node_modules/@parcel/watcher/**' });
-@@ -495,8 +496,6 @@
+ 		const versionedResourcesFolder = util.getVersionedResourcesFolder('win32', commit!);
+@@ -691,7 +692,7 @@
+ }
+ 
+ function copyCopilotNativeDepsTask(platform: string, arch: string, destinationFolderName: string) {
+-	const outputDir = path.join(path.dirname(root), destinationFolderName);
++	const outputDir = path.join(buildRoot, destinationFolderName);
+ 
+ 	return async () => {
+ 		// On Windows with win32VersionedUpdate, app resources live under a
+@@ -708,8 +709,6 @@
  	};
  }
  
