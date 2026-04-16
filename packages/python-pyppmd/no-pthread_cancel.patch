@@ -2,21 +2,21 @@ diff --git a/src/lib/buffer/ThreadDecoder.c b/src/lib/buffer/ThreadDecoder.c
 index ca80a52..3216be6 100644
 --- a/src/lib/buffer/ThreadDecoder.c
 +++ b/src/lib/buffer/ThreadDecoder.c
-@@ -179,7 +179,7 @@ int Ppmd7T_decode(CPpmd7 *cPpmd7, CPpmd7z_RangeDec *rc, OutBuffer *out, int max_
- void Ppmd7T_Free(CPpmd7 *cPpmd7, ppmd_info *threadInfo, IAllocPtr allocator) {
-     ppmd_thread_control_t *tc = (ppmd_thread_control_t *)threadInfo->t;
-     if (!(tc->finished)) {
+@@ -199,7 +199,7 @@ void Ppmd7T_Free(CPpmd7 *cPpmd7, ppmd_info *threadInfo, IAllocPtr allocator) {
+         pthread_cond_broadcast(&tc->notEmpty);
+         pthread_mutex_unlock(&tc->mutex);
+ 
 -        pthread_cancel(tc->handle);
 +        pthread_kill(tc->handle, SIGTERM);
+         pthread_join(tc->handle, NULL);
          tc->finished = True;
      }
-     IAlloc_Free(allocator, tc);
-@@ -274,7 +274,7 @@ inempty:
- void Ppmd8T_Free(CPpmd8 *cPpmd8, ppmd_info *threadInfo, IAllocPtr allocator) {
-     ppmd_thread_control_t *tc = (ppmd_thread_control_t *)threadInfo->t;
-     if (!(tc->finished)) {
+@@ -308,7 +308,7 @@ void Ppmd8T_Free(CPpmd8 *cPpmd8, ppmd_info *threadInfo, IAllocPtr allocator) {
+         pthread_cond_broadcast(&tc->notEmpty);
+         pthread_mutex_unlock(&tc->mutex);
+ 
 -        pthread_cancel(tc->handle);
 +        pthread_kill(tc->handle, SIGTERM);
+         pthread_join(tc->handle, NULL);
          tc->finished = True;
      }
-     IAlloc_Free(allocator, tc);
