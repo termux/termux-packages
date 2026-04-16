@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Magical shell history"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="../../LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="18.14.1"
+TERMUX_PKG_VERSION="18.15.1"
 TERMUX_PKG_SRCURL="https://github.com/atuinsh/atuin/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=4b717911a0c8f2752d0e5c5d8f3fb988154972c4b3b079b2db2bacd021074ea5
+TERMUX_PKG_SHA256=5afbcd5a654604ab3118dbacb91d2202cba51500d92a4f2a3d1e43d023fb4b32
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -29,8 +29,6 @@ termux_step_pre_configure() {
 	find ./vendor \
 		-mindepth 1 -maxdepth 1 -type d \
 		! -wholename ./vendor/rustls-platform-verifier \
-		! -wholename ./vendor/serial-core \
-		! -wholename ./vendor/serial-unix \
 		-exec rm -rf '{}' \;
 
 	find vendor/rustls-platform-verifier -type f -print0 | \
@@ -39,15 +37,9 @@ termux_step_pre_configure() {
 		-e "s|ANDROID|DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK|g" \
 		-e 's|"linux"|"android"|g'
 
-	local patch="$TERMUX_PKG_BUILDER_DIR/serial-unix-termios-0.3.3.diff"
-	echo "Applying patch: $patch"
-	patch -p1 -d vendor/serial-unix < "$patch"
-
 	echo "" >> Cargo.toml
 	echo '[patch.crates-io]' >> Cargo.toml
 	echo 'rustls-platform-verifier = { path = "./vendor/rustls-platform-verifier" }' >> Cargo.toml
-	echo 'serial-core = { path = "./vendor/serial-core" }' >> Cargo.toml
-	echo 'serial-unix = { path = "./vendor/serial-unix" }' >> Cargo.toml
 }
 
 termux_step_post_make_install() {
