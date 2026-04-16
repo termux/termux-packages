@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.falkon.org/
 TERMUX_PKG_DESCRIPTION="Cross-platform QtWebEngine Browser"
 TERMUX_PKG_LICENSE="GPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="25.12.3"
+TERMUX_PKG_VERSION="26.04.0"
 TERMUX_PKG_SRCURL=https://download.kde.org/stable/release-service/$TERMUX_PKG_VERSION/src/falkon-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=25f90957335058fff8536b511135e36d96e74c49fab45690be89b994015777b5
+TERMUX_PKG_SHA256=f1f7b91cedc70bf51010f1eecb06f8d5cc4f170f77105b9ffaf0bb1dd6cf075c
 TERMUX_PKG_DEPENDS="kf6-karchive, kf6-ki18n, qt6-qtbase, qt6-qtdeclarative, qt6-qtwebsockets, qt6-qtwebengine"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules"
 # Qt6-Webengine doesn't support i686 on Termux.
