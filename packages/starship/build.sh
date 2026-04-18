@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://starship.rs
 TERMUX_PKG_DESCRIPTION="A minimal, blazing fast, and extremely customizable prompt for any shell"
 TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
-TERMUX_PKG_VERSION="1.24.2"
+TERMUX_PKG_VERSION="1.25.0"
 TERMUX_PKG_SRCURL=https://github.com/starship/starship/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=b7ab0ef364f527395b46d2fb7f59f9592766b999844325e35f62c8fa4d528795
+TERMUX_PKG_SHA256=e77f3c23683eb544f6dae7171e3c80676aefc66329225bdcd58e40846bb6445f
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_DEPENDS="zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -13,6 +13,20 @@ TERMUX_PKG_SUGGESTS="nerdfix, taplo"
 
 termux_step_pre_configure() {
 	termux_setup_rust
+	cargo vendor
+	find ./vendor \
+		-mindepth 1 -maxdepth 1 -type d \
+		! -wholename ./vendor/systemstat \
+		-exec rm -rf '{}' \;
+
+	local patch="$TERMUX_PKG_BUILDER_DIR/systemstat-android-is-linux.diff"
+	echo "Applying patch: $patch"
+	patch -p1 < "$patch"
+
+	echo "" >> Cargo.toml
+	echo '[patch.crates-io]' >> Cargo.toml
+	echo "systemstat = { path = \"./vendor/systemstat\" }" >> Cargo.toml
+
 	termux_setup_cmake
 	: "${CARGO_HOME:=${HOME}/.cargo}"
 	export CARGO_HOME
