@@ -1,0 +1,21 @@
+To fix error:
+
+[87/651] Building CXX object lib/wmchat/CMakeFiles/wmchat.dir/src/wmchat.cpp.o
+FAILED: [code=1] lib/wmchat/CMakeFiles/wmchat.dir/src/wmchat.cpp.o 
+/home/builder/.termux-build/_cache/android-r29-api-24-v4/bin/clang++ --target=aarch64-none-linux-android --gcc-toolchain=/home/builder/.termux-build/_cache/android-r29-api-24-v4 --sysroot=/home/builder/.termux-build/_cache/android-r29-api-24-v4/sysroot -DHAVE_TERMUX -DNCHAT_BUILD_RELEASE=1 -D_XOPEN_SOURCE_EXTENDED -Dwmchat_EXPORTS -I/home/builder/.termux-build/nchat/src/lib/wmchat/../common/src -I/home/builder/.termux-build/nchat/src/lib/wmchat/../ncutil/src -I/home/builder/.termux-build/nchat/src/lib/wmchat/go -I/home/builder/.termux-build/nchat/src/lib/ncutil/ext/QR-Code-generator/cpp -I/home/builder/.termux-build/nchat/src/lib/ncutil/ext/stb -isystem /home/builder/.termux-build/nchat/build/data/data/com.termux/files/usr/lib -fstack-protector-strong -Oz --target=aarch64-linux-android24  -isystem/data/data/com.termux/files/usr/include/c++/v1 -isystem/data/data/com.termux/files/usr/include -O3 -DNDEBUG -std=gnu++14 -fPIC -Wall -Wextra -Wpedantic -Wshadow -Wpointer-arith                        -Wcast-qual -Wno-missing-braces -Wswitch-default                        -Wunreachable-code -Wundef -Wuninitialized                        -Wcast-align -MD -MT lib/wmchat/CMakeFiles/wmchat.dir/src/wmchat.cpp.o -MF lib/wmchat/CMakeFiles/wmchat.dir/src/wmchat.cpp.o.d -o lib/wmchat/CMakeFiles/wmchat.dir/src/wmchat.cpp.o -c /home/builder/.termux-build/nchat/src/lib/wmchat/src/wmchat.cpp
+/home/builder/.termux-build/nchat/src/lib/wmchat/src/wmchat.cpp:16:10: fatal error: 'libcgowm.h' file not found
+   16 | #include "libcgowm.h"
+      |          ^~~~~~~~~~~~
+1 error generated.
+
+
+--- ./lib/wmchat/CMakeLists.txt~	2026-03-21 05:06:10.000000000 +0100
++++ ./lib/wmchat/CMakeLists.txt	2026-04-25 11:30:22.867254774 +0200
+@@ -34,6 +34,7 @@
+ # Headers
+ target_include_directories(wmchat PRIVATE "../common/src")
+ target_include_directories(wmchat PRIVATE "../ncutil/src")
++target_include_directories(wmchat PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/go")
+ 
+ # Compiler flags
+ set_target_properties(wmchat PROPERTIES COMPILE_FLAGS
