@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://lxqt.github.io
 TERMUX_PKG_DESCRIPTION="Tools to configure LXQt and the underlying operating system"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.3.2"
+TERMUX_PKG_VERSION="2.4.0"
 TERMUX_PKG_SRCURL="https://github.com/lxqt/lxqt-config/releases/download/${TERMUX_PKG_VERSION}/lxqt-config-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=6bfa556fafa27a4e1ea43a76de3b6f89885a39376e2b874d51977515639db0f4
+TERMUX_PKG_SHA256=8943a0d61993e068fa71aac85eb1eb93ac32064928ee1c8c1ff9666b45e1610e
 TERMUX_PKG_DEPENDS="libc++, liblxqt, libqtxdg, libxcb, libxcursor, libxfixes, lxqt-menu-data, qt6-qtbase, shared-mime-info, zlib"
 TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt6-qttools"
 # libinput is required to switch on input configuration
