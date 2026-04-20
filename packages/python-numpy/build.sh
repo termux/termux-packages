@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="The fundamental package for scientific computing with Py
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 # Revbump revdeps after updating
-TERMUX_PKG_VERSION="2.4.3"
+TERMUX_PKG_VERSION="2.4.4"
 TERMUX_PKG_SRCURL="https://github.com/numpy/numpy/releases/download/v$TERMUX_PKG_VERSION/numpy-$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=483a201202b73495f00dbc83796c6ae63137a9bdade074f7648b3e32613412dd
+TERMUX_PKG_SHA256=2d390634c5182175533585cc89f3608a4682ccb173cc9bb940b2881c8d6f8fa0
 TERMUX_PKG_DEPENDS="libc++, libopenblas, python"
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
