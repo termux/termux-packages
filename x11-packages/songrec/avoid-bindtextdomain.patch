@@ -1,0 +1,31 @@
+Prevents this crash, by disabling bindtextdomain() calls, which are also disabled in other Termux packages.
+
+...songrec', stop reason = signal SIGSEGV: address not mapped to object...
+
+...gettextrs::bindtextdomain::hec38...
+
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -296,7 +296,6 @@ macro_rules! app {
+ fn main() -> Result<(), Box<dyn Error>> {
+     // Set up the translation/internationalization part
+ 
+-    let i18n_folder = setup_internationalization();
+ 
+     // TODO simplify the code in this module etc. path handling ^
+ 
+@@ -314,14 +314,6 @@ fn main() -> Result<(), Box<dyn Error>> {
+ 
+     Logging::bind_glib_logging();
+ 
+-    match i18n_folder {
+-        Some(path) => {
+-            debug!("Translations folder found at: {}", path.to_str().unwrap());
+-        }
+-        None => {
+-            debug!("Translations folder set to system default");
+-        }
+-    };
+ 
+     // Set the FreeDesktop ID of the program.
+ 

@@ -1,0 +1,14 @@
+cpal 0.18.0 no longer has a "StreamError"
+https://github.com/RustAudio/cpal/blob/master/UPGRADING.md#1-unified-error-and-errorkind-type
+
+--- a/src/core/microphone_thread.rs
++++ b/src/core/microphone_thread.rs
+@@ -76,7 +76,7 @@ pub fn microphone_thread(
+ 
+                 let err_fn_2 = err_fn.clone();
+                 let err_fn_3 = err_fn.clone();
+-                let err_fn_cb = move |error: cpal::StreamError| {
++                let err_fn_cb = move |error: cpal::Error| {
+                     err_fn_2(Box::new(error));
+                 };
+ 
