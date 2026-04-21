@@ -12,15 +12,15 @@ Subject: [PATCH] Do not use `__builtin_elementwise_ctlz/cttz for `clc_clz/ctz`
  delete mode 100644 libclc/clc/lib/generic/integer/clc_clz.inc
  delete mode 100644 libclc/clc/lib/generic/integer/clc_ctz.inc
 
-diff --git a/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_clz.cl b/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_clz.cl
+diff --git a/external/clspv/third_party/llvm/libclc/clc/lib/generic/integer/clc_clz.cl b/external/clspv/third_party/llvm/libclc/clc/lib/generic/integer/clc_clz.cl
 index 48c4400f1..ae98288d5 100644
---- a/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_clz.cl
-+++ b/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_clz.cl
+--- a/external/clspv/third_party/llvm/libclc/clc/lib/generic/integer/clc_clz.cl
++++ b/external/clspv/third_party/llvm/libclc/clc/lib/generic/integer/clc_clz.cl
 @@ -9,5 +9,38 @@
- #include <clc/integer/clc_clz.h>
- #include <clc/internal/clc.h>
+ #include "clc/integer/clc_clz.h"
+ #include "clc/internal/clc.h"
  
--#define __CLC_BODY <clc_clz.inc>
+-#define __CLC_BODY "clc_clz.inc"
 +_CLC_OVERLOAD _CLC_DEF char __clc_clz(char x) {
 +  return __clc_clz((ushort)(uchar)x) - 8;
 +}
@@ -54,12 +54,12 @@ index 48c4400f1..ae98288d5 100644
 +}
 +
 +#define __CLC_FUNCTION __clc_clz
-+#define __CLC_BODY <clc/shared/unary_def_scalarize.inc>
- #include <clc/integer/gentype.inc>
-diff --git a/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_clz.inc b/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_clz.inc
++#define __CLC_BODY "clc/shared/unary_def_scalarize.inc"
+ #include "clc/integer/gentype.inc"
+diff --git a/external/clspv/third_party/llvm/libclc/clc/lib/generic/integer/clc_clz.inc b/external/clspv/third_party/llvm/libclc/clc/lib/generic/integer/clc_clz.inc
 deleted file mode 100644
 index 1972a338f..000000000
---- a/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_clz.inc
+--- a/external/clspv/third_party/llvm/libclc/clc/lib/generic/integer/clc_clz.inc
 +++ /dev/null
 @@ -1,11 +0,0 @@
 -//===----------------------------------------------------------------------===//
@@ -73,15 +73,15 @@ index 1972a338f..000000000
 -_CLC_OVERLOAD _CLC_DEF __CLC_GENTYPE __clc_clz(__CLC_GENTYPE x) {
 -  return __builtin_elementwise_clzg(x, (__CLC_GENTYPE)__CLC_GENSIZE);
 -}
-diff --git a/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_ctz.cl b/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_ctz.cl
+diff --git a/external/clspv/third_party/llvm/libclc/clc/lib/generic/integer/clc_ctz.cl b/external/clspv/third_party/llvm/libclc/clc/lib/generic/integer/clc_ctz.cl
 index 42cfa90c3..96afe951d 100644
---- a/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_ctz.cl
-+++ b/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_ctz.cl
+--- a/external/clspv/third_party/llvm/libclc/clc/lib/generic/integer/clc_ctz.cl
++++ b/external/clspv/third_party/llvm/libclc/clc/lib/generic/integer/clc_ctz.cl
 @@ -9,5 +9,34 @@
- #include <clc/integer/clc_ctz.h>
- #include <clc/internal/clc.h>
+ #include "clc/integer/clc_ctz.h"
+ #include "clc/internal/clc.h"
  
--#define __CLC_BODY <clc_ctz.inc>
+-#define __CLC_BODY "clc_ctz.inc"
 +_CLC_OVERLOAD _CLC_DEF char __clc_ctz(char x) {
 +  return __clc_ctz(__clc_as_uchar(x));
 +}
@@ -111,12 +111,12 @@ index 42cfa90c3..96afe951d 100644
 +}
 +
 +#define __CLC_FUNCTION __clc_ctz
-+#define __CLC_BODY <clc/shared/unary_def_scalarize.inc>
- #include <clc/integer/gentype.inc>
-diff --git a/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_ctz.inc b/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_ctz.inc
++#define __CLC_BODY "clc/shared/unary_def_scalarize.inc"
+ #include "clc/integer/gentype.inc"
+diff --git a/external/clspv/third_party/llvm/libclc/clc/lib/generic/integer/clc_ctz.inc b/external/clspv/third_party/llvm/libclc/clc/lib/generic/integer/clc_ctz.inc
 deleted file mode 100644
 index b868482fd..000000000
---- a/external/clspv/third_party/llvm/libclc//clc/lib/generic/integer/clc_ctz.inc
+--- a/external/clspv/third_party/llvm/libclc/clc/lib/generic/integer/clc_ctz.inc
 +++ /dev/null
 @@ -1,11 +0,0 @@
 -//===----------------------------------------------------------------------===//
