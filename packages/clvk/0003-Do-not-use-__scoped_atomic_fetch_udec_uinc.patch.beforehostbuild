@@ -10,10 +10,10 @@ Subject: [PATCH] Do not use `__scoped_atomic_fetch_udec/uinc` for
  libclc/clc/lib/generic/atomic/clc_atomic_inc.cl  | 2 +-
  3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/external/clspv/third_party/llvm/libclc//clc/lib/generic/atomic/clc_atomic_dec.cl b/external/clspv/third_party/llvm/libclc//clc/lib/generic/atomic/clc_atomic_dec.cl
+diff --git a/external/clspv/third_party/llvm/libclc/clc/lib/generic/atomic/clc_atomic_dec.cl b/external/clspv/third_party/llvm/libclc/clc/lib/generic/atomic/clc_atomic_dec.cl
 index 4603e7ebd..7984dba57 100644
---- a/external/clspv/third_party/llvm/libclc//clc/lib/generic/atomic/clc_atomic_dec.cl
-+++ b/external/clspv/third_party/llvm/libclc//clc/lib/generic/atomic/clc_atomic_dec.cl
+--- a/external/clspv/third_party/llvm/libclc/clc/lib/generic/atomic/clc_atomic_dec.cl
++++ b/external/clspv/third_party/llvm/libclc/clc/lib/generic/atomic/clc_atomic_dec.cl
 @@ -9,7 +9,7 @@
  #include <clc/atomic/clc_atomic_dec.h>
  
@@ -23,10 +23,10 @@ index 4603e7ebd..7984dba57 100644
  #define __CLC_INC_DEC
  
  #define __CLC_BODY <clc_atomic_def.inc>
-diff --git a/external/clspv/third_party/llvm/libclc//clc/lib/generic/atomic/clc_atomic_def.inc b/external/clspv/third_party/llvm/libclc//clc/lib/generic/atomic/clc_atomic_def.inc
+diff --git a/external/clspv/third_party/llvm/libclc/clc/lib/generic/atomic/clc_atomic_def.inc b/external/clspv/third_party/llvm/libclc/clc/lib/generic/atomic/clc_atomic_def.inc
 index 3a313defe..5ce2445c0 100644
---- a/external/clspv/third_party/llvm/libclc//clc/lib/generic/atomic/clc_atomic_def.inc
-+++ b/external/clspv/third_party/llvm/libclc//clc/lib/generic/atomic/clc_atomic_def.inc
+--- a/external/clspv/third_party/llvm/libclc/clc/lib/generic/atomic/clc_atomic_def.inc
++++ b/external/clspv/third_party/llvm/libclc/clc/lib/generic/atomic/clc_atomic_def.inc
 @@ -44,7 +44,7 @@
  #define __CLC_DEFINE_ATOMIC(ADDRSPACE)                                         \
    _CLC_OVERLOAD _CLC_DEF __CLC_GENTYPE __CLC_FUNCTION(                         \
@@ -36,19 +36,19 @@ index 3a313defe..5ce2445c0 100644
                                 MemoryScope);                                   \
    }
  #elif defined(__CLC_RETURN_VOID)
-diff --git a/external/clspv/third_party/llvm/libclc//clc/lib/generic/atomic/clc_atomic_inc.cl b/external/clspv/third_party/llvm/libclc//clc/lib/generic/atomic/clc_atomic_inc.cl
+diff --git a/external/clspv/third_party/llvm/libclc/clc/lib/generic/atomic/clc_atomic_inc.cl b/external/clspv/third_party/llvm/libclc/clc/lib/generic/atomic/clc_atomic_inc.cl
 index 53915c588..7171f84c3 100644
---- a/external/clspv/third_party/llvm/libclc//clc/lib/generic/atomic/clc_atomic_inc.cl
-+++ b/external/clspv/third_party/llvm/libclc//clc/lib/generic/atomic/clc_atomic_inc.cl
+--- a/external/clspv/third_party/llvm/libclc/clc/lib/generic/atomic/clc_atomic_inc.cl
++++ b/external/clspv/third_party/llvm/libclc/clc/lib/generic/atomic/clc_atomic_inc.cl
 @@ -9,7 +9,7 @@
- #include <clc/atomic/clc_atomic_inc.h>
+ #include "clc/atomic/clc_atomic_inc.h"
  
  #define __CLC_FUNCTION __clc_atomic_inc
 -#define __CLC_IMPL_FUNCTION __scoped_atomic_fetch_uinc
 +#define __CLC_IMPL_FUNCTION __scoped_atomic_fetch_sub
  #define __CLC_INC_DEC
  
- #define __CLC_BODY <clc_atomic_def.inc>
+ #define __CLC_BODY "clc_atomic_def.inc"
 -- 
 2.43.0
 
