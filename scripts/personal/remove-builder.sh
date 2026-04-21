@@ -13,7 +13,7 @@ fi
 
 _remove_container() {
 	$SUDO docker container rm -f "$1"
-	rm -rf "output/_builder/$1"
+	$SUDO rm -rf "output/_builder/$1"
 }
 
 if (( "$#" > 1 )); then
