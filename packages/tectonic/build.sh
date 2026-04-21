@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://tectonic-typesetting.github.io/
 TERMUX_PKG_DESCRIPTION="A modernized, complete, self-contained TeX/LaTeX engine"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.15.0"
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_VERSION="0.16.9"
 TERMUX_PKG_SRCURL=git+https://github.com/tectonic-typesetting/tectonic
 TERMUX_PKG_GIT_BRANCH=tectonic@${TERMUX_PKG_VERSION}
-TERMUX_PKG_DEPENDS="fontconfig, freetype, libc++, libgraphite, libicu, libpng, openssl, zlib"
+TERMUX_PKG_DEPENDS="fontconfig, freetype, libc++, libgraphite, libicu, libpng, openssl, zlib, harfbuzz"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_pkg_auto_update() {
@@ -29,7 +28,7 @@ termux_pkg_auto_update() {
 
 termux_step_make() {
 	termux_setup_rust
-	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release --features "external-harfbuzz"
 }
 
 termux_step_make_install() {
