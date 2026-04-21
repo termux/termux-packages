@@ -8,7 +8,6 @@ TERMUX_PKG_SHA256=0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make_install() {
-	# Standard Termux Cross-Compilation
 	$CXX $CXXFLAGS $CPPFLAGS -std=c++17 \
 		$TERMUX_PKG_SRCDIR/javax-comp.cpp \
 		$TERMUX_PKG_SRCDIR/xcompiler.cpp \
