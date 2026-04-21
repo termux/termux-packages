@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://jfrog.com/getcli
 TERMUX_PKG_DESCRIPTION="A CLI for JFrog products"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.101.0"
+TERMUX_PKG_VERSION="2.102.0"
 TERMUX_PKG_SRCURL=https://github.com/jfrog/jfrog-cli/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=b39bb1a9b44ea01d56f463998193cdbe1ee5f4dd79acda6736c87e328cdb06ab
+TERMUX_PKG_SHA256=8370b9ab1f98f5a542d0a2f65e33ea0c4eadaee9280b9cc1c8355bb3a990dae0
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
