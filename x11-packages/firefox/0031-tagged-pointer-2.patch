@@ -23,8 +23,8 @@ https://github.com/termux/termux-packages/issues/29105
  // Type we'll be using to store callback handle ref counts
  //
  // 32-bits should never overflow and ReleaseAcquire is the recommended memory
-@@ -64,6 +71,44 @@
-   return refCount;
+@@ -66,6 +73,46 @@
+   delete handlePointer;
  }
  
 +#else
@@ -56,11 +56,13 @@ https://github.com/termux/termux-packages/issues/29105
 +uint32_t CallbackHandleRelease(uint64_t aHandle) {
 +  std::lock_guard lock(gHandleMapMutex);
 +  auto it = gHandleMap.find(aHandle);
-+  uint32_t refCount = --(it->second);
-+  if (refCount == 0) {
-+    gHandleMap.erase(it);
-+  }
-+  return refCount;
++  return --(it->second);
++}
++
++void CallbackHandleFree(uint64_t aHandle) {
++  std::lock_guard lock(gHandleMapMutex);
++  auto it = gHandleMap.find(aHandle);
++  gHandleMap.erase(it);
 +}
 +
 +#endif
