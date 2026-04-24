@@ -94,7 +94,7 @@ fi
 	fi
 
 	# unmount overlayfs before we remove the parent directory
-	[ -d "$TERMUX_TOPDIR" ] && for dir in $(find "$TERMUX_TOPDIR" -type d); do
+	[[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]] && [ -d "$TERMUX_TOPDIR" ] && for dir in $(find "$TERMUX_TOPDIR" -type d); do
 		if mountpoint -q "$dir"; then
 			umount "$dir"
 		fi
