@@ -26,7 +26,7 @@ termux_step_make() {
 
 	local SDK_VER=$(go list -f '{{.Version}}' -m code.gitea.io/sdk/gitea)
 	go build \
-		-ldflags "-X 'main.Version=${TERMUX_PKG_VERSION}' -X 'main.SDK=${SDK_VER}'" \
+		-ldflags "-X 'code.gitea.io/tea/modules/version.Version=${TERMUX_PKG_VERSION}' -X 'code.gitea.io/tea/modules/version.SDK=${SDK_VER}'" \
 		-o tea
 }
 
