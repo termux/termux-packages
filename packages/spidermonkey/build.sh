@@ -2,11 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://spidermonkey.dev
 TERMUX_PKG_DESCRIPTION="Mozilla's JavaScript engine"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="128.10.0"
-TERMUX_PKG_REVISION=2
-_REAL_VERSION=${TERMUX_PKG_VERSION}esr
-TERMUX_PKG_SRCURL=https://archive.mozilla.org/pub/firefox/releases/$_REAL_VERSION/source/firefox-$_REAL_VERSION.source.tar.xz
-TERMUX_PKG_SHA256=2ed83e26e41a8b3e2c7c0d13448a84dbb9b7ed65ed46bc162d629b0c6b071caf
+TERMUX_PKG_VERSION="140.7.0"
+TERMUX_PKG_SRCURL="https://archive.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION}esr/source/firefox-${TERMUX_PKG_VERSION}esr.source.tar.xz"
+TERMUX_PKG_SHA256=608a739071726f30236f7100ec5e30e1b8ec342d4e91e715948c287909cb1529
 TERMUX_PKG_DEPENDS="libicu, libnspr, libnss, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 

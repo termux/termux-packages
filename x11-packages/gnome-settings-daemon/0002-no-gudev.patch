@@ -1,0 +1,65 @@
+--- a/plugins/power/gsd-backlight.c
++++ b/plugins/power/gsd-backlight.c
+@@ -27,7 +27,7 @@
+ #include "gsd-power-constants.h"
+ #include "gsd-power-manager.h"
+ 
+-#ifdef __linux__
++#if defined(__linux__) && defined(HAVE_GUDEV) && HAVE_GUDEV
+ #include <gudev/gudev.h>
+ #endif /* __linux__ */
+ 
+@@ -53,7 +53,7 @@
+ 
+         BacklightBackend backend;
+ 
+-#ifdef __linux__
++#if defined(__linux__) && defined(HAVE_GUDEV) && HAVE_GUDEV
+         GDBusProxy *logind_proxy;
+ 
+         GUdevClient *udev;
+@@ -93,7 +93,7 @@
+                         G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE,
+                                                gsd_backlight_initable_iface_init);)
+ 
+-#ifdef __linux__
++#if defined(__linux__) && defined(HAVE_GUDEV) && HAVE_GUDEV
+ static GUdevDevice*
+ gsd_backlight_udev_get_type (GList *devices, const gchar *type)
+ {
+@@ -511,7 +511,7 @@
+                 return;
+         }
+ 
+-#ifdef __linux__
++#if defined(__linux__) && defined(HAVE_GUDEV) && HAVE_GUDEV
+         if (backlight->backend == BACKLIGHT_BACKEND_UDEV) {
+                 BacklightHelperData *task_data;
+ 
+@@ -915,7 +915,7 @@
+                                  G_CONNECT_SWAPPED);
+         maybe_update_mutter_backlight (backlight);
+ 
+-#ifdef __linux__
++#if defined(__linux__) && defined(HAVE_GUDEV) && HAVE_GUDEV
+         backlight->logind_proxy =
+                 g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
+                                                0,
+@@ -987,7 +987,7 @@
+ {
+         GsdBacklight *backlight = GSD_BACKLIGHT (object);
+ 
+-#ifdef __linux__
++#if defined(__linux__) && defined(HAVE_GUDEV) && HAVE_GUDEV
+         g_assert (backlight->active_task == NULL);
+         g_assert (g_queue_is_empty (&backlight->tasks));
+         g_clear_object (&backlight->logind_proxy);
+@@ -1033,7 +1033,7 @@
+         backlight->brightness_val = -1;
+         backlight->brightness_step = 1;
+ 
+-#ifdef __linux__
++#if defined(__linux__) && defined(HAVE_GUDEV) && HAVE_GUDEV
+         backlight->active_task = NULL;
+         g_queue_init (&backlight->tasks);
+ #endif /* __linux__ */
