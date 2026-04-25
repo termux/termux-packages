@@ -49,6 +49,7 @@ PACKAGES+=" uuid-utils"
 PACKAGES+=" valac"
 PACKAGES+=" xmlto"				# Needed by git's manpage generation
 PACKAGES+=" zip"
+PACKAGES+=" file"				# Needed by nchat
 
 PYTHON_PACKAGES=""
 PYTHON_PACKAGES+=" itstool"			# necessary to build orca and some other packages
