@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE="https://apps.kde.org/angelfish"
 TERMUX_PKG_DESCRIPTION="Web browser for Plasma Mobile"
 TERMUX_PKG_LICENSE="GPL-2.0-or-later, LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="25.12.3"
+TERMUX_PKG_VERSION="26.04.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/angelfish-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=344138769158714d45c7bf2625c517b126afd375166c47ac2caa11d007352325
+TERMUX_PKG_SHA256=ab4caa582c6c98672ef83eeeb69242ca8b45013a0cd56e17fb6461c326da4ed1
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="futuresql, kf6-kconfig, kf6-kcoreaddons, kf6-kcrash, kf6-kdbusaddons, kf6-ki18n, kf6-kirigami, kf6-knotifications, kf6-kwindowsystem, kf6-purpose, kf6-qqc2-desktop-style, kirigami-addons, libc++, qcoro, qt6-qt5compat, qt6-qtbase, qt6-qtdeclarative, qt6-qtwebengine"
 TERMUX_PKG_BUILD_DEPENDS="corrosion, extra-cmake-modules, qcoro-static"
@@ -13,6 +13,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_SYSTEM_NAME=Linux
 -DKDE_INSTALL_QMLDIR=lib/qt6/qml
 -DKDE_INSTALL_QTPLUGINDIR=lib/qt6/plugins
+-DCMAKE_MODULE_PATH=$TERMUX_PREFIX/share/cmake
 "
 
 termux_step_pre_configure() {
