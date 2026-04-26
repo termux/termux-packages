@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/open-source-parsers/jsoncpp
 TERMUX_PKG_DESCRIPTION="C++ library for interacting with JSON"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.9.6
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="1.9.7"
 TERMUX_PKG_SRCURL=https://github.com/open-source-parsers/jsoncpp/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=f93b6dd7ce796b13d02c108bc9f79812245a82e577581c4c9aabe57075c90ea2
+TERMUX_PKG_SHA256=830bf352d822d8558e9d0eb19d640d2e38536b4b6699c30a4488da09d5b1df18
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BREAKS="jsoncpp-dev"
@@ -20,7 +19,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	local _SOVERSION=26
+	local _SOVERSION=27
 
 	local v=$(sed -En 's/^set\(PROJECT_SOVERSION\s+([0-9]+).*/\1/p' \
 			CMakeLists.txt)
