@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=http://www.flintlib.org
 TERMUX_PKG_DESCRIPTION="C library for doing number theory"
 TERMUX_PKG_LICENSE="LGPL-3.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.4.0"
+TERMUX_PKG_VERSION="3.5.0"
 TERMUX_PKG_SRCURL="https://github.com/flintlib/flint/releases/download/v$TERMUX_PKG_VERSION/flint-$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=9497679804dead926e3affeb8d4c58739d1c7684d60c2c12827550d28e454a33
+TERMUX_PKG_SHA256=3982f385f00610a944e0152eb0a29893b2366fa640e8f5f3076c47564cf7e2a6
 TERMUX_PKG_DEPENDS="blas-openblas, libgmp, libmpfr"
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -22,7 +22,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	local _SOVERSION=22
+	local _SOVERSION=23
 
 	local v=$(sed -En 's/^FLINT_MAJOR_SO=([0-9]+).*/\1/p' configure.ac)
 	if [ "${v}" != "${_SOVERSION}" ]; then
