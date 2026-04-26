@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://wiki.gnome.org/Accessibility
 TERMUX_PKG_DESCRIPTION="Assistive Technology Service Provider Interface (AT-SPI)"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.60.1"
+TERMUX_PKG_VERSION="2.60.2"
 # https://download.gnome.org/sources/at-spi2-core/${TERMUX_PKG_VERSION%.*}/at-spi2-core-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SRCURL=https://gitlab.gnome.org/GNOME/at-spi2-core/-/archive/${TERMUX_PKG_VERSION}/at-spi2-core-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=385d616ae796eccc5652082edeb1cf1f5ee5a4eaa87e223b0406a79efb28d104
+TERMUX_PKG_SHA256=446f6c181f38a91e3821d8bac206ef28724398a93c7fd3493ce6883b405724b4
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="dbus, glib, libx11, libxi, libxtst"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, libxml2"
