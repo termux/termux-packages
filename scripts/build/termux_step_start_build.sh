@@ -14,7 +14,7 @@ termux_step_start_build() {
 	fi
 
 	if [ -n "${TERMUX_PKG_EXCLUDED_ARCHES:=""}" ] && [ "$TERMUX_PKG_EXCLUDED_ARCHES" != "${TERMUX_PKG_EXCLUDED_ARCHES/$TERMUX_ARCH/}" ]; then
-		echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
+		echo "skipping build $TERMUX_PKG_NAME for $TERMUX_ARCH"
 		exit 0
 	fi
 
@@ -51,7 +51,7 @@ termux_step_start_build() {
 		if [ "$TERMUX_PKG_HAS_DEBUG" = "true" ]; then
 			DEBUG="-dbg"
 		else
-			echo "Skipping building debug build for $TERMUX_PKG_NAME"
+			echo "skipping debug build of $TERMUX_PKG_NAME"
 			exit 0
 		fi
 	else
@@ -61,12 +61,12 @@ termux_step_start_build() {
 	if [ "$TERMUX_DEBUG_BUILD" = "false" ] && [ "$TERMUX_FORCE_BUILD" = "false" ]; then
 		if [ -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME" ] &&
 			[ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME")" = "$TERMUX_PKG_FULLVERSION" ]; then
-			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION built - skipping (rm $TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME to force rebuild)"
+			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_VERSION already built - skipping (rm $TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME to force rebuild)"
 			exit 0
 		elif [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] &&
 			([[ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" && "$(dpkg-query -W -f '${db:Status-Status} ${Version}\n' "$TERMUX_PKG_NAME" 2>/dev/null)" = "installed $TERMUX_PKG_FULLVERSION" ]] ||
 			 [[ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" && "$(pacman -Q $TERMUX_PKG_NAME 2>/dev/null)" = "$TERMUX_PKG_NAME $TERMUX_PKG_FULLVERSION_FOR_PACMAN" ]]); then
-			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION installed - skipping"
+			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_VERSION already installed - skipping"
 			exit 0
 		fi
 	fi
@@ -78,7 +78,7 @@ termux_step_start_build() {
 		TERMUX_PKG_BUILD_ONLY_MULTILIB=true
 	fi
 
-	echo "termux - building $TERMUX_PKG_NAME for arch $TERMUX_ARCH..."
+	echo "Building $TERMUX_PKG_NAME for $TERMUX_ARCH..."
 	test -t 1 && printf "\033]0;%s...\007" "$TERMUX_PKG_NAME"
 
 	# Avoid exporting PKG_CONFIG_LIBDIR until after termux_step_host_build.
