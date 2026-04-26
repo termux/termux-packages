@@ -19,6 +19,17 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLE_AVX2=OFF
 "
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=22
+
+	local v=$(sed -En 's/^FLINT_MAJOR_SO=([0-9]+).*/\1/p' configure.ac)
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed: expected $_SOVERSION, got $v"
+	fi
+}
+
 termux_step_pre_configure() {
 	# upstream discourages the use of the CMakeLists.txt on UNIX-like platforms,
 	# but Arch Linux forcibly runs the CMakeLists.txt anyway using this,
