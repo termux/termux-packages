@@ -1,6 +1,16 @@
+--- a/Makefile
++++ b/Makefile
+@@ -135,7 +135,6 @@
+ ifneq "${GOOS}" "darwin"
+ ifneq "${GOOS}" "windows"
+ 	go-build-finalize= \
+-		CGO_LDFLAGS="${LIBFIDO2_LDFLAGS}" \
+ 		$(call go-build,$(1),$(2),$(3))
+ endif
+ endif
 --- a/internal/frontend/cli/accounts.go
 +++ b/internal/frontend/cli/accounts.go
-@@ -27,9 +27,7 @@ import (
+@@ -27,9 +27,7 @@
  	"github.com/ProtonMail/proton-bridge/v3/internal/bridge"
  	"github.com/ProtonMail/proton-bridge/v3/internal/certs"
  	"github.com/ProtonMail/proton-bridge/v3/internal/constants"
@@ -10,7 +20,7 @@
  	"github.com/ProtonMail/proton-bridge/v3/internal/vault"
  	"github.com/abiosoft/ishell"
  	"github.com/sirupsen/logrus"
-@@ -188,8 +186,6 @@ func (f *frontendCLI) loginAccount(c *ishell.Context) {
+@@ -188,8 +186,6 @@
  		return
  	}
  
@@ -19,7 +29,7 @@
  	switch auth.TwoFA.Enabled {
  	case proton.HasTOTP:
  		if err := f.loginTOTP(c, client); err != nil {
-@@ -198,45 +194,12 @@ func (f *frontendCLI) loginAccount(c *ishell.Context) {
+@@ -198,45 +194,12 @@
  		}
  
  	case proton.HasFIDO2:
@@ -35,8 +45,8 @@
 -		}
 -		if err := fido.AuthWithHardwareKeyCLI(f, client, auth); err != nil {
 -			if errors.Is(err, fido.ErrorUnsupportedWindowsVersion) {
--				f.printAndLogError("Hardware keys aren't supported on this version of Windows.\n" +
--					"To sign in on this device, you'll need to update Windows or add an authenticator app to your account")
+-				f.printAndLogError("Hardware security keys are not supported in this version of Windows.\n" +
+-					"To continue signing in, use a code from your authenticator app.")
 -			} else {
 -				f.printAndLogError("Cannot login: ", err)
 -			}
@@ -50,8 +60,8 @@
 -		if useFIDO {
 -			err := fido.AuthWithHardwareKeyCLI(f, client, auth)
 -			if errors.Is(err, fido.ErrorUnsupportedWindowsVersion) {
--				f.printAndLogError("Hardware keys aren't supported on this version of Windows.\n" +
--					"To continue signing in, use a code from your authenticator app.")
+-				f.printAndLogError("Hardware security keys are not supported in this version of Windows.\n" +
+-					"To sign in on this device, update Windows or add an authenticator app to your account.")
 -				err = f.loginTOTP(c, client)
 -			}
 -			if err != nil {
@@ -69,13 +79,3 @@
  	}
  
  	var keyPass []byte
---- a/Makefile
-+++ b/Makefile
-@@ -134,7 +134,6 @@ endif
- ifneq "${GOOS}" "darwin"
- ifneq "${GOOS}" "windows"
- 	go-build-finalize= \
--		CGO_LDFLAGS="${LIBFIDO2_LDFLAGS}" \
- 		$(call go-build,$(1),$(2),$(3))
- endif
- endif
