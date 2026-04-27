@@ -9,10 +9,10 @@ TERMUX_PKG_SRCURL=https://github.com/thangnhox/ip4termux/archive/refs/tags/v${TE
 TERMUX_PKG_SHA256=6945172838a414972e43378740519e31c0306b156f386291e9790cb25cb54418
 
 termux_step_make() {
-    cd $TERMUX_PKG_SRCDIR
-    $CC $CFLAGS $CPPFLAGS $LDFLAGS ip.c -o ip
+	cd $TERMUX_PKG_SRCDIR
+	$CC $CFLAGS $CPPFLAGS $LDFLAGS ip.c -o ip
 }
 
 termux_step_make_install() {
-    install -Dm755 $TERMUX_PKG_SRCDIR/ip $TERMUX_PREFIX/bin/termux-ip
+	install -Dm755 $TERMUX_PKG_SRCDIR/ip $TERMUX_PREFIX/bin/termux-ip
 }
