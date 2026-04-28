@@ -1,0 +1,46 @@
+From f7c6ed47c0b15a5bf5481610d74b6405f588bd89 Mon Sep 17 00:00:00 2001
+From: lumaparallax <257510328+lumaparallax@users.noreply.github.com>
+Date: Mon, 20 Apr 2026 21:32:52 +0900
+Subject: [PATCH 8/9] relax Qt and libvlc versioning
+
+---
+ frontend/cmake/os-linux.cmake        | 9 +++++++++
+ plugins/vlc-video/vlc-video-plugin.c | 2 ++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/frontend/cmake/os-linux.cmake b/frontend/cmake/os-linux.cmake
+index 29aa32e3e..1f7273b5d 100644
+--- a/frontend/cmake/os-linux.cmake
++++ b/frontend/cmake/os-linux.cmake
+@@ -13,6 +13,15 @@ target_compile_definitions(
+ )
+ target_link_libraries(obs-studio PRIVATE Qt::DBus)
+ 
++if(OS_ANDROID)
++    find_package(Qt6 REQUIRED COMPONENTS GuiPrivate)
++    target_link_libraries(obs-studio PRIVATE Qt::GuiPrivate)
++else()
++    if(Qt6_VERSION VERSION_LESS "6.9.0")
++        target_link_libraries(obs-studio PRIVATE Qt::GuiPrivate)
++    endif()
++endif()
++
+ if(Qt6_VERSION AND Qt6_VERSION VERSION_LESS "6.9.0")
+   target_link_libraries(obs-studio PRIVATE Qt::GuiPrivate)
+ endif()
+diff --git a/plugins/vlc-video/vlc-video-plugin.c b/plugins/vlc-video/vlc-video-plugin.c
+index d92397538..ba7882e52 100644
+--- a/plugins/vlc-video/vlc-video-plugin.c
++++ b/plugins/vlc-video/vlc-video-plugin.c
+@@ -187,6 +187,8 @@ static bool load_libvlc_module(void)
+ 
+ 	if (!libvlc_core_module)
+ 		return false;
++#elif defined(__ANDROID__)
++#define LIBVLC_FILE "libvlc.so"
+ #else
+ #define LIBVLC_FILE "libvlc.so.5"
+ #endif
+-- 
+2.54.0
+
