@@ -3,19 +3,16 @@ TERMUX_PKG_DESCRIPTION="A fast, compliant alternative implementation of Python"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 _MAJOR_VERSION=2.7
-# FIXME: Starting from pypy 7.3.21, host pypy segfaults when translating files.
-# FIXME: Should align the version to TERMUX_PKG_VERSION after finding out what happens.
-_HOST_PYPY_VERSION="7.3.20"
-TERMUX_PKG_VERSION="7.3.21"
+TERMUX_PKG_VERSION="7.3.22"
 TERMUX_PKG_SRCURL=(
 	https://downloads.python.org/pypy/pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION-src.tar.bz2
-	https://downloads.python.org/pypy/pypy2.7-v$_HOST_PYPY_VERSION-linux64.tar.bz2
-	https://downloads.python.org/pypy/pypy2.7-v$_HOST_PYPY_VERSION-linux32.tar.bz2
+	https://downloads.python.org/pypy/pypy2.7-v$TERMUX_PKG_VERSION-linux64.tar.bz2
+	https://downloads.python.org/pypy/pypy2.7-v$TERMUX_PKG_VERSION-linux32.tar.bz2
 )
 TERMUX_PKG_SHA256=(
-	23537c62e875ad1a3e675c64d4435eff392ea20843e20d690fd1400b79363d64
-	aa3bb92dbb529fa2d4920895b16d67a810b0c709207857d56cfe4a6e3b41e02a
-	9d554c5efcb6ef80146bb82965f5d8404d6848e6f04b25c378852a095768a69c
+	f4445c1a835effe4d3b26521e73a7780893dec02520aa6799a377c9a0fcdd8ad
+	c47a4030542cbd34d0cb673a0de1956c94c1ebe6c6b094f2ae6a167c55375f68
+	3512d44a9005b52611ad2d84e63c575c8b592fb1dd1a708a00f787b46e6ee07b
 )
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, zlib"
@@ -42,7 +39,7 @@ termux_step_pre_configure() {
 }
 
 __setup_host_pypy2() {
-	export PATH="$TERMUX_PKG_SRCDIR/pypy2.7-v$_HOST_PYPY_VERSION-linux$TERMUX_ARCH_BITS/bin:$PATH"
+	export PATH="$TERMUX_PKG_SRCDIR/pypy2.7-v$TERMUX_PKG_VERSION-linux$TERMUX_ARCH_BITS/bin:$PATH"
 
 	pypy2 -m ensurepip --altinstall --no-default-pip
 	pypy2 -m pip install cparser cffi
