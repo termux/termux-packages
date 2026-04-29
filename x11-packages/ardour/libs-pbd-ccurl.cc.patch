@@ -1,0 +1,23 @@
+diff -u -r ../cache/tmp-checkout/libs/pbd/ccurl.cc ./libs/pbd/ccurl.cc
+--- ../cache/tmp-checkout/libs/pbd/ccurl.cc	2026-02-16 09:42:47.548725178 +0000
++++ ./libs/pbd/ccurl.cc	2026-02-16 10:24:07.009321377 +0000
+@@ -209,6 +209,11 @@
+ 	 */
+ 	assert (!ca_path && !ca_info); // call once
+ 
++#ifdef __ANDROID__
++	if (Glib::file_test ("@TERMUX_PREFIX@/etc/tls/cert.pem", Glib::FILE_TEST_IS_REGULAR)) {
++		ca_info = "@TERMUX_PREFIX@/etc/tls/cert.pem";
++	}
++#else
+ 	if (Glib::file_test ("/etc/pki/tls/certs/ca-bundle.crt", Glib::FILE_TEST_IS_REGULAR)) {
+ 		// Fedora / RHEL, Arch
+ 		ca_info = "/etc/pki/tls/certs/ca-bundle.crt";
+@@ -219,6 +224,7 @@
+ 		// GNU/TLS can keep extra stuff here
+ 		ca_info = "/etc/pki/tls/cert.pem";
+ 	}
++#endif
+ 	// else NULL: use default (currently) "/etc/ssl/certs/ca-certificates.crt" if it exists
+ 
+ 	/* If we don't set anything, defaults are used. At the time of writing we compile bundled curl on debian

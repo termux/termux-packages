@@ -130,29 +130,3 @@
  	pthread_mutex_unlock (&thread_map_lock);
  }
  
---- a/libs/surfaces/frontier/tranzport/tranzport_control_protocol.cc
-+++ b/libs/surfaces/frontier/tranzport/tranzport_control_protocol.cc
-@@ -1029,8 +1029,10 @@
- 
- 
- 	PBD::notify_gui_about_thread_creation ("gui", pthread_self(), X_("Tranzport"));
-+#ifndef __ANDROID__
- 	pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, 0);
- 	pthread_setcanceltype (PTHREAD_CANCEL_ASYNCHRONOUS, 0);
-+#endif
- 	next_track ();
- 	rtpriority_set();
- 	inflight=0;
---- a/libs/surfaces/tranzport/init.cc
-+++ b/libs/surfaces/tranzport/init.cc
-@@ -155,8 +155,10 @@
- 	uint8_t offline = 0;
- 
- 	register_thread (X_("Tranzport"));
-+#ifndef __ANDROID__
- 	pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, 0);
- 	pthread_setcanceltype (PTHREAD_CANCEL_ASYNCHRONOUS, 0);
-+#endif
- 	rtpriority_set();
- 	inflight=0;
- 	//int intro = 20;
