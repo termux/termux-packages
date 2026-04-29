@@ -1,0 +1,40 @@
+diff --git a/morphosis/meson.build b/morphosis/meson.build
+index c47831f..54265f5 100644
+--- a/morphosis/meson.build
++++ b/morphosis/meson.build
+@@ -1,4 +1,4 @@
+-python.install_sources(
++install_data(
+     files(
+         '__init__.py',
+         '__main__.py',
+@@ -6,14 +6,14 @@ python.install_sources(
+         'document.py',
+         'tasks.py',
+     ),
+-    subdir: 'morphosis',
++    install_dir: get_option('prefix') / 'lib/python@PYTHON_VERSION@/site-packages' / 'morphosis',
+ )
+
+ configure_file(
+     input: 'config.py.in',
+     output: '@BASENAME@',
+     configuration: conf,
+-    install_dir: python.get_install_dir(subdir: 'morphosis'),
++    install_dir: get_option('prefix') / 'lib/python@PYTHON_VERSION@/site-packages' / 'morphosis',
+ )
+
+ subdir('ui')
+diff --git a/morphosis/ui/meson.build b/morphosis/ui/meson.build
+index 1188d3a..88d160d 100644
+--- a/morphosis/ui/meson.build
++++ b/morphosis/ui/meson.build
+@@ -1,6 +1,6 @@
+-python.install_sources(
++install_data(
+     files('__init__.py', 'drop_overlay.py', 'window.py'),
+-    subdir: 'morphosis' / 'ui',
++    install_dir: get_option('prefix') / 'lib/python@PYTHON_VERSION@/site-packages' / 'morphosis' / 'ui',
+ )
+
+ blueprints = custom_target(
