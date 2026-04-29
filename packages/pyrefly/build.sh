@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/facebook/pyrefly.git
 TERMUX_PKG_DESCRIPTION="A fast type checker and language server for Python"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@AhmadNaruto"
-TERMUX_PKG_VERSION="0.63.0"
+TERMUX_PKG_VERSION="0.63.1"
 TERMUX_PKG_SRCURL="https://github.com/facebook/pyrefly/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=a3e3fd8284e9c4b97a82127bb25d97a6e25f95c4f2e52927f2dc4062e603d9a8
+TERMUX_PKG_SHA256=8812f78495ced3c28fcdcb9880c4b7abf6a4dae957af55896c158a91ce0e374a
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
