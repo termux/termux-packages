@@ -1,0 +1,51 @@
+From d0b945a88606d9b31b2f8b47deb8b3c2150c9951 Mon Sep 17 00:00:00 2001
+From: David Spickett <david.spickett@arm.com>
+Date: Thu, 16 Apr 2026 16:13:36 +0000
+Subject: [PATCH] [lldb] Add EXPORT to lldb-tblgen
+
+Fixes #192408
+
+You can tell an llvm build to use existing tools using options
+like LLVM_NATIVE_TOOL_DIR.
+
+When you do this, the tools are usually still built in case
+they need to be part of a later install. For example if you
+provide a clang-tblgen, we still build another clang-tblgen
+as part of the build.
+
+Which means if you install that build, it is a complete install,
+and if you are doing a cross build, you get a cross built copy
+of clang-tblgen that you can use on the target machine.
+
+In #159812, lldb-tblgen was added to the list of tools to
+install, so that installed builds could be used as a base for
+subsequent builds.
+
+However we were missing the EXPORT flag for lldb-tblgen. As far
+as I can tell, this tells cmake that this tool will be part
+of the final install regardless of whether something within
+the build requires it.
+
+This missing option meant that cross builds, which do not have
+an internal reason to build the cross lldb-tblgen binary,
+did not build it did try to install it and of course failed
+because it did not exist.
+
+Adding EXPORT forces lldb-tblgen to be built and now
+installing works as expected.
+---
+ lldb/utils/TableGen/CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lldb/utils/TableGen/CMakeLists.txt b/lldb/utils/TableGen/CMakeLists.txt
+index ce96dddd44201..7ca1ea51df5af 100644
+--- a/lldb/utils/TableGen/CMakeLists.txt
++++ b/lldb/utils/TableGen/CMakeLists.txt
+@@ -9,6 +9,7 @@ if (NOT DEFINED LLDB_TABLEGEN_EXE)
+ 
+     add_tablegen(lldb-tblgen LLDB
+       DESTINATION "${CMAKE_INSTALL_BINDIR}"
++      EXPORT LLDB
+       LLDBOptionDefEmitter.cpp
+       LLDBPropertyDefEmitter.cpp
+       LLDBTableGen.cpp
