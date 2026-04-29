@@ -1,0 +1,11 @@
+--- a/src/unix/pty_process.rs
++++ b/src/unix/pty_process.rs
+@@ -24,7 +24,7 @@ use tokio::{
+     time::{sleep, Duration, Instant},
+ };
+
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ use nix::pty::ptsname_r;
+
+ /// Start a process in a forked tty so you can interact with it the same as you would
