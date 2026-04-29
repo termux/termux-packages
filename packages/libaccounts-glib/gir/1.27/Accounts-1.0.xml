@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="AgAccount" get-type="ag_account_get_type" parents="GObject">
+    <implements name="GInitable"/>
+    <property name="id" type="guint" flags="235" default-value="0"/>
+    <property name="manager" type="AgManager" flags="11"/>
+    <property name="provider" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="foreign" type="gboolean" flags="234" default-value="FALSE"/>
+    <property name="enabled" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="display-name" type="gchararray" flags="225" default-value="NULL"/>
+    <signal name="enabled" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="display-name-changed" return="void" when="last">
+    </signal>
+    <signal name="deleted" return="void" when="last">
+    </signal>
+  </class>
+  <boxed name="AgAccountSettingIter" get-type="ag_account_settings_iter_get_type"/>
+  <class name="AgAccountService" get-type="ag_account_service_get_type" parents="GObject">
+    <property name="account" type="AgAccount" flags="11"/>
+    <property name="service" type="AgService" flags="11"/>
+    <property name="enabled" type="gboolean" flags="225" default-value="FALSE"/>
+    <signal name="enabled" return="void" when="last">
+      <param type="gboolean"/>
+    </signal>
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <boxed name="AgApplication" get-type="ag_application_get_type"/>
+  <boxed name="AgAuthData" get-type="ag_auth_data_get_type"/>
+  <class name="AgManager" get-type="ag_manager_get_type" parents="GObject">
+    <implements name="GInitable"/>
+    <property name="service-type" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="db-timeout" type="guint" flags="227" default-value="5000"/>
+    <property name="abort-on-db-timeout" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="use-dbus" type="gboolean" flags="235" default-value="TRUE"/>
+    <signal name="account-created" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="enabled-event" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="account-deleted" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="account-updated" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+  </class>
+  <boxed name="AgProvider" get-type="ag_provider_get_type"/>
+  <boxed name="AgService" get-type="ag_service_get_type"/>
+  <boxed name="AgServiceType" get-type="ag_service_type_get_type"/>
+  <error-quark function="ag_accounts_error_quark" domain="ag_errors"/>
+</dump>
