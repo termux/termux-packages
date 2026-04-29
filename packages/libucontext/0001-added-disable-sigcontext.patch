@@ -1,0 +1,26 @@
+diff --git a/arch/aarch64/include/libucontext/bits.h b/arch/aarch64/include/libucontext/bits.h
+index e249448..d8f5b6f 100644
+--- a/arch/aarch64/include/libucontext/bits.h
++++ b/arch/aarch64/include/libucontext/bits.h
+@@ -10,12 +10,21 @@ typedef struct {
+ 	unsigned int fpcr;
+ } libucontext_fpregset_t;
+ 
++#ifndef LIBUCONTEXT_DISABLED_SIGCONTEXT
+ typedef struct sigcontext {
+ 	unsigned long fault_address;
+ 	unsigned long regs[31];
+ 	unsigned long sp, pc, pstate;
+ 	long double __reserved[256];
+ } libucontext_mcontext_t;
++#else
++typedef struct {
++        unsigned long fault_address;
++        unsigned long regs[31];
++        unsigned long sp, pc, pstate;
++        long double __reserved[256];
++} libucontext_mcontext_t;
++#endif
+ 
+ typedef struct {
+ 	void *ss_sp;
