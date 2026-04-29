@@ -1,0 +1,465 @@
+From 8dc0ce55a2c6c2059d8c120cce315ecc9cd4539e Mon Sep 17 00:00:00 2001
+From: lumaparallax <257510328+lumaparallax@users.noreply.github.com>
+Date: Tue, 28 Apr 2026 16:20:50 +0900
+Subject: [PATCH 6/9] linux capture switch to AHardwareBuffer DRI3
+
+---
+ plugins/linux-capture/CMakeLists.txt     |   1 +
+ plugins/linux-capture/xcomposite-input.c | 109 ++++++++++++++++
+ plugins/linux-capture/xhelpers.c         |  13 ++
+ plugins/linux-capture/xshm-input.c       | 159 ++++++++++++++++++++++-
+ 4 files changed, 280 insertions(+), 2 deletions(-)
+
+diff --git a/plugins/linux-capture/CMakeLists.txt b/plugins/linux-capture/CMakeLists.txt
+index 5a504c0e4..79b085166 100644
+--- a/plugins/linux-capture/CMakeLists.txt
++++ b/plugins/linux-capture/CMakeLists.txt
+@@ -26,6 +26,7 @@ target_sources(
+ target_link_libraries(
+   linux-capture
+   PRIVATE OBS::libobs OBS::glad X11::X11 XCB::XCB XCB::XFIXES XCB::RANDR XCB::SHM XCB::XINERAMA XCB::COMPOSITE
++  $<$<BOOL:${OS_ANDROID}>:android nativewindow xcb-dri3 android-shmem>
+ )
+ 
+ set_target_properties_obs(linux-capture PROPERTIES FOLDER plugins PREFIX "")
+diff --git a/plugins/linux-capture/xcomposite-input.c b/plugins/linux-capture/xcomposite-input.c
+index 0e86fe443..55c4b7c45 100644
+--- a/plugins/linux-capture/xcomposite-input.c
++++ b/plugins/linux-capture/xcomposite-input.c
+@@ -22,6 +22,29 @@
+ #include <util/dstr.h>
+ #include <util/darray.h>
+ 
++#if defined(__ANDROID__)
++#include <android/hardware_buffer.h>
++#include <sys/socket.h>
++#include <unistd.h>
++#include <X11/Xlib-xcb.h>
++#include <xcb/dri3.h>
++
++#define AHARDWAREBUFFER_SOCKET_FD 1255ULL
++
++struct ahb_sender {
++	int fd;
++	AHardwareBuffer *buffer;
++};
++
++static void *send_ahb_thread(void *arg) {
++	struct ahb_sender *s = arg;
++	uint8_t token;
++	if (read(s->fd, &token, 1) != 1) return NULL;
++	AHardwareBuffer_sendHandleToUnixSocket(s->buffer, s->fd);
++	return NULL;
++}
++#endif
++
+ #define WIN_STRING_DIV "\r\n"
+ #define FIND_WINDOW_INTERVAL 2.0
+ 
+@@ -61,6 +84,12 @@ struct xcompcap {
+ 	Pixmap pixmap;
+ 	gs_texture_t *gltex;
+ 
++	#if defined(__ANDROID__)
++	AHardwareBuffer *ahb;
++	xcb_pixmap_t ahb_pixmap;
++	xcb_gcontext_t gc;
++        #endif
++
+ 	pthread_mutex_t lock;
+ 
+ 	bool show_cursor;
+@@ -335,6 +364,16 @@ void xcomp_cleanup_pixmap(Display *disp, struct xcompcap *s)
+ 		gs_texture_destroy(s->gltex);
+ 		s->gltex = 0;
+ 	}
++   #if defined(__ANDROID__)
++	if (s->ahb) {
++		if (s->ahb_pixmap) xcb_free_pixmap(XGetXCBConnection(disp), s->ahb_pixmap);
++		if (s->gc) xcb_free_gc(XGetXCBConnection(disp), s->gc);
++		AHardwareBuffer_release(s->ahb);
++		s->ahb = NULL;
++		s->ahb_pixmap = 0;
++		s->gc = 0;
++	}
++   #endif
+ 
+ 	if (s->pixmap) {
+ 		XFreePixmap(disp, s->pixmap);
+@@ -369,6 +408,8 @@ void xcomp_create_pixmap(xcb_connection_t *conn, struct xcompcap *s, int log_lev
+ 	int32_t depth = geom->depth;
+ 	if (depth != 32) {
+ 		s->exclude_alpha = true;
++	} else {
++		s->exclude_alpha = false;
+ 	}
+ 	free(geom);
+ 
+@@ -387,9 +428,50 @@ void xcomp_create_pixmap(xcb_connection_t *conn, struct xcompcap *s, int log_lev
+ 		return;
+ 	}
+ 
++#if defined(__ANDROID__)
++	AHardwareBuffer_Desc desc;
++	memset(&desc, 0, sizeof(desc));
++	desc.width = s->width;
++	desc.height = s->height;
++	desc.layers = 1;
++	desc.format = AHARDWAREBUFFER_FORMAT_R8G8B8A8_UNORM;
++	desc.usage = AHARDWAREBUFFER_USAGE_CPU_READ_OFTEN |
++	             AHARDWAREBUFFER_USAGE_CPU_WRITE_OFTEN |
++	             AHARDWAREBUFFER_USAGE_GPU_SAMPLED_IMAGE |
++	             AHARDWAREBUFFER_USAGE_GPU_COLOR_OUTPUT;
++
++	if (AHardwareBuffer_allocate(&desc, &s->ahb) == 0) {
++		AHardwareBuffer_describe(s->ahb, &desc);
++		int sv[2];
++		if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, sv) == 0) {
++			pthread_t tid;
++			struct ahb_sender sender = { sv[0], s->ahb };
++			pthread_create(&tid, NULL, send_ahb_thread, &sender);
++
++			s->ahb_pixmap = xcb_generate_id(conn);
++			int32_t fds[1] = { sv[1] };
++
++			xcb_void_cookie_t dri_cookie = xcb_dri3_pixmap_from_buffers_checked(
++				conn, s->ahb_pixmap, s->win, 1,
++				s->width, s->height, desc.stride * 4,
++				0, 0, 0, 0, 0, 0, 0, depth, 32,
++				AHARDWAREBUFFER_SOCKET_FD, fds
++			);
++			xcb_flush(conn);
++			pthread_join(tid, NULL);
++			close(sv[0]); close(sv[1]);
++
++			s->gc = xcb_generate_id(conn);
++			uint32_t values[] = { 0xffffffff, 0x00000000 };
++			xcb_create_gc(conn, s->gc, s->ahb_pixmap, XCB_GC_FOREGROUND | XCB_GC_BACKGROUND, values);
++		}
++	}
++	s->gltex = gs_texture_create(s->width, s->height, GS_BGRA_UNORM, 1, NULL, GS_DYNAMIC);
++#else
+ 	XErrorHandler prev = XSetErrorHandler(silence_x11_errors);
+ 	s->gltex = gs_texture_create_from_pixmap(s->width, s->height, GS_BGRA_UNORM, GL_TEXTURE_2D, (void *)s->pixmap);
+ 	XSetErrorHandler(prev);
++#endif
+ }
+ 
+ struct reg_item {
+@@ -655,6 +737,33 @@ static void xcompcap_video_tick(void *data, float seconds)
+ 	if (xcompcap_get_height(s) == 0 || xcompcap_get_width(s) == 0)
+ 		goto done;
+ 
++#if defined(__ANDROID__)
++	if (s->gltex && s->pixmap && s->ahb && s->ahb_pixmap && xcompcap_get_height(s) > 0 && xcompcap_get_width(s) > 0) {
++		// 1. Copy composite pixmap -> AHB pixmap
++		xcb_copy_area(conn, s->pixmap, s->ahb_pixmap, s->gc, 0, 0, 0, 0, s->width, s->height);
++
++		// 2. Sync to ensure GPU finished
++		xcb_get_input_focus_cookie_t sync_c = xcb_get_input_focus_unchecked(conn);
++		xcb_get_input_focus_reply_t *sync_r = xcb_get_input_focus_reply(conn, sync_c, NULL);
++		free(sync_r);
++
++		// 3. Lock AHB, write to OBS texture, unlock AHB
++		void *pixels = NULL;
++		if (AHardwareBuffer_lock(s->ahb, AHARDWAREBUFFER_USAGE_CPU_READ_OFTEN, -1, NULL, &pixels) == 0) {
++			AHardwareBuffer_Desc desc;
++			AHardwareBuffer_describe(s->ahb, &desc);
++
++			gs_texture_set_image(s->gltex, (const uint8_t*)pixels, desc.stride * 4, false);
++			AHardwareBuffer_unlock(s->ahb, NULL);
++		}
++	}
++#endif
++	if (!s->gltex)
++		goto done;
++
++	if (xcompcap_get_height(s) == 0 || xcompcap_get_width(s) == 0)
++		goto done;
++
+ 	if (s->show_cursor) {
+ 		xcb_xcursor_update(conn, s->cursor);
+ 
+diff --git a/plugins/linux-capture/xhelpers.c b/plugins/linux-capture/xhelpers.c
+index c5ffd9353..5fb357e6f 100644
+--- a/plugins/linux-capture/xhelpers.c
++++ b/plugins/linux-capture/xhelpers.c
+@@ -16,7 +16,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
+ #include <stdint.h>
++#if !defined(__ANDROID__)
+ #include <sys/shm.h>
++#endif
+ #include <xcb/randr.h>
+ #include <xcb/xcb.h>
+ #include <xcb/xinerama.h>
+@@ -264,6 +266,12 @@ fail:
+ 
+ xcb_shm_t *xshm_xcb_attach(xcb_connection_t *xcb, const int w, const int h)
+ {
++#if defined(__ANDROID__)
++	UNUSED_PARAMETER(xcb);
++	UNUSED_PARAMETER(w);
++	UNUSED_PARAMETER(h);
++	return NULL;
++#else
+ 	if (!xcb)
+ 		return NULL;
+ 
+@@ -283,10 +291,14 @@ xcb_shm_t *xshm_xcb_attach(xcb_connection_t *xcb, const int w, const int h)
+ fail:
+ 	xshm_xcb_detach(shm);
+ 	return NULL;
++#endif
+ }
+ 
+ void xshm_xcb_detach(xcb_shm_t *shm)
+ {
++#if defined(__ANDROID__)
++	UNUSED_PARAMETER(shm);
++#else
+ 	if (!shm)
+ 		return;
+ 
+@@ -299,6 +311,7 @@ void xshm_xcb_detach(xcb_shm_t *shm)
+ 		shmctl(shm->shmid, IPC_RMID, NULL);
+ 
+ 	bfree(shm);
++#endif
+ }
+ 
+ xcb_screen_t *xcb_get_screen(xcb_connection_t *xcb, int screen)
+diff --git a/plugins/linux-capture/xshm-input.c b/plugins/linux-capture/xshm-input.c
+index c927209d0..688baf2b4 100644
+--- a/plugins/linux-capture/xshm-input.c
++++ b/plugins/linux-capture/xshm-input.c
+@@ -28,6 +28,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #include "xcursor-xcb.h"
+ #include "xhelpers.h"
+ 
++#if defined(__ANDROID__)
++#include <fcntl.h>
++#include <unistd.h>
++#include <errno.h>
++#include <xcb/dri3.h>
++#include <android/hardware_buffer.h>
++#include <pthread.h>
++#include <sys/socket.h>
++
++#define AHARDWAREBUFFER_SOCKET_FD 1255ULL
++
++struct ahb_sender {
++	int fd;
++	AHardwareBuffer *buffer;
++};
++
++static void *send_ahb_thread(void *arg) {
++	struct ahb_sender *s = arg;
++	uint8_t token;
++	if (read(s->fd, &token, 1) != 1) return NULL;
++	AHardwareBuffer_sendHandleToUnixSocket(s->buffer, s->fd);
++	return NULL;
++}
++#endif
++
+ #define XSHM_DATA(voidptr) struct xshm_data *data = voidptr;
+ 
+ #define blog(level, msg, ...) blog(level, "xshm-input: " msg, ##__VA_ARGS__)
+@@ -39,6 +64,12 @@ struct xshm_data {
+ 
+ 	xcb_connection_t *xcb;
+ 	xcb_screen_t *xcb_screen;
++#if defined(__ANDROID__)
++	AHardwareBuffer *ahb;
++	xcb_pixmap_t pixmap;
++	xcb_gcontext_t gc;
++	bool dri3_attached;
++#endif
+ 	xcb_shm_t *xshm;
+ 	xcb_xcursor_t *cursor;
+ 
+@@ -88,10 +119,18 @@ static bool xshm_check_extensions(xcb_connection_t *xcb)
+ {
+ 	bool ok = true;
+ 
++	#if defined(__ANDROID__)
++	const xcb_query_extension_reply_t *dri3_ext = xcb_get_extension_data(xcb, &xcb_dri3_id);
++	if (!dri3_ext || !dri3_ext->present) {
++		blog(LOG_ERROR, "Missing DRI3 extension! This X server does not support DMA-BUFs.");
++		ok = false;
++	}
++#else
+ 	if (!xcb_get_extension_data(xcb, &xcb_shm_id)->present) {
+ 		blog(LOG_ERROR, "Missing SHM extension !");
+ 		ok = false;
+ 	}
++#endif
+ 
+ 	if (!xcb_get_extension_data(xcb, &xcb_xinerama_id)->present)
+ 		blog(LOG_INFO, "Missing Xinerama extension !");
+@@ -197,6 +236,17 @@ static void xshm_capture_stop(struct xshm_data *data)
+ 
+ 	obs_leave_graphics();
+ 
++#if defined(__ANDROID__)
++	if (data->xcb && data->dri3_attached) {
++		xcb_free_pixmap(data->xcb, data->pixmap);
++		xcb_free_gc(data->xcb, data->gc);
++	}
++	if (data->ahb) {
++		AHardwareBuffer_release(data->ahb);
++		data->ahb = NULL;
++	}
++	data->dri3_attached = false;
++#endif
+ 	if (data->xshm) {
+ 		xshm_xcb_detach(data->xshm);
+ 		data->xshm = NULL;
+@@ -247,11 +297,86 @@ static void xshm_capture_start(struct xshm_data *data)
+ 		goto fail;
+ 	}
+ 
++#if defined(__ANDROID__)
++	AHardwareBuffer_Desc desc;
++	memset(&desc, 0, sizeof(desc));
++	desc.width = data->adj_width;
++	desc.height = data->adj_height;
++	desc.layers = 1;
++	desc.format = AHARDWAREBUFFER_FORMAT_R8G8B8A8_UNORM;
++	desc.usage = AHARDWAREBUFFER_USAGE_CPU_READ_OFTEN |
++	             AHARDWAREBUFFER_USAGE_CPU_WRITE_OFTEN |
++	             AHARDWAREBUFFER_USAGE_GPU_SAMPLED_IMAGE |
++	             AHARDWAREBUFFER_USAGE_GPU_COLOR_OUTPUT;
++
++	data->ahb = NULL;
++	int alloc_res = AHardwareBuffer_allocate(&desc, &data->ahb);
++
++	// Safe check: Only proceed if allocation succeeded AND pointer is valid
++	if (alloc_res == 0 && data->ahb != NULL) {
++		AHardwareBuffer_describe(data->ahb, &desc);
++
++		int sv[2];
++		if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, sv) != 0) {
++			blog(LOG_ERROR, "socketpair failed");
++			goto fail;
++		}
++
++		struct ahb_sender sender;
++		sender.fd = sv[0];
++		sender.buffer = data->ahb;
++
++		pthread_t tid;
++		if (pthread_create(&tid, NULL, send_ahb_thread, &sender) != 0) {
++			close(sv[0]);
++			close(sv[1]);
++			goto fail;
++		}
++
++		data->pixmap = xcb_generate_id(data->xcb);
++		int32_t fds[1] = { sv[1] };
++
++		xcb_void_cookie_t dri_cookie = xcb_dri3_pixmap_from_buffers_checked(
++			data->xcb, data->pixmap, data->xcb_screen->root, 1,
++			data->adj_width, data->adj_height, desc.stride * 4,
++			0, 0, 0, 0, 0, 0, 0, data->xcb_screen->root_depth, 32,
++			AHARDWAREBUFFER_SOCKET_FD, fds
++		);
++
++		xcb_flush(data->xcb);
++		pthread_join(tid, NULL);
++		close(sv[0]);
++		close(sv[1]);
++
++		xcb_generic_error_t *err = xcb_request_check(data->xcb, dri_cookie);
++		if (err) {
++			blog(LOG_ERROR, "xcb_dri3_pixmap_from_buffers failed: error_code=%u", err->error_code);
++			free(err);
++			goto fail;
++		}
++
++		data->gc = xcb_generate_id(data->xcb);
++		uint32_t values[] = { 0xffffffff, 0x00000000, XCB_SUBWINDOW_MODE_INCLUDE_INFERIORS };
++		xcb_create_gc(data->xcb, data->gc, data->pixmap,
++		              XCB_GC_FOREGROUND | XCB_GC_BACKGROUND | XCB_GC_SUBWINDOW_MODE, values);
++
++		data->dri3_attached = true;
++	} else {
++		// FALLBACK: Android 7 / Stub Failure
++		blog(LOG_INFO, "AHardwareBuffer not supported, falling back to SHM.");
++		data->xshm = xshm_xcb_attach(data->xcb, data->adj_width, data->adj_height);
++		if (!data->xshm) {
++			blog(LOG_ERROR, "failed to attach shm !");
++			goto fail;
++		}
++	}
++#else
+ 	data->xshm = xshm_xcb_attach(data->xcb, data->adj_width, data->adj_height);
+ 	if (!data->xshm) {
+ 		blog(LOG_ERROR, "failed to attach shm !");
+ 		goto fail;
+ 	}
++#endif
+ 
+ 	data->cursor = xcb_xcursor_init(data->xcb);
+ 	xcb_xcursor_offset(data->cursor, data->adj_x_org, data->adj_y_org);
+@@ -475,6 +600,10 @@ static void *xshm_create(obs_data_t *settings, obs_source_t *source)
+ {
+ 	struct xshm_data *data = bzalloc(sizeof(struct xshm_data));
+ 	data->source = source;
++#if defined(__ANDROID__)
++	data->ahb = NULL;
++	data->dri3_attached = false;
++#endif
+ 
+ 	xshm_update(data, settings);
+ 
+@@ -494,6 +623,34 @@ static void xshm_video_tick(void *vptr, float seconds)
+ 	if (!obs_source_showing(data->source))
+ 		return;
+ 
++#if defined(__ANDROID__)
++	if (data->dri3_attached && data->ahb != NULL) {
++		xcb_copy_area(data->xcb, data->xcb_screen->root, data->pixmap, data->gc,
++		              data->adj_x_org, data->adj_y_org, 0, 0, data->adj_width, data->adj_height);
++
++		xcb_get_input_focus_cookie_t sync_c = xcb_get_input_focus_unchecked(data->xcb);
++		xcb_get_input_focus_reply_t *sync_r = xcb_get_input_focus_reply(data->xcb, sync_c, NULL);
++		free(sync_r);
++
++		void *pixels = NULL;
++		if (AHardwareBuffer_lock(data->ahb, AHARDWAREBUFFER_USAGE_CPU_READ_OFTEN, -1, NULL, &pixels) == 0) {
++			AHardwareBuffer_Desc desc;
++			AHardwareBuffer_describe(data->ahb, &desc);
++
++			obs_enter_graphics();
++			gs_texture_set_image(data->texture, (const uint8_t*)pixels, desc.stride * 4, false);
++			xcb_xcursor_update(data->xcb, data->cursor);
++			obs_leave_graphics();
++
++			AHardwareBuffer_unlock(data->ahb, NULL);
++		}
++		return; // Done with AHB frame
++	}
++#endif
++
++	// --- FALLBACK (Standard Linux & Android 7 SHM Path) ---
++	if (!data->xshm) return;
++
+ 	xcb_shm_get_image_cookie_t img_c;
+ 	xcb_shm_get_image_reply_t *img_r;
+ 
+@@ -507,10 +664,8 @@ static void xshm_video_tick(void *vptr, float seconds)
+ 		goto exit;
+ 
+ 	obs_enter_graphics();
+-
+ 	gs_texture_set_image(data->texture, (void *)data->xshm->data, data->adj_width * 4, false);
+ 	xcb_xcursor_update(data->xcb, data->cursor);
+-
+ 	obs_leave_graphics();
+ 
+ exit:
+-- 
+2.54.0
+

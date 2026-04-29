@@ -1,0 +1,72 @@
+From 0135d793e0c63210842f8bb55ad87e660c745575 Mon Sep 17 00:00:00 2001
+From: lumaparallax <257510328+lumaparallax@users.noreply.github.com>
+Date: Mon, 20 Apr 2026 21:18:06 +0900
+Subject: [PATCH 7/9] disable vaapi and its dependencies
+
+---
+ plugins/obs-ffmpeg/CMakeLists.txt           | 14 +++++++-------
+ plugins/obs-ffmpeg/cmake/dependencies.cmake |  2 +-
+ plugins/obs-ffmpeg/obs-ffmpeg.c             |  2 +-
+ 3 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/plugins/obs-ffmpeg/CMakeLists.txt b/plugins/obs-ffmpeg/CMakeLists.txt
+index 7d37eeb6e..2c093dd3c 100644
+--- a/plugins/obs-ffmpeg/CMakeLists.txt
++++ b/plugins/obs-ffmpeg/CMakeLists.txt
+@@ -23,9 +23,9 @@ target_sources(
+     $<$<BOOL:${ENABLE_NEW_MPEGTS_OUTPUT}>:obs-ffmpeg-rist.h>
+     $<$<BOOL:${ENABLE_NEW_MPEGTS_OUTPUT}>:obs-ffmpeg-srt.h>
+     $<$<BOOL:${ENABLE_NEW_MPEGTS_OUTPUT}>:obs-ffmpeg-url.h>
+-    $<$<PLATFORM_ID:Linux,FreeBSD,OpenBSD>:obs-ffmpeg-vaapi.c>
+-    $<$<PLATFORM_ID:Linux,FreeBSD,OpenBSD>:vaapi-utils.c>
+-    $<$<PLATFORM_ID:Linux,FreeBSD,OpenBSD>:vaapi-utils.h>
++    $<$<AND:$<PLATFORM_ID:Linux,FreeBSD,OpenBSD>,$<NOT:$<BOOL:${OS_ANDROID}>>>:obs-ffmpeg-vaapi.c>
++    $<$<AND:$<PLATFORM_ID:Linux,FreeBSD,OpenBSD>,$<NOT:$<BOOL:${OS_ANDROID}>>>:vaapi-utils.c>
++    $<$<AND:$<PLATFORM_ID:Linux,FreeBSD,OpenBSD>,$<NOT:$<BOOL:${OS_ANDROID}>>>:vaapi-utils.h>
+     obs-ffmpeg-audio-encoders.c
+     obs-ffmpeg-av1.c
+     obs-ffmpeg-compat.h
+@@ -65,10 +65,10 @@ target_link_libraries(
+     FFmpeg::swresample
+     $<$<PLATFORM_ID:Windows>:OBS::w32-pthreads>
+     $<$<PLATFORM_ID:Windows>:ws2_32>
+-    $<$<PLATFORM_ID:Linux,FreeBSD,OpenBSD>:Libva::va>
+-    $<$<PLATFORM_ID:Linux,FreeBSD,OpenBSD>:Libva::drm>
+-    $<$<PLATFORM_ID:Linux,FreeBSD,OpenBSD>:Libpci::pci>
+-    $<$<PLATFORM_ID:Linux,FreeBSD,OpenBSD>:Libdrm::Libdrm>
++    $<$<AND:$<PLATFORM_ID:Linux,FreeBSD,OpenBSD>,$<NOT:$<BOOL:${OS_ANDROID}>>>:Libva::va>
++    $<$<AND:$<PLATFORM_ID:Linux,FreeBSD,OpenBSD>,$<NOT:$<BOOL:${OS_ANDROID}>>>:Libva::drm>
++    $<$<AND:$<PLATFORM_ID:Linux,FreeBSD,OpenBSD>,$<NOT:$<BOOL:${OS_ANDROID}>>>:Libpci::pci>
++    $<$<AND:$<PLATFORM_ID:Linux,FreeBSD,OpenBSD>,$<NOT:$<BOOL:${OS_ANDROID}>>>:Libdrm::Libdrm>
+     $<$<BOOL:${ENABLE_NEW_MPEGTS_OUTPUT}>:Librist::Librist>
+     $<$<BOOL:${ENABLE_NEW_MPEGTS_OUTPUT}>:Libsrt::Libsrt>
+ )
+diff --git a/plugins/obs-ffmpeg/cmake/dependencies.cmake b/plugins/obs-ffmpeg/cmake/dependencies.cmake
+index 5e523cd37..e46ac94a5 100644
+--- a/plugins/obs-ffmpeg/cmake/dependencies.cmake
++++ b/plugins/obs-ffmpeg/cmake/dependencies.cmake
+@@ -15,7 +15,7 @@ endif()
+ if(OS_WINDOWS AND CMAKE_VS_PLATFORM_NAME STREQUAL x64)
+   find_package(AMF 1.4.29 REQUIRED)
+   add_subdirectory(obs-amf-test)
+-elseif(OS_LINUX OR OS_FREEBSD OR OS_OPENBSD)
++elseif((OS_LINUX AND NOT OS_ANDROID) OR OS_FREEBSD OR OS_OPENBSD)
+   find_package(Libva REQUIRED)
+   find_package(Libpci REQUIRED)
+   find_package(Libdrm REQUIRED)
+diff --git a/plugins/obs-ffmpeg/obs-ffmpeg.c b/plugins/obs-ffmpeg/obs-ffmpeg.c
+index d7880e51c..56df4b70b 100644
+--- a/plugins/obs-ffmpeg/obs-ffmpeg.c
++++ b/plugins/obs-ffmpeg/obs-ffmpeg.c
+@@ -9,7 +9,7 @@
+ #include <dxgi.h>
+ #endif
+ 
+-#if !defined(_WIN32) && !defined(__APPLE__)
++#if !defined(_WIN32) && !defined(__APPLE__) && !defined(__ANDROID__)
+ #include "vaapi-utils.h"
+ 
+ #define LIBAVUTIL_VAAPI_AVAILABLE
+-- 
+2.54.0
+
