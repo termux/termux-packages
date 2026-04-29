@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="A fast, compliant alternative implementation of Python 3
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 _MAJOR_VERSION=3.11
-TERMUX_PKG_VERSION=7.3.21
+TERMUX_PKG_VERSION=7.3.22
 TERMUX_PKG_SRCURL=https://downloads.python.org/pypy/pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION-src.tar.bz2
-TERMUX_PKG_SHA256=e7c9d8236ef279dba51abb9e691401a6c805bbe3250c6842dc9bac98f8de688a
+TERMUX_PKG_SHA256=9f885a47a232b957f9b5cc4307264af229570ddea62a9c175351afa3a6321820
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, zlib"
 TERMUX_PKG_BUILD_DEPENDS="aosp-libs, coreutils, clang, make, pkg-config, python2, tk, xorgproto"
 TERMUX_PKG_RECOMMENDS="clang, make, pkg-config"
@@ -101,16 +101,20 @@ __setup_termux_docker_rootfs() {
 		)
 	fi
 
-	# Download update-static-dns and static-dns-hosts.txt from older termux-docker commit
+	# Download busybox, update-static-dns and static-dns-hosts.txt from older termux-docker commit
 	mkdir -p "$TERMUX_PKG_CACHEDIR"/termux-docker-utils
 	termux_download \
 		https://github.com/termux/termux-docker/raw/98af62205f4da832b71bb4de09cb8d6b17ceeaca/static-dns-hosts.txt \
 		"$TERMUX_PKG_CACHEDIR"/termux-docker-utils/static-dns-hosts.txt \
 		f5e28c8d37dc69e4876372cc05dcfd07aadc8499f5fa05bb6af1cfbff7cd656a
 	termux_download \
-		https://github.com/termux/termux-docker/raw/98af62205f4da832b71bb4de09cb8d6b17ceeaca/system/arm/bin/update-static-dns \
+		https://github.com/termux/termux-docker/raw/98af62205f4da832b71bb4de09cb8d6b17ceeaca/system/x86/bin/update-static-dns \
 		"$TERMUX_PKG_CACHEDIR"/termux-docker-utils/update-static-dns \
 		14b6ba13506dd90b691e5dbb84bf79ca155837dd43eb05c0e68fbe991c05ee5e
+	termux_download \
+		https://github.com/termux/termux-docker/raw/98af62205f4da832b71bb4de09cb8d6b17ceeaca/system/x86/bin/busybox \
+		"$TERMUX_PKG_CACHEDIR"/termux-docker-utils/busybox \
+		6c63a8623659aff24843d9b0720fa4aa216d44a5d60f29979a4073f3f80ce69c
 
 	# Extract host platform rootfs tar
 	__pypy3_host_rootfs="$TERMUX_PKG_CACHEDIR/host-termux-rootfs-$__pypy3_host_arch"
@@ -125,9 +129,12 @@ __setup_termux_docker_rootfs() {
 			"$__pypy3_host_rootfs".tmp/system/etc/
 		cp "$TERMUX_PKG_CACHEDIR"/termux-docker-utils/update-static-dns \
 			"$__pypy3_host_rootfs".tmp/"$TERMUX_PREFIX"/bin/
+		cp "$TERMUX_PKG_CACHEDIR"/termux-docker-utils/busybox \
+			"$__pypy3_host_rootfs".tmp/system/bin/
 		cp "$TERMUX_PKG_CACHEDIR"/proot-bin/proot \
 			"$__pypy3_host_rootfs".tmp/"$TERMUX_PREFIX"/bin/
 		chmod +x "$__pypy3_host_rootfs".tmp/"$TERMUX_PREFIX"/bin/update-static-dns
+		chmod +x "$__pypy3_host_rootfs".tmp/system/bin/busybox
 		rm -f "$__pypy3_host_rootfs".tmp/bin
 		rm -f "$__pypy3_host_rootfs".tmp/usr
 		rm -f "$__pypy3_host_rootfs".tmp/tmp
