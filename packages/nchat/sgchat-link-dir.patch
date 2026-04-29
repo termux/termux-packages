@@ -1,0 +1,16 @@
+# github.com/d99kris/nchat/lib/sgchat/go
+/home/builder/.termux-build/_cache/go1.26.2-r1/pkg/tool/linux_amd64/link: running aarch64-linux-android-clang failed: exit status 1
+/home/builder/.termux-build/_cache/android-r29-api-24-v4/bin/aarch64-linux-android-clang -Wl,-z,relro -shared -Wl,-z,nodelete -Wl,-Bsymbolic -Wl,--build-id=0x80e2aacf37ad344cad0223b6090462b09745b787 -o a.out -rdynamic -Qunused-arguments -Wl,--compress-debug-sections=zlib [ tmp files omitted ... ] -L/data/data/com.termux/files/usr/lib -Wl,-rpath=/data/data/com.termux/files/usr/lib -Wl,--enable-new-dtags -Wl,--as-needed -Wl,-unresolved-symbols=ignore-all -L/data/data/com.termux/files/usr/lib -Wl,-rpath=/data/data/com.termux/files/usr/lib -Wl,--enable-new-dtags -Wl,--as-needed -ldl -L/data/data/com.termux/files/usr/lib -Wl,-rpath=/data/data/com.termux/files/usr/lib -Wl,--enable-new-dtags -Wl,--as-needed -lsignal_ffi -ldl -lm -lz -lstdc++ -L/data/data/com.termux/files/usr/lib -Wl,-rpath=/data/data/com.termux/files/usr/lib -Wl,--enable-new-dtags -Wl,--as-needed -llog -L/data/data/com.termux/files/usr/lib -Wl,-rpath=/data/data/com.termux/files/usr/lib -Wl,--enable-new-dtags -Wl,--as-needed -L/data/data/com.termux/files/usr/lib -Wl,-rpath=/data/data/com.termux/files/usr/lib -Wl,--enable-new-dtags -Wl,--as-needed
+ld.lld: error: unable to find library -lsignal_ffi
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+--- ../nchat-5.14.44/lib/sgchat/go/CMakeLists.txt	2026-03-21 05:06:10.000000000 +0100
++++ ./lib/sgchat/go/CMakeLists.txt	2026-04-25 19:46:05.451909567 +0200
+@@ -153,7 +153,7 @@
+ add_custom_command(OUTPUT ${OUTPUT_DIR}/${LIB}
+   DEPENDS ${SRCS}
+   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+-  COMMAND env GOPATH=${GOPATH} CGO_ENABLED=1 LIBRARY_PATH=${LIBSIGNAL_FFI_DIR}
++  COMMAND env GOPATH=${GOPATH} CGO_ENABLED=1 CGO_LDFLAGS="-L${LIBSIGNAL_FFI_DIR}"
+   go build -buildmode=${BUILDMODE} ${CUSTOM_GO_FLAGS}
+   -o "${OUTPUT_DIR}/${LIB}"
+   ${CMAKE_GO_FLAGS} .
