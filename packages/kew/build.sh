@@ -3,12 +3,13 @@ TERMUX_PKG_DESCRIPTION="Music for the Shell"
 TERMUX_PKG_LICENSE="GPL-2.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.0.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://codeberg.org/ravachol/kew/archive/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=746236a57c96f9e74e88557f1d9d9e62cad53a2e140596bb9acb051cf59118b5
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="chafa, faad2, fftw, glib, libogg, libvorbis, libopus, opusfile, taglib"
-TERMUX_PKG_RECOMMENDS="chroma-visualizer"
+TERMUX_PKG_SUGGESTS="chroma-visualizer"
 TERMUX_PKG_EXTRA_MAKE_ARGS="ARCH=$TERMUX_ARCH"
 
 termux_step_post_get_source() {
