@@ -1135,15 +1135,6 @@ index eff6db2b3b..a9b3c90d68 100644
      if (api_contents) {
        api::tabs::Tab tab;
        tab.id = api_contents->ID();
-@@ -58,7 +58,7 @@ std::optional<base::Value::Dict> ElectronMessagingDelegate::MaybeGetTabInfo(
- content::WebContents* ElectronMessagingDelegate::GetWebContentsByTabId(
-     content::BrowserContext* browser_context,
-     int tab_id) {
--  auto* contents = electron::api::WebContents::FromID(tab_id);
-+  auto* contents = ::electron::api::WebContents::FromID(tab_id);
-   if (!contents) {
-     return nullptr;
-   }
 diff --git a/electron/shell/browser/hid/hid_chooser_context.cc b/electron/shell/browser/hid/hid_chooser_context.cc
 index 4869f56eb8..93ce4eaff9 100644
 --- a/electron/shell/browser/hid/hid_chooser_context.cc
