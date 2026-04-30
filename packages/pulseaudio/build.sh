@@ -20,12 +20,12 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-D alsa=disabled
 TERMUX_PKG_CONFFILES="etc/pulse/client.conf etc/pulse/daemon.conf etc/pulse/default.pa etc/pulse/system.pa"
 
 termux_step_pre_configure() {
-	# Our aaudio sink module needs libaaudio.so from a later android api version:
-	if [ $TERMUX_PKG_API_LEVEL -lt 26 ]; then
+	# Our aaudio sink module uses API 28 AudioEffect session attributes.
+	if [ $TERMUX_PKG_API_LEVEL -lt 28 ]; then
 		local _libdir="$TERMUX_PKG_TMPDIR/libaaudio"
 		rm -rf "${_libdir}"
 		mkdir -p "${_libdir}"
-		cp "$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/26/libaaudio.so" \
+		cp "$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/28/libaaudio.so" \
 			"${_libdir}"
 		LDFLAGS+=" -L${_libdir}"
 	fi

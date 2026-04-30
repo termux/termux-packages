@@ -42,6 +42,7 @@
 #include <pulsecore/thread-mq.h>
 #include <pulsecore/rtpoll.h>
 
+#include <android/api-level.h>
 #include <android/versioning.h>
 #undef __INTRODUCED_IN
 #define __INTRODUCED_IN(api_level)
@@ -68,6 +69,7 @@ PA_MODULE_USAGE(
 #define DEFAULT_PERFORMANCE_MODE 11
 #define DEFAULT_BUFFER_CAPACITY_FRAMES 18472
 #define DEFAULT_FRAMES_PER_CALLBACK 9236
+#define MINIMUM_AAUDIO_API_LEVEL 28
 
 enum {
     SINK_MESSAGE_RENDER = PA_SINK_MESSAGE_MAX,
@@ -412,8 +414,15 @@ int pa__init(pa_module*m) {
     const char *sharing_mode;
     const char *session_id;
     uint32_t parsed_session_id;
+    int api_level;
 
     pa_assert(m);
+
+    api_level = android_get_device_api_level();
+    if (api_level < MINIMUM_AAUDIO_API_LEVEL) {
+        pa_log("module-aaudio-sink requires Android API level %d or newer, device API level is %d.", MINIMUM_AAUDIO_API_LEVEL, api_level);
+        return -1;
+    }
 
     m->userdata = u = pa_xnew0(struct userdata, 1);
 
