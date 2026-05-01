@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://torproject.org/
 TERMUX_PKG_DESCRIPTION="Pluggable Transport based on HTTP Upgrade(HTTPT)"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.0.3"
+TERMUX_PKG_VERSION="0.0.4"
 TERMUX_PKG_SRCURL="https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/webtunnel/-/archive/v${TERMUX_PKG_VERSION}/webtunnel-v${TERMUX_PKG_VERSION}.tar.bz2"
-TERMUX_PKG_SHA256=b1cda89f7ea5f5535774805eb9f8ae56f3a2be5f7f0a7b4f88fe3f5dc6c274c1
+TERMUX_PKG_SHA256=a72dcca2f1234685c738c5b5b545d6be6c9866b1b44f5608e837da7702162775
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
