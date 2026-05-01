@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/fcitx/fcitx5-unikey
+TERMUX_PKG_DESCRIPTION="Unikey engine support for Fcitx5"
+TERMUX_PKG_LICENSE="GPL-2.0-or-later"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="5.1.10"
+TERMUX_PKG_SRCURL=https://github.com/fcitx/fcitx5-unikey/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=131557bac758b5ed1046779739c91293201d412c0277f1ff087e52d4541ffece
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_DEPENDS="fcitx5, fcitx5-qt, libc++, qt6-qtbase"
