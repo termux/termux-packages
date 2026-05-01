@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.khronos.org/openxr/
 TERMUX_PKG_DESCRIPTION="Open standard that provides a common set of APIs for developing XR applications"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.1.58"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1.1.59"
 TERMUX_PKG_SRCURL="https://github.com/KhronosGroup/OpenXR-SDK-Source/releases/download/release-$TERMUX_PKG_VERSION/OpenXR-SDK-Source-release-$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=7139158a60b3e0f96d9afdac4337292a54539c8ec6e331f19844d7dae8daf041
+TERMUX_PKG_SHA256=3b241897f93e2cf7e833d27f8ec3c3433cf5cf064e13724af026984acede02e7
 # configuration error if jsoncpp and jsoncpp-static are not both installed simultaneously
 TERMUX_PKG_DEPENDS="jsoncpp, libc++, libx11, vulkan-icd, libxrandr, libxxf86vm, opengl"
 TERMUX_PKG_AUTO_UPDATE=true
