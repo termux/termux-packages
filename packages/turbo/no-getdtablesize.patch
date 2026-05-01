@@ -1,0 +1,11 @@
+--- a/crates/turborepo-process/src/child.rs
++++ b/crates/turborepo-process/src/child.rs
+@@ -269,7 +269,7 @@ fn close_fd(fd: RawFd) {
+ 
+ #[cfg(unix)]
+ fn close_inherited_fds(pipe_read_fd: RawFd, target_exit_fd: Option<RawFd>) {
+-    let max_fd = unsafe { libc::getdtablesize() };
++    let max_fd = unsafe { libc::sysconf(libc::_SC_OPEN_MAX) };
+     let max_fd = if max_fd > 0 { max_fd } else { 1024 };
+ 
+     for fd in 0..max_fd {
