@@ -1,8 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://aws.amazon.com/cli
 TERMUX_PKG_DESCRIPTION="Universal Command Line Interface for Amazon Web Services"
 TERMUX_PKG_LICENSE="Apache-2.0"
+TERMUX_PKG_LICENSE_FILE="LICENSE.txt, exe/assets/THIRD_PARTY_LICENSES"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.34.41"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/aws/aws-cli/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=ea7986566ec5fb0eece65553d798fec012f0ffa32fccf81dfdea1fe47bcbd7f2
 TERMUX_PKG_AUTO_UPDATE=true
@@ -39,6 +41,7 @@ termux_step_pre_configure() {
 			return 1 ;;
 	esac
 	export PYI_PLATFORM
+	export PYI_LOG_LEVEL=DEBUG
 
 	local PYTHON_INCLUDE="$TERMUX_PREFIX/include/python$TERMUX_PYTHON_VERSION"
 
@@ -96,6 +99,7 @@ termux_step_pre_configure() {
 	LDFLAGS='$LDFLAGS' \
 	PYTHON='$TERMUX_PREFIX/bin/python' \
 	PYI_PLATFORM=$PYI_PLATFORM \
+	PYI_LOG_LEVEL=$PYI_LOG_LEVEL \
 	"
 }
 
