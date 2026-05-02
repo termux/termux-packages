@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="A simple library to load images of various formats as SD
 TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.4.2"
+TERMUX_PKG_VERSION="3.4.4"
 TERMUX_PKG_SRCURL="https://github.com/libsdl-org/SDL_image/releases/download/release-${TERMUX_PKG_VERSION}/SDL3_image-${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=82fdb88cf1a9cbdc1c77797aaa3292e6d22ce12586be718c8ea43530df1536b4
+TERMUX_PKG_SHA256=29751304a13d25ac513f24305fa25b06a6edd9607718c90129b8350d35fc5573
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libavif, libjpeg-turbo, libjxl, libpng, libtiff, libwebp, sdl3"
 
