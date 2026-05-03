@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tool to fetch and install precompiled musl-based static 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.19.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/cargo-bins/cargo-binstall/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=0f577b7d7e10e6ddcb2eaedc10df50dec57d95f06f88411119bfbd62240f488f
 TERMUX_PKG_DEPENDS="resolv-conf"
@@ -22,7 +23,7 @@ termux_step_pre_configure() {
 		! -wholename ./vendor/netdev \
 		-exec rm -rf '{}' \;
 
-	find vendor/rustls-platform-verifier -type f -print0 | \
+	find vendor/{rustls-platform-verifier,hickory-resolver} -type f -print0 | \
 		xargs -0 sed -i \
 		-e 's|"android"|"disabling_this_because_it_is_for_building_an_apk"|g' \
 		-e "s|ANDROID|DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK|g" \
