@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL="https://mesa.freedesktop.org/archive/demos/mesa-demos-${TERMU
 TERMUX_PKG_SHA256=3046a3d26a7b051af7ebdd257a5f23bfeb160cad6ed952329cdff1e9f1ed496b
 TERMUX_PKG_DEPENDS="freeglut, glu, libx11, libxext, opengl"
 # will overwrite poly from polyml
-TERMUX_PKG_ON_DEVICE_BUILD_SUPPORTED=false
+TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dlibdrm=disabled
 -Dvulkan=disabled
