@@ -1,0 +1,64 @@
+diff --git a/submodules/base/tools/aapt2/cmd/Link.cpp b/submodules/base/tools/aapt2/cmd/Link.cpp
+index 642a5618..f1348ce7 100644
+--- a/submodules/base/tools/aapt2/cmd/Link.cpp
++++ b/submodules/base/tools/aapt2/cmd/Link.cpp
+@@ -2483,10 +2483,11 @@ int LinkCommand::Action(const std::vector<std::string>& args) {
+     if (package_id_int > std::numeric_limits<uint8_t>::max()
+         || package_id_int == kFrameworkPackageId
+         || (!options_.allow_reserved_package_id && package_id_int < kAppPackageId)) {
+-      context.GetDiagnostics()->Error(
++      context.GetDiagnostics()->Warn(
+           android::DiagMessage() << StringPrintf(
+-              "invalid package ID 0x%02x. Must be in the range 0x7f-0xff.", package_id_int));
+-      return 1;
++              "invalid package ID 0x%02x. Must be in the range 0x7f-0xff. Ignoring...", package_id_int));
++      // Apktool
++      // return 1;
+     }
+     context.SetPackageId(static_cast<uint8_t>(package_id_int));
+   }
+@@ -2589,6 +2590,23 @@ int LinkCommand::Action(const std::vector<std::string>& args) {
+       ".mpg", ".mpeg", ".mp4", ".m4a", ".m4v", ".3gp", ".3gpp", ".3g2", ".3gpp2", ".wma", ".wmv",
+       ".webm", ".mkv"});
+ 
++  // Populate no compress extensions specified in the extensions file.
++  if (options_.extensions_to_not_compress_path) {
++    std::ifstream extensionsFile(options_.extensions_to_not_compress_path.value());
++
++    if (extensionsFile.fail()) {
++      context.GetDiagnostics()->Error(
++        android::DiagMessage() << "could not open extensions file "
++          << options_.extensions_to_not_compress_path.value()
++          << " for reading");
++      return 1;
++    }
++
++    for (std::string line; getline(extensionsFile, line);) {
++      options_.extensions_to_not_compress.insert(line);
++    }
++  }
++
+   // Turn off auto versioning for static-libs.
+   if (context.GetPackageType() == PackageType::kStaticLib) {
+     options_.no_auto_version = true;
+diff --git a/submodules/base/tools/aapt2/cmd/Link.h b/submodules/base/tools/aapt2/cmd/Link.h
+index 2f178537..7d3111d5 100644
+--- a/submodules/base/tools/aapt2/cmd/Link.h
++++ b/submodules/base/tools/aapt2/cmd/Link.h
+@@ -78,6 +78,7 @@ struct LinkOptions {
+   bool use_sparse_encoding = false;
+   std::unordered_set<std::string> extensions_to_not_compress;
+   std::optional<std::regex> regex_to_not_compress;
++  std::optional<std::string> extensions_to_not_compress_path;
+   FeatureFlagValues feature_flag_values;
+ 
+   // Static lib options.
+@@ -291,6 +292,8 @@ class LinkCommand : public Command {
+                     &options_.manifest_fixer_options.rename_overlay_category);
+     AddOptionalFlagList("-0", "File suffix not to compress.",
+         &options_.extensions_to_not_compress);
++    AddOptionalFlag("-e", "File containing list of extensions not to compress.",
++        &options_.extensions_to_not_compress_path);
+     AddOptionalSwitch("--no-compress", "Do not compress any resources.",
+         &options_.do_not_compress_anything);
+     AddOptionalSwitch("--keep-raw-values", "Preserve raw attribute values in xml files.",
