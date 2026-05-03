@@ -3,9 +3,12 @@ TERMUX_PKG_DESCRIPTION="A Standard ML implementation"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.9.2"
-TERMUX_PKG_SRCURL=https://github.com/polyml/polyml/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL="https://github.com/polyml/polyml/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=5cf5f77767568c25cf880acc2d0a32ee3d399e935475ab1626e8192fc3b07390
 TERMUX_PKG_AUTO_UPDATE=true
+# this package needs its libpolymain.a to run its 'polyc' command
+TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_DEPENDS="libandroid-posix-semaphore, libc++, libffi, libgmp"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
