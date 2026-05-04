@@ -49,36 +49,19 @@ error[E0425]: cannot find function `posix_spawnattr_init` in crate `libc`
      return rust_system(command);
  }
  #endif
---- a/platform-checks/src/lib.rs
-+++ b/platform-checks/src/lib.rs
-@@ -146,27 +146,10 @@ pub fn perform_system_checks() -> HashSet<String> {
+--- a/platform-checks/build.rs
++++ b/platform-checks/build.rs
+@@ -43,10 +43,6 @@ const SYMBOL_PROBES: &[(&str, &str)] = &[
+     ("execl", "unistd.h"),
+     ("execlp", "unistd.h"),
+     ("execle", "unistd.h"),
+-    ("posix_spawn", "spawn.h"),
+-    ("posix_spawnp", "spawn.h"),
+-    ("popen", "stdio.h"),
+-    ("system", "stdlib.h"),
+ ];
  
-     check_include_file("spawn.h", "spawn_h");
- 
--    // posix_spawn family
--    for symbol in &["posix_spawn", "posix_spawnp"] {
--        if check_symbol_exists(symbol, "spawn.h") {
--            detected_symbols.insert(symbol.to_string());
--        }
--    }
--
-     check_include_file("stdio.h", "stdio_h");
- 
--    // popen
--    if check_symbol_exists("popen", "stdio.h") {
--        detected_symbols.insert("popen".to_string());
--    }
--
-     check_include_file("stdlib.h", "stdlib_h");
- 
--    // system
--    if check_symbol_exists("system", "stdlib.h") {
--        detected_symbols.insert("system".to_string());
--    }
--
-     detected_symbols
- }
- 
+ fn main() {
 --- a/intercept-preload/src/implementation.rs
 +++ b/intercept-preload/src/implementation.rs
 @@ -504,7 +504,7 @@ pub unsafe extern "C" fn rust_posix_spawnp(
