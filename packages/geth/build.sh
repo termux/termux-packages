@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://geth.ethereum.org/
 TERMUX_PKG_DESCRIPTION="Go implementation of the Ethereum protocol"
 TERMUX_PKG_LICENSE="LGPL-3.0, GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.17.0"
+TERMUX_PKG_VERSION="1.17.2"
 TERMUX_PKG_SRCURL=https://github.com/ethereum/go-ethereum/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=a78d478d67f796c3fa73ebdc4a4da8093ab1c37486615e29b64cb9b0ae22e01a
+TERMUX_PKG_SHA256=cdbfcf0eb282849d0ffce21e1cffd82b51a1d08c27421d7fa86dccf65b76b523
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SUGGESTS="geth-utils"
 

@@ -1,0 +1,22 @@
+diff --git a/test/parallel/test-process-umask-mask.js b/test/parallel/test-process-umask-mask.js
+index f0a67b8f14e..ea274e0ceca 100644
+--- a/test/parallel/test-process-umask-mask.js
++++ b/test/parallel/test-process-umask-mask.js
+@@ -3,6 +3,7 @@
+ // This tests that the lower bits of mode > 0o777 still works in
+ // process.umask()
+ 
++const os = require('os')
+ const common = require('../common');
+ const assert = require('assert');
+ const { isMainThread } = require('worker_threads');
+@@ -10,6 +11,9 @@ const { isMainThread } = require('worker_threads');
+ if (!isMainThread)
+   common.skip('Setting process.umask is not supported in Workers');
+ 
++if (common.isDebug && os.platform() == 'android')
++  common.skip('process.umask on Android in debug builds fails libc assertion which we are checking here')
++
+ let mask;
+ 
+ if (common.isWindows) {

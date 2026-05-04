@@ -7,7 +7,6 @@ bin/btoa
 bin/certutil
 bin/chktest
 bin/cmsutil
-bin/conflict
 bin/crlutil
 bin/crmftest
 bin/dbtest

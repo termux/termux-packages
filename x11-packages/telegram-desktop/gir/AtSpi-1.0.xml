@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<dump>
+  <interface name="AtSpiStatus" get-type="at_spi_status_get_type">
+    <property name="screen-reader-enabled" type="gboolean" flags="227" default-value="FALSE"/>
+  </interface>
+  <class name="AtSpiStatusProxy" get-type="at_spi_status_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="AtSpiStatus"/>
+  </class>
+  <class name="AtSpiStatusSkeleton" get-type="at_spi_status_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="AtSpiStatus"/>
+  </class>
+  <interface name="AtSpiObject" get-type="at_spi_object_get_type">
+    <prerequisite name="GDBusObject"/>
+    <property name="status" type="AtSpiStatus" flags="227"/>
+  </interface>
+  <class name="AtSpiObjectProxy" get-type="at_spi_object_proxy_get_type" parents="GDBusObjectProxy,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="AtSpiObject"/>
+  </class>
+  <class name="AtSpiObjectSkeleton" get-type="at_spi_object_skeleton_get_type" parents="GDBusObjectSkeleton,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="AtSpiObject"/>
+  </class>
+  <class name="AtSpiObjectManagerClient" get-type="at_spi_object_manager_client_get_type" parents="GDBusObjectManagerClient,GObject">
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GDBusObjectManager"/>
+  </class>
+</dump>

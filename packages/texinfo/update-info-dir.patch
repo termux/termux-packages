@@ -9,13 +9,19 @@
  
  set -e
  
-@@ -14,13 +14,7 @@
+@@ -14,19 +14,7 @@
  # the dir file. Unset LANGUAGE and reload /etc/environment to get
  # the system wide settings. See bug #536476
  unset LANGUAGE
 -unset LANG
 -if [ -r /etc/environment ] ; then
--  . /etc/environment
+-  exec 9<&0 </etc/environment
+-  while read -r env
+-  echo $env | grep -q "^#" && env=""
+-  do if [ -n "$env" ]
+-     then export "$env"
+-  fi; done
+-  exec 0<&9 9<&-
 -fi
 -if [ -r /etc/default/locale ] ; then
 -  . /etc/default/locale

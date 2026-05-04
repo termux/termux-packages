@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.OLD, COPYING.LIB"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="11.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://dl.winehq.org/wine/source/${TERMUX_PKG_VERSION%%.*}.0/wine-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=c07a6857933c1fc60dff5448d79f39c92481c1e9db5aa628db9d0358446e0701
 TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, opengl, pulseaudio, sdl2 | sdl2-compat, vulkan-loader, xorg-xrandr"
@@ -18,9 +18,12 @@ TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
 "
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+ac_cv_header_linux_userfaultfd_h=no
 enable_wineandroid_drv=no
+enable_tools=yes
 --prefix=$TERMUX_PREFIX/opt/wine-stable
 --exec-prefix=$TERMUX_PREFIX/opt/wine-stable
+--includedir=$TERMUX_PREFIX/opt/wine-stable/include
 --libdir=$TERMUX_PREFIX/opt/wine-stable/lib
 --with-wine-tools=$TERMUX_PKG_HOSTBUILD_DIR
 --enable-nls
@@ -136,6 +139,10 @@ termux_step_pre_configure() {
 		chmod +x "$TERMUX_PKG_TMPDIR/bin/x86_64-linux-android-clang"
 		export PATH="$TERMUX_PKG_TMPDIR/bin:$PATH"
 	fi
+}
+
+termux_step_make() {
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 }
 
 termux_step_make_install() {

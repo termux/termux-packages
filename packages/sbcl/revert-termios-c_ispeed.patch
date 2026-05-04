@@ -1,0 +1,70 @@
+Reverts:
+https://github.com/sbcl/sbcl/commit/7c5b07f38a096ea2d0fbb89203b2c48ca671ad8b
+
+Android's termios struct does not have c_ispeed or c_ospeed.
+
+https://cs.android.com/android/platform/superproject/+/android-16.0.0_r4:bionic/libc/kernel/uapi/asm-generic/termios.h;l=19
+
+This prevents:
+../../obj/from-self/contrib/sb-posix/runme.c:1787:49: error: no member named 'c_ispeed' in 'struct termios'
+
+original purpose of the code is stated to be to fix an issue that occured when running on OpenBSD.
+
+preserve the test, since the test actually still passes on Android despite the code it tested having been removed,
+proving that this code is unnecessary on android.
+
+--- a/contrib/sb-posix/constants.lisp
++++ b/contrib/sb-posix/constants.lisp
+@@ -436,9 +436,7 @@
+               (tcflag-t oflag "tcflag_t" "c_oflag")
+               (tcflag-t cflag "tcflag_t" "c_cflag")
+               (tcflag-t lflag "tcflag_t" "c_lflag")
+-              ((array cc-t) cc "cc_t" "c_cc")
+-              (speed-t ispeed "speed_t" "c_ispeed")
+-              (speed-t ospeed "speed_t" "c_ospeed")))
++              ((array cc-t) cc "cc_t" "c_cc")))
+ 
+  ;; utime(), utimes()
+  #-win32
+--- a/contrib/sb-posix/defpackage.lisp
++++ b/contrib/sb-posix/defpackage.lisp
+@@ -20,9 +20,7 @@
+            #:stat-gid #:stat-size #:stat-atime #:stat-mtime #:stat-ctime
+            #:stat-rdev
+            #:termios-iflag #:termios-oflag #:termios-cflag
+-           #:termios-lflag #:termios-cc
+-           #:termios-ispeed #:termios-ospeed
+-           #:timeval-sec #:timeval-usec
++           #:termios-lflag #:termios-cc #:timeval-sec #:timeval-usec
+            #:flock-type #:flock-whence #:flock-start #:flock-len
+            #:flock-pid
+ 
+--- a/contrib/sb-posix/interface.lisp
++++ b/contrib/sb-posix/interface.lisp
+@@ -813,20 +813,16 @@ not supported."
+ 
+ #-win32
+ (define-protocol-class termios alien-termios ()
+-  ((iflag :initarg :iflag :accessor termios-iflag
++  ((iflag :initarg :iflag :accessor sb-posix:termios-iflag
+           :documentation "Input modes.")
+-   (oflag :initarg :oflag :accessor termios-oflag
++   (oflag :initarg :oflag :accessor sb-posix:termios-oflag
+           :documentation "Output modes.")
+-   (cflag :initarg :cflag :accessor termios-cflag
++   (cflag :initarg :cflag :accessor sb-posix:termios-cflag
+           :documentation "Control modes.")
+-   (lflag :initarg :lflag :accessor termios-lflag
++   (lflag :initarg :lflag :accessor sb-posix:termios-lflag
+           :documentation "Local modes.")
+-   (cc :initarg :cc :accessor termios-cc :array-length nccs
+-       :documentation "Control characters.")
+-   (ispeed :initarg :ispeed :accessor termios-ispeed
+-           :documentation "Input speed.")
+-   (ospeed :initarg :ospeed :accessor termios-ospeed
+-           :documentation "Output speed."))
++   (cc :initarg :cc :accessor sb-posix:termios-cc :array-length nccs
++       :documentation "Control characters."))
+   (:documentation
+    "Instances of this class represent I/O characteristics of the terminal."))
+ 

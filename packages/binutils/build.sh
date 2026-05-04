@@ -2,15 +2,16 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/binutils/
 TERMUX_PKG_DESCRIPTION="A GNU collection of binary utilities"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
+# `lua-language-server` links against libbfd,
+# remember to rebuild it when updating `binutils`.
 TERMUX_PKG_VERSION="2.46.0"
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/binutils/binutils-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_REVISION=3
+TERMUX_PKG_SRCURL="https://mirrors.kernel.org/gnu/binutils/binutils-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=d75a94f4d73e7a4086f7513e67e439e8fcdcbb726ffe63f4661744e6256b2cf2
-TERMUX_PKG_DEPENDS="binutils-bin, zlib, zstd"
-TERMUX_PKG_BREAKS="binutils (<< 2.46), binutils-libs, binutils-dev"
-TERMUX_PKG_REPLACES="binutils (<< 2.46), binutils-libs, binutils-dev"
+TERMUX_PKG_DEPENDS="libc++, zlib, zstd"
+TERMUX_PKG_BREAKS="binutils (<< 2.46), binutils-bin, binutils-libs, binutils-dev"
+TERMUX_PKG_REPLACES="binutils (<< 2.46), binutils-bin, binutils-libs, binutils-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
---bindir=$TERMUX_PREFIX/libexec/binutils
 --disable-gprofng
 --enable-plugins
 --disable-werror
@@ -20,6 +21,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 TERMUX_PKG_EXTRA_MAKE_ARGS="tooldir=$TERMUX_PREFIX"
 TERMUX_PKG_RM_AFTER_INSTALL="share/man/man1/windmc.1 share/man/man1/windres.1"
 TERMUX_PKG_NO_STATICSPLIT=true
+# will overwrite llvm binutils and llvm ld
+TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 TERMUX_PKG_GROUPS="base-devel"
 
 # For binutils-cross:
@@ -39,8 +42,13 @@ ZSTD_LIBS=-l:libzstd.a
 "
 
 termux_step_post_get_source() {
-	# Remove this marker all the time, as binutils is architecture-specific.
+	# Remove the marker every time, as binutils is architecture-specific.
 	rm -rf "$TERMUX_HOSTBUILD_MARKER"
+
+	# https://gitlab.archlinux.org/archlinux/packaging/packages/binutils/-/blob/2.46-1/PKGBUILD#L76-77
+	# Turn off development mode (-Werror, gas run-time checks, date in sonames)
+	sed -i '/^development=/s/true/false/' "$TERMUX_PKG_SRCDIR/bfd/development.sh"
+
 }
 
 termux_step_host_build() {
@@ -66,32 +74,27 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	local dir="$TERMUX_PREFIX/share/binutils"
-	mkdir -p "$dir"
-	touch "$dir/.placeholder"
-
-	mkdir -p "$TERMUX_PREFIX/bin"
-	cd "$TERMUX_PREFIX/libexec/binutils" || termux_error_exit "failed to change into 'libexec/binutils' directory"
-
-	mv ld{.bfd,}
-	ln -sf ld{,.bfd}
-	ln -sfr "$TERMUX_PREFIX/libexec/binutils/ld" "$TERMUX_PREFIX/bin/ld.bfd"
-
-	local bin
-	for bin in ./*; do
-		ln -sfr "$TERMUX_PREFIX/libexec/binutils/$bin" \
-			"$TERMUX_PREFIX/bin/$bin"
+	rm "${TERMUX_PREFIX}/bin/ld"
+	mv "${TERMUX_PREFIX}/share/man/man1/ld.1" \
+		"${TERMUX_PREFIX}/share/man/man1/ld.bfd.1"
+	local -a _BINUTILS_CONFLICTING_WITH_LLVM=(
+		"ar"
+		"addr2line"
+		"c++filt"
+		"nm"
+		"objcopy"
+		"objdump"
+		"ranlib"
+		"readelf"
+		"size"
+		"strings"
+		"strip"
+	)
+	local binutil
+	for binutil in "${_BINUTILS_CONFLICTING_WITH_LLVM[@]}"; do
+		mv "${TERMUX_PREFIX}/bin/${binutil}" \
+			"${TERMUX_PREFIX}/bin/g${binutil}"
+		mv "${TERMUX_PREFIX}/share/man/man1/${binutil}.1" \
+			"${TERMUX_PREFIX}/share/man/man1/g${binutil}.1"
 	done
-
-	# Setup symlinks as these are used when building, so used by
-	# system setup in e.g. python, perl and libtool:
-	local -a _TOOLS_WITH_HOST_PREFIX=("ar" "ld" "nm" "objdump" "ranlib" "readelf" "strip")
-	for bin in "${_TOOLS_WITH_HOST_PREFIX[@]}"; do
-		ln -sfr "$TERMUX_PREFIX/libexec/binutils/$bin" \
-			"$TERMUX_PREFIX/bin/$TERMUX_HOST_PLATFORM-$bin"
-	done
-}
-
-termux_step_post_massage() {
-	rm -rf bin
 }

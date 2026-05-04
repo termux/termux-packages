@@ -42,22 +42,22 @@
  	for (size_t x = 0; x < ARRAYSIZE(hints); x++)
 --- a/winpr/libwinpr/timezone/timezone.c
 +++ b/winpr/libwinpr/timezone/timezone.c
-@@ -102,7 +102,7 @@
+@@ -98,7 +98,7 @@
  
  static char* winpr_get_timezone_from_link(const char* links[], size_t count)
  {
 -	const char* _links[] = { "/etc/localtime", "/etc/TZ" };
 +	const char* _links[] = { "@TERMUX_PREFIX@/etc/localtime", "@TERMUX_PREFIX@/etc/TZ" };
  
- 	if (links == NULL)
+ 	if (links == nullptr)
  	{
-@@ -295,7 +295,7 @@
+@@ -291,7 +291,7 @@
  
  static char* winpr_translate_time_zone(const char* tzid)
  {
 -	const char* zipath = "/usr/share/zoneinfo/";
 +	const char* zipath = "@TERMUX_PREFIX@/share/zoneinfo/";
- 	char* buf = NULL;
+ 	char* buf = nullptr;
  	const char* links[] = { buf };
  
 --- a/winpr/libwinpr/wtsapi/wtsapi.c

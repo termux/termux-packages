@@ -1,0 +1,3929 @@
+From 1a9a3c0ac99d67798b21d047bf17797250828992 Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <licy183@termux.dev>
+Date: Tue, 10 Mar 2026 02:00:39 +0800
+Subject: [PATCH 6/8] ui
+
+---
+ ui/accessibility/ax_enum_util.h               | 12 +++----
+ ui/accessibility/ax_position.h                | 25 +++++++-------
+ ui/accessibility/ax_tree.cc                   | 18 +++++-----
+ ui/accessibility/ax_tree_manager_map.cc       |  2 ++
+ .../automation/automation_ax_tree_wrapper.cc  |  3 +-
+ .../platform/ax_platform_node_delegate.cc     |  5 +--
+ ui/accessibility/platform/ax_unique_id.cc     |  1 +
+ .../platform/browser_accessibility.cc         |  3 +-
+ .../inspect/ax_tree_formatter_base.cc         |  5 ++-
+ .../one_shot_accessibility_tree_search.cc     |  3 +-
+ ui/android/overscroll_refresh.cc              |  4 +--
+ ui/android/overscroll_refresh_handler.cc      |  6 ++--
+ ui/android/view_android.cc                    |  3 +-
+ ui/aura/host_frame_rate_throttler.cc          |  5 +--
+ .../native_window_occlusion_tracker_win.cc    |  1 +
+ ui/aura/scoped_simple_keyboard_hook.cc        |  3 +-
+ ui/aura/window.cc                             |  5 +--
+ ui/aura/window_occlusion_tracker.cc           | 10 +++---
+ ui/aura/window_tracker.cc                     |  6 ++--
+ ui/aura/window_tree_host.cc                   |  3 +-
+ ui/base/accelerators/accelerator.cc           |  4 +--
+ ui/base/accelerators/accelerator_manager.cc   |  3 +-
+ .../global_accelerator_listener_ozone.cc      |  5 +--
+ ui/base/clipboard/clipboard.cc                |  3 +-
+ ui/base/clipboard/clipboard_android.cc        |  1 +
+ ui/base/clipboard/clipboard_non_backed.cc     |  3 +-
+ ui/base/clipboard/clipboard_ozone.cc          |  7 ++--
+ ui/base/clipboard/test/test_clipboard.cc      |  7 ++--
+ .../os_exchange_data_provider_non_backed.cc   |  3 +-
+ ui/base/ime/ash/input_method_util.cc          |  4 +--
+ ui/base/ime/win/tsf_input_scope.cc            |  6 ++--
+ ui/base/interaction/element_identifier.cc     |  3 +-
+ ui/base/interaction/element_identifier.h      |  2 +-
+ ui/base/interaction/element_tracker.cc        |  5 +--
+ .../interaction/interactive_test_internal.cc  |  3 +-
+ .../interaction/interactive_test_internal.h   |  1 +
+ ui/base/metadata/metadata_cache.cc            |  3 +-
+ ui/base/models/list_selection_model.cc        |  3 +-
+ ui/base/page_transition_types.cc              |  6 ++--
+ ui/base/resource/data_pack.cc                 |  3 +-
+ ui/base/resource/resource_scale_factor.cc     |  3 +-
+ .../user_activity/user_activity_detector.cc   |  5 ++-
+ ui/base/win/hwnd_subclass.cc                  |  4 +--
+ ui/base/x/selection_utils.cc                  |  3 +-
+ ui/base/x/x11_clipboard_helper.cc             |  5 +--
+ ui/base/x/x11_gl_egl_utility.cc               |  3 +-
+ ui/base/x/x11_global_shortcut_listener.cc     |  4 ++-
+ ui/base/x/x11_os_exchange_data_provider.cc    |  1 +
+ ui/base/x/x11_util.cc                         |  3 +-
+ ui/color/color_provider_utils.cc              |  3 +-
+ ui/compositor/compositor.cc                   |  3 +-
+ ui/compositor/layer.cc                        |  3 +-
+ ui/display/display.cc                         |  1 +
+ ui/display/display_change_notifier.cc         |  3 +-
+ ui/display/display_layout.cc                  | 11 ++++---
+ .../manager/content_protection_key_manager.cc |  3 +-
+ ui/display/manager/display_configurator.cc    |  5 ++-
+ ui/display/manager/display_manager.cc         | 11 ++++---
+ ui/display/manager/touch_device_manager.cc    | 21 ++++++------
+ ui/display/screen.cc                          |  5 +--
+ ui/display/unified_desktop_utils.cc           |  9 ++---
+ ui/display/util/display_util.cc               | 33 ++++++++++---------
+ ui/display/win/screen_win.cc                  |  1 +
+ ui/events/ash/keyboard_capability.cc          |  5 +--
+ ui/events/blink/blink_event_util.cc           |  4 +--
+ ui/events/blink/web_input_event.cc            |  9 +++--
+ ui/events/devices/device_data_manager.cc      |  3 +-
+ ui/events/event.cc                            |  3 +-
+ ui/events/event_utils.cc                      |  4 +--
+ .../touch_disposition_gesture_filter.cc       | 11 +++----
+ ui/events/gesture_event_details.cc            |  8 ++---
+ ui/events/gestures/gesture_recognizer_impl.cc |  1 +
+ ui/events/keyboard_hook_base.cc               |  3 +-
+ ui/events/ozone/chromeos/cursor_controller.cc |  1 +
+ .../ozone/evdev/event_converter_evdev_impl.cc |  5 ++-
+ .../ozone/evdev/input_device_factory_evdev.cc |  8 ++---
+ ui/gfx/image/image_skia.cc                    |  3 +-
+ ui/gfx/linux/gbm_support_x11.cc               |  3 +-
+ ui/gfx/linux/test/mock_gbm_device.cc          |  4 +--
+ ui/gfx/render_text_harfbuzz.cc                |  5 +--
+ ui/gfx/x/connection.cc                        |  3 +-
+ ui/gfx/x/randr_output_manager.cc              | 16 +++++----
+ ui/gfx/x/window_cache.cc                      |  5 +--
+ ui/gfx/x/x11_crtc_resizer.cc                  |  3 +-
+ ui/gl/gl_display.cc                           |  1 +
+ ui/gl/gl_gl_api_implementation.cc             |  1 +
+ ui/gl/gl_implementation.cc                    |  3 +-
+ ui/gl/gl_surface_egl_x11.cc                   |  3 +-
+ ui/gl/init/gl_display_initializer.cc          |  3 +-
+ ui/gtk/gtk_ui.cc                              |  5 +--
+ ui/gtk/os_settings_provider_gtk.cc            |  5 +--
+ ui/message_center/message_center_impl.cc      |  3 +-
+ ui/message_center/popup_timers_controller.cc  |  3 +-
+ ui/native_theme/native_theme.cc               |  6 ++--
+ ui/native_theme/os_settings_provider.cc       |  7 ++--
+ ui/ozone/common/base_keyboard_hook.cc         |  3 +-
+ .../platform/drm/gpu/drm_device_manager.cc    |  3 +-
+ ui/ozone/platform/drm/gpu/drm_framebuffer.cc  |  6 ++--
+ .../drm/gpu/drm_gpu_display_manager.cc        | 11 ++++---
+ ui/ozone/platform/drm/gpu/fake_drm_device.cc  |  8 ++---
+ .../hardware_display_plane_manager_atomic.cc  |  4 +--
+ .../hardware_display_plane_manager_legacy.cc  |  8 ++---
+ .../wayland/gpu/wayland_buffer_manager_gpu.cc |  4 +--
+ .../wayland/gpu/wayland_canvas_surface.cc     |  1 +
+ .../wayland/gpu/wayland_gl_egl_utility.cc     |  6 ++--
+ .../host/gtk_primary_selection_offer.cc       |  6 ++--
+ .../wayland/host/wayland_data_offer.cc        |  6 ++--
+ .../wayland/host/wayland_data_offer_base.cc   |  3 +-
+ .../host/wayland_input_method_context.cc      |  4 +--
+ .../platform/wayland/host/wayland_screen.cc   |  5 +--
+ .../wayland/host/wayland_serial_tracker.cc    |  7 ++--
+ .../platform/wayland/host/wayland_window.cc   |  3 +-
+ .../host/wayland_window_drag_controller.cc    |  5 ++-
+ .../platform/wayland/host/xdg_toplevel.cc     |  4 +--
+ .../host/zwp_primary_selection_offer.cc       |  4 +--
+ .../wayland_ozone_ui_controls_test_helper.cc  |  3 +-
+ ui/ozone/platform/x11/x11_window_manager.cc   |  3 +-
+ ui/touch_selection/touch_selection_metrics.cc | 11 ++++---
+ ui/views/accessibility/ax_aura_obj_cache.cc   |  4 +--
+ ui/views/accessibility/ax_root_obj_wrapper.cc |  4 +--
+ ...iew_ax_platform_node_delegate_auralinux.cc |  3 +-
+ .../bubble/bubble_dialog_delegate_view.cc     |  7 ++--
+ .../cocoa/native_widget_mac_ns_window_host.mm |  3 +-
+ ui/views/controls/menu/menu_item_view.cc      |  3 +-
+ ui/views/controls/menu/submenu_view.cc        |  6 ++--
+ ui/views/controls/table/table_view.cc         |  9 ++---
+ ui/views/controls/textfield/textfield.cc      | 31 ++++++++---------
+ ui/views/controls/textfield/textfield.h       |  3 +-
+ ui/views/examples/examples_window.cc          |  3 +-
+ .../touchui/touch_selection_menu_views.cc     | 11 ++++---
+ ui/views/view.cc                              |  6 ++--
+ ui/views/view.h                               |  4 +--
+ .../desktop_window_tree_host_platform.cc      |  3 +-
+ ui/views/widget/sublevel_manager.cc           |  2 +-
+ ...hwnd_message_handler_interactive_uitest.cc |  9 ++---
+ ui/views/windows_stationarity_monitor_mac.mm  |  3 +-
+ ui/wm/core/cursor_util.cc                     |  3 +-
+ ui/wm/core/shadow_controller.cc               |  6 ++--
+ ui/wm/core/transient_window_manager.cc        |  5 +--
+ ui/wm/core/window_animations.cc               |  4 +--
+ 140 files changed, 410 insertions(+), 328 deletions(-)
+
+diff --git a/ui/accessibility/ax_enum_util.h b/ui/accessibility/ax_enum_util.h
+index 56f19378ba..8cc4a07a80 100644
+--- a/ui/accessibility/ax_enum_util.h
++++ b/ui/accessibility/ax_enum_util.h
+@@ -7,12 +7,12 @@
+ 
+ #include <optional>
+ #include <string>
+-#include <utility>
+ 
+ #include "base/containers/flat_map.h"
+ #include "base/logging.h"
+ #include "base/no_destructor.h"
+ #include "base/notreached.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "ui/accessibility/ax_base_export.h"
+ #include "ui/accessibility/ax_enums.mojom-forward.h"
+ 
+@@ -166,15 +166,15 @@ template <typename T>
+ std::optional<T> MaybeParseAXEnum(const char* attribute) {
+   static const base::NoDestructor<base::flat_map<std::string, T>> attr_map([] {
+     static_assert(T::kNone == T::kMinValue);
+-    static_assert(std::to_underlying(T::kNone) == 0);
++    static_assert(base::to_underlying(T::kNone) == 0);
+     std::vector<std::pair<std::string, T>> entries;
+     // Normally, this would be max - min + 1, but as a special case, the empty
+     // string always maps to kNone as well.
+-    entries.reserve(std::to_underlying(T::kMaxValue) -
+-                    std::to_underlying(T::kMinValue) + 2);
++    entries.reserve(base::to_underlying(T::kMaxValue) -
++                    base::to_underlying(T::kMinValue) + 2);
+     entries.push_back({"", T::kNone});
+-    for (auto i = std::to_underlying(T::kMinValue);
+-         i <= std::to_underlying(T::kMaxValue); ++i) {
++    for (auto i = base::to_underlying(T::kMinValue);
++         i <= base::to_underlying(T::kMaxValue); ++i) {
+       T attr = T{i};
+       std::string str = ToString(attr);
+       entries.push_back({std::move(str), attr});
+diff --git a/ui/accessibility/ax_position.h b/ui/accessibility/ax_position.h
+index a1cda02ae0..51d417a4b1 100644
+--- a/ui/accessibility/ax_position.h
++++ b/ui/accessibility/ax_position.h
+@@ -8,7 +8,6 @@
+ #include <math.h>
+ #include <stdint.h>
+ 
+-#include <algorithm>
+ #include <functional>
+ #include <memory>
+ #include <optional>
+@@ -19,6 +18,7 @@
+ #include <vector>
+ 
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/containers/stack.h"
+ #include "base/export_template.h"
+ #include "base/functional/bind.h"
+@@ -762,8 +762,8 @@ class AXPosition {
+       case AXPositionKind::TEXT_POSITION: {
+         const std::vector<int32_t>& word_starts =
+             text_position->GetWordStartOffsets();
+-        return std::ranges::contains(word_starts,
+-                                     int32_t{text_position->text_offset_});
++        return base::Contains(word_starts,
++                              int32_t{text_position->text_offset_});
+       }
+     }
+   }
+@@ -789,8 +789,7 @@ class AXPosition {
+       case AXPositionKind::TEXT_POSITION: {
+         const std::vector<int32_t>& word_ends =
+             text_position->GetWordEndOffsets();
+-        return std::ranges::contains(word_ends,
+-                                     int32_t{text_position->text_offset_});
++        return base::Contains(word_ends, int32_t{text_position->text_offset_});
+       }
+     }
+   }
+@@ -957,8 +956,8 @@ class AXPosition {
+         if (format_starts.size() <= 1) {
+           return GetFormatStartBoundaryType() != AXBoundaryType::kNone;
+         }
+-        return std::ranges::contains(format_starts,
+-                                     int32_t{text_position->text_offset_});
++        return base::Contains(format_starts,
++                              int32_t{text_position->text_offset_});
+       }
+     }
+   }
+@@ -1010,8 +1009,8 @@ class AXPosition {
+         if (format_ends.size() <= 1) {
+           return GetFormatEndBoundaryType() != AXBoundaryType::kNone;
+         }
+-        return std::ranges::contains(format_ends,
+-                                     int32_t{text_position->text_offset_});
++        return base::Contains(format_ends,
++                              int32_t{text_position->text_offset_});
+       }
+     }
+   }
+@@ -1038,8 +1037,8 @@ class AXPosition {
+         const std::vector<int32_t>& sentence_starts =
+             text_position->GetAnchor()->GetIntListAttribute(
+                 ax::mojom::IntListAttribute::kSentenceStarts);
+-        return std::ranges::contains(sentence_starts,
+-                                     int32_t{text_position->text_offset_});
++        return base::Contains(sentence_starts,
++                              int32_t{text_position->text_offset_});
+       }
+     }
+   }
+@@ -1066,8 +1065,8 @@ class AXPosition {
+         const std::vector<int32_t>& sentence_ends =
+             text_position->GetAnchor()->GetIntListAttribute(
+                 ax::mojom::IntListAttribute::kSentenceEnds);
+-        return std::ranges::contains(sentence_ends,
+-                                     int32_t{text_position->text_offset_});
++        return base::Contains(sentence_ends,
++                              int32_t{text_position->text_offset_});
+       }
+     }
+   }
+diff --git a/ui/accessibility/ax_tree.cc b/ui/accessibility/ax_tree.cc
+index 91ade842fe..2950d70367 100644
+--- a/ui/accessibility/ax_tree.cc
++++ b/ui/accessibility/ax_tree.cc
+@@ -17,6 +17,7 @@
+ #include "base/check_op.h"
+ #include "base/command_line.h"
+ #include "base/containers/adapters.h"
++#include "base/containers/contains.h"
+ #include "base/containers/flat_set.h"
+ #include "base/containers/map_util.h"
+ #include "base/debug/crash_logging.h"
+@@ -370,7 +371,7 @@ struct AXTreeUpdateState {
+ 
+   // Returns whether this update creates a node marked by |node_id|.
+   bool IsCreatedNode(AXNodeID node_id) const {
+-    return new_node_ids.contains(node_id);
++    return base::Contains(new_node_ids, node_id);
+   }
+ 
+   // Returns whether this update creates |node|.
+@@ -612,7 +613,7 @@ struct AXTreeUpdateState {
+   // Returns whether this update must invalidate the unignored cached
+   // values for |node_id|.
+   bool InvalidatesUnignoredCachedValues(AXNodeID node_id) const {
+-    return invalidate_unignored_cached_values_ids.contains(node_id);
++    return base::Contains(invalidate_unignored_cached_values_ids, node_id);
+   }
+ 
+   // Adds the parent of |node_id| to the list of nodes to invalidate unignored
+@@ -1327,8 +1328,8 @@ bool AXTree::Unserialize(const AXTreeUpdate& update) {
+       // the same ignored state.
+       bool is_root_of_ignored_change =
+           !node->parent() ||
+-          !update_state.ignored_state_changed_ids.contains(
+-              node->parent()->id()) ||
++          !base::Contains(update_state.ignored_state_changed_ids,
++                          node->parent()->id()) ||
+           node->IsIgnored() != node->parent()->IsIgnored();
+       observers_.Notify(&AXTreeObserver::OnIgnoredWillChange, this, node,
+                         will_be_ignored, is_root_of_ignored_change);
+@@ -1962,7 +1963,7 @@ bool AXTree::ComputePendingChangesToNode(const AXNodeData& new_data,
+   }
+ 
+   for (AXNodeID child_id : create_or_destroy_ids) {
+-    if (new_child_id_set.contains(child_id)) {
++    if (base::Contains(new_child_id_set, child_id)) {
+       // This is a serious error - nodes should never be reparented without
+       // first being removed from the tree. If a node exists in the tree already
+       // then adding it to a new parent would mean stealing the node from its
+@@ -2083,7 +2084,8 @@ void AXTree::NotifySubtreeWillBeReparentedOrDeleted(
+   // Don't fire redundant remove notification in the case where the parent
+   // will become ignored at the same time.
+   if (notify_removed && node->parent() &&
+-      update_state->ignored_state_changed_ids.contains(node->parent()->id()) &&
++      base::Contains(update_state->ignored_state_changed_ids,
++                     node->parent()->id()) &&
+       !node->parent()->IsIgnored()) {
+     notify_removed = false;
+   }
+@@ -2275,7 +2277,7 @@ void AXTree::NotifyNodeAttributesHaveBeenChanged(
+   observers_.Notify(&AXTreeObserver::OnNodeDataChanged, this, old_data,
+                     new_data);
+ 
+-  if (update_state.ignored_state_changed_ids.contains(new_data.id)) {
++  if (base::Contains(update_state.ignored_state_changed_ids, new_data.id)) {
+     observers_.Notify(&AXTreeObserver::OnIgnoredChanged, this, node,
+                       node->IsIgnored());
+   }
+@@ -2575,7 +2577,7 @@ void AXTree::DeleteOldChildren(AXNode* node,
+ 
+   // Delete the old children.
+   for (AXNode* child : node->children()) {
+-    if (!new_child_id_set.contains(child->id()))
++    if (!base::Contains(new_child_id_set, child->id()))
+       DestroySubtree(child, update_state);
+   }
+ }
+diff --git a/ui/accessibility/ax_tree_manager_map.cc b/ui/accessibility/ax_tree_manager_map.cc
+index 6a72267a02..9adf8266a0 100644
+--- a/ui/accessibility/ax_tree_manager_map.cc
++++ b/ui/accessibility/ax_tree_manager_map.cc
+@@ -4,6 +4,8 @@
+ 
+ #include "ui/accessibility/ax_tree_manager_map.h"
+ 
++#include "base/containers/contains.h"
++
+ namespace ui {
+ 
+ AXTreeManagerMap::AXTreeManagerMap() = default;
+diff --git a/ui/accessibility/platform/automation/automation_ax_tree_wrapper.cc b/ui/accessibility/platform/automation/automation_ax_tree_wrapper.cc
+index fc68d27e8a..46e66702ef 100644
+--- a/ui/accessibility/platform/automation/automation_ax_tree_wrapper.cc
++++ b/ui/accessibility/platform/automation/automation_ax_tree_wrapper.cc
+@@ -7,6 +7,7 @@
+ #include <map>
+ #include <vector>
+ 
++#include "base/containers/contains.h"
+ #include "base/no_destructor.h"
+ #include "base/trace_event/common/trace_event_common.h"
+ #include "base/trace_event/trace_event.h"
+@@ -118,7 +119,7 @@ bool AutomationAXTreeWrapper::OnAccessibilityEvents(
+ 
+   // Refresh child tree id  mappings.
+   for (const AXTreeID& child_tree_id : ax_tree_->GetAllChildTreeIds()) {
+-    DCHECK(!child_tree_id_reverse_map.contains(child_tree_id));
++    DCHECK(!base::Contains(child_tree_id_reverse_map, child_tree_id));
+     child_tree_id_reverse_map.insert(std::make_pair(child_tree_id, this));
+   }
+ 
+diff --git a/ui/accessibility/platform/ax_platform_node_delegate.cc b/ui/accessibility/platform/ax_platform_node_delegate.cc
+index a4ef40157a..e83b0ab19e 100644
+--- a/ui/accessibility/platform/ax_platform_node_delegate.cc
++++ b/ui/accessibility/platform/ax_platform_node_delegate.cc
+@@ -4,8 +4,6 @@
+ 
+ #include "ui/accessibility/platform/ax_platform_node_delegate.h"
+ 
+-#include <algorithm>
+-
+ #include "base/containers/fixed_flat_set.h"
+ #include "base/notimplemented.h"
+ #include "base/notreached.h"
+@@ -540,8 +538,7 @@ std::vector<AXPlatformNode*> AXPlatformNodeDelegate::GetTargetNodesForRelation(
+ 
+   for (int32_t target_id : target_ids) {
+     AXPlatformNode* target = GetFromNodeID(target_id);
+-    if (IsValidRelationTarget(target) &&
+-        !std::ranges::contains(nodes, target)) {
++    if (IsValidRelationTarget(target) && !base::Contains(nodes, target)) {
+       nodes.push_back(target);
+     }
+   }
+diff --git a/ui/accessibility/platform/ax_unique_id.cc b/ui/accessibility/platform/ax_unique_id.cc
+index c306e3c692..7846a965ff 100644
+--- a/ui/accessibility/platform/ax_unique_id.cc
++++ b/ui/accessibility/platform/ax_unique_id.cc
+@@ -5,6 +5,7 @@
+ #include "ui/accessibility/platform/ax_unique_id.h"
+ 
+ #include "base/check_op.h"
++#include "base/containers/contains.h"
+ #include "base/no_destructor.h"
+ #include "third_party/abseil-cpp/absl/container/flat_hash_set.h"
+ 
+diff --git a/ui/accessibility/platform/browser_accessibility.cc b/ui/accessibility/platform/browser_accessibility.cc
+index d5f98748c3..9fc2a475f7 100644
+--- a/ui/accessibility/platform/browser_accessibility.cc
++++ b/ui/accessibility/platform/browser_accessibility.cc
+@@ -10,6 +10,7 @@
+ #include <iterator>
+ 
+ #include "base/check.h"
++#include "base/containers/contains.h"
+ #include "base/logging.h"
+ #include "base/memory/ptr_util.h"
+ #include "base/notimplemented.h"
+@@ -2195,7 +2196,7 @@ TextAttributeMap BrowserAccessibility::ComputeTextAttributeMap(
+ // static
+ bool BrowserAccessibility::HasInvalidAttribute(
+     const TextAttributeList& attributes) {
+-  return std::ranges::contains(attributes, "invalid", &TextAttribute::first);
++  return base::Contains(attributes, "invalid", &TextAttribute::first);
+ }
+ 
+ static bool HasListAncestor(const BrowserAccessibility* node) {
+diff --git a/ui/accessibility/platform/inspect/ax_tree_formatter_base.cc b/ui/accessibility/platform/inspect/ax_tree_formatter_base.cc
+index 577811ce6f..6ef09c33f8 100644
+--- a/ui/accessibility/platform/inspect/ax_tree_formatter_base.cc
++++ b/ui/accessibility/platform/inspect/ax_tree_formatter_base.cc
+@@ -4,8 +4,7 @@
+ 
+ #include "ui/accessibility/platform/inspect/ax_tree_formatter_base.h"
+ 
+-#include <algorithm>
+-
++#include "base/containers/contains.h"
+ #include "base/notimplemented.h"
+ #include "base/notreached.h"
+ #include "base/strings/string_util.h"
+@@ -225,7 +224,7 @@ std::vector<AXPropertyNode> AXTreeFormatterBase::PropertyFilterNodesFor(
+ 
+     // Filter out if doesn't match line index (if specified).
+     if (!property_node.line_indexes.empty() &&
+-        !std::ranges::contains(property_node.line_indexes, line_index)) {
++        !base::Contains(property_node.line_indexes, line_index)) {
+       continue;
+     }
+ 
+diff --git a/ui/accessibility/platform/one_shot_accessibility_tree_search.cc b/ui/accessibility/platform/one_shot_accessibility_tree_search.cc
+index 95d9e98410..b04c3dd313 100644
+--- a/ui/accessibility/platform/one_shot_accessibility_tree_search.cc
++++ b/ui/accessibility/platform/one_shot_accessibility_tree_search.cc
+@@ -8,6 +8,7 @@
+ 
+ #include <string>
+ 
++#include "base/containers/contains.h"
+ #include "base/i18n/case_conversion.h"
+ #include "base/strings/utf_string_conversions.h"
+ #include "ui/accessibility/ax_enums.mojom.h"
+@@ -236,7 +237,7 @@ bool OneShotAccessibilityTreeSearch::Matches(BrowserAccessibility* node) {
+     bool found_text_match = false;
+     for (auto node_string : node_strings) {
+       std::u16string node_string_lower = base::i18n::ToLower(node_string);
+-      if (node_string_lower.contains(search_text_lower)) {
++      if (base::Contains(node_string_lower, search_text_lower)) {
+         found_text_match = true;
+         break;
+       }
+diff --git a/ui/android/overscroll_refresh.cc b/ui/android/overscroll_refresh.cc
+index 2fe2301f37..6caaf90fdc 100644
+--- a/ui/android/overscroll_refresh.cc
++++ b/ui/android/overscroll_refresh.cc
+@@ -5,12 +5,12 @@
+ #include "ui/android/overscroll_refresh.h"
+ 
+ #include <ostream>
+-#include <utility>
+ 
+ #include "base/check.h"
+ #include "base/check_op.h"
+ #include "base/feature_list.h"
+ #include "base/notreached.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "cc/input/overscroll_behavior.h"
+ #include "ui/android/overscroll_refresh_handler.h"
+ #include "ui/android/ui_android_features.h"
+@@ -173,7 +173,7 @@ bool OverscrollRefresh::WillHandleScrollUpdate(
+   }
+ 
+   NOTREACHED() << "Invalid overscroll state: "
+-               << std::to_underlying(scroll_consumption_state_);
++               << base::to_underlying(scroll_consumption_state_);
+ }
+ 
+ void OverscrollRefresh::ReleaseWithoutActivation() {
+diff --git a/ui/android/overscroll_refresh_handler.cc b/ui/android/overscroll_refresh_handler.cc
+index 880dff0943..e556a16d6a 100644
+--- a/ui/android/overscroll_refresh_handler.cc
++++ b/ui/android/overscroll_refresh_handler.cc
+@@ -4,9 +4,8 @@
+ 
+ #include "ui/android/overscroll_refresh_handler.h"
+ 
+-#include <utility>
+-
+ #include "base/android/jni_android.h"
++#include "base/types/cxx23_to_underlying.h"
+ 
+ // Must come after all headers that specialize FromJniType() / ToJniType().
+ #include "ui/android/overscroll_refresh.h"
+@@ -31,8 +30,7 @@ bool OverscrollRefreshHandler::PullStart(
+   CHECK_EQ(type == OverscrollAction::kHistoryNavigation,
+            initiating_edge.has_value());
+   return Java_OverscrollRefreshHandler_start(
+-      AttachCurrentThread(), j_overscroll_refresh_handler_,
+-      std::to_underlying(type),
++      AttachCurrentThread(), j_overscroll_refresh_handler_,  base::to_underlying(type),
+       static_cast<int>(initiating_edge ? initiating_edge.value()
+                                        : BackGestureEventSwipeEdge::RIGHT));
+ }
+diff --git a/ui/android/view_android.cc b/ui/android/view_android.cc
+index ba2a44286a..a0c1011a14 100644
+--- a/ui/android/view_android.cc
++++ b/ui/android/view_android.cc
+@@ -11,6 +11,7 @@
+ #include "base/android/jni_android.h"
+ #include "base/android/jni_string.h"
+ #include "base/containers/adapters.h"
++#include "base/containers/contains.h"
+ #include "base/memory/raw_ptr.h"
+ #include "cc/slim/layer.h"
+ #include "components/viz/common/frame_sinks/copy_output_request.h"
+@@ -130,7 +131,7 @@ ScopedJavaLocalRef<jobject> ViewAndroid::GetEventForwarder() {
+ 
+ void ViewAndroid::AddChild(ViewAndroid* child) {
+   DCHECK(child);
+-  DCHECK(!std::ranges::contains(children_, child));
++  DCHECK(!base::Contains(children_, child));
+   DCHECK(!RootPathHasEventForwarder(this) || !SubtreeHasEventForwarder(child))
+       << "Some view tree path will have more than one event forwarder "
+          "if the child is added.";
+diff --git a/ui/aura/host_frame_rate_throttler.cc b/ui/aura/host_frame_rate_throttler.cc
+index aea5691d92..60119bba8b 100644
+--- a/ui/aura/host_frame_rate_throttler.cc
++++ b/ui/aura/host_frame_rate_throttler.cc
+@@ -4,6 +4,7 @@
+ 
+ #include "ui/aura/host_frame_rate_throttler.h"
+ 
++#include "base/containers/contains.h"
+ #include "build/build_config.h"
+ #include "components/viz/common/surfaces/frame_sink_id.h"
+ #include "components/viz/host/host_frame_sink_manager.h"
+@@ -29,14 +30,14 @@ HostFrameRateThrottler::HostFrameRateThrottler() = default;
+ HostFrameRateThrottler::~HostFrameRateThrottler() = default;
+ 
+ void HostFrameRateThrottler::AddHost(WindowTreeHost* host) {
+-  if (hosts_.contains(host))
++  if (base::Contains(hosts_, host))
+     return;
+   hosts_.insert(host);
+   UpdateHostFrameSinkManager();
+ }
+ 
+ void HostFrameRateThrottler::RemoveHost(WindowTreeHost* host) {
+-  if (!hosts_.contains(host))
++  if (!base::Contains(hosts_, host))
+     return;
+   hosts_.erase(host);
+   UpdateHostFrameSinkManager();
+diff --git a/ui/aura/native_window_occlusion_tracker_win.cc b/ui/aura/native_window_occlusion_tracker_win.cc
+index 883f238106..90568a7278 100644
+--- a/ui/aura/native_window_occlusion_tracker_win.cc
++++ b/ui/aura/native_window_occlusion_tracker_win.cc
+@@ -10,6 +10,7 @@
+ #include <memory>
+ #include <string>
+ 
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/functional/callback.h"
+ #include "base/memory/scoped_refptr.h"
+diff --git a/ui/aura/scoped_simple_keyboard_hook.cc b/ui/aura/scoped_simple_keyboard_hook.cc
+index ed6e8e4093..4d65c9465b 100644
+--- a/ui/aura/scoped_simple_keyboard_hook.cc
++++ b/ui/aura/scoped_simple_keyboard_hook.cc
+@@ -6,6 +6,7 @@
+ 
+ #include <utility>
+ 
++#include "base/containers/contains.h"
+ #include "ui/events/keycodes/dom/dom_code.h"
+ 
+ namespace aura {
+@@ -20,7 +21,7 @@ bool ScopedSimpleKeyboardHook::IsKeyLocked(ui::DomCode dom_code) {
+   if (dom_code == ui::DomCode::NONE)
+     return false;
+ 
+-  return !dom_codes_ || dom_codes_.value().contains(dom_code);
++  return !dom_codes_ || base::Contains(dom_codes_.value(), dom_code);
+ }
+ 
+ }  // namespace aura
+diff --git a/ui/aura/window.cc b/ui/aura/window.cc
+index 7eeb016112..0540f9267b 100644
+--- a/ui/aura/window.cc
++++ b/ui/aura/window.cc
+@@ -13,6 +13,7 @@
+ #include "base/check.h"
+ #include "base/compiler_specific.h"
+ #include "base/containers/adapters.h"
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/functional/callback.h"
+ #include "base/functional/callback_helpers.h"
+@@ -553,7 +554,7 @@ void Window::AddChild(Window* child) {
+ 
+   Window* old_root = child->GetRootWindow();
+ 
+-  DCHECK(!std::ranges::contains(children_, child));
++  DCHECK(!base::Contains(children_, child));
+   if (child->parent())
+     child->parent()->RemoveChildImpl(child, this);
+ 
+@@ -1020,7 +1021,7 @@ void Window::RemoveOrDestroyChildren() {
+     if (child->owned_by_parent_) {
+       delete child;
+       // Deleting the child so remove it from out children_ list.
+-      DCHECK(!std::ranges::contains(children_, child));
++      DCHECK(!base::Contains(children_, child));
+     } else {
+       // Even if we can't delete the child, we still need to remove it from the
+       // parent so that relevant bookkeeping (parent_ back-pointers etc) are
+diff --git a/ui/aura/window_occlusion_tracker.cc b/ui/aura/window_occlusion_tracker.cc
+index abd50ca767..8f52fee81e 100644
+--- a/ui/aura/window_occlusion_tracker.cc
++++ b/ui/aura/window_occlusion_tracker.cc
+@@ -6,6 +6,7 @@
+ 
+ #include "base/auto_reset.h"
+ #include "base/containers/adapters.h"
++#include "base/containers/contains.h"
+ #include "base/trace_event/trace_event.h"
+ #include "third_party/skia/include/core/SkRect.h"
+ #include "third_party/skia/include/core/SkRegion.h"
+@@ -668,17 +669,18 @@ void WindowOcclusionTracker::SetOccluded(Window* window,
+ }
+ 
+ bool WindowOcclusionTracker::WindowIsTracked(Window* window) const {
+-  return tracked_windows_.contains(window);
++  return base::Contains(tracked_windows_, window);
+ }
+ 
+ bool WindowOcclusionTracker::WindowIsAnimated(Window* window) const {
+-  return !ShouldUseTargetValues() && animated_windows_.contains(window) &&
++  return !ShouldUseTargetValues() &&
++         base::Contains(animated_windows_, window) &&
+          window->layer()->GetAnimator()->IsAnimatingOnePropertyOf(
+              kSkipWindowWhenPropertiesAnimated);
+ }
+ 
+ bool WindowOcclusionTracker::WindowIsExcluded(Window* window) const {
+-  return excluded_windows_.contains(window);
++  return base::Contains(excluded_windows_, window);
+ }
+ 
+ bool WindowOcclusionTracker::WindowIsVisible(Window* window) const {
+@@ -1005,7 +1007,7 @@ void WindowOcclusionTracker::OnWindowHierarchyChanged(
+     const HierarchyChangeParams& params) {
+   Window* const window = params.target;
+   Window* const root_window = window->GetRootWindow();
+-  if (root_window && root_windows_.contains(root_window) &&
++  if (root_window && base::Contains(root_windows_, root_window) &&
+       !window_observations_.IsObservingSource(window)) {
+     AddObserverToWindowAndDescendants(window);
+   }
+diff --git a/ui/aura/window_tracker.cc b/ui/aura/window_tracker.cc
+index fa74540511..c91b9886f4 100644
+--- a/ui/aura/window_tracker.cc
++++ b/ui/aura/window_tracker.cc
+@@ -6,6 +6,7 @@
+ 
+ #include <algorithm>
+ 
++#include "base/containers/contains.h"
+ #include "ui/aura/window.h"
+ 
+ namespace aura {
+@@ -22,9 +23,8 @@ WindowTracker::~WindowTracker() {
+ }
+ 
+ void WindowTracker::Add(Window* window) {
+-  if (std::ranges::contains(windows_, window)) {
++  if (base::Contains(windows_, window))
+     return;
+-  }
+ 
+   window->AddObserver(this);
+   windows_.push_back(window);
+@@ -52,7 +52,7 @@ Window* WindowTracker::Pop() {
+ }
+ 
+ bool WindowTracker::Contains(Window* window) const {
+-  return std::ranges::contains(windows_, window);
++  return base::Contains(windows_, window);
+ }
+ 
+ void WindowTracker::OnWindowDestroying(Window* window) {
+diff --git a/ui/aura/window_tree_host.cc b/ui/aura/window_tree_host.cc
+index d2f51a7545..fee32090a1 100644
+--- a/ui/aura/window_tree_host.cc
++++ b/ui/aura/window_tree_host.cc
+@@ -7,6 +7,7 @@
+ #include <optional>
+ 
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/feature_list.h"
+ #include "base/memory/ptr_util.h"
+ #include "base/memory/raw_ptr.h"
+@@ -119,7 +120,7 @@ const char WindowTreeHost::kWindowTreeHostUsesParent[] =
+ 
+ WindowTreeHost::~WindowTreeHost() {
+   DCHECK(!compositor_) << "compositor must be destroyed before root window";
+-  DCHECK(!HostFrameRateThrottler::GetInstance().hosts().contains(this));
++  DCHECK(!base::Contains(HostFrameRateThrottler::GetInstance().hosts(), this));
+ }
+ 
+ // static
+diff --git a/ui/base/accelerators/accelerator.cc b/ui/base/accelerators/accelerator.cc
+index 46b49a484f..5ad9332dd2 100644
+--- a/ui/base/accelerators/accelerator.cc
++++ b/ui/base/accelerators/accelerator.cc
+@@ -7,13 +7,13 @@
+ #include <stdint.h>
+ 
+ #include <tuple>
+-#include <utility>
+ 
+ #include "base/check_op.h"
+ #include "base/i18n/rtl.h"
+ #include "base/notreached.h"
+ #include "base/strings/string_util.h"
+ #include "base/strings/utf_string_conversions.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "build/build_config.h"
+ #include "ui/base/l10n/l10n_util.h"
+ #include "ui/events/event.h"
+@@ -172,7 +172,7 @@ std::u16string Accelerator::GetKeyCodeStringForShortcut() const {
+     // accent' for '0'). For display in the menu (e.g. Ctrl-0 for the
+     // default zoom level), we leave VK_[0-9] alone without translation.
+     wchar_t key;
+-    if (base::IsAsciiDigit(std::to_underlying(key_code_))) {
++    if (base::IsAsciiDigit(base::to_underlying(key_code_))) {
+       key = static_cast<wchar_t>(key_code_);
+     } else {
+       key = LOWORD(::MapVirtualKeyW(key_code_, MAPVK_VK_TO_CHAR));
+diff --git a/ui/base/accelerators/accelerator_manager.cc b/ui/base/accelerators/accelerator_manager.cc
+index c6e43f0152..186356b49e 100644
+--- a/ui/base/accelerators/accelerator_manager.cc
++++ b/ui/base/accelerators/accelerator_manager.cc
+@@ -8,6 +8,7 @@
+ #include <ostream>
+ 
+ #include "base/check.h"
++#include "base/containers/contains.h"
+ 
+ namespace ui {
+ 
+@@ -169,7 +170,7 @@ bool AcceleratorManager::AcceleratorTargetInfo::HasPriorityHandler() const {
+ bool AcceleratorManager::AcceleratorTargetInfo::Contains(
+     AcceleratorTarget* target) const {
+   DCHECK(target);
+-  return std::ranges::contains(targets_, target);
++  return base::Contains(targets_, target);
+ }
+ 
+ }  // namespace ui
+diff --git a/ui/base/accelerators/global_accelerator_listener/global_accelerator_listener_ozone.cc b/ui/base/accelerators/global_accelerator_listener/global_accelerator_listener_ozone.cc
+index 0e85d30f70..a82a333a97 100644
+--- a/ui/base/accelerators/global_accelerator_listener/global_accelerator_listener_ozone.cc
++++ b/ui/base/accelerators/global_accelerator_listener/global_accelerator_listener_ozone.cc
+@@ -4,6 +4,7 @@
+ 
+ #include "ui/base/accelerators/global_accelerator_listener/global_accelerator_listener_ozone.h"
+ 
++#include "base/containers/contains.h"
+ #include "base/memory/ptr_util.h"
+ #include "base/no_destructor.h"
+ #include "build/config/linux/dbus/buildflags.h"
+@@ -119,7 +120,7 @@ void GlobalAcceleratorListenerOzone::StopListening() {
+ 
+ bool GlobalAcceleratorListenerOzone::StartListeningForAccelerator(
+     const ui::Accelerator& accelerator) {
+-  DCHECK(!registered_hot_keys_.contains(accelerator));
++  DCHECK(!base::Contains(registered_hot_keys_, accelerator));
+ 
+   if (!platform_global_shortcut_listener_) {
+     return false;
+@@ -137,7 +138,7 @@ bool GlobalAcceleratorListenerOzone::StartListeningForAccelerator(
+ 
+ void GlobalAcceleratorListenerOzone::StopListeningForAccelerator(
+     const ui::Accelerator& accelerator) {
+-  DCHECK(registered_hot_keys_.contains(accelerator));
++  DCHECK(base::Contains(registered_hot_keys_, accelerator));
+   // Otherwise how could the accelerator be registered?
+   DCHECK(platform_global_shortcut_listener_);
+ 
+diff --git a/ui/base/clipboard/clipboard.cc b/ui/base/clipboard/clipboard.cc
+index b1c16555d4..092f80738e 100644
+--- a/ui/base/clipboard/clipboard.cc
++++ b/ui/base/clipboard/clipboard.cc
+@@ -12,6 +12,7 @@
+ #include <variant>
+ 
+ #include "base/check.h"
++#include "base/containers/contains.h"
+ #include "base/json/json_reader.h"
+ #include "base/memory/ptr_util.h"
+ #include "base/no_destructor.h"
+@@ -373,7 +374,7 @@ base::PlatformThreadId Clipboard::GetAndValidateThreadID() {
+   // was allowlisted to use the clipboard. This is a CHECK rather than a DCHECK
+   // to catch incorrect usage in production (e.g. https://crbug.com/872737).
+   CHECK(AllowedThreads().empty() ||
+-        std::ranges::contains(AllowedThreads(), id));
++        base::Contains(AllowedThreads(), id));
+ 
+   return id;
+ }
+diff --git a/ui/base/clipboard/clipboard_android.cc b/ui/base/clipboard/clipboard_android.cc
+index a0c85e044a..d6b724609e 100644
+--- a/ui/base/clipboard/clipboard_android.cc
++++ b/ui/base/clipboard/clipboard_android.cc
+@@ -15,6 +15,7 @@
+ #include "base/android/jni_array.h"
+ #include "base/android/jni_string.h"
+ #include "base/android/scoped_java_ref.h"
++#include "base/containers/contains.h"
+ #include "base/feature_list.h"
+ #include "base/functional/bind.h"
+ #include "base/functional/callback.h"
+diff --git a/ui/base/clipboard/clipboard_non_backed.cc b/ui/base/clipboard/clipboard_non_backed.cc
+index 56f76ae7a5..af13f21284 100644
+--- a/ui/base/clipboard/clipboard_non_backed.cc
++++ b/ui/base/clipboard/clipboard_non_backed.cc
+@@ -17,6 +17,7 @@
+ #include <vector>
+ 
+ #include "base/check_op.h"
++#include "base/containers/contains.h"
+ #include "base/containers/span.h"
+ #include "base/functional/bind.h"
+ #include "base/memory/ptr_util.h"
+@@ -84,7 +85,7 @@ void UnregisterInstance(const ClipboardNonBacked* clipboard) {
+ // ClipboardNonBacked*.
+ bool IsRegisteredInstance(const Clipboard* clipboard) {
+   base::AutoLock lock(GetInstanceRegistryLock());
+-  return GetInstanceRegistry()->contains(clipboard);
++  return base::Contains(*GetInstanceRegistry(), clipboard);
+ }
+ 
+ }  // namespace
+diff --git a/ui/base/clipboard/clipboard_ozone.cc b/ui/base/clipboard/clipboard_ozone.cc
+index 0790b55911..337d8ae58a 100644
+--- a/ui/base/clipboard/clipboard_ozone.cc
++++ b/ui/base/clipboard/clipboard_ozone.cc
+@@ -14,6 +14,7 @@
+ 
+ #include "base/check.h"
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/containers/flat_map.h"
+ #include "base/containers/map_util.h"
+ #include "base/containers/span.h"
+@@ -84,7 +85,7 @@ std::vector<std::u16string> GetStandardFormatsFromMimeTypes(
+          mime_type == kMimeTypeLinuxText || mime_type == kMimeTypeLinuxString ||
+          mime_type == kMimeTypeUtf8PlainText ||
+          mime_type == kMimeTypeLinuxUtf8String) &&
+-        !std::ranges::contains(types, kMimeTypePlainText16)) {
++        !base::Contains(types, kMimeTypePlainText16)) {
+       types.push_back(kMimeTypePlainText16);
+       continue;
+     }
+@@ -493,7 +494,7 @@ bool ClipboardOzone::IsFormatAvailable(
+     return false;
+ 
+   auto available_types = async_clipboard_ozone_->RequestMimeTypes(buffer);
+-  return std::ranges::contains(available_types, format.GetName());
++  return base::Contains(available_types, format.GetName());
+ }
+ 
+ void ClipboardOzone::Clear(ClipboardBuffer buffer) {
+@@ -526,7 +527,7 @@ void ClipboardOzone::OnReadAvailableTypes(
+   std::vector<std::u16string> types =
+       GetStandardFormatsFromMimeTypes(available_types);
+ 
+-  if (std::ranges::contains(
++  if (base::Contains(
+           available_types,
+           ClipboardFormatType::DataTransferCustomType().GetName())) {
+     async_clipboard_ozone_->ReadClipboardDataAsync(
+diff --git a/ui/base/clipboard/test/test_clipboard.cc b/ui/base/clipboard/test/test_clipboard.cc
+index 1bc086526a..b926ae5477 100644
+--- a/ui/base/clipboard/test/test_clipboard.cc
++++ b/ui/base/clipboard/test/test_clipboard.cc
+@@ -11,6 +11,7 @@
+ #include <string_view>
+ #include <utility>
+ 
++#include "base/containers/contains.h"
+ #include "base/containers/span.h"
+ #include "base/memory/ptr_util.h"
+ #include "base/notreached.h"
+@@ -92,10 +93,10 @@ bool TestClipboard::IsFormatAvailable(
+   // Chrome can retrieve an image from the clipboard as either a bitmap or PNG.
+   if (format == ClipboardFormatType::PngType() ||
+       format == ClipboardFormatType::BitmapType()) {
+-    return store.data.contains(ClipboardFormatType::PngType()) ||
+-           store.data.contains(ClipboardFormatType::BitmapType());
++    return base::Contains(store.data, ClipboardFormatType::PngType()) ||
++           base::Contains(store.data, ClipboardFormatType::BitmapType());
+   }
+-  return store.data.contains(format);
++  return base::Contains(store.data, format);
+ }
+ 
+ void TestClipboard::Clear(ClipboardBuffer buffer) {
+diff --git a/ui/base/dragdrop/os_exchange_data_provider_non_backed.cc b/ui/base/dragdrop/os_exchange_data_provider_non_backed.cc
+index 952f3a100a..373263a8fd 100644
+--- a/ui/base/dragdrop/os_exchange_data_provider_non_backed.cc
++++ b/ui/base/dragdrop/os_exchange_data_provider_non_backed.cc
+@@ -10,6 +10,7 @@
+ #include <string_view>
+ 
+ #include "base/check.h"
++#include "base/containers/contains.h"
+ #include "base/feature_list.h"
+ #include "base/files/file_path.h"
+ #include "base/strings/utf_string_conversions.h"
+@@ -185,7 +186,7 @@ bool OSExchangeDataProviderNonBacked::HasFile() const {
+ 
+ bool OSExchangeDataProviderNonBacked::HasCustomFormat(
+     const ClipboardFormatType& format) const {
+-  return pickle_data_.contains(format);
++  return base::Contains(pickle_data_, format);
+ }
+ 
+ void OSExchangeDataProviderNonBacked::SetFileContents(
+diff --git a/ui/base/ime/ash/input_method_util.cc b/ui/base/ime/ash/input_method_util.cc
+index cda3c42e45..4cd5dc60ee 100644
+--- a/ui/base/ime/ash/input_method_util.cc
++++ b/ui/base/ime/ash/input_method_util.cc
+@@ -11,7 +11,6 @@
+ 
+ #include <stddef.h>
+ 
+-#include <algorithm>
+ #include <functional>
+ #include <map>
+ #include <memory>
+@@ -19,6 +18,7 @@
+ #include <string_view>
+ #include <utility>
+ 
++#include "base/containers/contains.h"
+ #include "base/logging.h"
+ #include "base/strings/string_split.h"
+ #include "base/strings/string_util.h"
+@@ -737,7 +737,7 @@ void InputMethodUtil::GetLanguageCodesFromInputMethodIds(
+     DCHECK(!input_method->language_codes().empty());
+     const std::string language_code = input_method->language_codes().at(0);
+     // Add it if it's not already present.
+-    if (!std::ranges::contains(*out_language_codes, language_code)) {
++    if (!base::Contains(*out_language_codes, language_code)) {
+       out_language_codes->push_back(language_code);
+     }
+   }
+diff --git a/ui/base/ime/win/tsf_input_scope.cc b/ui/base/ime/win/tsf_input_scope.cc
+index 695f8ec846..54cd304b90 100644
+--- a/ui/base/ime/win/tsf_input_scope.cc
++++ b/ui/base/ime/win/tsf_input_scope.cc
+@@ -13,10 +13,9 @@
+ 
+ #include <stddef.h>
+ 
+-#include <algorithm>
+-
+ #include "base/check.h"
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/task/current_thread.h"
+ #include "base/trace_event/trace_event.h"
+ 
+@@ -30,9 +29,8 @@ void AppendNonTrivialInputScope(std::vector<InputScope>* input_scopes,
+   if (input_scope == IS_DEFAULT)
+     return;
+ 
+-  if (std::ranges::contains(*input_scopes, input_scope)) {
++  if (base::Contains(*input_scopes, input_scope))
+     return;
+-  }
+ 
+   input_scopes->push_back(input_scope);
+ }
+diff --git a/ui/base/interaction/element_identifier.cc b/ui/base/interaction/element_identifier.cc
+index fe818680c4..967ed50dc0 100644
+--- a/ui/base/interaction/element_identifier.cc
++++ b/ui/base/interaction/element_identifier.cc
+@@ -8,6 +8,7 @@
+ 
+ #include "base/check.h"
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/no_destructor.h"
+ 
+ namespace ui {
+@@ -32,7 +33,7 @@ ElementIdentifier ElementIdentifier::FromRawValue(intptr_t value) {
+     return ElementIdentifier();
+   const auto* impl =
+       reinterpret_cast<const internal::ElementIdentifierImpl*>(value);
+-  CHECK(GetKnownIdentifiers().contains(impl));
++  CHECK(base::Contains(GetKnownIdentifiers(), impl));
+   return ElementIdentifier(impl);
+ }
+ 
+diff --git a/ui/base/interaction/element_identifier.h b/ui/base/interaction/element_identifier.h
+index dabcda86ce..1f0f20b642 100644
+--- a/ui/base/interaction/element_identifier.h
++++ b/ui/base/interaction/element_identifier.h
+@@ -85,7 +85,7 @@ class HelpBubbleHandler;
+ //   DCHECK(!id1);
+ //   EXPECT_TRUE(static_cast<bool>(id2));
+ //   DCHECK_NE(id1, id2);
+-//   EXPECT_FALSE(map.contains(id1));
++//   EXPECT_FALSE(base::Contains(map, id1));
+ //   ASSERT_EQ(4, map[id2]);
+ //
+ // -----
+diff --git a/ui/base/interaction/element_tracker.cc b/ui/base/interaction/element_tracker.cc
+index 97695213fa..57d2980a2f 100644
+--- a/ui/base/interaction/element_tracker.cc
++++ b/ui/base/interaction/element_tracker.cc
+@@ -12,6 +12,7 @@
+ 
+ #include "base/callback_list.h"
+ #include "base/check.h"
++#include "base/containers/contains.h"
+ #include "base/dcheck_is_on.h"
+ #include "base/functional/bind.h"
+ #include "base/memory/raw_ptr.h"
+@@ -58,7 +59,7 @@ class ElementTracker::ElementData {
+   ElementContext context() const { return context_; }
+ 
+   bool HasElement(const TrackedElement* element) const {
+-    return element_lookup_.contains(element);
++    return base::Contains(element_lookup_, element);
+   }
+ 
+   bool empty() const {
+@@ -110,7 +111,7 @@ class ElementTracker::ElementData {
+   void NotifyElementActivated(
+       raw_ptr<TrackedElement, CtnExperimental>& element) {
+     // Note: "All contexts" does not require the element to be present here.
+-    DCHECK(!context_ || element_lookup_.contains(element));
++    DCHECK(!context_ || base::Contains(element_lookup_, element));
+     activated_callbacks_.Notify(element);
+   }
+ 
+diff --git a/ui/base/interaction/interactive_test_internal.cc b/ui/base/interaction/interactive_test_internal.cc
+index 6206478f74..e234e2b722 100644
+--- a/ui/base/interaction/interactive_test_internal.cc
++++ b/ui/base/interaction/interactive_test_internal.cc
+@@ -15,6 +15,7 @@
+ #include "base/callback_list.h"
+ #include "base/check.h"
+ #include "base/containers/adapters.h"
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/strings/string_util.h"
+ #include "base/strings/stringprintf.h"
+@@ -167,7 +168,7 @@ void InteractiveTestPrivate::OnElementAdded(TrackedElement* el) {
+ 
+ void InteractiveTestPrivate::MaybeAddPivotElement(ElementContext context) {
+   CHECK(context) << "Attempted to run steps in an invalid (null) context.";
+-  if (!pivot_elements_.contains(context)) {
++  if (!base::Contains(pivot_elements_, context)) {
+     auto pivot =
+         std::make_unique<TestElement>(kInteractiveTestPivotElementId, context);
+     auto* const el = pivot.get();
+diff --git a/ui/base/interaction/interactive_test_internal.h b/ui/base/interaction/interactive_test_internal.h
+index db9a77490a..c391a79a4e 100644
+--- a/ui/base/interaction/interactive_test_internal.h
++++ b/ui/base/interaction/interactive_test_internal.h
+@@ -18,6 +18,7 @@
+ #include <variant>
+ 
+ #include "base/callback_list.h"
++#include "base/containers/contains.h"
+ #include "base/logging.h"
+ #include "base/memory/raw_ref.h"
+ #include "base/memory/weak_ptr.h"
+diff --git a/ui/base/metadata/metadata_cache.cc b/ui/base/metadata/metadata_cache.cc
+index 191725b1e9..c4952ea1fc 100644
+--- a/ui/base/metadata/metadata_cache.cc
++++ b/ui/base/metadata/metadata_cache.cc
+@@ -7,6 +7,7 @@
+ #include <algorithm>
+ 
+ #include "base/check_op.h"
++#include "base/containers/contains.h"
+ #include "base/memory/raw_ptr.h"
+ #include "base/no_destructor.h"
+ #include "ui/base/metadata/metadata_types.h"
+@@ -25,7 +26,7 @@ MetaDataCache* MetaDataCache::GetInstance() {
+ 
+ void MetaDataCache::AddClassMetaData(
+     std::unique_ptr<ClassMetaData> class_data) {
+-  DCHECK(!std::ranges::contains(class_data_cache_, class_data->GetUniqueName(),
++  DCHECK(!base::Contains(class_data_cache_, class_data->GetUniqueName(),
+                                 &ClassMetaData::GetUniqueName));
+   class_data_cache_.push_back(class_data.release());
+ }
+diff --git a/ui/base/models/list_selection_model.cc b/ui/base/models/list_selection_model.cc
+index 9739ab3fbf..4a9428f376 100644
+--- a/ui/base/models/list_selection_model.cc
++++ b/ui/base/models/list_selection_model.cc
+@@ -9,6 +9,7 @@
+ #include <valarray>
+ 
+ #include "base/check_op.h"
++#include "base/containers/contains.h"
+ #include "base/strings/string_number_conversions.h"
+ #include "base/strings/string_util.h"
+ 
+@@ -145,7 +146,7 @@ void ListSelectionModel::SetSelectedIndex(std::optional<size_t> index) {
+ }
+ 
+ bool ListSelectionModel::IsSelected(size_t index) const {
+-  return selected_indices_.contains(index);
++  return base::Contains(selected_indices_, index);
+ }
+ 
+ void ListSelectionModel::AddIndexToSelection(size_t index) {
+diff --git a/ui/base/page_transition_types.cc b/ui/base/page_transition_types.cc
+index 687bae9427..3a6cc2a3c6 100644
+--- a/ui/base/page_transition_types.cc
++++ b/ui/base/page_transition_types.cc
+@@ -5,17 +5,17 @@
+ #include "ui/base/page_transition_types.h"
+ 
+ #include <ostream>
+-#include <utility>
+ 
+ #include "base/check_op.h"
+ #include "base/notreached.h"
++#include "base/types/cxx23_to_underlying.h"
+ 
+ namespace ui {
+ 
+ bool PageTransitionCoreTypeIs(PageTransition lhs,
+                               PageTransition rhs) {
+   // Expect the rhs to have no qualifiers.
+-  DCHECK(IsValidPageTransitionType(std::to_underlying(rhs)));
++  DCHECK(IsValidPageTransitionType(base::to_underlying(rhs)));
+   const auto rhs_core = PageTransitionStripQualifier(rhs);
+   DCHECK(PageTransitionTypeIncludingQualifiersIs(rhs, rhs_core));
+   return PageTransitionTypeIncludingQualifiersIs(
+@@ -24,7 +24,7 @@ bool PageTransitionCoreTypeIs(PageTransition lhs,
+ 
+ bool PageTransitionTypeIncludingQualifiersIs(PageTransition lhs,
+                                              PageTransition rhs) {
+-  return std::to_underlying(lhs) == std::to_underlying(rhs);
++  return base::to_underlying(lhs) == base::to_underlying(rhs);
+ }
+ 
+ PageTransition PageTransitionStripQualifier(PageTransition type) {
+diff --git a/ui/base/resource/data_pack.cc b/ui/base/resource/data_pack.cc
+index 5ba9a7e43c..9ade2b9aa8 100644
+--- a/ui/base/resource/data_pack.cc
++++ b/ui/base/resource/data_pack.cc
+@@ -15,6 +15,7 @@
+ 
+ #include "base/command_line.h"
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/files/file.h"
+ #include "base/files/file_util.h"
+ #include "base/files/memory_mapped_file.h"
+@@ -67,7 +68,7 @@ void MaybePrintResourceId(uint16_t resource_id) {
+   // DataPack doesn't require single-threaded access, so use a lock.
+   static base::Lock* lock = new base::Lock;
+   base::AutoLock auto_lock(*lock);
+-  if (!resource_ids_logged->contains(resource_id)) {
++  if (!base::Contains(*resource_ids_logged, resource_id)) {
+     printf("Resource=%d\n", resource_id);
+     resource_ids_logged->insert(resource_id);
+   }
+diff --git a/ui/base/resource/resource_scale_factor.cc b/ui/base/resource/resource_scale_factor.cc
+index 1db8518448..32b50af2bf 100644
+--- a/ui/base/resource/resource_scale_factor.cc
++++ b/ui/base/resource/resource_scale_factor.cc
+@@ -14,6 +14,7 @@
+ 
+ #include "base/check.h"
+ #include "base/check_op.h"
++#include "base/containers/contains.h"
+ 
+ namespace ui {
+ 
+@@ -123,7 +124,7 @@ bool IsScaleFactorSupported(ResourceScaleFactor scale_factor) {
+   CHECK_NE(g_supported_resource_scale_factors, nullptr)
+       << "ResourceBundle needs to be initialized.";
+ 
+-  return std::ranges::contains(*g_supported_resource_scale_factors,
++  return base::Contains(*g_supported_resource_scale_factors,
+                                scale_factor);
+ }
+ 
+diff --git a/ui/base/user_activity/user_activity_detector.cc b/ui/base/user_activity/user_activity_detector.cc
+index c6c7dd5ac0..3253641fe7 100644
+--- a/ui/base/user_activity/user_activity_detector.cc
++++ b/ui/base/user_activity/user_activity_detector.cc
+@@ -4,12 +4,11 @@
+ 
+ #include "ui/base/user_activity/user_activity_detector.h"
+ 
+-#include <utility>
+-
+ #include "base/format_macros.h"
+ #include "base/logging.h"
+ #include "base/observer_list.h"
+ #include "base/strings/stringprintf.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "build/build_config.h"
+ #include "ui/base/user_activity/user_activity_observer.h"
+ #include "ui/events/event_utils.h"
+@@ -23,7 +22,7 @@ namespace {
+ std::string GetEventDebugString(const ui::Event* event) {
+   std::string details = base::StringPrintf(
+       "type=%d name=%s flags=%d time=%" PRId64,
+-      std::to_underlying(event->type()), event->GetName(), event->flags(),
++      base::to_underlying(event->type()), event->GetName(), event->flags(),
+       (event->time_stamp() - base::TimeTicks()).InMilliseconds());
+ 
+   if (event->IsKeyEvent()) {
+diff --git a/ui/base/win/hwnd_subclass.cc b/ui/base/win/hwnd_subclass.cc
+index a1b7af55d4..3478100436 100644
+--- a/ui/base/win/hwnd_subclass.cc
++++ b/ui/base/win/hwnd_subclass.cc
+@@ -7,6 +7,7 @@
+ #include <algorithm>
+ 
+ #include "base/check.h"
++#include "base/containers/contains.h"
+ #include "base/memory/ptr_util.h"
+ #include "base/memory/raw_ptr.h"
+ #include "base/memory/singleton.h"
+@@ -96,9 +97,8 @@ HWNDSubclass* HWNDSubclass::GetHwndSubclassForTarget(HWND target) {
+ 
+ void HWNDSubclass::AddFilter(HWNDMessageFilter* filter) {
+   DCHECK(filter);
+-  if (!std::ranges::contains(filters_, filter)) {
++  if (!base::Contains(filters_, filter))
+     filters_.push_back(filter);
+-  }
+ }
+ 
+ void HWNDSubclass::RemoveFilter(HWNDMessageFilter* filter) {
+diff --git a/ui/base/x/selection_utils.cc b/ui/base/x/selection_utils.cc
+index 43852ea72a..afe40e2373 100644
+--- a/ui/base/x/selection_utils.cc
++++ b/ui/base/x/selection_utils.cc
+@@ -12,6 +12,7 @@
+ #include <string_view>
+ #include <vector>
+ 
++#include "base/containers/contains.h"
+ #include "base/containers/span.h"
+ #include "base/i18n/icu_string_conversions.h"
+ #include "base/memory/ref_counted_memory.h"
+@@ -56,7 +57,7 @@ void GetAtomIntersection(const std::vector<x11::Atom>& desired,
+                          const std::vector<x11::Atom>& offered,
+                          std::vector<x11::Atom>* output) {
+   for (const auto& desired_atom : desired) {
+-    if (std::ranges::contains(offered, desired_atom)) {
++    if (base::Contains(offered, desired_atom)) {
+       output->push_back(desired_atom);
+     }
+   }
+diff --git a/ui/base/x/x11_clipboard_helper.cc b/ui/base/x/x11_clipboard_helper.cc
+index b6a04b3d5c..57aa6e7218 100644
+--- a/ui/base/x/x11_clipboard_helper.cc
++++ b/ui/base/x/x11_clipboard_helper.cc
+@@ -9,6 +9,7 @@
+ #include <vector>
+ 
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/feature_list.h"
+ #include "base/memory/ref_counted_memory.h"
+ #include "base/memory/singleton.h"
+@@ -116,7 +117,7 @@ class XClipboardHelper::TargetList {
+ 
+   bool ContainsText() const {
+     for (const auto& atom : GetTextAtomsFrom()) {
+-      if (std::ranges::contains(target_list_, atom)) {
++      if (base::Contains(target_list_, atom)) {
+         return true;
+       }
+     }
+@@ -125,7 +126,7 @@ class XClipboardHelper::TargetList {
+ 
+   bool ContainsFormat(const ClipboardFormatType& format_type) const {
+     x11::Atom atom = x11::GetAtom(format_type.GetName().c_str());
+-    return std::ranges::contains(target_list_, atom);
++    return base::Contains(target_list_, atom);
+   }
+ 
+  private:
+diff --git a/ui/base/x/x11_gl_egl_utility.cc b/ui/base/x/x11_gl_egl_utility.cc
+index 6c46b15d25..d98330e42e 100644
+--- a/ui/base/x/x11_gl_egl_utility.cc
++++ b/ui/base/x/x11_gl_egl_utility.cc
+@@ -6,6 +6,7 @@
+ 
+ #include <algorithm>
+ 
++#include "base/containers/contains.h"
+ #include "ui/base/x/x11_util.h"
+ #include "ui/gfx/x/visual_manager.h"
+ #include "ui/gl/gl_surface_egl.h"
+@@ -45,7 +46,7 @@ void GetPlatformExtraDisplayAttribs(EGLenum platform_type,
+   // ANGLE_NULL and SwiftShader backends don't use the visual,
+   // and may run without X11 where we can't get it anyway.
+   if ((platform_type != EGL_PLATFORM_ANGLE_TYPE_NULL_ANGLE) &&
+-      !std::ranges::contains(
++      !base::Contains(
+           *attributes, EGL_PLATFORM_ANGLE_DEVICE_TYPE_SWIFTSHADER_ANGLE)) {
+     x11::VisualId visual_id;
+     x11::Connection::Get()->GetOrCreateVisualManager().ChooseVisualForWindow(
+diff --git a/ui/base/x/x11_global_shortcut_listener.cc b/ui/base/x/x11_global_shortcut_listener.cc
+index 8c9a137d5e..838b89cd8d 100644
+--- a/ui/base/x/x11_global_shortcut_listener.cc
++++ b/ui/base/x/x11_global_shortcut_listener.cc
+@@ -8,6 +8,7 @@
+ 
+ #include <array>
+ 
++#include "base/containers/contains.h"
+ #include "ui/base/x/x11_util.h"
+ #include "ui/events/event.h"
+ #include "ui/events/keycodes/keyboard_code_conversion_x.h"
+@@ -137,7 +138,8 @@ void XGlobalShortcutListener::OnKeyPressEvent(const KeyEvent& event) {
+   const bool is_ctrl_down = event.flags() & EF_CONTROL_DOWN;
+   const bool is_shift_down = event.flags() & EF_SHIFT_DOWN;
+ 
+-  if (!registered_combinations_.contains(
++  if (!base::Contains(
++          registered_combinations_,
+           Accelerator(key_code, is_alt_down, is_ctrl_down, is_shift_down))) {
+     return;
+   }
+diff --git a/ui/base/x/x11_os_exchange_data_provider.cc b/ui/base/x/x11_os_exchange_data_provider.cc
+index 33a69713ff..8304502396 100644
+--- a/ui/base/x/x11_os_exchange_data_provider.cc
++++ b/ui/base/x/x11_os_exchange_data_provider.cc
+@@ -8,6 +8,7 @@
+ #include <string_view>
+ #include <utility>
+ 
++#include "base/containers/contains.h"
+ #include "base/files/file_path.h"
+ #include "base/memory/ref_counted_memory.h"
+ #include "base/notimplemented.h"
+diff --git a/ui/base/x/x11_util.cc b/ui/base/x/x11_util.cc
+index cf5b14d733..2432743e7d 100644
+--- a/ui/base/x/x11_util.cc
++++ b/ui/base/x/x11_util.cc
+@@ -19,6 +19,7 @@
+ 
+ #include "base/command_line.h"
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/containers/span.h"
+ #include "base/location.h"
+ #include "base/logging.h"
+@@ -560,7 +561,7 @@ bool IsX11WindowFullScreen(x11::Window window) {
+     std::vector<x11::Atom> atom_properties;
+     if (x11::Connection::Get()->GetArrayProperty(
+             window, x11::GetAtom("_NET_WM_STATE"), &atom_properties)) {
+-      return std::ranges::contains(atom_properties, fullscreen_atom);
++      return base::Contains(atom_properties, fullscreen_atom);
+     }
+   }
+ 
+diff --git a/ui/color/color_provider_utils.cc b/ui/color/color_provider_utils.cc
+index 1cf16b3f50..f01af855b2 100644
+--- a/ui/color/color_provider_utils.cc
++++ b/ui/color/color_provider_utils.cc
+@@ -7,6 +7,7 @@
+ #include <memory>
+ #include <string_view>
+ 
++#include "base/containers/contains.h"
+ #include "base/containers/fixed_flat_map.h"
+ #include "base/no_destructor.h"
+ #include "base/strings/string_util.h"
+@@ -792,7 +793,7 @@ bool IsRendererColorMappingEquivalent(
+ 
+   for (const auto& table : kRendererColorIdMap) {
+     // The `renderer_color_map_` should map the full set of renderer color ids.
+-    DCHECK(renderer_color_map.contains(table.renderer_color_id));
++    DCHECK(base::Contains(renderer_color_map, table.renderer_color_id));
+     if (color_provider->GetColor(table.color_id) !=
+         renderer_color_map.at(table.renderer_color_id)) {
+       return false;
+diff --git a/ui/compositor/compositor.cc b/ui/compositor/compositor.cc
+index 0baec53e72..e400c61ef3 100644
+--- a/ui/compositor/compositor.cc
++++ b/ui/compositor/compositor.cc
+@@ -14,6 +14,7 @@
+ 
+ #include "base/check.h"
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/dcheck_is_on.h"
+ #include "base/feature_list.h"
+ #include "base/functional/bind.h"
+@@ -948,7 +949,7 @@ Compositor::TrackerState::~TrackerState() = default;
+ void Compositor::StartMetricsTracker(
+     TrackerId tracker_id,
+     CompositorMetricsTrackerHost::ReportCallback callback) {
+-  DCHECK(!compositor_metrics_tracker_map_.contains(tracker_id));
++  DCHECK(!base::Contains(compositor_metrics_tracker_map_, tracker_id));
+ 
+   auto& tracker_state = compositor_metrics_tracker_map_[tracker_id];
+   tracker_state.report_callback = std::move(callback);
+diff --git a/ui/compositor/layer.cc b/ui/compositor/layer.cc
+index f19dd3d8cb..bb316fdbe1 100644
+--- a/ui/compositor/layer.cc
++++ b/ui/compositor/layer.cc
+@@ -13,6 +13,7 @@
+ 
+ #include "base/check_op.h"
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/json/json_writer.h"
+ #include "base/memory/ptr_util.h"
+@@ -1094,7 +1095,7 @@ base::WeakPtr<Layer> Layer::AsWeakPtr() {
+ }
+ 
+ bool Layer::ContainsMirrorForTest(Layer* mirror) const {
+-  return std::ranges::contains(mirrors_, mirror, &LayerMirror::dest);
++  return base::Contains(mirrors_, mirror, &LayerMirror::dest);
+ }
+ 
+ void Layer::SetTransferableResource(const viz::TransferableResource& resource,
+diff --git a/ui/display/display.cc b/ui/display/display.cc
+index 4ddd20fabb..d54818004f 100644
+--- a/ui/display/display.cc
++++ b/ui/display/display.cc
+@@ -7,6 +7,7 @@
+ #include <algorithm>
+ 
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/logging.h"
+ #include "base/no_destructor.h"
+ #include "base/notreached.h"
+diff --git a/ui/display/display_change_notifier.cc b/ui/display/display_change_notifier.cc
+index 30fe5bcd0a..47bfe44584 100644
+--- a/ui/display/display_change_notifier.cc
++++ b/ui/display/display_change_notifier.cc
+@@ -8,6 +8,7 @@
+ 
+ #include <algorithm>
+ 
++#include "base/containers/contains.h"
+ #include "base/observer_list.h"
+ #include "build/buildflag.h"
+ #include "ui/display/display.h"
+@@ -34,7 +35,7 @@ void DisplayChangeNotifier::NotifyDisplaysChanged(
+   // Display present in old_displays but not in new_displays has been removed.
+   for (auto old_it = old_displays.begin(); old_it != old_displays.end();
+        ++old_it) {
+-    if (!std::ranges::contains(new_displays, old_it->id(), &Display::id)) {
++    if (!base::Contains(new_displays, old_it->id(), &Display::id)) {
+       removed_displays.push_back(*old_it);
+     }
+   }
+diff --git a/ui/display/display_layout.cc b/ui/display/display_layout.cc
+index 8cee567b36..c8d71dd31b 100644
+--- a/ui/display/display_layout.cc
++++ b/ui/display/display_layout.cc
+@@ -14,6 +14,7 @@
+ 
+ #include "base/check.h"
+ #include "base/check_op.h"
++#include "base/containers/contains.h"
+ #include "base/logging.h"
+ #include "base/strings/string_number_conversions.h"
+ #include "base/values.h"
+@@ -522,7 +523,7 @@ void DisplayLayout::ApplyToDisplayList(Displays* display_list,
+ bool DisplayLayout::Validate(const DisplayIdList& list,
+                              const DisplayLayout& layout) {
+   // The primary display should be in the list.
+-  if (!std::ranges::contains(list, layout.primary_id)) {
++  if (!base::Contains(list, layout.primary_id)) {
+     DISPLAY_LOG(ERROR) << "The primary id: " << layout.primary_id
+                        << " is not in the id list.";
+     return false;
+@@ -560,13 +561,13 @@ bool DisplayLayout::Validate(const DisplayIdList& list,
+       DISPLAY_LOG(ERROR) << "display_id must not be same as parent_display_id";
+       return false;
+     }
+-    if (!std::ranges::contains(list, placement.display_id)) {
++    if (!base::Contains(list, placement.display_id)) {
+       DISPLAY_LOG(ERROR) << "display_id is not in the id list:"
+                          << placement.ToString();
+       return false;
+     }
+ 
+-    if (!std::ranges::contains(list, placement.parent_display_id)) {
++    if (!base::Contains(list, placement.parent_display_id)) {
+       DISPLAY_LOG(ERROR) << "parent_display_id is not in the id list:"
+                          << placement.ToString();
+       return false;
+@@ -615,10 +616,10 @@ bool DisplayLayout::HasSamePlacementList(const DisplayLayout& layout) const {
+ 
+ void DisplayLayout::RemoveDisplayPlacements(const DisplayIdList& list) {
+   std::erase_if(placement_list, [&list](const DisplayPlacement& placement) {
+-    return std::ranges::contains(list, placement.display_id);
++    return base::Contains(list, placement.display_id);
+   });
+   for (DisplayPlacement& placement : placement_list) {
+-    if (std::ranges::contains(list, placement.parent_display_id)) {
++    if (base::Contains(list, placement.parent_display_id)) {
+       placement.parent_display_id = primary_id;
+     }
+   }
+diff --git a/ui/display/manager/content_protection_key_manager.cc b/ui/display/manager/content_protection_key_manager.cc
+index 1b6608d4c3..6249d81b89 100644
+--- a/ui/display/manager/content_protection_key_manager.cc
++++ b/ui/display/manager/content_protection_key_manager.cc
+@@ -4,6 +4,7 @@
+ 
+ #include "ui/display/manager/content_protection_key_manager.h"
+ 
++#include "base/containers/contains.h"
+ #include "base/memory/raw_ptr.h"
+ #include "ui/display/display_features.h"
+ #include "ui/display/manager/util/display_manager_util.h"
+@@ -123,7 +124,7 @@ void ContentProtectionKeyManager::OnKeyInjectedToKernel(int64_t display_id,
+ 
+ void ContentProtectionKeyManager::TriggerPendingCallbacks(int64_t display_id,
+                                                           bool is_key_set) {
+-  CHECK(pending_display_callbacks_.contains(display_id));
++  CHECK(base::Contains(pending_display_callbacks_, display_id));
+   KeySetCallback callback = std::move(pending_display_callbacks_[display_id]);
+   DCHECK(!callback.is_null());
+   std::move(callback).Run(is_key_set);
+diff --git a/ui/display/manager/display_configurator.cc b/ui/display/manager/display_configurator.cc
+index 58c7779732..c655cdb2e6 100644
+--- a/ui/display/manager/display_configurator.cc
++++ b/ui/display/manager/display_configurator.cc
+@@ -4,11 +4,11 @@
+ 
+ #include "ui/display/manager/display_configurator.h"
+ 
+-#include <algorithm>
+ #include <cstddef>
+ #include <utility>
+ 
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/functional/callback_helpers.h"
+ #include "base/logging.h"
+@@ -54,8 +54,7 @@ struct DisplayState {
+ bool IsDisplayIdInDisplayStateList(
+     int64_t display_id,
+     const DisplayConfigurator::DisplayStateList& display_list) {
+-  return std::ranges::contains(display_list, display_id,
+-                               &DisplaySnapshot::display_id);
++  return base::Contains(display_list, display_id, &DisplaySnapshot::display_id);
+ }
+ 
+ // Returns true if a platform native |mode| is equal to a |managed_mode|.
+diff --git a/ui/display/manager/display_manager.cc b/ui/display/manager/display_manager.cc
+index 0a1b689398..6fafb412f2 100644
+--- a/ui/display/manager/display_manager.cc
++++ b/ui/display/manager/display_manager.cc
+@@ -16,6 +16,7 @@
+ 
+ #include "base/auto_reset.h"
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/logging.h"
+ #include "base/metrics/histogram_macros.h"
+@@ -1306,7 +1307,7 @@ bool DisplayManager::UpdateDisplaysWith(
+   std::vector<size_t> updated_indices;
+   UpdateNonPrimaryDisplayBoundsForLayout(&new_displays, &updated_indices);
+   for (size_t updated_index : updated_indices) {
+-    if (!std::ranges::contains(added_display_indices, updated_index)) {
++    if (!base::Contains(added_display_indices, updated_index)) {
+       uint32_t metrics = DisplayObserver::DISPLAY_METRIC_BOUNDS |
+                          DisplayObserver::DISPLAY_METRIC_WORK_AREA;
+       if (display_changes.find(updated_index) != display_changes.end()) {
+@@ -1949,8 +1950,8 @@ bool DisplayManager::UpdateDisplayBounds(int64_t display_id,
+   display_info_[display_id].SetBounds(new_bounds);
+   // Don't notify observers if the mirrored window has changed.
+   if (IsInSoftwareMirrorMode() &&
+-      std::ranges::contains(software_mirroring_display_list_, display_id,
+-                            &Display::id)) {
++      base::Contains(software_mirroring_display_list_, display_id,
++                     &Display::id)) {
+     return false;
+   }
+ 
+@@ -2096,8 +2097,8 @@ void DisplayManager::CreateSoftwareMirroringDisplayInfo(
+             layout_store()->GetRegisteredDisplayLayout(
+                 CreateDisplayIdList(*display_info_list));
+         source_id = layout.primary_id;
+-        if (!std::ranges::contains(*display_info_list, source_id,
+-                                   &ManagedDisplayInfo::id)) {
++        if (!base::Contains(*display_info_list, source_id,
++                            &ManagedDisplayInfo::id)) {
+           // It is possible that primary display is removed in the new display
+           // configuration.
+           source_id = first_display_id_;
+diff --git a/ui/display/manager/touch_device_manager.cc b/ui/display/manager/touch_device_manager.cc
+index b46ae0a3a8..34a8d4cc28 100644
+--- a/ui/display/manager/touch_device_manager.cc
++++ b/ui/display/manager/touch_device_manager.cc
+@@ -9,6 +9,7 @@
+ #include <string>
+ #include <tuple>
+ 
++#include "base/containers/contains.h"
+ #include "base/hash/hash.h"
+ #include "base/logging.h"
+ #include "base/strings/string_number_conversions.h"
+@@ -130,7 +131,7 @@ ManagedDisplayInfo* GetBestMatchForDevice(
+ 
+   // If we have no historical information for the touch device identified by
+   // |identifier|, do an early return.
+-  if (!touch_associations.contains(identifier))
++  if (!base::Contains(touch_associations, identifier))
+     return display_info;
+ 
+   const TouchDeviceManager::AssociationInfoMap& info_map =
+@@ -141,7 +142,7 @@ ManagedDisplayInfo* GetBestMatchForDevice(
+     // We do not want to match anything to the internal display.
+     if (IsInternalDisplayId(display->id()))
+       continue;
+-    if (!info_map.contains(display->id()))
++    if (!base::Contains(info_map, display->id()))
+       continue;
+     const TouchDeviceManager::TouchAssociationInfo& info =
+         info_map.at(display->id());
+@@ -392,8 +393,8 @@ void TouchDeviceManager::AssociateDevicesWithCollision(
+     // If this device is not the one that has a collision or if this device is
+     // the one that has collision but we have no past port mapping information
+     // associated with it, then we skip.
+-    if (!collision_set.contains(identifier) ||
+-        !port_associations_.contains(identifier)) {
++    if (!base::Contains(collision_set, identifier) ||
++        !base::Contains(port_associations_, identifier)) {
+       device_it++;
+       continue;
+     }
+@@ -634,7 +635,7 @@ void TouchDeviceManager::ClearTouchCalibrationData(
+     int64_t display_id) {
+   const TouchDeviceIdentifier identifier =
+       TouchDeviceIdentifier::FromDevice(device);
+-  if (touch_associations_.contains(identifier)) {
++  if (base::Contains(touch_associations_, identifier)) {
+     ClearCalibrationDataInMap(touch_associations_.at(identifier), display_id);
+   }
+ }
+@@ -655,7 +656,7 @@ TouchCalibrationData TouchDeviceManager::GetCalibrationData(
+   if (display_id == kInvalidDisplayId) {
+     // If the touch device is currently not associated with any display and the
+     // |display_id| was not provided, then this is an invalid query.
+-    if (!active_touch_associations_.contains(identifier))
++    if (!base::Contains(active_touch_associations_, identifier))
+       return TouchCalibrationData();
+ 
+     // If the display id is not provided, we return the calibration information
+@@ -664,7 +665,7 @@ TouchCalibrationData TouchDeviceManager::GetCalibrationData(
+     display_id = active_touch_associations_.at(identifier);
+   }
+ 
+-  if (touch_associations_.contains(identifier)) {
++  if (base::Contains(touch_associations_, identifier)) {
+     const AssociationInfoMap& info_map = touch_associations_.at(identifier);
+     if (info_map.find(display_id) != info_map.end())
+       return info_map.at(display_id).calibration_data;
+@@ -673,7 +674,7 @@ TouchCalibrationData TouchDeviceManager::GetCalibrationData(
+   // Check for legacy calibration data.
+   TouchDeviceIdentifier fallback_identifier(
+       TouchDeviceIdentifier::GetFallbackTouchDeviceIdentifier());
+-  if (touch_associations_.contains(fallback_identifier)) {
++  if (base::Contains(touch_associations_, fallback_identifier)) {
+     const AssociationInfoMap& info_map =
+         touch_associations_.at(fallback_identifier);
+     if (info_map.find(display_id) != info_map.end())
+@@ -689,7 +690,7 @@ bool TouchDeviceManager::DisplayHasTouchDevice(
+     const ui::TouchscreenDevice& device) const {
+   const TouchDeviceIdentifier identifier =
+       TouchDeviceIdentifier::FromDevice(device);
+-  return active_touch_associations_.contains(identifier) &&
++  return base::Contains(active_touch_associations_, identifier) &&
+          active_touch_associations_.at(identifier) == display_id;
+ }
+ 
+@@ -697,7 +698,7 @@ int64_t TouchDeviceManager::GetAssociatedDisplay(
+     const ui::TouchscreenDevice& device) const {
+   const TouchDeviceIdentifier identifier =
+       TouchDeviceIdentifier::FromDevice(device);
+-  if (active_touch_associations_.contains(identifier))
++  if (base::Contains(active_touch_associations_, identifier))
+     return active_touch_associations_.at(identifier);
+   return kInvalidDisplayId;
+ }
+diff --git a/ui/display/screen.cc b/ui/display/screen.cc
+index b918c494ed..65aaea2a70 100644
+--- a/ui/display/screen.cc
++++ b/ui/display/screen.cc
+@@ -9,6 +9,7 @@
+ #include <utility>
+ 
+ #include "base/check.h"
++#include "base/containers/contains.h"
+ #include "base/memory/ptr_util.h"
+ #include "base/notimplemented.h"
+ #include "base/time/time.h"
+@@ -207,9 +208,9 @@ ScreenInfos Screen::GetScreenInfosNearestDisplay(int64_t nearest_id) const {
+   int64_t primary_id = primary.id();
+   int64_t current_id = nearest_id;
+   const bool has_primary =
+-      std::ranges::contains(displays, primary_id, &Display::id);
++      base::Contains(displays, primary_id, &Display::id);
+   const bool has_nearest =
+-      std::ranges::contains(displays, nearest_id, &Display::id);
++      base::Contains(displays, nearest_id, &Display::id);
+   if (!has_primary)
+     primary_id = has_nearest ? nearest_id : displays[0].id();
+   if (!has_nearest)
+diff --git a/ui/display/unified_desktop_utils.cc b/ui/display/unified_desktop_utils.cc
+index 388f97fa7f..4914a0ca41 100644
+--- a/ui/display/unified_desktop_utils.cc
++++ b/ui/display/unified_desktop_utils.cc
+@@ -8,6 +8,7 @@
+ #include <map>
+ #include <set>
+ 
++#include "base/containers/contains.h"
+ #include "base/containers/stack.h"
+ #include "base/logging.h"
+ #include "ui/display/types/display_constants.h"
+@@ -202,7 +203,7 @@ bool BuildUnifiedDesktopMatrix(const DisplayIdList& ids_list,
+                                const DisplayLayout& layout,
+                                UnifiedDesktopLayoutMatrix* out_matrix) {
+   // The primary display should be in the IDs list.
+-  if (!std::ranges::contains(ids_list, layout.primary_id)) {
++  if (!base::Contains(ids_list, layout.primary_id)) {
+     LOG(ERROR) << "The primary ID: " << layout.primary_id
+                << " is not in the IDs list.";
+     return false;
+@@ -213,7 +214,7 @@ bool BuildUnifiedDesktopMatrix(const DisplayIdList& ids_list,
+   for (const auto& id : ids_list) {
+     if (id == layout.primary_id)
+       continue;
+-    if (!std::ranges::contains(layout.placement_list, id,
++    if (!base::Contains(layout.placement_list, id,
+                                &DisplayPlacement::display_id)) {
+       LOG(ERROR) << "Display with ID: " << id << " has no placement.";
+       return false;
+@@ -253,13 +254,13 @@ bool BuildUnifiedDesktopMatrix(const DisplayIdList& ids_list,
+       LOG(ERROR) << "display_id must not be the same as parent_display_id";
+       return false;
+     }
+-    if (!std::ranges::contains(ids_list, placement.display_id)) {
++    if (!base::Contains(ids_list, placement.display_id)) {
+       LOG(ERROR) << "display_id: " << placement.display_id
+                  << " is not in the id list: " << placement.ToString();
+       return false;
+     }
+ 
+-    if (!std::ranges::contains(ids_list, placement.parent_display_id)) {
++    if (!base::Contains(ids_list, placement.parent_display_id)) {
+       LOG(ERROR) << "parent_display_id: " << placement.parent_display_id
+                  << " is not in the id list: " << placement.ToString();
+       return false;
+diff --git a/ui/display/util/display_util.cc b/ui/display/util/display_util.cc
+index 2ce08bf583..7080542956 100644
+--- a/ui/display/util/display_util.cc
++++ b/ui/display/util/display_util.cc
+@@ -10,6 +10,7 @@
+ 
+ #include "base/command_line.h"
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/containers/span.h"
+ #include "base/logging.h"
+ #include "base/metrics/histogram_functions.h"
+@@ -166,37 +167,39 @@ gfx::ColorSpace GetColorSpaceFromEdid(const display::EdidParser& edid_parser) {
+   EmitEdidColorSpaceChecksOutcomeUma(EdidColorSpaceChecksOutcome::kSuccess);
+ 
+   auto transfer_id = gfx::ColorSpace::TransferID::INVALID;
+-  if (edid_parser.supported_color_primary_matrix_ids().contains(
++  if (base::Contains(
++          edid_parser.supported_color_primary_matrix_ids(),
+           EdidParser::PrimaryMatrixPair(gfx::ColorSpace::PrimaryID::BT2020,
+                                         gfx::ColorSpace::MatrixID::RGB)) ||
+-      edid_parser.supported_color_primary_matrix_ids().contains(
+-          EdidParser::PrimaryMatrixPair(
+-              gfx::ColorSpace::PrimaryID::BT2020,
+-              gfx::ColorSpace::MatrixID::BT2020_NCL))) {
+-    if (edid_parser.supported_color_transfer_ids().contains(
+-            gfx::ColorSpace::TransferID::PQ)) {
++      base::Contains(edid_parser.supported_color_primary_matrix_ids(),
++                     EdidParser::PrimaryMatrixPair(
++                         gfx::ColorSpace::PrimaryID::BT2020,
++                         gfx::ColorSpace::MatrixID::BT2020_NCL))) {
++    if (base::Contains(edid_parser.supported_color_transfer_ids(),
++                       gfx::ColorSpace::TransferID::PQ)) {
+       transfer_id = gfx::ColorSpace::TransferID::PQ;
+ #if BUILDFLAG(IS_CHROMEOS)
+       if (base::FeatureList::IsEnabled(
+               display::features::kEnableExternalDisplayHDR10Mode) &&
+           edid_parser.is_external_display() &&
+-          edid_parser.supported_color_primary_matrix_ids().contains(
++          base::Contains(
++              edid_parser.supported_color_primary_matrix_ids(),
+               EdidParser::PrimaryMatrixPair(gfx::ColorSpace::PrimaryID::BT2020,
+                                             gfx::ColorSpace::MatrixID::RGB))) {
+         return gfx::ColorSpace::CreateHDR10();
+       }
+ #endif
+-    } else if (edid_parser.supported_color_transfer_ids().contains(
+-                   gfx::ColorSpace::TransferID::HLG)) {
++    } else if (base::Contains(edid_parser.supported_color_transfer_ids(),
++                              gfx::ColorSpace::TransferID::HLG)) {
+       transfer_id = gfx::ColorSpace::TransferID::HLG;
+     }
+     // If we reach here: CDB has {BT2020,RGB} or {BT2020,NCL},
+     // but HDR Static Metadata Data Block does not contain PQ.
+     // transfer == INVALID
+-  } else if (edid_parser.supported_color_primary_matrix_ids().contains(
+-                 EdidParser::PrimaryMatrixPair(
+-                     gfx::ColorSpace::PrimaryID::P3,
+-                     gfx::ColorSpace::MatrixID::RGB))) {
++  } else if (base::Contains(edid_parser.supported_color_primary_matrix_ids(),
++                            EdidParser::PrimaryMatrixPair(
++                                gfx::ColorSpace::PrimaryID::P3,
++                                gfx::ColorSpace::MatrixID::RGB))) {
+     return gfx::ColorSpace::CreateDisplayP3D65();
+   } else if (gamma == 2.2f) {
+     transfer_id = gfx::ColorSpace::TransferID::GAMMA22;
+@@ -238,7 +241,7 @@ bool CompareDisplayIds(int64_t id1, int64_t id2) {
+ }
+ 
+ bool IsInternalDisplayId(int64_t display_id) {
+-  return internal_display_ids()->contains(display_id);
++  return base::Contains(*internal_display_ids(), display_id);
+ }
+ 
+ const base::flat_set<int64_t>& GetInternalDisplayIds() {
+diff --git a/ui/display/win/screen_win.cc b/ui/display/win/screen_win.cc
+index bfc40f8073..5cb7c912eb 100644
+--- a/ui/display/win/screen_win.cc
++++ b/ui/display/win/screen_win.cc
+@@ -15,6 +15,7 @@
+ #include "base/callback_list.h"
+ #include "base/check.h"
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/containers/flat_map.h"
+ #include "base/containers/flat_set.h"
+ #include "base/debug/alias.h"
+diff --git a/ui/events/ash/keyboard_capability.cc b/ui/events/ash/keyboard_capability.cc
+index f847b4f7e6..c3b2a0370b 100644
+--- a/ui/events/ash/keyboard_capability.cc
++++ b/ui/events/ash/keyboard_capability.cc
+@@ -19,6 +19,7 @@
+ #include "base/check_is_test.h"
+ #include "base/check_op.h"
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/containers/fixed_flat_map.h"
+ #include "base/containers/fixed_flat_set.h"
+ #include "base/containers/flat_set.h"
+@@ -1332,10 +1333,10 @@ bool KeyboardCapability::HasTopRowActionKey(const KeyboardDevice& keyboard,
+                                             TopRowActionKey action_key) const {
+   const auto* keyboard_info = GetKeyboardInfo(keyboard);
+   if (!keyboard_info) {
+-    return std::ranges::contains(kLayout1TopRowActionKeys, action_key);
++    return base::Contains(kLayout1TopRowActionKeys, action_key);
+   }
+ 
+-  return std::ranges::contains(keyboard_info->top_row_action_keys, action_key);
++  return base::Contains(keyboard_info->top_row_action_keys, action_key);
+ }
+ 
+ bool KeyboardCapability::HasTopRowActionKey(int device_id,
+diff --git a/ui/events/blink/blink_event_util.cc b/ui/events/blink/blink_event_util.cc
+index 396f51544f..28b86a7a14 100644
+--- a/ui/events/blink/blink_event_util.cc
++++ b/ui/events/blink/blink_event_util.cc
+@@ -10,11 +10,11 @@
+ #include <bitset>
+ #include <limits>
+ #include <memory>
+-#include <utility>
+ 
+ #include "base/numerics/angle_conversions.h"
+ #include "base/time/time.h"
+ #include "base/trace_event/typed_macros.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "build/build_config.h"
+ #include "third_party/blink/public/common/input/web_input_event.h"
+ #include "third_party/blink/public/common/input/web_mouse_wheel_event.h"
+@@ -468,7 +468,7 @@ WebGestureEvent CreateWebGestureEvent(const GestureEventDetails& details,
+       break;
+     default:
+       NOTREACHED() << "EventType provided wasn't a valid gesture event: "
+-                   << std::to_underlying(details.type());
++                   << base::to_underlying(details.type());
+   }
+ 
+   return gesture;
+diff --git a/ui/events/blink/web_input_event.cc b/ui/events/blink/web_input_event.cc
+index b79e35621a..69156d8898 100644
+--- a/ui/events/blink/web_input_event.cc
++++ b/ui/events/blink/web_input_event.cc
+@@ -4,10 +4,9 @@
+ 
+ #include "ui/events/blink/web_input_event.h"
+ 
+-#include <utility>
+-
+ #include "base/feature_list.h"
+ #include "base/notimplemented.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "build/build_config.h"
+ #include "third_party/blink/public/common/features.h"
+ #include "ui/base/ui_base_features.h"
+@@ -182,10 +181,10 @@ blink::WebGestureEvent MakeWebGestureEventFromUiEvent(
+       break;
+     case EventType::kScroll:
+       NOTREACHED() << "Invalid gesture type: "
+-                   << std::to_underlying(event.type());
++                   << base::to_underlying(event.type());
+     default:
+       NOTREACHED() << "Unknown gesture type: "
+-                   << std::to_underlying(event.type());
++                   << base::to_underlying(event.type());
+   }
+ 
+   blink::WebGestureEvent webkit_event(
+@@ -402,7 +401,7 @@ blink::WebMouseEvent MakeWebMouseEventFromUiEvent(const MouseEvent& event) {
+       break;
+     default:
+       NOTIMPLEMENTED() << "Received unexpected event: "
+-                       << std::to_underlying(event.type());
++                       << base::to_underlying(event.type());
+       break;
+   }
+ 
+diff --git a/ui/events/devices/device_data_manager.cc b/ui/events/devices/device_data_manager.cc
+index 8af6c2c458..478e4f2236 100644
+--- a/ui/events/devices/device_data_manager.cc
++++ b/ui/events/devices/device_data_manager.cc
+@@ -8,6 +8,7 @@
+ 
+ #include "base/at_exit.h"
+ #include "base/check_op.h"
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/observer_list.h"
+ #include "ui/display/types/display_constants.h"
+@@ -112,7 +113,7 @@ void DeviceDataManager::UpdateTouchMap() {
+       [this](const std::pair<int, TouchDeviceTransform>& map_entry) {
+         // Remove the device identified by |map_entry| from |touch_map_| if it
+         // is not present in the list of currently connected devices.
+-        return !std::ranges::contains(touchscreen_devices_,
++        return !base::Contains(touchscreen_devices_,
+                                       map_entry.second.device_id,
+                                       &TouchscreenDevice::id);
+       });
+diff --git a/ui/events/event.cc b/ui/events/event.cc
+index c909948930..280ed1b75c 100644
+--- a/ui/events/event.cc
++++ b/ui/events/event.cc
+@@ -22,6 +22,7 @@
+ #include "base/strings/string_util.h"
+ #include "base/strings/stringprintf.h"
+ #include "base/time/time.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "build/build_config.h"
+ #include "ui/events/base_event_utils.h"
+ #include "ui/events/event_constants.h"
+@@ -1178,7 +1179,7 @@ ScrollEvent::ScrollEvent(const PlatformEvent& native_event)
+     GetFlingData(native_event, &x_offset_, &y_offset_, &x_offset_ordinal_,
+                  &y_offset_ordinal_, nullptr);
+   } else {
+-    NOTREACHED() << "Unexpected event type " << std::to_underlying(type())
++    NOTREACHED() << "Unexpected event type " << base::to_underlying(type())
+                  << " when constructing a ScrollEvent.";
+   }
+ }
+diff --git a/ui/events/event_utils.cc b/ui/events/event_utils.cc
+index 3e42628333..64169898b9 100644
+--- a/ui/events/event_utils.cc
++++ b/ui/events/event_utils.cc
+@@ -7,7 +7,6 @@
+ #include <limits>
+ #include <map>
+ #include <string_view>
+-#include <utility>
+ #include <vector>
+ 
+ #include "base/check.h"
+@@ -16,6 +15,7 @@
+ #include "base/time/time.h"
+ #include "base/trace_event/trace_id_helper.h"
+ #include "base/trace_event/typed_macros.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "build/build_config.h"
+ #include "third_party/perfetto/include/perfetto/tracing/string_helpers.h"
+ #include "third_party/perfetto/include/perfetto/tracing/track.h"
+@@ -34,7 +34,7 @@ namespace ui {
+ 
+ namespace {
+ 
+-int g_custom_event_types = std::to_underlying(EventType::kLast);
++int g_custom_event_types = base::to_underlying(EventType::kLast);
+ 
+ #define UMA_HISTOGRAM_EVENT_LATENCY_TIMES(name, sample)           \
+   UMA_HISTOGRAM_CUSTOM_TIMES(name, sample, base::Milliseconds(1), \
+diff --git a/ui/events/gesture_detection/touch_disposition_gesture_filter.cc b/ui/events/gesture_detection/touch_disposition_gesture_filter.cc
+index 5431bf9f26..e5d0adff4f 100644
+--- a/ui/events/gesture_detection/touch_disposition_gesture_filter.cc
++++ b/ui/events/gesture_detection/touch_disposition_gesture_filter.cc
+@@ -6,11 +6,10 @@
+ 
+ #include <stddef.h>
+ 
+-#include <utility>
+-
+ #include "base/check_op.h"
+ #include "base/notreached.h"
+ #include "base/trace_event/typed_macros.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "ui/base/ui_base_features.h"
+ #include "ui/events/gesture_event_details.h"
+ 
+@@ -18,8 +17,8 @@ namespace ui {
+ namespace {
+ 
+ // A BitSet32 is used for tracking dropped gesture types.
+-static_assert(std::to_underlying(EventType::kGestureTypeEnd) -
+-                      std::to_underlying(EventType::kGestureTypeStart) <
++static_assert(base::to_underlying(EventType::kGestureTypeEnd) -
++                      base::to_underlying(EventType::kGestureTypeStart) <
+                   32,
+               "gesture type count too large");
+ 
+@@ -131,8 +130,8 @@ DispositionHandlingInfo GetDispositionHandlingInfo(EventType type) {
+ int GetGestureTypeIndex(EventType type) {
+   DCHECK_GE(type, EventType::kGestureTypeStart);
+   DCHECK_LE(type, EventType::kGestureTypeEnd);
+-  return std::to_underlying(type) -
+-         std::to_underlying(EventType::kGestureTypeStart);
++  return base::to_underlying(type) -
++         base::to_underlying(EventType::kGestureTypeStart);
+ }
+ 
+ bool IsTouchStartEvent(GestureEventDataPacket::GestureSource gesture_source) {
+diff --git a/ui/events/gesture_event_details.cc b/ui/events/gesture_event_details.cc
+index a344b7e7a3..671bc908e7 100644
+--- a/ui/events/gesture_event_details.cc
++++ b/ui/events/gesture_event_details.cc
+@@ -6,11 +6,11 @@
+ 
+ #include <algorithm>
+ #include <ostream>
+-#include <utility>
+ 
+ #include "base/check_op.h"
+ #include "base/containers/span.h"
+ #include "base/notreached.h"
++#include "base/types/cxx23_to_underlying.h"
+ 
+ // Since ui::GestureEventDetails::Details is a union structure that corresponds
+ // to only one EventType, allow conversion to a byte span to avoid using memset
+@@ -77,7 +77,7 @@ GestureEventDetails::GestureEventDetails(ui::EventType type,
+ 
+     default:
+       NOTREACHED() << "Invalid event type for constructor: "
+-                   << std::to_underlying(type);
++                   << base::to_underlying(type);
+   }
+ }
+ 
+@@ -114,8 +114,8 @@ GestureEventDetails::GestureEventDetails(ui::EventType type,
+     case ui::EventType::kGestureSwipe:
+     case ui::EventType::kGesturePinchUpdate:
+       DCHECK_EQ(type, other.type()) << " - Invalid gesture conversion from "
+-                                    << std::to_underlying(other.type())
+-                                    << " to " << std::to_underlying(type);
++                                    << base::to_underlying(other.type())
++                                    << " to " << base::to_underlying(type);
+       break;
+     default:
+       break;
+diff --git a/ui/events/gestures/gesture_recognizer_impl.cc b/ui/events/gestures/gesture_recognizer_impl.cc
+index c52c7cad46..86acafdf79 100644
+--- a/ui/events/gestures/gesture_recognizer_impl.cc
++++ b/ui/events/gestures/gesture_recognizer_impl.cc
+@@ -12,6 +12,7 @@
+ 
+ #include "base/check.h"
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/memory/ptr_util.h"
+ #include "base/memory/raw_ptr.h"
+ #include "base/time/time.h"
+diff --git a/ui/events/keyboard_hook_base.cc b/ui/events/keyboard_hook_base.cc
+index 2197228d0f..46cdc7e30e 100644
+--- a/ui/events/keyboard_hook_base.cc
++++ b/ui/events/keyboard_hook_base.cc
+@@ -6,6 +6,7 @@
+ 
+ #include <utility>
+ 
++#include "base/containers/contains.h"
+ #include "base/notimplemented.h"
+ #include "ui/events/event.h"
+ #include "ui/events/keycodes/dom/dom_code.h"
+@@ -35,7 +36,7 @@ bool KeyboardHookBase::ShouldCaptureKeyEvent(DomCode dom_code) const {
+   if (dom_code == DomCode::NONE)
+     return false;
+ 
+-  return !dom_codes_ || dom_codes_.value().contains(dom_code);
++  return !dom_codes_ || base::Contains(dom_codes_.value(), dom_code);
+ }
+ 
+ void KeyboardHookBase::ForwardCapturedKeyEvent(KeyEvent* event) {
+diff --git a/ui/events/ozone/chromeos/cursor_controller.cc b/ui/events/ozone/chromeos/cursor_controller.cc
+index bc43cf2526..df36398730 100644
+--- a/ui/events/ozone/chromeos/cursor_controller.cc
++++ b/ui/events/ozone/chromeos/cursor_controller.cc
+@@ -5,6 +5,7 @@
+ #include "ui/events/ozone/chromeos/cursor_controller.h"
+ 
+ #include "base/check.h"
++#include "base/containers/contains.h"
+ 
+ namespace ui {
+ 
+diff --git a/ui/events/ozone/evdev/event_converter_evdev_impl.cc b/ui/events/ozone/evdev/event_converter_evdev_impl.cc
+index 0ad3f73f9c..e3795d4aa4 100644
+--- a/ui/events/ozone/evdev/event_converter_evdev_impl.cc
++++ b/ui/events/ozone/evdev/event_converter_evdev_impl.cc
+@@ -8,9 +8,8 @@
+ #include <linux/input.h>
+ #include <stddef.h>
+ 
+-#include <algorithm>
+-
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/logging.h"
+ #include "base/trace_event/trace_event.h"
+ #include "ui/events/devices/stylus_state.h"
+@@ -294,7 +293,7 @@ void EventConverterEvdevImpl::OnKeyChange(unsigned int key,
+ 
+   // Block all modifiers from continuing down stream from this device if the
+   // flag is set.
+-  if (block_modifiers_ && std::ranges::contains(kModifierEvdevCodes, key)) {
++  if (block_modifiers_ && base::Contains(kModifierEvdevCodes, key)) {
+     return;
+   }
+ 
+diff --git a/ui/events/ozone/evdev/input_device_factory_evdev.cc b/ui/events/ozone/evdev/input_device_factory_evdev.cc
+index c849a7ccad..5a8fa053f9 100644
+--- a/ui/events/ozone/evdev/input_device_factory_evdev.cc
++++ b/ui/events/ozone/evdev/input_device_factory_evdev.cc
+@@ -8,10 +8,10 @@
+ #include <linux/input.h>
+ #include <stddef.h>
+ 
+-#include <algorithm>
+ #include <utility>
+ 
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/files/scoped_file.h"
+ #include "base/functional/bind.h"
+ #include "base/memory/ptr_util.h"
+@@ -212,7 +212,7 @@ void InputDeviceFactoryEvdev::AttachInputDevice(
+         imposter_checker_->OnDeviceAdded(converters_[path].get());
+     // Check for imposters on all devices that share the same physical port.
+     for (const auto& it : converters_) {
+-      if (std::ranges::contains(ids_to_check, it.second->id()) &&
++      if (base::Contains(ids_to_check, it.second->id()) &&
+           imposter_checker_->FlagSuspectedImposter(it.second.get())) {
+         UpdateDirtyFlags(it.second.get());
+       }
+@@ -254,7 +254,7 @@ void InputDeviceFactoryEvdev::DetachInputDevice(const base::FilePath& path) {
+     // Declassify any devices as no longer imposters, if the removal of this
+     // device changes their status.
+     for (const auto& it : converters_) {
+-      if (std::ranges::contains(ids_to_check, it.second->id()) &&
++      if (base::Contains(ids_to_check, it.second->id()) &&
+           !imposter_checker_->FlagSuspectedImposter(it.second.get())) {
+         UpdateDirtyFlags(it.second.get());
+       }
+@@ -454,7 +454,7 @@ void InputDeviceFactoryEvdev::ApplyInputDeviceSettings() {
+ 
+     // Block modifiers on the current converter if the device id exists in
+     // `input_device_settings_.blocked_modifiers_devices`
+-    converter->SetBlockModifiers(std::ranges::contains(
++    converter->SetBlockModifiers(base::Contains(
+         input_device_settings_.blocked_modifiers_devices, converter->id()));
+ 
+     converter->ApplyDeviceSettings(input_device_settings_);
+diff --git a/ui/gfx/image/image_skia.cc b/ui/gfx/image/image_skia.cc
+index 1d56eed3be..47fdb763d7 100644
+--- a/ui/gfx/image/image_skia.cc
++++ b/ui/gfx/image/image_skia.cc
+@@ -14,6 +14,7 @@
+ #include "base/check.h"
+ #include "base/check_op.h"
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/memory/ptr_util.h"
+ #include "base/memory/ref_counted.h"
+ #include "base/no_destructor.h"
+@@ -263,7 +264,7 @@ std::vector<ImageSkiaRep>::const_iterator ImageSkiaStorage::FindRepresentation(
+     }
+ 
+     // If the source returned the new image, store it.
+-    if (!image.is_null() && !std::ranges::contains(image_reps_, image.scale(),
++    if (!image.is_null() && !base::Contains(image_reps_, image.scale(),
+                                                    &ImageSkiaRep::scale)) {
+       mutable_this->image_reps_.push_back(image);
+     }
+diff --git a/ui/gfx/linux/gbm_support_x11.cc b/ui/gfx/linux/gbm_support_x11.cc
+index 83362ba894..728e9dc86d 100644
+--- a/ui/gfx/linux/gbm_support_x11.cc
++++ b/ui/gfx/linux/gbm_support_x11.cc
+@@ -10,6 +10,7 @@
+ #include <algorithm>
+ #include <memory>
+ 
++#include "base/containers/contains.h"
+ #include "base/debug/crash_logging.h"
+ #include "base/logging.h"
+ #include "base/no_destructor.h"
+@@ -133,7 +134,7 @@ std::unique_ptr<GbmBuffer> GBMSupportX11::CreateBuffer(
+     LOG(ERROR) << "Can't create buffer -- gbm  device is missing.";
+     return nullptr;
+   }
+-  if (!std::ranges::contains(supported_configs_,
++  if (!base::Contains(supported_configs_,
+                              BufferUsageAndSIFormat(usage, format))) {
+     LOG(ERROR) << "Can't create buffer -- unsupported config: usage="
+                << gfx::BufferUsageToString(usage)
+diff --git a/ui/gfx/linux/test/mock_gbm_device.cc b/ui/gfx/linux/test/mock_gbm_device.cc
+index aa83e83bad..1469a2ae35 100644
+--- a/ui/gfx/linux/test/mock_gbm_device.cc
++++ b/ui/gfx/linux/test/mock_gbm_device.cc
+@@ -6,11 +6,11 @@
+ 
+ #include <xf86drm.h>
+ 
+-#include <algorithm>
+ #include <memory>
+ #include <utility>
+ 
+ #include "base/check_op.h"
++#include "base/containers/contains.h"
+ #include "base/files/file_util.h"
+ #include "base/logging.h"
+ #include "base/notimplemented.h"
+@@ -163,7 +163,7 @@ std::unique_ptr<GbmBuffer> MockGbmDevice::CreateBufferWithModifiers(
+   uint64_t format_modifier =
+       modifiers.empty() ? DRM_FORMAT_MOD_NONE : modifiers.back();
+ 
+-  if (!std::ranges::contains(supported_modifiers_, format_modifier)) {
++  if (!base::Contains(supported_modifiers_, format_modifier)) {
+     PLOG(ERROR) << "Unsupported format modifier: " << std::hex
+                 << format_modifier;
+     return nullptr;
+diff --git a/ui/gfx/render_text_harfbuzz.cc b/ui/gfx/render_text_harfbuzz.cc
+index 4baedc8b39..69c79ed4af 100644
+--- a/ui/gfx/render_text_harfbuzz.cc
++++ b/ui/gfx/render_text_harfbuzz.cc
+@@ -10,6 +10,7 @@
+ #include <string_view>
+ 
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/containers/lru_cache.h"
+ #include "base/containers/span.h"
+ #include "base/debug/alias.h"
+@@ -177,10 +178,10 @@ void ScriptSetIntersect(UChar32 codepoint, std::vector<UScriptCode>& result) {
+     return;
+   }
+ 
+-  CHECK(!std::ranges::contains(extensions, USCRIPT_INHERITED));
++  CHECK(!base::Contains(extensions, USCRIPT_INHERITED));
+ 
+   std::erase_if(result, [&](auto script) {
+-    return !std::ranges::contains(extensions, script);
++    return !base::Contains(extensions, script);
+   });
+ }
+ 
+diff --git a/ui/gfx/x/connection.cc b/ui/gfx/x/connection.cc
+index 22c797406f..7b6d10782a 100644
+--- a/ui/gfx/x/connection.cc
++++ b/ui/gfx/x/connection.cc
+@@ -13,6 +13,7 @@
+ #include "base/auto_reset.h"
+ #include "base/command_line.h"
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/memory/ptr_util.h"
+ #include "base/memory/scoped_refptr.h"
+ #include "base/no_destructor.h"
+@@ -352,7 +353,7 @@ std::string Connection::GetWmName() const {
+ bool Connection::WmSupportsHint(Atom atom) const {
+   if (WmSupportsEwmh()) {
+     auto supported = root_props_->GetAsSpan<Atom>(GetAtom("_NET_SUPPORTED"));
+-    return std::ranges::contains(supported, atom);
++    return base::Contains(supported, atom);
+   }
+   return false;
+ }
+diff --git a/ui/gfx/x/randr_output_manager.cc b/ui/gfx/x/randr_output_manager.cc
+index 6625cb0fa6..8c96cc16ee 100644
+--- a/ui/gfx/x/randr_output_manager.cc
++++ b/ui/gfx/x/randr_output_manager.cc
+@@ -11,11 +11,13 @@
+ #include <type_traits>
+ #include <utility>
+ 
++#include "base/containers/contains.h"
+ #include "base/containers/span.h"
+ #include "base/logging.h"
+ #include "base/numerics/byte_conversions.h"
+ #include "base/strings/stringprintf.h"
+ #include "base/system/sys_info.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "ui/gfx/geometry/vector2d.h"
+ #include "ui/gfx/x/connection.h"
+ #include "ui/gfx/x/x11_crtc_resizer.h"
+@@ -139,7 +141,7 @@ gfx::Size CalculateSizeInMmForGnome(const gfx::Size& dimensions,
+   // https://gitlab.gnome.org/GNOME/mutter/-/blob/main/src/backends/meta-monitor-manager.c
+   constexpr std::pair<int, int> kBadSizes[] = {
+       {16, 9}, {16, 10}, {160, 90}, {160, 100}, {1600, 900}, {1600, 1000}};
+-  if (std::ranges::contains(kBadSizes, std::pair(width_mm, height_mm))) {
++  if (base::Contains(kBadSizes, std::pair(width_mm, height_mm))) {
+     width_mm--;
+   }
+   return {width_mm, height_mm};
+@@ -396,8 +398,8 @@ void RandROutputManager::SetLayout(const RandRMonitorLayout& layout) {
+         continue;
+       }
+       resizer.AddActiveCrtc(crtc, mode, {output}, new_layout.rect());
+-      VLOG(0) << "Added display with crtc: " << std::to_underlying(crtc)
+-              << ", output: " << std::to_underlying(output);
++      VLOG(0) << "Added display with crtc: " << base::to_underlying(crtc)
++              << ", output: " << base::to_underlying(output);
+     }
+     if (i < diff.new_displays.configs.size()) {
+       LOG(WARNING) << "Failed to create "
+@@ -415,7 +417,7 @@ void RandROutputManager::SetLayout(const RandRMonitorLayout& layout) {
+       // This is not expected to happen. Disabled Outputs are not expected to
+       // have any Monitor, but |output| was found in the RRGetMonitors response,
+       // so it should have a CRTC attached.
+-      LOG(ERROR) << "No CRTC found for output: " << std::to_underlying(output);
++      LOG(ERROR) << "No CRTC found for output: " << base::to_underlying(output);
+       continue;
+     }
+     resizer.DisableCrtc(crtc);
+@@ -435,7 +437,7 @@ void RandROutputManager::SetLayout(const RandRMonitorLayout& layout) {
+     auto output = GetOutputFromContext(removed_display.context);
+     auto crtc = resizer.GetCrtcForOutput(output);
+     if (crtc == kDisabledCrtc) {
+-      LOG(ERROR) << "No CRTC found for output: " << std::to_underlying(output);
++      LOG(ERROR) << "No CRTC found for output: " << base::to_underlying(output);
+       continue;
+     }
+     resizer.DisableCrtc(crtc);
+@@ -502,7 +504,7 @@ void RandROutputManager::SetResolutionForOutput(x11::RandR::Output output,
+     // This is not expected to happen. Disabled Outputs are not expected to
+     // have any Monitor, but |output| was found in the RRGetMonitors response,
+     // so it should have a CRTC attached.
+-    LOG(ERROR) << "No CRTC found for output: " << std::to_underlying(output);
++    LOG(ERROR) << "No CRTC found for output: " << base::to_underlying(output);
+     return;
+   }
+ 
+@@ -553,7 +555,7 @@ std::string RandROutputManager::GetModeNameForOutput(
+   // The name of the mode representing the current client view resolution. This
+   // must be unique per Output, so that Outputs can be resized independently.
+   return base::StringPrintf("%s%i", output_name_prefix_.c_str(),
+-                            std::to_underlying(output));
++                            base::to_underlying(output));
+ }
+ 
+ }  // namespace x11
+diff --git a/ui/gfx/x/window_cache.cc b/ui/gfx/x/window_cache.cc
+index a627693b01..d61fd9226c 100644
+--- a/ui/gfx/x/window_cache.cc
++++ b/ui/gfx/x/window_cache.cc
+@@ -8,6 +8,7 @@
+ #include <vector>
+ 
+ #include "base/containers/adapters.h"
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/notreached.h"
+ #include "base/run_loop.h"
+@@ -269,7 +270,7 @@ void WindowCache::OnEvent(const Event& event) {
+   } else if (auto* shape = event.As<Shape::NotifyEvent>()) {
+     Window window = shape->affected_window;
+     Shape::Sk kind = shape->shape_kind;
+-    if (kind != Shape::Sk::Clip && windows_.contains(window)) {
++    if (kind != Shape::Sk::Clip && base::Contains(windows_, window)) {
+       AddRequest(connection_->shape().GetRectangles(window, kind),
+                  &WindowCache::OnGetRectanglesResponse, window, kind);
+     }
+@@ -277,7 +278,7 @@ void WindowCache::OnEvent(const Event& event) {
+ }
+ 
+ void WindowCache::AddWindow(Window window, Window parent) {
+-  if (windows_.contains(window)) {
++  if (base::Contains(windows_, window)) {
+     return;
+   }
+   WindowInfo& info = windows_[window];
+diff --git a/ui/gfx/x/x11_crtc_resizer.cc b/ui/gfx/x/x11_crtc_resizer.cc
+index a1b2bbc013..51db6c7cfc 100644
+--- a/ui/gfx/x/x11_crtc_resizer.cc
++++ b/ui/gfx/x/x11_crtc_resizer.cc
+@@ -11,6 +11,7 @@
+ 
+ #include "base/check.h"
+ #include "base/containers/adapters.h"
++#include "base/containers/contains.h"
+ #include "base/logging.h"
+ #include "base/stl_util.h"
+ #include "ui/gfx/geometry/vector2d.h"
+@@ -117,7 +118,7 @@ x11::RandR::Crtc X11CrtcResizer::GetCrtcForOutput(
+   // but this should never occur with Xorg+video-dummy.
+   auto iter =
+       std::ranges::find_if(active_crtcs_, [output](const CrtcInfo& crtc_info) {
+-        return std::ranges::contains(crtc_info.outputs, output);
++        return base::Contains(crtc_info.outputs, output);
+       });
+   if (iter == active_crtcs_.end()) {
+     return kDisabledCrtc;
+diff --git a/ui/gl/gl_display.cc b/ui/gl/gl_display.cc
+index 83fd49846e..f0501e7149 100644
+--- a/ui/gl/gl_display.cc
++++ b/ui/gl/gl_display.cc
+@@ -9,6 +9,7 @@
+ #include <vector>
+ 
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/debug/crash_logging.h"
+ #include "base/export_template.h"
+ #include "base/logging.h"
+diff --git a/ui/gl/gl_gl_api_implementation.cc b/ui/gl/gl_gl_api_implementation.cc
+index 6e785fafa2..512d9d4a6f 100644
+--- a/ui/gl/gl_gl_api_implementation.cc
++++ b/ui/gl/gl_gl_api_implementation.cc
+@@ -8,6 +8,7 @@
+ #include <vector>
+ 
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/strings/string_split.h"
+ #include "base/strings/string_util.h"
+ #include "ui/gl/gl_context.h"
+diff --git a/ui/gl/gl_implementation.cc b/ui/gl/gl_implementation.cc
+index 5f2a5e965b..d6c0fb9919 100644
+--- a/ui/gl/gl_implementation.cc
++++ b/ui/gl/gl_implementation.cc
+@@ -16,6 +16,7 @@
+ #include "base/at_exit.h"
+ #include "base/command_line.h"
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/logging.h"
+ #include "base/strings/string_split.h"
+ #include "base/strings/string_util.h"
+@@ -473,7 +474,7 @@ std::string FilterGLExtensionList(
+       extensions, " ", base::TRIM_WHITESPACE, base::SPLIT_WANT_ALL);
+ 
+   auto is_disabled = [&disabled_extensions](std::string_view ext) {
+-    return std::ranges::contains(disabled_extensions, ext);
++    return base::Contains(disabled_extensions, ext);
+   };
+   std::erase_if(extension_vec, is_disabled);
+ 
+diff --git a/ui/gl/gl_surface_egl_x11.cc b/ui/gl/gl_surface_egl_x11.cc
+index 3a6401b222..992d35a07f 100644
+--- a/ui/gl/gl_surface_egl_x11.cc
++++ b/ui/gl/gl_surface_egl_x11.cc
+@@ -6,6 +6,7 @@
+ 
+ #include <algorithm>
+ 
++#include "base/containers/contains.h"
+ #include "ui/base/x/x11_util.h"
+ #include "ui/base/x/x11_xrandr_interval_only_vsync_provider.h"
+ #include "ui/gfx/frame_data.h"
+@@ -96,7 +97,7 @@ void NativeViewGLSurfaceEGLX11::OnEvent(const x11::Event& x11_event) {
+   // When ANGLE is used for EGL, it creates an X11 child window. Expose events
+   // from this window need to be forwarded to this class.
+   auto* expose = x11_event.As<x11::ExposeEvent>();
+-  if (!expose || !std::ranges::contains(children_, expose->window)) {
++  if (!expose || !base::Contains(children_, expose->window)) {
+     return;
+   }
+ 
+diff --git a/ui/gl/init/gl_display_initializer.cc b/ui/gl/init/gl_display_initializer.cc
+index 9bfadaacbf..1245385328 100644
+--- a/ui/gl/init/gl_display_initializer.cc
++++ b/ui/gl/init/gl_display_initializer.cc
+@@ -7,6 +7,7 @@
+ #include <algorithm>
+ 
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/trace_event/trace_event.h"
+ #include "ui/gl/gl_bindings.h"
+ #include "ui/gl/gl_features.h"
+@@ -21,7 +22,7 @@ namespace {
+ void AddInitDisplay(std::vector<DisplayType>* init_displays,
+                     DisplayType display_type) {
+   // Make sure to not add the same display type twice.
+-  if (!std::ranges::contains(*init_displays, display_type)) {
++  if (!base::Contains(*init_displays, display_type)) {
+     init_displays->push_back(display_type);
+   }
+ }
+diff --git a/ui/gtk/gtk_ui.cc b/ui/gtk/gtk_ui.cc
+index 066dcd9965..0d5191d941 100644
+--- a/ui/gtk/gtk_ui.cc
++++ b/ui/gtk/gtk_ui.cc
+@@ -19,6 +19,7 @@
+ 
+ #include "base/command_line.h"
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/containers/flat_map.h"
+ #include "base/debug/leak_annotations.h"
+ #include "base/environment.h"
+@@ -888,13 +889,13 @@ void GtkUi::OnMonitorsChanged(GListModel* list,
+   std::unordered_set<GdkMonitor*> monitors;
+   for (size_t i = 0; i < n_monitors; ++i) {
+     auto* monitor = static_cast<GdkMonitor*>(g_list_model_get_item(list, i));
+-    if (!monitor_signals_.contains(monitor)) {
++    if (!base::Contains(monitor_signals_, monitor)) {
+       TrackMonitor(monitor);
+     }
+     monitors.insert(monitor);
+   }
+   std::erase_if(monitor_signals_, [&](const auto& pair) {
+-    return !monitors.contains(pair.first);
++    return !base::Contains(monitors, pair.first);
+   });
+   UpdateDeviceScaleFactor();
+ }
+diff --git a/ui/gtk/os_settings_provider_gtk.cc b/ui/gtk/os_settings_provider_gtk.cc
+index 2bbc4f519d..e6992b7ed3 100644
+--- a/ui/gtk/os_settings_provider_gtk.cc
++++ b/ui/gtk/os_settings_provider_gtk.cc
+@@ -9,6 +9,7 @@
+ 
+ #include <string>
+ 
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/strings/string_util.h"
+ #include "base/time/time.h"
+@@ -48,8 +49,8 @@ ui::NativeTheme::PreferredContrast OsSettingsProviderGtk::PreferredContrast()
+   const std::string theme_name =
+       base::ToLowerASCII(GetGtkSettingsStringProperty(
+           gtk_settings_get_default(), "gtk-theme-name"));
+-  const bool high_contrast =
+-      theme_name.contains("high") && theme_name.contains("contrast");
++  const bool high_contrast = base::Contains(theme_name, "high") &&
++                             base::Contains(theme_name, "contrast");
+   return high_contrast ? ui::NativeTheme::PreferredContrast::kMore
+                        : ui::NativeTheme::PreferredContrast::kNoPreference;
+ }
+diff --git a/ui/message_center/message_center_impl.cc b/ui/message_center/message_center_impl.cc
+index bf4d35853b..0cd4eac261 100644
+--- a/ui/message_center/message_center_impl.cc
++++ b/ui/message_center/message_center_impl.cc
+@@ -13,6 +13,7 @@
+ 
+ #include "ash/constants/ash_features.h"
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/observer_list.h"
+ #include "base/strings/string_util.h"
+@@ -107,7 +108,7 @@ void MessageCenterImpl::RemoveObserver(MessageCenterObserver* observer) {
+ 
+ void MessageCenterImpl::AddNotificationBlocker(NotificationBlocker* blocker) {
+   DCHECK_CALLED_ON_VALID_THREAD(thread_checker_);
+-  if (std::ranges::contains(blockers_, blocker)) {
++  if (base::Contains(blockers_, blocker)) {
+     return;
+   }
+ 
+diff --git a/ui/message_center/popup_timers_controller.cc b/ui/message_center/popup_timers_controller.cc
+index 521442f3e4..ae1093e894 100644
+--- a/ui/message_center/popup_timers_controller.cc
++++ b/ui/message_center/popup_timers_controller.cc
+@@ -7,6 +7,7 @@
+ #include <algorithm>
+ #include <memory>
+ 
++#include "base/containers/contains.h"
+ #include "ui/base/ui_base_features.h"
+ #include "ui/message_center/public/cpp/message_center_constants.h"
+ #include "ui/message_center/public/cpp/notification_types.h"
+@@ -92,7 +93,7 @@ void PopupTimersController::CancelAll() {
+ }
+ 
+ void PopupTimersController::TimerFinished(const std::string& id) {
+-  if (!popup_timers_.contains(id))
++  if (!base::Contains(popup_timers_, id))
+     return;
+ 
+   CancelTimer(id);
+diff --git a/ui/native_theme/native_theme.cc b/ui/native_theme/native_theme.cc
+index 3deaaa6810..c53ca6989c 100644
+--- a/ui/native_theme/native_theme.cc
++++ b/ui/native_theme/native_theme.cc
+@@ -317,8 +317,10 @@ void NativeTheme::Paint(cc::PaintCanvas* canvas,
+        preferred_color_scheme() == PreferredColorScheme::kDark);
+ 
+   // Form control accents shouldn't be drawn with any transparency.
+-  const std::optional<SkColor> accent_color_opaque = accent_color.transform(
+-      [](SkColor c) { return SkColorSetA(c, SK_AlphaOPAQUE); });
++  const std::optional<SkColor> accent_color_opaque =
++      accent_color.has_value() ? std::make_optional(SkColorSetA(
++                                     accent_color.value(), SK_AlphaOPAQUE))
++                               : std::nullopt;
+ 
+   gfx::Canvas gfx_canvas(canvas, 1.0f);
+   gfx::ScopedCanvas scoped_canvas(&gfx_canvas);
+diff --git a/ui/native_theme/os_settings_provider.cc b/ui/native_theme/os_settings_provider.cc
+index bd1e6f78da..ce54c02f9e 100644
+--- a/ui/native_theme/os_settings_provider.cc
++++ b/ui/native_theme/os_settings_provider.cc
+@@ -16,6 +16,7 @@
+ #include "base/no_destructor.h"
+ #include "base/sequence_checker.h"
+ #include "base/time/time.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "build/build_config.h"
+ #include "third_party/skia/include/core/SkColor.h"
+ #include "ui/color/color_provider_key.h"
+@@ -53,9 +54,9 @@ std::forward_list<OsSettingsProvider*>& GetOsSettingsProviders(
+ 
+   static base::NoDestructor<std::array<
+       std::forward_list<OsSettingsProvider*>,
+-      std::to_underlying(OsSettingsProvider::PriorityLevel::kLast) + 1>>
++      base::to_underlying(OsSettingsProvider::PriorityLevel::kLast) + 1>>
+       s_providers;
+-  return (*s_providers)[std::to_underlying(priority_level)];
++  return (*s_providers)[base::to_underlying(priority_level)];
+ }
+ 
+ // Returns the global list of callbacks to notify on setting changes. This is
+@@ -102,7 +103,7 @@ OsSettingsProvider::~OsSettingsProvider() {
+ OsSettingsProvider& OsSettingsProvider::Get() {
+   // Return any higher-than-production-priority providers first.
+   for (auto i = PriorityLevel::kLast; i > PriorityLevel::kProduction;
+-       i = static_cast<PriorityLevel>(std::to_underlying(i) - 1)) {
++       i = static_cast<PriorityLevel>(base::to_underlying(i) - 1)) {
+     if (const auto& providers = GetOsSettingsProviders(i); !providers.empty()) {
+       return *providers.front();
+     }
+diff --git a/ui/ozone/common/base_keyboard_hook.cc b/ui/ozone/common/base_keyboard_hook.cc
+index 90dc9d4ebd..5c7f986151 100644
+--- a/ui/ozone/common/base_keyboard_hook.cc
++++ b/ui/ozone/common/base_keyboard_hook.cc
+@@ -6,6 +6,7 @@
+ 
+ #include <utility>
+ 
++#include "base/containers/contains.h"
+ #include "ui/events/keycodes/dom/dom_code.h"
+ 
+ namespace ui {
+@@ -28,7 +29,7 @@ bool BaseKeyboardHook::ShouldCaptureKeyEvent(DomCode dom_code) const {
+   if (dom_code == DomCode::NONE)
+     return false;
+ 
+-  return !dom_codes_ || dom_codes_.value().contains(dom_code);
++  return !dom_codes_ || base::Contains(dom_codes_.value(), dom_code);
+ }
+ 
+ void BaseKeyboardHook::ForwardCapturedKeyEvent(KeyEvent* event) {
+diff --git a/ui/ozone/platform/drm/gpu/drm_device_manager.cc b/ui/ozone/platform/drm/gpu/drm_device_manager.cc
+index c1ccd04fe3..fff890e8c3 100644
+--- a/ui/ozone/platform/drm/gpu/drm_device_manager.cc
++++ b/ui/ozone/platform/drm/gpu/drm_device_manager.cc
+@@ -8,6 +8,7 @@
+ #include <memory>
+ #include <utility>
+ 
++#include "base/containers/contains.h"
+ #include "base/logging.h"
+ #include "ui/ozone/platform/drm/gpu/drm_device.h"
+ #include "ui/ozone/platform/drm/gpu/drm_device_generator.h"
+@@ -24,7 +25,7 @@ DrmDeviceManager::~DrmDeviceManager() {
+ 
+ bool DrmDeviceManager::AddDrmDevice(const base::FilePath& path,
+                                     base::ScopedFD fd) {
+-  if (std::ranges::contains(devices_, path, &DrmDevice::device_path)) {
++  if (base::Contains(devices_, path, &DrmDevice::device_path)) {
+     VLOG(2) << "Got request to add existing device: " << path.value();
+     return false;
+   }
+diff --git a/ui/ozone/platform/drm/gpu/drm_framebuffer.cc b/ui/ozone/platform/drm/gpu/drm_framebuffer.cc
+index d9f9981017..f114af85ad 100644
+--- a/ui/ozone/platform/drm/gpu/drm_framebuffer.cc
++++ b/ui/ozone/platform/drm/gpu/drm_framebuffer.cc
+@@ -4,10 +4,10 @@
+ 
+ #include "ui/ozone/platform/drm/gpu/drm_framebuffer.h"
+ 
+-#include <algorithm>
+ #include <utility>
+ 
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/logging.h"
+ #include "ui/gfx/linux/drm_util_linux.h"
+ #include "ui/gfx/linux/gbm_buffer.h"
+@@ -29,13 +29,13 @@ bool ForceUsingOpaqueFormatWorkaround(
+       DRM_FORMAT_ARGB2101010, DRM_FORMAT_ABGR2101010, DRM_FORMAT_RGBA1010102,
+       DRM_FORMAT_BGRA1010102};
+   const bool is_high_bit_depth_format_with_alpha =
+-      std::ranges::contains(kHighBitDepthARGBFormats, drm_fourcc);
++      base::Contains(kHighBitDepthARGBFormats, drm_fourcc);
+   if (!is_high_bit_depth_format_with_alpha)
+     return false;
+ 
+   const std::vector<uint32_t>& supported_formats =
+       drm_device->plane_manager()->GetSupportedFormats();
+-  return !std::ranges::contains(supported_formats, drm_fourcc);
++  return !base::Contains(supported_formats, drm_fourcc);
+ }
+ 
+ }  // namespace
+diff --git a/ui/ozone/platform/drm/gpu/drm_gpu_display_manager.cc b/ui/ozone/platform/drm/gpu/drm_gpu_display_manager.cc
+index a8994855e6..3764efea7a 100644
+--- a/ui/ozone/platform/drm/gpu/drm_gpu_display_manager.cc
++++ b/ui/ozone/platform/drm/gpu/drm_gpu_display_manager.cc
+@@ -14,6 +14,7 @@
+ #include <vector>
+ 
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/containers/flat_map.h"
+ #include "base/logging.h"
+ #include "base/memory/raw_ptr.h"
+@@ -334,11 +335,11 @@ MovableDisplaySnapshots DrmGpuDisplayManager::GetDisplays() {
+     // Make sure that the display infos we got have valid connector IDs.
+     // If not, we need to remove the display info from the list. This removes
+     // any zombie connectors.
+-    std::erase_if(display_infos,
+-                  [&valid_connector_ids](const auto& display_info) {
+-                    return !valid_connector_ids.contains(
+-                        display_info->connector()->connector_id);
+-                  });
++    std::erase_if(
++        display_infos, [&valid_connector_ids](const auto& display_info) {
++          return !base::Contains(valid_connector_ids,
++                                 display_info->connector()->connector_id);
++        });
+ 
+     // Consolidate all display infos that belong to the same tiled display into
+     // one.
+diff --git a/ui/ozone/platform/drm/gpu/fake_drm_device.cc b/ui/ozone/platform/drm/gpu/fake_drm_device.cc
+index cb25829b44..485cc217e2 100644
+--- a/ui/ozone/platform/drm/gpu/fake_drm_device.cc
++++ b/ui/ozone/platform/drm/gpu/fake_drm_device.cc
+@@ -9,6 +9,7 @@
+ 
+ #include "base/check.h"
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/logging.h"
+ #include "skia/ext/legacy_display_globals.h"
+ #include "testing/gtest/include/gtest/gtest.h"
+@@ -134,7 +135,7 @@ uint32_t GetUniqueNumber() {
+ }
+ 
+ bool IsPropertyValueBlob(uint32_t prop_id) {
+-  return std::ranges::contains(kBlobPropertyIds, prop_id);
++  return base::Contains(kBlobPropertyIds, prop_id);
+ }
+ 
+ }  // namespace
+@@ -297,7 +298,7 @@ FakeDrmDevice::PlaneProperties& FakeDrmDevice::AddPlane(
+ 
+   size_t crtc_mask = 0u;
+   for (size_t i = 0; i < drm_state_.crtc_properties.size(); ++i) {
+-    if (std::ranges::contains(crtc_ids, drm_state_.crtc_properties[i].id)) {
++    if (base::Contains(crtc_ids, drm_state_.crtc_properties[i].id)) {
+       crtc_mask |= (1 << i);
+     }
+   }
+@@ -1089,9 +1090,8 @@ bool FakeDrmDevice::ValidatePropertyValue(uint32_t id, uint64_t value) {
+ 
+   std::vector<std::string> blob_properties = {"CTM", "DEGAMMA_LUT", "GAMMA_LUT",
+                                               "PLANE_CTM"};
+-  if (std::ranges::contains(blob_properties, it->second)) {
++  if (base::Contains(blob_properties, it->second))
+     return allocated_blobs_.contains(value);
+-  }
+ 
+   return true;
+ }
+diff --git a/ui/ozone/platform/drm/gpu/hardware_display_plane_manager_atomic.cc b/ui/ozone/platform/drm/gpu/hardware_display_plane_manager_atomic.cc
+index 114a955908..cf8ada8891 100644
+--- a/ui/ozone/platform/drm/gpu/hardware_display_plane_manager_atomic.cc
++++ b/ui/ozone/platform/drm/gpu/hardware_display_plane_manager_atomic.cc
+@@ -8,12 +8,12 @@
+ #include <xf86drm.h>
+ #include <xf86drmMode.h>
+ 
+-#include <algorithm>
+ #include <memory>
+ #include <sstream>
+ #include <utility>
+ 
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/containers/flat_set.h"
+ #include "base/files/platform_file.h"
+ #include "base/functional/bind.h"
+@@ -145,7 +145,7 @@ bool ResetPlanePropsIfUnused(
+   // current frames must be checked, not just the current |plane_list| as
+   // the plane might have migrated to another CRTC.
+   for (HardwareDisplayPlaneList* plane_list : plane_lists) {
+-    if (std::ranges::contains(plane_list->plane_list, plane)) {
++    if (base::Contains(plane_list->plane_list, plane)) {
+       return false;
+     }
+   }
+diff --git a/ui/ozone/platform/drm/gpu/hardware_display_plane_manager_legacy.cc b/ui/ozone/platform/drm/gpu/hardware_display_plane_manager_legacy.cc
+index 27fa0a5f80..676395df7f 100644
+--- a/ui/ozone/platform/drm/gpu/hardware_display_plane_manager_legacy.cc
++++ b/ui/ozone/platform/drm/gpu/hardware_display_plane_manager_legacy.cc
+@@ -6,11 +6,11 @@
+ 
+ #include <errno.h>
+ 
+-#include <algorithm>
+ #include <memory>
+ #include <utility>
+ 
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/logging.h"
+ #include "base/posix/eintr_wrapper.h"
+@@ -153,9 +153,9 @@ bool HardwareDisplayPlaneManagerLegacy::TestSeamlessMode(
+ bool HardwareDisplayPlaneManagerLegacy::DisableOverlayPlanes(
+     HardwareDisplayPlaneList* plane_list) {
+   // We're never going to ship legacy pageflip with overlays enabled.
+-  DCHECK(!std::ranges::contains(plane_list->old_plane_list,
+-                                static_cast<uint32_t>(DRM_PLANE_TYPE_OVERLAY),
+-                                &HardwareDisplayPlane::type));
++  DCHECK(!base::Contains(plane_list->old_plane_list,
++                         static_cast<uint32_t>(DRM_PLANE_TYPE_OVERLAY),
++                         &HardwareDisplayPlane::type));
+   return true;
+ }
+ 
+diff --git a/ui/ozone/platform/wayland/gpu/wayland_buffer_manager_gpu.cc b/ui/ozone/platform/wayland/gpu/wayland_buffer_manager_gpu.cc
+index c553d6503a..7cd5c5e49a 100644
+--- a/ui/ozone/platform/wayland/gpu/wayland_buffer_manager_gpu.cc
++++ b/ui/ozone/platform/wayland/gpu/wayland_buffer_manager_gpu.cc
+@@ -6,9 +6,9 @@
+ 
+ #include <drm_fourcc.h>
+ 
+-#include <algorithm>
+ #include <utility>
+ 
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/process/process.h"
+ #include "base/task/current_thread.h"
+@@ -365,7 +365,7 @@ bool WaylandBufferManagerGpu::AllowsImplicitModifierForFormat(
+     viz::SharedImageFormat format) const {
+   auto it = supported_formats_with_modifiers_.find(format);
+   if (it != supported_formats_with_modifiers_.end()) {
+-    return std::ranges::contains(it->second, DRM_FORMAT_MOD_INVALID);
++    return base::Contains(it->second, DRM_FORMAT_MOD_INVALID);
+   }
+   return false;
+ }
+diff --git a/ui/ozone/platform/wayland/gpu/wayland_canvas_surface.cc b/ui/ozone/platform/wayland/gpu/wayland_canvas_surface.cc
+index 13b72eea29..eff0df8513 100644
+--- a/ui/ozone/platform/wayland/gpu/wayland_canvas_surface.cc
++++ b/ui/ozone/platform/wayland/gpu/wayland_canvas_surface.cc
+@@ -7,6 +7,7 @@
+ #include <memory>
+ #include <utility>
+ 
++#include "base/containers/contains.h"
+ #include "base/files/scoped_file.h"
+ #include "base/memory/raw_ptr.h"
+ #include "base/memory/shared_memory_mapping.h"
+diff --git a/ui/ozone/platform/wayland/gpu/wayland_gl_egl_utility.cc b/ui/ozone/platform/wayland/gpu/wayland_gl_egl_utility.cc
+index 694e78926d..a85c4bc0cb 100644
+--- a/ui/ozone/platform/wayland/gpu/wayland_gl_egl_utility.cc
++++ b/ui/ozone/platform/wayland/gpu/wayland_gl_egl_utility.cc
+@@ -4,7 +4,7 @@
+ 
+ #include "ui/ozone/platform/wayland/gpu/wayland_gl_egl_utility.h"
+ 
+-#include <algorithm>
++#include "base/containers/contains.h"
+ 
+ // From ANGLE's egl/eglext.h. Follows the same approach as in
+ // ui/gl/gl_surface_egl.cc
+@@ -49,8 +49,8 @@ WaylandGLEGLUtility::~WaylandGLEGLUtility() = default;
+ void WaylandGLEGLUtility::GetAdditionalEGLAttributes(
+     EGLenum platform_type,
+     std::vector<EGLAttrib>* display_attributes) {
+-  if (std::ranges::contains(*display_attributes,
+-                            EGL_PLATFORM_ANGLE_DEVICE_TYPE_SWIFTSHADER_ANGLE)) {
++  if (base::Contains(*display_attributes,
++                     EGL_PLATFORM_ANGLE_DEVICE_TYPE_SWIFTSHADER_ANGLE)) {
+     display_attributes->push_back(
+         EGL_PLATFORM_ANGLE_NATIVE_PLATFORM_TYPE_ANGLE);
+     display_attributes->push_back(
+diff --git a/ui/ozone/platform/wayland/host/gtk_primary_selection_offer.cc b/ui/ozone/platform/wayland/host/gtk_primary_selection_offer.cc
+index e92520182a..84bbee3844 100644
+--- a/ui/ozone/platform/wayland/host/gtk_primary_selection_offer.cc
++++ b/ui/ozone/platform/wayland/host/gtk_primary_selection_offer.cc
+@@ -6,8 +6,7 @@
+ 
+ #include <gtk-primary-selection-client-protocol.h>
+ 
+-#include <algorithm>
+-
++#include "base/containers/contains.h"
+ #include "base/files/file_util.h"
+ #include "ui/base/clipboard/clipboard_constants.h"
+ 
+@@ -27,9 +26,8 @@ GtkPrimarySelectionOffer::~GtkPrimarySelectionOffer() {
+ }
+ 
+ base::ScopedFD GtkPrimarySelectionOffer::Receive(const std::string& mime_type) {
+-  if (!std::ranges::contains(mime_types(), mime_type)) {
++  if (!base::Contains(mime_types(), mime_type))
+     return base::ScopedFD();
+-  }
+ 
+   base::ScopedFD read_fd;
+   base::ScopedFD write_fd;
+diff --git a/ui/ozone/platform/wayland/host/wayland_data_offer.cc b/ui/ozone/platform/wayland/host/wayland_data_offer.cc
+index a8db0061a2..70d265108e 100644
+--- a/ui/ozone/platform/wayland/host/wayland_data_offer.cc
++++ b/ui/ozone/platform/wayland/host/wayland_data_offer.cc
+@@ -4,9 +4,8 @@
+ 
+ #include "ui/ozone/platform/wayland/host/wayland_data_offer.h"
+ 
+-#include <algorithm>
+-
+ #include "base/check.h"
++#include "base/containers/contains.h"
+ #include "base/files/file_util.h"
+ #include "ui/base/clipboard/clipboard_constants.h"
+ 
+@@ -39,9 +38,8 @@ void WaylandDataOffer::Reject(uint32_t serial) {
+ }
+ 
+ base::ScopedFD WaylandDataOffer::Receive(const std::string& mime_type) {
+-  if (!std::ranges::contains(mime_types(), mime_type)) {
++  if (!base::Contains(mime_types(), mime_type))
+     return base::ScopedFD();
+-  }
+ 
+   base::ScopedFD read_fd;
+   base::ScopedFD write_fd;
+diff --git a/ui/ozone/platform/wayland/host/wayland_data_offer_base.cc b/ui/ozone/platform/wayland/host/wayland_data_offer_base.cc
+index 1d3498a987..bcf2ead397 100644
+--- a/ui/ozone/platform/wayland/host/wayland_data_offer_base.cc
++++ b/ui/ozone/platform/wayland/host/wayland_data_offer_base.cc
+@@ -6,6 +6,7 @@
+ 
+ #include <algorithm>
+ 
++#include "base/containers/contains.h"
+ #include "ui/base/clipboard/clipboard_constants.h"
+ 
+ namespace ui {
+@@ -14,7 +15,7 @@ WaylandDataOfferBase::WaylandDataOfferBase() = default;
+ WaylandDataOfferBase::~WaylandDataOfferBase() = default;
+ 
+ void WaylandDataOfferBase::EnsureTextMimeTypeIfNeeded() {
+-  if (std::ranges::contains(mime_types_, kMimeTypePlainText)) {
++  if (base::Contains(mime_types_, kMimeTypePlainText)) {
+     return;
+   }
+ 
+diff --git a/ui/ozone/platform/wayland/host/wayland_input_method_context.cc b/ui/ozone/platform/wayland/host/wayland_input_method_context.cc
+index ced17f3874..24cb3b2c7b 100644
+--- a/ui/ozone/platform/wayland/host/wayland_input_method_context.cc
++++ b/ui/ozone/platform/wayland/host/wayland_input_method_context.cc
+@@ -4,12 +4,12 @@
+ 
+ #include "ui/ozone/platform/wayland/host/wayland_input_method_context.h"
+ 
+-#include <algorithm>
+ #include <optional>
+ #include <string>
+ #include <string_view>
+ 
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/debug/dump_without_crashing.h"
+ #include "base/environment.h"
+ #include "base/feature_list.h"
+@@ -745,7 +745,7 @@ void WaylandInputMethodContext::OnDeleteSurroundingText(int32_t index,
+   };
+   base::UTF8ToUTF16AndAdjustOffsets(base::UTF16ToUTF8(surrounding_text),
+                                     &offsets_for_adjustment);
+-  if (std::ranges::contains(offsets_for_adjustment, std::u16string::npos)) {
++  if (base::Contains(offsets_for_adjustment, std::u16string::npos)) {
+     LOG(DFATAL) << "The selection range for surrounding text is invalid.";
+     return;
+   }
+diff --git a/ui/ozone/platform/wayland/host/wayland_screen.cc b/ui/ozone/platform/wayland/host/wayland_screen.cc
+index 8049e3d187..11a1f6a0ba 100644
+--- a/ui/ozone/platform/wayland/host/wayland_screen.cc
++++ b/ui/ozone/platform/wayland/host/wayland_screen.cc
+@@ -7,6 +7,7 @@
+ #include <set>
+ #include <vector>
+ 
++#include "base/containers/contains.h"
+ #include "base/feature_list.h"
+ #include "base/notimplemented.h"
+ #include "base/observer_list.h"
+@@ -388,8 +389,8 @@ gfx::AcceleratedWidget WaylandScreen::GetLocalProcessWidgetAtPoint(
+     const gfx::Point& point,
+     const std::set<gfx::AcceleratedWidget>& ignore) const {
+   auto widget = GetAcceleratedWidgetAtScreenPoint(point);
+-  return !widget || ignore.contains(widget) ? gfx::kNullAcceleratedWidget
+-                                            : widget;
++  return !widget || base::Contains(ignore, widget) ? gfx::kNullAcceleratedWidget
++                                                   : widget;
+ }
+ 
+ display::Display WaylandScreen::GetDisplayNearestPoint(
+diff --git a/ui/ozone/platform/wayland/host/wayland_serial_tracker.cc b/ui/ozone/platform/wayland/host/wayland_serial_tracker.cc
+index 4e63e78416..75c8ca8ee3 100644
+--- a/ui/ozone/platform/wayland/host/wayland_serial_tracker.cc
++++ b/ui/ozone/platform/wayland/host/wayland_serial_tracker.cc
+@@ -8,6 +8,7 @@
+ #include <sstream>
+ #include <vector>
+ 
++#include "base/containers/contains.h"
+ #include "base/containers/fixed_flat_map.h"
+ #include "base/time/time.h"
+ 
+@@ -25,19 +26,19 @@ SerialTracker::SerialTracker()
+ SerialTracker::~SerialTracker() = default;
+ 
+ void SerialTracker::UpdateSerial(SerialType type, uint32_t serial) {
+-  DCHECK(serials_.contains(type));
++  DCHECK(base::Contains(serials_, type));
+   serials_.at(type) = {.value = serial,
+                        .type = type,
+                        .timestamp = base::TimeTicks::Now() - base_time_};
+ }
+ 
+ void SerialTracker::ResetSerial(SerialType type) {
+-  DCHECK(serials_.contains(type));
++  DCHECK(base::Contains(serials_, type));
+   serials_.at(type) = std::nullopt;
+ }
+ 
+ std::optional<Serial> SerialTracker::GetSerial(SerialType type) const {
+-  DCHECK(serials_.contains(type));
++  DCHECK(base::Contains(serials_, type));
+   return serials_.at(type);
+ }
+ 
+diff --git a/ui/ozone/platform/wayland/host/wayland_window.cc b/ui/ozone/platform/wayland/host/wayland_window.cc
+index 862cc0ea11..4ecb97d8d7 100644
+--- a/ui/ozone/platform/wayland/host/wayland_window.cc
++++ b/ui/ozone/platform/wayland/host/wayland_window.cc
+@@ -13,6 +13,7 @@
+ #include <utility>
+ 
+ #include "base/auto_reset.h"
++#include "base/containers/contains.h"
+ #include "base/feature_list.h"
+ #include "base/functional/bind.h"
+ #include "base/memory/scoped_refptr.h"
+@@ -205,7 +206,7 @@ void WaylandWindow::RemoveBubble(WaylandBubble* window) {
+ }
+ 
+ void WaylandWindow::ActivateBubble(WaylandBubble* window) {
+-  CHECK(!window || std::ranges::contains(child_bubbles_, window));
++  CHECK(!window || base::Contains(child_bubbles_, window));
+   CHECK(!window || (window->AsWaylandBubble() &&
+                     window->AsWaylandBubble()->activatable()));
+   if (active_bubble_ == window) {
+diff --git a/ui/ozone/platform/wayland/host/wayland_window_drag_controller.cc b/ui/ozone/platform/wayland/host/wayland_window_drag_controller.cc
+index e401b53202..6513052118 100644
+--- a/ui/ozone/platform/wayland/host/wayland_window_drag_controller.cc
++++ b/ui/ozone/platform/wayland/host/wayland_window_drag_controller.cc
+@@ -8,13 +8,13 @@
+ #include <wayland-client-protocol.h>
+ #include <xdg-toplevel-drag-v1-client-protocol.h>
+ 
+-#include <algorithm>
+ #include <cstdint>
+ #include <memory>
+ #include <ostream>
+ #include <utility>
+ 
+ #include "base/check.h"
++#include "base/containers/contains.h"
+ #include "base/functional/callback.h"
+ #include "base/logging.h"
+ #include "base/memory/raw_ref.h"
+@@ -346,8 +346,7 @@ void WaylandWindowDragController::OnDragEnter(WaylandWindow* window,
+   // TODO(crbug.com/40704369): Exo does not support custom mime types. In this
+   // case, |data_offer_| will hold an empty mime_types list and, at this point,
+   // it's safe just to skip the offer checks and requests here.
+-  if (!std::ranges::contains(data_offer_->mime_types(),
+-                             kMimeTypeChromiumWindow)) {
++  if (!base::Contains(data_offer_->mime_types(), kMimeTypeChromiumWindow)) {
+     DVLOG(1) << "OnEnter. No valid mime type found.";
+     return;
+   }
+diff --git a/ui/ozone/platform/wayland/host/xdg_toplevel.cc b/ui/ozone/platform/wayland/host/xdg_toplevel.cc
+index c85b59a994..01fdb7a2e9 100644
+--- a/ui/ozone/platform/wayland/host/xdg_toplevel.cc
++++ b/ui/ozone/platform/wayland/host/xdg_toplevel.cc
+@@ -8,10 +8,10 @@
+ #include <xdg-shell-client-protocol.h>
+ #include <xdg-toplevel-icon-v1-client-protocol.h>
+ 
+-#include <algorithm>
+ #include <optional>
+ 
+ #include "base/bit_cast.h"
++#include "base/containers/contains.h"
+ #include "base/logging.h"
+ #include "base/notimplemented.h"
+ #include "base/notreached.h"
+@@ -84,7 +84,7 @@ bool CheckIfWlArrayHasValue(struct wl_array* wl_array, uint32_t value) {
+   auto span =
+       UNSAFE_BUFFERS(base::span(reinterpret_cast<uint32_t*>(wl_array->data),
+                                 wl_array->size / sizeof(uint32_t)));
+-  return std::ranges::contains(span, value);
++  return base::Contains(span, value);
+ }
+ 
+ }  // namespace
+diff --git a/ui/ozone/platform/wayland/host/zwp_primary_selection_offer.cc b/ui/ozone/platform/wayland/host/zwp_primary_selection_offer.cc
+index 051eab7ce4..7ca4a7e6e8 100644
+--- a/ui/ozone/platform/wayland/host/zwp_primary_selection_offer.cc
++++ b/ui/ozone/platform/wayland/host/zwp_primary_selection_offer.cc
+@@ -10,6 +10,7 @@
+ #include <algorithm>
+ 
+ #include "base/check.h"
++#include "base/containers/contains.h"
+ #include "base/files/file_util.h"
+ #include "ui/base/clipboard/clipboard_constants.h"
+ 
+@@ -29,9 +30,8 @@ ZwpPrimarySelectionOffer::~ZwpPrimarySelectionOffer() {
+ }
+ 
+ base::ScopedFD ZwpPrimarySelectionOffer::Receive(const std::string& mime_type) {
+-  if (!std::ranges::contains(mime_types(), mime_type)) {
++  if (!base::Contains(mime_types(), mime_type))
+     return base::ScopedFD();
+-  }
+ 
+   base::ScopedFD read_fd;
+   base::ScopedFD write_fd;
+diff --git a/ui/ozone/platform/wayland/test/wayland_ozone_ui_controls_test_helper.cc b/ui/ozone/platform/wayland/test/wayland_ozone_ui_controls_test_helper.cc
+index 7df013b200..ba11773bb3 100644
+--- a/ui/ozone/platform/wayland/test/wayland_ozone_ui_controls_test_helper.cc
++++ b/ui/ozone/platform/wayland/test/wayland_ozone_ui_controls_test_helper.cc
+@@ -4,6 +4,7 @@
+ 
+ #include "ui/ozone/platform/wayland/test/wayland_ozone_ui_controls_test_helper.h"
+ 
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/memory/raw_ptr.h"
+ #include "base/run_loop.h"
+@@ -123,7 +124,7 @@ void WaylandOzoneUIControlsTestHelper::RequestProcessed(uint32_t request_id) {
+   // https://crbug.com/1443374#c3 for details.
+   wl::WaylandProxy::GetInstance()->RoundTripQueue();
+ 
+-  if (pending_closures_.contains(request_id)) {
++  if (base::Contains(pending_closures_, request_id)) {
+     if (!pending_closures_[request_id].is_null()) {
+       // PostTask to avoid re-entrancy.
+       base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
+diff --git a/ui/ozone/platform/x11/x11_window_manager.cc b/ui/ozone/platform/x11/x11_window_manager.cc
+index 1cc302fa1a..dd2e69ce10 100644
+--- a/ui/ozone/platform/x11/x11_window_manager.cc
++++ b/ui/ozone/platform/x11/x11_window_manager.cc
+@@ -4,6 +4,7 @@
+ 
+ #include "ui/ozone/platform/x11/x11_window_manager.h"
+ 
++#include "base/containers/contains.h"
+ #include "ui/ozone/platform/x11/x11_window.h"
+ 
+ namespace ui {
+@@ -66,7 +67,7 @@ void X11WindowManager::AddWindow(X11Window* window) {
+   DCHECK(window);
+   auto widget = window->GetWidget();
+   DCHECK_NE(gfx::kNullAcceleratedWidget, widget);
+-  DCHECK(!windows_.contains(widget));
++  DCHECK(!base::Contains(windows_, widget));
+   windows_.emplace(widget, window);
+ }
+ 
+diff --git a/ui/touch_selection/touch_selection_metrics.cc b/ui/touch_selection/touch_selection_metrics.cc
+index b5b2fda073..d9abf5e3d9 100644
+--- a/ui/touch_selection/touch_selection_metrics.cc
++++ b/ui/touch_selection/touch_selection_metrics.cc
+@@ -5,6 +5,7 @@
+ #include "ui/touch_selection/touch_selection_metrics.h"
+ 
+ #include "base/metrics/histogram_functions.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "ui/touch_selection/touch_editing_controller.h"
+ 
+ namespace ui {
+@@ -13,15 +14,15 @@ namespace {
+ 
+ TouchSelectionMenuAction MapCommandIdToMenuAction(int command_id) {
+   switch (command_id) {
+-    case std::to_underlying(TouchEditable::MenuCommands::kCut):
++    case base::to_underlying(TouchEditable::MenuCommands::kCut):
+       return TouchSelectionMenuAction::kCut;
+-    case std::to_underlying(TouchEditable::MenuCommands::kCopy):
++    case base::to_underlying(TouchEditable::MenuCommands::kCopy):
+       return TouchSelectionMenuAction::kCopy;
+-    case std::to_underlying(TouchEditable::MenuCommands::kPaste):
++    case base::to_underlying(TouchEditable::MenuCommands::kPaste):
+       return TouchSelectionMenuAction::kPaste;
+-    case std::to_underlying(TouchEditable::MenuCommands::kSelectAll):
++    case base::to_underlying(TouchEditable::MenuCommands::kSelectAll):
+       return TouchSelectionMenuAction::kSelectAll;
+-    case std::to_underlying(TouchEditable::MenuCommands::kSelectWord):
++    case base::to_underlying(TouchEditable::MenuCommands::kSelectWord):
+       return TouchSelectionMenuAction::kSelectWord;
+     default:
+       NOTREACHED() << "Invalid command id: " << command_id;
+diff --git a/ui/views/accessibility/ax_aura_obj_cache.cc b/ui/views/accessibility/ax_aura_obj_cache.cc
+index 97d58dbe8a..b7e5d2be94 100644
+--- a/ui/views/accessibility/ax_aura_obj_cache.cc
++++ b/ui/views/accessibility/ax_aura_obj_cache.cc
+@@ -4,10 +4,10 @@
+ 
+ #include "ui/views/accessibility/ax_aura_obj_cache.h"
+ 
+-#include <algorithm>
+ #include <utility>
+ #include <vector>
+ 
++#include "base/containers/contains.h"
+ #include "base/memory/raw_ptr.h"
+ #include "base/strings/string_util.h"
+ #include "ui/accessibility/ax_enums.mojom.h"
+@@ -328,7 +328,7 @@ void AXAuraObjCache::OnRootWindowObjCreated(aura::Window* window) {
+   }
+ 
+   // Do not allow duplicate entries.
+-  if (!std::ranges::contains(root_windows_, window)) {
++  if (!base::Contains(root_windows_, window)) {
+     root_windows_.push_back(window);
+   }
+ }
+diff --git a/ui/views/accessibility/ax_root_obj_wrapper.cc b/ui/views/accessibility/ax_root_obj_wrapper.cc
+index 49f2990323..1bccb6a144 100644
+--- a/ui/views/accessibility/ax_root_obj_wrapper.cc
++++ b/ui/views/accessibility/ax_root_obj_wrapper.cc
+@@ -4,9 +4,9 @@
+ 
+ #include "ui/views/accessibility/ax_root_obj_wrapper.h"
+ 
+-#include <algorithm>
+ #include <utility>
+ 
++#include "base/containers/contains.h"
+ #include "base/memory/raw_ptr.h"
+ #include "base/strings/utf_string_conversions.h"
+ #include "ui/accessibility/ax_enums.mojom.h"
+@@ -27,7 +27,7 @@ AXRootObjWrapper::~AXRootObjWrapper() = default;
+ bool AXRootObjWrapper::HasChild(views::AXAuraObjWrapper* child) {
+   std::vector<raw_ptr<views::AXAuraObjWrapper, VectorExperimental>> children;
+   GetChildren(&children);
+-  return std::ranges::contains(children, child);
++  return base::Contains(children, child);
+ }
+ 
+ views::AXAuraObjWrapper* AXRootObjWrapper::GetParent() {
+diff --git a/ui/views/accessibility/view_ax_platform_node_delegate_auralinux.cc b/ui/views/accessibility/view_ax_platform_node_delegate_auralinux.cc
+index 76d33cd3cf..32cd3ef2f5 100644
+--- a/ui/views/accessibility/view_ax_platform_node_delegate_auralinux.cc
++++ b/ui/views/accessibility/view_ax_platform_node_delegate_auralinux.cc
+@@ -8,6 +8,7 @@
+ #include <memory>
+ #include <vector>
+ 
++#include "base/containers/contains.h"
+ #include "base/memory/raw_ptr.h"
+ #include "base/no_destructor.h"
+ #include "base/scoped_multi_source_observation.h"
+@@ -92,7 +93,7 @@ class AuraLinuxApplication : public ui::AXPlatformNodeDelegate,
+ 
+     widget = GetToplevelWidgetIncludingTransientWindows(widget);
+     if (!widget || !widget->native_widget() ||
+-        std::ranges::contains(widgets_, widget)) {
++        base::Contains(widgets_, widget)) {
+       return;
+     }
+ 
+diff --git a/ui/views/bubble/bubble_dialog_delegate_view.cc b/ui/views/bubble/bubble_dialog_delegate_view.cc
+index 81af56588e..c506cc20ee 100644
+--- a/ui/views/bubble/bubble_dialog_delegate_view.cc
++++ b/ui/views/bubble/bubble_dialog_delegate_view.cc
+@@ -13,6 +13,7 @@
+ #include <utility>
+ #include <vector>
+ 
++#include "base/containers/contains.h"
+ #include "base/feature_list.h"
+ #include "base/functional/bind.h"
+ #include "base/memory/ptr_util.h"
+@@ -250,7 +251,7 @@ class BubbleDialogDelegate::AnchorViewObserver : public ViewObserver {
+  private:
+   void AddToAnchorVector() {
+     auto& vector = GetAnchorVector(anchor_view_);
+-    DCHECK(!std::ranges::contains(vector, parent_));
++    DCHECK(!base::Contains(vector, parent_));
+     vector.push_back(parent_);
+   }
+ 
+@@ -932,8 +933,8 @@ void BubbleDialogDelegate::BubbleUmaLogger::LogMetric(
+   }
+ 
+   if (allowed_class_names_for_testing_.has_value()) {
+-    if (!std::ranges::contains(allowed_class_names_for_testing_.value(),
+-                               bubble_name.value())) {
++    if (!base::Contains(allowed_class_names_for_testing_.value(),
++                        bubble_name.value())) {
+       return;
+     }
+   } else if (!views_metrics::IsValidBubbleName(bubble_name.value())) {
+diff --git a/ui/views/cocoa/native_widget_mac_ns_window_host.mm b/ui/views/cocoa/native_widget_mac_ns_window_host.mm
+index e40d0d5be1..5c0d4134c8 100644
+--- a/ui/views/cocoa/native_widget_mac_ns_window_host.mm
++++ b/ui/views/cocoa/native_widget_mac_ns_window_host.mm
+@@ -10,6 +10,7 @@
+ 
+ #include "base/apple/foundation_util.h"
+ #include "base/base64.h"
++#include "base/containers/contains.h"
+ #include "base/no_destructor.h"
+ #include "base/numerics/safe_conversions.h"
+ #include "base/strings/sys_string_conversions.h"
+@@ -1155,7 +1156,7 @@ bool NativeWidgetMacNSWindowHost::DispatchMonitorEvent(
+   for (auto* event_monitor : event_monitors_snapshot) {
+     // Ensure `event_monitor` was not removed from `event_monitors_` by a
+     // previous call to NativeWidgetMacEventMonitorOnEvent.
+-    if (!std::ranges::contains(event_monitors_, event_monitor)) {
++    if (!base::Contains(event_monitors_, event_monitor)) {
+       continue;
+     }
+     event_monitor->client_->NativeWidgetMacEventMonitorOnEvent(
+diff --git a/ui/views/controls/menu/menu_item_view.cc b/ui/views/controls/menu/menu_item_view.cc
+index 25653e1b0c..d34c5ae274 100644
+--- a/ui/views/controls/menu/menu_item_view.cc
++++ b/ui/views/controls/menu/menu_item_view.cc
+@@ -16,6 +16,7 @@
+ 
+ #include "base/auto_reset.h"
+ #include "base/containers/adapters.h"
++#include "base/containers/contains.h"
+ #include "base/i18n/case_conversion.h"
+ #include "base/strings/utf_string_conversions.h"
+ #include "build/build_config.h"
+@@ -1648,7 +1649,7 @@ bool MenuItemView::ShouldPaintAsSelected(PaintMode mode) const {
+ 
+ bool MenuItemView::IsScheduledForDeletion() const {
+   return parent_menu_item_ &&
+-         (std::ranges::contains(parent_menu_item_->removed_items_, this) ||
++         (base::Contains(parent_menu_item_->removed_items_, this) ||
+           parent_menu_item_->IsScheduledForDeletion());
+ }
+ 
+diff --git a/ui/views/controls/menu/submenu_view.cc b/ui/views/controls/menu/submenu_view.cc
+index f4195d0080..01dd92dd52 100644
+--- a/ui/views/controls/menu/submenu_view.cc
++++ b/ui/views/controls/menu/submenu_view.cc
+@@ -12,6 +12,7 @@
+ #include <vector>
+ 
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/numerics/safe_conversions.h"
+ #include "ui/accessibility/ax_enums.mojom.h"
+ #include "ui/accessibility/ax_node_data.h"
+@@ -118,9 +119,8 @@ void SubmenuView::UpdateMenuPartSizes() {
+       std::ranges::any_of(menu_items, &MenuItemView::HasSubmenu)) {
+     trailing_padding_ +=
+         config.arrow_size +
+-        (std::ranges::contains(menu_items,
+-                               MenuItemView::Type::kActionableSubMenu,
+-                               &MenuItemView::GetType)
++        (base::Contains(menu_items, MenuItemView::Type::kActionableSubMenu,
++                        &MenuItemView::GetType)
+              ? config.actionable_submenu_arrow_to_edge_padding
+              : config.arrow_to_edge_padding);
+   }
+diff --git a/ui/views/controls/table/table_view.cc b/ui/views/controls/table/table_view.cc
+index 385d6abde6..39026215bb 100644
+--- a/ui/views/controls/table/table_view.cc
++++ b/ui/views/controls/table/table_view.cc
+@@ -13,6 +13,7 @@
+ #include <utility>
+ 
+ #include "base/auto_reset.h"
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/functional/callback.h"
+ #include "base/i18n/rtl.h"
+@@ -495,13 +496,13 @@ void TableView::SetSortDescriptors(const SortDescriptors& sort_descriptors) {
+ }
+ 
+ bool TableView::IsColumnVisible(int id) const {
+-  return std::ranges::contains(
+-      visible_columns_, id,
+-      [](const VisibleColumn& column) { return column.column.id; });
++  return base::Contains(visible_columns_, id, [](const VisibleColumn& column) {
++    return column.column.id;
++  });
+ }
+ 
+ bool TableView::HasColumn(int id) const {
+-  return std::ranges::contains(columns_, id, &ui::TableColumn::id);
++  return base::Contains(columns_, id, &ui::TableColumn::id);
+ }
+ 
+ bool TableView::GetHasFocusIndicator() const {
+diff --git a/ui/views/controls/textfield/textfield.cc b/ui/views/controls/textfield/textfield.cc
+index 026d61a4d1..a12805697c 100644
+--- a/ui/views/controls/textfield/textfield.cc
++++ b/ui/views/controls/textfield/textfield.cc
+@@ -20,6 +20,7 @@
+ #include "base/strings/utf_string_conversions.h"
+ #include "base/time/time.h"
+ #include "base/trace_event/trace_event.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "build/build_config.h"
+ #include "ui/accessibility/ax_action_data.h"
+ #include "ui/accessibility/ax_node_data.h"
+@@ -139,11 +140,11 @@ ui::TextEditCommand GetTextEditCommandFromMenuCommand(int command_id,
+   switch (command_id) {
+     case Textfield::kUndo:
+       return ui::TextEditCommand::UNDO;
+-    case std::to_underlying(ui::TouchEditable::MenuCommands::kCut):
++    case base::to_underlying(ui::TouchEditable::MenuCommands::kCut):
+       return ui::TextEditCommand::CUT;
+-    case std::to_underlying(ui::TouchEditable::MenuCommands::kCopy):
++    case base::to_underlying(ui::TouchEditable::MenuCommands::kCopy):
+       return ui::TextEditCommand::COPY;
+-    case std::to_underlying(ui::TouchEditable::MenuCommands::kPaste):
++    case base::to_underlying(ui::TouchEditable::MenuCommands::kPaste):
+       return ui::TextEditCommand::PASTE;
+     case Textfield::kDelete:
+       // The DELETE menu action only works in case of an active selection.
+@@ -151,9 +152,9 @@ ui::TextEditCommand GetTextEditCommandFromMenuCommand(int command_id,
+         return ui::TextEditCommand::DELETE_FORWARD;
+       }
+       break;
+-    case std::to_underlying(ui::TouchEditable::MenuCommands::kSelectAll):
++    case base::to_underlying(ui::TouchEditable::MenuCommands::kSelectAll):
+       return ui::TextEditCommand::SELECT_ALL;
+-    case std::to_underlying(ui::TouchEditable::MenuCommands::kSelectWord):
++    case base::to_underlying(ui::TouchEditable::MenuCommands::kSelectWord):
+       return ui::TextEditCommand::SELECT_WORD;
+   }
+   return ui::TextEditCommand::INVALID_COMMAND;
+@@ -1592,19 +1593,19 @@ bool Textfield::GetAcceleratorForCommandId(int command_id,
+       *accelerator = ui::Accelerator(ui::VKEY_Z, ui::EF_PLATFORM_ACCELERATOR);
+       return true;
+ 
+-    case std::to_underlying(ui::TouchEditable::MenuCommands::kCut):
++    case base::to_underlying(ui::TouchEditable::MenuCommands::kCut):
+       *accelerator = ui::Accelerator(ui::VKEY_X, ui::EF_PLATFORM_ACCELERATOR);
+       return true;
+ 
+-    case std::to_underlying(ui::TouchEditable::MenuCommands::kCopy):
++    case base::to_underlying(ui::TouchEditable::MenuCommands::kCopy):
+       *accelerator = ui::Accelerator(ui::VKEY_C, ui::EF_PLATFORM_ACCELERATOR);
+       return true;
+ 
+-    case std::to_underlying(ui::TouchEditable::MenuCommands::kPaste):
++    case base::to_underlying(ui::TouchEditable::MenuCommands::kPaste):
+       *accelerator = ui::Accelerator(ui::VKEY_V, ui::EF_PLATFORM_ACCELERATOR);
+       return true;
+ 
+-    case std::to_underlying(ui::TouchEditable::MenuCommands::kSelectAll):
++    case base::to_underlying(ui::TouchEditable::MenuCommands::kSelectAll):
+       *accelerator = ui::Accelerator(ui::VKEY_A, ui::EF_PLATFORM_ACCELERATOR);
+       return true;
+ 
+@@ -1627,9 +1628,9 @@ void Textfield::ExecuteCommand(int command_id, int event_flags) {
+   if (::features::IsTouchTextEditingRedesignEnabled() &&
+       (event_flags & ui::EF_FROM_TOUCH) &&
+       (command_id ==
+-           std::to_underlying(ui::TouchEditable::MenuCommands::kSelectAll) ||
++           base::to_underlying(ui::TouchEditable::MenuCommands::kSelectAll) ||
+        command_id ==
+-           std::to_underlying(ui::TouchEditable::MenuCommands::kSelectWord))) {
++           base::to_underlying(ui::TouchEditable::MenuCommands::kSelectWord))) {
+     CreateTouchSelectionControllerAndNotifyIt();
+   }
+ }
+@@ -3052,16 +3053,16 @@ void Textfield::UpdateContextMenu() {
+   context_menu_contents_->AddItemWithStringId(kUndo, IDS_APP_UNDO);
+   context_menu_contents_->AddSeparator(ui::NORMAL_SEPARATOR);
+   context_menu_contents_->AddItemWithStringId(
+-      std::to_underlying(ui::TouchEditable::MenuCommands::kCut), IDS_APP_CUT);
++      base::to_underlying(ui::TouchEditable::MenuCommands::kCut), IDS_APP_CUT);
+   context_menu_contents_->AddItemWithStringId(
+-      std::to_underlying(ui::TouchEditable::MenuCommands::kCopy), IDS_APP_COPY);
++      base::to_underlying(ui::TouchEditable::MenuCommands::kCopy), IDS_APP_COPY);
+   context_menu_contents_->AddItemWithStringId(
+-      std::to_underlying(ui::TouchEditable::MenuCommands::kPaste),
++      base::to_underlying(ui::TouchEditable::MenuCommands::kPaste),
+       IDS_APP_PASTE);
+   context_menu_contents_->AddItemWithStringId(kDelete, IDS_APP_DELETE);
+   context_menu_contents_->AddSeparator(ui::NORMAL_SEPARATOR);
+   context_menu_contents_->AddItemWithStringId(
+-      std::to_underlying(ui::TouchEditable::MenuCommands::kSelectAll),
++      base::to_underlying(ui::TouchEditable::MenuCommands::kSelectAll),
+       IDS_APP_SELECT_ALL);
+ 
+   // If the controller adds menu commands, also override ExecuteCommand() and
+diff --git a/ui/views/controls/textfield/textfield.h b/ui/views/controls/textfield/textfield.h
+index a31c515db7..e2d3ab7f96 100644
+--- a/ui/views/controls/textfield/textfield.h
++++ b/ui/views/controls/textfield/textfield.h
+@@ -19,6 +19,7 @@
+ #include "base/memory/raw_ptr.h"
+ #include "base/memory/weak_ptr.h"
+ #include "base/timer/timer.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "build/build_config.h"
+ #include "third_party/skia/include/core/SkColor.h"
+ #include "ui/base/clipboard/clipboard_buffer.h"
+@@ -83,7 +84,7 @@ class VIEWS_EXPORT Textfield : public View,
+ 
+  public:
+   enum MenuCommands {
+-    kUndo = std::to_underlying(
++    kUndo = base::to_underlying(
+                 ui::TouchEditable::MenuCommands::kLastTouchEditableCommandId) +
+             1,
+     kDelete,
+diff --git a/ui/views/examples/examples_window.cc b/ui/views/examples/examples_window.cc
+index 8ab42a4cec..14a2edaa72 100644
+--- a/ui/views/examples/examples_window.cc
++++ b/ui/views/examples/examples_window.cc
+@@ -14,6 +14,7 @@
+ #include <vector>
+ 
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/memory/raw_ptr.h"
+ #include "base/stl_util.h"
+ #include "base/strings/strcat.h"
+@@ -72,7 +73,7 @@ ExampleVector GetExamplesToShow(ExampleVector examples) {
+     // from the list.
+     if (!valid_examples.empty()) {
+       std::erase_if(examples, [&](const auto& example) {
+-        return !std::ranges::contains(valid_examples, example->example_title());
++        return !base::Contains(valid_examples, example->example_title());
+       });
+     }
+   } else if (command_line->HasSwitch(kEnableExamples)) {
+diff --git a/ui/views/touchui/touch_selection_menu_views.cc b/ui/views/touchui/touch_selection_menu_views.cc
+index 75da5b100a..748484aa63 100644
+--- a/ui/views/touchui/touch_selection_menu_views.cc
++++ b/ui/views/touchui/touch_selection_menu_views.cc
+@@ -11,6 +11,7 @@
+ #include "base/check.h"
+ #include "base/feature_list.h"
+ #include "base/strings/utf_string_conversions.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "ui/aura/window.h"
+ #include "ui/base/l10n/l10n_util.h"
+ #include "ui/base/metadata/metadata_impl_macros.h"
+@@ -39,16 +40,16 @@ struct MenuCommand {
+ };
+ 
+ MenuCommand kMenuCommands[] = {
+-    {std::to_underlying(ui::TouchEditable::MenuCommands::kCut), IDS_APP_CUT},
+-    {std::to_underlying(ui::TouchEditable::MenuCommands::kCopy), IDS_APP_COPY},
+-    {std::to_underlying(ui::TouchEditable::MenuCommands::kPaste),
++    {base::to_underlying(ui::TouchEditable::MenuCommands::kCut), IDS_APP_CUT},
++    {base::to_underlying(ui::TouchEditable::MenuCommands::kCopy), IDS_APP_COPY},
++    {base::to_underlying(ui::TouchEditable::MenuCommands::kPaste),
+      IDS_APP_PASTE},
+ };
+ 
+ MenuCommand kMenuSelectCommands[] = {
+-    {std::to_underlying(ui::TouchEditable::MenuCommands::kSelectWord),
++    {base::to_underlying(ui::TouchEditable::MenuCommands::kSelectWord),
+      IDS_APP_SELECT},
+-    {std::to_underlying(ui::TouchEditable::MenuCommands::kSelectAll),
++    {base::to_underlying(ui::TouchEditable::MenuCommands::kSelectAll),
+      IDS_APP_SELECT_ALL},
+ };
+ 
+diff --git a/ui/views/view.cc b/ui/views/view.cc
+index 223a778312..148db40696 100644
+--- a/ui/views/view.cc
++++ b/ui/views/view.cc
+@@ -20,6 +20,7 @@
+ #include "base/check_op.h"
+ #include "base/command_line.h"
+ #include "base/containers/adapters.h"
++#include "base/containers/contains.h"
+ #include "base/containers/flat_set.h"
+ #include "base/debug/crash_logging.h"
+ #include "base/debug/dump_without_crashing.h"
+@@ -1864,7 +1865,7 @@ void View::AddAccelerator(const ui::Accelerator& accelerator) {
+     accelerators_ = std::make_unique<std::vector<ui::Accelerator>>();
+   }
+ 
+-  if (!std::ranges::contains(*accelerators_, accelerator)) {
++  if (!base::Contains(*accelerators_, accelerator)) {
+     accelerators_->push_back(accelerator);
+   }
+ 
+@@ -2663,8 +2664,7 @@ void View::AddLayerToRegionImpl(
+     ui::Layer* new_layer,
+     std::vector<raw_ptr<ui::Layer, VectorExperimental>>& layer_vector) {
+   DCHECK(new_layer);
+-  DCHECK(!std::ranges::contains(layer_vector, new_layer))
+-      << "Layer already added.";
++  DCHECK(!base::Contains(layer_vector, new_layer)) << "Layer already added.";
+ 
+   new_layer->AddObserver(this);
+   new_layer->SetVisible(GetVisible());
+diff --git a/ui/views/view.h b/ui/views/view.h
+index 6e3002f544..286cc94d3b 100644
+--- a/ui/views/view.h
++++ b/ui/views/view.h
+@@ -7,7 +7,6 @@
+ 
+ #include <stddef.h>
+ 
+-#include <algorithm>
+ #include <concepts>
+ #include <memory>
+ #include <optional>
+@@ -20,6 +19,7 @@
+ #include "base/auto_reset.h"
+ #include "base/callback_list.h"
+ #include "base/check.h"
++#include "base/containers/contains.h"
+ #include "base/functional/callback.h"
+ #include "base/gtest_prod_util.h"
+ #include "base/memory/advanced_memory_safety_checks.h"
+@@ -532,7 +532,7 @@ class VIEWS_EXPORT View : public ui::LayerDelegate,
+     CHECK(!view->owned_by_client())
+         << "This should only be called if the client doesn't already have "
+            "ownership of |view|.";
+-    DCHECK(std::ranges::contains(children_, view));
++    DCHECK(base::Contains(children_, view));
+     RemoveChildView(view);
+     return base::WrapUnique(view);
+   }
+diff --git a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
+index 17476127a1..0a2962a811 100644
+--- a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
++++ b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
+@@ -9,6 +9,7 @@
+ #include <string>
+ #include <utility>
+ 
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/memory/raw_ptr.h"
+ #include "base/notimplemented.h"
+@@ -1014,7 +1015,7 @@ void DesktopWindowTreeHostPlatform::OnCloseRequest() {
+ 
+ void DesktopWindowTreeHostPlatform::OnAcceleratedWidgetAvailable(
+     gfx::AcceleratedWidget widget) {
+-  DCHECK(!std::ranges::contains(open_windows(), widget));
++  DCHECK(!base::Contains(open_windows(), widget));
+   open_windows().push_front(widget);
+   aura::WindowTreeHostPlatform::OnAcceleratedWidgetAvailable(widget);
+ }
+diff --git a/ui/views/widget/sublevel_manager.cc b/ui/views/widget/sublevel_manager.cc
+index 99bc5f99ee..445a0b3f76 100644
+--- a/ui/views/widget/sublevel_manager.cc
++++ b/ui/views/widget/sublevel_manager.cc
+@@ -90,7 +90,7 @@ void SublevelManager::EnsureOwnerTreeSublevel() {
+ 
+ void SublevelManager::OnWidgetChildAdded(Widget* owner, Widget* child) {
+   CHECK_EQ(owner, owner_);
+-  CHECK(!std::ranges::contains(children_, child));
++  CHECK(!base::Contains(children_, child));
+   CHECK_EQ(child->parent(), owner_);
+   children_.push_back(child);
+ }
+diff --git a/ui/views/win/hwnd_message_handler_interactive_uitest.cc b/ui/views/win/hwnd_message_handler_interactive_uitest.cc
+index 576f79bd64..6d8fdc9e05 100644
+--- a/ui/views/win/hwnd_message_handler_interactive_uitest.cc
++++ b/ui/views/win/hwnd_message_handler_interactive_uitest.cc
+@@ -5,6 +5,7 @@
+ #include <algorithm>
+ #include <memory>
+ 
++#include "base/containers/contains.h"
+ #include "testing/gtest/include/gtest/gtest.h"
+ #include "ui/base/accelerators/accelerator.h"
+ #include "ui/base/ime/mock_input_method.h"
+@@ -168,7 +169,7 @@ TEST_F(HWNDMessageHandlerTest, GetOwnedWindows) {
+ 
+   std::vector<HWND> owned_windows = parent_handler->GetOwnedWindows();
+   ASSERT_EQ(1u, owned_windows.size());
+-  EXPECT_TRUE(std::ranges::contains(owned_windows, child_handler->hwnd()));
++  EXPECT_TRUE(base::Contains(owned_windows, child_handler->hwnd()));
+ 
+   child_handler->CloseNow();
+   parent_handler->CloseNow();
+@@ -208,9 +209,9 @@ TEST_F(HWNDMessageHandlerTest, GetOwnedWindows_Depth3) {
+ 
+   std::vector<HWND> owned_windows = grandparent_handler->GetOwnedWindows();
+   ASSERT_EQ(3u, owned_windows.size());
+-  EXPECT_TRUE(std::ranges::contains(owned_windows, parent1_handler->hwnd()));
+-  EXPECT_TRUE(std::ranges::contains(owned_windows, parent2_handler->hwnd()));
+-  EXPECT_TRUE(std::ranges::contains(owned_windows, child_handler->hwnd()));
++  EXPECT_TRUE(base::Contains(owned_windows, parent1_handler->hwnd()));
++  EXPECT_TRUE(base::Contains(owned_windows, parent2_handler->hwnd()));
++  EXPECT_TRUE(base::Contains(owned_windows, child_handler->hwnd()));
+ 
+   child_handler->CloseNow();
+   parent2_handler->CloseNow();
+diff --git a/ui/views/windows_stationarity_monitor_mac.mm b/ui/views/windows_stationarity_monitor_mac.mm
+index dcec028b43..c8c8d75175 100644
+--- a/ui/views/windows_stationarity_monitor_mac.mm
++++ b/ui/views/windows_stationarity_monitor_mac.mm
+@@ -6,7 +6,6 @@
+ 
+ #import <AppKit/AppKit.h>
+ 
+-#include <algorithm>
+ #include <vector>
+ 
+ #include "base/functional/bind.h"
+@@ -30,7 +29,7 @@ WindowsStationarityMonitorMac::WindowsStationarityMonitorMac()
+     // For example, if the window is a system created NSToolbarFullScreenWindow
+     // GetFromNativeWindow() will later interrogate the original NSWindow,
+     // result in a tracked widget.
+-    if (!widget || std::ranges::contains(tracked_windows_, widget)) {
++    if (!widget || base::Contains(tracked_windows_, widget)) {
+       continue;
+     }
+ 
+diff --git a/ui/wm/core/cursor_util.cc b/ui/wm/core/cursor_util.cc
+index c9d080cc26..386bebf68b 100644
+--- a/ui/wm/core/cursor_util.cc
++++ b/ui/wm/core/cursor_util.cc
+@@ -12,6 +12,7 @@
+ 
+ #include "base/check_op.h"
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/containers/flat_map.h"
+ #include "base/no_destructor.h"
+ #include "base/notreached.h"
+@@ -298,7 +299,7 @@ std::optional<ui::CursorData> GetCursorData(
+   }
+ 
+   AnimationCache& cursor_animations = GetAnimationCache();
+-  if (!cursor_animations.contains(type)) {
++  if (!base::Contains(cursor_animations, type)) {
+     // Read lottie content and create a lottie animation.
+     std::optional<std::vector<uint8_t>> lottie_bytes =
+         ui::ResourceBundle::GetSharedInstance().GetLottieData(resource_id);
+diff --git a/ui/wm/core/shadow_controller.cc b/ui/wm/core/shadow_controller.cc
+index 42e6756310..0fa1a3e4bd 100644
+--- a/ui/wm/core/shadow_controller.cc
++++ b/ui/wm/core/shadow_controller.cc
+@@ -4,10 +4,10 @@
+ 
+ #include "ui/wm/core/shadow_controller.h"
+ 
+-#include <algorithm>
+ #include <utility>
+ 
+ #include "base/check.h"
++#include "base/containers/contains.h"
+ #include "base/containers/flat_set.h"
+ #include "base/memory/raw_ptr.h"
+ #include "base/no_destructor.h"
+@@ -55,10 +55,8 @@ int GetShadowElevationForActiveState(aura::Window* window) {
+ int GetShadowElevationForWindowLosingActive(aura::Window* losing_active,
+                                             aura::Window* gaining_active) {
+   if (gaining_active && GetHideOnDeactivate(gaining_active)) {
+-    if (std::ranges::contains(GetTransientChildren(losing_active),
+-                              gaining_active)) {
++    if (base::Contains(GetTransientChildren(losing_active), gaining_active))
+       return kShadowElevationActiveWindow;
+-    }
+   }
+   return kShadowElevationInactiveWindow;
+ }
+diff --git a/ui/wm/core/transient_window_manager.cc b/ui/wm/core/transient_window_manager.cc
+index dee2eb3507..fa14366fc2 100644
+--- a/ui/wm/core/transient_window_manager.cc
++++ b/ui/wm/core/transient_window_manager.cc
+@@ -8,6 +8,7 @@
+ #include <functional>
+ 
+ #include "base/auto_reset.h"
++#include "base/containers/contains.h"
+ #include "base/memory/ptr_util.h"
+ #include "base/observer_list.h"
+ #include "ui/aura/client/transient_window_client.h"
+@@ -87,7 +88,7 @@ void TransientWindowManager::AddTransientChild(Window* child) {
+   TransientWindowManager* child_manager = GetOrCreate(child);
+   if (child_manager->transient_parent_)
+     GetOrCreate(child_manager->transient_parent_)->RemoveTransientChild(child);
+-  DCHECK(!std::ranges::contains(transient_children_, child));
++  DCHECK(!base::Contains(transient_children_, child));
+   transient_children_.push_back(child);
+   child_manager->transient_parent_ = window_;
+ 
+@@ -166,7 +167,7 @@ void TransientWindowManager::RestackTransientDescendants() {
+       Window::Windows(parent->children().rbegin(), parent->children().rend()));
+   while (!tracker.windows().empty()) {
+     auto* child_window = tracker.Pop();
+-    if (!std::ranges::contains(parent->children(), child_window)) {
++    if (!base::Contains(parent->children(), child_window)) {
+       continue;
+     }
+     if (child_window != window_ &&
+diff --git a/ui/wm/core/window_animations.cc b/ui/wm/core/window_animations.cc
+index 7cf0960524..57e1d9ddda 100644
+--- a/ui/wm/core/window_animations.cc
++++ b/ui/wm/core/window_animations.cc
+@@ -12,6 +12,7 @@
+ #include "base/check_op.h"
+ #include "base/command_line.h"
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/memory/raw_ptr.h"
+ #include "base/metrics/histogram_macros.h"
+@@ -110,9 +111,8 @@ class HidingWindowAnimationObserverBase : public aura::WindowObserver {
+       CHECK(iter != window_->parent()->children().end());
+       aura::Window* topmost_transient_child = nullptr;
+       for (++iter; iter != window_->parent()->children().end(); ++iter) {
+-        if (std::ranges::contains(transient_children, *iter)) {
++        if (base::Contains(transient_children, *iter))
+           topmost_transient_child = *iter;
+-        }
+       }
+       if (topmost_transient_child) {
+         window_->parent()->layer()->StackAbove(

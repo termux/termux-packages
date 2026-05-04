@@ -2,9 +2,8 @@ TERMUX_PKG_HOMEPAGE=https://nuetzlich.net/gocryptfs/
 TERMUX_PKG_DESCRIPTION="An encrypted overlay filesystem written in Go"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.5.4
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://github.com/rfjakob/gocryptfs/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_VERSION="2.6.1+really2.5.4"
+TERMUX_PKG_SRCURL=https://github.com/rfjakob/gocryptfs/archive/refs/tags/v${TERMUX_PKG_VERSION#*really}.tar.gz
 TERMUX_PKG_SHA256=bbdfb574ad08faed19b724022bc167b00236967c742b23c25f95f8c31837342c
 TERMUX_PKG_DEPENDS="openssl, libfuse2"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -19,7 +18,7 @@ termux_step_pre_configure() {
 termux_step_make() {
 	local GITVERSIONFUSE=$(go list -m github.com/hanwen/go-fuse/v2 | cut -d' ' -f2-)
 	local GO_LDFLAGS="-extldflags=-Wl,-rpath=$TERMUX_PREFIX/lib"
-	GO_LDFLAGS+=" -X \"main.GitVersion=v${TERMUX_PKG_VERSION#*:}\""
+	GO_LDFLAGS+=" -X \"main.GitVersion=v${TERMUX_PKG_VERSION#*really}\""
 	GO_LDFLAGS+=" -X \"main.GitVersionFuse=$GITVERSIONFUSE\""
 	GO_LDFLAGS+=" -X \"main.BuildDate=$(date +%Y-%m-%d)\""
 	go build -ldflags "$GO_LDFLAGS"

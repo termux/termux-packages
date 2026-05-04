@@ -66,3 +66,4 @@ echo
 echo "- ncurses5-compat-libs"
 echo "- makedepend"
 echo "- python2"
+echo "- lib32-c-ares"

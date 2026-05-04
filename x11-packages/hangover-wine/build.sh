@@ -3,15 +3,14 @@ TERMUX_PKG_DESCRIPTION="A compatibility layer for running Windows programs (Hang
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.OLD, COPYING.LIB"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="11.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="11.4"
 TERMUX_PKG_SRCURL=(
 	"https://github.com/AndreRH/wine/archive/refs/tags/hangover-${TERMUX_PKG_VERSION/\~/-}.tar.gz"
-	"https://github.com/AndreRH/hangover/releases/download/hangover-${TERMUX_PKG_VERSION/\~/-}/hangover_${TERMUX_PKG_VERSION/\~/-}_ubuntu2004_focal_arm64.tar"
+	"https://github.com/AndreRH/hangover/releases/download/hangover-${TERMUX_PKG_VERSION/\~/-}/hangover_${TERMUX_PKG_VERSION/\~/-}_ubuntu2204_jammy_arm64.tar"
 )
 TERMUX_PKG_SHA256=(
-	9915e4de1a75c98cc6e4ecf9da5853dcda09459046f576f953b1e9c3859ac3f5
-	f4ebd8b5a339e9f4d53f0dff26fdd4202a486ce89a8e8de05aabc3f5d40fe6e0
+	e6714947e68ee6c7ab03963752945138b60e98b8e24a41cbe8858cf06eb6946d
+	95779011771040c1b3d2aff80f57098dfde8e2902ed64b9a80a87608b7a32389
 )
 TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, opengl, pulseaudio, sdl2, vulkan-loader, xorg-xrandr"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="vulkan-loader"

@@ -1,0 +1,54 @@
+Sourced from https://github.com/panda3d/panda3d/pull/1800/
+commit 586b92a4ab124a8fc5b2a1f4a985f9fe8057ddea
+Author: Yaksh Bariya <yakshbari4@gmail.com>
+Date:   Mon Jan 12 07:03:37 2026 +0530
+
+    makepanda: fix for python >= 3.13 on android
+    
+    android is now a supported platform Python since Python 3.13.
+    Earlier logic for figuring out android is still kept to preserve
+    backwards compatibility with Python versions <= 3.12.
+    
+    Also have added a comment where we are monkeypatching sys.platform to
+    "android" to remove it once minimum python requirement is removed
+    
+    Found initially during Python bump for Termux (https://github.com/termux/termux-packages/pull/27739)
+    
+    Also seems like Pyright too hasn't caught up with this yet. So it needs
+    to be made aware as well
+
+diff --git a/makepanda/makepandacore.py b/makepanda/makepandacore.py
+index 1e32c11dd3..cfc19fb1ad 100644
+--- a/makepanda/makepandacore.py
++++ b/makepanda/makepandacore.py
+@@ -284,7 +284,7 @@ def GetHost():
+         return 'darwin'
+     elif sys.platform.startswith('linux'):
+         try:
+-            # Python seems to offer no built-in way to check this.
++            # Python versions before 3.13 reported android as "linux"
+             osname = subprocess.check_output(["uname", "-o"])
+             if osname.strip().lower() == b'android':
+                 return 'android'
+@@ -294,6 +294,9 @@ def GetHost():
+             return 'linux'
+     elif sys.platform.startswith('freebsd'):
+         return 'freebsd'
++    # Handle for Python >= 3.13
++    elif sys.platform == 'android':
++        return 'android'
+     else:
+         exit('Unrecognized sys.platform: %s' % (sys.platform))
+ 
+diff --git a/panda/src/android/site.py b/panda/src/android/site.py
+index 7c8d22e207..ac04b2bf7c 100644
+--- a/panda/src/android/site.py
++++ b/panda/src/android/site.py
+@@ -6,6 +6,7 @@ from importlib.machinery import ModuleSpec
+ 
+ from importlib import _bootstrap_external
+ 
++# This should not be needed once we bump the minimum python version requirement to 3.13
+ sys.platform = "android"
+ 
+ class AndroidExtensionFinder(MetaPathFinder):

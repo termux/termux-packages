@@ -190,10 +190,16 @@
     <property name="accessible-role" type="GtkAccessibleRole" flags="227" default-value="GTK_ACCESSIBLE_ROLE_NONE"/>
   </interface>
   <boxed name="GtkAccessibleList" get-type="gtk_accessible_list_get_type"/>
-  <interface name="GtkAccessibleRange" get-type="gtk_accessible_range_get_type">
+  <interface name="GtkAccessibleText" get-type="gtk_accessible_text_get_type">
     <prerequisite name="GtkAccessible"/>
   </interface>
-  <interface name="GtkAccessibleText" get-type="gtk_accessible_text_get_type">
+  <class name="GtkAccessibleHyperlink" get-type="gtk_accessible_hyperlink_get_type" parents="GObject">
+    <implements name="GtkAccessible"/>
+  </class>
+  <interface name="GtkAccessibleHypertext" get-type="gtk_accessible_hypertext_get_type">
+    <prerequisite name="GtkAccessible"/>
+  </interface>
+  <interface name="GtkAccessibleRange" get-type="gtk_accessible_range_get_type">
     <prerequisite name="GtkAccessible"/>
   </interface>
   <interface name="GtkActionable" get-type="gtk_actionable_get_type">
@@ -340,6 +346,8 @@
   <fundamental name="GtkClosureExpression" get-type="gtk_closure_expression_get_type" instantiatable="1" parents="GtkExpression">
   </fundamental>
   <fundamental name="GtkCClosureExpression" get-type="gtk_cclosure_expression_get_type" instantiatable="1" parents="GtkExpression">
+  </fundamental>
+  <fundamental name="GtkTryExpression" get-type="gtk_try_expression_get_type" instantiatable="1" parents="GtkExpression">
   </fundamental>
   <fundamental name="GtkParamSpecExpression" get-type="gtk_param_expression_get_type" instantiatable="1" parents="GParam">
   </fundamental>
@@ -749,6 +757,7 @@
     <member name="GTK_DEBUG_INVERT_TEXT_DIR" nick="invert-text-dir" value="524288"/>
     <member name="GTK_DEBUG_CSS" nick="css" value="1048576"/>
     <member name="GTK_DEBUG_BUILDER" nick="builder" value="2097152"/>
+    <member name="GTK_DEBUG_SESSION" nick="session" value="4194304"/>
   </flags>
   <enum name="GtkDialogError" get-type="gtk_dialog_error_get_type">
     <member name="GTK_DIALOG_ERROR_FAILED" nick="failed" value="0"/>
@@ -1070,12 +1079,12 @@
     <member name="GTK_CONSTRAINT_ATTRIBUTE_CENTER_Y" nick="center-y" value="10"/>
     <member name="GTK_CONSTRAINT_ATTRIBUTE_BASELINE" nick="baseline" value="11"/>
   </enum>  <enum name="GtkConstraintVflParserError" get-type="gtk_constraint_vfl_parser_error_get_type">
-    <member name="GTK_CONSTRAINT_VFL_PARSER_ERROR_INVALID_SYMBOL" nick="symbol" value="0"/>
-    <member name="GTK_CONSTRAINT_VFL_PARSER_ERROR_INVALID_ATTRIBUTE" nick="attribute" value="1"/>
-    <member name="GTK_CONSTRAINT_VFL_PARSER_ERROR_INVALID_VIEW" nick="view" value="2"/>
-    <member name="GTK_CONSTRAINT_VFL_PARSER_ERROR_INVALID_METRIC" nick="metric" value="3"/>
-    <member name="GTK_CONSTRAINT_VFL_PARSER_ERROR_INVALID_PRIORITY" nick="priority" value="4"/>
-    <member name="GTK_CONSTRAINT_VFL_PARSER_ERROR_INVALID_RELATION" nick="relation" value="5"/>
+    <member name="GTK_CONSTRAINT_VFL_PARSER_ERROR_INVALID_SYMBOL" nick="invalid-symbol" value="0"/>
+    <member name="GTK_CONSTRAINT_VFL_PARSER_ERROR_INVALID_ATTRIBUTE" nick="invalid-attribute" value="1"/>
+    <member name="GTK_CONSTRAINT_VFL_PARSER_ERROR_INVALID_VIEW" nick="invalid-view" value="2"/>
+    <member name="GTK_CONSTRAINT_VFL_PARSER_ERROR_INVALID_METRIC" nick="invalid-metric" value="3"/>
+    <member name="GTK_CONSTRAINT_VFL_PARSER_ERROR_INVALID_PRIORITY" nick="invalid-priority" value="4"/>
+    <member name="GTK_CONSTRAINT_VFL_PARSER_ERROR_INVALID_RELATION" nick="invalid-relation" value="5"/>
   </enum>  <enum name="GtkSystemSetting" get-type="gtk_system_setting_get_type">
     <member name="GTK_SYSTEM_SETTING_DPI" nick="dpi" value="0"/>
     <member name="GTK_SYSTEM_SETTING_FONT_NAME" nick="font-name" value="1"/>
@@ -1087,6 +1096,7 @@
     <member name="GTK_SYMBOLIC_COLOR_ERROR" nick="error" value="1"/>
     <member name="GTK_SYMBOLIC_COLOR_WARNING" nick="warning" value="2"/>
     <member name="GTK_SYMBOLIC_COLOR_SUCCESS" nick="success" value="3"/>
+    <member name="GTK_SYMBOLIC_COLOR_ACCENT" nick="accent" value="4"/>
   </enum>  <enum name="GtkAccessibleRole" get-type="gtk_accessible_role_get_type">
     <member name="GTK_ACCESSIBLE_ROLE_ALERT" nick="alert" value="0"/>
     <member name="GTK_ACCESSIBLE_ROLE_ALERT_DIALOG" nick="alert-dialog" value="1"/>
@@ -1275,6 +1285,9 @@
     <member name="GTK_INTERFACE_CONTRAST_NO_PREFERENCE" nick="no-preference" value="1"/>
     <member name="GTK_INTERFACE_CONTRAST_MORE" nick="more" value="2"/>
     <member name="GTK_INTERFACE_CONTRAST_LESS" nick="less" value="3"/>
+  </enum>  <enum name="GtkReducedMotion" get-type="gtk_reduced_motion_get_type">
+    <member name="GTK_REDUCED_MOTION_NO_PREFERENCE" nick="no-preference" value="0"/>
+    <member name="GTK_REDUCED_MOTION_REDUCE" nick="reduce" value="1"/>
   </enum>  <flags name="GtkEventControllerScrollFlags" get-type="gtk_event_controller_scroll_flags_get_type">
     <member name="GTK_EVENT_CONTROLLER_SCROLL_NONE" nick="none" value="0"/>
     <member name="GTK_EVENT_CONTROLLER_SCROLL_VERTICAL" nick="vertical" value="1"/>
@@ -1349,6 +1362,10 @@
     <member name="GTK_REVEALER_TRANSITION_TYPE_SWING_LEFT" nick="swing-left" value="7"/>
     <member name="GTK_REVEALER_TRANSITION_TYPE_SWING_UP" nick="swing-up" value="8"/>
     <member name="GTK_REVEALER_TRANSITION_TYPE_SWING_DOWN" nick="swing-down" value="9"/>
+    <member name="GTK_REVEALER_TRANSITION_TYPE_FADE_SLIDE_RIGHT" nick="fade-slide-right" value="10"/>
+    <member name="GTK_REVEALER_TRANSITION_TYPE_FADE_SLIDE_LEFT" nick="fade-slide-left" value="11"/>
+    <member name="GTK_REVEALER_TRANSITION_TYPE_FADE_SLIDE_UP" nick="fade-slide-up" value="12"/>
+    <member name="GTK_REVEALER_TRANSITION_TYPE_FADE_SLIDE_DOWN" nick="fade-slide-down" value="13"/>
   </enum>  <enum name="GtkCornerType" get-type="gtk_corner_type_get_type">
     <member name="GTK_CORNER_TOP_LEFT" nick="top-left" value="0"/>
     <member name="GTK_CORNER_BOTTOM_LEFT" nick="bottom-left" value="1"/>
@@ -1414,6 +1431,24 @@
     <member name="GTK_COLLATION_NONE" nick="none" value="0"/>
     <member name="GTK_COLLATION_UNICODE" nick="unicode" value="1"/>
     <member name="GTK_COLLATION_FILENAME" nick="filename" value="2"/>
+  </enum>  <flags name="GtkSvgFeatures" get-type="gtk_svg_features_get_type">
+    <member name="GTK_SVG_ANIMATIONS" nick="animations" value="1"/>
+    <member name="GTK_SVG_SYSTEM_RESOURCES" nick="system-resources" value="2"/>
+    <member name="GTK_SVG_EXTERNAL_RESOURCES" nick="external-resources" value="4"/>
+    <member name="GTK_SVG_EXTENSIONS" nick="extensions" value="8"/>
+    <member name="GTK_SVG_TRADITIONAL_SYMBOLIC" nick="traditional-symbolic" value="16"/>
+  </flags>
+  <enum name="GtkSvgError" get-type="gtk_svg_error_get_type">
+    <member name="GTK_SVG_ERROR_INVALID_SYNTAX" nick="invalid-syntax" value="0"/>
+    <member name="GTK_SVG_ERROR_INVALID_ELEMENT" nick="invalid-element" value="1"/>
+    <member name="GTK_SVG_ERROR_INVALID_ATTRIBUTE" nick="invalid-attribute" value="2"/>
+    <member name="GTK_SVG_ERROR_MISSING_ATTRIBUTE" nick="missing-attribute" value="3"/>
+    <member name="GTK_SVG_ERROR_INVALID_REFERENCE" nick="invalid-reference" value="4"/>
+    <member name="GTK_SVG_ERROR_FAILED_UPDATE" nick="failed-update" value="5"/>
+    <member name="GTK_SVG_ERROR_FAILED_RENDERING" nick="failed-rendering" value="6"/>
+    <member name="GTK_SVG_ERROR_IGNORED_ELEMENT" nick="ignored-element" value="7"/>
+    <member name="GTK_SVG_ERROR_LIMITS_EXCEEDED" nick="limits-exceeded" value="8"/>
+    <member name="GTK_SVG_ERROR_NOT_IMPLEMENTED" nick="not-implemented" value="9"/>
   </enum>  <flags name="GtkTextSearchFlags" get-type="gtk_text_search_flags_get_type">
     <member name="GTK_TEXT_SEARCH_VISIBLE_ONLY" nick="visible-only" value="1"/>
     <member name="GTK_TEXT_SEARCH_TEXT_ONLY" nick="text-only" value="2"/>
@@ -1505,6 +1540,7 @@
     <implements name="GtkStyleProvider"/>
     <property name="prefers-color-scheme" type="GtkInterfaceColorScheme" flags="1073742051" default-value="GTK_INTERFACE_COLOR_SCHEME_DEFAULT"/>
     <property name="prefers-contrast" type="GtkInterfaceContrast" flags="1073742051" default-value="GTK_INTERFACE_CONTRAST_NO_PREFERENCE"/>
+    <property name="prefers-reduced-motion" type="GtkReducedMotion" flags="1073742051" default-value="GTK_REDUCED_MOTION_NO_PREFERENCE"/>
     <signal name="parsing-error" return="void" when="last">
       <param type="GtkCssSection"/>
       <param type="GError"/>
@@ -1716,6 +1752,9 @@
     <signal name="delete-surrounding" return="gboolean" when="last">
       <param type="gint"/>
       <param type="gint"/>
+    </signal>
+    <signal name="invalid-composition" return="gboolean" when="last">
+      <param type="gchararray"/>
     </signal>
   </class>
   <class name="GtkEntryBuffer" get-type="gtk_entry_buffer_get_type" parents="GObject">
@@ -3352,6 +3391,16 @@
     <property name="keep-aspect-ratio" type="gboolean" flags="-1073741597" default-value="TRUE"/>
     <property name="can-shrink" type="gboolean" flags="1073742051" default-value="TRUE"/>
     <property name="content-fit" type="GtkContentFit" flags="1073742051" default-value="GTK_CONTENT_FIT_CONTAIN"/>
+    <property name="isolate-contents" type="gboolean" flags="1073742051" default-value="TRUE"/>
+  </class>
+  <class name="GtkPopoverBin" get-type="gtk_popover_bin_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="child" type="GtkWidget" flags="1073742051"/>
+    <property name="popover" type="GtkPopover" flags="1073742051"/>
+    <property name="menu-model" type="GMenuModel" flags="1073742051"/>
+    <property name="handle-input" type="gboolean" flags="1073742051" default-value="FALSE"/>
   </class>
   <class name="GtkPopoverMenu" get-type="gtk_popover_menu_get_type" parents="GtkPopover,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="GtkAccessible"/>
@@ -3607,6 +3656,7 @@
     <property name="input-hints" type="GtkInputHints" flags="1073742051" default-value="GTK_INPUT_HINT_NONE"/>
     <property name="activates-default" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="search-delay" type="guint" flags="1073742051" default-value="150"/>
+    <property name="key-capture-widget" type="GtkWidget" flags="1073742055"/>
     <signal name="activate" return="void" when="last" action="1">
     </signal>
     <signal name="search-changed" return="void" when="last">
@@ -3695,6 +3745,7 @@
     <property name="gtk-font-rendering" type="GtkFontRendering" flags="227" default-value="GTK_FONT_RENDERING_AUTOMATIC"/>
     <property name="gtk-interface-color-scheme" type="GtkInterfaceColorScheme" flags="227" default-value="GTK_INTERFACE_COLOR_SCHEME_UNSUPPORTED"/>
     <property name="gtk-interface-contrast" type="GtkInterfaceContrast" flags="227" default-value="GTK_INTERFACE_CONTRAST_UNSUPPORTED"/>
+    <property name="gtk-interface-reduced-motion" type="GtkReducedMotion" flags="227" default-value="GTK_REDUCED_MOTION_NO_PREFERENCE"/>
   </class>
   <class name="GtkShortcutController" get-type="gtk_shortcut_controller_get_type" parents="GtkEventController,GObject">
     <implements name="GListModel"/>
@@ -3877,6 +3928,18 @@
   </interface>
   <class name="GtkStyleContext" get-type="gtk_style_context_get_type" parents="GObject">
     <property name="display" type="GdkDisplay" flags="227"/>
+  </class>
+  <class name="GtkSvg" get-type="gtk_svg_get_type" parents="GObject">
+    <implements name="GdkPaintable"/>
+    <implements name="GtkSymbolicPaintable"/>
+    <property name="resource" type="gchararray" flags="1073741827" default-value="NULL"/>
+    <property name="features" type="GtkSvgFeatures" flags="1073741827" default-value="GTK_SVG_ANIMATIONS | GTK_SVG_SYSTEM_RESOURCES | GTK_SVG_EXTERNAL_RESOURCES | GTK_SVG_EXTENSIONS"/>
+    <property name="playing" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <property name="weight" type="gdouble" flags="1073741827" default-value="-1.000000"/>
+    <property name="state" type="guint" flags="1073741827" default-value="0"/>
+    <signal name="error" return="void" when="last">
+      <param type="GError"/>
+    </signal>
   </class>
   <class name="GtkSwitch" get-type="gtk_switch_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
     <implements name="GtkAccessible"/>
@@ -4360,4 +4423,5 @@
   <error-quark function="gtk_file_chooser_error_quark" domain="gtk-file-chooser-error-quark"/>
   <error-quark function="gtk_print_error_quark" domain="gtk-print-error-quark"/>
   <error-quark function="gtk_recent_manager_error_quark" domain="gtk-recent-manager-error-quark"/>
+  <error-quark function="gtk_svg_error_quark" domain="GtkSvgError"/>
 </dump>

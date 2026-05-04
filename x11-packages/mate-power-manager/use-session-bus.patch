@@ -1,0 +1,131 @@
+--- a/src/egg-console-kit.c
++++ b/src/egg-console-kit.c
+@@ -380,7 +380,7 @@
+ 	console->priv->session_id = NULL;
+ 
+ 	/* connect to D-Bus */
+-	console->priv->connection = dbus_g_bus_get (DBUS_BUS_SYSTEM, &error);
++	console->priv->connection = dbus_g_bus_get (DBUS_BUS_SESSION, &error);
+ 	if (console->priv->connection == NULL) {
+ 		g_warning ("Failed to connect to the D-Bus daemon: %s", error->message);
+ 		g_error_free (error);
+
+--- a/src/gpm-button.c
++++ b/src/gpm-button.c
+@@ -261,7 +261,7 @@
+ 	g_return_val_if_fail (GPM_IS_BUTTON (button), FALSE);
+ 
+ 	if (LOGIND_RUNNING()) {
+-		proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
++		proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+ 						       G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
+ 						       NULL,
+ 						       "org.freedesktop.UPower",
+
+--- a/src/gpm-control.c
++++ b/src/gpm-control.c
+@@ -97,7 +97,7 @@
+ 	GVariant *res = NULL;
+ 
+ 	g_debug ("Requesting systemd to shutdown");
+-	proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
++	proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+ 					       G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
+ 					       NULL,
+ 					       "org.freedesktop.login1",
+@@ -300,7 +300,7 @@
+ 
+ 	if (LOGIND_RUNNING()) {
+ 		/* sleep via logind */
+-		proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
++		proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+ 						       G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
+ 						       NULL,
+ 						       "org.freedesktop.login1",
+@@ -455,7 +455,7 @@
+ 
+ 	if (LOGIND_RUNNING()) {
+ 		/* sleep via logind */
+-		proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
++		proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+ 						       G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
+ 						       NULL,
+ 						       "org.freedesktop.login1",
+
+--- a/src/gpm-kbd-backlight.c
++++ b/src/gpm-kbd-backlight.c
+@@ -593,7 +593,7 @@
+ 
+    backlight->priv = gpm_kbd_backlight_get_instance_private (backlight);
+ 
+-   backlight->priv->upower_proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
++   backlight->priv->upower_proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+                                       G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
+                                       NULL,
+                                       "org.freedesktop.UPower",
+
+--- a/src/gpm-main.c
++++ b/src/gpm-main.c
+@@ -201,7 +201,7 @@
+ 	g_debug ("MATE %s %s", GPM_NAME, VERSION);
+ 
+ 	/* check dbus connections, exit if not valid */
+-	system_connection = dbus_g_bus_get (DBUS_BUS_SYSTEM, &error);
++	system_connection = dbus_g_bus_get (DBUS_BUS_SESSION, &error);
+ 	if (error) {
+ 		g_warning ("%s", error->message);
+ 		g_error_free (error);
+
+--- a/src/gpm-manager.c
++++ b/src/gpm-manager.c
+@@ -1741,7 +1741,7 @@
+     const char* arg_mode = "block";
+ 
+     g_debug ("Inhibiting systemd sleep");
+-    proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
++    proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+                                        G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
+                                         NULL,
+                                         "org.freedesktop.login1",
+
+--- a/src/gpm-networkmanager.c
++++ b/src/gpm-networkmanager.c
+@@ -47,7 +47,7 @@
+ 	DBusGProxy *nm_proxy = NULL;
+ 	GError *error = NULL;
+ 
+-	connection = dbus_g_bus_get (DBUS_BUS_SYSTEM, &error);
++	connection = dbus_g_bus_get (DBUS_BUS_SESSION, &error);
+ 	if (error) {
+ 		g_warning ("%s", error->message);
+ 		g_error_free (error);
+@@ -81,7 +81,7 @@
+ 	DBusGProxy *nm_proxy = NULL;
+ 	GError *error = NULL;
+ 
+-	connection = dbus_g_bus_get (DBUS_BUS_SYSTEM, &error);
++	connection = dbus_g_bus_get (DBUS_BUS_SESSION, &error);
+ 	if (error) {
+ 		g_warning ("%s", error->message);
+ 		g_error_free (error);
+
+--- a/src/gpm-prefs-core.c
++++ b/src/gpm-prefs-core.c
+@@ -614,7 +614,7 @@
+ 	if (LOGIND_RUNNING()) {
+ 		/* get values from logind */
+ 
+-		proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
++		proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+ 						       G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
+ 						       NULL,
+ 						       "org.freedesktop.login1",
+@@ -685,7 +685,7 @@
+ 	}
+ 
+ 	if (LOGIND_RUNNING()) {
+-		proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
++		proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+ 						       G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
+ 						       NULL,
+ 						       "org.freedesktop.UPower",

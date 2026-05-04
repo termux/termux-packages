@@ -289,6 +289,14 @@
     <member name="GIMP_TEXT_JUSTIFY_RIGHT" nick="right" value="1"/>
     <member name="GIMP_TEXT_JUSTIFY_CENTER" nick="center" value="2"/>
     <member name="GIMP_TEXT_JUSTIFY_FILL" nick="fill" value="3"/>
+  </enum>  <enum name="GimpTextOutline" get-type="gimp_text_outline_get_type">
+    <member name="GIMP_TEXT_OUTLINE_NONE" nick="none" value="0"/>
+    <member name="GIMP_TEXT_OUTLINE_STROKE_ONLY" nick="stroke-only" value="1"/>
+    <member name="GIMP_TEXT_OUTLINE_STROKE_FILL" nick="stroke-fill" value="2"/>
+  </enum>  <enum name="GimpTextOutlineDirection" get-type="gimp_text_outline_direction_get_type">
+    <member name="GIMP_TEXT_OUTLINE_DIRECTION_OUTER" nick="outer" value="0"/>
+    <member name="GIMP_TEXT_OUTLINE_DIRECTION_INNER" nick="inner" value="1"/>
+    <member name="GIMP_TEXT_OUTLINE_DIRECTION_CENTERED" nick="centered" value="2"/>
   </enum>  <enum name="GimpTransferMode" get-type="gimp_transfer_mode_get_type">
     <member name="GIMP_TRANSFER_SHADOWS" nick="shadows" value="0"/>
     <member name="GIMP_TRANSFER_MIDTONES" nick="midtones" value="1"/>
@@ -435,6 +443,12 @@
     <member name="GIMP_CONVERT_DITHER_FS" nick="fs" value="1"/>
     <member name="GIMP_CONVERT_DITHER_FS_LOWBLEED" nick="fs-lowbleed" value="2"/>
     <member name="GIMP_CONVERT_DITHER_FIXED" nick="fixed" value="3"/>
+  </enum>  <enum name="GimpCurvePointType" get-type="gimp_curve_point_type_get_type">
+    <member name="GIMP_CURVE_POINT_SMOOTH" nick="smooth" value="0"/>
+    <member name="GIMP_CURVE_POINT_CORNER" nick="corner" value="1"/>
+  </enum>  <enum name="GimpCurveType" get-type="gimp_curve_type_get_type">
+    <member name="GIMP_CURVE_SMOOTH" nick="smooth" value="0"/>
+    <member name="GIMP_CURVE_FREE" nick="free" value="1"/>
   </enum>  <enum name="GimpHistogramChannel" get-type="gimp_histogram_channel_get_type">
     <member name="GIMP_HISTOGRAM_VALUE" nick="value" value="0"/>
     <member name="GIMP_HISTOGRAM_RED" nick="red" value="1"/>
@@ -518,6 +532,7 @@
     <member name="GIMP_LAYER_MODE_SPLIT" nick="split" value="60"/>
     <member name="GIMP_LAYER_MODE_PASS_THROUGH" nick="pass-through" value="61"/>
     <member name="GIMP_LAYER_MODE_REPLACE" nick="replace" value="62"/>
+    <member name="GIMP_LAYER_MODE_OVERWRITE" nick="overwrite" value="63"/>
   </enum>  <enum name="GimpTRCType" get-type="gimp_trc_type_get_type">
     <member name="GIMP_TRC_LINEAR" nick="linear" value="0"/>
     <member name="GIMP_TRC_NON_LINEAR" nick="non-linear" value="1"/>
@@ -542,6 +557,14 @@
   <class name="GimpDrawable" get-type="gimp_drawable_get_type" parents="GimpItem,GObject" abstract="1">
   </class>
   <class name="GimpChannel" get-type="gimp_channel_get_type" parents="GimpDrawable,GimpItem,GObject">
+  </class>
+  <class name="GimpCurve" get-type="gimp_curve_get_type" parents="GObject">
+    <property name="curve-type" type="GimpCurveType" flags="1073743079" default-value="GIMP_CURVE_SMOOTH"/>
+    <property name="n-samples" type="gint" flags="1073743079" default-value="256"/>
+    <signal name="points-changed" return="void" when="first">
+    </signal>
+    <signal name="samples-changed" return="void" when="first">
+    </signal>
   </class>
   <class name="GimpDisplay" get-type="gimp_display_get_type" parents="GObject">
     <property name="id" type="gint" flags="235" default-value="0"/>
@@ -579,6 +602,9 @@
   </class>
   <class name="GimpLayerMask" get-type="gimp_layer_mask_get_type" parents="GimpChannel,GimpDrawable,GimpItem,GObject">
   </class>
+  <class name="GimpLinkLayer" get-type="gimp_link_layer_get_type" parents="GimpLayer,GimpDrawable,GimpItem,GObject">
+    <implements name="GimpRasterizable"/>
+  </class>
   <class name="GimpLoadProcedure" get-type="gimp_load_procedure_get_type" parents="GimpFileProcedure,GimpProcedure,GObject">
   </class>
   <class name="GimpPalette" get-type="gimp_palette_get_type" parents="GimpResource,GObject">
@@ -593,6 +619,12 @@
   <fundamental name="GimpParamLayer" get-type="gimp_param_layer_get_type" instantiatable="1" parents="GimpParamDrawable,GimpParamItem,GParamObject,GParam">
   </fundamental>
   <fundamental name="GimpParamTextLayer" get-type="gimp_param_text_layer_get_type" instantiatable="1" parents="GimpParamLayer,GimpParamDrawable,GimpParamItem,GParamObject,GParam">
+  </fundamental>
+  <fundamental name="GimpParamVectorLayer" get-type="gimp_param_vector_layer_get_type" instantiatable="1" parents="GimpParamLayer,GimpParamDrawable,GimpParamItem,GParamObject,GParam">
+  </fundamental>
+  <fundamental name="GimpParamLinkLayer" get-type="gimp_param_link_layer_get_type" instantiatable="1" parents="GimpParamLayer,GimpParamDrawable,GimpParamItem,GParamObject,GParam">
+  </fundamental>
+  <fundamental name="GimpParamRasterizable" get-type="gimp_param_rasterizable_get_type" instantiatable="1" parents="GimpParamDrawable,GimpParamItem,GParamObject,GParam">
   </fundamental>
   <fundamental name="GimpParamGroupLayer" get-type="gimp_param_group_layer_get_type" instantiatable="1" parents="GimpParamLayer,GimpParamDrawable,GimpParamItem,GParamObject,GParam">
   </fundamental>
@@ -620,6 +652,8 @@
   </fundamental>
   <fundamental name="GimpParamFont" get-type="gimp_param_font_get_type" instantiatable="1" parents="GimpParamResource,GimpParamObject,GParamObject,GParam">
   </fundamental>
+  <fundamental name="GimpParamCurve" get-type="gimp_param_curve_get_type" instantiatable="1" parents="GParamObject,GParam">
+  </fundamental>
   <class name="GimpPath" get-type="gimp_path_get_type" parents="GimpItem,GObject">
   </class>
   <class name="GimpPattern" get-type="gimp_pattern_get_type" parents="GimpResource,GObject">
@@ -635,11 +669,18 @@
   <class name="GimpProcedureConfig" get-type="gimp_procedure_config_get_type" parents="GObject" abstract="1">
     <property name="procedure" type="GimpProcedure" flags="235"/>
   </class>
+  <interface name="GimpRasterizable" get-type="gimp_rasterizable_get_type">
+    <prerequisite name="GimpDrawable"/>
+  </interface>
   <class name="GimpSelection" get-type="gimp_selection_get_type" parents="GimpChannel,GimpDrawable,GimpItem,GObject">
   </class>
   <class name="GimpTextLayer" get-type="gimp_text_layer_get_type" parents="GimpLayer,GimpDrawable,GimpItem,GObject">
+    <implements name="GimpRasterizable"/>
   </class>
   <class name="GimpThumbnailProcedure" get-type="gimp_thumbnail_procedure_get_type" parents="GimpProcedure,GObject">
+  </class>
+  <class name="GimpVectorLayer" get-type="gimp_vector_layer_get_type" parents="GimpLayer,GimpDrawable,GimpItem,GObject">
+    <implements name="GimpRasterizable"/>
   </class>
   <class name="GimpVectorLoadProcedure" get-type="gimp_vector_load_procedure_get_type" parents="GimpLoadProcedure,GimpFileProcedure,GimpProcedure,GObject" final="1">
   </class>

@@ -1,0 +1,70 @@
+Author: Pino Toscano <pino@debian.org>
+Description: Guard __int128_t usage using QT_COMPILER_SUPPORTS_INT128
+ __int128_t is available only on certain architectures (likely 64bit ones);
+ guard its usage using the Qt define QT_COMPILER_SUPPORTS_INT128.
+ .
+ Cannot be upstreamed as QT_COMPILER_SUPPORTS_INT128 was introduced in Qt 6.7,
+ and qtcreator requires Qt 6.5.
+Forwarded: not-needed
+Last-Update: 2026-01-31
+
+--- a/src/libs/sqlite/sqlitebasestatement.cpp
++++ b/src/libs/sqlite/sqlitebasestatement.cpp
+@@ -163,7 +163,7 @@ void BaseStatement::bind(int index, long
+         Sqlite::throwError(resultCode, sqliteDatabaseHandle(sourceLocation), sourceLocation);
+ }
+ 
+-#ifdef Q_OS_UNIX
++#ifdef QT_COMPILER_SUPPORTS_INT128
+ void BaseStatement::bind(int index, __int128_t value, const source_location &sourceLocation)
+ {
+     NanotraceHR::Tracer tracer{"bind int128",
+@@ -560,7 +560,7 @@ long long BaseStatement::fetchLongLongVa
+     return value;
+ }
+ 
+-#ifdef Q_OS_UNIX
++#ifdef QT_COMPILER_SUPPORTS_INT128
+ __int128_t BaseStatement::fetchInt128Value(int column) const
+ {
+     NanotraceHR::Tracer tracer{"fetch int 128",
+@@ -586,7 +586,7 @@ long long BaseStatement::fetchValue<long
+     return fetchLongLongValue(column);
+ }
+ 
+-#ifdef Q_OS_UNIX
++#ifdef QT_COMPILER_SUPPORTS_INT128
+ template<>
+ __int128_t BaseStatement::fetchValue<__int128_t>(int column) const
+ {
+--- a/src/libs/sqlite/sqlitebasestatement.h
++++ b/src/libs/sqlite/sqlitebasestatement.h
+@@ -59,7 +59,7 @@ public:
+     int fetchIntValue(int column) const;
+     long fetchLongValue(int column) const;
+     long long fetchLongLongValue(int column) const;
+-#ifdef Q_OS_UNIX
++#ifdef QT_COMPILER_SUPPORTS_INT128
+     __int128_t fetchInt128Value(int column) const;
+ #endif
+ 
+@@ -74,7 +74,7 @@ public:
+     void bind(int index, NullValue, const source_location &sourceLocation);
+     void bind(int index, int value, const source_location &sourceLocation);
+     void bind(int index, long long value, const source_location &sourceLocation);
+-#ifdef Q_OS_UNIX
++#ifdef QT_COMPILER_SUPPORTS_INT128
+     void bind(int index, __int128_t value, const source_location &sourceLocation);
+ #endif
+ 
+--- a/tests/unit/tests/unittests/sqlite/sqlitestatement-test.cpp
++++ b/tests/unit/tests/unittests/sqlite/sqlitestatement-test.cpp
+@@ -377,7 +377,7 @@ TEST_F(SqliteStatement, bind_long_intege
+     ASSERT_THAT(statement.fetchSmallStringViewValue(0), "poo");
+ }
+ 
+-#ifdef Q_OS_LINUX
++#ifdef QT_COMPILER_SUPPORTS_INT128
+ TEST_F(SqliteStatement, bind_int128)
+ {
+     SqliteTestStatement<1, 1> statement("WITH T(blob) AS (VALUES (?)) SELECT blob FROM T", database);

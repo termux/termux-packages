@@ -38,3 +38,14 @@
    request_->selected_challenge_option = std::move(selected_challenge_option);
  
    should_unmask_card_ = request_->card.masked() ||
+--- a/chrome/browser/net/profile_network_context_service.cc
++++ b/chrome/browser/net/profile_network_context_service.cc
+@@ -1287,7 +1287,7 @@ std::vector<uint8_t>
+ ProfileNetworkContextService::GetEncryptedCachePrimaryKey() {
+   std::string encoded_encrypted_primary_key = profile_->GetPrefs()->GetString(
+       enterprise_connectors::kEncryptedCachePrimaryKey);
+-  return base::Base64Decode(encoded_encrypted_primary_key).value_or({});
++  return base::Base64Decode(encoded_encrypted_primary_key).value_or(std::vector<uint8_t>{});
+ }
+ 
+ #endif  // BUILDFLAG(ENTERPRISE_CACHE_ENCRYPTION)

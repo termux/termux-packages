@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.chromium.org/Home
 TERMUX_PKG_DESCRIPTION="Chromium web browser (Host tools)"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
-_CHROMIUM_VERSION=144.0.7559.132
-TERMUX_PKG_VERSION="145.0.7632.75+really$_CHROMIUM_VERSION"
-TERMUX_PKG_SRCURL=https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$_CHROMIUM_VERSION-lite.tar.xz
-TERMUX_PKG_SHA256=41cc60391836575f4a40ffd576f647c0b9105219acb494e739c9ea2c66f5ddb9
+TERMUX_PKG_VERSION="146.0.7680.177"
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$TERMUX_PKG_VERSION-lite.tar.xz
+TERMUX_PKG_SHA256=e66465f7b26c91dfa06b31aba3c56f6e65edac6b227c6bd2edc04535ef8966cb
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libffi-static"
 # TODO: Split chromium-common and chromium-headless
@@ -15,7 +15,7 @@ TERMUX_PKG_BUILD_DEPENDS="libffi-static"
 TERMUX_PKG_EXCLUDED_ARCHES="i686"
 TERMUX_PKG_NO_STRIP=true
 TERMUX_PKG_NO_ELF_CLEANER=true
-TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
 SYSTEM_LIBRARIES="    fontconfig"
@@ -25,7 +25,7 @@ termux_pkg_auto_update() {
 	local latest_version="$(curl -s 'https://chromiumdash.appspot.com/fetch_releases?channel=Stable&platform=Linux&num=10&offset=0' | jq -rc '.[].version' | sort -t. -k 1,1n -k 2,2n -k 3,3n -k 4,4n | tail -n 1)"
 
 	if ! termux_pkg_is_update_needed \
-		"${_CHROMIUM_VERSION#*:}" "${latest_version}"; then
+		"${TERMUX_PKG_VERSION#*:}" "${latest_version}"; then
 		echo "INFO: No update needed. Already at version '${latest_version}'."
 		return 0
 	fi
@@ -60,6 +60,13 @@ termux_pkg_auto_update() {
 }
 
 termux_step_post_get_source() {
+	# Apply patches related to c++23
+	local f
+	for f in $(find "$TERMUX_PKG_BUILDER_DIR/cxx-patches" -maxdepth 1 -type f -name *.patch | sort); do
+		echo "Applying patch: $(basename $f)"
+		patch -p1 --silent < "$f"
+	done
+
 	# Apply patches related to chromium
 	local f
 	for f in $(find "$TERMUX_PKG_BUILDER_DIR/cr-patches" -maxdepth 1 -type f -name *.patch | sort); do
@@ -79,7 +86,7 @@ termux_step_post_get_source() {
 		$SYSTEM_LIBRARIES
 
 	# Remove the source file to keep more space
-	rm -f "$TERMUX_PKG_CACHEDIR/chromium-$_CHROMIUM_VERSION-lite.tar.xz"
+	rm -f "$TERMUX_PKG_CACHEDIR/chromium-$TERMUX_PKG_VERSION-lite.tar.xz"
 }
 
 termux_step_configure() {
@@ -129,6 +136,38 @@ EOF
 	# Install nodejs
 	if [ ! -f "third_party/node/linux/node-linux-x64/bin/node" ]; then
 		./third_party/node/update_node_binaries
+	fi
+
+	# Download npm deps
+	if [ ! -d "third_party/node/node_modules" ]; then
+		local _npm_object_name=$(python -c "Var = str
+Str = str
+exec(open('$TERMUX_PKG_SRCDIR/DEPS').read())
+print(deps['src/third_party/node/node_modules']['objects'][0]['object_name'])
+")
+		local _npm_sha256sum=$(python -c "Var = str
+Str = str
+exec(open('$TERMUX_PKG_SRCDIR/DEPS').read())
+print(deps['src/third_party/node/node_modules']['objects'][0]['sha256sum'])
+")
+		local _npm_file="$TERMUX_PKG_SRCDIR/third_party/node/node_modules.tar.gz"
+		termux_download \
+			"https://commondatastorage.googleapis.com/chromium-nodejs/$_npm_object_name" \
+			"${_npm_file}" \
+			"${_npm_sha256sum}"
+		mkdir -p $TERMUX_PKG_SRCDIR/third_party/node/node_modules-tmp
+		tar -xf "$_npm_file" --strip-components=1 -C "$TERMUX_PKG_SRCDIR/third_party/node/node_modules-tmp"
+		mv "$TERMUX_PKG_SRCDIR/third_party/node/node_modules-tmp" "$TERMUX_PKG_SRCDIR/third_party/node/node_modules"
+	fi
+
+	# Sync rollup-related native deps in devtools
+	if [ ! -d "third_party/devtools-frontend/src/node_modules/@rollup/rollup-linux-x64-gnu" ]; then
+		if [ ! -f "third_party/devtools-frontend/src/third_party/rollup_libs/rollup.linux-x64-gnu.node" ]; then
+			termux_error_exit "rollup.linux-x64-gnu.node not found"
+		fi
+		pushd third_party/devtools-frontend/src
+		python3 scripts/deps/sync_rollup_libs.py
+		popd # third_party/devtools-frontend/src
 	fi
 
 	local CARGO_TARGET_NAME="${TERMUX_ARCH}-linux-android"
@@ -276,6 +315,9 @@ exclude_unwind_tables = false
 use_jumbo_build = true
 # Compile pdfium as a static library
 pdf_is_complete_lib = true
+# NDK r29 can't compile chromium with cxx23, see
+# https://github.com/termux/termux-packages/issues/28459#issuecomment-3991943697
+use_cxx23 = false
 " > $_common_args_file
 
 	if [ "$TERMUX_ARCH" = "arm" ]; then

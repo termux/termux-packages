@@ -1,15 +1,24 @@
 --- a/Makefile
 +++ b/Makefile
-@@ -29,10 +29,10 @@
- 	go vet ./...
+@@ -1,6 +1,7 @@
+ export PATH := $(PATH):`go env GOPATH`/bin
+ export GO111MODULE=on
+-LDFLAGS := -s -w
++# for https://github.com/wlynxg/anet?tab=readme-ov-file#how-to-build-with-go-1230-or-later
++LDFLAGS := -s -w -checklinkname=0
+ NOWEB_TAG = $(shell [ ! -d web/frps/dist ] || [ ! -d web/frpc/dist ] && echo ',noweb')
+ 
+ .PHONY: web frps-web frpc-web frps frpc
+@@ -33,10 +34,10 @@
+ 	go vet -tags "$(NOWEB_TAG)" ./...
  
  frps:
--	env CGO_ENABLED=0 go build -trimpath -ldflags "$(LDFLAGS)" -tags frps -o bin/frps ./cmd/frps
-+	env go build -trimpath -ldflags "$(LDFLAGS)" -tags frps -o bin/frps ./cmd/frps
+-	env CGO_ENABLED=0 go build -trimpath -ldflags "$(LDFLAGS)" -tags "frps$(NOWEB_TAG)" -o bin/frps ./cmd/frps
++	env go build -trimpath -ldflags "$(LDFLAGS)" -tags "frps$(NOWEB_TAG)" -o bin/frps ./cmd/frps
  
  frpc:
--	env CGO_ENABLED=0 go build -trimpath -ldflags "$(LDFLAGS)" -tags frpc -o bin/frpc ./cmd/frpc
-+	env go build -trimpath -ldflags "$(LDFLAGS)" -tags frpc -o bin/frpc ./cmd/frpc
+-	env CGO_ENABLED=0 go build -trimpath -ldflags "$(LDFLAGS)" -tags "frpc$(NOWEB_TAG)" -o bin/frpc ./cmd/frpc
++	env go build -trimpath -ldflags "$(LDFLAGS)" -tags "frpc$(NOWEB_TAG)" -o bin/frpc ./cmd/frpc
  
  test: gotest
  

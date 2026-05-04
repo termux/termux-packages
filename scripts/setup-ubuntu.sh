@@ -25,6 +25,10 @@ PACKAGES+=" lzop"
 PACKAGES+=" lz4"
 PACKAGES+=" zstd"
 
+# userspace overlayfs implementation for rootless containers
+# Used to setup NDK toolchain without having to copy the whole toolchain to save some disk space
+PACKAGES+=" fuse-overlayfs"
+
 # Used by common build systems.
 PACKAGES+=" autoconf"
 PACKAGES+=" autogen"
@@ -310,6 +314,9 @@ PACKAGES+=" patchelf"
 # Needed by lldb for python integration
 PACKAGES+=" swig"
 
+# Needed by nchat
+PACKAGES+=" libmagic-dev"
+
 # Needed by binutils-cross
 PACKAGES+=" libzstd-dev"
 
@@ -344,6 +351,7 @@ LLVM_PACKAGES=""
 LLVM_PACKAGES+=" llvm-${TERMUX_HOST_LLVM_MAJOR_VERSION}-dev"
 LLVM_PACKAGES+=" llvm-${TERMUX_HOST_LLVM_MAJOR_VERSION}-tools"
 LLVM_PACKAGES+=" clang-${TERMUX_HOST_LLVM_MAJOR_VERSION}"
+LLVM_PACKAGES+=" lld-${TERMUX_HOST_LLVM_MAJOR_VERSION}"
 
 $SUDO apt-get -yq update
 

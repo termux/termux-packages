@@ -1,0 +1,19 @@
+Description: Add prebuilt baseline for Mono LLVM packages
+ When TargetsLinuxBionic is set, the Mono build initializes LLVM
+ which downloads prebuilt LLVM packages. The source-build validation
+ in finish-source-only.proj flags these as new prebuilts not in the
+ baseline. Add a prebuilt-baseline.xml to whitelist them.
+
+diff --git a/eng/tools/prebuilt-baseline.xml b/eng/tools/prebuilt-baseline.xml
+new file mode 100644
+index 000000000..000000001
+--- /dev/null
++++ b/eng/tools/prebuilt-baseline.xml
+@@ -0,0 +1,7 @@
++<UsageData>
++  <Usages>
++    <Usage Id="runtime.placeholder-rid.Microsoft.NETCore.Runtime.Mono.LLVM.Libclang" Version="19.1.0-alpha.1.25461.1" />
++    <Usage Id="runtime.placeholder-rid.Microsoft.NETCore.Runtime.Mono.LLVM.Sdk" Version="19.1.0-alpha.1.25461.1" />
++    <Usage Id="runtime.placeholder-rid.Microsoft.NETCore.Runtime.Mono.LLVM.Tools" Version="19.1.0-alpha.1.25461.1" />
++  </Usages>
++</UsageData>

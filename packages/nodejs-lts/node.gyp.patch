@@ -1,6 +1,6 @@
---- ./node.gyp.orig	2025-09-25 20:13:15.000000000 +0530
-+++ ./node.gyp	2025-09-29 10:45:45.364950564 +0530
-@@ -548,7 +548,8 @@
+--- ./node.gyp.orig	2026-02-24 11:43:37.000000000 +0530
++++ ./node.gyp	2026-03-10 23:24:51.921515542 +0530
+@@ -568,7 +568,8 @@
        ],
  
        'sources': [
@@ -9,8 +9,8 @@
 +        'src/getaddrinfo.c'
        ],
  
-       'dependencies': [
-@@ -1045,314 +1046,6 @@
+       'msvs_settings': {
+@@ -1079,357 +1080,6 @@
          },
        ],
      }, # node_lib_target_name
@@ -19,7 +19,6 @@
 -      'type': 'executable',
 -      'dependencies': [
 -        '<(node_lib_target_name)',
--        'deps/histogram/histogram.gyp:histogram',
 -      ],
 -
 -      'includes': [
@@ -44,6 +43,11 @@
 -        'test/fuzzers/fuzz_env.cc',
 -      ],
 -      'conditions': [
+-        [ 'node_shared_hdr_histogram=="false"', {
+-          'dependencies': [
+-            'deps/histogram/histogram.gyp:histogram',
+-          ],
+-        }],
 -        ['OS=="linux" or OS=="openharmony"', {
 -          'ldflags': [ '-fsanitize=fuzzer' ]
 -        }],
@@ -62,7 +66,6 @@
 -      'type': 'executable',
 -      'dependencies': [
 -        '<(node_lib_target_name)',
--        'deps/histogram/histogram.gyp:histogram',
 -      ],
 -      'includes': [
 -        'node.gypi'
@@ -85,6 +88,11 @@
 -        'test/fuzzers/fuzz_ClientHelloParser.cc',
 -      ],
 -      'conditions': [
+-        [ 'node_shared_hdr_histogram=="false"', {
+-          'dependencies': [
+-            'deps/histogram/histogram.gyp:histogram',
+-          ],
+-        }],
 -        [ 'node_shared_uvwasi=="false"', {
 -          'dependencies': [ 'deps/uvwasi/uvwasi.gyp:uvwasi' ],
 -          'include_dirs': [ 'deps/uvwasi/include' ],
@@ -107,9 +115,6 @@
 -      'type': 'executable',
 -      'dependencies': [
 -        '<(node_lib_target_name)',
--        'deps/googletest/googletest.gyp:gtest_prod',
--        'deps/histogram/histogram.gyp:histogram',
--        'deps/nbytes/nbytes.gyp:nbytes',
 -      ],
 -      'includes': [
 -        'node.gypi'
@@ -132,6 +137,21 @@
 -        'test/fuzzers/fuzz_strings.cc',
 -      ],
 -      'conditions': [
+-        [ 'node_shared_gtest=="false"', {
+-          'dependencies': [
+-            'deps/googletest/googletest.gyp:gtest_prod',
+-          ],
+-        }],
+-        [ 'node_shared_hdr_histogram=="false"', {
+-          'dependencies': [
+-            'deps/histogram/histogram.gyp:histogram',
+-          ],
+-        }],
+-        [ 'node_shared_nbytes=="false"', {
+-          'dependencies': [
+-            'deps/nbytes/nbytes.gyp:nbytes',
+-          ],
+-        }],
 -        [ 'node_shared_uvwasi=="false"', {
 -          'dependencies': [ 'deps/uvwasi/uvwasi.gyp:uvwasi' ],
 -          'include_dirs': [ 'deps/uvwasi/include' ],
@@ -155,10 +175,6 @@
 -
 -      'dependencies': [
 -        '<(node_lib_target_name)',
--        'deps/googletest/googletest.gyp:gtest',
--        'deps/googletest/googletest.gyp:gtest_main',
--        'deps/histogram/histogram.gyp:histogram',
--        'deps/nbytes/nbytes.gyp:nbytes',
 -        'tools/v8_gypfiles/abseil.gyp:abseil',
 -      ],
 -
@@ -184,6 +200,25 @@
 -      'sources': [ '<@(node_cctest_sources)' ],
 -
 -      'conditions': [
+-        [ 'node_shared_gtest=="false"', {
+-          'dependencies': [
+-            'deps/googletest/googletest.gyp:gtest',
+-            'deps/googletest/googletest.gyp:gtest_main',
+-          ],
+-        }],
+-        [ 'node_shared_gtest=="true"', {
+-          'libraries': [ '-lgtest_main' ],
+-        }],
+-        [ 'node_shared_hdr_histogram=="false"', {
+-          'dependencies': [
+-            'deps/histogram/histogram.gyp:histogram',
+-          ],
+-        }],
+-        [ 'node_shared_nbytes=="false"', {
+-          'dependencies': [
+-            'deps/nbytes/nbytes.gyp:nbytes',
+-          ],
+-        }],
 -        [ 'node_use_openssl=="true"', {
 -          'defines': [
 -            'HAVE_OPENSSL=1',
@@ -244,8 +279,6 @@
 -
 -      'dependencies': [
 -        '<(node_lib_target_name)',
--        'deps/histogram/histogram.gyp:histogram',
--        'deps/nbytes/nbytes.gyp:nbytes',
 -      ],
 -
 -      'includes': [
@@ -279,6 +312,16 @@
 -          'xcode_settings': {
 -            'OTHER_LDFLAGS': [ '-Wl,-rpath,@loader_path', ],
 -          },
+-        }],
+-        [ 'node_shared_hdr_histogram=="false"', {
+-          'dependencies': [
+-            'deps/histogram/histogram.gyp:histogram',
+-          ],
+-        }],
+-        [ 'node_shared_nbytes=="false"', {
+-          'dependencies': [
+-            'deps/nbytes/nbytes.gyp:nbytes',
+-          ],
 -        }],
 -        ['OS=="win"', {
 -          'libraries': [
@@ -325,80 +368,3 @@
      {
        'target_name': 'node_js2c',
        'type': 'executable',
-@@ -1389,76 +1082,6 @@
-         }],
-       ]
-     },
--    {
--      'target_name': 'node_mksnapshot',
--      'type': 'executable',
--
--      'dependencies': [
--        '<(node_lib_target_name)',
--        'deps/histogram/histogram.gyp:histogram',
--        'deps/nbytes/nbytes.gyp:nbytes',
--      ],
--
--      'includes': [
--        'node.gypi'
--      ],
--
--      'include_dirs': [
--        'src',
--        'tools/msvs/genfiles',
--        'deps/v8/include',
--        'deps/cares/include',
--        'deps/uv/include',
--      ],
--
--      'defines': [ 'NODE_WANT_INTERNALS=1' ],
--
--      'sources': [
--        'src/node_snapshot_stub.cc',
--        'tools/snapshot/node_mksnapshot.cc',
--      ],
--
--      'msvs_settings': {
--        'VCLinkerTool': {
--          'EnableCOMDATFolding': '1', # /OPT:NOICF
--        },
--      },
--
--      'conditions': [
--        ['node_write_snapshot_as_array_literals=="true"', {
--          'defines': [ 'NODE_MKSNAPSHOT_USE_ARRAY_LITERALS=1' ],
--        }],
--        [ 'node_use_openssl=="true"', {
--          'dependencies': [
--            'deps/ncrypto/ncrypto.gyp:ncrypto',
--          ],
--          'defines': [
--            'HAVE_OPENSSL=1',
--          ],
--        }],
--        [ 'node_use_node_code_cache=="true"', {
--          'defines': [
--            'NODE_USE_NODE_CODE_CACHE=1',
--          ],
--        }],
--        ['v8_enable_inspector==1', {
--          'defines': [
--            'HAVE_INSPECTOR=1',
--          ],
--        }],
--        ['OS=="win"', {
--          'libraries': [
--            'Dbghelp.lib',
--            'winmm.lib',
--            'Ws2_32.lib',
--          ],
--        }],
--        # Avoid excessive LTO
--        ['enable_lto=="true"', {
--          'ldflags': [ '-fno-lto' ],
--        }],
--      ],
--    }, # node_mksnapshot
-   ], # end targets
- 
-   'conditions': [

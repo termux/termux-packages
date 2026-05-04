@@ -63,7 +63,7 @@ index 047283a2..58ce611c 100644
  import("//build/config/mips.gni")
  import("//build/config/riscv.gni")
  import("//build/config/rust.gni")
-@@ -3142,26 +3143,54 @@
+@@ -3295,26 +3296,55 @@
      }
    }
  
@@ -81,6 +81,7 @@ index 047283a2..58ce611c 100644
 +    "src/ic/binary-op-assembler.cc",
 +    "src/ic/unary-op-assembler.cc",
 +    "src/interpreter/interpreter-generator.cc",
++    "src/compiler/turboshaft/builtin-compiler.cc",
 +  ]
 +
    if (v8_current_cpu == "x86") {
@@ -391,19 +392,6 @@ index 8aa1fe07..19ca3805 100644
  }  // namespace v8
 +
 +#undef Is64
-diff --git a/v8/src/compiler/revectorizer.cc b/v8/src/compiler/revectorizer.cc
-index 1d332c42..2f47c7d4 100644
---- a/v8/src/compiler/revectorizer.cc
-+++ b/v8/src/compiler/revectorizer.cc
-@@ -1456,6 +1456,8 @@ void Revectorizer::PrintStores(ZoneMap<Node*, StoreNodeSet>* store_chains) {
-   }
- }
- 
-+#undef TRACE
-+
- }  // namespace compiler
- }  // namespace internal
- }  // namespace v8
 diff --git a/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc b/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc
 index cc5b406f..9fac2172 100644
 --- a/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc
@@ -918,24 +906,27 @@ index fd558992..190e9ee0 100644
  namespace v8 {
  namespace internal {
  
-@@ -2110,3 +2112,5 @@ RegExpNode* RegExpQuantifier::ToNode(int min, int max, bool is_greedy,
+@@ -2326,3 +2328,8 @@ RegExpNode* RegExpQuantifier::ToNode(int min, int max, bool is_greedy,
  
  }  // namespace internal
  }  // namespace v8
 +
++#undef TRACE
++#undef TRACE_WITH_NODE
++#undef REGISTER_NODE
 +#undef kMaxCodePoint
 diff --git a/v8/src/sandbox/testing.cc b/v8/src/sandbox/testing.cc
 index 52d73951..d96f56f4 100644
 --- a/v8/src/sandbox/testing.cc
 +++ b/v8/src/sandbox/testing.cc
-@@ -20,6 +20,7 @@
+@@ -29,6 +29,7 @@
  #include <sys/mman.h>
  #include <sys/ucontext.h>
  #include <unistd.h>
 +#undef MAP_TYPE
- #endif  // V8_OS_LINUX
  
- #ifdef V8_USE_ADDRESS_SANITIZER
+ #include "src/base/platform/platform-linux.h"
+ #endif  // V8_OS_LINUX
 diff --git a/v8/src/snapshot/read-only-deserializer.cc b/v8/src/snapshot/read-only-deserializer.cc
 index 24e770f1..3568071a 100644
 --- a/v8/src/snapshot/read-only-deserializer.cc
@@ -985,24 +976,6 @@ index 4b1d2bd4..f55c0b4a 100644
 +
 +#undef ror
 +#undef shr
-diff --git a/v8/src/wasm/wasm-external-refs.cc b/v8/src/wasm/wasm-external-refs.cc
-index 2be79a9d..faa205ef 100644
---- a/v8/src/wasm/wasm-external-refs.cc
-+++ b/v8/src/wasm/wasm-external-refs.cc
-@@ -715,6 +715,8 @@ V ReadAndIncrementOffset(Address data, size_t* offset) {
-   return result;
- }
- 
-+#define kSuccess kSuccess_WASMExternalRefs
-+
- constexpr int32_t kSuccess = 1;
- constexpr int32_t kOutOfBounds = 0;
- }  // namespace
-@@ -1122,3 +1124,4 @@ Address load_old_fp(Isolate* isolate) {
- 
- #undef V8_WITH_SANITIZER
- #undef RESET_THREAD_IN_WASM_FLAG_FOR_ASAN_ON_WINDOWS
-+#undef kSuccess
 --- a/v8/src/compiler/turboshaft/turbolev-graph-builder.cc
 +++ b/v8/src/compiler/turboshaft/turbolev-graph-builder.cc
 @@ -6655,4 +6655,6 @@
@@ -1070,3 +1043,31 @@ index 2be79a9d..faa205ef 100644
  }  // namespace v8::internal::compiler::turboshaft
 +
 +#undef TRACE
+--- a/v8/src/regexp/regexp-compiler.cc
++++ b/v8/src/regexp/regexp-compiler.cc
+@@ -4106,3 +4106,7 @@
+ #endif
+ 
+ }  // namespace v8::internal
++
++#undef TRACE
++#undef TRACE_WITH_NODE
++#undef REGISTER_NODE
+--- a/v8/src/codegen/arm64/instructions-arm64.cc
++++ b/v8/src/codegen/arm64/instructions-arm64.cc
+@@ -9,6 +9,8 @@
+ #include "src/codegen/arm64/assembler-arm64-inl.h"
+ #include "src/common/code-memory-access-inl.h"
+ 
++#define RotateRight RotateRight_InstructionsARM64
++
+ namespace v8 {
+ namespace internal {
+ 
+@@ -415,4 +417,6 @@
+ }  // namespace internal
+ }  // namespace v8
+ 
++#undef RotateRight
++
+ #endif  // V8_TARGET_ARCH_ARM64

@@ -1,6 +1,6 @@
 --- a/server/control_session_http.cpp
 +++ b/server/control_session_http.cpp
-@@ -41,11 +41,11 @@
+@@ -56,11 +56,11 @@
      "    This webserver is a websocket endpoint for control clients (ws://<i>host</i>:1780/jsonrpc) and streaming clients"
      "    (ws://<i>host</i>:1780/stream), but it can also host simple web pages. To serve a web page, you must configure the"
      "    document root in the snapserver configuration file <b>snapserver.conf</b>, usually located in"
@@ -8,13 +8,13 @@
 +    "    <b>@TERMUX_PREFIX@/etc/snapserver.conf</b>"
      "  </p>"
      "  <p>"
-     "    The Snapserver installation should include a copy of <a href=\"https://github.com/badaix/snapweb\">Snapweb</a>,"
+     "    The Snapserver installation should include a copy of <a href=\"https://github.com/snapcast/snapweb\">Snapweb</a>,"
 -    "    located in <b>/usr/share/snapserver/snapweb/</b><br>"
 +    "    located in <b>@TERMUX_PREFIX@/share/snapserver/snapweb/</b><br>"
      "    To activate it, please configure the <b>doc_root</b> as follows, and restart Snapserver to activate the changes:"
      "  </p>"
      "  <pre>"
-@@ -56,7 +56,7 @@
+@@ -71,7 +71,7 @@
      "...\n"
      "\n"
      "# serve a website from the doc_root location\n"
@@ -23,9 +23,9 @@
      "\n"
      "#\n"
      "################################################</pre>"
-@@ -282,7 +282,7 @@
+@@ -317,7 +317,7 @@
  
-     if (settings_.doc_root.empty())
+     if (settings_.http.doc_root.empty())
      {
 -        static constexpr auto default_page = "/usr/share/snapserver/index.html";
 +        static constexpr auto default_page = "@TERMUX_PREFIX@/share/snapserver/index.html";

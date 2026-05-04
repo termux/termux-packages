@@ -8,7 +8,7 @@
 set -e -u
 
 ARCH="x86_64"
-REPO_URL="https://service.termux-pacman.dev/cgct/${ARCH}"
+REPO_URL="https://sync.termux-pacman.dev/cgct/${ARCH}"
 
 if [ "$ARCH" != "$(uname -m)" ]; then
 	echo "Error: the requested CGCT is not supported on your architecture"

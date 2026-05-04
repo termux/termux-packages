@@ -753,7 +753,7 @@ index 676a3a6166..baa24d545a 100644
      const base::Value& condition,
      std::string* error) {
 +  namespace keys = declarative_webrequest_constants;
-   const base::Value::Dict* condition_dict = condition.GetIfDict();
+   const base::DictValue* condition_dict = condition.GetIfDict();
    if (!condition_dict) {
      *error = kExpectedDictionary;
 diff --git a/extensions/browser/api/declarative_webrequest/webrequest_condition_attribute.cc b/extensions/browser/api/declarative_webrequest/webrequest_condition_attribute.cc
@@ -938,10 +938,10 @@ index 262048f73d..cf68c564eb 100644
  
 @@ -1801,6 +1800,7 @@ void ClearCacheOnNavigation() {
  // dictionary.
- base::Value::Dict CreateHeaderDictionary(const std::string& name,
-                                          const std::string& value) {
-+  namespace keys = extension_web_request_api_constants; 
-   base::Value::Dict header;
+ base::DictValue CreateHeaderDictionary(const std::string& name,
+                                        const std::string& value) {
++  namespace keys = extension_web_request_api_constants;
+   base::DictValue header;
    header.Set(keys::kHeaderNameKey, name);
    if (base::IsStringUTF8(value)) {
 diff --git a/extensions/browser/api/web_request/web_request_event_details.cc b/extensions/browser/api/web_request/web_request_event_details.cc
@@ -1029,19 +1029,19 @@ index af80323215..68c8e72d0a 100644
 +++ b/extensions/browser/guest_view/app_view/app_view_guest.cc
 @@ -219,7 +219,7 @@ void AppViewGuest::CreateInnerPage(
      scoped_refptr<content::SiteInstance> site_instance,
-     const base::Value::Dict& create_params,
+     const base::DictValue& create_params,
      GuestPageCreatedCallback callback) {
 -  const std::string* app_id = create_params.FindString(appview::kAppID);
 +  const std::string* app_id = create_params.FindString(::appview::kAppID);
    if (!app_id) {
      RejectGuestCreation(std::move(owned_this), std::move(callback));
      return;
-@@ -230,7 +230,7 @@ void AppViewGuest::CreateInnerPage(
+@@ -230,7 +230,7 @@
      return;
    }
  
--  const base::Value::Dict* data = create_params.FindDict(appview::kData);
-+  const base::Value::Dict* data = create_params.FindDict(::appview::kData);
+-  const base::DictValue* data = create_params.FindDict(appview::kData);
++  const base::DictValue* data = create_params.FindDict(::appview::kData);
    if (!data) {
      RejectGuestCreation(std::move(owned_this), std::move(callback));
      return;
@@ -1057,7 +1057,7 @@ index af80323215..68c8e72d0a 100644
 @@ -359,9 +359,9 @@ void AppViewGuest::LaunchAppAndFireEvent(
                                       std::move(callback))));
  
-   base::Value::Dict embed_request;
+   base::DictValue embed_request;
 -  embed_request.Set(appview::kGuestInstanceID, guest_instance_id());
 -  embed_request.Set(appview::kEmbedderID, owner_host());
 -  embed_request.Set(appview::kData, std::move(data));
@@ -1352,3 +1352,89 @@ index fa5a6c1c2f..5c0681f071 100644
  }  // namespace extensions
 +
 +#undef kCancelReason
+--- a/chrome/browser/extensions/api/developer_private/developer_private_functions.cc
++++ b/chrome/browser/extensions/api/developer_private/developer_private_functions.cc
+@@ -2297,10 +2297,10 @@
+ 
+   // Directory url is non empty only for syncfilesystem.
+   if (!directory_url_str.empty()) {
+-    storage::FileSystemURL directory_url =
++    ::storage::FileSystemURL directory_url =
+         context_->CrackURLInFirstPartyContext(GURL(directory_url_str));
+     if (!directory_url.is_valid() ||
+-        directory_url.type() != storage::kFileSystemTypeSyncable) {
++        directory_url.type() != ::storage::kFileSystemTypeSyncable) {
+       return RespondNow(Error("DirectoryEntry of unsupported filesystem."));
+     }
+     return LoadByFileSystemAPI(directory_url);
+@@ -2318,19 +2318,19 @@
+   // points to a non-native local directory.
+   std::string filesystem_id;
+   bool cracked =
+-      storage::CrackIsolatedFileSystemName(filesystem_name, &filesystem_id);
++      ::storage::CrackIsolatedFileSystemName(filesystem_name, &filesystem_id);
+   CHECK(cracked);
+   base::FilePath virtual_path =
+-      storage::IsolatedContext::GetInstance()
++      ::storage::IsolatedContext::GetInstance()
+           ->CreateVirtualRootPath(filesystem_id)
+           .Append(base::FilePath::FromUTF8Unsafe(filesystem_path));
+-  storage::FileSystemURL directory_url = context_->CreateCrackedFileSystemURL(
++  ::storage::FileSystemURL directory_url = context_->CreateCrackedFileSystemURL(
+       blink::StorageKey::CreateFirstParty(extension()->origin()),
+-      storage::kFileSystemTypeIsolated, virtual_path);
++      ::storage::kFileSystemTypeIsolated, virtual_path);
+ 
+   if (directory_url.is_valid() &&
+-      directory_url.type() != storage::kFileSystemTypeLocal &&
+-      directory_url.type() != storage::kFileSystemTypeDragged) {
++      directory_url.type() != ::storage::kFileSystemTypeLocal &&
++      directory_url.type() != ::storage::kFileSystemTypeDragged) {
+     return LoadByFileSystemAPI(directory_url);
+   }
+ 
+@@ -2340,7 +2340,7 @@
+ 
+ ExtensionFunction::ResponseAction
+ DeveloperPrivateLoadDirectoryFunction::LoadByFileSystemAPI(
+-    const storage::FileSystemURL& directory_url) {
++    const ::storage::FileSystemURL& directory_url) {
+   std::string directory_url_str = directory_url.ToGURL().spec();
+ 
+   size_t pos = 0;
+@@ -2396,7 +2396,7 @@
+     const base::FilePath& project_path,
+     const base::FilePath& destination_path) {
+   GURL project_url = GURL(project_base_url_ + destination_path.AsUTF8Unsafe());
+-  storage::FileSystemURL url =
++  ::storage::FileSystemURL url =
+       context_->CrackURLInFirstPartyContext(project_url);
+ 
+   context_->operation_runner()->ReadDirectory(
+@@ -2409,7 +2409,7 @@
+     const base::FilePath& project_path,
+     const base::FilePath& destination_path,
+     base::File::Error status,
+-    storage::FileSystemOperation::FileEntryList file_list,
++    ::storage::FileSystemOperation::FileEntryList file_list,
+     bool has_more) {
+   if (status != base::File::FILE_OK) {
+     DLOG(ERROR) << "Error in copying files from sync filesystem.";
+@@ -2434,7 +2434,7 @@
+ 
+     GURL project_url = GURL(project_base_url_ +
+                             destination_path.Append(file.name).AsUTF8Unsafe());
+-    storage::FileSystemURL url =
++    ::storage::FileSystemURL url =
+         context_->CrackURLInFirstPartyContext(project_url);
+ 
+     base::FilePath target_path = project_path;
+@@ -2466,7 +2466,7 @@
+     base::File::Error result,
+     const base::File::Info& file_info,
+     const base::FilePath& src_path,
+-    scoped_refptr<storage::ShareableFileReference> file_ref) {
++    scoped_refptr<::storage::ShareableFileReference> file_ref) {
+   if (result != base::File::FILE_OK) {
+     error_ = "Error in copying files from sync filesystem.";
+     success_ = false;

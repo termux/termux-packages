@@ -1,0 +1,22 @@
+--- a/src/TimerRecordDialog.cpp	2026-02-11 00:08:39.000000000 -0500
++++ b/src/TimerRecordDialog.cpp	2026-02-11 19:35:37.945922737 -0500
+@@ -217,7 +217,8 @@
+ 
+    // User might have had the dialog up for a while, or
+    // had a future day, set hour of day less than now's, then changed day to today.
+-   wxTimerEvent dummyTimerEvent;
++   wxTimer dummyTimer;
++   wxTimerEvent dummyTimerEvent(dummyTimer);
+    this->OnTimer(dummyTimerEvent);
+ 
+    // Always update End for changed Start, keeping Duration constant.
+@@ -532,7 +533,8 @@
+ 
+          // Make sure that start and end time are updated, so we always get the full
+          // duration, even if there's some delay getting here.
+-         wxTimerEvent dummyTimerEvent;
++         wxTimer dummyTimer;
++         wxTimerEvent dummyTimerEvent(dummyTimer);
+          this->OnTimer(dummyTimerEvent);
+ 
+          // Loop for progress display during recording.

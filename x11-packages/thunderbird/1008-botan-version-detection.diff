@@ -1,0 +1,13 @@
+diff --git a/third_party/rnp/moz.build b/third_party/rnp/moz.build
+index 64bbd12bcc8..f944cd5fe9e 100644
+--- a/comm/third_party/rnp/moz.build
++++ b/comm/third_party/rnp/moz.build
+@@ -70,7 +72,7 @@ rnp_defines = {
+ }
+ crypto_backend = CONFIG["MZLA_LIBRNP_BACKEND"]
+ if crypto_backend == "botan":
+-    crypto_backend_version = CONFIG["BOTAN_VERSION"]
++    crypto_backend_version = "@TERMUX_BOTAN_VERSION@"
+     LOCAL_INCLUDES += ["!../botan/build/include/public"]
+     if CONFIG["MZLA_SYSTEM_BOTAN"]:
+         CXXFLAGS += CONFIG["MZLA_BOTAN_CFLAGS"]

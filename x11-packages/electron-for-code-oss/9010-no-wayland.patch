@@ -1,0 +1,11 @@
+--- a/electron/shell/browser/linux/x11_util.cc
++++ b/electron/shell/browser/linux/x11_util.cc
+@@ -19,7 +19,7 @@
+ }
+ 
+ bool IsWayland() {
+-#if BUILDFLAG(IS_LINUX)
++#if BUILDFLAG(IS_LINUX) && !defined(__TERMUX__)
+   static const bool is = ui::GetOzonePlatformId() == ui::kPlatformWayland;
+   return is;
+ #else

@@ -1,0 +1,18 @@
+diff --git a/src/runtime/src/native/libs/CMakeLists.txt b/src/runtime/src/native/libs/CMakeLists.txt
+index cf8b2b47f..2aee2d51d 100644
+--- a/src/runtime/src/native/libs/CMakeLists.txt
++++ b/src/runtime/src/native/libs/CMakeLists.txt
+@@ -156,12 +156,9 @@ if (CLR_CMAKE_TARGET_UNIX OR CLR_CMAKE_TARGET_BROWSER OR CLR_CMAKE_TARGET_WASI)
+         endif ()
+ 
+         add_subdirectory(System.Security.Cryptography.Native.Apple)
+-    elseif (CLR_CMAKE_TARGET_ANDROID AND NOT FORCE_ANDROID_OPENSSL)
+-        add_subdirectory(System.Security.Cryptography.Native.Android)
+-    elseif (FORCE_ANDROID_OPENSSL)
+-        add_subdirectory(System.Security.Cryptography.Native)
+     else ()
+         add_subdirectory(System.Net.Security.Native)
+         add_subdirectory(System.Security.Cryptography.Native)
++        add_subdirectory(System.Security.Cryptography.Native.Android)
+     endif ()
+ endif ()

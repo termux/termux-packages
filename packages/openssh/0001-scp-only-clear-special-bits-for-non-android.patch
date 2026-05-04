@@ -1,0 +1,35 @@
+From 2a70036ec807cd39c66993ac81c74d938fb7b791 Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <grimler@termux.dev>
+Date: Fri, 24 Apr 2026 13:23:09 +0200
+Subject: [PATCH] scp: only clear special bits for non-android
+
+On android we run into a fortify error if we try to clear the special
+bits:
+
+```
+$ scp -t .
+FORTIFY: umask: called with invalid mask 7077
+```
+
+Fixes: https://github.com/termux/termux-packages/issues/29411
+---
+ scp.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/scp.c b/scp.c
+index 1faa9a555..64f2dfcfa 100644
+--- a/scp.c
++++ b/scp.c
+@@ -1679,7 +1679,9 @@ sink(int argc, char **argv, const char *src)
+ 	setimes = targisdir = 0;
+ 	mask = umask(0);
+ 	if (!pflag) {
++#ifndef __ANDROID__
+ 		mask |= 07000;
++#endif
+ 		(void) umask(mask);
+ 	}
+ 	if (argc != 1) {
+-- 
+2.43.0
+

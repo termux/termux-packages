@@ -4,15 +4,16 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 _LLVM_VERSION=20.1.7
-TERMUX_PKG_VERSION="0.19.5"
+TERMUX_PKG_VERSION="0.19.6"
+TERMUx_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
 	https://github.com/exaloop/codon/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
 	https://github.com/exaloop/codon/releases/download/v$TERMUX_PKG_VERSION/codon-linux-x86_64.tar.gz
 	https://github.com/exaloop/llvm-project/archive/refs/tags/codon-$_LLVM_VERSION.tar.gz
 )
 TERMUX_PKG_SHA256=(
-	e4bb2b21390bad2dab0010a9885aaf9ee9cdd9029ec3009197786f8fd610d6a4
-	6df4a1c62ed31ef5d8351f4016a8ec0cac77420c10967a0148e53bad5357a5a0
+	e33deefaf7ff3518c838db22d92b31f28cff4675a7ece70b79d5d31be1ce7420
+	38befce9eb87244698014b1fbe56a4102660120f1b82b3c7777c2a98c109770a
 	09df072c95628d9f59f67e0ad309bd3f4387f8cb06ae115f78c496c34f2c1e98
 )
 TERMUX_PKG_DEPENDS="libc++, libxml2, zlib, zstd"
@@ -28,7 +29,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DPYTHON_EXECUTABLE=$(command -v python3)
 -DLLVM_ENABLE_PIC=ON
 -DLLVM_ENABLE_LIBEDIT=OFF
--DDEFAULT_SYSROOT=$(dirname $TERMUX_PREFIX)
 -DLLVM_LINK_LLVM_DYLIB=on
 -DLLVM_NATIVE_TOOL_DIR=$TERMUX_PKG_HOSTBUILD_DIR/llvm-build/bin
 -DCROSS_TOOLCHAIN_FLAGS_LLVM_NATIVE=-DLLVM_NATIVE_TOOL_DIR=$TERMUX_PKG_HOSTBUILD_DIR/llvm-build/bin
@@ -64,6 +64,12 @@ termux_step_post_get_source() {
 		termux_error_exit "LLVM version mismatch: current $_LLVM_VERSION, expected $_llvm_version."
 	fi
 	mv llvm-project-codon-"$_llvm_version" llvm-project
+}
+
+termux_step_pre_configure() {
+	# This can't be set in the global scope because $TERMUX_PREFIX
+	# is not set here during auto update checks here.
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DDEFAULT_SYSROOT=$(dirname "$TERMUX_PREFIX")"
 }
 
 termux_step_host_build() {

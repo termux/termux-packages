@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/TomWright/dasel
 TERMUX_PKG_DESCRIPTION="Select, put and delete data from JSON, TOML, YAML, XML and CSV files with a single utility"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.2.2"
+TERMUX_PKG_VERSION="3.8.1"
 TERMUX_PKG_SRCURL=https://github.com/TomWright/dasel/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=4711deb92e3b6daf65453244559cb6e718041b5673f76d5dfa2aa4584e38e5c6
+TERMUX_PKG_SHA256=92711ddecfad9a1e97a41011d12ea88e9bb3c37827e5d5a718c3a8e8eaa88eaa
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 

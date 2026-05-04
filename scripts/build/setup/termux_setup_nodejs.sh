@@ -5,7 +5,7 @@ termux_setup_nodejs() {
 	# Ref: https://github.com/nodejs/node/commit/506b79e888
 	NODE_OPTIONS+=" --network-family-autoselection-attempt-timeout=500"
 	# Use LTS version for now
-	local NODEJS_VERSION=22.22.0
+	local NODEJS_VERSION=22.22.2
 	local NODEJS_FOLDER
 
 	if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
@@ -20,7 +20,7 @@ termux_setup_nodejs() {
 			local NODEJS_TAR_FILE=$TERMUX_PKG_TMPDIR/nodejs-$NODEJS_VERSION.tar.xz
 			termux_download https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.xz \
 				"$NODEJS_TAR_FILE" \
-				9aa8e9d2298ab68c600bd6fb86a6c13bce11a4eca1ba9b39d79fa021755d7c37
+				88fd1ce767091fd8d4a99fdb2356e98c819f93f3b1f8663853a2dee9b438068a
 			tar -xf "$NODEJS_TAR_FILE" -C "$NODEJS_FOLDER" --strip-components=1
 		fi
 		export PATH=$NODEJS_FOLDER/bin:$PATH

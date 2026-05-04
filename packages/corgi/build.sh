@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="CLI workflow manager"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.2.4"
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://github.com/DrakeW/corgi/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=783fa88c29aecfbd8a557c186cee4d2f41927a3147464d4ccabb99600e3a02e6
 TERMUX_PKG_RECOMMENDS="fzf"
@@ -31,7 +31,7 @@ termux_step_make_install() {
 termux_step_post_make_install() {
 	mkdir -p "$TERMUX_PREFIX"/etc/profile.d
 	cat <<- EOF > "$TERMUX_PREFIX"/etc/profile.d/corgi.sh
-	#!$TERMUX_PREFIX/bin/sh
-	export HISTFILE=\$SHELL
+	export HISTFILE="\$HISTFILE"
 	EOF
+	chmod 700 "$TERMUX_PREFIX"/etc/profile.d/corgi.sh
 }

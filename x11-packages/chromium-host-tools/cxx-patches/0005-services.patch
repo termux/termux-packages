@@ -1,0 +1,979 @@
+From ea5fb518f4292e7eb031f2bb62431cf0f3dc3609 Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <licy183@termux.dev>
+Date: Tue, 10 Mar 2026 02:00:01 +0800
+Subject: [PATCH 5/8] services
+
+---
+ services/audio/output_controller.cc             |  6 ++++--
+ .../platform_sensor_provider_chromeos.cc        |  4 ++--
+ services/device/hid/hid_connection.cc           | 10 ++++------
+ services/device/hid/hid_connection_win.cc       |  1 +
+ services/device/public/cpp/hid/hid_blocklist.cc |  6 +++---
+ .../device/public/cpp/hid/hid_report_utils.cc   |  8 ++++----
+ services/device/usb/usb_service_android.cc      |  1 +
+ services/device/usb/usb_service_impl.cc         |  6 +++---
+ services/image_annotation/annotator.cc          | 17 +++++++++--------
+ services/network/accept_ch_frame_interceptor.cc |  8 +++-----
+ .../attribution/request_headers_internal.cc     |  9 +++++----
+ services/network/cors/cors_url_loader.cc        |  8 +++-----
+ .../network/device_bound_session_manager.cc     |  6 ++----
+ services/network/prefetch_matches.cc            |  3 ++-
+ .../content_security_policy.cc                  |  3 ++-
+ .../cpp/content_security_policy/csp_context.cc  |  3 ++-
+ .../public/cpp/is_potentially_trustworthy.cc    |  7 ++++---
+ services/network/public/cpp/parsed_headers.cc   |  5 +++--
+ .../permissions_policy/permissions_policy.cc    |  5 +++--
+ .../public/cpp/sri_message_signatures.cc        |  7 ++++---
+ .../public/cpp/timing_allow_origin_parser.cc    |  3 ++-
+ .../shared_storage_request_helper.cc            |  5 ++---
+ services/network/stringify_enum.h               |  3 ++-
+ .../expiry_inspecting_record_expiry_delegate.cc |  8 +++-----
+ .../network/trust_tokens/trust_token_store.cc   | 15 +++++++--------
+ .../memory_instrumentation/graph.cc             |  5 ++---
+ .../queued_request_dispatcher.cc                |  4 ++--
+ .../public/cpp/service_executable/main.cc       |  5 ++---
+ services/video_capture/device_factory_impl.cc   |  6 +++---
+ .../public/cpp/mock_video_frame_handler.cc      |  3 ++-
+ ...shared_memory_virtual_device_mojo_adapter.cc |  5 +++--
+ .../compositor_frame_metadata_mojom_traits.cc   |  3 ++-
+ .../webnn/public/cpp/graph_validation_utils.cc  |  4 +++-
+ 33 files changed, 99 insertions(+), 93 deletions(-)
+
+diff --git a/services/audio/output_controller.cc b/services/audio/output_controller.cc
+index 1acd08a61a..f09d22264c 100644
+--- a/services/audio/output_controller.cc
++++ b/services/audio/output_controller.cc
+@@ -12,6 +12,7 @@
+ #include <utility>
+ 
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/feature_list.h"
+ #include "base/functional/bind.h"
+ #include "base/functional/callback_helpers.h"
+@@ -22,6 +23,7 @@
+ #include "base/strings/to_string.h"
+ #include "base/threading/platform_thread.h"
+ #include "base/trace_event/trace_event.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "build/build_config.h"
+ #include "media/base/audio_timestamp_helper.h"
+ #include "media/base/media_switches.h"
+@@ -178,7 +180,7 @@ OutputController::OutputController(
+       state_(kEmpty),
+       sync_reader_(sync_reader),
+       power_monitor_(params.sample_rate(),
+-                     base::Milliseconds(std::to_underlying(
++                     base::Milliseconds(base::to_underlying(
+                          kPowerMeasurementTimeConstantMillis))),
+       request_before_read_(base::FeatureList::IsEnabled(
+           kAudioOutputControllerRequestBeforeRead)),
+@@ -577,7 +579,7 @@ void OutputController::StartSnooping(Snooper* snooper) {
+ 
+   // The list will only update on this thread, and only be read on the realtime
+   // audio thread.
+-  DCHECK(!std::ranges::contains(snoopers_, snooper));
++  DCHECK(!base::Contains(snoopers_, snooper));
+   base::AutoLock lock(snooper_lock_);
+   snoopers_.push_back(snooper);
+ }
+diff --git a/services/device/generic_sensor/platform_sensor_provider_chromeos.cc b/services/device/generic_sensor/platform_sensor_provider_chromeos.cc
+index 55820a049b..4c2a5d5f17 100644
+--- a/services/device/generic_sensor/platform_sensor_provider_chromeos.cc
++++ b/services/device/generic_sensor/platform_sensor_provider_chromeos.cc
+@@ -9,6 +9,7 @@
+ #include <map>
+ #include <utility>
+ 
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/memory/scoped_refptr.h"
+ #include "base/strings/string_number_conversions.h"
+@@ -552,8 +553,7 @@ void PlatformSensorProviderChromeOS::DetermineLightSensor() {
+ 
+   for (const auto& sensor : sensors_) {
+     if (sensor.second.ignored ||
+-        !std::ranges::contains(sensor.second.types,
+-                               mojom::SensorType::AMBIENT_LIGHT))
++        !base::Contains(sensor.second.types, mojom::SensorType::AMBIENT_LIGHT))
+       continue;
+ 
+     if (!id.has_value() || sensor.second.location == SensorLocation::kLid)
+diff --git a/services/device/hid/hid_connection.cc b/services/device/hid/hid_connection.cc
+index 6a8afc9a83..22ccf3cfe8 100644
+--- a/services/device/hid/hid_connection.cc
++++ b/services/device/hid/hid_connection.cc
+@@ -6,6 +6,7 @@
+ 
+ #include <algorithm>
+ 
++#include "base/containers/contains.h"
+ #include "base/memory/ref_counted_memory.h"
+ #include "components/device_event_log/device_event_log.h"
+ #include "services/device/public/cpp/hid/hid_blocklist.h"
+@@ -178,20 +179,17 @@ bool HidConnection::IsReportProtected(uint8_t report_id,
+     // Deny access to reports that match HID blocklist rules.
+     if (report_type == HidReportType::kInput) {
+       if (device.protected_input_report_ids.has_value() &&
+-          std::ranges::contains(*device.protected_input_report_ids,
+-                                report_id)) {
++          base::Contains(*device.protected_input_report_ids, report_id)) {
+         return true;
+       }
+     } else if (report_type == HidReportType::kOutput) {
+       if (device.protected_output_report_ids.has_value() &&
+-          std::ranges::contains(*device.protected_output_report_ids,
+-                                report_id)) {
++          base::Contains(*device.protected_output_report_ids, report_id)) {
+         return true;
+       }
+     } else if (report_type == HidReportType::kFeature) {
+       if (device.protected_feature_report_ids.has_value() &&
+-          std::ranges::contains(*device.protected_feature_report_ids,
+-                                report_id)) {
++          base::Contains(*device.protected_feature_report_ids, report_id)) {
+         return true;
+       }
+     }
+diff --git a/services/device/hid/hid_connection_win.cc b/services/device/hid/hid_connection_win.cc
+index 45ca01537f..da1202277a 100644
+--- a/services/device/hid/hid_connection_win.cc
++++ b/services/device/hid/hid_connection_win.cc
+@@ -9,6 +9,7 @@
+ #include <utility>
+ 
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/feature_list.h"
+ #include "base/files/file.h"
+ #include "base/functional/bind.h"
+diff --git a/services/device/public/cpp/hid/hid_blocklist.cc b/services/device/public/cpp/hid/hid_blocklist.cc
+index ee54ce526c..f53451c9cf 100644
+--- a/services/device/public/cpp/hid/hid_blocklist.cc
++++ b/services/device/public/cpp/hid/hid_blocklist.cc
+@@ -4,11 +4,11 @@
+ 
+ #include "services/device/public/cpp/hid/hid_blocklist.h"
+ 
+-#include <algorithm>
+ #include <array>
+ #include <string_view>
+ 
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/no_destructor.h"
+ #include "base/strings/string_number_conversions.h"
+ #include "base/strings/string_split.h"
+@@ -289,8 +289,8 @@ bool HidBlocklist::IsKnownSecurityKey(uint16_t vendor_id, uint16_t product_id) {
+   // bypass the blocklist to access FIDO HID capabilities. Devices in
+   // kKnownSecurityKeys are considered FIDO for the purpose of this bypass, even
+   // if the device has no FIDO collection.
+-  return std::ranges::contains(kKnownSecurityKeys,
+-                               VendorProduct{vendor_id, product_id});
++  return base::Contains(kKnownSecurityKeys,
++                        VendorProduct{vendor_id, product_id});
+ }
+ 
+ // static
+diff --git a/services/device/public/cpp/hid/hid_report_utils.cc b/services/device/public/cpp/hid/hid_report_utils.cc
+index fcb588a4fd..e9006c179a 100644
+--- a/services/device/public/cpp/hid/hid_report_utils.cc
++++ b/services/device/public/cpp/hid/hid_report_utils.cc
+@@ -4,7 +4,7 @@
+ 
+ #include "services/device/public/cpp/hid/hid_report_utils.h"
+ 
+-#include <algorithm>
++#include "base/containers/contains.h"
+ 
+ namespace device {
+ 
+@@ -101,9 +101,9 @@ const mojom::HidCollectionInfo* FindCollectionWithReport(
+   // `report_type`, or nullptr if it is not in any collection.
+   auto find_it = std::ranges::find_if(
+       device.collections, [report_id, report_type](const auto& collection) {
+-        return std::ranges::contains(ReportsForType(*collection, report_type),
+-                                     report_id,
+-                                     &mojom::HidReportDescription::report_id);
++        return base::Contains(ReportsForType(*collection, report_type),
++                              report_id,
++                              &mojom::HidReportDescription::report_id);
+       });
+   if (find_it == device.collections.end()) {
+     return nullptr;
+diff --git a/services/device/usb/usb_service_android.cc b/services/device/usb/usb_service_android.cc
+index f0122c3491..030438fd7a 100644
+--- a/services/device/usb/usb_service_android.cc
++++ b/services/device/usb/usb_service_android.cc
+@@ -7,6 +7,7 @@
+ #include <string>
+ #include <vector>
+ 
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/location.h"
+ #include "base/task/sequenced_task_runner.h"
+diff --git a/services/device/usb/usb_service_impl.cc b/services/device/usb/usb_service_impl.cc
+index 15594a158d..591ec9328c 100644
+--- a/services/device/usb/usb_service_impl.cc
++++ b/services/device/usb/usb_service_impl.cc
+@@ -6,7 +6,6 @@
+ 
+ #include <stdint.h>
+ 
+-#include <algorithm>
+ #include <list>
+ #include <memory>
+ #include <set>
+@@ -14,6 +13,7 @@
+ 
+ #include "base/barrier_closure.h"
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/functional/callback_helpers.h"
+ #include "base/location.h"
+@@ -260,8 +260,8 @@ void UsbServiceImpl::OnDeviceList(
+   // Look for new and existing devices.
+   for (auto& device : *devices) {
+     // Ignore devices that have failed enumeration previously.
+-    if (std::ranges::contains(ignored_devices_, device.get(),
+-                              &ScopedLibusbDeviceRef::get)) {
++    if (base::Contains(ignored_devices_, device.get(),
++                       &ScopedLibusbDeviceRef::get)) {
+       continue;
+     }
+ 
+diff --git a/services/image_annotation/annotator.cc b/services/image_annotation/annotator.cc
+index 734963f4f5..7508e58387 100644
+--- a/services/image_annotation/annotator.cc
++++ b/services/image_annotation/annotator.cc
+@@ -11,6 +11,7 @@
+ #include <vector>
+ 
+ #include "base/base64.h"
++#include "base/containers/contains.h"
+ #include "base/feature_list.h"
+ #include "base/functional/bind.h"
+ #include "base/json/json_reader.h"
+@@ -1096,9 +1097,9 @@ std::string Annotator::ComputePreferredLanguage(
+ 
+   // If the page language is a server language and it's in the list of accept
+   // languages or top languages for this user, return that.
+-  if (std::ranges::contains(server_languages_, page_language) &&
+-      (std::ranges::contains(accept_languages, page_language) ||
+-       std::ranges::contains(top_languages, page_language))) {
++  if (base::Contains(server_languages_, page_language) &&
++      (base::Contains(accept_languages, page_language) ||
++       base::Contains(top_languages, page_language))) {
+     return page_language;
+   }
+ 
+@@ -1108,8 +1109,8 @@ std::string Annotator::ComputePreferredLanguage(
+   // top language and a server language.
+   if (!top_languages.empty()) {
+     for (const std::string& accept_language : accept_languages) {
+-      if (std::ranges::contains(server_languages_, accept_language) &&
+-          std::ranges::contains(top_languages, accept_language)) {
++      if (base::Contains(server_languages_, accept_language) &&
++          base::Contains(top_languages, accept_language)) {
+         return accept_language;
+       }
+     }
+@@ -1118,14 +1119,14 @@ std::string Annotator::ComputePreferredLanguage(
+   // Sometimes the top languages are empty. Try any accept language that's
+   // a server language.
+   for (const std::string& accept_language : accept_languages) {
+-    if (std::ranges::contains(server_languages_, accept_language)) {
++    if (base::Contains(server_languages_, accept_language)) {
+       return accept_language;
+     }
+   }
+ 
+   // If that still fails, try any top language that's a server language.
+   for (const std::string& top_language : top_languages) {
+-    if (std::ranges::contains(server_languages_, top_language)) {
++    if (base::Contains(server_languages_, top_language)) {
+       return top_language;
+     }
+   }
+@@ -1192,7 +1193,7 @@ void Annotator::OnServerLangsResponseReceived(
+     new_server_languages.push_back(lang.GetString());
+   }
+ 
+-  if (!std::ranges::contains(new_server_languages, "en")) {
++  if (!base::Contains(new_server_languages, "en")) {
+     DVLOG(1) << "Server langs don't even include 'en', rejecting";
+     return;
+   }
+diff --git a/services/network/accept_ch_frame_interceptor.cc b/services/network/accept_ch_frame_interceptor.cc
+index 478b56a9e1..88157900ac 100644
+--- a/services/network/accept_ch_frame_interceptor.cc
++++ b/services/network/accept_ch_frame_interceptor.cc
+@@ -4,8 +4,7 @@
+ 
+ #include "services/network/accept_ch_frame_interceptor.h"
+ 
+-#include <algorithm>
+-
++#include "base/containers/contains.h"
+ #include "base/feature_list.h"
+ #include "base/metrics/histogram_functions.h"
+ #include "base/time/time.h"
+@@ -175,11 +174,10 @@ AcceptCHFrameInterceptor::NeedsObserverCheck(
+   // is not in either list, we must fall back to the browser process to check.
+   bool needs_observer_check = false;
+   for (const auto& h : hints) {
+-    const bool is_in_hints =
+-        std::ranges::contains(enabled_client_hints_->hints, h);
++    const bool is_in_hints = base::Contains(enabled_client_hints_->hints, h);
+     const bool is_in_not_allowed_hints =
+         features::kAcceptCHFrameOffloadNotAllowedHints.Get() &&
+-        std::ranges::contains(enabled_client_hints_->not_allowed_hints, h);
++        base::Contains(enabled_client_hints_->not_allowed_hints, h);
+     const bool is_valid_for_offload = is_in_hints || is_in_not_allowed_hints;
+     if (is_in_not_allowed_hints && !is_in_hints) {
+       base::UmaHistogramEnumeration(
+diff --git a/services/network/attribution/request_headers_internal.cc b/services/network/attribution/request_headers_internal.cc
+index c4f75aefbc..430b310c91 100644
+--- a/services/network/attribution/request_headers_internal.cc
++++ b/services/network/attribution/request_headers_internal.cc
+@@ -15,6 +15,7 @@
+ #include "base/check.h"
+ #include "base/notreached.h"
+ #include "base/strings/strcat.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "net/http/structured_headers.h"
+ #include "services/network/public/mojom/attribution.mojom.h"
+ 
+@@ -114,10 +115,10 @@ AttributionReportingHeaderGreaseOptions::FromBits(uint8_t bits) {
+   options.swap_greases = bits & 0b1;
+   bits >>= 1;
+ 
+-  static_assert(std::to_underlying(GreaseContext::kNone) == 0);
+-  static_assert(std::to_underlying(GreaseContext::kKey) == 1);
+-  static_assert(std::to_underlying(GreaseContext::kValue) == 2);
+-  static_assert(std::to_underlying(GreaseContext::kParamName) == 3);
++  static_assert(base::to_underlying(GreaseContext::kNone) == 0);
++  static_assert(base::to_underlying(GreaseContext::kKey) == 1);
++  static_assert(base::to_underlying(GreaseContext::kValue) == 2);
++  static_assert(base::to_underlying(GreaseContext::kParamName) == 3);
+ 
+   options.context1 = static_cast<GreaseContext>(bits & 0b11);
+   bits >>= 2;
+diff --git a/services/network/cors/cors_url_loader.cc b/services/network/cors/cors_url_loader.cc
+index ad7380b048..77c5fb3341 100644
+--- a/services/network/cors/cors_url_loader.cc
++++ b/services/network/cors/cors_url_loader.cc
+@@ -4,11 +4,11 @@
+ 
+ #include "services/network/cors/cors_url_loader.h"
+ 
+-#include <algorithm>
+ #include <optional>
+ #include <sstream>
+ #include <utility>
+ 
++#include "base/containers/contains.h"
+ #include "base/containers/flat_set.h"
+ #include "base/dcheck_is_on.h"
+ #include "base/debug/dump_without_crashing.h"
+@@ -458,8 +458,7 @@ void CorsURLLoader::FollowRedirect(
+ 
+   if (GetSecSharedStorageWritableHeader(modified_headers)) {
+     request_.shared_storage_writable_eligible = true;
+-  } else if (std::ranges::contains(removed_headers,
+-                                   kSecSharedStorageWritableHeader)) {
++  } else if (base::Contains(removed_headers, kSecSharedStorageWritableHeader)) {
+     request_.shared_storage_writable_eligible = false;
+   }
+ 
+@@ -838,8 +837,7 @@ void CorsURLLoader::StartRequest() {
+   TRACE_EVENT("loading", "CorsURLLoader::StartRequest",
+               net::NetLogWithSourceToFlow(net_log_));
+   if (fetch_cors_flag_ && !skip_cors_enabled_scheme_check_ &&
+-      !std::ranges::contains(url::GetCorsEnabledSchemes(),
+-                             request_.url.GetScheme())) {
++      !base::Contains(url::GetCorsEnabledSchemes(), request_.url.GetScheme())) {
+     HandleComplete(URLLoaderCompletionStatus(
+         CorsErrorStatus(mojom::CorsError::kCorsDisabledScheme)));
+     return;
+diff --git a/services/network/device_bound_session_manager.cc b/services/network/device_bound_session_manager.cc
+index cf6db3384c..e4cb462a1a 100644
+--- a/services/network/device_bound_session_manager.cc
++++ b/services/network/device_bound_session_manager.cc
+@@ -4,8 +4,6 @@
+ 
+ #include "services/network/device_bound_session_manager.h"
+ 
+-#include <algorithm>
+-
+ #include "base/barrier_callback.h"
+ #include "base/containers/unique_ptr_adapters.h"
+ #include "base/functional/callback_helpers.h"
+@@ -70,13 +68,13 @@ void DeviceBoundSessionManager::DeleteAllSessions(
+         // TODO(crbug.com/384437667): Consolidate ClearDataFilter matching logic
+         [](const mojom::ClearDataFilter& filter, const url::Origin& origin,
+            const net::SchemefulSite& site) {
+-          bool is_match = std::ranges::contains(filter.origins, origin);
++          bool is_match = base::Contains(filter.origins, origin);
+           if (!is_match && !filter.domains.empty()) {
+             const std::string etld1_for_origin =
+                 net::registry_controlled_domains::GetDomainAndRegistry(
+                     site.GetURL(), net::registry_controlled_domains::
+                                        INCLUDE_PRIVATE_REGISTRIES);
+-            is_match = std::ranges::contains(filter.domains, etld1_for_origin);
++            is_match = base::Contains(filter.domains, etld1_for_origin);
+           }
+ 
+           switch (filter.type) {
+diff --git a/services/network/prefetch_matches.cc b/services/network/prefetch_matches.cc
+index afe504cd14..bbb50ec1df 100644
+--- a/services/network/prefetch_matches.cc
++++ b/services/network/prefetch_matches.cc
+@@ -18,6 +18,7 @@
+ 
+ #include "base/check.h"
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/containers/fixed_flat_map.h"
+ #include "base/containers/fixed_flat_set.h"
+ #include "base/containers/span.h"
+@@ -519,7 +520,7 @@ struct FieldMatcher {
+ };
+ 
+ template <Fields f>
+-constexpr bool kFieldIsIgnored = std::ranges::contains(kIgnoredFields, f);
++constexpr bool kFieldIsIgnored = base::Contains(kIgnoredFields, f);
+ 
+ // This is the implementation of FieldMatcher that completely ignores the
+ // contents of the field. Fields which should use this implementation should be
+diff --git a/services/network/public/cpp/content_security_policy/content_security_policy.cc b/services/network/public/cpp/content_security_policy/content_security_policy.cc
+index b635d1df62..496eff983a 100644
+--- a/services/network/public/cpp/content_security_policy/content_security_policy.cc
++++ b/services/network/public/cpp/content_security_policy/content_security_policy.cc
+@@ -10,6 +10,7 @@
+ #include <string_view>
+ 
+ #include "base/base64url.h"
++#include "base/containers/contains.h"
+ #include "base/containers/flat_set.h"
+ #include "base/feature_list.h"
+ #include "base/strings/strcat.h"
+@@ -899,7 +900,7 @@ network::mojom::CSPRequireTrustedTypesFor ParseRequireTrustedTypesFor(
+ bool IsValidTrustedTypesPolicyName(std::string_view value) {
+   return std::ranges::all_of(value, [](char c) {
+     return base::IsAsciiAlpha(c) || base::IsAsciiDigit(c) ||
+-           std::ranges::contains("-#=_/@.%", c);
++           base::Contains("-#=_/@.%", c);
+   });
+ }
+ 
+diff --git a/services/network/public/cpp/content_security_policy/csp_context.cc b/services/network/public/cpp/content_security_policy/csp_context.cc
+index bdf0f2db3a..2e13c2c2e0 100644
+--- a/services/network/public/cpp/content_security_policy/csp_context.cc
++++ b/services/network/public/cpp/content_security_policy/csp_context.cc
+@@ -6,6 +6,7 @@
+ 
+ #include <algorithm>
+ 
++#include "base/containers/contains.h"
+ #include "base/notreached.h"
+ #include "services/network/public/cpp/content_security_policy/content_security_policy.h"
+ #include "url/url_util.h"
+@@ -67,7 +68,7 @@ bool CSPContext::SchemeShouldBypassCSP(std::string_view scheme) {
+   // TODO(arthursonzogni): url::GetBypassingCSPScheme() is used instead of the
+   // blink::SchemeRegistry. It contains 1) but not 2).
+   const auto& bypassing_schemes = url::GetCSPBypassingSchemes();
+-  return std::ranges::contains(bypassing_schemes, scheme);
++  return base::Contains(bypassing_schemes, scheme);
+ }
+ 
+ void CSPContext::SanitizeDataForUseInCspViolation(
+diff --git a/services/network/public/cpp/is_potentially_trustworthy.cc b/services/network/public/cpp/is_potentially_trustworthy.cc
+index a9c36d2e19..2c3f235060 100644
+--- a/services/network/public/cpp/is_potentially_trustworthy.cc
++++ b/services/network/public/cpp/is_potentially_trustworthy.cc
+@@ -12,6 +12,7 @@
+ #include <vector>
+ 
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/logging.h"
+ #include "base/metrics/histogram_macros.h"
+ #include "base/no_destructor.h"
+@@ -246,7 +247,7 @@ std::vector<std::string> ParseSecureOriginAllowlistFromCmdline() {
+ 
+ bool IsAllowlisted(const std::vector<std::string>& allowlist,
+                    const url::Origin& origin) {
+-  if (std::ranges::contains(allowlist, origin.Serialize()))
++  if (base::Contains(allowlist, origin.Serialize()))
+     return true;
+ 
+   for (const std::string& origin_or_pattern : allowlist) {
+@@ -274,8 +275,8 @@ bool IsSchemeConsideredAuthenticated(std::string_view scheme) {
+   //   content::ContentClient::Schemes::secure_schemes
+   // - url::AddLocalScheme
+   // - url::AddSecureScheme
+-  return std::ranges::contains(url::GetSecureSchemes(), scheme) ||
+-         std::ranges::contains(url::GetLocalSchemes(), scheme);
++  return base::Contains(url::GetSecureSchemes(), scheme) ||
++         base::Contains(url::GetLocalSchemes(), scheme);
+ }
+ 
+ }  // namespace
+diff --git a/services/network/public/cpp/parsed_headers.cc b/services/network/public/cpp/parsed_headers.cc
+index e8202e03ed..eaec277b17 100644
+--- a/services/network/public/cpp/parsed_headers.cc
++++ b/services/network/public/cpp/parsed_headers.cc
+@@ -8,6 +8,7 @@
+ #include <string>
+ #include <vector>
+ 
++#include "base/containers/contains.h"
+ #include "base/containers/flat_set.h"
+ #include "base/feature_list.h"
+ #include "build/build_config.h"
+@@ -121,14 +122,14 @@ mojom::ParsedHeadersPtr PopulateParsedHeaders(
+   network::mojom::SupportsLoadingModePtr result =
+       network::ParseSupportsLoadingMode(*headers);
+   if (!result.is_null()) {
+-    if (std::ranges::contains(
++    if (base::Contains(
+             result->supported_modes,
+             network::mojom::LoadingMode::kCredentialedPrerender)) {
+       parsed_headers->supports_loading_mode.push_back(
+           network::mojom::LoadingMode::kCredentialedPrerender);
+     }
+ 
+-    if (std::ranges::contains(
++    if (base::Contains(
+             result->supported_modes,
+             network::mojom::LoadingMode::kPrerenderCrossOriginFrames)) {
+       parsed_headers->supports_loading_mode.push_back(
+diff --git a/services/network/public/cpp/permissions_policy/permissions_policy.cc b/services/network/public/cpp/permissions_policy/permissions_policy.cc
+index 44a74f882b..9b977f8efc 100644
+--- a/services/network/public/cpp/permissions_policy/permissions_policy.cc
++++ b/services/network/public/cpp/permissions_policy/permissions_policy.cc
+@@ -6,6 +6,7 @@
+ 
+ #include <algorithm>
+ 
++#include "base/containers/contains.h"
+ #include "base/containers/map_util.h"
+ #include "base/memory/ptr_util.h"
+ #include "base/no_destructor.h"
+@@ -217,7 +218,7 @@ bool PermissionsPolicy::IsFeatureEnabledForOrigin(
+     bool override_default_policy_to_all) const {
+   DCHECK(feature_list_->contains(feature));
+   DCHECK(!override_default_policy_to_all ||
+-         std::ranges::contains(kDefinedOptInFeatures, feature));
++         base::Contains(kDefinedOptInFeatures, feature));
+ 
+   // 9.9.2: If policy’s inherited policy for feature is Disabled, return
+   // "Disabled".
+@@ -541,7 +542,7 @@ PermissionsPolicy::CreateFlexibleForFencedFrame(
+     const network::PermissionsPolicyFeatureList& features) {
+   network::PermissionsPolicyFeaturesBitset inherited_policies;
+   for (const auto& [feature, default_value] : features) {
+-    if (std::ranges::contains(network::kFencedFrameAllowedFeatures, feature) &&
++    if (base::Contains(network::kFencedFrameAllowedFeatures, feature) &&
+         InheritedValueForFeature(subframe_origin, parent_policy,
+                                  {feature, default_value}, container_policy)) {
+       inherited_policies.Add(feature);
+diff --git a/services/network/public/cpp/sri_message_signatures.cc b/services/network/public/cpp/sri_message_signatures.cc
+index 8445b1f07d..7751b882f7 100644
+--- a/services/network/public/cpp/sri_message_signatures.cc
++++ b/services/network/public/cpp/sri_message_signatures.cc
+@@ -7,6 +7,7 @@
+ #include <algorithm>
+ 
+ #include "base/base64.h"
++#include "base/containers/contains.h"
+ #include "base/strings/escape.h"
+ #include "base/strings/strcat.h"
+ #include "base/strings/string_number_conversions.h"
+@@ -153,7 +154,7 @@ std::optional<mojom::SRIMessageSignatureComponentPtr> ParseComponent(
+       }
+     }
+     return result;
+-  } else if (std::ranges::contains(kDerivedComponents, name)) {
++  } else if (base::Contains(kDerivedComponents, name)) {
+     // The `@status` derived component must not have any parameters (as it's
+     // pulled from the response, not the request).
+     if (name == "@status") {
+@@ -330,7 +331,7 @@ std::string SerializeDerivedComponent(
+     const net::URLRequest& url_request,
+     const int response_status_code,
+     const mojom::SRIMessageSignatureComponentPtr& component) {
+-  DCHECK(std::ranges::contains(kDerivedComponents, component->name));
++  DCHECK(base::Contains(kDerivedComponents, component->name));
+   DCHECK(url_request.url().is_valid());
+ 
+   if (component->name == "@authority") {
+@@ -709,7 +710,7 @@ std::optional<std::string> ConstructSignatureBase(
+     //         produce an error.
+     std::optional<std::string> component_value;
+     if (component->name.starts_with('@')) {
+-      if (!std::ranges::contains(kDerivedComponents, component->name)) {
++      if (!base::Contains(kDerivedComponents, component->name)) {
+         return std::nullopt;
+       }
+       component_value = SerializeDerivedComponent(
+diff --git a/services/network/public/cpp/timing_allow_origin_parser.cc b/services/network/public/cpp/timing_allow_origin_parser.cc
+index e6d2435c3b..167bb13c03 100644
+--- a/services/network/public/cpp/timing_allow_origin_parser.cc
++++ b/services/network/public/cpp/timing_allow_origin_parser.cc
+@@ -9,6 +9,7 @@
+ #include <utility>
+ #include <vector>
+ 
++#include "base/containers/contains.h"
+ #include "net/http/http_util.h"
+ #include "services/network/public/mojom/timing_allow_origin.mojom-forward.h"
+ 
+@@ -39,7 +40,7 @@ mojom::TimingAllowOriginPtr ParseTimingAllowOrigin(const std::string& value) {
+ bool TimingAllowOriginCheck(const mojom::TimingAllowOriginPtr& tao,
+                             const url::Origin& origin) {
+   return tao && (tao->which() == mojom::TimingAllowOrigin::Tag::kAll ||
+-                 ::std::ranges::contains(tao->get_serialized_origins(),
++                 ::base::Contains(tao->get_serialized_origins(),
+                                          origin.Serialize()));
+ }
+ 
+diff --git a/services/network/shared_storage/shared_storage_request_helper.cc b/services/network/shared_storage/shared_storage_request_helper.cc
+index 6d2e602a30..818c280d4b 100644
+--- a/services/network/shared_storage/shared_storage_request_helper.cc
++++ b/services/network/shared_storage/shared_storage_request_helper.cc
+@@ -4,13 +4,13 @@
+ 
+ #include "services/network/shared_storage/shared_storage_request_helper.h"
+ 
+-#include <algorithm>
+ #include <memory>
+ #include <optional>
+ #include <string>
+ #include <utility>
+ #include <vector>
+ 
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/functional/callback.h"
+ #include "base/notreached.h"
+@@ -273,8 +273,7 @@ void SharedStorageRequestHelper::UpdateSharedStorageWritableEligible(
+   // takes precedence.
+   if (GetSecSharedStorageWritableHeader(modified_headers)) {
+     shared_storage_writable_eligible_ = true;
+-  } else if (std::ranges::contains(removed_headers,
+-                                   kSecSharedStorageWritableHeader)) {
++  } else if (base::Contains(removed_headers, kSecSharedStorageWritableHeader)) {
+     shared_storage_writable_eligible_ = false;
+   }
+ }
+diff --git a/services/network/stringify_enum.h b/services/network/stringify_enum.h
+index a3d2ca5909..992e3e6fa1 100644
+--- a/services/network/stringify_enum.h
++++ b/services/network/stringify_enum.h
+@@ -22,6 +22,7 @@
+ #include "base/check.h"
+ #include "base/compiler_specific.h"
+ #include "base/strings/string_util.h"
++#include "base/types/cxx23_to_underlying.h"
+ 
+ namespace network {
+ 
+@@ -318,7 +319,7 @@ void StreamEnumValueTo(std::ostream& os, Enum&& value) {
+   } else {
+     const std::string_view name = GetEnumValueNameForGenericCode(value);
+     if (name.empty()) {
+-      os << "Unknown (" << std::to_underlying(value) << ")";
++      os << "Unknown (" << base::to_underlying(value) << ")";
+     } else {
+       os << name;
+     }
+diff --git a/services/network/trust_tokens/expiry_inspecting_record_expiry_delegate.cc b/services/network/trust_tokens/expiry_inspecting_record_expiry_delegate.cc
+index b7377a92a2..3c95070269 100644
+--- a/services/network/trust_tokens/expiry_inspecting_record_expiry_delegate.cc
++++ b/services/network/trust_tokens/expiry_inspecting_record_expiry_delegate.cc
+@@ -4,8 +4,7 @@
+ 
+ #include "services/network/trust_tokens/expiry_inspecting_record_expiry_delegate.h"
+ 
+-#include <algorithm>
+-
++#include "base/containers/contains.h"
+ #include "components/cbor/reader.h"
+ #include "components/cbor/values.h"
+ #include "services/network/public/mojom/trust_tokens.mojom.h"
+@@ -41,9 +40,8 @@ bool ExpiryInspectingRecordExpiryDelegate::IsRecordExpired(
+   // Treat the RR as expired if its associated token-issuance verification key
+   // (|token_verification_key|) is no longer present in its issuer's key
+   // commitment.
+-  if (!std::ranges::contains(key_commitments->keys,
+-                             record.token_verification_key(),
+-                             &mojom::TrustTokenVerificationKey::body)) {
++  if (!base::Contains(key_commitments->keys, record.token_verification_key(),
++                      &mojom::TrustTokenVerificationKey::body)) {
+     return true;
+   }
+ 
+diff --git a/services/network/trust_tokens/trust_token_store.cc b/services/network/trust_tokens/trust_token_store.cc
+index 898611f26b..b3ff853f98 100644
+--- a/services/network/trust_tokens/trust_token_store.cc
++++ b/services/network/trust_tokens/trust_token_store.cc
+@@ -10,6 +10,7 @@
+ #include <optional>
+ #include <utility>
+ 
++#include "base/containers/contains.h"
+ #include "net/base/registry_controlled_domains/registry_controlled_domain.h"
+ #include "services/network/public/cpp/is_potentially_trustworthy.h"
+ #include "services/network/public/cpp/trust_token_parameterization.h"
+@@ -133,8 +134,7 @@ bool TrustTokenStore::IsAssociated(const SuitableTrustTokenOrigin& issuer,
+       persister_->GetToplevelConfig(top_level);
+   if (!config)
+     return false;
+-  return std::ranges::contains(config->associated_issuers(),
+-                               issuer.Serialize());
++  return base::Contains(config->associated_issuers(), issuer.Serialize());
+ }
+ 
+ bool TrustTokenStore::SetAssociation(
+@@ -146,7 +146,7 @@ bool TrustTokenStore::SetAssociation(
+     config = std::make_unique<TrustTokenToplevelConfig>();
+   auto string_issuer = issuer.Serialize();
+ 
+-  if (std::ranges::contains(config->associated_issuers(), string_issuer))
++  if (base::Contains(config->associated_issuers(), string_issuer))
+     return true;
+ 
+   if (config->associated_issuers_size() >=
+@@ -177,8 +177,8 @@ void TrustTokenStore::PruneStaleIssuerState(
+ 
+   google::protobuf::RepeatedPtrField<TrustToken> filtered_tokens;
+   for (auto& token : *config->mutable_tokens()) {
+-    if (std::ranges::contains(keys, token.signing_key(),
+-                              &mojom::TrustTokenVerificationKey::body)) {
++    if (base::Contains(keys, token.signing_key(),
++                       &mojom::TrustTokenVerificationKey::body)) {
+       *filtered_tokens.Add() = std::move(token);
+     }
+   }
+@@ -314,8 +314,7 @@ bool TrustTokenStore::ClearDataForFilter(mojom::ClearDataFilterPtr filter) {
+         // - it is an eTLD+1 (aka "domain and registry") match with anything
+         // on |filter|'s domain list, or
+         // - it is an origin match with anything on |filter|'s origin list.
+-        bool is_match =
+-            std::ranges::contains(filter.origins, storage_key.origin());
++        bool is_match = base::Contains(filter.origins, storage_key.origin());
+ 
+         // Computing the domain might be a little expensive, so
+         // skip it if we know for sure the origin is a match because it
+@@ -325,7 +324,7 @@ bool TrustTokenStore::ClearDataForFilter(mojom::ClearDataFilterPtr filter) {
+               net::registry_controlled_domains::GetDomainAndRegistry(
+                   storage_key.origin(),
+                   net::registry_controlled_domains::INCLUDE_PRIVATE_REGISTRIES);
+-          is_match = std::ranges::contains(filter.domains, etld1_for_origin);
++          is_match = base::Contains(filter.domains, etld1_for_origin);
+         }
+ 
+         switch (filter.type) {
+diff --git a/services/resource_coordinator/memory_instrumentation/graph.cc b/services/resource_coordinator/memory_instrumentation/graph.cc
+index 2e505146fd..e68cb7bcbd 100644
+--- a/services/resource_coordinator/memory_instrumentation/graph.cc
++++ b/services/resource_coordinator/memory_instrumentation/graph.cc
+@@ -4,9 +4,8 @@
+ 
+ #include "services/resource_coordinator/memory_instrumentation/graph.h"
+ 
+-#include <algorithm>
+-
+ #include "base/containers/adapters.h"
++#include "base/containers/contains.h"
+ #include "base/functional/callback.h"
+ #include "base/memory/raw_ptr.h"
+ #include "base/strings/string_tokenizer.h"
+@@ -269,7 +268,7 @@ Node* PostOrderIterator::next() {
+ 
+     // If the node is not at the front, it should also certainly not be
+     // anywhere else in the path. If it is, there is a cycle in the graph.
+-    DCHECK(!std::ranges::contains(path_, node));
++    DCHECK(!base::Contains(path_, node));
+     path_.push_back(node);
+ 
+     // Add this node back to the queue of nodes to visit.
+diff --git a/services/resource_coordinator/memory_instrumentation/queued_request_dispatcher.cc b/services/resource_coordinator/memory_instrumentation/queued_request_dispatcher.cc
+index 9e42948460..6bc18be0cb 100644
+--- a/services/resource_coordinator/memory_instrumentation/queued_request_dispatcher.cc
++++ b/services/resource_coordinator/memory_instrumentation/queued_request_dispatcher.cc
+@@ -6,11 +6,11 @@
+ 
+ #include <inttypes.h>
+ 
+-#include <algorithm>
+ #include <string_view>
+ #include <utility>
+ 
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/format_macros.h"
+ #include "base/functional/bind.h"
+ #include "base/logging.h"
+@@ -308,7 +308,7 @@ void QueuedRequestDispatcher::SetUpAndDispatchVmRegionRequest(
+                                       desired_pids, std::move(callback));
+ #else
+   for (const auto& client_info : clients) {
+-    if (std::ranges::contains(desired_pids, client_info.pid)) {
++    if (base::Contains(desired_pids, client_info.pid)) {
+       mojom::ClientProcess* client = client_info.client;
+       request->pending_responses.insert(client_info.pid);
+       request->responses[client_info.pid].process_id = client_info.pid;
+diff --git a/services/service_manager/public/cpp/service_executable/main.cc b/services/service_manager/public/cpp/service_executable/main.cc
+index 6c614c91ee..0118d69854 100644
+--- a/services/service_manager/public/cpp/service_executable/main.cc
++++ b/services/service_manager/public/cpp/service_executable/main.cc
+@@ -2,11 +2,10 @@
+ // Use of this source code is governed by a BSD-style license that can be
+ // found in the LICENSE file.
+ 
+-#include <algorithm>
+-
+ #include "base/at_exit.h"
+ #include "base/base_switches.h"
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/debug/debugger.h"
+ #include "base/debug/stack_trace.h"
+ #include "base/feature_list.h"
+@@ -51,7 +50,7 @@ void WaitForDebuggerIfNecessary() {
+         break;
+       }
+     }
+-    if (apps_to_debug.empty() || std::ranges::contains(apps_to_debug, app)) {
++    if (apps_to_debug.empty() || base::Contains(apps_to_debug, app)) {
+ #if BUILDFLAG(IS_WIN)
+       std::wstring appw = base::UTF8ToWide(app);
+       std::wstring message = base::UTF8ToWide(
+diff --git a/services/video_capture/device_factory_impl.cc b/services/video_capture/device_factory_impl.cc
+index 007e2f601c..18d3be094f 100644
+--- a/services/video_capture/device_factory_impl.cc
++++ b/services/video_capture/device_factory_impl.cc
+@@ -4,10 +4,10 @@
+ 
+ #include "services/video_capture/device_factory_impl.h"
+ 
+-#include <algorithm>
+ #include <sstream>
+ #include <utility>
+ 
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/notimplemented.h"
+ #if BUILDFLAG(IS_CHROMEOS)
+@@ -50,8 +50,8 @@ static void TranslateDeviceInfos(
+       }
+       translated_format.frame_size = format.frame_size;
+       translated_format.frame_rate = format.frame_rate;
+-      if (std::ranges::contains(translated_device_info.supported_formats,
+-                                translated_format)) {
++      if (base::Contains(translated_device_info.supported_formats,
++                         translated_format)) {
+         continue;
+       }
+       translated_device_info.supported_formats.push_back(translated_format);
+diff --git a/services/video_capture/public/cpp/mock_video_frame_handler.cc b/services/video_capture/public/cpp/mock_video_frame_handler.cc
+index 7d380b9d5c..e16eef1079 100644
+--- a/services/video_capture/public/cpp/mock_video_frame_handler.cc
++++ b/services/video_capture/public/cpp/mock_video_frame_handler.cc
+@@ -6,6 +6,7 @@
+ 
+ #include <algorithm>
+ 
++#include "base/containers/contains.h"
+ #include "mojo/public/cpp/bindings/pending_remote.h"
+ #include "mojo/public/cpp/bindings/remote.h"
+ 
+@@ -35,7 +36,7 @@ void MockVideoFrameHandler::ReleaseAccessedFrames() {
+ void MockVideoFrameHandler::OnNewBuffer(
+     int32_t buffer_id,
+     media::mojom::VideoBufferHandlePtr buffer_handle) {
+-  CHECK(!std::ranges::contains(known_buffer_ids_, buffer_id));
++  CHECK(!base::Contains(known_buffer_ids_, buffer_id));
+   known_buffer_ids_.push_back(buffer_id);
+   DoOnNewBuffer(buffer_id, &buffer_handle);
+ }
+diff --git a/services/video_capture/shared_memory_virtual_device_mojo_adapter.cc b/services/video_capture/shared_memory_virtual_device_mojo_adapter.cc
+index ea9d4dbc21..14d7a7381b 100644
+--- a/services/video_capture/shared_memory_virtual_device_mojo_adapter.cc
++++ b/services/video_capture/shared_memory_virtual_device_mojo_adapter.cc
+@@ -8,6 +8,7 @@
+ #include <utility>
+ 
+ #include "base/check_op.h"
++#include "base/containers/contains.h"
+ #include "base/functional/bind.h"
+ #include "base/functional/callback.h"
+ #include "base/memory/scoped_refptr.h"
+@@ -82,7 +83,7 @@ void SharedMemoryVirtualDeviceMojoAdapter::RequestFrameBuffer(
+     return;
+   }
+ 
+-  if (!std::ranges::contains(known_buffer_ids_, buffer_id)) {
++  if (!base::Contains(known_buffer_ids_, buffer_id)) {
+     if (video_frame_handler_.is_bound()) {
+       media::mojom::VideoBufferHandlePtr buffer_handle =
+           media::mojom::VideoBufferHandle::NewUnsafeShmemRegion(
+@@ -120,7 +121,7 @@ void SharedMemoryVirtualDeviceMojoAdapter::OnFrameReadyInBuffer(
+     ::media::mojom::VideoFrameInfoPtr frame_info) {
+   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+   // Unknown buffer ID.
+-  if (!std::ranges::contains(known_buffer_ids_, buffer_id)) {
++  if (!base::Contains(known_buffer_ids_, buffer_id)) {
+     return;
+   }
+ 
+diff --git a/services/viz/public/cpp/compositing/compositor_frame_metadata_mojom_traits.cc b/services/viz/public/cpp/compositing/compositor_frame_metadata_mojom_traits.cc
+index f776f6b9f3..426d2542f1 100644
+--- a/services/viz/public/cpp/compositing/compositor_frame_metadata_mojom_traits.cc
++++ b/services/viz/public/cpp/compositing/compositor_frame_metadata_mojom_traits.cc
+@@ -6,6 +6,7 @@
+ 
+ #include <algorithm>
+ 
++#include "base/containers/contains.h"
+ #include "build/build_config.h"
+ #include "services/viz/public/cpp/compositing/begin_frame_args_mojom_traits.h"
+ #include "services/viz/public/cpp/compositing/compositor_frame_transition_directive_mojom_traits.h"
+@@ -87,7 +88,7 @@ bool StructTraits<viz::mojom::CompositorFrameMetadataDataView,
+ 
+   // Verify that OffsetTagDefinition providers are referenced surfaces.
+   for (auto& tag_def : out->offset_tag_definitions) {
+-    if (!std::ranges::contains(out->referenced_surfaces, tag_def.provider)) {
++    if (!base::Contains(out->referenced_surfaces, tag_def.provider)) {
+       return false;
+     }
+   }
+diff --git a/services/webnn/public/cpp/graph_validation_utils.cc b/services/webnn/public/cpp/graph_validation_utils.cc
+index 66464aee5d..2a532aa30a 100644
+--- a/services/webnn/public/cpp/graph_validation_utils.cc
++++ b/services/webnn/public/cpp/graph_validation_utils.cc
+@@ -11,8 +11,10 @@
+ #include <variant>
+ #include <vector>
+ 
++#include "base/containers/contains.h"
+ #include "base/check.h"
+ #include "base/check_op.h"
++#include "base/containers/contains.h"
+ #include "base/notreached.h"
+ #include "base/numerics/checked_math.h"
+ #include "base/numerics/safe_conversions.h"
+@@ -206,7 +208,7 @@ ValidateReduceAxesAndInferOutput(base::span<const uint32_t> input_dimensions,
+     }
+   } else {
+     for (size_t i = 0; i < input_rank; i++) {
+-      if (!std::ranges::contains(axes, i)) {
++      if (!base::Contains(axes, i)) {
+         output_shape.push_back(input_dimensions[i]);
+       }
+     }

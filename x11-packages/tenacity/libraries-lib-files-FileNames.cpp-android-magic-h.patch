@@ -1,0 +1,28 @@
+--- a/libraries/lib-files/FileNames.cpp	2026-02-11 00:08:39.000000000 -0500
++++ b/libraries/lib-files/FileNames.cpp	2026-02-11 12:34:06.761932385 -0500
+@@ -727,14 +727,23 @@
+ }
+ #elif defined(__linux__)
+ #include <sys/statfs.h>
+-#include "/usr/include/linux/magic.h"
++#if defined(__has_include)
++#if __has_include(<linux/magic.h>)
++#include <linux/magic.h>
++#define TENACITY_HAVE_LINUX_MAGIC_H 1
++#endif
++#endif
+ bool FileNames::IsOnFATFileSystem(const FilePath &path)
+ {
+    struct statfs fs;
+    if (statfs(wxPathOnly(path).c_str(), &fs))
+       // Error from statfs
+       return false;
+-   return fs.f_type == MSDOS_SUPER_MAGIC;
++   #if defined(TENACITY_HAVE_LINUX_MAGIC_H)
++      return fs.f_type == MSDOS_SUPER_MAGIC;
++   #else
++      return false;
++   #endif
+ }
+ #elif defined(_WIN32)
+ #include <fileapi.h>

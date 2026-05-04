@@ -104,8 +104,6 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.TERMUXBOT2_TOKEN }}
-      - name: Set process id limit for 32-bit builds depending on aosp-libs
-        run: echo 65535 | sudo tee /proc/sys/kernel/pid_max
       - name: Enable zram
         uses: ./.github/actions/zram
         with:
@@ -113,13 +111,22 @@ jobs:
           size: 16G
           priority: 100
           device_name: /dev/zram0
+      - name: Load Docker image
+        run: |
+          ./scripts/run-docker.sh true
       - name: Free additional disk space
-        run: CLEAN_DOCKER_IMAGES=false ./scripts/free-space.sh
+        run: ./scripts/free-space.sh
+      - name: Install needed dependencies for package updates
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            curl \
+            python3 \
+            jq
       - name: Process package updates
         env:
           GITHUB_TOKEN: ${{ secrets.TERMUXBOT2_TOKEN }}
           BUILD_PACKAGES: "true"
-          TERMUX_DOCKER__CONTAINER_EXEC_COMMAND__PRE_CHECK_IF_WILL_BUILD_PACKAGES: "true"
           CREATE_ISSUE: "true"
           GIT_COMMIT_PACKAGES: "true"
           GIT_PUSH_PACKAGES: "true"

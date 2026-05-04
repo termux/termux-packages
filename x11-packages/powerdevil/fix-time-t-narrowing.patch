@@ -1,0 +1,11 @@
+--- a/daemon/powerdevilcore.cpp
++++ b/daemon/powerdevilcore.cpp
+@@ -1224,7 +1224,7 @@
+     } else {
+         // now pick the first timeout from the list
+         WakeupInfo wakeup = m_scheduledWakeups.first();
+-        nextWakeup = {wakeup.timeout, 0};
++        nextWakeup = {static_cast<time_t>(wakeup.timeout), 0};
+         enableNotifier = true;
+     }
+     if (m_timerFd != -1) {

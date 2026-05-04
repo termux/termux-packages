@@ -318,25 +318,15 @@ index 58810cc..601d03e 100644
  import("//build/config/python.gni")
  import("//build/util/lastchange.gni")
  import("//build/util/process_version.gni")
-@@ -233,7 +234,7 @@ static_library("backend_cdp_bindings") {
+@@ -312,7 +313,7 @@
+   ]
  }
  
- # Code that is not needed in a renderer process.
--component("headless_non_renderer") {
-+jumbo_component("headless_non_renderer") {
+-source_set("headless_browser") {
++jumbo_source_set("headless_browser") {
    sources = [
      "lib/browser/command_line_handler.cc",
      "lib/browser/command_line_handler.h",
-@@ -304,6 +305,9 @@ component("headless_non_renderer") {
-     "public/internal/value_conversions.h",
-     "public/switches.h",
-   ]
-+  jumbo_excluded_sources = [
-+    "lib/utility/headless_content_utility_client.cc", # Conflict with //headless:headless_shell_lib
-+  ]
- 
-   configs += [ "//build/config/compiler:wexit_time_destructors" ]
- 
 diff --git a/ipc/BUILD.gn b/ipc/BUILD.gn
 index ee8324d..a1b6fc3 100644
 --- a/ipc/BUILD.gn

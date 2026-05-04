@@ -1,0 +1,61 @@
+From 3640b28ff1afcf44e6ed874212eaed949ed3b08c Mon Sep 17 00:00:00 2001
+From: Thomas Holder <thomas@thomas-holder.de>
+Date: Sat, 10 Jan 2026 23:44:10 +0100
+Subject: [PATCH] Fix build with poppler 26.01.0
+
+---
+ src/extension/internal/pdfinput/pdf-input.cpp   | 1 +
+ src/extension/internal/pdfinput/svg-builder.cpp | 9 +++++++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/src/extension/internal/pdfinput/pdf-input.cpp b/src/extension/internal/pdfinput/pdf-input.cpp
+index 7b5e0ecb1d..539d737e52 100644
+--- a/src/extension/internal/pdfinput/pdf-input.cpp
++++ b/src/extension/internal/pdfinput/pdf-input.cpp
+@@ -28,6 +28,7 @@
+ #include <poppler/PDFDoc.h>
+ #include <poppler/Page.h>
+ #include <poppler/goo/GooString.h>
++#include <poppler/goo/gmem.h>
+ 
+ #ifdef HAVE_POPPLER_CAIRO
+ #include <poppler/glib/poppler.h>
+diff --git a/src/extension/internal/pdfinput/svg-builder.cpp b/src/extension/internal/pdfinput/svg-builder.cpp
+index 6c78247dfb..8b2e6f3d54 100644
+--- a/src/extension/internal/pdfinput/svg-builder.cpp
++++ b/src/extension/internal/pdfinput/svg-builder.cpp
+@@ -32,6 +32,7 @@
+ #include <poppler/GfxState.h>
+ #include <poppler/Page.h>
+ #include <poppler/Stream.h>
++#include <poppler/goo/gmem.h>
+ 
+ #include "color.h"
+ #include "color/cms-util.h"
+@@ -2093,7 +2094,11 @@ Inkscape::XML::Node *SvgBuilder::_createImage(Stream *str, int width, int height
+         } else {
+             image_stream = new ImageStream(str, width, 1, 1);
+         }
++#if POPPLER_CHECK_VERSION(26, 0, 0)
++        image_stream->rewind();
++#else
+         image_stream->reset();
++#endif
+ 
+         // Convert grayscale values
+         unsigned char *buffer = new unsigned char[width];
+@@ -2119,7 +2124,11 @@ Inkscape::XML::Node *SvgBuilder::_createImage(Stream *str, int width, int height
+         image_stream = new ImageStream(str, width,
+                                        color_map->getNumPixelComps(),
+                                        color_map->getBits());
++#if POPPLER_CHECK_VERSION(26, 0, 0)
++        image_stream->rewind();
++#else
+         image_stream->reset();
++#endif
+ 
+         // Convert RGB values
+         unsigned int *buffer = new unsigned int[width];
+-- 
+GitLab
+

@@ -1,0 +1,11 @@
+--- a/src/peer/utmetadata.cpp 01:43:29.339142276 +0530
++++ b/src/peer/utmetadata.cpp	2026-04-20 01:44:04.420161389 +0530
+@@ -34,7 +34,7 @@
+         return;
+     }
+ 
+-    const auto tmp = QByteArrayView{packet, size}.sliced(2);
++        const auto tmp = QByteArrayView{packet, static_cast<qsizetype>(size)}.sliced(2);
+     try {
+         BDecoder dec(tmp.data(), tmp.size(), false);
+         const std::unique_ptr<BDictNode> dict = dec.decodeDict();

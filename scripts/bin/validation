@@ -192,7 +192,7 @@ maybe_cleanup() {
 		return
 	fi
 
-	./clean.sh
+	./scripts/run-docker.sh ./clean.sh
 	rm -rf ./output/*
 }
 
@@ -215,7 +215,7 @@ for package in "${PACKAGES[@]}"; do
 		# Header
 		echo "INFO: Building ${package} for ${ARCH}"
 		maybe_cleanup "${package}"
-		./build-package.sh -I -f -a "${ARCH}" "${package}"
+		./scripts/run-docker.sh ./build-package.sh -I -f -a "${ARCH}" "${package}"
 		status="${PIPESTATUS[0]}"
 		echo # newline
 		echo "INFO: Building ${package} for ${ARCH} took $(ms_to_human_readable $(( $(date +%10s%3N) - start )))"

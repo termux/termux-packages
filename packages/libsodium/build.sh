@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://libsodium.org/
 TERMUX_PKG_DESCRIPTION="Network communication, cryptography and signaturing library"
 TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.0.21"
-TERMUX_PKG_SRCURL=https://github.com/jedisct1/libsodium/archive/refs/tags/${TERMUX_PKG_VERSION}-RELEASE.tar.gz
-TERMUX_PKG_SHA256=42e0ca94faaec901f4fbeda84b1b94b18f5309c360c66345cf52a7ab515b245b
+TERMUX_PKG_VERSION="1.0.22"
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL="https://github.com/jedisct1/libsodium/archive/refs/tags/${TERMUX_PKG_VERSION}-RELEASE.tar.gz"
+TERMUX_PKG_SHA256=5838bb0c3da6148c24ebe531d1ed1297de9a87aea77d426bcd99f289e681631c
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE=latest-release-tag
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+(?=-RELEASE)"

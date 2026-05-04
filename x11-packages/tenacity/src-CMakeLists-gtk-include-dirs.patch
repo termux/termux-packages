@@ -1,0 +1,24 @@
+--- a/src/CMakeLists.txt	2026-02-11 00:08:39.000000000 -0500
++++ b/src/CMakeLists.txt	2026-02-11 20:52:55.241920968 -0500
+@@ -10,6 +10,21 @@
+ set( CMAKE_ENABLE_EXPORTS ON )
+ 
+ add_executable( ${TARGET} )
++# Ensure GTK headers are available when building wxGTK code that includes <gtk/gtk.h>
++# (e.g. KeyboardCapture.cpp). find_package(GTK ...) is done at top-level on Linux,
++# but the include dirs are not automatically applied to this target.
++if(NOT CMAKE_SYSTEM_NAME MATCHES "Darwin|Windows")
++  find_package(PkgConfig REQUIRED)
++
++  pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
++  pkg_check_modules(GDKX11 REQUIRED gdk-x11-3.0)
++
++  target_include_directories(${TARGET} PRIVATE ${GTK3_INCLUDE_DIRS} ${GDKX11_INCLUDE_DIRS})
++  target_link_directories(${TARGET} PRIVATE ${GTK3_LIBRARY_DIRS} ${GDKX11_LIBRARY_DIRS})
++  target_compile_options(${TARGET} PRIVATE ${GTK3_CFLAGS_OTHER} ${GDKX11_CFLAGS_OTHER})
++  target_link_libraries(${TARGET} PRIVATE ${GTK3_LIBRARIES} ${GDKX11_LIBRARIES})
++endif()
++
+ add_dependencies( ${TARGET} locale )
+ add_dependencies( ${TARGET} nyquist )
+ add_dependencies( ${TARGET} plug-ins )

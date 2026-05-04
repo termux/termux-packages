@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="An extremely fast Python package installer and resolver,
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE-APACHE, LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.9.15"
+TERMUX_PKG_VERSION="0.11.8"
 TERMUX_PKG_SRCURL=https://github.com/astral-sh/uv/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=4bd98152fbeb3cbe4a06fd0d49824d44db3023e24d17ba265df71fd52591bc09
+TERMUX_PKG_SHA256=e47431f7e5af7c4ee29a288eb45d81e78ef57ea9fa6604a9a09e599a9d25ee33
 TERMUX_PKG_DEPENDS="zstd"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -13,23 +13,6 @@ TERMUX_PKG_AUTO_UPDATE=true
 termux_step_pre_configure() {
 	termux_setup_cmake
 	termux_setup_rust
-
-	# Dummy CMake toolchain file to workaround build error:
-	# error: failed to run custom build command for `libz-ng-sys v1.1.15`
-	# ...
-	# CMake Error at /home/builder/.termux-build/_cache/cmake-3.28.3/share/cmake-3.28/Modules/Platform/Android-Determine.cmake:217 (message):
-	# Android: Neither the NDK or a standalone toolchain was found.
-	export TARGET_CMAKE_TOOLCHAIN_FILE="${TERMUX_PKG_BUILDDIR}/android.toolchain.cmake"
-	touch "${TERMUX_PKG_BUILDDIR}/android.toolchain.cmake"
-
-	: "${CARGO_HOME:=$HOME/.cargo}"
-	export CARGO_HOME
-
-	rm -rf "${CARGO_HOME}"/registry/src/*/sys-info-*
-	cargo fetch --target "${CARGO_TARGET_NAME}"
-
-	patch -p1 -d "${CARGO_HOME}"/registry/src/*/sys-info-* \
-	-i "${TERMUX_PKG_BUILDER_DIR}"/0001-sys-info-replace-index-with-strchr.diff
 }
 
 termux_step_make() {
@@ -53,10 +36,6 @@ termux_step_post_make_install() {
 	touch "${TERMUX_PREFIX}"/share/elvish/lib/uv.elv
 	touch "${TERMUX_PREFIX}"/share/fish/vendor_completions.d/uv.fish
 	touch "${TERMUX_PREFIX}"/share/zsh/site-functions/_uv
-}
-
-termux_step_post_massage() {
-	rm -rf "${CARGO_HOME}"/registry/src/*/sys-info-*
 }
 
 termux_step_create_debscripts() {

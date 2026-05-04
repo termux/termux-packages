@@ -5,9 +5,10 @@
   <boxed name="GnmParsePos" get-type="gnm_parse_pos_get_type"/>
   <boxed name="GnmCellRef" get-type="gnm_cellref_get_type"/>
   <boxed name="GnmRangeRef" get-type="gnm_rangeref_get_type"/>
+  <class name="GnmConventions" get-type="gnm_conventions_get_type" parents="GObject">
+  </class>
   <boxed name="GnmLexerItem" get-type="gnm_lexer_item_get_type"/>
   <boxed name="GnmParseError" get-type="gnm_parse_error_get_type"/>
-  <boxed name="GnmConventions" get-type="gnm_conventions_get_type"/>
   <boxed name="GnmValue" get-type="gnm_value_get_type"/>
   <class name="GnmDataCacheSource" get-type="gnm_data_cache_source_get_type" parents="GObject">
     <implements name="GODataCacheSource"/>
@@ -110,7 +111,6 @@
   <class name="GnmCmdContextStderr" get-type="gnm_cmd_context_stderr_get_type" parents="GObject">
     <implements name="GOCmdContext"/>
   </class>
-  <boxed name="GnmStyle" get-type="gnm_style_get_type"/>
   <enum name="GnmHAlign" get-type="gnm_align_h_get_type">
     <member name="GNM_HALIGN_GENERAL" nick="general" value="1"/>
     <member name="GNM_HALIGN_LEFT" nick="left" value="2"/>
@@ -126,7 +126,15 @@
     <member name="GNM_VALIGN_CENTER" nick="center" value="4"/>
     <member name="GNM_VALIGN_JUSTIFY" nick="justify" value="8"/>
     <member name="GNM_VALIGN_DISTRIBUTED" nick="distributed" value="16"/>
-  </enum>  <boxed name="GnmColor" get-type="gnm_color_get_type"/>
+  </enum>  <boxed name="GnmStyle" get-type="gnm_style_get_type"/>
+  <class name="GnmComplete" get-type="gnm_complete_get_type" parents="GObject">
+    <signal name="notify-match" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="GnmCompleteSheet" get-type="gnm_complete_sheet_get_type" parents="GnmComplete,GObject">
+  </class>
+  <boxed name="GnmColor" get-type="gnm_color_get_type"/>
   <boxed name="GnmBorder" get-type="gnm_border_get_type"/>
   <class name="GnmGODataScalar" get-type="gnm_go_data_scalar_get_type" parents="GODataScalar,GOData,GObject">
   </class>
@@ -134,11 +142,85 @@
   </class>
   <class name="GnmGODataMatrix" get-type="gnm_go_data_matrix_get_type" parents="GODataMatrix,GOData,GObject">
   </class>
-  <class name="GnmComplete" get-type="gnm_complete_get_type" parents="GObject">
+  <enum name="gnm_tool_group_by_t" get-type="gnm_tool_group_by_get_type">
+    <member name="GNM_TOOL_GROUPED_BY_ROW" nick="row" value="0"/>
+    <member name="GNM_TOOL_GROUPED_BY_COL" nick="col" value="1"/>
+    <member name="GNM_TOOL_GROUPED_BY_AREA" nick="area" value="2"/>
+    <member name="GNM_TOOL_GROUPED_BY_BIN" nick="bin" value="3"/>
+  </enum>  <class name="GnmAnalysisTool" get-type="gnm_analysis_tool_get_type" parents="GObject">
+    <signal name="update-dao" return="gboolean" when="last">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="update-descriptor" return="gchararray" when="last">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="prepare-output-range" return="gboolean" when="last">
+      <param type="WorkbookControl"/>
+      <param type="gpointer"/>
+    </signal>
+    <signal name="last-validity-check" return="gboolean" when="last">
+      <param type="WorkbookControl"/>
+      <param type="gpointer"/>
+    </signal>
+    <signal name="format-output-range" return="gboolean" when="last">
+      <param type="WorkbookControl"/>
+      <param type="gpointer"/>
+    </signal>
+    <signal name="perform-calc" return="gboolean" when="last">
+      <param type="WorkbookControl"/>
+      <param type="gpointer"/>
+    </signal>
   </class>
-  <class name="GnmCompleteSheet" get-type="gnm_complete_sheet_get_type" parents="GnmComplete,GObject">
+  <class name="GnmGenericAnalysisTool" get-type="gnm_generic_analysis_tool_get_type" parents="GnmAnalysisTool,GObject">
+    <property name="labels" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="group-by" type="gnm_tool_group_by_t" flags="3" default-value="GNM_TOOL_GROUPED_BY_COL"/>
+  </class>
+  <class name="GnmCorrelationTool" get-type="gnm_correlation_tool_get_type" parents="GnmGenericAnalysisTool,GnmAnalysisTool,GObject">
+  </class>
+  <class name="GnmCovarianceTool" get-type="gnm_covariance_tool_get_type" parents="GnmGenericAnalysisTool,GnmAnalysisTool,GObject">
+  </class>
+  <class name="GnmAnovaSingleTool" get-type="gnm_anova_single_tool_get_type" parents="GnmGenericAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="alpha" type="gdouble" flags="3" default-value="0.050000"/>
+  </class>
+  <class name="GnmDescriptiveTool" get-type="gnm_descriptive_tool_get_type" parents="GnmGenericAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="do-summary-statistics" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="do-confidence-level" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="do-kth-largest" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="do-kth-smallest" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="use-ssmedian" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="k-smallest" type="gint" flags="3" default-value="1"/>
+    <property name="k-largest" type="gint" flags="3" default-value="1"/>
+    <property name="confidence-level" type="gdouble" flags="3" default-value="0.950000"/>
+  </class>
+  <class name="GnmMovingAverageTool" get-type="gnm_moving_average_tool_get_type" parents="GnmGenericAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="interval" type="gint" flags="3" default-value="1"/>
+    <property name="std-error-flag" type="gint" flags="3" default-value="0"/>
+    <property name="df" type="gint" flags="3" default-value="0"/>
+    <property name="offset" type="gint" flags="3" default-value="0"/>
+    <property name="show-graph" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="ma-type" type="gint" flags="3" default-value="0"/>
+  </class>
+  <class name="GnmFourierTool" get-type="gnm_fourier_tool_get_type" parents="GnmGenericAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="inverse" type="gboolean" flags="3" default-value="FALSE"/>
+  </class>
+  <class name="GnmSamplingTool" get-type="gnm_sampling_tool_get_type" parents="GnmGenericAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="periodic" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="row-major" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="offset" type="guint" flags="3" default-value="0"/>
+    <property name="size" type="guint" flags="3" default-value="0"/>
+    <property name="period" type="guint" flags="3" default-value="0"/>
+    <property name="number" type="guint" flags="3" default-value="0"/>
+  </class>
+  <class name="GnmRankingTool" get-type="gnm_ranking_tool_get_type" parents="GnmGenericAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="av-ties" type="gboolean" flags="3" default-value="FALSE"/>
+  </class>
+  <class name="GnmGenericBAnalysisTool" get-type="gnm_generic_b_analysis_tool_get_type" parents="GnmAnalysisTool,GObject">
+    <property name="labels" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="alpha" type="gdouble" flags="3" default-value="0.050000"/>
   </class>
   <boxed name="GnmConsolidate" get-type="gnm_consolidate_get_type"/>
+  <class name="GnmConsolidateTool" get-type="gnm_consolidate_tool_get_type" parents="GnmAnalysisTool,GObject">
+  </class>
   <boxed name="GnmSheetSize" get-type="gnm_sheet_size_get_type"/>
   <enum name="GnmSheetType" get-type="gnm_sheet_type_get_type">
     <member name="GNM_SHEET_DATA" nick="data" value="0"/>
@@ -208,7 +290,14 @@
   <boxed name="GnmExprDeriv" get-type="gnm_expr_deriv_info_get_type"/>
   <boxed name="GnmNamedExpr" get-type="gnm_named_expr_get_type"/>
   <boxed name="GnmNamedExprCollection" get-type="gnm_named_expr_collection_get_type"/>
-  <boxed name="GnmFT" get-type="gnm_ft_get_type"/>
+  <class name="GnmFTCategoryGroup" get-type="gnm_ft_category_group_get_type" parents="GObject">
+  </class>
+  <class name="GnmFTCategory" get-type="gnm_ft_category_get_type" parents="GObject">
+  </class>
+  <class name="GnmFT" get-type="gnm_ft_get_type" parents="GObject">
+  </class>
+  <class name="GnmFTMember" get-type="gnm_ft_member_get_type" parents="GObject">
+  </class>
   <boxed name="GnmFuncGroup" get-type="gnm_func_group_get_type"/>
   <class name="GnmFunc" get-type="gnm_func_get_type" parents="GObject">
     <property name="name" type="gchararray" flags="235" default-value="NULL"/>
@@ -543,8 +632,12 @@
   <boxed name="GnmStyleRegion" get-type="gnm_style_region_get_type"/>
   <class name="SheetView" get-type="gnm_sheet_view_get_type" parents="GObject">
   </class>
-  <boxed name="GnmSortData" get-type="gnm_sort_data_get_type"/>
-  <boxed name="StfParseOptions_t" get-type="stf_parse_options_get_type"/>
+  <class name="GnmSortData" get-type="gnm_sort_data_get_type" parents="GObject">
+  </class>
+  <class name="GnmStfParsedLines" get-type="gnm_stf_parsed_lines_get_type" parents="GObject">
+  </class>
+  <class name="GnmStfParseOptions" get-type="stf_parse_options_get_type" parents="GObject">
+  </class>
   <boxed name="GnmStyleCond" get-type="gnm_style_cond_get_type"/>
   <class name="GnmStyleConditions" get-type="gnm_style_conditions_get_type" parents="GObject">
   </class>
@@ -584,8 +677,160 @@
     <property name="preferred-height" type="gint" flags="227" default-value="768"/>
     <property name="workbook" type="Workbook" flags="235"/>
   </class>
+  <class name="GnmAnovaTwoFactorTool" get-type="gnm_anova_two_factor_tool_get_type" parents="GnmAnalysisTool,GObject">
+    <property name="group-by" type="gnm_tool_group_by_t" flags="3" default-value="GNM_TOOL_GROUPED_BY_COL"/>
+    <property name="alpha" type="gdouble" flags="3" default-value="0.050000"/>
+    <property name="labels" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="replication" type="gint" flags="3" default-value="1"/>
+  </class>
+  <class name="GnmAutoExpressionTool" get-type="gnm_auto_expression_tool_get_type" parents="GnmGenericAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="multiple" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="below" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="function" type="gchararray" flags="227" default-value="NULL"/>
+  </class>
+  <class name="GnmChiSquaredTool" get-type="gnm_chi_squared_tool_get_type" parents="GnmAnalysisTool,GObject">
+    <property name="alpha" type="gdouble" flags="3" default-value="0.050000"/>
+    <property name="independence" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="labels" type="gboolean" flags="3" default-value="FALSE"/>
+  </class>
+  <class name="GnmExpSmoothingTool" get-type="gnm_exp_smoothing_tool_get_type" parents="GnmGenericAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="damp-fact" type="gdouble" flags="3" default-value="0.500000"/>
+    <property name="g-damp-fact" type="gdouble" flags="3" default-value="0.500000"/>
+    <property name="s-damp-fact" type="gdouble" flags="3" default-value="0.500000"/>
+    <property name="s-period" type="gint" flags="3" default-value="1"/>
+    <property name="std-error-flag" type="gint" flags="3" default-value="0"/>
+    <property name="df" type="gint" flags="3" default-value="0"/>
+    <property name="show-graph" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="es-type" type="gint" flags="3" default-value="0"/>
+  </class>
+  <enum name="gnm_freq_tool_chart_t" get-type="gnm_freq_tool_chart_get_type">
+    <member name="GNM_FREQ_TOOL_NO_CHART" nick="none" value="0"/>
+    <member name="GNM_FREQ_TOOL_BAR_CHART" nick="bar" value="1"/>
+    <member name="GNM_FREQ_TOOL_COLUMN_CHART" nick="column" value="2"/>
+  </enum>  <class name="GnmFrequencyTool" get-type="gnm_frequency_tool_get_type" parents="GnmGenericAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="predetermined" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="max" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="min" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="n" type="gint" flags="3" default-value="1"/>
+    <property name="percentage" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="exact" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="chart" type="gnm_freq_tool_chart_t" flags="3" default-value="GNM_FREQ_TOOL_NO_CHART"/>
+  </class>
+  <class name="GnmFTestTool" get-type="gnm_ftest_tool_get_type" parents="GnmGenericBAnalysisTool,GnmAnalysisTool,GObject">
+  </class>
+  <enum name="gnm_hist_tool_chart_t" get-type="gnm_hist_tool_chart_get_type">
+    <member name="GNM_HIST_TOOL_NO_CHART" nick="none" value="0"/>
+    <member name="GNM_HIST_TOOL_HISTOGRAM_CHART" nick="histogram" value="1"/>
+    <member name="GNM_HIST_TOOL_BAR_CHART" nick="bar" value="2"/>
+    <member name="GNM_HIST_TOOL_COLUMN_CHART" nick="column" value="3"/>
+  </enum>  <class name="GnmHistogramTool" get-type="gnm_histogram_tool_get_type" parents="GnmGenericAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="predetermined" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="bin-type" type="gint" flags="3" default-value="0"/>
+    <property name="max-given" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="min-given" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="max" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="min" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="n" type="gint" flags="3" default-value="1"/>
+    <property name="percentage" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="cumulative" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="only-numbers" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="chart" type="gnm_hist_tool_chart_t" flags="3" default-value="GNM_HIST_TOOL_NO_CHART"/>
+  </class>
+  <class name="GnmKaplanMeierTool" get-type="gnm_kaplan_meier_tool_get_type" parents="GnmGenericBAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="censored" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="censor-mark" type="gint" flags="3" default-value="0"/>
+    <property name="censor-mark-to" type="gint" flags="3" default-value="0"/>
+    <property name="chart" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="ticks" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="std-err" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="median" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="logrank-test" type="gboolean" flags="3" default-value="FALSE"/>
+  </class>
+  <enum name="gnm_normality_test_type_t" get-type="gnm_normality_test_type_get_type">
+    <member name="GNM_NORMALITY_TEST_TYPE_ANDERSONDARLING" nick="andersondarling" value="0"/>
+    <member name="GNM_NORMALITY_TEST_TYPE_CRAMERVONMISES" nick="cramervonmises" value="1"/>
+    <member name="GNM_NORMALITY_TEST_TYPE_LILLIEFORS" nick="lilliefors" value="2"/>
+    <member name="GNM_NORMALITY_TEST_TYPE_SHAPIROFRANCIA" nick="shapirofrancia" value="3"/>
+  </enum>  <class name="GnmNormalityTool" get-type="gnm_normality_tool_get_type" parents="GnmGenericAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="alpha" type="gdouble" flags="3" default-value="0.050000"/>
+    <property name="type" type="gnm_normality_test_type_t" flags="3" default-value="GNM_NORMALITY_TEST_TYPE_ANDERSONDARLING"/>
+    <property name="graph" type="gboolean" flags="3" default-value="FALSE"/>
+  </class>
+  <class name="GnmOneMeanTestTool" get-type="gnm_one_mean_test_tool_get_type" parents="GnmGenericAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="mean" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="alpha" type="gdouble" flags="3" default-value="0.050000"/>
+  </class>
+  <class name="GnmPrincipalComponentsTool" get-type="gnm_principal_components_tool_get_type" parents="GnmGenericAnalysisTool,GnmAnalysisTool,GObject">
+  </class>
+  <class name="GnmRegressionTool" get-type="gnm_regression_tool_get_type" parents="GnmGenericBAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="group-by" type="gnm_tool_group_by_t" flags="3" default-value="GNM_TOOL_GROUPED_BY_COL"/>
+    <property name="intercept" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="multiple-regression" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="multiple-y" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="residual" type="gboolean" flags="3" default-value="TRUE"/>
+  </class>
+  <class name="GnmSignTestTool" get-type="gnm_sign_test_tool_get_type" parents="GnmGenericAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="median" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="alpha" type="gdouble" flags="3" default-value="0.050000"/>
+  </class>
+  <class name="GnmSignTestTwoTool" get-type="gnm_sign_test_two_tool_get_type" parents="GnmGenericBAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="median" type="gdouble" flags="3" default-value="0.000000"/>
+  </class>
+  <class name="GnmSignedRankTestTool" get-type="gnm_signed_rank_test_tool_get_type" parents="GnmGenericAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="median" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="alpha" type="gdouble" flags="3" default-value="0.050000"/>
+  </class>
+  <class name="GnmSignedRankTestTwoTool" get-type="gnm_signed_rank_test_two_tool_get_type" parents="GnmGenericBAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="median" type="gdouble" flags="3" default-value="0.000000"/>
+  </class>
+  <class name="GnmTTestPairedTool" get-type="gnm_ttest_paired_tool_get_type" parents="GnmGenericBAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="mean-diff" type="gdouble" flags="3" default-value="0.000000"/>
+  </class>
+  <class name="GnmTTestEqVarTool" get-type="gnm_ttest_eqvar_tool_get_type" parents="GnmGenericBAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="mean-diff" type="gdouble" flags="3" default-value="0.000000"/>
+  </class>
+  <class name="GnmTTestNeqVarTool" get-type="gnm_ttest_neqvar_tool_get_type" parents="GnmGenericBAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="mean-diff" type="gdouble" flags="3" default-value="0.000000"/>
+  </class>
+  <class name="GnmWilcoxonMannWhitneyTool" get-type="gnm_wilcoxon_mann_whitney_tool_get_type" parents="GnmGenericBAnalysisTool,GnmAnalysisTool,GObject">
+  </class>
+  <class name="GnmZTestTool" get-type="gnm_ztest_tool_get_type" parents="GnmGenericBAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="mean-diff" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="var1" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="var2" type="gdouble" flags="3" default-value="0.000000"/>
+  </class>
+  <class name="GnmDataShuffle" get-type="gnm_data_shuffle_get_type" parents="GObject">
+  </class>
+  <enum name="gnm_fill_series_type_t" get-type="fill_series_type_get_type">
+    <member name="GNM_FILL_SERIES_LINEAR" nick="linear" value="0"/>
+    <member name="GNM_FILL_SERIES_GROWTH" nick="growth" value="1"/>
+    <member name="GNM_FILL_SERIES_DATE" nick="date" value="2"/>
+  </enum>  <enum name="gnm_fill_series_date_unit_t" get-type="fill_series_date_unit_get_type">
+    <member name="GNM_FILL_SERIES_UNIT_DAY" nick="day" value="0"/>
+    <member name="GNM_FILL_SERIES_UNIT_WEEKDAY" nick="weekday" value="1"/>
+    <member name="GNM_FILL_SERIES_UNIT_MONTH" nick="month" value="2"/>
+    <member name="GNM_FILL_SERIES_UNIT_YEAR" nick="year" value="3"/>
+  </enum>  <class name="GnmFillSeriesTool" get-type="gnm_fill_series_tool_get_type" parents="GnmAnalysisTool,GObject">
+    <property name="type" type="gnm_fill_series_type_t" flags="3" default-value="GNM_FILL_SERIES_LINEAR"/>
+    <property name="date-unit" type="gnm_fill_series_date_unit_t" flags="3" default-value="GNM_FILL_SERIES_UNIT_DAY"/>
+    <property name="series-in-rows" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="step-value" type="gdouble" flags="3" default-value="1.000000"/>
+    <property name="stop-value" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="start-value" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="is-step-set" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="is-stop-set" type="gboolean" flags="3" default-value="FALSE"/>
+  </class>
+  <class name="GnmAdvancedFilterTool" get-type="gnm_advanced_filter_tool_get_type" parents="GnmGenericBAnalysisTool,GnmAnalysisTool,GObject">
+    <property name="unique-only-flag" type="gboolean" flags="3" default-value="FALSE"/>
+  </class>
+  <class name="GnmRandomCorTool" get-type="gnm_random_cor_tool_get_type" parents="GnmAnalysisTool,GObject">
+  </class>
+  <class name="GnmRandomTool" get-type="gnm_random_tool_get_type" parents="GnmAnalysisTool,GObject">
+  </class>
   <boxed name="GnmScenarioItem" get-type="gnm_scenario_item_get_type"/>
   <class name="GnmScenario" get-type="gnm_scenario_get_type" parents="GObject">
+  </class>
+  <class name="GnmTabulate" get-type="gnm_tabulate_get_type" parents="GObject">
   </class>
   <class name="GnmDao" get-type="gnm_dao_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="AtkImplementorIface"/>

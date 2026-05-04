@@ -1,0 +1,1741 @@
+From 89dca22c4cbd5c11710d4aa2b63ce169ae6a0b49 Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <licy183@termux.dev>
+Date: Tue, 10 Mar 2026 01:58:10 +0800
+Subject: [PATCH 1/8] base
+
+---
+ base/BUILD.gn                                 |  4 +
+ base/apple/mach_port_rendezvous.cc            |  1 +
+ base/apple/mach_port_rendezvous_mac.cc        |  9 +--
+ base/check.cc                                 |  6 +-
+ base/containers/circular_deque.h              |  8 +-
+ base/containers/contains.h                    | 56 ++++++++++++++
+ base/containers/contains_nocompile.nc         | 31 ++++++++
+ base/containers/contains_unittest.cc          | 38 ++++++++++
+ base/containers/enum_set.h                    | 31 ++++----
+ base/containers/flat_tree.h                   | 36 ---------
+ base/containers/intrusive_heap.h              |  4 +-
+ base/containers/span.h                        | 20 +++--
+ base/containers/to_vector.h                   | 19 +----
+ base/feature_list.h                           | 16 ++--
+ base/files/file_path.cc                       |  5 +-
+ base/functional/callback_internal.cc          |  5 +-
+ base/ios/crb_protocol_observers.mm            |  3 +-
+ .../test_memory_consumer_registry.cc          |  5 +-
+ base/metrics/histogram.cc                     |  3 +-
+ base/metrics/histogram_macros_internal.h      |  4 +-
+ base/metrics/persistent_memory_allocator.cc   |  4 +-
+ base/metrics/sample_vector.cc                 |  5 +-
+ base/numerics/basic_ops_impl.h                | 73 +++++++++++++++++-
+ base/numerics/byte_conversions.h              | 36 +++++----
+ base/numerics/checked_math_impl.h             |  3 +-
+ base/observer_list_threadsafe.h               |  1 +
+ base/parameter_pack.h                         |  6 +-
+ .../sampling_heap_profiler.cc                 |  2 +-
+ base/scoped_add_feature_flags.cc              | 10 +--
+ base/scoped_multi_source_observation.h        |  1 +
+ base/sequence_checker_impl.cc                 |  6 +-
+ base/state_transitions.h                      |  4 +-
+ base/strings/strcat_internal.h                | 74 ++++++++++++-------
+ base/strings/string_view_util.h               | 12 ++-
+ base/sys_byteorder.h                          | 20 ++---
+ base/test/scoped_feature_list.cc              | 11 ++-
+ base/threading/thread_id_name_manager.cc      |  7 +-
+ base/time/time.h                              |  4 +-
+ base/token.cc                                 |  3 +-
+ base/token.h                                  |  2 +-
+ .../memory_infra_background_allowlist.cc      |  9 +--
+ base/trace_event/trace_config.cc              |  5 +-
+ base/types/cxx23_from_range.h                 | 25 +++++++
+ base/types/cxx23_to_underlying.h              | 23 ++++++
+ 44 files changed, 446 insertions(+), 204 deletions(-)
+ create mode 100644 base/containers/contains.h
+ create mode 100644 base/containers/contains_nocompile.nc
+ create mode 100644 base/containers/contains_unittest.cc
+ create mode 100644 base/types/cxx23_from_range.h
+ create mode 100644 base/types/cxx23_to_underlying.h
+
+diff --git a/base/BUILD.gn b/base/BUILD.gn
+index d0317b2920..80cce97915 100644
+--- a/base/BUILD.gn
++++ b/base/BUILD.gn
+@@ -247,6 +247,7 @@ component("base") {
+     "containers/buffer_iterator.h",
+     "containers/checked_iterators.h",
+     "containers/circular_deque.h",
++    "containers/contains.h",
+     "containers/enum_set.h",
+     "containers/extend.h",
+     "containers/fixed_flat_map.h",
+@@ -931,6 +932,7 @@ component("base") {
+     "trace_event/trace_session_observer.h",
+     "traits_bag.h",
+     "tuple.h",
++    "types/cxx23_from_range.h",
+     "types/cxx26_projected_value_t.h",
+     "types/expected.h",
+     "types/expected_internal.h",
+@@ -3473,6 +3475,7 @@ test("base_unittests") {
+     "containers/buffer_iterator_unittest.cc",
+     "containers/checked_iterators_unittest.cc",
+     "containers/circular_deque_unittest.cc",
++    "containers/contains_unittest.cc",
+     "containers/enum_set_unittest.cc",
+     "containers/extend_unittest.cc",
+     "containers/fixed_flat_map_unittest.cc",
+@@ -4535,6 +4538,7 @@ if (enable_nocompile_tests) {
+       "check_nocompile.nc",
+       "containers/buffer_iterator_nocompile.nc",
+       "containers/checked_iterators_nocompile.nc",
++      "containers/contains_nocompile.nc",
+       "containers/enum_set_nocompile.nc",
+       "containers/fixed_flat_map_nocompile.nc",
+       "containers/fixed_flat_set_nocompile.nc",
+diff --git a/base/apple/mach_port_rendezvous.cc b/base/apple/mach_port_rendezvous.cc
+index 3d47f143c1..bf19f32333 100644
+--- a/base/apple/mach_port_rendezvous.cc
++++ b/base/apple/mach_port_rendezvous.cc
+@@ -21,6 +21,7 @@
+ #include "base/notreached.h"
+ #include "base/numerics/byte_conversions.h"
+ #include "base/strings/stringprintf.h"
++#include "base/types/cxx23_to_underlying.h"
+ 
+ namespace base {
+ 
+diff --git a/base/apple/mach_port_rendezvous_mac.cc b/base/apple/mach_port_rendezvous_mac.cc
+index bc23cfa532..dd29fa474e 100644
+--- a/base/apple/mach_port_rendezvous_mac.cc
++++ b/base/apple/mach_port_rendezvous_mac.cc
+@@ -27,6 +27,7 @@
+ #include "base/numerics/byte_conversions.h"
+ #include "base/strings/string_number_conversions.h"
+ #include "base/strings/stringprintf.h"
++#include "base/types/cxx23_to_underlying.h"
+ 
+ namespace base {
+ 
+@@ -387,13 +388,11 @@ GetPeerValidationPolicyFromEnvironment() {
+     }
+ 
+     switch (policy_int) {
+-      case std::to_underlying(
+-          MachPortRendezvousPeerValidationPolicy::kNoValidation):
++      case to_underlying(MachPortRendezvousPeerValidationPolicy::kNoValidation):
+         return MachPortRendezvousPeerValidationPolicy::kNoValidation;
+-      case std::to_underlying(
+-          MachPortRendezvousPeerValidationPolicy::kValidateOnly):
++      case to_underlying(MachPortRendezvousPeerValidationPolicy::kValidateOnly):
+         return MachPortRendezvousPeerValidationPolicy::kValidateOnly;
+-      case std::to_underlying(MachPortRendezvousPeerValidationPolicy::kEnforce):
++      case to_underlying(MachPortRendezvousPeerValidationPolicy::kEnforce):
+         return MachPortRendezvousPeerValidationPolicy::kEnforce;
+       default:
+         // An invalid policy or no policy was passed via the environment. Fall
+diff --git a/base/check.cc b/base/check.cc
+index 2ce900f0f4..d69a6aa13d 100644
+--- a/base/check.cc
++++ b/base/check.cc
+@@ -5,7 +5,6 @@
+ #include "base/check.h"
+ 
+ #include <optional>
+-#include <utility>
+ 
+ #include "base/check_op.h"
+ #include "base/check_version_internal.h"
+@@ -14,6 +13,7 @@
+ #include "base/debug/dump_without_crashing.h"
+ #include "base/logging.h"
+ #include "base/thread_annotations.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "build/build_config.h"
+ 
+ namespace logging {
+@@ -67,7 +67,7 @@ LogSeverity GetDumpSeverity() {
+ 
+ LogSeverity GetNotFatalUntilSeverity(base::NotFatalUntil fatal_milestone) {
+   if (fatal_milestone != base::NotFatalUntil::NoSpecifiedMilestoneInternal &&
+-      std::to_underlying(fatal_milestone) <= BASE_CHECK_VERSION_INTERNAL) {
++      base::to_underlying(fatal_milestone) <= BASE_CHECK_VERSION_INTERNAL) {
+     return LOGGING_FATAL;
+   }
+   return GetDumpSeverity();
+@@ -112,7 +112,7 @@ void MaybeSetFatalMilestoneCrashKey(base::NotFatalUntil fatal_milestone) {
+   }
+   base::debug::SetCrashKeyString(
+       GetFatalMilestoneCrashKey(),
+-      base::NumberToString(std::to_underlying(fatal_milestone)));
++      base::NumberToString(base::to_underlying(fatal_milestone)));
+ }
+ 
+ void DumpWithoutCrashing(base::debug::CrashKeyString* message_key,
+diff --git a/base/containers/circular_deque.h b/base/containers/circular_deque.h
+index 3da35b6a72..bb3c53485a 100644
+--- a/base/containers/circular_deque.h
++++ b/base/containers/circular_deque.h
+@@ -8,7 +8,6 @@
+ #include <algorithm>
+ #include <cstddef>
+ #include <iterator>
+-#include <ranges>
+ #include <utility>
+ 
+ #include "base/check.h"
+@@ -18,6 +17,7 @@
+ #include "base/memory/raw_ptr_exclusion.h"
+ #include "base/numerics/checked_math.h"
+ #include "base/numerics/safe_conversions.h"
++#include "base/types/cxx23_from_range.h"
+ 
+ #if DCHECK_IS_ON()
+ #include <ostream>
+@@ -48,7 +48,7 @@
+ //   circular_deque(size_t count);
+ //   circular_deque(size_t count, const T& value);
+ //   circular_deque(InputIterator first, InputIterator last);
+-//   circular_deque(std::from_range_t, Range range);
++//   circular_deque(base::from_range_t, Range range);
+ //   circular_deque(const circular_deque&);
+ //   circular_deque(circular_deque&&);
+ //   circular_deque(std::initializer_list<value_type>);
+@@ -518,11 +518,11 @@ class circular_deque {
+   // Example:
+   // ```
+   // int values[] = {1, 3};
+-  // circular_deque<int> deq(std::from_range, values);
++  // circular_deque<int> deq(base::from_range, values);
+   // ```
+   template <typename Range>
+     requires(std::ranges::input_range<Range>)
+-  circular_deque(std::from_range_t, Range&& value) : circular_deque() {
++  circular_deque(base::from_range_t, Range&& value) : circular_deque() {
+     assign_range(std::forward<Range>(value));
+   }
+ 
+diff --git a/base/containers/contains.h b/base/containers/contains.h
+new file mode 100644
+index 0000000000..0b71102403
+--- /dev/null
++++ b/base/containers/contains.h
+@@ -0,0 +1,56 @@
++// Copyright 2020 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#ifndef BASE_CONTAINERS_CONTAINS_H_
++#define BASE_CONTAINERS_CONTAINS_H_
++
++// Provides `Contains()`, a general purpose utility to check whether a container
++// contains a value. This will probe whether a `contains` or `find` member
++// function on `container` exists, and fall back to a generic linear search over
++// `container`.
++
++#include <algorithm>
++#include <concepts>
++#include <ranges>
++#include <utility>
++
++namespace base {
++
++// A general purpose utility to check whether `container` contains `value`. This
++// will probe whether a `contains` or `find` member function on `container`
++// exists, and fall back to a generic linear search over `container`.
++template <typename Container, typename Value>
++constexpr bool Contains(const Container& container, const Value& value) {
++  if constexpr (requires {
++                  { container.contains(value) } -> std::same_as<bool>;
++                }) {
++    return container.contains(value);
++  } else if constexpr (requires { container.find(value) != Container::npos; }) {
++    return container.find(value) != Container::npos;
++  } else if constexpr (requires { container.find(value) != container.end(); }) {
++    return container.find(value) != container.end();
++  } else {
++    static_assert(
++        !requires { typename Container::key_type; },
++        "Error: About to perform linear search on an associative container. "
++        "Either use a more generic comparator (e.g. std::less<>) or, if a "
++        "linear search is desired, provide an explicit projection parameter.");
++    return std::ranges::find(container, value) != std::ranges::end(container);
++  }
++}
++
++// Overload that allows callers to provide an additional projection invocable.
++// This projection will be applied to every element in `container` before
++// comparing it with `value`. This will always perform a linear search.
++template <typename Container, typename Value, typename Proj>
++constexpr bool Contains(const Container& container,
++                        const Value& value,
++                        Proj proj) {
++  return std::ranges::find(container, value, std::move(proj)) !=
++         std::ranges::end(container);
++}
++
++}  // namespace base
++
++#endif  // BASE_CONTAINERS_CONTAINS_H_
+diff --git a/base/containers/contains_nocompile.nc b/base/containers/contains_nocompile.nc
+new file mode 100644
+index 0000000000..4a95c93286
+--- /dev/null
++++ b/base/containers/contains_nocompile.nc
+@@ -0,0 +1,31 @@
++// Copyright 2020 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++// This is a "No Compile Test" suite.
++// https://dev.chromium.org/developers/testing/no-compile-tests
++
++#include <set>
++#include <string_view>
++#include <string>
++
++#include "base/containers/contains.h"
++
++namespace base {
++
++// The following code would perform a linear search through the set which is
++// likely unexpected and not intended. This is because the expression
++// `set.find(kFoo)` is ill-formed, since there is no implimit conversion from
++// std::string_view to `std::string`. This means Contains would fall back to the
++// general purpose `std::ranges::find(set, kFoo)` linear search.
++// To fix this clients can either use a more generic comparator like std::less<>
++// (in this case `set.find()` accepts any type that is comparable to a
++// std::string), or pass an explicit projection parameter to Contains, at which
++// point it will always perform a linear search.
++void UnexpectedLinearSearch() {
++  constexpr std::string_view kFoo = "foo";
++  std::set<std::string> set = {"foo", "bar", "baz"};
++  Contains(set, kFoo);  // expected-error@*:* {{About to perform linear search on an associative container}}
++}
++
++}  // namespace base
+diff --git a/base/containers/contains_unittest.cc b/base/containers/contains_unittest.cc
+new file mode 100644
+index 0000000000..e0781d79b6
+--- /dev/null
++++ b/base/containers/contains_unittest.cc
+@@ -0,0 +1,38 @@
++// Copyright 2020 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#include "base/containers/contains.h"
++
++#include <functional>
++#include <set>
++#include <string>
++#include <string_view>
++
++#include "base/containers/flat_set.h"
++#include "base/strings/string_util.h"
++#include "testing/gmock/include/gmock/gmock.h"
++#include "testing/gtest/include/gtest/gtest.h"
++
++namespace base {
++
++TEST(ContainsTest, GenericContains) {
++  constexpr char allowed_chars[] = {'a', 'b', 'c', 'd'};
++
++  static_assert(Contains(allowed_chars, 'a'), "");
++  static_assert(!Contains(allowed_chars, 'z'), "");
++  static_assert(!Contains(allowed_chars, 0), "");
++
++  constexpr char allowed_chars_including_nul[] = "abcd";
++  static_assert(Contains(allowed_chars_including_nul, 0), "");
++}
++
++TEST(ContainsTest, GenericContainsWithProjection) {
++  const char allowed_chars[] = {'A', 'B', 'C', 'D'};
++
++  EXPECT_TRUE(Contains(allowed_chars, 'a', &ToLowerASCII<char>));
++  EXPECT_FALSE(Contains(allowed_chars, 'z', &ToLowerASCII<char>));
++  EXPECT_FALSE(Contains(allowed_chars, 0, &ToLowerASCII<char>));
++}
++
++}  // namespace base
+diff --git a/base/containers/enum_set.h b/base/containers/enum_set.h
+index f38ef65d5a..3bd3b62e82 100644
+--- a/base/containers/enum_set.h
++++ b/base/containers/enum_set.h
+@@ -17,6 +17,7 @@
+ #include "base/check.h"
+ #include "base/check_op.h"
+ #include "base/memory/raw_ptr.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "build/build_config.h"
+ 
+ namespace base {
+@@ -62,7 +63,7 @@ class EnumSet {
+   static const E kMinValue = MinEnumValue;
+   static const E kMaxValue = MaxEnumValue;
+   static const size_t kValueCount =
+-      std::to_underlying(kMaxValue) - std::to_underlying(kMinValue) + 1;
++      to_underlying(kMaxValue) - to_underlying(kMinValue) + 1;
+ 
+   static_assert(kMinValue <= kMaxValue,
+                 "min value must be no greater than max value");
+@@ -227,37 +228,37 @@ class EnumSet {
+ 
+   // Returns an EnumSet constructed from |bitmask|.
+   static constexpr EnumSet FromEnumBitmask(const uint64_t bitmask) {
+-    static_assert(std::to_underlying(kMaxValue) < 64,
++    static_assert(to_underlying(kMaxValue) < 64,
+                   "The highest enum value must be < 64 for FromEnumBitmask ");
+-    static_assert(std::to_underlying(kMinValue) >= 0,
++    static_assert(to_underlying(kMinValue) >= 0,
+                   "The lowest enum value must be >= 0 for FromEnumBitmask ");
+-    return EnumSet(EnumBitSet(bitmask >> std::to_underlying(kMinValue)));
++    return EnumSet(EnumBitSet(bitmask >> to_underlying(kMinValue)));
+   }
+   // Returns a bitmask for the EnumSet.
+   uint64_t ToEnumBitmask() const {
+-    static_assert(std::to_underlying(kMaxValue) < 64,
++    static_assert(to_underlying(kMaxValue) < 64,
+                   "The highest enum value must be < 64 for ToEnumBitmask ");
+-    static_assert(std::to_underlying(kMinValue) >= 0,
++    static_assert(to_underlying(kMinValue) >= 0,
+                   "The lowest enum value must be >= 0 for FromEnumBitmask ");
+-    return enums_.to_ullong() << std::to_underlying(kMinValue);
++    return enums_.to_ullong() << to_underlying(kMinValue);
+   }
+ 
+   // Returns a uint64_t bit mask representing the values within the range
+   // [64*n, 64*n + 63] of the EnumSet.
+   std::optional<uint64_t> GetNth64bitWordBitmask(size_t n) const {
+     // If the EnumSet contains less than n 64-bit masks, return std::nullopt.
+-    if (std::to_underlying(kMaxValue) / 64 < n) {
++    if (to_underlying(kMaxValue) / 64 < n) {
+       return std::nullopt;
+     }
+ 
+     std::bitset<kValueCount> mask = ~uint64_t{0};
+     std::bitset<kValueCount> bits = enums_;
+-    if (std::to_underlying(kMinValue) < n * 64) {
+-      bits >>= n * 64 - std::to_underlying(kMinValue);
++    if (to_underlying(kMinValue) < n * 64) {
++      bits >>= n * 64 - to_underlying(kMinValue);
+     }
+     uint64_t result = (bits & mask).to_ullong();
+-    if (std::to_underlying(kMinValue) > n * 64) {
+-      result <<= std::to_underlying(kMinValue) - n * 64;
++    if (to_underlying(kMinValue) > n * 64) {
++      result <<= to_underlying(kMinValue) - n * 64;
+     }
+     return result;
+   }
+@@ -390,13 +391,13 @@ class EnumSet {
+   // Converts a value to/from an index into |enums_|.
+   static constexpr size_t ToIndex(E value) {
+     CHECK(InRange(value));
+-    return static_cast<size_t>(std::to_underlying(value)) -
+-           static_cast<size_t>(std::to_underlying(MinEnumValue));
++    return static_cast<size_t>(to_underlying(value)) -
++           static_cast<size_t>(to_underlying(MinEnumValue));
+   }
+ 
+   static E FromIndex(size_t i) {
+     DCHECK_LT(i, kValueCount);
+-    return static_cast<E>(std::to_underlying(MinEnumValue) + i);
++    return static_cast<E>(to_underlying(MinEnumValue) + i);
+   }
+ 
+   EnumBitSet enums_;
+diff --git a/base/containers/flat_tree.h b/base/containers/flat_tree.h
+index 5104d90b4f..8fc8e78db4 100644
+--- a/base/containers/flat_tree.h
++++ b/base/containers/flat_tree.h
+@@ -169,12 +169,6 @@ class flat_tree {
+             InputIterator last,
+             const key_compare& comp = key_compare());
+ 
+-  template <class Range>
+-    requires(std::ranges::input_range<Range>)
+-  flat_tree(std::from_range_t,
+-            Range&& range,
+-            const key_compare& comp = key_compare());
+-
+   flat_tree(const container_type& items,
+             const key_compare& comp = key_compare());
+ 
+@@ -190,13 +184,6 @@ class flat_tree {
+             InputIterator last,
+             const key_compare& comp = key_compare());
+ 
+-  template <class Range>
+-    requires(std::ranges::input_range<Range>)
+-  flat_tree(std::from_range_t,
+-            sorted_unique_t,
+-            Range&& range,
+-            const key_compare& comp = key_compare());
+-
+   flat_tree(sorted_unique_t,
+             const container_type& items,
+             const key_compare& comp = key_compare());
+@@ -567,17 +554,6 @@ flat_tree<Key, GetKeyFromValue, KeyCompare, Container>::flat_tree(
+   sort_and_unique();
+ }
+ 
+-template <class Key, class GetKeyFromValue, class KeyCompare, class Container>
+-template <class Range>
+-  requires(std::ranges::input_range<Range>)
+-flat_tree<Key, GetKeyFromValue, KeyCompare, Container>::flat_tree(
+-    std::from_range_t,
+-    Range&& range,
+-    const KeyCompare& comp)
+-    : comp_(comp), body_(std::from_range, std::forward<Range>(range)) {
+-  sort_and_unique();
+-}
+-
+ template <class Key, class GetKeyFromValue, class KeyCompare, class Container>
+ flat_tree<Key, GetKeyFromValue, KeyCompare, Container>::flat_tree(
+     const container_type& items,
+@@ -612,18 +588,6 @@ flat_tree<Key, GetKeyFromValue, KeyCompare, Container>::flat_tree(
+   DCHECK(is_sorted_and_unique(*this, value_comp()));
+ }
+ 
+-template <class Key, class GetKeyFromValue, class KeyCompare, class Container>
+-template <class Range>
+-  requires(std::ranges::input_range<Range>)
+-flat_tree<Key, GetKeyFromValue, KeyCompare, Container>::flat_tree(
+-    std::from_range_t,
+-    sorted_unique_t,
+-    Range&& range,
+-    const KeyCompare& comp)
+-    : comp_(comp), body_(std::from_range, std::forward<Range>(range)) {
+-  DCHECK(is_sorted_and_unique(*this, value_comp()));
+-}
+-
+ template <class Key, class GetKeyFromValue, class KeyCompare, class Container>
+ flat_tree<Key, GetKeyFromValue, KeyCompare, Container>::flat_tree(
+     sorted_unique_t,
+diff --git a/base/containers/intrusive_heap.h b/base/containers/intrusive_heap.h
+index a9ffe303fa..d0a60ed748 100644
+--- a/base/containers/intrusive_heap.h
++++ b/base/containers/intrusive_heap.h
+@@ -135,7 +135,6 @@
+ #include <iterator>
+ #include <limits>
+ #include <memory>
+-#include <ranges>
+ #include <type_traits>
+ #include <utility>
+ #include <vector>
+@@ -145,6 +144,7 @@
+ #include "base/check_op.h"
+ #include "base/compiler_specific.h"
+ #include "base/memory/ptr_util.h"
++#include "base/types/cxx23_from_range.h"
+ #include "third_party/abseil-cpp/absl/container/inlined_vector.h"
+ 
+ namespace base {
+@@ -255,7 +255,7 @@ class IntrusiveHeap {
+   // Constructs a heap containing all elements in the `range`.
+   template <class Range>
+     requires(std::ranges::input_range<Range>)
+-  IntrusiveHeap(std::from_range_t,
++  IntrusiveHeap(base::from_range_t,
+                 Range&& range,
+                 const value_compare& comp = value_compare(),
+                 const heap_handle_accessor& access = heap_handle_accessor())
+diff --git a/base/containers/span.h b/base/containers/span.h
+index 934dfabcfb..8bb658d370 100644
+--- a/base/containers/span.h
++++ b/base/containers/span.h
+@@ -568,7 +568,7 @@ class GSL_POINTER span {
+   constexpr void copy_from(span<const element_type, extent> other)
+     requires(!std::is_const_v<element_type>)
+   {
+-    if consteval {
++    if (std::is_constant_evaluated()) {
+       // Comparing pointers to different objects at compile time yields
+       // unspecified behavior, which would halt compilation. Instead,
+       // unconditionally use a separate buffer in the constexpr context. This
+@@ -583,7 +583,10 @@ class GSL_POINTER span {
+           constexpr ~Holder() {}
+           element_type value;
+         };
+-        auto buffer = std::make_unique<Holder[]>(extent);
++        // std::unique_ptr<T[]> isn't constexpr enough prior to C++23; another
++        // alternative is std::vector, but that requires including <vector> just
++        // for this edge case.
++        Holder* buffer = new Holder[extent];
+         for (size_t i = 0; i < extent; ++i) {
+           // SAFETY: `buffers` is allocated with `extent` elements, and the loop
+           // body only executes if `i < extent`.
+@@ -595,6 +598,7 @@ class GSL_POINTER span {
+           (*this)[i] = UNSAFE_BUFFERS(buffer[i]).value;
+           UNSAFE_BUFFERS(buffer[i]).value.~element_type();
+         }
++        delete[] buffer;
+       }
+     } else {
+       // Using `<=` to compare pointers to different allocations is UB;
+@@ -639,7 +643,7 @@ class GSL_POINTER span {
+     // unspecified behavior, which would halt compilation. Instead implement in
+     // terms of the guaranteed-safe behavior; performance is irrelevant in the
+     // constexpr context.
+-    if consteval {
++    if (std::is_constant_evaluated()) {
+       copy_from(other);
+       return;
+     }
+@@ -1105,7 +1109,7 @@ class GSL_POINTER span<ElementType, dynamic_extent, InternalPtrType> {
+     requires(!std::is_const_v<element_type>)
+   {
+     CHECK(size() == other.size());
+-    if consteval {
++    if (std::is_constant_evaluated()) {
+       // Comparing pointers to different objects at compile time yields
+       // unspecified behavior, which would halt compilation. Instead,
+       // unconditionally use a separate buffer in the constexpr context. This
+@@ -1118,7 +1122,10 @@ class GSL_POINTER span<ElementType, dynamic_extent, InternalPtrType> {
+         constexpr ~Holder() {}
+         element_type value;
+       };
+-      auto buffer = std::make_unique<Holder[]>(other.size());
++      // std::unique_ptr<T[]> isn't constexpr enough prior to C++23; another
++      // alternative is std::vector, but that requires including <vector> just
++      // for this edge case.
++      Holder* buffer = new Holder[other.size()];
+       for (size_t i = 0; i < other.size(); ++i) {
+         // SAFETY: `buffers` is allocated with `other.size()` elements, and the
+         // loop body only executes if `i < other.size()`.
+@@ -1130,6 +1137,7 @@ class GSL_POINTER span<ElementType, dynamic_extent, InternalPtrType> {
+         (*this)[i] = UNSAFE_BUFFERS(buffer[i]).value;
+         UNSAFE_BUFFERS(buffer[i]).value.~element_type();
+       }
++      delete[] buffer;
+     } else {
+       // Using `<=` to compare pointers to different allocations is UB;
+       // reinterpret_cast is the workaround.
+@@ -1167,7 +1175,7 @@ class GSL_POINTER span<ElementType, dynamic_extent, InternalPtrType> {
+     // unspecified behavior, which would halt compilation. Instead implement in
+     // terms of the guaranteed-safe behavior; performance is irrelevant in the
+     // constexpr context.
+-    if consteval {
++    if (std::is_constant_evaluated()) {
+       copy_from(other);
+       return;
+     }
+diff --git a/base/containers/to_vector.h b/base/containers/to_vector.h
+index 90b3d2f283..c4ff98bf95 100644
+--- a/base/containers/to_vector.h
++++ b/base/containers/to_vector.h
+@@ -18,21 +18,6 @@
+ 
+ namespace base {
+ 
+-// Converts a container to a std::vector. The vector's element type is the same
+-// as the container's value type, if it is not explicitly specified.
+-//
+-// Complexity: linear in the size of `range`.
+-template <typename U = void,
+-          int&... ExplicitArgumentBarrier,
+-          typename Range,
+-          typename T = std::conditional_t<std::is_void_v<U>,
+-                                          std::ranges::range_value_t<Range>,
+-                                          U>>
+-  requires(std::ranges::input_range<Range>)
+-constexpr std::vector<T> ToVector(Range&& range) {
+-  return {std::from_range, std::forward<Range>(range)};
+-}
+-
+ // Maps a container to a std::vector<> with respect to the provided projection.
+ // The deduced vector element type is equal to the projection's return type with
+ // cv-qualifiers removed if it's not explicitly specified.
+@@ -44,14 +29,14 @@ constexpr std::vector<T> ToVector(Range&& range) {
+ template <typename U = void,
+           int&... ExplicitArgumentBarrier,
+           typename Range,
+-          typename Proj,
++          typename Proj = std::identity,
+           typename ProjectedType = std::conditional_t<
+               std::is_void_v<U>,
+               base::projected_value_t<std::ranges::iterator_t<Range>, Proj>,
+               U>>
+   requires std::ranges::sized_range<Range> && std::ranges::input_range<Range> &&
+            std::indirectly_unary_invocable<Proj, std::ranges::iterator_t<Range>>
+-constexpr auto ToVector(Range&& range, Proj proj) {
++constexpr auto ToVector(Range&& range, Proj proj = {}) {
+   std::vector<ProjectedType> container;
+   container.reserve(std::ranges::size(range));
+   std::ranges::transform(std::forward<Range>(range),
+diff --git a/base/feature_list.h b/base/feature_list.h
+index 63f62e12f1..30a5733aac 100644
+--- a/base/feature_list.h
++++ b/base/feature_list.h
+@@ -96,13 +96,15 @@ enum FeatureState {
+   constinit const base::Feature feature(                           \
+       name, default_state, base::internal::FeatureMacroHandshake::kSecret)
+ 
+-#define BASE_FEATURE_INTERNAL_2_ARGS(feature, default_state)              \
+-  constinit const base::Feature feature(                                  \
+-      []() {                                                              \
+-        static_assert(#feature[0] == 'k');                                \
+-        static constexpr base::internal::StringStorage storage(#feature); \
+-        return storage.storage.data();                                    \
+-      }(),                                                                \
++// TODO(crbug.com/436274260): Use constexpr lambda to avoid the namespace hack
++// after C++23 is supported. See https://godbolt.org/z/W3sdhresP for the syntax.
++#define BASE_FEATURE_INTERNAL_2_ARGS(feature, default_state)                \
++  namespace base_feature_internal_##feature {                               \
++    static_assert(#feature[0] == 'k');                                      \
++    static constexpr base::internal::StringStorage feature##Name(#feature); \
++  }                                                                         \
++  constinit const base::Feature feature(                                    \
++      base_feature_internal_##feature::feature##Name.storage.data(),        \
+       default_state, base::internal::FeatureMacroHandshake::kSecret)
+ 
+ #define GET_BASE_FEATURE_MACRO(_1, _2, _3, NAME, ...) NAME
+diff --git a/base/files/file_path.cc b/base/files/file_path.cc
+index a1d8b5b1da..651381cd17 100644
+--- a/base/files/file_path.cc
++++ b/base/files/file_path.cc
+@@ -11,6 +11,7 @@
+ #include <string_view>
+ 
+ #include "base/check_op.h"
++#include "base/containers/contains.h"
+ #include "base/containers/span.h"
+ #include "base/features.h"
+ #include "base/files/safe_base_name.h"
+@@ -319,7 +320,7 @@ std::ostream& operator<<(std::ostream& out, const FilePath& file_path) {
+ // static
+ bool FilePath::IsSeparator(CharType character) {
+   span<const CharType> all_known_separators = SeparatorsAsSpan();
+-  return std::ranges::contains(all_known_separators, character);
++  return base::Contains(all_known_separators, character);
+ }
+ 
+ std::vector<FilePath::StringType> FilePath::GetComponents() const {
+@@ -1620,7 +1621,7 @@ FilePath FilePath::NormalizePathSeparatorsTo(
+     CharType normalized_separator) const {
+ #if defined(FILE_PATH_USES_WIN_SEPARATORS)
+   span<const CharType> all_known_separators = SeparatorsAsSpan();
+-  DCHECK(std::ranges::contains(all_known_separators, normalized_separator));
++  DCHECK(base::Contains(all_known_separators, normalized_separator));
+ 
+   StringType copy = path_;
+   for (CharType known_separator : all_known_separators) {
+diff --git a/base/functional/callback_internal.cc b/base/functional/callback_internal.cc
+index de55b8c340..27f6900728 100644
+--- a/base/functional/callback_internal.cc
++++ b/base/functional/callback_internal.cc
+@@ -4,10 +4,9 @@
+ 
+ #include "base/functional/callback_internal.h"
+ 
+-#include <utility>
+-
+ #include "base/check.h"
+ #include "base/notreached.h"
++#include "base/types/cxx23_to_underlying.h"
+ 
+ namespace base::internal {
+ 
+@@ -18,7 +17,7 @@ bool QueryCancellationTraitsForNonCancellables(
+     BindStateBase::CancellationQueryMode mode) {
+   // Non-cancellables are never cancelled and always valid, which means the
+   // response for each mode is the same as its underlying value.
+-  return std::to_underlying(mode);
++  return to_underlying(mode);
+ }
+ 
+ }  // namespace
+diff --git a/base/ios/crb_protocol_observers.mm b/base/ios/crb_protocol_observers.mm
+index 117728686f..92717597a3 100644
+--- a/base/ios/crb_protocol_observers.mm
++++ b/base/ios/crb_protocol_observers.mm
+@@ -11,6 +11,7 @@
+ #include <vector>
+ 
+ #include "base/check.h"
++#include "base/containers/contains.h"
+ #include "base/notreached.h"
+ 
+ @interface CRBProtocolObservers () {
+@@ -106,7 +107,7 @@ id Iterator::GetNext() {
+   DCHECK(observer);
+   DCHECK([observer conformsToProtocol:self.protocol]);
+ 
+-  if (std::ranges::contains(_observers, observer)) {
++  if (base::Contains(_observers, observer)) {
+     return;
+   }
+ 
+diff --git a/base/memory_coordinator/test_memory_consumer_registry.cc b/base/memory_coordinator/test_memory_consumer_registry.cc
+index c9f6284fa5..6b9227111b 100644
+--- a/base/memory_coordinator/test_memory_consumer_registry.cc
++++ b/base/memory_coordinator/test_memory_consumer_registry.cc
+@@ -4,10 +4,9 @@
+ 
+ #include "base/memory_coordinator/test_memory_consumer_registry.h"
+ 
+-#include <algorithm>
+-
+ #include "base/check.h"
+ #include "base/check_op.h"
++#include "base/containers/contains.h"
+ #include "base/memory_coordinator/memory_consumer.h"
+ #include "base/task/single_thread_task_runner.h"
+ 
+@@ -28,7 +27,7 @@ void TestMemoryConsumerRegistry::OnMemoryConsumerAdded(
+     std::string_view consumer_id,
+     MemoryConsumerTraits traits,
+     RegisteredMemoryConsumer consumer) {
+-  CHECK(!std::ranges::contains(memory_consumers_, consumer));
++  CHECK(!Contains(memory_consumers_, consumer));
+   memory_consumers_.push_back(consumer);
+ }
+ 
+diff --git a/base/metrics/histogram.cc b/base/metrics/histogram.cc
+index df4b054bcb..9e51b5d381 100644
+--- a/base/metrics/histogram.cc
++++ b/base/metrics/histogram.cc
+@@ -21,6 +21,7 @@
+ #include <utility>
+ 
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/debug/alias.h"
+ #include "base/debug/crash_logging.h"
+ #include "base/debug/dump_without_crashing.h"
+@@ -257,7 +258,7 @@ HistogramBase* Histogram::Factory::Build() {
+         "DevTools.ExperimentEnabledAtLaunch",
+         "DevTools.PanelShown",
+     };
+-    if (std::ranges::contains(kKnownBadHistogramsHashes, name_)) {
++    if (Contains(kKnownBadHistogramsHashes, name_)) {
+       DEBUG_ALIAS_FOR_CSTR(hist_name, std::string(name_).c_str(), 32);
+       debug::DumpWithoutCrashing();
+     }
+diff --git a/base/metrics/histogram_macros_internal.h b/base/metrics/histogram_macros_internal.h
+index 0a22535e60..09a9458fac 100644
+--- a/base/metrics/histogram_macros_internal.h
++++ b/base/metrics/histogram_macros_internal.h
+@@ -11,13 +11,13 @@
+ #include <limits>
+ #include <memory>
+ #include <type_traits>
+-#include <utility>
+ 
+ #include "base/dcheck_is_on.h"
+ #include "base/metrics/histogram.h"
+ #include "base/metrics/sparse_histogram.h"
+ #include "base/no_destructor.h"
+ #include "base/time/time.h"
++#include "base/types/cxx23_to_underlying.h"
+ 
+ // This is for macros and helpers internal to base/metrics. They should not be
+ // used outside of this directory. For writing to UMA histograms, see
+@@ -33,7 +33,7 @@ struct EnumSizeTraits {
+     if constexpr (requires { Enum::kMaxValue; }) {
+       // Since the UMA histogram macros expect a value one larger than the max
+       // defined enumerator value, add one.
+-      return static_cast<uintmax_t>(std::to_underlying(Enum::kMaxValue) + 1);
++      return static_cast<uintmax_t>(base::to_underlying(Enum::kMaxValue) + 1);
+     } else {
+       static_assert(
+           sizeof(Enum) == 0,
+diff --git a/base/metrics/persistent_memory_allocator.cc b/base/metrics/persistent_memory_allocator.cc
+index 38bbb2dd48..d6d5e04315 100644
+--- a/base/metrics/persistent_memory_allocator.cc
++++ b/base/metrics/persistent_memory_allocator.cc
+@@ -13,6 +13,7 @@
+ 
+ #include "base/bits.h"
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/debug/alias.h"
+ #include "base/debug/crash_logging.h"
+ #include "base/debug/dump_without_crashing.h"
+@@ -441,8 +442,7 @@ PersistentMemoryAllocator::PersistentMemoryAllocator(Memory memory,
+   } else {
+     if (shared_meta()->size == 0 ||
+         (shared_meta()->version != kGlobalVersion &&
+-         !std::ranges::contains(kOldCompatibleVersions,
+-                                shared_meta()->version)) ||
++         !Contains(kOldCompatibleVersions, shared_meta()->version)) ||
+         shared_meta()->freeptr.load(std::memory_order_relaxed) == 0 ||
+         shared_meta()->tailptr == 0 || shared_meta()->queue.cookie == 0 ||
+         shared_meta()->queue.next.load(std::memory_order_relaxed) == 0) {
+diff --git a/base/metrics/sample_vector.cc b/base/metrics/sample_vector.cc
+index b06968aaba..ffed6e2f2a 100644
+--- a/base/metrics/sample_vector.cc
++++ b/base/metrics/sample_vector.cc
+@@ -183,7 +183,10 @@ Count32 SampleVectorBase::TotalCount() const {
+   // Handle the multi-sample case.
+   if (counts().has_value() || MountExistingCountsStorage()) {
+     Count32 count = 0;
+-    for (const HistogramBase::AtomicCount& c : counts().value()) {
++    // TODO(danakj): In C++23 we can skip the `counts_span` lvalue and iterate
++    // over `counts().value()` directly without creating a dangling reference.
++    span<const HistogramBase::AtomicCount> counts_span = counts().value();
++    for (const HistogramBase::AtomicCount& c : counts_span) {
+       count += subtle::NoBarrier_Load(&c);
+     }
+     return count;
+diff --git a/base/numerics/basic_ops_impl.h b/base/numerics/basic_ops_impl.h
+index cacb6d345d..f0937d2768 100644
+--- a/base/numerics/basic_ops_impl.h
++++ b/base/numerics/basic_ops_impl.h
+@@ -29,12 +29,81 @@ using MathType = std::conditional_t<
+     T,
+     std::conditional_t<std::is_signed_v<T>, int, unsigned int>>;
+ 
++// Reverses the byte order of the integer.
++template <class T>
++  requires(std::is_unsigned_v<T> && std::is_integral_v<T>)
++inline constexpr T SwapBytes(T value) {
++  // MSVC intrinsics are not constexpr, so we provide our own constexpr
++  // implementation. We provide it unconditionally so we can test it on all
++  // platforms for correctness.
++  if (std::is_constant_evaluated()) {
++    if constexpr (sizeof(T) == 1u) {
++      return value;
++    } else if constexpr (sizeof(T) == 2u) {
++      MathType<T> a = (MathType<T>(value) >> 0) & MathType<T>{0xff};
++      MathType<T> b = (MathType<T>(value) >> 8) & MathType<T>{0xff};
++      return static_cast<T>((a << 8) | (b << 0));
++    } else if constexpr (sizeof(T) == 4u) {
++      T a = (value >> 0) & T{0xff};
++      T b = (value >> 8) & T{0xff};
++      T c = (value >> 16) & T{0xff};
++      T d = (value >> 24) & T{0xff};
++      return (a << 24) | (b << 16) | (c << 8) | (d << 0);
++    } else {
++      static_assert(sizeof(T) == 8u);
++      T a = (value >> 0) & T{0xff};
++      T b = (value >> 8) & T{0xff};
++      T c = (value >> 16) & T{0xff};
++      T d = (value >> 24) & T{0xff};
++      T e = (value >> 32) & T{0xff};
++      T f = (value >> 40) & T{0xff};
++      T g = (value >> 48) & T{0xff};
++      T h = (value >> 56) & T{0xff};
++      return (a << 56) | (b << 48) | (c << 40) | (d << 32) |  //
++             (e << 24) | (f << 16) | (g << 8) | (h << 0);
++    }
++  }
++
++#if _MSC_VER
++  if constexpr (sizeof(T) == 1u) {
++    return value;
++  } else if constexpr (sizeof(T) == sizeof(unsigned short)) {
++    using U = unsigned short;
++    return _byteswap_ushort(U{value});
++  } else if constexpr (sizeof(T) == sizeof(unsigned long)) {
++    using U = unsigned long;
++    return _byteswap_ulong(U{value});
++  } else {
++    static_assert(sizeof(T) == 8u);
++    return _byteswap_uint64(value);
++  }
++#else
++  if constexpr (sizeof(T) == 1u) {
++    return value;
++  } else if constexpr (sizeof(T) == 2u) {
++    return __builtin_bswap16(uint16_t{value});
++  } else if constexpr (sizeof(T) == 4u) {
++    return __builtin_bswap32(value);
++  } else {
++    static_assert(sizeof(T) == 8u);
++    return __builtin_bswap64(value);
++  }
++#endif
++}
++
++// Signed values are byte-swapped as unsigned values.
++template <class T>
++  requires(std::is_signed_v<T> && std::is_integral_v<T>)
++inline constexpr T SwapBytes(T value) {
++  return static_cast<T>(SwapBytes(static_cast<std::make_unsigned_t<T>>(value)));
++}
++
+ // Converts from a byte array to an integer.
+ template <class T>
+   requires(std::is_unsigned_v<T> && std::is_integral_v<T>)
+ inline constexpr T FromLittleEndian(std::span<const uint8_t, sizeof(T)> bytes) {
+   T val;
+-  if consteval {
++  if (std::is_constant_evaluated()) {
+     val = T{0};
+     for (size_t i = 0u; i < sizeof(T); i += 1u) {
+       // SAFETY: `i < sizeof(T)` (the number of bytes in T), so `(8 * i)` is
+@@ -60,7 +129,7 @@ template <class T>
+   requires(std::is_unsigned_v<T> && std::is_integral_v<T>)
+ inline constexpr std::array<uint8_t, sizeof(T)> ToLittleEndian(T val) {
+   auto bytes = std::array<uint8_t, sizeof(T)>();
+-  if consteval {
++  if (std::is_constant_evaluated()) {
+     for (size_t i = 0u; i < sizeof(T); i += 1u) {
+       const auto last_byte = static_cast<uint8_t>(val & 0xff);
+       // The low bytes go to the front of the array in little endian.
+diff --git a/base/numerics/byte_conversions.h b/base/numerics/byte_conversions.h
+index 2b7898e146..b66f022b13 100644
+--- a/base/numerics/byte_conversions.h
++++ b/base/numerics/byte_conversions.h
+@@ -19,6 +19,14 @@ static_assert(std::endian::native == std::endian::little);
+ 
+ namespace base {
+ 
++// Returns a value with all bytes in |x| swapped, i.e. reverses the endianness.
++// TODO(pkasting): Once C++23 is available, replace with std::byteswap.
++template <class T>
++  requires(std::is_integral_v<T>)
++[[nodiscard]] inline constexpr T ByteSwap(T value) {
++  return numerics_internal::SwapBytes(value);
++}
++
+ // Returns a uint8_t with the value in `bytes` interpreted as the native endian
+ // encoding of the integer for the machine.
+ //
+@@ -288,7 +296,7 @@ inline constexpr uint8_t U8FromBigEndian(std::span<const uint8_t, 1u> bytes) {
+ // that were always in memory, such as when stored in shared-memory (or through
+ // IPC) as a byte buffer.
+ inline constexpr uint16_t U16FromBigEndian(std::span<const uint8_t, 2u> bytes) {
+-  return std::byteswap(numerics_internal::FromLittleEndian<uint16_t>(bytes));
++  return ByteSwap(numerics_internal::FromLittleEndian<uint16_t>(bytes));
+ }
+ // Returns a uint32_t with the value in `bytes` interpreted as a big-endian
+ // encoding of the integer.
+@@ -298,7 +306,7 @@ inline constexpr uint16_t U16FromBigEndian(std::span<const uint8_t, 2u> bytes) {
+ // that were always in memory, such as when stored in shared-memory (or through
+ // IPC) as a byte buffer.
+ inline constexpr uint32_t U32FromBigEndian(std::span<const uint8_t, 4u> bytes) {
+-  return std::byteswap(numerics_internal::FromLittleEndian<uint32_t>(bytes));
++  return ByteSwap(numerics_internal::FromLittleEndian<uint32_t>(bytes));
+ }
+ // Returns a uint64_t with the value in `bytes` interpreted as a big-endian
+ // encoding of the integer.
+@@ -308,7 +316,7 @@ inline constexpr uint32_t U32FromBigEndian(std::span<const uint8_t, 4u> bytes) {
+ // that were always in memory, such as when stored in shared-memory (or through
+ // IPC) as a byte buffer.
+ inline constexpr uint64_t U64FromBigEndian(std::span<const uint8_t, 8u> bytes) {
+-  return std::byteswap(numerics_internal::FromLittleEndian<uint64_t>(bytes));
++  return ByteSwap(numerics_internal::FromLittleEndian<uint64_t>(bytes));
+ }
+ // Returns a int8_t with the value in `bytes` interpreted as a big-endian
+ // encoding of the integer.
+@@ -332,7 +340,7 @@ inline constexpr int8_t I8FromBigEndian(std::span<const uint8_t, 1u> bytes) {
+ // that were always in memory, such as when stored in shared-memory (or through
+ // IPC) as a byte buffer.
+ inline constexpr int16_t I16FromBigEndian(std::span<const uint8_t, 2u> bytes) {
+-  return std::byteswap(numerics_internal::FromLittleEndian<int16_t>(bytes));
++  return ByteSwap(numerics_internal::FromLittleEndian<int16_t>(bytes));
+ }
+ // Returns a int32_t with the value in `bytes` interpreted as a big-endian
+ // encoding of the integer.
+@@ -342,7 +350,7 @@ inline constexpr int16_t I16FromBigEndian(std::span<const uint8_t, 2u> bytes) {
+ // that were always in memory, such as when stored in shared-memory (or through
+ // IPC) as a byte buffer.
+ inline constexpr int32_t I32FromBigEndian(std::span<const uint8_t, 4u> bytes) {
+-  return std::byteswap(numerics_internal::FromLittleEndian<int32_t>(bytes));
++  return ByteSwap(numerics_internal::FromLittleEndian<int32_t>(bytes));
+ }
+ // Returns a int64_t with the value in `bytes` interpreted as a big-endian
+ // encoding of the integer.
+@@ -352,7 +360,7 @@ inline constexpr int32_t I32FromBigEndian(std::span<const uint8_t, 4u> bytes) {
+ // that were always in memory, such as when stored in shared-memory (or through
+ // IPC) as a byte buffer.
+ inline constexpr int64_t I64FromBigEndian(std::span<const uint8_t, 8u> bytes) {
+-  return std::byteswap(numerics_internal::FromLittleEndian<int64_t>(bytes));
++  return ByteSwap(numerics_internal::FromLittleEndian<int64_t>(bytes));
+ }
+ // Returns a float with the value in `bytes` interpreted as a big-endian
+ // encoding of the integer.
+@@ -608,7 +616,7 @@ inline constexpr std::array<uint8_t, 1u> U8ToBigEndian(uint8_t val) {
+ // IPC) as a byte buffer. Use the little-endian encoding for storing and reading
+ // from storage.
+ inline constexpr std::array<uint8_t, 2u> U16ToBigEndian(uint16_t val) {
+-  return numerics_internal::ToLittleEndian(std::byteswap(val));
++  return numerics_internal::ToLittleEndian(ByteSwap(val));
+ }
+ // Returns a byte array holding the value of a uint32_t encoded as the
+ // big-endian encoding of the integer.
+@@ -619,7 +627,7 @@ inline constexpr std::array<uint8_t, 2u> U16ToBigEndian(uint16_t val) {
+ // IPC) as a byte buffer. Use the little-endian encoding for storing and reading
+ // from storage.
+ inline constexpr std::array<uint8_t, 4u> U32ToBigEndian(uint32_t val) {
+-  return numerics_internal::ToLittleEndian(std::byteswap(val));
++  return numerics_internal::ToLittleEndian(ByteSwap(val));
+ }
+ // Returns a byte array holding the value of a uint64_t encoded as the
+ // big-endian encoding of the integer.
+@@ -630,7 +638,7 @@ inline constexpr std::array<uint8_t, 4u> U32ToBigEndian(uint32_t val) {
+ // IPC) as a byte buffer. Use the little-endian encoding for storing and reading
+ // from storage.
+ inline constexpr std::array<uint8_t, 8u> U64ToBigEndian(uint64_t val) {
+-  return numerics_internal::ToLittleEndian(std::byteswap(val));
++  return numerics_internal::ToLittleEndian(ByteSwap(val));
+ }
+ // Returns a byte array holding the value of a int8_t encoded as the big-endian
+ // encoding of the integer.
+@@ -652,7 +660,7 @@ inline constexpr std::array<uint8_t, 1u> I8ToBigEndian(int8_t val) {
+ // IPC) as a byte buffer. Use the little-endian encoding for storing and reading
+ // from storage.
+ inline constexpr std::array<uint8_t, 2u> I16ToBigEndian(int16_t val) {
+-  return numerics_internal::ToLittleEndian(std::byteswap(val));
++  return numerics_internal::ToLittleEndian(ByteSwap(val));
+ }
+ // Returns a byte array holding the value of a int32_t encoded as the
+ // big-endian encoding of the integer.
+@@ -663,7 +671,7 @@ inline constexpr std::array<uint8_t, 2u> I16ToBigEndian(int16_t val) {
+ // IPC) as a byte buffer. Use the little-endian encoding for storing and reading
+ // from storage.
+ inline constexpr std::array<uint8_t, 4u> I32ToBigEndian(int32_t val) {
+-  return numerics_internal::ToLittleEndian(std::byteswap(val));
++  return numerics_internal::ToLittleEndian(ByteSwap(val));
+ }
+ // Returns a byte array holding the value of a int64_t encoded as the
+ // big-endian encoding of the integer.
+@@ -674,7 +682,7 @@ inline constexpr std::array<uint8_t, 4u> I32ToBigEndian(int32_t val) {
+ // IPC) as a byte buffer. Use the little-endian encoding for storing and reading
+ // from storage.
+ inline constexpr std::array<uint8_t, 8u> I64ToBigEndian(int64_t val) {
+-  return numerics_internal::ToLittleEndian(std::byteswap(val));
++  return numerics_internal::ToLittleEndian(ByteSwap(val));
+ }
+ // Returns a byte array holding the value of a float encoded as the big-endian
+ // encoding of the number.
+@@ -686,7 +694,7 @@ inline constexpr std::array<uint8_t, 8u> I64ToBigEndian(int64_t val) {
+ // from storage.
+ inline constexpr std::array<uint8_t, 4u> FloatToBigEndian(float val) {
+   return numerics_internal::ToLittleEndian(
+-      std::byteswap(std::bit_cast<uint32_t>(val)));
++      ByteSwap(std::bit_cast<uint32_t>(val)));
+ }
+ // Returns a byte array holding the value of a double encoded as the big-endian
+ // encoding of the number.
+@@ -698,7 +706,7 @@ inline constexpr std::array<uint8_t, 4u> FloatToBigEndian(float val) {
+ // from storage.
+ inline constexpr std::array<uint8_t, 8u> DoubleToBigEndian(double val) {
+   return numerics_internal::ToLittleEndian(
+-      std::byteswap(std::bit_cast<uint64_t>(val)));
++      ByteSwap(std::bit_cast<uint64_t>(val)));
+ }
+ 
+ }  // namespace base
+diff --git a/base/numerics/checked_math_impl.h b/base/numerics/checked_math_impl.h
+index 89fcdc0cc6..9d0e5438f9 100644
+--- a/base/numerics/checked_math_impl.h
++++ b/base/numerics/checked_math_impl.h
+@@ -590,8 +590,7 @@ class CheckedNumericState<T, NUMERIC_FLOATING> {
+       : CheckedNumericState(rhs.value(), rhs.is_valid()) {}
+ 
+   constexpr bool is_valid() const {
+-    // Written this way because std::isfinite is not constexpr on the Windows
+-    // toolchain yet.
++    // Written this way because std::isfinite is not constexpr before C++23.
+     // TODO(C++23): Use `std::isfinite()` unconditionally.
+     return std::is_constant_evaluated()
+                ? value_ <= std::numeric_limits<T>::max() &&
+diff --git a/base/observer_list_threadsafe.h b/base/observer_list_threadsafe.h
+index bb2e5bb1aa..b513abb83e 100644
+--- a/base/observer_list_threadsafe.h
++++ b/base/observer_list_threadsafe.h
+@@ -12,6 +12,7 @@
+ #include "base/base_export.h"
+ #include "base/check.h"
+ #include "base/check_op.h"
++#include "base/containers/contains.h"
+ #include "base/dcheck_is_on.h"
+ #include "base/debug/stack_trace.h"
+ #include "base/functional/bind.h"
+diff --git a/base/parameter_pack.h b/base/parameter_pack.h
+index ae4ff05e18..c0ffb58bc2 100644
+--- a/base/parameter_pack.h
++++ b/base/parameter_pack.h
+@@ -7,22 +7,22 @@
+ 
+ #include <stddef.h>
+ 
+-#include <algorithm>
+ #include <initializer_list>
+ #include <tuple>
+ #include <type_traits>
+ 
++#include "base/containers/contains.h"
+ 
+ namespace base {
+ 
+ // Checks if any of the elements in |ilist| is true.
+ inline constexpr bool any_of(std::initializer_list<bool> ilist) {
+-  return std::ranges::contains(ilist, true);
++  return base::Contains(ilist, true);
+ }
+ 
+ // Checks if all of the elements in |ilist| are true.
+ inline constexpr bool all_of(std::initializer_list<bool> ilist) {
+-  return !std::ranges::contains(ilist, false);
++  return !base::Contains(ilist, false);
+ }
+ 
+ // Counts the elements in |ilist| that are equal to |value|.
+diff --git a/base/sampling_heap_profiler/sampling_heap_profiler.cc b/base/sampling_heap_profiler/sampling_heap_profiler.cc
+index 8310716c9a..734f95969f 100644
+--- a/base/sampling_heap_profiler/sampling_heap_profiler.cc
++++ b/base/sampling_heap_profiler/sampling_heap_profiler.cc
+@@ -297,7 +297,7 @@ std::vector<SamplingHeapProfiler::Sample> SamplingHeapProfiler::GetSamples(
+ std::vector<const char*> SamplingHeapProfiler::GetStrings() {
+   PoissonAllocationSampler::ScopedMuteThreadSamples no_samples_scope;
+   AutoLock lock(mutex_);
+-  return std::vector<const char*>(std::from_range, strings_);
++  return std::vector<const char*>(strings_.begin(), strings_.end());
+ }
+ 
+ // static
+diff --git a/base/scoped_add_feature_flags.cc b/base/scoped_add_feature_flags.cc
+index c04a2647a7..6d1893019c 100644
+--- a/base/scoped_add_feature_flags.cc
++++ b/base/scoped_add_feature_flags.cc
+@@ -4,11 +4,11 @@
+ 
+ #include "base/scoped_add_feature_flags.h"
+ 
+-#include <algorithm>
+ #include <string_view>
+ 
+ #include "base/base_switches.h"
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/strings/strcat.h"
+ #include "base/strings/string_util.h"
+ 
+@@ -68,10 +68,10 @@ bool ScopedAddFeatureFlags::IsEnabledWithParameter(
+   if (!parameter_name.empty()) {
+     StrAppend(&feature_name, {":", parameter_name, "/", parameter_value});
+   }
+-  if (std::ranges::contains(disabled_features_, feature_name)) {
++  if (Contains(disabled_features_, feature_name)) {
+     return false;
+   }
+-  if (std::ranges::contains(enabled_features_, feature_name)) {
++  if (Contains(enabled_features_, feature_name)) {
+     return true;
+   }
+   return feature.default_state == FEATURE_ENABLED_BY_DEFAULT;
+@@ -81,8 +81,8 @@ void ScopedAddFeatureFlags::AddFeatureIfNotSet(const Feature& feature,
+                                                std::string_view suffix,
+                                                bool enable) {
+   std::string feature_name = StrCat({feature.name, suffix});
+-  if (std::ranges::contains(enabled_features_, feature_name) ||
+-      std::ranges::contains(disabled_features_, feature_name)) {
++  if (Contains(enabled_features_, feature_name) ||
++      Contains(disabled_features_, feature_name)) {
+     return;
+   }
+   if (enable) {
+diff --git a/base/scoped_multi_source_observation.h b/base/scoped_multi_source_observation.h
+index 7b1afe8c88..dbec0b52d1 100644
+--- a/base/scoped_multi_source_observation.h
++++ b/base/scoped_multi_source_observation.h
+@@ -8,6 +8,7 @@
+ #include <stddef.h>
+ 
+ #include "base/check.h"
++#include "base/containers/contains.h"
+ #include "base/memory/raw_ptr.h"
+ #include "base/scoped_observation_traits.h"
+ #include "third_party/abseil-cpp/absl/container/flat_hash_set.h"
+diff --git a/base/sequence_checker_impl.cc b/base/sequence_checker_impl.cc
+index aeb0571e06..737041866f 100644
+--- a/base/sequence_checker_impl.cc
++++ b/base/sequence_checker_impl.cc
+@@ -9,6 +9,7 @@
+ 
+ #include "base/check.h"
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/debug/stack_trace.h"
+ #include "base/sequence_token.h"
+ #include "base/synchronization/lock_subtle.h"
+@@ -96,7 +97,7 @@ bool SequenceCheckerImpl::CalledOnValidSequence(
+   if (!is_valid) {
+ #if DCHECK_IS_ON()
+     for (uintptr_t lock : subtle::GetTrackedLocksHeldByCurrentThread()) {
+-      if (std::ranges::contains(locks_, lock)) {
++      if (Contains(locks_, lock)) {
+         is_valid = true;
+         break;
+       }
+@@ -148,8 +149,7 @@ bool SequenceCheckerImpl::CalledOnValidSequence(
+   // `locks_` must contain locks held at binding time and for all calls to
+   // `CalledOnValidSequence` that returned true afterwards.
+   std::erase_if(locks_, [](uintptr_t lock_ptr) {
+-    return !std::ranges::contains(subtle::GetTrackedLocksHeldByCurrentThread(),
+-                                  lock_ptr);
++    return !Contains(subtle::GetTrackedLocksHeldByCurrentThread(), lock_ptr);
+   });
+ #endif  // DCHECK_IS_ON()
+ 
+diff --git a/base/state_transitions.h b/base/state_transitions.h
+index fc704337ad..c17f0fa799 100644
+--- a/base/state_transitions.h
++++ b/base/state_transitions.h
+@@ -5,10 +5,10 @@
+ #ifndef BASE_STATE_TRANSITIONS_H_
+ #define BASE_STATE_TRANSITIONS_H_
+ 
+-#include <algorithm>
+ #include <vector>
+ 
+ #include "base/check_op.h"
++#include "base/containers/contains.h"
+ #include "base/containers/span.h"
+ 
+ namespace base {
+@@ -84,7 +84,7 @@ struct StateTransitions {
+ 
+   // Tests whether transitioning from |source| to |destination| is valid.
+   bool IsTransitionValid(const State& source, const State& destination) const {
+-    return std::ranges::contains(GetValidTransitions(source), destination);
++    return base::Contains(GetValidTransitions(source), destination);
+   }
+ 
+   const std::vector<StateTransition> state_transitions;
+diff --git a/base/strings/strcat_internal.h b/base/strings/strcat_internal.h
+index 5636c30a13..9ada2da3a7 100644
+--- a/base/strings/strcat_internal.h
++++ b/base/strings/strcat_internal.h
+@@ -5,47 +5,65 @@
+ #ifndef BASE_STRINGS_STRCAT_INTERNAL_H_
+ #define BASE_STRINGS_STRCAT_INTERNAL_H_
+ 
+-#include <ranges>
++#include <concepts>
+ #include <string>
+ 
+ #include "base/compiler_specific.h"
+ #include "base/containers/span.h"
+-#include "base/numerics/safe_conversions.h"
+ 
+-namespace base::internal {
++namespace base {
+ 
+-// Appends `strings` to `dest`. Instead of simply calling `dest.append()`
+-// `strings.size()` times, this method first resizes `dest` to be of the desired
+-// size, and then appends each string via `std::ranges::copy`. This achieves
++namespace internal {
++
++// Default to regular `std::basic_string::resize()`.
++template <typename CharT>
++void Resize(std::basic_string<CharT>& str, size_t total_size) {
++  str.resize(total_size);
++}
++
++// Optimized version of `std::basic_string::resize()` that skips zero
++// initialization of appended characters. Reading from the newly allocated
++// characters results in undefined behavior if they are not explicitly
++// initialized afterwards. Available in C++23 as
++// `std::basic_string::resize_and_overwrite()`:
++// https://en.cppreference.com/w/cpp/string/basic_string/resize_and_overwrite
++template <typename CharT>
++  requires requires(std::basic_string<CharT>& str, size_t total_size) {
++    { str.__resize_default_init(total_size) } -> std::same_as<void>;
++  }
++auto Resize(std::basic_string<CharT>& str, size_t total_size) {
++  str.__resize_default_init(total_size);
++}
++
++// Appends `pieces` to `dest`. Instead of simply calling `dest.append()`
++// `pieces.size()` times, this method first resizes `dest` to be of the desired
++// size, and then appends each piece via `std::char_traits::copy`. This achieves
+ // two goals:
+ // 1) Allocating the desired size all at once avoids other allocations that
+ //    could happen if intermediate allocations did not reserve enough capacity.
+-// 2) Invoking std::ranges::copy instead of std::basic_string::append
++// 2) Invoking std::char_traits::copy instead of std::basic_string::append
+ //    avoids having to write the terminating '\0' character n times.
+ template <typename CharT, typename StringT>
+-void StrAppendT(std::basic_string<CharT>& dest, span<const StringT> strings) {
++void StrAppendT(std::basic_string<CharT>& dest, span<const StringT> pieces) {
+   const size_t initial_size = dest.size();
+   size_t total_size = initial_size;
+-  for (const StringT& str : strings) {
+-    total_size += str.size();
++  for (const auto& cur : pieces) {
++    total_size += cur.size();
+   }
+ 
+-  dest.resize_and_overwrite(total_size, [&](CharT* p, size_t n) {
+-    // SAFETY: `std::basic_string::resize_and_overwrite` guarantees that the
+-    // range `[p, p + n]` is valid.
+-    UNSAFE_BUFFERS(base::span to_overwrite(p, n));
+-    auto write_it = to_overwrite.begin();
+-
+-    // The first `initial_size` characters are guaranteed to be the previous
+-    // contents of `dest`.
+-    write_it += base::checked_cast<ptrdiff_t>(initial_size);
+-
+-    // Copy each string into the destination, resetting `write_it` as we go.
+-    for (const StringT& str : strings) {
+-      write_it = std::ranges::copy(str, write_it).out;
+-    }
+-    return n;
+-  });
++  // Note: As opposed to `reserve()` calling `resize()` with an argument smaller
++  // than the current `capacity()` does not result in the string releasing spare
++  // capacity. Furthermore, common std::string implementations apply a geometric
++  // growth strategy if the current capacity is not sufficient for the newly
++  // added characters. Since this codepath is also triggered by `resize()`, we
++  // don't have to manage the std::string's capacity ourselves here to avoid
++  // performance hits in case `StrAppend()` gets called in a loop.
++  Resize(dest, total_size);
++  CharT* dest_char = &dest[initial_size];
++  for (const auto& cur : pieces) {
++    std::char_traits<CharT>::copy(dest_char, cur.data(), cur.size());
++    UNSAFE_TODO(dest_char += cur.size());
++  }
+ }
+ 
+ template <typename StringT>
+@@ -55,6 +73,8 @@ auto StrCatT(span<const StringT> pieces) {
+   return result;
+ }
+ 
+-}  // namespace base::internal
++}  // namespace internal
++
++}  // namespace base
+ 
+ #endif  // BASE_STRINGS_STRCAT_INTERNAL_H_
+diff --git a/base/strings/string_view_util.h b/base/strings/string_view_util.h
+index 5959cdbd91..2783328565 100644
+--- a/base/strings/string_view_util.h
++++ b/base/strings/string_view_util.h
+@@ -28,17 +28,23 @@ constexpr std::basic_string_view<CharT> MakeStringViewWithNulChars(
+ // std:: has no direct equivalent for this; however, it eases span adoption in
+ // Chromium, which uses `string`s and `string_view`s in many cases that
+ // rightfully should be containers of `uint8_t`.
++//
++// TODO(C++23): Replace with direct use of the `std::string_view` range
++// constructor to avoid marking UNSAFE_BUFFERS.
+ constexpr auto as_string_view(span<const char> s) {
+-  return std::string_view(s);
++  // SAFETY: legitimate spans are valid from `begin()` to `end()`.
++  return UNSAFE_BUFFERS(std::string_view(s.begin(), s.end()));
+ }
+ constexpr auto as_string_view(span<const unsigned char> s) {
+   return as_string_view(as_chars(s));
+ }
+ constexpr auto as_string_view(span<const char16_t> s) {
+-  return std::u16string_view(s);
++  // SAFETY: legitimate spans are valid from `begin()` to `end()`.
++  return UNSAFE_BUFFERS(std::u16string_view(s.begin(), s.end()));
+ }
+ constexpr auto as_string_view(span<const wchar_t> s) {
+-  return std::wstring_view(s);
++  // SAFETY: legitimate spans are valid from `begin()` to `end()`.
++  return UNSAFE_BUFFERS(std::wstring_view(s.begin(), s.end()));
+ }
+ 
+ }  // namespace base
+diff --git a/base/sys_byteorder.h b/base/sys_byteorder.h
+index 9196171e4c..86a89aa622 100644
+--- a/base/sys_byteorder.h
++++ b/base/sys_byteorder.h
+@@ -2,8 +2,9 @@
+ // Use of this source code is governed by a BSD-style license that can be
+ // found in the LICENSE file.
+ 
+-// This header defines cross-platform NetToHostXX() / HostToNextXX() functions
+-// equivalent to the traditional ntohX() and htonX() functions.
++// This header defines cross-platform ByteSwap() implementations for 16, 32 and
++// 64-bit values, and NetToHostXX() / HostToNextXX() functions equivalent to
++// the traditional ntohX() and htonX() functions.
+ // Use the functions defined here rather than using the platform-specific
+ // functions directly.
+ 
+@@ -12,8 +13,7 @@
+ 
+ #include <stdint.h>
+ 
+-#include <bit>
+-
++#include "base/numerics/byte_conversions.h"
+ #include "build/build_config.h"
+ 
+ #if defined(COMPILER_MSVC)
+@@ -26,21 +26,21 @@ namespace base {
+ // returns the result.
+ inline constexpr uint16_t NetToHost16(uint16_t x) {
+ #if defined(ARCH_CPU_LITTLE_ENDIAN)
+-  return std::byteswap(x);
++  return ByteSwap(x);
+ #else
+   return x;
+ #endif
+ }
+ inline constexpr uint32_t NetToHost32(uint32_t x) {
+ #if defined(ARCH_CPU_LITTLE_ENDIAN)
+-  return std::byteswap(x);
++  return ByteSwap(x);
+ #else
+   return x;
+ #endif
+ }
+ inline constexpr uint64_t NetToHost64(uint64_t x) {
+ #if defined(ARCH_CPU_LITTLE_ENDIAN)
+-  return std::byteswap(x);
++  return ByteSwap(x);
+ #else
+   return x;
+ #endif
+@@ -50,21 +50,21 @@ inline constexpr uint64_t NetToHost64(uint64_t x) {
+ // returns the result.
+ inline constexpr uint16_t HostToNet16(uint16_t x) {
+ #if defined(ARCH_CPU_LITTLE_ENDIAN)
+-  return std::byteswap(x);
++  return ByteSwap(x);
+ #else
+   return x;
+ #endif
+ }
+ inline constexpr uint32_t HostToNet32(uint32_t x) {
+ #if defined(ARCH_CPU_LITTLE_ENDIAN)
+-  return std::byteswap(x);
++  return ByteSwap(x);
+ #else
+   return x;
+ #endif
+ }
+ inline constexpr uint64_t HostToNet64(uint64_t x) {
+ #if defined(ARCH_CPU_LITTLE_ENDIAN)
+-  return std::byteswap(x);
++  return ByteSwap(x);
+ #else
+   return x;
+ #endif
+diff --git a/base/test/scoped_feature_list.cc b/base/test/scoped_feature_list.cc
+index 46c3f6d389..1a2c3bbfad 100644
+--- a/base/test/scoped_feature_list.cc
++++ b/base/test/scoped_feature_list.cc
+@@ -4,7 +4,6 @@
+ 
+ #include "base/test/scoped_feature_list.h"
+ 
+-#include <algorithm>
+ #include <atomic>
+ #include <memory>
+ #include <string_view>
+@@ -12,6 +11,7 @@
+ #include <vector>
+ 
+ #include "base/check_op.h"
++#include "base/containers/contains.h"
+ #include "base/containers/flat_map.h"
+ #include "base/features.h"
+ #include "base/memory/ptr_util.h"
+@@ -189,11 +189,10 @@ std::string_view GetFeatureName(std::string_view feature) {
+ bool ContainsFeature(
+     const std::vector<ScopedFeatureList::FeatureWithStudyGroup>& feature_vector,
+     std::string_view feature_name) {
+-  return std::ranges::contains(
+-      feature_vector, feature_name,
+-      [](const ScopedFeatureList::FeatureWithStudyGroup& a) {
+-        return a.feature_name;
+-      });
++  return Contains(feature_vector, feature_name,
++                  [](const ScopedFeatureList::FeatureWithStudyGroup& a) {
++                    return a.feature_name;
++                  });
+ }
+ 
+ // Merges previously-specified feature overrides with those passed into one of
+diff --git a/base/threading/thread_id_name_manager.cc b/base/threading/thread_id_name_manager.cc
+index c5e504481d..3cb0db3377 100644
+--- a/base/threading/thread_id_name_manager.cc
++++ b/base/threading/thread_id_name_manager.cc
+@@ -7,9 +7,8 @@
+ #include <stdlib.h>
+ #include <string.h>
+ 
+-#include <algorithm>
+-
+ #include "base/check.h"
++#include "base/containers/contains.h"
+ #include "base/memory/singleton.h"
+ #include "base/strings/string_util.h"
+ #include "base/trace_event/heap_profiler_allocation_context_tracker.h"  // no-presubmit-check
+@@ -54,13 +53,13 @@ void ThreadIdNameManager::RegisterThread(PlatformThreadHandle::Handle handle,
+ 
+ void ThreadIdNameManager::AddObserver(Observer* obs) {
+   AutoLock locked(lock_);
+-  DCHECK(!std::ranges::contains(observers_, obs));
++  DCHECK(!base::Contains(observers_, obs));
+   observers_.push_back(obs);
+ }
+ 
+ void ThreadIdNameManager::RemoveObserver(Observer* obs) {
+   AutoLock locked(lock_);
+-  DCHECK(std::ranges::contains(observers_, obs));
++  DCHECK(base::Contains(observers_, obs));
+   std::erase(observers_, obs);
+ }
+ 
+diff --git a/base/time/time.h b/base/time/time.h
+index 332fef264f..78ac81258f 100644
+--- a/base/time/time.h
++++ b/base/time/time.h
+@@ -126,8 +126,8 @@ constexpr TimeDelta Microseconds(T n);
+ 
+ namespace {
+ 
+-// TODO: Replace usage of this with std::isnan() once the Windows toolchain
+-// supports that being constexpr (other toolchains already do).
++// TODO: Replace usage of this with std::isnan() once Chromium uses C++23,
++// where that is constexpr.
+ constexpr bool isnan(double d) {
+   return d != d;
+ }
+diff --git a/base/token.cc b/base/token.cc
+index a0f57b3003..909afb0c75 100644
+--- a/base/token.cc
++++ b/base/token.cc
+@@ -79,8 +79,7 @@ std::optional<Token> ReadTokenFromPickle(PickleIterator* pickle_iterator) {
+   return Token(high, low);
+ }
+ 
+-// static
+-size_t TokenHash::operator()(const Token& token) {
++size_t TokenHash::operator()(const Token& token) const {
+   return HashInts64(token.high(), token.low());
+ }
+ 
+diff --git a/base/token.h b/base/token.h
+index f598840903..cc47f0356f 100644
+--- a/base/token.h
++++ b/base/token.h
+@@ -79,7 +79,7 @@ class BASE_EXPORT Token {
+ 
+ // For use in std::unordered_map.
+ struct BASE_EXPORT TokenHash {
+-  static size_t operator()(const Token& token);
++  size_t operator()(const Token& token) const;
+ };
+ 
+ class Pickle;
+diff --git a/base/trace_event/memory_infra_background_allowlist.cc b/base/trace_event/memory_infra_background_allowlist.cc
+index 065c941f88..6e74592922 100644
+--- a/base/trace_event/memory_infra_background_allowlist.cc
++++ b/base/trace_event/memory_infra_background_allowlist.cc
+@@ -6,10 +6,10 @@
+ 
+ #include <string.h>
+ 
+-#include <algorithm>
+ #include <string>
+ #include <string_view>
+ 
++#include "base/containers/contains.h"
+ #include "base/containers/fixed_flat_set.h"
+ #include "base/strings/string_util.h"
+ #include "build/build_config.h"
+@@ -362,8 +362,7 @@ bool IsMemoryDumpProviderInAllowlist(const char* mdp_name) {
+   if (g_dump_provider_allowlist_for_testing.empty()) {
+     return kDumpProviderAllowlist.contains(mdp_name);
+   } else {
+-    return std::ranges::contains(g_dump_provider_allowlist_for_testing,
+-                                 mdp_name);
++    return base::Contains(g_dump_provider_allowlist_for_testing, mdp_name);
+   }
+ }
+ 
+@@ -411,8 +410,8 @@ bool IsMemoryAllocatorDumpNameInAllowlist(const std::string& name) {
+   if (g_allocator_dump_name_allowlist_for_testing.empty()) {
+     return kAllocatorDumpNameAllowlist.contains(stripped_str);
+   } else {
+-    return std::ranges::contains(g_allocator_dump_name_allowlist_for_testing,
+-                                 stripped_str);
++    return base::Contains(g_allocator_dump_name_allowlist_for_testing,
++                          stripped_str);
+   }
+ }
+ 
+diff --git a/base/trace_event/trace_config.cc b/base/trace_event/trace_config.cc
+index 6c09341e32..8b0e84103b 100644
+--- a/base/trace_event/trace_config.cc
++++ b/base/trace_event/trace_config.cc
+@@ -11,6 +11,7 @@
+ #include <string_view>
+ #include <utility>
+ 
++#include "base/containers/contains.h"
+ #include "base/json/json_reader.h"
+ #include "base/json/json_writer.h"
+ #include "base/logging.h"
+@@ -803,8 +804,8 @@ std::string TraceConfig::ToTraceOptionsString() const {
+ std::string TraceConfig::ToPerfettoTrackEventConfigRaw(
+     bool privacy_filtering_enabled) const {
+   perfetto::protos::gen::TrackEventConfig te_cfg;
+-  if (!std::ranges::contains(category_filter_.excluded_categories(), "*") &&
+-      !std::ranges::contains(category_filter_.included_categories(), "*")) {
++  if (!base::Contains(category_filter_.excluded_categories(), "*") &&
++      !base::Contains(category_filter_.included_categories(), "*")) {
+     // In the case when the default behavior is not specified, apply the
+     // following rule: if no categories are explicitly enabled, enable the
+     // default ones; otherwise only enable matching categories.
+diff --git a/base/types/cxx23_from_range.h b/base/types/cxx23_from_range.h
+new file mode 100644
+index 0000000000..dc152fc0bb
+--- /dev/null
++++ b/base/types/cxx23_from_range.h
+@@ -0,0 +1,25 @@
++// Copyright 2024 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#ifndef BASE_TYPES_CXX23_FROM_RANGE_H_
++#define BASE_TYPES_CXX23_FROM_RANGE_H_
++
++namespace base {
++
++// A marker type for constructors from a range. This is a backport of
++// `std::from_range_t` in C++23, and will be relaced with the std version one
++// day.
++//
++// https://en.cppreference.com/w/cpp/ranges/from_range
++struct from_range_t {
++  from_range_t() = default;
++};
++
++// The instantiation of `from_range_t`, to be passed to constructors taking the
++// marker type `from_range_t`.
++constexpr inline from_range_t from_range;
++
++}  // namespace base
++
++#endif  // BASE_TYPES_CXX23_FROM_RANGE_H_
+diff --git a/base/types/cxx23_to_underlying.h b/base/types/cxx23_to_underlying.h
+new file mode 100644
+index 0000000000..8250bdd125
+--- /dev/null
++++ b/base/types/cxx23_to_underlying.h
+@@ -0,0 +1,23 @@
++// Copyright 2022 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#ifndef BASE_TYPES_CXX23_TO_UNDERLYING_H_
++#define BASE_TYPES_CXX23_TO_UNDERLYING_H_
++
++#include <type_traits>
++
++namespace base {
++
++// Implementation of C++23's std::to_underlying.
++//
++// Reference: https://en.cppreference.com/w/cpp/utility/to_underlying
++template <typename EnumT>
++  requires(std::is_enum_v<EnumT>)
++constexpr std::underlying_type_t<EnumT> to_underlying(EnumT e) noexcept {
++  return static_cast<std::underlying_type_t<EnumT>>(e);
++}
++
++}  // namespace base
++
++#endif  // BASE_TYPES_CXX23_TO_UNDERLYING_H_

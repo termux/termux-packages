@@ -21,6 +21,9 @@ termux_download() {
 		elif [ ! -f "$source" ]; then
 			echo "No local source file found at path of URL '$URL'"
 			return 1
+		else
+			ln -sf "$source" "$DESTINATION"
+			return 0
 		fi
 	fi
 
