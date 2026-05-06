@@ -1,0 +1,20 @@
+--- a/Battery.cxx
++++ b/Battery.cxx
+@@ -41,7 +41,7 @@
+     hide();
+   else
+   {
+-    QDBusConnection::systemBus()
++    QDBusConnection::sessionBus()
+       .connect("org.freedesktop.UPower",
+                "/org/freedesktop/UPower",
+                "org.freedesktop.DBus.Properties",
+@@ -55,7 +55,7 @@
+                                      "org.freedesktop.DBus.Properties",
+                                      "Get");
+     msg << QLatin1String("org.freedesktop.UPower") << QLatin1String("OnBattery");
+-    QDBusConnection::systemBus().callWithCallback(msg, this, SLOT(onBatteryReply(QDBusMessage)), nullptr);
++    QDBusConnection::sessionBus().callWithCallback(msg, this, SLOT(onBatteryReply(QDBusMessage)), nullptr);
+
+     connect(device.as<Solid::Battery>(), &Solid::Battery::chargePercentChanged, this, &Battery::changed);
+     connect(device.as<Solid::Battery>(), &Solid::Battery::chargeStateChanged, this, &Battery::changed);
