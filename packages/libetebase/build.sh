@@ -1,0 +1,20 @@
+TERMUX_PKG_HOMEPAGE="https://github.com/etesync/libetebase"
+TERMUX_PKG_DESCRIPTION="Etebase C library"
+TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_LICENSE_FILE="LICENSE"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.5.8"
+TERMUX_PKG_SRCURL="https://github.com/etesync/libetebase/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256="4f2623a6e194aa3df69307d13ad00c42ec853a1af02ca329e35cd829ff472145"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_DEPENDS="libc++, libsodium, openssl"
+
+termux_step_pre_configure() {
+	termux_setup_rust
+	export CARGO_BUILD_TARGET=$CARGO_TARGET_NAME
+	export OPENSSL_DIR=$TERMUX_PREFIX
+
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DRust_CARGO_TARGET=$CARGO_TARGET_NAME"
+}
