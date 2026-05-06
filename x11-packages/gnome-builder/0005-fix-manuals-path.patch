@@ -1,0 +1,44 @@
+diff --git a/src/plugins/manuals/manuals-system-importer.c b/src/plugins/manuals/manuals-system-importer.c
+index b96ce57f4..16a6dd22e 100644
+--- a/src/plugins/manuals/manuals-system-importer.c
++++ b/src/plugins/manuals/manuals-system-importer.c
+@@ -31,7 +31,7 @@
+ #include "manuals-sdk.h"
+ #include "manuals-system-importer.h"
+ 
+-#define VAR_RUN_HOST "/var/run/host"
++#define VAR_RUN_HOST "@TERMUX_PREFIX@/var/run/host"
+ 
+ struct _ManualsSystemImporter
+ {
+@@ -104,13 +104,13 @@ manuals_system_importer_import_fiber (gpointer user_data)
+ 
+   if (g_file_test ("/.flatpak-info", G_FILE_TEST_EXISTS))
+     {
+-      manuals_devhelp_importer_add_directory (devhelp, VAR_RUN_HOST "/usr/share/doc", sdk_id);
+-      manuals_devhelp_importer_add_directory (devhelp, VAR_RUN_HOST "/usr/share/gtk-doc/html", sdk_id);
++      manuals_devhelp_importer_add_directory (devhelp, VAR_RUN_HOST "@TERMUX_PREFIX@/share/doc", sdk_id);
++      manuals_devhelp_importer_add_directory (devhelp, VAR_RUN_HOST "@TERMUX_PREFIX@/share/gtk-doc/html", sdk_id);
+     }
+   else
+     {
+-      manuals_devhelp_importer_add_directory (devhelp, "/usr/share/doc", sdk_id);
+-      manuals_devhelp_importer_add_directory (devhelp, "/usr/share/gtk-doc/html", sdk_id);
++      manuals_devhelp_importer_add_directory (devhelp, "@TERMUX_PREFIX@/share/doc", sdk_id);
++      manuals_devhelp_importer_add_directory (devhelp, "@TERMUX_PREFIX@/share/gtk-doc/html", sdk_id);
+     }
+ 
+   dex_await (manuals_importer_import (MANUALS_IMPORTER (devhelp),
+diff --git a/src/plugins/manuals/manuals-utils.c b/src/plugins/manuals/manuals-utils.c
+index 35158cf03..dcf5fa2b4 100644
+--- a/src/plugins/manuals/manuals-utils.c
++++ b/src/plugins/manuals/manuals-utils.c
+@@ -61,7 +61,7 @@ manuals_get_os_info (const char *key_name)
+   char *ret = NULL;
+ 
+   if (g_file_test ("/.flatpak-info", G_FILE_TEST_EXISTS))
+-    ret = get_os_info_from_os_release (key_name, "/var/run/host/os-release");
++    ret = get_os_info_from_os_release (key_name, "@TERMUX_PREFIX@/var/run/host/os-release");
+ 
+   if (ret == NULL)
+     ret = g_get_os_info (key_name);
