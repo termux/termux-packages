@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://djvu.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Suite to create, manipulate and view DjVu ('déjà vu') documents"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.5.29"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="3.5.30"
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/djvu/djvulibre-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=d3b4b03ae2bdca8516a36ef6eb27b777f0528c9eda26745d9962824a3fdfeccf
+TERMUX_PKG_SHA256=ee5e457d4cfebe566f94b99e5e3d3cc7f5c79ddb741c2ac2ba2e456f00329644
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, libjpeg-turbo, libtiff"
 
