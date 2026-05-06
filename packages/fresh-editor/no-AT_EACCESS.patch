@@ -1,0 +1,23 @@
+Fixes:
+error[E0425]: cannot find value `AT_EACCESS` in crate `libc`
+
+If Android is presented with a call to `faccessat()` that
+has a 4th argument that is any non-zero value, its `faccessat()`
+will always return an error, so set the 4th argument to
+0 instead of `AT_EACCESS` for the greatest chance of
+somehow preventing this code from causing an error
+at either build-time or runtime on Android.
+
+https://cs.android.com/android/platform/superproject/+/android-16.0.0_r4:bionic/libc/bionic/faccessat.cpp;l=45
+
+--- a/crates/fresh-editor/src/model/filesystem.rs
++++ b/crates/fresh-editor/src/model/filesystem.rs
+@@ -1264,7 +1264,7 @@ impl StdFileSystem {
+                 libc::AT_FDCWD,
+                 c_path.as_ptr(),
+                 libc::W_OK,
+-                libc::AT_EACCESS,
++                0,
+             )
+         };
+         Some(rc == 0)
