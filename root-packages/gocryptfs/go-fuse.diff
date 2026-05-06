@@ -1,0 +1,19 @@
+--- a/vendor/github.com/hanwen/go-fuse/v2/fuse/server.go
++++ b/vendor/github.com/hanwen/go-fuse/v2/fuse/server.go
+@@ -566,6 +566,16 @@ func (ms *Server) handleRequest(req *requestAlloc) Status {
+
+ 	h, inSize, outSize, outPayloadSize, code := parseRequest(req.inputBuf, &ms.kernelSettings)
+ 	if !code.Ok() {
++		if code == ENOSYS && len(req.inputBuf) >= int(unsafe.Sizeof(InHeader{})) {
++			in := (*InHeader)(unsafe.Pointer(&req.inputBuf[0]))
++			req.outputBuf = req.outBuf[:int(unsafe.Sizeof(OutHeader{}))]
++			out := (*OutHeader)(unsafe.Pointer(&req.outputBuf[0]))
++			out.Length = uint32(unsafe.Sizeof(OutHeader{}))
++			out.Status = -int32(ENOSYS)
++			out.Unique = in.Unique
++			syscall.Write(ms.mountFd, req.outputBuf)
++			return OK
++		}
+ 		ms.opts.Logger.Printf("parseRequest: %v", code)
+ 		return code
+ 	}
