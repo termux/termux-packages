@@ -10,9 +10,9 @@ TERMUX_PKG_LICENSE_FILE="
 	Documentation/licenses/COPYING.ISC
 "
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.41.3"
+TERMUX_PKG_VERSION="2.42"
 TERMUX_PKG_SRCURL="https://www.kernel.org/pub/linux/utils/util-linux/v${TERMUX_PKG_VERSION:0:4}/util-linux-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=3330d873f0fceb5560b89a7dc14e4f3288bbd880e96903ed9b50ec2b5799e58b
+TERMUX_PKG_SHA256=3452b260bbaa775d6e749ac3bb22111785003fc1f444970025c8da26dfa758e9
 # <dependency>: <binaries linking to that dependency>
 # libandroid-glob: lsclocks
 # libandroid-posix-semaphore: lsipc and the lib{blkid,smartcols,uuid} subpackages
@@ -40,9 +40,12 @@ ac_cv_func_uselocale=no
 ac_cv_type_struct_statx=no
 --enable-setpriv
 --disable-agetty
+--disable-chmem
+--disable-copyfilerange
 --disable-ctrlaltdel
 --disable-eject
 --disable-fdformat
+--disable-hwclock-cmos
 --disable-ipcmk
 --disable-ipcrm
 --disable-ipcs
@@ -50,19 +53,17 @@ ac_cv_type_struct_statx=no
 --disable-last
 --disable-liblastlog2
 --disable-logger
---disable-mesg
+--disable-lsmem
 --disable-makeinstall-chown
+--disable-mesg
 --disable-mountpoint
 --disable-nologin
 --disable-pivot_root
 --disable-poman
 --disable-raw
+--disable-rfkill
 --disable-switch_root
 --disable-wall
---disable-lsmem
---disable-chmem
---disable-rfkill
---disable-hwclock-cmos
 "
 
 termux_step_pre_configure() {

@@ -1,11 +1,16 @@
-col is by default only built when using glibc, but we keep
+`col` is by default only built when using glibc, but we keep
 it in Termux by patching away the configure check.
 
 See https://github.com/termux/termux-packages/issues/21537
 
+`copyfilerange`'s disable flag seems to be busted in 2.42
+Trying to build it causes a build failure so jury rig it
+for now to force disable it.
+We were not previously building it.
+
 --- a/configure
 +++ b/configure
-@@ -40869,7 +40869,7 @@ fi
+@@ -42078,7 +42078,7 @@ fi
  else
  
    build_col=yes
@@ -14,7 +19,7 @@ See https://github.com/termux/termux-packages/issues/21537
  fi
  
  
-@@ -40909,7 +40909,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+@@ -42118,7 +42118,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
      yes:yes)
        build_col=yes ;;
      yes:*)
@@ -23,3 +28,14 @@ See https://github.com/termux/termux-packages/issues/21537
      check:yes)
        build_col=yes ;;
      check:*)
+@@ -45217,8 +45217,8 @@ fi
+   fi
+ else
+ 
+-  build_copyfilerange=yes
+-  enable_copyfilerange=check
++  build_copyfilerange=no
++  enable_copyfilerange=no
+ fi
+ 
+ 
