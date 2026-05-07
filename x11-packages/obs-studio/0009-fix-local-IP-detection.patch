@@ -1,0 +1,91 @@
+From fc5674831abbcf69a968f0287424a60d9e559f40 Mon Sep 17 00:00:00 2001
+From: lumaparallax <257510328+lumaparallax@users.noreply.github.com>
+Date: Fri, 24 Apr 2026 15:37:35 +0900
+Subject: [PATCH 9/9] fix local IP detection
+
+---
+ plugins/obs-websocket | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Submodule plugins/obs-websocket 1fcb95b15..32aa80ab2:
+diff --git a/plugins/obs-websocket/src/utils/Platform.cpp b/plugins/obs-websocket/src/utils/Platform.cpp
+index e8045dd..023ce1f 100644
+--- a/plugins/obs-websocket/src/utils/Platform.cpp
++++ b/plugins/obs-websocket/src/utils/Platform.cpp
+@@ -23,11 +23,17 @@ with this program. If not, see <https://www.gnu.org/licenses/>
+ #include <QHostAddress>
+ #include <obs-frontend-api.h>
+ 
++#include <ifaddrs.h>
++#include <arpa/inet.h>
++#include <netinet/in.h>
++
+ #include "Platform.h"
+ #include "plugin-macros.generated.h"
+ 
+ std::string Utils::Platform::GetLocalAddress()
+ {
++	std::string localIp = "127.0.0.1"; // Fallback to localhost
++try {
+ 	std::vector<QString> validAddresses;
+ 	for (auto address : QNetworkInterface::allAddresses()) {
+ 		// Exclude addresses which won't work
+@@ -45,10 +51,6 @@ std::string Utils::Platform::GetLocalAddress()
+ 		validAddresses.push_back(address.toString());
+ 	}
+ 
+-	// Return early if no valid addresses were found
+-	if (validAddresses.size() == 0)
+-		return "0.0.0.0";
+-
+ 	std::vector<std::pair<QString, uint8_t>> preferredAddresses;
+ 	for (auto address : validAddresses) {
+ 		// Attribute a priority (0 is best) to the address to choose the best picks
+@@ -72,8 +74,44 @@ std::string Utils::Platform::GetLocalAddress()
+ 	std::sort(preferredAddresses.begin(), preferredAddresses.end(),
+ 		  [=](std::pair<QString, uint8_t> a, std::pair<QString, uint8_t> b) { return a.second < b.second; });
+ 
++	if (!preferredAddresses.empty()) {
+ 	// Return highest priority address
+ 	return preferredAddresses[0].first.toStdString();
++	}
++} catch (...) {
++		//ignore any exceptions thrown by QT and proceed to Fallback
++	}
++
++	//Androd Fallback
++	struct ifaddrs *interfaces = nullptr;
++	struct ifaddrs *temp_addr = nullptr;
++
++	if (getifaddrs(&interfaces) == 0) {
++		temp_addr = interfaces;
++		while (temp_addr != nullptr) {
++			if (temp_addr->ifa_addr != nullptr && temp_addr->ifa_addr->sa_family == AF_INET) { // IPv4 only
++				std::string ifName = temp_addr->ifa_name;
++
++				// Prioritize Android Wi-Fi (wlan0) or Ethernet (eth0)
++				if (ifName == "wlan0" || ifName == "eth0") {
++					char ipBuffer[INET_ADDRSTRLEN];
++					inet_ntop(AF_INET, &((struct sockaddr_in*)temp_addr->ifa_addr)->sin_addr, ipBuffer, INET_ADDRSTRLEN);
++					localIp = ipBuffer;
++					break;
++				}
++				// Fallback: If not wlan0/eth0, grab the first thing that isn't loopback (lo) or cellular (rmnet)
++				else if (ifName != "lo" && localIp == "127.0.0.1" && ifName.find("rmnet") == std::string::npos) {
++					char ipBuffer[INET_ADDRSTRLEN];
++					inet_ntop(AF_INET, &((struct sockaddr_in*)temp_addr->ifa_addr)->sin_addr, ipBuffer, INET_ADDRSTRLEN);
++					localIp = ipBuffer;
++				}
++			}
++			temp_addr = temp_addr->ifa_next;
++		}
++		freeifaddrs(interfaces);
++	}
++
++	return localIp;
+ }
+ 
+ QString Utils::Platform::GetCommandLineArgument(QString arg)
+-- 
+2.54.0
+
