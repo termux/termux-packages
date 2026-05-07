@@ -1,0 +1,14 @@
+TERMUX_PKG_HOMEPAGE=https://dickey.his.com/cdk/cdk.html
+TERMUX_PKG_DESCRIPTION="Curses Development Kit"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=5.0-20260119
+TERMUX_PKG_SRCURL="https://github.com/ThomasDickey/cdk-snapshots/archive/refs/tags/t${TERMUX_PKG_VERSION#*-}.tar.gz"
+TERMUX_PKG_SHA256=0f3095d7983227c06d1d326a6c95e0255e944be8a0f9748174840bfb3edd0cb5
+TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_DEPENDS="ncurses"
+TERMUX_PKG_BREAKS="libcdk"
+TERMUX_PKG_REPLACES="libcdk"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--with-shared
+"
