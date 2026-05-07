@@ -1,15 +1,19 @@
+diff --git a/yazi-fs/Cargo.toml b/yazi-fs/Cargo.toml
+index aa42cf5..9c77a58 100644
 --- a/yazi-fs/Cargo.toml
 +++ b/yazi-fs/Cargo.toml
-@@ -45,5 +45,5 @@ windows-sys = { version = "0.61.2", features = [ "Win32_Storage_FileSystem" ] }
+@@ -48,5 +48,5 @@ windows-sys = { version = "0.61.2", features = [ "Win32_Storage_FileSystem" ] }
  core-foundation-sys = { workspace = true }
  objc2               = { workspace = true }
  
 -[target.'cfg(not(target_os = "android"))'.dependencies]
 +[target.'cfg(not(target_os = "disabling_this_because_it_is_for_building_an_apk"))'.dependencies]
- trash = "5.2.5"
+ trash = "5.2.6"
+diff --git a/yazi-fs/src/provider/local/local.rs b/yazi-fs/src/provider/local/local.rs
+index 6ec0557..b2b2baa 100644
 --- a/yazi-fs/src/provider/local/local.rs
 +++ b/yazi-fs/src/provider/local/local.rs
-@@ -189,7 +189,7 @@ impl<'a> Provider for Local<'a> {
+@@ -209,7 +209,7 @@ impl<'a> Provider for Local<'a> {
  	async fn trash(&self) -> io::Result<()> {
  		let path = self.path.to_owned();
  		tokio::task::spawn_blocking(move || {
@@ -18,7 +22,7 @@
  			{
  				Err(io::Error::new(io::ErrorKind::Unsupported, "Unsupported OS for trash operation"))
  			}
-@@ -200,7 +200,7 @@ impl<'a> Provider for Local<'a> {
+@@ -220,7 +220,7 @@ impl<'a> Provider for Local<'a> {
  				ctx.set_delete_method(DeleteMethod::NsFileManager);
  				ctx.delete(path).map_err(io::Error::other)
  			}
