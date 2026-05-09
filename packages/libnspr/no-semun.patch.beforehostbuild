@@ -1,0 +1,11 @@
+--- a/pr/src/pthreads/ptsynch.c
++++ b/pr/src/pthreads/ptsynch.c
+@@ -858,7 +858,7 @@ PR_IMPLEMENT(PRStatus) PR_DeleteSemaphore(const char* name) {
+  */
+ #    if (defined(__GNU_LIBRARY__) && !defined(_SEM_SEMUN_UNDEFINED)) || \
+         (defined(FREEBSD) && __FreeBSD_version < 1200059) ||            \
+-        defined(OPENBSD) || defined(DARWIN)
++        defined(OPENBSD) || defined(DARWIN) || defined(__ANDROID__)
+ /* union semun is defined by including <sys/sem.h> */
+ #    else
+ /* according to X/OPEN we have to define it ourselves */

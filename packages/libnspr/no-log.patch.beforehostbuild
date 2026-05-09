@@ -1,0 +1,50 @@
+--- a/pr/src/Makefile.in
++++ b/pr/src/Makefile.in
+@@ -144,9 +144,6 @@ ifeq ($(OS_ARCH),WINCE)
+ OS_LIBS		= ws2.lib
+ endif
+ 
+-ifeq ($(OS_TARGET),Android)
+-OS_LIBS		+= -llog
+-endif
+ 
+ EXTRA_LIBS += $(OS_LIBS)
+ 
+--- a/pr/src/io/prlog.c
++++ b/pr/src/io/prlog.c
+@@ -6,7 +6,7 @@
+ #include "prenv.h"
+ #include "prprf.h"
+ #include <string.h>
+-#ifdef ANDROID
++#if 0
+ #  include <android/log.h>
+ #endif
+ 
+@@ -100,7 +100,7 @@ static void OutputDebugStringA(const char* msg) {
+       fwrite(buf, 1, nb, fd);   \
+       fflush(fd);               \
+     }
+-#elif defined(ANDROID)
++#elif 0
+ #  define _PUT_LOG(fd, buf, nb)                            \
+     PR_BEGIN_MACRO                                         \
+     if (fd == _pr_stderr) {                                \
+@@ -535,7 +535,7 @@ PR_IMPLEMENT(void) PR_LogFlush(void) {
+ 
+ PR_IMPLEMENT(void) PR_Abort(void) {
+   PR_LogPrint("Aborting");
+-#ifdef ANDROID
++#if 0
+   __android_log_write(ANDROID_LOG_ERROR, "PRLog", "Aborting");
+ #endif
+   abort();
+@@ -547,7 +547,7 @@ PR_IMPLEMENT(void) PR_Assert(const char* s, const char* file, PRIntn ln) {
+   fflush(stderr);
+ #ifdef WIN32
+   DebugBreak();
+-#elif defined(ANDROID)
++#elif 0
+   __android_log_assert(NULL, "PRLog", "Assertion failure: %s, at %s:%d\n", s,
+                        file, ln);
+ #endif

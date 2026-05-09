@@ -1,0 +1,107 @@
+libnspr has an extremely archaic and broken 2000s-ism behavior
+of assuming that all 64-bit x86 Linux devices are also capable
+of running 32-bit x86 code; that causes the `nsinstall` binary
+to crash during building within 64-bit x86 Termux, so must be
+avoided
+
+--- a/configure
++++ b/configure
+@@ -7186,13 +7170,12 @@ fi
+         arm*)
+             CPU_ARCH=arm
+             ;;
+-        i*86*|x86_64)
+-            if test -n "$USE_64"; then
+-                CPU_ARCH=x86_64
+-            else
+-                CPU_ARCH=i386
+-            fi
++        i*86*)
++            CPU_ARCH=i386
+             ;;
++        x86_64)
++            CPU_ARCH=x86_64
++	    ;;
+         aarch64)
+             CPU_ARCH=aarch64
+             ;;
+@@ -7387,30 +7370,12 @@ tools are selected during the Xcode/Developer Tools installation." "$LINENO" 5
+         PR_MD_ASFILES=os_Linux_ia64.s
+         ;;
+     x86_64)
+-        if test -n "$USE_64"; then
+-            PR_MD_ASFILES=os_Linux_x86_64.s
+-        elif test -n "$USE_X32"; then
+-            PR_MD_ASFILES=os_Linux_x86_64.s
+-            CC="$CC -mx32"
+-            CXX="$CXX -mx32"
+-        else
+-            printf "%s\n" "#define i386 1" >>confdefs.h
+-
+-            PR_MD_ASFILES=os_Linux_x86.s
+-            CC="$CC -m32"
+-            CXX="$CXX -m32"
+-        fi
++        PR_MD_ASFILES=os_Linux_x86_64.s
+         ;;
+     ppc|powerpc)
+         PR_MD_ASFILES=os_Linux_ppc.s
+         ;;
+     powerpc64)
+-        if test -n "$USE_64"; then
+-            CC="$CC -m64"
+-            CXX="$CXX -m64"
+-        else
+-            PR_MD_ASFILES=os_Linux_ppc.s
+-        fi
+         ;;
+     esac
+     ;;
+@@ -7607,31 +7573,24 @@ printf "%s\n" "$as_me: WARNING: Unknown version of the Microsoft (R) Manifest To
+     esac
+ 
+     case "$target_cpu" in
+-    i*86|x86_64)
+-	if test -n "$USE_64"; then
+-	    printf "%s\n" "#define _AMD64_ 1" >>confdefs.h
+-
+-	else
++    i*86)
+ 	    printf "%s\n" "#define _X86_ 1" >>confdefs.h
+ 
+             if test -z "$GNU_CC" -a "$MSC_VER" -ge "1700"; then
+                                                 CFLAGS="$CFLAGS -arch:IA32"
+             fi
+-	fi
+-        ;;
++            ;;
++    x86_64)
++	    printf "%s\n" "#define _AMD64_ 1" >>confdefs.h
++            ;;
+     aarch64)
+ 	    printf "%s\n" "#define _ARM64_ 1" >>confdefs.h
+-
+-	    USE_64=1
+ 	    ;;
+     ia64)
+ 	    printf "%s\n" "#define _IA64_ 1" >>confdefs.h
+-
+-	    USE_64=1
+ 	    ;;
+     *)
+ 	    printf "%s\n" "#define _CPU_ARCH_NOT_DEFINED 1" >>confdefs.h
+-
+ 	    ;;
+     esac
+     ;;
+@@ -8804,10 +8738,6 @@ else
+     OBJDIR_TAG=_DBG
+ fi
+ 
+-if test -n "$USE_64"; then
+-    COMPILER_TAG=_64
+-fi
+-
+ RELEASE_OBJDIR_NAME="${OS_CONFIG}${CPU_ARCH_TAG}${COMPILER_TAG}${IMPL_STRATEGY}${OBJDIR_TAG}.${OBJDIR_SUFFIX}"
+ 
+ case "$target_os" in
