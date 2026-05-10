@@ -1,0 +1,36 @@
+From b4d0b533bc95c1ed4612d982ad2eac23dd8aeb34 Mon Sep 17 00:00:00 2001
+From: Yateng Hong <yatengh@microsoft.com>
+Date: Tue, 21 Apr 2026 15:15:27 +0800
+Subject: [PATCH] Fix ARM NEON assembly build with Clang
+
+Use CMAKE_ASM_COMPILER_ID (assembly files use the ASM compiler) and MATCHES Clang to cover AppleClang/ARMClang variants, whose integrated assembler does not support .func/.endfunc.
+
+Fixes #510
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+---
+ libde265/arm/CMakeLists.txt | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/libde265/arm/CMakeLists.txt b/libde265/arm/CMakeLists.txt
+index a1d970f22678..722591f15450 100644
+--- a/libde265/arm/CMakeLists.txt
++++ b/libde265/arm/CMakeLists.txt
+@@ -6,11 +6,16 @@ if(HAVE_NEON)
+     hevcdsp_qpel_neon.S
+   )
+ 
++  # Clang's assembler does not support .func/.endfunc directives.
++  if(NOT CMAKE_ASM_COMPILER_ID MATCHES Clang)
++    set(AS_FUNC_FLAG -DHAVE_AS_FUNC)
++  endif()
++
+   target_compile_options(arm_neon PRIVATE
+     -mfpu=neon
+     -DHAVE_NEON
+     -DEXTERN_ASM=
+-    -DHAVE_AS_FUNC
++    ${AS_FUNC_FLAG}
+     -DHAVE_SECTION_DATA_REL_RO
+   )
+ 
