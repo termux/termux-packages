@@ -1,23 +1,23 @@
 termux_step_patch_package() {
-	[ "$TERMUX_PKG_METAPACKAGE" = "true" ] && return
+	[[ "$TERMUX_PKG_METAPACKAGE" == "true" ]] && return
+	local -a PATCHES=() DEBUG_PATCHES=() ON_DEVICE_PATCHES=() VARIABLES=()
+	readarray -t VARIABLES < <(compgen -v)
 
 	cd "$TERMUX_PKG_SRCDIR"
 	# Suffix patch with ".patch32" or ".patch64" to only apply for
 	# these bitnesses
-	local PATCHES=$(find $TERMUX_PKG_BUILDER_DIR -mindepth 1 -maxdepth 1 \
+	readarray -t PATCHES < <(find $TERMUX_PKG_BUILDER_DIR -mindepth 1 -maxdepth 1 \
 			     -name \*.patch -o -name \*.patch$TERMUX_ARCH_BITS | sort)
-	local DEBUG_PATCHES=""
-	if [ "$TERMUX_DEBUG_BUILD" = "true" ]; then
-		DEBUG_PATCHES=$(find $TERMUX_PKG_BUILDER_DIR -mindepth 1 -maxdepth 1 -name \*.patch.debug | sort)
-	fi
-	local ON_DEVICE_PATCHES=""
+	[[ "$TERMUX_DEBUG_BUILD" == "true" ]] \
+		&& readarray -t DEBUG_PATCHES < <(find $TERMUX_PKG_BUILDER_DIR -mindepth 1 -maxdepth 1 -name \*.patch.debug | sort)
+
 	# .patch.ondevice patches should only be applied when building
 	# on device
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
-		ON_DEVICE_PATCHES=$(find $TERMUX_PKG_BUILDER_DIR -mindepth 1 -maxdepth 1 -name \*.patch.ondevice | sort)
-	fi
+	[[ "$TERMUX_ON_DEVICE_BUILD" = "true" ]] \
+		&& readarray -t ON_DEVICE_PATCHES < <(find $TERMUX_PKG_BUILDER_DIR -mindepth 1 -maxdepth 1 -name \*.patch.ondevice | sort)
+
 	shopt -s nullglob
-	for patch in $PATCHES $DEBUG_PATCHES $ON_DEVICE_PATCHES; do
+	for patch in "${PATCHES[@]}" "${DEBUG_PATCHES[@]}" "${ON_DEVICE_PATCHES[@]}"; do
 		echo "Applying patch: $(basename $patch)"
 		test -f "$patch" && sed \
 			-e "s%\@TERMUX_APP_PACKAGE\@%${TERMUX_APP_PACKAGE}%g" \
@@ -31,7 +31,16 @@ termux_step_patch_package() {
 			-e "s%\@TERMUX_ENV__S_TERMUX_API_APP\@%${TERMUX_ENV__S_TERMUX_API_APP}%g" \
 			-e "s%\@TERMUX_ENV__S_TERMUX_ROOTFS\@%${TERMUX_ENV__S_TERMUX_ROOTFS}%g" \
 			-e "s%\@TERMUX_ENV__S_TERMUX_EXEC\@%${TERMUX_ENV__S_TERMUX_EXEC}%g" \
-			"$patch" | patch --silent -p1
+			"$patch" | (
+				while IFS= read -r line; do
+					[[ $line == +[!+]* && $line == *@@*@@* ]] \
+						&& for var in "${VARIABLES[@]}"; do
+							[[ $line == *"@@${var}@@"* ]] \
+							&& line="${line//"@@${var}@@"/"${!var}"}"
+						done
+					printf '%s\n' "$line"
+				done
+			) | patch --silent -p1
 	done
 	shopt -u nullglob
 }
