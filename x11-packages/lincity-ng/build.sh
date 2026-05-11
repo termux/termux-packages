@@ -7,5 +7,5 @@ TERMUX_PKG_SRCURL=https://github.com/lincity-ng/lincity-ng/archive/refs/tags/lin
 TERMUX_PKG_SHA256=67ef6ef13d3b971db69653742a112bf3d343380834c7d777fd082d5f42fa2bb4
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libc++, libxml++-5.0, libxml2, fmt, sdl3, sdl3-mixer, sdl3-image, sdl3-ttf, zlib"
+TERMUX_PKG_DEPENDS="libc++, libxml++-5.0, libxml2, lincity-ng-data, fmt, sdl3, sdl3-mixer, sdl3-image, sdl3-ttf, zlib"
 TERMUX_PKG_GROUPS="games"
