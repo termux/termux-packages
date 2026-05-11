@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://tpo.pages.torproject.net/core/arti/
 TERMUX_PKG_DESCRIPTION="Arti is a work-in-progress project to write a full-featured Tor implementation in Rust."
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
-TERMUX_PKG_VERSION="2.1.0"
+TERMUX_PKG_VERSION="2.3.0"
 TERMUX_PKG_SRCURL="https://gitlab.torproject.org/tpo/core/arti/-/archive/arti-v${TERMUX_PKG_VERSION}/arti-arti-v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=9187d6a7b789de4e6b09445c8f3ba63f3ec24bc080a36468b923cda38070208d
+TERMUX_PKG_SHA256=c6a9dc41d7d827884315feab596954bd164137de502640d24db5c5c8a59b2099
 TERMUX_PKG_DEPENDS="liblzma, libsqlite, openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
 
