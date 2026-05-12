@@ -1,0 +1,21 @@
+diff -uNr ruby-4.0.3/yjit/src/options.rs ruby-4.0.3.mod/yjit/src/options.rs
+--- ruby-4.0.3/yjit/src/options.rs	2024-12-25 07:43:20.000000000 +0000
++++ ruby-4.0.3.mod/yjit/src/options.rs	2025-02-04 23:00:22.000000000 +0000
+@@ -83,7 +83,7 @@
+     /// Run code GC when exec_mem_size is reached.
+     pub code_gc: bool,
+ 
+-    /// Enable writing /tmp/perf-{pid}.map for Linux perf
++    /// Enable writing @TERMUX_PREFIX@/tmp/perf-{pid}.map for Linux perf
+     pub perf_map: Option<PerfMap>,
+ 
+     // Where to store the log. `None` disables the log.
+@@ -155,7 +155,7 @@
+     File(std::os::unix::io::RawFd),
+ }
+ 
+-/// Type of symbols to dump into /tmp/perf-{pid}.map
++/// Type of symbols to dump into @TERMUX_PREFIX@/tmp/perf-{pid}.map
+ #[derive(Clone, Copy, PartialEq, Eq, Debug)]
+ pub enum PerfMap {
+     // Dump ISEQ symbols

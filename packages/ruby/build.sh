@@ -5,17 +5,16 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Packages which should be rebuilt after "minor" bump (e.g. 3.1.x to 3.2.0):
 # - asciidoctor
 # - weechat
-TERMUX_PKG_VERSION="3.4.1"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="4.0.3"
 TERMUX_PKG_SRCURL=https://cache.ruby-lang.org/pub/ruby/$(echo $TERMUX_PKG_VERSION | cut -d . -f 1-2)/ruby-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=018d59ffb52be3c0a6d847e22d3fd7a2c52d0ddfee249d3517a0c8c6dbfa70af
+TERMUX_PKG_SHA256=22cf6005d25bbe496b5ebe9224d63a1aaabfbfe02591bb5d612517c5a7836f29
 # libbffi is used by the fiddle extension module:
 TERMUX_PKG_DEPENDS="libandroid-execinfo, libandroid-support, libffi, libgmp, readline, openssl, libyaml, zlib"
 TERMUX_PKG_RECOMMENDS="clang, make, pkg-config, resolv-conf"
 TERMUX_PKG_BREAKS="ruby-dev"
 TERMUX_PKG_REPLACES="ruby-dev"
 # Needed to fix compilation on android:
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_setgroups=no ac_cv_func_setresuid=no ac_cv_func_setreuid=no --enable-rubygems"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_setgroups=no ac_cv_func_setresuid=no ac_cv_func_setreuid=no --enable-rubygems --enable-yjit --enable-zjit"
 # Do not link in libcrypt.so if available (now in disabled-packages):
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_lib_crypt_crypt=no"
 # Fix DEPRECATED_TYPE macro clang compatibility:
@@ -45,6 +44,17 @@ termux_step_pre_configure() {
 		-e "s|@RUBY_API_VERSION@|${_RUBY_API_VERSION}|g" \
 		$TERMUX_PKG_BUILDER_DIR/tool-rbinstall.rb.diff \
 		| patch --silent -p1
+
+	# Install/locate a rustup-managed Rust toolchain that has std for
+	# ${CARGO_TARGET_NAME} (e.g. aarch64-linux-android). The Termux toolchain
+	# setup already exports CARGO_TARGET_NAME and the
+	# CARGO_TARGET_<TARGET>_LINKER variables, so we just need rustup + std.
+	termux_setup_rust
+
+	# Pass the rust target through to configure.ac (see configure.ac.patch),
+	# which injects "--target=$JIT_RUST_TARGET" into RUSTC for the JIT crates,
+	# so libyjit/libzjit/libruby.a are built for Android instead of the host.
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" JIT_RUST_TARGET=$CARGO_TARGET_NAME"
 
 	autoreconf -fi
 
