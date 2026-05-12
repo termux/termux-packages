@@ -2,12 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://matt.ucc.asn.au/dropbear/dropbear.html
 TERMUX_PKG_DESCRIPTION="Small SSH server and client"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2025.89"
+TERMUX_PKG_VERSION="2026.91"
 TERMUX_PKG_SRCURL=https://matt.ucc.asn.au/dropbear/releases/dropbear-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=0d1f7ca711cfc336dc8a85e672cab9cfd8223a02fe2da0a4a7aeb58c9e113634
+TERMUX_PKG_SHA256=defa924475abf6bc1e74abc00173e46bfdc804bd47caafa14f5a4ef0cc76da34
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="termux-auth, zlib"
-TERMUX_PKG_SUGGESTS="openssh-sftp-server"
+TERMUX_PKG_SUGGESTS="openssh-sftp-server, termux-services"
 TERMUX_PKG_CONFLICTS="openssh"
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -27,6 +27,16 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install() {
 	ln -sf "dropbearmulti" "${TERMUX_PREFIX}/bin/ssh"
+
+	mkdir -p "$TERMUX_PREFIX/var/run"
+	echo "Dropbear needs this directory to put dropbear.pid in" > "$TERMUX_PREFIX/var/run/README.dropbear"
+
+	# Setup termux-services scripts
+	mkdir -p "$TERMUX_PREFIX/var/service/dropbear/log"
+	ln -sf "$TERMUX_PREFIX/share/termux-services/svlogger" "$TERMUX_PREFIX/var/service/dropbear/log/run"
+	sed "s%@TERMUX_PREFIX@%$TERMUX_PREFIX%g" "$TERMUX_PKG_BUILDER_DIR/sv/dropbear.run.in" > "$TERMUX_PREFIX/var/service/dropbear/run"
+	chmod 700 "$TERMUX_PREFIX/var/service/dropbear/run"
+	touch "$TERMUX_PREFIX/var/service/dropbear/down"
 }
 
 termux_step_create_debscripts() {
@@ -37,6 +47,11 @@ termux_step_create_debscripts() {
 	echo "	KEYFILE=$TERMUX_PREFIX/etc/dropbear/dropbear_\${a}_host_key"
 	echo "	test ! -f \$KEYFILE && dropbearkey -t \$a -f \$KEYFILE"
 	echo "done"
+	echo ""
+	echo "echo \"You can enable dropbear to autostart\""
+	echo "echo \"Run 'pkg i termux-services'\""
+	echo "echo \"to install the ('runit') service manager\""
+	echo "echo \"then using 'sv-enable dropbear'\""
 	echo "exit 0"
 	} > postinst
 	chmod 0755 postinst
