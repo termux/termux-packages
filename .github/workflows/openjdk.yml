@@ -1,0 +1,164 @@
+name: OpenJDK
+
+on:
+  workflow_dispatch:
+    inputs:
+      java-version:
+        description: "OpenJDK version to build"
+        required: true
+        default: "all"
+        type: choice
+        options:
+        - all
+        - "17"
+        - "21"
+        - "25"
+      target-arch:
+        description: "Target architecture to build"
+        required: true
+        default: "all"
+        type: choice
+        options:
+        - all
+        - aarch64
+        - arm
+        - i686
+        - x86_64
+  schedule:
+  - cron: "0 0 * * 0"
+  pull_request:
+    paths:
+    - ".github/workflows/openjdk.yml"
+    - "build-package.sh"
+    - "scripts/**"
+    - "packages/openjdk-17/**"
+    - "packages/openjdk-21/**"
+    - "packages/openjdk-25/**"
+  push:
+    branches:
+    - master
+    - dev
+    - "dev/**"
+    paths:
+    - ".github/workflows/openjdk.yml"
+    - "build-package.sh"
+    - "scripts/**"
+    - "packages/openjdk-17/**"
+    - "packages/openjdk-21/**"
+    - "packages/openjdk-25/**"
+
+permissions: {} # none
+
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('{0}-{1}', github.workflow, github.event.pull_request.number) || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  prepare:
+    permissions:
+      contents: read
+    runs-on: ubuntu-slim
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+    - name: Generate build matrix
+      id: matrix
+      env:
+        EVENT_NAME: ${{ github.event_name }}
+        INPUT_JAVA_VERSION: ${{ inputs['java-version'] }}
+        INPUT_TARGET_ARCH: ${{ inputs['target-arch'] }}
+      run: |
+        java_versions=(17 21 25)
+        target_arches=(aarch64 arm i686 x86_64)
+        matrix='{"include":['
+        separator=''
+
+        for java_version in "${java_versions[@]}"; do
+          for target_arch in "${target_arches[@]}"; do
+            if [[ "$java_version" == "25" && "$target_arch" == "i686" ]]; then
+              continue
+            fi
+            if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+              if [[ "$INPUT_JAVA_VERSION" != "all" && "$INPUT_JAVA_VERSION" != "$java_version" ]]; then
+                continue
+              fi
+              if [[ "$INPUT_TARGET_ARCH" != "all" && "$INPUT_TARGET_ARCH" != "$target_arch" ]]; then
+                continue
+              fi
+            fi
+            matrix+="${separator}{\"java_version\":\"${java_version}\",\"target_arch\":\"${target_arch}\"}"
+            separator=','
+          done
+        done
+
+        if [[ -z "$separator" ]]; then
+          echo "::error ::No supported OpenJDK build matched java-version=${INPUT_JAVA_VERSION} target-arch=${INPUT_TARGET_ARCH}"
+          exit 1
+        fi
+
+        matrix+=']}'
+        echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
+  build:
+    permissions:
+      contents: read
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v6
+
+    - name: Enable zram
+      uses: ./.github/actions/zram
+      with:
+        algorithm: zstd
+        size: 16G
+        priority: 100
+        device_name: /dev/zram0
+
+    - name: Load Docker image
+      run: ./scripts/run-docker.sh true
+
+    - name: Free additional disk space
+      run: ./scripts/free-space.sh
+
+    - name: Build openjdk-${{ matrix.java_version }}
+      run: |
+        ./scripts/run-docker.sh -d ./build-package.sh -I -C -a "${{ matrix.target_arch }}" "openjdk-${{ matrix.java_version }}"
+
+    - name: Collect build output
+      if: always()
+      run: |
+        mkdir -p artifacts output
+        if [ -d termux-packages/output ]; then
+          mv termux-packages/output/* ./output/ 2>/dev/null || true
+        fi
+        tar cf "artifacts/openjdk-${{ matrix.java_version }}-${{ matrix.target_arch }}-${{ github.sha }}.tar" output
+
+    - name: Checksums for built artifacts
+      if: always()
+      run: |
+        find output -type f -exec sha256sum "{}" \; | sort -k2 | tee "openjdk-${{ matrix.java_version }}-${{ matrix.target_arch }}-${{ github.sha }}.sha256"
+
+    - name: Store checksums
+      if: always()
+      uses: actions/upload-artifact@v6
+      with:
+        name: openjdk-${{ matrix.java_version }}-${{ matrix.target_arch }}-${{ github.sha }}-checksums
+        path: openjdk-${{ matrix.java_version }}-${{ matrix.target_arch }}-${{ github.sha }}.sha256
+
+    - name: Store packages
+      if: always()
+      uses: actions/upload-artifact@v6
+      with:
+        name: openjdk-${{ matrix.java_version }}-${{ matrix.target_arch }}-${{ github.sha }}
+        path: artifacts/
+        retention-days: 14
+
+    - name: AppArmor Logs
+      if: always()
+      run: sudo dmesg | grep apparmor || true
