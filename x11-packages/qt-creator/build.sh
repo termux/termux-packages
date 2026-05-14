@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Integrated Development Environment for Qt"
 TERMUX_PKG_LICENSE="GPL-3.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="19.0.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qtcreator/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/qt-creator-opensource-src-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=92711b85a5642af5970dd3100982f724f4ce2af2181aea5fe0e335a30060dfc0
 TERMUX_PKG_AUTO_UPDATE=true
