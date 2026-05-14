@@ -3,8 +3,8 @@ TERMUX_PKG_DESCRIPTION="Software-defined radio digital signal processing library
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.7.0"
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://github.com/jgaeddert/liquid-dsp/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SRCURL="https://github.com/jgaeddert/liquid-dsp/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=33c42ebc2e6088570421e282c6332e899705d42b4f73ebd1212e6a11da714dd4
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="fftw"
@@ -12,6 +12,10 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	autoreconf -fi
+}
+
+termux_step_post_make_install() {
+	ln -sf libliquid.so "$TERMUX_PREFIX/lib/libliquid.so.1"
 }
 
 termux_step_post_massage() {
