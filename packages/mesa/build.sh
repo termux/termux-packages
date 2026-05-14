@@ -27,92 +27,92 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dllvm=enabled
 -Dshared-llvm=enabled
 -Dplatforms=x11,wayland
--Dgallium-drivers=llvmpipe,softpipe,virgl,zink
 -Dgallium-rusticl=true
 -Dglvnd=enabled
 -Dxmlconfig=disabled
 "
 
 termux_step_post_get_source() {
-	# Do not use meson wrap projects
-	rm -rf subprojects
+		# Do not use meson wrap projects
+		rm -rf subprojects
 }
 
 termux_step_pre_configure() {
-	if [ "$TERMUX_PKG_API_LEVEL" -lt 29 ]; then
-		# ELF TLS is supported starting with API level 29.
-		patch --silent -p1 < "$TERMUX_PKG_BUILDER_DIR/0011-lld-undefined-version.diff"
-	fi
+		if [ "$TERMUX_PKG_API_LEVEL" -lt 29 ]; then
+				# ELF TLS is supported starting with API level 29.
+				patch --silent -p1 < "$TERMUX_PKG_BUILDER_DIR/0011-lld-undefined-version.diff"
+		fi
 
-	termux_setup_cmake
-	termux_setup_rust
+		termux_setup_cmake
+		termux_setup_rust
 
-	: "${CARGO_HOME:=${HOME}/.cargo}"
-	export CARGO_HOME
+		: "${CARGO_HOME:=${HOME}/.cargo}"
+		export CARGO_HOME
 
-	cargo install --force --locked bindgen-cli
-	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
-		export BINDGEN_EXTRA_CLANG_ARGS="--sysroot ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot"
-		case "${TERMUX_ARCH}" in
-		arm) BINDGEN_EXTRA_CLANG_ARGS+=" --target=arm-linux-androideabi${TERMUX_PKG_API_LEVEL}" ;;
-		*) BINDGEN_EXTRA_CLANG_ARGS+=" --target=${TERMUX_ARCH}-linux-android${TERMUX_PKG_API_LEVEL}" ;;
-		esac
-	fi
+		cargo install --force --locked bindgen-cli
+		if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
+				export BINDGEN_EXTRA_CLANG_ARGS="--sysroot ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot"
+				case "${TERMUX_ARCH}" in
+				arm) BINDGEN_EXTRA_CLANG_ARGS+=" --target=arm-linux-androideabi${TERMUX_PKG_API_LEVEL}" ;;
+				*) BINDGEN_EXTRA_CLANG_ARGS+=" --target=${TERMUX_ARCH}-linux-android${TERMUX_PKG_API_LEVEL}" ;;
+				esac
+		fi
 
-	CPPFLAGS+=" -D__USE_GNU"
-	LDFLAGS+=" -landroid-shmem"
+		CPPFLAGS+=" -D__USE_GNU"
+		LDFLAGS+=" -landroid-shmem"
 
-	_WRAPPER_BIN=$TERMUX_PKG_BUILDDIR/_wrapper/bin
-	mkdir -p $_WRAPPER_BIN
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-		sed 's|@CMAKE@|'"$(command -v cmake)"'|g' \
-			$TERMUX_PKG_BUILDER_DIR/cmake-wrapper.in \
-			> $_WRAPPER_BIN/cmake
-		chmod 0700 $_WRAPPER_BIN/cmake
-		termux_setup_wayland_cross_pkg_config_wrapper
-	fi
-	export LLVM_CONFIG="${TERMUX_PREFIX}/bin/llvm-config"
-	export PATH="${_WRAPPER_BIN}:${CARGO_HOME}/bin:${PATH}"
+		_WRAPPER_BIN=$TERMUX_PKG_BUILDDIR/_wrapper/bin
+		mkdir -p $_WRAPPER_BIN
+		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+				sed 's|@CMAKE@|'"$(command -v cmake)"'|g' \
+						$TERMUX_PKG_BUILDER_DIR/cmake-wrapper.in \
+						> $_WRAPPER_BIN/cmake
+				chmod 0700 $_WRAPPER_BIN/cmake
+				termux_setup_wayland_cross_pkg_config_wrapper
+		fi
+		export LLVM_CONFIG="${TERMUX_PREFIX}/bin/llvm-config"
+		export PATH="${_WRAPPER_BIN}:${CARGO_HOME}/bin:${PATH}"
 
-	local _vk_drivers="swrast"
-	if [ "$TERMUX_ARCH" = "arm" ] || [ "$TERMUX_ARCH" = "aarch64" ]; then
-		_vk_drivers+=",freedreno"
-		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dfreedreno-kmds=msm,kgsl"
-	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
-		_vk_drivers+=",intel"
-		# iris support, also i used AI to make this i hope everything is correct
-		TERMUX_PKG_EXTRA_CONFIGURE_ARGS="${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/-Dgallium-drivers=llvmpipe,softpipe,virgl,zink/-Dgallium-drivers=llvmpipe,softpipe,virgl,zink,iris}"
-	fi
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dvulkan-drivers=$_vk_drivers"
-}
+		local _vk_drivers="swrast"
+		local _gallium_drivers="llvmpipe,softpipe,virgl,zink"
+
+		if [ "$TERMUX_ARCH" = "arm" ] || [ "$TERMUX_ARCH" = "aarch64" ]; then
+				_vk_drivers+=",freedreno"
+				TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dfreedreno-kmds=msm,kgsl"
+		elif [ "$TERMUX_ARCH" = "x86_64" ]; then
+				_vk_drivers+=",intel"
+		fi
+			
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dgallium-drivers=$_gallium_drivers"
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dvulkan-drivers=$_vk_drivers" 
 
 termux_step_post_configure() {
-	rm -f $_WRAPPER_BIN/cmake
+		rm -f $_WRAPPER_BIN/cmake
 }
 
 termux_step_post_make_install() {
-	# Avoid hard links
-	local f1
-	for f1 in $TERMUX_PREFIX/lib/dri/*; do
-		if [ ! -f "${f1}" ]; then
-			continue
-		fi
-		local f2
-		for f2 in $TERMUX_PREFIX/lib/dri/*; do
-			if [ -f "${f2}" ] && [ "${f1}" != "${f2}" ]; then
-				local s1=$(stat -c "%i" "${f1}")
-				local s2=$(stat -c "%i" "${f2}")
-				if [ "${s1}" = "${s2}" ]; then
-					ln -sfr "${f1}" "${f2}"
+		# Avoid hard links
+		local f1
+		for f1 in $TERMUX_PREFIX/lib/dri/*; do
+				if [ ! -f "${f1}" ]; then
+						continue
 				fi
-			fi
+				local f2
+				for f2 in $TERMUX_PREFIX/lib/dri/*; do
+						if [ -f "${f2}" ] && [ "${f1}" != "${f2}" ]; then
+								local s1=$(stat -c "%i" "${f1}")
+								local s2=$(stat -c "%i" "${f2}")
+								if [ "${s1}" = "${s2}" ]; then
+										ln -sfr "${f1}" "${f2}"
+								fi
+						fi
+				done
 		done
-	done
 
-	# Create symlinks
-	ln -sf libEGL_mesa.so ${TERMUX_PREFIX}/lib/libEGL_mesa.so.0
-	ln -sf libGLX_mesa.so ${TERMUX_PREFIX}/lib/libGLX_mesa.so.0
-	ln -sf libRusticlOpenCL.so ${TERMUX_PREFIX}/lib/libRusticlOpenCL.so.1
+		# Create symlinks
+		ln -sf libEGL_mesa.so ${TERMUX_PREFIX}/lib/libEGL_mesa.so.0
+		ln -sf libGLX_mesa.so ${TERMUX_PREFIX}/lib/libGLX_mesa.so.0
+		ln -sf libRusticlOpenCL.so ${TERMUX_PREFIX}/lib/libRusticlOpenCL.so.1
 
-	unset BINDGEN_EXTRA_CLANG_ARGS LLVM_CONFIG
+		unset BINDGEN_EXTRA_CLANG_ARGS LLVM_CONFIG
 }
