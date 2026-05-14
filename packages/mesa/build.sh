@@ -116,5 +116,3 @@ termux_step_post_make_install() {
 
 	unset BINDGEN_EXTRA_CLANG_ARGS LLVM_CONFIG
 }
-
-
