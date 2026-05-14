@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A backend implementation for xdg-desktop-portal that is 
 TERMUX_PKG_LICENSE="LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.6.5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/plasma/${TERMUX_PKG_VERSION}/xdg-desktop-portal-kde-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=21d699585294064fce7c74dee685c2093ef73dd095797913e68ef14780856b27
 TERMUX_PKG_AUTO_UPDATE=true
