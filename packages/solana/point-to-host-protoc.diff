@@ -1,0 +1,45 @@
+--- a/build.rs	2022-09-03 02:43:27.000000000 +0600
++++ b/build.rs	2026-05-15 16:44:25.165720358 +0600
+@@ -18,21 +18,28 @@
+ use std::fs;
+ use std::path::PathBuf;
+
+-fn main() -> Result<(), Box<dyn Error>> {
+-    let out_dir = PathBuf::from(env::var("OUT_DIR")?);
+-    let install_dir = out_dir.join("install");
+-    fs::create_dir_all(&install_dir)?;
++// Termux cross-compilation shim for protobuf-src.
++// Instead of compiling libprotobuf from C++ (which fails because Cargo
++// sets CC/CXX for the Android target, not the build host), we reuse the
++// protoc binary that Termux's own `protobuf` package provides.
++fn main() {
++    let protoc = std::env::var("PROTOC")
++        .expect("PROTOC must be set; install the `protobuf` Termux package");
+
+-    autotools::Config::new("protobuf")
+-        .disable("maintainer-mode", None)
+-        .out_dir(&install_dir)
+-        .build();
+-
+-    // Move the build directory out of the installation directory.
+-    let _ = fs::remove_dir_all(out_dir.join("build"));
+-    fs::rename(install_dir.join("build"), out_dir.join("build"))?;
++    // Derive the installation prefix from the path to protoc:
++    //   e.g. /data/data/com.termux/files/usr/bin/protoc
++    //        -> /data/data/com.termux/files/usr
++    let install_dir = std::path::Path::new(&protoc)
++        .parent()          // …/bin
++        .and_then(|p| p.parent()) // …/usr  (the prefix)
++        .expect("Could not determine install prefix from PROTOC path")
++        .to_path_buf();
+
++    // INSTALL_DIR is read at compile-time by protobuf_src::protoc() and
++    // protobuf_src::include() via env!("INSTALL_DIR").
+     println!("cargo:rustc-env=INSTALL_DIR={}", install_dir.display());
++    // Required by crates that consume DEP_PROTOBUF_SRC_CXXBRIDGE_DIR0.
+     println!("cargo:CXXBRIDGE_DIR0={}/include", install_dir.display());
+-    Ok(())
++    // Required by crates that consume DEP_PROTOBUF_SRC_ROOT.
++    println!("cargo:ROOT={}", install_dir.display());
+ }
+
