@@ -21,19 +21,21 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        KERNEL_VERSION="$(uname -r | grep -o "^[0-9\\.]*")"
+        FULL_KERNEL_VERSION="$(uname -r)"
+        KERNEL_VERSION="$(grep -o "^[0-9\\.]*" <<< "${FULL_KERNEL_VERSION}")"
         TAR_KERNEL_VERSION="${KERNEL_VERSION%\.0}"
 
+        echo "full_kernel_version=${FULL_KERNEL_VERSION}" >> "$GITHUB_OUTPUT"
         echo "kernel_version=${KERNEL_VERSION}" >> "$GITHUB_OUTPUT"
         echo "tar_version=${TAR_KERNEL_VERSION}" >> "$GITHUB_OUTPUT"
-        echo "modules_dir=/lib/modules/$(uname -r)" >> "$GITHUB_OUTPUT"
+        echo "modules_dir=/lib/modules/${FULL_KERNEL_VERSION}" >> "$GITHUB_OUTPUT"
 
     - name: Restore cached zram kernel module
       id: cache-zram
       uses: actions/cache/restore@v5
       with:
         path: scripts/zram.ko.zst
-        key: ${{ steps.kernel-info.outputs.kernel_version }}-${{ hashFiles('scripts/linux-kernel-signing-keys.gpg') }}-${{ hashFiles('.github/actions/zram/action.yml') }}
+        key: ${{ steps.kernel-info.outputs.full_kernel_version }}-${{ hashFiles('scripts/linux-kernel-signing-keys.gpg') }}-${{ hashFiles('.github/actions/zram/action.yml') }}
 
     - name: Build zram kernel module
       if: steps.cache-zram.outputs.cache-hit != 'true'
@@ -69,7 +71,7 @@ runs:
     - name: Enable zram kernel module
       shell: bash
       run: |
-        set -euo pipefail
+        set -euov pipefail
         sudo cp scripts/zram.ko.zst ${{ steps.kernel-info.outputs.modules_dir }}/kernel/
         sudo depmod
         sudo modprobe zram
