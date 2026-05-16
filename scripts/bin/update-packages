@@ -124,8 +124,37 @@ _update() {
 	. "${TERMUX_PKG_BUILDER_DIR}"/build.sh 2>/dev/null
 	set -e -u
 
+	# Attempt to determine the update method for logging purposes.
+	local _tag_type="${TERMUX_PKG_UPDATE_TAG_TYPE:-}" _update_method _codepath
+	_update_method="$(termux_pkg_get_update_method "$TERMUX_PKG_SRCURL")"
+
+	if [[ -z "${_tag_type}" ]]; then
+		if [[ "${TERMUX_PKG_SRCURL:0:4}" == "git+" ]]; then
+			_tag_type="newest-tag"
+		elif [[ -n "$TERMUX_PKG_UPDATE_VERSION_REGEXP" ]]; then
+			_tag_type="latest-regex"
+		else
+			_tag_type="latest-release-tag"
+		fi
+	fi
+
+	# Colorize the codepaths if not in CI for at a glance identification.
+	if [[ -z "${CI:-}" ]]; then
+		case "$_tag_type" in
+			"newest-tag") printf -v _tag_type '\e[1;33m%s\e[m' "$_tag_type";;
+			"latest-regex") printf -v _tag_type '\e[1;34m%s\e[m' "$_tag_type";;
+			"latest-release-tag") printf -v _tag_type '\e[1;32m%s\e[m' "$_tag_type";;
+		esac
+
+		case "$_update_method" in
+			"github") printf -v _update_method '\e[1;92m%s\e[m' "$_update_method";;
+			"gitlab") printf -v _update_method '\e[1;93m%s\e[m' "$_update_method";;
+			"repology") printf -v _update_method '\e[1;96m%s\e[m' "$_update_method";;
+		esac
+	fi
+
 	echo # Newline.
-	echo "INFO: Updating ${TERMUX_PKG_NAME} [Current version: ${TERMUX_PKG_VERSION}]"
+	echo "INFO: Updating ${TERMUX_PKG_NAME} [Current version: ${TERMUX_PKG_VERSION}, ${_update_method}/${_tag_type}]"
 	# Throw FD 3 into the FIFO for reporting
 	exec {IPC_FIFO_FD}<>"$IPC_FIFO"
 	termux_pkg_auto_update 3>& "${IPC_FIFO_FD}"
@@ -240,7 +269,7 @@ _fetch_and_cache_tags() {
 		termux_pkg_auto_update
 	}
 
-	echo "$([[ "${CI-false}" == "true" ]] && echo "::group::" || :)INFO: Fetching GitHub packages via GraphQL API"
+	echo "${CI:+::group::}INFO: Fetching GitHub packages via GraphQL API"
 
 	local line
 	local -a LATEST_TAGS=() LATEST_TAGS_GITHUB=()
@@ -255,7 +284,7 @@ _fetch_and_cache_tags() {
 		esac
 	done < <(termux_github_graphql "${GITHUB_GRAPHQL_QUERIES[@]}")
 
-	[[ "${CI-false}" == "true" ]] && echo "::endgroup::" || :
+	echo "${CI:+::endgroup::}"
 
 	echo "INFO: Fetching non-GitHub packages"
 	while read -r line; do
@@ -282,7 +311,7 @@ _fetch_and_cache_tags() {
 	unset -f __main__
 
 	local -A __GITHUB_CURRENT_TAGS=()
-	[[ "${CI-false}" == "true" ]] && echo "::group::INFO: Skipping the following up-to-date packages" || :
+	echo "${CI:+::group::}INFO: Skipping the following up-to-date packages"
 	local pkg pkg_type pkg_name pkg_version
 	for pkg in "${LATEST_TAGS[@]}" "${LATEST_TAGS_GITHUB[@]}"; do
 		pkg_type="${pkg%%|*}"
@@ -307,7 +336,7 @@ _fetch_and_cache_tags() {
 		_LATEST_TAGS["${pkg_name:-_}"]="$pkg_version"
 	done
 
-	[[ "${CI-false}" == "true" ]] && echo "::endgroup::" || :
+	echo "${CI:+::endgroup::}"
 
 	# Sum up results
 	echo "INFO: Fetched ${#LATEST_TAGS[*]} tags."
@@ -316,10 +345,10 @@ _fetch_and_cache_tags() {
 	echo "INFO: Cached - ${#_ALREADY_SEEN[*]}"
 	if (( ${#__UNCACHED_PACKAGES[@]} )); then
 	printf '%s\n' \
-		"$([[ "${CI-false}" == "true" ]] && echo "::group::" || :)INFO: Uncached - ${#__UNCACHED_PACKAGES[*]}" \
+		"${CI:+::group::}INFO: Uncached - ${#__UNCACHED_PACKAGES[*]}" \
 		"Not cacheable due to custom \`termux_pkg_auto_update()\`" \
 		"${__UNCACHED_PACKAGES[@]##*/}" \
-		"$([[ "${CI-false}" == "true" ]] && echo "::endgroup::" || :)"
+		"${CI:+::endgroup::}"
 	fi
 }
 
