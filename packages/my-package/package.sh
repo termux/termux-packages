@@ -1,0 +1,8 @@
+TERMUX_PKG_HOMEPAGE="https://example.com"
+TERMUX_PKG_DESCRIPTION="My custom Termux package"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="AbdulSamad Arilewola <abdulsamad.arilewola@gmail.com>"
+TERMUX_PKG_VERSION="1.0.0"
+TERMUX_PKG_SRCURL=""
+TERMUX_PKG_SHA256=""
+TERMUX_PKG_SKIP_SRC_EXTRACT=true
