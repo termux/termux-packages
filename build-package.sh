@@ -523,6 +523,7 @@ _show_usage() {
 	echo "  -f Force build even if package has already been built."
 	echo "  -F Force build even if package and its dependencies have already been built."
 	[[ "$TERMUX_ON_DEVICE_BUILD" = "false" ]] && echo "  -i Download and extract dependencies instead of building them."
+	echo "  --fast skip as much as possible when testing build system "
 	echo "  -I Download and extract dependencies instead of building them, keep existing $TERMUX_BASE_DIR files."
 	echo "  -L The package and its dependencies will be based on the same library."
 	echo "  -q Quiet build."
@@ -533,6 +534,7 @@ _show_usage() {
 	echo "     flags are not passed."
 	echo "  -w Install dependencies without version binding."
 	echo "  -s Skip dependency check."
+	echo "  --safe safe on device build "
 	echo "  -o Specify directory where to put built packages. Default: output/"
 	echo "  --format Specify package output format (debian, pacman)."
 	echo "  --library Specify library of package (bionic, glibc)."
@@ -574,6 +576,7 @@ while (( $# )); do
 		-D) TERMUX_IS_DISABLED=true;;
 		-f) TERMUX_FORCE_BUILD=true;;
 		-F) TERMUX_FORCE_BUILD_DEPENDENCIES=true && TERMUX_FORCE_BUILD=true;;
+		--fast) TERMUX_FAST_BUILD=true;;
 		-i)
 			if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
 				termux_error_exit "./build-package.sh: option '-i' is not available for on-device builds"
@@ -590,6 +593,7 @@ while (( $# )); do
 		-r) export TERMUX_PKGS__BUILD__RM_ALL_PKG_BUILD_DEPENDENT_DIRS=true;;
 		-w) export TERMUX_WITHOUT_DEPVERSION_BINDING=true;;
 		-s) export TERMUX_SKIP_DEPCHECK=true;;
+		--safe) TERMUX_SAFE_BUILD=true;;
 		-o)
 			if [[ -z "${2-}" ]]; then
 				termux_error_exit "./build-package.sh: option '-o' requires an argument"
@@ -766,9 +770,19 @@ for (( i=0; i < ${#PACKAGE_LIST[@]}; i++ )); do
 		termux_step_post_make_install
 		termux_step_install_pacman_hooks
 		termux_step_install_service_scripts
+		if $TERMUX_SAFE_BUILD || $TERMUX_FAST_BUILD; then
+			prefix0=$TERMUX_PREFIX
+			TERMUX_PREFIX=$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX
+		fi
 		termux_step_install_license
-		cd "$TERMUX_PKG_MASSAGEDIR"
-		termux_step_copy_into_massagedir
+		if $TERMUX_SAFE_BUILD || $TERMUX_FAST_BUILD; then
+			TERMUX_PREFIX=$prefix0
+		fi
+		if ! ($TERMUX_SAFE_BUILD || $TERMUX_FAST_BUILD); then
+			echo running tar -N on system folder to find installed files . skip with --fast or --safe
+			cd "$TERMUX_PKG_MASSAGEDIR"
+			termux_step_copy_into_massagedir
+		fi
 		cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL"
 		termux_step_pre_massage
 		cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL"

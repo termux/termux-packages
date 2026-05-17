@@ -4,6 +4,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_DEBUG_BUILD:="false"}"
 	: "${TERMUX_FORCE_BUILD:="false"}"
 	: "${TERMUX_FORCE_BUILD_DEPENDENCIES:="false"}"
+	: "${TERMUX_FAST_BUILD:="false"}"
 	: "${TERMUX_INSTALL_DEPS:="false"}"
 	: "${TERMUX_PKG_MAKE_PROCESSES:="$(nproc)"}"
 	: "${TERMUX_PKGS__BUILD__RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES:="true"}"
