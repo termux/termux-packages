@@ -39,6 +39,7 @@ echo_and_run cargo build --target armv7-linux-androideabi
 echo_and_run cargo build --target i686-linux-android
 echo_and_run cargo build --target x86_64-linux-android
 echo_and_run cargo build --target wasm32-unknown-unknown
+echo_and_run cargo build --target wasm32v1-none
 echo_and_run cargo build --target wasm32-wasip1
 echo_and_run cargo build --target wasm32-wasip2
 echo_and_run cargo build --target wasm32-wasip3
@@ -48,6 +49,7 @@ echo_and_run cargo build --target armv7-linux-androideabi --release
 echo_and_run cargo build --target i686-linux-android --release
 echo_and_run cargo build --target x86_64-linux-android --release
 echo_and_run cargo build --target wasm32-unknown-unknown --release
+echo_and_run cargo build --target wasm32v1-none --release
 echo_and_run cargo build --target wasm32-wasip1 --release
 echo_and_run cargo build --target wasm32-wasip2 --release
 echo_and_run cargo build --target wasm32-wasip3 --release
