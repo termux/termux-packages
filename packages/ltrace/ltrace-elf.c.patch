@@ -1,8 +1,8 @@
 diff --git a/ltrace-elf.c b/ltrace-elf.c
-index f439cb0..60f1941 100644
+index beaf69f..f91c2ef 100644
 --- a/ltrace-elf.c
 +++ b/ltrace-elf.c
-@@ -423,7 +423,9 @@ ltelf_destroy(struct ltelf *lte)
+@@ -443,7 +443,9 @@ ltelf_destroy(struct ltelf *lte)
  	debug(DEBUG_FUNCTION, "close_elf()");
  	elf_end(lte->elf);
  	close(lte->fd);
@@ -13,7 +13,18 @@ index f439cb0..60f1941 100644
  }
  
  static void
-@@ -1149,9 +1151,11 @@ read_module(struct library *lib, struct process *proc,
+@@ -1015,8 +1017,9 @@ populate_this_symtab(struct process *proc, const char *filename,
+ 		arch_addr_t addr = (arch_addr_t)
+ 			(uintptr_t)(sym.st_value + lte->bias);
+ 		arch_addr_t naddr;
+-
++#ifdef PPC64_LOCAL_ENTRY_OFFSET
+ 		addr += PPC64_LOCAL_ENTRY_OFFSET(sym.st_other);
++#endif
+ 
+ 		/* On arches that support OPD, the value of typical
+ 		 * function symbol will be a pointer to .opd, but some
+@@ -1185,9 +1188,11 @@ read_module(struct library *lib, struct process *proc,
  	 * determine whether ABI is supported.  This is to get
  	 * reasonable error messages when trying to run 64-bit binary
  	 * with 32-bit ltrace.  It is desirable to preserve this.  */
@@ -28,3 +39,13 @@ index f439cb0..60f1941 100644
  
  	/* Find out the base address.  For PIE main binaries we look
  	 * into auxv, otherwise we scan phdrs.  */
+@@ -1255,7 +1260,8 @@ read_module(struct library *lib, struct process *proc,
+ 			goto fail;
+ 		library_set_soname(lib, soname, 1);
+ 	} else {
+-		const char *soname = rindex(lib->pathname, '/');
++		// Use strrchr() instead of the obsolete rindex()
++		const char *soname = strrchr(lib->pathname, '/');
+ 		if (soname != NULL)
+ 			soname += 1;
+ 		else
