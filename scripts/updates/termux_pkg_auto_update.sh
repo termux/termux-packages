@@ -3,6 +3,10 @@
 termux_pkg_get_update_method() {
 	local source_url="$1"
 
+	# shellcheck source=/dev/null
+	# If the package has an explicit $TERMUX_PKG_UPDATE_METHOD make sure we know about it.
+	TERMUX_PKG_UPDATE_METHOD="$(set +e +u; . "${TERMUX_PKG_BUILDER_DIR}/build.sh" &> /dev/null ; echo "${TERMUX_PKG_UPDATE_METHOD:-}")"
+
 	# Example:
 	# https://github.com/vim/vim/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 	#            _="https:"
@@ -26,7 +30,7 @@ termux_pkg_get_update_method() {
 			TERMUX_PKG_UPDATE_METHOD="repology"
 		fi
 	fi
-	printf '%s' "$TERMUX_PKG_UPDATE_METHOD"
+	printf '%s' "${TERMUX_PKG_UPDATE_METHOD}"
 }
 
 termux_pkg_auto_update() {
