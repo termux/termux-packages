@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Version should be equal to TERMUX_NDK_{VERSION_NUM,REVISION} in
 # scripts/properties.sh
 TERMUX_PKG_VERSION=29
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://dl.google.com/android/repository/android-ndk-r${TERMUX_PKG_VERSION}-linux.zip
 TERMUX_PKG_SHA256=4abbbcdc842f3d4879206e9695d52709603e52dd68d3c1fff04b3b5e7a308ecf
 TERMUX_PKG_AUTO_UPDATE=false
@@ -70,7 +70,8 @@ termux_step_post_get_source() {
 
 termux_step_make_install() {
 	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib \
-		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share
 
 	cp -Rf toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/* \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
@@ -97,6 +98,14 @@ termux_step_make_install() {
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
 	cp toolchains/llvm/prebuilt/linux-x86_64/lib/clang/21/lib/linux/$NDK_ARCH/libunwind.a \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
+
+	# import std
+	cp toolchains/llvm/prebuilt/linux-x86_64/lib/libc++.modules.json \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
+	cp -r toolchains/llvm/prebuilt/linux-x86_64/share/libc++ \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share
+
+	sed -i "s#../..#..#g" $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libc++.modules.json
 
 	# librt and libpthread are built into libc on android, so setup them as symlinks
 	# to libc for compatibility with programs that users try to build:
