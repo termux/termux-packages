@@ -124,20 +124,6 @@ _update() {
 	. "${TERMUX_PKG_BUILDER_DIR}"/build.sh 2>/dev/null
 	set -e -u
 
-	# Attempt to determine the update method for logging purposes.
-	local _tag_type="${TERMUX_PKG_UPDATE_TAG_TYPE:-}" _update_method _codepath
-	_update_method="$(termux_pkg_get_update_method "$TERMUX_PKG_SRCURL")"
-
-	if [[ -z "${_tag_type}" ]]; then
-		if [[ "${TERMUX_PKG_SRCURL:0:4}" == "git+" ]]; then
-			_tag_type="newest-tag"
-		elif [[ -n "$TERMUX_PKG_UPDATE_VERSION_REGEXP" ]]; then
-			_tag_type="latest-regex"
-		else
-			_tag_type="latest-release-tag"
-		fi
-	fi
-
 	# Colorize the codepaths if not in CI for at a glance identification.
 	if [[ -z "${CI:-}" ]]; then
 		case "$_tag_type" in
@@ -153,8 +139,12 @@ _update() {
 		esac
 	fi
 
-	echo # Newline.
-	echo "INFO: Updating ${TERMUX_PKG_NAME} [Current version: ${TERMUX_PKG_VERSION}, ${_update_method}/${_tag_type}]"
+	# INFO: Updating <package name> [<current version>, <update api>(/<tag type>)?]
+	printf '\nINFO: Updating %s [%s, %s]\n' \
+		"${TERMUX_PKG_NAME}" \
+		"Current version: ${TERMUX_PKG_VERSION}" \
+		"${_update_method}${_tag_type:+/}${_tag_type}"
+
 	# Throw FD 3 into the FIFO for reporting
 	exec {IPC_FIFO_FD}<>"$IPC_FIFO"
 	termux_pkg_auto_update 3>& "${IPC_FIFO_FD}"
@@ -163,7 +153,8 @@ _update() {
 
 declare -A _LATEST_TAGS=()
 declare -A _FAILED_UPDATES=()
-declare -A _ALREADY_SEEN=() # Array of successful or packages and their old/new version.
+declare -A _ALREADY_SEEN=()   # Array of successful updates or packages and their old/new version.
+declare -A _UPDATE_METHODS=() # Codepath counts for the various codepath combinations for auto-updates.
 
 # _fetch_and_cache_tags fetches all possible tags using termux_pkg_auto_update, but using Ninja build system.
 # The key difference is that we make the process concurrent, allowing us to fetch tags simultaneously rather than one at a time.
@@ -400,8 +391,30 @@ _run_update() {
 	export TERMUX_PKG_NAME="${pkg_name}"
 
 	local output="" _CURRENT_VERSION _NEWEST_VERSION _ISSUE
+
 	# shellcheck disable=SC1091 # Ignore shellcheck's inability to follow the source
+	{
+	local _SRCURL _REGEXP _tag_type _update_method
 	_CURRENT_VERSION="$(set +eu; . "$(realpath "$pkg_dir")/build.sh"; echo "${TERMUX_PKG_VERSION#*:}")"
+	_SRCURL="$(set +eu; . "$(realpath "$pkg_dir")/build.sh"; echo "${TERMUX_PKG_SRCURL}")"
+	_REGEXP="$(set +eu; . "$(realpath "$pkg_dir")/build.sh"; echo "${TERMUX_PKG_UPDATE_VERSION_REGEXP:-}")"
+	_tag_type="$(set +eu; . "$(realpath "$pkg_dir")/build.sh"; echo "${TERMUX_PKG_UPDATE_TAG_TYPE:-}")"
+	_update_method="$(termux_pkg_get_update_method "$_SRCURL")"
+	} &> /dev/null
+
+	# Repology method only has a $_tag_type if set explicitly.
+	if [[ -z "${_tag_type}" && "${_update_method}" != 'repology' ]]; then
+		if [[ "${_SRCURL:0:4}" == "git+" ]]; then
+			_tag_type="newest-tag"
+		elif [[ -n "$_REGEXP" ]]; then
+			_tag_type="latest-regex"
+		else
+			_tag_type="latest-release-tag"
+		fi
+	fi
+
+	# Keep a running count for each of the methods
+	(( _UPDATE_METHODS["${_update_method}${_tag_type:+/}${_tag_type}"]++ ))
 
 	# Ensure the FIFO is empty at the start of each update.
 	# This clears stale data from dependency checks, to prevent
@@ -584,6 +597,13 @@ indirect="$(( total - direct ))"
 echo ""
 echo "SUMMARY: Checked ${total} packages - took $(ms_to_human_readable $(( $(date +%10s%3N) - _start_time ))) in total."
 echo "SUMMARY: ${direct} (Directly passed), ${indirect} (Dependencies)"
+echo "SUMMARY: Update methods and release types."
+for variant in "${!_UPDATE_METHODS[@]}"; do
+    printf '%-30s%s\n' "${variant}:" "${_UPDATE_METHODS[$variant]}"
+done | sort
+echo
+# This expands to e.g. +12 +34 +56 +78, which then sums up.
+echo "total: $(( ${_UPDATE_METHODS[@]/#/+} ))"
 echo ""
 echo "=================================================="
 echo ""
@@ -593,7 +613,7 @@ echo ""
 echo "SUMMARY: ${#_FAILED_UPDATES[*]} failed updates."
 echo "${!_FAILED_UPDATES[@]}"
 
-unset IPC_FIFO IPC_FIFO_FD _unix_millis _start_time _pkg total direct indirect
+unset IPC_FIFO IPC_FIFO_FD _unix_millis _start_time _pkg total direct indirect variant
 
 ################################################FAILURE HANDLING#################################################
 
