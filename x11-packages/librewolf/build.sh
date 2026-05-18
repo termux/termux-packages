@@ -35,7 +35,7 @@ termux_pkg_auto_update() {
 	if [[ "${e}" != 0 ]]; then
 		cat <<- EOL >&2
 		WARN: Auto update failure!
-		api_url_r=${api_url_r}
+		api_url=${api_url}
 		latest_version=${latest_version}
 		uptime_now=${uptime_now}
 		uptime_s=${uptime_s}
