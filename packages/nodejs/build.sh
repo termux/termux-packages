@@ -2,15 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environment"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
-TERMUX_PKG_VERSION=25.8.2
+TERMUX_PKG_VERSION=26.1.0
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=3efb19e757dc59bb21632507200d2de782369d5226a68955e9372c925fdf2471
+TERMUX_PKG_SHA256=779a1364889575d44e0215adc381806bbd0d9437557b59893e172f5b9d35a990
 # thunder-coding: don't try to autoupdate nodejs, that thing takes 2 whole hours to build for a single arch, and requires a lot of patch updates everytime. Also I run tests everytime I update it to ensure least bugs
 TERMUX_PKG_AUTO_UPDATE=false
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
-TERMUX_PKG_DEPENDS="libc++, openssl, c-ares, libicu, libsqlite, zlib"
+TERMUX_PKG_DEPENDS="libc++, openssl, c-ares, libicu, libsqlite, zlib, libffi"
 TERMUX_PKG_RECOMMENDS="npm"
 TERMUX_PKG_CONFLICTS="nodejs-lts, nodejs-current"
 TERMUX_PKG_BREAKS="nodejs-dev"
@@ -72,14 +72,14 @@ termux_step_host_build() {
 	#  'bucket': 'chromium-browser-clang',
 	#  'objects': [
 	#    {
-	#      'object_name': 'Linux_x64/clang-llvmorg-21-init-16348-gbd809ffb-17.tar.xz',
-	#      'sha256sum': 'a9f5af449672a239366199c17441427c2c4433a120cace9ffd32397e15224c64',
-	#      'size_bytes': 55087424,
-	#      'generation': 1754486730635359,
+	#      'object_name': 'Linux_x64/clang-llvmorg-23-init-484-gf646b915-1.tar.xz',
+	#      'sha256sum': '1c3c056427ab0db261c54c8fdf7c8404ff55e3de3e550520bcb1e1660ca05aad',
+	#      'size_bytes': 57489092,
+	#      'generation': 1768590901063677,
 	#      'condition': 'host_os == "linux"',
 	#    },
 	#
-	# then the LLVM_COMMIT is bd809ffb. The g before the hash is not part of the
+	# then the LLVM_COMMIT is f646b915. The g before the hash is not part of the
 	# hash, weird that they decided to include a 'g' for no reason, but 'g' isn't
 	# a part of the hexadecimal characters so anyways.. Also v8 project only
 	# stores the short-hash in the DEPS file, but we are using full hash here for
@@ -88,8 +88,8 @@ termux_step_host_build() {
 	# llvm-project directory.
 	#
 	# Also the sha256sum is the hash of the tarball, which we can directly use
-	local LLVM_TAR="clang-llvmorg-21-init-16348-gbd809ffb-17.tar.xz"
-	local LLVM_TAR_HASH=a9f5af449672a239366199c17441427c2c4433a120cace9ffd32397e15224c64
+	local LLVM_TAR="clang-llvmorg-23-init-484-gf646b915-1.tar.xz"
+	local LLVM_TAR_HASH=1c3c056427ab0db261c54c8fdf7c8404ff55e3de3e550520bcb1e1660ca05aad
 	cd $TERMUX_PKG_HOSTBUILD_DIR
 	mkdir llvm-project-build
 	termux_download \
@@ -101,6 +101,9 @@ termux_step_host_build() {
 
 termux_step_pre_configure() {
 	termux_setup_ninja
+	# Temporal API needs rust and cargo to build
+	# Although it is not supported when using shared ICU, so there is no point of setting up rust when we aren't even going to use it
+	# termux_setup_rust
 }
 
 termux_step_configure() {
@@ -139,6 +142,13 @@ termux_step_configure() {
 		export CC_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project-build/bin/clang -m32"
 		export CXX_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project-build/bin/clang++ -m32"
 		export LINK_host="$TERMUX_PKG_HOSTBUILD_DIR/llvm-project-build/bin/clang++ -m32"
+
+		# We need libffi on host for host builds of node
+		# We have libffi installed on host for 64-bit but not 32-bit, so install it
+		ARCHITECTURE=i386 \
+			termux_download_ubuntu_packages "libffi8"
+		export LDFLAGS_host="-L$TERMUX_PKG_HOSTBUILD_DIR/ubuntu_packages/usr/lib/i386-linux-gnu/ -Wl,-rpath=$TERMUX_PKG_HOSTBUILD_DIR/ubuntu_packages/usr/lib/i386-linux-gnu/"
+		ln -sf $TERMUX_PKG_HOSTBUILD_DIR/ubuntu_packages/usr/lib/i386-linux-gnu/libffi.so{.8,}
 	fi
 	# Although without any configuration at all GYP builds both out/Release/ and out/Debug/
 	# with build.ninja, it is incorrect to use the other directory as configure.py passes
@@ -158,6 +168,7 @@ termux_step_configure() {
 		--dest-os=android \
 		--without-npm \
 		--shared-cares \
+		--shared-ffi \
 		--shared-openssl \
 		--shared-sqlite \
 		--shared-zlib \
