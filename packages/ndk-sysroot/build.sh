@@ -49,6 +49,9 @@ termux_step_get_source() {
 		lib_path="toolchains/llvm/prebuilt/linux-x86_64/lib"
 		mkdir -p "$TERMUX_PKG_SRCDIR"/"$lib_path"
 		cp -fr "$NDK"/"$lib_path"/* "$TERMUX_PKG_SRCDIR"/"$lib_path"/
+		local share_path="toolchains/llvm/prebuilt/linux-x86_64/share"
+		mkdir -p "$TERMUX_PKG_SRCDIR"/"$share_path"
+		cp -fr "$NDK"/"$share_path"/* "$TERMUX_PKG_SRCDIR"/"$share_path"/
 	fi
 }
 
@@ -102,7 +105,7 @@ termux_step_make_install() {
 	# import std
 	cp toolchains/llvm/prebuilt/linux-x86_64/lib/libc++.modules.json \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
-	cp -r toolchains/llvm/prebuilt/linux-x86_64/share/libc++ \
+	cp -fr toolchains/llvm/prebuilt/linux-x86_64/share/libc++ \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share
 
 	sed -i "s#../..#..#g" $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libc++.modules.json
