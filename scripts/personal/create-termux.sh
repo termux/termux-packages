@@ -21,6 +21,7 @@ fi
 $SUDO docker run \
 	-dit \
 	--volume $HOME/termux-apt-repo:/apt:ro \
+	--volume $PWD/output:/data/data/com.termux/files/home/termux-packages/output:rw \
 	--volume $PWD:/data/data/com.termux/files/home/termux-packages:rw \
 	--name "$CONTAINER_NAME" \
 	"$TERMUX_DOCKER_IMAGE_NAME"
