@@ -21,6 +21,10 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
+        # We need to use the full kernel version instead of just the kernel version for caching the zram module as
+        # GitHub Actions seems to have two different kernels with the same version but different patch versions
+        # which are not compatible with each other.
+        # For example 6.17.0-1010-azure and 6.17.0-1030-azure
         FULL_KERNEL_VERSION="$(uname -r)"
         KERNEL_VERSION="$(grep -o "^[0-9\\.]*" <<< "${FULL_KERNEL_VERSION}")"
         TAR_KERNEL_VERSION="${KERNEL_VERSION%\.0}"
@@ -35,6 +39,7 @@ runs:
       uses: actions/cache/restore@v5
       with:
         path: scripts/zram.ko.zst
+        # See above section where FULL_KERNEL_VERSION is declared for why we need to use full kernel version for caching the builds
         key: ${{ steps.kernel-info.outputs.full_kernel_version }}-${{ hashFiles('scripts/linux-kernel-signing-keys.gpg') }}-${{ hashFiles('.github/actions/zram/action.yml') }}
 
     - name: Build zram kernel module
