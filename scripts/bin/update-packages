@@ -126,6 +126,7 @@ _update() {
 
 	# Colorize the codepaths if not in CI for at a glance identification.
 	if [[ -z "${CI:-}" ]]; then
+		[[ -n "${_is_dependency:-}" ]] && printf -v _is_dependency '(\e[1;95m%s\e[m)' "${_is_dependency:1:-1}"
 		case "$_tag_type" in
 			"newest-tag") printf -v _tag_type '\e[1;33m%s\e[m' "$_tag_type";;
 			"latest-regex") printf -v _tag_type '\e[1;34m%s\e[m' "$_tag_type";;
@@ -140,10 +141,11 @@ _update() {
 	fi
 
 	# INFO: Updating <package name> [<current version>, <update api>(/<tag type>)?]
-	printf '\nINFO: Updating %s [%s, %s]\n' \
+	printf '\nINFO: Updating %s [%s, %s%s]\n' \
 		"${TERMUX_PKG_NAME}" \
 		"Current version: ${TERMUX_PKG_VERSION}" \
-		"${_update_method}${_tag_type:+/}${_tag_type}"
+		"${_update_method}${_tag_type:+/}${_tag_type}" \
+		"${_is_dependency:-}"
 
 	# Throw FD 3 into the FIFO for reporting
 	exec {IPC_FIFO_FD}<>"$IPC_FIFO"
@@ -153,8 +155,8 @@ _update() {
 
 declare -A _LATEST_TAGS=()
 declare -A _FAILED_UPDATES=()
-declare -A _ALREADY_SEEN=()   # Array of successful updates or packages and their old/new version.
-declare -A _UPDATE_METHODS=() # Codepath counts for the various codepath combinations for auto-updates.
+declare -A _ALREADY_SEEN=() # Array of successful updates or packages and their old/new version.
+declare -A _SUMMARY=()      # Updater codepath, package and dependency counts for the summary.
 
 # _fetch_and_cache_tags fetches all possible tags using termux_pkg_auto_update, but using Ninja build system.
 # The key difference is that we make the process concurrent, allowing us to fetch tags simultaneously rather than one at a time.
@@ -325,15 +327,16 @@ _fetch_and_cache_tags() {
 			;;
 		esac
 		_LATEST_TAGS["${pkg_name:-_}"]="$pkg_version"
+		(( _SUMMARY["total"]++ ))
 	done
 
 	echo "${CI:+::endgroup::}"
 
 	# Sum up results
-	echo "INFO: Fetched ${#LATEST_TAGS[*]} tags."
+	echo "INFO: Fetched ${_SUMMARY[total]} tags."
 	echo "INFO: GitHub - ${#LATEST_TAGS_GITHUB[*]}"
-	echo "INFO: Other  - $(( ${#LATEST_TAGS[*]} - ${#LATEST_TAGS_GITHUB[*]} ))"
-	echo "INFO: Cached - ${#_ALREADY_SEEN[*]}"
+	echo "INFO: Other  - $(( _SUMMARY[total] - ${#LATEST_TAGS_GITHUB[*]} ))"
+	echo "INFO: Cached - $(( _SUMMARY[total] - ${#__UNCACHED_PACKAGES[@]} ))"
 	if (( ${#__UNCACHED_PACKAGES[@]} )); then
 	printf '%s\n' \
 		"${CI:+::group::}INFO: Uncached - ${#__UNCACHED_PACKAGES[*]}" \
@@ -394,7 +397,7 @@ _run_update() {
 
 	# shellcheck disable=SC1091 # Ignore shellcheck's inability to follow the source
 	{
-	local _SRCURL _REGEXP _tag_type _update_method
+	local _SRCURL _REGEXP _tag_type _update_method _is_dependency
 	_CURRENT_VERSION="$(set +eu; . "$(realpath "$pkg_dir")/build.sh"; echo "${TERMUX_PKG_VERSION#*:}")"
 	_SRCURL="$(set +eu; . "$(realpath "$pkg_dir")/build.sh"; echo "${TERMUX_PKG_SRCURL}")"
 	_REGEXP="$(set +eu; . "$(realpath "$pkg_dir")/build.sh"; echo "${TERMUX_PKG_UPDATE_VERSION_REGEXP:-}")"
@@ -414,7 +417,18 @@ _run_update() {
 	fi
 
 	# Keep a running count for each of the methods
-	(( _UPDATE_METHODS["${_update_method}${_tag_type:+/}${_tag_type}"]++ ))
+	(( _SUMMARY["${_update_method}${_tag_type:+/}${_tag_type}"]++ ))
+
+
+	# If this package hasn't been seen before update the total.
+	if [[ -z ${_LATEST_TAGS[${pkg_name}]:-} ]]; then
+		(( _SUMMARY["total"]++ ))
+		# Check if this is running though _update_dependencies()
+		if [[ "${FUNCNAME[1]}" == '_update_dependencies' ]]; then
+			_is_dependency='(dependency)'
+			(( _SUMMARY["dependencies"]++ ))
+		fi
+	fi
 
 	# Ensure the FIFO is empty at the start of each update.
 	# This clears stale data from dependency checks, to prevent
@@ -588,22 +602,27 @@ exec {IPC_FIFO_FD}<&- # close the FIFO
 # Clean up our FIFO and repology data file
 rm "$IPC_FIFO" "$TERMUX_REPOLOGY_DATA_FILE"
 
+############################################CALCULATE CODEPATH SUMMARY###########################################
+
+for update_codepath in "${!_SUMMARY[@]}"; do
+	case "${update_codepath}" in
+		'dependencies'|'total');;
+		*)
+			printf -v codepaths '%s%-30s%s\n' \
+				"${codepaths:-}" \
+				"${update_codepath}:" \
+				"${_SUMMARY[$update_codepath]}"
+		;;
+	esac
+done
+
 #################################################REPORT CHANGES##################################################
 
-total="${#_ALREADY_SEEN[*]}"
-direct="$#"
-indirect="$(( total - direct ))"
-
 echo ""
-echo "SUMMARY: Checked ${total} packages - took $(ms_to_human_readable $(( $(date +%10s%3N) - _start_time ))) in total."
-echo "SUMMARY: ${direct} (Directly passed), ${indirect} (Dependencies)"
+echo "SUMMARY: Checked ${_SUMMARY[total]} packages - took $(ms_to_human_readable $(( $(date +%10s%3N) - _start_time ))) in total."
+echo "SUMMARY: $# (Directly passed), ${_SUMMARY[dependencies]} (Dependencies)"
 echo "SUMMARY: Update methods and release types."
-for variant in "${!_UPDATE_METHODS[@]}"; do
-    printf '%-30s%s\n' "${variant}:" "${_UPDATE_METHODS[$variant]}"
-done | sort
-echo
-# This expands to e.g. +12 +34 +56 +78, which then sums up.
-echo "total: $(( ${_UPDATE_METHODS[@]/#/+} ))"
+sort <<< "${codepaths}"
 echo ""
 echo "=================================================="
 echo ""
@@ -613,7 +632,7 @@ echo ""
 echo "SUMMARY: ${#_FAILED_UPDATES[*]} failed updates."
 echo "${!_FAILED_UPDATES[@]}"
 
-unset IPC_FIFO IPC_FIFO_FD _unix_millis _start_time _pkg total direct indirect variant
+unset IPC_FIFO IPC_FIFO_FD _unix_millis _start_time _pkg update_codepath codepaths
 
 ################################################FAILURE HANDLING#################################################
 
