@@ -43,7 +43,7 @@ diff -u -r /home/builder/lib/android-ndk-r28b/toolchains/llvm/prebuilt/linux-x86
 + 
 +/* Used by perl, fish, and others. */
 +#if !defined(__swift__)
-+__BIONIC_CTYPE_INLINE char* _Nonnull ctermid(char* _Nullable s) {
++static __inline__ char* _Nonnull ctermid(char* _Nullable s) {
 +	if (s == 0) return (char*) "/dev/tty";
 +	strcpy(s, "/dev/tty");
 +	return s;
@@ -61,7 +61,7 @@ diff -u -r /home/builder/lib/android-ndk-r28b/toolchains/llvm/prebuilt/linux-x86
 +extern int unlink(const char*);
 +void free(void* p);
 +uint32_t arc4random(void);
-+__BIONIC_CTYPE_INLINE FILE* _Nullable tmpfile() {
++static __inline__ FILE* _Nullable tmpfile() {
 +	int p = getpid();
 +	char* path;
 +	int i;

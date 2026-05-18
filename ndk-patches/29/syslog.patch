@@ -5,7 +5,7 @@ diff -uNr sysroot.orig/usr/include/syslog.h sysroot/usr/include/syslog.h
   */
  void vsyslog(int __priority, const char* __fmt, va_list __args) __printflike(2, 0);
  
-+__BIONIC_CTYPE_INLINE void android_polyfill_syslog_r(int syslog_priority, void* d, const char* format, ...)
++static __inline__ void android_polyfill_syslog_r(int syslog_priority, void* d, const char* format, ...)
 +{
 +  (void) d;
 +  va_list myargs;
@@ -14,7 +14,7 @@ diff -uNr sysroot.orig/usr/include/syslog.h sysroot/usr/include/syslog.h
 +  va_end(myargs);
 +}
 +
-+__BIONIC_CTYPE_INLINE void android_polyfill_vsyslog_r(int syslog_priority, void* d, const char* fmt, va_list ap)
++static __inline__ void android_polyfill_vsyslog_r(int syslog_priority, void* d, const char* fmt, va_list ap)
 +{
 +  (void) d;
 +  vsyslog(syslog_priority, fmt, ap);
