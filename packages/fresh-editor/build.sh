@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://getfresh.dev/
 TERMUX_PKG_DESCRIPTION="Text editor for your terminal: easy, powerful and fast"
 TERMUX_PKG_LICENSE="GPL-2.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.3.6"
+TERMUX_PKG_VERSION="0.3.7"
 TERMUX_PKG_SRCURL="https://github.com/sinelaw/fresh/releases/download/v$TERMUX_PKG_VERSION/fresh-editor-$TERMUX_PKG_VERSION-source.tar.gz"
-TERMUX_PKG_SHA256=f94c7a972f7cfbb806fc6d62fedfbf76f5b574a69029d685cb6d437071d5c847
+TERMUX_PKG_SHA256=ffa604330c7f25cc6d975bdd331aaebe506f0dd2ba625d9eacb5ade1a47d9b31
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
