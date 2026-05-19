@@ -803,3 +803,110 @@ index a802111d9f..ea6aad2af4 100644
 +
 +#undef ClampLevelEstimateDbfs
 +#undef GetInitialSpeechLevelEstimateDbfs
+diff --git a/third_party/webrtc/common_video/h264/h264_bitstream_parser.cc b/third_party/webrtc/common_video/h264/h264_bitstream_parser.cc
+index 1a66e5a88a..5fe34c340b 100644
+--- a/third_party/webrtc/common_video/h264/h264_bitstream_parser.cc
++++ b/third_party/webrtc/common_video/h264/h264_bitstream_parser.cc
+@@ -21,6 +21,10 @@
+ #include "rtc_base/bitstream_reader.h"
+ #include "rtc_base/logging.h"
+ 
++#define kMaxAbsQpDeltaValue kMaxAbsQpDeltaValue_H264BitstreamParser
++#define kMinQpValue kMinQpValue_H264BitstreamParser
++#define kMaxQpValue kMaxQpValue_H264BitstreamParser
++
+ namespace webrtc {
+ namespace {
+ 
+@@ -362,3 +366,7 @@ std::optional<int> H264BitstreamParser::GetLastSliceQp() const {
+ }
+ 
+ }  // namespace webrtc
++
++#undef kMaxAbsQpDeltaValue
++#undef kMinQpValue
++#undef kMaxQpValue
+diff --git a/third_party/webrtc/logging/rtc_event_log/events/rtc_event_field_encoding_parser.cc b/third_party/webrtc/logging/rtc_event_log/events/rtc_event_field_encoding_parser.cc
+index 3e04b42ca4..1f354956a4 100644
+--- a/third_party/webrtc/logging/rtc_event_log/events/rtc_event_field_encoding_parser.cc
++++ b/third_party/webrtc/logging/rtc_event_log/events/rtc_event_field_encoding_parser.cc
+@@ -26,6 +26,8 @@
+ #include "rtc_base/bitstream_reader.h"
+ #include "rtc_base/checks.h"
+ 
++#define ConvertFieldType ConvertFieldType_rtc_event_field_encoding_parser
++
+ namespace webrtc {
+ 
+ namespace {
+@@ -404,3 +406,5 @@ EventParser::ParseOptionalNumericField(const FieldParameters& params,
+ }
+ 
+ }  // namespace webrtc
++
++#undef ConvertFieldType
+diff --git a/third_party/webrtc/modules/audio_processing/aec3/fullband_erle_estimator.cc b/third_party/webrtc/modules/audio_processing/aec3/fullband_erle_estimator.cc
+index 07acfa98a3..fe064c8842 100644
+--- a/third_party/webrtc/modules/audio_processing/aec3/fullband_erle_estimator.cc
++++ b/third_party/webrtc/modules/audio_processing/aec3/fullband_erle_estimator.cc
+@@ -24,6 +24,10 @@
+ #include "modules/audio_processing/logging/apm_data_dumper.h"
+ #include "rtc_base/checks.h"
+ 
++#define kX2BandEnergyThreshold kX2BandEnergyThreshold_fullband_erle_estimator
++#define kBlocksToHoldErle      kBlocksToHoldErle_fullband_erle_estimator
++#define kPointsToAccumulate    kPointsToAccumulate_fullband_erle_estimator
++
+ namespace webrtc {
+ 
+ namespace {
+@@ -192,3 +196,7 @@ void FullBandErleEstimator::ErleInstantaneous::UpdateQualityEstimate() {
+ }
+ 
+ }  // namespace webrtc
++
++#undef kX2BandEnergyThreshold
++#undef kBlocksToHoldErle
++#undef kPointsToAccumulate
+diff --git a/third_party/webrtc/modules/audio_processing/aec3/subband_erle_estimator.cc b/third_party/webrtc/modules/audio_processing/aec3/subband_erle_estimator.cc
+index 8db40a2579..edf979ef62 100644
+--- a/third_party/webrtc/modules/audio_processing/aec3/subband_erle_estimator.cc
++++ b/third_party/webrtc/modules/audio_processing/aec3/subband_erle_estimator.cc
+@@ -26,6 +26,10 @@
+ #include "rtc_base/checks.h"
+ #include "rtc_base/numerics/safe_minmax.h"
+ 
++#define kX2BandEnergyThreshold kX2BandEnergyThreshold_subband_erle_estimator
++#define kBlocksToHoldErle      kBlocksToHoldErle_subband_erle_estimator
++#define kPointsToAccumulate    kPointsToAccumulate_subband_erle_estimator
++
+ namespace webrtc {
+ 
+ namespace {
+@@ -259,3 +263,7 @@ void SubbandErleEstimator::UpdateAccumulatedSpectra(
+ }
+ 
+ }  // namespace webrtc
++
++#undef kX2BandEnergyThreshold
++#undef kBlocksToHoldErle
++#undef kPointsToAccumulate
+diff --git a/third_party/webrtc/modules/desktop_capture/linux/wayland/shared_screencast_stream.cc b/third_party/webrtc/modules/desktop_capture/linux/wayland/shared_screencast_stream.cc
+index 44eab8fa33..240e3a9ae1 100644
+--- a/third_party/webrtc/modules/desktop_capture/linux/wayland/shared_screencast_stream.cc
++++ b/third_party/webrtc/modules/desktop_capture/linux/wayland/shared_screencast_stream.cc
+@@ -60,6 +60,8 @@
+ #include "rtc_base/thread_annotations.h"
+ #include "rtc_base/time_utils.h"
+ 
++#define kBytesPerPixel kBytesPerPixel_shared_screencast_stream
++
+ namespace webrtc {
+ 
+ const int kBytesPerPixel = 4;
+@@ -1160,3 +1162,5 @@ std::optional<DesktopVector> SharedScreenCastStream::CaptureCursorPosition() {
+ }
+ 
+ }  // namespace webrtc
++
++#undef kBytesPerPixel

@@ -486,21 +486,23 @@ diff --git a/net/quic/dedicated_web_transport_http3_client.cc b/net/quic/dedicat
 index 9879fd4203..0bf1ff4aec 100644
 --- a/net/quic/dedicated_web_transport_http3_client.cc
 +++ b/net/quic/dedicated_web_transport_http3_client.cc
-@@ -32,6 +32,8 @@
+@@ -33,6 +33,9 @@
  #include "net/url_request/url_request_context.h"
  #include "url/scheme_host_port.h"
  
 +#define HostsFromOrigins HostsFromOrigins_DedicatedWebTransportHTTP3Client
++#define HostsFromSchemeHostPorts HostsFromSchemeHostPorts_DedicatedWebTransportHTTP3Client
 +
  namespace net {
  
  namespace {
-@@ -991,3 +993,5 @@ void DedicatedWebTransportHttp3Client::OnDatagramProcessed(
+@@ -1029,3 +1032,6 @@
  }
  
  }  // namespace net
 +
 +#undef HostsFromOrigins
++#undef HostsFromSchemeHostPorts
 diff --git a/net/quic/quic_chromium_client_stream.cc b/net/quic/quic_chromium_client_stream.cc
 index f6becb91d0..ceaf3d57b0 100644
 --- a/net/quic/quic_chromium_client_stream.cc
@@ -850,3 +852,22 @@ index 73ab379a2b..a8f23eece0 100644
  }  // namespace disk_cache
 +
 +#undef IsBrowserIdle
+diff --git a/net/socket/tcp_connect_job.cc b/net/socket/tcp_connect_job.cc
+index 5562515695..3c3e94150c 100644
+--- a/net/socket/tcp_connect_job.cc
++++ b/net/socket/tcp_connect_job.cc
+@@ -36,6 +36,8 @@
+ #include "url/scheme_host_port.h"
+ #include "url/url_constants.h"
+ 
++#define ToLegacyDestinationEndpoint ToLegacyDestinationEndpoint_TcpConnectJob
++
+ namespace net {
+ 
+ namespace {
+@@ -601,3 +603,5 @@ void TcpConnectJob::NotifyDelegateIfDone(int result) {
+ }
+ 
+ }  // namespace net
++
++#undef ToLegacyDestinationEndpoint

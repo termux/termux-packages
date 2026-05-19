@@ -8,7 +8,7 @@ Subject: [PATCH 5/8] services
  .../platform_sensor_provider_chromeos.cc        |  4 ++--
  services/device/hid/hid_connection.cc           | 10 ++++------
  services/device/hid/hid_connection_win.cc       |  1 +
- services/device/public/cpp/hid/hid_blocklist.cc |  6 +++---
+ services/device/public/cpp/hid/hid_blocklist.cc |  4 ++--
  .../device/public/cpp/hid/hid_report_utils.cc   |  8 ++++----
  services/device/usb/usb_service_android.cc      |  1 +
  services/device/usb/usb_service_impl.cc         |  6 +++---
@@ -37,10 +37,10 @@ Subject: [PATCH 5/8] services
  ...shared_memory_virtual_device_mojo_adapter.cc |  5 +++--
  .../compositor_frame_metadata_mojom_traits.cc   |  3 ++-
  .../webnn/public/cpp/graph_validation_utils.cc  |  4 +++-
- 33 files changed, 99 insertions(+), 93 deletions(-)
+ 33 files changed, 98 insertions(+), 92 deletions(-)
 
 diff --git a/services/audio/output_controller.cc b/services/audio/output_controller.cc
-index 1acd08a61a..f09d22264c 100644
+index 5bd743342a..1e6c93bbc1 100644
 --- a/services/audio/output_controller.cc
 +++ b/services/audio/output_controller.cc
 @@ -12,6 +12,7 @@
@@ -57,9 +57,9 @@ index 1acd08a61a..f09d22264c 100644
  #include "base/trace_event/trace_event.h"
 +#include "base/types/cxx23_to_underlying.h"
  #include "build/build_config.h"
+ #include "media/audio/audio_device_description.h"
  #include "media/base/audio_timestamp_helper.h"
- #include "media/base/media_switches.h"
-@@ -178,7 +180,7 @@ OutputController::OutputController(
+@@ -181,7 +183,7 @@ OutputController::OutputController(
        state_(kEmpty),
        sync_reader_(sync_reader),
        power_monitor_(params.sample_rate(),
@@ -68,7 +68,7 @@ index 1acd08a61a..f09d22264c 100644
                           kPowerMeasurementTimeConstantMillis))),
        request_before_read_(base::FeatureList::IsEnabled(
            kAudioOutputControllerRequestBeforeRead)),
-@@ -577,7 +579,7 @@ void OutputController::StartSnooping(Snooper* snooper) {
+@@ -585,7 +587,7 @@ void OutputController::StartSnooping(Snooper* snooper) {
  
    // The list will only update on this thread, and only be read on the realtime
    // audio thread.
@@ -136,7 +136,7 @@ index 6a8afc9a83..22ccf3cfe8 100644
        }
      }
 diff --git a/services/device/hid/hid_connection_win.cc b/services/device/hid/hid_connection_win.cc
-index 45ca01537f..da1202277a 100644
+index ba1a0262de..de6cc3ce8b 100644
 --- a/services/device/hid/hid_connection_win.cc
 +++ b/services/device/hid/hid_connection_win.cc
 @@ -9,6 +9,7 @@
@@ -148,23 +148,10 @@ index 45ca01537f..da1202277a 100644
  #include "base/files/file.h"
  #include "base/functional/bind.h"
 diff --git a/services/device/public/cpp/hid/hid_blocklist.cc b/services/device/public/cpp/hid/hid_blocklist.cc
-index ee54ce526c..f53451c9cf 100644
+index 9943cdc12f..d78353f562 100644
 --- a/services/device/public/cpp/hid/hid_blocklist.cc
 +++ b/services/device/public/cpp/hid/hid_blocklist.cc
-@@ -4,11 +4,11 @@
- 
- #include "services/device/public/cpp/hid/hid_blocklist.h"
- 
--#include <algorithm>
- #include <array>
- #include <string_view>
- 
- #include "base/command_line.h"
-+#include "base/containers/contains.h"
- #include "base/no_destructor.h"
- #include "base/strings/string_number_conversions.h"
- #include "base/strings/string_split.h"
-@@ -289,8 +289,8 @@ bool HidBlocklist::IsKnownSecurityKey(uint16_t vendor_id, uint16_t product_id) {
+@@ -293,8 +293,8 @@ bool HidBlocklist::IsKnownSecurityKey(uint16_t vendor_id, uint16_t product_id) {
    // bypass the blocklist to access FIDO HID capabilities. Devices in
    // kKnownSecurityKeys are considered FIDO for the purpose of this bypass, even
    // if the device has no FIDO collection.
@@ -362,7 +349,7 @@ index c4f75aefbc..430b310c91 100644
    options.context1 = static_cast<GreaseContext>(bits & 0b11);
    bits >>= 2;
 diff --git a/services/network/cors/cors_url_loader.cc b/services/network/cors/cors_url_loader.cc
-index ad7380b048..77c5fb3341 100644
+index 9f332f1e73..b3dbdce7dc 100644
 --- a/services/network/cors/cors_url_loader.cc
 +++ b/services/network/cors/cors_url_loader.cc
 @@ -4,11 +4,11 @@
@@ -378,7 +365,7 @@ index ad7380b048..77c5fb3341 100644
  #include "base/containers/flat_set.h"
  #include "base/dcheck_is_on.h"
  #include "base/debug/dump_without_crashing.h"
-@@ -458,8 +458,7 @@ void CorsURLLoader::FollowRedirect(
+@@ -474,8 +474,7 @@ void CorsURLLoader::FollowRedirect(
  
    if (GetSecSharedStorageWritableHeader(modified_headers)) {
      request_.shared_storage_writable_eligible = true;
@@ -388,7 +375,7 @@ index ad7380b048..77c5fb3341 100644
      request_.shared_storage_writable_eligible = false;
    }
  
-@@ -838,8 +837,7 @@ void CorsURLLoader::StartRequest() {
+@@ -904,8 +903,7 @@ void CorsURLLoader::StartRequest() {
    TRACE_EVENT("loading", "CorsURLLoader::StartRequest",
                net::NetLogWithSourceToFlow(net_log_));
    if (fetch_cors_flag_ && !skip_cors_enabled_scheme_check_ &&
@@ -428,7 +415,7 @@ index cf6db3384c..e4cb462a1a 100644
  
            switch (filter.type) {
 diff --git a/services/network/prefetch_matches.cc b/services/network/prefetch_matches.cc
-index afe504cd14..bbb50ec1df 100644
+index bc964399ff..db2857f812 100644
 --- a/services/network/prefetch_matches.cc
 +++ b/services/network/prefetch_matches.cc
 @@ -18,6 +18,7 @@
@@ -439,7 +426,7 @@ index afe504cd14..bbb50ec1df 100644
  #include "base/containers/fixed_flat_map.h"
  #include "base/containers/fixed_flat_set.h"
  #include "base/containers/span.h"
-@@ -519,7 +520,7 @@ struct FieldMatcher {
+@@ -522,7 +523,7 @@ struct FieldMatcher {
  };
  
  template <Fields f>
@@ -449,7 +436,7 @@ index afe504cd14..bbb50ec1df 100644
  // This is the implementation of FieldMatcher that completely ignores the
  // contents of the field. Fields which should use this implementation should be
 diff --git a/services/network/public/cpp/content_security_policy/content_security_policy.cc b/services/network/public/cpp/content_security_policy/content_security_policy.cc
-index b635d1df62..496eff983a 100644
+index 0094b6f40e..2e4a0d3bd2 100644
 --- a/services/network/public/cpp/content_security_policy/content_security_policy.cc
 +++ b/services/network/public/cpp/content_security_policy/content_security_policy.cc
 @@ -10,6 +10,7 @@
@@ -460,7 +447,7 @@ index b635d1df62..496eff983a 100644
  #include "base/containers/flat_set.h"
  #include "base/feature_list.h"
  #include "base/strings/strcat.h"
-@@ -899,7 +900,7 @@ network::mojom::CSPRequireTrustedTypesFor ParseRequireTrustedTypesFor(
+@@ -896,7 +897,7 @@ network::mojom::CSPRequireTrustedTypesFor ParseRequireTrustedTypesFor(
  bool IsValidTrustedTypesPolicyName(std::string_view value) {
    return std::ranges::all_of(value, [](char c) {
      return base::IsAsciiAlpha(c) || base::IsAsciiDigit(c) ||
@@ -491,7 +478,7 @@ index bdf0f2db3a..2e13c2c2e0 100644
  
  void CSPContext::SanitizeDataForUseInCspViolation(
 diff --git a/services/network/public/cpp/is_potentially_trustworthy.cc b/services/network/public/cpp/is_potentially_trustworthy.cc
-index a9c36d2e19..2c3f235060 100644
+index eca1a7f325..879c0a4497 100644
 --- a/services/network/public/cpp/is_potentially_trustworthy.cc
 +++ b/services/network/public/cpp/is_potentially_trustworthy.cc
 @@ -12,6 +12,7 @@
@@ -500,9 +487,9 @@ index a9c36d2e19..2c3f235060 100644
  #include "base/command_line.h"
 +#include "base/containers/contains.h"
  #include "base/logging.h"
- #include "base/metrics/histogram_macros.h"
  #include "base/no_destructor.h"
-@@ -246,7 +247,7 @@ std::vector<std::string> ParseSecureOriginAllowlistFromCmdline() {
+ #include "base/numerics/checked_math.h"
+@@ -245,7 +246,7 @@ std::vector<std::string> ParseSecureOriginAllowlistFromCmdline() {
  
  bool IsAllowlisted(const std::vector<std::string>& allowlist,
                     const url::Origin& origin) {
@@ -511,7 +498,7 @@ index a9c36d2e19..2c3f235060 100644
      return true;
  
    for (const std::string& origin_or_pattern : allowlist) {
-@@ -274,8 +275,8 @@ bool IsSchemeConsideredAuthenticated(std::string_view scheme) {
+@@ -273,8 +274,8 @@ bool IsSchemeConsideredAuthenticated(std::string_view scheme) {
    //   content::ContentClient::Schemes::secure_schemes
    // - url::AddLocalScheme
    // - url::AddSecureScheme
@@ -803,7 +790,7 @@ index 2e505146fd..e68cb7bcbd 100644
  
      // Add this node back to the queue of nodes to visit.
 diff --git a/services/resource_coordinator/memory_instrumentation/queued_request_dispatcher.cc b/services/resource_coordinator/memory_instrumentation/queued_request_dispatcher.cc
-index 9e42948460..6bc18be0cb 100644
+index ba5f957b54..4aae4e48c7 100644
 --- a/services/resource_coordinator/memory_instrumentation/queued_request_dispatcher.cc
 +++ b/services/resource_coordinator/memory_instrumentation/queued_request_dispatcher.cc
 @@ -6,11 +6,11 @@
@@ -933,7 +920,7 @@ index ea9d4dbc21..14d7a7381b 100644
    }
  
 diff --git a/services/viz/public/cpp/compositing/compositor_frame_metadata_mojom_traits.cc b/services/viz/public/cpp/compositing/compositor_frame_metadata_mojom_traits.cc
-index f776f6b9f3..426d2542f1 100644
+index a5a920151a..ebc3c0adac 100644
 --- a/services/viz/public/cpp/compositing/compositor_frame_metadata_mojom_traits.cc
 +++ b/services/viz/public/cpp/compositing/compositor_frame_metadata_mojom_traits.cc
 @@ -6,6 +6,7 @@
@@ -944,7 +931,7 @@ index f776f6b9f3..426d2542f1 100644
  #include "build/build_config.h"
  #include "services/viz/public/cpp/compositing/begin_frame_args_mojom_traits.h"
  #include "services/viz/public/cpp/compositing/compositor_frame_transition_directive_mojom_traits.h"
-@@ -87,7 +88,7 @@ bool StructTraits<viz::mojom::CompositorFrameMetadataDataView,
+@@ -88,7 +89,7 @@ bool StructTraits<viz::mojom::CompositorFrameMetadataDataView,
  
    // Verify that OffsetTagDefinition providers are referenced surfaces.
    for (auto& tag_def : out->offset_tag_definitions) {
@@ -954,7 +941,7 @@ index f776f6b9f3..426d2542f1 100644
      }
    }
 diff --git a/services/webnn/public/cpp/graph_validation_utils.cc b/services/webnn/public/cpp/graph_validation_utils.cc
-index 66464aee5d..2a532aa30a 100644
+index 1c4529a07c..953fdfbf1d 100644
 --- a/services/webnn/public/cpp/graph_validation_utils.cc
 +++ b/services/webnn/public/cpp/graph_validation_utils.cc
 @@ -11,8 +11,10 @@
@@ -968,7 +955,7 @@ index 66464aee5d..2a532aa30a 100644
  #include "base/notreached.h"
  #include "base/numerics/checked_math.h"
  #include "base/numerics/safe_conversions.h"
-@@ -206,7 +208,7 @@ ValidateReduceAxesAndInferOutput(base::span<const uint32_t> input_dimensions,
+@@ -251,7 +253,7 @@ ValidateReduceAxesAndInferOutput(base::span<const uint32_t> input_dimensions,
      }
    } else {
      for (size_t i = 0; i < input_rank; i++) {
@@ -977,3 +964,15 @@ index 66464aee5d..2a532aa30a 100644
          output_shape.push_back(input_dimensions[i]);
        }
      }
+diff --git a/services/device/public/cpp/hid/hid_blocklist.cc b/services/device/public/cpp/hid/hid_blocklist.cc
+index d78353f562..8c604b879b 100644
+--- a/services/device/public/cpp/hid/hid_blocklist.cc
++++ b/services/device/public/cpp/hid/hid_blocklist.cc
+@@ -11,6 +11,7 @@
+ #include "base/check.h"
+ #include "base/check_op.h"
+ #include "base/command_line.h"
++#include "base/containers/contains.h"
+ #include "base/logging.h"
+ #include "base/no_destructor.h"
+ #include "base/notreached.h"
