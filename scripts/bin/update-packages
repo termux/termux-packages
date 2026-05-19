@@ -156,7 +156,10 @@ _update() {
 declare -A _LATEST_TAGS=()
 declare -A _FAILED_UPDATES=()
 declare -A _ALREADY_SEEN=() # Array of successful updates or packages and their old/new version.
-declare -A _SUMMARY=()      # Updater codepath, package and dependency counts for the summary.
+declare -A _SUMMARY=(       # Updater codepath, package and dependency counts for the summary.
+    [dependencies]=0        # Initialize [dependencies] and
+    [total]=0               # [total] to 0 so they have values even if all packages are cache hits.
+)
 
 # _fetch_and_cache_tags fetches all possible tags using termux_pkg_auto_update, but using Ninja build system.
 # The key difference is that we make the process concurrent, allowing us to fetch tags simultaneously rather than one at a time.
@@ -622,7 +625,7 @@ echo ""
 echo "SUMMARY: Checked ${_SUMMARY[total]} packages - took $(ms_to_human_readable $(( $(date +%10s%3N) - _start_time ))) in total."
 echo "SUMMARY: $# (Directly passed), ${_SUMMARY[dependencies]} (Dependencies)"
 echo "SUMMARY: Update methods and release types."
-sort <<< "${codepaths}"
+sort <<< "${codepaths:-}"
 echo ""
 echo "=================================================="
 echo ""
