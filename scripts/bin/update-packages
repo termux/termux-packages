@@ -549,13 +549,13 @@ export IPC_FIFO="${TMPDIR:-/tmp}/termux_ipc_$$.fifo"
 mkfifo "$IPC_FIFO"
 exec {IPC_FIFO_FD}<>"$IPC_FIFO"
 
-echo "INFO: Running the 'dump-repology-data' script"
-if python3 "${TERMUX_SCRIPTDIR}"/scripts/updates/api/dump-repology-data "${TERMUX_REPOLOGY_DATA_FILE}"; then
-	echo "INFO: The 'dump-repology-data' script was successful"
-else
-	echo "INFO: The 'dump-repology-data' script was unsuccessful, so an empty json is being placed in \${TERMUX_REPOLOGY_DATA_FILE}"
-	echo "{}" > "${TERMUX_REPOLOGY_DATA_FILE}"
-fi
+# echo "INFO: Running the 'dump-repology-data' script"
+# if python3 "${TERMUX_SCRIPTDIR}"/scripts/updates/api/dump-repology-data "${TERMUX_REPOLOGY_DATA_FILE}"; then
+# 	echo "INFO: The 'dump-repology-data' script was successful"
+# else
+# 	echo "INFO: The 'dump-repology-data' script was unsuccessful, so an empty json is being placed in \${TERMUX_REPOLOGY_DATA_FILE}"
+# 	echo "{}" > "${TERMUX_REPOLOGY_DATA_FILE}"
+# fi
 
 if [[ "$1" == "@all" ]]; then
 	declare -a PACKAGE_LIST=()
