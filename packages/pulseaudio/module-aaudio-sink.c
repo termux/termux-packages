@@ -31,6 +31,7 @@
 #include <pulse/xmalloc.h>
 
 #include <pulsecore/i18n.h>
+#include <pulsecore/atomic.h>
 #include <pulsecore/macro.h>
 #include <pulsecore/sink.h>
 #include <pulsecore/module.h>
@@ -41,6 +42,7 @@
 #include <pulsecore/thread-mq.h>
 #include <pulsecore/rtpoll.h>
 
+#include <android/api-level.h>
 #include <android/versioning.h>
 #undef __INTRODUCED_IN
 #define __INTRODUCED_IN(api_level)
@@ -56,14 +58,23 @@ PA_MODULE_USAGE(
     "rate=<sampling rate> "
     "latency=<buffer length> "
     "pm=<performance mode> "
+    "sharing_mode=<shared|exclusive> "
+    "buffer_capacity_frames=<AAudio buffer capacity> "
+    "frames_per_callback=<AAudio callback frame count> "
+    "session_id=<none|allocate|session id> "
     "no_close_hack=<avoid segfault caused by AAudioStream_close()> "
 );
 
 #define DEFAULT_SINK_NAME "AAudio sink"
+#define DEFAULT_PERFORMANCE_MODE 11
+#define DEFAULT_BUFFER_CAPACITY_FRAMES 18472
+#define DEFAULT_FRAMES_PER_CALLBACK 9236
+#define MINIMUM_AAUDIO_API_LEVEL 28
 
 enum {
     SINK_MESSAGE_RENDER = PA_SINK_MESSAGE_MAX,
-    SINK_MESSAGE_OPEN_STREAM
+    SINK_MESSAGE_OPEN_STREAM,
+    SINK_MESSAGE_RECONNECT_STREAM
 };
 
 struct userdata {
@@ -80,6 +91,10 @@ struct userdata {
     uint32_t rate;
     uint32_t latency;
     uint32_t pm;
+    uint32_t buffer_capacity_frames;
+    uint32_t frames_per_callback;
+    aaudio_session_id_t session_id;
+    bool exclusive;
     bool no_close;
 
     pa_memchunk memchunk;
@@ -88,6 +103,9 @@ struct userdata {
     AAudioStreamBuilder *builder;
     AAudioStream *stream;
     pa_sample_spec ss;
+    pa_atomic_t stream_closing;
+    pa_atomic_t reconnect_pending;
+    int32_t device_id;
 };
 
 static const char* const valid_modargs[] = {
@@ -96,6 +114,10 @@ static const char* const valid_modargs[] = {
     "rate",
     "latency",
     "pm",
+    "sharing_mode",
+    "buffer_capacity_frames",
+    "frames_per_callback",
+    "session_id",
     "no_close_hack",
     NULL
 };
@@ -104,7 +126,7 @@ static int process_render(struct userdata *u, void *audioData, int64_t numFrames
     pa_assert(u->sink->thread_info.state != PA_SINK_INIT);
 
     /* a render message could be queued after a set state message */
-    if (!PA_SINK_IS_LINKED(u->sink->thread_info.state))
+    if (pa_atomic_load(&u->stream_closing) || !PA_SINK_IS_LINKED(u->sink->thread_info.state))
         return AAUDIO_CALLBACK_RESULT_STOP;
 
     u->memchunk.memblock = pa_memblock_new_fixed(u->core->mempool, audioData, u->frame_size * numFrames, false);
@@ -120,6 +142,9 @@ static aaudio_data_callback_result_t data_callback(AAudioStream *stream, void *u
 
     pa_assert(u);
 
+    if (pa_atomic_load(&u->stream_closing))
+        return AAUDIO_CALLBACK_RESULT_STOP;
+
     return pa_asyncmsgq_send(u->aaudio_msgq, PA_MSGOBJECT(u->sink), SINK_MESSAGE_RENDER, audioData, numFrames, NULL);
 }
 
@@ -130,17 +155,21 @@ static void error_callback(AAudioStream *stream, void *userdata, aaudio_result_t
 
     while (u->sink->state == PA_SINK_INIT);
 
-    if (error != AAUDIO_ERROR_DISCONNECTED)
+    if (error == AAUDIO_ERROR_DISCONNECTED)
+        pa_log_info("AAudio stream disconnected: device_id=%d", u->device_id);
+    else
         pa_log_debug("AAudio error: %d", error);
 
-    pa_sink_suspend(u->sink, true, PA_SUSPEND_UNAVAILABLE);
-    pa_sink_suspend(u->sink, false, PA_SUSPEND_UNAVAILABLE);
+    pa_atomic_store(&u->stream_closing, 1);
+
+    if (error == AAUDIO_ERROR_DISCONNECTED && pa_atomic_cmpxchg(&u->reconnect_pending, 0, 1))
+        pa_asyncmsgq_post(u->aaudio_msgq, PA_MSGOBJECT(u->sink), SINK_MESSAGE_RECONNECT_STREAM, NULL, 0, NULL, NULL);
 }
 
 #define CHK(stmt) { \
     aaudio_result_t res = stmt; \
     if (res != AAUDIO_OK) { \
-        fprintf(stderr, "error %d at %s:%d\n", res, __FILE__, __LINE__); \
+        fprintf(stderr, "error %d (%s) at %s:%d\n", res, AAudio_convertResultToText(res), __FILE__, __LINE__); \
         goto fail; \
     } \
 }
@@ -149,10 +178,16 @@ static int pa_open_aaudio_stream(struct userdata *u)
 {
     bool want_float;
     aaudio_format_t format;
+    char ss_buf[PA_SAMPLE_SPEC_SNPRINT_MAX];
     pa_sample_spec *ss = &u->ss;
+
+    pa_atomic_store(&u->stream_closing, 0);
+    pa_atomic_store(&u->reconnect_pending, 0);
 
     CHK(AAudio_createStreamBuilder(&u->builder));
     AAudioStreamBuilder_setPerformanceMode(u->builder, AAUDIO_PERFORMANCE_MODE_NONE + u->pm);
+    AAudioStreamBuilder_setUsage(u->builder, AAUDIO_USAGE_MEDIA);
+    AAudioStreamBuilder_setContentType(u->builder, AAUDIO_CONTENT_TYPE_MUSIC);
     AAudioStreamBuilder_setDataCallback(u->builder, data_callback, u);
     AAudioStreamBuilder_setErrorCallback(u->builder, error_callback, u);
 
@@ -161,16 +196,37 @@ static int pa_open_aaudio_stream(struct userdata *u)
     format = want_float ? AAUDIO_FORMAT_PCM_FLOAT : AAUDIO_FORMAT_PCM_I16;
     AAudioStreamBuilder_setFormat(u->builder, format);
 
-    if (u->rate)
-        AAudioStreamBuilder_setSampleRate(u->builder, u->rate);
+    AAudioStreamBuilder_setSampleRate(u->builder, ss->rate);
 
     AAudioStreamBuilder_setChannelCount(u->builder, ss->channels);
+    AAudioStreamBuilder_setSharingMode(u->builder, u->exclusive ? AAUDIO_SHARING_MODE_EXCLUSIVE : AAUDIO_SHARING_MODE_SHARED);
+    if (u->buffer_capacity_frames)
+        AAudioStreamBuilder_setBufferCapacityInFrames(u->builder, u->buffer_capacity_frames);
+    if (u->frames_per_callback)
+        AAudioStreamBuilder_setFramesPerDataCallback(u->builder, u->frames_per_callback);
+    if (u->session_id != AAUDIO_SESSION_ID_NONE)
+        AAudioStreamBuilder_setSessionId(u->builder, u->session_id);
 
     CHK(AAudioStreamBuilder_openStream(u->builder, &u->stream));
     CHK(AAudioStreamBuilder_delete(u->builder));
 
     ss->rate = AAudioStream_getSampleRate(u->stream);
+    ss->channels = AAudioStream_getChannelCount(u->stream);
+    u->device_id = AAudioStream_getDeviceId(u->stream);
     u->frame_size = pa_frame_size(ss);
+
+    pa_log_info("AAudio stream opened: device_id=%d, session_id=%d, sharing_mode=%d, performance_mode=%d, state=%s, sample_spec=%s, aaudio_format=%d, buffer_capacity_frames=%d, buffer_size_frames=%d, frames_per_burst=%d, frames_per_callback=%d",
+                u->device_id,
+                AAudioStream_getSessionId(u->stream),
+                AAudioStream_getSharingMode(u->stream),
+                AAudioStream_getPerformanceMode(u->stream),
+                AAudio_convertStreamStateToText(AAudioStream_getState(u->stream)),
+                pa_sample_spec_snprint(ss_buf, sizeof(ss_buf), ss),
+                AAudioStream_getFormat(u->stream),
+                AAudioStream_getBufferCapacityInFrames(u->stream),
+                AAudioStream_getBufferSizeInFrames(u->stream),
+                AAudioStream_getFramesPerBurst(u->stream),
+                AAudioStream_getFramesPerDataCallback(u->stream));
 
     return 0;
 
@@ -186,6 +242,33 @@ static pa_usec_t get_latency(struct userdata *u) {
     } else {
         return PA_USEC_PER_MSEC * u->latency;
     }
+}
+
+static int reconnect_aaudio_stream(struct userdata *u) {
+    aaudio_result_t res;
+
+    pa_log_info("Reconnecting AAudio stream after disconnect");
+
+    if (u->stream) {
+        AAudioStream_close(u->stream);
+        u->stream = NULL;
+    }
+
+    if (pa_open_aaudio_stream(u) < 0) {
+        pa_log("pa_open_aaudio_stream() failed during reconnect.");
+        return -1;
+    }
+
+    if (PA_SINK_IS_OPENED(u->sink->thread_info.state)) {
+        res = AAudioStream_requestStart(u->stream);
+        pa_log_info("AAudioStream_requestStart() after reconnect returned %d (%s), state=%s, xruns=%d", res, AAudio_convertResultToText(res), AAudio_convertStreamStateToText(AAudioStream_getState(u->stream)), AAudioStream_getXRunCount(u->stream));
+        if (res < 0) {
+            pa_log("AAudioStream_requestStart() failed after reconnect.");
+            return -1;
+        }
+    }
+
+    return 0;
 }
 
 static int sink_process_msg(pa_msgobject *o, int code, void *data, int64_t offset, pa_memchunk *memchunk) {
@@ -204,6 +287,12 @@ static int sink_process_msg(pa_msgobject *o, int code, void *data, int64_t offse
             code = PA_SINK_MESSAGE_SET_FIXED_LATENCY;
             offset = get_latency(u);
             break;
+        case SINK_MESSAGE_RECONNECT_STREAM:
+            if (reconnect_aaudio_stream(u) < 0)
+                return -1;
+            code = PA_SINK_MESSAGE_SET_FIXED_LATENCY;
+            offset = get_latency(u);
+            break;
     }
 
     return pa_sink_process_msg(o, code, data, offset, memchunk);
@@ -215,7 +304,9 @@ static int state_func_main(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t
     pa_sink_input *i;
     pa_idxset *inputs;
 
-    if (s->state == PA_SINK_SUSPENDED && PA_SINK_IS_OPENED(state)) {
+    if (PA_SINK_IS_OPENED(s->state) && (state == PA_SINK_SUSPENDED || state == PA_SINK_UNLINKED)) {
+        pa_atomic_store(&u->stream_closing, 1);
+    } else if (s->state == PA_SINK_SUSPENDED && PA_SINK_IS_OPENED(state)) {
         if (pa_asyncmsgq_send(u->aaudio_msgq, PA_MSGOBJECT(u->sink), SINK_MESSAGE_OPEN_STREAM, NULL, 0, NULL) < 0)
             return -1;
 
@@ -228,9 +319,7 @@ static int state_func_main(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t
             }
         }
 
-        s->alternate_sample_rate = u->ss.rate;
         pa_sink_reconfigure(s, &u->ss, false);
-        s->default_sample_rate = u->ss.rate;
 
         /* Avoid infinite loop triggered if uncork in this case */
         if (s->suspend_cause == PA_SUSPEND_IDLE)
@@ -244,21 +333,30 @@ static int state_func_main(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t
 
 static int state_func_io(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t suspend_cause) {
     struct userdata *u = s->userdata;
+    aaudio_result_t res;
 
     if (PA_SINK_IS_OPENED(s->thread_info.state) &&
         (state == PA_SINK_SUSPENDED || state == PA_SINK_UNLINKED)) {
+        pa_atomic_store(&u->stream_closing, 1);
         if (!u->no_close)
             AAudioStream_close(u->stream);
         else
             AAudioStream_requestStop(u->stream);
     } else if (s->thread_info.state == PA_SINK_SUSPENDED && PA_SINK_IS_OPENED(state)) {
-        if (AAudioStream_requestStart(u->stream) < 0)
+        pa_atomic_store(&u->stream_closing, 0);
+        res = AAudioStream_requestStart(u->stream);
+        pa_log_info("AAudioStream_requestStart() returned %d (%s), state=%s, xruns=%d", res, AAudio_convertResultToText(res), AAudio_convertStreamStateToText(AAudioStream_getState(u->stream)), AAudioStream_getXRunCount(u->stream));
+        if (res < 0)
             pa_log("AAudioStream_requestStart() failed.");
     } else if (s->thread_info.state == PA_SINK_INIT && PA_SINK_IS_LINKED(state)) {
         if (PA_SINK_IS_OPENED(state)) {
-            if (AAudioStream_requestStart(u->stream) < 0)
+            pa_atomic_store(&u->stream_closing, 0);
+            res = AAudioStream_requestStart(u->stream);
+            pa_log_info("AAudioStream_requestStart() returned %d (%s), state=%s, xruns=%d", res, AAudio_convertResultToText(res), AAudio_convertStreamStateToText(AAudioStream_getState(u->stream)), AAudioStream_getXRunCount(u->stream));
+            if (res < 0)
                 pa_log("AAudioStream_requestStart() failed.");
         } else {
+            pa_atomic_store(&u->stream_closing, 1);
             if (!u->no_close)
                 AAudioStream_close(u->stream);
         }
@@ -267,6 +365,13 @@ static int state_func_io(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t s
 }
 
 static void reconfigure_func(pa_sink *s, pa_sample_spec *ss, bool passthrough) {
+    struct userdata *u = s->userdata;
+
+    if (ss != &u->ss) {
+        u->ss.rate = ss->rate;
+        u->rate = ss->rate;
+    }
+
     s->sample_spec.rate = ss->rate;
 }
 
@@ -306,8 +411,18 @@ int pa__init(pa_module*m) {
     pa_channel_map map;
     pa_modargs *ma = NULL;
     pa_sink_new_data data;
+    const char *sharing_mode;
+    const char *session_id;
+    uint32_t parsed_session_id;
+    int api_level;
 
     pa_assert(m);
+
+    api_level = android_get_device_api_level();
+    if (api_level < MINIMUM_AAUDIO_API_LEVEL) {
+        pa_log("module-aaudio-sink requires Android API level %d or newer, device API level is %d.", MINIMUM_AAUDIO_API_LEVEL, api_level);
+        return -1;
+    }
 
     m->userdata = u = pa_xnew0(struct userdata, 1);
 
@@ -345,8 +460,42 @@ int pa__init(pa_module*m) {
 
     pa_modargs_get_value_u32(ma, "latency", &u->latency);
 
-    u->pm = AAUDIO_PERFORMANCE_MODE_LOW_LATENCY - AAUDIO_PERFORMANCE_MODE_NONE;
+    u->pm = DEFAULT_PERFORMANCE_MODE - AAUDIO_PERFORMANCE_MODE_NONE;
     pa_modargs_get_value_u32(ma, "pm", &u->pm);
+
+    u->buffer_capacity_frames = DEFAULT_BUFFER_CAPACITY_FRAMES;
+    u->frames_per_callback = DEFAULT_FRAMES_PER_CALLBACK;
+    pa_modargs_get_value_u32(ma, "buffer_capacity_frames", &u->buffer_capacity_frames);
+    pa_modargs_get_value_u32(ma, "frames_per_callback", &u->frames_per_callback);
+
+    u->session_id = AAUDIO_SESSION_ID_ALLOCATE;
+    session_id = pa_modargs_get_value(ma, "session_id", NULL);
+    if (session_id) {
+        if (pa_streq(session_id, "none"))
+            u->session_id = AAUDIO_SESSION_ID_NONE;
+        else if (pa_streq(session_id, "allocate"))
+            u->session_id = AAUDIO_SESSION_ID_ALLOCATE;
+        else {
+            if (pa_atou(session_id, &parsed_session_id) < 0 || parsed_session_id == 0) {
+                pa_log("Invalid session_id value: %s", session_id);
+                goto fail;
+            }
+            u->session_id = parsed_session_id;
+        }
+    }
+
+    sharing_mode = pa_modargs_get_value(ma, "sharing_mode", NULL);
+    if (sharing_mode) {
+        if (pa_streq(sharing_mode, "exclusive"))
+            u->exclusive = true;
+        else if (pa_streq(sharing_mode, "shared"))
+            u->exclusive = false;
+        else {
+            pa_log("Invalid sharing_mode value: %s", sharing_mode);
+            goto fail;
+        }
+    } else if (getenv("PULSE_AAUDIO_EXCLUSIVE"))
+        u->exclusive = true;
 
     pa_modargs_get_value_boolean(ma, "no_close_hack", &u->no_close);
 
