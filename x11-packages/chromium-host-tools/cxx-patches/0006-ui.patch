@@ -4,8 +4,8 @@ Date: Tue, 10 Mar 2026 02:00:39 +0800
 Subject: [PATCH 6/8] ui
 
 ---
- ui/accessibility/ax_enum_util.h               | 12 +++----
- ui/accessibility/ax_position.h                | 25 +++++++-------
+ ui/accessibility/ax_enum_util.h               | 11 ++++---
+ ui/accessibility/ax_position.h                | 20 +++++------
  ui/accessibility/ax_tree.cc                   | 18 +++++-----
  ui/accessibility/ax_tree_manager_map.cc       |  2 ++
  .../automation/automation_ax_tree_wrapper.cc  |  3 +-
@@ -15,7 +15,7 @@ Subject: [PATCH 6/8] ui
  .../inspect/ax_tree_formatter_base.cc         |  5 ++-
  .../one_shot_accessibility_tree_search.cc     |  3 +-
  ui/android/overscroll_refresh.cc              |  4 +--
- ui/android/overscroll_refresh_handler.cc      |  6 ++--
+ ui/android/overscroll_refresh_handler.cc      |  3 +-
  ui/android/view_android.cc                    |  3 +-
  ui/aura/host_frame_rate_throttler.cc          |  5 +--
  .../native_window_occlusion_tracker_win.cc    |  1 +
@@ -28,17 +28,17 @@ Subject: [PATCH 6/8] ui
  ui/base/accelerators/accelerator_manager.cc   |  3 +-
  .../global_accelerator_listener_ozone.cc      |  5 +--
  ui/base/clipboard/clipboard.cc                |  3 +-
- ui/base/clipboard/clipboard_android.cc        |  1 +
- ui/base/clipboard/clipboard_non_backed.cc     |  3 +-
- ui/base/clipboard/clipboard_ozone.cc          |  7 ++--
- ui/base/clipboard/test/test_clipboard.cc      |  7 ++--
+ ui/base/clipboard/clipboard_non_backed.cc     |  5 +--
+ ui/base/clipboard/clipboard_ozone.cc          |  5 +--
+ ui/base/clipboard/scoped_clipboard_writer.cc  |  6 +++-
+ ui/base/clipboard/test/test_clipboard.cc      |  1 +
  .../os_exchange_data_provider_non_backed.cc   |  3 +-
  ui/base/ime/ash/input_method_util.cc          |  4 +--
  ui/base/ime/win/tsf_input_scope.cc            |  6 ++--
- ui/base/interaction/element_identifier.cc     |  3 +-
+ ui/base/interaction/element_identifier.cc     |  1 +
  ui/base/interaction/element_identifier.h      |  2 +-
  ui/base/interaction/element_tracker.cc        |  5 +--
- .../interaction/interactive_test_internal.cc  |  3 +-
+ .../interaction/interactive_test_internal.cc  |  2 +-
  .../interaction/interactive_test_internal.h   |  1 +
  ui/base/metadata/metadata_cache.cc            |  3 +-
  ui/base/models/list_selection_model.cc        |  3 +-
@@ -48,7 +48,7 @@ Subject: [PATCH 6/8] ui
  .../user_activity/user_activity_detector.cc   |  5 ++-
  ui/base/win/hwnd_subclass.cc                  |  4 +--
  ui/base/x/selection_utils.cc                  |  3 +-
- ui/base/x/x11_clipboard_helper.cc             |  5 +--
+ ui/base/x/x11_clipboard_helper.cc             |  4 +--
  ui/base/x/x11_gl_egl_utility.cc               |  3 +-
  ui/base/x/x11_global_shortcut_listener.cc     |  4 ++-
  ui/base/x/x11_os_exchange_data_provider.cc    |  1 +
@@ -73,7 +73,7 @@ Subject: [PATCH 6/8] ui
  ui/events/devices/device_data_manager.cc      |  3 +-
  ui/events/event.cc                            |  3 +-
  ui/events/event_utils.cc                      |  4 +--
- .../touch_disposition_gesture_filter.cc       | 11 +++----
+ .../touch_disposition_gesture_filter.cc       |  9 ++---
  ui/events/gesture_event_details.cc            |  8 ++---
  ui/events/gestures/gesture_recognizer_impl.cc |  1 +
  ui/events/keyboard_hook_base.cc               |  3 +-
@@ -123,10 +123,9 @@ Subject: [PATCH 6/8] ui
  ui/ozone/platform/x11/x11_window_manager.cc   |  3 +-
  ui/touch_selection/touch_selection_metrics.cc | 11 ++++---
  ui/views/accessibility/ax_aura_obj_cache.cc   |  4 +--
- ui/views/accessibility/ax_root_obj_wrapper.cc |  4 +--
  ...iew_ax_platform_node_delegate_auralinux.cc |  3 +-
  .../bubble/bubble_dialog_delegate_view.cc     |  7 ++--
- .../cocoa/native_widget_mac_ns_window_host.mm |  3 +-
+ .../cocoa/native_widget_mac_ns_window_host.mm |  2 +-
  ui/views/controls/menu/menu_item_view.cc      |  3 +-
  ui/views/controls/menu/submenu_view.cc        |  6 ++--
  ui/views/controls/table/table_view.cc         |  9 ++---
@@ -144,19 +143,13 @@ Subject: [PATCH 6/8] ui
  ui/wm/core/shadow_controller.cc               |  6 ++--
  ui/wm/core/transient_window_manager.cc        |  5 +--
  ui/wm/core/window_animations.cc               |  4 +--
- 140 files changed, 410 insertions(+), 328 deletions(-)
+ 139 files changed, 402 insertions(+), 315 deletions(-)
 
 diff --git a/ui/accessibility/ax_enum_util.h b/ui/accessibility/ax_enum_util.h
-index 56f19378ba..8cc4a07a80 100644
+index 56f19378ba..974b4f1f6c 100644
 --- a/ui/accessibility/ax_enum_util.h
 +++ b/ui/accessibility/ax_enum_util.h
-@@ -7,12 +7,12 @@
- 
- #include <optional>
- #include <string>
--#include <utility>
- 
- #include "base/containers/flat_map.h"
+@@ -13,6 +13,7 @@
  #include "base/logging.h"
  #include "base/no_destructor.h"
  #include "base/notreached.h"
@@ -164,7 +157,7 @@ index 56f19378ba..8cc4a07a80 100644
  #include "ui/accessibility/ax_base_export.h"
  #include "ui/accessibility/ax_enums.mojom-forward.h"
  
-@@ -166,15 +166,15 @@ template <typename T>
+@@ -166,15 +167,15 @@ template <typename T>
  std::optional<T> MaybeParseAXEnum(const char* attribute) {
    static const base::NoDestructor<base::flat_map<std::string, T>> attr_map([] {
      static_assert(T::kNone == T::kMinValue);
@@ -186,18 +179,10 @@ index 56f19378ba..8cc4a07a80 100644
        std::string str = ToString(attr);
        entries.push_back({std::move(str), attr});
 diff --git a/ui/accessibility/ax_position.h b/ui/accessibility/ax_position.h
-index a1cda02ae0..51d417a4b1 100644
+index e46ba59926..3359ec8c68 100644
 --- a/ui/accessibility/ax_position.h
 +++ b/ui/accessibility/ax_position.h
-@@ -8,7 +8,6 @@
- #include <math.h>
- #include <stdint.h>
- 
--#include <algorithm>
- #include <functional>
- #include <memory>
- #include <optional>
-@@ -19,6 +18,7 @@
+@@ -19,6 +19,7 @@
  #include <vector>
  
  #include "base/compiler_specific.h"
@@ -205,7 +190,7 @@ index a1cda02ae0..51d417a4b1 100644
  #include "base/containers/stack.h"
  #include "base/export_template.h"
  #include "base/functional/bind.h"
-@@ -762,8 +762,8 @@ class AXPosition {
+@@ -765,8 +766,8 @@ class AXPosition {
        case AXPositionKind::TEXT_POSITION: {
          const std::vector<int32_t>& word_starts =
              text_position->GetWordStartOffsets();
@@ -216,7 +201,7 @@ index a1cda02ae0..51d417a4b1 100644
        }
      }
    }
-@@ -789,8 +789,7 @@ class AXPosition {
+@@ -792,8 +793,7 @@ class AXPosition {
        case AXPositionKind::TEXT_POSITION: {
          const std::vector<int32_t>& word_ends =
              text_position->GetWordEndOffsets();
@@ -226,29 +211,25 @@ index a1cda02ae0..51d417a4b1 100644
        }
      }
    }
-@@ -957,8 +956,8 @@ class AXPosition {
+@@ -960,7 +960,7 @@ class AXPosition {
          if (format_starts.size() <= 1) {
            return GetFormatStartBoundaryType() != AXBoundaryType::kNone;
          }
--        return std::ranges::contains(format_starts,
--                                     int32_t{text_position->text_offset_});
-+        return base::Contains(format_starts,
-+                              int32_t{text_position->text_offset_});
-       }
-     }
-   }
-@@ -1010,8 +1009,8 @@ class AXPosition {
+-        if (!std::ranges::contains(format_starts,
++        if (!base::Contains(format_starts,
+                                    int32_t{text_position->text_offset_})) {
+           return false;
+         }
+@@ -1024,7 +1024,7 @@ class AXPosition {
          if (format_ends.size() <= 1) {
            return GetFormatEndBoundaryType() != AXBoundaryType::kNone;
          }
--        return std::ranges::contains(format_ends,
--                                     int32_t{text_position->text_offset_});
-+        return base::Contains(format_ends,
-+                              int32_t{text_position->text_offset_});
-       }
-     }
-   }
-@@ -1038,8 +1037,8 @@ class AXPosition {
+-        if (!std::ranges::contains(format_ends,
++        if (!base::Contains(format_ends,
+                                    int32_t{text_position->text_offset_})) {
+           return false;
+         }
+@@ -1063,8 +1063,8 @@ class AXPosition {
          const std::vector<int32_t>& sentence_starts =
              text_position->GetAnchor()->GetIntListAttribute(
                  ax::mojom::IntListAttribute::kSentenceStarts);
@@ -259,7 +240,7 @@ index a1cda02ae0..51d417a4b1 100644
        }
      }
    }
-@@ -1066,8 +1065,8 @@ class AXPosition {
+@@ -1091,8 +1091,8 @@ class AXPosition {
          const std::vector<int32_t>& sentence_ends =
              text_position->GetAnchor()->GetIntListAttribute(
                  ax::mojom::IntListAttribute::kSentenceEnds);
@@ -271,7 +252,7 @@ index a1cda02ae0..51d417a4b1 100644
      }
    }
 diff --git a/ui/accessibility/ax_tree.cc b/ui/accessibility/ax_tree.cc
-index 91ade842fe..2950d70367 100644
+index a1820d210c..cebfcb6cd2 100644
 --- a/ui/accessibility/ax_tree.cc
 +++ b/ui/accessibility/ax_tree.cc
 @@ -17,6 +17,7 @@
@@ -320,7 +301,7 @@ index 91ade842fe..2950d70367 100644
        // This is a serious error - nodes should never be reparented without
        // first being removed from the tree. If a node exists in the tree already
        // then adding it to a new parent would mean stealing the node from its
-@@ -2083,7 +2084,8 @@ void AXTree::NotifySubtreeWillBeReparentedOrDeleted(
+@@ -2095,7 +2096,8 @@ void AXTree::NotifySubtreeWillBeReparentedOrDeleted(
    // Don't fire redundant remove notification in the case where the parent
    // will become ignored at the same time.
    if (notify_removed && node->parent() &&
@@ -330,7 +311,7 @@ index 91ade842fe..2950d70367 100644
        !node->parent()->IsIgnored()) {
      notify_removed = false;
    }
-@@ -2275,7 +2277,7 @@ void AXTree::NotifyNodeAttributesHaveBeenChanged(
+@@ -2287,7 +2289,7 @@ void AXTree::NotifyNodeAttributesHaveBeenChanged(
    observers_.Notify(&AXTreeObserver::OnNodeDataChanged, this, old_data,
                      new_data);
  
@@ -339,7 +320,7 @@ index 91ade842fe..2950d70367 100644
      observers_.Notify(&AXTreeObserver::OnIgnoredChanged, this, node,
                        node->IsIgnored());
    }
-@@ -2575,7 +2577,7 @@ void AXTree::DeleteOldChildren(AXNode* node,
+@@ -2587,7 +2589,7 @@ void AXTree::DeleteOldChildren(AXNode* node,
  
    // Delete the old children.
    for (AXNode* child : node->children()) {
@@ -510,7 +491,7 @@ index 2fe2301f37..6caaf90fdc 100644
  
  void OverscrollRefresh::ReleaseWithoutActivation() {
 diff --git a/ui/android/overscroll_refresh_handler.cc b/ui/android/overscroll_refresh_handler.cc
-index 880dff0943..e556a16d6a 100644
+index 50709f6183..f99f11c27d 100644
 --- a/ui/android/overscroll_refresh_handler.cc
 +++ b/ui/android/overscroll_refresh_handler.cc
 @@ -4,9 +4,8 @@
@@ -524,18 +505,8 @@ index 880dff0943..e556a16d6a 100644
  
  // Must come after all headers that specialize FromJniType() / ToJniType().
  #include "ui/android/overscroll_refresh.h"
-@@ -31,8 +30,7 @@ bool OverscrollRefreshHandler::PullStart(
-   CHECK_EQ(type == OverscrollAction::kHistoryNavigation,
-            initiating_edge.has_value());
-   return Java_OverscrollRefreshHandler_start(
--      AttachCurrentThread(), j_overscroll_refresh_handler_,
--      std::to_underlying(type),
-+      AttachCurrentThread(), j_overscroll_refresh_handler_,  base::to_underlying(type),
-       static_cast<int>(initiating_edge ? initiating_edge.value()
-                                        : BackGestureEventSwipeEdge::RIGHT));
- }
 diff --git a/ui/android/view_android.cc b/ui/android/view_android.cc
-index ba2a44286a..a0c1011a14 100644
+index ccb3975fdc..f12f78e2b1 100644
 --- a/ui/android/view_android.cc
 +++ b/ui/android/view_android.cc
 @@ -11,6 +11,7 @@
@@ -546,7 +517,7 @@ index ba2a44286a..a0c1011a14 100644
  #include "base/memory/raw_ptr.h"
  #include "cc/slim/layer.h"
  #include "components/viz/common/frame_sinks/copy_output_request.h"
-@@ -130,7 +131,7 @@ ScopedJavaLocalRef<jobject> ViewAndroid::GetEventForwarder() {
+@@ -157,7 +158,7 @@ ScopedJavaLocalRef<jobject> ViewAndroid::GetEventForwarder() {
  
  void ViewAndroid::AddChild(ViewAndroid* child) {
    DCHECK(child);
@@ -618,7 +589,7 @@ index ed6e8e4093..4d65c9465b 100644
  
  }  // namespace aura
 diff --git a/ui/aura/window.cc b/ui/aura/window.cc
-index 7eeb016112..0540f9267b 100644
+index 1437ffcb45..92ba78c0c6 100644
 --- a/ui/aura/window.cc
 +++ b/ui/aura/window.cc
 @@ -13,6 +13,7 @@
@@ -629,7 +600,7 @@ index 7eeb016112..0540f9267b 100644
  #include "base/functional/bind.h"
  #include "base/functional/callback.h"
  #include "base/functional/callback_helpers.h"
-@@ -553,7 +554,7 @@ void Window::AddChild(Window* child) {
+@@ -551,7 +552,7 @@ void Window::AddChild(Window* child) {
  
    Window* old_root = child->GetRootWindow();
  
@@ -638,7 +609,7 @@ index 7eeb016112..0540f9267b 100644
    if (child->parent())
      child->parent()->RemoveChildImpl(child, this);
  
-@@ -1020,7 +1021,7 @@ void Window::RemoveOrDestroyChildren() {
+@@ -1018,7 +1019,7 @@ void Window::RemoveOrDestroyChildren() {
      if (child->owned_by_parent_) {
        delete child;
        // Deleting the child so remove it from out children_ list.
@@ -648,7 +619,7 @@ index 7eeb016112..0540f9267b 100644
        // Even if we can't delete the child, we still need to remove it from the
        // parent so that relevant bookkeeping (parent_ back-pointers etc) are
 diff --git a/ui/aura/window_occlusion_tracker.cc b/ui/aura/window_occlusion_tracker.cc
-index abd50ca767..8f52fee81e 100644
+index aeb7c36477..98918d371a 100644
 --- a/ui/aura/window_occlusion_tracker.cc
 +++ b/ui/aura/window_occlusion_tracker.cc
 @@ -6,6 +6,7 @@
@@ -659,7 +630,7 @@ index abd50ca767..8f52fee81e 100644
  #include "base/trace_event/trace_event.h"
  #include "third_party/skia/include/core/SkRect.h"
  #include "third_party/skia/include/core/SkRegion.h"
-@@ -668,17 +669,18 @@ void WindowOcclusionTracker::SetOccluded(Window* window,
+@@ -662,17 +663,18 @@ void WindowOcclusionTracker::SetOccluded(Window* window,
  }
  
  bool WindowOcclusionTracker::WindowIsTracked(Window* window) const {
@@ -681,7 +652,7 @@ index abd50ca767..8f52fee81e 100644
  }
  
  bool WindowOcclusionTracker::WindowIsVisible(Window* window) const {
-@@ -1005,7 +1007,7 @@ void WindowOcclusionTracker::OnWindowHierarchyChanged(
+@@ -999,7 +1001,7 @@ void WindowOcclusionTracker::OnWindowHierarchyChanged(
      const HierarchyChangeParams& params) {
    Window* const window = params.target;
    Window* const root_window = window->GetRootWindow();
@@ -823,7 +794,7 @@ index 0e85d30f70..a82a333a97 100644
    DCHECK(platform_global_shortcut_listener_);
  
 diff --git a/ui/base/clipboard/clipboard.cc b/ui/base/clipboard/clipboard.cc
-index b1c16555d4..092f80738e 100644
+index db3cd03998..2b49c394d2 100644
 --- a/ui/base/clipboard/clipboard.cc
 +++ b/ui/base/clipboard/clipboard.cc
 @@ -12,6 +12,7 @@
@@ -834,7 +805,7 @@ index b1c16555d4..092f80738e 100644
  #include "base/json/json_reader.h"
  #include "base/memory/ptr_util.h"
  #include "base/no_destructor.h"
-@@ -373,7 +374,7 @@ base::PlatformThreadId Clipboard::GetAndValidateThreadID() {
+@@ -396,7 +397,7 @@ base::PlatformThreadId Clipboard::GetAndValidateThreadID() {
    // was allowlisted to use the clipboard. This is a CHECK rather than a DCHECK
    // to catch incorrect usage in production (e.g. https://crbug.com/872737).
    CHECK(AllowedThreads().empty() ||
@@ -843,20 +814,8 @@ index b1c16555d4..092f80738e 100644
  
    return id;
  }
-diff --git a/ui/base/clipboard/clipboard_android.cc b/ui/base/clipboard/clipboard_android.cc
-index a0c85e044a..d6b724609e 100644
---- a/ui/base/clipboard/clipboard_android.cc
-+++ b/ui/base/clipboard/clipboard_android.cc
-@@ -15,6 +15,7 @@
- #include "base/android/jni_array.h"
- #include "base/android/jni_string.h"
- #include "base/android/scoped_java_ref.h"
-+#include "base/containers/contains.h"
- #include "base/feature_list.h"
- #include "base/functional/bind.h"
- #include "base/functional/callback.h"
 diff --git a/ui/base/clipboard/clipboard_non_backed.cc b/ui/base/clipboard/clipboard_non_backed.cc
-index 56f76ae7a5..af13f21284 100644
+index 88f80571b0..0708b2997e 100644
 --- a/ui/base/clipboard/clipboard_non_backed.cc
 +++ b/ui/base/clipboard/clipboard_non_backed.cc
 @@ -17,6 +17,7 @@
@@ -876,8 +835,17 @@ index 56f76ae7a5..af13f21284 100644
  }
  
  }  // namespace
+@@ -416,7 +417,7 @@ class ClipboardDataBuilder {
+                         base::span<const uint8_t> data) {
+     ClipboardData* clipboard_data = GetCurrentData();
+     clipboard_data->SetCustomData(format,
+-                                  std::string_view(base::as_chars(data)));
++                                  base::as_string_view(base::as_chars(data)));
+   }
+ 
+  private:
 diff --git a/ui/base/clipboard/clipboard_ozone.cc b/ui/base/clipboard/clipboard_ozone.cc
-index 0790b55911..337d8ae58a 100644
+index 0dd321f1e8..0dfd217653 100644
 --- a/ui/base/clipboard/clipboard_ozone.cc
 +++ b/ui/base/clipboard/clipboard_ozone.cc
 @@ -14,6 +14,7 @@
@@ -888,7 +856,7 @@ index 0790b55911..337d8ae58a 100644
  #include "base/containers/flat_map.h"
  #include "base/containers/map_util.h"
  #include "base/containers/span.h"
-@@ -84,7 +85,7 @@ std::vector<std::u16string> GetStandardFormatsFromMimeTypes(
+@@ -79,7 +80,7 @@ std::vector<std::u16string> GetStandardFormatsFromMimeTypes(
           mime_type == kMimeTypeLinuxText || mime_type == kMimeTypeLinuxString ||
           mime_type == kMimeTypeUtf8PlainText ||
           mime_type == kMimeTypeLinuxUtf8String) &&
@@ -897,16 +865,7 @@ index 0790b55911..337d8ae58a 100644
        types.push_back(kMimeTypePlainText16);
        continue;
      }
-@@ -493,7 +494,7 @@ bool ClipboardOzone::IsFormatAvailable(
-     return false;
- 
-   auto available_types = async_clipboard_ozone_->RequestMimeTypes(buffer);
--  return std::ranges::contains(available_types, format.GetName());
-+  return base::Contains(available_types, format.GetName());
- }
- 
- void ClipboardOzone::Clear(ClipboardBuffer buffer) {
-@@ -526,7 +527,7 @@ void ClipboardOzone::OnReadAvailableTypes(
+@@ -430,7 +431,7 @@ void ClipboardOzone::OnReadAvailableTypes(
    std::vector<std::u16string> types =
        GetStandardFormatsFromMimeTypes(available_types);
  
@@ -915,11 +874,35 @@ index 0790b55911..337d8ae58a 100644
            available_types,
            ClipboardFormatType::DataTransferCustomType().GetName())) {
      async_clipboard_ozone_->ReadClipboardDataAsync(
+diff --git a/ui/base/clipboard/scoped_clipboard_writer.cc b/ui/base/clipboard/scoped_clipboard_writer.cc
+index 12695bb8f3..d2c70ac65a 100644
+--- a/ui/base/clipboard/scoped_clipboard_writer.cc
++++ b/ui/base/clipboard/scoped_clipboard_writer.cc
+@@ -10,6 +10,7 @@
+ #include <utility>
+ #include <variant>
+ 
++#include "base/compiler_specific.h"
+ #include "base/json/json_writer.h"
+ #include "base/pickle.h"
+ #include "base/strings/escape.h"
+@@ -197,7 +198,10 @@ void ScopedClipboardWriter::WritePickledData(
+   RecordWrite(ClipboardFormatMetric::kCustomData);
+   Clipboard::RawData raw_data;
+   raw_data.format = format;
+-  raw_data.data = std::vector<uint8_t>(std::from_range, pickle.AsBytes());
++  raw_data.data = std::vector<uint8_t>(
++      reinterpret_cast<const uint8_t*>(pickle.data()),
++      UNSAFE_TODO(reinterpret_cast<const uint8_t*>(pickle.data()) +
++                  pickle.size()));
+   raw_objects_.insert({format, std::move(raw_data)});
+ }
+ 
 diff --git a/ui/base/clipboard/test/test_clipboard.cc b/ui/base/clipboard/test/test_clipboard.cc
-index 1bc086526a..b926ae5477 100644
+index f705374375..c13f038760 100644
 --- a/ui/base/clipboard/test/test_clipboard.cc
 +++ b/ui/base/clipboard/test/test_clipboard.cc
-@@ -11,6 +11,7 @@
+@@ -12,6 +12,7 @@
  #include <string_view>
  #include <utility>
  
@@ -927,20 +910,6 @@ index 1bc086526a..b926ae5477 100644
  #include "base/containers/span.h"
  #include "base/memory/ptr_util.h"
  #include "base/notreached.h"
-@@ -92,10 +93,10 @@ bool TestClipboard::IsFormatAvailable(
-   // Chrome can retrieve an image from the clipboard as either a bitmap or PNG.
-   if (format == ClipboardFormatType::PngType() ||
-       format == ClipboardFormatType::BitmapType()) {
--    return store.data.contains(ClipboardFormatType::PngType()) ||
--           store.data.contains(ClipboardFormatType::BitmapType());
-+    return base::Contains(store.data, ClipboardFormatType::PngType()) ||
-+           base::Contains(store.data, ClipboardFormatType::BitmapType());
-   }
--  return store.data.contains(format);
-+  return base::Contains(store.data, format);
- }
- 
- void TestClipboard::Clear(ClipboardBuffer buffer) {
 diff --git a/ui/base/dragdrop/os_exchange_data_provider_non_backed.cc b/ui/base/dragdrop/os_exchange_data_provider_non_backed.cc
 index 952f3a100a..373263a8fd 100644
 --- a/ui/base/dragdrop/os_exchange_data_provider_non_backed.cc
@@ -1019,7 +988,7 @@ index 695f8ec846..54cd304b90 100644
    input_scopes->push_back(input_scope);
  }
 diff --git a/ui/base/interaction/element_identifier.cc b/ui/base/interaction/element_identifier.cc
-index fe818680c4..967ed50dc0 100644
+index d039002f72..aa2901530b 100644
 --- a/ui/base/interaction/element_identifier.cc
 +++ b/ui/base/interaction/element_identifier.cc
 @@ -8,6 +8,7 @@
@@ -1030,20 +999,11 @@ index fe818680c4..967ed50dc0 100644
  #include "base/no_destructor.h"
  
  namespace ui {
-@@ -32,7 +33,7 @@ ElementIdentifier ElementIdentifier::FromRawValue(intptr_t value) {
-     return ElementIdentifier();
-   const auto* impl =
-       reinterpret_cast<const internal::ElementIdentifierImpl*>(value);
--  CHECK(GetKnownIdentifiers().contains(impl));
-+  CHECK(base::Contains(GetKnownIdentifiers(), impl));
-   return ElementIdentifier(impl);
- }
- 
 diff --git a/ui/base/interaction/element_identifier.h b/ui/base/interaction/element_identifier.h
-index dabcda86ce..1f0f20b642 100644
+index 6e74e3bc56..41e3c5faa2 100644
 --- a/ui/base/interaction/element_identifier.h
 +++ b/ui/base/interaction/element_identifier.h
-@@ -85,7 +85,7 @@ class HelpBubbleHandler;
+@@ -78,7 +78,7 @@
  //   DCHECK(!id1);
  //   EXPECT_TRUE(static_cast<bool>(id2));
  //   DCHECK_NE(id1, id2);
@@ -1053,7 +1013,7 @@ index dabcda86ce..1f0f20b642 100644
  //
  // -----
 diff --git a/ui/base/interaction/element_tracker.cc b/ui/base/interaction/element_tracker.cc
-index 97695213fa..57d2980a2f 100644
+index 3607f66d7d..9796f30d78 100644
 --- a/ui/base/interaction/element_tracker.cc
 +++ b/ui/base/interaction/element_tracker.cc
 @@ -12,6 +12,7 @@
@@ -1064,7 +1024,7 @@ index 97695213fa..57d2980a2f 100644
  #include "base/dcheck_is_on.h"
  #include "base/functional/bind.h"
  #include "base/memory/raw_ptr.h"
-@@ -58,7 +59,7 @@ class ElementTracker::ElementData {
+@@ -59,7 +60,7 @@ class ElementTracker::ElementData {
    ElementContext context() const { return context_; }
  
    bool HasElement(const TrackedElement* element) const {
@@ -1073,7 +1033,7 @@ index 97695213fa..57d2980a2f 100644
    }
  
    bool empty() const {
-@@ -110,7 +111,7 @@ class ElementTracker::ElementData {
+@@ -111,7 +112,7 @@ class ElementTracker::ElementData {
    void NotifyElementActivated(
        raw_ptr<TrackedElement, CtnExperimental>& element) {
      // Note: "All contexts" does not require the element to be present here.
@@ -1083,18 +1043,10 @@ index 97695213fa..57d2980a2f 100644
    }
  
 diff --git a/ui/base/interaction/interactive_test_internal.cc b/ui/base/interaction/interactive_test_internal.cc
-index 6206478f74..e234e2b722 100644
+index 7e2f43bfe0..4b8501c972 100644
 --- a/ui/base/interaction/interactive_test_internal.cc
 +++ b/ui/base/interaction/interactive_test_internal.cc
-@@ -15,6 +15,7 @@
- #include "base/callback_list.h"
- #include "base/check.h"
- #include "base/containers/adapters.h"
-+#include "base/containers/contains.h"
- #include "base/functional/bind.h"
- #include "base/strings/string_util.h"
- #include "base/strings/stringprintf.h"
-@@ -167,7 +168,7 @@ void InteractiveTestPrivate::OnElementAdded(TrackedElement* el) {
+@@ -239,7 +239,7 @@ void InteractiveTestPrivate::OnElementAdded(TrackedElement* el) {
  
  void InteractiveTestPrivate::MaybeAddPivotElement(ElementContext context) {
    CHECK(context) << "Attempted to run steps in an invalid (null) context.";
@@ -1104,7 +1056,7 @@ index 6206478f74..e234e2b722 100644
          std::make_unique<TestElement>(kInteractiveTestPivotElementId, context);
      auto* const el = pivot.get();
 diff --git a/ui/base/interaction/interactive_test_internal.h b/ui/base/interaction/interactive_test_internal.h
-index db9a77490a..c391a79a4e 100644
+index af5e41fe05..6dffecc4b4 100644
 --- a/ui/base/interaction/interactive_test_internal.h
 +++ b/ui/base/interaction/interactive_test_internal.h
 @@ -18,6 +18,7 @@
@@ -1191,7 +1143,7 @@ index 687bae9427..3a6cc2a3c6 100644
  
  PageTransition PageTransitionStripQualifier(PageTransition type) {
 diff --git a/ui/base/resource/data_pack.cc b/ui/base/resource/data_pack.cc
-index 5ba9a7e43c..9ade2b9aa8 100644
+index b9e3211619..84e2b96218 100644
 --- a/ui/base/resource/data_pack.cc
 +++ b/ui/base/resource/data_pack.cc
 @@ -15,6 +15,7 @@
@@ -1202,7 +1154,7 @@ index 5ba9a7e43c..9ade2b9aa8 100644
  #include "base/files/file.h"
  #include "base/files/file_util.h"
  #include "base/files/memory_mapped_file.h"
-@@ -67,7 +68,7 @@ void MaybePrintResourceId(uint16_t resource_id) {
+@@ -69,7 +70,7 @@ void MaybePrintResourceId(uint16_t resource_id) {
    // DataPack doesn't require single-threaded access, so use a lock.
    static base::Lock* lock = new base::Lock;
    base::AutoLock auto_lock(*lock);
@@ -1283,7 +1235,7 @@ index a1b7af55d4..3478100436 100644
  
  void HWNDSubclass::RemoveFilter(HWNDMessageFilter* filter) {
 diff --git a/ui/base/x/selection_utils.cc b/ui/base/x/selection_utils.cc
-index 43852ea72a..afe40e2373 100644
+index 15073d5ffc..871ce141cd 100644
 --- a/ui/base/x/selection_utils.cc
 +++ b/ui/base/x/selection_utils.cc
 @@ -12,6 +12,7 @@
@@ -1294,7 +1246,7 @@ index 43852ea72a..afe40e2373 100644
  #include "base/containers/span.h"
  #include "base/i18n/icu_string_conversions.h"
  #include "base/memory/ref_counted_memory.h"
-@@ -56,7 +57,7 @@ void GetAtomIntersection(const std::vector<x11::Atom>& desired,
+@@ -46,7 +47,7 @@ void GetAtomIntersection(const std::vector<x11::Atom>& desired,
                           const std::vector<x11::Atom>& offered,
                           std::vector<x11::Atom>* output) {
    for (const auto& desired_atom : desired) {
@@ -1304,18 +1256,10 @@ index 43852ea72a..afe40e2373 100644
      }
    }
 diff --git a/ui/base/x/x11_clipboard_helper.cc b/ui/base/x/x11_clipboard_helper.cc
-index b6a04b3d5c..57aa6e7218 100644
+index ec255465fd..11c12ba2b9 100644
 --- a/ui/base/x/x11_clipboard_helper.cc
 +++ b/ui/base/x/x11_clipboard_helper.cc
-@@ -9,6 +9,7 @@
- #include <vector>
- 
- #include "base/compiler_specific.h"
-+#include "base/containers/contains.h"
- #include "base/feature_list.h"
- #include "base/memory/ref_counted_memory.h"
- #include "base/memory/singleton.h"
-@@ -116,7 +117,7 @@ class XClipboardHelper::TargetList {
+@@ -124,7 +124,7 @@ class XClipboardHelper::TargetList {
  
    bool ContainsText() const {
      for (const auto& atom : GetTextAtomsFrom()) {
@@ -1324,7 +1268,7 @@ index b6a04b3d5c..57aa6e7218 100644
          return true;
        }
      }
-@@ -125,7 +126,7 @@ class XClipboardHelper::TargetList {
+@@ -133,7 +133,7 @@ class XClipboardHelper::TargetList {
  
    bool ContainsFormat(const ClipboardFormatType& format_type) const {
      x11::Atom atom = x11::GetAtom(format_type.GetName().c_str());
@@ -1377,7 +1321,7 @@ index 8c9a137d5e..838b89cd8d 100644
      return;
    }
 diff --git a/ui/base/x/x11_os_exchange_data_provider.cc b/ui/base/x/x11_os_exchange_data_provider.cc
-index 33a69713ff..8304502396 100644
+index bde8f3ce83..cc9903a17c 100644
 --- a/ui/base/x/x11_os_exchange_data_provider.cc
 +++ b/ui/base/x/x11_os_exchange_data_provider.cc
 @@ -8,6 +8,7 @@
@@ -1431,7 +1375,7 @@ index 1cf16b3f50..f01af855b2 100644
          renderer_color_map.at(table.renderer_color_id)) {
        return false;
 diff --git a/ui/compositor/compositor.cc b/ui/compositor/compositor.cc
-index 0baec53e72..e400c61ef3 100644
+index 3aec78e17d..5ec53830f3 100644
 --- a/ui/compositor/compositor.cc
 +++ b/ui/compositor/compositor.cc
 @@ -14,6 +14,7 @@
@@ -1442,7 +1386,7 @@ index 0baec53e72..e400c61ef3 100644
  #include "base/dcheck_is_on.h"
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
-@@ -948,7 +949,7 @@ Compositor::TrackerState::~TrackerState() = default;
+@@ -951,7 +952,7 @@ Compositor::TrackerState::~TrackerState() = default;
  void Compositor::StartMetricsTracker(
      TrackerId tracker_id,
      CompositorMetricsTrackerHost::ReportCallback callback) {
@@ -1452,7 +1396,7 @@ index 0baec53e72..e400c61ef3 100644
    auto& tracker_state = compositor_metrics_tracker_map_[tracker_id];
    tracker_state.report_callback = std::move(callback);
 diff --git a/ui/compositor/layer.cc b/ui/compositor/layer.cc
-index f19dd3d8cb..bb316fdbe1 100644
+index dfa207f57b..e2298d53f8 100644
 --- a/ui/compositor/layer.cc
 +++ b/ui/compositor/layer.cc
 @@ -13,6 +13,7 @@
@@ -1462,8 +1406,8 @@ index f19dd3d8cb..bb316fdbe1 100644
 +#include "base/containers/contains.h"
  #include "base/functional/bind.h"
  #include "base/json/json_writer.h"
- #include "base/memory/ptr_util.h"
-@@ -1094,7 +1095,7 @@ base::WeakPtr<Layer> Layer::AsWeakPtr() {
+ #include "base/logging.h"
+@@ -1142,7 +1143,7 @@ base::WeakPtr<Layer> Layer::AsWeakPtr() {
  }
  
  bool Layer::ContainsMirrorForTest(Layer* mirror) const {
@@ -1604,7 +1548,7 @@ index 58c7779732..c655cdb2e6 100644
  
  // Returns true if a platform native |mode| is equal to a |managed_mode|.
 diff --git a/ui/display/manager/display_manager.cc b/ui/display/manager/display_manager.cc
-index 0a1b689398..6fafb412f2 100644
+index 0144a790a8..9a84ea72df 100644
 --- a/ui/display/manager/display_manager.cc
 +++ b/ui/display/manager/display_manager.cc
 @@ -16,6 +16,7 @@
@@ -1887,7 +1831,7 @@ index 2ce08bf583..7080542956 100644
  
  const base::flat_set<int64_t>& GetInternalDisplayIds() {
 diff --git a/ui/display/win/screen_win.cc b/ui/display/win/screen_win.cc
-index bfc40f8073..5cb7c912eb 100644
+index 383ec2e72c..66092b47d8 100644
 --- a/ui/display/win/screen_win.cc
 +++ b/ui/display/win/screen_win.cc
 @@ -15,6 +15,7 @@
@@ -1899,7 +1843,7 @@ index bfc40f8073..5cb7c912eb 100644
  #include "base/containers/flat_set.h"
  #include "base/debug/alias.h"
 diff --git a/ui/events/ash/keyboard_capability.cc b/ui/events/ash/keyboard_capability.cc
-index f847b4f7e6..c3b2a0370b 100644
+index 1d062c6e57..2375e5f61d 100644
 --- a/ui/events/ash/keyboard_capability.cc
 +++ b/ui/events/ash/keyboard_capability.cc
 @@ -19,6 +19,7 @@
@@ -1910,7 +1854,7 @@ index f847b4f7e6..c3b2a0370b 100644
  #include "base/containers/fixed_flat_map.h"
  #include "base/containers/fixed_flat_set.h"
  #include "base/containers/flat_set.h"
-@@ -1332,10 +1333,10 @@ bool KeyboardCapability::HasTopRowActionKey(const KeyboardDevice& keyboard,
+@@ -1328,10 +1329,10 @@ bool KeyboardCapability::HasTopRowActionKey(const KeyboardDevice& keyboard,
                                              TopRowActionKey action_key) const {
    const auto* keyboard_info = GetKeyboardInfo(keyboard);
    if (!keyboard_info) {
@@ -1924,7 +1868,7 @@ index f847b4f7e6..c3b2a0370b 100644
  
  bool KeyboardCapability::HasTopRowActionKey(int device_id,
 diff --git a/ui/events/blink/blink_event_util.cc b/ui/events/blink/blink_event_util.cc
-index 396f51544f..28b86a7a14 100644
+index 95fbaa2d13..5018eaf5ad 100644
 --- a/ui/events/blink/blink_event_util.cc
 +++ b/ui/events/blink/blink_event_util.cc
 @@ -10,11 +10,11 @@
@@ -1940,7 +1884,7 @@ index 396f51544f..28b86a7a14 100644
  #include "build/build_config.h"
  #include "third_party/blink/public/common/input/web_input_event.h"
  #include "third_party/blink/public/common/input/web_mouse_wheel_event.h"
-@@ -468,7 +468,7 @@ WebGestureEvent CreateWebGestureEvent(const GestureEventDetails& details,
+@@ -477,7 +477,7 @@ WebGestureEvent CreateWebGestureEvent(const GestureEventDetails& details,
        break;
      default:
        NOTREACHED() << "EventType provided wasn't a valid gesture event: "
@@ -2009,10 +1953,10 @@ index 8af6c2c458..478e4f2236 100644
                                        &TouchscreenDevice::id);
        });
 diff --git a/ui/events/event.cc b/ui/events/event.cc
-index c909948930..280ed1b75c 100644
+index dd4343f5c9..e3ea61e03b 100644
 --- a/ui/events/event.cc
 +++ b/ui/events/event.cc
-@@ -22,6 +22,7 @@
+@@ -21,6 +21,7 @@
  #include "base/strings/string_util.h"
  #include "base/strings/stringprintf.h"
  #include "base/time/time.h"
@@ -2020,7 +1964,7 @@ index c909948930..280ed1b75c 100644
  #include "build/build_config.h"
  #include "ui/events/base_event_utils.h"
  #include "ui/events/event_constants.h"
-@@ -1178,7 +1179,7 @@ ScrollEvent::ScrollEvent(const PlatformEvent& native_event)
+@@ -1177,7 +1178,7 @@ ScrollEvent::ScrollEvent(const PlatformEvent& native_event)
      GetFlingData(native_event, &x_offset_, &y_offset_, &x_offset_ordinal_,
                   &y_offset_ordinal_, nullptr);
    } else {
@@ -2059,23 +2003,18 @@ index 3e42628333..64169898b9 100644
  #define UMA_HISTOGRAM_EVENT_LATENCY_TIMES(name, sample)           \
    UMA_HISTOGRAM_CUSTOM_TIMES(name, sample, base::Milliseconds(1), \
 diff --git a/ui/events/gesture_detection/touch_disposition_gesture_filter.cc b/ui/events/gesture_detection/touch_disposition_gesture_filter.cc
-index 5431bf9f26..e5d0adff4f 100644
+index ba27f3de07..f32ecf3633 100644
 --- a/ui/events/gesture_detection/touch_disposition_gesture_filter.cc
 +++ b/ui/events/gesture_detection/touch_disposition_gesture_filter.cc
-@@ -6,11 +6,10 @@
- 
- #include <stddef.h>
- 
--#include <utility>
--
- #include "base/check_op.h"
+@@ -15,6 +15,7 @@
  #include "base/notreached.h"
+ #include "base/time/time.h"
  #include "base/trace_event/typed_macros.h"
 +#include "base/types/cxx23_to_underlying.h"
  #include "ui/base/ui_base_features.h"
+ #include "ui/events/gesture_detection/gesture_touch_uma_histogram.h"
  #include "ui/events/gesture_event_details.h"
- 
-@@ -18,8 +17,8 @@ namespace ui {
+@@ -23,8 +24,8 @@ namespace ui {
  namespace {
  
  // A BitSet32 is used for tracking dropped gesture types.
@@ -2086,7 +2025,7 @@ index 5431bf9f26..e5d0adff4f 100644
                    32,
                "gesture type count too large");
  
-@@ -131,8 +130,8 @@ DispositionHandlingInfo GetDispositionHandlingInfo(EventType type) {
+@@ -143,8 +144,8 @@ DispositionHandlingInfo GetDispositionHandlingInfo(EventType type) {
  int GetGestureTypeIndex(EventType type) {
    DCHECK_GE(type, EventType::kGestureTypeStart);
    DCHECK_LE(type, EventType::kGestureTypeEnd);
@@ -2098,7 +2037,7 @@ index 5431bf9f26..e5d0adff4f 100644
  
  bool IsTouchStartEvent(GestureEventDataPacket::GestureSource gesture_source) {
 diff --git a/ui/events/gesture_event_details.cc b/ui/events/gesture_event_details.cc
-index a344b7e7a3..671bc908e7 100644
+index 8bcb96bb1c..dbe547f74b 100644
 --- a/ui/events/gesture_event_details.cc
 +++ b/ui/events/gesture_event_details.cc
 @@ -6,11 +6,11 @@
@@ -2114,7 +2053,7 @@ index a344b7e7a3..671bc908e7 100644
  
  // Since ui::GestureEventDetails::Details is a union structure that corresponds
  // to only one EventType, allow conversion to a byte span to avoid using memset
-@@ -77,7 +77,7 @@ GestureEventDetails::GestureEventDetails(ui::EventType type,
+@@ -83,7 +83,7 @@ GestureEventDetails::GestureEventDetails(ui::EventType type,
  
      default:
        NOTREACHED() << "Invalid event type for constructor: "
@@ -2123,7 +2062,7 @@ index a344b7e7a3..671bc908e7 100644
    }
  }
  
-@@ -114,8 +114,8 @@ GestureEventDetails::GestureEventDetails(ui::EventType type,
+@@ -120,8 +120,8 @@ GestureEventDetails::GestureEventDetails(ui::EventType type,
      case ui::EventType::kGestureSwipe:
      case ui::EventType::kGesturePinchUpdate:
        DCHECK_EQ(type, other.type()) << " - Invalid gesture conversion from "
@@ -2204,7 +2143,7 @@ index 0ad3f73f9c..e3795d4aa4 100644
    }
  
 diff --git a/ui/events/ozone/evdev/input_device_factory_evdev.cc b/ui/events/ozone/evdev/input_device_factory_evdev.cc
-index c849a7ccad..5a8fa053f9 100644
+index 1f40d861c4..ce2cccde2a 100644
 --- a/ui/events/ozone/evdev/input_device_factory_evdev.cc
 +++ b/ui/events/ozone/evdev/input_device_factory_evdev.cc
 @@ -8,10 +8,10 @@
@@ -2218,8 +2157,8 @@ index c849a7ccad..5a8fa053f9 100644
 +#include "base/containers/contains.h"
  #include "base/files/scoped_file.h"
  #include "base/functional/bind.h"
- #include "base/memory/ptr_util.h"
-@@ -212,7 +212,7 @@ void InputDeviceFactoryEvdev::AttachInputDevice(
+ #include "base/logging.h"
+@@ -213,7 +213,7 @@ void InputDeviceFactoryEvdev::AttachInputDevice(
          imposter_checker_->OnDeviceAdded(converters_[path].get());
      // Check for imposters on all devices that share the same physical port.
      for (const auto& it : converters_) {
@@ -2228,7 +2167,7 @@ index c849a7ccad..5a8fa053f9 100644
            imposter_checker_->FlagSuspectedImposter(it.second.get())) {
          UpdateDirtyFlags(it.second.get());
        }
-@@ -254,7 +254,7 @@ void InputDeviceFactoryEvdev::DetachInputDevice(const base::FilePath& path) {
+@@ -255,7 +255,7 @@ void InputDeviceFactoryEvdev::DetachInputDevice(const base::FilePath& path) {
      // Declassify any devices as no longer imposters, if the removal of this
      // device changes their status.
      for (const auto& it : converters_) {
@@ -2237,7 +2176,7 @@ index c849a7ccad..5a8fa053f9 100644
            !imposter_checker_->FlagSuspectedImposter(it.second.get())) {
          UpdateDirtyFlags(it.second.get());
        }
-@@ -454,7 +454,7 @@ void InputDeviceFactoryEvdev::ApplyInputDeviceSettings() {
+@@ -455,7 +455,7 @@ void InputDeviceFactoryEvdev::ApplyInputDeviceSettings() {
  
      // Block modifiers on the current converter if the device id exists in
      // `input_device_settings_.blocked_modifiers_devices`
@@ -2340,7 +2279,7 @@ index 4baedc8b39..69c79ed4af 100644
  }
  
 diff --git a/ui/gfx/x/connection.cc b/ui/gfx/x/connection.cc
-index 22c797406f..7b6d10782a 100644
+index 70e8628456..40dd7ec2a1 100644
 --- a/ui/gfx/x/connection.cc
 +++ b/ui/gfx/x/connection.cc
 @@ -13,6 +13,7 @@
@@ -2361,7 +2300,7 @@ index 22c797406f..7b6d10782a 100644
    return false;
  }
 diff --git a/ui/gfx/x/randr_output_manager.cc b/ui/gfx/x/randr_output_manager.cc
-index 6625cb0fa6..8c96cc16ee 100644
+index e10defba9f..74d3e5320a 100644
 --- a/ui/gfx/x/randr_output_manager.cc
 +++ b/ui/gfx/x/randr_output_manager.cc
 @@ -11,11 +11,13 @@
@@ -2387,7 +2326,7 @@ index 6625cb0fa6..8c96cc16ee 100644
      width_mm--;
    }
    return {width_mm, height_mm};
-@@ -396,8 +398,8 @@ void RandROutputManager::SetLayout(const RandRMonitorLayout& layout) {
+@@ -398,8 +400,8 @@ void RandROutputManager::SetLayout(const RandRMonitorLayout& layout) {
          continue;
        }
        resizer.AddActiveCrtc(crtc, mode, {output}, new_layout.rect());
@@ -2398,7 +2337,7 @@ index 6625cb0fa6..8c96cc16ee 100644
      }
      if (i < diff.new_displays.configs.size()) {
        LOG(WARNING) << "Failed to create "
-@@ -415,7 +417,7 @@ void RandROutputManager::SetLayout(const RandRMonitorLayout& layout) {
+@@ -417,7 +419,7 @@ void RandROutputManager::SetLayout(const RandRMonitorLayout& layout) {
        // This is not expected to happen. Disabled Outputs are not expected to
        // have any Monitor, but |output| was found in the RRGetMonitors response,
        // so it should have a CRTC attached.
@@ -2407,7 +2346,7 @@ index 6625cb0fa6..8c96cc16ee 100644
        continue;
      }
      resizer.DisableCrtc(crtc);
-@@ -435,7 +437,7 @@ void RandROutputManager::SetLayout(const RandRMonitorLayout& layout) {
+@@ -437,7 +439,7 @@ void RandROutputManager::SetLayout(const RandRMonitorLayout& layout) {
      auto output = GetOutputFromContext(removed_display.context);
      auto crtc = resizer.GetCrtcForOutput(output);
      if (crtc == kDisabledCrtc) {
@@ -2416,7 +2355,7 @@ index 6625cb0fa6..8c96cc16ee 100644
        continue;
      }
      resizer.DisableCrtc(crtc);
-@@ -502,7 +504,7 @@ void RandROutputManager::SetResolutionForOutput(x11::RandR::Output output,
+@@ -504,7 +506,7 @@ void RandROutputManager::SetResolutionForOutput(x11::RandR::Output output,
      // This is not expected to happen. Disabled Outputs are not expected to
      // have any Monitor, but |output| was found in the RRGetMonitors response,
      // so it should have a CRTC attached.
@@ -2425,7 +2364,7 @@ index 6625cb0fa6..8c96cc16ee 100644
      return;
    }
  
-@@ -553,7 +555,7 @@ std::string RandROutputManager::GetModeNameForOutput(
+@@ -555,7 +557,7 @@ std::string RandROutputManager::GetModeNameForOutput(
    // The name of the mode representing the current client view resolution. This
    // must be unique per Output, so that Outputs can be resized independently.
    return base::StringPrintf("%s%i", output_name_prefix_.c_str(),
@@ -2486,7 +2425,7 @@ index a1b2bbc013..51db6c7cfc 100644
    if (iter == active_crtcs_.end()) {
      return kDisabledCrtc;
 diff --git a/ui/gl/gl_display.cc b/ui/gl/gl_display.cc
-index 83fd49846e..f0501e7149 100644
+index 06f8b6cab6..02365383a2 100644
 --- a/ui/gl/gl_display.cc
 +++ b/ui/gl/gl_display.cc
 @@ -9,6 +9,7 @@
@@ -2552,7 +2491,7 @@ index 3a6401b222..992d35a07f 100644
    }
  
 diff --git a/ui/gl/init/gl_display_initializer.cc b/ui/gl/init/gl_display_initializer.cc
-index 9bfadaacbf..1245385328 100644
+index 00374e6d8f..5adfe70df0 100644
 --- a/ui/gl/init/gl_display_initializer.cc
 +++ b/ui/gl/init/gl_display_initializer.cc
 @@ -7,6 +7,7 @@
@@ -3134,7 +3073,7 @@ index 4e63e78416..75c8ca8ee3 100644
  }
  
 diff --git a/ui/ozone/platform/wayland/host/wayland_window.cc b/ui/ozone/platform/wayland/host/wayland_window.cc
-index 862cc0ea11..4ecb97d8d7 100644
+index 10b2f02756..bccc8685aa 100644
 --- a/ui/ozone/platform/wayland/host/wayland_window.cc
 +++ b/ui/ozone/platform/wayland/host/wayland_window.cc
 @@ -13,6 +13,7 @@
@@ -3144,8 +3083,8 @@ index 862cc0ea11..4ecb97d8d7 100644
 +#include "base/containers/contains.h"
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
- #include "base/memory/scoped_refptr.h"
-@@ -205,7 +206,7 @@ void WaylandWindow::RemoveBubble(WaylandBubble* window) {
+ #include "base/logging.h"
+@@ -206,7 +207,7 @@ void WaylandWindow::RemoveBubble(WaylandBubble* window) {
  }
  
  void WaylandWindow::ActivateBubble(WaylandBubble* window) {
@@ -3155,7 +3094,7 @@ index 862cc0ea11..4ecb97d8d7 100644
                      window->AsWaylandBubble()->activatable()));
    if (active_bubble_ == window) {
 diff --git a/ui/ozone/platform/wayland/host/wayland_window_drag_controller.cc b/ui/ozone/platform/wayland/host/wayland_window_drag_controller.cc
-index e401b53202..6513052118 100644
+index 8011d8ad14..f50bb252df 100644
 --- a/ui/ozone/platform/wayland/host/wayland_window_drag_controller.cc
 +++ b/ui/ozone/platform/wayland/host/wayland_window_drag_controller.cc
 @@ -8,13 +8,13 @@
@@ -3307,7 +3246,7 @@ index b5b2fda073..d9abf5e3d9 100644
      default:
        NOTREACHED() << "Invalid command id: " << command_id;
 diff --git a/ui/views/accessibility/ax_aura_obj_cache.cc b/ui/views/accessibility/ax_aura_obj_cache.cc
-index 97d58dbe8a..b7e5d2be94 100644
+index 77c6f7d232..c47e9b03d9 100644
 --- a/ui/views/accessibility/ax_aura_obj_cache.cc
 +++ b/ui/views/accessibility/ax_aura_obj_cache.cc
 @@ -4,10 +4,10 @@
@@ -3320,9 +3259,9 @@ index 97d58dbe8a..b7e5d2be94 100644
  
 +#include "base/containers/contains.h"
  #include "base/memory/raw_ptr.h"
- #include "base/strings/string_util.h"
  #include "ui/accessibility/ax_enums.mojom.h"
-@@ -328,7 +328,7 @@ void AXAuraObjCache::OnRootWindowObjCreated(aura::Window* window) {
+ #include "ui/accessibility/ax_node.h"
+@@ -327,7 +327,7 @@ void AXAuraObjCache::OnRootWindowObjCreated(aura::Window* window) {
    }
  
    // Do not allow duplicate entries.
@@ -3331,30 +3270,6 @@ index 97d58dbe8a..b7e5d2be94 100644
      root_windows_.push_back(window);
    }
  }
-diff --git a/ui/views/accessibility/ax_root_obj_wrapper.cc b/ui/views/accessibility/ax_root_obj_wrapper.cc
-index 49f2990323..1bccb6a144 100644
---- a/ui/views/accessibility/ax_root_obj_wrapper.cc
-+++ b/ui/views/accessibility/ax_root_obj_wrapper.cc
-@@ -4,9 +4,9 @@
- 
- #include "ui/views/accessibility/ax_root_obj_wrapper.h"
- 
--#include <algorithm>
- #include <utility>
- 
-+#include "base/containers/contains.h"
- #include "base/memory/raw_ptr.h"
- #include "base/strings/utf_string_conversions.h"
- #include "ui/accessibility/ax_enums.mojom.h"
-@@ -27,7 +27,7 @@ AXRootObjWrapper::~AXRootObjWrapper() = default;
- bool AXRootObjWrapper::HasChild(views::AXAuraObjWrapper* child) {
-   std::vector<raw_ptr<views::AXAuraObjWrapper, VectorExperimental>> children;
-   GetChildren(&children);
--  return std::ranges::contains(children, child);
-+  return base::Contains(children, child);
- }
- 
- views::AXAuraObjWrapper* AXRootObjWrapper::GetParent() {
 diff --git a/ui/views/accessibility/view_ax_platform_node_delegate_auralinux.cc b/ui/views/accessibility/view_ax_platform_node_delegate_auralinux.cc
 index 76d33cd3cf..32cd3ef2f5 100644
 --- a/ui/views/accessibility/view_ax_platform_node_delegate_auralinux.cc
@@ -3377,7 +3292,7 @@ index 76d33cd3cf..32cd3ef2f5 100644
      }
  
 diff --git a/ui/views/bubble/bubble_dialog_delegate_view.cc b/ui/views/bubble/bubble_dialog_delegate_view.cc
-index 81af56588e..c506cc20ee 100644
+index 6a88df4700..5f21e3d8a2 100644
 --- a/ui/views/bubble/bubble_dialog_delegate_view.cc
 +++ b/ui/views/bubble/bubble_dialog_delegate_view.cc
 @@ -13,6 +13,7 @@
@@ -3387,8 +3302,8 @@ index 81af56588e..c506cc20ee 100644
 +#include "base/containers/contains.h"
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
- #include "base/memory/ptr_util.h"
-@@ -250,7 +251,7 @@ class BubbleDialogDelegate::AnchorViewObserver : public ViewObserver {
+ #include "base/logging.h"
+@@ -251,7 +252,7 @@ class BubbleDialogDelegate::AnchorViewObserver : public ViewObserver {
   private:
    void AddToAnchorVector() {
      auto& vector = GetAnchorVector(anchor_view_);
@@ -3397,7 +3312,7 @@ index 81af56588e..c506cc20ee 100644
      vector.push_back(parent_);
    }
  
-@@ -932,8 +933,8 @@ void BubbleDialogDelegate::BubbleUmaLogger::LogMetric(
+@@ -976,8 +977,8 @@ void BubbleDialogDelegate::BubbleUmaLogger::LogMetric(
    }
  
    if (allowed_class_names_for_testing_.has_value()) {
@@ -3409,18 +3324,10 @@ index 81af56588e..c506cc20ee 100644
      }
    } else if (!views_metrics::IsValidBubbleName(bubble_name.value())) {
 diff --git a/ui/views/cocoa/native_widget_mac_ns_window_host.mm b/ui/views/cocoa/native_widget_mac_ns_window_host.mm
-index e40d0d5be1..5c0d4134c8 100644
+index 2914e7149f..cdbd944cae 100644
 --- a/ui/views/cocoa/native_widget_mac_ns_window_host.mm
 +++ b/ui/views/cocoa/native_widget_mac_ns_window_host.mm
-@@ -10,6 +10,7 @@
- 
- #include "base/apple/foundation_util.h"
- #include "base/base64.h"
-+#include "base/containers/contains.h"
- #include "base/no_destructor.h"
- #include "base/numerics/safe_conversions.h"
- #include "base/strings/sys_string_conversions.h"
-@@ -1155,7 +1156,7 @@ bool NativeWidgetMacNSWindowHost::DispatchMonitorEvent(
+@@ -1196,7 +1196,7 @@ bool NativeWidgetMacNSWindowHost::DispatchMonitorEvent(
    for (auto* event_monitor : event_monitors_snapshot) {
      // Ensure `event_monitor` was not removed from `event_monitors_` by a
      // previous call to NativeWidgetMacEventMonitorOnEvent.
@@ -3430,7 +3337,7 @@ index e40d0d5be1..5c0d4134c8 100644
      }
      event_monitor->client_->NativeWidgetMacEventMonitorOnEvent(
 diff --git a/ui/views/controls/menu/menu_item_view.cc b/ui/views/controls/menu/menu_item_view.cc
-index 25653e1b0c..d34c5ae274 100644
+index e22ac23452..80cf2bedb1 100644
 --- a/ui/views/controls/menu/menu_item_view.cc
 +++ b/ui/views/controls/menu/menu_item_view.cc
 @@ -16,6 +16,7 @@
@@ -3441,7 +3348,7 @@ index 25653e1b0c..d34c5ae274 100644
  #include "base/i18n/case_conversion.h"
  #include "base/strings/utf_string_conversions.h"
  #include "build/build_config.h"
-@@ -1648,7 +1649,7 @@ bool MenuItemView::ShouldPaintAsSelected(PaintMode mode) const {
+@@ -1660,7 +1661,7 @@ bool MenuItemView::ShouldPaintAsSelected(PaintMode mode) const {
  
  bool MenuItemView::IsScheduledForDeletion() const {
    return parent_menu_item_ &&
@@ -3451,7 +3358,7 @@ index 25653e1b0c..d34c5ae274 100644
  }
  
 diff --git a/ui/views/controls/menu/submenu_view.cc b/ui/views/controls/menu/submenu_view.cc
-index f4195d0080..01dd92dd52 100644
+index 4b6bd6dcaf..dc66c6b251 100644
 --- a/ui/views/controls/menu/submenu_view.cc
 +++ b/ui/views/controls/menu/submenu_view.cc
 @@ -12,6 +12,7 @@
@@ -3475,7 +3382,7 @@ index f4195d0080..01dd92dd52 100644
               : config.arrow_to_edge_padding);
    }
 diff --git a/ui/views/controls/table/table_view.cc b/ui/views/controls/table/table_view.cc
-index 385d6abde6..39026215bb 100644
+index 5f7ec145f8..99d43f98af 100644
 --- a/ui/views/controls/table/table_view.cc
 +++ b/ui/views/controls/table/table_view.cc
 @@ -13,6 +13,7 @@
@@ -3486,7 +3393,7 @@ index 385d6abde6..39026215bb 100644
  #include "base/functional/bind.h"
  #include "base/functional/callback.h"
  #include "base/i18n/rtl.h"
-@@ -495,13 +496,13 @@ void TableView::SetSortDescriptors(const SortDescriptors& sort_descriptors) {
+@@ -501,13 +502,13 @@ void TableView::SetSortDescriptors(const SortDescriptors& sort_descriptors) {
  }
  
  bool TableView::IsColumnVisible(int id) const {
@@ -3505,10 +3412,10 @@ index 385d6abde6..39026215bb 100644
  
  bool TableView::GetHasFocusIndicator() const {
 diff --git a/ui/views/controls/textfield/textfield.cc b/ui/views/controls/textfield/textfield.cc
-index 026d61a4d1..a12805697c 100644
+index 0387f622e0..dfbadd66cc 100644
 --- a/ui/views/controls/textfield/textfield.cc
 +++ b/ui/views/controls/textfield/textfield.cc
-@@ -20,6 +20,7 @@
+@@ -21,6 +21,7 @@
  #include "base/strings/utf_string_conversions.h"
  #include "base/time/time.h"
  #include "base/trace_event/trace_event.h"
@@ -3516,7 +3423,7 @@ index 026d61a4d1..a12805697c 100644
  #include "build/build_config.h"
  #include "ui/accessibility/ax_action_data.h"
  #include "ui/accessibility/ax_node_data.h"
-@@ -139,11 +140,11 @@ ui::TextEditCommand GetTextEditCommandFromMenuCommand(int command_id,
+@@ -140,11 +141,11 @@ ui::TextEditCommand GetTextEditCommandFromMenuCommand(int command_id,
    switch (command_id) {
      case Textfield::kUndo:
        return ui::TextEditCommand::UNDO;
@@ -3531,7 +3438,7 @@ index 026d61a4d1..a12805697c 100644
        return ui::TextEditCommand::PASTE;
      case Textfield::kDelete:
        // The DELETE menu action only works in case of an active selection.
-@@ -151,9 +152,9 @@ ui::TextEditCommand GetTextEditCommandFromMenuCommand(int command_id,
+@@ -152,9 +153,9 @@ ui::TextEditCommand GetTextEditCommandFromMenuCommand(int command_id,
          return ui::TextEditCommand::DELETE_FORWARD;
        }
        break;
@@ -3543,7 +3450,7 @@ index 026d61a4d1..a12805697c 100644
        return ui::TextEditCommand::SELECT_WORD;
    }
    return ui::TextEditCommand::INVALID_COMMAND;
-@@ -1592,19 +1593,19 @@ bool Textfield::GetAcceleratorForCommandId(int command_id,
+@@ -1615,19 +1616,19 @@ bool Textfield::GetAcceleratorForCommandId(int command_id,
        *accelerator = ui::Accelerator(ui::VKEY_Z, ui::EF_PLATFORM_ACCELERATOR);
        return true;
  
@@ -3567,7 +3474,7 @@ index 026d61a4d1..a12805697c 100644
        *accelerator = ui::Accelerator(ui::VKEY_A, ui::EF_PLATFORM_ACCELERATOR);
        return true;
  
-@@ -1627,9 +1628,9 @@ void Textfield::ExecuteCommand(int command_id, int event_flags) {
+@@ -1650,9 +1651,9 @@ void Textfield::ExecuteCommand(int command_id, int event_flags) {
    if (::features::IsTouchTextEditingRedesignEnabled() &&
        (event_flags & ui::EF_FROM_TOUCH) &&
        (command_id ==
@@ -3579,7 +3486,7 @@ index 026d61a4d1..a12805697c 100644
      CreateTouchSelectionControllerAndNotifyIt();
    }
  }
-@@ -3052,16 +3053,16 @@ void Textfield::UpdateContextMenu() {
+@@ -3111,16 +3112,16 @@ void Textfield::UpdateContextMenu() {
    context_menu_contents_->AddItemWithStringId(kUndo, IDS_APP_UNDO);
    context_menu_contents_->AddSeparator(ui::NORMAL_SEPARATOR);
    context_menu_contents_->AddItemWithStringId(
@@ -3601,10 +3508,10 @@ index 026d61a4d1..a12805697c 100644
  
    // If the controller adds menu commands, also override ExecuteCommand() and
 diff --git a/ui/views/controls/textfield/textfield.h b/ui/views/controls/textfield/textfield.h
-index a31c515db7..e2d3ab7f96 100644
+index 2ddf0e6d6c..2804637e11 100644
 --- a/ui/views/controls/textfield/textfield.h
 +++ b/ui/views/controls/textfield/textfield.h
-@@ -19,6 +19,7 @@
+@@ -20,6 +20,7 @@
  #include "base/memory/raw_ptr.h"
  #include "base/memory/weak_ptr.h"
  #include "base/timer/timer.h"
@@ -3612,7 +3519,7 @@ index a31c515db7..e2d3ab7f96 100644
  #include "build/build_config.h"
  #include "third_party/skia/include/core/SkColor.h"
  #include "ui/base/clipboard/clipboard_buffer.h"
-@@ -83,7 +84,7 @@ class VIEWS_EXPORT Textfield : public View,
+@@ -85,7 +86,7 @@ class VIEWS_EXPORT Textfield : public View,
  
   public:
    enum MenuCommands {
@@ -3643,7 +3550,7 @@ index 8ab42a4cec..14a2edaa72 100644
      }
    } else if (command_line->HasSwitch(kEnableExamples)) {
 diff --git a/ui/views/touchui/touch_selection_menu_views.cc b/ui/views/touchui/touch_selection_menu_views.cc
-index 75da5b100a..748484aa63 100644
+index 85fc2767da..49ba85a3f8 100644
 --- a/ui/views/touchui/touch_selection_menu_views.cc
 +++ b/ui/views/touchui/touch_selection_menu_views.cc
 @@ -11,6 +11,7 @@
@@ -3677,7 +3584,7 @@ index 75da5b100a..748484aa63 100644
  };
  
 diff --git a/ui/views/view.cc b/ui/views/view.cc
-index 223a778312..148db40696 100644
+index 9f45012495..91148b96ac 100644
 --- a/ui/views/view.cc
 +++ b/ui/views/view.cc
 @@ -20,6 +20,7 @@
@@ -3688,7 +3595,7 @@ index 223a778312..148db40696 100644
  #include "base/containers/flat_set.h"
  #include "base/debug/crash_logging.h"
  #include "base/debug/dump_without_crashing.h"
-@@ -1864,7 +1865,7 @@ void View::AddAccelerator(const ui::Accelerator& accelerator) {
+@@ -1871,7 +1872,7 @@ void View::AddAccelerator(const ui::Accelerator& accelerator) {
      accelerators_ = std::make_unique<std::vector<ui::Accelerator>>();
    }
  
@@ -3697,7 +3604,7 @@ index 223a778312..148db40696 100644
      accelerators_->push_back(accelerator);
    }
  
-@@ -2663,8 +2664,7 @@ void View::AddLayerToRegionImpl(
+@@ -2687,8 +2688,7 @@ void View::AddLayerToRegionImpl(
      ui::Layer* new_layer,
      std::vector<raw_ptr<ui::Layer, VectorExperimental>>& layer_vector) {
    DCHECK(new_layer);
@@ -3708,7 +3615,7 @@ index 223a778312..148db40696 100644
    new_layer->AddObserver(this);
    new_layer->SetVisible(GetVisible());
 diff --git a/ui/views/view.h b/ui/views/view.h
-index 6e3002f544..286cc94d3b 100644
+index ea27a73076..75aa86093c 100644
 --- a/ui/views/view.h
 +++ b/ui/views/view.h
 @@ -7,7 +7,6 @@
@@ -3727,7 +3634,7 @@ index 6e3002f544..286cc94d3b 100644
  #include "base/functional/callback.h"
  #include "base/gtest_prod_util.h"
  #include "base/memory/advanced_memory_safety_checks.h"
-@@ -532,7 +532,7 @@ class VIEWS_EXPORT View : public ui::LayerDelegate,
+@@ -530,7 +530,7 @@ class VIEWS_EXPORT View : public ui::LayerDelegate,
      CHECK(!view->owned_by_client())
          << "This should only be called if the client doesn't already have "
             "ownership of |view|.";
@@ -3737,7 +3644,7 @@ index 6e3002f544..286cc94d3b 100644
      return base::WrapUnique(view);
    }
 diff --git a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
-index 17476127a1..0a2962a811 100644
+index 942e685096..02737ba0a9 100644
 --- a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
 +++ b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
 @@ -9,6 +9,7 @@
@@ -3748,7 +3655,7 @@ index 17476127a1..0a2962a811 100644
  #include "base/functional/bind.h"
  #include "base/memory/raw_ptr.h"
  #include "base/notimplemented.h"
-@@ -1014,7 +1015,7 @@ void DesktopWindowTreeHostPlatform::OnCloseRequest() {
+@@ -1034,7 +1035,7 @@ void DesktopWindowTreeHostPlatform::OnCloseRequest() {
  
  void DesktopWindowTreeHostPlatform::OnAcceleratedWidgetAvailable(
      gfx::AcceleratedWidget widget) {
@@ -3771,7 +3678,7 @@ index 99bc5f99ee..445a0b3f76 100644
    children_.push_back(child);
  }
 diff --git a/ui/views/win/hwnd_message_handler_interactive_uitest.cc b/ui/views/win/hwnd_message_handler_interactive_uitest.cc
-index 576f79bd64..6d8fdc9e05 100644
+index 75ed0d7de4..09b58d6071 100644
 --- a/ui/views/win/hwnd_message_handler_interactive_uitest.cc
 +++ b/ui/views/win/hwnd_message_handler_interactive_uitest.cc
 @@ -5,6 +5,7 @@
@@ -3782,7 +3689,7 @@ index 576f79bd64..6d8fdc9e05 100644
  #include "testing/gtest/include/gtest/gtest.h"
  #include "ui/base/accelerators/accelerator.h"
  #include "ui/base/ime/mock_input_method.h"
-@@ -168,7 +169,7 @@ TEST_F(HWNDMessageHandlerTest, GetOwnedWindows) {
+@@ -170,7 +171,7 @@ TEST_F(HWNDMessageHandlerTest, GetOwnedWindows) {
  
    std::vector<HWND> owned_windows = parent_handler->GetOwnedWindows();
    ASSERT_EQ(1u, owned_windows.size());
@@ -3791,7 +3698,7 @@ index 576f79bd64..6d8fdc9e05 100644
  
    child_handler->CloseNow();
    parent_handler->CloseNow();
-@@ -208,9 +209,9 @@ TEST_F(HWNDMessageHandlerTest, GetOwnedWindows_Depth3) {
+@@ -210,9 +211,9 @@ TEST_F(HWNDMessageHandlerTest, GetOwnedWindows_Depth3) {
  
    std::vector<HWND> owned_windows = grandparent_handler->GetOwnedWindows();
    ASSERT_EQ(3u, owned_windows.size());
@@ -3875,7 +3782,7 @@ index 42e6756310..0fa1a3e4bd 100644
    return kShadowElevationInactiveWindow;
  }
 diff --git a/ui/wm/core/transient_window_manager.cc b/ui/wm/core/transient_window_manager.cc
-index dee2eb3507..fa14366fc2 100644
+index 6bc770d413..bbff5e46d1 100644
 --- a/ui/wm/core/transient_window_manager.cc
 +++ b/ui/wm/core/transient_window_manager.cc
 @@ -8,6 +8,7 @@
@@ -3884,9 +3791,9 @@ index dee2eb3507..fa14366fc2 100644
  #include "base/auto_reset.h"
 +#include "base/containers/contains.h"
  #include "base/memory/ptr_util.h"
+ #include "base/memory/weak_auto_reset.h"
  #include "base/observer_list.h"
- #include "ui/aura/client/transient_window_client.h"
-@@ -87,7 +88,7 @@ void TransientWindowManager::AddTransientChild(Window* child) {
+@@ -88,7 +89,7 @@ void TransientWindowManager::AddTransientChild(Window* child) {
    TransientWindowManager* child_manager = GetOrCreate(child);
    if (child_manager->transient_parent_)
      GetOrCreate(child_manager->transient_parent_)->RemoveTransientChild(child);
@@ -3895,7 +3802,7 @@ index dee2eb3507..fa14366fc2 100644
    transient_children_.push_back(child);
    child_manager->transient_parent_ = window_;
  
-@@ -166,7 +167,7 @@ void TransientWindowManager::RestackTransientDescendants() {
+@@ -167,7 +168,7 @@ void TransientWindowManager::RestackTransientDescendants() {
        Window::Windows(parent->children().rbegin(), parent->children().rend()));
    while (!tracker.windows().empty()) {
      auto* child_window = tracker.Pop();
@@ -3927,3 +3834,37 @@ index 7cf0960524..57e1d9ddda 100644
        }
        if (topmost_transient_child) {
          window_->parent()->layer()->StackAbove(
+diff --git a/ui/views/controls/textfield/textfield.cc b/ui/views/controls/textfield/textfield.cc
+index dfbadd66cc..08ca1f104e 100644
+--- a/ui/views/controls/textfield/textfield.cc
++++ b/ui/views/controls/textfield/textfield.cc
+@@ -1601,7 +1601,7 @@ bool Textfield::IsCommandIdEnabled(int command_id) const {
+   // This method is called for menus. For shortcuts, IsTextEditCommandEnabled()
+   // is called instead.
+   if (command_id ==
+-      std::to_underlying(ui::TouchEditable::MenuCommands::kPaste)) {
++      base::to_underlying(ui::TouchEditable::MenuCommands::kPaste)) {
+     return !GetReadOnly() && clipboard_contains_text_for_menu_;
+   }
+ 
+diff --git a/ui/views/touchui/touch_selection_controller_impl.cc b/ui/views/touchui/touch_selection_controller_impl.cc
+index 800cac3516..70e728954b 100644
+--- a/ui/views/touchui/touch_selection_controller_impl.cc
++++ b/ui/views/touchui/touch_selection_controller_impl.cc
+@@ -12,6 +12,7 @@
+ #include "base/memory/raw_ptr_exclusion.h"
+ #include "base/notreached.h"
+ #include "base/time/time.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "ui/aura/client/cursor_client.h"
+ #include "ui/aura/env.h"
+ #include "ui/aura/window.h"
+@@ -602,7 +603,7 @@ bool TouchSelectionControllerImpl::ShouldShowHandleFor(
+ bool TouchSelectionControllerImpl::IsCommandIdEnabled(int command_id,
+                                                       bool can_paste) const {
+   if (command_id ==
+-      std::to_underlying(ui::TouchEditable::MenuCommands::kPaste)) {
++      base::to_underlying(ui::TouchEditable::MenuCommands::kPaste)) {
+     return can_paste && client_view_->IsCommandIdEnabled(command_id);
+   }
+   return client_view_->IsCommandIdEnabled(command_id);

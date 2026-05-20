@@ -1,0 +1,27 @@
+diff --git a/device/fido/cable/v2_handshake.cc b/device/fido/cable/v2_handshake.cc
+index 653c0f0c34..cda589f066 100644
+--- a/device/fido/cable/v2_handshake.cc
++++ b/device/fido/cable/v2_handshake.cc
+@@ -218,8 +218,10 @@ std::array<uint8_t, kAdvertSize> Encrypt(
+   DCHECK(ReservedBitsAreZero(eid));
+ 
+   auto [aes_key_bytes, hmac_key_bytes] = key.split_at<32>();
+-  static_assert(aes_key_bytes.size() == 32u);
+-  static_assert(hmac_key_bytes.size() == 32u);
++  // static_assert(aes_key_bytes.size() == 32u);
++  static_assert(std::remove_reference_t<decltype(aes_key_bytes)>::extent == 32u);
++  // static_assert(hmac_key_bytes.size() == 32u);
++  static_assert(std::remove_reference_t<decltype(hmac_key_bytes)>::extent == 32u);
+   AES_KEY aes_key;
+   CHECK(AES_set_encrypt_key(aes_key_bytes.data(),
+                             /*bits=*/8 * aes_key_bytes.size(), &aes_key) == 0);
+@@ -261,7 +263,8 @@ std::optional<CableEidArray> Decrypt(
+              &calculated_hmac_len) != nullptr);
+   CHECK_EQ(calculated_hmac_len, sizeof(calculated_hmac));
+   static_assert(sizeof(calculated_hmac) >= 4u);
+-  static_assert(base::span(advert).subspan<AES_BLOCK_SIZE>().size() == 4u);
++  // static_assert(base::span(advert).subspan<AES_BLOCK_SIZE>().size() == 4u);
++  static_assert(kAdvertSize - AES_BLOCK_SIZE == 4u);
+   if (CRYPTO_memcmp(calculated_hmac, &advert[AES_BLOCK_SIZE], 4) != 0) {
+     return std::nullopt;
+   }
