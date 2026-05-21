@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Version should be equal to TERMUX_NDK_{VERSION_NUM,REVISION} in
 # scripts/properties.sh
 TERMUX_PKG_VERSION=29
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://dl.google.com/android/repository/android-ndk-r${TERMUX_PKG_VERSION}-linux.zip
 TERMUX_PKG_SHA256=4abbbcdc842f3d4879206e9695d52709603e52dd68d3c1fff04b3b5e7a308ecf
 TERMUX_PKG_AUTO_UPDATE=false
@@ -47,6 +47,7 @@ prepare_libs() {
 	cp $BASEDIR/libc++_shared.so $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib
 	cp $BASEDIR/lib{c,dl,m}.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/opt/ndk-multilib/$SUFFIX/lib
 	cp $BASEDIR/lib{c++_static,c++abi,c++experimental}.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib
+	cp toolchains/llvm/prebuilt/linux-x86_64/lib/libc++.modules.json $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib
 	echo 'INPUT(-lc++_static -lc++abi)' > $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib/libc++_shared.a
 
 	local f
