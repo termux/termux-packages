@@ -1,0 +1,290 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -63,7 +63,6 @@
+     KIO
+     I18n
+     JobWidgets
+-    NetworkManagerQt
+     Notifications
+     Service
+     Solid
+@@ -72,7 +71,6 @@
+     WindowSystem
+     KCMUtils
+     Svg
+-    ModemManagerQt
+ )
+ 
+ find_package(Plasma ${PROJECT_DEP_VERSION} REQUIRED)
+@@ -102,9 +100,6 @@
+ set_package_properties(KF6QuickCharts PROPERTIES
+                        TYPE RUNTIME)
+ 
+-pkg_check_modules(NETWORKMANAGER IMPORTED_TARGET libnm>1.4.0 REQUIRED)
+-pkg_check_modules(MOBILEBROADBANDPROVIDERINFO mobile-broadband-provider-info)
+-pkg_get_variable(BROADBANDPROVIDER_DATABASE mobile-broadband-provider-info database)
+ 
+ find_package(QCoro6 REQUIRED COMPONENTS Core DBus)
+ 
+@@ -119,10 +114,6 @@
+ remove_definitions(-DQT_NO_CAST_FROM_ASCII -DQT_NO_CAST_FROM_BYTEARRAY)
+ 
+ add_subdirectory(applet)
+-add_subdirectory(kded)
+-add_subdirectory(kcms)
+-add_subdirectory(libs)
+-add_subdirectory(vpn)
+ 
+ # Enable unit testing
+ if (BUILD_TESTING)
+
+--- a/applet/PopupDialog.qml
++++ b/applet/PopupDialog.qml
+@@ -4,6 +4,14 @@
+     SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
+ */
+ 
++/* ifdef TERMUX */
++import QtQuick
++import QtQuick.Layouts
++import org.kde.plasma.components as PlasmaComponents3
++import org.kde.plasma.extras as PlasmaExtras
++import org.kde.kirigami as Kirigami
++import org.kde.plasma.plasmoid
++/* else
+ import QtQuick
+ import QtQuick.Controls as QQC2
+ import QtQuick.Layouts
+@@ -11,10 +19,50 @@
+ import org.kde.plasma.extras as PlasmaExtras
+ import org.kde.plasma.networkmanagement as PlasmaNM
+ import org.kde.plasma.plasmoid
++endif */
+ 
+ PlasmaExtras.Representation {
+     id: full
+ 
++/* ifdef TERMUX */
++    property bool wifiConnected: false
++    property bool mobileConnected: false
++    property string operatorName: ""
++    property string mobileIcon: ""
++    property string wifiIcon: "network-wireless-connected-100"
++
++    collapseMarginsHint: true
++
++    header: PlasmaExtras.PlasmoidHeading {
++        contentItem: Toolbar {
++            wifiConnected: full.wifiConnected
++            mobileConnected: full.mobileConnected
++            operatorName: full.operatorName
++        }
++    }
++
++    ColumnLayout {
++        anchors.centerIn: parent
++        spacing: Kirigami.Units.smallSpacing
++
++        Kirigami.Icon {
++            Layout.alignment: Qt.AlignHCenter
++            width: Kirigami.Units.iconSizes.huge
++            height: Kirigami.Units.iconSizes.huge
++            isMask: true
++            source: full.wifiConnected ? full.wifiIcon
++                  : full.mobileConnected ? full.mobileIcon
++                  : "network-disconnect"
++        }
++
++        PlasmaComponents3.Label {
++            Layout.alignment: Qt.AlignHCenter
++            text: full.wifiConnected ? i18n("Wi-Fi Connected")
++                : full.mobileConnected ? full.operatorName
++                : i18n("No Network Connection")
++        }
++    }
++/* else
+     required property PlasmaNM.Handler nmHandler
+     required property PlasmaNM.NetworkStatus nmStatus
+ 
+@@ -127,4 +175,5 @@
+             }
+         }
+     }
++endif */
+ }
+
+--- a/applet/Toolbar.qml
++++ b/applet/Toolbar.qml
+@@ -4,6 +4,13 @@
+     SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
+ */
+ 
++/* ifdef TERMUX */
++import QtQuick
++import QtQuick.Layouts
++import org.kde.plasma.components as PlasmaComponents3
++import org.kde.kirigami as Kirigami
++import org.kde.plasma.extras as PlasmaExtras
++/* else
+ import QtQuick
+ import QtQuick.Layouts
+ import org.kde.plasma.components as PlasmaComponents3
+@@ -12,10 +19,26 @@
+ import org.kde.plasma.extras as PlasmaExtras
+ import org.kde.plasma.networkmanagement as PlasmaNM
+ import org.kde.kcmutils as KCMUtils
++endif */
+ 
+ RowLayout {
+     id: toolbar
+ 
++/* ifdef TERMUX */
++    property bool wifiConnected: false
++    property bool mobileConnected: false
++    property string operatorName: ""
++
++    spacing: Kirigami.Units.smallSpacing
++
++    PlasmaComponents3.Label {
++        Layout.fillWidth: true
++        horizontalAlignment: Text.AlignHCenter
++        text: wifiConnected ? i18n("Wi-Fi Connected")
++            : mobileConnected ? operatorName
++            : i18n("No Network Connection")
++    }
++/* else
+     readonly property var displayWifiOffMessage: !wifiSwitchButton.checked && wifiSwitchButton.visible
+     readonly property var displayWifiConnectingMessage: wifiSwitchButton.checked && wifiSwitchButton.visible && searchTextField.text.length === 0
+     readonly property var displayWwanMessage: !wwanSwitchButton.checked && wwanSwitchButton.visible
+@@ -257,4 +280,5 @@
+             KCMUtils.KCMLauncher.openSystemSettings(mainWindow.kcm)
+         }
+     }
++endif */
+ }
+
+--- a/applet/main.qml
++++ b/applet/main.qml
+@@ -4,6 +4,14 @@
+     SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
+ */
+ 
++/* ifdef TERMUX */
++import QtQuick
++import QtCore
++import org.kde.plasma.plasmoid
++import org.kde.kirigami as Kirigami
++import org.kde.plasma.plasma5support as Plasma5Support
++import QtQuick.Layouts
++/* else
+ import QtQuick
+ import org.kde.plasma.plasmoid
+ import org.kde.kirigami as Kirigami
+@@ -13,10 +21,79 @@
+ import QtQuick.Layouts
+ import org.kde.kcmutils as KCMUtils
+ import org.kde.config as KConfig
++endif */
+ 
+ PlasmoidItem {
+     id: mainWindow
+ 
++/* ifdef TERMUX */
++    property var wifiJson: ({})
++    property var mobileJson: ({})
++
++    readonly property bool wifiConnected: wifiJson.supplicant_state === "COMPLETED"
++    readonly property bool mobileConnected: mobileJson.data_state === "connected"
++    readonly property string operatorName: mobileJson.network_operator_name ?? ""
++
++    readonly property string wifiIcon: {
++        const rssi = wifiJson.rssi ?? -100
++        if (rssi >= -55) return "network-wireless-connected-100"
++        if (rssi >= -65) return "network-wireless-connected-75"
++        if (rssi >= -75) return "network-wireless-connected-50"
++        if (rssi >= -85) return "network-wireless-connected-25"
++        return "network-wireless-connected-00"
++    }
++
++    readonly property string mobileIconName: {
++        const t = (mobileJson.network_type ?? "").toLowerCase()
++        if (t === "nr" || t === "nrnsa") return "network-mobile-100-5g"
++        if (t === "lte" || t === "lte_ca") return "network-mobile-100-lte"
++        if (t === "hspa") return "network-mobile-100-hspa"
++        if (t === "hsupa") return "network-mobile-100-hsupa"
++        if (t === "hsdpa" || t === "hspap") return "network-mobile-100-hsdpa"
++        if (t === "umts") return "network-mobile-100-umts"
++        if (t === "edge") return "network-mobile-100-edge"
++        if (t === "gprs") return "network-mobile-100-gprs"
++        return "network-mobile-100"
++    }
++
++    readonly property string mobileIcon: {
++        const found = StandardPaths.locate(
++            StandardPaths.GenericDataLocation,
++            "icons/breeze/status/22/" + mobileIconName + ".svg"
++        )
++        const fallback = StandardPaths.locate(
++            StandardPaths.GenericDataLocation,
++            "icons/breeze/status/22/network-mobile-100.svg"
++        )
++        return found !== "" ? found : fallback
++    }
++
++    toolTipMainText: i18n("Networks")
++    toolTipSubText: wifiConnected ? i18n("Wi-Fi Connected")
++                  : mobileConnected ? operatorName
++                  : i18n("Disconnected")
++
++    Plasmoid.busy: false
++    Plasmoid.icon: wifiConnected ? wifiIcon
++                 : mobileConnected ? mobileIcon
++                 : "network-disconnect-symbolic"
++
++    switchWidth: Kirigami.Units.gridUnit * 10
++    switchHeight: Kirigami.Units.gridUnit * 10
++
++    fullRepresentation: PopupDialog {
++        id: dialogItem
++        wifiConnected: mainWindow.wifiConnected
++        mobileConnected: mainWindow.mobileConnected
++        operatorName: mainWindow.operatorName
++        mobileIcon: mainWindow.mobileIcon
++        wifiIcon: mainWindow.wifiIcon
++        Layout.minimumWidth: Kirigami.Units.iconSizes.medium * 10
++        Layout.minimumHeight: Kirigami.Units.gridUnit * 10
++        anchors.fill: parent
++        focus: true
++    }
++/* else
+     readonly property string kcm: "kcm_networkmanagement"
+     readonly property bool kcmAuthorized: KConfig.KAuthorized.authorizeControlModule("kcm_networkmanagement")
+     readonly property bool delayModelUpdates: fullRepresentationItem !== null
+@@ -152,4 +229,27 @@
+ 
+         onTriggered: handler.requestScan()
+     }
++endif */
++
++/* ifdef TERMUX */
++    Plasma5Support.DataSource {
++        id: wifiSource
++        engine: "executable"
++        connectedSources: ["termux-wifi-connectioninfo"]
++        interval: 30000
++        onNewData: (source, data) => {
++            try { mainWindow.wifiJson = JSON.parse(data["stdout"]) } catch(e) {}
++        }
++    }
++
++    Plasma5Support.DataSource {
++        id: mobileSource
++        engine: "executable"
++        connectedSources: ["termux-telephony-deviceinfo"]
++        interval: 30000
++        onNewData: (source, data) => {
++            try { mainWindow.mobileJson = JSON.parse(data["stdout"]) } catch(e) {}
++        }
++    }
++/* endif */
+ }
