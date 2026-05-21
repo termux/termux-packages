@@ -19,7 +19,8 @@ termux_step_pre_configure() {
 	cargo vendor
 	find ./vendor \
 		-mindepth 1 -maxdepth 1 -type d \
-		! -wholename ./vendor/trash -o -wholename ./vendor/lua-src \
+		! -wholename ./vendor/trash \
+		! -wholename ./vendor/lua-src \
 		-exec rm -rf '{}' \;
 	find vendor/trash -type f -print0 | \
 		xargs -0 sed -i \
@@ -32,19 +33,18 @@ termux_step_pre_configure() {
 	echo "Applying patch: $patch"
 	patch -p1 -d "$dir" < "$patch"
 
-	echo "" >> Cargo.toml
-	echo '[patch.crates-io]' >> Cargo.toml
-	echo 'trash = { path = "./vendor/trash" }' >> Cargo.toml
-
 	# patch lua-src
 	local patch="$TERMUX_PKG_BUILDER_DIR/lua-src-fix-target-match.diff"
 	local dir="vendor/lua-src"
 	echo "Applying patch: $patch"
 	patch -p1 -d "$dir" < "$patch"
 
-	echo "" >> Cargo.toml
-	echo '[patch.crates-io]' >> Cargo.toml
-	echo 'lua-src = { path = "./vendor/lua-src" }' >> Cargo.toml
+	cat >> Cargo.toml <<-EOF
+
+		[patch.crates-io]
+		trash = { path = "./vendor/trash" }
+		lua-src = { path = "./vendor/lua-src" }
+	EOF
 }
 
 termux_step_make() {
