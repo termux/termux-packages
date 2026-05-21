@@ -19,13 +19,14 @@ termux_step_pre_configure() {
 	cargo vendor
 	find ./vendor \
 		-mindepth 1 -maxdepth 1 -type d \
-		! -wholename ./vendor/trash \
+		! -wholename ./vendor/trash -o -wholename ./vendor/lua-src \
 		-exec rm -rf '{}' \;
 	find vendor/trash -type f -print0 | \
 		xargs -0 sed -i \
 		-e 's|"android"|"disabling_this_because_it_is_for_building_an_apk"|g' \
 		-e "s|/tmp|$TERMUX_PREFIX/tmp|g"
 
+	# patch trash-rs
 	local patch="$TERMUX_PKG_BUILDER_DIR/trash-rs-implement-get_mount_points-android.diff"
 	local dir="vendor/trash"
 	echo "Applying patch: $patch"
@@ -35,19 +36,15 @@ termux_step_pre_configure() {
 	echo '[patch.crates-io]' >> Cargo.toml
 	echo 'trash = { path = "./vendor/trash" }' >> Cargo.toml
 
-	find ./vendor \
-		-mindepth 1 -maxdepth 1 -type d \
-		! -wholename ./vendor/cc \
-		-exec rm -rf '{}' \;
-
-	local patch="$TERMUX_PKG_BUILDER_DIR/rust-cc-do-not-concatenate-all-the-CFLAGS.diff"
-	local dir="vendor/cc"
+	# patch lua-src
+	local patch="$TERMUX_PKG_BUILDER_DIR/lua-src-fix-target-match.diff"
+	local dir="vendor/lua-src"
 	echo "Applying patch: $patch"
 	patch -p1 -d "$dir" < "$patch"
 
 	echo "" >> Cargo.toml
 	echo '[patch.crates-io]' >> Cargo.toml
-	echo 'cc = { path = "./vendor/cc" }' >> Cargo.toml
+	echo 'lua-src = { path = "./vendor/lua-src" }' >> Cargo.toml
 }
 
 termux_step_make() {
