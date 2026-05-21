@@ -21,7 +21,6 @@ termux_step_pre_configure() {
 		-mindepth 1 -maxdepth 1 -type d \
 		! -wholename ./vendor/trash \
 		-exec rm -rf '{}' \;
-
 	find vendor/trash -type f -print0 | \
 		xargs -0 sed -i \
 		-e 's|"android"|"disabling_this_because_it_is_for_building_an_apk"|g' \
@@ -35,6 +34,20 @@ termux_step_pre_configure() {
 	echo "" >> Cargo.toml
 	echo '[patch.crates-io]' >> Cargo.toml
 	echo 'trash = { path = "./vendor/trash" }' >> Cargo.toml
+
+	find ./vendor \
+		-mindepth 1 -maxdepth 1 -type d \
+		! -wholename ./vendor/cc \
+		-exec rm -rf '{}' \;
+
+	local patch="$TERMUX_PKG_BUILDER_DIR/rust-cc-do-not-concatenate-all-the-CFLAGS.diff"
+	local dir="vendor/cc"
+	echo "Applying patch: $patch"
+	patch -p1 -d "$dir" < "$patch"
+
+	echo "" >> Cargo.toml
+	echo '[patch.crates-io]' >> Cargo.toml
+	echo 'cc = { path = "./vendor/cc" }' >> Cargo.toml
 }
 
 termux_step_make() {
