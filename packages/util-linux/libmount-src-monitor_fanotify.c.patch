@@ -1,0 +1,14 @@
+--- a/libmount/src/monitor_fanotify.c
++++ b/libmount/src/monitor_fanotify.c
+@@ -25,7 +25,10 @@
+ #include "strutils.h"
+ #include "pathnames.h"
+ 
+-#include <sys/fanotify.h>
++#include <linux/fanotify.h>
++#include <sys/syscall.h>
++#define fanotify_init(flags,event_f_flags) syscall(SYS_fanotify_init,flags,event_f_flags)
++#define fanotify_mark(fanotify_fd,flags,mask,dirfd,path) syscall(SYS_fanotify_init,fanotify_fd,flags,mask,dirfd,path)
+ #include <sys/epoll.h>
+ 
+ #ifndef FAN_MNT_ATTACH
