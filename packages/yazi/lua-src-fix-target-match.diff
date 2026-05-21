@@ -1,0 +1,14 @@
+diff --git a/src/lib.rs b/src/lib.rs
+index d3ccf84..4b1da54 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -136,6 +136,9 @@ impl Build {
+             _ if target.contains("linux") => {
+                 config.define("LUA_USE_LINUX", None);
+             }
++            _ if target.ends_with("android") => {
++                config.define("LUA_USE_POSIX", None);
++            }
+             _ if target.ends_with("bsd") => {
+                 config.define("LUA_USE_LINUX", None);
+             }
