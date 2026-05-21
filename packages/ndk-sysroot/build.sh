@@ -108,7 +108,7 @@ termux_step_make_install() {
 	cp -fr toolchains/llvm/prebuilt/linux-x86_64/share/libc++ \
 		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share"
 
-	sed -i "s#\.\./\.\.#..#g" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libc++.modules.json"
+	sed -i "s#\.\./\.\./share#../share#g" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libc++.modules.json"
 
 	# librt and libpthread are built into libc on android, so setup them as symlinks
 	# to libc for compatibility with programs that users try to build:
