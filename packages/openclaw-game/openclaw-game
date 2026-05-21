@@ -1,0 +1,24 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# OpenClaw Game Launcher
+
+TERMUX_PREFIX="/data/data/com.termux/files/usr"
+DATA_DIR="${1:-$TERMUX_PREFIX/share/openclaw-game}"
+
+# Check game binary
+if [ ! -f "$TERMUX_PREFIX/bin/openclaw" ]; then
+    echo "Error: openclaw not installed!"
+    exit 1
+fi
+
+# Check assets
+if [ ! -f "$DATA_DIR/RE1.PAL" ]; then
+    echo "Game files not found!"
+    echo "Copy Claw files to: $DATA_DIR"
+    exit 1
+fi
+
+export SDL_VIDEODRIVER=x11
+export DISPLAY=:1
+
+cd "$DATA_DIR"
+exec "$TERMUX_PREFIX/bin/openclaw" "$@"
