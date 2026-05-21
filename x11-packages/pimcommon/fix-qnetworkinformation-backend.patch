@@ -1,0 +1,28 @@
+--- a/src/pimcommonakonadi/addressline/addresslineedit/addresseelineeditmanager.cpp
++++ b/src/pimcommonakonadi/addressline/addresslineedit/addresseelineeditmanager.cpp
+@@ -118,6 +118,17 @@ void AddresseeLineEditManager::setAddressLineEdit(AddresseeLineEdit *addressLine
+ 
+ bool AddresseeLineEditManager::isOnline() const
+ {
++#ifdef __TERMUX__
++    bool isBackendLoaded = QNetworkInformation::loadBackendByFeatures(QNetworkInformation::Feature::Reachability);
++    if (!isBackendLoaded) {
++        return true;
++    }
++
++    const auto info = QNetworkInformation::instance();
++    return info
++        && info->reachability() == QNetworkInformation::Reachability::Online
++        && !info->isBehindCaptivePortal();
++#else
+     bool isBackendLoaded = QNetworkInformation::loadBackendByFeatures(QNetworkInformation::Feature::Reachability);
+     if (isBackendLoaded) {
+         return QNetworkInformation::instance()->reachability() == QNetworkInformation::Reachability::Online
+@@ -126,6 +137,7 @@ bool AddresseeLineEditManager::isOnline() const
+         qCWarning(PIMCOMMONAKONADI_LOG) << "Couldn't find a working backend for QNetworkInformation";
+         return false;
+     }
++#endif
+ }
+ 
+ KLDAPCore::LdapClientSearch *AddresseeLineEditManager::ldapSearch() const
