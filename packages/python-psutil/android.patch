@@ -11,3 +11,18 @@ https://github.com/giampaolo/psutil/issues/2743
  MACOS = sys.platform.startswith("darwin")
  OSX = MACOS  # deprecated alias
  FREEBSD = sys.platform.startswith(("freebsd", "midnightbsd"))
+--- a/psutil/_pslinux.py
++++ b/psutil/_pslinux.py
+@@ -1209,8 +1209,11 @@ def disk_partitions(all=False):
+     """Return mounted disk partitions as a list of namedtuples."""
+     fstypes = set()
+     procfs_path = get_procfs_path()
++    proc_filesystems_path = procfs_path + "/filesystems"
++    if not os.access(proc_filesystems_path, os.R_OK):
++        proc_filesystems_path = "@TERMUX_PREFIX@/etc/psutil/filesystems"
+     if not all:
+-        with open_text(f"{procfs_path}/filesystems") as f:
++        with open_text(proc_filesystems_path) as f:
+             for line in f:
+                 line = line.strip()
+                 if not line.startswith("nodev"):
