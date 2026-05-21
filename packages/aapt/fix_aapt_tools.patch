@@ -1,0 +1,77 @@
+diff --git a/submodules/base/tools/aapt2/ResourceTable.cpp b/submodules/base/tools/aapt2/ResourceTable.cpp
+index a3b0b45d..1ddb4f12 100644
+--- a/submodules/base/tools/aapt2/ResourceTable.cpp
++++ b/submodules/base/tools/aapt2/ResourceTable.cpp
+@@ -470,9 +470,10 @@ bool ResourceTable::AddResource(NewResource&& res, android::IDiagnostics* diag)
+   const bool validate = validation_ == Validation::kEnabled;
+   const android::Source source = res.value ? res.value->GetSource() : android::Source{};
+   if (validate && !res.allow_mangled && !IsValidResourceEntryName(res.name.entry)) {
+-    diag->Error(android::DiagMessage(source)
+-                << "resource '" << res.name << "' has invalid entry name '" << res.name.entry);
+-    return false;
++    // Apktool
++    // diag->Error(android::DiagMessage(source)
++    //             << "resource '" << res.name << "' has invalid entry name '" << res.name.entry);
++    // return false;
+   }
+ 
+   if (res.id.has_value() && !res.id->first.is_valid()) {
+diff --git a/submodules/base/tools/aapt2/ResourceUtils.cpp b/submodules/base/tools/aapt2/ResourceUtils.cpp
+index d358df98..7daa7b21 100644
+--- a/submodules/base/tools/aapt2/ResourceUtils.cpp
++++ b/submodules/base/tools/aapt2/ResourceUtils.cpp
+@@ -217,7 +217,8 @@ bool ParseAttributeReference(StringPiece str, ResourceNameRef* out_ref) {
+     }
+ 
+     if (!type.empty() && type != "attr") {
+-      return false;
++      // Apktool: Don't die out if private resource.
++      // return false;
+     }
+ 
+     if (entry.empty()) {
+diff --git a/submodules/base/tools/aapt2/java/JavaClassGenerator.cpp b/submodules/base/tools/aapt2/java/JavaClassGenerator.cpp
+index 6e73b017..e3db14f8 100644
+--- a/submodules/base/tools/aapt2/java/JavaClassGenerator.cpp
++++ b/submodules/base/tools/aapt2/java/JavaClassGenerator.cpp
+@@ -58,7 +58,9 @@ static const std::set<StringPiece> sJavaIdentifiers = {
+     "true",       "false",        "null"};
+ 
+ static bool IsValidSymbol(StringPiece symbol) {
+-  return sJavaIdentifiers.find(symbol) == sJavaIdentifiers.end();
++  // Apktool: Everything is a valid symbol
++  return true;
++  // return sJavaIdentifiers.find(symbol) == sJavaIdentifiers.end();
+ }
+ 
+ // Java symbols can not contain . or -, but those are valid in a resource name.
+diff --git a/submodules/base/tools/aapt2/link/PrivateAttributeMover.cpp b/submodules/base/tools/aapt2/link/PrivateAttributeMover.cpp
+index 8c6c743d..f9a70d3f 100644
+--- a/submodules/base/tools/aapt2/link/PrivateAttributeMover.cpp
++++ b/submodules/base/tools/aapt2/link/PrivateAttributeMover.cpp
+@@ -82,7 +82,8 @@ bool PrivateAttributeMover::Consume(IAaptContext* context, ResourceTable* table)
+ 
+     auto attr_private_type = ResourceNamedTypeWithDefaultName(ResourceType::kAttrPrivate);
+     ResourceTableType* priv_attr_type = package->FindOrCreateType(attr_private_type);
+-    CHECK(priv_attr_type->entries.empty());
++    // Apktool
++    // CHECK(priv_attr_type->entries.empty());
+     priv_attr_type->entries = std::move(private_attr_entries);
+   }
+   return true;
+diff --git a/submodules/base/tools/aapt2/link/ReferenceLinker.cpp b/submodules/base/tools/aapt2/link/ReferenceLinker.cpp
+index c69b3251..c7662625 100644
+--- a/submodules/base/tools/aapt2/link/ReferenceLinker.cpp
++++ b/submodules/base/tools/aapt2/link/ReferenceLinker.cpp
+@@ -299,8 +299,9 @@ const SymbolTable::Symbol* ReferenceLinker::ResolveSymbolCheckVisibility(const R
+   }
+ 
+   if (!IsSymbolVisible(*symbol, reference, callsite)) {
+-    if (out_error) *out_error = "is private";
+-    return nullptr;
++    // if (out_error) *out_error = "is private";
++    // Apktool
++    // return nullptr;
+   }
+   return symbol;
+ }
