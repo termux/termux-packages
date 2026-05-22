@@ -1,6 +1,6 @@
 termux_setup_gn() {
 	termux_setup_ninja
-	local GN_COMMIT=64d35867ca0a1088f13de8f4ccaf1a5687d7f1ce
+	local GN_COMMIT=e44942b445d9376451f7d519965dae036efde5bc
 	local GN_TARFILE=$TERMUX_COMMON_CACHEDIR/gn_$GN_COMMIT.tar.gz
 	local GN_SOURCE=https://gn.googlesource.com/gn/+archive/$GN_COMMIT.tar.gz
 
@@ -19,10 +19,11 @@ termux_setup_gn() {
 				$GN_SOURCE \
 				$GN_TARFILE \
 				SKIP_CHECKSUM
-			mkdir -p $GN_FOLDER
-			tar xf $GN_TARFILE -C $GN_FOLDER
+			rm -rf "$GN_FOLDER".tmp
+			mkdir -p "$GN_FOLDER".tmp
+			tar xf $GN_TARFILE -C "$GN_FOLDER".tmp
 			local LAST_PWD=$(pwd)
-			cd $GN_FOLDER
+			cd "$GN_FOLDER".tmp
 			(
 				unset CC CXX CFLAGS CXXFLAGS LD LDFLAGS AR AS CPP OBJCOPY OBJDUMP RANLIB READELF STRIP
 				export CC="clang-${TERMUX_HOST_LLVM_MAJOR_VERSION}"
@@ -34,13 +35,14 @@ termux_setup_gn() {
 				cat <<-EOF >./out/last_commit_position.h
 					#ifndef OUT_LAST_COMMIT_POSITION_H_
 					#define OUT_LAST_COMMIT_POSITION_H_
-					#define LAST_COMMIT_POSITION_NUM 2311
-					#define LAST_COMMIT_POSITION "2311 ${GN_COMMIT:0:12}"
+					#define LAST_COMMIT_POSITION_NUM 2405
+					#define LAST_COMMIT_POSITION "2405 ${GN_COMMIT:0:12}"
 					#endif  // OUT_LAST_COMMIT_POSITION_H_
 				EOF
 				ninja -C out/
 			)
 			cd $LAST_PWD
+			mv "$GN_FOLDER".tmp "$GN_FOLDER"
 		fi
 		export PATH=$GN_FOLDER/out:$PATH
 	else
