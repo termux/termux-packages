@@ -1,0 +1,10 @@
+--- a/src/solc.rs	2026-05-22 15:19:03.052904138 +0600
++++ b/src/solc.rs	2026-05-22 15:32:18.016904185 +0600
+@@ -55,6 +55,7 @@
+     constraint: Option<&PragmaConstraint>,
+     client: Option<&tower_lsp::Client>,
+ ) -> PathBuf {
++    return PathBuf::from("solc");
+     // 1. Try pragma constraint (may be tightened from the full import graph)
+     if let Some(constraint) = constraint {
+         // For exact pragmas, always honour the file — foundry.toml can't override
