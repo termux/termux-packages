@@ -1,0 +1,27 @@
+reverts the change in
+https://github.com/RsyncProject/rsync/commit/4fa7156ccdb2ad34b034d18fe2fd6cd79adef8a1
+that is causing https://github.com/RsyncProject/rsync/issues/904 and
+https://www.reddit.com/r/termux/comments/1tivbjl/rsync_errors_since_upgrade/
+
+diff --git a/syscall.c b/syscall.c
+index e317bcc..1e2897c 100644
+--- a/syscall.c
++++ b/syscall.c
+@@ -1691,7 +1691,7 @@ static int path_has_dotdot_component(const char *path)
+ 	return 0;
+ }
+ 
+-#ifdef __linux__
++#if 0
+ static int secure_relative_open_linux(const char *basedir, const char *relpath, int flags, mode_t mode)
+ {
+ 	struct open_how how;
+@@ -1791,7 +1791,7 @@ int secure_relative_open(const char *basedir, const char *relpath, int flags, mo
+ 		return -1;
+ 	}
+ 
+-#ifdef __linux__
++#if 0
+ 	{
+ 		int fd = secure_relative_open_linux(basedir, relpath, flags, mode);
+ 		/* ENOSYS = kernel < 5.6 doesn't have the syscall even though
