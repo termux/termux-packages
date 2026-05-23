@@ -6,10 +6,10 @@ TERMUX_PKG_VERSION="1.16.0"
 TERMUX_PKG_SRCURL=https://github.com/gleam-lang/gleam/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=dd676c5faff4963d7a26683b164788a09f1261326bcb1c7fc20e001ed3843c30
 TERMUX_PKG_DEPENDS="erlang"
-TERMUX_PKG_SUGGESTS="nodejs | nodejs-lts"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="nodejs, nodejs-lts"
-TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_SUGGESTS="nodejs | nodejs-lts"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_configure() {
 	termux_setup_rust

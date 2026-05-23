@@ -7,12 +7,12 @@ TERMUX_PKG_REVISION=1
 # The upstream w3m project is dead, this is the fork shipped by e.g. Arch Linux.
 TERMUX_PKG_SRCURL="https://git.sr.ht/~rkta/w3m/archive/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=8dd652cd3f31817d68c7263c34eeffb50118c80be19e1159bf8cbf763037095e
-TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_BUILD_DEPENDS="imlib2, libsixel"
 TERMUX_PKG_DEPENDS="libgc, ncurses, openssl, zlib"
+TERMUX_PKG_BUILD_DEPENDS="imlib2, libsixel"
 TERMUX_PKG_SUGGESTS="imlib2, libsixel, perl"
 TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_AUTO_UPDATE=true
 
 # ac_cv_func_bcopy=yes to avoid w3m defining it's own bcopy function, which
 # breaks 64-bit builds where NDK headers define bcopy as a macro:
