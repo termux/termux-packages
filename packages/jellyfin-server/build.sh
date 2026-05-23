@@ -17,8 +17,8 @@ TERMUX_PKG_SHA256=(
 	4f31a4c37b1cda6013beb379e2ef8882dc2b8fa182dd6cdc5bb6fec54a543edd
 	2e869699fe2ec73649ba2579a904ec737e19555549bf789d8769a854e9179d8c
 )
-TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-9.0, dotnet-targeting-pack-9.0, libcairo, pango, libjpeg-turbo, giflib, librsvg"
 TERMUX_PKG_DEPENDS="aspnetcore-runtime-9.0, dotnet-host, dotnet-runtime-9.0, libskiasharp, libesqlite3, jellyfin-ffmpeg"
+TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-9.0, dotnet-targeting-pack-9.0, libcairo, pango, libjpeg-turbo, giflib, librsvg"
 TERMUX_PKG_SERVICE_SCRIPT=(
 	"jellyfin"
 	"exec ${TERMUX_PREFIX}/bin/jellyfin 2>&1"
