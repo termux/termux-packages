@@ -524,6 +524,8 @@ _show_usage() {
 	echo "  -F Force build even if package and its dependencies have already been built."
 	[[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]] && echo "  -i Download and extract dependencies instead of building them."
 	echo "  -I Download and extract dependencies instead of building them, keep existing $TERMUX_BASE_DIR files."
+	echo "  -j <N> Number of threads. (default or 0, N = \`nproc\` = $(nproc))"
+	echo "         Can also be passed combined, e.g. '-j12'."
 	echo "  -L The package and its dependencies will be based on the same library."
 	echo "  -q Quiet build."
 	echo "  -Q Loud build -- set -x debug output and function tracing."
@@ -583,6 +585,21 @@ while (( $# )); do
 		-I)
 			export TERMUX_INSTALL_DEPS=true
 			export TERMUX_PKGS__BUILD__RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES=false
+		;;
+		-j|-j[0-9]*)
+			# If we got the 2 arg form discard the "-j".
+			[[ "$1" == "-j" && "${2:-}" == [0-9]* ]] && shift 1
+			# Check that -j's argument exists and is numeric.
+			[[ -n "${1/-j}" && "${1/-j}" =~ ^[0-9]+$ ]] || termux_error_exit "./build-package.sh: option '-j' only takes integers"
+
+			# Assign the requested number of threads.
+			# If the result is 0 or negative then default to `nproc`
+			TERMUX_PKG_MAKE_PROCESSES="${1/-j}"
+			if (( TERMUX_PKG_MAKE_PROCESSES < 1 )); then
+				TERMUX_PKG_MAKE_PROCESSES="$(nproc)"
+			fi
+
+			export TERMUX_PKG_MAKE_PROCESSES
 		;;
 		-L) export TERMUX_GLOBAL_LIBRARY=true;;
 		-q) export TERMUX_QUIET_BUILD=true;;
