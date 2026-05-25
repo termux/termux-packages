@@ -3,18 +3,17 @@ TERMUX_PKG_DESCRIPTION="A free media system for organizing and streaming media (
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(
-	10.11.8
+	10.11.10
 	7.1.3.6
 )
-TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=(
 	"https://github.com/jellyfin/jellyfin/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.tar.gz"
 	"https://github.com/jellyfin/jellyfin-web/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.zip"
 	"https://github.com/jellyfin/jellyfin-ffmpeg/archive/refs/tags/v${TERMUX_PKG_VERSION[1]%.*}-${TERMUX_PKG_VERSION[1]##*.}.tar.gz"
 )
 TERMUX_PKG_SHA256=(
-	56b1bdc12c483b9396fd24326f5506f7baabcfe6e32f7095a8a8719afeabacae
-	21dc89954e3c9285778d322ac2286dd937bbb76fb43d72af4a8347eaddd8b3aa
+	76a4126107c6ced0e871a0f6a86de10196d8a931790ef0d31460443887aeee7e
+	2fa0da84a717871a3cba1a132fc0f4f221bc47de79f8b5c7822ecb3b501b36e5
 	3a1aa0ebfa15794110cf031d0e3fa528b907961580474356c2344122484c8a34
 )
 TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-9.0, dotnet-targeting-pack-9.0, libcairo, pango, libjpeg-turbo, giflib, librsvg"
