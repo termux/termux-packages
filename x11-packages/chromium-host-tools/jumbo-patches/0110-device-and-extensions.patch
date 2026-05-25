@@ -1438,3 +1438,22 @@ index fa5a6c1c2f..5c0681f071 100644
    if (result != base::File::FILE_OK) {
      error_ = "Error in copying files from sync filesystem.";
      success_ = false;
+diff --git a/device/gamepad/udev_gamepad_linux.cc b/device/gamepad/udev_gamepad_linux.cc
+index a7578effcd..ba2135ed71 100644
+--- a/device/gamepad/udev_gamepad_linux.cc
++++ b/device/gamepad/udev_gamepad_linux.cc
+@@ -8,6 +8,8 @@
+ #include "base/strings/string_util.h"
+ #include "device/udev_linux/udev.h"
+ 
++#define ToStringView ToStringView_udev_gamepad_linux
++
+ namespace device {
+ 
+ namespace {
+@@ -120,3 +122,5 @@ std::unique_ptr<UdevGamepadLinux> UdevGamepadLinux::Create(udev_device* dev) {
+ }
+ 
+ }  // namespace device
++
++#undef ToStringView

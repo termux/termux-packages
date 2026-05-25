@@ -14,9 +14,9 @@ Subject: [PATCH 7/8] content
  .../aggregatable_report_assembler.cc          |  3 +-
  .../aggregatable_report_scheduler.cc          |  2 +-
  .../aggregation_service_test_utils.cc         |  3 +-
+ content/browser/ai/echo_ai_manager_impl.cc    |  9 +--
  .../attribution_resolver_impl.cc              |  7 +-
  .../attribution_src_browsertest.cc            | 19 ++---
- .../attribution_storage_sql.cc                |  1 +
  .../attributions_browsertest.cc               | 21 ++---
  .../sql_query_plan_test_util.cc               |  5 +-
  .../browser/back_forward_cache_browsertest.cc |  6 +-
@@ -25,7 +25,6 @@ Subject: [PATCH 7/8] content
  .../background_sync_manager.cc                |  5 +-
  .../browser/bluetooth/advertisement_client.cc |  3 +-
  .../bluetooth_adapter_factory_wrapper.cc      |  3 +-
- .../bluetooth/bluetooth_allowed_devices.cc    |  7 +-
  .../bluetooth_device_chooser_controller.cc    |  3 +-
  .../frame_connected_bluetooth_devices.cc      |  3 +-
  .../bluetooth/web_bluetooth_service_impl.cc   |  9 ++-
@@ -43,8 +42,7 @@ Subject: [PATCH 7/8] content
  content/browser/client_hints/client_hints.cc  |  1 +
  .../generated_code_cache_browsertest.cc       |  2 +-
  .../content_security_policy_browsertest.cc    |  3 +-
- .../device_posture_registry_watcher_win.cc    |  1 +
- .../devtools/devtools_agent_host_impl.cc      |  9 ++-
+ .../devtools/devtools_agent_host_impl.cc      |  7 +-
  .../browser/devtools/devtools_http_handler.cc |  2 +-
  content/browser/devtools/devtools_session.cc  |  5 +-
  .../devtools_url_loader_interceptor.cc        |  4 +-
@@ -81,7 +79,7 @@ Subject: [PATCH 7/8] content
  content/browser/host_zoom_map_impl.cc         |  5 +-
  .../in_memory_federated_permission_context.cc |  1 +
  .../indexed_db/indexed_db_context_impl.cc     |  5 +-
- .../indexed_db/instance/bucket_context.cc     |  3 +-
+ .../indexed_db/instance/bucket_context.cc     |  1 +
  .../browser/indexed_db/instance/connection.cc |  3 +-
  .../browser/indexed_db/instance/database.cc   |  4 +-
  .../instance/leveldb/active_blob_registry.cc  |  3 +-
@@ -93,7 +91,7 @@ Subject: [PATCH 7/8] content
  .../loader/navigation_url_loader_impl.cc      |  5 +-
  .../object_navigation_fallback_body_loader.cc |  1 +
  content/browser/locks/lock_manager.h          |  1 +
- .../media/active_media_session_controller.cc  |  4 +-
+ .../media/active_media_session_controller.cc  |  2 +-
  content/browser/media/audible_metrics.cc      |  3 +-
  content/browser/media/audio_stream_monitor.cc |  3 +-
  ...b_capture_target_id_web_contents_helper.cc |  4 +-
@@ -103,7 +101,6 @@ Subject: [PATCH 7/8] content
  content/browser/media/midi_host.cc            |  7 +-
  .../session/media_session_browsertest.cc      |  3 +-
  .../media/session/media_session_impl.cc       |  4 +-
- .../browser_memory_consumer_registry.cc       |  3 +-
  content/browser/mojo_binder_policy_applier.cc |  5 +-
  content/browser/navigation_browsertest.cc     |  9 ++-
  .../network/sandboxed_nqe_browsertest.cc      |  4 +-
@@ -128,25 +125,25 @@ Subject: [PATCH 7/8] content
  ...ivate_aggregation_pending_contributions.cc |  5 +-
  .../process_internals_handler_impl.cc         |  2 +-
  .../agent_scheduling_group_host.cc            |  3 +-
- .../renderer_host/back_forward_cache_impl.cc  |  3 +-
+ .../renderer_host/back_forward_cache_impl.cc  |  2 +-
  .../renderer_host/compositor_impl_android.cc  |  1 +
  content/browser/renderer_host/cookie_utils.cc |  2 +-
  .../renderer_host/delegated_frame_host.cc     |  1 +
  content/browser/renderer_host/frame_tree.cc   |  7 +-
- .../touch_selection_controller_client_aura.cc | 25 +++---
- ...selection_controller_client_child_frame.cc | 25 +++---
+ .../touch_selection_controller_client_aura.cc | 19 ++---
+ ...selection_controller_client_child_frame.cc | 19 ++---
  .../media/media_devices_manager.cc            |  5 +-
- .../media/media_stream_manager.cc             | 14 ++--
+ .../media/media_stream_manager.cc             |  5 +-
  .../media/video_capture_controller.cc         |  9 ++-
  .../renderer_host/media/video_capture_host.cc |  9 ++-
- .../media/video_capture_manager.cc            |  7 +-
+ .../media/video_capture_manager.cc            |  6 +-
  .../renderer_host/mixed_content_checker.cc    |  7 +-
  .../navigation_controller_impl_browsertest.cc |  6 +-
  .../renderer_host/navigation_request.cc       |  6 +-
  .../renderer_host/plugin_registry_impl.cc     |  3 +-
  .../renderer_host/render_frame_host_impl.cc   | 13 ++--
  .../render_frame_host_impl_browsertest.cc     |  6 +-
- .../render_frame_host_manager.cc              | 12 +--
+ .../render_frame_host_manager.cc              |  8 +-
  .../renderer_host/render_frame_proxy_host.cc  |  1 +
  .../renderer_host/render_process_host_impl.cc |  5 +-
  .../render_widget_host_browsertest.cc         |  6 +-
@@ -158,12 +155,12 @@ Subject: [PATCH 7/8] content
  content/browser/renderer_host/stored_page.cc  |  1 +
  .../embedded_worker_instance.cc               |  4 +-
  .../service_worker_browsertest.cc             | 78 ++++++++++---------
- .../service_worker/service_worker_client.cc   |  3 +-
+ .../service_worker/service_worker_client.cc   |  1 +
  .../service_worker_container_host.cc          |  5 +-
  .../service_worker_process_manager.cc         |  3 +-
  .../service_worker/service_worker_registry.cc |  9 ++-
  .../service_worker_script_cache_map.cc        |  5 +-
- .../service_worker/service_worker_version.cc  | 29 +++----
+ .../service_worker/service_worker_version.cc  | 11 +--
  .../shared_storage_browsertest.cc             |  9 ++-
  content/browser/site_info.cc                  |  6 +-
  content/browser/site_instance_impl.cc         |  6 +-
@@ -187,11 +184,11 @@ Subject: [PATCH 7/8] content
  content/browser/xr/service/vr_service_impl.cc | 13 ++--
  .../xr/service/xr_permission_results.cc       |  3 +-
  content/child/font_warmup_win.cc              |  3 +-
- .../child_memory_consumer_registry.cc         |  3 +-
  content/common/color_parser.cc                |  3 +-
  content/common/font_cache_dispatcher_win.cc   |  4 +-
  content/common/input/actions_parser.cc        |  3 +-
- .../memory_consumer_traits_mojom_traits.h     | 25 +++---
+ .../memory_consumer_registry.cc               |  2 +-
+ .../memory_consumer_traits_mojom_traits.h     |  5 +-
  content/common/origin_util.cc                 |  3 +-
  .../webid/identity_url_loader_throttle.cc     |  3 +-
  .../public/browser/internal_webui_config.cc   |  1 +
@@ -207,11 +204,11 @@ Subject: [PATCH 7/8] content
  content/public/test/prerender_test_util.cc    | 10 +--
  .../test/test_download_http_response.cc       |  7 +-
  content/public/test/test_launcher.cc          |  3 +-
- .../annotations/ax_image_annotator.cc         | 11 +--
+ .../annotations/ax_image_annotator.cc         |  1 +
  .../annotations/ax_image_stopwords.cc         |  3 +-
  content/renderer/agent_scheduling_group.cc    |  4 +-
  .../renderer/dom_serializer_browsertest.cc    |  9 ++-
- .../media/media_permission_dispatcher.cc      |  5 +-
+ .../media/media_permission_dispatcher.cc      |  2 +-
  content/renderer/navigation_client.cc         | 17 ++--
  content/renderer/render_frame_impl.cc         |  1 +
  .../renderer/render_frame_impl_browsertest.cc |  2 +-
@@ -232,14 +229,14 @@ Subject: [PATCH 7/8] content
  content/test/mock_ssl_host_state_delegate.cc  | 11 +--
  ...b_contents_observer_consistency_checker.cc |  7 +-
  .../browser/fake_bluetooth_delegate.cc        |  7 +-
- .../web_test/browser/web_test_control_host.cc |  7 +-
- .../browser/web_test_permission_manager.cc    |  3 +-
+ .../web_test/browser/web_test_control_host.cc |  5 +-
+ .../browser/web_test_permission_manager.cc    |  1 +
  .../web_test_shell_platform_delegate_views.cc |  7 +-
  content/web_test/renderer/test_runner.cc      |  3 +-
- 232 files changed, 819 insertions(+), 667 deletions(-)
+ 229 files changed, 769 insertions(+), 623 deletions(-)
 
 diff --git a/content/browser/accessibility/accessibility_action_browsertest.cc b/content/browser/accessibility/accessibility_action_browsertest.cc
-index 9e3de22060..a882659a8e 100644
+index 52b6a5e73b..2ee21f305b 100644
 --- a/content/browser/accessibility/accessibility_action_browsertest.cc
 +++ b/content/browser/accessibility/accessibility_action_browsertest.cc
 @@ -2,12 +2,12 @@
@@ -256,7 +253,7 @@ index 9e3de22060..a882659a8e 100644
  #include "base/containers/span.h"
  #include "base/numerics/safe_conversions.h"
  #include "base/strings/escape.h"
-@@ -960,8 +960,8 @@ IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest,
+@@ -935,8 +935,8 @@ IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest,
        target->GetIntListAttribute(ax::mojom::IntListAttribute::kControlsIds);
    EXPECT_EQ(2u, control_list.size());
  
@@ -268,7 +265,7 @@ index 9e3de22060..a882659a8e 100644
  
  IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest, FocusLostOnDeletedNode) {
 diff --git a/content/browser/accessibility/browser_accessibility_android.cc b/content/browser/accessibility/browser_accessibility_android.cc
-index f3141b1fc3..0ceb624d18 100644
+index cd42de86b8..f075346d21 100644
 --- a/content/browser/accessibility/browser_accessibility_android.cc
 +++ b/content/browser/accessibility/browser_accessibility_android.cc
 @@ -7,6 +7,7 @@
@@ -280,19 +277,19 @@ index f3141b1fc3..0ceb624d18 100644
  #include "base/functional/bind.h"
  #include "base/functional/callback_helpers.h"
 diff --git a/content/browser/accessibility/browser_accessibility_manager_android.cc b/content/browser/accessibility/browser_accessibility_manager_android.cc
-index c22f594398..f12b28891f 100644
+index 206bf4b887..f816f8f079 100644
 --- a/content/browser/accessibility/browser_accessibility_manager_android.cc
 +++ b/content/browser/accessibility/browser_accessibility_manager_android.cc
-@@ -7,6 +7,7 @@
- #include <vector>
+@@ -9,6 +9,7 @@
  
+ #include "base/android/android_info.h"
  #include "base/check.h"
 +#include "base/containers/contains.h"
  #include "base/i18n/char_iterator.h"
  #include "base/strings/utf_string_conversions.h"
  #include "content/browser/accessibility/browser_accessibility_android.h"
 diff --git a/content/browser/accessibility/browser_accessibility_state_impl.cc b/content/browser/accessibility/browser_accessibility_state_impl.cc
-index c35bba83bd..e9b0c3fc81 100644
+index 9cb0a4350f..7edcb59f1b 100644
 --- a/content/browser/accessibility/browser_accessibility_state_impl.cc
 +++ b/content/browser/accessibility/browser_accessibility_state_impl.cc
 @@ -12,6 +12,7 @@
@@ -303,7 +300,7 @@ index c35bba83bd..e9b0c3fc81 100644
  #include "base/debug/crash_logging.h"
  #include "base/functional/bind.h"
  #include "base/memory/ptr_util.h"
-@@ -816,7 +817,7 @@ void BrowserAccessibilityStateImpl::OnWebContentsHidden(
+@@ -810,7 +811,7 @@ void BrowserAccessibilityStateImpl::OnWebContentsHidden(
    }
  
    // Add `web_contents` to the list of the last five hidden WCs.
@@ -313,7 +310,7 @@ index c35bba83bd..e9b0c3fc81 100644
  
    // Create the disabler for this WebContents. The provided callback will be run
 diff --git a/content/browser/accessibility/browser_accessibility_state_impl_android.cc b/content/browser/accessibility/browser_accessibility_state_impl_android.cc
-index 4055a625ce..e4dd73fec9 100644
+index d1a625ade1..0432d2f296 100644
 --- a/content/browser/accessibility/browser_accessibility_state_impl_android.cc
 +++ b/content/browser/accessibility/browser_accessibility_state_impl_android.cc
 @@ -4,10 +4,10 @@
@@ -328,9 +325,9 @@ index 4055a625ce..e4dd73fec9 100644
  #include "base/containers/fixed_flat_map.h"
  #include "base/debug/crash_logging.h"
  #include "base/metrics/histogram_functions.h"
-@@ -297,7 +297,7 @@ void BrowserAccessibilityStateImplAndroid::
- 
-     if (RecordAssistiveTechHistogram(service_hash)) {
+@@ -312,7 +312,7 @@ void BrowserAccessibilityStateImplAndroid::
+     if (RecordAssistiveTechHistogram(service_hash,
+                                      accessibility_tool_flags[i])) {
        has_assistive_tech = true;
 -    } else if (std::ranges::contains(kPasswordPackageHashes, service_hash)) {
 +    } else if (base::Contains(kPasswordPackageHashes, service_hash)) {
@@ -338,7 +335,7 @@ index 4055a625ce..e4dd73fec9 100644
      } else {
        has_unknown = true;
 diff --git a/content/browser/accessibility/cross_platform_accessibility_browsertest.cc b/content/browser/accessibility/cross_platform_accessibility_browsertest.cc
-index aa38f9ce7d..b5c961cad7 100644
+index b05eec7c05..67e28e737a 100644
 --- a/content/browser/accessibility/cross_platform_accessibility_browsertest.cc
 +++ b/content/browser/accessibility/cross_platform_accessibility_browsertest.cc
 @@ -10,6 +10,7 @@
@@ -349,7 +346,7 @@ index aa38f9ce7d..b5c961cad7 100644
  #include "base/functional/callback_helpers.h"
  #include "base/strings/escape.h"
  #include "base/strings/utf_string_conversions.h"
-@@ -77,7 +78,7 @@ class CrossPlatformAccessibilityBrowserTest : public ContentBrowserTest {
+@@ -78,7 +79,7 @@ class CrossPlatformAccessibilityBrowserTest : public ContentBrowserTest {
    void RecursiveAssertUniqueIds(const ui::AXNode* node,
                                  absl::flat_hash_set<int>* ids) const {
      ASSERT_TRUE(ids);
@@ -359,7 +356,7 @@ index aa38f9ce7d..b5c961cad7 100644
      for (const ui::AXNode* child : node->children()) {
        RecursiveAssertUniqueIds(child, ids);
 diff --git a/content/browser/accessibility/dump_accessibility_browsertest_base.cc b/content/browser/accessibility/dump_accessibility_browsertest_base.cc
-index c5ecd0f0a8..d0b84bf1c9 100644
+index 239c81d4ff..9ffdf41be4 100644
 --- a/content/browser/accessibility/dump_accessibility_browsertest_base.cc
 +++ b/content/browser/accessibility/dump_accessibility_browsertest_base.cc
 @@ -10,6 +10,7 @@
@@ -452,8 +449,28 @@ index b51eccf1bf..53a6b6d82f 100644
  
    bssl::ScopedEVP_HPKE_CTX recipient_context;
    if (!EVP_HPKE_CTX_setup_recipient(
+diff --git a/content/browser/ai/echo_ai_manager_impl.cc b/content/browser/ai/echo_ai_manager_impl.cc
+index 1791c9ffed..9599be7983 100644
+--- a/content/browser/ai/echo_ai_manager_impl.cc
++++ b/content/browser/ai/echo_ai_manager_impl.cc
+@@ -209,11 +209,10 @@ void EchoAIManagerImpl::CreateLanguageModel(
+   }
+ 
+   // Extract tools from options, defaulting to an empty vector.
+-  std::vector<blink::mojom::AILanguageModelToolDeclarationPtr> tools =
+-      *(std::move(options->tools).or_else([] {
+-        // Return an engaged optional holding a default-constructed vector.
+-        return decltype(options->tools)(std::in_place);
+-      }));
++  std::vector<blink::mojom::AILanguageModelToolDeclarationPtr> tools;
++  if (options->tools.has_value()) {
++    tools = std::move(options->tools.value());
++  }
+ 
+   auto return_language_model_callback = base::BindOnce(
+       &EchoAIManagerImpl::ReturnAILanguageModelCreationResult,
 diff --git a/content/browser/attribution_reporting/attribution_resolver_impl.cc b/content/browser/attribution_reporting/attribution_resolver_impl.cc
-index 448caf7506..bfd4236035 100644
+index 49b798abfb..494fbae2fa 100644
 --- a/content/browser/attribution_reporting/attribution_resolver_impl.cc
 +++ b/content/browser/attribution_reporting/attribution_resolver_impl.cc
 @@ -15,6 +15,7 @@
@@ -542,20 +559,8 @@ index d6b185bdf3..accd561f6c 100644
  }
  
  IN_PROC_BROWSER_TEST_P(AttributionSrcBrowserTest,
-diff --git a/content/browser/attribution_reporting/attribution_storage_sql.cc b/content/browser/attribution_reporting/attribution_storage_sql.cc
-index 6bb9cb3997..58b594bbe0 100644
---- a/content/browser/attribution_reporting/attribution_storage_sql.cc
-+++ b/content/browser/attribution_reporting/attribution_storage_sql.cc
-@@ -23,6 +23,7 @@
- 
- #include "base/check.h"
- #include "base/check_op.h"
-+#include "base/containers/contains.h"
- #include "base/containers/enum_set.h"
- #include "base/containers/flat_set.h"
- #include "base/containers/span.h"
 diff --git a/content/browser/attribution_reporting/attributions_browsertest.cc b/content/browser/attribution_reporting/attributions_browsertest.cc
-index 9bd399546e..55b01ce80e 100644
+index 53246be26d..92fee1e5d5 100644
 --- a/content/browser/attribution_reporting/attributions_browsertest.cc
 +++ b/content/browser/attribution_reporting/attributions_browsertest.cc
 @@ -13,6 +13,7 @@
@@ -645,7 +650,7 @@ index bbbac65fbe..dff9352168 100644
  
  }  // namespace
 diff --git a/content/browser/back_forward_cache_browsertest.cc b/content/browser/back_forward_cache_browsertest.cc
-index 1d4fcfc7f4..40921051fd 100644
+index 674396a46e..55b53b6973 100644
 --- a/content/browser/back_forward_cache_browsertest.cc
 +++ b/content/browser/back_forward_cache_browsertest.cc
 @@ -4,13 +4,13 @@
@@ -675,7 +680,7 @@ index 1d4fcfc7f4..40921051fd 100644
  
  void BackForwardCacheBrowserTest::EvictByJavaScript(RenderFrameHostImpl* rfh) {
 diff --git a/content/browser/back_forward_cache_features_browsertest.cc b/content/browser/back_forward_cache_features_browsertest.cc
-index 199c6a8f53..0dec8cd163 100644
+index 6c683e0c79..9ef52af63b 100644
 --- a/content/browser/back_forward_cache_features_browsertest.cc
 +++ b/content/browser/back_forward_cache_features_browsertest.cc
 @@ -2,8 +2,7 @@
@@ -688,7 +693,7 @@ index 199c6a8f53..0dec8cd163 100644
  #include "base/strings/string_number_conversions.h"
  #include "base/strings/stringprintf.h"
  #include "base/threading/platform_thread.h"
-@@ -1781,16 +1780,15 @@ IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest,
+@@ -1694,16 +1693,15 @@ IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest,
    std::vector<base::Bucket> blocklist_values = histogram_tester().GetAllSamples(
        "BackForwardCache.HistoryNavigationOutcome."
        "BlocklistedFeature");
@@ -730,7 +735,7 @@ index a0f5b77a6d..83a51b02ce 100644
    }
  
 diff --git a/content/browser/background_sync/background_sync_manager.cc b/content/browser/background_sync/background_sync_manager.cc
-index 944066323a..919d2aa9f1 100644
+index 49482fcf7f..2d4cf011cf 100644
 --- a/content/browser/background_sync/background_sync_manager.cc
 +++ b/content/browser/background_sync/background_sync_manager.cc
 @@ -8,6 +8,7 @@
@@ -741,7 +746,7 @@ index 944066323a..919d2aa9f1 100644
  #include "base/debug/crash_logging.h"
  #include "base/functional/bind.h"
  #include "base/functional/callback_helpers.h"
-@@ -1530,7 +1531,7 @@ bool BackgroundSyncManager::AllConditionsExceptConnectivitySatisfied(
+@@ -1531,7 +1532,7 @@ bool BackgroundSyncManager::AllConditionsExceptConnectivitySatisfied(
    if (registration.is_suspended())
      return false;
  
@@ -750,7 +755,7 @@ index 944066323a..919d2aa9f1 100644
      return false;
  
    return true;
-@@ -2372,7 +2373,7 @@ blink::ServiceWorkerStatusCode BackgroundSyncManager::CanEmulateSyncEvent(
+@@ -2374,7 +2375,7 @@ blink::ServiceWorkerStatusCode BackgroundSyncManager::CanEmulateSyncEvent(
    if (!network_observer_->NetworkSufficient())
      return blink::ServiceWorkerStatusCode::kErrorEventWaitUntilRejected;
    int64_t registration_id = active_version->registration_id();
@@ -801,44 +806,8 @@ index 4f7aadfccf..c631f4daeb 100644
  }
  
  void BluetoothAdapterFactoryWrapper::MaybeAddAdapterObserver(
-diff --git a/content/browser/bluetooth/bluetooth_allowed_devices.cc b/content/browser/bluetooth/bluetooth_allowed_devices.cc
-index 632e4ce7aa..1265b40ec4 100644
---- a/content/browser/bluetooth/bluetooth_allowed_devices.cc
-+++ b/content/browser/bluetooth/bluetooth_allowed_devices.cc
-@@ -7,6 +7,7 @@
- #include <string>
- #include <vector>
- 
-+#include "base/containers/contains.h"
- #include "base/logging.h"
- #include "base/strings/string_util.h"
- #include "content/browser/bluetooth/bluetooth_blocklist.h"
-@@ -108,7 +109,7 @@ bool BluetoothAllowedDevices::IsAllowedToAccessService(
-   auto id_iter = device_id_to_services_map_.find(device_id);
-   return id_iter == device_id_to_services_map_.end()
-              ? false
--             : id_iter->second.contains(service_uuid);
-+             : base::Contains(id_iter->second, service_uuid);
- }
- 
- bool BluetoothAllowedDevices::IsAllowedToGATTConnect(
-@@ -125,12 +126,12 @@ bool BluetoothAllowedDevices::IsAllowedToAccessManufacturerData(
-   auto id_iter = device_id_to_manufacturers_map_.find(device_id);
-   return id_iter == device_id_to_manufacturers_map_.end()
-              ? false
--             : id_iter->second.contains(manufacturer_code);
-+             : base::Contains(id_iter->second, manufacturer_code);
- }
- 
- blink::WebBluetoothDeviceId BluetoothAllowedDevices::GenerateUniqueDeviceId() {
-   blink::WebBluetoothDeviceId device_id = blink::WebBluetoothDeviceId::Create();
--  while (device_id_set_.contains(device_id)) {
-+  while (base::Contains(device_id_set_, device_id)) {
-     LOG(WARNING) << "Generated repeated id.";
-     device_id = blink::WebBluetoothDeviceId::Create();
-   }
 diff --git a/content/browser/bluetooth/bluetooth_device_chooser_controller.cc b/content/browser/bluetooth/bluetooth_device_chooser_controller.cc
-index 35ff6873ad..4c097c8398 100644
+index 78334d7666..7c138176ea 100644
 --- a/content/browser/bluetooth/bluetooth_device_chooser_controller.cc
 +++ b/content/browser/bluetooth/bluetooth_device_chooser_controller.cc
 @@ -8,6 +8,7 @@
@@ -880,7 +849,7 @@ index ccfcca2381..1ecd92942e 100644
    }
  
 diff --git a/content/browser/bluetooth/web_bluetooth_service_impl.cc b/content/browser/bluetooth/web_bluetooth_service_impl.cc
-index 7a3592cbbb..78ed69c40e 100644
+index 534f529107..75d00a97cf 100644
 --- a/content/browser/bluetooth/web_bluetooth_service_impl.cc
 +++ b/content/browser/bluetooth/web_bluetooth_service_impl.cc
 @@ -15,6 +15,7 @@
@@ -891,7 +860,7 @@ index 7a3592cbbb..78ed69c40e 100644
  #include "base/containers/queue.h"
  #include "base/containers/to_vector.h"
  #include "base/functional/bind.h"
-@@ -563,7 +564,7 @@ void WebBluetoothServiceImpl::OnPermissionRevoked(const url::Origin& origin) {
+@@ -569,7 +570,7 @@ void WebBluetoothServiceImpl::OnPermissionRevoked(const url::Origin& origin) {
  
    std::erase_if(watch_advertisements_clients_,
                  [&](const std::unique_ptr<WatchAdvertisementsClient>& client) {
@@ -900,7 +869,7 @@ index 7a3592cbbb..78ed69c40e 100644
                  });
  
    MaybeStopDiscovery();
-@@ -721,8 +722,8 @@ void WebBluetoothServiceImpl::GattCharacteristicValueChanged(
+@@ -727,8 +728,8 @@ void WebBluetoothServiceImpl::GattCharacteristicValueChanged(
      BluetoothRemoteGattCharacteristic* characteristic,
      const std::vector<uint8_t>& value) {
    // Don't notify of characteristics that we haven't returned.
@@ -911,7 +880,7 @@ index 7a3592cbbb..78ed69c40e 100644
      return;
    }
  
-@@ -2307,7 +2308,7 @@ void WebBluetoothServiceImpl::RunPendingPrimaryServicesRequests(
+@@ -2313,7 +2314,7 @@ void WebBluetoothServiceImpl::RunPendingPrimaryServicesRequests(
    }
  
    // Sending get-service responses unexpectedly queued another request.
@@ -952,7 +921,7 @@ index 9f4a766715..392e6c90e3 100644
  
  template <typename T>
 diff --git a/content/browser/browsing_data/browsing_data_remover_impl.cc b/content/browser/browsing_data/browsing_data_remover_impl.cc
-index 973a753fcc..e8bd3ed665 100644
+index f663284cd0..838ee6fd1d 100644
 --- a/content/browser/browsing_data/browsing_data_remover_impl.cc
 +++ b/content/browser/browsing_data/browsing_data_remover_impl.cc
 @@ -11,6 +11,7 @@
@@ -963,7 +932,7 @@ index 973a753fcc..e8bd3ed665 100644
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
  #include "base/functional/callback.h"
-@@ -95,7 +96,7 @@ bool DoesStorageKeyMatchMask(
+@@ -96,7 +97,7 @@ bool DoesStorageKeyMatchMask(
      storage::SpecialStoragePolicy* policy) {
    const std::vector<std::string>& schemes = url::GetWebStorageSchemes();
    bool is_web_scheme =
@@ -973,7 +942,7 @@ index 973a753fcc..e8bd3ed665 100644
    // If a websafe origin is unprotected, it matches iff UNPROTECTED_WEB.
    if ((origin_type_mask & BrowsingDataRemover::ORIGIN_TYPE_UNPROTECTED_WEB) &&
 diff --git a/content/browser/browsing_data/browsing_data_remover_impl_browsertest.cc b/content/browser/browsing_data/browsing_data_remover_impl_browsertest.cc
-index f302a94ed5..c21bb7074d 100644
+index f11e405fdc..74930c31f0 100644
 --- a/content/browser/browsing_data/browsing_data_remover_impl_browsertest.cc
 +++ b/content/browser/browsing_data/browsing_data_remover_impl_browsertest.cc
 @@ -4,6 +4,7 @@
@@ -982,9 +951,9 @@ index f302a94ed5..c21bb7074d 100644
  
 +#include "base/containers/contains.h"
  #include "base/files/file_path.h"
+ #include "base/files/file_util.h"
  #include "base/functional/bind.h"
- #include "base/location.h"
-@@ -92,7 +93,7 @@ std::unique_ptr<net::test_server::HttpResponse> HandleHttpAuthRequest(
+@@ -97,7 +98,7 @@ std::unique_ptr<net::test_server::HttpResponse> HandleHttpAuthRequest(
    }
  
    auto http_response = std::make_unique<net::test_server::BasicHttpResponse>();
@@ -1015,7 +984,7 @@ index 1b97df5423..2d620c7076 100644
      input_types.push_back(net::kDatatypeStorage);
      input_types.push_back(net::kDatatypeCache);
 diff --git a/content/browser/browsing_instance.cc b/content/browser/browsing_instance.cc
-index 18ed48be99..0dd5137ec4 100644
+index 1918251271..8c6cc0d76d 100644
 --- a/content/browser/browsing_instance.cc
 +++ b/content/browser/browsing_instance.cc
 @@ -6,6 +6,7 @@
@@ -1036,7 +1005,7 @@ index 18ed48be99..0dd5137ec4 100644
  
  scoped_refptr<SiteInstanceImpl> BrowsingInstance::GetSiteInstanceForURL(
 diff --git a/content/browser/btm/btm_bounce_detector_browsertest.cc b/content/browser/btm/btm_bounce_detector_browsertest.cc
-index 4d0885e915..3fd0c7e05d 100644
+index 767dc97588..38292a0873 100644
 --- a/content/browser/btm/btm_bounce_detector_browsertest.cc
 +++ b/content/browser/btm/btm_bounce_detector_browsertest.cc
 @@ -15,6 +15,7 @@
@@ -1047,7 +1016,7 @@ index 4d0885e915..3fd0c7e05d 100644
  #include "base/feature_list.h"
  #include "base/files/file_path.h"
  #include "base/functional/bind.h"
-@@ -3127,9 +3128,9 @@ class BtmPrivacySandboxDataPreservationTest : public ContentBrowserTest {
+@@ -2431,9 +2432,9 @@ class BtmPrivacySandboxDataPreservationTest : public ContentBrowserTest {
                if (request.relative_url != "/issue") {
                  return nullptr;
                }
@@ -1061,7 +1030,7 @@ index 4d0885e915..3fd0c7e05d 100644
                }
  
 diff --git a/content/browser/buckets/bucket_manager_host.cc b/content/browser/buckets/bucket_manager_host.cc
-index ebfd202496..56de648997 100644
+index ee69445c88..d0ee785311 100644
 --- a/content/browser/buckets/bucket_manager_host.cc
 +++ b/content/browser/buckets/bucket_manager_host.cc
 @@ -6,6 +6,7 @@
@@ -1070,8 +1039,8 @@ index ebfd202496..56de648997 100644
  
 +#include "base/containers/contains.h"
  #include "base/metrics/histogram_functions.h"
- #include "base/metrics/histogram_macros.h"
  #include "base/task/sequenced_task_runner.h"
+ #include "base/time/time.h"
 @@ -162,7 +163,7 @@ void BucketManagerHost::DeleteBucket(const std::string& name,
  }
  
@@ -1082,7 +1051,7 @@ index ebfd202496..56de648997 100644
  }
  
 diff --git a/content/browser/cache_storage/cache_storage.cc b/content/browser/cache_storage/cache_storage.cc
-index b87bb0fa62..106d84c3c8 100644
+index 75cbc18177..01c504ed6b 100644
 --- a/content/browser/cache_storage/cache_storage.cc
 +++ b/content/browser/cache_storage/cache_storage.cc
 @@ -14,6 +14,7 @@
@@ -1093,7 +1062,7 @@ index b87bb0fa62..106d84c3c8 100644
  #include "base/containers/span.h"
  #include "base/files/file_util.h"
  #include "base/files/memory_mapped_file.h"
-@@ -249,13 +250,13 @@ class CacheStorage::MemoryLoader : public CacheStorage::CacheLoader {
+@@ -250,13 +251,13 @@ class CacheStorage::MemoryLoader : public CacheStorage::CacheLoader {
  
    void NotifyCacheCreated(const std::u16string& cache_name,
                            CacheStorageCacheHandle cache_handle) override {
@@ -1109,7 +1078,7 @@ index b87bb0fa62..106d84c3c8 100644
      cache_handles_.erase(impl->cache_name());
    }
  
-@@ -294,7 +295,7 @@ class CacheStorage::SimpleCacheLoader : public CacheStorage::CacheLoader {
+@@ -295,7 +296,7 @@ class CacheStorage::SimpleCacheLoader : public CacheStorage::CacheLoader {
        int64_t cache_size,
        int64_t cache_padding) override {
      DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
@@ -1118,7 +1087,7 @@ index b87bb0fa62..106d84c3c8 100644
  
      std::string cache_dir = cache_name_to_cache_dir_[cache_name];
      base::FilePath cache_path = directory_path_.AppendASCII(cache_dir);
-@@ -399,7 +400,7 @@ class CacheStorage::SimpleCacheLoader : public CacheStorage::CacheLoader {
+@@ -398,7 +399,7 @@ class CacheStorage::SimpleCacheLoader : public CacheStorage::CacheLoader {
      protobuf_index.set_bucket_is_default(bucket_locator_.is_default);
  
      for (const auto& cache_metadata : index.ordered_cache_metadata()) {
@@ -1127,7 +1096,7 @@ index b87bb0fa62..106d84c3c8 100644
  
        proto::CacheStorageIndex::Cache* index_cache = protobuf_index.add_cache();
        index_cache->set_name(base::UTF16ToUTF8(cache_metadata.name));
-@@ -547,7 +548,7 @@ class CacheStorage::SimpleCacheLoader : public CacheStorage::CacheLoader {
+@@ -546,7 +547,7 @@ class CacheStorage::SimpleCacheLoader : public CacheStorage::CacheLoader {
      {
        base::FilePath cache_path;
        while (!(cache_path = file_enum.Next()).empty()) {
@@ -1136,7 +1105,7 @@ index b87bb0fa62..106d84c3c8 100644
            dirs_to_delete.push_back(cache_path);
        }
      }
-@@ -982,7 +983,8 @@ bool CacheStorage::InitiateScheduledIndexWriteForTest(
+@@ -981,7 +982,8 @@ bool CacheStorage::InitiateScheduledIndexWriteForTest(
  
  void CacheStorage::CacheSizeUpdated(const CacheStorageCache* cache) {
    // Should not be called for doomed caches.
@@ -1146,7 +1115,7 @@ index b87bb0fa62..106d84c3c8 100644
    DCHECK_NE(cache->cache_padding(), kSizeUnknown);
    bool size_changed =
        cache_index_->SetCacheSize(cache->cache_name(), cache->cache_size());
-@@ -1165,7 +1167,7 @@ void CacheStorage::HasCacheImpl(const std::u16string& cache_name,
+@@ -1164,7 +1166,7 @@ void CacheStorage::HasCacheImpl(const std::u16string& cache_name,
                                  BoolAndErrorCallback callback) {
    TRACE_EVENT("CacheStorage", "CacheStorage::HasCacheImpl",
                perfetto::Flow::Global(trace_id), "cache_name", cache_name);
@@ -1198,7 +1167,7 @@ index ecc6060478..619d3b8070 100644
    cache_metadata_map_[cache_metadata.name] = --ordered_cache_metadata_.end();
    storage_size_ = CacheStorage::kSizeUnknown;
 diff --git a/content/browser/child_process_security_policy_impl.cc b/content/browser/child_process_security_policy_impl.cc
-index 441a835365..9c3fe588e7 100644
+index a033e108aa..e589115b43 100644
 --- a/content/browser/child_process_security_policy_impl.cc
 +++ b/content/browser/child_process_security_policy_impl.cc
 @@ -12,6 +12,7 @@
@@ -1209,7 +1178,7 @@ index 441a835365..9c3fe588e7 100644
  #include "base/containers/map_util.h"
  #include "base/debug/crash_logging.h"
  #include "base/debug/dump_without_crashing.h"
-@@ -284,8 +285,8 @@ bool AllowProcessLockMismatchForNTP(const ProcessLock& expected_lock,
+@@ -365,8 +366,8 @@ bool AllowProcessLockMismatchForNTP(const ProcessLock& expected_lock,
    // does not require its process to be locked.  This should only be the case
    // for sites used to load most visited tiles.
    const auto& webui_schemes = URLDataManagerBackend::GetWebUISchemes();
@@ -1220,7 +1189,7 @@ index 441a835365..9c3fe588e7 100644
      return false;
    }
    if (GetContentClient()->browser()->DoesWebUIUrlRequireProcessLock(
-@@ -1522,7 +1523,7 @@ bool ChildProcessSecurityPolicyImpl::CanRequestURL(int child_id,
+@@ -1677,7 +1678,7 @@ bool ChildProcessSecurityPolicyImpl::CanRequestURL(int child_id,
    // scheme.
    const auto& webui_schemes = URLDataManagerBackend::GetWebUISchemes();
    if (!RenderProcessHost::run_renderer_in_process() &&
@@ -1229,7 +1198,7 @@ index 441a835365..9c3fe588e7 100644
      bool should_be_locked =
          GetContentClient()->browser()->DoesWebUIUrlRequireProcessLock(url);
      if (should_be_locked) {
-@@ -2810,7 +2811,7 @@ bool ChildProcessSecurityPolicyImpl::IsIsolatedOrigin(
+@@ -2976,7 +2977,7 @@ bool ChildProcessSecurityPolicyImpl::IsIsolatedOrigin(
  
  bool ChildProcessSecurityPolicyImpl::IsGloballyIsolatedOriginForTesting(
      const url::Origin& origin) {
@@ -1238,7 +1207,7 @@ index 441a835365..9c3fe588e7 100644
  }
  
  std::vector<url::Origin> ChildProcessSecurityPolicyImpl::GetIsolatedOrigins(
-@@ -3285,8 +3286,8 @@ void ChildProcessSecurityPolicyImpl::
+@@ -3451,8 +3452,8 @@ void ChildProcessSecurityPolicyImpl::
    // We only support adding new entries, not modifying existing ones. If at
    // some point in the future we allow isolation status to change during the
    // lifetime of a BrowsingInstance, then this will need to be updated.
@@ -1250,7 +1219,7 @@ index 441a835365..9c3fe588e7 100644
    }
  }
 diff --git a/content/browser/client_hints/client_hints.cc b/content/browser/client_hints/client_hints.cc
-index 8246d97469..67bb645548 100644
+index b1778eb659..ca5de87836 100644
 --- a/content/browser/client_hints/client_hints.cc
 +++ b/content/browser/client_hints/client_hints.cc
 @@ -10,6 +10,7 @@
@@ -1295,20 +1264,8 @@ index 76d835f723..9a45654185 100644
      return nullptr;
    }
  
-diff --git a/content/browser/device_posture/device_posture_registry_watcher_win.cc b/content/browser/device_posture/device_posture_registry_watcher_win.cc
-index ccf63efcb0..c47053f19d 100644
---- a/content/browser/device_posture/device_posture_registry_watcher_win.cc
-+++ b/content/browser/device_posture/device_posture_registry_watcher_win.cc
-@@ -5,6 +5,7 @@
- 
- #include <optional>
- 
-+#include "base/containers/contains.h"
- #include "base/containers/fixed_flat_map.h"
- #include "base/json/json_reader.h"
- #include "base/strings/string_number_conversions.h"
 diff --git a/content/browser/devtools/devtools_agent_host_impl.cc b/content/browser/devtools/devtools_agent_host_impl.cc
-index 9ad1eff1d9..34a866ac84 100644
+index d7c727ed93..ac21e48bce 100644
 --- a/content/browser/devtools/devtools_agent_host_impl.cc
 +++ b/content/browser/devtools/devtools_agent_host_impl.cc
 @@ -8,6 +8,7 @@
@@ -1319,7 +1276,7 @@ index 9ad1eff1d9..34a866ac84 100644
  #include "base/functional/bind.h"
  #include "base/memory/ref_counted_memory.h"
  #include "base/no_destructor.h"
-@@ -198,7 +199,7 @@ DevToolsAgentHost::List DevToolsAgentHost::GetOrCreateAll() {
+@@ -206,7 +207,7 @@ DevToolsAgentHost::List DevToolsAgentHost::GetOrCreateAll() {
  #if DCHECK_IS_ON()
    for (auto it : result) {
      DevToolsAgentHostImpl* host = static_cast<DevToolsAgentHostImpl*>(it.get());
@@ -1328,7 +1285,7 @@ index 9ad1eff1d9..34a866ac84 100644
    }
  #endif
  
-@@ -317,7 +318,7 @@ bool DevToolsAgentHostImpl::AttachInternal(
+@@ -325,7 +326,7 @@ bool DevToolsAgentHostImpl::AttachInternal(
    }
    renderer_channel_.AttachSession(session);
    sessions_.push_back(session);
@@ -1337,16 +1294,7 @@ index 9ad1eff1d9..34a866ac84 100644
    session_by_client_.emplace(session->GetClient(), std::move(session_owned));
    if (sessions_.size() == 1)
      NotifyAttached();
-@@ -548,7 +549,7 @@ std::string DevToolsAgentHostImpl::GetSubtype() {
- }
- 
- void DevToolsAgentHostImpl::NotifyCreated() {
--  DCHECK(!GetDevtoolsInstances().contains(id_));
-+  DCHECK(!base::Contains(GetDevtoolsInstances(), id_));
-   GetDevtoolsInstances()[id_] = this;
-   for (auto& observer : GetDevtoolsObservers())
-     observer.DevToolsAgentHostCreated(this);
-@@ -575,7 +576,7 @@ void DevToolsAgentHostImpl::NotifyCrashed(base::TerminationStatus status) {
+@@ -583,7 +584,7 @@ void DevToolsAgentHostImpl::NotifyCrashed(base::TerminationStatus status) {
  }
  
  void DevToolsAgentHostImpl::NotifyDestroyed() {
@@ -1356,10 +1304,10 @@ index 9ad1eff1d9..34a866ac84 100644
      observer.DevToolsAgentHostDestroyed(this);
    GetDevtoolsInstances().erase(id_);
 diff --git a/content/browser/devtools/devtools_http_handler.cc b/content/browser/devtools/devtools_http_handler.cc
-index 79bf965d5d..904e6e9805 100644
+index fbfe1abebb..0cd1fffa2c 100644
 --- a/content/browser/devtools/devtools_http_handler.cc
 +++ b/content/browser/devtools/devtools_http_handler.cc
-@@ -634,7 +634,7 @@ void DevToolsHttpHandler::OnJsonRequest(
+@@ -640,7 +640,7 @@ void DevToolsHttpHandler::OnJsonRequest(
    std::vector<std::string_view> query_components = base::SplitStringPiece(
        query, "&", base::KEEP_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
  
@@ -1369,7 +1317,7 @@ index 79bf965d5d..904e6e9805 100644
    if (command == "list") {
      DevToolsManager* manager = DevToolsManager::GetInstance();
 diff --git a/content/browser/devtools/devtools_session.cc b/content/browser/devtools/devtools_session.cc
-index ab01d49452..d982e32714 100644
+index b473017975..cd2452ef4f 100644
 --- a/content/browser/devtools/devtools_session.cc
 +++ b/content/browser/devtools/devtools_session.cc
 @@ -7,6 +7,7 @@
@@ -1380,7 +1328,7 @@ index ab01d49452..d982e32714 100644
  #include "base/containers/flat_set.h"
  #include "base/functional/bind.h"
  #include "base/trace_event/trace_event.h"
-@@ -392,7 +393,7 @@ void DevToolsSession::FallThrough(int call_id,
+@@ -406,7 +407,7 @@ void DevToolsSession::FallThrough(int call_id,
    // In browser-only mode, we should've handled everything in dispatcher.
    DCHECK(!browser_only_);
  
@@ -1389,7 +1337,7 @@ index ab01d49452..d982e32714 100644
      DispatchProtocolMessageToClient(
          crdtp::CreateErrorResponse(call_id,
                                     crdtp::DispatchResponse::InvalidRequest(
-@@ -628,7 +629,7 @@ void DevToolsSession::DetachChildSession(const std::string& session_id) {
+@@ -642,7 +643,7 @@ void DevToolsSession::DetachChildSession(const std::string& session_id) {
  }
  
  bool DevToolsSession::HasChildSession(const std::string& session_id) {
@@ -1399,7 +1347,7 @@ index ab01d49452..d982e32714 100644
  
  void DevToolsSession::AddObserver(ChildObserver* obs) {
 diff --git a/content/browser/devtools/devtools_url_loader_interceptor.cc b/content/browser/devtools/devtools_url_loader_interceptor.cc
-index 88fe791f8c..aff0f49ae8 100644
+index 391a51c0d4..1a80178daf 100644
 --- a/content/browser/devtools/devtools_url_loader_interceptor.cc
 +++ b/content/browser/devtools/devtools_url_loader_interceptor.cc
 @@ -10,6 +10,7 @@
@@ -1421,7 +1369,7 @@ index 88fe791f8c..aff0f49ae8 100644
    }
    return base::MatchPattern(url, url_pattern);
 diff --git a/content/browser/devtools/frame_auto_attacher.cc b/content/browser/devtools/frame_auto_attacher.cc
-index 3b1c56def0..e9d2d0e8f0 100644
+index d0c0983a0e..bde1b61d75 100644
 --- a/content/browser/devtools/frame_auto_attacher.cc
 +++ b/content/browser/devtools/frame_auto_attacher.cc
 @@ -4,6 +4,7 @@
@@ -1452,7 +1400,7 @@ index 3b1c56def0..e9d2d0e8f0 100644
    }
  
 diff --git a/content/browser/devtools/protocol/input_handler.cc b/content/browser/devtools/protocol/input_handler.cc
-index 0e9590badb..3f1332823f 100644
+index 9364acb5ca..d8b7843d98 100644
 --- a/content/browser/devtools/protocol/input_handler.cc
 +++ b/content/browser/devtools/protocol/input_handler.cc
 @@ -13,6 +13,7 @@
@@ -1463,7 +1411,7 @@ index 0e9590badb..3f1332823f 100644
  #include "base/functional/bind.h"
  #include "base/functional/callback.h"
  #include "base/functional/callback_helpers.h"
-@@ -252,7 +253,7 @@ bool GenerateTouchPoints(
+@@ -255,7 +256,7 @@ bool GenerateTouchPoints(
                                    ? blink::WebTouchPoint::State::kStateCancelled
                                    : blink::WebTouchPoint::State::kStateReleased;
      event->SetType(type);
@@ -1472,7 +1420,7 @@ index 0e9590badb..3f1332823f 100644
      event->touches[0].state = blink::WebTouchPoint::State::kStatePressed;
      event->SetType(blink::WebInputEvent::Type::kTouchStart);
    } else {
-@@ -535,7 +536,7 @@ CreateWebTouchEvents(
+@@ -575,7 +576,7 @@ CreateWebTouchEvents(
    std::vector<blink::WebTouchEvent> events;
    bool ok = true;
    for (auto& id_point : points) {
@@ -1481,7 +1429,7 @@ index 0e9590badb..3f1332823f 100644
          type == blink::WebInputEvent::Type::kTouchMove &&
          touched_points[id_point.first].PositionInWidget() ==
              id_point.second.PositionInWidget()) {
-@@ -1807,7 +1808,7 @@ void InputHandler::DispatchSyntheticPointerActionTouch(
+@@ -1847,7 +1848,7 @@ void InputHandler::DispatchSyntheticPointerActionTouch(
  
      SyntheticPointerActionParams::PointerActionType action_type =
          SyntheticPointerActionParams::PointerActionType::MOVE;
@@ -1490,7 +1438,7 @@ index 0e9590badb..3f1332823f 100644
        pointer_ids_.insert(id);
        action_type = SyntheticPointerActionParams::PointerActionType::PRESS;
      }
-@@ -1830,7 +1831,7 @@ void InputHandler::DispatchSyntheticPointerActionTouch(
+@@ -1870,7 +1871,7 @@ void InputHandler::DispatchSyntheticPointerActionTouch(
            SyntheticPointerActionParams::PointerActionType::MOVE &&
        current_pointer_ids.size() < pointer_ids_.size()) {
      for (auto it = pointer_ids_.begin(); it != pointer_ids_.end();) {
@@ -1500,7 +1448,7 @@ index 0e9590badb..3f1332823f 100644
          continue;
        }
 diff --git a/content/browser/devtools/protocol/network_handler.cc b/content/browser/devtools/protocol/network_handler.cc
-index 685deb662d..347ed2150a 100644
+index 522e01e30b..b40fb17149 100644
 --- a/content/browser/devtools/protocol/network_handler.cc
 +++ b/content/browser/devtools/protocol/network_handler.cc
 @@ -7,7 +7,6 @@
@@ -1511,15 +1459,15 @@ index 685deb662d..347ed2150a 100644
  #include <memory>
  #include <string_view>
  #include <utility>
-@@ -16,6 +15,7 @@
- #include "base/barrier_closure.h"
+@@ -17,6 +16,7 @@
  #include "base/base64.h"
+ #include "base/check_deref.h"
  #include "base/command_line.h"
 +#include "base/containers/contains.h"
  #include "base/containers/queue.h"
  #include "base/containers/span.h"
  #include "base/feature_list.h"
-@@ -1630,7 +1630,7 @@ NetworkHandler::BuildProtocolReport(const net::ReportingReport& report) {
+@@ -1692,7 +1692,7 @@ NetworkHandler::BuildProtocolReport(const net::ReportingReport& report) {
      return nullptr;
    }
    std::vector<GURL> reporting_filter_urls = ComputeReportingURLs(host_);
@@ -1550,7 +1498,7 @@ index 4508e10634..872ac32adc 100644
          String("Unknown event id: " + base::NumberToString(event_id)));
    }
 diff --git a/content/browser/devtools/protocol/target_handler.cc b/content/browser/devtools/protocol/target_handler.cc
-index 18f066a5c7..9d08c36348 100644
+index 3732a63380..6b75b539b5 100644
 --- a/content/browser/devtools/protocol/target_handler.cc
 +++ b/content/browser/devtools/protocol/target_handler.cc
 @@ -10,6 +10,7 @@
@@ -1561,7 +1509,7 @@ index 18f066a5c7..9d08c36348 100644
  #include "base/containers/flat_map.h"
  #include "base/functional/bind.h"
  #include "base/functional/callback_helpers.h"
-@@ -902,7 +903,7 @@ bool TargetHandler::AutoAttach(TargetAutoAttacher* source,
+@@ -909,7 +910,7 @@ bool TargetHandler::AutoAttach(TargetAutoAttacher* source,
    if (!auto_attach_target_filter_->Match(*host)) {
      return false;
    }
@@ -1570,7 +1518,7 @@ index 18f066a5c7..9d08c36348 100644
      return false;
    }
    if (!auto_attach_service_workers_ &&
-@@ -937,12 +938,12 @@ void TargetHandler::SetAttachedTargetsOfType(
+@@ -944,12 +945,12 @@ void TargetHandler::SetAttachedTargetsOfType(
      if (host->GetType() == type &&
          entry.second->auto_attacher_id_ ==
              reinterpret_cast<uintptr_t>(source) &&
@@ -1585,7 +1533,7 @@ index 18f066a5c7..9d08c36348 100644
        AutoAttach(source, host.get(), false);
      }
    }
-@@ -950,7 +951,7 @@ void TargetHandler::SetAttachedTargetsOfType(
+@@ -957,7 +958,7 @@ void TargetHandler::SetAttachedTargetsOfType(
  
  void TargetHandler::TargetInfoChanged(DevToolsAgentHost* host) {
    // Only send target info for targets we reported in any way.
@@ -1594,7 +1542,7 @@ index 18f066a5c7..9d08c36348 100644
        auto_attached_sessions_.find(host) == auto_attached_sessions_.end()) {
      return;
    }
-@@ -1239,7 +1240,7 @@ Response TargetHandler::CloseTarget(const std::string& target_id,
+@@ -1246,7 +1247,7 @@ Response TargetHandler::CloseTarget(const std::string& target_id,
    if (access_mode_ == AccessMode::kAutoAttachOnly) {
      // Only allow to close the targets that we are attached to.
      if (target_id != owner_target_id_ &&
@@ -1603,7 +1551,7 @@ index 18f066a5c7..9d08c36348 100644
        return Response::ServerError(kNotAllowedError);
      }
    }
-@@ -1411,7 +1412,7 @@ void TargetHandler::DevToolsAgentHostCreated(DevToolsAgentHost* host) {
+@@ -1418,7 +1419,7 @@ void TargetHandler::DevToolsAgentHostCreated(DevToolsAgentHost* host) {
    }
    // If we start discovering late, all existing agent hosts will be reported,
    // but we could have already attached to some.
@@ -1612,7 +1560,7 @@ index 18f066a5c7..9d08c36348 100644
      frontend_->TargetCreated(BuildTargetInfo(host));
      reported_hosts_.insert(host);
    }
-@@ -1422,7 +1423,7 @@ void TargetHandler::DevToolsAgentHostNavigated(DevToolsAgentHost* host) {
+@@ -1429,7 +1430,7 @@ void TargetHandler::DevToolsAgentHostNavigated(DevToolsAgentHost* host) {
  }
  
  void TargetHandler::DevToolsAgentHostDestroyed(DevToolsAgentHost* host) {
@@ -1621,7 +1569,7 @@ index 18f066a5c7..9d08c36348 100644
      return;
    }
    frontend_->TargetDestroyed(host->GetId());
-@@ -1439,7 +1440,7 @@ void TargetHandler::DevToolsAgentHostDetached(DevToolsAgentHost* host) {
+@@ -1446,7 +1447,7 @@ void TargetHandler::DevToolsAgentHostDetached(DevToolsAgentHost* host) {
  
  void TargetHandler::DevToolsAgentHostCrashed(DevToolsAgentHost* host,
                                               base::TerminationStatus status) {
@@ -1652,7 +1600,7 @@ index 0a846fd5c8..74d47787a2 100644
          FROM_HERE,
          base::BindOnce(&BindCallback::sendFailure, std::move(callback),
 diff --git a/content/browser/devtools/service_worker_devtools_manager.cc b/content/browser/devtools/service_worker_devtools_manager.cc
-index 2532df420a..f771973298 100644
+index 163dae85ac..6cda50f735 100644
 --- a/content/browser/devtools/service_worker_devtools_manager.cc
 +++ b/content/browser/devtools/service_worker_devtools_manager.cc
 @@ -7,6 +7,7 @@
@@ -1663,7 +1611,7 @@ index 2532df420a..f771973298 100644
  #include "base/no_destructor.h"
  #include "base/observer_list.h"
  #include "content/browser/devtools/devtools_instrumentation.h"
-@@ -154,7 +155,7 @@ void ServiceWorkerDevToolsManager::WorkerStarting(
+@@ -158,7 +159,7 @@ void ServiceWorkerDevToolsManager::WorkerStarting(
      bool* pause_on_start) {
    DCHECK_CURRENTLY_ON(BrowserThread::UI);
    const WorkerId worker_id(worker_process_id, worker_route_id);
@@ -1736,7 +1684,7 @@ index c95b46717f..e3707c6321 100644
    hosts_[host] = base::MakeRefCounted<DedicatedWorkerDevToolsAgentHost>(
        process_id,
 diff --git a/content/browser/do_not_track_browsertest.cc b/content/browser/do_not_track_browsertest.cc
-index 266eee4064..66e6364e08 100644
+index 9782b3ac79..e8450e1ed3 100644
 --- a/content/browser/do_not_track_browsertest.cc
 +++ b/content/browser/do_not_track_browsertest.cc
 @@ -3,6 +3,7 @@
@@ -1756,7 +1704,7 @@ index 266eee4064..66e6364e08 100644
    EXPECT_EQ("1", header_map["DNT"]);
  
    // Wait until the worker script is loaded to stop the test from crashing
-@@ -203,7 +204,7 @@ IN_PROC_BROWSER_TEST_F(DoNotTrackTest, MAYBE_SharedWorker) {
+@@ -196,7 +197,7 @@ IN_PROC_BROWSER_TEST_F(DoNotTrackTest, SharedWorker) {
        GetURL("/workers/create_shared_worker.html?worker_url=/capture")));
    loop.Run();
  
@@ -1765,7 +1713,7 @@ index 266eee4064..66e6364e08 100644
    EXPECT_EQ("1", header_map["DNT"]);
  
    // Wait until the worker script is loaded to stop the test from crashing
-@@ -229,7 +230,7 @@ IN_PROC_BROWSER_TEST_F(DoNotTrackTest, ServiceWorker_Register) {
+@@ -222,7 +223,7 @@ IN_PROC_BROWSER_TEST_F(DoNotTrackTest, ServiceWorker_Register) {
    EXPECT_EQ("DONE", EvalJs(shell(), "register('/capture');"));
    loop.Run();
  
@@ -1774,7 +1722,7 @@ index 266eee4064..66e6364e08 100644
    EXPECT_EQ("1", header_map["DNT"]);
  
    // Service worker doesn't have to wait for onmessage event because
-@@ -255,7 +256,7 @@ IN_PROC_BROWSER_TEST_F(DoNotTrackTest, ModuleServiceWorker_Register) {
+@@ -248,7 +249,7 @@ IN_PROC_BROWSER_TEST_F(DoNotTrackTest, ModuleServiceWorker_Register) {
    EXPECT_EQ("DONE", EvalJs(shell(), "register('/capture', '', 'module');"));
    loop.Run();
  
@@ -1783,7 +1731,7 @@ index 266eee4064..66e6364e08 100644
    EXPECT_EQ("1", header_map["DNT"]);
  
    // Module Service worker doesn't have to wait for onmessage event because
-@@ -289,7 +290,7 @@ IN_PROC_BROWSER_TEST_F(DoNotTrackTest,
+@@ -282,7 +283,7 @@ IN_PROC_BROWSER_TEST_F(DoNotTrackTest,
              EvalJs(shell(), "register('/captureWorker','', 'module');"));
    loop.Run();
  
@@ -1792,7 +1740,7 @@ index 266eee4064..66e6364e08 100644
    EXPECT_EQ("1", header_map["DNT"]);
  
    // Module Service worker doesn't have to wait for onmessage event because
-@@ -319,7 +320,7 @@ IN_PROC_BROWSER_TEST_F(DoNotTrackTest, ServiceWorker_Update) {
+@@ -312,7 +313,7 @@ IN_PROC_BROWSER_TEST_F(DoNotTrackTest, ServiceWorker_Update) {
    EXPECT_EQ("DONE", EvalJs(shell(), "update();"));
    loop.Run();
  
@@ -1801,7 +1749,7 @@ index 266eee4064..66e6364e08 100644
    EXPECT_EQ("1", header_map["DNT"]);
  
    // Service worker doesn't have to wait for onmessage event because
-@@ -349,7 +350,7 @@ IN_PROC_BROWSER_TEST_F(DoNotTrackTest, ModuleServiceWorker_Update) {
+@@ -342,7 +343,7 @@ IN_PROC_BROWSER_TEST_F(DoNotTrackTest, ModuleServiceWorker_Update) {
    EXPECT_EQ("DONE", EvalJs(shell(), "update();"));
    loop.Run();
  
@@ -1810,7 +1758,7 @@ index 266eee4064..66e6364e08 100644
    EXPECT_EQ("1", header_map["DNT"]);
  
    // Module service worker doesn't have to wait for onmessage event because
-@@ -382,7 +383,7 @@ IN_PROC_BROWSER_TEST_F(DoNotTrackTest, StaticImportModuleServiceWorker_Update) {
+@@ -375,7 +376,7 @@ IN_PROC_BROWSER_TEST_F(DoNotTrackTest, StaticImportModuleServiceWorker_Update) {
    EXPECT_EQ("DONE", EvalJs(shell(), "update();"));
    loop.Run();
  
@@ -1849,7 +1797,7 @@ index f60d962470..58b6f78773 100644
  }
  
 diff --git a/content/browser/download/download_browsertest.cc b/content/browser/download/download_browsertest.cc
-index b354903a78..fc386f96ac 100644
+index cc165fa471..db5d2e50c9 100644
 --- a/content/browser/download/download_browsertest.cc
 +++ b/content/browser/download/download_browsertest.cc
 @@ -1290,19 +1290,19 @@ class DownloadContentTestWithoutStrongValidators : public DownloadContentTest {
@@ -1940,7 +1888,7 @@ index b354903a78..fc386f96ac 100644
              document_url.DeprecatedGetOriginAsURL().spec());
  }
 diff --git a/content/browser/download/download_manager_impl.cc b/content/browser/download/download_manager_impl.cc
-index 7bedb1b17a..3ea58b8651 100644
+index 683cabb33a..41b88bb338 100644
 --- a/content/browser/download/download_manager_impl.cc
 +++ b/content/browser/download/download_manager_impl.cc
 @@ -7,6 +7,7 @@
@@ -2059,7 +2007,7 @@ index 83a40d396c..7c89971074 100644
  
      return;
 diff --git a/content/browser/fenced_frame/fenced_frame_browsertest.cc b/content/browser/fenced_frame/fenced_frame_browsertest.cc
-index c3bed47ab6..a2dc8d161b 100644
+index 3c5690bdfa..3174e57418 100644
 --- a/content/browser/fenced_frame/fenced_frame_browsertest.cc
 +++ b/content/browser/fenced_frame/fenced_frame_browsertest.cc
 @@ -8,6 +8,7 @@
@@ -2088,7 +2036,7 @@ index c3bed47ab6..a2dc8d161b 100644
      std::string header = sec_fetch_dest_headers_map_[file_name];
      EXPECT_EQ(expected_value, header);
      sec_fetch_dest_headers_map_.erase(file_name);
-@@ -7137,10 +7138,10 @@ class FencedFrameReportEventBrowserTest
+@@ -7122,10 +7123,10 @@ class FencedFrameReportEventBrowserTest
      response->set_code(net::HTTP_OK);
      response->AddCustomHeader(cors::kAccessControlAllowMethods,
                                request->method_string);
@@ -2101,7 +2049,7 @@ index c3bed47ab6..a2dc8d161b 100644
        response->AddCustomHeader(
            cors::kAccessControlAllowHeaders,
            request->headers.at(cors::kAccessControlRequestHeaders));
-@@ -7200,7 +7201,7 @@ class FencedFrameReportEventBrowserTest
+@@ -7185,7 +7186,7 @@ class FencedFrameReportEventBrowserTest
          ASSERT_FALSE(step.destination.path.empty());
          int redirect_index = 0;
          for (auto& redirect_destination : step.redirects) {
@@ -2110,7 +2058,7 @@ index c3bed47ab6..a2dc8d161b 100644
            ASSERT_FALSE(redirect_destination.origin.empty());
            ASSERT_FALSE(redirect_destination.path.empty());
            paths.insert(redirect_destination.path);
-@@ -7467,10 +7468,10 @@ class FencedFrameReportEventBrowserTest
+@@ -7452,10 +7453,10 @@ class FencedFrameReportEventBrowserTest
                /*web_expected=*/true,
                /*os_expected=*/false);
          } else {
@@ -2125,7 +2073,7 @@ index c3bed47ab6..a2dc8d161b 100644
          }
  
          // TODO(crbug.com/40286778): Remove this check after 3PCD.
-@@ -8234,9 +8235,11 @@ IN_PROC_BROWSER_TEST_F(FencedFrameReportEventBrowserTest,
+@@ -8219,9 +8220,11 @@ IN_PROC_BROWSER_TEST_F(FencedFrameReportEventBrowserTest,
          response.http_request()->headers.at("Attribution-Reporting-Support"),
          /*web_expected=*/true,
          /*os_expected=*/false);
@@ -2140,7 +2088,7 @@ index c3bed47ab6..a2dc8d161b 100644
  
      // Send 302 redirect response.
      GURL redirect_url = https_server()->GetURL("a.test", "/redirect.html");
-@@ -8255,11 +8258,12 @@ IN_PROC_BROWSER_TEST_F(FencedFrameReportEventBrowserTest,
+@@ -8240,11 +8243,12 @@ IN_PROC_BROWSER_TEST_F(FencedFrameReportEventBrowserTest,
      EXPECT_EQ(redirect_response.http_request()->method,
                net::test_server::HttpMethod::METHOD_GET);
      // Check that POST-specific headers were stripped.
@@ -2157,7 +2105,7 @@ index c3bed47ab6..a2dc8d161b 100644
      // Check that the content body was stripped.
      EXPECT_TRUE(redirect_response.http_request()->content.empty());
      // These extra request headers were not stripped.
-@@ -8353,11 +8357,12 @@ IN_PROC_BROWSER_TEST_F(FencedFrameReportEventBrowserTest,
+@@ -8338,11 +8342,12 @@ IN_PROC_BROWSER_TEST_F(FencedFrameReportEventBrowserTest,
      EXPECT_EQ(reporting_response.http_request()->method,
                net::test_server::HttpMethod::METHOD_POST);
      EXPECT_EQ(reporting_response.http_request()->content, event_data);
@@ -2174,7 +2122,7 @@ index c3bed47ab6..a2dc8d161b 100644
      ExpectValidAttributionReportingEligibleHeaderForEventBeacon(
          reporting_response.http_request()->headers.at(
              "Attribution-Reporting-Eligible"));
-@@ -8385,10 +8390,10 @@ IN_PROC_BROWSER_TEST_F(FencedFrameReportEventBrowserTest,
+@@ -8370,10 +8375,10 @@ IN_PROC_BROWSER_TEST_F(FencedFrameReportEventBrowserTest,
      EXPECT_EQ(redirect_response.http_request()->method,
                net::test_server::HttpMethod::METHOD_GET);
      EXPECT_EQ(redirect_response.http_request()->headers.at("Origin"), "null");
@@ -2189,7 +2137,7 @@ index c3bed47ab6..a2dc8d161b 100644
      // Check that the content body was stripped.
      EXPECT_TRUE(redirect_response.http_request()->content.empty());
      // These extra request headers were not stripped.
-@@ -9186,10 +9191,10 @@ class FencedFrameAutomaticBeaconBrowserTest
+@@ -9171,10 +9176,10 @@ class FencedFrameAutomaticBeaconBrowserTest
      response->set_code(net::HTTP_OK);
      response->AddCustomHeader(cors::kAccessControlAllowMethods,
                                request->method_string);
@@ -2335,10 +2283,10 @@ index 7f8117edfb..d838bb05a7 100644
  #include "base/files/file_util.h"
  #include "base/files/scoped_temp_dir.h"
 diff --git a/content/browser/file_system_access/file_system_access_manager_impl.cc b/content/browser/file_system_access/file_system_access_manager_impl.cc
-index b9ecd894b4..c22510de79 100644
+index 12dabdaf7e..5366fd87e7 100644
 --- a/content/browser/file_system_access/file_system_access_manager_impl.cc
 +++ b/content/browser/file_system_access/file_system_access_manager_impl.cc
-@@ -2160,7 +2160,8 @@ bool FileSystemAccessManagerImpl::IsSafePathComponent(
+@@ -2148,7 +2148,8 @@ bool FileSystemAccessManagerImpl::IsSafePathComponent(
      // Check for both '/' and '\' as path separators, regardless of what OS
      // we're running on.
      return component16 != u"." && component16 != u".." &&
@@ -2424,7 +2372,7 @@ index 5912020d07..874d90bc76 100644
      return false;
    }
 diff --git a/content/browser/first_party_sets/first_party_set_parser.cc b/content/browser/first_party_sets/first_party_set_parser.cc
-index 3276dd8a42..e5b29e7597 100644
+index 6395cabf4a..cfd4c1fdc6 100644
 --- a/content/browser/first_party_sets/first_party_set_parser.cc
 +++ b/content/browser/first_party_sets/first_party_set_parser.cc
 @@ -14,6 +14,7 @@
@@ -2435,7 +2383,7 @@ index 3276dd8a42..e5b29e7597 100644
  #include "base/containers/flat_map.h"
  #include "base/containers/flat_set.h"
  #include "base/containers/map_util.h"
-@@ -500,10 +501,10 @@ class ParseContext {
+@@ -501,10 +502,10 @@ class ParseContext {
      std::vector<std::pair<net::SchemefulSite, net::SchemefulSite>> aliases;
      for (const auto [site, site_alias_list] : *cctld_dict) {
        net::SchemefulSite site_as_schemeful_site((GURL(site)));
@@ -2450,7 +2398,7 @@ index 3276dd8a42..e5b29e7597 100644
          warnings_.push_back(ParseWarning(
              ParseWarningType::kCctldKeyNotCanonical, {kCCTLDsField, site}));
          continue;
-@@ -566,7 +567,7 @@ class ParseContext {
+@@ -567,7 +568,7 @@ class ParseContext {
  
      if (result.has_site()) {
        const net::SchemefulSite& site = result.site();
@@ -2493,7 +2441,7 @@ index 0a987c03e3..d9c0d7f1f6 100644
    sensor_provider_->CreateVirtualSensor(type, std::move(metadata),
                                          std::move(callback));
 diff --git a/content/browser/gpu/gpu_internals_ui.cc b/content/browser/gpu/gpu_internals_ui.cc
-index eb24f05c95..e66db0a495 100644
+index 6f43ee799d..75e7c3e649 100644
 --- a/content/browser/gpu/gpu_internals_ui.cc
 +++ b/content/browser/gpu/gpu_internals_ui.cc
 @@ -12,6 +12,7 @@
@@ -2555,7 +2503,7 @@ index ac730953a2..3e563d1ae0 100644
        }
      }
 diff --git a/content/browser/host_zoom_map_impl.cc b/content/browser/host_zoom_map_impl.cc
-index 9652bb025e..d77640b14a 100644
+index 5635ee44c0..33ef53f0c0 100644
 --- a/content/browser/host_zoom_map_impl.cc
 +++ b/content/browser/host_zoom_map_impl.cc
 @@ -9,6 +9,7 @@
@@ -2597,7 +2545,7 @@ index 9c96aca648..45621b0e41 100644
  #include "base/functional/callback_helpers.h"
  #include "content/browser/webid/flags.h"
 diff --git a/content/browser/indexed_db/indexed_db_context_impl.cc b/content/browser/indexed_db/indexed_db_context_impl.cc
-index 70fe94f617..1885f32325 100644
+index 94d07a3eae..cc18392c56 100644
 --- a/content/browser/indexed_db/indexed_db_context_impl.cc
 +++ b/content/browser/indexed_db/indexed_db_context_impl.cc
 @@ -18,6 +18,7 @@
@@ -2608,7 +2556,7 @@ index 70fe94f617..1885f32325 100644
  #include "base/containers/flat_map.h"
  #include "base/feature_list.h"
  #include "base/files/file.h"
-@@ -907,8 +908,8 @@ void IndexedDBContextImpl::PurgeOrigins() {
+@@ -889,8 +890,8 @@ void IndexedDBContextImpl::PurgeOrigins() {
      // Delete the storage if its origin matches one of the origins to purge, or
      // if it is third-party and the top-level site is same-site with one of
      // those origins.
@@ -2620,7 +2568,7 @@ index 70fe94f617..1885f32325 100644
      if (!delete_bucket && bucket_locator.storage_key.IsThirdPartyContext()) {
        delete_bucket = std::ranges::any_of(
 diff --git a/content/browser/indexed_db/instance/bucket_context.cc b/content/browser/indexed_db/instance/bucket_context.cc
-index 550e75f85f..a7f9b569f7 100644
+index 492c46c912..24ed17d24b 100644
 --- a/content/browser/indexed_db/instance/bucket_context.cc
 +++ b/content/browser/indexed_db/instance/bucket_context.cc
 @@ -25,6 +25,7 @@
@@ -2630,18 +2578,9 @@ index 550e75f85f..a7f9b569f7 100644
 +#include "base/containers/contains.h"
  #include "base/containers/map_util.h"
  #include "base/feature_list.h"
- #include "base/files/file_path.h"
-@@ -674,7 +675,7 @@ void BucketContext::DeleteDatabase(
-     }
-   }
- 
--  if (!databases_.contains(name)) {
-+  if (!base::Contains(databases_, name)) {
-     // This adds `Database` in an uninitialized state.
-     CreateAndAddDatabase(name);
-   }
+ #include "base/files/file_enumerator.h"
 diff --git a/content/browser/indexed_db/instance/connection.cc b/content/browser/indexed_db/instance/connection.cc
-index 5cf8ac86ee..edbfc9cad2 100644
+index ee7a2b10e7..554e30d037 100644
 --- a/content/browser/indexed_db/instance/connection.cc
 +++ b/content/browser/indexed_db/instance/connection.cc
 @@ -27,6 +27,7 @@
@@ -2652,7 +2591,7 @@ index 5cf8ac86ee..edbfc9cad2 100644
  #include "base/unguessable_token.h"
  #include "components/services/storage/indexed_db/locks/partitioned_lock_id.h"
  #include "components/services/storage/indexed_db/locks/partitioned_lock_manager.h"
-@@ -208,7 +209,7 @@ void Connection::DisallowInactiveClient(
+@@ -207,7 +208,7 @@ void Connection::DisallowInactiveClient(
      return;
    }
  
@@ -2662,10 +2601,10 @@ index 5cf8ac86ee..edbfc9cad2 100644
    if (client_keep_active_remotes_[reason_index].is_bound()) {
      // Since the keep_active remote is found in client_keep_active_remotes_,
 diff --git a/content/browser/indexed_db/instance/database.cc b/content/browser/indexed_db/instance/database.cc
-index b301ff2035..88fc27df61 100644
+index c8d7936044..50db5397eb 100644
 --- a/content/browser/indexed_db/instance/database.cc
 +++ b/content/browser/indexed_db/instance/database.cc
-@@ -963,7 +963,7 @@ Status Database::ClearOperation(
+@@ -960,7 +960,7 @@ Status Database::ClearOperation(
  }
  
  bool Database::IsObjectStoreIdInMetadata(int64_t object_store_id) const {
@@ -2674,7 +2613,7 @@ index b301ff2035..88fc27df61 100644
  }
  
  bool Database::IsObjectStoreIdAndMaybeIndexIdInMetadata(
-@@ -975,7 +975,7 @@ bool Database::IsObjectStoreIdAndMaybeIndexIdInMetadata(
+@@ -972,7 +972,7 @@ bool Database::IsObjectStoreIdAndMaybeIndexIdInMetadata(
    const IndexedDBObjectStoreMetadata& object_store_metadata =
        GetObjectStoreMetadata(object_store_id);
    return index_id == IndexedDBIndexMetadata::kInvalidId ||
@@ -2705,10 +2644,10 @@ index 9a3de20394..ad7c0059dc 100644
    SingleDBMap& blobs_in_db = blob_reference_tracker_[database_id];
    auto iter = blobs_in_db.find(blob_number);
 diff --git a/content/browser/indexed_db/instance/leveldb/backing_store.cc b/content/browser/indexed_db/instance/leveldb/backing_store.cc
-index 9eb0a7b95f..05ec7a2879 100644
+index 4477eb4829..12743f604d 100644
 --- a/content/browser/indexed_db/instance/leveldb/backing_store.cc
 +++ b/content/browser/indexed_db/instance/leveldb/backing_store.cc
-@@ -20,6 +20,7 @@
+@@ -21,6 +21,7 @@
  #include "base/byte_count.h"
  #include "base/check.h"
  #include "base/check_op.h"
@@ -2716,7 +2655,7 @@ index 9eb0a7b95f..05ec7a2879 100644
  #include "base/containers/span.h"
  #include "base/dcheck_is_on.h"
  #include "base/files/file.h"
-@@ -3140,7 +3141,7 @@ StatusOr<IndexedDBKey> BackingStore::Transaction::GetFirstPrimaryKeyForIndexKey(
+@@ -3147,7 +3148,7 @@ StatusOr<IndexedDBKey> BackingStore::Transaction::GetFirstPrimaryKeyForIndexKey(
  StatusOr<bool> BackingStore::DatabaseExists(std::u16string_view database_name) {
    return GetDatabaseNames().transform(
        [&](const std::vector<std::u16string>& names) {
@@ -2747,7 +2686,7 @@ index 82ba410025..e8878bb261 100644
          *frame_host_, blink::mojom::ConsoleMessageLevel::kError,
          "Invalid AuctionConfig. The config provided an auctionNonce value "
 diff --git a/content/browser/interest_group/interest_group_auction.cc b/content/browser/interest_group/interest_group_auction.cc
-index 7c58726bbb..b0b06db640 100644
+index 04f467fa75..cafef45a8d 100644
 --- a/content/browser/interest_group/interest_group_auction.cc
 +++ b/content/browser/interest_group/interest_group_auction.cc
 @@ -22,6 +22,7 @@
@@ -2758,7 +2697,7 @@ index 7c58726bbb..b0b06db640 100644
  #include "base/containers/flat_set.h"
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
-@@ -6599,7 +6600,7 @@ bool InterestGroupAuction::OnParsedServerResponseImpl(
+@@ -6600,7 +6601,7 @@ bool InterestGroupAuction::OnParsedServerResponseImpl(
      blink::InterestGroupKey winning_group(response->interest_group_owner,
                                            response->interest_group_name);
      // Winning group must be a bidder.
@@ -2768,7 +2707,7 @@ index 7c58726bbb..b0b06db640 100644
        saved_response_.emplace();
        base::UmaHistogramEnumeration(
 diff --git a/content/browser/interest_group/interest_group_browsertest.cc b/content/browser/interest_group/interest_group_browsertest.cc
-index 5f63b305ed..35d86b681e 100644
+index ff92d58be4..558dd780c0 100644
 --- a/content/browser/interest_group/interest_group_browsertest.cc
 +++ b/content/browser/interest_group/interest_group_browsertest.cc
 @@ -22,6 +22,7 @@
@@ -2890,7 +2829,7 @@ index 647760aabe..858bff0ace 100644
            blink::mojom::DebugModeDetails::New();
      }
 diff --git a/content/browser/loader/navigation_url_loader_impl.cc b/content/browser/loader/navigation_url_loader_impl.cc
-index 3a3065c5c1..4ea63f72a2 100644
+index 33d730f5c5..869c9d4ee3 100644
 --- a/content/browser/loader/navigation_url_loader_impl.cc
 +++ b/content/browser/loader/navigation_url_loader_impl.cc
 @@ -4,7 +4,6 @@
@@ -2909,7 +2848,7 @@ index 3a3065c5c1..4ea63f72a2 100644
  #include "base/debug/crash_logging.h"
  #include "base/debug/dump_without_crashing.h"
  #include "base/feature_list.h"
-@@ -684,8 +684,7 @@ void NavigationURLLoaderImpl::Start() {
+@@ -687,8 +687,7 @@ void NavigationURLLoaderImpl::Start() {
      // Requests to WebUI scheme won't get redirected to/from other schemes
      // or be intercepted, so we just let it go here.
      std::string scheme = request_info_->common_params->url.GetScheme();
@@ -2944,21 +2883,9 @@ index 4ca7d03d9c..ef0f2b3946 100644
  #include "base/functional/bind.h"
  #include "base/functional/callback.h"
 diff --git a/content/browser/media/active_media_session_controller.cc b/content/browser/media/active_media_session_controller.cc
-index 8215febe5d..3cf58b6771 100644
+index 936e0461a6..681ffa4b3a 100644
 --- a/content/browser/media/active_media_session_controller.cc
 +++ b/content/browser/media/active_media_session_controller.cc
-@@ -4,10 +4,10 @@
- 
- #include "content/browser/media/active_media_session_controller.h"
- 
--#include <algorithm>
- #include <utility>
- #include <vector>
- 
-+#include "base/containers/contains.h"
- #include "base/metrics/histogram_macros.h"
- #include "base/unguessable_token.h"
- #include "content/browser/browser_main_loop.h"
 @@ -76,7 +76,7 @@ void ActiveMediaSessionController::MediaSessionActionsChanged(
          MediaSessionActionToKeyCode(action);
      if (!action_key_code.has_value())
@@ -3037,10 +2964,10 @@ index c79f1692de..c743004d53 100644
  
  void SubCaptureTargetIdWebContentsHelper::ReadyToCommitNavigation(
 diff --git a/content/browser/media/cdm_storage_manager.cc b/content/browser/media/cdm_storage_manager.cc
-index 5a58e33222..85cd3791ff 100644
+index 621008a08c..123e17460e 100644
 --- a/content/browser/media/cdm_storage_manager.cc
 +++ b/content/browser/media/cdm_storage_manager.cc
-@@ -233,7 +233,7 @@ void CdmStorageManager::DidOpenFile(const blink::StorageKey& storage_key,
+@@ -234,7 +234,7 @@ void CdmStorageManager::DidOpenFile(const blink::StorageKey& storage_key,
  
    // Check whether this CDM file is in-use.
    CdmFileId id(file_name, cdm_type, storage_key);
@@ -3050,7 +2977,7 @@ index 5a58e33222..85cd3791ff 100644
      return;
    }
 diff --git a/content/browser/media/media_internals.cc b/content/browser/media/media_internals.cc
-index 94edb74c40..e543c0a81a 100644
+index 945aeeaadd..23c7c81b77 100644
 --- a/content/browser/media/media_internals.cc
 +++ b/content/browser/media/media_internals.cc
 @@ -302,7 +302,7 @@ void MediaInternals::AudioLogImpl::SetWebContentsTitle() {
@@ -3081,7 +3008,7 @@ index 94edb74c40..e543c0a81a 100644
  }
  
 diff --git a/content/browser/media/media_internals.h b/content/browser/media/media_internals.h
-index 498c11f797..b5d25ae378 100644
+index 6eec32f547..064b637e7d 100644
 --- a/content/browser/media/media_internals.h
 +++ b/content/browser/media/media_internals.h
 @@ -12,12 +12,12 @@
@@ -3161,10 +3088,10 @@ index 6966319c03..46edf62121 100644
  
    MediaSession* SetupMediaImageTest(bool expect_media_image = true) {
 diff --git a/content/browser/media/session/media_session_impl.cc b/content/browser/media/session/media_session_impl.cc
-index 542bd7ee9a..d6540fb28c 100644
+index e6c0c69720..fb0c63054d 100644
 --- a/content/browser/media/session/media_session_impl.cc
 +++ b/content/browser/media/session/media_session_impl.cc
-@@ -1385,7 +1385,7 @@ void MediaSessionImpl::GetMediaImageBitmap(
+@@ -1398,7 +1398,7 @@ void MediaSessionImpl::GetMediaImageBitmap(
    bool found = false;
    bool source_icon = false;
    for (auto& image_type : images_) {
@@ -3173,7 +3100,7 @@ index 542bd7ee9a..d6540fb28c 100644
        found = true;
  
        if (image_type.first ==
-@@ -1399,7 +1399,7 @@ void MediaSessionImpl::GetMediaImageBitmap(
+@@ -1412,7 +1412,7 @@ void MediaSessionImpl::GetMediaImageBitmap(
    // Or the `image` is in chapters.
    if (!found) {
      for (auto& chapter : metadata_.chapters) {
@@ -3182,27 +3109,6 @@ index 542bd7ee9a..d6540fb28c 100644
          found = true;
          break;
        }
-diff --git a/content/browser/memory_coordinator/browser_memory_consumer_registry.cc b/content/browser/memory_coordinator/browser_memory_consumer_registry.cc
-index 96e9e1a346..01f36518df 100644
---- a/content/browser/memory_coordinator/browser_memory_consumer_registry.cc
-+++ b/content/browser/memory_coordinator/browser_memory_consumer_registry.cc
-@@ -9,6 +9,7 @@
- 
- #include "base/check.h"
- #include "base/check_op.h"
-+#include "base/containers/contains.h"
- 
- namespace content {
- 
-@@ -45,7 +46,7 @@ void BrowserMemoryConsumerRegistry::ConsumerGroup::OnUpdateMemoryLimit() {
- 
- void BrowserMemoryConsumerRegistry::ConsumerGroup::AddMemoryConsumer(
-     base::RegisteredMemoryConsumer consumer) {
--  CHECK(!std::ranges::contains(memory_consumers_, consumer));
-+  CHECK(!base::Contains(memory_consumers_, consumer));
-   memory_consumers_.push_back(consumer);
- 
-   // Ensure the added consumer is up to date with the current memory limit
 diff --git a/content/browser/mojo_binder_policy_applier.cc b/content/browser/mojo_binder_policy_applier.cc
 index 7c673551f1..5058068160 100644
 --- a/content/browser/mojo_binder_policy_applier.cc
@@ -3234,7 +3140,7 @@ index 7c673551f1..5058068160 100644
        } else {
          deferred_binders_.push_back(std::move(binder_callback));
 diff --git a/content/browser/navigation_browsertest.cc b/content/browser/navigation_browsertest.cc
-index 271b514615..a4556b5511 100644
+index 32c40a4e3d..236df5a306 100644
 --- a/content/browser/navigation_browsertest.cc
 +++ b/content/browser/navigation_browsertest.cc
 @@ -11,6 +11,7 @@
@@ -3265,7 +3171,7 @@ index 271b514615..a4556b5511 100644
  }
  
  // Test NavigationRequest::CheckAboutSrcDoc()
-@@ -5308,7 +5311,7 @@ class SubresourceLoadingTest : public NavigationBrowserTest {
+@@ -5293,7 +5296,7 @@ class SubresourceLoadingTest : public NavigationBrowserTest {
        WebContents* current_contents =
            WebContents::FromRenderFrameHost(current_frame);
        DCHECK(current_contents);
@@ -3299,10 +3205,10 @@ index d7878f43ac..fe8710bfc4 100644
        return;
      }
 diff --git a/content/browser/network/shared_dictionary_browsertest.cc b/content/browser/network/shared_dictionary_browsertest.cc
-index 8ee9b3490a..2c57fc48c2 100644
+index d7dcc7499a..f703f4f204 100644
 --- a/content/browser/network/shared_dictionary_browsertest.cc
 +++ b/content/browser/network/shared_dictionary_browsertest.cc
-@@ -958,7 +958,7 @@ class SharedDictionaryBrowserTest
+@@ -1006,7 +1006,7 @@ class SharedDictionaryBrowserTest
        return nullptr;
      }
      auto response = std::make_unique<net::test_server::BasicHttpResponse>();
@@ -3378,18 +3284,18 @@ index 658de0fec1..50fb54d485 100644
  
                ASSERT_THAT(params->trust_token_redemption_policy,
 diff --git a/content/browser/payments/payment_app_content_unittest_base.cc b/content/browser/payments/payment_app_content_unittest_base.cc
-index 556c982091..5258c038fb 100644
+index ea6497a787..dddcd7af36 100644
 --- a/content/browser/payments/payment_app_content_unittest_base.cc
 +++ b/content/browser/payments/payment_app_content_unittest_base.cc
-@@ -10,6 +10,7 @@
+@@ -9,6 +9,7 @@
  #include <set>
  #include <utility>
  
 +#include "base/containers/contains.h"
  #include "base/files/file_path.h"
  #include "base/functional/bind.h"
- #include "base/run_loop.h"
-@@ -248,7 +249,7 @@ PaymentAppContentUnitTestBase::CreateUninitializedPaymentManager(
+ #include "base/memory/raw_ptr.h"
+@@ -254,7 +255,7 @@ PaymentAppContentUnitTestBase::CreateUninitializedPaymentManager(
    // Find a last registered payment manager.
    for (const auto& candidate_manager :
         payment_app_context()->payment_managers_) {
@@ -3468,10 +3374,10 @@ index 918ced38d0..7fc0d16645 100644
    }
  }
 diff --git a/content/browser/picture_in_picture/video_picture_in_picture_content_browsertest.cc b/content/browser/picture_in_picture/video_picture_in_picture_content_browsertest.cc
-index fc56134bd2..b6ed565fae 100644
+index c49ebcaaa4..4304342acc 100644
 --- a/content/browser/picture_in_picture/video_picture_in_picture_content_browsertest.cc
 +++ b/content/browser/picture_in_picture/video_picture_in_picture_content_browsertest.cc
-@@ -697,7 +697,7 @@ IN_PROC_BROWSER_TEST_F(VideoPictureInPictureContentBrowserTest,
+@@ -705,7 +705,7 @@ IN_PROC_BROWSER_TEST_F(VideoPictureInPictureContentBrowserTest,
    // The overlay window should have received the favicon image.
    ASSERT_EQ(overlay_window()->favicon_images().size(), 1u);
    const std::string icon_src = overlay_window()->favicon_images()[0].src.spec();
@@ -3480,7 +3386,7 @@ index fc56134bd2..b6ed565fae 100644
        << "The icon source: \"" << icon_src << "\" should contain \"test.ico\"";
  
    // The overlay window should be able to retrieve the favicon image.
-@@ -717,7 +717,7 @@ IN_PROC_BROWSER_TEST_F(VideoPictureInPictureContentBrowserTest,
+@@ -725,7 +725,7 @@ IN_PROC_BROWSER_TEST_F(VideoPictureInPictureContentBrowserTest,
        .WillOnce([](const std::vector<media_session::MediaImage>& images) {
          ASSERT_EQ(images.size(), 1u);
          const std::string icon_src = images[0].src.spec();
@@ -3532,7 +3438,7 @@ index 33d805488c..64d039fa48 100644
  
  base::ScopedFD PosixFileDescriptorInfoImpl::ReleaseFD(base::PlatformFile file) {
 diff --git a/content/browser/preloading/prefetch/prefetch_canary_checker.cc b/content/browser/preloading/prefetch/prefetch_canary_checker.cc
-index 97b36cdf4d..fbce6b094f 100644
+index 889e770e62..84f3df1672 100644
 --- a/content/browser/preloading/prefetch/prefetch_canary_checker.cc
 +++ b/content/browser/preloading/prefetch/prefetch_canary_checker.cc
 @@ -15,6 +15,7 @@
@@ -3574,10 +3480,10 @@ index 6e0c51ae21..3412483b8c 100644
            ->SetPrefetchStatusOnReleaseStartedPrefetch(
                PrefetchStatus::kPrefetchEvictedAfterCandidateRemoved);
 diff --git a/content/browser/preloading/prefetch/prefetch_service.cc b/content/browser/preloading/prefetch/prefetch_service.cc
-index b98c1999cf..9759994930 100644
+index 7fcf668235..5f3c228266 100644
 --- a/content/browser/preloading/prefetch/prefetch_service.cc
 +++ b/content/browser/preloading/prefetch/prefetch_service.cc
-@@ -1437,7 +1437,7 @@ void PrefetchService::MayReleasePrefetch(
+@@ -1290,7 +1290,7 @@ void PrefetchService::MayReleasePrefetch(
      return;
    }
  
@@ -3587,7 +3493,7 @@ index b98c1999cf..9759994930 100644
    }
  
 diff --git a/content/browser/preloading/preloading_decider.cc b/content/browser/preloading/preloading_decider.cc
-index d26f1ba1de..63528618bf 100644
+index 18adbd3f62..5ab6c77536 100644
 --- a/content/browser/preloading/preloading_decider.cc
 +++ b/content/browser/preloading/preloading_decider.cc
 @@ -609,7 +609,7 @@ PreloadingDecider::GetMergedSpeculationTagsFromSuitableCandidates(
@@ -3600,7 +3506,7 @@ index d26f1ba1de..63528618bf 100644
        }
      }
 diff --git a/content/browser/preloading/prerender/prerender_browsertest.cc b/content/browser/preloading/prerender/prerender_browsertest.cc
-index 0b8550aad9..e8c4aebd43 100644
+index 6caa757890..f30526a2bd 100644
 --- a/content/browser/preloading/prerender/prerender_browsertest.cc
 +++ b/content/browser/preloading/prerender/prerender_browsertest.cc
 @@ -2,7 +2,6 @@
@@ -3611,7 +3517,7 @@ index 0b8550aad9..e8c4aebd43 100644
  #include <cstdint>
  #include <optional>
  #include <tuple>
-@@ -8783,7 +8782,7 @@ IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest, MultipleNewTabPrerendering) {
+@@ -9731,7 +9730,7 @@ IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest, MultipleNewTabPrerendering) {
      PrerenderHostId host_id = prerender_helper()->AddPrerender(
          prerendering_url, /*eagerness=*/std::nullopt, "_blank");
  
@@ -3620,7 +3526,7 @@ index 0b8550aad9..e8c4aebd43 100644
      prerender_host_ids.push_back(host_id);
  
      // Make sure that prerendering in a new tab creates new WebContentsImpl, not
-@@ -8793,8 +8792,8 @@ IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest, MultipleNewTabPrerendering) {
+@@ -9741,8 +9740,8 @@ IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest, MultipleNewTabPrerendering) {
      ASSERT_TRUE(prerender_web_contents);
      EXPECT_NE(prerender_web_contents, web_contents_impl());
      ExpectWebContentsIsForNewTabPrerendering(*prerender_web_contents);
@@ -3632,7 +3538,7 @@ index 0b8550aad9..e8c4aebd43 100644
    }
  
 diff --git a/content/browser/preloading/prerender/prerender_host.cc b/content/browser/preloading/prerender/prerender_host.cc
-index 3c59151d27..69eafcc3dd 100644
+index e1e9120e9b..ac3f7362a3 100644
 --- a/content/browser/preloading/prerender/prerender_host.cc
 +++ b/content/browser/preloading/prerender/prerender_host.cc
 @@ -4,7 +4,6 @@
@@ -3643,7 +3549,7 @@ index 3c59151d27..69eafcc3dd 100644
  #include <memory>
  #include <optional>
  
-@@ -747,7 +746,7 @@ void PrerenderHost::ReadyToCommitNavigation(
+@@ -752,7 +751,7 @@ void PrerenderHost::ReadyToCommitNavigation(
          base::FeatureList::IsEnabled(
              blink::features::kPrerender2CrossOriginIframes);
      if (is_prerender_2_cross_origin_iframes_enabled &&
@@ -3653,7 +3559,7 @@ index 3c59151d27..69eafcc3dd 100644
              network::mojom::LoadingMode::kPrerenderCrossOriginFrames)) {
        allow_cross_origin_subframe_navigation_ = true;
 diff --git a/content/browser/preloading/prerender/prerender_host_registry.cc b/content/browser/preloading/prerender/prerender_host_registry.cc
-index 0cdaa3f62b..8a7431d44d 100644
+index 3026f5535e..5a8fe87418 100644
 --- a/content/browser/preloading/prerender/prerender_host_registry.cc
 +++ b/content/browser/preloading/prerender/prerender_host_registry.cc
 @@ -4,10 +4,9 @@
@@ -3667,8 +3573,8 @@ index 0cdaa3f62b..8a7431d44d 100644
 +#include "base/containers/contains.h"
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
- #include "base/memory/memory_pressure_monitor.h"
-@@ -1033,12 +1032,12 @@ void PrerenderHostRegistry::CancelHostsForTriggers(
+ #include "base/memory_coordinator/utils.h"
+@@ -1015,12 +1014,12 @@ void PrerenderHostRegistry::CancelHostsForTriggers(
    std::vector<PrerenderHostId> ids_to_be_deleted;
  
    for (auto& iter : prerender_host_by_id_) {
@@ -3684,7 +3590,7 @@ index 0cdaa3f62b..8a7431d44d 100644
        CHECK(IsSpeculationRuleType(iter.second->trigger_type()));
        ids_to_be_deleted.push_back(iter.first);
 diff --git a/content/browser/preloading/prerender/prerender_navigation_throttle.cc b/content/browser/preloading/prerender/prerender_navigation_throttle.cc
-index 3817a26122..bfbfdfbad3 100644
+index 562995aaa7..b1d4ea848f 100644
 --- a/content/browser/preloading/prerender/prerender_navigation_throttle.cc
 +++ b/content/browser/preloading/prerender/prerender_navigation_throttle.cc
 @@ -4,8 +4,6 @@
@@ -3696,7 +3602,7 @@ index 3817a26122..bfbfdfbad3 100644
  #include "base/memory/ptr_util.h"
  #include "base/no_destructor.h"
  #include "base/strings/string_split.h"
-@@ -253,7 +251,7 @@ PrerenderNavigationThrottle::WillProcessResponse() {
+@@ -265,7 +263,7 @@ PrerenderNavigationThrottle::WillProcessResponse() {
    bool is_credentialed_prerender =
        navigation_request->response() &&
        navigation_request->response()->parsed_headers &&
@@ -3706,7 +3612,7 @@ index 3817a26122..bfbfdfbad3 100644
            network::mojom::LoadingMode::kCredentialedPrerender);
    // Cancel prerendering when this is same-site cross-origin navigation but the
 diff --git a/content/browser/preloading/prerenderer_impl.cc b/content/browser/preloading/prerenderer_impl.cc
-index 96bf4ac5ce..8b4a279df5 100644
+index e000b63878..5700ff4e71 100644
 --- a/content/browser/preloading/prerenderer_impl.cc
 +++ b/content/browser/preloading/prerenderer_impl.cc
 @@ -279,8 +279,8 @@ void PrerendererImpl::ProcessCandidatesForPrerender(
@@ -3751,10 +3657,10 @@ index 09f34506f3..7a6996282f 100644
        AddToFinalUnmergedContributions(
            std::move(conditional_contributions_[error_event]),
 diff --git a/content/browser/process_internals/process_internals_handler_impl.cc b/content/browser/process_internals/process_internals_handler_impl.cc
-index 1a34ef6e25..66d9611b56 100644
+index a18be802e0..ab7e89b000 100644
 --- a/content/browser/process_internals/process_internals_handler_impl.cc
 +++ b/content/browser/process_internals/process_internals_handler_impl.cc
-@@ -135,7 +135,7 @@ using IsolatedOriginSource = ChildProcessSecurityPolicy::IsolatedOriginSource;
+@@ -137,7 +137,7 @@ using IsolatedOriginSource = ChildProcessSecurityPolicy::IsolatedOriginSource;
              RenderFrameHostToFrameInfoNoTraverse(rfh, type);
          all_frame_info[rfh] = frame_info.get();
          RenderFrameHostImpl* parent = rfh->GetParentOrOuterDocumentOrEmbedder();
@@ -3785,18 +3691,10 @@ index 7c27f68f07..929fadf596 100644
  #endif
  
 diff --git a/content/browser/renderer_host/back_forward_cache_impl.cc b/content/browser/renderer_host/back_forward_cache_impl.cc
-index 8169853107..3abdf05934 100644
+index 3594333cd8..5483cbd3bc 100644
 --- a/content/browser/renderer_host/back_forward_cache_impl.cc
 +++ b/content/browser/renderer_host/back_forward_cache_impl.cc
-@@ -13,6 +13,7 @@
- 
- #include "base/barrier_closure.h"
- #include "base/check.h"
-+#include "base/containers/contains.h"
- #include "base/containers/enum_set.h"
- #include "base/functional/bind.h"
- #include "base/memory/weak_ptr.h"
-@@ -1923,7 +1924,7 @@ bool BackForwardCacheImpl::IsQueryAllowed(const GURL& current_url) {
+@@ -2030,7 +2030,7 @@ bool BackForwardCacheImpl::IsQueryAllowed(const GURL& current_url) {
        base::SplitString(current_url.query(), "&", base::TRIM_WHITESPACE,
                          base::SplitResult::SPLIT_WANT_NONEMPTY);
    for (const std::string& cgi_param : cgi_params) {
@@ -3806,7 +3704,7 @@ index 8169853107..3abdf05934 100644
      }
    }
 diff --git a/content/browser/renderer_host/compositor_impl_android.cc b/content/browser/renderer_host/compositor_impl_android.cc
-index c3e36be987..81f220d4a9 100644
+index 7cc0c5e358..0b048cdf96 100644
 --- a/content/browser/renderer_host/compositor_impl_android.cc
 +++ b/content/browser/renderer_host/compositor_impl_android.cc
 @@ -17,6 +17,7 @@
@@ -3818,10 +3716,10 @@ index c3e36be987..81f220d4a9 100644
  #include "base/logging.h"
  #include "base/memory/raw_ptr.h"
 diff --git a/content/browser/renderer_host/cookie_utils.cc b/content/browser/renderer_host/cookie_utils.cc
-index c0350929dc..9db660d5f3 100644
+index 2d240fc7dc..2bb401fd64 100644
 --- a/content/browser/renderer_host/cookie_utils.cc
 +++ b/content/browser/renderer_host/cookie_utils.cc
-@@ -511,7 +511,7 @@ void EmitCookieWarningsAndMetrics(
+@@ -525,7 +525,7 @@ void EmitCookieWarningsAndMetrics(
          cookie->cookie_or_line->is_cookie() &&
          cookie->cookie_or_line->get_cookie().Name().empty()) {
        cookie_set_has_empty_name = true;
@@ -3831,7 +3729,7 @@ index c0350929dc..9db660d5f3 100644
        }
      }
 diff --git a/content/browser/renderer_host/delegated_frame_host.cc b/content/browser/renderer_host/delegated_frame_host.cc
-index a00f9447da..31acb51738 100644
+index 557605517a..950f4f287d 100644
 --- a/content/browser/renderer_host/delegated_frame_host.cc
 +++ b/content/browser/renderer_host/delegated_frame_host.cc
 @@ -9,6 +9,7 @@
@@ -3843,7 +3741,7 @@ index a00f9447da..31acb51738 100644
  #include "base/debug/dump_without_crashing.h"
  #include "base/functional/bind.h"
 diff --git a/content/browser/renderer_host/frame_tree.cc b/content/browser/renderer_host/frame_tree.cc
-index 80a9205c74..1602a31070 100644
+index ce8d961d3e..c1b64357b5 100644
 --- a/content/browser/renderer_host/frame_tree.cc
 +++ b/content/browser/renderer_host/frame_tree.cc
 @@ -8,10 +8,10 @@
@@ -3875,7 +3773,7 @@ index 80a9205c74..1602a31070 100644
    // If `include_delegate_nodes_for_inner_frame_trees_` is true then
    // `should_descend_into_inner_trees_` must be true.
    DCHECK(!include_delegate_nodes_for_inner_frame_trees_ ||
-@@ -735,7 +736,7 @@ void FrameTree::RegisterRenderViewHost(RenderViewHostMapId id,
+@@ -736,7 +737,7 @@ void FrameTree::RegisterRenderViewHost(RenderViewHostMapId id,
    TRACE_EVENT_INSTANT("navigation", "FrameTree::RegisterRenderViewHost",
                        ChromeTrackEvent::kRenderViewHost, *rvh);
    CHECK(!rvh->is_speculative());
@@ -3885,7 +3783,7 @@ index 80a9205c74..1602a31070 100644
        controller()
            .GetBackForwardCache()
 diff --git a/content/browser/renderer_host/input/touch_selection_controller_client_aura.cc b/content/browser/renderer_host/input/touch_selection_controller_client_aura.cc
-index 975cc01b9c..bab0af17fc 100644
+index e0762497cf..98d8a0301e 100644
 --- a/content/browser/renderer_host/input/touch_selection_controller_client_aura.cc
 +++ b/content/browser/renderer_host/input/touch_selection_controller_client_aura.cc
 @@ -9,6 +9,7 @@
@@ -3896,24 +3794,9 @@ index 975cc01b9c..bab0af17fc 100644
  #include "content/browser/renderer_host/render_widget_host_delegate.h"
  #include "content/browser/renderer_host/render_widget_host_impl.h"
  #include "content/browser/renderer_host/render_widget_host_view_aura.h"
-@@ -507,11 +508,11 @@ bool TouchSelectionControllerClientAura::IsCommandIdEnabled(
-   bool readable = rwhva_->GetTextInputType() != ui::TEXT_INPUT_TYPE_PASSWORD;
-   bool has_selection = !rwhva_->GetSelectedText().empty();
-   switch (command_id) {
--    case std::to_underlying(ui::TouchEditable::MenuCommands::kCut):
-+    case base::to_underlying(ui::TouchEditable::MenuCommands::kCut):
-       return editable && readable && has_selection;
--    case std::to_underlying(ui::TouchEditable::MenuCommands::kCopy):
-+    case base::to_underlying(ui::TouchEditable::MenuCommands::kCopy):
-       return readable && has_selection;
--    case std::to_underlying(ui::TouchEditable::MenuCommands::kPaste): {
-+    case base::to_underlying(ui::TouchEditable::MenuCommands::kPaste): {
-       std::u16string result;
-       ui::DataTransferEndpoint data_dst = ui::DataTransferEndpoint(
-           ui::EndpointType::kDefault, {.notify_if_restricted = false});
-@@ -519,14 +520,14 @@ bool TouchSelectionControllerClientAura::IsCommandIdEnabled(
-           ui::ClipboardBuffer::kCopyPaste, &data_dst, &result);
-       return editable && !result.empty();
+@@ -548,14 +549,14 @@ bool TouchSelectionControllerClientAura::IsCommandIdEnabled(
+     case std::to_underlying(ui::TouchEditable::MenuCommands::kPaste): {
+       return editable && can_paste;
      }
 -    case std::to_underlying(ui::TouchEditable::MenuCommands::kSelectAll): {
 +    case base::to_underlying(ui::TouchEditable::MenuCommands::kSelectAll): {
@@ -3928,7 +3811,7 @@ index 975cc01b9c..bab0af17fc 100644
        gfx::Range text_range;
        if (rwhva_->GetTextRange(&text_range)) {
          return readable && !has_selection && !text_range.is_empty();
-@@ -541,9 +542,9 @@ bool TouchSelectionControllerClientAura::IsCommandIdEnabled(
+@@ -570,9 +571,9 @@ bool TouchSelectionControllerClientAura::IsCommandIdEnabled(
  void TouchSelectionControllerClientAura::ExecuteCommand(int command_id,
                                                          int event_flags) {
    if (command_id !=
@@ -3940,7 +3823,7 @@ index 975cc01b9c..bab0af17fc 100644
      rwhva_->selection_controller()->HideAndDisallowShowingAutomatically();
    }
    RenderWidgetHostDelegate* host_delegate = rwhva_->host()->delegate();
-@@ -551,19 +552,19 @@ void TouchSelectionControllerClientAura::ExecuteCommand(int command_id,
+@@ -580,19 +581,19 @@ void TouchSelectionControllerClientAura::ExecuteCommand(int command_id,
      return;
  
    switch (command_id) {
@@ -3966,7 +3849,7 @@ index 975cc01b9c..bab0af17fc 100644
            blink::mojom::SelectionGranularity::kWord,
            /*should_show_handle=*/true,
 diff --git a/content/browser/renderer_host/input/touch_selection_controller_client_child_frame.cc b/content/browser/renderer_host/input/touch_selection_controller_client_child_frame.cc
-index b0bb8e1e24..1f9ddb7fe3 100644
+index b5bb422e87..02da807445 100644
 --- a/content/browser/renderer_host/input/touch_selection_controller_client_child_frame.cc
 +++ b/content/browser/renderer_host/input/touch_selection_controller_client_child_frame.cc
 @@ -6,6 +6,7 @@
@@ -3977,24 +3860,9 @@ index b0bb8e1e24..1f9ddb7fe3 100644
  #include "content/browser/renderer_host/render_widget_host_delegate.h"
  #include "content/browser/renderer_host/render_widget_host_impl.h"
  #include "content/browser/renderer_host/render_widget_host_view_child_frame.h"
-@@ -172,11 +173,11 @@ bool TouchSelectionControllerClientChildFrame::IsCommandIdEnabled(
-   bool readable = rwhv_->GetTextInputType() != ui::TEXT_INPUT_TYPE_PASSWORD;
-   bool has_selection = !rwhv_->GetSelectedText().empty();
-   switch (command_id) {
--    case std::to_underlying(ui::TouchEditable::MenuCommands::kCut):
-+    case base::to_underlying(ui::TouchEditable::MenuCommands::kCut):
-       return editable && readable && has_selection;
--    case std::to_underlying(ui::TouchEditable::MenuCommands::kCopy):
-+    case base::to_underlying(ui::TouchEditable::MenuCommands::kCopy):
-       return readable && has_selection;
--    case std::to_underlying(ui::TouchEditable::MenuCommands::kPaste): {
-+    case base::to_underlying(ui::TouchEditable::MenuCommands::kPaste): {
-       std::u16string result;
-       ui::DataTransferEndpoint data_dst = ui::DataTransferEndpoint(
-           ui::EndpointType::kDefault, {.notify_if_restricted = false});
-@@ -184,14 +185,14 @@ bool TouchSelectionControllerClientChildFrame::IsCommandIdEnabled(
-           ui::ClipboardBuffer::kCopyPaste, &data_dst, &result);
-       return editable && !result.empty();
+@@ -180,14 +181,14 @@ bool TouchSelectionControllerClientChildFrame::IsCommandIdEnabled(
+     case std::to_underlying(ui::TouchEditable::MenuCommands::kPaste): {
+       return editable && can_paste;
      }
 -    case std::to_underlying(ui::TouchEditable::MenuCommands::kSelectAll): {
 +    case base::to_underlying(ui::TouchEditable::MenuCommands::kSelectAll): {
@@ -4009,7 +3877,7 @@ index b0bb8e1e24..1f9ddb7fe3 100644
        gfx::Range text_range;
        if (rwhv_->GetTextRange(&text_range)) {
          return readable && !has_selection && !text_range.is_empty();
-@@ -206,9 +207,9 @@ bool TouchSelectionControllerClientChildFrame::IsCommandIdEnabled(
+@@ -202,9 +203,9 @@ bool TouchSelectionControllerClientChildFrame::IsCommandIdEnabled(
  void TouchSelectionControllerClientChildFrame::ExecuteCommand(int command_id,
                                                                int event_flags) {
    if (command_id !=
@@ -4021,7 +3889,7 @@ index b0bb8e1e24..1f9ddb7fe3 100644
      manager_->GetTouchSelectionController()
          ->HideAndDisallowShowingAutomatically();
    }
-@@ -217,19 +218,19 @@ void TouchSelectionControllerClientChildFrame::ExecuteCommand(int command_id,
+@@ -213,19 +214,19 @@ void TouchSelectionControllerClientChildFrame::ExecuteCommand(int command_id,
      return;
  
    switch (command_id) {
@@ -4047,7 +3915,7 @@ index b0bb8e1e24..1f9ddb7fe3 100644
            blink::mojom::SelectionGranularity::kWord,
            /*should_show_handle=*/true,
 diff --git a/content/browser/renderer_host/media/media_devices_manager.cc b/content/browser/renderer_host/media/media_devices_manager.cc
-index 63e6c1a2af..3d0b03fccd 100644
+index f13c437187..6b3698b525 100644
 --- a/content/browser/renderer_host/media/media_devices_manager.cc
 +++ b/content/browser/renderer_host/media/media_devices_manager.cc
 @@ -14,6 +14,7 @@
@@ -4058,7 +3926,7 @@ index 63e6c1a2af..3d0b03fccd 100644
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
  #include "base/location.h"
-@@ -1525,8 +1526,8 @@ void MediaDevicesManager::MaybeStopRemovedInputDevices(
+@@ -1670,8 +1671,8 @@ void MediaDevicesManager::MaybeStopRemovedInputDevices(
         current_snapshot_[static_cast<size_t>(type)]) {
      // If a device was removed, notify the MediaStreamManager to stop all
      // streams using that device.
@@ -4070,7 +3938,7 @@ index 63e6c1a2af..3d0b03fccd 100644
  
        if (type == MediaDeviceType::kMediaAudioInput) {
 diff --git a/content/browser/renderer_host/media/media_stream_manager.cc b/content/browser/renderer_host/media/media_stream_manager.cc
-index ed51cf269d..29f944028f 100644
+index 157821789f..4948ee2670 100644
 --- a/content/browser/renderer_host/media/media_stream_manager.cc
 +++ b/content/browser/renderer_host/media/media_stream_manager.cc
 @@ -15,6 +15,7 @@
@@ -4081,31 +3949,18 @@ index ed51cf269d..29f944028f 100644
  #include "base/functional/bind.h"
  #include "base/logging.h"
  #include "base/memory/ptr_util.h"
-@@ -446,18 +447,17 @@ bool ChangeSourceSupported(const MediaStreamDevices& devices) {
-     return false;  // Killswitch engaged.
+@@ -447,9 +448,9 @@ bool ChangeSourceSupported(const MediaStreamDevices& devices) {
+     }
    }
  
 -  if (!std::ranges::contains(devices, MediaStreamType::DISPLAY_VIDEO_CAPTURE,
--                             &MediaStreamDevice::type) &&
--      !std::ranges::contains(devices,
--                             MediaStreamType::DISPLAY_VIDEO_CAPTURE_THIS_TAB,
--                             &MediaStreamDevice::type)) {
 +  if (!base::Contains(devices, MediaStreamType::DISPLAY_VIDEO_CAPTURE,
-+                      &MediaStreamDevice::type) &&
-+      !base::Contains(devices, MediaStreamType::DISPLAY_VIDEO_CAPTURE_THIS_TAB,
-+                      &MediaStreamDevice::type)) {
+                              &MediaStreamDevice::type) &&
+-      !std::ranges::contains(devices,
++      !base::Contains(devices,
+                              MediaStreamType::DISPLAY_VIDEO_CAPTURE_THIS_TAB,
+                              &MediaStreamDevice::type)) {
      return false;  // Not an API call that supports share-this-tab-instead.
-   }
- 
-   if (!base::FeatureList::IsEnabled(
-           media::kShareThisTabInsteadButtonGetDisplayMediaAudio) &&
--      std::ranges::contains(devices, MediaStreamType::DISPLAY_AUDIO_CAPTURE,
--                            &MediaStreamDevice::type)) {
-+      base::Contains(devices, MediaStreamType::DISPLAY_AUDIO_CAPTURE,
-+                     &MediaStreamDevice::type)) {
-     // The user chose to capture audio, but the killswitch against
-     // share-this-tab-instead with audio is engaged.
-     return false;
 diff --git a/content/browser/renderer_host/media/video_capture_controller.cc b/content/browser/renderer_host/media/video_capture_controller.cc
 index 7f570e18fb..2185ba70c7 100644
 --- a/content/browser/renderer_host/media/video_capture_controller.cc
@@ -4182,18 +4037,10 @@ index 39cb85f38a..d34e5fd3de 100644
    }
  
 diff --git a/content/browser/renderer_host/media/video_capture_manager.cc b/content/browser/renderer_host/media/video_capture_manager.cc
-index 2d5bb7c85a..e53b31e083 100644
+index b46521e4c6..73e054ae3a 100644
 --- a/content/browser/renderer_host/media/video_capture_manager.cc
 +++ b/content/browser/renderer_host/media/video_capture_manager.cc
-@@ -10,6 +10,7 @@
- #include <utility>
- 
- #include "base/command_line.h"
-+#include "base/containers/contains.h"
- #include "base/functional/bind.h"
- #include "base/functional/callback_helpers.h"
- #include "base/location.h"
-@@ -262,7 +263,7 @@ void VideoCaptureManager::DoStopDevice(VideoCaptureController* controller) {
+@@ -283,7 +283,7 @@ void VideoCaptureManager::DoStopDevice(VideoCaptureController* controller) {
    DCHECK_CURRENTLY_ON(BrowserThread::IO);
    TRACE_EVENT0(TRACE_DISABLED_BY_DEFAULT("video_and_image_capture"),
                 "VideoCaptureManager::DoStopDevice");
@@ -4202,7 +4049,7 @@ index 2d5bb7c85a..e53b31e083 100644
  
    // If start request has not yet started processing, i.e. if it is not at the
    // beginning of the queue, remove it from the queue.
-@@ -895,8 +896,8 @@ VideoCaptureManager::LookupControllerByMediaTypeAndDeviceId(
+@@ -938,8 +938,8 @@ VideoCaptureManager::LookupControllerByMediaTypeAndDeviceId(
  bool VideoCaptureManager::IsControllerPointerValid(
      const VideoCaptureController* controller) const {
    DCHECK_CURRENTLY_ON(BrowserThread::IO);
@@ -4214,7 +4061,7 @@ index 2d5bb7c85a..e53b31e083 100644
  
  scoped_refptr<VideoCaptureController>
 diff --git a/content/browser/renderer_host/mixed_content_checker.cc b/content/browser/renderer_host/mixed_content_checker.cc
-index f5f14eaa1f..0595f14b81 100644
+index 233ddd4dae..077f796270 100644
 --- a/content/browser/renderer_host/mixed_content_checker.cc
 +++ b/content/browser/renderer_host/mixed_content_checker.cc
 @@ -4,8 +4,7 @@
@@ -4244,10 +4091,10 @@ index f5f14eaa1f..0595f14b81 100644
  
  // Should return the same value as the resource URL checks result from
 diff --git a/content/browser/renderer_host/navigation_controller_impl_browsertest.cc b/content/browser/renderer_host/navigation_controller_impl_browsertest.cc
-index 7e4a0503a7..97a95a8c0e 100644
+index 3afdecead8..2380af12cf 100644
 --- a/content/browser/renderer_host/navigation_controller_impl_browsertest.cc
 +++ b/content/browser/renderer_host/navigation_controller_impl_browsertest.cc
-@@ -16884,7 +16884,7 @@ IN_PROC_BROWSER_TEST_P(NavigationControllerBrowserTest,
+@@ -16856,7 +16856,7 @@ IN_PROC_BROWSER_TEST_P(NavigationControllerBrowserTest,
    EXPECT_TRUE(NavigateToURL(shell(), first_url));
    curr_spare_ids = spare_manager.GetSpareIds();
    curr_host = shell()->web_contents()->GetPrimaryMainFrame()->GetProcess();
@@ -4256,7 +4103,7 @@ index 7e4a0503a7..97a95a8c0e 100644
  
    // No process swap when navigating away from the initial blank page.
    EXPECT_EQ(prev_host, curr_host);
-@@ -16919,7 +16919,7 @@ IN_PROC_BROWSER_TEST_P(NavigationControllerBrowserTest,
+@@ -16891,7 +16891,7 @@ IN_PROC_BROWSER_TEST_P(NavigationControllerBrowserTest,
    EXPECT_NE(prev_host, curr_host);
    // If present, the spare RenderProcessHost should have been be used.
    if (!prev_spare_ids.empty()) {
@@ -4265,7 +4112,7 @@ index 7e4a0503a7..97a95a8c0e 100644
    }
    // A new spare should be warmed-up in site-per-process mode.
    if (AreAllSitesIsolatedForTesting()) {
-@@ -16941,7 +16941,7 @@ IN_PROC_BROWSER_TEST_P(NavigationControllerBrowserTest,
+@@ -16913,7 +16913,7 @@ IN_PROC_BROWSER_TEST_P(NavigationControllerBrowserTest,
    EXPECT_NE(prev_host, curr_host);
    // If present, the spare RenderProcessHost should have been used.
    if (!prev_spare_ids.empty()) {
@@ -4275,7 +4122,7 @@ index 7e4a0503a7..97a95a8c0e 100644
    // A new spare should be warmed-up in site-per-process mode.
    if (AreAllSitesIsolatedForTesting()) {
 diff --git a/content/browser/renderer_host/navigation_request.cc b/content/browser/renderer_host/navigation_request.cc
-index 5b79df01e0..4febf7751b 100644
+index d2feb51609..7353e0a8ad 100644
 --- a/content/browser/renderer_host/navigation_request.cc
 +++ b/content/browser/renderer_host/navigation_request.cc
 @@ -4,7 +4,6 @@
@@ -4286,15 +4133,15 @@ index 5b79df01e0..4febf7751b 100644
  #include <memory>
  #include <optional>
  #include <string>
-@@ -15,6 +14,7 @@
- #include "base/auto_reset.h"
+@@ -17,6 +16,7 @@
  #include "base/check_is_test.h"
+ #include "base/check_op.h"
  #include "base/command_line.h"
 +#include "base/containers/contains.h"
  #include "base/containers/span.h"
  #include "base/debug/alias.h"
  #include "base/debug/crash_logging.h"
-@@ -826,8 +826,8 @@ bool IsOptedInFencedFrame(const net::HttpResponseHeaders& http_headers) {
+@@ -863,8 +863,8 @@ bool IsOptedInFencedFrame(const net::HttpResponseHeaders& http_headers) {
    network::mojom::SupportsLoadingModePtr result =
        network::ParseSupportsLoadingMode(http_headers);
    return !result.is_null() &&
@@ -4327,18 +4174,18 @@ index 21342e79f4..af3355c9e2 100644
        }
        plugins.push_back(std::move(plugin_blink));
 diff --git a/content/browser/renderer_host/render_frame_host_impl.cc b/content/browser/renderer_host/render_frame_host_impl.cc
-index 46368e70af..75cb871259 100644
+index 2bacb736c7..f6ed40ba9a 100644
 --- a/content/browser/renderer_host/render_frame_host_impl.cc
 +++ b/content/browser/renderer_host/render_frame_host_impl.cc
-@@ -18,6 +18,7 @@
- 
+@@ -19,6 +19,7 @@
  #include "base/check.h"
+ #include "base/check_op.h"
  #include "base/command_line.h"
 +#include "base/containers/contains.h"
  #include "base/containers/flat_set.h"
  #include "base/containers/span_reader.h"
  #include "base/debug/crash_logging.h"
-@@ -7896,8 +7897,8 @@ void RenderFrameHostImpl::AllowBindings(BindingsPolicySet bindings) {
+@@ -8052,8 +8053,8 @@ void RenderFrameHostImpl::AllowBindings(BindingsPolicySet bindings) {
        !RenderProcessHost::run_renderer_in_process()) {
      ProcessLock process_lock = GetProcess()->GetProcessLock();
      if (!process_lock.IsLockedToSite() ||
@@ -4349,7 +4196,7 @@ index 46368e70af..75cb871259 100644
        SCOPED_CRASH_KEY_STRING256("AllowBindings", "process_lock",
                                   process_lock.ToString());
        NOTREACHED() << "Calling AllowBindings for a process not locked to WebUI:"
-@@ -10609,7 +10610,7 @@ void RenderFrameHostImpl::MaybeSendFencedFrameAutomaticReportingBeacon(
+@@ -10874,7 +10875,7 @@ void RenderFrameHostImpl::MaybeSendFencedFrameAutomaticReportingBeacon(
      // the event's "destination" for setReportEventDataForAutomaticBeacons().
      // For cross-origin frames, the data must be opted in to being used for
      // cross-origin beacons.
@@ -4358,7 +4205,7 @@ index 46368e70af..75cb871259 100644
          (is_same_origin || info->cross_origin_exposed)) {
        data = info->data;
      }
-@@ -12618,7 +12619,7 @@ void RenderFrameHostImpl::CommitNavigation(
+@@ -12970,7 +12971,7 @@ void RenderFrameHostImpl::CommitNavigation(
  
      // See if this is for WebUI.
      const auto& webui_schemes = URLDataManagerBackend::GetWebUISchemes();
@@ -4367,7 +4214,7 @@ index 46368e70af..75cb871259 100644
        mojo::PendingRemote<network::mojom::URLLoaderFactory> factory_for_webui =
            url_loader_factory::CreatePendingRemote(
                ContentBrowserClient::URLLoaderFactoryType::kDocumentSubResource,
-@@ -13058,8 +13059,8 @@ void RenderFrameHostImpl::AddResourceTimingEntryForFailedSubframeNavigation(
+@@ -13403,8 +13404,8 @@ void RenderFrameHostImpl::AddResourceTimingEntryForFailedSubframeNavigation(
        response_head->request_start, response_head->response_start, status_code,
        mime_type, response_head->load_timing, response_head->connection_info,
        response_head->alpn_negotiated_protocol,
@@ -4379,7 +4226,7 @@ index 46368e70af..75cb871259 100644
  }
  
 diff --git a/content/browser/renderer_host/render_frame_host_impl_browsertest.cc b/content/browser/renderer_host/render_frame_host_impl_browsertest.cc
-index 47f75908c4..61bde1d068 100644
+index 7c29e5ac15..80489d8818 100644
 --- a/content/browser/renderer_host/render_frame_host_impl_browsertest.cc
 +++ b/content/browser/renderer_host/render_frame_host_impl_browsertest.cc
 @@ -4,7 +4,6 @@
@@ -4398,7 +4245,7 @@ index 47f75908c4..61bde1d068 100644
  #include "base/files/file_path.h"
  #include "base/functional/bind.h"
  #include "base/functional/callback_helpers.h"
-@@ -5850,7 +5850,7 @@ ObjectData kInnerObject{10, {"getInnerId"}};
+@@ -5969,7 +5969,7 @@ ObjectData kInnerObject{10, {"getInnerId"}};
  class MockInnerObject : public blink::mojom::RemoteObject {
   public:
    void HasMethod(const std::string& name, HasMethodCallback callback) override {
@@ -4407,7 +4254,7 @@ index 47f75908c4..61bde1d068 100644
    }
    void GetMethods(GetMethodsCallback callback) override {
      std::move(callback).Run(kInnerObject.methods);
-@@ -5876,7 +5876,7 @@ class MockObject : public blink::mojom::RemoteObject {
+@@ -5995,7 +5995,7 @@ class MockObject : public blink::mojom::RemoteObject {
        mojo::PendingReceiver<blink::mojom::RemoteObject> receiver)
        : receiver_(this, std::move(receiver)) {}
    void HasMethod(const std::string& name, HasMethodCallback callback) override {
@@ -4417,10 +4264,10 @@ index 47f75908c4..61bde1d068 100644
  
    void GetMethods(GetMethodsCallback callback) override {
 diff --git a/content/browser/renderer_host/render_frame_host_manager.cc b/content/browser/renderer_host/render_frame_host_manager.cc
-index 40bec6c27e..c677464d2d 100644
+index c7c9750f40..39930b1a48 100644
 --- a/content/browser/renderer_host/render_frame_host_manager.cc
 +++ b/content/browser/renderer_host/render_frame_host_manager.cc
-@@ -15,6 +15,7 @@
+@@ -17,6 +17,7 @@
  #include "base/check_op.h"
  #include "base/command_line.h"
  #include "base/containers/adapters.h"
@@ -4428,7 +4275,7 @@ index 40bec6c27e..c677464d2d 100644
  #include "base/debug/crash_logging.h"
  #include "base/debug/dump_without_crashing.h"
  #include "base/feature_list.h"
-@@ -27,6 +28,7 @@
+@@ -29,6 +30,7 @@
  #include "base/timer/elapsed_timer.h"
  #include "base/trace_event/named_trigger.h"
  #include "base/trace_event/typed_macros.h"
@@ -4436,18 +4283,7 @@ index 40bec6c27e..c677464d2d 100644
  #include "base/types/expected.h"
  #include "base/unguessable_token.h"
  #include "build/build_config.h"
-@@ -1139,8 +1141,8 @@ void RenderFrameHostManager::PrepareForCollectingPage(
-     // new cross-process, cross-BrowsingInstance navigation, as well as any
-     // restored proxies which are also in a different BrowsingInstance.
-     if (group->IsRelatedSiteInstanceGroup(it.second->site_instance_group())) {
--      DCHECK(render_view_hosts->contains(
--          it.second->GetRenderViewHost()->GetSafeRef()));
-+      DCHECK(base::Contains(*render_view_hosts,
-+                            it.second->GetRenderViewHost()->GetSafeRef()));
-       auto pair = proxy_hosts->insert({it.first, std::move(it.second)});
-       bool insertion_took_place = pair.second;
-       // There should be only one proxy for any given SiteInstanceGroup, so this
-@@ -5175,9 +5177,9 @@ void RenderFrameHostManager::CommitPending(
+@@ -5245,9 +5247,9 @@ void RenderFrameHostManager::CommitPending(
        for (auto& proxy : proxy_hosts_to_restore) {
          // We only cache pages when swapping BrowsingInstance, so we should
          // never be reusing SiteInstanceGroups.
@@ -4461,7 +4297,7 @@ index 40bec6c27e..c677464d2d 100644
              render_frame_host_->browsing_context_state().get());
          TRACE_EVENT_INSTANT(
 diff --git a/content/browser/renderer_host/render_frame_proxy_host.cc b/content/browser/renderer_host/render_frame_proxy_host.cc
-index bce2b4cafc..c2074dd5a0 100644
+index eb03d035d3..085406a622 100644
 --- a/content/browser/renderer_host/render_frame_proxy_host.cc
 +++ b/content/browser/renderer_host/render_frame_proxy_host.cc
 @@ -10,6 +10,7 @@
@@ -4473,7 +4309,7 @@ index bce2b4cafc..c2074dd5a0 100644
  #include "base/hash/hash.h"
  #include "base/lazy_instance.h"
 diff --git a/content/browser/renderer_host/render_process_host_impl.cc b/content/browser/renderer_host/render_process_host_impl.cc
-index 8c6e66e4d3..b9d602a782 100644
+index 48d024ccc2..6cb5a28d15 100644
 --- a/content/browser/renderer_host/render_process_host_impl.cc
 +++ b/content/browser/renderer_host/render_process_host_impl.cc
 @@ -21,6 +21,7 @@
@@ -4484,7 +4320,7 @@ index 8c6e66e4d3..b9d602a782 100644
  #include "base/containers/flat_map.h"
  #include "base/containers/map_util.h"
  #include "base/debug/alias.h"
-@@ -3395,8 +3396,8 @@ bool RenderProcessHostImpl::HostHasNotBeenUsed() {
+@@ -3447,8 +3448,8 @@ bool RenderProcessHostImpl::HostHasNotBeenUsed() {
  }
  
  bool RenderProcessHostImpl::IsSpare() const {
@@ -4496,7 +4332,7 @@ index 8c6e66e4d3..b9d602a782 100644
  
  void RenderProcessHostImpl::SetProcessLock(
 diff --git a/content/browser/renderer_host/render_widget_host_browsertest.cc b/content/browser/renderer_host/render_widget_host_browsertest.cc
-index 5d165b7ed6..b78a8db80f 100644
+index c04126bccd..a14c6c1918 100644
 --- a/content/browser/renderer_host/render_widget_host_browsertest.cc
 +++ b/content/browser/renderer_host/render_widget_host_browsertest.cc
 @@ -2,10 +2,10 @@
@@ -4511,7 +4347,7 @@ index 5d165b7ed6..b78a8db80f 100644
  #include "base/functional/bind.h"
  #include "base/memory/raw_ptr.h"
  #include "base/run_loop.h"
-@@ -295,8 +295,8 @@ IN_PROC_BROWSER_TEST_F(RenderWidgetHostTouchEmulatorBrowserTest,
+@@ -320,8 +320,8 @@ IN_PROC_BROWSER_TEST_F(RenderWidgetHostTouchEmulatorBrowserTest,
      // that we generated a GestureScrollEnd and routed it without crashing.
      TestInputEventObserver::EventTypeVector dispatched_events =
          observer.GetAndResetDispatchedEventTypes();
@@ -4523,7 +4359,7 @@ index 5d165b7ed6..b78a8db80f 100644
  }
  #endif  // !BUILDFLAG(IS_ANDROID)
 diff --git a/content/browser/renderer_host/render_widget_host_impl.cc b/content/browser/renderer_host/render_widget_host_impl.cc
-index 5f820ecdcb..122dabd5e6 100644
+index fe46ebe4e5..891a7bbd68 100644
 --- a/content/browser/renderer_host/render_widget_host_impl.cc
 +++ b/content/browser/renderer_host/render_widget_host_impl.cc
 @@ -16,6 +16,7 @@
@@ -4534,7 +4370,7 @@ index 5f820ecdcb..122dabd5e6 100644
  #include "base/debug/alias.h"
  #include "base/debug/dump_without_crashing.h"
  #include "base/files/file_path.h"
-@@ -1878,7 +1879,7 @@ input::InputRouter* RenderWidgetHostImpl::input_router() {
+@@ -1841,7 +1842,7 @@ input::InputRouter* RenderWidgetHostImpl::input_router() {
  
  void RenderWidgetHostImpl::AddKeyPressEventCallback(
      const KeyPressEventCallback& callback) {
@@ -4543,7 +4379,7 @@ index 5f820ecdcb..122dabd5e6 100644
    key_press_event_callbacks_.push_back(callback);
  }
  
-@@ -1889,7 +1890,7 @@ void RenderWidgetHostImpl::RemoveKeyPressEventCallback(
+@@ -1852,7 +1853,7 @@ void RenderWidgetHostImpl::RemoveKeyPressEventCallback(
  
  void RenderWidgetHostImpl::AddMouseEventCallback(
      const MouseEventCallback& callback) {
@@ -4552,7 +4388,7 @@ index 5f820ecdcb..122dabd5e6 100644
    mouse_event_callbacks_.push_back(callback);
  }
  
-@@ -1900,7 +1901,7 @@ void RenderWidgetHostImpl::RemoveMouseEventCallback(
+@@ -1863,7 +1864,7 @@ void RenderWidgetHostImpl::RemoveMouseEventCallback(
  
  void RenderWidgetHostImpl::AddSuppressShowingImeCallback(
      const SuppressShowingImeCallback& callback) {
@@ -4562,7 +4398,7 @@ index 5f820ecdcb..122dabd5e6 100644
  }
  
 diff --git a/content/browser/renderer_host/render_widget_host_view_base.cc b/content/browser/renderer_host/render_widget_host_view_base.cc
-index f63a7b0b7a..65d8fae81d 100644
+index eba3d431d9..f6a0fdab53 100644
 --- a/content/browser/renderer_host/render_widget_host_view_base.cc
 +++ b/content/browser/renderer_host/render_widget_host_view_base.cc
 @@ -7,6 +7,7 @@
@@ -4574,7 +4410,7 @@ index f63a7b0b7a..65d8fae81d 100644
  #include "base/functional/bind.h"
  #include "base/lazy_instance.h"
 diff --git a/content/browser/renderer_host/render_widget_host_view_browsertest.cc b/content/browser/renderer_host/render_widget_host_view_browsertest.cc
-index 5ed6d64d6c..0c8b7aa5f2 100644
+index 65ff689990..d2cba9e18e 100644
 --- a/content/browser/renderer_host/render_widget_host_view_browsertest.cc
 +++ b/content/browser/renderer_host/render_widget_host_view_browsertest.cc
 @@ -4,7 +4,6 @@
@@ -4585,7 +4421,7 @@ index 5ed6d64d6c..0c8b7aa5f2 100644
  #include <memory>
  #include <string>
  #include <utility>
-@@ -884,7 +883,7 @@ IN_PROC_BROWSER_TEST_F(BFCachedRenderWidgetHostViewBrowserTest,
+@@ -885,7 +884,7 @@ IN_PROC_BROWSER_TEST_F(BFCachedRenderWidgetHostViewBrowserTest,
      const auto evicted_ids =
          static_cast<RenderWidgetHostImpl*>(rfh1->GetRenderWidgetHost())
              ->CollectSurfaceIdsForEviction();
@@ -4616,7 +4452,7 @@ index f1a3a4ea7a..e79106f2f6 100644
      return true;
    }
 diff --git a/content/browser/renderer_host/spare_render_process_host_manager_impl.cc b/content/browser/renderer_host/spare_render_process_host_manager_impl.cc
-index b83abee880..704cfe5f48 100644
+index 784ef806bb..9db5c1a3b0 100644
 --- a/content/browser/renderer_host/spare_render_process_host_manager_impl.cc
 +++ b/content/browser/renderer_host/spare_render_process_host_manager_impl.cc
 @@ -4,7 +4,6 @@
@@ -4627,7 +4463,7 @@ index b83abee880..704cfe5f48 100644
  #include <optional>
  
  #include "base/check.h"
-@@ -895,7 +894,7 @@ void SpareRenderProcessHostManagerImpl::ReleaseSpare(
+@@ -900,7 +899,7 @@ void SpareRenderProcessHostManagerImpl::ReleaseSpare(
  
  void SpareRenderProcessHostManagerImpl::RenderProcessReady(
      RenderProcessHost* host) {
@@ -4649,7 +4485,7 @@ index 5720148c13..b7412a99f3 100644
  #include "content/browser/renderer_host/render_frame_host_impl.h"
  #include "content/browser/renderer_host/render_frame_proxy_host.h"
 diff --git a/content/browser/service_worker/embedded_worker_instance.cc b/content/browser/service_worker/embedded_worker_instance.cc
-index 194552ae4e..6a9e6ff546 100644
+index 13dc706305..2a1b3b9d0e 100644
 --- a/content/browser/service_worker/embedded_worker_instance.cc
 +++ b/content/browser/service_worker/embedded_worker_instance.cc
 @@ -4,10 +4,10 @@
@@ -4664,7 +4500,7 @@ index 194552ae4e..6a9e6ff546 100644
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
  #include "base/functional/callback.h"
-@@ -951,7 +951,7 @@ EmbeddedWorkerInstance::CreateFactoryBundle(
+@@ -923,7 +923,7 @@ EmbeddedWorkerInstance::CreateFactoryBundle(
      // redirects to data: URLs in ServiceWorkerGlobalScope
      // (https://crbug.com/1334249).
      if (scheme != url::kDataScheme &&
@@ -4674,18 +4510,18 @@ index 194552ae4e..6a9e6ff546 100644
      }
  
 diff --git a/content/browser/service_worker/service_worker_browsertest.cc b/content/browser/service_worker/service_worker_browsertest.cc
-index 5167c8c8c6..af41161aca 100644
+index 99c6bd70fd..3021e34c66 100644
 --- a/content/browser/service_worker/service_worker_browsertest.cc
 +++ b/content/browser/service_worker/service_worker_browsertest.cc
-@@ -13,6 +13,7 @@
- #include <utility>
+@@ -14,6 +14,7 @@
  
+ #include "base/byte_size.h"
  #include "base/command_line.h"
 +#include "base/containers/contains.h"
  #include "base/functional/bind.h"
  #include "base/functional/callback.h"
  #include "base/functional/callback_helpers.h"
-@@ -5175,25 +5176,27 @@ class ServiceWorkerStaticRouterRaceNetworkAndFetchHandlerSourceBrowserTest
+@@ -5159,25 +5160,27 @@ class ServiceWorkerStaticRouterRaceNetworkAndFetchHandlerSourceBrowserTest
      test_server->RegisterRequestHandler(base::BindRepeating(
          [](const net::test_server::HttpRequest& request)
              -> std::unique_ptr<net::test_server::HttpResponse> {
@@ -4719,7 +4555,7 @@ index 5167c8c8c6..af41161aca 100644
              http_response->set_code(net::HTTP_TEMPORARY_REDIRECT);
  
              const int pos = request.GetURL().GetQuery().find(kQueryForRedirect);
-@@ -5206,12 +5209,13 @@ class ServiceWorkerStaticRouterRaceNetworkAndFetchHandlerSourceBrowserTest
+@@ -5190,12 +5193,13 @@ class ServiceWorkerStaticRouterRaceNetworkAndFetchHandlerSourceBrowserTest
              return http_response;
            }
  
@@ -4736,7 +4572,7 @@ index 5167c8c8c6..af41161aca 100644
              // The data pipe buffer size created for the RaceNetworkRequest test
              // is 1024 byte. Set large data to overflow the buffer.
              http_response->set_content(std::string(1024 * 3, 'A'));
-@@ -5221,7 +5225,7 @@ class ServiceWorkerStaticRouterRaceNetworkAndFetchHandlerSourceBrowserTest
+@@ -5205,7 +5209,7 @@ class ServiceWorkerStaticRouterRaceNetworkAndFetchHandlerSourceBrowserTest
              return http_response;
            }
  
@@ -4745,7 +4581,7 @@ index 5167c8c8c6..af41161aca 100644
              http_response->set_code(net::HTTP_NOT_FOUND);
              http_response->set_content(
                  "[ServiceWorkerRaceNetworkRequest] Not found");
-@@ -6997,15 +7001,16 @@ class ServiceWorkerStaticRouterBrowserTest : public ServiceWorkerBrowserTest {
+@@ -6919,15 +6923,16 @@ class ServiceWorkerStaticRouterBrowserTest : public ServiceWorkerBrowserTest {
      embedded_test_server()->RegisterRequestHandler(base::BindRepeating(
          [](const net::test_server::HttpRequest& request)
              -> std::unique_ptr<net::test_server::HttpResponse> {
@@ -4771,7 +4607,7 @@ index 5167c8c8c6..af41161aca 100644
              auto http_response =
                  std::make_unique<net::test_server::BasicHttpResponse>();
              http_response->set_code(net::HTTP_OK);
-@@ -7015,8 +7020,8 @@ class ServiceWorkerStaticRouterBrowserTest : public ServiceWorkerBrowserTest {
+@@ -6937,8 +6942,8 @@ class ServiceWorkerStaticRouterBrowserTest : public ServiceWorkerBrowserTest {
                  "Response from the network");
              return http_response;
            }
@@ -4782,7 +4618,7 @@ index 5167c8c8c6..af41161aca 100644
              auto http_response =
                  std::make_unique<net::test_server::BasicHttpResponse>();
              http_response->set_code(net::HTTP_OK);
-@@ -7693,12 +7698,12 @@ class ServiceWorkerSyntheticResponseBrowserTest
+@@ -7622,12 +7627,12 @@ class ServiceWorkerSyntheticResponseBrowserTest
      test_server->RegisterRequestHandler(base::BindRepeating(
          [](const net::test_server::HttpRequest& request)
              -> std::unique_ptr<net::test_server::HttpResponse> {
@@ -4798,7 +4634,7 @@ index 5167c8c8c6..af41161aca 100644
              auto response =
                  std::make_unique<net::test_server::BasicHttpResponse>();
              response->set_code(net::HTTP_TEMPORARY_REDIRECT);
-@@ -7708,7 +7713,7 @@ class ServiceWorkerSyntheticResponseBrowserTest
+@@ -7637,7 +7642,7 @@ class ServiceWorkerSyntheticResponseBrowserTest
            }
  
            const bool is_slow =
@@ -4807,7 +4643,7 @@ index 5167c8c8c6..af41161aca 100644
  
            std::string headers =
                "HTTP/1.1 200 OK\r\n"
-@@ -7718,28 +7723,29 @@ class ServiceWorkerSyntheticResponseBrowserTest
+@@ -7648,28 +7653,29 @@ class ServiceWorkerSyntheticResponseBrowserTest
                "Date: Fri, 27 Jun 2025 10:50:00 JST\r\n"
                "Test-Duplicated-Header: x\r\n";
  
@@ -4849,7 +4685,7 @@ index 5167c8c8c6..af41161aca 100644
                  "<meta http-equiv=\"Content-Security-Policy\" "
                  "content=\"script-src 'nonce-jDHFShrQe4XmmH47DWyhaQ'\" />"
 diff --git a/content/browser/service_worker/service_worker_client.cc b/content/browser/service_worker/service_worker_client.cc
-index 2ca12d307d..dbedf555a6 100644
+index 3c95a59736..16f2130861 100644
 --- a/content/browser/service_worker/service_worker_client.cc
 +++ b/content/browser/service_worker/service_worker_client.cc
 @@ -9,6 +9,7 @@
@@ -4859,18 +4695,9 @@ index 2ca12d307d..dbedf555a6 100644
 +#include "base/containers/contains.h"
  #include "base/debug/alias.h"
  #include "base/debug/crash_logging.h"
- #include "base/notreached.h"
-@@ -330,7 +331,7 @@ void ServiceWorkerClient::AddMatchingRegistration(
-     return;
-   }
-   size_t key = registration->scope().spec().size();
--  if (matching_registrations_.contains(key)) {
-+  if (base::Contains(matching_registrations_, key)) {
-     return;
-   }
-   registration->AddListener(this);
+ #include "base/metrics/histogram_functions.h"
 diff --git a/content/browser/service_worker/service_worker_container_host.cc b/content/browser/service_worker/service_worker_container_host.cc
-index dfb38e8a8a..3fd77e4d09 100644
+index 72bbd04624..3f09eb1aa0 100644
 --- a/content/browser/service_worker/service_worker_container_host.cc
 +++ b/content/browser/service_worker/service_worker_container_host.cc
 @@ -7,6 +7,7 @@
@@ -4881,7 +4708,7 @@ index dfb38e8a8a..3fd77e4d09 100644
  #include "base/debug/crash_logging.h"
  #include "base/debug/dump_without_crashing.h"
  #include "base/feature_list.h"
-@@ -600,7 +601,7 @@ ServiceWorkerRegistrationObjectManager::CreateInfo(
+@@ -607,7 +608,7 @@ ServiceWorkerRegistrationObjectManager::CreateInfo(
  void ServiceWorkerRegistrationObjectManager::RemoveHost(
      int64_t registration_id) {
    DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
@@ -4890,7 +4717,7 @@ index dfb38e8a8a..3fd77e4d09 100644
    // This is a workaround for a really unfavorable ownership structure of
    // service worker content code. This boils down to the following ownership
    // cycle:
-@@ -672,7 +673,7 @@ ServiceWorkerObjectManager::GetOrCreateHost(
+@@ -679,7 +680,7 @@ ServiceWorkerObjectManager::GetOrCreateHost(
  
  void ServiceWorkerObjectManager::RemoveHost(int64_t version_id) {
    DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
@@ -4900,7 +4727,7 @@ index dfb38e8a8a..3fd77e4d09 100644
    // ServiceWorkerObjectHost to be deleted may have the last reference to
    // ServiceWorkerVersion that indirectly owns this ServiceWorkerContainerHost.
 diff --git a/content/browser/service_worker/service_worker_process_manager.cc b/content/browser/service_worker/service_worker_process_manager.cc
-index 93be2cb0c0..64afbc8e82 100644
+index 5925e7e9ad..efab478e74 100644
 --- a/content/browser/service_worker/service_worker_process_manager.cc
 +++ b/content/browser/service_worker/service_worker_process_manager.cc
 @@ -9,6 +9,7 @@
@@ -4921,18 +4748,18 @@ index 93be2cb0c0..64afbc8e82 100644
  
    // Create a SiteInstance to get the renderer process from.
 diff --git a/content/browser/service_worker/service_worker_registry.cc b/content/browser/service_worker/service_worker_registry.cc
-index 9833e28325..f4188fdea2 100644
+index 4ec4fc97f6..d09889afc1 100644
 --- a/content/browser/service_worker/service_worker_registry.cc
 +++ b/content/browser/service_worker/service_worker_registry.cc
-@@ -8,6 +8,7 @@
- #include <utility>
+@@ -9,6 +9,7 @@
  
+ #include "base/byte_size.h"
  #include "base/check_is_test.h"
 +#include "base/containers/contains.h"
  #include "base/memory/ptr_util.h"
  #include "base/memory/raw_ptr.h"
  #include "base/memory/weak_ptr.h"
-@@ -687,7 +688,7 @@ void ServiceWorkerRegistry::DeleteRegistration(
+@@ -690,7 +691,7 @@ void ServiceWorkerRegistry::DeleteRegistration(
                       std::move(callback)),
        registration->id(), registration->key());
  
@@ -4941,16 +4768,16 @@ index 9833e28325..f4188fdea2 100644
    uninstalling_registrations_[registration->id()] = registration;
    registration->SetStatus(ServiceWorkerRegistration::Status::kUninstalling);
  }
-@@ -1211,7 +1212,7 @@ ServiceWorkerRegistry::GetOrCreateRegistration(
+@@ -1214,7 +1215,7 @@ ServiceWorkerRegistry::GetOrCreateRegistration(
    registration->SetStored();
-   registration->set_resources_total_size_bytes(data.resources_total_size_bytes);
+   registration->set_resources_total_size(data.resources_total_size);
    registration->set_last_update_check(data.last_update_check);
 -  DCHECK(!uninstalling_registrations_.contains(data.registration_id));
 +  DCHECK(!base::Contains(uninstalling_registrations_, data.registration_id));
  
    scoped_refptr<ServiceWorkerVersion> version =
        context_->GetLiveVersion(data.version_id);
-@@ -1276,7 +1277,7 @@ ServiceWorkerRegistry::FindFromLiveRegistrationsForId(int64_t registration_id) {
+@@ -1279,7 +1280,7 @@ ServiceWorkerRegistry::FindFromLiveRegistrationsForId(int64_t registration_id) {
      // The registration is considered as findable when it's stored or in
      // installing state.
      if (registration->IsStored() ||
@@ -4959,7 +4786,7 @@ index 9833e28325..f4188fdea2 100644
        return registration;
      }
      // Otherwise, the registration should not be findable even if it's still
-@@ -2101,7 +2102,7 @@ void ServiceWorkerRegistry::StartRemoteCall(
+@@ -2103,7 +2104,7 @@ void ServiceWorkerRegistry::StartRemoteCall(
  }
  
  void ServiceWorkerRegistry::FinishRemoteCall(const InflightCall* call) {
@@ -4969,12 +4796,12 @@ index 9833e28325..f4188fdea2 100644
  }
  
 diff --git a/content/browser/service_worker/service_worker_script_cache_map.cc b/content/browser/service_worker/service_worker_script_cache_map.cc
-index 2f841ea053..3267d2e83f 100644
+index c40c081a68..67abf1f81f 100644
 --- a/content/browser/service_worker/service_worker_script_cache_map.cc
 +++ b/content/browser/service_worker/service_worker_script_cache_map.cc
-@@ -7,6 +7,7 @@
- #include <utility>
+@@ -9,6 +9,7 @@
  
+ #include "base/byte_size.h"
  #include "base/check_op.h"
 +#include "base/containers/contains.h"
  #include "base/functional/bind.h"
@@ -4999,7 +4826,7 @@ index 2f841ea053..3267d2e83f 100644
  
    mojo::Remote<storage::mojom::ServiceWorkerResourceMetadataWriter> writer;
 diff --git a/content/browser/service_worker/service_worker_version.cc b/content/browser/service_worker/service_worker_version.cc
-index b06ff89c38..761aef6f0e 100644
+index 8672211976..ae267abea0 100644
 --- a/content/browser/service_worker/service_worker_version.cc
 +++ b/content/browser/service_worker/service_worker_version.cc
 @@ -13,6 +13,7 @@
@@ -5010,7 +4837,7 @@ index b06ff89c38..761aef6f0e 100644
  #include "base/debug/crash_logging.h"
  #include "base/debug/dump_without_crashing.h"
  #include "base/functional/bind.h"
-@@ -788,7 +789,7 @@ ServiceWorkerExternalRequestResult ServiceWorkerVersion::StartExternalRequest(
+@@ -790,7 +791,7 @@ ServiceWorkerExternalRequestResult ServiceWorkerVersion::StartExternalRequest(
      return ServiceWorkerExternalRequestResult::kWorkerNotRunning;
    }
  
@@ -5019,7 +4846,7 @@ index b06ff89c38..761aef6f0e 100644
      return ServiceWorkerExternalRequestResult::kBadRequestId;
    }
  
-@@ -932,7 +933,7 @@ void ServiceWorkerVersion::AddControllee(
+@@ -995,7 +996,7 @@ void ServiceWorkerVersion::AddControllee(
    CHECK(!service_worker_client->client_uuid().empty());
    // TODO(crbug.com/40657227): Change to DCHECK once we figure out the cause of
    // crash.
@@ -5028,56 +4855,7 @@ index b06ff89c38..761aef6f0e 100644
  
    controllee_map_[uuid] = service_worker_client->AsWeakPtr();
    // Even if `context_` is invalid, `controllee_map_` should have `uuid`.
-@@ -972,7 +973,7 @@ void ServiceWorkerVersion::RemoveControllee(const std::string& client_uuid) {
-   DCHECK_CURRENTLY_ON(BrowserThread::UI);
-   // TODO(crbug.com/40653867): Remove this once RemoveControllee() matches with
-   // AddControllee().
--  if (!controllee_map_.contains(client_uuid)) {
-+  if (!base::Contains(controllee_map_, client_uuid)) {
-     return;
-   }
- 
-@@ -1011,8 +1012,8 @@ void ServiceWorkerVersion::OnControlleeNavigationCommitted(
- void ServiceWorkerVersion::MoveControlleeToBackForwardCacheMap(
-     const std::string& client_uuid) {
-   DCHECK(IsBackForwardCacheEnabled());
--  CHECK(controllee_map_.contains(client_uuid));
--  CHECK(!bfcached_controllee_map_.contains(client_uuid));
-+  CHECK(base::Contains(controllee_map_, client_uuid));
-+  CHECK(!base::Contains(bfcached_controllee_map_, client_uuid));
-   bfcached_controllee_map_[client_uuid] = controllee_map_[client_uuid];
-   RemoveControllee(client_uuid);
- }
-@@ -1022,14 +1023,14 @@ void ServiceWorkerVersion::RestoreControlleeFromBackForwardCacheMap(
-   // TODO(crbug.com/40657227): Change these to DCHECK once we figure out the
-   // cause of crash.
-   CHECK(IsBackForwardCacheEnabled());
--  CHECK(!controllee_map_.contains(client_uuid));
--  if (!bfcached_controllee_map_.contains(client_uuid)) {
-+  CHECK(!base::Contains(controllee_map_, client_uuid));
-+  if (!base::Contains(bfcached_controllee_map_, client_uuid)) {
-     // We are navigating to the page using BackForwardCache, which is being
-     // evicted due to activation, postMessage or claim. In this case, we reload
-     // the page without using BackForwardCache, so we can assume that
-     // ContainerHost will be deleted soon.
-     // TODO(crbug.com/40657227): Remove this CHECK once we fix the crash.
--    CHECK(controllees_to_be_evicted_.contains(client_uuid));
-+    CHECK(base::Contains(controllees_to_be_evicted_, client_uuid));
-     // TODO(crbug.com/40657227): Remove DumpWithoutCrashing once we confirm the
-     // cause of the crash.
-     BackForwardCacheCanStoreDocumentResult can_store;
-@@ -1053,8 +1054,8 @@ void ServiceWorkerVersion::RemoveControlleeFromBackForwardCacheMap(
-   // TODO(crbug.com/341322515): Investigate why sometimes
-   // `bfcache_controllee_map_` does not contain the client.
-   SCOPED_CRASH_KEY_BOOL("ServiceWorkerBfcache", "in_controllee_map",
--                        controllee_map_.contains(client_uuid));
--  CHECK(bfcached_controllee_map_.contains(client_uuid));
-+                        base::Contains(controllee_map_, client_uuid));
-+  CHECK(base::Contains(bfcached_controllee_map_, client_uuid));
-   bfcached_controllee_map_.erase(client_uuid);
- }
- 
-@@ -1062,9 +1063,9 @@ void ServiceWorkerVersion::Uncontrol(const std::string& client_uuid) {
+@@ -1126,9 +1127,9 @@ void ServiceWorkerVersion::Uncontrol(const std::string& client_uuid) {
    if (!IsBackForwardCacheEnabled()) {
      RemoveControllee(client_uuid);
    } else {
@@ -5089,16 +4867,7 @@ index b06ff89c38..761aef6f0e 100644
        RemoveControlleeFromBackForwardCacheMap(client_uuid);
      } else {
        // It is possible that the controllee belongs to neither |controllee_map_|
-@@ -1074,7 +1075,7 @@ void ServiceWorkerVersion::Uncontrol(const std::string& client_uuid) {
-       // In this case, |controllees_to_be_evicted_| should contain the
-       // controllee.
-       // TODO(crbug.com/40657227): Remove this CHECK once we fix the crash.
--      CHECK(controllees_to_be_evicted_.contains(client_uuid));
-+      CHECK(base::Contains(controllees_to_be_evicted_, client_uuid));
-       controllees_to_be_evicted_.erase(client_uuid);
-     }
-   }
-@@ -3311,7 +3312,7 @@ void ServiceWorkerVersion::GetAssociatedInterface(
+@@ -3389,7 +3390,7 @@ void ServiceWorkerVersion::GetAssociatedInterface(
  
  bool ServiceWorkerVersion::BFCacheContainsControllee(
      const std::string& uuid) const {
@@ -5108,7 +4877,7 @@ index b06ff89c38..761aef6f0e 100644
  
  base::WeakPtr<ServiceWorkerVersion> ServiceWorkerVersion::GetWeakPtr() {
 diff --git a/content/browser/shared_storage/shared_storage_browsertest.cc b/content/browser/shared_storage/shared_storage_browsertest.cc
-index 044880542d..ebf1a64bae 100644
+index edbd3bf6ed..4e371e8de8 100644
 --- a/content/browser/shared_storage/shared_storage_browsertest.cc
 +++ b/content/browser/shared_storage/shared_storage_browsertest.cc
 @@ -16,6 +16,7 @@
@@ -5136,7 +4905,7 @@ index 044880542d..ebf1a64bae 100644
      EXPECT_EQ(response.http_request()->content, "");
      response.Send(http_status, content_type,
 diff --git a/content/browser/site_info.cc b/content/browser/site_info.cc
-index bf9f6c94e5..9c0438f051 100644
+index f7efa11c50..a744fd54d3 100644
 --- a/content/browser/site_info.cc
 +++ b/content/browser/site_info.cc
 @@ -8,6 +8,7 @@
@@ -5157,7 +4926,7 @@ index bf9f6c94e5..9c0438f051 100644
      return false;
    }
  
-@@ -714,7 +714,7 @@ bool SiteInfo::ShouldLockProcessToSite(
+@@ -735,7 +735,7 @@ bool SiteInfo::ShouldLockProcessToSite(
    // Most WebUI processes should be locked on all platforms.  The only exception
    // is NTP, handled via the separate callout to the embedder.
    const auto& webui_schemes = URLDataManagerBackend::GetWebUISchemes();
@@ -5167,7 +4936,7 @@ index bf9f6c94e5..9c0438f051 100644
          site_url_);
    }
 diff --git a/content/browser/site_instance_impl.cc b/content/browser/site_instance_impl.cc
-index 7fff40908c..9e85bfc6eb 100644
+index 9392365ed4..c156bc9b9b 100644
 --- a/content/browser/site_instance_impl.cc
 +++ b/content/browser/site_instance_impl.cc
 @@ -4,11 +4,11 @@
@@ -5183,7 +4952,7 @@ index 7fff40908c..9e85bfc6eb 100644
  #include "base/debug/crash_logging.h"
  #include "base/debug/dump_without_crashing.h"
  #include "base/no_destructor.h"
-@@ -339,8 +339,8 @@ scoped_refptr<SiteInstanceImpl> SiteInstanceImpl::CreateForTesting(
+@@ -341,8 +341,8 @@ scoped_refptr<SiteInstanceImpl> SiteInstanceImpl::CreateForTesting(
  // static
  bool SiteInstanceImpl::ShouldAssignSiteForUrlInfo(const UrlInfo& url_info) {
    // Only empty document schemes can leave SiteInstances unassigned.
@@ -5195,7 +4964,7 @@ index 7fff40908c..9e85bfc6eb 100644
    }
  
 diff --git a/content/browser/site_per_process_browsertest.cc b/content/browser/site_per_process_browsertest.cc
-index 670bd8e6da..45fcdb8935 100644
+index 0a03345212..397b86c24d 100644
 --- a/content/browser/site_per_process_browsertest.cc
 +++ b/content/browser/site_per_process_browsertest.cc
 @@ -19,6 +19,7 @@
@@ -5218,7 +4987,7 @@ index 670bd8e6da..45fcdb8935 100644
 +  EXPECT_FALSE(base::Contains(test_client.crashed_rfhs(), rfh_b3));
  }
  
- INSTANTIATE_TEST_SUITE_P(All,
+ namespace {
 diff --git a/content/browser/site_per_process_hit_test_browsertest.cc b/content/browser/site_per_process_hit_test_browsertest.cc
 index eb0f36fc1f..54441aedd9 100644
 --- a/content/browser/site_per_process_hit_test_browsertest.cc
@@ -5303,7 +5072,7 @@ index a5ed85a696..c354805311 100644
  
        std::string html = SkColorToHtmlColor(expected);
 diff --git a/content/browser/storage_partition_impl.cc b/content/browser/storage_partition_impl.cc
-index c3e9ef303e..e032755db3 100644
+index ab16e6b159..e8e7a44e66 100644
 --- a/content/browser/storage_partition_impl.cc
 +++ b/content/browser/storage_partition_impl.cc
 @@ -16,6 +16,7 @@
@@ -5315,7 +5084,7 @@ index c3e9ef303e..e032755db3 100644
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
 diff --git a/content/browser/storage_partition_impl_map.cc b/content/browser/storage_partition_impl_map.cc
-index 35c5b7da14..a71f31aa7f 100644
+index 6c66262dcc..f32109ea75 100644
 --- a/content/browser/storage_partition_impl_map.cc
 +++ b/content/browser/storage_partition_impl_map.cc
 @@ -9,6 +9,7 @@
@@ -5358,7 +5127,7 @@ index 5eedfbdee8..1d1b9d5e64 100644
      return new_scenario;
    };
 diff --git a/content/browser/web_contents/web_contents_impl.cc b/content/browser/web_contents/web_contents_impl.cc
-index 345951d78d..a15ffe486a 100644
+index a65a4f8dae..299a1c9ca1 100644
 --- a/content/browser/web_contents/web_contents_impl.cc
 +++ b/content/browser/web_contents/web_contents_impl.cc
 @@ -21,6 +21,7 @@
@@ -5369,7 +5138,7 @@ index 345951d78d..a15ffe486a 100644
  #include "base/containers/flat_set.h"
  #include "base/debug/crash_logging.h"
  #include "base/feature_list.h"
-@@ -1051,7 +1052,7 @@ void WebContentsImpl::WebContentsTreeNode::DetachInnerWebContents(
+@@ -1057,7 +1058,7 @@ void WebContentsImpl::WebContentsTreeNode::DetachInnerWebContents(
  bool WebContentsImpl::WebContentsTreeNode::IsUnownedInnerWebContents(
      WebContents* inner_web_contents) const {
    CHECK_EQ(inner_web_contents->GetOuterWebContents(), current_web_contents_);
@@ -5378,7 +5147,7 @@ index 345951d78d..a15ffe486a 100644
  }
  
  void WebContentsImpl::WebContentsTreeNode::DetachUnownedInnerWebContents(
-@@ -6032,7 +6033,7 @@ std::string WebContentsImpl::DumpAccessibilityTree(
+@@ -6200,7 +6201,7 @@ std::string WebContentsImpl::DumpAccessibilityTree(
    // This only runs during integration tests, or if a developer is
    // using an inspection tool, e.g. chrome://accessibility.
    ui::AXTreeManager::AlwaysFailFast();
@@ -5387,7 +5156,7 @@ index 345951d78d..a15ffe486a 100644
    std::unique_ptr<ui::AXTreeFormatter> formatter =
        AXInspectFactory::CreateFormatter(api_type);
  
-@@ -6067,7 +6068,7 @@ void WebContentsImpl::RecordAccessibilityEvents(
+@@ -6235,7 +6236,7 @@ void WebContentsImpl::RecordAccessibilityEvents(
          ax_mgr->GetBrowserAccessibilityRoot()
              ->GetTargetForNativeAccessibilityEvent();
  
@@ -5397,7 +5166,7 @@ index 345951d78d..a15ffe486a 100644
          api_type, ax_mgr, pid, ui::AXTreeSelector(widget));
      event_recorder_->ListenToEvents(*callback);
 diff --git a/content/browser/web_contents/web_contents_impl_browsertest.cc b/content/browser/web_contents/web_contents_impl_browsertest.cc
-index e139cc339c..634b0d1586 100644
+index 057dd95ca3..02f6f7e45e 100644
 --- a/content/browser/web_contents/web_contents_impl_browsertest.cc
 +++ b/content/browser/web_contents/web_contents_impl_browsertest.cc
 @@ -13,6 +13,7 @@
@@ -5408,7 +5177,7 @@ index e139cc339c..634b0d1586 100644
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
  #include "base/functional/callback_helpers.h"
-@@ -3676,7 +3677,7 @@ IN_PROC_BROWSER_TEST_F(WebContentsImplBrowserTest, SyncRendererPrefs) {
+@@ -3664,7 +3665,7 @@ IN_PROC_BROWSER_TEST_F(WebContentsImplBrowserTest, SyncRendererPrefs) {
      DLOG(INFO) << "render_view_host=" << render_view_host;
  
      // Multiple frame hosts can be associated to the same RenderViewHost.
@@ -5417,7 +5186,7 @@ index e139cc339c..634b0d1586 100644
        render_view_hosts.push_back(render_view_host);
      }
    }
-@@ -4596,11 +4597,10 @@ IN_PROC_BROWSER_TEST_F(UnownedInnerWebContentsBrowserTest,
+@@ -4712,11 +4713,10 @@ IN_PROC_BROWSER_TEST_F(UnownedInnerWebContentsBrowserTest,
        inner_wc->GetPrimaryMainFrame()->GetParentOrOuterDocumentOrEmbedder());
    EXPECT_EQ(nullptr,
              inner_wc->GetPrimaryMainFrame()->GetParentOrOuterDocument());
@@ -5432,7 +5201,7 @@ index e139cc339c..634b0d1586 100644
  
    // Verify that the inner WebContents can navigate while attached.
    EXPECT_TRUE(NavigateToURL(inner_wc.get(), another_url));
-@@ -4700,13 +4700,12 @@ IN_PROC_BROWSER_TEST_F(UnownedInnerWebContentsBrowserTest,
+@@ -4816,13 +4816,12 @@ IN_PROC_BROWSER_TEST_F(UnownedInnerWebContentsBrowserTest,
    // Verify that the connection is broken.
    EXPECT_EQ(nullptr, inner_wc->GetOuterWebContents());
    EXPECT_TRUE(inner_wc_impl->GetOuterDelegateFrameTreeNodeId().is_null());
@@ -5450,7 +5219,7 @@ index e139cc339c..634b0d1586 100644
              ->is_attaching_inner_delegate());
  
 diff --git a/content/browser/webauth/authenticator_common_impl.cc b/content/browser/webauth/authenticator_common_impl.cc
-index a01341bacd..7f38b1dbcf 100644
+index b0d3502f7f..f6184feb38 100644
 --- a/content/browser/webauth/authenticator_common_impl.cc
 +++ b/content/browser/webauth/authenticator_common_impl.cc
 @@ -19,6 +19,7 @@
@@ -5461,7 +5230,7 @@ index a01341bacd..7f38b1dbcf 100644
  #include "base/containers/flat_set.h"
  #include "base/containers/span.h"
  #include "base/containers/to_vector.h"
-@@ -642,8 +643,7 @@ void DeleteUnacceptedVirtualAuthenticatorCreds(
+@@ -638,8 +639,7 @@ void DeleteUnacceptedVirtualAuthenticatorCreds(
        if (registration.second.user && registration.second.rp &&
            registration.second.rp->id == relying_party_id &&
            registration.second.user->id == user_id &&
@@ -5511,7 +5280,7 @@ index 6e2f4a4cda..d97f3a8cf5 100644
      }
    }
 diff --git a/content/browser/webid/accounts_fetcher.cc b/content/browser/webid/accounts_fetcher.cc
-index d7e65056f3..1ef1fa56cb 100644
+index 881613d4b2..34e3c6c1d4 100644
 --- a/content/browser/webid/accounts_fetcher.cc
 +++ b/content/browser/webid/accounts_fetcher.cc
 @@ -4,9 +4,9 @@
@@ -5525,7 +5294,7 @@ index d7e65056f3..1ef1fa56cb 100644
  #include "content/browser/webid/config_fetcher.h"
  #include "content/browser/webid/flags.h"
  #include "content/browser/webid/idp_network_request_manager.h"
-@@ -242,9 +242,8 @@ void AccountsFetcher::OnAllConfigAndWellKnownFetched(
+@@ -245,9 +245,8 @@ void AccountsFetcher::OnAllConfigAndWellKnownFetched(
  
      if (IsIdPRegistrationEnabled()) {
        if (get_info_it->second.provider->config->type) {
@@ -5537,7 +5306,7 @@ index d7e65056f3..1ef1fa56cb 100644
            result.idp_info = std::move(idp_info);
            result.error = FederatedAuthRequestResult::kTypeNotMatching;
            result.token_status = TokenStatus::kConfigNotMatchingType;
-@@ -259,7 +258,7 @@ void AccountsFetcher::OnAllConfigAndWellKnownFetched(
+@@ -262,7 +261,7 @@ void AccountsFetcher::OnAllConfigAndWellKnownFetched(
        // If a token format was specified, make sure that the configURL
        // supports it as well as the feature is enabled.
        if (!IsDelegationEnabled() ||
@@ -5546,7 +5315,7 @@ index d7e65056f3..1ef1fa56cb 100644
          result.idp_info = std::move(idp_info);
          result.error = FederatedAuthRequestResult::kConfigInvalidResponse;
          result.token_status = TokenStatus::kConfigInvalidResponse;
-@@ -492,7 +491,7 @@ void AccountsFetcher::FilterAccountsWithLabel(
+@@ -512,7 +511,7 @@ void AccountsFetcher::MarkAccountsWithLabel(
    // would be shown.
    size_t accounts_remaining = 0u;
    for (auto& account : accounts) {
@@ -5555,7 +5324,7 @@ index d7e65056f3..1ef1fa56cb 100644
        account->is_filtered_out = true;
      } else {
        ++accounts_remaining;
-@@ -517,7 +516,7 @@ void AccountsFetcher::FilterAccountsWithLoginHint(
+@@ -537,7 +536,7 @@ void AccountsFetcher::MarkAccountsWithLoginHint(
      if (account->is_filtered_out) {
        continue;
      }
@@ -5564,7 +5333,7 @@ index d7e65056f3..1ef1fa56cb 100644
        account->is_filtered_out = true;
      } else {
        ++accounts_remaining;
-@@ -543,7 +542,7 @@ void AccountsFetcher::FilterAccountsWithDomainHint(
+@@ -563,7 +562,7 @@ void AccountsFetcher::MarkAccountsWithDomainHint(
          account->is_filtered_out = true;
          continue;
        }
@@ -5574,7 +5343,7 @@ index d7e65056f3..1ef1fa56cb 100644
        continue;
      }
 diff --git a/content/browser/webid/url_computations.cc b/content/browser/webid/url_computations.cc
-index eca676b920..509d7f470d 100644
+index f3b8262a88..4cfb7f4f14 100644
 --- a/content/browser/webid/url_computations.cc
 +++ b/content/browser/webid/url_computations.cc
 @@ -4,9 +4,9 @@
@@ -5602,7 +5371,7 @@ index eca676b920..509d7f470d 100644
  
  }  // namespace
 diff --git a/content/browser/websockets/websocket_connector_impl.cc b/content/browser/websockets/websocket_connector_impl.cc
-index 08053b7f5a..940c78ed66 100644
+index 107cf4c00b..7683748639 100644
 --- a/content/browser/websockets/websocket_connector_impl.cc
 +++ b/content/browser/websockets/websocket_connector_impl.cc
 @@ -4,9 +4,8 @@
@@ -5697,7 +5466,7 @@ index 155c29dc58..efe1823064 100644
    if (!url.is_valid()) {
      NOTREACHED();
 diff --git a/content/browser/xr/service/browser_xr_runtime_impl.cc b/content/browser/xr/service/browser_xr_runtime_impl.cc
-index 86355279e5..5aec152cbf 100644
+index 5ea6411c56..5f832bcc14 100644
 --- a/content/browser/xr/service/browser_xr_runtime_impl.cc
 +++ b/content/browser/xr/service/browser_xr_runtime_impl.cc
 @@ -8,6 +8,7 @@
@@ -5744,7 +5513,7 @@ index 86355279e5..5aec152cbf 100644
          for (Observer& observer : observers_) {
            observer.WebXRCameraInUseChanged(web_contents, true);
 diff --git a/content/browser/xr/service/vr_service_impl.cc b/content/browser/xr/service/vr_service_impl.cc
-index 63eba5c1c2..1dc3d7337e 100644
+index fb714ec13b..96437561a1 100644
 --- a/content/browser/xr/service/vr_service_impl.cc
 +++ b/content/browser/xr/service/vr_service_impl.cc
 @@ -8,6 +8,7 @@
@@ -5755,7 +5524,7 @@ index 63eba5c1c2..1dc3d7337e 100644
  #include "base/dcheck_is_on.h"
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
-@@ -84,7 +85,7 @@ std::vector<blink::PermissionType> GetRequiredPermissionsForFeatures(
+@@ -86,7 +87,7 @@ std::vector<blink::PermissionType> GetRequiredPermissionsForFeatures(
      auto feature_permission =
          content::XrPermissionResults::GetPermissionFor(required_feature);
      if (feature_permission &&
@@ -5764,7 +5533,7 @@ index 63eba5c1c2..1dc3d7337e 100644
        permissions.push_back(*feature_permission);
      }
    }
-@@ -93,7 +94,7 @@ std::vector<blink::PermissionType> GetRequiredPermissionsForFeatures(
+@@ -95,7 +96,7 @@ std::vector<blink::PermissionType> GetRequiredPermissionsForFeatures(
      auto feature_permission =
          content::XrPermissionResults::GetPermissionFor(optional_feature);
      if (feature_permission &&
@@ -5773,7 +5542,7 @@ index 63eba5c1c2..1dc3d7337e 100644
        permissions.push_back(*feature_permission);
      }
    }
-@@ -815,10 +816,10 @@ void VRServiceImpl::DoRequestSession(SessionRequestData request) {
+@@ -812,10 +813,10 @@ void VRServiceImpl::DoRequestSession(SessionRequestData request) {
    }
  
    bool use_dom_overlay =
@@ -5830,27 +5599,6 @@ index 5b17346712..b01fc8b2c6 100644
                               buffer ? buffer_length : INT32_MAX, buffer);
    // We can't distinguish between an empty table and an error.
    if (length == 0)
-diff --git a/content/child/memory_coordinator/child_memory_consumer_registry.cc b/content/child/memory_coordinator/child_memory_consumer_registry.cc
-index 8f7390632b..7f788a303a 100644
---- a/content/child/memory_coordinator/child_memory_consumer_registry.cc
-+++ b/content/child/memory_coordinator/child_memory_consumer_registry.cc
-@@ -11,6 +11,7 @@
- 
- #include "base/check.h"
- #include "base/check_op.h"
-+#include "base/containers/contains.h"
- #include "base/memory_coordinator/memory_consumer.h"
- #include "content/public/common/child_process_id.h"
- #include "content/public/common/process_type.h"
-@@ -41,7 +42,7 @@ void ChildMemoryConsumerRegistry::ConsumerGroup::OnUpdateMemoryLimit() {
- 
- void ChildMemoryConsumerRegistry::ConsumerGroup::AddMemoryConsumer(
-     base::RegisteredMemoryConsumer consumer) {
--  CHECK(!std::ranges::contains(memory_consumers_, consumer));
-+  CHECK(!base::Contains(memory_consumers_, consumer));
-   memory_consumers_.push_back(consumer);
- 
-   // Ensure the added consumer is up to date with the current memory limit
 diff --git a/content/common/color_parser.cc b/content/common/color_parser.cc
 index ea063f5306..71222376bf 100644
 --- a/content/common/color_parser.cc
@@ -5921,8 +5669,21 @@ index 0c7ff633f1..bb836eb8ea 100644
      error_message_ = std::string("pointer name already exists");
      return false;
    }
+diff --git a/content/common/memory_coordinator/memory_consumer_registry.cc b/content/common/memory_coordinator/memory_consumer_registry.cc
+index ef4125ca70..a9850961fd 100644
+--- a/content/common/memory_coordinator/memory_consumer_registry.cc
++++ b/content/common/memory_coordinator/memory_consumer_registry.cc
+@@ -39,7 +39,7 @@ void MemoryConsumerRegistry::ConsumerGroup::UpdateMemoryLimit(int percentage) {
+ 
+ void MemoryConsumerRegistry::ConsumerGroup::AddMemoryConsumer(
+     base::RegisteredMemoryConsumer consumer) {
+-  CHECK(!std::ranges::contains(memory_consumers_, consumer));
++  CHECK(!base::Contains(memory_consumers_, consumer));
+   memory_consumers_.push_back(consumer);
+ 
+   // Ensure the added consumer is up to date with the current memory limit
 diff --git a/content/common/memory_coordinator/mojom/memory_consumer_traits_mojom_traits.h b/content/common/memory_coordinator/mojom/memory_consumer_traits_mojom_traits.h
-index b05e3a10c3..1303541207 100644
+index ad6f236401..e9453cb770 100644
 --- a/content/common/memory_coordinator/mojom/memory_consumer_traits_mojom_traits.h
 +++ b/content/common/memory_coordinator/mojom/memory_consumer_traits_mojom_traits.h
 @@ -5,9 +5,8 @@
@@ -5945,56 +5706,6 @@ index b05e3a10c3..1303541207 100644
        return false;
      }
  
-@@ -28,39 +27,39 @@ struct StructTraits<content::mojom::MemoryConsumerTraitsDataView,
- 
-   static uint8_t supports_memory_limit(
-       const base::MemoryConsumerTraits& input) {
--    return std::to_underlying(input.supports_memory_limit);
-+    return base::to_underlying(input.supports_memory_limit);
-   }
-   static uint8_t in_process(const base::MemoryConsumerTraits& input) {
--    return std::to_underlying(input.in_process);
-+    return base::to_underlying(input.in_process);
-   }
-   static uint8_t estimated_memory_usage(
-       const base::MemoryConsumerTraits& input) {
--    return std::to_underlying(input.estimated_memory_usage);
-+    return base::to_underlying(input.estimated_memory_usage);
-   }
-   static uint8_t release_memory_cost(const base::MemoryConsumerTraits& input) {
--    return std::to_underlying(input.release_memory_cost);
-+    return base::to_underlying(input.release_memory_cost);
-   }
-   static uint8_t recreate_memory_cost(const base::MemoryConsumerTraits& input) {
--    return std::to_underlying(input.recreate_memory_cost);
-+    return base::to_underlying(input.recreate_memory_cost);
-   }
-   static uint8_t information_retention(
-       const base::MemoryConsumerTraits& input) {
--    return std::to_underlying(input.information_retention);
-+    return base::to_underlying(input.information_retention);
-   }
-   static uint8_t memory_release_behavior(
-       const base::MemoryConsumerTraits& input) {
--    return std::to_underlying(input.memory_release_behavior);
-+    return base::to_underlying(input.memory_release_behavior);
-   }
-   static uint8_t execution_type(const base::MemoryConsumerTraits& input) {
--    return std::to_underlying(input.execution_type);
-+    return base::to_underlying(input.execution_type);
-   }
-   static uint8_t release_gc_references(
-       const base::MemoryConsumerTraits& input) {
--    return std::to_underlying(input.release_gc_references);
-+    return base::to_underlying(input.release_gc_references);
-   }
-   static uint8_t garbage_collects_v8_heap(
-       const base::MemoryConsumerTraits& input) {
--    return std::to_underlying(input.garbage_collects_v8_heap);
-+    return base::to_underlying(input.garbage_collects_v8_heap);
-   }
- 
-   static bool Read(content::mojom::MemoryConsumerTraitsDataView input,
 diff --git a/content/common/origin_util.cc b/content/common/origin_util.cc
 index 44d47285b9..c0abdbac49 100644
 --- a/content/common/origin_util.cc
@@ -6017,7 +5728,7 @@ index 44d47285b9..c0abdbac49 100644
    }
  
 diff --git a/content/common/webid/identity_url_loader_throttle.cc b/content/common/webid/identity_url_loader_throttle.cc
-index 581106193f..8a9c0b690e 100644
+index 0c7e74fa76..65587b0c9d 100644
 --- a/content/common/webid/identity_url_loader_throttle.cc
 +++ b/content/common/webid/identity_url_loader_throttle.cc
 @@ -7,6 +7,7 @@
@@ -6028,7 +5739,7 @@ index 581106193f..8a9c0b690e 100644
  #include "base/functional/bind.h"
  #include "base/metrics/histogram_macros.h"
  #include "base/strings/string_split.h"
-@@ -131,7 +132,7 @@ bool IdentityUrlLoaderThrottle::HeaderHasToken(
+@@ -137,7 +138,7 @@ bool IdentityUrlLoaderThrottle::HeaderHasToken(
  
    std::vector<std::string_view> tokens = base::SplitStringPiece(
        value, ";", base::TRIM_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
@@ -6050,7 +5761,7 @@ index 3852a806e7..4a40b0917b 100644
  #include "content/public/browser/web_ui_controller.h"
  #include "content/public/common/content_client.h"
 diff --git a/content/public/browser/web_contents_delegate.cc b/content/public/browser/web_contents_delegate.cc
-index 509256e4c3..9f2180563e 100644
+index 0c0672e0a2..3761181130 100644
 --- a/content/public/browser/web_contents_delegate.cc
 +++ b/content/public/browser/web_contents_delegate.cc
 @@ -8,6 +8,7 @@
@@ -6061,7 +5772,7 @@ index 509256e4c3..9f2180563e 100644
  #include "base/logging.h"
  #include "base/memory/singleton.h"
  #include "base/notreached.h"
-@@ -329,12 +330,12 @@ WebContentsDelegate::~WebContentsDelegate() {
+@@ -336,12 +337,12 @@ WebContentsDelegate::~WebContentsDelegate() {
  }
  
  void WebContentsDelegate::Attach(WebContents* web_contents) {
@@ -6089,7 +5800,7 @@ index e74da278fe..094f55ddfa 100644
  #include "base/no_destructor.h"
  #include "base/strings/strcat.h"
 diff --git a/content/public/common/content_client.cc b/content/public/common/content_client.cc
-index 4d72993163..4b96cb2535 100644
+index beede8e101..9a65f81ce8 100644
 --- a/content/public/common/content_client.cc
 +++ b/content/public/common/content_client.cc
 @@ -7,6 +7,7 @@
@@ -6099,16 +5810,16 @@ index 4d72993163..4b96cb2535 100644
 +#include "base/containers/contains.h"
  #include "base/feature_list.h"
  #include "base/memory/ref_counted_memory.h"
- #include "base/no_destructor.h"
-@@ -195,7 +196,7 @@ bool ContentClient::ShouldIgnoreDuplicateNavs(
+ #include "base/metrics/histogram_functions.h"
+@@ -211,7 +212,7 @@ bool ContentClient::IsUrlInIgnoreDuplicateNavsOrigins(const GURL& url) const {
+         return origins;
        }());
  
-   const url::Origin navigation_origin = url::Origin::Create(url);
--  return std::ranges::contains(*target_origin_ignorelist, navigation_origin);
-+  return base::Contains(*target_origin_ignorelist, navigation_origin);
+-  return std::ranges::contains(*target_origin_ignorelist,
++  return base::Contains(*target_origin_ignorelist,
+                                url::Origin::Create(url));
  }
  
- bool ContentClient::IsFilePickerAllowedForCrossOriginSubframe(
 diff --git a/content/public/test/back_forward_cache_util.cc b/content/public/test/back_forward_cache_util.cc
 index afaf576f91..a1328ddbdd 100644
 --- a/content/public/test/back_forward_cache_util.cc
@@ -6147,18 +5858,18 @@ index afaf576f91..a1328ddbdd 100644
      }
    }
 diff --git a/content/public/test/browser_test_utils.cc b/content/public/test/browser_test_utils.cc
-index d5d5c139fc..d95d64c975 100644
+index bf590eea6a..f2116a5331 100644
 --- a/content/public/test/browser_test_utils.cc
 +++ b/content/public/test/browser_test_utils.cc
-@@ -14,6 +14,7 @@
- #include <utility>
+@@ -17,6 +17,7 @@
+ #include <vector>
  
  #include "base/command_line.h"
 +#include "base/containers/contains.h"
  #include "base/containers/span.h"
  #include "base/functional/bind.h"
- #include "base/functional/callback_helpers.h"
-@@ -2604,7 +2605,7 @@ void TitleWatcher::TitleWasSet(NavigationEntry* entry) {
+ #include "base/functional/callback.h"
+@@ -2613,7 +2614,7 @@ void TitleWatcher::TitleWasSet(NavigationEntry* entry) {
  
  void TitleWatcher::TestTitle() {
    const std::u16string& current_title = web_contents()->GetTitle();
@@ -6265,7 +5976,7 @@ index cc166c152b..9dfb493863 100644
               : base::FilePath();
  }
 diff --git a/content/public/test/fake_service_worker_context.cc b/content/public/test/fake_service_worker_context.cc
-index e7a0214994..6b67efba32 100644
+index 8a9a7fd17a..991649a74a 100644
 --- a/content/public/test/fake_service_worker_context.cc
 +++ b/content/public/test/fake_service_worker_context.cc
 @@ -6,6 +6,7 @@
@@ -6286,7 +5997,7 @@ index e7a0214994..6b67efba32 100644
  void FakeServiceWorkerContext::GetAllStorageKeysInfo(
      GetUsageInfoCallback callback) {
 diff --git a/content/public/test/mock_render_process_host.cc b/content/public/test/mock_render_process_host.cc
-index 986773bf9a..f9bb9ea1ea 100644
+index 695c598d85..fe73c43b30 100644
 --- a/content/public/test/mock_render_process_host.cc
 +++ b/content/public/test/mock_render_process_host.cc
 @@ -9,6 +9,7 @@
@@ -6297,7 +6008,7 @@ index 986773bf9a..f9bb9ea1ea 100644
  #include "base/functional/bind.h"
  #include "base/functional/callback_helpers.h"
  #include "base/lazy_instance.h"
-@@ -560,8 +561,8 @@ bool MockRenderProcessHost::HostHasNotBeenUsed() {
+@@ -564,8 +565,8 @@ bool MockRenderProcessHost::HostHasNotBeenUsed() {
  }
  
  bool MockRenderProcessHost::IsSpare() const {
@@ -6309,7 +6020,7 @@ index 986773bf9a..f9bb9ea1ea 100644
  
  void MockRenderProcessHost::SetProcessLock(
 diff --git a/content/public/test/prerender_test_util.cc b/content/public/test/prerender_test_util.cc
-index 944e56b845..a2d240b9a6 100644
+index 3fd5e434d9..c1ecf3b416 100644
 --- a/content/public/test/prerender_test_util.cc
 +++ b/content/public/test/prerender_test_util.cc
 @@ -5,7 +5,6 @@
@@ -6355,7 +6066,7 @@ index 944e56b845..a2d240b9a6 100644
                 last_status_.value_or(PrerenderFinalStatus::kDestroyed))
          << ", before waiting for headers.";
  
-@@ -960,7 +960,7 @@ net::test_server::HttpRequest::HeaderMap PrerenderTestHelper::GetRequestHeaders(
+@@ -948,7 +948,7 @@ net::test_server::HttpRequest::HeaderMap PrerenderTestHelper::GetRequestHeaders(
    EXPECT_TRUE(content::BrowserThread::CurrentlyOn(BrowserThread::UI));
    base::AutoLock auto_lock(lock_);
    std::string path = url.PathForRequest();
@@ -6422,7 +6133,7 @@ index 4e3eb3db8f..42c137ac4c 100644
      if (!base::StringToDouble(switches[switches::kEnableTracingFraction],
                                &enable_tracing_fraction) ||
 diff --git a/content/renderer/accessibility/annotations/ax_image_annotator.cc b/content/renderer/accessibility/annotations/ax_image_annotator.cc
-index d9ef0d3e6b..429fe9f866 100644
+index ec44d856dc..7df07eb89b 100644
 --- a/content/renderer/accessibility/annotations/ax_image_annotator.cc
 +++ b/content/renderer/accessibility/annotations/ax_image_annotator.cc
 @@ -11,6 +11,7 @@
@@ -6433,61 +6144,19 @@ index d9ef0d3e6b..429fe9f866 100644
  #include "base/containers/fixed_flat_map.h"
  #include "base/i18n/char_iterator.h"
  #include "base/metrics/histogram_functions.h"
-@@ -538,12 +539,12 @@ bool AXImageAnnotator::HasAnnotationInCache(blink::WebAXObject& image) const {
- 
- bool AXImageAnnotator::HasImageInCache(const blink::WebAXObject& image) const {
-   DCHECK(!image.IsDetached());
--  return image_annotations_.contains(image.AxID());
-+  return base::Contains(image_annotations_, image.AxID());
- }
- 
- void AXImageAnnotator::OnImageAdded(blink::WebAXObject& image) {
-   DCHECK(!image.IsDetached());
--  DCHECK(!image_annotations_.contains(image.AxID()));
-+  DCHECK(!base::Contains(image_annotations_, image.AxID()));
-   const std::string image_id = GenerateImageSourceId(image);
-   if (image_id.empty())
-     return;
-@@ -563,7 +564,7 @@ void AXImageAnnotator::OnImageAdded(blink::WebAXObject& image) {
- 
- void AXImageAnnotator::OnImageUpdated(blink::WebAXObject& image) {
-   DCHECK(!image.IsDetached());
--  DCHECK(image_annotations_.contains(image.AxID()));
-+  DCHECK(base::Contains(image_annotations_, image.AxID()));
-   const std::string image_id = GenerateImageSourceId(image);
-   if (image_id.empty())
-     return;
-@@ -579,7 +580,7 @@ void AXImageAnnotator::OnImageUpdated(blink::WebAXObject& image) {
- 
- void AXImageAnnotator::OnImageRemoved(blink::WebAXObject& image) {
-   DCHECK(!image.IsDetached());
--  DCHECK(image_annotations_.contains(image.AxID()));
-+  DCHECK(base::Contains(image_annotations_, image.AxID()));
-   image_annotations_.erase(image.AxID());
- }
- 
-@@ -735,7 +736,7 @@ void AXImageAnnotator::OnImageAnnotated(
-   DCHECK(render_accessibility_->GetAXContext());
-   render_accessibility_->GetAXContext()->UpdateAXForAllDocuments();
- 
--  if (!image_annotations_.contains(image.AxID()))
-+  if (!base::Contains(image_annotations_, image.AxID()))
-     return;
- 
-   if (image.IsDetached()) {
 diff --git a/content/renderer/accessibility/annotations/ax_image_stopwords.cc b/content/renderer/accessibility/annotations/ax_image_stopwords.cc
-index fd1f556fbb..1bd4014ff5 100644
+index 0561a99777..5e5d9ebefa 100644
 --- a/content/renderer/accessibility/annotations/ax_image_stopwords.cc
 +++ b/content/renderer/accessibility/annotations/ax_image_stopwords.cc
-@@ -8,6 +8,7 @@
+@@ -7,6 +7,7 @@
+ #include <string>
  #include <string_view>
- #include <vector>
  
 +#include "base/containers/contains.h"
  #include "base/containers/flat_set.h"
  #include "base/i18n/case_conversion.h"
  #include "base/i18n/char_iterator.h"
-@@ -568,7 +569,7 @@ bool AXImageStopwords::IsImageStopword(const char* word_utf8) const {
+@@ -563,7 +564,7 @@ bool AXImageStopwords::IsImageStopword(std::string_view word_utf8) const {
      return true;
    }
  
@@ -6563,25 +6232,10 @@ index 4ee0bee412..ebdf4e65de 100644
  }
  
 diff --git a/content/renderer/media/media_permission_dispatcher.cc b/content/renderer/media/media_permission_dispatcher.cc
-index 5c310e7f03..08f4c95324 100644
+index 7d0e90456d..b386f22fac 100644
 --- a/content/renderer/media/media_permission_dispatcher.cc
 +++ b/content/renderer/media/media_permission_dispatcher.cc
-@@ -4,13 +4,12 @@
- 
- #include "content/renderer/media/media_permission_dispatcher.h"
- 
--#include <utility>
--
- #include "base/functional/bind.h"
- #include "base/logging.h"
- #include "base/notreached.h"
- #include "base/task/bind_post_task.h"
- #include "base/task/single_thread_task_runner.h"
-+#include "base/types/cxx23_to_underlying.h"
- #include "third_party/blink/public/web/web_local_frame.h"
- #include "url/gurl.h"
- 
-@@ -33,7 +32,7 @@ blink::mojom::PermissionDescriptorPtr MediaPermissionTypeToPermissionDescriptor(
+@@ -34,7 +34,7 @@ blink::mojom::PermissionDescriptorPtr MediaPermissionTypeToPermissionDescriptor(
        descriptor->name = blink::mojom::PermissionName::VIDEO_CAPTURE;
        break;
      default:
@@ -6640,7 +6294,7 @@ index c01edf2527..a92dc72e65 100644
        "");
  }
 diff --git a/content/renderer/render_frame_impl.cc b/content/renderer/render_frame_impl.cc
-index cd9a5bb5b1..67415bac38 100644
+index 5936c5eaa0..433755de81 100644
 --- a/content/renderer/render_frame_impl.cc
 +++ b/content/renderer/render_frame_impl.cc
 @@ -15,6 +15,7 @@
@@ -6652,10 +6306,10 @@ index cd9a5bb5b1..67415bac38 100644
  #include "base/containers/to_vector.h"
  #include "base/debug/alias.h"
 diff --git a/content/renderer/render_frame_impl_browsertest.cc b/content/renderer/render_frame_impl_browsertest.cc
-index 19a018c97e..78fa1ad536 100644
+index 260f4eda54..4db361ed69 100644
 --- a/content/renderer/render_frame_impl_browsertest.cc
 +++ b/content/renderer/render_frame_impl_browsertest.cc
-@@ -1189,7 +1189,7 @@ bool HasText(blink::WebLocalFrame* frame, const std::string& text) {
+@@ -1187,7 +1187,7 @@ bool HasText(blink::WebLocalFrame* frame, const std::string& text) {
            frame, blink::TestWebFrameContentDumper::kLayoutAsTextNormal)
            .Utf8();
  
@@ -6665,7 +6319,7 @@ index 19a018c97e..78fa1ad536 100644
  
  // Waits for the navigation to finish.
 diff --git a/content/renderer/render_thread_impl.cc b/content/renderer/render_thread_impl.cc
-index 231e13b24a..ba834ad3d5 100644
+index 7b8f245a90..d2d2da9380 100644
 --- a/content/renderer/render_thread_impl.cc
 +++ b/content/renderer/render_thread_impl.cc
 @@ -17,6 +17,7 @@
@@ -6676,7 +6330,7 @@ index 231e13b24a..ba834ad3d5 100644
  #include "base/debug/crash_logging.h"
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
-@@ -325,7 +326,7 @@ std::string RenderThreadImpl::HistogramCustomizer::ConvertToCustomHistogramName(
+@@ -340,7 +341,7 @@ std::string RenderThreadImpl::HistogramCustomizer::ConvertToCustomHistogramName(
      const char* histogram_name) const {
    std::string name(histogram_name);
    if (!common_host_histogram_suffix_.empty() &&
@@ -6773,7 +6427,7 @@ index 4245110771..362108a7de 100644
      return;
    }
 diff --git a/content/shell/browser/shell_devtools_bindings.cc b/content/shell/browser/shell_devtools_bindings.cc
-index 6486639ced..ffa3aec6ba 100644
+index 8ec9dcebbd..e41b2a2efd 100644
 --- a/content/shell/browser/shell_devtools_bindings.cc
 +++ b/content/shell/browser/shell_devtools_bindings.cc
 @@ -12,6 +12,7 @@
@@ -6836,7 +6490,7 @@ index 907350d598..42ced1ae15 100644
  #include "content/public/browser/web_contents.h"
  #include "content/shell/browser/shell.h"
 diff --git a/content/shell/browser/shell_platform_delegate_views.cc b/content/shell/browser/shell_platform_delegate_views.cc
-index 1e0887ae0c..b2088dab7d 100644
+index 0c52b54f11..2a111dee0c 100644
 --- a/content/shell/browser/shell_platform_delegate_views.cc
 +++ b/content/shell/browser/shell_platform_delegate_views.cc
 @@ -9,6 +9,7 @@
@@ -6847,7 +6501,7 @@ index 1e0887ae0c..b2088dab7d 100644
  #include "base/functional/bind.h"
  #include "base/memory/raw_ptr.h"
  #include "base/strings/utf_string_conversions.h"
-@@ -351,7 +352,7 @@ ShellPlatformDelegate::~ShellPlatformDelegate() = default;
+@@ -352,7 +353,7 @@ ShellPlatformDelegate::~ShellPlatformDelegate() = default;
  void ShellPlatformDelegate::CreatePlatformWindow(
      Shell* shell,
      const gfx::Size& initial_size) {
@@ -6856,7 +6510,7 @@ index 1e0887ae0c..b2088dab7d 100644
    ShellData& shell_data = shell_data_map_[shell];
  
    shell_data.content_size = initial_size;
-@@ -385,19 +386,19 @@ void ShellPlatformDelegate::CreatePlatformWindow(
+@@ -386,19 +387,19 @@ void ShellPlatformDelegate::CreatePlatformWindow(
  }
  
  gfx::NativeWindow ShellPlatformDelegate::GetNativeWindow(Shell* shell) {
@@ -6879,7 +6533,7 @@ index 1e0887ae0c..b2088dab7d 100644
    ShellData& shell_data = shell_data_map_[shell];
  
    ShellViewForWidget(shell_data.window_widget)
-@@ -417,7 +418,7 @@ void ShellPlatformDelegate::EnableUIControl(Shell* shell,
+@@ -424,7 +425,7 @@ void ShellPlatformDelegate::EnableUIControl(Shell* shell,
    if (Shell::ShouldHideToolbar())
      return;
  
@@ -6888,7 +6542,7 @@ index 1e0887ae0c..b2088dab7d 100644
    ShellData& shell_data = shell_data_map_[shell];
  
    auto* view = ShellViewForWidget(shell_data.window_widget);
-@@ -434,7 +435,7 @@ void ShellPlatformDelegate::SetAddressBarURL(Shell* shell, const GURL& url) {
+@@ -441,7 +442,7 @@ void ShellPlatformDelegate::SetAddressBarURL(Shell* shell, const GURL& url) {
    if (Shell::ShouldHideToolbar())
      return;
  
@@ -6897,7 +6551,7 @@ index 1e0887ae0c..b2088dab7d 100644
    ShellData& shell_data = shell_data_map_[shell];
  
    ShellViewForWidget(shell_data.window_widget)->SetAddressBarURL(url);
-@@ -444,7 +445,7 @@ void ShellPlatformDelegate::SetIsLoading(Shell* shell, bool loading) {}
+@@ -451,7 +452,7 @@ void ShellPlatformDelegate::SetIsLoading(Shell* shell, bool loading) {}
  
  void ShellPlatformDelegate::SetTitle(Shell* shell,
                                       const std::u16string& title) {
@@ -6906,7 +6560,7 @@ index 1e0887ae0c..b2088dab7d 100644
    ShellData& shell_data = shell_data_map_[shell];
  
    shell_data.window_widget->widget_delegate()->SetTitle(title);
-@@ -454,7 +455,7 @@ void ShellPlatformDelegate::MainFrameCreated(Shell* shell,
+@@ -461,7 +462,7 @@ void ShellPlatformDelegate::MainFrameCreated(Shell* shell,
                                               RenderFrameHost* main_frame) {}
  
  bool ShellPlatformDelegate::DestroyShell(Shell* shell) {
@@ -6976,7 +6630,7 @@ index 634d763dc3..d4b6f13a0e 100644
      if (base::StringToInt(field_params[kMinPeriodicSyncEventsInterval],
                            &min_periodic_sync_events_interval_sec)) {
 diff --git a/content/test/mock_clipboard_host.cc b/content/test/mock_clipboard_host.cc
-index a255a9e642..ae3c3a772a 100644
+index eea7805176..556f922e1c 100644
 --- a/content/test/mock_clipboard_host.cc
 +++ b/content/test/mock_clipboard_host.cc
 @@ -4,9 +4,9 @@
@@ -6990,7 +6644,7 @@ index a255a9e642..ae3c3a772a 100644
  #include "base/notreached.h"
  #include "base/numerics/byte_conversions.h"
  #include "base/strings/strcat.h"
-@@ -63,7 +63,7 @@ std::vector<std::u16string> MockClipboardHost::ReadStandardFormatNames() {
+@@ -72,7 +72,7 @@ std::vector<std::u16string> MockClipboardHost::ReadStandardFormatNames() {
      types.push_back(ui::kMimeTypePng16);
    }
    for (auto& it : custom_data_) {
@@ -7021,7 +6675,7 @@ index ea62ad4af0..32a0cf3838 100644
    }
  
 diff --git a/content/test/mock_ssl_host_state_delegate.cc b/content/test/mock_ssl_host_state_delegate.cc
-index 9e320b6644..06b16745d0 100644
+index 151c6099da..6fbce5f49a 100644
 --- a/content/test/mock_ssl_host_state_delegate.cc
 +++ b/content/test/mock_ssl_host_state_delegate.cc
 @@ -4,6 +4,7 @@
@@ -7034,7 +6688,7 @@ index 9e320b6644..06b16745d0 100644
  
 @@ -42,7 +43,7 @@ SSLHostStateDelegate::CertJudgment MockSSLHostStateDelegate::QueryPolicy(
      const net::X509Certificate& cert,
-     int error,
+     net::Error error,
      StoragePartition* storage_partition) {
 -  if (!exceptions_.contains(host)) {
 +  if (!base::Contains(exceptions_, host)) {
@@ -7151,7 +6805,7 @@ index 60b619fa64..8c94055bdb 100644
  
  void FakeBluetoothDelegate::AddFramePermissionObserver(
 diff --git a/content/web_test/browser/web_test_control_host.cc b/content/web_test/browser/web_test_control_host.cc
-index 34711c544d..98faa282bc 100644
+index 6e59d62489..1508103825 100644
 --- a/content/web_test/browser/web_test_control_host.cc
 +++ b/content/web_test/browser/web_test_control_host.cc
 @@ -21,6 +21,7 @@
@@ -7162,7 +6816,7 @@ index 34711c544d..98faa282bc 100644
  #include "base/files/file_path.h"
  #include "base/files/file_util.h"
  #include "base/functional/bind.h"
-@@ -1253,8 +1254,8 @@ void WebTestControlHost::HandleNewRenderFrameHost(RenderFrameHost* frame) {
+@@ -1255,8 +1256,8 @@ void WebTestControlHost::HandleNewRenderFrameHost(RenderFrameHost* frame) {
    // TODO(rakina): Understand the fetch tests to figure out if it's possible to
    // remove RenderProcessHost tracking here.
    if (main_window &&
@@ -7173,17 +6827,8 @@ index 34711c544d..98faa282bc 100644
      // When we find the main window's main frame for the first time, we mark the
      // test as starting for the renderer.
      const bool starting_test = main_window_render_process_hosts_.empty();
-@@ -2191,7 +2192,7 @@ mojo::AssociatedRemote<mojom::WebTestRenderFrame>&
- WebTestControlHost::GetWebTestRenderFrameRemote(RenderFrameHost* frame) {
-   GlobalRenderFrameHostId key(frame->GetProcess()->GetDeprecatedID(),
-                               frame->GetRoutingID());
--  if (!web_test_render_frame_map_.contains(key)) {
-+  if (!base::Contains(web_test_render_frame_map_, key)) {
-     mojo::AssociatedRemote<mojom::WebTestRenderFrame>& new_ptr =
-         web_test_render_frame_map_[key];
-     frame->GetRemoteAssociatedInterfaces()->GetInterface(&new_ptr);
 diff --git a/content/web_test/browser/web_test_permission_manager.cc b/content/web_test/browser/web_test_permission_manager.cc
-index b13c16a75c..c5c30e0103 100644
+index d94b2987de..e5ae09faa2 100644
 --- a/content/web_test/browser/web_test_permission_manager.cc
 +++ b/content/web_test/browser/web_test_permission_manager.cc
 @@ -10,6 +10,7 @@
@@ -7194,15 +6839,6 @@ index b13c16a75c..c5c30e0103 100644
  #include "base/functional/bind.h"
  #include "base/functional/callback.h"
  #include "base/functional/callback_helpers.h"
-@@ -195,7 +196,7 @@ void WebTestPermissionManager::ResetPermission(blink::PermissionType permission,
-       PermissionDescriptorUtil::CreatePermissionDescriptorForPermissionType(
-           permission),
-       requesting_origin, embedding_origin);
--  if (!permissions_.contains(key)) {
-+  if (!base::Contains(permissions_, key)) {
-     return;
-   }
-   permissions_.erase(key);
 diff --git a/content/web_test/browser/web_test_shell_platform_delegate_views.cc b/content/web_test/browser/web_test_shell_platform_delegate_views.cc
 index 52982c07d3..d79981352b 100644
 --- a/content/web_test/browser/web_test_shell_platform_delegate_views.cc
@@ -7243,7 +6879,7 @@ index 52982c07d3..d79981352b 100644
  
    aura::Window* content = shell->web_contents()->GetNativeView();
 diff --git a/content/web_test/renderer/test_runner.cc b/content/web_test/renderer/test_runner.cc
-index dfb183a72a..db6ddfae17 100644
+index a5697578c4..47b144b295 100644
 --- a/content/web_test/renderer/test_runner.cc
 +++ b/content/web_test/renderer/test_runner.cc
 @@ -14,6 +14,7 @@
@@ -7254,7 +6890,7 @@ index dfb183a72a..db6ddfae17 100644
  #include "base/containers/unique_ptr_adapters.h"
  #include "base/functional/callback_helpers.h"
  #include "base/logging.h"
-@@ -3063,7 +3064,7 @@ void TestRunner::AddLoadingFrame(blink::WebLocalFrame* frame) {
+@@ -3136,7 +3137,7 @@ void TestRunner::AddLoadingFrame(blink::WebLocalFrame* frame) {
  
  void TestRunner::RemoveLoadingFrame(blink::WebLocalFrame* frame) {
    // We don't track frames that were started between tests.
@@ -7263,3 +6899,112 @@ index dfb183a72a..db6ddfae17 100644
      return;
  
    // We had a DCHECK checking
+diff --git a/content/common/memory_coordinator/mojom/memory_consumer_traits_mojom_traits.h b/content/common/memory_coordinator/mojom/memory_consumer_traits_mojom_traits.h
+index e9453cb770..531351ed99 100644
+--- a/content/common/memory_coordinator/mojom/memory_consumer_traits_mojom_traits.h
++++ b/content/common/memory_coordinator/mojom/memory_consumer_traits_mojom_traits.h
+@@ -27,42 +27,42 @@ struct StructTraits<content::mojom::MemoryConsumerTraitsDataView,
+ 
+   static uint8_t estimated_memory_usage(
+       const base::MemoryConsumerTraits& input) {
+-    return std::to_underlying(input.estimated_memory_usage);
++    return base::to_underlying(input.estimated_memory_usage);
+   }
+   static uint8_t release_memory_cost(const base::MemoryConsumerTraits& input) {
+-    return std::to_underlying(input.release_memory_cost);
++    return base::to_underlying(input.release_memory_cost);
+   }
+   static uint8_t information_retention(
+       const base::MemoryConsumerTraits& input) {
+-    return std::to_underlying(input.information_retention);
++    return base::to_underlying(input.information_retention);
+   }
+   static uint8_t execution_type(const base::MemoryConsumerTraits& input) {
+-    return std::to_underlying(input.execution_type);
++    return base::to_underlying(input.execution_type);
+   }
+   static uint8_t supports_memory_limit(
+       const base::MemoryConsumerTraits& input) {
+-    return std::to_underlying(input.supports_memory_limit);
++    return base::to_underlying(input.supports_memory_limit);
+   }
+   static uint8_t in_process(const base::MemoryConsumerTraits& input) {
+-    return std::to_underlying(input.in_process);
++    return base::to_underlying(input.in_process);
+   }
+   static uint8_t recreate_memory_cost(const base::MemoryConsumerTraits& input) {
+-    return std::to_underlying(input.recreate_memory_cost);
++    return base::to_underlying(input.recreate_memory_cost);
+   }
+   static uint8_t memory_release_behavior(
+       const base::MemoryConsumerTraits& input) {
+-    return std::to_underlying(input.memory_release_behavior);
++    return base::to_underlying(input.memory_release_behavior);
+   }
+   static uint8_t release_gc_references(
+       const base::MemoryConsumerTraits& input) {
+-    return std::to_underlying(input.release_gc_references);
++    return base::to_underlying(input.release_gc_references);
+   }
+   static uint8_t garbage_collects_v8_heap(
+       const base::MemoryConsumerTraits& input) {
+-    return std::to_underlying(input.garbage_collects_v8_heap);
++    return base::to_underlying(input.garbage_collects_v8_heap);
+   }
+   static uint8_t is_stateful(const base::MemoryConsumerTraits& input) {
+-    return std::to_underlying(input.is_stateful);
++    return base::to_underlying(input.is_stateful);
+   }
+ 
+   static bool Read(content::mojom::MemoryConsumerTraitsDataView input,
+diff --git a/content/browser/renderer_host/input/touch_selection_controller_client_aura.cc b/content/browser/renderer_host/input/touch_selection_controller_client_aura.cc
+index 98d8a0301e..b2617fc711 100644
+--- a/content/browser/renderer_host/input/touch_selection_controller_client_aura.cc
++++ b/content/browser/renderer_host/input/touch_selection_controller_client_aura.cc
+@@ -542,11 +542,11 @@ bool TouchSelectionControllerClientAura::IsCommandIdEnabled(
+   bool readable = rwhva_->GetTextInputType() != ui::TEXT_INPUT_TYPE_PASSWORD;
+   bool has_selection = !rwhva_->GetSelectedText().empty();
+   switch (command_id) {
+-    case std::to_underlying(ui::TouchEditable::MenuCommands::kCut):
++    case base::to_underlying(ui::TouchEditable::MenuCommands::kCut):
+       return editable && readable && has_selection;
+-    case std::to_underlying(ui::TouchEditable::MenuCommands::kCopy):
++    case base::to_underlying(ui::TouchEditable::MenuCommands::kCopy):
+       return readable && has_selection;
+-    case std::to_underlying(ui::TouchEditable::MenuCommands::kPaste): {
++    case base::to_underlying(ui::TouchEditable::MenuCommands::kPaste): {
+       return editable && can_paste;
+     }
+     case base::to_underlying(ui::TouchEditable::MenuCommands::kSelectAll): {
+diff --git a/content/browser/renderer_host/input/touch_selection_controller_client_child_frame.cc b/content/browser/renderer_host/input/touch_selection_controller_client_child_frame.cc
+index 02da807445..2e3db99ea9 100644
+--- a/content/browser/renderer_host/input/touch_selection_controller_client_child_frame.cc
++++ b/content/browser/renderer_host/input/touch_selection_controller_client_child_frame.cc
+@@ -174,11 +174,11 @@ bool TouchSelectionControllerClientChildFrame::IsCommandIdEnabled(
+   bool readable = rwhv_->GetTextInputType() != ui::TEXT_INPUT_TYPE_PASSWORD;
+   bool has_selection = !rwhv_->GetSelectedText().empty();
+   switch (command_id) {
+-    case std::to_underlying(ui::TouchEditable::MenuCommands::kCut):
++    case base::to_underlying(ui::TouchEditable::MenuCommands::kCut):
+       return editable && readable && has_selection;
+-    case std::to_underlying(ui::TouchEditable::MenuCommands::kCopy):
++    case base::to_underlying(ui::TouchEditable::MenuCommands::kCopy):
+       return readable && has_selection;
+-    case std::to_underlying(ui::TouchEditable::MenuCommands::kPaste): {
++    case base::to_underlying(ui::TouchEditable::MenuCommands::kPaste): {
+       return editable && can_paste;
+     }
+     case base::to_underlying(ui::TouchEditable::MenuCommands::kSelectAll): {
+diff --git a/content/browser/site_info.cc b/content/browser/site_info.cc
+index 0b40bc0b02..12d1a608eb 100644
+--- a/content/browser/site_info.cc
++++ b/content/browser/site_info.cc
+@@ -525,7 +525,7 @@ bool SiteInfo::IsGuest() const {
+ }
+ 
+ bool SiteInfo::IsWebUI() const {
+-  return std::ranges::contains(URLDataManagerBackend::GetWebUISchemes(),
++  return base::Contains(URLDataManagerBackend::GetWebUISchemes(),
+                                site_url_.scheme());
+ }
+ 

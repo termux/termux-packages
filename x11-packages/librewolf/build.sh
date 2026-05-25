@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://librewolf.net/
 TERMUX_PKG_DESCRIPTION="A custom version of Firefox, focused on privacy, security and freedom."
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@3ls-it"
-TERMUX_PKG_VERSION="150.0.3-1"
+TERMUX_PKG_VERSION="151.0.1-2"
 TERMUX_PKG_SRCURL="https://codeberg.org/api/packages/librewolf/generic/librewolf-source/${TERMUX_PKG_VERSION}/librewolf-${TERMUX_PKG_VERSION}.source.tar.gz"
-TERMUX_PKG_SHA256=1344a3245d6384ec3e486fcc37309372ce0495e7c56f84b74a8487f7936e799b
+TERMUX_PKG_SHA256=1c5dbd7544e398d685ea00e7edfe6a725d3aaff246a367c71ce00a3b9d370ca3
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
@@ -35,7 +35,7 @@ termux_pkg_auto_update() {
 	if [[ "${e}" != 0 ]]; then
 		cat <<- EOL >&2
 		WARN: Auto update failure!
-		api_url_r=${api_url_r}
+		api_url=${api_url}
 		latest_version=${latest_version}
 		uptime_now=${uptime_now}
 		uptime_s=${uptime_s}

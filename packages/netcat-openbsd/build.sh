@@ -2,18 +2,18 @@ TERMUX_PKG_HOMEPAGE=https://packages.debian.org/sid/netcat-openbsd
 TERMUX_PKG_DESCRIPTION="TCP/IP swiss army knife. OpenBSD variant."
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.234-2"
-TERMUX_PKG_SRCURL=https://salsa.debian.org/debian/netcat-openbsd/-/archive/debian/${TERMUX_PKG_VERSION}/netcat-openbsd-debian-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=11a00e7cfb37dfd41ef6228ad4757efb45553f21f0f8709a676eb18e6f01b5ef
+TERMUX_PKG_VERSION="1.238-1"
+TERMUX_PKG_SRCURL="https://salsa.debian.org/debian/netcat-openbsd/-/archive/debian/${TERMUX_PKG_VERSION}/netcat-openbsd-debian-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=ca2fed5e3e0e9841af812bd7ad2ed9e094f5c4cb72817e91323c75e14858af4a
 TERMUX_PKG_PROVIDES="nc, ncat, netcat"
-TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_TAG_TYPE=newest-tag
 TERMUX_PKG_DEPENDS="libbsd"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE=newest-tag
 
 termux_step_pre_configure() {
 	local p
-	for p in $(cat debian/patches/series); do
+	for p in $(< debian/patches/series); do
 		echo "Applying debian/patches/$p"
 		patch -p1 -i "debian/patches/$p"
 	done

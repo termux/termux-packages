@@ -12,12 +12,12 @@ Subject: [PATCH 1/8] base
  base/containers/contains.h                    | 56 ++++++++++++++
  base/containers/contains_nocompile.nc         | 31 ++++++++
  base/containers/contains_unittest.cc          | 38 ++++++++++
- base/containers/enum_set.h                    | 31 ++++----
+ base/containers/enum_set.h                    | 30 ++++----
  base/containers/flat_tree.h                   | 36 ---------
  base/containers/intrusive_heap.h              |  4 +-
  base/containers/span.h                        | 20 +++--
  base/containers/to_vector.h                   | 19 +----
- base/feature_list.h                           | 16 ++--
+ base/feature_internal.h                       | 16 ++--
  base/files/file_path.cc                       |  5 +-
  base/functional/callback_internal.cc          |  5 +-
  base/ios/crb_protocol_observers.mm            |  3 +-
@@ -48,7 +48,8 @@ Subject: [PATCH 1/8] base
  base/trace_event/trace_config.cc              |  5 +-
  base/types/cxx23_from_range.h                 | 25 +++++++
  base/types/cxx23_to_underlying.h              | 23 ++++++
- 44 files changed, 446 insertions(+), 204 deletions(-)
+ 45 files changed, 455 insertions(+), 204 deletions(-)
+ create mode 100644 base/BUILD.gn.rej
  create mode 100644 base/containers/contains.h
  create mode 100644 base/containers/contains_nocompile.nc
  create mode 100644 base/containers/contains_unittest.cc
@@ -56,10 +57,10 @@ Subject: [PATCH 1/8] base
  create mode 100644 base/types/cxx23_to_underlying.h
 
 diff --git a/base/BUILD.gn b/base/BUILD.gn
-index d0317b2920..80cce97915 100644
+index aad39d7927..b774402064 100644
 --- a/base/BUILD.gn
 +++ b/base/BUILD.gn
-@@ -247,6 +247,7 @@ component("base") {
+@@ -249,6 +249,7 @@ component("base") {
      "containers/buffer_iterator.h",
      "containers/checked_iterators.h",
      "containers/circular_deque.h",
@@ -67,7 +68,7 @@ index d0317b2920..80cce97915 100644
      "containers/enum_set.h",
      "containers/extend.h",
      "containers/fixed_flat_map.h",
-@@ -931,6 +932,7 @@ component("base") {
+@@ -938,6 +939,7 @@ component("base") {
      "trace_event/trace_session_observer.h",
      "traits_bag.h",
      "tuple.h",
@@ -75,7 +76,7 @@ index d0317b2920..80cce97915 100644
      "types/cxx26_projected_value_t.h",
      "types/expected.h",
      "types/expected_internal.h",
-@@ -3473,6 +3475,7 @@ test("base_unittests") {
+@@ -3546,6 +3548,7 @@ test("base_unittests") {
      "containers/buffer_iterator_unittest.cc",
      "containers/checked_iterators_unittest.cc",
      "containers/circular_deque_unittest.cc",
@@ -83,16 +84,16 @@ index d0317b2920..80cce97915 100644
      "containers/enum_set_unittest.cc",
      "containers/extend_unittest.cc",
      "containers/fixed_flat_map_unittest.cc",
-@@ -4535,6 +4538,7 @@ if (enable_nocompile_tests) {
+@@ -4611,6 +4614,7 @@ if (enable_nocompile_tests) {
        "check_nocompile.nc",
        "containers/buffer_iterator_nocompile.nc",
        "containers/checked_iterators_nocompile.nc",
 +      "containers/contains_nocompile.nc",
-       "containers/enum_set_nocompile.nc",
        "containers/fixed_flat_map_nocompile.nc",
        "containers/fixed_flat_set_nocompile.nc",
+       "containers/heap_array_nocompile.nc",
 diff --git a/base/apple/mach_port_rendezvous.cc b/base/apple/mach_port_rendezvous.cc
-index 3d47f143c1..bf19f32333 100644
+index 6827382152..7cd6db6ca0 100644
 --- a/base/apple/mach_port_rendezvous.cc
 +++ b/base/apple/mach_port_rendezvous.cc
 @@ -21,6 +21,7 @@
@@ -104,7 +105,7 @@ index 3d47f143c1..bf19f32333 100644
  namespace base {
  
 diff --git a/base/apple/mach_port_rendezvous_mac.cc b/base/apple/mach_port_rendezvous_mac.cc
-index bc23cfa532..dd29fa474e 100644
+index 42c7323898..21ca22e6f0 100644
 --- a/base/apple/mach_port_rendezvous_mac.cc
 +++ b/base/apple/mach_port_rendezvous_mac.cc
 @@ -27,6 +27,7 @@
@@ -356,93 +357,7 @@ index 0000000000..e0781d79b6
 +}
 +
 +}  // namespace base
-diff --git a/base/containers/enum_set.h b/base/containers/enum_set.h
-index f38ef65d5a..3bd3b62e82 100644
---- a/base/containers/enum_set.h
-+++ b/base/containers/enum_set.h
-@@ -17,6 +17,7 @@
- #include "base/check.h"
- #include "base/check_op.h"
- #include "base/memory/raw_ptr.h"
-+#include "base/types/cxx23_to_underlying.h"
- #include "build/build_config.h"
- 
- namespace base {
-@@ -62,7 +63,7 @@ class EnumSet {
-   static const E kMinValue = MinEnumValue;
-   static const E kMaxValue = MaxEnumValue;
-   static const size_t kValueCount =
--      std::to_underlying(kMaxValue) - std::to_underlying(kMinValue) + 1;
-+      to_underlying(kMaxValue) - to_underlying(kMinValue) + 1;
- 
-   static_assert(kMinValue <= kMaxValue,
-                 "min value must be no greater than max value");
-@@ -227,37 +228,37 @@ class EnumSet {
- 
-   // Returns an EnumSet constructed from |bitmask|.
-   static constexpr EnumSet FromEnumBitmask(const uint64_t bitmask) {
--    static_assert(std::to_underlying(kMaxValue) < 64,
-+    static_assert(to_underlying(kMaxValue) < 64,
-                   "The highest enum value must be < 64 for FromEnumBitmask ");
--    static_assert(std::to_underlying(kMinValue) >= 0,
-+    static_assert(to_underlying(kMinValue) >= 0,
-                   "The lowest enum value must be >= 0 for FromEnumBitmask ");
--    return EnumSet(EnumBitSet(bitmask >> std::to_underlying(kMinValue)));
-+    return EnumSet(EnumBitSet(bitmask >> to_underlying(kMinValue)));
-   }
-   // Returns a bitmask for the EnumSet.
-   uint64_t ToEnumBitmask() const {
--    static_assert(std::to_underlying(kMaxValue) < 64,
-+    static_assert(to_underlying(kMaxValue) < 64,
-                   "The highest enum value must be < 64 for ToEnumBitmask ");
--    static_assert(std::to_underlying(kMinValue) >= 0,
-+    static_assert(to_underlying(kMinValue) >= 0,
-                   "The lowest enum value must be >= 0 for FromEnumBitmask ");
--    return enums_.to_ullong() << std::to_underlying(kMinValue);
-+    return enums_.to_ullong() << to_underlying(kMinValue);
-   }
- 
-   // Returns a uint64_t bit mask representing the values within the range
-   // [64*n, 64*n + 63] of the EnumSet.
-   std::optional<uint64_t> GetNth64bitWordBitmask(size_t n) const {
-     // If the EnumSet contains less than n 64-bit masks, return std::nullopt.
--    if (std::to_underlying(kMaxValue) / 64 < n) {
-+    if (to_underlying(kMaxValue) / 64 < n) {
-       return std::nullopt;
-     }
- 
-     std::bitset<kValueCount> mask = ~uint64_t{0};
-     std::bitset<kValueCount> bits = enums_;
--    if (std::to_underlying(kMinValue) < n * 64) {
--      bits >>= n * 64 - std::to_underlying(kMinValue);
-+    if (to_underlying(kMinValue) < n * 64) {
-+      bits >>= n * 64 - to_underlying(kMinValue);
-     }
-     uint64_t result = (bits & mask).to_ullong();
--    if (std::to_underlying(kMinValue) > n * 64) {
--      result <<= std::to_underlying(kMinValue) - n * 64;
-+    if (to_underlying(kMinValue) > n * 64) {
-+      result <<= to_underlying(kMinValue) - n * 64;
-     }
-     return result;
-   }
-@@ -390,13 +391,13 @@ class EnumSet {
-   // Converts a value to/from an index into |enums_|.
-   static constexpr size_t ToIndex(E value) {
-     CHECK(InRange(value));
--    return static_cast<size_t>(std::to_underlying(value)) -
--           static_cast<size_t>(std::to_underlying(MinEnumValue));
-+    return static_cast<size_t>(to_underlying(value)) -
-+           static_cast<size_t>(to_underlying(MinEnumValue));
-   }
- 
-   static E FromIndex(size_t i) {
-     DCHECK_LT(i, kValueCount);
--    return static_cast<E>(std::to_underlying(MinEnumValue) + i);
-+    return static_cast<E>(to_underlying(MinEnumValue) + i);
-   }
- 
-   EnumBitSet enums_;
+
 diff --git a/base/containers/flat_tree.h b/base/containers/flat_tree.h
 index 5104d90b4f..8fc8e78db4 100644
 --- a/base/containers/flat_tree.h
@@ -541,10 +456,10 @@ index a9ffe303fa..d0a60ed748 100644
                  const value_compare& comp = value_compare(),
                  const heap_handle_accessor& access = heap_handle_accessor())
 diff --git a/base/containers/span.h b/base/containers/span.h
-index 934dfabcfb..8bb658d370 100644
+index 7487510cea..fc365e6cc7 100644
 --- a/base/containers/span.h
 +++ b/base/containers/span.h
-@@ -568,7 +568,7 @@ class GSL_POINTER span {
+@@ -629,7 +629,7 @@ class GSL_POINTER span {
    constexpr void copy_from(span<const element_type, extent> other)
      requires(!std::is_const_v<element_type>)
    {
@@ -553,7 +468,7 @@ index 934dfabcfb..8bb658d370 100644
        // Comparing pointers to different objects at compile time yields
        // unspecified behavior, which would halt compilation. Instead,
        // unconditionally use a separate buffer in the constexpr context. This
-@@ -583,7 +583,10 @@ class GSL_POINTER span {
+@@ -644,7 +644,10 @@ class GSL_POINTER span {
            constexpr ~Holder() {}
            element_type value;
          };
@@ -565,7 +480,7 @@ index 934dfabcfb..8bb658d370 100644
          for (size_t i = 0; i < extent; ++i) {
            // SAFETY: `buffers` is allocated with `extent` elements, and the loop
            // body only executes if `i < extent`.
-@@ -595,6 +598,7 @@ class GSL_POINTER span {
+@@ -656,6 +659,7 @@ class GSL_POINTER span {
            (*this)[i] = UNSAFE_BUFFERS(buffer[i]).value;
            UNSAFE_BUFFERS(buffer[i]).value.~element_type();
          }
@@ -573,7 +488,7 @@ index 934dfabcfb..8bb658d370 100644
        }
      } else {
        // Using `<=` to compare pointers to different allocations is UB;
-@@ -639,7 +643,7 @@ class GSL_POINTER span {
+@@ -700,7 +704,7 @@ class GSL_POINTER span {
      // unspecified behavior, which would halt compilation. Instead implement in
      // terms of the guaranteed-safe behavior; performance is irrelevant in the
      // constexpr context.
@@ -582,7 +497,7 @@ index 934dfabcfb..8bb658d370 100644
        copy_from(other);
        return;
      }
-@@ -1105,7 +1109,7 @@ class GSL_POINTER span<ElementType, dynamic_extent, InternalPtrType> {
+@@ -1209,7 +1213,7 @@ class GSL_POINTER span<ElementType, dynamic_extent, InternalPtrType> {
      requires(!std::is_const_v<element_type>)
    {
      CHECK(size() == other.size());
@@ -591,7 +506,7 @@ index 934dfabcfb..8bb658d370 100644
        // Comparing pointers to different objects at compile time yields
        // unspecified behavior, which would halt compilation. Instead,
        // unconditionally use a separate buffer in the constexpr context. This
-@@ -1118,7 +1122,10 @@ class GSL_POINTER span<ElementType, dynamic_extent, InternalPtrType> {
+@@ -1222,7 +1226,10 @@ class GSL_POINTER span<ElementType, dynamic_extent, InternalPtrType> {
          constexpr ~Holder() {}
          element_type value;
        };
@@ -603,7 +518,7 @@ index 934dfabcfb..8bb658d370 100644
        for (size_t i = 0; i < other.size(); ++i) {
          // SAFETY: `buffers` is allocated with `other.size()` elements, and the
          // loop body only executes if `i < other.size()`.
-@@ -1130,6 +1137,7 @@ class GSL_POINTER span<ElementType, dynamic_extent, InternalPtrType> {
+@@ -1234,6 +1241,7 @@ class GSL_POINTER span<ElementType, dynamic_extent, InternalPtrType> {
          (*this)[i] = UNSAFE_BUFFERS(buffer[i]).value;
          UNSAFE_BUFFERS(buffer[i]).value.~element_type();
        }
@@ -611,7 +526,7 @@ index 934dfabcfb..8bb658d370 100644
      } else {
        // Using `<=` to compare pointers to different allocations is UB;
        // reinterpret_cast is the workaround.
-@@ -1167,7 +1175,7 @@ class GSL_POINTER span<ElementType, dynamic_extent, InternalPtrType> {
+@@ -1271,7 +1279,7 @@ class GSL_POINTER span<ElementType, dynamic_extent, InternalPtrType> {
      // unspecified behavior, which would halt compilation. Instead implement in
      // terms of the guaranteed-safe behavior; performance is irrelevant in the
      // constexpr context.
@@ -663,14 +578,14 @@ index 90b3d2f283..c4ff98bf95 100644
    std::vector<ProjectedType> container;
    container.reserve(std::ranges::size(range));
    std::ranges::transform(std::forward<Range>(range),
-diff --git a/base/feature_list.h b/base/feature_list.h
-index 63f62e12f1..30a5733aac 100644
---- a/base/feature_list.h
-+++ b/base/feature_list.h
-@@ -96,13 +96,15 @@ enum FeatureState {
-   constinit const base::Feature feature(                           \
+diff --git a/base/feature_internal.h b/base/feature_internal.h
+index d83ee1d4fd..143dfe9188 100644
+--- a/base/feature_internal.h
++++ b/base/feature_internal.h
+@@ -43,13 +43,15 @@ StringStorage(const char (&feature)[N]) -> StringStorage<N - 1>;
        name, default_state, base::internal::FeatureMacroHandshake::kSecret)
  
+ // Two-argument version of BASE_FEATURE macro.
 -#define BASE_FEATURE_INTERNAL_2_ARGS(feature, default_state)              \
 -  constinit const base::Feature feature(                                  \
 -      []() {                                                              \
@@ -689,9 +604,31 @@ index 63f62e12f1..30a5733aac 100644
 +      base_feature_internal_##feature::feature##Name.storage.data(),        \
        default_state, base::internal::FeatureMacroHandshake::kSecret)
  
- #define GET_BASE_FEATURE_MACRO(_1, _2, _3, NAME, ...) NAME
+   // Helper macro to deduce the whether to use the 2 or 3 argument version of
+@@ -78,14 +80,15 @@ StringStorage(const char (&feature)[N]) -> StringStorage<N - 1>;
+ // Four-argument version of BASE_FEATURE_PARAM macro.
+ #define BASE_FEATURE_PARAM_INTERNAL_4_ARGS(T, feature_object_name, feature, \
+                                            default_value)                   \
++  namespace base_feature_param_internal_##feature_object_name {             \
++    static_assert(#feature_object_name[0] == 'k');                          \
++    static constexpr base::internal::StringStorage                          \
++      feature_object_name##Name(#feature_object_name);                      \
++  }                                                                         \
+   BASE_FEATURE_PARAM_INTERNAL_5_ARGS(                                       \
+       T, feature_object_name, feature,                                      \
+-      []() {                                                                \
+-        static_assert(#feature_object_name[0] == 'k');                      \
+-        static constexpr base::internal::StringStorage storage(             \
+-            #feature_object_name);                                          \
+-        return storage.storage.data();                                      \
+-      }(),                                                                  \
++      base_feature_param_internal_##feature_object_name::                   \
++        feature_object_name##Name.storage.data(),                           \
+       default_value)
+ 
+ // Helper macro to deduce the whether to use the 4 or 5 argument version of
 diff --git a/base/files/file_path.cc b/base/files/file_path.cc
-index a1d8b5b1da..651381cd17 100644
+index 61c9dfe1e3..9d13f01845 100644
 --- a/base/files/file_path.cc
 +++ b/base/files/file_path.cc
 @@ -11,6 +11,7 @@
@@ -767,7 +704,7 @@ index 117728686f..92717597a3 100644
    }
  
 diff --git a/base/memory_coordinator/test_memory_consumer_registry.cc b/base/memory_coordinator/test_memory_consumer_registry.cc
-index c9f6284fa5..6b9227111b 100644
+index c13b513cbf..30396a961c 100644
 --- a/base/memory_coordinator/test_memory_consumer_registry.cc
 +++ b/base/memory_coordinator/test_memory_consumer_registry.cc
 @@ -4,10 +4,9 @@
@@ -782,9 +719,9 @@ index c9f6284fa5..6b9227111b 100644
  #include "base/memory_coordinator/memory_consumer.h"
  #include "base/task/single_thread_task_runner.h"
  
-@@ -28,7 +27,7 @@ void TestMemoryConsumerRegistry::OnMemoryConsumerAdded(
-     std::string_view consumer_id,
-     MemoryConsumerTraits traits,
+@@ -29,7 +28,7 @@ void TestMemoryConsumerRegistry::OnMemoryConsumerAdded(
+     std::string_view consumer_name,
+     std::optional<MemoryConsumerTraits> traits,
      RegisteredMemoryConsumer consumer) {
 -  CHECK(!std::ranges::contains(memory_consumers_, consumer));
 +  CHECK(!Contains(memory_consumers_, consumer));
@@ -792,7 +729,7 @@ index c9f6284fa5..6b9227111b 100644
  }
  
 diff --git a/base/metrics/histogram.cc b/base/metrics/histogram.cc
-index df4b054bcb..9e51b5d381 100644
+index d3b87d4b2c..16cf9cafb5 100644
 --- a/base/metrics/histogram.cc
 +++ b/base/metrics/histogram.cc
 @@ -21,6 +21,7 @@
@@ -803,7 +740,7 @@ index df4b054bcb..9e51b5d381 100644
  #include "base/debug/alias.h"
  #include "base/debug/crash_logging.h"
  #include "base/debug/dump_without_crashing.h"
-@@ -257,7 +258,7 @@ HistogramBase* Histogram::Factory::Build() {
+@@ -277,7 +278,7 @@ HistogramBase* Histogram::Factory::Build() {
          "DevTools.ExperimentEnabledAtLaunch",
          "DevTools.PanelShown",
      };
@@ -1189,7 +1126,7 @@ index 8310716c9a..734f95969f 100644
  
  // static
 diff --git a/base/scoped_add_feature_flags.cc b/base/scoped_add_feature_flags.cc
-index c04a2647a7..6d1893019c 100644
+index ba3cf5e962..44d94d6a53 100644
 --- a/base/scoped_add_feature_flags.cc
 +++ b/base/scoped_add_feature_flags.cc
 @@ -4,11 +4,11 @@
@@ -1228,7 +1165,7 @@ index c04a2647a7..6d1893019c 100644
 +      Contains(disabled_features_, feature_name)) {
      return;
    }
-   if (enable) {
+   auto& features = enable ? enabled_features_ : disabled_features_;
 diff --git a/base/scoped_multi_source_observation.h b/base/scoped_multi_source_observation.h
 index 7b1afe8c88..dbec0b52d1 100644
 --- a/base/scoped_multi_source_observation.h
@@ -1404,7 +1341,7 @@ index 5636c30a13..9ada2da3a7 100644
  
  #endif  // BASE_STRINGS_STRCAT_INTERNAL_H_
 diff --git a/base/strings/string_view_util.h b/base/strings/string_view_util.h
-index 5959cdbd91..2783328565 100644
+index a3ffdebd2e..42cd526871 100644
 --- a/base/strings/string_view_util.h
 +++ b/base/strings/string_view_util.h
 @@ -28,17 +28,23 @@ constexpr std::basic_string_view<CharT> MakeStringViewWithNulChars(
@@ -1414,20 +1351,20 @@ index 5959cdbd91..2783328565 100644
 +//
 +// TODO(C++23): Replace with direct use of the `std::string_view` range
 +// constructor to avoid marking UNSAFE_BUFFERS.
- constexpr auto as_string_view(span<const char> s) {
+ constexpr auto as_string_view(span<const char> s LIFETIME_BOUND) {
 -  return std::string_view(s);
 +  // SAFETY: legitimate spans are valid from `begin()` to `end()`.
 +  return UNSAFE_BUFFERS(std::string_view(s.begin(), s.end()));
  }
- constexpr auto as_string_view(span<const unsigned char> s) {
+ constexpr auto as_string_view(span<const unsigned char> s LIFETIME_BOUND) {
    return as_string_view(as_chars(s));
  }
- constexpr auto as_string_view(span<const char16_t> s) {
+ constexpr auto as_string_view(span<const char16_t> s LIFETIME_BOUND) {
 -  return std::u16string_view(s);
 +  // SAFETY: legitimate spans are valid from `begin()` to `end()`.
 +  return UNSAFE_BUFFERS(std::u16string_view(s.begin(), s.end()));
  }
- constexpr auto as_string_view(span<const wchar_t> s) {
+ constexpr auto as_string_view(span<const wchar_t> s LIFETIME_BOUND) {
 -  return std::wstring_view(s);
 +  // SAFETY: legitimate spans are valid from `begin()` to `end()`.
 +  return UNSAFE_BUFFERS(std::wstring_view(s.begin(), s.end()));
@@ -1511,7 +1448,7 @@ index 9196171e4c..86a89aa622 100644
    return x;
  #endif
 diff --git a/base/test/scoped_feature_list.cc b/base/test/scoped_feature_list.cc
-index 46c3f6d389..1a2c3bbfad 100644
+index 2fc274eec4..8c5ba9f9cc 100644
 --- a/base/test/scoped_feature_list.cc
 +++ b/base/test/scoped_feature_list.cc
 @@ -4,7 +4,6 @@
@@ -1578,7 +1515,7 @@ index c5e504481d..3cb0db3377 100644
  }
  
 diff --git a/base/time/time.h b/base/time/time.h
-index 332fef264f..78ac81258f 100644
+index b9c97f6131..c7efca52aa 100644
 --- a/base/time/time.h
 +++ b/base/time/time.h
 @@ -126,8 +126,8 @@ constexpr TimeDelta Microseconds(T n);
@@ -1657,7 +1594,7 @@ index 065c941f88..6e74592922 100644
  }
  
 diff --git a/base/trace_event/trace_config.cc b/base/trace_event/trace_config.cc
-index 6c09341e32..8b0e84103b 100644
+index 44690830a2..73b8fd4080 100644
 --- a/base/trace_event/trace_config.cc
 +++ b/base/trace_event/trace_config.cc
 @@ -11,6 +11,7 @@
@@ -1668,7 +1605,7 @@ index 6c09341e32..8b0e84103b 100644
  #include "base/json/json_reader.h"
  #include "base/json/json_writer.h"
  #include "base/logging.h"
-@@ -803,8 +804,8 @@ std::string TraceConfig::ToTraceOptionsString() const {
+@@ -802,8 +803,8 @@ std::string TraceConfig::ToTraceOptionsString() const {
  std::string TraceConfig::ToPerfettoTrackEventConfigRaw(
      bool privacy_filtering_enabled) const {
    perfetto::protos::gen::TrackEventConfig te_cfg;
@@ -1739,3 +1676,541 @@ index 0000000000..8250bdd125
 +}  // namespace base
 +
 +#endif  // BASE_TYPES_CXX23_TO_UNDERLYING_H_
+diff --git a/base/metrics/statistics_recorder.cc b/base/metrics/statistics_recorder.cc
+index 98233a7724..b9967852a5 100644
+--- a/base/metrics/statistics_recorder.cc
++++ b/base/metrics/statistics_recorder.cc
+@@ -9,6 +9,7 @@
+ 
+ #include "base/at_exit.h"
+ #include "base/barrier_closure.h"
++#include "base/containers/contains.h"
+ #include "base/debug/leak_annotations.h"
+ #include "base/functional/callback_helpers.h"
+ #include "base/json/string_escape.h"
+@@ -593,7 +594,8 @@ StatisticsRecorder::Histograms StatisticsRecorder::WithName(
+   auto histogram_name_does_not_contain_query =
+       [comparator, query](const HistogramBase* const h) {
+         const auto& name = h->histogram_name();
+-        return !std::ranges::contains_subrange(name, query, comparator);
++        return std::search(name.begin(), name.end(), query.begin(), query.end(),
++                           comparator) == name.end();
+       };
+   // Erase the non-matching histograms. Note that `histograms` was passed by
+   // value so we can efficiently remove the unwanted elements and return the
+diff --git a/base/pickle.cc b/base/pickle.cc
+index 2321db7bfd..dd30340bb6 100644
+--- a/base/pickle.cc
++++ b/base/pickle.cc
+@@ -291,12 +291,14 @@ bool PickleIterator::ReadString16(std::u16string* result) {
+   // This is necessary because it is not safe to reinterpret_cast the data
+   // pointer for use with `std::u16string::assign()`, as the pointer may not
+   // have the proper alignment to avoid undefined behavior.
+-  result->resize_and_overwrite(len, [&](char16_t* p, size_t n) {
++  {
++    result->resize(len);
++    auto p = result->data();
++    auto n = result->size();
+     // SAFETY: `resize_and_overwrite` ensures `p` points to `n` elements.
+     as_writable_bytes(UNSAFE_BUFFERS(span(p, n)))
+         .copy_from_nonoverlapping(bytes);
+-    return n;
+-  });
++  }
+ 
+   return true;
+ }
+diff --git a/base/strings/string_util_impl_helpers.h b/base/strings/string_util_impl_helpers.h
+index d0d3a1ff6b..7bdfd173c7 100644
+--- a/base/strings/string_util_impl_helpers.h
++++ b/base/strings/string_util_impl_helpers.h
+@@ -232,7 +232,7 @@ inline bool DoIsStringUTF8(std::string_view str) {
+ // Lookup table for fast ASCII case-insensitive comparison.
+ inline constexpr std::array<unsigned char, 256> kToLower = []() {
+   std::array<unsigned char, 256> table;
+-  std::ranges::iota(table, 0);
++  std::iota(table.begin(), table.end(), 0);
+   std::iota(table.begin() + size_t{'A'}, table.begin() + size_t{'Z'} + 1, 'a');
+   return table;
+ }();
+diff --git a/base/containers/enum_set.h b/base/containers/enum_set.h
+index 4cf3168c6b..02a235dbfa 100644
+--- a/base/containers/enum_set.h
++++ b/base/containers/enum_set.h
+@@ -17,6 +17,8 @@
+ #include "base/check.h"
+ #include "base/check_op.h"
+ #include "base/memory/raw_ptr.h"
++#include "base/types/cxx23_to_underlying.h"
++#include "build/build_config.h"
+ 
+ namespace base {
+ 
+@@ -25,16 +27,16 @@ template <typename E, E MinEnumValue, E MaxEnumValue>
+ class EnumSet;
+ 
+ template <typename E, E Min, E Max>
+-constexpr EnumSet<E, Min, Max> Union(EnumSet<E, Min, Max> set1,
+-                                     EnumSet<E, Min, Max> set2);
++EnumSet<E, Min, Max> Union(EnumSet<E, Min, Max> set1,
++                           EnumSet<E, Min, Max> set2);
+ 
+ template <typename E, E Min, E Max>
+-constexpr EnumSet<E, Min, Max> Intersection(EnumSet<E, Min, Max> set1,
+-                                            EnumSet<E, Min, Max> set2);
++EnumSet<E, Min, Max> Intersection(EnumSet<E, Min, Max> set1,
++                                  EnumSet<E, Min, Max> set2);
+ 
+ template <typename E, E Min, E Max>
+-constexpr EnumSet<E, Min, Max> Difference(EnumSet<E, Min, Max> set1,
+-                                          EnumSet<E, Min, Max> set2);
++EnumSet<E, Min, Max> Difference(EnumSet<E, Min, Max> set1,
++                                EnumSet<E, Min, Max> set2);
+ 
+ // An EnumSet is a set that can hold enum values between a min and a
+ // max value (inclusive of both).  It's essentially a wrapper around
+@@ -58,10 +60,10 @@ class EnumSet {
+ 
+  public:
+   using EnumType = E;
+-  static constexpr E kMinValue = MinEnumValue;
+-  static constexpr E kMaxValue = MaxEnumValue;
+-  static constexpr size_t kValueCount =
+-      std::to_underlying(kMaxValue) - std::to_underlying(kMinValue) + 1;
++  static const E kMinValue = MinEnumValue;
++  static const E kMaxValue = MaxEnumValue;
++  static const size_t kValueCount =
++      base::to_underlying(kMaxValue) - base::to_underlying(kMinValue) + 1;
+ 
+   static_assert(kMinValue <= kMaxValue,
+                 "min value must be no greater than max value");
+@@ -90,7 +92,7 @@ class EnumSet {
+   //   Process(*it);
+   // }
+   //
+-  // The iterator must not outlive the set. In particular, the following
++  // The iterator must not be outlived by the set. In particular, the following
+   // is an error:
+   //
+   // EnumSet<...> SomeFn() { ... }
+@@ -109,25 +111,25 @@ class EnumSet {
+     using reference = EnumType&;
+     using iterator_category = std::forward_iterator_tag;
+ 
+-    constexpr Iterator() : enums_(nullptr), i_(kValueCount) {}
+-    constexpr ~Iterator() = default;
++    Iterator() : enums_(nullptr), i_(kValueCount) {}
++    ~Iterator() = default;
+ 
+-    constexpr Iterator(const Iterator&) = default;
+-    constexpr Iterator& operator=(const Iterator&) = default;
++    Iterator(const Iterator&) = default;
++    Iterator& operator=(const Iterator&) = default;
+ 
+-    constexpr Iterator(Iterator&&) = default;
+-    constexpr Iterator& operator=(Iterator&&) = default;
++    Iterator(Iterator&&) = default;
++    Iterator& operator=(Iterator&&) = default;
+ 
+-    friend constexpr bool operator==(const Iterator& lhs, const Iterator& rhs) {
++    friend bool operator==(const Iterator& lhs, const Iterator& rhs) {
+       return lhs.i_ == rhs.i_;
+     }
+ 
+-    constexpr value_type operator*() const {
++    value_type operator*() const {
+       DCHECK(Good());
+       return FromIndex(i_);
+     }
+ 
+-    constexpr Iterator& operator++() {
++    Iterator& operator++() {
+       DCHECK(Good());
+       // If there are no more set elements in the bitset, this will result in an
+       // index equal to kValueCount, which is equivalent to EnumSet.end().
+@@ -136,7 +138,7 @@ class EnumSet {
+       return *this;
+     }
+ 
+-    constexpr Iterator operator++(int) {
++    Iterator operator++(int) {
+       DCHECK(Good());
+       Iterator old(*this);
+ 
+@@ -144,22 +146,20 @@ class EnumSet {
+       // index equal to kValueCount, which is equivalent to EnumSet.end().
+       i_ = FindNext(i_ + 1);
+ 
+-      return old;
++      return std::move(old);
+     }
+ 
+    private:
+-    friend constexpr Iterator EnumSet::begin() const;
++    friend Iterator EnumSet::begin() const;
+ 
+-    explicit constexpr Iterator(const EnumBitSet& enums)
++    explicit Iterator(const EnumBitSet& enums)
+         : enums_(&enums), i_(FindNext(0)) {}
+ 
+     // Returns true iff the iterator points to an EnumSet and it
+     // hasn't yet traversed the EnumSet entirely.
+-    constexpr bool Good() const {
+-      return enums_ && i_ < kValueCount && enums_->test(i_);
+-    }
++    bool Good() const { return enums_ && i_ < kValueCount && enums_->test(i_); }
+ 
+-    constexpr size_t FindNext(size_t i) const {
++    size_t FindNext(size_t i) {
+       while ((i < kValueCount) && !enums_->test(i)) {
+         ++i;
+       }
+@@ -170,37 +170,60 @@ class EnumSet {
+     size_t i_;
+   };
+ 
+-  constexpr EnumSet() = default;
++  EnumSet() = default;
+ 
+-  constexpr ~EnumSet() = default;
++  ~EnumSet() = default;
+ 
+   constexpr EnumSet(std::initializer_list<E> values) {
+-    for (E value : values) {
+-      Put(value);
++    if (std::is_constant_evaluated()) {
++      enums_ = bitstring(values);
++    } else {
++      for (E value : values) {
++        Put(value);
++      }
+     }
+   }
+ 
+   // Returns an EnumSet with all values between kMinValue and kMaxValue, which
+   // also contains undefined enum values if the enum in question has gaps
+   // between kMinValue and kMaxValue.
+-  static consteval EnumSet All() {
+-    EnumBitSet enums;
+-    enums.set();
+-    return EnumSet(enums);
++  static constexpr EnumSet All() {
++    if (std::is_constant_evaluated()) {
++      if (kValueCount == 0) {
++        return EnumSet();
++      }
++      // Since `1 << kValueCount` may trigger shift-count-overflow warning if
++      // the `kValueCount` is 64, instead of returning `(1 << kValueCount) - 1`,
++      // the bitmask will be constructed from two parts: the most significant
++      // bits and the remaining.
++      uint64_t mask = 1ULL << (kValueCount - 1);
++      return EnumSet(EnumBitSet(mask - 1 + mask));
++    } else {
++      // When `kValueCount` is greater than 64, we can't use the constexpr path,
++      // and we will build an `EnumSet` value by value.
++      EnumSet enum_set;
++      for (size_t value = 0; value < kValueCount; ++value) {
++        enum_set.Put(FromIndex(value));
++      }
++      return enum_set;
++    }
+   }
+ 
+   // Returns an EnumSet with all the values from start to end, inclusive.
+   static constexpr EnumSet FromRange(E start, E end) {
+-    EnumSet result;
+-    result.PutRange(start, end);
+-    return result;
++    if constexpr (kValueCount <= 64) {
++      CHECK_LE(start, end);
++      return EnumSet(EnumBitSet(
++          ((single_val_bitstring(end)) - (single_val_bitstring(start))) |
++          (single_val_bitstring(end))));
++    } else {
++      EnumSet enum_set;
++      enum_set.PutRange(start, end);
++      return enum_set;
++    }
+   }
+ 
+-  constexpr EnumSet(const EnumSet&) = default;
+-  constexpr EnumSet& operator=(const EnumSet&) = default;
+-
+-  constexpr EnumSet(EnumSet&&) = default;
+-  constexpr EnumSet& operator=(EnumSet&&) = default;
++  // Copy constructor and assignment welcome.
+ 
+   // Bitmask operations.
+   //
+@@ -211,37 +234,37 @@ class EnumSet {
+ 
+   // Returns an EnumSet constructed from |bitmask|.
+   static constexpr EnumSet FromEnumBitmask(const uint64_t bitmask) {
+-    static_assert(std::to_underlying(kMaxValue) < 64,
++    static_assert(base::to_underlying(kMaxValue) < 64,
+                   "The highest enum value must be < 64 for FromEnumBitmask ");
+-    static_assert(std::to_underlying(kMinValue) >= 0,
++    static_assert(base::to_underlying(kMinValue) >= 0,
+                   "The lowest enum value must be >= 0 for FromEnumBitmask ");
+-    return EnumSet(EnumBitSet(bitmask >> std::to_underlying(kMinValue)));
++    return EnumSet(EnumBitSet(bitmask >> base::to_underlying(kMinValue)));
+   }
+   // Returns a bitmask for the EnumSet.
+-  constexpr uint64_t ToEnumBitmask() const {
+-    static_assert(std::to_underlying(kMaxValue) < 64,
++  uint64_t ToEnumBitmask() const {
++    static_assert(base::to_underlying(kMaxValue) < 64,
+                   "The highest enum value must be < 64 for ToEnumBitmask ");
+-    static_assert(std::to_underlying(kMinValue) >= 0,
++    static_assert(base::to_underlying(kMinValue) >= 0,
+                   "The lowest enum value must be >= 0 for FromEnumBitmask ");
+-    return enums_.to_ullong() << std::to_underlying(kMinValue);
++    return enums_.to_ullong() << base::to_underlying(kMinValue);
+   }
+ 
+   // Returns a uint64_t bit mask representing the values within the range
+   // [64*n, 64*n + 63] of the EnumSet.
+-  constexpr std::optional<uint64_t> GetNth64bitWordBitmask(size_t n) const {
++  std::optional<uint64_t> GetNth64bitWordBitmask(size_t n) const {
+     // If the EnumSet contains less than n 64-bit masks, return std::nullopt.
+-    if (std::to_underlying(kMaxValue) / 64 < n) {
++    if (base::to_underlying(kMaxValue) / 64 < n) {
+       return std::nullopt;
+     }
+ 
+     std::bitset<kValueCount> mask = ~uint64_t{0};
+     std::bitset<kValueCount> bits = enums_;
+-    if (std::to_underlying(kMinValue) < n * 64) {
+-      bits >>= n * 64 - std::to_underlying(kMinValue);
++    if (base::to_underlying(kMinValue) < n * 64) {
++      bits >>= n * 64 - base::to_underlying(kMinValue);
+     }
+     uint64_t result = (bits & mask).to_ullong();
+-    if (std::to_underlying(kMinValue) > n * 64) {
+-      result <<= std::to_underlying(kMinValue) - n * 64;
++    if (base::to_underlying(kMinValue) > n * 64) {
++      result <<= base::to_underlying(kMinValue) - n * 64;
+     }
+     return result;
+   }
+@@ -251,16 +274,16 @@ class EnumSet {
+   // (defined below).
+ 
+   // Adds the given value (which must be in range) to our set.
+-  constexpr void Put(E value) { enums_.set(ToIndex(value)); }
++  void Put(E value) { enums_.set(ToIndex(value)); }
+ 
+   // Adds all values in the given set to our set.
+-  constexpr void PutAll(EnumSet other) { enums_ |= other.enums_; }
++  void PutAll(EnumSet other) { enums_ |= other.enums_; }
+ 
+   // Adds all values in the given range to our set, inclusive.
+   constexpr void PutRange(E start, E end) {
+     CHECK_LE(start, end);
+-    size_t end_index_inclusive = ToIndex(end);
+-    for (size_t current = ToIndex(start); current <= end_index_inclusive;
++    size_t endIndexInclusive = ToIndex(end);
++    for (size_t current = ToIndex(start); current <= endIndexInclusive;
+          ++current) {
+       enums_.set(current);
+     }
+@@ -269,23 +292,23 @@ class EnumSet {
+   // There's no real need for a Retain(E) member function.
+ 
+   // Removes all values not in the given set from our set.
+-  constexpr void RetainAll(EnumSet other) { enums_ &= other.enums_; }
++  void RetainAll(EnumSet other) { enums_ &= other.enums_; }
+ 
+   // If the given value is in range, removes it from our set.
+-  constexpr void Remove(E value) {
++  void Remove(E value) {
+     if (InRange(value)) {
+       enums_.reset(ToIndex(value));
+     }
+   }
+ 
+   // Removes all values in the given set from our set.
+-  constexpr void RemoveAll(EnumSet other) { enums_ &= ~other.enums_; }
++  void RemoveAll(EnumSet other) { enums_ &= ~other.enums_; }
+ 
+   // Removes all values from our set.
+-  constexpr void Clear() { enums_.reset(); }
++  void Clear() { enums_.reset(); }
+ 
+   // Conditionally puts or removes `value`, based on `should_be_present`.
+-  constexpr void PutOrRemove(E value, bool should_be_present) {
++  void PutOrRemove(E value, bool should_be_present) {
+     if (should_be_present) {
+       Put(value);
+     } else {
+@@ -299,34 +322,33 @@ class EnumSet {
+   }
+ 
+   // Returns true iff the given set is a subset of our set.
+-  constexpr bool HasAll(EnumSet other) const {
++  bool HasAll(EnumSet other) const {
+     return (enums_ & other.enums_) == other.enums_;
+   }
+ 
+   // Returns true if the given set contains any value of our set.
+-  constexpr bool HasAny(EnumSet other) const {
+-    return (enums_ & other.enums_).any();
++  bool HasAny(EnumSet other) const {
++    return (enums_ & other.enums_).count() > 0;
+   }
+ 
+   // Returns true iff our set is empty.
+-  constexpr bool empty() const { return enums_.none(); }
++  bool empty() const { return !enums_.any(); }
+ 
+   // Returns how many values our set has.
+-  constexpr size_t size() const { return enums_.count(); }
++  size_t size() const { return enums_.count(); }
+ 
+   // Returns an iterator pointing to the first element (if any).
+-  constexpr Iterator begin() const { return Iterator(enums_); }
++  Iterator begin() const { return Iterator(enums_); }
+ 
+   // Returns an iterator that does not point to any element, but to the position
+   // that follows the last element in the set.
+-  constexpr Iterator end() const { return Iterator(); }
++  Iterator end() const { return Iterator(); }
+ 
+   // Returns true iff `a` and `b` contain exactly the same values.
+-  friend constexpr bool operator==(const EnumSet& a,
+-                                   const EnumSet& b) = default;
++  friend bool operator==(const EnumSet& a, const EnumSet& b) = default;
+ 
+-  // Compares `a` and `b` by their integer representation.
+-  friend constexpr auto operator<=>(const EnumSet& a, const EnumSet& b) {
++  // Compares `a` and `b` by their integer representation (see ToEnumBitmask).
++  friend auto operator<=>(const EnumSet& a, const EnumSet& b) {
+     return a.ToEnumBitmask() <=> b.ToEnumBitmask();
+   }
+ 
+@@ -339,47 +361,80 @@ class EnumSet {
+   }
+ 
+  private:
+-  friend constexpr EnumSet Union<E, MinEnumValue, MaxEnumValue>(EnumSet set1,
+-                                                                EnumSet set2);
+-  friend constexpr EnumSet Intersection<E, MinEnumValue, MaxEnumValue>(
+-      EnumSet set1,
+-      EnumSet set2);
+-  friend constexpr EnumSet Difference<E, MinEnumValue, MaxEnumValue>(
+-      EnumSet set1,
+-      EnumSet set2);
++  friend EnumSet Union<E, MinEnumValue, MaxEnumValue>(EnumSet set1,
++                                                      EnumSet set2);
++  friend EnumSet Intersection<E, MinEnumValue, MaxEnumValue>(EnumSet set1,
++                                                             EnumSet set2);
++  friend EnumSet Difference<E, MinEnumValue, MaxEnumValue>(EnumSet set1,
++                                                           EnumSet set2);
++
++  static constexpr uint64_t bitstring(const std::initializer_list<E>& values) {
++    uint64_t result = 0;
++    for (E value : values) {
++      result |= single_val_bitstring(value);
++    }
++    return result;
++  }
+ 
+-  explicit constexpr EnumSet(EnumBitSet enums) : enums_(enums) {}
++  static constexpr uint64_t single_val_bitstring(E val) {
++    const uint64_t bitstring = 1;
++    const size_t shift_amount = ToIndex(val);
++    CHECK_LT(shift_amount, sizeof(bitstring) * 8);
++    return bitstring << shift_amount;
++  }
++
++  // A bitset can't be constexpr constructed if it has size > 64, since the
++  // constexpr constructor uses a uint64_t. If your EnumSet has > 64 values, you
++  // can safely remove the constepxr qualifiers from this file, at the cost of
++  // some minor optimizations.
++  explicit constexpr EnumSet(EnumBitSet enums) : enums_(enums) {
++    if (std::is_constant_evaluated()) {
++      CHECK(kValueCount <= 64)
++          << "Max number of enum values is 64 for constexpr constructor";
++    }
++  }
+ 
+   // Converts a value to/from an index into |enums_|.
+   static constexpr size_t ToIndex(E value) {
+     CHECK(InRange(value));
+-    return static_cast<size_t>(std::to_underlying(value)) -
+-           static_cast<size_t>(std::to_underlying(MinEnumValue));
++    return static_cast<size_t>(base::to_underlying(value)) -
++           static_cast<size_t>(base::to_underlying(MinEnumValue));
+   }
+ 
+-  static constexpr E FromIndex(size_t i) {
++  static E FromIndex(size_t i) {
+     DCHECK_LT(i, kValueCount);
+-    return static_cast<E>(std::to_underlying(MinEnumValue) + i);
++    return static_cast<E>(base::to_underlying(MinEnumValue) + i);
+   }
+ 
+   EnumBitSet enums_;
+ };
+ 
++template <typename E, E MinEnumValue, E MaxEnumValue>
++const E EnumSet<E, MinEnumValue, MaxEnumValue>::kMinValue;
++
++template <typename E, E MinEnumValue, E MaxEnumValue>
++const E EnumSet<E, MinEnumValue, MaxEnumValue>::kMaxValue;
++
++template <typename E, E MinEnumValue, E MaxEnumValue>
++const size_t EnumSet<E, MinEnumValue, MaxEnumValue>::kValueCount;
++
++// The usual set operations.
++
+ template <typename E, E Min, E Max>
+-constexpr EnumSet<E, Min, Max> Union(EnumSet<E, Min, Max> set1,
+-                                     EnumSet<E, Min, Max> set2) {
++EnumSet<E, Min, Max> Union(EnumSet<E, Min, Max> set1,
++                           EnumSet<E, Min, Max> set2) {
+   return EnumSet<E, Min, Max>(set1.enums_ | set2.enums_);
+ }
+ 
+ template <typename E, E Min, E Max>
+-constexpr EnumSet<E, Min, Max> Intersection(EnumSet<E, Min, Max> set1,
+-                                            EnumSet<E, Min, Max> set2) {
++EnumSet<E, Min, Max> Intersection(EnumSet<E, Min, Max> set1,
++                                  EnumSet<E, Min, Max> set2) {
+   return EnumSet<E, Min, Max>(set1.enums_ & set2.enums_);
+ }
+ 
+ template <typename E, E Min, E Max>
+-constexpr EnumSet<E, Min, Max> Difference(EnumSet<E, Min, Max> set1,
+-                                          EnumSet<E, Min, Max> set2) {
++EnumSet<E, Min, Max> Difference(EnumSet<E, Min, Max> set1,
++                                EnumSet<E, Min, Max> set2) {
+   return EnumSet<E, Min, Max>(set1.enums_ & ~set2.enums_);
+ }
+ 
+diff --git a/base/feature_internal.h b/base/feature_internal.h
+index 143dfe9188..fc05850ec4 100644
+--- a/base/feature_internal.h
++++ b/base/feature_internal.h
+@@ -115,14 +115,15 @@ StringStorage(const char (&feature)[N]) -> StringStorage<N - 1>;
+ // Five-argument version of BASE_FEATURE_ENUM_PARAM macro.
+ #define BASE_FEATURE_ENUM_PARAM_INTERNAL_5_ARGS(                \
+     T, feature_object_name, feature, default_value, options)    \
++  namespace base_feature_param_internal_##feature_object_name { \
++    static_assert(#feature_object_name[0] == 'k');              \
++    static constexpr base::internal::StringStorage              \
++      feature_object_name##Name(#feature_object_name);          \
++  }                                                             \
+   BASE_FEATURE_ENUM_PARAM_INTERNAL_6_ARGS(                      \
+       T, feature_object_name, feature,                          \
+-      []() {                                                    \
+-        static_assert(#feature_object_name[0] == 'k');          \
+-        static constexpr base::internal::StringStorage storage( \
+-            #feature_object_name);                              \
+-        return storage.storage.data();                          \
+-      }(),                                                      \
++      base_feature_param_internal_##feature_object_name::       \
++        feature_object_name##Name.storage.data(),               \
+       default_value, options)
+ 
+ // Helper macro to deduce the whether to use the 5 or 6 argument version of

@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.chromium.org/Home
 TERMUX_PKG_DESCRIPTION="Chromium web browser"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION="146.0.7680.177"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="148.0.7778.178"
 TERMUX_PKG_SRCURL=https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$TERMUX_PKG_VERSION-lite.tar.xz
-TERMUX_PKG_SHA256=e66465f7b26c91dfa06b31aba3c56f6e65edac6b227c6bd2edc04535ef8966cb
+TERMUX_PKG_SHA256=074cc06fd96c7d47abfe4a4bb4b09b99f4261a3f1a4e49a07624810e83ef4556
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="chromium-host-tools, libffi-static"
 # TODO: Split chromium-common and chromium-headless
@@ -78,6 +77,14 @@ termux_step_post_get_source() {
 		patch -p1 --silent < "$f"
 	done
 
+	# Enable jumbo build for //components and //chrome
+	python \
+		"$TERMUX_PKG_BUILDER_DIR/../chromium-host-tools/scripts/rewrite_gn_jumbo.py" \
+		"$TERMUX_PKG_SRCDIR" \
+		--verbose \
+		--subdirs chrome \
+		--subdirs components
+
 	# Apply patches for jumbo build
 	local f
 	for f in $(find "$TERMUX_PKG_BUILDER_DIR/../chromium-host-tools/jumbo-patches" -maxdepth 1 -type f -name *.patch | sort); do
@@ -128,11 +135,9 @@ EOF
 	fi
 
 	# Remove termux's dummy pkg-config
-	local _target_pkg_config=$(command -v pkg-config)
-	local _host_pkg_config="$(cat $_target_pkg_config | grep exec | awk '{print $2}')"
 	rm -rf $TERMUX_PKG_CACHEDIR/host-pkg-config-bin
 	mkdir -p $TERMUX_PKG_CACHEDIR/host-pkg-config-bin
-	ln -s $_host_pkg_config $TERMUX_PKG_CACHEDIR/host-pkg-config-bin/pkg-config
+	ln -s /usr/bin/pkg-config "$TERMUX_PKG_CACHEDIR"/host-pkg-config-bin/pkg-config
 	export PATH="$TERMUX_PKG_CACHEDIR/host-pkg-config-bin:$PATH"
 
 	# Install amd64 rootfs
@@ -437,8 +442,6 @@ termux_step_make_install() {
 
 		# Scripts
 		chrome-wrapper
-		xdg-mime
-		xdg-settings
 
 		# Angle
 		libEGL.so

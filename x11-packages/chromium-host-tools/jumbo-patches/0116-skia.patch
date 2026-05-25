@@ -153,7 +153,7 @@ index d0260eb23d..2ad7fc2c0b 100644
      forward_variables_from(invoker, "*")
  
      check_includes = false
-@@ -766,6 +790,18 @@ skia_source_set("skia_core_and_effects") {
+@@ -917,6 +917,18 @@ skia_source_set("skia_core_and_effects") {
    sources += skia_effects_sources
    sources += skia_effects_imagefilter_sources
    sources += skia_pathops_sources
@@ -164,9 +164,9 @@ index d0260eb23d..2ad7fc2c0b 100644
 +    # TODO: Enable them
 +    "//third_party/skia/src/core/SkBitmapProcState_opts_ssse3.cpp",
 +    "//third_party/skia/src/core/SkBlitMask_opts_ssse3.cpp",
-+    "//third_party/skia/src/core/SkBlitRow_opts_hsw.cpp",
++    "//third_party/skia/src/core/SkBlitRow_opts_ml3.cpp",
 +    "//third_party/skia/src/core/SkMemset_opts_avx.cpp",
-+    "//third_party/skia/src/core/SkSwizzler_opts_hsw.cpp",
++    "//third_party/skia/src/core/SkSwizzler_opts_ml3.cpp",
 +    "//third_party/skia/src/core/SkSwizzler_opts_ssse3.cpp",
 +  ]
    deps = []
@@ -298,17 +298,6 @@ index 6b125ac834..95d27ac49d 100644
 +
 +#undef SK_OPTS_TARGET
 +#undef init
-diff --git a/third_party/skia/src/core/SkBlitRow_opts_hsw.cpp b/third_party/skia/src/core/SkBlitRow_opts_hsw.cpp
-index e110b8c3fa..a51bb5ae74 100644
---- a/third_party/skia/src/core/SkBlitRow_opts_hsw.cpp
-+++ b/third_party/skia/src/core/SkBlitRow_opts_hsw.cpp
-@@ -30,4 +30,6 @@ namespace SkOpts {
-     }
- }  // namespace SkOpts
- 
-+#undef SK_OPTS_TARGET
-+
- #endif // SK_CPU_X86 && !SK_ENABLE_OPTIMIZE_SIZE
 diff --git a/third_party/skia/src/core/SkGeometry.cpp b/third_party/skia/src/core/SkGeometry.cpp
 index 8500efdf2e..e1b3469d0a 100644
 --- a/third_party/skia/src/core/SkGeometry.cpp
@@ -447,17 +436,6 @@ index 0665a19fbb..7a0e7bee9b 100644
 +
 +#undef SK_OPTS_TARGET
 +#undef init
-diff --git a/third_party/skia/src/core/SkSwizzler_opts_hsw.cpp b/third_party/skia/src/core/SkSwizzler_opts_hsw.cpp
-index 68c85d9471..8964fcda72 100644
---- a/third_party/skia/src/core/SkSwizzler_opts_hsw.cpp
-+++ b/third_party/skia/src/core/SkSwizzler_opts_hsw.cpp
-@@ -39,4 +39,6 @@ namespace SkOpts {
-     }
- }  // namespace SkOpts
- 
-+#undef SK_OPTS_TARGET
-+
- #endif // SK_CPU_X86 && !SK_ENABLE_OPTIMIZE_SIZE
 diff --git a/third_party/skia/src/core/SkSwizzler_opts_ssse3.cpp b/third_party/skia/src/core/SkSwizzler_opts_ssse3.cpp
 index 1721e59186..a58556841f 100644
 --- a/third_party/skia/src/core/SkSwizzler_opts_ssse3.cpp
@@ -523,9 +501,9 @@ index eb5f62a311..35200bdf65 100644
 --- a/third_party/skia/src/gpu/ganesh/GrDirectContext.cpp
 +++ b/third_party/skia/src/gpu/ganesh/GrDirectContext.cpp
 @@ -1229,3 +1229,5 @@ sk_sp<GrDirectContext> GrDirectContext::MakeDirect3D(const GrD3DBackendContext&
+ 
      return direct;
  }
- #endif
 +
 +#undef ASSERT_SINGLE_OWNER
 diff --git a/third_party/skia/src/gpu/ganesh/GrDirectContextPriv.cpp b/third_party/skia/src/gpu/ganesh/GrDirectContextPriv.cpp
@@ -1203,3 +1181,60 @@ index dc38257ceb..e7187190de 100644
 +#undef is_sep
 +#undef skip_ws
 +#undef skip_sep
+diff --git a/third_party/skia/src/core/SkBitmapProcState_matrixProcs.cpp b/third_party/skia/src/core/SkBitmapProcState_matrixProcs.cpp
+index 95126546f7..f8eede3769 100644
+--- a/third_party/skia/src/core/SkBitmapProcState_matrixProcs.cpp
++++ b/third_party/skia/src/core/SkBitmapProcState_matrixProcs.cpp
+@@ -21,6 +21,8 @@
+ #include <cstdint>
+ #include <cstring>
+ 
++#define sk_int_mod sk_int_mod_SkBitmapProcState_matrixProcs
++
+ /*
+  *  The decal_ functions require that
+  *  1. dx > 0
+@@ -564,3 +566,5 @@ uint32_t sktests::pack_mirror(SkFixed f, unsigned max, size_t width) {
+     // Based on MirrorX_MirrorY_Procs[1] (filter_scale)
+     return ::pack<mirror, extract_low_bits_general>(f, max, SK_Fixed1 / width);
+ }
++
++#undef sk_int_mod
+diff --git a/third_party/skia/src/core/SkScan_Hairline.cpp b/third_party/skia/src/core/SkScan_Hairline.cpp
+index cea699f4ad..3b51fa508e 100644
+--- a/third_party/skia/src/core/SkScan_Hairline.cpp
++++ b/third_party/skia/src/core/SkScan_Hairline.cpp
+@@ -36,6 +36,8 @@
+ #include <cstring>
+ #include <optional>
+ 
++#define canConvertFDot6ToFixed canConvertFDot6ToFixed_Hairline
++
+ #define DISPATCH_LOOP()                                     \
+     const auto pm = direct->pm;                             \
+     const auto value = direct->value;                       \
+@@ -803,3 +805,5 @@ void SkScan::AntiHairLine(SkSpan<const SkPoint> pts, const SkRasterClip& clip, S
+         AntiHairLineRgn(pts, clipRgn, blitter);
+     }
+ }
++
++#undef canConvertFDot6ToFixed
+diff --git a/third_party/skia/src/gpu/ganesh/vk/GrVkBackendSurface.cpp b/third_party/skia/src/gpu/ganesh/vk/GrVkBackendSurface.cpp
+index 98a7ef0f27..1d412da2d8 100644
+--- a/third_party/skia/src/gpu/ganesh/vk/GrVkBackendSurface.cpp
++++ b/third_party/skia/src/gpu/ganesh/vk/GrVkBackendSurface.cpp
+@@ -30,6 +30,8 @@
+ #include <string>
+ #include <utility>
+ 
++#define get_and_cast_data get_and_cast_data_VkBackendSurface
++
+ class GrVkBackendFormatData final : public GrBackendFormatData {
+ public:
+     GrVkBackendFormatData(VkFormat format, const skgpu::VulkanYcbcrConversionInfo& ycbcrInfo)
+@@ -448,3 +450,5 @@ void SetVkImageLayout(GrBackendRenderTarget* rt, VkImageLayout layout) {
+ }
+ 
+ }  // namespace GrBackendRenderTargets
++
++#undef get_and_cast_data

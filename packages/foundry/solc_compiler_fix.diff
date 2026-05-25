@@ -1,0 +1,127 @@
+--- a/src/compilers/solc/compiler.rs	2026-05-17 14:57:47.955143666 +0600
++++ b/src/compilers/solc/compiler.rs	2026-05-17 19:30:50.792780332 +0600
+@@ -17,6 +17,71 @@
+
+ /// Extensions acceptable by solc compiler.
+ pub const SOLC_EXTENSIONS: &[&str] = &["sol", "yul"];
++// ────────────────── Termux compatibility layer ────────────────────
++// Prebuilt solc binaries from binaries.soliditylang.org are x86_64/aarch64
++// glibc ELFs — they won't execute on Termux (Android / Bionic).
++// Instead we require the user to have installed solc via:
++//   pkg install solidity
++//
++// All functions that would normally download a binary are intercepted here
++// and replaced with a clear, actionable error message.
++
++// Returns the path to termux-packaged `solc` binary or `None` if it is
++// not installed
++const TERMUX_PREFIX: &str = "@TERMUX_PREFIX@";
++
++fn termux_solc_path() -> Option<PathBuf> {
++    let path = PathBuf::from(TERMUX_PREFIX).join("bin").join("solc");
++    if path.is_file() { Some(path) } else { None }
++}
++
++// The error message shown to Termux User when solc cannot be found.
++fn termux_solc_not_found_error() -> SolcError {
++    SolcError::msg(
++        "solc not found.\n\
++        Prebuilt solc binaries do not work on Termux.\n\
++        Install solc with Termux's package manager:\n\
++        \n\
++        \x20   pkg install solidity\n\
++        \n\
++        Then re-run your forge command.",
++    )
++}
++/// Used by `blocking_install` and `install` on Termux.
++///
++/// Instead of downloading a prebuilt binary (which won't run on Android/Bionic),
++/// we return the system-installed solc from the Termux prefix.
++/// If the installed version doesn't match what was requested, we warn and
++/// proceed — solc itself will surface any real incompatibility as a compile
++/// error.
++fn termux_use_system_solc(requested: &Version) -> std::result::Result<Solc, svm::SvmError> {
++    let path = termux_solc_path().ok_or_else(|| {
++        svm::SvmError::IoError(std::io::Error::new(
++            std::io::ErrorKind::NotFound,
++            termux_solc_not_found_error().to_string(),
++        ))
++    })?;
++
++    let installed = Solc::version(&path).map_err(|e| {
++        svm::SvmError::IoError(std::io::Error::new(
++            std::io::ErrorKind::Other,
++            e.to_string(),
++        ))
++    })?;
++
++    if &installed != requested {
++        eprintln!(
++            "\n\x1b[33m[Termux] Warning:\x1b[0m foundry.toml requests solc {requested}, \
++             but Termux has {installed} installed.\n\
++             Prebuilt solc binaries cannot run on Termux — \
++             compiling with {installed} instead.\n\
++             \x20 • To silence this: remove `solc` from foundry.toml\n\
++             \x20 • Or upgrade:       pkg upgrade solidity\n"
++        );
++    }
++
++    Ok(Solc::new_with_version(path, installed))
++}
+
+ /// take the lock in tests, we use this to enforce that
+ /// a test does not run while a compiler version is being installed
+@@ -160,6 +225,21 @@
+     /// If the required compiler version is not installed, it also proceeds to install it.
+     #[cfg(feature = "svm-solc")]
+     pub fn ensure_installed(sol_version: &VersionReq) -> Result<Version> {
++        // ── Termux: never download prebuilt binaries ────
++        let path = termux_solc_path().ok_or_else(termux_solc_not_found_error)?;
++        let version = Self::version(&path)?;
++        return if sol_version.matches(&version) {
++            Ok(version)
++        } else {
++            Err(SolcError::msg(format!(
++                        "Termux solc {version} does not satisfy the pragma requirement \
++                        `{sol_version}`.\n\
++                        The Termux `solidity` package provides a single version.\n\
++                        You can:\n\
++                        \x20 • Upgrade it with:  pkg upgrade solidity\n\
++                        \x20 • Or relax the pragma in your contract to accept {version}",
++            )))
++        };
+         #[cfg(test)]
+         take_solc_installer_lock!(_lock);
+
+@@ -276,6 +356,8 @@
+     #[cfg(feature = "svm-solc")]
+     #[instrument(name = "Solc::install", skip_all)]
+     pub async fn install(version: &Version) -> std::result::Result<Self, svm::SvmError> {
++        // Safety net: when version mismatches this function is called
++        return termux_use_system_solc(version);
+         trace!("installing solc version \"{}\"", version);
+         crate::report::solc_installation_start(version);
+         match svm::install(version).await {
+@@ -294,6 +376,8 @@
+     #[cfg(feature = "svm-solc")]
+     #[instrument(name = "Solc::blocking_install", skip_all)]
+     pub fn blocking_install(version: &Version) -> std::result::Result<Self, svm::SvmError> {
++        // Same as `install()` logic for Safety
++        return termux_use_system_solc(version);
+         use foundry_compilers_core::utils::RuntimeOrHandle;
+
+         #[cfg(test)]
+@@ -530,6 +614,12 @@
+     /// Either finds an installed Solc version or installs it if it's not found.
+     #[cfg(feature = "svm-solc")]
+     pub fn find_or_install(version: &Version) -> Result<Self> {
++        // ───────── Termux: use system solc, never download ──────────
++        let path = termux_solc_path().ok_or_else(termux_solc_not_found_error)?;
++        // Use the system version; forge will have already validated the
++        // version requirement in ensure_installed() above.
++        let sys_version = Self::version(&path)?;
++        return Ok(Self::new_with_version(path, sys_version));
+         let solc = if let Some(solc) = Self::find_svm_installed_version(version)? {
+             solc
+         } else {

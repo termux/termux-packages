@@ -1,13 +1,21 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/astral-sh/ty
 TERMUX_PKG_DESCRIPTION="An extremely fast Python type checker and language server, written in Rust"
-TERMUX_PKG_VERSION="0.0.37"
+TERMUX_PKG_VERSION="0.0.39"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL="https://github.com/astral-sh/ty/releases/download/$TERMUX_PKG_VERSION/source.tar.gz"
-TERMUX_PKG_SHA256=1fc7e5b92c254888963bb8603ccfaa404fcdfb3202cd22af0d09822934bef12f
+TERMUX_PKG_SHA256=c2a81165547c671b384304b62065156eef0fe5dfc20d5837196c78c2c88a8f77
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+
+# The original "termux_extract_src_archive" always strips the first components
+# but the source of ty is directly under the root directory of the tar file
+termux_extract_src_archive() {
+	local file="$TERMUX_PKG_CACHEDIR/$(basename "$TERMUX_PKG_SRCURL")"
+	mkdir -p "$TERMUX_PKG_SRCDIR"
+	tar -xf "$file" -C "$TERMUX_PKG_SRCDIR"
+}
 
 termux_step_pre_configure() {
 	# when rust projects include a .cargo folder with their source code,
@@ -16,6 +24,9 @@ termux_step_pre_configure() {
 	# varying depending on what content exactly was in .cargo.
 	# deleting .cargo first before doing anything else usually seems to prevent that.
 	rm -rf .cargo
+	TERMUX_PKG_SRCDIR+="/ruff"
+	TERMUX_PKG_BUILDDIR="$TERMUX_PKG_SRCDIR"
+	cd "$TERMUX_PKG_SRCDIR"
 
 	termux_setup_rust
 

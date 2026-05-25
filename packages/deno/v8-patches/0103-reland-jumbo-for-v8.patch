@@ -55,15 +55,15 @@ diff --git a/v8/BUILD.gn b/v8/BUILD.gn
 index 047283a2..58ce611c 100644
 --- a/v8/BUILD.gn
 +++ b/v8/BUILD.gn
-@@ -7,6 +7,7 @@
+@@ -10,6 +10,7 @@
  import("//build/config/coverage/coverage.gni")
  import("//build/config/dcheck_always_on.gni")
  import("//build/config/host_byteorder.gni")
 +import("//build/config/jumbo.gni")
  import("//build/config/mips.gni")
  import("//build/config/riscv.gni")
- import("//build/config/rust.gni")
-@@ -3295,26 +3296,55 @@
+ import("//build/config/sanitizers/sanitizers.gni")
+@@ -3369,26 +3370,55 @@
      }
    }
  
@@ -119,7 +119,7 @@ index 047283a2..58ce611c 100644
    } else if (v8_current_cpu == "mips64" || v8_current_cpu == "mips64el") {
      sources += [
        ### gcmole(mips64el) ###
-@@ -5275,6 +5304,24 @@
+@@ -5558,6 +5588,24 @@
    "src/compiler/zone-stats.cc",
  ]
  
@@ -144,7 +144,7 @@ index 047283a2..58ce611c 100644
  if (!v8_enable_maglev) {
    # When Maglev is not enabled, Turboshaft still needs Maglev's graph builder.
    v8_compiler_sources += [
-@@ -5301,6 +5348,11 @@
+@@ -5586,6 +5634,11 @@
      "src/compiler/backend/ia32/instruction-scheduler-ia32.cc",
      "src/compiler/backend/ia32/instruction-selector-ia32.cc",
    ]
@@ -156,7 +156,7 @@ index 047283a2..58ce611c 100644
  } else if (v8_current_cpu == "x64") {
    v8_compiler_sources += [
      ### gcmole(x64) ###
-@@ -5309,6 +5361,9 @@
+@@ -5594,6 +5647,9 @@
      "src/compiler/backend/x64/instruction-selector-x64.cc",
      "src/compiler/backend/x64/unwinding-info-writer-x64.cc",
    ]
@@ -166,7 +166,7 @@ index 047283a2..58ce611c 100644
  } else if (v8_current_cpu == "arm") {
    v8_compiler_sources += [
      ### gcmole(arm) ###
-@@ -5317,6 +5372,9 @@
+@@ -5602,6 +5658,9 @@
      "src/compiler/backend/arm/instruction-selector-arm.cc",
      "src/compiler/backend/arm/unwinding-info-writer-arm.cc",
    ]
@@ -176,7 +176,7 @@ index 047283a2..58ce611c 100644
  } else if (v8_current_cpu == "arm64") {
    v8_compiler_sources += [
      ### gcmole(arm64) ###
-@@ -5325,6 +5383,9 @@
+@@ -5610,6 +5669,9 @@
      "src/compiler/backend/arm64/instruction-selector-arm64.cc",
      "src/compiler/backend/arm64/unwinding-info-writer-arm64.cc",
    ]
@@ -186,26 +186,25 @@ index 047283a2..58ce611c 100644
  } else if (v8_current_cpu == "mips64" || v8_current_cpu == "mips64el") {
    v8_compiler_sources += [
      ### gcmole(mips64el) ###
-@@ -5399,6 +5460,10 @@
+@@ -5683,6 +5745,9 @@
+     "src/compiler/wasm-typer.cc",
      "src/wasm/turboshaft-graph-interface.cc",
-     "src/wasm/wrappers.cc",
    ]
 +  v8_compiler_sources_jumbo_excluded += [
 +      "src/wasm/turboshaft-graph-interface.cc",
-+      "src/wasm/wrappers.cc",
 +  ]
  }
  
  if (v8_enable_wasm_simd256_revec) {
-@@ -5419,6 +5484,7 @@
+@@ -5716,6 +5781,7 @@
    visibility = [ ":*" ]  # Only targets in this file can depend on this.
  
    sources = v8_compiler_sources
 +  jumbo_excluded_sources = v8_compiler_sources_jumbo_excluded
  
-   public_deps = [
-     ":generate_bytecode_builtins_list",
-@@ -5454,6 +5520,7 @@
+   exclude_from_cluster = exclude_from_compiler_cluster
+ 
+@@ -5756,6 +5822,7 @@
  
    if (v8_enable_turbofan) {
      sources = v8_compiler_sources
@@ -213,7 +212,7 @@ index 047283a2..58ce611c 100644
    } else {
      # With Turbofan disabled, we only include the stubbed-out API.
      sources = [ "src/compiler/turbofan-disabled.cc" ]
-@@ -6016,6 +6083,8 @@
+@@ -6359,6 +6426,8 @@
      ]
    }
  
@@ -222,7 +221,7 @@ index 047283a2..58ce611c 100644
    if (v8_enable_maglev) {
      sources += [
        "src/maglev/maglev-assembler.cc",
-@@ -6049,6 +6118,10 @@
+@@ -6394,6 +6463,10 @@
          "src/maglev/arm64/maglev-assembler-arm64.cc",
          "src/maglev/arm64/maglev-ir-arm64.cc",
        ]
@@ -233,7 +232,7 @@ index 047283a2..58ce611c 100644
      } else if (v8_current_cpu == "riscv64") {
        sources += [
          "src/maglev/riscv/maglev-assembler-riscv.cc",
-@@ -6059,6 +6132,10 @@
+@@ -6404,6 +6477,10 @@
          "src/maglev/x64/maglev-assembler-x64.cc",
          "src/maglev/x64/maglev-ir-x64.cc",
        ]
@@ -244,8 +243,8 @@ index 047283a2..58ce611c 100644
      } else if (v8_current_cpu == "s390x") {
        sources += [
          "src/maglev/s390/maglev-assembler-s390.cc",
-@@ -6138,6 +6215,14 @@
-       "src/wasm/wasm-tracing.cc",
+@@ -6491,6 +6568,14 @@
+       "src/wasm/wasm-wrapper-cache.cc",
        "src/wasm/well-known-imports.cc",
      ]
 +    jumbo_excluded_sources += [
@@ -259,7 +258,7 @@ index 047283a2..58ce611c 100644
      if (v8_wasm_random_fuzzers) {
        sources += [
          ### gcmole(all) ###
-@@ -6172,6 +6257,26 @@
+@@ -6525,6 +6610,26 @@
      sources += [ "src/heap/reference-summarizer.cc" ]
    }
  
@@ -286,7 +285,7 @@ index 047283a2..58ce611c 100644
    if (v8_current_cpu == "x86") {
      sources += [
        ### gcmole(ia32) ###
-@@ -6279,6 +6384,11 @@
+@@ -6632,6 +6737,11 @@
      if (is_win) {
        sources += [ "src/diagnostics/unwinding-info-win64.cc" ]
      }
@@ -875,7 +874,7 @@ diff --git a/v8/src/regexp/experimental/experimental-compiler.cc b/v8/src/regexp
 index 7bee9f11..391dac8c 100644
 --- a/v8/src/regexp/experimental/experimental-compiler.cc
 +++ b/v8/src/regexp/experimental/experimental-compiler.cc
-@@ -224,7 +224,7 @@ bool ExperimentalRegExpCompiler::CanBeHandled(RegExpTree* tree,
+@@ -219,7 +219,7 @@
    return CanBeHandledVisitor::Check(tree, flags, capture_count);
  }
  
@@ -884,15 +883,15 @@ index 7bee9f11..391dac8c 100644
  
  // A label in bytecode which starts with no known address. The address *must*
  // be bound with `Bind` before the label goes out of scope.
-@@ -1226,7 +1226,7 @@ class CompileVisitor : private RegExpVisitor {
+@@ -1218,7 +1218,7 @@
  
- ZoneList<RegExpInstruction> ExperimentalRegExpCompiler::Compile(
-     RegExpTree* tree, RegExpFlags flags, Zone* zone) {
+ ZoneList<Instruction> ExperimentalCompiler::Compile(Tree* tree, Flags flags,
+                                                     Zone* zone) {
 -  return CompileVisitor::Compile(tree, flags, zone);
 +  return experimental::CompileVisitor::Compile(tree, flags, zone);
  }
  
- }  // namespace internal
+ }  // namespace regexp
 diff --git a/v8/src/regexp/regexp-compiler-tonode.cc b/v8/src/regexp/regexp-compiler-tonode.cc
 index fd558992..190e9ee0 100644
 --- a/v8/src/regexp/regexp-compiler-tonode.cc
@@ -985,39 +984,6 @@ index 4b1d2bd4..f55c0b4a 100644
 +#undef TRACE
 +
  }  // namespace v8::internal::compiler::turboshaft
---- a/v8/src/objects/call-site-info.h
-+++ b/v8/src/objects/call-site-info.h
-@@ -23,7 +23,7 @@
- 
- #include "torque-generated/src/objects/call-site-info-tq.inc"
- 
--V8_OBJECT class CallSiteInfo : public StructLayout {
-+V8_OBJECT class CallSiteInfo : public v8::internal::StructLayout {
-  public:
-   DEFINE_TORQUE_GENERATED_CALL_SITE_INFO_FLAGS()
- 
---- a/v8/src/objects/property-descriptor-object.h
-+++ b/v8/src/objects/property-descriptor-object.h
-@@ -16,7 +16,7 @@
- 
- #include "torque-generated/src/objects/property-descriptor-object-tq.inc"
- 
--V8_OBJECT class PropertyDescriptorObject : public StructLayout {
-+V8_OBJECT class PropertyDescriptorObject : public v8::internal::StructLayout {
-  public:
-   DEFINE_TORQUE_GENERATED_PROPERTY_DESCRIPTOR_OBJECT_FLAGS()
- 
---- a/v8/src/objects/template-objects.h
-+++ b/v8/src/objects/template-objects.h
-@@ -24,7 +24,7 @@
- // TemplateObjectDescription is a tuple of raw strings and cooked strings for
- // tagged template literals. Used to communicate with the runtime for template
- // object creation within the {Runtime_GetTemplateObject} method.
--V8_OBJECT class TemplateObjectDescription final : public StructLayout {
-+V8_OBJECT class TemplateObjectDescription final : public v8::internal::StructLayout {
-  public:
-   static DirectHandle<JSArray> GetTemplateObject(
-       Isolate* isolate, DirectHandle<NativeContext> native_context,
 --- a/v8/src/maglev/maglev-known-node-aspects.cc
 +++ b/v8/src/maglev/maglev-known-node-aspects.cc
 @@ -13,6 +13,8 @@
@@ -1043,16 +1009,6 @@ index 4b1d2bd4..f55c0b4a 100644
  }  // namespace v8::internal::compiler::turboshaft
 +
 +#undef TRACE
---- a/v8/src/regexp/regexp-compiler.cc
-+++ b/v8/src/regexp/regexp-compiler.cc
-@@ -4106,3 +4106,7 @@
- #endif
- 
- }  // namespace v8::internal
-+
-+#undef TRACE
-+#undef TRACE_WITH_NODE
-+#undef REGISTER_NODE
 --- a/v8/src/codegen/arm64/instructions-arm64.cc
 +++ b/v8/src/codegen/arm64/instructions-arm64.cc
 @@ -9,6 +9,8 @@

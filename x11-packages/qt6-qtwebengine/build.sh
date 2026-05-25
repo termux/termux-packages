@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.qt.io/
 TERMUX_PKG_DESCRIPTION="Qt 6 WebEngine Library"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION="6.11.0"
+TERMUX_PKG_VERSION="6.11.1"
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtwebengine-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=63b921c8b2dd59152ced9a796676010166df044588ee00ef9429dc2fd2146736
+TERMUX_PKG_SHA256=679c66ccc6c158fc215e9c58ef160331ecd29974232e345c05161889f8667083
 TERMUX_PKG_DEPENDS="dbus, fontconfig, libc++, libexpat, libjpeg-turbo, libminizip, libnspr, libnss, libopus, libpng, libsnappy, libvpx, libwebp, libx11, libxkbfile, mesa, pulseaudio, qt6-qtbase (>= ${TERMUX_PKG_VERSION}), qt6-qtdeclarative (>= ${TERMUX_PKG_VERSION}), qt6-qtwebchannel (>= ${TERMUX_PKG_VERSION}), zlib"
 TERMUX_PKG_BUILD_DEPENDS="qt6-qtbase-cross-tools, qt6-qtdeclarative-cross-tools"
 TERMUX_PKG_HOSTBUILD=true
@@ -21,6 +21,16 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DQT_FEATURE_webengine_system_pulseaudio=ON
 -DQT_FEATURE_webengine_proprietary_codecs=ON
 "
+
+termux_step_post_get_source() {
+	# Enable jumbo build for //components and //chrome
+	python \
+		"$TERMUX_PKG_BUILDER_DIR/../chromium-host-tools/scripts/rewrite_gn_jumbo.py" \
+		"$TERMUX_PKG_SRCDIR/src/3rdparty/chromium" \
+		--verbose \
+		--subdirs chrome \
+		--subdirs components
+}
 
 termux_step_host_build() {
 	termux_setup_cmake
@@ -44,12 +54,10 @@ termux_step_configure() {
 	export PATH="$TERMUX_PKG_HOSTBUILD_DIR/host-gn-build/MinSizeRel:$PATH"
 
 	# Remove termux's dummy pkg-config
-	local _host_pkg_config="$(cat $(command -v pkg-config) | grep exec | awk '{print $2}')"
-	rm -rf $TERMUX_PKG_TMPDIR/host-pkg-config-bin
-	mkdir -p $TERMUX_PKG_TMPDIR/host-pkg-config-bin
-	ln -s $_host_pkg_config $TERMUX_PKG_TMPDIR/host-pkg-config-bin/pkg-config
-	ln -s $(command -v pkg-config) $TERMUX_PKG_TMPDIR/host-pkg-config-bin/$TERMUX_HOST_PLATFORM-pkg-config
-	export PATH="$TERMUX_PKG_TMPDIR/host-pkg-config-bin:$PATH"
+	rm -rf $TERMUX_PKG_CACHEDIR/host-pkg-config-bin
+	mkdir -p $TERMUX_PKG_CACHEDIR/host-pkg-config-bin
+	ln -s /usr/bin/pkg-config "$TERMUX_PKG_CACHEDIR"/host-pkg-config-bin/pkg-config
+	export PATH="$TERMUX_PKG_CACHEDIR/host-pkg-config-bin:$PATH"
 
 	# Create dummy sysroot
 	if [ ! -d "$TERMUX_PKG_CACHEDIR/sysroot-$TERMUX_ARCH" ]; then
