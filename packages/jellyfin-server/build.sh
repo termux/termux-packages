@@ -119,27 +119,43 @@ termux_step_pre_configure() {
 		--disable-vulkan
 
 	make -j"$TERMUX_PKG_MAKE_PROCESSES"
-	make install
+	make install DESTDIR="${TERMUX_PKG_BUILDDIR}/jellyfin-ffmpeg-dest"
 	popd
 }
 
 termux_step_make() {
-	dotnet publish "$TERMUX_PKG_SRCDIR"/Jellyfin.Server --configuration Release --runtime "$DOTNET_TARGET_NAME" --output "$TERMUX_PKG_BUILDDIR"/build --no-self-contained -p:DebugType=None
+	dotnet publish "$TERMUX_PKG_SRCDIR"/Jellyfin.Server --configuration Release --runtime "$DOTNET_TARGET_NAME" --output "$TERMUX_PKG_BUILDDIR"/jellyfin-server-dist --no-self-contained -p:DebugType=None
 	dotnet build-server shutdown
 }
 
 termux_step_make_install() {
 	# we provide bionic builds of these in the repo
-	rm -f "${TERMUX_PKG_BUILDDIR}/build/"{libe_sqlite3,libSkiaSharp,libHarfBuzzSharp}.so*
-	chmod 0700 "${TERMUX_PKG_BUILDDIR}/build"
+	rm -f "${TERMUX_PKG_BUILDDIR}/jellyfin-server-dist/"{libe_sqlite3,libSkiaSharp,libHarfBuzzSharp}.so*
 
-	mv "${TERMUX_PKG_BUILDDIR}/jellyfin-web" "${TERMUX_PKG_BUILDDIR}/build"
 	# XML cruft generated during build used to provide documentation for functions and objects
-	find "${TERMUX_PKG_BUILDDIR}/build" -name '*.xml' -type f -exec rm '{}' +
-	find "${TERMUX_PKG_BUILDDIR}/build" ! \( -name 'jellyfin' -o -type d \) -exec chmod 0600 '{}' \;
-	find "${TERMUX_PKG_BUILDDIR}/build" \( -name 'jellyfin' -o -type d \) -exec chmod 0700 '{}' \;
-	mv "${TERMUX_PKG_BUILDDIR}/build" "${TERMUX_PREFIX}/lib/jellyfin"
+	find "${TERMUX_PKG_BUILDDIR}/jellyfin-server-dist" -name '*.xml' -type f -exec rm '{}' +
+	
+	# Set permissions
+	chmod 0700 "${TERMUX_PKG_BUILDDIR}/jellyfin-server-dist"
+	find "${TERMUX_PKG_BUILDDIR}/jellyfin-server-dist" ! \( -name 'jellyfin' -o -type d \) -exec chmod 0600 '{}' \;
+	find "${TERMUX_PKG_BUILDDIR}/jellyfin-server-dist" \( -name 'jellyfin' -o -type d \) -exec chmod 0700 '{}' \;
+
+	# Install server files
+	mkdir -p "${TERMUX_PREFIX}/lib/jellyfin"
+	cp -a "${TERMUX_PKG_BUILDDIR}/jellyfin-server-dist/." "${TERMUX_PREFIX}/lib/jellyfin/"
+	
+	# Install web files
+	if [ -d "${TERMUX_PKG_BUILDDIR}/jellyfin-web" ]; then
+		cp -a "${TERMUX_PKG_BUILDDIR}/jellyfin-web" "${TERMUX_PREFIX}/lib/jellyfin/"
+	fi
+
+	# Create symlink
 	ln -sf "${TERMUX_PREFIX}/lib/jellyfin/jellyfin" "${TERMUX_PREFIX}/bin/jellyfin"
+
+	# Move the ffmpeg files (from the temporary DESTDIR to the real prefix)
+	if [ -d "${TERMUX_PKG_BUILDDIR}/jellyfin-ffmpeg-dest/${TERMUX_PREFIX}" ]; then
+		cp -a "${TERMUX_PKG_BUILDDIR}/jellyfin-ffmpeg-dest/${TERMUX_PREFIX}/." "${TERMUX_PREFIX}/"
+	fi
 }
 # References
 # - Jellyfin-FFMPEG
