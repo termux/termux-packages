@@ -119,7 +119,7 @@ termux_step_start_build() {
 		echo "Building in src due to TERMUX_PKG_BUILD_IN_SRC being set to true" > "$TERMUX_PKG_BUILDDIR_ORIG/BUILDING_IN_SRC.txt"
 	fi
 
-	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
+	if ! $TERMUX_FAST_BUILD && [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
 		if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 			case "$TERMUX_APP_PACKAGE_MANAGER" in
 				"apt") apt install -y termux-elf-cleaner;;
