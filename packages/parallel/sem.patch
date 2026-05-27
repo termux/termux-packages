@@ -6,8 +6,8 @@ index 873f294..4fa24cb 100644
      ## Shell
      #
      if($opt::fast) {
--	$Global::shell = $ENV{'PARALLEL_SHELL'} || which("dash") || "/bin/sh";
-+	$Global::shell = $ENV{'PARALLEL_SHELL'} || which("dash") || "@TERMUX_PREFIX@/bin/sh";
+-	$Global::shell = $ENV{'PARALLEL_SHELL'} || ::which("dash") || "/bin/sh";
++	$Global::shell = $ENV{'PARALLEL_SHELL'} || ::which("dash") || "@TERMUX_PREFIX@/bin/sh";
      } else {
  	$Global::shell = $ENV{'PARALLEL_SHELL'} || parent_shell($$)
 -	    || $ENV{'SHELL'} || "/bin/sh";
