@@ -3423,7 +3423,7 @@ index 0387f622e0..dfbadd66cc 100644
  #include "build/build_config.h"
  #include "ui/accessibility/ax_action_data.h"
  #include "ui/accessibility/ax_node_data.h"
-@@ -140,11 +141,11 @@ ui::TextEditCommand GetTextEditCommandFromMenuCommand(int command_id,
+@@ -140,11 +141,11 @@
    switch (command_id) {
      case Textfield::kUndo:
        return ui::TextEditCommand::UNDO;
@@ -3438,7 +3438,7 @@ index 0387f622e0..dfbadd66cc 100644
        return ui::TextEditCommand::PASTE;
      case Textfield::kDelete:
        // The DELETE menu action only works in case of an active selection.
-@@ -152,9 +153,9 @@ ui::TextEditCommand GetTextEditCommandFromMenuCommand(int command_id,
+@@ -152,9 +153,9 @@
          return ui::TextEditCommand::DELETE_FORWARD;
        }
        break;
@@ -3450,7 +3450,25 @@ index 0387f622e0..dfbadd66cc 100644
        return ui::TextEditCommand::SELECT_WORD;
    }
    return ui::TextEditCommand::INVALID_COMMAND;
-@@ -1615,19 +1616,19 @@ bool Textfield::GetAcceleratorForCommandId(int command_id,
+@@ -1581,7 +1582,7 @@
+ 
+ bool Textfield::IsCommandIdEnabled(int command_id, bool can_paste) const {
+   if (command_id ==
+-      std::to_underlying(ui::TouchEditable::MenuCommands::kPaste)) {
++      base::to_underlying(ui::TouchEditable::MenuCommands::kPaste)) {
+     return !GetReadOnly() && can_paste;
+   }
+   return IsCommandIdEnabled(command_id);
+@@ -1608,7 +1609,7 @@
+   // This method is called for menus. For shortcuts, IsTextEditCommandEnabled()
+   // is called instead.
+   if (command_id ==
+-      std::to_underlying(ui::TouchEditable::MenuCommands::kPaste)) {
++      base::to_underlying(ui::TouchEditable::MenuCommands::kPaste)) {
+     return !GetReadOnly() && clipboard_contains_text_for_menu_;
+   }
+ 
+@@ -1623,19 +1624,19 @@
        *accelerator = ui::Accelerator(ui::VKEY_Z, ui::EF_PLATFORM_ACCELERATOR);
        return true;
  
@@ -3474,7 +3492,7 @@ index 0387f622e0..dfbadd66cc 100644
        *accelerator = ui::Accelerator(ui::VKEY_A, ui::EF_PLATFORM_ACCELERATOR);
        return true;
  
-@@ -1650,9 +1651,9 @@ void Textfield::ExecuteCommand(int command_id, int event_flags) {
+@@ -1658,9 +1659,9 @@
    if (::features::IsTouchTextEditingRedesignEnabled() &&
        (event_flags & ui::EF_FROM_TOUCH) &&
        (command_id ==
@@ -3486,7 +3504,7 @@ index 0387f622e0..dfbadd66cc 100644
      CreateTouchSelectionControllerAndNotifyIt();
    }
  }
-@@ -3111,16 +3112,16 @@ void Textfield::UpdateContextMenu() {
+@@ -3119,16 +3120,16 @@
    context_menu_contents_->AddItemWithStringId(kUndo, IDS_APP_UNDO);
    context_menu_contents_->AddSeparator(ui::NORMAL_SEPARATOR);
    context_menu_contents_->AddItemWithStringId(
@@ -3834,37 +3852,3 @@ index 7cf0960524..57e1d9ddda 100644
        }
        if (topmost_transient_child) {
          window_->parent()->layer()->StackAbove(
-diff --git a/ui/views/controls/textfield/textfield.cc b/ui/views/controls/textfield/textfield.cc
-index dfbadd66cc..08ca1f104e 100644
---- a/ui/views/controls/textfield/textfield.cc
-+++ b/ui/views/controls/textfield/textfield.cc
-@@ -1601,7 +1601,7 @@ bool Textfield::IsCommandIdEnabled(int command_id) const {
-   // This method is called for menus. For shortcuts, IsTextEditCommandEnabled()
-   // is called instead.
-   if (command_id ==
--      std::to_underlying(ui::TouchEditable::MenuCommands::kPaste)) {
-+      base::to_underlying(ui::TouchEditable::MenuCommands::kPaste)) {
-     return !GetReadOnly() && clipboard_contains_text_for_menu_;
-   }
- 
-diff --git a/ui/views/touchui/touch_selection_controller_impl.cc b/ui/views/touchui/touch_selection_controller_impl.cc
-index 800cac3516..70e728954b 100644
---- a/ui/views/touchui/touch_selection_controller_impl.cc
-+++ b/ui/views/touchui/touch_selection_controller_impl.cc
-@@ -12,6 +12,7 @@
- #include "base/memory/raw_ptr_exclusion.h"
- #include "base/notreached.h"
- #include "base/time/time.h"
-+#include "base/types/cxx23_to_underlying.h"
- #include "ui/aura/client/cursor_client.h"
- #include "ui/aura/env.h"
- #include "ui/aura/window.h"
-@@ -602,7 +603,7 @@ bool TouchSelectionControllerImpl::ShouldShowHandleFor(
- bool TouchSelectionControllerImpl::IsCommandIdEnabled(int command_id,
-                                                       bool can_paste) const {
-   if (command_id ==
--      std::to_underlying(ui::TouchEditable::MenuCommands::kPaste)) {
-+      base::to_underlying(ui::TouchEditable::MenuCommands::kPaste)) {
-     return can_paste && client_view_->IsCommandIdEnabled(command_id);
-   }
-   return client_view_->IsCommandIdEnabled(command_id);
