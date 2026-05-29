@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://packages.debian.org/apt
 TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
 TERMUX_PKG_LICENSE="BSD 3-Clause, GPL-2.0-only, GPL-2.0-or-later, MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.1.15"
+TERMUX_PKG_VERSION="3.3.1"
 # old tarball are removed in https://deb.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SRCURL="https://salsa.debian.org/apt-team/apt/-/archive/${TERMUX_PKG_VERSION}/apt-${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=41f1d0c3ffca5bb4a2beda0a015cd5c1a9e5324df42da4151761b4ac388793e1
+TERMUX_PKG_SHA256=8e2588917e070596e47a3f266c635933c964176701546dc98e9b1d4d35e0074a
 # apt-key requires utilities from coreutils, findutils, gpgv, grep, sed.
 TERMUX_PKG_DEPENDS="coreutils, dpkg, findutils, grep, libandroid-glob, libbz2, libc++, libiconv, liblz4, liblzma, libseccomp, openssl, sed, sequoia-sqv | gpgv, termux-keyring, termux-licenses, xxhash, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="docbook-xsl, libdb, gnupg, sequoia-sqv"

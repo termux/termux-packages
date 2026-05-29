@@ -5,6 +5,8 @@ will result in a compilation error.
 This patch replace all usages of `std::basic_string_view<unsigned char>`
 with a custom `ByteView` implementation.
 
+diff --git a/apt-pkg/contrib/hashes.cc b/apt-pkg/contrib/hashes.cc
+index 74419b63b..9884ea807 100644
 --- a/apt-pkg/contrib/hashes.cc
 +++ b/apt-pkg/contrib/hashes.cc
 @@ -33,6 +33,24 @@
@@ -32,20 +34,20 @@ with a custom `ByteView` implementation.
  const char * HashString::_SupportedHashes[] =
  {
     "SHA512", "SHA256", "SHA1", "MD5Sum", "Checksum-FileSize", NULL
-@@ -296,7 +314,7 @@
+@@ -296,7 +314,7 @@ bool HashStringList::operator!=(HashStringList const &other) const
     return !(*this == other);
  }
  									/*}}}*/
--static APT_PURE std::string HexDigest(std::basic_string_view<unsigned char> const &Sum)
+-static APT_PURE std::string HexDigest(std::span<unsigned char> const &Sum)
 +static APT_PURE std::string HexDigest(ByteView const &Sum)
  {
     char Conv[16] =
        {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b',
-@@ -360,7 +378,7 @@
+@@ -360,7 +378,7 @@ class PrivateHashes
        EVP_DigestFinal_ex(tmpContext, Sum, nullptr);
        EVP_MD_CTX_destroy(tmpContext);
  
--      return ::HexDigest(std::basic_string_view<unsigned char>(Sum, Size));
+-      return ::HexDigest(std::span<unsigned char>(Sum, Size));
 +      return ::HexDigest(ByteView(Sum, Size));
     }
  
