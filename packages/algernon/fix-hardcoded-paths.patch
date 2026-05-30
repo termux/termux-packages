@@ -1,6 +1,6 @@
 --- a/engine/config.go
 +++ b/engine/config.go
-@@ -154,7 +154,7 @@
+@@ -188,7 +188,7 @@
  
  // New creates a new server configuration based using the default values
  func New(versionString, description string) (*Config, error) {
@@ -9,8 +9,8 @@
  	ac := &Config{
  		curlSupport: true,
  
-@@ -187,7 +187,7 @@
- 		defaultLuaDataFilename: "data.lua",
+@@ -222,7 +222,7 @@
+ 		defaultLogFile: filepath.Join(tmpdir, "algernon.log"),
  
  		// List of configuration filenames to check
 -		serverConfigurationFilenames: []string{"/etc/algernon/serverconf.lua", "/etc/algernon/server.lua"},
@@ -18,7 +18,7 @@
  
  		// Compression speed over compactness
  		cacheCompressionSpeed: true,
-@@ -218,7 +218,7 @@
+@@ -254,7 +254,7 @@
  		return nil, err
  	}
  	// Read in the mimetype information from the system. Set UTF-8 when setting Content-Type.
@@ -29,33 +29,33 @@
  	// File stat cache
 --- a/engine/flags.go
 +++ b/engine/flags.go
-@@ -206,9 +206,9 @@
+@@ -230,9 +230,9 @@
  	switch {
  	case ac.productionMode:
  		// Use system directories
 -		ac.serverDirOrFilename = "/srv/algernon"
--		ac.serverCert = "/etc/algernon/cert.pem"
--		ac.serverKey = "/etc/algernon/key.pem"
+-		ac.serve.serverCert = "/etc/algernon/cert.pem"
+-		ac.serve.serverKey = "/etc/algernon/key.pem"
 +		ac.serverDirOrFilename = "@TERMUX_PREFIX@/var/lib/algernon"
-+		ac.serverCert = "@TERMUX_PREFIX@/etc/algernon/cert.pem"
-+		ac.serverKey = "@TERMUX_PREFIX@/etc/algernon/key.pem"
++		ac.serve.serverCert = "@TERMUX_PREFIX@/etc/algernon/cert.pem"
++		ac.serve.serverKey = "@TERMUX_PREFIX@/etc/algernon/key.pem"
  		ac.cacheMode = cachemode.Production
  		ac.serverMode = true
  	case ac.devMode:
 --- a/engine/serve.go
 +++ b/engine/serve.go
-@@ -167,7 +167,7 @@
- 			// If $XDG_CONFIG_DIR is not set, use $HOME.
- 			// If $HOME is not set, use $TMPDIR.
- 			// If $TMPDIR is not set, use /tmp.
--			certStorageDir := env.StrAlt("XDG_CONFIG_DIR", "HOME", env.Str("TMPDIR", "/tmp"))
-+			certStorageDir := env.StrAlt("XDG_CONFIG_DIR", "HOME", env.Str("TMPDIR", "@TERMUX_PREFIX@/tmp"))
- 
- 			defaultEmail := env.Str("LOGNAME", "root") + "@localhost"
- 			if len(ac.certMagicDomains) > 0 {
+@@ -132,7 +132,7 @@
+ // configureCertMagic sets CertMagic package-level defaults from ac.
+ // If $XDG_CONFIG_DIR is not set, uses $HOME, then $TMPDIR, then /tmp for cert storage.
+ func (ac *Config) configureCertMagic() {
+-	certStorageDir := env.StrAlt("XDG_CONFIG_DIR", "HOME", env.Str("TMPDIR", "/tmp"))
++	certStorageDir := env.StrAlt("XDG_CONFIG_DIR", "HOME", env.Str("TMPDIR", "@TERMUX_PREFIX@/tmp"))
+ 	defaultEmail := env.StrAlt("LOGNAME", "USER", "root") + "@localhost"
+ 	if len(ac.serve.certMagicDomains) > 0 {
+ 		defaultEmail = "webmaster@" + ac.serve.certMagicDomains[0]
 --- a/vendor/github.com/caddyserver/certmagic/dnsutil.go
 +++ b/vendor/github.com/caddyserver/certmagic/dnsutil.go
-@@ -339,4 +339,4 @@
+@@ -376,4 +376,4 @@
  	fqdnSOACacheMu sync.Mutex
  )
  
