@@ -1,0 +1,29 @@
+--- a/gfx/thebes/gfxFcPlatformFontList.cpp
++++ b/gfx/thebes/gfxFcPlatformFontList.cpp
+@@ -300,8 +300,25 @@
+   // "blanks", effectively assuming that, if the font has a blank glyph,
+   // then the author intends any associated character to be rendered
+   // blank.
+-  RefPtr<FcPattern> pattern =
++  const bool faceHasFamilyName =
++      aFace && aFace->family_name && aFace->family_name[0] != '\0';
++  RefPtr<FcPattern> pattern = nullptr;
++  if (faceHasFamilyName) {
++    pattern =
+       dont_AddRef(FcFreeTypeQueryFace(aFace, ToFcChar8Ptr(""), 0, nullptr));
++  } else {
++    printf_stderr(
++        "[gfxFc] FT_Face has no family_name; skipping FcFreeTypeQueryFace "
++        "(face=%p style='%s' num_glyphs=%ld face_flags=0x%lx style_flags=0x%lx "
++        "units_per_EM=%u)\n",
++        aFace,
++        (aFace && aFace->style_name) ? aFace->style_name : "(null)",
++        aFace ? (long)aFace->num_glyphs : -1L,
++        aFace ? (long)aFace->face_flags : 0L,
++        aFace ? (long)aFace->style_flags : 0L,
++        aFace ? (unsigned)aFace->units_per_EM : 0u);
++    NS_WARNING("CreatePatternForFace: skipped FcFreeTypeQueryFace, FT_Face has no family_name");
++  }
+   // given that we have a FT_Face, not really sure this is possible...
+   if (!pattern) {
+     pattern = dont_AddRef(FcPatternCreate());
