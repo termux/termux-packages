@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A custom version of Firefox, focused on privacy, securit
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@3ls-it"
 TERMUX_PKG_VERSION="151.0.1-2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://codeberg.org/api/packages/librewolf/generic/librewolf-source/${TERMUX_PKG_VERSION}/librewolf-${TERMUX_PKG_VERSION}.source.tar.gz"
 TERMUX_PKG_SHA256=1c5dbd7544e398d685ea00e7edfe6a725d3aaff246a367c71ce00a3b9d370ca3
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
