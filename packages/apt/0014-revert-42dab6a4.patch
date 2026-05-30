@@ -1,0 +1,295 @@
+diff --git a/apt-pkg/solver3.cc b/apt-pkg/solver3.cc
+index 06132995b..339853763 100644
+--- a/apt-pkg/solver3.cc
++++ b/apt-pkg/solver3.cc
+@@ -18,6 +18,8 @@
+  * classic APT solver.
+  */
+ 
++#define APT_COMPILING_APT
++
+ #include <config.h>
+ 
+ #include <apt-pkg/algorithms.h>
+@@ -57,7 +59,7 @@ Solver::Solver(pkgCache &cache)
+ Solver::~Solver() = default;
+ 
+ // This function determines if a work item is less important than another.
+-constexpr bool Solver::Work::operator<(Solver::Work const &b) const noexcept
++bool Solver::Work::operator<(Solver::Work const &b) const
+ {
+    if ((not clause->optional && size < 2) != (not b.clause->optional && b.size < 2))
+       return not b.clause->optional && b.size < 2;
+@@ -128,7 +130,7 @@ std::string Solver::Work::toString(pkgCache &cache) const
+    return out.str();
+ }
+ 
+-constexpr Var Solver::bestReason(Clause const *clause, Var var) const noexcept
++inline Var Solver::bestReason(Clause const *clause, Var var) const
+ {
+    if (not clause)
+       return Var{};
+@@ -143,7 +145,7 @@ constexpr Var Solver::bestReason(Clause const *clause, Var var) const noexcept
+    return clause->reason;
+ }
+ 
+-constexpr LiftedBool Solver::value(Lit lit) const noexcept
++inline LiftedBool Solver::value(Lit lit) const
+ {
+    return lit.sign() ? ~(*this)[lit.var()].assignment : (*this)[lit.var()].assignment;
+ }
+@@ -415,9 +417,9 @@ bool Solver::Propagate(const Clause *clause, Lit p)
+    }
+ 
+    // Check if the clause is unit, conflict, or undecided
+-   auto not_false = [&](auto lit) noexcept { return value(lit) != LiftedBool::False; };
++   auto not_false = [&](auto lit) { return value(lit) != LiftedBool::False; };
+    auto head = std::ranges::find_if(clause->solutions, not_false);
+-   auto find_tail = [&]() noexcept { return std::ranges::find_last_if(clause->solutions, not_false); };
++   auto find_tail = [&]() { return std::ranges::find_last_if(clause->solutions, not_false); };
+    if (head == clause->solutions.end())
+    {
+       // Conflict clause. If this clause is non-optional; reject its "reason".
+@@ -771,11 +773,7 @@ DependencySolver::DependencySolver(pkgCache &cache, pkgDepCache::Policy &policy,
+ 
+ DependencySolver::~DependencySolver() = default;
+ 
+-// This is called in the hot path of Discover() as we are trying to determine if a dependency
+-// is the same in all packages.
+-// Marking it constexpr causes it to be inlined, which significantly improves solver performance,
+-// around 5%; but it produces more LL cache misses.
+-constexpr bool SameOrGroup(pkgCache::DepIterator a, pkgCache::DepIterator b) noexcept
++static bool SameOrGroup(pkgCache::DepIterator a, pkgCache::DepIterator b)
+ {
+    while (1)
+    {
+@@ -815,14 +813,14 @@ const Clause *DependencySolver::RegisterClause(Clause &&clause)
+ 	     earlierDep.end() || (earlierDep->CompareOp & pkgCache::Dep::Or) ||
+ 	     earlierDep.TargetPkg() != dep.TargetPkg())
+ 	    continue;
+-	 if (std::none_of(earlierClause->solutions.begin(), earlierClause->solutions.end(), [&clause](auto earlierSol) noexcept
++	 if (std::none_of(earlierClause->solutions.begin(), earlierClause->solutions.end(), [&clause](auto earlierSol)
+ 			  { return std::ranges::contains(clause.solutions,
+ 							 earlierSol); }))
+ 	    continue;
+ 
+ 	 if (earlierClause->optional == clause.optional)
+ 	 {
+-	    std::erase_if(earlierClause->solutions, [&clause, this](auto earlierSol) noexcept
++	    std::erase_if(earlierClause->solutions, [&clause, this](auto earlierSol)
+ 			  { return not std::ranges::contains(clause.solutions,
+ 							     earlierSol); });
+ 
+@@ -832,7 +830,7 @@ const Clause *DependencySolver::RegisterClause(Clause &&clause)
+ 	 else if (clause.optional)
+ 	 {
+ 	    // If say a Depends has fewer solution than a Recommends, remove the Recommend's extranous ones.
+-	    std::erase_if(clause.solutions, [&earlierClause, this](auto sol) noexcept
++	    std::erase_if(clause.solutions, [&earlierClause, this](auto sol)
+ 			  { return not std::ranges::contains(earlierClause->solutions,
+ 							     sol); });
+ 
+diff --git a/apt-pkg/solver3.h b/apt-pkg/solver3.h
+index 8d5e25906..f82aa4058 100644
+--- a/apt-pkg/solver3.h
++++ b/apt-pkg/solver3.h
+@@ -56,8 +56,8 @@ class ContiguousCacheMap
+ 
+       data_ = new V[size]{};
+    }
+-   constexpr V &operator[](const K *key) noexcept { return data_[key->ID]; }
+-   constexpr const V &operator[](const K *key) const noexcept { return data_[key->ID]; }
++   V &operator[](const K *key) { return data_[key->ID]; }
++   const V &operator[](const K *key) const { return data_[key->ID]; }
+    ~ContiguousCacheMap() { delete[] data_; }
+ 
+    // Delete copy constructors for memory safety (rule of 3)
+@@ -136,45 +136,45 @@ struct Var
+ {
+    uint32_t value;
+ 
+-   explicit constexpr Var(uint32_t value = 0) noexcept : value{value} {}
+-   explicit Var(pkgCache::PkgIterator const &Pkg) noexcept : value(uint32_t(Pkg.MapPointer()) << 1) {}
+-   explicit Var(pkgCache::VerIterator const &Ver) noexcept : value(uint32_t(Ver.MapPointer()) << 1 | 1) {}
++   explicit constexpr Var(uint32_t value = 0) : value{value} {}
++   explicit Var(pkgCache::PkgIterator const &Pkg) : value(uint32_t(Pkg.MapPointer()) << 1) {}
++   explicit Var(pkgCache::VerIterator const &Ver) : value(uint32_t(Ver.MapPointer()) << 1 | 1) {}
+ 
+-   constexpr bool isVersion() const noexcept { return value & 1; }
+-   constexpr uint32_t mapPtr() const noexcept { return value >> 1; }
++   inline constexpr bool isVersion() const { return value & 1; }
++   inline constexpr uint32_t mapPtr() const { return value >> 1; }
+ 
+    // \brief Return the package, if any, otherwise 0.
+-   constexpr map_pointer<pkgCache::Package> Pkg() const noexcept
++   map_pointer<pkgCache::Package> Pkg() const
+    {
+       return isVersion() ? 0 : map_pointer<pkgCache::Package>{mapPtr()};
+    }
+    // \brief Return the version, if any, otherwise 0.
+-   constexpr map_pointer<pkgCache::Version> Ver() const noexcept
++   map_pointer<pkgCache::Version> Ver() const
+    {
+       return isVersion() ? map_pointer<pkgCache::Version>{mapPtr()} : 0;
+    }
+    // \brief Return the package iterator if storing a package, or an empty one
+-   constexpr pkgCache::PkgIterator Pkg(pkgCache &cache) const noexcept
++   pkgCache::PkgIterator Pkg(pkgCache &cache) const
+    {
+       return isVersion() ? pkgCache::PkgIterator() : pkgCache::PkgIterator(cache, cache.PkgP + Pkg());
+    }
+    // \brief Return the version iterator if storing a package, or an empty end.
+-   constexpr pkgCache::VerIterator Ver(pkgCache &cache) const noexcept
++   pkgCache::VerIterator Ver(pkgCache &cache) const
+    {
+       return isVersion() ? pkgCache::VerIterator(cache, cache.VerP + Ver()) : pkgCache::VerIterator();
+    }
+    // \brief Return a package, cast from version if needed
+-   constexpr pkgCache::PkgIterator CastPkg(pkgCache &cache) const noexcept
++   pkgCache::PkgIterator CastPkg(pkgCache &cache) const
+    {
+       return isVersion() ? Ver(cache).ParentPkg() : Pkg(cache);
+    }
+    // \brief Check if there is no reason.
+-   constexpr bool empty() const noexcept { return value == 0; }
++   constexpr bool empty() const { return value == 0; }
+    constexpr bool operator!=(Var const other) const noexcept { return value != other.value; }
+    constexpr bool operator==(Var const other) const noexcept { return value == other.value; }
+ 
+    /// \brief Negate
+-   constexpr Lit operator~() const noexcept;
++   constexpr Lit operator~() const;
+ 
+    std::string toString(pkgCache &cache) const
+    {
+@@ -196,21 +196,21 @@ struct Lit
+    private:
+    friend struct std::hash<Lit>;
+    // Private constructor from a number, to be used with operator~
+-   explicit constexpr Lit(int32_t value) noexcept : value{value} {}
++   explicit constexpr Lit(int32_t value) : value{value} {}
+    int32_t value;
+ 
+    public:
+-   constexpr Lit() noexcept : value{0} {}
++   constexpr Lit() : value{0} {}
+    // SAFETY: value must be 31 bit, one bit is needed for the sign.
+-   constexpr Lit(Var var) noexcept : value{static_cast<int32_t>(var.value)} {}
++   constexpr Lit(Var var) : value{static_cast<int32_t>(var.value)} {}
+ 
+    // Accessors
+-   constexpr Var var() const noexcept { return Var(std::abs(value)); }
+-   constexpr bool sign() const noexcept { return value < 0; }
+-   constexpr Lit operator~() const noexcept { return Lit(-value); }
++   constexpr Var var() const { return Var(std::abs(value)); }
++   constexpr bool sign() const { return value < 0; }
++   constexpr Lit operator~() const { return Lit(-value); }
+ 
+    // Properties
+-   constexpr bool empty() const noexcept { return value == 0; }
++   constexpr bool empty() const { return value == 0; }
+    constexpr bool operator!=(Lit const other) const noexcept { return value != other.value; }
+    constexpr bool operator==(Lit const other) const noexcept { return value == other.value; }
+ 
+@@ -250,12 +250,12 @@ struct Clause
+    std::string toString(pkgCache &cache, bool pretty = false, bool showMerged = true) const;
+ };
+ 
+-constexpr Lit Solver::Var::operator~() const noexcept
++constexpr Lit Solver::Var::operator~() const
+ {
+    return ~Lit(*this);
+ }
+ 
+-constexpr LiftedBool operator~(LiftedBool value) noexcept
++inline LiftedBool operator~(LiftedBool value)
+ {
+    switch (value)
+    {
+@@ -307,29 +307,29 @@ class Solver
+    ContiguousCacheMap<pkgCache::Version, State> verStates;
+ 
+    // \brief Helper function for safe access to package state.
+-   constexpr State &operator[](const pkgCache::Package *P) noexcept
++   inline State &operator[](const pkgCache::Package *P)
+    {
+       return pkgStates[P];
+    }
+-   constexpr const State &operator[](const pkgCache::Package *P) const noexcept
++   inline const State &operator[](const pkgCache::Package *P) const
+    {
+       return pkgStates[P];
+    }
+ 
+    // \brief Helper function for safe access to version state.
+-   constexpr State &operator[](const pkgCache::Version *V) noexcept
++   inline State &operator[](const pkgCache::Version *V)
+    {
+       return verStates[V];
+    }
+-   constexpr const State &operator[](const pkgCache::Version *V) const noexcept
++   inline const State &operator[](const pkgCache::Version *V) const
+    {
+       return verStates[V];
+    }
+    // \brief Helper function for safe access to either state.
+-   constexpr State &operator[](Var r) noexcept;
+-   constexpr const State &operator[](Var r) const noexcept;
++   inline State &operator[](Var r);
++   inline const State &operator[](Var r) const;
+ 
+-   constexpr std::vector<const Clause *> &watches(Lit lit) noexcept;
++   inline std::vector<const Clause *> &watches(Lit lit);
+ 
+    // \brief Heap of the remaining work.
+    //
+@@ -375,8 +375,8 @@ class Solver
+    {
+       return static_cast<level_type>(trailLim.size());
+    }
+-   constexpr Var bestReason(Clause const *clause, Var var) const noexcept;
+-   constexpr LiftedBool value(Lit lit) const noexcept;
++   inline Var bestReason(Clause const *clause, Var var) const;
++   inline LiftedBool value(Lit lit) const;
+ 
+    public:
+    // \brief Revert to the previous decision level.
+@@ -515,9 +515,9 @@ struct APT::Solver::Solver::Work
+    /// Number of valid choices at insertion time
+    size_t size{0};
+ 
+-   constexpr bool operator<(APT::Solver::Solver::Work const &b) const noexcept;
++   bool operator<(APT::Solver::Solver::Work const &b) const;
+    std::string toString(pkgCache &cache) const;
+-   constexpr Work(const Clause *clause, level_type level) noexcept : clause(clause), level(level) {}
++   inline Work(const Clause *clause, level_type level) : clause(clause), level(level) {}
+ };
+ 
+ /**
+@@ -583,7 +583,7 @@ struct APT::Solver::Solver::Trail
+    std::optional<Work> work;
+ };
+ 
+-constexpr APT::Solver::Solver::State &APT::Solver::Solver::operator[](APT::Solver::Var r) noexcept
++inline APT::Solver::Solver::State &APT::Solver::Solver::operator[](APT::Solver::Var r)
+ {
+    if (auto P = r.Pkg())
+       return (*this)[cache.PkgP + P];
+@@ -592,7 +592,7 @@ constexpr APT::Solver::Solver::State &APT::Solver::Solver::operator[](APT::Solve
+    return *rootState.get();
+ }
+ 
+-constexpr const APT::Solver::Solver::State &APT::Solver::Solver::operator[](APT::Solver::Var r) const noexcept
++inline const APT::Solver::Solver::State &APT::Solver::Solver::operator[](APT::Solver::Var r) const
+ {
+    return const_cast<Solver &>(*this)[r];
+ }
+@@ -613,7 +613,7 @@ struct std::hash<APT::Solver::Lit>
+    std::size_t operator()(const APT::Solver::Lit &v) const noexcept { return hash_value(v.value); }
+ };
+ 
+-constexpr std::vector<const APT::Solver::Clause *> &APT::Solver::Solver::watches(Lit lit) noexcept
++inline std::vector<const APT::Solver::Clause *> &APT::Solver::Solver::watches(Lit lit)
+ {
+    return (*this)[lit.var()].watches[lit.sign()];
+ }

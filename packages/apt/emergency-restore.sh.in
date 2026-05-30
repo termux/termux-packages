@@ -1,0 +1,68 @@
+#!@TERMUX_PREFIX@/bin/sh
+# shellcheck shell=dash
+
+set -eu
+
+is_installed() {
+	case "$(dpkg-query -W -f '${db:Status-Status}' "$1" 2>/dev/null)" in
+		'not-installed'|'config-files') return 1;;
+	esac
+}
+
+was_upgraded() {
+	case "$1" in
+		# Versions of the rebuilt packages prior to the Apt 3.x merge
+		'apt')             OLD_VERSION='2.8.1-1';;
+		'dpkg')            OLD_VERSION='1.22.6-1';;
+		'apt-file')        OLD_VERSION='3.3';;
+		'libapt-pkg-perl') OLD_VERSION='0.1.40-10';;
+		'nala')            OLD_VERSION='0.16.0';;
+		'synaptic')        OLD_VERSION='0.91.7-1';;
+		'termux-tools')    OLD_VERSION='1.46.0+really1.45.0';;
+		*) # How did we get here?
+			echo "Package '$1' isn't covered by this script."
+			return 1
+		;;
+	esac
+
+	INSTALLED_VERSION="$(dpkg-query -W -f '${Version}' "$1")"
+
+	dpkg --compare-versions "$INSTALLED_VERSION" le "$OLD_VERSION"
+}
+
+download_backup() {
+	PKG_NAME="$1"
+	was_upgraded "$PKG_NAME" || return 1
+
+	TERMUX_ARCH="@TERMUX_ARCH@"
+	OUTPUT_FILE"${TMPDIR:-@TERMUX_PREFIX@/tmp}/${PKG_NAME}_${OLD_VERSION}_${TERMUX_ARCH}.deb"
+	PKG_URL="$MIRROR_URL"
+	curl -L "$PKG_URL" -o "$OUTPUT_FILE"
+}
+
+downgrade() {
+	# Check that 'dpkg' is in a sane enough state to mark itself 'ok'
+	case "$(dpkg-query -W -f '${Status}' dpkg)" in
+		*' ok '*);;
+		*) # If 'dpkg' isn't in a known 'ok' state something has gone very wrong.
+			echo "Something is seriously wrong with 'dpkg'."
+			echo "Unable to proceed with automatic restore."
+			exit 1
+		;;
+	esac
+
+	for package in 'dpkg' 'apt' 'libapt-pkg-perl' 'apt-file' 'nala' 'synaptic' 'termux-tools'; do
+		echo "Checking: '$package'"
+
+		# Do we even have this package?
+		is_installed "$package" || continue
+
+		# Download the old DEB if needed
+		download_backup "$package"
+
+	done
+	# Force install the old version.
+	dpkg -i "$OUTPUT_FILE"
+}
+
+downgrade

@@ -6,7 +6,7 @@ diff -u -r ../dpkg-1.21.7/configure ./configure
  printf %s "checking dpkg cpu type... " >&6; }
  
 -      cpu_type=$(PERL=$PERL ${CONFIG_SHELL-/bin/sh} "$srcdir/build-aux/run-script" scripts/dpkg-architecture.pl -t$host -qDEB_HOST_ARCH_CPU 2>/dev/null)
-+      cpu_type=TERMUX_ARCH
++      cpu_type=@TERMUX_ARCH@
  
    if test "x$cpu_type" = "x"
  then :
@@ -15,7 +15,7 @@ diff -u -r ../dpkg-1.21.7/configure ./configure
  printf %s "checking dpkg architecture name... " >&6; }
  
 -      dpkg_arch=$(PERL=$PERL ${CONFIG_SHELL-/bin/sh} "$srcdir/build-aux/run-script" scripts/dpkg-architecture.pl -t$host -qDEB_HOST_ARCH 2>/dev/null)
-+      dpkg_arch=TERMUX_ARCH
++      dpkg_arch=@TERMUX_ARCH@
  
    if test "x$dpkg_arch" = "x"
  then :
