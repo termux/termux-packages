@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Deduplicating and compressing backup program"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="1.4.4"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/borgbackup/borg/releases/download/${TERMUX_PKG_VERSION}/borgbackup-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=2716bc124a24908efcac9436df31b716d1f0bbd828ad39b18f73bfdd772a651a
 TERMUX_PKG_DEPENDS="libacl, liblz4, openssl, python, python-pip, xxhash, zstd"
@@ -12,12 +13,4 @@ TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make_install() {
 	cross-pip install --no-deps --prefix="$TERMUX_PREFIX" "$TERMUX_PKG_SRCDIR"
-}
-
-termux_step_create_debscripts() {
-	cat <<- EOF > ./postinst
-	#!$TERMUX_PREFIX/bin/sh
-	echo "Installing dependencies through pip..."
-	pip3 install $TERMUX_PKG_PYTHON_TARGET_DEPS
-	EOF
 }
