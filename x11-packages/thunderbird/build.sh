@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Unofficial Thunderbird email client"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="151.0.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://archive.mozilla.org/pub/thunderbird/releases/${TERMUX_PKG_VERSION#*really}/source/thunderbird-${TERMUX_PKG_VERSION#*really}.source.tar.xz"
 TERMUX_PKG_SHA256=cf3ced40f9b136163cde35d963f8348c3d095b15bb6016e96436a5cb6913d47d
 TERMUX_PKG_DEPENDS="botan3, ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libotr, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
