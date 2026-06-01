@@ -3,8 +3,8 @@ TERMUX_PKG_DESCRIPTION="Shell with lots of features"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENCE"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
-TERMUX_PKG_VERSION=5.9
-TERMUX_PKG_REVISION=10
+TERMUX_PKG_VERSION="5.9"
+TERMUX_PKG_REVISION=11
 TERMUX_PKG_SRCURL="https://www.zsh.org/pub/zsh-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=9b8d1ecedd5b5e81fbf1918e876752a7dd948e05c1a0dba10ab863842d45acd5
 TERMUX_PKG_DEPENDS="libandroid-support, libcap, ncurses, termux-tools, pcre2"
@@ -72,28 +72,6 @@ termux_step_post_configure() {
 	)
 	for module in "${modules[@]}"; do
 		sed -i "s|${module}.mdd link=no|${module}.mdd link=static|" "$TERMUX_PKG_BUILDDIR/config.modules"
-	done
-
-	# Save a couple completion definitions for distro specific commands
-	# that are available on Termux by moving them to the generic Unix/ directory.
-	local compdef
-	local -a used_on_termux=(
-		'Debian/Command/_apt'                 # packages/apt
-		'Debian/Command/_apt-file'            # packages/apt-file
-		'Debian/Command/_apt-show-versions'   # packages/apt-show-versions
-		'Debian/Command/_dpkg'                # packages/dpkg
-		'Debian/Command/_update-alternatives' # packages/dpkg
-		'Redhat/Command/_rpm'                 # packages/rpm
-	)
-	for compdef in "${used_on_termux[@]}"; do
-		mv -v "$TERMUX_PKG_BUILDDIR/Completion/$compdef" "$TERMUX_PKG_BUILDDIR/Completion/Unix/Command/"
-	done
-
-	# Adapted from Arch Linux's build.
-	# Remove unneeded and conflicting completion scripts
-	for compdir in AIX BSD Cygwin Darwin Debian Mandriva openSUSE Redhat Solaris; do
-		rm -rf Completion/$compdir
-		sed "s#\s*Completion/$compdir/\*/\*##g" -i "$TERMUX_PKG_BUILDDIR/Src/Zle/complete.mdd"
 	done
 }
 
