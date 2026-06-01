@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="dev tools, env vars, task runner"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2026.5.18"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/jdx/mise/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=f1a3b31060484207b1618746b526571c29ee7150e509c4229f33b1e512b2d667
 TERMUX_PKG_DEPENDS="bzip2, openssl"
@@ -22,6 +23,7 @@ termux_step_pre_configure() {
 	find ./vendor-termux \
 		-mindepth 1 -maxdepth 1 -type d \
 		! -wholename ./vendor-termux/rattler_pty \
+		! -wholename ./vendor-termux/cc \
 		-exec rm -rf '{}' \;
 
 	patch="$TERMUX_PKG_BUILDER_DIR/rattler_pty-android-target.diff"
@@ -29,10 +31,16 @@ termux_step_pre_configure() {
 	echo "Applying patch: $patch"
 	patch -p1 -d "$dir" < "$patch"
 
+	patch="$TERMUX_PKG_BUILDER_DIR/rust-cc-do-not-concatenate-all-the-CFLAGS.diff"
+	dir="vendor-termux/cc"
+	echo "Applying patch: $patch"
+	patch -p1 -d "$dir" < "$patch"
+
 	cat <<-EOL >> Cargo.toml
 
 		[patch.crates-io]
 		rattler_pty = { path = "./vendor-termux/rattler_pty" }
+		cc = { path = "./vendor-termux/cc" }
 	EOL
 
 	local -u env_host="${CARGO_TARGET_NAME//-/_}"
