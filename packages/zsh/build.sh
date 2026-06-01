@@ -29,7 +29,10 @@ zsh_cv_rlim_t_is_longer=no
 zsh_cv_type_rlim_t_is_unsigned=yes
 "
 
-TERMUX_PKG_CONFFILES="etc/zshrc"
+TERMUX_PKG_CONFFILES="
+etc/zprofile
+etc/zshrc
+"
 TERMUX_PKG_BUILD_IN_SRC=true
 # Remove hard link to bin/zsh as Android does not support hard links.
 # We replace this with a symlink to offer the same functionality:
@@ -76,12 +79,16 @@ termux_step_post_configure() {
 
 	# Save a couple completion definitions for distro specific commands
 	# that are available on Termux by moving them to the generic Unix/ directory.
+	# This becomes $TERMUX_PREFIX/share/zsh/functions/Completion/Unix/ after compilation.
+	# Command and Type are not differentiated in the final directory structure.
 	local compdef
 	local -a used_on_termux=(
 		'Debian/Command/_apt'                 # packages/apt
 		'Debian/Command/_apt-file'            # packages/apt-file
 		'Debian/Command/_apt-show-versions'   # packages/apt-show-versions
 		'Debian/Command/_dpkg'                # packages/dpkg
+		'Debian/Type/_deb_files'              # Used by _apt
+		'Debian/Type/_deb_packages'           # Used by _apt, _apt-file, _apt-show-versions, _dpkg
 		'Debian/Command/_update-alternatives' # packages/dpkg
 		'Redhat/Command/_rpm'                 # packages/rpm
 	)
@@ -92,7 +99,7 @@ termux_step_post_configure() {
 	# Adapted from Arch Linux's build.
 	# Remove unneeded and conflicting completion scripts
 	for compdir in AIX BSD Cygwin Darwin Debian Mandriva openSUSE Redhat Solaris; do
-		rm -rf Completion/$compdir
+		rm -rf "Completion/$compdir"
 		sed "s#\s*Completion/$compdir/\*/\*##g" -i "$TERMUX_PKG_BUILDDIR/Src/Zle/complete.mdd"
 	done
 }
@@ -100,6 +107,12 @@ termux_step_post_configure() {
 termux_step_post_make_install() {
 	# /etc/zshrc - Run for interactive shells (http://zsh.sourceforge.net/Guide/zshguide02.html):
 	sed "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" "$TERMUX_PKG_BUILDER_DIR/etc-zshrc" > "$TERMUX_PREFIX/etc/zshrc"
+	sed "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" "$TERMUX_PKG_BUILDER_DIR/etc-zprofile" > "$TERMUX_PREFIX/etc/zprofile"
+
+	# Make sure the site-functions dir exists and is part of the Zsh package.
+	local site_dir="$TERMUX_PREFIX/share/zsh/site-functions"
+	mkdir -p "$site_dir"
+	touch "$site_dir/.placeholder"
 
 	# Remove zsh.new/zsh.old/zsh-$version if any exists:
 	rm -f "$TERMUX_PREFIX"/{zsh-*,zsh.*}

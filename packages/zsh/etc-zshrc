@@ -1,4 +1,7 @@
-emulate sh -c '. @TERMUX_PREFIX@/etc/profile'
+# Test if PS1 is set to the upstream default value, and if so overwrite it with our default.
+# This allows users to override $PS1 by passing it to the invocation of zsh as an environment variable.
+# We drop '%m' (hostname) from the default PS1 as it isn't meaningful on Termux/Android.
+[[ "$PS1" == '%m%# ' ]] && PS1='%# '
 
 # Handles nonexistent commands.
 # If user has entered command which invokes non-available
@@ -9,5 +12,8 @@ if [ -x "@TERMUX_PREFIX@/libexec/termux/command-not-found" ]; then
 	}
 fi
 
-PS1='%# '
+# Load and initialize the completions system.
+autoload -U compinit
+compinit
+
 # vim: set noet ft=zsh tw=4 sw=4 ff=unix
