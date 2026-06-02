@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/termux/proot-distro
 TERMUX_PKG_DESCRIPTION="Termux official utility for managing proot'ed Linux distributions"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="5.1.2"
+TERMUX_PKG_VERSION="5.1.4"
 TERMUX_PKG_SRCURL=https://github.com/termux/proot-distro/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=cf6d1a7ff27bcee78818716a6befedda445f0e90b047b59e4e3ed9161092d4f4
+TERMUX_PKG_SHA256=fafaa3ebf29d4d2e675c04d41f0593d1817828f2927e5373b42ef83c508c7457
 TERMUX_PKG_DEPENDS="proot (>= 5.1.107-71), python"
 TERMUX_PKG_SUGGESTS="bash-completion, termux-api, zsh-completions"
 TERMUX_PKG_BUILD_IN_SRC=true
