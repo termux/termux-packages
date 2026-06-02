@@ -1,11 +1,17 @@
---- ./Completion/Unix/Command/_man	2022-05-08 08:18:22.000000000 +0200
-+++ ../zsh-5.9-patched/Completion/Unix/Command/_man	2022-09-23 21:48:20.995363539 +0200
-@@ -180,7 +180,7 @@
+diff --git a/Completion/Unix/Command/_man b/Completion/Unix/Command/_man
+index 888d738..6023bde 100644
+--- a/Completion/Unix/Command/_man
++++ b/Completion/Unix/Command/_man
+@@ -198,9 +198,9 @@ _man() {
    fi
  
-   (( $#_manpath )) ||
--      _manpath=( /usr/man(-/) /(opt|usr)/(pkg|dt|share|X11R6|local)/(cat|)man(-/) )
-+      _manpath=( @TERMUX_PREFIX@/man(-/) @TERMUX_PREFIX@/(pkg|dt|share|X11R6|local)/(cat|)man(-/) )
+   (( $#_manpath )) || _manpath=(
+-    /usr/man(-/)
+-    /(opt|usr)/(pkg|dt|share|X11R6|local)/(cat|)man(-/)
+-    /(opt|usr)/local/share/(cat|)man(-/)
++    @TERMUX_PREFIX@/man(-/)
++    @TERMUX_PREFIX@/(pkg|dt|share|X11R6|local)/(cat|)man(-/)
++    @TERMUX_PREFIX@/local/share/(cat|)man(-/)
+   )
  
-   # Override man path
-   [[ -n ${opt_args[-M]} ]] &&
+   # `sman' is the SGML manual directory for Solaris 7.

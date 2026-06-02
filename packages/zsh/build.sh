@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="Shell with lots of features"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENCE"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
-TERMUX_PKG_VERSION=5.9
-TERMUX_PKG_REVISION=10
+TERMUX_PKG_VERSION=5.9.1
 TERMUX_PKG_SRCURL="https://www.zsh.org/pub/zsh-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=9b8d1ecedd5b5e81fbf1918e876752a7dd948e05c1a0dba10ab863842d45acd5
+TERMUX_PKG_SHA256=5d20bec03f981dc4e9a09ec245e7415388ff641f79c5c5c416b5042e58d8280d
 TERMUX_PKG_DEPENDS="libandroid-support, libcap, ncurses, termux-tools, pcre2"
 TERMUX_PKG_RECOMMENDS="command-not-found, zsh-completions"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -15,6 +14,11 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-etcdir=$TERMUX_PREFIX/etc
 --enable-pcre
 --enable-site-fndir=no
+--enable-zsh-secure-free
+--enable-multibyte
+--enable-function-subdirs
+--enable-fndir=$TERMUX_PREFIX/share/zsh/functions
+--enable-scriptdir=$TERMUX_PREFIX/share/zsh/scripts
 zsh_cv_path_wtmp=no
 ac_cv_header_utmp_h=no
 ac_cv_func_getpwuid=yes
