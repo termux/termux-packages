@@ -1,14 +1,16 @@
 asymptote's GUI has dependency on PySide6, but this asymptote package is minimal
 and is not in the x11-packages folder.
 
+diff --git a/Makefile.in b/Makefile.in
+index 4537389e3..21d02b84a 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -135,7 +135,7 @@
+@@ -158,7 +158,7 @@ endif
  
  export prefix docdir exampledir mandir infodir INSTALL MAKE DESTDIR TEXI2DVI
  
--asy: base/version.asy $(FILES:=.o) $(XNAME) revision.o $(GCLIB) \
-+asy: base/version.asy $(FILES:=.o) revision.o $(GCLIB) \
- 		@LSPLIB@ @GLEW@
- 	$(CXX) $(OPTS) -o $(NAME) $(FILES:=.o) revision.o $(LIBS)
- 
+-asy: base/version.asy $(FILES:=.o) $(XNAME) revision.o $(GCLIB) @LSPLIB@ $(SHIMLIBS)
++asy: base/version.asy $(FILES:=.o) revision.o $(GCLIB) @LSPLIB@ $(SHIMLIBS)
+ 	$(CXX) $(OPTS) -rdynamic -o $(NAME) $(FILES:=.o) revision.o $(LIBS)
+ ifeq ($(BUNDLE_VULKAN),yes)
+ 	@sh build-scripts/bundle-vulkan-macos.sh $(NAME) "$(CODESIGN_IDENTITY)"
