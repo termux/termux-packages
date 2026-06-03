@@ -187,53 +187,37 @@ diff --git a/chrome/browser/BUILD.gn b/chrome/browser/BUILD.gn
 index 740af9876e..299c6e56f7 100644
 --- a/chrome/browser/BUILD.gn
 +++ b/chrome/browser/BUILD.gn
-@@ -1580,6 +1580,12 @@ jumbo_static_library("browser") {
-     "//chrome/browser/glic/fre",
-     "//chrome/browser/background/glic:impl",
+@@ -277,6 +277,7 @@
+     "universal_web_contents_observers.cc",
+     "universal_web_contents_observers.h",
    ]
-+  jumbo_excluded_sources = [
-+    "page_content_annotations/page_content_annotations_service_factory.cc",
-+    "page_load_metrics/observers/core/ukm_page_load_metrics_observer.cc",
-+    "performance_manager/chrome_browser_main_extra_parts_performance_manager.cc",
-+    "performance_manager/policies/keep_alive_dse_policy.cc",
-+  ]
++  jumbo_excluded_sources = []
  
-   if (is_android) {
-     # TODO(crbug.com/353332589): Remove this circular dependency when
-@@ -4373,6 +4379,10 @@ jumbo_static_library("browser") {
-       # ... get componentized.
-       "//chrome/browser/ui/search:impl",
+   configs += [
+     "//build/config/compiler:wexit_time_destructors",
+@@ -2489,6 +2490,10 @@
+       "repost_form_warning_controller.cc",
+       "repost_form_warning_controller.h",
      ]
 +    jumbo_excluded_sources += [
-+      # Too many symbol conflicts
-+      "new_tab_page/modules/file_suggestion/microsoft_files_page_handler.cc",
++      # Conflict with //chrome/browser/memory:impl
++      "memory/oom_memory_details.cc",
 +    ]
- 
-     #!is_android
-     # Any circular includes must depend on the target
-@@ -4672,6 +4682,11 @@ jumbo_static_library("browser") {
-       "media/capture_access_handler_base.cc",
-       "media/capture_access_handler_base.h",
+
+     sources += [
+       "web_applications/isolated_web_apps/window_management/isolated_web_apps_window_open_permission_service.cc",
+@@ -3043,6 +3048,11 @@
+       "ui/ash/shelf/chrome_shelf_metrics_provider.cc",
+       "ui/ash/shelf/chrome_shelf_metrics_provider.h",
      ]
 +    jumbo_excluded_sources += [
-+      # `QUERY` in `components/search_engines/template_url.h` conflicts with 
++      # `QUERY` in `components/search_engines/template_url.h` conflicts with
 +      # the one in NDK's `nameser_compat.h`
 +      "first_run/first_run.cc",
 +    ]
  
-     if (is_android) {
-       sources += [
-@@ -6554,6 +6569,10 @@ jumbo_static_library("browser") {
-       "//components/enterprise/watermarking",
-       "//components/enterprise/watermarking/content",
-     ]
-+    jumbo_excluded_sources += [
-+      # Conflict with //chrome/browser/enterprise/watermark:watermark_view_lib
-+      "enterprise/watermark/settings.cc",
-+    ]
-   }
- 
-   if (enterprise_data_controls) {
+     deps += [
+       "//ash",
 diff --git a/chrome/browser/actor/BUILD.gn b/chrome/browser/actor/BUILD.gn
 index 623752ebed..d1b290735a 100644
 --- a/chrome/browser/actor/BUILD.gn
@@ -917,45 +901,6 @@ index 7c555cfd5f..e8a3466654 100644
      content::WebContents* web_contents = tab->GetContents();
      CHECK(web_contents);
  
-diff --git a/chrome/browser/extensions/api/tabs/tabs_event_router.h b/chrome/browser/extensions/api/tabs/tabs_event_router.h
-index 016a72b6fb..841d64b4ca 100644
---- a/chrome/browser/extensions/api/tabs/tabs_event_router.h
-+++ b/chrome/browser/extensions/api/tabs/tabs_event_router.h
-@@ -107,7 +107,7 @@ class TabsEventRouter : public favicon::FaviconDriverObserver,
-     void OnRecentlyAudibleStateChanged(bool was_recently_audible);
- 
-     // Called when the pin state has changed for the given tab.
--    void OnPinnedStateChanged(tabs::TabInterface* tab, bool new_pinned_state);
-+    void OnPinnedStateChanged(::tabs::TabInterface* tab, bool new_pinned_state);
- 
-     // Whether we are waiting to fire the 'complete' status change. This will
-     // occur the first time the WebContents stops loading after the
-@@ -192,20 +192,20 @@ class TabsEventRouter : public favicon::FaviconDriverObserver,
- 
-   // TabListInterfaceObserver:
-   void OnTabAdded(TabListInterface& tab_list,
--                  tabs::TabInterface* tab,
-+                  ::tabs::TabInterface* tab,
-                   int index) override;
-   void OnActiveTabChanged(TabListInterface& tab_list,
--                          tabs::TabInterface* tab) override;
-+                          ::tabs::TabInterface* tab) override;
-   void OnTabRemoved(TabListInterface& tab_list,
--                    tabs::TabInterface* tab,
-+                    ::tabs::TabInterface* tab,
-                     TabRemovedReason removed_reason) override;
-   void OnTabMoved(TabListInterface& tab_list,
--                  tabs::TabInterface* tab,
-+                  ::tabs::TabInterface* tab,
-                   int from_index,
-                   int to_index) override;
-   void OnHighlightedTabsChanged(
-       TabListInterface& tab_list,
--      const std::set<tabs::TabInterface*>& highlighted_tabs) override;
-+      const std::set<::tabs::TabInterface*>& highlighted_tabs) override;
-   void OnTabListDestroyed(TabListInterface& tab_list) override;
- 
-   // ZoomObserver:
 diff --git a/chrome/browser/extensions/api/tabs/tabs_event_router_platform_delegate_non_android.h b/chrome/browser/extensions/api/tabs/tabs_event_router_platform_delegate_non_android.h
 index ed959562b7..aba15ad707 100644
 --- a/chrome/browser/extensions/api/tabs/tabs_event_router_platform_delegate_non_android.h
@@ -1006,19 +951,6 @@ index 5af8b82010..13c46f4168 100644
      if (base::Contains(all_tabs, tab)) {
        return browser;  // Found it!
      }
-diff --git a/chrome/browser/extensions/extension_management.cc b/chrome/browser/extensions/extension_management.cc
-index 0ecc0c12ea..9539ad670d 100644
---- a/chrome/browser/extensions/extension_management.cc
-+++ b/chrome/browser/extensions/extension_management.cc
-@@ -478,7 +478,7 @@ bool ExtensionManagement::IsAllowedByUnpackedDeveloperModePolicy(
-   }
-   // Allow extensions loaded from DevTools' "Extensions.loadUnpacked" command.
-   if (base::CommandLine::ForCurrentProcess()->HasSwitch(
--          switches::kEnableUnsafeExtensionDebugging)) {
-+          ::switches::kEnableUnsafeExtensionDebugging)) {
-     return true;
-   }
- 
 diff --git a/chrome/browser/extensions/extension_view_host_factory.cc b/chrome/browser/extensions/extension_view_host_factory.cc
 index 01021f4f4b..557a7e6ff4 100644
 --- a/chrome/browser/extensions/extension_view_host_factory.cc
@@ -1967,17 +1899,6 @@ index 4cef995ac6..2da13d8f94 100644
  
    if (enable_session_service) {
      sources += [
-@@ -1419,6 +1420,10 @@ jumbo_static_library("ui") {
-       "webui/webui_util_desktop.cc",
-       "webui/webui_util_desktop.h",
-     ]
-+    jumbo_excluded_sources += [
-+      # Conflict with //chrome/browser/ui/read_anything:read_anything
-+      "read_anything/read_anything_prefs.cc",
-+    ]
- 
-     if (is_chrome_branded) {
-       sources += [
 @@ -3164,6 +3173,10 @@ jumbo_static_library("ui") {
        "views/passwords/biometric_authentication_for_filling_bubble_view.cc",
        "views/passwords/biometric_authentication_for_filling_bubble_view.h",
@@ -3362,25 +3283,6 @@ index 81dcd46a0c..a828bf566e 100644
 +
 +#undef kUpdateManifestFetchTrafficAnnotation
 +#undef kWebBundleDownloadTrafficAnnotation
-diff --git a/chrome/browser/webauthn/challenge_url_fetcher.cc b/chrome/browser/webauthn/challenge_url_fetcher.cc
-index a815d5350a..b38e803b1c 100644
---- a/chrome/browser/webauthn/challenge_url_fetcher.cc
-+++ b/chrome/browser/webauthn/challenge_url_fetcher.cc
-@@ -16,6 +16,8 @@
- #include "services/network/public/mojom/fetch_api.mojom.h"
- #include "services/network/public/mojom/url_response_head.mojom.h"
- 
-+#define kTrafficAnnotation kTrafficAnnotation_ChallengeURLFetcher
-+
- namespace {
- 
- // The specification says a challenge must be at least 16 bytes but does not
-@@ -144,3 +146,5 @@ ChallengeUrlFetcher::GetChallenge() {
-           ChallengeNotAvailableReason::kErrorFetchingChallenge);
-   }
- }
-+
-+#undef kTrafficAnnotation
 diff --git a/chrome/browser/webauthn/enclave_manager.cc b/chrome/browser/webauthn/enclave_manager.cc
 index 40b40360c9..7aed76bc73 100644
 --- a/chrome/browser/webauthn/enclave_manager.cc
@@ -3591,18 +3493,6 @@ index c37dd28a45..0f6ee5c96a 100644
      sources = lib_sources
      deps = lib_deps
      public_deps = lib_public_deps
-diff --git a/chrome/browser/BUILD.gn b/chrome/browser/BUILD.gn
-index d7dfe42837..fb1edefbfa 100644
---- a/chrome/browser/BUILD.gn
-+++ b/chrome/browser/BUILD.gn
-@@ -1585,6 +1585,7 @@ jumbo_source_set("browser") {
-     "page_load_metrics/observers/core/ukm_page_load_metrics_observer.cc",
-     "performance_manager/chrome_browser_main_extra_parts_performance_manager.cc",
-     "performance_manager/policies/keep_alive_dse_policy.cc",
-+    "ssl/typed_navigation_upgrade_throttle.cc",
-   ]
- 
-   if (is_android) {
 diff --git a/chrome/browser/extensions/api/instance_id/instance_id_api.cc b/chrome/browser/extensions/api/instance_id/instance_id_api.cc
 index 37c3e417be..9f1c1526fd 100644
 --- a/chrome/browser/extensions/api/instance_id/instance_id_api.cc
@@ -3892,29 +3782,6 @@ index 4a8c1622df..21b36d31ac 100644
  }
 +
 +#undef OmniboxState
-diff --git a/chrome/browser/BUILD.gn b/chrome/browser/BUILD.gn
-index 2e58c3d49e..4fee61aafb 100644
---- a/chrome/browser/BUILD.gn
-+++ b/chrome/browser/BUILD.gn
-@@ -1391,6 +1391,7 @@ jumbo_static_library("browser") {
-     "performance_manager/chrome_browser_main_extra_parts_performance_manager.cc",
-     "performance_manager/policies/keep_alive_dse_policy.cc",
-     "ssl/typed_navigation_upgrade_throttle.cc",
-+    "page_load_metrics/page_load_metrics_initialize.cc",
-   ]
- 
-   deps = [
-@@ -3816,6 +3817,10 @@ jumbo_static_library("browser") {
-       "webauthn/ui_readiness_barrier.cc",
-       "webauthn/ui_readiness_barrier.h",
-     ]
-+    jumbo_excluded_sources += [
-+      # Conflict with //chrome/browser/memory:impl
-+      "memory/oom_memory_details.cc",
-+    ]
- 
-     sources += [
-       "web_applications/isolated_web_apps/window_management/isolated_web_apps_window_open_permission_service.cc",
 diff --git a/chrome/browser/memory/BUILD.gn b/chrome/browser/memory/BUILD.gn
 index 8668c71e02..ca7aafa142 100644
 --- a/chrome/browser/memory/BUILD.gn
@@ -3959,3 +3826,419 @@ index 2d7eb185bf..d0d8f6c208 100644
  }
 +
 +#undef GeneratePassword
+diff --git a/chrome/browser/web_applications/model/web_app_icon_types.cc b/chrome/browser/web_applications/model/web_app_icon_types.cc
+index 13ec4c7137..a8689fd46c 100644
+--- a/chrome/browser/web_applications/model/web_app_icon_types.cc
++++ b/chrome/browser/web_applications/model/web_app_icon_types.cc
+@@ -11,6 +11,8 @@
+ #include "base/strings/to_string.h"
+ #include "ui/gfx/skia_util.h"
+ 
++#define BitmapMapsEqual BitmapMapsEqual_web_app_icon_types
++
+ namespace web_app {
+ 
+ namespace {
+@@ -147,3 +149,5 @@ bool operator==(const IconSizes& icon_sizes1, const IconSizes& icon_sizes2) {
+ }
+ 
+ }  // namespace web_app
++
++#undef BitmapMapsEqual
+diff --git a/chrome/browser/extensions/api/tabs/tabs_event_router.cc b/chrome/browser/extensions/api/tabs/tabs_event_router.cc
+index d108bc281b..898089a418 100644
+--- a/chrome/browser/extensions/api/tabs/tabs_event_router.cc
++++ b/chrome/browser/extensions/api/tabs/tabs_event_router.cc
+@@ -574,7 +574,7 @@ void TabsEventRouter::OnHighlightedTabsChanged(
+ 
+ void TabsEventRouter::OnWebContentsReplaced(
+     TabListInterface& tab_list,
+-    tabs::TabInterface* tab,
++    ::tabs::TabInterface* tab,
+     content::WebContents* old_contents,
+     content::WebContents* new_contents) {
+   // Notify listeners that the next tabs closing or being added are due to
+diff --git a/chrome/browser/extensions/api/tabs/tabs_event_router.h b/chrome/browser/extensions/api/tabs/tabs_event_router.h
+index 79fbd0e45c..501c13a779 100644
+--- a/chrome/browser/extensions/api/tabs/tabs_event_router.h
++++ b/chrome/browser/extensions/api/tabs/tabs_event_router.h
+@@ -107,7 +107,7 @@ class TabsEventRouter : public favicon::FaviconDriverObserver,
+     void OnRecentlyAudibleStateChanged(bool was_recently_audible);
+ 
+     // Called when the pin state has changed for the given tab.
+-    void OnPinnedStateChanged(tabs::TabInterface* tab, bool new_pinned_state);
++    void OnPinnedStateChanged(::tabs::TabInterface* tab, bool new_pinned_state);
+ 
+     // Whether we are waiting to fire the 'complete' status change. This will
+     // occur the first time the WebContents stops loading after the
+@@ -192,22 +192,22 @@ class TabsEventRouter : public favicon::FaviconDriverObserver,
+ 
+   // TabListInterfaceObserver:
+   void OnTabAdded(TabListInterface& tab_list,
+-                  tabs::TabInterface* tab,
++                  ::tabs::TabInterface* tab,
+                   int index) override;
+   void OnActiveTabChanged(TabListInterface& tab_list,
+-                          tabs::TabInterface* tab) override;
++                          ::tabs::TabInterface* tab) override;
+   void OnTabRemoved(TabListInterface& tab_list,
+-                    tabs::TabInterface* tab,
++                    ::tabs::TabInterface* tab,
+                     TabRemovedReason removed_reason) override;
+   void OnTabMoved(TabListInterface& tab_list,
+-                  tabs::TabInterface* tab,
++                  ::tabs::TabInterface* tab,
+                   int from_index,
+                   int to_index) override;
+   void OnHighlightedTabsChanged(
+       TabListInterface& tab_list,
+-      const std::set<tabs::TabInterface*>& highlighted_tabs) override;
++      const std::set<::tabs::TabInterface*>& highlighted_tabs) override;
+   void OnWebContentsReplaced(TabListInterface& tab_list,
+-                             tabs::TabInterface* tab,
++                             ::tabs::TabInterface* tab,
+                              content::WebContents* old_contents,
+                              content::WebContents* new_contents) override;
+   void OnTabListDestroyed(TabListInterface& tab_list) override;
+diff --git a/chrome/browser/enterprise/data_protection/view_source_navigation_throttle.cc b/chrome/browser/enterprise/data_protection/view_source_navigation_throttle.cc
+index 4f9a391683..16529c7e92 100644
+--- a/chrome/browser/enterprise/data_protection/view_source_navigation_throttle.cc
++++ b/chrome/browser/enterprise/data_protection/view_source_navigation_throttle.cc
+@@ -34,6 +34,8 @@
+ #include "content/public/common/url_constants.h"
+ #include "url/gurl.h"
+ 
++#define IsEnterpriseLookupEnabled IsEnterpriseLookupEnabled_view_source_navigation_throttle
++
+ namespace enterprise_data_protection {
+ 
+ namespace {
+@@ -251,3 +253,5 @@ void ViewSourceNavigationThrottle::OnRealTimeLookupComplete(
+ }
+ 
+ }  // namespace enterprise_data_protection
++
++#undef IsEnterpriseLookupEnabled
+diff --git a/chrome/browser/metrics/first_web_contents_profiler.cc b/chrome/browser/metrics/first_web_contents_profiler.cc
+index eb64841649..5043793e07 100644
+--- a/chrome/browser/metrics/first_web_contents_profiler.cc
++++ b/chrome/browser/metrics/first_web_contents_profiler.cc
+@@ -119,7 +119,7 @@ void BeginFirstWebContentsProfiling() {
+   content::WebContents* visible_contents = nullptr;
+   ForEachCurrentBrowserWindowInterfaceOrderedByActivation(
+       [&](BrowserWindowInterface* browser) {
+-        if (features::kWebUIReloadButtonDeferBrowserViewShow.Get()) {
++        if (::features::kWebUIReloadButtonDeferBrowserViewShow.Get()) {
+           visible_contents = GetWebContentsToProfile(browser);
+         } else {
+           visible_contents =
+diff --git a/chrome/browser/new_tab_page/modules/v2/calendar/outlook_calendar_page_handler.cc b/chrome/browser/new_tab_page/modules/v2/calendar/outlook_calendar_page_handler.cc
+index 9e4bcd5e60..ae73a87089 100644
+--- a/chrome/browser/new_tab_page/modules/v2/calendar/outlook_calendar_page_handler.cc
++++ b/chrome/browser/new_tab_page/modules/v2/calendar/outlook_calendar_page_handler.cc
+@@ -28,6 +28,10 @@
+ #include "services/network/public/cpp/resource_request.h"
+ #include "services/network/public/mojom/url_response_head.mojom.h"
+ 
++#define traffic_annotation traffic_annotation_outlook_calendar_page_handler
++#define RecordResponseValueCount RecordResponseValueCount_OutlookCalendarPageHandler
++#define RecordThrottlingWaitTime RecordThrottlingWaitTime_OutlookCalendarPageHandler
++
+ namespace {
+ 
+ const char kBaseAttachmentResourceUrl[] =
+@@ -544,3 +548,7 @@ void OutlookCalendarPageHandler::OnHeaderReceived(
+   }
+   std::move(callback).Run(std::move(events));
+ }
++
++#undef traffic_annotation
++#undef RecordResponseValueCount
++#undef RecordThrottlingWaitTime
+diff --git a/chrome/browser/performance_manager/execution_context_priority/side_panel_loading_voter.cc b/chrome/browser/performance_manager/execution_context_priority/side_panel_loading_voter.cc
+index e3dd7b59f2..280aa538c2 100644
+--- a/chrome/browser/performance_manager/execution_context_priority/side_panel_loading_voter.cc
++++ b/chrome/browser/performance_manager/execution_context_priority/side_panel_loading_voter.cc
+@@ -38,7 +38,7 @@ void SidePanelLoadingVoter::MarkAsSidePanel(const PageNode* page_node) {
+   // This is possible for a preloaded Side Panel. The navigation has already
+   // committed and the page is visible.
+   if (!page_node->GetMainFrameUrl().is_empty()) {
+-    if (!features::IsImmersiveReadAnythingEnabled()) {
++    if (!::features::IsImmersiveReadAnythingEnabled()) {
+       CHECK(page_node->IsVisible());
+       return;
+     }
+diff --git a/chrome/browser/performance_manager/metrics/metrics_provider_desktop.cc b/chrome/browser/performance_manager/metrics/metrics_provider_desktop.cc
+index a325a3ba8c..c8431d8ed1 100644
+--- a/chrome/browser/performance_manager/metrics/metrics_provider_desktop.cc
++++ b/chrome/browser/performance_manager/metrics/metrics_provider_desktop.cc
+@@ -369,7 +369,7 @@ void MetricsProviderDesktop::Initialize() {
+ }
+ 
+ void MetricsProviderDesktop::ProvideCurrentSessionData(
+-    metrics::ChromeUserMetricsExtension* uma_proto) {
++    ::metrics::ChromeUserMetricsExtension* uma_proto) {
+   // It's valid for this to be called when `initialized_` is false if the finch
+   // features controlling battery saver and memory saver are disabled.
+   // TODO(crbug.com/40233418): CHECK(initialized_) when the features are enabled
+diff --git a/chrome/browser/policy/webhid_device_policy_handler.cc b/chrome/browser/policy/webhid_device_policy_handler.cc
+index 7ae774bd9a..a36d5768a5 100644
+--- a/chrome/browser/policy/webhid_device_policy_handler.cc
++++ b/chrome/browser/policy/webhid_device_policy_handler.cc
+@@ -21,6 +21,8 @@
+ #include "components/strings/grit/components_strings.h"
+ #include "url/gurl.h"
+ 
++#define kUrlsKey kUrlsKey_webhid_device_policy_handler
++
+ namespace policy {
+ 
+ namespace {
+@@ -93,3 +95,5 @@ void WebHidDevicePolicyHandler::ApplyPolicySettings(const PolicyMap& policies,
+ }
+ 
+ }  // namespace policy
++
++#undef kUrlsKey
+diff --git a/chrome/browser/profiles/delete_profile_helper.cc b/chrome/browser/profiles/delete_profile_helper.cc
+index 0a824ff70b..60b3d3903a 100644
+--- a/chrome/browser/profiles/delete_profile_helper.cc
++++ b/chrome/browser/profiles/delete_profile_helper.cc
+@@ -48,6 +48,8 @@
+ #include "content/public/browser/browser_task_traits.h"
+ #include "content/public/browser/browser_thread.h"
+ 
++#define IsRegisteredAsEphemeral IsRegisteredAsEphemeral_delete_profile_helper
++
+ namespace {
+ 
+ // Called after a deleted profile was checked and cleaned up.
+@@ -468,3 +470,5 @@ void DeleteProfileHelper::OnNewActiveProfileInitialized(
+                         std::move(profile_keep_alive));
+   std::move(callback).Run(loaded_profile);
+ }
++
++#undef IsRegisteredAsEphemeral
+diff --git a/chrome/browser/ssl/BUILD.gn b/chrome/browser/ssl/BUILD.gn
+index 0db3166d95..2f24036b52 100644
+--- a/chrome/browser/ssl/BUILD.gn
++++ b/chrome/browser/ssl/BUILD.gn
+@@ -113,6 +113,9 @@ jumbo_source_set("impl") {
+     "stateful_ssl_host_state_delegate_factory.cc",
+     "typed_navigation_upgrade_throttle.cc",
+   ]
++  jumbo_excluded_sources = [
++    "typed_navigation_upgrade_throttle.cc",
++  ]
+ 
+   public_deps = [
+     ":ssl",
+diff --git a/chrome/browser/task_manager/providers/web_contents/prerender_new_tab_task.cc b/chrome/browser/task_manager/providers/web_contents/prerender_new_tab_task.cc
+index 7050fe33e3..38093bf9a0 100644
+--- a/chrome/browser/task_manager/providers/web_contents/prerender_new_tab_task.cc
++++ b/chrome/browser/task_manager/providers/web_contents/prerender_new_tab_task.cc
+@@ -10,6 +10,8 @@
+ #include "ui/base/resource/resource_bundle.h"
+ #include "ui/gfx/image/image_skia.h"
+ 
++#define PrefixPrerenderTitle PrefixPrerenderTitle_prerender_new_tab_task
++
+ namespace task_manager {
+ 
+ namespace {
+@@ -54,3 +56,5 @@ void PrerenderNewTabTask::UpdateFavicon() {
+ }
+ 
+ }  // namespace task_manager
++
++#undef PrefixPrerenderTitle
+diff --git a/chrome/browser/ui/views/frame/multi_contents_view.cc b/chrome/browser/ui/views/frame/multi_contents_view.cc
+index 02ab883852..b3f918f962 100644
+--- a/chrome/browser/ui/views/frame/multi_contents_view.cc
++++ b/chrome/browser/ui/views/frame/multi_contents_view.cc
+@@ -54,6 +54,8 @@
+ #include "ui/views/layout/proposed_layout.h"
+ #include "ui/views/view_class_properties.h"
+ 
++#define kSnapDistance kSnapDistance_multi_contents_view
++
+ namespace {
+ constexpr int kSnapDistance = 15;
+ }
+@@ -803,3 +805,5 @@ void MultiContentsView::SetShouldShowTopSeparator(bool should_show) {
+ 
+ BEGIN_METADATA(MultiContentsView)
+ END_METADATA
++
++#undef kSnapDistance
+diff --git a/media/cast/encoding/media_video_encoder_wrapper.cc b/media/cast/encoding/media_video_encoder_wrapper.cc
+index faea9829b5..11bde2d00e 100644
+--- a/media/cast/encoding/media_video_encoder_wrapper.cc
++++ b/media/cast/encoding/media_video_encoder_wrapper.cc
+@@ -41,6 +41,8 @@
+ #include "media/video/av1_video_encoder.h"
+ #endif  // BUILDFLAG(ENABLE_LIBAOM)
+ 
++#define kMaxH264Quantizer kMaxH264Quantizer_media_video_encoder_wrapper
++
+ namespace media::cast {
+ namespace {
+ 
+@@ -559,3 +561,5 @@ void MediaVideoEncoderWrapper::OnOptionsUpdated(EncoderStatus status) {
+ }
+ 
+ }  //  namespace media::cast
++
++#undef kMaxH264Quantizer
+diff --git a/chrome/browser/actor/tab_observation_controller.cc b/chrome/browser/actor/tab_observation_controller.cc
+index 9ec63739f7..a84318dc11 100644
+--- a/chrome/browser/actor/tab_observation_controller.cc
++++ b/chrome/browser/actor/tab_observation_controller.cc
+@@ -32,6 +32,8 @@
+ #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
+ #endif  // !BUILDFLAG(SKIP_ANDROID_UNMIGRATED_ACTOR_FILES)
+ 
++#define ToTabObservationResult ToTabObservationResult_tab_observation_controller
++
+ namespace actor {
+ 
+ namespace {
+@@ -428,3 +430,5 @@ ActorTask* TabObservationController::GetActorTask() const {
+ }
+ 
+ }  // namespace actor
++
++#undef ToTabObservationResult
+diff --git a/chrome/browser/glic/suggestions/glic_cue_target.cc b/chrome/browser/glic/suggestions/glic_cue_target.cc
+index 322b6d8002..2934cc6075 100644
+--- a/chrome/browser/glic/suggestions/glic_cue_target.cc
++++ b/chrome/browser/glic/suggestions/glic_cue_target.cc
+@@ -47,7 +47,7 @@ void GlicCueTarget::Register(BrowserWindowInterface& browser_window_interface) {
+       browser_window_interface.GetFeatures().contextual_cueing_controller();
+   CHECK(contextual_cueing_controller);
+   contextual_cueing_controller->RegisterCueTarget(
+-      contextual_cueing::CueTargetType::kGlic,
++      ::contextual_cueing::CueTargetType::kGlic,
+       std::make_unique<GlicCueTarget>(
+           *glic_keyed_service,
+           OptimizationGuideKeyedServiceFactory::GetForProfile(
+@@ -72,24 +72,24 @@ bool GlicCueTarget::IsEligible() const {
+              *browser_window_interface_);
+ }
+ 
+-void GlicCueTarget::OnClick(contextual_cueing::CueActionData data) {
++void GlicCueTarget::OnClick(::contextual_cueing::CueActionData data) {
+   InvokeGlic(std::move(data), base::FeatureList::IsEnabled(
+                                   features::kGlicContextualCueingV2AutoSubmit));
+ }
+ 
+-void GlicCueTarget::OnEditPrompt(contextual_cueing::CueActionData data) {
++void GlicCueTarget::OnEditPrompt(::contextual_cueing::CueActionData data) {
+   InvokeGlic(std::move(data), /*should_autosubmit=*/false);
+ }
+ 
+-void GlicCueTarget::InvokeGlic(contextual_cueing::CueActionData data,
++void GlicCueTarget::InvokeGlic(::contextual_cueing::CueActionData data,
+                                bool should_autosubmit) {
+ #if BUILDFLAG(IS_ANDROID)
+   NOTIMPLEMENTED() << "Glic contextual cue not yet implemented for Android.";
+ #else
+-  if (!std::holds_alternative<contextual_cueing::GlicCueActionData>(data)) {
++  if (!std::holds_alternative<::contextual_cueing::GlicCueActionData>(data)) {
+     return;
+   }
+-  auto& glic_data = std::get<contextual_cueing::GlicCueActionData>(data);
++  auto& glic_data = std::get<::contextual_cueing::GlicCueActionData>(data);
+   GlicInvokeOptions options(
+       Target(browser_window_interface_->GetActiveTabInterface(),
+              NewConversation()),
+@@ -132,9 +132,9 @@ ui::ImageModel GlicCueTarget::GetOmniboxChipIcon() const {
+       ui::kColorSysOnSurface, 18);
+ }
+ 
+-contextual_cueing::CueActionData GlicCueTarget::CueActionDataFromResponse(
++::contextual_cueing::CueActionData GlicCueTarget::CueActionDataFromResponse(
+     const optimization_guide::proto::ContextualCueingResponse& response) const {
+-  contextual_cueing::GlicCueActionData data;
++  ::contextual_cueing::GlicCueActionData data;
+   if (!response.has_gemini_in_chrome_surface()) {
+     CUEING_LOG("Missing Gemini surface data.");
+     return data;
+diff --git a/chrome/browser/glic/suggestions/glic_cue_target.h b/chrome/browser/glic/suggestions/glic_cue_target.h
+index 28224aadbb..563c3c4a9e 100644
+--- a/chrome/browser/glic/suggestions/glic_cue_target.h
++++ b/chrome/browser/glic/suggestions/glic_cue_target.h
+@@ -16,7 +16,7 @@ namespace glic {
+ 
+ class GlicKeyedService;
+ 
+-class GlicCueTarget : public contextual_cueing::CueTarget {
++class GlicCueTarget : public ::contextual_cueing::CueTarget {
+  public:
+   static void Register(BrowserWindowInterface& browser_window_interface);
+ 
+@@ -26,20 +26,20 @@ class GlicCueTarget : public contextual_cueing::CueTarget {
+       BrowserWindowInterface& browser_window_interface);
+   ~GlicCueTarget() override;
+ 
+-  // contextual_cueing::CueTarget:
++  // ::contextual_cueing::CueTarget:
+   bool IsEligible() const override;
+-  void OnClick(contextual_cueing::CueActionData data) override;
+-  void OnEditPrompt(contextual_cueing::CueActionData data) override;
++  void OnClick(::contextual_cueing::CueActionData data) override;
++  void OnEditPrompt(::contextual_cueing::CueActionData data) override;
+   ui::ImageModel GetAnchoredMessageIcon() const override;
+   ui::ImageModel GetOmniboxChipIcon() const override;
+-  contextual_cueing::CueActionData CueActionDataFromResponse(
++  ::contextual_cueing::CueActionData CueActionDataFromResponse(
+       const optimization_guide::proto::ContextualCueingResponse& response)
+       const override;
+   optimization_guide::proto::ContextualCueingSurface GetSurface()
+       const override;
+ 
+  private:
+-  void InvokeGlic(contextual_cueing::CueActionData data,
++  void InvokeGlic(::contextual_cueing::CueActionData data,
+                   bool should_autosubmit);
+ 
+   tabs::TabHandle GetActiveTabHandle();
+diff --git a/chrome/browser/BUILD.gn b/chrome/browser/BUILD.gn
+index e4ed7f1468..c6db8b574d 100644
+--- a/chrome/browser/BUILD.gn
++++ b/chrome/browser/BUILD.gn
+@@ -4657,6 +4657,11 @@ jumbo_static_library("browser") {
+       "policy/value_provider/extension_policies_value_provider.cc",
+       "policy/value_provider/extension_policies_value_provider.h",
+     ]
++    jumbo_excluded_sources += [
++      # Conflict with //chrome/browser/policy:impl
++      "policy/value_provider/extension_install_policies_value_provider.cc",
++      "policy/value_provider/extension_policies_value_provider.cc",
++    ]
+     public_deps += [
+       "//chrome/browser/apps/platform_apps",
+       "//chrome/browser/apps/platform_apps/api",
+diff --git a/chrome/browser/policy/BUILD.gn b/chrome/browser/policy/BUILD.gn
+index 10bb528ee3..8edeef64d8 100644
+--- a/chrome/browser/policy/BUILD.gn
++++ b/chrome/browser/policy/BUILD.gn
+@@ -905,6 +905,7 @@ jumbo_source_set("impl") {
+     "value_provider/value_provider_util.cc",
+     "webusb_allow_devices_for_urls_policy_handler.cc",
+   ]
++  jumbo_excluded_sources = []
+ 
+   public_deps = [
+     ":policy",
+@@ -1181,5 +1182,10 @@ jumbo_source_set("impl") {
+       "value_provider/extension_install_policies_value_provider.cc",
+       "value_provider/extension_policies_value_provider.cc",
+     ]
++    jumbo_excluded_sources += [
++      # Conflict with //chrome/browser:browser
++      "value_provider/extension_install_policies_value_provider.cc",
++      "value_provider/extension_policies_value_provider.cc",
++    ]
+   }
+ }
