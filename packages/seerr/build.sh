@@ -103,6 +103,35 @@ termux_step_make_install() {
 	cp -r node_modules "${TERMUX_PREFIX}/lib/seerr/"
 	cp package.json "${TERMUX_PREFIX}/lib/seerr/"
 
+	# Remove Next.js build cache (only used at compilation time, not runtime)
+	rm -rf "${TERMUX_PREFIX}/lib/seerr/.next/cache"
+
+	# Remove useless dev/doc files from node_modules to reduce package size
+	find "${TERMUX_PREFIX}/lib/seerr/node_modules" -type f \( \
+		-name "*.md" -o \
+		-name "*.map" -o \
+		-name "*.ts" -o \
+		-name "*.tsx" -o \
+		-name "*.yml" -o \
+		-name "*.yaml" -o \
+		-name "LICENSE" -o \
+		-name "license" -o \
+		-name "Makefile" \
+	\) -delete
+
+	find "${TERMUX_PREFIX}/lib/seerr/node_modules" -type d \( \
+		-name "test" -o \
+		-name "tests" -o \
+		-name "__tests__" -o \
+		-name "docs" -o \
+		-name "doc" -o \
+		-name "example" -o \
+		-name "examples" -o \
+		-name ".github" -o \
+		-name ".circleci" -o \
+		-name ".husky" \
+	\) -exec rm -rf {} +
+
 	# Strip native Node.js binaries, ignoring non-ELF formats like macOS Mach-O
 	find "${TERMUX_PREFIX}/lib/seerr/node_modules" -name "*.node" -exec sh -c '${STRIP} --strip-unneeded "$1" 2>/dev/null || true' _ {} \;
 
