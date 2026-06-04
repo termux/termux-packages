@@ -3,10 +3,11 @@ TERMUX_PKG_DESCRIPTION="Music player daemon"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.24.12"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/MusicPlayerDaemon/MPD/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=331549c8d90e822b82e1da68913bbfa0ce6bdbba525f17eafdc642cc87c4986e
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libchromaprint, dbus, ffmpeg, game-music-emu, libao, libbz2, libc++, libcurl, libexpat, libflac, libicu, libid3tag, libmad, libmp3lame, libmodplug, libmpdclient, libnfs, libogg, libopenmpt, libopus, libsamplerate, libsndfile, libsoxr, libsqlite, libvorbis, libwavpack, libmpg123, openal-soft, pcre2, pulseaudio, yajl, zlib, fmt"
+TERMUX_PKG_DEPENDS="dbus, ffmpeg, fmt, game-music-emu, libao, libbz2, libc++, libchromaprint, libcurl, libexpat, libflac, libicu, libid3tag, libmad, libmodplug, libmp3lame, libmpdclient, libmpg123, libnfs, libogg, libopenmpt, libopus, libsamplerate, libsndfile, libsoxr, libvorbis, libwavpack, openal-soft, pcre2, pulseaudio, sqlite, yajl, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libiconv"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dalsa=disabled
@@ -34,14 +35,16 @@ termux_step_pre_configure() {
 
 	CXXFLAGS+=" -DTERMUX -UANDROID -std=c++20"
 	LDFLAGS+=" -lOpenSLES"
-	rm -f $TERMUX_PREFIX/etc/mpd.conf
+	rm -f "$TERMUX_PREFIX/etc/mpd.conf"
 }
 
 termux_step_post_make_install() {
-	install -Dm600 $TERMUX_PKG_SRCDIR/doc/mpdconf.example $TERMUX_PREFIX/etc/mpd.conf
+	install -Dm600 "$TERMUX_PKG_SRCDIR/doc/mpdconf.example" "$TERMUX_PREFIX/etc/mpd.conf"
 }
 
 termux_step_create_debscripts() {
-	echo "#!$TERMUX_PREFIX/bin/sh" >postinst
-	echo 'mkdir -p $HOME/.mpd/playlists' >>postinst
+	{
+		echo "#!$TERMUX_PREFIX/bin/sh"
+		echo 'mkdir -p $HOME/.mpd/playlists'
+	} >postinst
 }
