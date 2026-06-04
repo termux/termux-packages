@@ -3,11 +3,11 @@ TERMUX_PKG_DESCRIPTION="Centralized version control system characterized by its 
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.14.5"
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://downloads.apache.org/subversion/subversion-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SRCURL="https://downloads.apache.org/subversion/subversion-${TERMUX_PKG_VERSION}.tar.bz2"
 TERMUX_PKG_SHA256=e78a29e7766b8b7b354497d08f71a55641abc53675ce1875584781aae35644a1
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="apr, apr-util, serf, libexpat, libsqlite, liblz4, utf8proc, zlib"
+TERMUX_PKG_DEPENDS="apr, apr-util, serf, libexpat, liblz4, sqlite, utf8proc, zlib"
 TERMUX_PKG_BREAKS="subversion-dev"
 TERMUX_PKG_REPLACES="subversion-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -22,7 +22,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	make -j $TERMUX_PKG_MAKE_PROCESSES install-swig-pl-lib
+	make -j "$TERMUX_PKG_MAKE_PROCESSES" install-swig-pl-lib
 
 	pushd subversion/bindings/swig/perl/native
 	# it's probably not needed to pass all flags to both perl and make
@@ -34,14 +34,14 @@ termux_step_post_make_install() {
 		perl Makefile.PL PREFIX="$TERMUX_PREFIX"
 	popd
 
-	make -j $TERMUX_PKG_MAKE_PROCESSES PREFIX="$TERMUX_PREFIX" \
+	make -j "$TERMUX_PKG_MAKE_PROCESSES" PREFIX="$TERMUX_PREFIX" \
 		PERL_MM_USE_DEFAULT=1 INSTALLDIRS=site CC="$CC" LD="$CC" \
 		OPTIMIZE="$CFLAGS" CFLAGS="$CFLAGS" CCFLAGS="$CFLAGS" \
 		LDFLAGS="$LDFLAGS -lperl" LDDLFLAGS="-shared $CFLAGS $LDFLAGS -lperl" \
 		INSTALLSITEMAN3DIR="$TERMUX_PREFIX/share/man/man3" \
 		install-swig-pl
 
-	local perl_version=$(. $TERMUX_SCRIPTDIR/packages/perl/build.sh; echo $TERMUX_PKG_VERSION)
+	local perl_version=$(. "$TERMUX_SCRIPTDIR/packages/perl/build.sh"; echo "$TERMUX_PKG_VERSION")
 	local host_perl_version=$(perl -e 'printf "%vd\n", $^V;')
 	cd "$TERMUX_PREFIX/lib"
 	rm "x86_64-linux-gnu/perl/$host_perl_version/perllocal.pod"
