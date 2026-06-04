@@ -4,9 +4,10 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 _MAJOR_VERSION=3.11
 TERMUX_PKG_VERSION=7.3.22
-TERMUX_PKG_SRCURL=https://downloads.python.org/pypy/pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION-src.tar.bz2
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL="https://downloads.python.org/pypy/pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION-src.tar.bz2"
 TERMUX_PKG_SHA256=9f885a47a232b957f9b5cc4307264af229570ddea62a9c175351afa3a6321820
-TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, zlib"
+TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, ncurses, ncurses-ui-libs, openssl, sqlite, zlib"
 TERMUX_PKG_BUILD_DEPENDS="aosp-libs, coreutils, clang, make, pkg-config, python2, tk, xorgproto"
 TERMUX_PKG_RECOMMENDS="clang, make, pkg-config"
 TERMUX_PKG_SUGGESTS="pypy3-tkinter"
@@ -14,7 +15,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
 termux_step_post_get_source() {
-	local sqlite_version=$(. $TERMUX_SCRIPTDIR/packages/libsqlite/build.sh; echo $TERMUX_PKG_VERSION)
+	local sqlite_version=$(. "$TERMUX_SCRIPTDIR/packages/sqlite/build.sh"; echo "$TERMUX_PKG_VERSION")
 	local sqlite_version_X=$(cut -d"." -f1 <<< "$sqlite_version")
 	local sqlite_version_Y=$(cut -d"." -f2 <<< "$sqlite_version")
 	local sqlite_version_Z=$(cut -d"." -f3 <<< "$sqlite_version")
