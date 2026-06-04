@@ -4,14 +4,12 @@ TERMUX_PKG_LICENSE="GPL-2.0, BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="COPYING, LICENCE.miniupnpd"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.3.3
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=git+https://git.code.sf.net/p/minidlna/git
-TERMUX_PKG_GIT_BRANCH=v${TERMUX_PKG_VERSION//./_}
-TERMUX_PKG_DEPENDS="ffmpeg, libexif, libflac, libiconv, libid3tag, libjpeg-turbo, libogg, libsqlite, libvorbis"
+TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION//./_}"
+TERMUX_PKG_DEPENDS="ffmpeg, libexif, libflac, libiconv, libid3tag, libjpeg-turbo, libogg, libvorbis, sqlite"
 TERMUX_PKG_BUILD_IN_SRC=true
-
 TERMUX_PKG_CONFFILES="etc/minidlna.conf"
-
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-static
 --with-log-path=$TERMUX_PREFIX/var/log
@@ -23,7 +21,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	install -Dm600 -t $TERMUX_PREFIX/etc minidlna.conf
+	install -Dm600 -t "$TERMUX_PREFIX/etc" minidlna.conf
 }
 
 termux_step_create_debscripts() {
