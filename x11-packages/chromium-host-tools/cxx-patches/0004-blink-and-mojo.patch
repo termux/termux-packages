@@ -12,6 +12,7 @@ Subject: [PATCH 4/8] blink and mojo
  .../cpp/bindings/lib/multiplex_router.cc      |  6 +--
  mojo/public/cpp/bindings/remote_set.h         |  1 +
  .../cpp_templates/interface_definition.tmpl   |  8 ++--
+ .../generators/cpp_templates/module.cc.tmpl   |  1 +
  .../associated_interface_provider.cc          |  3 +-
  .../custom_handlers/protocol_handler_utils.cc |  4 +-
  .../web_coalesced_input_event_mojom_traits.cc |  6 +--
@@ -32,7 +33,7 @@ Subject: [PATCH 4/8] blink and mojo
  .../scripts/templates/origin_trials.cc.tmpl   | 11 +++--
  .../core/css/css_image_generator_value.cc     |  1 +
  .../css/cssom/computed_style_property_map.cc  |  4 +-
- .../core/css/parser/css_variable_parser.cc    |  2 +-
+ .../core/css/parser/css_variable_parser.cc    |  3 +-
  .../blink/renderer/core/css/rule_set.cc       |  1 +
  .../renderer/core/css/selector_checker.cc     |  6 +--
  .../core/css/style_environment_variables.cc   |  1 +
@@ -55,6 +56,7 @@ Subject: [PATCH 4/8] blink and mojo
  .../core/html/html_iframe_element_sandbox.cc  |  5 +-
  .../renderer/core/html/html_slot_element.cc   |  1 +
  .../media/media_video_visibility_tracker.cc   |  4 +-
+ .../renderer/core/html/menu_safe_triangle.cc  |  3 +-
  .../core/html/parser/atomic_html_token.h      |  6 +--
  .../renderer/core/layout/fragment_builder.cc  |  5 +-
  .../layout/svg/svg_text_layout_algorithm.cc   |  9 ++--
@@ -93,6 +95,7 @@ Subject: [PATCH 4/8] blink and mojo
  .../mediastream/user_media_processor.cc       |  3 +-
  .../blink/renderer/modules/ml/ml_context.cc   |  7 ++-
  .../modules/ml/webnn/ml_graph_builder.cc      |  5 +-
+ .../blink/renderer/modules/nfc/ndef_record.cc |  3 +-
  ...mock_peer_connection_dependency_factory.cc |  1 +
  .../mock_peer_connection_impl.cc              |  5 +-
  .../peerconnection/peer_connection_tracker.cc |  1 +
@@ -136,7 +139,7 @@ Subject: [PATCH 4/8] blink and mojo
  .../network/network_state_notifier.cc         |  1 +
  .../platform/peerconnection/rtc_stats.cc      |  1 +
  .../rtc_video_decoder_adapter.cc              |  3 +-
- .../peerconnection/rtc_video_encoder.cc       | 12 ++---
+ .../peerconnection/rtc_video_encoder.cc       | 11 ++---
  .../rtc_video_encoder_factory.cc              |  9 ++--
  .../video_encoder_state_observer_impl.cc      |  3 +-
  .../peerconnection/webrtc_audio_sink.cc       |  3 +-
@@ -147,13 +150,13 @@ Subject: [PATCH 4/8] blink and mojo
  .../convert_to_webrtc_video_frame_buffer.cc   |  5 +-
  .../webrtc/webrtc_video_frame_adapter.cc      |  6 +--
  .../platform/wtf/text/text_codec_utf16.cc     |  5 +-
- 143 files changed, 379 insertions(+), 338 deletions(-)
+ 146 files changed, 384 insertions(+), 340 deletions(-)
 
 diff --git a/mojo/golden/generated/c++/interface.test-mojom.cc.golden b/mojo/golden/generated/c++/interface.test-mojom.cc.golden
-index 0a063b0066..e044e2f524 100644
+index e9efdaa1ce..bcd63f894b 100644
 --- a/mojo/golden/generated/c++/interface.test-mojom.cc.golden
 +++ b/mojo/golden/generated/c++/interface.test-mojom.cc.golden
-@@ -22,6 +22,7 @@
+@@ -20,6 +20,7 @@
  #include "base/task/thread_pool/thread_pool_instance.h"
  #include "base/trace_event/trace_event.h"
  #include "base/trace_event/typed_macros.h"
@@ -161,7 +164,7 @@ index 0a063b0066..e044e2f524 100644
  #include "mojo/public/cpp/bindings/lib/default_construct_tag_internal.h"
  #include "mojo/public/cpp/bindings/lib/generated_code_util.h"
  #include "mojo/public/cpp/bindings/lib/message_internal.h"
-@@ -145,7 +146,7 @@ void IFaceProxy::Method(
+@@ -143,7 +144,7 @@ void IFaceProxy::Method(
    const size_t estimated_payload_size =
      0;
    mojo::Message message(
@@ -170,7 +173,7 @@ index 0a063b0066..e044e2f524 100644
    mojo::internal::MessageFragment<
        ::golden::internal::IFace_Method_Params_Data> params(
            message);
-@@ -262,7 +263,7 @@ void IFace_Method_ProxyToResponder::Run(
+@@ -260,7 +261,7 @@ void IFace_Method_ProxyToResponder::Run(
    const size_t estimated_payload_size =
      0;
    mojo::Message message(
@@ -180,10 +183,10 @@ index 0a063b0066..e044e2f524 100644
        ::golden::internal::IFace_Method_ResponseParams_Data> params(
            message);
 diff --git a/mojo/golden/generated/c++/results.test-mojom.cc.golden b/mojo/golden/generated/c++/results.test-mojom.cc.golden
-index 8e471dcbd0..bd10cf152a 100644
+index 8eb1ea656f..161e77547d 100644
 --- a/mojo/golden/generated/c++/results.test-mojom.cc.golden
 +++ b/mojo/golden/generated/c++/results.test-mojom.cc.golden
-@@ -22,6 +22,7 @@
+@@ -20,6 +20,7 @@
  #include "base/task/thread_pool/thread_pool_instance.h"
  #include "base/trace_event/trace_event.h"
  #include "base/trace_event/typed_macros.h"
@@ -191,7 +194,7 @@ index 8e471dcbd0..bd10cf152a 100644
  #include "mojo/public/cpp/bindings/lib/default_construct_tag_internal.h"
  #include "mojo/public/cpp/bindings/lib/generated_code_util.h"
  #include "mojo/public/cpp/bindings/lib/message_internal.h"
-@@ -412,7 +413,7 @@ void ResultInterfaceProxy::Method(
+@@ -410,7 +411,7 @@ void ResultInterfaceProxy::Method(
    const size_t estimated_payload_size =
      0;
    mojo::Message message(
@@ -200,7 +203,7 @@ index 8e471dcbd0..bd10cf152a 100644
    mojo::internal::MessageFragment<
        ::golden::internal::ResultInterface_Method_Params_Data> params(
            message);
-@@ -462,7 +463,7 @@ base::expected<
+@@ -460,7 +461,7 @@ base::expected<
    const size_t estimated_payload_size =
      0;
    mojo::Message message(
@@ -209,7 +212,7 @@ index 8e471dcbd0..bd10cf152a 100644
    mojo::internal::MessageFragment<
        ::golden::internal::ResultInterface_SyncMethod_Params_Data> params(
            message);
-@@ -520,7 +521,7 @@ void ResultInterfaceProxy::SyncMethod(
+@@ -518,7 +519,7 @@ void ResultInterfaceProxy::SyncMethod(
    const size_t estimated_payload_size =
      0;
    mojo::Message message(
@@ -218,7 +221,7 @@ index 8e471dcbd0..bd10cf152a 100644
    mojo::internal::MessageFragment<
        ::golden::internal::ResultInterface_SyncMethod_Params_Data> params(
            message);
-@@ -650,7 +651,7 @@ void ResultInterface_Method_ProxyToResponder::Run(
+@@ -648,7 +649,7 @@ void ResultInterface_Method_ProxyToResponder::Run(
    const size_t estimated_payload_size =
      0;
    mojo::Message message(
@@ -227,7 +230,7 @@ index 8e471dcbd0..bd10cf152a 100644
    mojo::internal::MessageFragment<
        ::golden::internal::ResultInterface_Method_ResponseParams_Data> params(
            message);
-@@ -800,7 +801,7 @@ void ResultInterface_SyncMethod_ProxyToResponder::Run(
+@@ -798,7 +799,7 @@ void ResultInterface_SyncMethod_ProxyToResponder::Run(
    const size_t estimated_payload_size =
      0;
    mojo::Message message(
@@ -237,10 +240,10 @@ index 8e471dcbd0..bd10cf152a 100644
        ::golden::internal::ResultInterface_SyncMethod_ResponseParams_Data> params(
            message);
 diff --git a/mojo/golden/generated/c++/typemap.test-mojom.cc.golden b/mojo/golden/generated/c++/typemap.test-mojom.cc.golden
-index 4ab22004ad..8365260862 100644
+index 4fa9b009a5..dbaba7f6d4 100644
 --- a/mojo/golden/generated/c++/typemap.test-mojom.cc.golden
 +++ b/mojo/golden/generated/c++/typemap.test-mojom.cc.golden
-@@ -22,6 +22,7 @@
+@@ -20,6 +20,7 @@
  #include "base/task/thread_pool/thread_pool_instance.h"
  #include "base/trace_event/trace_event.h"
  #include "base/trace_event/typed_macros.h"
@@ -248,7 +251,7 @@ index 4ab22004ad..8365260862 100644
  #include "mojo/public/cpp/bindings/lib/default_construct_tag_internal.h"
  #include "mojo/public/cpp/bindings/lib/generated_code_util.h"
  #include "mojo/public/cpp/bindings/lib/message_internal.h"
-@@ -197,7 +198,7 @@ void IFaceWithTypemapProxy::Echo(
+@@ -195,7 +196,7 @@ void IFaceWithTypemapProxy::Echo(
    const size_t estimated_payload_size =
      0;
    mojo::Message message(
@@ -257,7 +260,7 @@ index 4ab22004ad..8365260862 100644
    mojo::internal::MessageFragment<
        ::golden::internal::IFaceWithTypemap_Echo_Params_Data> params(
            message);
-@@ -329,7 +330,7 @@ void IFaceWithTypemap_Echo_ProxyToResponder::Run(
+@@ -327,7 +328,7 @@ void IFaceWithTypemap_Echo_ProxyToResponder::Run(
    const size_t estimated_payload_size =
      0;
    mojo::Message message(
@@ -394,10 +397,10 @@ index 85174a0176..4398196cb9 100644
  {%-     if method.response_parameters != None %}
        &internal::{{class_name}}_{{method.name}}_ResponseParams_Data::Validate}},
 diff --git a/mojo/public/tools/bindings/generators/cpp_templates/module.cc.tmpl b/mojo/public/tools/bindings/generators/cpp_templates/module.cc.tmpl
-index 8e1854256b..6c8746347d 100644
+index 45082a3937..82aab2bb02 100644
 --- a/mojo/public/tools/bindings/generators/cpp_templates/module.cc.tmpl
 +++ b/mojo/public/tools/bindings/generators/cpp_templates/module.cc.tmpl
-@@ -28,6 +28,7 @@
+@@ -31,6 +31,7 @@
  #include "base/task/thread_pool/thread_pool_instance.h"
  #include "base/trace_event/trace_event.h"
  #include "base/trace_event/typed_macros.h"
@@ -538,7 +541,7 @@ index fae1ccc295..e30062f423 100644
    return InternalPlainTextKAnonKeyForAdNameReporting(
        group.owner, group.name, group.bidding_url.value_or(GURL()),
 diff --git a/third_party/blink/common/loader/throttling_url_loader.cc b/third_party/blink/common/loader/throttling_url_loader.cc
-index c00d392c37..6d3b45899c 100644
+index e72cf39fb1..a12d09bc6d 100644
 --- a/third_party/blink/common/loader/throttling_url_loader.cc
 +++ b/third_party/blink/common/loader/throttling_url_loader.cc
 @@ -4,10 +4,10 @@
@@ -904,10 +907,18 @@ index e8a4273f4d..65459a4714 100644
    }
  
 diff --git a/third_party/blink/renderer/core/css/parser/css_variable_parser.cc b/third_party/blink/renderer/core/css/parser/css_variable_parser.cc
-index 3b23a6ad90..f44b82fa73 100644
+index 3b23a6ad90..630b56bea8 100644
 --- a/third_party/blink/renderer/core/css/parser/css_variable_parser.cc
 +++ b/third_party/blink/renderer/core/css/parser/css_variable_parser.cc
-@@ -837,7 +837,7 @@ StringView CSSVariableParser::StripTrailingWhitespaceAndComments(
+@@ -8,6 +8,7 @@
+ #include <optional>
+ 
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "third_party/blink/renderer/core/css/css_attr_type.h"
+ #include "third_party/blink/renderer/core/css/css_syntax_component.h"
+ #include "third_party/blink/renderer/core/css/css_syntax_definition.h"
+@@ -837,7 +838,7 @@ StringView CSSVariableParser::StripTrailingWhitespaceAndComments(
    // (i.e. not CSSOM, where we just get a string), we know we can't
    // have unfinished comments, so consider piping that knowledge all
    // the way through here.
@@ -917,7 +928,7 @@ index 3b23a6ad90..f44b82fa73 100644
      // SAFETY: empty strings short-circuited in &&-expression means that
      // the last character is valid.
 diff --git a/third_party/blink/renderer/core/css/rule_set.cc b/third_party/blink/renderer/core/css/rule_set.cc
-index 8e16190f79..3cc799d17f 100644
+index 8d24eaf2e1..23449cf441 100644
 --- a/third_party/blink/renderer/core/css/rule_set.cc
 +++ b/third_party/blink/renderer/core/css/rule_set.cc
 @@ -35,6 +35,7 @@
@@ -929,7 +940,7 @@ index 8e16190f79..3cc799d17f 100644
  #include "third_party/blink/public/common/features.h"
  #include "third_party/blink/renderer/core/css/css_font_selector.h"
 diff --git a/third_party/blink/renderer/core/css/selector_checker.cc b/third_party/blink/renderer/core/css/selector_checker.cc
-index a56679924f..16c9ac45e8 100644
+index 11c1020c3f..e1e1945daf 100644
 --- a/third_party/blink/renderer/core/css/selector_checker.cc
 +++ b/third_party/blink/renderer/core/css/selector_checker.cc
 @@ -29,8 +29,6 @@
@@ -941,7 +952,7 @@ index a56679924f..16c9ac45e8 100644
  #include "base/auto_reset.h"
  #include "base/compiler_specific.h"
  #include "third_party/blink/public/mojom/input/focus_type.mojom-blink.h"
-@@ -3359,8 +3357,8 @@ bool SelectorChecker::CheckPseudoElement(const SelectorCheckingContext& context,
+@@ -3354,8 +3352,8 @@ bool SelectorChecker::CheckPseudoElement(const SelectorCheckingContext& context,
        // contained in the pseudo-element's classes (pseudo_ident_list).
        return std::ranges::all_of(base::span(selector.IdentList()).subspan(1ul),
                                   [&](const AtomicString& class_from_selector) {
@@ -965,7 +976,7 @@ index 0012bb75f8..981ad7924b 100644
  #include "third_party/blink/renderer/platform/runtime_enabled_features.h"
  namespace blink {
 diff --git a/third_party/blink/renderer/core/dom/focusgroup_flags.h b/third_party/blink/renderer/core/dom/focusgroup_flags.h
-index 8540e862c0..df0209ad0e 100644
+index 9521a96baa..6148a15f6e 100644
 --- a/third_party/blink/renderer/core/dom/focusgroup_flags.h
 +++ b/third_party/blink/renderer/core/dom/focusgroup_flags.h
 @@ -6,8 +6,8 @@
@@ -1052,7 +1063,7 @@ index 5c3082018e..ffb17fec08 100644
        std::ranges::find(internal_observers_, associated_observer));
  
 diff --git a/third_party/blink/renderer/core/editing/ime/edit_context.cc b/third_party/blink/renderer/core/editing/ime/edit_context.cc
-index 1b8e05aa3c..fc85ebead0 100644
+index 6033c0b5e2..821fd33218 100644
 --- a/third_party/blink/renderer/core/editing/ime/edit_context.cc
 +++ b/third_party/blink/renderer/core/editing/ime/edit_context.cc
 @@ -7,6 +7,7 @@
@@ -1063,7 +1074,7 @@ index 1b8e05aa3c..fc85ebead0 100644
  #include "base/trace_event/trace_event.h"
  #include "third_party/blink/public/platform/web_string.h"
  #include "third_party/blink/public/web/web_local_frame_client.h"
-@@ -823,8 +824,8 @@ void EditContext::SetSelection(int start,
+@@ -824,8 +825,8 @@ void EditContext::SetSelection(int start,
  }
  
  void EditContext::AttachElement(HTMLElement* element_to_attach) {
@@ -1098,7 +1109,7 @@ index b5ec02ffdf..3a76eb5cd8 100644
  
  bool IsPointerEventType(const AtomicString& event_type) {
 diff --git a/third_party/blink/renderer/core/execution_context/security_context_init.cc b/third_party/blink/renderer/core/execution_context/security_context_init.cc
-index 949fa87f5c..a86be33c27 100644
+index 794bd9fe9d..0cfcdde743 100644
 --- a/third_party/blink/renderer/core/execution_context/security_context_init.cc
 +++ b/third_party/blink/renderer/core/execution_context/security_context_init.cc
 @@ -4,7 +4,6 @@
@@ -1108,8 +1119,8 @@ index 949fa87f5c..a86be33c27 100644
 -#include <algorithm>
  #include <optional>
  
- #include "base/metrics/histogram_macros.h"
-@@ -237,8 +236,8 @@ void SecurityContextInit::ApplyPermissionsPolicy(
+ #include "services/network/public/cpp/permissions_policy/fenced_frame_permissions_policies.h"
+@@ -252,8 +251,8 @@ void SecurityContextInit::ApplyPermissionsPolicy(
  
          // Warn if a disallowed permissions policy is attempted to be enabled.
          for (const auto& policy : container_policy) {
@@ -1145,7 +1156,7 @@ index c77667f391..d0e491c23a 100644
          language_histogram_name,
          is_xml_lang ? AcceptLanguageAndXmlHtmlLangUsage::
 diff --git a/third_party/blink/renderer/core/frame/csp/content_security_policy.cc b/third_party/blink/renderer/core/frame/csp/content_security_policy.cc
-index 0ddb753a6f..f7cacc4d80 100644
+index 33399df97b..c9c44190c1 100644
 --- a/third_party/blink/renderer/core/frame/csp/content_security_policy.cc
 +++ b/third_party/blink/renderer/core/frame/csp/content_security_policy.cc
 @@ -31,6 +31,7 @@
@@ -1193,7 +1204,7 @@ index 6e5af5ec6b..7104c57be1 100644
                ::network::mojom::blink::IntegrityPolicy::Source::kInline));
  }
 diff --git a/third_party/blink/renderer/core/frame/local_dom_window.cc b/third_party/blink/renderer/core/frame/local_dom_window.cc
-index 51f03729c2..1a27327b61 100644
+index f442c8d8e3..3a60f76d4c 100644
 --- a/third_party/blink/renderer/core/frame/local_dom_window.cc
 +++ b/third_party/blink/renderer/core/frame/local_dom_window.cc
 @@ -31,6 +31,7 @@
@@ -1227,7 +1238,7 @@ index 1f1b53f28a..a90ebeeed0 100644
      }
    }
 diff --git a/third_party/blink/renderer/core/html/forms/html_button_element.cc b/third_party/blink/renderer/core/html/forms/html_button_element.cc
-index ba5a442ddc..4feba74e60 100644
+index 243c838126..134af2094a 100644
 --- a/third_party/blink/renderer/core/html/forms/html_button_element.cc
 +++ b/third_party/blink/renderer/core/html/forms/html_button_element.cc
 @@ -25,8 +25,6 @@
@@ -1249,7 +1260,7 @@ index ba5a442ddc..4feba74e60 100644
  
  const AtomicString& HTMLButtonElement::FormControlTypeAsString() const {
 diff --git a/third_party/blink/renderer/core/html/forms/html_button_element.h b/third_party/blink/renderer/core/html/forms/html_button_element.h
-index 038652d402..bad110497d 100644
+index 36fafadb2e..e289f5c877 100644
 --- a/third_party/blink/renderer/core/html/forms/html_button_element.h
 +++ b/third_party/blink/renderer/core/html/forms/html_button_element.h
 @@ -24,8 +24,6 @@
@@ -1261,7 +1272,7 @@ index 038652d402..bad110497d 100644
  #include "third_party/blink/renderer/bindings/core/v8/script_iterator.h"
  #include "third_party/blink/renderer/core/dom/events/simulated_click_options.h"
  #include "third_party/blink/renderer/core/html/forms/html_form_control_element.h"
-@@ -65,9 +63,9 @@ class CORE_EXPORT HTMLButtonElement final : public HTMLFormControlElement {
+@@ -69,9 +67,9 @@ class CORE_EXPORT HTMLButtonElement final : public HTMLFormControlElement {
    // These values are a subset of the `FormControlType` enum. They have the same
    // binary representation so that FormControlType() reduces to a type cast.
    enum Type : std::underlying_type_t<mojom::blink::FormControlType> {
@@ -1275,7 +1286,7 @@ index 038652d402..bad110497d 100644
  
    mojom::blink::FormControlType FormControlType() const override;
 diff --git a/third_party/blink/renderer/core/html/forms/html_form_element.cc b/third_party/blink/renderer/core/html/forms/html_form_element.cc
-index 4598e3aea8..496905eba5 100644
+index 537e709ba2..7359af7933 100644
 --- a/third_party/blink/renderer/core/html/forms/html_form_element.cc
 +++ b/third_party/blink/renderer/core/html/forms/html_form_element.cc
 @@ -25,7 +25,6 @@
@@ -1286,7 +1297,7 @@ index 4598e3aea8..496905eba5 100644
  #include <limits>
  
  #include "base/auto_reset.h"
-@@ -1162,7 +1161,7 @@ void HTMLFormElement::CollectListedElements(
+@@ -1271,7 +1270,7 @@ void HTMLFormElement::CollectListedElements(
          if (elements_for_autofill) {
            elements_for_autofill->push_back(listed_element);
          }
@@ -1378,7 +1389,7 @@ index e377bf0b12..92556474e7 100644
  
    virtual bool IsInteractiveContent() const;
 diff --git a/third_party/blink/renderer/core/html/html_capability_element_base.cc b/third_party/blink/renderer/core/html/html_capability_element_base.cc
-index 022147762d..e41fc1c40f 100644
+index 739bed3b7f..b1e96641df 100644
 --- a/third_party/blink/renderer/core/html/html_capability_element_base.cc
 +++ b/third_party/blink/renderer/core/html/html_capability_element_base.cc
 @@ -9,6 +9,7 @@
@@ -1389,7 +1400,7 @@ index 022147762d..e41fc1c40f 100644
  #include "base/functional/bind.h"
  #include "base/memory/scoped_refptr.h"
  #include "base/strings/string_split.h"
-@@ -1511,7 +1512,7 @@ bool HTMLCapabilityElementBase::IsStyleValid() {
+@@ -1420,7 +1421,7 @@ bool HTMLCapabilityElementBase::IsStyleValid() {
      return false;
    }
  
@@ -1422,7 +1433,7 @@ index 993bef215b..cb2d6a78ef 100644
    }
    return token == kAllowSameSiteNoneCookiesSandboxToken &&
 diff --git a/third_party/blink/renderer/core/html/html_slot_element.cc b/third_party/blink/renderer/core/html/html_slot_element.cc
-index deb9ad3e28..889b246d69 100644
+index 0a3aab5b50..1e97d75a6b 100644
 --- a/third_party/blink/renderer/core/html/html_slot_element.cc
 +++ b/third_party/blink/renderer/core/html/html_slot_element.cc
 @@ -31,6 +31,7 @@
@@ -1434,7 +1445,7 @@ index deb9ad3e28..889b246d69 100644
  #include "third_party/blink/renderer/core/css/style_change_reason.h"
  #include "third_party/blink/renderer/core/css/style_engine.h"
 diff --git a/third_party/blink/renderer/core/html/media/media_video_visibility_tracker.cc b/third_party/blink/renderer/core/html/media/media_video_visibility_tracker.cc
-index ba5d99ee22..92b8a97756 100644
+index 2a6b98c3d9..65dca9c3cd 100644
 --- a/third_party/blink/renderer/core/html/media/media_video_visibility_tracker.cc
 +++ b/third_party/blink/renderer/core/html/media/media_video_visibility_tracker.cc
 @@ -4,8 +4,6 @@
@@ -1446,7 +1457,7 @@ index ba5d99ee22..92b8a97756 100644
  #include "base/metrics/histogram_macros.h"
  #include "third_party/blink/renderer/core/dom/document.h"
  #include "third_party/blink/renderer/core/dom/shadow_root.h"
-@@ -394,7 +392,7 @@ void MediaVideoVisibilityTracker::ElementDidMoveToNewDocument() {
+@@ -421,7 +419,7 @@ void MediaVideoVisibilityTracker::ElementDidMoveToNewDocument() {
  
  void MediaVideoVisibilityTracker::Invoke(ExecutionContext* context,
                                           Event* event) {
@@ -1455,8 +1466,29 @@ index ba5d99ee22..92b8a97756 100644
  
    // Video is not loaded yet.
    if (VideoElement().getReadyState() < HTMLMediaElement::kHaveMetadata) {
+diff --git a/third_party/blink/renderer/core/html/menu_safe_triangle.cc b/third_party/blink/renderer/core/html/menu_safe_triangle.cc
+index 61eff1339d..d649de2b7b 100644
+--- a/third_party/blink/renderer/core/html/menu_safe_triangle.cc
++++ b/third_party/blink/renderer/core/html/menu_safe_triangle.cc
+@@ -7,6 +7,7 @@
+ #include <algorithm>
+ #include <array>
+ 
++#include "base/containers/contains.h"
+ #include "third_party/blink/renderer/core/dom/document.h"
+ #include "third_party/blink/renderer/core/dom/flat_tree_traversal.h"
+ #include "third_party/blink/renderer/core/execution_context/execution_context.h"
+@@ -33,7 +34,7 @@ constexpr base::TimeDelta kSafeTriangleDuration = base::Milliseconds(1000);
+ 
+ bool IsInclusiveFlatTreeAncestorOf(Node* possible_ancestor,
+                                    Node* possible_descendant) {
+-  return std::ranges::contains(
++  return base::Contains(
+       FlatTreeTraversal::InclusiveAncestorsOf(*possible_descendant),
+       *possible_ancestor);
+ }
 diff --git a/third_party/blink/renderer/core/html/parser/atomic_html_token.h b/third_party/blink/renderer/core/html/parser/atomic_html_token.h
-index 313fdf44c4..e11d507eca 100644
+index 6a0c76b11d..a8602d5113 100644
 --- a/third_party/blink/renderer/core/html/parser/atomic_html_token.h
 +++ b/third_party/blink/renderer/core/html/parser/atomic_html_token.h
 @@ -26,11 +26,11 @@
@@ -1472,7 +1504,7 @@ index 313fdf44c4..e11d507eca 100644
  #include "base/notreached.h"
  #include "third_party/blink/renderer/core/core_export.h"
  #include "third_party/blink/renderer/core/dom/attribute.h"
-@@ -368,8 +368,8 @@ void AtomicHTMLToken::InitializeAttributes(
+@@ -367,8 +367,8 @@ void AtomicHTMLToken::InitializeAttributes(
          continue;
        }
      } else {
@@ -1484,7 +1516,7 @@ index 313fdf44c4..e11d507eca 100644
          continue;
        }
 diff --git a/third_party/blink/renderer/core/layout/fragment_builder.cc b/third_party/blink/renderer/core/layout/fragment_builder.cc
-index 52be88bc56..f80e24e823 100644
+index cec7e8450c..67896c40bd 100644
 --- a/third_party/blink/renderer/core/layout/fragment_builder.cc
 +++ b/third_party/blink/renderer/core/layout/fragment_builder.cc
 @@ -6,6 +6,7 @@
@@ -1495,7 +1527,7 @@ index 52be88bc56..f80e24e823 100644
  #include "base/numerics/safe_conversions.h"
  #include "third_party/blink/public/mojom/use_counter/metrics/web_feature.mojom-shared.h"
  #include "third_party/blink/renderer/core/animation/animation_trigger.h"
-@@ -828,8 +829,8 @@ void FragmentBuilder::PropagateOOFPositionedInfo(
+@@ -830,8 +831,8 @@ void FragmentBuilder::PropagateOOFPositionedInfo(
      static_position.offset += adjusted_offset;
  
      // |oof_positioned_candidates_| should not have duplicated entries.
@@ -1505,9 +1537,9 @@ index 52be88bc56..f80e24e823 100644
 +                           &LogicalOofPositionedNode::Node));
      oof_candidates_may_have_anchors_ |= node.MayContainAnchor();
      oof_positioned_candidates_.emplace_back(
-         node, descendant.break_token, static_position,
+         node, descendant.GetBreakToken(), static_position,
 diff --git a/third_party/blink/renderer/core/layout/svg/svg_text_layout_algorithm.cc b/third_party/blink/renderer/core/layout/svg/svg_text_layout_algorithm.cc
-index 3806b78a82..6f338c552f 100644
+index 6db35b1d6b..7625b53119 100644
 --- a/third_party/blink/renderer/core/layout/svg/svg_text_layout_algorithm.cc
 +++ b/third_party/blink/renderer/core/layout/svg/svg_text_layout_algorithm.cc
 @@ -385,9 +385,8 @@ void SvgTextLayoutAlgorithm::ResolveTextLength(
@@ -1522,7 +1554,7 @@ index 3806b78a82..6f338c552f 100644
          shift += character_delta;
        }
        info.text_length_resolved = true;
-@@ -899,8 +898,8 @@ bool SvgTextLayoutAlgorithm::IsFirstCharacterInTextPath(
+@@ -898,8 +897,8 @@ bool SvgTextLayoutAlgorithm::IsFirstCharacterInTextPath(
    // This implementation is O(N) where N is the number of <textPath>s in
    // a <text>. If this function is a performance bottleneck, we should add
    // |first_in_text_path| flag to SvgCharacterData.
@@ -1534,7 +1566,7 @@ index 3806b78a82..6f338c552f 100644
  
  }  // namespace blink
 diff --git a/third_party/blink/renderer/core/loader/document_loader.cc b/third_party/blink/renderer/core/loader/document_loader.cc
-index b98cf42ff3..3c6971ad42 100644
+index e0c3801d2e..66c4205772 100644
 --- a/third_party/blink/renderer/core/loader/document_loader.cc
 +++ b/third_party/blink/renderer/core/loader/document_loader.cc
 @@ -29,7 +29,6 @@
@@ -1545,7 +1577,7 @@ index b98cf42ff3..3c6971ad42 100644
  #include <memory>
  #include <optional>
  #include <utility>
-@@ -3471,7 +3470,7 @@ void DocumentLoader::RecordAcceptLanguageAndContentLanguageMetric() {
+@@ -3468,7 +3467,7 @@ void DocumentLoader::RecordAcceptLanguageAndContentLanguageMetric() {
              kContentLanguageMatchesPrimaryAcceptLanguage);
    }
  
@@ -1555,7 +1587,7 @@ index b98cf42ff3..3c6971ad42 100644
                                    AcceptLanguageAndContentLanguageUsage::
                                        kContentLanguageMatchesAnyAcceptLanguage);
 diff --git a/third_party/blink/renderer/core/loader/mixed_content_checker.cc b/third_party/blink/renderer/core/loader/mixed_content_checker.cc
-index 90b04bebaf..2ad30628c1 100644
+index 8bc524b89b..af2b1fa25c 100644
 --- a/third_party/blink/renderer/core/loader/mixed_content_checker.cc
 +++ b/third_party/blink/renderer/core/loader/mixed_content_checker.cc
 @@ -28,9 +28,9 @@
@@ -1581,7 +1613,7 @@ index 90b04bebaf..2ad30628c1 100644
          source->GetDocument(),
          WebFeature::kMixedContentInSecureFrameThatDoesNotRestrictMixedContent);
 diff --git a/third_party/blink/renderer/core/loader/preload_helper.cc b/third_party/blink/renderer/core/loader/preload_helper.cc
-index 6242c18f27..14743bae8b 100644
+index 98e6cb0e33..bd3fe802d6 100644
 --- a/third_party/blink/renderer/core/loader/preload_helper.cc
 +++ b/third_party/blink/renderer/core/loader/preload_helper.cc
 @@ -4,12 +4,11 @@
@@ -1598,7 +1630,7 @@ index 6242c18f27..14743bae8b 100644
  #include "services/metrics/public/cpp/ukm_builders.h"
  #include "third_party/blink/public/common/features.h"
  #include "third_party/blink/public/mojom/fetch/fetch_api_request.mojom-blink.h"
-@@ -906,7 +905,7 @@ void PreloadHelper::LoadLinksFromHeader(
+@@ -934,7 +933,7 @@ void PreloadHelper::LoadLinksFromHeader(
        const OriginStatusOnSubresource origin_status =
            GetOriginStatus(from_same_origin, to_same_origin);
        ukm::builders::Blink_Preloading_ByLinkHeader(document->UkmSourceID())
@@ -1632,7 +1664,7 @@ index 2c50dd6a07..5843f036f1 100644
              mojom::blink::ConsoleMessageSource::kOther,
              mojom::blink::ConsoleMessageLevel::kWarning,
 diff --git a/third_party/blink/renderer/core/permissions_policy/permissions_policy_parser.cc b/third_party/blink/renderer/core/permissions_policy/permissions_policy_parser.cc
-index 163b900aa1..1d131e1a85 100644
+index 779fc4a8b4..1d7a7e4e7d 100644
 --- a/third_party/blink/renderer/core/permissions_policy/permissions_policy_parser.cc
 +++ b/third_party/blink/renderer/core/permissions_policy/permissions_policy_parser.cc
 @@ -8,6 +8,7 @@
@@ -1643,7 +1675,7 @@ index 163b900aa1..1d131e1a85 100644
  #include "base/feature_list.h"
  #include "base/metrics/histogram_macros.h"
  #include "net/http/structured_headers.h"
-@@ -774,8 +775,8 @@ PermissionsPolicyParser::ParsePermissionsPolicyForTest(
+@@ -773,8 +774,8 @@ PermissionsPolicyParser::ParsePermissionsPolicyForTest(
  
  bool IsFeatureDeclared(network::mojom::PermissionsPolicyFeature feature,
                         const network::ParsedPermissionsPolicy& policy) {
@@ -1655,7 +1687,7 @@ index 163b900aa1..1d131e1a85 100644
  
  bool RemoveFeatureIfPresent(network::mojom::PermissionsPolicyFeature feature,
 diff --git a/third_party/blink/renderer/core/scheduler/task_attribution_tracker_impl.h b/third_party/blink/renderer/core/scheduler/task_attribution_tracker_impl.h
-index eafadab085..f29869b75f 100644
+index db545b42b9..656325d1a6 100644
 --- a/third_party/blink/renderer/core/scheduler/task_attribution_tracker_impl.h
 +++ b/third_party/blink/renderer/core/scheduler/task_attribution_tracker_impl.h
 @@ -7,6 +7,7 @@
@@ -1690,7 +1722,7 @@ index 0da3497ae8..6afe158b50 100644
                out_error,
                StrCat({"Unrecognized \"relative_to\" value: ",
 diff --git a/third_party/blink/renderer/core/speculation_rules/document_speculation_rules.cc b/third_party/blink/renderer/core/speculation_rules/document_speculation_rules.cc
-index ce87f516f2..e9dee69ac3 100644
+index a73dd41f52..03e953158c 100644
 --- a/third_party/blink/renderer/core/speculation_rules/document_speculation_rules.cc
 +++ b/third_party/blink/renderer/core/speculation_rules/document_speculation_rules.cc
 @@ -6,6 +6,7 @@
@@ -1805,7 +1837,7 @@ index 61902e73be..55237a54f4 100644
  
  bool FilterOperations::UsesCurrentColor() const {
 diff --git a/third_party/blink/renderer/core/testing/mock_clipboard_host.cc b/third_party/blink/renderer/core/testing/mock_clipboard_host.cc
-index 7547eca627..3b26e9e24d 100644
+index 06e95be7be..33dacafca8 100644
 --- a/third_party/blink/renderer/core/testing/mock_clipboard_host.cc
 +++ b/third_party/blink/renderer/core/testing/mock_clipboard_host.cc
 @@ -4,8 +4,7 @@
@@ -1818,7 +1850,7 @@ index 7547eca627..3b26e9e24d 100644
  #include "base/numerics/byte_conversions.h"
  #include "build/build_config.h"
  #include "mojo/public/cpp/base/big_buffer.h"
-@@ -80,7 +79,7 @@ Vector<String> MockClipboardHost::ReadStandardFormatNames() {
+@@ -81,7 +80,7 @@ Vector<String> MockClipboardHost::ReadStandardFormatNames() {
    if (!png_.empty())
      types.push_back(ui::kMimeTypePng);
    for (auto& it : custom_data_) {
@@ -1826,9 +1858,9 @@ index 7547eca627..3b26e9e24d 100644
 +    CHECK(!base::Contains(types, it.key));
      types.push_back(it.key);
    }
-   return types;
+   for (const String& fmt : forced_formats_) {
 diff --git a/third_party/blink/renderer/core/timing/performance.cc b/third_party/blink/renderer/core/timing/performance.cc
-index acc773777d..a2b92e5b4b 100644
+index 136a5eec5b..71f7834282 100644
 --- a/third_party/blink/renderer/core/timing/performance.cc
 +++ b/third_party/blink/renderer/core/timing/performance.cc
 @@ -35,6 +35,7 @@
@@ -1840,7 +1872,7 @@ index acc773777d..a2b92e5b4b 100644
  #include "base/metrics/histogram_macros.h"
  #include "base/task/single_thread_task_runner.h"
 diff --git a/third_party/blink/renderer/core/view_transition/view_transition_style_tracker.cc b/third_party/blink/renderer/core/view_transition/view_transition_style_tracker.cc
-index c1812deaa5..dfca60c790 100644
+index 49523ad05a..989b62e545 100644
 --- a/third_party/blink/renderer/core/view_transition/view_transition_style_tracker.cc
 +++ b/third_party/blink/renderer/core/view_transition/view_transition_style_tracker.cc
 @@ -578,7 +578,7 @@ void ViewTransitionStyleTracker::AddTransitionElement(
@@ -1853,7 +1885,7 @@ index c1812deaa5..dfca60c790 100644
    // Otherwise, insert a new sequence id with this name. We'll use the sequence
    // to sort later.
 diff --git a/third_party/blink/renderer/core/xmlhttprequest/xml_http_request.cc b/third_party/blink/renderer/core/xmlhttprequest/xml_http_request.cc
-index f39de99225..3fcd014368 100644
+index b345c249ec..7dbd339431 100644
 --- a/third_party/blink/renderer/core/xmlhttprequest/xml_http_request.cc
 +++ b/third_party/blink/renderer/core/xmlhttprequest/xml_http_request.cc
 @@ -28,6 +28,7 @@
@@ -1874,7 +1906,7 @@ index f39de99225..3fcd014368 100644
                      StrCat({"Refused to get unsafe header \"", name, "\""}));
      return g_null_atom;
 diff --git a/third_party/blink/renderer/modules/accessibility/ax_node_object.cc b/third_party/blink/renderer/modules/accessibility/ax_node_object.cc
-index b2510bb26a..703b0dc465 100644
+index 7c282cdcf9..facd7e10dd 100644
 --- a/third_party/blink/renderer/modules/accessibility/ax_node_object.cc
 +++ b/third_party/blink/renderer/modules/accessibility/ax_node_object.cc
 @@ -37,6 +37,7 @@
@@ -1885,7 +1917,7 @@ index b2510bb26a..703b0dc465 100644
  #include "base/containers/fixed_flat_set.h"
  #include "base/metrics/histogram_functions.h"
  #include "base/numerics/safe_conversions.h"
-@@ -1174,7 +1175,7 @@ AXObjectInclusion AXNodeObject::ShouldIncludeBasedOnSemantics(
+@@ -1175,7 +1176,7 @@ AXObjectInclusion AXNodeObject::ShouldIncludeBasedOnSemantics(
            ax::mojom::blink::Role::kVideo,
        });
  
@@ -1895,7 +1927,7 @@ index b2510bb26a..703b0dc465 100644
    }
  
 diff --git a/third_party/blink/renderer/modules/accessibility/ax_object_cache_impl.cc b/third_party/blink/renderer/modules/accessibility/ax_object_cache_impl.cc
-index 1f6bcca34f..6547199051 100644
+index fc849d3127..d41e558940 100644
 --- a/third_party/blink/renderer/modules/accessibility/ax_object_cache_impl.cc
 +++ b/third_party/blink/renderer/modules/accessibility/ax_object_cache_impl.cc
 @@ -35,6 +35,7 @@
@@ -2250,7 +2282,7 @@ index 98e217a9b2..6e4c556c9d 100644
          return true;
        }
 diff --git a/third_party/blink/renderer/modules/mediastream/media_stream_constraints_util_audio.cc b/third_party/blink/renderer/modules/mediastream/media_stream_constraints_util_audio.cc
-index da15d83d7d..2754785af7 100644
+index 881f2cd0b3..5180f79e82 100644
 --- a/third_party/blink/renderer/modules/mediastream/media_stream_constraints_util_audio.cc
 +++ b/third_party/blink/renderer/modules/mediastream/media_stream_constraints_util_audio.cc
 @@ -10,6 +10,7 @@
@@ -2261,7 +2293,7 @@ index da15d83d7d..2754785af7 100644
  #include "base/strings/string_number_conversions.h"
  #include "build/build_config.h"
  #include "media/audio/audio_features.h"
-@@ -1005,14 +1006,14 @@ class ProcessingBasedContainer {
+@@ -1022,14 +1023,14 @@ class ProcessingBasedContainer {
      // If the device parameters indicate that system echo cancellation is
      // available, add support for it to `echo_cancellation_modes`.
      if (EchoCanceller::IsPlatformAecAvailable(device_parameters.effects())) {
@@ -2403,7 +2435,7 @@ index dabfc02766..47f884fe0b 100644
    }
  }
 diff --git a/third_party/blink/renderer/modules/ml/ml_context.cc b/third_party/blink/renderer/modules/ml/ml_context.cc
-index 48e91550f6..80eccf4f38 100644
+index 2267acf00c..ab149ab3f4 100644
 --- a/third_party/blink/renderer/modules/ml/ml_context.cc
 +++ b/third_party/blink/renderer/modules/ml/ml_context.cc
 @@ -4,10 +4,9 @@
@@ -2418,7 +2450,7 @@ index 48e91550f6..80eccf4f38 100644
  #include "base/types/expected.h"
  #include "base/types/expected_macros.h"
  #include "base/types/pass_key.h"
-@@ -1191,7 +1190,7 @@ ScriptPromise<MLTensor> MLContext::createTensor(
+@@ -1202,7 +1201,7 @@ ScriptPromise<MLTensor> MLContext::createTensor(
    //
    // This assertion protects against the usage flags changing without updating
    // this mapping.
@@ -2427,7 +2459,7 @@ index 48e91550f6..80eccf4f38 100644
    webnn::MLTensorUsage usage;
    if (descriptor->readable()) {
      usage.Put(webnn::MLTensorUsageFlags::kRead);
-@@ -1278,7 +1277,7 @@ ScriptPromise<MLTensor> MLContext::createExportableTensor(
+@@ -1289,7 +1288,7 @@ ScriptPromise<MLTensor> MLContext::createExportableTensor(
    //
    // This assertion protects against the usage flags changing without updating
    // this mapping.
@@ -2437,7 +2469,7 @@ index 48e91550f6..80eccf4f38 100644
    usage.Put(webnn::MLTensorUsageFlags::kWebGpuInterop);
    if (descriptor->readable()) {
 diff --git a/third_party/blink/renderer/modules/ml/webnn/ml_graph_builder.cc b/third_party/blink/renderer/modules/ml/webnn/ml_graph_builder.cc
-index b47015f0e7..e06a48994c 100644
+index 7a02f72fa0..49f64a7327 100644
 --- a/third_party/blink/renderer/modules/ml/webnn/ml_graph_builder.cc
 +++ b/third_party/blink/renderer/modules/ml/webnn/ml_graph_builder.cc
 @@ -7,6 +7,7 @@
@@ -2448,7 +2480,7 @@ index b47015f0e7..e06a48994c 100644
  #include "base/containers/enum_set.h"
  #include "base/containers/span.h"
  #include "base/metrics/histogram_macros.h"
-@@ -1563,8 +1564,8 @@ void FoldReshapableConstants(blink_mojom::GraphInfo& graph_info) {
+@@ -1561,8 +1562,8 @@ void FoldReshapableConstants(blink_mojom::GraphInfo& graph_info) {
                graph_info.operations,
                [&constant_operand_id](
                    const blink_mojom::OperationPtr& operation) {
@@ -2459,6 +2491,27 @@ index b47015f0e7..e06a48994c 100644
                }) > 1) {
          break;
        }
+diff --git a/third_party/blink/renderer/modules/nfc/ndef_record.cc b/third_party/blink/renderer/modules/nfc/ndef_record.cc
+index 6b84f070c9..128c2bd8af 100644
+--- a/third_party/blink/renderer/modules/nfc/ndef_record.cc
++++ b/third_party/blink/renderer/modules/nfc/ndef_record.cc
+@@ -7,6 +7,7 @@
+ #include <string_view>
+ 
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/notreached.h"
+ #include "services/device/public/mojom/nfc.mojom-blink.h"
+ #include "third_party/blink/renderer/bindings/core/v8/idl_types.h"
+@@ -120,7 +121,7 @@ bool IsValidExternalType(const String& input) {
+   for (wtf_size_t i = 0; i < type.length(); i++) {
+     // SAFETY: index checked against length in loop body.
+     if (!IsAsciiAlphanumeric(UNSAFE_BUFFERS(type[i])) &&
+-        !kOtherCharsForCustomType.contains(UNSAFE_BUFFERS(type[i]))) {
++        !base::Contains(kOtherCharsForCustomType, UNSAFE_BUFFERS(type[i]))) {
+       return false;
+     }
+   }
 diff --git a/third_party/blink/renderer/modules/peerconnection/mock_peer_connection_dependency_factory.cc b/third_party/blink/renderer/modules/peerconnection/mock_peer_connection_dependency_factory.cc
 index c3cd6cb079..2179397969 100644
 --- a/third_party/blink/renderer/modules/peerconnection/mock_peer_connection_dependency_factory.cc
@@ -2502,7 +2555,7 @@ index 99837475f7..bc5f504276 100644
                              "Mock: sender not found in senders");
    }
 diff --git a/third_party/blink/renderer/modules/peerconnection/peer_connection_tracker.cc b/third_party/blink/renderer/modules/peerconnection/peer_connection_tracker.cc
-index c9191f74f9..f510f9a92b 100644
+index 4a7c0f6595..eff8090282 100644
 --- a/third_party/blink/renderer/modules/peerconnection/peer_connection_tracker.cc
 +++ b/third_party/blink/renderer/modules/peerconnection/peer_connection_tracker.cc
 @@ -14,6 +14,7 @@
@@ -2514,7 +2567,7 @@ index c9191f74f9..f510f9a92b 100644
  #include "base/types/pass_key.h"
  #include "base/values.h"
 diff --git a/third_party/blink/renderer/modules/peerconnection/rtc_peer_connection_handler.cc b/third_party/blink/renderer/modules/peerconnection/rtc_peer_connection_handler.cc
-index 388c257295..ad7dceafe0 100644
+index 188095b08e..d6d4443ac8 100644
 --- a/third_party/blink/renderer/modules/peerconnection/rtc_peer_connection_handler.cc
 +++ b/third_party/blink/renderer/modules/peerconnection/rtc_peer_connection_handler.cc
 @@ -6,7 +6,6 @@
@@ -2533,7 +2586,7 @@ index 388c257295..ad7dceafe0 100644
  #include "base/location.h"
  #include "base/logging.h"
  #include "base/memory/scoped_refptr.h"
-@@ -2010,7 +2010,7 @@ void RTCPeerConnectionHandler::OnModifyTransceivers(
+@@ -2029,7 +2029,7 @@ void RTCPeerConnectionHandler::OnModifyTransceivers(
    // removed transceivers are reflected as "stopped" in JavaScript.
    Vector<uintptr_t> removed_transceivers;
    for (auto transceiver_id : previous_transceiver_ids_) {
@@ -2652,7 +2705,7 @@ index c863cd794d..5c467e4fa4 100644
    }
  
 diff --git a/third_party/blink/renderer/modules/webcodecs/video_encoder.cc b/third_party/blink/renderer/modules/webcodecs/video_encoder.cc
-index 0d745e1706..b845f94a76 100644
+index af5e8b23c2..52bc17ea0b 100644
 --- a/third_party/blink/renderer/modules/webcodecs/video_encoder.cc
 +++ b/third_party/blink/renderer/modules/webcodecs/video_encoder.cc
 @@ -7,6 +7,7 @@
@@ -2675,7 +2728,7 @@ index 0d745e1706..b845f94a76 100644
      }
  
 diff --git a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
-index e3f40494b3..4bd5484ffc 100644
+index 172759394d..1a6d964ba5 100644
 --- a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
 +++ b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
 @@ -31,6 +31,7 @@
@@ -2703,7 +2756,7 @@ index 4aae58a3c6..0f5332277c 100644
    switch (status) {
      case wgpu::RequestAdapterStatus::Success:
 diff --git a/third_party/blink/renderer/modules/webrtc/webrtc_audio_device_impl.cc b/third_party/blink/renderer/modules/webrtc/webrtc_audio_device_impl.cc
-index dfb5d18956..c82a4e0316 100644
+index 5935f96a9f..8220fde70c 100644
 --- a/third_party/blink/renderer/modules/webrtc/webrtc_audio_device_impl.cc
 +++ b/third_party/blink/renderer/modules/webrtc/webrtc_audio_device_impl.cc
 @@ -4,8 +4,7 @@
@@ -2716,7 +2769,7 @@ index dfb5d18956..c82a4e0316 100644
  #include "base/logging.h"
  #include "base/metrics/histogram_macros.h"
  #include "base/strings/stringprintf.h"
-@@ -386,7 +385,7 @@ void WebRtcAudioDeviceImpl::AddAudioCapturer(
+@@ -394,7 +393,7 @@ void WebRtcAudioDeviceImpl::AddAudioCapturer(
    DCHECK(!capturer->device().id.empty());
  
    base::AutoLock auto_lock(lock_);
@@ -2725,7 +2778,7 @@ index dfb5d18956..c82a4e0316 100644
    capturers_.push_back(capturer);
    capturer->SetOutputDeviceForAec(output_device_id_for_aec_.Utf8());
  }
-@@ -406,7 +405,7 @@ void WebRtcAudioDeviceImpl::AddPlayoutSink(
+@@ -414,7 +413,7 @@ void WebRtcAudioDeviceImpl::AddPlayoutSink(
    DVLOG(1) << "WebRtcAudioDeviceImpl::AddPlayoutSink()";
    DCHECK(sink);
    base::AutoLock auto_lock(lock_);
@@ -2735,7 +2788,7 @@ index dfb5d18956..c82a4e0316 100644
  }
  
 diff --git a/third_party/blink/renderer/modules/webrtc/webrtc_audio_renderer.cc b/third_party/blink/renderer/modules/webrtc/webrtc_audio_renderer.cc
-index 632689b40a..e8818d6f10 100644
+index 18417a8612..0b78f3125f 100644
 --- a/third_party/blink/renderer/modules/webrtc/webrtc_audio_renderer.cc
 +++ b/third_party/blink/renderer/modules/webrtc/webrtc_audio_renderer.cc
 @@ -8,6 +8,7 @@
@@ -2746,7 +2799,7 @@ index 632689b40a..e8818d6f10 100644
  #include "base/location.h"
  #include "base/logging.h"
  #include "base/metrics/histogram_macros.h"
-@@ -713,7 +714,7 @@ bool WebRtcAudioRenderer::AddPlayingState(webrtc::AudioSourceInterface* source,
+@@ -733,7 +734,7 @@ bool WebRtcAudioRenderer::AddPlayingState(webrtc::AudioSourceInterface* source,
    DCHECK(state->playing());
    // Look up or add the |source| to the map.
    PlayingStates& array = source_playing_states_[source];
@@ -2768,7 +2821,7 @@ index 2556a41a02..5b32724f89 100644
  #include "third_party/blink/renderer/modules/xr/xr_plane.h"
  #include "third_party/blink/renderer/modules/xr/xr_plane_set.h"
 diff --git a/third_party/blink/renderer/modules/xr/xr_render_state.cc b/third_party/blink/renderer/modules/xr/xr_render_state.cc
-index 4317c3616f..460010d731 100644
+index b8cb29f6f5..b2d44791f5 100644
 --- a/third_party/blink/renderer/modules/xr/xr_render_state.cc
 +++ b/third_party/blink/renderer/modules/xr/xr_render_state.cc
 @@ -10,6 +10,7 @@
@@ -2779,7 +2832,7 @@ index 4317c3616f..460010d731 100644
  #include "third_party/blink/renderer/bindings/modules/v8/v8_xr_render_state_init.h"
  #include "third_party/blink/renderer/modules/xr/xr_composition_layer.h"
  #include "third_party/blink/renderer/modules/xr/xr_frame_provider.h"
-@@ -183,7 +184,7 @@ void XRRenderState::UpdateLayersState(FrozenArray<XRLayer>* layers) {
+@@ -72,7 +73,7 @@ void XRRenderState::UpdateLayersState(FrozenArray<XRLayer>* layers) {
                                         const FrozenArray<XRLayer>& other_layers,
                                         bool needs_redraw) {
      std::ranges::for_each(source_layers, [&](auto& source_layer) {
@@ -2788,7 +2841,7 @@ index 4317c3616f..460010d731 100644
          source_layer->SetNeedsRedraw(needs_redraw);
        }
      });
-@@ -237,7 +238,7 @@ bool XRRenderState::HasLayer(XRLayer* layer) const {
+@@ -122,7 +123,7 @@ bool XRRenderState::HasLayer(XRLayer* layer) const {
      return true;
    }
    if (layers_) {
@@ -2798,7 +2851,7 @@ index 4317c3616f..460010d731 100644
    return false;
  }
 diff --git a/third_party/blink/renderer/modules/xr/xr_session.cc b/third_party/blink/renderer/modules/xr/xr_session.cc
-index 8f4add9f5f..c9f540f486 100644
+index a66eb4f083..7658888afe 100644
 --- a/third_party/blink/renderer/modules/xr/xr_session.cc
 +++ b/third_party/blink/renderer/modules/xr/xr_session.cc
 @@ -10,6 +10,7 @@
@@ -2875,7 +2928,7 @@ index 7259cb65c2..a9ab1028fc 100644
    auto lower_bound = free_chunks_.lower_bound(chunk.start_offset());
    DCHECK(free_chunks_.upper_bound(chunk.start_offset()) ==
 diff --git a/third_party/blink/renderer/platform/exported/file_path_conversion.cc b/third_party/blink/renderer/platform/exported/file_path_conversion.cc
-index e0065d7502..867411bce1 100644
+index dbfdb7a7a8..c8e6aa2133 100644
 --- a/third_party/blink/renderer/platform/exported/file_path_conversion.cc
 +++ b/third_party/blink/renderer/platform/exported/file_path_conversion.cc
 @@ -7,6 +7,7 @@
@@ -2896,7 +2949,7 @@ index e0065d7502..867411bce1 100644
  #if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
    StringUtf8Adaptor utf8(str);
 diff --git a/third_party/blink/renderer/platform/fonts/font_description.cc b/third_party/blink/renderer/platform/fonts/font_description.cc
-index 3b6a3a0c6c..49acecf861 100644
+index 9e5caaa89a..e6fdd77826 100644
 --- a/third_party/blink/renderer/platform/fonts/font_description.cc
 +++ b/third_party/blink/renderer/platform/fonts/font_description.cc
 @@ -32,6 +32,7 @@
@@ -2968,7 +3021,7 @@ index f75194fc7e..4e38ff8a6e 100644
  };
  
 diff --git a/third_party/blink/renderer/platform/fonts/script_run_iterator.cc b/third_party/blink/renderer/platform/fonts/script_run_iterator.cc
-index 511d5f9ca4..a3c0405c2a 100644
+index 0ab15284ad..9590867ced 100644
 --- a/third_party/blink/renderer/platform/fonts/script_run_iterator.cc
 +++ b/third_party/blink/renderer/platform/fonts/script_run_iterator.cc
 @@ -7,6 +7,7 @@
@@ -2978,8 +3031,8 @@ index 511d5f9ca4..a3c0405c2a 100644
 +#include "base/containers/contains.h"
  #include "base/logging.h"
  #include "base/notreached.h"
- #include "third_party/blink/renderer/platform/runtime_enabled_features.h"
-@@ -376,7 +377,7 @@ bool ScriptRunIterator::MergeSets() {
+ #include "third_party/blink/renderer/platform/text/character.h"
+@@ -375,7 +376,7 @@ bool ScriptRunIterator::MergeSets() {
  
    // Neither is common or inherited. If current is a singleton,
    // just see if it exists in the next set. This is the common case.
@@ -3059,7 +3112,7 @@ index 53fadafe5e..1bb8403609 100644
  
  // In the spec, https://fetch.spec.whatwg.org/#ref-for-concept-request-mode,
 diff --git a/third_party/blink/renderer/platform/loader/fetch/resource_fetcher.cc b/third_party/blink/renderer/platform/loader/fetch/resource_fetcher.cc
-index f7082144a3..90144907e6 100644
+index 6fb28940e1..d14cfb15e7 100644
 --- a/third_party/blink/renderer/platform/loader/fetch/resource_fetcher.cc
 +++ b/third_party/blink/renderer/platform/loader/fetch/resource_fetcher.cc
 @@ -35,6 +35,7 @@
@@ -3070,7 +3123,7 @@ index f7082144a3..90144907e6 100644
  #include "base/feature_list.h"
  #include "base/logging.h"
  #include "base/metrics/histogram_functions.h"
-@@ -3365,8 +3366,7 @@ bool ResourceFetcher::IsPotentiallyUnusedPreload(
+@@ -3397,8 +3398,7 @@ bool ResourceFetcher::IsPotentiallyUnusedPreload(
        break;
    }
  
@@ -3093,7 +3146,7 @@ index 33a5e46bc0..ed5a6c1e0c 100644
  #include "base/metrics/histogram.h"
  #include "base/numerics/safe_conversions.h"
 diff --git a/third_party/blink/renderer/platform/loader/fetch/resource_response.cc b/third_party/blink/renderer/platform/loader/fetch/resource_response.cc
-index 9ceba4edeb..0a95a2df86 100644
+index f3708e0c3d..37696562e8 100644
 --- a/third_party/blink/renderer/platform/loader/fetch/resource_response.cc
 +++ b/third_party/blink/renderer/platform/loader/fetch/resource_response.cc
 @@ -29,6 +29,7 @@
@@ -3200,7 +3253,7 @@ index 2071827a30..490c917cc1 100644
  }
  
 diff --git a/third_party/blink/renderer/platform/media/multi_buffer.cc b/third_party/blink/renderer/platform/media/multi_buffer.cc
-index a44fe6b962..d1218e74d5 100644
+index c5cf4b52a3..9101dedc44 100644
 --- a/third_party/blink/renderer/platform/media/multi_buffer.cc
 +++ b/third_party/blink/renderer/platform/media/multi_buffer.cc
 @@ -6,11 +6,13 @@
@@ -3227,7 +3280,7 @@ index a44fe6b962..d1218e74d5 100644
    }
  }
 diff --git a/third_party/blink/renderer/platform/media/new_session_cdm_result_promise.cc b/third_party/blink/renderer/platform/media/new_session_cdm_result_promise.cc
-index 753bb03dd9..bcf6a5909f 100644
+index c04a51b430..eb915083f6 100644
 --- a/third_party/blink/renderer/platform/media/new_session_cdm_result_promise.cc
 +++ b/third_party/blink/renderer/platform/media/new_session_cdm_result_promise.cc
 @@ -4,9 +4,9 @@
@@ -3251,7 +3304,7 @@ index 753bb03dd9..bcf6a5909f 100644
             "Cannot finish session initialization");
      return;
 diff --git a/third_party/blink/renderer/platform/media/resource_multi_buffer_data_provider.cc b/third_party/blink/renderer/platform/media/resource_multi_buffer_data_provider.cc
-index 61b798d0b3..0ed0cc8e68 100644
+index 5af370831c..ecd65c37de 100644
 --- a/third_party/blink/renderer/platform/media/resource_multi_buffer_data_provider.cc
 +++ b/third_party/blink/renderer/platform/media/resource_multi_buffer_data_provider.cc
 @@ -9,6 +9,7 @@
@@ -3262,7 +3315,7 @@ index 61b798d0b3..0ed0cc8e68 100644
  #include "base/location.h"
  #include "base/metrics/histogram_functions.h"
  #include "base/metrics/histogram_macros.h"
-@@ -283,7 +284,7 @@ void ResourceMultiBufferDataProvider::DidReceiveResponse(
+@@ -284,7 +285,7 @@ void ResourceMultiBufferDataProvider::DidReceiveResponse(
      // Check to see whether the server supports byte ranges.
      std::string accept_ranges =
          response.HttpHeaderField("Accept-Ranges").Utf8();
@@ -3342,7 +3395,7 @@ index 9e3d9fc109..9a1ba6268b 100644
    if (url.ProtocolIsInHttpFamily()) {
      return true;
 diff --git a/third_party/blink/renderer/platform/mhtml/mhtml_parser.cc b/third_party/blink/renderer/platform/mhtml/mhtml_parser.cc
-index b98c8e9237..8909f6024d 100644
+index 73b476ecba..ce4db49fa1 100644
 --- a/third_party/blink/renderer/platform/mhtml/mhtml_parser.cc
 +++ b/third_party/blink/renderer/platform/mhtml/mhtml_parser.cc
 @@ -34,6 +34,7 @@
@@ -3366,7 +3419,7 @@ index ed69c14c03..21acf29882 100644
  #include "base/task/single_thread_task_runner.h"
  #include "net/nqe/effective_connection_type.h"
 diff --git a/third_party/blink/renderer/platform/peerconnection/rtc_stats.cc b/third_party/blink/renderer/platform/peerconnection/rtc_stats.cc
-index 5cb09d6fa3..04a3b9a94b 100644
+index 11103f80cf..8fc91fa96c 100644
 --- a/third_party/blink/renderer/platform/peerconnection/rtc_stats.cc
 +++ b/third_party/blink/renderer/platform/peerconnection/rtc_stats.cc
 @@ -10,6 +10,7 @@
@@ -3399,7 +3452,7 @@ index b9e357a441..a76b894459 100644
      return;
    }
 diff --git a/third_party/blink/renderer/platform/peerconnection/rtc_video_encoder.cc b/third_party/blink/renderer/platform/peerconnection/rtc_video_encoder.cc
-index 20ecc910fa..6dbbb8c05a 100644
+index 4ee951f5e4..30f38efd43 100644
 --- a/third_party/blink/renderer/platform/peerconnection/rtc_video_encoder.cc
 +++ b/third_party/blink/renderer/platform/peerconnection/rtc_video_encoder.cc
 @@ -4,7 +4,6 @@
@@ -3410,15 +3463,7 @@ index 20ecc910fa..6dbbb8c05a 100644
  #include <array>
  #include <memory>
  #include <numeric>
-@@ -12,6 +11,7 @@
- 
- #include "base/command_line.h"
- #include "base/compiler_specific.h"
-+#include "base/containers/contains.h"
- #include "base/feature_list.h"
- #include "base/functional/callback_helpers.h"
- #include "base/location.h"
-@@ -1977,7 +1977,7 @@ bool RTCVideoEncoder::Impl::NeedConvertToMemoryFrame(
+@@ -1997,7 +1996,7 @@ bool RTCVideoEncoder::Impl::NeedConvertToMemoryFrame(
        STORAGE_OWNED_MEMORY,
        STORAGE_SHMEM,
    };
@@ -3427,7 +3472,7 @@ index 20ecc910fa..6dbbb8c05a 100644
      // We need to convert to I420 memory frame if mojo doesn't support it.
      return true;
    }
-@@ -2244,8 +2244,8 @@ void RTCVideoEncoder::Impl::EncodeOneFrame(FrameChunk frame_chunk) {
+@@ -2271,8 +2270,8 @@ void RTCVideoEncoder::Impl::EncodeOneFrame(FrameChunk frame_chunk) {
    frame->set_timestamp(timestamp);
  
    if (!failed_timestamp_match_) {
@@ -3438,7 +3483,7 @@ index 20ecc910fa..6dbbb8c05a 100644
      submitted_frames_.emplace_back(timestamp, frame_chunk.timestamp,
                                     frame_chunk.render_time_ms,
                                     GetActiveSpatialLayers());
-@@ -2376,8 +2376,8 @@ void RTCVideoEncoder::Impl::DoNativeEncodeWithNativeInput(
+@@ -2403,8 +2402,8 @@ void RTCVideoEncoder::Impl::DoNativeEncodeWithNativeInput(
    frame->set_timestamp(base::Microseconds(frame_chunk.timestamp_us));
  
    if (!failed_timestamp_match_) {
@@ -3528,7 +3573,7 @@ index 7274814e09..0b003298fe 100644
  }
  
 diff --git a/third_party/blink/renderer/platform/scheduler/worker/worker_thread_scheduler.cc b/third_party/blink/renderer/platform/scheduler/worker/worker_thread_scheduler.cc
-index ef9b3a1aa7..3598edfd24 100644
+index 249c4499ba..acfb95a5ca 100644
 --- a/third_party/blink/renderer/platform/scheduler/worker/worker_thread_scheduler.cc
 +++ b/third_party/blink/renderer/platform/scheduler/worker/worker_thread_scheduler.cc
 @@ -6,6 +6,7 @@
@@ -3552,7 +3597,7 @@ index ce1ebce3d0..347e501d79 100644
  #include "base/memory/ptr_util.h"
  #include "base/run_loop.h"
 diff --git a/third_party/blink/renderer/platform/weborigin/kurl.cc b/third_party/blink/renderer/platform/weborigin/kurl.cc
-index 1975c0804b..6773d4629c 100644
+index a7d1594264..318d1fea4c 100644
 --- a/third_party/blink/renderer/platform/weborigin/kurl.cc
 +++ b/third_party/blink/renderer/platform/weborigin/kurl.cc
 @@ -883,7 +883,7 @@ bool ProtocolIs(const StringView& url, const char* protocol) {
@@ -3653,10 +3698,10 @@ index 5f984f26b5..bfb77a6e60 100644
                frame->format())) ||
           frame->HasSharedImage();
 diff --git a/third_party/blink/renderer/platform/webrtc/webrtc_video_frame_adapter.cc b/third_party/blink/renderer/platform/webrtc/webrtc_video_frame_adapter.cc
-index a9689c7379..74d0dd4749 100644
+index cfca8cbdd5..65f5793d83 100644
 --- a/third_party/blink/renderer/platform/webrtc/webrtc_video_frame_adapter.cc
 +++ b/third_party/blink/renderer/platform/webrtc/webrtc_video_frame_adapter.cc
-@@ -563,8 +563,7 @@ webrtc::scoped_refptr<webrtc::VideoFrameBuffer>
+@@ -392,8 +392,7 @@ webrtc::scoped_refptr<webrtc::VideoFrameBuffer>
  WebRtcVideoFrameAdapter::ScaledBuffer::GetMappedFrameBuffer(
      std::span<webrtc::VideoFrameBuffer::Type> types) {
    auto frame_buffer = parent_->GetOrCreateFrameBufferForSize(size_);
@@ -3666,7 +3711,7 @@ index a9689c7379..74d0dd4749 100644
  }
  
  webrtc::scoped_refptr<webrtc::VideoFrameBuffer>
-@@ -621,8 +620,7 @@ webrtc::scoped_refptr<webrtc::VideoFrameBuffer>
+@@ -450,8 +449,7 @@ webrtc::scoped_refptr<webrtc::VideoFrameBuffer>
  WebRtcVideoFrameAdapter::GetMappedFrameBuffer(
      std::span<webrtc::VideoFrameBuffer::Type> types) {
    auto frame_buffer = GetOrCreateFrameBufferForSize(full_size_);
@@ -3677,7 +3722,7 @@ index a9689c7379..74d0dd4749 100644
  
  // Soft-applies cropping and scaling. The result is a ScaledBuffer.
 diff --git a/third_party/blink/renderer/platform/wtf/text/text_codec_utf16.cc b/third_party/blink/renderer/platform/wtf/text/text_codec_utf16.cc
-index 5021b7bbc6..364928b2a2 100644
+index ac6b030eeb..390287c0e6 100644
 --- a/third_party/blink/renderer/platform/wtf/text/text_codec_utf16.cc
 +++ b/third_party/blink/renderer/platform/wtf/text/text_codec_utf16.cc
 @@ -27,7 +27,6 @@
@@ -3706,57 +3751,51 @@ index 5021b7bbc6..364928b2a2 100644
      }
      decode(c);
    }
-diff --git a/third_party/blink/renderer/core/css/parser/css_variable_parser.cc b/third_party/blink/renderer/core/css/parser/css_variable_parser.cc
-index f44b82fa73..630b56bea8 100644
---- a/third_party/blink/renderer/core/css/parser/css_variable_parser.cc
-+++ b/third_party/blink/renderer/core/css/parser/css_variable_parser.cc
-@@ -8,6 +8,7 @@
- #include <optional>
+diff --git a/third_party/blink/renderer/core/layout/inline/fragment_item.cc b/third_party/blink/renderer/core/layout/inline/fragment_item.cc
+index 089ba6bfb4..3acb2f6152 100644
+--- a/third_party/blink/renderer/core/layout/inline/fragment_item.cc
++++ b/third_party/blink/renderer/core/layout/inline/fragment_item.cc
+@@ -5,6 +5,7 @@
+ #include "third_party/blink/renderer/core/layout/inline/fragment_item.h"
  
- #include "base/compiler_specific.h"
-+#include "base/containers/contains.h"
- #include "third_party/blink/renderer/core/css/css_attr_type.h"
- #include "third_party/blink/renderer/core/css/css_syntax_component.h"
- #include "third_party/blink/renderer/core/css/css_syntax_definition.h"
-diff --git a/third_party/blink/renderer/core/html/menu_safe_triangle.cc b/third_party/blink/renderer/core/html/menu_safe_triangle.cc
-index 61eff1339d..d649de2b7b 100644
---- a/third_party/blink/renderer/core/html/menu_safe_triangle.cc
-+++ b/third_party/blink/renderer/core/html/menu_safe_triangle.cc
-@@ -7,6 +7,7 @@
- #include <algorithm>
- #include <array>
+ #include "base/debug/dump_without_crashing.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "third_party/blink/renderer/core/editing/bidi_adjustment.h"
+ #include "third_party/blink/renderer/core/editing/position_with_affinity.h"
+ #include "third_party/blink/renderer/core/layout/geometry/writing_mode_converter.h"
+@@ -59,11 +60,11 @@ FragmentItem::FragmentItem(const InlineItem& inline_item,
+       ink_overflow_type_(static_cast<unsigned>(InkOverflow::Type::kNotSet)),
+       is_dirty_(false),
+       is_last_for_node_(true) {
+-  static_assert(std::to_underlying(ItemType::kMaxValue) <
++  static_assert(base::to_underlying(ItemType::kMaxValue) <
+                 (1 << kConstTypeBits));
+-  static_assert(std::to_underlying(TextItemType::kMaxValue) <
++  static_assert(base::to_underlying(TextItemType::kMaxValue) <
+                 (1 << kSubTypeBits));
+-  static_assert(std::to_underlying(LineBoxType::kMaxValue) <
++  static_assert(base::to_underlying(LineBoxType::kMaxValue) <
+                 (1 << kSubTypeBits));
  
-+#include "base/containers/contains.h"
- #include "third_party/blink/renderer/core/dom/document.h"
- #include "third_party/blink/renderer/core/dom/flat_tree_traversal.h"
- #include "third_party/blink/renderer/core/execution_context/execution_context.h"
-@@ -33,7 +34,7 @@ constexpr base::TimeDelta kSafeTriangleDuration = base::Milliseconds(1000);
+ #if DCHECK_IS_ON()
+diff --git a/third_party/blink/renderer/modules/xr/xr_webgl_binding.cc b/third_party/blink/renderer/modules/xr/xr_webgl_binding.cc
+index 51cd01af3d..33e17f7a55 100644
+--- a/third_party/blink/renderer/modules/xr/xr_webgl_binding.cc
++++ b/third_party/blink/renderer/modules/xr/xr_webgl_binding.cc
+@@ -4,6 +4,7 @@
  
- bool IsInclusiveFlatTreeAncestorOf(Node* possible_ancestor,
-                                    Node* possible_descendant) {
--  return std::ranges::contains(
-+  return base::Contains(
-       FlatTreeTraversal::InclusiveAncestorsOf(*possible_descendant),
-       *possible_ancestor);
- }
-diff --git a/third_party/blink/renderer/modules/nfc/ndef_record.cc b/third_party/blink/renderer/modules/nfc/ndef_record.cc
-index 6b84f070c9..128c2bd8af 100644
---- a/third_party/blink/renderer/modules/nfc/ndef_record.cc
-+++ b/third_party/blink/renderer/modules/nfc/ndef_record.cc
-@@ -7,6 +7,7 @@
- #include <string_view>
+ #include "third_party/blink/renderer/modules/xr/xr_webgl_binding.h"
  
- #include "base/compiler_specific.h"
-+#include "base/containers/contains.h"
- #include "base/notreached.h"
- #include "services/device/public/mojom/nfc.mojom-blink.h"
- #include "third_party/blink/renderer/bindings/core/v8/idl_types.h"
-@@ -120,7 +121,7 @@ bool IsValidExternalType(const String& input) {
-   for (wtf_size_t i = 0; i < type.length(); i++) {
-     // SAFETY: index checked against length in loop body.
-     if (!IsAsciiAlphanumeric(UNSAFE_BUFFERS(type[i])) &&
--        !kOtherCharsForCustomType.contains(UNSAFE_BUFFERS(type[i]))) {
-+        !base::Contains(kOtherCharsForCustomType, UNSAFE_BUFFERS(type[i]))) {
-       return false;
-     }
-   }
++#include "base/types/cxx23_to_underlying.h"
+ #include "third_party/blink/renderer/bindings/modules/v8/v8_union_webgl2renderingcontext_webglrenderingcontext.h"
+ #include "third_party/blink/renderer/bindings/modules/v8/v8_xr_cube_layer_init.h"
+ #include "third_party/blink/renderer/bindings/modules/v8/v8_xr_cylinder_layer_init.h"
+@@ -129,7 +130,7 @@ XRWebGLSwapChain* XRWebGLBinding::CreateColorSwapchain(
+     V8XRLayerLayout::Enum final_layout,
+     bool clear_on_access) {
+   DLOG(ERROR) << __func__ << " clear_on_access=" << clear_on_access
+-              << " texture_type=" << std::to_underlying(texture_type.AsEnum());
++              << " texture_type=" << base::to_underlying(texture_type.AsEnum());
+   XRWebGLSwapChain::Descriptor color_desc = {};
+   color_desc.format = FormatForLayerFormat(layer_format);
+   color_desc.internal_format = InternalFormatForLayerFormat(layer_format);

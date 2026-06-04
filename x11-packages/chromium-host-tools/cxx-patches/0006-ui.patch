@@ -5,7 +5,7 @@ Subject: [PATCH 6/8] ui
 
 ---
  ui/accessibility/ax_enum_util.h               | 11 ++++---
- ui/accessibility/ax_position.h                | 20 +++++------
+ ui/accessibility/ax_position.h                | 19 +++++------
  ui/accessibility/ax_tree.cc                   | 18 +++++-----
  ui/accessibility/ax_tree_manager_map.cc       |  2 ++
  .../automation/automation_ax_tree_wrapper.cc  |  3 +-
@@ -57,7 +57,7 @@ Subject: [PATCH 6/8] ui
  ui/compositor/compositor.cc                   |  3 +-
  ui/compositor/layer.cc                        |  3 +-
  ui/display/display.cc                         |  1 +
- ui/display/display_change_notifier.cc         |  3 +-
+ ui/display/display_change_notifier.cc         |  2 +-
  ui/display/display_layout.cc                  | 11 ++++---
  .../manager/content_protection_key_manager.cc |  3 +-
  ui/display/manager/display_configurator.cc    |  5 ++-
@@ -116,7 +116,7 @@ Subject: [PATCH 6/8] ui
  .../platform/wayland/host/wayland_screen.cc   |  5 +--
  .../wayland/host/wayland_serial_tracker.cc    |  7 ++--
  .../platform/wayland/host/wayland_window.cc   |  3 +-
- .../host/wayland_window_drag_controller.cc    |  5 ++-
+ .../host/wayland_window_drag_controller.cc    |  3 +-
  .../platform/wayland/host/xdg_toplevel.cc     |  4 +--
  .../host/zwp_primary_selection_offer.cc       |  4 +--
  .../wayland_ozone_ui_controls_test_helper.cc  |  3 +-
@@ -129,9 +129,10 @@ Subject: [PATCH 6/8] ui
  ui/views/controls/menu/menu_item_view.cc      |  3 +-
  ui/views/controls/menu/submenu_view.cc        |  6 ++--
  ui/views/controls/table/table_view.cc         |  9 ++---
- ui/views/controls/textfield/textfield.cc      | 31 ++++++++---------
+ ui/views/controls/textfield/textfield.cc      | 33 ++++++++++---------
  ui/views/controls/textfield/textfield.h       |  3 +-
  ui/views/examples/examples_window.cc          |  3 +-
+ .../touch_selection_controller_impl.cc        |  3 +-
  .../touchui/touch_selection_menu_views.cc     | 11 ++++---
  ui/views/view.cc                              |  6 ++--
  ui/views/view.h                               |  4 +--
@@ -143,7 +144,7 @@ Subject: [PATCH 6/8] ui
  ui/wm/core/shadow_controller.cc               |  6 ++--
  ui/wm/core/transient_window_manager.cc        |  5 +--
  ui/wm/core/window_animations.cc               |  4 +--
- 139 files changed, 402 insertions(+), 315 deletions(-)
+ 140 files changed, 402 insertions(+), 316 deletions(-)
 
 diff --git a/ui/accessibility/ax_enum_util.h b/ui/accessibility/ax_enum_util.h
 index 56f19378ba..974b4f1f6c 100644
@@ -179,18 +180,10 @@ index 56f19378ba..974b4f1f6c 100644
        std::string str = ToString(attr);
        entries.push_back({std::move(str), attr});
 diff --git a/ui/accessibility/ax_position.h b/ui/accessibility/ax_position.h
-index e46ba59926..3359ec8c68 100644
+index c4709199ed..b357ef989d 100644
 --- a/ui/accessibility/ax_position.h
 +++ b/ui/accessibility/ax_position.h
-@@ -19,6 +19,7 @@
- #include <vector>
- 
- #include "base/compiler_specific.h"
-+#include "base/containers/contains.h"
- #include "base/containers/stack.h"
- #include "base/export_template.h"
- #include "base/functional/bind.h"
-@@ -765,8 +766,8 @@ class AXPosition {
+@@ -767,8 +767,8 @@ class AXPosition {
        case AXPositionKind::TEXT_POSITION: {
          const std::vector<int32_t>& word_starts =
              text_position->GetWordStartOffsets();
@@ -201,7 +194,7 @@ index e46ba59926..3359ec8c68 100644
        }
      }
    }
-@@ -792,8 +793,7 @@ class AXPosition {
+@@ -794,8 +794,7 @@ class AXPosition {
        case AXPositionKind::TEXT_POSITION: {
          const std::vector<int32_t>& word_ends =
              text_position->GetWordEndOffsets();
@@ -211,7 +204,7 @@ index e46ba59926..3359ec8c68 100644
        }
      }
    }
-@@ -960,7 +960,7 @@ class AXPosition {
+@@ -962,7 +961,7 @@ class AXPosition {
          if (format_starts.size() <= 1) {
            return GetFormatStartBoundaryType() != AXBoundaryType::kNone;
          }
@@ -220,7 +213,7 @@ index e46ba59926..3359ec8c68 100644
                                     int32_t{text_position->text_offset_})) {
            return false;
          }
-@@ -1024,7 +1024,7 @@ class AXPosition {
+@@ -1026,7 +1025,7 @@ class AXPosition {
          if (format_ends.size() <= 1) {
            return GetFormatEndBoundaryType() != AXBoundaryType::kNone;
          }
@@ -229,7 +222,7 @@ index e46ba59926..3359ec8c68 100644
                                     int32_t{text_position->text_offset_})) {
            return false;
          }
-@@ -1063,8 +1063,8 @@ class AXPosition {
+@@ -1065,8 +1064,8 @@ class AXPosition {
          const std::vector<int32_t>& sentence_starts =
              text_position->GetAnchor()->GetIntListAttribute(
                  ax::mojom::IntListAttribute::kSentenceStarts);
@@ -240,7 +233,7 @@ index e46ba59926..3359ec8c68 100644
        }
      }
    }
-@@ -1091,8 +1091,8 @@ class AXPosition {
+@@ -1093,8 +1092,8 @@ class AXPosition {
          const std::vector<int32_t>& sentence_ends =
              text_position->GetAnchor()->GetIntListAttribute(
                  ax::mojom::IntListAttribute::kSentenceEnds);
@@ -252,7 +245,7 @@ index e46ba59926..3359ec8c68 100644
      }
    }
 diff --git a/ui/accessibility/ax_tree.cc b/ui/accessibility/ax_tree.cc
-index a1820d210c..cebfcb6cd2 100644
+index 871e3b4186..7c9ca4af0d 100644
 --- a/ui/accessibility/ax_tree.cc
 +++ b/ui/accessibility/ax_tree.cc
 @@ -17,6 +17,7 @@
@@ -281,7 +274,7 @@ index a1820d210c..cebfcb6cd2 100644
    }
  
    // Adds the parent of |node_id| to the list of nodes to invalidate unignored
-@@ -1327,8 +1328,8 @@ bool AXTree::Unserialize(const AXTreeUpdate& update) {
+@@ -1328,8 +1329,8 @@ bool AXTree::Unserialize(const AXTreeUpdate& update) {
        // the same ignored state.
        bool is_root_of_ignored_change =
            !node->parent() ||
@@ -292,7 +285,7 @@ index a1820d210c..cebfcb6cd2 100644
            node->IsIgnored() != node->parent()->IsIgnored();
        observers_.Notify(&AXTreeObserver::OnIgnoredWillChange, this, node,
                          will_be_ignored, is_root_of_ignored_change);
-@@ -1962,7 +1963,7 @@ bool AXTree::ComputePendingChangesToNode(const AXNodeData& new_data,
+@@ -1963,7 +1964,7 @@ bool AXTree::ComputePendingChangesToNode(const AXNodeData& new_data,
    }
  
    for (AXNodeID child_id : create_or_destroy_ids) {
@@ -301,7 +294,7 @@ index a1820d210c..cebfcb6cd2 100644
        // This is a serious error - nodes should never be reparented without
        // first being removed from the tree. If a node exists in the tree already
        // then adding it to a new parent would mean stealing the node from its
-@@ -2095,7 +2096,8 @@ void AXTree::NotifySubtreeWillBeReparentedOrDeleted(
+@@ -2096,7 +2097,8 @@ void AXTree::NotifySubtreeWillBeReparentedOrDeleted(
    // Don't fire redundant remove notification in the case where the parent
    // will become ignored at the same time.
    if (notify_removed && node->parent() &&
@@ -311,7 +304,7 @@ index a1820d210c..cebfcb6cd2 100644
        !node->parent()->IsIgnored()) {
      notify_removed = false;
    }
-@@ -2287,7 +2289,7 @@ void AXTree::NotifyNodeAttributesHaveBeenChanged(
+@@ -2288,7 +2290,7 @@ void AXTree::NotifyNodeAttributesHaveBeenChanged(
    observers_.Notify(&AXTreeObserver::OnNodeDataChanged, this, old_data,
                      new_data);
  
@@ -320,7 +313,7 @@ index a1820d210c..cebfcb6cd2 100644
      observers_.Notify(&AXTreeObserver::OnIgnoredChanged, this, node,
                        node->IsIgnored());
    }
-@@ -2587,7 +2589,7 @@ void AXTree::DeleteOldChildren(AXNode* node,
+@@ -2588,7 +2590,7 @@ void AXTree::DeleteOldChildren(AXNode* node,
  
    // Delete the old children.
    for (AXNode* child : node->children()) {
@@ -464,7 +457,7 @@ index 95d9e98410..b04c3dd313 100644
          break;
        }
 diff --git a/ui/android/overscroll_refresh.cc b/ui/android/overscroll_refresh.cc
-index 2fe2301f37..6caaf90fdc 100644
+index d79158ec52..a68553053b 100644
 --- a/ui/android/overscroll_refresh.cc
 +++ b/ui/android/overscroll_refresh.cc
 @@ -5,12 +5,12 @@
@@ -556,7 +549,7 @@ index aea5691d92..60119bba8b 100644
    hosts_.erase(host);
    UpdateHostFrameSinkManager();
 diff --git a/ui/aura/native_window_occlusion_tracker_win.cc b/ui/aura/native_window_occlusion_tracker_win.cc
-index 883f238106..90568a7278 100644
+index baa69932bd..8366042e4c 100644
 --- a/ui/aura/native_window_occlusion_tracker_win.cc
 +++ b/ui/aura/native_window_occlusion_tracker_win.cc
 @@ -10,6 +10,7 @@
@@ -764,7 +757,7 @@ index c6e43f0152..186356b49e 100644
  
  }  // namespace ui
 diff --git a/ui/base/accelerators/global_accelerator_listener/global_accelerator_listener_ozone.cc b/ui/base/accelerators/global_accelerator_listener/global_accelerator_listener_ozone.cc
-index 0e85d30f70..a82a333a97 100644
+index ade7a735b5..ae13e9c980 100644
 --- a/ui/base/accelerators/global_accelerator_listener/global_accelerator_listener_ozone.cc
 +++ b/ui/base/accelerators/global_accelerator_listener/global_accelerator_listener_ozone.cc
 @@ -4,6 +4,7 @@
@@ -775,7 +768,7 @@ index 0e85d30f70..a82a333a97 100644
  #include "base/memory/ptr_util.h"
  #include "base/no_destructor.h"
  #include "build/config/linux/dbus/buildflags.h"
-@@ -119,7 +120,7 @@ void GlobalAcceleratorListenerOzone::StopListening() {
+@@ -124,7 +125,7 @@ void GlobalAcceleratorListenerOzone::StopListening() {
  
  bool GlobalAcceleratorListenerOzone::StartListeningForAccelerator(
      const ui::Accelerator& accelerator) {
@@ -784,7 +777,7 @@ index 0e85d30f70..a82a333a97 100644
  
    if (!platform_global_shortcut_listener_) {
      return false;
-@@ -137,7 +138,7 @@ bool GlobalAcceleratorListenerOzone::StartListeningForAccelerator(
+@@ -142,7 +143,7 @@ bool GlobalAcceleratorListenerOzone::StartListeningForAccelerator(
  
  void GlobalAcceleratorListenerOzone::StopListeningForAccelerator(
      const ui::Accelerator& accelerator) {
@@ -845,7 +838,7 @@ index 88f80571b0..0708b2997e 100644
  
   private:
 diff --git a/ui/base/clipboard/clipboard_ozone.cc b/ui/base/clipboard/clipboard_ozone.cc
-index 0dd321f1e8..0dfd217653 100644
+index 3255402bbd..0d45075593 100644
 --- a/ui/base/clipboard/clipboard_ozone.cc
 +++ b/ui/base/clipboard/clipboard_ozone.cc
 @@ -14,6 +14,7 @@
@@ -856,7 +849,7 @@ index 0dd321f1e8..0dfd217653 100644
  #include "base/containers/flat_map.h"
  #include "base/containers/map_util.h"
  #include "base/containers/span.h"
-@@ -79,7 +80,7 @@ std::vector<std::u16string> GetStandardFormatsFromMimeTypes(
+@@ -80,7 +81,7 @@ std::vector<std::u16string> GetStandardFormatsFromMimeTypes(
           mime_type == kMimeTypeLinuxText || mime_type == kMimeTypeLinuxString ||
           mime_type == kMimeTypeUtf8PlainText ||
           mime_type == kMimeTypeLinuxUtf8String) &&
@@ -865,7 +858,7 @@ index 0dd321f1e8..0dfd217653 100644
        types.push_back(kMimeTypePlainText16);
        continue;
      }
-@@ -430,7 +431,7 @@ void ClipboardOzone::OnReadAvailableTypes(
+@@ -433,7 +434,7 @@ void ClipboardOzone::OnReadAvailableTypes(
    std::vector<std::u16string> types =
        GetStandardFormatsFromMimeTypes(available_types);
  
@@ -911,7 +904,7 @@ index f705374375..c13f038760 100644
  #include "base/memory/ptr_util.h"
  #include "base/notreached.h"
 diff --git a/ui/base/dragdrop/os_exchange_data_provider_non_backed.cc b/ui/base/dragdrop/os_exchange_data_provider_non_backed.cc
-index 952f3a100a..373263a8fd 100644
+index 74fd44b17d..5896b01877 100644
 --- a/ui/base/dragdrop/os_exchange_data_provider_non_backed.cc
 +++ b/ui/base/dragdrop/os_exchange_data_provider_non_backed.cc
 @@ -10,6 +10,7 @@
@@ -1321,7 +1314,7 @@ index 8c9a137d5e..838b89cd8d 100644
      return;
    }
 diff --git a/ui/base/x/x11_os_exchange_data_provider.cc b/ui/base/x/x11_os_exchange_data_provider.cc
-index bde8f3ce83..cc9903a17c 100644
+index d7069e89bb..eaacc644ec 100644
 --- a/ui/base/x/x11_os_exchange_data_provider.cc
 +++ b/ui/base/x/x11_os_exchange_data_provider.cc
 @@ -8,6 +8,7 @@
@@ -1375,7 +1368,7 @@ index 1cf16b3f50..f01af855b2 100644
          renderer_color_map.at(table.renderer_color_id)) {
        return false;
 diff --git a/ui/compositor/compositor.cc b/ui/compositor/compositor.cc
-index 3aec78e17d..5ec53830f3 100644
+index 8ccf374934..771ab13fe9 100644
 --- a/ui/compositor/compositor.cc
 +++ b/ui/compositor/compositor.cc
 @@ -14,6 +14,7 @@
@@ -1386,7 +1379,7 @@ index 3aec78e17d..5ec53830f3 100644
  #include "base/dcheck_is_on.h"
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
-@@ -951,7 +952,7 @@ Compositor::TrackerState::~TrackerState() = default;
+@@ -958,7 +959,7 @@ Compositor::TrackerState::~TrackerState() = default;
  void Compositor::StartMetricsTracker(
      TrackerId tracker_id,
      CompositorMetricsTrackerHost::ReportCallback callback) {
@@ -1429,18 +1422,10 @@ index 4ddd20fabb..d54818004f 100644
  #include "base/no_destructor.h"
  #include "base/notreached.h"
 diff --git a/ui/display/display_change_notifier.cc b/ui/display/display_change_notifier.cc
-index 30fe5bcd0a..47bfe44584 100644
+index eeb182de0d..5e45180d19 100644
 --- a/ui/display/display_change_notifier.cc
 +++ b/ui/display/display_change_notifier.cc
-@@ -8,6 +8,7 @@
- 
- #include <algorithm>
- 
-+#include "base/containers/contains.h"
- #include "base/observer_list.h"
- #include "build/buildflag.h"
- #include "ui/display/display.h"
-@@ -34,7 +35,7 @@ void DisplayChangeNotifier::NotifyDisplaysChanged(
+@@ -35,7 +35,7 @@ void DisplayChangeNotifier::NotifyDisplaysChanged(
    // Display present in old_displays but not in new_displays has been removed.
    for (auto old_it = old_displays.begin(); old_it != old_displays.end();
         ++old_it) {
@@ -2254,7 +2239,7 @@ index aa83e83bad..1469a2ae35 100644
                  << format_modifier;
      return nullptr;
 diff --git a/ui/gfx/render_text_harfbuzz.cc b/ui/gfx/render_text_harfbuzz.cc
-index 4baedc8b39..69c79ed4af 100644
+index 38977d7e88..92a2242ee2 100644
 --- a/ui/gfx/render_text_harfbuzz.cc
 +++ b/ui/gfx/render_text_harfbuzz.cc
 @@ -10,6 +10,7 @@
@@ -2512,7 +2497,7 @@ index 00374e6d8f..5adfe70df0 100644
    }
  }
 diff --git a/ui/gtk/gtk_ui.cc b/ui/gtk/gtk_ui.cc
-index 066dcd9965..0d5191d941 100644
+index 43dd02ec8f..2f699257a9 100644
 --- a/ui/gtk/gtk_ui.cc
 +++ b/ui/gtk/gtk_ui.cc
 @@ -19,6 +19,7 @@
@@ -2523,7 +2508,7 @@ index 066dcd9965..0d5191d941 100644
  #include "base/containers/flat_map.h"
  #include "base/debug/leak_annotations.h"
  #include "base/environment.h"
-@@ -888,13 +889,13 @@ void GtkUi::OnMonitorsChanged(GListModel* list,
+@@ -891,13 +892,13 @@ void GtkUi::OnMonitorsChanged(GListModel* list,
    std::unordered_set<GdkMonitor*> monitors;
    for (size_t i = 0; i < n_monitors; ++i) {
      auto* monitor = static_cast<GdkMonitor*>(g_list_model_get_item(list, i));
@@ -3094,25 +3079,10 @@ index 10b2f02756..bccc8685aa 100644
                      window->AsWaylandBubble()->activatable()));
    if (active_bubble_ == window) {
 diff --git a/ui/ozone/platform/wayland/host/wayland_window_drag_controller.cc b/ui/ozone/platform/wayland/host/wayland_window_drag_controller.cc
-index 8011d8ad14..f50bb252df 100644
+index e4caa8c6e3..ab0b68e6f4 100644
 --- a/ui/ozone/platform/wayland/host/wayland_window_drag_controller.cc
 +++ b/ui/ozone/platform/wayland/host/wayland_window_drag_controller.cc
-@@ -8,13 +8,13 @@
- #include <wayland-client-protocol.h>
- #include <xdg-toplevel-drag-v1-client-protocol.h>
- 
--#include <algorithm>
- #include <cstdint>
- #include <memory>
- #include <ostream>
- #include <utility>
- 
- #include "base/check.h"
-+#include "base/containers/contains.h"
- #include "base/functional/callback.h"
- #include "base/logging.h"
- #include "base/memory/raw_ref.h"
-@@ -346,8 +346,7 @@ void WaylandWindowDragController::OnDragEnter(WaylandWindow* window,
+@@ -359,8 +359,7 @@ void WaylandWindowDragController::OnDragEnter(WaylandWindow* window,
    // TODO(crbug.com/40704369): Exo does not support custom mime types. In this
    // case, |data_offer_| will hold an empty mime_types list and, at this point,
    // it's safe just to skip the offer checks and requests here.
@@ -3292,7 +3262,7 @@ index 76d33cd3cf..32cd3ef2f5 100644
      }
  
 diff --git a/ui/views/bubble/bubble_dialog_delegate_view.cc b/ui/views/bubble/bubble_dialog_delegate_view.cc
-index 6a88df4700..5f21e3d8a2 100644
+index 49689a0dec..8602b33492 100644
 --- a/ui/views/bubble/bubble_dialog_delegate_view.cc
 +++ b/ui/views/bubble/bubble_dialog_delegate_view.cc
 @@ -13,6 +13,7 @@
@@ -3312,7 +3282,7 @@ index 6a88df4700..5f21e3d8a2 100644
      vector.push_back(parent_);
    }
  
-@@ -976,8 +977,8 @@ void BubbleDialogDelegate::BubbleUmaLogger::LogMetric(
+@@ -961,8 +962,8 @@ void BubbleDialogDelegate::BubbleUmaLogger::LogMetric(
    }
  
    if (allowed_class_names_for_testing_.has_value()) {
@@ -3324,10 +3294,10 @@ index 6a88df4700..5f21e3d8a2 100644
      }
    } else if (!views_metrics::IsValidBubbleName(bubble_name.value())) {
 diff --git a/ui/views/cocoa/native_widget_mac_ns_window_host.mm b/ui/views/cocoa/native_widget_mac_ns_window_host.mm
-index 2914e7149f..cdbd944cae 100644
+index bd419e6448..c20d4bf690 100644
 --- a/ui/views/cocoa/native_widget_mac_ns_window_host.mm
 +++ b/ui/views/cocoa/native_widget_mac_ns_window_host.mm
-@@ -1196,7 +1196,7 @@ bool NativeWidgetMacNSWindowHost::DispatchMonitorEvent(
+@@ -1223,7 +1223,7 @@ bool NativeWidgetMacNSWindowHost::DispatchMonitorEvent(
    for (auto* event_monitor : event_monitors_snapshot) {
      // Ensure `event_monitor` was not removed from `event_monitors_` by a
      // previous call to NativeWidgetMacEventMonitorOnEvent.
@@ -3382,7 +3352,7 @@ index 4b6bd6dcaf..dc66c6b251 100644
               : config.arrow_to_edge_padding);
    }
 diff --git a/ui/views/controls/table/table_view.cc b/ui/views/controls/table/table_view.cc
-index 5f7ec145f8..99d43f98af 100644
+index 46da9ee7ab..49703c343b 100644
 --- a/ui/views/controls/table/table_view.cc
 +++ b/ui/views/controls/table/table_view.cc
 @@ -13,6 +13,7 @@
@@ -3412,7 +3382,7 @@ index 5f7ec145f8..99d43f98af 100644
  
  bool TableView::GetHasFocusIndicator() const {
 diff --git a/ui/views/controls/textfield/textfield.cc b/ui/views/controls/textfield/textfield.cc
-index 0387f622e0..dfbadd66cc 100644
+index 0387f622e0..08ca1f104e 100644
 --- a/ui/views/controls/textfield/textfield.cc
 +++ b/ui/views/controls/textfield/textfield.cc
 @@ -21,6 +21,7 @@
@@ -3423,7 +3393,7 @@ index 0387f622e0..dfbadd66cc 100644
  #include "build/build_config.h"
  #include "ui/accessibility/ax_action_data.h"
  #include "ui/accessibility/ax_node_data.h"
-@@ -140,11 +141,11 @@
+@@ -140,11 +141,11 @@ ui::TextEditCommand GetTextEditCommandFromMenuCommand(int command_id,
    switch (command_id) {
      case Textfield::kUndo:
        return ui::TextEditCommand::UNDO;
@@ -3438,7 +3408,7 @@ index 0387f622e0..dfbadd66cc 100644
        return ui::TextEditCommand::PASTE;
      case Textfield::kDelete:
        // The DELETE menu action only works in case of an active selection.
-@@ -152,9 +153,9 @@
+@@ -152,9 +153,9 @@ ui::TextEditCommand GetTextEditCommandFromMenuCommand(int command_id,
          return ui::TextEditCommand::DELETE_FORWARD;
        }
        break;
@@ -3450,16 +3420,7 @@ index 0387f622e0..dfbadd66cc 100644
        return ui::TextEditCommand::SELECT_WORD;
    }
    return ui::TextEditCommand::INVALID_COMMAND;
-@@ -1581,7 +1582,7 @@
- 
- bool Textfield::IsCommandIdEnabled(int command_id, bool can_paste) const {
-   if (command_id ==
--      std::to_underlying(ui::TouchEditable::MenuCommands::kPaste)) {
-+      base::to_underlying(ui::TouchEditable::MenuCommands::kPaste)) {
-     return !GetReadOnly() && can_paste;
-   }
-   return IsCommandIdEnabled(command_id);
-@@ -1608,7 +1609,7 @@
+@@ -1600,7 +1601,7 @@ bool Textfield::IsCommandIdEnabled(int command_id) const {
    // This method is called for menus. For shortcuts, IsTextEditCommandEnabled()
    // is called instead.
    if (command_id ==
@@ -3468,7 +3429,7 @@ index 0387f622e0..dfbadd66cc 100644
      return !GetReadOnly() && clipboard_contains_text_for_menu_;
    }
  
-@@ -1623,19 +1624,19 @@
+@@ -1615,19 +1616,19 @@ bool Textfield::GetAcceleratorForCommandId(int command_id,
        *accelerator = ui::Accelerator(ui::VKEY_Z, ui::EF_PLATFORM_ACCELERATOR);
        return true;
  
@@ -3492,7 +3453,7 @@ index 0387f622e0..dfbadd66cc 100644
        *accelerator = ui::Accelerator(ui::VKEY_A, ui::EF_PLATFORM_ACCELERATOR);
        return true;
  
-@@ -1658,9 +1659,9 @@
+@@ -1650,9 +1651,9 @@ void Textfield::ExecuteCommand(int command_id, int event_flags) {
    if (::features::IsTouchTextEditingRedesignEnabled() &&
        (event_flags & ui::EF_FROM_TOUCH) &&
        (command_id ==
@@ -3504,7 +3465,7 @@ index 0387f622e0..dfbadd66cc 100644
      CreateTouchSelectionControllerAndNotifyIt();
    }
  }
-@@ -3119,16 +3120,16 @@
+@@ -3111,16 +3112,16 @@ void Textfield::UpdateContextMenu() {
    context_menu_contents_->AddItemWithStringId(kUndo, IDS_APP_UNDO);
    context_menu_contents_->AddSeparator(ui::NORMAL_SEPARATOR);
    context_menu_contents_->AddItemWithStringId(
@@ -3602,7 +3563,7 @@ index 85fc2767da..49ba85a3f8 100644
  };
  
 diff --git a/ui/views/view.cc b/ui/views/view.cc
-index 9f45012495..91148b96ac 100644
+index 53543fbc94..4b9bba29eb 100644
 --- a/ui/views/view.cc
 +++ b/ui/views/view.cc
 @@ -20,6 +20,7 @@
@@ -3633,7 +3594,7 @@ index 9f45012495..91148b96ac 100644
    new_layer->AddObserver(this);
    new_layer->SetVisible(GetVisible());
 diff --git a/ui/views/view.h b/ui/views/view.h
-index ea27a73076..75aa86093c 100644
+index 3d016a2264..095760f12e 100644
 --- a/ui/views/view.h
 +++ b/ui/views/view.h
 @@ -7,7 +7,6 @@
@@ -3652,7 +3613,7 @@ index ea27a73076..75aa86093c 100644
  #include "base/functional/callback.h"
  #include "base/gtest_prod_util.h"
  #include "base/memory/advanced_memory_safety_checks.h"
-@@ -530,7 +530,7 @@ class VIEWS_EXPORT View : public ui::LayerDelegate,
+@@ -527,7 +527,7 @@ class VIEWS_EXPORT View : public ui::LayerDelegate,
      CHECK(!view->owned_by_client())
          << "This should only be called if the client doesn't already have "
             "ownership of |view|.";
@@ -3662,7 +3623,7 @@ index ea27a73076..75aa86093c 100644
      return base::WrapUnique(view);
    }
 diff --git a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
-index 942e685096..02737ba0a9 100644
+index ee67004697..e9ec1bce48 100644
 --- a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
 +++ b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
 @@ -9,6 +9,7 @@
@@ -3800,7 +3761,7 @@ index 42e6756310..0fa1a3e4bd 100644
    return kShadowElevationInactiveWindow;
  }
 diff --git a/ui/wm/core/transient_window_manager.cc b/ui/wm/core/transient_window_manager.cc
-index 6bc770d413..bbff5e46d1 100644
+index ef261c6258..5e8c9a9c29 100644
 --- a/ui/wm/core/transient_window_manager.cc
 +++ b/ui/wm/core/transient_window_manager.cc
 @@ -8,6 +8,7 @@
@@ -3852,3 +3813,14 @@ index 7cf0960524..57e1d9ddda 100644
        }
        if (topmost_transient_child) {
          window_->parent()->layer()->StackAbove(
+--- a/ui/views/controls/textfield/textfield.cc
++++ b/ui/views/controls/textfield/textfield.cc
+@@ -1582,7 +1582,7 @@
+ 
+ bool Textfield::IsCommandIdEnabled(int command_id, bool can_paste) const {
+   if (command_id ==
+-      std::to_underlying(ui::TouchEditable::MenuCommands::kPaste)) {
++      base::to_underlying(ui::TouchEditable::MenuCommands::kPaste)) {
+     return !GetReadOnly() && can_paste;
+   }
+   return IsCommandIdEnabled(command_id);

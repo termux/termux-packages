@@ -98,24 +98,24 @@ index 018b8c9c55..d7ad72591d 100644
 +
 +#undef kPadLengthFieldSize
 diff --git a/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr2_sender.cc b/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr2_sender.cc
-index 21134ac65e..1d357e6e4b 100644
+index 730a781877..e529d79b6a 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr2_sender.cc
 +++ b/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr2_sender.cc
 @@ -23,6 +23,8 @@
  #include "quiche/common/platform/api/quiche_logging.h"
  #include "quiche/common/print_elements.h"
  
-+#define kDefaultMinimumCongestionWindow kDefaultMinimumCongestionWindow_BBR2
++#define kMaxModeChangesPerCongestionEvent kMaxModeChangesPerCongestionEvent_BBR2
 +
  namespace quic {
  
  namespace {
-@@ -584,3 +586,5 @@ std::ostream& operator<<(std::ostream& os, const Bbr2Sender::DebugState& s) {
+@@ -534,3 +536,5 @@ Bbr2DebugState Bbr2Sender::ExportDebugState() const {
  }
  
  }  // namespace quic
 +
-+#undef kDefaultMinimumCongestionWindow
++#undef kMaxModeChangesPerCongestionEvent
 diff --git a/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr_sender.cc b/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr_sender.cc
 index 34bb0689a3..01ca5ab92f 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/congestion_control/bbr_sender.cc
