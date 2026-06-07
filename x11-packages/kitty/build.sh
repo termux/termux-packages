@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://sw.kovidgoyal.net/kitty/
 TERMUX_PKG_DESCRIPTION="Cross-platform, fast, feature-rich, GPU based terminal"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.47.1"
+TERMUX_PKG_VERSION="0.47.2"
 TERMUX_PKG_SRCURL="https://github.com/kovidgoyal/kitty/releases/download/v${TERMUX_PKG_VERSION}/kitty-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=8105fa8f8170eb7a1733c759976c307b1c5e49b634bbcb504db8f2ea3decc563
+TERMUX_PKG_SHA256=810d9eaec88fb2d877330b21badf4ee4d72ffcab0a16572874bdd6ae13f4995a
 # fontconfig is dlopen(3)ed:
 TERMUX_PKG_DEPENDS="dbus, fontconfig, harfbuzz, libpng, librsync, libx11, libxkbcommon, littlecms, ncurses, opengl, openssl, python, xxhash, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libxcursor, libxi, libxinerama, libxrandr, simde, xorgproto"
