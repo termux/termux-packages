@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE="https://github.com/mity/md4c"
+TERMUX_PKG_DESCRIPTION="C Markdown parser"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.5.3"
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_SRCURL="https://github.com/mity/md4c/archive/refs/tags/release-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256="353c346f376b87c954a13f3415ede2d51264cc61dc5abcd38ff1d2aa0d059b9e"
+TERMUX_PKG_AUTO_UPDATE=true
