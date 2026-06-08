@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="A peer-to-peer hypermedia distribution protocol"
 TERMUX_PKG_LICENSE="MIT, Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE-APACHE, LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.41.0"
+TERMUX_PKG_VERSION="0.42.0"
 TERMUX_PKG_SRCURL="https://github.com/ipfs/kubo/releases/download/v${TERMUX_PKG_VERSION}/kubo-source.tar.gz"
-TERMUX_PKG_SHA256=d20dce2c72f5ee99e2604fa1331ae493cec26c9a3a214de6ec236383dd26951b
+TERMUX_PKG_SHA256=1515f7f4f19a2d7aed802e5948177f8f9fbe6bbe4b223308f2a68de8b238dc68
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SUGGESTS="termux-services"
 TERMUX_PKG_SERVICE_SCRIPT=("ipfs" "[ ! -d \"${TERMUX_ANDROID_HOME}/.ipfs\" ] && ipfs init --empty-repo 2>&1 && ipfs config --json Swarm.EnableRelayHop false 2>&1 && ipfs config --json Swarm.EnableAutoRelay true 2>&1; exec ipfs daemon --enable-namesys-pubsub 2>&1")
@@ -22,10 +22,6 @@ termux_step_make() {
 	cp -a "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/github.com/ipfs/kubo"
 	cd "${GOPATH}/src/github.com/ipfs/kubo"
 
-	# TODO: remove this once the upstream package is updated to suport go 1.26
-	go mod edit -replace github.com/cockroachdb/swiss=github.com/cockroachdb/swiss@b0f6560
-	go mod tidy
-	go mod vendor
 	make build
 
 	# Fix folders without write permissions preventing which fails repeating builds:
