@@ -4,10 +4,11 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 _MAJOR_VERSION=2.7
 TERMUX_PKG_VERSION="7.3.23"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
-	https://downloads.python.org/pypy/pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION-src.tar.bz2
-	https://downloads.python.org/pypy/pypy2.7-v$TERMUX_PKG_VERSION-linux64.tar.bz2
-	https://downloads.python.org/pypy/pypy2.7-v$TERMUX_PKG_VERSION-linux32.tar.bz2
+	"https://downloads.python.org/pypy/pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION-src.tar.bz2"
+	"https://downloads.python.org/pypy/pypy2.7-v$TERMUX_PKG_VERSION-linux64.tar.bz2"
+	"https://downloads.python.org/pypy/pypy2.7-v$TERMUX_PKG_VERSION-linux32.tar.bz2"
 )
 TERMUX_PKG_SHA256=(
 	7aa8eaf414d25f916fe426365404759c56aa28aea6190e65967c4a45f64dc899
@@ -15,7 +16,7 @@ TERMUX_PKG_SHA256=(
 	fa6499281775ec22f4742e9dd7b31c22b8fc6a700c1cf50aebc7ef24f61461c5
 )
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, zlib"
+TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, ncurses, ncurses-ui-libs, openssl, sqlite, zlib"
 TERMUX_PKG_BUILD_DEPENDS="aosp-libs, tk, xorgproto"
 TERMUX_PKG_RECOMMENDS="clang, make, pkg-config"
 TERMUX_PKG_SUGGESTS="pypy-tkinter"

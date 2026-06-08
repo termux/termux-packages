@@ -5,7 +5,7 @@ TERMUX_PKG_LICENSE_FILE="license.terms"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="8.6.14"
 TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/tcl/Tcl/${TERMUX_PKG_VERSION}/tcl${TERMUX_PKG_VERSION}-src.tar.gz
+TERMUX_PKG_SRCURL="https://downloads.sourceforge.net/project/tcl/Tcl/${TERMUX_PKG_VERSION}/tcl${TERMUX_PKG_VERSION}-src.tar.gz"
 TERMUX_PKG_SHA256=5880225babf7954c58d4fb0f5cf6279104ce1cd6aa9b71e9a6322540e1c4de66
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="zlib"
@@ -28,7 +28,7 @@ tcl_cv_strtoul_unbroken=ok
 "
 
 termux_step_pre_configure() {
-	rm -rf $TERMUX_PKG_SRCDIR/pkgs/sqlite3* # libsqlite-tcl is a separate package
+	rm -rf "$TERMUX_PKG_SRCDIR"/pkgs/sqlite3* # sqlite-tcl is a separate package
 	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/unix
 	CFLAGS+=" -DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD"
 }
@@ -37,12 +37,12 @@ termux_step_post_make_install() {
 	# expect needs private headers
 	make install-private-headers
 	local _MAJOR_VERSION=${TERMUX_PKG_VERSION:0:3}
-	cd $TERMUX_PREFIX/bin
-	ln -f -s tclsh$_MAJOR_VERSION tclsh
+	cd "$TERMUX_PREFIX/bin"
+	ln -sf "tclsh$_MAJOR_VERSION" tclsh
 
 	# Needed to install $TERMUX_PKG_LICENSE_FILE.
 	TERMUX_PKG_SRCDIR=$(dirname "$TERMUX_PKG_SRCDIR")
 
 	#avoid conflict with perl
-	mv $TERMUX_PREFIX/share/man/man3/Thread.3 $TERMUX_PREFIX/share/man/man3/Tcl_Thread.3
+	mv "$TERMUX_PREFIX/share/man/man3/Thread.3" "$TERMUX_PREFIX/share/man/man3/Tcl_Thread.3"
 }

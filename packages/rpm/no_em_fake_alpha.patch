@@ -1,0 +1,17 @@
+This constant isn't defined in Android/LLVM's `elf.h`.
+Would be 41 as per Glibc sources.
+But Android doesn't support DEC Alpha, virtualized or otherwise.
+So let's just remove the reference.
+https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;t=2.43#l198
+diff --git a/tools/elfdeps.c b/tools/elfdeps.c
+index 9cb7b68..035ddea 100644
+--- a/tools/elfdeps.c
++++ b/tools/elfdeps.c
+@@ -84,7 +84,6 @@ static const char *mkmarker(GElf_Ehdr *ehdr)
+     if (ehdr->e_ident[EI_CLASS] == ELFCLASS64) {
+ 	switch (ehdr->e_machine) {
+ 	case EM_ALPHA:
+-	case EM_FAKE_ALPHA:
+ 	    /* alpha doesn't traditionally have 64bit markers */
+ 	    break;
+ 	default:

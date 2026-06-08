@@ -5,18 +5,18 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
 TERMUX_PKG_VERSION="3.13.13"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 _DEBPYTHON_COMMIT=f358ab52bf2932ad55b1a72a29c9762169e6ac47
 TERMUX_PKG_SRCURL=(
-	https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
-	https://salsa.debian.org/cpython-team/python3-defaults/-/archive/${_DEBPYTHON_COMMIT}/python3-defaults-${_DEBPYTHON_COMMIT}.tar.gz
+	"https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz"
+	"https://salsa.debian.org/cpython-team/python3-defaults/-/archive/${_DEBPYTHON_COMMIT}/python3-defaults-${_DEBPYTHON_COMMIT}.tar.gz"
 )
 TERMUX_PKG_SHA256=(
 	2ab91ff401783ccca64f75d10c882e957bdfd60e2bf5a72f8421793729b78a71
 	3b7a76c144d39f5c4a2c7789fd4beb3266980c2e667ad36167e1e7a357c684b0
 )
 TERMUX_PKG_AUTO_UPDATE=false
-TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib"
+TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, ncurses, ncurses-ui-libs, openssl, readline, sqlite, zlib"
 TERMUX_PKG_BUILD_DEPENDS="tk"
 TERMUX_PKG_RECOMMENDS="python-ensurepip-wheels, python-pip"
 TERMUX_PKG_SUGGESTS="python-tkinter"

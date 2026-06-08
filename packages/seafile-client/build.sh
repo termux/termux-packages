@@ -5,11 +5,12 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="9.0.18"
-TERMUX_PKG_SRCURL=https://github.com/haiwen/seafile/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL="https://github.com/haiwen/seafile/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=0b2a93e75b04e40c503c74059ca00b521bf981935f764efcbc5adfabff929d90
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
-TERMUX_PKG_DEPENDS="argon2, glib, libcurl, libevent, libjansson, libsearpc, libsqlite, libuuid, libwebsockets, openssl, python, zlib"
+TERMUX_PKG_DEPENDS="argon2, glib, libcurl, libevent, libjansson, libsearpc, libuuid, libwebsockets, openssl, python, sqlite, zlib"
 TERMUX_PKG_BREAKS="seafile-client-dev, ccnet"
 TERMUX_PKG_REPLACES="seafile-client-dev, ccnet"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -25,6 +26,6 @@ termux_step_pre_configure() {
 
 termux_step_post_configure() {
 	#the package has trouble to prepare some headers
-	cd $TERMUX_PKG_SRCDIR/lib
-	python $TERMUX_PREFIX/bin/searpc-codegen.py $TERMUX_PKG_SRCDIR/lib/rpc_table.py
+	cd "$TERMUX_PKG_SRCDIR/lib"
+	python "$TERMUX_PREFIX/bin/searpc-codegen.py" "$TERMUX_PKG_SRCDIR/lib/rpc_table.py"
 }

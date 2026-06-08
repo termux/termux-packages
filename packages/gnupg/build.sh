@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="Implementation of the OpenPGP standard for encrypting an
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.5.17"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://www.gnupg.org/ftp/gcrypt/gnupg/gnupg-${TERMUX_PKG_VERSION}.tar.bz2"
 TERMUX_PKG_SHA256=2c1fbe20e2958fd8fb53cf37d7c38e84a900edc0d561a1c4af4bc3a10888685d
-TERMUX_PKG_DEPENDS="libassuan, libbz2, libgcrypt, libgnutls, libgpg-error, libksba, libnpth, libsqlite, readline, pinentry, resolv-conf, zlib"
+TERMUX_PKG_DEPENDS="libassuan, libbz2, libgcrypt, libgnutls, libgpg-error, libksba, libnpth, readline, pinentry, resolv-conf, sqlite, zlib"
 TERMUX_PKG_CONFLICTS="gnupg2 (<< 2.2.9-1), dirmngr (<< 2.2.17-1)"
 TERMUX_PKG_REPLACES="gnupg2 (<< 2.2.9-1), dirmngr (<< 2.2.17-1)"
 TERMUX_PKG_SUGGESTS="scdaemon"
@@ -24,16 +25,16 @@ TERMUX_PKG_RM_AFTER_INSTALL="share/gnupg/help.*.txt share/man/man1/gpg-zip.1 sha
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
-	LIBGPG_ERROR_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libgpg-error/build.sh; echo $TERMUX_PKG_VERSION)
-	LIBGPG_ERROR_SRCURL=$(. $TERMUX_SCRIPTDIR/packages/libgpg-error/build.sh; echo $TERMUX_PKG_SRCURL)
-	LIBGPG_ERROR_SHA256=$(. $TERMUX_SCRIPTDIR/packages/libgpg-error/build.sh; echo $TERMUX_PKG_SHA256)
+	LIBGPG_ERROR_VERSION="$(. "$TERMUX_SCRIPTDIR/packages/libgpg-error/build.sh"; echo "$TERMUX_PKG_VERSION")"
+	LIBGPG_ERROR_SRCURL="$(. "$TERMUX_SCRIPTDIR/packages/libgpg-error/build.sh"; echo "$TERMUX_PKG_SRCURL")"
+	LIBGPG_ERROR_SHA256="$(. "$TERMUX_SCRIPTDIR/packages/libgpg-error/build.sh"; echo "$TERMUX_PKG_SHA256")"
 
 	termux_download \
-		$LIBGPG_ERROR_SRCURL \
-		$TERMUX_PKG_CACHEDIR/libgpg-error-${LIBGPG_ERROR_VERSION}.tar.bz2 \
-		$LIBGPG_ERROR_SHA256
-	tar xf $TERMUX_PKG_CACHEDIR/libgpg-error-${LIBGPG_ERROR_VERSION}.tar.bz2
-	./libgpg-error-${LIBGPG_ERROR_VERSION}/configure
+		"$LIBGPG_ERROR_SRCURL" \
+		"$TERMUX_PKG_CACHEDIR/libgpg-error-${LIBGPG_ERROR_VERSION}.tar.bz2" \
+		"$LIBGPG_ERROR_SHA256"
+	tar xf "$TERMUX_PKG_CACHEDIR/libgpg-error-${LIBGPG_ERROR_VERSION}.tar.bz2"
+	./libgpg-error-"${LIBGPG_ERROR_VERSION}"/configure
 	make -C doc yat2m
 }
 
@@ -43,6 +44,6 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	cd $TERMUX_PREFIX/bin
+	cd "$TERMUX_PREFIX/bin"
 	ln -sf gpg gpg2
 }

@@ -29,8 +29,8 @@ TCLLIBDIR=${TERMUX__PREFIX__LIB_DIR}/tcl8.6/sqlite
 
 termux_step_pre_configure() {
 	# CPPFLAGS and LDFLAGS as directed by README.md
-	# and also by the termux-packages libsqlite package so that sqlcipher
-	# can be built after libsqlite but before packages that depend on libsqlite
+	# and also by the termux-packages sqlite package so that sqlcipher
+	# can be built after sqlite but before packages that depend on sqlite
 	# and provide the exact same symbols as libsqlite
 	# in a single docker container building many packages
 	CPPFLAGS+=" -DSQLCIPHER_OMIT_LOG_DEVICE"

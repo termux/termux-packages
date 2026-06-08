@@ -4,10 +4,11 @@ TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_LICENSE_FILE="nss/COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.124"
-TERMUX_PKG_SRCURL=https://archive.mozilla.org/pub/security/nss/releases/NSS_${TERMUX_PKG_VERSION//./_}_RTM/src/nss-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL="https://archive.mozilla.org/pub/security/nss/releases/NSS_${TERMUX_PKG_VERSION//./_}_RTM/src/nss-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=80da9f1cbcb267293b2248818d288bc02f874d6a34f1989a2828401d74a0bc9b
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libnspr, libsqlite"
+TERMUX_PKG_DEPENDS="libnspr, sqlite"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="
 CC_IS_CLANG=1
@@ -29,7 +30,7 @@ termux_step_host_build() {
 	mkdir -p nsinstall
 	cd nsinstall
 	for f in nsinstall.c pathsub.c; do
-		gcc -c $TERMUX_PKG_SRCDIR/nss/coreconf/nsinstall/$f
+		gcc -c "$TERMUX_PKG_SRCDIR/nss/coreconf/nsinstall/$f"
 	done
 	gcc nsinstall.o pathsub.o -o nsinstall
 }
@@ -39,7 +40,7 @@ termux_step_pre_configure() {
 	LDFLAGS+=" -llog"
 
 	TERMUX_PKG_EXTRA_MAKE_ARGS+=" NSINSTALL=$TERMUX_PKG_HOSTBUILD_DIR/nsinstall/nsinstall"
-	if [ $TERMUX_ARCH_BITS -eq 64 ]; then
+	if (( TERMUX_ARCH_BITS == 64 )); then
 		TERMUX_PKG_EXTRA_MAKE_ARGS+=" USE_64=1"
 	fi
 }
