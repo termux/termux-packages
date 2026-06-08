@@ -8,11 +8,11 @@ TERMUX_PKG_SRCURL="https://github.com/aws/aws-cli/archive/refs/tags/$TERMUX_PKG_
 TERMUX_PKG_SHA256=896b07b03588832f3b5d8857e6e731cea271f20501a99fd4caaa1776db2e94e4
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+.\d+.\d+"
-TERMUX_PKG_DEPENDS="libandroid-posix-semaphore, libandroid-support, mandoc"
+TERMUX_PKG_DEPENDS="libandroid-posix-semaphore, libandroid-support, python, mandoc"
 TERMUX_PKG_SUGGESTS="groff"
 TERMUX_PKG_BUILD_DEPENDS="aosp-libs, python-pip, cmake, ldd"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
---with-install-type=portable-exe
+--with-install-type=system-sandbox
 --with-download-deps
 PYTHON=$TERMUX_PREFIX/bin/python
 "
