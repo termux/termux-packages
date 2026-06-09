@@ -604,25 +604,6 @@ index 1594e73546..7de1802d74 100644
  }  // namespace breadcrumbs
 +
 +#undef kEventSeparator
-diff --git a/components/component_updater/installer_policies/plus_address_blocklist_component_installer.cc b/components/component_updater/installer_policies/plus_address_blocklist_component_installer.cc
-index cc99993b21..5fbba765c6 100644
---- a/components/component_updater/installer_policies/plus_address_blocklist_component_installer.cc
-+++ b/components/component_updater/installer_policies/plus_address_blocklist_component_installer.cc
-@@ -17,6 +17,8 @@
- #include "components/plus_addresses/core/browser/plus_address_blocklist_data.h"
- #include "components/plus_addresses/core/common/features.h"
- 
-+#define GetInstalledPath GetInstalledPath_plus_address_blocklist_component_installer
-+
- namespace component_updater {
- namespace {
- 
-@@ -137,3 +139,5 @@ void RegisterPlusAddressBlocklistComponent(ComponentUpdateService* cus) {
- }
- 
- }  // namespace component_updater
-+
-+#undef GetInstalledPath
 diff --git a/components/content_settings/core/browser/content_settings_default_provider.cc b/components/content_settings/core/browser/content_settings_default_provider.cc
 index 8a82bc5d45..de32b7710f 100644
 --- a/components/content_settings/core/browser/content_settings_default_provider.cc
@@ -2540,4 +2521,27 @@ index a7b1875915..c84c06c5e8 100644
  
  }  // namespace webcrypto
 +
++#undef SynthesizeImportAlgorithmForClone
+diff --git a/components/webcrypto/algorithms/ml_kem.cc b/components/webcrypto/algorithms/ml_kem.cc
+index b0dbe94e97..13dae915a3 100644
+--- a/components/webcrypto/algorithms/ml_kem.cc
++++ b/components/webcrypto/algorithms/ml_kem.cc
+@@ -18,6 +18,10 @@
+ #include "third_party/blink/public/platform/web_crypto_key_algorithm.h"
+ #include "third_party/boringssl/src/include/openssl/evp.h"
+ 
++#define GetEvpPkeyAlg GetEvpPkeyAlg_ml_kem
++#define GetJwkAlg     GetJwkAlg_ml_kem
++#define SynthesizeImportAlgorithmForClone SynthesizeImportAlgorithmForClone_ml_kem
++
+ namespace webcrypto {
+ 
+ namespace {
+@@ -512,3 +516,7 @@ std::unique_ptr<AlgorithmImplementation> CreateMlKemImplementation() {
+ }
+ 
+ }  // namespace webcrypto
++
++#undef GetEvpKem
++#undef GetJwkAlg
 +#undef SynthesizeImportAlgorithmForClone

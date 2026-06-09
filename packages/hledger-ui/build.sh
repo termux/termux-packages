@@ -1,14 +1,15 @@
 TERMUX_PKG_HOMEPAGE=https://hledger.org/
 TERMUX_PKG_DESCRIPTION="hledger-ui - terminal interface (TUI) for hledger, a robust, friendly plain text accounting app."
 TERMUX_PKG_LICENSE="GPL-3.0-or-later"
-TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.43.2
-TERMUX_PKG_SRCURL=https://hackage.haskell.org/package/hledger-ui-${TERMUX_PKG_VERSION}/hledger-ui-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=dbd6b92afd4741811671fa3311384640a10c21afb60964133291d5f266b3e5f7
+TERMUX_PKG_MAINTAINER="Andriy Mykhaylyk <erp.lsf@gmail.com>"
+TERMUX_PKG_VERSION="1.52.1"
+TERMUX_PKG_SRCURL="https://hackage.haskell.org/package/hledger-ui-${TERMUX_PKG_VERSION}/hledger-ui-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=61bf2eb30e7ebb49aa2a4bb2bfd547810b5aedd481861025a3986d61f9ead8fd
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_BUILD_DEPENDS="aosp-libs"
 TERMUX_PKG_DEPENDS="libffi, libiconv, libgmp, zlib, ncurses, asciinema"
+TERMUX_PKG_BUILD_DEPENDS="aosp-libs"
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_post_configure() {
 	cabal get splitmix-0.1.3.1

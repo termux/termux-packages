@@ -1,4 +1,4 @@
-TERMUX_SUBPKG_DESCRIPTION="AOSP-based mksh, toybox and iputils for termux-docker"
+TERMUX_SUBPKG_DESCRIPTION="AOSP-based mksh, toybox, grep and iputils for termux-docker"
 # It doesn't seem trivial to "wildcard" include most files in the bin folder
 # while excluding linker, debuggerd and crash_dump, which belong in the
 # main package.
@@ -158,4 +158,7 @@ opt/aosp/bin/xargs
 opt/aosp/bin/xxd
 opt/aosp/bin/yes
 opt/aosp/bin/zcat
+opt/aosp/bin/grep
+opt/aosp/bin/egrep
+opt/aosp/bin/fgrep
 "

@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/microsoft/vscode
 TERMUX_PKG_DESCRIPTION="Visual Studio Code - OSS"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION="1.117.0"
+TERMUX_PKG_VERSION="1.122.1"
 TERMUX_PKG_SRCURL=git+https://github.com/microsoft/vscode
 TERMUX_PKG_GIT_BRANCH="$TERMUX_PKG_VERSION"
 TERMUX_PKG_DEPENDS="electron-for-code-oss, libx11, libxkbfile, libsecret, ripgrep"
@@ -117,7 +117,7 @@ termux_step_make_install() {
 	chmod +x $TERMUX_PREFIX/lib/code-oss/bin/code-oss
 
 	# Replace ripgrep
-	ln -sfr $TERMUX_PREFIX/bin/rg $TERMUX_PREFIX/lib/code-oss/resources/app/node_modules/@vscode/ripgrep/bin/rg
+	ln -sfr $TERMUX_PREFIX/bin/rg $TERMUX_PREFIX/lib/code-oss/resources/app/node_modules/@vscode/ripgrep-universal/bin/rg
 
 	# Install appdata and desktop file
 	sed -i "s|@@NAME_SHORT@@|Code|g

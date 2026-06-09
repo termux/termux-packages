@@ -20,7 +20,7 @@ Subject: [PATCH 8/8] other
  cc/tiles/checker_image_tracker.h              |  1 +
  cc/tiles/tile_manager.cc                      |  3 +-
  cc/trees/damage_tracker.cc                    | 13 ++--
- cc/trees/layer_tree_impl.cc                   |  1 +
+ cc/trees/layer_tree_impl.cc                   |  5 +-
  cc/trees/tree_synchronizer.cc                 |  3 +-
  .../components/kcer/token_results_merger.h    |  1 +
  .../components/tether/fake_host_connection.h  |  1 +
@@ -91,7 +91,7 @@ Subject: [PATCH 8/8] other
  device/vr/openxr/openxr_hit_test_manager.cc   |  6 +-
  device/vr/openxr/openxr_path_helper.cc        |  6 +-
  device/vr/openxr/openxr_platform_helper.cc    | 10 +--
- device/vr/openxr/openxr_render_loop.cc        |  6 +-
+ device/vr/openxr/openxr_render_loop.cc        |  2 +-
  .../openxr/openxr_spatial_anchor_manager.cc   |  3 +-
  .../openxr/openxr_spatial_hit_test_manager.cc | 13 ++--
  .../vr/openxr/openxr_spatial_plane_manager.cc | 18 +++--
@@ -102,7 +102,6 @@ Subject: [PATCH 8/8] other
  .../api/app_runtime/app_runtime_api.cc        | 17 ++---
  .../browser/api/app_window/app_window_api.cc  |  4 +-
  .../api/audio/audio_service_chromeos.cc       | 15 ++---
- .../automation_event_router.cc                |  1 +
  .../api/bluetooth/bluetooth_event_router.cc   |  1 +
  .../bluetooth_low_energy_api.cc               |  5 +-
  .../api/declarative/deduping_factory.h        |  1 +
@@ -142,12 +141,13 @@ Subject: [PATCH 8/8] other
  .../web_request/web_request_api_helpers.cc    | 15 +++--
  .../api/web_request/web_request_info.cc       |  3 +-
  .../app_window/app_window_geometry_cache.cc   |  3 +-
- .../browser/app_window/app_window_registry.cc |  3 +-
+ .../browser/app_window/app_window_registry.cc |  2 +-
  extensions/browser/blocklist.cc               |  3 +-
  .../browser/blocklist_extension_prefs.cc      |  4 +-
  extensions/browser/blocklist_state_fetcher.cc |  3 +-
  .../content_verifier/content_verifier.cc      | 14 ++--
  .../browser/content_verifier/test_utils.cc    |  3 +-
+ extensions/browser/cws_info_service.cc        |  3 +-
  extensions/browser/disable_reason.cc          |  4 +-
  extensions/browser/event_listener_map.cc      |  3 +-
  extensions/browser/event_router.cc            | 11 +--
@@ -164,7 +164,7 @@ Subject: [PATCH 8/8] other
  .../guest_view/extensions_guest_view.cc       |  3 +-
  .../mime_handler_view_attach_helper.cc        |  3 +-
  .../mime_handler_view_embedder.cc             |  4 +-
- .../web_view/web_view_renderer_state.cc       |  3 +-
+ .../web_view/web_view_renderer_state.cc       |  2 +-
  .../browser/install/crx_install_error.cc      |  6 +-
  extensions/browser/install_verifier.cc        | 23 ++++---
  .../browser/lazy_background_task_queue.cc     |  3 +-
@@ -177,7 +177,7 @@ Subject: [PATCH 8/8] other
  .../browser/permissions/permissions_updater.h | 13 ++--
  extensions/browser/permissions_manager.cc     |  9 +--
  extensions/browser/process_manager.cc         |  9 +--
- extensions/browser/process_map.cc             |  3 +-
+ extensions/browser/process_map.cc             |  1 +
  extensions/browser/renderer_startup_helper.cc | 15 +++--
  extensions/browser/script_executor.cc         | 11 +--
  .../browser/script_injection_tracker.cc       |  3 +-
@@ -196,15 +196,15 @@ Subject: [PATCH 8/8] other
  extensions/common/constants.cc                |  9 +--
  .../content_script_injection_url_getter.cc    |  7 +-
  extensions/common/csp_validator.cc            |  3 +-
- extensions/common/extension.cc                |  5 +-
+ extensions/common/event_filter.cc             |  5 +-
+ extensions/common/extension.cc                |  3 +-
  extensions/common/extension_api.cc            |  3 +-
  extensions/common/extension_l10n_util.cc      |  5 +-
  extensions/common/extension_set.cc            |  3 +-
- extensions/common/features/simple_feature.cc  | 14 ++--
+ extensions/common/features/simple_feature.cc  | 16 ++---
  extensions/common/file_util.cc                |  4 +-
  extensions/common/manifest.cc                 |  4 +-
  extensions/common/manifest_handler.cc         |  1 +
- .../manifest_handlers/mime_types_handler.cc   |  3 +-
  .../manifest_handlers/requirements_info.cc    |  4 +-
  .../manifest_handlers/shared_module_info.cc   |  3 +-
  .../web_accessible_resources_info.cc          |  3 +-
@@ -247,7 +247,7 @@ Subject: [PATCH 8/8] other
  .../service/framebuffer_completeness_cache.cc |  3 +-
  .../service/gles2_cmd_decoder.cc              | 47 ++++++-------
  .../gles2_cmd_decoder_passthrough_doers.cc    | 11 +--
- gpu/command_buffer/service/program_cache.cc   |  3 +-
+ gpu/command_buffer/service/program_cache.cc   |  2 +-
  .../shared_image/ozone_image_backing.cc       |  3 +-
  .../shared_image/shared_image_factory.cc      |  1 +
  .../shared_image/shared_image_manager.cc      |  3 +-
@@ -259,7 +259,7 @@ Subject: [PATCH 8/8] other
  .../tests/gl_webgl_multi_draw_test.cc         |  7 +-
  gpu/config/gpu_feature_info.cc                |  3 +-
  gpu/config/gpu_switching.cc                   |  5 +-
- gpu/ipc/client/gpu_channel_host.cc            |  3 +-
+ gpu/ipc/client/gpu_channel_host.cc            |  2 +-
  ipc/param_traits_utils.cc                     |  4 +-
  media/audio/alsa/audio_manager_alsa.cc        |  3 +-
  media/audio/audio_output_dispatcher_impl.cc   |  7 +-
@@ -314,7 +314,7 @@ Subject: [PATCH 8/8] other
  media/gpu/windows/mf_audio_encoder.cc         |  5 +-
  media/midi/midi_manager_win.cc                |  7 +-
  .../services/gpu_mojo_media_client_linux.cc   |  2 -
- media/mojo/services/media_metrics_provider.cc |  2 +-
+ media/mojo/services/media_metrics_provider.cc |  3 +-
  media/mojo/services/watch_time_recorder.cc    |  3 +-
  media/parsers/vp9_parser.cc                   |  5 +-
  media/remoting/renderer_controller.cc         | 10 ++-
@@ -329,7 +329,7 @@ Subject: [PATCH 8/8] other
  net/cert/qwac.cc                              |  7 +-
  net/cert/two_qwac.cc                          |  5 +-
  net/cert/x509_certificate.cc                  |  8 +--
- net/cookies/canonical_cookie.cc               |  1 +
+ net/cookies/canonical_cookie.cc               |  5 +-
  net/cookies/cookie_base.cc                    |  5 +-
  .../cookie_partition_key_collection.cc        |  1 +
  net/cookies/cookie_util.cc                    |  3 +-
@@ -343,7 +343,6 @@ Subject: [PATCH 8/8] other
  net/dns/dns_response_result_extractor.cc      |  5 +-
  net/dns/dns_util.cc                           |  3 +-
  net/dns/host_cache.cc                         |  5 +-
- net/dns/host_resolver_dns_task.cc             |  2 +-
  net/dns/host_resolver_manager.cc              |  4 +-
  net/dns/host_resolver_manager_job.cc          |  3 +-
  net/dns/host_resolver_nat64_task.cc           |  2 +-
@@ -377,6 +376,7 @@ Subject: [PATCH 8/8] other
  net/quic/quic_session_pool_peer.cc            |  3 +-
  net/reporting/reporting_cache_impl.cc         |  3 +-
  net/reporting/reporting_delivery_agent.cc     |  7 +-
+ net/socket/client_socket_pool_manager.cc      | 27 ++++----
  net/socket/ssl_client_socket_impl.cc          |  2 +-
  net/socket/transport_client_socket_pool.cc    | 19 +++---
  .../websocket_transport_client_socket_pool.cc |  4 +-
@@ -389,7 +389,7 @@ Subject: [PATCH 8/8] other
  net/url_request/url_request_job_factory.cc    |  3 +-
  pdf/pdf_annotation_agent.h                    |  4 +-
  pdf/pdfium/pdfium_engine.cc                   |  5 +-
- pdf/pdfium/pdfium_on_demand_searchifier.cc    |  2 +-
+ pdf/pdfium/pdfium_on_demand_searchifier.cc    |  3 +-
  printing/backend/cups_ipp_helper.cc           |  7 +-
  printing/backend/cups_jobs.cc                 |  5 +-
  remoting/host/linux/gvariant_ref.h            |  4 +-
@@ -420,7 +420,7 @@ Subject: [PATCH 8/8] other
  url/origin.cc                                 |  5 +-
  url/scheme_host_port.cc                       |  6 +-
  url/url_util.cc                               |  9 ++-
- 416 files changed, 1328 insertions(+), 1048 deletions(-)
+ 416 files changed, 1343 insertions(+), 1062 deletions(-)
 
 diff --git a/apps/load_and_launch_browsertest.cc b/apps/load_and_launch_browsertest.cc
 index 3499d5faac..dd090cebf7 100644
@@ -449,7 +449,7 @@ index 3499d5faac..dd090cebf7 100644
  #endif
  
 diff --git a/cc/animation/animation_host.cc b/cc/animation/animation_host.cc
-index f55272ee87..5ba2dcedaf 100644
+index d66d924e34..aa096a1f0a 100644
 --- a/cc/animation/animation_host.cc
 +++ b/cc/animation/animation_host.cc
 @@ -9,6 +9,7 @@
@@ -460,7 +460,7 @@ index f55272ee87..5ba2dcedaf 100644
  #include "base/functional/bind.h"
  #include "base/functional/callback.h"
  #include "base/memory/ptr_util.h"
-@@ -948,7 +949,7 @@ void AnimationHost::HandleRemovedScrollAnimatingElements(
+@@ -950,7 +951,7 @@ void AnimationHost::HandleRemovedScrollAnimatingElements(
  }
  
  void AnimationHost::AddToTicking(scoped_refptr<Animation> animation) {
@@ -491,7 +491,7 @@ index b27ae1f186..8224ae5245 100644
        entry.second.second = std::nullopt;
      }
 diff --git a/cc/layers/tile_based_layer_impl.h b/cc/layers/tile_based_layer_impl.h
-index f0c0d4ed3a..eb736f1bf2 100644
+index 53611a2be2..cc56394d70 100644
 --- a/cc/layers/tile_based_layer_impl.h
 +++ b/cc/layers/tile_based_layer_impl.h
 @@ -124,7 +124,7 @@ class CC_EXPORT TileBasedLayerImpl : public LayerImpl {
@@ -770,7 +770,7 @@ index 27a654c123..a0d8a3a97e 100644
  #include "cc/cc_export.h"
  #include "cc/paint/image_id.h"
 diff --git a/cc/tiles/tile_manager.cc b/cc/tiles/tile_manager.cc
-index 61bdd5cc3a..54bc1eb08b 100644
+index abb51ae008..ba6adace9a 100644
 --- a/cc/tiles/tile_manager.cc
 +++ b/cc/tiles/tile_manager.cc
 @@ -12,6 +12,7 @@
@@ -829,7 +829,7 @@ index a7fcfa86fc..9ce1b9a083 100644
      return layer_drawable_bounds;
    }
 diff --git a/cc/trees/layer_tree_impl.cc b/cc/trees/layer_tree_impl.cc
-index d273c50cf4..8310cc66ed 100644
+index aef7a17ec4..28e2d47391 100644
 --- a/cc/trees/layer_tree_impl.cc
 +++ b/cc/trees/layer_tree_impl.cc
 @@ -15,6 +15,7 @@
@@ -840,8 +840,26 @@ index d273c50cf4..8310cc66ed 100644
  #include "base/debug/crash_logging.h"
  #include "base/debug/dump_without_crashing.h"
  #include "base/json/json_writer.h"
+@@ -2372,7 +2373,7 @@ void LayerTreeImpl::NotifyLayerHasAnimatedImagesChanged(
+     layer_list_.RemovePictureLayerWithAnimatedImages(layer);
+   }
+   DCHECK_EQ(has_animated_images,
+-            std::ranges::contains(layer_list_.PictureLayersWithAnimatedImages(),
++            base::Contains(layer_list_.PictureLayersWithAnimatedImages(),
+                                   layer));
+ }
+ 
+@@ -2390,7 +2391,7 @@ void LayerTreeImpl::NotifyLayerHasPaintWorkletsChanged(PictureLayerImpl* layer,
+   } else {
+     layer_list_.RemovePictureLayerWithWorklet(layer);
+   }
+-  DCHECK_EQ(has_worklets, std::ranges::contains(
++  DCHECK_EQ(has_worklets, base::Contains(
+                               layer_list_.PictureLayersWithWorklets(), layer));
+ }
+ 
 diff --git a/cc/trees/tree_synchronizer.cc b/cc/trees/tree_synchronizer.cc
-index 020da4b0eb..1d3642a527 100644
+index ab885439fd..014e208445 100644
 --- a/cc/trees/tree_synchronizer.cc
 +++ b/cc/trees/tree_synchronizer.cc
 @@ -13,6 +13,7 @@
@@ -958,7 +976,7 @@ index d71392a2f9..ef36620b24 100644
        device::BluetoothAdapter::BluetoothRole::kCentralPeripheral));
  #else
 diff --git a/device/bluetooth/bluetooth_adapter_winrt.cc b/device/bluetooth/bluetooth_adapter_winrt.cc
-index 4a9e74c38e..6fb72b71ab 100644
+index 29ba11bf82..591ef4cc42 100644
 --- a/device/bluetooth/bluetooth_adapter_winrt.cc
 +++ b/device/bluetooth/bluetooth_adapter_winrt.cc
 @@ -9,11 +9,11 @@
@@ -974,7 +992,7 @@ index 4a9e74c38e..6fb72b71ab 100644
  #include "base/containers/span.h"
  #include "base/functional/bind.h"
  #include "base/functional/callback.h"
-@@ -1383,7 +1383,7 @@ void BluetoothAdapterWinrt::OnAdvertisementWatcherStopped(
+@@ -1392,7 +1392,7 @@ void BluetoothAdapterWinrt::OnAdvertisementWatcherStopped(
  void BluetoothAdapterWinrt::OnRegisterAdvertisement(
      BluetoothAdvertisement* advertisement,
      CreateAdvertisementCallback callback) {
@@ -2273,7 +2291,7 @@ index 0cb6eea55f..1c5be4efc5 100644
    }
    observed_adverts_.insert(advert_array);
 diff --git a/device/fido/cable/v2_test_util.cc b/device/fido/cable/v2_test_util.cc
-index 70162ae1b4..5f3587fa84 100644
+index 1199cd233f..17764e5737 100644
 --- a/device/fido/cable/v2_test_util.cc
 +++ b/device/fido/cable/v2_test_util.cc
 @@ -12,6 +12,7 @@
@@ -2429,7 +2447,7 @@ index 92809136af..23500a436e 100644
  
  void FidoRequestHandlerBase::MaybeSignalTransportsEnumerated() {
 diff --git a/device/fido/get_assertion_request_handler.cc b/device/fido/get_assertion_request_handler.cc
-index ad82ac045a..f77bd6cfca 100644
+index b48490c596..8296bdfec3 100644
 --- a/device/fido/get_assertion_request_handler.cc
 +++ b/device/fido/get_assertion_request_handler.cc
 @@ -11,6 +11,7 @@
@@ -2440,7 +2458,7 @@ index ad82ac045a..f77bd6cfca 100644
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
  #include "base/json/json_writer.h"
-@@ -328,8 +329,8 @@ void GetAssertionRequestHandler::PreselectAccount(
+@@ -335,8 +336,8 @@ void GetAssertionRequestHandler::PreselectAccount(
      DiscoverableCredentialMetadata credential) {
    DCHECK(!preselected_credential_);
    DCHECK(request_.allow_list.empty() ||
@@ -2941,7 +2959,7 @@ index 3b2d431899..9c72b50ab2 100644
    }
  
 diff --git a/device/vr/openxr/openxr_api_wrapper.cc b/device/vr/openxr/openxr_api_wrapper.cc
-index 03c07c0efe..a5ea38df81 100644
+index 3d06a5c6f3..19b2200301 100644
 --- a/device/vr/openxr/openxr_api_wrapper.cc
 +++ b/device/vr/openxr/openxr_api_wrapper.cc
 @@ -12,6 +12,7 @@
@@ -3127,7 +3145,7 @@ index fa557d1c28..85d7023a52 100644
  
  }  // namespace device
 diff --git a/device/vr/openxr/openxr_render_loop.cc b/device/vr/openxr/openxr_render_loop.cc
-index 5698ebb234..63cf1e7736 100644
+index 5ddd8eebc9..6659a06a31 100644
 --- a/device/vr/openxr/openxr_render_loop.cc
 +++ b/device/vr/openxr/openxr_render_loop.cc
 @@ -6,7 +6,6 @@
@@ -3146,19 +3164,6 @@ index 5698ebb234..63cf1e7736 100644
  #include "build/build_config.h"
  #include "components/viz/common/gpu/context_provider.h"
  #include "device/vr/openxr/exit_xr_present_reason.h"
-@@ -81,10 +81,10 @@ OpenXrRenderLoop::~OpenXrRenderLoop() {
- }
- 
- void OpenXrRenderLoop::ExitPresent(ExitXrPresentReason reason) {
--  DVLOG(1) << __func__ << " reason=" << std::to_underlying(reason);
-+  DVLOG(1) << __func__ << " reason=" << base::to_underlying(reason);
-   TRACE_EVENT_INSTANT1("xr", "OpenXrRenderLoop::ExitPresent",
-                        TRACE_EVENT_SCOPE_THREAD, "reason",
--                       std::to_underlying(reason));
-+                       base::to_underlying(reason));
-   if (!is_presenting_) {
-     return;
-   }
 diff --git a/device/vr/openxr/openxr_spatial_anchor_manager.cc b/device/vr/openxr/openxr_spatial_anchor_manager.cc
 index 580efbed01..2042d9b64a 100644
 --- a/device/vr/openxr/openxr_spatial_anchor_manager.cc
@@ -3288,7 +3293,7 @@ index 4e6a0fefef..c8a62742c9 100644
  
      // If not, let's enable the first attachable component that we found, since
 diff --git a/device/vr/openxr/test/fake_openxr_impl_api.cc b/device/vr/openxr/test/fake_openxr_impl_api.cc
-index 6c4078b67d..d968885648 100644
+index a14869560c..e18de280f9 100644
 --- a/device/vr/openxr/test/fake_openxr_impl_api.cc
 +++ b/device/vr/openxr/test/fake_openxr_impl_api.cc
 @@ -2,8 +2,7 @@
@@ -3311,7 +3316,7 @@ index 6c4078b67d..d968885648 100644
  
    RETURN_IF_FALSE(all_valid, XR_ERROR_VALIDATION_FAILURE,
 diff --git a/device/vr/openxr/test/openxr_test_helper.cc b/device/vr/openxr/test/openxr_test_helper.cc
-index 31a1c9cb63..9afc8acf71 100644
+index 99c03c8ecb..f5eb2474da 100644
 --- a/device/vr/openxr/test/openxr_test_helper.cc
 +++ b/device/vr/openxr/test/openxr_test_helper.cc
 @@ -4,10 +4,10 @@
@@ -3326,7 +3331,7 @@ index 31a1c9cb63..9afc8acf71 100644
  #include "base/logging.h"
  #include "base/no_destructor.h"
  #include "device/vr/openxr/openxr_interaction_profile_paths.h"
-@@ -637,7 +637,7 @@ XrResult OpenXrTestHelper::BeginSession(
+@@ -775,7 +775,7 @@ XrResult OpenXrTestHelper::BeginSession(
      }
  
      // Check for duplicates.
@@ -3463,18 +3468,6 @@ index 649be7aaeb..39a0b20bf6 100644
  
    for (const auto& device : devices) {
      if (filter && filter->is_active && *filter->is_active != device.active)
-diff --git a/extensions/browser/api/automation_internal/automation_event_router.cc b/extensions/browser/api/automation_internal/automation_event_router.cc
-index 67145961a2..2eee7ffea7 100644
---- a/extensions/browser/api/automation_internal/automation_event_router.cc
-+++ b/extensions/browser/api/automation_internal/automation_event_router.cc
-@@ -9,6 +9,7 @@
- #include <string>
- #include <utility>
- 
-+#include "base/containers/contains.h"
- #include "base/observer_list.h"
- #include "base/values.h"
- #include "build/build_config.h"
 diff --git a/extensions/browser/api/bluetooth/bluetooth_event_router.cc b/extensions/browser/api/bluetooth/bluetooth_event_router.cc
 index 1c1e11ef78..7f473b747f 100644
 --- a/extensions/browser/api/bluetooth/bluetooth_event_router.cc
@@ -3488,7 +3481,7 @@ index 1c1e11ef78..7f473b747f 100644
  #include "base/functional/callback_helpers.h"
  #include "base/lazy_instance.h"
 diff --git a/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc b/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
-index c5b796b5af..2ce70b676c 100644
+index 78d5e7637f..6e8a05dfe5 100644
 --- a/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
 +++ b/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
 @@ -17,6 +17,7 @@
@@ -3499,7 +3492,7 @@ index c5b796b5af..2ce70b676c 100644
  #include "base/types/expected_macros.h"
  #include "base/values.h"
  #include "build/build_config.h"
-@@ -196,7 +197,7 @@ device::BluetoothGattCharacteristic::Properties GetBluetoothProperties(
+@@ -194,7 +195,7 @@ device::BluetoothGattCharacteristic::Properties GetBluetoothProperties(
        device::BluetoothGattCharacteristic::PROPERTY_NONE;
  
    static_assert(
@@ -3508,7 +3501,7 @@ index c5b796b5af..2ce70b676c 100644
        "Update required if the number of characteristic properties changes.");
  
    if (HasProperty(api_properties,
-@@ -282,7 +283,7 @@ device::BluetoothGattCharacteristic::Permissions GetBluetoothPermissions(
+@@ -280,7 +281,7 @@ device::BluetoothGattCharacteristic::Permissions GetBluetoothPermissions(
        device::BluetoothGattCharacteristic::PERMISSION_NONE;
  
    static_assert(
@@ -3530,7 +3523,7 @@ index 5573b10d31..39df57f02e 100644
  #include "base/containers/flat_set.h"
  #include "base/memory/ref_counted.h"
 diff --git a/extensions/browser/api/declarative/rules_registry.cc b/extensions/browser/api/declarative/rules_registry.cc
-index fdc9ab5c2d..f78508a4ea 100644
+index 376867d321..daf16cfb3c 100644
 --- a/extensions/browser/api/declarative/rules_registry.cc
 +++ b/extensions/browser/api/declarative/rules_registry.cc
 @@ -8,6 +8,7 @@
@@ -3837,7 +3830,7 @@ index a1d49adb2d..bf44717c9c 100644
        }
  
 diff --git a/extensions/browser/api/declarative_net_request/ruleset_manager.cc b/extensions/browser/api/declarative_net_request/ruleset_manager.cc
-index 6e9db2ade6..b6f7870431 100644
+index 9d4b5fc3dc..099bc95550 100644
 --- a/extensions/browser/api/declarative_net_request/ruleset_manager.cc
 +++ b/extensions/browser/api/declarative_net_request/ruleset_manager.cc
 @@ -11,6 +11,7 @@
@@ -3848,7 +3841,7 @@ index 6e9db2ade6..b6f7870431 100644
  #include "base/functional/bind.h"
  #include "base/metrics/histogram_functions.h"
  #include "base/metrics/histogram_macros.h"
-@@ -230,8 +231,8 @@ bool RulesetManager::HasExtraHeadersMatcherForRequest(
+@@ -251,8 +252,8 @@ bool RulesetManager::HasExtraHeadersMatcherForRequest(
    // request would potentially match any onHeadersReceived rules based on
    // non-header parameters.
    return HasRulesets(RulesetMatchingStage::kOnHeadersReceived) ||
@@ -3975,7 +3968,7 @@ index 082c8e4f51..53689183fd 100644
        result->insert(rule_trigger->second);
    }
 diff --git a/extensions/browser/api/device_permissions_manager.cc b/extensions/browser/api/device_permissions_manager.cc
-index 9f2624f8e5..a5e31e8a1c 100644
+index dc95d38657..da5d897b1c 100644
 --- a/extensions/browser/api/device_permissions_manager.cc
 +++ b/extensions/browser/api/device_permissions_manager.cc
 @@ -9,6 +9,7 @@
@@ -3985,7 +3978,7 @@ index 9f2624f8e5..a5e31e8a1c 100644
 +#include "base/containers/contains.h"
  #include "base/functional/bind.h"
  #include "base/memory/scoped_refptr.h"
- #include "base/memory/singleton.h"
+ #include "base/no_destructor.h"
 @@ -522,8 +523,8 @@ void DevicePermissionsManager::AllowUsbDevice(
  
      device_permissions->entries_.insert(device_entry);
@@ -4129,7 +4122,7 @@ index c0daba7685..d3470374b4 100644
    // Update the device information.
    devices_[resource_id] = std::move(device);
 diff --git a/extensions/browser/api/management/management_api.cc b/extensions/browser/api/management/management_api.cc
-index 2c7cb53f89..8d2c9d8bf1 100644
+index 200a361398..741e1bb4b1 100644
 --- a/extensions/browser/api/management/management_api.cc
 +++ b/extensions/browser/api/management/management_api.cc
 @@ -4,12 +4,12 @@
@@ -4178,7 +4171,7 @@ index 24f57a1bfe..544e9cd0ba 100644
  
  bool ExtensionMessagePort::IsValidPort() {
 diff --git a/extensions/browser/api/messaging/message_service.cc b/extensions/browser/api/messaging/message_service.cc
-index cacadbaf0e..4eda6fdddb 100644
+index a61bff1e8c..13755c2a5a 100644
 --- a/extensions/browser/api/messaging/message_service.cc
 +++ b/extensions/browser/api/messaging/message_service.cc
 @@ -12,6 +12,7 @@
@@ -4315,7 +4308,7 @@ index e20871def6..61dba34dff 100644
    DCHECK(data.host);
  
 diff --git a/extensions/browser/api/runtime/runtime_api.cc b/extensions/browser/api/runtime/runtime_api.cc
-index c9a0947e7b..f4f9f37096 100644
+index 3174eabde6..80d36905b8 100644
 --- a/extensions/browser/api/runtime/runtime_api.cc
 +++ b/extensions/browser/api/runtime/runtime_api.cc
 @@ -4,7 +4,6 @@
@@ -4326,7 +4319,7 @@ index c9a0947e7b..f4f9f37096 100644
  #include <memory>
  #include <utility>
  #include <vector>
-@@ -167,39 +166,37 @@ bool ExtensionContextMatchesFilter(
+@@ -168,39 +167,37 @@ bool ExtensionContextMatchesFilter(
      const api::runtime::ExtensionContext& context,
      const api::runtime::ContextFilter& filter) {
    if (filter.context_types &&
@@ -4374,7 +4367,7 @@ index c9a0947e7b..f4f9f37096 100644
      return false;
    }
    if (filter.incognito && *filter.incognito != context.incognito) {
-@@ -823,8 +820,8 @@ ExtensionFunction::ResponseAction RuntimeGetContextsFunction::Run() {
+@@ -829,8 +826,8 @@ ExtensionFunction::ResponseAction RuntimeGetContextsFunction::Run() {
    // Minor optimization: only construct the context if there's a chance it will
    // match the filter.
    if (!filter.context_types ||
@@ -4437,7 +4430,7 @@ index d816e03f51..ee45cdc70c 100644
  
  void StorageFrontend::RunWithStorage(
 diff --git a/extensions/browser/api/storage/storage_utils.cc b/extensions/browser/api/storage/storage_utils.cc
-index 93a6915f77..b5334e93fc 100644
+index 51508b31ad..fde2058d3e 100644
 --- a/extensions/browser/api/storage/storage_utils.cc
 +++ b/extensions/browser/api/storage/storage_utils.cc
 @@ -4,8 +4,7 @@
@@ -4448,9 +4441,9 @@ index 93a6915f77..b5334e93fc 100644
 -
 +#include "base/types/cxx23_to_underlying.h"
  #include "base/values.h"
+ #include "content/public/common/child_process_id.h"
  #include "extensions/browser/extension_prefs.h"
- #include "extensions/browser/extension_util.h"
-@@ -63,7 +62,7 @@ api::storage::AccessLevel GetAccessLevelForArea(
+@@ -64,7 +63,7 @@ api::storage::AccessLevel GetAccessLevelForArea(
      // Return access level iff it's a valid value.
      if (stored_access_level_int > 0 &&
          stored_access_level_int <=
@@ -4459,7 +4452,7 @@ index 93a6915f77..b5334e93fc 100644
        return static_cast<api::storage::AccessLevel>(stored_access_level_int);
      }
    }
-@@ -88,7 +87,7 @@ void SetAccessLevelForArea(const ExtensionId& extension_id,
+@@ -89,7 +88,7 @@ void SetAccessLevelForArea(const ExtensionId& extension_id,
    ExtensionPrefs* prefs = ExtensionPrefs::Get(&browser_context);
    const PrefMap* pref_map = GetPrefMapForStorageArea(storage_area);
    prefs->SetIntegerPref(extension_id, *pref_map,
@@ -4513,7 +4506,7 @@ index c5f00b8940..6a64acac43 100644
      }
  
 diff --git a/extensions/browser/api/web_request/extension_web_request_event_router.cc b/extensions/browser/api/web_request/extension_web_request_event_router.cc
-index b11485abe1..f90752726c 100644
+index e2a4c79e4f..32f702e9ef 100644
 --- a/extensions/browser/api/web_request/extension_web_request_event_router.cc
 +++ b/extensions/browser/api/web_request/extension_web_request_event_router.cc
 @@ -8,7 +8,6 @@
@@ -4532,7 +4525,7 @@ index b11485abe1..f90752726c 100644
  #include "components/guest_view/buildflags/buildflags.h"
  #include "content/public/browser/browser_context.h"
  #include "content/public/browser/browser_thread.h"
-@@ -960,11 +960,11 @@ bool WebRequestEventRouter::SignaledRequestIDTracker::GetAndSet(
+@@ -962,11 +962,11 @@ bool WebRequestEventRouter::SignaledRequestIDTracker::GetAndSet(
      EventTypes event_type) {
    auto iter = signaled_requests_.find(request_id);
    if (iter == signaled_requests_.end()) {
@@ -4547,7 +4540,7 @@ index b11485abe1..f90752726c 100644
    return was_signaled_before;
  }
  
-@@ -973,7 +973,7 @@ void WebRequestEventRouter::SignaledRequestIDTracker::ClearEventType(
+@@ -975,7 +975,7 @@ void WebRequestEventRouter::SignaledRequestIDTracker::ClearEventType(
      EventTypes event_type) {
    auto iter = signaled_requests_.find(request_id);
    if (iter != signaled_requests_.end()) {
@@ -4556,7 +4549,7 @@ index b11485abe1..f90752726c 100644
    }
  }
  
-@@ -2341,8 +2341,8 @@ void WebRequestEventRouter::OnOTRBrowserContextDestroyed(
+@@ -2358,8 +2358,8 @@ void WebRequestEventRouter::OnOTRBrowserContextDestroyed(
    // ways that break the expectations we have in production code.
    if (event_router) {
      event_router->OnBrowserContextShutdown(otr_browser_context);
@@ -4567,7 +4560,7 @@ index b11485abe1..f90752726c 100644
    }
  }
  
-@@ -2759,8 +2759,7 @@ bool WebRequestEventRouter::ListenerMatchesRequest(
+@@ -2776,8 +2776,7 @@ bool WebRequestEventRouter::ListenerMatchesRequest(
    }
  
    const std::vector<WebRequestResourceType>& types = listener.filter.types;
@@ -4659,7 +4652,7 @@ index 9b5cf554c9..c1cd6d0fdf 100644
            uint64_t allow_rule_priority_for_extension = 0u;
            if (auto& allow_action =
 diff --git a/extensions/browser/app_window/app_window_geometry_cache.cc b/extensions/browser/app_window/app_window_geometry_cache.cc
-index 5a183a7c17..898e04c16a 100644
+index b8f0b31d79..2090852a87 100644
 --- a/extensions/browser/app_window/app_window_geometry_cache.cc
 +++ b/extensions/browser/app_window/app_window_geometry_cache.cc
 @@ -8,6 +8,7 @@
@@ -4669,8 +4662,8 @@ index 5a183a7c17..898e04c16a 100644
 +#include "base/containers/contains.h"
  #include "base/functional/bind.h"
  #include "base/json/values_util.h"
- #include "base/observer_list.h"
-@@ -57,7 +58,7 @@ void AppWindowGeometryCache::SaveGeometry(
+ #include "base/no_destructor.h"
+@@ -58,7 +59,7 @@ void AppWindowGeometryCache::SaveGeometry(
    if (extension_data[window_id].bounds == bounds &&
        extension_data[window_id].window_state == window_state &&
        extension_data[window_id].screen_bounds == screen_bounds &&
@@ -4680,18 +4673,10 @@ index 5a183a7c17..898e04c16a 100644
  
    base::Time now = base::Time::Now();
 diff --git a/extensions/browser/app_window/app_window_registry.cc b/extensions/browser/app_window/app_window_registry.cc
-index 404c52fd2f..86b7a6edf3 100644
+index f4c8802f8f..b2c732dcb2 100644
 --- a/extensions/browser/app_window/app_window_registry.cc
 +++ b/extensions/browser/app_window/app_window_registry.cc
-@@ -8,6 +8,7 @@
- #include <string>
- #include <vector>
- 
-+#include "base/containers/contains.h"
- #include "base/observer_list.h"
- #include "base/strings/stringprintf.h"
- #include "components/keyed_service/content/browser_context_dependency_manager.h"
-@@ -176,7 +177,7 @@ void AppWindowRegistry::DevToolsAgentHostDetached(
+@@ -177,7 +177,7 @@ void AppWindowRegistry::DevToolsAgentHostDetached(
  }
  
  void AppWindowRegistry::AddAppWindowToList(AppWindow* app_window) {
@@ -4832,6 +4817,27 @@ index 3f898bc48a..15bbbe2960 100644
      return;
    EXPECT_TRUE(id_to_wait_for_.empty());
    EXPECT_EQ(loop_runner_.get(), nullptr);
+diff --git a/extensions/browser/cws_info_service.cc b/extensions/browser/cws_info_service.cc
+index 8a36bc971b..5a48b3793b 100644
+--- a/extensions/browser/cws_info_service.cc
++++ b/extensions/browser/cws_info_service.cc
+@@ -9,6 +9,7 @@
+ #include <string>
+ #include <string_view>
+ 
++#include "base/containers/contains.h"
+ #include "base/containers/fixed_flat_map.h"
+ #include "base/containers/queue.h"
+ #include "base/features.h"
+@@ -186,7 +187,7 @@ base::DictValue GetDictFromStoreMetadataProto(const StoreMetadata* metadata) {
+ 
+     const auto& proto_labels = metadata->labels();
+     for (const auto* label : kLabels) {
+-      dict.Set(label, std::ranges::contains(proto_labels, label));
++      dict.Set(label, base::Contains(proto_labels, label));
+     }
+   }
+ 
 diff --git a/extensions/browser/disable_reason.cc b/extensions/browser/disable_reason.cc
 index 1d7bea7d10..9a5a6c109f 100644
 --- a/extensions/browser/disable_reason.cc
@@ -4878,7 +4884,7 @@ index 628dce6d20..8d86a6a2bd 100644
  
  }  // namespace extensions
 diff --git a/extensions/browser/event_router.cc b/extensions/browser/event_router.cc
-index 2b92a7237e..b4a70327b1 100644
+index 318a34cdab..8d07e17114 100644
 --- a/extensions/browser/event_router.cc
 +++ b/extensions/browser/event_router.cc
 @@ -15,6 +15,7 @@
@@ -4889,16 +4895,25 @@ index 2b92a7237e..b4a70327b1 100644
  #include "base/debug/crash_logging.h"
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
-@@ -179,7 +180,7 @@ void EventRouter::RouteDispatchEvent(
+@@ -160,7 +161,7 @@
+ bool IsSubEventName(std::string_view event) {
+   return (event.starts_with("webRequest.") ||
+           event.starts_with("webViewInternal.")) &&
+-         event.contains("/");
++         base::Contains(event, "/");
+ }
+ 
+ }  // namespace
+@@ -218,7 +219,7 @@
      mojom::DispatchEventParamsPtr params,
      base::ListValue event_args,
      mojom::EventDispatcher::DispatchEventCallback callback) {
 -  CHECK(observed_process_set_.contains(rph));
 +  CHECK(base::Contains(observed_process_set_, rph));
-   int worker_thread_id = params->worker_thread_id;
-   mojo::AssociatedRemote<mojom::EventDispatcher>& dispatcher =
-       rph_dispatcher_map_[rph][worker_thread_id];
-@@ -593,7 +594,7 @@ void EventRouter::AddEventListener(const std::string& event_name,
+ 
+   if (params->is_user_gesture &&
+       params->host_id->type == mojom::HostID::HostType::kExtensions) {
+@@ -894,7 +895,7 @@
                                     const ExtensionId& extension_id) {
    listeners_.AddListener(EventListener::ForExtension(event_name, extension_id,
                                                       process, std::nullopt));
@@ -4907,7 +4922,7 @@ index 2b92a7237e..b4a70327b1 100644
  }
  
  void EventRouter::AddServiceWorkerEventListener(
-@@ -606,7 +607,7 @@ void EventRouter::AddServiceWorkerEventListener(
+@@ -907,7 +908,7 @@
        event_listener->listener_owner->get_extension_id(), process,
        process->GetBrowserContext(), service_worker.scope_url,
        service_worker.version_id, service_worker.thread_id, std::nullopt));
@@ -4916,7 +4931,7 @@ index 2b92a7237e..b4a70327b1 100644
  }
  
  void EventRouter::RemoveEventListener(const std::string& event_name,
-@@ -636,7 +637,7 @@ void EventRouter::AddEventListenerForURL(const std::string& event_name,
+@@ -937,7 +938,7 @@
                                           const GURL& listener_url) {
    listeners_.AddListener(
        EventListener::ForURL(event_name, listener_url, process, std::nullopt));
@@ -4925,7 +4940,7 @@ index 2b92a7237e..b4a70327b1 100644
  }
  
  void EventRouter::RemoveEventListenerForURL(const std::string& event_name,
-@@ -650,7 +651,7 @@ void EventRouter::RemoveEventListenerForURL(const std::string& event_name,
+@@ -951,7 +952,7 @@
  void EventRouter::RegisterObserver(Observer* observer,
                                     const std::string& event_name) {
    // Observing sub-event names like "foo.onBar/123" is not allowed.
@@ -4935,7 +4950,7 @@ index 2b92a7237e..b4a70327b1 100644
    if (!observers) {
      observers = std::make_unique<Observers>();
 diff --git a/extensions/browser/events/event_dispatch_helper.cc b/extensions/browser/events/event_dispatch_helper.cc
-index c200c55b8c..f399efbf05 100644
+index f3894b566f..e5f07f1fb4 100644
 --- a/extensions/browser/events/event_dispatch_helper.cc
 +++ b/extensions/browser/events/event_dispatch_helper.cc
 @@ -6,6 +6,7 @@
@@ -4946,7 +4961,7 @@ index c200c55b8c..f399efbf05 100644
  #include "base/functional/bind.h"
  #include "base/task/sequenced_task_runner.h"
  #include "content/public/browser/render_process_host.h"
-@@ -424,7 +425,7 @@ void EventDispatchHelper::RecordAlreadyQueued(
+@@ -425,7 +426,7 @@ void EventDispatchHelper::RecordAlreadyQueued(
  
  bool EventDispatchHelper::IsAlreadyQueued(
      const LazyContextId& dispatch_context) const {
@@ -4956,7 +4971,7 @@ index c200c55b8c..f399efbf05 100644
  
  bool EventDispatchHelper::ListenerMeetsRestrictions(
 diff --git a/extensions/browser/extension_action.cc b/extensions/browser/extension_action.cc
-index 53a6d58261..668577b6f2 100644
+index 900ba7a414..3cd5d25044 100644
 --- a/extensions/browser/extension_action.cc
 +++ b/extensions/browser/extension_action.cc
 @@ -9,6 +9,7 @@
@@ -4976,7 +4991,7 @@ index 53a6d58261..668577b6f2 100644
  }
  
  }  // namespace
-@@ -314,7 +315,7 @@ bool ExtensionAction::GetIsVisibleInternal(TabID tab_id,
+@@ -315,7 +316,7 @@ bool ExtensionAction::GetIsVisibleInternal(TabID tab_id,
      return *tab_is_visible;
    }
  
@@ -4986,7 +5001,7 @@ index 53a6d58261..668577b6f2 100644
    }
  
 diff --git a/extensions/browser/extension_action.h b/extensions/browser/extension_action.h
-index 44596528e0..20d95bb53a 100644
+index 50f62b482b..1b38d526ca 100644
 --- a/extensions/browser/extension_action.h
 +++ b/extensions/browser/extension_action.h
 @@ -10,6 +10,7 @@
@@ -5106,7 +5121,7 @@ index 1c9797c2a4..9e6f00b220 100644
    // destroyed.  This is always true when waiting for
    // OnExtensionHostDestroyed(), but can also happen if the ExtensionHost is
 diff --git a/extensions/browser/extension_navigation_throttle.cc b/extensions/browser/extension_navigation_throttle.cc
-index 1d16ed89a5..84023057ea 100644
+index 6b4ab4ad52..0bc1525f4d 100644
 --- a/extensions/browser/extension_navigation_throttle.cc
 +++ b/extensions/browser/extension_navigation_throttle.cc
 @@ -4,10 +4,10 @@
@@ -5133,7 +5148,7 @@ index 1d16ed89a5..84023057ea 100644
    }
  
 diff --git a/extensions/browser/extension_prefs.cc b/extensions/browser/extension_prefs.cc
-index 80eb1599a2..767e57c82b 100644
+index 7d3c6f5fd0..c2bc615566 100644
 --- a/extensions/browser/extension_prefs.cc
 +++ b/extensions/browser/extension_prefs.cc
 @@ -15,6 +15,7 @@
@@ -5288,7 +5303,7 @@ index bce04790af..2c26750555 100644
  }
  
 diff --git a/extensions/browser/guest_view/mime_handler_view/mime_handler_view_attach_helper.cc b/extensions/browser/guest_view/mime_handler_view/mime_handler_view_attach_helper.cc
-index 27568610cf..9e2f680dc8 100644
+index b1ab7caaa4..c57191af21 100644
 --- a/extensions/browser/guest_view/mime_handler_view/mime_handler_view_attach_helper.cc
 +++ b/extensions/browser/guest_view/mime_handler_view/mime_handler_view_attach_helper.cc
 @@ -9,6 +9,7 @@
@@ -5299,7 +5314,7 @@ index 27568610cf..9e2f680dc8 100644
  #include "base/containers/flat_map.h"
  #include "base/functional/bind.h"
  #include "base/memory/ptr_util.h"
-@@ -85,7 +86,7 @@ MimeHandlerViewAttachHelper* MimeHandlerViewAttachHelper::Get(
+@@ -46,7 +47,7 @@ MimeHandlerViewAttachHelper* MimeHandlerViewAttachHelper::Get(
      int32_t render_process_id) {
    DCHECK_CURRENTLY_ON(BrowserThread::UI);
    auto& map = *GetProcessIdToHelperMap();
@@ -5331,18 +5346,10 @@ index b4b761d0bd..c024538e30 100644
        frame_tree_node_id,
        base::WrapUnique(new MimeHandlerViewEmbedder(
 diff --git a/extensions/browser/guest_view/web_view/web_view_renderer_state.cc b/extensions/browser/guest_view/web_view/web_view_renderer_state.cc
-index 1b1f50fb30..d085c5482a 100644
+index f78ff2d515..c6766af752 100644
 --- a/extensions/browser/guest_view/web_view/web_view_renderer_state.cc
 +++ b/extensions/browser/guest_view/web_view/web_view_renderer_state.cc
-@@ -4,6 +4,7 @@
- 
- #include "extensions/browser/guest_view/web_view/web_view_renderer_state.h"
- 
-+#include "base/containers/contains.h"
- #include "content/public/browser/browser_thread.h"
- 
- using content::BrowserThread;
-@@ -28,7 +29,7 @@ WebViewRendererState::~WebViewRendererState() = default;
+@@ -29,7 +29,7 @@ WebViewRendererState::~WebViewRendererState() = default;
  
  bool WebViewRendererState::IsGuest(int render_process_id) const {
    base::AutoLock auto_lock(web_view_partition_id_map_lock_);
@@ -5377,7 +5384,7 @@ index f864ae599f..9c16dcaf27 100644
  
  // Returns true if the error occurred during crx installation due to mismatch in
 diff --git a/extensions/browser/install_verifier.cc b/extensions/browser/install_verifier.cc
-index ef8a1bcfae..d642dab8fa 100644
+index 9b00c052d7..73202eee5d 100644
 --- a/extensions/browser/install_verifier.cc
 +++ b/extensions/browser/install_verifier.cc
 @@ -11,6 +11,7 @@
@@ -5611,7 +5618,7 @@ index 8d7d14d823..b50078d33b 100644
  #include "base/feature_list.h"
  #include "base/logging.h"
 diff --git a/extensions/browser/permissions/active_tab_permission_granter.cc b/extensions/browser/permissions/active_tab_permission_granter.cc
-index 9d17063006..d8dc622dc2 100644
+index 1b298e1007..e76c5632d6 100644
 --- a/extensions/browser/permissions/active_tab_permission_granter.cc
 +++ b/extensions/browser/permissions/active_tab_permission_granter.cc
 @@ -7,6 +7,7 @@
@@ -5778,7 +5785,7 @@ index a12d4d9045..91280e088a 100644
    }
    return UserSiteSetting::kCustomizeByExtension;
 diff --git a/extensions/browser/process_manager.cc b/extensions/browser/process_manager.cc
-index b80e711ccd..987a33819a 100644
+index 2e412026f5..2fca53e386 100644
 --- a/extensions/browser/process_manager.cc
 +++ b/extensions/browser/process_manager.cc
 @@ -8,6 +8,7 @@
@@ -5789,7 +5796,7 @@ index b80e711ccd..987a33819a 100644
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
  #include "base/location.h"
-@@ -282,7 +283,7 @@ ProcessManager::FrameSet ProcessManager::GetRenderFrameHostsForExtension(
+@@ -289,7 +290,7 @@ ProcessManager::FrameSet ProcessManager::GetRenderFrameHostsForExtension(
  
  bool ProcessManager::IsRenderFrameHostRegistered(
      content::RenderFrameHost* render_frame_host) {
@@ -5798,7 +5805,7 @@ index b80e711ccd..987a33819a 100644
  }
  
  void ProcessManager::AddObserver(ProcessManagerObserver* observer) {
-@@ -566,7 +567,7 @@ void ProcessManager::NetworkRequestDone(
+@@ -573,7 +574,7 @@ void ProcessManager::NetworkRequestDone(
    ExtensionHost* host = result->second;
    pending_network_requests_.erase(result);
  
@@ -5807,7 +5814,7 @@ index b80e711ccd..987a33819a 100644
      return;
    }
  
-@@ -673,7 +674,7 @@ void ProcessManager::CloseBackgroundHost(ExtensionHost* host) {
+@@ -680,7 +681,7 @@ void ProcessManager::CloseBackgroundHost(ExtensionHost* host) {
          mojom::ViewType::kExtensionBackgroundPage);
    delete host;
    // |host| should deregister itself from our structures.
@@ -5816,7 +5823,7 @@ index b80e711ccd..987a33819a 100644
  
    for (auto& observer : observer_list_)
      observer.OnBackgroundHostClose(extension_id);
-@@ -1020,7 +1021,7 @@ void ProcessManager::OnExtensionHostDestroyed(ExtensionHost* host) {
+@@ -1027,7 +1028,7 @@ void ProcessManager::OnExtensionHostDestroyed(ExtensionHost* host) {
    TRACE_EVENT0("browser,startup", "ProcessManager::OnExtensionHostDestroyed");
    host->RemoveObserver(this);
  
@@ -5826,7 +5833,7 @@ index b80e711ccd..987a33819a 100644
    // Note: |host->extension()| may be null at this point.
    ClearBackgroundPageData(host->extension_id());
 diff --git a/extensions/browser/process_map.cc b/extensions/browser/process_map.cc
-index 3059d914ba..1ab9c0a38d 100644
+index 08d2b74e79..de50935e26 100644
 --- a/extensions/browser/process_map.cc
 +++ b/extensions/browser/process_map.cc
 @@ -8,6 +8,7 @@
@@ -5837,17 +5844,8 @@ index 3059d914ba..1ab9c0a38d 100644
  #include "base/containers/map_util.h"
  #include "base/types/optional_util.h"
  #include "components/guest_view/buildflags/buildflags.h"
-@@ -97,7 +98,7 @@ bool ProcessMap::Contains(const ExtensionId& extension_id_in,
- }
- 
- bool ProcessMap::Contains(int process_id) const {
--  return items_.contains(process_id);
-+  return base::Contains(items_, process_id);
- }
- 
- bool ProcessMap::ExtensionHasProcess(const ExtensionId& extension_id) const {
 diff --git a/extensions/browser/renderer_startup_helper.cc b/extensions/browser/renderer_startup_helper.cc
-index caff8f5170..7c62cc8857 100644
+index 632b4a3ea3..487495aae4 100644
 --- a/extensions/browser/renderer_startup_helper.cc
 +++ b/extensions/browser/renderer_startup_helper.cc
 @@ -10,6 +10,7 @@
@@ -5858,7 +5856,7 @@ index caff8f5170..7c62cc8857 100644
  #include "base/debug/crash_logging.h"
  #include "base/debug/dump_without_crashing.h"
  #include "base/feature_list.h"
-@@ -384,8 +385,8 @@ void RendererStartupHelper::InitializeProcess(
+@@ -385,8 +386,8 @@ void RendererStartupHelper::InitializeProcess(
        ExtensionRegistry::Get(browser_context_)->enabled_extensions();
    for (const auto& ext : extensions) {
      // OnExtensionLoaded should have already been called for the extension.
@@ -5869,7 +5867,7 @@ index caff8f5170..7c62cc8857 100644
  
      if (!util::IsExtensionVisibleToContext(*ext, renderer_context)) {
        continue;
-@@ -413,8 +414,8 @@ void RendererStartupHelper::InitializeProcess(
+@@ -414,8 +415,8 @@ void RendererStartupHelper::InitializeProcess(
      for (const ExtensionId& id : iter->second) {
        // The extension should be loaded in the process.
        DCHECK(extensions.Contains(id));
@@ -5880,7 +5878,7 @@ index caff8f5170..7c62cc8857 100644
        renderer->ActivateExtension(id);
      }
    }
-@@ -472,7 +473,7 @@ void RendererStartupHelper::ActivateExtensionInProcess(
+@@ -473,7 +474,7 @@ void RendererStartupHelper::ActivateExtensionInProcess(
  
    auto remote = process_mojo_map_.find(process);
    if (remote != process_mojo_map_.end()) {
@@ -5889,7 +5887,7 @@ index caff8f5170..7c62cc8857 100644
      remote->second->ActivateExtension(extension.id());
    } else {
      pending_active_extensions_[process].insert(extension.id());
-@@ -480,7 +481,7 @@ void RendererStartupHelper::ActivateExtensionInProcess(
+@@ -481,7 +482,7 @@ void RendererStartupHelper::ActivateExtensionInProcess(
  }
  
  void RendererStartupHelper::OnExtensionLoaded(const Extension& extension) {
@@ -5898,7 +5896,7 @@ index caff8f5170..7c62cc8857 100644
  
    // Mark the extension as loaded.
    std::set<raw_ptr<content::RenderProcessHost, SetExperimental>>&
-@@ -516,7 +517,7 @@ void RendererStartupHelper::OnExtensionLoaded(const Extension& extension) {
+@@ -517,7 +518,7 @@ void RendererStartupHelper::OnExtensionLoaded(const Extension& extension) {
  }
  
  void RendererStartupHelper::OnExtensionUnloaded(const Extension& extension) {
@@ -5965,7 +5963,7 @@ index 1f235b5abf..12d25606ba 100644
      if (params->injection->is_js()) {
        ScriptInjectionTracker::ScriptType script_type =
 diff --git a/extensions/browser/script_injection_tracker.cc b/extensions/browser/script_injection_tracker.cc
-index 3376f8a354..7df80cc776 100644
+index 2f7f427609..5d84f28bb0 100644
 --- a/extensions/browser/script_injection_tracker.cc
 +++ b/extensions/browser/script_injection_tracker.cc
 @@ -7,6 +7,7 @@
@@ -6031,7 +6029,7 @@ index 837c0c7b88..bfd37c3df7 100644
  #include "base/strings/utf_string_conversions.h"
  #include "extensions/browser/extension_user_script_loader.h"
 diff --git a/extensions/browser/service_worker/service_worker_task_queue.cc b/extensions/browser/service_worker/service_worker_task_queue.cc
-index d475240e83..ca676189e3 100644
+index 7157535041..789e89d31f 100644
 --- a/extensions/browser/service_worker/service_worker_task_queue.cc
 +++ b/extensions/browser/service_worker/service_worker_task_queue.cc
 @@ -11,6 +11,7 @@
@@ -6050,7 +6048,7 @@ index d475240e83..ca676189e3 100644
  #include "content/public/browser/browser_context.h"
  #include "content/public/browser/browser_task_traits.h"
  #include "content/public/browser/browser_thread.h"
-@@ -287,7 +289,7 @@ void ServiceWorkerTaskQueue::AddPendingTask(
+@@ -289,7 +291,7 @@ void ServiceWorkerTaskQueue::AddPendingTask(
        lazy_context_id.extension_id(),
        lazy_context_id.browser_context()->UniqueId(), *activation_token};
  
@@ -6059,7 +6057,7 @@ index d475240e83..ca676189e3 100644
      // If the worker hasn't finished registration, wait for it to complete. The
      // worker can't be started until a registration is found for it in the
      // //content layer. `DidRegisterServiceWorker()` will start the worker to
-@@ -343,7 +345,7 @@ void ServiceWorkerTaskQueue::ActivateExtension(const Extension* extension) {
+@@ -345,7 +347,7 @@ void ServiceWorkerTaskQueue::ActivateExtension(const Extension* extension) {
    activation_tokens_[extension_id] = activation_token;
    const SequencedContextId context_id = {
        extension_id, browser_context_->UniqueId(), activation_token};
@@ -6068,7 +6066,7 @@ index d475240e83..ca676189e3 100644
  
    content::ServiceWorkerContext* service_worker_context =
        GetServiceWorkerContext(extension->id());
-@@ -367,7 +369,7 @@ void ServiceWorkerTaskQueue::ActivateExtension(const Extension* extension) {
+@@ -369,7 +371,7 @@ void ServiceWorkerTaskQueue::ActivateExtension(const Extension* extension) {
                                           !service_worker_already_registered);
    }
  
@@ -6077,7 +6075,7 @@ index d475240e83..ca676189e3 100644
    if (service_worker_already_registered) {
      worker_registered_.insert(context_id);
      VerifyRegistration(service_worker_context, context_id, extension->url());
-@@ -665,8 +667,9 @@ void ServiceWorkerTaskQueue::RetryRegisterServiceWorker(
+@@ -667,8 +669,9 @@ void ServiceWorkerTaskQueue::RetryRegisterServiceWorker(
    // Ensure the activation is still current.
    if (!IsCurrentActivation(context_id.extension_id, context_id.token)) {
      // NOTE: retry state has been cleared when `DeactivateExtension` was called.
@@ -6089,7 +6087,7 @@ index d475240e83..ca676189e3 100644
      return;
    }
  
-@@ -691,7 +694,7 @@ void ServiceWorkerTaskQueue::RetryStartWorker(
+@@ -693,7 +696,7 @@ void ServiceWorkerTaskQueue::RetryStartWorker(
    // Ensure the activation is still current.
    if (!IsCurrentActivation(context_id.extension_id, context_id.token)) {
      // NOTE: retry state has been cleared when `DeactivateExtension` was called.
@@ -6098,7 +6096,7 @@ index d475240e83..ca676189e3 100644
      return;
    }
    ServiceWorkerState* worker_state = GetWorkerState(context_id);
-@@ -1003,7 +1006,7 @@ void ServiceWorkerTaskQueue::DidUnregisterServiceWorker(
+@@ -1009,7 +1012,7 @@ void ServiceWorkerTaskQueue::DidUnregisterServiceWorker(
    if (!success) {
      LOG(ERROR) << "Failed to unregister service worker for extension id: "
                 << extension_id
@@ -6107,7 +6105,7 @@ index d475240e83..ca676189e3 100644
      base::UmaHistogramEnumeration(
          "Extensions.ServiceWorkerBackground.WorkerUnregistrationFailureStatus",
          status);
-@@ -1210,7 +1213,7 @@ bool ServiceWorkerTaskQueue::IsWorkerRegistered(
+@@ -1216,7 +1219,7 @@ bool ServiceWorkerTaskQueue::IsWorkerRegistered(
    }
    const SequencedContextId context_id = {
        extension_id, browser_context_->UniqueId(), *activation_token};
@@ -6403,7 +6401,7 @@ index 977e60cd3a..759886270a 100644
        }
      }
 diff --git a/extensions/common/csp_validator.cc b/extensions/common/csp_validator.cc
-index a5042114c5..080842b5a0 100644
+index f253acc3e7..72cd6edbc6 100644
 --- a/extensions/common/csp_validator.cc
 +++ b/extensions/common/csp_validator.cc
 @@ -15,6 +15,7 @@
@@ -6414,7 +6412,7 @@ index a5042114c5..080842b5a0 100644
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
  #include "base/functional/callback.h"
-@@ -192,7 +193,7 @@ bool isNonWildcardTLD(const std::string& url,
+@@ -197,7 +198,7 @@ bool isNonWildcardTLD(const std::string& url,
  
    std::string host(url, start_of_host, end_of_host - start_of_host);
    // Global wildcards are not allowed.
@@ -6423,8 +6421,24 @@ index a5042114c5..080842b5a0 100644
      return false;
    }
  
+diff --git a/extensions/common/event_filter.cc b/extensions/common/event_filter.cc
+index 84f99d5d24..8b2f506fc6 100644
+--- a/extensions/common/event_filter.cc
++++ b/extensions/common/event_filter.cc
+@@ -154,7 +154,10 @@ std::string EventFilter::RemoveEventMatcher(
+   // executed in batch with a single call to
+   // `URLMatcher::UpdateInternalDatastructures();` instead of N calls.
+   if (condition_sets_for_bulk_removal) {
+-    condition_sets_for_bulk_removal->append_range(condition_set_ids);
++    condition_sets_for_bulk_removal->insert(
++      condition_sets_for_bulk_removal->end(),
++      condition_set_ids.begin(),
++      condition_set_ids.end());
+     matcher_it->second->DontRemoveConditionSetsInDestructor();
+   }
+   matcher_map.erase(matcher_it);
 diff --git a/extensions/common/extension.cc b/extensions/common/extension.cc
-index 542bc99fba..fc310b9832 100644
+index 8a8ab0a0e2..6e47c86652 100644
 --- a/extensions/common/extension.cc
 +++ b/extensions/common/extension.cc
 @@ -15,6 +15,7 @@
@@ -6435,7 +6449,7 @@ index 542bc99fba..fc310b9832 100644
  #include "base/containers/map_util.h"
  #include "base/files/file_path.h"
  #include "base/i18n/rtl.h"
-@@ -84,7 +85,7 @@ bool ContainsReservedCharacters(const base::FilePath& path) {
+@@ -86,7 +87,7 @@ bool ContainsReservedCharacters(const base::FilePath& path) {
    // Extensions are cross-platform.
    // Since FilePath uses backslash '\\' as file path separator on Windows, so we
    // need to check manually.
@@ -6444,15 +6458,6 @@ index 542bc99fba..fc310b9832 100644
      return true;
    }
    return !net::IsSafePortableRelativePath(path);
-@@ -786,7 +787,7 @@ bool Extension::LoadExtent(const char* key,
- 
-     // We do not allow authors to put wildcards in their paths. Instead, we
-     // imply one at the end.
--    if (pattern.path().contains('*')) {
-+    if (base::Contains(pattern.path(), '*')) {
-       *error = ErrorUtils::FormatErrorMessageUTF16(
-           value_error, base::NumberToString(i), errors::kNoWildCardsInPaths);
-       return false;
 diff --git a/extensions/common/extension_api.cc b/extensions/common/extension_api.cc
 index d456bdfd13..083f06e129 100644
 --- a/extensions/common/extension_api.cc
@@ -6526,7 +6531,7 @@ index 2b9fa06987..a6d05320c2 100644
  
  bool ExtensionSet::Insert(const scoped_refptr<const Extension>& extension) {
 diff --git a/extensions/common/features/simple_feature.cc b/extensions/common/features/simple_feature.cc
-index 7333581b40..4ca1324530 100644
+index e8c1f9c7d8..ed4177483d 100644
 --- a/extensions/common/features/simple_feature.cc
 +++ b/extensions/common/features/simple_feature.cc
 @@ -11,6 +11,7 @@
@@ -6537,7 +6542,16 @@ index 7333581b40..4ca1324530 100644
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
  #include "base/no_destructor.h"
-@@ -492,7 +493,7 @@ bool SimpleFeature::IsIdInList(const HashedExtensionId& hashed_id,
+@@ -191,7 +192,7 @@ bool IsCommandLineSwitchEnabled(base::CommandLine* command_line,
+ 
+ bool IsAllowlistedForTest(const HashedExtensionId& hashed_id) {
+   const auto& ids = GetAllowlistInfo().hashed_ids;
+-  return std::ranges::contains(ids, hashed_id.value());
++  return base::Contains(ids, hashed_id.value());
+ }
+ 
+ }  // namespace
+@@ -490,7 +491,7 @@ bool SimpleFeature::IsIdInList(const HashedExtensionId& hashed_id,
    if (!IsValidHashedExtensionId(hashed_id))
      return false;
  
@@ -6546,7 +6560,7 @@ index 7333581b40..4ca1324530 100644
  }
  
  bool SimpleFeature::MatchesManifestLocation(
-@@ -517,15 +518,14 @@ bool SimpleFeature::MatchesSessionTypes(
+@@ -515,15 +516,14 @@ bool SimpleFeature::MatchesSessionTypes(
    if (session_types_.empty())
      return true;
  
@@ -6564,7 +6578,7 @@ index 7333581b40..4ca1324530 100644
  }
  
  bool SimpleFeature::RequiresDelegatedAvailabilityCheck() const {
-@@ -632,7 +632,7 @@ Feature::Availability SimpleFeature::GetEnvironmentAvailability(
+@@ -630,7 +630,7 @@ Feature::Availability SimpleFeature::GetEnvironmentAvailability(
      int context_id,
      bool check_developer_mode) const {
    base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
@@ -6573,7 +6587,7 @@ index 7333581b40..4ca1324530 100644
      return CreateAvailability(AvailabilityResult::kInvalidPlatform);
  
    if (channel_ && *channel_ < GetCurrentChannel()) {
-@@ -696,7 +696,7 @@ Feature::Availability SimpleFeature::GetManifestAvailability(
+@@ -694,7 +694,7 @@ Feature::Availability SimpleFeature::GetManifestAvailability(
    Manifest::Type type_to_check =
        (type == Manifest::Type::kUserScript) ? Manifest::Type::kExtension : type;
    if (!extension_types_.empty() &&
@@ -6582,7 +6596,7 @@ index 7333581b40..4ca1324530 100644
      return CreateAvailability(AvailabilityResult::kInvalidType, type);
    }
  
-@@ -738,7 +738,7 @@ Feature::Availability SimpleFeature::GetContextAvailability(
+@@ -736,7 +736,7 @@ Feature::Availability SimpleFeature::GetContextAvailability(
    // extension API calls, since there's no guarantee that the extension is
    // "active" in current renderer process when the API permission check is
    // done.
@@ -6651,29 +6665,8 @@ index c6abee1a0d..9106a1c32c 100644
  #include "extensions/common/extension.h"
  #include "extensions/common/manifest_handler_registry.h"
  #include "extensions/common/permissions/manifest_permission.h"
-diff --git a/extensions/common/manifest_handlers/mime_types_handler.cc b/extensions/common/manifest_handlers/mime_types_handler.cc
-index 7f29cad365..7fe3808d53 100644
---- a/extensions/common/manifest_handlers/mime_types_handler.cc
-+++ b/extensions/common/manifest_handlers/mime_types_handler.cc
-@@ -8,6 +8,7 @@
- 
- #include <algorithm>
- 
-+#include "base/containers/contains.h"
- #include "base/metrics/histogram_functions.h"
- #include "base/no_destructor.h"
- #include "base/strings/string_util.h"
-@@ -70,7 +71,7 @@ void MimeTypesHandler::AddMIMEType(const std::string& mime_type) {
- }
- 
- bool MimeTypesHandler::CanHandleMIMEType(const std::string& mime_type) const {
--  return mime_type_set_.contains(mime_type);
-+  return base::Contains(mime_type_set_, mime_type);
- }
- 
- bool MimeTypesHandler::HasPlugin() const {
 diff --git a/extensions/common/manifest_handlers/requirements_info.cc b/extensions/common/manifest_handlers/requirements_info.cc
-index e4ca3dab19..5325c1e24d 100644
+index e090d192f9..20b35070ee 100644
 --- a/extensions/common/manifest_handlers/requirements_info.cc
 +++ b/extensions/common/manifest_handlers/requirements_info.cc
 @@ -4,9 +4,9 @@
@@ -6697,7 +6690,7 @@ index e4ca3dab19..5325c1e24d 100644
    }
  
 diff --git a/extensions/common/manifest_handlers/shared_module_info.cc b/extensions/common/manifest_handlers/shared_module_info.cc
-index 9223028228..91231ee29a 100644
+index 229e1735c5..21e2b8516c 100644
 --- a/extensions/common/manifest_handlers/shared_module_info.cc
 +++ b/extensions/common/manifest_handlers/shared_module_info.cc
 @@ -11,6 +11,7 @@
@@ -6718,7 +6711,7 @@ index 9223028228..91231ee29a 100644
  
  // static
 diff --git a/extensions/common/manifest_handlers/web_accessible_resources_info.cc b/extensions/common/manifest_handlers/web_accessible_resources_info.cc
-index 719d252a3d..cef1a38d04 100644
+index 0a43d41316..ace67f5ea1 100644
 --- a/extensions/common/manifest_handlers/web_accessible_resources_info.cc
 +++ b/extensions/common/manifest_handlers/web_accessible_resources_info.cc
 @@ -9,6 +9,7 @@
@@ -6729,7 +6722,7 @@ index 719d252a3d..cef1a38d04 100644
  #include "base/feature_list.h"
  #include "base/strings/string_number_conversions.h"
  #include "base/strings/utf_string_conversions.h"
-@@ -241,7 +242,7 @@ bool IsResourceWebAccessibleImpl(
+@@ -242,7 +243,7 @@ bool IsResourceWebAccessibleImpl(
        if (initiator_url.SchemeIs(extensions::kExtensionScheme) &&
            (entry.allow_all_extensions ||
             extension.id() == initiator_url.GetHost() ||
@@ -6915,7 +6908,7 @@ index bdf25b893f..f089602aa8 100644
    }
    return result;
 diff --git a/extensions/renderer/api/messaging/native_renderer_messaging_service.cc b/extensions/renderer/api/messaging/native_renderer_messaging_service.cc
-index bbd2434dde..d6f60744f8 100644
+index d7989a1bc2..d763b4f1e4 100644
 --- a/extensions/renderer/api/messaging/native_renderer_messaging_service.cc
 +++ b/extensions/renderer/api/messaging/native_renderer_messaging_service.cc
 @@ -9,6 +9,7 @@
@@ -7199,7 +7192,7 @@ index 420c4bcea1..981ff3d0e2 100644
  
  }  // namespace
 diff --git a/extensions/renderer/dispatcher.cc b/extensions/renderer/dispatcher.cc
-index fd3960fce4..bb569eb54f 100644
+index 2ec5cee9b3..4f4c2ca33e 100644
 --- a/extensions/renderer/dispatcher.cc
 +++ b/extensions/renderer/dispatcher.cc
 @@ -13,6 +13,7 @@
@@ -7229,7 +7222,7 @@ index fd3960fce4..bb569eb54f 100644
      load_status = ExtensionRendererLoadStatus::kExtensionUnloaded;
    }
 diff --git a/extensions/renderer/guest_view/mime_handler_view/mime_handler_view_container_manager.cc b/extensions/renderer/guest_view/mime_handler_view/mime_handler_view_container_manager.cc
-index 1b987d63e4..91d758e64e 100644
+index def9a888c6..f4c727c79f 100644
 --- a/extensions/renderer/guest_view/mime_handler_view/mime_handler_view_container_manager.cc
 +++ b/extensions/renderer/guest_view/mime_handler_view/mime_handler_view_container_manager.cc
 @@ -7,6 +7,7 @@
@@ -7241,7 +7234,7 @@ index 1b987d63e4..91d758e64e 100644
  #include "base/metrics/histogram_functions.h"
  #include "base/no_destructor.h"
 diff --git a/extensions/renderer/native_extension_bindings_system.cc b/extensions/renderer/native_extension_bindings_system.cc
-index 27f2d604c0..4b2e09111b 100644
+index 3a8688cfc4..1a79edc567 100644
 --- a/extensions/renderer/native_extension_bindings_system.cc
 +++ b/extensions/renderer/native_extension_bindings_system.cc
 @@ -4,12 +4,12 @@
@@ -7258,7 +7251,7 @@ index 27f2d604c0..4b2e09111b 100644
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
  #include "base/functional/callback.h"
-@@ -422,7 +422,7 @@ bool ShouldCollectJSStackTrace(const APIRequestHandler::Request& request) {
+@@ -423,7 +423,7 @@ bool ShouldCollectJSStackTrace(const APIRequestHandler::Request& request) {
            extensions_features::kIncludeJSCallStackInExtensionApiRequest)) {
      return false;
    }
@@ -7727,7 +7720,7 @@ index 0ce9ab6c35..368bbabbff 100644
  
  void FramebufferCompletenessCache::SetComplete(const std::string& signature) {
 diff --git a/gpu/command_buffer/service/gles2_cmd_decoder.cc b/gpu/command_buffer/service/gles2_cmd_decoder.cc
-index d55fb20369..1c8abc105a 100644
+index 1710e44f84..a63325aa9d 100644
 --- a/gpu/command_buffer/service/gles2_cmd_decoder.cc
 +++ b/gpu/command_buffer/service/gles2_cmd_decoder.cc
 @@ -23,6 +23,7 @@
@@ -7738,7 +7731,7 @@ index d55fb20369..1c8abc105a 100644
  #include "base/containers/flat_set.h"
  #include "base/containers/heap_array.h"
  #include "base/containers/queue.h"
-@@ -14651,28 +14652,28 @@ error::Error GLES2DecoderImpl::HandleRequestExtensionCHROMIUM(
+@@ -14639,28 +14640,28 @@ error::Error GLES2DecoderImpl::HandleRequestExtensionCHROMIUM(
    bool desire_nv_egl_stream_consumer_external = false;
    if (feature_info_->context_type() == CONTEXT_TYPE_WEBGL1) {
      desire_standard_derivatives =
@@ -7781,7 +7774,7 @@ index d55fb20369..1c8abc105a 100644
    }
    if (desire_standard_derivatives != derivatives_explicitly_enabled_ ||
        desire_fbo_render_mipmap != fbo_render_mipmap_explicitly_enabled_ ||
-@@ -14705,31 +14706,31 @@ error::Error GLES2DecoderImpl::HandleRequestExtensionCHROMIUM(
+@@ -14693,31 +14694,31 @@ error::Error GLES2DecoderImpl::HandleRequestExtensionCHROMIUM(
      DestroyShaderTranslator();
    }
  
@@ -7823,18 +7816,18 @@ index d55fb20369..1c8abc105a 100644
    }
  
 diff --git a/gpu/command_buffer/service/gles2_cmd_decoder_passthrough_doers.cc b/gpu/command_buffer/service/gles2_cmd_decoder_passthrough_doers.cc
-index 6d640db03a..24a549a994 100644
+index ef823b7d55..9243b90908 100644
 --- a/gpu/command_buffer/service/gles2_cmd_decoder_passthrough_doers.cc
 +++ b/gpu/command_buffer/service/gles2_cmd_decoder_passthrough_doers.cc
-@@ -8,6 +8,7 @@
- 
+@@ -9,6 +9,7 @@
+ #include "base/check.h"
  #include "base/bits.h"
  #include "base/compiler_specific.h"
 +#include "base/containers/contains.h"
  #include "base/functional/callback_helpers.h"
  #include "base/memory/raw_ptr.h"
  #include "base/notimplemented.h"
-@@ -394,7 +395,7 @@ error::Error GLES2DecoderPassthroughImpl::DoBindBuffer(GLenum target,
+@@ -393,7 +394,7 @@ error::Error GLES2DecoderPassthroughImpl::DoBindBuffer(GLenum target,
      return error::kNoError;
    }
  
@@ -7843,7 +7836,7 @@ index 6d640db03a..24a549a994 100644
    bound_buffers_[target] = buffer;
    if (target == GL_ELEMENT_ARRAY_BUFFER) {
      bound_element_array_buffer_dirty_ = false;
-@@ -413,7 +414,7 @@ error::Error GLES2DecoderPassthroughImpl::DoBindBufferBase(GLenum target,
+@@ -412,7 +413,7 @@ error::Error GLES2DecoderPassthroughImpl::DoBindBufferBase(GLenum target,
      return error::kNoError;
    }
  
@@ -7852,7 +7845,7 @@ index 6d640db03a..24a549a994 100644
    bound_buffers_[target] = buffer;
    if (target == GL_ELEMENT_ARRAY_BUFFER) {
      bound_element_array_buffer_dirty_ = false;
-@@ -435,7 +436,7 @@ error::Error GLES2DecoderPassthroughImpl::DoBindBufferRange(GLenum target,
+@@ -434,7 +435,7 @@ error::Error GLES2DecoderPassthroughImpl::DoBindBufferRange(GLenum target,
      return error::kNoError;
    }
  
@@ -7861,7 +7854,7 @@ index 6d640db03a..24a549a994 100644
    bound_buffers_[target] = buffer;
    if (target == GL_ELEMENT_ARRAY_BUFFER) {
      bound_element_array_buffer_dirty_ = false;
-@@ -3729,7 +3730,7 @@ error::Error GLES2DecoderPassthroughImpl::DoBeginQueryEXT(
+@@ -3732,7 +3733,7 @@ error::Error GLES2DecoderPassthroughImpl::DoBeginQueryEXT(
      linking_program_service_id_ = 0u;
    }
    if (IsEmulatedQueryTarget(target)) {
@@ -7870,7 +7863,7 @@ index 6d640db03a..24a549a994 100644
        InsertError(GL_INVALID_OPERATION, "Query already active on target.");
        return error::kNoError;
      }
-@@ -3821,7 +3822,7 @@ error::Error GLES2DecoderPassthroughImpl::DoEndQueryEXT(GLenum target,
+@@ -3824,7 +3825,7 @@ error::Error GLES2DecoderPassthroughImpl::DoEndQueryEXT(GLenum target,
      }
    }
  
@@ -7880,18 +7873,10 @@ index 6d640db03a..24a549a994 100644
    active_queries_.erase(target);
  
 diff --git a/gpu/command_buffer/service/program_cache.cc b/gpu/command_buffer/service/program_cache.cc
-index add16f5191..e0fbb4b604 100644
+index b9e3c9d972..c1ac56cba6 100644
 --- a/gpu/command_buffer/service/program_cache.cc
 +++ b/gpu/command_buffer/service/program_cache.cc
-@@ -9,6 +9,7 @@
- #include <memory>
- #include <string>
- 
-+#include "base/containers/contains.h"
- #include "base/containers/heap_array.h"
- #include "base/containers/span_writer.h"
- #include "base/hash/hash.h"
-@@ -51,7 +52,7 @@ bool ProgramCache::HasSuccessfullyCompiledShader(
+@@ -50,7 +50,7 @@ bool ProgramCache::HasSuccessfullyCompiledShader(
      const std::string& shader_signature) const {
    Hash sha;
    ComputeShaderHash(shader_signature, sha);
@@ -7922,7 +7907,7 @@ index 1ea4718dba..12283b1f1c 100644
      last_write_stream_ = access_stream;
    }
 diff --git a/gpu/command_buffer/service/shared_image/shared_image_factory.cc b/gpu/command_buffer/service/shared_image/shared_image_factory.cc
-index 6219a95d78..860cbb004c 100644
+index b498faab9a..b38ac59566 100644
 --- a/gpu/command_buffer/service/shared_image/shared_image_factory.cc
 +++ b/gpu/command_buffer/service/shared_image/shared_image_factory.cc
 @@ -8,6 +8,7 @@
@@ -8171,18 +8156,10 @@ index 6efae76e40..bb0fe432e0 100644
      gl::GLSurface::SetForcedGpuPreference(gl::GpuPreference::kLowPower);
    }
 diff --git a/gpu/ipc/client/gpu_channel_host.cc b/gpu/ipc/client/gpu_channel_host.cc
-index 54c463f720..802471828e 100644
+index c7bb34eb04..90a6f81e25 100644
 --- a/gpu/ipc/client/gpu_channel_host.cc
 +++ b/gpu/ipc/client/gpu_channel_host.cc
-@@ -8,6 +8,7 @@
- #include <utility>
- 
- #include "base/atomic_sequence_num.h"
-+#include "base/containers/contains.h"
- #include "base/functional/bind.h"
- #include "base/memory/ptr_util.h"
- #include "base/task/common/task_annotator.h"
-@@ -435,7 +436,7 @@ bool GpuChannelHost::ConnectionTracker::AddObserverIfNotAlreadyLost(
+@@ -434,7 +434,7 @@ bool GpuChannelHost::ConnectionTracker::AddObserverIfNotAlreadyLost(
    if (!is_connected()) {
      return false;
    }
@@ -8578,7 +8555,7 @@ index 71eac38b86..a7fcf65b09 100644
      }
    }
 diff --git a/media/capture/video/video_capture_device_client.cc b/media/capture/video/video_capture_device_client.cc
-index fc4ae204e4..6fad4643b8 100644
+index e05967c392..02ccec13ca 100644
 --- a/media/capture/video/video_capture_device_client.cc
 +++ b/media/capture/video/video_capture_device_client.cc
 @@ -11,6 +11,7 @@
@@ -8589,7 +8566,7 @@ index fc4ae204e4..6fad4643b8 100644
  #include "base/containers/span.h"
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
-@@ -680,7 +681,7 @@ VideoCaptureDeviceClient::CreateReadyFrameFromExternalBuffer(
+@@ -684,7 +685,7 @@ VideoCaptureDeviceClient::CreateReadyFrameFromExternalBuffer(
    }
  
    // Register the buffer with the receiver if it is new.
@@ -8598,7 +8575,7 @@ index fc4ae204e4..6fad4643b8 100644
      media::mojom::VideoBufferHandlePtr buffer_handle =
          buffer_pool_->GetVideoBufferHandle(buffer_id);
      receiver_->OnNewBuffer(buffer_id, std::move(buffer_handle));
-@@ -748,7 +749,7 @@ VideoCaptureDeviceClient::ReserveOutputBuffer(const gfx::Size& frame_size,
+@@ -753,7 +754,7 @@ VideoCaptureDeviceClient::ReserveOutputBuffer(const gfx::Size& frame_size,
  
    CHECK_NE(VideoCaptureBufferPool::kInvalidId, buffer_id);
  
@@ -8660,7 +8637,7 @@ index fce5ef8dc6..ba8af66d22 100644
        photo_state->current_eye_gaze_correction_mode !=
        mojom::EyeGazeCorrectionMode::OFF;
 diff --git a/media/capture/video/win/video_capture_device_factory_win.cc b/media/capture/video/win/video_capture_device_factory_win.cc
-index dbf798caab..171ce24010 100644
+index 70bbb9a421..1d4f147522 100644
 --- a/media/capture/video/win/video_capture_device_factory_win.cc
 +++ b/media/capture/video/win/video_capture_device_factory_win.cc
 @@ -310,10 +310,10 @@ std::string GetDeviceModelId(const std::string& device_id) {
@@ -8679,7 +8656,7 @@ index dbf798caab..171ce24010 100644
  
  // Returns a non DirectShow descriptor DevicesInfo with the provided name and
 diff --git a/media/capture/video/win/video_capture_device_mf_win.cc b/media/capture/video/win/video_capture_device_mf_win.cc
-index 9f73dc267d..20901a4806 100644
+index 4ae7ade7ab..495eb0a28c 100644
 --- a/media/capture/video/win/video_capture_device_mf_win.cc
 +++ b/media/capture/video/win/video_capture_device_mf_win.cc
 @@ -19,6 +19,7 @@
@@ -8691,7 +8668,7 @@ index 9f73dc267d..20901a4806 100644
  #include "base/functional/bind.h"
  #include "base/location.h"
 diff --git a/media/cast/encoding/media_video_encoder_wrapper.cc b/media/cast/encoding/media_video_encoder_wrapper.cc
-index cd803559aa..7b96a389a2 100644
+index 388e9ee6f1..fa812905f1 100644
 --- a/media/cast/encoding/media_video_encoder_wrapper.cc
 +++ b/media/cast/encoding/media_video_encoder_wrapper.cc
 @@ -13,6 +13,7 @@
@@ -8702,7 +8679,7 @@ index cd803559aa..7b96a389a2 100644
  #include "media/base/async_destroy_video_encoder.h"
  #include "media/base/encoder_status.h"
  #include "media/base/media_util.h"
-@@ -68,7 +69,7 @@ std::unique_ptr<media::VideoEncoder> CreateSoftwareEncoder(VideoCodec codec) {
+@@ -88,7 +89,7 @@ std::unique_ptr<media::VideoEncoder> CreateSoftwareEncoder(VideoCodec codec) {
        return std::make_unique<media::Av1VideoEncoder>();
  #endif  // BUILDFLAG(ENABLE_LIBAOM)
      default:
@@ -8711,7 +8688,7 @@ index cd803559aa..7b96a389a2 100644
    }
  }
  
-@@ -86,7 +87,7 @@ VideoCodecProfile ToProfile(VideoCodec codec) {
+@@ -106,7 +107,7 @@ VideoCodecProfile ToProfile(VideoCodec codec) {
      case VideoCodec::kAV1:
        return AV1PROFILE_PROFILE_MAIN;
      default:
@@ -9052,7 +9029,7 @@ index d9b5e3fb6b..6708536079 100644
      // belongs to.
      std::erase(images_, image);
 diff --git a/media/gpu/android/ndk_video_encode_accelerator_tests.cc b/media/gpu/android/ndk_video_encode_accelerator_tests.cc
-index 9132601995..aa0f48faa0 100644
+index 703afe61a2..8dff2533e2 100644
 --- a/media/gpu/android/ndk_video_encode_accelerator_tests.cc
 +++ b/media/gpu/android/ndk_video_encode_accelerator_tests.cc
 @@ -14,6 +14,7 @@
@@ -9073,7 +9050,7 @@ index 9132601995..aa0f48faa0 100644
  
      if (!codec_supported) {
 diff --git a/media/gpu/chromeos/generic_dmabuf_video_frame_mapper.cc b/media/gpu/chromeos/generic_dmabuf_video_frame_mapper.cc
-index 5fe29dbdf6..728d956374 100644
+index a95b384c60..a2d4afb15a 100644
 --- a/media/gpu/chromeos/generic_dmabuf_video_frame_mapper.cc
 +++ b/media/gpu/chromeos/generic_dmabuf_video_frame_mapper.cc
 @@ -6,12 +6,12 @@
@@ -9456,7 +9433,7 @@ index 54b7338618..0cd24d3c3b 100644
        return;
      // This key is no longer valid, decryption will fail, so stop playback
 diff --git a/media/gpu/vaapi/vaapi_wrapper.cc b/media/gpu/vaapi/vaapi_wrapper.cc
-index f67de041ed..9a2687c7aa 100644
+index 60d2994651..d2ad8ae5b8 100644
 --- a/media/gpu/vaapi/vaapi_wrapper.cc
 +++ b/media/gpu/vaapi/vaapi_wrapper.cc
 @@ -26,6 +26,7 @@
@@ -9467,7 +9444,7 @@ index f67de041ed..9a2687c7aa 100644
  #include "base/containers/fixed_flat_set.h"
  #include "base/cpu.h"
  #include "base/environment.h"
-@@ -680,8 +681,8 @@ bool IsLowPowerIntelProcessor() {
+@@ -685,8 +686,8 @@ bool IsLowPowerIntelProcessor() {
          base::MatchPattern(cpuid.cpu_brand(), "Intel(R) Core(TM) *Y CPU*");
  
      return cpuid.family() == kPentiumAndLaterFamily &&
@@ -9478,7 +9455,7 @@ index f67de041ed..9a2687c7aa 100644
    }();
  
    return is_low_power_intel;
-@@ -815,10 +816,10 @@ bool IsVAProfileSupported(VAProfile va_profile, bool is_encoding) {
+@@ -820,10 +821,10 @@ bool IsVAProfileSupported(VAProfile va_profile, bool is_encoding) {
          VAProfileVP9Profile0,
          VAProfileAV1Profile0,
      };
@@ -9492,7 +9469,7 @@ index f67de041ed..9a2687c7aa 100644
  }
  
  bool IsBlockedDriver(VaapiWrapper::CodecMode mode,
-@@ -917,8 +918,8 @@ std::vector<VAEntrypoint> GetEntryPointsForProfile(const base::Lock* va_lock,
+@@ -922,8 +923,8 @@ std::vector<VAEntrypoint> GetEntryPointsForProfile(const base::Lock* va_lock,
    std::vector<VAEntrypoint> entrypoints;
    std::ranges::copy_if(va_entrypoints, std::back_inserter(entrypoints),
                         [&kAllowedEntryPoints, mode](VAEntrypoint entry_point) {
@@ -9503,7 +9480,7 @@ index f67de041ed..9a2687c7aa 100644
                         });
    return entrypoints;
  }
-@@ -977,7 +978,7 @@ bool GetRequiredAttribs(const base::Lock* va_lock,
+@@ -982,7 +983,7 @@ bool GetRequiredAttribs(const base::Lock* va_lock,
    constexpr VAProfile kSupportedH264VaProfilesForEncoding[] = {
        VAProfileH264ConstrainedBaseline, VAProfileH264Main, VAProfileH264High};
    // VAConfigAttribEncPackedHeaders is H.264 specific.
@@ -9512,7 +9489,7 @@ index f67de041ed..9a2687c7aa 100644
      // Encode with Packed header if the driver supports.
      VAConfigAttrib attrib{};
      attrib.type = VAConfigAttribEncPackedHeaders;
-@@ -1407,8 +1408,8 @@ const VASupportedImageFormats& VASupportedImageFormats::Get() {
+@@ -1412,8 +1413,8 @@ const VASupportedImageFormats& VASupportedImageFormats::Get() {
  
  bool VASupportedImageFormats::IsImageFormatSupported(
      const VAImageFormat& va_image_format) const {
@@ -9523,7 +9500,7 @@ index f67de041ed..9a2687c7aa 100644
  }
  
  const std::vector<VAImageFormat>&
-@@ -1487,7 +1488,7 @@ bool IsLowPowerEncSupported(VAProfile va_profile) {
+@@ -1492,7 +1493,7 @@ bool IsLowPowerEncSupported(VAProfile va_profile) {
        VAProfileVP9Profile0,
        VAProfileAV1Profile0,
    };
@@ -9532,7 +9509,7 @@ index f67de041ed..9a2687c7aa 100644
      return false;
  
    if ((IsGen95Gpu() || IsGen9Gpu()) &&
-@@ -1738,7 +1739,7 @@ int VaapiWrapper::GetMaxNumDecoderInstances() {
+@@ -1775,7 +1776,7 @@ int VaapiWrapper::GetMaxNumDecoderInstances() {
    constexpr int kAMDStoneyRidgeMaxNumOfInstances = 10;
    auto va_display_state_handle = VADisplayStateSingleton::GetHandle();
    if (va_display_state_handle &&
@@ -9541,7 +9518,7 @@ index f67de041ed..9a2687c7aa 100644
      return kAMDStoneyRidgeMaxNumOfInstances;
    }
    // TODO(andrescj): we can relax this once we extract video decoding into its
-@@ -2060,7 +2061,7 @@ bool VaapiWrapper::IsVppFormatSupported(uint32_t va_fourcc) {
+@@ -2097,7 +2098,7 @@ bool VaapiWrapper::IsVppFormatSupported(uint32_t va_fourcc) {
    if (!profile_info)
      return false;
  
@@ -9550,7 +9527,7 @@ index f67de041ed..9a2687c7aa 100644
  }
  
  // static
-@@ -3480,7 +3481,7 @@ VaapiWrapper::CreateScopedVASurfaces(
+@@ -3520,7 +3521,7 @@ VaapiWrapper::CreateScopedVASurfaces(
    VA_SUCCESS_OR_RETURN(va_res, VaapiFunctions::kVACreateSurfaces_Allocating,
                         std::vector<std::unique_ptr<ScopedVASurface>>{});
  
@@ -9560,7 +9537,7 @@ index f67de041ed..9a2687c7aa 100644
  
    DCHECK(!visible_size.has_value() || !visible_size->IsEmpty());
 diff --git a/media/gpu/vaapi/vp8_vaapi_video_encoder_delegate.cc b/media/gpu/vaapi/vp8_vaapi_video_encoder_delegate.cc
-index 0c7a5697e1..078c6fe71f 100644
+index bceb859715..8bb8e84579 100644
 --- a/media/gpu/vaapi/vp8_vaapi_video_encoder_delegate.cc
 +++ b/media/gpu/vaapi/vp8_vaapi_video_encoder_delegate.cc
 @@ -13,6 +13,7 @@
@@ -9571,7 +9548,7 @@ index 0c7a5697e1..078c6fe71f 100644
  #include "base/memory/ref_counted_memory.h"
  #include "base/strings/string_number_conversions.h"
  #include "build/build_config.h"
-@@ -388,7 +389,7 @@ VP8VaapiVideoEncoderDelegate::PrepareEncodeJob(EncodeJob& encode_job) {
+@@ -390,7 +391,7 @@ VP8VaapiVideoEncoderDelegate::PrepareEncodeJob(EncodeJob& encode_job) {
    }
  
    DCHECK(!picture->frame_hdr->IsKeyframe() ||
@@ -9581,10 +9558,10 @@ index 0c7a5697e1..078c6fe71f 100644
    if (!SubmitFrameParameters(encode_job, current_params_, picture,
                               reference_frames_, ref_frames_used)) {
 diff --git a/media/gpu/windows/media_foundation_video_encode_accelerator_win.cc b/media/gpu/windows/media_foundation_video_encode_accelerator_win.cc
-index 55d8c7e582..ceb64223d8 100644
+index 768a96d8c7..e464123c08 100644
 --- a/media/gpu/windows/media_foundation_video_encode_accelerator_win.cc
 +++ b/media/gpu/windows/media_foundation_video_encode_accelerator_win.cc
-@@ -1564,7 +1564,7 @@ void MediaFoundationVideoEncodeAccelerator::SetSWRateControl() {
+@@ -1566,7 +1566,7 @@ void MediaFoundationVideoEncodeAccelerator::SetSWRateControl() {
  #endif  // BUILDFLAG(ENABLE_PLATFORM_HEVC)
        VideoCodec::kAV1,
    };
@@ -9662,10 +9639,18 @@ index 06b54878ab..30f67f7b2c 100644
  #include "base/task/sequenced_task_runner.h"
  #include "components/viz/common/resources/shared_image_format.h"
 diff --git a/media/mojo/services/media_metrics_provider.cc b/media/mojo/services/media_metrics_provider.cc
-index b21fc87294..3155b9b8a9 100644
+index aac9a08e26..952ab8fac9 100644
 --- a/media/mojo/services/media_metrics_provider.cc
 +++ b/media/mojo/services/media_metrics_provider.cc
-@@ -114,7 +114,7 @@ MediaMetricsProvider::~MediaMetricsProvider() {
+@@ -10,6 +10,7 @@
+ #include "base/atomic_sequence_num.h"
+ #include "base/logging.h"
+ #include "base/metrics/histogram_functions.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "build/build_config.h"
+ #include "build/chromecast_buildflags.h"
+ #include "media/base/key_systems.h"
+@@ -114,7 +115,7 @@ MediaMetricsProvider::~MediaMetricsProvider() {
    if (!media_info_->is_mse) {
      builder.SetURLScheme(static_cast<int64_t>(media_info_->url_scheme));
      if (container_name_)
@@ -9696,7 +9681,7 @@ index d51b30732d..9ab56bb0b7 100644
      }
  
 diff --git a/media/parsers/vp9_parser.cc b/media/parsers/vp9_parser.cc
-index 0a9137fde8..f2b47ae50f 100644
+index 0f1df59353..8c199a0e94 100644
 --- a/media/parsers/vp9_parser.cc
 +++ b/media/parsers/vp9_parser.cc
 @@ -16,6 +16,7 @@
@@ -9707,7 +9692,7 @@ index 0a9137fde8..f2b47ae50f 100644
  #include "base/containers/span.h"
  #include "base/containers/span_reader.h"
  #include "base/functional/bind.h"
-@@ -390,11 +391,11 @@ bool Vp9FrameContext::IsValid() const {
+@@ -387,11 +388,11 @@ bool Vp9FrameContext::IsValid() const {
      for (auto& ai : a) {
        for (auto& aj : ai) {
          auto [dc, ac] = base::span(aj).split_at<1u>();
@@ -9759,7 +9744,7 @@ index 2c91adef2b..5b22b5a063 100644
  
  bool RendererController::SinkSupportsRemoting() const {
 diff --git a/media/video/software_video_encoder_test.cc b/media/video/software_video_encoder_test.cc
-index fc86111f65..b297c7ab65 100644
+index d25df6ba01..01ebceb2e7 100644
 --- a/media/video/software_video_encoder_test.cc
 +++ b/media/video/software_video_encoder_test.cc
 @@ -2,7 +2,6 @@
@@ -10019,7 +10004,7 @@ index 26be34e5ac..4dd313a81c 100644
  
    // The host portion of a URL may support a variety of name resolution formats
 diff --git a/net/cookies/canonical_cookie.cc b/net/cookies/canonical_cookie.cc
-index 1e790bd53e..035f7b8917 100644
+index 1e790bd53e..110a2e8d9d 100644
 --- a/net/cookies/canonical_cookie.cc
 +++ b/net/cookies/canonical_cookie.cc
 @@ -52,6 +52,7 @@
@@ -10030,6 +10015,20 @@ index 1e790bd53e..035f7b8917 100644
  #include "base/dcheck_is_on.h"
  #include "base/feature_list.h"
  #include "base/format_macros.h"
+@@ -355,11 +356,11 @@ std::unique_ptr<CanonicalCookie> CanonicalCookie::Create(
+   UMA_HISTOGRAM_BOOLEAN("Cookie.Parse.EmptyName", parsed_cookie.Name().empty());
+   if (parsed_cookie.Name().empty()) {
+     UMA_HISTOGRAM_BOOLEAN("Cookie.Parse.EmptyNameAmbiguousValue",
+-                          parsed_cookie.Value().contains('='));
++                          base::Contains(parsed_cookie.Value(), '='));
+ 
+     if (base::FeatureList::IsEnabled(
+             net::features::kCookieParseRejectEmptyNameAmbiguous) &&
+-        parsed_cookie.Value().contains('=')) {
++        base::Contains(parsed_cookie.Value(), '=')) {
+       status->AddExclusionReason(CookieInclusionStatus::ExclusionReason::
+                                      EXCLUDE_AMBIGUOUS_SERIALIZATION);
+     }
 diff --git a/net/cookies/cookie_base.cc b/net/cookies/cookie_base.cc
 index ce84f7f0a1..c83ebc335f 100644
 --- a/net/cookies/cookie_base.cc
@@ -10113,7 +10112,7 @@ index dc765ae15a..7fae82b4d7 100644
    }
    return net::NamelessCookieLineParseType::kBareToken;
 diff --git a/net/cookies/test_cookie_access_delegate.cc b/net/cookies/test_cookie_access_delegate.cc
-index 700cab049c..cb67d80951 100644
+index 56b407f668..3ac7edfa00 100644
 --- a/net/cookies/test_cookie_access_delegate.cc
 +++ b/net/cookies/test_cookie_access_delegate.cc
 @@ -11,6 +11,7 @@
@@ -10146,7 +10145,7 @@ index 32c35b1a37..2db6917faa 100644
      return base::unexpected(SessionError{
          SessionError::kInvalidCredentialsCookieUnpermittedAttribute});
 diff --git a/net/device_bound_sessions/registration_fetcher.cc b/net/device_bound_sessions/registration_fetcher.cc
-index 6b5aaf80df..b4d3f7bca3 100644
+index 19890807a1..6555cd87f4 100644
 --- a/net/device_bound_sessions/registration_fetcher.cc
 +++ b/net/device_bound_sessions/registration_fetcher.cc
 @@ -4,11 +4,11 @@
@@ -10162,7 +10161,7 @@ index 6b5aaf80df..b4d3f7bca3 100644
  #include "base/functional/callback.h"
  #include "base/functional/callback_helpers.h"
  #include "base/metrics/histogram_functions.h"
-@@ -401,7 +401,7 @@ class RegistrationFetcherImpl : public RegistrationFetcher {
+@@ -418,7 +418,7 @@ class RegistrationFetcherImpl : public RegistrationFetcher {
      std::string target_origin =
          url::Origin::Create(fetcher_endpoint_).Serialize();
      if (!maybe_params->relying_origins.has_value() ||
@@ -10171,7 +10170,7 @@ index 6b5aaf80df..b4d3f7bca3 100644
        return SessionError::kFederatedNotAuthorizedByProvider;
      }
  
-@@ -771,7 +771,7 @@ class RegistrationFetcherImpl : public RegistrationFetcher {
+@@ -788,7 +788,7 @@ class RegistrationFetcherImpl : public RegistrationFetcher {
      }
  
      if (!maybe_params->registering_origins.has_value() ||
@@ -10203,7 +10202,7 @@ index ecc0c60fa1..7ebf9d4260 100644
                   kDeviceBoundSessionsForRestrictedSitesExperimentIdParam.Get()
                       .empty()) {
 diff --git a/net/device_bound_sessions/session_store_impl.cc b/net/device_bound_sessions/session_store_impl.cc
-index d49fd2728a..771e7eebcf 100644
+index f8c742a459..5876569eb9 100644
 --- a/net/device_bound_sessions/session_store_impl.cc
 +++ b/net/device_bound_sessions/session_store_impl.cc
 @@ -376,7 +376,8 @@ void SessionStoreImpl::OnGetAllKeysForGarbageCollection(
@@ -10217,10 +10216,10 @@ index d49fd2728a..771e7eebcf 100644
      }
    }
 diff --git a/net/dns/dns_response.cc b/net/dns/dns_response.cc
-index d2366f6e09..8337d29349 100644
+index 356d677d52..83399e7a23 100644
 --- a/net/dns/dns_response.cc
 +++ b/net/dns/dns_response.cc
-@@ -232,7 +232,9 @@ unsigned DnsRecordParser::ReadName(const void* const vpos,
+@@ -248,7 +248,9 @@ unsigned DnsRecordParser::ReadName(const void* const vpos,
          if (out) {
            if (!out->empty())
              out->append(".");
@@ -10305,19 +10304,6 @@ index 2d42255a1d..1237c78b7d 100644
          continue;
        }
  
-diff --git a/net/dns/host_resolver_dns_task.cc b/net/dns/host_resolver_dns_task.cc
-index c45706d5f3..ad59ba0f49 100644
---- a/net/dns/host_resolver_dns_task.cc
-+++ b/net/dns/host_resolver_dns_task.cc
-@@ -498,7 +498,7 @@ void HostResolverDnsTask::OnDnsTransactionComplete(
-     int net_error,
-     const DnsResponse* response) {
-   CHECK(transaction_info_it != transactions_in_progress_.end());
--  DCHECK(transactions_in_progress_.contains(*transaction_info_it));
-+  DCHECK(base::Contains(transactions_in_progress_, *transaction_info_it));
- 
-   // Pull the TransactionInfo out of `transactions_in_progress_` now, so it
-   // and its underlying DnsTransaction will be deleted on completion of
 diff --git a/net/dns/host_resolver_manager.cc b/net/dns/host_resolver_manager.cc
 index 51cbcc9aea..4497fd1b9b 100644
 --- a/net/dns/host_resolver_manager.cc
@@ -10341,7 +10327,7 @@ index 51cbcc9aea..4497fd1b9b 100644
      }
    }
 diff --git a/net/dns/host_resolver_manager_job.cc b/net/dns/host_resolver_manager_job.cc
-index bf13934233..fa32985fd5 100644
+index 00015f8b71..fceecf1ca4 100644
 --- a/net/dns/host_resolver_manager_job.cc
 +++ b/net/dns/host_resolver_manager_job.cc
 @@ -4,7 +4,6 @@
@@ -10461,7 +10447,7 @@ index 4f73e6667f..328cf54b17 100644
    }
  
 diff --git a/net/dns/opt_record_rdata.cc b/net/dns/opt_record_rdata.cc
-index 27cc167f56..824d8d7ae1 100644
+index 24cb43ed63..7cb630b0e8 100644
 --- a/net/dns/opt_record_rdata.cc
 +++ b/net/dns/opt_record_rdata.cc
 @@ -15,6 +15,7 @@
@@ -10472,7 +10458,7 @@ index 27cc167f56..824d8d7ae1 100644
  #include "base/containers/span.h"
  #include "base/containers/span_reader.h"
  #include "base/containers/span_writer.h"
-@@ -252,7 +253,7 @@ OptRecordRdata::UnknownOpt::CreateForTesting(uint16_t code,
+@@ -251,7 +252,7 @@ OptRecordRdata::UnknownOpt::CreateForTesting(uint16_t code,
  OptRecordRdata::UnknownOpt::UnknownOpt(uint16_t code,
                                         base::span<const uint8_t> data)
      : Opt(data), code_(code) {
@@ -10503,7 +10489,7 @@ index 0926982341..d77d717b67 100644
  }
  
 diff --git a/net/dns/resolve_context.cc b/net/dns/resolve_context.cc
-index ea5aaa6c5a..82600672bc 100644
+index d43763f520..080f768caa 100644
 --- a/net/dns/resolve_context.cc
 +++ b/net/dns/resolve_context.cc
 @@ -10,6 +10,7 @@
@@ -10635,7 +10621,7 @@ index 0ccbec3fcc..314d777307 100644
    response_drainers_.erase(response_drainers_.find(drainer));
  }
 diff --git a/net/http/http_no_vary_search_data.cc b/net/http/http_no_vary_search_data.cc
-index 781a12bed1..41509e7b14 100644
+index 9b04ab7cd0..9ae6f8d999 100644
 --- a/net/http/http_no_vary_search_data.cc
 +++ b/net/http/http_no_vary_search_data.cc
 @@ -4,10 +4,10 @@
@@ -10650,7 +10636,7 @@ index 781a12bed1..41509e7b14 100644
  #include "base/containers/flat_set.h"
  #include "base/debug/crash_logging.h"
  #include "base/debug/dump_without_crashing.h"
-@@ -228,10 +228,9 @@ HttpNoVarySearchData::ParseNoVarySearchDictionary(
+@@ -229,10 +229,9 @@ HttpNoVarySearchData::ParseNoVarySearchDictionary(
    bool vary_by_default = true;
  
    // If the dictionary contains unknown keys, maybe fail parsing.
@@ -10665,7 +10651,7 @@ index 781a12bed1..41509e7b14 100644
    UMA_HISTOGRAM_BOOLEAN("Net.HttpNoVarySearch.HasUnrecognizedKeys",
                          has_unrecognized_keys);
 diff --git a/net/http/http_server_properties.cc b/net/http/http_server_properties.cc
-index 371c136b93..9217e0299a 100644
+index ebc6dbd31f..0f595d530a 100644
 --- a/net/http/http_server_properties.cc
 +++ b/net/http/http_server_properties.cc
 @@ -6,6 +6,7 @@
@@ -10676,7 +10662,7 @@ index 371c136b93..9217e0299a 100644
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
  #include "base/location.h"
-@@ -1338,7 +1339,7 @@ void HttpServerProperties::OnServerInfoLoaded(
+@@ -1339,7 +1340,7 @@ void HttpServerProperties::OnServerInfoLoaded(
                              kCanonicalPort),
          it.first.network_anonymization_key);
      // If we already have a valid canonical server, we're done.
@@ -10698,7 +10684,7 @@ index b98a6a0a52..eec99d2252 100644
  #include "base/functional/bind.h"
  #include "base/functional/callback.h"
 diff --git a/net/http/http_stream_factory_job_controller.cc b/net/http/http_stream_factory_job_controller.cc
-index d1eeac2c2d..57aada2932 100644
+index 6e5ee5d069..dd3892cc2e 100644
 --- a/net/http/http_stream_factory_job_controller.cc
 +++ b/net/http/http_stream_factory_job_controller.cc
 @@ -7,6 +7,7 @@
@@ -10757,10 +10743,10 @@ index 6b38a7c613..64040b7633 100644
      }
      return service_endpoint;
 diff --git a/net/http/http_stream_pool_attempt_manager.cc b/net/http/http_stream_pool_attempt_manager.cc
-index a1121e715b..bb3cf91f9b 100644
+index 7a6cae2267..ddf102bac8 100644
 --- a/net/http/http_stream_pool_attempt_manager.cc
 +++ b/net/http/http_stream_pool_attempt_manager.cc
-@@ -407,8 +407,8 @@ bool HttpStreamPool::AttemptManager::IsEndpointUsableForTcpBasedAttempt(
+@@ -427,8 +427,8 @@ bool HttpStreamPool::AttemptManager::IsEndpointUsableForTcpBasedAttempt(
    // configured ones.
    return std::ranges::any_of(
        endpoint.metadata.supported_protocol_alpns, [&](const auto& alpn) {
@@ -10771,7 +10757,7 @@ index a1121e715b..bb3cf91f9b 100644
        });
  }
  
-@@ -486,7 +486,7 @@ HttpStreamPool::AttemptManager::GetServiceEndpoint(
+@@ -506,7 +506,7 @@ HttpStreamPool::AttemptManager::GetServiceEndpoint(
      const std::vector<IPEndPoint>& ip_endpoints = ip_endpoint.address().IsIPv4()
                                                        ? endpoint.ipv4_endpoints
                                                        : endpoint.ipv6_endpoints;
@@ -10920,7 +10906,7 @@ index 3e6d245b8f..40f5cef42e 100644
  
  int ProofVerifierChromium::Job::DoVerifyCertComplete(int result) {
 diff --git a/net/quic/dedicated_web_transport_http3_client.cc b/net/quic/dedicated_web_transport_http3_client.cc
-index 8821ff4638..eaf6d03f9f 100644
+index bd332006a0..8486487c18 100644
 --- a/net/quic/dedicated_web_transport_http3_client.cc
 +++ b/net/quic/dedicated_web_transport_http3_client.cc
 @@ -4,10 +4,10 @@
@@ -10935,7 +10921,7 @@ index 8821ff4638..eaf6d03f9f 100644
  #include "base/feature_list.h"
  #include "base/memory/raw_ptr.h"
  #include "base/metrics/field_trial_params.h"
-@@ -533,7 +533,7 @@ int DedicatedWebTransportHttp3Client::DoInit() {
+@@ -555,7 +555,7 @@ int DedicatedWebTransportHttp3Client::DoInit() {
    // Add other supported versions if available.
    for (quic::ParsedQuicVersion& version :
         quic_context_->params()->supported_versions) {
@@ -10944,7 +10930,7 @@ index 8821ff4638..eaf6d03f9f 100644
        continue;  // Skip as we've already added it above.
      supported_versions_.push_back(version);
    }
-@@ -992,7 +992,7 @@ void DedicatedWebTransportHttp3Client::OnConnectionClosed(
+@@ -1014,7 +1014,7 @@ void DedicatedWebTransportHttp3Client::OnConnectionClosed(
      original_supported_versions_ = supported_versions_;
      std::erase_if(
          supported_versions_, [this](const quic::ParsedQuicVersion& version) {
@@ -11017,7 +11003,7 @@ index fb68e214d6..89eb654c52 100644
      }
    }
 diff --git a/net/quic/quic_session_pool.cc b/net/quic/quic_session_pool.cc
-index ca45656f66..0fa6175849 100644
+index b03953abb3..367c3fe89d 100644
 --- a/net/quic/quic_session_pool.cc
 +++ b/net/quic/quic_session_pool.cc
 @@ -13,6 +13,7 @@
@@ -11028,7 +11014,7 @@ index ca45656f66..0fa6175849 100644
  #include "base/feature_list.h"
  #include "base/functional/bind.h"
  #include "base/functional/callback_helpers.h"
-@@ -1603,8 +1604,8 @@ quic::ParsedQuicVersion QuicSessionPool::SelectQuicVersion(
+@@ -1611,8 +1612,8 @@ quic::ParsedQuicVersion QuicSessionPool::SelectQuicVersion(
    // https://datatracker.ietf.org/doc/html/rfc9460#name-interaction-with-alt-svc
    if (known_quic_version.IsKnown()) {
      std::string expected_alpn = quic::AlpnForVersion(known_quic_version);
@@ -11111,11 +11097,95 @@ index fcc3cc6255..e9effd72e5 100644
          continue;
  
        // Find an endpoint to deliver these reports to.
+diff --git a/net/socket/client_socket_pool_manager.cc b/net/socket/client_socket_pool_manager.cc
+index 460931e04d..218f2cf879 100644
+--- a/net/socket/client_socket_pool_manager.cc
++++ b/net/socket/client_socket_pool_manager.cc
+@@ -12,6 +12,7 @@
+ #include "base/check_op.h"
+ #include "base/metrics/field_trial_params.h"
+ #include "base/numerics/safe_conversions.h"
++#include "base/types/cxx23_to_underlying.h"
+ #include "build/build_config.h"
+ #include "net/base/load_flags.h"
+ #include "net/base/proxy_chain.h"
+@@ -32,7 +33,7 @@ namespace net {
+ namespace {
+ 
+ static constexpr size_t kSocketPoolTypesSize =
+-    std::to_underlying(HttpNetworkSession::SocketPoolType::kMaxValue) + 1;
++    base::to_underlying(HttpNetworkSession::SocketPoolType::kMaxValue) + 1;
+ 
+ // The soft limit for active sockets per pool for this network process. This may
+ // be modified by set_socket_soft_cap_per_pool in tests, but should otherwise be
+@@ -152,7 +153,7 @@ ClientSocketPoolManager::~ClientSocketPoolManager() = default;
+ // static
+ size_t ClientSocketPoolManager::socket_soft_cap_per_pool(
+     HttpNetworkSession::SocketPoolType pool_type) {
+-  return g_socket_soft_cap_per_pool[std::to_underlying(pool_type)];
++  return g_socket_soft_cap_per_pool[base::to_underlying(pool_type)];
+ }
+ 
+ // static
+@@ -161,15 +162,15 @@ void ClientSocketPoolManager::set_socket_soft_cap_per_pool_for_test(
+     size_t socket_count) {
+   DCHECK_LT(0u, socket_count);     // At least one socket must be allowed.
+   DCHECK_GE(2048u, socket_count);  // For now, we pick a ceiling of 2^11.
+-  g_socket_soft_cap_per_pool[std::to_underlying(pool_type)] = socket_count;
+-  DCHECK_GE(g_socket_soft_cap_per_pool[std::to_underlying(pool_type)],
+-            g_max_sockets_per_group[std::to_underlying(pool_type)]);
++  g_socket_soft_cap_per_pool[base::to_underlying(pool_type)] = socket_count;
++  DCHECK_GE(g_socket_soft_cap_per_pool[base::to_underlying(pool_type)],
++            g_max_sockets_per_group[base::to_underlying(pool_type)]);
+ }
+ 
+ // static
+ size_t ClientSocketPoolManager::max_sockets_per_group(
+     HttpNetworkSession::SocketPoolType pool_type) {
+-  return g_max_sockets_per_group[std::to_underlying(pool_type)];
++  return g_max_sockets_per_group[base::to_underlying(pool_type)];
+ }
+ 
+ // static
+@@ -178,18 +179,18 @@ void ClientSocketPoolManager::set_max_sockets_per_group_for_test(
+     size_t socket_count) {
+   DCHECK_LT(0u, socket_count);    // At least one socket must be allowed.
+   DCHECK_GE(512u, socket_count);  // For now, we pick a ceiling of 2^9.
+-  g_max_sockets_per_group[std::to_underlying(pool_type)] = socket_count;
++  g_max_sockets_per_group[base::to_underlying(pool_type)] = socket_count;
+ 
+-  DCHECK_GE(g_socket_soft_cap_per_pool[std::to_underlying(pool_type)],
+-            g_max_sockets_per_group[std::to_underlying(pool_type)]);
+-  DCHECK_GE(GlobalMaxSocketPerProxyChain()[std::to_underlying(pool_type)],
+-            g_max_sockets_per_group[std::to_underlying(pool_type)]);
++  DCHECK_GE(g_socket_soft_cap_per_pool[base::to_underlying(pool_type)],
++            g_max_sockets_per_group[base::to_underlying(pool_type)]);
++  DCHECK_GE(GlobalMaxSocketPerProxyChain()[base::to_underlying(pool_type)],
++            g_max_sockets_per_group[base::to_underlying(pool_type)]);
+ }
+ 
+ // static
+ size_t ClientSocketPoolManager::max_sockets_per_proxy_chain(
+     HttpNetworkSession::SocketPoolType pool_type) {
+-  return GlobalMaxSocketPerProxyChain()[std::to_underlying(pool_type)];
++  return GlobalMaxSocketPerProxyChain()[base::to_underlying(pool_type)];
+ }
+ 
+ // static
+@@ -202,7 +203,7 @@ void ClientSocketPoolManager::set_max_sockets_per_proxy_chain(
+   CHECK_GE(socket_count, 6u);
+   CHECK_LE(socket_count, 256u);
+   // LINT.ThenChange(/net/socket/client_socket_pool_manager.cc:SetMaxConnectionsPerProxyChain)
+-  GlobalMaxSocketPerProxyChain()[std::to_underlying(pool_type)] = socket_count;
++  GlobalMaxSocketPerProxyChain()[base::to_underlying(pool_type)] = socket_count;
+ }
+ 
+ // static
 diff --git a/net/socket/ssl_client_socket_impl.cc b/net/socket/ssl_client_socket_impl.cc
-index 8ac4477210..4aeac3d114 100644
+index 538458447d..421d362c57 100644
 --- a/net/socket/ssl_client_socket_impl.cc
 +++ b/net/socket/ssl_client_socket_impl.cc
-@@ -1544,7 +1544,7 @@ int SSLClientSocketImpl::ClientCertRequestCallback(SSL* ssl) {
+@@ -1573,7 +1573,7 @@ int SSLClientSocketImpl::ClientCertRequestCallback(SSL* ssl) {
      // If the key supports rsa_pkcs1_sha256, automatically add support for
      // rsa_pkcs1_sha256_legacy, for use with TLS 1.3. We convert here so that
      // not every `SSLPrivateKey` needs to implement it explicitly.
@@ -11198,7 +11268,7 @@ index cbabc026ce..a60d7c2818 100644
      pending_callbacks_.erase(reinterpret_cast<ClientSocketHandleID>(handle));
    }
 diff --git a/net/spdy/spdy_session.cc b/net/spdy/spdy_session.cc
-index b81a1c76b0..14ea0d950a 100644
+index db379d09e0..c44149abf7 100644
 --- a/net/spdy/spdy_session.cc
 +++ b/net/spdy/spdy_session.cc
 @@ -14,6 +14,7 @@
@@ -11210,7 +11280,7 @@ index b81a1c76b0..14ea0d950a 100644
  #include "base/containers/span_writer.h"
  #include "base/functional/bind.h"
 diff --git a/net/spdy/spdy_session_pool.cc b/net/spdy/spdy_session_pool.cc
-index 27e6084235..37a3873f5b 100644
+index 1417cadf99..f44398cafd 100644
 --- a/net/spdy/spdy_session_pool.cc
 +++ b/net/spdy/spdy_session_pool.cc
 @@ -9,6 +9,7 @@
@@ -11394,10 +11464,10 @@ index 30c041a7b8..28b5dc1bf0 100644
    }
  
 diff --git a/pdf/pdfium/pdfium_engine.cc b/pdf/pdfium/pdfium_engine.cc
-index 1e69739e18..54e3a94a1c 100644
+index dbfdddbb66..287b0d412e 100644
 --- a/pdf/pdfium/pdfium_engine.cc
 +++ b/pdf/pdfium/pdfium_engine.cc
-@@ -18,6 +18,7 @@
+@@ -19,6 +19,7 @@
  #include "base/auto_reset.h"
  #include "base/check_op.h"
  #include "base/compiler_specific.h"
@@ -11405,7 +11475,7 @@ index 1e69739e18..54e3a94a1c 100644
  #include "base/containers/flat_map.h"
  #include "base/containers/span.h"
  #include "base/feature_list.h"
-@@ -3455,7 +3456,7 @@ void PDFiumEngine::CalculateVisiblePages() {
+@@ -3510,7 +3511,7 @@ void PDFiumEngine::CalculateVisiblePages() {
  bool PDFiumEngine::IsPageVisible(int page_index) const {
    // CalculateVisiblePages() must have been called first to populate
    // `visible_pages_`. Otherwise, this will always return false.
@@ -11414,7 +11484,7 @@ index 1e69739e18..54e3a94a1c 100644
  }
  
  void PDFiumEngine::ScrollToPage(int page) {
-@@ -3480,7 +3481,7 @@ bool PDFiumEngine::CheckPageAvailable(uint32_t index,
+@@ -3535,7 +3536,7 @@ bool PDFiumEngine::CheckPageAvailable(uint32_t index,
  
    FX_DOWNLOADHINTS& download_hints = document_->download_hints();
    if (!FPDFAvail_IsPageAvail(fpdf_availability(), index, &download_hints)) {
@@ -11424,10 +11494,18 @@ index 1e69739e18..54e3a94a1c 100644
      }
      return false;
 diff --git a/pdf/pdfium/pdfium_on_demand_searchifier.cc b/pdf/pdfium/pdfium_on_demand_searchifier.cc
-index 19a21ba357..c4f598c575 100644
+index 19a21ba357..df1f43bf84 100644
 --- a/pdf/pdfium/pdfium_on_demand_searchifier.cc
 +++ b/pdf/pdfium/pdfium_on_demand_searchifier.cc
-@@ -115,7 +115,7 @@ bool PDFiumOnDemandSearchifier::IsPageScheduled(uint32_t page_index) const {
+@@ -8,6 +8,7 @@
+ #include <utility>
+ 
+ #include "base/check.h"
++#include "base/containers/contains.h"
+ #include "base/logging.h"
+ #include "base/metrics/histogram_functions.h"
+ #include "base/notreached.h"
+@@ -115,7 +116,7 @@ bool PDFiumOnDemandSearchifier::IsPageScheduled(uint32_t page_index) const {
      return true;
    }
  
@@ -11437,7 +11515,7 @@ index 19a21ba357..c4f598c575 100644
  
  void PDFiumOnDemandSearchifier::SchedulePage(uint32_t page_index) {
 diff --git a/printing/backend/cups_ipp_helper.cc b/printing/backend/cups_ipp_helper.cc
-index cf252e4e3a..5680584f40 100644
+index 44df05b25b..ce4a9b80cc 100644
 --- a/printing/backend/cups_ipp_helper.cc
 +++ b/printing/backend/cups_ipp_helper.cc
 @@ -13,6 +13,7 @@
@@ -11448,7 +11526,7 @@ index cf252e4e3a..5680584f40 100644
  #include "base/containers/fixed_flat_map.h"
  #include "base/containers/fixed_flat_set.h"
  #include "base/logging.h"
-@@ -432,8 +433,8 @@ void ExtractMediaTypes(const CupsOptionProvider& printer,
+@@ -430,8 +431,8 @@ void ExtractMediaTypes(const CupsOptionProvider& printer,
  bool CollateCapable(const CupsOptionProvider& printer) {
    std::vector<std::string_view> values =
        printer.GetSupportedOptionValueStrings(kIppCollate);
@@ -11459,7 +11537,7 @@ index cf252e4e3a..5680584f40 100644
  }
  
  bool CollateDefault(const CupsOptionProvider& printer) {
-@@ -456,7 +457,7 @@ bool PinSupported(const CupsOptionProvider& printer) {
+@@ -454,7 +455,7 @@ bool PinSupported(const CupsOptionProvider& printer) {
  
    std::vector<std::string_view> values =
        printer.GetSupportedOptionValueStrings(kIppPinEncryption);
@@ -11534,7 +11612,7 @@ index 91eb1036a3..b453cd8b32 100644
      }
      auto iterator = populated_memory_items_.Get(item->item_id());
 diff --git a/storage/browser/blob/blob_registry_impl.cc b/storage/browser/blob/blob_registry_impl.cc
-index 7e2b6c3ef8..01267fcd85 100644
+index a746162063..713959ca7c 100644
 --- a/storage/browser/blob/blob_registry_impl.cc
 +++ b/storage/browser/blob/blob_registry_impl.cc
 @@ -522,7 +522,7 @@ void BlobRegistryImpl::Register(
@@ -11812,7 +11890,7 @@ index e368ea7e99..5a4e1490ff 100644
  
        if (find_info.IsDirectory()) {
 diff --git a/storage/browser/file_system/sandbox_file_system_backend_delegate.cc b/storage/browser/file_system/sandbox_file_system_backend_delegate.cc
-index 9978b2d2ec..d612097e78 100644
+index 3401dd23f2..418d3d2f7a 100644
 --- a/storage/browser/file_system/sandbox_file_system_backend_delegate.cc
 +++ b/storage/browser/file_system/sandbox_file_system_backend_delegate.cc
 @@ -11,6 +11,7 @@
@@ -11890,10 +11968,10 @@ index 25a85d4fe9..52cb27612c 100644
      }
  
 diff --git a/storage/browser/quota/quota_manager_impl.cc b/storage/browser/quota/quota_manager_impl.cc
-index beb6c5cde9..8a033fbe35 100644
+index 2ea77a5999..05c138e0a9 100644
 --- a/storage/browser/quota/quota_manager_impl.cc
 +++ b/storage/browser/quota/quota_manager_impl.cc
-@@ -785,7 +785,7 @@ class QuotaManagerImpl::BucketSetDataDeleter {
+@@ -778,7 +778,7 @@ class QuotaManagerImpl::BucketSetDataDeleter {
                             QuotaErrorOr<mojom::BucketTableEntryPtr> entry) {
      DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
  
@@ -11902,7 +11980,7 @@ index beb6c5cde9..8a033fbe35 100644
      bucket_deleters_.erase(deleter);
  
      if (!entry.has_value()) {
-@@ -2421,7 +2421,7 @@ void QuotaManagerImpl::WithdrawOverridesForHandle(int handle_id) {
+@@ -2379,7 +2379,7 @@ void QuotaManagerImpl::WithdrawOverridesForHandle(int handle_id) {
  std::optional<int64_t> QuotaManagerImpl::GetQuotaOverrideForStorageKey(
      const StorageKey& storage_key) {
    DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
@@ -12158,7 +12236,7 @@ index db04c73436..bfcf8d1358 100644
      }
  
 diff --git a/url/url_util.cc b/url/url_util.cc
-index 0ec8bea97c..676c3fffa2 100644
+index cedfbaf417..4a047fedcc 100644
 --- a/url/url_util.cc
 +++ b/url/url_util.cc
 @@ -7,13 +7,13 @@
@@ -12204,227 +12282,183 @@ index 0ec8bea97c..676c3fffa2 100644
    schemes->push_back({std::string(new_scheme), type});
  }
  
-diff --git a/net/cookies/canonical_cookie.cc b/net/cookies/canonical_cookie.cc
-index 035f7b8917..110a2e8d9d 100644
---- a/net/cookies/canonical_cookie.cc
-+++ b/net/cookies/canonical_cookie.cc
-@@ -356,11 +356,11 @@ std::unique_ptr<CanonicalCookie> CanonicalCookie::Create(
-   UMA_HISTOGRAM_BOOLEAN("Cookie.Parse.EmptyName", parsed_cookie.Name().empty());
-   if (parsed_cookie.Name().empty()) {
-     UMA_HISTOGRAM_BOOLEAN("Cookie.Parse.EmptyNameAmbiguousValue",
--                          parsed_cookie.Value().contains('='));
-+                          base::Contains(parsed_cookie.Value(), '='));
+diff --git a/net/dns/filtering_details_url_generator.cc b/net/dns/filtering_details_url_generator.cc
+index 04f4060f1d..3f649eac94 100644
+--- a/net/dns/filtering_details_url_generator.cc
++++ b/net/dns/filtering_details_url_generator.cc
+@@ -24,7 +24,14 @@ const FilteringDetailsUrlGenerator* g_instance_for_testing = nullptr;
+ // detected by those tools.
+ #define MAKE_STATIC_STORAGE_BASE_FEATURE(feature_name, feature_state) \
+   ([]() {                                                             \
+-    static BASE_FEATURE(feature_name, feature_state);                 \
++    static const base::Feature feature_name(                          \
++        []() {                                                        \
++          static constexpr base::internal::StringStorage storage(     \
++              #feature_name);                                         \
++          return storage.storage.data();                              \
++        }(),                                                          \
++        feature_state,                                                \
++        base::internal::FeatureMacroHandshake::kSecret);              \
+     return &feature_name;                                             \
+   })()
  
-     if (base::FeatureList::IsEnabled(
-             net::features::kCookieParseRejectEmptyNameAmbiguous) &&
--        parsed_cookie.Value().contains('=')) {
-+        base::Contains(parsed_cookie.Value(), '=')) {
-       status->AddExclusionReason(CookieInclusionStatus::ExclusionReason::
-                                      EXCLUDE_AMBIGUOUS_SERIALIZATION);
-     }
-diff --git a/net/socket/client_socket_pool_manager.cc b/net/socket/client_socket_pool_manager.cc
-index 460931e04d..218f2cf879 100644
---- a/net/socket/client_socket_pool_manager.cc
-+++ b/net/socket/client_socket_pool_manager.cc
-@@ -12,6 +12,7 @@
- #include "base/check_op.h"
- #include "base/metrics/field_trial_params.h"
- #include "base/numerics/safe_conversions.h"
-+#include "base/types/cxx23_to_underlying.h"
- #include "build/build_config.h"
- #include "net/base/load_flags.h"
- #include "net/base/proxy_chain.h"
-@@ -32,7 +33,7 @@ namespace net {
- namespace {
+diff --git a/net/dns/public/doh_provider_entry.cc b/net/dns/public/doh_provider_entry.cc
+index f48d26044b..65da71300c 100644
+--- a/net/dns/public/doh_provider_entry.cc
++++ b/net/dns/public/doh_provider_entry.cc
+@@ -60,7 +60,14 @@ DnsOverHttpsServerConfig ParseValidDohTemplate(
+ // detected by those tools.
+ #define MAKE_STATIC_STORAGE_BASE_FEATURE(feature_name, feature_state) \
+   ([]() {                                                             \
+-    static BASE_FEATURE(feature_name, feature_state);                 \
++    static const base::Feature feature_name(                          \
++        []() {                                                        \
++          static constexpr base::internal::StringStorage storage(     \
++              #feature_name);                                         \
++          return storage.storage.data();                              \
++        }(),                                                          \
++        feature_state,                                                \
++        base::internal::FeatureMacroHandshake::kSecret);              \
+     return &feature_name;                                             \
+   })()
  
- static constexpr size_t kSocketPoolTypesSize =
--    std::to_underlying(HttpNetworkSession::SocketPoolType::kMaxValue) + 1;
-+    base::to_underlying(HttpNetworkSession::SocketPoolType::kMaxValue) + 1;
+diff --git a/ui/accessibility/ax_position.h b/ui/accessibility/ax_position.h
+index b357ef989d..4fba674fc9 100644
+--- a/ui/accessibility/ax_position.h
++++ b/ui/accessibility/ax_position.h
+@@ -19,6 +19,7 @@
+ #include <vector>
  
- // The soft limit for active sockets per pool for this network process. This may
- // be modified by set_socket_soft_cap_per_pool in tests, but should otherwise be
-@@ -152,7 +153,7 @@ ClientSocketPoolManager::~ClientSocketPoolManager() = default;
- // static
- size_t ClientSocketPoolManager::socket_soft_cap_per_pool(
-     HttpNetworkSession::SocketPoolType pool_type) {
--  return g_socket_soft_cap_per_pool[std::to_underlying(pool_type)];
-+  return g_socket_soft_cap_per_pool[base::to_underlying(pool_type)];
+ #include "base/compiler_specific.h"
++#include "base/containers/contains.h"
+ #include "base/containers/span.h"
+ #include "base/containers/stack.h"
+ #include "base/export_template.h"
+diff --git a/extensions/common/csp_validator.cc b/extensions/common/csp_validator.cc
+index 72cd6edbc6..12b14932a0 100644
+--- a/extensions/common/csp_validator.cc
++++ b/extensions/common/csp_validator.cc
+@@ -781,7 +781,7 @@ bool DoesCSPDisallowRemoteCode(const std::string& extension_id,
  }
  
- // static
-@@ -161,15 +162,15 @@ void ClientSocketPoolManager::set_socket_soft_cap_per_pool_for_test(
-     size_t socket_count) {
-   DCHECK_LT(0u, socket_count);     // At least one socket must be allowed.
-   DCHECK_GE(2048u, socket_count);  // For now, we pick a ceiling of 2^11.
--  g_socket_soft_cap_per_pool[std::to_underlying(pool_type)] = socket_count;
--  DCHECK_GE(g_socket_soft_cap_per_pool[std::to_underlying(pool_type)],
--            g_max_sockets_per_group[std::to_underlying(pool_type)]);
-+  g_socket_soft_cap_per_pool[base::to_underlying(pool_type)] = socket_count;
-+  DCHECK_GE(g_socket_soft_cap_per_pool[base::to_underlying(pool_type)],
-+            g_max_sockets_per_group[base::to_underlying(pool_type)]);
+ bool IsExtensionAllowedToUseChromeResources(const std::string& extension_id) {
+-  return std::ranges::contains(kExtensionsAllowedToUseChromeResources,
++  return base::Contains(kExtensionsAllowedToUseChromeResources,
+                                extension_id);
  }
  
- // static
- size_t ClientSocketPoolManager::max_sockets_per_group(
-     HttpNetworkSession::SocketPoolType pool_type) {
--  return g_max_sockets_per_group[std::to_underlying(pool_type)];
-+  return g_max_sockets_per_group[base::to_underlying(pool_type)];
- }
+diff --git a/extensions/common/manifest_handlers/app_urls_info.cc b/extensions/common/manifest_handlers/app_urls_info.cc
+index aa34546f0d..54cb31d57c 100644
+--- a/extensions/common/manifest_handlers/app_urls_info.cc
++++ b/extensions/common/manifest_handlers/app_urls_info.cc
+@@ -4,6 +4,7 @@
  
- // static
-@@ -178,18 +179,18 @@ void ClientSocketPoolManager::set_max_sockets_per_group_for_test(
-     size_t socket_count) {
-   DCHECK_LT(0u, socket_count);    // At least one socket must be allowed.
-   DCHECK_GE(512u, socket_count);  // For now, we pick a ceiling of 2^9.
--  g_max_sockets_per_group[std::to_underlying(pool_type)] = socket_count;
-+  g_max_sockets_per_group[base::to_underlying(pool_type)] = socket_count;
+ #include "extensions/common/manifest_handlers/app_urls_info.h"
  
--  DCHECK_GE(g_socket_soft_cap_per_pool[std::to_underlying(pool_type)],
--            g_max_sockets_per_group[std::to_underlying(pool_type)]);
--  DCHECK_GE(GlobalMaxSocketPerProxyChain()[std::to_underlying(pool_type)],
--            g_max_sockets_per_group[std::to_underlying(pool_type)]);
-+  DCHECK_GE(g_socket_soft_cap_per_pool[base::to_underlying(pool_type)],
-+            g_max_sockets_per_group[base::to_underlying(pool_type)]);
-+  DCHECK_GE(GlobalMaxSocketPerProxyChain()[base::to_underlying(pool_type)],
-+            g_max_sockets_per_group[base::to_underlying(pool_type)]);
- }
++#include "base/containers/contains.h"
+ #include "base/strings/string_number_conversions.h"
+ #include "base/values.h"
+ #include "extensions/common/error_utils.h"
+@@ -75,7 +76,7 @@ bool ParseAppURLs(Extension& extension, std::u16string* error) {
  
- // static
- size_t ClientSocketPoolManager::max_sockets_per_proxy_chain(
-     HttpNetworkSession::SocketPoolType pool_type) {
--  return GlobalMaxSocketPerProxyChain()[std::to_underlying(pool_type)];
-+  return GlobalMaxSocketPerProxyChain()[base::to_underlying(pool_type)];
- }
+     // We do not allow authors to put wildcards in their paths. Instead, we
+     // imply one at the end.
+-    if (pattern.path().contains('*')) {
++    if (base::Contains(pattern.path(), '*')) {
+       *error = ErrorUtils::FormatErrorMessageUTF16(errors::kInvalidWebURL,
+                                                    base::NumberToString(i),
+                                                    errors::kNoWildCardsInPaths);
+diff --git a/extensions/common/manifest_handlers/mime_types_handler.cc b/extensions/common/manifest_handlers/mime_types_handler.cc
+index a02d1105b9..823c2627bf 100644
+--- a/extensions/common/manifest_handlers/mime_types_handler.cc
++++ b/extensions/common/manifest_handlers/mime_types_handler.cc
+@@ -8,6 +8,7 @@
  
- // static
-@@ -202,7 +203,7 @@ void ClientSocketPoolManager::set_max_sockets_per_proxy_chain(
-   CHECK_GE(socket_count, 6u);
-   CHECK_LE(socket_count, 256u);
-   // LINT.ThenChange(/net/socket/client_socket_pool_manager.cc:SetMaxConnectionsPerProxyChain)
--  GlobalMaxSocketPerProxyChain()[std::to_underlying(pool_type)] = socket_count;
-+  GlobalMaxSocketPerProxyChain()[base::to_underlying(pool_type)] = socket_count;
- }
+ #include <algorithm>
  
- // static
-diff --git a/gpu/ipc/common/vulkan_types_mojom_traits.h b/gpu/ipc/common/vulkan_types_mojom_traits.h
-index 49b16b3c80..9c33ce39d6 100644
---- a/gpu/ipc/common/vulkan_types_mojom_traits.h
-+++ b/gpu/ipc/common/vulkan_types_mojom_traits.h
-@@ -30,7 +30,7 @@ std::string_view SafelyRetrieveStringView(
-     // We can safely construct a `string_view` from this.
-     return std::string_view(field.data());
-   };
--  return std::string_view(field);
-+  return std::string_view(field.data(), field.size());
- }
- 
- template <>
-diff --git a/cc/trees/layer_tree_impl.cc b/cc/trees/layer_tree_impl.cc
-index 8310cc66ed..020efde5f9 100644
---- a/cc/trees/layer_tree_impl.cc
-+++ b/cc/trees/layer_tree_impl.cc
-@@ -2357,7 +2357,7 @@ void LayerTreeImpl::NotifyLayerHasAnimatedImagesChanged(
-     layer_list_.RemovePictureLayerWithAnimatedImages(layer);
-   }
-   DCHECK_EQ(has_animated_images,
--            std::ranges::contains(layer_list_.PictureLayersWithAnimatedImages(),
-+            base::Contains(layer_list_.PictureLayersWithAnimatedImages(),
-                                   layer));
- }
- 
-@@ -2375,7 +2375,7 @@ void LayerTreeImpl::NotifyLayerHasPaintWorkletsChanged(PictureLayerImpl* layer,
-   } else {
-     layer_list_.RemovePictureLayerWithWorklet(layer);
-   }
--  DCHECK_EQ(has_worklets, std::ranges::contains(
-+  DCHECK_EQ(has_worklets, base::Contains(
-                               layer_list_.PictureLayersWithWorklets(), layer));
- }
- 
-diff --git a/media/mojo/services/media_metrics_provider.cc b/media/mojo/services/media_metrics_provider.cc
-index 3155b9b8a9..df8f446b7a 100644
---- a/media/mojo/services/media_metrics_provider.cc
-+++ b/media/mojo/services/media_metrics_provider.cc
-@@ -10,6 +10,7 @@
- #include "base/atomic_sequence_num.h"
- #include "base/logging.h"
++#include "base/containers/contains.h"
+ #include "base/feature_list.h"
  #include "base/metrics/histogram_functions.h"
-+#include "base/types/cxx23_to_underlying.h"
- #include "build/build_config.h"
- #include "build/chromecast_buildflags.h"
- #include "media/base/key_systems.h"
-diff --git a/extensions/browser/cws_info_service.cc b/extensions/browser/cws_info_service.cc
-index 80277e9c47..9f06aa6c3f 100644
---- a/extensions/browser/cws_info_service.cc
-+++ b/extensions/browser/cws_info_service.cc
-@@ -9,6 +9,7 @@
- #include <string>
+ #include "base/no_destructor.h"
+@@ -67,7 +68,7 @@ bool ParseDictFormat(extensions::Extension* extension,
+ 
+   // Extensions from allow list are allowed to register as any mime type.
+   const bool is_legacy_extension =
+-      std::ranges::contains(kMIMETypeHandlersAllowlist, extension->id());
++      base::Contains(kMIMETypeHandlersAllowlist, extension->id());
+ 
+   for (const auto [mime_type, entry_value] : dict) {
+     auto config = ConfigType::FromValue(entry_value);
+@@ -82,7 +83,7 @@ bool ParseDictFormat(extensions::Extension* extension,
+       continue;
+     }
+     if (!is_legacy_extension &&
+-        !std::ranges::contains(MimeTypesHandler::GetPublicAllowedMIMETypeList(),
++        !base::Contains(MimeTypesHandler::GetPublicAllowedMIMETypeList(),
+                                mime_type)) {
+       extension->AddInstallWarning(extensions::InstallWarning(
+           base::StrCat({"mime_types_handler: ignoring unsupported "
+@@ -166,7 +167,7 @@ std::vector<std::string> MimeTypesHandler::GetSupportedMimeTypes() const {
+ }
+ 
+ bool MimeTypesHandler::IsPluginExtension() const {
+-  return std::ranges::contains(kMIMETypeHandlersAllowlist, extension_id_);
++  return base::Contains(kMIMETypeHandlersAllowlist, extension_id_);
+ }
+ 
+ GURL MimeTypesHandler::GetHandlerUrl(const std::string& mime_type) const {
+diff --git a/extensions/common/webstore_override.cc b/extensions/common/webstore_override.cc
+index 61ef43ce95..32bf545ad3 100644
+--- a/extensions/common/webstore_override.cc
++++ b/extensions/common/webstore_override.cc
+@@ -10,6 +10,7 @@
  #include <string_view>
  
+ #include "base/command_line.h"
 +#include "base/containers/contains.h"
- #include "base/containers/fixed_flat_map.h"
- #include "base/containers/queue.h"
- #include "base/features.h"
-@@ -185,7 +186,7 @@ base::DictValue GetDictFromStoreMetadataProto(const StoreMetadata* metadata) {
- 
-     const auto& proto_labels = metadata->labels();
-     for (const auto* label : kLabels) {
--      dict.Set(label, std::ranges::contains(proto_labels, label));
-+      dict.Set(label, base::Contains(proto_labels, label));
-     }
+ #include "base/containers/span.h"
+ #include "base/functional/bind.h"
+ #include "base/functional/callback.h"
+@@ -81,7 +82,7 @@ bool AreWebstoreFeaturesAvailable(const std::string& api_full_name,
+   if (context != extensions::mojom::ContextType::kWebPage) {
+     return false;
+   }
+-  if (!std::ranges::contains(kWebstoreOverrideFeatureList, api_full_name)) {
++  if (!base::Contains(kWebstoreOverrideFeatureList, api_full_name)) {
+     return false;
    }
  
-diff --git a/extensions/browser/event_router.cc b/extensions/browser/event_router.cc
-index b4a70327b1..cd33a08554 100644
---- a/extensions/browser/event_router.cc
-+++ b/extensions/browser/event_router.cc
-@@ -1434,7 +1434,7 @@ void EventRouter::RemoveOrphanedWebRequestEvents(
-   size_t removed_count = std::erase_if(events, [](const std::string& event) {
-     return (event.starts_with("webRequest.") ||
-             event.starts_with("webViewInternal.")) &&
--           event.contains("/");
-+           base::Contains(event, "/");
-   });
+diff --git a/extensions/browser/mv2_deprecation_impact_checker.cc b/extensions/browser/mv2_deprecation_impact_checker.cc
+index 4b7d9ec82b..9351e10c47 100644
+--- a/extensions/browser/mv2_deprecation_impact_checker.cc
++++ b/extensions/browser/mv2_deprecation_impact_checker.cc
+@@ -8,6 +8,7 @@
+ #include <string>
+ #include <vector>
  
-   if (removed_count > 0) {
-diff --git a/extensions/common/event_filter.cc b/extensions/common/event_filter.cc
-index 84f99d5d24..8b2f506fc6 100644
---- a/extensions/common/event_filter.cc
-+++ b/extensions/common/event_filter.cc
-@@ -154,7 +154,10 @@ std::string EventFilter::RemoveEventMatcher(
-   // executed in batch with a single call to
-   // `URLMatcher::UpdateInternalDatastructures();` instead of N calls.
-   if (condition_sets_for_bulk_removal) {
--    condition_sets_for_bulk_removal->append_range(condition_set_ids);
-+    condition_sets_for_bulk_removal->insert(
-+      condition_sets_for_bulk_removal->end(),
-+      condition_set_ids.begin(),
-+      condition_set_ids.end());
-     matcher_it->second->DontRemoveConditionSetsInDestructor();
++#include "base/containers/contains.h"
+ #include "base/no_destructor.h"
+ #include "base/strings/string_split.h"
+ #include "content/public/browser/browser_context.h"
+@@ -83,7 +84,7 @@ bool MV2DeprecationImpactChecker::IsExtensionAffected(
    }
-   matcher_map.erase(matcher_it);
-diff --git a/extensions/common/features/simple_feature.cc b/extensions/common/features/simple_feature.cc
-index 4ca1324530..70f0f30049 100644
---- a/extensions/common/features/simple_feature.cc
-+++ b/extensions/common/features/simple_feature.cc
-@@ -192,7 +192,7 @@ bool IsCommandLineSwitchEnabled(base::CommandLine* command_line,
  
- bool IsAllowlistedForTest(const HashedExtensionId& hashed_id) {
-   const auto& ids = GetAllowlistInfo().hashed_ids;
--  return std::ranges::contains(ids, hashed_id.value());
-+  return base::Contains(ids, hashed_id.value());
+   // Extensions with a temporary exception.
+-  if (std::ranges::contains(GetHashedExceptionList(), hashed_id.value())) {
++  if (base::Contains(GetHashedExceptionList(), hashed_id.value())) {
+     return false;
+   }
+ 
+diff --git a/media/cast/encoding/media_video_encoder_wrapper.cc b/media/cast/encoding/media_video_encoder_wrapper.cc
+index fa812905f1..faea9829b5 100644
+--- a/media/cast/encoding/media_video_encoder_wrapper.cc
++++ b/media/cast/encoding/media_video_encoder_wrapper.cc
+@@ -60,7 +60,7 @@ double GetMaxQuantizer(media::VideoCodec codec) {
+     case media::VideoCodec::kVP9:
+       return QuantizerEstimator::MAX_VPX_QUANTIZER;
+     default:
+-      NOTREACHED() << "Unhandled codec. value=" << std::to_underlying(codec);
++      NOTREACHED() << "Unhandled codec. value=" << base::to_underlying(codec);
+   }
  }
  
- }  // namespace
-diff --git a/pdf/pdfium/pdfium_on_demand_searchifier.cc b/pdf/pdfium/pdfium_on_demand_searchifier.cc
-index c4f598c575..df1f43bf84 100644
---- a/pdf/pdfium/pdfium_on_demand_searchifier.cc
-+++ b/pdf/pdfium/pdfium_on_demand_searchifier.cc
-@@ -8,6 +8,7 @@
- #include <utility>
- 
- #include "base/check.h"
-+#include "base/containers/contains.h"
- #include "base/logging.h"
- #include "base/metrics/histogram_functions.h"
- #include "base/notreached.h"

@@ -5,5 +5,5 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.1.7
 TERMUX_PKG_SRCURL="https://github.com/krrishnarraj/clpeak/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=bdcafc2df6b721edcdf10c7f47577e64bc498ca8348fff28bac8e002168fac52
-TERMUX_PKG_BUILD_DEPENDS="opencl-headers, opencl-clhpp"
 TERMUX_PKG_DEPENDS="libc++, ocl-icd"
+TERMUX_PKG_BUILD_DEPENDS="opencl-headers, opencl-clhpp"

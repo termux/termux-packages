@@ -2214,3 +2214,34 @@ index 143dfe9188..fc05850ec4 100644
        default_value, options)
  
  // Helper macro to deduce the whether to use the 5 or 6 argument version of
+diff --git a/base/system/sys_info_posix.cc b/base/system/sys_info_posix.cc
+index 5460a7f35e..1335857402 100644
+--- a/base/system/sys_info_posix.cc
++++ b/base/system/sys_info_posix.cc
+@@ -177,16 +177,20 @@ ByteSize SysInfo::AmountOfVirtualMemory() {
+ 
+ // static
+ std::optional<int64_t> SysInfo::AmountOfFreeDiskSpace(const FilePath& path) {
+-  return AmountOfDiskSpace(path).transform([](DiskSpaceInfo info) {
+-    return static_cast<int64_t>(info.available.InBytes());
+-  });
++  auto disk_space_info = AmountOfDiskSpace(path);
++  if (!disk_space_info.has_value()) {
++    return std::nullopt;
++  }
++  return static_cast<int64_t>(disk_space_info->available.InBytes());
+ }
+ 
+ // static
+ std::optional<int64_t> SysInfo::AmountOfTotalDiskSpace(const FilePath& path) {
+-  return AmountOfDiskSpace(path).transform([](DiskSpaceInfo info) {
+-    return static_cast<int64_t>(info.total.InBytes());
+-  });
++  auto disk_space_info = AmountOfDiskSpace(path);
++  if (!disk_space_info.has_value()) {
++    return std::nullopt;
++  }
++  return static_cast<int64_t>(disk_space_info->total.InBytes());
+ }
+ 
+ // static

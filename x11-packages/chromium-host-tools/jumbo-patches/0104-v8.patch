@@ -182,13 +182,12 @@ index 05490a65a0..b759021b2a 100644
  } else if (v8_current_cpu == "mips64" || v8_current_cpu == "mips64el") {
    v8_compiler_sources += [
      ### gcmole(mips64el) ###
-@@ -5322,6 +5383,10 @@ if (v8_enable_webassembly) {
+@@ -5322,6 +5383,9 @@ if (v8_enable_webassembly) {
+     "src/compiler/wasm-typer.cc",
      "src/wasm/turboshaft-graph-interface.cc",
-     "src/wasm/wrappers.cc",
    ]
 +  v8_compiler_sources_jumbo_excluded += [
 +    "src/wasm/turboshaft-graph-interface.cc",
-+    "src/wasm/wrappers.cc",
 +  ]
  }
  
@@ -1043,42 +1042,3 @@ index a962ce78f0..5d0cf0fa43 100644
  }  // namespace v8
 +
 +#undef Is64
-diff --git a/v8/src/objects/call-site-info.h b/v8/src/objects/call-site-info.h
-index cb4d8433f1..a6e63ec2f4 100644
---- a/v8/src/objects/call-site-info.h
-+++ b/v8/src/objects/call-site-info.h
-@@ -23,7 +23,7 @@ class StructBodyDescriptor;
- 
- #include "torque-generated/src/objects/call-site-info-tq.inc"
- 
--V8_OBJECT class CallSiteInfo : public StructLayout {
-+V8_OBJECT class CallSiteInfo : public v8::internal::StructLayout {
-  public:
-   DEFINE_TORQUE_GENERATED_CALL_SITE_INFO_FLAGS()
- 
-diff --git a/v8/src/objects/property-descriptor-object.h b/v8/src/objects/property-descriptor-object.h
-index fae3a4a038..0e310ad91a 100644
---- a/v8/src/objects/property-descriptor-object.h
-+++ b/v8/src/objects/property-descriptor-object.h
-@@ -16,7 +16,7 @@ namespace internal {
- 
- #include "torque-generated/src/objects/property-descriptor-object-tq.inc"
- 
--V8_OBJECT class PropertyDescriptorObject : public StructLayout {
-+V8_OBJECT class PropertyDescriptorObject : public v8::internal::StructLayout {
-  public:
-   DEFINE_TORQUE_GENERATED_PROPERTY_DESCRIPTOR_OBJECT_FLAGS()
- 
-diff --git a/v8/src/objects/template-objects.h b/v8/src/objects/template-objects.h
-index 5f3f87fc13..6c94801914 100644
---- a/v8/src/objects/template-objects.h
-+++ b/v8/src/objects/template-objects.h
-@@ -24,7 +24,7 @@ class StructBodyDescriptor;
- // TemplateObjectDescription is a tuple of raw strings and cooked strings for
- // tagged template literals. Used to communicate with the runtime for template
- // object creation within the {Runtime_GetTemplateObject} method.
--V8_OBJECT class TemplateObjectDescription final : public StructLayout {
-+V8_OBJECT class TemplateObjectDescription final : public v8::internal::StructLayout {
-  public:
-   static DirectHandle<JSArray> GetTemplateObject(
-       Isolate* isolate, DirectHandle<NativeContext> native_context,

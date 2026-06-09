@@ -6,14 +6,14 @@ TERMUX_PKG_VERSION="0.13.0"
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/cabinpkg/cabin/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=f9115bb0566800beedb41106e00f44a7eaf1dea0fa6528281e31de5f80864177
-TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="fmt, libc++, libcurl, libgit2, libspdlog, libtbb"
+TERMUX_PKG_BUILD_DEPENDS="nlohmann-json"
+TERMUX_PKG_SUGGESTS="clang, make, pkg-config"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 TERMUX_PKG_CONFLICTS="poac"
 TERMUX_PKG_REPLACES="poac"
-TERMUX_PKG_BUILD_DEPENDS="nlohmann-json"
-TERMUX_PKG_DEPENDS="fmt, libc++, libcurl, libgit2, libspdlog, libtbb"
-TERMUX_PKG_SUGGESTS="clang, make, pkg-config"
-TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
 	make RELEASE=1 -j$TERMUX_PKG_MAKE_PROCESSES
