@@ -20,7 +20,7 @@ PYTHON=$TERMUX_PREFIX/bin/python
 # shellcheck disable=SC2115
 termux_step_pre_configure() {
 	export LDFLAGS+=" -lm"
-	export PIP_NO_BINARY="awscrt,pyinstaller"
+	export PIP_NO_BINARY="awscrt"
 	export AWS_CRT_BUILD_FORCE_STATIC_LIBS=1
 
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
@@ -29,18 +29,6 @@ termux_step_pre_configure() {
 
 	export PIP_VERBOSE=1
 	export PIP_NO_CACHE_DIR=1
-
-	case "$TERMUX_ARCH" in
-		aarch64) PYI_PLATFORM=Linux-64bit-arm ;;
-		arm)     PYI_PLATFORM=Linux-32bit-arm ;;
-		x86_64)  PYI_PLATFORM=Linux-64bit-intel ;;
-		i686)    PYI_PLATFORM=Linux-32bit-intel ;;
-		*)
-			echo "ERROR: Unknown architecture: $TERMUX_ARCH"
-			return 1 ;;
-	esac
-	export PYI_PLATFORM
-	export PYI_LOG_LEVEL=DEBUG
 
 	local PYTHON_INCLUDE="$TERMUX_PREFIX/include/python$TERMUX_PYTHON_VERSION"
 
@@ -97,8 +85,6 @@ termux_step_pre_configure() {
 	CXXFLAGS='$CXXFLAGS' \
 	LDFLAGS='$LDFLAGS' \
 	PYTHON='$TERMUX_PREFIX/bin/python' \
-	PYI_PLATFORM=$PYI_PLATFORM \
-	PYI_LOG_LEVEL=$PYI_LOG_LEVEL \
 	"
 }
 
@@ -122,9 +108,7 @@ termux_step_make() {
 	source venv/bin/activate
 	python3 -m pip install pip-tools
 	popd
-	# required by pyinstaller==6.20.0 https://github.com/pyinstaller/pyinstaller/pull/9399
-	# https://github.com/aws/aws-cli/blob/v2/requirements/download-deps/bootstrap.txt#L1
-	sed -i 's/^setuptools==.*/setuptools==82.0.1/' requirements/download-deps/bootstrap.txt
+
 	pip-compile \
 		--allow-unsafe \
 		--generate-hashes \
@@ -134,21 +118,17 @@ termux_step_make() {
 		--unsafe-package=setuptools \
 		--unsafe-package=wheel \
 		requirements/download-deps/bootstrap.txt
-	# Workaround for https://github.com/aws/aws-cli/issues/10145
-	echo hatchling >>requirements/portable-exe-extras.txt
-	# required for pep 738 https://github.com/pyinstaller/pyinstaller/pull/9398
-	# https://github.com/aws/aws-cli/blob/v2/requirements/portable-exe-extras.txt#L1
-	sed -i 's/^pyinstaller==.*/pyinstaller==6.20.0/' requirements/portable-exe-extras.txt
+
 	pip-compile \
 		--allow-unsafe \
 		--generate-hashes \
-		--output-file=requirements/download-deps/portable-exe-lock.txt \
+		--output-file=requirements/download-deps/runtime-lock.txt \
 		--unsafe-package=flit-core \
 		--unsafe-package=pip \
 		--unsafe-package=setuptools \
 		--unsafe-package=wheel \
-		pyproject.toml \
-		requirements/portable-exe-extras.txt
+		pyproject.toml
+
 	deactivate
 
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
@@ -181,7 +161,7 @@ termux_step_make() {
 		--abi none \
 		--no-deps \
 		-r requirements/download-deps/bootstrap-lock.txt \
-		-r requirements/download-deps/portable-exe-lock.txt
+		-r requirements/download-deps/runtime-lock.txt
 
 	popd
 
