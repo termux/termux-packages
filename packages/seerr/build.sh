@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A fork of Overseerr with focus on adding support for Jel
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.3.0"
-TERMUX_PKG_REVISION=0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/seerr-team/seerr/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256="3a6caf9266f7525c3ac2aecb666f5939034e383296761bdea14ad3105237721c"
 TERMUX_PKG_BUILD_DEPENDS="nodejs, libvips, pkg-config"
@@ -101,7 +101,7 @@ termux_step_make_install() {
 	cp -r public "${TERMUX_PREFIX}/lib/seerr/"
 	cp -r .next "${TERMUX_PREFIX}/lib/seerr/"
 	cp -r node_modules "${TERMUX_PREFIX}/lib/seerr/"
-	cp package.json "${TERMUX_PREFIX}/lib/seerr/"
+	cp package.json seerr-api.yml "${TERMUX_PREFIX}/lib/seerr/"
 
 	# Remove Next.js build cache (only used at compilation time, not runtime)
 	rm -rf "${TERMUX_PREFIX}/lib/seerr/.next/cache"
@@ -112,8 +112,6 @@ termux_step_make_install() {
 		-name "*.map" -o \
 		-name "*.ts" -o \
 		-name "*.tsx" -o \
-		-name "*.yml" -o \
-		-name "*.yaml" -o \
 		-name "LICENSE" -o \
 		-name "license" -o \
 		-name "Makefile" \
