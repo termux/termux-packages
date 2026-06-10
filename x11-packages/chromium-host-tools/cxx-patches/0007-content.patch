@@ -6880,3 +6880,24 @@ index 87bb4e1789..a390baafc1 100644
    }
    inflight_requests_.Remove(request_id);
    // TODO(crbug.com/40864997): remove the following DCHECK when the cause
+diff --git a/content/browser/renderer_host/model_context_user_data.cc b/content/browser/renderer_host/model_context_user_data.cc
+index 99eea74797..a8e560a17e 100644
+--- a/content/browser/renderer_host/model_context_user_data.cc
++++ b/content/browser/renderer_host/model_context_user_data.cc
+@@ -6,6 +6,7 @@
+ 
+ #include <algorithm>
+ 
++#include "base/containers/contains.h"
+ #include "content/browser/bad_message.h"
+ #include "content/browser/renderer_host/frame_tree_node.h"
+ #include "content/browser/renderer_host/page_impl.h"
+@@ -42,7 +43,7 @@ bool IsScriptToolRequestedByOrigin(
+   if (tool_owner_origin.IsSameOriginWith(caller_origin)) {
+     return true;
+   }
+-  return std::ranges::contains(from_origins, tool_owner_origin);
++  return base::Contains(from_origins, tool_owner_origin);
+ }
+ 
+ bool IsWebMCPEnabled(RenderFrameHost& rfh) {
