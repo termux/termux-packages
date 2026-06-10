@@ -1,39 +1,3 @@
-# Media Server Stack for Termux (aarch64)
-
-This branch contains pre-built packages and build scripts for **Jellyfin** and the **Arr Stack** (Sonarr, Radarr, Prowlarr) targeting **.NET 9.0** on Termux `aarch64`.
-
-## Installation Instructions
-
-To install the pre-built packages from the [latest release](https://github.com/DevGitPit/termux-packages/releases/tag/v2026.05.19-media), follow these steps in Termux:
-
-### 1. Update and setup dependencies
-Ensure your environment is up to date and has the required .NET runtimes:
-```bash
-pkg update && pkg upgrade
-pkg install dotnet-host dotnet-runtime-9.0 aspnetcore-runtime-9.0 mono libesqlite3 libcurl ffmpeg
-```
-
-### 2. Download and install the packages
-You can download the `.deb` files from the [Releases page](https://github.com/DevGitPit/termux-packages/releases/tag/v2026.05.19-media) or use `wget`:
-
-```bash
-# Example for Jellyfin
-wget https://github.com/DevGitPit/termux-packages/releases/download/v2026.05.19-media/jellyfin-server_10.11.8_aarch64.deb
-pkg install ./jellyfin-server_10.11.8_aarch64.deb
-```
-
-### 3. Run the applications
-After installation, you can start the services using their respective commands:
-- **Jellyfin:** `jellyfin`
-- **Sonarr:** `sonarr`
-- **Radarr:** `radarr`
-- **Prowlarr:** `prowlarr`
-
----
-
-<details>
-<summary><b>View Original Termux README</b></summary>
-
 # Termux packages
 
 ![GitHub repo size](https://img.shields.io/github/repo-size/termux/termux-packages)
@@ -92,5 +56,3 @@ The Termux Community docs are available [here](https://github.com/termux/termux-
 
 [<img alt="Warp" width="25%" src="https://github.com/warpdotdev/brand-assets/blob/640dffd347439bbcb535321ab36b7281cf4446c0/Github/Sponsor/Warp-Github-LG-03.png" />](https://www.warp.dev/?utm_source=github&utm_medium=readme&utm_campaign=termux)  
 [*Warp, built for coding with multiple AI agents*](https://www.warp.dev/?utm_source=github&utm_medium=readme&utm_campaign=termux)
-
-</details>
