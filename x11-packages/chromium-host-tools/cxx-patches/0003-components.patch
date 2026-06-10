@@ -14450,3 +14450,37 @@ index 57351736ee..4ee45a5eeb 100644
  #include "base/logging.h"
  #include "components/contextual_search/contextual_search_session_handle.h"
  #include "components/contextual_search/contextual_search_types.h"
+diff --git a/components/metrics/histogram_encoder.cc b/components/metrics/histogram_encoder.cc
+index e936645077..66036fb5fe 100644
+--- a/components/metrics/histogram_encoder.cc
++++ b/components/metrics/histogram_encoder.cc
+@@ -8,6 +8,7 @@
+ #include <memory>
+ #include <string_view>
+ 
++#include "base/containers/contains.h"
+ #include "base/feature_list.h"
+ #include "base/metrics/field_trial_params.h"
+ #include "base/metrics/histogram.h"
+@@ -56,7 +57,7 @@ bool EncodeHistogramDelta(
+   uint64_t name_hash = base::HashMetricName(histogram_name);
+   // Note: When the feature is disabled, `kHistogramDenylistParam`'s default
+   // value is used.
+-  if (std::ranges::contains(GetHistogramDenylist(), name_hash)) {
++  if (base::Contains(GetHistogramDenylist(), name_hash)) {
+     return false;
+   }
+ 
+diff --git a/components/contextual_search/input_state_model.cc b/components/contextual_search/input_state_model.cc
+index c14fdc682d..0f34aa9ed3 100644
+--- a/components/contextual_search/input_state_model.cc
++++ b/components/contextual_search/input_state_model.cc
+@@ -142,7 +142,7 @@ std::optional<omnibox::ToolMode> GetActiveToolFromUrl(
+   size_t max_matched_params = 0;
+ 
+   for (const auto& tool_config : tool_configs) {
+-    if (!std::ranges::contains(allowed_tools, tool_config.tool())) {
++    if (!base::Contains(allowed_tools, tool_config.tool())) {
+       continue;
+     }
+     if (tool_config.aim_url_params().empty()) {
