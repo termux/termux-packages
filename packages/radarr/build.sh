@@ -42,7 +42,9 @@ termux_step_pre_configure() {
 	find src -name "*.csproj" -exec sed -i '/Include="System\.\(ValueTuple\|Memory\|Runtime\.Loader\|Threading\.Tasks\.Extensions\)"/d' {} +
 
 	# Fix ambiguous IPNetwork reference under .NET 9.0
-	find src -name "Startup.cs" -exec sed -i 's/\bIPNetwork\b/Microsoft.AspNetCore.HttpOverrides.IPNetwork/g' {} +
+	if ! grep -q "using IPNetwork =" src/NzbDrone.Host/Startup.cs; then
+		sed -i 's/\bIPNetwork\b/Microsoft.AspNetCore.HttpOverrides.IPNetwork/g' src/NzbDrone.Host/Startup.cs
+	fi
 
 	# Build UI
 	export NODE_OPTIONS="--max-old-space-size=4096"
@@ -51,6 +53,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
+	TERMUX_DOTNET_VERSION=9.0
 	local COMMON_ARGS=(
 		--framework "net${TERMUX_DOTNET_VERSION}"
 		--no-self-contained

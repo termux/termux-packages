@@ -84,13 +84,15 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	export PATH="$TERMUX_PKG_SRCDIR/node_modules/.bin:$PATH"
+	termux_setup_nodejs
+	export PATH="$TERMUX_PKG_TMPDIR/pnpm/node_modules/.bin:$TERMUX_PKG_SRCDIR/node_modules/.bin:$PATH"
 	pnpm build
 }
 
 termux_step_make_install() {
+	termux_setup_nodejs
 	# Clean up devDependencies before packaging
-	export PATH="$TERMUX_PKG_SRCDIR/node_modules/.bin:$PATH"
+	export PATH="$TERMUX_PKG_TMPDIR/pnpm/node_modules/.bin:$TERMUX_PKG_SRCDIR/node_modules/.bin:$PATH"
 	pnpm prune --prod --ignore-scripts
 
 	rm -rf "${TERMUX_PREFIX}/lib/seerr"
