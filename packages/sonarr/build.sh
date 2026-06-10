@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE="https://sonarr.tv"
 TERMUX_PKG_DESCRIPTION="A PVR for Usenet and BitTorrent users (server)"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.0.13.2931"
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_VERSION="4.0.17.2952"
 TERMUX_PKG_SRCURL="https://github.com/Sonarr/Sonarr/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=b9b6b9cb9c7ab8f43294b471a8dbf465be678d3dfe00cf81f6b14438a92ba65d
+TERMUX_PKG_SHA256=9b986545f28308de5969bdd913ae3b3528f71a632b7dc097af72c63b16789d7b
 TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-9.0, dotnet-targeting-pack-9.0, nodejs, yarn"
 TERMUX_PKG_DEPENDS="aspnetcore-runtime-9.0, dotnet-host, dotnet-runtime-9.0, mono, libesqlite3, libcurl, ffmpeg"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -41,6 +40,9 @@ termux_step_pre_configure() {
 
 	# Remove obsolete System.* package references that are built into .NET 9.0
 	find src -name "*.csproj" -exec sed -i '/Include="System\.\(ValueTuple\|Memory\|Runtime\.Loader\|Threading\.Tasks\.Extensions\)"/d' {} +
+
+	# Fix ambiguous IPNetwork reference under .NET 9.0
+	find src -name "Startup.cs" -exec sed -i 's/\bIPNetwork\b/Microsoft.AspNetCore.HttpOverrides.IPNetwork/g' {} +
 
 	# Build UI
 	export NODE_OPTIONS="--max-old-space-size=4096"
