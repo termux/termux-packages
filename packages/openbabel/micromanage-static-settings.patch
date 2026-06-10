@@ -1,0 +1,41 @@
+Build plugins and openbabel library statically, but build binaries
+as dynamically linked binaries so that they remain
+dynamically linked to these shared libraries:
+/data/data/com.termux/files/usr/lib/libxml2.so.16
+/data/data/com.termux/files/usr/lib/libz.so.1
+/data/data/com.termux/files/usr/lib/libc++_shared.so
+/system/lib64/libdl.so
+/system/lib64/libc.so
+/system/lib64/ld-android.so
+/system/lib64/libm.so
+
+openbabel only supports either static plugins, or dynamically loaded plugins,
+not dynamically linked plugins.
+if openbabel is built with dynamically loaded plugins, they are not loaded correctly
+for some reason and the 'obabel -L formats' command fails to show more than a random
+selection of 0-1 of the plugins.
+however, if openbabel is built with static plugins, they seem to work correctly,
+including for actual conversions utilizing the intended functionality of openbabel.
+
+--- a/tools/CMakeLists.txt
++++ b/tools/CMakeLists.txt
+@@ -38,7 +38,7 @@ INCLUDE(CheckFunctionExists)
+ SET(GETOPT getopt)
+ CHECK_FUNCTION_EXISTS(${GETOPT} GETOPT_FOUND)
+ 
+-if(BUILD_SHARED)
++if(TRUE)
+   foreach(tool ${tools})
+     add_executable(${tool} ${tool}.cpp)
+     target_link_libraries(${tool} ${BABEL_LIBRARY})
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -133,8 +133,6 @@ else()
+     set(CMAKE_C_FLAGS_RELEASE	"/MT /O2 /Ob2 /D NDEBUG")
+     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "/INCREMENTAL:NO /NODEFAULTLIB:MSVCRT")
+     # note: static libraries are specified when running cmake
+-  else()
+-    set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+   endif()
+ endif()
+ 
