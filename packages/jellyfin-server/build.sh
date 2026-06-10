@@ -134,7 +134,7 @@ termux_step_make_install() {
 
 	# XML cruft generated during build used to provide documentation for functions and objects
 	find "${TERMUX_PKG_BUILDDIR}/jellyfin-server-dist" -name '*.xml' -type f -exec rm '{}' +
-	
+
 	# Set permissions
 	chmod 0700 "${TERMUX_PKG_BUILDDIR}/jellyfin-server-dist"
 	find "${TERMUX_PKG_BUILDDIR}/jellyfin-server-dist" ! \( -name 'jellyfin' -o -type d \) -exec chmod 0600 '{}' \;
@@ -143,7 +143,7 @@ termux_step_make_install() {
 	# Install server files
 	mkdir -p "${TERMUX_PREFIX}/lib/jellyfin"
 	cp -a "${TERMUX_PKG_BUILDDIR}/jellyfin-server-dist/." "${TERMUX_PREFIX}/lib/jellyfin/"
-	
+
 	# Install web files
 	if [ -d "${TERMUX_PKG_BUILDDIR}/jellyfin-web" ]; then
 		cp -a "${TERMUX_PKG_BUILDDIR}/jellyfin-web" "${TERMUX_PREFIX}/lib/jellyfin/"
