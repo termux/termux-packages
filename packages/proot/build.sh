@@ -4,6 +4,7 @@ TERMUX_PKG_DESCRIPTION="Emulate chroot, bind mount and binfmt_misc for non-root 
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Michal Bednarski @michalbednarski"
 TERMUX_PKG_VERSION="5.1.107.78"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/termux/proot/archive/v${TERMUX_PKG_VERSION}.zip
 TERMUX_PKG_SHA256=7babd3fde0875adfff33936418886620c429cdd077d42db3af605d6bbe686d22
 TERMUX_PKG_AUTO_UPDATE=true
