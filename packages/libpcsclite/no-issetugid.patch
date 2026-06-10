@@ -1,5 +1,16 @@
---- ./src/sys_unix.c~	2025-03-26 14:52:29.000000000 +0000
-+++ ./src/sys_unix.c	2025-03-28 15:37:25.385774847 +0000
+--- a/meson.build
++++ b/meson.build
+@@ -113,8 +113,6 @@
+     if compiler.has_function('issetugid', dependencies: libbsd)
+       pcscd_dep += libbsd
+       libpcsclite_dep += libbsd
+-    else
+-      error('Could not find right library for issetugid()')
+     endif
+   endif
+ endif
+--- a/src/sys_unix.c
++++ b/src/sys_unix.c
 @@ -170,10 +170,12 @@
  #ifdef HAVE_SECURE_GETENV
  	return secure_getenv(name);
