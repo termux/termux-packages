@@ -4,11 +4,11 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # `weechat-python-plugin` depends on libpython${TERMUX_PYTHON_VERSION}.so.
 # Please revbump and rebuild when bumping TERMUX_PYTHON_VERSION.
-TERMUX_PKG_VERSION="4.7.1"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="4.9.2"
 TERMUX_PKG_SRCURL="https://www.weechat.org/files/src/weechat-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=e83fb71ca251c5dd74bd9c5a6bd3f85dc2eb8ecec0955f43c07f3e0911edb7d3
+TERMUX_PKG_SHA256=d1389a9e521bda0c4ebfa108e2abf885ee6c5150c385299f5dca0181a43a0914
 TERMUX_PKG_DEPENDS="libandroid-support, libcurl, libgcrypt, libgnutls, libiconv, ncurses, zlib, zstd"
+TERMUX_PKG_BUILD_DEPENDS="python"
 TERMUX_PKG_BREAKS="weechat-dev"
 TERMUX_PKG_REPLACES="weechat-dev"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -36,10 +36,13 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DMSGMERGE_EXECUTABLE=$(command -v msgmerge)
 -DXGETTEXT_EXECUTABLE=$(command -v xgettext)
 -DDL_LIBRARY=0
+-DRuby_LIBRARY=$TERMUX_PREFIX/lib/libruby.so
 "
 
 termux_step_pre_configure() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DPKG_CONFIG_EXECUTABLE=${PKG_CONFIG}"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DPython_LIBRARY=$TERMUX_PREFIX/lib/libpython${TERMUX_PYTHON_VERSION}.so"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DPython_INCLUDE_DIR=$TERMUX_PREFIX/include/python${TERMUX_PYTHON_VERSION}"
 
 	local _Ruby_API_VERSION=$(
 		. $TERMUX_SCRIPTDIR/packages/ruby/build.sh
