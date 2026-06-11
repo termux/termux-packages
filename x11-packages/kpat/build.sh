@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="KPatience offers a selection of solitaire card games"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="3ls-it <3ls-it@pm.me>"
 TERMUX_PKG_VERSION="26.04.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/kpat-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=c0ae10f2c10e2413351ea79cbc83d9a56ec1c37c57065dc3d5e481d37c76afd7
 TERMUX_PKG_AUTO_UPDATE=true
