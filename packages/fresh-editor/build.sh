@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Text editor for your terminal: easy, powerful and fast"
 TERMUX_PKG_LICENSE="GPL-2.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.4.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/sinelaw/fresh/releases/download/v$TERMUX_PKG_VERSION/fresh-editor-$TERMUX_PKG_VERSION-source.tar.gz"
 TERMUX_PKG_SHA256=8ec87634f0457e7592008a1acdf4dd2675a612e129878d595467eeb8fc8c586c
 TERMUX_PKG_AUTO_UPDATE=true
@@ -51,7 +52,12 @@ termux_step_pre_configure() {
 		-e 's|"linux"|"android"|g' \
 		-e "s|libxkbcommon.so.0|libxkbcommon.so|g" \
 		-e "s|libxkbcommon-x11.so.0|libxkbcommon-x11.so|g" \
-		-e "s|libxcb.so.1|libxcb.so|g" \
+		-e "s|libxcb.so.1|libxcb.so|g"
+
+	find . -type f -print0 | \
+		xargs -0 sed -i \
+		-e "s|/usr|$TERMUX_PREFIX|g" \
+		-e "s|/var|$TERMUX_PREFIX/var|g" \
 		-e "s|/tmp|$TERMUX_PREFIX/tmp|g"
 
 	echo "" >> Cargo.toml
