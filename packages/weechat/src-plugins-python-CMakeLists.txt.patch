@@ -1,0 +1,24 @@
+--- a/src/plugins/python/CMakeLists.txt	2026-06-11 16:09:50.211045788 +0300
++++ b/src/plugins/python/CMakeLists.txt	2026-06-11 16:09:58.610203762 +0300
+@@ -19,10 +19,18 @@
+ # along with WeeChat.  If not, see <https://www.gnu.org/licenses/>.
+ #
+ 
+-if(CMAKE_VERSION VERSION_LESS "3.18.0")
+-  find_package(Python 3.0 REQUIRED COMPONENTS Interpreter Development)
++if(CMAKE_CROSSCOMPILING)
++  if(CMAKE_VERSION VERSION_LESS "3.18.0")
++    find_package(Python 3.0 REQUIRED COMPONENTS Development)
++  else()
++    find_package(Python 3.0 REQUIRED COMPONENTS Development.Embed)
++  endif()
+ else()
+-  find_package(Python 3.0 REQUIRED COMPONENTS Interpreter Development.Embed)
++  if(CMAKE_VERSION VERSION_LESS "3.18.0")
++    find_package(Python 3.0 REQUIRED COMPONENTS Interpreter Development)
++  else()
++    find_package(Python 3.0 REQUIRED COMPONENTS Interpreter Development.Embed)
++  endif()
+ endif()
+ 
+ add_library(python MODULE
