@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE='https://invent.kde.org/frameworks/knotifyconfig'
 TERMUX_PKG_DESCRIPTION='Configuration system for KNotify'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.26.0"
+TERMUX_PKG_VERSION="6.27.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/knotifyconfig-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=062e22f48a1da485d42ef56b37db1fc502f5f9305871483627d218f357560a28
+TERMUX_PKG_SHA256=81861316d615e7e5ff07143c1d58d9b52cadc5e02ab38c8f2677c01f71e51f26
 TERMUX_PKG_DEPENDS="kf6-kconfig (>= ${TERMUX_PKG_VERSION%.*}), kf6-ki18n (>= ${TERMUX_PKG_VERSION%.*}), kf6-kio (>= ${TERMUX_PKG_VERSION%.*}), libc++, libcanberra, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION%.*}), qt6-qttools"
 TERMUX_PKG_AUTO_UPDATE=true
