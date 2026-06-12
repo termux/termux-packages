@@ -3,10 +3,9 @@ TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org/
 TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed and concurrency"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.95.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1.96.0"
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-${TERMUX_PKG_VERSION}-src.tar.xz
-TERMUX_PKG_SHA256=62b67230754da642a264ca0cb9fc08820c54e2ed7b3baba0289876d4cdb48c08
+TERMUX_PKG_SHA256=b99ce16cdf0ecfc761b585ac84d131b46733465a02f8ecd0ff2de9713c62ee09
 TERMUX_PKG_DEPENDS="clang, libandroid-execinfo, libc++, libllvm (<< $TERMUX_LLVM_NEXT_MAJOR_VERSION), lld, openssl, zlib"
 TERMUX_PKG_BUILD_DEPENDS="wasi-libc"
 TERMUX_PKG_SUGGESTS="rust-analyzer"
@@ -145,7 +144,7 @@ termux_step_configure() {
 	# like 30 to 40 + minutes ... so lets get it right
 
 	# upstream tests build using versions N and N-1
-	local BOOTSTRAP_VERSION=1.94.0
+	local BOOTSTRAP_VERSION=1.95.0
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
 		if ! rustup install "${BOOTSTRAP_VERSION}"; then
 			echo "WARN: ${BOOTSTRAP_VERSION} is unavailable, fallback to stable version!"
