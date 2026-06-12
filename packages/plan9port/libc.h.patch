@@ -1,0 +1,23 @@
+--- a/include/libc.h
++++ b/include/libc.h
+@@ -410,13 +410,13 @@ extern	double	p9pow10(int);
+ extern	char*	searchpath(char*);
+ /* extern	int	p9setjmp(p9jmp_buf); */
+ #define p9setjmp(b)	sigsetjmp((void*)(b), 1)
+-/*
+- * <stdlib.h>
+-extern	long	strtol(char*, char**, int);
+-extern	ulong	strtoul(char*, char**, int);
+-extern	vlong	strtoll(char*, char**, int);
+-extern	uvlong	strtoull(char*, char**, int);
+- */
++#ifdef _STDLIB_H_P9P
++/* <stdlib.h> */
++extern	long	strtol(const char*, char**, int);
++extern	ulong	strtoul(const char*, char**, int);
++extern	vlong	strtoll(const char*, char**, int);
++extern	uvlong	strtoull(const char*, char**, int);
++#endif
+ extern	void	sysfatal(char*, ...);
+ extern	void	p9syslog(int, char*, char*, ...);
+ extern	long	p9time(long*);
