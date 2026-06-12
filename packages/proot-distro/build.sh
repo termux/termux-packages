@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Termux official utility for managing proot'ed Linux dist
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.2.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/termux/proot-distro/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=285d852ef5d0c01e0b50e32b95fb11ed555af94632d47f0bc4a4a77e7958c057
 # note for regular maintainers of proot-distro: since version 5.1.5, proot-distro
@@ -31,7 +32,6 @@ termux_step_create_debscripts() {
 
 	cat <<- EOF > ./"$pkgscript"
 	#!${TERMUX_PREFIX}/bin/bash
-	set -e
 	msg() {
 		echo
 		echo "You are upgrading proot-distro to new major release v5.x"
