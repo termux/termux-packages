@@ -1,0 +1,29 @@
+--- a/bin/9l
++++ b/bin/9l
+@@ -27,7 +27,7 @@ case "$tag" in
+ *Linux*)
+ 	ld="${CC9:-gcc} $CC9FLAGS"
+ 	userpath=true
+-	extralibs="$extralibs -lutil -lresolv -lpthread"
++	extralibs="$extralibs -lutil -lresolv_wrapper -lpthread"
+ 	;;
+ *Darwin*)
+ 	ld="${CC9:-gcc} -m64 $CC9FLAGS"
+@@ -147,7 +147,7 @@ then
+ 					grep '__p9l_autolib_[a-zA-Z0-9+-]*' |
+ 					sed 's/.*__p9l_autolib_//; s/:.*//' |
+ 					sort -u |
+-					$egrep -v '^(thread|draw)$'
++					grep -E -v '^(thread|draw)$'
+ 				`
+ 				a="$a $b"
+ 			done
+@@ -338,7 +338,7 @@ quiet()
+ 	ignore=$ignore'|ld: warning: ignoring duplicate libraries:'
+ 
+ 	sed 's/.*: In function `[^:]*: *//' "$1" |
+-	$egrep -v "$ignore"
++	grep -E -v "$ignore"
+ }
+ 
+ # Must use temp file to avoid pipe; pipe loses status.
