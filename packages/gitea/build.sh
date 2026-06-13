@@ -2,38 +2,32 @@ TERMUX_PKG_HOMEPAGE=https://gitea.io
 TERMUX_PKG_DESCRIPTION="Git with a cup of tea, painless self-hosted git service"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.25.5"
+TERMUX_PKG_VERSION="1.26.2"
 TERMUX_PKG_SRCURL=https://github.com/go-gitea/gitea/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=b4f3cd4ed0ff3e6a272702690b94a9415b8ff0a1d2fbf365a1bb5c8cedcab458
+TERMUX_PKG_SHA256=1b2113ca1fe956b608ccc892a59b232668af8d30c7ee091cbf2446d5014be5ff
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="dash, git"
+TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFFILES="etc/gitea/app.ini"
+TERMUX_PKG_HOSTBUILD=true
 
-termux_step_pre_configure() {
+termux_step_host_build() {
+	termux_setup_nodejs
+
+	export DISABLE_V8_COMPILE_CACHE=1
+	(unset PREFIX prefix
+	npm install pnpm)
+	export PATH="$TERMUX_PKG_HOSTBUILD_DIR/node_modules/.bin:$PATH"
+}
+
+termux_step_configure() {
 	termux_setup_nodejs
 	termux_setup_golang
+
+	export PATH="$TERMUX_PKG_HOSTBUILD_DIR/node_modules/.bin:$PATH"
 }
 
 termux_step_make() {
-	export GOPATH=$TERMUX_PKG_BUILDDIR
-	mkdir -p "$GOPATH"/src/code.gitea.io
-	cp -a "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/code.gitea.io/gitea
-
-	(cd "$TERMUX_PKG_SRCDIR" && npm install pnpm)
-	export PATH="$TERMUX_PKG_SRCDIR/node_modules/.bin:$PATH"
-
-	cd "$GOPATH"/src/code.gitea.io/gitea
-
-	go mod init || :
-	go mod tidy
-
-	# Effectively a backport of https://github.com/lib/pq/commit/6a102c04ac8dc082f1684b0488275575c374cb4c.
-	for f in "$GOPATH"/pkg/mod/github.com/lib/pq@*/user_posix.go; do
-		chmod 0755 "$(dirname "$f")"
-		chmod 0644 "$f"
-		sed -i '/^\/\/ +build /s/ linux / linux,!android /g' "$f"
-	done
-
 	LDFLAGS=""
 	LDFLAGS+=" -X code.gitea.io/gitea/modules/setting.CustomConf=$TERMUX_PREFIX/etc/gitea/app.ini"
 	LDFLAGS+=" -X code.gitea.io/gitea/modules/setting.AppWorkPath=$TERMUX_PREFIX/var/lib/gitea"
@@ -43,7 +37,7 @@ termux_step_make() {
 
 termux_step_make_install() {
 	install -Dm700 \
-		"$GOPATH"/src/code.gitea.io/gitea/gitea \
+		"$TERMUX_PKG_SRCDIR"/gitea \
 		"$TERMUX_PREFIX"/bin/gitea
 
 	mkdir -p "$TERMUX_PREFIX"/etc/gitea
