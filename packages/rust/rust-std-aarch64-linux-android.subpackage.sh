@@ -1,4 +1,4 @@
-TERMUX_SUBPKG_DESCRIPTION="Rust std for target aarch64-linux-android"
+TERMUX_SUBPKG_DESCRIPTION="Component files for target aarch64-linux-android"
 TERMUX_SUBPKG_DEPEND_ON_PARENT=false
 TERMUX_SUBPKG_BREAKS="rust (<< 1.74.1-1)"
 TERMUX_SUBPKG_REPLACES="rust (<< 1.74.1-1)"

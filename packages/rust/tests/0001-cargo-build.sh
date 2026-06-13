@@ -23,7 +23,7 @@ pushd "$tmpdir"
 echo_and_run cargo new rusthello
 pushd rusthello
 mkdir -p .cargo
-cat <<- EOL > .cargo/config.toml
+cat << EOL > .cargo/config.toml
 [target.aarch64-linux-android]
 rustflags = "-Clink-arg=--target=aarch64-linux-android"
 [target.armv7-linux-androideabi]
@@ -39,20 +39,24 @@ echo_and_run cargo build --target armv7-linux-androideabi
 echo_and_run cargo build --target i686-linux-android
 echo_and_run cargo build --target x86_64-linux-android
 echo_and_run cargo build --target wasm32-unknown-unknown
-echo_and_run cargo build --target wasm32v1-none
 echo_and_run cargo build --target wasm32-wasip1
 echo_and_run cargo build --target wasm32-wasip2
 echo_and_run cargo build --target wasm32-wasip3
+if ! echo_and_run cargo build --target wasm32v1-none; then
+	echo "INFO: Expected because wasm32v1-none doesnt support std"
+fi
 echo_and_run cargo build --release
 echo_and_run cargo build --target aarch64-linux-android --release
 echo_and_run cargo build --target armv7-linux-androideabi --release
 echo_and_run cargo build --target i686-linux-android --release
 echo_and_run cargo build --target x86_64-linux-android --release
 echo_and_run cargo build --target wasm32-unknown-unknown --release
-echo_and_run cargo build --target wasm32v1-none --release
 echo_and_run cargo build --target wasm32-wasip1 --release
 echo_and_run cargo build --target wasm32-wasip2 --release
 echo_and_run cargo build --target wasm32-wasip3 --release
+if ! echo_and_run cargo build --target wasm32v1-none --release; then
+	echo "INFO: Expected because wasm32v1-none doesnt support std"
+fi
 echo_and_run cargo run
 echo_and_run file target/*/rusthello
 echo_and_run file target/*/*/rusthello
@@ -67,9 +71,11 @@ popd
 
 echo_and_run cargo new rusthello-lib --lib
 pushd rusthello-lib
-echo >> Cargo.toml
-echo '[lib]' >> Cargo.toml
-echo 'crate-type = ["cdylib"]' >> Cargo.toml
+cat << EOL >> Cargo.toml
+
+[lib]
+crate-type = ["cdylib"]
+EOL
 echo_and_run cargo build
 echo_and_run llvm-readelf -d target/*/deps/librusthello_lib.so
 if ! echo_and_run "llvm-readelf -s target/*/deps/librusthello_lib.so | grep __emutls_get_address | grep WEAK"; then
@@ -77,6 +83,36 @@ if ! echo_and_run "llvm-readelf -s target/*/deps/librusthello_lib.so | grep __em
 	echo "ERROR: this should be WEAK" 1>&2
 	exit 1
 fi
+popd
+
+echo_and_run cargo new rusthello-lib-wasm32 --lib
+pushd rusthello-lib-wasm32
+cat << EOL >> Cargo.toml
+
+[lib]
+crate-type = ["cdylib"]
+EOL
+cat << EOL > src/lib.rs.tmp
+#![no_std]
+
+#[panic_handler]
+fn panic_handler(_info: &core::panic::PanicInfo<'_>) -> ! {
+	core::arch::wasm32::unreachable()
+}
+EOL
+cat src/lib.rs >> src/lib.rs.tmp
+mv -v src/lib.rs.tmp src/lib.rs
+echo_and_run cargo build --target wasm32-unknown-unknown
+echo_and_run cargo build --target wasm32-wasip1
+echo_and_run cargo build --target wasm32-wasip2
+echo_and_run cargo build --target wasm32-wasip3
+echo_and_run cargo build --target wasm32v1-none
+echo_and_run cargo build --target wasm32-unknown-unknown --release
+echo_and_run cargo build --target wasm32-wasip1 --release
+echo_and_run cargo build --target wasm32-wasip2 --release
+echo_and_run cargo build --target wasm32-wasip3 --release
+echo_and_run cargo build --target wasm32v1-none --release
+echo_and_run file target/*/*/rusthello_lib_wasm32.wasm
 popd
 
 popd
