@@ -1,6 +1,13 @@
 --- a/include/libc.h
 +++ b/include/libc.h
-@@ -410,13 +410,13 @@ extern	double	p9pow10(int);
+@@ -406,17 +406,19 @@ extern	void	perror(const char*);
+ extern	int	postnote(int, int, char *);
+ extern	double	p9pow10(int);
+ /* extern	int	putenv(char*, char*); <stdlib.h. */
+-/* extern	void	qsort(void*, long, long, int (*)(void*, void*)); <stdlib.h> */
++#ifdef _STDLIB_H_P9P
++extern	void	qsort(void*, long, long, int (*)(const void*, const void*));
++#endif
  extern	char*	searchpath(char*);
  /* extern	int	p9setjmp(p9jmp_buf); */
  #define p9setjmp(b)	sigsetjmp((void*)(b), 1)
