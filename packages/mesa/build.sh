@@ -3,11 +3,11 @@ TERMUX_PKG_DESCRIPTION="An open-source implementation of the OpenGL specificatio
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="docs/license.rst"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="26.0.6"
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=1d3c3b8a8363b8cc354175bb4a684ad8b035211cc1d6fa17aeb9b9623c513f89
-TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_VERSION="26.2.0"
+TERMUX_PKG_SRCURL=git+https://github.com/lfdevs/mesa-for-android-container.git
+TERMUX_PKG_GIT_BRANCH=dev/adreno-main
+_COMMIT=14fd4ce175ccf9862e701c12f0308a8b22d3fc84
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libglvnd, libllvm (<< $TERMUX_LLVM_NEXT_MAJOR_VERSION), libwayland, libx11, libxext, libxfixes, libxshmfence, libxxf86vm, ncurses, vulkan-loader, zlib, zstd"
 TERMUX_PKG_SUGGESTS="mesa-dev"
 TERMUX_PKG_BUILD_DEPENDS="libclc, libwayland-protocols, libxrandr, llvm, llvm-tools, mlir, spirv-tools, xorgproto"
@@ -28,13 +28,20 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dllvm=enabled
 -Dshared-llvm=enabled
 -Dplatforms=x11,wayland
--Dgallium-drivers=llvmpipe,softpipe,virgl,zink
 -Dgallium-rusticl=true
 -Dglvnd=enabled
 -Dxmlconfig=disabled
 "
 
 termux_step_post_get_source() {
+	if [ -n "${_COMMIT}" ]; then
+		# Ensure the requested commit is available when cloning shallow.
+		if git -C "$TERMUX_PKG_SRCDIR" rev-parse --is-shallow-repository | grep -q true; then
+			git -C "$TERMUX_PKG_SRCDIR" fetch --unshallow
+		fi
+		git -C "$TERMUX_PKG_SRCDIR" checkout "$_COMMIT"
+	fi
+
 	# Do not use meson wrap projects
 	rm -rf subprojects
 }
@@ -76,11 +83,14 @@ termux_step_pre_configure() {
 	export PATH="${_WRAPPER_BIN}:${CARGO_HOME}/bin:${PATH}"
 
 	local _vk_drivers="swrast"
+	local _opengl_drivers="llvmpipe,softpipe,virgl,zink"
 	if [ $TERMUX_ARCH = "arm" ] || [ $TERMUX_ARCH = "aarch64" ]; then
 		_vk_drivers+=",freedreno"
+		_opengl_drivers+=",freedreno"
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dfreedreno-kmds=msm,kgsl"
 	fi
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dvulkan-drivers=$_vk_drivers"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dgallium-drivers=$_opengl_drivers"
 }
 
 termux_step_post_configure() {
