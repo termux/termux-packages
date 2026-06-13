@@ -4,11 +4,19 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 _MAJOR_VERSION=3.11
 TERMUX_PKG_VERSION=7.3.23
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://downloads.python.org/pypy/pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION-src.tar.bz2
-TERMUX_PKG_SHA256=f15c9c41e03f3f7ecc25228c6c67427b8918f21ef2d694215994b1fade20f69b
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SRCURL=(
+	https://downloads.python.org/pypy/pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION-src.tar.bz2
+    https://downloads.python.org/pypy/pypy2.7-v$TERMUX_PKG_VERSION-linux64.tar.bz2
+    https://downloads.python.org/pypy/pypy2.7-v$TERMUX_PKG_VERSION-linux32.tar.bz2
+)
+TERMUX_PKG_SHA256=(
+	f15c9c41e03f3f7ecc25228c6c67427b8918f21ef2d694215994b1fade20f69b
+    7833be48244a6f4aa0720c6b98f151428291a52697da849ef6b3ca7d5bf45b96
+    fa6499281775ec22f4742e9dd7b31c22b8fc6a700c1cf50aebc7ef24f61461c5
+)
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, zlib"
-TERMUX_PKG_BUILD_DEPENDS="aosp-libs, coreutils, clang, make, pkg-config, python2, tk, xorgproto"
+TERMUX_PKG_BUILD_DEPENDS="aosp-libs, tk, xorgproto"
 TERMUX_PKG_RECOMMENDS="clang, make, pkg-config"
 TERMUX_PKG_SUGGESTS="pypy3-tkinter"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -44,6 +52,17 @@ termux_step_post_get_source() {
 		"$TERMUX_PKG_SRCDIR"/rpython/translator/platform/termux.py
 }
 
+__setup_host_pypy2() {
+	if [ "$TERMUX_ARCH_BITS" = "32" ]; then
+		export PATH="$TERMUX_PKG_SRCDIR/pypy2.7-v$TERMUX_PKG_VERSION-linux32/bin:$PATH"
+	else
+		export PATH="$TERMUX_PKG_SRCDIR/pypy2.7-v$TERMUX_PKG_VERSION-linux64/bin:$PATH"
+	fi
+
+	pypy2 -m ensurepip --altinstall --no-default-pip
+	pypy2 -m pip install cparser cffi
+}
+
 __setup_proot() {
 	mkdir -p "$TERMUX_PKG_CACHEDIR"/proot-bin
 	termux_download \
@@ -51,7 +70,6 @@ __setup_proot() {
 		"$TERMUX_PKG_CACHEDIR"/proot-bin/proot \
 		d1eb20cb201e6df08d707023efb000623ff7c10d6574839d7bb42d0adba6b4da
 	chmod +x "$TERMUX_PKG_CACHEDIR"/proot-bin/proot
-	mkdir -p "$TERMUX_PKG_TMPDIR"/proot-tmp-dir
 	export PATH="$TERMUX_PKG_CACHEDIR/proot-bin:$PATH"
 }
 
@@ -70,147 +88,10 @@ __setup_qemu_static_binaries() {
 	export PATH="$TERMUX_PKG_CACHEDIR/qemu-static-bin:$PATH"
 }
 
-__setup_docker_utils() {
-	mkdir -p "$TERMUX_PKG_CACHEDIR"/docker-utils
-	termux_download \
-		https://raw.githubusercontent.com/NotGlop/docker-drag/5413165a2453aa0bc275d7dc14aeb64e814d5cc0/docker_pull.py \
-		"$TERMUX_PKG_CACHEDIR"/docker-utils/docker_pull.py \
-		04e52b70c862884e75874b2fd229083fdf09a4bac35fc16fd7a0874ba20bd075
-	termux_download \
-		https://raw.githubusercontent.com/larsks/undocker/649f3fdeb0a9cf8aa794d90d6cc6a7c7698a25e6/undocker.py \
-		"$TERMUX_PKG_CACHEDIR"/docker-utils/undocker.py \
-		32bc122c53153abeb27491e6d45122eb8cef4f047522835bedf9b4b87877a907
-}
-
-__setup_termux_docker_rootfs() {
-	__setup_docker_utils
-
-	# Pick up host platform arch
-	local __pypy3_host_arch=""
-	if [ "$TERMUX_ARCH_BITS" = "32" ]; then
-		__pypy3_host_arch="i686"
-	else
-		__pypy3_host_arch="x86_64"
-	fi
-
-	# Get host platform rootfs tar if needed
-	if [ ! -f "$TERMUX_PKG_CACHEDIR/termux_termux-docker_$__pypy3_host_arch.tar" ]; then
-		(
-			cd "$TERMUX_PKG_CACHEDIR"
-			python docker-utils/docker_pull.py termux/termux-docker:$__pypy3_host_arch
-			mv termux_termux-docker.tar termux_termux-docker_$__pypy3_host_arch.tar
-		)
-	fi
-
-	# Extract host platform rootfs tar
-	__pypy3_host_rootfs="$TERMUX_PKG_CACHEDIR/host-termux-rootfs-$__pypy3_host_arch"
-	if [ ! -d "$__pypy3_host_rootfs" ]; then
-		rm -rf "$__pypy3_host_rootfs".tmp
-		mkdir -p "$__pypy3_host_rootfs".tmp
-		cat "$TERMUX_PKG_CACHEDIR"/termux_termux-docker_$__pypy3_host_arch.tar | \
-			python "$TERMUX_PKG_CACHEDIR"/docker-utils/undocker.py -o "$__pypy3_host_rootfs".tmp
-		mkdir -p "$__pypy3_host_rootfs".tmp/"$TERMUX_PREFIX"/bin
-		mkdir -p "$__pypy3_host_rootfs".tmp/"$TERMUX_ANDROID_HOME"
-		rm -f "$__pypy3_host_rootfs".tmp/bin
-		rm -f "$__pypy3_host_rootfs".tmp/usr
-		rm -f "$__pypy3_host_rootfs".tmp/tmp
-		mv "$__pypy3_host_rootfs".tmp "$__pypy3_host_rootfs"
-	fi
-}
-
-__setup_termux_envs() {
-	__pypy3_termux_envs="
-ANDROID_DATA=/data
-ANDROID_ROOT=/system
-HOME=$TERMUX_ANDROID_HOME
-LANG=en_US.UTF-8
-PATH=$TERMUX_PREFIX/bin
-PREFIX=$TERMUX_PREFIX
-TMPDIR=$TERMUX_PREFIX/tmp
-TERM=$TERM
-TZ=UTC"
-
-	__pypy3_run_on_host="
-env -i
-PROOT_NO_SECCOMP=1
-PROOT_TMP_DIR=/tmp
-$__pypy3_termux_envs
-$TERMUX_PKG_CACHEDIR/proot-bin/proot
--b /proc -b /dev -b /sys
--b $HOME
--b /tmp
--b /data/:/target-termux-rootfs/data/
--b /system/:/target-termux-rootfs/system/
--w $TERMUX_PKG_TMPDIR
--r $__pypy3_host_rootfs/
-"
-
-	__pypy3_run_on_target_from_builder="
-env -i
-PROOT_NO_SECCOMP=1
-PROOT_TMP_DIR=/tmp
-$__pypy3_termux_envs
-$TERMUX_PKG_CACHEDIR/proot-bin/proot
--b /data/:/target-termux-rootfs/data/
--b /system/:/target-termux-rootfs/system/
--w $TERMUX_PKG_TMPDIR
--R /
-/usr/bin/env -i
-PROOT_NO_SECCOMP=1
-PROOT_TMP_DIR=/tmp
-$__pypy3_termux_envs
-$TERMUX_PKG_CACHEDIR/proot-bin/proot
--b /proc -b /dev -b /sys
--b /bin/bash
--b /lib -b /lib64
--b $HOME
--b /tmp
--w $TERMUX_PKG_TMPDIR
--r /target-termux-rootfs/
-"
-
-	__pypy3_run_on_target_from_host="
-env -i
-PROOT_NO_SECCOMP=1
-PROOT_TMP_DIR=/tmp
-$__pypy3_termux_envs
-$TERMUX_PKG_CACHEDIR/proot-bin/proot
--b /proc -b /dev -b /sys
--b $HOME
--b /tmp
--b $TERMUX_ANDROID_HOME:$TERMUX_ANDROID_HOME
--w $TERMUX_PKG_TMPDIR
--r /target-termux-rootfs/
-"
-
-	# Set qemu-user-static if needed
-	case "$TERMUX_ARCH" in
-		"aarch64" |  "arm")
-			__pypy3_run_on_target_from_host+=" -q $TERMUX_PKG_CACHEDIR/qemu-static-bin/qemu-$TERMUX_ARCH-static"
-			__pypy3_run_on_target_from_builder+=" -q $TERMUX_PKG_CACHEDIR/qemu-static-bin/qemu-$TERMUX_ARCH-static"
-			;;
-		*)
-			;;
-	esac
-}
-
-__run_on_host_docker_rootfs() {
-	$__pypy3_run_on_host "$@"
-}
-
 termux_step_configure() {
+	__setup_host_pypy2
 	__setup_proot
 	__setup_qemu_static_binaries
-	__setup_docker_utils
-	__setup_termux_docker_rootfs
-	__setup_termux_envs
-
-	# Install deps on host termux rootfs if needed
-	__run_on_host_docker_rootfs apt update
-	__run_on_host_docker_rootfs apt upgrade -yq -o Dpkg::Options::=--force-confnew
-	__run_on_host_docker_rootfs apt update
-	__run_on_host_docker_rootfs apt install binutils clang ndk-sysroot ndk-multilib python2 make -y
-	__run_on_host_docker_rootfs python2 -m pip install cffi pycparser
 
 	CFLAGS+=" -DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD=1"
 	# error: incompatible function pointer types passing 'Signed (*)(void *, const char *, XML_Encoding *)' (aka 'long (*)(void *, const char *, XML_Encoding *)') to parameter of type 'XML_UnknownEncodingHandler' (aka 'int (*)(void *, const char *, XML_Encoding *)') [-Wincompatible-function-pointer-types]
@@ -220,18 +101,43 @@ termux_step_configure() {
 termux_step_make() {
 	mkdir -p "$TERMUX_PKG_SRCDIR"/usession-dir
 
-	__run_on_host_docker_rootfs uname -a
-	__run_on_host_docker_rootfs $__pypy3_run_on_target_from_host uname -a
+	local HOST_ROOTFS=""
+	local PROOT_TARGET="proot
+-b $HOME
+-b $TERMUX_PKG_TMPDIR
+-b /proc -b /dev -b /sys
+-w $TERMUX_PKG_TMPDIR
+-r /
+"
+
+	# Set qemu-user-static if needed
+	case "$TERMUX_ARCH" in
+		"aarch64" |  "arm")
+			PROOT_TARGET+=" -q $TERMUX_PKG_CACHEDIR/qemu-static-bin/qemu-$TERMUX_ARCH-static"
+			HOST_ROOTFS="/host-rootfs"
+			;;
+		*)
+			;;
+	esac
+
+	# Set arch32 if needed
+	local SETARCH32=()
+	if [ "$TERMUX_ARCH_BITS" = "32" ]; then
+		SETARCH32+=(CC="gcc -m32")
+		SETARCH32+=("linux32")
+	fi
 
 	# (Cross) Translation
-	__run_on_host_docker_rootfs \
-		env \
+	env -i \
 		-C "$TERMUX_PKG_SRCDIR"/pypy/goal \
+		PATH="$PATH" \
 		PYPY_USESSION_DIR="$TERMUX_PKG_SRCDIR/usession-dir" \
-		PROOT_TARGET="$__pypy3_run_on_target_from_host" \
+		PROOT_TARGET="$PROOT_TARGET" \
 		TARGET_CFLAGS="$CFLAGS $CPPFLAGS" \
 		TARGET_LDFLAGS="$LDFLAGS" \
-		python2 -u ../../rpython/bin/rpython \
+		TARGET_CC="$CC" \
+		"${SETARCH32[@]}" \
+		pypy2 -X faulthandler -u ../../rpython/bin/rpython \
 				--platform=termux-"$TERMUX_ARCH" \
 				--source --no-compile -Ojit \
 				targetpypystandalone.py
@@ -239,55 +145,36 @@ termux_step_make() {
 	# Build
 	cd "$TERMUX_PKG_SRCDIR"/usession-dir
 	cd "$(ls -C | awk '{print $1}')"/testing_1
-	local srcdir="$(pwd)"
-	__run_on_host_docker_rootfs \
-		env -C "$srcdir" make clean
-	__run_on_host_docker_rootfs \
-		env -C "$srcdir" make -j$TERMUX_PKG_MAKE_PROCESSES
+	make clean
+	make -j$TERMUX_PKG_MAKE_PROCESSES
 
 	# Copy the built files
 	cp ./pypy$_MAJOR_VERSION-c "$TERMUX_PKG_SRCDIR"/pypy/goal/pypy$_MAJOR_VERSION-c
 	cp ./libpypy$_MAJOR_VERSION-c.so "$TERMUX_PKG_SRCDIR"/pypy/goal/libpypy$_MAJOR_VERSION-c.so
 	cp ./libpypy$_MAJOR_VERSION-c.so "$TERMUX_PREFIX"/lib/libpypy$_MAJOR_VERSION-c.so
 
-	echo $__pypy3_run_on_host
-	echo $__pypy3_run_on_target_from_host
-	echo $__pypy3_run_on_target_from_builder
-
 	# Dummy cc and strip
-	rm -rf "$TERMUX_PKG_TMPDIR"/dummy-bin
-	mkdir -p "$TERMUX_PKG_TMPDIR"/dummy-bin
-	cp "$TERMUX_PKG_BUILDER_DIR"/cc.sh "$TERMUX_PKG_TMPDIR"/dummy-bin/cc
-	chmod +x "$TERMUX_PKG_TMPDIR"/dummy-bin/cc
-	ln -sf $(command -v llvm-strip) "$TERMUX_PKG_TMPDIR"/dummy-bin/strip
-
-	# Set host-rootfs if needed
-	local HOST_ROOTFS=""
-	case "$TERMUX_ARCH" in
-		"aarch64" |  "arm")
-			HOST_ROOTFS="/host-rootfs"
-			;;
-		*)
-			;;
-	esac
+	mkdir -p "$TERMUX_PKG_SRCDIR"/dummy-bin
+	cp "$TERMUX_PKG_BUILDER_DIR"/cc.sh "$TERMUX_PKG_SRCDIR"/dummy-bin/cc
+	chmod +x "$TERMUX_PKG_SRCDIR"/dummy-bin/cc
+	ln -sf $(command -v llvm-strip) "$TERMUX_PKG_SRCDIR"/dummy-bin/strip
+	ln -sf cc "$TERMUX_PKG_SRCDIR"/dummy-bin/gcc
 
 	# Build cffi imports (Cross exec)
-	$__pypy3_run_on_target_from_builder \
-		env -i \
-		PATH="$TERMUX_PKG_TMPDIR/dummy-bin:$TERMUX_PREFIX/bin" \
-		HOST_ROOTFS="$HOST_ROOTFS" \
-		TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_STANDALONE_TOOLCHAIN" \
-		CC="$TERMUX_PKG_TMPDIR/dummy-bin/cc" \
-		LDSHARED="$TERMUX_PKG_TMPDIR/dummy-bin/cc -pthread -shared" \
-		CCTERMUX_HOST_PLATFORM="$CCTERMUX_HOST_PLATFORM" \
-		CFLAGS="$CFLAGS $CPPFLAGS" \
-		LDFLAGS="$LDFLAGS" \
-		"$TERMUX_PKG_SRCDIR"/pypy/goal/pypy$_MAJOR_VERSION-c \
-			$TERMUX_PKG_SRCDIR/pypy/tool/release/package.py \
-			--archive-name=pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION \
-			--targetdir=$TERMUX_PKG_SRCDIR \
-			--no-embedded-dependencies \
-			--no-keep-debug
+	$PROOT_TARGET env -i \
+				PATH="$TERMUX_PKG_SRCDIR/dummy-bin:$PATH" \
+				HOST_ROOTFS="$HOST_ROOTFS" \
+				TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_STANDALONE_TOOLCHAIN" \
+				CC=cc \
+				CCTERMUX_HOST_PLATFORM="$CCTERMUX_HOST_PLATFORM" \
+				CFLAGS="$CFLAGS $CPPFLAGS" \
+				LDFLAGS="$LDFLAGS" \
+				"$TERMUX_PKG_SRCDIR"/pypy/goal/pypy$_MAJOR_VERSION-c \
+					$TERMUX_PKG_SRCDIR/pypy/tool/release/package.py \
+					--archive-name=pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION \
+					--targetdir=$TERMUX_PKG_SRCDIR \
+					--no-embedded-dependencies \
+					--no-keep-debug
 
 	rm -f "$TERMUX_PREFIX"/lib/libpypy$_MAJOR_VERSION-c.so
 }
