@@ -19,7 +19,7 @@ termux_step_make_install() {
 	cp -r . ${dir}
 	(
 		cd ${dir}
-		./INSTALL -c
+		./INSTALL -c -r ${dir}
 	)
 	ln -s ../lib/plan9/bin/9 ${TERMUX_PREFIX}/bin/9
 }
