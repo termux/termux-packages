@@ -1,0 +1,15 @@
+--- a/INSTALL
++++ b/INSTALL
+@@ -118,9 +118,9 @@ fi
+ if [ `uname` != Darwin ]; then
+ 	# Determine whether fontsrv X11 files are available.
+ 	rm -f a.out
+-	cc -o a.out -c -Iinclude -I/usr/include -I/usr/local/include -I/usr/include/freetype2 -I/usr/local/include/freetype2 \
+-	    -I/usr/X11R7/include -I/usr/X11R7/include/freetype2 \
+-	    -I/usr/X11R6/include -I/usr/X11R6/include/freetype2 src/cmd/fontsrv/x11.c >/dev/null 2>&1
++	cc -o a.out -c -Iinclude -I@TERMUX_PREFIX@/include -I@TERMUX_PREFIX@/local/include -I@TERMUX_PREFIX@/include/freetype2 -I@TERMUX_PREFIX@/local/include/freetype2 \
++	    -I@TERMUX_PREFIX@/X11R7/include -I@TERMUX_PREFIX@/X11R7/include/freetype2 \
++	    -I@TERMUX_PREFIX@/X11R6/include -I@TERMUX_PREFIX@/X11R6/include/freetype2 src/cmd/fontsrv/x11.c
+ 	if [ -f a.out ]; then
+ 		echo "	fontsrv dependencies found."
+ 		echo "FONTSRV=fontsrv" >>$PLAN9/config
