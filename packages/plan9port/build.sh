@@ -21,5 +21,5 @@ termux_step_make_install() {
 		cd ${dir}
 		./INSTALL -c -r ${dir}
 	)
-	ln -s ../lib/plan9/bin/9 ${TERMUX_PREFIX}/bin/9
+	ln -f -s ../lib/plan9/bin/9 ${TERMUX_PREFIX}/bin/9
 }
