@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/marin-m/SongRec
 TERMUX_PKG_DESCRIPTION="Open-source, unofficial Shazam client"
 TERMUX_PKG_LICENSE="GPL-3.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.7.3"
+TERMUX_PKG_VERSION="0.7.4"
 TERMUX_PKG_SRCURL="https://github.com/marin-m/SongRec/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=f88bd166b1385ddd94e759fab72a997c87077043d0232c2395440941bc694a92
+TERMUX_PKG_SHA256=f62efd1ad8c8eb4722f814c3ef96a41f1f7ac261564b2609f79ecb469964852a
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="gtk4, alsa-lib, alsa-plugins, openssl, ffmpeg, libc++, gettext, glib, pango, libcairo, dbus, hicolor-icon-theme, gdk-pixbuf, libadwaita, pulseaudio, libsoup3"
@@ -31,9 +31,11 @@ termux_step_make() {
 	PKG_CONFIG_PATH_x86_64_unknown_linux_gnu="$(grep 'DefaultSearchPaths:' "/usr/share/pkgconfig/personality.d/${HOST_TRIPLET}.personality" | cut -d ' ' -f 2)"
 	export PKG_CONFIG_PATH_x86_64_unknown_linux_gnu
 
-	git clone https://github.com/RustAudio/cpal.git vendor/cpal-git
-	# remove eventually whenever a commit is no longer hardcoded in upstream's code
-	git -C vendor/cpal-git checkout 1c40a85
+	cargo vendor
+	find ./vendor \
+		-mindepth 1 -maxdepth 1 -type d \
+		! -wholename ./vendor/cpal \
+		-exec rm -rf '{}' \;
 
 	find . -type f -print0 | \
 		xargs -0 sed -i \
@@ -42,8 +44,8 @@ termux_step_make() {
 
 	cat >> Cargo.toml <<-'EOF'
 
-	[patch."git+https://github.com/RustAudio/cpal.git"]
-	cpal = { path = "./vendor/cpal-git" }
+	[patch.crates-io]
+	cpal = { path = "./vendor/cpal" }
 EOF
 
 	local _release='--release'
