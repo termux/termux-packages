@@ -17,6 +17,10 @@ selection of 0-1 of the plugins.
 however, if openbabel is built with static plugins, they seem to work correctly,
 including for actual conversions utilizing the intended functionality of openbabel.
 
+also, normally openbabel does not support statically building the cairo-dependent plugin
+or the rapidjson-dependent plugins, but I forced it to by adding additional code to
+implement that.
+
 --- a/tools/CMakeLists.txt
 +++ b/tools/CMakeLists.txt
 @@ -38,7 +38,7 @@ INCLUDE(CheckFunctionExists)
@@ -39,3 +43,92 @@ including for actual conversions utilizing the intended functionality of openbab
    endif()
  endif()
  
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -185,7 +185,7 @@ if(BUILD_SHARED)
+ else(BUILD_SHARED)
+   include(formats/formats.cmake)
+   foreach(format ${formats})
+-    set(openbabel_srcs ${openbabel_srcs} formats/${format}.cpp)
++    set(openbabel_srcs ${openbabel_srcs} ${${format}_additional_sources} formats/${format}.cpp)
+   endforeach(format ${formats})
+ 
+   if(LIBXML2_FOUND AND WITH_STATIC_LIBXML)
+@@ -194,6 +194,12 @@ else(BUILD_SHARED)
+       set(openbabel_srcs ${openbabel_srcs} formats/xml/${format}.cpp)
+     endforeach(format ${formats_xml})
+   endif(LIBXML2_FOUND AND WITH_STATIC_LIBXML)
++
++  if(RAPIDJSON_FOUND)
++    foreach(format ${formats_json})
++      set(openbabel_srcs ${openbabel_srcs} formats/json/${format}.cpp)
++    endforeach(format ${formats_json})
++  endif(RAPIDJSON_FOUND)
+ 
+   foreach(plugingroup descriptors fingerprints forcefields ops charges)
+     set(openbabel_srcs ${openbabel_srcs} ${${plugingroup}})
+--- a/src/formats/formats.cmake
++++ b/src/formats/formats.cmake
+@@ -19,8 +19,8 @@ set(formats_utility
+   textformat
+   titleformat
+   )
+-set(painterformat_additional_sources ../depict/commandpainter.cpp)
+-set(asciiformat_additional_sources   ../depict/asciipainter.cpp)
++set(painterformat_additional_sources ${CMAKE_SOURCE_DIR}/src/depict/commandpainter.cpp)
++set(asciiformat_additional_sources   ${CMAKE_SOURCE_DIR}/src/depict/asciipainter.cpp)
+ if(TARGET Eigen3::Eigen)
+   set(formats_utility ${formats_utility}
+       confabreport
+@@ -152,7 +152,7 @@ set(formats_misc
+       yasaraformat
+       )
+ 
+-set(wlnformat_additional_sources wln-nextmove.cpp)
++set(wlnformat_additional_sources ${CMAKE_SOURCE_DIR}/src/formats/wln-nextmove.cpp)
+ # genbankformat can currently only be built statically
+ if(NOT BUILD_SHARED)
+   set(formats_misc ${formats_misc} genbankformat)
+@@ -165,7 +165,7 @@ if(CAIRO_FOUND)
+   set(formats_cairo
+     png2format
+   )
+-  set(png2format_additional_sources ../depict/cairopainter.cpp)
++  set(png2format_additional_sources ${CMAKE_SOURCE_DIR}/src/depict/cairopainter.cpp)
+   set(optional_formatgroups
+     ${optional_formatgroups} formats_cairo
+     )
+--- a/include/openbabel/plugin.h
++++ b/include/openbabel/plugin.h
+@@ -463,7 +463,14 @@ public:
+   OB_STATIC_PLUGIN(PDBQTFormat, thePDBQTFormat)
+ #ifdef HAVE_LIBZ
+   OB_STATIC_PLUGIN(PNGFormat, thePNGFormat)
++  OB_STATIC_PLUGIN(PNG2Format, thePNG2Format)
+ #endif
++#ifdef HAVE_RAPIDJSON
++  OB_STATIC_PLUGIN(KETFormat, theKETFormat)
++  OB_STATIC_PLUGIN(ChemicalJSONFormat, theChemicalJSONFormat)
++  OB_STATIC_PLUGIN(PubChemJSONFormat, thePubChemJSONFormat)
++  OB_STATIC_PLUGIN(ChemDoodleJSONFormat, theChemDoodleJSONFormat)
++#endif
+   OB_STATIC_PLUGIN(PointCloudFormat, thePointCloudFormat)
+   OB_STATIC_PLUGIN(PovrayFormat, thePovrayFormat)
+   OB_STATIC_PLUGIN(PQRFormat, thePQRFormat)
+--- a/src/plugin.cpp
++++ b/src/plugin.cpp
+@@ -315,7 +315,14 @@ std::vector<std::string> EnableStaticPlugins()
+   plugin_ids.push_back(reinterpret_cast<OBPlugin*>(&thePDBQTFormat)->GetID());
+ #ifdef HAVE_LIBZ
+   plugin_ids.push_back(reinterpret_cast<OBPlugin*>(&thePNGFormat)->GetID());
++  plugin_ids.push_back(reinterpret_cast<OBPlugin*>(&thePNG2Format)->GetID());
+ #endif
++#ifdef HAVE_RAPIDJSON
++  plugin_ids.push_back(reinterpret_cast<OBPlugin*>(&theKETFormat)->GetID());
++  plugin_ids.push_back(reinterpret_cast<OBPlugin*>(&theChemicalJSONFormat)->GetID());
++  plugin_ids.push_back(reinterpret_cast<OBPlugin*>(&thePubChemJSONFormat)->GetID());
++  plugin_ids.push_back(reinterpret_cast<OBPlugin*>(&theChemDoodleJSONFormat)->GetID());
++#endif
+   plugin_ids.push_back(reinterpret_cast<OBPlugin*>(&thePointCloudFormat)->GetID());
+   plugin_ids.push_back(reinterpret_cast<OBPlugin*>(&thePovrayFormat)->GetID());
+   plugin_ids.push_back(reinterpret_cast<OBPlugin*>(&thePQRFormat)->GetID());
