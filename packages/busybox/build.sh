@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://busybox.net/
 TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a single small executable"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.37.0
-TERMUX_PKG_REVISION=3
-TERMUX_PKG_SRCURL=https://busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=3311dff32e746499f4df0d5df04d7eb396382d7e108bb9250e7b519b837043a4
+TERMUX_PKG_VERSION="1.38.0"
+TERMUX_PKG_SRCURL="https://busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2"
+TERMUX_PKG_SHA256=34f9ea6ff8636f2c9241153b9114eefa9e65674a45318ae1ef95bb5f31c53bb2
 TERMUX_PKG_DEPENDS="libandroid-selinux"
 TERMUX_PKG_BUILD_IN_SRC=true
 

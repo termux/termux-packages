@@ -53,11 +53,13 @@ diff -uNr busybox-1.31.1/include/libbb.h busybox-1.31.1.mod/include/libbb.h
 diff -uNr ../busybox-1.35.0/networking/telnetd.c ./networking/telnetd.c
 --- ../busybox-1.35.0/networking/telnetd.c	2021-12-26 17:53:21.000000000 +0100
 +++ ./networking/telnetd.c	2022-08-05 08:44:20.976821463 +0200
-@@ -105,7 +105,7 @@
+@@ -112,8 +112,8 @@
+ //usage:#define telnetd_full_usage "\n\n"
  //usage:       "Handle incoming telnet connections"
  //usage:	IF_NOT_FEATURE_TELNETD_STANDALONE(" via inetd") "\n"
- //usage:     "\n	-l LOGIN	Exec LOGIN on connect"
--//usage:     "\n	-f ISSUE_FILE	Display ISSUE_FILE instead of /etc/issue"
+-//usage:     "\n	-l LOGIN	Exec LOGIN on connect (default /bin/login)"
+-//usage:     "\n	-f ISSUE_FILE	Display ISSUE_FILE instead of /etc/issue.net"
++//usage:     "\n	-l LOGIN	Exec LOGIN on connect (default @TERMUX_PREFIX@/bin/login)"
 +//usage:     "\n	-f ISSUE_FILE	Display ISSUE_FILE instead of @TERMUX_PREFIX@/etc/issue.net"
  //usage:     "\n	-K		Close connection as soon as login exits"
  //usage:     "\n			(normally wait until all programs close slave pty)"
