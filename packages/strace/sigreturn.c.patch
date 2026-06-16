@@ -1,12 +1,12 @@
---- strace-5.11/src/sigreturn.c     2021-02-16 08:00:00.000000000 +0000
-+++ strace-5.11.mod/src/sigreturn.c 2021-02-24 13:57:17.100000000 +0000
+--- a/src/sigreturn.c
++++ b/src/sigreturn.c
 @@ -15,6 +15,7 @@
  # include <asm/sigcontext.h>
  #endif
  
 +#if !(defined(__ANDROID__) && (defined(__arm__) || defined(__aarch64__)))
- /* The following function might be unused, hence the inline qualifier.  */
- static inline void
+ /* The following function might be unused.  */
+ static void ATTRIBUTE_UNUSED
  print_sigmask_addr_size(const void *const addr, const unsigned int size)
 @@ -24,6 +25,7 @@
  	tprints_string(sprintsigmask_n("", addr, size));
