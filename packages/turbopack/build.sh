@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Rust-based incremental compilation engine and bundler fo
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION="16.2.5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/vercel/next.js/archive/refs/tags/v${TERMUX_PKG_VERSION//\~/-}.tar.gz
 TERMUX_PKG_SHA256=b3ec707ac9af1fb3125f3c9b801dbfccf37d094c6ec5f3ddf4e2c7dde9e53ded
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -33,9 +34,9 @@ termux_step_make() {
 		export "CARGO_TARGET_${ENV_PREFIX}_LINKER"="$CC"
 		export "CC_${RUST_TARGET//-/_}"="$CC"
 	fi
-	npx pnpm install
+	npx --yes pnpm install
 	cd packages/next-swc
-	npx pnpm run build-native-release --target "$RUST_TARGET"
+	npx --yes pnpm run build-native-release --target "$RUST_TARGET"
 }
 
 termux_step_make_install() {
