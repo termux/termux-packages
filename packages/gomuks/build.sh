@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://go.mau.fi/gomuks
 TERMUX_PKG_DESCRIPTION="A terminal Matrix client written in Go"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="26.05"
+TERMUX_PKG_VERSION="26.06"
 TERMUX_PKG_SRCURL="https://github.com/gomuks/gomuks/archive/refs/tags/v0.${TERMUX_PKG_VERSION/.}.0.tar.gz"
-TERMUX_PKG_SHA256=ff0795b87995e20a942ba938c96b82efa58cd977e13429974ded256b03a5c272
+TERMUX_PKG_SHA256=b55ecc9bb050ad00553077e2f1e451a1ae56ee0f39240a359354ab29b390ff46
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="0\.\K\d+(?=\.0)"
 TERMUX_PKG_UPDATE_VERSION_SED_REGEXP="s/([0-9][0-9])([0-9][0-9])/\1.\2/"
@@ -47,7 +47,7 @@ termux_step_make() {
 	# https://github.com/gomuks/gomuks/blob/v0.2511.0/build-noweb.sh
 	mkdir -p web/dist/
 	touch web/dist/empty
-	BINARY_NAME=gomuks MAU_VERSION_PACKAGE=go.mau.fi/gomuks/version $TERMUX_PKG_HOSTBUILD_DIR/maubuild "$@"
+	BINARY_NAME=gomuks MAU_VERSION_PACKAGE=go.mau.fi/gomuks/version $TERMUX_PKG_HOSTBUILD_DIR/maubuild -tags "sqlite_fts5" "$@"
 }
 
 termux_step_make_install() {
