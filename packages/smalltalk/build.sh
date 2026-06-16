@@ -3,13 +3,22 @@ TERMUX_PKG_DESCRIPTION="A free implementation of the Smalltalk-80 language"
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION="3.2.91"
-TERMUX_PKG_REVISION=16
+TERMUX_PKG_REVISION=17
 TERMUX_PKG_SRCURL="ftp://alpha.gnu.org/gnu/smalltalk/smalltalk-$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=13a7480553c182dbb8092bd4f215781b9ec871758d1db7045c2d8587e4d1bef9
-TERMUX_PKG_DEPENDS="gdbm, glib, libandroid-execinfo, libandroid-support, libexpat, libffi, libgmp, libiconv, libltdl, libsigsegv, libsqlite, zlib"
+TERMUX_PKG_DEPENDS="gdbm, glib, libandroid-execinfo, libandroid-support, libexpat, libffi, libgmp, libiconv, libltdl, libsigsegv, libsqlite, readline, zlib"
 TERMUX_PKG_BREAKS="smalltalk-dev"
 TERMUX_PKG_REPLACES="smalltalk-dev"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-gtk"
+# in some older packages, --with-readline=$TERMUX_PREFIX is used.
+# in the case of smalltalk, --with-readline=$TERMUX_PREFIX does not work,
+# and reading and testing the autotools code of smalltalk reveals
+# that actually what works in smalltalk is:
+# --with-readline=$TERMUX_PREFIX/lib gst_cv_readline_libs=-lreadline
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--disable-gtk
+--with-readline=$TERMUX_PREFIX/lib
+gst_cv_readline_libs=-lreadline
+"
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {

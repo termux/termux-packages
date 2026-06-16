@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE='https://invent.kde.org/frameworks/syndication'
 TERMUX_PKG_DESCRIPTION='RSS/Atom parser library'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.26.0"
+TERMUX_PKG_VERSION="6.27.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/syndication-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=6130b8bc976cb078eda34b833ecd558a156b4e6bc4cb55e57ac362cb2998ba47
+TERMUX_PKG_SHA256=e28036eba9bf94f62466eaff66f49305fff9dd576a317df2474d6bfe5bfbc759
 TERMUX_PKG_DEPENDS="kf6-kcodecs (>= ${TERMUX_PKG_VERSION%.*}), qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION%.*}), libc++, qt6-qttools"
 TERMUX_PKG_AUTO_UPDATE=true

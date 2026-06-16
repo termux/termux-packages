@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE="https://invent.kde.org/frameworks/kwidgetsaddons"
 TERMUX_PKG_DESCRIPTION="Large set of desktop Qt widgets (KDE)"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.26.0"
+TERMUX_PKG_VERSION="6.27.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kwidgetsaddons-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=65044882e30b305fe9fb20331a354cd811ca9d80b5c7f9fa722639f3334fe630
+TERMUX_PKG_SHA256=4cba86999331960b3fddac8ed02cccb31fc49406422360217135f6bf3fbca8d9
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION%.*}), qt6-qttools"

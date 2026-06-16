@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.mozilla.org/firefox
 TERMUX_PKG_DESCRIPTION="Mozilla Firefox web browser"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="151.0.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="151.0.4"
 TERMUX_PKG_SRCURL="https://archive.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION#*really}/source/firefox-${TERMUX_PKG_VERSION#*really}.source.tar.xz"
-TERMUX_PKG_SHA256=63c4267799f2618dd7ac5997d0306bbcf2a5306caaca0056795bc6c61d00f8c8
+TERMUX_PKG_SHA256=ffda1991cc3b9b35d3c034314d253a51d6a20f603b693db2f55a00fa840e83a7
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"

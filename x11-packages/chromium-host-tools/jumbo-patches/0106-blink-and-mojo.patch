@@ -1507,41 +1507,6 @@ index 7f7bf26076..08974870e3 100644
 +#ifdef __clang__
 +#pragma clang diagnostic pop
 +#endif
-diff --git a/third_party/blink/renderer/core/html/track/cue_timeline.cc b/third_party/blink/renderer/core/html/track/cue_timeline.cc
-index a0acee2829..ccad139a8e 100644
---- a/third_party/blink/renderer/core/html/track/cue_timeline.cc
-+++ b/third_party/blink/renderer/core/html/track/cue_timeline.cc
-@@ -358,7 +358,7 @@ void CueTimeline::TimeMarchesOn() {
-           is_enter_event ? event_type_names::kEnter : event_type_names::kExit;
-       media_element.ScheduleEvent(
-           CreateEventWithTarget(event_name, task.second.Get()));
--      if (features::IsTextBasedAudioDescriptionEnabled()) {
-+      if (::features::IsTextBasedAudioDescriptionEnabled()) {
-         if (is_enter_event) {
-           cue->OnEnter(MediaElement());
-         } else {
-diff --git a/third_party/blink/renderer/core/html/track/text_track.cc b/third_party/blink/renderer/core/html/track/text_track.cc
-index 26701d1aaa..7845625181 100644
---- a/third_party/blink/renderer/core/html/track/text_track.cc
-+++ b/third_party/blink/renderer/core/html/track/text_track.cc
-@@ -323,7 +323,7 @@ void TextTrack::InvalidateTrackIndex() {
- }
- 
- bool TextTrack::IsRendered() const {
--  if (features::IsTextBasedAudioDescriptionEnabled()) {
-+  if (::features::IsTextBasedAudioDescriptionEnabled()) {
-     return mode_ == TextTrackMode::kShowing &&
-            (IsVisualKind() || IsSpokenKind());
-   }
-@@ -333,7 +333,7 @@ bool TextTrack::IsRendered() const {
- bool TextTrack::CanBeRendered() const {
-   // A track can be displayed when it's of kind captions, subtitles, or
-   // descriptions and hasn't failed to load.
--  if (features::IsTextBasedAudioDescriptionEnabled()) {
-+  if (::features::IsTextBasedAudioDescriptionEnabled()) {
-     return GetReadinessState() != kFailedToLoad &&
-            (IsVisualKind() || IsSpokenKind());
-   }
 diff --git a/third_party/blink/renderer/core/imagebitmap/image_bitmap.cc b/third_party/blink/renderer/core/imagebitmap/image_bitmap.cc
 index 4f43f06dda..a2d196308f 100644
 --- a/third_party/blink/renderer/core/imagebitmap/image_bitmap.cc
@@ -1840,30 +1805,6 @@ index 869fb948ea..e7d3925366 100644
  }  // namespace blink
 +
 +#undef GeometryPropertiesChanged
-diff --git a/third_party/blink/renderer/core/layout/text_autosizer.cc b/third_party/blink/renderer/core/layout/text_autosizer.cc
-index e223f6633f..eda0d46217 100644
---- a/third_party/blink/renderer/core/layout/text_autosizer.cc
-+++ b/third_party/blink/renderer/core/layout/text_autosizer.cc
-@@ -63,6 +63,11 @@
- #include "third_party/blink/renderer/platform/wtf/hash_functions.h"
- #include "ui/gfx/geometry/rect.h"
- 
-+#ifdef __clang__
-+#pragma clang diagnostic push
-+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
-+#endif
-+
- namespace blink {
- namespace {
- struct FingerprintSourceData;
-@@ -1633,3 +1638,7 @@ void TextAutosizer::FingerprintMapper::Trace(Visitor* visitor) const {
- }
- 
- }  // namespace blink
-+
-+#ifdef __clang__
-+#pragma clang diagnostic pop
-+#endif
 diff --git a/third_party/blink/renderer/core/loader/alternate_signed_exchange_resource_info.cc b/third_party/blink/renderer/core/loader/alternate_signed_exchange_resource_info.cc
 index 0405cf3c03..c99c9bee20 100644
 --- a/third_party/blink/renderer/core/loader/alternate_signed_exchange_resource_info.cc
@@ -4819,3 +4760,55 @@ index 247fc491ae..269fe797d7 100644
  }  // namespace blink
 +
 +#undef IsConstraintEnabled
+diff --git a/third_party/blink/renderer/core/html/parser/html_document_parser.cc b/third_party/blink/renderer/core/html/parser/html_document_parser.cc
+index 6e496798f7..59787d0917 100644
+--- a/third_party/blink/renderer/core/html/parser/html_document_parser.cc
++++ b/third_party/blink/renderer/core/html/parser/html_document_parser.cc
+@@ -86,6 +86,8 @@
+ #include "third_party/blink/renderer/platform/wtf/wtf.h"
+ #include "third_party/perfetto/include/perfetto/tracing/track_event_args.h"
+ 
++#define FeatureResetMode FeatureResetMode_html_document_parser
++
+ namespace blink {
+ 
+ // This sets the (default) maximum number of tokens which the foreground HTML
+@@ -1859,3 +1861,5 @@ bool HTMLDocumentParser::AllowPreloading() {
+ }
+ 
+ }  // namespace blink
++
++#undef FeatureResetMode
+diff --git a/third_party/blink/renderer/core/html/parser/html_tree_builder.cc b/third_party/blink/renderer/core/html/parser/html_tree_builder.cc
+index fa8347ddd7..3398b452d5 100644
+--- a/third_party/blink/renderer/core/html/parser/html_tree_builder.cc
++++ b/third_party/blink/renderer/core/html/parser/html_tree_builder.cc
+@@ -70,6 +70,8 @@
+ #include "third_party/blink/renderer/platform/wtf/text/strcat.h"
+ #include "third_party/blink/renderer/platform/wtf/text/string_buffer.h"
+ 
++#define FeatureResetMode FeatureResetMode_html_tree_builder
++
+ namespace blink {
+ 
+ using HTMLTag = html_names::HTMLTag;
+@@ -3261,3 +3263,5 @@ const char* HTMLTreeBuilder::ToString(HTMLTreeBuilder::InsertionMode mode) {
+ #endif
+ 
+ }  // namespace blink
++
++#undef FeatureResetMode
+diff --git a/third_party/blink/renderer/modules/accessibility/BUILD.gn b/third_party/blink/renderer/modules/accessibility/BUILD.gn
+index 12a864be8e..55711b2902 100644
+--- a/third_party/blink/renderer/modules/accessibility/BUILD.gn
++++ b/third_party/blink/renderer/modules/accessibility/BUILD.gn
+@@ -50,6 +50,9 @@ blink_modules_sources("accessibility") {
+     "inspector_type_builder_helper.cc",
+     "inspector_type_builder_helper.h",
+   ]
++  jumbo_excluded_sources = [
++    "ax_object.cc",
++  ]
+ 
+   deps = [
+     "//third_party/blink/public/strings:strings_grit",

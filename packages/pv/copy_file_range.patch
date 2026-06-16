@@ -1,0 +1,44 @@
+diff -uNr pv-1.11.0/src/pv/transfer.c pv-1.11.0.mod/src/pv/transfer.c
+--- pv-1.11.0/src/pv/transfer.c	2026-06-12 05:24:05.000000000 +0800
++++ pv-1.11.0.mod/src/pv/transfer.c	2026-06-12 20:41:58.201873288 +0800
+@@ -22,6 +22,7 @@
+ #include <fcntl.h>
+ #include <signal.h>
+ #include <sys/time.h>
++#include <sys/syscall.h>
+ 
+ /*
+  * splint note: In a few places, "#if SPLINT" is used to substitute other
+@@ -688,7 +689,23 @@
+  * 0.
+  *
+  * Returns the total number of bytes transferred, or negative on error.
++ *
++ * Wrapper that uses syscall for copy_file_range, so it works even when libc
++ * doesn't expose the function (Android < API 34). Returns -1 with errno
++ * set if kernel doesn't support the syscall.
+  */
++static ssize_t
++runtime_copy_file_range(int fd_in, off64_t *off_in, int fd_out,
++                        off64_t *off_out, size_t len, unsigned flags)
++{
++#ifdef __NR_copy_file_range
++    return syscall(__NR_copy_file_range, fd_in, off_in, fd_out, off_out, len, flags);
++#else
++    errno = ENOSYS;
++    return -1;
++#endif
++}
++
+ static ssize_t pv__transfer__copy_file_range_repeated(pvstate_t state, int input_fd, int output_fd,
+ 						      off_t max_to_read, off_t max_to_write, bool *transfer_attempted)
+ {
+@@ -740,7 +757,7 @@
+ 		long double elapsed_seconds;
+ 
+ 		/*@-nullpass@ *//*@-type@ *//* splint doesn't know about copy_file_range. */
+-		ncopied = copy_file_range(input_fd, NULL, output_fd, NULL, bytes_to_copy, 0);
++		ncopied = runtime_copy_file_range(input_fd, NULL, output_fd, NULL, bytes_to_copy, 0);
+ 		/*@+type@ *//*@+nullpass@ */
+ 
+ 		debug("bytes_to_copy=%lu, ncopied=%ld", bytes_to_copy, ncopied);

@@ -1719,83 +1719,6 @@ index 15f50694f0..bb203d48cb 100644
        broker_holder_.reset();
      } else {
        broker_holder_->broker_receiver().reset();
-diff --git a/content/browser/renderer_host/render_frame_host_manager.cc b/content/browser/renderer_host/render_frame_host_manager.cc
-index 635822edc7..666fc4bb99 100644
---- a/content/browser/renderer_host/render_frame_host_manager.cc
-+++ b/content/browser/renderer_host/render_frame_host_manager.cc
-@@ -1337,7 +1337,7 @@ void RenderFrameHostManager::UnloadOldFrame(
-   //
-   // This is well under the required shutdown time of the renderer process
-   // which has security implications if exceeded (https://crbug.com/1177674).
--  if (features::ShouldAckCOREarlyForViewTransition() &&
-+  if (::features::ShouldAckCOREarlyForViewTransition() &&
-       !old_render_frame_host->GetParentOrOuterDocument() &&
-       view_transition_commit_info.has_view_transition_resources) {
-     old_render_frame_host->GetProcess()->DelayProcessShutdown(
-diff --git a/content/browser/renderer_host/render_process_host_impl.cc b/content/browser/renderer_host/render_process_host_impl.cc
-index 5d35444a51..bda9911884 100644
---- a/content/browser/renderer_host/render_process_host_impl.cc
-+++ b/content/browser/renderer_host/render_process_host_impl.cc
-@@ -1756,7 +1756,7 @@
-   UnregisterHost(GetID());
- 
-   // Remove the cache handles for the client at teardown if relevant.
--  if (features::IsShaderDiskCacheEnabled(
-+  if (::features::IsShaderDiskCacheEnabled(
-           base::CommandLine::ForCurrentProcess())) {
-     if (GetGpuDiskCacheFactorySingleton()) {
-         gpu_client_->RemoveDiskCacheHandles();
-@@ -1823,7 +1823,7 @@
-   // stored on the channels. Note that we also check if the factory is
-   // initialized because in tests the factory may never have been initialized.
-   if (!GetBrowserContext()->IsOffTheRecord() &&
--      features::IsShaderDiskCacheEnabled(
-+      ::features::IsShaderDiskCacheEnabled(
-           base::CommandLine::ForCurrentProcess())) {
-     if (auto* cache_factory = GetGpuDiskCacheFactorySingleton()) {
-       for (const gpu::GpuDiskCacheType type : gpu::kGpuDiskCacheTypes) {
-@@ -3522,8 +3522,8 @@
-   }
- 
-   if (base::FeatureList::IsEnabled(
--          features::kSkipIPCChannelPausingForNonGuests)) {
--    if (features::kSkipIPCChannelPausingForNonGuestsInternalWebUiOnly.Get()) {
-+          ::features::kSkipIPCChannelPausingForNonGuests)) {
-+    if (::features::kSkipIPCChannelPausingForNonGuestsInternalWebUiOnly.Get()) {
- #if !BUILDFLAG(IS_ANDROID)
-       // Skip pausing if we're on initial WebUI, so return false in that case.
-       return !IsForInitialWebUI();
-@@ -5933,7 +5933,7 @@
-   // TODO(crbug.com/455620851): Remove the function after finishing the
-   // holdback experiment.
-   return base::FeatureList::IsEnabled(
--             features::kSpareRendererUseWarmupConnection) ||
-+             ::features::kSpareRendererUseWarmupConnection) ||
-          !HasSpareRendererPriority();
- }
- 
-diff --git a/content/browser/renderer_host/render_process_host_impl_receiver_bindings.cc b/content/browser/renderer_host/render_process_host_impl_receiver_bindings.cc
-index 48c77eeee7..d7cbfb2dd1 100644
---- a/content/browser/renderer_host/render_process_host_impl_receiver_bindings.cc
-+++ b/content/browser/renderer_host/render_process_host_impl_receiver_bindings.cc
-@@ -219,7 +219,7 @@ void RenderProcessHostImpl::RegisterMojoInterfaces() {
-       hyphenation::HyphenationImpl::GetTaskRunner());
- #endif
- #if BUILDFLAG(IS_ANDROID)
--  if (base::FeatureList::IsEnabled(features::kFontSrcLocalMatching)) {
-+  if (base::FeatureList::IsEnabled(::features::kFontSrcLocalMatching)) {
-     registry->AddInterface(
-         base::BindRepeating(&FontUniqueNameLookupService::Create),
-         FontUniqueNameLookupService::GetTaskRunner());
-@@ -346,7 +346,7 @@ void RenderProcessHostImpl::IOThreadHostImpl::BindHostReceiver(
-   }
- 
- #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
--  if (features::IsFontDataServiceEnabled()) {
-+  if (::features::IsFontDataServiceEnabled()) {
-     if (auto font_data_receiver =
-             receiver.As<font_data_service::mojom::FontDataService>()) {
-       font_data_service::FontDataServiceImpl::ConnectToFontService(
 diff --git a/content/browser/renderer_host/render_widget_host_view_base.cc b/content/browser/renderer_host/render_widget_host_view_base.cc
 index 99f590d854..016c264e0e 100644
 --- a/content/browser/renderer_host/render_widget_host_view_base.cc
@@ -2476,65 +2399,47 @@ index f6ed40ba9a..37690396d0 100644
         change.cause == net::CookieChangeCause::INSERTED_NO_CHANGE_OVERWRITE ||
         change.cause ==
 diff --git a/content/browser/renderer_host/render_frame_host_manager.cc b/content/browser/renderer_host/render_frame_host_manager.cc
-index 9629b27b22..f610b88188 100644
+index b1b189c5cd..c645eaa00c 100644
 --- a/content/browser/renderer_host/render_frame_host_manager.cc
 +++ b/content/browser/renderer_host/render_frame_host_manager.cc
-@@ -478,9 +478,9 @@ void UpdateProcessReusePolicyForMainFrame(SiteInstanceImpl* site_instance,
-                                           FrameTreeNode* frame_tree_node,
-                                           bool is_new_site_instance) {
-   if (!base::FeatureList::IsEnabled(
--          features::kReusePrerenderingProcessForMainFrames)) {
-+          ::features::kReusePrerenderingProcessForMainFrames)) {
-     if (!base::FeatureList::IsEnabled(
--            features::kProcessPerSiteUpToMainFrameThreshold) ||
-+            ::features::kProcessPerSiteUpToMainFrameThreshold) ||
-         !GetContentClient()
-              ->browser()
-              ->ShouldAllowProcessPerSiteForMultipleMainFrames(
-@@ -497,13 +497,13 @@ void UpdateProcessReusePolicyForMainFrame(SiteInstanceImpl* site_instance,
-   if (!is_new_site_instance) {
-     return;
+@@ -487,13 +487,13 @@ GetProcessReusePolicyForMainFrame(BrowserContext* browser_context,
+         MainFrameProcessReuseBlockReason::kDoesNotRequireDedicatedProcess);
    }
+ 
 -  if (base::FeatureList::IsEnabled(features::kDisableProcessReuse)) {
 +  if (base::FeatureList::IsEnabled(::features::kDisableProcessReuse)) {
-     RecordMainFrameProcessReuseBlockReason(
-         MainFrameProcessReuseBlockReason::kDisableProcessResuse);
-     return;
+     return base::unexpected(
+         MainFrameProcessReuseBlockReason::kDisableProcessReuse);
    }
+ 
    if (!base::FeatureList::IsEnabled(
 -          features::kMainFrameProcessReuseAllowDevToolsAttached) &&
 +          ::features::kMainFrameProcessReuseAllowDevToolsAttached) &&
        RenderFrameDevToolsAgentHost::WasEverAttachedToAnyFrame()) {
-     RecordMainFrameProcessReuseBlockReason(
+     return base::unexpected(
          MainFrameProcessReuseBlockReason::kDevToolsWasEverAttached);
-@@ -523,7 +523,7 @@ void UpdateProcessReusePolicyForMainFrame(SiteInstanceImpl* site_instance,
+@@ -507,7 +507,7 @@ GetProcessReusePolicyForMainFrame(BrowserContext* browser_context,
    // explicitly allows it.
-   const GURL& site_url = site_instance->GetSiteURL();
+   const GURL& site_url = site_info.site_url();
    if (!base::FeatureList::IsEnabled(
 -          features::kMainFrameProcessReuseAllowIPAndLocalhost) &&
 +          ::features::kMainFrameProcessReuseAllowIPAndLocalhost) &&
        (site_url.HostIsIPAddress() ||
         net::IsLocalHostname(site_url.GetHost()))) {
-     RecordMainFrameProcessReuseBlockReason(
-@@ -544,7 +544,7 @@ void UpdateProcessReusePolicyForMainFrame(SiteInstanceImpl* site_instance,
-   // original_url() accurately reflects the intended target. Return if the
-   // embedder does not prefer reuse here.
-   if (base::FeatureList::IsEnabled(
--          features::kProcessPerSiteUpToMainFrameThreshold) &&
-+          ::features::kProcessPerSiteUpToMainFrameThreshold) &&
-       GetContentClient()
-           ->browser()
-           ->ShouldReuseAnyExistingProcessForNewMainFrameSiteInstance(
-@@ -555,7 +555,7 @@ void UpdateProcessReusePolicyForMainFrame(SiteInstanceImpl* site_instance,
-     site_instance->set_process_reuse_policy(
-         ProcessReusePolicy::kReusePendingOrCommittedSiteWithMainFrameThreshold);
-   } else if (base::FeatureList::IsEnabled(
--                 features::kReusePrerenderingProcessForMainFrames)) {
-+                 ::features::kReusePrerenderingProcessForMainFrames)) {
-     RecordMainFrameProcessReuseBlockReason(
-         MainFrameProcessReuseBlockReason::kNotBlocked);
-     site_instance->set_process_reuse_policy(
-@@ -771,8 +771,8 @@ void RenderFrameHostManager::InitRoot(
+     return base::unexpected(
+@@ -521,9 +521,9 @@ GetProcessReusePolicyForMainFrame(BrowserContext* browser_context,
+   }
+ 
+   bool process_per_site_reuse_enabled = base::FeatureList::IsEnabled(
+-      features::kProcessPerSiteUpToMainFrameThreshold);
++      ::features::kProcessPerSiteUpToMainFrameThreshold);
+   bool prerender_reuse_enabled = base::FeatureList::IsEnabled(
+-      features::kReusePrerenderingProcessForMainFrames);
++      ::features::kReusePrerenderingProcessForMainFrames);
+   bool client_allow_process_per_site = false;
+   bool client_allow_process_per_site_for_url = false;
+ 
+@@ -830,8 +830,8 @@ void RenderFrameHostManager::InitRoot(
      const std::string& name,
      const base::UnguessableToken& devtools_frame_token) {
    bool is_legacy_browsing_context_state_mode =
@@ -2545,7 +2450,7 @@ index 9629b27b22..f610b88188 100644
            kLegacyOneToOneWithFrameTreeNode;
    scoped_refptr<BrowsingContextState> browsing_context_state =
        base::MakeRefCounted<BrowsingContextState>(
-@@ -825,8 +825,8 @@ void RenderFrameHostManager::InitChild(
+@@ -884,8 +884,8 @@ void RenderFrameHostManager::InitChild(
      std::string frame_name,
      std::string frame_unique_name) {
    bool is_legacy_browsing_context_state_mode =
@@ -2556,7 +2461,7 @@ index 9629b27b22..f610b88188 100644
            kLegacyOneToOneWithFrameTreeNode;
    scoped_refptr<BrowsingContextState> browsing_context_state =
        base::MakeRefCounted<BrowsingContextState>(
-@@ -1210,14 +1210,14 @@ void RenderFrameHostManager::PrepareForCollectingPage(
+@@ -1269,14 +1269,14 @@ void RenderFrameHostManager::PrepareForCollectingPage(
    // in FrameTree (which, for example, is shared between the new page and
    // the page entering BFCache), so they have to be collected explicitly above.
    // Since proxies are not collected, we can return early here.
@@ -2575,7 +2480,16 @@ index 9629b27b22..f610b88188 100644
                 kLegacyOneToOneWithFrameTreeNode);
  
    // Prepare the proxies.
-@@ -1645,7 +1645,7 @@ void RenderFrameHostManager::DidCreateNavigationRequest(
+@@ -1484,7 +1484,7 @@ void RenderFrameHostManager::UnloadOldFrame(
+   //
+   // This is well under the required shutdown time of the renderer process
+   // which has security implications if exceeded (https://crbug.com/1177674).
+-  if (features::ShouldAckCOREarlyForViewTransition() &&
++  if (::features::ShouldAckCOREarlyForViewTransition() &&
+       !old_render_frame_host->GetParentOrOuterDocument() &&
+       view_transition_commit_info.HasViewTransitionResources() &&
+       view_transition_commit_info.delay_layer_tree_view_deletion) {
+@@ -1693,7 +1693,7 @@ void RenderFrameHostManager::DidCreateNavigationRequest(
          frame_tree_node_->navigator().controller().GetBrowserContext();
      DeferSpeculativeRFHAction defer_action =
          DeferSpeculativeRFHAction::kNotDeferred;
@@ -2584,7 +2498,7 @@ index 9629b27b22..f610b88188 100644
          CanIntentionallyDeferSpeculativeRFHForRequest(request, browser_context,
                                                        frame_tree_node_)) {
        // By skipping GetFrameHostForNavigation(), we are no longer calculating
-@@ -1654,7 +1654,7 @@ void RenderFrameHostManager::DidCreateNavigationRequest(
+@@ -1702,7 +1702,7 @@ void RenderFrameHostManager::DidCreateNavigationRequest(
        // on a very powerful workstation in a release build.
        // The GetFrameHostForNavigation() function will be called in
        // NavigationRequest::OnStartChecksComplete after staring the URL loader.
@@ -2593,7 +2507,7 @@ index 9629b27b22..f610b88188 100644
            RenderProcessHostImpl::IsSpareProcessKeptAtAllTimes()) {
          // Since Android does not create a spare renderer by default, we choose
          // to check IsSpareProcessKeptAtAllTimes() before warming up a renderer.
-@@ -1666,9 +1666,9 @@ void RenderFrameHostManager::DidCreateNavigationRequest(
+@@ -1714,9 +1714,9 @@ void RenderFrameHostManager::DidCreateNavigationRequest(
          // TODO(crbug.com/394973143): Move the timeout logic to
          // SpareRenderProcessHostManagerImpl
          if (base::FeatureList::IsEnabled(
@@ -2605,25 +2519,7 @@ index 9629b27b22..f610b88188 100644
          }
          SpareRenderProcessHostManagerImpl::Get().WarmupSpare(browser_context,
                                                               timeout);
-@@ -1928,7 +1928,7 @@ RenderFrameHostManager::GetFrameHostForNavigation(
-   std::string site_instance_reason;
-   std::string* reason_output =
-       (base::FeatureList::IsEnabled(
--           features::kHoldbackDebugReasonStringRemoval) ||
-+           ::features::kHoldbackDebugReasonStringRemoval) ||
-        request->IsInitialWebUINavigation())
-           ? &site_instance_reason
-           : reason;
-@@ -1937,7 +1937,7 @@ RenderFrameHostManager::GetFrameHostForNavigation(
-                                           browsing_context_group_swap,
-                                           reason_output);
-   if (reason && (base::FeatureList::IsEnabled(
--                     features::kHoldbackDebugReasonStringRemoval) ||
-+                     ::features::kHoldbackDebugReasonStringRemoval) ||
-                  request->IsInitialWebUINavigation())) {
-     reason->append(site_instance_reason);
-   }
-@@ -2904,8 +2904,8 @@ RenderFrameHostManager::ShouldSwapBrowsingInstancesForNavigation(
+@@ -2932,8 +2932,8 @@ RenderFrameHostManager::ShouldSwapBrowsingInstancesForNavigation(
              current_instance->GetRelatedActiveContentsCount()),
          51);
      if (base::FeatureList::IsEnabled(
@@ -2634,7 +2530,7 @@ index 9629b27b22..f610b88188 100644
        return BrowsingContextGroupSwap::CreateSecuritySwap();
      }
    }
-@@ -3261,7 +3261,7 @@ RenderFrameHostManager::GetSiteInstanceForNavigation(
+@@ -3289,7 +3289,7 @@ RenderFrameHostManager::GetSiteInstanceForNavigation(
      // this decision. Certain frames have different enough workloads so that
      // it's better to avoid placing a subframe into an existing process for
      // better performance isolation.  See https://crbug.com/899418.
@@ -2643,7 +2539,7 @@ index 9629b27b22..f610b88188 100644
          GetContentClient()
              ->browser()
              ->ShouldEmbeddedFramesTryToReuseExistingProcess(
-@@ -3368,7 +3368,7 @@ RenderFrameHostManager::GetSiteInstanceForNavigation(
+@@ -3396,7 +3396,7 @@ RenderFrameHostManager::GetSiteInstanceForNavigation(
            ProcessReuseOnCOOPType::kSameSiteNavigationInSingleWebContents;
        process_to_reuse = current_instance->GetProcess();
      } else if (base::FeatureList::IsEnabled(
@@ -2652,7 +2548,16 @@ index 9629b27b22..f610b88188 100644
                 frame_tree_node_->frame_tree().is_prerendering()) {
        coop_process_reuse_type = ProcessReuseOnCOOPType::kPrerender;
        process_to_reuse = current_instance->GetProcess();
-@@ -4317,8 +4317,8 @@ RenderFrameHostManager::CreateRenderFrameHost(
+@@ -3736,7 +3736,7 @@ RenderFrameHostManager::DetermineSiteInstanceForURL(
+     // SiteInstance if there's a "warm" locked process available for the
+     // destination. This is specifically useful on Android where NTP reuses its
+     // unlocked process for navigations.
+-    if (base::FeatureList::IsEnabled(features::kPreferWarmRendererProcess) &&
++    if (base::FeatureList::IsEnabled(::features::kPreferWarmRendererProcess) &&
+         frame_tree_node_->IsOutermostMainFrame() &&
+         dest_site_info.RequiresDedicatedProcess(
+             current_instance->GetIsolationContext())) {
+@@ -4380,8 +4380,8 @@ RenderFrameHostManager::CreateRenderFrameHost(
    if (!render_view_host) {
      render_view_host = frame_tree.CreateRenderViewHost(
          site_instance->group(), frame_routing_id, renderer_initiated_creation,
@@ -2663,7 +2568,7 @@ index 9629b27b22..f610b88188 100644
                      kSwapForCrossBrowsingInstanceNavigations
              ? browsing_context_state
              : nullptr,
-@@ -4386,8 +4386,8 @@ bool RenderFrameHostManager::CreateSpeculativeRenderFrameHost(
+@@ -4449,8 +4449,8 @@ bool RenderFrameHostManager::CreateSpeculativeRenderFrameHost(
    }
  
    scoped_refptr<BrowsingContextState> browsing_context_state;
@@ -2674,7 +2579,7 @@ index 9629b27b22..f610b88188 100644
            kLegacyOneToOneWithFrameTreeNode) {
      browsing_context_state = render_frame_host_->browsing_context_state();
    } else {
-@@ -4654,8 +4654,8 @@ void RenderFrameHostManager::CreateRenderFrameProxy(
+@@ -4717,8 +4717,8 @@ void RenderFrameHostManager::CreateRenderFrameProxy(
        render_view_host = frame_tree_node_->frame_tree().CreateRenderViewHost(
            group, /*main_frame_routing_id=*/IPC::mojom::kRoutingIdNone,
            /*renderer_initiated_creation=*/false,
@@ -2685,7 +2590,7 @@ index 9629b27b22..f610b88188 100644
                        kSwapForCrossBrowsingInstanceNavigations
                ? render_frame_host_->browsing_context_state()
                : nullptr,
-@@ -5087,8 +5087,8 @@ RenderFrameHostManager::GetFrameTokenForSiteInstanceGroup(
+@@ -5150,8 +5150,8 @@ RenderFrameHostManager::GetFrameTokenForSiteInstanceGroup(
    // instance after a browsing instance swap, and we want to ensure that this
    // doesn't break anything, so we tie it to the GetBrowsingContextMode which
    // needs it and is disabled-by-default)
@@ -2696,7 +2601,7 @@ index 9629b27b22..f610b88188 100644
                kSwapForCrossBrowsingInstanceNavigations &&
        !render_frame_host_->GetSiteInstance()
             ->group()
-@@ -5239,8 +5239,8 @@ void RenderFrameHostManager::CommitPending(
+@@ -5302,8 +5302,8 @@ void RenderFrameHostManager::CommitPending(
      // because in the new implementation, proxies will be swapped/restored
      // whenever the RenderFrameHost (and internal BrowsingContextState) is
      // restored.
@@ -2708,24 +2613,78 @@ index 9629b27b22..f610b88188 100644
        BrowsingContextState::RenderFrameProxyHostMap proxy_hosts_to_restore =
            pending_stored_page->TakeProxyHosts();
 diff --git a/content/browser/renderer_host/render_process_host_impl.cc b/content/browser/renderer_host/render_process_host_impl.cc
-index 1a542a36af..e5cb179e00 100644
+index 20aa9f764e..28e7b18fe3 100644
 --- a/content/browser/renderer_host/render_process_host_impl.cc
 +++ b/content/browser/renderer_host/render_process_host_impl.cc
-@@ -1848,7 +1848,7 @@ bool RenderProcessHostImpl::Init() {
-     InitializeChannelProxy();
+@@ -1827,7 +1827,7 @@ RenderProcessHostImpl::~RenderProcessHostImpl() {
+   UnregisterHost(GetID());
+ 
+   // Remove the cache handles for the client at teardown if relevant.
+-  if (features::IsShaderDiskCacheEnabled(
++  if (::features::IsShaderDiskCacheEnabled(
+           base::CommandLine::ForCurrentProcess())) {
+     if (GetGpuDiskCacheFactorySingleton()) {
+         gpu_client_->RemoveDiskCacheHandles();
+@@ -1927,7 +1927,7 @@ bool RenderProcessHostImpl::Init() {
+   // stored on the channels. Note that we also check if the factory is
+   // initialized because in tests the factory may never have been initialized.
+   if (!GetBrowserContext()->IsOffTheRecord() &&
+-      features::IsShaderDiskCacheEnabled(
++      ::features::IsShaderDiskCacheEnabled(
+           base::CommandLine::ForCurrentProcess())) {
+     if (auto* cache_factory = GetGpuDiskCacheFactorySingleton()) {
+       for (const gpu::GpuDiskCacheType type : gpu::kGpuDiskCacheTypes) {
+@@ -3627,8 +3627,8 @@ bool RenderProcessHostImpl::ShouldPauseChannelUntilProcessLaunched() {
    }
  
--  if (base::FeatureList::IsEnabled(features::kSendGPUChannelEarly)) {
-+  if (base::FeatureList::IsEnabled(::features::kSendGPUChannelEarly)) {
-     // Pre-establish the GPU channel and send the renderer pipe at renderer
-     // launch time.
-     gpu_client_->InitializeGpuChannelForNewRenderer(
-@@ -3609,7 +3609,7 @@ void RenderProcessHostImpl::AppendRendererCommandLine(
-     command_line->AppendSwitch(switches::kTopChromeWebUI);
+   if (base::FeatureList::IsEnabled(
+-          features::kSkipIPCChannelPausingForNonGuests)) {
+-    if (features::kSkipIPCChannelPausingForNonGuestsInternalWebUiOnly.Get()) {
++          ::features::kSkipIPCChannelPausingForNonGuests)) {
++    if (::features::kSkipIPCChannelPausingForNonGuestsInternalWebUiOnly.Get()) {
+ #if !BUILDFLAG(IS_ANDROID)
+       // Skip pausing if we're on initial WebUI, so return false in that case.
+       return !IsForTopChromeWebUI();
+@@ -6143,7 +6143,7 @@ bool RenderProcessHostImpl::CanUseWarmUpConnection() {
+   // TODO(crbug.com/455620851): Remove the function after finishing the
+   // holdback experiment.
+   return base::FeatureList::IsEnabled(
+-             features::kSpareRendererUseWarmupConnection) ||
++             ::features::kSpareRendererUseWarmupConnection) ||
+          !HasSpareRendererPriority();
+ }
+ 
+diff --git a/content/browser/renderer_host/render_process_host_impl_receiver_bindings.cc b/content/browser/renderer_host/render_process_host_impl_receiver_bindings.cc
+index db280b0576..66fd0c8244 100644
+--- a/content/browser/renderer_host/render_process_host_impl_receiver_bindings.cc
++++ b/content/browser/renderer_host/render_process_host_impl_receiver_bindings.cc
+@@ -224,7 +224,7 @@ void RenderProcessHostImpl::RegisterMojoInterfaces() {
+       FontUniqueNameLookupService::GetTaskRunner());
+ #endif
+ #if BUILDFLAG(IS_WIN)
+-  if (!features::IsFontDataServiceEnabled()) {
++  if (!::features::IsFontDataServiceEnabled()) {
+     // DWriteFontProxy is superseded by FontDataService.
+     registry->AddInterface(
+         base::BindRepeating(&DWriteFontProxyImpl::Create),
+@@ -346,7 +346,7 @@ void RenderProcessHostImpl::IOThreadHostImpl::BindHostReceiver(
    }
  
--  if (base::FeatureList::IsEnabled(features::kSendGPUChannelEarly)) {
-+  if (base::FeatureList::IsEnabled(::features::kSendGPUChannelEarly)) {
-     command_line->AppendSwitchASCII(
-         switches::kGpuClientId, base::NumberToString(gpu_client_->client_id()));
-   }
+ #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+-  if (features::IsFontDataServiceEnabled()) {
++  if (::features::IsFontDataServiceEnabled()) {
+     if (auto font_data_receiver =
+             receiver.As<font_data_service::mojom::FontDataService>()) {
+       font_data_service::FontDataServiceImpl::ConnectToFontService(
+--- a/content/browser/renderer_host/render_process_host_impl.cc
++++ b/content/browser/renderer_host/render_process_host_impl.cc
+@@ -3608,8 +3608,8 @@
+ }
+ 
+ bool RenderProcessHostImpl::ShouldSendGpuChannelEarly() const {
+-  return base::FeatureList::IsEnabled(features::kSendGPUChannelEarly) &&
+-         (!features::kSendGPUChannelEarlyTopChromeOnly.Get() ||
++  return base::FeatureList::IsEnabled(::features::kSendGPUChannelEarly) &&
++         (!::features::kSendGPUChannelEarlyTopChromeOnly.Get() ||
+           IsForTopChromeWebUI());
+ }

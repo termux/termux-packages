@@ -1,0 +1,35 @@
+--- a/src/os/unix/dir.cpp
++++ b/src/os/unix/dir.cpp
+@@ -210,7 +210,7 @@ stringT pws_os::getxmldir(void)
+ #ifdef __FreeBSD__
+   xmldir = _T("/usr/local/share/pwsafe/xml/");
+ #else
+-  xmldir = _T("/usr/share/passwordsafe/xml/");
++  xmldir = _T("@TERMUX_PREFIX@/share/passwordsafe/xml/");
+ #endif
+   }
+   return xmldir;
+@@ -223,7 +223,7 @@ stringT pws_os::gethelpdir(void)
+ #if defined( __FreeBSD__) || defined(__OpenBSD)
+     helpdir = _T("/usr/local/share/doc/passwordsafe/help/");
+ #else
+-    helpdir = _T("/usr/share/passwordsafe/help/");
++    helpdir = _T("@TERMUX_PREFIX@/share/passwordsafe/help/");
+ #endif
+   }
+   return helpdir;
+--- a/src/ui/wxWidgets/PWSafeApp.cpp
++++ b/src/ui/wxWidgets/PWSafeApp.cpp
+@@ -220,9 +220,9 @@ void PWSafeApp::Init()
+ {
+   pws_os::install_cleanup_handler(cleanup_handler, &m_core);
+   m_locale = new wxLocale;
+-  wxLocale::AddCatalogLookupPathPrefix(L"/usr/share/locale");
+-  wxLocale::AddCatalogLookupPathPrefix(L"/usr");
+-  wxLocale::AddCatalogLookupPathPrefix(L"/usr/local");
++  wxLocale::AddCatalogLookupPathPrefix(L"@TERMUX_PREFIX@/share/locale");
++  wxLocale::AddCatalogLookupPathPrefix(L"@TERMUX_PREFIX@");
++  wxLocale::AddCatalogLookupPathPrefix(L"@TERMUX_PREFIX@/local");
+ #if defined(__WXDEBUG__) || defined(_DEBUG) || defined(DEBUG)
+   wxLocale::AddCatalogLookupPathPrefix(L"../I18N/mos");
+   wxLocale::AddCatalogLookupPathPrefix(L"src/ui/wxWidgets/I18N/mos"); // located in cmake's build directory

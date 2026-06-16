@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE='https://invent.kde.org/frameworks/solid'
 TERMUX_PKG_DESCRIPTION='Hardware integration and detection'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.26.0"
+TERMUX_PKG_VERSION="6.27.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/solid-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=85cfab9b0787f59478661140997c485fadab62cec535ffcef2953d312f736c4a
+TERMUX_PKG_SHA256=70a9ee69b4357ebf83cc87aa61db6fdff8c96a59e24f9572e51716f1d3c579fe
 TERMUX_PKG_DEPENDS="libimobiledevice, libplist, qt6-qtbase, libc++, upower, util-linux"
 # media-player-info, systemd-libs, udisks2 can be added to TERMUX_PKG_DEPENDS when available
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION%.*}), qt6-qtdeclarative, qt6-qttools"

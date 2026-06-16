@@ -4,11 +4,11 @@ TERMUX_PKG_DESCRIPTION="Telegram Desktop Client"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LEGAL"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.8.2"
+TERMUX_PKG_VERSION="6.9.3"
 TERMUX_PKG_SRCURL="https://github.com/telegramdesktop/tdesktop/releases/download/v$TERMUX_PKG_VERSION/tdesktop-$TERMUX_PKG_VERSION-full.tar.gz"
-TERMUX_PKG_SHA256=cce1c196ef00703e9872d7072defd14860c970effc52d52d990745c8dca16cac
-TERMUX_PKG_DEPENDS="abseil-cpp, boost, ffmpeg, glib, hicolor-icon-theme, hunspell, kf6-kcoreaddons, libandroid-shmem, libc++, libdispatch, libdrm, libjxl, liblz4, libminizip, protobuf, librnnoise, libsigc++-3.0, libx11, libxcomposite, libxdamage, libxrandr, libxtst, openal-soft, opengl, openh264, openssl, pipewire, pulseaudio, qt6-qtbase, qt6-qtimageformats, qt6-qtsvg, xxhash, zlib"
-TERMUX_PKG_BUILD_DEPENDS="ada, aosp-libs, boost-headers, glib-cross, qt6-qtbase-cross-tools"
+TERMUX_PKG_SHA256=5e9233d4c07f717e38f414c5aca16782a3326e428ded388513c79f950acb1610
+TERMUX_PKG_DEPENDS="abseil-cpp, boost, ffmpeg, glib, hicolor-icon-theme, hunspell, kf6-kcoreaddons, libandroid-shmem, libc++, libdispatch, libdrm, libjxl, liblz4, libminizip, protobuf, librnnoise, libsigc++-3.0, libx11, libxcomposite, libxdamage, libxrandr, libxtst, openal-soft, opengl, openh264, openssl, pipewire, pulseaudio, qt6-qtbase, qt6-qtimageformats, qt6-shadertools, qt6-qtsvg, xxhash, zlib"
+TERMUX_PKG_BUILD_DEPENDS="ada, aosp-libs, boost-headers, glib-cross, qt6-qtbase-cross-tools, qt6-shadertools-cross-tools"
 TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_AUTO_UPDATE=true
 
@@ -243,6 +243,7 @@ termux_step_configure() {
 
 		CPPFLAGS+=" -DG_VA_COPY_AS_ARRAY=0"
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DPROTOBUF_PROTOC_EXECUTABLE=$(command -v protoc)"
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DQSB_EXECUTABLE=$TERMUX_PREFIX/opt/qt6/cross/lib/qt6/bin/qsb"
 
 		mkdir -p "$TERMUX_PKG_TMPDIR/bin"
 		local _type

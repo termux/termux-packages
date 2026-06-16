@@ -185,6 +185,25 @@ https://github.com/landley/toybox/commit/20eb4585a140a4bcd7901d4892a3222ff9f0d12
  #define CFG_SULOGIN 0
  #define USE_SULOGIN(...)
  #define CFG_SWAPOFF 1
+--- a/external/toybox/generated/flags.h
++++ b/external/toybox/generated/flags.h
+@@ -5339,11 +5339,11 @@
+ #ifndef TT
+ #define TT this.su
+ #endif
+-#define FLAG_s (FORCED_FLAG<<0)
+-#define FLAG_c (FORCED_FLAG<<1)
+-#define FLAG_p (FORCED_FLAG<<2)
+-#define FLAG_m (FORCED_FLAG<<3)
+-#define FLAG_l (FORCED_FLAG<<4)
++#define FLAG_s (1<<0)
++#define FLAG_c (1<<1)
++#define FLAG_p (1<<2)
++#define FLAG_m (1<<3)
++#define FLAG_l (1<<4)
+ #endif
+ 
+ #ifdef FOR_sulogin
 --- a/external/toybox/toys/lsb/su.c
 +++ b/external/toybox/toys/lsb/su.c
 @@ -41,9 +41,8 @@ static char *snapshot_env(char *name)
@@ -225,3 +244,12 @@ https://github.com/landley/toybox/commit/20eb4585a140a4bcd7901d4892a3222ff9f0d12
    }
  
    up = xgetpwnam(name);
+@@ -86,7 +86,7 @@ void su_main()
+     *(argv++) = "-l";
+     xchdir(up->pw_dir);
+   } else unsetenv("IFS");
+-  setenv("PATH", "/sbin:/bin:/usr/sbin:/usr/bin", 1);
++  setenv("PATH", "/system/bin", 1);
+   if (!(toys.optflags & (FLAG_m|FLAG_p))) {
+     setenv("HOME", up->pw_dir, 1);
+     setenv("SHELL", up->pw_shell, 1);

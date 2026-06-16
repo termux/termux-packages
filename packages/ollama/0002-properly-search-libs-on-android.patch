@@ -1,11 +1,11 @@
 --- a/ml/path.go
 +++ b/ml/path.go
-@@ -27,7 +27,7 @@
- 	switch runtime.GOOS {
- 	case "windows":
- 		libPath = filepath.Join(filepath.Dir(exe), "lib", "ollama")
--	case "linux":
-+	case "linux", "android":
- 		libPath = filepath.Join(filepath.Dir(exe), "..", "lib", "ollama")
- 	case "darwin":
- 		libPath = filepath.Dir(exe)
+@@ -82,7 +82,7 @@
+ 			// Local dist output and standard installs keep helpers under lib/ollama.
+ 			add(filepath.Join(exeDir, "lib", "ollama"))
+ 			add(filepath.Join(exeDir, "..", "lib", "ollama"))
+-		case "linux":
++		case "linux", "android":
+ 			add(filepath.Join(exeDir, "..", "lib", "ollama"))
+ 			add(filepath.Join(exeDir, "lib", "ollama"))
+ 		case "windows":
