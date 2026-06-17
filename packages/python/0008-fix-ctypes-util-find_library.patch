@@ -1,10 +1,10 @@
 This was introduced in https://github.com/python/cpython/commit/1f8b24ef69896680d6ba6005e75e1cc79a744f9e but breaks our builds as we need directories from other paths as well
 
 diff --git a/Lib/ctypes/util.py b/Lib/ctypes/util.py
-index 117bf06cb01..12d7428fe9a 100644
+index 3b21658433b..9c40a9fa618 100644
 --- a/Lib/ctypes/util.py
 +++ b/Lib/ctypes/util.py
-@@ -89,15 +89,6 @@ def find_library(name):
+@@ -170,15 +170,6 @@ def dllist():
  
      from ctypes._aix import find_library
  
@@ -17,6 +17,6 @@ index 117bf06cb01..12d7428fe9a 100644
 -        fname = f"{directory}/lib{name}.so"
 -        return fname if os.path.isfile(fname) else None
 -
- elif os.name == "posix":
-     # Andreas Degert's find functions, using gcc, /sbin/ldconfig, objdump
-     import re, tempfile
+ elif sys.platform == "emscripten":
+     def _is_wasm(filename):
+         # Return True if the given file is an WASM module
