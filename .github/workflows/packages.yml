@@ -254,6 +254,27 @@ jobs:
       run: |
         ./scripts/free-space.sh
 
+    - name: List packages that are still installed on the server
+      if: ${{ steps.build-info.outputs.free-space == 'true' && steps.build-info.outputs.skip-building != 'true' && runner.debug }}
+      run: |
+        dpkg-query -W -f='${Installed-size} ${Package}\n' | sort -n
+
+    - name: List directory size for debug
+      if: ${{ steps.build-info.outputs.free-space == 'true' && steps.build-info.outputs.skip-building != 'true' && runner.debug }}
+      run: |
+        size() {
+          echo "Directory size info for '$1':"
+          du --bytes "$1" --max-depth 1 | sort -n
+          echo
+          echo
+          echo
+        }
+        size /
+        size /usr
+        size /var
+        size /var/lib
+        size /var/
+
     - name: Build packages
       if: ${{ steps.build-info.outputs.skip-building != 'true' }}
       run: |
