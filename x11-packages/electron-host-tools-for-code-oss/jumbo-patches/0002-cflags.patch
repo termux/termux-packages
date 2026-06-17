@@ -12,13 +12,13 @@ index 74594e1a36..daf977b133 100644
 --- a/build/config/compiler/BUILD.gn
 +++ b/build/config/compiler/BUILD.gn
 @@ -2219,6 +2219,10 @@ config("default_warnings") {
-   cflags += [
-     "-Wno-unknown-warning-option",
-     "-Wno-unknown-pragmas",
+     cflags += [
+       "-Wno-unknown-warning-option",
+       "-Wno-unknown-pragmas",
 +
-+    # Treat macro redefined as error
-+    # In jumbo build, it may cause undefined behavior
-+    "-Werror=macro-redefined",
-   ]
++      # Treat macro redefined as error
++      # In jumbo build, it may cause undefined behavior
++      "-Werror=macro-redefined",
+     ]
+   }
  
-   # Rust warnings

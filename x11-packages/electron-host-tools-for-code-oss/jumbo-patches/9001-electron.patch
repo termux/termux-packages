@@ -677,26 +677,17 @@ diff --git a/electron/shell/browser/api/electron_api_safe_storage.cc b/electron/
 index f9ecdd0734..52d640bfa5 100644
 --- a/electron/shell/browser/api/electron_api_safe_storage.cc
 +++ b/electron/shell/browser/api/electron_api_safe_storage.cc
-@@ -12,7 +12,7 @@
- #include "shell/common/gin_helper/dictionary.h"
- #include "shell/common/node_includes.h"
+@@ -345,6 +345,8 @@
  
--namespace {
+ }  // namespace electron::api
+ 
 +namespace a_electron_browser_safe_storage {
- 
- const char* kEncryptionVersionPrefixV10 = "v10";
- const char* kEncryptionVersionPrefixV11 = "v11";
-@@ -125,8 +125,6 @@ std::string DecryptString(v8::Isolate* isolate, v8::Local<v8::Value> buffer) {
-   return plaintext;
- }
- 
--}  // namespace
--
++
  void Initialize(v8::Local<v8::Object> exports,
                  v8::Local<v8::Value> unused,
                  v8::Local<v8::Context> context,
-@@ -142,4 +140,9 @@ void Initialize(v8::Local<v8::Object> exports,
-   dict.SetMethod("setUsePlainTextEncryption", &SetUsePasswordV10);
+@@ -354,4 +356,9 @@
+   dict.Set("safeStorage", electron::api::SafeStorage::Create(isolate));
  }
  
 -NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_safe_storage, Initialize)
@@ -1740,3 +1731,46 @@ index ef288ce49b..9acefb179a 100644
 -NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_msix_updater, Initialize)
 +NODE_LINKED_BINDING_CONTEXT_AWARE(electron_browser_msix_updater, a_electron_api_msix_updater::Initialize)
 +#undef _module
+--- a/electron/shell/browser/extensions/electron_extension_tab_util.cc
++++ b/electron/shell/browser/extensions/electron_extension_tab_util.cc
+@@ -9,10 +9,10 @@
+ 
+ namespace extensions {
+ 
+-electron::api::WebContents* GetElectronTabById(
++::electron::api::WebContents* GetElectronTabById(
+     int tab_id,
+     content::BrowserContext* browser_context) {
+-  auto* contents = electron::api::WebContents::FromID(tab_id);
++  auto* contents = ::electron::api::WebContents::FromID(tab_id);
+   if (!contents || !contents->web_contents())
+     return nullptr;
+   if (contents->web_contents()->GetBrowserContext() != browser_context)
+--- a/electron/shell/browser/extensions/electron_extension_tab_util.h
++++ b/electron/shell/browser/extensions/electron_extension_tab_util.h
+@@ -20,7 +20,7 @@
+ // treated as nonexistent so that an extension loaded into one Session cannot
+ // observe or operate on windows belonging to another Session, matching
+ // Chrome's profile-scoped ExtensionTabUtil::GetTabById semantics.
+-electron::api::WebContents* GetElectronTabById(
++::electron::api::WebContents* GetElectronTabById(
+     int tab_id,
+     content::BrowserContext* browser_context);
+ 
+--- a/electron/shell/browser/ui/views/frameless_view.cc
++++ b/electron/shell/browser/ui/views/frameless_view.cc
+@@ -12,6 +12,8 @@
+ #include "ui/views/widget/widget.h"
+ #include "ui/views/widget/widget_delegate.h"
+ 
++#define kResizeInsideBoundsSize kResizeInsideBoundsSize_frameless_view
++
+ namespace electron {
+ 
+ namespace {
+@@ -133,3 +135,5 @@
+ END_METADATA
+ 
+ }  // namespace electron
++
++#undef kResizeInsideBoundsSize

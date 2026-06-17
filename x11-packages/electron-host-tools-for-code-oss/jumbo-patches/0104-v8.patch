@@ -58,7 +58,7 @@ index 05490a65a0..b759021b2a 100644
  import("//build/config/mips.gni")
  import("//build/config/riscv.gni")
  import("//build/config/rust.gni")
-@@ -3101,26 +3102,54 @@ v8_source_set("v8_initializers") {
+@@ -3101,26 +3102,55 @@ v8_source_set("v8_initializers") {
      }
    }
  
@@ -76,6 +76,7 @@ index 05490a65a0..b759021b2a 100644
 +    "src/ic/binary-op-assembler.cc",
 +    "src/ic/unary-op-assembler.cc",
 +    "src/interpreter/interpreter-generator.cc",
++    "src/compiler/turboshaft/builtin-compiler.cc",
 +  ]
 +
    if (v8_current_cpu == "x86") {
@@ -113,7 +114,7 @@ index 05490a65a0..b759021b2a 100644
    } else if (v8_current_cpu == "mips64" || v8_current_cpu == "mips64el") {
      sources += [
        ### gcmole(mips64el) ###
-@@ -5200,6 +5229,24 @@ v8_compiler_sources = [
+@@ -5200,6 +5229,25 @@ v8_compiler_sources = [
    "src/compiler/zone-stats.cc",
  ]
  
@@ -133,6 +134,7 @@ index 05490a65a0..b759021b2a 100644
 +  "src/compiler/turboshaft/csa-load-elimination-phase.cc",
 +  "src/compiler/turboshaft/csa-memory-optimization-phase.cc",
 +  "src/compiler/turboshaft/pipelines.cc",
++  "src/compiler/turboshaft/turbolev-frontend-pipeline.cc",
 +]
 +
  if (!v8_enable_maglev) {
@@ -368,25 +370,6 @@ index bb743f3552..c4e4cb0348 100644
    }
  
    FloatRegister GetFloatRegister() const {
-diff --git a/v8/src/compiler/heap-refs.cc b/v8/src/compiler/heap-refs.cc
-index 81f0a42..2a8299b 100644
---- a/v8/src/compiler/heap-refs.cc
-+++ b/v8/src/compiler/heap-refs.cc
-@@ -27,6 +27,8 @@
- #include "src/objects/property-cell.h"
- #include "src/objects/template-objects-inl.h"
- 
-+#define Is64 Is64_HeapRefs
-+
- namespace v8 {
- namespace internal {
- namespace compiler {
-@@ -2542,3 +2544,5 @@
- }  // namespace compiler
- }  // namespace internal
- }  // namespace v8
-+
-+#undef Is64
 diff --git a/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc b/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc
 index cc5b406f1b..9fac217286 100644
 --- a/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc
@@ -741,19 +724,14 @@ diff --git a/v8/src/objects/js-atomics-synchronization.h b/v8/src/objects/js-ato
 index 73a03828db..8b458f2fba 100644
 --- a/v8/src/objects/js-atomics-synchronization.h
 +++ b/v8/src/objects/js-atomics-synchronization.h
-@@ -29,11 +29,11 @@ template <typename T>
- class AsyncWaiterQueueNode;
+@@ -27,8 +27,8 @@
+ class WaiterQueueNode;
  }  // namespace detail
  
 -using detail::WaiterQueueLockGuard;
 -using detail::WaiterQueueNode;
--using LockAsyncWaiterQueueNode = detail::AsyncWaiterQueueNode<JSAtomicsMutex>;
 +using internal::detail::WaiterQueueLockGuard;
 +using internal::detail::WaiterQueueNode;
-+using LockAsyncWaiterQueueNode = internal::detail::AsyncWaiterQueueNode<JSAtomicsMutex>;
- using WaitAsyncWaiterQueueNode =
--    detail::AsyncWaiterQueueNode<JSAtomicsCondition>;
-+    internal::detail::AsyncWaiterQueueNode<JSAtomicsCondition>;
  
  // JSSynchronizationPrimitive is the base class for JSAtomicsMutex and
  // JSAtomicsCondition. It contains a 32-bit state field and a pointer to a
@@ -843,7 +821,7 @@ diff --git a/v8/src/regexp/experimental/experimental-compiler.cc b/v8/src/regexp
 index 7bee9f1179..391dac8cad 100644
 --- a/v8/src/regexp/experimental/experimental-compiler.cc
 +++ b/v8/src/regexp/experimental/experimental-compiler.cc
-@@ -224,7 +224,7 @@ bool ExperimentalRegExpCompiler::CanBeHandled(RegExpTree* tree,
+@@ -219,7 +219,7 @@
    return CanBeHandledVisitor::Check(tree, flags, capture_count);
  }
  
@@ -852,15 +830,15 @@ index 7bee9f1179..391dac8cad 100644
  
  // A label in bytecode which starts with no known address. The address *must*
  // be bound with `Bind` before the label goes out of scope.
-@@ -1226,7 +1226,7 @@ class CompileVisitor : private RegExpVisitor {
+@@ -1218,7 +1218,7 @@
  
- ZoneList<RegExpInstruction> ExperimentalRegExpCompiler::Compile(
-     RegExpTree* tree, RegExpFlags flags, Zone* zone) {
+ ZoneList<Instruction> ExperimentalCompiler::Compile(Tree* tree, Flags flags,
+                                                     Zone* zone) {
 -  return CompileVisitor::Compile(tree, flags, zone);
 +  return experimental::CompileVisitor::Compile(tree, flags, zone);
  }
  
- }  // namespace internal
+ }  // namespace regexp
 diff --git a/v8/src/regexp/regexp-compiler-tonode.cc b/v8/src/regexp/regexp-compiler-tonode.cc
 index fd5589921d..190e9ee025 100644
 --- a/v8/src/regexp/regexp-compiler-tonode.cc
@@ -884,14 +862,14 @@ diff --git a/v8/src/sandbox/testing.cc b/v8/src/sandbox/testing.cc
 index 52d7395145..d96f56f433 100644
 --- a/v8/src/sandbox/testing.cc
 +++ b/v8/src/sandbox/testing.cc
-@@ -20,6 +20,7 @@
+@@ -29,6 +29,7 @@
  #include <sys/mman.h>
  #include <sys/ucontext.h>
  #include <unistd.h>
 +#undef MAP_TYPE
- #endif  // V8_OS_LINUX
  
- #ifdef V8_USE_ADDRESS_SANITIZER
+ #include "src/base/platform/platform-linux.h"
+ #endif  // V8_OS_LINUX
 diff --git a/v8/src/snapshot/read-only-deserializer.cc b/v8/src/snapshot/read-only-deserializer.cc
 index 24e770f1ab..3568071acb 100644
 --- a/v8/src/snapshot/read-only-deserializer.cc
@@ -941,24 +919,6 @@ index 4b1d2bd42b..f55c0b4aec 100644
 +
 +#undef ror
 +#undef shr
-diff --git a/v8/src/wasm/wasm-external-refs.cc b/v8/src/wasm/wasm-external-refs.cc
-index 2be79a9db1..faa205ef32 100644
---- a/v8/src/wasm/wasm-external-refs.cc
-+++ b/v8/src/wasm/wasm-external-refs.cc
-@@ -715,6 +715,8 @@ V ReadAndIncrementOffset(Address data, size_t* offset) {
-   return result;
- }
- 
-+#define kSuccess kSuccess_WASMExternalRefs
-+
- constexpr int32_t kSuccess = 1;
- constexpr int32_t kOutOfBounds = 0;
- }  // namespace
-@@ -1122,3 +1124,4 @@ Address load_old_fp(Isolate* isolate) {
- 
- #undef V8_WITH_SANITIZER
- #undef RESET_THREAD_IN_WASM_FLAG_FOR_ASAN_ON_WINDOWS
-+#undef kSuccess
 diff --git a/v8/src/compiler/revectorizer.cc b/v8/src/compiler/revectorizer.cc
 index 1d332c42ae..dc9e3906b6 100644
 --- a/v8/src/compiler/revectorizer.cc
@@ -997,13 +957,139 @@ index ddf3b81c7a..f6548579c7 100644
 +#undef TRACE
 +
  }  // namespace v8::internal::maglev
-diff --git a/v8/src/compiler/turboshaft/turbolev-graph-builder.cc b/v8/src/compiler/turboshaft/turbolev-graph-builder.cc
-index d80362036d..18246136c0 100644
---- a/v8/src/compiler/turboshaft/turbolev-graph-builder.cc
-+++ b/v8/src/compiler/turboshaft/turbolev-graph-builder.cc
-@@ -6665,3 +6665,5 @@ std::optional<BailoutReason> TurbolevGraphBuildingPhase::Run(PipelineData* data,
- #include "src/compiler/turboshaft/undef-assembler-macros.inc"
+diff --git a/v8/BUILD.gn b/v8/BUILD.gn
+index d91aea71f1..fe232e23b4 100644
+--- a/v8/BUILD.gn
++++ b/v8/BUILD.gn
+@@ -5344,6 +5344,10 @@ if (!v8_enable_maglev) {
+     "src/maglev/maglev-phi-representation-selector.cc",
+     "src/maglev/maglev-truncation.cc",
+   ]
++  v8_compiler_sources_jumbo_excluded += [
++    # call to 'DestructivelyIntersect' is ambiguous
++    "src/maglev/maglev-known-node-aspects.cc",
++  ]
+ }
+ 
+ if (v8_current_cpu == "x86") {
+@@ -6112,6 +6116,10 @@ v8_source_set("v8_base_without_compiler") {
+       "src/maglev/maglev-truncation.cc",
+       "src/maglev/maglev.cc",
+     ]
++    jumbo_excluded_sources += [
++      # call to 'DestructivelyIntersect' is ambiguous
++      "src/maglev/maglev-known-node-aspects.cc",
++    ]
+     if (v8_current_cpu == "arm") {
+       sources += [
+         "src/maglev/arm/maglev-assembler-arm.cc",
+diff --git a/v8/src/compiler/turboshaft/wasm-shuffle-reducer.cc b/v8/src/compiler/turboshaft/wasm-shuffle-reducer.cc
+index 68e56a28b8..d025caf4cb 100644
+--- a/v8/src/compiler/turboshaft/wasm-shuffle-reducer.cc
++++ b/v8/src/compiler/turboshaft/wasm-shuffle-reducer.cc
+@@ -518,3 +518,5 @@ void WasmShuffleAnalyzer::ProcessShuffle(const Simd128ShuffleOp& shuffle) {
+ }
  
  }  // namespace v8::internal::compiler::turboshaft
 +
 +#undef TRACE
+diff --git a/v8/src/regexp/regexp-compiler-tonode.cc b/v8/src/regexp/regexp-compiler-tonode.cc
+index 24ff99c950..0a3a077905 100644
+--- a/v8/src/regexp/regexp-compiler-tonode.cc
++++ b/v8/src/regexp/regexp-compiler-tonode.cc
+@@ -2329,4 +2329,6 @@ RegExpNode* RegExpQuantifier::ToNode(int min, int max, bool is_greedy,
+ }  // namespace internal
+ }  // namespace v8
+ 
++#undef TRACE
++#undef TRACE_WITH_NODE
+ #undef kMaxCodePoint
+diff --git a/v8/src/codegen/arm64/instructions-arm64.cc b/v8/src/codegen/arm64/instructions-arm64.cc
+index 4ead67d303..6cad6669c2 100644
+--- a/v8/src/codegen/arm64/instructions-arm64.cc
++++ b/v8/src/codegen/arm64/instructions-arm64.cc
+@@ -9,6 +9,8 @@
+ #include "src/codegen/arm64/assembler-arm64-inl.h"
+ #include "src/common/code-memory-access-inl.h"
+ 
++#define RotateRight RotateRight_InstructionsARM64
++
+ namespace v8 {
+ namespace internal {
+ 
+@@ -415,4 +417,6 @@ uint8_t NEONFormatDecoder::PickBits(const uint8_t bits[]) {
+ }  // namespace internal
+ }  // namespace v8
+ 
++#undef RotateRight
++
+ #endif  // V8_TARGET_ARCH_ARM64
+diff --git a/v8/src/compiler/heap-refs.cc b/v8/src/compiler/heap-refs.cc
+index a962ce78f0..5d0cf0fa43 100644
+--- a/v8/src/compiler/heap-refs.cc
++++ b/v8/src/compiler/heap-refs.cc
+@@ -31,6 +31,8 @@
+ #include "src/objects/struct-inl.h"
+ #include "src/objects/template-objects-inl.h"
+ 
++#define Is64 Is64_HeapRefs
++
+ namespace v8 {
+ namespace internal {
+ namespace compiler {
+@@ -2653,3 +2655,5 @@ unsigned CodeRef::GetInlinedBytecodeSize() const {
+ }  // namespace compiler
+ }  // namespace internal
+ }  // namespace v8
++
++#undef Is64
+diff --git a/v8/src/objects/call-site-info.h b/v8/src/objects/call-site-info.h
+index cb4d8433f1..a6e63ec2f4 100644
+--- a/v8/src/objects/call-site-info.h
++++ b/v8/src/objects/call-site-info.h
+@@ -23,7 +23,7 @@ class StructBodyDescriptor;
+ 
+ #include "torque-generated/src/objects/call-site-info-tq.inc"
+ 
+-V8_OBJECT class CallSiteInfo : public StructLayout {
++V8_OBJECT class CallSiteInfo : public v8::internal::StructLayout {
+  public:
+   DEFINE_TORQUE_GENERATED_CALL_SITE_INFO_FLAGS()
+ 
+diff --git a/v8/src/objects/property-descriptor-object.h b/v8/src/objects/property-descriptor-object.h
+index fae3a4a038..0e310ad91a 100644
+--- a/v8/src/objects/property-descriptor-object.h
++++ b/v8/src/objects/property-descriptor-object.h
+@@ -16,7 +16,7 @@ namespace internal {
+ 
+ #include "torque-generated/src/objects/property-descriptor-object-tq.inc"
+ 
+-V8_OBJECT class PropertyDescriptorObject : public StructLayout {
++V8_OBJECT class PropertyDescriptorObject : public v8::internal::StructLayout {
+  public:
+   DEFINE_TORQUE_GENERATED_PROPERTY_DESCRIPTOR_OBJECT_FLAGS()
+ 
+diff --git a/v8/src/objects/template-objects.h b/v8/src/objects/template-objects.h
+index 5f3f87fc13..6c94801914 100644
+--- a/v8/src/objects/template-objects.h
++++ b/v8/src/objects/template-objects.h
+@@ -24,7 +24,7 @@ class StructBodyDescriptor;
+ // TemplateObjectDescription is a tuple of raw strings and cooked strings for
+ // tagged template literals. Used to communicate with the runtime for template
+ // object creation within the {Runtime_GetTemplateObject} method.
+-V8_OBJECT class TemplateObjectDescription final : public StructLayout {
++V8_OBJECT class TemplateObjectDescription final : public v8::internal::StructLayout {
+  public:
+   static DirectHandle<JSArray> GetTemplateObject(
+       Isolate* isolate, DirectHandle<NativeContext> native_context,
+--- a/v8/src/objects/arguments.h
++++ b/v8/src/objects/arguments.h
+@@ -64,7 +64,7 @@
+ // - the parameter map contains no fast alias mapping (i.e. the hole)
+ // - this struct (in the slow backing store) contains an index into the context
+ // - all attributes are available as part if the property details
+-V8_OBJECT class AliasedArgumentsEntry : public StructLayout {
++V8_OBJECT class AliasedArgumentsEntry : public v8::internal::StructLayout {
+  public:
+   inline int aliased_context_slot() const;
+   inline void set_aliased_context_slot(int value);
