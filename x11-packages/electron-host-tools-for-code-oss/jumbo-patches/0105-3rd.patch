@@ -413,25 +413,6 @@ index 0129beaec4..e3f0d88d57 100644
  }  // namespace quic
 +
 +#undef ENDPOINT
-diff --git a/net/third_party/quiche/src/quiche/quic/core/quic_stream_send_buffer.cc b/net/third_party/quiche/src/quiche/quic/core/quic_stream_send_buffer.cc
-index ad78782500..fecbd8006d 100644
---- a/net/third_party/quiche/src/quiche/quic/core/quic_stream_send_buffer.cc
-+++ b/net/third_party/quiche/src/quiche/quic/core/quic_stream_send_buffer.cc
-@@ -22,6 +22,8 @@
- #include "quiche/common/quiche_buffer_allocator.h"
- #include "quiche/common/quiche_mem_slice.h"
- 
-+#define CompareOffset CompareOffset_BufferedSlice
-+
- namespace quic {
- 
- namespace {
-@@ -194,3 +196,5 @@ QuicByteCount QuicStreamSendBuffer::TotalDataBufferedForTest() {
- }
- 
- }  // namespace quic
-+
-+#undef CompareOffset
 diff --git a/net/third_party/quiche/src/quiche/quic/core/quic_stream_send_buffer_inlining.cc b/net/third_party/quiche/src/quiche/quic/core/quic_stream_send_buffer_inlining.cc
 index bd4924e44a..d775d98c9a 100644
 --- a/net/third_party/quiche/src/quiche/quic/core/quic_stream_send_buffer_inlining.cc
@@ -497,3 +478,20 @@ index db16e21024..dbf02f0dee 100644
    sources = leveldb_sources
  
    configs -= [ "//build/config/compiler:chromium_code" ]
+--- a/net/third_party/quiche/src/quiche/oblivious_http/oblivious_http_gateway.cc
++++ b/net/third_party/quiche/src/quiche/oblivious_http/oblivious_http_gateway.cc
+@@ -23,6 +23,8 @@
+ #include "quiche/oblivious_http/common/oblivious_http_chunk_handler.h"
+ #include "quiche/oblivious_http/common/oblivious_http_header_key_config.h"
+ 
++#define kFinalChunkIndicator kFinalChunkIndicator_ObliviousHttpGateway
++
+ namespace quiche {
+ namespace {
+ constexpr uint64_t kFinalChunkIndicator = 0;
+@@ -356,3 +358,5 @@
+ }
+ 
+ }  // namespace quiche
++
++#undef kFinalChunkIndicator

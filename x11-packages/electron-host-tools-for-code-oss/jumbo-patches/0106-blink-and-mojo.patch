@@ -316,9 +316,9 @@ index 87b3bbe9ae..d3d7f411fa 100644
  # found in the LICENSE file.
  
 +import("//build/config/jumbo.gni")
+ import("//mojo/public/tools/bindings/mojom_rust.gni")
  import("//third_party/closure_compiler/closure_args.gni")
  import("//third_party/closure_compiler/compile_js.gni")
- import("//third_party/protobuf/proto_library.gni")
 @@ -1029,7 +1030,7 @@ template("mojom") {
    }
  
@@ -492,17 +492,15 @@ index 3ca42542b5..409c3941cc 100644
          properties,
          T("};"),
          EmptyNode(),
-@@ -740,10 +740,10 @@ def make_fill_template_properties_function(cg_context):
+@@ -740,9 +740,9 @@ def make_fill_template_properties_function(cg_context):
  
      if cg_context.dictionary.own_members:
          body.extend([
 -            T("static_assert(std::size(kOwnPropertyNames) "
 +            T("static_assert(std::size(kOwnPropertyNames_{}) ".format(cg_context.class_name) +
                "== kOwnPropertyCount);"),
--            T("properties.AppendRange(std::cbegin(kOwnPropertyNames),"
--              " std::cend(kOwnPropertyNames));"),
-+            T("properties.AppendRange(std::cbegin(kOwnPropertyNames_{}),".format(cg_context.class_name) +
-+              " std::cend(kOwnPropertyNames_{}));".format(cg_context.class_name)),
+-            T("properties.append_range(kOwnPropertyNames);"),
++            T("properties.append_range(kOwnPropertyNames_{});".format(cg_context.class_name)),
              T("DCHECK_EQ(properties.size(), kTotalPropertyCount);")
          ])
  
@@ -1423,48 +1421,6 @@ index 3a1da2ef67..8b4b48e393 100644
 +#undef SourceFrameForOptionalToken
 +#undef kFireInterval
 +#undef kLargeAdSizeToViewportSizeThreshold
-diff --git a/third_party/blink/renderer/core/frame/overlay_interstitial_ad_detector.cc b/third_party/blink/renderer/core/frame/overlay_interstitial_ad_detector.cc
-index 49ed8f6dcb..0a71a64cec 100644
---- a/third_party/blink/renderer/core/frame/overlay_interstitial_ad_detector.cc
-+++ b/third_party/blink/renderer/core/frame/overlay_interstitial_ad_detector.cc
-@@ -18,6 +18,9 @@
- #include "third_party/blink/renderer/core/paint/timing/paint_timing.h"
- #include "third_party/blink/renderer/core/scroll/scrollable_area.h"
- 
-+#define kFireInterval                       kFireInterval_OverlayInterstitialAdDetector
-+#define kLargeAdSizeToViewportSizeThreshold kLargeAdSizeToViewportSizeThreshold_OverlayInterstitialAdDetector
-+
- namespace blink {
- 
- namespace {
-@@ -234,3 +237,6 @@ void OverlayInterstitialAdDetector::OnPopupDetected(
- }
- 
- }  // namespace blink
-+
-+#undef kFireInterval
-+#undef kLargeAdSizeToViewportSizeThreshold
-diff --git a/third_party/blink/renderer/core/frame/sticky_ad_detector.cc b/third_party/blink/renderer/core/frame/sticky_ad_detector.cc
-index 8dd8e2c1e9..8eaa9917ae 100644
---- a/third_party/blink/renderer/core/frame/sticky_ad_detector.cc
-+++ b/third_party/blink/renderer/core/frame/sticky_ad_detector.cc
-@@ -20,6 +20,9 @@
- 
- #include <cstdlib>
- 
-+#define kFireInterval                       kFireInterval_StickyAdDetector
-+#define kLargeAdSizeToViewportSizeThreshold kLargeAdSizeToViewportSizeThreshold_StickyAdDetector
-+
- namespace blink {
- 
- namespace {
-@@ -151,3 +154,6 @@ void StickyAdDetector::OnLargeStickyAdDetected(
- }
- 
- }  // namespace blink
-+
-+#undef kFireInterval
-+#undef kLargeAdSizeToViewportSizeThreshold
 diff --git a/third_party/blink/renderer/core/html/anchor_element_metrics_sender.cc b/third_party/blink/renderer/core/html/anchor_element_metrics_sender.cc
 index 29bb02707f..b9685f1c1b 100644
 --- a/third_party/blink/renderer/core/html/anchor_element_metrics_sender.cc
@@ -2148,123 +2104,6 @@ index 12b25ffde8..83d1633b15 100644
 +#ifdef __clang__
 +#pragma clang diagnostic pop
 +#endif
-diff --git a/third_party/blink/renderer/core/timing/responsiveness_metrics.cc b/third_party/blink/renderer/core/timing/responsiveness_metrics.cc
-index 08406d2138..811fe144b0 100644
---- a/third_party/blink/renderer/core/timing/responsiveness_metrics.cc
-+++ b/third_party/blink/renderer/core/timing/responsiveness_metrics.cc
-@@ -32,6 +32,11 @@
- #include "third_party/perfetto/include/perfetto/tracing/track.h"
- #include "third_party/perfetto/include/perfetto/tracing/track_event.h"
- 
-+#ifdef __clang__
-+#pragma clang diagnostic push
-+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
-+#endif
-+
- namespace blink {
- 
- namespace {
-@@ -64,6 +69,10 @@ constexpr char kSlowInteractionToNextPaintTraceEventCategory[] = "latency";
- constexpr char kSlowInteractionToNextPaintTraceEventName[] =
-     "SlowInteractionToNextPaint";
- 
-+} // namespace {
-+
-+namespace responsiveness_metrics {
-+
- // These values are logged to UMA. Please keep in sync with
- // "EventTimingClickInteractionEvents" in tools/metrics/histograms/enums.xml.
- // LINT.IfChange
-@@ -81,6 +90,10 @@ enum ClickInteractionEvents {
- };
- // LINT.ThenChange(/tools/metrics/histograms/enums.xml:EventTimingClickInteractionEvents)
- 
-+} // namespace responsiveness_metrics {
-+
-+namespace {
-+
- void EmitSlowInteractionToNextPaintTraceEvent(
-     const ResponsivenessMetrics::EventTimestamps& event,
-     uint64_t event_id) {
-@@ -274,6 +287,7 @@ void ResponsivenessMetrics::RecordTapOrClickUKM(
- bool ResponsivenessMetrics::SetPointerIdAndRecordLatency(
-     PerformanceEventTiming* entry,
-     EventTimestamps event_timestamps) {
-+  using responsiveness_metrics::ClickInteractionEvents;
-   const AtomicString& event_type = entry->name();
-   auto pointer_id = entry->GetEventTimingReportingInfo()->pointer_id.value();
-   auto* pointer_info = pointer_id_entry_map_.Contains(pointer_id)
-@@ -801,3 +815,7 @@ bool ResponsivenessMetrics::TryHandleKeyboardEventSimulatedClick(
-   return true;
- }
- }  // namespace blink
-+
-+#ifdef __clang__
-+#pragma clang diagnostic pop
-+#endif
-diff --git a/third_party/blink/renderer/core/timing/soft_navigation_heuristics.cc b/third_party/blink/renderer/core/timing/soft_navigation_heuristics.cc
-index b011a33c54..30b5c74004 100644
---- a/third_party/blink/renderer/core/timing/soft_navigation_heuristics.cc
-+++ b/third_party/blink/renderer/core/timing/soft_navigation_heuristics.cc
-@@ -60,6 +60,11 @@ const char
-     kPageLoadInternalSoftNavigationNotEmittedInsufficientPaintTotalPaintAreaPercentage
-         [] = "PageLoad.Internal.SoftNavigation.NotEmittedInsufficientPaint."
-              "TotalPaintAreaPoints";
-+
-+} // namespace {
-+
-+namespace soft_navigation_heuristics {
-+
- // These values are logged to UMA. Entries should not be renumbered and numeric
- // values should never be reused. Please keep in sync with
- // "SoftNavigationOutcome" in tools/metrics/histograms/enums.xml. Note also that
-@@ -83,6 +88,10 @@ enum SoftNavigationOutcome {
- };
- // LINT.ThenChange(/tools/metrics/histograms/enums.xml:SoftNavigationOutcome)
- 
-+} // namespace soft_navigation_heuristics {
-+
-+namespace {
-+
- void OnSoftNavigationContextWasExhausted(const SoftNavigationContext& context,
-                                          uint64_t viewport_area,
-                                          uint64_t required_paint_area) {
-@@ -125,9 +134,11 @@ void OnSoftNavigationContextWasExhausted(const SoftNavigationContext& context,
-         kPageLoadInternalSoftNavigationEmittedTotalPaintAreaPoints,
-         base::saturated_cast<int>(points_val));
-   } else if (!context.HasDomModification()) {
-+    using namespace soft_navigation_heuristics;
-     base::UmaHistogramEnumeration(kPageLoadInternalSoftNavigationOutcome,
-                                   SoftNavigationOutcome::kNoDomModification);
-   } else if (!context.SatisfiesSoftNavPaintCriteria(required_paint_area)) {
-+    using namespace soft_navigation_heuristics;
-     base::UmaHistogramEnumeration(kPageLoadInternalSoftNavigationOutcome,
-                                   SoftNavigationOutcome::kInsufficientPaints);
-     uint64_t total_paint_area = context.PaintedArea();
-@@ -320,6 +331,7 @@ void SoftNavigationHeuristics::SameDocumentNavigationCommitted(
-                         "SoftNavigationHeuristics::"
-                         "SameDocumentNavigationCommittedWithoutContext",
-                         perfetto::Track::FromPointer(this), "url", url);
-+    using namespace soft_navigation_heuristics;
-     base::UmaHistogramEnumeration(
-         kPageLoadInternalSoftNavigationOutcome,
-         SoftNavigationOutcome::kNoSoftNavContextDuringUrlChange);
-@@ -337,6 +349,7 @@ void SoftNavigationHeuristics::SameDocumentNavigationCommitted(
-                         "edIntoPreviousContext",
-                         perfetto::Track::FromPointer(context), "context",
-                         *context_for_current_url_, "url", url);
-+    using namespace soft_navigation_heuristics;
-     base::UmaHistogramEnumeration(
-         kPageLoadInternalSoftNavigationOutcome,
-         SoftNavigationOutcome::
-@@ -584,6 +597,7 @@ void SoftNavigationHeuristics::ReportSoftNavigationToMetrics(
-   }
- 
-   // Count "successful soft nav" in histogram
-+  using soft_navigation_heuristics::SoftNavigationOutcome;
-   base::UmaHistogramEnumeration(kPageLoadInternalSoftNavigationOutcome,
-                                 SoftNavigationOutcome::kSoftNavigationDetected);
- }
 diff --git a/third_party/blink/renderer/core/timing/window_performance.cc b/third_party/blink/renderer/core/timing/window_performance.cc
 index c58b9bea3a..e4a20645b2 100644
 --- a/third_party/blink/renderer/core/timing/window_performance.cc
@@ -3664,10 +3503,10 @@ diff --git a/third_party/blink/renderer/platform/BUILD.gn b/third_party/blink/re
 index 589dd18b99..d65ab808e7 100644
 --- a/third_party/blink/renderer/platform/BUILD.gn
 +++ b/third_party/blink/renderer/platform/BUILD.gn
-@@ -7,6 +7,7 @@ import("//build/buildflag_header.gni")
+@@ -6,6 +6,7 @@
+ import("//build/buildflag_header.gni")
  import("//build/compiled_action.gni")
  import("//build/config/compiler/compiler.gni")
- import("//build/config/features.gni")
 +import("//build/config/jumbo.gni")
  import("//build/config/ui.gni")
  import("//build/nocompile.gni")
@@ -3711,9 +3550,12 @@ index 589dd18b99..d65ab808e7 100644
  
 -static_library("test_support") {
 +jumbo_static_library("test_support") {
-   visibility += [
-     "//third_party/blink/*",
-     "//tools/privacy_budget/font_indexer:*",
+   visibility += [ "//third_party/blink/*" ]
+   testonly = true
+ 
+   configs += blink_symbols_config
+ }
+ 
 @@ -2180,7 +2198,7 @@ if (enable_nocompile_tests) {
    }
  }
@@ -4142,7 +3984,7 @@ diff --git a/third_party/blink/renderer/platform/image-decoders/BUILD.gn b/third
 index 31f8b57c43..8137a8ab59 100644
 --- a/third_party/blink/renderer/platform/image-decoders/BUILD.gn
 +++ b/third_party/blink/renderer/platform/image-decoders/BUILD.gn
-@@ -2,12 +2,13 @@
+@@ -2,13 +2,14 @@
  # Use of this source code is governed by a BSD-style license that can be
  # found in the LICENSE file.
  
@@ -4150,6 +3992,7 @@ index 31f8b57c43..8137a8ab59 100644
  import("//build/config/sanitizers/sanitizers.gni")
  import("//media/media_options.gni")
  import("//testing/test.gni")
+ import("//third_party/blink/renderer/config.gni")
  import("//third_party/blink/renderer/platform/platform.gni")
  
 -component("image_decoders") {
@@ -4187,9 +4030,9 @@ index 368305c6b0..969c6dcf2e 100644
  # found in the LICENSE file.
  
 +import("//build/config/jumbo.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
  import("//testing/test.gni")
  import("//third_party/blink/renderer/build/scripts/scripts.gni")
- import("//third_party/blink/renderer/platform/platform.gni")
 @@ -189,6 +190,14 @@ blink_platform_sources("loader") {
    sources +=
        get_target_outputs(":make_platform_loader_generated_delivery_type_names")
@@ -4767,17 +4610,59 @@ index d7ec050e88..609a531b26 100644
 +#endif
 +
  #endif  // THIRD_PARTY_BLINK_RENDERER_PLATFORM_WTF_VECTOR_H_
---- a/third_party/blink/renderer/core/annotation/annotation_agent_impl.cc
-+++ b/third_party/blink/renderer/core/annotation/annotation_agent_impl.cc
-@@ -177,7 +177,7 @@ bool ShouldUseIsValidRangeAndMarkable(mojom::blink::AnnotationType type) {
- // instant.
- int GetGlicSmoothScrollThresholdInDIPs() {
-   const base::FeatureParam<int> glic_smooth_scroll_threshold_in_dips{
--      &features::kProgrammaticScrollAnimationOverride,
-+      &::features::kProgrammaticScrollAnimationOverride,
-       "glic_smooth_scroll_threshold_in_dips", 15000};
-   return glic_smooth_scroll_threshold_in_dips.Get();
+diff --git a/third_party/blink/renderer/platform/wtf/text/atomic_string.h b/third_party/blink/renderer/platform/wtf/text/atomic_string.h
+index 0d4bfa601d..f3c82b3d8e 100644
+--- a/third_party/blink/renderer/platform/wtf/text/atomic_string.h
++++ b/third_party/blink/renderer/platform/wtf/text/atomic_string.h
+@@ -326,3 +326,6 @@ WTF_ALLOW_MOVE_INIT_AND_COMPARE_WITH_MEM_FUNCTIONS(blink::AtomicString)
+ 
+ #include "third_party/blink/renderer/platform/wtf/text/string_operators_atomic.h"
+ #endif  // THIRD_PARTY_BLINK_RENDERER_PLATFORM_WTF_TEXT_ATOMIC_STRING_H_
++
++// FIXME: Where exactly did Google forget to include this file?
++#include "third_party/blink/renderer/platform/wtf/text/atomic_string_hash.h"
+diff --git a/third_party/blink/renderer/modules/peerconnection/rtc_transport/rtc_transport.cc b/third_party/blink/renderer/modules/peerconnection/rtc_transport/rtc_transport.cc
+index 3ebe4bb745..fba0084cb1 100644
+--- a/third_party/blink/renderer/modules/peerconnection/rtc_transport/rtc_transport.cc
++++ b/third_party/blink/renderer/modules/peerconnection/rtc_transport/rtc_transport.cc
+@@ -37,6 +37,8 @@
+ #include "third_party/webrtc/pc/ice_server_parsing.h"
+ #include "third_party/webrtc/rtc_base/rtc_certificate_generator.h"
+ 
++#define kMaxDigestSize kMaxDigestSize_RtcTransport
++
+ namespace blink {
+ namespace {
+ // Maximum known size (SHA-512). See
+@@ -548,3 +550,5 @@ void RtcTransport::Dispose() {
  }
+ 
+ }  // namespace blink
++
++#undef kMaxDigestSize
+diff --git a/third_party/blink/renderer/core/xml/parser/xml_document_parser_rs.cc b/third_party/blink/renderer/core/xml/parser/xml_document_parser_rs.cc
+index 8238b11bef..5abb967f85 100644
+--- a/third_party/blink/renderer/core/xml/parser/xml_document_parser_rs.cc
++++ b/third_party/blink/renderer/core/xml/parser/xml_document_parser_rs.cc
+@@ -54,6 +54,10 @@
+ #include "third_party/blink/renderer/core/xmlns_names.h"
+ #include "third_party/blink/renderer/platform/wtf/text/strcat.h"
+ 
++#define HasNoStyleInformation HasNoStyleInformation_RS
++#define SetAttributes         SetAttributes_RS
++#define kMaxXMLTreeDepth      kMaxXMLTreeDepth_RS
++
+ namespace blink {
+ 
+ namespace {
+@@ -835,3 +839,7 @@ HashMap<String, String> ParseAttributesRust(const String& attrs_string,
+ }
+ 
+ }  // namespace blink
++
++#undef HasNoStyleInformation
++#undef SetAttributes
++#undef kMaxXMLTreeDepth
 --- a/third_party/blink/renderer/core/dom/subscriber.cc
 +++ b/third_party/blink/renderer/core/dom/subscriber.cc
 @@ -22,8 +22,6 @@
@@ -4789,116 +4674,148 @@ index d7ec050e88..609a531b26 100644
  class Subscriber::ConsumerAbortSubscriptionAlgorithm final
      : public AbortSignal::Algorithm {
   public:
---- a/third_party/blink/renderer/core/paint/svg_mask_painter.cc
-+++ b/third_party/blink/renderer/core/paint/svg_mask_painter.cc
-@@ -26,6 +26,9 @@
- #include "third_party/blink/renderer/platform/graphics/scoped_image_rendering_settings.h"
- #include "ui/gfx/geometry/rect_conversions.h"
+--- a/third_party/blink/renderer/modules/xr/xr_rigid_transform.h
++++ b/third_party/blink/renderer/modules/xr/xr_rigid_transform.h
+@@ -11,10 +11,7 @@
+ #include "third_party/blink/renderer/core/typed_arrays/dom_typed_array.h"
+ #include "third_party/blink/renderer/modules/modules_export.h"
+ #include "third_party/blink/renderer/platform/bindings/script_wrappable.h"
+-
+-namespace gfx {
+-class Transform;
+-}
++#include "ui/gfx/geometry/transform.h"
  
-+#define ScopedMaskLuminanceLayer ScopedMaskLuminanceLayer_SVGMaskPainter
-+#define ToMaskSourceIfSVGMask    ToMaskSourceIfSVGMask_SVGMaskPainter
+ namespace blink {
+ 
+diff --git a/third_party/blink/renderer/core/loader/lazy_media_helper.cc b/third_party/blink/renderer/core/loader/lazy_media_helper.cc
+index 2ae2d4fe39..67451e5e80 100644
+--- a/third_party/blink/renderer/core/loader/lazy_media_helper.cc
++++ b/third_party/blink/renderer/core/loader/lazy_media_helper.cc
+@@ -16,6 +16,8 @@
+ #include "third_party/blink/renderer/core/html_names.h"
+ #include "third_party/blink/renderer/platform/instrumentation/use_counter.h"
+ 
++#define GetRootDocumentOrNull GetRootDocumentOrNull_LazyMediaHelper
 +
  namespace blink {
  
  namespace {
-@@ -327,3 +330,6 @@
+@@ -73,3 +75,5 @@ bool LazyMediaHelper::ShouldDeferMediaLoad(LocalFrame& frame,
+ }
+ 
+ }  // namespace blink
++
++#undef GetRootDocumentOrNull
+diff --git a/third_party/blink/renderer/core/annotation/annotation_agent_impl.cc b/third_party/blink/renderer/core/annotation/annotation_agent_impl.cc
+index 3e04c36079..6ba30349d9 100644
+--- a/third_party/blink/renderer/core/annotation/annotation_agent_impl.cc
++++ b/third_party/blink/renderer/core/annotation/annotation_agent_impl.cc
+@@ -179,7 +179,7 @@ bool ShouldUseIsValidRangeAndMarkable(mojom::blink::AnnotationType type) {
+ // instant.
+ int GetGlicSmoothScrollThresholdInDIPs() {
+   const base::FeatureParam<int> glic_smooth_scroll_threshold_in_dips{
+-      &features::kProgrammaticScrollAnimationOverride,
++      &::features::kProgrammaticScrollAnimationOverride,
+       "glic_smooth_scroll_threshold_in_dips", 15000};
+   return glic_smooth_scroll_threshold_in_dips.Get();
+ }
+diff --git a/third_party/blink/renderer/core/html/html_login_element.cc b/third_party/blink/renderer/core/html/html_login_element.cc
+index a355aa2042..96f6846b30 100644
+--- a/third_party/blink/renderer/core/html/html_login_element.cc
++++ b/third_party/blink/renderer/core/html/html_login_element.cc
+@@ -27,6 +27,8 @@
+ #include "third_party/blink/renderer/platform/instrumentation/use_counter.h"
+ #include "third_party/blink/renderer/platform/wtf/functional.h"
+ 
++#define IsEnterKeyKeydownEvent IsEnterKeyKeydownEvent_html_login_element
++
+ namespace blink {
+ 
+ namespace {
+@@ -212,3 +214,5 @@ void HTMLLoginElement::Trace(Visitor* visitor) const {
+ }
+ 
+ }  // namespace blink
++
++#undef IsEnterKeyKeydownEvent
+diff --git a/third_party/blink/renderer/core/paint/svg_mask_painter.cc b/third_party/blink/renderer/core/paint/svg_mask_painter.cc
+index 7b16fc4f70..97f2b4cbb0 100644
+--- a/third_party/blink/renderer/core/paint/svg_mask_painter.cc
++++ b/third_party/blink/renderer/core/paint/svg_mask_painter.cc
+@@ -27,6 +27,9 @@
+ #include "third_party/blink/renderer/platform/graphics/scoped_image_rendering_settings.h"
+ #include "ui/gfx/geometry/rect_conversions.h"
+ 
++#define ScopedMaskLuminanceLayer ScopedMaskLuminanceLayer_svg_mask_painter
++#define ToMaskSourceIfSVGMask    SToMaskSourceIfSVGMask_svg_mask_painter
++
+ namespace blink {
+ 
+ namespace {
+@@ -333,3 +336,6 @@ gfx::RectF SVGMaskPainter::ResourceBoundsForSVGChild(
  }
  
  }  // namespace blink
 +
 +#undef ScopedMaskLuminanceLayer
 +#undef ToMaskSourceIfSVGMask
+diff --git a/third_party/blink/renderer/core/timing/performance_timing.cc b/third_party/blink/renderer/core/timing/performance_timing.cc
+index bb862c3284..a5039ffbfd 100644
 --- a/third_party/blink/renderer/core/timing/performance_timing.cc
 +++ b/third_party/blink/renderer/core/timing/performance_timing.cc
 @@ -22,6 +22,8 @@
  #include "third_party/blink/renderer/platform/loader/fetch/resource_load_timing.h"
  #include "third_party/blink/renderer/platform/loader/fetch/resource_response.h"
  
-+#define ToIntegerMilliseconds ToIntegerMilliseconds_PerformanceTiming
++#define ToIntegerMilliseconds ToIntegerMilliseconds_performance_timing
 +
  // Legacy support for NT1(https://www.w3.org/TR/navigation-timing/).
  namespace blink {
  
-@@ -386,3 +388,5 @@
+@@ -386,3 +388,5 @@ void PerformanceTiming::Trace(Visitor* visitor) const {
  }
  
  }  // namespace blink
 +
 +#undef ToIntegerMilliseconds
---- a/third_party/blink/renderer/modules/webaudio/audio_listener.cc
-+++ b/third_party/blink/renderer/modules/webaudio/audio_listener.cc
-@@ -34,6 +34,10 @@
- #include "third_party/blink/renderer/platform/audio/audio_bus.h"
- #include "third_party/blink/renderer/platform/audio/audio_utilities.h"
+diff --git a/third_party/blink/renderer/core/ad_tracker/sticky_ad_detector.cc b/third_party/blink/renderer/core/ad_tracker/sticky_ad_detector.cc
+index 96d1bfc991..eeae19041e 100644
+--- a/third_party/blink/renderer/core/ad_tracker/sticky_ad_detector.cc
++++ b/third_party/blink/renderer/core/ad_tracker/sticky_ad_detector.cc
+@@ -20,6 +20,9 @@
+ #include "third_party/blink/renderer/core/paint/timing/paint_timing.h"
+ #include "third_party/blink/renderer/core/scroll/scrollable_area.h"
  
-+#define kDefaultPositionXValue kDefaultPositionXValue_AudioListener
-+#define kDefaultPositionYValue kDefaultPositionYValue_AudioListener
-+#define kDefaultPositionZValue kDefaultPositionZValue_AudioListener
++#define kFireInterval kFireInterval_sticky_ad_detector
++#define kLargeAdSizeToViewportSizeThreshold kLargeAdSizeToViewportSizeThreshold_sticky_ad_detector
 +
  namespace blink {
  
  namespace {
-@@ -230,3 +234,7 @@
+@@ -155,3 +158,6 @@ void StickyAdDetector::OnLargeStickyAdDetected(
  }
  
  }  // namespace blink
 +
-+#undef kDefaultPositionXValue
-+#undef kDefaultPositionYValue
-+#undef kDefaultPositionZValue
---- a/third_party/blink/renderer/modules/webaudio/gain_node.cc
-+++ b/third_party/blink/renderer/modules/webaudio/gain_node.cc
-@@ -29,6 +29,8 @@
- #include "third_party/blink/renderer/modules/webaudio/audio_graph_tracer.h"
- #include "third_party/blink/renderer/modules/webaudio/gain_handler.h"
++#undef kFireInterval
++#undef kLargeAdSizeToViewportSizeThreshold
+diff --git a/third_party/blink/renderer/modules/mediastream/user_media_request_provider_impl.cc b/third_party/blink/renderer/modules/mediastream/user_media_request_provider_impl.cc
+index 247fc491ae..269fe797d7 100644
+--- a/third_party/blink/renderer/modules/mediastream/user_media_request_provider_impl.cc
++++ b/third_party/blink/renderer/modules/mediastream/user_media_request_provider_impl.cc
+@@ -21,6 +21,8 @@
+ #include "third_party/blink/renderer/platform/bindings/v8_throw_exception.h"
+ #include "third_party/blink/renderer/platform/mediastream/media_stream_descriptor.h"
  
-+#define kDefaultGainValue kDefaultGainValue_GainNode
++#define IsConstraintEnabled IsConstraintEnabled_user_media_request_provider_impl
 +
  namespace blink {
  
  namespace {
-@@ -93,3 +95,5 @@
+@@ -197,3 +199,5 @@ void UserMediaRequestProviderImpl::StartRequest(
  }
  
  }  // namespace blink
 +
-+#undef kDefaultGainValue
---- a/third_party/blink/renderer/modules/webaudio/oscillator_node.cc
-+++ b/third_party/blink/renderer/modules/webaudio/oscillator_node.cc
-@@ -41,6 +41,8 @@
- #include "third_party/blink/renderer/platform/wtf/math_extras.h"
- #include "third_party/blink/renderer/platform/wtf/std_lib_extras.h"
- 
-+#define kDefaultFrequencyValue kDefaultFrequencyValue_OscillatorNode
-+
- namespace blink {
- 
- namespace {
-@@ -162,3 +164,5 @@
- }
- 
- }  // namespace blink
-+
-+#undef kDefaultFrequencyValue
-diff --git a/third_party/blink/renderer/platform/geometry/layout_unit.cc b/third_party/blink/renderer/platform/geometry/layout_unit.cc
-index 7beff1852a..c033914175 100644
---- a/third_party/blink/renderer/platform/geometry/layout_unit.cc
-+++ b/third_party/blink/renderer/platform/geometry/layout_unit.cc
-@@ -56,4 +56,6 @@ INSTANTIATE(6, int32_t);
- INSTANTIATE(16, int32_t);
- INSTANTIATE(16, int64_t);
- 
-+#undef INSTANTIATE
-+
- }  // namespace blink
-diff --git a/third_party/blink/renderer/platform/geometry/physical_offset.cc b/third_party/blink/renderer/platform/geometry/physical_offset.cc
-index f3101af87e..a88e217c7d 100644
---- a/third_party/blink/renderer/platform/geometry/physical_offset.cc
-+++ b/third_party/blink/renderer/platform/geometry/physical_offset.cc
-@@ -28,4 +28,6 @@ std::ostream& operator<<(std::ostream& os,
- 
- INSTANTIATE(LayoutUnit);
- 
-+#undef INSTANTIATE
-+
- }  // namespace blink
++#undef IsConstraintEnabled
