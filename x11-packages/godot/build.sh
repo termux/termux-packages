@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://godotengine.org
 TERMUX_PKG_DESCRIPTION="Advanced cross-platform 2D and 3D game engine"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.6.3"
+TERMUX_PKG_VERSION="4.7"
 TERMUX_PKG_SRCURL="https://github.com/godotengine/godot/archive/refs/tags/$TERMUX_PKG_VERSION-stable.tar.gz"
-TERMUX_PKG_SHA256=fa22b5f974125057087c9ef725eae582dbc5e39385dc377e8d5dbc295b367e1c
+TERMUX_PKG_SHA256=5960084fce0934dfa68acd26df1103385cf3675d0de2b5124922d3cae602bf1c
 TERMUX_PKG_DEPENDS="brotli, ca-certificates, fontconfig, freetype, glu, libandroid-execinfo, libc++, libenet, libgraphite, libjpeg-turbo, libogg, libtheora, libvorbis, libvpx, libwebp, libwslay, libxcursor, libxi, libxinerama, libxkbcommon, libxrandr, mbedtls, miniupnpc, opengl, opusfile, pcre2, python, sdl3, speechd, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="pulseaudio, yasm"
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="scons"
@@ -90,10 +90,16 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm644 misc/dist/linux/org.godotengine.Godot.desktop $TERMUX_PREFIX/share/applications/godot.desktop
-	install -Dm644 icon.svg $TERMUX_PREFIX/share/pixmaps/godot.svg
-	install -Dm644 LICENSE.txt $TERMUX_PREFIX/share/licenses/godot/LICENSE
-	install -Dm755 $TERMUX_PKG_BUILDDIR/bin/godot.linuxbsd.editor.llvm $TERMUX_PREFIX/bin/godot
-	install -Dm644 $TERMUX_PKG_BUILDDIR/misc/dist/linux/godot.6 $TERMUX_PREFIX/share/man/man6/godot.6
-	install -Dm644 $TERMUX_PKG_BUILDDIR/misc/dist/linux/org.godotengine.Godot.xml $TERMUX_PREFIX/share/mime/packages/org.godotengine.Godot.xml
+	install -Dm644 misc/dist/linux/org.godotengine.Godot.desktop \
+		"$TERMUX_PREFIX/share/applications/godot.desktop"
+	install -Dm644 misc/logo/icon.svg \
+		"$TERMUX_PREFIX/share/pixmaps/godot.svg"
+	install -Dm644 LICENSE.txt \
+		"$TERMUX_PREFIX/share/licenses/godot/LICENSE"
+	install -Dm755 "$TERMUX_PKG_BUILDDIR/bin/godot.linuxbsd.editor.llvm" \
+		"$TERMUX_PREFIX/bin/godot"
+	install -Dm644 "$TERMUX_PKG_BUILDDIR/misc/dist/linux/godot.6" \
+		"$TERMUX_PREFIX/share/man/man6/godot.6"
+	install -Dm644 "$TERMUX_PKG_BUILDDIR/misc/dist/linux/org.godotengine.Godot.xml" \
+		"$TERMUX_PREFIX/share/mime/packages/org.godotengine.Godot.xml"
 }
