@@ -1,6 +1,16 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 986c72f..7f4a5aa 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -63,7 +63,6 @@
+@@ -41,7 +41,6 @@ find_package(Qt6 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS
+     QuickWidgets
+     Widgets
+ )
+-find_package(Qt6Keychain 0.15.0 CONFIG REQUIRED)
+ 
+ find_package(PkgConfig REQUIRED)
+ 
+@@ -64,7 +63,6 @@ find_package(KF6 ${KF6_MIN_VERSION} REQUIRED
      KIO
      I18n
      JobWidgets
@@ -8,7 +18,7 @@
      Notifications
      Service
      Solid
-@@ -72,7 +71,6 @@
+@@ -72,7 +70,6 @@ find_package(KF6 ${KF6_MIN_VERSION} REQUIRED
      WindowSystem
      KCMUtils
      Svg
@@ -16,9 +26,9 @@
  )
  
  find_package(Plasma ${PROJECT_DEP_VERSION} REQUIRED)
-@@ -102,9 +100,6 @@
- set_package_properties(KF6QuickCharts PROPERTIES
-                        TYPE RUNTIME)
+@@ -100,9 +97,6 @@ set_package_properties(KF6QuickCharts PROPERTIES
+ 
+ find_package(OpenSSL REQUIRED)
  
 -pkg_check_modules(NETWORKMANAGER IMPORTED_TARGET libnm>1.4.0 REQUIRED)
 -pkg_check_modules(MOBILEBROADBANDPROVIDERINFO mobile-broadband-provider-info)
@@ -26,7 +36,7 @@
  
  find_package(QCoro6 REQUIRED COMPONENTS Core DBus)
  
-@@ -119,10 +114,6 @@
+@@ -117,10 +111,6 @@ add_definitions(-DQT_NO_URL_CAST_FROM_STRING)
  remove_definitions(-DQT_NO_CAST_FROM_ASCII -DQT_NO_CAST_FROM_BYTEARRAY)
  
  add_subdirectory(applet)
@@ -37,7 +47,8 @@
  
  # Enable unit testing
  if (BUILD_TESTING)
-
+diff --git a/applet/PopupDialog.qml b/applet/PopupDialog.qml
+index ab3e6b6..75547f9 100644
 --- a/applet/PopupDialog.qml
 +++ b/applet/PopupDialog.qml
 @@ -4,6 +4,14 @@
@@ -55,7 +66,7 @@
  import QtQuick
  import QtQuick.Controls as QQC2
  import QtQuick.Layouts
-@@ -11,10 +19,50 @@
+@@ -11,10 +19,50 @@ import org.kde.plasma.components as PlasmaComponents3
  import org.kde.plasma.extras as PlasmaExtras
  import org.kde.plasma.networkmanagement as PlasmaNM
  import org.kde.plasma.plasmoid
@@ -106,13 +117,14 @@
      required property PlasmaNM.Handler nmHandler
      required property PlasmaNM.NetworkStatus nmStatus
  
-@@ -127,4 +175,5 @@
+@@ -130,4 +178,5 @@ PlasmaExtras.Representation {
              }
          }
      }
 +endif */
  }
-
+diff --git a/applet/Toolbar.qml b/applet/Toolbar.qml
+index dfa0642..0ad9987 100644
 --- a/applet/Toolbar.qml
 +++ b/applet/Toolbar.qml
 @@ -4,6 +4,13 @@
@@ -129,7 +141,7 @@
  import QtQuick
  import QtQuick.Layouts
  import org.kde.plasma.components as PlasmaComponents3
-@@ -12,10 +19,26 @@
+@@ -12,10 +19,26 @@ import org.kde.kirigami as Kirigami
  import org.kde.plasma.extras as PlasmaExtras
  import org.kde.plasma.networkmanagement as PlasmaNM
  import org.kde.kcmutils as KCMUtils
@@ -156,13 +168,14 @@
      readonly property var displayWifiOffMessage: !wifiSwitchButton.checked && wifiSwitchButton.visible
      readonly property var displayWifiConnectingMessage: wifiSwitchButton.checked && wifiSwitchButton.visible && searchTextField.text.length === 0
      readonly property var displayWwanMessage: !wwanSwitchButton.checked && wwanSwitchButton.visible
-@@ -257,4 +280,5 @@
+@@ -257,4 +280,5 @@ RowLayout {
              KCMUtils.KCMLauncher.openSystemSettings(mainWindow.kcm)
          }
      }
 +endif */
  }
-
+diff --git a/applet/main.qml b/applet/main.qml
+index 6b86b76..f562b1b 100644
 --- a/applet/main.qml
 +++ b/applet/main.qml
 @@ -4,6 +4,14 @@
@@ -180,7 +193,7 @@
  import QtQuick
  import org.kde.plasma.plasmoid
  import org.kde.kirigami as Kirigami
-@@ -13,10 +21,79 @@
+@@ -13,10 +21,79 @@ import org.kde.networkmanager as NMQt
  import QtQuick.Layouts
  import org.kde.kcmutils as KCMUtils
  import org.kde.config as KConfig
@@ -260,7 +273,7 @@
      readonly property string kcm: "kcm_networkmanagement"
      readonly property bool kcmAuthorized: KConfig.KAuthorized.authorizeControlModule("kcm_networkmanagement")
      readonly property bool delayModelUpdates: fullRepresentationItem !== null
-@@ -152,4 +229,27 @@
+@@ -159,4 +236,52 @@ PlasmoidItem {
  
          onTriggered: handler.requestScan()
      }
@@ -270,20 +283,45 @@
 +    Plasma5Support.DataSource {
 +        id: wifiSource
 +        engine: "executable"
-+        connectedSources: ["termux-wifi-connectioninfo"]
-+        interval: 30000
 +        onNewData: (source, data) => {
 +            try { mainWindow.wifiJson = JSON.parse(data["stdout"]) } catch(e) {}
++            disconnectSource(source)
++            wifiWatchdog.stop()
 +        }
 +    }
 +
 +    Plasma5Support.DataSource {
 +        id: mobileSource
 +        engine: "executable"
-+        connectedSources: ["termux-telephony-deviceinfo"]
-+        interval: 30000
 +        onNewData: (source, data) => {
 +            try { mainWindow.mobileJson = JSON.parse(data["stdout"]) } catch(e) {}
++            disconnectSource(source)
++            mobileWatchdog.stop()
++        }
++    }
++
++    Timer {
++        id: wifiWatchdog
++        interval: 10000
++        onTriggered: wifiSource.disconnectSource("termux-wifi-connectioninfo")
++    }
++
++    Timer {
++        id: mobileWatchdog
++        interval: 10000
++        onTriggered: mobileSource.disconnectSource("termux-telephony-deviceinfo")
++    }
++
++    Timer {
++        interval: 30000
++        running: true
++        repeat: true
++        triggeredOnStart: true
++        onTriggered: {
++            wifiSource.connectSource("termux-wifi-connectioninfo")
++            wifiWatchdog.restart()
++            mobileSource.connectSource("termux-telephony-deviceinfo")
++            mobileWatchdog.restart()
 +        }
 +    }
 +/* endif */
