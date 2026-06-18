@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/microsoft/vscode
 TERMUX_PKG_DESCRIPTION="Visual Studio Code - OSS"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION="1.122.1"
+TERMUX_PKG_VERSION="1.125.0"
 TERMUX_PKG_SRCURL=git+https://github.com/microsoft/vscode
 TERMUX_PKG_GIT_BRANCH="$TERMUX_PKG_VERSION"
 TERMUX_PKG_DEPENDS="electron-for-code-oss, libx11, libxkbfile, libsecret, ripgrep"
@@ -18,8 +18,8 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
-_setup_nodejs_22() {
-	local NODEJS_VERSION=22.22.1
+_setup_nodejs_24() {
+	local NODEJS_VERSION=24.15.0
 	local NODEJS_FOLDER=${TERMUX_PKG_CACHEDIR}/build-tools/nodejs-${NODEJS_VERSION}
 
 	if [ ! -x "$NODEJS_FOLDER/bin/node" ]; then
@@ -27,17 +27,17 @@ _setup_nodejs_22() {
 		local NODEJS_TAR_FILE=$TERMUX_PKG_TMPDIR/nodejs-$NODEJS_VERSION.tar.xz
 		termux_download https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.xz \
 			"$NODEJS_TAR_FILE" \
-			9a6bc82f9b491279147219f6a18add1e18424dce90d41d2a5fcd69d4924ba3aa
+			472655581fb851559730c48763e0c9d3bc25975c59d518003fc0849d3e4ba0f6
 		tar -xf "$NODEJS_TAR_FILE" -C "$NODEJS_FOLDER" --strip-components=1
 	fi
 	export PATH="$NODEJS_FOLDER/bin:$PATH"
 }
 
 termux_step_post_get_source() {
-	# Ensure that code-oss supports node 22
+	# Ensure that code-oss supports node 24
 	local _node_version=$(cat .nvmrc | cut -d. -f1 -)
-	if [ "$_node_version" != 22 ]; then
-		termux_error_exit "Version mismatch: Expected 22, got $_node_version."
+	if [ "$_node_version" != 24 ]; then
+		termux_error_exit "Version mismatch: Expected 24, got $_node_version."
 	fi
 
 	# Check whether the prebuilt electron version matches the electron version from package.json
@@ -62,7 +62,7 @@ termux_step_post_get_source() {
 }
 
 termux_step_host_build() {
-	_setup_nodejs_22
+	_setup_nodejs_24
 	export DISABLE_V8_COMPILE_CACHE=1
 	(unset PREFIX prefix
 	npm install node-gyp)
@@ -70,7 +70,7 @@ termux_step_host_build() {
 }
 
 termux_step_configure() {
-	_setup_nodejs_22
+	_setup_nodejs_24
 	export PATH="$TERMUX_PKG_HOSTBUILD_DIR/node_modules/.bin:$PATH"
 }
 
@@ -117,7 +117,7 @@ termux_step_make_install() {
 	chmod +x $TERMUX_PREFIX/lib/code-oss/bin/code-oss
 
 	# Replace ripgrep
-	ln -sfr $TERMUX_PREFIX/bin/rg $TERMUX_PREFIX/lib/code-oss/resources/app/node_modules/@vscode/ripgrep-universal/bin/rg
+	ln -sf $TERMUX_PREFIX/bin/rg $TERMUX_PREFIX/lib/code-oss/resources/app/node_modules/@vscode/ripgrep-universal/bin/linux-$NPM_CONFIG_ARCH/rg
 
 	# Install appdata and desktop file
 	sed -i "s|@@NAME_SHORT@@|Code|g
