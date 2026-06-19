@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT, BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
 _CHROMIUM_VERSION=148.0.7778.97
 TERMUX_PKG_VERSION=42.2.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/electron/electron
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libnotify, libffi-static"
@@ -364,9 +365,10 @@ termux_step_make_install() {
 		bytecode_builtins_list_generator # generate_bytecode_builtins_list
 		gen-regexp-special-case          # v8:run_gen-regexp-special-case
 		node_js2c						 # electron:node_js2c_exec
+		icudtl.dat                       # icu data
 	)
 	mkdir -p "$_install_prefix/$cr_v8_toolchain/"
-	cp "${v8_tools[@]/#/out/Release/$cr_v8_toolchain/}" "$_install_prefix/$cr_v8_toolchain/"
+	cp -f "${v8_tools[@]/#/out/Release/$cr_v8_toolchain/}" "$_install_prefix/$cr_v8_toolchain/"
 
 	local host_tools=(
 		# make_top_domain_list_variables     # generate_top_domain_list_variables_file
@@ -378,7 +380,7 @@ termux_step_make_install() {
 		icudtl.dat                         # icu data
 	)
 	mkdir -p "$_install_prefix/host/"
-	cp "${host_tools[@]/#/out/Release/host/}" "$_install_prefix/host/"
+	cp -f "${host_tools[@]/#/out/Release/host/}" "$_install_prefix/host/"
 
 	local normal_files=(
 		# v8 snapshot data
@@ -389,7 +391,7 @@ termux_step_make_install() {
 		libvk_swiftshader.so
 		vk_swiftshader_icd.json
 	)
-	cp "${normal_files[@]/#/out/Release/}" "$_install_prefix/"
+	cp -f "${normal_files[@]/#/out/Release/}" "$_install_prefix/"
 
 	# mkdir -p "$_install_prefix/obj/third_party/pdfium/"
 	# cp "out/Release/obj/third_party/pdfium/libpdfium.a" "$_install_prefix/obj/third_party/pdfium/"
