@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tool to fetch and install precompiled musl-based static 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.20.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/cargo-bins/cargo-binstall/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=b10b4892be05f2ad2a8ae681f187bb3b90c7c6baa056cf1f244c8ff308fd786f
 TERMUX_PKG_DEPENDS="resolv-conf"
@@ -28,7 +29,7 @@ termux_step_pre_configure() {
 		-e "s|ANDROID|DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK|g" \
 		-e 's|"linux"|"android"|g'
 
-	find vendor/{hickory-resolver,camino,resolv-conf,netdev} -type f -print0 | \
+	find . -type f -print0 | \
 		xargs -0 sed -i \
 		-e "s|/etc|$TERMUX_PREFIX/etc|g"
 
