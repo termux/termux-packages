@@ -9,21 +9,12 @@
  	;;
  *Darwin*)
  	ld="${CC9:-gcc} -m64 $CC9FLAGS"
-@@ -147,7 +147,7 @@ then
- 					grep '__p9l_autolib_[a-zA-Z0-9+-]*' |
- 					sed 's/.*__p9l_autolib_//; s/:.*//' |
- 					sort -u |
--					$egrep -v '^(thread|draw)$'
-+					grep -E -v '^(thread|draw)$'
- 				`
- 				a="$a $b"
- 			done
-@@ -338,7 +338,7 @@ quiet()
- 	ignore=$ignore'|ld: warning: ignoring duplicate libraries:'
- 
- 	sed 's/.*: In function `[^:]*: *//' "$1" |
--	$egrep -v "$ignore"
-+	grep -E -v "$ignore"
+@@ -342,7 +342,7 @@ quiet()
  }
  
  # Must use temp file to avoid pipe; pipe loses status.
+-xtmp=${TMPDIR-/tmp}/9l.$$.$USER.out
++xtmp=${TMPDIR-@TERMUX_PREFIX@/tmp}/9l.$$.$USER.out
+ $ld -L"$PLAN9/lib" "$@" $libsl $extralibs $frameworks >"$xtmp" 2>&1
+ status=$?
+ quiet "$xtmp"
