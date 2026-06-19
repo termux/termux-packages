@@ -1,0 +1,36 @@
+--- a/crates/next-napi-bindings/build.rs
++++ b/crates/next-napi-bindings/build.rs
+@@ -51,13 +51,20 @@
+-    let git = vergen_gitcl::GitclBuilder::default()
+-        .dirty(/* include_untracked */ true)
+-        .describe(
+-            /* tags */ true,
+-            /* dirty */ !is_ci, // suppress the dirty suffix in CI
+-            /* matches */ Some("v[0-9]*"), // find the last version tag
+-        )
+-        .build()?;
+-    vergen_gitcl::Emitter::default()
+-        .fail_on_error()
+-        .add_instructions(&cargo)?
+-        .add_instructions(&git)?
+-        .emit()?;
++    let mut emitter = vergen_gitcl::Emitter::default();
++    let _ = emitter.add_instructions(&cargo);
++
++    let git_res = vergen_gitcl::GitclBuilder::default()
++        .dirty(/* include_untracked */ true)
++        .describe(
++            /* tags */ true,
++            /* dirty */ !is_ci,
++            Some("v[0-9]*"),
++        )
++        .build();
++
++    let mut git_ok = false;
++    if let Ok(git) = git_res {
++        if emitter.add_instructions(&git).is_ok() {
++            git_ok = true;
++        }
++    }
++
++    let _ = emitter.emit();
