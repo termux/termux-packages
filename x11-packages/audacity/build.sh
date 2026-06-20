@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An easy-to-use, multi-track audio editor and recorder"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.7.8"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/audacity/audacity/archive/refs/tags/Audacity-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=ed680774b9ac104949b962e0642155ad093ab5ade14ad5d8468c6cfae0f1d9ea
 TERMUX_PKG_DEPENDS="ffmpeg, gdk-pixbuf, glib, gtk3, libc++, libexpat, libflac, libid3tag, libogg, libopus, libsndfile, libsoundtouch, libsoxr, libuuid, libvorbis, libwavpack, libmpg123, opusfile, portaudio, portmidi, wxwidgets"
@@ -51,9 +52,12 @@ termux_step_host_build() {
 		# To avoid messing with `apt update` and `apt download` we will get download links directly from ubuntu servers.
 
 		local ubuntu_packages=(
+			# GTK 2
 			"libgtk2.0-0t64"
 			"libgtk2.0-dev"
-			"libasound2-dev"
+			# alsa
+			"libasound2-dev" # Contains symlink libasound.so
+			"libasound2t64"  # Needed because the actual libasound.so points to here
 		)
 
 		DESTINATION="$_PREFIX" \
@@ -68,9 +72,14 @@ termux_step_host_build() {
 		_LIBDIR="$_PREFIX/usr/lib/x86_64-linux-gnu"
 		export PKG_CONFIG_LIBDIR="$_LIBDIR/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig"
 		export CFLAGS="-I$_PREFIX/usr/include"
-		export LDFLAGS="-Wl,-rpath,$_LIBDIR"
+		export LDFLAGS="-L$_LIBDIR -Wl,-rpath,$_LIBDIR"
 		export CMAKE_INCLUDE_PATH="$_PREFIX/usr/include:$_LIBDIR/gtk-2.0/include"
 		export CMAKE_LIBRARY_PATH="$_LIBDIR"
+		export DOCBOOK_TO_MAN="xmlto man --skip-validation"
+		# Use Clang instead of GCC due to some breaking changes in GCC 15.
+		# Ref: https://lists.opensuse.org/archives/list/bugs@lists.opensuse.org/thread/5H62ZKT4JOXG5J5OZDWFTOYKYS6RWR67/
+		# Reference not exactly related to this package, but gives a summary of what's happening
+		export CC="clang-${TERMUX_HOST_LLVM_MAJOR_VERSION}"
 		cmake -GNinja -B "$TERMUX_PKG_HOSTBUILD_DIR" -S "$TERMUX_PKG_SRCDIR" -DCMAKE_BUILD_TYPE=Release
 		ninja -C "$TERMUX_PKG_HOSTBUILD_DIR" image-compiler
 	)
