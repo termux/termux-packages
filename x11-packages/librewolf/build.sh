@@ -10,6 +10,7 @@ TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, liband
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_SED_REGEXP="s/_/-/g"
 
 termux_step_post_get_source() {
 	local f="media/ffvpx/config_unix_aarch64.h"
