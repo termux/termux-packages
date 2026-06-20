@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Syntax highlighting Engine for Structured Text and Code"
 TERMUX_PKG_LICENSE="GPL-2.0-only, LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.26.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/syntax-highlighting-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=a4e86d167cd5f3c4318584119451f891551c24cd4a0ff1f7ef95e2476a39c5ac
 TERMUX_PKG_DEPENDS="libc++, qt6-qtdeclarative, qt6-qtbase"
