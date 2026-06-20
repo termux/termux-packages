@@ -14,7 +14,7 @@ external/iputils/NOTICE
 "
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="9.0.0-r76"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://android.googlesource.com/platform/manifest
 TERMUX_PKG_SHA256=SKIP_CHECKSUM
 TERMUX_PKG_AUTO_UPDATE=false
@@ -44,13 +44,14 @@ termux_step_get_source() {
 		export PATH="${TMP_CHECKOUT}/prefix/usr/bin:${PATH//$HOME\/.cargo\/bin/}"
 
 		local -a ubuntu_packages=(
-			"libncurses5"
+			# For libtinfo.so.5
 			"libtinfo5"
-			"openssh-client"
+			# for libncurses.so.5
+			"libncurses5"
 		)
 
 		DESTINATION="${TMP_CHECKOUT}/prefix" \
-		UBUNTU_RELEASE=jammy \
+		UBUNTU_RELEASE="jammy" \
 		termux_download_ubuntu_packages "${ubuntu_packages[@]}"
 
 		termux_download https://storage.googleapis.com/git-repo-downloads/repo "${TERMUX_PKG_CACHEDIR}/repo" SKIP_CHECKSUM
@@ -93,8 +94,10 @@ termux_step_host_build() {
 		b62c0e7937551d0cc02b8fd5cb0f544f9405bafc9a54d3808ed4594812edef43
 	tar xf "${TERMUX_PKG_CACHEDIR}/python2.tar.xz" --strip-components=1 -C "${PYTHON2_WORKDIR}"
 	pushd "${PYTHON2_WORKDIR}"
+	export CC="clang-${TERMUX_HOST_LLVM_MAJOR_VERSION}"
+	export CXX="clang-${TERMUX_HOST_LLVM_MAJOR_VERSION}"
 	./configure --prefix="${PYTHON2_INSTALLDIR}"
-	make install
+	make install -j"$TERMUX_PKG_MAKE_PROCESSES"
 	popd
 	export PATH="${PYTHON2_INSTALLDIR}/bin:${PATH}"
 	python2 -m ensurepip
