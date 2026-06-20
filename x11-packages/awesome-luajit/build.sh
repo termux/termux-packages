@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=fa805ab465821c54094126b71a92acf2eba17674
 TERMUX_PKG_VERSION="2026.03.31"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/awesomeWM/awesome
 TERMUX_PKG_SHA256=ed61955ed9bdf1d216b881543572c32c83a15f419d9410d5c6b4ed3df3392383
 TERMUX_PKG_GIT_BRANCH=master
@@ -61,67 +62,76 @@ termux_step_host_build() {
 	local hostbuild_luajit_version="5.1"
 
 	local -a ubuntu_packages=(
+		# imagemagick
 		"imagemagick"
-		"imagemagick-6-common"
-		"imagemagick-6.q16"
-		"libaom3"
-		"libde265-0"
-		"libdjvulibre-text"
-		"libdjvulibre21"
+		"imagemagick-7-common"
+		"imagemagick-7.q16"
 		"libfftw3-double3"
-		"libheif-plugin-aomdec"
-		"libheif-plugin-aomenc"
-		"libheif-plugin-libde265"
-		"libheif1"
-		"libjxr-tools"
-		"libjxr0t64"
 		"liblqr-1-0"
+		"libmagickcore-7.q16-10"
+		"libmagickwand-7.q16-10"
+		# gobject-introspection needed to build lua-lgi
+		"libgirepository-1.0-dev"
+		# lua $hostbuild_lua_version
+		"lua-any"
 		"libluajit-$hostbuild_luajit_version-2"
 		"libluajit-$hostbuild_luajit_version-dev"
-		"libmagickcore-6.q16-7-extra"
-		"libmagickcore-6.q16-7t64"
-		"libmagickwand-6.q16-7t64"
-		"libstartup-notification0"
-		"libstartup-notification0-dev"
-		"libwmflite-0.2-7"
-		"libx11-xcb-dev"
+		# gobject-introspect needed by lua-lgi
+		"libgirepository-1.0-dev"
+		# ldoc is needed for generation of manpages, other lua packages below are dependenies of ldoc
+		"lua-ldoc"
+		"lua-filesystem"
+		"lua-penlight"
+
+		# xcb-cursor
 		"libxcb-cursor-dev"
 		"libxcb-cursor0"
-		"libxcb-icccm4"
-		"libxcb-icccm4-dev"
 		"libxcb-image0"
 		"libxcb-image0-dev"
-		"libxcb-keysyms1"
-		"libxcb-keysyms1-dev"
-		"libxcb-randr0-dev"
 		"libxcb-render-util0"
 		"libxcb-render-util0-dev"
-		"libxcb-shape0"
-		"libxcb-shape0"
-		"libxcb-shape0-dev"
-		"libxcb-shape0-dev"
-		"libxcb-util-dev"
-		"libxcb-util0-dev"
 		"libxcb-util1"
-		"libxcb-xfixes0-dev"
-		"libxcb-xinerama0"
+		# xcb-randr
+		"libxcb-randr0-dev"
+		# xcb-xtest
+		"libxcb-xtest0-dev"
+		"libxcb-xtest0"
+		# xcb-cinerama
 		"libxcb-xinerama0-dev"
+		"libxcb-xinerama0"
+		# xcb-shape
+		"libxcb-shape0-dev"
+		"libxcb-shape0"
+		# xcb-util
+		"libxcb-util0-dev"
+		"libxcb-util-dev"
+		"libxcb-util1"
+		# xcb-keysyms
+		"libxcb-keysyms1-dev"
+		"libxcb-keysyms1"
+		# xcb-icccm
+		"libxcb-icccm4-dev"
+		"libxcb-icccm4"
+		# xcb-xfixes
+		"libxcb-xfixes0-dev"
+		"libxcb-xfixes0"
+		# xcb-xkb
 		"libxcb-xkb-dev"
 		"libxcb-xkb1"
-		"libxcb-xrm-dev"
-		"libxcb-xrm0"
-		"libxcb-xtest0"
-		"libxcb-xtest0-dev"
+		# xkbcommon-x11
+		"libxkbcommon-x11-dev"
+		"libxkbcommon-x11-0"
+		# libstartup-notification-1.0
+		"libstartup-notification0-dev"
+		"libstartup-notification0"
+		# libxdg-basedir
 		"libxdg-basedir-dev"
 		"libxdg-basedir1"
-		"libxkbcommon-x11-0"
-		"libxkbcommon-x11-dev"
-		"lua-any"
-		"lua-expat"
-		"lua-filesystem"
-		"lua-ldoc"
-		"lua-penlight"
+		# xcb-xrm
+		"libxcb-xrm-dev"
+		"libxcb-xrm0"
 	)
+
 
 	termux_download_ubuntu_packages "${ubuntu_packages[@]}"
 
@@ -131,7 +141,7 @@ termux_step_host_build() {
 		xargs -n 1 sed -i -e "s|/usr|${HOSTBUILD_ROOTFS}/usr|g"
 	find "${HOSTBUILD_ROOTFS}/usr/lib/x86_64-linux-gnu" -xtype l \
 		-exec sh -c "ln -snvf /usr/lib/x86_64-linux-gnu/\$(readlink \$1) \$1" sh {} \;
-	ln -sf convert-im6.q16 "${HOSTBUILD_ROOTFS}/usr/bin/convert"
+	ln -sf convert-im7.q16 "${HOSTBUILD_ROOTFS}/usr/bin/convert"
 	ln -sf $(command -v luajit) "${HOSTBUILD_ROOTFS}/usr/bin/lua-any"
 
 	_load_ubuntu_packages
@@ -146,9 +156,16 @@ termux_step_host_build() {
 	export PKG_CONFIG_PATH="${HOSTBUILD_ROOTFS}/usr/lib/x86_64-linux-gnu/pkgconfig"
 	export CFLAGS="-I${HOSTBUILD_ROOTFS}/usr/include/x86_64-linux-gnu"
 	CFLAGS+=" -I/usr/include/xcb"
+	CFLAGS+=" -I${HOSTBUILD_ROOTFS}/usr/include/gobject-introspection-1.0"
 
 	LUAJIT_LGI="$TERMUX_PKG_HOSTBUILD_DIR/luajit-lgi"
-	(. "$TERMUX_SCRIPTDIR/packages/luajit-lgi/build.sh"; TERMUX_PKG_SRCDIR="$LUAJIT_LGI" termux_step_get_source)
+	(
+		. "$TERMUX_SCRIPTDIR/packages/luajit-lgi/build.sh"
+		TERMUX_PKG_SRCDIR="$LUAJIT_LGI" termux_step_get_source
+		for patch in "$TERMUX_SCRIPTDIR/packages/luajit-lgi"/*.patch; do
+			patch -p1 -d "$LUAJIT_LGI" < "$patch"
+		done
+	)
 	$TERMUX_MESON setup \
 		"$LUAJIT_LGI" \
 		"$LUAJIT_LGI/build" \
