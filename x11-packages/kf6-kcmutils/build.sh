@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Utilities for interacting with KCModules"
 TERMUX_PKG_LICENSE="LGPL-2.0-only, LGPL-3.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.27.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kcmutils-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=beb0a50a22230fdd94164a5d6e53ea7f4cbc97b86cbab3ff2a592ea8663efa41
 TERMUX_PKG_AUTO_UPDATE=true
