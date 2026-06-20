@@ -1,20 +1,20 @@
---- a/gfx/wr/webrender/src/texture_cache.rs	2026-06-08 15:13:30.000000000 -0400
-+++ b/gfx/wr/webrender/src/texture_cache.rs	2026-06-11 16:15:09.138861529 -0400
-@@ -275,7 +275,7 @@
+--- a/gfx/wr/webrender/src/texture_cache.rs
++++ b/gfx/wr/webrender/src/texture_cache.rs
+@@ -275,7 +275,7 @@ enum BudgetType {
  impl BudgetType {
-     pub const COUNT: usize = 7;
+     const COUNT: usize = 7;
  
--    pub const VALUES: [BudgetType; BudgetType::COUNT] = [
-+    pub const VALUES: [BudgetType; 7] = [
+-    const VALUES: [BudgetType; BudgetType::COUNT] = [
++    const VALUES: [BudgetType; 7] = [
          BudgetType::SharedColor8Linear,
          BudgetType::SharedColor8Nearest,
          BudgetType::SharedColor8Glyphs,
-@@ -285,7 +285,7 @@
+@@ -285,7 +285,7 @@ impl BudgetType {
          BudgetType::Standalone,
      ];
  
--    pub const PRESSURE_COUNTERS: [usize; BudgetType::COUNT] = [
-+    pub const PRESSURE_COUNTERS: [usize; 7] = [
+-    const PRESSURE_COUNTERS: [usize; BudgetType::COUNT] = [
++    const PRESSURE_COUNTERS: [usize; 7] = [
          profiler::ATLAS_COLOR8_LINEAR_PRESSURE,
          profiler::ATLAS_COLOR8_NEAREST_PRESSURE,
          profiler::ATLAS_COLOR8_GLYPHS_PRESSURE,
