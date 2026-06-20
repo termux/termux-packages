@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="COPYING.txt"
 TERMUX_PKG_MAINTAINER="3ls-it <3ls-it@pm.me>"
 TERMUX_PKG_VERSION="6.16.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://fc-solve.shlomifish.org/downloads/fc-solve/freecell-solver-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=71b8882e68f1be62529069018d0c732b75078669077c96348279575849f34313
 TERMUX_PKG_AUTO_UPDATE=true
@@ -28,11 +29,11 @@ termux_step_host_build() {
 	)
 	termux_download_ubuntu_packages "${ubuntu_packages[@]}"
 
-	# Need Python module pysol_cards
+	# Need Python modules pysol_cards, six
 	local hostbuild_venv_dir="${TERMUX_PKG_HOSTBUILD_DIR}/venv-dir"
 	python3 -m venv --system-site-packages "$hostbuild_venv_dir"
 	. "$hostbuild_venv_dir/bin/activate"
-	python3 -m pip install --no-input --disable-pip-version-check pysol-cards
+	python3 -m pip install --no-input --disable-pip-version-check pysol-cards six
 }
 
 termux_step_pre_configure() {
