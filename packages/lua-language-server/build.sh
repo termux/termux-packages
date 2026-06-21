@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Sumneko Lua Language Server coded in Lua"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="3.18.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"
 TERMUX_PKG_SRCURL="git+https://github.com/sumneko/lua-language-server"
 # `lua-language-server` links against libbfd,
@@ -21,46 +22,12 @@ _patch_on_device() {
 	fi
 }
 
-_load_ubuntu_packages() {
-	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
-		export HOSTBUILD_ROOTFS="${TERMUX_PKG_HOSTBUILD_DIR}/ubuntu_packages"
-		export LD_LIBRARY_PATH="${HOSTBUILD_ROOTFS}/usr/lib/x86_64-linux-gnu"
-		LD_LIBRARY_PATH+=":${HOSTBUILD_ROOTFS}/usr/lib"
-	fi
-}
-
 termux_step_host_build() {
 	_patch_on_device
 	termux_setup_ninja
 
 	mkdir 3rd
 	cp -a "${TERMUX_PKG_SRCDIR}"/3rd/luamake 3rd/
-
-	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
-		local -a ubuntu_packages=(
-			"binutils"
-			"binutils-common"
-			"binutils-dev"
-			"binutils-x86-64-linux-gnu"
-			"libbinutils"
-			"libctf-nobfd0"
-			"libctf0"
-			"libgprofng0"
-			"libsframe1"
-			"libunwind-dev"
-			"libunwind8"
-		)
-
-		termux_download_ubuntu_packages "${ubuntu_packages[@]}"
-
-		_load_ubuntu_packages
-
-		patch="$TERMUX_PKG_BUILDER_DIR/hostbuild-force-link.diff"
-		echo "Applying patch: $(basename "$patch")"
-		test -f "$patch" && sed \
-			-e "s%\@TERMUX_PKG_HOSTBUILD_DIR\@%${TERMUX_PKG_HOSTBUILD_DIR}%g" \
-			"$patch" | patch --silent -p1
-	fi
 
 	cd 3rd/luamake
 	./compile/install.sh
@@ -76,8 +43,6 @@ termux_step_make() {
 		-e "s%\@FLAGS\@%${CFLAGS} ${CPPFLAGS}%g" \
 		-e "s%\@LDFLAGS\@%${LDFLAGS}%g" \
 		"${TERMUX_PKG_BUILDER_DIR}"/make.lua.diff | patch --silent -p1
-
-	_load_ubuntu_packages
 
 	patch="$TERMUX_PKG_BUILDER_DIR/force-cast-unw_context_t.diff"
 	echo "Applying patch: $(basename "$patch")"
