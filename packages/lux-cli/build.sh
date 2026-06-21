@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A package manager for Lua, similar to luarocks"
 TERMUX_PKG_LICENSE="LGPL-3.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.33.4"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/lumen-oss/lux/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=d0a72d8e6d24a6714957fbbc8cdccc14d194e23662251ea398962df719dd90df
 TERMUX_PKG_DEPENDS="bzip2, gpgme, libgit2, libgpg-error, lua54, openssl, xz-utils"
@@ -49,31 +50,6 @@ termux_step_host_build() {
 		return
 	fi
 
-	# libgpgme-dev and any dependencies that aren't in the ubuntu builder at time of writing
-	local -a ubuntu_packages=(
-		"dirmngr"
-		"gnupg"
-		"gnupg-l10n"
-		"gnupg-utils"
-		"gpg"
-		"gpg-agent"
-		"gpg-wks-client"
-		"gpgconf"
-		"gpgsm"
-		"gpgv"
-		"keyboxd"
-		"libassuan-dev"
-		"libgpgme-dev"
-		"libgpgme11t64"
-	)
-
-	termux_download_ubuntu_packages "${ubuntu_packages[@]}"
-
-	PKG_CONFIG_PATH_x86_64_unknown_linux_gnu="${TERMUX_PKG_HOSTBUILD_DIR}/ubuntu_packages/usr/lib/x86_64-linux-gnu/pkgconfig"
-	RUSTFLAGS="-L${TERMUX_PKG_HOSTBUILD_DIR}/ubuntu_packages/usr/lib/x86_64-linux-gnu"
-
-	export PKG_CONFIG_PATH_x86_64_unknown_linux_gnu RUSTFLAGS
-
 	cd "${TERMUX_PKG_SRCDIR}" || termux_error_exit "Couldn't enter source code directory: ${TERMUX_PKG_SRCDIR}"
 
 	termux_setup_rust
@@ -82,8 +58,6 @@ termux_step_host_build() {
 
 	# build shell completions
 	cargo run --package xtask --release --frozen -- dist-completions
-
-	unset PKG_CONFIG_PATH_x86_64_unknown_linux_gnu RUSTFLAGS
 
 	# preserve the hostbuilt shell completions
 	rm -rf "${TERMUX_PKG_HOSTBUILD_DIR}/dist/"
