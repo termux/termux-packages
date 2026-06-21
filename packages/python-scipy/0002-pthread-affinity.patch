@@ -1,0 +1,20 @@
+--- a/subprojects/duccfft/ducc0/infra/threading.cc
++++ b/subprojects/duccfft/ducc0/infra/threading.cc
+@@ -111,7 +111,7 @@
+   {
+   static const size_t available_hardware_threads_ = []()
+     {
+-#if __has_include(<pthread.h>) && defined(__linux__) && defined(_GNU_SOURCE)
++#if __has_include(<pthread.h>) && defined(__linux__) && defined(_GNU_SOURCE) && !defined(__ANDROID__)
+     cpu_set_t cpuset;
+     CPU_ZERO(&cpuset);
+     pthread_getaffinity_np(pthread_self(), sizeof(cpuset), &cpuset);
+@@ -202,7 +202,7 @@
+     bool empty() const { return size_==0; }
+   };
+ 
+-#if __has_include(<pthread.h>) && defined(__linux__) && defined(_GNU_SOURCE)
++#if __has_include(<pthread.h>) && defined(__linux__) && defined(_GNU_SOURCE) && !defined(__ANDROID__)
+ static void do_pinning(int ithread)
+   {
+   if (pin_info()==-1) return;

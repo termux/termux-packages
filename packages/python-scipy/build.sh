@@ -2,16 +2,16 @@ TERMUX_PKG_HOMEPAGE=https://scipy.org/
 TERMUX_PKG_DESCRIPTION="Fundamental algorithms for scientific computing in Python"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.17.1"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="1.18.0"
 TERMUX_PKG_SRCURL=git+https://github.com/scipy/scipy
-TERMUX_PKG_DEPENDS="libc++, libopenblas, python, python-numpy, python-pip"
+TERMUX_PKG_DEPENDS="libandroid-complex-math, libc++, libopenblas, python, python-numpy, python-pip"
 TERMUX_PKG_BUILD_DEPENDS="python-numpy-static, pybind11"
-TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel, 'Cython>=3.0.8', meson-python, build"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel, 'Cython>=3.2.0', meson-python, build"
 _NUMPY_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python-numpy/build.sh; echo $TERMUX_PKG_VERSION)
 TERMUX_PKG_PYTHON_CROSS_BUILD_DEPS="pythran, 'numpy==$_NUMPY_VERSION'"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
+TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
@@ -29,10 +29,6 @@ bin/
 "
 
 termux_step_pre_configure() {
-	if $TERMUX_ON_DEVICE_BUILD; then
-		termux_error_exit "Package '$TERMUX_PKG_NAME' is not available for on-device builds."
-	fi
-
 	termux_setup_flang
 
 	# Use a wrapper FC
@@ -46,6 +42,11 @@ termux_step_pre_configure() {
 }
 
 termux_step_configure() {
+	termux_setup_pkg_config_wrapper \
+		"${TERMUX_PREFIX}/lib/python${TERMUX_PYTHON_VERSION}/site-packages/numpy/_core/lib/pkgconfig"
+
+	LDFLAGS+=" -landroid-complex-math -lm"
+
 	termux_setup_meson
 
 	cp -f $TERMUX_MESON_CROSSFILE $TERMUX_MESON_WHEEL_CROSSFILE
