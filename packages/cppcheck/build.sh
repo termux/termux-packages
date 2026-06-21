@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://github.com/danmar/cppcheck
 TERMUX_PKG_DESCRIPTION="tool for static C/C++ code analysis"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.21.0"
+TERMUX_PKG_VERSION="2.21.1"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_METHOD=repology # Upstream only releases major versions theough GitHub. Other minor updates are released using git tags, better rely on repology for updated versiom
 TERMUX_PKG_SRCURL=https://github.com/danmar/cppcheck/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=f028ff75ca5372738f3737c8b3e8611426a6526b6aea2ef01301ab0f5902f044
+TERMUX_PKG_SHA256=ba750bd872ad7c01f951ff2d9dc8c68ea5852654545ec7a62a4c318d690c8e22
 TERMUX_PKG_DEPENDS="libandroid-execinfo, libc++"
 
 # Prevent running dmake during builds. dmake just generates Makefile which we
