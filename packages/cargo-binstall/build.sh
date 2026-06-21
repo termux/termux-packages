@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/cargo-bins/cargo-binstall
 TERMUX_PKG_DESCRIPTION="Tool to fetch and install precompiled musl-based static binaries from the Rust ecosystem"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.20.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1.20.1"
 TERMUX_PKG_SRCURL="https://github.com/cargo-bins/cargo-binstall/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=b10b4892be05f2ad2a8ae681f187bb3b90c7c6baa056cf1f244c8ff308fd786f
+TERMUX_PKG_SHA256=5eb3e91392589d18e133f5b6e627fee6c17f830b562b316289a67ba9f88d58ac
 TERMUX_PKG_DEPENDS="resolv-conf"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -18,7 +17,6 @@ termux_step_pre_configure() {
 		-mindepth 1 -maxdepth 1 -type d \
 		! -wholename ./vendor/rustls-platform-verifier \
 		! -wholename ./vendor/hickory-resolver \
-		! -wholename ./vendor/camino \
 		! -wholename ./vendor/resolv-conf \
 		! -wholename ./vendor/netdev \
 		-exec rm -rf '{}' \;
@@ -38,7 +36,6 @@ termux_step_pre_configure() {
 		[patch.crates-io]
 		rustls-platform-verifier = { path = "./vendor/rustls-platform-verifier" }
 		hickory-resolver = { path = "./vendor/hickory-resolver" }
-		camino = { path = "./vendor/camino" }
 		resolv-conf = { path = "./vendor/resolv-conf" }
 		netdev = { path = "./vendor/netdev" }
 	EOF
