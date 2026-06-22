@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A pager designed to just do the right thing without any 
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.15.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/walles/moor/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=efef9649f11aae825423381513a44b28840a009bf928edd436068cab0fdb5551
 TERMUX_PKG_CONFLICTS="moar"
