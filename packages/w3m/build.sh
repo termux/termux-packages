@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Text based Web browser and pager"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.5.6"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 # The upstream w3m project is dead, this is the fork shipped by e.g. Arch Linux.
 TERMUX_PKG_SRCURL="https://git.sr.ht/~rkta/w3m/archive/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=8dd652cd3f31817d68c7263c34eeffb50118c80be19e1159bf8cbf763037095e
