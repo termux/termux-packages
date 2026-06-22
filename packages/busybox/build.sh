@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a singl
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.38.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2"
 TERMUX_PKG_SHA256=34f9ea6ff8636f2c9241153b9114eefa9e65674a45318ae1ef95bb5f31c53bb2
 TERMUX_PKG_DEPENDS="libandroid-selinux"
