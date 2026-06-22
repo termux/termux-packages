@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Text editor for your terminal: easy, powerful and fast"
 TERMUX_PKG_LICENSE="GPL-2.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.4.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/sinelaw/fresh/releases/download/v$TERMUX_PKG_VERSION/fresh-editor-$TERMUX_PKG_VERSION-source.tar.gz"
 TERMUX_PKG_SHA256=2f0a281d7514345de29634d95fb1a064174383bbb40f62f90845a1345c07c2fa
 TERMUX_PKG_AUTO_UPDATE=true
