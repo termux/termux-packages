@@ -329,6 +329,14 @@ if [ "$(id -u)" = "0" ]; then
 	SUDO=""
 fi
 
+# Use GNU Coreutils as Rust coreutils has bugs which we are affected with.
+# TODO(@thunder-coding): Look back into this when we move to 28.04 LTS
+# https://documentation.ubuntu.com/release-notes/26.04/summary-for-lts-users/#rust-coreutils
+# Known problems with Rust coreutils:
+# comm: https://github.com/uutils/coreutils/issues/12972
+$SUDO env DEBIAN_FRONTEND=noninteractive \
+	apt-get install -yq --allow-remove-essential coreutils-from-gnu coreutils-from-uutils-
+
 # Allow 32-bit packages.
 $SUDO dpkg --add-architecture i386
 
