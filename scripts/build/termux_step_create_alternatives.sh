@@ -54,7 +54,7 @@ termux_step_create_alternatives() {
 		termux_parse_alternatives "$alternatives_file"
 
 		case "${TERMUX_PACKAGE_FORMAT}" in
-			"apt")
+			"debian")
 			# Handle postinst script
 			[[ -f postinst ]] && mv postinst{,.orig}
 
