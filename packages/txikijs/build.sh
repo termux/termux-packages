@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/saghul/txiki.js
 TERMUX_PKG_DESCRIPTION="A small and powerful JavaScript runtime"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1:26.5.0"
+TERMUX_PKG_VERSION="1:26.6.0"
 TERMUX_PKG_SRCURL=git+https://github.com/saghul/txiki.js
 TERMUX_PKG_DEPENDS="libandroid-spawn, libc++, libcurl, libffi"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -14,6 +14,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_CMAKE_BUILD="Unix Makefiles"
 
 termux_step_host_build() {
 	rm -rf "$TERMUX_PKG_HOSTBUILD_DIR"
@@ -38,6 +39,9 @@ termux_step_pre_configure() {
 	else
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
+
+	# Workaround strict compiler error
+	sed -i "s/-Werror/-Wno-error/g" CMakeLists.txt
 
 	LDFLAGS+=" -landroid-spawn"
 }
