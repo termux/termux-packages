@@ -74,7 +74,7 @@ termux_step_host_build() {
 		# gobject-introspection needed to build lua-lgi
 		"libgirepository-1.0-dev"
 		# lua $hostbuild_lua_version
-		"lua-any"
+		"lua$hostbuild_lua_version"
 		"liblua$hostbuild_lua_version-0"
 		"liblua$hostbuild_lua_version-dev"
 		# gobject-introspect needed by lua-lgi
@@ -142,7 +142,7 @@ termux_step_host_build() {
 	find "${HOSTBUILD_ROOTFS}/usr/lib/x86_64-linux-gnu" -xtype l \
 		-exec sh -c "ln -snvf /usr/lib/x86_64-linux-gnu/\$(readlink \$1) \$1" sh {} \;
 	ln -sf convert-im7.q16 "${HOSTBUILD_ROOTFS}/usr/bin/convert"
-	ln -sf $(command -v "lua$hostbuild_lua_version") "${HOSTBUILD_ROOTFS}/usr/bin/lua-any"
+	ln -sf "${HOSTBUILD_ROOTFS}/usr/bin/lua$hostbuild_lua_version" "${HOSTBUILD_ROOTFS}/usr/bin/lua-any"
 
 	_load_ubuntu_packages
 
