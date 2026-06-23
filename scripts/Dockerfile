@@ -33,7 +33,21 @@ RUN apt-get update && \
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/* && \
 	su - builder -c "rm ~/lib/*.zip" && \
-	su - builder -c "rm -r ~/.android/cache/"
+	su - builder -c "rm -r ~/.android/cache/" && \
+	# Use GNU Coreutils as Rust coreutils has bugs which we are affected with.
+	# This needs to be done at the end because installing the packages we need seems to override this somehow
+	# Bisecting the problem seems more trouble than overriding this at the end
+	# TODO(@thunder-coding): Look back into this when we move to 28.04 LTS
+	# https://documentation.ubuntu.com/release-notes/26.04/summary-for-lts-users/#rust-coreutils
+	# Known problems with Rust coreutils:
+	# comm: https://github.com/uutils/coreutils/issues/12972
+	# Ideally we should be able to do this and be done
+	# But Canonical doesn't seem to be competent enough to support this
+	# build-essential specifically depends on coreutils-from uutils, so that their builds don't break
+	# Seems like distros should know that more than their builds, their users builds matter more
+	# $SUDO env DEBIAN_FRONTEND=noninteractive \
+	# 	apt-get install -yq --allow-remove-essential coreutils-from-gnu coreutils-from-uutils-
+	find /usr/lib/cargo/bin/coreutils/ -type f -exec bash -c 'gnuln -sf /usr/bin/gnu"$(basename {})" /usr/bin/"$(basename {})"' \;
 
 # Switch User
 USER builder:builder
