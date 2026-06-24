@@ -3,7 +3,6 @@ TERMUX_SUBPKG_INCLUDE="
 bin/abidump
 bin/abigen
 bin/blsync
-bin/clef
 bin/devp2p
 bin/era
 bin/ethkey
