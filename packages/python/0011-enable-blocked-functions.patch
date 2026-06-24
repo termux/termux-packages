@@ -1,0 +1,197 @@
+diff --git a/Modules/posixmodule.c b/Modules/posixmodule.c
+index 69e28a1..d6d868a 100644
+--- a/Modules/posixmodule.c
++++ b/Modules/posixmodule.c
+@@ -3953,6 +3953,12 @@ static PyObject *
+ os_chroot_impl(PyObject *module, path_t *path)
+ /*[clinic end generated code: output=de80befc763a4475 input=14822965652c3dc3]*/
+ {
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return posix_error();
++    }
++#endif
+     int res;
+     Py_BEGIN_ALLOW_THREADS
+     res = chroot(path->narrow);
+@@ -9361,6 +9367,12 @@ os_initgroups_impl(PyObject *module, PyObject *oname, gid_t gid)
+ /*[clinic end generated code: output=59341244521a9e3f input=7e4514dff4526a95]*/
+ #endif
+ {
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return PyErr_SetFromErrno(PyExc_OSError);
++    }
++#endif
+     const char *username = PyBytes_AS_STRING(oname);
+ 
+     if (initgroups(username, gid) == -1)
+@@ -9784,6 +9796,12 @@ static PyObject *
+ os_setuid_impl(PyObject *module, uid_t uid)
+ /*[clinic end generated code: output=a0a41fd0d1ec555f input=c921a3285aa22256]*/
+ {
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return posix_error();
++    }
++#endif
+     if (setuid(uid) < 0)
+         return posix_error();
+     Py_RETURN_NONE;
+@@ -9805,6 +9823,12 @@ static PyObject *
+ os_seteuid_impl(PyObject *module, uid_t euid)
+ /*[clinic end generated code: output=102e3ad98361519a input=ba93d927e4781aa9]*/
+ {
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return posix_error();
++    }
++#endif
+     if (seteuid(euid) < 0)
+         return posix_error();
+     Py_RETURN_NONE;
+@@ -9826,6 +9850,12 @@ static PyObject *
+ os_setegid_impl(PyObject *module, gid_t egid)
+ /*[clinic end generated code: output=4e4b825a6a10258d input=4080526d0ccd6ce3]*/
+ {
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return posix_error();
++    }
++#endif
+     if (setegid(egid) < 0)
+         return posix_error();
+     Py_RETURN_NONE;
+@@ -9848,6 +9878,12 @@ static PyObject *
+ os_setreuid_impl(PyObject *module, uid_t ruid, uid_t euid)
+ /*[clinic end generated code: output=62d991210006530a input=0ca8978de663880c]*/
+ {
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return posix_error();
++    }
++#endif
+     if (setreuid(ruid, euid) < 0) {
+         return posix_error();
+     } else {
+@@ -9872,6 +9908,12 @@ static PyObject *
+ os_setregid_impl(PyObject *module, gid_t rgid, gid_t egid)
+ /*[clinic end generated code: output=aa803835cf5342f3 input=c59499f72846db78]*/
+ {
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return posix_error();
++    }
++#endif
+     if (setregid(rgid, egid) < 0)
+         return posix_error();
+     Py_RETURN_NONE;
+@@ -9892,6 +9934,12 @@ static PyObject *
+ os_setgid_impl(PyObject *module, gid_t gid)
+ /*[clinic end generated code: output=bdccd7403f6ad8c3 input=27d30c4059045dc6]*/
+ {
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return posix_error();
++    }
++#endif
+     if (setgid(gid) < 0)
+         return posix_error();
+     Py_RETURN_NONE;
+@@ -14847,6 +14895,12 @@ static PyObject *
+ os_setresuid_impl(PyObject *module, uid_t ruid, uid_t euid, uid_t suid)
+ /*[clinic end generated code: output=834a641e15373e97 input=9e33cb79a82792f3]*/
+ {
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return posix_error();
++    }
++#endif
+     if (setresuid(ruid, euid, suid) < 0)
+         return posix_error();
+     Py_RETURN_NONE;
+@@ -14870,6 +14924,12 @@ static PyObject *
+ os_setresgid_impl(PyObject *module, gid_t rgid, gid_t egid, gid_t sgid)
+ /*[clinic end generated code: output=6aa402f3d2e514a9 input=33e9e0785ef426b1]*/
+ {
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return posix_error();
++    }
++#endif
+     if (setresgid(rgid, egid, sgid) < 0)
+         return posix_error();
+     Py_RETURN_NONE;
+diff --git a/Modules/socketmodule.c b/Modules/socketmodule.c
+index 23a8440..926bd25 100644
+--- a/Modules/socketmodule.c
++++ b/Modules/socketmodule.c
+@@ -5925,6 +5925,13 @@ socket_sethostname(PyObject *self, PyObject *args)
+     Py_buffer buf;
+     int res, flag = 0;
+ 
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return PyErr_SetFromErrno(PyExc_OSError);
++    }
++#endif
++
+ #if defined(_AIX) || (defined(__sun) && defined(__SVR4) && Py_SUNOS_VERSION <= 510)
+ /* issue #18259, sethostname is not declared in any useful header file on AIX
+  * the same is true for Solaris 10 */
+diff --git a/configure b/configure
+index cdd4823..9e822b5 100755
+--- a/configure
++++ b/configure
+@@ -19275,16 +19275,12 @@ printf "%s\n" "$MACHDEP_OBJS" >&6; }
+ fi
+ 
+ if test "$ac_sys_system" = "Linux-android"; then
+-  # When these functions are used in an unprivileged process, they crash rather
+-  # than returning an error.
+-  blocked_funcs="chroot initgroups setegid seteuid setgid sethostname
+-    setregid setresgid setresuid setreuid setuid"
+ 
+   # Before API level 23, when fchmodat is called with the unimplemented flag
+   # AT_SYMLINK_NOFOLLOW, instead of returning ENOTSUP as it should, it actually
+   # follows the symlink.
+   if test "$ANDROID_API_LEVEL" -lt 23; then
+-    blocked_funcs="$blocked_funcs fchmodat"
++    blocked_funcs="fchmodat"
+   fi
+ 
+   for name in $blocked_funcs; do
+diff --git a/configure.ac b/configure.ac
+index a5c670c..2401b44 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -5239,16 +5239,12 @@ else
+ fi
+ 
+ if test "$ac_sys_system" = "Linux-android"; then
+-  # When these functions are used in an unprivileged process, they crash rather
+-  # than returning an error.
+-  blocked_funcs="chroot initgroups setegid seteuid setgid sethostname
+-    setregid setresgid setresuid setreuid setuid"
+ 
+   # Before API level 23, when fchmodat is called with the unimplemented flag
+   # AT_SYMLINK_NOFOLLOW, instead of returning ENOTSUP as it should, it actually
+   # follows the symlink.
+   if test "$ANDROID_API_LEVEL" -lt 23; then
+-    blocked_funcs="$blocked_funcs fchmodat"
++    blocked_funcs="fchmodat"
+   fi
+ 
+   for name in $blocked_funcs; do
+
