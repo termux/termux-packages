@@ -372,3 +372,29 @@ $SUDO chown -R "$(whoami)" "${TERMUX_APP__DATA_DIR%"${TERMUX_APP__DATA_DIR#/*/}"
 # that have a build dependency on 'aosp-libs'; see scripts/build/termux_step_override_config_scripts.sh
 # and scripts/build/setup/termux_setup_proot.sh for more information
 $SUDO ln -sf "$TERMUX_APP__DATA_DIR/aosp" /system
+
+# Use GNU Coreutils as Rust coreutils has bugs which we are affected with.
+# Known problems with Rust coreutils:
+# comm: https://github.com/uutils/coreutils/issues/12972
+mkdir -p /tmp/build-essential-build
+pushd /tmp/build-essential-build
+$SUDO sed -i 's/^Types: deb$/Types: deb deb-src/g' /etc/apt/sources.list.d/ubuntu.sources
+$SUDO apt-get update
+$SUDO env DEBIAN_FRONTEND=noninteractive \
+	apt-get install -yq devscripts debhelper
+apt source build-essential
+sed -i 's/coreutils-from-uutils/coreutils-from-uutils | coreutils-from-gnu/g' \
+	build-essential-*/debian/control
+pushd build-essential-*
+debuild -b -uc -us
+popd # build-essential-*
+$SUDO env DEBIAN_FRONTEND=noninteractive \
+	apt-get reinstall -yq --allow-downgrades \
+	./build-essential_*.deb
+$SUDO env DEBIAN_FRONTEND=noninteractive \
+	apt-get remove -yq --autoremove --allow-remove-essential \
+	devscripts debhelper coreutils-from-uutils
+popd # /tmp/build-essential-build
+rm -Rf /tmp/build-essential-build
+# Prevent package from being upgraded and overwriting our manual installation:
+$SUDO apt-mark hold build-essential
