@@ -11,7 +11,7 @@ TERMUX_PKG_LICENSE_FILE="
 "
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.42.1"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL="https://www.kernel.org/pub/linux/utils/util-linux/v${TERMUX_PKG_VERSION:0:4}/util-linux-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=82e9158eb12a9b0b569d84e1687fed9dd18fe89ccd8ef5ac3427218a7c0d7f7f
 # <dependency>: <binaries linking to that dependency>
@@ -75,4 +75,5 @@ termux_step_pre_configure() {
 	esac
 
 	LDFLAGS+=" -landroid-posix-semaphore"
+	autoreconf -fi
 }
