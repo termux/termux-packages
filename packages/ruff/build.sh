@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An extremely fast Python linter, written in Rust"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.15.20"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/charliermarsh/ruff/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=3d2d9283f8221d04f1debf1ac32ec900bba08aec5609266ac93b8b8464073d16
 TERMUX_PKG_AUTO_UPDATE=true
