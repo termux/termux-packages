@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=fa805ab465821c54094126b71a92acf2eba17674
 TERMUX_PKG_VERSION="2026.03.31"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=git+https://github.com/awesomeWM/awesome
 TERMUX_PKG_SHA256=ed61955ed9bdf1d216b881543572c32c83a15f419d9410d5c6b4ed3df3392383
 TERMUX_PKG_GIT_BRANCH=master
@@ -72,8 +72,6 @@ termux_step_host_build() {
 		"libmagickwand-7.q16-10"
 		# gobject-introspection needed to build lua-lgi
 		"libgirepository-1.0-dev"
-		# lua $hostbuild_lua_version
-		"luajit"
 		"libluajit-$hostbuild_luajit_version-2"
 		"libluajit-$hostbuild_luajit_version-dev"
 		# gobject-introspect needed by lua-lgi
@@ -142,7 +140,7 @@ termux_step_host_build() {
 	find "${HOSTBUILD_ROOTFS}/usr/lib/x86_64-linux-gnu" -xtype l \
 		-exec sh -c "ln -snvf /usr/lib/x86_64-linux-gnu/\$(readlink \$1) \$1" sh {} \;
 	ln -sf convert-im7.q16 "${HOSTBUILD_ROOTFS}/usr/bin/convert"
-	ln -sf "${HOSTBUILD_ROOTFS}/usr/bin/luajit" "${HOSTBUILD_ROOTFS}/usr/bin/lua-any"
+	ln -sf $(command -v luajit) "${HOSTBUILD_ROOTFS}/usr/bin/lua-any"
 
 	_load_ubuntu_packages
 
