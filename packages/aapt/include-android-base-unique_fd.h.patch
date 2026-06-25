@@ -1,17 +1,17 @@
---- a/libbase/include/android-base/unique_fd.h
-+++ b/libbase/include/android-base/unique_fd.h
-@@ -46,7 +46,7 @@
- // unique_fd is also known as ScopedFd/ScopedFD/scoped_fd; mentioned here to help
- // you find this class if you're searching for one of those names.
+--- a/vendor/libbase/include/android-base/unique_fd.h
++++ b/vendor/libbase/include/android-base/unique_fd.h
+@@ -29,7 +29,7 @@
+ // Including other headers from libbase frequently results in inclusion of
+ // android-base/macros.h, which causes macro collisions.
  
 -#if defined(__BIONIC__)
 +#if defined(__BIONIC__) && __ANDROID_API__ >= 29
  #include <android/fdsan.h>
  #endif
- 
-@@ -54,7 +54,7 @@
- namespace base {
- 
+ #if !defined(_WIN32) && !defined(__TRUSTY__)
+@@ -151,7 +151,7 @@
+ // The actual details of closing are factored out to support unusual cases.
+ // Almost everyone will want this DefaultCloser, which handles fdsan on bionic.
  struct DefaultCloser {
 -#if defined(__BIONIC__)
 +#if defined(__BIONIC__) && __ANDROID_API__ >= 29

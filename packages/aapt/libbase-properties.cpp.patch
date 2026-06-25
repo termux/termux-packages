@@ -1,47 +1,144 @@
---- a/libbase/properties.cpp
-+++ b/libbase/properties.cpp
-@@ -32,7 +32,7 @@
+--- a/vendor/libbase/properties.cpp
++++ b/vendor/libbase/properties.cpp
+@@ -25,6 +25,7 @@
+ #include <limits>
+ #include <set>
+ #include <string>
++#include <thread>
+ 
+ #include <android-base/parsebool.h>
  #include <android-base/parseint.h>
- #include <android-base/strings.h>
+@@ -161,6 +162,11 @@
+   const prop_info* pi = __system_property_find(key.c_str());
+   if (pi == nullptr) return default_value;
  
--#if !defined(__BIONIC__)
-+#if !defined(__BIONIC__) || defined(__TERMUX__)
++#if defined(__BIONIC__) && __ANDROID_API__ < 26
++  char value[PROP_VALUE_MAX];
++  if (__system_property_read(pi, nullptr, value) < 0) return default_value;
++  property_value = value;
++#else
+   __system_property_read_callback(
+       pi,
+       [](void* cookie, const char*, const char* value, unsigned) {
+@@ -168,6 +174,7 @@
+         *property_value = value;
+       },
+       &property_value);
++#endif
+   // If the property exists but is empty, also return the default value.
+   // Since we can't remove system properties, "empty" is traditionally
+   // the same as "missing" (this was true for cutils' property_get).
+@@ -180,6 +187,8 @@
  
- #define PROP_VALUE_MAX 92
+ #if defined(__BIONIC__)
  
-@@ -53,6 +53,9 @@
-   return 0;
++#if __ANDROID_API__ >= 26
++
+ struct WaitForPropertyData {
+   bool done;
+   const std::string* expected_value;
+@@ -237,8 +246,23 @@
+   return pi;
  }
  
 +#endif
 +
-+#if !defined(__BIONIC__)
- int __system_property_get(const char* key, char* value) {
-   auto it = g_properties.find(key);
-   if (it == g_properties.end()) {
-@@ -62,7 +65,6 @@
-   snprintf(value, PROP_VALUE_MAX, "%s", it->second.c_str());
-   return strlen(value);
+ bool WaitForProperty(const std::string& key, const std::string& expected_value,
+                      std::chrono::milliseconds relative_timeout) {
++#if __ANDROID_API__ < 26
++  auto start_time = std::chrono::steady_clock::now();
++  while (true) {
++    if (GetProperty(key, "") == expected_value) return true;
++
++    auto now = std::chrono::steady_clock::now();
++    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_time);
++    if (elapsed >= relative_timeout) return false;
++
++    auto remaining_timeout = relative_timeout - elapsed;
++    std::this_thread::sleep_for(std::min(std::chrono::milliseconds(50), remaining_timeout));
++  }
++#else
+   auto start_time = std::chrono::steady_clock::now();
+   const prop_info* pi = WaitForPropertyCreation(key, relative_timeout, start_time);
+   if (pi == nullptr) return false;
+@@ -257,12 +281,27 @@
+     uint32_t unused;
+     if (!__system_property_wait(pi, data.last_read_serial, &unused, &ts)) return false;
+   }
++#endif
  }
--
- #endif
  
- namespace android {
-@@ -108,7 +110,7 @@
- 
- std::string GetProperty(const std::string& key, const std::string& default_value) {
-   std::string property_value;
--#if defined(__BIONIC__)
-+#if defined(__BIONIC__) && !defined(__TERMUX__)
-   const prop_info* pi = __system_property_find(key.c_str());
-   if (pi == nullptr) return default_value;
- 
-@@ -134,7 +136,7 @@
-   return (__system_property_set(key.c_str(), value.c_str()) == 0);
+ bool WaitForPropertyCreation(const std::string& key,
+                              std::chrono::milliseconds relative_timeout) {
++#if __ANDROID_API__ < 26
++  auto start_time = std::chrono::steady_clock::now();
++  while (true) {
++    if (__system_property_find(key.c_str()) != nullptr) return true;
++
++    auto now = std::chrono::steady_clock::now();
++    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_time);
++    if (elapsed >= relative_timeout) return false;
++
++    auto remaining_timeout = relative_timeout - elapsed;
++    std::this_thread::sleep_for(std::min(std::chrono::milliseconds(50), remaining_timeout));
++  }
++#else
+   auto start_time = std::chrono::steady_clock::now();
+   return (WaitForPropertyCreation(key, relative_timeout, start_time) != nullptr);
++#endif
  }
  
--#if defined(__BIONIC__)
-+#if defined(__BIONIC__) && !defined(__TERMUX__)
+ CachedProperty::CachedProperty(std::string property_name)
+@@ -296,6 +335,14 @@
+     // Only bother re-reading the property if it's actually changed since last time.
+     uint32_t property_serial = __system_property_serial(prop_info_);
+     if (property_serial != cached_property_serial_) {
++#if __ANDROID_API__ < 26
++      char value[PROP_VALUE_MAX];
++      if (__system_property_read(prop_info_, nullptr, value) >= 0) {
++        cached_property_serial_ = property_serial;
++        strlcpy(cached_value_, value, PROP_VALUE_MAX);
++        read_only_property_ = cached_value_;
++      }
++#else
+       __system_property_read_callback(
+           prop_info_,
+           [](void* data, const char*, const char* value, uint32_t serial) {
+@@ -310,6 +357,7 @@
+             }
+           },
+           this);
++#endif
+     }
+   }
  
- struct WaitForPropertyData {
-   bool done;
+@@ -325,6 +373,21 @@
+ }
+ 
+ const char* CachedProperty::WaitForChange(std::chrono::milliseconds relative_timeout) {
++#if __ANDROID_API__ < 26
++  auto start_time = std::chrono::steady_clock::now();
++  uint32_t old_serial = cached_property_serial_.value_or(0);
++  while (true) {
++    const char* value = Get(nullptr);
++    if (prop_info_ != nullptr && cached_property_serial_.value_or(0) != old_serial) return value;
++
++    auto now = std::chrono::steady_clock::now();
++    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_time);
++    if (elapsed >= relative_timeout) return nullptr;
++
++    auto remaining_timeout = relative_timeout - elapsed;
++    std::this_thread::sleep_for(std::min(std::chrono::milliseconds(50), remaining_timeout));
++  }
++#else
+   if (!prop_info_) {
+     auto start_time = std::chrono::steady_clock::now();
+     prop_info_ = WaitForPropertyCreation(property_name_, relative_timeout, start_time);
+@@ -341,6 +404,7 @@
+   }
+ 
+   return Get(nullptr);
++#endif
+ }
+ 
+ CachedBoolProperty::CachedBoolProperty(std::string property_name)
