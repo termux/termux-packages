@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="External JavaScript for yt-dlp supporting many runtimes"
 TERMUX_PKG_LICENSE="Unlicense"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.8.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/yt-dlp/ejs/releases/download/$TERMUX_PKG_VERSION/yt_dlp_ejs-$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=d5fa1639f63b5c4af8d932495f60689d5370f1a095782c944f7f62a303eb104e
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="build, hatchling, hatch-vcs"
