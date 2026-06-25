@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Most popular and complete prolog implementation"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="10.1.10"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://www.swi-prolog.org/download/devel/src/swipl-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=5cc835c077db4e6fc1f9b060506fb522e37145844a7e1132258efabbe7573f83
 TERMUX_PKG_DEPENDS="libandroid-execinfo, libarchive, libcrypt, libdb, libedit, libgmp, libyaml, ncurses, openssl, ossp-uuid, pcre2, python, unixodbc, zlib"
@@ -50,6 +50,22 @@ termux_pkg_auto_update() {
 	termux_pkg_upgrade_version "$version"
 }
 
+_load_ubuntu_packages() {
+	export HOSTBUILD_ROOTFS="${TERMUX_PKG_HOSTBUILD_DIR}/ubuntu_packages"
+	if [[ "$TERMUX_ARCH_BITS" == "32" ]]; then
+		export HOSTBUILD_ARCH="i386"
+		export HOSTBUILD_ARCH_LIBDIR="/usr/lib/i386-linux-gnu"
+		export HOSTBUILD_ARCH_INCLUDEDIR="/usr/include/i386-linux-gnu"
+	else
+		export HOSTBUILD_ARCH="amd64"
+		export HOSTBUILD_ARCH_LIBDIR="/usr/lib/x86_64-linux-gnu"
+		export HOSTBUILD_ARCH_INCLUDEDIR="/usr/include/x86_64-linux-gnu"
+	fi
+	export LD_LIBRARY_PATH="${HOSTBUILD_ROOTFS}${HOSTBUILD_ARCH_LIBDIR}"
+	LD_LIBRARY_PATH+=":${HOSTBUILD_ROOTFS}/usr/lib"
+	LD_LIBRARY_PATH+=":${HOSTBUILD_ARCH_LIBDIR}"
+}
+
 # We do this to produce:
 # a native host build to produce
 # boot<nn>.prc, INDEX.pl, ssl cetificate tests,
@@ -57,8 +73,10 @@ termux_pkg_auto_update() {
 # this build for the artifacts needed to build the
 # Android version
 termux_step_host_build() {
-	# make build dependencies of hostbuild exactly match build dependencies of target build
-	# prevents possible errors that can otherwise occur
+	_load_ubuntu_packages
+
+	# make build dependencies of hostbuild match build dependencies of target build
+	# as closely as possible. prevents possible errors that can otherwise occur
 	local -a ubuntu_packages=(
 		"libacl1-dev"
 		"libarchive-dev"
@@ -72,8 +90,6 @@ termux_step_host_build() {
 		"libmd-dev"
 		"libodbccr2"
 		"libodbcinst2"
-		"libossp-uuid-dev"
-		"libossp-uuid16"
 		"libpython3-dev"
 		"libpython3.14-dev"
 		"nettle-dev"
@@ -83,51 +99,93 @@ termux_step_host_build() {
 		"unixodbc-dev"
 	)
 
-	termux_download_ubuntu_packages "${ubuntu_packages[@]}"
+	# these have 64-bit packages preinstalled, but not 32-bit packages
+	# it's difficult to precisely calculate which ones are necessary;
+	# more were added until all fatal errors disappeared
+	if [[ "$HOSTBUILD_ARCH" == "i386" ]]; then
+		ubuntu_packages+=("libacl1")
+		ubuntu_packages+=("libarchive13t64")
+		ubuntu_packages+=("libbsd0")
+		ubuntu_packages+=("libdb5.3t64")
+		ubuntu_packages+=("libedit2")
+		ubuntu_packages+=("libgmp10")
+		ubuntu_packages+=("libgmpxx4ldbl")
+		ubuntu_packages+=("libltdl-dev")
+		ubuntu_packages+=("libltdl7")
+		ubuntu_packages+=("liblz4-1")
+		ubuntu_packages+=("liblzma5")
+		ubuntu_packages+=("libmd0")
+		ubuntu_packages+=("libncurses6")
+		ubuntu_packages+=("libncursesw6")
+		ubuntu_packages+=("libnettle8t64")
+		ubuntu_packages+=("libodbc2")
+		ubuntu_packages+=("libpcre2-16-0")
+		ubuntu_packages+=("libpcre2-32-0")
+		ubuntu_packages+=("libpcre2-dev")
+		ubuntu_packages+=("libpcre2-posix3")
+		ubuntu_packages+=("libpython3.14-minimal")
+		ubuntu_packages+=("libpython3.14-stdlib")
+		ubuntu_packages+=("libpython3.14")
+		ubuntu_packages+=("libtinfo6")
+		ubuntu_packages+=("libuuid1")
+		ubuntu_packages+=("libxml2-16")
+		ubuntu_packages+=("libxxhash0")
+		ubuntu_packages+=("libyaml-0-2")
+		ubuntu_packages+=("libyaml-dev")
+		ubuntu_packages+=("python3.14-minimal")
+		ubuntu_packages+=("python3.14")
+		ubuntu_packages+=("uuid-dev")
+	fi
 
-	local HOSTBUILD_ROOTFS="${TERMUX_PKG_HOSTBUILD_DIR}/ubuntu_packages"
+	# these do not exist for 32-bit x86 Ubuntu
+	if [[ "$HOSTBUILD_ARCH" == "amd64" ]]; then
+		ubuntu_packages+=("libossp-uuid-dev")
+		ubuntu_packages+=("libossp-uuid16")
+	fi
+
+	ARCHITECTURE="$HOSTBUILD_ARCH" \
+	termux_download_ubuntu_packages "${ubuntu_packages[@]}"
 
 	find "${HOSTBUILD_ROOTFS}" -type f -name '*.pc' | \
 		xargs -n 1 sed -i -e "s|/usr|${HOSTBUILD_ROOTFS}/usr|g"
 
-	# delete python static libraries to prevent error:
+	# delete all static libraries to prevent errors:
 	# relocation R_X86_64_32 against `.rodata' can not be used when making a shared object; recompile with -fPIC
-	find "${HOSTBUILD_ROOTFS}" -type f -name '*python*.a' -delete
+	# and
+	# undefined reference to`ZSTD_isError'
+	find "${HOSTBUILD_ROOTFS}" -type f -name '*.a' -delete
 
-	find "${HOSTBUILD_ROOTFS}/usr/lib/x86_64-linux-gnu" -xtype l \
-		-exec sh -c "ln -snvf /usr/lib/x86_64-linux-gnu/\$(readlink \$1) \$1" sh {} \;
-
-	export LD_LIBRARY_PATH="${HOSTBUILD_ROOTFS}/usr/lib/x86_64-linux-gnu"
-	LD_LIBRARY_PATH+=":${HOSTBUILD_ROOTFS}/usr/lib"
+	find "${HOSTBUILD_ROOTFS}${HOSTBUILD_ARCH_LIBDIR}" -xtype l \
+		-exec sh -c "ln -snvf ${HOSTBUILD_ARCH_LIBDIR}/\$(readlink \$1) \$1" sh {} \;
 
 	# fixes: fatal error: uuid.h: No such file or directory
 	export CFLAGS+=" -I${HOSTBUILD_ROOTFS}/usr/include/ossp"
 
 	# fixes: fatal error: unixodbc.h: No such file or directory
-	CFLAGS+=" -I${HOSTBUILD_ROOTFS}/usr/include/x86_64-linux-gnu"
+	CFLAGS+=" -I${HOSTBUILD_ROOTFS}${HOSTBUILD_ARCH_INCLUDEDIR}"
 
 	# fixes: fatal error: x86_64-linux-gnu/python3.12/pyconfig.h: No such file or directory
 	CFLAGS+=" -I${HOSTBUILD_ROOTFS}/usr/include"
 
-	local HOSTBUILD_EXTRA_CONFIGURE_ARGS_32=""
+	LDFLAGS+=" -L${HOSTBUILD_ROOTFS}${HOSTBUILD_ARCH_LIBDIR}"
+
 	if [[ "$TERMUX_ARCH_BITS" == "32" ]]; then
 		export LDFLAGS+=" -m32"
 		export CFLAGS+=" -m32"
 		export CXXFLAGS+=" -m32 -funwind-tables"
-		HOSTBUILD_EXTRA_CONFIGURE_ARGS_32+=" -DCMAKE_LIBRARY_PATH=/usr/lib/i386-linux-gnu"
-		# problem: difficult to enable these during hostbuild for 32-bit targets without errors
-		HOSTBUILD_EXTRA_CONFIGURE_ARGS_32+=" -DSWIPL_PACKAGES_ODBC=OFF"
-		HOSTBUILD_EXTRA_CONFIGURE_ARGS_32+=" -DSWIPL_PACKAGES_PYTHON=OFF"
 	fi
 
 	termux_setup_cmake
 	termux_setup_ninja
 
-	cmake "$TERMUX_PKG_SRCDIR"                        \
-		-G "Ninja"                                    \
+	cmake "$TERMUX_PKG_SRCDIR" \
+		-G "Ninja" \
 		-DCMAKE_PREFIX_PATH="${HOSTBUILD_ROOTFS}/usr" \
-		$_SHARED_EXTRA_CONFIGURE_ARGS                 \
-		$HOSTBUILD_EXTRA_CONFIGURE_ARGS_32
+		-DCMAKE_LIBRARY_PATH="${HOSTBUILD_ARCH_LIBDIR}" \
+		-DCMAKE_LIBRARY_PATH="${HOSTBUILD_ROOTFS}${HOSTBUILD_ARCH_LIBDIR}" \
+		-DOPENSSL_CRYPTO_LIBRARY="${HOSTBUILD_ARCH_LIBDIR}/libcrypto.so" \
+		-DOPENSSL_SSL_LIBRARY="${HOSTBUILD_ARCH_LIBDIR}/libssl.so" \
+		$_SHARED_EXTRA_CONFIGURE_ARGS
 
 	ninja
 
@@ -141,10 +199,7 @@ termux_step_pre_configure() {
 
 	LDFLAGS+=" -landroid-execinfo $($CC -print-libgcc-file-name)"
 
-	local HOSTBUILD_ROOTFS="${TERMUX_PKG_HOSTBUILD_DIR}/ubuntu_packages"
-
-	export LD_LIBRARY_PATH="${HOSTBUILD_ROOTFS}/usr/lib/x86_64-linux-gnu"
-	LD_LIBRARY_PATH+=":${HOSTBUILD_ROOTFS}/usr/lib"
+	_load_ubuntu_packages
 }
 
 termux_step_post_make_install() {
