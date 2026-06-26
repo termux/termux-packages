@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Cross-platform process and system utilities module for P
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="7.2.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/giampaolo/psutil/archive/refs/tags/release-$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=38f406bf21acc67e45f414b7980463b2e6e6270ba3616ffd41995d997078cbe6
 TERMUX_PKG_DEPENDS="python, python-pip"
