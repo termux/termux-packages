@@ -1,5 +1,23 @@
 --- a/bin/9c
 +++ b/bin/9c
+@@ -29,7 +29,7 @@ usegcc()
+ 	# want to put -fno-optimize-sibling-calls here but
+ 	# that option only works with gcc3+ it seems
+ 	cflags="$cflags -ggdb"
+-	cflags="$cflags $CC9FLAGS"
++	cflags="$cflags $CFLAGS"
+ }
+ 
+ quiet()
+@@ -88,7 +88,7 @@ useclang()
+ 		-fno-common \
+ 	"
+ 	cflags="$cflags -g"
+-	cflags="$cflags $CC9FLAGS"
++	cflags="$cflags $CFLAGS"
+ }
+ 
+ usexlc()
 @@ -118,7 +118,7 @@ case "$tag" in
  		cflags="$cflags -g3 -m64"
  		;;
