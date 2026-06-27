@@ -1,5 +1,14 @@
 --- a/bin/9c
 +++ b/bin/9c
+@@ -3,7 +3,7 @@
+ test -f "$PLAN9/config" && . "$PLAN9/config"
+ usegcc()
+ {
+-	cc=${CC9:-gcc}
++	cc=$CC
+ 	cflags=" \
+ 		-O2 \
+ 		-c \
 @@ -29,7 +29,7 @@ usegcc()
  	# want to put -fno-optimize-sibling-calls here but
  	# that option only works with gcc3+ it seems
@@ -9,6 +18,15 @@
  }
  
  quiet()
+@@ -64,7 +64,7 @@ quiet()
+ 
+ useclang()
+ {
+-	cc=${CC9:-clang}
++	cc=$CC
+ 	cflags=" \
+ 		-O2 \
+ 		-c \
 @@ -88,7 +88,7 @@ useclang()
  		-fno-common \
  	"
