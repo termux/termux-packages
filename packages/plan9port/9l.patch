@@ -7,9 +7,9 @@
 -	ld="${CC9:-gcc} $CC9FLAGS"
 +	if [ "$bootstrap" = 'true' ]
 +	then
-+		ld="${CC9:-clang} $CC9FLAGS"
++		ld="${CC9:-clang} $CC9FLAGS -L@TERMUX_PREFIX@/lib"
 +	else
-+		ld="$CC $CFLAGS"
++		ld="$CC $CFLAGS -L@TERMUX_PREFIX@/lib"
 +	fi
  	userpath=true
 -	extralibs="$extralibs -lutil -lresolv -lpthread"
