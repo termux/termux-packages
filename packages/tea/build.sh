@@ -2,9 +2,8 @@ TERMUX_PKG_HOMEPAGE=https://gitea.com/gitea/tea
 TERMUX_PKG_DESCRIPTION="The official CLI for Gitea"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.14.1"
-TERMUX_PKG_SRCURL=https://gitea.com/gitea/tea/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=848b6b2fafa270fa77b4e278d521bfcc16d2f721c45ac90f08f5b16dc630c3f9
+TERMUX_PKG_VERSION="0.14.2"
+TERMUX_PKG_SRCURL=git+https://gitea.com/gitea/tea
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
@@ -44,6 +43,6 @@ termux_step_make_install() {
 	"$TERMUX_PKG_HOSTBUILD_DIR"/tea completion fish > \
 		"$TERMUX_PREFIX"/share/fish/vendor_completions.d/tea.fish
 
-	mkdir -p "$TERMUX_PREFIX"/share/man/man8
-	"$TERMUX_PKG_HOSTBUILD_DIR"/tea man --out "$TERMUX_PREFIX"/share/man/man8/tea.8
+	mkdir -p "$TERMUX_PREFIX"/share/man/man1
+	"$TERMUX_PKG_HOSTBUILD_DIR"/tea man --out "$TERMUX_PREFIX"/share/man/man1/tea.1
 }
