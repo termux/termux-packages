@@ -239,6 +239,11 @@ PACKAGES+=" sqlite3"
 PACKAGES+=" cvs"
 PACKAGES+=" python3-yaml"
 
+# Needed by blueprint-compiler (termux_setup_bpc)
+PACKAGES+=" python3-gi"
+PACKAGES+=" python3-gi-cairo"
+PACKAGES+=" gir1.2-gtk-4.0"
+
 # Needed by gobject-introspection (termux_setup_gir).
 PACKAGES+=" bash-static"
 
