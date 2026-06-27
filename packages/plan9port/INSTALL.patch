@@ -1,15 +1,25 @@
 --- a/INSTALL
 +++ b/INSTALL
-@@ -118,9 +118,9 @@ fi
- if [ `uname` != Darwin ]; then
- 	# Determine whether fontsrv X11 files are available.
- 	rm -f a.out
--	cc -o a.out -c -Iinclude -I/usr/include -I/usr/local/include -I/usr/include/freetype2 -I/usr/local/include/freetype2 \
--	    -I/usr/X11R7/include -I/usr/X11R7/include/freetype2 \
--	    -I/usr/X11R6/include -I/usr/X11R6/include/freetype2 src/cmd/fontsrv/x11.c >/dev/null 2>&1
-+	cc -o a.out -c -Iinclude -I@TERMUX_PREFIX@/include -I@TERMUX_PREFIX@/local/include -I@TERMUX_PREFIX@/include/freetype2 -I@TERMUX_PREFIX@/local/include/freetype2 \
-+	    -I@TERMUX_PREFIX@/X11R7/include -I@TERMUX_PREFIX@/X11R7/include/freetype2 \
-+	    -I@TERMUX_PREFIX@/X11R6/include -I@TERMUX_PREFIX@/X11R6/include/freetype2 src/cmd/fontsrv/x11.c >/dev/null 2>&1
- 	if [ -f a.out ]; then
- 		echo "	fontsrv dependencies found."
- 		echo "FONTSRV=fontsrv" >>$PLAN9/config
+@@ -150,8 +150,11 @@ unset MKSHELL
+ 
+ cd src
+ if $dobuild; then
+-	echo "* Building mk..."
+-	../dist/buildmk 2>&1 | sed 's/^[+] //'
++	echo "* Building native mk..."
++	(
++		export CC=${CC:-clang}
++		../dist/buildmk 2>&1 | sed 's/^[+] //'
++	)
+ 
+ 	if [ ! -x ../bin/mk ]; then
+ 		echo "* Error: mk failed to build."
+@@ -175,6 +178,8 @@ if $dobuild; then
+ 		cp $PLAN9/bin/quote1 $PLAN9/bin/'"'
+ 		cp $PLAN9/bin/quote2 $PLAN9/bin/'""'
+ 	fi
++	echo "* Building cross mk..."
++	../dist/buildmk 2>&1 | sed 's/^[+] //'
+ 	echo "* Cleaning up..."
+ 	mk clean
+ fi
