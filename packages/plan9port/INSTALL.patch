@@ -1,24 +1,21 @@
 --- a/INSTALL
 +++ b/INSTALL
-@@ -150,8 +150,11 @@ unset MKSHELL
+@@ -150,7 +150,8 @@ unset MKSHELL
  
  cd src
  if $dobuild; then
 -	echo "* Building mk..."
--	../dist/buildmk 2>&1 | sed 's/^[+] //'
 +	echo "* Building native mk..."
-+	(
-+		export CC=${CC:-clang}
-+		../dist/buildmk 2>&1 | sed 's/^[+] //'
-+	)
++	export bootstrap=true
+ 	../dist/buildmk 2>&1 | sed 's/^[+] //'
  
  	if [ ! -x ../bin/mk ]; then
- 		echo "* Error: mk failed to build."
-@@ -175,6 +178,8 @@ if $dobuild; then
+@@ -175,6 +176,9 @@ if $dobuild; then
  		cp $PLAN9/bin/quote1 $PLAN9/bin/'"'
  		cp $PLAN9/bin/quote2 $PLAN9/bin/'""'
  	fi
 +	echo "* Building cross mk..."
++	export bootstrap=false
 +	../dist/buildmk 2>&1 | sed 's/^[+] //'
  	echo "* Cleaning up..."
  	mk clean
