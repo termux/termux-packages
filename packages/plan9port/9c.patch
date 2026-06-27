@@ -1,42 +1,34 @@
 --- a/bin/9c
 +++ b/bin/9c
-@@ -3,7 +3,7 @@
- test -f "$PLAN9/config" && . "$PLAN9/config"
- usegcc()
- {
--	cc=${CC9:-gcc}
-+	cc=$CC
- 	cflags=" \
- 		-O2 \
- 		-c \
-@@ -29,7 +29,7 @@ usegcc()
+@@ -29,7 +29,12 @@ usegcc()
  	# want to put -fno-optimize-sibling-calls here but
  	# that option only works with gcc3+ it seems
  	cflags="$cflags -ggdb"
 -	cflags="$cflags $CC9FLAGS"
-+	cflags="$cflags $CFLAGS"
++	if [ "$bootstrap" = 'true' ]
++	then
++		cflags="$cflags $CC9FLAGS"
++	else
++		cflags="$cflags $CFLAGS"
++	fi
  }
  
  quiet()
-@@ -64,7 +64,7 @@ quiet()
- 
- useclang()
- {
--	cc=${CC9:-clang}
-+	cc=$CC
- 	cflags=" \
- 		-O2 \
- 		-c \
-@@ -88,7 +88,7 @@ useclang()
+@@ -88,7 +93,12 @@ useclang()
  		-fno-common \
  	"
  	cflags="$cflags -g"
 -	cflags="$cflags $CC9FLAGS"
-+	cflags="$cflags $CFLAGS"
++	if [ "$bootstrap" = 'true' ]
++	then
++		cflags="$cflags $CC9FLAGS"
++	else
++		cflags="$cflags $CFLAGS"
++	fi
  }
  
  usexlc()
-@@ -118,13 +118,11 @@ case "$tag" in
+@@ -118,14 +128,7 @@ case "$tag" in
  		cflags="$cflags -g3 -m64"
  		;;
  *HP-UX*)	cc=${CC9:-cc}; cflags="-g -O -c -Ae" ;;
@@ -47,15 +39,12 @@
 -			cflags="-c -g"
 -			;;
 -		esac
-+*Linux*)	useclang
-+		if [ "$bootstrap" = 'true' ]
-+		then
-+			cc=${CC:-clang}
-+		fi
- 		;;
+-		;;
++*Linux*)	useclang ;;
  *OSF1*)		cc=${CC9:-cc}; cflags="-g -O -c" ;;
  *SunOS*-cc)	cc=cc;
-@@ -150,7 +148,7 @@ case "$tag" in
+ 		cflags="-mt -g -O -c -xCC -D__sun__"
+@@ -150,7 +153,7 @@ case "$tag" in
  esac
  
  # Must use temp file to avoid pipe; pipe loses status.
