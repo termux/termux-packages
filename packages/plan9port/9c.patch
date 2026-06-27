@@ -36,16 +36,26 @@
  }
  
  usexlc()
-@@ -118,7 +118,7 @@ case "$tag" in
+@@ -118,13 +118,11 @@ case "$tag" in
  		cflags="$cflags -g3 -m64"
  		;;
  *HP-UX*)	cc=${CC9:-cc}; cflags="-g -O -c -Ae" ;;
 -*Linux*)	usegcc
+-		case "${CC9:-gcc}" in
+-		tcc)
+-			cc=tcc
+-			cflags="-c -g"
+-			;;
+-		esac
 +*Linux*)	useclang
- 		case "${CC9:-gcc}" in
- 		tcc)
- 			cc=tcc
-@@ -150,7 +150,7 @@ case "$tag" in
++		if [ "$bootstrap" = 'true' ]
++		then
++			cc=${CC:-clang}
++		fi
+ 		;;
+ *OSF1*)		cc=${CC9:-cc}; cflags="-g -O -c" ;;
+ *SunOS*-cc)	cc=cc;
+@@ -150,7 +148,7 @@ case "$tag" in
  esac
  
  # Must use temp file to avoid pipe; pipe loses status.
