@@ -10,12 +10,19 @@
  	../dist/buildmk 2>&1 | sed 's/^[+] //'
  
  	if [ ! -x ../bin/mk ]; then
-@@ -175,6 +176,9 @@ if $dobuild; then
+@@ -159,6 +160,7 @@ if $dobuild; then
+ 	fi
+ 
+ 	echo "* Building everything (be patient)..."
++	export bootstrap=false
+ 	mk clean
+ 	mk libs-nuke
+ 	mk all || exit 1
+@@ -175,6 +177,8 @@ if $dobuild; then
  		cp $PLAN9/bin/quote1 $PLAN9/bin/'"'
  		cp $PLAN9/bin/quote2 $PLAN9/bin/'""'
  	fi
 +	echo "* Building cross mk..."
-+	export bootstrap=false
 +	../dist/buildmk 2>&1 | sed 's/^[+] //'
  	echo "* Cleaning up..."
  	mk clean
