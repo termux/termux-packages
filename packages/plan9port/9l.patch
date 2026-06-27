@@ -1,8 +1,11 @@
 --- a/bin/9l
 +++ b/bin/9l
-@@ -27,7 +27,7 @@ case "$tag" in
+@@ -25,9 +25,9 @@ case "$tag" in
+ 	nmflags="-B"
+ 	;;
  *Linux*)
- 	ld="${CC9:-gcc} $CC9FLAGS"
+-	ld="${CC9:-gcc} $CC9FLAGS"
++	ld="${CC9:-gcc} $CC9FLAGS -L@TERMUX_PREFIX@/lib"
  	userpath=true
 -	extralibs="$extralibs -lutil -lresolv -lpthread"
 +	extralibs="$extralibs -lutil -lresolv_wrapper -lpthread"
