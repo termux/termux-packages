@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Advanced cross-platform 2D and 3D game engine"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.7"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/godotengine/godot/archive/refs/tags/$TERMUX_PKG_VERSION-stable.tar.gz"
 TERMUX_PKG_SHA256=5960084fce0934dfa68acd26df1103385cf3675d0de2b5124922d3cae602bf1c
 TERMUX_PKG_DEPENDS="brotli, ca-certificates, fontconfig, freetype, glu, libandroid-execinfo, libc++, libenet, libgraphite, libjpeg-turbo, libogg, libtheora, libvorbis, libvpx, libwebp, libwslay, libxcursor, libxi, libxinerama, libxkbcommon, libxrandr, mbedtls, miniupnpc, opengl, opusfile, pcre2, python, sdl3, speechd, zlib, zstd"
