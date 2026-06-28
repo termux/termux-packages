@@ -15,3 +15,19 @@
  	echo "* Building everything (be patient)..."
  	mk clean
  	mk libs-nuke
+@@ -175,6 +167,15 @@ if $dobuild; then
+ 		cp $PLAN9/bin/quote1 $PLAN9/bin/'"'
+ 		cp $PLAN9/bin/quote2 $PLAN9/bin/'""'
+ 	fi
++	echo "* Building mk..."
++	rm -f ../bin/mk
++	../dist/buildmk 2>&1 | sed 's/^[+] //'
++
++	if [ ! -x ../bin/mk ]; then
++		echo "* Error: mk failed to build."
++		exit 1
++	fi
++
+ 	echo "* Cleaning up..."
+ 	mk clean
+ fi
