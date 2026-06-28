@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="AudioTube can search YouTube Music, list albums and arti
 TERMUX_PKG_LICENSE="GPL-2.0-or-later, LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26.04.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/audiotube-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=af049214826346351215c8604e74ab74409cc9bf3005565b2a280fcd5afed393
 TERMUX_PKG_AUTO_UPDATE=true
