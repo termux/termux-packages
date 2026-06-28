@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://9fans.github.io
-TERMUX_PKG_DESCRIPTION="Build automation system from Plan 9 from Bell Labs"
+TERMUX_PKG_DESCRIPTION="Build automation system from Plan 9 from User Space"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0
@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/9fans/plan9port/archive/b36c747d62a690ffb9c
 TERMUX_PKG_SHA256=b3c5dc0f2813c6f51178ada1765b6771910060ec3efaa8f05ea3f93c0334b5a8
 TERMUX_PKG_DEPENDS="libresolv-wrapper"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
 	if [ "${TERMUX_ON_DEVICE_BUILD}" = 'false' ]
