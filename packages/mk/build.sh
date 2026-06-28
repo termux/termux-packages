@@ -9,6 +9,16 @@ TERMUX_PKG_SHA256=b3c5dc0f2813c6f51178ada1765b6771910060ec3efaa8f05ea3f93c0334b5
 TERMUX_PKG_DEPENDS="libresolv-wrapper"
 TERMUX_PKG_BUILD_IN_SRC=true
 
+termux_step_host_build() {
+	if [ "$TERMUX_ON_DEVICE_BUILD" = 'false' ]
+	then
+		(
+			cd ${TERMUX_PKG_SRCDIR}
+			./INSTALL -b
+		)
+	fi
+}
+
 termux_step_make() {
 	./INSTALL -b
 }
