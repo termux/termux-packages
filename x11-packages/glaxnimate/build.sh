@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Vector animation and motion design application"
 TERMUX_PKG_LICENSE="GPL-3.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.6.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="git+https://invent.kde.org/graphics/glaxnimate"
 TERMUX_PKG_GIT_BRANCH="master"
 TERMUX_PKG_AUTO_UPDATE=true
