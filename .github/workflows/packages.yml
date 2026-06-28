@@ -489,6 +489,14 @@ jobs:
               if ! aptly_publish_repo; then
                 exit 1
               fi
+
+              # Publish to staging repo if we haven't already
+              if [[ "$REPOSITORY_DISTRIBUTION" != "staging" ]]; then
+                REPOSITORY_DISTRIBUTION=staging
+                if ! aptly_publish_repo; then
+                  exit 1
+                fi
+              fi
             fi
           fi
         done
