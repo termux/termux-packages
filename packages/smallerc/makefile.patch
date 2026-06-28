@@ -1,0 +1,28 @@
+diff --git a/common.mk b/common.mk
+index d1272d6..3de1c52 100644
+--- a/common.mk
++++ b/common.mk
+@@ -2,6 +2,7 @@ prefix = /usr/local
+ bindir = $(prefix)/bin
+ libdir = $(prefix)/smlrc/lib
+ incdir = $(prefix)/smlrc/include
++SMLRCC ?= ./smlrcc
+ 
+ CFLAGS ?= -pipe -Wall -O2
+ CPPFLAGS += -DPATH_PREFIX='"$(prefix)"'
+@@ -38,13 +39,13 @@ clean:
+ .SUFFIXES: .op .txt
+ 
+ .op.a:
+-	./smlrcc -SI $(srcdir)/include -I $(srcdir)/srclib @$<
++	$(SMLRCC) -SI $(srcdir)/include -I $(srcdir)/srclib @$<
+ 
+ .txt.op:
+ 	awk -v l=$(srcdir)/srclib/ '/[.](c|asm)$$/{$$0=l$$0}{print}' $< > $@
+ 
+ $(stub):
+-	./smlrcc -small $(srcdir)/srclib/dpstub.asm -o $@
++	$(SMLRCC) -small $(srcdir)/srclib/dpstub.asm -o $@
+ 
+ smlrpp:
+ 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) -o $@ -DSTAND_ALONE -DUCPP_CONFIG \
