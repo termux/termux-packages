@@ -11,7 +11,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
-	if [ "${TERMUX_PKG_HOSTBUILD_DIR}" = 'false' ]
+	if [ "${TERMUX_ON_DEVICE_BUILD}" = 'false' ]
 	then
 		cp -r ${TERMUX_PKG_SRCDIR}/. .
 		./INSTALL
@@ -19,6 +19,7 @@ termux_step_host_build() {
 }
 
 termux_step_make() {
+	export TERMUX_PKG_HOSTBUILD_DIR
 	./INSTALL -b
 }
 
