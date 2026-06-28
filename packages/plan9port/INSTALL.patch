@@ -1,10 +1,17 @@
 --- a/INSTALL
 +++ b/INSTALL
-@@ -1,5 +1,7 @@
- #!/bin/sh
+@@ -150,14 +150,6 @@ unset MKSHELL
  
-+alias mk="${TERMUX_PKG_HOSTBUILD_DIR}"/bin/mk
-+
- dobuild=true
- doinstall=true
- 
+ cd src
+ if $dobuild; then
+-	echo "* Building mk..."
+-	../dist/buildmk 2>&1 | sed 's/^[+] //'
+-
+-	if [ ! -x ../bin/mk ]; then
+-		echo "* Error: mk failed to build."
+-		exit 1
+-	fi
+-
+ 	echo "* Building everything (be patient)..."
+ 	mk clean
+ 	mk libs-nuke
