@@ -1,0 +1,95 @@
+From d31cc9f07668a91c892d5f13367b9a1e773fbe2b Mon Sep 17 00:00:00 2001
+From: Fangrui Song <i@maskray.me>
+Date: Sat, 15 Nov 2025 13:37:03 -0800
+Subject: [PATCH] Adapt llvm 22 changes
+
+Type::Elaborated is removed by llvmorg-22-init-3166-g91cdd35008e9
+
+llvm::sys::fs and clang functions are changed due to
+https://discourse.llvm.org/t/rfc-file-system-sandboxing-in-clang-llvm/88791
+---
+ src/indexer.cc             | 9 ++++++++-
+ src/messages/initialize.cc | 4 ++++
+ src/sema_manager.cc        | 7 ++++++-
+ 3 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/src/indexer.cc b/src/indexer.cc
+index 6d32077e1..bd4da48db 100644
+--- a/src/indexer.cc
++++ b/src/indexer.cc
+@@ -364,9 +364,11 @@ const Decl *getTypeDecl(QualType t, bool *specialization = nullptr) {
+ 
+     // FIXME: Template type parameters!
+ 
++#if LLVM_VERSION_MAJOR < 22 // llvmorg-22-init-3166-g91cdd35008e9
+   case Type::Elaborated:
+     tp = cast<ElaboratedType>(tp)->getNamedType().getTypePtrOrNull();
+     goto try_again;
++#endif
+ 
+   default:
+     break;
+@@ -1266,7 +1268,7 @@ IndexResult index(WorkingFiles *wfiles, VFS *vfs, const std::string &opt_wdir, c
+   clang->setInvocation(std::move(ci));
+ #endif
+   clang->createDiagnostics(
+-#if LLVM_VERSION_MAJOR >= 20
++#if LLVM_VERSION_MAJOR >= 20 && LLVM_VERSION_MAJOR < 22
+       *fs,
+ #endif
+       &dc, false);
+@@ -1279,7 +1281,12 @@ IndexResult index(WorkingFiles *wfiles, VFS *vfs, const std::string &opt_wdir, c
+   if (!clang->hasTarget())
+     return {};
+   clang->getPreprocessorOpts().RetainRemappedFileBuffers = true;
++#if LLVM_VERSION_MAJOR >= 22
++  clang->setVirtualFileSystem(fs);
++  clang->createFileManager();
++#else
+   clang->createFileManager(fs);
++#endif
+   clang->setSourceManager(new SourceManager(clang->getDiagnostics(), clang->getFileManager(), true));
+ 
+   IndexParam param(*vfs, no_linkage);
+diff --git a/src/messages/initialize.cc b/src/messages/initialize.cc
+index 03e1b0045..4db64710a 100644
+--- a/src/messages/initialize.cc
++++ b/src/messages/initialize.cc
+@@ -345,7 +345,11 @@ void do_initialize(MessageHandler *m, InitializeParam &param, ReplyOnce &reply)
+ 
+     if (g_config->cache.directory.size()) {
+       SmallString<256> path(g_config->cache.directory);
++#if LLVM_VERSION_MAJOR >= 22
++      sys::path::make_absolute(project_path, path);
++#else
+       sys::fs::make_absolute(project_path, path);
++#endif
+       // Use upper case for the Driver letter on Windows.
+       g_config->cache.directory = normalizePath(path.str());
+       ensureEndsInSlash(g_config->cache.directory);
+diff --git a/src/sema_manager.cc b/src/sema_manager.cc
+index 9ae1c132a..222d110f8 100644
+--- a/src/sema_manager.cc
++++ b/src/sema_manager.cc
+@@ -268,7 +268,7 @@ std::unique_ptr<CompilerInstance> buildCompilerInstance(Session &session, std::u
+   clang->setInvocation(std::move(ci));
+ #endif
+   clang->createDiagnostics(
+-#if LLVM_VERSION_MAJOR >= 20
++#if LLVM_VERSION_MAJOR >= 20 && LLVM_VERSION_MAJOR < 22
+       *fs,
+ #endif
+       &dc, false);
+@@ -283,7 +283,12 @@ std::unique_ptr<CompilerInstance> buildCompilerInstance(Session &session, std::u
+   // Construct SourceManager with UserFilesAreVolatile: true because otherwise
+   // RequiresNullTerminator: true may cause out-of-bounds read when a file is
+   // mmap'ed but is saved concurrently.
++#if LLVM_VERSION_MAJOR >= 22
++  clang->setVirtualFileSystem(fs);
++  clang->createFileManager();
++#else
+   clang->createFileManager(fs);
++#endif
+   clang->setSourceManager(new SourceManager(clang->getDiagnostics(), clang->getFileManager(), true));
+   auto &isec = clang->getFrontendOpts().Inputs;
+   if (isec.size()) {
