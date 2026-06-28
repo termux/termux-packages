@@ -13,9 +13,12 @@ TERMUX_PKG_HOSTBUILD=true
 termux_step_host_build() {
 	if [ "${TERMUX_ON_DEVICE_BUILD}" = 'false' ]
 	then
+		echo '**********'
+		echo "${TERMUX_PKG_HOSTBUILD_DIR}"
+		echo '**********'
 		(
 			cd ${TERMUX_PKG_SRCDIR}
-			./INSTALL -b
+			./INSTALL
 		)
 	fi
 }
