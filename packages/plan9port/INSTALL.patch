@@ -1,29 +1,10 @@
 --- a/INSTALL
 +++ b/INSTALL
-@@ -150,7 +150,8 @@ unset MKSHELL
+@@ -1,5 +1,7 @@
+ #!/bin/sh
  
- cd src
- if $dobuild; then
--	echo "* Building mk..."
-+	echo "* Building native mk..."
-+	export bootstrap=true
- 	../dist/buildmk 2>&1 | sed 's/^[+] //'
++alias mk="${TERMUX_PKG_HOSTBUILD_DIR}"/bin/mk
++
+ dobuild=true
+ doinstall=true
  
- 	if [ ! -x ../bin/mk ]; then
-@@ -159,6 +160,7 @@ if $dobuild; then
- 	fi
- 
- 	echo "* Building everything (be patient)..."
-+	export bootstrap=false
- 	mk clean
- 	mk libs-nuke
- 	mk all || exit 1
-@@ -175,6 +177,8 @@ if $dobuild; then
- 		cp $PLAN9/bin/quote1 $PLAN9/bin/'"'
- 		cp $PLAN9/bin/quote2 $PLAN9/bin/'""'
- 	fi
-+	echo "* Building cross mk..."
-+	../dist/buildmk 2>&1 | sed 's/^[+] //'
- 	echo "* Cleaning up..."
- 	mk clean
- fi
