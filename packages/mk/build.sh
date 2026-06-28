@@ -10,7 +10,7 @@ TERMUX_PKG_DEPENDS="libresolv-wrapper"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_host_build() {
-	if [ "$TERMUX_ON_DEVICE_BUILD" = 'false' ]
+	if [ "${TERMUX_ON_DEVICE_BUILD}" = 'false' ]
 	then
 		(
 			cd ${TERMUX_PKG_SRCDIR}
