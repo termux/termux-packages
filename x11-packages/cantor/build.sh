@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="KDE Frontend to Mathematical Software"
 TERMUX_PKG_LICENSE="GPL-2.0-or-later, LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26.04.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/cantor-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256="a1224d780ac8657dfac0f53bfc645aad8bee7f0b2beb9e373212c91dd2f4dcf6"
 TERMUX_PKG_AUTO_UPDATE=true
