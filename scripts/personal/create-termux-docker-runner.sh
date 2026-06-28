@@ -50,10 +50,10 @@ $SUDO docker run \
 
 __change_container_pid_max
 
-$SUDO docker exec -it $CONTAINER_NAME /entrypoint.sh bash -c 'echo "deb file:///apt/termux-main stable main" > $PREFIX/etc/apt/sources.list'
+$SUDO docker exec -it $CONTAINER_NAME /entrypoint.sh bash -c 'echo "deb file:///apt/termux-main staging main" > $PREFIX/etc/apt/sources.list'
 $SUDO docker exec -it $CONTAINER_NAME /entrypoint.sh bash -c 'mkdir -p $PREFIX/etc/apt/sources.list.d'
-$SUDO docker exec -it $CONTAINER_NAME /entrypoint.sh bash -c 'echo "deb file:///apt/termux-root root stable" > $PREFIX/etc/apt/sources.list.d/root.list'
-$SUDO docker exec -it $CONTAINER_NAME /entrypoint.sh bash -c 'echo "deb file:///apt/termux-x11 x11 main" > $PREFIX/etc/apt/sources.list.d/x11.list'
+$SUDO docker exec -it $CONTAINER_NAME /entrypoint.sh bash -c 'echo "deb file:///apt/termux-root staging stable" > $PREFIX/etc/apt/sources.list.d/root.list'
+$SUDO docker exec -it $CONTAINER_NAME /entrypoint.sh bash -c 'echo "deb file:///apt/termux-x11 staging main" > $PREFIX/etc/apt/sources.list.d/x11.list'
 $SUDO docker exec -it $CONTAINER_NAME /entrypoint.sh bash -c 'apt-get update && apt-get full-upgrade -o Dpkg::Options::=--force-confnew -y'
 
 # Now install some packages which are handy
