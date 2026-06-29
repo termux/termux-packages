@@ -10,9 +10,6 @@ TERMUX_PKG_DEPENDS="libresolv-wrapper, libx11, freetype"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 
-# The following variables are for use in the package
-_P9P_BOOTSTRAP=true
-
 termux_step_host_build() {
 	if [ "${TERMUX_ON_DEVICE_BUILD}" = 'false' ]
 	then
@@ -22,11 +19,12 @@ termux_step_host_build() {
 }
 
 termux_step_make() {
+	export _P9P_BOOTSTRAP=false
 	if [ "${TERMUX_ON_DEVICE_BUILD}" = 'false' ]
 	then
 		ln -s ${TERMUX_PKG_HOSTBUILD_DIR}/bin/mk ${TERMUX_PKG_SRCDIR}/bin/mk
+		export _P9P_BOOTSTRAP=true
 	fi
-	export _P9P_BOOTSTRAP
 	./INSTALL -b
 }
 
