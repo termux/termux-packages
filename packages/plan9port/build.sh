@@ -14,7 +14,7 @@ termux_step_host_build() {
 	if [ "${TERMUX_ON_DEVICE_BUILD}" = 'false' ]
 	then
 		cp -r ${TERMUX_PKG_SRCDIR}/. .
-		./INSTALL
+		./INSTALL > /dev/null
 	fi
 }
 
@@ -25,7 +25,7 @@ termux_step_make() {
 		ln -s ${TERMUX_PKG_HOSTBUILD_DIR}/bin/mk ${TERMUX_PKG_SRCDIR}/bin/mk
 		export _P9P_BOOTSTRAP=true
 	fi
-	./INSTALL -b
+	./INSTALL -b > /dev/null
 }
 
 termux_step_make_install() {
@@ -34,7 +34,7 @@ termux_step_make_install() {
 	rm -f ${TERMUX_PREFIX}/bin/9
 	(
 		cd ${dir}
-		./INSTALL -c
+		./INSTALL -c > /dev/null
 	)
 	ln -s ../lib/plan9/bin/9 ${TERMUX_PREFIX}/bin/9
 }
