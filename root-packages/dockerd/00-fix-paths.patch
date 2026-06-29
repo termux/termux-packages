@@ -1,0 +1,394 @@
+diff -uNr src/libnetwork/cmd/dnet/dnet.go src.mod/libnetwork/cmd/dnet/dnet.go
+--- src/libnetwork/cmd/dnet/dnet.go	2026-06-29 13:03:16.172365386 +0200
++++ src.mod/libnetwork/cmd/dnet/dnet.go	2026-06-29 13:03:23.176274744 +0200
+@@ -45,9 +45,9 @@
+ 	// DefaultHTTPPort is the default http port used by dnet
+ 	DefaultHTTPPort = 2385
+ 	// DefaultUnixSocket exported
+-	DefaultUnixSocket = "/var/run/dnet.sock"
++	DefaultUnixSocket = "@TERMUX_PREFIX@/var/run/dnet.sock"
+ 	cfgFileEnv        = "LIBNETWORK_CFG"
+-	defaultCfgFile    = "/etc/default/libnetwork.toml"
++	defaultCfgFile    = "@TERMUX_PREFIX@/etc/default/libnetwork.toml"
+ 	defaultHeartbeat  = time.Duration(10) * time.Second
+ 	ttlFactor         = 2
+ )
+@@ -408,11 +408,11 @@
+ 		fmt.Fprint(w, "null")
+ 	})
+ 
+-	if err := os.MkdirAll("/etc/docker/plugins", 0755); err != nil {
++	if err := os.MkdirAll("@TERMUX_PREFIX@/etc/docker/plugins", 0755); err != nil {
+ 		return err
+ 	}
+ 
+-	return ioutil.WriteFile("/etc/docker/plugins/test.spec", []byte(server.URL), 0644)
++	return ioutil.WriteFile("@TERMUX_PREFIX@/etc/docker/plugins/test.spec", []byte(server.URL), 0644)
+ }
+ 
+ func newDnetConnection(val string) (*dnetConnection, error) {
+@@ -432,7 +432,7 @@
+ }
+ 
+ const (
+-	defaultUnixSocket = "unix:///var/run/docker.sock"
++	defaultUnixSocket = "unix://@TERMUX_PREFIX@/var/run/docker.sock"
+ 	defaultTCPHost    = "tcp://localhost:2375"
+ )
+ 
+diff -uNr src/libnetwork/osl/namespace_linux.go src.mod/libnetwork/osl/namespace_linux.go
+--- src/libnetwork/osl/namespace_linux.go	2026-06-29 13:03:16.181210862 +0200
++++ src.mod/libnetwork/osl/namespace_linux.go	2026-06-29 13:03:23.185103961 +0200
+@@ -23,7 +23,7 @@
+ 	"github.com/vishvananda/netns"
+ )
+ 
+-const defaultPrefix = "/var/run/docker"
++const defaultPrefix = "@TERMUX_PREFIX@/var/run/docker"
+ 
+ func init() {
+ 	reexec.Register("set-ipv6", reexecSetIPv6)
+diff -uNr src/libnetwork/resolvconf/resolvconf.go src.mod/libnetwork/resolvconf/resolvconf.go
+--- src/libnetwork/resolvconf/resolvconf.go	2026-06-29 13:03:16.182210240 +0200
++++ src.mod/libnetwork/resolvconf/resolvconf.go	2026-06-29 13:03:23.186083635 +0200
+@@ -16,9 +16,9 @@
+ 
+ const (
+ 	// defaultPath is the default path to the resolv.conf that contains information to resolve DNS. See Path().
+-	defaultPath = "/etc/resolv.conf"
++	defaultPath = "@TERMUX_PREFIX@/etc/resolv.conf"
+ 	// alternatePath is a path different from defaultPath, that may be used to resolve DNS. See Path().
+-	alternatePath = "/run/systemd/resolve/resolv.conf"
++	alternatePath = "/etc/resolv.conf"
+ )
+ 
+ var (
+diff -uNr src/libnetwork/sandbox_dns_unix.go src.mod/libnetwork/sandbox_dns_unix.go
+--- src/libnetwork/sandbox_dns_unix.go	2026-06-29 13:03:16.182264315 +0200
++++ src.mod/libnetwork/sandbox_dns_unix.go	2026-06-29 13:03:23.240447836 +0200
+@@ -228,7 +228,7 @@
+ 		// it's ok to continue if /etc/resolv.conf doesn't exist, default resolvers (Google's Public DNS)
+ 		// will be used
+ 		currRC = &resolvconf.File{}
+-		logrus.Infof("/etc/resolv.conf does not exist")
++		logrus.Infof("@TERMUX_PREFIX@/etc/resolv.conf does not exist")
+ 	}
+ 
+ 	if len(sb.config.dnsList) > 0 || len(sb.config.dnsSearchList) > 0 || len(sb.config.dnsOptionsList) > 0 {
+diff -uNr src/libnetwork/vendor/github.com/docker/docker/pkg/plugins/discovery_unix.go src.mod/libnetwork/vendor/github.com/docker/docker/pkg/plugins/discovery_unix.go
+--- src/libnetwork/vendor/github.com/docker/docker/pkg/plugins/discovery_unix.go	2026-06-29 13:03:16.195208267 +0200
++++ src.mod/libnetwork/vendor/github.com/docker/docker/pkg/plugins/discovery_unix.go	2026-06-29 13:03:23.199179830 +0200
+@@ -2,4 +2,4 @@
+ 
+ package plugins // import "github.com/docker/docker/pkg/plugins"
+ 
+-var specsPaths = []string{"/etc/docker/plugins", "/usr/lib/docker/plugins"}
++var specsPaths = []string{"@TERMUX_PREFIX@/etc/docker/plugins", "@TERMUX_PREFIX@/lib/docker/plugins"}
+diff -uNr src/libnetwork/vendor/github.com/hashicorp/memberlist/config.go src.mod/libnetwork/vendor/github.com/hashicorp/memberlist/config.go
+--- src/libnetwork/vendor/github.com/hashicorp/memberlist/config.go	2026-06-29 13:03:16.203882705 +0200
++++ src.mod/libnetwork/vendor/github.com/hashicorp/memberlist/config.go	2026-06-29 13:03:23.208520125 +0200
+@@ -254,7 +254,7 @@
+ 		SecretKey: nil,
+ 		Keyring:   nil,
+ 
+-		DNSConfigPath: "/etc/resolv.conf",
++		DNSConfigPath: "@TERMUX_PREFIX@/etc/resolv.conf",
+ 
+ 		HandoffQueueDepth: 1024,
+ 		UDPBufferSize:     1400,
+diff -uNr src/moby/client/client_unix.go src.mod/moby/client/client_unix.go
+--- src/moby/client/client_unix.go	2026-06-29 13:03:15.895003484 +0200
++++ src.mod/moby/client/client_unix.go	2026-06-29 13:03:22.878532225 +0200
+@@ -5,4 +5,4 @@
+ 
+ // DefaultDockerHost defines OS-specific default host if the DOCKER_HOST
+ // (EnvOverrideHost) environment variable is unset or empty.
+-const DefaultDockerHost = "unix:///var/run/docker.sock"
++const DefaultDockerHost = "unix://@TERMUX_PREFIX@/var/run/docker.sock"
+diff -uNr src/moby/cmd/dockerd/daemon_unix.go src.mod/moby/cmd/dockerd/daemon_unix.go
+--- src/moby/cmd/dockerd/daemon_unix.go	2026-06-29 13:03:15.901951075 +0200
++++ src.mod/moby/cmd/dockerd/daemon_unix.go	2026-06-29 13:03:22.880916243 +0200
+@@ -24,7 +24,7 @@
+ 
+ func getDefaultDaemonConfigDir() (string, error) {
+ 	if !honorXDG {
+-		return "/etc/docker", nil
++		return "@TERMUX_PREFIX@/etc/docker", nil
+ 	}
+ 	// NOTE: CLI uses ~/.docker while the daemon uses ~/.config/docker, because
+ 	// ~/.docker was not designed to store daemon configurations.
+diff -uNr src/moby/daemon/config/config_linux.go src.mod/moby/daemon/config/config_linux.go
+--- src/moby/daemon/config/config_linux.go	2026-06-29 13:03:15.908032326 +0200
++++ src.mod/moby/daemon/config/config_linux.go	2026-06-29 13:03:22.888020854 +0200
+@@ -232,9 +232,9 @@
+ 		cfg.ExecRoot = filepath.Join(runtimeDir, "docker")
+ 		cfg.Pidfile = filepath.Join(runtimeDir, "docker.pid")
+ 	} else {
+-		cfg.Root = "/var/lib/docker"
+-		cfg.ExecRoot = "/var/run/docker"
+-		cfg.Pidfile = "/var/run/docker.pid"
++		cfg.Root = "@TERMUX_PREFIX@/var/lib/docker"
++		cfg.ExecRoot = "@TERMUX_PREFIX@/var/run/docker"
++		cfg.Pidfile = "@TERMUX_PREFIX@/var/run/docker.pid"
+ 	}
+ 
+ 	return nil
+diff -uNr src/moby/daemon/container_operations_unix.go src.mod/moby/daemon/container_operations_unix.go
+--- src/moby/daemon/container_operations_unix.go	2026-06-29 13:03:15.908323106 +0200
++++ src.mod/moby/daemon/container_operations_unix.go	2026-06-29 13:03:22.902960785 +0200
+@@ -395,8 +395,8 @@
+ 		// as on the host itself. The container gets a copy of these files.
+ 		*sboxOptions = append(
+ 			*sboxOptions,
+-			libnetwork.OptionOriginHostsPath("/etc/hosts"),
+-			libnetwork.OptionOriginResolvConfPath("/etc/resolv.conf"),
++			libnetwork.OptionOriginHostsPath("@TERMUX_PREFIX@/etc/hosts"),
++			libnetwork.OptionOriginResolvConfPath("@TERMUX_PREFIX@/etc/resolv.conf"),
+ 		)
+ 	case container.HostConfig.NetworkMode.IsUserDefined():
+ 		// The container uses a user-defined network. We use the embedded DNS
+@@ -412,7 +412,7 @@
+ 		// directly, as they can be dynamically reconfigured.
+ 		*sboxOptions = append(
+ 			*sboxOptions,
+-			libnetwork.OptionOriginResolvConfPath("/etc/resolv.conf"),
++			libnetwork.OptionOriginResolvConfPath("@TERMUX_PREFIX@/etc/resolv.conf"),
+ 		)
+ 	default:
+ 		// For other situations, such as the default bridge network, container
+diff -uNr src/moby/daemon/daemon_linux.go src.mod/moby/daemon/daemon_linux.go
+--- src/moby/daemon/daemon_linux.go	2026-06-29 13:03:15.919026523 +0200
++++ src.mod/moby/daemon/daemon_linux.go	2026-06-29 13:03:22.902960785 +0200
+@@ -24,7 +24,7 @@
+ // plugin socket files are created here and they cannot exceed max
+ // path length of 108 bytes.
+ func getPluginExecRoot(_ *config.Config) string {
+-	return "/run/docker/plugins"
++	return "@TERMUX_PREFIX@/var/run/docker/plugins"
+ }
+ 
+ func (daemon *Daemon) cleanupMountsByID(id string) error {
+diff -uNr src/moby/libnetwork/datastore/datastore.go src.mod/moby/libnetwork/datastore/datastore.go
+--- src/moby/libnetwork/datastore/datastore.go	2026-06-29 13:03:15.937631390 +0200
++++ src.mod/moby/libnetwork/datastore/datastore.go	2026-06-29 13:03:22.928418724 +0200
+@@ -119,7 +119,7 @@
+ 	// SwarmScope is not indicating a datastore location. It is defined here
+ 	// along with the other two scopes just for consistency.
+ 	SwarmScope    = "swarm"
+-	defaultPrefix = "/var/lib/docker/network/files"
++	defaultPrefix = "@TERMUX_PREFIX@/var/lib/docker/network/files"
+ )
+ 
+ const (
+diff -uNr src/moby/libnetwork/osl/namespace_linux.go src.mod/moby/libnetwork/osl/namespace_linux.go
+--- src/moby/libnetwork/osl/namespace_linux.go	2026-06-29 13:03:15.945412599 +0200
++++ src.mod/moby/libnetwork/osl/namespace_linux.go	2026-06-29 13:03:22.938831564 +0200
+@@ -23,7 +23,7 @@
+ 	"golang.org/x/sys/unix"
+ )
+ 
+-const defaultPrefix = "/var/run/docker"
++const defaultPrefix = "@TERMUX_PREFIX@/var/run/docker"
+ 
+ func init() {
+ 	// Lock main() to the initial thread to exclude the goroutines spawned
+diff -uNr src/moby/libnetwork/sandbox_dns_unix.go src.mod/moby/libnetwork/sandbox_dns_unix.go
+--- src/moby/libnetwork/sandbox_dns_unix.go	2026-06-29 13:03:15.947375151 +0200
++++ src.mod/moby/libnetwork/sandbox_dns_unix.go	2026-06-29 13:03:22.941531215 +0200
+@@ -20,7 +20,7 @@
+ )
+ 
+ const (
+-	defaultPrefix = "/var/lib/docker/network/files"
++	defaultPrefix = "@TERMUX_PREFIX@/var/lib/docker/network/files"
+ 	dirPerm       = 0o755
+ 	filePerm      = 0o644
+ )
+diff -uNr src/moby/opts/hosts.go src.mod/moby/opts/hosts.go
+--- src/moby/opts/hosts.go	2026-06-29 13:03:15.947939415 +0200
++++ src.mod/moby/opts/hosts.go	2026-06-29 13:03:22.942353684 +0200
+@@ -20,7 +20,7 @@
+ 	DefaultTLSHTTPPort = 2376 // Default TLS encrypted HTTP Port
+ 	// DefaultUnixSocket Path for the unix socket.
+ 	// Docker daemon by default always listens on the default unix socket
+-	DefaultUnixSocket = "/var/run/docker.sock"
++	DefaultUnixSocket = "@TERMUX_PREFIX@/var/run/docker.sock"
+ 	// DefaultTCPHost constant defines the default host string used by docker on Windows
+ 	DefaultTCPHost = "tcp://" + DefaultHTTPHost + ":2375"
+ 	// DefaultTLSHost constant defines the default host string used by docker for TLS sockets
+diff -uNr src/moby/pkg/plugins/discovery_unix.go src.mod/moby/pkg/plugins/discovery_unix.go
+--- src/moby/pkg/plugins/discovery_unix.go	2026-06-29 13:03:15.954292705 +0200
++++ src.mod/moby/pkg/plugins/discovery_unix.go	2026-06-29 13:03:22.951008640 +0200
+@@ -15,7 +15,7 @@
+ 		return filepath.Join(configHome, "docker/plugins")
+ 	}
+ 
+-	return "/etc/docker/plugins"
++	return "@TERMUX_PREFIX@/etc/docker/plugins"
+ }
+ 
+ func rootlessLibPluginsPath() string {
+@@ -24,7 +24,7 @@
+ 		return filepath.Join(libHome, "docker/plugins")
+ 	}
+ 
+-	return "/usr/lib/docker/plugins"
++	return "@TERMUX_PREFIX@/lib/docker/plugins"
+ }
+ 
+ // SpecsPaths returns
+@@ -37,5 +37,5 @@
+ 		return []string{rootlessConfigPluginsPath(), rootlessLibPluginsPath()}
+ 	}
+ 
+-	return []string{"/etc/docker/plugins", "/usr/lib/docker/plugins"}
++	return []string{"@TERMUX_PREFIX@/etc/docker/plugins", "@TERMUX_PREFIX@/lib/docker/plugins"}
+ }
+diff -uNr src/moby/plugin/v2/plugin_linux.go src.mod/moby/plugin/v2/plugin_linux.go
+--- src/moby/plugin/v2/plugin_linux.go	2026-06-29 13:03:15.958452774 +0200
++++ src.mod/moby/plugin/v2/plugin_linux.go	2026-06-29 13:03:22.956764722 +0200
+@@ -54,18 +54,18 @@
+ 		if p.PluginObj.Config.Network.Type == "host" {
+ 			oci.RemoveNamespace(&s, specs.LinuxNamespaceType("network"))
+ 		}
+-		etcHosts := "/etc/hosts"
+-		resolvConf := "/etc/resolv.conf"
++		etcHosts := "@TERMUX_PREFIX@/etc/hosts"
++		resolvConf := "@TERMUX_PREFIX@/etc/resolv.conf"
+ 		mounts = append(mounts,
+ 			types.PluginMount{
+ 				Source:      &etcHosts,
+-				Destination: etcHosts,
++				Destination: "/etc/hosts",
+ 				Type:        "bind",
+ 				Options:     []string{"rbind", "ro"},
+ 			},
+ 			types.PluginMount{
+ 				Source:      &resolvConf,
+-				Destination: resolvConf,
++				Destination: "/etc/resolv.conf",
+ 				Type:        "bind",
+ 				Options:     []string{"rbind", "ro"},
+ 			})
+diff -uNr src/moby/registry/config_unix.go src.mod/moby/registry/config_unix.go
+--- src/moby/registry/config_unix.go	2026-06-29 13:03:15.960074343 +0200
++++ src.mod/moby/registry/config_unix.go	2026-06-29 13:03:22.959007851 +0200
+@@ -6,7 +6,7 @@
+ // defaultCertsDir is the platform-specific default directory where certificates
+ // are stored. On Linux, it may be overridden through certsDir, for example, when
+ // running in rootless mode.
+-const defaultCertsDir = "/etc/docker/certs.d"
++const defaultCertsDir = "@TERMUX_PREFIX@/etc/docker/certs.d"
+ 
+ // cleanPath is used to ensure that a directory name is valid on the target
+ // platform. It will be passed in something *similar* to a URL such as
+diff -uNr src/moby/registry/endpoint_v1.go src.mod/moby/registry/endpoint_v1.go
+--- src/moby/registry/endpoint_v1.go	2026-06-29 13:03:15.960074343 +0200
++++ src.mod/moby/registry/endpoint_v1.go	2026-06-29 13:03:22.959007851 +0200
+@@ -63,7 +63,7 @@
+ 		if endpoint.IsSecure {
+ 			// If registry is secure and HTTPS failed, show user the error and tell them about `--insecure-registry`
+ 			// in case that's what they need. DO NOT accept unknown CA certificates, and DO NOT fallback to HTTP.
+-			return invalidParamf("invalid registry endpoint %s: %v. If this private registry supports only HTTP or HTTPS with an unknown CA certificate, please add `--insecure-registry %s` to the daemon's arguments. In the case of HTTPS, if you have access to the registry's CA certificate, no need for the flag; simply place the CA certificate at /etc/docker/certs.d/%s/ca.crt", endpoint, err, endpoint.URL.Host, endpoint.URL.Host)
++			return invalidParamf("invalid registry endpoint %s: %v. If this private registry supports only HTTP or HTTPS with an unknown CA certificate, please add `--insecure-registry %s` to the daemon's arguments. In the case of HTTPS, if you have access to the registry's CA certificate, no need for the flag; simply place the CA certificate at @TERMUX_PREFIX@/etc/docker/certs.d/%s/ca.crt", endpoint, err, endpoint.URL.Host, endpoint.URL.Host)
+ 		}
+ 
+ 		// If registry is insecure and HTTPS failed, fallback to HTTP.
+diff -uNr src/moby/testutil/daemon/daemon.go src.mod/moby/testutil/daemon/daemon.go
+--- src/moby/testutil/daemon/daemon.go	2026-06-29 13:03:15.961672800 +0200
++++ src.mod/moby/testutil/daemon/daemon.go	2026-06-29 13:03:22.961185368 +0200
+@@ -43,9 +43,9 @@
+ 
+ const (
+ 	defaultDockerdBinary         = "dockerd"
+-	defaultContainerdSocket      = "/var/run/docker/containerd/containerd.sock"
++	defaultContainerdSocket      = "@TERMUX_PREFIX@/var/run/docker/containerd/containerd.sock"
+ 	defaultDockerdRootlessBinary = "dockerd-rootless.sh"
+-	defaultUnixSocket            = "/var/run/docker.sock"
++	defaultUnixSocket            = "@TERMUX_PREFIX@/var/run/docker.sock"
+ 	defaultTLSHost               = "localhost:2376"
+ )
+ 
+diff -uNr src/moby/vendor/github.com/containerd/containerd/defaults/defaults_unix.go src.mod/moby/vendor/github.com/containerd/containerd/defaults/defaults_unix.go
+--- src/moby/vendor/github.com/containerd/containerd/defaults/defaults_unix.go	2026-06-29 13:03:16.004761043 +0200
++++ src.mod/moby/vendor/github.com/containerd/containerd/defaults/defaults_unix.go	2026-06-29 13:03:23.007186522 +0200
+@@ -22,19 +22,19 @@
+ const (
+ 	// DefaultRootDir is the default location used by containerd to store
+ 	// persistent data
+-	DefaultRootDir = "/var/lib/containerd"
++	DefaultRootDir = "@TERMUX_PREFIX@/var/lib/containerd"
+ 	// DefaultStateDir is the default location used by containerd to store
+ 	// transient data
+-	DefaultStateDir = "/run/containerd"
++	DefaultStateDir = "@TERMUX_PREFIX@/var/run/containerd"
+ 	// DefaultAddress is the default unix socket address
+-	DefaultAddress = "/run/containerd/containerd.sock"
++	DefaultAddress = "@TERMUX_PREFIX@/var/run/containerd/containerd.sock"
+ 	// DefaultDebugAddress is the default unix socket address for pprof data
+-	DefaultDebugAddress = "/run/containerd/debug.sock"
++	DefaultDebugAddress = "@TERMUX_PREFIX@/var/run/containerd/debug.sock"
+ 	// DefaultFIFODir is the default location used by client-side cio library
+ 	// to store FIFOs.
+-	DefaultFIFODir = "/run/containerd/fifo"
++	DefaultFIFODir = "@TERMUX_PREFIX@/var/run/containerd/fifo"
+ 	// DefaultRuntime is the default linux runtime
+ 	DefaultRuntime = "io.containerd.runc.v2"
+ 	// DefaultConfigDir is the default location for config files.
+-	DefaultConfigDir = "/etc/containerd"
++	DefaultConfigDir = "@TERMUX_PREFIX@/etc/containerd"
+ )
+diff -uNr src/moby/vendor/github.com/containerd/containerd/oci/spec_opts.go src.mod/moby/vendor/github.com/containerd/containerd/oci/spec_opts.go
+--- src/moby/vendor/github.com/containerd/containerd/oci/spec_opts.go	2026-06-29 13:03:16.007999012 +0200
++++ src.mod/moby/vendor/github.com/containerd/containerd/oci/spec_opts.go	2026-06-29 13:03:23.010211416 +0200
+@@ -499,7 +499,7 @@
+ 	s.Mounts = append(s.Mounts, specs.Mount{
+ 		Destination: "/etc/hosts",
+ 		Type:        "bind",
+-		Source:      "/etc/hosts",
++		Source:      "@TERMUX_PREFIX@/etc/hosts",
+ 		Options:     []string{"rbind", "ro"},
+ 	})
+ 	return nil
+@@ -510,7 +510,7 @@
+ 	s.Mounts = append(s.Mounts, specs.Mount{
+ 		Destination: "/etc/resolv.conf",
+ 		Type:        "bind",
+-		Source:      "/etc/resolv.conf",
++		Source:      "@TERMUX_PREFIX@/etc/resolv.conf",
+ 		Options:     []string{"rbind", "ro"},
+ 	})
+ 	return nil
+@@ -521,7 +521,7 @@
+ 	s.Mounts = append(s.Mounts, specs.Mount{
+ 		Destination: "/etc/localtime",
+ 		Type:        "bind",
+-		Source:      "/etc/localtime",
++		Source:      "@TERMUX_PREFIX@/etc/localtime",
+ 		Options:     []string{"rbind", "ro"},
+ 	})
+ 	return nil
+diff -uNr src/moby/vendor/github.com/containerd/containerd/rootfs/init_linux.go src.mod/moby/vendor/github.com/containerd/containerd/rootfs/init_linux.go
+--- src/moby/vendor/github.com/containerd/containerd/rootfs/init_linux.go	2026-06-29 13:03:16.010692182 +0200
++++ src.mod/moby/vendor/github.com/containerd/containerd/rootfs/init_linux.go	2026-06-29 13:03:23.012877585 +0200
+@@ -114,7 +114,7 @@
+ 		createDirectory("/proc", uid, gid),
+ 		createDirectory("/sys", uid, gid),
+ 		createDirectory("/etc", uid, gid),
+-		touchFile("/etc/resolv.conf", uid, gid),
++		touchFile("@/etc/resolv.conf", uid, gid),
+ 		touchFile("/etc/hosts", uid, gid),
+ 		touchFile("/etc/hostname", uid, gid),
+ 		symlink("/proc/mounts", "/etc/mtab"),
+diff -uNr src/moby/vendor/github.com/hashicorp/memberlist/config.go src.mod/moby/vendor/github.com/hashicorp/memberlist/config.go
+--- src/moby/vendor/github.com/hashicorp/memberlist/config.go	2026-06-29 13:03:16.043951904 +0200
++++ src.mod/moby/vendor/github.com/hashicorp/memberlist/config.go	2026-06-29 13:03:23.046177066 +0200
+@@ -317,7 +317,7 @@
+ 		SecretKey: nil,
+ 		Keyring:   nil,
+ 
+-		DNSConfigPath: "/etc/resolv.conf",
++		DNSConfigPath: "@TERMUX_PREFIX@/etc/resolv.conf",
+ 
+ 		HandoffQueueDepth: 1024,
+ 		UDPBufferSize:     1400,
