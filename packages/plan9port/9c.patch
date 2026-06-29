@@ -1,6 +1,17 @@
 --- a/bin/9c
 +++ b/bin/9c
-@@ -30,6 +30,10 @@ usegcc()
+@@ -4,6 +4,10 @@ test -f "$PLAN9/config" && . "$PLAN9/config"
+ usegcc()
+ {
+ 	cc=${CC9:-gcc}
++	if [ "$_P9P_BOOTSTRAP" = 'true' ]
++	then
++		cc=$CC
++	fi
+ 	cflags=" \
+ 		-O2 \
+ 		-c \
+@@ -30,6 +34,10 @@ usegcc()
  	# that option only works with gcc3+ it seems
  	cflags="$cflags -ggdb"
  	cflags="$cflags $CC9FLAGS"
@@ -11,7 +22,18 @@
  }
  
  quiet()
-@@ -89,6 +93,10 @@ useclang()
+@@ -65,6 +73,10 @@ quiet()
+ useclang()
+ {
+ 	cc=${CC9:-clang}
++	if [ "$_P9P_BOOTSTRAP" = 'true' ]
++	then
++		cc=$CC
++	fi
+ 	cflags=" \
+ 		-O2 \
+ 		-c \
+@@ -89,11 +101,19 @@ useclang()
  	"
  	cflags="$cflags -g"
  	cflags="$cflags $CC9FLAGS"
@@ -22,7 +44,16 @@
  }
  
  usexlc()
-@@ -107,6 +115,10 @@ usexlc()
+ {
+ 	cc=${CC9:-xlc_r}
++	if [ "$_P9P_BOOTSTRAP" = 'true' ]
++	then
++		cc=$CC
++	fi
+ 	cflags=" \
+ 		-c \
+ 		-O2 \
+@@ -107,6 +127,10 @@ usexlc()
  	"
  	cflags="$cflags -g -qdbxextra -qfullpath"
  	cflags="$cflags $CC9FLAGS"
@@ -33,7 +64,7 @@
  }
  
  tag="${SYSNAME:-`uname`}-${CC9:-cc}"
-@@ -118,14 +130,7 @@ case "$tag" in
+@@ -118,14 +142,7 @@ case "$tag" in
  		cflags="$cflags -g3 -m64"
  		;;
  *HP-UX*)	cc=${CC9:-cc}; cflags="-g -O -c -Ae" ;;
@@ -49,7 +80,7 @@
  *OSF1*)		cc=${CC9:-cc}; cflags="-g -O -c" ;;
  *SunOS*-cc)	cc=cc;
  		cflags="-mt -g -O -c -xCC -D__sun__"
-@@ -150,7 +155,7 @@ case "$tag" in
+@@ -150,7 +167,7 @@ case "$tag" in
  esac
  
  # Must use temp file to avoid pipe; pipe loses status.
