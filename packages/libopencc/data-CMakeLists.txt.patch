@@ -1,0 +1,42 @@
+--- a/data/CMakeLists.txt
++++ b/data/CMakeLists.txt
+@@ -78,13 +78,18 @@
+   ${DICT_GENERATED_DIR}/TSPhrases.ocd2
+   ${CMAKE_CURRENT_SOURCE_DIR}/config/t2s.json
+ )
++
++if(NOT CMAKE_CROSSCOMPILING)
++    set(OPENCC_HOST_BIN $<TARGET_FILE:${OPENCC_BIN}>)
++endif()
++
+ set(
+   DICT_STPhrases_GeneratedFromRegionalPhrases_GENERATING_COMMAND
+   ${DICT_GENERATE_ST_PHRASES_BIN}
+     --input ${DICT_DIR}/HKPhrases.txt
+     --input ${DICT_DIR}/TWPhrases.txt
+     --output STPhrases_GeneratedFromRegionalPhrases.txt
+-    --opencc $<TARGET_FILE:${OPENCC_BIN}>
++    --opencc ${OPENCC_HOST_BIN}
+     --config ${CMAKE_CURRENT_SOURCE_DIR}/config/t2s.json
+     --dict-dir ${DICT_GENERATED_DIR}
+ )
+@@ -149,6 +154,10 @@
+   )
+ endforeach(DICT)
+
++if(NOT CMAKE_CROSSCOMPILING)
++    set(OPENCC_DICT_HOST_BIN ${OPENCC_DICT_BIN})
++endif()
++
+ foreach(DICT ${DICTS})
+   add_custom_command(
+     OUTPUT
+@@ -156,7 +165,7 @@
+     COMMENT
+       "Building ${DICT}.ocd2"
+     COMMAND
+-      ${OPENCC_DICT_BIN}
++      ${OPENCC_DICT_HOST_BIN}
+         --input ${DICT_${DICT}_INPUT}
+         --output ${DICT}.ocd2
+         --from text
