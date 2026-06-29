@@ -1,0 +1,22 @@
+--- a/cmake/local.cmake
++++ b/cmake/local.cmake
+@@ -115,6 +115,19 @@
+         get_filename_component(OLLAMA_LLAMA_CPP_SOURCE_DIR
+             "${FETCHCONTENT_SOURCE_DIR_LLAMA_CPP}" ABSOLUTE BASE_DIR "${CMAKE_SOURCE_DIR}")
+         message(STATUS "Using llama.cpp source override: ${OLLAMA_LLAMA_CPP_SOURCE_DIR}")
++        message(STATUS
++            "Applying Ollama llama.cpp compat patch to source override: "
++            "${OLLAMA_LLAMA_CPP_SOURCE_DIR}")
++        execute_process(
++            COMMAND ${OLLAMA_LLAMA_CPP_COMPAT_PATCH_COMMAND}
++            WORKING_DIRECTORY "${OLLAMA_LLAMA_CPP_SOURCE_DIR}"
++            RESULT_VARIABLE __ollama_compat_patch_result
++        )
++        if(NOT __ollama_compat_patch_result EQUAL 0)
++            message(FATAL_ERROR
++                "Failed to apply Ollama llama.cpp compat patch to "
++                "${OLLAMA_LLAMA_CPP_SOURCE_DIR}")
++        endif()
+         add_custom_target(ollama-llama-cpp-source)
+     elseif(DEFINED ENV{OLLAMA_LLAMA_CPP_SOURCE})
+         get_filename_component(OLLAMA_LLAMA_CPP_SOURCE_DIR

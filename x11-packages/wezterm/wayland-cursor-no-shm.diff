@@ -1,0 +1,63 @@
+Prevents:
+error[E0425]: cannot find function `shm_open` in module `mman`
+   --> /home/builder/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wayland-cursor-0.29.5/src/lib.rs:350:21
+    |
+350 |         match mman::shm_open(
+    |                     ^^^^^^^^ not found in `mman`
+
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -326,52 +326,5 @@ pub struct FrameAndDuration {
+ 
+ /// Create a shared file descriptor in memory.
+ fn create_shm_fd() -> IoResult<RawFd> {
+-    // Only try memfd on linux.
+-    #[cfg(target_os = "linux")]
+-    loop {
+-        match memfd::memfd_create(
+-            CStr::from_bytes_with_nul(b"wayland-cursor-rs\0").unwrap(),
+-            memfd::MemFdCreateFlag::MFD_CLOEXEC,
+-        ) {
+-            Ok(fd) => return Ok(fd),
+-            Err(Errno::EINTR) => continue,
+-            Err(Errno::ENOSYS) => break,
+-            Err(errno) => return Err(errno.into()),
+-        }
+-    }
+-
+-    // Fallback to using shm_open.
+-    let sys_time = SystemTime::now();
+-    let mut mem_file_handle = format!(
+-        "/wayland-cursor-rs-{}",
+-        sys_time.duration_since(UNIX_EPOCH).unwrap().subsec_nanos()
+-    );
+-    loop {
+-        match mman::shm_open(
+-            mem_file_handle.as_str(),
+-            fcntl::OFlag::O_CREAT
+-                | fcntl::OFlag::O_EXCL
+-                | fcntl::OFlag::O_RDWR
+-                | fcntl::OFlag::O_CLOEXEC,
+-            stat::Mode::S_IRUSR | stat::Mode::S_IWUSR,
+-        ) {
+-            Ok(fd) => match mman::shm_unlink(mem_file_handle.as_str()) {
+-                Ok(_) => return Ok(fd),
+-                Err(errno) => match unistd::close(fd) {
+-                    Ok(_) => return Err(IoError::from(errno)),
+-                    Err(errno) => return Err(IoError::from(errno)),
+-                },
+-            },
+-            Err(Errno::EEXIST) => {
+-                // If a file with that handle exists then change the handle
+-                mem_file_handle = format!(
+-                    "/wayland-cursor-rs-{}",
+-                    sys_time.duration_since(UNIX_EPOCH).unwrap().subsec_nanos()
+-                );
+-                continue;
+-            }
+-            Err(Errno::EINTR) => continue,
+-            Err(errno) => return Err(IoError::from(errno)),
+-        }
+-    }
++    Err(Errno::ENOSYS.into())
+ }

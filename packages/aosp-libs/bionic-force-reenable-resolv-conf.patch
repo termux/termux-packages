@@ -1,0 +1,98 @@
+This part of Android is a fork of part of NetBSD.
+This patch forcibly reenables the codepath of NetBSD that
+was designed to read resolv.conf configuration files, which
+was disabled by the Android developers because in
+vanilla Android netd replaces resolv.conf, but in termux-docker
+there is no netd, so DNS resolution in termux-docker was handled by
+dnsmasq or by static-dns-hosts,
+which was inconvenient, until this patch was invented.
+
+--- a/bionic/libc/dns/include/resolv_private.h
++++ b/bionic/libc/dns/include/resolv_private.h
+@@ -108,6 +108,10 @@ struct __res_state; /* forward */
+  * initial name server(s) to query and the domain search list.
+  */
+ 
++// for termux-docker; standard docker engine automatically creates an /etc/resolv.conf (nameservers dynamically detected)
++#define _PATH_RESCONF_DOCKER "/etc/resolv.conf"
++// for termux resolv-conf package; alternative for non-docker situations (hardcoded to 8.8.8.8; manually configurable)
++#define _PATH_RESCONF_TERMUX "@TERMUX_PREFIX@/etc/resolv.conf"
+ #ifndef _PATH_RESCONF
+ #ifdef ANDROID_CHANGES
+ #define _PATH_RESCONF        "/etc/ppp/resolv.conf"
+--- a/bionic/libc/dns/resolv/res_init.c
++++ b/bionic/libc/dns/resolv/res_init.c
+@@ -114,6 +114,7 @@ __RCSID("$NetBSD: res_init.c,v 1.8 2006/03/19 03:10:08 christos Exp $");
+ 
+ #include "res_private.h"
+ 
++#define RESOLVSORT
+ /* Options.  Should all be left alone. */
+ #ifndef DEBUG
+ #define DEBUG
+@@ -165,23 +165,23 @@ res_ninit(res_state statp) {
+ /* This function has to be reachable by res_data.c but not publicly. */
+ int
+ __res_vinit(res_state statp, int preinit) {
+-#if !defined(__BIONIC__)
++#if 1
+ 	register FILE *fp;
+ #endif
+ 	register char *cp, **pp;
+-#if !defined(__BIONIC__)
++#if 1
+ 	register int n;
+ #endif
+ 	char buf[BUFSIZ];
+ 	int nserv = 0;    /* number of nameserver records read from file */
+-#if !defined(__BIONIC__)
++#if 1
+ 	int haveenv = 0;
+ #endif
+ 	int havesearch = 0;
+ #ifdef RESOLVSORT
+ 	int nsort = 0;
+ #endif
+-#if !defined(__BIONIC__)
++#if 1
+ 	char *net;
+ #endif
+ 	int dots;
+@@ -284,14 +284,14 @@ __res_vinit(res_state statp, int preinit) {
+ 		statp->nscount = nserv;
+ #endif
+ 
+-#ifndef ANDROID_CHANGES /* !ANDROID_CHANGES - IGNORE resolv.conf in Android */
++#if 1
+ #define	MATCH(line, name) \
+ 	(!strncmp(line, name, sizeof(name) - 1) && \
+ 	(line[sizeof(name) - 1] == ' ' || \
+ 	 line[sizeof(name) - 1] == '\t'))
+ 
+ 	nserv = 0;
+-	if ((fp = fopen(_PATH_RESCONF, "re")) != NULL) {
++	if ((fp = fopen(_PATH_RESCONF_DOCKER, "re")) != NULL || (fp = fopen(_PATH_RESCONF_TERMUX, "re")) != NULL) {
+ 	    /* read the config file */
+ 	    while (fgets(buf, sizeof(buf), fp) != NULL) {
+ 		/* skip comments */
+@@ -368,12 +368,20 @@ __res_vinit(res_state statp, int preinit) {
+ 			hints.ai_flags = AI_NUMERICHOST;
+ 			sprintf(sbuf, "%u", NAMESERVER_PORT);
+ 			if (getaddrinfo(cp, sbuf, &hints, &ai) == 0 &&
++#ifdef __LP64__
+ 			    ai->ai_addrlen <= minsiz) {
++#else
++			    (unsigned int)ai->ai_addrlen <= minsiz) {
++#endif
+ 			    if (statp->_u._ext.ext != NULL) {
+ 				memcpy(&statp->_u._ext.ext->nsaddrs[nserv],
+ 				    ai->ai_addr, ai->ai_addrlen);
+ 			    }
++#ifdef __LP64__
+ 			    if (ai->ai_addrlen <=
++#else
++			    if ((unsigned int)ai->ai_addrlen <=
++#endif
+ 			        sizeof(statp->nsaddr_list[nserv])) {
+ 				memcpy(&statp->nsaddr_list[nserv],
+ 				    ai->ai_addr, ai->ai_addrlen);

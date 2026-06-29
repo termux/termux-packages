@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.chromium.org/Home
 TERMUX_PKG_DESCRIPTION="Chromium web browser"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION=146.0.7680.153
+TERMUX_PKG_VERSION=149.0.7827.155
 TERMUX_PKG_SRCURL=https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$TERMUX_PKG_VERSION-lite.tar.xz
-TERMUX_PKG_SHA256=c0185f8dd2cec0148358b8da249968bb6d81aeb4ac6e42f2dd8b6fad548d773d
-TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pulseaudio, zlib"
+TERMUX_PKG_SHA256=4e39fd0ae3ad64fd4bff6a523d94fe5e2917ad51a7f46a73c84a5736d9dda862
+TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pipewire, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="chromium-host-tools, libffi-static"
 # TODO: Split chromium-common and chromium-headless
 # TERMUX_PKG_DEPENDS+=", chromium-common"
@@ -77,6 +77,14 @@ termux_step_post_get_source() {
 		patch -p1 --silent < "$f"
 	done
 
+	# Enable jumbo build for //components and //chrome
+	python \
+		"$TERMUX_PKG_BUILDER_DIR/../chromium-host-tools/scripts/rewrite_gn_jumbo.py" \
+		"$TERMUX_PKG_SRCDIR" \
+		--verbose \
+		--subdirs chrome \
+		--subdirs components
+
 	# Apply patches for jumbo build
 	local f
 	for f in $(find "$TERMUX_PKG_BUILDER_DIR/../chromium-host-tools/jumbo-patches" -maxdepth 1 -type f -name *.patch | sort); do
@@ -127,11 +135,9 @@ EOF
 	fi
 
 	# Remove termux's dummy pkg-config
-	local _target_pkg_config=$(command -v pkg-config)
-	local _host_pkg_config="$(cat $_target_pkg_config | grep exec | awk '{print $2}')"
 	rm -rf $TERMUX_PKG_CACHEDIR/host-pkg-config-bin
 	mkdir -p $TERMUX_PKG_CACHEDIR/host-pkg-config-bin
-	ln -s $_host_pkg_config $TERMUX_PKG_CACHEDIR/host-pkg-config-bin/pkg-config
+	ln -s /usr/bin/pkg-config "$TERMUX_PKG_CACHEDIR"/host-pkg-config-bin/pkg-config
 	export PATH="$TERMUX_PKG_CACHEDIR/host-pkg-config-bin:$PATH"
 
 	# Install amd64 rootfs
@@ -316,9 +322,6 @@ use_vaapi = false
 is_cfi = false
 use_cfi_icall = false
 use_thin_lto = false
-# OpenCL doesn't work out of box in Termux, use NNAPI instead
-build_tflite_with_opencl = false
-build_tflite_with_nnapi = true
 # Enable rust
 custom_target_rust_abi_target = \"$CARGO_TARGET_NAME\"
 clang_warning_suppression_file = \"\"
@@ -436,8 +439,6 @@ termux_step_make_install() {
 
 		# Scripts
 		chrome-wrapper
-		xdg-mime
-		xdg-settings
 
 		# Angle
 		libEGL.so
@@ -478,9 +479,11 @@ termux_step_make_install() {
 	install -Dm644 $TERMUX_PKG_SRCDIR/chrome/installer/linux/common/desktop.template \
 		"$TERMUX_PREFIX/share/applications/chromium.desktop"
 	sed -i \
-		-e 's/@@MENUNAME@@/Chromium/g' \
-		-e 's/@@PACKAGE@@/chromium/g' \
-		-e 's/@@USR_BIN_SYMLINK_NAME@@/chromium-browser/g' \
+		-e 's/@@MENUNAME/Chromium/g' \
+		-e 's/@@PACKAGE/chromium/g' \
+		-e 's/@@usr_bin_symlink_name/chromium-browser/g' \
+		-e 's|@@uri_scheme|x-scheme-handler/chromium;|g' \
+		-e 's/@@extra_desktop_entries//g' \
 		-e "s|Exec=/usr/bin|Exec=$TERMUX_PREFIX/bin|g" \
 		"$TERMUX_PREFIX/share/applications/chromium.desktop" \
 		"$TERMUX_PREFIX/share/man/man1/chromium.1"

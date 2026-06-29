@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=git+https://github.com/Mbed-TLS/mbedtls
 TERMUX_PKG_VERSION="3.6.4"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_BREAKS="mbedtls-dev"
 TERMUX_PKG_REPLACES="mbedtls-dev"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -36,4 +36,8 @@ termux_step_pre_configure() {
 	if [ "$TERMUX_ARCH" = "i686" ]; then
 		scripts/config.py unset MBEDTLS_AESNI_C
 	fi
+
+	# for sfml
+	scripts/config.py set MBEDTLS_THREADING_C
+	scripts/config.py set MBEDTLS_THREADING_PTHREAD
 }

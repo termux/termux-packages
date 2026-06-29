@@ -5,7 +5,6 @@ TERMUX_PKG_LICENSE_FILE="\
 LICENSE/LICENSE
 LICENSE/LICENSE_AMSFONTS
 LICENSE/LICENSE_BAKOMA
-LICENSE/LICENSE_CARLOGO
 LICENSE/LICENSE_COLORBREWER
 LICENSE/LICENSE_COURIERTEN
 LICENSE/LICENSE_JSXTOOLS_RESIZE_OBSERVER
@@ -14,12 +13,11 @@ LICENSE/LICENSE_SOLARIZED
 LICENSE/LICENSE_STIX
 LICENSE/LICENSE_YORICK"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.10.8"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION="3.11.0"
 TERMUX_PKG_SRCURL="https://github.com/matplotlib/matplotlib/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=dbc50c7b15bb8d7dbe51a27a58322ed73f09291772d9e3184f03f11c576693f7
+TERMUX_PKG_SHA256=58723eaaa7d38b26fca940b537a26c5d14ebd87c60a5685e32299b55587fe561
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="freetype, libc++, patchelf, ninja, python, python-contourpy, python-numpy, python-pillow, python-pip"
+TERMUX_PKG_DEPENDS="freetype, libc++, libraqm, patchelf, qhull, ninja, python, python-contourpy, python-numpy, python-pillow, python-pip"
 _NUMPY_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python-numpy/build.sh; echo $TERMUX_PKG_VERSION)
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="build, 'meson-python>=0.13.1', wheel, 'numpy==$_NUMPY_VERSION', 'pybind11>=2.6.0', 'setuptools>=64', 'setuptools_scm>=7'"
 
@@ -27,6 +25,8 @@ TERMUX_MESON_WHEEL_CROSSFILE="$TERMUX_PKG_TMPDIR/wheel-cross-file.txt"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --cross-file $TERMUX_MESON_WHEEL_CROSSFILE
 -Dsystem-freetype=true
+-Dsystem-libraqm=true
+-Dsystem-qhull=true
 "
 
 termux_step_pre_configure() {

@@ -38,12 +38,12 @@
          _exit(127);
      }
  
-@@ -1395,20 +1391,7 @@ void *
+@@ -1395,22 +1395,9 @@ void *
  Fopen(const char *file, const char *type)
  {
      FILE *iop;
 -    int ruid, euid;
--
+ 
 -    ruid = getuid();
 -    euid = geteuid();
 -
@@ -51,9 +51,11 @@
 -        return NULL;
 -    }
      iop = fopen(file, type);
--
+ 
 -    if (seteuid(euid) == -1) {
--        fclose(iop);
+-        if (iop) {
+-            fclose(iop);
+-        }
 -        return NULL;
 -    }
      return iop;

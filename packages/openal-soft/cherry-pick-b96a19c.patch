@@ -1,0 +1,68 @@
+From b96a19cfd1705cc81b0bae78c782df1cd39966bd Mon Sep 17 00:00:00 2001
+From: Chris Robinson <chris.kcat@gmail.com>
+Date: Tue, 12 May 2026 18:04:30 -0700
+Subject: [PATCH] Work around a Clang 19 issue with emplacing an optional
+
+---
+ alc/effects/chorus.cpp     | 3 ++-
+ alc/effects/distortion.cpp | 3 ++-
+ alc/effects/fshifter.cpp   | 3 ++-
+ alc/effects/pshifter.cpp   | 3 ++-
+ 4 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/alc/effects/chorus.cpp b/alc/effects/chorus.cpp
+index 3484869906..0700e206ed 100644
+--- a/alc/effects/chorus.cpp
++++ b/alc/effects/chorus.cpp
+@@ -156,7 +156,8 @@ void ChorusState::deviceUpdate(const DeviceBase *device, const BufferStorage*)
+         auto const splitter = BandSplitter{device->mXOverFreq
+             / static_cast<float>(device->mSampleRate)};
+ 
+-        auto &upsampler = mUpsampler.emplace();
++        using upsampler_t = decltype(mUpsampler)::value_type;
++        auto &upsampler = mUpsampler.emplace(upsampler_t{});
+         for(auto &chandata : upsampler)
+         {
+             chandata.mHfScale = hfscales[idx];
+diff --git a/alc/effects/distortion.cpp b/alc/effects/distortion.cpp
+index 976c5166d9..5f75190753 100644
+--- a/alc/effects/distortion.cpp
++++ b/alc/effects/distortion.cpp
+@@ -123,7 +123,8 @@ void DistortionState::deviceUpdate(DeviceBase const *const device, const BufferS
+         auto const splitter = BandSplitter{device->mXOverFreq
+             / static_cast<float>(device->mSampleRate)};
+ 
+-        auto &upsampler = mUpsampler.emplace();
++        using upsampler_t = decltype(mUpsampler)::value_type;
++        auto &upsampler = mUpsampler.emplace(upsampler_t{});
+         for(auto &chandata : upsampler)
+         {
+             chandata.mHfScale = hfscales[idx];
+diff --git a/alc/effects/fshifter.cpp b/alc/effects/fshifter.cpp
+index 50786f36a4..c0f71c6374 100644
+--- a/alc/effects/fshifter.cpp
++++ b/alc/effects/fshifter.cpp
+@@ -156,7 +156,8 @@ void FshifterState::deviceUpdate(DeviceBase const *device, BufferStorage const*)
+         auto const splitter = BandSplitter{device->mXOverFreq
+             / static_cast<float>(device->mSampleRate)};
+ 
+-        auto &upsampler = mUpsampler.emplace();
++        using upsampler_t = decltype(mUpsampler)::value_type;
++        auto &upsampler = mUpsampler.emplace(upsampler_t{});
+         for(auto &chandata : upsampler)
+         {
+             chandata.mHfScale = hfscales[idx];
+diff --git a/alc/effects/pshifter.cpp b/alc/effects/pshifter.cpp
+index c359cccbf0..5816673dc9 100644
+--- a/alc/effects/pshifter.cpp
++++ b/alc/effects/pshifter.cpp
+@@ -159,7 +159,8 @@ void PshifterState::deviceUpdate(DeviceBase const *device, BufferStorage const*)
+         auto const splitter = BandSplitter{device->mXOverFreq
+             / static_cast<float>(device->mSampleRate)};
+ 
+-        auto &upsampler = mUpsampler.emplace();
++        using upsampler_t = decltype(mUpsampler)::value_type;
++        auto &upsampler = mUpsampler.emplace(upsampler_t{});
+         for(auto &chandata : upsampler)
+         {
+             chandata.mHfScale = hfscales[idx];

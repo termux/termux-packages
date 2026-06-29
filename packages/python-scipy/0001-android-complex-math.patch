@@ -1,0 +1,14 @@
+--- a/scipy/special/_complexstuff.h
++++ b/scipy/special/_complexstuff.h
+@@ -16,6 +16,11 @@
+ #include <numpy/npy_common.h>
+ #include "scipy_complex_support.h"
+ 
++#if defined(__ANDROID__) && __ANDROID_API__ < 26
++    double complex clog(double complex);
++    double complex cpow(double complex, double complex);
++#endif
++
+ #if defined(_MSC_VER)
+     typedef _Dcomplex _scipy_dz;
+ #else

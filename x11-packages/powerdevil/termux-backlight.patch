@@ -1,0 +1,272 @@
+--- a/daemon/controllers/backlightbrightness.cpp
++++ b/daemon/controllers/backlightbrightness.cpp
+@@ -17,6 +17,12 @@
+ #include <QFileInfo>
+ #include <QTimer>
+
++#if defined(__TERMUX__)
++#include <QProcess>
++#include <QJsonDocument>
++#include <QJsonObject>
++#endif
++
+ #include <KAuth/Action>
+ #include <KAuth/ActionReply>
+ #include <KAuth/ExecuteJob>
+@@ -38,6 +44,76 @@
+
+ void BacklightDetector::detect()
+ {
++#if defined(__TERMUX__)
++    int brightness = 128;
++    int maxBrightness = 255;
++
++    auto readBrightness = []() -> int {
++        QProcess proc;
++        proc.start(QStringLiteral("termux-brightness"));
++
++        if (!proc.waitForFinished(2000) ||
++            proc.exitStatus() != QProcess::NormalExit ||
++            proc.exitCode() != 0) {
++            return -1;
++        }
++
++        QByteArray out = proc.readAllStandardOutput();
++
++        QJsonParseError err;
++        QJsonDocument doc = QJsonDocument::fromJson(out, &err);
++
++        if (err.error != QJsonParseError::NoError || !doc.isObject()) {
++            return -1;
++        }
++
++        return doc.object().value(QStringLiteral("brightness")).toInt(-1);
++    };
++
++    int initial = readBrightness();
++
++    if (initial >= 0) {
++        brightness = initial;
++    }
++
++    m_display.reset(new BacklightBrightness(brightness, maxBrightness, QString()));
++    Q_EMIT detectionFinished(true);
++
++    if (initial < 0) {
++        return;
++    }
++
++    int lastBrightness = brightness;
++
++    QTimer *timer = new QTimer(this);
++
++    connect(timer, &QTimer::timeout, this, [this, readBrightness, lastBrightness]() mutable {
++        if (!m_display)
++            return;
++
++        int current = readBrightness();
++
++        if (current < 0)
++            return;
++
++        if (current == lastBrightness)
++            return;
++
++        lastBrightness = current;
++
++        auto *display = static_cast<BacklightBrightness*>(m_display.get());
++
++        display->m_requestedBrightness = current;
++        display->m_observedBrightness = current;
++        display->m_executedBrightness = current;
++
++        Q_EMIT display->externalBrightnessChangeObserved(display, current);
++    });
++
++    timer->start(5000);
++
++    return;
++#endif
+     if (m_display) {
+         disconnect(m_display.get(), nullptr, nullptr, nullptr);
+     }
+@@ -86,6 +162,7 @@
+                     Q_EMIT detectionFinished(false);
+                     return;
+                 }
++
+                 if (maxBrightness > 0) {
+                     QString syspath = syspathJob->data()[u"syspath"_s].toString();
+                     syspath = QFileInfo(syspath).symLinkTarget();
+@@ -211,6 +288,30 @@
+
+ void BacklightBrightness::setBrightness(int newBrightness, bool allowAnimations)
+ {
++#if defined(__TERMUX__)
++    if (newBrightness == m_requestedBrightness) {
++        return;
++    }
++
++    QProcess proc;
++    proc.start(QStringLiteral("termux-brightness"),
++               QStringList() << QString::number(newBrightness));
++
++    if (!proc.waitForFinished(2000)) {
++        qWarning() << "termux-brightness write timed out";
++        return;
++    }
++
++    if (proc.exitStatus() != QProcess::NormalExit || proc.exitCode() != 0) {
++        qWarning() << "termux-brightness write failed";
++        return;
++    }
++
++    m_requestedBrightness = newBrightness;
++    m_observedBrightness = newBrightness;
++    m_executedBrightness = newBrightness;
++    return;
++#endif
+     if (!isSupported()) {
+         qCWarning(POWERDEVIL) << "[BacklightBrightness]: Not supported, setBrightness() should not be called";
+         return;
+
+--- a/daemon/controllers/backlighthelper_linux.cpp
++++ b/daemon/controllers/backlighthelper_linux.cpp
+@@ -12,6 +12,12 @@
+ #include <QDebug>
+ #include <QDir>
+
++#if defined(__TERMUX__)
++#include <QProcess>
++#include <QJsonDocument>
++#include <QJsonObject>
++#endif
++
+ #include <KLocalizedString>
+
+ #include <algorithm>
+@@ -31,6 +37,11 @@
+
+ void BacklightHelper::init()
+ {
++#if defined(__TERMUX__)
++    m_isSupported = true;
++    return;
++#else
++
+     initUsingBacklightType();
+
+     if (m_devices.isEmpty()) {
+@@ -47,6 +58,7 @@
+     });
+
+     m_isSupported = true;
++#endif
+ }
+
+ int BacklightHelper::readFromDevice(const QString &device, const QString &property) const
+@@ -179,11 +191,38 @@
+
+ int BacklightHelper::readBrightness() const
+ {
++#if defined(__TERMUX__)
++    QProcess proc;
++    proc.start(QStringLiteral("termux-brightness"));
++
++    if (!proc.waitForFinished(2000)) {
++        qWarning() << "termux-brightness read timed out";
++        return -1;
++    }
++
++    if (proc.exitStatus() != QProcess::NormalExit || proc.exitCode() != 0) {
++        qWarning() << "termux-brightness read failed";
++        return -1;
++    }
++
++    QByteArray out = proc.readAllStandardOutput();
++
++    QJsonParseError err;
++    QJsonDocument doc = QJsonDocument::fromJson(out, &err);
++
++    if (err.error != QJsonParseError::NoError || !doc.isObject()) {
++        qWarning() << "Failed to parse JSON from termux-brightness:" << err.errorString();
++        return -1;
++    }
++
++    return doc.object().value(QStringLiteral("brightness")).toInt(-1);
++#else
+     if (!m_isSupported) {
+         return -1;
+     }
+
+     return readFromDevice(m_devices.constFirst().first, QLatin1String("brightness"));
++#endif
+ }
+
+ ActionReply BacklightHelper::setbrightness(const QVariantMap &args)
+@@ -212,6 +251,23 @@
+
+ bool BacklightHelper::writeBrightness(int brightness) const
+ {
++#if defined(__TERMUX__)
++    QProcess proc;
++    proc.start(QStringLiteral("termux-brightness"),
++               QStringList() << QString::number(brightness));
++
++    if (!proc.waitForFinished(2000)) {
++        qWarning() << "termux-brightness write timed out";
++        return false;
++    }
++
++    if (proc.exitStatus() != QProcess::NormalExit || proc.exitCode() != 0) {
++        qWarning() << "termux-brightness write failed";
++        return false;
++    }
++
++    return true;
++#else
+     if (!m_devices.isEmpty()) {
+         const int first_maxbrightness = std::max(1, m_devices.constFirst().second);
+         for (const auto &device : m_devices) {
+@@ -224,10 +280,16 @@
+     }
+
+     return true;
++#endif
+ }
+
+ ActionReply BacklightHelper::syspath(const QVariantMap &args)
+ {
++#if defined(__TERMUX__)
++    ActionReply reply;
++    reply.addData(QStringLiteral("syspath"), QStringLiteral("/org/termux/backlight"));
++    return reply;
++#else
+     Q_UNUSED(args);
+
+     ActionReply reply;
+@@ -240,10 +302,16 @@
+     reply.addData(QStringLiteral("syspath"), m_devices.constFirst().first);
+
+     return reply;
++#endif
+ }
+
+ ActionReply BacklightHelper::brightnessmax(const QVariantMap &args)
+ {
++#if defined(__TERMUX__)
++    ActionReply reply;
++    reply.addData(QStringLiteral("brightnessmax"), 255);
++    return reply;
++#else
+     Q_UNUSED(args);
+
+     ActionReply reply;
+@@ -265,6 +333,7 @@
+     // qCDebug(POWERDEVIL) << "data contains:" << reply.data()["brightnessmax"];
+
+     return reply;
++#endif
+ }
+
+ KAUTH_HELPER_MAIN("org.kde.powerdevil.backlighthelper", BacklightHelper)

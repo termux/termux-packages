@@ -1,0 +1,16 @@
+xdg-open from termux-tools is not compatible with folders, only files and websites.
+in order to be compatible with folder-opening buttons, such as the "Show Settings Button"
+in obs-studio,
+xdg-utils-xdg-open from xdg-utils must be used instead.
+
+--- a/src/gui/platform/unix/qdesktopunixservices.cpp
++++ b/src/gui/platform/unix/qdesktopunixservices.cpp
+@@ -101,7 +101,7 @@ static inline bool detectWebBrowser(const QByteArray &desktop,
+     const char *browsers[] = {"google-chrome", "firefox", "mozilla", "opera"};
+ 
+     browser->clear();
+-    if (checkExecutable(QStringLiteral("xdg-open"), browser))
++    if (checkExecutable(QStringLiteral("xdg-utils-xdg-open"), browser))
+         return true;
+ 
+     if (checkBrowserVariable) {

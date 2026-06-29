@@ -1,0 +1,11 @@
+--- a/xcb.el
++++ b/xcb.el
+@@ -113,7 +113,7 @@
+ 
+ (defun xcb:display->socket (display)
+   "Convert X11 display DISPLAY to its corresponding socket."
+-  (concat "/tmp/.X11-unix/X"
++  (concat "@TERMUX_PREFIX@/tmp/.X11-unix/X"
+           (replace-regexp-in-string ".*:\\([^\\.]+\\).*" "\\1" display)))
+ 
+ (defun xcb:connect-to-display-with-auth-info (&optional display auth _screen)

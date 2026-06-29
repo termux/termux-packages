@@ -2,12 +2,12 @@ TERMUX_PKG_HOMEPAGE="https://aka.ms/gcm"
 TERMUX_PKG_DESCRIPTION="Cross-platform Git credential storage for multiple hosting providers"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.7.3"
+TERMUX_PKG_VERSION="2.8.0"
 TERMUX_PKG_SRCURL="https://github.com/git-ecosystem/git-credential-manager/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=a9c1d7a89c620bea0df65623f25c62e66122d22557583ab390ed612d544884e9
+TERMUX_PKG_SHA256=44d66fa8273c871cabdeb286fac331da4d1c5e8dd760af7af6744a753e4d5769
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_DOTNET_VERSION=8.0
-TERMUX_PKG_DEPENDS="dotnet-host, dotnet-runtime-8.0"
+TERMUX_DOTNET_VERSION=10.0
+TERMUX_PKG_DEPENDS="dotnet-host, dotnet-runtime-10.0"
 TERMUX_PKG_EXCLUDED_ARCHES="arm"
 TERMUX_PKG_AUTO_UPDATE=true
 

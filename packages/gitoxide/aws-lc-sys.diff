@@ -6,7 +6,7 @@ gitoxide/src/vendor/aws-lc-sys/aws-lc/crypto/rand_extra/getentropy.c:35:9: error
 @@ -13,7 +13,8 @@
  #elif defined(OPENSSL_MACOS) || defined(OPENSSL_OPENBSD) || \
      defined(OPENSSL_FREEBSD)  || defined(OPENSSL_NETBSD) || \
-     defined(OPENSSL_SOLARIS) || \
+     defined(OPENSSL_SOLARIS) || defined(OPENSSL_WASM) || \
 -    (defined(OPENSSL_LINUX) && !defined(HAVE_LINUX_RANDOM_H))
 +    (defined(OPENSSL_LINUX) && !defined(HAVE_LINUX_RANDOM_H) && \
 +    !defined(__ANDROID__) || __ANDROID_API__ >= 28)

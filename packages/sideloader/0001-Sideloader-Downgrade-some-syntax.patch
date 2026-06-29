@@ -1,0 +1,46 @@
+From eff23d97d39afc2e2465ab7e773421389913849d Mon Sep 17 00:00:00 2001
+From: alexytomi <60690056+alexytomi@users.noreply.github.com>
+Date: Wed, 10 Dec 2025 10:01:12 +0800
+Subject: [PATCH 1/5] [Sideloader] Downgrade some syntax
+
+This newer syntax is not understandable by the ancient ldc 1.30 version
+termux uses
+---
+ source/sideload/macho.d | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
+
+diff --git a/source/sideload/macho.d b/source/sideload/macho.d
+index e7d2799..7cefd6d 100644
+--- a/source/sideload/macho.d
++++ b/source/sideload/macho.d
+@@ -532,16 +532,18 @@ class CodeDirectoryBlob: Blob {
+         import std.string;
+         import std.stdio;
+         string s = cast(string) data[codeDirectory.identOffset..codeDirectory.identOffset + 5];
+-        return new CodeDirectoryBlob(
+-            hash: null,
+-            bundleIdentifier: (cast(immutable(char)*) (data.ptr + codeDirectory.identOffset)).fromStringz(),
+-            teamIdentifier: (cast(immutable(char)*) (data.ptr + codeDirectory.teamOffset)).fromStringz(),
+-            machO: null,
+-            entitlements: null,
+-            infoPlist: null,
+-            codeResources: null,
+-            isAlternate: false,
++        CodeDirectoryBlob blob = new CodeDirectoryBlob(
++           null,
++          (cast(immutable(char)*) (data.ptr + codeDirectory.identOffset)).fromStringz(),
++          (cast(immutable(char)*) (data.ptr + codeDirectory.teamOffset)).fromStringz(),
++           null,
++           null,
++           null,
++           null,
++           false,
+         );
++
++        return blob;
+     }
+ 
+     ubyte[] encode(ubyte[][] previousEncodedBlobs) {
+-- 
+2.51.2
+

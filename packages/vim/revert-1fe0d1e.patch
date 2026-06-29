@@ -1,0 +1,33 @@
+Reverts https://github.com/vim/vim/commit/1fe0d1e8f5d50061c7dc8a867fc010abdd0af2e9
+Fixes https://github.com/Benjamin-Loison/vim/issues/42
+
+--- a/src/term.c
++++ b/src/term.c
+@@ -7594,14 +7594,6 @@ got_code_from_term(char_u *code, int len)
+ # ifdef FEAT_EVAL
+ 		    ch_log(NULL, "got_code_from_term(): Entry %c%c did not change",
+ 							     name[0], name[1]);
+-# endif
+-		}
+-		else if (i >= 0 && name[0] == 'K' && VIM_ISDIGIT(name[1]))
+-		{
+-		    // Would replace existing entry with keypad key - skip.
+-# ifdef FEAT_EVAL
+-		    ch_log(NULL, "got_code_from_term(): Skipping entry %c%c in favor of %c%c with matching keys %s",
+-			    name[0], name[1], termcodes[i].name[0], termcodes[i].name[1], str);
+ # endif
+ 		}
+ 		else
+diff --git a/src/version.c b/src/version.c
+index 7ea6b06..b70c8be 100644
+--- a/src/version.c
++++ b/src/version.c
+@@ -820,8 +820,6 @@ static int included_patches[] =
+     231,
+ /**/
+     230,
+-/**/
+-    229,
+ /**/
+     228,
+ /**/

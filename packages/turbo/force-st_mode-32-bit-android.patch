@@ -1,0 +1,91 @@
+--- a/crates/turborepo-cache/src/cache_archive/create.rs
++++ b/crates/turborepo-cache/src/cache_archive/create.rs
+@@ -305,8 +305,30 @@ fn archive_source(
+ 
+     let (parent, file_name) = open_parent_dir(anchor, file_path)?;
+     let file_info = fstatat_no_follow(parent.as_raw_fd(), &file_name)?;
++    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++    let file_type = file_info.st_mode & libc::S_IFMT as u32;
++    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+     let file_type = file_info.st_mode & libc::S_IFMT;
+ 
++    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++    if file_type == libc::S_IFREG as u32 {
++        let file = open_file_at(parent.as_raw_fd(), &file_name)?;
++        let file_info = file.metadata()?;
++        if !file_info.is_file() {
++            return Err(CacheError::CreateUnsupportedFileType(Backtrace::capture()));
++        }
++
++        let header = CacheWriter::create_header(&file_info)?;
++        Ok(ArchiveSource::Regular { file, header })
++    } else if file_type == libc::S_IFLNK as u32 {
++        let target = read_link_at(parent.as_raw_fd(), &file_name)?;
++        let header = create_header_from_stat(&file_info)?;
++        Ok(ArchiveSource::Symlink { target, header })
++    } else {
++        let header = create_header_from_stat(&file_info)?;
++        Ok(ArchiveSource::Other { header })
++    }
++    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+     if file_type == libc::S_IFREG {
+         let file = open_file_at(parent.as_raw_fd(), &file_name)?;
+         let file_info = file.metadata()?;
+@@ -449,7 +471,27 @@ fn create_header_from_stat(file_info: &libc::stat) -> Result<Header, CacheError>
+     let mut header = Header::new_gnu();
+     header.set_mode(unix_mode_to_u32(file_info.st_mode));
+ 
++    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++    let file_type = file_info.st_mode & libc::S_IFMT as u32;
++    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+     let file_type = file_info.st_mode & libc::S_IFMT;
++    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++    if file_type == libc::S_IFLNK as u32 {
++        header.set_entry_type(EntryType::Symlink);
++        header.set_size(0);
++    } else if file_type == libc::S_IFDIR as u32 {
++        header.set_entry_type(EntryType::Directory);
++        header.set_size(0);
++    } else if file_type == libc::S_IFREG as u32 {
++        header.set_entry_type(EntryType::Regular);
++        header.set_size(
++            u64::try_from(file_info.st_size)
++                .map_err(|_| CacheError::CreateUnsupportedFileType(Backtrace::capture()))?,
++        );
++    } else {
++        return Err(CacheError::CreateUnsupportedFileType(Backtrace::capture()));
++    }
++    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+     if file_type == libc::S_IFLNK {
+         header.set_entry_type(EntryType::Symlink);
+         header.set_size(0);
+@@ -491,12 +533,28 @@ fn unix_mode_to_u32(mode: libc::mode_t) -> u32 {
+         target_os = "ios",
+         target_os = "tvos",
+         target_os = "watchos"
+-    ))
++    )),
++    not(all(target_os = "android", target_pointer_width = "32"))
+ ))]
+ fn unix_mode_to_u32(mode: libc::mode_t) -> u32 {
+     mode
+ }
+ 
++#[cfg(all(
++    unix,
++    not(any(
++        target_os = "macos",
++        target_os = "ios",
++        target_os = "tvos",
++        target_os = "watchos"
++    )),
++    all(target_os = "android", target_pointer_width = "32")
++))]
++fn unix_mode_to_u32(mode: u32) -> u32 {
++    mode
++}
++
++
+ fn set_consistent_header_metadata(header: &mut Header) {
+     header.set_uid(0);
+     header.set_gid(0);

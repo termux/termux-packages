@@ -80,6 +80,7 @@ done
 
 case "$subcmd" in
 	build)
+		echo "$PROGNAME: building parser"
 		# shellcheck disable=SC2086
 		(
 		cd "$srcdir"
@@ -94,16 +95,19 @@ case "$subcmd" in
 		)
 	;;
 	generate)
+		echo -n "$PROGNAME: generating parser "
 		if [[ -e "$srcdir"/grammar.json ]]; then
+			echo "from 'grammar.json' file"
 			tree-sitter generate --abi="${TREE_SITTER_ABI_VERSION}" "$srcdir"/grammar.json
 		else
+			echo "from 'grammar.js' file"
 			tree-sitter generate --abi="${TREE_SITTER_ABI_VERSION}" "$srcdir"/../grammar.js
 		fi
 	;;
 	install)
-
 		# Install the parser and set up the soversion symlink chain all the way
-		install -D -v -m755 "$srcdir/$name.so.${TREE_SITTER_ABI_VERSION}.0" \
+		echo "$PROGNAME: installing parser library and symlinks"
+		install -v -Dm755 "$srcdir/$name.so.${TREE_SITTER_ABI_VERSION}.0" \
 			"$TERMUX_PREFIX/lib/libtree-sitter-$name.so.${TREE_SITTER_ABI_VERSION}.0"
 		ln -sfv "libtree-sitter-$name.so.${TREE_SITTER_ABI_VERSION}.0" \
 			"$TERMUX_PREFIX/lib/libtree-sitter-$name.so.${TREE_SITTER_ABI_VERSION}"
@@ -117,18 +121,21 @@ case "$subcmd" in
 
 		# Install queries if they exist
 		if [[ -d "$querydir" ]]; then
+			echo "$PROGNAME: installing queries"
 			find "$querydir" -name '*.scm' -exec \
-			install -vD -m755 -t "$TERMUX_PREFIX/share/tree-sitter/queries/$name/" '{}' \;
+			install -v -Dm755 -t "$TERMUX_PREFIX/share/tree-sitter/queries/$name/" '{}' \;
 		fi
 
 		# Install C bindings if they exist
 		if [[ -d "bindings/c" ]]; then
+			echo "$PROGNAME: installing C headers"
 			# Parser header files should be in bindings/c/tree_sitter/$parser_name.h
 			# But some slightly older parsers may have them in another location,
 			# use `find` to ensure we install them.
 			find bindings/c -name '*.h' -exec \
-			install -vD -m644 -t "$TERMUX_PREFIX/include/tree_sitter/" '{}' \;
+			install -v -Dm644 -t "$TERMUX_PREFIX/include/tree_sitter/" '{}' \;
 			mkdir -p "$TERMUX_PREFIX/lib/pkgconfig"
+			echo "$PROGNAME: installing pkgconfig file"
 			# shellcheck disable=SC2016
 			sed -e "s|@ADDITIONAL_LIBS@||" \
 				-e 's|@CMAKE_INSTALL_INCLUDEDIR@|${prefix}/include|' \

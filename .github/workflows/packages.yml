@@ -37,14 +37,14 @@ jobs:
   build:
     permissions:
       contents: read # actions/upload-artifact doesn't need contents: write
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     strategy:
       matrix:
         target_arch: [aarch64, arm, i686, x86_64]
       fail-fast: false
     steps:
     - name: Clone repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: 1000
 
@@ -254,6 +254,27 @@ jobs:
       run: |
         ./scripts/free-space.sh
 
+    - name: List packages that are still installed on the server
+      if: ${{ steps.build-info.outputs.free-space == 'true' && steps.build-info.outputs.skip-building != 'true' && runner.debug }}
+      run: |
+        dpkg-query -W -f='${Installed-size} ${Package}\n' | sort -n
+
+    - name: List directory size for debug
+      if: ${{ steps.build-info.outputs.free-space == 'true' && steps.build-info.outputs.skip-building != 'true' && runner.debug }}
+      run: |
+        size() {
+          echo "Directory size info for '$1':"
+          du --bytes "$1" --max-depth 1 | sort -n
+          echo
+          echo
+          echo
+        }
+        size /
+        size /usr
+        size /var
+        size /var/lib
+        size /var/
+
     - name: Build packages
       if: ${{ steps.build-info.outputs.skip-building != 'true' }}
       run: |
@@ -324,7 +345,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
     - name: Clone repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
     - name: Randomise buildorder.py test
       run: ./scripts/bin/test-buildorder-random
     - name: Randomise buildorder.py test (aarch64)
@@ -352,7 +373,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
     - name: Clone repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
     - name: Get *.deb files
       uses: actions/download-artifact@v7
       with:
@@ -419,7 +440,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
     - name: Clone repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
     - name: Get *.deb files
       uses: actions/download-artifact@v7
       with:
@@ -467,6 +488,14 @@ jobs:
               # Final part to make changes appear in web root.
               if ! aptly_publish_repo; then
                 exit 1
+              fi
+
+              # Publish to staging repo if we haven't already
+              if [[ "$REPOSITORY_DISTRIBUTION" != "staging" ]]; then
+                REPOSITORY_DISTRIBUTION=staging
+                if ! aptly_publish_repo; then
+                  exit 1
+                fi
               fi
             fi
           fi

@@ -1,0 +1,20 @@
+Without this:
+WARN wgpu_hal::vulkan::instance: Unable to find extension: VK_EXT_physical_device_drm
+INFO ruffle_desktop::gui::controller: Using preferred backend Vulkan
+INFO ruffle_desktop::gui::controller: Using graphics API vulkan on llvmpipe (LLVM 21.1.8, 128 bits) (type: Cpu)
+
+With this:
+INFO ruffle_desktop::gui::controller: Using preferred backend Vulkan
+INFO ruffle_desktop::gui::controller: Using graphics API vulkan on Turnip Adreno (TM) 612 (type: IntegratedGpu)
+
+--- a/src/vulkan/instance.rs
++++ b/src/vulkan/instance.rs
+@@ -307,6 +307,7 @@ impl super::Instance {
+             unix,
+             not(target_vendor = "apple"),
+-            not(target_family = "wasm")
++            not(target_family = "wasm"),
++            not(target_os = "android")
+         )) {
+             // VK_EXT_acquire_drm_display -> VK_EXT_direct_mode_display -> VK_KHR_display
+             extensions.push(ext::acquire_drm_display::NAME);

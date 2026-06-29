@@ -3,9 +3,14 @@ termux_setup_pkg_config_wrapper() {
 	local _WRAPPER_BIN="${TERMUX_PKG_BUILDDIR}/_wrapper/bin"
 	mkdir -p "${_WRAPPER_BIN}"
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
+		local _PKG_CONFIG_BASE="${TERMUX_STANDALONE_TOOLCHAIN}/bin/pkg-config"
+		if [[ -x "${_WRAPPER_BIN}/pkg-config" ]]; then
+			_PKG_CONFIG_BASE="${_WRAPPER_BIN}/pkg-config"
+		fi
 		sed "s|^export PKG_CONFIG_LIBDIR=|export PKG_CONFIG_LIBDIR=${_PKG_CONFIG_LIBDIR}:|" \
-			"${TERMUX_STANDALONE_TOOLCHAIN}/bin/pkg-config" \
-			> "${_WRAPPER_BIN}/pkg-config"
+			"${_PKG_CONFIG_BASE}" \
+			> "${_WRAPPER_BIN}/pkg-config.tmp"
+		mv "${_WRAPPER_BIN}/pkg-config.tmp" "${_WRAPPER_BIN}/pkg-config"
 		chmod +x "${_WRAPPER_BIN}/pkg-config"
 		export PKG_CONFIG="${_WRAPPER_BIN}/pkg-config"
 	fi

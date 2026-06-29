@@ -1,5 +1,5 @@
---- "a/intercept-preload/src/implementation.rs"
-+++ "b/intercept-preload/src/implementation.rs"
+--- a/intercept-preload/src/implementation.rs
++++ b/intercept-preload/src/implementation.rs
 @@ -33,7 +33,12 @@ use bear::intercept::reporter::{Reporter, ReporterFactory};
  use bear::intercept::tcp::ReporterOnTcp;
  use bear::intercept::{Event, Execution};
@@ -11,15 +11,6 @@
 +const RTLD_NEXT: *mut libc::c_void = -1isize as *mut _;
 +#[cfg(target_pointer_width = "32")]
 +const RTLD_NEXT: *mut libc::c_void = 0xfffffffeusize as *mut _;
-
+ 
  use crate::session::{DoctoredEnvironment, SESSION, in_session, init_session_from_envp};
-
-@@ -740,7 +745,7 @@ fn working_dir() -> Result<PathBuf, c_int> {
- #[cfg(any(target_os = "linux", target_os = "android"))]
- unsafe fn set_errno(value: c_int) {
-     unsafe {
--        *libc::__errno_location() = value;
-+        *libc::__errno() = value;
-     }
- }
-
+ 

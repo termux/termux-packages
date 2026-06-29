@@ -1,6 +1,15 @@
 --- a/Makefile
 +++ b/Makefile
-@@ -33,10 +33,10 @@
+@@ -1,6 +1,7 @@
+ export PATH := $(PATH):`go env GOPATH`/bin
+ export GO111MODULE=on
+-LDFLAGS := -s -w
++# for https://github.com/wlynxg/anet?tab=readme-ov-file#how-to-build-with-go-1230-or-later
++LDFLAGS := -s -w -checklinkname=0
+ NOWEB_TAG = $(shell [ ! -d web/frps/dist ] || [ ! -d web/frpc/dist ] && echo ',noweb')
+ 
+ .PHONY: web frps-web frpc-web frps frpc
+@@ -33,10 +34,10 @@
  	go vet -tags "$(NOWEB_TAG)" ./...
  
  frps:

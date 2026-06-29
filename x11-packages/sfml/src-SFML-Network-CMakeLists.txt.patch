@@ -1,0 +1,11 @@
+--- a/src/SFML/Network/CMakeLists.txt
++++ b/src/SFML/Network/CMakeLists.txt
+@@ -53,7 +53,7 @@
+ if(SFML_OS_WINDOWS)
+     target_link_libraries(sfml-network PRIVATE Crypt32 ws2_32 Dnsapi)
+ elseif(SFML_OS_LINUX OR SFML_OS_IOS OR SFML_OS_MACOS)
+-    target_link_libraries(sfml-network PRIVATE resolv)
++    target_link_libraries(sfml-network PRIVATE resolv_wrapper)
+ endif()
+ 
+ if(SFML_USE_SYSTEM_DEPS)

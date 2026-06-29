@@ -4,15 +4,19 @@ TERMUX_PKG_LICENSE="LGPL-2.1, BSD 2-Clause"
 TERMUX_PKG_LICENSE_FILE="BSD, COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.12.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.libssh.org/files/${TERMUX_PKG_VERSION%.*}/libssh-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=1a6af424d8327e5eedef4e5fe7f5b924226dd617ac9f3de80f217d82a36a7121
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="openssl, zlib"
 TERMUX_PKG_BREAKS="libssh-dev"
 TERMUX_PKG_REPLACES="libssh-dev"
+# -DWITH_EXAMPLES=OFF prevents:
+# src/examples/ssh_server.c:260:9: error: call to undeclared function 'set_default_keys'
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DHAVE_ARGP_H=OFF
 -DWITH_GSSAPI=OFF
+-DWITH_EXAMPLES=OFF
 "
 
 termux_step_post_get_source() {
@@ -28,5 +32,5 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
-	CPPFLAGS+=" -D__USE_GNU"
+	CPPFLAGS+=" -D_GNU_SOURCE"
 }

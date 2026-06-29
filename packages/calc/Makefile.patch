@@ -1,0 +1,36 @@
+# Do not execute cross compiled test program to check a working compiler
+
+--- a/Makefile
++++ b/Makefile
+@@ -401,15 +401,6 @@
+ 	    echo "libs, and libraries (likely -lreadline -lhistory -lncurses)." 1>&2; \
+ 	    exit 2; \
+ 	fi
+-	${Q} if ! ./lcc_test${EXT}; then \
+-	    echo "ERROR: Local C compiler: ${LCC} produced: lcc_test${EXT} that failed to execute from C program:" 1>&2; \
+-	    echo 1>&2; \
+-	    echo "    echo 'int main(void) { return 0; }' | ${LCC} -x c -o lcc_test${EXT} - ${S}" 1>&2; \
+-	    echo 1>&2; \
+-	    echo "Be sure that you have properly installed ${LCC}, and the related tools, include files," 1>&2; \
+-	    echo "libs, and libraries (likely -lreadline -lhistory -lncurses)." 1>&2; \
+-	    exit 3; \
+-	fi
+ 	${Q} ${RM} -f lcc_test${EXT}
+ 
+ # check_lcc_include - check if the local C compiler ${LCC} has access to the <stdio.h> system include file
+@@ -461,15 +452,6 @@
+ 	    echo "libs, and libraries (likely -lreadline -lhistory -lncurses)." 1>&2; \
+ 	    exit 6; \
+ 	fi
+-	${Q} if ! ./cc_test${EXT}; then \
+-	    echo "ERROR: The C compiler: ${CC} produced: cc_test${EXT} that failed to execute from C program:" 1>&2; \
+-	    echo 1>&2; \
+-	    echo "    echo 'int main(void) { return 0; }' | ${CC} -x c -o cc_test${EXT} - ${S}" 1>&2; \
+-	    echo 1>&2; \
+-	    echo "Be sure that you have properly installed ${CC}, and the related tools, include files," 1>&2; \
+-	    echo "libs, and libraries (likely -lreadline -lhistory -lncurses)." 1>&2; \
+-	    exit 7; \
+-	fi
+ 	${Q} ${RM} -f cc_test${EXT}
+ 
+ # check_cc_include - check if the C compiler ${CC} has access to the <stdio.h> system include file

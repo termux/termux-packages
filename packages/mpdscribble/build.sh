@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.musicpd.org/clients/mpdscribble/
 TERMUX_PKG_DESCRIPTION="A Music Player Daemon (MPD) client which submits information about tracks being played to a scrobbler"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-TERMUX_PKG_VERSION="0.25"
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_VERSION="0.26"
 TERMUX_PKG_SRCURL="https://github.com/MusicPlayerDaemon/mpdscribble/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=ce24145df6657f1d8070c88f6795f567f21ff9126b0740c088f40344fc496b1e
-TERMUX_PKG_DEPENDS="libc++, libcurl, libgcrypt, mpd, libmpdclient, glib"
+TERMUX_PKG_SHA256=add1c21cd8acab9fc78c8bbbd89bc54bf0e8aef94f169564c882a742c3a96edb
+TERMUX_PKG_DEPENDS="fmt, libc++, libcurl, libgcrypt, mpd, libmpdclient"
 TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers"
 TERMUX_PKG_CONFFILES="etc/mpdscribble.conf"
 # mpdscribble already puts timestamps in the info printed to stdout so no need for svlogd -tt,
@@ -23,7 +22,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install () {
-	install $TERMUX_PKG_SRCDIR/doc/mpdscribble.conf $TERMUX_PREFIX/etc/
+	install "$TERMUX_PKG_SRCDIR"/doc/mpdscribble.conf "$TERMUX_PREFIX"/etc/
 }
 
 termux_step_create_debscripts () {

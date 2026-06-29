@@ -2,50 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://librewolf.net/
 TERMUX_PKG_DESCRIPTION="A custom version of Firefox, focused on privacy, security and freedom."
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@3ls-it"
-TERMUX_PKG_VERSION="148.0.2-3"
+TERMUX_PKG_VERSION="152.0.2-1"
 TERMUX_PKG_SRCURL="https://codeberg.org/api/packages/librewolf/generic/librewolf-source/${TERMUX_PKG_VERSION}/librewolf-${TERMUX_PKG_VERSION}.source.tar.gz"
-TERMUX_PKG_SHA256=e00c0de9330b6655fbfa2e31540d5f02248f6b1959bbece384d4afb1a0d6efa7
+TERMUX_PKG_SHA256=2db000606af1acb50e857a57f744d2ae40325d0d81a6bb6ba648422b9114b625
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-
-
-termux_pkg_auto_update() {
-	local api_url="https://codeberg.org/api/v1/repos/librewolf/source/releases?draft=false&pre-release=false"
-	local e=0
-	local latest_version
-	latest_version="$(
-		curl -fsL \
-			-A "Termux update checker 1.1 (github.com/termux/termux-packages)" \
-			-H "accept: application/json" \
-			"$api_url" \
-		| jq -r '.[0].tag_name'
-	)"
-
-	local uptime_now=$(cat /proc/uptime)
-	local uptime_s="${uptime_now//.*}"
-	local uptime_h_limit=2
-	local uptime_s_limit=$((uptime_h_limit*60*60))
-	[[ -z "${uptime_s}" ]] && [[ "$(uname -o)" != "Android" ]] && e=1
-	[[ "${uptime_s}" == 0 ]] && [[ "$(uname -o)" != "Android" ]] && e=1
-	[[ "${uptime_s}" -gt "${uptime_s_limit}" ]] && e=1
-
-	if [[ "${e}" != 0 ]]; then
-		cat <<- EOL >&2
-		WARN: Auto update failure!
-		api_url_r=${api_url_r}
-		latest_version=${latest_version}
-		uptime_now=${uptime_now}
-		uptime_s=${uptime_s}
-		uptime_s_limit=${uptime_s_limit}
-		EOL
-		return
-	fi
-
-	termux_pkg_upgrade_version "$latest_version"
-}
+TERMUX_PKG_UPDATE_VERSION_SED_REGEXP="s/_/-/g"
 
 termux_step_post_get_source() {
 	local f="media/ffvpx/config_unix_aarch64.h"

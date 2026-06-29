@@ -1,0 +1,14 @@
+--- a/libs/sqlite3/sqlite3.c
++++ b/libs/sqlite3/sqlite3.c
+@@ -30709,7 +30709,11 @@
+ #elif defined(__GNUC__)
+   __sync_synchronize();
+ #elif MSVC_VERSION>=1400
++#ifndef __clang__
+   _ReadWriteBarrier();
++#else
++  __asm__ __volatile__("" ::: "memory");
++#endif
+ #elif defined(MemoryBarrier)
+   MemoryBarrier();
+ #endif

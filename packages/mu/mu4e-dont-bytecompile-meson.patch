@@ -4,12 +4,12 @@
 diff -uNr a/meson.build b/meson.build
 --- a/meson.build	2026-01-16 01:29:15.000000000 +0530
 +++ b/meson.build	2026-01-16 10:25:54.391552150 +0530
-@@ -365,9 +365,7 @@
+@@ -357,9 +357,7 @@
+ # emacs -- needed for mu4e compilation
  emacs_name=get_option('emacs')
- emacs_min_version='26.3'
- emacs=find_program([emacs_name], version: '>=' + emacs_min_version, required:false)
+ emacs_min_version='28.1'
+-emacs=find_program([emacs_name], version: '>=' + emacs_min_version, required:false)
 -if emacs.found()
--  emacs28 = find_program([emacs_name], version: '>=28', required:false)
 -  subdir('man')
 +if true
    subdir('mu4e')
@@ -18,16 +18,7 @@ diff -uNr a/meson.build b/meson.build
 diff -uNr a/mu4e/meson.build b/mu4e/meson.build
 --- a/mu4e/meson.build	2026-01-16 01:29:15.000000000 +0530
 +++ b/mu4e/meson.build	2026-01-16 10:29:59.896162690 +0530
-@@ -80,7 +80,7 @@
- # not very elegant, but
- # https://stackoverflow.com/questions/49221792/byte-compile-file-only-when-library-is-found
- mu4e_srcs += 'mu4e-transient.el'
--if emacs28.found()
-+if true
-   mu4e_bc_srcs += 'mu4e-transient.el'
- else
-   message('mu4e-transient.el cannot be byte-compiled')
-@@ -88,8 +88,7 @@
+@@ -79,8 +79,7 @@
  
  # do have we have dbus support?
  mu4e_srcs += 'mu4e-dbus.el'
@@ -37,15 +28,15 @@ diff -uNr a/mu4e/meson.build b/mu4e/meson.build
  if emacs_dbus.returncode() == 0
    mu4e_bc_srcs += 'mu4e-dbus.el'
  else
-@@ -105,6 +104,7 @@
+@@ -95,6 +94,7 @@
+ #... so let's not do that!
  
- # byte compile the sources that can be byte-compiled. This may exclude mu4e-transient.el and
- # mu4e-dbus.el
+ # byte compile the sources that can be byte-compiled. This may exclude mu4e-dbus.el
 +if false
  foreach src : mu4e_bc_srcs
    target_name= '@BASENAME@.elc'
    target_path = join_paths(meson.current_build_dir(), target_name)
-@@ -149,6 +149,7 @@
+@@ -139,6 +139,7 @@
              '--load', 'package',
              '--eval', '(package-generate-autoloads "mu4e" "' +
                        meson.current_build_dir() + '" )'])

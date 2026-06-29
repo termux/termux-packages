@@ -17,6 +17,9 @@ if (-Not $?) {
         --detach `
         --name $CONTAINER_NAME `
         --volume "${PWD}:/home/builder/termux-packages" `
+        --security-opt seccomp="${PWD}/scripts/profile.json" `
+        --cap-add CAP_SYS_ADMIN `
+        --device /dev/fuse `
         --tty `
         "$IMAGE_NAME"
 }

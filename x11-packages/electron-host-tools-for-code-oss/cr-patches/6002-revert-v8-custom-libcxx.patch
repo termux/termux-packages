@@ -1,0 +1,17 @@
+Safe libcxx requires custom libcxx enabled, but Termux's chromium uses NDK
+to compile, so it can't be built with custom libcxx enabled.
+
+This reverts https://github.com/v8/v8/commits/5958585ab325d2a98f8d77950d7df25a3d0c9885
+
+--- a/v8/BUILD.gn
++++ b/v8/BUILD.gn
+@@ -788,9 +788,6 @@
+ assert(!v8_enable_sandbox || v8_enable_external_code_space,
+        "The sandbox requires the external code space")
+ 
+-assert(!v8_enable_sandbox || use_safe_libcxx,
+-       "The sandbox requires libc++ hardening")
+-
+ assert(!v8_enable_memory_corruption_api || v8_enable_sandbox,
+        "The Memory Corruption API requires the sandbox")
+ 

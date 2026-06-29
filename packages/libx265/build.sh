@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=http://x265.org/
 TERMUX_PKG_DESCRIPTION="H.265/HEVC video stream encoder library"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.1"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION="4.2"
 TERMUX_PKG_SRCURL=https://bitbucket.org/multicoreware/x265_git/downloads/x265_${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=a31699c6a89806b74b0151e5e6a7df65de4b49050482fe5ebf8a4379d7af8f29
+TERMUX_PKG_SHA256=40b1ea0453e0309f0eba934e0ddf533f8f6295966679e8894e8f1c1c8d5e1210
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-posix-semaphore, libc++"
 TERMUX_PKG_BREAKS="libx265-dev"
 TERMUX_PKG_REPLACES="libx265-dev"
@@ -13,7 +13,7 @@ TERMUX_PKG_REPLACES="libx265-dev"
 termux_step_pre_configure() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	local _SOVERSION=215
+	local _SOVERSION=216
 
 	local v=$(sed -En 's/^.*set\(X265_BUILD ([0-9]+).*$/\1/p' \
 			source/CMakeLists.txt)

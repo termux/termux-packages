@@ -1,0 +1,11 @@
+--- a/CMakeLists.txt	2026-06-11 16:00:26.182533214 +0300
++++ b/CMakeLists.txt	2026-06-11 16:00:45.609203788 +0300
+@@ -301,7 +301,7 @@
+ 
+ if(${CMAKE_SYSTEM_NAME} STREQUAL "Haiku")
+   list(APPEND EXTRA_LIBS "network")
+-else()
++elseif(NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Android")
+   list(APPEND EXTRA_LIBS "pthread")
+ endif()
+ 

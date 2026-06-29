@@ -1,13 +1,38 @@
-diff --git a/udocker/helper/hostinfo.py b/udocker/helper/hostinfo.py
-index e08de03..e4c95a7 100644
+Python 3.12 on Android:
+platform.system(): kernel name, e.g. "Linux"
+platform.release(): kernel version, e.g. "4.14.190-lineage-gef0cb31b13"
+os.uname().sysname: kernel name, e.g. "Linux"
+os.uname().release: kernel version, e.g. "4.14.190-lineage-gef0cb31b13"
+
+Python 3.13 on Android:
+platform.system(): OS name, e.g. "Android"
+platform.release(): OS version, e.g. "13"
+os.uname().sysname: kernel name, e.g. "Linux"
+os.uname().release: kernel version, e.g. "4.14.190-lineage-gef0cb31b13"
+
+udocker was written for, and expects, the previous behavior when running in Python on Android,
+so use os.uname() instead of platform, which is the same as the previous behavior, and unlikely to change.
+
 --- a/udocker/helper/hostinfo.py
 +++ b/udocker/helper/hostinfo.py
-@@ -32,7 +32,7 @@ class HostInfo(ArchInfo):
+@@ -30,16 +30,16 @@ class HostInfo(ArchInfo):
+         return arch[0] if arch[0] else ""
+ 
      def osversion(self):
-         """Get operating system"""
+-        """Get operating system"""
++        """Get operating system kernel name"""
          try:
 -            return platform.system().lower()
-+            return "linux"
++            return os.uname().sysname.lower()
          except (NameError, AttributeError):
              return ""
+ 
+     def oskernel(self):
+-        """Get operating system"""
++        """Get operating system kernel version"""
+         try:
+-            return platform.release()
++            return os.uname().release
+         except (NameError, AttributeError):
+             return "6.1.1"
  

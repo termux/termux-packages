@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
 TERMUX_PKG_DESCRIPTION="Library for parsing XML documents"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.15.2"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="2.15.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.gnome.org/sources/libxml2/${TERMUX_PKG_VERSION%.*}/libxml2-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=c8b9bc81f8b590c33af8cc6c336dbff2f53409973588a351c95f1c621b13d09d
+TERMUX_PKG_SHA256=78262a6e7ac170d6528ebfe2efccdf220191a5af6a6cd61ea4a9a9a5042c7a07
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_SETUP_PYTHON=true
@@ -39,7 +39,8 @@ TERMUX_PKG_REPLACES="libxml2-dev"
 
 termux_step_host_build() {
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
-		termux_download_ubuntu_packages doxygen libclang-cpp18 libclang1-18 libfmt9 libxapian30
+		# We need doxygen, other packages are it's dependencies
+		termux_download_ubuntu_packages doxygen libfmt10 libspdlog1.15 libxapian30
 	fi
 }
 

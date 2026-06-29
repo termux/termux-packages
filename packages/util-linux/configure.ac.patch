@@ -1,0 +1,15 @@
+col is by default only built when using glibc, but we keep
+it in Termux by patching away the configure check.
+
+See https://github.com/termux/termux-packages/issues/21537
+
+--- a/configure.ac	2026-06-25 11:55:32.660220134 +0530
++++ b/configure.ac	2026-06-25 11:55:34.072002997 +0530
+@@ -2291,7 +2291,6 @@
+ AM_CONDITIONAL([BUILD_BITS], [test "x$build_bits" = xyes])
+ 
+ UL_BUILD_INIT([col], [check])
+-UL_REQUIRES_COMPILE([col], [#include <limits.h>], [__GLIBC__], [building for glibc])
+ AM_CONDITIONAL([BUILD_COL], [test "x$build_col" = xyes])
+ 
+ UL_BUILD_INIT([colcrt], [yes])

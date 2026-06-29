@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE="https://github.com/sammycage/plutovg"
+TERMUX_PKG_DESCRIPTION="Tiny 2D vector graphics library in C"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.3.3"
+TERMUX_PKG_SRCURL="https://github.com/sammycage/plutovg/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=2b0d17a6e016f47b86f9c00e2cb82600041b1ea1f7d2a00c2d46ae542cbfed3c
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DBUILD_SHARED_LIBS=ON
+"

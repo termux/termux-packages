@@ -1,8 +1,8 @@
 diff --git a/include/pathnames.h b/include/pathnames.h
-index 34ba11ca3..a7d3278c8 100644
+index 6dcfced22..d60e24dea 100644
 --- a/include/pathnames.h
 +++ b/include/pathnames.h
-@@ -19,77 +19,78 @@
+@@ -19,72 +19,73 @@
  /* DEFPATHs from <paths.h> don't include /usr/local */
  #undef _PATH_DEFPATH
  
@@ -62,18 +62,20 @@ index 34ba11ca3..a7d3278c8 100644
 -#define _PATH_GROUP		"/etc/group"
 -#define _PATH_SHADOW_PASSWD	"/etc/shadow"
 -#define _PATH_SHELLS		"/etc/shells"
-+// Termux doesn't support multiuser environment.
-+// Some Android versions support /etc/passwd and /etc/group but files
-+// /etc/shadow and /etc/gshadow are not supported.
++// Termux doesn't support multiuser environments.
++// Some Android versions support /etc/passwd and /etc/group
++// but files /etc/shadow and /etc/gshadow are not supported.
 +#define _PATH_PASSWD		"/system/etc/passwd"
 +#define _PATH_GSHADOW		"/system/etc/gshadow"
 +#define _PATH_GROUP		"/system/etc/group"
 +#define _PATH_SHADOW_PASSWD	"/system/etc/shadow"
 +// Ignored in Termux.
 +#define _PATH_SHELLS		"@TERMUX_PREFIX@/etc/shells"
+ #define _PATH_PASSWDBAK_SUFFIX  "-"
  
  #ifndef _PATH_TMP
- # define _PATH_TMP		"/tmp/"
+-# define _PATH_TMP		"/tmp/"
++# define _PATH_TMP		"@TERMUX_PREFIX@/tmp/"
  #endif
  
 +// btmp, (and utmp/wtmp) files are unsupported.
@@ -81,14 +83,6 @@ index 34ba11ca3..a7d3278c8 100644
 -# define _PATH_BTMP		"/var/log/btmp"
 +# define _PATH_BTMP		"@TERMUX_PREFIX@/var/log/btmp"
  #endif
- 
- #define _PATH_ISSUE_FILENAME	"issue"
- #define _PATH_ISSUE_DIRNAME	_PATH_ISSUE_FILENAME ".d"
- 
--#define _PATH_ISSUE		"/etc/" _PATH_ISSUE_FILENAME
--#define _PATH_ISSUEDIR		"/etc/" _PATH_ISSUE_DIRNAME
-+#define _PATH_ISSUE		"@TERMUX_PREFIX@/etc/" _PATH_ISSUE_FILENAME
-+#define _PATH_ISSUEDIR		"@TERMUX_PREFIX@/etc/" _PATH_ISSUE_DIRNAME
  
 -#define _PATH_OS_RELEASE_ETC	"/etc/os-release"
 -#define _PATH_OS_RELEASE_USR	"/usr/lib/os-release"
@@ -115,7 +109,7 @@ index 34ba11ca3..a7d3278c8 100644
  #define _PATH_PROC		"/proc"
  #define _PATH_PROC_SWAPS	"/proc/swaps"
  #define _PATH_PROC_FILESYSTEMS	"/proc/filesystems"
-@@ -132,7 +133,7 @@
+@@ -129,7 +130,7 @@
  # ifdef MOUNTED					/* deprecated */
  #  define _PATH_MOUNTED		MOUNTED
  # else
@@ -124,7 +118,7 @@ index 34ba11ca3..a7d3278c8 100644
  # endif
  #endif
  
-@@ -140,7 +141,8 @@
+@@ -137,7 +138,8 @@
  # ifdef MNTTAB					/* deprecated */
  #  define _PATH_MNTTAB		MNTTAB
  # else
@@ -134,7 +128,7 @@ index 34ba11ca3..a7d3278c8 100644
  # endif
  #endif
  
-@@ -155,22 +157,22 @@
+@@ -152,22 +154,22 @@
  
  #define _PATH_DEV_MEM		"/dev/mem"
  
@@ -165,21 +159,8 @@ index 34ba11ca3..a7d3278c8 100644
  #endif
  
  #ifdef __ia64__
-diff --git a/lib/exec_shell.c b/lib/exec_shell.c
-index 96d3e95a8..46840a53e 100644
---- a/lib/exec_shell.c
-+++ b/lib/exec_shell.c
-@@ -28,7 +28,7 @@
- 
- #include "exec_shell.h"
- 
--#define DEFAULT_SHELL "/bin/sh"
-+#define DEFAULT_SHELL "@TERMUX_PREFIX@/bin/sh"
- 
- void __attribute__((__noreturn__)) exec_shell(void)
- {
 diff --git a/lib/loopdev.c b/lib/loopdev.c
-index 2359bf781..056ac6e75 100644
+index 57479ccb4..4f8a7eaf5 100644
 --- a/lib/loopdev.c
 +++ b/lib/loopdev.c
 @@ -128,13 +128,13 @@ int loopcxt_set_device(struct loopdev_cxt *lc, const char *device)
@@ -222,42 +203,40 @@ index fa2379c4d..f11996748 100644
  #define BLKID_ERR_IO	 5
  #define BLKID_ERR_SYSFS	 9
 diff --git a/libblkid/src/topology/dm.c b/libblkid/src/topology/dm.c
-index 7687e327a..6d510abaf 100644
+index 7687e327a..3d4a29857 100644
 --- a/libblkid/src/topology/dm.c
 +++ b/libblkid/src/topology/dm.c
-@@ -30,9 +30,8 @@ static int probe_dm_tp(blkid_probe pr,
+@@ -30,9 +30,7 @@ static int probe_dm_tp(blkid_probe pr,
  		const struct blkid_idmag *mag __attribute__((__unused__)))
  {
  	const char * const paths[] = {
 -		"/usr/local/sbin/dmsetup",
 -		"/usr/sbin/dmsetup",
 -		"/sbin/dmsetup"
-+		"@TERMUX_PREFIX@/bin/dmsetup",
-+		"@TERMUX_PREFIX@/sbin/dmsetup"
++		"@TERMUX_PREFIX@/bin/dmsetup"
  	};
  	int dmpipe[] = { -1, -1 }, stripes = 0, stripesize = 0;
  	const char *cmd = NULL;
 diff --git a/libblkid/src/topology/lvm.c b/libblkid/src/topology/lvm.c
-index f5c3d484b..80be642a1 100644
+index f5c3d484b..7a952fdbf 100644
 --- a/libblkid/src/topology/lvm.c
 +++ b/libblkid/src/topology/lvm.c
-@@ -36,9 +36,8 @@ static int probe_lvm_tp(blkid_probe pr,
+@@ -36,9 +36,7 @@ static int probe_lvm_tp(blkid_probe pr,
  		const struct blkid_idmag *mag __attribute__((__unused__)))
  {
  	const char * const paths[] = {
 -		"/usr/local/sbin/lvdisplay",
 -		"/usr/sbin/lvdisplay",
 -		"/sbin/lvdisplay"
-+		"@TERMUX_PREFIX@/bin/lvdisplay",
-+		"@TERMUX_PREFIX@/sbin/lvdisplay"
++		"@TERMUX_PREFIX@/bin/lvdisplay"
  	};
  	int lvpipe[] = { -1, -1 }, stripes = 0, stripesize = 0;
  	FILE *stream = NULL;
 diff --git a/libmount/src/cache.c b/libmount/src/cache.c
-index b7956346f..ffe3dc103 100644
+index 4d2a20f23..167ece9bd 100644
 --- a/libmount/src/cache.c
 +++ b/libmount/src/cache.c
-@@ -654,7 +654,7 @@ char *mnt_pretty_path(const char *path, struct libmnt_cache *cache)
+@@ -762,7 +762,7 @@ char *mnt_pretty_path(const char *path, struct libmnt_cache *cache)
  	/* users assume backing file name rather than /dev/loopN in
  	 * output if the device has been initialized by mount(8).
  	 */
@@ -267,7 +246,7 @@ index b7956346f..ffe3dc103 100644
  
  		if (loopcxt_init(&lc, 0) || loopcxt_set_device(&lc, pretty))
 diff --git a/libmount/src/hook_loopdev.c b/libmount/src/hook_loopdev.c
-index 444d69d6f..54ca0ebf3 100644
+index 114d055ba..8b70a633e 100644
 --- a/libmount/src/hook_loopdev.c
 +++ b/libmount/src/hook_loopdev.c
 @@ -105,7 +105,7 @@ is_mounted_same_loopfile(struct libmnt_context *cxt,
@@ -280,7 +259,7 @@ index 444d69d6f..54ca0ebf3 100644
  
  		} else if (opts && (flags & MNT_MS_LOOP) &&
 diff --git a/libmount/src/tab.c b/libmount/src/tab.c
-index 4209d697a..fb0e59731 100644
+index 0d2b0ecd4..f1bac6801 100644
 --- a/libmount/src/tab.c
 +++ b/libmount/src/tab.c
 @@ -1948,7 +1948,7 @@ int __mnt_table_is_fs_mounted(struct libmnt_table *tb, struct libmnt_fs *fstab_f
@@ -305,50 +284,11 @@ index f76acc8b2..14b1c2c12 100644
  
  #define UUIDD_OP_GETPID			0
  #define UUIDD_OP_GET_MAXOP		1
-diff --git a/login-utils/su-common.c b/login-utils/su-common.c
-index ae0621de3..57b01f77e 100644
---- a/login-utils/su-common.c
-+++ b/login-utils/su-common.c
-@@ -106,7 +106,7 @@ UL_DEBUG_DEFINE_MASKNAMES(su) = UL_DEBUG_EMPTY_MASKNAMES;
- #define is_pam_failure(_rc)	((_rc) != PAM_SUCCESS)
- 
- /* The shell to run if none is given in the user's passwd entry.  */
--#define DEFAULT_SHELL "/bin/sh"
-+#define DEFAULT_SHELL "@TERMUX_PREFIX@/bin/sh"
- 
- /* The user to become if none is specified.  */
- #define DEFAULT_USER "root"
-diff --git a/login-utils/sulogin.c b/login-utils/sulogin.c
-index aeaa3f11f..ba0e13d4b 100644
---- a/login-utils/sulogin.c
-+++ b/login-utils/sulogin.c
-@@ -893,7 +893,7 @@ static void sushell(struct passwd *pwd, struct console *con)
- 		if (pwd->pw_shell[0])
- 			su_shell = pwd->pw_shell;
- 		else
--			su_shell = "/bin/sh";
-+			su_shell = "@TERMUX_PREFIX@/bin/sh";
- 	}
- 	if ((p = strrchr(su_shell, '/')) == NULL)
- 		p = su_shell;
-@@ -942,9 +942,9 @@ static void sushell(struct passwd *pwd, struct console *con)
- 	execl(su_shell, shell, (char *)NULL);
- 	warn(_("failed to execute %s"), su_shell);
- 
--	xsetenv("SHELL", "/bin/sh", 1);
--	execl("/bin/sh", profile ? "-sh" : "sh", (char *)NULL);
--	warn(_("failed to execute %s"), "/bin/sh");
-+	xsetenv("SHELL", "@TERMUX_PREFIX@/bin/sh", 1);
-+	execl("@TERMUX_PREFIX@/bin/sh", profile ? "-sh" : "sh", (char *)NULL);
-+	warn(_("failed to execute %s"), "@TERMUX_PREFIX@/bin/sh");
- }
- 
- #ifdef HAVE_LIBSELINUX
 diff --git a/misc-utils/whereis.c b/misc-utils/whereis.c
-index b575e57ae..40b2d34cc 100644
+index 2e2ecda9e..0b44018b3 100644
 --- a/misc-utils/whereis.c
 +++ b/misc-utils/whereis.c
-@@ -101,84 +101,18 @@ struct wh_dirlist {
+@@ -102,84 +102,18 @@ struct wh_dirlist {
  };
  
  static const char *const bindirs[] = {
@@ -438,45 +378,31 @@ index b575e57ae..40b2d34cc 100644
  };
  
 diff --git a/sys-utils/setarch.c b/sys-utils/setarch.c
-index 4bcb5e69e..a61db097d 100644
+index 3a86f2ee9..a0fef02f0 100644
 --- a/sys-utils/setarch.c
 +++ b/sys-utils/setarch.c
-@@ -482,7 +482,7 @@ int main(int argc, char *argv[])
- 		/* Don't use ifdef sparc here, we get "Unrecognized architecture"
- 		 * error message later if necessary */
- 		if (strcmp(arch, "sparc32bash") == 0) {
--			shell = "/bin/bash";
-+			shell = "@TERMUX_PREFIX@/bin/bash";
- 			shell_arg = "";
- 			goto set_arch;
- 		}
-@@ -605,7 +605,7 @@ set_arch:
+@@ -32,6 +32,7 @@
+ #include <getopt.h>
+ #include <limits.h>
+ #include <sys/utsname.h>
++#include <paths.h>
+ #include "nls.h"
+ #include "c.h"
+ #include "closestream.h"
+@@ -652,7 +653,7 @@ set_arch:
  		verify_arch_domain(doms, target, arch);
  
  	if (!argc) {
 -		shell = "/bin/sh";
-+		shell = "@TERMUX_PREFIX@/bin/sh";
++		shell = _PATH_BSHELL;
  		shell_arg = "-sh";
  	}
  	if (verbose) {
-diff --git a/sys-utils/setpriv.c b/sys-utils/setpriv.c
-index 7242c333d..67b7b422d 100644
---- a/sys-utils/setpriv.c
-+++ b/sys-utils/setpriv.c
-@@ -56,7 +56,7 @@
- #define SETPRIV_EXIT_PRIVERR 127	/* how we exit when we fail to set privs */
- 
- /* The shell to set SHELL env.variable if none is given in the user's passwd entry.  */
--#define DEFAULT_SHELL "/bin/sh"
-+#define DEFAULT_SHELL "@TERMUX_PREFIX@/bin/sh"
- 
- static gid_t get_group(const char *s, const char *err);
- 
 diff --git a/text-utils/more.c b/text-utils/more.c
-index 13b1b0bb9..936abf11c 100644
+index bc04064cf..c37ce7025 100644
 --- a/text-utils/more.c
 +++ b/text-utils/more.c
-@@ -81,6 +81,7 @@
+@@ -83,6 +83,7 @@
  # include <magic.h>
  #endif
  
@@ -485,15 +411,23 @@ index 13b1b0bb9..936abf11c 100644
  #include "nls.h"
  #include "xalloc.h"
 diff --git a/text-utils/pg.c b/text-utils/pg.c
-index 3623f3f78..6c68dc16e 100644
+index 939086bc8..b7990d909 100644
 --- a/text-utils/pg.c
 +++ b/text-utils/pg.c
-@@ -1371,7 +1371,7 @@ static void pgfile(FILE *f, const char *name)
+@@ -58,6 +58,7 @@
+ #include <unistd.h>
+ #include <signal.h>
+ #include <setjmp.h>
++#include <paths.h>
+ 
+ #if defined(HAVE_NCURSESW_NCURSES_H)
+ # include <ncursesw/ncurses.h>
+@@ -1372,7 +1373,7 @@ static void pgfile(FILE *f, const char *name)
  					{
  						const char *sh = getenv("SHELL");
  						if (!sh)
 -							sh = "/bin/sh";
-+							sh = "@TERMUX_PREFIX@/bin/sh";
++							sh = _PATH_BSHELL;
  						if (!nobuf)
  							fclose(fbuf);
  						fclose(find);

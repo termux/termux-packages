@@ -2,14 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://github.com/apache/arrow
 TERMUX_PKG_DESCRIPTION="C++ libraries for Apache Arrow"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="23.0.1"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="24.0.0"
 TERMUX_PKG_SRCURL="https://github.com/apache/arrow/archive/refs/tags/apache-arrow-${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=9a9a057bba3aa7080abc2ba8e7a079effa74626a4f308ac56bfce035d31ef1ac
+TERMUX_PKG_SHA256=94e18d188f26324c4da6bb3a723fec1536ae88b8308bada28d53c0b8d5206b28
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="abseil-cpp, apache-orc, libandroid-execinfo, libc++, liblz4, libprotobuf, libre2, libsnappy, thrift, utf8proc, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers, rapidjson"
-TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="build, 'Cython>=3.1', numpy, setuptools, setuptools-scm, wheel"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="build, 'Cython>=3.1', libcst, numpy, scikit-build-core, setuptools-scm, wheel"
 TERMUX_PKG_BREAKS="libarrow-python (<< ${TERMUX_PKG_VERSION})"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DARROW_BUILD_STATIC=OFF
@@ -31,7 +30,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	local _EXPECTED_SOVERSION=2300
+	local _EXPECTED_SOVERSION=2400
 
 	# From cpp/CMakeLists.txt: ARROW_SO_VERSION = "${ARROW_VERSION_MAJOR} * 100 + ${ARROW_VERSION_MINOR}"
 	local _ACTUAL_SOVERSION=$(echo "$TERMUX_PKG_VERSION" | awk -F'.' '{print $1 * 100 + $2}')
@@ -58,11 +57,8 @@ termux_step_post_make_install() {
 	TERMUX_PKG_BUILDDIR="$TERMUX_PKG_SRCDIR"
 	cd "$TERMUX_PKG_BUILDDIR"
 
-	export PYARROW_CMAKE_GENERATOR=Ninja
-	export PYARROW_CMAKE_OPTIONS="
-		-DCMAKE_PREFIX_PATH=$TERMUX_PREFIX/lib/cmake
-		-DNUMPY_INCLUDE_DIRS=$TERMUX_PYTHON_HOME/site-packages/numpy/_core/include
-		"
+	export CMAKE_GENERATOR="Ninja"
+
 	export PYARROW_WITH_DATASET=1
 	export PYARROW_WITH_HDFS=1
 	export PYARROW_WITH_ORC=1
@@ -74,7 +70,10 @@ termux_step_post_make_install() {
 	termux_setup_ninja
 
 	# termux_step_make
-	python -m build -w -n -x "$TERMUX_PKG_SRCDIR"
+	python -m build -w -n -x \
+		-C cmake.args="-DCMAKE_PREFIX_PATH=$TERMUX_PREFIX/lib/cmake" \
+		-C cmake.args="-DNUMPY_INCLUDE_DIRS=$TERMUX_PYTHON_HOME/site-packages/numpy/_core/include" \
+		"$TERMUX_PKG_SRCDIR"
 
 	# termux_step_make_install
 	local _pyver="${TERMUX_PYTHON_VERSION//./}"

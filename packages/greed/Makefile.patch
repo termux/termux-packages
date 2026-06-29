@@ -1,0 +1,18 @@
+Fix hardcoded SFILE declaration
+
+Also do not add optimization flags to rust compiler
+--- a/Makefile	2026-05-20 17:31:36.106919358 +0530
++++ b/Makefile	2026-05-20 17:37:09.409957865 +0530
+@@ -8,10 +8,10 @@
+ DATADIR     ?= $(PREFIX)/share
+ MANDIR      ?= $(DATADIR)/man
+ 
+-SFILE=/usr/games/lib/greed.hs
++SFILE=@TERMUX_PREFIX@/var/greed.hs
+ 
+ RUSTC ?= rustc
+-RUSTFLAGS += -C opt-level=2
++RUSTFLAGS ?=
+ 
+ VERSION=$(shell sed -n <NEWS.adoc '/^[0-9]/s/:.*//p' | head -1)
+ 

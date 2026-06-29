@@ -13,6 +13,7 @@ termux_setup_zig() {
 
 	local ZIG_TXZ_SHA256
 	case "${TERMUX_ZIG_VERSION}" in
+	0.16.0) ZIG_TXZ_SHA256=70e49664a74374b48b51e6f3fdfbf437f6395d42509050588bd49abe52ba3d00 ;;
 	0.15.2) ZIG_TXZ_SHA256=02aa270f183da276e5b5920b1dac44a63f1a49e55050ebde3aecc9eb82f93239 ;;
 	0.15.1) ZIG_TXZ_SHA256=c61c5da6edeea14ca51ecd5e4520c6f4189ef5250383db33d01848293bfafe05 ;;
 	0.14.1) ZIG_TXZ_SHA256=24aeeec8af16c381934a6cd7d95c807a8cb2cf7df9fa40d359aa884195c4716c ;;
@@ -70,8 +71,16 @@ termux_setup_zig() {
 		if [[ -n "$(find "${TERMUX_SCRIPTDIR}/packages/zig/${TERMUX_ZIG_VERSION}" -name 'zig-*.patch')" ]]; then
 			echo "termux_setup_zig: Applying patches from packages/zig/${TERMUX_ZIG_VERSION}"
 			local p
-			for p in "${TERMUX_SCRIPTDIR}"/packages/zig/${TERMUX_ZIG_VERSION}/zig-*.patch; do
+			for p in "${TERMUX_SCRIPTDIR}/packages/zig/${TERMUX_ZIG_VERSION}"/zig-*.patch; do
 				patch -d "${ZIG_FOLDER}" -p2 -i "${p}"
+			done
+		fi
+		if [[ -n "$(find "${TERMUX_SCRIPTDIR}/packages/zig/${TERMUX_ZIG_VERSION}" -name '*.diff')" ]]; then
+			echo "termux_setup_zig: Applying diff from packages/zig/${TERMUX_ZIG_VERSION}"
+			local p
+			for p in "${TERMUX_SCRIPTDIR}/packages/zig/${TERMUX_ZIG_VERSION}"/*.diff; do
+				sed "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" "${p}" | \
+					patch -d "${ZIG_FOLDER}" -p2
 			done
 		fi
 	fi

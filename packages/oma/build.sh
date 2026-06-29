@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://aosc.io/oma
 TERMUX_PKG_DESCRIPTION="oma is an attempt at reworking APT's interface"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.25.0"
+TERMUX_PKG_VERSION="1.26.5"
 TERMUX_PKG_SRCURL="https://github.com/AOSC-Dev/oma/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=da036df7baf461053e2170b32c39f9e821db2876ae63c5cd7e15a52ad3ad01ec
+TERMUX_PKG_SHA256=cd64c4efca83606d775955a916fa75c3761ff3374ef542ed489516bda3891221
 TERMUX_PKG_DEPENDS="libnettle, apt"
 TERMUX_PKG_RECOMMENDS="ripgrep"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -49,9 +49,32 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	cargo build --jobs "$TERMUX_PKG_MAKE_PROCESSES" --target "$CARGO_TARGET_NAME" --release
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release $TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 }
 
 termux_step_make_install() {
 	install -Dm700 -t "$TERMUX_PREFIX/bin" "target/${CARGO_TARGET_NAME}/release/oma"
+
+	install -Dm644 "$TERMUX_PKG_SRCDIR/README.md" "$TERMUX_PREFIX/share/doc/oma/README"
+	install -Dm644 "$TERMUX_PKG_SRCDIR/data/apt.conf.d/50oma-debian.conf" "$TERMUX_PREFIX/etc/apt/apt.conf.d/50oma.conf"
+	install -Dm644 "$TERMUX_PKG_SRCDIR/data/config/oma-debian.toml" "$TERMUX_PREFIX/etc/oma.toml"
+
+	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/bash-completion/completions/oma.bash"
+	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/zsh/site-functions/_oma"
+	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/fish/vendor_completions.d/oma.fish"
+}
+
+termux_step_create_debscripts() {
+	cat <<-EOF >./postinst
+		#!${TERMUX_PREFIX}/bin/sh
+		COMPLETE=bash oma > ${TERMUX_PREFIX}/share/bash-completion/completions/oma.bash
+		COMPLETE=zsh oma > ${TERMUX_PREFIX}/share/zsh/site-functions/_oma
+		COMPLETE=fish oma > ${TERMUX_PREFIX}/share/fish/vendor_completions.d/oma.fish
+		LOCALE=\$(/system/bin/getprop persist.sys.locale 2>/dev/null || echo "C")
+		case "\$LOCALE" in
+		zh-CN) LANG=zh_CN.UTF-8 oma generate-manpages --path $TERMUX_PREFIX/share/man/man1/ ;;
+		zh-TW) LANG=zh_TW.UTF-8 oma generate-manpages --path $TERMUX_PREFIX/share/man/man1/ ;;
+		*) LANG=C oma generate-manpages --path $TERMUX_PREFIX/share/man/man1/ ;;
+		esac
+	EOF
 }
