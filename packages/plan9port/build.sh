@@ -22,7 +22,7 @@ termux_step_make() {
 	export _P9P_BOOTSTRAP=false
 	if [ "${TERMUX_ON_DEVICE_BUILD}" = 'false' ]
 	then
-		ln -s ${TERMUX_PKG_HOSTBUILD_DIR}/bin/mk ${TERMUX_PKG_SRCDIR}/bin/mk
+		cp ${TERMUX_PKG_HOSTBUILD_DIR}/bin/mk ${TERMUX_PKG_SRCDIR}/bin
 		export _P9P_BOOTSTRAP=true
 	fi
 	./INSTALL -b > /dev/null
