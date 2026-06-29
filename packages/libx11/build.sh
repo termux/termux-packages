@@ -5,11 +5,14 @@ TERMUX_PKG_LICENSE="MIT, X11"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.8.13"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/lib/libX11-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=69606f485c2c07c14ef64f75b7bb326d48587af33795d9ab3e607c0b5f94f11c
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libandroid-support, libxcb"
-TERMUX_PKG_BUILD_DEPENDS="xorgproto, xorg-util-macros, xtrans"
+# building all reverse dependencies of libx11 requires xorgproto
+# and the x11.pc file of libx11 explicitly marks a dependency on xorgproto
+TERMUX_PKG_DEPENDS="libandroid-support, libxcb, xorgproto"
+TERMUX_PKG_BUILD_DEPENDS="xorg-util-macros, xtrans"
 TERMUX_PKG_RECOMMENDS="xorg-xauth"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_path_RAWCPP=/usr/bin/cpp
