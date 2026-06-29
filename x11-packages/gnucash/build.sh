@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="Personal and small-business financial-accounting softwar
 TERMUX_PKG_LICENSE="GPL-2.0-or-later" # with OpenSSL linking exceptions
 TERMUX_PKG_LICENSE_FILE="LICENSE"     # specified for additional nuance.
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="5.15"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="5.16"
 TERMUX_PKG_SRCURL="https://github.com/Gnucash/gnucash/releases/download/${TERMUX_PKG_VERSION}/gnucash-${TERMUX_PKG_VERSION}.tar.bz2"
-TERMUX_PKG_SHA256=b0bd4af43b6bde3454227d4b398e9ec7a0dbd5143469c1373fc824c3caab0909
+TERMUX_PKG_SHA256=bb9b6c67ebb6a3e06d9ff4f4e0417a97bef0159d26912be9b0e75a32901fd493
 TERMUX_PKG_DEPENDS="boost, gettext, guile, glib, gtk3, libicu, libsecret, libxml2, libxslt, perl, python, swig, webkit2gtk-4.1, xsltproc, zlib"
 TERMUX_PKG_BUILD_DEPENDS="aosp-libs, boost-headers, googletest"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -24,6 +23,7 @@ termux_step_pre_configure() {
 
 	# gnc-autoclear.c:151:22: error: format string is not a string literal (potentially insecure)
 	CFLAGS+=" -Wno-format-security"
+	CXXFLAGS+=" -Wno-format-security"
 
 	# ERROR: ./lib/libgnc-expressions.so contains undefined symbols log, pow, exp...
 	LDFLAGS+=" -lm"
