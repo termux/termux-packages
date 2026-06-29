@@ -1,18 +1,22 @@
 --- a/bin/9l
 +++ b/bin/9l
-@@ -25,9 +25,9 @@ case "$tag" in
+@@ -25,9 +25,13 @@ case "$tag" in
  	nmflags="-B"
  	;;
  *Linux*)
 -	ld="${CC9:-gcc} $CC9FLAGS"
-+	ld="$CC $LDFLAGS -L@TERMUX_PREFIX@/lib"
++	ld="${CC9:-clang} $CC9FLAGS"
++	if [ "$_P9P_BOOTSTRAP" = 'true' ]
++	then
++		ld="${CC9:-clang} $LDFLAGS -L@TERMUX_PREFIX@"
++	fi
  	userpath=true
 -	extralibs="$extralibs -lutil -lresolv -lpthread"
 +	extralibs="$extralibs -lutil -lresolv_wrapper -lpthread"
  	;;
  *Darwin*)
  	ld="${CC9:-gcc} -m64 $CC9FLAGS"
-@@ -342,7 +342,7 @@ quiet()
+@@ -342,7 +346,7 @@ quiet()
  }
  
  # Must use temp file to avoid pipe; pipe loses status.
