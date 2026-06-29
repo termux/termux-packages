@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=b3c5dc0f2813c6f51178ada1765b6771910060ec3efaa8f05ea3f93c0334b5
 TERMUX_PKG_DEPENDS="libresolv-wrapper, libx11, freetype"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
+_P9P_BOOTSTRAP=true
 
 termux_step_host_build() {
 	if [ "${TERMUX_ON_DEVICE_BUILD}" = 'false' ]
@@ -23,6 +24,7 @@ termux_step_make() {
 	then
 		ln -s ${TERMUX_PKG_HOSTBUILD_DIR}/bin/mk ${TERMUX_PKG_SRCDIR}/bin/mk
 	fi
+	export _P9P_BOOTSTRAP
 	./INSTALL -b
 }
 
