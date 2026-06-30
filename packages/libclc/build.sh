@@ -4,27 +4,26 @@ TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_LICENSE_FILE="libclc/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(
-	21.1.3
-	21.1.1
+	22.1.6 # Keep in sync with libllvm
+	22.1.2 # Keep in sync with spirv-llvm-translator
 )
-TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
-	https://github.com/llvm/llvm-project/releases/download/llvmorg-${TERMUX_PKG_VERSION[0]}/llvm-project-${TERMUX_PKG_VERSION[0]}.src.tar.xz
-	https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/refs/tags/v${TERMUX_PKG_VERSION[1]}.tar.gz
+	"https://github.com/llvm/llvm-project/releases/download/llvmorg-${TERMUX_PKG_VERSION[0]}/llvm-project-${TERMUX_PKG_VERSION[0]}.src.tar.xz"
+	"https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/refs/tags/v${TERMUX_PKG_VERSION[1]}.tar.gz"
 )
 TERMUX_PKG_SHA256=(
-	9c9db50d8046f668156d83f6b594631b4ca79a0d96e4f19bed9dc019b022e58f
-	dda46febdb060a1d5cc2ceeb9682ccaf33e55ae294fd0793274531b54f07c46b
+	6e0b376a1f6d9873e7dfb09ae6e04b9c7024400f01733fa4c29be69d5c138bc2
+	b37196b1a1a60282a24cf937ab7d6807d7d54dc718f2a37a78e211be26df57ac
 )
 TERMUX_PKG_BUILD_DEPENDS="clang, libc++, libllvm, libllvm-static, lld, llvm, spirv-llvm-translator"
-TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_FORCE_CMAKE=true
+TERMUX_PKG_AUTO_UPDATE=false
 
 termux_step_post_get_source() {
 	mkdir -p llvm/projects
-	ln -fsv ../../SPIRV-LLVM-Translator-${TERMUX_PKG_VERSION[1]} llvm/projects
+	ln -fsv ../../"SPIRV-LLVM-Translator-${TERMUX_PKG_VERSION[1]}" llvm/projects
 }
 
 termux_step_host_build() {
@@ -72,7 +71,7 @@ termux_step_configure() {
 	# always remove this marker because this package is built in termux_step_host_build()
 	# this prevents "ERROR: No files in package." when the package is built again without deleting
 	# the docker container.
-	rm -rf $TERMUX_HOSTBUILD_MARKER
+	rm -rf "$TERMUX_HOSTBUILD_MARKER"
 	# also, termux_step_configure() does not do anything else for this package
 }
 
