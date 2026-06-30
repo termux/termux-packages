@@ -20,7 +20,7 @@ index 39ef978..5899a7a 100644
      env = environ.copy()
      env["LC_ALL"] = "C.UTF-8"
 -    process = Popen(('/usr/bin/dpkg', '-L', package_name), stdout=PIPE,
-+    env["LD_PRELOAD"] = ""
++    env.pop('LD_PRELOAD', None)
 +    process = Popen(['@TERMUX_PREFIX@/bin/bash', '-c',
 +        'source @TERMUX_PREFIX_CLASSICAL@/bin/termux-setup-package-manager && echo ${TERMUX_APP_PACKAGE_MANAGER}'],
 +        stdout=PIPE)
