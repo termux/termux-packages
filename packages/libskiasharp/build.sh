@@ -2,48 +2,103 @@ TERMUX_PKG_HOMEPAGE="https://github.com/mono/SkiaSharp"
 TERMUX_PKG_DESCRIPTION="SkiaSharp is a cross-platform 2D graphics API for .NET platforms"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=4e4ce7af7ea8702593af5aeb25d05c65ffb74e90
-_COMMIT_DATE=20260624
-TERMUX_PKG_VERSION="4.148.0.${_COMMIT_DATE}"
-TERMUX_PKG_SRCURL="https://github.com/mono/SkiaSharp/archive/${_COMMIT}.tar.gz"
-TERMUX_PKG_SHA256=14d7d891881e7652d7e9f1eb93cc6f5bc1155dff9f5a28a7c42772b577c0b08f
+_COMMIT=v3.119.4
+_COMMIT_DATE=20260525
+TERMUX_PKG_VERSION="3.119.4.${_COMMIT_DATE}"
+
+# Target the official source release archive for the tag
+TERMUX_PKG_SRCURL="https://github.com/mono/SkiaSharp/archive/refs/tags/v3.119.4.tar.gz"
+TERMUX_PKG_SHA256=caf91eea422e043007368fc19e09c310eed28dee14f8133292640264b78b0e8c
+
 TERMUX_PKG_DEPENDS="libexpat, libglvnd, libpng, libwebp, freetype, zlib, libjpeg-turbo"
-TERMUX_PKG_BUILD_DEPENDS="libc++"
+TERMUX_PKG_BUILD_DEPENDS="libc++, gn, python"
 TERMUX_PKG_EXCLUDED_ARCHES="arm"
 
 termux_step_make() {
+	if [ -f "$TERMUX_PKG_BUILDDIR/libSkiaSharp.so" ] && [ -f "$TERMUX_PKG_BUILDDIR/libHarfBuzzSharp.so" ]; then
+		echo "Skipping compilation as build output is already present."
+		return
+	fi
+
 	termux_setup_gn
 	local _target_cpu=""
 	case "$TERMUX_ARCH" in
 	aarch64) _target_cpu="arm64" ;;
-		#		arm) _target_cpu="arm" ;;
 	x86_64) _target_cpu="x64" ;;
 	i686) _target_cpu="x86" ;;
 	*) termux_error_exit "Unsupported arch: $TERMUX_ARCH" ;;
 	esac
 
+	# Ensure NDK sources are available in the standalone toolchain directory
+	# since Skia's third_party libraries (zlib, libwebp, cpu-features) reference them.
+	ln -sf "$NDK/sources" "$TERMUX_STANDALONE_TOOLCHAIN/sources"
+
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+		# Setup a mock NDK compiler wrapper layout inside the standalone toolchain directory.
+		# This is required on-device because Skia unconditionally expects NDK compiler paths
+		# for target_os="android" builds (resolving to toolchains/llvm/prebuilt/linux-x86_64/bin).
+		local _toolchain_bin="$TERMUX_STANDALONE_TOOLCHAIN/toolchains/llvm/prebuilt/linux-x86_64/bin"
+		local _sysroot="$TERMUX_STANDALONE_TOOLCHAIN/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
+		mkdir -p "$_toolchain_bin" "$_sysroot"
+
+		local _ndk_target=""
+		case "$TERMUX_ARCH" in
+		aarch64) _ndk_target="aarch64-linux-android" ;;
+		x86_64) _ndk_target="x86_64-linux-android" ;;
+		i686) _ndk_target="i686-linux-android" ;;
+		esac
+
+		rm -rf "$_sysroot/usr"
+		ln -sf "$TERMUX_PREFIX" "$_sysroot/usr"
+		ln -sf "$(command -v clang)" "$_toolchain_bin/${_ndk_target}${TERMUX_PKG_API_LEVEL}-clang"
+		ln -sf "$(command -v clang++)" "$_toolchain_bin/${_ndk_target}${TERMUX_PKG_API_LEVEL}-clang++"
+		ln -sf "$(command -v llvm-ar)" "$_toolchain_bin/llvm-ar"
+	fi
+
 	pushd "$TERMUX_PKG_SRCDIR"
-	./tools/git-sync-deps
+
+	# Initialize a fresh git workspace out of the extracted tarball
+	# to allow submodule checking to work seamlessly
+	rm -rf .git
+	git init
+	git config user.email "termux@localhost"
+	git config user.name "termux"
+	git remote add origin https://github.com/mono/SkiaSharp.git
+	git fetch --depth 1 origin "$_COMMIT"
+	git reset --hard FETCH_HEAD
+
+	# Now submodules can safely be cloned relative to this commit context
+	git submodule update --init --recursive
+
+	# Move inside the submodule source directory where tools reside
+	cd externals/skia
+
+	# Hot-fix: Patch fetch-gn to prevent KeyError: 'android' on native Termux builds
+	sed -i "s/sys.platform/'linux'/g" bin/fetch-gn
+
+	python3 tools/git-sync-deps
+
+	# Apply null-safety fixes to sk_codec.cpp to prevent native SIGSEGV crashes on corrupt media files
+	cp "$TERMUX_PKG_BUILDER_DIR/sk_codec.cpp.nullsafe" src/c/sk_codec.cpp
+	cp "$TERMUX_PKG_BUILDER_DIR/SkJpegCodec.cpp.patched" src/codec/SkJpegCodec.cpp
 
 	local LIBS_CFLAGS="$(pkg-config --cflags freetype2 libpng libwebp expat opengl egl)"
 	local LIBS_LDFLAGS="$(pkg-config --libs freetype2 libpng libwebp expat opengl egl)"
 	local _flag _GN_CFLAGS _GN_LDFLAGS _GN_CPPFLAGS _GN_LIBS
 	for _flag in CFLAGS LDFLAGS CPPFLAGS LIBS_CFLAGS LIBS_LDFLAGS; do
-		# converts xFLAGS into GN form
-		# For example: CFLAGS="-O3 -fno-vectorize"
-		# becomes _GN_CFLAGS='"-O3", "-fno-vectorize"'
 		declare _GN_"${_flag}"="$(eval printf '%s' "\"\$${_flag}\"" | awk '{for (i=1;i<NF;i++) { printf "\"%s\", ",$i }; printf "\"%s\"",$i}')"
 	done
+
 	local _args_pre=""
 	local _args=""
-	# note all single quotes get converted into double quotes and all tabs get stripped before being fed into gn
+
+	# Configuration Block A: SkiaSharp Native Binary Compilation
 	_args_pre="target_os='android' \
 	target_cpu='${_target_cpu}' \
 	skia_use_icu=false \
 	skia_use_harfbuzz=false \
 	skia_use_piex=true \
 	skia_use_sfntly=false \
-	skia_enable_gpu=true \
 	skia_enable_ganesh=true \
 	skia_enable_tools=false \
 	skia_use_dng_sdk=false \
@@ -75,6 +130,7 @@ termux_step_make() {
 	gn gen 'out' --args="${_args}"
 	ninja -C out SkiaSharp
 
+	# Configuration Block B: HarfBuzzSharp Native Binary Compilation
 	_args_pre="target_os='android' \
 	target_cpu='${_target_cpu}' \
 	visibility_hidden=false \
@@ -103,8 +159,8 @@ termux_step_make_install() {
 	install -Dm600 -t "${TERMUX_PREFIX}/lib" "${TERMUX_PKG_BUILDDIR}/libSkiaSharp.so"
 	install -Dm600 -t "${TERMUX_PREFIX}/lib" "${TERMUX_PKG_BUILDDIR}/libHarfBuzzSharp.so"
 }
-# References
-# https://cgit.freebsd.org/ports/tree/graphics/libskiasharp
-# https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=282704
-# https://github.com/mono/SkiaSharp/blob/release/3.116.1/native/android/build.cake
-# https://gn.googlesource.com/gn/+/main/docs/reference.md
+
+termux_step_post_massage() {
+	# Remove any stray files captured from the host system during on-device build
+	rm -rf var/
+}

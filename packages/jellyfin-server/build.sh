@@ -16,8 +16,8 @@ TERMUX_PKG_SHA256=(
 	054a83cf0b1cd6bc0493bc53622cc2136cbe35e1e8c0b2b1bf7fcc9ba25fb8d5
 	38fff90f73b3c4f9c3c7270711411a4ec3cbe63b205d4b4a5525bcc532d3d31f
 )
-TERMUX_PKG_DEPENDS="aspnetcore-runtime-9.0, dotnet-host, dotnet-runtime-9.0, libskiasharp, libesqlite3, jellyfin-ffmpeg"
-TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-9.0, dotnet-targeting-pack-9.0, libcairo, pango, libjpeg-turbo, giflib, librsvg"
+TERMUX_PKG_DEPENDS="aspnetcore-runtime-10.0, dotnet-host, dotnet-runtime-10.0, libskiasharp (>= 3.119), libskiasharp (<< 4), libesqlite3, jellyfin-ffmpeg"
+TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-10.0, dotnet-targeting-pack-10.0, libcairo, pango, libjpeg-turbo, giflib, librsvg"
 TERMUX_PKG_SERVICE_SCRIPT=(
 	"jellyfin"
 	"exec ${TERMUX_PREFIX}/bin/jellyfin 2>&1"
@@ -42,7 +42,7 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
-	TERMUX_DOTNET_VERSION=9.0
+	TERMUX_DOTNET_VERSION=10.0
 	termux_setup_dotnet
 	termux_setup_nodejs
 
@@ -128,12 +128,7 @@ termux_step_make_install() {
 	find "${TERMUX_PKG_BUILDDIR}/build" -name '*.xml' -type f -exec rm '{}' +
 	find "${TERMUX_PKG_BUILDDIR}/build" ! \( -name 'jellyfin' -o -type d \) -exec chmod 0600 '{}' \;
 	find "${TERMUX_PKG_BUILDDIR}/build" \( -name 'jellyfin' -o -type d \) -exec chmod 0700 '{}' \;
+	rm -rf "${TERMUX_PREFIX}/lib/jellyfin"
 	mv "${TERMUX_PKG_BUILDDIR}/build" "${TERMUX_PREFIX}/lib/jellyfin"
-	ln -s "${TERMUX_PREFIX}/lib/jellyfin/jellyfin" "${TERMUX_PREFIX}/bin/jellyfin"
+	ln -sf "${TERMUX_PREFIX}/lib/jellyfin/jellyfin" "${TERMUX_PREFIX}/bin/jellyfin"
 }
-# References
-# - Jellyfin-FFMPEG
-# https://github.com/jellyfin/jellyfin-ffmpeg/blob/jellyfin/builder/build.sh
-# https://github.com/termux/termux-packages/tree/master/packages/ffmpeg
-# Note: All patches for Jellyfin-FFMPEG should be based off the patched version, see termux_step_post_get_source
-# One of the source urls (jellyfin-web) points to a zip to avoid overwriting jellyfin's source archive due to duplicate filename
