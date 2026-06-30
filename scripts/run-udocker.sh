@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e -u
 
+# Set TERMUX_PREFIX, falling back to the default Termux directory if not already defined.
+TERMUX_PREFIX="${TERMUX_PREFIX:-/data/data/com.termux/files/usr}"
+
 # Find the root directory of the script's repository.
 # This is more robust than using ${PWD} as it works regardless of where the script is called from.
 TERMUX_SCRIPTDIR=$(cd "$(realpath "$(dirname "$0")")"; cd ..; pwd)
@@ -41,9 +44,27 @@ CONTAINER_PACKAGES_DIR="$CONTAINER_HOME_DIR/termux-packages"
 # Define the volume mount using the robustly calculated repository root.
 VOLUME="$TERMUX_SCRIPTDIR:$CONTAINER_PACKAGES_DIR"
 
-# Set default image and container names if they are not already set.
-: ${TERMUX_BUILDER_IMAGE_NAME:=ghcr.io/termux/package-builder}
-: ${CONTAINER_NAME:=termux-package-builder}
+# --- ARCHITECTURE DETECTION ---
+# Detect host architecture to set the appropriate default image
+HOST_ARCH=$(uname -m)
+case "$HOST_ARCH" in
+	x86_64|i?86)
+		DEFAULT_IMAGE_NAME="ghcr.io/termux/package-builder"
+		DEFAULT_CONTAINER_NAME="termux-package-builder"
+		;;
+	aarch64|arm64|armv*l)
+		DEFAULT_IMAGE_NAME="ghcr.io/nonamewasdefined/termux-package-builder"
+		DEFAULT_CONTAINER_NAME="termux-package-builder-arm"
+		;;
+	*)
+		echo "Error: Unsupported architecture: $HOST_ARCH" 1>&2
+		exit 1
+		;;
+esac
+
+# Set default image and container names if they are not already set by environment variables.
+: ${TERMUX_BUILDER_IMAGE_NAME:=$DEFAULT_IMAGE_NAME}
+: ${CONTAINER_NAME:=$DEFAULT_CONTAINER_NAME}
 
 # --- DYNAMIC WORKDIR LOGIC ---
 # Calculate the relative path from the repository root to the current directory.
@@ -72,7 +93,35 @@ fi
 
 # If no arguments are provided, default to starting an interactive bash shell.
 if [ "$#" -eq "0" ]; then
-	set -- /bin/bash -i
+	# Use /bin/bash if available (standard on x86_64 Linux).
+	# Otherwise, look for bash under Termux's prefix (for native ARM/Termux devices).
+	if [ -x "/bin/bash" ]; then
+		set -- /bin/bash -i
+	elif [ -x "$TERMUX_PREFIX/bin/bash" ]; then
+		set -- "$TERMUX_PREFIX/bin/bash" -i
+	else
+		# Fall back to relying on $PATH to find bash.
+		set -- bash -i
+	fi
+fi
+
+# === Fix interpreter for scripts ===
+# The ARM container image (ghcr.io/nonamewasdefined/termux-package-builder)
+# is Android-based and does not have /bin/bash or /bin/sh at standard paths.
+# Bash is available at /data/data/com.termux/files/usr/bin/bash (via PATH).
+# If the command is a script with a standard shebang that won't work inside
+# the container, prepend 'bash' which is available via PATH.
+if [ "$#" -gt 0 ] && [ -f "$1" ]; then
+	if [ "$(head -c 2 "$1" 2>/dev/null)" = "#!" ]; then
+		SHEBANG=$(head -1 "$1")
+		case "$SHEBANG" in
+			"#!/bin/bash"|"#!/bin/sh")
+				# Prepend 'bash' which is available inside the container
+				# either at /bin/bash (x86_64) or via PATH (ARM/Android).
+				set -- bash "$@"
+				;;
+		esac
+	fi
 fi
 
 echo "Running command in container '$CONTAINER_NAME' (workdir: $WORKDIR_IN_CONTAINER)..."
@@ -83,6 +132,17 @@ if [ "${CI:-}" = "true" ]; then
 	CI_OPT="--env=CI=true"
 fi
 
+# Set LD_PRELOAD for Android-based containers (ARM) to support termux-exec.
+# The ARM container image is Android-based and on-device builds require
+# termux-exec to be loaded via LD_PRELOAD.
+LD_PRELOAD_OPT=""
+case "$HOST_ARCH" in
+	aarch64|arm64|armv*l)
+		TERMUX_EXEC_LIB="${TERMUX_PREFIX}/lib/libtermux-exec.so"
+		LD_PRELOAD_OPT="--env=LD_PRELOAD=$TERMUX_EXEC_LIB"
+		;;
+esac
+
 # Execute the command.
 # This version uses a dynamically calculated working directory to mirror the
 # host's current directory, making the script much more flexible.
@@ -90,6 +150,7 @@ udocker run \
     --user="builder" \
     --workdir="$WORKDIR_IN_CONTAINER" \
     $CI_OPT \
+    $LD_PRELOAD_OPT \
     --volume="$VOLUME" \
     "$CONTAINER_NAME" \
     "$@"
