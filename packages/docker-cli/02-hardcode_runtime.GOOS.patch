@@ -1,0 +1,255 @@
+diff --git a/cli/command/cli.go b/cli/command/cli.go
+index 1551c14da8..1bd2dcb501 100644
+--- a/cli/command/cli.go
++++ b/cli/command/cli.go
+@@ -6,7 +6,7 @@ import (
+ 	"io"
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"strconv"
+ 	"sync"
+ 	"time"
+@@ -512,7 +512,7 @@ func getServerHost(hosts []string, tlsOptions *tlsconfig.Options) (string, error
+ 
+ // UserAgent returns the user agent string used for making API requests
+ func UserAgent() string {
+-	return "Docker-Client/" + version.Version + " (" + runtime.GOOS + ")"
++	return "Docker-Client/" + version.Version + " (" + "linux" + ")"
+ }
+ 
+ var defaultStoreEndpoints = []store.NamedTypeGetter{
+diff --git a/cli/command/container/hijack.go b/cli/command/container/hijack.go
+index 7ecf5f5057..359342c0d7 100644
+--- a/cli/command/container/hijack.go
++++ b/cli/command/container/hijack.go
+@@ -4,7 +4,7 @@ import (
+ 	"context"
+ 	"fmt"
+ 	"io"
+-	"runtime"
++	_ "runtime"
+ 	"sync"
+ 
+ 	"github.com/docker/cli/cli/command"
+@@ -200,7 +200,7 @@ func restoreTerminal(streams command.Streams, in io.Closer) error {
+ 	// not the "legacy" console, and you start the client in a new window. eg
+ 	// `start docker run --rm -it microsoft/nanoserver cmd /s /c echo foobar`
+ 	// will hang. Remove start, and it won't repro.
+-	if in != nil && runtime.GOOS != "darwin" && runtime.GOOS != "windows" {
++	if in != nil && "linux" != "darwin" && "linux" != "windows" {
+ 		return in.Close()
+ 	}
+ 	return nil
+diff --git a/cli/command/container/tty.go b/cli/command/container/tty.go
+index 1d287b0068..c626e3b21a 100644
+--- a/cli/command/container/tty.go
++++ b/cli/command/container/tty.go
+@@ -5,7 +5,7 @@ import (
+ 	"fmt"
+ 	"os"
+ 	gosignal "os/signal"
+-	"runtime"
++	_ "runtime"
+ 	"time"
+ 
+ 	"github.com/docker/cli/cli/command"
+@@ -70,7 +70,7 @@ func initTtySize(ctx context.Context, cli command.Cli, id string, isExec bool, r
+ // MonitorTtySize updates the container tty size when the terminal tty changes size
+ func MonitorTtySize(ctx context.Context, cli command.Cli, id string, isExec bool) error {
+ 	initTtySize(ctx, cli, id, isExec, resizeTty)
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		go func() {
+ 			prevH, prevW := cli.Out().GetTtySize()
+ 			for {
+diff --git a/cli/command/image/build.go b/cli/command/image/build.go
+index 2c69a23b96..d2d5531ff4 100644
+--- a/cli/command/image/build.go
++++ b/cli/command/image/build.go
+@@ -11,7 +11,7 @@ import (
+ 	"os"
+ 	"path/filepath"
+ 	"regexp"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 
+ 	"github.com/docker/cli/cli"
+@@ -370,7 +370,7 @@ func runBuild(dockerCli command.Cli, options buildOptions) error {
+ 
+ 	// Windows: show error message about modified file permissions if the
+ 	// daemon isn't running Windows.
+-	if response.OSType != "windows" && runtime.GOOS == "windows" && !options.quiet {
++	if response.OSType != "windows" && "linux" == "windows" && !options.quiet {
+ 		fmt.Fprintln(dockerCli.Out(), "SECURITY WARNING: You are building a Docker "+
+ 			"image from Windows against a non-Windows Docker host. All files and "+
+ 			"directories added to build context will have '-rwxr-xr-x' permissions. "+
+diff --git a/cli/command/image/build/context.go b/cli/command/image/build/context.go
+index c4deef7e08..d4c2c8798b 100644
+--- a/cli/command/image/build/context.go
++++ b/cli/command/image/build/context.go
+@@ -9,7 +9,7 @@ import (
+ 	"net/http"
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 	"time"
+ 
+@@ -365,7 +365,7 @@ func getDockerfileRelPath(absContextDir, givenDockerfile string) (string, error)
+ // isUNC returns true if the path is UNC (one starting \\). It always returns
+ // false on Linux.
+ func isUNC(path string) bool {
+-	return runtime.GOOS == "windows" && strings.HasPrefix(path, `\\`)
++	return "linux" == "windows" && strings.HasPrefix(path, `\\`)
+ }
+ 
+ // AddDockerfileToBuildContext from a ReadCloser, returns a new archive and
+diff --git a/cli/command/registry.go b/cli/command/registry.go
+index 95c16d7dc5..95920c8fbb 100644
+--- a/cli/command/registry.go
++++ b/cli/command/registry.go
+@@ -6,7 +6,7 @@ import (
+ 	"fmt"
+ 	"io"
+ 	"os"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 
+ 	configtypes "github.com/docker/cli/cli/config/types"
+@@ -98,7 +98,7 @@ func ConfigureAuth(cli Cli, flUser, flPassword string, authconfig *registrytypes
+ 	// - https://github.com/moby/moby/pull/17738
+ 	//
+ 	// TODO(thaJeztah): we need to confirm if this special handling is still needed, as we may not be doing this in other places.
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		cli.SetIn(streams.NewIn(os.Stdin))
+ 	}
+ 
+diff --git a/cli/command/stack/loader/loader.go b/cli/command/stack/loader/loader.go
+index 39810d8832..adde63d12e 100644
+--- a/cli/command/stack/loader/loader.go
++++ b/cli/command/stack/loader/loader.go
+@@ -5,7 +5,7 @@ import (
+ 	"io"
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"sort"
+ 	"strings"
+ 
+@@ -105,7 +105,7 @@ func GetConfigDetails(composefiles []string, stdin io.Reader) (composetypes.Conf
+ func buildEnvironment(env []string) (map[string]string, error) {
+ 	result := make(map[string]string, len(env))
+ 	for _, s := range env {
+-		if runtime.GOOS == "windows" && len(s) > 0 {
++		if "linux" == "windows" && len(s) > 0 {
+ 			// cmd.exe can have special environment variables which names start with "=".
+ 			// They are only there for MS-DOS compatibility and we should ignore them.
+ 			// See TestBuildEnvironment for examples.
+diff --git a/cli/command/system/version.go b/cli/command/system/version.go
+index a84b93fe34..71a3bce4e2 100644
+--- a/cli/command/system/version.go
++++ b/cli/command/system/version.go
+@@ -93,7 +93,7 @@ func newClientVersion(contextName string, dockerCli command.Cli) clientVersion {
+ 		GoVersion: runtime.Version(),
+ 		GitCommit: version.GitCommit,
+ 		BuildTime: reformatDate(version.BuildTime),
+-		Os:        runtime.GOOS,
++		Os:        "linux",
+ 		Arch:      arch(),
+ 		Context:   contextName,
+ 	}
+diff --git a/cli/command/trust/key_load.go b/cli/command/trust/key_load.go
+index bbb19e733e..45ff51a1e7 100644
+--- a/cli/command/trust/key_load.go
++++ b/cli/command/trust/key_load.go
+@@ -6,7 +6,7 @@ import (
+ 	"fmt"
+ 	"io"
+ 	"os"
+-	"runtime"
++	_ "runtime"
+ 
+ 	"github.com/docker/cli/cli"
+ 	"github.com/docker/cli/cli/command"
+@@ -70,7 +70,7 @@ func loadPrivKey(streams command.Streams, keyPath string, options keyLoadOptions
+ }
+ 
+ func getPrivKeyBytesFromPath(keyPath string) ([]byte, error) {
+-	if runtime.GOOS != "windows" {
++	if "linux" != "windows" {
+ 		fileInfo, err := os.Stat(keyPath)
+ 		if err != nil {
+ 			return nil, err
+diff --git a/cli/command/utils.go b/cli/command/utils.go
+index 753f428aa0..ffbeaee2fa 100644
+--- a/cli/command/utils.go
++++ b/cli/command/utils.go
+@@ -6,7 +6,7 @@ import (
+ 	"io"
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 
+ 	"github.com/docker/cli/cli/streams"
+@@ -81,7 +81,7 @@ func PromptForConfirmation(ins io.Reader, outs io.Writer, message string) bool {
+ 	_, _ = fmt.Fprint(outs, message)
+ 
+ 	// On Windows, force the use of the regular OS stdin stream.
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		ins = streams.NewIn(os.Stdin)
+ 	}
+ 
+diff --git a/cli/connhelper/commandconn/commandconn.go b/cli/connhelper/commandconn/commandconn.go
+index 835c4c48df..9f5ac609cf 100644
+--- a/cli/connhelper/commandconn/commandconn.go
++++ b/cli/connhelper/commandconn/commandconn.go
+@@ -20,7 +20,7 @@ import (
+ 	"io"
+ 	"net"
+ 	"os"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 	"sync"
+ 	"sync/atomic"
+@@ -89,7 +89,7 @@ func (c *commandConn) kill() {
+ 	}
+ 	c.cmdMutex.Lock()
+ 	var werr error
+-	if runtime.GOOS != "windows" {
++	if "linux" != "windows" {
+ 		werrCh := make(chan error)
+ 		go func() { werrCh <- c.cmd.Wait() }()
+ 		_ = c.cmd.Process.Signal(syscall.SIGTERM)
+diff --git a/cli/streams/in.go b/cli/streams/in.go
+index 1a10f7c830..e2f04f9116 100644
+--- a/cli/streams/in.go
++++ b/cli/streams/in.go
+@@ -4,7 +4,7 @@ import (
+ 	"errors"
+ 	"io"
+ 	"os"
+-	"runtime"
++	_ "runtime"
+ 
+ 	"github.com/moby/term"
+ )
+@@ -45,7 +45,7 @@ func (i *In) CheckTty(attachStdin, ttyMode bool) error {
+ 	// incompatible with `docker run -t`, `docker exec -t` or `docker attach`.
+ 	if ttyMode && attachStdin && !i.isTerminal {
+ 		const eText = "the input device is not a TTY"
+-		if runtime.GOOS == "windows" {
++		if "linux" == "windows" {
+ 			return errors.New(eText + ".  If you are using mintty, try prefixing the command with 'winpty'")
+ 		}
+ 		return errors.New(eText)
