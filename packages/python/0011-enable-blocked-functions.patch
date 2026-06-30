@@ -1,0 +1,166 @@
+diff --git a/Modules/posixmodule.c b/Modules/posixmodule.c
+index 78a8776..3a09af9 100644
+--- a/Modules/posixmodule.c
++++ b/Modules/posixmodule.c
+@@ -3837,6 +3837,12 @@ static PyObject *
+ os_chroot_impl(PyObject *module, path_t *path)
+ /*[clinic end generated code: output=de80befc763a4475 input=14822965652c3dc3]*/
+ {
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return posix_error();
++    }
++#endif
+     int res;
+     Py_BEGIN_ALLOW_THREADS
+     res = chroot(path->narrow);
+@@ -9256,6 +9262,12 @@ os_initgroups_impl(PyObject *module, PyObject *oname, gid_t gid)
+ /*[clinic end generated code: output=59341244521a9e3f input=17d8fbe2dea42ca4]*/
+ #endif
+ {
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return PyErr_SetFromErrno(PyExc_OSError);
++    }
++#endif
+     const char *username = PyBytes_AS_STRING(oname);
+ 
+     if (initgroups(username, gid) == -1)
+@@ -9678,6 +9690,12 @@ static PyObject *
+ os_setuid_impl(PyObject *module, uid_t uid)
+ /*[clinic end generated code: output=a0a41fd0d1ec555f input=c921a3285aa22256]*/
+ {
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return posix_error();
++    }
++#endif
+     if (setuid(uid) < 0)
+         return posix_error();
+     Py_RETURN_NONE;
+@@ -9699,6 +9717,12 @@ static PyObject *
+ os_seteuid_impl(PyObject *module, uid_t euid)
+ /*[clinic end generated code: output=102e3ad98361519a input=ba93d927e4781aa9]*/
+ {
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return posix_error();
++    }
++#endif
+     if (seteuid(euid) < 0)
+         return posix_error();
+     Py_RETURN_NONE;
+@@ -9720,6 +9744,12 @@ static PyObject *
+ os_setegid_impl(PyObject *module, gid_t egid)
+ /*[clinic end generated code: output=4e4b825a6a10258d input=4080526d0ccd6ce3]*/
+ {
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return posix_error();
++    }
++#endif
+     if (setegid(egid) < 0)
+         return posix_error();
+     Py_RETURN_NONE;
+@@ -9742,6 +9772,12 @@ static PyObject *
+ os_setreuid_impl(PyObject *module, uid_t ruid, uid_t euid)
+ /*[clinic end generated code: output=62d991210006530a input=0ca8978de663880c]*/
+ {
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return posix_error();
++    }
++#endif
+     if (setreuid(ruid, euid) < 0) {
+         return posix_error();
+     } else {
+@@ -9766,6 +9802,12 @@ static PyObject *
+ os_setregid_impl(PyObject *module, gid_t rgid, gid_t egid)
+ /*[clinic end generated code: output=aa803835cf5342f3 input=c59499f72846db78]*/
+ {
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return posix_error();
++    }
++#endif
+     if (setregid(rgid, egid) < 0)
+         return posix_error();
+     Py_RETURN_NONE;
+@@ -9786,6 +9828,12 @@ static PyObject *
+ os_setgid_impl(PyObject *module, gid_t gid)
+ /*[clinic end generated code: output=bdccd7403f6ad8c3 input=27d30c4059045dc6]*/
+ {
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return posix_error();
++    }
++#endif
+     if (setgid(gid) < 0)
+         return posix_error();
+     Py_RETURN_NONE;
+@@ -14706,6 +14754,12 @@ static PyObject *
+ os_setresuid_impl(PyObject *module, uid_t ruid, uid_t euid, uid_t suid)
+ /*[clinic end generated code: output=834a641e15373e97 input=9e33cb79a82792f3]*/
+ {
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return posix_error();
++    }
++#endif
+     if (setresuid(ruid, euid, suid) < 0)
+         return posix_error();
+     Py_RETURN_NONE;
+@@ -14729,6 +14783,12 @@ static PyObject *
+ os_setresgid_impl(PyObject *module, gid_t rgid, gid_t egid, gid_t sgid)
+ /*[clinic end generated code: output=6aa402f3d2e514a9 input=33e9e0785ef426b1]*/
+ {
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return posix_error();
++    }
++#endif
+     if (setresgid(rgid, egid, sgid) < 0)
+         return posix_error();
+     Py_RETURN_NONE;
+diff --git a/Modules/socketmodule.c b/Modules/socketmodule.c
+index 98bd892..c2babd8 100644
+--- a/Modules/socketmodule.c
++++ b/Modules/socketmodule.c
+@@ -5711,6 +5711,13 @@ socket_sethostname(PyObject *self, PyObject *args)
+     Py_buffer buf;
+     int res, flag = 0;
+ 
++#ifdef __ANDROID__
++    if (getuid() != 0) {
++        errno = EPERM;
++        return PyErr_SetFromErrno(PyExc_OSError);
++    }
++#endif
++
+ #if defined(_AIX) || (defined(__sun) && defined(__SVR4) && Py_SUNOS_VERSION <= 510)
+ /* issue #18259, sethostname is not declared in any useful header file on AIX
+  * the same is true for Solaris 10 */
+diff --git a/configure.ac b/configure.ac
+index 030ae56..35f3f8c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -5197,8 +5197,7 @@ fi
+ if test "$ac_sys_system" = "Linux-android"; then
+   # When these functions are used in an unprivileged process, they crash rather
+   # than returning an error.
+-  blocked_funcs="chroot initgroups setegid seteuid setgid sethostname
+-    setregid setresgid setresuid setreuid setuid"
++  blocked_funcs=""
+ 
+   # Before API level 23, when fchmodat is called with the unimplemented flag
+   # AT_SYMLINK_NOFOLLOW, instead of returning ENOTSUP as it should, it actually
