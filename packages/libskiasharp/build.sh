@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE="https://github.com/mono/SkiaSharp"
 TERMUX_PKG_DESCRIPTION="SkiaSharp is a cross-platform 2D graphics API for .NET platforms"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=c16e913577083761d847146db7a04b8d3b3bf755
-_COMMIT_DATE=20241024
-TERMUX_PKG_VERSION="3.116.1.${_COMMIT_DATE}"
-TERMUX_PKG_SRCURL="https://github.com/mono/skia/archive/${_COMMIT}.tar.gz"
-TERMUX_PKG_SHA256=3fd17a42cca9a7dbde68ab016969b70ab7dd4833403ac1a192e1aa51aed4617b
+_COMMIT=4e4ce7af7ea8702593af5aeb25d05c65ffb74e90
+_COMMIT_DATE=20260624
+TERMUX_PKG_VERSION="4.148.0.${_COMMIT_DATE}"
+TERMUX_PKG_SRCURL="https://github.com/mono/SkiaSharp/archive/${_COMMIT}.tar.gz"
+TERMUX_PKG_SHA256=14d7d891881e7652d7e9f1eb93cc6f5bc1155dff9f5a28a7c42772b577c0b08f
 TERMUX_PKG_DEPENDS="libexpat, libglvnd, libpng, libwebp, freetype, zlib, libjpeg-turbo"
 TERMUX_PKG_BUILD_DEPENDS="libc++"
 TERMUX_PKG_EXCLUDED_ARCHES="arm"
@@ -15,11 +15,11 @@ termux_step_make() {
 	termux_setup_gn
 	local _target_cpu=""
 	case "$TERMUX_ARCH" in
-		aarch64) _target_cpu="arm64" ;;
-#		arm) _target_cpu="arm" ;;
-		x86_64) _target_cpu="x64" ;;
-		i686) _target_cpu="x86" ;;
-		*) termux_error_exit  "Unsupported arch: $TERMUX_ARCH"
+	aarch64) _target_cpu="arm64" ;;
+		#		arm) _target_cpu="arm" ;;
+	x86_64) _target_cpu="x64" ;;
+	i686) _target_cpu="x86" ;;
+	*) termux_error_exit "Unsupported arch: $TERMUX_ARCH" ;;
 	esac
 
 	pushd "$TERMUX_PKG_SRCDIR"
@@ -32,7 +32,7 @@ termux_step_make() {
 		# converts xFLAGS into GN form
 		# For example: CFLAGS="-O3 -fno-vectorize"
 		# becomes _GN_CFLAGS='"-O3", "-fno-vectorize"'
-		declare _GN_"${_flag}"="$(eval printf '%s' "\"\$${_flag}\"" | awk '{for (i=1;i<NF;i++) { printf "\"%s\", ",$i }; printf "\"%s\"",$i}' )"
+		declare _GN_"${_flag}"="$(eval printf '%s' "\"\$${_flag}\"" | awk '{for (i=1;i<NF;i++) { printf "\"%s\", ",$i }; printf "\"%s\"",$i}')"
 	done
 	local _args_pre=""
 	local _args=""
