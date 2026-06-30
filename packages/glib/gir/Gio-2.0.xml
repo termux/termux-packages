@@ -477,12 +477,14 @@
   <flags name="GTlsDatabaseVerifyFlags" get-type="g_tls_database_verify_flags_get_type">
     <member name="G_TLS_DATABASE_VERIFY_NONE" nick="none" value="0"/>
   </flags>
-  <enum name="GTlsDatabaseLookupFlags" get-type="g_tls_database_lookup_flags_get_type">
+  <flags name="GTlsDatabaseLookupFlags" get-type="g_tls_database_lookup_flags_get_type">
     <member name="G_TLS_DATABASE_LOOKUP_NONE" nick="none" value="0"/>
     <member name="G_TLS_DATABASE_LOOKUP_KEYPAIR" nick="keypair" value="1"/>
-  </enum>  <enum name="GTlsCertificateRequestFlags" get-type="g_tls_certificate_request_flags_get_type">
+  </flags>
+  <flags name="GTlsCertificateRequestFlags" get-type="g_tls_certificate_request_flags_get_type">
     <member name="G_TLS_CERTIFICATE_REQUEST_NONE" nick="none" value="0"/>
-  </enum>  <enum name="GTlsProtocolVersion" get-type="g_tls_protocol_version_get_type">
+  </flags>
+  <enum name="GTlsProtocolVersion" get-type="g_tls_protocol_version_get_type">
     <member name="G_TLS_PROTOCOL_VERSION_UNKNOWN" nick="unknown" value="0"/>
     <member name="G_TLS_PROTOCOL_VERSION_SSL_3_0" nick="ssl-3-0" value="1"/>
     <member name="G_TLS_PROTOCOL_VERSION_TLS_1_0" nick="tls-1-0" value="2"/>
@@ -491,10 +493,11 @@
     <member name="G_TLS_PROTOCOL_VERSION_TLS_1_3" nick="tls-1-3" value="5"/>
     <member name="G_TLS_PROTOCOL_VERSION_DTLS_1_0" nick="dtls-1-0" value="201"/>
     <member name="G_TLS_PROTOCOL_VERSION_DTLS_1_2" nick="dtls-1-2" value="202"/>
-  </enum>  <enum name="GIOModuleScopeFlags" get-type="g_io_module_scope_flags_get_type">
+  </enum>  <flags name="GIOModuleScopeFlags" get-type="g_io_module_scope_flags_get_type">
     <member name="G_IO_MODULE_SCOPE_NONE" nick="none" value="0"/>
     <member name="G_IO_MODULE_SCOPE_BLOCK_DUPLICATES" nick="block-duplicates" value="1"/>
-  </enum>  <enum name="GSocketClientEvent" get-type="g_socket_client_event_get_type">
+  </flags>
+  <enum name="GSocketClientEvent" get-type="g_socket_client_event_get_type">
     <member name="G_SOCKET_CLIENT_RESOLVING" nick="resolving" value="0"/>
     <member name="G_SOCKET_CLIENT_RESOLVED" nick="resolved" value="1"/>
     <member name="G_SOCKET_CLIENT_CONNECTING" nick="connecting" value="2"/>
@@ -542,6 +545,11 @@
     <member name="G_MEMORY_MONITOR_WARNING_LEVEL_LOW" nick="low" value="50"/>
     <member name="G_MEMORY_MONITOR_WARNING_LEVEL_MEDIUM" nick="medium" value="100"/>
     <member name="G_MEMORY_MONITOR_WARNING_LEVEL_CRITICAL" nick="critical" value="255"/>
+  </enum>  <enum name="GEcnCodePoint" get-type="g_ecn_code_point_get_type">
+    <member name="G_ECN_NO_ECN" nick="no-ecn" value="0"/>
+    <member name="G_ECN_ECT_1" nick="ect-1" value="1"/>
+    <member name="G_ECN_ECT_0" nick="ect-0" value="2"/>
+    <member name="G_ECN_ECT_CE" nick="ect-ce" value="3"/>
   </enum>  <flags name="GResolverNameLookupFlags" get-type="g_resolver_name_lookup_flags_get_type">
     <member name="G_RESOLVER_NAME_LOOKUP_FLAGS_DEFAULT" nick="default" value="0"/>
     <member name="G_RESOLVER_NAME_LOOKUP_FLAGS_IPV4_ONLY" nick="ipv4-only" value="1"/>
@@ -1001,6 +1009,12 @@
   <class name="GIOModule" get-type="g_io_module_get_type" parents="GTypeModule,GObject">
     <implements name="GTypePlugin"/>
   </class>
+  <class name="GSocketControlMessage" get-type="g_socket_control_message_get_type" parents="GObject" abstract="1">
+  </class>
+  <class name="GIPTosMessage" get-type="g_ip_tos_message_get_type" parents="GSocketControlMessage,GObject">
+  </class>
+  <class name="GIPv6TclassMessage" get-type="g_ipv6_tclass_message_get_type" parents="GSocketControlMessage,GObject">
+  </class>
   <interface name="GListModel" get-type="g_list_model_get_type">
     <signal name="items-changed" return="void" when="last">
       <param type="guint"/>
@@ -1315,8 +1329,6 @@
   </interface>
   <class name="GSocketConnection" get-type="g_socket_connection_get_type" parents="GIOStream,GObject">
     <property name="socket" type="GSocket" flags="235"/>
-  </class>
-  <class name="GSocketControlMessage" get-type="g_socket_control_message_get_type" parents="GObject" abstract="1">
   </class>
   <class name="GSocketListener" get-type="g_socket_listener_get_type" parents="GObject">
     <property name="listen-backlog" type="gint" flags="231" default-value="10"/>
