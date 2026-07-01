@@ -1,0 +1,80 @@
+From e4f3220e535a7bc93730e50d1f10c89ef3996075 Mon Sep 17 00:00:00 2001
+From: Chocobo1 <Chocobo1@users.noreply.github.com>
+Date: Fri, 13 May 2022 18:15:52 +0800
+Subject: [PATCH 1/2] Provide project information to autotools
+
+---
+ configure.ac | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index f0b1bdb..03bf9a3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -30,7 +30,8 @@
+ # POSSIBILITY OF SUCH DAMAGE.
+ 
+ AC_PREREQ(2.69)
+-AC_INIT(package-unused, version-unused,, libbacktrace)
++AC_INIT(libbacktrace, 1.0, https://github.com/ianlancetaylor/libbacktrace/issues,
++        libbacktrace, https://github.com/ianlancetaylor/libbacktrace)
+ AC_CONFIG_SRCDIR(backtrace.h)
+ AC_CONFIG_HEADER(config.h)
+ AC_CONFIG_MACRO_DIR(config)
+
+From f75f3eee369686694c379619a134c473982c0951 Mon Sep 17 00:00:00 2001
+From: Chocobo1 <Chocobo1@users.noreply.github.com>
+Date: Fri, 13 May 2022 18:16:57 +0800
+Subject: [PATCH 2/2] Add pkg-config file
+
+---
+ Makefile.am        |  3 +++
+ configure.ac       |  2 +-
+ libbacktrace.pc.in | 11 +++++++++++
+ 3 files changed, 15 insertions(+), 1 deletion(-)
+ create mode 100644 libbacktrace.pc.in
+
+diff --git a/Makefile.am b/Makefile.am
+index 166a058..a50585f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -84,6 +84,9 @@ libbacktrace_la_LIBADD = \
+ 
+ libbacktrace_la_DEPENDENCIES = $(libbacktrace_la_LIBADD)
+ 
++pkgconfigdir = $(libdir)/pkgconfig
++pkgconfig_DATA = libbacktrace.pc
++
+ # Testsuite.
+ 
+ # Add a test to this variable if you want it to be built.
+diff --git a/configure.ac b/configure.ac
+index 03bf9a3..62eb4e5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -538,7 +538,7 @@ else
+   multilib_arg=
+ fi
+ 
+-AC_CONFIG_FILES(Makefile backtrace-supported.h)
++AC_CONFIG_FILES(Makefile backtrace-supported.h libbacktrace.pc)
+ AC_CONFIG_FILES(install-debuginfo-for-buildid.sh, chmod +x install-debuginfo-for-buildid.sh)
+ 
+ # We need multilib support, but only if configuring for the target.
+diff --git a/libbacktrace.pc.in b/libbacktrace.pc.in
+new file mode 100644
+index 0000000..35c32c3
+--- /dev/null
++++ b/libbacktrace.pc.in
+@@ -0,0 +1,11 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++libdir=@libdir@
++includedir=@includedir@
++
++Name: libbacktrace
++Description: A C library that may be linked into a C/C++ program to produce symbolic backtraces
++URL: https://github.com/ianlancetaylor/libbacktrace
++Version: @VERSION@
++Cflags: -I${includedir}
++Libs: -L${libdir} -lbacktrace
