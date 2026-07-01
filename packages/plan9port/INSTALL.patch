@@ -1,0 +1,46 @@
+--- a/INSTALL
++++ b/INSTALL
+@@ -150,15 +150,17 @@ unset MKSHELL
+ 
+ cd src
+ if $dobuild; then
+-	echo "* Building mk..."
+-	../dist/buildmk 2>&1 | sed 's/^[+] //'
++	echo "* Building everything (be patient)..."
++	if [ "$_P9P_BOOTSTRAP" = 'false' ]
++	then
++		echo "* Building mk..."
++		../dist/buildmk 2>&1 | sed 's/^[+] //'
+ 
+-	if [ ! -x ../bin/mk ]; then
+-		echo "* Error: mk failed to build."
+-		exit 1
++		if [ ! -x ../bin/mk ]; then
++			echo "* Error: mk failed to build."
++			exit 1
++		fi
+ 	fi
+-
+-	echo "* Building everything (be patient)..."
+ 	mk clean
+ 	mk libs-nuke
+ 	mk all || exit 1
+@@ -175,6 +177,18 @@ if $dobuild; then
+ 		cp $PLAN9/bin/quote1 $PLAN9/bin/'"'
+ 		cp $PLAN9/bin/quote2 $PLAN9/bin/'""'
+ 	fi
++	if [ "$_P9P_BOOTSTRAP" = 'true' ]
++	then
++		echo "* Building mk..."
++		rm -f ../bin/mk
++		../dist/buildmk 2>&1 | sed 's/^[+] //'
++
++		if [ ! -x ../bin/mk ]; then
++			echo "* Error: mk failed to build."
++			exit 1
++		fi
++	fi
++
+ 	echo "* Cleaning up..."
+ 	mk clean
+ fi
