@@ -1,18 +1,36 @@
-for i in @TERMUX_PREFIX@/etc/profile.d/*.sh; do
-	if [ -r $i ]; then
-		. $i
-	fi
-done
-unset i
+# shellcheck shell=sh
 
-# Source etc/bash.bashrc and ~/.bashrc also for interactive bash login shells:
-if [ "$BASH" ]; then
-        if [[ "$-" == *"i"* ]]; then
-                if [ -r @TERMUX_PREFIX@/etc/bash.bashrc ]; then
-                        . @TERMUX_PREFIX@/etc/bash.bashrc
-                fi
-                if [ -r @TERMUX_HOME@/.bashrc ]; then
-                        . @TERMUX_HOME@/.bashrc
-                fi
-        fi
+# This file is intended to allow optionally setting or overriding PATH or other variables
+# for users potentially using the termux bash package outside of the termux app
+# in a way that does not require editing etc/profile, so that etc/profile
+# can be upgraded by pkg upgrade updates to the bash package for that usecase
+# without the user having to always select to not overwrite it during the upgrade
+if [ -f "@TERMUX_PREFIX@/etc/profile.pre" ] ; then
+    # shellcheck source=@TERMUX_PREFIX@/etc/profile.pre
+    . "@TERMUX_PREFIX@/etc/profile.pre"
 fi
+
+if [ -d "@TERMUX_PREFIX@/etc/profile.d/" ]; then
+    for i in "@TERMUX_PREFIX@/etc/profile.d"/*.sh; do
+        # shellcheck source=/dev/null
+        [ -r "$i" ] && . "$i"
+    done
+    unset i
+fi
+
+# unset GLOBSORT, before anything else is sourced
+# This variable is part of bash >= 5.3
+# The rationale is that the user should always be able
+# to expect that the snippets be processed in a deterministic order.
+unset -v GLOBSORT
+
+# Source global bash config, when interactive but not posix or sh mode
+if [ -n "${BASH:-}" ] && \
+    [ -n "${PS1:-}" ] && \
+    [ -z "${POSIXLY_CORRECT:-}" ] && \
+    [ "${0#-}" != "sh" ] && \
+    [ -r "@TERMUX_PREFIX@/etc/bash.bashrc" ]; then
+        # shellcheck source=@TERMUX_PREFIX@/etc/bash.bashrc
+        . "@TERMUX_PREFIX@/etc/bash.bashrc"
+fi
+# vim: set noet ft=zsh tw=4 sw=4 ff=unix
