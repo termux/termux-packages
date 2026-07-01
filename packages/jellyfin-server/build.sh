@@ -20,7 +20,7 @@ TERMUX_PKG_DEPENDS="aspnetcore-runtime-10.0, dotnet-host, dotnet-runtime-10.0, l
 TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-10.0, dotnet-targeting-pack-10.0, libcairo, pango, libjpeg-turbo, giflib, librsvg"
 TERMUX_PKG_SERVICE_SCRIPT=(
 	"jellyfin"
-	"exec ${TERMUX_PREFIX}/bin/jellyfin 2>&1"
+	"OLD_DATA_DIR=\"\$HOME/.local/share/jellyfin\"; NEW_DATA_DIR=\"\$HOME/jellyfin\"; if [ -d \"\$OLD_DATA_DIR/root/default\" ] && [ -n \"\$(ls -A \"\$OLD_DATA_DIR/root/default\" 2>/dev/null)\" ] && { [ ! -d \"\$NEW_DATA_DIR/root/default\" ] || [ -z \"\$(ls -A \"\$NEW_DATA_DIR/root/default\" 2>/dev/null)\" ]; }; then echo \"[jellyfin-migrate] Detected pre-existing data at \$OLD_DATA_DIR not present at \$NEW_DATA_DIR — copying library root and fixing CollectionFolder paths. Back up \$NEW_DATA_DIR/data/jellyfin.db before relying on this.\"; mkdir -p \"\$NEW_DATA_DIR/root/default\"; cp -rn \"\$OLD_DATA_DIR/root/default/.\" \"\$NEW_DATA_DIR/root/default/\"; if [ -f \"\$NEW_DATA_DIR/data/jellyfin.db\" ] && command -v sqlite3 >/dev/null 2>&1; then sqlite3 \"\$NEW_DATA_DIR/data/jellyfin.db\" \"UPDATE BaseItems SET Path = REPLACE(Path, '\$OLD_DATA_DIR', '\$NEW_DATA_DIR') WHERE Path LIKE '\$OLD_DATA_DIR%';\" 2>/dev/null || echo '[jellyfin-migrate] WARNING: sqlite3 path fixup failed, run manually.'; fi; fi; exec ${TERMUX_PREFIX}/bin/jellyfin --datadir \"\$NEW_DATA_DIR\" 2>&1"
 )
 TERMUX_PKG_EXCLUDED_ARCHES="arm"
 TERMUX_PKG_RM_AFTER_INSTALL="
