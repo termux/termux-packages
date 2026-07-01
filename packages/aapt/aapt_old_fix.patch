@@ -1,0 +1,411 @@
+diff --git a/submodules/base/tools/aapt/AaptAssets.cpp b/submodules/base/tools/aapt/AaptAssets.cpp
+index 82bcfc2c..17a74898 100644
+--- a/submodules/base/tools/aapt/AaptAssets.cpp
++++ b/submodules/base/tools/aapt/AaptAssets.cpp
+@@ -38,6 +38,9 @@ static const String8 kResString(kResourceDir);
+  */
+ static bool validateFileName(const char* fileName)
+ {
++    // Apktool: Don't validate filename.
++    return true;
++
+     const char* cp = fileName;
+     size_t len = 0;
+ 
+@@ -1620,6 +1623,9 @@ sp<AaptDir> AaptAssets::resDir(const String8& name) const
+ bool
+ valid_symbol_name(const String8& symbol)
+ {
++    // Apktool: Don't validate symbol name.
++    return true;
++
+     static char const * const KEYWORDS[] = {
+         "abstract", "assert", "boolean", "break",
+         "byte", "case", "catch", "char", "class", "const", "continue",
+diff --git a/submodules/base/tools/aapt/AaptConfig.cpp b/submodules/base/tools/aapt/AaptConfig.cpp
+index 7578f79f..f2b1fbaf 100644
+--- a/submodules/base/tools/aapt/AaptConfig.cpp
++++ b/submodules/base/tools/aapt/AaptConfig.cpp
+@@ -260,6 +260,9 @@ bool parseCommaSeparatedList(const String8& str, std::set<ConfigDescription>* ou
+ }
+ 
+ void applyVersionForCompatibility(ConfigDescription* config) {
++    // Apktool: Don't apply implicit version during build.
++    return;
++
+     if (config == NULL) {
+         return;
+     }
+@@ -315,7 +318,7 @@ bool parseMcc(const char* name, ResTable_config* out) {
+         c++;
+     }
+     if (*c != 0) return false;
+-    if (c-val != 3) return false;
++    if (c-val != 3 && c-val != 4) return false;
+ 
+     int d = atoi(val);
+     if (d != 0) {
+@@ -345,7 +348,7 @@ bool parseMnc(const char* name, ResTable_config* out) {
+         c++;
+     }
+     if (*c != 0) return false;
+-    if (c-val == 0 || c-val > 3) return false;
++    if (c-val == 0 || c-val > 4) return false;
+ 
+     if (out) {
+         out->mnc = atoi(val);
+@@ -543,6 +546,27 @@ bool parseUiModeType(const char* name, ResTable_config* out) {
+               (out->uiMode&~ResTable_config::MASK_UI_MODE_TYPE)
+               | ResTable_config::UI_MODE_TYPE_VR_HEADSET;
+         return true;
++    } else if (strcmp(name, "smallui") == 0) {
++      if (out) out->uiMode =
++               (out->uiMode&~ResTable_config::MASK_UI_MODE_TYPE)
++               | 0xC;
++        return true;
++    } else if (strcmp(name, "mediumui") == 0) {
++      if (out) out->uiMode =
++               (out->uiMode&ResTable_config::MASK_UI_MODE_TYPE)
++               | 0xD;
++        return true;
++    } else if (strcmp(name, "largeui") == 0) {
++      if (out) out->uiMode =
++               (out->uiMode&ResTable_config::MASK_UI_MODE_TYPE)
++               | 0xE;
++        return true;
++    } else if (strcmp(name, "hugeui") == 0) {
++      if (out) out->uiMode = 0xF;
++        return true;
++    } else if (strcmp(name, "godzillaui") == 0) {
++      if (out) out->uiMode = 0xB;
++        return true;
+     }
+ 
+     return false;
+diff --git a/submodules/base/tools/aapt/Bundle.h b/submodules/base/tools/aapt/Bundle.h
+index deb9cc08..b0969ba5 100644
+--- a/submodules/base/tools/aapt/Bundle.h
++++ b/submodules/base/tools/aapt/Bundle.h
+@@ -58,7 +58,7 @@ public:
+           mNoVersionTransitions(false),
+           mCrunchedOutputDir(NULL), mProguardFile(NULL), mMainDexProguardFile(NULL),
+           mAndroidManifestFile(NULL), mPublicOutputFile(NULL),
+-          mRClassDir(NULL), mResourceIntermediatesDir(NULL), mManifestMinSdkVersion(NULL),
++          mRClassDir(NULL), mResourceIntermediatesDir(NULL), mForcedPackageId(-1), mManifestMinSdkVersion(NULL),
+           mMinSdkVersion(NULL), mTargetSdkVersion(NULL), mMaxSdkVersion(NULL),
+           mVersionCode(NULL), mVersionName(NULL), mReplaceVersion(false), mCustomPackage(NULL),
+           mExtraPackages(NULL), mMaxResVersion(NULL), mDebugMode(false), mNonConstantId(false),
+@@ -180,6 +180,8 @@ public:
+     const android::String8& getFeatureOfPackage() const { return mFeatureOfPackage; }
+     void setFeatureAfterPackage(const char* str) { mFeatureAfterPackage = str; }
+     const android::String8& getFeatureAfterPackage() const { return mFeatureAfterPackage; }
++    int getForcedPackageId() const { return mForcedPackageId; }
++    void setForcedPackageId(int val) { mForcedPackageId = val; }
+ 
+     const char*  getManifestMinSdkVersion() const { return mManifestMinSdkVersion; }
+     void setManifestMinSdkVersion(const char*  val) { mManifestMinSdkVersion = val; }
+@@ -327,6 +329,7 @@ private:
+     android::String8 mFeatureOfPackage;
+     android::String8 mFeatureAfterPackage;
+     android::String8 mRevisionCode;
++    int mForcedPackageId;
+     const char* mManifestMinSdkVersion;
+     const char* mMinSdkVersion;
+     const char* mTargetSdkVersion;
+diff --git a/submodules/base/tools/aapt/Main.cpp b/submodules/base/tools/aapt/Main.cpp
+index 66a05101..0d156a9c 100644
+--- a/submodules/base/tools/aapt/Main.cpp
++++ b/submodules/base/tools/aapt/Main.cpp
+@@ -16,6 +16,7 @@
+ #include <cstdlib>
+ #include <getopt.h>
+ #include <cassert>
++#include <fstream>
+ 
+ using namespace android;
+ 
+@@ -72,7 +73,7 @@ void usage(void)
+         "   xmlstrings       Print the strings of the given compiled xml assets.\n\n", gProgName);
+     fprintf(stderr,
+         " %s p[ackage] [-d][-f][-m][-u][-v][-x][-z][-M AndroidManifest.xml] \\\n"
+-        "        [-0 extension [-0 extension ...]] [-g tolerance] [-j jarfile] \\\n"
++        "        [-0 extension [-0 extension ...]] [-e extensions_file] [-g tolerance] [-j jarfile] \\\n"
+         "        [--debug-mode] [--min-sdk-version VAL] [--target-sdk-version VAL] \\\n"
+         "        [--app-version VAL] [--app-version-name TEXT] [--custom-package VAL] \\\n"
+         "        [--rename-manifest-package PACKAGE] \\\n"
+@@ -146,6 +147,8 @@ void usage(void)
+         "   -0  specifies an additional extension for which such files will not\n"
+         "       be stored compressed in the .apk.  An empty string means to not\n"
+         "       compress any files at all.\n"
++        "   -e  specifies path to a file containing a list of additional extensions for which such files will not\n"
++        "       be stored compressed in the .apk.\n"
+         "   --debug-mode\n"
+         "       inserts android:debuggable=\"true\" in to the application node of the\n"
+         "       manifest, making the application debuggable even on production devices.\n"
+@@ -153,6 +156,8 @@ void usage(void)
+         "       when used with \"dump badging\" also includes meta-data tags.\n"
+         "   --pseudo-localize\n"
+         "       generate resources for pseudo-locales (en-XA and ar-XB).\n"
++        "   --forced-package-id\n"
++        "       forces value as package-id\n"
+         "   --min-sdk-version\n"
+         "       inserts android:minSdkVersion in to manifest.  If the version is 7 or\n"
+         "       higher, the default encoding for resources will be in UTF-8.\n"
+@@ -532,9 +537,37 @@ int main(int argc, char* const argv[])
+                     bundle.setCompressionMethod(ZipEntry::kCompressStored);
+                 }
+                 break;
++            case 'e': {
++                 argc--;
++                 argv++;
++                 if (!argc) {
++                     fprintf(stderr, "ERROR: No argument supplied for '-e' option\n");
++                     wantUsage = true;
++                     goto bail;
++                 }
++                 std::ifstream extensionsFile(argv[0]);
++
++                 if (extensionsFile.fail()) {
++                     fprintf(stderr, "ERROR: Could not open extensions file %s for reading\n", argv[0]);
++                     goto bail;
++                 }
++
++                 for (std::string line; getline(extensionsFile, line);) {
++                     bundle.addNoCompressExtension(line.c_str());
++                 }
++                 break;
++            }
+             case '-':
+                 if (strcmp(cp, "-debug-mode") == 0) {
+                     bundle.setDebugMode(true);
++                } else if (strcmp(cp, "-forced-package-id") == 0) {
++                    argc--;
++                    argv++;
++                    if (!argc) {
++                        fprintf(stderr, "ERROR: No argument supplied for '--forced-package-id' option\n");
++                        wantUsage = true;
++                        goto bail;
++                    }
+                 } else if (strcmp(cp, "-min-sdk-version") == 0) {
+                     argc--;
+                     argv++;
+diff --git a/submodules/base/tools/aapt/Resource.cpp b/submodules/base/tools/aapt/Resource.cpp
+index 7e4e186e..159c9f75 100644
+--- a/submodules/base/tools/aapt/Resource.cpp
++++ b/submodules/base/tools/aapt/Resource.cpp
+@@ -270,6 +270,19 @@ static status_t parsePackage(Bundle* bundle, const sp<AaptAssets>& assets,
+         bundle->setRevisionCode(String8(block.getAttributeStringValue(revisionCodeIndex, &len)).c_str());
+     }
+ 
++    // Extract platformBuild info from current AndroidManifest.xml
++    ssize_t platformBuildVersionCodeIndex = block.indexOfAttribute(NULL, "platformBuildVersionCode");
++    if (platformBuildVersionCodeIndex >= 0) {
++        const char16_t* platformBuildVersionCode16 = block.getAttributeStringValue(platformBuildVersionCodeIndex, &len);
++        bundle->setPlatformBuildVersionCode(String8(platformBuildVersionCode16));
++    }
++
++    ssize_t platformBuildVersionNameIndex = block.indexOfAttribute(NULL, "platformBuildVersionName");
++    if (platformBuildVersionNameIndex >= 0) {
++        const char16_t* platformBuildVersionName16 = block.getAttributeStringValue(platformBuildVersionNameIndex, &len);
++        bundle->setPlatformBuildVersionName(String8(platformBuildVersionName16));
++    }
++
+     String16 uses_sdk16("uses-sdk");
+     while ((code=block.next()) != ResXMLTree::END_DOCUMENT
+            && code != ResXMLTree::BAD_DOCUMENT) {
+@@ -315,9 +328,10 @@ static status_t makeFileResources(Bundle* bundle, const sp<AaptAssets>& assets,
+         const char16_t* const end = str + baseName.size();
+         while (str < end) {
+             if (!((*str >= 'a' && *str <= 'z')
++                    || (*str >= 'A' && *str <= 'Z')
+                     || (*str >= '0' && *str <= '9')
+-                    || *str == '_' || *str == '.')) {
+-                fprintf(stderr, "%s: Invalid file name: must contain only [a-z0-9_.]\n",
++                    || *str == '_' || *str == '.' || *str == '$')) {
++                fprintf(stderr, "%s: Invalid file name: must contain only [a-zA-Z0-9$_.]\n",
+                         it.getPath().c_str());
+                 hasErrors = true;
+             }
+@@ -551,7 +565,8 @@ static int validateAttr(const String8& path, const ResTable& table,
+                     fprintf(stderr, "%s:%d: Tag <%s> attribute %s has invalid character '%c'.\n",
+                             path.c_str(), parser.getLineNumber(),
+                             String8(parser.getElementName(&len)).c_str(), attr, (char)str[i]);
+-                    return (int)i;
++                    // Apktool - ignore invalid characters.
++                    // return (int)i;
+                 }
+             }
+         }
+@@ -1140,8 +1155,10 @@ static ssize_t extractPlatformBuildVersion(AssetManager& assets, Bundle* bundle)
+ 
+     Asset* asset = assets.openNonAsset(cookie, "AndroidManifest.xml", Asset::ACCESS_STREAMING);
+     if (asset == NULL) {
+-        fprintf(stderr, "ERROR: Platform AndroidManifest.xml not found\n");
+-        return UNKNOWN_ERROR;
++        // Apktool
++        // fprintf(stderr, "ERROR: Platform AndroidManifest.xml not found\n");
++        // return UNKNOWN_ERROR;
++        return NO_ERROR;
+     }
+ 
+     ssize_t result = NO_ERROR;
+diff --git a/submodules/base/tools/aapt/ResourceTable.cpp b/submodules/base/tools/aapt/ResourceTable.cpp
+index 9fb73194..c5aec78c 100644
+--- a/submodules/base/tools/aapt/ResourceTable.cpp
++++ b/submodules/base/tools/aapt/ResourceTable.cpp
+@@ -111,7 +111,7 @@ status_t compileXmlFile(const Bundle* bundle,
+     }
+ 
+     if ((options&XML_COMPILE_PARSE_VALUES) != 0) {
+-        status_t err = root->parseValues(assets, table);
++        status_t err = root->parseValues(bundle, assets, table);
+         if (err != NO_ERROR) {
+             hasErrors = true;
+         }
+@@ -1765,24 +1765,26 @@ ResourceTable::ResourceTable(Bundle* bundle, const String16& assetsPackage, Reso
+     , mNumLocal(0)
+     , mBundle(bundle)
+ {
+-    ssize_t packageId = -1;
+-    switch (mPackageType) {
+-        case App:
+-        case AppFeature:
+-            packageId = 0x7f;
+-            break;
++    ssize_t packageId = mBundle->getForcedPackageId();
++    if (packageId == -1) {
++        switch (mPackageType) {
++            case App:
++            case AppFeature:
++                packageId = 0x7f;
++                break;
+ 
+-        case System:
+-            packageId = 0x01;
+-            break;
++            case System:
++                packageId = 0x01;
++                break;
+ 
+-        case SharedLibrary:
+-            packageId = 0x00;
+-            break;
++            case SharedLibrary:
++                packageId = 0x00;
++                break;
+ 
+-        default:
+-            assert(0);
+-            break;
++            default:
++                assert(0);
++                break;
++        }
+     }
+     sp<Package> package = new Package(mAssetsPackage, packageId);
+     mPackages.add(assetsPackage, package);
+@@ -2317,7 +2319,7 @@ bool ResourceTable::stringToValue(Res_value* outValue, StringPool* pool,
+     if (style == NULL || style->size() == 0) {
+         // Text is not styled so it can be any type...  let's figure it out.
+         res = mAssets->getIncludedResources()
+-            .stringToValue(outValue, &finalStr, str.c_str(), str.size(), preserveSpaces,
++            .stringToValue(mBundle->getForcedPackageId(), outValue, &finalStr, str.c_str(), str.size(), preserveSpaces,
+                             coerceType, attrID, NULL, &mAssetsPackage, this,
+                            accessorCookie, attrType);
+     } else {
+@@ -2658,8 +2660,9 @@ status_t ResourceTable::assignResourceIds()
+             const size_t N = t->getOrderedConfigs().size();
+             t->setIndex(ti + 1 + typeIdOffset);
+ 
+-            LOG_ALWAYS_FATAL_IF(ti == 0 && attr != t,
+-                                "First type is not attr!");
++            // Apktool
++            // LOG_ALWAYS_FATAL_IF(ti == 0 && attr != t,
++            //                     "First type is not attr!");
+ 
+             for (size_t ei=0; ei<N; ei++) {
+                 sp<ConfigList> c = t->getOrderedConfigs().itemAt(ei);
+@@ -3559,7 +3562,8 @@ status_t ResourceTable::Entry::addToBag(const SourcePos& sourcePos,
+     // one an attr and one an id, with the same name.  Not something we
+     // currently ever have to worry about.
+     ssize_t origKey = mBag.indexOfKey(key);
+-    if (origKey >= 0) {
++    // Apktool: Make statement false so we pack duplicate bag items if needed.
++    if (origKey >= 0 && 1 == 2) {
+         if (!replace) {
+             const Item& item(mBag.valueAt(origKey));
+             sourcePos.error("Resource entry %s already has bag item %s.\n"
+@@ -4603,6 +4607,9 @@ bool ResourceTable::shouldGenerateVersionedResource(
+  * attribute will be respected.
+  */
+ status_t ResourceTable::modifyForCompat(const Bundle* bundle) {
++    // Apktool: Don't modify for compatibility.
++    return NO_ERROR;
++
+     const int minSdk = getMinSdkVersion(bundle);
+     if (minSdk >= SDK_LOLLIPOP_MR1) {
+         // Lollipop MR1 and up handles public attributes differently, no
+@@ -4833,6 +4840,9 @@ status_t ResourceTable::modifyForCompat(const Bundle* bundle,
+                                         const String16& resourceName,
+                                         const sp<AaptFile>& target,
+                                         const sp<XMLNode>& root) {
++    // Apktool: Skip compatibility checks
++    return NO_ERROR;
++
+     const String16 vector16("vector");
+     const String16 animatedVector16("animated-vector");
+     const String16 pathInterpolator16("pathInterpolator");
+diff --git a/submodules/base/tools/aapt/XMLNode.cpp b/submodules/base/tools/aapt/XMLNode.cpp
+index 1a648c01..edc3d75a 100644
+--- a/submodules/base/tools/aapt/XMLNode.cpp
++++ b/submodules/base/tools/aapt/XMLNode.cpp
+@@ -971,7 +971,7 @@ void XMLNode::removeWhitespace(bool stripAll, const char** cDataTags)
+     }
+ }
+ 
+-status_t XMLNode::parseValues(const sp<AaptAssets>& assets,
++status_t XMLNode::parseValues(const Bundle* bundle, const sp<AaptAssets>& assets,
+                               ResourceTable* table)
+ {
+     bool hasErrors = false;
+@@ -985,7 +985,7 @@ status_t XMLNode::parseValues(const sp<AaptAssets>& assets,
+                     String8(e.string));
+             table->setCurrentXmlPos(SourcePos(mFilename, getStartLineNumber()));
+             if (!assets->getIncludedResources()
+-                    .stringToValue(&e.value, &e.string,
++                    .stringToValue(bundle->getForcedPackageId(), &e.value, &e.string,
+                                   e.string.c_str(), e.string.size(), true, true,
+                                   e.nameResId, NULL, &defPackage, table, &ac)) {
+                 hasErrors = true;
+@@ -999,7 +999,7 @@ status_t XMLNode::parseValues(const sp<AaptAssets>& assets,
+     }
+     const size_t N = mChildren.size();
+     for (size_t i=0; i<N; i++) {
+-        status_t err = mChildren.itemAt(i)->parseValues(assets, table);
++        status_t err = mChildren.itemAt(i)->parseValues(bundle, assets, table);
+         if (err != NO_ERROR) {
+             hasErrors = true;
+         }
+diff --git a/submodules/base/tools/aapt/XMLNode.h b/submodules/base/tools/aapt/XMLNode.h
+index ac920186..5364b525 100644
+--- a/submodules/base/tools/aapt/XMLNode.h
++++ b/submodules/base/tools/aapt/XMLNode.h
+@@ -81,8 +81,7 @@ public:
+         }
+ 
+         bool needStringValue() const {
+-            return nameResId == 0
+-                || value.dataType == Res_value::TYPE_NULL
++            return value.dataType == Res_value::TYPE_NULL
+                 || value.dataType == Res_value::TYPE_STRING;
+         }
+         
+@@ -135,7 +134,7 @@ public:
+ 
+     void setUTF8(bool val) { mUTF8 = val; }
+ 
+-    status_t parseValues(const sp<AaptAssets>& assets, ResourceTable* table);
++    status_t parseValues(const Bundle* bundle, const sp<AaptAssets>& assets, ResourceTable* table);
+ 
+     status_t assignResourceIds(const sp<AaptAssets>& assets,
+                                const ResourceTable* table = NULL);
