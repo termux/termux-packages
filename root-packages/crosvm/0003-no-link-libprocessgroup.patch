@@ -1,0 +1,21 @@
+--- a/src/crosvm/sys/linux.rs
++++ b/src/crosvm/sys/linux.rs
+@@ -2,8 +2,6 @@
+ // Use of this source code is governed by a BSD-style license that can be
+ // found in the LICENSE file.
+ 
+-#[cfg(target_os = "android")]
+-mod android;
+ pub mod cmdline;
+ pub mod config;
+ mod device_helpers;
+@@ -3966,9 +3964,6 @@ fn run_control(
+         }
+     }
+ 
+-    #[cfg(target_os = "android")]
+-    android::set_process_profiles(&cfg.task_profiles)?;
+-
+     #[allow(unused_mut)]
+     let mut run_mode = if cfg.suspended {
+         // Sleep devices before creating vcpus.
