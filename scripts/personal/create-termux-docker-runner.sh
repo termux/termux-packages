@@ -27,7 +27,7 @@ __change_container_pid_max() {
 	else
 		# On kernel versions >= 6.14, the pid_max value is pid namespaced, so we need to set it in the container namespace instead of host.
 		# But some distributions may backport the pid namespacing to older kernels, so we check whether it's effective by checking the value in the container after setting it.
-		$SUDO docker run --privileged --pid="container:$CONTAINER_NAME" --rm "ubuntu:24.04" sh -c "echo 65535 | tee /proc/sys/kernel/pid_max > /dev/null" || :
+		$SUDO docker run --privileged --pid="container:$CONTAINER_NAME" --rm "ubuntu:26.04" sh -c "echo 65535 | tee /proc/sys/kernel/pid_max > /dev/null" || :
 		if [[ "$($SUDO docker exec $CONTAINER_NAME cat /proc/sys/kernel/pid_max)" -eq 65535 ]]; then
 			echo "Successfully changed /proc/sys/kernel/pid_max for container namespace"
 		else
