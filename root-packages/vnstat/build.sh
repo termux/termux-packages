@@ -10,7 +10,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libsqlite"
 TERMUX_PKG_SERVICE_SCRIPT=("vnstat" "exec su -c \"PATH=\$PATH $TERMUX_PREFIX/bin/vnstatd -n 2>&1\"")
 
-# from docker root package: https://github.com/termux/termux-packages/blob/master/root-packages/docker/build.sh
+# from dockerd root package: https://github.com/termux/termux-packages/blob/master/root-packages/dockerd/build.sh
 termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/var/service/vnstat/
 	{
