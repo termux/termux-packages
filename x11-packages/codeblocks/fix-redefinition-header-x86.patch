@@ -1,0 +1,39 @@
+Fixes:
+In file included from /home/builder/.termux-build/codeblocks/src/src/
+plugins/compilergcc/depslib/src/headers.c:24:
+/home/builder/.termux-build/codeblocks/src/src/plugins/compilergcc/
+depslib/src/headers.h:25:8: error: redefinition of '_header'
+   25 | struct _header
+      |        ^
+/home/builder/.termux-build/_cache/android-r29-api-24-v4/bin/
+../sysroot/usr/include/x86_64-linux-android/asm/sigcontext.h:81:8:
+note: previous definition is here
+   81 | struct _header {
+      |        ^
+due to conflict with preexisting overly-general varaible name '_header'
+in Android-x86 headers.
+
+--- a/src/plugins/compilergcc/depslib/src/headers.h
++++ b/src/plugins/compilergcc/depslib/src/headers.h
+@@ -9,17 +9,17 @@
+  *
+  * ALL WARRANTIES ARE HEREBY DISCLAIMED.
+  */
+-typedef struct _headers HEADERS;
+-typedef struct _header HEADER;
++typedef struct codeblocks_headers HEADERS;
++typedef struct codeblocks_header HEADER;
+ 
+-struct _headers
++struct codeblocks_headers
+ {
+ 	HEADERS *next;
+ 	HEADERS *tail;
+ 	HEADER *header;
+ };
+ 
+-struct _header
++struct codeblocks_header
+ {
+ 	const char *key;
+ 	LIST *includes;
