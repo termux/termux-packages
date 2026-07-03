@@ -1,0 +1,21 @@
+Conflicts directly with:
+/data/data/com.termux/files/usr/lib/pkgconfig/fmt.pc
+/data/data/com.termux/files/usr/include/fmt/format.h
+of the Termux fmt package,
+and if the Termux fmt package is version 11.X and the vendored fmt
+of python-torch is version 12.X, causes errors when later
+building other packages in the same container without deleting
+the container, such as telegram-desktop, like:
+ld.lld: error: undefined symbol: fmt::v12::vformat(fmt::v12::basic_string_view...
+
+--- a/cmake/Dependencies.cmake
++++ b/cmake/Dependencies.cmake
+@@ -1593,7 +1593,7 @@ endif()
+ # This was the default behavior before version 12.0.0.
+ # Since PyTorch C API depends on it, make it available for projects that
+ # depend on PyTorch.
+-set(FMT_INSTALL ON)
++set(FMT_INSTALL OFF)
+ set(TEMP_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
+ set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libs" FORCE)
+ add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/fmt)
