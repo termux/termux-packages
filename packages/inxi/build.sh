@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://smxi.org/site/about.htm#inxi
 TERMUX_PKG_DESCRIPTION="Full featured CLI system information tool"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.3.40-1"
+TERMUX_PKG_VERSION="3.3.41-1"
 TERMUX_PKG_SRCURL=https://codeberg.org/smxi/inxi/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=b3f307f06c3b969bd65151d39729b97a767af42fddd3d9bab971135c0e7cd873
+TERMUX_PKG_SHA256=2f3b16d099fde1b250a4bf6500b0c8e32b13d77469625c5cfc7a5d195a0c8585
 # NOTE: auto-update first checks whether the latest version matches this regex and then
 # replaces the last `.` with '-'. Thus, it shouldn't update to wrong version.
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+(-|\.)\d+"
