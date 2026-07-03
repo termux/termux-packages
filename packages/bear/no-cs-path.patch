@@ -5,8 +5,8 @@ error[E0425]: cannot find value `_CS_PATH` in crate `libc`
 151 | ...::confstr(libc::_CS_PATH, std::ptr::null_mut(), 0) };
     |                    ^^^^^^^^ not found in `libc`
 
---- a/bear/src/context.rs
-+++ b/bear/src/context.rs
+--- a/crates/intercept-supervisor/src/context.rs
++++ b/crates/intercept-supervisor/src/context.rs
 @@ -144,7 +144,7 @@ fn is_sip_enabled() -> bool {
  ///
  /// On Unix systems, this queries the system configuration for the standard
@@ -28,8 +28,8 @@ error[E0425]: cannot find value `_CS_PATH` in crate `libc`
  }
  
  #[cfg(test)]
---- a/intercept-preload/src/implementation.rs
-+++ b/intercept-preload/src/implementation.rs
+--- a/crates/intercept-preload/src/implementation.rs
++++ b/crates/intercept-preload/src/implementation.rs
 @@ -535,8 +535,8 @@ pub unsafe extern "C" fn rust_popen(command: *const c_char, mode: *const c_char)
  
      report(|| {
