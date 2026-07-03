@@ -244,6 +244,9 @@ PACKAGES+=" python3-gi"
 PACKAGES+=" python3-gi-cairo"
 PACKAGES+=" gir1.2-gtk-4.0"
 
+# Needed by telegram-desktop
+PACKAGES+=" libgirepository1.0-dev"
+
 # Needed by gobject-introspection (termux_setup_gir).
 PACKAGES+=" bash-static"
 
