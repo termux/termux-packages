@@ -1,9 +1,9 @@
---- a/intercept-preload/src/implementation.rs
-+++ b/intercept-preload/src/implementation.rs
-@@ -33,7 +33,12 @@ use bear::intercept::reporter::{Reporter, ReporterFactory};
- use bear::intercept::tcp::ReporterOnTcp;
- use bear::intercept::{Event, Execution};
- use ctor::ctor;
+--- a/crates/intercept-preload/src/implementation.rs
++++ b/crates/intercept-preload/src/implementation.rs
+@@ -33,7 +33,12 @@ use ctor::ctor;
+ use intercept::Execution;
+ use intercept::reporter::{Reporter, ReporterFactory};
+ use intercept::tcp::ReporterOnTcp;
 -use libc::{RTLD_NEXT, c_char, c_int, pid_t, posix_spawn_file_actions_t, posix_spawnattr_t};
 +use libc::{c_char, c_int, pid_t, posix_spawn_file_actions_t, posix_spawnattr_t};
 +
@@ -12,5 +12,5 @@
 +#[cfg(target_pointer_width = "32")]
 +const RTLD_NEXT: *mut libc::c_void = 0xfffffffeusize as *mut _;
  
- use crate::session::{DoctoredEnvironment, SESSION, in_session, init_session_from_envp};
+ use crate::session::{DoctoredEnvironment, SESSION_CTX, in_session, init_session_from_envp};
  

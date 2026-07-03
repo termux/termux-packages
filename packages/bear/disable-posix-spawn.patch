@@ -1,8 +1,8 @@
 Prevents:
 error[E0425]: cannot find function `posix_spawnattr_init` in crate `libc`
 
---- a/intercept-preload/src/c/shim.c
-+++ b/intercept-preload/src/c/shim.c
+--- a/crates/intercept-preload/src/c/shim.c
++++ b/crates/intercept-preload/src/c/shim.c
 @@ -25,7 +25,9 @@
  #include <stdarg.h>
  #include <stddef.h>
@@ -49,8 +49,8 @@ error[E0425]: cannot find function `posix_spawnattr_init` in crate `libc`
      return rust_system(command);
  }
  #endif
---- a/platform-checks/build.rs
-+++ b/platform-checks/build.rs
+--- a/build-support/platform-checks/build.rs
++++ b/build-support/platform-checks/build.rs
 @@ -43,11 +43,6 @@ const SYMBOL_PROBES: &[(&str, &str)] = &[
      ("execl", "unistd.h"),
      ("execlp", "unistd.h"),
@@ -63,8 +63,8 @@ error[E0425]: cannot find function `posix_spawnattr_init` in crate `libc`
  ];
  
  fn main() {
---- a/intercept-preload/src/implementation.rs
-+++ b/intercept-preload/src/implementation.rs
+--- a/crates/intercept-preload/src/implementation.rs
++++ b/crates/intercept-preload/src/implementation.rs
 @@ -504,7 +504,7 @@ pub unsafe extern "C" fn rust_posix_spawnp(
  /// - Returns a raw pointer to a FILE structure
  ///
