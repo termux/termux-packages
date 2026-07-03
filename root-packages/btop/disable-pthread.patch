@@ -15,10 +15,10 @@ index ffd5ee6..21568d6 100644
  	#endif
  	}
  
-@@ -738,20 +738,7 @@ namespace Runner {
+@@ -741,20 +735,7 @@ namespace Runner {
  		if (active) {
  			Logger::error("Stall in Runner thread, restarting!");
- 			active = false;
+ 			set_active(false);
 -			// exit(1);
 -			pthread_cancel(Runner::runner_id);
 -
@@ -26,7 +26,7 @@ index ffd5ee6..21568d6 100644
 -			void* thread_result;
 -			int join_result = pthread_join(Runner::runner_id, &thread_result);
 -			if (join_result != 0) {
--				Logger::warning("Failed to join cancelled thread: " + string(strerror(join_result)));
+-				Logger::warning("Failed to join cancelled thread: {}", strerror(join_result));
 -			}
 -
 -			if (pthread_create(&Runner::runner_id, nullptr, &Runner::_runner, nullptr) != 0) {

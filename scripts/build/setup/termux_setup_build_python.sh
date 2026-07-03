@@ -50,7 +50,7 @@ termux_setup_build_python() {
 				-f "python-$_PYTHON_VERSION.tar.xz"
 			cd "$_PYTHON_FOLDER"
 
-			for f in "$TERMUX_SCRIPTDIR"/packages/python/0009-fix-ctypes-util-find_library.patch; do
+			for f in "$TERMUX_SCRIPTDIR"/packages/python/0008-fix-ctypes-util-find_library.patch; do
 				echo "[${FUNCNAME[0]}]: Applying $(basename "$f")"
 				cat "$f" | sed -e "s|@@TERMUX_PKG_API_LEVEL@@|${TERMUX_PKG_API_LEVEL}|g" | patch --silent -p1
 			done

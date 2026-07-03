@@ -1,0 +1,22 @@
+--- a/src/xdp-utils.c
++++ b/src/xdp-utils.c
+@@ -29,6 +29,7 @@
+ #include <stdint.h>
+ #include <stdio.h>
+ #include <string.h>
++#include <syscall.h>
+ #include <sys/random.h>
+ 
+ #include <gio/gio.h>
+@@ -1478,7 +1479,11 @@
+ {
+   uint8_t key[16];
+ 
++#if defined(__ANDROID__) && __ANDROID_API__ < 28
++  if (syscall(__NR_getrandom, key, sizeof (key), 0) != sizeof (key))
++#else
+   if (getrandom (key, sizeof (key), 0) != sizeof (key))
++#endif
+     {
+       g_set_error (error, G_IO_ERROR, g_io_error_from_errno (errno),
+                    "Failed to get random data: %s", g_strerror (errno));

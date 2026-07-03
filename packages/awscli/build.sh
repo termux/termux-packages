@@ -1,13 +1,14 @@
 TERMUX_PKG_HOMEPAGE=https://aws.amazon.com/cli
 TERMUX_PKG_DESCRIPTION="Universal Command Line Interface for Amazon Web Services"
 TERMUX_PKG_LICENSE="Apache-2.0"
+TERMUX_PKG_LICENSE_FILE="LICENSE.txt, exe/assets/THIRD_PARTY_LICENSES"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.34.0"
+TERMUX_PKG_VERSION="2.35.15"
 TERMUX_PKG_SRCURL="https://github.com/aws/aws-cli/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=c51f72d6272f6748c874ae395c66b06433922f7399e6b9e4f4aa4ed5806d5331
+TERMUX_PKG_SHA256=8aaad9e8704176598f4b62688a940d8e18cbaea636cc5feb77111027a9214bad
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+.\d+.\d+"
-TERMUX_PKG_DEPENDS="libandroid-posix-semaphore, libandroid-support, libbz2, libexpat, libffi, liblzma, libsqlite, mandoc, openssl, readline, zlib"
+TERMUX_PKG_DEPENDS="libandroid-posix-semaphore, libandroid-support, mandoc"
 TERMUX_PKG_SUGGESTS="groff"
 TERMUX_PKG_BUILD_DEPENDS="aosp-libs, python-pip, cmake, ldd"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -19,14 +20,11 @@ PYTHON=$TERMUX_PREFIX/bin/python
 # shellcheck disable=SC2115
 termux_step_pre_configure() {
 	export LDFLAGS+=" -lm"
-	export PIP_NO_BINARY=awscrt
 	export AWS_CRT_BUILD_FORCE_STATIC_LIBS=1
 
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
 		return
 	fi
-
-	local PYTHON_INCLUDE="$TERMUX_PREFIX/include/python$TERMUX_PYTHON_VERSION"
 
 	[[ -n "$TERMUX_PKG_TMPDIR" ]] || termux_error_exit "TERMUX_PKG_TMPDIR is unset"
 	rm -rf "${TERMUX_PKG_TMPDIR}/bin"
@@ -56,12 +54,13 @@ termux_step_pre_configure() {
 		ln -sf "$path" "$TERMUX_PKG_TMPDIR/bin/$target"
 	done
 
+	local PYTHON_INCLUDE="$TERMUX_PREFIX/include/python$TERMUX_PYTHON_VERSION"
+
 	TERMUX_PROOT_EXTRA_ENV_VARS=" \
 	LD_PRELOAD= LD_LIBRARY_PATH= \
-	PIP_NO_BINARY=$PIP_NO_BINARY \
 	AWS_CRT_BUILD_FORCE_STATIC_LIBS=$AWS_CRT_BUILD_FORCE_STATIC_LIBS \
-	PIP_NO_INDEX=1 \
 	PIP_VERBOSE=1 \
+	PIP_NO_CACHE_DIR=1 \
 	AS=$AS \
 	CC=$CC \
 	CPP=$CPP \
@@ -79,7 +78,9 @@ termux_step_pre_configure() {
 	CPPFLAGS='$CPPFLAGS -I$PYTHON_INCLUDE' \
 	CXXFLAGS='$CXXFLAGS' \
 	LDFLAGS='$LDFLAGS' \
-	"
+	PYTHON='$TERMUX_PREFIX/bin/python3' \
+	PYI_LOG_LEVEL=DEBUG \
+	" termux_setup_proot
 }
 
 termux_step_configure() {
@@ -88,10 +89,26 @@ termux_step_configure() {
 		return
 	fi
 
-	termux_setup_proot
-
 	termux-proot-run env PATH="$TERMUX_PKG_TMPDIR/bin:$TERMUX_PREFIX/bin:$PATH" \
 		"$TERMUX_PKG_SRCDIR/configure" --prefix="$TERMUX_PREFIX" $TERMUX_PKG_EXTRA_CONFIGURE_ARGS
+}
+
+termux_step_post_configure() {
+	cat <<-EOF >"$TERMUX_PKG_TMPDIR"/post_config.sh
+		python3 -m venv $TERMUX_PKG_TMPDIR/venv
+		source $TERMUX_PKG_TMPDIR/venv/bin/activate
+		pip3 install pip-tools
+		python3 $TERMUX_PKG_SRCDIR/scripts/regenerate-lock-files
+		deactivate
+	EOF
+
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
+		bash "$TERMUX_PKG_TMPDIR"/post_config.sh
+		return
+	fi
+
+	termux-proot-run env PATH="$TERMUX_PKG_TMPDIR/bin:$TERMUX_PREFIX/bin:$PATH" \
+		bash "$TERMUX_PKG_TMPDIR"/post_config.sh
 }
 
 termux_step_make() {
@@ -100,24 +117,9 @@ termux_step_make() {
 		return
 	fi
 
-	local WHEELHOUSE="$TERMUX_PKG_BUILDDIR/wheelhouse"
-	mkdir -p "$WHEELHOUSE"
-
-	python3 -m pip download \
-		--dest "$WHEELHOUSE" \
-		--platform "linux_$TERMUX_ARCH" \
-		--python-version "$TERMUX_PYTHON_VERSION" \
-		--implementation cp \
-		--abi cp"${TERMUX_PYTHON_VERSION//.}" \
-		--abi abi3 \
-		--abi none \
-		--no-deps \
-		-r "$TERMUX_PKG_SRCDIR/requirements/download-deps/bootstrap-lock.txt" \
-		-r "$TERMUX_PKG_SRCDIR/requirements/download-deps/portable-exe-lock.txt"
-
 	termux-proot-run \
 		-b "$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include/android:$TERMUX__PREFIX__INCLUDE_DIR/android" \
-		env PIP_FIND_LINKS="file://$WHEELHOUSE" PATH="$TERMUX_PKG_TMPDIR/bin:$TERMUX_PREFIX/bin:$PATH" \
+		env PATH="$TERMUX_PKG_TMPDIR/bin:$TERMUX_PREFIX/bin:$PATH" \
 		make
 }
 

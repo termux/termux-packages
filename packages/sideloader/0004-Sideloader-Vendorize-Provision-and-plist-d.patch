@@ -1,0 +1,145 @@
+From 1206855211085e74932f07a05be859989b0b0a9f Mon Sep 17 00:00:00 2001
+From: alexytomi <60690056+alexytomi@users.noreply.github.com>
+Date: Mon, 22 Dec 2025 02:38:39 +0800
+Subject: [PATCH 4/5] [Sideloader] "Vendorize" Provision and plist-d
+
+Since we need to apply patches to it, let's do it the more official way
+and have it as a path source in dub rather than abusing `dub build` to
+clone it into .dub cache and patching the cache.
+
+This method also reduces build time!
+---
+ dub.json                              | 8 +++-----
+ dub.selections.json                   | 4 ++--
+ frontends/cli/dub.selections.json     | 4 ++--
+ frontends/dlangui/dub.selections.json | 4 ++--
+ frontends/gtk/dub.selections.json     | 4 ++--
+ frontends/qt/dub.selections.json      | 4 ++--
+ frontends/swiftui/dub.selections.json | 4 ++--
+ 7 files changed, 15 insertions(+), 17 deletions(-)
+
+diff --git a/dub.json b/dub.json
+index 51cfd1a..8d9bd07 100644
+--- a/dub.json
++++ b/dub.json
+@@ -18,12 +18,10 @@
+         },
+         "intel-intrinsics": "~>1.11.15",
+         "plist-d": {
+-            "repository": "git+https://github.com/Dadoum/libplist-d.git",
+-            "version": "6fdaa60d62bbf7c55044069e8f03cbe74401c444"
++            "path": "./libplist-d/"
+         },
+         "provision": {
+-            "repository": "git+https://github.com/Dadoum/Provision.git",
+-            "version": "645d56d8e8c86c057893321843db00b21f1aaeb2"
++            "path": "./Provision/"
+         },
+         "requests": "~>2.1",
+         "slf4d": "~>2"
+@@ -40,4 +38,4 @@
+         "frontends/qt",
+         "frontends/swiftui"
+     ]
+-}
+\ No newline at end of file
++}
+diff --git a/dub.selections.json b/dub.selections.json
+index 7cc573a..5fb8612 100644
+--- a/dub.selections.json
++++ b/dub.selections.json
+@@ -30,9 +30,9 @@
+ 		"memutils": "1.0.10",
+ 		"mir-core": "1.6.0",
+ 		"plist": "~master",
+-		"plist-d": {"version":"6fdaa60d62bbf7c55044069e8f03cbe74401c444","repository":"git+https://github.com/Dadoum/libplist-d.git"},
++		"plist-d": {"path":"libplist-d/"},
+ 		"progress": "5.0.2",
+-		"provision": {"version":"645d56d8e8c86c057893321843db00b21f1aaeb2","repository":"git+https://github.com/Dadoum/Provision.git"},
++		"provision": {"path":"Provision/"},
+ 		"requests": "2.1.2",
+ 		"silly": "1.2.0-dev.2",
+ 		"slf4d": "2.4.3",
+diff --git a/frontends/cli/dub.selections.json b/frontends/cli/dub.selections.json
+index e651f97..f0895d7 100644
+--- a/frontends/cli/dub.selections.json
++++ b/frontends/cli/dub.selections.json
+@@ -30,9 +30,9 @@
+ 		"memutils": "1.0.10",
+ 		"mir-core": "1.6.0",
+ 		"plist": "~master",
+-		"plist-d": {"version":"6fdaa60d62bbf7c55044069e8f03cbe74401c444","repository":"git+https://github.com/Dadoum/libplist-d.git"},
++		"plist-d": {"path":"../../libplist-d/"},
+ 		"progress": "5.0.2",
+-		"provision": {"version":"645d56d8e8c86c057893321843db00b21f1aaeb2","repository":"git+https://github.com/Dadoum/Provision.git"},
++		"provision": {"path":"../../Provision/"},
+ 		"requests": "2.1.2",
+ 		"sideloader": {"path":"../../"},
+ 		"silly": "1.2.0-dev.2",
+diff --git a/frontends/dlangui/dub.selections.json b/frontends/dlangui/dub.selections.json
+index e651f97..f0895d7 100644
+--- a/frontends/dlangui/dub.selections.json
++++ b/frontends/dlangui/dub.selections.json
+@@ -30,9 +30,9 @@
+ 		"memutils": "1.0.10",
+ 		"mir-core": "1.6.0",
+ 		"plist": "~master",
+-		"plist-d": {"version":"6fdaa60d62bbf7c55044069e8f03cbe74401c444","repository":"git+https://github.com/Dadoum/libplist-d.git"},
++		"plist-d": {"path":"../../libplist-d/"},
+ 		"progress": "5.0.2",
+-		"provision": {"version":"645d56d8e8c86c057893321843db00b21f1aaeb2","repository":"git+https://github.com/Dadoum/Provision.git"},
++		"provision": {"path":"../../Provision/"},
+ 		"requests": "2.1.2",
+ 		"sideloader": {"path":"../../"},
+ 		"silly": "1.2.0-dev.2",
+diff --git a/frontends/gtk/dub.selections.json b/frontends/gtk/dub.selections.json
+index e651f97..f0895d7 100644
+--- a/frontends/gtk/dub.selections.json
++++ b/frontends/gtk/dub.selections.json
+@@ -30,9 +30,9 @@
+ 		"memutils": "1.0.10",
+ 		"mir-core": "1.6.0",
+ 		"plist": "~master",
+-		"plist-d": {"version":"6fdaa60d62bbf7c55044069e8f03cbe74401c444","repository":"git+https://github.com/Dadoum/libplist-d.git"},
++		"plist-d": {"path":"../../libplist-d/"},
+ 		"progress": "5.0.2",
+-		"provision": {"version":"645d56d8e8c86c057893321843db00b21f1aaeb2","repository":"git+https://github.com/Dadoum/Provision.git"},
++		"provision": {"path":"../../Provision/"},
+ 		"requests": "2.1.2",
+ 		"sideloader": {"path":"../../"},
+ 		"silly": "1.2.0-dev.2",
+diff --git a/frontends/qt/dub.selections.json b/frontends/qt/dub.selections.json
+index e651f97..f0895d7 100644
+--- a/frontends/qt/dub.selections.json
++++ b/frontends/qt/dub.selections.json
+@@ -30,9 +30,9 @@
+ 		"memutils": "1.0.10",
+ 		"mir-core": "1.6.0",
+ 		"plist": "~master",
+-		"plist-d": {"version":"6fdaa60d62bbf7c55044069e8f03cbe74401c444","repository":"git+https://github.com/Dadoum/libplist-d.git"},
++		"plist-d": {"path":"../../libplist-d/"},
+ 		"progress": "5.0.2",
+-		"provision": {"version":"645d56d8e8c86c057893321843db00b21f1aaeb2","repository":"git+https://github.com/Dadoum/Provision.git"},
++		"provision": {"path":"../../Provision/"},
+ 		"requests": "2.1.2",
+ 		"sideloader": {"path":"../../"},
+ 		"silly": "1.2.0-dev.2",
+diff --git a/frontends/swiftui/dub.selections.json b/frontends/swiftui/dub.selections.json
+index e651f97..f0895d7 100644
+--- a/frontends/swiftui/dub.selections.json
++++ b/frontends/swiftui/dub.selections.json
+@@ -30,9 +30,9 @@
+ 		"memutils": "1.0.10",
+ 		"mir-core": "1.6.0",
+ 		"plist": "~master",
+-		"plist-d": {"version":"6fdaa60d62bbf7c55044069e8f03cbe74401c444","repository":"git+https://github.com/Dadoum/libplist-d.git"},
++		"plist-d": {"path":"../../libplist-d/"},
+ 		"progress": "5.0.2",
+-		"provision": {"version":"645d56d8e8c86c057893321843db00b21f1aaeb2","repository":"git+https://github.com/Dadoum/Provision.git"},
++		"provision": {"path":"../../Provision/"},
+ 		"requests": "2.1.2",
+ 		"sideloader": {"path":"../../"},
+ 		"silly": "1.2.0-dev.2",
+-- 
+2.51.2
+

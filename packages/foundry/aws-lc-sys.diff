@@ -1,0 +1,31 @@
+Prevents error:
+gitoxide/src/vendor/aws-lc-sys/aws-lc/crypto/rand_extra/getentropy.c:35:9: error: call to undeclared function 'getentropy'
+
+--- a/aws-lc/crypto/rand_extra/internal.h
++++ b/aws-lc/crypto/rand_extra/internal.h
+@@ -13,7 +13,8 @@
+ #elif defined(OPENSSL_MACOS) || defined(OPENSSL_OPENBSD) || \
+     defined(OPENSSL_FREEBSD)  || defined(OPENSSL_NETBSD) || \
+     defined(OPENSSL_SOLARIS) || defined(OPENSSL_WASM) || \
+-    (defined(OPENSSL_LINUX) && !defined(HAVE_LINUX_RANDOM_H))
++    (defined(OPENSSL_LINUX) && !defined(HAVE_LINUX_RANDOM_H) && \
++    !defined(__ANDROID__) || __ANDROID_API__ >= 28)
+ #define OPENSSL_RAND_GETENTROPY
+ #elif defined(OPENSSL_IOS)
+ #define OPENSSL_RAND_CCRANDOMGENERATEBYTES
+
+--- a/builder/cc_builder.rs	2026-05-10 09:42:41.006902478 +0600
++++ b/builder/cc_builder.rs	2026-05-10 15:54:27.113039568 +0600
+@@ -712,11 +712,6 @@
+         // custom linker setups this could lead to a mismatch between the
+         // expected and the actually used linker. Explicitly respecting LDFLAGS
+         // here brings us back to parity with CMake.
+-        if let Ok(ldflags) = std::env::var("LDFLAGS") {
+-            for flag in ldflags.split_whitespace() {
+-                memcmp_compile_args.push(flag.into());
+-            }
+-        }
+
+         memcmp_compile_args.push(
+             self.manifest_dir
+

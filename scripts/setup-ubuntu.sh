@@ -72,7 +72,7 @@ PACKAGES+=" xmltoman"
 PACKAGES+=" python3-pip"
 PACKAGES+=" python3-setuptools"
 PACKAGES+=" python-wheel-common"
-PACKAGES+=" python3.12-venv"
+PACKAGES+=" python3.14-venv"
 
 # Needed by package bc.
 PACKAGES+=" ed"
@@ -220,7 +220,7 @@ PACKAGES+=" gtk-doc-tools"
 PACKAGES+=" happy"
 PACKAGES+=" itstool"
 PACKAGES+=" libdbus-glib-1-dev-bin"
-PACKAGES+=" libgdk-pixbuf2.0-dev"
+PACKAGES+=" libgdk-pixbuf-xlib-2.0-dev"
 PACKAGES+=" python3-html5lib"
 PACKAGES+=" python3-xcbgen"
 PACKAGES+=" sassc"
@@ -238,6 +238,11 @@ PACKAGES+=" sqlite3"
 # Needed by packages in game repository
 PACKAGES+=" cvs"
 PACKAGES+=" python3-yaml"
+
+# Needed by blueprint-compiler (termux_setup_bpc)
+PACKAGES+=" python3-gi"
+PACKAGES+=" python3-gi-cairo"
+PACKAGES+=" gir1.2-gtk-4.0"
 
 # Needed by gobject-introspection (termux_setup_gir).
 PACKAGES+=" bash-static"
@@ -314,6 +319,9 @@ PACKAGES+=" patchelf"
 # Needed by lldb for python integration
 PACKAGES+=" swig"
 
+# Needed by nchat
+PACKAGES+=" libmagic-dev"
+
 # Needed by binutils-cross
 PACKAGES+=" libzstd-dev"
 
@@ -339,7 +347,7 @@ $SUDO env DEBIAN_FRONTEND=noninteractive \
 $SUDO cp $(dirname "$(realpath "$0")")/llvm-snapshot.gpg.key /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 $SUDO chmod a+r /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 {
-	echo "deb [arch=amd64] http://apt.llvm.org/noble/ llvm-toolchain-noble-${TERMUX_HOST_LLVM_MAJOR_VERSION} main"
+	echo "deb [arch=amd64] http://apt.llvm.org/resolute/ llvm-toolchain-resolute-${TERMUX_HOST_LLVM_MAJOR_VERSION} main"
 } | $SUDO tee /etc/apt/sources.list.d/apt-llvm-org.list > /dev/null
 
 LLVM_PACKAGES=""
@@ -370,27 +378,28 @@ $SUDO chown -R "$(whoami)" "${TERMUX_APP__DATA_DIR%"${TERMUX_APP__DATA_DIR#/*/}"
 # and scripts/build/setup/termux_setup_proot.sh for more information
 $SUDO ln -sf "$TERMUX_APP__DATA_DIR/aosp" /system
 
-# Install newer pkg-config then what ubuntu provides, as the stock
-# ubuntu version has performance problems with at least protobuf:
-PKGCONF_VERSION=2.3.0
-PKGCONF_SHA256=3a9080ac51d03615e7c1910a0a2a8df08424892b5f13b0628a204d3fcce0ea8b
-HOST_TRIPLET=$(gcc -dumpmachine)
-PKG_CONFIG_DIRS=$(grep DefaultSearchPaths: /usr/share/pkgconfig/personality.d/${HOST_TRIPLET}.personality | cut -d ' ' -f 2)
-SYSTEM_LIBDIRS=$(grep SystemLibraryPaths: /usr/share/pkgconfig/personality.d/${HOST_TRIPLET}.personality | cut -d ' ' -f 2)
-mkdir -p /tmp/pkgconf-build
-cd /tmp/pkgconf-build
-curl -O https://distfiles.ariadne.space/pkgconf/pkgconf-${PKGCONF_VERSION}.tar.xz
-tar xf pkgconf-${PKGCONF_VERSION}.tar.xz
-echo "${PKGCONF_SHA256}  pkgconf-${PKGCONF_VERSION}.tar.xz" | sha256sum -c -
-cd pkgconf-${PKGCONF_VERSION}
-echo "SYSTEM_LIBDIRS: $SYSTEM_LIBDIRS"
-echo "PKG_CONFIG_DIRS: $PKG_CONFIG_DIRS"
-./configure --prefix=/usr \
-	--with-system-libdir=${SYSTEM_LIBDIRS} \
-	--with-pkg-config-dir=${PKG_CONFIG_DIRS}
-make
-$SUDO make install
-cd -
-rm -Rf /tmp/pkgconf-build
+# Use GNU Coreutils as Rust coreutils has bugs which we are affected with.
+# Known problems with Rust coreutils:
+# comm: https://github.com/uutils/coreutils/issues/12972
+mkdir -p /tmp/build-essential-build
+pushd /tmp/build-essential-build
+$SUDO sed -i 's/^Types: deb$/Types: deb deb-src/g' /etc/apt/sources.list.d/ubuntu.sources
+$SUDO apt-get update
+$SUDO env DEBIAN_FRONTEND=noninteractive \
+	apt-get install -yq devscripts debhelper
+apt source build-essential
+sed -i 's/coreutils-from-uutils/coreutils-from-uutils | coreutils-from-gnu/g' \
+	build-essential-*/debian/control
+pushd build-essential-*
+debuild -b -uc -us
+popd # build-essential-*
+$SUDO env DEBIAN_FRONTEND=noninteractive \
+	apt-get reinstall -yq --allow-downgrades \
+	./build-essential_*.deb
+$SUDO env DEBIAN_FRONTEND=noninteractive \
+	apt-get remove -yq --autoremove --allow-remove-essential \
+	devscripts debhelper coreutils-from-uutils
+popd # /tmp/build-essential-build
+rm -Rf /tmp/build-essential-build
 # Prevent package from being upgraded and overwriting our manual installation:
-$SUDO apt-mark hold pkgconf
+$SUDO apt-mark hold build-essential

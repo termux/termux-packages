@@ -2,30 +2,32 @@ TERMUX_PKG_HOMEPAGE=https://myriad-dreamin.github.io/tinymist
 TERMUX_PKG_DESCRIPTION="An integrated language service for Typst"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
-TERMUX_PKG_VERSION="0.14.10"
-TERMUX_PKG_SRCURL=https://github.com/Myriad-Dreamin/tinymist/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=215c08d8a10ff51e15711f0684eafc85d119dc98db57f4f47ec7bf5987ea681e
+TERMUX_PKG_VERSION="0.15.2"
+TERMUX_PKG_SRCURL="https://github.com/Myriad-Dreamin/tinymist/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=f7a3bbcf4f6020aea6071b86bc9d20bdde2208f6dcbef019593e257baad4cca6
 TERMUX_PKG_DEPENDS="openssl"
 TERMUX_PKG_BREAKS="typst-lsp"
 TERMUX_PKG_REPLACES="typst-lsp"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXCLUDED_ARCHES="i686"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+\.\d+'
+TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+\.\d*[02468](?!-)' # https://github.com/Myriad-Dreamin/tinymist#versioning-and-release-cycle
 
 
 termux_step_pre_configure() {
 	# We're not shipping the VS Code plugin
 	rm -rf .vscode
+
+	# tinymist-viewer tries to open an android native window to show preview but fails
+	rm -rf ./crates/tinymist-viewer
+
 	termux_setup_rust
 	unset CFLAGS # clash with rust host build
 
-	: "${CARGO_HOME:=$HOME/.cargo}"
-	export CARGO_HOME
 	export OPENSSL_NO_VENDOR=1
 	export PKG_CONFIG_ALL_DYNAMIC=1
 
-	cargo fetch --locked --target "$CARGO_TARGET_NAME"
+	cargo fetch --target "$CARGO_TARGET_NAME"
 }
 
 termux_step_make() {
@@ -37,6 +39,7 @@ termux_step_make() {
 
 termux_step_make_install() {
 	install -Dm700 -t "$TERMUX_PREFIX/bin" target/"${CARGO_TARGET_NAME}"/release/tinymist
+	install -Dm700 -t "$TERMUX_PREFIX/bin" target/"${CARGO_TARGET_NAME}"/release/typlite
 
 	mkdir -p "${TERMUX_PREFIX}/share/elvish/lib"
 	mkdir -p "${TERMUX_PREFIX}/share/zsh/site-functions"

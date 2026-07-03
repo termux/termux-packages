@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A sh-compatible shell that incorporates useful features 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION=5.3.9
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/bash/bash-${TERMUX_PKG_VERSION%.*}.tar.gz
 TERMUX_PKG_SHA256=0d5cd86965f869a26cf64f4b71be7b96f90a3ba8b3d74e27e8e9d9d5550f31ba
 TERMUX_PKG_AUTO_UPDATE=false
@@ -57,6 +58,9 @@ termux_step_pre_configure() {
 			"${PATCH_CHECKSUMS[$PATCH_NUM]}"
 		patch -p0 -i "$PATCHFILE"
 	done
+	# Bash tries to redefine bool keyword which breaks with GCC 15, so use Clang for
+	# build (the binaries that are run on the builder)
+	export CC_FOR_BUILD="clang-${TERMUX_HOST_LLVM_MAJOR_VERSION}"
 }
 
 termux_step_post_make_install() {

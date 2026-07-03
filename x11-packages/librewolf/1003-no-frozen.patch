@@ -1,0 +1,36 @@
+Prevents:
+error: cannot update the lock file /home/builder/.termux-build/librewolf/src/Cargo.lock
+because --frozen was passed to prevent this
+
+--- a/python/mozbuild/mozbuild/vendor/vendor_rust.py
++++ b/python/mozbuild/mozbuild/vendor/vendor_rust.py
+@@ -734,7 +734,6 @@ license file's hash.
+         flags = ["--output-format=json"]
+         if "MOZ_AUTOMATION" in os.environ:
+             flags.append("--locked")
+-            flags.append("--frozen")
+         res = cargo_vet(
+             self,
+             flags,
+--- a/config/makefiles/rust.mk
++++ b/config/makefiles/rust.mk
+@@ -24,7 +24,6 @@ endif
+ # within a tree, the Rust dependencies have been vendored in so Cargo won't
+ # touch the lock file.
+ ifndef JS_STANDALONE
+-cargo_build_flags += --frozen
+ endif
+ 
+ cargo_build_flags += --manifest-path $(CARGO_FILE)
+ 
+--- a/build/RunCbindgen.py
++++ b/build/RunCbindgen.py
+@@ -55,7 +55,7 @@ def generate_metadata(output, cargo_config):
+     # within a tree, the Rust dependencies have been vendored in so Cargo won't
+     # touch the lock file.
+     if not buildconfig.substs.get("JS_STANDALONE"):
+-        args.append("--frozen")
++        pass
+ 
+     stdout, returncode = _run_process(args)
+ 

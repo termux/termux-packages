@@ -1,0 +1,22 @@
+--- a/zig/lib/libc/musl/src/network/resolvconf.c
++++ b/zig/lib/libc/musl/src/network/resolvconf.c
+@@ -19,6 +19,7 @@
+ 	if (search) *search = 0;
+ 
+ 	f = __fopen_rb_ca("/etc/resolv.conf", &_f, _buf, sizeof _buf);
++	if (!f) f = __fopen_rb_ca("@TERMUX_PREFIX@/etc/resolv.conf", &_f, _buf, sizeof _buf);
+ 	if (!f) switch (errno) {
+ 	case ENOENT:
+ 	case ENOTDIR:
+--- a/zig/lib/std/Io/net/HostName.zig
++++ b/zig/lib/std/Io/net/HostName.zig
+@@ -402,7 +402,8 @@
+             .attempts = 2,
+         };
+ 
+-        const file = Io.Dir.openFileAbsolute(io, "/etc/resolv.conf", .{}) catch |err| switch (err) {
++        const resolvconf = Io.Dir.openFileAbsolute(io, "/etc/resolv.conf", .{}) catch Io.Dir.openFileAbsolute(io, "@TERMUX_PREFIX@/etc/resolv.conf", .{});
++        const file = resolvconf catch |err| switch (err) {
+             error.FileNotFound,
+             error.NotDir,
+             error.AccessDenied,

@@ -11,19 +11,28 @@
  [[maybe_unused]] static const char *kForceDefaultCallbackKey = "debug.vvl.forcelayerlog";
 --- a/third_party/vulkan-validation-layers/src/layers/vk_layer_config.cpp
 +++ b/third_party/vulkan-validation-layers/src/layers/vk_layer_config.cpp
-@@ -52,7 +52,7 @@
+@@ -42,7 +42,7 @@
+ #define GetCurrentDir getcwd
  #endif
  
- std::string GetEnvironment(const char *variable) {
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ static void PropCallback(void* cookie, [[maybe_unused]] const char* name, const char* value, [[maybe_unused]] uint32_t serial) {
+     std::string* property = static_cast<std::string*>(cookie);
+     *property = value;
+@@ -50,7 +50,7 @@
+ #endif
+ 
+ std::string GetEnvironment(const char* variable) {
 -#if !defined(__ANDROID__) && !defined(_WIN32)
-+#if !(defined(__ANDROID__) && !defined(__TERMUX__)) && !defined(_WIN32)
-     const char *output = getenv(variable);
++#if (!defined(__ANDROID__) && !defined(_WIN32)) || defined(__TERMUX__)
+     const char* output = getenv(variable);
      return output == NULL ? "" : output;
  #elif defined(_WIN32)
-@@ -90,7 +90,7 @@
+@@ -88,7 +88,7 @@
  }
  
- void SetEnvironment(const char *variable, const char *value) {
+ void SetEnvironment(const char* variable, const char* value) {
 -#if !defined(__ANDROID__) && !defined(_WIN32)
 +#if (!defined(__ANDROID__) && !defined(_WIN32)) || defined(__TERMUX__)
      setenv(variable, value, 1);

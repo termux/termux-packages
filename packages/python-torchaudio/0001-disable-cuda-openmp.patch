@@ -1,0 +1,17 @@
+--- ../cache/tmp-checkout/tools/setup_helpers/extension.py	2024-10-03 18:27:06.446948017 +0000
++++ ./tools/setup_helpers/extension.py	2024-10-04 12:28:00.563912841 +0000
+@@ -35,11 +35,11 @@ def _get_build(var, default=False):
+ _BUILD_CPP_TEST = _get_build("BUILD_CPP_TEST", False)
+ _BUILD_RIR = _get_build("BUILD_RIR", True)
+ _BUILD_RNNT = _get_build("BUILD_RNNT", True)
+-_USE_ROCM = _get_build("USE_ROCM", torch.backends.cuda.is_built() and torch.version.hip is not None)
+-_USE_CUDA = _get_build("USE_CUDA", torch.backends.cuda.is_built() and torch.version.hip is None)
++_USE_ROCM = _get_build("USE_ROCM", False)
++_USE_CUDA = _get_build("USE_CUDA", False)
+ _BUILD_ALIGN = _get_build("BUILD_ALIGN", True)
+ _BUILD_CUDA_CTC_DECODER = _get_build("BUILD_CUDA_CTC_DECODER", _USE_CUDA)
+-_USE_OPENMP = _get_build("USE_OPENMP", True) and "ATen parallel backend: OpenMP" in torch.__config__.parallel_info()
++_USE_OPENMP = _get_build("USE_OPENMP", False)
+ _TORCH_CUDA_ARCH_LIST = os.environ.get("TORCH_CUDA_ARCH_LIST", None)
+ 
+ 

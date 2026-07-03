@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Free and open source program for creating and animating 
 TERMUX_PKG_LICENSE="GPL-2.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/LibreSprite/LibreSprite/releases/download/v$TERMUX_PKG_VERSION/SOURCE.CODE.+.submodules.tar.gz"
 TERMUX_PKG_SHA256=38a2387694df9d5725244622d1c2e6cae8aced06b19c19cfbeab96afb13523c0
 TERMUX_PKG_AUTO_UPDATE=true
@@ -32,7 +33,7 @@ termux_step_host_build() {
 	termux_setup_cmake
 	termux_setup_ninja
 
-	termux_download_ubuntu_packages libtinyxml2-10 libtinyxml2-dev
+	termux_download_ubuntu_packages libtinyxml2-dev libtinyxml2-11
 
 	cmake "$TERMUX_PKG_SRCDIR" \
 		-GNinja \

@@ -3,13 +3,16 @@ TERMUX_PKG_DESCRIPTION="A perceptual video quality assessment algorithm develope
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="../LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.0.0"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="3.2.0"
 TERMUX_PKG_SRCURL=https://github.com/Netflix/vmaf/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=7178c4833639e6b989ecae73131d02f70735fdb3fc2c7d84bc36c9c3461d93b1
+TERMUX_PKG_SHA256=a28f93f3b4fa65601be324587072e32a6a704a304ba7b1aec9b70b3f709bc1dc
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++"
 
 termux_step_pre_configure() {
-	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/libvmaf
+	TERMUX_PKG_SRCDIR="$TERMUX_PKG_SRCDIR/libvmaf"
+	# https://github.com/Netflix/vmaf/issues/1481
+	if [[ "$TERMUX_ARCH" == "i686" ]]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-Denable_asm=false"
+	fi
 }

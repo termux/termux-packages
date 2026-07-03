@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility 
 TERMUX_PKG_LICENSE="Apache-2.0, VIM License"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
-TERMUX_PKG_VERSION="0.12.0~dev-2603+g9ab6c607cc"
+TERMUX_PKG_VERSION="0.13.0~dev-903+g87c2319986"
 TERMUX_PKG_SRCURL="https://github.com/neovim/neovim/archive/${TERMUX_PKG_VERSION##*+g}.tar.gz"
-TERMUX_PKG_SHA256=a1bd2b757980e81db3af25e62db92f19f7f0d99493aa3f024f9c51ccc9d3d588
+TERMUX_PKG_SHA256=7af195f2b4557be968254aa54702942a2e57d01e44e30cc2148f1024e2505d6c
 TERMUX_PKG_REPOLOGY_METADATA_VERSION="${TERMUX_PKG_VERSION%%~*}"
 TERMUX_PKG_DEPENDS="libandroid-support, libiconv, libmsgpack, libunibilium, libuv, libvterm (>= 1:0.3-0), lua51-lpeg, luajit, luv, tree-sitter, tree-sitter-parsers, utf8proc"
 TERMUX_PKG_BREAKS="neovim"
@@ -20,10 +20,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLUAJIT_INCLUDE_DIR=$TERMUX_PREFIX/include/luajit-2.1
 -DLPEG_LIBRARY=$TERMUX_PREFIX/lib/liblpeg-5.1.so
 -DCOMPILE_LUA=OFF
-"
-
-# Available since 0.12.0~dev-2459+g62135f5a57
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 -DNLUA0_HOST_PRG=$TERMUX_PKG_HOSTBUILD_DIR/libnlua0.so
 -DNVIM_HOST_PRG=$TERMUX_PKG_HOSTBUILD_DIR/nvim
 "
@@ -78,21 +74,6 @@ termux_step_host_build() {
 
 	make distclean
 	rm -Rf build/
-}
-
-termux_step_pre_configure() {
-	# neovim has a weird CMake file that attempts to preprocess generated headers
-	# using the NDK Clang, but without ever adding the necessary --target argument
-	# to its commands for cross-preprocessing, so that must be done manually
-	local target="$CCTERMUX_HOST_PLATFORM"
-	if [[ "$TERMUX_ARCH" == "arm" ]]; then
-		target="armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL"
-	fi
-	patch="$TERMUX_PKG_BUILDER_DIR/add-target-to-gen-preprocessing.diff"
-	echo "Applying patch: $(basename "$patch")"
-	test -f "$patch" && sed \
-		-e "s%\@TARGET\@%${target}%g" \
-		"$patch" | patch --silent -p1
 }
 
 termux_step_post_make_install() {

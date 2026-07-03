@@ -8,9 +8,9 @@
                  if (!FileSystem::hardLink(blobPath, path))
                      WTFLogAlways("Failed to create hard link from %s to %s", blobPath.utf8().data(), path.utf8().data());
 +#endif
-                 return { existingData, hash };
-             }
-         }
+                 BlobStorage::Blob result { existingData, hash };
+ #if ENABLE(NETWORK_CACHE_BLOB_STORAGE_MEMORY_CACHE)
+                 if (addToMemoryCache && m_memoryCache)
 @@ -111,8 +113,10 @@ BlobStorage::Blob BlobStorage::add(const
      if (mappedData.isNull())
          return { };

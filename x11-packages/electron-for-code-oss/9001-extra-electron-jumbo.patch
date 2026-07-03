@@ -1,0 +1,26 @@
+--- a/electron/shell/browser/extensions/electron_extension_tab_util.cc
++++ b/electron/shell/browser/extensions/electron_extension_tab_util.cc
+@@ -9,10 +9,10 @@
+ 
+ namespace extensions {
+ 
+-electron::api::WebContents* GetElectronTabById(
++::electron::api::WebContents* GetElectronTabById(
+     int tab_id,
+     content::BrowserContext* browser_context) {
+-  auto* contents = electron::api::WebContents::FromID(tab_id);
++  auto* contents = ::electron::api::WebContents::FromID(tab_id);
+   if (!contents || !contents->web_contents())
+     return nullptr;
+   if (contents->web_contents()->GetBrowserContext() != browser_context)
+--- a/electron/shell/browser/extensions/electron_extension_tab_util.h
++++ b/electron/shell/browser/extensions/electron_extension_tab_util.h
+@@ -20,7 +20,7 @@
+ // treated as nonexistent so that an extension loaded into one Session cannot
+ // observe or operate on windows belonging to another Session, matching
+ // Chrome's profile-scoped ExtensionTabUtil::GetTabById semantics.
+-electron::api::WebContents* GetElectronTabById(
++::electron::api::WebContents* GetElectronTabById(
+     int tab_id,
+     content::BrowserContext* browser_context);
+ 

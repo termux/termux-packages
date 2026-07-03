@@ -44,7 +44,7 @@ termux_install_temporary_glibc() {
 	local PATH_TMP_GLIBC="$TERMUX_COMMON_CACHEDIR/temporary_glibc_for_cgct"
 	mkdir -p "$PATH_TMP_GLIBC"
 
-	local GPKG_LINK="https://service.termux-pacman.dev/gpkg/$TERMUX_ARCH"
+	local GPKG_LINK="https://sync.termux-pacman.dev/gpkg/$TERMUX_ARCH"
 	local GPKG_JSON="$PATH_TMP_GLIBC/gpkg-$TERMUX_ARCH.json"
 	termux_download "$GPKG_LINK/gpkg.json" \
 		"$GPKG_JSON" \

@@ -1,7 +1,7 @@
 --- a/zellij-server/src/pty.rs
 +++ b/zellij-server/src/pty.rs
-@@ -1048,7 +1048,7 @@
- 
+@@ -2244,8 +2244,8 @@
+ #[cfg(not(windows))]
  pub fn get_default_shell() -> PathBuf {
      PathBuf::from(std::env::var("SHELL").unwrap_or_else(|_| {
 -        log::warn!("Cannot read SHELL env, falling back to use /bin/sh");
@@ -10,14 +10,15 @@
 +        "@TERMUX_PREFIX@/bin/sh".to_string()
      }))
  }
+ 
 --- a/zellij-utils/src/consts.rs
 +++ b/zellij-utils/src/consts.rs
-@@ -13,7 +13,7 @@ pub const DEFAULT_SCROLL_BUFFER_SIZE: usize = 10_000;
- pub static SCROLL_BUFFER_SIZE: OnceCell<usize> = OnceCell::new();
- pub static DEBUG_MODE: OnceCell<bool> = OnceCell::new();
+@@ -16,7 +16,7 @@
+ pub static DEBUG_MODE: OnceLock<bool> = OnceLock::new();
  
+ #[cfg(not(windows))]
 -pub const SYSTEM_DEFAULT_CONFIG_DIR: &str = "/etc/zellij";
 +pub const SYSTEM_DEFAULT_CONFIG_DIR: &str = "@TERMUX_PREFIX@/etc/zellij";
+ #[cfg(windows)]
+ pub const SYSTEM_DEFAULT_CONFIG_DIR: &str = "C:\\ProgramData\\Zellij";
  pub const SYSTEM_DEFAULT_DATA_DIR_PREFIX: &str = system_default_data_dir();
- 
- const fn system_default_data_dir() -> &'static str {

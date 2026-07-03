@@ -1,10 +1,11 @@
-TERMUX_PKG_HOMEPAGE=https://waterlan.home.xs4all.nl/dos2unix.html
+TERMUX_PKG_HOMEPAGE=https://waterlander.net/dos2unix/
 TERMUX_PKG_DESCRIPTION="Converts between DOS and Unix text files"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_LICENSE_FILE="COPYING.txt"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="7.5.4"
-TERMUX_PKG_SRCURL="https://waterlan.home.xs4all.nl/dos2unix/dos2unix-${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=f811a2b9e4a0c936c61ef7c1732993d1820e5cf011f4d93861885ccb8101ca21
-TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_VERSION="7.5.6"
+TERMUX_PKG_SRCURL="https://waterlander.net/dos2unix/files/dos2unix-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=63650acbd0c7fa8623429bcbf93a888e3351a1cad0f556cf41876f5673dd7d0b
 TERMUX_PKG_DEPENDS="libandroid-support"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true

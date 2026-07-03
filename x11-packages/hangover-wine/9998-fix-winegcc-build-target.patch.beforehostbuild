@@ -1,21 +1,24 @@
 --- a/tools/winegcc/winegcc.c.orig
 +++ b/tools/winegcc/winegcc.c
-@@ -430,8 +430,17 @@
+@@ -406,10 +406,20 @@
+ 
+ static void add_clang_options( const char *target_name, struct strarray *ret )
+ {
++    const char* str = NULL;
+     if (target_name)
      {
-         if (target_name)
-         {
-+            if (strstr(target_name, "android")) {
-+                if (strstr(target_name, "arm")) {
-+                    str = strmake( "%s24", "armv7a-linux-androideabi" );
-+                } else {
-+                    str = strmake( "%s24", target_name );
-+                }
++        if (strstr(target_name, "android")) {
++            if (strstr(target_name, "arm")) {
++                str = strmake( "%s24", "armv7a-linux-androideabi" );
 +            } else {
-+                str = strmake( "%s", target_name );
++                str = strmake( "%s24", target_name );
 +            }
-             strarray_add( &ret, "-target" );
--            strarray_add( &ret, target_name );
-+            strarray_add( &ret, str );
-         }
-         strarray_add( &ret, "-Wno-unused-command-line-argument" );
-         strarray_add( &ret, "-fuse-ld=lld" );
++        } else {
++            str = strmake( "%s", target_name );
++        }
+         strarray_add( ret, "-target" );
+-        strarray_add( ret, target_name );
++        strarray_add( ret, str );
+     }
+     strarray_add( ret, "-Wno-unused-command-line-argument" );
+     strarray_add( ret, "-fuse-ld=lld" );

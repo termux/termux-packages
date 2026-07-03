@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(1:4.3.2
                     1.0.5)
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=(https://github.com/zmap/zmap/archive/refs/tags/v${TERMUX_PKG_VERSION[0]#*:}.tar.gz
                    http://downloads.sourceforge.net/sourceforge/judy/Judy-${TERMUX_PKG_VERSION[1]}.tar.gz)
 TERMUX_PKG_SHA256=(2f1e031d07d9c7040bf75aa58e258c311985e2b32dbb9a375e0d1c31bcedbf0a

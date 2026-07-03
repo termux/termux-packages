@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE="https://www.cups.org/"
 TERMUX_PKG_DESCRIPTION="Common UNIX Printing System"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.4.16"
+TERMUX_PKG_VERSION="2.4.19"
 TERMUX_PKG_SRCURL=https://github.com/OpenPrinting/cups/releases/download/v${TERMUX_PKG_VERSION}/cups-${TERMUX_PKG_VERSION}-source.tar.gz
-TERMUX_PKG_SHA256=0339587204b4f9428dd0592eb301dec0bf9ea6ea8dce5d9690d56be585aba92d
+TERMUX_PKG_SHA256=820984b12a67f98705785aae2dd1347fe0ac097828001d4583ff64574aed6389
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, libcrypt, libgnutls, libiconv, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn"
@@ -27,10 +27,16 @@ termux_step_pre_configure() {
 	export CHOWNPROG=true CHGRPPROG=true
 }
 
+termux_step_post_massage() {
+	# Restore world-readable permissions stripped by termux_step_massage
+	chmod -R o+rX share/doc/cups
+}
 
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
 	#!${TERMUX_PREFIX}/bin/sh
 	mkdir -p $TERMUX_PREFIX/var/run/cups
+	mkdir -p $TERMUX_PREFIX/var/spool/cups/tmp
+	mkdir -p $TERMUX_PREFIX/var/cache/cups
 	EOF
 }

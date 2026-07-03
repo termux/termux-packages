@@ -1,16 +1,15 @@
-diff --git a/Makefile b/Makefile
-index 82bd263..919fd1a 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1,9 +1,9 @@
- .POSIX:
+@@ -2,10 +2,10 @@
+ .PHONY: all install clean
  
+ OS=posix
 -PREFIX=/usr/local
 +PREFIX=@TERMUX_PREFIX@
  BINDIR=$(PREFIX)/bin
  MANDIR=$(PREFIX)/share/man
--ALL_CFLAGS=$(CFLAGS) -std=c99 -Wall -Wextra -Wpedantic -Wno-unused-parameter
-+ALL_CFLAGS=$(CFLAGS) -std=c99 -Wall -Wextra -Wpedantic -Wno-unused-parameter -I@TERMUX_PREFIX@/include
+-ALL_CFLAGS=$(CFLAGS) -std=c99 -Wall -Wextra -Wshadow -Wmissing-prototypes -Wpedantic -Wno-unused-parameter
++ALL_CFLAGS=$(CFLAGS) -std=c99 -Wall -Wextra -Wshadow -Wmissing-prototypes -Wpedantic -Wno-unused-parameter -I@TERMUX_PREFIX@/include
+ LDLIBS=-lrt
  OBJ=\
  	build.o\
- 	deps.o\

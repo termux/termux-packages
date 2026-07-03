@@ -12,7 +12,7 @@ _SNAPSHOT_COMMIT=5f58399b2de47ed14bdfe3a0cb149293b27893d5
 
 # The subshell leaving the value in the outer scope unchanged is the point here.
 # shellcheck disable=SC2031
-TERMUX_PKG_VERSION=(6.6.20260124+really6.5.20250830
+TERMUX_PKG_VERSION=(6.6.20260307+really6.5.20250830
                     9.31
                     "$(. "$TERMUX_SCRIPTDIR/x11-packages/kitty/build.sh"; echo "$TERMUX_PKG_VERSION")"
                     "$(. "$TERMUX_SCRIPTDIR/x11-packages/alacritty/build.sh"; echo "$TERMUX_PKG_VERSION")"

@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://snowflake.torproject.org/
 TERMUX_PKG_DESCRIPTION="Pluggable Transport using WebRTC, inspired by Flashproxy"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.12.1"
+TERMUX_PKG_VERSION="2.14.1"
 TERMUX_PKG_SRCURL=https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/archive/v${TERMUX_PKG_VERSION}/snowflake-v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=655f1daa9af141264c159ce0fe79070d7a4ca46ce43e94af2218a67f826d22d5
+TERMUX_PKG_SHA256=39aa853c9bf966ac606456b4f357631470b4bee970e256a20eab54cba8a55d2f
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 

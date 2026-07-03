@@ -26,4 +26,6 @@ termux_step_pre_configure() {
 	if [ $TERMUX_ARCH_BITS = 32 ]; then
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-year2038"
 	fi
+
+	autoreconf -fi
 }

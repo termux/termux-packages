@@ -1,7 +1,7 @@
 --- a/kitty/cli.py
 +++ b/kitty/cli.py
-@@ -1063,7 +1063,7 @@ def parse_args(
-     return ans, parse_cmdline(oc, disabled, ans, args=args)
+@@ -707,7 +707,7 @@ def create_oc() -> Options:
+     return ans, parse_cmdline(oc, disabled, ans, args=args, track_seen_options=track_seen_options)
  
  
 -SYSTEM_CONF = f'/etc/xdg/{appname}/{appname}.conf'
@@ -25,11 +25,11 @@
 -    if [[ -n "$ksi_val" && "$ksi_val" != *no-sudo* && -n "$TERMINFO" && ! ( -r "/usr/share/terminfo/x/xterm-kitty" || -r "/usr/share/terminfo/78/xterm-kitty" ) ]]; then
 +    if [[ -n "$ksi_val" && "$ksi_val" != *no-sudo* && -n "$TERMINFO" && ! ( -r "@TERMUX_PREFIX@/share/terminfo/x/xterm-kitty" || -r "@TERMUX_PREFIX@/share/terminfo/78/xterm-kitty" ) ]]; then
          # this must be done before sourcing user bashrc otherwise aliasing of sudo does not work
-         sudo() {
-             # Ensure terminfo is available in sudo
+             sudo() {
+                 # Ensure terminfo is available in sudo
 --- a/tools/config/api.go
 +++ b/tools/config/api.go
-@@ -289,7 +289,7 @@ func (self *ConfigParser) ParseFiles(paths ...string) error {
+@@ -295,7 +295,7 @@ func (self *ConfigParser) ParseFiles(paths ...string) error {
  }
  
  func (self *ConfigParser) LoadConfig(name string, paths []string, overrides []string) (err error) {

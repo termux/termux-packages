@@ -1,0 +1,121 @@
+From 281a78aade45ae933465015ef070ed6942ce03fa Mon Sep 17 00:00:00 2001
+From: alexytomi <60690056+alexytomi@users.noreply.github.com>
+Date: Mon, 22 Dec 2025 02:34:49 +0800
+Subject: [PATCH 3/5] [Sideloader] Bump botan to master
+
+Used `dub upgrade -s botan` after editing dub.json with the new value.
+
+This works around some weird cross-compiling android-specific TLS bug
+that I am not sure on the specifics of.
+---
+ dub.json                              | 2 +-
+ dub.selections.json                   | 3 +--
+ frontends/cli/dub.selections.json     | 2 +-
+ frontends/dlangui/dub.selections.json | 2 +-
+ frontends/gtk/dub.selections.json     | 2 +-
+ frontends/qt/dub.selections.json      | 2 +-
+ frontends/swiftui/dub.selections.json | 2 +-
+ 7 files changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/dub.json b/dub.json
+index 690cd16..51cfd1a 100644
+--- a/dub.json
++++ b/dub.json
+@@ -11,7 +11,7 @@
+     "buildRequirements": ["allowWarnings", "requireBoundsCheck"],
+ 
+     "dependencies": {
+-        "botan": "~>1.13",
++        "botan": "~master",
+         "dynamic-loader": {
+             "repository": "git+https://github.com/Dadoum/dynamicloader.git",
+             "version": "9202b389affa6be0740e7295dea8f0146537a784"
+diff --git a/dub.selections.json b/dub.selections.json
+index c6a6d7d..7cc573a 100644
+--- a/dub.selections.json
++++ b/dub.selections.json
+@@ -8,7 +8,7 @@
+ 		"bindbc-loader": "1.0.3",
+ 		"bindbc-opengl": "1.0.5",
+ 		"bindbc-sdl": "1.0.1",
+-		"botan": "1.13.6",
++		"botan": "~master",
+ 		"botan-math": "1.0.4",
+ 		"cachetools": "0.4.1",
+ 		"concepts": "0.0.9",
+@@ -34,7 +34,6 @@
+ 		"progress": "5.0.2",
+ 		"provision": {"version":"645d56d8e8c86c057893321843db00b21f1aaeb2","repository":"git+https://github.com/Dadoum/Provision.git"},
+ 		"requests": "2.1.2",
+-		"sideloader": {"path":"../../"},
+ 		"silly": "1.2.0-dev.2",
+ 		"slf4d": "2.4.3",
+ 		"test_allocator": "0.3.4",
+diff --git a/frontends/cli/dub.selections.json b/frontends/cli/dub.selections.json
+index c6a6d7d..e651f97 100644
+--- a/frontends/cli/dub.selections.json
++++ b/frontends/cli/dub.selections.json
+@@ -8,7 +8,7 @@
+ 		"bindbc-loader": "1.0.3",
+ 		"bindbc-opengl": "1.0.5",
+ 		"bindbc-sdl": "1.0.1",
+-		"botan": "1.13.6",
++		"botan": "~master",
+ 		"botan-math": "1.0.4",
+ 		"cachetools": "0.4.1",
+ 		"concepts": "0.0.9",
+diff --git a/frontends/dlangui/dub.selections.json b/frontends/dlangui/dub.selections.json
+index c6a6d7d..e651f97 100644
+--- a/frontends/dlangui/dub.selections.json
++++ b/frontends/dlangui/dub.selections.json
+@@ -8,7 +8,7 @@
+ 		"bindbc-loader": "1.0.3",
+ 		"bindbc-opengl": "1.0.5",
+ 		"bindbc-sdl": "1.0.1",
+-		"botan": "1.13.6",
++		"botan": "~master",
+ 		"botan-math": "1.0.4",
+ 		"cachetools": "0.4.1",
+ 		"concepts": "0.0.9",
+diff --git a/frontends/gtk/dub.selections.json b/frontends/gtk/dub.selections.json
+index c6a6d7d..e651f97 100644
+--- a/frontends/gtk/dub.selections.json
++++ b/frontends/gtk/dub.selections.json
+@@ -8,7 +8,7 @@
+ 		"bindbc-loader": "1.0.3",
+ 		"bindbc-opengl": "1.0.5",
+ 		"bindbc-sdl": "1.0.1",
+-		"botan": "1.13.6",
++		"botan": "~master",
+ 		"botan-math": "1.0.4",
+ 		"cachetools": "0.4.1",
+ 		"concepts": "0.0.9",
+diff --git a/frontends/qt/dub.selections.json b/frontends/qt/dub.selections.json
+index c6a6d7d..e651f97 100644
+--- a/frontends/qt/dub.selections.json
++++ b/frontends/qt/dub.selections.json
+@@ -8,7 +8,7 @@
+ 		"bindbc-loader": "1.0.3",
+ 		"bindbc-opengl": "1.0.5",
+ 		"bindbc-sdl": "1.0.1",
+-		"botan": "1.13.6",
++		"botan": "~master",
+ 		"botan-math": "1.0.4",
+ 		"cachetools": "0.4.1",
+ 		"concepts": "0.0.9",
+diff --git a/frontends/swiftui/dub.selections.json b/frontends/swiftui/dub.selections.json
+index c6a6d7d..e651f97 100644
+--- a/frontends/swiftui/dub.selections.json
++++ b/frontends/swiftui/dub.selections.json
+@@ -8,7 +8,7 @@
+ 		"bindbc-loader": "1.0.3",
+ 		"bindbc-opengl": "1.0.5",
+ 		"bindbc-sdl": "1.0.1",
+-		"botan": "1.13.6",
++		"botan": "~master",
+ 		"botan-math": "1.0.4",
+ 		"cachetools": "0.4.1",
+ 		"concepts": "0.0.9",
+-- 
+2.51.2
+

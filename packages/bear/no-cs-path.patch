@@ -1,0 +1,71 @@
+Prevents:
+error[E0425]: cannot find value `_CS_PATH` in crate `libc`
+   --> bear/src/context.rs:151:44
+    |
+151 | ...::confstr(libc::_CS_PATH, std::ptr::null_mut(), 0) };
+    |                    ^^^^^^^^ not found in `libc`
+
+--- a/bear/src/context.rs
++++ b/bear/src/context.rs
+@@ -144,7 +144,7 @@ fn is_sip_enabled() -> bool {
+ ///
+ /// On Unix systems, this queries the system configuration for the standard
+ /// utility search path. Falls back to `/usr/bin:/bin` if unavailable.
+-#[cfg(unix)]
++#[cfg(all(unix, not(target_os = "android")))]
+ fn get_confstr_cs_path() -> String {
+     use std::ffi::CStr;
+ 
+@@ -164,9 +164,9 @@ fn get_confstr_cs_path() -> String {
+         .unwrap_or_else(|_| "/usr/bin:/bin".to_string())
+ }
+ 
+-#[cfg(not(unix))]
++#[cfg(any(not(unix), target_os = "android"))]
+ fn get_confstr_cs_path() -> String {
+-    "/usr/bin:/bin".to_string()
++    "@TERMUX_PREFIX@/bin".to_string()
+ }
+ 
+ #[cfg(test)]
+--- a/intercept-preload/src/implementation.rs
++++ b/intercept-preload/src/implementation.rs
+@@ -535,8 +535,8 @@ pub unsafe extern "C" fn rust_popen(command: *const c_char, mode: *const c_char)
+ 
+     report(|| {
+         Ok(Execution {
+-            executable: PathBuf::from("/bin/sh"),
+-            arguments: vec!["/bin/sh".to_string(), "-c".to_string(), command_str.to_string()],
++            executable: PathBuf::from("@TERMUX_PREFIX@/bin/sh"),
++            arguments: vec!["@TERMUX_PREFIX@/bin/sh".to_string(), "-c".to_string(), command_str.to_string()],
+             working_dir: working_dir()?,
+             environment: std::env::vars().collect(),
+         })
+@@ -584,7 +584,7 @@ pub unsafe extern "C" fn rust_popen(command: *const c_char, mode: *const c_char)
+     unsafe { libc::posix_spawn_file_actions_addclose(&mut file_actions, child_fd) };
+ 
+     // Build argv for /bin/sh -c <command>
+-    let sh = c"/bin/sh";
++    let sh = c"@TERMUX_PREFIX@/bin/sh";
+     let dash_c = c"-c";
+     let cmd_cstr = match std::ffi::CString::new(command_str) {
+         Ok(c) => c,
+@@ -744,15 +744,15 @@ pub unsafe extern "C" fn rust_system(command: *const c_char) -> c_int {
+ 
+     report(|| {
+         Ok(Execution {
+-            executable: PathBuf::from("/bin/sh"),
+-            arguments: vec!["/bin/sh".to_string(), "-c".to_string(), command_str.to_string()],
++            executable: PathBuf::from("@TERMUX_PREFIX@/bin/sh"),
++            arguments: vec!["@TERMUX_PREFIX@/bin/sh".to_string(), "-c".to_string(), command_str.to_string()],
+             working_dir: working_dir()?,
+             environment: std::env::vars().collect(),
+         })
+     });
+ 
+     // Build argv for /bin/sh -c <command>
+-    let sh = c"/bin/sh";
++    let sh = c"@TERMUX_PREFIX@/bin/sh";
+     let dash_c = c"-c";
+     let cmd_cstr = match std::ffi::CString::new(command_str) {
+         Ok(c) => c,

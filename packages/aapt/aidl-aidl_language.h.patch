@@ -1,0 +1,16 @@
+--- a/vendor/aidl/aidl_language.h
++++ b/vendor/aidl/aidl_language.h
+@@ -556,7 +556,12 @@
+ struct DynamicArray {};
+ // Represents `[N][M]..`
+ struct FixedSizeArray {
+-  FixedSizeArray(std::unique_ptr<AidlConstantValue> dim) { dimensions.push_back(std::move(dim)); }
++  explicit FixedSizeArray(std::unique_ptr<AidlConstantValue> dim);
++  ~FixedSizeArray();
++  FixedSizeArray(FixedSizeArray&&) noexcept;
++  FixedSizeArray& operator=(FixedSizeArray&&) noexcept;
++  FixedSizeArray(const FixedSizeArray&) = delete;
++  FixedSizeArray& operator=(const FixedSizeArray&) = delete;
+   std::vector<std::unique_ptr<AidlConstantValue>> dimensions;
+   std::vector<int32_t> GetDimensionInts() const;
+ };

@@ -69,10 +69,10 @@ termux_gitlab_api_get_tag() {
 	# echo interpolates control characters, which jq does not like.
 	response="$(printf "%s\n" "${response%|*}")"
 
-	local tag_name=""
+	local tag_name="" err=0
 	case "${http_code}" in
 		200)
-			tag_name="$(jq --exit-status --raw-output "${jq_filter}" <<< "${response}")"
+			tag_name="$(jq --exit-status --raw-output "${jq_filter}" <<< "${response}")" || err=1
 		;;
 		404)
 			termux_error_exit <<-EndOfError
@@ -100,8 +100,25 @@ termux_gitlab_api_get_tag() {
 						fi
 					)'.
 				EndOfError
+			else
+				err=1
 			fi
 		;;
 	esac
+
+	# If the input failed to parse log it for the issue.
+	if (( err )); then
+		termux_error_exit <<-EndOfError
+			${CI:+::group::}ERROR: Response seems to be invalid JSON.
+			Codepath: ${FUNCNAME[0]}
+			API url : ${api_url}
+			API path: ${api_path}
+			\`\`\`json
+			${response}
+			\`\`\`
+			${CI:+::endgroup::}
+		EndOfError
+	fi
+
 	echo "${tag_name}"
 }

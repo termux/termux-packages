@@ -24,8 +24,10 @@ Enable jumbo build for the following template(s):
  third_party/skia/src/core/SkMemset_opts.cpp   |  5 +++
  .../skia/src/core/SkMemset_opts_avx.cpp       |  2 +
  third_party/skia/src/core/SkOpts.cpp          |  5 +++
+ third_party/skia/src/core/SkPath_editing.cpp  | 10 +++++
  third_party/skia/src/core/SkRecordCanvas.cpp  |  2 +
  third_party/skia/src/core/SkScalerContext.cpp |  4 ++
+ third_party/skia/src/core/SkScan_Antihair.cpp |  4 ++
  third_party/skia/src/core/SkSwizzler_opts.cpp |  5 +++
  .../skia/src/core/SkSwizzler_opts_hsw.cpp     |  2 +
  .../skia/src/core/SkSwizzler_opts_ssse3.cpp   |  2 +
@@ -74,7 +76,7 @@ Enable jumbo build for the following template(s):
  .../sksl/codegen/SkSLMetalCodeGenerator.cpp   | 10 +++++
  .../skia/src/utils/SkCustomTypeface.cpp       |  4 ++
  third_party/skia/src/utils/SkParsePath.cpp    | 14 ++++++
- 62 files changed, 308 insertions(+), 9 deletions(-)
+ 64 files changed, 322 insertions(+), 9 deletions(-)
 
 diff --git a/skia/BUILD.gn b/skia/BUILD.gn
 index d0260eb23d..2ad7fc2c0b 100644
@@ -151,7 +153,7 @@ index d0260eb23d..2ad7fc2c0b 100644
      forward_variables_from(invoker, "*")
  
      check_includes = false
-@@ -728,6 +752,18 @@ skia_source_set("skia_core_and_effects") {
+@@ -917,6 +917,18 @@ skia_source_set("skia_core_and_effects") {
    sources += skia_effects_sources
    sources += skia_effects_imagefilter_sources
    sources += skia_pathops_sources
@@ -162,14 +164,14 @@ index d0260eb23d..2ad7fc2c0b 100644
 +    # TODO: Enable them
 +    "//third_party/skia/src/core/SkBitmapProcState_opts_ssse3.cpp",
 +    "//third_party/skia/src/core/SkBlitMask_opts_ssse3.cpp",
-+    "//third_party/skia/src/core/SkBlitRow_opts_hsw.cpp",
++    "//third_party/skia/src/core/SkBlitRow_opts_ml3.cpp",
 +    "//third_party/skia/src/core/SkMemset_opts_avx.cpp",
-+    "//third_party/skia/src/core/SkSwizzler_opts_hsw.cpp",
++    "//third_party/skia/src/core/SkSwizzler_opts_ml3.cpp",
 +    "//third_party/skia/src/core/SkSwizzler_opts_ssse3.cpp",
 +  ]
+   deps = []
    if (skia_support_gpu) {
-     deps = [ "//gpu/config:workaround_list" ]
-   }
+     deps += [ "//gpu/config:workaround_list" ]
 @@ -941,6 +977,11 @@ if (skia_support_gpu) {
    skia_source_set("skia_graphite_private") {
      sources = skia_graphite_sources + skia_graphite_precompile_sources +
@@ -296,17 +298,6 @@ index 6b125ac834..95d27ac49d 100644
 +
 +#undef SK_OPTS_TARGET
 +#undef init
-diff --git a/third_party/skia/src/core/SkBlitRow_opts_hsw.cpp b/third_party/skia/src/core/SkBlitRow_opts_hsw.cpp
-index e110b8c3fa..a51bb5ae74 100644
---- a/third_party/skia/src/core/SkBlitRow_opts_hsw.cpp
-+++ b/third_party/skia/src/core/SkBlitRow_opts_hsw.cpp
-@@ -30,4 +30,6 @@ namespace SkOpts {
-     }
- }  // namespace SkOpts
- 
-+#undef SK_OPTS_TARGET
-+
- #endif // SK_CPU_X86 && !SK_ENABLE_OPTIMIZE_SIZE
 diff --git a/third_party/skia/src/core/SkGeometry.cpp b/third_party/skia/src/core/SkGeometry.cpp
 index 8500efdf2e..e1b3469d0a 100644
 --- a/third_party/skia/src/core/SkGeometry.cpp
@@ -406,6 +397,25 @@ index e9089a234d..a0879304da 100644
  
 +
 +#undef kSkShowTextBlitCoverage
+diff --git a/third_party/skia/src/core/SkScan_Antihair.cpp b/third_party/skia/src/core/SkScan_Antihair.cpp
+index 34553872d3..9a7951483f 100644
+--- a/third_party/skia/src/core/SkScan_Antihair.cpp
++++ b/third_party/skia/src/core/SkScan_Antihair.cpp
+@@ -26,6 +26,8 @@
+ #include <algorithm>
+ #include <cstdint>
+ 
++#define fixed_to_alpha fixed_to_alpha_SkScan_Antihair
++
+ #define HLINE_STACK_BUFFER      100
+ 
+ static inline U8CPU scale_alpha_by_coverage(U8CPU value, SkFDot6 coverage) {
+@@ -1023,3 +1025,5 @@ void SkScan::AntiFrameRect(const SkRect& r, const SkPoint& strokeSize,
+         AntiFrameRect(r, strokeSize, &wrap.getRgn(), wrap.getBlitter());
+     }
+ }
++
++#undef fixed_to_alpha
 diff --git a/third_party/skia/src/core/SkSwizzler_opts.cpp b/third_party/skia/src/core/SkSwizzler_opts.cpp
 index 0665a19fbb..7a0e7bee9b 100644
 --- a/third_party/skia/src/core/SkSwizzler_opts.cpp
@@ -426,17 +436,6 @@ index 0665a19fbb..7a0e7bee9b 100644
 +
 +#undef SK_OPTS_TARGET
 +#undef init
-diff --git a/third_party/skia/src/core/SkSwizzler_opts_hsw.cpp b/third_party/skia/src/core/SkSwizzler_opts_hsw.cpp
-index 68c85d9471..8964fcda72 100644
---- a/third_party/skia/src/core/SkSwizzler_opts_hsw.cpp
-+++ b/third_party/skia/src/core/SkSwizzler_opts_hsw.cpp
-@@ -39,4 +39,6 @@ namespace SkOpts {
-     }
- }  // namespace SkOpts
- 
-+#undef SK_OPTS_TARGET
-+
- #endif // SK_CPU_X86 && !SK_ENABLE_OPTIMIZE_SIZE
 diff --git a/third_party/skia/src/core/SkSwizzler_opts_ssse3.cpp b/third_party/skia/src/core/SkSwizzler_opts_ssse3.cpp
 index 1721e59186..a58556841f 100644
 --- a/third_party/skia/src/core/SkSwizzler_opts_ssse3.cpp
@@ -502,9 +501,9 @@ index eb5f62a311..35200bdf65 100644
 --- a/third_party/skia/src/gpu/ganesh/GrDirectContext.cpp
 +++ b/third_party/skia/src/gpu/ganesh/GrDirectContext.cpp
 @@ -1229,3 +1229,5 @@ sk_sp<GrDirectContext> GrDirectContext::MakeDirect3D(const GrD3DBackendContext&
+ 
      return direct;
  }
- #endif
 +
 +#undef ASSERT_SINGLE_OWNER
 diff --git a/third_party/skia/src/gpu/ganesh/GrDirectContextPriv.cpp b/third_party/skia/src/gpu/ganesh/GrDirectContextPriv.cpp
@@ -1201,40 +1200,34 @@ index 95126546f7..f8eede3769 100644
  }
 +
 +#undef sk_int_mod
-diff --git a/third_party/skia/src/core/SkPathBuilder.cpp b/third_party/skia/src/core/SkPathBuilder.cpp
-index edcffbd2ae..7715d574ba 100644
---- a/third_party/skia/src/core/SkPathBuilder.cpp
-+++ b/third_party/skia/src/core/SkPathBuilder.cpp
-@@ -31,6 +31,11 @@
+diff --git a/third_party/skia/src/core/SkScan_Hairline.cpp b/third_party/skia/src/core/SkScan_Hairline.cpp
+index cea699f4ad..3b51fa508e 100644
+--- a/third_party/skia/src/core/SkScan_Hairline.cpp
++++ b/third_party/skia/src/core/SkScan_Hairline.cpp
+@@ -36,6 +36,8 @@
  #include <cstring>
- #include <utility>
+ #include <optional>
  
-+#define subdivide_cubic_to     subdivide_cubic_to_SkPathBuilder
-+#define arc_is_lone_point      arc_is_lone_point_SkPathBuilder
-+#define angles_to_unit_vectors angles_to_unit_vectors_SkPathBuilder
-+#define build_arc_conics       build_arc_conics_SkPathBuilder
++#define canConvertFDot6ToFixed canConvertFDot6ToFixed_Hairline
 +
- namespace {
- 
- void subdivide_cubic_to(SkPathBuilder* path, const SkPoint pts[4], int level = 2) {
-@@ -1067,3 +1072,8 @@ bool SkPathBuilder::isZeroLengthSincePoint(int startPtIndex) const {
+ #define DISPATCH_LOOP()                                     \
+     const auto pm = direct->pm;                             \
+     const auto value = direct->value;                       \
+@@ -803,3 +805,5 @@ void SkScan::AntiHairLine(SkSpan<const SkPoint> pts, const SkRasterClip& clip, S
+         AntiHairLineRgn(pts, clipRgn, blitter);
      }
-     return true;
  }
 +
-+#undef subdivide_cubic_to
-+#undef arc_is_lone_point
-+#undef angles_to_unit_vectors
-+#undef build_arc_conics
++#undef canConvertFDot6ToFixed
 diff --git a/third_party/skia/src/gpu/ganesh/vk/GrVkBackendSurface.cpp b/third_party/skia/src/gpu/ganesh/vk/GrVkBackendSurface.cpp
-index d8649a1219..c2cd2746fa 100644
+index 98a7ef0f27..1d412da2d8 100644
 --- a/third_party/skia/src/gpu/ganesh/vk/GrVkBackendSurface.cpp
 +++ b/third_party/skia/src/gpu/ganesh/vk/GrVkBackendSurface.cpp
 @@ -30,6 +30,8 @@
  #include <string>
  #include <utility>
  
-+#define get_and_cast_data get_and_cast_data_vk
++#define get_and_cast_data get_and_cast_data_VkBackendSurface
 +
  class GrVkBackendFormatData final : public GrBackendFormatData {
  public:

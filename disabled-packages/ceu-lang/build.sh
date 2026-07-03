@@ -10,8 +10,7 @@ TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=bc3417d7a2a568d33ea01097bdfab6d34bb89da4b6191c169140a21cfefa5301
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_BUILD_DEPENDS="lua53, lua53-lpeg"
-TERMUX_PKG_DEPENDS="lua53, lua53-lpeg, liblua53"
+TERMUX_PKG_DEPENDS="lua53, lua53-lpeg"
 
 termux_step_post_get_source() {
 	git fetch --unshallow

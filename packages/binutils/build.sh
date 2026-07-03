@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # `lua-language-server` links against libbfd,
 # remember to rebuild it when updating `binutils`.
 TERMUX_PKG_VERSION="2.46.0"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL="https://mirrors.kernel.org/gnu/binutils/binutils-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=d75a94f4d73e7a4086f7513e67e439e8fcdcbb726ffe63f4661744e6256b2cf2
 TERMUX_PKG_DEPENDS="libc++, zlib, zstd"

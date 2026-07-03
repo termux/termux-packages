@@ -2,11 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://www.mesa3d.org
 TERMUX_PKG_DESCRIPTION="OpenGL demonstration and test programs"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=9.0.0
-TERMUX_PKG_REVISION=6
-TERMUX_PKG_SRCURL=https://mesa.freedesktop.org/archive/demos/mesa-demos-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_VERSION="9.0.0"
+TERMUX_PKG_REVISION=7
+TERMUX_PKG_SRCURL="https://mesa.freedesktop.org/archive/demos/mesa-demos-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=3046a3d26a7b051af7ebdd257a5f23bfeb160cad6ed952329cdff1e9f1ed496b
 TERMUX_PKG_DEPENDS="freeglut, glu, libx11, libxext, opengl"
+# will overwrite poly from polyml
+TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dlibdrm=disabled
 -Dvulkan=disabled
@@ -40,6 +42,9 @@ termux_step_post_make_install() {
 	EOF
 	chmod 0700 ${_eglinfo_system_script}
 	ln -sf ${_eglinfo_system_script} $TERMUX_PREFIX/bin/eglinfo-system
+
+	# conflict with polyml package
+	mv "$TERMUX_PREFIX"/bin/poly{,-mesa}
 }
 
 termux_step_install_license() {

@@ -12,7 +12,7 @@
  import (
 --- /dev/null
 +++ b/internal/updater/updater_android.go
-@@ -0,0 +1,86 @@
+@@ -0,0 +1,78 @@
 +// Copyright (c) 2023 Proton AG
 +//
 +// This file is part of Proton Mail Bridge.
@@ -59,7 +59,7 @@
 +
 +type Installer interface {
 +	IsAlreadyInstalled(*semver.Version) bool
-+	InstallUpdate(*semver.Version, io.Reader) error
++	InstallUpdate(*semver.Version, io.Reader, bool) error
 +}
 +
 +type Updater struct {
@@ -80,19 +80,11 @@
 +	}
 +}
 +
-+func (u *Updater) GetVersionInfoLegacy(ctx context.Context, downloader Downloader, channel Channel) (VersionInfoLegacy, error) {
-+	return VersionInfoLegacy{}, errors.New("no updates available for this channel")
-+}
-+
 +func (u *Updater) GetVersionInfo(ctx context.Context, downloader Downloader) (VersionInfo, error) {
 +	return VersionInfo{}, errors.New("no updates available for this channel")
 +}
 +
-+func (u *Updater) InstallUpdateLegacy(ctx context.Context, downloader Downloader, update VersionInfoLegacy) error {
-+	return nil
-+}
-+
-+func (u *Updater) InstallUpdate(ctx context.Context, downloader Downloader, release Release) error {
++func (u *Updater) InstallUpdate(ctx context.Context, downloader Downloader, release Release, removeTemporaryFolderDisabled bool) error {
 +	return nil
 +}
 +

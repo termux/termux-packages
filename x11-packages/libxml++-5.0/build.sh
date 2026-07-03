@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://libxmlplusplus.github.io/libxmlplusplus/
 TERMUX_PKG_DESCRIPTION="A C++ wrapper for the libxml2 XML parser library (version 5.0)"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@IntinteDAO"
-TERMUX_PKG_VERSION=5.6.0
+TERMUX_PKG_VERSION="5.6.1"
 TERMUX_PKG_SRCURL=https://github.com/libxmlplusplus/libxmlplusplus/releases/download/${TERMUX_PKG_VERSION}/libxml++-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=cd01ad15a5e44d5392c179ddf992891fb1ba94d33188d9198f9daf99e1bc4fec
+TERMUX_PKG_SHA256=4996e8a73995e8a4cd656c8591dce38181146edfc30cb47c97d1db3c56990ad7
 TERMUX_PKG_DEPENDS="libxml2, libiconv"
 TERMUX_PKG_AUTO_UPDATE=true
 
