@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tensors and Dynamic neural networks in Python"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.11.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=git+https://github.com/pytorch/pytorch
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 TERMUX_PKG_DEPENDS="abseil-cpp, libandroid-execinfo, libc++, libopenblas, libprotobuf, python, python-numpy, python-pip"
@@ -46,13 +46,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DANDROID_NDK_HOST_SYSTEM_NAME=linux-$HOSTTYPE
 -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 -DMI_NO_OPT_ARCH=ON
-"
-
-TERMUX_PKG_RM_AFTER_INSTALL="
-lib/pkgconfig
-lib/cmake/fmt
-lib/libfmt.a
-include/fmt
 "
 
 termux_step_host_build() {
