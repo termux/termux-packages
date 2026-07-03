@@ -22,7 +22,7 @@ termux_step_create_python_debscripts() {
 	# metadata file that at least some packages have, which contains the 'pip'-facing name of the
 	# package and any PyPi dependencies it has.
 	if [[ -d "$_package_python_home/site-packages" ]]; then
-		pip_metadata_file="$(find "$_package_python_home/site-packages" -name "METADATA" -print -quit)"
+		pip_metadata_file="$(find "$_package_python_home/site-packages" -name "METADATA" -print)"
 	fi
 
 	# add the internal 'pip'-facing name of the package to the 'pip install' dependencies if it exists
