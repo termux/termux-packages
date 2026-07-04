@@ -3,9 +3,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/phalcon/php-zephir-parser
 TERMUX_PKG_DESCRIPTION="The Zephir Parser delivered as a C extension for the PHP language"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="ian4hu <hu2008yinxiang@163.com>"
-TERMUX_PKG_VERSION="2.0.4"
+TERMUX_PKG_VERSION="2.1.0"
 TERMUX_PKG_SRCURL=https://github.com/zephir-lang/php-zephir-parser/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=ae155281999ee19b7e2040dcaa77fa106ddfe6c3f5947a4907014ea6d1af1422
+TERMUX_PKG_SHA256=17c1b197f00334969862807d8b3f665e265bd4a264de39f716c060d16a39dff4
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS=php
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -19,6 +19,6 @@ termux_step_pre_configure() {
 
 termux_step_host_build() {
 	# lemon excuted by build host, so we need build it by hostbuild, then it will be reused by later build
-	gcc -o "$TERMUX_PKG_HOSTBUILD_DIR/lemon" $TERMUX_PKG_SRCDIR/parser/lemon.c
+	gcc -std=c17 -o "$TERMUX_PKG_HOSTBUILD_DIR/lemon" $TERMUX_PKG_SRCDIR/parser/lemon.c
 
 }
