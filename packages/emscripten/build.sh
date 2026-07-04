@@ -37,6 +37,7 @@ opt/emscripten-llvm/bin/clang-ssaf-analyzer
 opt/emscripten-llvm/bin/clang-ssaf-format
 opt/emscripten-llvm/bin/clang-ssaf-linker
 opt/emscripten-llvm/bin/clang-sycl-linker
+opt/emscripten-llvm/bin/clangd
 opt/emscripten-llvm/bin/diagtool
 opt/emscripten-llvm/bin/git-clang-format
 opt/emscripten-llvm/bin/hmaptool

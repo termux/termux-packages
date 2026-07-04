@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Python bindings around the LAME encoder"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.8.4"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/chrisstaite/lameenc/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=70c7a23830c98139f2b8e2ebdd56990b3e8e50bb8eaf22daa7b8861b1f6bffcb
 TERMUX_PKG_AUTO_UPDATE=true

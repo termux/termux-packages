@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="a collection of programs for inspecting and manipulating
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.15.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mj.ucw.cz/download/linux/pci/pciutils-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a42e6e3f76fb6b1f6ac2e08cdd151f6bf78bc4f6312c591f4b6ec197582ede3a
 TERMUX_PKG_AUTO_UPDATE=true

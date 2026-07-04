@@ -3,14 +3,14 @@ TERMUX_PKG_DESCRIPTION="7-Zip file archiver with a high compression ratio"
 TERMUX_PKG_LICENSE="LGPL-2.1, BSD 3-Clause, BSD 2-Clause"
 TERMUX_PKG_LICENSE_FILE="DOC/License.txt, DOC/copying.txt"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="26.01"
+TERMUX_PKG_VERSION="26.02"
 TERMUX_PKG_SRCURL=(
 	"https://www.7-zip.org/a/7z${TERMUX_PKG_VERSION//./}-src.tar.xz"
 	"https://www.7-zip.org/a/7z${TERMUX_PKG_VERSION//./}-linux-arm.tar.xz" # for manual, arm is smallest
 )
 TERMUX_PKG_SHA256=(
-	b2389e0e930b2f9a348cf0fe7d9870a46482a8ec044ee0bdf42e2136db31c3d6
-	72c19911abb6964fcf85ebe213dfcee57bad892345e03bb940c5a27a1050b3bf
+	cf967c98bca02a4b8b16375f441825a8e141362f14be1969bbec8e1ca0bff9dd
+	81b7f04b3528852fac10f5becf9f15870a5da4cb94fbcb8a138197eb937468bf
 )
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true

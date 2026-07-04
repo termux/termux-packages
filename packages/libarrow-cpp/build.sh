@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="C++ libraries for Apache Arrow"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="24.0.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/apache/arrow/archive/refs/tags/apache-arrow-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=94e18d188f26324c4da6bb3a723fec1536ae88b8308bada28d53c0b8d5206b28
 TERMUX_PKG_AUTO_UPDATE=true
