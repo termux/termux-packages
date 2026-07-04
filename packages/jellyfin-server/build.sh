@@ -16,7 +16,7 @@ TERMUX_PKG_SHA256=(
 	054a83cf0b1cd6bc0493bc53622cc2136cbe35e1e8c0b2b1bf7fcc9ba25fb8d5
 	38fff90f73b3c4f9c3c7270711411a4ec3cbe63b205d4b4a5525bcc532d3d31f
 )
-TERMUX_PKG_DEPENDS="aspnetcore-runtime-10.0, dotnet-host, dotnet-runtime-10.0, libskiasharp (>= 3.119), libskiasharp (<< 4), libesqlite3, jellyfin-ffmpeg"
+TERMUX_PKG_DEPENDS="aspnetcore-runtime-10.0, dotnet-host, dotnet-runtime-10.0, libskiasharp3 (>= 3.119), libskiasharp3 (<< 4), libesqlite3, jellyfin-ffmpeg"
 TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-10.0, dotnet-targeting-pack-10.0, libcairo, pango, libjpeg-turbo, giflib, librsvg"
 TERMUX_PKG_SERVICE_SCRIPT=(
 	"jellyfin"
@@ -130,5 +130,7 @@ termux_step_make_install() {
 	find "${TERMUX_PKG_BUILDDIR}/build" \( -name 'jellyfin' -o -type d \) -exec chmod 0700 '{}' \;
 	rm -rf "${TERMUX_PREFIX}/lib/jellyfin"
 	mv "${TERMUX_PKG_BUILDDIR}/build" "${TERMUX_PREFIX}/lib/jellyfin"
+	ln -sf "${TERMUX_PREFIX}/lib/libskiasharp3/libSkiaSharp.so" "${TERMUX_PREFIX}/lib/jellyfin/libSkiaSharp.so"
+	ln -sf "${TERMUX_PREFIX}/lib/libskiasharp3/libHarfBuzzSharp.so" "${TERMUX_PREFIX}/lib/jellyfin/libHarfBuzzSharp.so"
 	ln -sf "${TERMUX_PREFIX}/lib/jellyfin/jellyfin" "${TERMUX_PREFIX}/bin/jellyfin"
 }
