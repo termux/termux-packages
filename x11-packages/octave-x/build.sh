@@ -2,15 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://octave.org
 TERMUX_PKG_DESCRIPTION="GNU Octave is a high-level language, primarily intended for numerical computations"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2:10.3.0"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="2:11.3.0"
 TERMUX_PKG_SRCURL="https://ftpmirror.gnu.org/octave/octave-${TERMUX_PKG_VERSION#*:}.tar.xz"
-TERMUX_PKG_SHA256=92ae9bf2edcd288bd2df9fd0b4f7aa719b49d3940fceb154c5fdcd846f254da1
+TERMUX_PKG_SHA256=2b80f3149b2de6d1f4f2fcb4fe6515a17eb363b52111bf57b90f37bf6f5e12e1
 TERMUX_PKG_DEPENDS="arpack-ng, clang, fftw, fltk, fontconfig, freetype, ghostscript, glpk, glu, graphicsmagick, libandroid-complex-math, libbz2, libc++, libcurl, libhdf5, libiconv, libopenblas, libsndfile, libx11, libxcursor, libxext, libxfixes, libxft, libxinerama, libxrender, make, opengl, openssl, pcre2, portaudio, qhull, qrupdate-ng, qscintilla-qt6, qt6-qt5compat, qt6-qtbase, qt6-qttools, readline, suitesparse, sundials, zlib"
 TERMUX_PKG_BUILD_DEPENDS="gnuplot, less, rapidjson, qt6-qtbase-cross-tools, qt6-qttools-cross-tools"
 TERMUX_PKG_RECOMMENDS="gnuplot, less"
 TERMUX_PKG_CONFLICTS="octave"
 TERMUX_PKG_BUILD_IN_SRC=true
+# gl_cv_cc_visibility=no prevents error about no '-fvisibility=hidden'
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-x
 --with-qt=6
@@ -35,6 +35,7 @@ ac_cv_func_getpwuid=no
 ac_cv_func_setgrent=no
 ac_cv_func_setpwent=no
 ac_cv_func_setpwuid=no
+gl_cv_cc_visibility=no
 "
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
