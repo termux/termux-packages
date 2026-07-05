@@ -1,0 +1,15 @@
+#!/bin/env bash
+echo '
+run this to boot strap glibc root
+apt -c $PREFIX/etc/apt/glibc.conf update
+apt -c $PREFIX/etc/apt/glibc.conf install apt-glibc bash-glibc
+
+open glibc shell
+unset LD_PRELOAD
+$PREFIX/glibc/bin/bash
+
+confirm you only see glibc packets
+export PATH=$PREFIX/glibc/bin:$PATH
+which apt
+apt list
+'
