@@ -1,0 +1,39 @@
+--- a/app/TrenchBroom/cmake/AddVersionToManual.cmake.in
++++ b/app/TrenchBroom/cmake/AddVersionToManual.cmake.in
+@@ -1,8 +1,6 @@
+ include(@CMAKE_SOURCE_DIR@/cmake/Utils.cmake)
+ 
+-get_git_describe("@GIT_EXECUTABLE@" "@CMAKE_SOURCE_DIR@" GIT_DESCRIBE)
+-get_app_version(GIT_DESCRIBE APP_VERSION_YEAR APP_VERSION_NUMBER APP_VERSION_RC)
+-get_app_version_str(APP_VERSION_YEAR APP_VERSION_NUMBER APP_VERSION_RC APP_VERSION_STR)
++set(APP_VERSION_STR "@TERMUX_PKG_VERSION@")
+ set(APP_BUILD_TYPE "@CMAKE_BUILD_TYPE@")
+ 
+ set(MANUAL_VERSION_PATTERN "__TB_VERSION__")
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -117,10 +117,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+ find_package(FastFloat CONFIG REQUIRED)
+ endif()
+ 
+-# Populate version variables using git
+-get_git_describe("${GIT_EXECUTABLE}" "${CMAKE_SOURCE_DIR}" GIT_DESCRIBE)
+-get_app_version(GIT_DESCRIBE APP_VERSION_YEAR APP_VERSION_NUMBER APP_VERSION_RC)
+-get_app_version_str(APP_VERSION_YEAR APP_VERSION_NUMBER APP_VERSION_RC APP_VERSION_STR)
++set(APP_VERSION_STR "@TERMUX_PKG_VERSION@")
+ set(APP_BUILD_TYPE "${CMAKE_BUILD_TYPE}")
+ 
+ # Some global variables used in several targets
+--- a/lib/TbUiLib/cmake/GenerateVersion.cmake
++++ b/lib/TbUiLib/cmake/GenerateVersion.cmake
+@@ -1,9 +1,7 @@
+ include("${UTILS}")
+ 
+ get_filename_component(SRC_DIR ${SRC} DIRECTORY)
+-get_git_describe("${GIT_EXECUTABLE}" "${SRC_DIR}" GIT_DESCRIBE)
+-get_app_version(GIT_DESCRIBE APP_VERSION_YEAR APP_VERSION_NUMBER APP_VERSION_RC)
+-get_app_version_str(APP_VERSION_YEAR APP_VERSION_NUMBER APP_VERSION_RC APP_VERSION_STR)
++set(APP_VERSION_STR "@TERMUX_PKG_VERSION@")
+ get_build_platform(APP_PLATFORM_NAME)
+ 
+ # Generate to a temporary file first
