@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Modern and intuitive terminal-based text editor"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.0.15"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 TERMUX_PKG_SRCURL=git+https://github.com/zyedidia/micro
@@ -26,4 +26,5 @@ termux_step_make_install() {
 	sed -zEi 's/VERSION = \$\(.+\\\n.+\)/VERSION = '"$TERMUX_PKG_VERSION"'/gm' Makefile
 	make build
 	mv micro "$TERMUX_PREFIX/bin/micro"
+	install -Dm644 -t $TERMUX_PREFIX/share/man/man1 assets/packaging/${TERMUX_PKG_NAME}.1
 }
