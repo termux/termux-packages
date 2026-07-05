@@ -1,0 +1,20 @@
+--- a/lib/TbUiLib/src/AppController.cpp
++++ b/lib/TbUiLib/src/AppController.cpp
+@@ -255,6 +255,9 @@ void AppController::askForAutoUpdates()
+   {
+     auto& prefs = PreferenceManager::instance();
+ 
++#ifdef __ANDROID__
++    const auto enableAutoCheck = false;
++#else
+     const auto enableAutoCheck =
+       QMessageBox::question(
+         nullptr,
+@@ -263,6 +266,7 @@ void AppController::askForAutoUpdates()
+           R"(TrenchBroom can check for updates automatically. Would you like to enable this now?)"),
+         QMessageBox::Yes | QMessageBox::No)
+       == QMessageBox::Yes;
++#endif
+ 
+     prefs.set(Preferences::AutoCheckForUpdates, enableAutoCheck);
+     prefs.set(Preferences::AskForAutoUpdates, false);
