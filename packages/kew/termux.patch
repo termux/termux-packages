@@ -1,24 +1,22 @@
 --- a/Makefile
 +++ b/Makefile
-@@ -19,9 +19,8 @@ ARCH := $(shell uname -m)
+@@ -19,7 +19,7 @@ ARCH := $(shell uname -m)
  KEW_VERSION ?= $(shell git describe --tags --dirty --always)
  
    # Check if we're in Termux environment
 -ifneq ($(wildcard @HARDCODED_TERMUX_PREFIX@),)
 +ifeq (1,1)
    # Termux environment
--  COMMONFLAGS += -D__ANDROID__
    IS_ANDROID := 1
  endif
+@@ -78,17 +78,17 @@ ifeq ($(origin USE_FAAD), undefined)
  
-@@ -38,17 +38,17 @@ endif
- ifeq ($(origin USE_FAAD), undefined)
- 
-   # Check if we're in Termux environment
--  ifneq ($(wildcard @HARDCODED_TERMUX_PREFIX@),)
-+  ifneq ($(wildcard @TERMUX_PREFIX@),)
-     # Termux environment - check common installation paths
-     USE_FAAD = $(shell [ -f "$(PREFIX)/lib/libfaad.so" ] || \
+   ifeq ($(USE_FAAD),0)
+         # Check if we're in Termux environment
+-        ifneq ($(wildcard @HARDCODED_TERMUX_PREFIX@),)
++        ifneq ($(wildcard @TERMUX_PREFIX@),)
+                 # Termux environment - check common installation paths
+                 USE_FAAD = $(shell [ -f "$(PREFIX)/lib/libfaad.so" ] || \
                         [ -f "$(PREFIX)/lib/libfaad2.so" ] || \
                         [ -f "$(PREFIX)/local/lib/libfaad.so" ] || \
                         [ -f "$(PREFIX)/local/lib/libfaad2.so" ] || \
@@ -32,9 +30,9 @@
 +                       [ -f "@TERMUX_PREFIX@/lib/libfaad2.so" ] || \
 +                       [ -f "@TERMUX_PREFIX@/local/lib/libfaad.so" ] || \
 +                       [ -f "@TERMUX_PREFIX@/local/lib/libfaad2.so" ] && echo 1 || echo 0)
-   else
-     # Non-Android build - try pkg-config first
-     USE_FAAD = $(shell $(PKG_CONFIG) --exists faad && echo 1 || echo 0)
+         else
+                 # Try to find libfaad dynamically in common paths
+                 USE_FAAD = $(shell [ -f /usr/lib/libfaad.so ] || [ -f /usr/lib64/libfaad.so ] || [ -f /usr/lib64/libfaad2.so ] || \
 @@ -137,7 +137,7 @@ ifeq ($(USE_FAAD), 1)
    ifeq ($(ARCH), arm64)
      CFLAGS += -I/opt/homebrew/opt/faad2/include
@@ -44,6 +42,15 @@
      CFLAGS += -I$(PREFIX)/include
      LIBS += -L$(PREFIX)/lib -lfaad
    else
+@@ -372,7 +372,7 @@ endif
+ 		done; \
+ 	fi
+ 
+-	@if [ "$$(uname)" = "Linux" ]; then \
++	@if false; then \
+ 		if command -v setcap >/dev/null 2>&1; then \
+ 			setcap cap_sys_nice+ep "$(DESTDIR)$(PREFIX)/bin/kew"; \
+ 		fi; \
 --- a/src/ui/termbox2_input.h
 +++ b/src/ui/termbox2_input.h
 @@ -2634,15 +2634,15 @@ static int load_terminfo(void)
@@ -81,21 +88,21 @@
  }
  
  void get_directory_from_path(const char *path, char *directory)
-@@ -402,7 +402,7 @@ int is_in_temp_dir(const char *path)
-         static char tmpdir_buf[PATH_MAX + 2];
+@@ -363,7 +363,7 @@ int is_in_temp_dir(const char *path)
+         static char tmpdir_buf[KEW_PATH_MAX + 2];
  
-         if (tmp_dir == NULL || strnlen(tmp_dir, PATH_MAX) >= PATH_MAX)
+         if (tmp_dir == NULL || strnlen(tmp_dir, KEW_PATH_MAX) >= KEW_PATH_MAX)
 -                tmp_dir = "/tmp";
 +                tmp_dir = "@TERMUX_PREFIX@/tmp";
  
          size_t len = strlen(tmp_dir);
-         strncpy(tmpdir_buf, tmp_dir, PATH_MAX);
-@@ -420,7 +420,7 @@ void generate_temp_file_path(char *file_path, const char *prefix, const char *su
- {
-         const char *tmp_dir = getenv("TMPDIR");
-         if (tmp_dir == NULL || strnlen(tmp_dir, PATH_MAX) >= PATH_MAX) {
--                tmp_dir = "/tmp";
-+                tmp_dir = "@TERMUX_PREFIX@/tmp";
-         }
+         c_strcpy(tmpdir_buf, tmp_dir, KEW_PATH_MAX);
+@@ -394,7 +394,7 @@ static const char *get_tmp_dir(void)
+     return "C:\\Temp";
+ #else
+     const char *tmp = getenv("TMPDIR");
+-    return (tmp && *tmp) ? tmp : "/tmp";
++    return (tmp && *tmp) ? tmp : "@TERMUX_PREFIX@/tmp";
+ #endif
+ }
  
-         struct passwd *pw = getpwuid(getuid());
