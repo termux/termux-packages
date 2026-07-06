@@ -1,0 +1,32 @@
+--- a/Makefile	2026-07-05 00:46:56.486787400 +0530
++++ b/Makefile	2026-07-05 00:46:57.968455570 +0530
+@@ -939,11 +939,19 @@
+ 
+ LIB_FILE = libgit.a
+ 
++ifdef CARGO_BUILD_TARGET
++ifdef DEBUG
++RUST_TARGET_DIR = target/${CARGO_BUILD_TARGET}/debug
++else
++RUST_TARGET_DIR = target/${CARGO_BUILD_TARGET}/release
++endif
++else
+ ifdef DEBUG
+ RUST_TARGET_DIR = target/debug
+ else
+ RUST_TARGET_DIR = target/release
+ endif
++endif
+ 
+ ifeq ($(uname_S),Windows)
+ RUST_LIB = $(RUST_TARGET_DIR)/gitcore.lib
+@@ -976,6 +984,9 @@
+ 
+ # Rust flags
+ CARGO_ARGS =
++ifdef CARGO_BUILD_TARGET
++CARGO_ARGS += --target ${CARGO_BUILD_TARGET}
++endif
+ ifndef V
+ CARGO_ARGS += --quiet
+ endif

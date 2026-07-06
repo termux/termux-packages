@@ -2,15 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://octave.org
 TERMUX_PKG_DESCRIPTION="GNU Octave is a high-level language, primarily intended for numerical computations. (only CLI)"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2:10.3.0"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="2:11.3.0"
 TERMUX_PKG_SRCURL="https://ftpmirror.gnu.org/octave/octave-${TERMUX_PKG_VERSION#*:}.tar.xz"
-TERMUX_PKG_SHA256=92ae9bf2edcd288bd2df9fd0b4f7aa719b49d3940fceb154c5fdcd846f254da1
+TERMUX_PKG_SHA256=2b80f3149b2de6d1f4f2fcb4fe6515a17eb363b52111bf57b90f37bf6f5e12e1
 TERMUX_PKG_DEPENDS="libandroid-complex-math, arpack-ng, clang, bzip2, fftw, fontconfig, freetype, ghostscript, glpk, graphicsmagick, libcurl, libhdf5, libiconv, libopenblas, libsndfile, make, openssl, pcre2, portaudio, qhull, qrupdate-ng, rapidjson, readline, suitesparse, sundials, zlib"
 TERMUX_PKG_BUILD_DEPENDS="gnuplot, less"
 TERMUX_PKG_RECOMMENDS="gnuplot, less"
 TERMUX_PKG_CONFLICTS="octave-x"
 TERMUX_PKG_BUILD_IN_SRC=true
+# gl_cv_cc_visibility=no prevents error about no '-fvisibility=hidden'
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-x
 --disable-java
@@ -34,6 +34,7 @@ ac_cv_func_getpwuid=no
 ac_cv_func_setgrent=no
 ac_cv_func_setpwent=no
 ac_cv_func_setpwuid=no
+gl_cv_cc_visibility=no
 "
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 

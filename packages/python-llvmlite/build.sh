@@ -5,8 +5,8 @@ TERMUX_PKG_LICENSE="BSD 2-Clause, Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.thirdparty"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(
-	"0.47.0"
-	"20.1.8"
+	"0.48.0"
+	"22.1.8"
 )
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=(
@@ -14,13 +14,16 @@ TERMUX_PKG_SRCURL=(
 	"https://github.com/llvm/llvm-project/releases/download/llvmorg-${TERMUX_PKG_VERSION[1]}/llvm-project-${TERMUX_PKG_VERSION[1]}.src.tar.xz"
 )
 TERMUX_PKG_SHA256=(
-	819a4db56e0983f9106734a07732238b55783bac654a2365c47f4c35f3c96ba2
-	6898f963c8e938981e6c4a302e83ec5beb4630147c7311183cf61069af16333d
+	a15971f69eb17e07718be1a7d18185918c298d3b0f82f0bf08e9a5893b2f53ca
+	922f1817a0df7b1489272d18134ee0087a8b068828f87ac63b9861b1a9965888
 )
 TERMUX_PKG_DEPENDS="libc++, libffi, python, python-pip"
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_AUTO_UPDATE=true
+# auto update does not work with packages that have a version array with two versions that must
+# be updated simultaneously
+# https://github.com/termux/termux-packages/pull/23678
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_HOSTBUILD=true
 
 # See http://llvm.org/docs/CMake.html:

@@ -2,12 +2,16 @@ https://github.com/termux/termux-packages/issues/29240
 
 --- a/Makefile
 +++ b/Makefile
-@@ -122,7 +122,7 @@ else ifeq ($(DEBUG), 2)
+@@ -122,10 +122,10 @@ COMMONFLAGS = $(LOCAL_INC) $(PKG_CFLAGS)
+ 
+ ifeq ($(DEBUG), 1)
+     SYMBOL_FLAGS := -g
+-    COMMONFLAGS += $(SYMBOL_FLAGS) -DDEBUG -Wformat -ffunction-sections -fdata-sections -Werror=format-security
++    COMMONFLAGS += $(SYMBOL_FLAGS) -DDEBUG -Wformat -ffunction-sections -fdata-sections
+ else ifeq ($(DEBUG), 2)
+     SYMBOL_FLAGS := -g -O0
+-    COMMONFLAGS += $(SYMBOL_FLAGS) -DDEBUG -Wformat -ffunction-sections -fdata-sections -Werror=format-security -fsanitize=address,undefined \
++    COMMONFLAGS += $(SYMBOL_FLAGS) -DDEBUG -Wformat -ffunction-sections -fdata-sections -fsanitize=address,undefined \
+           -fno-omit-frame-pointer \
            -fno-optimize-sibling-calls
      LDFLAGS += -fsanitize=address,undefined
- else
--    COMMONFLAGS += $(SYMBOL_FLAGS) -O2 -fstack-protector-strong -Wformat -ffunction-sections -fdata-sections -Werror=format-security -D_FORTIFY_SOURCE=2
-+    COMMONFLAGS += $(SYMBOL_FLAGS) -O2 -fstack-protector-strong -Wformat -ffunction-sections -fdata-sections -D_FORTIFY_SOURCE=2
- endif
- 
- ifneq ($(strip $(KEW_VERSION)),)

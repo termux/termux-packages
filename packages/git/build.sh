@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://git-scm.com/
 TERMUX_PKG_DESCRIPTION="Fast, scalable, distributed revision control system"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
-TERMUX_PKG_VERSION="2.54.0"
+TERMUX_PKG_VERSION="2.55.0"
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/pub/software/scm/git/git-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=f689162364c10de79ef89aa8dbf48731eb057e34edbbd20aca510ce0154681a3
+TERMUX_PKG_SHA256=457fdb04dc8728e007d4688695e6912e6f680727920f2a40bf11eacc17505357
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libcurl, libexpat, libiconv, less, openssl, pcre2, zlib"
 TERMUX_PKG_RECOMMENDS="openssh"
@@ -27,63 +27,32 @@ TERMUX_PKG_EXTRA_MAKE_ARGS="
 NO_NSEC=1
 NO_GETTEXT=1
 NO_INSTALL_HARDLINKS=1
+INSTALL_SYMLINKS=1
 CSPRNG_METHOD=openssl
-PERL_PATH=$TERMUX_PREFIX/bin/perl
 USE_LIBPCRE2=1
 DEFAULT_PAGER=pager
 DEFAULT_EDITOR=editor
 "
+TERMUX_PKG_MAKE_INSTALL_TARGET="install install-man"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
-	# Certain packages are not safe to build on device because their
-	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if [[ "$TERMUX_ON_DEVICE_BUILD" == 'true' ]]; then
-		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
-	fi
-
-	# Setup perl so that the build process can execute it:
-	rm -f "$TERMUX_PREFIX/bin/perl"
-	ln -s "$(command -v perl)" "$TERMUX_PREFIX/bin/perl"
-
-	# Force fresh perl files (otherwise files from earlier builds
-	# remains without bumped modification times, so are not picked
-	# up by the package):
-	rm -rf "$TERMUX_PREFIX/share/git-perl"
-
+	termux_setup_rust
+	export CARGO_BUILD_TARGET="$CARGO_TARGET_NAME"
 	# Fixes build if utfcpp is installed:
 	CPPFLAGS="-I$TERMUX_PKG_SRCDIR $CPPFLAGS"
 }
 
-termux_step_post_make_install() {
-	# shellcheck disable=SC2086 # We need word splitting on the extra args
-	{
-	# Installing man requires asciidoc and xmlto, so git uses separate make targets for man pages
-	make -j "$TERMUX_PKG_MAKE_PROCESSES" install-man
+termux_step_make_install() {
+	make -j "${TERMUX_PKG_MAKE_PROCESSES}" ${TERMUX_PKG_EXTRA_MAKE_ARGS} ${TERMUX_PKG_MAKE_INSTALL_TARGET}
+	make -C contrib/subtree -j "${TERMUX_PKG_MAKE_PROCESSES}" ${TERMUX_PKG_EXTRA_MAKE_ARGS} ${TERMUX_PKG_MAKE_INSTALL_TARGET}
+}
 
-	make -j "$TERMUX_PKG_MAKE_PROCESSES" -C contrib/subtree $TERMUX_PKG_EXTRA_MAKE_ARGS
-	make -C contrib/subtree $TERMUX_PKG_EXTRA_MAKE_ARGS "${TERMUX_PKG_MAKE_INSTALL_TARGET}"
-	make -j "$TERMUX_PKG_MAKE_PROCESSES" -C contrib/subtree install-man
-	}
+termux_step_post_make_install() {
 	mkdir -p "$TERMUX_PREFIX/etc/bash_completion.d/"
 	cp "$TERMUX_PKG_SRCDIR/contrib/completion/git-completion.bash" \
 		"$TERMUX_PKG_SRCDIR/contrib/completion/git-prompt.sh" \
 		"$TERMUX_PREFIX/etc/bash_completion.d/"
-
-	# Remove the build machine perl setup in termux_step_pre_configure to avoid it being packaged:
-	rm "$TERMUX_PREFIX/bin/perl"
-
-	# Remove clutter:
-	rm -rf "$TERMUX_PREFIX/lib"/*-linux*/perl
-
-	# shellcheck disable=SC2164
-	( # Remove duplicated binaries in bin/ with symlink to the one in libexec/git-core:
-		cd "$TERMUX_PREFIX/bin"
-		ln -sf ../libexec/git-core/git git
-		ln -sf ../libexec/git-core/git-upload-pack git-upload-pack
-		cd "$TERMUX_PREFIX/libexec/git-core"
-		ln -sf git-gui git-citool
-	)
 }
 
 termux_step_post_massage() {
