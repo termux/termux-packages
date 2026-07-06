@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://tenacityaudio.org/
 TERMUX_PKG_DESCRIPTION="An easy-to-use, privacy-friendly, FLOSS, cross-platform multi-track audio editor (Audacity fork)"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="@3ls-it"
-TERMUX_PKG_VERSION="1.3.4"
+TERMUX_PKG_MAINTAINER="3ls-it <3ls-it@pm.me>"
+TERMUX_PKG_VERSION="1.3.5"
 TERMUX_PKG_SRCURL=git+https://codeberg.org/tenacityteam/tenacity
 TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION}"
 TERMUX_PKG_DEPENDS="ffmpeg, gdk-pixbuf, glib, gtk3, libc++, vamp-plugin-sdk, libexpat, libflac, libid3tag, libogg, libopus, libsndfile, libsoundtouch, libsoxr, libuuid, libvorbis, libwavpack, libmpg123, opusfile, portaudio, portmidi, wxwidgets"
