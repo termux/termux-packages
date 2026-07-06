@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=c16e913577083761d847146db7a04b8d3b3bf755
 _COMMIT_DATE=20241024
 TERMUX_PKG_VERSION="3.116.1.${_COMMIT_DATE}"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/mono/skia/archive/${_COMMIT}.tar.gz"
 TERMUX_PKG_SHA256=3fd17a42cca9a7dbde68ab016969b70ab7dd4833403ac1a192e1aa51aed4617b
 TERMUX_PKG_DEPENDS="libexpat, libglvnd, libpng, libwebp, freetype, zlib, libjpeg-turbo"
