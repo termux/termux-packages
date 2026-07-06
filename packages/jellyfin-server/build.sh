@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A free media system for organizing and streaming media (
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(
-	10.11.11
+	12.0-rc2
 	7.1.4.3
 )
 TERMUX_PKG_SRCURL=(
@@ -12,15 +12,15 @@ TERMUX_PKG_SRCURL=(
 	"https://github.com/jellyfin/jellyfin-ffmpeg/archive/refs/tags/v${TERMUX_PKG_VERSION[1]%.*}-${TERMUX_PKG_VERSION[1]##*.}.tar.gz"
 )
 TERMUX_PKG_SHA256=(
-	71e1126d6ada344230c3bcfbcccd71e46921cc950c1b13877858e3a5fe011baf
-	7e1cf362996b8cd49b894428da3d5dec3bf6e121d0b6b7df24b8410000f04a4b
+	fc99a8e2680ca0e12fe4c0db5aa8b6fb1cf078e0818a83568e2b77ca4bd62838
+	054a83cf0b1cd6bc0493bc53622cc2136cbe35e1e8c0b2b1bf7fcc9ba25fb8d5
 	38fff90f73b3c4f9c3c7270711411a4ec3cbe63b205d4b4a5525bcc532d3d31f
 )
-TERMUX_PKG_DEPENDS="aspnetcore-runtime-9.0, dotnet-host, dotnet-runtime-9.0, libskiasharp, libesqlite3, jellyfin-ffmpeg"
-TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-9.0, dotnet-targeting-pack-9.0, libcairo, pango, libjpeg-turbo, giflib, librsvg"
+TERMUX_PKG_DEPENDS="aspnetcore-runtime-10.0, dotnet-host, dotnet-runtime-10.0, libskiasharp3 (>= 3.119), libskiasharp3 (<< 4), libesqlite3, jellyfin-ffmpeg"
+TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-10.0, dotnet-targeting-pack-10.0, libcairo, pango, libjpeg-turbo, giflib, librsvg"
 TERMUX_PKG_SERVICE_SCRIPT=(
 	"jellyfin"
-	"exec ${TERMUX_PREFIX}/bin/jellyfin 2>&1"
+	"OLD_DATA_DIR=\"\$HOME/.local/share/jellyfin\"; NEW_DATA_DIR=\"\$HOME/jellyfin\"; if [ -d \"\$OLD_DATA_DIR/root/default\" ] && [ -n \"\$(ls -A \"\$OLD_DATA_DIR/root/default\" 2>/dev/null)\" ] && { [ ! -d \"\$NEW_DATA_DIR/root/default\" ] || [ -z \"\$(ls -A \"\$NEW_DATA_DIR/root/default\" 2>/dev/null)\" ]; }; then echo \"[jellyfin-migrate] Detected pre-existing data at \$OLD_DATA_DIR not present at \$NEW_DATA_DIR — copying library root and fixing CollectionFolder paths. Back up \$NEW_DATA_DIR/data/jellyfin.db before relying on this.\"; mkdir -p \"\$NEW_DATA_DIR/root/default\"; cp -rn \"\$OLD_DATA_DIR/root/default/.\" \"\$NEW_DATA_DIR/root/default/\"; if [ -f \"\$NEW_DATA_DIR/data/jellyfin.db\" ] && command -v sqlite3 >/dev/null 2>&1; then sqlite3 \"\$NEW_DATA_DIR/data/jellyfin.db\" \"UPDATE BaseItems SET Path = REPLACE(Path, '\$OLD_DATA_DIR', '\$NEW_DATA_DIR') WHERE Path LIKE '\$OLD_DATA_DIR%';\" 2>/dev/null || echo '[jellyfin-migrate] WARNING: sqlite3 path fixup failed, run manually.'; fi; fi; exec ${TERMUX_PREFIX}/bin/jellyfin --datadir \"\$NEW_DATA_DIR\" 2>&1"
 )
 TERMUX_PKG_EXCLUDED_ARCHES="arm"
 TERMUX_PKG_RM_AFTER_INSTALL="
@@ -34,7 +34,7 @@ termux_step_post_get_source() {
 	# if [[ -f "debian/patches/series" ]]; then
 	# quilt push -a
 	# fi
-	local _patch;
+	local _patch
 	for _patch in $(<debian/patches/series); do
 		git apply --whitespace=nowarn "debian/patches/${_patch}"
 	done
@@ -42,8 +42,9 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
-	TERMUX_DOTNET_VERSION=9.0
-	termux_setup_dotnet; termux_setup_nodejs
+	TERMUX_DOTNET_VERSION=10.0
+	termux_setup_dotnet
+	termux_setup_nodejs
 
 	pushd jellyfin-web-"${TERMUX_PKG_VERSION[0]}"
 	npm install
@@ -67,9 +68,9 @@ termux_step_pre_configure() {
 		# Specify --disable-asm to prevent text relocations on i686,
 		# see https://trac.ffmpeg.org/ticket/4928
 		_EXTRA_CONFIGURE_FLAGS="--disable-asm"
-#	elif [ "$TERMUX_ARCH" = "arm" ]; then
-#		_ARCH="armeabi-v7a"
-#		_EXTRA_CONFIGURE_FLAGS="--enable-neon"
+		#	elif [ "$TERMUX_ARCH" = "arm" ]; then
+		#		_ARCH="armeabi-v7a"
+		#		_EXTRA_CONFIGURE_FLAGS="--enable-neon"
 	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
 		_ARCH="x86_64"
 	elif [ "$TERMUX_ARCH" = "aarch64" ]; then
@@ -84,28 +85,28 @@ termux_step_pre_configure() {
 	# generated using ffmpeg-configureopts.sh
 	# if names of variables used in this command are changed, please update variable names in ffmpeg-configureopts.sh as well
 	./configure --prefix="${_FFMPEG_PREFIX}" \
-	--arch="${_ARCH}" \
-	--as="$AS" \
-	--cc="$CC" \
-	--cxx="$CXX" \
-	--nm="$NM" \
-	--ar="$AR" \
-	--ranlib=llvm-ranlib \
-	--pkg-config="$PKG_CONFIG" \
-	--strip="$STRIP" \
-	--enable-cross-compile \
-	--extra-version="Jellyfin" \
-	--extra-cflags="" \
-	--extra-cxxflags="" \
-	--extra-ldflags="" \
-	--extra-ldexeflags="-pie" \
-	--extra-libs="-ldl -landroid-glob" \
-	--target-os=android \
-	--disable-static \
-	--enable-shared \
-	--enable-gpl --enable-version3 --disable-ffplay --disable-debug --disable-doc --disable-sdl2 --disable-libxcb --disable-xlib --enable-lto=auto --enable-iconv --enable-zlib --enable-libfreetype --enable-libfribidi --enable-gmp --enable-libxml2 --enable-openssl --enable-lzma --enable-fontconfig --enable-libharfbuzz --enable-libvorbis --enable-opencl --enable-chromaprint --enable-libdav1d --enable-libass --enable-libbluray --enable-libmp3lame --enable-libopus --enable-libtheora --enable-libvpx --enable-libwebp --enable-libopenmpt --enable-libsrt --enable-libsvtav1 --enable-libx264 --enable-libx265 --enable-libzimg \
-	${_EXTRA_CONFIGURE_FLAGS} \
-	--disable-vulkan
+		--arch="${_ARCH}" \
+		--as="$AS" \
+		--cc="$CC" \
+		--cxx="$CXX" \
+		--nm="$NM" \
+		--ar="$AR" \
+		--ranlib=llvm-ranlib \
+		--pkg-config="$PKG_CONFIG" \
+		--strip="$STRIP" \
+		--enable-cross-compile \
+		--extra-version="Jellyfin" \
+		--extra-cflags="" \
+		--extra-cxxflags="" \
+		--extra-ldflags="" \
+		--extra-ldexeflags="-pie" \
+		--extra-libs="-ldl -landroid-glob" \
+		--target-os=android \
+		--disable-static \
+		--enable-shared \
+		--enable-gpl --enable-version3 --disable-ffplay --disable-debug --disable-doc --disable-sdl2 --disable-libxcb --disable-xlib --enable-lto=auto --enable-iconv --enable-zlib --enable-libfreetype --enable-libfribidi --enable-gmp --enable-libxml2 --enable-openssl --enable-lzma --enable-fontconfig --enable-libharfbuzz --enable-libvorbis --enable-opencl --enable-chromaprint --enable-libdav1d --enable-libass --enable-libbluray --enable-libmp3lame --enable-libopus --enable-libtheora --enable-libvpx --enable-libwebp --enable-libopenmpt --enable-libsrt --enable-libsvtav1 --enable-libx264 --enable-libx265 --enable-libzimg \
+		${_EXTRA_CONFIGURE_FLAGS} \
+		--disable-vulkan
 
 	make -j"$TERMUX_PKG_MAKE_PROCESSES"
 	make install
@@ -127,12 +128,9 @@ termux_step_make_install() {
 	find "${TERMUX_PKG_BUILDDIR}/build" -name '*.xml' -type f -exec rm '{}' +
 	find "${TERMUX_PKG_BUILDDIR}/build" ! \( -name 'jellyfin' -o -type d \) -exec chmod 0600 '{}' \;
 	find "${TERMUX_PKG_BUILDDIR}/build" \( -name 'jellyfin' -o -type d \) -exec chmod 0700 '{}' \;
+	rm -rf "${TERMUX_PREFIX}/lib/jellyfin"
 	mv "${TERMUX_PKG_BUILDDIR}/build" "${TERMUX_PREFIX}/lib/jellyfin"
-	ln -s "${TERMUX_PREFIX}/lib/jellyfin/jellyfin" "${TERMUX_PREFIX}/bin/jellyfin"
+	ln -sf "${TERMUX_PREFIX}/lib/libskiasharp3/libSkiaSharp.so" "${TERMUX_PREFIX}/lib/jellyfin/libSkiaSharp.so"
+	ln -sf "${TERMUX_PREFIX}/lib/libskiasharp3/libHarfBuzzSharp.so" "${TERMUX_PREFIX}/lib/jellyfin/libHarfBuzzSharp.so"
+	ln -sf "${TERMUX_PREFIX}/lib/jellyfin/jellyfin" "${TERMUX_PREFIX}/bin/jellyfin"
 }
-# References
-# - Jellyfin-FFMPEG
-# https://github.com/jellyfin/jellyfin-ffmpeg/blob/jellyfin/builder/build.sh
-# https://github.com/termux/termux-packages/tree/master/packages/ffmpeg
-# Note: All patches for Jellyfin-FFMPEG should be based off the patched version, see termux_step_post_get_source
-# One of the source urls (jellyfin-web) points to a zip to avoid overwriting jellyfin's source archive due to duplicate filename

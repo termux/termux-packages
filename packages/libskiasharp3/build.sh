@@ -156,8 +156,8 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm600 -t "${TERMUX_PREFIX}/lib" "${TERMUX_PKG_BUILDDIR}/libSkiaSharp.so"
-	install -Dm600 -t "${TERMUX_PREFIX}/lib" "${TERMUX_PKG_BUILDDIR}/libHarfBuzzSharp.so"
+	install -Dm600 -t "${TERMUX_PREFIX}/lib/libskiasharp3" "${TERMUX_PKG_BUILDDIR}/libSkiaSharp.so"
+	install -Dm600 -t "${TERMUX_PREFIX}/lib/libskiasharp3" "${TERMUX_PKG_BUILDDIR}/libHarfBuzzSharp.so"
 }
 
 termux_step_post_massage() {
