@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://codeberg.org/ravachol/kew
+TERMUX_PKG_HOMEPAGE=https://kewplayer.com
 TERMUX_PKG_DESCRIPTION="Music for the Shell"
 TERMUX_PKG_LICENSE="GPL-2.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
