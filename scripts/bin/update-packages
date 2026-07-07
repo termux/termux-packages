@@ -85,9 +85,17 @@ TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'del(.pkg_format) | keys | .[]' "$
 
 # Converts milliseconds to human-readable format.
 # Example: `ms_to_human_readable 123456789` => 34h 17m 36s 789ms
+#
+# We need to manually clamp the inputs to 13 digits since uutils `date`
+# does not handle widths for the '%N' specifier correctly as of version 0.8.0
+# which is what currently ships with Ubuntu 26.04.
+# This commit can be reverted once Ubuntu ships uutils >= 0.9.0 or backports the fix.
 ms_to_human_readable() {
-	local t="$1" hrs=0 mins=0 secs=0 ms=0
-	(( ms = t%1000, t /= 1000, secs = t%60, t /= 60, mins = t%60, hrs = t/60 ))
+    local now start
+    printf -v now '%13d' "$1"
+    printf -v start '%13d' "$2"
+    local span="$(( now - start ))" hrs=0 mins=0 secs=0 ms=0
+	(( ms = span%1000, span /= 1000, secs = span%60, span /= 60, mins = span%60, hrs = span/60 ))
 	echo "${hrs}h ${mins}m ${secs}s ${ms}ms" | sed 's/0h //;s/0m //;s/0s //'
 }
 
@@ -538,7 +546,7 @@ if [[ -n "$GITHUB_TOKEN" ]] && command -v gh &> /dev/null; then
 	)
 	printf "Cached %s existing issues - took %s\n" \
 		"${#_CACHED_ISSUES[*]}" \
-		"$(ms_to_human_readable $(( $(date +%10s%3N) - _start_time )))"
+		"$(ms_to_human_readable "$(date +%10s%3N)" "$_start_time")"
 fi
 _start_time="$(date +%10s%3N)"
 
@@ -598,7 +606,7 @@ for pkg_dir in "${PACKAGE_DIRS_LIST[@]}"; do
 	_should_update "${pkg_dir}" || continue
 	_update_dependencies "${pkg_dir}"
 	_run_update "${pkg_dir}"
-	echo "termux - took $(ms_to_human_readable $(( $(date +%10s%3N) - _unix_millis )))"
+	echo "termux - took $(ms_to_human_readable "$(date +%10s%3N)" "$_unix_millis")"
 done
 
 exec {IPC_FIFO_FD}<&- # close the FIFO
@@ -622,7 +630,7 @@ done
 #################################################REPORT CHANGES##################################################
 
 echo ""
-echo "SUMMARY: Checked ${_SUMMARY[total]} packages - took $(ms_to_human_readable $(( $(date +%10s%3N) - _start_time ))) in total."
+echo "SUMMARY: Checked ${_SUMMARY[total]} packages - took $(ms_to_human_readable "$(date +%10s%3N)" "$_start_time") in total."
 echo "SUMMARY: $# (Directly passed), ${_SUMMARY[dependencies]} (Dependencies)"
 echo "SUMMARY: Update methods and release types."
 sort <<< "${codepaths:-}"
