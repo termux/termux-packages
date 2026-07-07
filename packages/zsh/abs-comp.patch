@@ -1,0 +1,16 @@
+--- a/Completion/Unix/Type/_path_files
++++ b/Completion/Unix/Type/_path_files
+@@ -358,6 +358,13 @@ else
+   fi
+ fi
+ 
++# Many system dirs that lie under / (including /) cannot be read for non-root
++# Android users. With the current state of zsh, this causes autocompletion
++# on absolute paths to fail when accept-exact-dirs is false (which is the
++# default). This workaround enables accept-exact-dirs temporarily to resolve
++# the issue.
++[[ "$PREFIX" = /* && "$EUID" != 0 ]] && accept_exact_dirs=1
++
+ # Now we generate the matches. First we loop over all prefix paths given
+ # with the `-W' option.
+ 
