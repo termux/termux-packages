@@ -176,8 +176,17 @@ fi
 
 # Converts milliseconds to human-readable format.
 # Example: `ms_to_human_readable 123456789` => 34h 17m 36s 789ms
+#
+# Clamp timestamps to 13 digits to work around uutils `date` bug.
+# See scripts/bin/update-packages ms_to_human_readable()
+# for detailed explanation.
 ms_to_human_readable() {
-	echo "$(($1/3600000))h $(($1%3600000/60000))m $(($1%60000/1000))s $(($1%1000))ms" | sed 's/0h //;s/0m //;s/0s //'
+    local now start
+    printf -v now '%13d' "$1"
+    printf -v start '%13d' "$2"
+    local span="$(( now - start ))" hrs=0 mins=0 secs=0 ms=0
+	(( ms = span%1000, span /= 1000, secs = span%60, span /= 60, mins = span%60, hrs = span/60 ))
+	echo "${hrs}h ${mins}m ${secs}s ${ms}ms" | sed 's/0h //;s/0m //;s/0s //'
 }
 
 maybe_cleanup() {
@@ -218,12 +227,12 @@ for package in "${PACKAGES[@]}"; do
 		./scripts/run-docker.sh ./build-package.sh -I -f -a "${ARCH}" "${package}"
 		status="${PIPESTATUS[0]}"
 		echo # newline
-		echo "INFO: Building ${package} for ${ARCH} took $(ms_to_human_readable $(( $(date +%10s%3N) - start )))"
+		echo "INFO: Building ${package} for ${ARCH} took $(ms_to_human_readable "$(date +%10s%3N)" "$start")"
 		echo # newline
 		exit "$status"
 	)" || failed["${package} ${ARCH}"]="${output}"
 done
-echo "INFO: Building all packages for ${ARCH} took $(ms_to_human_readable $(( $(date +%10s%3N) - start_building_arch )))" | tee -a "${GITHUB_STEP_SUMMARY}"
+echo "INFO: Building all packages for ${ARCH} took $(ms_to_human_readable "$(date +%10s%3N)" "$start_building_arch")" | tee -a "${GITHUB_STEP_SUMMARY}"
 echo # newline
 
 if (( ${#failed[@]} > 0 )); then

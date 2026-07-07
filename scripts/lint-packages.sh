@@ -800,10 +800,15 @@ linter_main() {
 	return
 }
 
+# Clamp timestamps to 13 digits (+ decimal point) to work around uutils `date` bug.
+# See scripts/bin/update-packages ms_to_human_readable()
+# for detailed explanation.
 time_elapsed() {
-	local start="$1" end="$(date +%10s.%3N)"
-	local elapsed="$(( ${end/.} - ${start/.} ))"
-	echo "[INFO]: Finished linting build scripts ($(date -d "@$end" --utc '+%Y-%m-%dT%H:%M:%SZ' 2>&1))"
+	local now start
+	printf -v now '%14s' "$(date +%10s.%3N)"
+	printf -v start '%14s' "$1"
+	local elapsed="$(( ${now/.} - ${start/.} ))"
+	echo "[INFO]: Finished linting build scripts ($(date -d "@$now" --utc '+%Y-%m-%dT%H:%M:%SZ' 2>&1))"
 	printf '[INFO]: Time elapsed: %s\n' \
 		"$(sed 's/0m //;s/0s //' <<< "$(( elapsed % 3600000 / 60000 ))m$(( elapsed % 60000 / 1000 ))s$(( elapsed % 1000 ))ms")"
 }
