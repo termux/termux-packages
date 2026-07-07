@@ -68,9 +68,10 @@ diff -uNr xrdp-0.9.16/sesman/startwm.sh xrdp-0.9.16.mod/sesman/startwm.sh
  wm_start
  
  exit 1
-diff -uNr xrdp-0.9.16/xrdp/xrdp.ini.in xrdp-0.9.16.mod/xrdp/xrdp.ini
---- xrdp-0.9.16/xrdp/xrdp.ini.in	2021-04-30 12:26:36.000000000 +0000
-+++ xrdp-0.9.16.mod/xrdp/xrdp.ini.in	2021-05-05 22:54:03.485386615 +0000
+diff --git a/xrdp/xrdp.ini.in b/xrdp/xrdp.ini.in
+index a014f28b789d..825f98bcb8ee 100644
+--- a/xrdp/xrdp.ini.in
++++ b/xrdp/xrdp.ini.in
 @@ -12,7 +12,7 @@ fork=true
  ;
  ; Examples:
@@ -80,7 +81,7 @@ diff -uNr xrdp-0.9.16/xrdp/xrdp.ini.in xrdp-0.9.16.mod/xrdp/xrdp.ini
  ;   port=tcp://.:3389                           127.0.0.1:3389
  ;   port=tcp://:3389                            *:3389
  ;   port=tcp://<any ipv4 format addr>:3389      192.168.1.1:3389
-@@ -197,7 +197,7 @@ ls_btn_cancel_height=30
+@@ -206,7 +206,7 @@ ls_btn_cancel_height=30
  ; Note: Log levels can be any of: core, error, warning, info, debug, or trace
  LogFile=xrdp.log
  LogLevel=INFO
@@ -89,7 +90,7 @@ diff -uNr xrdp-0.9.16/xrdp/xrdp.ini.in xrdp-0.9.16.mod/xrdp/xrdp.ini
  #SyslogLevel=INFO
  #EnableConsole=false
  #ConsoleLevel=INFO
-@@ -231,32 +231,17 @@ rail=true
+@@ -233,32 +233,17 @@ rail=true
  xrdpvr=true
  
  ; for debugging xrdp, in section xrdp1, change port=-1 to this:
@@ -123,34 +124,38 @@ diff -uNr xrdp-0.9.16/xrdp/xrdp.ini.in xrdp-0.9.16.mod/xrdp/xrdp.ini
 +username=na
  password=ask
  ip=127.0.0.1
- port=-1
-@@ -265,82 +250,3 @@ port=-1
+ ; port is -1 (sesman controlled), numeric (TCP connection) or an
+@@ -285,86 +270,3 @@ port=-1
  ; Disable requested encodings to support buggy VNC servers
  ; (1 = ExtendedDesktopSize)
  #disabled_encodings_mask=0
 -
 -; Generic VNC Proxy
--; Tailor this to specific hosts and VNC instances by specifying an ip
+-; To use this, remove the '#-#' prefix from the lines below. Tailor
+-; the section to specific hosts and VNC instances by specifying an ip
 -; and port and setting a suitable name.
--[vnc-any]
--name=vnc-any
--lib=libvnc.@lib_extension@
--ip=ask
--port=ask5900
--username=na
--password=ask
--#pamusername=asksame
--#pampassword=asksame
--#delay_ms=2000
--; Use one of these to connect to a chansrv instance created outside of sesman
--; (e.g. as part of an x11vnc console session). Replace 'n' with the
--; display number of the session, and (if applicable) 'u' with the numeric
--; UID of the session.
--;
--; If 'username' or 'pamusername' is set, you probably don't need to use
--; the two parameter variant with 'u'.
--#chansrvport=DISPLAY(n)
--#chansrvport=DISPLAY(n,u)
+-; This can be used with no customisations in test environments, but
+-; should always be locked down to specific hosts and/or ports in
+-; production.
+-#-#[vnc-any]
+-#-#name=vnc-any
+-#-#lib=libvnc.@lib_extension@
+-#-#ip=ask
+-#-#port=ask5900
+-#-#username=na
+-#-#password=ask
+-#-##pamusername=asksame
+-#-##pampassword=asksame
+-#-##delay_ms=2000
+-#-#; Use one of these to connect to a chansrv instance created outside of sesman
+-#-#; (e.g. as part of an x11vnc console session). Replace 'n' with the
+-#-#; display number of the session, and (if applicable) 'u' with the numeric
+-#-#; UID of the session.
+-#-#;
+-#-#; If 'username' or 'pamusername' is set, you probably don't need to use
+-#-#; the two parameter variant with 'u'.
+-#-##chansrvport=DISPLAY(n)
+-#-##chansrvport=DISPLAY(n,u)
 -
 -; Generic RDP proxy using NeutrinoRDP
 -; Tailor this to specific hosts by specifying an ip and port and setting
