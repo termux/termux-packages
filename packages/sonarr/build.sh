@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE="https://sonarr.tv"
 TERMUX_PKG_DESCRIPTION="A PVR for Usenet and BitTorrent users (server)"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.0.17.2952"
+TERMUX_PKG_VERSION="4.0.19.2979"
 TERMUX_PKG_SRCURL="https://github.com/Sonarr/Sonarr/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=9b986545f28308de5969bdd913ae3b3528f71a632b7dc097af72c63b16789d7b
+TERMUX_PKG_SHA256=f314e8b312ab431b78fe7d4c6c4093164e7bc402d93b7052cb87bd3e3dbf0b4c
 TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-9.0, dotnet-targeting-pack-9.0, nodejs, yarn"
 TERMUX_PKG_DEPENDS="aspnetcore-runtime-9.0, dotnet-host, dotnet-runtime-9.0, mono, libesqlite3, libcurl, ffmpeg"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -14,6 +14,8 @@ TERMUX_PKG_SERVICE_SCRIPT=(
 )
 TERMUX_PKG_EXCLUDED_ARCHES="arm"
 TERMUX_DOTNET_VERSION=9.0
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 
 termux_step_pre_configure() {
 	# Remove global.json to allow using system dotnet version
