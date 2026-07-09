@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="Provides cryptographic recipes and primitives to Python 
 TERMUX_PKG_LICENSE="Apache-2.0, BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.APACHE, LICENSE.BSD"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="48.0.1"
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://github.com/pyca/cryptography/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=7f5f25290d718ef861f7efd9fa3bddf2d15426a3d58cecf5155519c683f06cbb
+TERMUX_PKG_VERSION="49.0.0"
+TERMUX_PKG_SRCURL="https://github.com/pyca/cryptography/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=a533606510cdea9e0f0616c61b18dbe3cfa5a2bbfbf48344a159d6ddc207ae13
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="openssl, python, python-pip"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -20,6 +19,7 @@ termux_step_configure() {
 	export CARGO_BUILD_TARGET="${CARGO_TARGET_NAME}"
 	export PYO3_CROSS_LIB_DIR="${TERMUX_PREFIX}/lib"
 	export ANDROID_API_LEVEL="${TERMUX_PKG_API_LEVEL}"
+	export CFLAGS_${CARGO_TARGET_NAME//-/_}+=" -I$TERMUX_PREFIX/include/python$TERMUX_PYTHON_VERSION"
 }
 
 termux_step_make_install() {
