@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A validating, recursive, caching DNS resolver"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.25.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://nlnetlabs.nl/downloads/unbound/unbound-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=0fe8b6277b0959cfd17562debac0aa5f71e0b02dc4ffa9c60271c583edab586f
 TERMUX_PKG_AUTO_UPDATE=true
