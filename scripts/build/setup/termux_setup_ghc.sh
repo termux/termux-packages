@@ -20,10 +20,10 @@ termux_setup_ghc() {
 		[[ -d "$TERMUX_GHC_RUNTIME_FOLDER" ]] && return
 
 		declare -A checksums=(
-			["aarch64"]="a9a70c178d3b7cd5733730d93c00975b9957e164f203d80ba04e53cd76c54183"
-			["arm"]="173c3b9bbc37afb47edb5f1f2f287064c37c7b4ef19ce787e6d82970e7c5f9cf"
-			["i686"]="77315c0eeae163d5a21077c86d1c2f6f0192fdc6cb6fe1e377fc1115cfb073d4"
-			["x86_64"]="07a289d912be3a9ae75aa5e2ae5f22d577fabd3a13331de3e6f318d7545fd38a"
+			["aarch64"]="efd05af38dbfd37706dcfe457aae99725c33b91223490582bdde172f6383668d"
+			["arm"]="6caa502e8694b1098fb93cdc291baf75cfd52e4851100a2d482e014b37e4db39"
+			["i686"]="5596d519c5353c7559e841660df4a80ad57decd49ffa66a6b7eaec12c2facb8c"
+			["x86_64"]="3700423505d40fb2563b0a417a5a3f60aed12c8655cde6b242a75175d0b51ea3"
 		)
 
 		local target="$TERMUX_HOST_PLATFORM"
@@ -49,6 +49,13 @@ termux_setup_ghc() {
 				--host="$target"
 			make install
 		) &>/dev/null
+
+		# Provide a common interface for downstream usecase:
+		for b in "$TERMUX_GHC_RUNTIME_FOLDER"/bin/"$target"-*; do
+			ln -sf "$b" "${b/$target-/}"
+		done
+		ln -sf "$TERMUX_GHC_RUNTIME_FOLDER"/lib/"$target"-ghc-"$TERMUX_GHC_VERSION"/bin/{"$target"-ghc-iserv,ghc-iserv}
+		ln -sf "$TERMUX_GHC_RUNTIME_FOLDER"/lib/"$target"-ghc-"$TERMUX_GHC_VERSION"/bin/{"$target"-ghc-iserv-dyn,ghc-iserv-dyn}
 
 		rm -rf "$TERMUX_GHC_TAR" "$TERMUX_GHC_TEMP_FOLDER"
 	else
