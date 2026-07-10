@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE='https://invent.kde.org/frameworks/kirigami'
 TERMUX_PKG_DESCRIPTION='A QtQuick based components set'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.27.0"
+TERMUX_PKG_VERSION="6.28.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kirigami-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=d7daa74e9fe81b674e54e6e979feb85d3d2f4216bf6d9c02bfaa2c021fe1ac2d
+TERMUX_PKG_SHA256=30fc6bd928a7124ace334944c8b45748603d37e45464db874903d7eb91f41d36
 TERMUX_PKG_DEPENDS="libc++, qt6-qtbase, qt6-qtdeclarative"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION%.*}), qt6-shadertools, qt6-qtsvg, qt6-qttools"
 TERMUX_PKG_AUTO_UPDATE=true
