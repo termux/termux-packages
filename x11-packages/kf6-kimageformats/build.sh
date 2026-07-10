@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://invent.kde.org/frameworks/kimageformats
 TERMUX_PKG_DESCRIPTION="Image format plugins for KDE"
 TERMUX_PKG_LICENSE="LGPL-2.0-only, LGPL-3.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.27.0"
+TERMUX_PKG_VERSION="6.28.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kimageformats-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=6a9f40936ba946279063cbdaea473b9eb735b53047b0124c88aca7db17ccabac
+TERMUX_PKG_SHA256=91808c6de080ab5b506721c1f78ad5772bcb1f70bba7262c275ccd98de8b6b38
 TERMUX_PKG_DEPENDS="imath, kf6-karchive (>= ${TERMUX_PKG_VERSION%.*}), libavif, libc++, libheif, libjxl, libraw, openjpeg, openexr"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION%.*}), qt6-qttools"
 TERMUX_PKG_AUTO_UPDATE=true
