@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE='https://invent.kde.org/frameworks/attica'
 TERMUX_PKG_DESCRIPTION='Qt library that implements the Open Collaboration Services API'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.27.0"
+TERMUX_PKG_VERSION="6.28.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/attica-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=8f3d3d61ec8a7456db8a75caa801a2e5f5e046728bd240a003e71b8813093ae4
+TERMUX_PKG_SHA256=652e28562ed6798f834843b45f5cd3ea5833f0ee3c2607cfe3d021b57c6e7618
 TERMUX_PKG_DEPENDS="libc++, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION%.*}), qt6-qttools"
 TERMUX_PKG_AUTO_UPDATE=true
