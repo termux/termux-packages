@@ -11,14 +11,14 @@ TERMUX_PKG_LICENSE_FILE="
 "
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.42.1"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL="https://www.kernel.org/pub/linux/utils/util-linux/v${TERMUX_PKG_VERSION:0:4}/util-linux-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=82e9158eb12a9b0b569d84e1687fed9dd18fe89ccd8ef5ac3427218a7c0d7f7f
 # <dependency>: <binaries linking to that dependency>
 # libandroid-glob: lsclocks
-# libandroid-posix-semaphore: lsipc and the lib{blkid,smartcols,uuid} subpackages
+# libandroid-posix-semaphore: lsipc, lsns and the lib{blkid,smartcols,uuid} subpackages
 # libcap-ng: setpriv
-# libsmartcols: cal, column, fincore, irqtop, losetup, lsclocks, lscpu, lsfd, lsipc, lsirq, prlimit, wdctl, zramctl
+# libsmartcols: cal, column, fincore, irqtop, losetup, lsclocks, lscpu, lsfd, lsipc, lsirq, lsns, prlimit, wdctl, zramctl
 # ncurses: cal, dmesg, hexdump, irqtop, setterm, ul
 # zlib: fsck.cramfs
 #
@@ -27,12 +27,6 @@ TERMUX_PKG_DEPENDS="libandroid-glob, libandroid-posix-semaphore, libcap-ng, libs
 TERMUX_PKG_ESSENTIAL=true
 TERMUX_PKG_BREAKS="util-linux-dev"
 TERMUX_PKG_REPLACES="util-linux-dev"
-# Most android kernels are built without namespace support, so remove lsns
-TERMUX_PKG_RM_AFTER_INSTALL="
-bin/lsns
-share/bash-completion/completions/lsns
-share/man/man8/lsns.8.gz
-"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_setns=yes
 ac_cv_func_statx=no
