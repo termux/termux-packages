@@ -1,0 +1,176 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# OpenClaw Game Launcher with controller & save state support
+# This is the GAME with full features
+
+TERMUX_PREFIX="/data/data/com.termux/files/usr"
+GAME_EXE="$TERMUX_PREFIX/bin/openclaw"
+DATA_DIR="${1:-$TERMUX_PREFIX/share/openclaw-game}"
+SAVE_DIR="$HOME/.local/share/openclaw"
+CONFIG_DIR="$HOME/.config/openclaw"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+show_banner() {
+    echo -e "${CYAN}"
+    echo '╔══════════════════════════════════════════╗'
+    echo '║     🎮 OpenClaw Game - Termux Edition    ║'
+    echo '╚══════════════════════════════════════════╝'
+    echo -e "${NC}"
+}
+
+# Check if game binary exists
+if [ ! -f "$GAME_EXE" ]; then
+    echo -e "${RED}Error: OpenClaw game not found!${NC}"
+    echo "Please install: pkg install openclaw-game"
+    exit 1
+fi
+
+# Create save directory
+mkdir -p "$SAVE_DIR"
+mkdir -p "$CONFIG_DIR"
+
+# Setup controller/gamepad support
+setup_controller() {
+    # SDL2 gamepad mapping for common controllers
+    export SDL_GAMECONTROLLERCONFIG=""
+    
+    # Auto-detect connected gamepads
+    if [ -f /dev/input/js0 ]; then
+        echo -e "${GREEN}🎮 Gamepad detected!${NC}"
+    fi
+}
+
+# Setup save states
+setup_saves() {
+    # Create save directory structure
+    mkdir -p "$SAVE_DIR/saves"
+    mkdir -p "$SAVE_DIR/screenshots"
+    
+    # Migrate old saves if exist
+    if [ -d "$HOME/.openclaw" ]; then
+        cp -r "$HOME/.openclaw/"* "$SAVE_DIR/" 2>/dev/null || true
+    fi
+}
+
+# Create default config with controller support
+create_config() {
+    local config_file="$CONFIG_DIR/config.xml"
+    
+    if [ ! -f "$config_file" ]; then
+        cat > "$config_file" << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <video>
+        <width>854</width>
+        <height>480</height>
+        <fullscreen>false</fullscreen>
+        <vsync>true</vsync>
+    </video>
+    <audio>
+        <volume>100</volume>
+        <music>true</music>
+        <sfx>true</sfx>
+    </audio>
+    <game>
+        <fps>60</fps>
+        <debug>false</debug>
+        <save_dir>~/.local/share/openclaw</save_dir>
+    </game>
+    <controls>
+        <keyboard>
+            <left>LEFT</left>
+            <right>RIGHT</right>
+            <up>UP</up>
+            <down>DOWN</down>
+            <jump>SPACE</jump>
+            <attack>X</attack>
+            <magic>C</magic>
+            <use>Z</use>
+            <menu>ESCAPE</menu>
+            <save>F5</save>
+            <load>F9</load>
+        </keyboard>
+        <gamepad>
+            <enabled>true</enabled>
+            <axis_left_stick_move>true</axis_left_stick_move>
+            <button_jump>A</button_jump>
+            <button_attack>X</button_attack>
+            <button_magic>B</button_magic>
+            <button_use>Y</button_use>
+            <button_menu>START</button_menu>
+            <button_save>BACK+LB</button_save>
+            <button_load>BACK+RB</button_load>
+        </gamepad>
+    </controls>
+</config>
+EOF
+        echo -e "${GREEN}✓ Config created with controller support${NC}"
+    fi
+}
+
+# Show game info
+show_info() {
+    echo ""
+    echo -e "${CYAN}Game Info:${NC}"
+    echo "  Binary: $GAME_EXE"
+    echo "  Data:   $DATA_DIR"
+    echo "  Saves:  $SAVE_DIR"
+    echo "  Config: $CONFIG_DIR"
+    echo ""
+    echo -e "${YELLOW}Controls:${NC}"
+    echo "  Keyboard: Arrow keys + X/C/Z/Space"
+    echo "  Gamepad:  Left stick move, A/X/B/Y buttons"
+    echo "  Save:     F5 (keyboard) or BACK+LB (gamepad)"
+    echo "  Load:     F9 (keyboard) or BACK+RB (gamepad)"
+    echo ""
+}
+
+# Check for game assets
+check_assets() {
+    if [ ! -f "$DATA_DIR/RE1.PAL" ]; then
+        echo -e "${YELLOW}⚠️ Game assets not found!${NC}"
+        echo ""
+        echo "You need original Claw game files:"
+        echo "  1. Copy RE1.PAL to: $DATA_DIR"
+        echo "  2. Copy LEVEL*.SVR files"
+        echo "  3. Copy sound files (.WAV)"
+        echo ""
+        echo "Or use custom path:"
+        echo "  openclaw-game /sdcard/Claw"
+        echo ""
+        
+        # Try Termux storage
+        if [ -d "/sdcard/OpenClaw" ] && [ -f "/sdcard/OpenClaw/RE1.PAL" ]; then
+            echo -e "${GREEN}✓ Found assets in /sdcard/OpenClaw${NC}"
+            DATA_DIR="/sdcard/OpenClaw"
+        else
+            echo -e "${RED}❌ No game assets found. Cannot start.${NC}"
+            exit 1
+        fi
+    fi
+}
+
+# Main
+show_banner
+setup_controller
+setup_saves
+create_config
+check_assets
+show_info
+
+echo -e "${GREEN}🚀 Starting OpenClaw...${NC}"
+echo ""
+
+# Set environment
+export SDL_VIDEODRIVER=x11
+export SDL_AUDIODRIVER=opensles
+export DISPLAY=:1
+export HOME_SAVE_DIR="$SAVE_DIR"
+
+cd "$DATA_DIR"
+exec "$GAME_EXE" "$@"
