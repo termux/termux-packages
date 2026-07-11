@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=http://www.httrack.com
 TERMUX_PKG_DESCRIPTION="It allows you to download a World Wide Web site from the Internet"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.49.11"
+TERMUX_PKG_VERSION="3.49.12"
 TERMUX_PKG_SRCURL=https://ftp.debian.org/debian/pool/main/h/httrack/httrack_${TERMUX_PKG_VERSION}.orig.tar.gz
-TERMUX_PKG_SHA256=84a61f0f31b0ee12f63b95dc5c50db57da394d783c4d8c8af59812f80a99ee25
+TERMUX_PKG_SHA256=b9b83b85ffc3379e331f485acafa7c2da38837b94d6659d853d06029c382a856
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="httrack-data, libandroid-execinfo, libiconv, openssl, zlib"
 TERMUX_PKG_BREAKS="httrack-dev"
@@ -15,6 +15,12 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 LIBS=-liconv
 "
 TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_step_pre_configure() {
+	# Prevent warnings as error
+	sed -i "s/-Werror/-Wno-error/g" configure.ac
+	autoreconf -fiv
+}
 
 termux_step_post_configure() {
 	make clean
