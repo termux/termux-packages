@@ -120,6 +120,12 @@ termux_step_configure() {
 		termux_error_exit "Unsupported arch '$TERMUX_ARCH'"
 	fi
 
+	# aligned_alloc is used in cctest binary
+	if [[ "$TERMUX_PKG_API_LEVEL" -lt 28 ]]; then
+		CFLAGS+=" -Daligned_alloc=memalign"
+		CXXFLAGS+=" -Daligned_alloc=memalign"
+	fi
+
 	# Do not enable by default as it has severe performance degradations.
 	# Causes upto 10x performance degradations
 	#
