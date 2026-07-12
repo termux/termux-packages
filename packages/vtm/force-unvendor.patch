@@ -1,0 +1,33 @@
+Fixes https://github.com/termux/termux-packages/issues/30533 permanently
+Reverts https://github.com/termux/termux-packages/pull/27432
+https://github.com/directvt/vtm/commit/1cb9e7fe88358133ce4891dc0df0911bde18b28d is no longer working upstream
+Reapplies https://github.com/termux/termux-packages/pull/27256
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,5 +1,4 @@
+ cmake_minimum_required(VERSION 3.22)
+-include(FetchContent)
+ 
+ project("vtm" CXX)
+ # project("term")
+@@ -47,11 +47,14 @@ string(FIND "${ALL_CXX_FLAGS}" "/MT" HAVE_WIN_STATIC)
+ if(NOT HAVE_UNIX_STATIC EQUAL -1 OR NOT HAVE_WIN_STATIC EQUAL -1)
+     message(STATUS "Full-Static Mode: skipping system package search for FreeType/HarfBuzz/Lua/LunaSVG/STB.")
+ else()
+-    find_package(Lua ${LUA_MIN_VER}            QUIET)
+-    find_package(lunasvg                       QUIET)
+-    find_package(Stb                           QUIET)
+-    find_package(Freetype ${FT_MIN_VER} CONFIG QUIET)
+-    find_package(harfbuzz ${HB_MIN_VER} CONFIG QUIET)
++    find_package(Lua ${LUA_MIN_VER}            REQUIRED)
++    find_package(lunasvg                       REQUIRED)
++    add_library(stb_interface INTERFACE)
++    target_include_directories(stb_interface INTERFACE ${STB_INCLUDE_DIR})
++    add_library(stb::stb ALIAS stb_interface)
++    set(Stb_FOUND TRUE)
++    find_package(Freetype ${FT_MIN_VER}        REQUIRED)
++    find_package(harfbuzz                      REQUIRED)
+     if(NOT Freetype_FOUND)
+         find_package(Freetype ${FT_VER} QUIET)
+     endif()
