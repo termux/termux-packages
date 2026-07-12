@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Collection of image processing tools"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.3.47"
+TERMUX_PKG_REVISION=1
 # Bandwith limited on main ftp site, so it's asked to use sourceforge instead:
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick/${TERMUX_PKG_VERSION}/GraphicsMagick-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=95fb682dab0206a9db168d065963f4ffdf5a60b0b2a375aca1f4492fb18d0627
