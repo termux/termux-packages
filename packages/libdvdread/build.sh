@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://code.videolan.org/videolan/libdvdread
 TERMUX_PKG_DESCRIPTION="A library that allows easy use of sophisticated DVD navigation features"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="7.0.1"
+TERMUX_PKG_VERSION="7.1.0"
 TERMUX_PKG_SRCURL=https://code.videolan.org/videolan/libdvdread/-/archive/${TERMUX_PKG_VERSION}/libdvdread-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=5eeda23c75405c89d04f4c601cbb99447477ea5c8c05b341c59da07b1651155b
+TERMUX_PKG_SHA256=35fb76448fbf9a6a5145a9e4241dfd2ddcf05e8dfac68fa6307ebf99defefe41
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE=newest-tag
 
