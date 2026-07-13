@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE="https://radarr.video"
 TERMUX_PKG_DESCRIPTION="A PVR for Usenet and BitTorrent users (server)"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.2.1.10461"
+TERMUX_PKG_VERSION="6.3.0.10514"
 TERMUX_PKG_SRCURL="https://github.com/Radarr/Radarr/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=2cb1eccec4cd420461206248f351f41162c099387cba95a1f694d0a73e1631cc
+TERMUX_PKG_SHA256=cb5f3c7c8aa41112bc4ab9fa8d92c7f2ed1f30942545b2275792d853d66e0eba
 TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-9.0, dotnet-targeting-pack-9.0, nodejs, yarn"
 TERMUX_PKG_DEPENDS="aspnetcore-runtime-9.0, dotnet-host, dotnet-runtime-9.0, mono, libesqlite3, libcurl, ffmpeg"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -14,6 +14,8 @@ TERMUX_PKG_SERVICE_SCRIPT=(
 )
 TERMUX_PKG_EXCLUDED_ARCHES="arm"
 TERMUX_DOTNET_VERSION=9.0
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 
 termux_step_pre_configure() {
 	# Remove global.json to allow using system dotnet version
