@@ -1,7 +1,7 @@
 termux_step_configure_meson() {
 	termux_setup_meson
 
-	local _meson_buildtype="minsize"
+	local _meson_buildtype="release"
 	local _meson_stripflag="--strip"
 	if [ "$TERMUX_DEBUG_BUILD" = "true" ]; then
 		_meson_buildtype="debug"
