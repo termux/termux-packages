@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Suite to create, edit, compose, or convert images in a v
 TERMUX_PKG_LICENSE="ImageMagick"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="7.1.2.27"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/ImageMagick/ImageMagick/archive/refs/tags/${TERMUX_PKG_VERSION%.*}-${TERMUX_PKG_VERSION##*.}.tar.gz"
 TERMUX_PKG_SHA256=485dad5226fda2417ea65f3eb6e3f63e7d5dfacacdf6f57f9c39b6ef1e3cb667
 TERMUX_PKG_AUTO_UPDATE=true
