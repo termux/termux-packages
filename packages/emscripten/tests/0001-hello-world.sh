@@ -24,6 +24,9 @@ int main() {
 }
 EOL
 
+export PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
+. "${PREFIX}/etc/profile.d/emscripten.sh"
+
 emcc -v hello1.c -o hello1.html
 emcc -v hello2.c -o hello2.html
 em++ -v hello3.cpp -o hello3.html
