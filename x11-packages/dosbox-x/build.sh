@@ -8,6 +8,7 @@ TERMUX_PKG_SHA256=5ab3584870bec378b495242f20f03ecbef2cd032a128ee3394a88ff7a53cd9
 TERMUX_PKG_DEPENDS="dosbox-x-data, fluidsynth, freetype, libandroid-posix-semaphore, libc++, libiconv, libpcap, libpng, libslirp, libx11, libxkbfile, libxrandr, opengl, sdl2 | sdl2-compat, sdl2-net, zlib"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="sdl2-compat"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_path_SDL2_CONFIG=$TERMUX_PREFIX/bin/sdl2-config
 --enable-sdl2
