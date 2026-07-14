@@ -1,0 +1,17 @@
+--- a/src/Sonarr.Api.V3/Queue/QueueController.cs
++++ b/src/Sonarr.Api.V3/Queue/QueueController.cs
+@@ -177,10 +177,10 @@
+             var filteredQueue = includeUnknownSeriesItems ? queue : queue.Where(q => q.Series != null);
+             var pending = _pendingReleaseService.GetPendingQueue();
+ 
+-            var hasSeriesIdFilter = seriesIds.Any();
+-            var hasLanguageFilter = languages.Any();
+-            var hasQualityFilter = quality.Any();
+-            var hasStatusFilter = status.Any();
++            var hasSeriesIdFilter = seriesIds is { Count: > 0 };
++            var hasLanguageFilter = languages is { Count: > 0 };
++            var hasQualityFilter = quality is { Count: > 0 };
++            var hasStatusFilter = status is { Count: > 0 };
+ 
+             var fullQueue = filteredQueue.Concat(pending).Where(q =>
+             {

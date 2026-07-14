@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A PVR for Usenet and BitTorrent users (server)"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.0.19.2979"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/Sonarr/Sonarr/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=f314e8b312ab431b78fe7d4c6c4093164e7bc402d93b7052cb87bd3e3dbf0b4c
 TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-9.0, dotnet-targeting-pack-9.0, nodejs, yarn"
@@ -29,7 +30,7 @@ termux_step_pre_configure() {
 	local bin="$TERMUX_PKG_BUILDDIR/_bin"
 	mkdir -p "$bin"
 	local yarn="$bin/yarn"
-	cat > "$yarn" <<-EOF
+	cat >"$yarn" <<-EOF
 		#!/bin/sh
 		exec node $TERMUX_PREFIX/share/yarn/bin/yarn.js "\$@"
 	EOF
@@ -118,7 +119,7 @@ termux_step_make_install() {
 	ln -sf "${TERMUX_PREFIX}/bin/ffprobe" "${TERMUX_PREFIX}/lib/sonarr/ffprobe"
 
 	# Create launch script
-	cat > "${TERMUX_PREFIX}/bin/sonarr" <<-HERE
+	cat >"${TERMUX_PREFIX}/bin/sonarr" <<-HERE
 		#!${TERMUX_PREFIX}/bin/sh
 		exec dotnet "${TERMUX_PREFIX}/lib/sonarr/Sonarr.dll" "\$@"
 	HERE
