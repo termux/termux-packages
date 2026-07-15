@@ -4,10 +4,9 @@ TERMUX_PKG_DESCRIPTION="Telegram Desktop Client"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LEGAL"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.9.3"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="7.0.1"
 TERMUX_PKG_SRCURL="https://github.com/telegramdesktop/tdesktop/releases/download/v$TERMUX_PKG_VERSION/tdesktop-$TERMUX_PKG_VERSION-full.tar.gz"
-TERMUX_PKG_SHA256=5e9233d4c07f717e38f414c5aca16782a3326e428ded388513c79f950acb1610
+TERMUX_PKG_SHA256=70d6c2ce8d96925f68fb3f30e04376ab4c7d1fbcec68ffcee582a07aec1a1049
 TERMUX_PKG_DEPENDS="abseil-cpp, boost, ffmpeg, glib, hicolor-icon-theme, hunspell, kf6-kcoreaddons, libandroid-shmem, libc++, libdispatch, libdrm, libjxl, liblz4, libminizip, protobuf, librnnoise, libsigc++-3.0, libx11, libxcomposite, libxdamage, libxrandr, libxtst, openal-soft, opengl, openh264, openssl, pipewire, pulseaudio, qt6-qtbase, qt6-qtimageformats, qt6-shadertools, qt6-qtsvg, xxhash, zlib"
 TERMUX_PKG_BUILD_DEPENDS="ada, aosp-libs, boost-headers, glib-cross, qt6-qtbase-cross-tools, qt6-shadertools-cross-tools"
 TERMUX_PKG_VERSIONED_GIR=false
@@ -25,6 +24,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DDESKTOP_APP_DISABLE_AUTOUPDATE=ON
 -DTDESKTOP_API_ID=611335
 -DTDESKTOP_API_HASH=d524b414d21f4d37f08684c1df41ac9c
+-DCRL_FORCE_QT=ON
 "
 
 __tg_owt_fetch_source() {
@@ -151,6 +151,7 @@ __tg_owt_build() {
 -DBUILD_SHARED_LIBS=OFF
 -DBUILD_STATIC_LIBS=ON
 -DTG_OWT_USE_PIPEWIRE=OFF
+-DTG_OWT_BUILD_AUDIO_BACKENDS=OFF
 "
 
 	# Configure
