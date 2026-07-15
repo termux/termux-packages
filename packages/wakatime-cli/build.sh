@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://wakatime.com/plugins/
 TERMUX_PKG_DESCRIPTION="Command line interface used by all WakaTime text editor plugins"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.22.0"
+TERMUX_PKG_VERSION="2.22.1"
 TERMUX_PKG_SRCURL=https://github.com/wakatime/wakatime-cli/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=89084504dee74417311a992b59f310b5a25c85a7159a08498b7a1b18d36e9a0f
+TERMUX_PKG_SHA256=a00ee85250a7156875a5c30c5a0beaec31ddc494fb3d847ed8afc5c19baf72d5
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
