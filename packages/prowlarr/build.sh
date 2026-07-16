@@ -3,17 +3,20 @@ TERMUX_PKG_DESCRIPTION="An indexer manager/proxy built on the popular arr stack 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.4.0.5397"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/Prowlarr/Prowlarr/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=a01acf8f69b5233d63f3a9bbeceda3664a14a168fdac5993326ec3f2657f3347
-TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-9.0, dotnet-targeting-pack-9.0, nodejs, yarn"
-TERMUX_PKG_DEPENDS="aspnetcore-runtime-9.0, dotnet-host, dotnet-runtime-9.0, mono, libesqlite3, libcurl"
+TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-10.0, dotnet-targeting-pack-10.0, nodejs, yarn"
+TERMUX_PKG_DEPENDS="aspnetcore-runtime-10.0, dotnet-host, dotnet-runtime-10.0, mono, libesqlite3, libcurl"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SERVICE_SCRIPT=(
 	"prowlarr"
 	"exec ${TERMUX_PREFIX}/bin/prowlarr -nobrowser 2>&1"
 )
 TERMUX_PKG_EXCLUDED_ARCHES="arm"
-TERMUX_DOTNET_VERSION=9.0
+TERMUX_DOTNET_VERSION=10.0
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 
 termux_step_pre_configure() {
 	# Remove global.json to allow using system dotnet version
@@ -42,18 +45,18 @@ termux_step_pre_configure() {
 	sed -i '/<NoWarn>$(NoWarn);CS1591<\/NoWarn>/a \    <NoWarn>$(NoWarn);NU1901;NU1902;NU1903;NU1904;NU1605</NoWarn>' src/Directory.Build.props
 	sed -i '/<PropertyGroup>/a \    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>' src/Directory.Build.props
 
-	# Force all projects to target .NET 9.0
-	find src -name "*.csproj" -exec sed -i 's/<TargetFrameworks>.*<\/TargetFrameworks>/<TargetFrameworks>net9.0<\/TargetFrameworks>/g' {} +
-	find src -name "*.csproj" -exec sed -i 's/<TargetFramework>.*<\/TargetFramework>/<TargetFramework>net9.0<\/TargetFramework>/g' {} +
+	# Force all projects to target .NET 10.0
+	find src -name "*.csproj" -exec sed -i 's/<TargetFrameworks>.*<\/TargetFrameworks>/<TargetFrameworks>net10.0<\/TargetFrameworks>/g' {} +
+	find src -name "*.csproj" -exec sed -i 's/<TargetFramework>.*<\/TargetFramework>/<TargetFramework>net10.0<\/TargetFramework>/g' {} +
 
-	# Update Microsoft.Extensions and specific System packages to 9.0.0 for compatibility with .NET 9.0
-	find src -name "*.csproj" -exec sed -i 's/Include="Microsoft\.Extensions\.\([^"]*\)" Version="[0-9.]*"/Include="Microsoft.Extensions.\1" Version="9.0.0"/g' {} +
-	find src -name "*.csproj" -exec sed -i 's/Include="System\.ServiceProcess\.ServiceController" Version="[0-9.]*"/Include="System.ServiceProcess.ServiceController" Version="9.0.0"/g' {} +
+	# Update Microsoft.Extensions and specific System packages to 10.0.0 for compatibility with .NET 10.0
+	find src -name "*.csproj" -exec sed -i 's/Include="Microsoft\.Extensions\.\([^"]*\)" Version="[0-9.]*"/Include="Microsoft.Extensions.\1" Version="10.0.0"/g' {} +
+	find src -name "*.csproj" -exec sed -i 's/Include="System\.ServiceProcess\.ServiceController" Version="[0-9.]*"/Include="System.ServiceProcess.ServiceController" Version="10.0.0"/g' {} +
 
-	# Remove obsolete System.* package references that are built into .NET 9.0
+	# Remove obsolete System.* package references that are built into .NET 10.0
 	find src -name "*.csproj" -exec sed -i '/Include="System\.\(ValueTuple\|Memory\|Runtime\.Loader\|Threading\.Tasks\.Extensions\)"/d' {} +
 
-	# Fix ambiguous IPNetwork reference under .NET 9.0
+	# Fix ambiguous IPNetwork reference under .NET 10.0
 	if ! grep -q "using IPNetwork =" src/NzbDrone.Host/Startup.cs; then
 		sed -i 's/\bIPNetwork\b/Microsoft.AspNetCore.HttpOverrides.IPNetwork/g' src/NzbDrone.Host/Startup.cs
 	fi
@@ -91,8 +94,8 @@ termux_step_make() {
 	# Prowlarr.Mono is dynamically loaded at runtime on Linux/macOS
 	dotnet publish src/NzbDrone.Mono/Prowlarr.Mono.csproj "${COMMON_ARGS[@]}"
 
-	# Lower required .NET version in runtimeconfig.json to allow running on older .NET 9.0.x runtimes
-	find build -name "*.runtimeconfig.json" -exec sed -i 's/"version": "9.0.[0-9]*"/"version": "9.0.0"/g' {} +
+	# Lower required .NET version in runtimeconfig.json to allow running on older .NET 10.0.x runtimes
+	find build -name "*.runtimeconfig.json" -exec sed -i 's/"version": "10.0.[0-9]*"/"version": "10.0.0"/g' {} +
 
 	dotnet build-server shutdown
 }
