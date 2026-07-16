@@ -1,0 +1,13 @@
+diff --git a/winpr/include/winpr/cast.h b/winpr/include/winpr/cast.h
+index 804ea0f66..a139021d4 100644
+--- a/winpr/include/winpr/cast.h
++++ b/winpr/include/winpr/cast.h
+@@ -96,7 +96,7 @@
+ #define WINPR_FUNC_PTR_CAST(ptr, dstType) (dstType)(uintptr_t) ptr
+ #endif
+ 
+-#if defined(__GNUC__) || defined(__clang__)
++#if ! defined(__ANDROID__) && ( defined(__GNUC__) || defined(__clang__) )
+ 
+ /**
+  * @brief A macro to do checked integer casts.
