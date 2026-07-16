@@ -5,9 +5,9 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Match commit SHA with toxic/blob/master/script/build-minimal-static-toxic.sh
 # (for example, toxic 0.16.2 has the commit of c-toxcore version 0.2.22 in it)
 # https://github.com/JFreegman/toxic/blob/07dba324aa06916c6c96ed5104240d304a662050/script/build-minimal-static-toxic.sh#L146
-TERMUX_PKG_VERSION="0.2.22"
+TERMUX_PKG_VERSION="0.2.23"
 TERMUX_PKG_SRCURL="https://github.com/TokTok/c-toxcore/releases/download/v$TERMUX_PKG_VERSION/c-toxcore-v$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=276d447eb94e9d76e802cecc5ca7660c6c15128a83dfbe4353b678972aeb950a
+TERMUX_PKG_SHA256=15cdd006ed7793dfc657e340ef9f218f6637d2fe5b130704d39b961389bb6cd6
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_DEPENDS="libsodium, libopus, libvpx"
