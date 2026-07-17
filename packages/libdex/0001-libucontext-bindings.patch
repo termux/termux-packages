@@ -1,0 +1,20 @@
+diff --git a/src/dex-ucontext-private.h b/src/dex-ucontext-private.h
+index 247fe48..781d5a3 100644
+--- a/src/dex-ucontext-private.h
++++ b/src/dex-ucontext-private.h
+@@ -58,7 +58,14 @@
+ #endif
+ 
+ #if USE_UCONTEXT
+-# include <ucontext.h>
++# define LIBUCONTEXT_DISABLED_SIGCONTEXT
++# include <libucontext/libucontext.h>
++# define ucontext_t libucontext_ucontext_t
++#
++# define getcontext libucontext_getcontext
++# define setcontext libucontext_setcontext
++# define makecontext libucontext_makecontext
++# define swapcontext libucontext_swapcontext
+ #endif
+ 
+ #if defined(__FreeBSD__) && __FreeBSD__ < 5
