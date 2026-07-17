@@ -1,0 +1,80 @@
+--- a/mozc-config/Makefile
++++ b/mozc-config/Makefile
+@@ -1,38 +1,49 @@
+ DESTDIR =
+-prefix = /usr/local
++prefix = @TERMUX_PREFIX@
+ bindir = $(prefix)/bin
+ libexecdir = $(prefix)/libexec
+ datadir = $(prefix)/share
+ 
+-CXX	= g++
++CXX	?= g++
+ RM	= rm -f
+ INSTALL = /usr/bin/install
+ 
+-MOZC_SRC = ..
++MOZC_SRC = ../src
+ 
+-CFLAGS	= 
++CFLAGS	+= -std=gnu++17 -fpermissive -DOS_LINUX -DWITHOUT_IBUS
+ 
+-LDFLAGS	=
++LDFLAGS	= -std=gnu++17
+ 
+ INCS	= -I$(MOZC_SRC) \
+-	      -I$(MOZC_SRC)/out/Release/obj/gen \
+-	      -I$(MOZC_SRC)/out/Release/obj/gen/proto_out
++	  -I$(MOZC_SRC)/third_party/abseil-cpp \
++	  -I$(MOZC_SRC)/third_party/protobuf/src \
++	  -I$(MOZC_SRC)/out_linux/Release/gen \
++	  -I$(MOZC_SRC)/out_linux/Release/gen/proto_out \
++	  -I$(prefix)/include
+ 
+ MOZC_CONF	= mozc-config
+ 
+-MOZC_CONF_OBJS	= mozc_config_main.o
++MOZC_CONF_OBJS	= mozc_config_main.o $(CONFIG_PB_OBJ)
+ 
+ MOZC_DICT	= mozc-dict
+ 
+-MOZC_DICT_OBJS	= mozc_dict_main.o
++MOZC_DICT_OBJS	= mozc_dict_main.o $(USERDIC_PB_OBJ)
+ 
+-EXTOBJS	= $(MOZC_SRC)/out/Release/obj.target/session_protocol/gen/proto_out/session/config.pb.o \
+-          $(MOZC_SRC)/out/Release/obj.target/session/libconfig_handler.a \
+-		  $(MOZC_SRC)/out/Release/obj.target/dictionary/libdictionary.a \
+-		  $(MOZC_SRC)/out/Release/obj.target/dictionary/libuser_pos_data.a \
+-          $(MOZC_SRC)/out/Release/obj.target/base/*.a
++CONFIG_PB_SRC	= $(MOZC_SRC)/out_linux/Release/gen/proto_out/protocol/config.pb.cc
++CONFIG_PB_OBJ	= $(notdir $(CONFIG_PB_SRC:.cc=.o))
++USERDIC_PB_SRC	= $(MOZC_SRC)/out_linux/Release/gen/proto_out/protocol/user_dictionary_storage.pb.cc
++USERDIC_PB_OBJ	= $(notdir $(USERDIC_PB_SRC:.cc=.o))
+ 
+-LIBS	= -lpthread -lprotobuf
++EXTOBJS_	:= \
++-L$(MOZC_SRC)/out_linux/Release/obj/config \
++$(patsubst lib%.a,-l%,$(notdir $(wildcard $(MOZC_SRC)/out_linux/Release/obj/config/lib*.a))) \
++-L$(MOZC_SRC)/out_linux/Release/obj/dictionary \
++$(patsubst lib%.a,-l%,$(notdir $(wildcard $(MOZC_SRC)/out_linux/Release/obj/dictionary/lib*.a))) \
++-L$(MOZC_SRC)/out_linux/Release/obj/protobuf -lprotobuf \
++-L$(MOZC_SRC)/out_linux/Release/obj/base \
++$(patsubst lib%.a,-l%,$(notdir $(wildcard $(MOZC_SRC)/out_linux/Release/obj/base/lib*.a)))
++EXTOBJS	:= $(EXTOBJS_) $(EXTOBJS_) -Wl,-rpath,$(prefix)/lib $(prefix)/lib/libandroid-execinfo.so
++LIBS	= -Wl,-rpath,$(prefix)/lib $(prefix)/lib/libiconv.so
+ 
+ IBUS_SETUP_MOZC = ibus-setup-mozc
+ 
+@@ -77,6 +87,12 @@ clean:
+ 
+ .SUFFIXES: .cc .o .po .mo
+ 
++$(CONFIG_PB_OBJ): $(CONFIG_PB_SRC)
++	$(CXX) $(CFLAGS) $(INCS) -o $@ -c $(CONFIG_PB_SRC)
++
++$(USERDIC_PB_OBJ): $(USERDIC_PB_SRC)
++	$(CXX) $(CFLAGS) $(INCS) -o $@ -c $(USERDIC_PB_SRC)
++
+ .cc.o:
+ 	$(CXX) $(CFLAGS) $(INCS) -c $<
+ 
