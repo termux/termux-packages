@@ -25,6 +25,7 @@ termux_download_deb_pac() {
 	fi
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+		echo ""
 		case "$TERMUX_APP_PACKAGE_MANAGER" in
 			"apt") apt install -y "${PACKAGE}$(test ${TERMUX_WITHOUT_DEPVERSION_BINDING} != true && echo "=${VERSION}")";;
 			"pacman") pacman -S "${PACKAGE}$(test ${TERMUX_WITHOUT_DEPVERSION_BINDING} != true && echo "=${VERSION_PACMAN}")" --needed --noconfirm;;
@@ -54,9 +55,9 @@ termux_download_deb_pac() {
 					if [ -n "$PKG_HASH" ] && [ "$PKG_HASH" != "null" ]; then
 						if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
 							if [ "$TERMUX_REPO_PKG_FORMAT" = "debian" ]; then
-								echo "Found $PACKAGE in ${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}"
+								echo "found $PACKAGE in ${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}"
 							elif [ "$TERMUX_REPO_PKG_FORMAT" = "pacman" ]; then
-								echo "Found $PACKAGE in ${TERMUX_REPO_URL[$idx-1]}"
+								echo "found $PACKAGE in ${TERMUX_REPO_URL[$idx-1]}"
 							fi
 						fi
 						break 2
@@ -82,9 +83,9 @@ termux_download_deb_pac() {
 			if [ -n "$PKG_HASH" ] && [ "$PKG_HASH" != "null" ]; then
 				if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
 					if [ "$TERMUX_REPO_PKG_FORMAT" = "debian" ]; then
-						echo "Found $PACKAGE in ${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}"
+						echo "found $PACKAGE in ${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}"
 					elif [ "$TERMUX_REPO_PKG_FORMAT" = "pacman" ]; then
-						echo "Found $PACKAGE in ${TERMUX_REPO_URL[$idx-1]}"
+						echo "found $PACKAGE in ${TERMUX_REPO_URL[$idx-1]}"
 					fi
 				fi
 				break
@@ -102,9 +103,9 @@ termux_download_deb_pac() {
 			if [ -n "$PKG_HASH" ] && [ "$PKG_HASH" != "null" ]; then
 				if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
 					if [ "$TERMUX_REPO_PKG_FORMAT" = "debian" ]; then
-						echo "Found $PACKAGE in ${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}"
+						echo "found $PACKAGE in ${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}"
 					elif [ "$TERMUX_REPO_PKG_FORMAT" = "pacman" ]; then
-						echo "Found $PACKAGE in ${TERMUX_REPO_URL[$idx-1]}"
+						echo "found $PACKAGE in ${TERMUX_REPO_URL[$idx-1]}"
 					fi
 				fi
 				break
