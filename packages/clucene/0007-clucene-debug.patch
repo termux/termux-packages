@@ -1,0 +1,11 @@
+--- a/src/core/CLucene/index/TermInfosReader.cpp
++++ b/src/core/CLucene/index/TermInfosReader.cpp
+@@ -111,7 +111,7 @@
+ 	      //destroy their elements
+ #ifdef _DEBUG
+          for ( int32_t i=0; i<indexTermsLength;++i ){
+-            indexTerms[i].__cl_refcount--;
++            indexTerms[i].__cl_decref();
+          }
+ #endif
+          //Delete the arrays
