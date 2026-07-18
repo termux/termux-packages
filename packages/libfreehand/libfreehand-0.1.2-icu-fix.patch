@@ -1,0 +1,29 @@
+From af3197f795625f5188602073205a34369698b6df Mon Sep 17 00:00:00 2001
+From: Heiko Becker <heirecka@exherbo.org>
+Date: Fri, 4 Oct 2019 01:46:12 +0200
+Subject: [PATCH] Add missing semicolon to fix build with icu 65.1
+
+Change-Id: I7a0b0d600e9f7770245a7485813a944bfac4f088
+Reviewed-on: https://gerrit.libreoffice.org/80224
+Reviewed-by: Miklos Vajna <vmiklos@collabora.com>
+Tested-by: Miklos Vajna <vmiklos@collabora.com>
+---
+ src/lib/libfreehand_utils.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib/libfreehand_utils.cpp b/src/lib/libfreehand_utils.cpp
+index 439c457..32f23e0 100644
+--- a/src/lib/libfreehand_utils.cpp
++++ b/src/lib/libfreehand_utils.cpp
+@@ -162,7 +162,7 @@ void libfreehand::_appendUTF16(librevenge::RVNGString &text, std::vector<unsigne
+   while (j < length)
+   {
+     UChar32 c;
+-    U16_NEXT(s, j, length, c)
++    U16_NEXT(s, j, length, c);
+     unsigned char outbuf[U8_MAX_LENGTH+1];
+     int i = 0;
+     U8_APPEND_UNSAFE(&outbuf[0], i, c);
+-- 
+2.23.0
+
