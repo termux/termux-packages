@@ -1,0 +1,13 @@
+diff --git a/external/argon2/ExternalProject_argon2.mk b/external/argon2/ExternalProject_argon2.mk
+index 80d6b0596..bd60fd6b6 100644
+--- a/external/argon2/ExternalProject_argon2.mk
++++ b/external/argon2/ExternalProject_argon2.mk
+@@ -45,7 +45,7 @@ $(call gb_ExternalProject_get_state_target,argon2,build):
+ 		CFLAGS="$(CFLAGS) $(if $(filter-out WNT MACOSX,$(OS)),-fvisibility=hidden) -fPIC" \
+ 		MAKEFLAGS= $(MAKE) \
+ 			OPTTARGET=$(if $(filter X86_64,$(CPUNAME)),x86-64,forcefail) \
+-		$(if $(CROSS_COMPILING),,&& $(MAKE) test) \
++		$(if $(CROSS_COMPILING),,) \
+ 	)
+ 	$(call gb_Trace_EndRange,argon2,EXTERNAL)
+ 

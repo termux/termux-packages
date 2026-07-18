@@ -1,0 +1,43 @@
+diff --git a/external/firebird/UnpackedTarball_firebird.mk b/external/firebird/UnpackedTarball_firebird.mk
+index 060da2e08..4cd84777e 100644
+--- a/external/firebird/UnpackedTarball_firebird.mk
++++ b/external/firebird/UnpackedTarball_firebird.mk
+@@ -51,6 +51,7 @@ $(eval $(call gb_UnpackedTarball_add_patches,firebird,\
+ 	external/firebird/0001-Revert-Backported-fix-for-7122-Invalid-state-of-mapp.patch.1 \
+ 	external/firebird/0001-Revert-Fix-for-most-cases-of-7522-7828.patch.1 \
+ 	external/firebird/mold.patch \
++	external/firebird/firebird-icu76.patch \
+     external/firebird/c++26.patch \
+     external/firebird/c++20.patch \
+ ))
+diff --git a/external/firebird/firebird-icu76.patch b/external/firebird/firebird-icu76.patch
+new file mode 100644
+index 000000000..6266d437f
+--- /dev/null
++++ b/external/firebird/firebird-icu76.patch
+@@ -0,0 +1,13 @@
++diff -Naurp src.orig/common/unicode_util.cpp src/common/unicode_util.cpp
++--- src.orig/common/unicode_util.cpp	2020-10-20 03:40:05.000000000 -0500
+++++ src/common/unicode_util.cpp	2024-11-01 11:55:44.683926741 -0500
++@@ -40,6 +40,9 @@
++ #include "../common/StatusHolder.h"
++ #include "../common/os/path_utils.h"
++ 
+++#define U_SHOW_CPLUSPLUS_API 0
+++#define U_SHOW_CPLUSPLUS_HEADER_API 0
+++
++ #include <unicode/ustring.h>
++ #include <unicode/utrans.h>
++ #include <unicode/uchar.h>
+diff --git a/external/libcdr/ExternalProject_libcdr.mk b/external/libcdr/ExternalProject_libcdr.mk
+index 3a4be9d9c..2d24bcabc 100644
+--- a/external/libcdr/ExternalProject_libcdr.mk
++++ b/external/libcdr/ExternalProject_libcdr.mk
+@@ -27,6 +27,7 @@ $(call gb_ExternalProject_get_state_target,libcdr,build) :
+ 	$(call gb_Trace_StartRange,libcdr,EXTERNAL)
+ 	$(call gb_ExternalProject_run,build,\
+ 		export PKG_CONFIG="" \
++		export ICU_LIBS="-licui18n -licuuc -licudata" \
+ 		&& unset MSYS_NO_PATHCONV && MAKE=$(MAKE) $(gb_RUN_CONFIGURE) ./configure \
+ 			--with-pic \
+ 			--enable-static \

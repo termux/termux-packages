@@ -1,0 +1,21 @@
+configure.ac only sets _BOX2D_LIB when system box2d is 2.x, so with
+box2d 3.x (the same version LO bundles internally) AC_CHECK_LIB runs
+with an empty library name and configure dies with
+"box2d library not found". Default the lib name and fail clearly if
+pkg-config cannot report a version.
+
+Based on:- https://src.fedoraproject.org/rpms/libreoffice/c/d3e1518b2d2986747c8644a1aefa81c029878d28?branch=rawhide
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -12238,6 +12238,10 @@ if test "$with_system_box2d" = "yes"; then
+     BOX2D_VERSION=`$PKG_CONFIG --modversion box2d 2>/dev/null`
+     BOX2D_MAJOR=`echo $BOX2D_VERSION | cut -d"." -f1`
+     BOX2D_MINOR=`echo $BOX2D_VERSION | cut -d"." -f2`
++    if test -z "$BOX2D_MAJOR"; then
++        AC_MSG_ERROR([pkg-config could not find box2d, is box2d.pc installed?])
++    fi
++    _BOX2D_LIB=box2d
+     if test "$BOX2D_MAJOR" -eq "2"; then
+         if test "$BOX2D_MINOR" -eq "4"; then
+             _BOX2D_LIB=box2d
