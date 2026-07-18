@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Scalable cross-language services framework for IPC/RPC"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.24.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://downloads.apache.org/thrift/${TERMUX_PKG_VERSION}/thrift-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=e0fa5839a4c5c1d631b0931cf2c554ebbfa4e2fee3a9fb3ffd4f82ce4396c6e4
 TERMUX_PKG_AUTO_UPDATE=true
