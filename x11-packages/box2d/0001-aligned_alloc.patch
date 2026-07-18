@@ -1,0 +1,16 @@
+--- a/samples/main.cpp
++++ b/samples/main.cpp
+@@ -77,6 +77,13 @@
+ 
+ #if defined( _MSC_VER )
+ 	void* ptr = _aligned_malloc( sizeAligned, alignment );
++#elif defined( __ANDROID__ )
++	void* ptr = NULL;
++	if ( posix_memalign( &ptr, alignment, sizeAligned ) != 0 )
++	{
++		// allocation failed
++		ptr = nullptr;
++	}
+ #else
+ 	void* ptr = aligned_alloc( alignment, sizeAligned );
+ #endif
