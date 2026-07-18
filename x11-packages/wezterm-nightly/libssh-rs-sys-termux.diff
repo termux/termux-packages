@@ -16,10 +16,13 @@ Also, prepends @TERMUX_PREFIX@ to some instances of absolute path /etc
      cfg.include("vendored/include");
      cfg.flag_if_supported("-Wno-deprecated-declarations");
  
-@@ -30,10 +31,10 @@ fn main() {
-     let target = std::env::var("TARGET").unwrap();
- 
-     let target_family = std::env::var("CARGO_CFG_TARGET_FAMILY").unwrap();
+@@ -34,12 +34,12 @@ fn main() {
+     if target.contains("windows") {
+         cfg.define("GLOBAL_CONF_DIR", Some("\"C:/ProgramData/ssh\""));
+     } else {
+-        cfg.define("GLOBAL_CONF_DIR", Some("\"/etc/ssh\""));
++        cfg.define("GLOBAL_CONF_DIR", Some("\"@TERMUX_PREFIX@/etc/ssh\""));
+     }
 -    cfg.define("GLOBAL_CLIENT_CONFIG", Some("\"/etc/ssh/ssh_config\""));
 +    cfg.define("GLOBAL_CLIENT_CONFIG", Some("\"@TERMUX_PREFIX@/etc/ssh/ssh_config\""));
      cfg.define(
