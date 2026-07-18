@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An Ethereum smart contract-oriented language"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.8.36"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/argotorg/solidity/releases/download/v${TERMUX_PKG_VERSION}/solidity_${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=458c525af3a7bc1b5599e1a125cce960631ab8b3e7110c7ed4c9bbf34157fb86
 TERMUX_PKG_AUTO_UPDATE=true
