@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A lightweight header-only library that exposes C++ types
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.0.4"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/pybind/pybind11/archive/refs/tags/v${TERMUX_PKG_VERSION}/pybind11-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=74b6a2c2b4573a400cafb6ecbf60c98df300cd3d0041296b913d02b2cbbb2676
 TERMUX_PKG_AUTO_UPDATE=true
