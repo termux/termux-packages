@@ -1,0 +1,10 @@
+--- a/src/NzbDrone.Host/Bootstrap.cs
++++ b/src/NzbDrone.Host/Bootstrap.cs
+@@ -45,6 +45,7 @@
+ 
+         public static void Start(string[] args, Action<IHostBuilder> trayCallback = null)
+         {
++            AppContext.SetSwitch("Microsoft.AspNetCore.Authentication.Cookies.IgnoreRedirectMetadata", true);
+             try
+             {
+                 Logger.Info("Starting Sonarr - {0} - Version {1}",

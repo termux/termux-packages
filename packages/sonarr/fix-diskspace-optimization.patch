@@ -1,0 +1,225 @@
+--- a/src/NzbDrone.Mono/Disk/DiskProvider.cs
++++ b/src/NzbDrone.Mono/Disk/DiskProvider.cs
+@@ -21,13 +21,11 @@
+         private readonly Logger _logger;
+         private readonly IProcMountProvider _procMountProvider;
+         private readonly ISymbolicLinkResolver _symLinkResolver;
+-        private readonly ICreateRefLink _createRefLink;
+ 
+-        public DiskProvider(IProcMountProvider procMountProvider, ISymbolicLinkResolver symLinkResolver, ICreateRefLink createRefLink, Logger logger)
++        public DiskProvider(IProcMountProvider procMountProvider, ISymbolicLinkResolver symLinkResolver, Logger logger)
+         {
+             _procMountProvider = procMountProvider;
+             _symLinkResolver = symLinkResolver;
+-            _createRefLink = createRefLink;
+             _logger = logger;
+         }
+ 
+@@ -179,6 +177,22 @@
+                 _logger.Warn(e, $"Unable to get mounts: {e.Message}");
+             }
+ 
++            if (mounts.Any())
++            {
++                var filtered = mounts.Where(m => !m.RootDirectory.StartsWith("/apex/") &&
++                                                 !m.RootDirectory.StartsWith("/system") &&
++                                                 !m.RootDirectory.StartsWith("/vendor") &&
++                                                 !m.RootDirectory.StartsWith("/product") &&
++                                                 !m.RootDirectory.StartsWith("/odm") &&
++                                                 !m.RootDirectory.StartsWith("/bootstrap-apex") &&
++                                                 !m.RootDirectory.StartsWith("/mnt/opex") &&
++                                                 !m.RootDirectory.StartsWith("/sys/") &&
++                                                 !m.RootDirectory.StartsWith("/proc/") &&
++                                                 !m.RootDirectory.StartsWith("/dev/"))
++                                     .ToList();
++                return filtered;
++            }
++
+             try
+             {
+                 mounts.AddRange(GetDriveInfoMounts()
+@@ -234,19 +248,6 @@
+             return mount?.TotalSize;
+         }
+ 
+-        protected override void CloneFileInternal(string source, string destination, bool overwrite)
+-        {
+-            if (!File.Exists(destination) && !UnixFileSystemInfo.GetFileSystemEntry(source).IsSymbolicLink)
+-            {
+-                if (_createRefLink.TryCreateRefLink(source, destination))
+-                {
+-                    return;
+-                }
+-            }
+-
+-            CopyFileInternal(source, destination, overwrite);
+-        }
+-
+         protected override void CopyFileInternal(string source, string destination, bool overwrite)
+         {
+             var sourceInfo = UnixFileSystemInfo.GetFileSystemEntry(source);
+@@ -464,11 +465,6 @@
+             }
+         }
+ 
+-        public override bool TryCreateRefLink(string source, string destination)
+-        {
+-            return _createRefLink.TryCreateRefLink(source, destination);
+-        }
+-
+         private uint GetUserId(string user)
+         {
+             if (user.IsNullOrWhiteSpace())
+--- a/src/NzbDrone.Mono/Disk/ProcMount.cs
++++ b/src/NzbDrone.Mono/Disk/ProcMount.cs
+@@ -7,7 +7,8 @@
+ {
+     public class ProcMount : IMount
+     {
+-        private readonly UnixDriveInfo _unixDriveInfo;
++        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
++        private readonly System.IO.DriveInfo _driveInfo;
+ 
+         public ProcMount(DriveType driveType, string name, string mount, string type, MountOptions mountOptions)
+         {
+@@ -17,16 +18,51 @@
+             DriveFormat = type;
+             MountOptions = mountOptions;
+ 
+-            _unixDriveInfo = new UnixDriveInfo(mount);
++            try
++            {
++                _driveInfo = new System.IO.DriveInfo(mount);
++            }
++            catch (System.Exception ex)
++            {
++                Logger.Debug(ex, $"Failed to create DriveInfo for {mount}");
++            }
+         }
+ 
+-        public long AvailableFreeSpace => _unixDriveInfo.AvailableFreeSpace;
++        public long AvailableFreeSpace
++        {
++            get
++            {
++                try
++                {
++                    return _driveInfo?.AvailableFreeSpace ?? 0;
++                }
++                catch (System.Exception ex)
++                {
++                    Logger.Debug(ex, "Failed to get available free space");
++                    return 0;
++                }
++            }
++        }
+ 
+         public string DriveFormat { get; private set; }
+ 
+         public DriveType DriveType { get; private set; }
+ 
+-        public bool IsReady => _unixDriveInfo.IsReady;
++        public bool IsReady
++        {
++            get
++            {
++                try
++                {
++                    return _driveInfo?.IsReady ?? false;
++                }
++                catch (System.Exception ex)
++                {
++                    Logger.Debug(ex, "Failed to check if drive is ready");
++                    return false;
++                }
++            }
++        }
+ 
+         public MountOptions MountOptions { get; private set; }
+ 
+@@ -34,11 +70,63 @@
+ 
+         public string RootDirectory { get; private set; }
+ 
+-        public long TotalFreeSpace => _unixDriveInfo.TotalFreeSpace;
++        public long TotalFreeSpace
++        {
++            get
++            {
++                try
++                {
++                    return _driveInfo?.TotalFreeSpace ?? 0;
++                }
++                catch (System.OverflowException ex)
++                {
++                    Logger.Warn(ex, "Failed to get total free space");
++                    return long.MaxValue;
++                }
++                catch (System.Exception ex)
++                {
++                    Logger.Debug(ex, "Failed to get total free space");
++                    return 0;
++                }
++            }
++        }
+ 
+-        public long TotalSize => _unixDriveInfo.TotalSize;
++        public long TotalSize
++        {
++            get
++            {
++                try
++                {
++                    return _driveInfo?.TotalSize ?? 0;
++                }
++                catch (System.OverflowException ex)
++                {
++                    Logger.Warn(ex, "Failed to get total size");
++                    return long.MaxValue;
++                }
++                catch (System.Exception ex)
++                {
++                    Logger.Debug(ex, "Failed to get total size");
++                    return 0;
++                }
++            }
++        }
+ 
+-        public string VolumeLabel => _unixDriveInfo.VolumeLabel;
++        public string VolumeLabel
++        {
++            get
++            {
++                try
++                {
++                    return _driveInfo?.VolumeLabel ?? string.Empty;
++                }
++                catch (System.Exception ex)
++                {
++                    Logger.Debug(ex, "Failed to get volume label");
++                    return string.Empty;
++                }
++            }
++        }
+ 
+         public string VolumeName
+         {
+--- a/src/NzbDrone.Mono/Disk/ProcMountProvider.cs
++++ b/src/NzbDrone.Mono/Disk/ProcMountProvider.cs
+@@ -130,7 +130,15 @@
+                 driveType = DriveType.Network;
+             }
+ 
+-            return new ProcMount(driveType, name, mount, type, new MountOptions(options));
++            try
++            {
++                return new ProcMount(driveType, name, mount, type, new MountOptions(options));
++            }
++            catch (Exception ex)
++            {
++                _logger.Debug(ex, $"Failed to create ProcMount for {mount}: {ex.Message}");
++                return null;
++            }
+         }
+ 
+         private Dictionary<string, string> ParseOptions(string options)
