@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/cgoldberg/xvfbwrapper
+TERMUX_PKG_DESCRIPTION="Python wrapper for controlling Xvfb virtual displays"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="termux"
+TERMUX_PKG_VERSION="0.2.27"
+TERMUX_PKG_SRCURL=https://files.pythonhosted.org/packages/d8/a8/1a0d1104241adc19c5e1ba4bc67f0941ad2e5d15d78e768ac3e808a26189/xvfbwrapper-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=341a436f6ad4f3c30915add6c421b8518ad6efcc809592e4205f5112fd678855
+TERMUX_PKG_DEPENDS="python, xorg-server-xvfb"
+TERMUX_PKG_SETUP_PYTHON=true
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
