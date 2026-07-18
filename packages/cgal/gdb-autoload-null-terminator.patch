@@ -1,0 +1,27 @@
+Fixes this error when building openfoam:
+
+ld.lld: error: /home/builder/.termux-build/openfoam/src/build/linux64ClangDPInt32Opt/
+applications/utilities/mesh/generation/foamyMesh/foamyQuadMesh/CV2DIO.o:(.debug_gdb_scripts):
+string is not null terminated
+
+and this when building openfoam for 32-bit targets:
+
+<inline asm>:1:41: error: expected '%<type>' or "<type>"
+    1 | .pushsection ".debug_gdb_scripts", "MS",@progbits,1
+
+--- a/include/CGAL/gdb_autoload.h
++++ b/include/CGAL/gdb_autoload.h
+@@ -25,11 +25,11 @@
+ 
+ // Use inline assembly to embed the .debug_gdb_scripts section
+ __asm__(
+-    ".pushsection \".debug_gdb_scripts\", \"MS\",@progbits,1\n"
++    ".pushsection \".debug_gdb_scripts\", \"MS\",%progbits,1\n"
+     ".ascii \"\\4gdb.inlined-script.CGAL\\n\"\n"
+     ".ascii \"import gdb\\n\"\n"
+     ".ascii \"path=[line.strip() for line in gdb.execute('info sources', to_string=True).split(',') if line.count('include/CGAL/gdb_autoload.h')][0].replace('/include/CGAL/gdb_autoload.h', '')\\n\"\n"
+-    ".ascii \"gdb.execute('source ' + path + '/share/gdb/auto-load/cgal_printers.py')\\n\"\n"
++    ".ascii \"gdb.execute('source ' + path + '/share/gdb/auto-load/cgal_printers.py')\\n\0\"\n"
+     ".popsection\n"
+ );
+ 
