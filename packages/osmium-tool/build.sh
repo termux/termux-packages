@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.19.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/osmcode/osmium-tool/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=192713eef894735cf2d0dbeed3f8def67c067198e553de01d4a1f14417a64019
 TERMUX_PKG_DEPENDS="boost, libbz2, libc++, libexpat, liblz4, zlib"
