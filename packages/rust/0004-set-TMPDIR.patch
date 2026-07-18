@@ -1,9 +1,9 @@
 --- a/library/std/src/sys/paths/unix.rs
 +++ b/library/std/src/sys/paths/unix.rs
-@@ -408,7 +408,7 @@
+@@ -408,7 +408,7 @@ pub fn temp_dir() -> PathBuf {
      crate::env::var_os("TMPDIR").map(PathBuf::from).unwrap_or_else(|| {
          cfg_select! {
-             all(target_vendor = "apple", not(miri)) => darwin_temp_dir(),
+             target_vendor = "apple" => darwin_temp_dir(),
 -            target_os = "android" => PathBuf::from("/data/local/tmp"),
 +            target_os = "android" => PathBuf::from("@TERMUX_PREFIX@/tmp"),
              _ => PathBuf::from("/tmp"),

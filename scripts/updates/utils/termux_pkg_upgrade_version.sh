@@ -73,7 +73,7 @@ termux_pkg_upgrade_version() {
 	# Translate "-suffix" into "~suffix": "X.Y.Z-suffix" is considered later
 	# than X.Y.Z. for it to be considered earlier use "X.Y.Z~suffix".
 	for suffix in "rc" "alpha" "beta"; do
-		LATEST_VERSION="$(sed -E "s/[-.]?(${suffix}[0-9]*)/~\1/ig" <<< "$LATEST_VERSION")"
+		LATEST_VERSION="$(sed -E "s/[-._]?(${suffix}[0-9]*)/~\1/ig" <<< "$LATEST_VERSION")"
 	done
 
 	# If FD 3 is open, use it for reporting the fully parsed $LATEST_VERSION

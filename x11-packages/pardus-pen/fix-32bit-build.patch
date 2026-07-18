@@ -1,0 +1,32 @@
+diff --git a/include/widgets/DrawingWidget.h b/include/widgets/DrawingWidget.h
+index e3a3a67..b813711 100644
+--- a/include/widgets/DrawingWidget.h
++++ b/include/widgets/DrawingWidget.h
+@@ -22,7 +22,11 @@
+ #else
+ #include <cstdio>
+ #include "../utils/misc.h"
++#ifdef __LP64__
+ #define debug printf("[%s:%ld]:", __func__, get_epoch() - _cur_time); _cur_time = get_epoch(); printf
++#else
++#define debug printf("[%s:%d]:", __func__, get_epoch() - _cur_time); _cur_time = get_epoch(); printf
++#endif
+ #endif
+ 
+ #define PADDING 8*scale
+diff --git a/src/utils/Archive.cpp b/src/utils/Archive.cpp
+index d31d850..d17cd34 100644
+--- a/src/utils/Archive.cpp
++++ b/src/utils/Archive.cpp
+@@ -135,7 +135,11 @@ class ArchiveStorage {
+                 while (1) {
+                     char buf[4096];
+                     long int r = archive_read_data(ar, buf, sizeof(buf));
++#ifdef __LP64__
+                     debug("%ld %ld %s\n", r, size, entryName);
++#else
++                    debug("%ld %lld %s\n", r, size, entryName);
++#endif
+                     if (r > 0){ // continue read
+                         input.append(buf, r);
+                     } else if (r == 0) { // done

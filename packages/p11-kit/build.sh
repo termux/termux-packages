@@ -3,25 +3,29 @@ TERMUX_PKG_DESCRIPTION="Provides a way to load and enumerate PKCS#11 modules"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.26.4"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/p11-glue/p11-kit/releases/download/$TERMUX_PKG_VERSION/p11-kit-$TERMUX_PKG_VERSION.tar.xz"
 TERMUX_PKG_SHA256=89c3ffb10e076ee036e14732bf6547a1e1c4fb48699a5dee7ceb5ce4f7c0c462
 TERMUX_PKG_DEPENDS="libffi, libtasn1"
-TERMUX_PKG_BUILD_DEPENDS="aosp-libs, bash-completion"
+TERMUX_PKG_BUILD_DEPENDS="bash-completion"
+TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dtrust_module=enabled
 "
 TERMUX_PKG_AUTO_UPDATE=true
 
+termux_step_host_build() {
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
+		return
+	fi
+	# A host version of asn1Parser is required during the build.
+	termux_download_ubuntu_packages libtasn1-bin
+}
+
 termux_step_pre_configure() {
 	# force meson
 	rm configure
-
-	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
-		termux_setup_proot
-		sed \
-		-e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
-		"$TERMUX_PKG_BUILDER_DIR"/0001-workaround-asn1Parser-for-cross-compile.diff | patch -p1
-	fi
+	PATH+=":${TERMUX_PKG_HOSTBUILD_DIR}/ubuntu_packages/usr/bin"
 }
 
 termux_step_post_get_source() {

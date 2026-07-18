@@ -16,7 +16,7 @@ This patch will restore the old behaviour. For Termux we know how it is going.
 
 --- a/src/lib.rs
 +++ b/src/lib.rs
-@@ -3824,14 +3824,13 @@ impl Build {
+@@ -4010,14 +4010,13 @@
 
      /// Get values from CFLAGS-style environment variable.
      fn envflags(&self, env: &str) -> Result<Option<Vec<String>>, Error> {
@@ -28,7 +28,7 @@ This patch will restore the old behaviour. For Termux we know how it is going.
          let mut res = vec![];
 -        for env in self.target_envs(env)?.iter().rev() {
 +        for env in self.target_envs(env)?.iter() {
-             if let Some(var) = self.getenv(env) {
+             if let Some(var) = self.get_env(env) {
 +                if any_set {
 +                    continue;
 +                }
