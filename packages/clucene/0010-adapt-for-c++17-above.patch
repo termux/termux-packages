@@ -1,0 +1,147 @@
+Replace std::binary_function with typedefs (deprecated in c++11 and removed in c++17).
+Bug: https://bugs.gentoo.org/869170
+--- a/src/core/CLucene/index/_Term.h
++++ b/src/core/CLucene/index/_Term.h
+@@ -13,9 +13,12 @@
+ CL_NS_DEF(index)
+ 
+ 
+-class Term_Equals:public CL_NS_STD(binary_function)<const Term*,const Term*,bool>
++class Term_Equals
+ {
+ public:
++	using first_argument_type	= const Term*;
++	using second_argument_type	= const Term*;
++	using result_type		= bool;
+ 	bool operator()( const Term* val1, const Term* val2 ) const{
+ 		return val1->equals(val2);
+ 	}
+--- a/src/core/CLucene/search/BooleanQuery.cpp
++++ b/src/core/CLucene/search/BooleanQuery.cpp
+@@ -25,9 +25,12 @@ CL_NS_USE(index)
+ CL_NS_USE(util)
+ CL_NS_DEF(search)
+ 
+-	class BooleanClause_Compare:public CL_NS_STD(binary_function)<const BooleanClause*,const BooleanClause*,bool>
++	class BooleanClause_Compare
+ 	{
+ 	public:
++		using first_argument_type       = const BooleanClause*;
++		using second_argument_type      = const BooleanClause*;
++		using result_type               = bool;
+ 		bool operator()( const BooleanClause* val1, const BooleanClause* val2 ) const {
+ 			return val1->equals(val2);
+ 		}
+--- a/src/core/CLucene/search/MultiPhraseQuery.cpp
++++ b/src/core/CLucene/search/MultiPhraseQuery.cpp
+@@ -377,9 +377,12 @@ TCHAR* MultiPhraseQuery::toString(const TCHAR* f) const {
+ 	return buffer.giveBuffer();
+ }
+ 
+-class TermArray_Equals:public CL_NS_STD(binary_function)<const Term**,const Term**,bool>
++class TermArray_Equals
+ {
+ public:
++	using first_argument_type	= const Term**;
++	using second_argument_type	= const Term**;
++	using result_type		= bool;
+ 	bool operator()( CL_NS(util)::ArrayBase<CL_NS(index)::Term*>* val1, CL_NS(util)::ArrayBase<CL_NS(index)::Term*>* val2 ) const{
+     if ( val1->length != val2->length )
+       return false;
+--- a/src/core/CLucene/util/Equators.h
++++ b/src/core/CLucene/util/Equators.h
+@@ -22,21 +22,30 @@ CL_NS_DEF(util)
+ /** @internal */
+ class CLUCENE_INLINE_EXPORT Equals{
+ public:
+-	class CLUCENE_INLINE_EXPORT Int32:public CL_NS_STD(binary_function)<const int32_t*,const int32_t*,bool>
++	class CLUCENE_INLINE_EXPORT Int32
+ 	{
+ 	public:
++		using first_argument_type	= const int32_t*;
++		using second_argument_type	= const int32_t*;
++		using result_type		= bool;
+ 		bool operator()( const int32_t val1, const int32_t val2 ) const;
+ 	};
+ 	
+-	class CLUCENE_INLINE_EXPORT Char:public CL_NS_STD(binary_function)<const char*,const char*,bool>
++	class CLUCENE_INLINE_EXPORT Char
+ 	{
+ 	public:
++		using first_argument_type	= const char*;
++		using second_argument_type	= const char*;
++		using result_type		= bool;
+ 		bool operator()( const char* val1, const char* val2 ) const;
+ 	};
+ #ifdef _UCS2
+-	class CLUCENE_INLINE_EXPORT WChar: public CL_NS_STD(binary_function)<const wchar_t*,const wchar_t*,bool>
++	class CLUCENE_INLINE_EXPORT WChar
+ 	{
+ 	public:
++		using first_argument_type	= const wchar_t*;
++		using second_argument_type	= const wchar_t*;
++		using result_type		= bool;
+ 		bool operator()( const wchar_t* val1, const wchar_t* val2 ) const;
+ 	};
+ 	class CLUCENE_INLINE_EXPORT TChar: public WChar{
+@@ -48,9 +57,12 @@ public:
+ 
+ 
+     template<typename _cl>
+-	class CLUCENE_INLINE_EXPORT Void:public CL_NS_STD(binary_function)<const void*,const void*,bool>
++	class CLUCENE_INLINE_EXPORT Void
+ 	{
+ 	public:
++		using first_argument_type	= const void*;
++		using second_argument_type	= const void*;
++		using result_type		= bool;
+ 		bool operator()( _cl* val1, _cl* val2 ) const{
+ 			return val1==val2;
+ 		}
+--- a/src/core/CLucene/util/_Arrays.h
++++ b/src/core/CLucene/util/_Arrays.h
+@@ -124,12 +124,14 @@ CL_NS_DEF(util)
+ 	
+ 	template <typename _kt, typename _comparator, 
+ 		typename class1, typename class2>
+-	class CLListEquals:
+-		public CL_NS_STD(binary_function)<class1*,class2*,bool>
++	class CLListEquals
+ 	{
+ 	typedef typename class1::const_iterator _itr1;
+ 	typedef typename class2::const_iterator _itr2;
+ 	public:
++		using first_argument_type	= class1*;
++		using second_argument_type	= class2*;
++		using result_type		= bool;
+ 		CLListEquals(){
+ 		}
+ 		bool equals( class1* val1, class2* val2 ) const{
+--- a/src/test/index/TestTermVectorsReader.cpp
++++ b/src/test/index/TestTermVectorsReader.cpp
+@@ -93,17 +93,21 @@ CL_NS_USE(util);
+     }
+   };
+ 
+-  struct MyTCharCompare :
+-    public std::binary_function<const TCHAR*, const TCHAR*, bool>
++  struct MyTCharCompare
+   {
++    using first_argument_type	= const TCHAR*;
++    using second_argument_type	= const TCHAR*;
++    using result_type		= bool;
+     bool operator () (const TCHAR* v1, const TCHAR* v2) const {
+       return _tcscmp(v1, v2) < 0;
+     }
+   };
+ 
+-  struct TestTokenCompare : 
+-    public std::binary_function<const TestToken*, const TestToken*, bool>
++  struct TestTokenCompare
+   {
++    using first_argument_type   = const TestToken*;
++    using second_argument_type  = const TestToken*;
++    using result_type           = bool;
+     bool operator () (const TestToken* t1, const TestToken* t2) const {
+       return t1->pos < t2->pos;
+     }
