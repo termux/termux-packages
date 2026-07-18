@@ -1,0 +1,155 @@
+From 03cb4dd247eaa90d69e4a5509c324b9ef8f96164 Mon Sep 17 00:00:00 2001
+From: Md Arif <111168803+sabamdarif@users.noreply.github.com>
+Date: Fri, 17 Jul 2026 21:27:43 +0530
+Subject: [PATCH] fix UNO bridge RTTI lookup scope on Bionic (aarch64)
+
+The aarch64 UNO C++ bridge resolves exception type_info via a handle
+from dlopen(nullptr). On glibc that handle's dlsym searches the global
+scope and finds the weak _ZTIN3com3sun4star... exception type_info
+symbols exported by dynamically-loaded UNO component libraries. On
+Bionic that handle's dlsym scope is limited to the main executable's
+local group (soffice.bin plus its DT_NEEDED closure), so the lookup
+fails and getRtti() fabricates a fresh type_info at a new address.
+
+Because libc++abi matches catch clauses by type_info pointer identity,
+a fabricated type_info matches neither the typed catch (e.g.
+io::IOException) nor its base uno::Exception: this patch uses
+RTLD_DEFAULT (global-scope search: the executable plus every library
+in the global group) on Android for the lookup, otherwise UNO
+exceptions raised through the bridge escape every typed handler and
+reach std::terminate -> abort.
+
+Still required with the package-wide -Wl,-z,global linking: DF_1_GLOBAL
+puts each library in the global group, which RTLD_DEFAULT searches, but
+the dlopen(nullptr) handle's search set on Bionic never includes
+libraries dlopen'd after startup.
+
+The x86_64 and arm bridges already use RTLD_DEFAULT in their Android
+branches (activated by the __ANDROID__ fixes in patch 0004); this
+brings the aarch64 bridge in line.
+
+How this was diagnosed (device: LineageOS 13, aarch64, Termux):
+
+1. Startup aborted in std::terminate with a UNO exception in flight.
+   Reading bridges/source/cpp_uno/gcc3_linux_aarch64/abi.cxx showed
+   getRtti() doing dlsym on a dlopen(nullptr) handle and, on failure,
+   fabricating a type_info. This RTLD_DEFAULT change was applied
+   together with a temporary fprintf canary in the fabrication branch
+   to verify it on the device:
+
+     fprintf(stderr, "UNO-RTTI-FABRICATE: symbol '%s' not found in
+         global scope; fabricating type_info -> typed catch of this
+         UNO exception will FAIL\n", sym.getStr());
+
+   With RTLD_DEFAULT in place the canary never printed, i.e. the
+   dlsym now succeeds and the bridge no longer fabricates RTTI. But
+   typed catches in desktop startup code STILL missed, so a second,
+   independent failure mode had to exist for directly-thrown
+   (non-bridge) C++ exceptions.
+
+2. A temporary diagnostic at the catch site compared the in-flight
+   exception's type_info pointer against the catching library's own
+   &typeid(uno::Exception). Device output:
+
+     RTTI-DIAG: in-flight exception
+       type='N3com3sun4star3ucb18NameClashExceptionE'
+       ti_ptr=0x7546c6f468
+       local uno::Exception ti_ptr=0x782ab33d68 same=0
+       local uno::RuntimeException ti_ptr=0x782ab33d78 same=0
+
+   Same class hierarchy, two different type_info addresses: the thrown
+   NameClashException lived in libucpfile1.so, the catch site's base
+   uno::Exception in libsofficeapp.so. Pointer-identity matching means
+   the typed catch cannot match.
+
+3. To rule out a symbol-visibility/export bug, a readelf sweep ran on
+   the device over every library in libreoffice/program:
+
+     RE=$(command -v readelf || command -v llvm-readelf)
+     for f in *.so *.so.* soffice.bin; do
+       "$RE" -sW "$f" 2>/dev/null | \
+         grep ' _ZTIN3com3sun4star3uno9ExceptionE$'
+     done
+
+   Result: ~150 libraries each DEFINE their own copy of the symbol as
+   OBJECT WEAK DEFAULT (Ndx != UND), and only one C++ runtime
+   (libc++_shared.so) is linked. The symbols are exported correctly;
+   Bionic simply does not unify weak symbols across dlopen groups the
+   way glibc does process-wide.
+
+4. A minimal two-library experiment (~/rttitest on the device) nailed
+   down Bionic's exact semantics. Two shared libs were built from the
+   same source, each emitting the same weak type_info via an inline
+   virtual destructor; libb is dlopen'd later and throws, liba has the
+   typed catch:
+
+     struct MyExc { virtual ~MyExc() {} int v; };
+     extern "C" void THROWF() { throw MyExc(); }
+     extern "C" int CATCHF(void (*f)()) {
+         try { f(); } catch (MyExc&) { return 1; }
+         catch (...) { return 0; } return -1; }
+
+   Exact device output of the five load-order scenarios:
+
+     1. baseline: liba RTLD_LOCAL, libb dlopen'd
+        ti a=0x6fa6bd1de8 b=0x6fa6baade8 same=0  cross-catch: 0
+     2. liba local, then dlopen(RTLD_NOLOAD|RTLD_GLOBAL) promotion
+        promote liba: ok
+        ti a=0x70fc045de8 b=0x70fc024de8 same=0  cross-catch: 0
+     3. liba dlopen'd RTLD_GLOBAL from the start
+        ti a=0x759f9dede8 b=0x759f9b2de8 same=0  cross-catch: 0
+     4. liba as DT_NEEDED of the executable
+        ti a=0x7b4cc58de8 b=0x78bc9abde8 same=0  cross-catch: 0
+     5. same as 4 plus LD_PRELOAD=liba.so
+        ti a=0x702bc6ede8 b=0x702bc6ede8 same=1  cross-catch: 1
+
+   Only scenario 5 unifies the type_info and lets the typed catch
+   match. LD_PRELOAD is exactly the DF_1_GLOBAL load-time mechanism;
+   dlopen(RTLD_GLOBAL) and RTLD_NOLOAD promotion are silent no-ops for
+   how LATER dlopen groups bind their symbols.
+
+5. Confirmed live on the full application:
+
+     cd .../libreoffice/program
+     LD_PRELOAD=$PWD/libsofficeapp.so ./soffice.bin
+
+   The RTTI-DIAG line disappeared, typed catches matched, and the
+   Start Center rendered real UI instead of a white window (verified
+   with a root-window screenshot over X11). Since LD_PRELOAD only
+   covered one library and the same duplication exists across the
+   whole package, the general fix is linking every library with
+   -Wl,-z,global (build.sh), which sets DF_1_GLOBAL at load time for
+   all of them - the one mechanism the experiment proved effective.
+
+The experiment matrix also shows why this RTLD_DEFAULT patch remains
+necessary alongside -Wl,-z,global: the bridge's dlopen(nullptr) handle
+searches a snapshot of the executable's startup group and never sees
+libraries dlopen'd afterwards, while RTLD_DEFAULT searches the global
+group that -z global places every library into.
+---
+ bridges/source/cpp_uno/gcc3_linux_aarch64/abi.cxx | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/bridges/source/cpp_uno/gcc3_linux_aarch64/abi.cxx b/bridges/source/cpp_uno/gcc3_linux_aarch64/abi.cxx
+index dcd27e95a..4ec7485c9 100644
+--- a/bridges/source/cpp_uno/gcc3_linux_aarch64/abi.cxx
++++ b/bridges/source/cpp_uno/gcc3_linux_aarch64/abi.cxx
+@@ -75,9 +75,15 @@ OUString toUnoName(char const * name) {
+ 
+ class Rtti {
+ public:
++#if defined(__ANDROID__)
++    Rtti(): app_(RTLD_DEFAULT) {}
++
++    ~Rtti() {}
++#else
+     Rtti(): app_(dlopen(nullptr, RTLD_LAZY)) {}
+ 
+     ~Rtti() { dlclose(app_); }
++#endif
+ 
+     std::type_info * getRtti(typelib_TypeDescription const & type);
+ 
+-- 
+2.55.0
+

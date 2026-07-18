@@ -1,0 +1,174 @@
+diff --git a/bridges/source/cpp_uno/shared/vtablefactory.cxx b/bridges/source/cpp_uno/shared/vtablefactory.cxx
+index d8dd48977..5dc944caf 100644
+--- a/bridges/source/cpp_uno/shared/vtablefactory.cxx
++++ b/bridges/source/cpp_uno/shared/vtablefactory.cxx
+@@ -271,7 +271,7 @@ bool VtableFactory::createBlock(Block &block, sal_Int32 slotCount) const
+     {
+         OStringBuffer aTmpName(strDirectory);
+         if (aTmpName.isEmpty())
+-            aTmpName = "/tmp";
++            aTmpName = "@TERMUX_PREFIX@/tmp";
+ 
+         aTmpName.append("/.execoooXXXXXX");
+         if ((block.fd = mkstemp(aTmpName.getMutableStr())) == -1)
+diff --git a/cui/source/options/optinet2.cxx b/cui/source/options/optinet2.cxx
+index 92b2c590e..39265db22 100644
+--- a/cui/source/options/optinet2.cxx
++++ b/cui/source/options/optinet2.cxx
+@@ -520,7 +520,7 @@ IMPL_LINK_NOARG(SvxSecurityTabPage, CertMgrPBHdl, weld::Button&, void)
+                                  FileDialogFlags::NONE, GetDialogController()->getDialog());
+         OUString sPath = m_xParameterEdit->get_text();
+         if (sPath.isEmpty())
+-            sPath = "/usr/bin";
++            sPath = "@TERMUX_PREFIX@/bin";
+ 
+         OUString sUrl;
+         osl::FileBase::getFileURLFromSystemPath(sPath, sUrl);
+diff --git a/desktop/source/app/crashreport.cxx b/desktop/source/app/crashreport.cxx
+index 49c551b62..8aef1e2ee 100644
+--- a/desktop/source/app/crashreport.cxx
++++ b/desktop/source/app/crashreport.cxx
+@@ -254,7 +254,7 @@ void CrashReporter::installExceptionHandler()
+     if (!IsDumpEnable())
+         return;
+ #if defined( UNX ) && !defined MACOSX && !defined IOS && !defined ANDROID
+-    google_breakpad::MinidumpDescriptor descriptor("/tmp");
++    google_breakpad::MinidumpDescriptor descriptor("@TERMUX_PREFIX@/tmp");
+     mpExceptionHandler = std::make_unique<google_breakpad::ExceptionHandler>(descriptor, nullptr, dumpCallback, nullptr, true, -1);
+ #elif defined _WIN32
+     mpExceptionHandler = std::make_unique<google_breakpad::ExceptionHandler>(L".", nullptr, dumpCallback, nullptr, google_breakpad::ExceptionHandler::HANDLER_ALL);
+diff --git a/desktop/unx/source/start.c b/desktop/unx/source/start.c
+index e9cf4c547..00e6620d4 100644
+--- a/desktop/unx/source/start.c
++++ b/desktop/unx/source/start.c
+@@ -36,8 +36,8 @@
+ #include "pagein.h"
+ #include "splashx.h"
+ 
+-#define PIPEDEFAULTPATH      "/tmp"
+-#define PIPEALTERNATEPATH    "/var/tmp"
++#define PIPEDEFAULTPATH      "@TERMUX_PREFIX@/tmp"
++#define PIPEALTERNATEPATH    "@TERMUX_PREFIX@/var/cache"
+ 
+ /* Easier conversions: rtl_uString to rtl_String */
+ static rtl_String *ustr_to_str(rtl_uString *pStr)
+diff --git a/include/systools/opensslinit.hxx b/include/systools/opensslinit.hxx
+index 45715d1bc..fd61a1c53 100644
+--- a/include/systools/opensslinit.hxx
++++ b/include/systools/opensslinit.hxx
+@@ -22,11 +22,11 @@ static char const* GetCABundleFile()
+     // try system ones first; inspired by:
+     // https://www.happyassassin.net/posts/2015/01/12/a-note-about-ssltls-trusted-certificate-stores-and-platforms/
+     auto const candidates = {
+-        "/etc/pki/tls/certs/ca-bundle.crt",
+-        "/etc/pki/tls/certs/ca-bundle.trust.crt",
+-        "/etc/ssl/certs/ca-certificates.crt",
+-        "/var/lib/ca-certificates/ca-bundle.pem",
+-        "/etc/ssl/cert.pem", // macOS has one at this location
++        "@TERMUX_PREFIX@/etc/tls/cert.pem",
++        "@TERMUX_PREFIX@/etc/tls/certs/ca-certificates.crt",
++        "@TERMUX_PREFIX@/etc/ssl/certs/ca-certificates.crt",
++        "@TERMUX_PREFIX@/etc/ssl/cert.pem",
++        "@TERMUX_PREFIX@/share/ca-certificates/ca-bundle.pem",
+     };
+     for (char const* const candidate : candidates)
+     {
+diff --git a/sal/osl/unx/pipe.cxx b/sal/osl/unx/pipe.cxx
+index 5b0f374db..0049dbe3e 100644
+--- a/sal/osl/unx/pipe.cxx
++++ b/sal/osl/unx/pipe.cxx
+@@ -38,8 +38,8 @@
+ #include <sys/stat.h>
+ #include <unistd.h>
+ 
+-constexpr OString PIPEDEFAULTPATH = "/tmp"_ostr;
+-constexpr OString PIPEALTERNATEPATH = "/var/tmp"_ostr;
++constexpr OString PIPEDEFAULTPATH = "@TERMUX_PREFIX@/tmp"_ostr;
++constexpr OString PIPEALTERNATEPATH = "@TERMUX_PREFIX@/var/tmp"_ostr;
+ 
+ static oslPipe osl_psz_createPipe(const char *pszPipeName, oslPipeOptions Options, oslSecurity Security);
+ 
+diff --git a/sal/osl/unx/tempfile.cxx b/sal/osl/unx/tempfile.cxx
+index bce5b6fd3..24c10aa09 100644
+--- a/sal/osl/unx/tempfile.cxx
++++ b/sal/osl/unx/tempfile.cxx
+@@ -46,7 +46,7 @@ oslFileError SAL_CALL osl_getTempDirURL( rtl_uString** pustrTempDir )
+         pValue = getenv( "TMP" );
+ 
+     if ( !pValue )
+-        pValue = "/tmp";
++        pValue = "@TERMUX_PREFIX@/tmp";
+ 
+     auto nLen = strlen(pValue);
+     while (nLen > 1 && pValue[nLen - 1] == '/') // Allow path consisting of single "/"
+diff --git a/shell/source/backends/desktopbe/desktopbackend.cxx b/shell/source/backends/desktopbe/desktopbackend.cxx
+index d238cc0a8..f42f610ae 100644
+--- a/shell/source/backends/desktopbe/desktopbackend.cxx
++++ b/shell/source/backends/desktopbe/desktopbackend.cxx
+@@ -127,7 +127,7 @@ OUString xdg_user_dir_lookup (const char *type, bool bAllowHomeDir)
+ 
+     if (!aSecurity.getHomeDir( aHomeDirURL ) )
+     {
+-        osl::FileBase::getFileURLFromSystemPath(u"/tmp"_ustr, aDocumentsDirURL);
++        osl::FileBase::getFileURLFromSystemPath(u"@TERMUX_PREFIX@/tmp"_ustr, aDocumentsDirURL);
+         return aDocumentsDirURL;
+     }
+ 
+diff --git a/shell/source/unix/exec/shellexec.cxx b/shell/source/unix/exec/shellexec.cxx
+index 07414371f..ac113d8ec 100644
+--- a/shell/source/unix/exec/shellexec.cxx
++++ b/shell/source/unix/exec/shellexec.cxx
+@@ -190,7 +190,7 @@ void SAL_CALL ShellExec::execute( const OUString& aCommand, const OUString& aPar
+         aBuffer.append(" --");
+ #else
+         // Just use xdg-open on non-Mac
+-        aBuffer.append("xdg-open");
++        aBuffer.append("@TERMUX_PREFIX@/bin/xdg-utils-xdg-open");
+ #endif
+         aBuffer.append(" ");
+         escapeForShell(aBuffer, OUStringToOString(aURL, osl_getThreadTextEncoding()));
+diff --git a/shell/source/unix/misc/senddoc.sh b/shell/source/unix/misc/senddoc.sh
+index 65ade8426..c830fe1f5 100755
+--- a/shell/source/unix/misc/senddoc.sh
++++ b/shell/source/unix/misc/senddoc.sh
+@@ -92,17 +92,15 @@ case $(printf %s "$MAILER_TYPE" | sed 's/-.*$//') in
+         # Try to be smart, and send the mail anyway, if we have the
+         # possibility to do so.
+ 
+-        if [ -x /usr/bin/xdg-email ] ; then
+-            MAILER=/usr/bin/xdg-email
++        if [ -x @TERMUX_PREFIX@/bin/xdg-email ] ; then
++            MAILER=@TERMUX_PREFIX@/bin/xdg-email
+         elif [ -n "$DESKTOP_LAUNCH" ]; then
+             # http://lists.freedesktop.org/pipermail/xdg/2004-August/002873.html
+             MAILER=${DESKTOP_LAUNCH}
+-        elif [ -n "$KDE_FULL_SESSION" -a -x /usr/bin/kde-open ] ; then
+-            MAILER=/usr/bin/kde-open
+-        elif [ -x /usr/bin/xdg-open ] ; then
+-            MAILER=/usr/bin/xdg-open
+-        elif command -v xdg-open >/dev/null 2>&1 ; then
+-            MAILER=$(command -v xdg-open)
++        elif [ -n "$KDE_FULL_SESSION" -a -x @TERMUX_PREFIX@/bin/kde-open ] ; then
++            MAILER=@TERMUX_PREFIX@/bin/kde-open
++        elif [ -x @TERMUX_PREFIX@/bin/xdg-utils-xdg-open ] ; then
++            MAILER=@TERMUX_PREFIX@/bin/xdg-utils-xdg-open
+         else
+             echo "Unsupported mail client: $MAILER"
+             exit 2
+diff --git a/vcl/inc/unx/cpdmgr.hxx b/vcl/inc/unx/cpdmgr.hxx
+index 0c29639e5..260495187 100644
+--- a/vcl/inc/unx/cpdmgr.hxx
++++ b/vcl/inc/unx/cpdmgr.hxx
+@@ -32,9 +32,9 @@ typedef struct _GDBusConnection GDBusConnection;
+ #include <printerinfomanager.hxx>
+ #include "cupsmgr.hxx"
+ 
+-#define BACKEND_DIR "/usr/share/print-backends"
+-#define FRONTEND_INTERFACE "/usr/share/dbus-1/interfaces/org.openprinting.Frontend.xml"
+-#define BACKEND_INTERFACE "/usr/share/dbus-1/interfaces/org.openprinting.Backend.xml"
++#define BACKEND_DIR "@TERMUX_PREFIX@/share/print-backends"
++#define FRONTEND_INTERFACE "@TERMUX_PREFIX@/share/dbus-1/interfaces/org.openprinting.Frontend.xml"
++#define BACKEND_INTERFACE "@TERMUX_PREFIX@/share/dbus-1/interfaces/org.openprinting.Backend.xml"
+ 
+ namespace psp
+ {

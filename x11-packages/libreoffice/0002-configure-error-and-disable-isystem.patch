@@ -1,0 +1,50 @@
+diff --git a/configure.ac b/configure.ac
+index e805fbf39..669eb3990 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -4386,26 +4386,7 @@ else
+ fi
+ AC_SUBST(ENABLE_EMSCRIPTEN_PROXY_POSIX_SOCKETS)
+ 
+-# Use -isystem (gcc) if possible, to avoid warnings in 3rd party headers.
+-# NOTE: must _not_ be used for bundled external libraries!
+-ISYSTEM=
+-if test "$GCC" = "yes"; then
+-    AC_MSG_CHECKING( for -isystem )
+-    save_CFLAGS=$CFLAGS
+-    CFLAGS="$CFLAGS -isystem /usr/include -Werror"
+-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[ return 0; ]])],[ ISYSTEM="-isystem " ],[])
+-    CFLAGS=$save_CFLAGS
+-    if test -n "$ISYSTEM"; then
+-        AC_MSG_RESULT(yes)
+-    else
+-        AC_MSG_RESULT(no)
+-    fi
+-fi
+-if test -z "$ISYSTEM"; then
+-    # fall back to using -I
+-    ISYSTEM=-I
+-fi
+-AC_SUBST(ISYSTEM)
++ISYSTEM=-I
+ 
+ dnl ===================================================================
+ dnl  Check which Visual Studio compiler is used
+@@ -12008,7 +11989,7 @@ else
+         save_CXXFLAGS=$CXXFLAGS
+         save_IFS=$IFS
+         IFS=$P_SEP
+-        for i in $CPLUS_INCLUDE_PATH /usr/include; do
++        for i in $CPLUS_INCLUDE_PATH @TERMUX_PREFIX@/include; do
+             dnl Reset IFS as soon as possible, to avoid unexpected side effects (and the
+             dnl "/usr/include" fallback makes sure we get here at least once; resetting rather than
+             dnl unsetting follows the advice at <https://git.savannah.gnu.org/gitweb/?p=autoconf.git;
+@@ -13491,7 +13472,7 @@ elif test \( \( "$_os" = "Linux" -o "$_os" = "Darwin" \) -a "$ENABLE_NSS" = TRUE
+         SYSTEM_GPGMEPP=TRUE
+ 
+         # C++ library doesn't come with fancy gpgmepp-config, check for headers the old-fashioned way
+-        AC_CHECK_HEADER(gpgme++/gpgmepp_version.h, [ GPGMEPP_CFLAGS=-I/usr/include/gpgme++ ],
++        AC_CHECK_HEADER(gpgme++/gpgmepp_version.h, [ GPGMEPP_CFLAGS=-I@TERMUX_PREFIX@/include/gpgme++ ],
+             [AC_MSG_ERROR([gpgmepp headers not found, install gpgmepp >= 1.14 development package])], [])
+         AC_CHECK_HEADER(gpgme.h, [],
+             [AC_MSG_ERROR([gpgme headers not found, install gpgme development package])], [])
