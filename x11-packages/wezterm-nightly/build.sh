@@ -15,8 +15,8 @@ TERMUX_PKG_REPOLOGY_METADATA_VERSION="${TERMUX_PKG_VERSION:0:4}.${TERMUX_PKG_VER
 
 termux_pkg_auto_update() {
 	local origin_url last_autoupdate
-	# Throttle auto updates to once every three weeks
-	local update_interval="$((3 * 7 * 86400))"
+	# Throttle auto updates to once every two weeks
+	local update_interval="$((2 * 7 * 86400))"
 
 	# Get the git history
 	if origin_url="$(git config --get remote.origin.url)"; then
@@ -27,7 +27,7 @@ termux_pkg_auto_update() {
 		}
 	fi
 
-	# When was `wezterm` last autoupdated? (Unix epoch timestamp)
+	# When was the last autoupdate to this package? (Unix epoch timestamp)
 	last_autoupdate="$(
 		git log \
 		--author="Termux Github Actions <contact@termux.dev>" \
@@ -36,25 +36,45 @@ termux_pkg_auto_update() {
 		-- "$TERMUX_PKG_BUILDER_DIR/build.sh"
 	)"
 
-
-	if (( last_autoupdate > EPOCHSECONDS - update_interval )); then
+	# If we're still in the $update_interval skip the actual checking.
+	if (( last_autoupdate + update_interval > EPOCHSECONDS )); then
 		local t days hrs mins secs
-		(( t = EPOCHSECONDS - last_autoupdate, days = t/86400, t %= 86400, secs= t%60, t /= 60, mins = t%60, hrs = t/60 ))
+		(( t = EPOCHSECONDS - last_autoupdate, days = t/86400, t %= 86400, secs = t%60, t /= 60, mins = t%60, hrs = t/60 ))
 
 		printf 'INFO: Last updated %dd%dh%02dm%02ds ago.\n' "$days" "$hrs" "$mins" "$secs"
 		printf 'INFO: Which is less than the desired %sd minimum update interval.\n' "$(( update_interval / 86400 ))"
 		return
 	fi
 
-	local latest_commit_date
-	latest_commit_date="$(
-		curl -s https://api.github.com/repos/wezterm/wezterm/commits | jq -r '.[0] | .commit.author.date' | sed -e 's/-//g' | cut -c1-8
+	# Get the latest commit's date and SHA.
+	local response latest_commit_date latest_commit_sha
+	response="$(curl -sL \
+		-H "X-GitHub-Api-Version: 2026-03-10" \
+		-H "Accept: application/vnd.github+json" \
+		"https://api.github.com/repos/wezterm/wezterm/commits/HEAD"
 	)"
 
-	if [[ -z "${latest_commit_date}" ]]; then
-		termux_error_exit "Unable to get latest commit date from ${TERMUX_PKG_SRCURL}"
+
+	read -rd' ' latest_commit_date latest_commit_sha < <(
+		jq -r '.commit.author.date, .sha' <<< "$response"
+	)
+
+	# Are they valid?
+	if ! date -d "${latest_commit_date:=null}" > /dev/null || [[ ! "${latest_commit_sha:=null}" =~ [0-9a-f]* ]]; then
+		{
+			echo "Unable to get commit date and SHA from ${TERMUX_PKG_SRCURL}."
+			echo "Date: $latest_commit_date"
+			echo "SHA:  $latest_commit_sha"
+			jq . <<< "$response"
+			return
+		} | tee "${GITHUB_STEP_SUMMARY:-/dev/null}" >&2
 	fi
-	termux_pkg_upgrade_version "${latest_commit_date}"
+
+	# Massage the date into shape.
+	latest_commit_date="${latest_commit_date//-/}" # 2026-07-16T03:01:40Z -> 20260716T03:01:40Z
+	latest_commit_date="${latest_commit_date%T*}"  # 20260716T03:01:40Z -> 20260716
+
+	termux_pkg_upgrade_version "${latest_commit_date}+g${latest_commit_sha::8}"
 }
 
 termux_step_post_get_source() {
