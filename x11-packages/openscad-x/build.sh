@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The programmers solid 3D CAD modeller (X11 build)"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2021.01"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://files.openscad.org/openscad-$TERMUX_PKG_VERSION.src.tar.gz"
 TERMUX_PKG_SHA256=d938c297e7e5f65dbab1461cac472fc60dfeaa4999ea2c19b31a4184f2d70359
 TERMUX_PKG_DEPENDS="boost, double-conversion, fontconfig, freetype, glib, glu, glew, harfbuzz, libc++, libcairo, libgmp, libmpfr, libnettle, libx11, libxml2, libzip, opencsg, opengl, qscintilla, qt5-qtbase, qt5-qtmultimedia"
