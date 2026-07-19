@@ -1,0 +1,76 @@
+diff --git a/src/AngleSharp/Css/Dom/Internal/ClassSelector.cs b/src/AngleSharp/Css/Dom/Internal/ClassSelector.cs
+index d485698..387f981 100644
+--- a/src/AngleSharp/Css/Dom/Internal/ClassSelector.cs
++++ b/src/AngleSharp/Css/Dom/Internal/ClassSelector.cs
+@@ -18,6 +18,14 @@ public ClassSelector(String cls)
+ 
+         public void Accept(ISelectorVisitor visitor) => visitor.Class(_cls);
+ 
+-        public Boolean Match(IElement element, IElement? scope) => element.ClassList.Contains(_cls);
++        public Boolean Match(IElement element, IElement? scope)
++        {
++            var list = element.ClassList;
++            if (list is TokenList concreteList)
++            {
++                return concreteList.Contains(_cls);
++            }
++            return list.Contains(_cls);
++        }
+     }
+ }
+diff --git a/src/AngleSharp/Dom/Internal/Element.cs b/src/AngleSharp/Dom/Internal/Element.cs
+index d39a3bc..c6b47da 100644
+--- a/src/AngleSharp/Dom/Internal/Element.cs
++++ b/src/AngleSharp/Dom/Internal/Element.cs
+@@ -5,6 +5,7 @@ namespace AngleSharp.Dom
+     using AngleSharp.Text;
+     using System;
+     using System.Linq;
++    using System.Threading;
+     using Common;
+     using Html.Construction;
+     using Html.Parser;
+@@ -108,13 +109,15 @@ public ITokenList ClassList
+         {
+             get
+             {
+-                if (_classList is null)
++                var classList = Volatile.Read(ref _classList);
++                if (classList is null)
+                 {
+-                    _classList = new TokenList(this.GetOwnAttribute(AttributeNames.Class));
+-                    _classList.Changed += value => UpdateAttribute(AttributeNames.Class, value);
++                    var list = new TokenList(this.GetOwnAttribute(AttributeNames.Class));
++                    list.Changed += value => UpdateAttribute(AttributeNames.Class, value);
++                    var current = Interlocked.CompareExchange(ref _classList, list, null);
++                    classList = current ?? list;
+                 }
+-
+-                return _classList;
++                return classList;
+             }
+         }
+ 
+diff --git a/src/AngleSharp/Dom/QueryExtensions.cs b/src/AngleSharp/Dom/QueryExtensions.cs
+index 8612884..f1e5ce4 100644
+--- a/src/AngleSharp/Dom/QueryExtensions.cs
++++ b/src/AngleSharp/Dom/QueryExtensions.cs
+@@ -316,6 +316,18 @@ public static void QuerySelectorAll<T>(this T elements, ISelector selector, List
+         /// <returns>True if the string contained all tokens, otherwise false.</returns>
+         public static Boolean Contains<T>(this T list, String[] tokens) where T : class, ITokenList
+         {
++            if (list is TokenList concreteList)
++            {
++                for (var i = 0; i < tokens.Length; i++)
++                {
++                    if (!concreteList.Contains(tokens[i]))
++                    {
++                        return false;
++                    }
++                }
++                return true;
++            }
++
+             for (var i = 0; i < tokens.Length; i++)
+             {
+                 if (!list.Contains(tokens[i]))
