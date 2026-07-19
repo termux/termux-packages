@@ -1,11 +1,12 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/wez/wezterm
+TERMUX_PKG_HOMEPAGE=https://wezterm.org/
 TERMUX_PKG_DESCRIPTION="GPU-accelerated cross-platform terminal emulator and multiplexer"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="20240203-110809-5046fc22"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/wezterm/wezterm/releases/download/$TERMUX_PKG_VERSION/wezterm-$TERMUX_PKG_VERSION-src.tar.gz"
 TERMUX_PKG_SHA256=df60b1081d402b5a9239cc4cef16fc699eab68bbbeac9c669cb5d991a6010b2c
-TERMUX_PKG_DEPENDS="fontconfig, freetype, glib, harfbuzz, hicolor-icon-theme, libpng, libssh2, libx11, libxcb, libxkbcommon, openssl, ttf-jetbrains-mono, xdg-utils, xcb-util, xcb-util-image, zlib"
+TERMUX_PKG_DEPENDS="fontconfig, freetype, glib, harfbuzz, hicolor-icon-theme, libpng, libssh2, libx11, libxcb, libxkbcommon, openssl, ttf-jetbrains-mono, xdg-utils, xcb-util, xcb-util-image, zlib, zstd"
 TERMUX_PKG_RECOMMENDS="ncurses, ttf-nerd-fonts-symbols"
 TERMUX_PKG_BREAKS="wezterm-nightly"
 TERMUX_PKG_CONFLICTS="wezterm-nightly"
@@ -18,6 +19,7 @@ termux_step_pre_configure() {
 	sed -i 's/"vendored-fonts", //' wezterm-gui/Cargo.toml
 
 	export LIBSSH2_SYS_USE_PKG_CONFIG=1
+	export ZSTD_SYS_USE_PKG_CONFIG=1
 
 	cargo vendor
 	find ./vendor \

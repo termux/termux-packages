@@ -1,11 +1,12 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/wez/wezterm
+TERMUX_PKG_HOMEPAGE=https://wezterm.org/
 TERMUX_PKG_DESCRIPTION="GPU-accelerated cross-platform terminal emulator and multiplexer (development branch)"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="20260716"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/wezterm/wezterm
 TERMUX_PKG_GIT_BRANCH=main
-TERMUX_PKG_DEPENDS="fontconfig, freetype, glib, harfbuzz, hicolor-icon-theme, libpng, libssh2, libx11, libxcb, libxkbcommon, openssl, ttf-jetbrains-mono, xdg-utils, xcb-util, xcb-util-image, zlib"
+TERMUX_PKG_DEPENDS="fontconfig, freetype, glib, harfbuzz, hicolor-icon-theme, libpng, libssh2, libx11, libxcb, libxkbcommon, openssl, ttf-jetbrains-mono, xdg-utils, xcb-util, xcb-util-image, zlib, zstd"
 TERMUX_PKG_RECOMMENDS="ncurses, ttf-nerd-fonts-symbols"
 TERMUX_PKG_BREAKS="wezterm"
 TERMUX_PKG_CONFLICTS="wezterm"
@@ -65,6 +66,7 @@ termux_step_pre_configure() {
 	PKG_CONFIG_PATH_x86_64_unknown_linux_gnu="$(grep 'DefaultSearchPaths:' "/usr/share/pkgconfig/personality.d/${HOST_TRIPLET}.personality" | cut -d ' ' -f 2)"
 	export PKG_CONFIG_PATH_x86_64_unknown_linux_gnu
 	export LIBSSH2_SYS_USE_PKG_CONFIG=1
+	export ZSTD_SYS_USE_PKG_CONFIG=1
 
 	cargo vendor
 	find ./vendor \
