@@ -1,0 +1,26 @@
+From 5c44b2cf36e56a44bfdb3f974d11c3f96fc1b563 Mon Sep 17 00:00:00 2001
+From: Kristaps Dzonsons <kristaps@bsd.lv>
+Date: Sat, 18 Jul 2026 22:12:49 -0700
+Subject: [PATCH] Fix install source
+
+lowdown.h moved into src, but this wasn't reflected in an install rule
+in the Makefile.
+
+Fix #185
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index f40cb24..eae9788 100644
+--- a/Makefile
++++ b/Makefile
+@@ -317,7 +317,7 @@ install_lib_common: lowdown.pc
+ 	mkdir -p $(DESTDIR)$(LIBDIR)/pkgconfig
+ 	mkdir -p $(DESTDIR)$(INCLUDEDIR)
+ 	$(INSTALL_DATA) lowdown.pc $(DESTDIR)$(LIBDIR)/pkgconfig
+-	$(INSTALL_DATA) lowdown.h $(DESTDIR)$(INCLUDEDIR)
++	$(INSTALL_DATA) src/lowdown.h $(DESTDIR)$(INCLUDEDIR)
+ 	for f in $(MAN3S) ; do \
+ 		name=`basename $$f .html` ; \
+ 		section=$${name##*.} ; \
