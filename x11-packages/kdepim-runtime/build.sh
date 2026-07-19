@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Extends the functionality of kdepim"
 TERMUX_PKG_LICENSE="GPL-2.0-or-later, LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26.04.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/kdepim-runtime-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256="498744228f225176624fafbab283815b6872351f6d15bb935e2d02c1a644dd43"
 TERMUX_PKG_AUTO_UPDATE=true
