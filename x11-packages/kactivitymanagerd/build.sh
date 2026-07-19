@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="System service to manage user activities and track the u
 TERMUX_PKG_LICENSE="LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.7.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/plasma/${TERMUX_PKG_VERSION}/kactivitymanagerd-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=5336d9addebc89e85d3b613ff1136c7c842f74ca986dd1d46c0a2f7733dc095a
 TERMUX_PKG_AUTO_UPDATE=true
