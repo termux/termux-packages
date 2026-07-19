@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Please align the version with `poppler` package.
 TERMUX_PKG_VERSION="26.02.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://poppler.freedesktop.org/poppler-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=dded8621f7b2f695c91063aab1558691c8418374cd583501e89ed39487e7ab77
 # The package must be updated at the same time as poppler, auto updater script does not support that.
