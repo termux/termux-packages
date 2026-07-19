@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="To-do management application based on Akonadi"
 TERMUX_PKG_LICENSE="GPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26.04.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/zanshin-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256="a805e9a20b8240c552ea3d7d1586419037bf43aab943ab1cd48f00c3b5dc9792"
 TERMUX_PKG_AUTO_UPDATE=true
