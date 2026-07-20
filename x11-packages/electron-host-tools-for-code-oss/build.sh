@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT, BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
 _CHROMIUM_VERSION=148.0.7778.97
 TERMUX_PKG_VERSION=42.2.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=git+https://github.com/electron/electron
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libnotify, libffi-static"
@@ -261,6 +261,9 @@ exclude_unwind_tables = false
 use_jumbo_build = true
 # Compile pdfium as a static library
 # pdf_is_complete_lib = true
+# NDK r29 can't compile chromium with cxx23, see
+# https://github.com/termux/termux-packages/issues/28459#issuecomment-3991943697
+use_cxx23 = false
 # Use prebuilt js2c
 # prebuilt_js2c_binary = \"$TERMUX_PREFIX/opt/electron-jumbo-host-tools/$_v8_toolchain_name/node_js2c\"
 " >> $_common_args_file
