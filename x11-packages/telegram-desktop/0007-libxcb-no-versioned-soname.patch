@@ -1,0 +1,29 @@
+Necessary after https://github.com/desktop-app/lib_base/commit/dad317d45df060dad9566741a6877f6c7ca57983
+Fixes https://github.com/termux/termux-packages/issues/30626
+
+--- a/Telegram/lib_base/base/platform/linux/base_global_shortcuts_linux.cpp
++++ b/Telegram/lib_base/base/platform/linux/base_global_shortcuts_linux.cpp
+@@ -126,8 +126,8 @@ int (*xcb_is_private_keypad_key)(xcb_keysym_t keysym);
+ 
+ [[nodiscard]] bool Resolve() {
+ 	static const auto Result = [] {
+-		const auto record = LoadLibrary("libxcb-record.so.0", RTLD_NODELETE);
+-		const auto keysyms = LoadLibrary("libxcb-keysyms.so.1",
++		const auto record = LoadLibrary("libxcb-record.so", RTLD_NODELETE);
++		const auto keysyms = LoadLibrary("libxcb-keysyms.so",
+ 			RTLD_NODELETE);
+ 		return record
+ 			&& keysyms
+diff --git a/Telegram/lib_base/base/platform/linux/base_linux_xcb_library.cpp b/Telegram/lib_base/base/platform/linux/base_linux_xcb_library.cpp
+index b467385f..88b91dec 100644
+--- a/Telegram/lib_base/base/platform/linux/base_linux_xcb_library.cpp
++++ b/Telegram/lib_base/base/platform/linux/base_linux_xcb_library.cpp
+@@ -11,7 +11,7 @@
+ namespace base::Platform::XCB::Library {
+ 
+ void *LoadSymbol(const char *name) {
+-	static const auto Handle = LoadLibrary("libxcb.so.1", RTLD_NODELETE);
++	static const auto Handle = LoadLibrary("libxcb.so", RTLD_NODELETE);
+ 	return Handle ? LoadSymbolGeneric(Handle, name) : nullptr;
+ }
+ 
