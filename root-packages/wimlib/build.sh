@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://wimlib.net/
 TERMUX_PKG_DESCRIPTION="A library and command-line tools to create, extract, and modify Windows Imaging (WIM ) files"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@xingguangcuican6666"
-TERMUX_PKG_VERSION="1.14.4"
+TERMUX_PKG_VERSION="1.14.5"
 
 TERMUX_PKG_SRCURL="https://github.com/ebiggers/wimlib/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=fceff5e4383480f4416353a218f480b257fff75775ccf364be8ef4c13c605d81
+TERMUX_PKG_SHA256=5f9416b3750c29d6ad35a2fc3bd6697807566ee287b28e004b0111c3787b1ce2
 
 TERMUX_PKG_DEPENDS="libandroid-glob, libandroid-utimes, libfuse3, liblzma, libxml2, ntfs-3g, openssl, zlib"
 
