@@ -1,0 +1,50 @@
+From 492e1671ab90f067605225608d2da7a3154d3dc2 Mon Sep 17 00:00:00 2001
+From: lumaparallax <257510328+lumaparallax@users.noreply.github.com>
+Date: Fri, 24 Apr 2026 22:16:38 +0900
+Subject: [PATCH] cmake android build compatibility
+
+---
+ cmake/common/compiler_common.cmake |  6 +++++-
+ cmake/common/osconfig.cmake        | 11 ++++++++---
+ 2 files changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/cmake/common/compiler_common.cmake b/cmake/common/compiler_common.cmake
+index fcd2568..aacfd47 100644
+--- a/cmake/common/compiler_common.cmake
++++ b/cmake/common/compiler_common.cmake
+@@ -79,5 +79,9 @@ if(CMAKE_CXX_STANDARD GREATER_EQUAL 20)
+ endif()
+ 
+ if(NOT DEFINED CMAKE_COMPILE_WARNING_AS_ERROR)
+-  set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
++  if(OS_ANDROID)
++    set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
++  else()
++    set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
++  endif()
+ endif()
+diff --git a/cmake/common/osconfig.cmake b/cmake/common/osconfig.cmake
+index 87d435a..9b700c9 100644
+--- a/cmake/common/osconfig.cmake
++++ b/cmake/common/osconfig.cmake
+@@ -12,9 +12,14 @@ elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+   set(CMAKE_CXX_EXTENSIONS FALSE)
+   list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/macos")
+   set(OS_MACOS TRUE)
+-elseif(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux|FreeBSD|OpenBSD")
++elseif(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux|FreeBSD|OpenBSD|Android")
+   set(CMAKE_CXX_EXTENSIONS FALSE)
+   list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/linux")
+-  string(TOUPPER "${CMAKE_HOST_SYSTEM_NAME}" _SYSTEM_NAME_U)
+-  set(OS_${_SYSTEM_NAME_U} TRUE)
++  if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Android")
++    set(OS_LINUX TRUE)
++    set(OS_ANDROID TRUE)
++  else()
++    string(TOUPPER "${CMAKE_HOST_SYSTEM_NAME}" _SYSTEM_NAME_U)
++    set(OS_${_SYSTEM_NAME_U} TRUE)
++  endif()
+ endif()
+-- 
+2.54.0
+
