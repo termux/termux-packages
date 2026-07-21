@@ -2,8 +2,8 @@ TERMUX_PKG_HOMEPAGE=https://www.libreoffice.org/
 TERMUX_PKG_DESCRIPTION="Free and open source cross-platform office suite"
 TERMUX_PKG_LICENSE="MPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=26.8.0.1
-TERMUX_PKG_SRCURL=https://download.documentfoundation.org/libreoffice/src/${TERMUX_PKG_VERSION%.*}/libreoffice-$TERMUX_PKG_VERSION.tar.xz
+TERMUX_PKG_VERSION="26.8.0.1"
+TERMUX_PKG_SRCURL="https://download.documentfoundation.org/libreoffice/src/${TERMUX_PKG_VERSION%.*}/libreoffice-$TERMUX_PKG_VERSION.tar.xz"
 TERMUX_PKG_SHA256=47506016f8bfc028e0dabba2c38f364bafc7fc6fb2e28829d3c8990aa0382721
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="abseil-cpp, argon2, bison, boost, box2d, clucene, cups, curl, dbus, desktop-file-utils, doxygen, fontconfig, freetype, glib, glm, gpgme, gst-plugins-base, gstreamer, harfbuzz-icu, hicolor-icon-theme, hunspell, libabw, libatomic-ops, libcairo, libcdr, libcmis, libcurl, libe-book, libeot, libepoxy, libepubgen, libetonyek, libexpat, libexttextcat, libfreehand, libglvnd, libgraphite, libhyphen, libicu, libjpeg-turbo, liblangtag, libmspub, libmwaw, libneon, libnspr, libnss, libnumbertext, libodfgen, liborcus, libpagemaker, libpng, libqxp, libraptor2, librevenge, libstaroffice, libtiff, libtommath, libvisio, libwebp, libwpd, libwpg, libwps, libx11, libxext, libxinerama, libxml2, libxrandr, libxslt, libzmf, libzxing-cpp, littlecms, lpsolve, mdds, openjpeg, openldap, openssl, pango, poppler, python, redland, shared-mime-info, which, xdg-utils, xmlsec, zlib"
@@ -118,10 +118,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	export KF6INC=$TERMUX_PREFIX/include
-	export KF6LIB=$TERMUX_PREFIX/lib
+	export KF6INC="$TERMUX_PREFIX/include"
+	export KF6LIB="$TERMUX_PREFIX/lib"
 
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
 		export qt6_libexec_dirs="$TERMUX_PREFIX/lib/qt6"
 		termux-fix-shebang ./solenv/bin/*
 	else
@@ -156,7 +156,7 @@ termux_step_pre_configure() {
 	# 32-bit arches: CoinMP libraries need compiler-rt builtins from libgcc
 	# (ARM: __aeabi_* division helpers; x86: __divdi3/__moddi3 for 64-bit division).
 	# Without explicit linkage the Termux symbol checker flags them as undefined.
-	if [ "$TERMUX_ARCH" = "arm" ] || [ "$TERMUX_ARCH" = "i686" ]; then
+	if [[ "$TERMUX_ARCH_BITS" == "32" ]]; then
 		local _libgcc_file="$($CC -print-libgcc-file-name)"
 		export TERMUX_32BIT_BUILTINS="$_libgcc_file"
 		# -Wl, prefix: a bare .a path in LDFLAGS makes libtool (used by
@@ -179,8 +179,8 @@ termux_step_pre_configure() {
 	NOCONFIGURE=1 ./autogen.sh
 
 	# Use pkg-config-wrapper
-	mkdir -p $TERMUX_PKG_TMPDIR/pkg-config-wrapper-bin
-	cat >$TERMUX_PKG_TMPDIR/pkg-config-wrapper-bin/pkg-config <<-HERE
+	mkdir -p "$TERMUX_PKG_TMPDIR/pkg-config-wrapper-bin"
+	cat >"$TERMUX_PKG_TMPDIR/pkg-config-wrapper-bin/pkg-config" <<-HERE
 		#!/bin/sh
 
 		if [ "\$CROSS_COMPILING" = TRUE ]; then
@@ -195,7 +195,7 @@ termux_step_pre_configure() {
 
 		exec /usr/bin/pkg-config "\$@"
 	HERE
-	chmod +x $TERMUX_PKG_TMPDIR/pkg-config-wrapper-bin/pkg-config
+	chmod +x "$TERMUX_PKG_TMPDIR/pkg-config-wrapper-bin/pkg-config"
 	export PATH="$TERMUX_PKG_TMPDIR/pkg-config-wrapper-bin:$PATH"
 
 	# Do NOT set *_FOR_BUILD variables. The configure.ac patch
@@ -206,15 +206,11 @@ termux_step_pre_configure() {
 }
 
 termux_step_configure() {
-	if [ "$TERMUX_CONTINUE_BUILD" == "true" ]; then
+	if [[ "$TERMUX_CONTINUE_BUILD" == "true" ]]; then
 		termux_step_pre_configure
-		cd $TERMUX_PKG_SRCDIR
+		cd "$TERMUX_PKG_SRCDIR"
 		return
 	fi
 
 	termux_step_configure_autotools
-}
-
-termux_step_make() {
-	make -j $(nproc)
 }
