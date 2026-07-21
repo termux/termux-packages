@@ -104,7 +104,7 @@
      snprintf(info.device_path, sizeof(info.device_path), "usb:%s", sysfs_name);
  
      /* Read device serial number (if there is one).
-@@ -196,6 +245,15 @@
+@@ -308,6 +308,15 @@ static int filter_usb_device(char* sysfs_name,
       */
      info.serial_number[0] = '\0';
      if (dev->iSerialNumber) {
@@ -117,20 +117,20 @@
 +                     "%s", serial_num);
 +        } else {
 +#endif
-         char path[80];
-         int fd;
+         int chars_read = read_sysfs_string(sysfs_name, "serial", info.serial_number,
+                                            sizeof(info.serial_number) - 1);
  
-@@ -216,6 +274,9 @@
-                 info.serial_number[chars_read - 1] = '\0';
-             }
+@@ -324,6 +324,9 @@ static int filter_usb_device(char* sysfs_name,
+             // strip trailing newline
+             info.serial_number[chars_read - 1] = '\0';
          }
 +#ifdef __ANDROID__
 +        }
 +#endif
      }
  
-     for(i = 0; i < cfg->bNumInterfaces; i++) {
-@@ -277,6 +338,16 @@
+     while (len > 0) {
+@@ -374,6 +383,16 @@ static int filter_usb_device(char* sysfs_name,
          info.has_bulk_in = (in != -1);
          info.has_bulk_out = (out != -1);
  
@@ -147,7 +147,7 @@
          std::string interface;
          auto path = android::base::StringPrintf("/sys/bus/usb/devices/%s/%s:1.%d/interface",
                                                  sysfs_name, sysfs_name, ifc->bInterfaceNumber);
-@@ -286,6 +357,9 @@
+@@ -383,6 +402,9 @@ static int filter_usb_device(char* sysfs_name,
              }
              snprintf(info.interface, sizeof(info.interface), "%s", interface.c_str());
          }
@@ -157,7 +157,7 @@
  
          if(callback(&info) == 0) {
              *ept_in_id = in;
-@@ -368,16 +442,53 @@
+@@ -427,16 +449,53 @@ static std::unique_ptr<usb_handle> find_usb_device(const char* base, ifc_match_f
      int fd;
      int writable;
  
@@ -211,7 +211,7 @@
              if ((fd = open(devname, O_RDWR)) < 0) {
                  // Check if we have read-only access, so we can give a helpful
                  // diagnostic like "adb devices" does.
-@@ -386,12 +496,25 @@
+@@ -445,13 +504,26 @@ static std::unique_ptr<usb_handle> find_usb_device(const char* base, ifc_match_f
                      continue;
                  }
              }
@@ -223,9 +223,10 @@
  
 +#ifdef __ANDROID__
 +            if (filter_usb_device(de->d_name, search_termux_usb, fd, desc, n,
-+                                  writable, callback, &in, &out, &ifc) == 0) {
++                                  writable, callback, &in, &out, &ifc, &cfg, &alt_ifc) == 0) {
 +#else
-             if (filter_usb_device(de->d_name, desc, n, writable, callback, &in, &out, &ifc) == 0) {
+             if (filter_usb_device(de->d_name, desc, n, writable, callback,
+                                   &in, &out, &ifc, &cfg, &alt_ifc) == 0) {
 +#endif
                  usb.reset(new usb_handle());
 +#ifdef __ANDROID__
