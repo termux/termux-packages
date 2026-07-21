@@ -1,0 +1,20 @@
+To update to the newest version of gimp, 3.2.1+,
+unfortunately this patch will need to be heavily changed and possibly
+replaced with other, additional code outside of patches.
+
+--- a/meson.build
++++ b/meson.build
+@@ -1205,12 +1205,7 @@ if not python.language_version().version_compare(python3_minver)
+   error('Minimum supported Python version: @0@'.format(python3_minver))
+ endif
+ 
+-pygobject_found = run_command(python, '-c',
+-                              '\n'.join([
+-                              '''import sys, gi''',
+-                              '''version = '@0@' '''.format('3.0'),
+-                              '''sys.exit(gi.check_version(version))''']),
+-                              check: false).returncode() == 0
++pygobject_found = true
+ message('Found PyGObject: @0@'.format(pygobject_found))
+ 
+ if not pygobject_found
