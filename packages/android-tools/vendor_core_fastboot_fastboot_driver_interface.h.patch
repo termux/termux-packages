@@ -1,0 +1,11 @@
+--- a/vendor/core/fastboot/fastboot_driver_interface.h
++++ b/vendor/core/fastboot/fastboot_driver_interface.h
+@@ -93,5 +93,8 @@ class IFastBootDriver {
+     virtual RetCode CreatePartition(const std::string& partition, const std::string& size) = 0;
+     virtual RetCode Upload(const std::string& outfile, std::string* response = nullptr,
+                            std::vector<std::string>* info = nullptr) = 0;
++
++    virtual Transport* transport() = 0;
++
+ };
+ }  // namespace fastboot
