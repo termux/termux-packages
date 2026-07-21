@@ -397,8 +397,12 @@ main() {
 		termux_step_handle_buildarch
 
 		if [[ $FORCE_BUILD_PACKAGES == "1" ]]; then
-			rm -f "$TERMUX_BUILT_PACKAGES_DIRECTORY_FOR_ARCH"/*
-			rm -f "$TERMUX_BUILT_DEBS_DIRECTORY"/*
+			if [ -n "${TERMUX_BUILT_PACKAGES_DIRECTORY:-}" ] && [ -d "$TERMUX_BUILT_PACKAGES_DIRECTORY" ]; then
+				find "$TERMUX_BUILT_PACKAGES_DIRECTORY" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+			fi
+			if [ -n "${TERMUX_BUILT_DEBS_DIRECTORY:-}" ] && [ -d "$TERMUX_BUILT_DEBS_DIRECTORY" ]; then
+				find "$TERMUX_BUILT_DEBS_DIRECTORY" -mindepth 1 -maxdepth 1 -exec rm -f {} +
+			fi
 		fi
 
 		BOOTSTRAP_ROOTFS="$BOOTSTRAP_TMPDIR/rootfs-${TERMUX_ARCH}"
