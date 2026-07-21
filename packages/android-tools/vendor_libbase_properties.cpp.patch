@@ -19,6 +19,17 @@ index 8190987..6d48ab8 100644
  
  // Here lies a rudimentary implementation of system properties for non-Bionic
  // platforms. We are using weak symbols here because we want to allow
+@@ -64,8 +64,8 @@ struct prop_info_cmp {
+   bool operator()(const prop_info& lhs, std::string_view rhs) const { return lhs.key < rhs; }
+ };
+ 
+-static auto& g_properties_lock = *new std::mutex;
+-static auto& g_properties GUARDED_BY(g_properties_lock) = *new std::set<prop_info, prop_info_cmp>;
++static std::mutex g_properties_lock;
++static std::set<prop_info, prop_info_cmp> g_properties GUARDED_BY(g_properties_lock);
+ 
+ SYSPROP_WEAK int __system_property_set(const char* key, const char* value) {
+   if (key == nullptr || *key == '\0') return -1;
 @@ -113,7 +112,6 @@ SYSPROP_WEAK void __system_property_read_callback(const prop_info* pi,
    callback(cookie, pi->key.c_str(), pi->value.c_str(), pi->serial);
  }
