@@ -9,12 +9,3 @@
  #include <android/log.h>
  #endif
  
-@@ -121,7 +121,7 @@
- 
- namespace internal {
- 
--#if defined(__ANDROID__)
-+#if defined(__ANDROID__) && !defined(__TERMUX__)
- inline void DefaultLogHandler(LogLevel level, const char* filename, int line,
-                               const std::string& message) {
-   if (level < GOOGLE_PROTOBUF_MIN_LOG_LEVEL) {
