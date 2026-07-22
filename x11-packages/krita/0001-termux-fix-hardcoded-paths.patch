@@ -1,0 +1,80 @@
+diff --git a/krita/main.cc b/krita/main.cc
+index dd8b580..c646416 100644
+--- a/krita/main.cc
++++ b/krita/main.cc
+@@ -517,7 +517,7 @@ if (!qEnvironmentVariableIsEmpty("KRITA_OPENGL_DEBUG")) {
+         QByteArray originalXdgDataDirs = qgetenv("XDG_DATA_DIRS");
+         if (originalXdgDataDirs.isEmpty()) {
+             // We don't want to completely override the default
+-            originalXdgDataDirs = "/usr/local/share/:/usr/share/";
++            originalXdgDataDirs = "@TERMUX_PREFIX@/local/share/:@TERMUX_PREFIX@/share/";
+         }
+ 
+         // NOTE: This line helps also fontconfig have a user-accessible location on Android (see the commit).
+diff --git a/libs/flake/text/KoFontRegistry.cpp b/libs/flake/text/KoFontRegistry.cpp
+index eedfd93..ffd7aef 100644
+--- a/libs/flake/text/KoFontRegistry.cpp
++++ b/libs/flake/text/KoFontRegistry.cpp
+@@ -122,7 +122,7 @@ public:
+          * negligible.
+          */
+         if (qgetenv("FONTCONFIG_PATH").isEmpty()) {
+-            QDir appdir("/etc/fonts");
++            QDir appdir("@TERMUX_PREFIX@/etc/fonts");
+             if (QFile::exists(appdir.absoluteFilePath("fonts.conf"))) {
+                 qputenv("FONTCONFIG_PATH", QFile::encodeName(QDir::toNativeSeparators(appdir.absolutePath())));
+             } else {
+diff --git a/libs/ui/animation/KisFFMpegWrapper.cpp b/libs/ui/animation/KisFFMpegWrapper.cpp
+index ec69d45..7047a1f 100644
+--- a/libs/ui/animation/KisFFMpegWrapper.cpp
++++ b/libs/ui/animation/KisFFMpegWrapper.cpp
+@@ -482,8 +482,8 @@ QJsonObject KisFFMpegWrapper::findProcessPath(const QString &processName, const
+ 
+ #ifndef Q_OS_WIN
+     proposedPaths << QDir::homePath() + "/bin/" + processName;
+-    proposedPaths << "/usr/bin/" + processName;
+-    proposedPaths << "/usr/local/bin/" + processName;
++    proposedPaths << "@TERMUX_PREFIX@/bin/" + processName;
++    proposedPaths << "@TERMUX_PREFIX@/local/bin/" + processName;
+ #endif
+ 
+     dbgFile << proposedPaths;
+diff --git a/plugins/dockers/animation/KisAnimTimelineFrameDelegate.cpp b/plugins/dockers/animation/KisAnimTimelineFrameDelegate.cpp
+index 784d777..b701daf 100644
+--- a/plugins/dockers/animation/KisAnimTimelineFrameDelegate.cpp
++++ b/plugins/dockers/animation/KisAnimTimelineFrameDelegate.cpp
+@@ -25,7 +25,7 @@ KisAnimTimelineFrameDelegate::KisAnimTimelineFrameDelegate(QObject *parent)
+ 
+     // Clone frame stripes SVG -> Pixmap..
+     QImage stripesImage(":diagonal-stripe.svg", "svg");
+-    stripesImage.save("/tmp/krita_stripes.svg", "svg");
++    stripesImage.save("@TERMUX_PREFIX@/tmp/krita_stripes.svg", "svg");
+     stripes = QPixmap::fromImage(stripesImage);
+ }
+ 
+diff --git a/plugins/paintops/libpaintop/kis_clipboard_brush_widget.h b/plugins/paintops/libpaintop/kis_clipboard_brush_widget.h
+index 4af3cc9..6c03da0 100644
+--- a/plugins/paintops/libpaintop/kis_clipboard_brush_widget.h
++++ b/plugins/paintops/libpaintop/kis_clipboard_brush_widget.h
+@@ -16,7 +16,7 @@
+ #include <kis_brush.h>
+ #include "ui_wdgclipboardbrush.h"
+ 
+-const QString TEMPORARY_CLIPBOARD_BRUSH_FILENAME = "/tmp/temporaryClipboardBrush.gbr";
++const QString TEMPORARY_CLIPBOARD_BRUSH_FILENAME = "@TERMUX_PREFIX@/tmp/temporaryClipboardBrush.gbr";
+ const QString TEMPORARY_CLIPBOARD_BRUSH_NAME = "Temporary clipboard brush";
+ const double DEFAULT_CLIPBOARD_BRUSH_SPACING = 0.25;
+ 
+diff --git a/plugins/paintops/libpaintop/kis_custom_brush_widget.h b/plugins/paintops/libpaintop/kis_custom_brush_widget.h
+index 370b81d..d4e322a 100644
+--- a/plugins/paintops/libpaintop/kis_custom_brush_widget.h
++++ b/plugins/paintops/libpaintop/kis_custom_brush_widget.h
+@@ -15,7 +15,7 @@
+ #include <kis_brush.h>
+ #include <KoResourceServer.h>
+ 
+-const QString TEMPORARY_FILENAME = "/tmp/temporaryKritaBrush.gbr";
++const QString TEMPORARY_FILENAME = "@TERMUX_PREFIX@/tmp/temporaryKritaBrush.gbr";
+ const QString TEMPORARY_BRUSH_NAME = "Temporary custom brush";
+ const double DEFAULT_SPACING = 0.25;
+ 
