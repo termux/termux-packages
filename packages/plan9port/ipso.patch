@@ -1,0 +1,11 @@
+--- a/bin/ipso
++++ b/bin/ipso
+@@ -77,7 +77,7 @@ if(~ $get aesget && ~ $#* 0){
+ }
+ 
+ user=`{whoami}
+-cd /tmp || exit $status
++cd @TERMUX_PREFIX@/tmp || exit $status
+ tmp=`{df | grep -v /lib/init | awk '$1=="tmpfs" {print $NF}'}
+ if(! ~ $#tmp 0)
+ 	cd $tmp(1) || exit $status

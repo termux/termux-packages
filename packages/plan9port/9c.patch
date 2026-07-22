@@ -1,0 +1,91 @@
+--- a/bin/9c
++++ b/bin/9c
+@@ -4,6 +4,10 @@ test -f "$PLAN9/config" && . "$PLAN9/config"
+ usegcc()
+ {
+ 	cc=${CC9:-gcc}
++	if [ "$_P9P_BOOTSTRAP" = 'true' ]
++	then
++		cc=$CC
++	fi
+ 	cflags=" \
+ 		-O2 \
+ 		-c \
+@@ -30,6 +34,10 @@ usegcc()
+ 	# that option only works with gcc3+ it seems
+ 	cflags="$cflags -ggdb"
+ 	cflags="$cflags $CC9FLAGS"
++	if [ "$_P9P_BOOTSTRAP" = 'true' ]
++	then
++		cflags="-c $CFLAGS"
++	fi
+ }
+ 
+ quiet()
+@@ -65,6 +73,10 @@ quiet()
+ useclang()
+ {
+ 	cc=${CC9:-clang}
++	if [ "$_P9P_BOOTSTRAP" = 'true' ]
++	then
++		cc=$CC
++	fi
+ 	cflags=" \
+ 		-O2 \
+ 		-c \
+@@ -89,11 +101,19 @@ useclang()
+ 	"
+ 	cflags="$cflags -g"
+ 	cflags="$cflags $CC9FLAGS"
++	if [ "$_P9P_BOOTSTRAP" = 'true' ]
++	then
++		cflags="-c $CFLAGS"
++	fi
+ }
+ 
+ usexlc()
+ {
+ 	cc=${CC9:-xlc_r}
++	if [ "$_P9P_BOOTSTRAP" = 'true' ]
++	then
++		cc=$CC
++	fi
+ 	cflags=" \
+ 		-c \
+ 		-O2 \
+@@ -107,6 +127,10 @@ usexlc()
+ 	"
+ 	cflags="$cflags -g -qdbxextra -qfullpath"
+ 	cflags="$cflags $CC9FLAGS"
++	if [ "$_P9P_BOOTSTRAP" = 'true' ]
++	then
++		cflags="-c $CFLAGS"
++	fi
+ }
+ 
+ tag="${SYSNAME:-`uname`}-${CC9:-cc}"
+@@ -118,14 +142,7 @@ case "$tag" in
+ 		cflags="$cflags -g3 -m64"
+ 		;;
+ *HP-UX*)	cc=${CC9:-cc}; cflags="-g -O -c -Ae" ;;
+-*Linux*)	usegcc
+-		case "${CC9:-gcc}" in
+-		tcc)
+-			cc=tcc
+-			cflags="-c -g"
+-			;;
+-		esac
+-		;;
++*Linux*)	useclang ;;
+ *OSF1*)		cc=${CC9:-cc}; cflags="-g -O -c" ;;
+ *SunOS*-cc)	cc=cc;
+ 		cflags="-mt -g -O -c -xCC -D__sun__"
+@@ -150,7 +167,7 @@ case "$tag" in
+ esac
+ 
+ # Must use temp file to avoid pipe; pipe loses status.
+-xtmp=${TMPDIR-/tmp}/9c.$$.$USER.out
++xtmp=${TMPDIR-@TERMUX_PREFIX@/tmp}/9c.$$.$USER.out
+ $cc -DPLAN9PORT -I"$PLAN9/include" $cflags "$@" 2>"$xtmp"
+ status=$?
+ quiet "$xtmp"

@@ -1,0 +1,28 @@
+--- a/bin/ps
++++ b/bin/ps
+@@ -9,7 +9,7 @@ then
+ fi
+ export all
+ 
+-cat >/tmp/awk.xxx$$ <<'!'
++cat >@TERMUX_PREFIX@/tmp/awk.xxx$$ <<'!'
+ BEGIN{
+ 	state["D"] = "Spinwait";
+ 	state["I"] = "Idle";
+@@ -88,13 +88,13 @@ END{
+ case "${SYSNAME:-`uname`}" in 
+ SunOS)
+ 	/bin/ps -aA -o 'user,pid,stime,time,rss,s,s,args' | sed 1d |
+-		nawk -f /tmp/awk.xxx$$ | sort -n +1
++		nawk -f @TERMUX_PREFIX@/tmp/awk.xxx$$ | sort -n +1
+ 	;;
+ *)
+ 	/bin/ps -axww -o 'user,pid,start,time,rss,stat,wchan,command' | sed 1d |
+-		awk -f /tmp/awk.xxx$$ | sort -n +1
++		awk -f @TERMUX_PREFIX@/tmp/awk.xxx$$ | sort -n +1
+ 	;;
+ esac
+ 
+-rm -f /tmp/awk.xxx$$
++rm -f @TERMUX_PREFIX@/tmp/awk.xxx$$
+ 
