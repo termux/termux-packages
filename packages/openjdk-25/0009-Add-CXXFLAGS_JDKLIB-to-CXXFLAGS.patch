@@ -21,11 +21,11 @@ For modules jdk.jdwp.agent and java.instrument.
      LIBS := $(ICONV_LIBS), \
 --- a/make/modules/jdk.jdwp.agent/Lib.gmk
 +++ b/make/modules/jdk.jdwp.agent/Lib.gmk
-@@ -69,6 +69,7 @@ $(eval $(call SetupJdkLibrary, BUILD_LIBJDWP, \
-         unused-variable, \
-     DISABLED_WARNINGS_clang_utf_util.c := unused-but-set-variable, \
-     DISABLED_WARNINGS_microsoft_debugInit.c := 5287, \
+@@ -53,6 +53,7 @@ TARGETS += $(BUILD_LIBDT_SOCKET)
+ $(eval $(call SetupJdkLibrary, BUILD_LIBJDWP, \
+     NAME := jdwp, \
+     OPTIMIZATION := LOW, \
 +    CXXFLAGS := $(CXXFLAGS_JDKLIB), \
+     CFLAGS := -DJDWP_LOGGING $(ICONV_CFLAGS), \
      LDFLAGS := $(ICONV_LDFLAGS), \
      EXTRA_HEADER_DIRS := \
-         include \
