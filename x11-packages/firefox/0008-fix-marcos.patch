@@ -9,17 +9,28 @@
  int VideoEngine::SetAndroidObjects() {
    LOG(("%s", __PRETTY_FUNCTION__));
  
---- a/ipc/chromium/src/base/lock_impl_posix.cc
-+++ b/ipc/chromium/src/base/lock_impl_posix.cc
-@@ -22,7 +22,7 @@
+--- a/security/sandbox/chromium/base/synchronization/lock_impl_posix.cc
++++ b/security/sandbox/chromium/base/synchronization/lock_impl_posix.cc
+@@ -59,7 +59,7 @@ void dcheck_unlock_result(int rv) {
  // Lock::PriorityInheritanceAvailable still must be checked as the code may
  // compile but the underlying platform still may not correctly support priority
  // inheritance locks.
--#if defined(ANDROID)
-+#if defined(ANDROID) || defined(__TERMUX__)
- #  define PRIORITY_INHERITANCE_LOCKS_POSSIBLE() 0
+-#if BUILDFLAG(IS_NACL) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA)
++#if BUILDFLAG(IS_NACL) || BUILDFLAG(IS_ANDROID) || defined(__TERMUX__) || BUILDFLAG(IS_FUCHSIA)
+ #define PRIORITY_INHERITANCE_LOCKS_POSSIBLE() 0
  #else
- #  define PRIORITY_INHERITANCE_LOCKS_POSSIBLE() 1
+ #define PRIORITY_INHERITANCE_LOCKS_POSSIBLE() 1
+--- a/third_party/zucchini/chromium/base/synchronization/lock_impl_posix.cc
++++ b/third_party/zucchini/chromium/base/synchronization/lock_impl_posix.cc
+@@ -59,7 +59,7 @@ void dcheck_unlock_result(int rv) {
+ // Lock::PriorityInheritanceAvailable still must be checked as the code may
+ // compile but the underlying platform still may not correctly support priority
+ // inheritance locks.
+-#if BUILDFLAG(IS_NACL) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA)
++#if BUILDFLAG(IS_NACL) || BUILDFLAG(IS_ANDROID) || defined(__TERMUX__) || BUILDFLAG(IS_FUCHSIA)
+ #define PRIORITY_INHERITANCE_LOCKS_POSSIBLE() 0
+ #else
+ #define PRIORITY_INHERITANCE_LOCKS_POSSIBLE() 1
 --- a/js/src/ctypes/libffi/src/closures.c
 +++ b/js/src/ctypes/libffi/src/closures.c
 @@ -112,7 +112,7 @@
