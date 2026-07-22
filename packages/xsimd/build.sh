@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/xtensor-stack/xsimd
+TERMUX_PKG_DESCRIPTION="C++ wrappers for SIMD intrinsics"
+TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=14.3.0
+TERMUX_PKG_SRCURL="https://github.com/xtensor-stack/xsimd/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=b3d50e7a73fbf4642ceef30131c93414901d69eee41c2a5302db650b03e2c792
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_BUILD_DEPENDS="googletest"
+TERMUX_PKG_AUTO_UPDATE=true
