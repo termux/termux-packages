@@ -2,16 +2,25 @@ TERMUX_PKG_HOMEPAGE=https://mise.jdx.dev/
 TERMUX_PKG_DESCRIPTION="dev tools, env vars, task runner"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2026.7.11"
+TERMUX_PKG_VERSION="2026.7.12"
 TERMUX_PKG_SRCURL="https://github.com/jdx/mise/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=608a12c8243ce424c3ea70054d7bb38f638b189e5d1c66074d436aeb91e9a658
+TERMUX_PKG_SHA256=bcb84bbdfd942ce3d808ea844d2db1021f017de810a3d67f8c99ec0df51a719a
 TERMUX_PKG_DEPENDS="bzip2, openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE=latest-release-tag
 
 termux_step_pre_configure() {
+	termux_setup_cmake
 	termux_setup_rust
+
+	# Dummy CMake toolchain file to workaround build error:
+	# error: failed to run custom build command for `libz-ng-sys v1.1.29`
+	# ...
+	# CMake Error at /home/builder/.termux-build/_cache/cmake-4.4.0/share/cmake-4.4/Modules/Platform/Android-Determine.cmake:217 (message):
+	# Android: Neither the NDK or a standalone toolchain was found.
+	export TARGET_CMAKE_TOOLCHAIN_FILE="${TERMUX_PKG_BUILDDIR}/android.toolchain.cmake"
+	touch "${TERMUX_PKG_BUILDDIR}/android.toolchain.cmake"
 
 	# Vendor cargo deps to ./vendor-termux/ - not ./vendor/ - because mise's
 	# tree ships ./vendor/aqua-registry/ as build-time data (build.rs reads
