@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environme
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
 # Also update version in termux_setup_nodejs.sh when updating this package
-TERMUX_PKG_VERSION=24.17.0
+TERMUX_PKG_VERSION=24.18.0
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=a7ab562ed2369a29c68b72fa00e3103bcdfe37063dff799c6acc8e404e275fcd
+TERMUX_PKG_SHA256=e94afde24db08e0c564ee7110a2d5aab51ee0059382c9fd8233c54eec47b28f9
 # thunder-coding: don't try to autoupdate nodejs, that thing takes 2 whole hours to build for a single arch, and requires a lot of patch updates everytime. Also I run tests everytime I update it to ensure least bugs
 TERMUX_PKG_AUTO_UPDATE=false
 # Note that we do not use a shared libuv to avoid an issue with the Android
@@ -116,6 +116,12 @@ termux_step_configure() {
 		DEST_CPU="x64"
 	else
 		termux_error_exit "Unsupported arch '$TERMUX_ARCH'"
+	fi
+
+	# aligned_alloc is used in cctest binary
+	if [[ "$TERMUX_PKG_API_LEVEL" -lt 28 ]]; then
+		CFLAGS+=" -Daligned_alloc=memalign"
+		CXXFLAGS+=" -Daligned_alloc=memalign"
 	fi
 
 	# Do not enable by default as it has severe performance degradations.
