@@ -9,6 +9,7 @@ TERMUX_PKG_DEPENDS="atk, enchant, fontconfig, freetype, glib, gst-plugins-bad, g
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, xorgproto"
 TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
+TERMUX_DEBUG_BUILD=true
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLE_BUBBLEWRAP_SANDBOX=OFF
