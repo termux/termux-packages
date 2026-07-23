@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=git+https://github.com/pulseaudio/pulseaudio
 TERMUX_PKG_VERSION="17.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_DEPENDS="dbus, libandroid-execinfo, libandroid-glob, libc++, libltdl, libsndfile, libsoxr, libwebrtc-audio-processing, speexdsp"
 TERMUX_PKG_BREAKS="libpulseaudio-dev, libpulseaudio"
 TERMUX_PKG_REPLACES="libpulseaudio-dev, libpulseaudio"
@@ -66,5 +66,19 @@ termux_step_post_massage() {
 	cd ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib || exit 1
 	if [ ! -e "./libpulse.so.0" ]; then
 		ln -sf libpulse.so libpulse.so.0
+	fi
+}
+
+termux_step_create_debscripts() {
+	cat <<- POSTINST_EOF > ./postinst
+	#!$TERMUX_PREFIX/bin/sh
+	echo "If audio does not work on Android 8+, please try this workaround:"
+	echo "    sed -i 's/module-sles-sink/module-aaudio-sink/g' \\\$PREFIX/etc/pulse/default.pa"
+	POSTINST_EOF
+
+	chmod 0755 postinst
+
+	if [[ "$TERMUX_PACKAGE_FORMAT" == "pacman" ]]; then
+		echo "post_install" > postupg
 	fi
 }
