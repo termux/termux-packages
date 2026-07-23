@@ -19,7 +19,21 @@
  		if(chdir("/") != 0) {
  			fprintf(stderr, _("could not change directory to %s (%s)\n"),
  					"/", strerror(errno));
-@@ -684,7 +681,7 @@
+@@ -676,7 +673,12 @@
+ 		unsetenv("BASH_ENV");
+ 		umask(0022);
+ 		_alpm_reset_signals();
+-		_alpm_handle_free(handle);
++		/*
++		 * Do not free the inherited libalpm handle in the forked child.
++		 * On Termux/Bionic this cleanup can block on inherited library
++		 * locks before execv() reaches ALPM hooks. The child is about to
++		 * replace its image; the parent remains responsible for cleanup.
++		 */
+ 		execv(cmd, argv);
+ 		/* execv only returns if there was an error */
+ 		fprintf(stderr, _("call to execv failed (%s)\n"), strerror(errno));
+@@ -684,7 +686,7 @@
  		/* this code runs for the parent only (wait on the child) */
  		int status;
  		char obuf[PIPE_BUF]; /* writes <= PIPE_BUF are guaranteed atomic */
