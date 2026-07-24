@@ -1,21 +1,22 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/wez/wezterm
+TERMUX_PKG_HOMEPAGE=https://wezterm.org/
 TERMUX_PKG_DESCRIPTION="GPU-accelerated cross-platform terminal emulator and multiplexer (development branch)"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="20260716"
+TERMUX_PKG_VERSION="20260716+g76b606ec"
 TERMUX_PKG_SRCURL=git+https://github.com/wezterm/wezterm
 TERMUX_PKG_GIT_BRANCH=main
-TERMUX_PKG_DEPENDS="fontconfig, freetype, glib, harfbuzz, hicolor-icon-theme, libpng, libssh2, libx11, libxcb, libxkbcommon, openssl, ttf-jetbrains-mono, xdg-utils, xcb-util, xcb-util-image, zlib"
+TERMUX_PKG_DEPENDS="fontconfig, freetype, glib, harfbuzz, hicolor-icon-theme, libpng, libssh2, libx11, libxcb, libxkbcommon, openssl, ttf-jetbrains-mono, xdg-utils, xcb-util, xcb-util-image, zlib, zstd"
 TERMUX_PKG_RECOMMENDS="ncurses, ttf-nerd-fonts-symbols"
 TERMUX_PKG_BREAKS="wezterm"
 TERMUX_PKG_CONFLICTS="wezterm"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_REPOLOGY_METADATA_VERSION="${TERMUX_PKG_VERSION:0:4}.${TERMUX_PKG_VERSION:4:2}.${TERMUX_PKG_VERSION:6:2}"
 
 termux_pkg_auto_update() {
 	local origin_url last_autoupdate
-	# Throttle auto updates to once every three weeks
-	local update_interval="$((3 * 7 * 86400))"
+	# Throttle auto updates to once every two weeks
+	local update_interval="$((2 * 7 * 86400))"
 
 	# Get the git history
 	if origin_url="$(git config --get remote.origin.url)"; then
@@ -26,7 +27,7 @@ termux_pkg_auto_update() {
 		}
 	fi
 
-	# When was `wezterm` last autoupdated? (Unix epoch timestamp)
+	# When was the last autoupdate to this package? (Unix epoch timestamp)
 	last_autoupdate="$(
 		git log \
 		--author="Termux Github Actions <contact@termux.dev>" \
@@ -35,25 +36,54 @@ termux_pkg_auto_update() {
 		-- "$TERMUX_PKG_BUILDER_DIR/build.sh"
 	)"
 
-
-	if (( last_autoupdate > EPOCHSECONDS - update_interval )); then
+	# If we're still in the $update_interval skip the actual checking.
+	if (( last_autoupdate + update_interval > EPOCHSECONDS )); then
 		local t days hrs mins secs
-		(( t = EPOCHSECONDS - last_autoupdate, days = t/86400, t %= 86400, secs= t%60, t /= 60, mins = t%60, hrs = t/60 ))
+		(( t = EPOCHSECONDS - last_autoupdate, days = t/86400, t %= 86400, secs = t%60, t /= 60, mins = t%60, hrs = t/60 ))
 
 		printf 'INFO: Last updated %dd%dh%02dm%02ds ago.\n' "$days" "$hrs" "$mins" "$secs"
 		printf 'INFO: Which is less than the desired %sd minimum update interval.\n' "$(( update_interval / 86400 ))"
 		return
 	fi
 
-	local latest_commit_date
-	latest_commit_date="$(
-		curl -s https://api.github.com/repos/wezterm/wezterm/commits | jq -r '.[0] | .commit.author.date' | sed -e 's/-//g' | cut -c1-8
+	# Get the latest commit's date and SHA.
+	local response latest_commit_date latest_commit_sha
+	response="$(curl -sL \
+		-H "X-GitHub-Api-Version: 2026-03-10" \
+		-H "Accept: application/vnd.github+json" \
+		"https://api.github.com/repos/wezterm/wezterm/commits/HEAD"
 	)"
 
-	if [[ -z "${latest_commit_date}" ]]; then
-		termux_error_exit "Unable to get latest commit date from ${TERMUX_PKG_SRCURL}"
+
+	read -rd' ' latest_commit_date latest_commit_sha < <(
+		jq -r '.commit.author.date, .sha' <<< "$response"
+	)
+
+	# Are they valid?
+	if ! date -d "${latest_commit_date:=null}" > /dev/null || [[ ! "${latest_commit_sha:=null}" =~ [0-9a-f]* ]]; then
+		{
+			echo "Unable to get commit date and SHA from ${TERMUX_PKG_SRCURL}."
+			echo "Date: $latest_commit_date"
+			echo "SHA:  $latest_commit_sha"
+			jq . <<< "$response"
+			return
+		} | tee "${GITHUB_STEP_SUMMARY:-/dev/null}" >&2
 	fi
-	termux_pkg_upgrade_version "${latest_commit_date}"
+
+	# Massage the date into shape.
+	latest_commit_date="${latest_commit_date//-/}" # 2026-07-16T03:01:40Z -> 20260716T03:01:40Z
+	latest_commit_date="${latest_commit_date%T*}"  # 20260716T03:01:40Z -> 20260716
+
+	termux_pkg_upgrade_version "${latest_commit_date}+g${latest_commit_sha::8}"
+}
+
+termux_step_post_get_source() {
+	local commit="${TERMUX_PKG_VERSION##*+g}"
+	local commit_date="$TERMUX_PKG_REPOLOGY_METADATA_VERSION"
+
+	# Remember to pull in the necessary amount of git history
+	git fetch --shallow-since="$commit_date"
+	git checkout "$commit"
 }
 
 termux_step_pre_configure() {
@@ -65,6 +95,7 @@ termux_step_pre_configure() {
 	PKG_CONFIG_PATH_x86_64_unknown_linux_gnu="$(grep 'DefaultSearchPaths:' "/usr/share/pkgconfig/personality.d/${HOST_TRIPLET}.personality" | cut -d ' ' -f 2)"
 	export PKG_CONFIG_PATH_x86_64_unknown_linux_gnu
 	export LIBSSH2_SYS_USE_PKG_CONFIG=1
+	export ZSTD_SYS_USE_PKG_CONFIG=1
 
 	cargo vendor
 	find ./vendor \
