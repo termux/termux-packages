@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=git+https://github.com/pulseaudio/pulseaudio
 TERMUX_PKG_VERSION="17.0"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_DEPENDS="dbus, libandroid-execinfo, libandroid-glob, libc++, libltdl, libsndfile, libsoxr, libwebrtc-audio-processing, speexdsp"
 TERMUX_PKG_BREAKS="libpulseaudio-dev, libpulseaudio"
 TERMUX_PKG_REPLACES="libpulseaudio-dev, libpulseaudio"
@@ -44,6 +44,10 @@ termux_step_pre_configure() {
 	# https://github.com/termux/termux-packages/issues/18977
 	# https://github.com/termux/termux-packages/issues/18810
 	export LDFLAGS+=" -Wl,--undefined-version"
+
+	# https://github.com/termux/termux-packages/issues/27978
+	# https://github.com/termux/termux-packages/pull/23185
+	export LDFLAGS+=" -Wl,--no-as-needed,-lOpenSLES,--as-needed"
 }
 
 termux_step_post_make_install() {
