@@ -8,6 +8,7 @@ TERMUX_PKG_SHA256=acc4d5f7c3cbba5f9f8d08d8bdbeede84ecede46792f47929aa93218733855
 TERMUX_PKG_DEPENDS="libxcb, libxml2, libwayland, xkeyboard-config"
 TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn, libwayland-protocols, xorg-util-macros"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+\.\d+(?!beta|rc)'
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Denable-docs=false
 -Denable-wayland=true
