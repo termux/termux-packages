@@ -1,16 +1,27 @@
---- a/cmd/cloudflared/linux_service.go
-+++ b/cmd/cloudflared/linux_service.go
-@@ -1,4 +1,4 @@
--//go:build linux
-+//go:build linux && !android
+--- a/cmd/cloudflared/common_service.go
++++ b/cmd/cloudflared/common_service.go
+@@ -53,7 +53,7 @@
+ 		return cliutil.UsageError("Provided tunnel token is not valid (%s).", err)
+ 	}
  
- package main
+-	if err := createTokenFile(path); err != nil {
++	if err := createTokenFileUnix(path); err != nil {
+ 		return fmt.Errorf("create token file at %s: %w", path, err)
+ 	}
  
 --- a/cmd/cloudflared/generic_service.go
 +++ b/cmd/cloudflared/generic_service.go
 @@ -1,4 +1,4 @@
 -//go:build !windows && !darwin && !linux
 +//go:build !windows && !darwin && (android || !linux)
+ 
+ package main
+ 
+--- a/cmd/cloudflared/linux_service.go
++++ b/cmd/cloudflared/linux_service.go
+@@ -1,4 +1,4 @@
+-//go:build linux
++//go:build linux && !android
  
  package main
  
