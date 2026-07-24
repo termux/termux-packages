@@ -3938,9 +3938,9 @@ index 630cd06714..3b21f31817 100644
  #include "base/location.h"
  #include "base/logging.h"
 @@ -93,7 +94,7 @@ LocalFileChangeTracker::~LocalFileChangeTracker() {
- 
- void LocalFileChangeTracker::OnStartUpdate(const FileSystemURL& url) {
-   DCHECK(file_task_runner_->RunsTasksInCurrentSequence());
+   if (is_disabled_) {
+     return;
+   }
 -  if (changes_.contains(url) || demoted_changes_.contains(url)) {
 +  if (base::Contains(changes_, url) || base::Contains(demoted_changes_, url)) {
      return;

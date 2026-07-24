@@ -129,8 +129,23 @@ index c27602f164..c16d1d5a00 100644
 +    ]
    }
  
-   if (is_component_build) {
-@@ -671,6 +701,10 @@ source_set("electron_lib") {
+   if (electron_generate_js2c_code_cache) {
+@@ -643,6 +673,14 @@ source_set("electron_lib") {
+       "$root_gen_dir/electron_natives_code_cache_utility.cc",
+       "$root_gen_dir/electron_natives_code_cache_worker.cc",
+     ]
++    jumbo_excluded_sources += [
++      # Too many symbol confliction
++      "$root_gen_dir/electron_natives_code_cache_browser.cc",
++      "$root_gen_dir/electron_natives_code_cache_renderer.cc",
++      "$root_gen_dir/electron_natives_code_cache_sandbox.cc",
++      "$root_gen_dir/electron_natives_code_cache_utility.cc",
++      "$root_gen_dir/electron_natives_code_cache_worker.cc",
++    ]
+     deps += [ ":run_electron_natives_codecache" ]
+   } else {
+     sources += [ "shell/common/node_natives_code_cache_stub.cc" ]
+@@ -751,6 +789,10 @@ source_set("electron_lib") {
          "//ui/base/x",
          "//ui/ozone/platform/x11",
        ]
@@ -1757,20 +1772,3 @@ index ef288ce49b..9acefb179a 100644
      int tab_id,
      content::BrowserContext* browser_context);
  
---- a/electron/shell/browser/ui/views/frameless_view.cc
-+++ b/electron/shell/browser/ui/views/frameless_view.cc
-@@ -12,6 +12,8 @@
- #include "ui/views/widget/widget.h"
- #include "ui/views/widget/widget_delegate.h"
- 
-+#define kResizeInsideBoundsSize kResizeInsideBoundsSize_frameless_view
-+
- namespace electron {
- 
- namespace {
-@@ -133,3 +135,5 @@
- END_METADATA
- 
- }  // namespace electron
-+
-+#undef kResizeInsideBoundsSize
