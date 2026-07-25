@@ -2,15 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://artalk.js.org/
 TERMUX_PKG_DESCRIPTION="A self-hosted comment system"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Moraxyc <termux@qaq.li>"
-TERMUX_PKG_VERSION="2.9.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="2.10.0"
 TERMUX_PKG_SRCURL=(
 	"https://github.com/ArtalkJS/Artalk/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 	"https://github.com/ArtalkJS/Artalk/releases/download/v${TERMUX_PKG_VERSION}/artalk_ui.tar.gz"
 )
 TERMUX_PKG_SHA256=(
-	edb1f85fb84e103d9a6bfda25191b174df22b354c6d9d3dedb154c2fbbddc2ee
-	724282e2512b295749b89fa91b2b26311f7a6bd2e4ac2627581e23e953cff0e6
+	08d8686f5b5d8191693d612bf8d8e75d6d71790e465328889edcf641daa07171
+	6e6b5456a3265e29cecb36b7d935dbafb6639035e2681901123b6b150e307379
 )
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
