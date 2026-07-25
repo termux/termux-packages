@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE="https://prowlarr.com"
 TERMUX_PKG_DESCRIPTION="An indexer manager/proxy built on the popular arr stack (server)"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.4.0.5397"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION="2.5.2.5491"
 TERMUX_PKG_SRCURL="https://github.com/Prowlarr/Prowlarr/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=a01acf8f69b5233d63f3a9bbeceda3664a14a168fdac5993326ec3f2657f3347
+TERMUX_PKG_SHA256=99564425246f3e04de2c305695aa78ad7ce904d8da58432a4feca609b8093a2f
 TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-10.0, dotnet-targeting-pack-10.0, nodejs, yarn"
 TERMUX_PKG_DEPENDS="aspnetcore-runtime-10.0, dotnet-host, dotnet-runtime-10.0, mono, libesqlite3, libcurl"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -28,9 +27,9 @@ termux_step_pre_configure() {
 	# Clone, patch, and build custom AngleSharp to avoid JIT optimization bug on ARM64
 	local anglesharp_dir="$TERMUX_PKG_BUILDDIR/AngleSharp-src"
 	rm -rf "$anglesharp_dir"
-	git clone --depth 1 --branch v1.4.0 https://github.com/AngleSharp/AngleSharp.git "$anglesharp_dir"
+	git clone --depth 1 --branch 1.5.2 https://github.com/AngleSharp/AngleSharp.git "$anglesharp_dir"
 	cd "$anglesharp_dir"
-	patch -p1 < "$TERMUX_PKG_BUILDER_DIR/anglesharp-jit-fix.diff"
+	patch -p1 <"$TERMUX_PKG_BUILDER_DIR/anglesharp-jit-fix.diff"
 	dotnet build -c Release -f net10.0 src/AngleSharp/AngleSharp.Core.csproj
 	cd "$TERMUX_PKG_SRCDIR"
 
@@ -39,7 +38,7 @@ termux_step_pre_configure() {
 	local bin="$TERMUX_PKG_BUILDDIR/_bin"
 	mkdir -p "$bin"
 	local yarn="$bin/yarn"
-	cat > "$yarn" <<-EOF
+	cat >"$yarn" <<-EOF
 		#!/bin/sh
 		exec node $TERMUX_PREFIX/share/yarn/bin/yarn.js "\$@"
 	EOF
@@ -127,7 +126,7 @@ termux_step_make_install() {
 	cp -r _output/UI/* "${TERMUX_PREFIX}/lib/prowlarr/UI/"
 
 	# Create launch script
-	cat > "${TERMUX_PREFIX}/bin/prowlarr" <<-HERE
+	cat >"${TERMUX_PREFIX}/bin/prowlarr" <<-HERE
 		#!${TERMUX_PREFIX}/bin/sh
 		exec dotnet "${TERMUX_PREFIX}/lib/prowlarr/Prowlarr.dll" "\$@"
 	HERE

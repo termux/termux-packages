@@ -52,25 +52,26 @@ index d39a3bc..c6b47da 100644
          }
  
 diff --git a/src/AngleSharp/Dom/QueryExtensions.cs b/src/AngleSharp/Dom/QueryExtensions.cs
-index 8612884..f1e5ce4 100644
 --- a/src/AngleSharp/Dom/QueryExtensions.cs
 +++ b/src/AngleSharp/Dom/QueryExtensions.cs
-@@ -316,6 +316,18 @@ public static void QuerySelectorAll<T>(this T elements, ISelector selector, List
-         /// <returns>True if the string contained all tokens, otherwise false.</returns>
-         public static Boolean Contains<T>(this T list, String[] tokens) where T : class, ITokenList
-         {
-+            if (list is TokenList concreteList)
+@@ -361,6 +361,18 @@ namespace AngleSharp.Dom
+     public static Boolean Contains<T>(this T list, String[] tokens) where T : class, ITokenList
+     {
++        if (list is TokenList concreteList)
++        {
++            for (var i = 0; i < tokens.Length; i++)
 +            {
-+                for (var i = 0; i < tokens.Length; i++)
++                if (!concreteList.Contains(tokens[i]))
 +                {
-+                    if (!concreteList.Contains(tokens[i]))
-+                    {
-+                        return false;
-+                    }
++                    return false;
 +                }
-+                return true;
 +            }
++            return true;
++        }
 +
-             for (var i = 0; i < tokens.Length; i++)
-             {
-                 if (!list.Contains(tokens[i]))
+         for (var i = 0; i < tokens.Length; i++)
+         {
+             if (!list.Contains(tokens[i]))
+
+
+
