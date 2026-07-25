@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="LGPL-2.1, BSD 3-Clause, BSD 2-Clause"
 TERMUX_PKG_LICENSE_FILE="DOC/License.txt, DOC/copying.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26.02"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
 	"https://www.7-zip.org/a/7z${TERMUX_PKG_VERSION//./}-src.tar.xz"
 	"https://www.7-zip.org/a/7z${TERMUX_PKG_VERSION//./}-linux-arm.tar.xz" # for manual, arm is smallest
@@ -14,6 +15,9 @@ TERMUX_PKG_SHA256=(
 )
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_CONFLICTS="p7zip"
+TERMUX_PKG_PROVIDES="p7zip"
+TERMUX_PKG_REPLACES="p7zip"
 
 # The original "termux_extract_src_archive" always strips the first components
 # but the source of 7zip is directly under the root directory of the tar file
@@ -24,7 +28,7 @@ termux_extract_src_archive() {
 }
 
 termux_step_pre_configure() {
-	if [ "$TERMUX_ARCH" = 'aarch64' ]; then
+	if [[ "$TERMUX_ARCH" == 'aarch64' ]]; then
 		CFLAGS+=' -march=armv8.1-a+crypto'
 		CXXFLAGS+=' -march=armv8.1-a+crypto'
 	fi
@@ -36,22 +40,25 @@ termux_step_pre_configure() {
 
 termux_step_make() {
 	# from https://git.alpinelinux.org/aports/tree/community/7zip/APKBUILD?id=b4601c88f608662c75422311b7ca3c26fab4b1f4
-	cd CPP/7zip/Bundles/Alone2
-	mkdir -p b/c
 	# TODO: enable asm
 	# DISABLE_RAR: RAR codec is non-free
 	# -D_GNU_SOURCE: broken sched.h defines
-	make \
-		CC="$CC $CFLAGS $LDFLAGS -D_GNU_SOURCE" \
-		CXX="$CXX $CXXFLAGS $LDFLAGS -D_GNU_SOURCE" \
-		DISABLE_RAR=1 \
-		--file ../../cmpl_clang.mak \
-		--jobs "$TERMUX_PKG_MAKE_PROCESSES"
+	local bin
+	for bin in Bundles/{Alone,Alone2} UI/Console; do
+		make -C "CPP/7zip/$bin" \
+			CC="$CC $CFLAGS $LDFLAGS -D_GNU_SOURCE" \
+			CXX="$CXX $CXXFLAGS $LDFLAGS -D_GNU_SOURCE" \
+			DISABLE_RAR=1 \
+			--file ../../cmpl_clang.mak \
+			--jobs "$TERMUX_PKG_MAKE_PROCESSES"
+	done
 }
 
 termux_step_make_install() {
 	install -Dm0755 \
 		-t "$TERMUX_PREFIX"/bin \
+		"$TERMUX_PKG_BUILDDIR"/CPP/7zip/UI/Console/b/c/7z \
+		"$TERMUX_PKG_BUILDDIR"/CPP/7zip/Bundles/Alone/b/c/7za \
 		"$TERMUX_PKG_BUILDDIR"/CPP/7zip/Bundles/Alone2/b/c/7zz
 	install -Dm0644 \
 		-t "$TERMUX_PREFIX"/share/doc/"$TERMUX_PKG_NAME" \
