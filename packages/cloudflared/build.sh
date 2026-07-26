@@ -19,3 +19,11 @@ termux_step_make() {
 termux_step_make_install() {
 	install -Dm700 -t "$TERMUX_PREFIX"/bin cloudflared
 }
+
+termux_step_post_make_install() {
+	mkdir -p "$TERMUX_PREFIX/var/service/cloudflared/log"
+	ln -sf "$TERMUX_PREFIX/share/termux-services/svlogger" "$TERMUX_PREFIX/var/service/cloudflared/log/run"
+	sed "s%@TERMUX_PREFIX@%$TERMUX_PREFIX%g" "$TERMUX_PKG_BUILDER_DIR/sv/cloudflared.run.in" > "$TERMUX_PREFIX/var/service/cloudflared/run"
+	chmod 700 "$TERMUX_PREFIX/var/service/cloudflared/run"
+	touch "$TERMUX_PREFIX/var/service/cloudflared/down"
+}
