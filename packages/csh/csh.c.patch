@@ -1,18 +1,71 @@
---- a/csh.c
-+++ b/csh.c
-@@ -37,12 +37,14 @@
- #include <fcntl.h>
- #include <errno.h>
- #include <pwd.h>
-+#include <bsd/stdio.h>
- #include <stdlib.h>
+--- a/bin/csh/csh.c
++++ b/bin/csh/csh.c
+@@ -57,7 +57,8 @@
  #include <string.h>
- #include <locale.h>
+ #include <time.h>
  #include <unistd.h>
 -#include <vis.h>
 +#include <bsd/vis.h>
- #include <stdarg.h>
-+#include <time.h>
++#include <bsd/stdio.h>
  
  #include "csh.h"
- #include "proc.h"
+ #include "extern.h"
+@@ -184,9 +185,9 @@
+ 
+ extern char **environ;
+ 
+-static ssize_t readf(void *, void *, size_t);
+-static off_t seekf(void *, off_t, int);
+-static ssize_t writef(void *, const void *, size_t);
++static int readf(void *, char *, int);
++static fpos_t seekf(void *, fpos_t, int);
++static int writef(void *, const char *, int);
+ static int closef(void *);
+ static int srccat(Char *, Char *);
+ static int srcfile(const char *, int, int);
+@@ -298,14 +299,11 @@
+     (void)fclose(cshin);
+     (void)fclose(cshout);
+     (void)fclose(csherr);
+-    if (!(cshin  = funopen2((void *) &SHIN,  readf, writef, seekf, NULL,
+-	closef)))
++    if (!(cshin  = funopen((void *) &SHIN,  readf, writef, seekf, closef)))
+ 	exit(1);
+-    if (!(cshout = funopen2((void *) &SHOUT, readf, writef, seekf, NULL,
+-	closef)))
++    if (!(cshout = funopen((void *) &SHOUT, readf, writef, seekf, closef)))
+ 	exit(1);
+-    if (!(csherr = funopen2((void *) &SHERR, readf, writef, seekf, NULL,
+-	closef)))
++    if (!(csherr = funopen((void *) &SHERR, readf, writef, seekf, closef)))
+ 	exit(1);
+     (void)setvbuf(cshin,  NULL, _IOLBF, 0);
+     (void)setvbuf(cshout, NULL, _IOLBF, 0);
+@@ -1328,21 +1326,21 @@
+  */
+ #define DESC(a) (*((int *) (a)) - (didfds && *((int *) a) >= FSHIN ? FSHIN : 0))
+ 
+-static ssize_t
+-readf(void *oreo, void *buf, size_t siz)
++static int
++readf(void *oreo, char *buf, int siz)
+ {
+     return read(DESC(oreo), buf, siz);
+ }
+ 
+ 
+-static ssize_t
+-writef(void *oreo, const void *buf, size_t siz)
++static int
++writef(void *oreo, const char *buf, int siz)
+ {
+     return write(DESC(oreo), buf, siz);
+ }
+ 
+-static off_t
+-seekf(void *oreo, off_t off, int whence)
++static fpos_t
++seekf(void *oreo, fpos_t off, int whence)
+ {
+     return lseek(DESC(oreo), off, whence);
+ }
