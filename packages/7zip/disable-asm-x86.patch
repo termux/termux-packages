@@ -1,0 +1,26 @@
+The x86 ASM is not position-independent
+ld.lld: error: relocation R_386_32 cannot be used against symbol 'Reverse_Endian_Mask';
+recompile with -fPIC
+
+--- a/CPP/7zip/var_clang_x64.mak
++++ b/CPP/7zip/var_clang_x64.mak
+@@ -5,7 +5,7 @@ IS_X86=
+ IS_ARM64=
+ CROSS_COMPILE=
+ MY_ARCH=
+-USE_ASM=1
++USE_ASM=
+ CC=$(CROSS_COMPILE)clang
+ CXX=$(CROSS_COMPILE)clang++
+ USE_CLANG=1
+--- a/CPP/7zip/var_clang_x86.mak
++++ b/CPP/7zip/var_clang_x86.mak
+@@ -5,7 +5,7 @@ IS_X86=1
+ IS_ARM64=
+ CROSS_COMPILE=
+ MY_ARCH=-m32
+-USE_ASM=1
++USE_ASM=
+ CC=$(CROSS_COMPILE)clang
+ CXX=$(CROSS_COMPILE)clang++
+ USE_CLANG=1
