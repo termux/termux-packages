@@ -1,7 +1,6 @@
 #!/bin/sh
 
 SCRIPTNAME=termux-chroot
-PREFIX=@TERMUX_PREFIX@
 show_usage () {
 	echo "Usage: $SCRIPTNAME [command]"
 	echo "termux-chroot: Setup a chroot to mimic a normal Linux file system"
@@ -9,17 +8,37 @@ show_usage () {
 	echo "Execute a command in a chroot with traditional file system hierarchy"
 	echo "(having e.g. the folders /bin, /etc and /usr) within Termux."
 	echo "If run without argument, the default shell will be executed"
+	echo '-g GNU root $PREFIX/glibc '
+	echo '-u Ubuntu root $PREFIX/../ubuntu bash has to be installed and runnable'
 	exit 0
 }
 
-while getopts :h option
+gnu=false
+ubuntu=false
+while getopts hgu option
 do
 	case "$option" in
 		h) show_usage;;
+		g) gnu=true;;
+		u) ubuntu=true;;
 		?) echo "$SCRIPTNAME: illegal option -$OPTARG"; exit 1;
 	esac
 done
 shift $(($OPTIND-1))
+
+if $gnu; then
+ROOT=$PREFIX/glibc
+ROOT0=
+name=GNU
+elif $ubuntu; then
+ROOT=$PREFIX/../ubuntu
+ROOT0=
+name=ubuntu
+else
+ROOT=$PREFIX
+ROOT0=/..
+name=bionic
+fi
 
 # Kill processes on exit to avoid hanging on exit
 ARGS="--kill-on-exit"
@@ -66,11 +85,11 @@ if [ -d /storage ]; then
 fi
 
 # Mimic traditional Linux file system hierarchy - /usr:
-ARGS="$ARGS -b $PREFIX:/usr"
+ARGS="$ARGS -b $ROOT:/usr"
 
 # Mimic traditional Linux file system hierarchy - other Termux dirs:
 for f in bin etc lib share tmp var; do
-	ARGS="$ARGS -b $PREFIX/$f:/$f"
+	ARGS="$ARGS -b $ROOT/$f:/$f"
 done
 
 # Mimic traditional Linux file system hierarchy- system dirs:
@@ -80,9 +99,10 @@ done
 
 # Set /home as current directory:
 ARGS="$ARGS --cwd=/home"
+ARGS+=" -b $HOME:/home"
 
 # Root of the file system:
-ARGS="$ARGS -r $PREFIX/.."
+ARGS="$ARGS -r $ROOT$ROOT0"
 
 # Shell to execute:
 PROGRAM=/bin/bash
@@ -90,7 +110,11 @@ if [ -x $HOME/.termux/shell ]; then
 	PROGRAM=`readlink -f $HOME/.termux/shell`
 fi
 
+# export to the new shell
 export HOME=/home
+export PATH=/bin:$PATH
+export PROOT=$ROOT PROOT_NAME=$name
+export PS1="$name \w "
 
 # Execute shell if no command has been supplied
 if [ -z "$1" ];then
