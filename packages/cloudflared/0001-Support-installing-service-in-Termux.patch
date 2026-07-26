@@ -4,9 +4,10 @@ Date: Sun, 26 Jul 2026 02:09:02 +0000
 Subject: [PATCH] Support installing service in Termux
 
 ---
- cmd/cloudflared/android_service.go | 194 +++++++++++++++++++++++++++++
- cmd/cloudflared/linux_service.go   |   2 +-
- 2 files changed, 195 insertions(+), 1 deletion(-)
+ cmd/cloudflared/android_service.go  | 194 +++++++++++++++++++++++++++++
+ cmd/cloudflared/generic_service.go  |   2 +-
+ cmd/cloudflared/linux_service.go    |   2 +-
+ 3 files changed, 196 insertions(+), 2 deletions(-)
  create mode 100644 cmd/cloudflared/android_service.go
 
 diff --git a/cmd/cloudflared/android_service.go b/cmd/cloudflared/android_service.go
@@ -33,7 +34,7 @@ index 00000000..d0b78254
 +)
 +
 +const (
-+	defaultTermuxPrefix = "/data/data/com.termux/files/usr"
++	defaultTermuxPrefix = "@TERMUX_PREFIX@"
 +	termuxServiceName   = "cloudflared"
 +	termuxSvcRelDir     = "var/service"
 +	termuxSvlogRelPath  = "share/termux-services/svlogger"
@@ -99,7 +100,7 @@ index 00000000..d0b78254
 +		return fmt.Errorf("error determining executable path: %w", err)
 +	}
 +
-+	var extraArgs []string
++	extraArgs := []string{"tunnel", "run"}
 +	if c.NArg() > 0 {
 +		cd, err := homedir.Dir()
 +		if err != nil {
@@ -177,9 +178,9 @@ index 00000000..d0b78254
 +	log.Info().Msg("To ensure the service starts on device boot:")
 +	log.Info().Msg("  1. Install Termux:Boot from F-Droid")
 +	log.Info().Msg("  2. Create ~/.termux/boot/start-services with:")
-+	log.Info().Msg("     #!/data/data/com.termux/files/usr/bin/sh")
++	log.Info().Msg("     #!@TERMUX_PREFIX@/bin/sh")
 +	log.Info().Msg("     termux-wake-lock")
-+	log.Info().Msg("     exec runsvdir -P /data/data/com.termux/files/usr/var/service")
++	log.Info().Msg("     exec runsvdir -P @TERMUX_PREFIX@/var/service")
 +	log.Info().Msg("  3. Make it executable: chmod +x ~/.termux/boot/start-services")
 +	log.Info().Msg("  4. Disable battery optimization for Termux in Android settings")
 +
@@ -216,6 +217,16 @@ index 067d5b40..e74a7a75 100644
 @@ -1,4 +1,4 @@
 -//go:build linux
 +//go:build linux && !android
+ 
+  package main
+  
+diff --git a/cmd/cloudflared/generic_service.go b/cmd/cloudflared/generic_service.go
+index 9b262345..0b9ea0f5 100644
+--- a/cmd/cloudflared/generic_service.go
++++ b/cmd/cloudflared/generic_service.go
+@@ -1,4 +1,4 @@
+-//go:build !windows && !darwin && !linux
++//go:build !windows && !darwin && !linux && !android
  
  package main
  
