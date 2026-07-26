@@ -1,0 +1,28 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -3904,6 +3904,12 @@
+ 
+ [begin]_group "JIT section" && {
+ AC_CHECK_PROG(RUSTC, [rustc], [rustc], [no]) dnl no ac_tool_prefix
++
++dnl Allow injecting a Rust --target for cross-compiling YJIT/ZJIT (Termux-specific).
++AC_ARG_VAR([JIT_RUST_TARGET], [Target triple passed to rustc for JIT cross-compile])
++AS_IF([test "$RUSTC" != "no" && test -n "$JIT_RUST_TARGET"], [
++    RUSTC="$RUSTC --target=$JIT_RUST_TARGET"
++])
+ 
+ dnl check if rustc is recent enough to build YJIT (rustc >= 1.58.0)
+ JIT_RUSTC_OK=no
+@@ -3926,10 +3932,10 @@
+ dnl check if we can build YJIT/ZJIT on this target platform
+ dnl we can't easily cross-compile with rustc so we don't support that
+ JIT_TARGET_OK=no
+-AS_IF([test "$cross_compiling" = no],
++AS_IF([test "$cross_compiling" = no || test -n "$JIT_RUST_TARGET"],
+     AS_CASE(["$target_cpu-$target_os"],
+         [*android*], [
+-            JIT_TARGET_OK=no
++            JIT_TARGET_OK=yes
+         ],
+         [arm64-darwin*|aarch64-darwin*|x86_64-darwin*], [
+             JIT_TARGET_OK=yes
