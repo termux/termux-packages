@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION="0.19.1"
 TERMUX_PKG_SRCURL=https://github.com/restic/restic/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=bb9b1a19040744d26d8a79be029d4e6b189c45ccc9d8831d7fe367d3c33df725
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_SUGGESTS="openssh, rclone, restic-server"
+TERMUX_PKG_SUGGESTS="openssh, rclone, restic-server, tzdata"
 
 termux_step_make() {
 	termux_setup_golang
