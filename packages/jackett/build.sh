@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE="https://github.com/jackett/jackett"
 TERMUX_PKG_DESCRIPTION="API Support for your favorite torrent trackers"
 TERMUX_PKG_LICENSE="GPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.24.2267"
+TERMUX_PKG_VERSION="0.24.2277"
 TERMUX_PKG_SRCURL="https://github.com/Jackett/Jackett/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=0cef8deefa02abd2c88da78a31cc02603e0aaa197fff495333f0d2405ac75614
-TERMUX_PKG_DEPENDS="aspnetcore-runtime-9.0, dotnet-host, dotnet-runtime-9.0"
-TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-9.0, dotnet-targeting-pack-9.0"
+TERMUX_PKG_SHA256=71667a30e0ca3052298906ef4db59c20883426f54bd57ad44861ccd3e1b9bfdd
+TERMUX_PKG_DEPENDS="aspnetcore-runtime-10.0, dotnet-host, dotnet-runtime-10.0"
+TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-10.0, dotnet-targeting-pack-10.0"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXCLUDED_ARCHES="arm"
 TERMUX_PKG_SERVICE_SCRIPT=("jackett" "exec ${TERMUX_PREFIX}/bin/jackett --DataFolder ${TERMUX_ANDROID_HOME}/.config/jackett 2>&1")
@@ -68,8 +68,47 @@ termux_pkg_auto_update() {
 }
 
 termux_step_pre_configure() {
-	TERMUX_DOTNET_VERSION=9.0
+	TERMUX_DOTNET_VERSION=10.0
 	termux_setup_dotnet
+
+	# Clone, patch, and build custom AngleSharp
+	local anglesharp_dir="$TERMUX_PKG_BUILDDIR/AngleSharp-src"
+	rm -rf "$anglesharp_dir"
+	git clone --depth 1 --branch 1.5.2 https://github.com/AngleSharp/AngleSharp.git "$anglesharp_dir"
+	cd "$anglesharp_dir"
+	patch -p1 <"$TERMUX_PKG_BUILDER_DIR/anglesharp-jit-fix.diff"
+	dotnet build -c Release -f "net${TERMUX_DOTNET_VERSION}" src/AngleSharp/AngleSharp.Core.csproj
+	cd "$TERMUX_PKG_SRCDIR"
+
+	# Force all projects to target .NET 10.0
+	find src -name "*.csproj" -exec sed -i "s/<TargetFrameworks>.*<\/TargetFrameworks>/<TargetFrameworks>net${TERMUX_DOTNET_VERSION}<\/TargetFrameworks>/g" {} +
+	find src -name "*.csproj" -exec sed -i "s/<TargetFramework>.*<\/TargetFramework>/<TargetFramework>net${TERMUX_DOTNET_VERSION}<\/TargetFramework>/g" {} +
+
+	# Update Microsoft.Extensions, Microsoft.AspNetCore and specific System packages to 10.0.0 for compatibility with .NET 10.0
+	find src -name "*.csproj" -exec sed -i 's/Include="Microsoft\.Extensions\.\([^"]*\)" Version="[0-9.]*"/Include="Microsoft.Extensions.\1" Version="10.0.0"/g' {} +
+	find src -name "*.csproj" -exec sed -i 's/Include="Microsoft\.AspNetCore\.\([^"]*\)" Version="[0-9.]*"/Include="Microsoft.AspNetCore.\1" Version="10.0.0"/g' {} +
+	find src -name "*.csproj" -exec sed -i 's/Include="System\.ServiceProcess\.ServiceController" Version="[0-9.]*"/Include="System.ServiceProcess.ServiceController" Version="10.0.0"/g' {} +
+
+	# Remove obsolete System.* package references that are built into .NET 10.0
+	find src -name "*.csproj" -exec sed -i '/Include="System\.\(ValueTuple\|Memory\|Runtime\.Loader\|Threading\.Tasks\.Extensions\)"/d' {} +
+
+	# Microsoft.AspNetCore.Http and .WebUtilities don't exist as standalone NuGet packages for .NET 10.
+	# Jackett.Common uses Microsoft.NET.Sdk (not .Web) and its FrameworkReference entries are only
+	# inside net471/net9.0 conditional blocks — none apply to net10.0. Remove the dead package refs
+	# and inject an unconditional FrameworkReference so ASP.NET Core types are available.
+	find src -name "*.csproj" -exec sed -i '/Include="Microsoft\.AspNetCore\.\(Http\|WebUtilities\)"/d' {} +
+	python3 -c "
+import re, sys
+path = 'src/Jackett.Common/Jackett.Common.csproj'
+content = open(path).read()
+inject = '  <ItemGroup>\n    <FrameworkReference Include=\"Microsoft.AspNetCore.App\" />\n  </ItemGroup>\n\n'
+content = re.sub(r'(?=\s*<ItemGroup>)', inject, content, count=1)
+open(path, 'w').write(content)
+"
+
+	# Fix conditional ItemGroup that targets net9.0 in Jackett.Server — update to net10.0 so that
+	# packages like Microsoft.AspNetCore.Mvc.NewtonsoftJson are included when building for net10.0.
+	find src -name "*.csproj" -exec sed -i "s/'\$(TargetFramework)' == 'net9\.0'/'\$(TargetFramework)' == 'net${TERMUX_DOTNET_VERSION}'/g" {} +
 }
 
 termux_step_make() {
@@ -83,6 +122,13 @@ termux_step_make() {
 	/p:FileVersion="${TERMUX_PKG_VERSION}" \
 	/p:InformationalVersion="${TERMUX_PKG_VERSION}" \
 	/p:Version="${TERMUX_PKG_VERSION}"
+
+	# Overwrite restored AngleSharp.dll with our JIT-patch-compiled one
+	cp -f "$TERMUX_PKG_BUILDDIR/AngleSharp-src/src/AngleSharp/bin/Release/net${TERMUX_DOTNET_VERSION}/AngleSharp.dll" build/
+
+	# Lower required .NET version in runtimeconfig.json to allow running on older .NET 10.0.x runtimes
+	find build -name "*.runtimeconfig.json" -exec sed -i 's/"version": "10.0.[0-9]*"/"version": "10.0.0"/g' {} +
+
 	dotnet build-server shutdown
 }
 

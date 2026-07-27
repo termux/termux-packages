@@ -1,0 +1,10 @@
+--- a/src/Jackett.Server/Program.cs
++++ b/src/Jackett.Server/Program.cs
+@@ -34,6 +34,7 @@
+ 
+         public static void Main(string[] args)
+         {
++            AppContext.SetSwitch("Microsoft.AspNetCore.Authentication.Cookies.IgnoreRedirectMetadata", true);
+             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+ 
+             var commandLineParser = new Parser(settings => settings.CaseSensitive = false);
