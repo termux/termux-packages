@@ -1,0 +1,20 @@
+--- ./lib-src/emacsclient.c.orig	2020-07-29 23:40:41.000000000 +0200
++++ ./lib-src/emacsclient.c	2020-09-14 21:36:04.883963456 +0200
+@@ -1411,7 +1411,7 @@
+ 	        tmpdirlen = min (n - 1, socknamesize);
+ # endif
+ 	      if (tmpdirlen < 0)
+-		tmpdirlen = snprintf (sockname, socknamesize, "/tmp");
++		tmpdirlen = snprintf (sockname, socknamesize, "@TERMUX_PREFIX@/tmp");
+ 	    }
+ 	  socknamelen = local_sockname (sockname, socknamesize, tmpdirlen,
+ 					uid, server_name);
+@@ -1495,7 +1495,7 @@
+ 	  uintmax_t id = uid;
+ 	  char sockdirname[socknamesize];
+ 	  int sockdirnamelen = snprintf (sockdirname, sizeof sockdirname,
+-					 "/run/user/%"PRIuMAX, id);
++					 "@TERMUX_PREFIX@/var/run/user/%"PRIuMAX, id);
+ 	  if (0 <= sockdirnamelen && sockdirnamelen < sizeof sockdirname
+ 	      && faccessat (AT_FDCWD, sockdirname, X_OK, AT_EACCESS) == 0)
+ 	    message
