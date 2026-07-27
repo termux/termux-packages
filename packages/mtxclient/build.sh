@@ -1,0 +1,14 @@
+TERMUX_PKG_HOMEPAGE=https://nheko.im/nheko-reborn/mtxclient
+TERMUX_PKG_DESCRIPTION="Client API library for Matrix"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.9.2"
+TERMUX_PKG_SRCURL="https://nheko.im/nheko-reborn/mtxclient/-/archive/v${TERMUX_PKG_VERSION}/mtxclient-v${TERMUX_PKG_VERSION}.tar.bz2"
+TERMUX_PKG_SHA256=2106f4600016377671f376b1ef886e6130ca64ff2d8bbbfbdbd7087cb21aa95a
+TERMUX_PKG_DEPENDS="coeurl, fmt, libc++, libolm, libre2, libspdlog, openssl"
+TERMUX_PKG_BUILD_DEPENDS="nlohmann-json"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DBUILD_LIB_TESTS=OFF
+-DBUILD_LIB_EXAMPLES=OFF
+"
