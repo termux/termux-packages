@@ -1,0 +1,16 @@
+Enable storage_8bit for a6xx_gen4 GPUs (Adreno 7c+ Gen 3)
+
+The a7xx_base class already has storage_8bit = True, but a6xx_gen4
+(which includes Adreno 7c+ Gen 3) does not. Since a7xx is derived
+from a6xx_gen4, the hardware very likely supports it.
+
+--- a/src/freedreno/common/freedreno_devices.py
++++ b/src/freedreno/common/freedreno_devices.py
+@@ -425,6 +425,7 @@ a6xx_gen4 = GPUProps(
+         instr_cache_size = 96,
+         has_sample_locations = True,
+         storage_16bit = True,
++        storage_8bit = True,
+         lpac_16k_instr_cache = True,
+         lrz_track_quirk = True,
+         has_tex_filter_cubic = True,
