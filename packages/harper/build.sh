@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL="https://github.com/Automattic/harper/archive/refs/tags/v${TER
 TERMUX_PKG_SHA256=9cd55f642eb17c2a1c7e8bfb9f958fe5ea165ec98264b7ce568bedbc32dc8b18
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_REVISION=1
 
 termux_step_pre_configure() {
 	termux_setup_rust
@@ -28,9 +29,9 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	cargo build --release --manifest-path $TERMUX_PKG_BUILDDIR/harper-ls/Cargo.toml
+	cargo build --release --manifest-path $TERMUX_PKG_BUILDDIR/harper-ls/Cargo.toml --target "${CARGO_TARGET_NAME}"
 }
 
 termux_step_make_install() {
-	install -Dm700 target/release/harper-ls "${TERMUX_PREFIX}"/bin/harper-ls
+	install -Dm700 target/"${CARGO_TARGET_NAME}"/release/harper-ls "${TERMUX_PREFIX}"/bin/harper-ls
 }
