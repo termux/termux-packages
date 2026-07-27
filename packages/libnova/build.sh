@@ -4,11 +4,17 @@ TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.16
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://deb.debian.org/debian/pool/main/libn/libnova/libnova_${TERMUX_PKG_VERSION}.orig.tar.xz
 TERMUX_PKG_SHA256=5dea5b29cba777ab8de4fd30cdfdbc1728fe1b3c573902270c1106bad55439a2
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	autoreconf -fi
+}
+
+termux_step_post_massage() {
+	if [[ ! -f "${TERMUX_PKG_MASSAGEDIR}${TERMUX__PREFIX__LIB_DIR}/libnova.so" ]]; then
+		termux_error_exit "libnova.so should exist in $TERMUX_PKG_NAME!"
+	fi
 }
