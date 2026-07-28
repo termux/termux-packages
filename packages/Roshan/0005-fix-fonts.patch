@@ -1,0 +1,59 @@
+From: Roshan Editor <roshan@termux-packages.org>
+Date: Tue, 28 Jul 2026 15:24:00 +0530
+Subject: [PATCH 5/7] Dynamic FIGlet font parser and custom engine loader
+
+--- a/roshan_font.c
++++ b/roshan_font.c
+@@ -1,12 +1,90 @@
+-#include <stdio.h>
+-
+-void load_font() {
+-    printf("Loading font...\n");
+-}
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
+
++#define MAX_FONT_NAME 128
++#define MAX_PATH_SIZE 2048
+
++int locate_and_verify_font(const char *font_name, const char *prefix, char *output_path) {
++    char test_path[MAX_PATH_SIZE];
++    
++    snprintf(test_path, sizeof(test_path), "%s/share/figlet/%s.flf", prefix, font_name);
++    if (access(test_path, F_OK) == 0) {
++        strcpy(output_path, test_path);
++        return 1;
++    }
++
++    snprintf(test_path, sizeof(test_path), "%s/share/figlet/%s.tlf", prefix, font_name);
++    if (access(test_path, F_OK) == 0) {
++        strcpy(output_path, test_path);
++        return 1;
++    }
+
++    snprintf(test_path, sizeof(test_path), "%s/share/figlet/standard.flf", prefix);
++    if (access(test_path, F_OK) == 0) {
++        strcpy(output_path, test_path);
++        return 0; 
++    }
+
++    return -1;
++}
+
++void print_figlet_banner(const char *text, const char *font_name, const char *prefix) {
++    char valid_font_path[MAX_PATH_SIZE];
++    int res = locate_and_verify_font(font_name, prefix, valid_font_path);
++    
++    if (res == -1) {
++        fprintf(stderr, "[!] Critical Error: No FIGlet fonts found in Termux directory!\n");
++        return;
++    }
++    
++    char command[MAX_PATH_SIZE * 2];
++    snprintf(command, sizeof(command), "figlet -f \"%s\" \"%s\"", valid_font_path, text);
++    
++    printf("[*] Executing Font Render Engine...\n");
++    system(command);
++}
