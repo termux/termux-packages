@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A tunneling daemon that proxies traffic from the Cloudfl
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2026.7.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/cloudflare/cloudflared/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8e452b1630064f5951e18a2537e66274e006eb2e83daa0d42a0adb3fab3ee788
 TERMUX_PKG_AUTO_UPDATE=true
