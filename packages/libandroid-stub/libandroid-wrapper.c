@@ -1,4 +1,6 @@
 #include <dlfcn.h>
+
+#include "platform-ns.h"
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 #include <android/choreographer.h>
@@ -325,7 +327,7 @@ static struct {
 #undef STUB
 
 __attribute__((constructor)) static void init() {
-    void* handle = dlopen(LIB, RTLD_LOCAL);
+    void* handle = platform_dlopen(LIB, RTLD_LOCAL);
     // Nothing bad happened, normal case for termux-docker.
     if (!handle)
         return;
