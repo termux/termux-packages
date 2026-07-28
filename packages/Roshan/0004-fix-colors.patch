@@ -1,0 +1,64 @@
+From: Roshan Editor <roshan@termux-packages.org>
+Date: Tue, 28 Jul 2026 15:23:00 +0530
+Subject: [PATCH 4/7] High performance ANSI color parser and formatting macros
+
+--- a/roshan_color.c
++++ b/roshan_color.c
+@@ -1,10 +1,95 @@
+-#include <stdio.h>
+-
+-void print_red(const char* text) {
+-    printf("\033[31m%s\033[0m", text);
+-}
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++
++#define ANSI_COLOR_RED     "\x1b[31m"
++#define ANSI_COLOR_GREEN   "\x1b[32m"
++#define ANSI_COLOR_YELLOW  "\x1b[33m"
++#define ANSI_COLOR_BLUE    "\x1b[34m"
++#define ANSI_COLOR_MAGENTA "\x1b[35m"
++#define ANSI_COLOR_CYAN    "\x1b[36m"
++#define ANSI_COLOR_RESET   "\x1b[0m"
++#define ANSI_BOLD          "\x1b[1m"
++
++typedef enum {
++    COLOR_NONE,
++    COLOR_RED,
++    COLOR_GREEN,
++    COLOR_YELLOW,
++    COLOR_BLUE,
++    COLOR_MAGENTA,
++    COLOR_CYAN
++} ColorScheme;
++
++void render_colored_text(const char *text, ColorScheme color, int is_bold) {
++    const char *color_code = ANSI_COLOR_RESET;
++    
++    switch(color) {
++        case COLOR_RED:     color_code = ANSI_COLOR_RED; break;
++        case COLOR_GREEN:   color_code = ANSI_COLOR_GREEN; break;
++        case COLOR_YELLOW:  color_code = ANSI_COLOR_YELLOW; break;
++        case COLOR_BLUE:    color_code = ANSI_COLOR_BLUE; break;
++        case COLOR_MAGENTA: color_code = ANSI_COLOR_MAGENTA; break;
++        case COLOR_CYAN:    color_code = ANSI_COLOR_CYAN; break;
++        default:            color_code = ANSI_COLOR_RESET; break;
++    }
++
++    if (is_bold) {
++        printf("%s%s%s%s", ANSI_BOLD, color_code, text, ANSI_COLOR_RESET);
++    } else {
++        printf("%s%s%s", color_code, text, ANSI_COLOR_RESET);
++    }
++}
+
++ColorScheme parse_color_string(const char *str) {
++    if (!str) return COLOR_NONE;
++    if (strcasecmp(str, "red") == 0) return COLOR_RED;
++    if (strcasecmp(str, "green") == 0) return COLOR_GREEN;
++    if (strcasecmp(str, "yellow") == 0) return COLOR_YELLOW;
++    if (strcasecmp(str, "blue") == 0) return COLOR_BLUE;
++    if (strcasecmp(str, "cyan") == 0) return COLOR_CYAN;
++    return COLOR_NONE;
++}
