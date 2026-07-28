@@ -1,20 +1,20 @@
-From 855d959a82b7c6aa5c84bfa52eb4f6a417af32da Mon Sep 17 00:00:00 2001
+From 3ca729db490d6583629cbe76dcd8ac9ca7b40d29 Mon Sep 17 00:00:00 2001
 From: toidicakhia <108525966+toidicakhia@users.noreply.github.com>
 Date: Tue, 28 Jul 2026 02:56:40 +0000
 Subject: [PATCH] Support installing service in Termux
 
 ---
- cmd/cloudflared/android_service.go | 164 +++++++++++++++++++++++++++++
+ cmd/cloudflared/android_service.go | 142 +++++++++++++++++++++++++++++
  cmd/cloudflared/linux_service.go   |   2 +-
- 2 files changed, 165 insertions(+), 1 deletion(-)
+ 2 files changed, 143 insertions(+), 1 deletion(-)
  create mode 100644 cmd/cloudflared/android_service.go
 
 diff --git a/cmd/cloudflared/android_service.go b/cmd/cloudflared/android_service.go
 new file mode 100644
-index 00000000..30c044d3
+index 00000000..3de16426
 --- /dev/null
 +++ b/cmd/cloudflared/android_service.go
-@@ -0,0 +1,164 @@
+@@ -0,0 +1,142 @@
 +//go:build android
 +
 +package main
@@ -36,7 +36,6 @@ index 00000000..30c044d3
 +	defaultTermuxPrefix = "@TERMUX_PREFIX@"
 +	termuxServiceName   = "cloudflared"
 +	termuxSvcRelDir     = "var/service"
-+	termuxSvlogRelPath  = "share/termux-services/svlogger"
 +	termuxConfigDirName = ".cloudflared"
 +)
 +
@@ -55,11 +54,8 @@ index 00000000..30c044d3
 +Installs cloudflared as a runit-managed service using termux-services.
 +
 +A token may optionally be provided. If a token is provided, it will be written
-+to disk in the service configuration directory and the cloudflared service
-+configured to use it via the --token-file argument.
-+
-+If no token is provided, cloudflared will run without the --token-file argument,
-+causing it to look for credentials in a configuration file upon startup.`,
++to disk in the home directory and the cloudflared service configured to use
++it via the --token-file argument.`,
 +				Action: cliutil.ConfiguredAction(installTermuxService),
 +			},
 +			{
@@ -87,14 +83,9 @@ index 00000000..30c044d3
 +	return filepath.Join(svDir(), termuxServiceName)
 +}
 +
-+func runScriptPath() string {
-+	return filepath.Join(serviceDir(), "run")
-+}
-+
 +func installTermuxService(c *cli.Context) error {
 +	log := logger.CreateLoggerFromContext(c, logger.EnableTerminalLog)
 +
-+	var extraArgs []string
 +	if c.NArg() > 0 {
 +		cd, err := homedir.Dir()
 +		if err != nil {
@@ -102,31 +93,15 @@ index 00000000..30c044d3
 +		}
 +		cfgDir := filepath.Join(cd, termuxConfigDirName)
 +
-+		defer func() {
-+			if err != nil {
-+				removeTokenFile(cfgDir, log)
-+			}
-+		}()
-+
-+		if err = writeTokenToConfigDir(c, cfgDir); err != nil {
-+			return fmt.Errorf("could not write token to configuration directory: %w", err)
++		if err := os.MkdirAll(cfgDir, 0o700); err != nil {
++			return fmt.Errorf("create config directory %s: %w", cfgDir, err)
 +		}
 +
-+		extraArgs = buildArgsForTokenFile(cfgDir)
++		tokenPath := filepath.Join(cfgDir, "token")
++		if err := os.WriteFile(tokenPath, []byte(c.Args().First()), 0o600); err != nil {
++			return fmt.Errorf("could not write token to %s: %w", tokenPath, err)
++		}
 +	}
-+
-+	shell := filepath.Join(termuxPrefix(), "bin", "sh")
-+	runContent := fmt.Sprintf("#!%s\nexec cloudflared", shell)
-+	for _, arg := range extraArgs {
-+		runContent += " " + arg
-+	}
-+	runContent += "\n"
-+
-+	runPath := runScriptPath()
-+	if err := os.WriteFile(runPath, []byte(runContent), 0o755); err != nil {
-+		return fmt.Errorf("write run script to %s: %w", runPath, err)
-+	}
-+	log.Info().Msgf("Updated run script at %s", runPath)
 +
 +	svcDir := serviceDir()
 +
@@ -173,7 +148,10 @@ index 00000000..30c044d3
 +
 +	cd, err := homedir.Dir()
 +	if err == nil {
-+		removeTokenFile(filepath.Join(cd, termuxConfigDirName), log)
++		tokenPath := filepath.Join(cd, termuxConfigDirName, "token")
++		if err := os.Remove(tokenPath); err != nil && !os.IsNotExist(err) {
++			log.Warn().Err(err).Msgf("Could not remove %s", tokenPath)
++		}
 +	}
 +
 +	log.Info().Msg("Termux runit service for cloudflared uninstalled successfully")
@@ -187,8 +165,6 @@ index 067d5b40..e74a7a75 100644
 -//go:build linux
 +//go:build linux && !android
  
- package main
- 
--- 
+ 	package main
+ -- 
 2.55.0.windows.3
-
