@@ -1,0 +1,92 @@
+From: Roshan Editor <roshan@termux-packages.org>
+Date: Tue, 28 Jul 2026 15:26:00 +0530
+Subject: [PATCH 7/7] GNU-style CLI parser, help menu, and version flags implementation
+
+--- a/roshan_cli.c
++++ b/roshan_cli.c
+@@ -1,15 +1,110 @@
+-#include <stdio.h>
+-
+-void show_help() {
+-    printf("Help\n");
+-}
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <getopt.h>
++
++#define ROSHAN_CLI_VERSION "1.0.0"
+
++void display_roshan_help(const char *prog_name) {
++    printf("\n=========================================================\n");
++    printf("             ROSHAN CLI ANIMATED ENGINE - HELP            \n");
++    printf("=========================================================\n");
++    printf("Usage: %s [OPTIONS] <TEXT>\n\n", prog_name);
++    printf("Options:\n");
++    printf("  -f, --font <NAME>     Set custom FIGlet font (Default: standard)\n");
++    printf("  -c, --color <COLOR>   Set text output color (red, green, cyan)\n");
++    printf("  -v, --version         Show binary build version\n");
++    printf("  -h, --help            Show this usage documentation\n\n");
++    printf("Examples:\n");
++    printf("  %s -f slant -c cyan \"Roshan Editor\"\n", prog_name);
++    printf("  %s --color green \"Termux Packages\"\n", prog_name);
++    printf("=========================================================\n\n");
++}
+
++void display_roshan_version(void) {
++    printf("Roshan CLI Tool v%s (Termux Official Port)\n", ROSHAN_CLI_VERSION);
++    printf("License GPLv2+: GNU GPL version 2 or later.\n");
++}
+
++typedef struct {
++    char font_name[64];
++    char color_name[32];
++    char text_input[512];
++} CLIArgs;
+
++int parse_cli_arguments(int argc, char *argv[], CLIArgs *args) {
++    strcpy(args->font_name, "standard");
++    strcpy(args->color_name, "cyan");
++    args->text_input[0] = '\0';
+
++    static struct option long_options[] = {
++        {"font",    required_argument, 0, 'f'},
++        {"color",   required_argument, 0, 'c'},
++        {"version", no_argument,       0, 'v'},
++        {"help",    no_argument,       0, 'h'},
++        {0, 0, 0, 0}
++    };
+
++    int opt;
++    int option_index = 0;
++    
++    while ((opt = getopt_long(argc, argv, "f:c:vh", long_options, &option_index)) != -1) {
++        switch (opt) {
++            case 'f':
++                strncpy(args->font_name, optarg, sizeof(args->font_name) - 1);
++                break;
++            case 'c':
++                strncpy(args->color_name, optarg, sizeof(args->color_name) - 1);
++                break;
++            case 'v':
++                display_roshan_version();
++                exit(0);
++            case 'h':
++                display_roshan_help(argv[0]);
++                exit(0);
++            default:
++                display_roshan_help(argv[0]);
++                return -1;
++        }
++    }
+
++    if (optind < argc) {
++        strncpy(args->text_input, argv[optind], sizeof(args->text_input) - 1);
++    } else {
++        fprintf(stderr, "[!] Error: No text string provided to render!\n");
++        display_roshan_help(argv[0]);
++        return -1;
++    }
+
++    return 0;
++}
