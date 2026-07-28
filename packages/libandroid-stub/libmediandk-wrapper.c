@@ -1,4 +1,5 @@
 #include <dlfcn.h>
+#include <stdatomic.h>
 
 #include "platform-ns.h"
 #include <media/NdkImage.h>
@@ -228,7 +229,11 @@ static struct {
 } stubs;
 #undef STUB
 
-__attribute__((constructor)) static void init() {
+static void ensure_loaded() {
+    static atomic_flag tried = ATOMIC_FLAG_INIT;
+    if (atomic_flag_test_and_set(&tried))
+        return;
+
     void* handle = platform_dlopen(LIB, RTLD_LOCAL);
     // Nothing bad happened, normal case for termux-docker.
     if (!handle)
@@ -238,7 +243,7 @@ __attribute__((constructor)) static void init() {
 #undef LOAD
 }
 
-#define CALL(f, def, ...) if (!stubs.f) return def; else return (stubs.f)(__VA_ARGS__)
+#define CALL(f, def, ...) ensure_loaded(); if (!stubs.f) return def; else return (stubs.f)(__VA_ARGS__)
 
 void AImage_delete(AImage* image) {
     CALL(AImage_delete,, image);
