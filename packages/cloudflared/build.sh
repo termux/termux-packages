@@ -27,3 +27,15 @@ termux_step_post_make_install() {
 	chmod 700 "$TERMUX_PREFIX/var/service/cloudflared/run"
 	touch "$TERMUX_PREFIX/var/service/cloudflared/down"
 }
+
+termux_step_create_debscripts() {
+	cat <<- EOF > ./prerm
+		#!${TERMUX_PREFIX}/bin/sh
+		if [ -x "${TERMUX_PREFIX}/bin/sv" ]; then
+			sv-disable cloudflared || :
+			sv down cloudflared || :
+		fi
+		rm -rf ${TERMUX_PREFIX}/var/service/cloudflared
+	EOF
+	chmod 0700 prerm
+}
