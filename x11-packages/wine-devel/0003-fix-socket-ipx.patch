@@ -1,0 +1,32 @@
+--- a/dlls/ntdll/unix/socket.c
++++ b/dlls/ntdll/unix/socket.c
+@@ -54,7 +54,7 @@
+ #  include <linux/types.h>
+ # endif
+ # include <linux/ipx.h>
+-# ifdef SOL_IPX
++# if defined(SOL_IPX) && !defined(__ANDROID__)
+ #  define HAS_IPX
+ # endif
+ #endif
+--- a/dlls/ws2_32/unixlib.c
++++ b/dlls/ws2_32/unixlib.c
+ #  include <linux/types.h>
+ # endif
+ # include <linux/ipx.h>
+-# ifdef SOL_IPX
++# if defined(SOL_IPX) && !defined(__ANDROID__)
+ #  define HAS_IPX
+ # endif
+ #endif
+--- a/server/sock.c
++++ b/server/sock.c
+@@ -71,7 +71,7 @@
+ #  include <linux/types.h>
+ # endif
+ # include <linux/ipx.h>
+-# ifdef SOL_IPX
++# if defined(SOL_IPX) && !defined(__ANDROID__)
+ #  define HAS_IPX
+ # endif
+ #endif
