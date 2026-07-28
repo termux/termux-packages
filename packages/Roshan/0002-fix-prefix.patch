@@ -1,0 +1,66 @@
+From: Roshan Editor <roshan@termux-packages.org>
+Date: Tue, 28 Jul 2026 15:21:00 +0530
+Subject: [PATCH 2/7] Implement robust path resolver and runtime directory structure
+
+--- a/roshan_path.c
++++ b/roshan_path.c
+@@ -1,20 +1,110 @@
+-#include <stdio.h>
+-
+-char* get_prefix() {
+-    return "/usr";
+-}
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <sys/stat.h>
++
++#define PATH_MAX_BUFFER 4096
++
++typedef struct {
++    char base_prefix[PATH_MAX_BUFFER];
++    char font_dir[PATH_MAX_BUFFER];
++    char asset_dir[PATH_MAX_BUFFER];
++    char log_file[PATH_MAX_BUFFER];
++} PathConfig;
++
++PathConfig g_paths;
++
++void resolve_system_paths(PathConfig *cfg) {
++    const char *prefix_env = getenv("PREFIX");
++    if (prefix_env && strlen(prefix_env) > 0) {
++        snprintf(cfg->base_prefix, PATH_MAX_BUFFER, "%s", prefix_env);
++    } else {
++        snprintf(cfg->base_prefix, PATH_MAX_BUFFER, "/data/data/com.termux/files/usr");
++    }
++
++    snprintf(cfg->font_dir, PATH_MAX_BUFFER, "%s/share/figlet", cfg->base_prefix);
++    snprintf(cfg->asset_dir, PATH_MAX_BUFFER, "%s/share/roshan/assets", cfg->base_prefix);
++    snprintf(cfg->log_file, PATH_MAX_BUFFER, "%s/tmp/roshan_execution.log", cfg->base_prefix);
++}
++
++int verify_path_existence(const char *path) {
++    struct stat st;
++    if (stat(path, &st) == 0) {
++        if (S_ISDIR(st.st_mode) || S_ISREG(st.st_mode)) {
++            return 1;
++        }
++    }
++    return 0;
++}
++
++void ensure_runtime_directories(PathConfig *cfg) {
++    resolve_system_paths(cfg);
++    
++    if (!verify_path_existence(cfg->asset_dir)) {
++        char mkdir_cmd[PATH_MAX_BUFFER * 2];
++        snprintf(mkdir_cmd, sizeof(mkdir_cmd), "mkdir -p %s", cfg->asset_dir);
++        system(mkdir_cmd);
++    }
++    
++    printf("[*] Path Config Verified:\n");
++    printf("    Prefix : %s\n", cfg->base_prefix);
++    printf("    Fonts  : %s\n", cfg->font_dir);
++    printf("    Assets : %s\n", cfg->asset_dir);
++}
