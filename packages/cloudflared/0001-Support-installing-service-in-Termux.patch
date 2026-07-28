@@ -1,18 +1,17 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: taodicakhia <74099190+taodicakhia@users.noreply.github.com>
-Date: Sun, 26 Jul 2026 02:09:02 +0000
+From 855d959a82b7c6aa5c84bfa52eb4f6a417af32da Mon Sep 17 00:00:00 2001
+From: toidicakhia <108525966+toidicakhia@users.noreply.github.com>
+Date: Tue, 28 Jul 2026 02:56:40 +0000
 Subject: [PATCH] Support installing service in Termux
 
 ---
- cmd/cloudflared/android_service.go  | 164 ++++++++++++++++++++++++++++
- cmd/cloudflared/generic_service.go  |   2 +-
- cmd/cloudflared/linux_service.go    |   2 +-
- 3 files changed, 166 insertions(+), 2 deletions(-)
+ cmd/cloudflared/android_service.go | 164 +++++++++++++++++++++++++++++
+ cmd/cloudflared/linux_service.go   |   2 +-
+ 2 files changed, 165 insertions(+), 1 deletion(-)
  create mode 100644 cmd/cloudflared/android_service.go
 
 diff --git a/cmd/cloudflared/android_service.go b/cmd/cloudflared/android_service.go
 new file mode 100644
-index 00000000..d0b78254
+index 00000000..30c044d3
 --- /dev/null
 +++ b/cmd/cloudflared/android_service.go
 @@ -0,0 +1,164 @@
@@ -34,7 +33,7 @@ index 00000000..d0b78254
 +)
 +
 +const (
-+	defaultTermuxPrefix = "@TERMUX_PREFIX@"
++	defaultTermuxPrefix = "/data/data/com.termux/files/usr"
 +	termuxServiceName   = "cloudflared"
 +	termuxSvcRelDir     = "var/service"
 +	termuxSvlogRelPath  = "share/termux-services/svlogger"
@@ -95,7 +94,7 @@ index 00000000..d0b78254
 +func installTermuxService(c *cli.Context) error {
 +	log := logger.CreateLoggerFromContext(c, logger.EnableTerminalLog)
 +
-+	extraArgs := []string{"tunnel", "run"}
++	var extraArgs []string
 +	if c.NArg() > 0 {
 +		cd, err := homedir.Dir()
 +		if err != nil {
@@ -153,9 +152,9 @@ index 00000000..d0b78254
 +	log.Info().Msg("To ensure the service starts on device boot:")
 +	log.Info().Msg("  1. Install Termux:Boot from F-Droid")
 +	log.Info().Msg("  2. Create ~/.termux/boot/start-services with:")
-+	log.Info().Msg("     #!@TERMUX_PREFIX@/bin/sh")
++	log.Info().Msg("     #!/data/data/com.termux/files/usr/bin/sh")
 +	log.Info().Msg("     termux-wake-lock")
-+	log.Info().Msg("     exec runsvdir -P @TERMUX_PREFIX@/var/service")
++	log.Info().Msg("     exec runsvdir -P /data/data/com.termux/files/usr/var/service")
 +	log.Info().Msg("  3. Make it executable: chmod +x ~/.termux/boot/start-services")
 +	log.Info().Msg("  4. Disable battery optimization for Termux in Android settings")
 +
@@ -187,16 +186,9 @@ index 067d5b40..e74a7a75 100644
 @@ -1,4 +1,4 @@
 -//go:build linux
 +//go:build linux && !android
- 	package main
  
-diff --git a/cmd/cloudflared/generic_service.go b/cmd/cloudflared/generic_service.go
-index 9b262345..0b9ea0f5 100644
---- a/cmd/cloudflared/generic_service.go
-+++ b/cmd/cloudflared/generic_service.go
-@@ -1,4 +1,4 @@
--//go:build !windows && !darwin && !linux
-+//go:build !windows && !darwin && !linux && !android
- 	package main
+ package main
  
 -- 
 2.55.0.windows.3
+
