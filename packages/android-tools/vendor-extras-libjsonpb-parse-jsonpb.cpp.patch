@@ -1,0 +1,10 @@
++++ ./vendor/extras/libjsonpb/parse/jsonpb.cpp
+@@ -33,7 +33,7 @@
+ static constexpr char kTypeUrlPrefix[] = "type.googleapis.com";
+ 
+ std::string GetTypeUrl(const Message& message) {
+-  return std::string(kTypeUrlPrefix) + "/" + message.GetDescriptor()->full_name();
++  return std::string(kTypeUrlPrefix) + "/" + std::string{message.GetDescriptor()->full_name()};
+ }
+ 
+ ErrorOr<std::string> MessageToJsonString(const Message& message) {
