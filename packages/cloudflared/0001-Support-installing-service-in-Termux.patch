@@ -33,7 +33,7 @@ index 00000000..30c044d3
 +)
 +
 +const (
-+	defaultTermuxPrefix = "/data/data/com.termux/files/usr"
++	defaultTermuxPrefix = "@TERMUX_PREFIX@"
 +	termuxServiceName   = "cloudflared"
 +	termuxSvcRelDir     = "var/service"
 +	termuxSvlogRelPath  = "share/termux-services/svlogger"
@@ -152,9 +152,9 @@ index 00000000..30c044d3
 +	log.Info().Msg("To ensure the service starts on device boot:")
 +	log.Info().Msg("  1. Install Termux:Boot from F-Droid")
 +	log.Info().Msg("  2. Create ~/.termux/boot/start-services with:")
-+	log.Info().Msg("     #!/data/data/com.termux/files/usr/bin/sh")
++	log.Info().Msgf("     #!%s/bin/sh", termuxPrefix())
 +	log.Info().Msg("     termux-wake-lock")
-+	log.Info().Msg("     exec runsvdir -P /data/data/com.termux/files/usr/var/service")
++	log.Info().Msgf("     exec runsvdir -P %s/var/service", termuxPrefix())
 +	log.Info().Msg("  3. Make it executable: chmod +x ~/.termux/boot/start-services")
 +	log.Info().Msg("  4. Disable battery optimization for Termux in Android settings")
 +
