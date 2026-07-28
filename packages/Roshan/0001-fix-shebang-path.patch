@@ -1,7 +1,52 @@
+From: Roshan Editor <roshan@termux-packages.org>
+Date: Tue, 28 Jul 2026 15:10:00 +0530
+Subject: [PATCH 1/7] Fix Shebang path and add full environment initialization
+
+This patch updates the interpreter shebang to target Termux's absolute 
+usr path, initializes shell flags, and configures runtime environment variables.
+
 --- a/roshan.sh
 +++ b/roshan.sh
-@@ -1,3 +1,3 @@
+@@ -1,15 +1,45 @@
 -#!/bin/bash
+-# Standard bash script start
+-
+-echo "Starting Roshan script..."
+-
+-if [ -f /etc/roshan.conf ]; then
+-    source /etc/roshan.conf
+-fi
+-
+-exit 0
 +#!/data/data/com.termux/files/usr/bin/bash
- 
- # Termux Shebang Fix
++# ==============================================================================
++# Package Name  : Roshan
++# Description   : Advanced Animated Banner Generator for Termux Environment
++# Author        : Roshan Editor
++# License       : GPL-2.0
++# ==============================================================================
++
++set -euo pipefail
++
++# Termux Absolute Environment Variable Setup
++export TERMUX_PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
++export TERMUX_PATH="${TERMUX_PREFIX}/bin:${PATH}"
++export PATH="${TERMUX_PATH}"
++
++# Global Script Variables
++ROSHAN_VERSION="1.0.0"
++ROSHAN_CONFIG_DIR="${TERMUX_PREFIX}/etc/roshan"
++ROSHAN_LOG_DIR="${TERMUX_PREFIX}/var/log/roshan"
++
++# Ensure required directories exist before execution
++init_environment() {
++    if [ ! -d "${ROSHAN_CONFIG_DIR}" ]; then
++        mkdir -p "${ROSHAN_CONFIG_DIR}" 2>/dev/null || true
++    fi
++    if [ ! -d "${ROSHAN_LOG_DIR}" ]; then
++        mkdir -p "${ROSHAN_LOG_DIR}" 2>/dev/null || true
++    fi
++}
++
++init_environment
++echo "[+] Roshan Environment Successfully Initialized."
