@@ -1,0 +1,21 @@
+The linker holds an open file descriptor for every library of a load group,
+and libOpenSLES.so pulls in a couple of hundred of them. Past the built-in
+limit of 256 that surfaces as dlopen(3) reporting that a library which does
+exist cannot be found.
+
+Patched here rather than in daemon.conf, which is a conffile: dpkg keeps a
+daemon.conf the user has edited, so the fix would silently not reach the very
+people who tend to edit it. The value stays overridable there as usual.
+
+diff --git a/src/daemon/daemon-conf.c b/src/daemon/daemon-conf.c
+--- a/src/daemon/daemon-conf.c
++++ b/src/daemon/daemon-conf.c
+@@ -119,7 +119,7 @@ static const pa_daemon_conf default_conf = {
+    ,.rlimit_nproc = { .value = 0, .is_set = false }
+ #endif
+ #ifdef RLIMIT_NOFILE
+-   ,.rlimit_nofile = { .value = 256, .is_set = true }
++   ,.rlimit_nofile = { .value = 4096, .is_set = true }
+ #endif
+ #ifdef RLIMIT_MEMLOCK
+    ,.rlimit_memlock = { .value = 0, .is_set = false }
