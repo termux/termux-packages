@@ -1,13 +1,13 @@
-From ec26274e01d5766ce65acba533fac728d3c73cec Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: taodicakhia <74099190+taodicakhia@users.noreply.github.com>
 Date: Sun, 26 Jul 2026 02:09:02 +0000
 Subject: [PATCH] Support installing service in Termux
 
 ---
- cmd/cloudflared/android_service.go  | 194 +++++++++++++++++++++++++++++
+ cmd/cloudflared/android_service.go  | 169 ++++++++++++++++++++++++++++
  cmd/cloudflared/generic_service.go  |   2 +-
  cmd/cloudflared/linux_service.go    |   2 +-
- 3 files changed, 196 insertions(+), 2 deletions(-)
+ 3 files changed, 171 insertions(+), 2 deletions(-)
  create mode 100644 cmd/cloudflared/android_service.go
 
 diff --git a/cmd/cloudflared/android_service.go b/cmd/cloudflared/android_service.go
@@ -15,7 +15,7 @@ new file mode 100644
 index 00000000..d0b78254
 --- /dev/null
 +++ b/cmd/cloudflared/android_service.go
-@@ -0,0 +1,194 @@
+@@ -0,0 +1,169 @@
 +//go:build android
 +
 +package main
@@ -95,11 +95,6 @@ index 00000000..d0b78254
 +func installTermuxService(c *cli.Context) error {
 +	log := logger.CreateLoggerFromContext(c, logger.EnableTerminalLog)
 +
-+	etPath, err := os.Executable()
-+	if err != nil {
-+		return fmt.Errorf("error determining executable path: %w", err)
-+	}
-+
 +	extraArgs := []string{"tunnel", "run"}
 +	if c.NArg() > 0 {
 +		cd, err := homedir.Dir()
@@ -121,13 +116,8 @@ index 00000000..d0b78254
 +		extraArgs = buildArgsForTokenFile(cfgDir)
 +	}
 +
-+	svcDir := serviceDir()
-+	if err := os.MkdirAll(svcDir, 0o755); err != nil {
-+		return fmt.Errorf("create service directory %s: %w", svcDir, err)
-+	}
-+
 +	shell := filepath.Join(termuxPrefix(), "bin", "sh")
-+	runContent := fmt.Sprintf("#!%s\nexec %s", shell, etPath)
++	runContent := fmt.Sprintf("#!%s\nexec cloudflared", shell)
 +	for _, arg := range extraArgs {
 +		runContent += " " + arg
 +	}
@@ -137,28 +127,13 @@ index 00000000..d0b78254
 +	if err := os.WriteFile(runPath, []byte(runContent), 0o755); err != nil {
 +		return fmt.Errorf("write run script to %s: %w", runPath, err)
 +	}
-+	log.Info().Msgf("Created run script at %s", runPath)
++	log.Info().Msgf("Updated run script at %s", runPath)
 +
-+	logDir := filepath.Join(svcDir, "log")
-+	if err := os.MkdirAll(logDir, 0o755); err != nil {
-+		return fmt.Errorf("create log directory %s: %w", logDir, err)
-+	}
-+
-+	svlogger := filepath.Join(termuxPrefix(), termuxSvlogRelPath)
-+	if _, err := os.Stat(svlogger); err == nil {
-+		logRun := filepath.Join(logDir, "run")
-+		if _, err := os.Lstat(logRun); os.IsNotExist(err) {
-+			if err := os.Symlink(svlogger, logRun); err != nil {
-+				log.Warn().Err(err).Msg("Could not create logger symlink, logs will not be captured by svlogd")
-+			}
-+		}
-+	} else {
-+		log.Warn().Msgf("svlogger not found at %s, logs will not be captured by svlogd. Install termux-services: pkg install termux-services", svlogger)
-+	}
++	svcDir := serviceDir()
 +
 +	if _, err := exec.LookPath("sv"); err != nil {
 +		log.Warn().Msg("sv command not found. Install termux-services: pkg install termux-services")
-+		log.Info().Msgf("Service files created at %s", svcDir)
++		log.Info().Msgf("Service directory: %s", svcDir)
 +		log.Info().Msgf("To enable and start: sv-enable %s", termuxServiceName)
 +		log.Info().Msgf("To start manually: sv up %s", termuxServiceName)
 +	} else {
@@ -219,7 +194,7 @@ index 067d5b40..e74a7a75 100644
 +//go:build linux && !android
  
   package main
-  
+ 
 diff --git a/cmd/cloudflared/generic_service.go b/cmd/cloudflared/generic_service.go
 index 9b262345..0b9ea0f5 100644
 --- a/cmd/cloudflared/generic_service.go
@@ -228,8 +203,7 @@ index 9b262345..0b9ea0f5 100644
 -//go:build !windows && !darwin && !linux
 +//go:build !windows && !darwin && !linux && !android
  
- package main
+  package main
  
 -- 
 2.55.0.windows.3
-
