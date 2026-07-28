@@ -4,10 +4,10 @@ Date: Sun, 26 Jul 2026 02:09:02 +0000
 Subject: [PATCH] Support installing service in Termux
 
 ---
- cmd/cloudflared/android_service.go  | 169 ++++++++++++++++++++++++++++
+ cmd/cloudflared/android_service.go  | 164 ++++++++++++++++++++++++++++
  cmd/cloudflared/generic_service.go  |   2 +-
  cmd/cloudflared/linux_service.go    |   2 +-
- 3 files changed, 171 insertions(+), 2 deletions(-)
+ 3 files changed, 166 insertions(+), 2 deletions(-)
  create mode 100644 cmd/cloudflared/android_service.go
 
 diff --git a/cmd/cloudflared/android_service.go b/cmd/cloudflared/android_service.go
@@ -15,7 +15,7 @@ new file mode 100644
 index 00000000..d0b78254
 --- /dev/null
 +++ b/cmd/cloudflared/android_service.go
-@@ -0,0 +1,169 @@
+@@ -0,0 +1,164 @@
 +//go:build android
 +
 +package main
@@ -187,9 +187,8 @@ index 067d5b40..e74a7a75 100644
 @@ -1,4 +1,4 @@
 -//go:build linux
 +//go:build linux && !android
- 
-  package main
- 
+ 	package main
+
 diff --git a/cmd/cloudflared/generic_service.go b/cmd/cloudflared/generic_service.go
 index 9b262345..0b9ea0f5 100644
 --- a/cmd/cloudflared/generic_service.go
@@ -197,8 +196,8 @@ index 9b262345..0b9ea0f5 100644
 @@ -1,4 +1,4 @@
 -//go:build !windows && !darwin && !linux
 +//go:build !windows && !darwin && !linux && !android
- 
-  package main
- 
--- 
+ 	package main
+
+
+--
 2.55.0.windows.3
