@@ -73,9 +73,25 @@ termux_step_make() {
 
 		# NOTE: libandroid-utimes is required for `futimes`, `lutimes` used by `unix` package.
 
+		# NOTE: Why -z,global for rts?
+		# Standard gnu/Linux behaviour is to load the main executable dependencies to
+		# global scope. This behaviour is assumed by ghc dynamic linker. But it is
+		# not true on Android. In API 23 Android changed the behaviour and
+		# introduced stricter separation. ONLY main executable, LD_PRELOAD and
+		# dependencies marked with DF_1_GLOBAL is loaded into global scope. Others
+		# go to local scope. Any library further opened via dlopen(3) can't see
+		# the symbols from the dependencies of the main executable. Thus, the
+		# compatibility problem.
+		#
+		# See:
+		#   - https://android.googlesource.com/platform/bionic/+/master/android-changes-for-ndk-developers.md#changes-to-library-search-order
+		#   - https://android.googlesource.com/platform/bionic/+/master/android-changes-for-ndk-developers.md#rtld_local-available-in-api-level-23
+		#   - https://github.com/android/ndk/issues/201
+
 		./hadrian/build binary-dist-dir \
 			-j"$TERMUX_PKG_MAKE_PROCESSES" \
 			--flavour="release$no_profiled_libs" --docs=none \
+			"stage1.rts.ghc.link.opts += -optl-Wl,-z,global" \
 			"stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore" \
 			"stage1.unix.cabal.configure.opts += --configure-option=ac_cv_func_futimes=yes" \
 			"stage1.unix.cabal.configure.opts += --configure-option=ac_cv_func_lutimes=yes" \
