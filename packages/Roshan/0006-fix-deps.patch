@@ -1,0 +1,66 @@
+From: Roshan Editor <roshan@termux-packages.org>
+Date: Tue, 28 Jul 2026 15:25:00 +0530
+Subject: [PATCH 6/7] Comprehensive binary dependency check and pkg command installer guidance
+
+--- a/roshan_deps.c
++++ b/roshan_deps.c
+@@ -1,10 +1,85 @@
+-#include <stdio.h>
+-
+-int check_deps() {
+-    return 1;
+-}
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++
++typedef struct {
++    const char *binary_name;
++    const char *pkg_name;
++    int is_critical;
++} Dependency;
++
++static Dependency required_deps[] = {
++    {"figlet", "figlet", 1},
++    {"tput", "ncurses-utils", 0},
++    {"gawk", "gawk", 0},
++    {NULL, NULL, 0}
++};
++
++int verify_system_dependencies(void) {
++    int missing_count = 0;
++    char check_cmd[256];
+
++    printf("[*] Running System Binary Verification Engine...\n");
++    
++    for (int i = 0; required_deps[i].binary_name != NULL; i++) {
++        snprintf(check_cmd, sizeof(check_cmd), "command -v %s >/dev/null 2>&1", required_deps[i].binary_name);
++        int result = system(check_cmd);
++        
++        if (result != 0) {
++            missing_count++;
++            fprintf(stderr, "[!] Missing Dependency: '%s' (Required Package: %s)\n", 
++                    required_deps[i].binary_name, required_deps[i].pkg_name);
++        } else {
++            printf("    [OK] Found binary: %s\n", required_deps[i].binary_name);
++        }
++    }
++
++    if (missing_count > 0) {
++        printf("\n-----------------------------------------------------\n");
++        printf(" To install missing dependencies, run this in Termux:\n");
++        printf(" pkg install ");
++        for (int i = 0; required_deps[i].binary_name != NULL; i++) {
++            snprintf(check_cmd, sizeof(check_cmd), "command -v %s >/dev/null 2>&1", required_deps[i].binary_name);
++            if (system(check_cmd) != 0) {
++                printf("%s ", required_deps[i].pkg_name);
++            }
++        }
++        printf("\n-----------------------------------------------------\n\n");
++        return 0;
++    }
+
++    printf("[+] All binary requirements satisfied successfully.\n");
++    return 1;
++}
