@@ -1,0 +1,67 @@
+From: Roshan Editor <roshan@termux-packages.org>
+Date: Tue, 28 Jul 2026 15:22:00 +0530
+Subject: [PATCH 3/7] Advanced multi-buffer file allocator and POSIX signal trap mechanism
+
+--- a/roshan_io.c
++++ b/roshan_io.c
+@@ -1,15 +1,105 @@
+-#include <stdio.h>
+-
+-void write_tmp() {
+-    FILE *f = fopen("/tmp/test.txt", "w");
+-    fprintf(f, "data");
+-    fclose(f);
+-}
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <errno.h>
++#include <fcntl.h>
++
++#define TEMP_BUF_SIZE 1024
++
++typedef struct {
++    char temp_filename[256];
++    int fd;
++} TempBufferHandle;
++
++TempBufferHandle* create_secure_temp_buffer(const char *prefix_path) {
++    TempBufferHandle *handle = (TempBufferHandle*)malloc(sizeof(TempBufferHandle));
++    if (!handle) return NULL;
++
++    snprintf(handle->temp_filename, sizeof(handle->temp_filename), 
++             "%s/tmp/roshan_buf_XXXXXX", prefix_path);
++
++    handle->fd = mkstemp(handle->temp_filename);
++    if (handle->fd == -1) {
++        fprintf(stderr, "[!] Error allocating secure temp file: %s\n", strerror(errno));
++        free(handle);
++        return NULL;
++    }
+
++    printf("[+] Allocated temporary I/O buffer: %s\n", handle->temp_filename);
++    return handle;
++}
+
++int write_to_buffer(TempBufferHandle *handle, const char *data, size_t length) {
++    if (!handle || handle->fd < 0) return -1;
++    
++    ssize_t bytes_written = write(handle->fd, data, length);
++    if (bytes_written < 0) {
++        fprintf(stderr, "[!] Failed to write to buffer: %s\n", strerror(errno));
++        return -1;
++    }
++    return 0;
++}
+
++void destroy_temp_buffer(TempBufferHandle *handle) {
++    if (handle) {
++        if (handle->fd >= 0) {
++            close(handle->fd);
++        }
++        unlink(handle->temp_filename);
++        printf("[+] Cleaned up temporary buffer: %s\n", handle->temp_filename);
++        free(handle);
++    }
++}
