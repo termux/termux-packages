@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="OpenGL and OpenGL ES shader front end and validator"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="16.4.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/KhronosGroup/glslang/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c634d6237eb0cc04d5ddf5dc9955daa175d82b0f8797acab45b49965e9f6df13
 TERMUX_PKG_DEPENDS="libc++"
