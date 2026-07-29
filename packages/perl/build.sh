@@ -11,10 +11,10 @@ TERMUX_PKG_MAINTAINER="@termux"
 # - subversion
 # - vim
 # - vim-gtk
-TERMUX_PKG_VERSION=(5.42.0
+TERMUX_PKG_VERSION=(5.42.2
                     1.6.4)
-TERMUX_PKG_SHA256=(73cf6cc1ea2b2b1c110a18c14bbbc73a362073003893ffcedc26d22ebdbdd0c3
-                   b176522bceb1fc3533eb85e4435e5ab06f7473633979122a8f5b18a2b4fc865a)
+TERMUX_PKG_SHA256=(0a585eeb9e363c0f80482ddb3571625250c2c86aeb408853e8ea50805cfb14bb
+		b176522bceb1fc3533eb85e4435e5ab06f7473633979122a8f5b18a2b4fc865a)
 TERMUX_PKG_SRCURL=("https://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION[0]}.tar.xz"
                    "https://github.com/arsv/perl-cross/archive/refs/tags/${TERMUX_PKG_VERSION[1]}.tar.gz")
 TERMUX_PKG_DEPENDS="libandroid-utimes"
@@ -33,8 +33,12 @@ termux_step_post_get_source() {
 	rm -f "$TERMUX_PREFIX/include/perl"
 
 	# apply perl-cross patches to this perl version if necessary
-	#local perl_cross_version="5.40.2"
-	#cp -r "cnf/diffs/perl5-${perl_cross_version}/" cnf/diffs/perl5-${TERMUX_PKG_VERSION[0]}/
+	local perl_cross_version="5.42.0"
+	ln -sf perl5-${perl_cross_version} cnf/diffs/perl5-${TERMUX_PKG_VERSION[0]}
+}
+
+termux_step_pre_configure() {
+	sed -i "s/-D_LARGEFILE_SOURCE/-D_LARGEFILE64_SOURCE -D_GNU_SOURCE/g" $(grep -srl "\-D_LARGEFILE_SOURCE")
 }
 
 termux_step_configure() {
