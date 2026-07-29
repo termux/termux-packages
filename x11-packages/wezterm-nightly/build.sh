@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://wezterm.org/
 TERMUX_PKG_DESCRIPTION="GPU-accelerated cross-platform terminal emulator and multiplexer (development branch)"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="20260716+g76b606ec"
+TERMUX_PKG_VERSION="20260729+g46a166d6"
 TERMUX_PKG_SRCURL=git+https://github.com/wezterm/wezterm
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_DEPENDS="fontconfig, freetype, glib, harfbuzz, hicolor-icon-theme, libpng, libssh2, libx11, libxcb, libxkbcommon, openssl, ttf-jetbrains-mono, xdg-utils, xcb-util, xcb-util-image, zlib, zstd"
@@ -78,11 +78,11 @@ termux_pkg_auto_update() {
 }
 
 termux_step_post_get_source() {
-	local commit="${TERMUX_PKG_VERSION##*+g}"
-	local commit_date="$TERMUX_PKG_REPOLOGY_METADATA_VERSION"
+	local commit="${TERMUX_PKG_VERSION##*+g}" epoch_date
+	epoch_date="$(date '+%s' -d "${TERMUX_PKG_VERSION%%+g*}")"
 
 	# Remember to pull in the necessary amount of git history
-	git fetch --shallow-since="$commit_date"
+	git fetch --shallow-since="$epoch_date"
 	git checkout "$commit"
 }
 
