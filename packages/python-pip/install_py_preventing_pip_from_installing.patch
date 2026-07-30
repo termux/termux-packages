@@ -1,8 +1,8 @@
---- pip-23.1/src/pip/_internal/commands/install.py	2023-04-16 00:05:42.665257200 +0100
-+++ pip-23.1.mod/src/pip/_internal/commands/install.py	2023-04-16 00:09:42.989257317 +0100
-@@ -342,6 +342,20 @@
+--- a/src/pip/_internal/commands/install.py
++++ b/src/pip/_internal/commands/install.py
+@@ -448,6 +448,20 @@
+         try:
              reqs = self.get_requirements(args, options, finder, session)
-             check_legacy_setup_py_options(options, reqs)
  
 +            reqs_list = [req.name for req in reqs]
 +            while reqs_list.count("pip") != 0:
@@ -20,4 +20,4 @@
 +
              wheel_cache = WheelCache(options.cache_dir)
  
-             # Only when installing is it permitted to use PEP 660.
+             preparer = self.make_requirement_preparer(
