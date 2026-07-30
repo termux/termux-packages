@@ -8,12 +8,12 @@
 +    return dirval.split(os.pathsep) + ["@TERMUX_PREFIX@/etc"]
 --- a/src/pip/_vendor/platformdirs/unix.py
 +++ b/src/pip/_vendor/platformdirs/unix.py
-@@ -79,7 +79,7 @@ class Unix(PlatformDirsABC):  # noqa: PLR0904
-     def _site_config_dirs(self) -> list[str]:
-         path = os.environ.get("XDG_CONFIG_DIRS", "")
-         if not path.strip():
--            path = "/etc/xdg"
-+            path = "@TERMUX_PREFIX@/etc/xdg"
-         return [self._append_app_name_and_version(p) for p in path.split(os.pathsep)]
+@@ -53,7 +53,7 @@ class _UnixDefaults(PlatformDirsABC):  # noqa: PLR0904
  
      @property
+     def _site_config_dirs(self) -> list[str]:
+-        return [self._append_app_name_and_version("/etc/xdg")]
++        return [self._append_app_name_and_version("@TERMUX_PREFIX@/etc/xdg")]
+ 
+     @property
+     def user_cache_dir(self) -> str:
