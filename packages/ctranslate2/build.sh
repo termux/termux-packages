@@ -1,0 +1,28 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/OpenNMT/CTranslate2
+TERMUX_PKG_DESCRIPTION="A fast inference engine for Transformer models"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=4.8.1
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_BUILD_IN_SRC=true
+
+TERMUX_PKG_SRCURL=git+https://github.com/OpenNMT/CTranslate2.git
+TERMUX_PKG_GIT_BRANCH=v${TERMUX_PKG_VERSION}
+
+TERMUX_PKG_DEPENDS="libandroid-posix-semaphore, libopenblas"
+TERMUX_PKG_BUILD_DEPENDS="ninja"
+
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DWITH_MKL=OFF
+-DWITH_OPENBLAS=ON
+-DOPENBLAS_LIBRARIES=${TERMUX_PREFIX}/lib/libopenblas.so
+-DOPENBLAS_INCLUDE_DIR=${TERMUX_PREFIX}/include
+-DOPENMP_RUNTIME=NONE
+-DCPU_ISA_DISPATCH=OFF
+-DLIB_ANDROID_POSIX_SEMAPHORE=ON
+"
+
+termux_step_pre_configure() {
+	export CXXFLAGS+=" -I${TERMUX_PREFIX}/include/openblas -D_GNU_SOURCE"
+	export LDFLAGS+=" -lc++_shared -landroid-posix-semaphore"
+}
