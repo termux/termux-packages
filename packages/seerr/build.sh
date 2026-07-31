@@ -2,11 +2,13 @@ TERMUX_PKG_HOMEPAGE="https://github.com/seerr-team/seerr"
 TERMUX_PKG_DESCRIPTION="A fork of Overseerr with focus on adding support for Jellyfin/Emby"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.3.0"
+TERMUX_PKG_VERSION="3.4.1"
 TERMUX_PKG_SRCURL="https://github.com/seerr-team/seerr/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256="3a6caf9266f7525c3ac2aecb666f5939034e383296761bdea14ad3105237721c"
+TERMUX_PKG_SHA256=38bb1f2c90ea648a327244352d5b4b13b19526e384655be8779bbfe7f6a8f447
 TERMUX_PKG_BUILD_DEPENDS="nodejs, libvips, pkg-config"
 TERMUX_PKG_DEPENDS="nodejs, libvips, termux-services"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 # Uncomment the line below to avoid file conflicts when building on-device
 # while other background services are actively writing logs (system-level bug #30401)
 # TERMUX_PKG_RM_AFTER_INSTALL="var/log"
@@ -36,10 +38,10 @@ termux_step_pre_configure() {
 
 	local GYP_ARCH
 	case "$TERMUX_ARCH" in
-		aarch64) GYP_ARCH="arm64" ;;
-		arm) GYP_ARCH="arm" ;;
-		i686) GYP_ARCH="ia32" ;;
-		x86_64) GYP_ARCH="x64" ;;
+	aarch64) GYP_ARCH="arm64" ;;
+	arm) GYP_ARCH="arm" ;;
+	i686) GYP_ARCH="ia32" ;;
+	x86_64) GYP_ARCH="x64" ;;
 	esac
 	export npm_config_arch=$GYP_ARCH
 	export npm_config_platform=android
@@ -122,7 +124,7 @@ termux_step_make_install() {
 		-name "LICENSE" -o \
 		-name "license" -o \
 		-name "Makefile" \
-	\) -delete
+		\) -delete
 
 	find "${TERMUX_PREFIX}/lib/seerr/node_modules" -type d \( \
 		-name "test" -o \
@@ -135,7 +137,7 @@ termux_step_make_install() {
 		-name ".github" -o \
 		-name ".circleci" -o \
 		-name ".husky" \
-	\) -exec rm -rf {} +
+		\) -exec rm -rf {} +
 
 	# Strip native Node.js binaries, ignoring non-ELF formats like macOS Mach-O
 	find "${TERMUX_PREFIX}/lib/seerr/node_modules" -name "*.node" -exec sh -c '${STRIP} --strip-unneeded "$1" 2>/dev/null || true' _ {} \;
@@ -144,7 +146,7 @@ termux_step_make_install() {
 	find "${TERMUX_PREFIX}/lib/seerr/node_modules" -type d -name "obj.target" -exec rm -rf {} +
 
 	# Create launch script
-	cat > "${TERMUX_PREFIX}/bin/seerr" <<-HERE
+	cat >"${TERMUX_PREFIX}/bin/seerr" <<-HERE
 		#!${TERMUX_PREFIX}/bin/sh
 		export CONFIG_DIRECTORY="\${CONFIG_DIRECTORY:-\$HOME/.config/seerr}"
 		export PORT="\${PORT:-5055}"
