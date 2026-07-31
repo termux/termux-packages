@@ -1,13 +1,13 @@
 # Disable backtrace
 
---- a/src/httrack.c
-+++ b/src/httrack.c
-@@ -68,7 +68,7 @@ static int linput(FILE * fp, char *s, int max);
+--- a/src/htsbacktrace.c
++++ b/src/htsbacktrace.c
+@@ -47,7 +47,7 @@
+ #ifdef HAVE_UNISTD_H
  #include <unistd.h>
  #endif
- #include <ctype.h>
 -#if (defined(__linux) && defined(HAVE_EXECINFO_H))
 +#if (defined(__linux) && defined(HAVE_EXECINFO_H) && !defined(__ANDROID__))
+ #include <dlfcn.h>
+ #include <errno.h>
  #include <execinfo.h>
- #define USES_BACKTRACE
- #endif
