@@ -1,0 +1,20 @@
+--- a/src/thread_pool.cc
++++ b/src/thread_pool.cc
+@@ -86,9 +86,17 @@
+     cpu_set_t cpuset;
+     CPU_ZERO(&cpuset);
+     CPU_SET(index, &cpuset);
++#if defined(__ANDROID__)
++    const int status = sched_setaffinity(pthread_gettid_np(pthread_self()), sizeof(cpu_set_t), &cpuset);
++#else
+     const int status = pthread_setaffinity_np(thread.native_handle(), sizeof (cpu_set_t), &cpuset);
++#endif
+     if (status != 0) {
++#if defined(__ANDROID__)
++      throw std::runtime_error("Error calling sched_setaffinity: "
++#else
+       throw std::runtime_error("Error calling pthread_setaffinity_np: "
++#endif
+                                + std::to_string(status));
+     }
+ #endif
