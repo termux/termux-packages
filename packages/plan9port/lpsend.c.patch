@@ -1,0 +1,20 @@
+--- a/src/cmd/lp/lpsend.c
++++ b/src/cmd/lp/lpsend.c
+@@ -36,7 +36,7 @@
+ #define	ACK(a)	write(a, "", 1)
+ #define NAK(a)	write(a, "\001", 1)
+ 
+-#define LPDAEMONLOG	"/tmp/lpdaemonl"
++#define LPDAEMONLOG	"@TERMUX_PREFIX@/tmp/lpdaemonl"
+ 
+ #define LNBFSZ	4096
+ char lnbuf[LNBFSZ];
+@@ -184,7 +184,7 @@ tempfile(void)
+ 	char tmpf[20];
+ 	int tmpfd;
+ 
+-	sprint(tmpf, "/var/tmp/lp%d.%d", getpid(), tindx++);
++	sprint(tmpf, "@TERMUX_PREFIX@/var/tmp/lp%d.%d", getpid(), tindx++);
+ 	if((tmpfd=create(tmpf,
+ 
+ #ifdef plan9

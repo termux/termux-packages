@@ -1,0 +1,16 @@
+--- a/src/cmd/samterm/plan9.c
++++ b/src/cmd/samterm/plan9.c
+@@ -152,11 +152,11 @@ extstart(void)
+ 		return;
+ 	disp = getenv("DISPLAY");
+ 	if(disp){
+-		exname = smprint("/tmp/.sam.%s.%s", user, disp);
++		exname = smprint("@TERMUX_PREFIX@/tmp/.sam.%s.%s", user, disp);
+ 		free(disp);
+ 	}
+ 	else
+-		exname = smprint("/tmp/.sam.%s", user);
++		exname = smprint("@TERMUX_PREFIX@/tmp/.sam.%s", user);
+ 	free(user);
+ 	if(exname == nil){
+ 		fprint(2, "not posting for B: out of memory\n");
