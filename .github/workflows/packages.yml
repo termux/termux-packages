@@ -32,6 +32,8 @@ concurrency:
   group: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.run_id }}
   # only cancel in-progress when it’s a PR
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  # invalid when cancel-in-progress: true and queue: max
+  queue: ${{ github.event_name == 'pull_request' && 'single' || 'max' }}
 
 jobs:
   build:
