@@ -1,0 +1,29 @@
+--- a/src/gui/calc/calc.c	2007-12-16 10:29:16.000000000 -0500
++++ b/src/gui/calc/calc.c	2026-07-30 17:57:39.190347313 -0400
+@@ -313,7 +313,7 @@
+ {
+     gdk_draw_pixmap(
+         widget->window,
+-		widget->style->fg_gc[GTK_WIDGET_STATE (widget)],
++		widget->style->fg_gc[gtk_widget_get_state(widget)],
+ 		pixmap,
+ 		event->area.x, event->area.y,
+ 		event->area.x, event->area.y,
+@@ -586,7 +586,7 @@
+ 
+     // Install LCD refresh: 100 FPS (10 ms)
+     tid = g_timeout_add((params.lcd_rate == -1) ? 50 : params.lcd_rate, 
+-		(GtkFunction)hid_refresh, NULL);
++		(GSourceFunc)hid_refresh, NULL);
+ 
+ 	explicit_destroy = 0;
+ 	gtk_widget_show(main_wnd);	// show wnd here
+@@ -640,7 +640,7 @@
+ 	g_source_remove(tid);
+ 
+ 	tid = g_timeout_add((params.lcd_rate == -1) ? 50 : params.lcd_rate, 
+-		(GtkFunction)hid_refresh, NULL);
++		(GSourceFunc)hid_refresh, NULL);
+ }
+ 
+ int hid_switch_with_skin(void)

@@ -1,0 +1,19 @@
+--- a/src/core/uae/sysdeps.h	2007-06-24 01:05:05.000000000 -0400
++++ b/src/core/uae/sysdeps.h	2026-07-30 16:53:11.346347313 -0400
+@@ -137,12 +137,16 @@
+ #define ENUMDECL typedef enum
+ #define ENUMNAME(name) name
+ 
++/* Remove macro; collides with libc abort()*/
++#if 0
+ /* While we're here, make abort more useful.  */
+ #define abort() \
+   do { \
+     fprintf (stderr, "UAE: Internal error; file %s, line %d\n", __FILE__, __LINE__); \
+     (abort) (); \
+ } while (0)
++#endif
++
+ #else
+ #define ENUMDECL enum
+ #define ENUMNAME(name) ; typedef int name

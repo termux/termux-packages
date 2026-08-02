@@ -1,0 +1,38 @@
+--- a/src/gui/calc/screen.c	2006-11-06 12:18:51.000000000 -0500
++++ b/src/gui/calc/screen.c	2026-07-30 18:08:42.554347313 -0400
+@@ -187,7 +187,7 @@
+ 	skin_infos.image = gdk_pixbuf_scale_simple(skin_infos.raw, wr.wr.w, wr.wr.h, GDK_INTERP_NEAREST);
+ 
+ 	// and draw image into pixmap (next, into window on expose event)
+-    gdk_draw_pixbuf(pixmap, main_wnd->style->fg_gc[GTK_WIDGET_STATE(main_wnd)],
++    gdk_draw_pixbuf(pixmap, main_wnd->style->fg_gc[gtk_widget_get_state(main_wnd)],
+ 		  skin_infos.image, 0, 0, 0, 0, -1, -1, GDK_RGB_DITHER_NONE, 0, 0);
+ 	gdk_window_invalidate_rect(main_wnd->window, &wr.gr, FALSE);
+ }
+@@ -204,7 +204,7 @@
+ 		gdk_pixbuf_scale_simple(skin_infos.raw, sr.w, sr.h, GDK_INTERP_NEAREST);
+ 
+ 	// and draw
+-	gdk_draw_pixbuf(pixmap, main_wnd->style->fg_gc[GTK_WIDGET_STATE(main_wnd)],
++	gdk_draw_pixbuf(pixmap, main_wnd->style->fg_gc[gtk_widget_get_state(main_wnd)],
+ 		  skin_infos.image, ls.x, ls.y, lr.x, lr.y, lr.w, lr.h, GDK_RGB_DITHER_NONE, 0, 0);
+ 	gtk_widget_queue_draw_area(area, lr.x, lr.y, lr.w, lr.h);
+ }
+@@ -324,7 +324,7 @@
+ 			skin_infos.image = gdk_pixbuf_scale_simple(lcd, lr.w, lr.h, GDK_INTERP_NEAREST);
+ 
+ 			// and draw image into pixmap (next, into window on expose event)
+-			gdk_draw_pixbuf(pixmap, main_wnd->style->fg_gc[GTK_WIDGET_STATE(main_wnd)],
++			gdk_draw_pixbuf(pixmap, main_wnd->style->fg_gc[gtk_widget_get_state(main_wnd)],
+ 			 skin_infos.image, src.x, src.y, lr.x, lr.y, src.w, src.h,
+ 			  GDK_RGB_DITHER_NONE, 0, 0);
+ 			gtk_widget_queue_draw_area(area, lr.x, lr.y, src.w, src.h);
+@@ -332,7 +332,7 @@
+ 		else
+ 		{
+ 			// and draw image into pixmap (next, into window on expose event)
+-			gdk_draw_pixbuf(pixmap, main_wnd->style->fg_gc[GTK_WIDGET_STATE(main_wnd)],
++			gdk_draw_pixbuf(pixmap, main_wnd->style->fg_gc[gtk_widget_get_state(main_wnd)],
+ 			  lcd_mem, src.x, src.y, lr.x, lr.y, src.w, src.h,
+ 			  GDK_RGB_DITHER_NONE, 0, 0);
+ 			gtk_widget_queue_draw_area(area, lr.x, lr.y, src.w, src.h);

@@ -1,0 +1,185 @@
+--- a/src/gui/debugger/dbg_wnds.c	2009-05-07 03:18:02.000000000 -0400
++++ b/src/gui/debugger/dbg_wnds.c	2026-07-30 18:58:11.478347313 -0400
+@@ -74,21 +74,21 @@
+ 	if(options3.dbg_dock)
+ 		return;
+ 
+-    if(GTK_WIDGET_VISIBLE(dbgw.regs))
++    if(gtk_widget_get_visible(dbgw.regs))
+         gtk_window_iconify(GTK_WINDOW(dbgw.regs));
+-    if(GTK_WIDGET_VISIBLE(dbgw.bkpts))
++    if(gtk_widget_get_visible(dbgw.bkpts))
+         gtk_window_iconify(GTK_WINDOW(dbgw.bkpts));
+-    if(GTK_WIDGET_VISIBLE(dbgw.mem))
++    if(gtk_widget_get_visible(dbgw.mem))
+         gtk_window_iconify(GTK_WINDOW(dbgw.mem));
+-    if(GTK_WIDGET_VISIBLE(dbgw.pclog))
++    if(gtk_widget_get_visible(dbgw.pclog))
+         gtk_window_iconify(GTK_WINDOW(dbgw.pclog));
+-    if(GTK_WIDGET_VISIBLE(dbgw.code) & all)
++    if(gtk_widget_get_visible(dbgw.code) & all)
+         gtk_window_iconify(GTK_WINDOW(dbgw.code));
+-    if(GTK_WIDGET_VISIBLE(dbgw.stack))
++    if(gtk_widget_get_visible(dbgw.stack))
+         gtk_window_iconify(GTK_WINDOW(dbgw.stack));
+-	if(GTK_WIDGET_VISIBLE(dbgw.heap))
++	if(gtk_widget_get_visible(dbgw.heap))
+         gtk_window_iconify(GTK_WINDOW(dbgw.heap));
+-	if(GTK_WIDGET_VISIBLE(dbgw.iop))
++	if(gtk_widget_get_visible(dbgw.iop))
+         gtk_window_iconify(GTK_WINDOW(dbgw.iop));
+ }
+ 
+@@ -98,21 +98,21 @@
+ 	if(options3.dbg_dock)
+ 		return;
+ 
+-    if(GTK_WIDGET_VISIBLE(dbgw.regs))
++    if(gtk_widget_get_visible(dbgw.regs))
+         gtk_window_deiconify(GTK_WINDOW(dbgw.regs));
+-    if(GTK_WIDGET_VISIBLE(dbgw.bkpts))
++    if(gtk_widget_get_visible(dbgw.bkpts))
+         gtk_window_deiconify(GTK_WINDOW(dbgw.bkpts));
+-    if(GTK_WIDGET_VISIBLE(dbgw.mem))
++    if(gtk_widget_get_visible(dbgw.mem))
+         gtk_window_deiconify(GTK_WINDOW(dbgw.mem));
+-    if(GTK_WIDGET_VISIBLE(dbgw.pclog))
++    if(gtk_widget_get_visible(dbgw.pclog))
+         gtk_window_deiconify(GTK_WINDOW(dbgw.pclog));
+-    if(GTK_WIDGET_VISIBLE(dbgw.code) & all)
++    if(gtk_widget_get_visible(dbgw.code) & all)
+         gtk_window_deiconify(GTK_WINDOW(dbgw.code));
+-    if(GTK_WIDGET_VISIBLE(dbgw.stack))
++    if(gtk_widget_get_visible(dbgw.stack))
+         gtk_window_deiconify(GTK_WINDOW(dbgw.stack));
+-	if(GTK_WIDGET_VISIBLE(dbgw.heap))
++	if(gtk_widget_get_visible(dbgw.heap))
+         gtk_window_deiconify(GTK_WINDOW(dbgw.heap));
+-	if(GTK_WIDGET_VISIBLE(dbgw.iop))
++	if(gtk_widget_get_visible(dbgw.iop))
+         gtk_window_deiconify(GTK_WINDOW(dbgw.iop));
+ }
+ 
+@@ -122,21 +122,21 @@
+     if(options3.dbg_dock)
+ 		return;
+ 
+-    if(!GTK_WIDGET_VISIBLE(dbgw.regs))
++    if(!gtk_widget_get_visible(dbgw.regs))
+         gtk_widget_show(dbgw.regs);
+-    if(!GTK_WIDGET_VISIBLE(dbgw.bkpts))
++    if(!gtk_widget_get_visible(dbgw.bkpts))
+         gtk_widget_show(dbgw.bkpts);
+-    if(!GTK_WIDGET_VISIBLE(dbgw.mem))
++    if(!gtk_widget_get_visible(dbgw.mem))
+         gtk_widget_show(dbgw.mem);
+-    if(!GTK_WIDGET_VISIBLE(dbgw.pclog))
++    if(!gtk_widget_get_visible(dbgw.pclog))
+         gtk_widget_show(dbgw.pclog);
+-    if(!GTK_WIDGET_VISIBLE(dbgw.code) && all)
++    if(!gtk_widget_get_visible(dbgw.code) && all)
+         gtk_widget_show(dbgw.code);
+-    if(!GTK_WIDGET_VISIBLE(dbgw.stack))
++    if(!gtk_widget_get_visible(dbgw.stack))
+         gtk_widget_show(dbgw.stack);
+-	if(!GTK_WIDGET_VISIBLE(dbgw.heap))
++	if(!gtk_widget_get_visible(dbgw.heap))
+         gtk_widget_show(dbgw.heap);
+-	if(!GTK_WIDGET_VISIBLE(dbgw.iop))
++	if(!gtk_widget_get_visible(dbgw.iop))
+         gtk_widget_show(dbgw.iop);
+ }
+ 
+@@ -146,21 +146,21 @@
+     if(options3.dbg_dock)
+ 		return;
+ 
+-    if(GTK_WIDGET_VISIBLE(dbgw.regs))
++    if(gtk_widget_get_visible(dbgw.regs))
+         gtk_widget_hide(dbgw.regs);
+-    if(GTK_WIDGET_VISIBLE(dbgw.bkpts))
++    if(gtk_widget_get_visible(dbgw.bkpts))
+         gtk_widget_hide(dbgw.bkpts);
+-    if(GTK_WIDGET_VISIBLE(dbgw.mem))
++    if(gtk_widget_get_visible(dbgw.mem))
+         gtk_widget_hide(dbgw.mem);
+-    if(GTK_WIDGET_VISIBLE(dbgw.pclog))
++    if(gtk_widget_get_visible(dbgw.pclog))
+         gtk_widget_hide(dbgw.pclog);
+-    if(GTK_WIDGET_VISIBLE(dbgw.code) && all)
++    if(gtk_widget_get_visible(dbgw.code) && all)
+         gtk_widget_hide(dbgw.code);
+-    if(GTK_WIDGET_VISIBLE(dbgw.stack))
++    if(gtk_widget_get_visible(dbgw.stack))
+         gtk_widget_hide(dbgw.stack);
+-	if(GTK_WIDGET_VISIBLE(dbgw.heap))
++	if(gtk_widget_get_visible(dbgw.heap))
+         gtk_widget_hide(dbgw.heap);
+-	if(GTK_WIDGET_VISIBLE(dbgw.iop))
++	if(gtk_widget_get_visible(dbgw.iop))
+         gtk_widget_hide(dbgw.iop);
+ }
+ 
+@@ -338,7 +338,7 @@
+ 	if(!options3.dbg_dock)
+ 	{
+ 		g_signal_handlers_block_by_func(GTK_OBJECT(item), on_registers1_activate, NULL);
+-		gtk_check_menu_item_set_active(item, GTK_WIDGET_VISIBLE(dbgw.regs));
++		gtk_check_menu_item_set_active(item, gtk_widget_get_visible(dbgw.regs));
+ 		g_signal_handlers_unblock_by_func(GTK_OBJECT(item), on_registers1_activate, NULL);
+ 	}
+ 	else
+@@ -350,7 +350,7 @@
+ 	if(!options3.dbg_dock)
+ 	{
+ 		g_signal_handlers_block_by_func(GTK_OBJECT(item), on_breakpoints1_activate, NULL);
+-		gtk_check_menu_item_set_active(item, GTK_WIDGET_VISIBLE(dbgw.bkpts));
++		gtk_check_menu_item_set_active(item, gtk_widget_get_visible(dbgw.bkpts));
+ 		g_signal_handlers_unblock_by_func(GTK_OBJECT(item), on_breakpoints1_activate, NULL);
+ 	}
+ 	else
+@@ -362,7 +362,7 @@
+ 	if(!options3.dbg_dock)
+ 	{
+ 		g_signal_handlers_block_by_func(GTK_OBJECT(item), on_memory1_activate, NULL);
+-		gtk_check_menu_item_set_active(item, GTK_WIDGET_VISIBLE(dbgw.mem));
++		gtk_check_menu_item_set_active(item, gtk_widget_get_visible(dbgw.mem));
+ 		g_signal_handlers_unblock_by_func(GTK_OBJECT(item), on_memory1_activate, NULL);
+ 	}
+ 	else
+@@ -372,7 +372,7 @@
+     elt = g_list_nth(list, 3);
+     item = GTK_CHECK_MENU_ITEM(elt->data);
+     g_signal_handlers_block_by_func(GTK_OBJECT(item), on_pc_log1_activate, NULL);
+-    gtk_check_menu_item_set_active(item, GTK_WIDGET_VISIBLE(dbgw.pclog));
++    gtk_check_menu_item_set_active(item, gtk_widget_get_visible(dbgw.pclog));
+     g_signal_handlers_unblock_by_func(GTK_OBJECT(item), on_pc_log1_activate, NULL);
+ 
+     // stack
+@@ -381,7 +381,7 @@
+ 	if(!options3.dbg_dock)
+ 	{
+ 		g_signal_handlers_block_by_func(GTK_OBJECT(item), on_stack_frame1_activate, NULL);
+-		gtk_check_menu_item_set_active(item, GTK_WIDGET_VISIBLE(dbgw.stack));
++		gtk_check_menu_item_set_active(item, gtk_widget_get_visible(dbgw.stack));
+ 		g_signal_handlers_unblock_by_func(GTK_OBJECT(item), on_stack_frame1_activate, NULL);
+ 	}
+ 	else
+@@ -393,7 +393,7 @@
+ 	if(!options3.dbg_dock)
+ 	{
+ 		g_signal_handlers_block_by_func(GTK_OBJECT(item), on_heap_frame1_activate, NULL);
+-		gtk_check_menu_item_set_active(item, GTK_WIDGET_VISIBLE(dbgw.heap));
++		gtk_check_menu_item_set_active(item, gtk_widget_get_visible(dbgw.heap));
+ 		g_signal_handlers_unblock_by_func(GTK_OBJECT(item), on_heap_frame1_activate, NULL);
+ 	}
+ 	else
+@@ -403,7 +403,7 @@
+ 	elt = g_list_nth(list, 6);
+     item = GTK_CHECK_MENU_ITEM(elt->data);
+     g_signal_handlers_block_by_func(GTK_OBJECT(item), on_ioports_frame1_activate, NULL);
+-    gtk_check_menu_item_set_active(item, GTK_WIDGET_VISIBLE(dbgw.iop));
++    gtk_check_menu_item_set_active(item, gtk_widget_get_visible(dbgw.iop));
+     g_signal_handlers_unblock_by_func(GTK_OBJECT(item), on_ioports_frame1_activate, NULL);
+ 
+ 	// dock/multi mode

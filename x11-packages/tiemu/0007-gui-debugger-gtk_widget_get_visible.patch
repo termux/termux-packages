@@ -1,0 +1,50 @@
+--- a/src/gui/debugger/dbg_all.c	2009-05-08 06:56:40.000000000 -0400
++++ b/src/gui/debugger/dbg_all.c	2026-07-30 18:33:31.750347313 -0400
+@@ -90,21 +90,21 @@
+ {	
+ 	WND_TMR_START();
+ 
+-	if(options3.dbg_dock || GTK_WIDGET_VISIBLE(dbgw.regs))
++	if(options3.dbg_dock || gtk_widget_get_visible(dbgw.regs))
+ 		dbgregs_refresh_window();
+-	if(options3.dbg_dock || GTK_WIDGET_VISIBLE(dbgw.mem))
++	if(options3.dbg_dock || gtk_widget_get_visible(dbgw.mem))
+ 		dbgmem_refresh_window();
+-	if(options3.dbg_dock || GTK_WIDGET_VISIBLE(dbgw.bkpts))
++	if(options3.dbg_dock || gtk_widget_get_visible(dbgw.bkpts))
+ 		dbgbkpts_refresh_window();
+-	if(options3.dbg_dock || GTK_WIDGET_VISIBLE(dbgw.pclog))
++	if(options3.dbg_dock || gtk_widget_get_visible(dbgw.pclog))
+ 		dbgpclog_refresh_window();
+-	if(options3.dbg_dock || GTK_WIDGET_VISIBLE(dbgw.code))
++	if(options3.dbg_dock || gtk_widget_get_visible(dbgw.code))
+ 		dbgcode_refresh_window();
+-    if(options3.dbg_dock || GTK_WIDGET_VISIBLE(dbgw.stack))
++    if(options3.dbg_dock || gtk_widget_get_visible(dbgw.stack))
+ 		dbgstack_refresh_window();
+-	if(options3.dbg_dock || GTK_WIDGET_VISIBLE(dbgw.heap))
++	if(options3.dbg_dock || gtk_widget_get_visible(dbgw.heap))
+ 		dbgheap_refresh_window();
+-	if(options3.dbg_dock || GTK_WIDGET_VISIBLE(dbgw.iop))
++	if(options3.dbg_dock || gtk_widget_get_visible(dbgw.iop))
+ 		dbgiop_refresh_window();
+ 
+ 	WND_TMR_STOP("Debugger Refresh Time");
+@@ -163,7 +163,7 @@
+ 	gtk_debugger_refresh();
+ 
+ 	// enable the debugger if GDB disabled it
+-	if (!options3.dbg_dock && !GTK_WIDGET_SENSITIVE(dbgw.regs))
++	if (!options3.dbg_dock && !gtk_widget_get_sensitive(dbgw.regs))
+ 		gtk_debugger_enable();
+ 
+ 	// handle automatic debugging requests
+@@ -180,7 +180,7 @@
+ 
+ 			ti68k_bkpt_get_pgmentry_offset(id, &handle, &offset);
+ 			ti68k_bkpt_del_pgmentry(handle);
+-			if(options3.dbg_dock || GTK_WIDGET_VISIBLE(dbgw.bkpts))
++			if(options3.dbg_dock || gtk_widget_get_visible(dbgw.bkpts))
+ 				dbgbkpts_refresh_window();
+ 
+ 			delete_command(NULL, 0);

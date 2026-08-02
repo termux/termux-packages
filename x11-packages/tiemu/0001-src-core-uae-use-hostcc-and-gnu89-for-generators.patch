@@ -1,0 +1,46 @@
+--- a/src/core/uae/Makefile	2006-01-06 18:30:04.000000000 -0500
++++ b/src/core/uae/Makefile	2026-07-30 14:58:01.182347313 -0400
+@@ -6,6 +6,8 @@
+ # trying to be portable... *TRYING*
+ #CFLAGS   = -mms-bitfields
+ CPUFLAGS = $(CFLAGS) -fomit-frame-pointer -Wno-unused -Wno-format -W -Wmissing-prototypes -Wstrict-prototypes -D__inline__=inline -DSTATFS_NO_ARGS=2 -DSTATBUF_BAVAIL=f_bavail #-Wall
++HOSTCC ?= gcc
++HOSTCFLAGS ?= -std=gnu89
+ 
+ gen: cpudefs.c cpustbl.c cputbl.h cpuemu.c
+ 
+@@ -14,26 +16,26 @@
+ 
+ # For cross-compiling (generators are run on host)
+ build68k_host.o: build68k.c
+-	C_INCLUDE_PATH="" LIBRARY_PATH="" gcc -c -o $@ $?
++	C_INCLUDE_PATH="" LIBRARY_PATH="" $(HOSTCC) $(HOSTCFLAGS) -c -o $@ $?
+ gencpu_host.o: gencpu.c
+-	C_INCLUDE_PATH="" LIBRARY_PATH="" gcc -c -o $@ $?
++	C_INCLUDE_PATH="" LIBRARY_PATH="" $(HOSTCC) $(HOSTCFLAGS) -c -o $@ $?
+ readcpu_host.o: readcpu.c
+-	C_INCLUDE_PATH="" LIBRARY_PATH="" gcc -c -o $@ $?
++	C_INCLUDE_PATH="" LIBRARY_PATH="" $(HOSTCC) $(HOSTCFLAGS) -c -o $@ $?
+ cpudefs_host.o: cpudefs.c
+-	C_INCLUDE_PATH="" LIBRARY_PATH="" gcc -c -o $@ $?
++	C_INCLUDE_PATH="" LIBRARY_PATH="" $(HOSTCC) $(HOSTCFLAGS) -c -o $@ $?
+ missing_host.o: missing.c
+-	C_INCLUDE_PATH="" LIBRARY_PATH="" gcc -c -o $@ $?
++	C_INCLUDE_PATH="" LIBRARY_PATH="" $(HOSTCC) $(HOSTCFLAGS) -c -o $@ $?
+ xmalloc_host.o: xmalloc.c
+-	C_INCLUDE_PATH="" LIBRARY_PATH="" gcc -c -o $@ $?
++	C_INCLUDE_PATH="" LIBRARY_PATH="" $(HOSTCC) $(HOSTCFLAGS) -c -o $@ $?
+ 
+ # Build generators and files to generate
+ build68k: build68k_host.o
+ 	@echo "-> Compiling 68k builder..."
+-	C_INCLUDE_PATH="" LIBRARY_PATH="" gcc $(LDFLAGS) -o $@ $?
++	C_INCLUDE_PATH="" LIBRARY_PATH="" $(HOSTCC) $(HOSTCFLAGS) -o $@ $?
+ 
+ gencpu: gencpu_host.o readcpu_host.o cpudefs_host.o missing_host.o xmalloc_host.o
+ 	@echo "-> Compiling CPU generator..."
+-	C_INCLUDE_PATH="" LIBRARY_PATH="" gcc $(LDFLAGS) -o $@ gencpu_host.o readcpu_host.o cpudefs_host.o missing_host.o xmalloc_host.o
++	C_INCLUDE_PATH="" LIBRARY_PATH="" $(HOSTCC) $(HOSTCFLAGS) -o $@ gencpu_host.o readcpu_host.o cpudefs_host.o missing_host.o xmalloc_host.o
+ 
+ cpudefs.c: build68k table68k
+ 	@echo "-> Building CPU definitions..."

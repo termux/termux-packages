@@ -1,0 +1,38 @@
+--- a/src/gui/debugger/dbg_mem.c	2009-05-06 15:48:47.000000000 -0400
++++ b/src/gui/debugger/dbg_mem.c	2026-07-30 21:47:45.010347313 -0400
+@@ -435,7 +435,7 @@
+ 		gtk_window_iconify(GTK_WINDOW(dbgw.mem));
+ #endif
+ 
+-	if(!GTK_WIDGET_VISIBLE(dbgw.mem) && !options3.mem.closed)
++	if(!gtk_widget_get_visible(dbgw.mem) && !options3.mem.closed)
+ 		gtk_widget_show(dbgw.mem);
+ 
+     return dbgw.mem;
+@@ -551,7 +551,7 @@
+ 
+ 	menu = gtk_menu_new();
+ 	g_object_set_data_full(G_OBJECT(menu), "memmap_menu",
+-			       gtk_widget_ref(menu),
++			       g_object_ref(menu),
+ 			       (GDestroyNotify)g_object_unref);
+ 
+ 	// (re)load mem map
+@@ -574,7 +574,7 @@
+ 
+ 		item = gtk_menu_item_new_with_label(label);
+ 		g_object_set_data_full(G_OBJECT(menu), "c_drive",
+-					   gtk_widget_ref(item),
++					   g_object_ref(item),
+ 					   (GDestroyNotify)g_object_unref);
+ 		gtk_widget_show(item);
+ 
+@@ -605,7 +605,7 @@
+ 
+ GLADE_CB void
+ on_notebook1_switch_page               (GtkNotebook     *notebook,
+-                                        GtkNotebookPage *page,
++                                        GtkNotebookTab  *page,
+                                         guint            page_num,
+                                         gpointer         user_data)
+ {
