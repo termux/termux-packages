@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="docs/license.rst"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26.0.6"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=1d3c3b8a8363b8cc354175bb4a684ad8b035211cc1d6fa17aeb9b9623c513f89
 TERMUX_PKG_AUTO_UPDATE=true
@@ -75,7 +75,7 @@ termux_step_pre_configure() {
 	export LLVM_CONFIG="${TERMUX_PREFIX}/bin/llvm-config"
 	export PATH="${_WRAPPER_BIN}:${CARGO_HOME}/bin:${PATH}"
 
-	local _vk_drivers="swrast"
+	local _vk_drivers="swrast,virtio"
 	if [ $TERMUX_ARCH = "arm" ] || [ $TERMUX_ARCH = "aarch64" ]; then
 		_vk_drivers+=",freedreno"
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dfreedreno-kmds=msm,kgsl"
