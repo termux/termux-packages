@@ -289,7 +289,8 @@ jobs:
         echo "packages: ${packages[*]}"
 
         if [[ "${#packages[@]}" -gt 0 ]]; then
-          ./scripts/run-docker.sh -d ./build-package.sh -I -C -a "${{ matrix.target_arch }}" "${packages[@]}"
+          ./scripts/run-docker.sh -d ./build-package.sh -I -C -a "${{ matrix.target_arch }}" \
+            ${{ case(matrix.target_arch == 'aarch64', '-m', '') }} "${packages[@]}"
         fi
 
     - name: Generate build artifacts
@@ -334,6 +335,13 @@ jobs:
       with:
         name: debs-${{ matrix.target_arch }}-${{ github.sha }}
         path: ./artifacts
+    - name: Store source files
+      if: ${{ matrix.target_arch == 'aarch64' }}
+      uses: actions/upload-artifact@v6
+      with:
+        name: source
+        path: ./output/source
+        if-no-files-found: ignore
     - name: AppArmor Logs
       if: always()
       run: |
@@ -500,3 +508,15 @@ jobs:
             fi
           fi
         done
+    - name: Upload source archives to source mirror
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        [ -d "source" ] || exit 0
+        cd "source"
+        for source_file in *; do
+          mirror_name="$(../scripts/build/get_source/termux_download_source_mirror.sh --mirror-name "${source_file}")"
+          echo "Uploading ${source_file} to ${mirror_name}"
+          gh release upload --clobber "${mirror_name}" "${source_file}"
+        done
+        cd ..
