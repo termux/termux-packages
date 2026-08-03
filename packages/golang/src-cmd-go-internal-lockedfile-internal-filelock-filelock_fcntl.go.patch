@@ -1,0 +1,13 @@
+https://github.com/termux/termux-packages/issues/30831
+
+--- a/src/cmd/go/internal/lockedfile/internal/filelock/filelock_fcntl.go
++++ b/src/cmd/go/internal/lockedfile/internal/filelock/filelock_fcntl.go
+@@ -2,7 +2,7 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
+-//go:build aix || (solaris && !illumos)
++//go:build aix || (solaris && !illumos) || android
+ 
+ // This code implements the filelock API using POSIX 'fcntl' locks, which attach
+ // to an (inode, process) pair rather than a file descriptor. To avoid unlocking
