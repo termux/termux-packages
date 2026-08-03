@@ -1,0 +1,233 @@
+#!/bin/bash
+
+export TERMUX_SCRIPTDIR
+TERMUX_SCRIPTDIR=$(realpath "$(dirname "$0")/../..") # Root of repository."
+DOWNLOAD_DIR="${TERMUX_SCRIPTDIR}/source-mirror"
+
+if [[ $# != 1 ]]; then
+  echo "Usage:"
+  echo "$0 download      Download all source archives to directory ${DOWNLOAD_DIR}"
+  echo "$0 upload        Upload source archives to Github releases from directory ${DOWNLOAD_DIR}"
+  echo "$0 clean         Remove all obsolete source archives from Github releases"
+  exit 0
+fi
+
+COMMAND="$1"
+if [ "$COMMAND" != "download" ] && [ "$COMMAND" != "upload" ] && [ "$COMMAND" != "clean" ]; then
+  echo "Invalid command"
+  exit 1
+fi
+
+cd "${TERMUX_SCRIPTDIR}" || exit 1
+
+TERMUX_PKG_TMPDIR=${TERMUX_SCRIPTDIR}/tmp
+PARALLEL_DOWNLOADS=10
+
+rm -rf ${TERMUX_PKG_TMPDIR}
+mkdir -p ${TERMUX_PKG_TMPDIR}
+
+# Utility function to download a resource with an expected checksum.
+# shellcheck source=scripts/build/termux_download.sh
+source "${TERMUX_SCRIPTDIR}/scripts/build/termux_download.sh"
+
+source "${TERMUX_SCRIPTDIR}/scripts/build/get_source/termux_download_source_mirror.sh"
+
+# Some package scripts require these extra variables
+TERMUX_ARCH=aarch64
+TERMUX_PREFIX=/data/data/com.termux/files
+
+mkdir -p ${DOWNLOAD_DIR}
+if [ "$COMMAND" = "download" ]; then
+  rm -f ${DOWNLOAD_DIR}/download-failed.txt
+elif [ "$COMMAND" = "upload" ] || [ "$COMMAND" = "clean" ]; then
+  rm -f ${DOWNLOAD_DIR}/list-*.txt ${DOWNLOAD_DIR}/list-*.sha256 ${DOWNLOAD_DIR}/upload-failed.txt
+fi
+
+total_packages=$(find packages x11-packages root-packages -mindepth 1 -maxdepth 1 -type d | sort)
+no_of_total_packages=$(echo "${total_packages}" | wc -l)
+count=0
+
+command_download() {
+  if [ -f "${DOWNLOAD_DIR}/${mirror_name}/${source_file}" ]; then
+    echo "${count}/${no_of_total_packages}: Archive already downloaded: ${url}"
+    return 0
+  fi
+
+  if [[ "${url}" =~ ^git[+]https://.* ]]; then
+    rm -rf "${TERMUX_PKG_TMPDIR}/${TERMUX_PKG_NAME}"
+    mkdir -p "${TERMUX_PKG_TMPDIR}/${TERMUX_PKG_NAME}"
+    git clone \
+        --depth 1 \
+        --branch "${TERMUX_PKG_GIT_BRANCH:-v${TERMUX_PKG_VERSION#*:}}" \
+        "${url:4}" \
+        "${TERMUX_PKG_TMPDIR}/${TERMUX_PKG_NAME}/src" \
+      && git \
+        -C "${TERMUX_PKG_TMPDIR}/${TERMUX_PKG_NAME}/src" \
+        submodule update --init --recursive --depth=1 \
+      && tar --xz \
+        -f "${TERMUX_PKG_TMPDIR}/${source_file}" \
+        -C "${TERMUX_PKG_TMPDIR}/${TERMUX_PKG_NAME}/src" \
+        -c . \
+      && mv -f "${TERMUX_PKG_TMPDIR}/${source_file}" \
+        "${DOWNLOAD_DIR}/${mirror_name}/${source_file}" \
+      && rm -rf "${TERMUX_PKG_TMPDIR}/${TERMUX_PKG_NAME}" \
+      || echo "${source_file} git clone --depth=1 --branch ${TERMUX_PKG_GIT_BRANCH:-v${TERMUX_PKG_VERSION#*:}} ${url:4} src && git -C src submodule update --init --recursive --depth=1 && tar -c --xz -C src -f ${source_file} ." \
+        >> "${DOWNLOAD_DIR}/download-failed.txt" &
+  elif [ -n "${url}" ]; then
+    echo "${count}/${no_of_total_packages}: Downloading ${url}"
+    mkdir -p ${DOWNLOAD_DIR}/${mirror_name}
+    termux_download_source_mirror \
+        "${TERMUX_PKG_NAME}" \
+        "${url}" \
+        "${DOWNLOAD_DIR}/${mirror_name}/${source_file}" \
+        "${sha256}" \
+      || termux_download \
+        "${url}" \
+        "${DOWNLOAD_DIR}/${mirror_name}/${source_file}" \
+        "${sha256}" \
+      || echo "${source_file} ${url}" \
+        >> "${DOWNLOAD_DIR}/download-failed.txt" &
+  fi
+}
+
+command_upload() {
+  if [ ! -f "${DOWNLOAD_DIR}/${mirror_name}/${source_file}" ]; then
+    echo "${source_file} is not downloaded, skipping" | tee -a "${DOWNLOAD_DIR}/upload-failed.txt"
+    return
+  fi
+
+  echo "${count}/${no_of_total_packages}: ${source_file}"
+  if [ ! -e "${DOWNLOAD_DIR}/list-${mirror_name}.txt" ]; then
+    gh release view --json assets --jq '.assets[].name' ${mirror_name} > "${DOWNLOAD_DIR}/list-${mirror_name}.txt" || exit 1
+    gh release view --json assets ${mirror_name} | jq -r '.assets[] | "\(.digest)  \(.name)"' \
+      | sed 's/^sha256://g' > "${DOWNLOAD_DIR}/list-${mirror_name}.sha256" || exit 1
+  fi
+
+  # TODO: check uploaded file checksum and re-upload if it does not match
+  ACTUAL_CHECKSUM=$(sha256sum "${DOWNLOAD_DIR}/${mirror_name}/${source_file}" | cut -d' ' -f1)
+  UPLOAD_CHECKSUM=$(grep -F " ${source_file}" "${DOWNLOAD_DIR}/list-${mirror_name}.sha256" | cut -d' ' -f1)
+  if [ "$sha256" = "SKIP_CHECKSUM" ] || [[ "${url}" =~ ^git[+]https://.* ]]; then
+    echo "Checksum check skipped"
+    if [ -n "$UPLOAD_CHECKSUM" ]; then
+      echo "File is already uploaded, skipping"
+      return
+    fi
+  elif [ "$sha256" != "$ACTUAL_CHECKSUM" ]; then
+    echo "${source_file} checksum is wrong for the local file, skipping" | tee -a "${DOWNLOAD_DIR}/upload-failed.txt"
+    return
+  elif [ "$sha256" = "$UPLOAD_CHECKSUM" ]; then
+    echo "File is already uploaded and the checksum matches, skipping"
+    return
+  elif [ -n "$UPLOAD_CHECKSUM" ]; then
+    echo "${source_file} uploaded file checksum is wrong, uploading the file again"
+  fi
+
+  pushd "${DOWNLOAD_DIR}/${mirror_name}" >/dev/null
+  gh release upload --clobber "${mirror_name}" "${source_file}" \
+    || echo "${source_file} upload failed" | tee -a "${DOWNLOAD_DIR}/upload-failed.txt"
+  popd >/dev/null
+}
+
+command_clean() {
+  echo "${count}/${no_of_total_packages}: ${source_file}"
+  if [ ! -e "${DOWNLOAD_DIR}/list-${mirror_name}.txt" ]; then
+    gh release view --json assets --jq '.assets[].name' ${mirror_name} > "${DOWNLOAD_DIR}/list-${mirror_name}.txt" || exit 1
+  fi
+  grep -Fxv "${source_file}" "${DOWNLOAD_DIR}/list-${mirror_name}.txt" > "${DOWNLOAD_DIR}/list-${mirror_name}.txt.new"
+  mv -f "${DOWNLOAD_DIR}/list-${mirror_name}.txt.new" "${DOWNLOAD_DIR}/list-${mirror_name}.txt"
+}
+
+for pkg in ${total_packages}; do
+  while [ $(jobs -rp | wc -l) -ge ${PARALLEL_DOWNLOADS} ]; do
+    sleep 1
+  done
+
+  count=$(expr ${count} + 1)
+
+  unset TERMUX_PKG_SRCURL
+  unset TERMUX_PKG_GIT_BRANCH
+  unset TERMUX_PKG_VERSION
+  unset TERMUX_PKG_SHA256
+
+  source "${pkg}/build.sh"
+
+  TERMUX_PKG_NAME="$(basename ${pkg})"
+  mirror_name="$(termux_get_source_mirror_name ${TERMUX_PKG_NAME})"
+
+  if [ "${TERMUX_PKG_NAME}" = "aapt" ]; then
+    echo "aapt git archive is bigger than 2 gigabytes and cannot be uploaded to Github source mirror"
+    continue
+  elif [ "${TERMUX_PKG_NAME}" = "angle-android" ]; then
+    echo "angle-android package points to the invalid git branch and instead clones the whole repo in the custom build step"
+    continue
+  fi
+
+  # TERMUX_PKG_SRCURL is actually an archive, loop through it
+  PKG_SRCURL=(${TERMUX_PKG_SRCURL[@]})
+  PKG_SHA256=(${TERMUX_PKG_SHA256[@]})
+
+  for i in $(seq 0 $(( ${#PKG_SRCURL[@]}-1 ))); do
+    sha256="${PKG_SHA256[$i]:-SKIP_CHECKSUM}"
+    url="${PKG_SRCURL[$i]}"
+    source_file="${TERMUX_PKG_NAME}_$(basename ${url})"
+    if [[ "${url}" =~ ^git[+]https://.* ]]; then
+      source_file="${TERMUX_PKG_NAME}_${TERMUX_PKG_GIT_BRANCH:-v${TERMUX_PKG_VERSION#*:}}.tar.xz"
+    fi
+
+    if [ "$COMMAND" = "download" ]; then
+      command_download
+    elif [ "$COMMAND" = "upload" ]; then
+      command_upload
+    elif [ "$COMMAND" = "clean" ]; then
+      command_clean
+    fi
+  done
+done
+
+wait
+
+if [ "$COMMAND" = "download" ]; then
+  if [ -f "${DOWNLOAD_DIR}/download-failed.txt" ]; then
+    echo "====="
+    echo "Download failed for following packages:"
+    echo "====="
+    cat "${DOWNLOAD_DIR}/download-failed.txt"
+    echo "====="
+    echo "Please download these source archives manually using a web browser,"
+    echo "rename downloaded file as specified here, and upload to source mirror."
+    echo "====="
+  else
+    echo "====="
+    echo "All source archives are downloaded to disk"
+    echo "====="
+  fi
+elif [ "$COMMAND" = "upload" ]; then
+  if [ -f "${DOWNLOAD_DIR}/upload-failed.txt" ]; then
+    echo "====="
+    echo "Upload failed for following packages:"
+    echo "====="
+    cat "${DOWNLOAD_DIR}/upload-failed.txt"
+    echo "====="
+  else
+    echo "====="
+    echo "All source archives are uploaded to source mirror"
+    echo "====="
+  fi
+  rm -f ${DOWNLOAD_DIR}/list-*.txt ${DOWNLOAD_DIR}/list-*.sha256 ${DOWNLOAD_DIR}/upload-failed.txt
+elif [ "$COMMAND" = "clean" ]; then
+  for list_file in ${DOWNLOAD_DIR}/list-*.txt; do
+    mirror_name="$(basename ${list_file} | sed -E 's/list-(.*)[.]txt/\1/')"
+    echo "====="
+    echo "Removing outdated source archives from source mirror ${mirror_name}:"
+    cat "${list_file}" | while read source_file; do
+      echo "${source_file}"
+      gh release delete-asset -y "${mirror_name}" "${source_file}"
+    done
+  done
+  echo "====="
+  echo "Done"
+  echo "====="
+  rm -f ${DOWNLOAD_DIR}/list-*.txt ${DOWNLOAD_DIR}/list-*.sha256
+fi
+
+rm -rf ${TERMUX_PKG_TMPDIR}
