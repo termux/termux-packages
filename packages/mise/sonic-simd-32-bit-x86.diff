@@ -1,0 +1,70 @@
+From 596cd359654dd2c23273bd43508cdf3d9393f5eb Mon Sep 17 00:00:00 2001
+From: alex09x <lol@lol.lol>
+Date: Mon, 3 Aug 2026 14:35:20 -0700
+Subject: [PATCH 1/2] fix(simd): gate arch intrinsics by target_arch for 32-bit
+ x86 compatibility
+
+Fixes #228
+
+When target_feature = "sse2" is enabled on 32-bit x86 targets (e.g. i686),
+sonic-simd failed to compile because core::arch::x86_64 was imported unconditionally.
+Gating core::arch imports by target_arch allows 32-bit x86 targets to correctly
+import from core::arch::x86.
+---
+ src/avx2.rs   | 9 +++++----
+ src/avx512.rs | 9 +++++----
+ src/sse2.rs   | 9 +++++----
+ 3 files changed, 15 insertions(+), 12 deletions(-)
+
+diff --git a/src/avx2.rs b/src/avx2.rs
+index e9a8d606..924e442d 100644
+--- a/src/avx2.rs
++++ b/src/avx2.rs
+@@ -1,7 +1,8 @@
+-use core::{
+-    arch::x86_64::*,
+-    ops::{BitAnd, BitOr, BitOrAssign},
+-};
++#[cfg(target_arch = "x86")]
++use core::arch::x86::*;
++#[cfg(target_arch = "x86_64")]
++use core::arch::x86_64::*;
++use core::ops::{BitAnd, BitOr, BitOrAssign};
+ 
+ use super::{Mask, Simd};
+ 
+diff --git a/src/avx512.rs b/src/avx512.rs
+index 5d3267cc..b6d64816 100644
+--- a/src/avx512.rs
++++ b/src/avx512.rs
+@@ -1,7 +1,8 @@
+-use core::{
+-    arch::x86_64::*,
+-    ops::{BitAnd, BitOr, BitOrAssign},
+-};
++#[cfg(target_arch = "x86")]
++use core::arch::x86::*;
++#[cfg(target_arch = "x86_64")]
++use core::arch::x86_64::*;
++use core::ops::{BitAnd, BitOr, BitOrAssign};
+ 
+ use super::{Mask, Simd};
+ 
+diff --git a/src/sse2.rs b/src/sse2.rs
+index 13906cb6..9c6a2033 100644
+--- a/src/sse2.rs
++++ b/src/sse2.rs
+@@ -1,7 +1,8 @@
+-use core::{
+-    arch::x86_64::*,
+-    ops::{BitAnd, BitOr, BitOrAssign},
+-};
++#[cfg(target_arch = "x86")]
++use core::arch::x86::*;
++#[cfg(target_arch = "x86_64")]
++use core::arch::x86_64::*;
++use core::ops::{BitAnd, BitOr, BitOrAssign};
+ 
+ use super::{Mask, Simd};
+ 
+
