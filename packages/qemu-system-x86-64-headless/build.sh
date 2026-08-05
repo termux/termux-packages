@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.qemu.org
 TERMUX_PKG_DESCRIPTION="A generic and open source machine emulator and virtualizer (headless)"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1:10.2.1"
+TERMUX_PKG_VERSION="1:11.0.3"
 TERMUX_PKG_SRCURL="https://download.qemu.org/qemu-${TERMUX_PKG_VERSION:2}.tar.xz"
-TERMUX_PKG_SHA256=a3717477d8e2c84d630bfffbc20f6cd3293eb45aa1e6dac6d0cc27689991c9e1
+TERMUX_PKG_SHA256=da5fcffc32762820568b828ed430a728864d34d50b6d2f30358597760cbb0523
 TERMUX_PKG_DEPENDS="alsa-lib, dtc, glib, jack2, libbz2, libcurl, libdw, libgmp, libgnutls, libiconv, libjpeg-turbo, liblzo, libnettle, libnfs, libpixman, libpng, libslirp, libspice-server, libssh, libusb, libusbredir, ncurses, pulseaudio, qemu-common, resolv-conf, zlib, zstd"
 
 # Required by configuration script, but I can't find any binary that uses it.
@@ -13,6 +13,7 @@ TERMUX_PKG_BUILD_DEPENDS="libtasn1"
 TERMUX_PKG_CONFLICTS="qemu-system-x86_64-headless"
 TERMUX_PKG_REPLACES="qemu-system-x86_64-headless"
 TERMUX_PKG_PROVIDES="qemu-system-x86_64-headless"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
@@ -48,40 +49,26 @@ termux_step_configure() {
 	local QEMU_TARGETS=""
 
 	# System emulation.
-	if [[ "$TERMUX_ARCH_BITS" == "64" ]]; then
-		QEMU_TARGETS+="aarch64-softmmu,"
-	fi
+	QEMU_TARGETS+="aarch64-softmmu,"
 	QEMU_TARGETS+="arm-softmmu,"
 	QEMU_TARGETS+="i386-softmmu,"
 	QEMU_TARGETS+="m68k-softmmu,"
-	if [[ "$TERMUX_ARCH_BITS" == "64" ]]; then
-		QEMU_TARGETS+="ppc64-softmmu,"
-	fi
+	QEMU_TARGETS+="ppc64-softmmu,"
 	QEMU_TARGETS+="ppc-softmmu,"
 	QEMU_TARGETS+="riscv32-softmmu,"
-	if [[ "$TERMUX_ARCH_BITS" == "64" ]]; then
-		QEMU_TARGETS+="riscv64-softmmu,"
-		QEMU_TARGETS+="x86_64-softmmu,"
-	fi
+	QEMU_TARGETS+="riscv64-softmmu,"
+	QEMU_TARGETS+="x86_64-softmmu,"
 
 	# User mode emulation.
-	if [[ "$TERMUX_ARCH_BITS" == "64" ]]; then
-		QEMU_TARGETS+="aarch64-linux-user,"
-	fi
+	QEMU_TARGETS+="aarch64-linux-user,"
 	QEMU_TARGETS+="arm-linux-user,"
 	QEMU_TARGETS+="i386-linux-user,"
 	QEMU_TARGETS+="m68k-linux-user,"
-	if [[ "$TERMUX_ARCH_BITS" == "64" ]]; then
-		QEMU_TARGETS+="ppc64-linux-user,"
-	fi
+	QEMU_TARGETS+="ppc64-linux-user,"
 	QEMU_TARGETS+="ppc-linux-user,"
-	if [[ "$TERMUX_ARCH_BITS" == "64" ]]; then
-		QEMU_TARGETS+="riscv32-linux-user,"
-		QEMU_TARGETS+="riscv64-linux-user,"
-		QEMU_TARGETS+="x86_64-linux-user"
-	else
-		QEMU_TARGETS+="riscv32-linux-user"
-	fi
+	QEMU_TARGETS+="riscv32-linux-user,"
+	QEMU_TARGETS+="riscv64-linux-user,"
+	QEMU_TARGETS+="x86_64-linux-user"
 
 	CFLAGS+=" $CPPFLAGS"
 	CXXFLAGS+=" $CPPFLAGS"
