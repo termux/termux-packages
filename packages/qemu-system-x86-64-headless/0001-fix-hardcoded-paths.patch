@@ -51,7 +51,7 @@ diff -uNr qemu-8.2.5/contrib/ivshmem-server/main.c qemu-8.2.5.mod/contrib/ivshme
 diff -uNr qemu-8.2.5/hw/hppa/machine.c qemu-8.2.5.mod/hw/hppa/machine.c
 --- qemu-8.2.5/hw/hppa/machine.c	2024-06-10 20:19:05.000000000 +0300
 +++ qemu-8.2.5.mod/hw/hppa/machine.c	2024-06-12 21:43:54.585416673 +0300
-@@ -207,37 +207,37 @@ static FWCfgState *create_fw_cfg(MachineState *ms, PCIBus *pci_bus,
+@@ -219,41 +219,41 @@ static FWCfgState *create_fw_cfg(MachineState *ms, PCIBus *pci_bus,
      fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, ms->ram_size);
  
      val = cpu_to_le64(MIN_SEABIOS_HPPA_VERSION);
@@ -73,6 +73,11 @@ diff -uNr qemu-8.2.5/hw/hppa/machine.c qemu-8.2.5.mod/hw/hppa/machine.c
 -    fw_cfg_add_file(fw_cfg, "/etc/hppa/machine",
 +    fw_cfg_add_file(fw_cfg, "@TERMUX_PREFIX@/etc/hppa/machine",
                      g_memdup2(mc->name, len), len);
+ 
+     val = cpu_to_le64(hpm->memsplit_addr);
+-    fw_cfg_add_file(fw_cfg, "/etc/hppa/memsplit-addr",
++    fw_cfg_add_file(fw_cfg, "@TERMUX_PREFIX@/etc/hppa/memsplit-addr",
+                     g_memdup2(&val, sizeof(val)), sizeof(val));
  
      val = cpu_to_le64(soft_power_reg);
 -    fw_cfg_add_file(fw_cfg, "/etc/hppa/power-button-addr",
@@ -133,10 +138,10 @@ diff -uNr qemu-8.2.5/linux-user/syscall.c qemu-8.2.5.mod/linux-user/syscall.c
              snprintf(filename, sizeof(filename), "%s/qemu-open.XXXXXX", tmpdir);
              fd = mkstemp(filename);
              if (fd < 0) {
-diff -uNr qemu-8.2.5/migration/migration.c qemu-8.2.5.mod/migration/migration.c
---- qemu-8.2.5/migration/migration.c	2024-06-10 20:19:05.000000000 +0300
-+++ qemu-8.2.5.mod/migration/migration.c	2024-06-12 21:43:13.393221456 +0300
-@@ -476,7 +476,7 @@
+diff -uNr qemu-8.2.5/migration/channel.c qemu-8.2.5.mod/migration/channel.c
+--- qemu-8.2.5/migration/channel.c	2024-06-10 20:19:05.000000000 +0300
++++ qemu-8.2.5.mod/migration/channel.c	2024-06-12 21:43:13.393221456 +0300
+@@ -364,7 +364,7 @@ bool migrate_uri_parse(const char *uri, MigrationChannel **channel,
          QAPI_LIST_APPEND(tail, g_strdup(exec_get_cmd_path()));
          QAPI_LIST_APPEND(tail, g_strdup("/c"));
  #else
