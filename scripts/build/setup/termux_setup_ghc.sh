@@ -17,13 +17,13 @@ termux_setup_ghc() {
 
 		export PATH="$TERMUX_GHC_RUNTIME_FOLDER/bin:$PATH"
 
-		[[ -d "$TERMUX_GHC_RUNTIME_FOLDER" ]] && return
+		# [[ -d "$TERMUX_GHC_RUNTIME_FOLDER" ]] && return
 
 		declare -A checksums=(
-			["aarch64"]="d78271c2bdfce5658e03938277cf4250acd457c485c539fe2e6820f8f7123f4e"
-			["arm"]="811377db2ee5db548997ef91505ce6fc0ac1d406260a3d1b3edead97394de87f"
-			["i686"]="8f97ed8b8b7817ce57f7c0c87d8042e11f9461a6572df9a45778689411fd7664"
-			["x86_64"]="7a678dacce5c2ca48364ee15aabff2bec0d9982b5c7ba3d9ce215ae45d6d60c0"
+			["aarch64"]="941c2d8d8da87bba8e71d562bd6e42205cea87012cfd47cb6de939a465faa04e"
+			["arm"]="941c2d8d8da87bba8e71d562bd6e42205cea87012cfd47cb6de939a465faa04e"
+			["i686"]="c6ac25a9a8ac1578378d2c002deed122d251bc63b40bc564c173d6ca3c60476d"
+			["x86_64"]="c494ac4f4c9eb68cea4e6a474e8416da423f7cc6107f31eb8324a5652953734d"
 		)
 
 		local target="$TERMUX_HOST_PLATFORM"
