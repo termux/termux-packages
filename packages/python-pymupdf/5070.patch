@@ -1,0 +1,33 @@
+From f20fb49fb1000f69e1c222dcb595e78b061a86fc Mon Sep 17 00:00:00 2001
+From: Robin Watts <Robin.Watts@artifex.com>
+Date: Wed, 29 Jul 2026 17:33:46 +0100
+Subject: [PATCH] Update fz_find_table_within_bounds call for revised API.
+
+The MuPDF C API has changed to take a pointer to an optional
+options struct. For now we just make PyMuPDF pass NULL so it
+behaves as before.
+
+Ideally we should offer a way to parse options and pass a
+populated struct in too, but this is enough to avoid tests
+dying.
+---
+ src/extra.i | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/extra.i b/src/extra.i
+index e2f815107..dd99b24c5 100644
+--- a/src/extra.i
++++ b/src/extra.i
+@@ -3728,7 +3728,11 @@ void make_table_dict(fz_stext_page *tp, PyObject *table_dict, PyObject *bbox)
+ 
+     try
+     {
+-        block = mupdf::ll_fz_find_table_within_bounds(tp, bounds);
++#if MUPDF_VERSION_GE(1, 28, 1)
++      block = mupdf::ll_fz_find_table_within_bounds(tp, bounds, NULL);
++#else
++      block = mupdf::ll_fz_find_table_within_bounds(tp, bounds);
++#endif
+     }
+     catch (std::exception&)
+     {
