@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="The Glasgow Haskell Compiler"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.dev>"
 TERMUX_PKG_VERSION=9.12.2
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL="https://downloads.haskell.org/~ghc/$TERMUX_PKG_VERSION/ghc-$TERMUX_PKG_VERSION-src.tar.xz"
 TERMUX_PKG_SHA256=0e49cd5dde43f348c5716e5de9a5d7a0f8d68d945dc41cf75dfdefe65084f933
 TERMUX_PKG_DEPENDS="libiconv, libffi, libgmp, libandroid-posix-semaphore, libandroid-utimes, ncurses"
@@ -92,10 +92,9 @@ termux_step_make() {
 			-j"$TERMUX_PKG_MAKE_PROCESSES" \
 			--flavour="release$no_profiled_libs" --docs=none \
 			"stage1.rts.ghc.link.opts += -optl-Wl,-z,global" \
-			"stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore" \
 			"stage1.unix.cabal.configure.opts += --configure-option=ac_cv_func_futimes=yes" \
 			"stage1.unix.cabal.configure.opts += --configure-option=ac_cv_func_lutimes=yes" \
-			"stage1.unix.ghc.link.opts += -optl-landroid-utimes"
+			"stage1.unix.cabal.configure.opts += -f+android-libs"
 	)
 }
 
