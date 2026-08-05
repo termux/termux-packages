@@ -10,7 +10,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SUGGESTS="ghc, dnsutils"
 TERMUX_PKG_DEPENDS="libffi, libiconv, libgmp, zlib, libandroid-posix-semaphore, libandroid-utimes"
 TERMUX_PKG_BUILD_DEPENDS="aosp-libs"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-f-native-dns --ghc-options=-optl-landroid-posix-semaphore"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-f-native-dns"
 TERMUX_PKG_PROVIDES="cabal"
 
 termux_step_post_configure() {
