@@ -17,7 +17,7 @@ termux_setup_ghc() {
 
 		export PATH="$TERMUX_GHC_RUNTIME_FOLDER/bin:$PATH"
 
-		# [[ -d "$TERMUX_GHC_RUNTIME_FOLDER" ]] && return
+		[[ -d "$TERMUX_GHC_RUNTIME_FOLDER" ]] && return
 
 		declare -A checksums=(
 			["aarch64"]="941c2d8d8da87bba8e71d562bd6e42205cea87012cfd47cb6de939a465faa04e"
