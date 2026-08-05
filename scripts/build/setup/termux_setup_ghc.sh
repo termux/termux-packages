@@ -21,7 +21,7 @@ termux_setup_ghc() {
 
 		declare -A checksums=(
 			["aarch64"]="941c2d8d8da87bba8e71d562bd6e42205cea87012cfd47cb6de939a465faa04e"
-			["arm"]="941c2d8d8da87bba8e71d562bd6e42205cea87012cfd47cb6de939a465faa04e"
+			["arm"]="451cd4f6c32a31ae650683e4b24487fbfd5cd5a8b7220acdc948cff42c166cd0"
 			["i686"]="c6ac25a9a8ac1578378d2c002deed122d251bc63b40bc564c173d6ca3c60476d"
 			["x86_64"]="c494ac4f4c9eb68cea4e6a474e8416da423f7cc6107f31eb8324a5652953734d"
 		)
