@@ -1,9 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://garagehq.deuxfleurs.fr/
 TERMUX_PKG_DESCRIPTION="S3-compatible object store for small self-hosted geo-distributed deployments"
-TERMUX_PKG_LICENSE="AGPL-V3"
+TERMUX_PKG_LICENSE="AGPL-3.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.3.0"
-TERMUX_PKG_SRCURL=https://git.deuxfleurs.fr/Deuxfleurs/garage/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL="https://git.deuxfleurs.fr/Deuxfleurs/garage/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=b83a981677676b35400bbbaf20974c396f32da31c7c7630ce55fc3e62c0e2e01
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
