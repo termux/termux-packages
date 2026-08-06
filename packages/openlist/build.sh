@@ -1,12 +1,15 @@
 TERMUX_PKG_HOMEPAGE=https://oplist.org/
 TERMUX_PKG_DESCRIPTION="A file list program that supports multiple storage"
-TERMUX_PKG_LICENSE="AGPL-V3"
+TERMUX_PKG_LICENSE="AGPL-3.0"
 TERMUX_PKG_MAINTAINER="2096779623 <admin@utermux.dev>"
-TERMUX_PKG_VERSION="4.2.4"
-_OPENLIST_WEB_VERSION="4.2.4"
+TERMUX_PKG_VERSION=(
+	"4.2.4"
+	"4.2.4" # Web Frontend
+)
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
-	https://github.com/OpenListTeam/OpenList/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-	https://github.com/OpenListTeam/OpenList-Frontend/releases/download/v${_OPENLIST_WEB_VERSION}/openlist-frontend-dist-v${_OPENLIST_WEB_VERSION}.tar.gz
+	"https://github.com/OpenListTeam/OpenList/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.tar.gz"
+	"https://github.com/OpenListTeam/OpenList-Frontend/releases/download/v${TERMUX_PKG_VERSION[1]}/openlist-frontend-dist-v${TERMUX_PKG_VERSION[1]}.tar.gz"
 )
 TERMUX_PKG_SHA256=(
 	4ed48156664ad046dd18e1da994354ecd2791508655a9b12c493142784b46511
@@ -30,8 +33,8 @@ termux_pkg_auto_update() {
 	return
 	} >&2
 
-	if [[ "${latest_tag}" == "${TERMUX_PKG_VERSION}" ]]; then
-		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+	if [[ "${latest_tag}" == "${TERMUX_PKG_VERSION[0]}" ]]; then
+		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION[0]}'."
 		return
 	fi
 
@@ -56,7 +59,7 @@ termux_pkg_auto_update() {
 	)
 
 	sed \
-		-e "s|^_OPENLIST_WEB_VERSION=.*|_OPENLIST_WEB_VERSION=\"${latest_web_version}\"|" \
+		-e "s|^\t\".*\" # Web Frontend|\t\"${latest_web_version}\" # Web Frontend|" \
 		-e "s|^\t${TERMUX_PKG_SHA256[0]}.*|\t${sha[0]}|" \
 		-e "s|^\t${TERMUX_PKG_SHA256[1]}.*|\t${sha[1]}|" \
 		-i "${TERMUX_PKG_BUILDER_DIR}/build.sh"
@@ -77,20 +80,20 @@ termux_step_get_source() {
 	# Download and extract backend source code
 	termux_download \
 		"${TERMUX_PKG_SRCURL[0]}" \
-		"$TERMUX_PKG_CACHEDIR"/"openlist-backend-src-v${TERMUX_PKG_VERSION}.tar.gz" \
+		"$TERMUX_PKG_CACHEDIR"/"openlist-backend-src-v${TERMUX_PKG_VERSION[0]}.tar.gz" \
 		"${TERMUX_PKG_SHA256[0]}"
 	tar xf \
-		"$TERMUX_PKG_CACHEDIR"/"openlist-backend-src-v${TERMUX_PKG_VERSION}.tar.gz" \
+		"$TERMUX_PKG_CACHEDIR"/"openlist-backend-src-v${TERMUX_PKG_VERSION[0]}.tar.gz" \
 		-C "$TERMUX_PKG_SRCDIR" --strip-components=1
 
 	# Download and extract frontend dist files
 	mkdir -p "$TERMUX_PKG_SRCDIR"/public/dist
 	termux_download \
 		"${TERMUX_PKG_SRCURL[1]}" \
-		"$TERMUX_PKG_CACHEDIR"/"openlist-frontend-dist-v${_OPENLIST_WEB_VERSION}.tar.gz" \
+		"$TERMUX_PKG_CACHEDIR"/"openlist-frontend-dist-v${TERMUX_PKG_VERSION[1]}.tar.gz" \
 		"${TERMUX_PKG_SHA256[1]}"
 	tar xf \
-		"$TERMUX_PKG_CACHEDIR"/"openlist-frontend-dist-v${_OPENLIST_WEB_VERSION}.tar.gz" \
+		"$TERMUX_PKG_CACHEDIR"/"openlist-frontend-dist-v${TERMUX_PKG_VERSION[1]}.tar.gz" \
 		-C "$TERMUX_PKG_SRCDIR"/public/dist
 }
 
@@ -101,7 +104,7 @@ termux_step_make() {
 	local _builtAt=$(date +'%F %T %z')
 	local _goVersion=$(go version | sed 's/go version //')
 	local _gitAuthor="The OpenList Projects Contributors <noreply@openlist.team>"
-	local _gitCommit=$(git ls-remote https://github.com/OpenListTeam/OpenList refs/tags/v$TERMUX_PKG_VERSION | head -c 7)
+	local _gitCommit=$(git ls-remote https://github.com/OpenListTeam/OpenList "refs/tags/v${TERMUX_PKG_VERSION[0]}" | head -c 7)
 	export CGO_ENABLED=1
 
 	ldflags="\
@@ -110,8 +113,8 @@ termux_step_make() {
 	-X 'github.com/OpenListTeam/OpenList/internal/conf.GoVersion=$_goVersion' \
 	-X 'github.com/OpenListTeam/OpenList/internal/conf.GitAuthor=$_gitAuthor' \
 	-X 'github.com/OpenListTeam/OpenList/internal/conf.GitCommit=$_gitCommit' \
-	-X 'github.com/OpenListTeam/OpenList/internal/conf.Version=$TERMUX_PKG_VERSION' \
-	-X 'github.com/OpenListTeam/OpenList/internal/conf.WebVersion=$_OPENLIST_WEB_VERSION' \
+	-X 'github.com/OpenListTeam/OpenList/internal/conf.Version=${TERMUX_PKG_VERSION[0]}' \
+	-X 'github.com/OpenListTeam/OpenList/internal/conf.WebVersion=${TERMUX_PKG_VERSION[1]}' \
 	"
 	go build -o "${TERMUX_PKG_NAME}" -ldflags="$ldflags" -tags=jsoniter
 }
@@ -121,10 +124,16 @@ termux_step_make_install() {
 
 	# Provide a symlink from openliat to alist
 	ln -sfr "$TERMUX_PREFIX"/bin/openlist "$TERMUX_PREFIX"/bin/alist
+	mkdir -p "${TERMUX_PREFIX}/share/zsh/site-functions"
+	mkdir -p "${TERMUX_PREFIX}/share/fish/vendor_completions.d"
+	mkdir -p "${TERMUX_PREFIX}/share/bash-completion/completions"
 
-	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/bash-completion/completions/openlist.bash"
-	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/zsh/site-functions/_openlist"
-	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/fish/vendor_completions.d/openlist.fish"
+	# borrowed from packages/gh
+	unset GOOS GOARCH CGO_LDFLAGS
+	unset CC CXX CFLAGS CXXFLAGS LDFLAGS
+	go run . completion  zsh > "${TERMUX_PREFIX}/share/zsh/site-functions/_${TERMUX_PKG_NAME}"
+	go run . completion bash > "${TERMUX_PREFIX}/share/bash-completion/completions/${TERMUX_PKG_NAME}"
+	go run . completion fish > "${TERMUX_PREFIX}/share/fish/vendor_completions.d/${TERMUX_PKG_NAME}.fish"
 }
 
 termux_step_create_debscripts() {
@@ -137,9 +146,5 @@ termux_step_create_debscripts() {
 		echo "It may be removed in the future. Please migrate to OpenList accordingly."
 		echo "********"
 		echo
-
-		openlist completion bash > ${TERMUX_PREFIX}/share/bash-completion/completions/openlist.bash
-		openlist completion zsh > ${TERMUX_PREFIX}/share/zsh/site-functions/_openlist
-		openlist completion fish > ${TERMUX_PREFIX}/share/fish/vendor_completions.d/openlist.fish
 	EOF
 }
