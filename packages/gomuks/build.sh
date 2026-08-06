@@ -1,8 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://go.mau.fi/gomuks
 TERMUX_PKG_DESCRIPTION="A terminal Matrix client written in Go"
-TERMUX_PKG_LICENSE="AGPL-V3"
+TERMUX_PKG_LICENSE="AGPL-3.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26.07"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/gomuks/gomuks/archive/refs/tags/v0.${TERMUX_PKG_VERSION/.}.0.tar.gz"
 TERMUX_PKG_SHA256=d0e0f7844e50f1c00c54583b4fc3cbce9b353d7a7029013882a9aef0e44bf23a
 TERMUX_PKG_AUTO_UPDATE=true

@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/ArtifexSoftware/pipcl
 TERMUX_PKG_DESCRIPTION="Python packaging operations for use by python-mupdf and python-pymupdf"
-TERMUX_PKG_LICENSE="AGPL-V3"
+TERMUX_PKG_LICENSE="AGPL-3.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="12"
 TERMUX_PKG_SRCURL="https://github.com/ArtifexSoftware/pipcl/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"

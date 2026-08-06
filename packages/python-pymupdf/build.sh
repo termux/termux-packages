@@ -1,9 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/pymupdf/PyMuPDF
 TERMUX_PKG_DESCRIPTION="Python bindings for MuPDF's rendering library"
-TERMUX_PKG_LICENSE="AGPL-V3"
+TERMUX_PKG_LICENSE="AGPL-3.0-or-later"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.28.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/pymupdf/PyMuPDF/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=20920e04b48d248454b2eb6086de26c3baff55e5d66530530174a4d4e02c0410
 TERMUX_PKG_DEPENDS="freetype, gumbo-parser, harfbuzz, jbig2dec, leptonica, libc++, libjpeg-turbo, mupdf, openjpeg, python, python-mupdf, tesseract"
