@@ -5,7 +5,7 @@ diff -u -r ../byobu-5.122/usr/bin/byobu.in ./usr/bin/byobu.in
  		. "$HOME/.byoburc"
  	fi
  fi
--export BYOBU_CHARMAP=$(locale charmap)
+-export BYOBU_CHARMAP=$(locale charmap 2>/dev/null || echo)
 +export BYOBU_CHARMAP=UTF-8
  [ -r "$HOME/.byoburc" ] && . "$HOME/.byoburc"
  [ -z "${BYOBU_PREFIX}" ] && export BYOBU_PREFIX="@prefix@" || export BYOBU_PREFIX
