@@ -13,7 +13,7 @@ check_package_license() {
 
 	for license in "${pkg_licenses[@]}"; do
 		case "$license" in
-			AFL-2.1|AFL-3.0|AGPL-V3|APL-1.0|APSL-2.0);;
+			AFL-2.1|AFL-3.0|APL-1.0|APSL-2.0);;
 			Apache-1.0|Apache-1.1|Apache-2.0|Artistic-License-2.0|Attribution);;
 			BSD|"BSD 2-Clause"|"BSD 3-Clause"|"BSD New"|"BSD Simplified");;
 			BSL-1.0|Bouncy-Castle|CA-TOSL-1.1|CC0-1.0|CDDL-1.0|CDDL-1.1|CPAL-1.0|CPL-1.0);;
@@ -21,6 +21,7 @@ check_package_license() {
 			Codehaus|Copyfree|curl|Day|Day-Addendum|ECL2|EPL-1.0|EPL-2.0|EUDATAGRID);;
 			EUPL-1.1|EUPL-1.2|Eiffel-2.0|Entessa-1.0|Facebook-Platform|Fair|Frameworx-1.0);;
 			GPL-2.0|GPL-2.0-only|GPL-2.0-or-later);;
+			AGPL-3.0|AGPL-3.0-only|AGPL-3.0-or-later);;
 			GPL-3.0|GPL-3.0-only|GPL-3.0-or-later);;
 			Go|hdparm|HPND|HSQLDB|Historical|IBMPL-1.0|IJG|IPAFont-1.0);;
 			ISC|IU-Extreme-1.1.1|ImageMagick|JA-SIG|JSON|JTidy);;
