@@ -70,11 +70,11 @@ termux_step_setup_variables() {
 	TERMUX_REAL_HOST_PLATFORM="$TERMUX_HOST_PLATFORM"
 
 	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
-		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && [ ! -d "$NDK" ]; then
+		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && [ ! -d "$NDK" ] && [ ! $TERMUX_FORCE_BUILD ]; then
 			termux_error_exit "NDK ($NDK) not pointing at a directory!"
 		fi
 
-		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && ! grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION_NUM" "$NDK/source.properties"; then
+		if [ ! $TERMUX_FORCE_BUILD ] && [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && ! grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION_NUM" "$NDK/source.properties"; then
 			termux_error_exit "Wrong NDK version - we need $TERMUX_NDK_VERSION"
 		fi
 	elif [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
