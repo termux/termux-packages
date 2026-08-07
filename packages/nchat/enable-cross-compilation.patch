@@ -1,0 +1,152 @@
+diff -ur ../nchat-5.14.44/lib/tgchat/ext/td/CMakeLists.txt ./lib/tgchat/ext/td/CMakeLists.txt
+--- ../nchat-5.14.44/lib/tgchat/ext/td/CMakeLists.txt	2026-03-21 05:06:10.000000000 +0100
++++ ./lib/tgchat/ext/td/CMakeLists.txt	2026-04-25 20:21:03.303001550 +0200
+@@ -29,9 +29,7 @@
+ option(TD_INSTALL_SHARED_LIBRARIES "Enable installation of shared libraries." ON)
+ option(TD_ENABLE_JNI "Use \"ON\" to enable JNI-compatible TDLib API.")
+ option(TD_ENABLE_DOTNET "Use \"ON\" or \"CX\" to enable generation of C++/CLI or C++/CX TDLib API bindings respectively.")
+-if (NOT CMAKE_CROSSCOMPILING)
+   option(TD_GENERATE_SOURCE_FILES "Use \"ON\" to just generate TDLib source files.")
+-endif()
+ option(TD_E2E_ONLY "Use \"ON\" to build and install tde2e instead of TDLib.")
+ 
+ include(CTest)
+@@ -156,7 +154,6 @@
+ 
+ add_subdirectory(td/generate)
+ 
+-if (NOT CMAKE_CROSSCOMPILING)
+   set(TD_ALWAYS_GENERATE_SOURCE "")
+   if (TD_GENERATE_SOURCE_FILES)
+     set(TD_ALWAYS_GENERATE_SOURCE "ALL")
+@@ -165,7 +162,6 @@
+   if (TD_ENABLE_DOTNET)
+     add_dependencies(prepare_cross_compiling generate_dotnet_api)
+   endif()
+-endif()
+ 
+ if (NOT OPENSSL_FOUND OR TD_GENERATE_SOURCE_FILES)
+   if (NOT TD_GENERATE_SOURCE_FILES)
+@@ -1290,9 +1286,7 @@
+   target_link_libraries(tdapi PUBLIC ${JAVA_JVM_LIBRARY})
+ endif()
+ 
+-if (NOT CMAKE_CROSSCOMPILING)
+   add_dependencies(tdapi tl_generate_common)
+-endif()
+ 
+ add_library(tdmtproto STATIC ${TD_MTPROTO_SOURCE})
+ target_include_directories(tdmtproto PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}> $<BUILD_INTERFACE:${TL_TD_AUTO_INCLUDE_DIR}>)
+@@ -1305,9 +1299,7 @@
+     target_link_libraries(tdmtproto PRIVATE ws2_32 Mswsock Crypt32)
+   endif()
+ endif()
+-if (NOT CMAKE_CROSSCOMPILING)
+   add_dependencies(tdmtproto tl_generate_mtproto)
+-endif()
+ 
+ # tdcore - internal TDLib interface
+ if (MSVC AND TD_ENABLE_LTO)
+@@ -1331,12 +1323,10 @@
+   set(TD_CORE_PART_TARGETS)
+ endif()
+ 
+-if (NOT CMAKE_CROSSCOMPILING)
+   add_dependencies(tdcore tl_generate_common)
+   if (TD_ENABLE_JNI)
+     add_dependencies(tdcore td_generate_java_api)
+   endif()
+-endif()
+ 
+ add_library(tdclient STATIC td/telegram/Client.cpp td/telegram/Client.h td/telegram/Log.cpp td/telegram/Log.h)
+ target_include_directories(tdclient PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
+@@ -1374,16 +1364,12 @@
+ add_library(tdc STATIC EXCLUDE_FROM_ALL ${TL_C_SCHEME_SOURCE} td/telegram/td_c_client.cpp td/telegram/td_c_client.h)
+ target_include_directories(tdc PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}> $<BUILD_INTERFACE:${TL_TD_AUTO_INCLUDE_DIR}>)
+ target_link_libraries(tdc PRIVATE tdclient tdutils)
+-if (NOT CMAKE_CROSSCOMPILING)
+   add_dependencies(tdc tl_generate_c)
+-endif()
+ 
+ add_library(tdjson_private STATIC ${TL_TD_JSON_SOURCE} td/telegram/ClientJson.cpp td/telegram/ClientJson.h)
+ target_include_directories(tdjson_private PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}> $<BUILD_INTERFACE:${TL_TD_AUTO_INCLUDE_DIR}>)
+ target_link_libraries(tdjson_private PUBLIC tdclient tdutils)
+-if (NOT CMAKE_CROSSCOMPILING)
+   add_dependencies(tdjson_private tl_generate_common tl_generate_json)
+-endif()
+ 
+ set(TD_JSON_HEADERS td/telegram/td_json_client.h td/telegram/td_log.h)
+ set(TD_JSON_SOURCE td/telegram/td_json_client.cpp td/telegram/td_log.cpp)
+@@ -1411,7 +1397,6 @@
+   target_link_libraries(${TD_EMSCRIPTEN} PRIVATE tdjson_static tdactor)
+ endif()
+ 
+-if (NOT CMAKE_CROSSCOMPILING)
+   add_executable(tg_cli td/telegram/cli.cpp ${TL_TD_JSON_SOURCE})
+ 
+   if (NOT READLINE_FOUND)
+@@ -1439,7 +1424,6 @@
+   endif()
+   target_link_libraries(tg_cli PRIVATE memprof tdclient tdcore)
+   add_dependencies(tg_cli tl_generate_json)
+-endif()
+ 
+ # Exported libraries
+ add_library(TdStatic INTERFACE)
+diff -ur ../nchat-5.14.44/lib/tgchat/ext/td/td/generate/CMakeLists.txt ./lib/tgchat/ext/td/td/generate/CMakeLists.txt
+--- ../nchat-5.14.44/lib/tgchat/ext/td/td/generate/CMakeLists.txt	2026-03-21 05:06:10.000000000 +0100
++++ ./lib/tgchat/ext/td/td/generate/CMakeLists.txt	2026-04-25 20:21:03.303093470 +0200
+@@ -137,7 +137,6 @@
+   tl_json_converter.h
+ )
+ 
+-if (NOT CMAKE_CROSSCOMPILING)
+   find_program(PHP_EXECUTABLE php)
+ 
+   if ((CMAKE_SYSTEM_NAME MATCHES "FreeBSD") AND (CMAKE_SYSTEM_VERSION MATCHES "HBSD"))
+@@ -249,4 +248,3 @@
+       DEPENDS td_generate_dotnet_api tl_generate_tlo ${TD_API_TLO_FILE} ${CMAKE_CURRENT_SOURCE_DIR}/scheme/td_api.tl ${CMAKE_CURRENT_SOURCE_DIR}/DotnetTlDocumentationGenerator.php
+     )
+   endif()
+-endif()
+diff -ur ../nchat-5.14.44/lib/tgchat/ext/td/tde2e/CMakeLists.txt ./lib/tgchat/ext/td/tde2e/CMakeLists.txt
+--- ../nchat-5.14.44/lib/tgchat/ext/td/tde2e/CMakeLists.txt	2026-03-21 05:06:10.000000000 +0100
++++ ./lib/tgchat/ext/td/tde2e/CMakeLists.txt	2026-04-25 20:27:38.748630669 +0200
+@@ -67,9 +67,7 @@
+ set(TDE2E_TEST_SOURCE "${TDE2E_TEST_SOURCE}" PARENT_SCOPE)
+ 
+ add_library(tde2e STATIC ${TDE2E_SOURCE})
+-if (NOT CMAKE_CROSSCOMPILING)
+   add_dependencies(tde2e tl_generate_common)
+-endif()
+ target_link_libraries(tde2e PRIVATE tdutils ${OPENSSL_CRYPTO_LIBRARY} ${CMAKE_DL_LIBS} ${ZLIB_LIBRARIES})
+ target_include_directories(tde2e SYSTEM PRIVATE $<BUILD_INTERFACE:${OPENSSL_INCLUDE_DIR}>)
+ target_include_directories(tde2e PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..> $<BUILD_INTERFACE:${TL_TD_AUTO_INCLUDE_DIR}>)
+diff -ur ../nchat-5.14.44/lib/tgchat/ext/td/tdutils/CMakeLists.txt ./lib/tgchat/ext/td/tdutils/CMakeLists.txt
+--- ../nchat-5.14.44/lib/tgchat/ext/td/tdutils/CMakeLists.txt	2026-03-21 05:06:10.000000000 +0100
++++ ./lib/tgchat/ext/td/tdutils/CMakeLists.txt	2026-04-25 20:21:03.303149489 +0200
+@@ -353,7 +353,7 @@
+ 
+ add_library(tdutils STATIC ${TDUTILS_SOURCE})
+ 
+-if (NOT CMAKE_CROSSCOMPILING AND TDUTILS_MIME_TYPE)
++if (TDUTILS_MIME_TYPE)
+   add_dependencies(tdutils tdmime_auto)
+ endif()
+ 
+diff -ur ../nchat-5.14.44/lib/tgchat/ext/td/tdutils/generate/CMakeLists.txt ./lib/tgchat/ext/td/tdutils/generate/CMakeLists.txt
+--- ../nchat-5.14.44/lib/tgchat/ext/td/tdutils/generate/CMakeLists.txt	2026-03-21 05:06:10.000000000 +0100
++++ ./lib/tgchat/ext/td/tdutils/generate/CMakeLists.txt	2026-04-25 20:21:03.303174599 +0200
+@@ -22,7 +22,6 @@
+ 
+ add_custom_target(tdmime_auto DEPENDS ${TDMIME_SOURCE})
+ 
+-if (NOT CMAKE_CROSSCOMPILING)
+   find_program(GPERF_EXECUTABLE gperf)
+   if (NOT GPERF_EXECUTABLE)
+     message(FATAL_ERROR "Could NOT find gperf. Add path to gperf executable to PATH environment variable or specify it manually using GPERF_EXECUTABLE option, i.e. 'cmake -DGPERF_EXECUTABLE:FILEPATH=\"<path to gperf executable>\"'.")
+@@ -59,4 +58,3 @@
+     COMMAND ${EXTENSION_TO_MIME_TYPE_CMD}
+     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/auto/extension_to_mime_type.gperf
+   )
+-endif()
