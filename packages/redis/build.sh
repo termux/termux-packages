@@ -11,7 +11,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFFILES="etc/redis.conf"
 TERMUX_PKG_BREAKS="valkey"
 TERMUX_PKG_CONFLICTS="valkey"
-TERMUX_PKG_REPLACES="valkey"
 
 termux_step_pre_configure() {
 	export PREFIX=$TERMUX_PREFIX
