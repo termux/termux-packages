@@ -1,0 +1,12 @@
+--- a/third_party/minijail/system.c
++++ b/third_party/minijail/system.c
+@@ -73,7 +73,8 @@
+  * When this is detected, remove the new bits and try the prctl call again.
+  */
+ #if defined(__ANDROID__)
+-_Static_assert(SECURE_ALL_BITS == 0x555, "SECURE_ALL_BITS == 0x555.");
++// NDK r29 still ships linux/securebits.h for kernel version < 6.14
++_Static_assert(SECURE_ALL_BITS == 0x55, "SECURE_ALL_BITS == 0x55.");
+ #endif
+ 
+ #define SECURE_BITS_6_14                                                       \

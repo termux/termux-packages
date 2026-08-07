@@ -1,0 +1,42 @@
+--- a/base/src/sys/linux/android/syslog.rs
++++ b/base/src/sys/linux/android/syslog.rs
+@@ -10,6 +10,7 @@ use std::mem::size_of;
+ 
+ use android_log_sys::__android_log_is_loggable;
+ use android_log_sys::__android_log_message;
++use android_log_sys::__android_log_write;
+ use android_log_sys::__android_log_write_log_message;
+ use android_log_sys::log_id_t;
+ use android_log_sys::LogPriority;
+@@ -100,7 +101,9 @@ fn android_log(
+             message: message.as_ptr(),
+         };
+         // SAFETY: `log_message` is guaranteed to be valid for duration of the call
+-        unsafe { __android_log_write_log_message(&mut log_message) };
++        //unsafe { __android_log_write_log_message(&mut log_message) };
++        // __android_log_write_log_message is only available in Android 11+ (API 30+)
++        unsafe { __android_log_write(priority as i32, tag.as_ptr(), message.as_ptr()) };
+     }
+     Ok(())
+ }
+--- a/base/src/sys/linux/mod.rs
++++ b/base/src/sys/linux/mod.rs
+@@ -263,11 +263,18 @@ pub fn fstat<F: AsRawDescriptor>(f: &F) -> Result<libc::stat64> {
+ }
+ 
+ /// Checks whether a file is a block device fie or not.
++#[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+ pub fn is_block_file<F: AsRawDescriptor>(file: &F) -> Result<bool> {
+     let stat = fstat(file)?;
+     Ok((stat.st_mode & libc::S_IFMT) == libc::S_IFBLK)
+ }
+ 
++#[cfg(all(target_os = "android", target_pointer_width = "32"))]
++pub fn is_block_file<F: AsRawDescriptor>(file: &F) -> Result<bool> {
++    let stat = fstat(file)?;
++    Ok((stat.st_mode as u16 & libc::S_IFMT) == libc::S_IFBLK)
++}
++
+ const BLOCK_IO_TYPE: u32 = 0x12;
+ ioctl_io_nr!(BLKDISCARD, BLOCK_IO_TYPE, 119);
+ 
