@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="1.28.2"
 TERMUX_PKG_SRCURL="https://mupdf.com/downloads/archive/mupdf-${TERMUX_PKG_VERSION}-source.tar.gz"
 TERMUX_PKG_SHA256=44075a84e329db55b9bef5f342a70fd26d69e48ad1d33cb89d9664581c641156
 TERMUX_PKG_DEPENDS="brotli, freetype, gumbo-parser, harfbuzz, jbig2dec, leptonica, libandroid-shmem, libc++, libjpeg-turbo, openjpeg, tesseract, zlib"
+TERMUX_PKG_BUILD_DEPENDS="python-pipcl"
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="clang"
 # clang crash occurs if removed
 # Arch Linux also sets this
@@ -42,15 +43,6 @@ termux_step_pre_configure() {
 		echo "Applying patch: $(basename "$patch")"
 		sed -e "s%\@TERMUX_HOST_LLVM_MAJOR_VERSION\@%${TERMUX_HOST_LLVM_MAJOR_VERSION}%g" \
 			"$patch" | patch --silent -p1
-		# workaround for problem with cross-compiling using pipcl
-		local python_cross_bindir="$(dirname "$(dirname "$(command -v cross-pip)")")/cross/bin"
-		local python_config="$python_cross_bindir/python$TERMUX_PYTHON_VERSION-config"
-		# not complete implementation of python3.XX-config - only implements --includes
-		if [[ ! -f "$python_config" ]]; then
-			echo '#!/bin/bash' > "$python_config"
-			echo "echo '-I$TERMUX_PREFIX/include/python$TERMUX_PYTHON_VERSION'" > "$python_config"
-			chmod +x "$python_config"
-		fi
 	fi
 }
 

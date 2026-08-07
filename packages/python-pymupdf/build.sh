@@ -7,8 +7,8 @@ TERMUX_PKG_VERSION="1.28.0"
 TERMUX_PKG_SRCURL="https://github.com/pymupdf/PyMuPDF/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=20920e04b48d248454b2eb6086de26c3baff55e5d66530530174a4d4e02c0410
 TERMUX_PKG_DEPENDS="freetype, gumbo-parser, harfbuzz, jbig2dec, leptonica, libc++, libjpeg-turbo, mupdf, openjpeg, python, python-mupdf, tesseract"
-TERMUX_PKG_BUILD_DEPENDS="python-psutil"
-TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="libclang, swig, build, distro, installer, pipcl"
+TERMUX_PKG_BUILD_DEPENDS="python-psutil, python-pipcl"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="libclang, swig, build, distro, installer"
 TERMUX_PKG_BUILD_IN_SRC=true
 # I assume it should be synchronized with mupdf
 TERMUX_PKG_AUTO_UPDATE=false
@@ -43,18 +43,6 @@ termux_step_make() {
 	LDFLAGS+=" ${ldflags[@]}"
 
 	export LD="$CC"
-
-	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
-		# workaround for problem with cross-compiling using pipcl
-		local python_cross_bindir="$(dirname "$(dirname "$(command -v cross-pip)")")/cross/bin"
-		local python_config="$python_cross_bindir/python$TERMUX_PYTHON_VERSION-config"
-		# not complete implementation of python3.XX-config - only implements --includes
-		if [[ ! -f "$python_config" ]]; then
-			echo '#!/bin/bash' > "$python_config"
-			echo "echo '-I$TERMUX_PREFIX/include/python$TERMUX_PYTHON_VERSION'" > "$python_config"
-			chmod +x "$python_config"
-		fi
-	fi
 
 	python -m build --wheel --no-isolation
 }
