@@ -11,6 +11,7 @@ TERMUX_PKG_DEPENDS="libffi, libiconv, libgmp, zlib, ncurses, asciinema"
 TERMUX_PKG_BUILD_DEPENDS="aosp-libs"
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-c entropy+donotgetentropy"
 
 termux_step_post_configure() {
 	cabal get splitmix-0.1.3.2
@@ -24,16 +25,7 @@ termux_step_post_configure() {
 	mv entropy{-*,}
 	sed -i -E 's|(build-type:\s*)Custom|\1Simple|' entropy/entropy.cabal
 
-	cat <<-EOF >>cabal.project.local
-		packages: splitmix entropy
-
-		package splitmix
-			benchmarks: False
-			tests: False
-
-		package entropy
-			flags: +donotgetentropy
-	EOF
+	echo "packages: splitmix entropy" >>cabal.project.local
 
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == false ]]; then # We do not need iserv for on device builds.
 		termux_setup_ghc_iserv

@@ -22,13 +22,7 @@ termux_step_post_configure() {
 		patch --silent -p1 -d splitmix <"$f"
 	done
 
-	cat <<-EOF >>cabal.project.local
-		packages: splitmix
-
-		package splitmix
-			benchmarks: False
-			tests: False
-	EOF
+	echo "packages: splitmix" >>cabal.project.local
 
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == false ]]; then # We do not need iserv for on device builds.
 		termux_setup_ghc_iserv
@@ -41,7 +35,7 @@ termux_step_post_configure() {
 	if [[ "$TERMUX_ARCH" == "arm" ]]; then
 		cat <<-EOF >>cabal.project.local
 			package atomic-counter
-			  flags: +no-cmm
+			    flags: +no-cmm
 		EOF
 	fi
 }

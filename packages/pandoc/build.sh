@@ -26,13 +26,7 @@ termux_step_post_configure() {
 		patch --silent -p1 -d splitmix <"$f"
 	done
 
-	cat <<-EOF >>cabal.project.local
-		packages: splitmix
-
-		package splitmix
-			benchmarks: False
-			tests: False
-	EOF
+	echo "packages: splitmix" >>cabal.project.local
 
 	cabal get xml-conduit-1.10.1.0 # NOTE: Confirm version before updating.
 	mv xml-conduit{-1.10.1.0,}
