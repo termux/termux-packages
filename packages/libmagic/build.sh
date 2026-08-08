@@ -1,14 +1,12 @@
 TERMUX_PKG_HOMEPAGE=https://darwinsys.com/file/
-TERMUX_PKG_DESCRIPTION="Command-line tool that tells you in words what kind of data a file contains"
+TERMUX_PKG_DESCRIPTION="File type identification library"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.48"
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://astron.com/pub/file/file-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SRCURL="https://astron.com/pub/file/file-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=ed14656883b23a364b4057c05595d93252da9bc473d30106519519d0da141283
 TERMUX_PKG_DEPENDS="zlib"
-TERMUX_PKG_BREAKS="file-dev"
-TERMUX_PKG_REPLACES="file-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_mmap_fixed_mapped=yes
 --disable-landlock
@@ -16,4 +14,4 @@ ac_cv_func_mmap_fixed_mapped=yes
 TERMUX_PKG_EXTRA_MAKE_ARGS="FILE_COMPILE=$TERMUX_PKG_HOSTBUILD_DIR/src/file"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_GROUPS="base-devel"
+TERMUX_PKG_REPOLOGY_METADATA_NAME="file"
