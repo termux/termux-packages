@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26.6"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://software-lab.de/picoLisp-${TERMUX_PKG_VERSION}.tgz
 TERMUX_PKG_SHA256=2642d28908fa7a69d8bf49519396df85f922781d1c41d8eaceca77bb457ab712
 TERMUX_PKG_AUTO_UPDATE=true
@@ -19,7 +20,7 @@ termux_step_make() {
 	$CC -O3 -c -emit-llvm base.ll
 	$CC -O3 -w -c -D_OS="\"Android\"" -D_CPU="\"$TERMUX_ARCH\"" `$PKGCONFIG --cflags libffi` -emit-llvm lib.c
 	mkdir -p ../bin ../lib
-	$CC $CFLAGS $LDFLAGS base.bc lib.bc -o ../bin/picolisp -rdynamic -lutil -lm -ldl -lreadline -lffi
+	$CC $CFLAGS $LDFLAGS base.bc lib.bc -o ../bin/picolisp -rdynamic -lutil -Wl,--no-as-needed,-lm,--as-needed -ldl -lreadline -lffi
 	$STRIP ../bin/picolisp
 
 	$CC -O3 -c -emit-llvm ext.ll
