@@ -1,3 +1,5 @@
+#include "platform-ns.h"
+
 #include <dlfcn.h>
 #include <stdio.h>
 
@@ -87,8 +89,8 @@ static struct {
 
 __attribute__((constructor)) static void init() {
     // simulate LD_PRELOAD=/system/lib64/libskcodec.so
-    void *skcodec_handle = dlopen(SKCODEC, RTLD_GLOBAL); // ignore errors, we only need to upload it to global namespace
-    void* handle = dlopen(LIB, RTLD_LOCAL);
+    void *skcodec_handle = platform_dlopen(SKCODEC, RTLD_GLOBAL); // ignore errors, we only need to upload it to global namespace
+    void* handle = platform_dlopen(LIB, RTLD_LOCAL);
     if (skcodec_handle)
         dlclose(skcodec_handle); // if the library is needed by any of libOpenSLES dependencies it will not be unloaded
 
