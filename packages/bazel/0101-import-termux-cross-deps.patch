@@ -1,0 +1,32 @@
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -479,3 +479,29 @@
+         "patch -p1 -i termux-patches/rules_cc.patch",
+     ]
+ )
++
++new_local_repository_ = use_repo_rule("@bazel_tools//tools/build_defs/repo:local.bzl", "new_local_repository")
++
++new_local_repository_(
++    name = "termux-prefix",
++    path = "@TERMUX_PREFIX@",
++    build_file_content = """
++package(default_visibility = ["//visibility:public"])
++filegroup(
++    name = "prefix",
++    srcs = glob(["**"])
++)
++"""
++)
++
++new_local_repository_(
++    name = "termux-toolchain",
++    path = "@TERMUX_PREFIX@/tmp/custom-toolchain",
++    build_file_content = """
++package(default_visibility = ["//visibility:public"])
++filegroup(
++    name = "toolchain",
++    srcs = glob(["**"])
++)
++"""
++)
