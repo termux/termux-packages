@@ -45,8 +45,8 @@ termux_step_post_get_source() {
 
 # shellcheck disable=SC2031
 termux_step_pre_configure() {
-    # Adapted code from pulseaudio package 
-ap	if [ $TERMUX_PKG_API_LEVEL -lt 26 ]; then
+    # Adapted code from pulseaudio package
+	if [ $TERMUX_PKG_API_LEVEL -lt 26 ]; then
 		local _libdir="$TERMUX_PKG_TMPDIR/libaaudio"
 		rm -rf "${_libdir}"
 		mkdir -p "${_libdir}"
