@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE="https://pwmt.org/projects/zathura-djvu/"
+TERMUX_PKG_DESCRIPTION="DjVu support for zathura"
+TERMUX_PKG_LICENSE="ZLIB"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="2026.07.18"
+TERMUX_PKG_SRCURL="https://github.com/pwmt/zathura-djvu/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=f28d5cdeba17f84c6b60d37a642fff1889033207c5757d79ef7e00d519122329
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_DEPENDS="djvulibre, girara, glib, libcairo, poppler, zathura"
