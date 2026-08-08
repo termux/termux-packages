@@ -1,47 +1,112 @@
 TERMUX_PKG_HOMEPAGE=https://www.lua.org/
-TERMUX_PKG_DESCRIPTION="Shared library for the Lua interpreter (v5.5.x)"
+TERMUX_PKG_DESCRIPTION="Lua scripting language 5.5.x"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=5.5.0
-TERMUX_PKG_REVISION=3
-TERMUX_PKG_SRCURL=https://www.lua.org/ftp/lua-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=57ccc32bbbd005cab75bcc52444052535af691789dba2b9016d5c50640d68b3d
-TERMUX_PKG_EXTRA_MAKE_ARGS=linux
+TERMUX_PKG_VERSION=5.5.1
+TERMUX_PKG_SRCURL="https://www.lua.org/ftp/lua-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=1c4b4068d67061f2a2231ad2b5422e77acea1487ea9890f6320af614f4373dce
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_BREAKS="liblua-dev, liblua55"
 TERMUX_PKG_REPLACES="liblua-dev, liblua55"
 TERMUX_PKG_BUILD_DEPENDS="readline"
 
-termux_step_configure() {
-	sed -e "s/%VER%/${TERMUX_PKG_VERSION%.*}/g;s/%REL%/${TERMUX_PKG_VERSION}/g" \
-		-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" \
-		"$TERMUX_PKG_BUILDER_DIR"/lua.pc.in > lua.pc
-}
-
 termux_step_pre_configure() {
 	OLDAR="$AR"
 	AR+=" rcu"
-	CFLAGS+=" -fPIC"
-	export MYLDFLAGS=$LDFLAGS
+
+	# Make a copy of the source tree to build liblua++ from
+	cp -vrf \
+		"${TERMUX_PKG_SRCDIR}" \
+		"${TERMUX_PKG_TMPDIR}/lua++-${TERMUX_PKG_VERSION}"
+}
+
+termux_step_configure() {
+	# Prepare pkgconfig files
+	sed -e "s|%VER%|${TERMUX_PKG_VERSION%.*}|g" \
+		-e "s|%REL%|${TERMUX_PKG_VERSION}|g" \
+		-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" \
+		"$TERMUX_PKG_BUILDER_DIR/lua.pc.in" \
+		> lua.pc
+
+	sed -e "s|%VER%|${TERMUX_PKG_VERSION%.*}|g" \
+		-e "s|%REL%|${TERMUX_PKG_VERSION}|g" \
+		-e "s|-llua|-llua++|g" \
+		-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" \
+		"$TERMUX_PKG_BUILDER_DIR/lua.pc.in" \
+		> "${TERMUX_PKG_TMPDIR}/lua++-${TERMUX_PKG_VERSION}/lua++.pc"
+}
+
+termux_step_make() {
+	local LUA_VERSION="${TERMUX_PKG_VERSION%.*}"
+
+	# Build Lua 5.5
+	make -j "$TERMUX_PKG_MAKE_PROCESSES" \
+		MYCFLAGS="$CFLAGS -fPIC" \
+		MYLDFLAGS="$LDFLAGS" \
+		LUA_A="liblua${LUA_VERSION}.a"\
+		LUA_SO="liblua${LUA_VERSION}.so"\
+		linux-readline
+
+	# Build liblua++
+	cd "${TERMUX_PKG_TMPDIR}/lua++-${TERMUX_PKG_VERSION}" && \
+	make -j "$TERMUX_PKG_MAKE_PROCESSES" \
+		CC="$CXX" \
+		MYCFLAGS="$CXXFLAGS -fPIC" \
+		MYLDFLAGS="$LDFLAGS" \
+		LUA_A="liblua++${LUA_VERSION}.a" \
+		LUA_SO="liblua++${LUA_VERSION}.so" \
+		linux-readline
 }
 
 termux_step_make_install() {
+	local LUA_VERSION="${TERMUX_PKG_VERSION%.*}"
+
+	# Install Lua 5.5
 	make \
-		TO_BIN="lua5.5 luac5.5" \
-		TO_LIB="liblua5.5.so liblua5.5.so.5.5 liblua5.5.so.${TERMUX_PKG_VERSION} liblua5.5.a" \
+		TO_BIN="lua${LUA_VERSION} luac${LUA_VERSION}" \
+		TO_LIB="liblua${LUA_VERSION}.so liblua${LUA_VERSION}.so.${LUA_VERSION} liblua${LUA_VERSION}.so.${TERMUX_PKG_VERSION} liblua${LUA_VERSION}.a" \
 		INSTALL_DATA="cp -d" \
 		INSTALL_TOP="$TERMUX_PREFIX" \
-		INSTALL_INC="$TERMUX_PREFIX/include/lua5.5" \
+		INSTALL_INC="$TERMUX_PREFIX/include/lua${LUA_VERSION}" \
 		INSTALL_MAN="$TERMUX_PREFIX/share/man/man1" \
 		install
-	install -Dm600 lua.pc "$TERMUX_PREFIX"/lib/pkgconfig/lua55.pc
-	ln -sf lua55.pc "$TERMUX_PREFIX"/lib/pkgconfig/lua5.5.pc
-	ln -sf lua55.pc "$TERMUX_PREFIX"/lib/pkgconfig/lua-5.5.pc
+
+	# Install and symlink pkgconfig files.
+	install -vDm600 lua.pc "$TERMUX_PREFIX/lib/pkgconfig/lua${LUA_VERSION/.}.pc"
+	ln -vsf "lua${LUA_VERSION/.}.pc" "$TERMUX_PREFIX/lib/pkgconfig/lua${LUA_VERSION}.pc"
+	ln -vsf "lua${LUA_VERSION/.}.pc" "$TERMUX_PREFIX/lib/pkgconfig/lua-${LUA_VERSION}.pc"
+
+	# Same for liblua++
+	cd "${TERMUX_PKG_TMPDIR}/lua++-${TERMUX_PKG_VERSION}" && \
+	make \
+		TO_BIN="lua${LUA_VERSION} luac${LUA_VERSION}" \
+		TO_LIB="liblua++${LUA_VERSION}.so liblua++${LUA_VERSION}.so.${LUA_VERSION} liblua++${LUA_VERSION}.so.${TERMUX_PKG_VERSION} liblua++${LUA_VERSION}.a" \
+		INSTALL_DATA='cp -d' \
+		INSTALL_BIN="null" \
+		INSTALL_INC="null" \
+		INSTALL_MAN="../null" \
+		install
+
+	# Install and symlink liblua++ pkgconfig files.
+	install -vDm600 lua++.pc "$TERMUX_PREFIX/lib/pkgconfig/lua++${LUA_VERSION/.}.pc"
+	ln -vsf "lua++${LUA_VERSION/.}.pc" "$TERMUX_PREFIX/lib/pkgconfig/lua++.pc"
+	ln -vsf "lua++${LUA_VERSION/.}.pc" "$TERMUX_PREFIX/lib/pkgconfig/lua++${LUA_VERSION}.pc"
+	ln -vsf "lua++${LUA_VERSION/.}.pc" "$TERMUX_PREFIX/lib/pkgconfig/lua++-${LUA_VERSION}.pc"
 }
 
 termux_step_post_make_install() {
-	cd "$TERMUX_PREFIX"/share/man/man1
-	mv -f lua.1 lua5.5.1
-	mv -f luac.1 luac5.5.1
+	local LUA_VERSION="${TERMUX_PKG_VERSION%.*}"
+	# Rename man pages to lua{,c}${LUA_VERSION}.
+	# The general `man 1 lua`/`man 1 luac` are provided
+	# via the alternatives system to match
+	# the version providing `$TERMUX_PREFIX/bin/lua`
+	mv -f \
+		"$TERMUX_PREFIX/share/man/man1/lua.1" \
+		"$TERMUX_PREFIX/share/man/man1/lua${LUA_VERSION}.1"
+
+	mv -f \
+		"$TERMUX_PREFIX/share/man/man1/luac.1" \
+		"$TERMUX_PREFIX/share/man/man1/luac${LUA_VERSION}.1"
+
 	export AR="$OLDAR"
 }
