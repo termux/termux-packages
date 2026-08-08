@@ -1,0 +1,41 @@
+From 8951ccb530f1db44300ab43a440f1f26c38cf906 Mon Sep 17 00:00:00 2001
+From: lumaparallax <257510328+lumaparallax@users.noreply.github.com>
+Date: Mon, 20 Apr 2026 20:52:34 +0900
+Subject: [PATCH 5/9] egl-saftey-checks
+
+---
+ libobs-opengl/gl-x11-egl.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/libobs-opengl/gl-x11-egl.c b/libobs-opengl/gl-x11-egl.c
+index a8d1d5d12..4e2bc14f0 100644
+--- a/libobs-opengl/gl-x11-egl.c
++++ b/libobs-opengl/gl-x11-egl.c
+@@ -419,7 +419,7 @@ static bool gl_x11_egl_platform_init_swapchain(struct gs_swap_chain *swap)
+ 		goto fail_window_surface;
+ 	}
+ 
+-	const EGLSurface surface = eglCreateWindowSurface(plat->edisplay, plat->config, wid, 0);
++	const EGLSurface surface = eglCreateWindowSurface(plat->edisplay, plat->config, (EGLNativeWindowType)(uintptr_t)wid, 0);
+ 	if (EGL_NO_SURFACE == surface) {
+ 		blog(LOG_ERROR, "Cannot get window EGL surface: %s", get_egl_error_string());
+ 		goto fail_window_surface;
+@@ -517,6 +517,15 @@ static void gl_x11_egl_device_load_swapchain(gs_device_t *device, gs_swapchain_t
+ 
+ static void gl_x11_egl_device_present(gs_device_t *device)
+ {
++	// Ensure the device, platform, swapchain and window info pointer exist
++	if (!device || !device->plat || !device->cur_swap || !device->cur_swap->wi)
++		return;
++	// Ensure the swapchain actually has a valid EGL surface initialized
++	if (device->cur_swap->wi->surface == EGL_NO_SURFACE)
++		return;
++	//  Ensure the current thread's draw surface matches the swapchain's surface
++	if (eglGetCurrentSurface(EGL_DRAW) != device->cur_swap->wi->surface)
++		return;
+ 	Display *display = device->plat->xdisplay;
+ 
+ 	xcb_connection_t *xcb_conn = XGetXCBConnection(display);
+-- 
+2.54.0
+
