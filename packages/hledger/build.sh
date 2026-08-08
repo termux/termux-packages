@@ -10,13 +10,14 @@ TERMUX_PKG_DEPENDS="asciinema, libffi, libgmp, libiconv, ncurses, zlib"
 TERMUX_PKG_BUILD_DEPENDS="aosp-libs"
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686" # upstream doesn't support 32bit
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-c entropy+donotgetentropy"
 
 termux_step_post_configure() {
 	cabal get splitmix-0.1.3.1
 	mv splitmix{-*,}
 
 	for f in "$TERMUX_PKG_BUILDER_DIR"/splitmix-patches/*.patch; do
-		patch --silent -p1 -d splitmix < "$f"
+		patch --silent -p1 -d splitmix <"$f"
 	done
 
 	cabal get entropy-0.4.1.11
@@ -25,13 +26,6 @@ termux_step_post_configure() {
 
 	cat <<-EOF >>cabal.project.local
 		packages: splitmix entropy
-
-		package splitmix
-			benchmarks: False
-			tests: False
-
-		package entropy
-			flags: +donotgetentropy
 	EOF
 
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == false ]]; then # We do not need iserv for on device builds.
