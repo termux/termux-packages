@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://github.com/OpenNMT/CTranslate2
 TERMUX_PKG_DESCRIPTION="A fast inference engine for Transformer models"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=4.8.1
+TERMUX_PKG_VERSION="4.8.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/OpenNMT/CTranslate2
-TERMUX_PKG_GIT_BRANCH=v${TERMUX_PKG_VERSION}
 TERMUX_PKG_DEPENDS="libandroid-posix-semaphore, libopenblas, libc++, python"
-TERMUX_PKG_BUILD_DEPENDS="half"
+TERMUX_PKG_BUILD_DEPENDS="half, nlohmann-json"
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="build, 'pybind11==2.11.1'"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -22,6 +22,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_pre_configure() {
 	export CXXFLAGS+=" -I${TERMUX_PREFIX}/include/openblas -D_GNU_SOURCE"
 	export LDFLAGS+=" -lc++_shared -landroid-posix-semaphore"
+
+	# unvendor
+	rm -rf include/{nlohmann,half_float}
 }
 
 termux_step_post_make_install() {
