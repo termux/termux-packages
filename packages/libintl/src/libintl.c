@@ -98,6 +98,14 @@ char *dgettext(const char *domainname, const char *msgid) {
 
     int fd = open(mo_path, O_RDONLY);
     if (fd < 0) {
+        char *underscore = strchr(lang, '_');
+        if (underscore) {
+            *underscore = '\0';
+            snprintf(mo_path, sizeof(mo_path), "%s/%s/LC_MESSAGES/%s.mo", base_dir, lang, domainname);
+            fd = open(mo_path, O_RDONLY);
+        }
+    }
+    if (fd < 0) {
         char short_lang[8];
         strncpy(short_lang, lang, sizeof(short_lang) - 1);
         short_lang[sizeof(short_lang) - 1] = '\0';
@@ -224,3 +232,13 @@ const char *g_dpgettext2(const char *domainname, const char *msgctxt, const char
     free(buf);
     return res;
 }
+
+char *libintl_gettext(const char *msgid) { return gettext(msgid); }
+char *libintl_dgettext(const char *domainname, const char *msgid) { return dgettext(domainname, msgid); }
+char *libintl_dcgettext(const char *domainname, const char *msgid, int category) { return dcgettext(domainname, msgid, category); }
+char *libintl_ngettext(const char *msgid1, const char *msgid2, unsigned long int n) { return ngettext(msgid1, msgid2, n); }
+char *libintl_dngettext(const char *domainname, const char *msgid1, const char *msgid2, unsigned long int n) { return dngettext(domainname, msgid1, msgid2, n); }
+char *libintl_dcngettext(const char *domainname, const char *msgid1, const char *msgid2, unsigned long int n, int category) { return dcngettext(domainname, msgid1, msgid2, n, category); }
+char *libintl_textdomain(const char *domainname) { return textdomain(domainname); }
+char *libintl_bindtextdomain(const char *domainname, const char *dirname) { return bindtextdomain(domainname, dirname); }
+char *libintl_bind_textdomain_codeset(const char *domainname, const char *codeset) { return bind_textdomain_codeset(domainname, codeset); }

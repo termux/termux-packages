@@ -17,6 +17,16 @@ char *textdomain(const char *domainname);
 char *bindtextdomain(const char *domainname, const char *dirname);
 char *bind_textdomain_codeset(const char *domainname, const char *codeset);
 
+char *libintl_gettext(const char *msgid);
+char *libintl_dgettext(const char *domainname, const char *msgid);
+char *libintl_dcgettext(const char *domainname, const char *msgid, int category);
+char *libintl_ngettext(const char *msgid1, const char *msgid2, unsigned long int n);
+char *libintl_dngettext(const char *domainname, const char *msgid1, const char *msgid2, unsigned long int n);
+char *libintl_dcngettext(const char *domainname, const char *msgid1, const char *msgid2, unsigned long int n, int category);
+char *libintl_textdomain(const char *domainname);
+char *libintl_bindtextdomain(const char *domainname, const char *dirname);
+char *libintl_bind_textdomain_codeset(const char *domainname, const char *codeset);
+
 #ifdef __cplusplus
 }
 #endif
