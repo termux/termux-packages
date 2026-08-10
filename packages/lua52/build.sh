@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Lua scripting language 5.2.x"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.2.4
-TERMUX_PKG_REVISION=18
+TERMUX_PKG_REVISION=19
 TERMUX_PKG_SRCURL="https://www.lua.org/ftp/lua-$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=b9e2e4aad6789b3b63a056d442f7b39f0ecfca3ae0f1fc0ae4e9614401b69f4b
 TERMUX_PKG_BREAKS="liblua52-dev, liblua52"
@@ -41,8 +41,9 @@ termux_step_make() {
 	local LUA_VERSION="${TERMUX_PKG_VERSION%.*}"
 
 	# Build Lua 5.2
+	# -DLUA_COMPAT_ALL is necessary for `vlc-qt`.
 	make -j "$TERMUX_PKG_MAKE_PROCESSES" \
-		MYCFLAGS="$CFLAGS -fPIC" \
+		MYCFLAGS="$CFLAGS -DLUA_COMPAT_ALL -fPIC" \
 		MYLDFLAGS="$LDFLAGS" \
 		LUA_A="liblua${LUA_VERSION}.a"\
 		LUA_SO="liblua${LUA_VERSION}.so"\
@@ -52,7 +53,7 @@ termux_step_make() {
 	cd "${TERMUX_PKG_TMPDIR}/lua++-${TERMUX_PKG_VERSION}" && \
 	make -j "$TERMUX_PKG_MAKE_PROCESSES" \
 		CC="$CXX" \
-		MYCFLAGS="$CXXFLAGS -fPIC" \
+		MYCFLAGS="$CXXFLAGS -DLUA_COMPAT_ALL -fPIC" \
 		MYLDFLAGS="$LDFLAGS" \
 		LUA_A="liblua++${LUA_VERSION}.a" \
 		LUA_SO="liblua++${LUA_VERSION}.so" \
