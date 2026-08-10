@@ -1,0 +1,37 @@
+diff -uNr bash-5.2/examples/loadables/getconf.c bash-5.2.mod/examples/loadables/getconf.c
+--- bash-5.2/examples/loadables/getconf.c	2021-12-03 16:46:22.000000000 +0000
++++ bash-5.2.mod/examples/loadables/getconf.c	2022-10-06 20:53:54.002071000 +0100
+@@ -489,8 +489,10 @@
+     { "POSIX2_UPE", _SC_2_UPE, SYSCONF },
+     { "POSIX2_VERSION", _SC_2_VERSION, SYSCONF },
+ 
++#ifdef _CS_PATH
+     { "PATH", _CS_PATH, CONFSTR },
+     { "CS_PATH", _CS_PATH, CONFSTR },
++#endif
+ 
+     /* LFS */
+ #ifdef _CS_LFS_CFLAGS
+@@ -1072,6 +1074,7 @@
+ 	printf ("%ld\n", value);
+       return (EXECUTION_SUCCESS);
+ 
++#ifndef __ANDROID__
+     case CONFSTR:
+       errno = 0;
+       clen = confstr (cn, (char *) NULL, 0);
+@@ -1092,10 +1095,14 @@
+ 	printf ("%.*s\n", (int) clen, cvalue);
+       free (cvalue);
+       return (EXECUTION_SUCCESS);
++#endif
+ 
+     case CONSTANT:
+       return (getconf_internal (c, all));
+ 
++#ifdef __ANDROID__
++    case CONFSTR:
++#endif
+     case UNDEFINED:
+       builtin_error ("%s: undefined", c->name);
+       return (EXECUTION_FAILURE);

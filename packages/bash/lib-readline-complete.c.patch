@@ -1,0 +1,13 @@
+diff --git a/lib/readline/complete.c b/lib/readline/complete.c
+index 9abdedef..b781de2d 100644
+--- a/lib/readline/complete.c
++++ b/lib/readline/complete.c
+@@ -2376,7 +2376,7 @@ rl_completion_matches (const char *text, rl_compentry_func_t *entry_function)
+ char *
+ rl_username_completion_function (const char *text, int state)
+ {
+-#if defined (_WIN32) || defined (__OPENNT) || !defined (HAVE_GETPWENT)
++#if defined (_WIN32) || defined (__OPENNT) || !defined (HAVE_GETPWENT) || defined (__ANDROID__)
+   return (char *)NULL;
+ #else /* !_WIN32 && !__OPENNT) && HAVE_GETPWENT */
+   static char *username = (char *)NULL;
