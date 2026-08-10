@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Lua scripting language 5.3.x"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.3.6
-TERMUX_PKG_REVISION=8
+TERMUX_PKG_REVISION=9
 TERMUX_PKG_SRCURL="https://www.lua.org/ftp/lua-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=fc5fd69bb8736323f026672b1b7235da613d7177e72558893a0bdcd320466d60
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -90,7 +90,6 @@ termux_step_make_install() {
 
 	# Install and symlink liblua++ pkgconfig files.
 	install -vDm600 lua++.pc "$TERMUX_PREFIX/lib/pkgconfig/lua++${LUA_VERSION/.}.pc"
-	ln -vsf "lua++${LUA_VERSION/.}.pc" "$TERMUX_PREFIX/lib/pkgconfig/lua++.pc"
 	ln -vsf "lua++${LUA_VERSION/.}.pc" "$TERMUX_PREFIX/lib/pkgconfig/lua++${LUA_VERSION}.pc"
 	ln -vsf "lua++${LUA_VERSION/.}.pc" "$TERMUX_PREFIX/lib/pkgconfig/lua++-${LUA_VERSION}.pc"
 }
