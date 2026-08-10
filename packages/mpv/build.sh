@@ -37,7 +37,10 @@ termux_step_post_get_source() {
 	# Version guard
 	local ver_m ver_x
 	ver_m="${TERMUX_PKG_VERSION#*:}"
-	ver_x="$(. "$TERMUX_SCRIPTDIR/x11-packages/mpv-x/build.sh"; echo "${TERMUX_PKG_VERSION#*:}")"
+	ver_x="$(
+		. "$TERMUX_SCRIPTDIR/x11-packages/mpv-x/build.sh"
+		echo "${TERMUX_PKG_VERSION#*:}"
+	)"
 	if [[ "${ver_m}" != "${ver_x}" ]]; then
 		termux_error_exit "Version mismatch between mpv and mpv-x."
 	fi
@@ -45,6 +48,16 @@ termux_step_post_get_source() {
 
 # shellcheck disable=SC2031
 termux_step_pre_configure() {
+	# Adapted code from pulseaudio package
+	if [ $TERMUX_PKG_API_LEVEL -lt 26 ]; then
+		local _libdir="$TERMUX_PKG_TMPDIR/libaaudio"
+		rm -rf "${_libdir}"
+		mkdir -p "${_libdir}"
+		cp "$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/26/libaaudio.so" \
+			"${_libdir}"
+		LDFLAGS+=" -L${_libdir}"
+		sed -i "s/aaudio_opt = get_option('aaudio').require(features\['android'\])/aaudio_opt = get_option('aaudio')/" "${TERMUX_PKG_SRCDIR}/meson.build"
+	fi
 	LDFLAGS+=" -landroid-glob"
 	sed -i "s/host_machine.system() == 'android'/false/" "${TERMUX_PKG_SRCDIR}/meson.build"
 }
