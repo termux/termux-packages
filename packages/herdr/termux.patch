@@ -1,0 +1,191 @@
+--- a/build.rs
++++ b/build.rs
+@@ -11,0 +12,2 @@
++        "x86_64-linux-android" => "x86_64-linux-android.24",
++        "aarch64-linux-android" => "aarch64-linux-android.24",
+--- a/src/detect/mod.rs
++++ b/src/detect/mod.rs
+@@ -341,0 +342,7 @@
++    if let Some(wrapped_agent) = process.argv.as_deref().and_then(|argv| {
++        let runtime = runtime_executable_name(argv.first()?)?;
++        wrapped_agent_name_from_runtime_argv(&runtime, Some(argv))
++    }) {
++        return wrapped_agent;
++    }
++
+@@ -352,2 +359,14 @@
+-    let argv = argv?;
+-    let runtime = normalized_agent_lookup_name(path_basename(runtime));
++    let runtime = runtime_executable_name(runtime)?;
++    let mut argv = argv?;
++    let has_duplicate_runtime = argv
++        .first()
++        .and_then(|arg| runtime_executable_name(arg))
++        .is_some_and(|arg| arg == runtime)
++        && argv
++            .get(1)
++            .and_then(|arg| runtime_executable_name(arg))
++            .is_some_and(|arg| arg == runtime);
++
++    if has_duplicate_runtime {
++        argv = &argv[1..];
++    }
+@@ -583,0 +603,6 @@
++fn runtime_executable_name(path: &str) -> Option<String> {
++    let name = path_basename(path).trim().to_lowercase();
++    let name = name.strip_suffix(".exe").unwrap_or(&name);
++    is_runtime_or_shell_name(name).then(|| name.to_string())
++}
++
+@@ -596 +621,4 @@
+-    let name = normalized_agent_lookup_name(path_basename(name));
++    runtime_executable_name(name).is_some()
++}
++
++fn is_runtime_or_shell_name(name: &str) -> bool {
+@@ -598 +626 @@
+-        name.as_str(),
++        name,
+@@ -822,0 +851,50 @@
++    fn identify_agent_in_android_runtime_argv() {
++        type RuntimeCase<'a> = (&'a str, Option<&'a str>, &'a [&'a str], Option<Agent>);
++        let node = "/data/data/com.termux/files/usr/bin/node";
++        let codex = "/data/data/com.termux/files/usr/bin/codex";
++        let cases: &[RuntimeCase<'_>] = &[
++            (
++                "MainThread",
++                None,
++                &["node", node, codex],
++                Some(Agent::Codex),
++            ),
++            (
++                "MainThread",
++                None,
++                &["node", node, "/tmp/not-an-agent.js", codex],
++                None,
++            ),
++            ("MainThread", None, &["node", "/tmp/node.js", codex], None),
++            ("MainThread", None, &["/tmp/node.js", codex], None),
++            ("node.js", None, &["node.js", codex], None),
++            (
++                "MainThread",
++                Some("/tmp/node.js"),
++                &["/tmp/node.js", codex],
++                None,
++            ),
++        ];
++
++        for &(name, argv0, argv, expected) in cases {
++            let mut process = foreground_process(17_024, name, argv);
++            process.argv0 = argv0.map(str::to_string);
++            let job = crate::platform::ForegroundJob {
++                process_group_id: 17_024,
++                processes: vec![process],
++            };
++            assert_eq!(
++                identify_agent_in_job(&job),
++                expected.map(|agent| (agent, "codex".to_string())),
++                "name={name:?}, argv0={argv0:?}, argv={argv:?}"
++            );
++        }
++
++        let mismatched_runtime_job = crate::platform::ForegroundJob {
++            process_group_id: 17_024,
++            processes: vec![foreground_process(17_024, "node", &["bun", node, codex])],
++        };
++        assert_eq!(identify_agent_in_job(&mismatched_runtime_job), None);
++    }
++
++    #[test]
+--- a/src/pane.rs
++++ b/src/pane.rs
+@@ -1323 +1323 @@
+-#[cfg(not(windows))]
++#[cfg(all(not(windows), not(target_os = "android")))]
+@@ -1325,0 +1326,5 @@
++}
++
++#[cfg(target_os = "android")]
++fn default_pane_shell() -> String {
++    "@TERMUX_PREFIX@/bin/sh".into()
+--- a/src/platform/linux.rs
++++ b/src/platform/linux.rs
+@@ -17,0 +18,9 @@
++
++#[cfg(target_os = "linux")]
++const POSIX_SHELL: &str = "/bin/sh";
++#[cfg(target_os = "android")]
++const POSIX_SHELL: &str = "@TERMUX_PREFIX@/bin/sh";
++#[cfg(target_os = "linux")]
++const URL_OPENER: &str = "xdg-open";
++#[cfg(target_os = "android")]
++const URL_OPENER: &str = "@TERMUX_PREFIX@/bin/termux-open-url";
+@@ -81 +90 @@
+-    vec!["/bin/sh".into(), flag.into(), command.into()]
++    vec![POSIX_SHELL.into(), flag.into(), command.into()]
+@@ -102 +111 @@
+-    Ok(vec!["/bin/sh".to_string(), "-c".to_string(), command])
++    Ok(vec![POSIX_SHELL.to_string(), "-c".to_string(), command])
+@@ -459 +468 @@
+-    Command::new("xdg-open")
++    Command::new(URL_OPENER)
+@@ -1265 +1274 @@
+-        assert_eq!(argv[0], "/bin/sh");
++        assert_eq!(argv[0], POSIX_SHELL);
+--- a/src/platform/mod.rs
++++ b/src/platform/mod.rs
+@@ -74 +74 @@
+-#[cfg(any(target_os = "linux", target_os = "macos"))]
++#[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
+@@ -88 +88 @@
+-#[cfg(any(target_os = "linux", target_os = "macos"))]
++#[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
+@@ -193 +193 @@
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+@@ -195 +195 @@
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+@@ -208 +208,6 @@
+-#[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
++#[cfg(not(any(
++    target_os = "linux",
++    target_os = "android",
++    target_os = "macos",
++    target_os = "windows"
++)))]
+@@ -210 +215,6 @@
+-#[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
++#[cfg(not(any(
++    target_os = "linux",
++    target_os = "android",
++    target_os = "macos",
++    target_os = "windows"
++)))]
+@@ -213 +223 @@
+-#[cfg(any(target_os = "linux", target_os = "macos"))]
++#[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
+@@ -236 +246 @@
+-#[cfg(any(target_os = "linux", target_os = "macos"))]
++#[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
+@@ -244 +254 @@
+-#[cfg(any(target_os = "linux", target_os = "macos"))]
++#[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
+@@ -297 +307 @@
+-#[cfg(not(any(target_os = "linux", target_os = "macos")))]
++#[cfg(not(any(target_os = "linux", target_os = "android", target_os = "macos")))]
+@@ -302 +312 @@
+-#[cfg(any(target_os = "linux", target_os = "macos"))]
++#[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
+@@ -365,0 +376,5 @@
++    #[cfg(target_os = "android")]
++    const SHELL: &str = "@TERMUX_PREFIX@/bin/sh";
++    #[cfg(not(target_os = "android"))]
++    const SHELL: &str = "/bin/sh";
++
+@@ -392 +407 @@
+-        assert_eq!(cmd.get_program(), std::ffi::OsStr::new("/bin/sh"));
++        assert_eq!(cmd.get_program(), std::ffi::OsStr::new(SHELL));
+@@ -405 +420 @@
+-            vec!["/bin/sh".into(), "-c".into(), "echo hello".into()];
++            vec![SHELL.into(), "-c".into(), "echo hello".into()];
