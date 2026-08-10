@@ -29,7 +29,9 @@ termux_step_massage() {
 	rm -f share/icons/hicolor/icon-theme.cache
 
 	# Remove locale files we're not interested in:
-	rm -Rf share/locale
+	if [ "${TERMUX_PKG_KEEP_SHARE_LOCALE:-false}" != "true" ]; then
+		rm -Rf share/locale
+	fi
 
 	# Remove ldconfig cache:
 	rm -f glibc/etc/ld{,32}.so.cache

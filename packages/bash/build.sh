@@ -3,22 +3,30 @@ TERMUX_PKG_DESCRIPTION="A sh-compatible shell that incorporates useful features 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION=5.3.15
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_KEEP_SHARE_LOCALE=true
 TERMUX_PKG_SRCURL="https://mirrors.kernel.org/gnu/bash/bash-${TERMUX_PKG_VERSION%.*}.tar.gz"
 TERMUX_PKG_SHA256=0d5cd86965f869a26cf64f4b71be7b96f90a3ba8b3d74e27e8e9d9d5550f31ba
 TERMUX_PKG_AUTO_UPDATE=false
-TERMUX_PKG_DEPENDS="libandroid-support, libiconv, readline (>= 8.3), termux-tools"
+TERMUX_PKG_DEPENDS="libandroid-support, libiconv, readline (>= 8.3), termux-tools, libintl"
 TERMUX_PKG_RECOMMENDS="command-not-found, bash-completion"
 TERMUX_PKG_BREAKS="bash-dev"
 TERMUX_PKG_REPLACES="bash-dev"
 TERMUX_PKG_ESSENTIAL=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-multibyte --without-bash-malloc --with-installed-readline --enable-progcomp"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-nls --enable-multibyte --without-bash-malloc --with-installed-readline --enable-progcomp"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" gt_cv_func_dgettext_libc=no"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_mblen=no"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_setgrent=no"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_getgrent=no"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_endgrent=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_job_control_missing=present"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_sys_siglist=yes"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_func_sigsetjmp=present"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_unusable_rtsigs=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_mbsnrtowcs=no"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_getdtablesize=no"
 # Use bash_cv_dev_fd=whacky to use /proc/self/fd instead of /dev/fd.
 # After making this change process substitution such as in 'cat <(ls)' works.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_dev_fd=whacky"
@@ -34,6 +42,8 @@ TERMUX_PKG_CONFFILES="etc/bash.bashrc etc/profile"
 TERMUX_PKG_RM_AFTER_INSTALL="share/man/man1/bashbug.1 bin/bashbug"
 
 termux_step_pre_configure() {
+	LDFLAGS+=" -lintl"
+	sed -i 's/getdtablesize ()/sysconf(_SC_OPEN_MAX)/g' examples/loadables/fdflags.c
 	local _MAIN_VERSION="${TERMUX_PKG_VERSION%.*}" _PATCH_VERSION="${TERMUX_PKG_VERSION##*.}"
 	(( _PATCH_VERSION == 0 )) && return
 	local PATCH_NUM PATCHFILE
@@ -66,6 +76,19 @@ termux_step_pre_configure() {
 	# Bash tries to redefine bool keyword which breaks with GCC 15, so use Clang for
 	# build (the binaries that are run on the builder)
 	export CC_FOR_BUILD="clang-${TERMUX_HOST_LLVM_MAJOR_VERSION}"
+}
+
+termux_step_post_configure() {
+	cat << 'EOF' >> config.h
+#ifdef __ANDROID__
+#ifndef mblen
+#define mblen(s, n) mbrlen(s, n, NULL)
+#endif
+#define setgrent() ((void)0)
+#define getgrent() ((struct group *)0)
+#define endgrent() ((void)0)
+#endif
+EOF
 }
 
 termux_step_post_make_install() {

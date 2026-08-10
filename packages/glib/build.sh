@@ -3,10 +3,11 @@ TERMUX_PKG_DESCRIPTION="Library providing core building blocks for libraries and
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.88.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.gnome.org/sources/glib/${TERMUX_PKG_VERSION%.*}/glib-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=ab24d24e698dfa1e408b7bcdb508f4aafc906185a8b8ce72fdf79bbbdc9b383b
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libandroid-support, libffi, libiconv, pcre2, resolv-conf, zlib, python"
+TERMUX_PKG_DEPENDS="gettext, libandroid-support, libffi, libiconv, pcre2, resolv-conf, zlib, python"
 TERMUX_PKG_SETUP_PYTHON=true
 TERMUX_PKG_BREAKS="glib-dev, glib-bin"
 TERMUX_PKG_REPLACES="glib-dev, glib-bin"
@@ -22,7 +23,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/glib-gettextize
 bin/gtester-report
-lib/locale
 share/gdb/auto-load
 share/glib-2.0/gdb
 share/glib-2.0/gettext
