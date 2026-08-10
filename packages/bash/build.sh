@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A sh-compatible shell that incorporates useful features 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION=5.3.15
-TERMUX_PKG_REVISION=8
+TERMUX_PKG_REVISION=9
 TERMUX_PKG_KEEP_SHARE_LOCALE=true
 TERMUX_PKG_SRCURL="https://mirrors.kernel.org/gnu/bash/bash-${TERMUX_PKG_VERSION%.*}.tar.gz"
 TERMUX_PKG_SHA256=0d5cd86965f869a26cf64f4b71be7b96f90a3ba8b3d74e27e8e9d9d5550f31ba
@@ -99,13 +99,17 @@ termux_step_post_configure() {
 #define BASH_BIONIC_COMPAT_H
 #include <wchar.h>
 #include <stdlib.h>
+#include <grp.h>
+static inline void bash_bionic_setgrent(void) {}
+static inline struct group *bash_bionic_getgrent(void) { return (struct group *)0; }
+static inline void bash_bionic_endgrent(void) {}
+#define setgrent bash_bionic_setgrent
+#define getgrent bash_bionic_getgrent
+#define endgrent bash_bionic_endgrent
 static inline int bash_bionic_mblen(const char *s, size_t n) {
 	return (int)mbrlen(s, n, NULL);
 }
 #define mblen bash_bionic_mblen
-#define setgrent() ((void)0)
-#define getgrent() ((struct group *)0)
-#define endgrent() ((void)0)
 #endif
 #endif
 EOF
