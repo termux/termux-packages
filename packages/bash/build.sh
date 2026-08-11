@@ -3,22 +3,32 @@ TERMUX_PKG_DESCRIPTION="A sh-compatible shell that incorporates useful features 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION=5.3.15
+TERMUX_PKG_REVISION=9
+TERMUX_PKG_KEEP_SHARE_LOCALE=true
 TERMUX_PKG_SRCURL="https://mirrors.kernel.org/gnu/bash/bash-${TERMUX_PKG_VERSION%.*}.tar.gz"
 TERMUX_PKG_SHA256=0d5cd86965f869a26cf64f4b71be7b96f90a3ba8b3d74e27e8e9d9d5550f31ba
 TERMUX_PKG_AUTO_UPDATE=false
-TERMUX_PKG_DEPENDS="libandroid-support, libiconv, readline (>= 8.3), termux-tools"
+TERMUX_PKG_DEPENDS="libandroid-support, libiconv, readline (>= 8.3), termux-tools, libintl"
 TERMUX_PKG_RECOMMENDS="command-not-found, bash-completion"
 TERMUX_PKG_BREAKS="bash-dev"
 TERMUX_PKG_REPLACES="bash-dev"
 TERMUX_PKG_ESSENTIAL=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-multibyte --without-bash-malloc --with-installed-readline --enable-progcomp"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-nls --enable-multibyte --without-bash-malloc --with-installed-readline --enable-progcomp --with-libintl-prefix=$TERMUX_PREFIX"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" gt_cv_func_dgettext_libc=no"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" gt_cv_func_dgettext_libintl=yes"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" gt_cv_func_gnugettext_libintl=yes"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_mblen=yes"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_setgrent=no"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_getgrent=no"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_endgrent=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_job_control_missing=present"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_sys_siglist=yes"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_func_sigsetjmp=present"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_unusable_rtsigs=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_mbsnrtowcs=no"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_getdtablesize=no"
 # Use bash_cv_dev_fd=whacky to use /proc/self/fd instead of /dev/fd.
 # After making this change process substitution such as in 'cat <(ls)' works.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_dev_fd=whacky"
@@ -34,6 +44,13 @@ TERMUX_PKG_CONFFILES="etc/bash.bashrc etc/profile"
 TERMUX_PKG_RM_AFTER_INSTALL="share/man/man1/bashbug.1 bin/bashbug"
 
 termux_step_pre_configure() {
+	CPPFLAGS+=" -I$TERMUX_PREFIX/include"
+	LDFLAGS+=" -lintl"
+	sed -i 's/getdtablesize ()/sysconf(_SC_OPEN_MAX)/g' examples/loadables/fdflags.c
+	sed -i 's/internal_warning.*setlocale.*/(void)0;/g' locale.c
+	sed -i 's/locale_mb_cur_max = MB_CUR_MAX;/locale_mb_cur_max = 4; locale_utf8locale = 1;/g' locale.c
+	sed -i 's/locale_isutf8 (char \*lspec)/locale_isutf8 (char *lspec) { return 1; } static int _disabled_locale_isutf8 (char *lspec)/g' locale.c
+	sed -i "s/zmieni'c/zmienić/g" po/pl.po
 	local _MAIN_VERSION="${TERMUX_PKG_VERSION%.*}" _PATCH_VERSION="${TERMUX_PKG_VERSION##*.}"
 	(( _PATCH_VERSION == 0 )) && return
 	local PATCH_NUM PATCHFILE
@@ -66,6 +83,36 @@ termux_step_pre_configure() {
 	# Bash tries to redefine bool keyword which breaks with GCC 15, so use Clang for
 	# build (the binaries that are run on the builder)
 	export CC_FOR_BUILD="clang-${TERMUX_HOST_LLVM_MAJOR_VERSION}"
+}
+
+termux_step_post_configure() {
+	sed -i 's|lib/intl/libintl.a|-lintl|g' Makefile
+	sed -i 's|INTL_LIB = .*|INTL_LIB = -lintl|g' Makefile
+	sed -i 's|INTL_LIBRARY = .*|INTL_LIBRARY =|g' Makefile
+	sed -i 's|INTL_DEP = .*|INTL_DEP =|g' Makefile
+	sed -i 's|INTL_INC = .*|INTL_INC = -I'$TERMUX_PREFIX'/include|g' Makefile
+	sed -i 's|LIBINTL_H = .*|LIBINTL_H = '$TERMUX_PREFIX'/include/libintl.h|g' Makefile
+
+	cat << 'EOF' >> config.h
+#ifdef __ANDROID__
+#ifndef BASH_BIONIC_COMPAT_H
+#define BASH_BIONIC_COMPAT_H
+#include <wchar.h>
+#include <stdlib.h>
+#include <grp.h>
+static inline void bash_bionic_setgrent(void) {}
+static inline struct group *bash_bionic_getgrent(void) { return (struct group *)0; }
+static inline void bash_bionic_endgrent(void) {}
+#define setgrent bash_bionic_setgrent
+#define getgrent bash_bionic_getgrent
+#define endgrent bash_bionic_endgrent
+static inline int bash_bionic_mblen(const char *s, size_t n) {
+	return (int)mbrlen(s, n, NULL);
+}
+#define mblen bash_bionic_mblen
+#endif
+#endif
+EOF
 }
 
 termux_step_post_make_install() {

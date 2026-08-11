@@ -59,7 +59,7 @@
    # libintl supports different threading APIs, which may not
    # require additional flags, but it defaults to using pthreads if
    # found. Meson's "threads" dependency does not allow you to
-@@ -2302,15 +2299,8 @@
+@@ -2302,15 +2299,9 @@
    endif
  endif
  
@@ -72,7 +72,8 @@
 -  libintl_deps = [libintl]
 -  have_bind_textdomain_codeset = true  # proxy-libintl supports it
 -endif
-+libintl_deps = []
++libintl = dependency('intl', allow_fallback: true)
++libintl_deps = [libintl]
 +have_bind_textdomain_codeset = true  # proxy-libintl supports it
  
  glib_conf.set('HAVE_BIND_TEXTDOMAIN_CODESET', have_bind_textdomain_codeset)
