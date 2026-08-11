@@ -12,6 +12,15 @@ TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 TERMUX_RUST_VERSION=1.96.1
 TERMUX_ZIG_VERSION=0.15.2
 
+termux_step_post_get_source() {
+	local p="$TERMUX_PKG_BUILDER_DIR/termux.diff"
+	echo "Applying $(basename "$p")"
+	sed \
+		-e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+		-e "s|@TERMUX_PKG_API_LEVEL@|${TERMUX_PKG_API_LEVEL}|g" \
+		"$p" | patch --silent -p1
+}
+
 termux_step_pre_configure() {
 	termux_setup_rust
 	termux_setup_zig

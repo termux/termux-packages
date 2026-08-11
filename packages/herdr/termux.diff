@@ -1,8 +1,8 @@
 --- a/build.rs
 +++ b/build.rs
 @@ -11,0 +12,2 @@
-+        "x86_64-linux-android" => "x86_64-linux-android.24",
-+        "aarch64-linux-android" => "aarch64-linux-android.24",
++        "x86_64-linux-android" => "x86_64-linux-android.@TERMUX_PKG_API_LEVEL@",
++        "aarch64-linux-android" => "aarch64-linux-android.@TERMUX_PKG_API_LEVEL@",
 --- a/src/detect/mod.rs
 +++ b/src/detect/mod.rs
 @@ -341,0 +342,7 @@
@@ -46,11 +46,13 @@
 @@ -598 +626 @@
 -        name.as_str(),
 +        name,
-@@ -822,0 +851,50 @@
+@@ -822,0 +851,42 @@
 +    fn identify_agent_in_android_runtime_argv() {
 +        type RuntimeCase<'a> = (&'a str, Option<&'a str>, &'a [&'a str], Option<Agent>);
-+        let node = "/data/data/com.termux/files/usr/bin/node";
-+        let codex = "/data/data/com.termux/files/usr/bin/codex";
++        let node = "@TERMUX_PREFIX@/bin/node";
++        let codex = "@TERMUX_PREFIX@/bin/codex";
++        let not_agent = "@TERMUX_PREFIX@/tmp/not-an-agent.js";
++        let node_js = "@TERMUX_PREFIX@/tmp/node.js";
 +        let cases: &[RuntimeCase<'_>] = &[
 +            (
 +                "MainThread",
@@ -58,21 +60,11 @@
 +                &["node", node, codex],
 +                Some(Agent::Codex),
 +            ),
-+            (
-+                "MainThread",
-+                None,
-+                &["node", node, "/tmp/not-an-agent.js", codex],
-+                None,
-+            ),
-+            ("MainThread", None, &["node", "/tmp/node.js", codex], None),
-+            ("MainThread", None, &["/tmp/node.js", codex], None),
++            ("MainThread", None, &["node", node, not_agent, codex], None),
++            ("MainThread", None, &["node", node_js, codex], None),
++            ("MainThread", None, &[node_js, codex], None),
 +            ("node.js", None, &["node.js", codex], None),
-+            (
-+                "MainThread",
-+                Some("/tmp/node.js"),
-+                &["/tmp/node.js", codex],
-+                None,
-+            ),
++            ("MainThread", Some(node_js), &[node_js, codex], None),
 +        ];
 +
 +        for &(name, argv0, argv, expected) in cases {
