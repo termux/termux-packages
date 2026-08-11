@@ -36,20 +36,21 @@ fi
 # shellcheck source=scripts/properties.sh
 source "$REPO_ROOT/scripts/properties.sh"
 
-for package_dir in "$@"; do
+for package_dir_org in "$@"; do
 	buildsh_path=
 	repo=
 	# Did we get the package in the form of ${channel}/${package_dir}?
-	if [[ -d "${package_dir}" && -f "${package_dir}/build.sh" ]]; then
-		repo="${package_dir%\/*}"
-		buildsh_path="${package_dir}/build.sh"
-		package_dir="$(basename "${package_dir}")"
+	if [[ -d "${package_dir_org}" && -f "${package_dir_org}/build.sh" ]]; then
+		repo="${package_dir_org%\/*}"
+		buildsh_path="${package_dir_org}/build.sh"
+		package_dir="$(basename "${package_dir_org}")"
 	else # If we did not, search each channel listed in repo.json for that package directory.
 		for channel in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "$REPO_ROOT/repo.json"); do
-			if [[ -d "${channel}/${package_dir}" && -f "${channel}/${package_dir}/build.sh" ]]; then
+			if [[ -d "${channel}/${package_dir_org}" && -f "${channel}/${package_dir_org}/build.sh" ]]; then
 				repo="$(jq --raw-output ".[\"$channel\"].name | sub(\"^termux-\"; \"\")" "$REPO_ROOT/repo.json")"
-				buildsh_path="${channel}/${package_dir}/build.sh"
-				package_dir="$(basename "${package_dir}")"
+				package_dir_org="${channel}/${package_dir_org}"
+				buildsh_path="${package_dir_org}/build.sh"
+				package_dir="$(basename "${package_dir_org}")"
 			fi
 		done
 	fi
@@ -128,7 +129,7 @@ for package_dir in "$@"; do
 		echo
 		case "${CHOICE}" in
 			y|Y)
-				git add "${buildsh_path}"
+				git add "${package_dir_org}"
 				git commit -m "bump(${repo}/${package_dir}): $(
 					# shellcheck source=/dev/null
 					source "${buildsh_path}"
