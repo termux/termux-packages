@@ -7,9 +7,6 @@ TERMUX_PKG_SRCURL="https://github.com/herdrdev/herdr/archive/refs/tags/v${TERMUX
 TERMUX_PKG_SHA256=47bdb0753beb8a6b157cf2fec26fbe6b787f85ffea0dde579b0001d6cd663572
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-# libghostty-vt requires an Android NDK and Zig 0.15.2, which are not
-# available in the supported on-device build environment.
-TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 # libghostty-vt has not been ported to Zig 0.16 yet.
 TERMUX_ZIG_VERSION=0.15.2
