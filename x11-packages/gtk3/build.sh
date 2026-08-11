@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="GObject-based multi-platform GUI toolkit"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.24.52"
-TERMUX_PKG_SRCURL=https://gitlab.gnome.org/GNOME/gtk/-/archive/$TERMUX_PKG_VERSION/gtk-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SRCURL="https://gitlab.gnome.org/GNOME/gtk/-/archive/$TERMUX_PKG_VERSION/gtk-$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=e62514019679f831fcb37f3d294a761c3a6c14f1d346745ad11d70c2be17146e
 TERMUX_PKG_DEPENDS="adwaita-icon-theme, at-spi2-core, coreutils, desktop-file-utils, fontconfig, fribidi, gdk-pixbuf, glib, gtk-update-icon-cache, harfbuzz, libcairo, libepoxy, libwayland, libxcomposite, libxcursor, libxdamage, libxfixes, libxi, libxinerama, libxkbcommon, libxrandr, pango, shared-mime-info, ttf-dejavu"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross, libwayland-protocols, libwayland-cross-scanner, xorgproto"
@@ -26,7 +26,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	termux_setup_cmake
 	termux_setup_gir
 	termux_setup_ninja
 	termux_setup_pkg_config_wrapper "${TERMUX_PREFIX}/opt/glib/cross/lib/x86_64-linux-gnu/pkgconfig:${TERMUX_PREFIX}/opt/libwayland/cross/lib/x86_64-linux-gnu/pkgconfig"

@@ -1,4 +1,7 @@
+#include "platform-ns.h"
+
 #include <dlfcn.h>
+#include <stdatomic.h>
 #include <stdio.h>
 
 // const attribute will not let us modify our variables
@@ -85,10 +88,14 @@ static struct {
 } stubs;
 #undef STUB
 
-__attribute__((constructor)) static void init() {
+static void ensure_loaded() {
+    static atomic_flag tried = ATOMIC_FLAG_INIT;
+    if (atomic_flag_test_and_set(&tried))
+        return;
+
     // simulate LD_PRELOAD=/system/lib64/libskcodec.so
-    void *skcodec_handle = dlopen(SKCODEC, RTLD_GLOBAL); // ignore errors, we only need to upload it to global namespace
-    void* handle = dlopen(LIB, RTLD_LOCAL);
+    void *skcodec_handle = platform_dlopen(SKCODEC, RTLD_GLOBAL); // ignore errors, we only need to upload it to global namespace
+    void* handle = platform_dlopen(LIB, RTLD_LOCAL);
     if (skcodec_handle)
         dlclose(skcodec_handle); // if the library is needed by any of libOpenSLES dependencies it will not be unloaded
 
@@ -103,7 +110,7 @@ __attribute__((constructor)) static void init() {
     #undef LOAD
 }
 
-#define CALL(f, def, ...) if (!stubs.f) return def; else return (stubs.f)(__VA_ARGS__)
+#define CALL(f, def, ...) ensure_loaded(); if (!stubs.f) return def; else return (stubs.f)(__VA_ARGS__)
 
 SL_API SLresult SLAPIENTRY slCreateEngine(SLObjectItf *pEngine, SLuint32 numOptions, const SLEngineOption *pEngineOptions, SLuint32 numInterfaces, const SLInterfaceID *pInterfaceIds, const SLboolean* pInterfaceRequired) {
     CALL(slCreateEngine, SL_RESULT_FEATURE_UNSUPPORTED, pEngine, numOptions, pEngineOptions, numInterfaces, pInterfaceIds, pInterfaceRequired);
