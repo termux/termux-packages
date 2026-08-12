@@ -1,0 +1,13 @@
+diff --git a/CLI/Repl.cpp b/CLI/Repl.cpp
+index 814d7c8..cd84245 100644
+--- a/CLI/Repl.cpp
++++ b/CLI/Repl.cpp
+@@ -783,7 +783,7 @@ int replMain(int argc, char** argv)
+     {
+ #if __linux__
+         char path[128];
+-        snprintf(path, sizeof(path), "/tmp/perf-%d.map", getpid());
++        snprintf(path, sizeof(path), "@TERMUX_PREFIX@/tmp/perf-%d.map", getpid());
+ 
+         // note, there's no need to close the log explicitly as it will be closed when the process exits
+         FILE* codegenPerfLog = fopen(path, "w");
