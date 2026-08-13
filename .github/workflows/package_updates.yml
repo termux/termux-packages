@@ -123,6 +123,10 @@ jobs:
             curl \
             python3 \
             jq
+      - name: Audit published packages for undeclared conflicts
+        env:
+          GITHUB_TOKEN: ${{ secrets.TERMUXBOT2_TOKEN }}
+        run: ./scripts/utils/termux_report_published_conflicts.sh
       - name: Process package updates
         env:
           GITHUB_TOKEN: ${{ secrets.TERMUXBOT2_TOKEN }}
