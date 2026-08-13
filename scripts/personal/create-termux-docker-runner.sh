@@ -65,7 +65,7 @@ PACKAGES+=("python" "nodejs" "bash")
 # The compilers
 PACKAGES+=("clang" "llvm" "llvm-tools" "mlir" "rust" "golang" "zig")
 # Debugging tools
-PACKAGES+=("gdb" "lldb" "strace" "ltrace" "valgrind")
+PACKAGES+=("gdb" "lldb" "strace" "ltrace")
 # Build systems
 PACKAGES+=("cmake" "ninja" "autoconf" "automake" "make" "autoconf-archive" "build-essential")
 # Some editors and stuff
