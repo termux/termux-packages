@@ -5,11 +5,12 @@ TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=7804621c533dddfe970e97c94c4ea72d48ed7f48
 _COMMIT_DATE=20221010
 TERMUX_PKG_VERSION=1.2.12-p${_COMMIT_DATE}
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=git+https://github.com/libsdl-org/SDL_mixer
 TERMUX_PKG_SHA256=473a39b04f1a2ec29a22e3eafaafeee9704129f117044d17c591646648b540cd
 TERMUX_PKG_GIT_BRANCH=SDL-1.2
-TERMUX_PKG_DEPENDS="libflac, libvorbis, sdl"
+TERMUX_PKG_DEPENDS="fluidsynth, libflac, libmodplug, libmpg123, libvorbis, sdl"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-music-mod-modplug"
 
 termux_step_post_get_source() {
 	git fetch --unshallow
