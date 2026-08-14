@@ -1,0 +1,18 @@
+--- a/manim/utils/file_ops.py
++++ b/manim/utils/file_ops.py
+@@ -202,8 +202,13 @@
+             raise OSError("os.startfile is unavailable on this Windows system")
+         startfile(file_path if not in_browser else file_path.parent)
+     else:
+-        if current_os == "Linux":
+-            commands = ["xdg-open"]
++        if current_os == "Linux" or current_os == "Android":
++            if shutil.which("xdg-utils-xdg-open") and os.environ.get("DISPLAY"):
++                commands = ["xdg-utils-xdg-open"]
++            elif not in_browser:
++                commands = ["xdg-open"]
++            elif not config.preview_command:
++                raise OSError("Opening a directory without a graphical environment is not supported")
+             file_path = file_path if not in_browser else file_path.parent
+         elif current_os.startswith("CYGWIN"):
+             commands = ["cygstart"]
