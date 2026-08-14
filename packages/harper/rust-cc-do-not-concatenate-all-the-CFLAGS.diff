@@ -18,13 +18,13 @@ This patch will restore the old behaviour. For Termux we know how it is going.
 
 --- a/src/lib.rs
 +++ b/src/lib.rs
-@@ -3844,8 +3844,11 @@
+@@ -4254,8 +4254,11 @@
          // `CFLAGS`).
          let mut any_set = false;
          let mut res = vec![];
 -        for env in self.target_envs(env)?.iter().rev() {
 +        for env in self.target_envs(env)?.iter() {
-             if let Some(var) = self.getenv(env) {
+             if let Some(var) = self.get_env(env) {
 +                if any_set {
 +                    continue;
 +                }
