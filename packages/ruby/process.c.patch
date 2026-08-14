@@ -1,7 +1,7 @@
 diff '--color=auto' -uNr a/process.c b/process.c
---- a/process.c	2024-12-25 15:43:20.000000000 +0800
-+++ b/process.c	2025-03-06 02:18:48.124897314 +0800
-@@ -4221,6 +4221,20 @@
+--- a/process.c	2024-12-25 07:43:20.000000000 +0000
++++ b/process.c	2025-02-04 23:00:22.000000000 +0000
+@@ -4120,6 +4120,20 @@
      return result;
  }
  
@@ -22,20 +22,20 @@ diff '--color=auto' -uNr a/process.c b/process.c
  rb_pid_t
  rb_fork_ruby(int *status)
  {
-@@ -4229,6 +4243,12 @@
-     int try_gc = 1, err;
+@@ -4128,6 +4142,12 @@
+     rb_pid_t pid;
+     int try_gc = 1, err = 0;
      struct child_handler_disabler_state old;
- 
++
 +#ifdef __ANDROID__
 +    if ((err = pthread_atfork(__rb_atfork_prepare, __rb_atfork_parent, __rb_atfork_child))) {
 +        rb_bug_errno("pthread_atfork", err);
 +    }
 +#endif
-+
+ 
      do {
          prefork();
- 
-@@ -4243,6 +4263,8 @@
+@@ -4141,6 +4161,8 @@
          if (
  #if defined(__FreeBSD__)
              pid != 0 &&
