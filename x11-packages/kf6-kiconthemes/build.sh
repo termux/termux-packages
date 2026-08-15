@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE='https://invent.kde.org/frameworks/kiconthemes'
 TERMUX_PKG_DESCRIPTION='Support for icon themes'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.28.0"
+TERMUX_PKG_VERSION="6.29.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kiconthemes-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=edf83069f25f8edf759d07502a6f8302c8c064cd562651deedefe6393fefcace
+TERMUX_PKG_SHA256=233de4cd2fef5b7b4ce1e317196407d25300b767614a93e160b45ac34710223d
 TERMUX_PKG_DEPENDS="kf6-breeze-icons (>= ${TERMUX_PKG_VERSION%.*}), kf6-karchive (>= ${TERMUX_PKG_VERSION%.*}), kf6-kcolorscheme (>= ${TERMUX_PKG_VERSION%.*}), kf6-kconfig (>= ${TERMUX_PKG_VERSION%.*}), kf6-kconfigwidgets (>= ${TERMUX_PKG_VERSION%.*}), kf6-ki18n (>= ${TERMUX_PKG_VERSION%.*}), kf6-kwidgetsaddons (>= ${TERMUX_PKG_VERSION%.*}), libc++, qt6-qtbase, qt6-qtdeclarative"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION%.*}), qt6-qtsvg, qt6-qttools"
 TERMUX_PKG_AUTO_UPDATE=true
