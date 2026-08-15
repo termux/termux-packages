@@ -17,7 +17,7 @@ fi
 
 declare -A CGCT=(
 	["cbt"]="2.47-0" # Cross Binutils for Termux
-	["cgt"]="16.1.0-0" # Cross GCCs for Termux
+	["cgt"]="16.2.0-0" # Cross GCCs for Termux
 	["glibc-cgct"]="2.44-0" # Glibc for CGCT
  	["cgct-headers"]="7.1-0" # Headers for CGCT
 )
