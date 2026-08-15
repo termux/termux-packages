@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE='https://invent.kde.org/frameworks/qqc2-desktop-style'
 TERMUX_PKG_DESCRIPTION='A style for Qt Quick Controls 2 to make it follow your desktop theme'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.28.0"
+TERMUX_PKG_VERSION="6.29.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/qqc2-desktop-style-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=8748d01f401cb16a34adbdf568b2bde2cc1820f82c38249fdec11b66d9da97d1
+TERMUX_PKG_SHA256=dfb815380b4297c28ef9e4bc8e3ab350b6fbf7b78e0677c3e2e3d4ca319ae336
 TERMUX_PKG_DEPENDS="kf6-kcolorscheme (>= ${TERMUX_PKG_VERSION%.*}), kf6-kconfig (>= ${TERMUX_PKG_VERSION%.*}), kf6-kiconthemes (>= ${TERMUX_PKG_VERSION%.*}), kf6-kirigami (>= ${TERMUX_PKG_VERSION%.*}), kf6-sonnet (>= ${TERMUX_PKG_VERSION%.*}), libc++, qt6-qtbase, qt6-qtdeclarative"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION%.*}), qt6-qttools"
 TERMUX_PKG_AUTO_UPDATE=true
