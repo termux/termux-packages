@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="SQLCipher is an SQLite extension that provides 256 bit A
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.17.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/sqlcipher/sqlcipher/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=79c0e164b9c059e7487bf8f29272f601cca5f3312cc267461f81e349962a5058
 TERMUX_PKG_DEPENDS="libedit, openssl"
@@ -70,9 +71,11 @@ termux_step_post_massage() {
 	mv bin/{sqlite3,sqlcipher}
 	mv include/{sqlite3,sqlcipher}.h
 	mv include/{sqlite3ext,sqlcipherext}.h
-	mv lib/lib{sqlite3,sqlcipher}.so
-	mv lib/lib{sqlite3,sqlcipher}.so.0
+	rm lib/libsqlite3.so
+	rm lib/libsqlite3.so.0
 	mv lib/lib{sqlite3,sqlcipher}.so."$sql_version"
+	ln -sf libsqlcipher.so."$sql_version" lib/libsqlcipher.so
+	ln -sf libsqlcipher.so."$sql_version" lib/libsqlcipher.so.0
 	mv lib/pkgconfig/{sqlite3,sqlcipher}.pc
 	mv share/man/man1/{sqlite3,sqlcipher}.1.gz
 	sed -i s/-lsqlite3/-lsqlcipher/ lib/pkgconfig/sqlcipher.pc
