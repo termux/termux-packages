@@ -1,0 +1,313 @@
+Upstream fixes merged after the 0.4.0 release: retry short reads/writes (PR #91, fixes read data loss) and wrap writes in a libmtp edit session so writing to Android devices works (PR #100). Drop once a release past 0.4.0 exists.
+
+diff --git a/src/simple-mtpfs-fuse.cpp b/src/simple-mtpfs-fuse.cpp
+index f842b06..e2a1932 100644
+--- a/src/simple-mtpfs-fuse.cpp
++++ b/src/simple-mtpfs-fuse.cpp
+@@ -85,13 +85,41 @@ int wrap_open(const char *path, struct fuse_file_info *file_info)
+ int wrap_read(const char *path, char *buf, size_t size, off_t offset,
+     struct fuse_file_info *file_info)
+ {
+-    return SMTPFileSystem::instance()->read(path, buf, size, offset, file_info);
++    if (file_info->direct_io) {
++        return SMTPFileSystem::instance()->read(path, buf, size, offset, file_info);
++    } else {
++        int bytes_read = 0;
++        while (bytes_read < size) {
++            int rval = SMTPFileSystem::instance()->read(path, buf + bytes_read, size - bytes_read, offset + bytes_read, file_info);
++            if (rval < 0) {
++                return rval;
++            } else if (rval == 0) {
++                break;
++            }
++            bytes_read += rval;
++        }
++        return bytes_read;
++    }
+ }
+ 
+ int wrap_write(const char *path, const char *buf, size_t size, off_t offset,
+     struct fuse_file_info *file_info)
+ {
+-    return SMTPFileSystem::instance()->write(path, buf, size, offset, file_info);
++    if (file_info->direct_io) {
++        return SMTPFileSystem::instance()->write(path, buf, size, offset, file_info);
++    } else {
++        int bytes_written = 0;
++        while (bytes_written < size) {
++            int rval = SMTPFileSystem::instance()->write(path, buf + bytes_written, size - bytes_written, offset + bytes_written, file_info);
++            if (rval < 0) {
++                return rval;
++            } else if (rval == 0) {
++                break;
++            }
++            bytes_written += rval;
++        }
++        return bytes_written;
++    }
+ }
+ 
+ int wrap_statfs(const char *path, struct statvfs *stat_info)
+@@ -525,6 +553,17 @@ int SMTPFileSystem::chown(const char *path, uid_t uid, gid_t gid)
+ 
+ int SMTPFileSystem::truncate(const char *path, off_t new_size)
+ {
++    if (hasPartialObjectSupport()) {
++        // close any open edit session before truncating in place
++        TypeTmpFile *tmp_file = const_cast<TypeTmpFile*>(
++            m_tmp_files_pool.getFile(std::string(path)));
++        if (tmp_file && tmp_file->isEditing()) {
++            m_device.editEnd(tmp_file->editObjectId());
++            tmp_file->clearEditing();
++        }
++        return m_device.fileTruncate(std::string(path), new_size);
++    }
++
+     const std::string tmp_path = m_tmp_files_pool.makeTmpPath(std::string(path));
+     int rval = m_device.filePull(std::string(path), tmp_path);
+     if (rval != 0) {
+@@ -581,7 +620,9 @@ int SMTPFileSystem::create(const char *path, mode_t mode, fuse_file_info *file_i
+         return -errno;
+ 
+     file_info->fh = rval;
+-    m_tmp_files_pool.addFile(TypeTmpFile(std::string(path), tmp_path, rval, true));
++    // don't re-upload the empty temp on the partial path
++    m_tmp_files_pool.addFile(TypeTmpFile(std::string(path), tmp_path, rval,
++        !hasPartialObjectSupport()));
+     rval = m_device.filePush(tmp_path, std::string(path));
+ 
+     if (rval != 0)
+@@ -657,6 +698,14 @@ int SMTPFileSystem::write(const char *path, const char *buf, size_t size,
+     int rval = 0;
+     if (hasPartialObjectSupport()) {
+         const std::string std_path(path);
++        // begin the edit session on the first write
++        TypeTmpFile *tmp_file = const_cast<TypeTmpFile*>(
++            m_tmp_files_pool.getFile(std_path));
++        if (tmp_file && !tmp_file->isEditing()) {
++            uint32_t id = m_device.editStart(std_path);
++            if (id)
++                tmp_file->setEditing(id);
++        }
+         rval = m_device.fileWrite(std_path, buf, size, offset);
+     } else {
+         const TypeTmpFile *tmp_file = m_tmp_files_pool.getFile(std::string(path));
+@@ -689,9 +738,17 @@ int SMTPFileSystem::release(const char *path, struct fuse_file_info *file_info)
+     if (tmp_file->refcnt() != 0)
+         return 0;
+ 
++    const bool editing = tmp_file->isEditing();
++    const uint32_t edit_id = tmp_file->editObjectId();
+     const bool modif = tmp_file->isModified();
+     const std::string tmp_path = tmp_file->pathTmp();
+     m_tmp_files_pool.removeFile(std_path);
++
++    // close the edit session
++    int edit_rval = 0;
++    if (editing)
++        edit_rval = m_device.editEnd(edit_id);
++
+     if (modif) {
+         rval = m_device.filePush(tmp_path, std_path);
+         if (rval != 0) {
+@@ -702,7 +759,7 @@ int SMTPFileSystem::release(const char *path, struct fuse_file_info *file_info)
+ 
+     ::unlink(tmp_path.c_str());
+ 
+-    return 0;
++    return edit_rval;
+ }
+ 
+ int SMTPFileSystem::statfs(const char *path, struct statvfs *stat_info)
+@@ -790,6 +847,17 @@ int SMTPFileSystem::fsyncdir(const char *path, int datasync,
+ int SMTPFileSystem::ftruncate(const char *path, off_t offset,
+     struct fuse_file_info *file_info)
+ {
++    if (hasPartialObjectSupport()) {
++        // close any open edit session before truncating in place
++        TypeTmpFile *edit_file = const_cast<TypeTmpFile*>(
++            m_tmp_files_pool.getFile(std::string(path)));
++        if (edit_file && edit_file->isEditing()) {
++            m_device.editEnd(edit_file->editObjectId());
++            edit_file->clearEditing();
++        }
++        return m_device.fileTruncate(std::string(path), offset);
++    }
++
+     const TypeTmpFile *tmp_file = m_tmp_files_pool.getFile(std::string(path));
+     if (::ftruncate(file_info->fh, offset) != 0)
+         return -errno;
+diff --git a/src/simple-mtpfs-mtp-device.cpp b/src/simple-mtpfs-mtp-device.cpp
+index 3b80c7a..57c8d77 100644
+--- a/src/simple-mtpfs-mtp-device.cpp
++++ b/src/simple-mtpfs-mtp-device.cpp
+@@ -522,9 +522,75 @@ int MTPDevice::fileWrite(const std::string &path, const char *buf, size_t size,
+ 
+     if (rval < 0)
+         return -EIO;
++
++    // keep the cached size in sync
++    uint64_t written_end = static_cast<uint64_t>(offset) + size;
++    if (written_end > file_to_fetch->size())
++        const_cast<TypeFile*>(file_to_fetch)->setSize(written_end);
++
+     return size;
+ }
+ 
++uint32_t MTPDevice::objectId(const std::string &path)
++{
++    const std::string path_basename(smtpfs_basename(path));
++    const std::string path_dirname(smtpfs_dirname(path));
++    const TypeDir *dir_parent = dirFetchContent(path_dirname);
++    const TypeFile *file = dir_parent ? dir_parent->file(path_basename) : nullptr;
++    return file ? file->id() : 0;
++}
++
++uint32_t MTPDevice::editStart(const std::string &path)
++{
++    uint32_t id = objectId(path);
++    if (!id)
++        return 0;
++
++    criticalEnter();
++    int rval = LIBMTP_BeginEditObject(m_device, id);
++    criticalLeave();
++
++    if (rval != 0)
++        return 0;
++    return id;
++}
++
++int MTPDevice::fileTruncate(const std::string &path, uint64_t size)
++{
++    const TypeDir *dir_parent = dirFetchContent(smtpfs_dirname(path));
++    const TypeFile *file = dir_parent ? dir_parent->file(smtpfs_basename(path)) : nullptr;
++    if (!file)
++        return -ENOENT;
++    uint32_t id = file->id();
++
++    criticalEnter();
++    int rval = LIBMTP_BeginEditObject(m_device, id);
++    if (rval == 0) {
++        rval = LIBMTP_TruncateObject(m_device, id, size);
++        LIBMTP_EndEditObject(m_device, id);
++    }
++    criticalLeave();
++
++    if (rval != 0)
++        return -EIO;
++
++    // sync the cache with the resized object
++    const_cast<TypeFile*>(file)->setSize(size);
++
++    return 0;
++}
++
++int MTPDevice::editEnd(uint32_t id)
++{
++    criticalEnter();
++    int rval = LIBMTP_EndEditObject(m_device, id);
++    criticalLeave();
++
++    if (rval != 0)
++        return -EIO;
++    return 0;
++}
++
+ int MTPDevice::filePull(const std::string &src, const std::string &dst)
+ {
+     const std::string src_basename(smtpfs_basename(src));
+@@ -720,6 +786,7 @@ bool MTPDevice::listDevices(bool verbose, const std::string &dev_file)
+             continue;
+         std::cout << i + 1 << ": "
+             << (raw_devices[i].device_entry.vendor ? raw_devices[i].device_entry.vendor : "Unknown vendor ")
++            << ", "
+             << (raw_devices[i].device_entry.product ? raw_devices[i].device_entry.product : "Unknown product")
+             << std::endl;
+ #ifdef HAVE_LIBMTP_CHECK_CAPABILITY
+diff --git a/src/simple-mtpfs-mtp-device.h b/src/simple-mtpfs-mtp-device.h
+index 087fce2..11ff997 100644
+--- a/src/simple-mtpfs-mtp-device.h
++++ b/src/simple-mtpfs-mtp-device.h
+@@ -85,6 +85,11 @@ public:
+     int fileRemove(const std::string &path);
+     int fileRename(const std::string &oldpath, const std::string &newpath);
+ 
++    uint32_t objectId(const std::string &path);
++    uint32_t editStart(const std::string &path);
++    int editEnd(uint32_t id);
++    int fileTruncate(const std::string &path, uint64_t size);
++
+     Capabilities getCapabilities() const;
+ 
+     static bool listDevices(bool verbose, const std::string &dev_file);
+diff --git a/src/simple-mtpfs-type-tmp-file.cpp b/src/simple-mtpfs-type-tmp-file.cpp
+index a423dd5..1fbaa1c 100644
+--- a/src/simple-mtpfs-type-tmp-file.cpp
++++ b/src/simple-mtpfs-type-tmp-file.cpp
+@@ -23,7 +23,9 @@ TypeTmpFile::TypeTmpFile():
+     m_path_device(),
+     m_path_tmp(),
+     m_file_descriptors(),
+-    m_modified(false)
++    m_modified(false),
++    m_editing(false),
++    m_object_id(0)
+ {
+ }
+ 
+@@ -32,7 +34,9 @@ TypeTmpFile::TypeTmpFile(const std::string &path_device,
+         bool modified):
+     m_path_device(path_device),
+     m_path_tmp(path_tmp),
+-    m_modified(modified)
++    m_modified(modified),
++    m_editing(false),
++    m_object_id(0)
+ {
+     m_file_descriptors.insert(file_desc);
+ }
+@@ -41,7 +45,9 @@ TypeTmpFile::TypeTmpFile(const TypeTmpFile &copy):
+     m_path_device(copy.m_path_device),
+     m_path_tmp(copy.m_path_tmp),
+     m_file_descriptors(copy.m_file_descriptors),
+-    m_modified(copy.m_modified)
++    m_modified(copy.m_modified),
++    m_editing(copy.m_editing),
++    m_object_id(copy.m_object_id)
+ {
+ }
+ 
+@@ -67,5 +73,7 @@ TypeTmpFile &TypeTmpFile::operator =(const TypeTmpFile &rhs)
+     m_path_tmp = rhs.m_path_tmp;
+     m_file_descriptors = rhs.m_file_descriptors;
+     m_modified = rhs.m_modified;
++    m_editing = rhs.m_editing;
++    m_object_id = rhs.m_object_id;
+     return *this;
+ }
+diff --git a/src/simple-mtpfs-type-tmp-file.h b/src/simple-mtpfs-type-tmp-file.h
+index e8d677a..c28112d 100644
+--- a/src/simple-mtpfs-type-tmp-file.h
++++ b/src/simple-mtpfs-type-tmp-file.h
+@@ -37,6 +37,11 @@ public:
+     bool isModified() const { return m_modified; }
+     void setModified(bool modified = true) { m_modified = modified; }
+ 
++    bool isEditing() const { return m_editing; }
++    uint32_t editObjectId() const { return m_object_id; }
++    void setEditing(uint32_t id) { m_editing = true; m_object_id = id; }
++    void clearEditing() { m_editing = false; m_object_id = 0; }
++
+     std::set<int> fileDescriptors() const { return m_file_descriptors; }
+     void addFileDescriptor(int fd) { m_file_descriptors.insert(fd); }
+     bool hasFileDescriptor(int fd);
+@@ -67,6 +72,8 @@ private:
+     std::string m_path_tmp;
+     std::set<int> m_file_descriptors;
+     bool m_modified;
++    bool m_editing;
++    uint32_t m_object_id;
+ };
+ 
+ #endif // SMTPFS_TYPE_TMP_FILE_H
