@@ -3,13 +3,18 @@ TERMUX_PKG_DESCRIPTION="Magical shell history"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="../../LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="18.17.1"
+TERMUX_PKG_VERSION="18.19.0"
 TERMUX_PKG_SRCURL="https://github.com/atuinsh/atuin/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=851c3f4870e4bd181b98d2dae60b9fd76ef30f05f16a85efa21ac7e7cf294862
+TERMUX_PKG_SHA256=fdb8268cdd5b13105db79e821f06c1c6624e0c5aee46befb0491e39af42fd4e6
+TERMUX_PKG_DEPENDS="openssl"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
+	export OPENSSL_INCLUDE_DIR="$TERMUX_PREFIX/include"
+	export OPENSSL_LIB_DIR="$TERMUX_PREFIX/lib"
+	export OPENSSL_NO_VENDOR=1
+
 	termux_setup_protobuf
 	termux_setup_rust
 	termux_setup_cmake
@@ -24,28 +29,12 @@ termux_step_pre_configure() {
 
 	# clash with rust host build
 	unset CFLAGS
-
-	cargo vendor
-	find ./vendor \
-		-mindepth 1 -maxdepth 1 -type d \
-		! -wholename ./vendor/rustls-platform-verifier \
-		-exec rm -rf '{}' \;
-
-	find vendor/rustls-platform-verifier -type f -print0 | \
-		xargs -0 sed -i \
-		-e 's|"android"|"disabling_this_because_it_is_for_building_an_apk"|g' \
-		-e "s|ANDROID|DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK|g" \
-		-e 's|"linux"|"android"|g'
-
-	echo "" >> Cargo.toml
-	echo '[patch.crates-io]' >> Cargo.toml
-	echo 'rustls-platform-verifier = { path = "./vendor/rustls-platform-verifier" }' >> Cargo.toml
 }
 
 termux_step_post_make_install() {
-	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/bash-completion/completions/atuin
-	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/zsh/site-functions/_atuin
-	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/fish/vendor_completions.d/atuin.fish
+	install -Dm644 /dev/null "$TERMUX_PREFIX/share/bash-completion/completions/atuin"
+	install -Dm644 /dev/null "$TERMUX_PREFIX/share/zsh/site-functions/_atuin"
+	install -Dm644 /dev/null "$TERMUX_PREFIX/share/fish/vendor_completions.d/atuin.fish"
 }
 
 termux_step_create_debscripts() {
