@@ -1,36 +1,31 @@
+diff --git a/crates/next-napi-bindings/build.rs b/crates/next-napi-bindings/build.rs
+index 14e75e7f..36e93816 100644
 --- a/crates/next-napi-bindings/build.rs
 +++ b/crates/next-napi-bindings/build.rs
-@@ -51,13 +51,20 @@
+@@ -47,15 +47,19 @@ fn main() -> anyhow::Result<()> {
+     // top-level crate has changed (which would've triggered our rebuild), then the resulting binary
+     // must be equivalent to a clean build anyways. Therefore, filesystem cache using the HEAD
+     // commit hash as a version is okay.
 -    let git = vergen_gitcl::GitclBuilder::default()
--        .dirty(/* include_untracked */ true)
--        .describe(
--            /* tags */ true,
--            /* dirty */ !is_ci, // suppress the dirty suffix in CI
--            /* matches */ Some("v[0-9]*"), // find the last version tag
--        )
++    let mut emitter = vergen_gitcl::Emitter::default();
++    let _ = emitter.add_instructions(&cargo);
++
++    let git_res = vergen_gitcl::GitclBuilder::default()
+         .dirty(/* include_untracked */ true)
+         .sha(/* short */ true)
 -        .build()?;
 -    vergen_gitcl::Emitter::default()
 -        .fail_on_error()
 -        .add_instructions(&cargo)?
 -        .add_instructions(&git)?
 -        .emit()?;
-+    let mut emitter = vergen_gitcl::Emitter::default();
-+    let _ = emitter.add_instructions(&cargo);
-+
-+    let git_res = vergen_gitcl::GitclBuilder::default()
-+        .dirty(/* include_untracked */ true)
-+        .describe(
-+            /* tags */ true,
-+            /* dirty */ !is_ci,
-+            Some("v[0-9]*"),
-+        )
 +        .build();
 +
-+    let mut git_ok = false;
 +    if let Ok(git) = git_res {
-+        if emitter.add_instructions(&git).is_ok() {
-+            git_ok = true;
-+        }
++        let _ = emitter.add_instructions(&git);
 +    }
 +
 +    let _ = emitter.emit();
+ 
+     match Command::new("git").args(["rev-parse", "HEAD"]).output() {
+         Ok(out) if out.status.success() => println!(

@@ -1,9 +1,9 @@
 diff --git a/Cargo.lock b/Cargo.lock
-index a06447a339..26a3e5247a 100644
+index c3699e35..2ca5b532 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
-@@ -2404,6 +2404,16 @@ dependencies = [
-  "syn 2.0.104",
+@@ -2830,6 +2830,16 @@ dependencies = [
+  "windows-sys 0.59.0",
  ]
  
 +[[package]]
@@ -19,20 +19,20 @@ index a06447a339..26a3e5247a 100644
  [[package]]
  name = "fs_extra"
  version = "1.3.0"
-@@ -4633,6 +4643,7 @@ dependencies = [
+@@ -5100,6 +5110,7 @@ dependencies = [
+  "console-subscriber",
   "dhat",
-  "either",
   "flate2",
 + "fs2",
   "futures-util",
   "getrandom 0.2.15",
   "iana-time-zone",
 diff --git a/crates/next-napi-bindings/Cargo.toml b/crates/next-napi-bindings/Cargo.toml
-index 1858344947..6e936d86f4 100644
+index 5237da8b..8c89c4f2 100644
 --- a/crates/next-napi-bindings/Cargo.toml
 +++ b/crates/next-napi-bindings/Cargo.toml
-@@ -102,6 +102,9 @@ swc_core = { workspace = true, features = [
-     "ecma_visit",
+@@ -86,6 +86,9 @@ swc_core = { workspace = true, features = [
+     "plugin_transform_host_native_filesystem_cache",
  ] }
  
 +[target.'cfg(target_os = "android")'.dependencies]
@@ -42,7 +42,7 @@ index 1858344947..6e936d86f4 100644
  [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
  lightningcss-napi = { workspace = true }
 diff --git a/crates/next-napi-bindings/src/lockfile.rs b/crates/next-napi-bindings/src/lockfile.rs
-index 35293d8a7b..2ea9913d0e 100644
+index 35293d8a..2ea9913d 100644
 --- a/crates/next-napi-bindings/src/lockfile.rs
 +++ b/crates/next-napi-bindings/src/lockfile.rs
 @@ -71,7 +71,7 @@ pub fn lockfile_try_acquire_sync(
@@ -98,7 +98,7 @@ index 35293d8a7b..2ea9913d0e 100644
  
  #[napi(ts_return_type = "Promise<{ __napiType: \"Lockfile\" } | null>")]
 diff --git a/packages/next-swc/package.json b/packages/next-swc/package.json
-index 486a91f893..1bf2e9aff8 100644
+index 40c44c03..b02aa459 100644
 --- a/packages/next-swc/package.json
 +++ b/packages/next-swc/package.json
 @@ -32,7 +32,8 @@
@@ -112,10 +112,10 @@ index 486a91f893..1bf2e9aff8 100644
      }
    },
 diff --git a/packages/next/src/build/swc/index.ts b/packages/next/src/build/swc/index.ts
-index ba7900daf8..51b0783812 100644
+index 3fa7bbef..8cc229eb 100644
 --- a/packages/next/src/build/swc/index.ts
 +++ b/packages/next/src/build/swc/index.ts
-@@ -149,7 +149,7 @@ function checkVersionMismatch(pkgData: any) {
+@@ -150,7 +150,7 @@ function checkVersionMismatch(pkgData: any) {
  // we'll not include native bindings for these platform at all.
  const knownDefaultWasmFallbackTriples = [
    'x86_64-unknown-freebsd',
@@ -125,10 +125,10 @@ index ba7900daf8..51b0783812 100644
    'armv7-unknown-linux-gnueabihf',
    'i686-pc-windows-msvc',
 diff --git a/turbopack/crates/turbo-tasks-fetch/Cargo.toml b/turbopack/crates/turbo-tasks-fetch/Cargo.toml
-index 177972f672..1c779bc330 100644
+index 6cf005e9..008af260 100644
 --- a/turbopack/crates/turbo-tasks-fetch/Cargo.toml
 +++ b/turbopack/crates/turbo-tasks-fetch/Cargo.toml
-@@ -42,7 +42,7 @@ reqwest = { workspace = true, features = ["rustls"] }
+@@ -43,7 +43,7 @@ reqwest = { workspace = true, features = ["rustls"] }
  # - Windows: aws-lc-sys requires NASM and CMake which we don't have installed in
  #   CI, and would complicate the development environment setup. We could
  #   possibly switch to always using `native-tls` on Windows in the future.
@@ -138,19 +138,19 @@ index 177972f672..1c779bc330 100644
  rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
  
 diff --git a/turbopack/crates/turbo-tasks-fetch/src/client.rs b/turbopack/crates/turbo-tasks-fetch/src/client.rs
-index 6dafa4099f..3b81eb5f8e 100644
+index 2b724056..39b1906c 100644
 --- a/turbopack/crates/turbo-tasks-fetch/src/client.rs
 +++ b/turbopack/crates/turbo-tasks-fetch/src/client.rs
-@@ -47,7 +47,7 @@ impl FetchClientConfig {
-     fn try_build_uncached_reqwest_client(&self) -> reqwest::Result<reqwest::Client> {
-         #[allow(unused_mut)]
-         let mut builder = reqwest::Client::builder();
+@@ -82,7 +82,7 @@ impl FetchClientConfig {
+         let mut builder = reqwest::Client::builder()
+             .connect_timeout(self.connect_timeout)
+             .timeout(self.timeout);
 -        #[cfg(any(target_os = "linux", all(windows, not(target_arch = "aarch64"))))]
 +        #[cfg(any(target_os = "linux", target_os = "android", all(windows, not(target_arch = "aarch64"))))]
          {
              use std::sync::Once;
              static ONCE: Once = Once::new();
-@@ -74,6 +74,84 @@ impl FetchClientConfig {
+@@ -109,6 +109,84 @@ impl FetchClientConfig {
                  },
              ))
          }
@@ -235,31 +235,10 @@ index 6dafa4099f..3b81eb5f8e 100644
          builder.build()
      }
  }
-@@ -120,6 +198,19 @@ impl FetchClientConfig {
-         match response_result {
-             Ok(resp) => Ok(Vc::cell(Ok(resp.resolved_cell()))),
-             Err(err) => {
-+
-+                //#[cfg(target_os = "android")]
-+                //{
-+                    // --- DEBUGGING START ---
-+                    //eprintln!("\n[Turbopack] NETWORK ERROR DEBUG:");
-+                    //eprintln!("URL: {}", url_ref);
-+                    //eprintln!("Error: {:?}", err); // Prints the high level error
-+                    //if let Some(source) = std::error::Error::source(&err) {
-+                    //    eprintln!("Caused by: {:?}", source); // Prints the deep TLS error
-+                    //}
-+                    // --- DEBUGGING END ---
-+                //}
-+                
-                 // the client failed to construct or the HTTP request failed
-                 mark_session_dependent();
-                 Ok(Vc::cell(Err(
-@@ -130,6 +221,33 @@ impl FetchClientConfig {
-     }
+@@ -353,6 +431,32 @@ fn parse_cache_control(headers: &reqwest::header::HeaderMap) -> Option<u64> {
+     max_age
  }
  
-+
 +#[cfg(target_os = "android")]
 +fn simple_base64_decode(input: &str) -> Result<Vec<u8>, ()> {
 +    let mut buffer = Vec::new();
@@ -290,7 +269,7 @@ index 6dafa4099f..3b81eb5f8e 100644
  pub fn __test_only_reqwest_client_cache_clear() {
      CLIENT_CACHE.clear()
 diff --git a/turbopack/crates/turbo-tasks-malloc/src/counter.rs b/turbopack/crates/turbo-tasks-malloc/src/counter.rs
-index d5faff91ba..061426541b 100644
+index d5faff91..06142654 100644
 --- a/turbopack/crates/turbo-tasks-malloc/src/counter.rs
 +++ b/turbopack/crates/turbo-tasks-malloc/src/counter.rs
 @@ -6,6 +6,9 @@ use std::{
@@ -419,16 +398,16 @@ index d5faff91ba..061426541b 100644
  }
  
 diff --git a/turbopack/crates/turbo-tasks-malloc/src/lib.rs b/turbopack/crates/turbo-tasks-malloc/src/lib.rs
-index 47410b0e11..c8e05a1ff9 100644
+index 9b72c958..4f319800 100644
 --- a/turbopack/crates/turbo-tasks-malloc/src/lib.rs
 +++ b/turbopack/crates/turbo-tasks-malloc/src/lib.rs
 @@ -1,3 +1,5 @@
 +#![feature(thread_local)]
 +
  mod counter;
+ mod memory_pressure;
  
- use std::{
-@@ -6,8 +8,31 @@ use std::{
+@@ -7,8 +9,31 @@ use std::{
      ops::{Add, AddAssign},
  };
  
@@ -460,7 +439,7 @@ index 47410b0e11..c8e05a1ff9 100644
  #[derive(Default, Clone, Debug)]
  pub struct AllocationInfo {
      pub allocations: usize,
-@@ -91,6 +116,11 @@ impl TurboMalloc {
+@@ -97,6 +122,11 @@ impl TurboMalloc {
  
      pub fn thread_stop() {
          flush();
@@ -471,8 +450,8 @@ index 47410b0e11..c8e05a1ff9 100644
 +        }
      }
  
-     pub fn allocation_counters() -> AllocationCounters {
-@@ -121,30 +151,91 @@ unsafe fn base_alloc_size(ptr: *const u8, layout: Layout) -> usize {
+     pub fn thread_park() {
+@@ -164,30 +194,91 @@ unsafe fn base_alloc_size(ptr: *const u8, layout: Layout) -> usize {
  
  unsafe impl GlobalAlloc for TurboMalloc {
      unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
@@ -564,7 +543,7 @@ index 47410b0e11..c8e05a1ff9 100644
          let old_size = unsafe { base_alloc_size(ptr, layout) };
          let ret = unsafe { base_alloc().realloc(ptr, layout, new_size) };
          if !ret.is_null() {
-@@ -154,6 +245,12 @@ unsafe impl GlobalAlloc for TurboMalloc {
+@@ -197,6 +288,12 @@ unsafe impl GlobalAlloc for TurboMalloc {
              let new_size = unsafe { base_alloc_size(ret, new_layout) };
              update(old_size, new_size);
          }
