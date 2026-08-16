@@ -1,0 +1,14 @@
+Android does not use udev. Skip udev/hwdb rules generation so the
+build does not try to execute the cross-compiled mtp-hotplug binary.
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -152,7 +152,7 @@ esac
+ AC_SUBST(OSFLAGS)
+
+ AC_MSG_CHECKING([if the host operating system is Linux])
+-AC_TRY_COMPILE([#ifndef __linux__
++AC_TRY_COMPILE([#if !defined(__linux__) || defined(__ANDROID__)
+ 		#error "FAIL"
+ 		#endif
+ 		],

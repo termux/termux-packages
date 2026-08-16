@@ -1,0 +1,13 @@
+rindex() isn't in bionic. Use the same branch as Windows, which already calls strrchr().
+
+--- a/examples/pathutils.c
++++ b/examples/pathutils.c
+@@ -132,7 +132,7 @@ find_filetype (const char * filename)
+   char *ptype;
+   LIBMTP_filetype_t filetype;
+
+-#ifdef __WIN32__
++#if defined(__WIN32__) || defined(__ANDROID__)
+   ptype = strrchr(filename, '.');
+ #else
+   ptype = rindex(filename,'.');
