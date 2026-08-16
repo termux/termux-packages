@@ -1,0 +1,75 @@
+diff --git a/src/main.cpp b/src/main.cpp
+index 0ecc6ac..3af6d2c 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -5,9 +5,12 @@
+ #include <queue>
+ #include <vector>
+ #include <clocale>
++#if _WIN32
+ #include <filesystem>
+-
+ namespace fs = std::filesystem;
++#else
++#include <libgen.h>
++#endif
+ 
+ #if _WIN32
+ // image decoder and encoder with wic
+@@ -659,18 +662,41 @@ void *save(void *args)
+         path_t ext = get_file_extension(v.outpath);
+ 
+         /* ----------- Create folder if not exists -------------------*/
+-        fs::path fs_path = fs::absolute(v.outpath);
+ #if _WIN32
++        fs::path fs_path = fs::absolute(v.outpath);
+         std::wstring parent_path = fs_path.parent_path().wstring();
+-#else
+-        std::string parent_path = fs_path.parent_path().string();
+-#endif
+-
+         if (!fs::exists(parent_path))
+         {
+             fprintf(stderr, "📂 Creating directory: %s\n", parent_path.c_str());
+             fs::create_directories(parent_path);
+         }
++#else
++        {
++            // Use POSIX APIs to avoid std::filesystem locale issues on Android/Bionic
++            std::string outpath_str(v.outpath);
++            // dirname() may modify its argument, so use a copy
++            std::vector<char> buf(outpath_str.begin(), outpath_str.end());
++            buf.push_back('\0');
++            const char* parent_dir = dirname(buf.data());
++            struct stat st;
++            if (stat(parent_dir, &st) != 0)
++            {
++                fprintf(stderr, "📂 Creating directory: %s\n", parent_dir);
++                // Create directories recursively
++                std::string dir(parent_dir);
++                for (size_t pos = 1; pos < dir.size(); ++pos)
++                {
++                    if (dir[pos] == '/')
++                    {
++                        dir[pos] = '\0';
++                        mkdir(dir.c_str(), 0755);
++                        dir[pos] = '/';
++                    }
++                }
++                mkdir(dir.c_str(), 0755);
++            }
++        }
++#endif
+ 
+         if (ext == PATHSTR("webp") || ext == PATHSTR("WEBP"))
+         {
+@@ -744,7 +770,9 @@ int wmain(int argc, wchar_t **argv)
+ int main(int argc, char **argv)
+ #endif
+ {
++#ifndef __BIONIC__
+     setlocale(LC_ALL, "");
++#endif
+     path_t inputpath;
+     path_t outputpath;
+     int scale = 4;
