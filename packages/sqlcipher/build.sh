@@ -70,9 +70,21 @@ termux_step_post_massage() {
 	mv bin/{sqlite3,sqlcipher}
 	mv include/{sqlite3,sqlcipher}.h
 	mv include/{sqlite3ext,sqlcipherext}.h
-	mv lib/lib{sqlite3,sqlcipher}.so
-	mv lib/lib{sqlite3,sqlcipher}.so.0
+	# lib/libsqlite3.so and lib/libsqlite3.so.0 are symlinks, not regular
+	# files. `mv` on a symlink only renames the link itself - it does NOT
+	# update the target path stored inside it. That left the renamed
+	# links still pointing at the old libsqlite3.so.* names, which no
+	# longer exist once the real versioned file below is renamed too,
+	# producing a broken chain: libsqlcipher.so -> libsqlite3.so.0 ->
+	# libsqlite3.so.<ver> (none of which exist anymore). This is what
+	# caused reverse-dependencies linking with -lsqlcipher to fail with
+	# "ld.lld: error: unable to find library -lsqlcipher".
+	# Remove the stale links and recreate them pointing at the new
+	# sqlcipher names instead of trying to rename them in place.
+	rm -f lib/libsqlite3.so lib/libsqlite3.so.0
 	mv lib/lib{sqlite3,sqlcipher}.so."$sql_version"
+	ln -sf libsqlcipher.so."$sql_version" lib/libsqlcipher.so.0
+	ln -sf libsqlcipher.so.0 lib/libsqlcipher.so
 	mv lib/pkgconfig/{sqlite3,sqlcipher}.pc
 	mv share/man/man1/{sqlite3,sqlcipher}.1.gz
 	sed -i s/-lsqlite3/-lsqlcipher/ lib/pkgconfig/sqlcipher.pc
