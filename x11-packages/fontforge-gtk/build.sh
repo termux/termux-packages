@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-3.0, BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="COPYING.gplv3, LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="20251009"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/fontforge/fontforge/releases/download/${TERMUX_PKG_VERSION}/fontforge-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=69046500185a5581b58139dfad30c0b3d8128f00ebbfddc31f2fcf877e329e52
 TERMUX_PKG_DEPENDS="freetype, giflib, glib, gtk3, gtkmm3, libc++, libcairo, libiconv, libjpeg-turbo, libpng, libtiff, libxml2, pango, python, readline, woff2, zlib"
