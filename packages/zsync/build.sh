@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://zsync.moria.org.uk/
 TERMUX_PKG_DESCRIPTION="A file transfer program to download files from remote web servers"
 TERMUX_PKG_LICENSE="Artistic-License-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.7.2"
+TERMUX_PKG_VERSION="0.8.0"
 TERMUX_PKG_SRCURL=https://zsync.moria.org.uk/download/zsync-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=51a54a2bcf60311f108924b5f8795fb7a8eeeedd0b52f4f634842ea3470978a2
+TERMUX_PKG_SHA256=58b02f27e14326b62b7fdd6ed431a3e243b1c5a3ea9e3c1678e136dbf00c238d
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
