@@ -1,0 +1,14 @@
+Prevent conflict with wabt
+https://github.com/WebAssembly/binaryen/issues/9002
+
+--- a/src/tools/wasm2c/CMakeLists.txt
++++ b/src/tools/wasm2c/CMakeLists.txt
+@@ -10,6 +10,6 @@ set(WASM2C_TEMPLATE_SOURCES
+     ${PREBUILT_DIR}/wasm2c_spec_top.cpp
+ )
+ 
+-binaryen_add_executable(wasm2c "wasm2c-builder.cpp;assertion-emitter.cpp;wasm2c.cpp;${WASM2C_TEMPLATE_SOURCES}")
++binaryen_add_executable(binaryen-wasm2c "wasm2c-builder.cpp;assertion-emitter.cpp;wasm2c.cpp;${WASM2C_TEMPLATE_SOURCES}")
+ # TODO: https://github.com/WebAssembly/binaryen/issues/8775 - stop using picosha2
+-target_include_directories(wasm2c PRIVATE ${PROJECT_SOURCE_DIR}/third_party/picosha2 ${PROJECT_SOURCE_DIR}/src/tools/wasm2c)
++target_include_directories(binaryen-wasm2c PRIVATE ${PROJECT_SOURCE_DIR}/third_party/picosha2 ${PROJECT_SOURCE_DIR}/src/tools/wasm2c)
