@@ -19,7 +19,9 @@ PACKAGES+=" autoconf"
 PACKAGES+=" automake"
 PACKAGES+=" bc"
 PACKAGES+=" bison"
-PACKAGES+=" bsdtar"				# Needed to create pacman packages
+PACKAGES+=" bsdtar"
+PACKAGES+=" which"
+# Needed to create pacman packages
 PACKAGES+=" cmake"
 PACKAGES+=" ed"
 PACKAGES+=" flex"
