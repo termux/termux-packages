@@ -18,6 +18,7 @@ CCAUX=gcc
 --disable-cups
 --disable-compile-inits
 --without-pcl
+--without-versioned-path
 --without-x
 --with-system-libtiff
 "
