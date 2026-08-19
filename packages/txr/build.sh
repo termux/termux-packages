@@ -9,10 +9,6 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libffi, zlib"
 TERMUX_PKG_EXTRA_MAKE_ARGS="LN:=ln LN+=-rs"
 
-termux_step_pre_configure() {
-	CFLAGS="${CFLAGS/-Oz/-O2}"
-}
-
 termux_step_configure() {
 	"${TERMUX_PKG_SRCDIR}/configure" \
 		prefix="${TERMUX__PREFIX}"
