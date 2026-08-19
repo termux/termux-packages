@@ -1,0 +1,30 @@
+--- a/pass-cli/src/features/mod.rs
++++ b/pass-cli/src/features/mod.rs
+@@ -64,20 +64,21 @@
+     let provider_type = env::var("PROTON_PASS_KEY_PROVIDER").unwrap_or_default();
+ 
+     match provider_type.as_str() {
+-        "fs" => {
++        "fs" | "" => {
+             info!("Using filesystem-based local key provider");
+             Ok(Arc::new(FsLocalKeyProvider::new(base_dir)))
+         }
+-        "keyring" | "" => {
+-            info!("Using keyring-based local key provider");
+-            Ok(Arc::new(keyring::KeyringKeyProvider::new(base_dir)?))
+-        }
++        "keyring" => Err(anyhow::anyhow!(
++            "PROTON_PASS_KEY_PROVIDER=keyring is unsupported on Termux/Android: the kernel keyring \
++             service is not available. Use 'fs' (default) or 'env' instead."
++        )),
+         "env" => {
+             info!("Using environment variable-based local key provider");
+             Ok(Arc::new(env_key_provider::EnvLocalKeyProvider::new()?))
+         }
+         _ => Err(anyhow::anyhow!(
+-            "Invalid PROTON_PASS_KEY_PROVIDER value: '{}'. Valid values are 'fs', 'keyring', or 'env'",
++            "Invalid PROTON_PASS_KEY_PROVIDER value: '{}'. Valid values are 'fs', 'keyring' (disabled \
++             on Termux/Android), or 'env'",
+             provider_type
+         )),
+     }

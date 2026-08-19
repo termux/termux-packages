@@ -1,0 +1,17 @@
+Use the system protoc installed by termux_setup_protobuf instead of the
+vendored protoc binary. protoc-bin-vendored only ships prebuilt binaries
+for common desktop targets (x86_64 Linux/macOS/Windows) and has no binary
+for aarch64-unknown-linux-android, so protoc_bin_path().unwrap() panics
+during the build on Android.
+
+--- a/pass-domain/build.rs
++++ b/pass-domain/build.rs
+@@ -63,7 +63,7 @@
+ 
+     protobuf_codegen::Codegen::new()
+         .protoc()
+-        .protoc_path(&protoc_bin_vendored::protoc_bin_path().unwrap())
++        .protoc_path(&PathBuf::from("protoc"))
+         .include(proto_dir)
+         .input(proto_path)
+         .out_dir(out_dir)
