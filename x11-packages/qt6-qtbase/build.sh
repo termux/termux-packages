@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="A cross-platform application and UI framework"
 TERMUX_PKG_LICENSE="GPL-3.0-only"
 TERMUX_PKG_LICENSE_FILE="LICENSES/GPL-3.0-only.txt"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.11.1"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="6.11.2"
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtbase-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=d9594a31228aa23ad6b531719a29b45f0f3989fe6c136d45767ea179f233c1ac
+TERMUX_PKG_SHA256=5b2e00eccaf5a4d8c14134ffa0ea8dfd0a35ae1ffc7f8d87fa4305a1ed23cf22
 TERMUX_PKG_DEPENDS="brotli, double-conversion, freetype, glib, harfbuzz, krb5, libandroid-posix-semaphore, libandroid-shmem, libc++, libdrm, libglvnd-dev, libice, libicu, libjpeg-turbo, libpng, libsm, libsqlite, libuuid, libx11, libxcb, libxi, libxkbcommon, libwayland, opengl, openssl, pcre2, vulkan-loader, xcb-util-cursor, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil, xcb-util-wm, xdg-utils, zlib, zstd"
 # gtk3 dependency is a run-time dependency only for the gtk platformtheme subpackage
 TERMUX_PKG_BUILD_DEPENDS="binutils-cross, cups, gdk-pixbuf, gtk3, libwayland-protocols, pango, vulkan-headers, vulkan-loader-generic"
