@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/ryanoasis/nerd-fonts/releases/download/v$TE
 TERMUX_PKG_SHA256=8e617904b980fe3648a4b116808788fe50c99d2d495376cb7c0badbd8a564c47
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_CONFFILES="
 etc/fonts/conf.d/10-nerd-font-symbols.conf
 "
