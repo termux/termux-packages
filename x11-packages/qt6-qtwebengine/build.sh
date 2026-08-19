@@ -9,6 +9,8 @@ TERMUX_PKG_DEPENDS="dbus, fontconfig, libc++, libexpat, libjpeg-turbo, libminizi
 TERMUX_PKG_BUILD_DEPENDS="qt6-qtbase-cross-tools, qt6-qtdeclarative-cross-tools"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_NO_STATICSPLIT=true
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP='v\d+\.\d+\.\d+(?!-)'
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 # Qt6-Webengine doesn't support cross-compile for i386.
 TERMUX_PKG_EXCLUDED_ARCHES="i686"
@@ -21,6 +23,19 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DQT_FEATURE_webengine_system_pulseaudio=ON
 -DQT_FEATURE_webengine_proprietary_codecs=ON
 "
+
+termux_pkg_auto_update() {
+	# use GitHub API for Qt packages because Repology is unreliable for Qt
+	# All Qt updates are published by upstream simultaneously, so the qtbase
+	# repository can be used for all Qt packages
+	local latest_tags
+	latest_tags="$(
+		TERMUX_PKG_SRCURL="https://github.com/qt/qtbase" \
+		termux_github_api_get_tag
+	)"
+
+	termux_pkg_upgrade_version "${latest_tags}"
+}
 
 termux_step_post_get_source() {
 	# Enable jumbo build for //components and //chrome
