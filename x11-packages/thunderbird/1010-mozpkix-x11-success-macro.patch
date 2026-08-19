@@ -1,0 +1,15 @@
+https://gitlab.archlinux.org/archlinux/packaging/packages/thunderbird/-/blob/7c5a5f74dacc75e9a221cbfac08ca020db5ad4e8/mozpkix-x11-success-macro.patch
+
+--- a/security/nss/lib/mozpkix/include/pkix/Result.h	2026-08-21 11:47:26.752396581 +0100
++++ b/security/nss/lib/mozpkix/include/pkix/Result.h	2026-08-21 11:47:26.759210035 +0100
+@@ -194,6 +194,10 @@
+                    SEC_ERROR_NO_MEMORY)                                        \
+   /* nothing here */
+ 
++#ifdef Success
++#  undef Success
++#endif
++
+ enum class Result {
+ #define MOZILLA_PKIX_MAP(name, value, nss_name) name = value,
+   MOZILLA_PKIX_MAP_LIST
