@@ -11,12 +11,26 @@ TERMUX_PKG_BUILD_DEPENDS="qt6-shadertools"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP='v\d+\.\d+\.\d+(?!-)'
 # enable ffmpeg plugin if desired; depends on ffmpeg and libandroid-shmem
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_MESSAGE_LOG_LEVEL=STATUS
 -DCMAKE_SYSTEM_NAME=Linux
 -DINPUT_ffmpeg=no
 "
+
+termux_pkg_auto_update() {
+	# use GitHub API for Qt packages because Repology is unreliable for Qt
+	# All Qt updates are published by upstream simultaneously, so the qtbase
+	# repository can be used for all Qt packages
+	local latest_tags
+	latest_tags="$(
+		TERMUX_PKG_SRCURL="https://github.com/qt/qtbase" \
+		termux_github_api_get_tag
+	)"
+
+	termux_pkg_upgrade_version "${latest_tags}"
+}
 
 termux_step_host_build() {
 	termux_setup_cmake

@@ -12,6 +12,7 @@ TERMUX_PKG_RECOMMENDS="qt6-qtdeclarative"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP='v\d+\.\d+\.\d+(?!-)'
 # disable clang, can not find libclangBasic.a
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_DISABLE_FIND_PACKAGE_Clang=ON
@@ -22,6 +23,19 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DQT_FORCE_BUILD_TOOLS=ON
 -DQT_HOST_PATH=${TERMUX_PREFIX}/opt/qt6/cross
 "
+
+termux_pkg_auto_update() {
+	# use GitHub API for Qt packages because Repology is unreliable for Qt
+	# All Qt updates are published by upstream simultaneously, so the qtbase
+	# repository can be used for all Qt packages
+	local latest_tags
+	latest_tags="$(
+		TERMUX_PKG_SRCURL="https://github.com/qt/qtbase" \
+		termux_github_api_get_tag
+	)"
+
+	termux_pkg_upgrade_version "${latest_tags}"
+}
 
 termux_step_host_build() {
 	termux_setup_cmake
