@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 # Keep version of `tigervnc` package aligned with this package, revbump tigervnc after modifying patches of this package
 TERMUX_PKG_VERSION="21.1.16"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=b14a116d2d805debc5b5b2aac505a279e69b217dae2fae2dfcb62400471a9970
 # We can not update it automatically because tigervnc server version must be aligned with xorg-server.
@@ -90,9 +90,16 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install () {
-	rm -f "${TERMUX_PREFIX}/usr/share/X11/xkb/compiled"
+	rm -f "${TERMUX_PREFIX}/usr/share/X11/xkb/compiled" "${TERMUX_PREFIX}/bin/X"
 	install -Dm644 -t "${TERMUX_PREFIX}/etc/X11/" "${TERMUX_PKG_BUILDER_DIR}/xorg.conf"
 	install -Dm755 "${TERMUX_PKG_CACHEDIR}/xvfb-run" "${TERMUX_PREFIX}/bin/"
+}
+
+termux_step_create_debscripts () {
+	cat <<- EOF > ./preinst
+	#!${TERMUX_PREFIX}/bin/sh
+	rm -f ${TERMUX_PREFIX}/bin/X
+	EOF
 }
 
 ## The following is required for package 'tigervnc'.
