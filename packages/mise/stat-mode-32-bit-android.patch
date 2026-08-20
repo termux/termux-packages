@@ -68,3 +68,23 @@ index eba9609..72fb85f 100644
          nix::sys::stat::fchmod(&destination, mode)?;
      }
      Ok(())
+--- a/src/system/managed_files.rs
++++ b/src/system/managed_files.rs
+@@ -1599,9 +1599,15 @@ fn open_or_create_directory_tree_inner(
+             Ok(directory) => directory,
+             Err(open_error) => {
+                 let metadata = fstatat(&directory, name.as_os_str(), AtFlags::AT_SYMLINK_NOFOLLOW);
+-                if metadata.is_ok_and(|metadata| {
++                #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
++                let metadataIsOk = metadata.is_ok_and(|metadata| {
+                     SFlag::from_bits_truncate(metadata.st_mode).contains(SFlag::S_IFLNK)
+-                }) {
++                });
++                #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++                let metadataIsOk = metadata.is_ok_and(|metadata| {
++                    SFlag::from_bits_truncate(metadata.st_mode as u16).contains(SFlag::S_IFLNK)
++                });
++                if metadataIsOk {
+                     let parent = fstat(&directory)?;
+                     if parent.st_uid != 0 || parent.st_mode & 0o022 != 0 {
+                         bail!(
