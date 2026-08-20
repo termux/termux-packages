@@ -257,6 +257,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/get_source/termux_step_get_source.sh"
 # shellcheck source=scripts/build/get_source/termux_step_get_source.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/get_source/termux_git_clone_src.sh"
 
+# Download source archive from Termux source mirror, for both .tar archives and git repositories.
+# shellcheck source=scripts/build/get_source/termux_download_source_mirror.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/get_source/termux_download_source_mirror.sh"
+
 # Run from termux_step_get_source if TERMUX_PKG_SRCURL does not begin with "git+".
 # shellcheck source=scripts/build/get_source/termux_download_src_archive.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/get_source/termux_download_src_archive.sh"
@@ -527,6 +531,7 @@ _show_usage() {
 	echo "  -j <N> Number of threads. (default or 0, N = \`nproc\` = $(nproc))"
 	echo "         Can also be passed combined, e.g. '-j12'."
 	echo "  -L The package and its dependencies will be based on the same library."
+	echo "  -m Copy downloaded source archives to directory output/source/, if they are not present on the source mirror."
 	echo "  -q Quiet build."
 	echo "  -Q Loud build -- set -x debug output and function tracing."
 	echo "  -r Remove all package build dependent dirs that '-f/-F'"
@@ -602,6 +607,7 @@ while (( $# )); do
 			export TERMUX_PKG_MAKE_PROCESSES
 		;;
 		-L) export TERMUX_GLOBAL_LIBRARY=true;;
+		-m) export TERMUX_COPY_TO_SOURCE_MIRROR=true;;
 		-q) export TERMUX_QUIET_BUILD=true;;
 		-Q) export PS4='+$0 \[\e[32m\]${FUNCNAME[0]:-<global scope>}${FUNCNAME[*]:+()}:$LINENO\[\e[0m\] '; set -x;;
 		-r) export TERMUX_PKGS__BUILD__RM_ALL_PKG_BUILD_DEPENDENT_DIRS=true;;
