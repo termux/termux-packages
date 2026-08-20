@@ -1,23 +1,12 @@
-diff --git a/configure.ac b/configure.ac
-index 67d6bc4..29e0e70 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -36,7 +36,7 @@ AC_CHECK_HEADER_STDBOOL
- AC_PROG_CC
- AC_FUNC_ALLOCA
- 
--AS_IF([test "x$disable_struct_support" == "xyes"], [
-+AS_IF([test "x$disable_struct_support" = "xyes"], [
-     AC_FUNC_OBSTACK
- ])
- 
-@@ -65,86 +65,10 @@ AC_CHECK_MEMBER([struct builtin.name],
+@@ -62,86 +62,8 @@
  
  AM_CONDITIONAL([ENABLE_STRUCTS], [test "x$disable_struct_support" != "xyes"])
  
 -# Does enable -f work with a very simple plugin?
 -LDFLAGS="${LDFLAGS} -shared -fPIC"
--
+ 
 -AC_MSG_CHECKING([whether a minimal bash plugin compiles])
 -AC_LINK_IFELSE([AC_LANG_SOURCE([[
 -    #include <stddef.h>
@@ -91,9 +80,9 @@ index 67d6bc4..29e0e70 100644
 -    AC_MSG_FAILURE([unable to build a test extension], 1)
 -])
 -
- LDFLAGS="${SAVED_LDFLAGS}"
- CPPFLAGS="${SAVED_CPPFLAGS}"
- 
+-LDFLAGS="${SAVED_LDFLAGS}"
+-CPPFLAGS="${SAVED_CPPFLAGS}"
+-
 -AS_IF([test "x$disable_struct_support" == "xyes"], [
 +AS_IF([test "x$disable_struct_support" = "xyes"], [
        AS_BOX([!!! AUTOMATIC STRUCT SUPPORT IS DISABLED DUE TO MISSING DEPENDENCIES !!!], [*])
