@@ -1,0 +1,26 @@
+From 600906b99dea975b64bad61e7d4e4859fb0ed2fa
+From: Finagolfin
+Date: Wed, 15 Apr 2026
+Subject: [PATCH] [libc++] Update `__mbstate_t.h` to include path to Android's
+ `mbstate_t.h`, back-ported to NDK 29
+
+Ever since ce4ac9945 started including `__mbstate_t.h` in this C++ `wchar.h`,
+the Android NDK sees some redefinition errors with `-fmodules`, likely because
+this Android `mbstate_t.h` was not included. Elliot, enh-google from the Android
+team, suggested this inclusion to fix it, and it worked for me in my local
+testing: see swiftlang/swift#85365 for the errors and more info. This fixes
+android/ndk#2230, once it gets into the NDK sysroot.
+
+diff --git a/usr/include/c++/v1/__mbstate_t.h b/usr/include/c++/v1/__mbstate_t.h
+index c23ea7113ca70..d331ba622d37f 100644
+--- a/usr/include/c++/v1/__mbstate_t.h
++++ b/usr/include/c++/v1/__mbstate_t.h
+@@ -43,6 +43,8 @@
+ #  include <bits/types/mbstate_t.h> // works on most Unixes
+ #elif __has_include(<sys/_types/_mbstate_t.h>)
+ #  include <sys/_types/_mbstate_t.h> // works on Darwin
++#elif __has_include(<bits/mbstate_t.h>)
++#  include <bits/mbstate_t.h> // works for Android
+ #elif _LIBCPP_HAS_WIDE_CHARACTERS && __has_include_next(<wchar.h>)
+ #  include_next <wchar.h> // fall back to the C standard provider of mbstate_t
+ #elif __has_include_next(<uchar.h>)
