@@ -1,0 +1,197 @@
+diff --git a/hermes_cli/banner.py b/hermes_cli/banner.py
+index a1cd4748..259c454b 100644
+--- a/hermes_cli/banner.py
++++ b/hermes_cli/banner.py
+@@ -406,7 +406,7 @@ def check_for_updates() -> Optional[int]:
+     # (web_server.py); mirror that here so the banner/TUI surfaces agree.
+     try:
+         from hermes_cli.config import detect_install_method, get_project_root
+-        if detect_install_method(get_project_root()) == "docker":
++        if detect_install_method(get_project_root()) in {"docker", "apt"}:
+             return None
+     except Exception:
+         pass
+diff --git a/hermes_cli/config.py b/hermes_cli/config.py
+index cd226a92..b632cd5f 100644
+--- a/hermes_cli/config.py
++++ b/hermes_cli/config.py
+@@ -410,7 +410,7 @@ def _install_method_project_root(project_root: Optional[Path] = None) -> Path:
+ 
+ 
+ def detect_install_method(project_root: Optional[Path] = None) -> str:
+-    """Detect how Hermes was installed: 'docker', 'nix', 'nixos', 'git', or 'unknown'.
++    """Detect how Hermes was installed: 'apt', 'docker', 'nix', 'nixos', 'git', or 'unknown'.
+ 
+     Resolution order:
+     1. Code-scoped stamp ``<install tree>/.install_method`` (next to the
+@@ -454,7 +454,8 @@ def detect_install_method(project_root: Optional[Path] = None) -> str:
+     See issue #34397.
+     """
+     root = _install_method_project_root(project_root)
+-    supported_methods = {"docker", "nix", "nixos", "git", "unknown"}
++    # "apt" is the Termux APT distribution identifier.
++    supported_methods = {"apt", "docker", "nix", "nixos", "git", "unknown"}
+ 
+     # 1. Code-scoped stamp â€” authoritative, immune to shared $HERMES_HOME.
+     try:
+@@ -548,6 +549,8 @@ def recommended_update_command_for_method(method: str) -> str:
+         return _NIX_UPDATE_MSG
+     if method == "docker":
+         return "docker pull nousresearch/hermes-agent:latest"
++    if method == "apt":
++        return "pkg upgrade hermes-agent"
+     return "hermes update"
+ 
+ 
+diff --git a/hermes_cli/doctor.py b/hermes_cli/doctor.py
+index e16de606..cf3f2e25 100644
+--- a/hermes_cli/doctor.py
++++ b/hermes_cli/doctor.py
+@@ -91,6 +91,8 @@ def _sqlite_upgrade_hint(install_method: str | None = None) -> str:
+         action = f"run `{command}`, then recreate all Hermes containers"
+     elif method in {"nix", "nixos"}:
+         action = recommended_update_command_for_method(method)
++    elif method == "apt":
++        action = f"run `{recommended_update_command_for_method(method)}`"
+     else:
+         action = "run `hermes update`"
+     return (
+diff --git a/hermes_cli/main.py b/hermes_cli/main.py
+index ed9fe973..92977ba8 100644
+--- a/hermes_cli/main.py
++++ b/hermes_cli/main.py
+@@ -9822,7 +9822,7 @@ def cmd_update(args):
+         print(format_docker_update_message())
+         sys.exit(1)
+ 
+-    if install_method in {"nix", "nixos"}:
++    if install_method in {"nix", "nixos", "apt"}:
+         print(recommended_update_command_for_method(install_method))
+         sys.exit(1)
+ 
+diff --git a/hermes_cli/observability/schemas/hermes.shared_metrics.v2.schema.json b/hermes_cli/observability/schemas/hermes.shared_metrics.v2.schema.json
+index 5d0bea61..00525696 100644
+--- a/hermes_cli/observability/schemas/hermes.shared_metrics.v2.schema.json
++++ b/hermes_cli/observability/schemas/hermes.shared_metrics.v2.schema.json
+@@ -58,7 +58,7 @@
+         },
+         "install_method": {
+           "type": "string",
+-          "enum": ["docker", "git", "homebrew", "nixos", "pip", "unknown"]
++          "enum": ["apt", "docker", "git", "homebrew", "nixos", "pip", "unknown"]
+         },
+         "os_family": {
+           "type": "string",
+diff --git a/hermes_cli/observability/shared_metrics_contract.py b/hermes_cli/observability/shared_metrics_contract.py
+index b7637c93..6a1cec1c 100644
+--- a/hermes_cli/observability/shared_metrics_contract.py
++++ b/hermes_cli/observability/shared_metrics_contract.py
+@@ -194,6 +194,7 @@ CLIENT_ARCHITECTURES: frozenset[str] = frozenset({
+     "x86_64",
+ })
+ CLIENT_INSTALL_METHODS: frozenset[str] = frozenset({
++    "apt",
+     "docker",
+     "git",
+     "homebrew",
+diff --git a/hermes_cli/uninstall.py b/hermes_cli/uninstall.py
+index efc546d8..446f8c5b 100644
+--- a/hermes_cli/uninstall.py
++++ b/hermes_cli/uninstall.py
+@@ -592,6 +592,11 @@ def run_uninstall(args):
+     project_root = get_project_root()
+     hermes_home = get_hermes_home()
+ 
++    from hermes_cli.config import detect_install_method
++    if detect_install_method(project_root) == "apt":
++        print("Hermes is managed by Termux APT; run `pkg uninstall hermes-agent`.")
++        raise SystemExit(1)
++
+     if bool(getattr(args, "dry_run", False)):
+         _print_uninstall_dry_run(
+             project_root=project_root,
+diff --git a/hermes_cli/update_cmd.py b/hermes_cli/update_cmd.py
+index 57cff41f..051557c3 100644
+--- a/hermes_cli/update_cmd.py
++++ b/hermes_cli/update_cmd.py
+@@ -2491,7 +2491,7 @@ def _cmd_update_check(branch: str = "main", *, branch_explicit: bool = False):
+         print(format_docker_update_message())
+         sys.exit(1)
+ 
+-    if method in {"nix", "nixos"}:
++    if method in {"nix", "nixos", "apt"}:
+         print(recommended_update_command_for_method(method))
+         sys.exit(1)
+ 
+diff --git a/hermes_cli/web_server.py b/hermes_cli/web_server.py
+index 2cc53ece..41f08791 100644
+--- a/hermes_cli/web_server.py
++++ b/hermes_cli/web_server.py
+@@ -4474,14 +4474,16 @@ async def update_hermes():
+             "update_command": recommended_update_command_for_method(install_method),
+         }
+ 
+-    if install_method in {"nix", "nixos"}:
++    if install_method in {"nix", "nixos", "apt"}:
+         message = recommended_update_command_for_method(install_method)
+         _record_completed_action("hermes-update", message, exit_code=1)
+         return {
+             "ok": False,
+             "pid": None,
+             "name": "hermes-update",
+-            "error": "nix_update_unsupported",
++            "error": (
++                "apt_update_required" if install_method == "apt" else "nix_update_unsupported"
++            ),
+             "message": message,
+             "update_command": message,
+         }
+@@ -4580,7 +4582,7 @@ async def check_hermes_update(force: bool = False):
+     ``POST /api/hermes/update`` actually runs ``hermes update``.
+ 
+     Returns:
+-        install_method: 'git' | 'docker' | 'nix' | 'nixos' | 'unknown'
++        install_method: 'apt' | 'git' | 'docker' | 'nix' | 'nixos' | 'unknown'
+         current_version: installed Hermes version string
+         behind: commits behind upstream (>=1), 0 if up to date,
+                 -1 if behind by an unknown count, or null if the
+@@ -4627,6 +4629,9 @@ async def check_hermes_update(force: bool = False):
+     if install_method == "docker":
+         payload["message"] = format_docker_update_message()
+         return payload
++    if install_method == "apt":
++        payload["message"] = "Hermes is managed by Termux APT; run `pkg upgrade hermes-agent`."
++        return payload
+ 
+     # banner.check_for_updates() handles git / nix-revision paths and
+     # caches the result for 6h. ``force`` busts the cache so the "Check now"
+diff --git a/pyproject.toml b/pyproject.toml
+index 1191bd2c..2171037f 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -5,14 +5,8 @@ name = "hermes-agent"
+ version = "0.20.2"
+ description = "The self-improving AI agent â€” creates skills from experience, improves them during use, and runs anywhere"
+ readme = "README.md"
+-# Upper bound is load-bearing, not cosmetic. uv resolves the project's
+-# Python from `requires-python`, and an inherited `UV_PYTHON` env var (or a
+-# fresh distro whose newest interpreter uv auto-picks) will otherwise select
+-# 3.14, where Rust-backed transitives (e.g. pydantic-core) have no cp314
+-# wheel yet and fall back to a maturin source build that fails. Capping at
+-# <3.14 makes uv refuse 3.14 with a clear error instead of attempting that
+-# build. Raise the ceiling once our Rust transitives ship cp314 wheels.
+-requires-python = ">=3.11,<3.14"
++# Termux ships Python 3.14; its package manager supplies the native dependencies.
++requires-python = ">=3.11,<3.15"
+ authors = [{ name = "Nous Research" }]
+ license = "MIT"
+ license-files = ["LICENSE"]
+@@ -112,7 +106,7 @@ dependencies = [
+   # .gitignore-aware file matching for desktop build stamp.
+   "pathspec==1.1.1",
+   "fastapi>=0.104.0,<1",
+-  "uvicorn[standard]>=0.24.0,<1",
++  "uvicorn>=0.24.0,<1",
+   # Streaming multipart uploads for the dashboard file manager (NS-501).
+   # FastAPI's UploadFile/Form depend on python-multipart; it is NOT pulled in
+   # by fastapi itself, so the dashboard's multipart upload endpoint would 500
