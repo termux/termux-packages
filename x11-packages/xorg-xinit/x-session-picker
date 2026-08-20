@@ -1,0 +1,94 @@
+#!@TERMUX_PREFIX@/bin/bash
+
+# Runs as xinit's client when the user has no ~/.xinitrc (see xinitrc).
+# Finds installed desktop environments and window managers, lets the user
+# pick one via dialog(1), remembers the choice, and execs into it.
+#
+# dialog needs to read from the terminal, but xinit put this process in a
+# process group of its own, detached from the terminal's foreground group -
+# fgrun(1) joins it back in for the duration of a single command. See fgrun.c.
+
+LAST_CHOICE=$HOME/.cache/x-session-picker/last
+
+run_chosen() {
+	if [[ -z $DBUS_SESSION_BUS_ADDRESS ]] && command -v dbus-run-session > /dev/null; then
+		exec dbus-run-session -- "$1"
+	fi
+	exec "$1"
+}
+
+# No terminal to draw a menu on (e.g. started from termux-boot) - replay
+# whatever was picked last time, or fall back to the default
+# x-session-manager/x-window-manager alternative, instead of failing outright.
+if [[ ! -t 0 ]]; then
+	if [[ -r $LAST_CHOICE ]]; then
+		run_chosen "$(< "$LAST_CHOICE")"
+	fi
+	for fallback in @TERMUX_PREFIX@/bin/x-session-manager @TERMUX_PREFIX@/bin/x-window-manager; do
+		[[ -x $fallback ]] && run_chosen "$fallback"
+	done
+	echo "x-session-picker: no terminal and no remembered or default session." >&2
+	exit 1
+fi
+
+# dialog(1)/ncurses needs a real TERM to draw anything at all; xinit does not
+# set one for its client, so whatever the invoking shell had is inherited -
+# fall back if that turns out to be empty or missing a terminfo entry.
+: "${TERM:=xterm-256color}"
+export TERM
+
+FGRUN=@TERMUX_PREFIX@/libexec/xorg-xinit/fgrun
+
+# Packages that can start a session register themselves as x-session-manager
+# or x-window-manager (see e.g. xfce4-session.alternatives) - exactly one
+# entry each, so unlike scanning share/xsessions/*.desktop this cannot list
+# the same session twice under different names. dialog's tag field is the
+# exec path itself, so the selection it returns needs no further lookup.
+menu_args=()
+for group in x-session-manager x-window-manager; do
+	for target in $(update-alternatives --list "$group" 2>/dev/null); do
+		menu_args+=("$target" "${target##*/}")
+	done
+done
+
+if (( ${#menu_args[@]} == 0 )); then
+	echo "x-session-picker: no desktop environment or window manager found." >&2
+	echo "Install one (e.g. xfce4, openbox, icewm), or write ~/.xinitrc by hand." >&2
+	exit 1
+fi
+
+exec 3>&1
+chosen=$("$FGRUN" dialog --backtitle "Termux:X11" \
+	--extra-button --extra-label "Remember" \
+	--menu "Select a session to start.\nUse \"Remember\" instead of OK to skip this next time." \
+	20 70 "$((${#menu_args[@]} / 2))" "${menu_args[@]}" \
+	2>&1 1>&3)
+rc=$?
+exec 3>&-
+clear
+
+# 0 = OK, 3 = the extra "Remember" button; both carry the highlighted item.
+if (( rc != 0 && rc != 3 )) || [[ -z $chosen ]]; then
+	echo "x-session-picker: no session selected." >&2
+	exit 1
+fi
+
+mkdir -p "${LAST_CHOICE%/*}"
+printf '%s\n' "$chosen" > "$LAST_CHOICE"
+
+# Sessions generally assume a session bus is already running; none of our
+# alternatives targets set one up themselves, so start one here. This is
+# duplicated into the remembered ~/.xinitrc below since xinit runs that
+# directly on later starts, skipping this script entirely.
+if (( rc == 3 )); then
+	cat > "$HOME/.xinitrc" <<-EOF
+	#!@TERMUX_PREFIX@/bin/sh
+	if [ -z "\$DBUS_SESSION_BUS_ADDRESS" ] && command -v dbus-run-session > /dev/null; then
+		exec dbus-run-session -- $chosen
+	fi
+	exec $chosen
+	EOF
+	chmod 755 "$HOME/.xinitrc"
+fi
+
+run_chosen "$chosen"
