@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="dev tools, env vars, task runner"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2026.8.9"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/jdx/mise/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=404defbcf11ddfe14133bbd7700f84a7c0658b90fcc0b2bce943ada5c496c38d
 TERMUX_PKG_DEPENDS="bzip2, openssl"
