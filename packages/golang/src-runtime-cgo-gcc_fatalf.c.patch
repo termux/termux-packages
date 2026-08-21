@@ -4,7 +4,7 @@
  	va_end(ap);
  	fprintf(stderr, "\n");
  
--#ifdef __ANDROID__
+-#if defined(__ANDROID__) && !defined(__TERMUX__)
 -	// When running from an Android .apk, /dev/stderr and /dev/stdout
 -	// redirect to /dev/null. And when running a test binary
 -	// via adb shell, it's easy to miss logcat. So write to both.
