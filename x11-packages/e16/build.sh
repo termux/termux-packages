@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Enlightenment DR16 window manager"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.31
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://downloads.sourceforge.net/enlightenment/e16-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=4b2255d43eab66dddd4599096d82948927d28997c0ce445dcc65528f682efe91
 TERMUX_PKG_DEPENDS="glib, imlib2, libiconv, libx11, libxext, libxft, libxrender, pango"
