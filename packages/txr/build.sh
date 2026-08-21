@@ -11,5 +11,6 @@ TERMUX_PKG_EXTRA_MAKE_ARGS="LN:=ln LN+=-rs"
 
 termux_step_configure() {
 	"${TERMUX_PKG_SRCDIR}/configure" \
-		prefix="${TERMUX__PREFIX}"
+		prefix="${TERMUX__PREFIX}" \
+		do_nopie=
 }
