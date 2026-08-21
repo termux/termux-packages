@@ -3,9 +3,9 @@ TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org/
 TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed and concurrency"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.97.1"
+TERMUX_PKG_VERSION="1.98.0"
 TERMUX_PKG_SRCURL="https://static.rust-lang.org/dist/rustc-${TERMUX_PKG_VERSION}-src.tar.xz"
-TERMUX_PKG_SHA256=0ed06fdaffd4722a7702e0b4eebfafc897ab8f513e8e1b247cdd7e5c6df6ded2
+TERMUX_PKG_SHA256=271fa73d8174f53d713c46a8310da7bf7cfdcfb8b7cfd1c2b74b84a83ae9fb1e
 TERMUX_PKG_DEPENDS="clang, libandroid-execinfo, libc++, libllvm (<< $TERMUX_LLVM_NEXT_MAJOR_VERSION), lld, openssl, zlib"
 TERMUX_PKG_BUILD_DEPENDS="wasi-libc"
 TERMUX_PKG_SUGGESTS="rust-analyzer"
@@ -41,23 +41,23 @@ termux_pkg_auto_update() {
 	[[ -z "${latest_version}" ]] && e=1
 
 	local uptime_now=$(cat /proc/uptime)
-	local uptime_s="${uptime_now//.*}"
+	local uptime_s="${uptime_now//.*/}"
 	local uptime_h_limit=2
-	local uptime_s_limit=$((uptime_h_limit*60*60))
+	local uptime_s_limit=$((uptime_h_limit * 60 * 60))
 	[[ -z "${uptime_s}" ]] && [[ "$(uname -o)" != "Android" ]] && e=1
 	[[ "${uptime_s}" == 0 ]] && [[ "$(uname -o)" != "Android" ]] && e=1
 	[[ "${uptime_s}" -gt "${uptime_s_limit}" ]] && e=1
 
 	if [[ "${e}" != 0 ]]; then
-		cat <<- EOL >&2
-		WARN: Auto update failure!
-		api_url1_r=${api_url1_r}
-		api_url2_r=${api_url2_r}
-		latest_version=${latest_version}
-		latest_version_url=${latest_version_url}
-		uptime_now=${uptime_now}
-		uptime_s=${uptime_s}
-		uptime_s_limit=${uptime_s_limit}
+		cat <<-EOL >&2
+			WARN: Auto update failure!
+			api_url1_r=${api_url1_r}
+			api_url2_r=${api_url2_r}
+			latest_version=${latest_version}
+			latest_version_url=${latest_version_url}
+			uptime_now=${uptime_now}
+			uptime_s=${uptime_s}
+			uptime_s_limit=${uptime_s_limit}
 		EOL
 		return
 	fi
@@ -83,8 +83,8 @@ termux_step_pre_configure() {
 
 	local p="${TERMUX_PKG_BUILDER_DIR}/0001-set-TERMUX_PKG_API_LEVEL.diff"
 	echo "Applying patch: $(basename "${p}")"
-	sed "s|@TERMUX_PKG_API_LEVEL@|${TERMUX_PKG_API_LEVEL}|g" "${p}" \
-		| patch --silent -p1
+	sed "s|@TERMUX_PKG_API_LEVEL@|${TERMUX_PKG_API_LEVEL}|g" "${p}" |
+		patch --silent -p1
 
 	# assist with downstream patch methods that bulk-replace
 	# string 'com.termux' throughout the repository
@@ -94,7 +94,7 @@ termux_step_pre_configure() {
 	if [[ "$TERMUX_PREFIX" != "$original_prefix" ]]; then
 		local patch="$TERMUX_PKG_BUILDER_DIR/force-allow-edit-vendor.diff"
 		echo "Applying patch: $(basename "$patch")"
-		patch --silent -p1 < "$patch"
+		patch --silent -p1 <"$patch"
 
 		local crate=openssl-probe
 		local crate_src_dir="$(realpath "$(find "$TERMUX_PKG_SRCDIR/vendor" -name "$crate"'*' | sort | tail -n1)")"
@@ -106,9 +106,9 @@ termux_step_pre_configure() {
 
 		local dir
 		for dir in "$TERMUX_PKG_SRCDIR"/{,src/tools/cargo,src/tools/miri}; do
-			echo '' >> "$dir/Cargo.toml"
-			echo '[patch.crates-io]' >> "$dir/Cargo.toml"
-			echo "$crate = { path = \"${crate_dest_dir}\" }" >> "$dir/Cargo.toml"
+			echo '' >>"$dir/Cargo.toml"
+			echo '[patch.crates-io]' >>"$dir/Cargo.toml"
+			echo "$crate = { path = \"${crate_dest_dir}\" }" >>"$dir/Cargo.toml"
 		done
 	fi
 
@@ -185,7 +185,7 @@ termux_step_configure() {
 		-e "s|@CARGO_TARGET_NAME@|${CARGO_TARGET_NAME}|g" \
 		-e "s|@RUSTC@|${RUSTC}|g" \
 		-e "s|@CARGO@|${CARGO}|g" \
-		"${TERMUX_PKG_BUILDER_DIR}"/bootstrap.toml > bootstrap.toml
+		"${TERMUX_PKG_BUILDER_DIR}"/bootstrap.toml >bootstrap.toml
 
 	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
 	export ${env_host}_OPENSSL_DIR=$TERMUX_PREFIX
@@ -195,7 +195,8 @@ termux_step_configure() {
 	# x86_64: __lttf2
 	case "${TERMUX_ARCH}" in
 	x86_64)
-		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$(${CC} -print-libgcc-file-name)" ;;
+		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$(${CC} -print-libgcc-file-name)"
+		;;
 	esac
 
 	# NDK r26
@@ -247,7 +248,7 @@ termux_step_make_install() {
 	"${TERMUX_PKG_SRCDIR}/x.py" dist -j "${TERMUX_PKG_MAKE_PROCESSES}" --stage 2 rustc-dev
 
 	# remove version suffix: beta, nightly
-	local VERSION=${TERMUX_PKG_VERSION//~*}
+	local VERSION=${TERMUX_PKG_VERSION//~*/}
 
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "true" ]]; then
 		echo "WARN: Replacing on device rust! Caveat emptor!"
@@ -298,12 +299,12 @@ termux_step_make_install() {
 	while IFS= read -r _rlib; do
 		echo "${_rlib}"
 		local _included_rlib=$(echo "${_included_rlib}" | grep -v "${_rlib}")
-	done < "${TERMUX_PKG_BUILDDIR}/rustlib-rlib.txt"
+	done <"${TERMUX_PKG_BUILDDIR}/rustlib-rlib.txt"
 	echo "INFO: _so"
 	while IFS= read -r _so; do
 		echo "${_so}"
 		local _included_so=$(echo "${_included_so}" | grep -v "${_so}")
-	done < "${TERMUX_PKG_BUILDDIR}/rustlib-so.txt"
+	done <"${TERMUX_PKG_BUILDDIR}/rustlib-so.txt"
 
 	export _INCLUDED=$(echo -e "${_included}\n${_included_rlib}\n${_included_so}")
 	echo -e "INFO: _INCLUDED:\n${_INCLUDED}"
