@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(1.16.2
 # Align the version with `xorg-server` package.
                     21.1.16)
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=("https://github.com/TigerVNC/tigervnc/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
                    "https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-${TERMUX_PKG_VERSION[1]}.tar.xz")
 TERMUX_PKG_SHA256=(

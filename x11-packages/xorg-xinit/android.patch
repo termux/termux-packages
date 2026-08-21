@@ -1,0 +1,38 @@
+Guard two calls in startClient()'s forked child that Android breaks:
+setuid(getuid()) is a no-op but still SIGSYS-killed by seccomp, and
+setWindowPath() consumes X replies meant for the parent since no server
+here sets XFree86_VT in the first place.
+
+--- a/xinit.c
++++ b/xinit.c
+@@ -471,6 +471,7 @@
+     return(serverpid);
+ }
+
++#ifndef __ANDROID__
+ static void
+ setWindowPath(void)
+ {
+@@ -564,6 +565,7 @@
+
+     free(newwindowpath);
+ }
++#endif /* __ANDROID__ */
+
+ static pid_t
+ startClient(char *client_argv[])
+@@ -571,12 +573,14 @@
+     clientpid = fork();
+     if (clientpid == 0) {
+         set_environment();
++#ifndef __ANDROID__
+         setWindowPath();
+
+         if (setuid(getuid()) == -1) {
+             Error("cannot change uid");
+             _exit(EXIT_FAILURE);
+         }
++#endif
+         setpgid(0, getpid());
+         Execute(client_argv);
+         Error("Unable to run program \"%s\"", client_argv[0]);

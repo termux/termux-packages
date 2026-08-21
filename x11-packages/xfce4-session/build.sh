@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A session manager for XFCE environment"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.20.4"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/xfce/xfce4-session/${TERMUX_PKG_VERSION%.*}/xfce4-session-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=805c373378d080754d69dd2f20db95cdc066c89a4f024a41435ca0d66571c402
 TERMUX_PKG_AUTO_UPDATE=true
@@ -22,4 +22,15 @@ ac_cv_path_ICEAUTH=${TERMUX_PREFIX}/bin/iceauth
 
 termux_step_pre_configure() {
 	termux_setup_glib_cross_pkg_config_wrapper
+}
+
+termux_step_create_debscripts() {
+	# update-alternatives --install does not retire an old registration
+	# under the same group name.
+	cat <<- EOF > ./preinst
+	#!${TERMUX_PREFIX}/bin/sh
+	command -v update-alternatives > /dev/null &&
+		update-alternatives --remove x-session-manager ${TERMUX_PREFIX}/bin/startxfce4 2>/dev/null
+	exit 0
+	EOF
 }
