@@ -1,0 +1,25 @@
+diff --git a/Makefile.am b/Makefile.am
+index 67144fc..5ec0dc5 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -5,8 +5,3 @@ bin_PROGRAMS = retry
+ retry_SOURCES = retry.c
+ 
+ EXTRA_DIST = retry.spec
+-dist_man_MANS = retry.1
+-
+-retry.1: retry.c $(top_srcdir)/configure.ac
+-	which txt2man && ./retry --help | txt2man -d 1 -t "${PACKAGE_NAME}" -r "${PACKAGE_NAME}-${PACKAGE_VERSION}" > retry.1 || true
+-
+diff --git a/retry.spec.in b/retry.spec.in
+index 6a53d8e..36e3d5a 100644
+--- a/retry.spec.in
++++ b/retry.spec.in
+@@ -39,7 +39,6 @@ is passed to stdout once and once only.
+ 
+ %files
+ %{_bindir}/retry
+-%{_mandir}/man1/retry.1*
+ 
+ %doc AUTHORS ChangeLog README
+ %license COPYING
