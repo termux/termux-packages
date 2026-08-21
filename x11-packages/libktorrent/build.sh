@@ -13,3 +13,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DKDE_INSTALL_QMLDIR=lib/qt6/qml
 -DKDE_INSTALL_QTPLUGINDIR=lib/qt6/plugins
 "
+
+termux_step_pre_configure() {
+	CXXFLAGS+=" -Wno-c++11-narrowing"
+}
