@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION="26.04.3"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/akonadi-contacts-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256="8b31ab21f118b20fce2826904e3f15e30080a69143519a544285606cf031bcde"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="akonadi, grantleetheme, kf6-kcodecs, kf6-kcolorscheme, kf6-kcompletion, kf6-kconfig, kf6-kcontacts, kf6-kcoreaddons, kf6-kguiaddons, kf6-ki18n, kf6-kiconthemes, kf6-kio, kf6-ktexttemplate, kf6-ktextwidgets, kf6-kwidgetsaddons, kf6-kxmlgui, kf6-prison, kmime, ktextaddons, libc++, qt6-qtbase"
+TERMUX_PKG_DEPENDS="akonadi, grantleetheme, kf6-kcodecs, kf6-kcolorscheme, kf6-kcompletion, kf6-kconfig, kf6-kcontacts, kf6-kcoreaddons, kf6-kguiaddons, kf6-ki18n, kf6-kiconthemes, kf6-kio, kf6-ktexttemplate, kf6-ktextwidgets, kf6-kwidgetsaddons, kf6-kxmlgui, kf6-prison, kf6-kmime, ktextaddons, libc++, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules"
 # akonadi depends on qt6-qtwebengine
 # qt6-qtwebengine is not supported on the i686 architecture

@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION="26.04.3"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/kalarm-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256="6bbe92ac0e9a8ea43a46c850e3344b735dee60a86f5fb8cc666a10b0f123c480"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="akonadi, akonadi-contacts, akonadi-mime, kcalutils, kf6-kauth, kf6-kcalendarcore, kf6-kcodecs, kf6-kcolorscheme, kf6-kcompletion, kf6-kconfig, kf6-kconfigwidgets, kf6-kcontacts, kf6-kcoreaddons, kf6-kcrash, kf6-kdbusaddons, kf6-kglobalaccel, kf6-kguiaddons, kf6-kholidays, kf6-ki18n, kf6-kiconthemes, kf6-kio, kf6-kitemmodels, kf6-knotifications, kf6-knotifyconfig, kf6-kstatusnotifieritem, kf6-ktextwidgets, kf6-kwidgetsaddons, kf6-kwindowsystem, kf6-kxmlgui, kidentitymanagement, kmailtransport, kmime, ktextaddons, libc++, mpv-x, qt6-qtbase, vlc-qt"
+TERMUX_PKG_DEPENDS="akonadi, akonadi-contacts, akonadi-mime, kcalutils, kf6-kauth, kf6-kcalendarcore, kf6-kcodecs, kf6-kcolorscheme, kf6-kcompletion, kf6-kconfig, kf6-kconfigwidgets, kf6-kcontacts, kf6-kcoreaddons, kf6-kcrash, kf6-kdbusaddons, kf6-kglobalaccel, kf6-kguiaddons, kf6-kholidays, kf6-ki18n, kf6-kiconthemes, kf6-kio, kf6-kitemmodels, kf6-knotifications, kf6-knotifyconfig, kf6-kstatusnotifieritem, kf6-ktextwidgets, kf6-kwidgetsaddons, kf6-kwindowsystem, kf6-kxmlgui, kidentitymanagement, kmailtransport, kf6-kmime, ktextaddons, libc++, mpv-x, qt6-qtbase, vlc-qt"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, kf6-kdoctools"
 # akonadi, akonadi-contacts, akonadi-mime depends on qt6-qtwebengine
 # qt6-qtwebengine is not supported on the i686 architecture

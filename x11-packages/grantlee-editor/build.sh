@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION="26.04.3"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/grantlee-editor-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256="1e1f3b086c4701f70ef6d733ec575eb4db386c152582a54e7e6fb3aeb41aeba4"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="akonadi-contacts, grantleetheme, kf6-karchive, kf6-kcompletion, kf6-kconfig, kf6-kconfigwidgets, kf6-kcontacts, kf6-kcoreaddons, kf6-kcrash, kf6-kdbusaddons, kf6-ki18n, kf6-kio, kf6-kwidgetsaddons, kf6-kxmlgui, kf6-syntax-highlighting, kmime, ktextaddons, libc++, messagelib, pimcommon, qt6-qtbase, qt6-qtwebengine"
+TERMUX_PKG_DEPENDS="akonadi-contacts, grantleetheme, kf6-karchive, kf6-kcompletion, kf6-kconfig, kf6-kconfigwidgets, kf6-kcontacts, kf6-kcoreaddons, kf6-kcrash, kf6-kdbusaddons, kf6-ki18n, kf6-kio, kf6-kwidgetsaddons, kf6-kxmlgui, kf6-syntax-highlighting, kf6-kmime, ktextaddons, libc++, messagelib, pimcommon, qt6-qtbase, qt6-qtwebengine"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, kf6-kdoctools"
 # qt6-qtwebengine is not supported on the i686 architecture
 TERMUX_PKG_EXCLUDED_ARCHES="i686"

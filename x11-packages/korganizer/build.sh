@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION="26.04.3"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/korganizer-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256="89a11d44aa4c46fe3e3ca64f2b38fd806cfcdb23262c63cc764c5e6ab9e04d48"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="akonadi, akonadi-calendar, akonadi-contacts, calendarsupport, eventviews, incidenceeditor, kcalutils, kdepim-addons, kdepim-runtime, kf6-kcalendarcore, kf6-kcmutils, kf6-kcolorscheme, kf6-kcompletion, kf6-kconfig, kf6-kconfigwidgets, kf6-kcontacts, kf6-kcoreaddons, kf6-kcrash, kf6-kholidays, kf6-ki18n, kf6-kiconthemes, kf6-kio, kf6-kitemmodels, kf6-kitemviews, kf6-kjobwidgets, kf6-kparts, kf6-kuserfeedback, kf6-kwidgetsaddons, kf6-kwindowsystem, kf6-kxmlgui, kmailtransport, kmime, kontactinterface, libc++, libkdepim, pimcommon, qt6-qtbase"
+TERMUX_PKG_DEPENDS="akonadi, akonadi-calendar, akonadi-contacts, calendarsupport, eventviews, incidenceeditor, kcalutils, kdepim-addons, kdepim-runtime, kf6-kcalendarcore, kf6-kcmutils, kf6-kcolorscheme, kf6-kcompletion, kf6-kconfig, kf6-kconfigwidgets, kf6-kcontacts, kf6-kcoreaddons, kf6-kcrash, kf6-kholidays, kf6-ki18n, kf6-kiconthemes, kf6-kio, kf6-kitemmodels, kf6-kitemviews, kf6-kjobwidgets, kf6-kparts, kf6-kuserfeedback, kf6-kwidgetsaddons, kf6-kwindowsystem, kf6-kxmlgui, kmailtransport, kf6-kmime, kontactinterface, libc++, libkdepim, pimcommon, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, kf6-kdoctools, qt6-qttools"
 # akonadi, akonadi-calendar, akonadi-contacts, calendarsupport, eventviews, incidenceeditor, kdepim-addons, kdepim-runtime, pimcommon depends on qt6-qtwebengine
 # qt6-qtwebengine is not supported on the i686 architecture
