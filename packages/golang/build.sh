@@ -3,7 +3,6 @@ TERMUX_PKG_DESCRIPTION="Go programming language compiler"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3:1.27.0"
-TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://go.dev/dl/go${TERMUX_PKG_VERSION#*:}.src.tar.gz"
 TERMUX_PKG_SHA256=7002403d7cc44529ef6d26f69a44818263395ead7c16c05a5808ae047ebeb0e5
 TERMUX_PKG_DEPENDS="clang"
@@ -45,8 +44,8 @@ termux_step_make_install() {
 
 	rm -Rf "$TERMUX_GODIR"
 	mkdir -p "$TERMUX_GODIR"/{bin,src,doc,lib,"pkg/tool/$TERMUX_GOLANG_DIRNAME",pkg/include}
-	# Go 1.27+ installs binaries directly into bin/ instead of bin/${GOOS}_${GOARCH}/
-	if [ -d "bin/$TERMUX_GOLANG_DIRNAME" ]; then
+	# Native builds install go/gofmt into bin/; cross builds still use bin/${GOOS}_${GOARCH}/.
+	if [[ -d "bin/$TERMUX_GOLANG_DIRNAME" ]]; then
 		cp "bin/$TERMUX_GOLANG_DIRNAME"/{go,gofmt} "$TERMUX_GODIR/bin/"
 	else
 		cp bin/{go,gofmt} "$TERMUX_GODIR/bin/"
