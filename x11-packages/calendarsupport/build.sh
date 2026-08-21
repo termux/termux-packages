@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION="26.04.3"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/calendarsupport-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256="cb0fe6531a4811ccc368e0c3f1d59118f4524bc051976707188c55bcea0c643b"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="akonadi, akonadi-calendar, kcalutils, kf6-kcalendarcore, kf6-kcodecs, kf6-kconfig, kf6-kcoreaddons, kf6-kguiaddons, kf6-kholidays, kf6-ki18n, kf6-kio, kf6-kservice, kf6-kwidgetsaddons, kidentitymanagement, kmime, libc++, qt6-qtbase"
+TERMUX_PKG_DEPENDS="akonadi, akonadi-calendar, kcalutils, kf6-kcalendarcore, kf6-kcodecs, kf6-kconfig, kf6-kcoreaddons, kf6-kguiaddons, kf6-kholidays, kf6-ki18n, kf6-kio, kf6-kservice, kf6-kwidgetsaddons, kidentitymanagement, kf6-kmime, libc++, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules"
 # akonadi, akonadi-calendar depends on qt6-qtwebengine
 # qt6-qtwebengine is not supported on the i686 architecture

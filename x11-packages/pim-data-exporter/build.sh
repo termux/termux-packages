@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION="26.04.3"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/pim-data-exporter-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256="2c0ecfb883267f5c18fdde254c7702c28fbb5c579d2633bf622c2de6d50c9560"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="akonadi, akonadi-mime, kf6-karchive, kf6-kcalendarcore, kf6-kconfig, kf6-kconfigwidgets, kf6-kcontacts, kf6-kcoreaddons, kf6-kcrash, kf6-kdbusaddons, kf6-ki18n, kf6-kiconthemes, kf6-kio, kf6-kitemviews, kf6-kstatusnotifieritem, kf6-kuserfeedback, kf6-kwidgetsaddons, kf6-kxmlgui, kidentitymanagement, kmailtransport, kmime, ktextaddons, libc++, mailcommon, pimcommon, qt6-qtbase"
+TERMUX_PKG_DEPENDS="akonadi, akonadi-mime, kf6-karchive, kf6-kcalendarcore, kf6-kconfig, kf6-kconfigwidgets, kf6-kcontacts, kf6-kcoreaddons, kf6-kcrash, kf6-kdbusaddons, kf6-ki18n, kf6-kiconthemes, kf6-kio, kf6-kitemviews, kf6-kstatusnotifieritem, kf6-kuserfeedback, kf6-kwidgetsaddons, kf6-kxmlgui, kidentitymanagement, kmailtransport, kf6-kmime, ktextaddons, libc++, mailcommon, pimcommon, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, kf6-kdoctools"
 # akonadi, akonadi-mime, mailcommon, pimcommon depends on qt6-qtwebengine
 # qt6-qtwebengine is not supported on the i686 architecture

@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION="26.04.3"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/akonadiconsole-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256="d27092a87af4da2d5e3a15eb5a73497081438f6545c2d86c2f2d7ff2db5364e5"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="akonadi, akonadi-contacts, akonadi-search, calendarsupport, kf6-kcalendarcore, kf6-kcolorscheme, kf6-kcompletion, kf6-kconfig, kf6-kconfigwidgets, kf6-kcontacts, kf6-kcoreaddons, kf6-kcrash, kf6-kdbusaddons, kf6-ki18n, kf6-kitemmodels, kf6-ktextwidgets, kf6-kwidgetsaddons, kf6-kxmlgui, kmime, libc++, libkdepim, libxapian, messagelib, qgpgme, qt6-qtbase"
+TERMUX_PKG_DEPENDS="akonadi, akonadi-contacts, akonadi-search, calendarsupport, kf6-kcalendarcore, kf6-kcolorscheme, kf6-kcompletion, kf6-kconfig, kf6-kconfigwidgets, kf6-kcontacts, kf6-kcoreaddons, kf6-kcrash, kf6-kdbusaddons, kf6-ki18n, kf6-kitemmodels, kf6-ktextwidgets, kf6-kwidgetsaddons, kf6-kxmlgui, kf6-kmime, libc++, libkdepim, libxapian, messagelib, qgpgme, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, kf6-kdoctools"
 # akonadi, akonadi-contacts, akonadi-search, calendarsupport, messagelib depends on qt6-qtwebengine
 # qt6-qtwebengine is not supported on the i686 architecture
