@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE="https://invent.kde.org/pim/kleopatra"
 TERMUX_PKG_DESCRIPTION="Certificate Manager and Unified Crypto GUI"
 TERMUX_PKG_LICENSE="GPL-2.0-or-later, LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="26.04.3"
+TERMUX_PKG_VERSION="26.08.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/kleopatra-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256="67d1c3786076de19f1005d0b3d75f6b44cfd2027a73615659093e192b9df8e1b"
+TERMUX_PKG_SHA256=cbd3a1e19249cd50337342f76254e3b870d000b4c65077a9f560c9e57d641357
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="akonadi-mime, gpgmepp, kf6-kcodecs, kf6-kcolorscheme, kf6-kconfig, kf6-kconfigwidgets, kf6-kcoreaddons, kf6-kcrash, kf6-kdbusaddons, kf6-ki18n, kf6-kiconthemes, kf6-kio, kf6-kitemmodels, kf6-kwidgetsaddons, kf6-kwindowsystem, kf6-kxmlgui, kidentitymanagement, kmailtransport, kf6-kmime, libassuan, libc++, libgpg-error, libkleo, mimetreeparser, qgpgme, qt6-qtbase"
+TERMUX_PKG_DEPENDS="akonadi-mime, gpgmepp, kf6-kcodecs, kf6-kcolorscheme, kf6-kconfig, kf6-kconfigwidgets, kf6-kcoreaddons, kf6-kcrash, kf6-kdbusaddons, kf6-ki18n, kf6-kiconthemes, kf6-kio, kf6-kitemmodels, kf6-kwidgetsaddons, kf6-kwindowsystem, kf6-kxmlgui, kdsingleapplication, kidentitymanagement, kmailtransport, kf6-kmime, libassuan, libc++, libgpg-error, libkleo, mimetreeparser, qgpgme, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, kf6-kdoctools"
 # akonadi-mime, mimetreeparser depends on qt6-qtwebengine
 # qt6-qtwebengine is not supported on the i686 architecture
