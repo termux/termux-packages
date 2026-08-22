@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://go.dev/
 TERMUX_PKG_DESCRIPTION="Go programming language compiler"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3:1.26.5"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="3:1.27.0"
 TERMUX_PKG_SRCURL="https://go.dev/dl/go${TERMUX_PKG_VERSION#*:}.src.tar.gz"
-TERMUX_PKG_SHA256=495be4bc87176ac567392e5b4116abd98466d33d7b49d41e764ccc6976b2dc42
+TERMUX_PKG_SHA256=7002403d7cc44529ef6d26f69a44818263395ead7c16c05a5808ae047ebeb0e5
 TERMUX_PKG_DEPENDS="clang"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="clang"
 TERMUX_PKG_RECOMMENDS="resolv-conf"
@@ -45,7 +44,12 @@ termux_step_make_install() {
 
 	rm -Rf "$TERMUX_GODIR"
 	mkdir -p "$TERMUX_GODIR"/{bin,src,doc,lib,"pkg/tool/$TERMUX_GOLANG_DIRNAME",pkg/include}
-	cp "bin/$TERMUX_GOLANG_DIRNAME"/{go,gofmt} "$TERMUX_GODIR/bin/"
+	# Native builds install go/gofmt into bin/; cross builds still use bin/${GOOS}_${GOARCH}/.
+	if [[ -d "bin/$TERMUX_GOLANG_DIRNAME" ]]; then
+		cp "bin/$TERMUX_GOLANG_DIRNAME"/{go,gofmt} "$TERMUX_GODIR/bin/"
+	else
+		cp bin/{go,gofmt} "$TERMUX_GODIR/bin/"
+	fi
 	ln -sfr "$TERMUX_GODIR/bin/go" "$TERMUX_PREFIX/bin/go"
 	ln -sfr "$TERMUX_GODIR/bin/gofmt" "$TERMUX_PREFIX/bin/gofmt"
 	cp go.env "$TERMUX_GODIR/"
