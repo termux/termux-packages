@@ -1,0 +1,33 @@
+diff --git a/extras/EsotericSoftwareSpine/CMakeLists.txt b/extras/EsotericSoftwareSpine/CMakeLists.txt
+index 2c32021..b3b925c 100644
+--- a/extras/EsotericSoftwareSpine/CMakeLists.txt
++++ b/extras/EsotericSoftwareSpine/CMakeLists.txt
+@@ -1,5 +1,6 @@
+ cmake_minimum_required(VERSION 3.2)
+ 
++if(NOT ANDROID)
+ add_custom_target(
+ 	rhubarbForSpine ALL
+ 	"./gradlew" "build"
+@@ -11,6 +12,7 @@ install(
+ 	DIRECTORY "build/libs/"
+ 	DESTINATION "extras/EsotericSoftwareSpine"
+ )
++endif()
+ 
+ install(
+ 	FILES README.adoc
+diff --git a/rhubarb/CMakeLists.txt b/rhubarb/CMakeLists.txt
+index 494e10d..c68330f 100644
+--- a/rhubarb/CMakeLists.txt
++++ b/rhubarb/CMakeLists.txt
+@@ -75,6 +75,9 @@ target_include_directories(sphinxbase SYSTEM PUBLIC
+ )
+ target_compile_options(sphinxbase PRIVATE ${disableWarningsFlags})
+ target_compile_definitions(sphinxbase PUBLIC __SPHINXBASE_EXPORT_H__=1 SPHINXBASE_EXPORT=) # Compile as static lib
++if(ANDROID)
++	target_link_libraries(sphinxbase log)
++endif()
+ set_target_properties(sphinxbase PROPERTIES FOLDER lib)
+ 
+ # ... PocketSphinx
