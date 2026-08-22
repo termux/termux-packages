@@ -1,12 +1,9 @@
-diff --git a/compiler/rustc_incremental/src/errors.rs b/compiler/rustc_incremental/src/errors.rs
-index 3354689d0..11c866df7 100644
---- a/compiler/rustc_incremental/src/errors.rs
-+++ b/compiler/rustc_incremental/src/errors.rs
-@@ -169,14 +169,6 @@ pub(crate) struct DeleteLock<'a> {
-     pub err: std::io::Error,
+--- a/compiler/rustc_incremental/src/diagnostics.rs
++++ b/compiler/rustc_incremental/src/diagnostics.rs
+@@ -170,14 +170,6 @@
  }
  
--#[derive(Diagnostic)]
+ #[derive(Diagnostic)]
 -#[diag(
 -    "hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `{$path}`"
 -)]
@@ -14,14 +11,13 @@ index 3354689d0..11c866df7 100644
 -    pub path: &'a Path,
 -}
 -
- #[derive(Diagnostic)]
+-#[derive(Diagnostic)]
  #[diag("failed to delete partly initialized session dir `{$path}`: {$err}")]
  pub(crate) struct DeletePartial<'a> {
-diff --git a/compiler/rustc_incremental/src/persist/fs.rs b/compiler/rustc_incremental/src/persist/fs.rs
-index f73cc4d43..e693a039e 100644
+     pub path: &'a Path,
 --- a/compiler/rustc_incremental/src/persist/fs.rs
 +++ b/compiler/rustc_incremental/src/persist/fs.rs
-@@ -274,13 +274,9 @@ pub(crate) fn prepare_session_directory(
+@@ -264,13 +264,9 @@
          debug!("attempting to copy data from source: {}", source_directory.display());
  
          // Try copying over all files from the source directory
@@ -30,7 +26,7 @@ index f73cc4d43..e693a039e 100644
              debug!("successfully copied data from: {}", source_directory.display());
  
 -            if !allows_links {
--                sess.dcx().emit_warn(errors::HardLinkFailed { path: &session_dir });
+-                sess.dcx().emit_warn(diagnostics::HardLinkFailed { path: &session_dir });
 -            }
 -
              sess.init_incr_comp_session(session_dir, directory_lock);
