@@ -16,8 +16,8 @@ TERMUX_PKG_DEPENDS="libffi, zlib"
 TERMUX_PKG_EXTRA_MAKE_ARGS="LN:=ln LN+=-rs"
 
 termux_step_post_get_source() {
-    cp "${TERMUX_PKG_SRCDIR}/data/data/com.termux/files/usr/share/txr/stdlib/"*.tlo "${TERMUX_PKG_SRCDIR}/stdlib/"
-    touch "${TERMUX_PKG_SRCDIR}/stdlib/"*.tlo
+	cp "${TERMUX_PKG_SRCDIR}/data/data/com.termux/files/usr/share/txr/stdlib/"*.tlo "${TERMUX_PKG_SRCDIR}/stdlib/"
+	touch "${TERMUX_PKG_SRCDIR}/stdlib/"*.tlo
 }
 
 termux_step_configure() {
