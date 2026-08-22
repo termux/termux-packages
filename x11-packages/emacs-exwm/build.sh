@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Emacs X Window Manager"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.34"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/emacs-exwm/exwm/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=ebe730bbda5bce75baf4532173171a9283a58684e7ec84192ba03c3d8328cf0a
 TERMUX_PKG_DEPENDS="emacs-x, emacs-xelb"
@@ -10,13 +11,17 @@ TERMUX_PKG_RECOMMENDS="dbus"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_host_build() {
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
 		return
 	fi
 
-	EMACS_SRCURL=https://mirrors.kernel.org/gnu/emacs/emacs-30.2.tar.xz
+	local emacs_version
+	emacs_version=$(. "$TERMUX_SCRIPTDIR/x11-packages/emacs-x/build.sh"; echo "$TERMUX_PKG_VERSION")
+
+	EMACS_SRCURL="https://mirrors.kernel.org/gnu/emacs/emacs-$emacs_version.tar.xz"
 	EMACS_SHA256=b3f36f18a6dd2715713370166257de2fae01f9d38cfe878ced9b1e6ded5befd9
 	EMACS_ARCHIVE="${TERMUX_PKG_CACHEDIR}/EMACS.tar.xz"
 	EMACS_WORKDIR="${TERMUX_PKG_TMPDIR}/EMACS"
@@ -42,15 +47,19 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
+	local emacs_version
+	emacs_version=$(. "$TERMUX_SCRIPTDIR/x11-packages/emacs-x/build.sh"; echo "$TERMUX_PKG_VERSION")
 	emacs -Q -batch \
-		-L . -L "$TERMUX_PREFIX/share/emacs/site-lisp/xelb" \
+		-L . -L "$TERMUX_PREFIX/share/emacs/$emacs_version/site-lisp/xelb" \
 		-f batch-byte-compile *.el
 }
 
 termux_step_make_install() {
 	local file
+	local emacs_version
+	emacs_version=$(. "$TERMUX_SCRIPTDIR/x11-packages/emacs-x/build.sh"; echo "$TERMUX_PKG_VERSION")
 	for file in *.el; do
-		install -Dm644 "$file" "$TERMUX_PREFIX/share/emacs/site-lisp/exwm/$file"
+		install -Dm644 "$file" "$TERMUX_PREFIX/share/emacs/$emacs_version/site-lisp/exwm/$file"
 	done
 }
 
