@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/termux/proot-distro
 TERMUX_PKG_DESCRIPTION="Termux official utility for managing proot'ed Linux distributions"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="5.7.0"
+TERMUX_PKG_VERSION="5.8.0"
 TERMUX_PKG_SRCURL="https://github.com/termux/proot-distro/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=9d3e52c08442c3e8cb875d13098bcd47850d3bc9f8b8d8516b8a22e9b9d3da59
+TERMUX_PKG_SHA256=432a6ed797ab94bc38f457a5f570a8d35392932017331750b66a86cd8940559d
 # note for regular maintainers of proot-distro: since version 5.1.5, proot-distro
 # has been detected by termux_step_create_python_debscripts as depending conditionally
 # on pytest. since termux_step_create_python_debscripts cannot fully resolve conditional
