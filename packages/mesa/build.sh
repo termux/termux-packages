@@ -3,14 +3,13 @@ TERMUX_PKG_DESCRIPTION="An open-source implementation of the OpenGL specificatio
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="docs/license.rst"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="26.0.6"
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=1d3c3b8a8363b8cc354175bb4a684ad8b035211cc1d6fa17aeb9b9623c513f89
+TERMUX_PKG_VERSION="26.2.0"
+TERMUX_PKG_SRCURL="https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SHA256=efd4bb08cdb7c365a812cd4e6c9202ab55b2f22cdcd13c7d6c4f9647b799a4ef
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libglvnd, libllvm (<< $TERMUX_LLVM_NEXT_MAJOR_VERSION), libwayland, libx11, libxext, libxfixes, libxshmfence, libxxf86vm, ncurses, vulkan-loader, zlib, zstd"
 TERMUX_PKG_SUGGESTS="mesa-dev"
-TERMUX_PKG_BUILD_DEPENDS="libclc, libwayland-protocols, libxrandr, llvm, llvm-tools, mlir, spirv-tools, xorgproto"
+TERMUX_PKG_BUILD_DEPENDS="aosp-libs, libclc, libwayland-protocols, libxrandr, llvm, llvm-tools, mlir, spirv-tools, xorgproto"
 TERMUX_PKG_BREAKS="osmesa, osmesa-demos"
 TERMUX_PKG_CONFLICTS="libmesa, ndk-sysroot (<= 25b), osmesa"
 TERMUX_PKG_REPLACES="libmesa, osmesa"
@@ -83,33 +82,37 @@ termux_step_pre_configure() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dvulkan-drivers=$_vk_drivers"
 }
 
+termux_step_configure() {
+	termux_setup_meson
+	termux_setup_proot
+
+	# Wrap mesa_clc with termux-proot-run
+	# bypasses:
+	# ../src/src/compiler/spirv/meson.build:83:23:
+	# ERROR: Tried to mix a host machine library ("vtn")
+	# with a build machine target "vtn_bindgen2"
+	# This is not possible in a cross build.
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
+		mkdir -p "$TERMUX_PKG_TMPDIR/bin"
+		local TERMUX_MESON_MESA_CROSSFILE="$TERMUX_PKG_TMPDIR/mesa-cross-file.txt"
+		cp -f "$TERMUX_MESON_CROSSFILE" "$TERMUX_MESON_MESA_CROSSFILE"
+		sed -i "s|^\(\[binaries\]\)$|\1\nexe_wrapper = 'termux-proot-run'|g" \
+			"$TERMUX_MESON_MESA_CROSSFILE"
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --cross-file $TERMUX_MESON_MESA_CROSSFILE"
+	fi
+
+	termux_step_configure_meson
+}
+
 termux_step_post_configure() {
-	rm -f $_WRAPPER_BIN/cmake
+	rm -f "$_WRAPPER_BIN/cmake"
 }
 
 termux_step_post_make_install() {
-	# Avoid hard links
-	local f1
-	for f1 in $TERMUX_PREFIX/lib/dri/*; do
-		if [ ! -f "${f1}" ]; then
-			continue
-		fi
-		local f2
-		for f2 in $TERMUX_PREFIX/lib/dri/*; do
-			if [ -f "${f2}" ] && [ "${f1}" != "${f2}" ]; then
-				local s1=$(stat -c "%i" "${f1}")
-				local s2=$(stat -c "%i" "${f2}")
-				if [ "${s1}" = "${s2}" ]; then
-					ln -sfr "${f1}" "${f2}"
-				fi
-			fi
-		done
-	done
-
 	# Create symlinks
-	ln -sf libEGL_mesa.so ${TERMUX_PREFIX}/lib/libEGL_mesa.so.0
-	ln -sf libGLX_mesa.so ${TERMUX_PREFIX}/lib/libGLX_mesa.so.0
-	ln -sf libRusticlOpenCL.so ${TERMUX_PREFIX}/lib/libRusticlOpenCL.so.1
+	ln -sf libEGL_mesa.so "${TERMUX_PREFIX}/lib/libEGL_mesa.so.0"
+	ln -sf libGLX_mesa.so "${TERMUX_PREFIX}/lib/libGLX_mesa.so.0"
+	ln -sf libRusticlOpenCL.so "${TERMUX_PREFIX}/lib/libRusticlOpenCL.so.1"
 
 	unset BINDGEN_EXTRA_CLANG_ARGS LLVM_CONFIG
 }
