@@ -1,12 +1,17 @@
+# Add Qt::PrintSupport to fix the following error.
+# messagelib/src/webengineviewer/src/webenginepage.cpp:19:10: fatal error: 'QPrinter' file not found
+# It is added in PRIVATE scope as same as messageviewer/src/CMakeLists.txt.
+# Otherwise, reverse dependencies try to find Qt::PrintSupport library and fail to build.
+
 diff --git a/webengineviewer/src/CMakeLists.txt b/webengineviewer/src/CMakeLists.txt
 index 7dfc895..867ac5b 100644
 --- a/webengineviewer/src/CMakeLists.txt
 +++ b/webengineviewer/src/CMakeLists.txt
-@@ -169,6 +169,7 @@ target_link_libraries(
-     KPim6WebEngineViewer
-     PUBLIC
+@@ -171,6 +171,7 @@ target_link_libraries(
          Qt::WebEngineWidgets
-+        Qt::PrintSupport
          KPim6::PimCommon
      PRIVATE
++        Qt::PrintSupport
          KF6::CoreAddons
+         KF6::XmlGui
+         KF6::I18n
