@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<dump>
+  <enum name="DexFutureStatus" get-type="dex_future_status_get_type">
+    <member name="DEX_FUTURE_STATUS_PENDING" nick="pending" value="0"/>
+    <member name="DEX_FUTURE_STATUS_RESOLVED" nick="resolved" value="1"/>
+    <member name="DEX_FUTURE_STATUS_REJECTED" nick="rejected" value="2"/>
+  </enum>  <fundamental name="DexObject" get-type="dex_object_get_type" abstract="1" instantiatable="1">
+  </fundamental>
+  <fundamental name="DexFuture" get-type="dex_future_get_type" instantiatable="1" parents="DexObject">
+  </fundamental>
+  <fundamental name="DexAsyncPair" get-type="dex_async_pair_get_type" final="1" instantiatable="1" parents="DexFuture,DexObject">
+  </fundamental>
+  <class name="DexAsyncResult" get-type="dex_async_result_get_type" parents="GObject" final="1">
+    <implements name="GAsyncResult"/>
+  </class>
+  <fundamental name="DexScheduler" get-type="dex_scheduler_get_type" abstract="1" instantiatable="1" parents="DexObject">
+  </fundamental>
+  <enum name="DexBlockKind" get-type="dex_block_kind_get_type">
+    <member name="DEX_BLOCK_KIND_THEN" nick="then" value="1"/>
+    <member name="DEX_BLOCK_KIND_CATCH" nick="catch" value="2"/>
+    <member name="DEX_BLOCK_KIND_FINALLY" nick="finally" value="3"/>
+  </enum>  <fundamental name="DexBlock" get-type="dex_block_get_type" final="1" instantiatable="1" parents="DexFuture,DexObject">
+  </fundamental>
+  <fundamental name="DexCancellable" get-type="dex_cancellable_get_type" final="1" instantiatable="1" parents="DexFuture,DexObject">
+  </fundamental>
+  <fundamental name="DexChannel" get-type="dex_channel_get_type" final="1" instantiatable="1" parents="DexObject">
+  </fundamental>
+  <fundamental name="DexDelayed" get-type="dex_delayed_get_type" final="1" instantiatable="1" parents="DexFuture,DexObject">
+  </fundamental>
+  <fundamental name="DexFiber" get-type="dex_fiber_get_type" final="1" instantiatable="1" parents="DexFuture,DexObject">
+  </fundamental>
+  <fundamental name="DexFutureSet" get-type="dex_future_set_get_type" final="1" instantiatable="1" parents="DexFuture,DexObject">
+  </fundamental>
+  <boxed name="DexFileInfoList" get-type="dex_file_info_list_get_type"/>
+  <boxed name="DexInetAddressList" get-type="dex_inet_address_list_get_type"/>
+  <fundamental name="DexMainScheduler" get-type="dex_main_scheduler_get_type" final="1" instantiatable="1" parents="DexScheduler,DexObject">
+  </fundamental>
+  <fundamental name="DexPromise" get-type="dex_promise_get_type" final="1" instantiatable="1" parents="DexFuture,DexObject">
+  </fundamental>
+  <fundamental name="DexStaticFuture" get-type="dex_static_future_get_type" final="1" instantiatable="1" parents="DexFuture,DexObject">
+  </fundamental>
+  <fundamental name="DexThreadPoolScheduler" get-type="dex_thread_pool_scheduler_get_type" final="1" instantiatable="1" parents="DexScheduler,DexObject">
+  </fundamental>
+  <fundamental name="DexTimeout" get-type="dex_timeout_get_type" final="1" instantiatable="1" parents="DexFuture,DexObject">
+  </fundamental>
+  <fundamental name="DexUnixSignal" get-type="dex_unix_signal_get_type" final="1" instantiatable="1" parents="DexFuture,DexObject">
+  </fundamental>
+  <error-quark function="dex_error_quark" domain="dex-error"/>
+</dump>
