@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A BitTorrent protocol implementation"
 TERMUX_PKG_LICENSE="GPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26.08.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/libktorrent-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=12308eeb1e61cdba380d10ba85b6e64ad44f3e38cc4f64e8f0f1d2694e8719be
 TERMUX_PKG_AUTO_UPDATE=true
