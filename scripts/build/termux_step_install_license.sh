@@ -2,6 +2,8 @@
 termux_step_install_license() {
 	[[ "$TERMUX_PKG_METAPACKAGE" == 'true' ]] && return
 
+	echo "Installing licenses ($TERMUX_PKG_LICENSE) for package '$TERMUX_PKG_NAME'"
+
 	mkdir -p "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME"
 	local LICENSE COUNTER=0
 	local -a LICENSES
@@ -35,7 +37,7 @@ termux_step_install_license() {
 				# shellcheck disable=SC2190 # this is a valid way to assign key value pairs
 				INSTALLED_LICENSES+=("${LICENSE_FILEPATH}" 'already installed')
 			fi
-			cp -f "${TERMUX_PKG_SRCDIR}/${LICENSE_FILE}" "$TARGET"
+			cp -vf "${TERMUX_PKG_SRCDIR}/${LICENSE_FILE}" "$TARGET"
 		done  <<< "${TERMUX_PKG_LICENSE_FILE//,/$'\n'}"
 	else # If a license file wasn't specified, find the one we need
 		local TO_LICENSE             # link target for generic licenses
@@ -79,9 +81,9 @@ termux_step_install_license() {
 						for FILE in "${COMMON_LICENSE_FILES[@]}"; do
 							[[ -f "$TERMUX_PKG_SRCDIR/$FILE" ]] && {
 								if (( COUNTER )); then
-									cp -f "${TERMUX_PKG_SRCDIR}/$FILE" "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}/copyright.${COUNTER}"
+									cp -vf "${TERMUX_PKG_SRCDIR}/$FILE" "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}/copyright.${COUNTER}"
 								else
-									cp -f "${TERMUX_PKG_SRCDIR}/$FILE" "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}/copyright"
+									cp -vf "${TERMUX_PKG_SRCDIR}/$FILE" "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}/copyright"
 								fi
 								(( ++COUNTER, ++FROM_SOURCES ))
 							}
@@ -104,9 +106,9 @@ termux_step_install_license() {
 						*)        termux_error_exit "'$TERMUX_PACKAGE_LIBRARY' is not a supported libc";;
 					esac
 					if (( COUNTER )); then
-						ln -sf "$TO_LICENSE" "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/copyright.${COUNTER}"
+						ln -vsf "$TO_LICENSE" "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/copyright.${COUNTER}"
 					else
-						ln -sf "$TO_LICENSE" "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/copyright"
+						ln -vsf "$TO_LICENSE" "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/copyright"
 					fi
 					(( ++COUNTER ))
 				;;
