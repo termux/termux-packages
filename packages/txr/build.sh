@@ -16,7 +16,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="LN:=ln LN+=-rs"
 
 termux_step_post_get_source() {
-	cp "${TERMUX_PKG_SRCDIR}/data/data/com.termux/files/usr/share/txr/stdlib/"*.tlo "${TERMUX_PKG_SRCDIR}/stdlib/"
+	cp "${TERMUX_PKG_SRCDIR}${TERMUX__PREFIX}/share/txr/stdlib/"*.tlo "${TERMUX_PKG_SRCDIR}/stdlib/"
 	touch "${TERMUX_PKG_SRCDIR}/stdlib/"*.tlo
 }
 
