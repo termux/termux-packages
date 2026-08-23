@@ -4,8 +4,8 @@ TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@examosa"
 TERMUX_PKG_VERSION="302"
 TERMUX_PKG_SRCURL=(
-	https://www.kylheku.com/cgit/txr/snapshot/txr-${TERMUX_PKG_VERSION}.tar.gz
-	https://www.kylheku.com/txr-downloads/txr-${TERMUX_PKG_VERSION}/txr-${TERMUX_PKG_VERSION}-Android-13.tar.gz
+	"https://www.kylheku.com/cgit/txr/snapshot/txr-${TERMUX_PKG_VERSION}.tar.gz"
+	"https://www.kylheku.com/txr-downloads/txr-${TERMUX_PKG_VERSION}/txr-${TERMUX_PKG_VERSION}-Android-13.tar.gz"
 )
 TERMUX_PKG_SHA256=(
 	94778081f698c2922117dc4bcbcc50f8c279c128660f4233221ce748d1369dc7
