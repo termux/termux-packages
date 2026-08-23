@@ -6,23 +6,27 @@ termux_step_install_license() {
 	local LICENSE COUNTER=0
 	local -a LICENSES
 	# Parse the license(s)
-	IFS+="," read -r -a LICENSES <<< "${TERMUX_PKG_LICENSE}"
+	IFS="," read -r -a LICENSES <<< "${TERMUX_PKG_LICENSE}"
+	shopt -s extglob
+	LICENSES=("${LICENSES[@]##+([[:space:]])}")
+	LICENSES=("${LICENSES[@]%%+([[:space:]])}")
+	shopt -u extglob
 
 	# Was a license file specified?
 	if [[ -n "${TERMUX_PKG_LICENSE_FILE}" ]]; then
 		COUNTER=1
-		local LICENSE_FILEPATH
+		local LICENSE_FILE LICENSE_FILEPATH
 		local -A INSTALLED_LICENSES=()
-		for LICENSE in "${LICENSES[@]}"; do
+		while read -r LICENSE_FILE; do
 			# Skip empty lines
-			[[ -z "${LICENSE}" ]] && continue
+			[[ -z "${LICENSE_FILE}" ]] && continue
 
 			# Check that the license file exists in the source files
-			[[ -f "$TERMUX_PKG_SRCDIR/$LICENSE" ]] || {
-				termux_error_exit "$TERMUX_PKG_SRCDIR/$LICENSE does not exist"
+			[[ -f "$TERMUX_PKG_SRCDIR/$LICENSE_FILE" ]] || {
+				termux_error_exit "$TERMUX_PKG_SRCDIR/$LICENSE_FILE does not exist"
 			}
 
-			LICENSE_FILEPATH="$(basename "$LICENSE")"
+			LICENSE_FILEPATH="$(basename "$LICENSE_FILE")"
 			if [[ -n ${INSTALLED_LICENSES[${LICENSE_FILEPATH}]:-} ]]; then
 				# We have already installed a license file named $(basename $LICENSE) so add a suffix to it
 				TARGET="$TERMUX_PREFIX/share/doc/${TERMUX_PKG_NAME}/${LICENSE_FILEPATH}.$((COUNTER++))"
@@ -31,16 +35,16 @@ termux_step_install_license() {
 				# shellcheck disable=SC2190 # this is a valid way to assign key value pairs
 				INSTALLED_LICENSES+=("${LICENSE_FILEPATH}" 'already installed')
 			fi
-			cp -f "${TERMUX_PKG_SRCDIR}/${LICENSE}" "$TARGET"
-		done
+			cp -f "${TERMUX_PKG_SRCDIR}/${LICENSE_FILE}" "$TARGET"
+		done  <<< "${TERMUX_PKG_LICENSE_FILE//,/$'\n'}"
 	else # If a license file wasn't specified, find the one we need
 		local TO_LICENSE             # link target for generic licenses
 		local FROM_SOURCES=0         # flag to check if we've included licenses from the source files yet
 		local -a COMMON_LICENSE_FILES=( # search list for licenses with copyright information
-		'copying'
-		'copyright'
-		'licence' # spelled with 'C'
-		'license' # spelled with 'S'
+			'copying'
+			'copyright'
+			'licence' # spelled with 'C'
+			'license' # spelled with 'S'
 		)
 
 		local license_name
