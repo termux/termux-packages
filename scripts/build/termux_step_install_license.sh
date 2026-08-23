@@ -4,13 +4,16 @@ termux_step_install_license() {
 
 	mkdir -p "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME"
 	local LICENSE COUNTER=0
+	local -a LICENSES
+	# Parse the license(s)
+	IFS+="," read -r -a LICENSES <<< "${TERMUX_PKG_LICENSE}"
 
 	# Was a license file specified?
 	if [[ -n "${TERMUX_PKG_LICENSE_FILE}" ]]; then
 		COUNTER=1
 		local LICENSE_FILEPATH
 		local -A INSTALLED_LICENSES=()
-		while read -r LICENSE; do
+		for LICENSE in "${LICENSES[@]}"; do
 			# Skip empty lines
 			[[ -z "${LICENSE}" ]] && continue
 
@@ -29,24 +32,36 @@ termux_step_install_license() {
 				INSTALLED_LICENSES+=("${LICENSE_FILEPATH}" 'already installed')
 			fi
 			cp -f "${TERMUX_PKG_SRCDIR}/${LICENSE}" "$TARGET"
-		done <<< "${TERMUX_PKG_LICENSE_FILE//,/$'\n'}"
+		done
 	else # If a license file wasn't specified, find the one we need
 		local TO_LICENSE             # link target for generic licenses
 		local FROM_SOURCES=0         # flag to check if we've included licenses from the source files yet
-		local COMMON_LICENSE_FILES=( # search list for licenses with copyright information
-		'COPYING' 'Copyright.txt'
-		'copyright' 'Copyright' 'COPYRIGHT'
-		'licence' 'Licence' 'LICENCE' # spelled with 'C'
-		'license' 'License' 'LICENSE' # spelled with 'S'
-		'license.txt' 'License.txt'
-		'LICENSE.txt' 'LICENSE.TXT'
-		'license.md' 'LICENSE.md'
+		local -a COMMON_LICENSE_FILES=( # search list for licenses with copyright information
+		'copying'
+		'copyright'
+		'licence' # spelled with 'C'
+		'license' # spelled with 'S'
 		)
-		# Parse the license(s)
-		while read -r LICENSE; do
-			# Skip empty lines
-			[[ -z "${LICENSE}" ]] && continue
 
+		local license_name
+		# Add *-$license_name variants of the filenames
+		for LICENSE in "${COMMON_LICENSE_FILES[@]}"; do
+			for license_name in "${LICENSES[@]}"; do
+				COMMON_LICENSE_FILES+=("$LICENSE-$license_name") # times (n+1)
+			done
+		done
+
+		# Add *.md, *.rst and *.txt variants of the filenames
+		for LICENSE in "${COMMON_LICENSE_FILES[@]}"; do
+			COMMON_LICENSE_FILES+=("$LICENSE"{.md,.rst,.txt}) # times 4
+		done
+
+		# Add Uppercase and UPPESTCASE variants of the filenames
+		for LICENSE in "${COMMON_LICENSE_FILES[@]@u}" "${COMMON_LICENSE_FILES[@]@U}"; do
+			COMMON_LICENSE_FILES+=("$LICENSE") # times 3
+		done
+
+		for LICENSE in "${LICENSES[@]}"; do
 			case "$LICENSE" in
 				# These licenses contain copyright information,
 				# so we cannot use a generic license file
@@ -56,9 +71,8 @@ termux_step_install_license() {
 					# We only want to include the license files from the source files once
 					if (( ! FROM_SOURCES )); then
 						local FILE
-						local EXTRA_LICENSE_FILES=("LICENCE-${LICENSE// /-}" "LICENSE-${LICENSE// /-}")
 						# Find the license file(s) in the source files
-						for FILE in "${COMMON_LICENSE_FILES[@]}" "${EXTRA_LICENSE_FILES[@]}"; do
+						for FILE in "${COMMON_LICENSE_FILES[@]}"; do
 							[[ -f "$TERMUX_PKG_SRCDIR/$FILE" ]] && {
 								if (( COUNTER )); then
 									cp -f "${TERMUX_PKG_SRCDIR}/$FILE" "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}/copyright.${COUNTER}"
@@ -93,7 +107,8 @@ termux_step_install_license() {
 					(( ++COUNTER ))
 				;;
 			esac
-		done <<< "${TERMUX_PKG_LICENSE//,/$'\n'}"
+		done
+
 		local license_files
 		license_files="$(find -L "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME" -maxdepth 1 \( -type f -o -type l \) -name "copyright*")"
 		[[ -n "$license_files" ]] || {
