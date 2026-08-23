@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.nongnu.org/txr/
 TERMUX_PKG_DESCRIPTION="Data munging language and pattern matching tool"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
-TERMUX_PKG_MAINTAINER="@examosa"
+TERMUX_PKG_MAINTAINER="Jules Amonith <examosa@fastmail.com>"
 TERMUX_PKG_VERSION="302"
 TERMUX_PKG_SRCURL=(
 	"https://www.kylheku.com/cgit/txr/snapshot/txr-${TERMUX_PKG_VERSION}.tar.gz"
