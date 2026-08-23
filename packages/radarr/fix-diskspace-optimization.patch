@@ -15,22 +15,16 @@
              _logger = logger;
          }
  
-@@ -179,6 +177,22 @@
+@@ -179,6 +177,16 @@
                  _logger.Warn(e, $"Unable to get mounts: {e.Message}");
              }
  
 +            if (mounts.Any())
 +            {
-+                var filtered = mounts.Where(m => !m.RootDirectory.StartsWith("/apex/") &&
-+                                                 !m.RootDirectory.StartsWith("/system") &&
-+                                                 !m.RootDirectory.StartsWith("/vendor") &&
-+                                                 !m.RootDirectory.StartsWith("/product") &&
-+                                                 !m.RootDirectory.StartsWith("/odm") &&
-+                                                 !m.RootDirectory.StartsWith("/bootstrap-apex") &&
-+                                                 !m.RootDirectory.StartsWith("/mnt/opex") &&
-+                                                 !m.RootDirectory.StartsWith("/sys/") &&
-+                                                 !m.RootDirectory.StartsWith("/proc/") &&
-+                                                 !m.RootDirectory.StartsWith("/dev/"))
++                var filtered = mounts.Where(m => (m.RootDirectory.StartsWith("/storage/") ||
++                                                  m.RootDirectory == "/storage" ||
++                                                  m.RootDirectory == "/data") &&
++                                                 m.TotalSize > 0)
 +                                     .ToList();
 +                return filtered;
 +            }
