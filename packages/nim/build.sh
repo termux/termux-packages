@@ -3,11 +3,43 @@ TERMUX_PKG_DESCRIPTION="Nim programming language compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.2.6
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://nim-lang.org/download/nim-$TERMUX_PKG_VERSION.tar.xz"
 TERMUX_PKG_SHA256=657b0e3d5def788148d2a87fa6123fa755b2d92cad31ef60fd261e451785528b
 TERMUX_PKG_DEPENDS="clang, git, libandroid-glob, openssl, libandroid-spawn"
-TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_pkg_auto_update() {
+	local TERMUX_SETUP_NIM="${TERMUX_SCRIPTDIR}/scripts/build/setup/termux_setup_nim.sh"
+	local latest_version="$(termux_repology_api_get_latest_version "${TERMUX_PKG_NAME}")"
+	if [[ "${latest_version}" == "null" ]]; then
+		latest_version="${TERMUX_PKG_VERSION}"
+	fi
+	if [[ "${latest_version}" == "${TERMUX_PKG_VERSION}" ]]; then
+		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+		return
+	fi
+
+	local TERMUX_NIM_TARNAME="nim-${latest_version}-linux_x64.tar.xz"
+	local TERMUX_NIM_URL="https://nim-lang.org/download/${TERMUX_NIM_TARNAME}"
+	local TERMUX_NIM_TARFILE="$(mktemp)"
+	curl -Ls "${TERMUX_NIM_URL}" -o "${TERMUX_NIM_TARFILE}"
+	local TERMUX_NIM_SHA256="$(sha256sum "${TERMUX_NIM_TARFILE}" | cut -d" " -f1)"
+
+	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
+		echo "INFO: package needs to be updated to ${latest_version}."
+		return
+	fi
+
+	sed \
+		-e "s|local TERMUX_NIM_VERSION=.*|local TERMUX_NIM_VERSION=${latest_version}|" \
+		-e "s|local TERMUX_NIM_SHA256=.*|local TERMUX_NIM_SHA256=${TERMUX_NIM_SHA256}|" \
+		-i "${TERMUX_SETUP_NIM}"
+	rm -f "${TERMUX_NIM_TARFILE}"
+
+	termux_pkg_upgrade_version "${latest_version}"
+}
 
 termux_step_pre_configure() {
 	termux_setup_nim
