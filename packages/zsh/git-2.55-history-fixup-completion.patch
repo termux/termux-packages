@@ -1,0 +1,21 @@
+diff --git a/Completion/Unix/Command/_git b/Completion/Unix/Command/_git
+index c4ed3c3..dd4fec2 100644
+--- a/Completion/Unix/Command/_git
++++ b/Completion/Unix/Command/_git
+@@ -1238,6 +1238,7 @@ _git-history() {
+       declare -a commands
+ 
+       commands=(
++        'fixup:squash staged changes into specified commit'
+         'reword:rewrite commit message of specified commit'
+         'split:interactively split up commit'
+       )
+@@ -1253,7 +1254,7 @@ _git-history() {
+       )
+ 
+       case $line[1] in
+-        reword) _arguments -S -s $endopt $common && ret=0 ;;
++        fixup|reword) _arguments -S -s $endopt $common && ret=0 ;;
+         split)
+           _arguments -S -s $endopt $common \
+             '*: :__git_ignore_line_inside_arguments __git_tree_files ${PREFIX:-.} ${(Q)line[1]}' && ret=0
