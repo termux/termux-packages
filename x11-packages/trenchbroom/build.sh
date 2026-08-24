@@ -2,15 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://trenchbroom.github.io/
 TERMUX_PKG_DESCRIPTION="Level editor for Quake-engine based games"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2026.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="2026.2"
 TERMUX_PKG_SRCURL="https://github.com/TrenchBroom/TrenchBroom/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=abb7d8a241362cea5bccbf2d6c0fc7406943ab126a2b5e8ab235b41c8d77b36c
+TERMUX_PKG_SHA256=3989d4adc45bda543b42c0f3eacea5e75de90b1fd22704ab4f37466b728f3ab7
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="assimp, cpptrace, freeimage, libtinyxml2, opengl, qt6-qtbase, qt6-qtsvg"
-# stduuid header-only library
+# stduuid and ctre header-only libraries
 # miniz and fmt needed during build, but not showing in ldd command on final binary
-TERMUX_PKG_BUILD_DEPENDS="stduuid, miniz, fmt"
+TERMUX_PKG_BUILD_DEPENDS="ctre, stduuid, miniz, fmt"
 # upstream does not develop builds for 32-bit targets
 # https://github.com/TrenchBroom/TrenchBroom/issues/3651
 # MiniGl.h:50:7: error: typedef redefinition with different types
