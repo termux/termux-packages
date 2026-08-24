@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/watchexec/watchexec
 TERMUX_PKG_DESCRIPTION="Executes commands in response to file modifications"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.6.1"
+TERMUX_PKG_VERSION="2.7.0"
 TERMUX_PKG_SRCURL="https://github.com/watchexec/watchexec/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=86da4682d38bd8357fee4652f02896db409dd40d35cef5582451f6c1adc2271f
+TERMUX_PKG_SHA256=b9860e46ed035ba870b309eea4151f29f9eddb6e168712112545bfda11acc594
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
