@@ -5,8 +5,9 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.4.1"
 TERMUX_PKG_SRCURL="https://github.com/seerr-team/seerr/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=38bb1f2c90ea648a327244352d5b4b13b19526e384655be8779bbfe7f6a8f447
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_BUILD_DEPENDS="nodejs, libvips, pkg-config"
-TERMUX_PKG_DEPENDS="nodejs, libvips, termux-services"
+TERMUX_PKG_DEPENDS="nodejs | nodejs-lts, libvips, termux-services"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 # Uncomment the line below to avoid file conflicts when building on-device
