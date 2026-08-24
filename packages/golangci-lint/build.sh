@@ -7,7 +7,6 @@ TERMUX_PKG_SRCURL=https://github.com/golangci/golangci-lint/archive/refs/tags/v$
 TERMUX_PKG_SHA256=1e132dc546c90611af81eede4c213018a542ff33e4c10eadab5d964854e0d9ae
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_BUILD_DEPENDS="golang"
 
 termux_step_make() {
 	termux_setup_golang
