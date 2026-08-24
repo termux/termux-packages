@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An automation rule engine for your media server"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.24.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/maintainerr/Maintainerr/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=546faf51aa75387895ca3d5210ed667ded6e801bfb94f57b2f382fd09af9d1ec
 TERMUX_PKG_BUILD_DEPENDS="nodejs, libvips, libcairo, pango, librsvg, giflib, libpixman, libjpeg-turbo, pkg-config, python"
@@ -60,6 +61,12 @@ termux_step_pre_configure() {
 
 	# Install dependencies
 	yarn install --network-timeout 99999999
+
+	# Explicitly compile better-sqlite3 native addon for target architecture
+	(
+		cd node_modules/better-sqlite3
+		npm_config_arch=$GYP_ARCH npm_config_platform=android "${TERMUX_PKG_SRCDIR}/node_modules/.bin/node-gyp" rebuild --release --force_build=1
+	)
 }
 
 termux_step_make() {
@@ -101,6 +108,11 @@ termux_step_make_install() {
 	if [ -d packages/contracts/node_modules ]; then
 		cp -r packages/contracts/node_modules "${TERMUX_PREFIX}/lib/maintainerr/packages/contracts/"
 	fi
+
+	# Remove incompatible host prebuilds bundled in better-sqlite3 and @img
+	rm -rf "${TERMUX_PREFIX}/lib/maintainerr/node_modules/better-sqlite3/prebuilds"
+	rm -rf "${TERMUX_PREFIX}/lib/maintainerr/node_modules/@img/sharp-libvips-"*
+	rm -rf "${TERMUX_PREFIX}/lib/maintainerr/node_modules/@img/sharp-"*
 
 	# Remove useless dev/doc files from node_modules to reduce package size
 	find "${TERMUX_PREFIX}/lib/maintainerr" -type f \( \
