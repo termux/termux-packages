@@ -7,7 +7,6 @@ TERMUX_PKG_SRCURL=https://github.com/air-verse/air/archive/refs/tags/v${TERMUX_P
 TERMUX_PKG_SHA256=d74de50458f4f2cd744bb08a1acf84dbbcc99138ea0682176568f9a381a81887
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_BUILD_DEPENDS="golang"
 
 termux_step_make() {
 	termux_setup_golang
