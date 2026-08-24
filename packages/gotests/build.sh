@@ -6,7 +6,6 @@ TERMUX_PKG_VERSION=1.9.0
 TERMUX_PKG_SRCURL=https://github.com/cweill/gotests/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=1a36874dd5beec211e9b9aaf7d72be8839e76b5ad0a002cb4e83b80ad948697b
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_BUILD_DEPENDS="golang"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
