@@ -7,7 +7,6 @@ TERMUX_PKG_SRCURL=https://github.com/golang/vuln/archive/refs/tags/v${TERMUX_PKG
 TERMUX_PKG_SHA256=da1a7f3224cf874325814dd198eaa42897143fc871226a04944583cb121a15c9
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_BUILD_DEPENDS="golang"
 
 # This repo (golang.org/x/vuln) contains the govulncheck CLI along with
 # internal packages for the Go vulnerability database client; we only
