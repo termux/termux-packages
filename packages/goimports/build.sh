@@ -7,7 +7,6 @@ TERMUX_PKG_SRCURL=https://github.com/golang/tools/archive/refs/tags/v${TERMUX_PK
 TERMUX_PKG_SHA256=df7f087706730d85ced76f5f2e3d1a51703de3beb305acc72d1170d405f5a21e
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_BUILD_DEPENDS="golang"
 
 # This whole repo (golang.org/x/tools) is a monorepo of many Go dev tools;
 # we only build and package the goimports subcommand out of it.
