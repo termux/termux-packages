@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="X protocol Emacs Lisp Binding"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.19"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://github.com/emacs-exwm/xelb/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=b518d4b74f41eaa104d389f77d9fe90eb1b99031d6afd7ba5a9dfd5dd49af112
 TERMUX_PKG_DEPENDS="emacs-x"
@@ -54,9 +54,7 @@ termux_step_make() {
 
 termux_step_make_install() {
 	local file
-	local emacs_version
-	emacs_version=$(. "$TERMUX_SCRIPTDIR/x11-packages/emacs-x/build.sh"; echo "$TERMUX_PKG_VERSION")
 	for file in *.el; do
-		install -Dm644 "$file" "$TERMUX_PREFIX/share/emacs/$emacs_version/site-lisp/xelb/$file"
+		install -Dm644 "$file" "$TERMUX_PREFIX/share/emacs/site-lisp/xelb/$file"
 	done
 }
