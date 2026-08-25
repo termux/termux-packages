@@ -1,0 +1,297 @@
+diff --git a/config/linux/build.xml b/config/linux/build.xml
+index 7fb5a3aae..52e354219 100644
+--- a/config/linux/build.xml
++++ b/config/linux/build.xml
+@@ -43,7 +43,7 @@
+                 <arg line="-mcpu=powerpc64le" if:set="build.arch.ppc64le"/>
+                 <arg line="-march=rv64g" if:set="build.arch.riscv64"/>
+                 <arg line="-O3 -flto=auto -fPIC @{flags} -pthread -DNDEBUG -DLWJGL_LINUX -DLWJGL_${build.arch}"/>
+-                <arg line="-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 -D_GNU_SOURCE"/>
++                <arg line="-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0"/>
+                 <arg line="-D_FILE_OFFSET_BITS=64"/>
+ 
+                 <arg value="-I${jni.headers}"/>
+@@ -162,7 +162,7 @@
+             <echo message="GCC executable: ${gcc.prefix}gcc${gcc.suffix}"/>
+             <exec executable="bash" logError="true" failonerror="false" taskname="Compiler">
+                 <arg line="-o pipefail -c"/>
+-                <arg value="${gcc.prefix}gcc${gcc.suffix} --version | grep ^.*gcc"/>
++                <arg value="${gcc.prefix}gcc${gcc.suffix} --version | head -1"/>
+             </exec>
+         </sequential>
+ 
+@@ -196,15 +196,8 @@
+                     <include name="${module.lwjgl}/jawt/src/generated/c/*.c" if:true="${binding.jawt}"/>
+                 </fileset>
+             </source>
+-            <beforeLink>
+-                <parallel threadsPerProcessor="2" failonany="true" unless:set="lib-dependencies-uptodate">
+-                    <update-dependency module="core" artifact="core/libffi.a"/>
+-                </parallel>
+-            </beforeLink>
+             <link>
+-                <fileset dir="${lib.native}/org/lwjgl">
+-                    <include name="libffi.a"/>
+-                </fileset>
++		<arg value="-lffi"/>
+                 <arg value="-ldl"/>
+             </link>
+         </build>
+@@ -273,15 +266,7 @@
+         <build module="nfd" simple="true" linker="g++" if:true="${binding.nfd}">
+             <beforeCompile>
+                 <compile lang="c++">
+-                    <arg value="-I/usr/include/gtk-3.0"/>
+-                    <arg value="-I/usr/include/glib-2.0"/>
+-                    <arg value="-I/usr/include/pango-1.0"/>
+-                    <arg value="-I/usr/include/harfbuzz"/>
+-                    <arg value="-I/usr/include/cairo"/>
+-                    <arg value="-I/usr/include/gdk-pixbuf-2.0"/>
+-                    <arg value="-I/usr/include/atk-1.0"/>
+-                    <arg value="-I/usr/lib64/glib-2.0/include"/>
+-                    <arg value="-I/usr/lib/${linux.triplet}/glib-2.0/include"/>
++		    <arg line="-I@TERMUX_PREFIX@/include/gtk-3.0 -I@TERMUX_PREFIX@/include/glib-2.0 -I@TERMUX_PREFIX@/lib/glib-2.0/include -I@TERMUX_PREFIX@/include/pango-1.0 -I@TERMUX_PREFIX@/include/harfbuzz -I@TERMUX_PREFIX@/include/cairo -I@TERMUX_PREFIX@/include/gdk-pixbuf-2.0 -I@TERMUX_PREFIX@/include/atk-1.0"/>
+                     <arg value="-I${src.main.rel}/include"/>
+                     <fileset dir="." includes="${src.main}/nfd_gtk.cpp"/>
+                 </compile>
+@@ -299,7 +284,7 @@
+         <build module="nfd" suffix="_portal" simple="true" linker="g++" if:true="${binding.nfd}">
+             <beforeCompile>
+                 <compile lang="c++">
+-                    <arg line="-I/usr/include/dbus-1.0 -I/usr/lib64/dbus-1.0/include -I/usr/lib/${linux.triplet}/dbus-1.0/include"/>
++                    <arg line="-I@TERMUX_PREFIX@/include/dbus-1.0 -I@TERMUX_PREFIX@/lib/dbus-1.0/include"/>
+                     <arg value="-I${src.main.rel}/include"/>
+                     <fileset dir="." includes="${src.main}/nfd_portal.cpp"/>
+                 </compile>
+@@ -347,6 +332,7 @@
+             <link>
+                 <arg value="-ldl"/>
+                 <arg value="-lm"/>
++		<arg value="-lGLX"/>
+                 <arg value="-l:libGL.so.1" unless:set="gcc.libpath.opengl"/>
+                 <arg line="-L ${gcc.libpath.opengl} -l:libGL.so.1" if:set="gcc.libpath.opengl"/>
+             </link>
+@@ -405,6 +391,7 @@
+         <!-- Vulkan Memory Allocator -->
+         <build module="vma" lang="c++" if:true="${binding.vma}">
+             <source>
++		<arg value="-Wno-nullability-completeness"/>
+                 <arg value="-I${src.main.rel}"/>
+                 <arg value="-I${module.lwjgl.rel}/vulkan/src/main/c"/>
+                 <fileset dir="." includes="${src.generated}/*.cpp"/>
+@@ -482,4 +469,4 @@
+             <touch file="${lib.native}/touch.txt" verbose="false"/>
+         </sequential>
+     </target>
+-</project>
+\ No newline at end of file
++</project>
+diff --git a/modules/lwjgl/core/src/main/c/linux/liburing/include/liburing.h b/modules/lwjgl/core/src/main/c/linux/liburing/include/liburing.h
+index 0188937b0..c22493987 100644
+--- a/modules/lwjgl/core/src/main/c/linux/liburing/include/liburing.h
++++ b/modules/lwjgl/core/src/main/c/linux/liburing/include/liburing.h
+@@ -323,11 +323,11 @@ int io_uring_register_restrictions(struct io_uring *ring,
+ 				   unsigned int nr_res) LIBURING_NOEXCEPT;
+ int io_uring_enable_rings(struct io_uring *ring) LIBURING_NOEXCEPT;
+ int __io_uring_sqring_wait(struct io_uring *ring) LIBURING_NOEXCEPT;
+-#ifdef _GNU_SOURCE
++#if defined(_GNU_SOURCE) && !defined(__ANDROID__)
+ int io_uring_register_iowq_aff(struct io_uring *ring, size_t cpusz,
+ 				const cpu_set_t *mask) LIBURING_NOEXCEPT;
+-#endif
+ int io_uring_unregister_iowq_aff(struct io_uring *ring) LIBURING_NOEXCEPT;
++#endif
+ int io_uring_register_iowq_max_workers(struct io_uring *ring,
+ 				       unsigned int *values) LIBURING_NOEXCEPT;
+ int io_uring_register_ring_fd(struct io_uring *ring) LIBURING_NOEXCEPT;
+@@ -1666,7 +1666,7 @@ IOURINGINLINE void io_uring_prep_fixed_fd_install(struct io_uring_sqe *sqe,
+ 	sqe->install_fd_flags = flags;
+ }
+ 
+-#ifdef _GNU_SOURCE
++#if defined(_GNU_SOURCE) && !defined(__ANDROID__)
+ IOURINGINLINE void io_uring_prep_ftruncate(struct io_uring_sqe *sqe,
+ 				       int fd, loff_t len)
+ 	LIBURING_NOEXCEPT
+diff --git a/modules/lwjgl/core/src/main/c/linux/liburing/include/liburing/compat.h b/modules/lwjgl/core/src/main/c/linux/liburing/include/liburing/compat.h
+index 55e0d501a..626e67f6f 100644
+--- a/modules/lwjgl/core/src/main/c/linux/liburing/include/liburing/compat.h
++++ b/modules/lwjgl/core/src/main/c/linux/liburing/include/liburing/compat.h
+@@ -6,28 +6,20 @@
+ #include <inttypes.h>
+ #include <stdint.h>
+ #include <sys/stat.h>
++#include <linux/time_types.h>
++#include <linux/openat2.h>
+ #include <linux/ioctl.h>
+ 
++#ifndef __kernel_rwf_t
+ typedef int __kernel_rwf_t;
+ 
+-struct __kernel_timespec {
+-	int64_t		tv_sec;
+-	long long	tv_nsec;
+-};
+ 
+ /* <linux/time_types.h> is not available, so it can't be included */
+ #define UAPI_LINUX_IO_URING_H_SKIP_LINUX_TIME_TYPES_H 1
+ 
+-#if !defined(__glibc_has_open_how) && !defined(_UAPI_LINUX_OPENAT2_H)
+-struct open_how {
+-	uint64_t	flags;
+-	uint64_t	mode;
+-	uint64_t	resolve;
+-};
+-#endif
+ 
+ #ifndef BLOCK_URING_CMD_DISCARD
+ #define BLOCK_URING_CMD_DISCARD                        _IO(0x12, 0)
+ #endif
+-
++#endif
+ #endif
+diff --git a/modules/lwjgl/core/src/main/c/linux/liburing/register.c b/modules/lwjgl/core/src/main/c/linux/liburing/register.c
+index 02d043b8f..0c4e0e20e 100644
+--- a/modules/lwjgl/core/src/main/c/linux/liburing/register.c
++++ b/modules/lwjgl/core/src/main/c/linux/liburing/register.c
+@@ -258,6 +258,7 @@ int io_uring_enable_rings(struct io_uring *ring)
+ 	return do_register(ring, IORING_REGISTER_ENABLE_RINGS, NULL, 0);
+ }
+ 
++#if defined(_GNU_SOURCE) && !defined(__ANDROID__)
+ int io_uring_register_iowq_aff(struct io_uring *ring, size_t cpusz,
+ 			       const cpu_set_t *mask)
+ {
+@@ -271,6 +272,7 @@ int io_uring_unregister_iowq_aff(struct io_uring *ring)
+ {
+ 	return do_register(ring, IORING_UNREGISTER_IOWQ_AFF, NULL, 0);
+ }
++#endif
+ 
+ int io_uring_register_iowq_max_workers(struct io_uring *ring, unsigned int *val)
+ {
+diff --git a/modules/lwjgl/core/src/templates/kotlin/core/linux/liburing/templates/liburing.kt b/modules/lwjgl/core/src/templates/kotlin/core/linux/liburing/templates/liburing.kt
+index 5683ef0d0..c75ed07c3 100644
+--- a/modules/lwjgl/core/src/templates/kotlin/core/linux/liburing/templates/liburing.kt
++++ b/modules/lwjgl/core/src/templates/kotlin/core/linux/liburing/templates/liburing.kt
+@@ -372,20 +372,6 @@ ENABLE_WARNINGS()""")
+         noPrefix = true
+     )
+ 
+-    int(
+-        "register_iowq_aff",
+-
+-        io_uring.p("ring"),
+-        size_t("cpusz"),
+-        cpu_set_t.const.p("mask")
+-    )
+-
+-    int(
+-        "unregister_iowq_aff",
+-
+-        io_uring.p("ring")
+-    )
+-
+     int(
+         "register_iowq_max_workers",
+ 
+@@ -1644,14 +1630,6 @@ ENABLE_WARNINGS()""")
+         unsigned_int("flags")
+     )
+ 
+-    void(
+-        "prep_ftruncate",
+-
+-        io_uring_sqe.p("sqe"),
+-        int("fd"),
+-        loff_t("len")
+-    )
+-
+     void(
+         "prep_cmd_discard",
+ 
+@@ -1860,4 +1838,4 @@ ENABLE_WARNINGS()""")
+         int("major"),
+         int("minor")
+     )
+-}
+\ No newline at end of file
++}
+diff --git a/modules/lwjgl/core/src/templates/kotlin/core/linux/templates/uio.kt b/modules/lwjgl/core/src/templates/kotlin/core/linux/templates/uio.kt
+index 87d339fcc..76ebfa16d 100644
+--- a/modules/lwjgl/core/src/templates/kotlin/core/linux/templates/uio.kt
++++ b/modules/lwjgl/core/src/templates/kotlin/core/linux/templates/uio.kt
+@@ -43,26 +43,6 @@ val uio = "UIO".nativeClass(Module.CORE_LINUX, nativeSubPath = "linux") {
+         int("__count")
+     )
+ 
+-    ssize_t(
+-        "preadv",
+-
+-        CaptureCallState.errno.param,
+-        int("__fd"),
+-        iovec.const.p("__iovec"),
+-        int("__count"),
+-        off_t("__offset")
+-    )
+-
+-    ssize_t(
+-        "pwritev",
+-
+-        CaptureCallState.errno.param,
+-        int("__fd"),
+-        iovec.const.p("__iovec"),
+-        int("__count"),
+-        off_t("__offset")
+-    )
+-
+     /*ssize_t(
+         "preadv2",
+ 
+@@ -84,28 +64,4 @@ val uio = "UIO".nativeClass(Module.CORE_LINUX, nativeSubPath = "linux") {
+         off_t("__offset"),
+         int("__flags")
+     )*/
+-
+-    ssize_t(
+-        "process_vm_readv",
+-
+-        CaptureCallState.errno.param,
+-        pid_t("__pid"),
+-        iovec.const.p("__lvec"),
+-        unsigned_long_int("__liovcnt"),
+-        iovec.const.p("__rvec"),
+-        unsigned_long_int("__riovcnt"),
+-        unsigned_long_int("__flags")
+-    )
+-
+-    ssize_t(
+-        "process_vm_writev",
+-
+-        CaptureCallState.errno.param,
+-        pid_t("__pid"),
+-        iovec.const.p("__lvec"),
+-        unsigned_long_int("__liovcnt"),
+-        iovec.const.p("__rvec"),
+-        unsigned_long_int("__riovcnt"),
+-        unsigned_long_int("__flags")
+-    )
+ }
+\ No newline at end of file
++}
+diff --git a/modules/lwjgl/nfd/src/main/c/nfd_portal.cpp b/modules/lwjgl/nfd/src/main/c/nfd_portal.cpp
+index 0ee222b23..db753fd45 100644
+--- a/modules/lwjgl/nfd/src/main/c/nfd_portal.cpp
++++ b/modules/lwjgl/nfd/src/main/c/nfd_portal.cpp
+@@ -17,7 +17,10 @@
+ #include <string.h>
+ #include <unistd.h>  // for access()
+ 
+-#if !defined(__has_include) || !defined(__linux__)
++#if defined(__ANDROID__)
++#include <sys/syscall.h>
++#define getrandom(buf, sz, flags) syscall(SYS_getrandom, buf, sz, flags)
++#elif !defined(__has_include) || !defined(__linux__)
+ #include <sys/random.h>  // for getrandom() - the random token string
+ #elif __has_include(<sys/random.h>)
+ #include <sys/random.h>
