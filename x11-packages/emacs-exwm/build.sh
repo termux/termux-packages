@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Emacs X Window Manager"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.34"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL="https://github.com/emacs-exwm/exwm/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=ebe730bbda5bce75baf4532173171a9283a58684e7ec84192ba03c3d8328cf0a
 TERMUX_PKG_DEPENDS="emacs-x, emacs-xelb"
@@ -22,7 +22,7 @@ termux_step_host_build() {
 	emacs_version=$(. "$TERMUX_SCRIPTDIR/x11-packages/emacs-x/build.sh"; echo "$TERMUX_PKG_VERSION")
 
 	EMACS_SRCURL="https://mirrors.kernel.org/gnu/emacs/emacs-$emacs_version.tar.xz"
-	EMACS_SHA256=b3f36f18a6dd2715713370166257de2fae01f9d38cfe878ced9b1e6ded5befd9
+	EMACS_SHA256=1da5790d9580c81932b5bf700633114468da7b3412d69faa767daebf974f4586
 	EMACS_ARCHIVE="${TERMUX_PKG_CACHEDIR}/EMACS.tar.xz"
 	EMACS_WORKDIR="${TERMUX_PKG_TMPDIR}/EMACS"
 	EMACS_INSTALLDIR="${TERMUX_PKG_HOSTBUILD_DIR}/EMACS"
