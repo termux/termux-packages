@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Clients provided with BIND"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="9.20.27"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://downloads.isc.org/isc/bind9/${TERMUX_PKG_VERSION}/bind-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=145ab7a50b33a06d9d488b5e668c887e754f42acf8954e2b5dc7e238b080e4a0
 TERMUX_PKG_DEPENDS="cmocka, json-c, krb5, libandroid-execinfo, libandroid-glob, libcap, libnghttp2, liburcu, libuv, libxml2, openssl, readline, resolv-conf, zlib"
