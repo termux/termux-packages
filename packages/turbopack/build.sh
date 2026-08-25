@@ -2,14 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://nextjs.org/
 TERMUX_PKG_DESCRIPTION="Rust-based incremental compilation engine and bundler for Next.js"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_VERSION="16.3.1"
+TERMUX_PKG_VERSION="16.3.2"
 TERMUX_PKG_SRCURL=https://github.com/vercel/next.js/archive/refs/tags/v${TERMUX_PKG_VERSION//\~/-}.tar.gz
-TERMUX_PKG_SHA256=b14fd7648da2039295796d0ad1aedc5471fddd54659e62c98e2de313ad2de6d1
+TERMUX_PKG_SHA256=632084be92ae11b2736f0c4825ce712c86c969c0dc1f4246066c3d38bf918584
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 TERMUX_PKG_DEPENDS="ca-certificates"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE=latest-release-tag
+TERMUX_PKG_API_LEVEL=29
 
 termux_step_pre_configure() {
 	export ANDROID_NDK_LATEST_HOME="${TERMUX_STANDALONE_TOOLCHAIN}"
@@ -19,7 +20,9 @@ termux_step_make() {
 	export RUSTC_BOOTSTRAP=1
 	termux_setup_rust
 	termux_setup_nodejs
-	export RUSTFLAGS="--cfg tokio_unstable"
+	export RUSTFLAGS="--cfg tokio_unstable -Z plt=no"
+	export CFLAGS="$CFLAGS -fno-emulated-tls -ftls-model=global-dynamic"
+	export CXXFLAGS="$CXXFLAGS -fno-emulated-tls -ftls-model=global-dynamic"
 	local ENV_PREFIX=$(echo "$CARGO_TARGET_NAME" | tr '[:lower:]-' '[:upper:]_')
 	if [ "$TERMUX_ARCH" == "aarch64" ]; then
 		export RUSTFLAGS+=" -Zshare-generics=y -Csymbol-mangling-version=v0"
