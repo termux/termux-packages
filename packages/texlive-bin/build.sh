@@ -3,10 +3,11 @@ TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION="1:2026.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/TeX-Live/texlive-source/archive/refs/heads/tags/texlive-${TERMUX_PKG_VERSION:2}.tar.gz"
 TERMUX_PKG_SHA256=f92e1be0fe4b3ad4e596f8443c5e4e7315ecf0554c2fc153d7af52f854865e24
 TERMUX_PKG_AUTO_UPDATE=false
-TERMUX_PKG_DEPENDS="freetype, harfbuzz, harfbuzz-icu, libandroid-complex-math, libc++, libcairo, libgd, libgmp, libgraphite, libiconv, libicu, lua52, libmpfr, libpaper, libpixman, libpng, teckit, zlib"
+TERMUX_PKG_DEPENDS="freetype, harfbuzz, harfbuzz-icu, libandroid-complex-math, libc++, libcairo, libgd, libgmp, libgraphite, libiconv, libicu, lua52, libmpfr, libpaper, libpixman, libpng, libsynctex (= $TERMUX_PKG_VERSION), teckit, zlib"
 # libpcre, glib, fontconfig are dependencies of libcairo. pkg-config gives an error if they are missing
 # libuuid, libxml2 are needed by fontconfig
 TERMUX_PKG_BUILD_DEPENDS="icu-devtools, pcre, glib, fontconfig, libuuid, libxml2"
@@ -88,20 +89,24 @@ share/texlive/texmf-dist/chktex
 share/texlive/texmf-dist/hbf2gf
 "
 
+# We create these directories before cd-ing into them.
+# So the shellcheck warning about accounting for
+# cd failure does not apply here.
+# shellcheck disable=SC2164
 termux_step_host_build() {
 	mkdir -p auxdir/auxsub
 	mkdir -p texk/kpathsea
 	mkdir -p texk/web2c
 
-	cd $TERMUX_PKG_HOSTBUILD_DIR/auxdir/auxsub
-	$TERMUX_PKG_SRCDIR/auxdir/auxsub/configure
+	cd "$TERMUX_PKG_HOSTBUILD_DIR/auxdir/auxsub"
+	"$TERMUX_PKG_SRCDIR/auxdir/auxsub/configure"
 	make
 
-	cd $TERMUX_PKG_HOSTBUILD_DIR/texk/kpathsea
-	$TERMUX_PKG_SRCDIR/texk/kpathsea/configure
+	cd "$TERMUX_PKG_HOSTBUILD_DIR/texk/kpathsea"
+	"$TERMUX_PKG_SRCDIR/texk/kpathsea/configure"
 
-	cd $TERMUX_PKG_HOSTBUILD_DIR/texk/web2c
-	$TERMUX_PKG_SRCDIR/texk/web2c/configure --without-x
+	cd "$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c"
+	"$TERMUX_PKG_SRCDIR/texk/web2c/configure" --without-x
 	make tangle
 	make ctangle
 	make tie
@@ -110,13 +115,13 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
-	export TANGLE=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/tangle
-	export TANGLEBOOT=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/tangleboot
-	export CTANGLE=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/ctangle
-	export CTANGLEBOOT=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/ctangleboot
-	export TIE=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/tie
-	export OTANGLE=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/otangle
-	export HIMKTABLES=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/himktables
+	export TANGLE="$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/tangle"
+	export TANGLEBOOT="$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/tangleboot"
+	export CTANGLE="$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/ctangle"
+	export CTANGLEBOOT="$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/ctangleboot"
+	export TIE="$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/tie"
+	export OTANGLE="$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/otangle"
+	export HIMKTABLES="$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/himktables"
 
 	sed -e "s%@TERMUX_PREFIX@%$TERMUX_PREFIX%g" \
 		-e "s%@YEAR@%${TERMUX_PKG_VERSION:2:6}%g" \

@@ -1,0 +1,58 @@
+From e91e5ad64d20eb4a7df377effc12ec21ba6f5f7c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Johannes=20L=C3=B6thberg?= <johannes@kyriasis.com>
+Date: Fri, 18 Mar 2022 00:02:43 +0100
+Subject: [PATCH] Remove mupdf linking detection
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Johannes Löthberg <johannes@kyriasis.com>
+---
+ meson.build | 40 ++++++++++++++--------------------------
+ 1 file changed, 14 insertions(+), 26 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index be1f554..3ead691 100644
+--- a/meson.build
++++ b/meson.build
+@@ -30,27 +30,20 @@ build_dependencies = [
+
+ mupdf_required_version_major = 1
+ mupdf_required_version_minor = 26
+-mupdf = dependency('mupdf', required: false, version: '>=@0@.@1@'.format(mupdf_required_version_major, mupdf_required_version_minor))
+-if not mupdf.found()
+-  # normal build of mupdf
+-  mupdf = cc.find_library('mupdf', has_headers: ['mupdf/fitz/version.h', 'mupdf/fitz.h', 'mupdf/pdf.h'], required: true)
+-  mupdfthird = cc.find_library('mupdf-third')
+-  version_check = '''
+-#include <mupdf/fitz/version.h>
++mupdf = cc.find_library('mupdf')
+
+-#if FZ_VERSION_MAJOR < @0@ || (FZ_VERSION_MAJOR == @0@ && FZ_VERSION_MINOR < @1@)
+-#error "mupdf @0@.@1@ or newer is requried"
+-#endif
+-'''.format(mupdf_required_version_major, mupdf_required_version_minor)
+-  if not cc.compiles(version_check, dependencies: [mupdf])
+-    error('mupdf @0@.@1@ or newer is required'.format(mupdf_required_version_major, mupdf_required_version_minor))
+-  endif
++libjpeg = dependency('libjpeg')
++libjbig2dec = cc.find_library('jbig2dec')
++libopenjp2 = dependency('libopenjp2')
++gumbo = dependency('gumbo')
+
+-  build_dependencies += [mupdf, mupdfthird]
+-else
+-  # build from Debian's libmupdf-dev
+-  build_dependencies += [mupdf]
+-endif
++build_dependencies += [
++  mupdf,
++  libjpeg,
++  libjbig2dec,
++  libopenjp2,
++  gumbo,
++]
+
+ if get_option('plugindir') == ''
+   plugindir = zathura.get_variable(pkgconfig: 'plugindir')
+

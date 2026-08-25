@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE="https://pwmt.org/projects/zathura-cb/"
+TERMUX_PKG_DESCRIPTION="Comic book support for zathura"
+TERMUX_PKG_LICENSE="ZLIB"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="2026.07.18"
+TERMUX_PKG_SRCURL="https://github.com/pwmt/zathura-cb/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=6cb21bde6ca9f92ed409a44f37fc58de5d4fa13a99bd3ae37de0542d6818857f
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_DEPENDS="girara, glib, libarchive, libcairo, zathura"
