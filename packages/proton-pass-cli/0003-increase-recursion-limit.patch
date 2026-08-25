@@ -1,0 +1,28 @@
+Raise the query recursion limit for the pass-cli binary crate.
+
+Since v2.3.3, release builds fail on all Termux targets (arm, i686,
+aarch64) with:
+
+    error: queries overflow the depth limit!
+      = help: consider increasing the recursion limit by adding a
+        `#![recursion_limit = "256"]` attribute to your crate (`pass_cli`)
+      = note: query depth increased by 130 when computing layout of
+        `{async block@pass-cli/src/commands/secret_resolver.rs:222:5: 222:10}`
+
+The `#[async_trait(?Send)]` usage in secret_resolver.rs, combined with
+the crate's other async trait objects, produces a deeply nested type
+that exceeds rustc's default query recursion limit (128) when
+computing layout in a release (non-incremental) build. Follow rustc's
+own suggestion and raise the limit.
+
+--- a/pass-cli/src/main.rs
++++ b/pass-cli/src/main.rs
+@@ -15,6 +15,8 @@
+  *
+  */
+ 
++#![recursion_limit = "512"]
++
+ #[macro_use]
+ extern crate tracing;
+ 

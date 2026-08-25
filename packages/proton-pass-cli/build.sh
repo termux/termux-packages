@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://protonpass.github.io/pass-cli/
 TERMUX_PKG_DESCRIPTION="Proton Pass Command Line Interface (CLI)"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="2.3.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="2.3.3"
 TERMUX_PKG_SRCURL="https://github.com/protonpass/pass-cli/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=9b15641124c6a29eb7015f510cabc8f209fdef9274ace2821085eb02e37997ff
+TERMUX_PKG_SHA256=a064b89fc4fb5d2db47a99e46e1782b7672dc1078e2ecbb881d0910c01947611
 TERMUX_PKG_DEPENDS="openssl, protobuf, sqlcipher, zlib"
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
