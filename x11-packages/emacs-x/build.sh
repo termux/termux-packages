@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Update both emacs and emacs-x to the same version in one PR.
 TERMUX_PKG_VERSION="31.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://ftp.gnu.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=1da5790d9580c81932b5bf700633114468da7b3412d69faa767daebf974f4586
 TERMUX_PKG_DEPENDS="dbus, fontconfig, freetype, gdk-pixbuf, giflib, glib, harfbuzz, libacl, libgmp, libgnutls, libice, libjpeg-turbo, libpng, librsvg, libsm, libsqlite, libtiff, libwebp, libx11, libxaw, libxcb, libxext, libxfixes, libxft, libxinerama, libxml2, libxmu, libxpm, libxrandr, libxrender, libxt, littlecms, ncurses, tree-sitter, zlib"
