@@ -1,0 +1,157 @@
+#!/data/data/com.termux/files/usr/bin/bash
+
+CM_DIR="$HOME/.local/share/cm"
+
+case $1 in
+    alpine)
+        echo "Starting Alpine Linux..."
+        export PATH="$CM_DIR/alpine/bin:$PATH"
+        export PS1="\[\e[1;36m\][Alpine@localhost]\[\e[0m\] \W # "
+        cd "$CM_DIR/alpine"
+        sh
+        ;;
+    kali)
+        echo "Starting Kali Linux Minimal..."
+        export PATH="$CM_DIR/kali/bin:$PATH"
+        export PS1="\[\e[1;31m\][Kali@localhost]\[\e[0m\] \W # "
+        cd "$CM_DIR/kali"
+        bash
+        ;;
+    ubuntu)
+        echo "Starting Ubuntu..."
+        export PATH="$CM_DIR/ubuntu/bin:$PATH"
+        export PS1="\[\e[1;33m\][Ubuntu@localhost]\[\e[0m\] \W \$ "
+        cd "$CM_DIR/ubuntu"
+        bash
+        ;;
+    debian)
+        echo "Starting Debian..."
+        export PATH="$CM_DIR/debian/bin:$PATH"
+        export PS1="\[\e[1;32m\][Debian@localhost]\[\e[0m\] \W \$ "
+        cd "$CM_DIR/debian"
+        bash
+        ;;
+    arch)
+        echo "Starting Arch Linux..."
+        export PATH="$CM_DIR/arch/bin:$PATH"
+        export PS1="\[\e[1;34m\][Arch@localhost]\[\e[0m\] \W # "
+        cd "$CM_DIR/arch"
+        bash
+        ;;
+    fedora)
+        echo "Starting Fedora..."
+        export PATH="$CM_DIR/fedora/bin:$PATH"
+        export PS1="\[\e[1;35m\][Fedora@localhost]\[\e[0m\] \W \$ "
+        cd "$CM_DIR/fedora"
+        bash
+        ;;
+    list)
+        echo "Installed distros:"
+        [ -d "$CM_DIR/alpine" ] && echo "  [✓] Alpine"
+        [ -d "$CM_DIR/kali" ] && echo "  [✓] Kali Minimal"
+        [ -d "$CM_DIR/ubuntu" ] && echo "  [✓] Ubuntu"
+        [ -d "$CM_DIR/debian" ] && echo "  [✓] Debian"
+        [ -d "$CM_DIR/arch" ] && echo "  [✓] Arch Linux"
+        [ -d "$CM_DIR/fedora" ] && echo "  [✓] Fedora"
+        ;;
+    install)
+        case $2 in
+            alpine)
+                echo "Downloading Alpine (5MB)..."
+                rm -rf "$CM_DIR/alpine"
+                mkdir -p "$CM_DIR/alpine"
+                cd "$CM_DIR/alpine"
+                wget -q --show-progress -O alpine-rootfs.tar.gz https://dl-cdn.alpinelinux.org/alpine/v3.19/releases/armv7/alpine-minirootfs-3.19.1-armv7.tar.gz
+                tar -xzf alpine-rootfs.tar.gz
+                rm -f alpine-rootfs.tar.gz
+                echo "Alpine installed!"
+                ;;
+            kali)
+                echo "Downloading Kali Minimal (150MB)..."
+                rm -rf "$CM_DIR/kali"
+                mkdir -p "$CM_DIR/kali"
+                cd "$CM_DIR/kali"
+                wget -q --show-progress -O kali-rootfs.tar.xz https://archive.kali.org/kali-images/kali-2023.4/kali-linux-2023.4-armhf-minimal.tar.xz
+                tar -xJf kali-rootfs.tar.xz
+                rm -f kali-rootfs.tar.xz
+                echo "Kali Minimal installed!"
+                ;;
+            ubuntu)
+                echo "Downloading Ubuntu (300MB)..."
+                rm -rf "$CM_DIR/ubuntu"
+                mkdir -p "$CM_DIR/ubuntu"
+                cd "$CM_DIR/ubuntu"
+                wget -q --show-progress -O ubuntu-rootfs.tar.gz https://github.com/termux/proot-distro/releases/download/v4.6.0/ubuntu-22.04-armhf.tar.gz
+                tar -xzf ubuntu-rootfs.tar.gz
+                rm -f ubuntu-rootfs.tar.gz
+                echo "Ubuntu installed!"
+                ;;
+            debian)
+                echo "Downloading Debian (300MB)..."
+                rm -rf "$CM_DIR/debian"
+                mkdir -p "$CM_DIR/debian"
+                cd "$CM_DIR/debian"
+                wget -q --show-progress -O debian-rootfs.tar.gz https://github.com/termux/proot-distro/releases/download/v4.6.0/debian-12-armhf.tar.gz
+                tar -xzf debian-rootfs.tar.gz
+                rm -f debian-rootfs.tar.gz
+                echo "Debian installed!"
+                ;;
+            arch)
+                echo "Downloading Arch (500MB)..."
+                rm -rf "$CM_DIR/arch"
+                mkdir -p "$CM_DIR/arch"
+                cd "$CM_DIR/arch"
+                wget -q --show-progress -O arch-rootfs.tar.gz https://github.com/termux/proot-distro/releases/download/v4.6.0/archlinux-armhf.tar.gz
+                tar -xzf arch-rootfs.tar.gz
+                rm -f arch-rootfs.tar.gz
+                echo "Arch Linux installed!"
+                ;;
+            fedora)
+                echo "Downloading Fedora (500MB)..."
+                rm -rf "$CM_DIR/fedora"
+                mkdir -p "$CM_DIR/fedora"
+                cd "$CM_DIR/fedora"
+                wget -q --show-progress -O fedora-rootfs.tar.gz https://github.com/termux/proot-distro/releases/download/v4.6.0/fedora-38-armhf.tar.gz
+                tar -xzf fedora-rootfs.tar.gz
+                rm -f fedora-rootfs.tar.gz
+                echo "Fedora installed!"
+                ;;
+            *)
+                echo "Available: cm install [alpine|kali|ubuntu|debian|arch|fedora]"
+                ;;
+        esac
+        ;;
+    remove)
+        echo "Removing $2..."
+        rm -rf "$CM_DIR/$2"
+        echo "$2 removed!"
+        ;;
+    clean)
+        echo "Cleaning all downloaded archives..."
+        find "$CM_DIR" -name "*.tar.gz" -delete 2>/dev/null
+        find "$CM_DIR" -name "*.tar.xz" -delete 2>/dev/null
+        echo "Cleaned!"
+        ;;
+    help)
+        echo "cm - CLI Emulator for Termux"
+        echo ""
+        echo "Usage: cm [COMMAND]"
+        echo ""
+        echo "Commands:"
+        echo "  alpine        - Start Alpine Linux"
+        echo "  kali          - Start Kali Linux Minimal"
+        echo "  ubuntu        - Start Ubuntu"
+        echo "  debian        - Start Debian"
+        echo "  arch          - Start Arch Linux"
+        echo "  fedora        - Start Fedora"
+        echo "  list          - Show installed distros"
+        echo "  install [os]  - Install a distro"
+        echo "  remove [os]   - Remove a distro"
+        echo "  clean         - Remove all .tar.gz/.tar.xz files"
+        echo "  help          - Show this help"
+        ;;
+    *)
+        echo "Error: Unknown command. Use 'cm help'"
+        exit 1
+        ;;
+esac
