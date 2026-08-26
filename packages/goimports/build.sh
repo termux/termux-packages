@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=0.49.0
 TERMUX_PKG_SRCURL=https://github.com/golang/tools/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=df7f087706730d85ced76f5f2e3d1a51703de3beb305acc72d1170d405f5a21e
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="^v\K[0-9]+\.[0-9]+\.[0-9]+$"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 # This whole repo (golang.org/x/tools) is a monorepo of many Go dev tools;
