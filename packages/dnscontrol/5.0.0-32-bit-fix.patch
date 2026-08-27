@@ -1,0 +1,101 @@
+From c58ff0f31578533f1e492d9351a0f28355b6fb84 Mon Sep 17 00:00:00 2001
+From: Tom Limoncelli <tal@whatexit.org>
+Date: Thu, 27 Aug 2026 07:42:26 -0400
+Subject: [PATCH] bugfix(mustbe): Fix 32-bit compatibility
+
+---
+ .../advanced-features/integration-tests.md    | 22 +++++++++++++++-
+ pkg/mustbe/numbers.go                         |  4 +--
+ pkg/mustbe/numbers_test.go                    | 26 +++++++++++++++++++
+ 3 files changed, 49 insertions(+), 3 deletions(-)
+
+diff --git a/documentation/advanced-features/integration-tests.md b/documentation/advanced-features/integration-tests.md
+index 0e5c8ff9f3..66bc2e9dd3 100644
+--- a/documentation/advanced-features/integration-tests.md
++++ b/documentation/advanced-features/integration-tests.md
+@@ -1,4 +1,9 @@
+-### Integration Tests
++# Integration Tests
++
++- [Integration Tests](#integration-tests)
++  - [Configuration](#configuration)
++  - [Running a test](#running-a-test)
++  - [Bonus: How to test for 32-bit compatibility](#bonus-how-to-test-for-32-bit-compatibility)
+ 
+ This is a simple framework for testing dns providers by making real requests.
+ 
+@@ -74,3 +79,18 @@ should create a script that you can `source` to set these
+ variables. Be careful not to check this script into Git since it
+ contains credentials.
+ {% endhint %}
++
++## Bonus: How to test for 32-bit compatibility
++
++Make sure it compiles:
++
++```bash
++GOOS=linux GOARCH=arm GOARM=7 go build
++```
++
++Use Docker to make sure all tests pass:
++
++```bash
++docker run --platform linux/arm -v "$(pwd):/src" -w /src golang:latest go test -v ./...
++docker run --platform linux/386 -v "$(pwd):/src" -w /src golang:latest go test -v ./...
++```
+diff --git a/pkg/mustbe/numbers.go b/pkg/mustbe/numbers.go
+index 575e942d9f..79c25d6ad4 100644
+--- a/pkg/mustbe/numbers.go
++++ b/pkg/mustbe/numbers.go
+@@ -114,12 +114,12 @@ func Uint32(arg any) uint32 {
+ 	case uint32:
+ 		return v
+ 	case uint:
+-		if v > math.MaxUint32 {
++		if uint64(v) > uint64(math.MaxUint32) { // casts to assure 32-bit compatibility.
+ 			panic(fmt.Sprintf("value %v overflows uint32", arg))
+ 		}
+ 		return uint32(v)
+ 	case int:
+-		if v < 0 || v > math.MaxUint32 {
++		if v < 0 || int64(v) > int64(math.MaxUint32) { // casts to assure 32-bit compatibility.
+ 			panic(fmt.Sprintf("value %v overflows uint32", arg))
+ 		}
+ 		return uint32(v)
+diff --git a/pkg/mustbe/numbers_test.go b/pkg/mustbe/numbers_test.go
+index aa44abb58c..a4b522a57d 100644
+--- a/pkg/mustbe/numbers_test.go
++++ b/pkg/mustbe/numbers_test.go
+@@ -2,6 +2,32 @@ package mustbe
+ 
+ import "testing"
+ 
++// Uint32
++
++func TestUint32FromUint(t *testing.T) {
++	if got := Uint32(uint(8888)); got != 8888 {
++		t.Fatalf("Uint32(uint(8888)) = %d, want 8888", got)
++	}
++}
++
++func TestUint32FromInt(t *testing.T) {
++	if got := Uint32(int(7777)); got != 7777 {
++		t.Fatalf("Uint32(int(7777)) = %d, want 7777", got)
++	}
++}
++
++func TestUint32RejectsNegative(t *testing.T) {
++	defer func() {
++		if r := recover(); r == nil {
++			t.Errorf("expected function to panic")
++		}
++	}()
++
++	Uint32(int(-1))
++}
++
++// Int64
++
+ func TestInt64FromFloat64(t *testing.T) {
+ 	if got := Int64(float64(12345)); got != 12345 {
+ 		t.Fatalf("Int64(12345) = %d, want 12345", got)
