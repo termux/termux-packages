@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Infrastructure as code for DNS!"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Izumi Sena Sora <info@unordinary.eu.org>"
 TERMUX_PKG_VERSION="5.0.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/StackExchange/dnscontrol/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=a7f2ea699f52f2fb9284e5c0be6569f2bad421563fd141963e23cb3c96ffd665
 TERMUX_PKG_BUILD_IN_SRC=true
