@@ -1,0 +1,36 @@
+--- a/build.zig
++++ b/build.zig
+@@ -9,11 +9,19 @@
+         "enable",
+         "Enable Tracy profiling",
+     ) orelse false;
+-    const options = b.addOptions();
+-    options.addOption(bool, "enable_tracy", enable);
+-    options.addOption(bool, "enable_tracy_allocation", false);
+-    options.addOption(bool, "enable_tracy_callstack", true);
+-    options.addOption(usize, "tracy_callstack_depth", 10);
++
++    const wf = b.addWriteFiles();
++    const options_file = wf.add("options.zig",
++        \\pub const enable_tracy = false;
++        \\pub const enable_fibers = false;
++        \\pub const on_demand = false;
++        \\pub const callstack: ?u32 = null;
++        \\pub const shared = false;
++    );
++
++    const tracy_options_mod = b.createModule(.{
++        .root_source_file = options_file,
++    });
+ 
+     const tracy = b.addModule("tracy", .{
+         .root_source_file = b.path("src/root.zig"),
+@@ -21,7 +29,7 @@
+         .optimize = optimize,
+     });
+ 
+-    tracy.addOptions("options", options);
++    tracy.addImport("options", tracy_options_mod);
+ 
+     if (enable) {
+         if (target.result.os.tag == .windows) {

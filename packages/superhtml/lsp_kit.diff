@@ -1,0 +1,11 @@
+--- a/src/codegen/codegen.zig
++++ b/src/codegen/codegen.zig
+@@ -20,7 +20,7 @@
+     const out_file_path = try gpa.dupe(u8, arg_it.next() orelse std.process.fatal("second argument must be the output path to the generated zig code", .{}));
+     defer gpa.free(out_file_path);
+ 
+-    var parsed_meta_model = try std.json.parseFromSlice(MetaModel, gpa, @embedFile("meta-model"), .{});
++    var parsed_meta_model = try std.json.parseFromSlice(MetaModel, gpa, @embedFile("metaModel.json"), .{});
+     defer parsed_meta_model.deinit();
+ 
+     const source = try renderMetaModel(gpa, &parsed_meta_model.value);
