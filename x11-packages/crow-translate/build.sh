@@ -7,11 +7,10 @@ LICENSES/GPL-3.0-or-later.txt
 LICENSES/CC-BY-SA-4.0.txt
 "
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.0.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="4.1.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/crow-translate/$TERMUX_PKG_VERSION/crow-translate-$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=e24b8e78b0bffa5dd02875e25126c371967f53729102c784e4e02d165feb3753
-TERMUX_PKG_DEPENDS="libc++, hicolor-icon-theme, kwayland, libx11, libxcb, onnxruntime, qt6-qtbase, qt6-qtmultimedia, qt6-qtscxml, qt6-qtspeech, tesseract"
+TERMUX_PKG_SHA256=70cab22a089aa976627fb0f04ea2bf2e918a138c36ff0337d4a7709ea5462fa3
+TERMUX_PKG_DEPENDS="libc++, hicolor-icon-theme, kf6-kiconthemes, kwayland, libx11, libxcb, onnxruntime, qt6-qtbase, qt6-qtmultimedia, qt6-qtscxml, qt6-qtspeech, tesseract"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, protobuf, qt6-qttools, qt6-qttools-cross-tools"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_HOSTBUILD=true
@@ -32,7 +31,7 @@ termux_step_post_get_source() {
 		export PATH="$DOS2UNIX:$PATH"
 	fi
 
-	find "$TERMUX_PKG_SRCDIR" -type f -print0 | xargs -0 dos2unix
+	find "$TERMUX_PKG_SRCDIR" -type f -print0 | xargs -0 dos2unix -q
 }
 
 termux_step_host_build() {
