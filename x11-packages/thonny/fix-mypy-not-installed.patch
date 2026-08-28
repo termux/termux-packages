@@ -1,0 +1,25 @@
+diff --git a/thonny/plugins/mypy/__init__.py b/thonny/plugins/mypy/__init__.py
+index af88951..dc9b2cd 100644
+--- a/thonny/plugins/mypy/__init__.py
++++ b/thonny/plugins/mypy/__init__.py
+@@ -13,7 +13,19 @@ logger = getLogger(__name__)
+ 
+ class MyPyAnalyzer(SubprocessProgramAnalyzer):
+     def is_enabled(self):
+-        return get_workbench().get_option("assistance.use_mypy")
++        if not get_workbench().get_option("assistance.use_mypy"):
++            return False
++
++        try:
++            import mypy  # noqa: F401
++        except ImportError:
++            logger.warning(
++                "MyPy checks are enabled, but the 'mypy' module is not installed. "
++                "Skipping MyPy analysis."
++            )
++            return False
++
++        return True
+ 
+     def start_analysis(self, main_file_path, imported_file_paths: Iterable[str]) -> None:
+         self.interesting_files = [main_file_path] + list(imported_file_paths)
