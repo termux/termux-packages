@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0, BSD 2-Clause"
 TERMUX_PKG_LICENSE_FILE="LICENSE, vendor/core/fastboot/LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="36.0.1+really35.0.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/nmeum/android-tools/releases/download/${TERMUX_PKG_VERSION#*really}/android-tools-${TERMUX_PKG_VERSION#*really}.tar.xz"
 TERMUX_PKG_SHA256=d2c3222280315f36d8bfa5c02d7632b47e365bfe2e77e99a3564fb6576f04097
 TERMUX_PKG_AUTO_UPDATE=true
