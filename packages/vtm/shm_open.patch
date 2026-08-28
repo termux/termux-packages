@@ -1,0 +1,58 @@
+--- a/src/netxs/desktopio/x11.hpp
++++ b/src/netxs/desktopio/x11.hpp
+@@ -666,7 +723,7 @@ namespace x11
+                 free_resource_id(shm_segmen_xid);
+             }
+             shm_buffer_fd =
+-            #if defined(__linux__)
++            #if defined(__linux__) && !defined(__ANDROID__)
+                 ::memfd_create("x11_shm_double_buf", MFD_CLOEXEC);
+             #else
+                 ::shm_open(SHM_ANON, O_RDWR | O_CREAT | O_EXCL, 0600); // SHM_ANON - native anonymous descriptor in BSD.
+--- a/src/netxs/desktopio/system.hpp
++++ b/src/netxs/desktopio/system.hpp
+@@ -72,6 +72,44 @@
+             #include <sys/mman.h> // X11 MIT-SHM ::shm_open()
+         #endif
+             #include <sys/mman.h> // X11 MIT-SHM ::memfd_create()
++        #define SHM_ANON "vtm"
++        int shm_open(const char *name, int oflag, mode_t mode) {
++            size_t namelen;
++            char *fname;
++            int fd;
++
++            /* Construct the filename.  */
++            while (name[0] == '/') ++name;
++
++            if (name[0] == '\0') {
++                /* The name "/" is not supported.  */
++                errno = EINVAL;
++                return -1;
++            }
++
++            namelen = strlen(name);
++            fname = (char *) alloca(sizeof("@TERMUX_PREFIX@/tmp/") - 1 + namelen + 1);
++            memcpy(fname, "@TERMUX_PREFIX@/tmp/", sizeof("@TERMUX_PREFIX@/tmp/") - 1);
++            memcpy(fname + sizeof("@TERMUX_PREFIX@/tmp/") - 1, name, namelen + 1);
++
++            fd = open(fname, oflag, mode);
++            if (fd != -1) {
++                /* We got a descriptor.  Now set the FD_CLOEXEC bit.  */
++                int flags = fcntl(fd, F_GETFD, 0);
++                flags |= FD_CLOEXEC;
++                flags = fcntl(fd, F_SETFD, flags);
++
++                if (flags == -1) {
++                    /* Something went wrong.  We cannot return the descriptor.  */
++                    int save_errno = errno;
++                    close(fd);
++                    fd = -1;
++                    errno = save_errno;
++                }
++            }
++
++            return fd;
++        }
+ 
+     #endif
+ 
