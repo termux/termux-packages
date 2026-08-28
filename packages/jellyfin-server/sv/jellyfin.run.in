@@ -1,0 +1,30 @@
+#!@TERMUX_PREFIX@/bin/sh
+OLD_DATA_DIR="$HOME/.local/share/jellyfin"
+NEW_DATA_DIR="$HOME/jellyfin"
+
+if pgrep -f "jellyfin.dll" >/dev/null 2>&1; then
+	pkill -9 -f "jellyfin.dll" 2>/dev/null || true
+	sleep 1
+fi
+
+if [ -d "$OLD_DATA_DIR" ] && [ ! -d "$NEW_DATA_DIR/data" ]; then
+	echo '[jellyfin-migrate] Detected v10.11 data at '$OLD_DATA_DIR' — migrating to '$NEW_DATA_DIR'...'
+	mkdir -p "$NEW_DATA_DIR/config" "$NEW_DATA_DIR/data"
+	if [ -d "$HOME/.config/jellyfin" ]; then
+		cp -rf "$HOME/.config/jellyfin/." "$NEW_DATA_DIR/config/"
+	fi
+	cp -rf "$OLD_DATA_DIR/." "$NEW_DATA_DIR/"
+fi
+
+if [ -d "$NEW_DATA_DIR/plugins" ] && [ ! -f "$NEW_DATA_DIR/.v12_plugins_backed_up" ]; then
+	echo '[jellyfin-migrate] Backing up legacy v10.11 plugins to plugins_v10.11_backup...'
+	mv "$NEW_DATA_DIR/plugins" "$NEW_DATA_DIR/plugins_v10.11_backup"
+	mkdir -p "$NEW_DATA_DIR/plugins"
+	touch "$NEW_DATA_DIR/.v12_plugins_backed_up"
+fi
+
+if command -v sqlite3 >/dev/null 2>&1 && [ -f "$NEW_DATA_DIR/data/jellyfin.db" ]; then
+	sqlite3 "$NEW_DATA_DIR/data/jellyfin.db" "UPDATE BaseItems SET Path = REPLACE(Path, '$OLD_DATA_DIR', '$NEW_DATA_DIR') WHERE Path LIKE '$OLD_DATA_DIR%';" 2>/dev/null || true
+fi
+
+exec @TERMUX_PREFIX@/bin/jellyfin --datadir "$NEW_DATA_DIR" 2>&1
