@@ -1,0 +1,13 @@
+TERMUX_PKG_HOMEPAGE=https://a4term.com/
+TERMUX_PKG_DESCRIPTION="Dynamic terminal window manager and multiplexer"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="Jules Amonith <examosa@fastmail.com>"
+TERMUX_PKG_VERSION=2.0
+TERMUX_PKG_SRCURL="https://github.com/rpmohn/a4/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=25fc11b38fb248fab2028547d7f7b96b693695ac3e0064802aa46a806ae6fe58
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_EXTRA_MAKE_ARGS="
+-C ${TERMUX_PKG_SRCDIR}
+PREFIX:=${TERMUX__PREFIX}
+TERMINFO_DIRS:=${TERMUX__PREFIX}/share/terminfo
+"
