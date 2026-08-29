@@ -3,7 +3,8 @@ TERMUX_PKG_DESCRIPTION="A shell parser and formatter"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.14.0"
-TERMUX_PKG_SRCURL=https://github.com/mvdan/sh/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL="https://github.com/mvdan/sh/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=f193c946e2882c4fa04935cd583f60e2cab60344209bd982a3a5933c4192aad8
 TERMUX_PKG_AUTO_UPDATE=true
 
@@ -20,4 +21,7 @@ termux_step_make_install() {
 		-ldflags "-X main.version=$TERMUX_PKG_VERSION" \
 		-o "$TERMUX_PREFIX/bin/shfmt" \
 		./cmd/shfmt
+
+	mkdir -p "$TERMUX_PREFIX/share/man/man1"
+	scdoc < cmd/shfmt/shfmt.1.scd > "$TERMUX_PREFIX/share/man/man1/shfmt.1"
 }
