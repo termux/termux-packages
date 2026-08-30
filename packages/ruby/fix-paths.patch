@@ -1,28 +1,28 @@
-diff -uNr ruby-3.0.0/addr2line.c ruby-3.0.0.mod/addr2line.c
---- ruby-3.0.0/addr2line.c	2020-12-25 05:33:01.000000000 +0200
-+++ ruby-3.0.0.mod/addr2line.c	2021-02-09 17:44:23.586601868 +0200
-@@ -545,7 +545,7 @@
+diff -uNr ruby-4.0.3/addr2line.c ruby-4.0.3.mod/addr2line.c
+--- ruby-4.0.3/addr2line.c	2024-12-25 07:43:20.000000000 +0000
++++ ruby-4.0.3.mod/addr2line.c	2025-02-04 23:00:22.000000000 +0000
+@@ -604,7 +604,7 @@
  follow_debuglink(const char *debuglink, int num_traces, void **traces,
- 		 obj_info_t **objp, line_info_t *lines, int offset)
+                  obj_info_t **objp, line_info_t *lines, int offset, FILE *errout)
  {
 -    static const char global_debug_dir[] = "/usr/lib/debug";
 +    static const char global_debug_dir[] = "@TERMUX_PREFIX@/lib/debug";
      const size_t global_debug_dir_len = sizeof(global_debug_dir) - 1;
      char *p;
      obj_info_t *o1 = *objp, *o2;
-@@ -577,7 +577,7 @@
+@@ -636,7 +636,7 @@
  follow_debuglink_build_id(const char *build_id, size_t build_id_size, int num_traces, void **traces,
-                           obj_info_t **objp, line_info_t *lines, int offset)
+                           obj_info_t **objp, line_info_t *lines, int offset, FILE *errout)
  {
 -    static const char global_debug_dir[] = "/usr/lib/debug/.build-id/";
 +    static const char global_debug_dir[] = "@TERMUX_PREFIX@/lib/debug/.build-id/";
+     static const char debug_suffix[] = ".debug";
      const size_t global_debug_dir_len = sizeof(global_debug_dir) - 1;
      char *p;
-     obj_info_t *o1 = *objp, *o2;
-diff -uNr ruby-3.0.0/dln_find.c ruby-3.0.0.mod/dln_find.c
---- ruby-3.0.0/dln_find.c	2020-12-25 05:33:01.000000000 +0200
-+++ ruby-3.0.0.mod/dln_find.c	2021-02-09 17:35:46.039359196 +0200
-@@ -72,10 +72,7 @@
+diff -uNr ruby-4.0.3/dln_find.c ruby-4.0.3.mod/dln_find.c
+--- ruby-4.0.3/dln_find.c	2024-12-25 07:43:20.000000000 +0000
++++ ruby-4.0.3.mod/dln_find.c	2025-02-04 23:00:22.000000000 +0000
+@@ -66,10 +66,7 @@
  
      if (!path) {
          path =
@@ -34,10 +34,10 @@ diff -uNr ruby-3.0.0/dln_find.c ruby-3.0.0.mod/dln_find.c
              ".";
      }
      buf = dln_find_1(fname, path, buf, size, 1 DLN_FIND_EXTRA_ARG);
-diff -uNr ruby-3.0.0/ext/etc/etc.c ruby-3.0.0.mod/ext/etc/etc.c
---- ruby-3.0.0/ext/etc/etc.c	2020-12-25 05:33:01.000000000 +0200
-+++ ruby-3.0.0.mod/ext/etc/etc.c	2021-02-09 17:41:07.618382244 +0200
-@@ -672,7 +672,7 @@
+diff -uNr ruby-4.0.3/ext/etc/etc.c ruby-4.0.3.mod/ext/etc/etc.c
+--- ruby-4.0.3/ext/etc/etc.c	2024-12-25 07:43:20.000000000 +0000
++++ ruby-4.0.3.mod/ext/etc/etc.c	2025-02-04 23:00:22.000000000 +0000
+@@ -744,7 +744,7 @@
      if (!len) return Qnil;
      tmpdir = rb_w32_conv_from_wchar(path, rb_filesystem_encoding());
  #else
@@ -46,10 +46,10 @@ diff -uNr ruby-3.0.0/ext/etc/etc.c ruby-3.0.0.mod/ext/etc/etc.c
      const char *tmpstr = default_tmp;
      size_t tmplen = strlen(default_tmp);
  # if defined _CS_DARWIN_USER_TEMP_DIR
-diff -uNr ruby-3.0.0/ext/pty/pty.c ruby-3.0.0.mod/ext/pty/pty.c
---- ruby-3.0.0/ext/pty/pty.c	2020-12-25 05:33:01.000000000 +0200
-+++ ruby-3.0.0.mod/ext/pty/pty.c	2021-02-09 17:45:16.473977053 +0200
-@@ -176,7 +176,7 @@
+diff -uNr ruby-4.0.3/ext/pty/pty.c ruby-4.0.3.mod/ext/pty/pty.c
+--- ruby-4.0.3/ext/pty/pty.c	2024-12-25 07:43:20.000000000 +0000
++++ ruby-4.0.3.mod/ext/pty/pty.c	2025-02-04 23:00:22.000000000 +0000
+@@ -207,7 +207,7 @@
      char		errbuf[32];
  
      if (argc == 0) {
@@ -58,10 +58,10 @@ diff -uNr ruby-3.0.0/ext/pty/pty.c ruby-3.0.0.mod/ext/pty/pty.c
  
          if ((p = getenv("SHELL")) != NULL) {
              shellname = p;
-diff -uNr ruby-3.0.0/hash.c ruby-3.0.0.mod/hash.c
---- ruby-3.0.0/hash.c	2020-12-25 05:33:01.000000000 +0200
-+++ ruby-3.0.0.mod/hash.c	2021-02-09 17:43:01.683876134 +0200
-@@ -717,11 +717,11 @@
+diff -uNr ruby-4.0.3/hash.c ruby-4.0.3.mod/hash.c
+--- ruby-4.0.3/hash.c	2024-12-25 07:43:20.000000000 +0000
++++ ruby-4.0.3.mod/hash.c	2025-02-04 23:00:22.000000000 +0000
+@@ -637,11 +637,11 @@
              else {
  #if 0
                  static int pid;
@@ -75,10 +75,10 @@ diff -uNr ruby-3.0.0/hash.c ruby-3.0.0.mod/hash.c
                      if ((fp = fopen(fname, "w")) == NULL) rb_bug("fopen");
                  }
  
-diff -uNr ruby-3.0.0/lib/mkmf.rb ruby-3.0.0.mod/lib/mkmf.rb
---- ruby-3.0.0/lib/mkmf.rb	2020-12-25 05:33:01.000000000 +0200
-+++ ruby-3.0.0.mod/lib/mkmf.rb	2021-02-09 17:35:46.039359196 +0200
-@@ -1580,7 +1580,7 @@
+diff -uNr ruby-4.0.3/lib/mkmf.rb ruby-4.0.3.mod/lib/mkmf.rb
+--- ruby-4.0.3/lib/mkmf.rb	2024-12-25 07:43:20.000000000 +0000
++++ ruby-4.0.3.mod/lib/mkmf.rb	2025-02-04 23:00:22.000000000 +0000
+@@ -1708,7 +1708,7 @@
      if path ||= ENV['PATH']
        path = path.split(File::PATH_SEPARATOR)
      else
@@ -87,31 +87,31 @@ diff -uNr ruby-3.0.0/lib/mkmf.rb ruby-3.0.0.mod/lib/mkmf.rb
      end
      file = nil
      path.each do |dir|
-diff -uNr ruby-3.0.0/lib/resolv.rb ruby-3.0.0.mod/lib/resolv.rb
---- ruby-3.0.0/lib/resolv.rb	2020-12-25 05:33:01.000000000 +0200
-+++ ruby-3.0.0.mod/lib/resolv.rb	2021-02-09 17:35:46.043359300 +0200
-@@ -173,7 +173,7 @@
-       rescue LoadError
+diff -uNr ruby-4.0.3/lib/resolv.rb ruby-4.0.3.mod/lib/resolv.rb
+--- ruby-4.0.3/lib/resolv.rb	2024-12-25 07:43:20.000000000 +0000
++++ ruby-4.0.3.mod/lib/resolv.rb	2025-02-04 23:00:22.000000000 +0000
+@@ -187,7 +187,7 @@
        end
      end
--    DefaultFileName ||= '/etc/hosts'
-+    DefaultFileName ||= '@TERMUX_PREFIX@/etc/hosts'
+     # The default file name for host names
+-    DefaultFileName = hosts || '/etc/hosts'
++    DefaultFileName = hosts || '@TERMUX_PREFIX@/etc/hosts'
  
      ##
      # Creates a new Resolv::Hosts, using +filename+ for its data source.
-@@ -985,7 +985,7 @@
-         return { :nameserver => nameserver, :search => search, :ndots => ndots }
+@@ -1020,7 +1020,7 @@
+         return { :nameserver => nameserver.freeze, :search => search.freeze, :ndots => ndots.freeze }.freeze
        end
  
 -      def Config.default_config_hash(filename="/etc/resolv.conf")
 +      def Config.default_config_hash(filename="@TERMUX_PREFIX@/etc/resolv.conf")
          if File.exist? filename
-           config_hash = Config.parse_resolv_conf(filename)
-         else
-diff -uNr ruby-3.0.0/process.c ruby-3.0.0.mod/process.c
---- ruby-3.0.0/process.c	2020-12-25 05:33:01.000000000 +0200
-+++ ruby-3.0.0.mod/process.c	2021-02-09 17:49:30.716668413 +0200
-@@ -1810,9 +1810,9 @@
+           Config.parse_resolv_conf(filename)
+         elsif defined?(Win32::Resolv)
+diff -uNr ruby-4.0.3/process.c ruby-4.0.3.mod/process.c
+--- ruby-4.0.3/process.c	2024-12-25 07:43:20.000000000 +0000
++++ ruby-4.0.3.mod/process.c	2025-02-04 23:00:22.000000000 +0000
+@@ -1617,9 +1617,9 @@
      *argv = (char *)prog;
      *--argv = (char *)"sh";
      if (envp)
@@ -123,7 +123,7 @@ diff -uNr ruby-3.0.0/process.c ruby-3.0.0.mod/process.c
  }
  
  #else
-@@ -1880,9 +1880,9 @@
+@@ -1687,9 +1687,9 @@
      }
  #else
      if (envp_str)
@@ -135,10 +135,10 @@ diff -uNr ruby-3.0.0/process.c ruby-3.0.0.mod/process.c
  #endif	/* _WIN32 */
      return errno;
  }
-diff -uNr ruby-3.1.0/ruby.c ruby-3.1.0.mod/ruby.c
---- ruby-3.1.0/ruby.c
-+++ ruby-3.1.0.mod/ruby.c
-@@ -684,7 +684,7 @@
+diff -uNr ruby-4.0.3/ruby.c ruby-4.0.3.mod/ruby.c
+--- ruby-4.0.3/ruby.c	2024-12-25 07:43:20.000000000 +0000
++++ ruby-4.0.3.mod/ruby.c	2025-02-04 23:00:22.000000000 +0000
+@@ -699,7 +699,7 @@
              RUBY_ARCH_PATH;
          const ptrdiff_t libdir_len = (ptrdiff_t)sizeof(libdir)
              - rb_strlen_lit(RUBY_ARCH_PATH) - 1;
@@ -147,9 +147,9 @@ diff -uNr ruby-3.1.0/ruby.c ruby-3.1.0.mod/ruby.c
          const ptrdiff_t bindir_len = (ptrdiff_t)sizeof(bindir) - 1;
  
          const char *p2 = NULL;
-diff -uNr ruby-3.0.0/spec/ruby/core/dir/shared/pwd.rb ruby-3.0.0.mod/spec/ruby/core/dir/shared/pwd.rb
---- ruby-3.0.0/spec/ruby/core/dir/shared/pwd.rb	2020-12-25 05:33:01.000000000 +0200
-+++ ruby-3.0.0.mod/spec/ruby/core/dir/shared/pwd.rb	2021-02-09 17:50:07.720664849 +0200
+diff -uNr ruby-4.0.3/spec/ruby/core/dir/shared/pwd.rb ruby-4.0.3.mod/spec/ruby/core/dir/shared/pwd.rb
+--- ruby-4.0.3/spec/ruby/core/dir/shared/pwd.rb	2024-12-25 07:43:20.000000000 +0000
++++ ruby-4.0.3.mod/spec/ruby/core/dir/shared/pwd.rb	2025-02-04 23:00:22.000000000 +0000
 @@ -14,7 +14,7 @@
      # The following uses inode rather than file names to account for
      # case insensitive file systems like default OS/X file systems
@@ -159,9 +159,9 @@ diff -uNr ruby-3.0.0/spec/ruby/core/dir/shared/pwd.rb ruby-3.0.0.mod/spec/ruby/c
      end
      platform_is :windows do
        File.stat(pwd).ino.should == File.stat(File.expand_path(`cd`.chomp)).ino
-diff -uNr ruby-3.0.0/spec/ruby/core/process/spawn_spec.rb ruby-3.0.0.mod/spec/ruby/core/process/spawn_spec.rb
---- ruby-3.0.0/spec/ruby/core/process/spawn_spec.rb	2020-12-25 05:33:01.000000000 +0200
-+++ ruby-3.0.0.mod/spec/ruby/core/process/spawn_spec.rb	2021-02-09 17:50:41.692695143 +0200
+diff -uNr ruby-4.0.3/spec/ruby/core/process/spawn_spec.rb ruby-4.0.3.mod/spec/ruby/core/process/spawn_spec.rb
+--- ruby-4.0.3/spec/ruby/core/process/spawn_spec.rb	2024-12-25 07:43:20.000000000 +0000
++++ ruby-4.0.3.mod/spec/ruby/core/process/spawn_spec.rb	2025-02-04 23:00:22.000000000 +0000
 @@ -133,7 +133,7 @@
    describe "with a command array" do
      it "uses the first element as the command name and the second as the argv[0] value" do
@@ -180,10 +180,10 @@ diff -uNr ruby-3.0.0/spec/ruby/core/process/spawn_spec.rb ruby-3.0.0.mod/spec/ru
          -> { Process.wait Process.spawn(o, "-c", "echo $0") }.should output_to_fd("argv_zero\n")
        end
        platform_is :windows do
-diff -uNr ruby-3.0.0/st.c ruby-3.0.0.mod/st.c
---- ruby-3.0.0/st.c	2020-12-25 05:33:01.000000000 +0200
-+++ ruby-3.0.0.mod/st.c	2021-02-09 17:39:08.594113373 +0200
-@@ -496,10 +496,10 @@
+diff -uNr ruby-4.0.3/st.c ruby-4.0.3.mod/st.c
+--- ruby-4.0.3/st.c	2024-12-25 07:43:20.000000000 +0000
++++ ruby-4.0.3.mod/st.c	2025-02-04 23:00:22.000000000 +0000
+@@ -493,10 +493,10 @@
  static void
  stat_col(void)
  {
