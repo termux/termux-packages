@@ -1,0 +1,61 @@
+--- a/library/uptime.c
++++ b/library/uptime.c
+@@ -40,6 +40,10 @@
+ #include <elogind/sd-login.h>
+ #endif
+ 
++#ifdef __ANDROID__
++#include <sys/sysinfo.h>
++#endif
++
+ #include "misc.h"
+ #include "procps-private.h"
+ #include "pids.h"
+@@ -97,6 +101,7 @@ PROCPS_EXPORT int procps_users(void)
+     }
+ #endif
+ 
++#ifndef __ANDROID__
+ #ifdef HAVE_UTMP_X
+     setutxent();
+     while ((ut = getutxent())) {
+@@ -108,6 +113,7 @@ PROCPS_EXPORT int procps_users(void)
+             numuser++;
+     }
+     endutent();
++#endif
+ 
+     return numuser;
+ }
+@@ -126,6 +130,23 @@ PROCPS_EXPORT int procps_uptime(
+         double *restrict uptime_secs,
+         double *restrict idle_secs)
+ {
++#ifdef __ANDROID__
++    /* Android does not allow read access to /proc/uptime */
++    if (idle_secs) {
++        *idle_secs = 0.;
++    }
++    struct sysinfo system_information;
++    if (sysinfo(&system_information) == 0) {
++        if (uptime_secs) {
++            *uptime_secs = (double) system_information.uptime;
++        }
++        return 0;
++    } else {
++        if (uptime_secs) {
++            *uptime_secs = 0.;
++        }
++    }
++#else
+     double up=0, idle=0;
+     locale_t tmplocale;
+     FILE *fp;
+@@ -148,6 +169,7 @@ PROCPS_EXPORT int procps_uptime(
+ 
+     if (rc < 2)
+         return -ERANGE;
++#endif
+     return 0;
+ }
+ 
