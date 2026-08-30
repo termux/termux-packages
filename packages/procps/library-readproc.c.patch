@@ -1,0 +1,18 @@
+--- a/library/readproc.c
++++ b/library/readproc.c
+@@ -1301,6 +1301,15 @@ static proc_t *simple_readproc(PROCTAB *restrict const PT, proc_t *restrict cons
+     if(p->nlwp > 1)
+       p->wchan = ~0ul;
+ 
++    // Termux patch to use argv0 instead of executable name,
++    // since that will soon (at time of writing) always be
++    // /system/bin/linker64.
++    char** cmdline_vec = file2strvec(PT->pidfd, "cmdline");
++    if (cmdline_vec) {
++        snprintf(p->cmd, sizeof(p->cmd), "%s", cmdline_vec[0]);
++        free(*cmdline_vec);
++    }
++
+     /* some number->text resolving which is time consuming */
+     /* ( names are cached, so memcpy to arrays was silly ) */
+     if (flags & PROC_FILLUSR)

@@ -1,15 +1,5 @@
---- a/w.c
-+++ b/w.c
-@@ -57,6 +57,9 @@
- #include <unistd.h>
- #ifdef HAVE_UTMPX_H
- #	include <utmpx.h>
-+#ifdef __ANDROID__
-+#	include <utmp.h>
-+#endif
- #else
- #	include <utmp.h>
- #endif
+--- a/src/w.c
++++ b/src/w.c
 @@ -207,13 +207,6 @@
  
  	if (ip_addresses) { /* -i switch used */
