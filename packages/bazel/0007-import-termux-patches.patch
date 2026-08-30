@@ -1,0 +1,77 @@
+--- a/third_party/BUILD
++++ b/third_party/BUILD
+@@ -35,6 +35,7 @@
+         "//third_party/py/mock:srcs",
+         "//third_party/py/six:srcs",
+         "//third_party/remoteapis:srcs",
++        "//third_party/termux-patches:srcs",
+     ],
+ )
+ 
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -418,3 +418,64 @@
+ register_toolchains("//src/main/res:empty_rc_toolchain")
+ 
+ register_toolchains("@graalvm_toolchains//:gvm")
++
++# =========================================
++# Termux patches
++# =========================================
++
++single_version_override(
++    module_name = "abseil-cpp",
++    patch_strip = 1,
++    patches = [
++       "//third_party/termux-patches:z-absl.patch",
++    ],
++    patch_cmds = [
++        "patch -p1 -i termux-patches/absl.patch",
++    ]
++)
++
++single_version_override(
++    module_name = "c-ares",
++    patch_strip = 1,
++    patches = [
++       "//third_party/termux-patches:z-cares.patch",
++       "//third_party/termux-patches:z-cares-config.patch",
++    ],
++    patch_cmds = [
++        "patch -p1 -i termux-patches/cares.patch",
++        "patch -p1 -i termux-patches/cares-config.patch",
++    ]
++)
++
++single_version_override(
++    module_name = "grpc",
++    patch_strip = 1,
++    patches = [
++        "//third_party/termux-patches:z-grpc.patch",
++    ],
++    patch_cmds = [
++        "patch -p1 -i termux-patches/grpc.patch",
++    ]
++)
++
++single_version_override(
++    module_name = "protobuf",
++    patch_strip = 1,
++    patches = [
++       "//third_party/termux-patches:z-protobuf.patch",
++    ],
++    patch_cmds = [
++        "patch -p1 -i termux-patches/protobuf.patch",
++    ]
++)
++
++single_version_override(
++    module_name = "rules_cc",
++    patch_strip = 1,
++    patches = [
++        "//third_party/termux-patches:z-rules_cc.patch"
++    ],
++    patch_cmds = [
++        "patch -p1 -i termux-patches/rules_cc.patch",
++    ]
++)

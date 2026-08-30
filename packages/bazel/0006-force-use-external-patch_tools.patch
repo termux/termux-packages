@@ -1,0 +1,14 @@
+Don't know why `grpc.patch` cannot be patched with builtin_patch_tool of bazel.
+No matter what, force using the external patch_tool.
+
+--- a/tools/build_defs/repo/utils.bzl
++++ b/tools/build_defs/repo/utils.bzl
+@@ -144,7 +144,7 @@
+         patch_tool = ctx.attr.patch_tool
+     if not patch_tool:
+         patch_tool = "patch"
+-        native_patch = True
++        native_patch = False
+     else:
+         native_patch = False
+ 
