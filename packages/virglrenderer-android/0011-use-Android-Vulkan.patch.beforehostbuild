@@ -1,0 +1,343 @@
+Permits virglrenderer-android to share Android Vulkan with Venus
+Original work from https://github.com/xMeM/
+at https://github.com/xMeM/termux-packages/blob/37100273db2f57f2c63eac8571c3bba3d8dff855/x11-packages/virglrenderer/virglrenderer-venus-android.patch,
+rebased to virglrenderer-android version, modified with `__TERMUX__` replacing  `__ANDROID__` and `getenv("ANDROID_VENUS")` removed
+diff --git a/src/venus/vkr_buffer.c b/src/venus/vkr_buffer.c
+--- a/src/venus/vkr_buffer.c
++++ b/src/venus/vkr_buffer.c
+@@ -37,6 +37,16 @@ vkr_dispatch_vkCreateBuffer(struct vn_dispatch_context *dispatch,
+     * vkr_physical_device_init_memory_properties as well.
+     */
+ 
++#if defined(__TERMUX__)
++   VkExternalMemoryBufferCreateInfo *handle_info = vkr_find_struct(
++      args->pCreateInfo->pNext, VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_BUFFER_CREATE_INFO);
++   if (handle_info) {
++      VkBaseInStructure *prev_of_handle_info = vkr_find_prev_struct(
++         args->pCreateInfo, VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_BUFFER_CREATE_INFO);
++      prev_of_handle_info->pNext = handle_info->pNext;
++   }
++#endif
++
+    vkr_buffer_create_and_add(dispatch->data, args);
+ }
+ 
+diff --git a/src/venus/vkr_device.c b/src/venus/vkr_device.c
+--- a/src/venus/vkr_device.c
++++ b/src/venus/vkr_device.c
+@@ -150,6 +150,15 @@ vkr_dispatch_vkCreateDevice(struct vn_dispatch_context *dispatch,
+       if (physical_dev->KHR_external_fence_fd)
+          exts[ext_count++] = "VK_KHR_external_fence_fd";
+ 
++#if defined(__TERMUX__)
++      for (unsigned i = 0u; i < ext_count; i++) {
++         if (!strcmp(exts[i], "VK_EXT_external_memory_dma_buf"))
++            exts[i] = "VK_ANDROID_external_memory_android_hardware_buffer";
++         if (!strcmp(exts[i], "VK_EXT_image_drm_format_modifier"))
++            exts[i--] = exts[--ext_count];
++      }
++#endif
++
+       ((VkDeviceCreateInfo *)args->pCreateInfo)->ppEnabledExtensionNames = exts;
+       ((VkDeviceCreateInfo *)args->pCreateInfo)->enabledExtensionCount = ext_count;
+    }
+diff --git a/src/venus/vkr_device_memory.c b/src/venus/vkr_device_memory.c
+--- a/src/venus/vkr_device_memory.c
++++ b/src/venus/vkr_device_memory.c
+@@ -200,6 +200,61 @@ vkr_gbm_get_fd_info_from_allocation_info(struct vkr_physical_device *physical_de
+ 
+ #else
+ 
++#if defined(__TERMUX__)
++#include <android/hardware_buffer.h>
++#include <dlfcn.h>
++#include <vulkan/vulkan_android.h>
++
++typedef struct native_handle {
++   int version; /* sizeof(native_handle_t) */
++   int numFds;  /* number of file-descriptors at &data[0] */
++   int numInts; /* number of ints at &data[numFds] */
++#if defined(__clang__)
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wzero-length-array"
++#endif
++   int data[0]; /* numFds + numInts ints */
++#if defined(__clang__)
++#pragma clang diagnostic pop
++#endif
++} native_handle_t;
++
++typedef int (*pfnAHardwareBuffer_allocate)(const AHardwareBuffer_Desc *desc,
++                                           AHardwareBuffer **outBuffer);
++typedef void (*pfnAHardwareBuffer_release)(AHardwareBuffer *buffer);
++typedef const native_handle_t *(*pfnAHardwareBuffer_getNativeHandle)(
++   const AHardwareBuffer *buffer);
++
++struct fake_gbm_bo {
++   AHardwareBuffer *base;
++   void *handle;
++   size_t size;
++   pfnAHardwareBuffer_allocate allocate;
++   pfnAHardwareBuffer_release release;
++   pfnAHardwareBuffer_getNativeHandle getNativeHandle;
++};
++#endif
++
++#if defined(__TERMUX__)
++static int
++vkr_gbm_bo_get_fd(void *gbm_bo)
++{
++   struct fake_gbm_bo *bo = gbm_bo;
++
++   const native_handle_t *bo_handle = bo->getNativeHandle(bo->base);
++   if (bo_handle) {
++      for (int i = 0u; i < bo_handle->numFds; i++) {
++         size_t size = lseek(bo_handle->data[i], 0, SEEK_END);
++         if (size < bo->size)
++            continue;
++
++         return os_dupfd_cloexec(bo_handle->data[i]);
++      }
++   }
++
++   return -1;
++}
++#else
+ static inline int
+ vkr_gbm_bo_get_fd(ASSERTED void *gbm_bo)
+ {
+@@ -207,14 +262,87 @@ vkr_gbm_bo_get_fd(ASSERTED void *gbm_bo)
+    assert(!gbm_bo);
+    return -1;
+ }
++#endif
+ 
++#if defined(__TERMUX__)
++static void
++vkr_gbm_bo_destroy(void *gbm_bo)
++{
++   struct fake_gbm_bo *bo = gbm_bo;
++   if (!bo)
++      return;
++
++   if (bo->base)
++      bo->release(bo->base);
++   dlclose(bo->handle);
++   free(gbm_bo);
++}
++#else
+ static inline void
+ vkr_gbm_bo_destroy(ASSERTED void *gbm_bo)
+ {
+    vkr_log("minigbm_allocation is not enabled");
+    assert(!gbm_bo);
+ }
++#endif
++
++#if defined(__TERMUX__)
++static VkResult
++vkr_get_fd_info_from_allocation_info(UNUSED struct vkr_physical_device *physical_dev,
++                                     const VkMemoryAllocateInfo *alloc_info,
++                                     void **out_gbm_bo,
++                                     VkImportMemoryFdInfoKHR *out_fd_info)
++{
++   struct fake_gbm_bo *bo = malloc(sizeof(*bo));
++   if (!bo)
++      return VK_ERROR_OUT_OF_HOST_MEMORY;
++
++   if ((bo->handle = dlopen("libandroid.so", RTLD_NOW)) != NULL) {
++#define LOAD_SYMBOL(func)                                                                \
++   if ((bo->func = (pfnAHardwareBuffer_##func)dlsym(                                     \
++           bo->handle, "AHardwareBuffer_" #func)) == NULL) {                             \
++      dlclose(bo->handle);                                                               \
++      free(bo);                                                                          \
++      return VK_ERROR_INITIALIZATION_FAILED;                                             \
++   }
++
++      LOAD_SYMBOL(allocate)
++      LOAD_SYMBOL(release)
++      LOAD_SYMBOL(getNativeHandle)
++#undef LOAD_SYMBOL
++   } else {
++      free(bo);
++      return VK_ERROR_INITIALIZATION_FAILED;
++   }
++   bo->size = alloc_info->allocationSize;
++
++   AHardwareBuffer_Desc bo_desc = {
++      .width = alloc_info->allocationSize,
++      .height = 1,
++      .layers = 1,
++      .format = AHARDWAREBUFFER_FORMAT_BLOB,
++      .usage = AHARDWAREBUFFER_USAGE_GPU_DATA_BUFFER |
++               AHARDWAREBUFFER_USAGE_CPU_READ_RARELY |
++               AHARDWAREBUFFER_USAGE_CPU_WRITE_RARELY,
++   };
++
++   if (bo->allocate(&bo_desc, &bo->base))
++      goto error_free_bo;
++
++   VkImportAndroidHardwareBufferInfoANDROID *out_hwb_info = (void *)out_fd_info;
++   *out_gbm_bo = bo;
++   *out_hwb_info = (VkImportAndroidHardwareBufferInfoANDROID){
++      .sType = VK_STRUCTURE_TYPE_IMPORT_ANDROID_HARDWARE_BUFFER_INFO_ANDROID,
++      .pNext = alloc_info->pNext,
++      .buffer = bo->base,
++   };
++   return VK_SUCCESS;
+ 
++error_free_bo:
++   vkr_gbm_bo_destroy(bo);
++   return VK_ERROR_OUT_OF_DEVICE_MEMORY;
++}
++#else
+ static inline VkResult
+ vkr_gbm_get_fd_info_from_allocation_info(UNUSED struct vkr_physical_device *physical_dev,
+                                          UNUSED const VkMemoryAllocateInfo *alloc_info,
+@@ -224,6 +352,7 @@ vkr_gbm_get_fd_info_from_allocation_info(UNUSED struct vkr_physical_device *phys
+    vkr_log("minigbm_allocation is not enabled");
+    return VK_ERROR_OUT_OF_DEVICE_MEMORY;
+ }
++#endif
+ 
+ #endif /* ENABLE_GBM_ALLOCATION */
+ 
+@@ -365,6 +494,23 @@ vkr_dispatch_vkAllocateMemory(struct vn_dispatch_context *dispatch,
+          valid_fd_types |= 1 << VIRGL_RESOURCE_FD_DMABUF;
+    }
+ 
++#if defined(__TERMUX__)
++   if (export_info) {
++      VkBaseInStructure *prev_of_export_info =
++         vkr_find_prev_struct(alloc_info, VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO);
++
++      prev_of_export_info->pNext = export_info->pNext;
++
++      args->ret = vkr_get_fd_info_from_allocation_info(physical_dev, alloc_info, &gbm_bo,
++                                                       &local_import_info);
++      if (args->ret != VK_SUCCESS)
++         return;
++
++      alloc_info->pNext = &local_import_info;
++      valid_fd_types = 1 << VIRGL_RESOURCE_FD_DMABUF;
++   }
++#endif
++
+    struct vkr_device_memory *mem = vkr_device_memory_create_and_add(ctx, args);
+    if (!mem) {
+       if (local_import_info.fd >= 0)
+diff --git a/src/venus/vkr_image.c b/src/venus/vkr_image.c
+--- a/src/venus/vkr_image.c
++++ b/src/venus/vkr_image.c
+@@ -31,6 +31,18 @@ vkr_dispatch_vkCreateImage(struct vn_dispatch_context *dispatch,
+     * situation because the app does not consider the memory external.
+     */
+ 
++#if defined(__TERMUX__)
++   VkExternalMemoryImageCreateInfo *handle_info = vkr_find_struct(
++      args->pCreateInfo->pNext, VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO);
++   if (handle_info) {
++      VkBaseInStructure *prev_of_handle_info = vkr_find_prev_struct(
++         args->pCreateInfo, VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO);
++      prev_of_handle_info->pNext = handle_info->pNext;
++   }
++   VkImageCreateInfo *image_info = (void *)args->pCreateInfo;
++   image_info->tiling = VK_IMAGE_TILING_LINEAR;
++#endif
++
+    vkr_image_create_and_add(dispatch->data, args);
+ }
+ 
+@@ -162,6 +174,12 @@ vkr_dispatch_vkGetImageDrmFormatModifierPropertiesEXT(
+    struct vkr_device *dev = vkr_device_from_handle(args->device);
+    struct vn_device_proc_table *vk = &dev->proc_table;
+ 
++#if defined(__TERMUX__)
++   args->pProperties->drmFormatModifier = 0 /* DRM_FORMAT_MOD_LINEAR */;
++   args->ret = VK_SUCCESS;
++   return;
++#endif
++
+    vn_replace_vkGetImageDrmFormatModifierPropertiesEXT_args_handle(args);
+    args->ret = vk->GetImageDrmFormatModifierPropertiesEXT(args->device, args->image,
+                                                           args->pProperties);
+diff --git a/src/venus/vkr_physical_device.c b/src/venus/vkr_physical_device.c
+--- a/src/venus/vkr_physical_device.c
++++ b/src/venus/vkr_physical_device.c
+@@ -284,6 +284,20 @@ vkr_physical_device_init_extensions(struct vkr_physical_device *physical_dev)
+       }
+    }
+ 
++#if defined(__TERMUX__)
++   physical_dev->EXT_external_memory_dma_buf = true;
++
++   if (advertised_count + 2 > count)
++      exts = realloc(exts, sizeof(*exts) * (advertised_count + 2));
++
++   exts[advertised_count++] =
++      (VkExtensionProperties){ VK_EXT_EXTERNAL_MEMORY_DMA_BUF_EXTENSION_NAME,
++                               VK_EXT_EXTERNAL_MEMORY_DMA_BUF_SPEC_VERSION };
++   exts[advertised_count++] =
++      (VkExtensionProperties){ VK_EXT_IMAGE_DRM_FORMAT_MODIFIER_EXTENSION_NAME,
++                               VK_EXT_IMAGE_DRM_FORMAT_MODIFIER_SPEC_VERSION };
++#endif
++
+    if (physical_dev->KHR_external_fence_fd) {
+       const VkPhysicalDeviceExternalFenceInfo fence_info = {
+          .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_FENCE_INFO,
+@@ -698,9 +712,36 @@ vkr_dispatch_vkGetPhysicalDeviceFormatProperties2(
+       vkr_physical_device_from_handle(args->physicalDevice);
+    struct vn_physical_device_proc_table *vk = &physical_dev->proc_table;
+ 
++#if defined(__TERMUX__)
++   VkDrmFormatModifierPropertiesListEXT *mod_list = vkr_find_struct(
++      args->pFormatProperties, VK_STRUCTURE_TYPE_DRM_FORMAT_MODIFIER_PROPERTIES_LIST_EXT);
++   if (mod_list) {
++      VkBaseInStructure *prev_of_mod_list =
++         vkr_find_prev_struct(args->pFormatProperties,
++                              VK_STRUCTURE_TYPE_DRM_FORMAT_MODIFIER_PROPERTIES_LIST_EXT);
++      prev_of_mod_list->pNext = mod_list->pNext;
++
++      mod_list->drmFormatModifierCount = 1;
++
++      if (mod_list->pDrmFormatModifierProperties) {
++         mod_list->pDrmFormatModifierProperties[0] = (VkDrmFormatModifierPropertiesEXT){
++            .drmFormatModifier = 0 /* DRM_FORMAT_MOD_LINEAR */,
++            .drmFormatModifierPlaneCount = 1,
++         };
++      }
++   }
++#endif
++
+    vn_replace_vkGetPhysicalDeviceFormatProperties2_args_handle(args);
+    vk->GetPhysicalDeviceFormatProperties2(args->physicalDevice, args->format,
+                                           args->pFormatProperties);
++
++#if defined(__TERMUX__)
++   if (mod_list) {
++      mod_list->pNext = args->pFormatProperties->pNext;
++      args->pFormatProperties->pNext = mod_list;
++   }
++#endif
+ }
+ 
+ static void
+@@ -712,6 +753,18 @@ vkr_dispatch_vkGetPhysicalDeviceImageFormatProperties2(
+       vkr_physical_device_from_handle(args->physicalDevice);
+    struct vn_physical_device_proc_table *vk = &physical_dev->proc_table;
+ 
++#if defined(__TERMUX__)
++   VkPhysicalDeviceImageDrmFormatModifierInfoEXT *mod_info = vkr_find_struct(
++      args->pImageFormatInfo->pNext,
++      VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_DRM_FORMAT_MODIFIER_INFO_EXT);
++   if (mod_info) {
++      VkBaseInStructure *prev_of_mod_info = vkr_find_prev_struct(
++         args->pImageFormatInfo,
++         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_DRM_FORMAT_MODIFIER_INFO_EXT);
++      prev_of_mod_info->pNext = mod_info->pNext;
++   }
++#endif
++
+    vn_replace_vkGetPhysicalDeviceImageFormatProperties2_args_handle(args);
+    args->ret = vk->GetPhysicalDeviceImageFormatProperties2(
+       args->physicalDevice, args->pImageFormatInfo, args->pImageFormatProperties);
