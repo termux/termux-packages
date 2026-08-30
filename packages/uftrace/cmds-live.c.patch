@@ -1,14 +1,11 @@
 --- a/cmds/live.c
 +++ b/cmds/live.c
-@@ -14,9 +14,9 @@
- #include "utils/utils.h"
+@@ -427,7 +427,7 @@
+ 	int ret;
  
- #define LIVE_NAME "uftrace-live-XXXXXX"
--#define TMP_LIVE_NAME "/tmp/" LIVE_NAME
-+#define TMP_LIVE_NAME "@TERMUX_PREFIX@/tmp/" LIVE_NAME
+ 	if (!opts->record) {
+-		const char *tmpdir = getenv("TMPDIR") ?: "/tmp";
++		const char *tmpdir = getenv("TMPDIR") ?: "@TERMUX_PREFIX@/tmp";
  
--#define TMP_DIR_NAME_SIZE 32
-+#define TMP_DIR_NAME_SIZE (strlen("@TERMUX_PREFIX@") + 32)
- 
- static char tmp_dirname[TMP_DIR_NAME_SIZE];
- static void cleanup_tempdir(void)
+ 		snprintf(tmp_dirname, sizeof(tmp_dirname), "%s/" LIVE_NAME, tmpdir);
+ 		umask(022);
