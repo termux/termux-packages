@@ -4,6 +4,7 @@ TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed an
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.98.0"
+TERMUX_PKG_REVISION="1"
 TERMUX_PKG_SRCURL="https://static.rust-lang.org/dist/rustc-${TERMUX_PKG_VERSION}-src.tar.xz"
 TERMUX_PKG_SHA256=271fa73d8174f53d713c46a8310da7bf7cfdcfb8b7cfd1c2b74b84a83ae9fb1e
 TERMUX_PKG_DEPENDS="clang, libandroid-execinfo, libc++, libllvm (<< $TERMUX_LLVM_NEXT_MAJOR_VERSION), lld, openssl, zlib"
