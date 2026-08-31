@@ -107,23 +107,23 @@ case "$subcmd" in
 	install)
 		# Install the parser and set up the soversion symlink chain all the way
 		echo "$PROGNAME: installing parser library and symlinks"
-		install -v -Dm755 "$srcdir/$name.so.${TREE_SITTER_ABI_VERSION}.0" \
+		install -vDm755 "$srcdir/$name.so.${TREE_SITTER_ABI_VERSION}.0" \
 			"$TERMUX_PREFIX/lib/libtree-sitter-$name.so.${TREE_SITTER_ABI_VERSION}.0"
-		ln -sfv "libtree-sitter-$name.so.${TREE_SITTER_ABI_VERSION}.0" \
+		ln -vsf "libtree-sitter-$name.so.${TREE_SITTER_ABI_VERSION}.0" \
 			"$TERMUX_PREFIX/lib/libtree-sitter-$name.so.${TREE_SITTER_ABI_VERSION}"
-		ln -sfv "libtree-sitter-$name.so.${TREE_SITTER_ABI_VERSION}" \
+		ln -vsf "libtree-sitter-$name.so.${TREE_SITTER_ABI_VERSION}" \
 			"$TERMUX_PREFIX/lib/libtree-sitter-$name.so"
 
 		# Add a symlink to the parser into lib/tree_sitter as well
-		[[ -d "$TERMUX_PREFIX/lib/tree_sitter" ]] || mkdir "$TERMUX_PREFIX/lib/tree_sitter"
-		ln -sfv "../libtree-sitter-$name.so" "$TERMUX_PREFIX/lib/tree_sitter/$name.so"
+		[[ -d "$TERMUX_PREFIX/lib/tree_sitter" ]] || mkdir -p "$TERMUX_PREFIX/lib/tree_sitter"
+		ln -vsf "../libtree-sitter-$name.so" "$TERMUX_PREFIX/lib/tree_sitter/$name.so"
 
 
 		# Install queries if they exist
 		if [[ -d "$querydir" ]]; then
 			echo "$PROGNAME: installing queries"
 			find "$querydir" -name '*.scm' -exec \
-			install -v -Dm755 -t "$TERMUX_PREFIX/share/tree-sitter/queries/$name/" '{}' \;
+			install -vDm755 -t "$TERMUX_PREFIX/share/tree-sitter/queries/$name/" '{}' \;
 		fi
 
 		# Install C bindings if they exist
@@ -133,7 +133,7 @@ case "$subcmd" in
 			# But some slightly older parsers may have them in another location,
 			# use `find` to ensure we install them.
 			find bindings/c -name '*.h' -exec \
-			install -v -Dm644 -t "$TERMUX_PREFIX/include/tree_sitter/" '{}' \;
+			install -vDm644 -t "$TERMUX_PREFIX/include/tree_sitter/" '{}' \;
 			mkdir -p "$TERMUX_PREFIX/lib/pkgconfig"
 			echo "$PROGNAME: installing pkgconfig file"
 			# shellcheck disable=SC2016

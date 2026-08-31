@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://tree-sitter.github.io/
 TERMUX_PKG_DESCRIPTION="An incremental parsing system for programming tools"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
-TERMUX_PKG_VERSION="0.26.13"
-TERMUX_PKG_SRCURL=https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=ece24c3c5e2a76384075e830c7139b59fce8fb01e4ef8436fab08bbe10444c89
+TERMUX_PKG_VERSION="0.27.0"
+TERMUX_PKG_SRCURL="https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=d35c96e68736bd9569d2757c3cc71052485f33082c3825f1aed9d0e86013a159
 TERMUX_PKG_BREAKS="libtreesitter"
 TERMUX_PKG_REPLACES="libtreesitter"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -32,7 +32,7 @@ termux_pkg_auto_update() {
 
 	# Do not forget to bump revision of reverse dependencies
 	# and rebuild them after SOVERSION has changed.
-	local _SOVERSION=0.26
+	local _SOVERSION=0.27
 
 	# This blocks auto-updates to an incompatible SO version.
 	if [[ "${latest_release}" != "${_SOVERSION}".* ]]; then
@@ -71,7 +71,7 @@ termux_step_pre_configure() {
 
 	# error: function-like macro '__GLIBC_USE' is not defined
 	# solution borrowed from packages/oma/build.sh
-	export BINDGEN_EXTRA_CLANG_ARGS_${CARGO_TARGET_NAME//-/_}="--sysroot ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot --target=${CARGO_TARGET_NAME}"
+	export BINDGEN_EXTRA_CLANG_ARGS_"${CARGO_TARGET_NAME//-/_}"="--sysroot ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot --target=${CARGO_TARGET_NAME}"
 }
 
 termux_step_post_make_install() {
