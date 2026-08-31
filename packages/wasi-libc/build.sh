@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Libc for WebAssembly programs built on top of WASI syste
 TERMUX_PKG_LICENSE="Apache-2.0, BSD 2-Clause, MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE, src/wasi-libc/LICENSE-MIT, src/wasi-libc/libc-bottom-half/cloudlibc/LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="34"
+TERMUX_PKG_VERSION="34+really33"
 TERMUX_PKG_SRCURL=git+https://github.com/WebAssembly/wasi-sdk
-TERMUX_PKG_GIT_BRANCH=wasi-sdk-${TERMUX_PKG_VERSION}
+TERMUX_PKG_GIT_BRANCH=wasi-sdk-${TERMUX_PKG_VERSION#*really}
 TERMUX_PKG_RECOMMENDS="wasm-component-ld"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -47,7 +47,7 @@ termux_step_host_build() {
 		-DCMAKE_C_COMPILER_WORKS=ON \
 		-DCMAKE_CXX_COMPILER_WORKS=ON \
 		-DCMAKE_INSTALL_PREFIX="${TERMUX_PREFIX}" \
-		-DCMAKE_TOOLCHAIN_FILE="${TERMUX_PKG_HOSTBUILD_DIR}/install/share/cmake/wasi-sdk-p2.cmake"
+		-DCMAKE_TOOLCHAIN_FILE="${TERMUX_PKG_HOSTBUILD_DIR}/install/share/cmake/wasi-sdk.cmake"
 	ninja \
 		-C "${TERMUX_PKG_HOSTBUILD_DIR}/sysroot" \
 		-j "${TERMUX_PKG_MAKE_PROCESSES}" \
