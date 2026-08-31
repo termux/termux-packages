@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE="https://github.com/ysf/anewer"
 TERMUX_PKG_DESCRIPTION="Append lines from stdin to a file if these lines do not present in that file (aHash-based uniq)"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@flosnvjx"
-TERMUX_PKG_VERSION="0.2.1"
+TERMUX_PKG_VERSION="0.2.2"
 TERMUX_PKG_SRCURL="https://github.com/ysf/anewer/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=4a747b8b33896e0de83e449b43ddecddeef7f3f3f6bcbe003bfdb0b9512b5a5e
+TERMUX_PKG_SHA256=2f4021c76084ff7a3a4b43f45ab806c3de4766283ba23b6993534c67b38b3d11
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
