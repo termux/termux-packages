@@ -1,9 +1,7 @@
 termux_setup_treesitter() {
 	local TERMUX_TREE_SITTER_VERSION
 	TERMUX_TREE_SITTER_VERSION="$(. "$TERMUX_SCRIPTDIR/packages/tree-sitter/build.sh"; echo "$TERMUX_PKG_VERSION")"
-	TERMUX_TREE_SITTER_URL="https://github.com/tree-sitter/tree-sitter/releases/download/v${TERMUX_TREE_SITTER_VERSION}/tree-sitter-linux-x64.gz"
-	local TERMUX_TREE_SITTER_SHA256=c9c8bef027658d60249ca4fc0663578ceb2e2029346bb8702e091e20d7716475
-
+	local TERMUX_TREE_SITTER_SHA256=20a1f39ec1c45f2211492dcb8881c802b643b554bb196869a29ac3778277fa77
 	local TERMUX_TREE_SITTER_GZNAME="tree-sitter-linux-x64.gz"
 	local TERMUX_TREE_SITTER_URL="https://github.com/tree-sitter/tree-sitter/releases/download/v${TERMUX_TREE_SITTER_VERSION}/${TERMUX_TREE_SITTER_GZNAME}"
 	TERMUX_TREE_SITTER_DIR="${TERMUX_COMMON_CACHEDIR}/tree-sitter-${TERMUX_TREE_SITTER_VERSION}"
@@ -35,7 +33,7 @@ termux_setup_treesitter() {
 		return
 	fi
 
-	if [[ "$( "${TERMUX_TREE_SITTER_DIR}/bin/tree-sitter" --version | cut -f2 -d' ')" != "$TERMUX_TREE_SITTER_VERSION" ]]; then
+	if [[ "$("${TERMUX_TREE_SITTER_DIR}/bin/tree-sitter" --version 2>/dev/null)" != "tree-sitter $TERMUX_TREE_SITTER_VERSION" ]]; then
 		echo "termux_step_setup_treesitter: installing tree-sitter $TERMUX_TREE_SITTER_VERSION"
 		termux_download "${TERMUX_TREE_SITTER_URL}" \
 			"${TERMUX_PKG_TMPDIR}/${TERMUX_TREE_SITTER_GZNAME}" \
