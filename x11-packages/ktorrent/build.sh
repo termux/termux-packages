@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A powerful BitTorrent client for KDE"
 TERMUX_PKG_LICENSE="GPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26.08.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/ktorrent-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=b352456c08c786b08c9c12fb2f9b28d8ee3a00491b5369f6ce57ff8cef3c02a6
 TERMUX_PKG_AUTO_UPDATE=true
@@ -16,6 +17,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
+	CXXFLAGS+=" -Wno-error=narrowing"
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DKF6_HOST_TOOLING=$TERMUX_PREFIX/opt/kf6/cross/lib/cmake/"
 	fi
