@@ -1,5 +1,5 @@
 #include <dlfcn.h>
-#include <stdatomic.h>
+#include <pthread.h>
 
 #include "platform-ns.h"
 #include <media/NdkImage.h>
@@ -229,10 +229,9 @@ static struct {
 } stubs;
 #undef STUB
 
-static void ensure_loaded() {
-    static atomic_flag tried = ATOMIC_FLAG_INIT;
-    if (atomic_flag_test_and_set(&tried))
-        return;
+static pthread_once_t loaded_once = PTHREAD_ONCE_INIT;
+
+static void load_stubs(void) {
 
     void* handle = platform_dlopen(LIB, RTLD_LOCAL);
     // Nothing bad happened, normal case for termux-docker.
@@ -241,6 +240,10 @@ static void ensure_loaded() {
 #define LOAD(s) stubs.s = dlsym(handle, #s);
     FUNCTIONS(LOAD)
 #undef LOAD
+}
+
+static inline void ensure_loaded(void) {
+    pthread_once(&loaded_once, load_stubs);
 }
 
 #define CALL(f, def, ...) ensure_loaded(); if (!stubs.f) return def; else return (stubs.f)(__VA_ARGS__)
