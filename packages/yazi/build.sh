@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://yazi-rs.github.io/
 TERMUX_PKG_DESCRIPTION="Blazing fast terminal file manager written in Rust, based on async I/O"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="26.8.15"
+TERMUX_PKG_VERSION="26.9.1"
 TERMUX_PKG_SRCURL=https://github.com/sxyazi/yazi/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=60bd4ca56398f0f6ea6dcf88cc18e325583bf5328aeec51d396070944a9495c8
+TERMUX_PKG_SHA256=66857f1b670469daf258edd0bb2ea51d9ad3e2cab4eea9684028c80059fd6862
 TERMUX_PKG_BUILD_DEPENDS='aosp-libs, imagemagick'
 TERMUX_PKG_RECOMMENDS='7zip, chafa, fd, ffmpeg, fzf, imagemagick, jq, poppler, ripgrep, zoxide'
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -42,7 +42,7 @@ termux_step_pre_configure() {
 
 	cat >> Cargo.toml <<-EOF
 
-		[patch.crates-io]
+		# append to [patch.crates-io]
 		trash = { path = "./vendor/trash" }
 		cc = { path = "./vendor/cc" }
 	EOF
