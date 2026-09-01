@@ -22,5 +22,5 @@ termux_step_make_install() {
 	# GitHub tarballs have no .git dir, so setuptools-scm can't infer the
 	# version on its own; pin it explicitly to TERMUX_PKG_VERSION.
 	export SETUPTOOLS_SCM_PRETEND_VERSION_FOR_PGCLI="$TERMUX_PKG_VERSION"
-	cross-pip install --prefix="$TERMUX_PREFIX" "$TERMUX_PKG_SRCDIR"
+	cross-pip install --no-deps --prefix="$TERMUX_PREFIX" "$TERMUX_PKG_SRCDIR"
 }
