@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0, VIM License"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="0.13.0~dev-1572+g318ea4de21"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/neovim/neovim/archive/${TERMUX_PKG_VERSION##*+g}.tar.gz"
 TERMUX_PKG_SHA256=a485ab247318298e27d7693424d0befb798a661105f1b776a045d26b9074e730
 TERMUX_PKG_REPOLOGY_METADATA_VERSION="${TERMUX_PKG_VERSION%%~*}"
@@ -81,7 +82,7 @@ termux_step_host_build() {
 	cp -vf ./build/bin/nvim "$TERMUX_PKG_HOSTBUILD_DIR/"
 
 	make distclean
-	rm -Rf build/
+	rm -rf build/
 }
 
 termux_step_post_make_install() {
