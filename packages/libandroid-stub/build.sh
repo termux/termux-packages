@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Version should be equal to TERMUX_NDK_{VERSION_NUM,REVISION} in
 # scripts/properties.sh
 TERMUX_PKG_VERSION=29
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_CONFLICTS="libandroid"
 TERMUX_PKG_REPLACES="libandroid"
@@ -29,7 +29,7 @@ termux_step_make() {
 		"${common_flags[@]}"
 
 	local stub
-	for stub in android mediandk OpenSLES; do
+	for stub in android mediandk OpenSLES binder_ndk; do
 		"${CC}" -shared -fPIC \
 			-o "${TERMUX_PREFIX}/lib/lib${stub}.so" \
 			"${TERMUX_PKG_BUILDER_DIR}/lib${stub}-wrapper.c" \
