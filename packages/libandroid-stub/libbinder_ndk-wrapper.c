@@ -3,7 +3,7 @@
 #include "platform-ns.h"
 
 #include <dlfcn.h>
-#include <stdatomic.h>
+#include <pthread.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -34,10 +34,17 @@ static struct {
 } stubs;
 #undef STUB
 
-static void ensure_loaded(void) {
-    static atomic_flag tried = ATOMIC_FLAG_INIT;
-    if (atomic_flag_test_and_set(&tried))
-        return;
+static pthread_once_t loaded_once = PTHREAD_ONCE_INIT;
+static uint32_t cached_env_threads = 0;
+
+static void load_stubs(void) {
+    // Cache environment variables once during initialization
+    const char *env = getenv("ANDROID_BINDER_THREAD_POOL_SIZE");
+    if (!env) env = getenv("FFMPEG_ANDROID_BINDER_THREAD_POOL_SIZE");
+    if (env) {
+        int val = atoi(env);
+        if (val > 0) cached_env_threads = (uint32_t)val;
+    }
 
     void* handle = platform_dlopen(LIB, RTLD_LOCAL);
     if (!handle)
@@ -50,6 +57,10 @@ static void ensure_loaded(void) {
 #undef LOAD
 }
 
+static inline void ensure_loaded(void) {
+    pthread_once(&loaded_once, load_stubs);
+}
+
 #define CALL(f, def, ...) ensure_loaded(); if (!stubs.f) return def; else return (stubs.f)(__VA_ARGS__)
 #define CALL_VOID(f, ...) ensure_loaded(); if (!stubs.f) return; else (stubs.f)(__VA_ARGS__)
 
@@ -58,11 +69,9 @@ void ABinderProcess_startThreadPool(void) {
 }
 
 bool ABinderProcess_setThreadPoolMaxThreadCount(uint32_t numThreads) {
-    const char *env = getenv("ANDROID_BINDER_THREAD_POOL_SIZE");
-    if (!env) env = getenv("FFMPEG_ANDROID_BINDER_THREAD_POOL_SIZE");
-    if (env) {
-        uint32_t val = (uint32_t) atoi(env);
-        if (val > 0) numThreads = val;
+    ensure_loaded();
+    if (cached_env_threads > 0) {
+        numThreads = cached_env_threads;
     } else if (numThreads < 4) {
         numThreads = 4;
     }
