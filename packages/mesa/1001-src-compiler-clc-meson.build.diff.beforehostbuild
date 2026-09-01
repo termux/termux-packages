@@ -1,0 +1,29 @@
+--- a/src/compiler/clc/meson.build
++++ b/src/compiler/clc/meson.build
+@@ -86,14 +86,7 @@ if dep_clc.found()
+   endif
+ endif
+ 
+-has_spirv_link_workaround = cpp.has_member(
+-  'spvtools::LinkerOptions',
+-  'SetAllowPtrTypeMismatch(true)',
+-  prefix : [
+-    '#include <spirv-tools/linker.hpp>',
+-  ],
+-  dependencies : dep_spirv_tools,
+-)
++has_spirv_link_workaround = true
+ if dep_llvm.version().version_compare('>= 17.0') and not has_spirv_link_workaround
+   error('SPIRV-Tools doesn\'t contain https://github.com/KhronosGroup/SPIRV-Tools/pull/5534\n')
+ endif
+--- a/meson.build
++++ b/meson.build
+@@ -77,6 +77,8 @@ cl_args = [
+   # Declare supported clang builtins since we don't autodetect for OpenCL
+   '-DHAVE___BUILTIN_FFS',
+   '-DHAVE___BUILTIN_CLZ',
++
++  '-I@LLVM_OPENCL_INCLUDE_DIR@',
+ ]
+ 
+ if with_mesa_ndebug
