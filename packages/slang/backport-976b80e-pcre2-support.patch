@@ -1,0 +1,2313 @@
+commit 976b80e
+Author: John E. Davis <jed@jedsoft.org>
+Date:   Tue May 12 21:08:48 2026 -0400
+
+    pre2.3.4-21: Added a pcre2 module with necessary modifications to the configure script
+diff --git a/autoconf/aclocal.m4 b/autoconf/aclocal.m4
+index b2dfcd3..d893059 100644
+--- a/autoconf/aclocal.m4
++++ b/autoconf/aclocal.m4
+@@ -203,17 +203,32 @@ AC_SUBST(RPATH)dnl
+ 
+ dnl#}}}
+ 
++dnl# Usage: JD_UPPERCASE(invar, outvar)
++dnl# This function uppercases the value of invar, and converts all non-alphanumeric to _
++dnl# It assigns the reslt to a new variable given by outvar
+ AC_DEFUN([JD_UPPERCASE], dnl#{{{
+ [
+-changequote(<<, >>)dnl
+-define(<<$2>>, translit($1, [a-z], [A-Z]))dnl
+-changequote([, ])dnl
++  changequote(<<, >>)dnl
++  define(<<$2>>, translit(patsubst(<<$1>>, <<[^a-zA-Z0-9]>>, <<_>>), [a-z], [A-Z]))dnl
++  dnl# define(<<$2>>, translit($1, [a-z], [A-Z]))dnl
++  changequote([, ])dnl
++])
++#}}}
++
++dnl# Usage: JD_SANITIZE(invar, outvar)
++dnl# This function converts all non-alphanumeric in the value of invar to _
++dnl# It assigns the reslt to a new variable given by outvar
++AC_DEFUN([JD_SANITIZE], dnl#{{{
++[
++  changequote(<<, >>)dnl
++  define(<<$2>>, patsubst(<<$1>>, <<[^a-zA-Z0-9]>>, <<_>>))dnl
++  changequote([, ])dnl
+ ])
+ #}}}
+ 
+ AC_DEFUN([JD_SIMPLE_LIB_DIR], dnl#{{{
+ [
+-JD_UPPERCASE($1,JD_UP_NAME)
++JD_UPPERCASE($1,[JD_UP_NAME])
+ JD_UP_NAME[]_LIB_DIR=$JD_Above_Dir/$1/libsrc/"$ARCH"objs
+ JD_UP_NAME[]_INCLUDE=$JD_Above_Dir/$1/libsrc
+ 
+@@ -811,42 +826,43 @@ dnl# jd_xxx_include_dir and jd_xxx_library_dir.  It does not perform any
+ dnl# substitutions, nor check for the existence of the supplied values.
+ AC_DEFUN([JD_WITH_LIBRARY_PATHS], dnl#{{{
+ [
+- JD_UPPERCASE($1,JD_ARG1)
+- jd_$1_include_dir=""
+- jd_$1_library_dir=""
+- if test X"$jd_with_$1_library" = X
++ JD_UPPERCASE($1,[JD_ARG1])
++ JD_SANITIZE($1,[jd_arg1])
++ jd_[]jd_arg1[]_include_dir=""
++ jd_[]jd_arg1[]_library_dir=""
++ if test X"$jd_with_[]jd_arg1[]_library" = X
+  then
+-   jd_with_$1_library=""
++   jd_with_[]jd_arg1[]_library=""
+  fi
+ 
+  AC_ARG_WITH($1,
+   [  --with-$1=DIR      Use DIR/lib and DIR/include for $1],
+-  [jd_with_$1_arg=$withval], [jd_with_$1_arg=unspecified])
++  [jd_with_[]jd_arg1[]_arg=$withval], [jd_with_[]jd_arg1[]_arg=unspecified])
+ 
+- case "x$jd_with_$1_arg" in
++ case "x$jd_with_[]jd_arg1[]_arg" in
+    xno)
+-     jd_with_$1_library="no"
++     jd_with_[]jd_arg1[]_library="no"
+     ;;
+    x)
+-    dnl# AC_MSG_ERROR(--with-$1 requires a value-- try yes or no)
+-    jd_with_$1_library="yes"
++    dnl# AC_MSG_ERROR(--with-[]jd_arg1[] requires a value-- try yes or no)
++    jd_with_[]jd_arg1[]_library="yes"
+     ;;
+    xunspecified)
+     ;;
+    xyes)
+-    jd_with_$1_library="yes"
++    jd_with_[]jd_arg1[]_library="yes"
+     ;;
+    *)
+-    jd_with_$1_library="yes"
+-    jd_$1_include_dir="$jd_with_$1_arg"/include
+-    jd_$1_library_dir="$jd_with_$1_arg"/lib
++    jd_with_[]jd_arg1[]_library="yes"
++    jd_[]jd_arg1[]_include_dir="$jd_with_[]jd_arg1[]_arg"/include
++    jd_[]jd_arg1[]_library_dir="$jd_with_[]jd_arg1[]_arg"/lib
+     ;;
+  esac
+ 
+  AC_ARG_WITH($1lib,
+   [  --with-$1lib=DIR   $1 library in DIR],
+-  [jd_with_$1lib_arg=$withval], [jd_with_$1lib_arg=unspecified])
+- case "x$jd_with_$1lib_arg" in
++  [jd_with_[]jd_arg1[]lib_arg=$withval], [jd_with_[]jd_arg1[]lib_arg=unspecified])
++ case "x$jd_with_[]jd_arg1[]lib_arg" in
+    xunspecified)
+     ;;
+    xno)
+@@ -855,15 +871,15 @@ AC_DEFUN([JD_WITH_LIBRARY_PATHS], dnl#{{{
+     AC_MSG_ERROR(--with-$1lib requres a value)
+     ;;
+    *)
+-    jd_with_$1_library="yes"
+-    jd_$1_library_dir="$jd_with_$1lib_arg"
++    jd_with_[]jd_arg1[]_library="yes"
++    jd_[]jd_arg1[]_library_dir="$jd_with_[]jd_arg1[]lib_arg"
+     ;;
+  esac
+ 
+  AC_ARG_WITH($1inc,
+   [  --with-$1inc=DIR   $1 include files in DIR],
+-  [jd_with_$1inc_arg=$withval], [jd_with_$1inc_arg=unspecified])
+- case "x$jd_with_$1inc_arg" in
++  [jd_with_[]jd_arg1[]inc_arg=$withval], [jd_with_[]jd_arg1[]inc_arg=unspecified])
++ case "x$jd_with_[]jd_arg1[]inc_arg" in
+    x)
+      AC_MSG_ERROR(--with-$1inc requres a value)
+      ;;
+@@ -872,8 +888,8 @@ AC_DEFUN([JD_WITH_LIBRARY_PATHS], dnl#{{{
+    xno)
+      ;;
+    *)
+-    jd_with_$1_library="yes"
+-    jd_$1_include_dir="$jd_with_$1inc_arg"
++    jd_with_[]jd_arg1[]_library="yes"
++    jd_[]jd_arg1[]_include_dir="$jd_with_[]jd_arg1[]inc_arg"
+    ;;
+  esac
+ ])
+@@ -891,20 +907,20 @@ AC_DEFUN([JD_CHECK_FOR_LIBRARY], dnl#{{{
+ [
+   AC_REQUIRE([JD_EXPAND_PREFIX])dnl
+   AC_REQUIRE([JD_GET_SYS_INCLIBS])dnl
+-  dnl JD_UPPERCASE($1,JD_ARG1)
+   JD_WITH_LIBRARY_PATHS($1)
++  JD_SANITIZE($1,[jd_arg1])
+   AC_MSG_CHECKING(for the $1 library and header files $2)
+-  if test X"$jd_with_$1_library" != Xno
++  if test X"$jd_with_[]jd_arg1[]_library" != Xno
+   then
+-    jd_$1_inc_file=$2
+-    dnl# jd_with_$1_library="yes"
++    jd_[]jd_arg1[]_inc_file=$2
++    dnl# jd_with_[]jd_arg1[]_library="yes"
+ 
+-    if test "X$jd_$1_inc_file" = "X"
++    if test "X$jd_[]jd_arg1[]_inc_file" = "X"
+     then
+-       jd_$1_inc_file=$1.h
++       jd_[]jd_arg1[]_inc_file=$1.h
+     fi
+ 
+-    if test X"$jd_$1_include_dir" = X
++    if test X"$jd_[]jd_arg1[]_include_dir" = X
+     then
+       inc_and_lib_dirs="\
+          $jd_prefix_incdir,$jd_prefix_libdir \
+@@ -935,9 +951,9 @@ AC_DEFUN([JD_CHECK_FOR_LIBRARY], dnl#{{{
+ 	   exts="so a"
+       esac
+ 
+-      xincfile="$jd_$1_inc_file"
++      xincfile="$jd_[]jd_arg1[]_inc_file"
+       xlibfile="lib$1"
+-      jd_with_$1_library="no"
++      jd_with_[]jd_arg1[]_library="no"
+ 
+       for include_and_lib in $inc_and_lib_dirs
+       do
+@@ -951,9 +967,9 @@ AC_DEFUN([JD_CHECK_FOR_LIBRARY], dnl#{{{
+ 	  do
+ 	    if test -r "$xlibdir/$xlibfile.$E"
+ 	    then
+-	      jd_$1_include_dir="$xincdir"
+-	      jd_$1_library_dir="$xlibdir"
+-	      jd_with_$1_library="yes"
++	      jd_[]jd_arg1[]_include_dir="$xincdir"
++	      jd_[]jd_arg1[]_library_dir="$xlibdir"
++	      jd_with_[]jd_arg1[]_library="yes"
+ 	      found=1
+ 	      break
+ 	    fi
+@@ -967,30 +983,30 @@ AC_DEFUN([JD_CHECK_FOR_LIBRARY], dnl#{{{
+     fi
+   fi
+ 
+-  if test X"$jd_$1_include_dir" != X -a X"$jd_$1_library_dir" != X
++  if test X"$jd_[]jd_arg1[]_include_dir" != X -a X"$jd_[]jd_arg1[]_library_dir" != X
+   then
+-    AC_MSG_RESULT(yes: $jd_$1_library_dir and $jd_$1_include_dir)
+-    jd_with_$1_library="yes"
++    AC_MSG_RESULT(yes: $jd_[]jd_arg1[]_library_dir and $jd_[]jd_arg1[]_include_dir)
++    jd_with_[]jd_arg1[]_library="yes"
+     dnl#  Avoid using /usr/lib and /usr/include because of problems with
+     dnl#  gcc on some solaris systems.
+-    JD_ARG1[]_LIB=-L$jd_$1_library_dir
+-    JD_ARG1[]_LIB_DIR=$jd_$1_library_dir
+-    if test "X$jd_$1_library_dir" = "X/usr/lib" -o "X$jd_$1_include_dir" = "X/usr/include"
++    JD_ARG1[]_LIB=-L$jd_[]jd_arg1[]_library_dir
++    JD_ARG1[]_LIB_DIR=$jd_[]jd_arg1[]_library_dir
++    if test "X$jd_[]jd_arg1[]_library_dir" = "X/usr/lib" -o "X$jd_[]jd_arg1[]_include_dir" = "X/usr/include"
+     then
+       JD_ARG1[]_LIB=""
+     else
+-      JD_SET_RPATH($jd_$1_library_dir)
++      JD_SET_RPATH($jd_[]jd_arg1[]_library_dir)
+     fi
+ 
+-    JD_ARG1[]_INC=-I$jd_$1_include_dir
+-    JD_ARG1[]_INC_DIR=$jd_$1_include_dir
+-    if test "X$jd_$1_include_dir" = "X/usr/include"
++    JD_ARG1[]_INC=-I$jd_[]jd_arg1[]_include_dir
++    JD_ARG1[]_INC_DIR=$jd_[]jd_arg1[]_include_dir
++    if test "X$jd_[]jd_arg1[]_include_dir" = "X/usr/include"
+     then
+       JD_ARG1[]_INC=""
+     fi
+   else
+     AC_MSG_RESULT(no)
+-    jd_with_$1_library="no"
++    jd_with_[]jd_arg1[]_library="no"
+     JD_ARG1[]_INC=""
+     JD_ARG1[]_LIB=""
+     JD_ARG1[]_INC_DIR=""
+diff --git a/autoconf/configure.ac b/autoconf/configure.ac
+index aeaaca8..fbc6bf4 100644
+--- a/autoconf/configure.ac
++++ b/autoconf/configure.ac
+@@ -261,7 +261,7 @@ JD_SET_OBJ_SRC_DIR(src)
+ missingmodules=""
+ extramodules=""
+ JD_CHECK_FOR_LIBRARY(pcre)
+-if test $jd_with_pcre_library = yes
++if test "$jd_with_pcre_library" = yes
+ then
+   PCRE_MODULE="pcre-module.so"
+   AC_DEFINE(HAVE_PCRE_H,1,[Set to 1 if you have the pcre.h header])
+@@ -272,6 +272,18 @@ else
+ fi
+ AC_SUBST(PCRE_MODULE)
+ 
++JD_CHECK_FOR_LIBRARY(pcre2-8,pcre2.h)
++if test "$jd_with_pcre2_8_library" = yes
++then
++  PCRE2_MODULE="pcre2-module.so"
++  AC_DEFINE(HAVE_PCRE2_H,1,[Set to 1 if you have the pcre2.h header])
++  extramodules="$extramodules pcre2"
++else
++  PCRE2_MODULE=""
++  missingmodules="$missingmodules pcre2"
++fi
++AC_SUBST(PCRE2_MODULE)
++
+ JD_CHECK_FOR_LIBRARY(onig,oniguruma.h)
+ if test $jd_with_onig_library = yes
+ then
+diff --git a/configure b/configure
+index 29e6244..bd19e74 100755
+--- a/configure
++++ b/configure
+@@ -653,6 +653,11 @@ ONIG_INC_DIR
+ ONIG_LIB_DIR
+ ONIG_INC
+ ONIG_LIB
++PCRE2_MODULE
++PCRE2_8_INC_DIR
++PCRE2_8_LIB_DIR
++PCRE2_8_INC
++PCRE2_8_LIB
+ PCRE_MODULE
+ PCRE_INC_DIR
+ PCRE_LIB_DIR
+@@ -772,6 +777,9 @@ enable_warnings
+ with_pcre
+ with_pcrelib
+ with_pcreinc
++with_pcre2_8
++with_pcre2_8lib
++with_pcre2_8inc
+ with_onig
+ with_oniglib
+ with_oniginc
+@@ -1435,6 +1443,9 @@ Optional Packages:
+   --with-pcre=DIR      Use DIR/lib and DIR/include for pcre
+   --with-pcrelib=DIR   pcre library in DIR
+   --with-pcreinc=DIR   pcre include files in DIR
++  --with-pcre2-8=DIR      Use DIR/lib and DIR/include for pcre2-8
++  --with-pcre2-8lib=DIR   pcre2-8 library in DIR
++  --with-pcre2-8inc=DIR   pcre2-8 include files in DIR
+   --with-onig=DIR      Use DIR/lib and DIR/include for onig
+   --with-oniglib=DIR   onig library in DIR
+   --with-oniginc=DIR   onig include files in DIR
+@@ -7082,6 +7093,8 @@ EOF
+ 
+ 
+ 
++
++
+  jd_pcre_include_dir=""
+  jd_pcre_library_dir=""
+  if test X"$jd_with_pcre_library" = X
+@@ -7161,6 +7174,8 @@ fi
+    ;;
+  esac
+ 
++
++
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for the pcre library and header files " >&5
+ $as_echo_n "checking for the pcre library and header files ... " >&6; }
+   if test X"$jd_with_pcre_library" != Xno
+@@ -7330,7 +7345,7 @@ $as_echo "no" >&6; }
+ 
+ 
+ 
+-if test $jd_with_pcre_library = yes
++if test "$jd_with_pcre_library" = yes
+ then
+   PCRE_MODULE="pcre-module.so"
+ 
+@@ -7347,6 +7362,277 @@ fi
+ 
+ 
+ 
++
++
++ jd_pcre2_8_include_dir=""
++ jd_pcre2_8_library_dir=""
++ if test X"$jd_with_pcre2_8_library" = X
++ then
++   jd_with_pcre2_8_library=""
++ fi
++
++
++# Check whether --with-pcre2-8 was given.
++if test "${with_pcre2_8+set}" = set; then :
++  withval=$with_pcre2_8; jd_with_pcre2_8_arg=$withval
++else
++  jd_with_pcre2_8_arg=unspecified
++fi
++
++
++ case "x$jd_with_pcre2_8_arg" in
++   xno)
++     jd_with_pcre2_8_library="no"
++    ;;
++   x)
++        jd_with_pcre2_8_library="yes"
++    ;;
++   xunspecified)
++    ;;
++   xyes)
++    jd_with_pcre2_8_library="yes"
++    ;;
++   *)
++    jd_with_pcre2_8_library="yes"
++    jd_pcre2_8_include_dir="$jd_with_pcre2_8_arg"/include
++    jd_pcre2_8_library_dir="$jd_with_pcre2_8_arg"/lib
++    ;;
++ esac
++
++
++# Check whether --with-pcre2-8lib was given.
++if test "${with_pcre2_8lib+set}" = set; then :
++  withval=$with_pcre2_8lib; jd_with_pcre2_8lib_arg=$withval
++else
++  jd_with_pcre2_8lib_arg=unspecified
++fi
++
++ case "x$jd_with_pcre2_8lib_arg" in
++   xunspecified)
++    ;;
++   xno)
++    ;;
++   x)
++    as_fn_error $? "--with-pcre2-8lib requres a value" "$LINENO" 5
++    ;;
++   *)
++    jd_with_pcre2_8_library="yes"
++    jd_pcre2_8_library_dir="$jd_with_pcre2_8lib_arg"
++    ;;
++ esac
++
++
++# Check whether --with-pcre2-8inc was given.
++if test "${with_pcre2_8inc+set}" = set; then :
++  withval=$with_pcre2_8inc; jd_with_pcre2_8inc_arg=$withval
++else
++  jd_with_pcre2_8inc_arg=unspecified
++fi
++
++ case "x$jd_with_pcre2_8inc_arg" in
++   x)
++     as_fn_error $? "--with-pcre2-8inc requres a value" "$LINENO" 5
++     ;;
++   xunspecified)
++     ;;
++   xno)
++     ;;
++   *)
++    jd_with_pcre2_8_library="yes"
++    jd_pcre2_8_include_dir="$jd_with_pcre2_8inc_arg"
++   ;;
++ esac
++
++
++
++  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for the pcre2-8 library and header files pcre2.h" >&5
++$as_echo_n "checking for the pcre2-8 library and header files pcre2.h... " >&6; }
++  if test X"$jd_with_pcre2_8_library" != Xno
++  then
++    jd_pcre2_8_inc_file=pcre2.h
++
++    if test "X$jd_pcre2_8_inc_file" = "X"
++    then
++       jd_pcre2_8_inc_file=pcre2-8.h
++    fi
++
++    if test X"$jd_pcre2_8_include_dir" = X
++    then
++      inc_and_lib_dirs="\
++         $jd_prefix_incdir,$jd_prefix_libdir \
++	 /usr/local/pcre2-8/include,/usr/local/pcre2-8/lib \
++	 /usr/local/include/pcre2-8,/usr/local/lib \
++	 /usr/local/include,/usr/local/lib \
++	 $JD_SYS_INCLIBS \
++	 /usr/include/pcre2-8,/usr/lib \
++	 /usr/pcre2-8/include,/usr/pcre2-8/lib \
++	 /usr/include,/usr/lib \
++	 /opt/include/pcre2-8,/opt/lib \
++	 /opt/pcre2-8/include,/opt/pcre2-8/lib \
++	 /opt/include,/opt/lib"
++
++      if test X != X
++      then
++        inc_and_lib_dirs="/include,/lib $inc_and_lib_dirs"
++      fi
++
++      case "$host_os" in
++         *darwin* )
++	   exts="dylib so a"
++	   ;;
++	 *cygwin* )
++	   exts="dll.a so a"
++	   ;;
++	 * )
++	   exts="so a"
++      esac
++
++      xincfile="$jd_pcre2_8_inc_file"
++      xlibfile="libpcre2-8"
++      jd_with_pcre2_8_library="no"
++
++      for include_and_lib in $inc_and_lib_dirs
++      do
++        # Yuk.  Is there a better way to set these variables??
++        xincdir=`echo $include_and_lib | tr ',' ' ' | awk '{print $1}'`
++	xlibdir=`echo $include_and_lib | tr ',' ' ' | awk '{print $2}'`
++	found=0
++	if test -r $xincdir/$xincfile
++	then
++	  for E in $exts
++	  do
++	    if test -r "$xlibdir/$xlibfile.$E"
++	    then
++	      jd_pcre2_8_include_dir="$xincdir"
++	      jd_pcre2_8_library_dir="$xlibdir"
++	      jd_with_pcre2_8_library="yes"
++	      found=1
++	      break
++	    fi
++	  done
++	fi
++	if test $found -eq 1
++	then
++	  break
++	fi
++      done
++    fi
++  fi
++
++  if test X"$jd_pcre2_8_include_dir" != X -a X"$jd_pcre2_8_library_dir" != X
++  then
++    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes: $jd_pcre2_8_library_dir and $jd_pcre2_8_include_dir" >&5
++$as_echo "yes: $jd_pcre2_8_library_dir and $jd_pcre2_8_include_dir" >&6; }
++    jd_with_pcre2_8_library="yes"
++            PCRE2_8_LIB=-L$jd_pcre2_8_library_dir
++    PCRE2_8_LIB_DIR=$jd_pcre2_8_library_dir
++    if test "X$jd_pcre2_8_library_dir" = "X/usr/lib" -o "X$jd_pcre2_8_include_dir" = "X/usr/include"
++    then
++      PCRE2_8_LIB=""
++    else
++
++if test "X$jd_pcre2_8_library_dir" != "X"
++then
++  if test "X$RPATH" = "X"
++  then
++
++case "$host_os" in
++  *linux*|*solaris* )
++    if test "X$GCC" = Xyes
++    then
++      if test "X$ac_R_nospace" = "Xno"
++      then
++        RPATH="-Wl,-R,"
++      else
++        RPATH="-Wl,-R"
++      fi
++    else
++      if test "X$ac_R_nospace" = "Xno"
++      then
++        RPATH="-R "
++      else
++	RPATH="-R"
++      fi
++    fi
++  ;;
++  *osf*|*openbsd*|*freebsd*)
++    if test "X$GCC" = Xyes
++    then
++      RPATH="-Wl,-rpath,"
++    else
++      RPATH="-rpath "
++    fi
++  ;;
++  *netbsd*)
++    if test "X$GCC" = Xyes
++    then
++      RPATH="-Wl,-R"
++    fi
++  ;;
++esac
++
++    if test "X$RPATH" != "X"
++    then
++      RPATH="$RPATH$jd_pcre2_8_library_dir"
++    fi
++  else
++    _already_there=0
++    for X in `echo $RPATH | sed 's/:/ /g'`
++    do
++      if test "$X" = "$jd_pcre2_8_library_dir"
++      then
++        _already_there=1
++	break
++      fi
++    done
++    if test $_already_there = 0
++    then
++      RPATH="$RPATH:$jd_pcre2_8_library_dir"
++    fi
++  fi
++fi
++
++    fi
++
++    PCRE2_8_INC=-I$jd_pcre2_8_include_dir
++    PCRE2_8_INC_DIR=$jd_pcre2_8_include_dir
++    if test "X$jd_pcre2_8_include_dir" = "X/usr/include"
++    then
++      PCRE2_8_INC=""
++    fi
++  else
++    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
++$as_echo "no" >&6; }
++    jd_with_pcre2_8_library="no"
++    PCRE2_8_INC=""
++    PCRE2_8_LIB=""
++    PCRE2_8_INC_DIR=""
++    PCRE2_8_LIB_DIR=""
++  fi
++
++
++
++
++
++if test "$jd_with_pcre2_8_library" = yes
++then
++  PCRE2_MODULE="pcre2-module.so"
++
++$as_echo "#define HAVE_PCRE2_H 1" >>confdefs.h
++
++  extramodules="$extramodules pcre2"
++else
++  PCRE2_MODULE=""
++  missingmodules="$missingmodules pcre2"
++fi
++
++
++
++
++
++
++
++
+  jd_onig_include_dir=""
+  jd_onig_library_dir=""
+  if test X"$jd_with_onig_library" = X
+@@ -7426,6 +7712,8 @@ fi
+    ;;
+  esac
+ 
++
++
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for the onig library and header files oniguruma.h" >&5
+ $as_echo_n "checking for the onig library and header files oniguruma.h... " >&6; }
+   if test X"$jd_with_onig_library" != Xno
+@@ -7612,6 +7900,8 @@ fi
+ 
+ 
+ 
++
++
+  jd_png_include_dir=""
+  jd_png_library_dir=""
+  if test X"$jd_with_png_library" = X
+@@ -7691,6 +7981,8 @@ fi
+    ;;
+  esac
+ 
++
++
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for the png library and header files " >&5
+ $as_echo_n "checking for the png library and header files ... " >&6; }
+   if test X"$jd_with_png_library" != Xno
+@@ -7877,6 +8169,8 @@ fi
+ 
+ 
+ 
++
++
+  jd_z_include_dir=""
+  jd_z_library_dir=""
+  if test X"$jd_with_z_library" = X
+@@ -7956,6 +8250,8 @@ fi
+    ;;
+  esac
+ 
++
++
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for the z library and header files zlib.h" >&5
+ $as_echo_n "checking for the z library and header files zlib.h... " >&6; }
+   if test X"$jd_with_z_library" != Xno
+@@ -8149,6 +8445,8 @@ ICONV_MODULE=""
+ 
+ 
+ 
++
++
+  jd_iconv_include_dir=""
+  jd_iconv_library_dir=""
+  if test X"$jd_with_iconv_library" = X
+@@ -8228,6 +8526,8 @@ fi
+    ;;
+  esac
+ 
++
++
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for the iconv library and header files " >&5
+ $as_echo_n "checking for the iconv library and header files ... " >&6; }
+   if test X"$jd_with_iconv_library" != Xno
+diff --git a/modules/Makefile.in b/modules/Makefile.in
+index 34ac674..8c2f866 100644
+--- a/modules/Makefile.in
++++ b/modules/Makefile.in
+@@ -3,10 +3,11 @@ MODULES = slsmg-module.so termios-module.so select-module.so fcntl-module.so \
+   varray-module.so socket-module.so rand-module.so fork-module.so \
+   csv-module.so base64-module.so chksum-module.so histogram-module.so \
+   stats-module.so json-module.so \
+-  @PCRE_MODULE@ @PNG_MODULE@ @ICONV_MODULE@ @ONIG_MODULE@ @ZLIB_MODULE@ @SYSCONF_MODULE@
++  @PCRE_MODULE@ @PCRE2_MODULE@ @PNG_MODULE@ @ICONV_MODULE@ \
++  @ONIG_MODULE@ @ZLIB_MODULE@ @SYSCONF_MODULE@
+ SLFILES = slsmg termios select fcntl varray socket rand fork csv  \
+   base64 chksum histogram stats json \
+-  pcre png iconv onig zlib sysconf
++  pcre png iconv onig zlib sysconf pcre2
+ TEST_SCRIPTS = test_slsmg.sl test_termios.sl test_select.sl test_fcntl.sl \
+   test_varray.sl test_socket.sl test_rand.sl test_fork.sl test_csv.sl \
+   test_base64.sl test_chksum.sl test_hist.sl test_stats.sl test_json.sl
+@@ -43,6 +44,8 @@ SLANG_LIB	= @SLANG_LIB_FOR_MODULES@
+ # ---------------------------------------------------------------------------
+ PCRE_INC	= @PCRE_INC@
+ PCRE_LIB	= @PCRE_LIB@ -lpcre
++PCRE2_INC	= @PCRE_INC@
++PCRE2_LIB	= @PCRE_LIB@ -lpcre2-8
+ # ---------------------------------------------------------------------------
+ # If building the PNG module, you may need to set these
+ # ---------------------------------------------------------------------------
+@@ -124,6 +127,8 @@ varray-module.so: $(SRCDIR)/varray-module.c $(CONFIG_H)
+ 	$(COMPILE_CMD) $(SRCDIR)/varray-module.c -o varray-module.so $(LIBS)
+ pcre-module.so: $(SRCDIR)/pcre-module.c $(CONFIG_H)
+ 	$(COMPILE_CMD) $(PCRE_INC) $(SRCDIR)/pcre-module.c -o pcre-module.so $(PCRE_LIB) $(LIBS)
++pcre2-module.so: $(SRCDIR)/pcre2-module.c $(CONFIG_H)
++	$(COMPILE_CMD) $(PCRE2_INC) $(SRCDIR)/pcre2-module.c -o pcre2-module.so $(PCRE2_LIB) $(LIBS)
+ onig-module.so: $(SRCDIR)/onig-module.c $(CONFIG_H)
+ 	$(COMPILE_CMD) $(ONIG_INC) $(SRCDIR)/onig-module.c -o onig-module.so $(ONIG_LIB) $(LIBS)
+ png-module.so: $(SRCDIR)/png-module.c $(CONFIG_H)
+diff --git a/modules/help/fcntlfuns.hlp b/modules/help/fcntlfuns.hlp
+new file mode 100644
+index 0000000..e623e8e
+--- /dev/null
++++ b/modules/help/fcntlfuns.hlp
+@@ -0,0 +1,124 @@
++fcntl_getfd
++
++ SYNOPSIS
++  Get a file descriptor's flags
++
++ USAGE
++  flags = fcntl_getfd (fd)
++
++ DESCRIPTION
++ This function returns the flags associated with the open file
++ descriptor `fd', which must be either an `FD_Type' object
++ or an integer.  If returns the value of the flags, or -1 and sets the
++ value of `errno' if an error occurs.
++
++ EXAMPLE
++
++   flags = fcntl_getfd (fileno(stdout));
++   if (flags == -1)
++     () = fprintf (stderr, "An error occurred: %s\n", errno_string());
++
++
++ NOTES
++ This function is a wrapper around the OS `fcntl(fd, F_GETFD,...)'
++ function.
++
++ SEE ALSO
++  fcntl_setfd, fcntl_getfl, fcntl_getpipe_sz, fileno, _fileno
++
++--------------------------------------------------------------
++
++fcntl_setfd
++
++ SYNOPSIS
++  Set a file descriptor's flags
++
++ USAGE
++  status = fcntl_setfd (flags, fd)
++
++ DESCRIPTION
++ This function may be used to set the flags on the open file
++ descriptior `fd'.  Here `flags' is an integer and `fd'
++ is either an integer or a `FD_Type' object.  It returns 0 if
++ successful, or -1 and sets the value of `error' upon failure.
++
++ EXAMPLE
++
++  flags = fcntl_getfd (fd);
++  status = fcntl_setfd (flags | FD_CLOEXEC, fd);
++  if (status != 0)
++     () = fprintf (stderr, "An error occurred: %s\n", errno_string());
++
++
++ NOTES
++ This function is a wrapper around the OS `fcntl(fd,F_SETFD,flags)'
++ function.
++
++ SEE ALSO
++  fcntl_getfd, fcntl_setfl, fcntl_setpipe_sz, fileno, _fileno
++
++--------------------------------------------------------------
++
++fcntl_getfl
++
++ SYNOPSIS
++
++ USAGE
++
++ DESCRIPTION
++
++ EXAMPLE
++
++ NOTES
++
++ SEE ALSO
++
++--------------------------------------------------------------
++
++fcntl_setfl
++
++ SYNOPSIS
++
++ USAGE
++
++ DESCRIPTION
++
++ EXAMPLE
++
++ NOTES
++
++ SEE ALSO
++
++--------------------------------------------------------------
++
++fcntl_getpipe_sz
++
++ SYNOPSIS
++
++ USAGE
++
++ DESCRIPTION
++
++ EXAMPLE
++
++ NOTES
++
++ SEE ALSO
++
++--------------------------------------------------------------
++
++fcntl_setpipe_sz
++
++ SYNOPSIS
++
++ USAGE
++
++ DESCRIPTION
++
++ EXAMPLE
++
++ NOTES
++
++ SEE ALSO
++
++--------------------------------------------------------------
+diff --git a/modules/help/pcre2funs.hlp b/modules/help/pcre2funs.hlp
+new file mode 100644
+index 0000000..8711f7d
+--- /dev/null
++++ b/modules/help/pcre2funs.hlp
+@@ -0,0 +1,210 @@
++pcre2_compile
++
++ SYNOPSIS
++  Compile a PCRE regular expression
++
++ USAGE
++  PCRE2_Type pcre2_compile (String_Type pattern [, Int_Type options])
++
++ DESCRIPTION
++ The `pcre2_compile' function compiles a PCRE style regular expression
++ and returns the result.  The optional `options' argument may be used
++ to provide addition information affecting the compilation of the pattern.
++ Specifically, it is a bit-mapped value formed from the logical-or of zero
++ or more of the following symbolic constants:
++
++    PCRE2_ANCHORED     Force the match to be at the start of a string
++    PCRE2_CASELESS     Matches are to be case-insensitive
++    PCRE2_DOLLAR_ENDONLY (See PCRE docs for more information)
++    PCRE2_DOTALL       The dot pattern matches all characters
++    PCRE2_EXTENDED     Ignore whitespace in the pattern
++    PCRE2_EXTRA        (See PCRE docs for features this activates)
++    PCRE2_MULTILINE    Treat the subject string as multi-lines
++    PCRE2_UNGREEDY     Make the matches not greedy
++    PCRE2_UTF          Regard the pattern and subject strings as UTF-8
++
++ Many of these flags may be set within the pattern itself.   See the PCRE
++ library documentation for more information about the precise details
++ of these flags and the supported regular expressions.
++
++ Upon success, this function returns a PCRE2_Type object representing
++ the compiled patterned.  If compilation fails, a `ParseError'
++ exception will be thrown.
++
++ SEE ALSO
++  pcre2_exec, pcre2_nth_match, pcre2_nth_substr, pcre2_matches
++
++--------------------------------------------------------------
++
++pcre2_exec
++
++ SYNOPSIS
++  Match a string against a compiled PCRE pattern
++
++ USAGE
++  Int_Type pcre2_exec(p, str [,pos [,options]]);
++
++   PCRE2_Type p;
++   String_Type str;
++   Int_Type pos, options;
++
++
++ DESCRIPTION
++ The `pcre2_exec' function applies a pre-compiled pattern `p' to a
++ string `str' and returns the result of the match.  The optional third
++ argument `pos' may be used to specify the point, as an offset from the
++ start of the string, where matching is to start.  The fourth argument, if
++ present, may be used to provide additional information about how matching
++ is to take place.  Its value may be specified as a logical-or of zero or
++ more of the following flags:
++
++   PCRE2_NOTBOL
++        The first character in the string is not at the beginning of a line.
++   PCRE2_NOTEOL
++        The last character in the string is not at the end of a line.
++   PCRE2_NOTEMPTY
++        An empty string is not a valid match.
++
++ See the PCRE library documentation for more information about the meaning
++ of these flags.
++
++ Upon success, this function returns a positive integer equal to 1 plus the
++ number of so-called captured substrings.  It returns 0 if the pattern
++ fails to match the string.
++
++ SEE ALSO
++  pcre2_compile, pcre2_nth_match, pcre2_nth_substr, pcre2_matches
++
++--------------------------------------------------------------
++
++pcre2_matches
++
++ SYNOPSIS
++  Match a PCRE to a string and return the matches
++
++ USAGE
++  String_Type[] = pcre2_matches (regexp, str [,pcre2_exec_options])
++
++ DESCRIPTION
++  This function combines the `pcre2_exec' and
++ `pcre2_nth_substr' functions into simple to use function that
++ matches the specified regular expression `regexp' to the string
++ `string' and returns matched substrings as an array.  If
++ `regexp' is a string, the function will first compile the
++ pattern using the `pcre2_compile' function.  The third parameter
++ is optional and, if provided, will be passed as the `options'
++ parameter to `pcre2_exec'.
++
++ If no match is found, the function will return NULL.
++
++ QUALIFIERS
++ The following qualifiers are supported:
++
++   options=int        Options to pass to pcre2_compile
++   offset=int         Start matching offset in bytes for pcre2_exec
++
++
++ EXAMPLE
++ After the execution of:
++
++    str = "Error in file foo.c, line 127, column 10";
++    pattern = "file ([^,]+), line (\\d+)";
++    matches = pcre2_matches (pattern, str);
++
++ the value of the matches variable will be the array:
++
++    [ "file foo.c, line 127",
++      "foo.c",
++      127
++    ]
++
++
++ SEE ALSO
++  pcre2_compile, pcre2_exec, pcre2_nth_substr, pcre2_nth_match
++
++--------------------------------------------------------------
++
++pcre2_nth_match
++
++ SYNOPSIS
++  Return the location of the nth match of a PCRE
++
++ USAGE
++  Int_Type[2] pcre2_nth_match (PCRE2_Type p, Int_Type nth)
++
++ DESCRIPTION
++ The `pcre2_nth_match' function returns an integer array whose values
++ specify the locations of the beginning and end of the `nth' captured
++ substrings of the most recent call to `pcre2_exec' with the compiled
++ pattern.  A value of `nth' equal to 0 represents the substring
++ representing the entire match of the pattern.
++
++ If the `nth' match did not take place, the function returns NULL.
++
++ EXAMPLE
++ After the execution of:
++
++    str = "Error in file foo.c, line 127, column 10";
++    pattern = "file ([^,]+), line (\\d+)";
++    p = pcre2_compile (pattern);
++    if (pcre2_exec (p, str))
++      {
++         match_pos = pcre2_nth_match (p, 0);
++         file_pos = pcre2_nth_match (p, 1);
++         line_pos = pcre2_nth_match (p, 2);
++      }
++
++ `match_pos' will be set to `[9,29]', `file_pos' to `[14,19,]'
++ and `line_pos' to `[26,29]'.  These integer arrays may be used to
++ extract the substrings matched by the pattern, e.g.,
++
++     file = substr (str, file_pos[0]+1, file_pos[1]-file_pos[0]);
++     line = str[[line_pos[0]:line_pos[1]-1]];
++
++ Alternatively, the function `pcre2_nth_substr' may be used to get the
++ matched substrings:
++
++     file = pcre2_nth_substr (p, str, 0);
++
++
++ SEE ALSO
++  pcre2_compile, pcre2_exec, pcre2_nth_substr, pcre2_matches
++
++--------------------------------------------------------------
++
++pcre2_nth_substr
++
++ SYNOPSIS
++  Extract the nth substring from a PCRE match
++
++ USAGE
++  String_Type pcre2_nth_substr (PCRE2_Type p, String_Type str, Int_Type nth)
++
++ DESCRIPTION
++ This function may be used to extract the `nth' captured substring
++ resulting from the most recent use of the compiled pattern `p' by the
++ `pcre2_exec' function.  Unlike `pcre2_nth_match', this function returns
++ the specified captured substring itself and not the position of the substring.
++ For this reason, the subject string of the pattern is a required argument.
++
++ SEE ALSO
++  pcre2_matches, pcre2_compile, pcre2_exec, pcre2_nth_match
++
++--------------------------------------------------------------
++
++slang_to_pcre2
++
++ SYNOPSIS
++  Convert a S-Lang regular expression to a PCRE2 one
++
++ USAGE
++  String_Type slang_to_pcre (String_Type pattern)
++
++ DESCRIPTION
++ This function may be used to convert a slang regular expression to a
++ PCRE2 compatible one.  The converted pattern is returned.
++
++ SEE ALSO
++  pcre2_compile, string_match
++
++--------------------------------------------------------------
+diff --git a/modules/help/zlib.hlp b/modules/help/zlib.hlp
+new file mode 100644
+index 0000000..28e2ecb
+--- /dev/null
++++ b/modules/help/zlib.hlp
+@@ -0,0 +1,107 @@
++zlib_deflate
++
++ SYNOPSIS
++  Compress a string
++
++ USAGE
++  zstr = zlib_deflate (str)
++
++ DESCRIPTION
++
++ QUALIFIERS
++  ; level=val:
++  ; method=val:
++  ; wbits=val:
++  ; memlevel=val:
++  ; strategy=val:
++
++ EXAMPLE
++
++ NOTES
++
++ SEE ALSO
++  zlib_inflate, zlib_inflate_new
++
++--------------------------------------------------------------
++
++zlib_deflate_new
++
++ SYNOPSIS
++  Create a zlib deflation object
++
++ USAGE
++  zlibobj = zlib_deflate_new ()
++
++ DESCRIPTION
++
++ QUALIFIERS
++  ; level=val: one of: ZLIB_NO_COMPRESSION, ZLIB_BEST_SPEED,
++ZLIB_BEST_COMPRESSION,
++ZLIB_DEFAULT_COMPRESSION (default: ZLIB_DEFAULT_COMPRESSION)
++  ; method=val: ZLIB_DEFLATED (default: ZLIB_DEFLATED)
++  ; wbits=val: Window size in bits, 8-15 is recommended (default: 15)
++  ; memlevel=val: Specifies the amount of memory to use; 1-9,
++default=8
++  ; strategy=val: one of: ZLIB_DEFAULT_STRATEGY, ZLIB_FILTERED,
++ZLIB_HUFFMAN_ONLY, ZLIB_RLE,ZLIB_FIXED (default: ZLIB_DEFAULT_STRATEGY)
++
++ METHODS
++  ..deflate : compress a string
++  ..reset : Resets the stream keeping various state parameters
++  ..flush : Flush pending output to the output buffer
++
++ EXAMPLE
++
++ NOTES
++ See the zlib compression library documentation for more information
++ regarding the qualifiers and methods.  Note that this module uses ZLIB as a
++ prefix whereas the underlying library API uses Z, e.g.,
++ `ZLIB_FIXED' vs `Z_FIXED'.
++
++ SEE ALSO
++  zlib_deflate, zlib_inflate_new
++
++--------------------------------------------------------------
++
++zlib_inflate
++
++ SYNOPSIS
++  Uncompress a string
++
++ USAGE
++  str = zlib_inflate (zstr)
++
++ DESCRIPTION
++
++ QUALIFIERS
++  ; wbits=val:
++
++ EXAMPLE
++
++ NOTES
++
++ SEE ALSO
++
++--------------------------------------------------------------
++
++zlib_inflate_new
++
++ SYNOPSIS
++  Create a zlib inflation object
++
++ USAGE
++
++ DESCRIPTION
++
++ METHODS
++  .inflate :
++  .reset :
++  .flush :
++
++ EXAMPLE
++
++ NOTES
++
++ SEE ALSO
++
++--------------------------------------------------------------
+diff --git a/modules/pcre2-module.c b/modules/pcre2-module.c
+new file mode 100644
+index 0000000..aa2eb90
+--- /dev/null
++++ b/modules/pcre2-module.c
+@@ -0,0 +1,657 @@
++/* -*- mode: C; mode: fold -*-
++Copyright (C) 2010-2021,2022 John E. Davis
++
++This file is part of the S-Lang Library.
++
++The S-Lang Library is free software; you can redistribute it and/or
++modify it under the terms of the GNU General Public License as
++published by the Free Software Foundation; either version 2 of the
++License, or (at your option) any later version.
++
++The S-Lang Library is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this library; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
++USA.
++*/
++#include "config.h"
++
++#include <stdio.h>
++#include <slang.h>
++#include <string.h>
++
++#define PCRE2_CODE_UNIT_WIDTH 8	       /* unicode */
++#include <pcre2.h>
++
++SLANG_MODULE(pcre2);
++
++static int PCRE2_Type_Id = 0;
++
++typedef struct
++{
++   pcre2_code *p;
++   pcre2_match_data *match_data;
++   unsigned int num_matches;       /* return value of pcre2_exec (>= 1)*/
++}
++PCRE2_Type;
++
++static pcre2_general_context *General_Context = NULL;
++static pcre2_compile_context *Compile_Context = NULL;
++
++static void free_pcre2_type (PCRE2_Type *pt)
++{
++   if (pt == NULL) return;
++
++   if (pt->match_data != NULL)
++     pcre2_match_data_free(pt->match_data);
++
++   if (pt->p != NULL)
++     pcre2_code_free (pt->p);
++
++   SLfree ((char *) pt);
++}
++
++/* checked */
++static SLang_MMT_Type *allocate_pcre_type (pcre2_code *p)
++{
++   PCRE2_Type *pt;
++   SLang_MMT_Type *mmt;
++
++   pt = (PCRE2_Type *) SLmalloc (sizeof (PCRE2_Type));
++   if (pt == NULL)
++     return NULL;
++   memset ((char *) pt, 0, sizeof (PCRE2_Type));
++
++   pt->p = p;
++
++   /* Create match data */
++   pt->match_data = pcre2_match_data_create_from_pattern(p, General_Context);
++   if (pt->match_data == NULL)
++     {
++	free_pcre2_type (pt);
++	SLang_verror (SL_INTRINSIC_ERROR, "pcre2_match_data_create_from_pattern failed");
++	return NULL;
++     }
++
++   if (NULL == (mmt = SLang_create_mmt (PCRE2_Type_Id, (VOID_STAR) pt)))
++     {
++	free_pcre2_type (pt);
++	return NULL;
++     }
++   return mmt;
++}
++
++/* checked */
++static int _pcre_compile_1 (char *pattern, int options)
++{
++   pcre2_code *p;
++   SLang_MMT_Type *mmt;
++   uint32_t pcre_options = 0;
++   PCRE2_SIZE erroffset;
++   int errorcode;
++
++   /* Convert SLang options to PCRE2 options */
++   if (options & 1) pcre_options |= PCRE2_CASELESS;
++   if (options & 2) pcre_options |= PCRE2_MULTILINE;
++
++   p = pcre2_compile((PCRE2_SPTR)pattern, PCRE2_ZERO_TERMINATED,
++                     pcre_options, &errorcode, &erroffset, Compile_Context);
++   if (p == NULL)
++     {
++	PCRE2_UCHAR buffer[256];
++	int rc = pcre2_get_error_message(errorcode, buffer, sizeof(buffer));
++	if (rc < 0) *buffer = 0;
++
++	SLang_verror (SL_Parse_Error, "Error compiling pattern '%s' at offset %d: %s",
++		      pattern, (int)erroffset, buffer);
++	return -1;
++     }
++
++   if (NULL == (mmt = allocate_pcre_type (p)))
++     {
++	pcre2_code_free(p);
++	return -1;
++     }
++
++   if (-1 == SLang_push_mmt (mmt))
++     {
++	SLang_free_mmt (mmt);
++	return -1;
++     }
++   return 0;
++}
++
++static void _pcre_compile (void)
++{
++   char *pattern;
++   int options = 0;
++
++   switch (SLang_Num_Function_Args)
++     {
++      case 2:
++	if (-1 == SLang_pop_integer (&options))
++	  return;
++       /* fall through */
++      case 1:
++      default:
++	if (-1 == SLang_pop_slstring (&pattern))
++	  return;
++     }
++   (void) _pcre_compile_1 (pattern, options);
++   SLang_free_slstring (pattern);
++}
++
++/* returns number of matches */
++/* checked */
++static int _pcre_exec_1 (PCRE2_Type *pt, char *str, unsigned int len, int pos, int options)
++{
++   uint32_t pcre_options = 0;
++   int rc;
++
++   /* Convert SLang options to PCRE2 options */
++   if (options & 1) pcre_options |= PCRE2_NOTBOL;
++   if (options & 2) pcre_options |= PCRE2_NOTEOL;
++
++   pt->num_matches = 0;
++   if ((unsigned int) pos > len)
++     return 0;
++
++   rc = pcre2_match(pt->p, (PCRE2_SPTR)str, len, pos,
++                    pcre_options, pt->match_data, NULL);
++
++   if (rc == PCRE2_ERROR_NOMATCH)
++     return 0;
++
++   if (rc < 0)
++     {
++	PCRE2_UCHAR buffer[256];
++	int erc = pcre2_get_error_message(rc, buffer, sizeof(buffer));
++	if (erc < 0) *buffer= 0;
++	SLang_verror (SL_INTRINSIC_ERROR, "pcre2_match failed with error %d: %s", rc, buffer);
++	return -1;
++     }
++
++   /* Note: rc = 0 means the ovector was too small for all captures,
++    * but it's still a successful match.
++    */
++   if (rc == 0)
++     rc = (int) pcre2_get_ovector_count(pt->match_data);
++
++   pt->num_matches = (unsigned int) rc;
++   return rc;
++}
++
++static int _pcre_exec (void)
++{
++   PCRE2_Type *p;
++   SLang_MMT_Type *mmt;
++   char *str;
++   SLang_BString_Type *bstr = NULL;
++   SLstrlen_Type len;
++   int pos = 0;
++   int options = 0;
++   int ret = -1;
++
++   switch (SLang_Num_Function_Args)
++     {
++      case 4:
++	if (-1 == SLang_pop_integer (&options))
++	  return -1;
++       /* fall through */
++      case 3:
++       /* fall through */
++	if (-1 == SLang_pop_integer (&pos))
++	  return -1;
++       /* fall through */
++      default:
++	switch (SLang_peek_at_stack())
++	  {
++	   case SLANG_STRING_TYPE:
++	     if (-1 == SLang_pop_slstring (&str))
++	       return -1;
++	     len = strlen (str);
++	     break;
++
++	   case SLANG_BSTRING_TYPE:
++	   default:
++	     if (-1 == SLang_pop_bstring(&bstr))
++	       return -1;
++	     str = (char *)SLbstring_get_pointer(bstr, &len);
++	     if (str == NULL)
++	       {
++		  SLbstring_free (bstr);
++		  return -1;
++              }
++	     break;
++         }
++     }
++
++   if (NULL == (mmt = SLang_pop_mmt (PCRE2_Type_Id)))
++     goto free_and_return;
++   p = (PCRE2_Type *)SLang_object_from_mmt (mmt);
++
++   ret = _pcre_exec_1 (p, str, len, pos, options);
++
++free_and_return:
++
++   SLang_free_mmt (mmt);
++   if (bstr != NULL)
++     SLbstring_free (bstr);
++   else
++     SLang_free_slstring (str);
++   return ret;
++}
++
++/* checked */
++static int get_nth_start_stop (PCRE2_Type *pt, unsigned int n,
++			       SLuindex_Type *a, SLuindex_Type *b)
++{
++   PCRE2_SIZE *ovector;
++
++   if (n >= pt->num_matches)
++     return -1;
++
++   if (NULL == (ovector = pcre2_get_ovector_pointer(pt->match_data)))
++     return -1;
++
++   if ((ovector[2*n] == PCRE2_UNSET) || (ovector[2*n+1] == PCRE2_UNSET))
++     return -1;
++
++   *a = (SLuindex_Type) ovector[2*n];
++   *b = (SLuindex_Type) ovector[2*n+1];
++   return 0;
++}
++
++static void _pcre_nth_match (PCRE2_Type *pt, int *np)
++{
++   SLuindex_Type start, stop;
++   SLang_Array_Type *at;
++   SLindex_Type two = 2;
++   int *data;
++
++   if (-1 == get_nth_start_stop (pt, (unsigned int) *np, &start, &stop))
++     {
++	SLang_push_null ();
++	return;
++     }
++
++   if (NULL == (at = SLang_create_array (SLANG_INT_TYPE, 0, NULL, &two, 1)))
++     return;
++
++   data = (int *)at->data;
++   data[0] = (int)start;
++   data[1] = (int)stop;
++   (void) SLang_push_array (at, 1);
++}
++
++static void _pcre_nth_substr (PCRE2_Type *pt, char *str, int *np)
++{
++   SLstrlen_Type start, stop;
++   SLstrlen_Type len;
++
++   len = strlen (str);
++
++   if ((-1 == get_nth_start_stop (pt, (unsigned int) *np, &start, &stop))
++       || (start > len) || (stop > len))
++     {
++	SLang_push_null ();
++	return;
++     }
++
++   str = SLang_create_nslstring (str + start, stop - start);
++   (void) SLang_push_string (str);
++   SLang_free_slstring (str);
++}
++
++/* This function converts a slang RE to a pcre expression. */
++static char *_slang_to_pcre2 (char *slpattern)
++{
++   char *pattern, *p, *s;
++   SLstrlen_Type len;
++   int in_bracket;
++   char ch;
++
++   len = strlen (slpattern);
++   pattern = (char *)SLmalloc (3*len + 1);
++   if (pattern == NULL)
++     return NULL;
++
++   p = pattern;
++   s = slpattern;
++   in_bracket = 0;
++   while ((ch = *s++) != 0)
++     {
++	switch (ch)
++	  {
++	   case '{':
++	   case '}':
++	   case '(':
++	   case ')':
++	   case '#':
++	   case '|':
++	     if (0 == in_bracket) *p++ = '\\';
++	     *p++ = ch;
++	     break;
++
++	   case '[':
++	     in_bracket = 1;
++	     *p++ = ch;
++	     break;
++
++	   case ']':
++	     in_bracket = 0;
++	     *p++ = ch;
++	     break;
++
++	   case '\\':
++	     ch = *s++;
++	     switch (ch)
++	       {
++		case 0:
++		  s--;
++		  break;
++
++		case '<':
++		case '>':
++		  *p++ = '\\'; *p++ = 'b';
++		  break;
++
++		case '(':
++		case ')':
++		case '{':
++		case '}':
++		  *p++ = ch;
++		  break;
++
++		case 'C':
++		  *p++ = '('; *p++ = '?'; *p++ = 'i'; *p++ = ')';
++		  break;
++		case 'c':
++		  *p++ = '('; *p++ = '?'; *p++ = '-'; *p++ = 'i'; *p++ = ')';
++		  break;
++
++		default:
++		  *p++ = '\\';
++		  *p++ = ch;
++              }
++	     break;
++
++	   default:
++	     *p++ = ch;
++	     break;
++         }
++     }
++   *p = 0;
++
++   s = SLang_create_slstring (pattern);
++   SLfree (pattern);
++   return s;
++}
++
++static void slang_to_pcre2 (char *pattern)
++{
++   /* NULL ok in code below */
++   pattern = _slang_to_pcre2 (pattern);
++   (void) SLang_push_string (pattern);
++   SLang_free_slstring (pattern);
++}
++
++static void destroy_pcre (SLtype type, VOID_STAR f)
++{
++   PCRE2_Type *pt;
++   (void) type;
++
++   pt = (PCRE2_Type *) f;
++   free_pcre2_type (pt);
++}
++
++#define DUMMY_PCRE2_TYPE ((SLtype)-1)
++#define P DUMMY_PCRE2_TYPE
++#define I SLANG_INT_TYPE
++#define V SLANG_VOID_TYPE
++#define S SLANG_STRING_TYPE
++static SLang_Intrin_Fun_Type PCRE2_Intrinsics [] =
++{
++   MAKE_INTRINSIC_0("pcre2_exec", _pcre_exec, I),
++   MAKE_INTRINSIC_0("pcre2_compile", _pcre_compile, V),
++   MAKE_INTRINSIC_2("pcre2_nth_match", _pcre_nth_match, V, P, I),
++   MAKE_INTRINSIC_3("pcre2_nth_substr", _pcre_nth_substr, V, P, S, I),
++   MAKE_INTRINSIC_1("slang_to_pcre2", slang_to_pcre2, V, S),
++   SLANG_END_INTRIN_FUN_TABLE
++};
++
++static SLang_IConstant_Type PCRE2_Consts [] =
++{
++   /* compile options */
++#ifndef PCRE2_ANCHORED
++# define PCRE2_ANCHORED 0
++#endif
++   MAKE_ICONSTANT("PCRE2_ANCHORED", PCRE2_ANCHORED),
++#ifndef PCRE2_AUTO_CALLOUT
++# define PCRE2_AUTO_CALLOUT 0
++#endif
++   MAKE_ICONSTANT("PCRE2_AUTO_CALLOUT", PCRE2_AUTO_CALLOUT),
++#ifndef PCRE2_BSR_ANYCRLF
++# define PCRE2_BSR_ANYCRLF 0
++#endif
++   MAKE_ICONSTANT("PCRE2_BSR_ANYCRLF", PCRE2_BSR_ANYCRLF),
++#ifndef PCRE2_BSR_UNICODE
++# define PCRE2_BSR_UNICODE 0
++#endif
++   MAKE_ICONSTANT("PCRE2_BSR_UNICODE", PCRE2_BSR_UNICODE),
++#ifndef PCRE2_CASELESS
++# define PCRE2_CASELESS 0
++#endif
++   MAKE_ICONSTANT("PCRE2_CASELESS", PCRE2_CASELESS),
++#ifndef PCRE2_DUPNAMES
++# define PCRE2_DUPNAMES 0
++#endif
++   MAKE_ICONSTANT("PCRE2_DUPNAMES", PCRE2_DUPNAMES),
++#ifndef PCRE2_DOLLAR_ENDONLY
++# define PCRE2_DOLLAR_ENDONLY 0
++#endif
++   MAKE_ICONSTANT("PCRE2_DOLLAR_ENDONLY", PCRE2_DOLLAR_ENDONLY),
++#ifndef PCRE2_DOTALL
++# define PCRE2_DOTALL 0
++#endif
++   MAKE_ICONSTANT("PCRE2_DOTALL", PCRE2_DOTALL),
++#ifndef PCRE2_EXTENDED
++# define PCRE2_EXTENDED 0
++#endif
++   MAKE_ICONSTANT("PCRE2_EXTENDED", PCRE2_EXTENDED),
++#ifndef PCRE2_FIRSTLINE
++# define PCRE2_FIRSTLINE 0
++#endif
++   MAKE_ICONSTANT("PCRE2_FIRSTLINE", PCRE2_FIRSTLINE),
++#ifndef PCRE2_MULTILINE
++# define PCRE2_MULTILINE 0
++#endif
++   MAKE_ICONSTANT("PCRE2_MULTILINE", PCRE2_MULTILINE),
++#ifndef PCRE2_NEVER_UTF
++# define PCRE2_NEVER_UTF 0
++#endif
++   MAKE_ICONSTANT("PCRE2_NEVER_UTF", PCRE2_NEVER_UTF),
++#ifndef PCRE2_NEWLINE_ANY
++# define PCRE2_NEWLINE_ANY 0
++#endif
++   MAKE_ICONSTANT("PCRE2_NEWLINE_ANY", PCRE2_NEWLINE_ANY),
++#ifndef PCRE2_NEWLINE_ANYCRLF
++# define PCRE2_NEWLINE_ANYCRLF 0
++#endif
++   MAKE_ICONSTANT("PCRE2_NEWLINE_ANYCRLF", PCRE2_NEWLINE_ANYCRLF),
++#ifndef PCRE2_NEWLINE_CR
++# define PCRE2_NEWLINE_CR 0
++#endif
++   MAKE_ICONSTANT("PCRE2_NEWLINE_CR", PCRE2_NEWLINE_CR),
++#ifndef PCRE2_NEWLINE_CRLF
++# define PCRE2_NEWLINE_CRLF 0
++#endif
++   MAKE_ICONSTANT("PCRE2_NEWLINE_CRLF", PCRE2_NEWLINE_CRLF),
++#ifndef PCRE2_NEWLINE_LF
++# define PCRE2_NEWLINE_LF 0
++#endif
++   MAKE_ICONSTANT("PCRE2_NEWLINE_LF", PCRE2_NEWLINE_LF),
++#ifndef PCRE2_NO_START_OPTIMIZE
++# define PCRE2_NO_START_OPTIMIZE 0
++#endif
++   MAKE_ICONSTANT("PCRE2_NO_START_OPTIMIZE", PCRE2_NO_START_OPTIMIZE),
++#ifndef PCRE2_NOTEMPTY
++# define PCRE2_NOTEMPTY 0
++#endif
++   MAKE_ICONSTANT("PCRE2_NOTEMPTY", PCRE2_NOTEMPTY),
++#ifndef PCRE2_NO_AUTO_CAPTURE
++# define PCRE2_NO_AUTO_CAPTURE 0
++#endif
++   MAKE_ICONSTANT("PCRE2_NO_AUTO_CAPTURE", PCRE2_NO_AUTO_CAPTURE),
++#ifndef PCRE2_NO_AUTO_POSSESS
++# define PCRE2_NO_AUTO_POSSESS 0
++#endif
++   MAKE_ICONSTANT("PCRE2_NO_AUTO_POSSESS", PCRE2_NO_AUTO_POSSESS),
++#ifndef PCRE2_NO_UTF8_CHECK
++# define PCRE2_NO_UTF8_CHECK 0
++#endif
++   MAKE_ICONSTANT("PCRE2_NO_UTF_CHECK", PCRE2_NO_UTF_CHECK),
++#ifndef PCRE2_UCP
++# define PCRE2_UCP 0
++#endif
++   MAKE_ICONSTANT("PCRE2_UCP", PCRE2_UCP),
++#ifndef PCRE2_UNGREEDY
++# define PCRE2_UNGREEDY 0
++#endif
++   MAKE_ICONSTANT("PCRE2_UNGREEDY", PCRE2_UNGREEDY),
++#ifndef PCRE2_UTF
++# define PCRE2_UTF 0
++#endif
++   MAKE_ICONSTANT("PCRE2_UTF", PCRE2_UTF),
++#ifndef PCRE2_MATCH_INVALID_UTF
++# define PCRE2_MATCH_INVALID_UTF 0
++#endif
++   MAKE_ICONSTANT("PCRE2_MATCH_INVALID_UTF", PCRE2_MATCH_INVALID_UTF),
++   /* exec options */
++#ifndef PCRE2_NOTBOL
++# define PCRE2_NOTBOL 0
++#endif
++   MAKE_ICONSTANT("PCRE2_NOTBOL", PCRE2_NOTBOL),
++#ifndef PCRE2_NOTEOL
++# define PCRE2_NOTEOL 0
++#endif
++   MAKE_ICONSTANT("PCRE2_NOTEOL", PCRE2_NOTEOL),
++#ifndef PCRE2_NOTEMPTY
++# define PCRE2_NOTEMPTY 0
++#endif
++   MAKE_ICONSTANT("PCRE2_NOTEMPTY", PCRE2_NOTEMPTY),
++#ifndef PCRE2_PARTIAL_SOFT
++# define PCRE2_PARTIAL_SOFT 0
++#endif
++   MAKE_ICONSTANT("PCRE2_PARTIAL_SOFT", PCRE2_PARTIAL_SOFT),
++#ifndef PCRE2_DFA_SHORTEST
++# define PCRE2_DFA_SHORTEST 0
++#endif
++   MAKE_ICONSTANT("PCRE2_DFA_SHORTEST", PCRE2_DFA_SHORTEST),
++#ifndef PCRE2_DFA_RESTART
++# define PCRE2_DFA_RESTART 0
++#endif
++   MAKE_ICONSTANT("PCRE2_DFA_RESTART", PCRE2_DFA_RESTART),
++#ifndef PCRE2_PARTIAL_HARD
++# define PCRE2_PARTIAL_HARD 0
++#endif
++   MAKE_ICONSTANT("PCRE2_PARTIAL_HARD", PCRE2_PARTIAL_HARD),
++#ifndef PCRE2_NOTEMPTY_ATSTART
++# define PCRE2_NOTEMPTY_ATSTART 0
++#endif
++   MAKE_ICONSTANT("PCRE2_NOTEMPTY_ATSTART", PCRE2_NOTEMPTY_ATSTART),
++
++   SLANG_END_ICONST_TABLE
++};
++
++#undef P
++#undef I
++#undef V
++#undef S
++
++static void *do_malloc (size_t n, void *data)
++{
++   (void) data;
++   return (void *) SLmalloc (n);
++}
++
++static void do_free (void *x, void *data)
++{
++   (void) data;
++   SLfree ((char *) x);
++}
++
++static int register_pcre_type (void)
++{
++   SLang_Class_Type *cl;
++
++   if (PCRE2_Type_Id != 0)
++     return 0;
++
++   if (General_Context == NULL)
++     {
++	General_Context = pcre2_general_context_create(do_malloc, do_free, NULL);
++	if (General_Context == NULL)
++	  return -1;
++     }
++   if (Compile_Context == NULL)
++     {
++	Compile_Context = pcre2_compile_context_create (General_Context);
++	if (Compile_Context == NULL)
++	  return -1;
++     }
++
++   if (NULL == (cl = SLclass_allocate_class ("PCRE2_Type")))
++     return -1;
++
++   if (-1 == SLclass_set_destroy_function (cl, destroy_pcre))
++     return -1;
++
++   /* By registering as SLANG_VOID_TYPE, slang will dynamically allocate a
++    * type.
++    */
++   if (-1 == SLclass_register_class (cl, SLANG_VOID_TYPE, sizeof (PCRE2_Type), SLANG_CLASS_TYPE_MMT))
++     return -1;
++
++   PCRE2_Type_Id = SLclass_get_class_id (cl);
++   if (-1 == SLclass_patch_intrin_fun_table1 (PCRE2_Intrinsics, DUMMY_PCRE2_TYPE, PCRE2_Type_Id))
++     return -1;
++
++   return 0;
++}
++
++int init_pcre2_module_ns (char *ns_name)
++{
++   SLang_NameSpace_Type *ns = SLns_create_namespace (ns_name);
++   if (ns == NULL)
++     return -1;
++
++   if (-1 == register_pcre_type ())
++     return -1;
++
++   if ((-1 == SLns_add_intrin_fun_table (ns, PCRE2_Intrinsics, "__PCRE2__"))
++       || (-1 == SLns_add_iconstant_table (ns, PCRE2_Consts, NULL)))
++     return -1;
++
++   return 0;
++}
++
++/* This function is optional */
++void deinit_pcre2_module (void)
++{
++   if (Compile_Context != NULL)
++     {
++	pcre2_compile_context_free(Compile_Context);
++	Compile_Context = NULL;
++     }
++   if (General_Context != NULL)
++     {
++	pcre2_general_context_free(General_Context);
++	General_Context = NULL;
++     }
++}
++
+diff --git a/modules/pcre2.sl b/modules/pcre2.sl
+new file mode 100644
+index 0000000..aea3621
+--- /dev/null
++++ b/modules/pcre2.sl
+@@ -0,0 +1,48 @@
++% Copyright (C) 2012-2021,2022 John E. Davis
++%
++% This file is part of the S-Lang Library and may be distributed under the
++% terms of the GNU General Public License.  See the file COPYING for
++% more information.
++%---------------------------------------------------------------------------
++import("pcre2");
++
++define pcre2_matches ()
++{
++   variable nargs = _NARGS;
++   if (nargs < 2)
++     usage ("\
++strings = pcre2_matches (regexp, str [,pcre_exec_options])\n\
++Qualifiers:\n\
++  options=0       pcre_compile options if regexp is a string\n\
++  offset=0        pcre_exec start matching offset in bytes\n\
++";
++	   );
++   variable re, str, options;
++   if (nargs == 2)
++     0;
++   (re, str, options) = ();
++   variable pos = qualifier ("offset", 0);
++   if (typeof (re) != PCRE2_Type)
++     {
++	variable compile_options = qualifier ("options", 0);
++	re = pcre2_compile (re, compile_options);
++     }
++
++   variable n = pcre2_exec (re, str, pos, options);
++   if (n == 0)
++     return NULL;
++
++   variable matches = String_Type[n];
++   _for (0, n-1, 1)
++     {
++	variable i = ();
++	matches[i] = pcre2_nth_substr (re, str, i);
++     }
++   return matches;
++}
++
++$1 = path_concat (path_dirname (__FILE__), "help/pcre2funs.hlp");
++if (NULL != stat_file ($1))
++  add_doc_file ($1);
++
++provide("pcre2");
+diff --git a/modules/test/test_pcre2.sl b/modules/test/test_pcre2.sl
+new file mode 100644
+index 0000000..1ff86b0
+--- /dev/null
++++ b/modules/test/test_pcre2.sl
+@@ -0,0 +1,48 @@
++() = evalfile ("./test.sl");
++require("pcre2.sl");
++
++static define test_regexp_match (slpat, str, eret, eans, opts)
++{
++   variable pat = slang_to_pcre2 (slpat);
++   variable p = pcre2_compile (pat, opts);
++
++   variable ret = pcre2_exec (p, str);
++   if (eret != ret)
++     failed ("pcre2_exec using '%s' failed: expected %d, got %d",
++	     slpat, eret, ret);
++
++   if (eans == NULL)
++     return;
++
++   variable ans = pcre2_nth_substr (p, str, 0);
++   if (ans != eans)
++     failed ("pcre2_exec(%s) matched '%s, expected '%s'",
++	     slpat, ans, eans);
++
++   variable matches = pcre2_matches (pat, str);
++   if ((matches == NULL) || (matches[0] != eans))
++     failed ("pcre2_matches");
++}
++
++define slsh_main ()
++{
++   testing_module ("pcre2");
++
++   test_regexp_match ("B.*[1-5]", "0xAB123G", 1, "B123", 0);
++   test_regexp_match ("\([1-5]+\)G\1"R, "0xAB123G12F", 0, NULL, 0);
++   test_regexp_match ("\([1-5]+\)G\1"R, "0xAB123G123F", 2, "123G123", 0);
++   test_regexp_match ("[1-5]", "0xAB123G", 1, "1", 0);
++   test_regexp_match ("\([1-5]2\)"R, "0xAB123G", 2, "12", 0);
++   test_regexp_match ("G", "0xAB123G", 1, "G", 0);
++   test_regexp_match ("\(G\)"R, "0xAB123G", 2, "G", 0);
++
++   test_regexp_match (`=\(\d\)`, "L=1X", 2, "=1", 0);
++   test_regexp_match (`=\(\d?\)`, "L=1X", 2, "=1", 0);
++   test_regexp_match (`=\(\d?\)`, "L=12X", 2, "=1", 0);
++   test_regexp_match (`=\(\d+\)`, "L=1X", 2, "=1", 0);
++   test_regexp_match (`=\(\d+\)`, "L=12X", 2, "=12", 0);
++   test_regexp_match (`=\(\d*\)`, "L=1X", 2, "=1", 0);
++   test_regexp_match (`=\(\d*\)`, "L=X", 2, "=", 0);
++
++   end_test ();
++}
+diff --git a/modules/tm/Makefile b/modules/tm/Makefile
+index 93ff244..2fec2cf 100644
+--- a/modules/tm/Makefile
++++ b/modules/tm/Makefile
+@@ -9,9 +9,10 @@ MACRODIR = # -I$(HOME)/lib/tmexpand/macros
+ TM2SGML = tmexpand
+ SGML2HTML = sgml2html
+ 
+-HLP_FILES = pngfuns.hlp pcrefuns.hlp sockfuns.hlp onigfuns.hlp \
++HLP_FILES = pngfuns.hlp pcrefuns.hlp pcre2funs.hlp sockfuns.hlp onigfuns.hlp \
+   randfuns.hlp forkfuns.hlp csvfuns.hlp slsmg.hlp histfuns.hlp \
+-  statsfuns.hlp jsonfuns.hlp base64funs.hlp chksumfuns.hlp
++  statsfuns.hlp jsonfuns.hlp base64funs.hlp chksumfuns.hlp \
++  fcntlfuns.hlp zlib.hlp
+ 
+ all: help-files
+ help-files: $(HLP_FILES)
+diff --git a/modules/tm/fcntlfuns.tm b/modules/tm/fcntlfuns.tm
+new file mode 100644
+index 0000000..a98d574
+--- /dev/null
++++ b/modules/tm/fcntlfuns.tm
+@@ -0,0 +1,81 @@
++\function{fcntl_getfd}
++\synopsis{Get a file descriptor's flags}
++\usage{flags = fcntl_getfd (fd)}
++\description
++ This function returns the flags associated with the open file
++ descriptor \exmp{fd}, which must be either an \ifun{FD_Type} object
++ or an integer.  If returns the value of the flags, or -1 and sets the
++ value of \ivar{errno} if an error occurs.
++\example
++#v+
++   flags = fcntl_getfd (fileno(stdout));
++   if (flags == -1)
++     () = fprintf (stderr, "An error occurred: %s\n", errno_string());
++#v-
++\notes
++ This function is a wrapper around the OS \exmp{fcntl(fd, F_GETFD,...)}
++ function.
++\seealso{fcntl_setfd, fcntl_getfl, fcntl_getpipe_sz, fileno, _fileno}
++\done
++
++
++\function{fcntl_setfd}
++\synopsis{Set a file descriptor's flags}
++\usage{status = fcntl_setfd (flags, fd)}
++\description
++ This function may be used to set the flags on the open file
++ descriptior \exmp{fd}.  Here \exmp{flags} is an integer and \exmp{fd}
++ is either an integer or a \ifun{FD_Type} object.  It returns 0 if
++ successful, or -1 and sets the value of \ivar{error} upon failure.
++\example
++#v+
++  flags = fcntl_getfd (fd);
++  status = fcntl_setfd (flags | FD_CLOEXEC, fd);
++  if (status != 0)
++     () = fprintf (stderr, "An error occurred: %s\n", errno_string());
++#v-
++\notes
++ This function is a wrapper around the OS \exmp{fcntl(fd,F_SETFD,flags)}
++ function.
++\seealso{fcntl_getfd, fcntl_setfl, fcntl_setpipe_sz, fileno, _fileno}
++\done
++
++
++\function{fcntl_getfl}
++\synopsis{}
++\usage{}
++\description
++\example
++\notes
++\seealso{}
++\done
++
++
++\function{fcntl_setfl}
++\synopsis{}
++\usage{}
++\description
++\example
++\notes
++\seealso{}
++\done
++
++
++\function{fcntl_getpipe_sz}
++\synopsis{}
++\usage{}
++\description
++\example
++\notes
++\seealso{}
++\done
++
++
++\function{fcntl_setpipe_sz}
++\synopsis{}
++\usage{}
++\description
++\example
++\notes
++\seealso{}
++\done
+diff --git a/modules/tm/modfuns.tm b/modules/tm/modfuns.tm
+index 30014ac..5537ea9 100644
+--- a/modules/tm/modfuns.tm
++++ b/modules/tm/modfuns.tm
+@@ -125,11 +125,17 @@ This module provides an interface to the Oniguruma regular expression
+ library.  Use \exmp{require("onig")} to load it.
+ #i onigfuns.tm
+ 
+-\chapter{Perl Compatible Regular Expression Module}
+-This module provides an interface to the PCRE library.  It may be
+-loaded using \exmp{require("pcre")}.
++\chapter{Perl Compatible Regular Expression Module (v1)}
++This module provides an interface to the PCRE v1 library.  It may be
++loaded using \exmp{require("pcre")}.  Note that PCRE v1 is obsolete.
++Consider migrating to PCRE v2.
+ #i pcrefuns.tm
+ 
++\chapter{Perl Compatible Regular Expression Module (v2)}
++This module provides an interface to the PCRE v1 library.  It may be
++loaded using \exmp{require("pcre2")}.
++#i pcre2funs.tm
++
+ \chapter{Portable Network Graphics Module}
+ The \module{png} module includes a number of functions for dealing
+ with PNG images and colormaps.  Use \exmp{require("png")} to load it.
+diff --git a/modules/tm/pcre2funs.tm b/modules/tm/pcre2funs.tm
+new file mode 100644
+index 0000000..5f2e215
+--- /dev/null
++++ b/modules/tm/pcre2funs.tm
+@@ -0,0 +1,159 @@
++\function{pcre2_compile}
++\synopsis{Compile a PCRE regular expression}
++\usage{PCRE2_Type pcre2_compile (String_Type pattern [, Int_Type options])}
++\description
++ The \ifun{pcre2_compile} function compiles a PCRE style regular expression
++ and returns the result.  The optional \var{options} argument may be used
++ to provide addition information affecting the compilation of the pattern.
++ Specifically, it is a bit-mapped value formed from the logical-or of zero
++ or more of the following symbolic constants:
++#v+
++    PCRE2_ANCHORED     Force the match to be at the start of a string
++    PCRE2_CASELESS     Matches are to be case-insensitive
++    PCRE2_DOLLAR_ENDONLY (See PCRE docs for more information)
++    PCRE2_DOTALL       The dot pattern matches all characters
++    PCRE2_EXTENDED     Ignore whitespace in the pattern
++    PCRE2_EXTRA        (See PCRE docs for features this activates)
++    PCRE2_MULTILINE    Treat the subject string as multi-lines
++    PCRE2_UNGREEDY     Make the matches not greedy
++    PCRE2_UTF          Regard the pattern and subject strings as UTF-8
++#v-
++ Many of these flags may be set within the pattern itself.   See the PCRE
++ library documentation for more information about the precise details
++ of these flags and the supported regular expressions.
++
++ Upon success, this function returns a \dtype{PCRE2_Type} object representing
++ the compiled patterned.  If compilation fails, a \exc{ParseError}
++ exception will be thrown.
++\seealso{pcre2_exec, pcre2_nth_match, pcre2_nth_substr, pcre2_matches}
++\done
++
++\function{pcre2_exec}
++\synopsis{Match a string against a compiled PCRE pattern}
++\usage{Int_Type pcre2_exec(p, str [,pos [,options]])};
++#v+
++   PCRE2_Type p;
++   String_Type str;
++   Int_Type pos, options;
++#v-
++\description
++ The \ifun{pcre2_exec} function applies a pre-compiled pattern \var{p} to a
++ string \ifun{str} and returns the result of the match.  The optional third
++ argument \ifun{pos} may be used to specify the point, as an offset from the
++ start of the string, where matching is to start.  The fourth argument, if
++ present, may be used to provide additional information about how matching
++ is to take place.  Its value may be specified as a logical-or of zero or
++ more of the following flags:
++#v+
++   PCRE2_NOTBOL
++        The first character in the string is not at the beginning of a line.
++   PCRE2_NOTEOL
++        The last character in the string is not at the end of a line.
++   PCRE2_NOTEMPTY
++        An empty string is not a valid match.
++#v-
++ See the PCRE library documentation for more information about the meaning
++ of these flags.
++
++ Upon success, this function returns a positive integer equal to 1 plus the
++ number of so-called captured substrings.  It returns 0 if the pattern
++ fails to match the string.
++\seealso{pcre2_compile, pcre2_nth_match, pcre2_nth_substr, pcre2_matches}
++\done
++
++\function{pcre2_matches}
++\synopsis{Match a PCRE to a string and return the matches}
++\usage{String_Type[] = pcre2_matches (regexp, str [,pcre2_exec_options])}
++\description
++  This function combines the \ifun{pcre2_exec} and
++ \ifun{pcre2_nth_substr} functions into simple to use function that
++ matches the specified regular expression \exmp{regexp} to the string
++ \exmp{string} and returns matched substrings as an array.  If
++ \exmp{regexp} is a string, the function will first compile the
++ pattern using the \ifun{pcre2_compile} function.  The third parameter
++ is optional and, if provided, will be passed as the \exmp{options}
++ parameter to \ifun{pcre2_exec}.
++
++ If no match is found, the function will return NULL.
++\qualifiers
++ The following qualifiers are supported:
++#v+
++   options=int        Options to pass to pcre2_compile
++   offset=int         Start matching offset in bytes for pcre2_exec
++#v-
++\example
++ After the execution of:
++#v+
++    str = "Error in file foo.c, line 127, column 10";
++    pattern = "file ([^,]+), line (\\d+)";
++    matches = pcre2_matches (pattern, str);
++#v-
++ the value of the matches variable will be the array:
++#v+
++    [ "file foo.c, line 127",
++      "foo.c",
++      127
++    ]
++#v-
++\seealso{pcre2_compile, pcre2_exec, pcre2_nth_substr, pcre2_nth_match}
++\done
++
++\function{pcre2_nth_match}
++\synopsis{Return the location of the nth match of a PCRE}
++\usage{Int_Type[2] pcre2_nth_match (PCRE2_Type p, Int_Type nth)}
++\description
++ The \ifun{pcre2_nth_match} function returns an integer array whose values
++ specify the locations of the beginning and end of the \var{nth} captured
++ substrings of the most recent call to \ifun{pcre2_exec} with the compiled
++ pattern.  A value of \var{nth} equal to 0 represents the substring
++ representing the entire match of the pattern.
++
++ If the \var{nth} match did not take place, the function returns \NULL.
++\example
++ After the execution of:
++#v+
++    str = "Error in file foo.c, line 127, column 10";
++    pattern = "file ([^,]+), line (\\d+)";
++    p = pcre2_compile (pattern);
++    if (pcre2_exec (p, str))
++      {
++         match_pos = pcre2_nth_match (p, 0);
++         file_pos = pcre2_nth_match (p, 1);
++         line_pos = pcre2_nth_match (p, 2);
++      }
++#v-
++ \exmp{match_pos} will be set to \exmp{[9,29]}, \exmp{file_pos} to \exmp{[14,19,]}
++ and \exmp{line_pos} to \exmp{[26,29]}.  These integer arrays may be used to
++ extract the substrings matched by the pattern, e.g.,
++#v+
++     file = substr (str, file_pos[0]+1, file_pos[1]-file_pos[0]);
++     line = str[[line_pos[0]:line_pos[1]-1]];
++#v-
++ Alternatively, the function \ifun{pcre2_nth_substr} may be used to get the
++ matched substrings:
++#v+
++     file = pcre2_nth_substr (p, str, 0);
++#v-
++\seealso{pcre2_compile, pcre2_exec, pcre2_nth_substr, pcre2_matches}
++\done
++
++\function{pcre2_nth_substr}
++\synopsis{Extract the nth substring from a PCRE match}
++\usage{String_Type pcre2_nth_substr (PCRE2_Type p, String_Type str, Int_Type nth)}
++\description
++ This function may be used to extract the \var{nth} captured substring
++ resulting from the most recent use of the compiled pattern \var{p} by the
++ \ifun{pcre2_exec} function.  Unlike \ifun{pcre2_nth_match}, this function returns
++ the specified captured substring itself and not the position of the substring.
++ For this reason, the subject string of the pattern is a required argument.
++\seealso{pcre2_matches, pcre2_compile, pcre2_exec, pcre2_nth_match}
++\done
++
++\function{slang_to_pcre2}
++\synopsis{Convert a S-Lang regular expression to a PCRE2 one}
++\usage{String_Type slang_to_pcre (String_Type pattern)}
++\description
++ This function may be used to convert a slang regular expression to a
++ PCRE2 compatible one.  The converted pattern is returned.
++\seealso{pcre2_compile, string_match}
++\done
+diff --git a/modules/tm/zlib.tm b/modules/tm/zlib.tm
+new file mode 100644
+index 0000000..01bb2c4
+--- /dev/null
++++ b/modules/tm/zlib.tm
+@@ -0,0 +1,67 @@
++\function{zlib_deflate}
++\synopsis{Compress a string}
++\usage{zstr = zlib_deflate (str)}
++\description
++\qualifiers
++\qualifier{level=val}{}
++\qualifier{method=val}{}
++\qualifier{wbits=val}{}
++\qualifier{memlevel=val}{}
++\qualifier{strategy=val}{}
++\example
++\notes
++\seealso{zlib_inflate, zlib_inflate_new}
++\done
++
++
++\function{zlib_deflate_new}
++\synopsis{Create a zlib deflation object}
++\usage{zlibobj = zlib_deflate_new ()}
++\description
++\qualifiers
++\qualifier{level=val}{one of: ZLIB_NO_COMPRESSION, ZLIB_BEST_SPEED,
++ZLIB_BEST_COMPRESSION,
++ZLIB_DEFAULT_COMPRESSION}{ZLIB_DEFAULT_COMPRESSION}
++\qualifier{method=val}{ZLIB_DEFLATED}{ZLIB_DEFLATED}
++\qualifier{wbits=val}{Window size in bits, 8-15 is recommended}{15}
++\qualifier{memlevel=val}{Specifies the amount of memory to use; 1-9,
++default=8}
++\qualifier{strategy=val}{one of: ZLIB_DEFAULT_STRATEGY, ZLIB_FILTERED,
++ZLIB_HUFFMAN_ONLY, ZLIB_RLE,ZLIB_FIXED}{ZLIB_DEFAULT_STRATEGY}
++\methods
++\method{.deflate}{compress a string}
++\method{.reset}{Resets the stream keeping various state parameters}
++\method{.flush}{Flush pending output to the output buffer}
++\example
++\notes
++ See the zlib compression library documentation for more information
++ regarding the qualifiers and methods.  Note that this module uses ZLIB as a
++ prefix whereas the underlying library API uses Z, e.g.,
++ \exmp{ZLIB_FIXED} vs \exmp{Z_FIXED}.
++\seealso{zlib_deflate, zlib_inflate_new}
++\done
++
++\function{zlib_inflate}
++\synopsis{Uncompress a string}
++\usage{str = zlib_inflate (zstr)}
++\description
++\qualifiers
++\qualifier{wbits=val}{}
++\example
++\notes
++\seealso{}
++\done
++
++
++\function{zlib_inflate_new}
++\synopsis{Create a zlib inflation object}
++\usage{}
++\description
++\methods
++\method{inflate}{}
++\method{reset}{}
++\method{flush}{}
++\example
++\notes
++\seealso{}
++\done
+diff --git a/src/config.hin b/src/config.hin
+index 1348e89..a23b2cb 100644
+--- a/src/config.hin
++++ b/src/config.hin
+@@ -216,6 +216,7 @@
+  */
+ 
+ #undef HAVE_PCRE_H
++#undef HAVE_PCRE2_H
+ 
+ #undef USE_TERMCAP
+ 
