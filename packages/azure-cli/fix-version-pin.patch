@@ -1,0 +1,18 @@
+--- a/src/azure-cli-core/setup.py	2026-09-03 00:48:38.274565056 +0000
++++ b/src/azure-cli-core/setup.py	2026-09-03 00:48:38.286127708 +0000
+@@ -56,8 +56,13 @@
+     'knack~=0.14.0',
+     'microsoft-security-utilities-secret-masker~=1.0.0b4',
+     'msal-extensions==1.3.1',
+-    'msal[broker]==1.36.0; sys_platform == "win32"',
+-    'msal==1.36.0; sys_platform != "win32"',
++    # msal==1.36.0 caps cryptography<49, but Termux only builds
++    # cryptography 50.0.1 (no aarch64-android wheel exists on PyPI for
++    # any older release either, so pinning down is not an option).
++    # msal 1.38.0 relaxed that cap to cryptography<51 with no other API
++    # changes relevant here, so allow pip to pick it up instead.
++    'msal[broker]>=1.36.0,<1.39; sys_platform == "win32"',
++    'msal>=1.36.0,<1.39; sys_platform != "win32"',
+     'packaging>=20.9',
+     # pkginfo>=1.12.0 reads the spec-defined wheel METADATA / unpacked .dist-info
+     # layout produced by modern wheel/setuptools (no metadata.json). Required so
