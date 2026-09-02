@@ -1,0 +1,15 @@
+--- a/src/sys/lib.rs
++++ b/src/sys/lib.rs
+@@ -2824,7 +2824,11 @@
+             );
+             Ok(())
+         }
+-        #[cfg(not(any(target_os = "macos", target_os = "freebsd")))]
++        #[cfg(target_os = "android")]
++        {
++            fchmodat(Fd::cwd(), path, mode, libc::AT_SYMLINK_NOFOLLOW)
++        }
++        #[cfg(not(any(target_os = "macos", target_os = "freebsd", target_os = "android")))]
+         {
+             const SYS_FCHMODAT2: libc::c_long = 452;
+             loop {

@@ -1,0 +1,14 @@
+--- a/scripts/build/tools.ts
++++ b/scripts/build/tools.ts
+@@ -278,6 +278,11 @@
+ function llvmSearchPaths(os: OS, arch: Arch): string[] {
+   const paths: string[] = [];
+ 
++  if (process.env.OVERRIDE_LLVM_BASE_DIR) {
++    paths.push(`${process.env.OVERRIDE_LLVM_BASE_DIR}/bin`);
++    return paths;
++  }
++
+   if (os === "darwin") {
+     // Try the arch-default prefix first (correct for standard homebrew
+     // installs — /opt/homebrew on Apple Silicon, /usr/local on Intel).
