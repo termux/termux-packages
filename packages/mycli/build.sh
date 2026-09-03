@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
 TERMUX_PKG_VERSION="2.18.5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/dbcli/mycli/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=3fa634dad5fc9284e4c92eb42d6179ca06f4aba97e823fc9e0bafaee058f5af2
 TERMUX_PKG_AUTO_UPDATE=true
@@ -20,5 +21,5 @@ termux_step_make_install() {
 	# GitHub tarballs have no .git dir, so setuptools-scm can't infer the
 	# version on its own; pin it explicitly to TERMUX_PKG_VERSION.
 	export SETUPTOOLS_SCM_PRETEND_VERSION_FOR_MYCLI="$TERMUX_PKG_VERSION"
-	cross-pip install --prefix="$TERMUX_PREFIX" "$TERMUX_PKG_SRCDIR"
+	cross-pip install --no-deps --prefix="$TERMUX_PREFIX" "$TERMUX_PKG_SRCDIR"
 }
