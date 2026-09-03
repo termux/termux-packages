@@ -1,39 +1,37 @@
 --- a/build/moz.configure/rust.configure
 +++ b/build/moz.configure/rust.configure
-@@ -514,17 +514,27 @@
+@@ -524,17 +524,27 @@ def rust_host_triple(rustc, host, rustc_host, rust_supported_targets, arm_target
      assert_rust_compile(host, rustc_target, rustc)
      return rustc_target
  
 +option("--custom-rust-target-triple", nargs=1, help="Customize Rust Target Triple")
-+
+ 
+-@depends(rustc, target, rust_supported_targets, arm_target, when=rust_compiler)
 +@depends("--custom-rust-target-triple")
 +def get_custom_rust_target_triple(custom_rust_target_triple):
 +    if custom_rust_target_triple:
 +        return custom_rust_target_triple[0]
 +    return None
- 
- @depends(
--    rustc, target, c_compiler, rust_supported_targets, arm_target, when=rust_compiler
-+    get_custom_rust_target_triple, rustc, target, c_compiler, rust_supported_targets, arm_target, when=rust_compiler
- )
++
++@depends(get_custom_rust_target_triple, rustc, target, rust_supported_targets, arm_target, when=rust_compiler)
  @checking("for rust target triplet")
- def rust_target_triple(
--    rustc, target, compiler_info, rust_supported_targets, arm_target
-+    custom_rust_target_triple, rustc, target, compiler_info, rust_supported_targets, arm_target
- ):
--    rustc_target = detect_rustc_target(
--        target, compiler_info, arm_target, rust_supported_targets
--    )
+-def rust_target_triple(rustc, target, rust_supported_targets, arm_target):
+-    rustc_target = detect_rustc_target(target, arm_target, rust_supported_targets)
++def rust_target_triple(custom_rust_target_triple, rustc, target, rust_supported_targets, arm_target):
 +    if custom_rust_target_triple:
 +        rustc_target = custom_rust_target_triple
 +    else:
-+        rustc_target = detect_rustc_target(
-+            target, compiler_info, arm_target, rust_supported_targets
-+        )
++        rustc_target = detect_rustc_target(target, arm_target, rust_supported_targets)
      assert_rust_compile(target, rustc_target, rustc)
      return rustc_target
  
-@@ -599,8 +609,6 @@
+ 
+ set_config("RUST_TARGET", rust_target_triple)
+ set_config("RUST_HOST_TARGET", rust_host_triple)
+ 
+ 
+ # This is used for putting source info into symbol files.
+@@ -618,8 +618,6 @@ set_define("MOZ_DEBUG_RUST", debug_rust)
  
  # ==============================================================
  
