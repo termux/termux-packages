@@ -11,9 +11,9 @@
      ]
 --- a/toolkit/library/rust/shared/Cargo.toml
 +++ b/toolkit/library/rust/shared/Cargo.toml
-@@ -113,10 +113,10 @@
+@@ -133,10 +133,10 @@ gecko-trace = { path = "../../../components/gecko-trace" }
  
- libz-rs-sys = { version = "0.4.1", features = ["custom-prefix"], optional = true }
+ sitecategories = { path = "../../../components/sitecategories" }
  
 -[target.'cfg(any(target_os = "android", target_os = "macos", target_os = "ios", all(target_os = "windows", not(target_arch = "aarch64"))))'.dependencies]
 +[target.'cfg(any(target_os = "macos", target_os = "ios", all(target_os = "windows", not(target_arch = "aarch64"))))'.dependencies]
@@ -21,7 +21,7 @@
  
 -[target.'cfg(not(target_os = "android"))'.dependencies]
 +[target.'cfg(target_os = "android")'.dependencies]
- gkrust-uniffi-components = { path = "../../../components/uniffi-bindgen-gecko-js/components/", features = ["xpcom"] }
+ gkrust-uniffi-components = { path = "../../../components/uniffi-bindgen-gecko-js/components/", features = ["xpcom", "mozbuild"] }
  uniffi-bindgen-gecko-js-test-fixtures = { path = "../../../components/uniffi-bindgen-gecko-js/test-fixtures/", optional = true }
  viaduct = "0.1"
 --- a/toolkit/library/rust/shared/lib.rs
