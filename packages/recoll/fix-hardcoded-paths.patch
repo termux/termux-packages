@@ -1,7 +1,7 @@
 --- a/common/rclconfig.cpp
 +++ b/common/rclconfig.cpp
-@@ -1817,7 +1817,7 @@
-             // being used by recollindex instances. So explicitely test for /run/user/$uid, still
+@@ -1827,7 +1827,7 @@
+             // being used by recollindex instances. So explicitly test for /run/user/$uid, still
              // leaving open the remote possibility that XDG_RUNTIME_DIR would be set to something
              // else...
 -            rundir = path_cat("/run/user", std::to_string(getuid()));
@@ -22,37 +22,37 @@
  rfiledir=$HOME/.config/Recoll.org
 --- a/filters/rclkwd
 +++ b/filters/rclkwd
-@@ -90,7 +90,7 @@
- elif test z"$TMPDIR" != z ; then
-    ttdir=$TMPDIR
- else
--   ttdir=/tmp
-+   ttdir=@TERMUX_PREFIX@/tmp
- fi
- tmpdir=$ttdir/rclkwd_tmp$$
- mkdir $tmpdir || exit 1
+@@ -86,7 +86,7 @@
+     elif test z"$TMPDIR" != z ; then
+         ttdir=$TMPDIR
+     else
+-        ttdir=/tmp
++        ttdir=@TERMUX_PREFIX@/tmp
+     fi
+     tmpdir=$ttdir/${progname}_tmp$$
+     mkdir $tmpdir || exit 1
 --- a/filters/rcllyx
 +++ b/filters/rcllyx
-@@ -108,7 +108,7 @@
- elif test z"$TMPDIR" != z ; then
-    ttdir=$TMPDIR
- else
--   ttdir=/tmp
-+   ttdir=@TERMUX_PREFIX@/tmp
- fi
- 
- tmpdir=$ttdir/rcllyx_tmp$$
+@@ -98,7 +98,7 @@
+     elif test z"$TMPDIR" != z ; then
+         ttdir=$TMPDIR
+     else
+-        ttdir=/tmp
++        ttdir=@TERMUX_PREFIX@/tmp
+     fi
+     tmpdir=$ttdir/${progname}_tmp$$
+     mkdir $tmpdir || exit 1
 --- a/filters/rclman
 +++ b/filters/rclman
-@@ -92,7 +92,7 @@
- elif test z"$TMPDIR" != z ; then
-    ttdir=$TMPDIR
- else
--   ttdir=/tmp
-+   ttdir=@TERMUX_PREFIX@/tmp
- fi
- tmpdir=$ttdir/rclman_tmp$$
- mkdir $tmpdir || exit 1
+@@ -88,7 +88,7 @@
+     elif test z"$TMPDIR" != z ; then
+         ttdir=$TMPDIR
+     else
+-        ttdir=/tmp
++        ttdir=@TERMUX_PREFIX@/tmp
+     fi
+     tmpdir=$ttdir/${progname}_tmp$$
+     mkdir $tmpdir || exit 1
 --- a/filters/rclocrcache.py
 +++ b/filters/rclocrcache.py
 @@ -95,7 +95,7 @@

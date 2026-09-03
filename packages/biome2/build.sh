@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://biomejs.dev/
 TERMUX_PKG_DESCRIPTION="A toolchain for web projects, aimed to provide functionalities to maintain them. Biome offers formatter and linter, usable via CLI and LSP"
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.5.11"
+TERMUX_PKG_VERSION="2.5.12"
 TERMUX_PKG_SRCURL=https://github.com/biomejs/biome/archive/refs/tags/@biomejs/biome@${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=e42e795fcde6984adca5f3a27649e90500b69aa78fdfb0973caaf3a2d52eeca3
+TERMUX_PKG_SHA256=4cdbaa79c9ade40d31003e37cfb64402c6f36918edecb1cda16bb6111ad1d9ca
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
