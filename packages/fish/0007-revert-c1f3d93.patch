@@ -40,7 +40,7 @@ error[E0425]: cannot find value `MNT_LOCAL` in crate `libc`
                          DirRemoteness::Remote
                      }
                  } else {
--                    let mut buf = MaybeUninit::uninit();
+-                    let mut buf = std::mem::MaybeUninit::uninit();
 -                    if unsafe { libc::statfs(narrow.as_ptr(), buf.as_mut_ptr()) } < 0 {
 -                        return DirRemoteness::Unknown;
 -                    }
@@ -66,7 +66,7 @@ error[E0425]: cannot find value `MNT_LOCAL` in crate `libc`
 +                        if is_local_flag == 0 {
 +                            return DirRemoteness::Unknown;
 +                        }
-+                        let mut buf = MaybeUninit::uninit();
++                        let mut buf = std::mem::MaybeUninit::uninit();
 +                        if unsafe { (statfn)(path.as_ptr(), buf.as_mut_ptr()) } < 0 {
 +                            return DirRemoteness::Unknown;
 +                        }
