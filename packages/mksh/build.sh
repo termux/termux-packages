@@ -3,12 +3,13 @@ TERMUX_PKG_DESCRIPTION="The MirBSD Korn Shell - an enhanced version of the publi
 TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=59c
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=http://download.openpkg.org/components/cache/mksh/mksh-R${TERMUX_PKG_VERSION}.tgz
 TERMUX_PKG_SHA256=77ae1665a337f1c48c61d6b961db3e52119b38e58884d1c89684af31f87bc506
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
+	export CFLAGS="$CFLAGS -DMKSH_ASSUME_UTF8 -DHAVE_PERSISTENT_HISTORY"
 	sh Build.sh -r
 }
 
