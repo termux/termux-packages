@@ -1,0 +1,11 @@
+--- a/bin/upas/isspam
++++ b/bin/upas/isspam
+@@ -5,7 +5,7 @@ rfork en
+ if (~ $#* 0)
+ 	echo usage: isspam mesg && exit 'usage'
+ 
+-TMP=/tmp/isspam.$USER.$pid
++TMP=@TERMUX_PREFIX@/tmp/isspam.$USER.$pid
+ {
+ 	echo '# hash table'
+ 	msgcat $1|sed '/^$/,$ s/^From / From /'|upas/msgtok|

@@ -1,0 +1,14 @@
+--- a/src/cmd/import.c
++++ b/src/cmd/import.c
+@@ -97,9 +97,9 @@ threadmain(int argc, char *argv[])
+ 		char *dbgfile;
+ 
+ 		if(rem)
+-			dbgfile = smprint("/tmp/%s.export.debug", getuser());
++			dbgfile = smprint("@TERMUX_PREFIX@/tmp/%s.export.debug", getuser());
+ 		else
+-			dbgfile = smprint("/tmp/%s.import.debug", getuser());
++			dbgfile = smprint("@TERMUX_PREFIX@/tmp/%s.import.debug", getuser());
+ 		dfd = create(dbgfile, OWRITE, 0664);
+ 		free(dbgfile);
+ 		fmtinstall('F', fcallfmt);
