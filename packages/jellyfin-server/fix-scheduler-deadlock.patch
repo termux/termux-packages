@@ -1,0 +1,36 @@
+--- a/MediaBrowser.Controller/LibraryTaskScheduler/LimitedConcurrencyLibraryScheduler.cs
++++ b/MediaBrowser.Controller/LibraryTaskScheduler/LimitedConcurrencyLibraryScheduler.cs
+@@ -94,6 +94,11 @@
+                 await item.Key.CancelAsync().ConfigureAwait(false);
+                 _taskRunners.Remove(item.Key);
+             }
++
++            lock (_taskLock)
++            {
++                _cleanupTask = null;
++            }
+         }
+     }
+ 
+@@ -141,7 +146,7 @@
+ 
+     private async Task ItemWorker(object? obj)
+     {
+-        var stopToken = ((CancellationTokenSource TaskStop, CancellationTokenSource GlobalStop))obj!;
++        var stopToken = ((CancellationTokenSource GlobalStop, CancellationTokenSource TaskStop))obj!;
+         _deadlockDetector.Value = stopToken.TaskStop;
+         try
+         {
+@@ -170,7 +175,11 @@
+         {
+             _logger.LogDebug("Cleanup Runner'.");
+             _deadlockDetector.Value = default!;
+-            _taskRunners.Remove(stopToken.TaskStop);
++            lock (_taskLock)
++            {
++                _taskRunners.Remove(stopToken.GlobalStop);
++            }
++
+             stopToken.GlobalStop.Dispose();
+             stopToken.TaskStop.Dispose();
+         }
