@@ -145,6 +145,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_golang.sh"
 # shellcheck source=scripts/build/setup/termux_setup_ldc.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ldc.sh"
 
+# Utility function for nim-using packages to setup a nim toolchain.
+# shellcheck source=scripts/build/setup/termux_setup_nim.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_nim.sh"
+
 # Utility function for setting up no-integrated (GNU Binutils) as.
 # shellcheck source=scripts/build/setup/termux_setup_no_integrated_as.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_no_integrated_as.sh"
