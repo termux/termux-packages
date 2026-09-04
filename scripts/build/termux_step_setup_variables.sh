@@ -14,6 +14,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_WITHOUT_DEPVERSION_BINDING:="false"}"
 	: "${TERMUX_SKIP_DEPCHECK:="false"}"
 	: "${TERMUX_GLOBAL_LIBRARY:="false"}"
+	: "${TERMUX_COPY_TO_SOURCE_MIRROR:="false"}"
 	: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
 	: "${TERMUX_PACMAN_PACKAGE_COMPRESSION:="xz"}"
 
