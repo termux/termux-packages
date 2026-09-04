@@ -3,12 +3,12 @@ TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.8.1"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 # old tarball are removed in https://deb.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SRCURL=https://salsa.debian.org/apt-team/apt/-/archive/${TERMUX_PKG_VERSION}/apt-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_SRCURL="https://salsa.debian.org/apt-team/apt/-/archive/${TERMUX_PKG_VERSION}/apt-${TERMUX_PKG_VERSION}.tar.bz2"
 TERMUX_PKG_SHA256=87ca18392c10822a133b738118505f7d04e0b31ba1122bf5d32911311cb2dc7e
 # apt-key requires utilities from coreutils, findutils, gpgv, grep, sed.
-TERMUX_PKG_DEPENDS="coreutils, dpkg, findutils, gpgv, grep, libandroid-glob, libbz2, libc++, libiconv, libgcrypt, libgnutls, liblz4, liblzma, sed, termux-keyring, termux-licenses, xxhash, zlib, zstd"
+TERMUX_PKG_DEPENDS="coreutils, dpkg, findutils, gpgv, grep, libandroid-glob, libandroid-selinux, libbz2, libc++, libiconv, libgcrypt, libgnutls, liblz4, liblzma, sed, termux-core, termux-keyring, termux-licenses, xxhash, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="docbook-xsl,libdb"
 TERMUX_PKG_CONFLICTS="apt-transport-https, libapt-pkg, unstable-repo, game-repo, science-repo"
 TERMUX_PKG_REPLACES="apt-transport-https, libapt-pkg, unstable-repo, game-repo, science-repo"
@@ -30,6 +30,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DUSE_NLS=OFF
 -DWITH_DOC=OFF
 -DWITH_DOC_MANPAGES=ON
+-DTERMUX_ENV__S_TERMUX=${TERMUX_ENV__S_TERMUX}
 "
 
 # ubuntu uses instead $PREFIX/lib instead of $PREFIX/libexec to
@@ -66,6 +67,24 @@ termux_step_pre_configure() {
 	CXXFLAGS+=" -Wno-c++11-narrowing"
 	# Fix glob() on Android 7.
 	LDFLAGS+=" -Wl,--no-as-needed -landroid-glob"
+	# required by 0010-prevent-usage-as-root-or-process-context-edgecase.patch
+	LDFLAGS+=" -ltermux-core_nos_c_tre -landroid-selinux"
+	cat > "$TERMUX_PKG_TMPDIR/apt-key_selinux_helper.c" <<-'EOF'
+		#include <stdio.h>
+		#include <selinux/selinux.h>
+
+		int main(void) {
+			if (is_selinux_enabled() && security_getenforce()) {
+				printf("enforcing\n");
+			} else {
+				printf("not enforcing\n");
+			}
+			return 0;
+		}
+	EOF
+	mkdir -p "$TERMUX_PREFIX/libexec/termux"
+	"$CC" $CFLAGS $CPPFLAGS $LDFLAGS "$TERMUX_PKG_TMPDIR/apt-key_selinux_helper.c" \
+		-o "$TERMUX_PREFIX/libexec/termux/apt-key_selinux_helper"
 
 	# for manpage build
 	local docbook_xsl_version=$(. $TERMUX_SCRIPTDIR/packages/docbook-xsl/build.sh; echo $TERMUX_PKG_VERSION)
