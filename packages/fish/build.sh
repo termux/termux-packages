@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://fishshell.com/
 TERMUX_PKG_DESCRIPTION="The user-friendly command line shell"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.9.0"
+TERMUX_PKG_VERSION="4.9.1"
 TERMUX_PKG_SRCURL="https://github.com/fish-shell/fish-shell/releases/download/$TERMUX_PKG_VERSION/fish-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=49d86d655cfcc82c7d13d66c6c30a3351600d44b40fb2b6218fbb8fb0e635122
+TERMUX_PKG_SHA256=93400374bfdb73215cae43bdb09c724f1653f439a85dfc1fe2866639046c95f6
 # fish calls 'tput' from ncurses-utils, at least when cancelling (Ctrl+C) a command line.
 # man is needed since fish calls apropos during command completion.
 TERMUX_PKG_DEPENDS="bc, libandroid-support, libc++, mandoc, ncurses, ncurses-utils, pcre2"
