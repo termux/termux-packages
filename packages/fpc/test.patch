@@ -1,0 +1,32 @@
+--- fpcbuild-3.2.2/fpcsrc/rtl/android/Makefile	2020-09-23 15:17:20.000000000 +0530
++++ fpcbuild-3.2.2.mod/fpcsrc/rtl/android/Makefile	2026-09-06 00:58:54.351510898 +0530
+@@ -2491,7 +2491,7 @@
+ ifeq ($(FULL_TARGET),sparc64-linux)
+ override COMPILER_TARGETDIR+=.
+ endif
+-override SHARED_LIBUNITS=$(SYSTEMUNIT) objpas strings dos unix baseunix unixtype unixutil sysutils typinfo math $(CPU_UNITS) getopts errors sockets classes fgl sysconst rtlconsts 
++override SHARED_LIBUNITS=$(SYSTEMUNIT) objpas strings dos unix baseunix unixtype unixutil sysutils typinfo math $(CPU_UNITS) getopts errors sockets classes fgl sysconst rtlconsts
+ ifdef REQUIRE_UNITSDIR
+ override UNITSDIR+=$(REQUIRE_UNITSDIR)
+ endif
+@@ -3719,7 +3719,7 @@
+ SYSCPUDEPS=$(addprefix $(PROCINC)/,$(CPUINCNAMES))
+ SYSDEPS=$(SYSINCDEPS) $(SYSCPUDEPS)
+ ifeq ($(ARCH),i386)
+-  ASTARGET=--32
++  ASTARGET=
+ endif
+ ifeq ($(ARCH),mipsel)
+   ASTARGET=-mips32 -KPIC
+@@ -3730,9 +3730,9 @@
+   CPUBITS=32
+ endif
+ prt0$(OEXT) : prt0.as
+-	$(AS) $(ASTARGET) -o $(UNITTARGETDIRPREFIX)prt0$(OEXT) --defsym CPU$(CPUBITS)=1 prt0.as
++	$(AS) $(ASTARGET) -o $(UNITTARGETDIRPREFIX)prt0$(OEXT) -Wa,--defsym,CPU$(CPUBITS)=1 prt0.as
+ dllprt0$(OEXT) : dllprt0.as
+-	$(AS) $(ASTARGET) -o $(UNITTARGETDIRPREFIX)dllprt0$(OEXT) --defsym CPU$(CPUBITS)=1 dllprt0.as
++	$(AS) $(ASTARGET) -o $(UNITTARGETDIRPREFIX)dllprt0$(OEXT) -Wa,--defsym,CPU$(CPUBITS)=1 dllprt0.as
+ $(SYSTEMUNIT)$(PPUEXT) : $(LINUXINC)/$(SYSTEMUNIT).pp $(SYSDEPS)
+ 	$(COMPILER) $(FPC_SYSTEM_OPT) -Us -Sg $(LINUXINC)/$(SYSTEMUNIT).pp
+ uuchar$(PPUEXT): $(SYSTEMUNIT)$(PPUEXT) $(INC)/uuchar.pp
