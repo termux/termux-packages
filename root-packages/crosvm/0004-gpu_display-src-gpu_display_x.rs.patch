@@ -1,0 +1,59 @@
+--- a/gpu_display/src/gpu_display_x.rs
++++ b/gpu_display/src/gpu_display_x.rs
+@@ -26,13 +26,56 @@ use std::rc::Rc;
+ use base::AsRawDescriptor;
+ use base::RawDescriptor;
+ use base::VolatileSlice;
++#[cfg(not(target_os = "android"))]
+ use libc::shmat;
++#[cfg(not(target_os = "android"))]
+ use libc::shmctl;
++#[cfg(not(target_os = "android"))]
+ use libc::shmdt;
++#[cfg(not(target_os = "android"))]
+ use libc::shmget;
++#[cfg(not(target_os = "android"))]
+ use libc::IPC_CREAT;
++#[cfg(not(target_os = "android"))]
+ use libc::IPC_PRIVATE;
++#[cfg(not(target_os = "android"))]
+ use libc::IPC_RMID;
++#[cfg(target_os = "android")]
++mod reexport_android_modules {
++    pub const IPC_CREAT: libc::c_int = 0o1000;
++    pub const IPC_PRIVATE: libc::key_t = 0;
++    pub const IPC_RMID: libc::c_int = 0;
++    pub type shmatt_t = libc::c_ulong;
++    pub struct ipc_perm {
++        pub __key: libc::key_t,
++        pub uid: libc::uid_t,
++        pub gid: libc::gid_t,
++        pub cuid: libc::uid_t,
++        pub cgid: libc::gid_t,
++        pub mode: libc::c_ushort,
++        pub __seq: libc::c_ushort,
++    }
++    pub struct shmid_ds {
++        pub shm_perm: ipc_perm,
++        pub shm_segsz: libc::size_t,
++        pub shm_atime: libc::time_t,
++        pub shm_dtime: libc::time_t,
++        pub shm_ctime: libc::time_t,
++        pub shm_cpid: libc::pid_t,
++        pub shm_lpid: libc::pid_t,
++        pub shm_nattch: shmatt_t,
++    }
++}
++#[cfg(target_os = "android")]
++pub use reexport_android_modules::*;
++#[cfg(target_os = "android")]
++#[link(name = "android-shmem")]
++unsafe extern "C" {
++    pub fn shmat(shmid: libc::c_int, shmaddr: *const libc::c_void, shmflg: libc::c_int) -> *mut libc::c_void;
++    pub fn shmctl(shmid: libc::c_int, cmd: libc::c_int, buf: *mut shmid_ds) -> libc::c_int;
++    pub fn shmdt(shmaddr: *const libc::c_void) -> libc::c_int;
++    pub fn shmget(key: libc::key_t, size: libc::size_t, shmflg: libc::c_int) -> libc::c_int;
++}
+ use linux_input_sys::virtio_input_event;
+ use vm_control::gpu::DisplayParameters;
+ 
