@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Incredibly fast JavaScript runtime, bundler, test runner
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
 TERMUX_PKG_VERSION="1.4.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/oven-sh/bun
 TERMUX_PKG_GIT_BRANCH="bun-v$TERMUX_PKG_VERSION"
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
@@ -38,10 +39,19 @@ termux_step_make() {
 	bun run build:release \
 		--abi=android \
 		--arch="$_bun_arch" \
-		--android-ndk="$NDK"
+		--android-ndk="$NDK" \
+		--canary=false \
+		--lto=on
 }
 
 termux_step_make_install() {
 	install -Dm755 "$TERMUX_PKG_SRCDIR/build/release/bun" "$TERMUX_PREFIX/bin/bun"
 	ln -sf bun "$TERMUX_PREFIX/bin/bunx"
+
+	install -Dm644 "$TERMUX_PKG_SRCDIR/completions/bun.bash" \
+		"$TERMUX_PREFIX/share/bash-completion/completions/bun"
+	install -Dm644 "$TERMUX_PKG_SRCDIR/completions/bun.zsh" \
+		"$TERMUX_PREFIX/share/zsh/site-functions/_bun"
+	install -Dm644 "$TERMUX_PKG_SRCDIR/completions/bun.fish" \
+		"$TERMUX_PREFIX/share/fish/vendor_completions.d/bun.fish"
 }
