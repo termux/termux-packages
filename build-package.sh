@@ -181,6 +181,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ninja.sh"
 # shellcheck source=scripts/build/setup/termux_setup_nodejs.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_nodejs.sh"
 
+# Utility function to setup Bun JavaScript runtime/package manager
+# shellcheck source=scripts/build/setup/termux_setup_bun.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_bun.sh"
+
 # Utility function to setup a current meson build system.
 # shellcheck source=scripts/build/setup/termux_setup_meson.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_meson.sh"
