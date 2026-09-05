@@ -1,0 +1,20 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/xiaoyeli/superlu
+TERMUX_PKG_DESCRIPTION="Set of subroutines to solve a sparse linear system"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_LICENSE_FILE="License.txt"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="7.0.1"
+TERMUX_PKG_SRCURL="https://github.com/xiaoyeli/superlu/archive/v${TERMUX_PKG_VERSION}/superlu-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=86dcca1e086f8b8079990d07f00eb707fc9ef412cf3b2ce808b37956f0de2cb8
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libopenblas"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DBUILD_SHARED_LIBS=ON
+-DCMAKE_INSTALL_INCLUDEDIR=include/superlu
+-Denable_internal_blaslib=OFF
+-Denable_fortran=OFF
+-Denable_examples=OFF
+-Denable_tests=OFF
+-Denable_doc=OFF
+-DTPL_BLAS_LIBRARIES=$TERMUX_PREFIX/lib/libopenblas.so
+"
