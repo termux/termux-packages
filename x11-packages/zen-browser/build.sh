@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://zen-browser.app
 TERMUX_PKG_DESCRIPTION="Zen is a firefox-based browser with the aim of pushing your productivity to a new level!"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@sabamdarif"
-TERMUX_PKG_VERSION="1.21.16b"
+TERMUX_PKG_VERSION="1.22b"
 TERMUX_PKG_SRCURL="https://github.com/zen-browser/desktop/releases/download/${TERMUX_PKG_VERSION}/zen.source.tar.zst"
-TERMUX_PKG_SHA256=10ea7951000a456eb8ed17756d50a8d0dd840ec1603fc7e6969f749b81a18cf9
+TERMUX_PKG_SHA256=b7e63d24e0ec4cf80bc811e6106eb9f468c5f3847074d10e965ed587cf649a5f
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
