@@ -1,0 +1,47 @@
+--- a/Core/Unix/Linux/CoreLinux.cpp
++++ b/Core/Unix/Linux/CoreLinux.cpp
+@@ -124,7 +124,7 @@
+ 			{
+ 				try
+ 				{
+-					Process::Execute ("dmsetup", dmsetupArgs);
++					Process::Execute ("@TERMUX_PREFIX@/bin/dmsetup", dmsetupArgs);
+ 				}
+ 				catch (ExecutedProcessFailed&)
+ 				{
+@@ -138,7 +138,7 @@
+
+ 						try
+ 						{
+-							Process::Execute ("dmsetup", deferredFallbackArgs);
++							Process::Execute ("@TERMUX_PREFIX@/bin/dmsetup", deferredFallbackArgs);
+ 						}
+ 						catch (ExecutedProcessFailed&)
+ 						{
+@@ -148,7 +148,7 @@
+ 								{
+ 									try
+ 									{
+-										Process::Execute ("dmsetup", fallbackArgs);
++										Process::Execute ("@TERMUX_PREFIX@/bin/dmsetup", fallbackArgs);
+ 										break;
+ 									}
+ 									catch (...)
+@@ -171,7 +171,7 @@
+ 				{
+ 					try
+ 					{
+-						Process::Execute ("dmsetup", dmsetupArgs);
++						Process::Execute ("@TERMUX_PREFIX@/bin/dmsetup", dmsetupArgs);
+ 						break;
+ 					}
+ 					catch (...)
+@@ -387,7 +387,7 @@
+ 				execArgs.push_back ("create");
+ 				execArgs.push_back (nativeDevName.str());
+
+-				Process::Execute ("dmsetup", execArgs, -1, nullptr, &dmCreateArgsBuf);
++				Process::Execute ("@TERMUX_PREFIX@/bin/dmsetup", execArgs, -1, nullptr, &dmCreateArgsBuf);
+
+ 				// Wait for the device to be created
+ 				for (int t = 0; true; t++)
