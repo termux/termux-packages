@@ -1,5 +1,5 @@
 --- fpcbuild-3.2.2/fpcsrc/rtl/android/Makefile	2020-09-23 15:17:20.000000000 +0530
-+++ fpcbuild-3.2.2.mod/fpcsrc/rtl/android/Makefile	2026-09-05 23:25:37.572525931 +0530
++++ fpcbuild-3.2.2.mod/fpcsrc/rtl/android/Makefile	2026-09-06 00:58:54.351510898 +0530
 @@ -2491,7 +2491,7 @@
  ifeq ($(FULL_TARGET),sparc64-linux)
  override COMPILER_TARGETDIR+=.
@@ -9,6 +9,15 @@
  ifdef REQUIRE_UNITSDIR
  override UNITSDIR+=$(REQUIRE_UNITSDIR)
  endif
+@@ -3719,7 +3719,7 @@
+ SYSCPUDEPS=$(addprefix $(PROCINC)/,$(CPUINCNAMES))
+ SYSDEPS=$(SYSINCDEPS) $(SYSCPUDEPS)
+ ifeq ($(ARCH),i386)
+-  ASTARGET=--32
++  ASTARGET=
+ endif
+ ifeq ($(ARCH),mipsel)
+   ASTARGET=-mips32 -KPIC
 @@ -3730,9 +3730,9 @@
    CPUBITS=32
  endif
