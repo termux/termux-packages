@@ -1,0 +1,14 @@
+diff --git a/src/vulkan/wsi/wsi_common_x11.c b/src/vulkan/wsi/wsi_common_x11.c
+index 22ac573cca2..9e0eb25f45f 100644
+--- a/src/vulkan/wsi/wsi_common_x11.c
++++ b/src/vulkan/wsi/wsi_common_x11.c
+@@ -462,7 +462,9 @@ static const VkFormat formats[] = {
+ };
+ 
+ static const VkPresentModeKHR present_modes[] = {
++#ifndef __TERMUX__
+    VK_PRESENT_MODE_IMMEDIATE_KHR,
++#endif
+    VK_PRESENT_MODE_MAILBOX_KHR,
+    VK_PRESENT_MODE_FIFO_KHR,
+    VK_PRESENT_MODE_FIFO_RELAXED_KHR,
