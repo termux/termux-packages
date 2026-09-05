@@ -1,0 +1,214 @@
+#!/bin/bash
+
+CONFIG_FILE="$HOME/.kde-mode.conf"
+
+check_deps() {
+    local missing_pkgs=()
+    
+    command -v startplasma-x11 >/dev/null 2>&1 || missing_pkgs+=("plasma-desktop")
+    command -v termux-x11 >/dev/null 2>&1 || missing_pkgs+=("termux-x11-nightly")
+    command -v dbus-daemon >/dev/null 2>&1 || missing_pkgs+=("dbus")
+    command -v pulseaudio >/dev/null 2>&1 || missing_pkgs+=("pulseaudio")
+    command -v sha256sum >/dev/null 2>&1 || missing_pkgs+=("coreutils")
+
+    if [ ${#missing_pkgs[@]} -ne 0 ]; then
+        echo "Error: Missing required dependencies: ${missing_pkgs[*]}"
+        read -p "Would you like to install missing dependencies now? (y/n) " INSTALL_NOW
+        if [[ "$INSTALL_NOW" =~ ^[Yy]$ ]]; then
+            pkg update && pkg install -y "${missing_pkgs[@]}"
+        else
+            echo "Execution aborted. Please install missing packages manually."
+            exit 1
+        fi
+    fi
+}
+
+run_setup() {
+    check_deps
+    echo "=== KDE Mode Setup ==="
+    read -p "Enter desired KDE username (e.g., usr): " SETUP_USER
+    read -s -p "Enter a new password: " SETUP_PASS
+    echo
+    read -s -p "Confirm password: " SETUP_PASS2
+    echo
+    
+    if [ "$SETUP_PASS" != "$SETUP_PASS2" ]; then
+        echo "Error: Passwords do not match. Setup aborted."
+        return 1
+    fi
+    
+    PASS_HASH=$(echo -n "$SETUP_PASS" | sha256sum | awk '{print $1}')
+    
+    echo "KDE_USER=\"$SETUP_USER\"" > "$CONFIG_FILE"
+    echo "KDE_PASS_HASH=\"$PASS_HASH\"" >> "$CONFIG_FILE"
+    chmod 600 "$CONFIG_FILE"
+    
+    echo "Setup completed successfully!"
+}
+
+authenticate() {
+    if [ "$1" == "--internal-bypass" ]; then
+        return 0
+    fi
+    
+    if [ ! -f "$CONFIG_FILE" ]; then
+        echo "Error: Setup is not completed."
+        return 1
+    fi
+    
+    source "$CONFIG_FILE"
+    read -s -p "${KDE_USER}'s password: " INPUT_PASS
+    echo
+    INPUT_HASH=$(echo -n "$INPUT_PASS" | sha256sum | awk '{print $1}')
+    
+    if [ "$INPUT_HASH" != "$KDE_PASS_HASH" ]; then
+        echo "Access denied: Incorrect password."
+        exit 1
+    fi
+}
+
+case "$1" in
+    setup)
+        if [ -f "$CONFIG_FILE" ]; then
+            authenticate
+            echo "Setup already completed. Please run kde-mode -rerun setup"
+        else
+            run_setup
+        fi
+        ;;
+    "-rerun")
+        if [ "$2" == "setup" ]; then
+            if [ -f "$CONFIG_FILE" ]; then
+                authenticate
+            fi
+            run_setup
+        else
+            echo "Usage: kde-mode -rerun setup"
+        fi
+        ;;
+    start)
+        check_deps
+        if ! pgrep -f "startplasma-x11" > /dev/null; then
+            if [ ! -f "$CONFIG_FILE" ]; then
+                read -p "Setup is not completed. Would you like to run setup now? (y/n) " RUN_NOW
+                if [[ "$RUN_NOW" =~ ^[Yy]$ ]]; then
+                    run_setup || exit 1
+                else
+                    echo "Start aborted. Please run 'kde-mode setup' first."
+                    exit 1
+                fi
+            fi
+
+            authenticate "$2"
+            source "$CONFIG_FILE"
+
+            echo "Starting KDE Plasma as $KDE_USER..."
+            
+            su -c "pkill -9 -f termux-x11" 2>/dev/null || true
+            pkill -9 -f termux-x11 2>/dev/null
+            pkill -9 -f dbus-daemon 2>/dev/null
+            pkill -9 -f pulseaudio 2>/dev/null
+            pkill -9 -f plasmashell 2>/dev/null
+            pkill -9 -f kwin 2>/dev/null
+            sleep 1
+
+            su -c "rm -rf /tmp/.X11-unix /tmp/.X0-lock /tmp/.X1-lock /tmp/dbus-*" 2>/dev/null || true
+            rm -rf /tmp/.X0-lock /tmp/.X11-unix /tmp/dbus-* ~/.config/pulse ~/.pulse /tmp/pulse-* $PREFIX/var/run/dbus/* 2>/dev/null
+
+            export USER="$KDE_USER"
+            export LOGNAME="$KDE_USER"
+
+            export XDG_RUNTIME_DIR="${TMPDIR:-/tmp}/runtime-${USER}"
+            mkdir -p "$XDG_RUNTIME_DIR"
+            chmod 700 "$XDG_RUNTIME_DIR"
+
+            mkdir -p $PREFIX/var/run/dbus
+            dbus-uuidgen --ensure 2>/dev/null || true
+            dbus-daemon --system --fork 2>/dev/null || true
+
+            su -c "pm grant com.termux android.permission.RECORD_AUDIO; appops set com.termux RECORD_AUDIO allow" 2>/dev/null || true
+
+            pulseaudio --start --exit-idle-time=-1 --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" 2>/dev/null || true
+            pactl load-module module-sles-sink >/dev/null 2>&1 || pactl load-module module-aaudio-sink >/dev/null 2>&1 || true
+            export PULSE_SERVER=127.0.0.1
+
+            pactl set-default-sink 0 2>/dev/null || true
+            pactl set-sink-mute 0 0 2>/dev/null || pactl set-sink-mute @DEFAULT_SINK@ 0 2>/dev/null || true
+            pactl set-sink-volume 0 100% 2>/dev/null || pactl set-sink-volume @DEFAULT_SINK@ 100% 2>/dev/null || true
+
+            export DISPLAY=:0
+            export LIBGL_ALWAYS_SOFTWARE=1
+            export GALLIUM_DRIVER=softpipe
+            export QT_QUICK_BACKEND=software
+            export KWIN_COMPOSE=N
+            export QT_XCB_GL_INTEGRATION=none
+
+            export MOZ_ENABLE_WAYLAND=0
+            export MOZ_WEBRENDER=0
+            export MOZ_DISABLE_CONTENT_SANDBOX=1
+
+            termux-x11 :0 &
+            am start -n com.termux.x11/.MainActivity >/dev/null 2>&1 || true
+            sleep 2
+
+            dbus-launch --exit-with-session startplasma-x11
+        else
+            echo "KDE Plasma is already running!"
+            am start -n com.termux.x11/.MainActivity >/dev/null 2>&1 || true
+        fi
+        ;;
+    stop)
+        if [ ! -f "$CONFIG_FILE" ]; then
+            echo "Setup is not completed."
+            exit 1
+        fi
+        if [ "$2" != "--internal-bypass" ]; then
+            read -p "Are you sure you want to stop Plasma? (y/n) " CONFIRM
+            if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
+                echo "Stop aborted."
+                exit 0
+            fi
+            authenticate
+        fi
+        
+        echo "Stopping KDE Plasma..."
+        su -c "pkill -9 -f termux-x11" 2>/dev/null || true
+        pkill -9 -f termux-x11 2>/dev/null
+        pkill -9 -f dbus-daemon 2>/dev/null
+        pkill -9 -f pulseaudio 2>/dev/null
+        pkill -9 -f plasmashell 2>/dev/null
+        pkill -9 -f kwin 2>/dev/null
+        echo "KDE Plasma session terminated."
+        ;;
+    restart)
+        if [ ! -f "$CONFIG_FILE" ]; then
+            echo "Setup is not completed. Please run setup first."
+            exit 1
+        fi
+        authenticate
+        echo "Restarting KDE Plasma..."
+        "$0" stop --internal-bypass
+        sleep 2
+        "$0" start --internal-bypass
+        ;;
+    status)
+        if pgrep -f "startplasma-x11" > /dev/null; then
+            echo "KDE Plasma is currently running."
+        else
+            echo "KDE Plasma is not running."
+        fi
+        ;;
+    *)
+        echo "Usage: 
+        
+        kde-mode setup         Initial setup for username and password (use kde-mode -rerun setup if you want to run setup process again).
+        
+        kde-mode start         Starts Plasma with default params.
+        
+        kde-mode stop          Stops Plasma (confirmation required).
+        
+        kde-mode restart       Stops Plasma and starts it again with default params.
+        
+        kde-mode status        Shows current Plasma state."
+        ;;
+esac
