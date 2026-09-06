@@ -1,0 +1,61 @@
+--- a/src/NzbDrone.Core/MediaFiles/DiskScanService.cs
++++ b/src/NzbDrone.Core/MediaFiles/DiskScanService.cs
+@@ -150,18 +150,51 @@
+             foreach (var file in seriesFiles)
+             {
+                 var path = Path.Combine(series.Path, file.RelativePath);
+-                var fileSize = _diskProvider.GetFileSize(path);
+ 
+-                if (file.Size == fileSize)
++                try
+                 {
+-                    continue;
+-                }
++                    var isDangling = _diskProvider.IsSymbolicLink(path) &&
++                                     new FileInfo(path).ResolveLinkTarget(true) is not { Exists: true };
++
++                    if (!_diskProvider.FileExists(path) || isDangling)
++                    {
++                        if (_diskProvider.IsSymbolicLink(path))
++                        {
++                            _logger.Info("Removing dangling symlink during scan: {0}", path);
++                            _diskProvider.DeleteFile(path);
++                        }
++
++                        _mediaFileService.Delete(file, DeleteMediaFileReason.MissingFromDisk);
++                        continue;
++                    }
++
++                    var fileSize = _diskProvider.GetFileSize(path);
++
++                    if (file.Size == fileSize)
++                    {
++                        continue;
++                    }
+ 
+-                file.Size = fileSize;
++                    file.Size = fileSize;
+ 
+-                if (!_updateMediaInfoService.Update(file, series))
++                    if (!_updateMediaInfoService.Update(file, series))
++                    {
++                        filesToUpdate.Add(file);
++                    }
++                }
++                catch (FileNotFoundException)
++                {
++                    if (_diskProvider.IsSymbolicLink(path))
++                    {
++                        _logger.Info("Removing dangling symlink during scan: {0}", path);
++                        _diskProvider.DeleteFile(path);
++                    }
++
++                    _mediaFileService.Delete(file, DeleteMediaFileReason.MissingFromDisk);
++                }
++                catch (Exception ex)
+                 {
+-                    filesToUpdate.Add(file);
++                    _logger.Error(ex, "Failed to process media file '{0}' during series scan", path);
+                 }
+             }
+ 
