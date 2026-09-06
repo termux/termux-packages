@@ -50,14 +50,14 @@ termux_step_pre_configure() {
 	# Since we have ld of clang before hosts, therefore it fails.
 	export PATH="/usr/bin:${PATH}"
 
-	fpcmake -T "${_ARCH}"-android
+	# fpcmake -T "${_ARCH}"-android
 }
 
 termux_step_make() {
-	cd fpcsrc/ || exit
+	# cd fpcsrc/ || exit
 
-	make crossall $TERMUX_PKG_EXTRA_MAKE_ARGS
-	make install
+	# make all CROSSINSTALL=1 $TERMUX_PKG_EXTRA_MAKE_ARGS INSTALL_PREFIX="$TERMUX_PREFIX"
+	make crossinstall $TERMUX_PKG_EXTRA_MAKE_ARGS INSTALL_PREFIX="$TERMUX_PREFIX"
 
 	# ls "$TERMUX_PREFIX"/man
 

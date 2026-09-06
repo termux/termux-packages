@@ -1,3 +1,8 @@
+# - agarmgas: llvm defaults to unified synatx so enable it by default. do not gate it for thumb2 only.
+# - it can also be fixed by explicitly saying llvm assembler to use divided syntax but since fpc has unified, let's default to that
+# 
+# - Makefile: disables NDK check
+
 --- fpcbuild-3.2.2/fpcsrc/rtl/android/Makefile	2020-09-23 15:17:20.000000000 +0530
 +++ fpcbuild-3.2.2.mod/fpcsrc/rtl/android/Makefile	2026-09-06 00:58:54.351510898 +0530
 @@ -2491,7 +2491,7 @@
@@ -30,3 +35,26 @@
  $(SYSTEMUNIT)$(PPUEXT) : $(LINUXINC)/$(SYSTEMUNIT).pp $(SYSDEPS)
  	$(COMPILER) $(FPC_SYSTEM_OPT) -Us -Sg $(LINUXINC)/$(SYSTEMUNIT).pp
  uuchar$(PPUEXT): $(SYSTEMUNIT)$(PPUEXT) $(INC)/uuchar.pp
+--- fpcbuild-3.2.2/fpcsrc/compiler/arm/agarmgas.pas	2020-09-23 14:49:51.000000000 +0530
++++ fpcbuild-3.2.2.mod/fpcsrc/compiler/arm/agarmgas.pas	2026-09-07 01:13:57.241383501 +0530
+@@ -95,8 +95,7 @@
+       begin
+         inherited;
+         InstrWriter := TArmInstrWriter.create(self);
+-        if GenerateThumb2Code then
+-          TArmInstrWriter(InstrWriter).unified_syntax:=true;
++        TArmInstrWriter(InstrWriter).unified_syntax:=true;
+       end;
+ 
+ 
+--- fpcbuild-3.2.2/Makefile	2021-05-13 17:07:04.000000000 +0530
++++ fpcbuild-3.2.2.mod/Makefile	2026-09-07 02:04:33.764647556 +0530
+@@ -2898,7 +2898,7 @@
+ endif   # spec found
+ endif   # rpm available
+ endif   # inUnix
+-ifeq ($(OS_TARGET),android)
++ifeq ($(OS_TARGET),notandroid)
+ ifneq ($(CPU_TARGET),jvm)
+ ifdef CROSSCOMPILE
+ ifeq ($(NDK),)
