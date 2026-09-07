@@ -1,33 +1,5 @@
-From cf315c2f59829ea70179e2f5342c19c796e7350c Mon Sep 17 00:00:00 2001
-From: Garfield Tan <xutan@google.com>
-Date: Thu, 18 Jun 2020 11:16:13 +0000
-Subject: [PATCH 5/6] samba-documents-provider-sambapatch
-
-https://github.com/google/samba-documents-provider/blob/master/sambapatch.diff
-
-smbd crash fix:
-https://github.com/elliott10/samba-4.5.1
----
- lib/param/loadparm.h               |   1 +
- lib/replace/getifaddrs.c           |   8 +
- lib/replace/netlink_ifaddrs.c      | 271 +++++++++++++++++++++++++++++
- lib/replace/replace.c              |  14 ++
- lib/replace/replace.h              |   5 +
- lib/socket/interfaces.c            |   4 +
- lib/util/util_pw.c                 |   2 -
- librpc/ndr/util.c                  |   2 +-
- nsswitch/libwbclient/wbc_pwd.c     |   5 -
- nsswitch/libwbclient/wbc_sid.c     |   2 +-
- nsswitch/winbind_struct_protocol.h |   4 +
- source3/lib/dumpcore.c             |   2 +-
- source3/lib/username.c             |   2 +
- source3/passdb/passdb.c            |   1 +
- source4/lib/socket/socket.c        |   2 +-
- 15 files changed, 314 insertions(+), 11 deletions(-)
- create mode 100644 lib/replace/netlink_ifaddrs.c
-
 diff --git a/lib/param/loadparm.h b/lib/param/loadparm.h
-index 65ff62c..e15546e 100644
+index a979a8a..2a9bed8 100644
 --- a/lib/param/loadparm.h
 +++ b/lib/param/loadparm.h
 @@ -31,6 +31,7 @@
@@ -349,10 +321,10 @@ index 0000000..4b0456b
 +  }
 +}
 diff --git a/lib/replace/replace.c b/lib/replace/replace.c
-index 99b18e8..d77fa18 100644
+index dd07e6c..80b37eb 100644
 --- a/lib/replace/replace.c
 +++ b/lib/replace/replace.c
-@@ -948,6 +948,20 @@ void rep_setproctitle_init(int argc, char *argv[], char *envp[])
+@@ -1131,6 +1131,20 @@ void rep_setproctitle_init(int argc, char *argv[], char *envp[])
  }
  #endif
  
@@ -370,14 +342,14 @@ index 99b18e8..d77fa18 100644
 +}
 +#endif /* HAVE_SWAB */
 +
- #ifndef HAVE_MEMSET_S
- # ifndef RSIZE_MAX
- #  define RSIZE_MAX (SIZE_MAX >> 1)
+ #ifndef HAVE_MEMSET_EXPLICIT
+ void *rep_memset_explicit(void *block, int c, size_t size)
+ {
 diff --git a/lib/replace/replace.h b/lib/replace/replace.h
-index 3f6b138..1c24ddb 100644
+index d3e1fd9..653468c 100644
 --- a/lib/replace/replace.h
 +++ b/lib/replace/replace.h
-@@ -958,6 +958,11 @@ const char *rep_getprogname(void);
+@@ -1006,6 +1006,11 @@ void rep_setproctitle(const char *fmt, ...) PRINTF_ATTRIBUTE(1, 2);
  void rep_setproctitle_init(int argc, char *argv[], char *envp[]);
  #endif
  
@@ -386,11 +358,11 @@ index 3f6b138..1c24ddb 100644
 +void rep_swab(const void *from, void *to, ssize_t n);
 +#endif
 +
- #ifndef HAVE_MEMSET_S
- #define memset_s rep_memset_s
- int rep_memset_s(void *dest, size_t destsz, int ch, size_t count);
+ #ifndef HAVE_MEMSET_EXPLICIT
+ #define memset_explicit rep_memset_explicit
+ void *rep_memset_explicit(void *block, int c, size_t size);
 diff --git a/lib/socket/interfaces.c b/lib/socket/interfaces.c
-index ac26b97..f5698f6 100644
+index 2426ce2..e73bd1a 100644
 --- a/lib/socket/interfaces.c
 +++ b/lib/socket/interfaces.c
 @@ -126,6 +126,10 @@ void make_net(struct sockaddr_storage *pss_out,
@@ -405,7 +377,7 @@ index ac26b97..f5698f6 100644
  {
  	int ret = 0;
 diff --git a/lib/util/util_pw.c b/lib/util/util_pw.c
-index 8035de4..5d70615 100644
+index 398932a..08f7acf 100644
 --- a/lib/util/util_pw.c
 +++ b/lib/util/util_pw.c
 @@ -37,7 +37,6 @@ struct passwd *tcopy_passwd(TALLOC_CTX *mem_ctx,
@@ -425,7 +397,7 @@ index 8035de4..5d70615 100644
  	ret->pw_shell = talloc_strdup(ret, from->pw_shell);
  
 diff --git a/librpc/ndr/util.c b/librpc/ndr/util.c
-index 0eb7eba..c2a2470 100644
+index 472f44a..2a232f6 100644
 --- a/librpc/ndr/util.c
 +++ b/librpc/ndr/util.c
 @@ -20,8 +20,8 @@
@@ -439,7 +411,7 @@ index 0eb7eba..c2a2470 100644
  
  _PUBLIC_ void ndr_print_sockaddr_storage(struct ndr_print *ndr, const char *name, const struct sockaddr_storage *ss)
 diff --git a/nsswitch/libwbclient/wbc_pwd.c b/nsswitch/libwbclient/wbc_pwd.c
-index 805ab63..8484194 100644
+index 4e83fbf..6f78927 100644
 --- a/nsswitch/libwbclient/wbc_pwd.c
 +++ b/nsswitch/libwbclient/wbc_pwd.c
 @@ -46,7 +46,6 @@ static void wbcPasswdDestructor(void *ptr)
@@ -462,10 +434,10 @@ index 805ab63..8484194 100644
  	if (pw->pw_shell == NULL) {
  		goto fail;
 diff --git a/nsswitch/libwbclient/wbc_sid.c b/nsswitch/libwbclient/wbc_sid.c
-index aab96cf..6fed2d9 100644
+index 50f3f24..c63555c 100644
 --- a/nsswitch/libwbclient/wbc_sid.c
 +++ b/nsswitch/libwbclient/wbc_sid.c
-@@ -1054,7 +1054,7 @@ wbcErr wbcCtxGetDisplayName(struct wbcContext *ctx,
+@@ -1078,7 +1078,7 @@ wbcErr wbcCtxGetDisplayName(struct wbcContext *ctx,
  
  		wbcFreeMemory(name);
  
@@ -475,7 +447,7 @@ index aab96cf..6fed2d9 100644
  		BAIL_ON_PTR_ERROR(name, wbc_status);
  	}
 diff --git a/nsswitch/winbind_struct_protocol.h b/nsswitch/winbind_struct_protocol.h
-index 4a5255c..11fcc4e 100644
+index 269f017..11336a6 100644
 --- a/nsswitch/winbind_struct_protocol.h
 +++ b/nsswitch/winbind_struct_protocol.h
 @@ -23,6 +23,10 @@ typedef char fstring[FSTRING_LEN];
@@ -490,10 +462,10 @@ index 4a5255c..11fcc4e 100644
  
  /* We let the build environment set the public winbindd socket
 diff --git a/source3/lib/dumpcore.c b/source3/lib/dumpcore.c
-index 0c91206..fa7908e 100644
+index 3ed6b89..ee59536 100644
 --- a/source3/lib/dumpcore.c
 +++ b/source3/lib/dumpcore.c
-@@ -319,7 +319,7 @@ void dump_core_setup(const char *progname, const char *log_file)
+@@ -320,7 +320,7 @@ void dump_core_setup(const char *progname, const char *log_file)
  		}
  	}
  
@@ -503,10 +475,10 @@ index 0c91206..fa7908e 100644
  
  #if defined(HAVE_PRCTL) && defined(PR_SET_DUMPABLE)
 diff --git a/source3/lib/username.c b/source3/lib/username.c
-index f69d9c3..3d44129 100644
+index 280285e..5ef953c 100644
 --- a/source3/lib/username.c
 +++ b/source3/lib/username.c
-@@ -157,6 +157,8 @@ static struct passwd *Get_Pwnam_internals(TALLOC_CTX *mem_ctx,
+@@ -158,6 +158,8 @@ static struct passwd *Get_Pwnam_internals(TALLOC_CTX *mem_ctx,
  done:
  	DEBUG(5,("Get_Pwnam_internals %s find user [%s]!\n",ret ?
  		 "did":"didn't", user));
@@ -516,10 +488,10 @@ index f69d9c3..3d44129 100644
  	return ret;
  }
 diff --git a/source3/passdb/passdb.c b/source3/passdb/passdb.c
-index 8ed1baf..a66b646 100644
+index 297c6d0..b59edf4 100644
 --- a/source3/passdb/passdb.c
 +++ b/source3/passdb/passdb.c
-@@ -115,6 +115,7 @@ static int count_commas(const char *str)
+@@ -117,6 +117,7 @@ static int count_commas(const char *str)
  {
  	int num_commas = 0;
  	const char *comma = str;
@@ -528,7 +500,7 @@ index 8ed1baf..a66b646 100644
  	while ((comma = strchr(comma, ',')) != NULL) {
  		comma += 1;
 diff --git a/source4/lib/socket/socket.c b/source4/lib/socket/socket.c
-index d7535bf..d54baa6 100644
+index ef54029..5df402e 100644
 --- a/source4/lib/socket/socket.c
 +++ b/source4/lib/socket/socket.c
 @@ -20,9 +20,9 @@
@@ -542,6 +514,3 @@ index d7535bf..d54baa6 100644
  #include "param/param.h"
  #include "../lib/tsocket/tsocket.h"
  #include "lib/util/util_net.h"
--- 
-2.25.1
-
