@@ -1,0 +1,22 @@
+--- a/pnpm/crates/crypto-hash/Cargo.toml
++++ b/pnpm/crates/crypto-hash/Cargo.toml
+@@ -18,7 +18,7 @@ ssri   = { workspace = true }
+ # Match pnpm-store-dir's MSVC-aware feature gate so this crate
+ # inherits the `asm` backend on every target where it compiles.
+ [target.'cfg(not(target_env = "msvc"))'.dependencies]
+-sha2 = { workspace = true, features = ["asm"] }
++sha2 = { workspace = true }
+ 
+ [dev-dependencies]
+ tempfile = { workspace = true }
+--- a/pnpm/crates/store-dir/Cargo.toml
++++ b/pnpm/crates/store-dir/Cargo.toml
+@@ -42,7 +42,7 @@ url           = { workspace = true }
+ # Non-MSVC Windows (e.g. windows-gnu via mingw) would work, but we
+ # build with MSVC in CI so gate it off there specifically.
+ [target.'cfg(not(target_env = "msvc"))'.dependencies]
+-sha2 = { workspace = true, features = ["asm"] }
++sha2 = { workspace = true }
+ 
+ [dev-dependencies]
+ pipe-trait        = { workspace = true }
