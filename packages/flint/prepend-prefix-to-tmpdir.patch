@@ -1,0 +1,11 @@
+--- a/src/qsieve/factor.c
++++ b/src/qsieve/factor.c
+@@ -234,7 +234,7 @@ void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n,
+     if (qs_inf->siqs == NULL)
+         flint_throw(FLINT_ERROR, "fopen failed\n");
+ #else
+-    strcpy(qs_inf->fname, "/tmp/siqsXXXXXX"); /* must be shorter than fname_alloc_size in init.c */
++    strcpy(qs_inf->fname, "@TERMUX_PREFIX@/tmp/siqsXXXXXX"); /* must be shorter than fname_alloc_size in init.c */
+     fd = mkstemp(qs_inf->fname);
+     if (fd == -1)
+         flint_throw(FLINT_ERROR, "mkstemp failed\n");

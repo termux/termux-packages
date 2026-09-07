@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="C library for doing number theory"
 TERMUX_PKG_LICENSE="LGPL-3.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.6.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/flintlib/flint/releases/download/v$TERMUX_PKG_VERSION/flint-$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=b95e2c7792f5eea4a1c8d2d42c4098434756832e57a094b295eb5dfdc9b4c36b
 TERMUX_PKG_DEPENDS="blas-openblas, libgmp, libmpfr"
