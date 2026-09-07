@@ -1,0 +1,14 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index b8dfdd7..c73750e 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -89,6 +89,9 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
+ 	# Don't use `-read_only_relocs' here as it seems to only work for 32 bits
+ 	# binaries
+ 	set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-bind_at_load")
++endif()
++
++if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin" OR "${CMAKE_SYSTEM_NAME}" STREQUAL "Android")
+ 	# Library for libiconv
+ 	set (LIB ${LIB} iconv)
+ else()
