@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://sourceware.org/elfutils/
 TERMUX_PKG_DESCRIPTION="ELF object file access library"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.193"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="0.196"
 TERMUX_PKG_SRCURL="https://sourceware.org/elfutils/ftp/${TERMUX_PKG_VERSION}/elfutils-${TERMUX_PKG_VERSION}.tar.bz2"
-TERMUX_PKG_SHA256=7857f44b624f4d8d421df851aaae7b1402cfe6bcdd2d8049f15fc07d3dde7635
+TERMUX_PKG_SHA256=fd5cc6b77ad6773cac93cb3f415f9318ac3b3455eecf801f6b4a742c4f6c7209
 # libandroid-support for langinfo.
 TERMUX_PKG_DEPENDS="libandroid-support, zlib, zstd, json-c"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_c99=yes --disable-symbol-versioning"
@@ -29,6 +28,8 @@ termux_step_pre_configure() {
 	CFLAGS+=" -D__USE_BSD"
 
 	CFLAGS+=" -DFNM_EXTMATCH=0"
+
+	CFLAGS+=" -I$TERMUX_PKG_SRCDIR/src"
 
 	if [ "$TERMUX_ARCH" = "arm" ]; then
 		CFLAGS="${CFLAGS/-Oz/-O1}"
