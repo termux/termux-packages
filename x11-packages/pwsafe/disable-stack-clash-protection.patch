@@ -1,0 +1,14 @@
+Fixes:
+clang++: error: argument unused during compilation: '-fstack-clash-protection'
+during build for 32-bit ARM
+
+--- a/CMakeModules/harden/harden-gcc.cmake
++++ b/CMakeModules/harden/harden-gcc.cmake
+@@ -43,7 +43,6 @@ harden_add_compile_definition(_FORTIFY_SOURCE 2 TRUE)
+ harden_add_compile_option(-Wformat HARDEN_COMPILE_WFORMAT FALSE)
+ harden_add_compile_option(-Wformat-security HARDEN_COMPILE_WFORMAT_SECURITY FALSE)
+ harden_add_compile_option(-Werror=format-security HARDEN_COMPILE_WERROR_FORMAT_SECURITY FALSE)
+-harden_add_compile_option(-fstack-clash-protection HARDEN_COMPILE_STACK_CLASH_PROTECTION  FALSE)
+ 
+ option(HARDEN_USE_SAFE_STACK "Enable the SafeStack sanitizer" ON)
+ 

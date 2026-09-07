@@ -1,11 +1,11 @@
 --- a/src/ui/wxWidgets/PWSafeApp.cpp
 +++ b/src/ui/wxWidgets/PWSafeApp.cpp
-@@ -406,8 +406,7 @@ bool PWSafeApp::OnInit()
-       ? selectedLang
-       : wxLANGUAGE_ENGLISH;
+@@ -387,7 +387,7 @@ bool PWSafeApp::OnInit()
+   // Otherwise fall back to English before touching the locale.
+   wxLanguage effectiveLang = ActivateLanguage(selectedLang, true) ? selectedLang : wxLANGUAGE_ENGLISH;
  
--  m_locale->Init(effectiveLang);
-   ActivateLanguage(effectiveLang, false);
+-#ifndef LOCALE_WX322
++#if defined(LOCALE_WX322) && !defined(__ANDROID__)
+   m_PWSLocaleIsSet = m_locale->Init(effectiveLang);
+ #endif
  
-  // Process encryption/decryption command line arguments
-   // Note that this is done after language is set, addressing GH1572
