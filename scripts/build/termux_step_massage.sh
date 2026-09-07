@@ -122,8 +122,6 @@ termux_step_massage() {
 	# Mostly specific to X11-related packages.
 	rm -f ./${ADDING_PREFIX}share/icons/hicolor/icon-theme.cache
 
-	test ! -z "$TERMUX_PKG_RM_AFTER_INSTALL" && rm -Rf $TERMUX_PKG_RM_AFTER_INSTALL
-
 	find . -type d -empty -delete # Remove empty directories
 
 	if [ -d ./${ADDING_PREFIX}share/man ]; then
@@ -141,6 +139,8 @@ termux_step_massage() {
 			ln -s $_link_value.gz $file.gz
 		done < <(find ./${ADDING_PREFIX}share/man -type l ! -iname \*.gz -print0)
 	fi
+
+	test ! -z "$TERMUX_PKG_RM_AFTER_INSTALL" && rm -Rf $TERMUX_PKG_RM_AFTER_INSTALL
 
 	# Remove python-glibc package files that are created
 	# due to its launch during package compilation.
