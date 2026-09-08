@@ -3,8 +3,7 @@ TERMUX_PKG_DESCRIPTION="A standalone runtime for WebAssembly"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="46.0.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="48.0.1"
 TERMUX_PKG_SRCURL=git+https://github.com/bytecodealliance/wasmtime
 TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION}"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -39,21 +38,6 @@ termux_pkg_auto_update() {
 
 termux_step_pre_configure() {
 	termux_setup_rust
-
-	cargo vendor
-	find ./vendor \
-		-mindepth 1 -maxdepth 1 -type d \
-		! -wholename ./vendor/listenfd \
-		-exec rm -rf '{}' \;
-
-	local patch="$TERMUX_PKG_BUILDER_DIR/listenfd-32-bit-android.diff"
-	local dir="vendor/listenfd"
-	echo "Applying patch: $patch"
-	patch -p1 -d "$dir" < "${patch}"
-
-	echo "" >> Cargo.toml
-	echo '[patch.crates-io]' >> Cargo.toml
-	echo 'listenfd = { path = "./vendor/listenfd" }' >> Cargo.toml
 }
 
 termux_step_make() {
