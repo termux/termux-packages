@@ -1,0 +1,20 @@
+--- a/src/freedreno/vulkan/meson.build
++++ b/src/freedreno/vulkan/meson.build
+@@ -176,7 +176,7 @@ tu_cpp_args += cpp.get_supported_arguments([
+ ])
+ 
+ libvulkan_freedreno = shared_library(
+-  'vulkan_freedreno',
++  'vulkan_freedreno_surfaceflinger',
+   [libtu_files, tu_entrypoints, tu_tracepoints, freedreno_xml_header_files, sha1_h, u_format_pack_h, bvh_spv],
+   include_directories : libtu_includes,
+   link_with : [
+@@ -237,7 +237,7 @@ freedreno_icd = custom_target(
+   build_by_default : true,
+   install_dir : with_vulkan_icd_dir,
+   install_tag : 'runtime',
+-  install : true,
++  install : false,
+ )
+ 
+ _dev_icdname = 'freedreno_devenv_icd.@0@.json'.format(host_machine.cpu())
