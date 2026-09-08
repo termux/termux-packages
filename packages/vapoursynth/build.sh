@@ -1,15 +1,12 @@
-TERMUX_PKG_HOMEPAGE=https://www.vapoursynth.com/
+TERMUX_PKG_HOMEPAGE="https://www.vapoursynth.com/"
 TERMUX_PKG_DESCRIPTION="Video processing framework with simplicity in mind"
 TERMUX_PKG_LICENSE="LGPL-2.1-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="73"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="79"
 TERMUX_PKG_SRCURL="https://github.com/vapoursynth/vapoursynth/archive/refs/tags/R${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=1bb8ffe31348eaf46d8f541b138f0136d10edaef0c130c1e5a13aa4a4b057280
+TERMUX_PKG_SHA256="cb7ea3c75431176f8ce1f466e1c1fff7ffdacdd2d397be8fabc2d467194ab5a6"
 TERMUX_PKG_DEPENDS="libzimg, python"
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="Cython"
-TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --disable-x86-asm"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP='R\d{2}(?!-)'
 
@@ -29,6 +26,4 @@ termux_step_pre_configure() {
 
 	LDFLAGS+=" -L$_libgcc_path -l:$_libgcc_name"
 	LDFLAGS+=" -Wl,-rpath=$TERMUX_PREFIX/lib/vapoursynth"
-
-	./autogen.sh
 }
