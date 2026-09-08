@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A fork of Overseerr with focus on adding support for Jel
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.4.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/seerr-team/seerr/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=38bb1f2c90ea648a327244352d5b4b13b19526e384655be8779bbfe7f6a8f447
 TERMUX_PKG_REVISION=1
@@ -14,11 +15,6 @@ TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 # while other background services are actively writing logs (system-level bug #30401)
 # TERMUX_PKG_RM_AFTER_INSTALL="var/log"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_SERVICE_SCRIPT=(
-	"seerr"
-	"exec ${TERMUX_PREFIX}/bin/seerr 2>&1"
-)
-
 termux_step_pre_configure() {
 	termux_setup_nodejs
 
@@ -156,4 +152,12 @@ termux_step_make_install() {
 		exec node dist/index.js "\$@"
 	HERE
 	chmod u+x "${TERMUX_PREFIX}/bin/seerr"
+}
+
+termux_step_post_make_install() {
+	# Setup termux-services scripts
+	mkdir -p "$TERMUX_PREFIX/var/service/seerr/log"
+	ln -sf "$TERMUX_PREFIX/share/termux-services/svlogger" "$TERMUX_PREFIX/var/service/seerr/log/run"
+	sed "s%@TERMUX_PREFIX@%$TERMUX_PREFIX%g" "$TERMUX_PKG_BUILDER_DIR/sv/seerr.run.in" >"$TERMUX_PREFIX/var/service/seerr/run"
+	chmod 700 "$TERMUX_PREFIX/var/service/seerr/run"
 }
