@@ -1,76 +1,8 @@
-diff --git a/src/system/packages/brew/cask.rs b/src/system/packages/brew/cask.rs
-index eba9609..72fb85f 100644
---- a/src/system/packages/brew/cask.rs
-+++ b/src/system/packages/brew/cask.rs
-@@ -1926,9 +1926,14 @@ fn copy_cask_artifact_at<Fd: std::os::fd::AsFd>(
-     use std::os::unix::fs::PermissionsExt;
- 
-     let metadata = from.symlink_metadata()?;
-+    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
-     let mode = nix::sys::stat::Mode::from_bits_truncate(
-         metadata.permissions().mode() as nix::libc::mode_t
-     );
-+    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
-+    let mode = nix::sys::stat::Mode::from_bits_truncate(
-+        metadata.permissions().mode() as u16
-+    );
-     if metadata.file_type().is_symlink() {
-         nix::unistd::symlinkat(&std::fs::read_link(from)?, parent, name)?;
-     } else if metadata.is_dir() {
-@@ -2004,7 +2009,10 @@ fn remove_all_at<Fd: std::os::fd::AsFd>(parent: Fd, name: &std::ffi::OsStr) -> R
-             Err(nix::errno::Errno::ENOENT) => return Ok(()),
-             Err(err) => return Err(err.into()),
-         };
-+    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
-     let kind = nix::sys::stat::SFlag::from_bits_truncate(stat.st_mode);
-+    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
-+    let kind = nix::sys::stat::SFlag::from_bits_truncate(stat.st_mode as u16);
-     if kind.contains(nix::sys::stat::SFlag::S_IFDIR) {
-         let fd = nix::fcntl::openat(
-             &parent,
-@@ -2207,6 +2215,7 @@ fn open_trusted_directory(
-             || current_groups.contains(&stat.st_gid);
-         let writable_by_untrusted = stat.st_mode & 0o002 != 0
-             || (stat.st_mode & 0o020 != 0 && (!allow_current_user || !trusted_group));
-+        #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
-         if !SFlag::from_bits_truncate(stat.st_mode).contains(SFlag::S_IFDIR)
-             || !trusted_owner
-             || writable_by_untrusted
-@@ -2216,6 +2225,16 @@ fn open_trusted_directory(
-                 directory.display()
-             );
-         }
-+        #[cfg(all(target_os = "android", target_pointer_width = "32"))]
-+        if !SFlag::from_bits_truncate(stat.st_mode as u16).contains(SFlag::S_IFDIR)
-+            || !trusted_owner
-+            || writable_by_untrusted
-+        {
-+            bail!(
-+                "brew-cask: refusing operation through untrusted directory {}",
-+                directory.display()
-+            );
-+        }
-         Ok(())
-     };
-     let mut directory = resolved_root.to_path_buf();
-@@ -2611,9 +2630,14 @@ fn ditto_into<Fd: std::os::fd::AsFd>(from: &Path, dir: Fd, name: &std::ffi::OsSt
-     // Restore the bundle's own permissions, which the private staging mode hid.
-     if let Ok(metadata) = from.symlink_metadata() {
-         use std::os::unix::fs::PermissionsExt;
-+        #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
-         let mode = nix::sys::stat::Mode::from_bits_truncate(
-             metadata.permissions().mode() as nix::libc::mode_t
-         );
-+        #[cfg(all(target_os = "android", target_pointer_width = "32"))]
-+        let mode = nix::sys::stat::Mode::from_bits_truncate(
-+            metadata.permissions().mode() as u16
-+        );
-         nix::sys::stat::fchmod(&destination, mode)?;
-     }
-     Ok(())
+diff --git a/src/system/managed_files.rs b/src/system/managed_files.rs
+index c2076c0..225b14a 100644
 --- a/src/system/managed_files.rs
 +++ b/src/system/managed_files.rs
-@@ -1599,9 +1599,15 @@ fn open_or_create_directory_tree_inner(
+@@ -1604,9 +1604,15 @@ fn open_or_create_directory_tree_inner(
              Ok(directory) => directory,
              Err(open_error) => {
                  let metadata = fstatat(&directory, name.as_os_str(), AtFlags::AT_SYMLINK_NOFOLLOW);
@@ -88,3 +20,92 @@ index eba9609..72fb85f 100644
                      let parent = fstat(&directory)?;
                      if parent.st_uid != 0 || parent.st_mode & 0o022 != 0 {
                          bail!(
+diff --git a/src/system/packages/brew/cask/app_version.rs b/src/system/packages/brew/cask/app_version.rs
+index ec63887..539fa68 100644
+--- a/src/system/packages/brew/cask/app_version.rs
++++ b/src/system/packages/brew/cask/app_version.rs
+@@ -56,7 +56,11 @@ pub(super) fn read_app_version(app: &Path) -> Result<AppVersion> {
+         OFlag::O_RDONLY | OFlag::O_NOFOLLOW | OFlag::O_NONBLOCK,
+         Mode::empty(),
+     )?;
+-    if SFlag::from_bits_truncate(fstat(&fd)?.st_mode) & SFlag::S_IFMT != SFlag::S_IFREG {
++    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
++    let st_mode = fstat(&fd)?.st_mode;
++    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++    let st_mode = fstat(&fd)?.st_mode as u16;
++    if SFlag::from_bits_truncate(st_mode) & SFlag::S_IFMT != SFlag::S_IFREG {
+         bail!("app Info.plist must be a regular file");
+     }
+     let plist = plist::Value::from_reader(std::fs::File::from(fd))?;
+diff --git a/src/system/packages/brew/cask/mod.rs b/src/system/packages/brew/cask/mod.rs
+index 2b89e18..0637114 100644
+--- a/src/system/packages/brew/cask/mod.rs
++++ b/src/system/packages/brew/cask/mod.rs
+@@ -1788,9 +1788,14 @@ fn copy_cask_artifact_at<Fd: std::os::fd::AsFd>(
+     use std::os::unix::fs::PermissionsExt;
+ 
+     let metadata = from.symlink_metadata()?;
++    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+     let mode = nix::sys::stat::Mode::from_bits_truncate(
+         metadata.permissions().mode() as nix::libc::mode_t
+     );
++    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++    let mode = nix::sys::stat::Mode::from_bits_truncate(
++        metadata.permissions().mode() as u16
++    );
+     if metadata.file_type().is_symlink() {
+         nix::unistd::symlinkat(&std::fs::read_link(from)?, parent, name)?;
+     } else if metadata.is_dir() {
+@@ -1859,7 +1864,10 @@ fn remove_all_at<Fd: std::os::fd::AsFd>(parent: Fd, name: &std::ffi::OsStr) -> R
+             Err(nix::errno::Errno::ENOENT) => return Ok(()),
+             Err(err) => return Err(err.into()),
+         };
++    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+     let kind = nix::sys::stat::SFlag::from_bits_truncate(stat.st_mode);
++    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++    let kind = nix::sys::stat::SFlag::from_bits_truncate(stat.st_mode as u16);
+     if kind.contains(nix::sys::stat::SFlag::S_IFDIR) {
+         let fd = open_dir_nofollow_at(&parent, name)?;
+         let mut directory = nix::dir::Dir::from_fd(fd)?;
+@@ -2055,6 +2063,7 @@ fn open_trusted_directory(
+             || current_groups.contains(&stat.st_gid);
+         let writable_by_untrusted = stat.st_mode & 0o002 != 0
+             || (stat.st_mode & 0o020 != 0 && (!allow_current_user || !trusted_group));
++        #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+         if !SFlag::from_bits_truncate(stat.st_mode).contains(SFlag::S_IFDIR)
+             || !trusted_owner
+             || writable_by_untrusted
+@@ -2064,6 +2073,17 @@ fn open_trusted_directory(
+                 directory.display()
+             );
+         }
++
++        #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++        if !SFlag::from_bits_truncate(stat.st_mode as u16).contains(SFlag::S_IFDIR)
++            || !trusted_owner
++            || writable_by_untrusted
++        {
++            bail!(
++                "brew-cask: refusing operation through untrusted directory {}",
++                directory.display()
++            );
++        }
+         Ok(())
+     };
+     let mut directory = resolved_root.to_path_buf();
+@@ -2447,9 +2467,14 @@ fn ditto_into<Fd: std::os::fd::AsFd>(from: &Path, dir: Fd, name: &std::ffi::OsSt
+     // Restore the bundle's own permissions, which the private staging mode hid.
+     if let Ok(metadata) = from.symlink_metadata() {
+         use std::os::unix::fs::PermissionsExt;
++        #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+         let mode = nix::sys::stat::Mode::from_bits_truncate(
+             metadata.permissions().mode() as nix::libc::mode_t
+         );
++        #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++        let mode = nix::sys::stat::Mode::from_bits_truncate(
++            metadata.permissions().mode() as u16
++        );
+         nix::sys::stat::fchmod(&destination, mode)?;
+     }
+     Ok(())
+
