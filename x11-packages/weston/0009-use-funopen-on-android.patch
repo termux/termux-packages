@@ -1,0 +1,51 @@
+diff --git a/libweston/weston-log.c b/libweston/weston-log.c
+index 7601c84..782cbb5 100644
+--- a/libweston/weston-log.c
++++ b/libweston/weston-log.c
+@@ -587,6 +587,14 @@ input_stream_write(void *cookie, const char *buf, size_t size)
+ 	return size;
+ }
+ 
++#ifdef __ANDROID__
++static int
++input_stream_write_android(void *cookie, const char *buf, int size)
++{
++	return input_stream_write(cookie, buf, (size_t)size);
++}
++#endif
++
+ static int
+ input_stream_close(void *cookie)
+ {
+@@ -653,10 +661,6 @@ weston_log_ctx_add_log_scope(struct weston_log_context *log_ctx,
+ {
+ 	struct weston_log_scope *scope;
+ 	struct weston_log_subscription *pending_sub = NULL;
+-	const cookie_io_functions_t input_stream_io_funcs = {
+-		.write = input_stream_write,
+-		.close = input_stream_close,
+-	};
+ 
+ 	if (!name || !description) {
+ 		fprintf(stderr, "Error: cannot add a debug scope without name or description.\n");
+@@ -689,7 +693,20 @@ weston_log_ctx_add_log_scope(struct weston_log_context *log_ctx,
+ 	scope->user_data = user_data;
+ 	wl_list_init(&scope->subscription_list);
+ 
++#ifdef __ANDROID__
++	scope->input_stream = funopen(scope,
++				      NULL,
++				      input_stream_write_android,
++				      NULL,
++				      input_stream_close);
++#else
++	const cookie_io_functions_t input_stream_io_funcs = {
++		.write = input_stream_write,
++		.close = input_stream_close,
++	};
++
+ 	scope->input_stream = fopencookie(scope, "w", input_stream_io_funcs);
++#endif
+ 
+ 	if (!scope->name || !scope->desc || !scope->input_stream) {
+ 		fprintf(stderr, "Error adding debug scope '%s': out of memory or cookie.\n",
