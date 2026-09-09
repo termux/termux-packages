@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://wasmtime.dev/
 TERMUX_PKG_DESCRIPTION="A standalone runtime for WebAssembly"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="48.0.1"
 TERMUX_PKG_SRCURL=git+https://github.com/bytecodealliance/wasmtime
@@ -14,7 +13,7 @@ termux_pkg_auto_update() {
 	local api_url="https://api.github.com/repos/bytecodealliance/wasmtime/git/refs/tags"
 	local api_url_r=$(curl -s "${api_url}")
 	local r1=$(echo "${api_url_r}" | jq .[].ref | sed -ne "s|.*/\(v.*\)\"|\1|p")
-	local latest_version=$(echo "${r1}" | sed -nE 's|(^v[0-9]+)|\1|p' | sort -V | tail -n1)
+	local latest_version=$(echo "${r1}" | sed -nE 's|^(v[0-9]+\.[0-9]+\.[0-9]+)$|\1|p' | sort -V | tail -n1)
 	if [[ "${latest_version}" == "v${TERMUX_PKG_VERSION}" ]]; then
 		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
 		return
