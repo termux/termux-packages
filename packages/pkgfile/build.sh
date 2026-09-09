@@ -3,11 +3,12 @@ TERMUX_PKG_DESCRIPTION="An alpm .files metadata explorer"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26"
-TERMUX_PKG_SRCURL=https://github.com/falconindy/pkgfile/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL="https://github.com/falconindy/pkgfile/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=8c6c558ebec32a6d40ba90a18a06328e382c0639879ae02dd83dfa03a5d51988
+TERMUX_PKG_DEPENDS="libandroid-glob, libandroid-utimes, libarchive, libcurl, pcre2"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
-TERMUX_PKG_DEPENDS="libandroid-glob, libandroid-utimes, libarchive, libcurl, pcre"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dsystemd_units=false
 "
