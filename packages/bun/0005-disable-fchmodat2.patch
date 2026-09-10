@@ -1,13 +1,17 @@
 --- a/src/sys/lib.rs
 +++ b/src/sys/lib.rs
-@@ -2824,7 +2824,11 @@
+@@ -2824,7 +2824,15 @@
              );
              Ok(())
          }
 -        #[cfg(not(any(target_os = "macos", target_os = "freebsd")))]
 +        #[cfg(target_os = "android")]
 +        {
-+            fchmodat(Fd::cwd(), path, mode, libc::AT_SYMLINK_NOFOLLOW)
++            let st = lstat(path)?;
++            if (st.st_mode as u32 & libc::S_IFMT as u32) == libc::S_IFLNK as u32 {
++                return Err(Error::from_code_int(libc::EOPNOTSUPP, Tag::lchmod).with_path(path.as_bytes()));
++            }
++            fchmodat(Fd::cwd(), path, mode, 0)
 +        }
 +        #[cfg(not(any(target_os = "macos", target_os = "freebsd", target_os = "android")))]
          {
