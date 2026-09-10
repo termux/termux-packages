@@ -2,10 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://pnpm.io
 TERMUX_PKG_DESCRIPTION="Fast, disk space efficient package manager for JavaScript"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="12.3.4"
+TERMUX_PKG_VERSION="12.4.1"
 TERMUX_PKG_SRCURL="https://github.com/pnpm/pnpm/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=4f400669b36259278efe44278e4adfc7f449fbccb4c255670c66332a7a792aa1
+TERMUX_PKG_SHA256=7388d1fe40ff2862d97645d4f5fca9f4a2459ac534c005d990717298aeacef6b
 TERMUX_PKG_DEPENDS="git, nodejs | nodejs-lts"
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
@@ -49,4 +50,7 @@ termux_step_post_make_install() {
 	# cargo install also drops a .crates.toml/.crates2.json receipt in
 	# $TERMUX_PREFIX - not wanted in the package.
 	rm -f "${TERMUX_PREFIX}/.crates.toml" "${TERMUX_PREFIX}/.crates2.json"
+
+	# Create symlink for pnpx pointing to pnpm
+	ln -sf pnpm "${TERMUX_PREFIX}/bin/pnpx"
 }
