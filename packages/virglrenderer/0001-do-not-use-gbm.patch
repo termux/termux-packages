@@ -1,0 +1,437 @@
+diff --git a/src/mesa/meson.build b/src/mesa/meson.build
+--- a/src/mesa/meson.build
++++ b/src/mesa/meson.build
+@@ -24,6 +24,16 @@
+   thread_dep,
+ ]
+ 
++if have_egl
++   files_mesa += files('util/vrend_winsys_shim.c')
++   # Headers only: gbm_*/drm* symbols in this file are resolved at
++   # runtime, never linked against libgbm.so/libdrm.so directly.
++   deps_mesa += [
++      gbm_dep.partial_dependency(compile_args: true, includes: true),
++      libdrm_dep.partial_dependency(compile_args: true, includes: true),
++   ]
++endif
++
+ libmesa = static_library(
+   'mesa',
+   files_mesa,
+diff --git a/src/mesa/util/vrend_winsys_shim.c b/src/mesa/util/vrend_winsys_shim.c
+--- a/src/mesa/util/vrend_winsys_shim.c
++++ b/src/mesa/util/vrend_winsys_shim.c
+@@ -0,0 +1,372 @@
++/*
++ * SPDX-License-Identifier: MIT
++ *
++ * Termux's own libgbm.so/libdrm.so are never linked against directly, so
++ * that the executable carries no DT_NEEDED/DT_RUNPATH for them (see
++ * vrend_mode.h). Every real GBM/DRM entry point used by this codebase
++ * (all of it confined to the GBM winsys/venus paths) is instead resolved
++ * once via dlopen()+dlsym() from an explicit absolute path, and skipped
++ * entirely in Android/ANGLE mode, where GBM is simply unavailable.
++ */
++
++#include "vrend_mode.h"
++
++#include <dlfcn.h>
++#include <gbm.h>
++#include <pthread.h>
++#include <stdio.h>
++#include <xf86drm.h>
++
++#ifndef TERMUX_PREFIX
++#error "TERMUX_PREFIX must be defined"
++#endif
++
++static int (*p_gbm_device_get_fd)(struct gbm_device *);
++static const char *(*p_gbm_device_get_backend_name)(struct gbm_device *);
++static int (*p_gbm_device_is_format_supported)(struct gbm_device *, uint32_t, uint32_t);
++static void (*p_gbm_device_destroy)(struct gbm_device *);
++static struct gbm_device *(*p_gbm_create_device)(int);
++static struct gbm_bo *(*p_gbm_bo_create)(struct gbm_device *, uint32_t, uint32_t, uint32_t,
++                                          uint32_t);
++static void *(*p_gbm_bo_map)(struct gbm_bo *, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t,
++                              uint32_t *, void **);
++static void (*p_gbm_bo_unmap)(struct gbm_bo *, void *);
++static uint32_t (*p_gbm_bo_get_width)(struct gbm_bo *);
++static uint32_t (*p_gbm_bo_get_height)(struct gbm_bo *);
++static uint32_t (*p_gbm_bo_get_stride_for_plane)(struct gbm_bo *, int);
++static uint32_t (*p_gbm_bo_get_format)(struct gbm_bo *);
++static uint32_t (*p_gbm_bo_get_offset)(struct gbm_bo *, int);
++static struct gbm_device *(*p_gbm_bo_get_device)(struct gbm_bo *);
++static union gbm_bo_handle (*p_gbm_bo_get_handle)(struct gbm_bo *);
++static int (*p_gbm_bo_get_fd)(struct gbm_bo *);
++static uint64_t (*p_gbm_bo_get_modifier)(struct gbm_bo *);
++static int (*p_gbm_bo_get_plane_count)(struct gbm_bo *);
++static union gbm_bo_handle (*p_gbm_bo_get_handle_for_plane)(struct gbm_bo *, int);
++static int (*p_gbm_bo_get_fd_for_plane)(struct gbm_bo *, int);
++static void (*p_gbm_bo_destroy)(struct gbm_bo *);
++
++static drmVersionPtr (*p_drmGetVersion)(int);
++static void (*p_drmFreeVersion)(drmVersionPtr);
++static int (*p_drmPrimeHandleToFD)(int, uint32_t, uint32_t, int *);
++
++static pthread_once_t gbm_shim_once = PTHREAD_ONCE_INIT;
++
++static void
++gbm_shim_load(void)
++{
++   if (g_vrend_android_mode)
++      return;
++
++   void *gbm_handle = dlopen(TERMUX_PREFIX "/lib/libgbm.so", RTLD_NOW | RTLD_LOCAL);
++   if (!gbm_handle)
++      fprintf(stderr, "vrend: gbm: dlopen failed: %s\n", dlerror());
++
++   void *drm_handle = dlopen(TERMUX_PREFIX "/lib/libdrm.so", RTLD_NOW | RTLD_LOCAL);
++   if (!drm_handle)
++      fprintf(stderr, "vrend: drm: dlopen failed: %s\n", dlerror());
++
++   /* ISO C forbids conversion of object pointer to function pointer type. */
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wpedantic"
++#define GBM_LOAD(sym) p_##sym = gbm_handle ? dlsym(gbm_handle, #sym) : NULL
++   GBM_LOAD(gbm_device_get_fd);
++   GBM_LOAD(gbm_device_get_backend_name);
++   GBM_LOAD(gbm_device_is_format_supported);
++   GBM_LOAD(gbm_device_destroy);
++   GBM_LOAD(gbm_create_device);
++   GBM_LOAD(gbm_bo_create);
++   GBM_LOAD(gbm_bo_map);
++   GBM_LOAD(gbm_bo_unmap);
++   GBM_LOAD(gbm_bo_get_width);
++   GBM_LOAD(gbm_bo_get_height);
++   GBM_LOAD(gbm_bo_get_stride_for_plane);
++   GBM_LOAD(gbm_bo_get_format);
++   GBM_LOAD(gbm_bo_get_offset);
++   GBM_LOAD(gbm_bo_get_device);
++   GBM_LOAD(gbm_bo_get_handle);
++   GBM_LOAD(gbm_bo_get_fd);
++   GBM_LOAD(gbm_bo_get_modifier);
++   GBM_LOAD(gbm_bo_get_plane_count);
++   GBM_LOAD(gbm_bo_get_handle_for_plane);
++   GBM_LOAD(gbm_bo_get_fd_for_plane);
++   GBM_LOAD(gbm_bo_destroy);
++#undef GBM_LOAD
++#define DRM_LOAD(sym) p_##sym = drm_handle ? dlsym(drm_handle, #sym) : NULL
++   DRM_LOAD(drmGetVersion);
++   DRM_LOAD(drmFreeVersion);
++   DRM_LOAD(drmPrimeHandleToFD);
++#undef DRM_LOAD
++#pragma GCC diagnostic pop
++}
++
++static void
++gbm_shim_fixme(const char *name)
++{
++   fprintf(stderr, "vrend: fixme: gbm unavailable, %s not resolved\n", name);
++}
++
++int
++gbm_device_get_fd(struct gbm_device *gbm)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_gbm_device_get_fd) {
++      gbm_shim_fixme("gbm_device_get_fd");
++      return -1;
++   }
++   return p_gbm_device_get_fd(gbm);
++}
++
++const char *
++gbm_device_get_backend_name(struct gbm_device *gbm)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_gbm_device_get_backend_name) {
++      gbm_shim_fixme("gbm_device_get_backend_name");
++      return NULL;
++   }
++   return p_gbm_device_get_backend_name(gbm);
++}
++
++int
++gbm_device_is_format_supported(struct gbm_device *gbm, uint32_t format, uint32_t flags)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_gbm_device_is_format_supported) {
++      gbm_shim_fixme("gbm_device_is_format_supported");
++      return 0;
++   }
++   return p_gbm_device_is_format_supported(gbm, format, flags);
++}
++
++void
++gbm_device_destroy(struct gbm_device *gbm)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_gbm_device_destroy) {
++      gbm_shim_fixme("gbm_device_destroy");
++      return;
++   }
++   p_gbm_device_destroy(gbm);
++}
++
++struct gbm_device *
++gbm_create_device(int fd)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_gbm_create_device) {
++      gbm_shim_fixme("gbm_create_device");
++      return NULL;
++   }
++   return p_gbm_create_device(fd);
++}
++
++struct gbm_bo *
++gbm_bo_create(struct gbm_device *gbm, uint32_t width, uint32_t height, uint32_t format,
++              uint32_t flags)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_gbm_bo_create) {
++      gbm_shim_fixme("gbm_bo_create");
++      return NULL;
++   }
++   return p_gbm_bo_create(gbm, width, height, format, flags);
++}
++
++void *
++gbm_bo_map(struct gbm_bo *bo, uint32_t x, uint32_t y, uint32_t width, uint32_t height,
++           uint32_t flags, uint32_t *stride, void **map_data)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_gbm_bo_map) {
++      gbm_shim_fixme("gbm_bo_map");
++      return NULL;
++   }
++   return p_gbm_bo_map(bo, x, y, width, height, flags, stride, map_data);
++}
++
++void
++gbm_bo_unmap(struct gbm_bo *bo, void *map_data)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_gbm_bo_unmap) {
++      gbm_shim_fixme("gbm_bo_unmap");
++      return;
++   }
++   p_gbm_bo_unmap(bo, map_data);
++}
++
++uint32_t
++gbm_bo_get_width(struct gbm_bo *bo)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_gbm_bo_get_width) {
++      gbm_shim_fixme("gbm_bo_get_width");
++      return 0;
++   }
++   return p_gbm_bo_get_width(bo);
++}
++
++uint32_t
++gbm_bo_get_height(struct gbm_bo *bo)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_gbm_bo_get_height) {
++      gbm_shim_fixme("gbm_bo_get_height");
++      return 0;
++   }
++   return p_gbm_bo_get_height(bo);
++}
++
++uint32_t
++gbm_bo_get_stride_for_plane(struct gbm_bo *bo, int plane)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_gbm_bo_get_stride_for_plane) {
++      gbm_shim_fixme("gbm_bo_get_stride_for_plane");
++      return 0;
++   }
++   return p_gbm_bo_get_stride_for_plane(bo, plane);
++}
++
++uint32_t
++gbm_bo_get_format(struct gbm_bo *bo)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_gbm_bo_get_format) {
++      gbm_shim_fixme("gbm_bo_get_format");
++      return 0;
++   }
++   return p_gbm_bo_get_format(bo);
++}
++
++uint32_t
++gbm_bo_get_offset(struct gbm_bo *bo, int plane)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_gbm_bo_get_offset) {
++      gbm_shim_fixme("gbm_bo_get_offset");
++      return 0;
++   }
++   return p_gbm_bo_get_offset(bo, plane);
++}
++
++struct gbm_device *
++gbm_bo_get_device(struct gbm_bo *bo)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_gbm_bo_get_device) {
++      gbm_shim_fixme("gbm_bo_get_device");
++      return NULL;
++   }
++   return p_gbm_bo_get_device(bo);
++}
++
++union gbm_bo_handle
++gbm_bo_get_handle(struct gbm_bo *bo)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_gbm_bo_get_handle) {
++      gbm_shim_fixme("gbm_bo_get_handle");
++      return (union gbm_bo_handle){ .s32 = -1 };
++   }
++   return p_gbm_bo_get_handle(bo);
++}
++
++int
++gbm_bo_get_fd(struct gbm_bo *bo)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_gbm_bo_get_fd) {
++      gbm_shim_fixme("gbm_bo_get_fd");
++      return -1;
++   }
++   return p_gbm_bo_get_fd(bo);
++}
++
++uint64_t
++gbm_bo_get_modifier(struct gbm_bo *bo)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_gbm_bo_get_modifier) {
++      gbm_shim_fixme("gbm_bo_get_modifier");
++      return 0;
++   }
++   return p_gbm_bo_get_modifier(bo);
++}
++
++int
++gbm_bo_get_plane_count(struct gbm_bo *bo)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_gbm_bo_get_plane_count) {
++      gbm_shim_fixme("gbm_bo_get_plane_count");
++      return -1;
++   }
++   return p_gbm_bo_get_plane_count(bo);
++}
++
++union gbm_bo_handle
++gbm_bo_get_handle_for_plane(struct gbm_bo *bo, int plane)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_gbm_bo_get_handle_for_plane) {
++      gbm_shim_fixme("gbm_bo_get_handle_for_plane");
++      return (union gbm_bo_handle){ .s32 = -1 };
++   }
++   return p_gbm_bo_get_handle_for_plane(bo, plane);
++}
++
++int
++gbm_bo_get_fd_for_plane(struct gbm_bo *bo, int plane)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_gbm_bo_get_fd_for_plane) {
++      gbm_shim_fixme("gbm_bo_get_fd_for_plane");
++      return -1;
++   }
++   return p_gbm_bo_get_fd_for_plane(bo, plane);
++}
++
++void
++gbm_bo_destroy(struct gbm_bo *bo)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_gbm_bo_destroy) {
++      gbm_shim_fixme("gbm_bo_destroy");
++      return;
++   }
++   p_gbm_bo_destroy(bo);
++}
++
++drmVersionPtr
++drmGetVersion(int fd)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_drmGetVersion) {
++      gbm_shim_fixme("drmGetVersion");
++      return NULL;
++   }
++   return p_drmGetVersion(fd);
++}
++
++void
++drmFreeVersion(drmVersionPtr version)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_drmFreeVersion) {
++      gbm_shim_fixme("drmFreeVersion");
++      return;
++   }
++   p_drmFreeVersion(version);
++}
++
++int
++drmPrimeHandleToFD(int fd, uint32_t handle, uint32_t flags, int *prime_fd)
++{
++   pthread_once(&gbm_shim_once, gbm_shim_load);
++   if (!p_drmPrimeHandleToFD) {
++      gbm_shim_fixme("drmPrimeHandleToFD");
++      return -1;
++   }
++   return p_drmPrimeHandleToFD(fd, handle, flags, prime_fd);
++}
+diff --git a/src/meson.build b/src/meson.build
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -161,7 +161,10 @@
+ virgl_depends = [
+    gallium_dep,
+    epoxy_dep,
+-   libdrm_dep,
++   # Headers only: real drm* symbols (confined to the GBM winsys/venus
++   # paths) are resolved at runtime via util/vrend_winsys_shim.c, never
++   # linked against libdrm.so directly.
++   libdrm_dep.partial_dependency(compile_args: true, includes: true),
+    thread_dep,
+    m_dep,
+    dl_dep,
+@@ -183,7 +186,10 @@
+ 
+ if gbm_dep.found()
+    virgl_sources += vrend_winsys_gbm_sources
+-   virgl_depends += [gbm_dep]
++   # Headers only: gbm_* symbols are resolved at runtime via
++   # util/vrend_winsys_shim.c, never linked against libgbm.so directly, so
++   # the final binary carries no DT_NEEDED/DT_RUNPATH for it.
++   virgl_depends += [gbm_dep.partial_dependency(compile_args: true, includes: true)]
+ endif
+ 
+ if have_egl
+diff --git a/vtest/meson.build b/vtest/meson.build
+--- a/vtest/meson.build
++++ b/vtest/meson.build
+@@ -37,7 +37,9 @@
+    libvirglrenderer_dep,
+    gallium_dep,
+    thread_dep,
+-   libdrm_dep,
++   # Headers only: real drm* symbols are resolved at runtime via
++   # util/vrend_winsys_shim.c, never linked against libdrm.so directly.
++   libdrm_dep.partial_dependency(compile_args: true, includes: true),
+    drm_uapi_dep,
+    mesa_dep,
+ ]
