@@ -5,11 +5,19 @@ rebased to virglrenderer-android version, modified with `__TERMUX__` replacing  
 diff --git a/src/venus/vkr_buffer.c b/src/venus/vkr_buffer.c
 --- a/src/venus/vkr_buffer.c
 +++ b/src/venus/vkr_buffer.c
-@@ -37,6 +37,16 @@ vkr_dispatch_vkCreateBuffer(struct vn_dispatch_context *dispatch,
+@@ -7,6 +7,7 @@
+ 
+ #include "vkr_buffer_gen.h"
+ #include "vkr_physical_device.h"
++#include "vrend_mode.h"
+ 
+ static void
+ vkr_dispatch_vkCreateBuffer(struct vn_dispatch_context *dispatch,
+@@ -37,6 +38,16 @@
      * vkr_physical_device_init_memory_properties as well.
      */
  
-+#if defined(__TERMUX__)
++   if (g_vrend_android_mode) {
 +   VkExternalMemoryBufferCreateInfo *handle_info = vkr_find_struct(
 +      args->pCreateInfo->pNext, VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_BUFFER_CREATE_INFO);
 +   if (handle_info) {
@@ -17,7 +25,7 @@ diff --git a/src/venus/vkr_buffer.c b/src/venus/vkr_buffer.c
 +         args->pCreateInfo, VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_BUFFER_CREATE_INFO);
 +      prev_of_handle_info->pNext = handle_info->pNext;
 +   }
-+#endif
++   }
 +
     vkr_buffer_create_and_add(dispatch->data, args);
  }
@@ -25,18 +33,26 @@ diff --git a/src/venus/vkr_buffer.c b/src/venus/vkr_buffer.c
 diff --git a/src/venus/vkr_device.c b/src/venus/vkr_device.c
 --- a/src/venus/vkr_device.c
 +++ b/src/venus/vkr_device.c
-@@ -150,6 +150,15 @@ vkr_dispatch_vkCreateDevice(struct vn_dispatch_context *dispatch,
+@@ -13,6 +13,7 @@
+ #include "vkr_device_memory.h"
+ #include "vkr_physical_device.h"
+ #include "vkr_queue.h"
++#include "vrend_mode.h"
+ 
+ static VkResult
+ vkr_device_create_queues(struct vkr_context *ctx,
+@@ -150,6 +151,15 @@
        if (physical_dev->KHR_external_fence_fd)
           exts[ext_count++] = "VK_KHR_external_fence_fd";
  
-+#if defined(__TERMUX__)
++      if (g_vrend_android_mode) {
 +      for (unsigned i = 0u; i < ext_count; i++) {
 +         if (!strcmp(exts[i], "VK_EXT_external_memory_dma_buf"))
 +            exts[i] = "VK_ANDROID_external_memory_android_hardware_buffer";
 +         if (!strcmp(exts[i], "VK_EXT_image_drm_format_modifier"))
 +            exts[i--] = exts[--ext_count];
 +      }
-+#endif
++      }
 +
        ((VkDeviceCreateInfo *)args->pCreateInfo)->ppEnabledExtensionNames = exts;
        ((VkDeviceCreateInfo *)args->pCreateInfo)->enabledExtensionCount = ext_count;
@@ -44,11 +60,18 @@ diff --git a/src/venus/vkr_device.c b/src/venus/vkr_device.c
 diff --git a/src/venus/vkr_device_memory.c b/src/venus/vkr_device_memory.c
 --- a/src/venus/vkr_device_memory.c
 +++ b/src/venus/vkr_device_memory.c
-@@ -200,6 +200,61 @@ vkr_gbm_get_fd_info_from_allocation_info(struct vkr_physical_device *physical_de
+@@ -9,6 +9,7 @@
  
- #else
+ #include "vkr_device_memory_gen.h"
+ #include "vkr_physical_device.h"
++#include "vrend_mode.h"
  
-+#if defined(__TERMUX__)
+ static bool
+ vkr_get_fd_info_from_resource_info(struct vkr_context *ctx,
+@@ -227,6 +228,127 @@
+ 
+ #endif /* ENABLE_GBM_ALLOCATION */
+ 
 +#include <android/hardware_buffer.h>
 +#include <dlfcn.h>
 +#include <vulkan/vulkan_android.h>
@@ -81,11 +104,9 @@ diff --git a/src/venus/vkr_device_memory.c b/src/venus/vkr_device_memory.c
 +   pfnAHardwareBuffer_release release;
 +   pfnAHardwareBuffer_getNativeHandle getNativeHandle;
 +};
-+#endif
 +
-+#if defined(__TERMUX__)
 +static int
-+vkr_gbm_bo_get_fd(void *gbm_bo)
++vkr_ahb_bo_get_fd(void *gbm_bo)
 +{
 +   struct fake_gbm_bo *bo = gbm_bo;
 +
@@ -102,19 +123,9 @@ diff --git a/src/venus/vkr_device_memory.c b/src/venus/vkr_device_memory.c
 +
 +   return -1;
 +}
-+#else
- static inline int
- vkr_gbm_bo_get_fd(ASSERTED void *gbm_bo)
- {
-@@ -207,14 +262,87 @@ vkr_gbm_bo_get_fd(ASSERTED void *gbm_bo)
-    assert(!gbm_bo);
-    return -1;
- }
-+#endif
- 
-+#if defined(__TERMUX__)
++
 +static void
-+vkr_gbm_bo_destroy(void *gbm_bo)
++vkr_ahb_bo_destroy(void *gbm_bo)
 +{
 +   struct fake_gbm_bo *bo = gbm_bo;
 +   if (!bo)
@@ -125,16 +136,7 @@ diff --git a/src/venus/vkr_device_memory.c b/src/venus/vkr_device_memory.c
 +   dlclose(bo->handle);
 +   free(gbm_bo);
 +}
-+#else
- static inline void
- vkr_gbm_bo_destroy(ASSERTED void *gbm_bo)
- {
-    vkr_log("minigbm_allocation is not enabled");
-    assert(!gbm_bo);
- }
-+#endif
 +
-+#if defined(__TERMUX__)
 +static VkResult
 +vkr_get_fd_info_from_allocation_info(UNUSED struct vkr_physical_device *physical_dev,
 +                                     const VkMemoryAllocateInfo *alloc_info,
@@ -185,29 +187,20 @@ diff --git a/src/venus/vkr_device_memory.c b/src/venus/vkr_device_memory.c
 +      .buffer = bo->base,
 +   };
 +   return VK_SUCCESS;
- 
++
 +error_free_bo:
-+   vkr_gbm_bo_destroy(bo);
++   vkr_ahb_bo_destroy(bo);
 +   return VK_ERROR_OUT_OF_DEVICE_MEMORY;
 +}
-+#else
- static inline VkResult
- vkr_gbm_get_fd_info_from_allocation_info(UNUSED struct vkr_physical_device *physical_dev,
-                                          UNUSED const VkMemoryAllocateInfo *alloc_info,
-@@ -224,6 +352,7 @@ vkr_gbm_get_fd_info_from_allocation_info(UNUSED struct vkr_physical_device *phys
-    vkr_log("minigbm_allocation is not enabled");
-    return VK_ERROR_OUT_OF_DEVICE_MEMORY;
- }
-+#endif
- 
- #endif /* ENABLE_GBM_ALLOCATION */
- 
-@@ -365,6 +494,23 @@ vkr_dispatch_vkAllocateMemory(struct vn_dispatch_context *dispatch,
++
+ static void
+ vkr_dispatch_vkAllocateMemory(struct vn_dispatch_context *dispatch,
+                               struct vn_command_vkAllocateMemory *args)
+@@ -365,12 +487,31 @@
           valid_fd_types |= 1 << VIRGL_RESOURCE_FD_DMABUF;
     }
  
-+#if defined(__TERMUX__)
-+   if (export_info) {
++   if (g_vrend_android_mode && export_info) {
 +      VkBaseInStructure *prev_of_export_info =
 +         vkr_find_prev_struct(alloc_info, VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO);
 +
@@ -221,19 +214,63 @@ diff --git a/src/venus/vkr_device_memory.c b/src/venus/vkr_device_memory.c
 +      alloc_info->pNext = &local_import_info;
 +      valid_fd_types = 1 << VIRGL_RESOURCE_FD_DMABUF;
 +   }
-+#endif
 +
     struct vkr_device_memory *mem = vkr_device_memory_create_and_add(ctx, args);
     if (!mem) {
        if (local_import_info.fd >= 0)
+          close(local_import_info.fd);
+-      if (gbm_bo)
+-         vkr_gbm_bo_destroy(gbm_bo);
++      if (gbm_bo) {
++         if (g_vrend_android_mode)
++            vkr_ahb_bo_destroy(gbm_bo);
++         else
++            vkr_gbm_bo_destroy(gbm_bo);
++      }
+       return;
+    }
+ 
+@@ -488,8 +629,12 @@
+ void
+ vkr_device_memory_release(struct vkr_device_memory *mem)
+ {
+-   if (mem->gbm_bo)
+-      vkr_gbm_bo_destroy(mem->gbm_bo);
++   if (mem->gbm_bo) {
++      if (g_vrend_android_mode)
++         vkr_ahb_bo_destroy(mem->gbm_bo);
++      else
++         vkr_gbm_bo_destroy(mem->gbm_bo);
++   }
+    if (mem->udmabuf_fd >= 0)
+       close(mem->udmabuf_fd);
+ }
+@@ -572,7 +717,8 @@
+       assert(handle_type == VK_EXTERNAL_MEMORY_HANDLE_TYPE_DMA_BUF_BIT_EXT);
+       assert(can_export_dma_buf && !can_export_opaque);
+ 
+-      fd = vkr_gbm_bo_get_fd(mem->gbm_bo);
++      fd = g_vrend_android_mode ? vkr_ahb_bo_get_fd(mem->gbm_bo)
++                                : vkr_gbm_bo_get_fd(mem->gbm_bo);
+       if (fd < 0) {
+          vkr_log("mem gbm bo export failed (ret %d)", fd);
+          return false;
 diff --git a/src/venus/vkr_image.c b/src/venus/vkr_image.c
 --- a/src/venus/vkr_image.c
 +++ b/src/venus/vkr_image.c
-@@ -31,6 +31,18 @@ vkr_dispatch_vkCreateImage(struct vn_dispatch_context *dispatch,
+@@ -7,6 +7,7 @@
+ 
+ #include "vkr_image_gen.h"
+ #include "vkr_physical_device.h"
++#include "vrend_mode.h"
+ 
+ static void
+ vkr_dispatch_vkCreateImage(struct vn_dispatch_context *dispatch,
+@@ -31,6 +32,18 @@
      * situation because the app does not consider the memory external.
      */
  
-+#if defined(__TERMUX__)
++   if (g_vrend_android_mode) {
 +   VkExternalMemoryImageCreateInfo *handle_info = vkr_find_struct(
 +      args->pCreateInfo->pNext, VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO);
 +   if (handle_info) {
@@ -243,20 +280,20 @@ diff --git a/src/venus/vkr_image.c b/src/venus/vkr_image.c
 +   }
 +   VkImageCreateInfo *image_info = (void *)args->pCreateInfo;
 +   image_info->tiling = VK_IMAGE_TILING_LINEAR;
-+#endif
++   }
 +
     vkr_image_create_and_add(dispatch->data, args);
  }
  
-@@ -162,6 +174,12 @@ vkr_dispatch_vkGetImageDrmFormatModifierPropertiesEXT(
+@@ -162,6 +175,12 @@
     struct vkr_device *dev = vkr_device_from_handle(args->device);
     struct vn_device_proc_table *vk = &dev->proc_table;
  
-+#if defined(__TERMUX__)
++   if (g_vrend_android_mode) {
 +   args->pProperties->drmFormatModifier = 0 /* DRM_FORMAT_MOD_LINEAR */;
 +   args->ret = VK_SUCCESS;
 +   return;
-+#endif
++   }
 +
     vn_replace_vkGetImageDrmFormatModifierPropertiesEXT_args_handle(args);
     args->ret = vk->GetImageDrmFormatModifierPropertiesEXT(args->device, args->image,
@@ -264,11 +301,19 @@ diff --git a/src/venus/vkr_image.c b/src/venus/vkr_image.c
 diff --git a/src/venus/vkr_physical_device.c b/src/venus/vkr_physical_device.c
 --- a/src/venus/vkr_physical_device.c
 +++ b/src/venus/vkr_physical_device.c
-@@ -284,6 +284,20 @@ vkr_physical_device_init_extensions(struct vkr_physical_device *physical_dev)
+@@ -10,6 +10,7 @@
+ #include "vkr_context.h"
+ #include "vkr_device.h"
+ #include "vkr_instance.h"
++#include "vrend_mode.h"
+ 
+ #ifdef HAVE_LINUX_UDMABUF_H
+ #include <fcntl.h>
+@@ -284,6 +285,20 @@
        }
     }
  
-+#if defined(__TERMUX__)
++   if (g_vrend_android_mode) {
 +   physical_dev->EXT_external_memory_dma_buf = true;
 +
 +   if (advertised_count + 2 > count)
@@ -280,17 +325,18 @@ diff --git a/src/venus/vkr_physical_device.c b/src/venus/vkr_physical_device.c
 +   exts[advertised_count++] =
 +      (VkExtensionProperties){ VK_EXT_IMAGE_DRM_FORMAT_MODIFIER_EXTENSION_NAME,
 +                               VK_EXT_IMAGE_DRM_FORMAT_MODIFIER_SPEC_VERSION };
-+#endif
++   }
 +
     if (physical_dev->KHR_external_fence_fd) {
        const VkPhysicalDeviceExternalFenceInfo fence_info = {
           .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_FENCE_INFO,
-@@ -698,9 +712,36 @@ vkr_dispatch_vkGetPhysicalDeviceFormatProperties2(
+@@ -698,9 +713,35 @@
        vkr_physical_device_from_handle(args->physicalDevice);
     struct vn_physical_device_proc_table *vk = &physical_dev->proc_table;
  
-+#if defined(__TERMUX__)
-+   VkDrmFormatModifierPropertiesListEXT *mod_list = vkr_find_struct(
++   VkDrmFormatModifierPropertiesListEXT *mod_list = NULL;
++   if (g_vrend_android_mode) {
++   mod_list = vkr_find_struct(
 +      args->pFormatProperties, VK_STRUCTURE_TYPE_DRM_FORMAT_MODIFIER_PROPERTIES_LIST_EXT);
 +   if (mod_list) {
 +      VkBaseInStructure *prev_of_mod_list =
@@ -307,26 +353,24 @@ diff --git a/src/venus/vkr_physical_device.c b/src/venus/vkr_physical_device.c
 +         };
 +      }
 +   }
-+#endif
++   }
 +
     vn_replace_vkGetPhysicalDeviceFormatProperties2_args_handle(args);
     vk->GetPhysicalDeviceFormatProperties2(args->physicalDevice, args->format,
                                            args->pFormatProperties);
 +
-+#if defined(__TERMUX__)
 +   if (mod_list) {
 +      mod_list->pNext = args->pFormatProperties->pNext;
 +      args->pFormatProperties->pNext = mod_list;
 +   }
-+#endif
  }
  
  static void
-@@ -712,6 +753,18 @@ vkr_dispatch_vkGetPhysicalDeviceImageFormatProperties2(
+@@ -712,6 +753,18 @@
        vkr_physical_device_from_handle(args->physicalDevice);
     struct vn_physical_device_proc_table *vk = &physical_dev->proc_table;
  
-+#if defined(__TERMUX__)
++   if (g_vrend_android_mode) {
 +   VkPhysicalDeviceImageDrmFormatModifierInfoEXT *mod_info = vkr_find_struct(
 +      args->pImageFormatInfo->pNext,
 +      VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_DRM_FORMAT_MODIFIER_INFO_EXT);
@@ -336,8 +380,38 @@ diff --git a/src/venus/vkr_physical_device.c b/src/venus/vkr_physical_device.c
 +         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_DRM_FORMAT_MODIFIER_INFO_EXT);
 +      prev_of_mod_info->pNext = mod_info->pNext;
 +   }
-+#endif
++   }
 +
     vn_replace_vkGetPhysicalDeviceImageFormatProperties2_args_handle(args);
     args->ret = vk->GetPhysicalDeviceImageFormatProperties2(
        args->physicalDevice, args->pImageFormatInfo, args->pImageFormatProperties);
+diff --git a/src/venus/vkr_library.c b/src/venus/vkr_library.c
+--- a/src/venus/vkr_library.c
++++ b/src/venus/vkr_library.c
+@@ -8,6 +8,12 @@
+ 
+ #include <dlfcn.h>
+ 
++#include "vrend_mode.h"
++
++#ifndef TERMUX_PREFIX
++#error "TERMUX_PREFIX must be defined"
++#endif
++
+ void
+ vkr_library_preload_icd(void)
+ {
+@@ -41,9 +47,11 @@
+    if (lib->handle)
+       return true;
+ 
+-   lib->handle = dlopen("libvulkan.so.1", RTLD_NOW | RTLD_LOCAL);
+-   if (lib->handle == NULL)
++   if (g_vrend_android_mode) {
+       lib->handle = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL);
++   } else {
++      lib->handle = dlopen(TERMUX_PREFIX "/lib/libvulkan.so.1", RTLD_NOW | RTLD_LOCAL);
++   }
+    if (lib->handle == NULL) {
+       vkr_log("failed to open libvulkan: %s", dlerror());
+       return false;

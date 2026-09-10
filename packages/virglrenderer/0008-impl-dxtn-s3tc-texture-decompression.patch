@@ -547,12 +547,12 @@ diff -Naur orig/src/vrend/vrend_formats.c mod/src/vrend/vrend_formats.c
 diff -Naur orig/src/vrend/vrend_renderer.c mod/src/vrend/vrend_renderer.c
 --- orig/src/vrend/vrend_renderer.c	2025-09-08 13:49:31.000000000 +0200
 +++ mod/src/vrend/vrend_renderer.c	2025-09-10 21:58:03.021261140 +0200
-@@ -73,6 +73,17 @@
+@@ -74,6 +74,17 @@
  #include "vrend_video.h"
  #endif
  
 +#include "gl4es-decompress.h"
-+const int dxtn_decompress = 1;
++int dxtn_decompress = 0;
 +static void CheckGlError( const char* pFunctionName )
 +{
 +   GLint error = glGetError();
@@ -565,7 +565,16 @@ diff -Naur orig/src/vrend/vrend_renderer.c mod/src/vrend/vrend_renderer.c
  #ifdef WIN32
  #include <dxgi1_2.h>
  #endif
-@@ -9232,6 +9243,9 @@
+@@ -7607,6 +7618,8 @@
+ 
+    vrend_clicbs = cbs;
+ 
++   dxtn_decompress = g_vrend_android_mode;
++
+    /* Give some defaults to be able to run the tests */
+    vrend_state.max_texture_2d_size =
+          vrend_state.max_texture_3d_size =
+@@ -9288,6 +9301,9 @@
  {
     void *data;
  
@@ -575,7 +584,7 @@ diff -Naur orig/src/vrend/vrend_renderer.c mod/src/vrend/vrend_renderer.c
     if ((is_only_bit(res->storage_bits, VREND_STORAGE_GUEST_MEMORY) ||
         has_bit(res->storage_bits, VREND_STORAGE_HOST_SYSTEM_MEMORY)) && res->iov) {
        return vrend_copy_iovec(iov, num_iovs, info->offset,
-@@ -9465,10 +9479,65 @@
+@@ -9521,10 +9537,65 @@
              else
                 vrend_scale_depth(data, send_size, depth_scale);
           }
@@ -642,7 +651,7 @@ diff -Naur orig/src/vrend/vrend_renderer.c mod/src/vrend/vrend_renderer.c
                                           info->box->width, info->box->height,
                                           glformat, comp_size, data);
              } else {
-@@ -9477,7 +9546,14 @@
+@@ -9533,7 +9604,14 @@
              }
           } else if (res->target == GL_TEXTURE_3D || res->target == GL_TEXTURE_2D_ARRAY || res->target == GL_TEXTURE_CUBE_MAP_ARRAY) {
              if (compressed) {
@@ -658,7 +667,7 @@ diff -Naur orig/src/vrend/vrend_renderer.c mod/src/vrend/vrend_renderer.c
                                           info->box->width, info->box->height, info->box->depth,
                                           glformat, comp_size, data);
              } else {
-@@ -9486,7 +9562,12 @@
+@@ -9542,7 +9620,12 @@
                                 glformat, gltype, data);
              }
           } else if (res->target == GL_TEXTURE_1D) {
@@ -672,7 +681,7 @@ diff -Naur orig/src/vrend/vrend_renderer.c mod/src/vrend/vrend_renderer.c
                 /* Covers both compressed and none compressed. */
                 report_gles_missing_func(ctx, "gl[Compressed]TexSubImage1D");
              } else if (compressed) {
-@@ -9499,7 +9580,18 @@
+@@ -9555,7 +9638,18 @@
              }
           } else {
              if (compressed) {
@@ -692,7 +701,7 @@ diff -Naur orig/src/vrend/vrend_renderer.c mod/src/vrend/vrend_renderer.c
                                           info->box->width, info->box->height,
                                           glformat, comp_size, data);
              } else {
-@@ -9522,6 +9614,9 @@
+@@ -9578,6 +9672,9 @@
  
        glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
  
