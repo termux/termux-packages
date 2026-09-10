@@ -9,6 +9,7 @@ TERMUX_PKG_DEPENDS="libzimg, python"
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="Cython"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP='R\d{2}(?!-)'
+TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 
 termux_step_pre_configure() {
 	rm -f "$TERMUX_PKG_SRCDIR/setup.py"
