@@ -15,6 +15,18 @@ _termux_should_cleanup() {
 	return 1 # false
 }
 
+_termux_check_new_debs_for_conflicts() {
+	# newer-than-marker, not by name: output/ has other packages' .debs too,
+	# and not every subpackage (e.g. *-static) has a .subpackage.sh to match.
+	local build_marker="$1" conflict_check_dir rc
+	conflict_check_dir="$(mktemp -d)"
+	find "${TERMUX_SCRIPTDIR}/output" -name '*.deb' -newer "${build_marker}" -exec cp -t "${conflict_check_dir}" {} +
+	"${TERMUX_SCRIPTDIR}/scripts/utils/termux_check_file_conflicts.sh" "${conflict_check_dir}"
+	rc=$?
+	rm -rf "${conflict_check_dir}"
+	return "${rc}"
+}
+
 termux_pkg_upgrade_version() {
 	if (( $# < 1 )); then
 		termux_error_exit <<-EndUsage
@@ -139,11 +151,17 @@ termux_pkg_upgrade_version() {
 
 	_termux_should_cleanup "${big_package}" && "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
 
-	if ! "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" -d ./build-package.sh -C -a "${TERMUX_ARCH}" -i "${TERMUX_PKG_NAME}"; then
+	local _build_marker
+	_build_marker="$(mktemp)"
+
+	if ! "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" -d ./build-package.sh -C -a "${TERMUX_ARCH}" -i "${TERMUX_PKG_NAME}" \
+			|| ! _termux_check_new_debs_for_conflicts "${_build_marker}"; then
+		rm -f "${_build_marker}"
 		_termux_should_cleanup "${big_package}" && "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
 		git checkout -- "${TERMUX_SCRIPTDIR}"
 		termux_error_exit "failed to build."
 	fi
+	rm -f "${_build_marker}"
 
 	_termux_should_cleanup "${big_package}" && "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
 
