@@ -1,0 +1,207 @@
+--- a/cmdline/apt-get.cc
++++ b/cmdline/apt-get.cc
+@@ -88,6 +88,11 @@
+ #include <vector>
+ 
+ #include <apti18n.h>
++
++#include <selinux/selinux.h>
++#include <termux-core/termux/termux_core__nos__c/v1/data/DataUtils.h>
++#include <termux-core/termux/termux_core__nos__c/v1/termux/shell/command/environment/TermuxShellEnvironment.h>
++#include <termux-core/termux/termux_core__nos__c/v1/unix/os/selinux/UnixSeLinuxUtils.h>
+ 									/*}}}*/
+ 
+ using namespace std;
+@@ -438,6 +443,26 @@ static std::vector<aptDispatchWithHelp> GetCommands()			/*{{{*/
+ 									/*}}}*/
+ int main(int argc,const char *argv[])					/*{{{*/
+ {
++   char seProcessContext[80];
++
++   if (getuid() == 0) {
++      std::cout << "Ability to run this command as root has been disabled permanently for safety purposes." << std::endl;
++      return 1;
++   }
++
++   if ((getSeProcessContextFromEnv("apt", ENV__TERMUX__SE_PROCESS_CONTEXT,
++           seProcessContext, sizeof(seProcessContext)) ||
++        getSeProcessContextFromFile("apt",
++           seProcessContext, sizeof(seProcessContext))) &&
++       (stringEquals(seProcessContext, PROCESS_CONTEXT__SHELL) ||
++        stringEquals(seProcessContext, PROCESS_CONTEXT__MAGISK_SU) ||
++        stringEquals(seProcessContext, PROCESS_CONTEXT__KERNEL_SU) ||
++        stringEquals(seProcessContext, PROCESS_CONTEXT__AOSP_SU)) &&
++        is_selinux_enabled() && security_getenforce()) {
++      std::cout << "Ability to run this command from a process context that does not have MCS categories while SELinux is Enforcing has been disabled permanently for safety purposes." << std::endl;
++      return 1;
++   }
++
+    // Parse the command line and initialize the package library
+    CommandLine CmdL;
+    auto const Cmds = ParseCommandLine(CmdL, APT_CMD::APT_GET, &_config, &_system, argc, argv, &ShowHelp, &GetCommands);
+--- a/cmdline/apt.cc
++++ b/cmdline/apt.cc
+@@ -38,6 +38,11 @@
+ #include <unistd.h>
+ 
+ #include <apti18n.h>
++
++#include <selinux/selinux.h>
++#include <termux-core/termux/termux_core__nos__c/v1/data/DataUtils.h>
++#include <termux-core/termux/termux_core__nos__c/v1/termux/shell/command/environment/TermuxShellEnvironment.h>
++#include <termux-core/termux/termux_core__nos__c/v1/unix/os/selinux/UnixSeLinuxUtils.h>
+ 									/*}}}*/
+ 
+ static bool ShowHelp(CommandLine &)					/*{{{*/
+@@ -104,6 +109,26 @@ static std::vector<aptDispatchWithHelp> GetCommands()			/*{{{*/
+ 									/*}}}*/
+ int main(int argc, const char *argv[])					/*{{{*/
+ {
++   char seProcessContext[80];
++
++   if (getuid() == 0) {
++      std::cout << "Ability to run this command as root has been disabled permanently for safety purposes." << std::endl;
++      return 1;
++   }
++
++   if ((getSeProcessContextFromEnv("apt", ENV__TERMUX__SE_PROCESS_CONTEXT,
++           seProcessContext, sizeof(seProcessContext)) ||
++        getSeProcessContextFromFile("apt",
++           seProcessContext, sizeof(seProcessContext))) &&
++       (stringEquals(seProcessContext, PROCESS_CONTEXT__SHELL) ||
++        stringEquals(seProcessContext, PROCESS_CONTEXT__MAGISK_SU) ||
++        stringEquals(seProcessContext, PROCESS_CONTEXT__KERNEL_SU) ||
++        stringEquals(seProcessContext, PROCESS_CONTEXT__AOSP_SU)) &&
++        is_selinux_enabled() && security_getenforce()) {
++      std::cout << "Ability to run this command from a process context that does not have MCS categories while SELinux is Enforcing has been disabled permanently for safety purposes." << std::endl;
++      return 1;
++   }
++
+    CommandLine CmdL;
+    auto const Cmds = ParseCommandLine(CmdL, APT_CMD::APT, &_config, &_system, argc, argv, &ShowHelp, &GetCommands);
+ 
+--- a/cmdline/apt-mark.cc
++++ b/cmdline/apt-mark.cc
+@@ -40,6 +40,11 @@
+ #include <unistd.h>
+ 
+ #include <apti18n.h>
++
++#include <selinux/selinux.h>
++#include <termux-core/termux/termux_core__nos__c/v1/data/DataUtils.h>
++#include <termux-core/termux/termux_core__nos__c/v1/termux/shell/command/environment/TermuxShellEnvironment.h>
++#include <termux-core/termux/termux_core__nos__c/v1/unix/os/selinux/UnixSeLinuxUtils.h>
+ 									/*}}}*/
+ using namespace std;
+ 
+@@ -466,6 +471,27 @@ static std::vector<aptDispatchWithHelp> GetCommands()			/*{{{*/
+ 									/*}}}*/
+ int main(int argc,const char *argv[])					/*{{{*/
+ {
++
++   char seProcessContext[80];
++
++   if (getuid() == 0) {
++      std::cout << "Ability to run this command as root has been disabled permanently for safety purposes." << std::endl;
++      return 1;
++   }
++
++   if ((getSeProcessContextFromEnv("apt", ENV__TERMUX__SE_PROCESS_CONTEXT,
++           seProcessContext, sizeof(seProcessContext)) ||
++        getSeProcessContextFromFile("apt",
++           seProcessContext, sizeof(seProcessContext))) &&
++       (stringEquals(seProcessContext, PROCESS_CONTEXT__SHELL) ||
++        stringEquals(seProcessContext, PROCESS_CONTEXT__MAGISK_SU) ||
++        stringEquals(seProcessContext, PROCESS_CONTEXT__KERNEL_SU) ||
++        stringEquals(seProcessContext, PROCESS_CONTEXT__AOSP_SU)) &&
++        is_selinux_enabled() && security_getenforce()) {
++      std::cout << "Ability to run this command from a process context that does not have MCS categories while SELinux is Enforcing has been disabled permanently for safety purposes." << std::endl;
++      return 1;
++   }
++
+    CommandLine CmdL;
+    auto const Cmds = ParseCommandLine(CmdL, APT_CMD::APT_MARK, &_config, &_system, argc, argv, &ShowHelp, &GetCommands);
+ 
+--- a/cmdline/apt-key.in
++++ b/cmdline/apt-key.in
+@@ -83,11 +83,23 @@ create_gpg_home() {
+     chmod 700 "$GPGHOMEDIR"
+ }
+ 
+-requires_root() {
+-	if [ ! -d "@TERMUX_PREFIX@" ] && [ "$(id -u)" -ne 0 ]; then
+-		apt_error "This command can only be used by root."
+-		exit 1
+-	fi
++assert_no_root_or_process_context_edgecase() {
++    if [ "$(id -u)" = "0" ]; then
++        apt_error "Ability to run this command as root has been disabled for safety purposes."
++        exit 1
++    fi
++
++    local se_process_context se_enforcing_status
++    se_process_context="$(cat "/proc/self/attr/current")" || true
++    se_enforcing_status="$(@TERMUX_PREFIX@/libexec/termux/apt-key_selinux_helper)" || true
++    if [ -n "$se_process_context" ] && [ "$se_enforcing_status" = "enforcing" ]; then
++        case "$se_process_context" in
++            "u:r:shell:s0"|"u:r:su:s0"|"u:r:ksu:s0"|"u:r:magisk:s0")
++                apt_error "Ability to run this command from a process context that does not have MCS categories while SELinux is Enforcing has been disabled for safety purposes."
++                exit 1
++                ;;
++        esac
++    fi
+ }
+ 
+ command_available() {
+@@ -614,7 +626,6 @@ while [ -n "$1" ]; do
+ 	 create_new_keyring() { if [ ! -r "$FORCED_KEYRING" ]; then TRUSTEDFILE='/dev/null'; FORCED_KEYRING="$TRUSTEDFILE"; fi; }
+ 	 ;;
+       --fakeroot)
+-	 requires_root() { true; }
+ 	 ;;
+       --quiet)
+ 	 aptkey_echo() { true; }
+@@ -755,7 +766,7 @@ fi
+ case "$command" in
+     add)
+ 	warn_on_script_usage
+-	requires_root
++	assert_no_root_or_process_context_edgecase
+ 	setup_merged_keyring
+ 	aptkey_execute "$GPG" --quiet --batch --import "$@"
+ 	merge_back_changes
+@@ -764,20 +775,20 @@ case "$command" in
+     del|rm|remove)
+ 	# no script warning here as removing 'add' usage needs 'del' for cleanup
+ 	warn_outside_maintscript
+-	requires_root
++	assert_no_root_or_process_context_edgecase
+ 	foreach_keyring_do 'remove_key_from_keyring' "$@"
+ 	aptkey_echo "OK"
+         ;;
+     update)
+ 	warn_on_script_usage
+-	requires_root
++	assert_no_root_or_process_context_edgecase
+ 	setup_merged_keyring
+ 	update
+ 	merge_back_changes
+ 	;;
+     net-update)
+ 	warn_on_script_usage
+-	requires_root
++	assert_no_root_or_process_context_edgecase
+ 	setup_merged_keyring
+ 	net_update
+ 	merge_back_changes
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -170,6 +170,8 @@ test_big_endian(WORDS_BIGENDIAN)
+ # FreeBSD
+ add_definitions(-D_WITH_GETLINE=1)
+ 
++add_definitions(-DTERMUX_ENV__S_TERMUX=\"${TERMUX_ENV__S_TERMUX}\")
++
+ CHECK_INCLUDE_FILES(machine/endian.h HAVE_MACHINE_ENDIAN_H)
+ CHECK_INCLUDE_FILES(sys/endian.h HAVE_SYS_ENDIAN_H)
+ CHECK_INCLUDE_FILES(endian.h HAVE_ENDIAN_H)
