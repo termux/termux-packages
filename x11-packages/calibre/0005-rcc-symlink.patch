@@ -1,0 +1,20 @@
+diff --git a/src/calibre/utils/rcc/__init__.py b/src/calibre/utils/rcc/__init__.py
+index 2836705492..d0d11c22cf 100644
+--- a/src/calibre/utils/rcc/__init__.py
++++ b/src/calibre/utils/rcc/__init__.py
+@@ -51,11 +51,11 @@ def index_theme(name, inherits=''):
+ 
+ 
+ def safe_link(src, dest):
++    os.makedirs(os.path.dirname(dest), exist_ok=True)
+     try:
+-        os.link(src, dest)
+-    except FileExistsError:
+-        os.remove(dest)
+-        os.link(src, dest)
++        os.symlink(os.path.abspath(src), dest)
++    except Exception as e:
++        pass
+ 
+ 
+ def compile_icon_dir_as_themes(
