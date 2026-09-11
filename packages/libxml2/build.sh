@@ -3,8 +3,10 @@ TERMUX_PKG_DESCRIPTION="Library for parsing XML documents"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.15.4"
+TERMUX_PKG_REVISION="1"
 TERMUX_PKG_SRCURL="https://download.gnome.org/sources/libxml2/${TERMUX_PKG_VERSION%.*}/libxml2-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=98087fd181d9070724f3fbc65c7377db03038eb92bd882374daff44940138821
+TERMUX_PKG_DEPENDS="libandroid-glob, libiconv, zlib"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_SETUP_PYTHON=true
@@ -14,7 +16,6 @@ TERMUX_PKG_SETUP_PYTHON=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 	-Ddocs=enabled
 	-Dhttp=enabled
-	-Dicu=enabled
 	-Dlegacy=enabled
 "
 # Python bindings
@@ -31,7 +32,6 @@ share/doc/libxml2/html
 share/doc/libxml2/xmlcatalog.html
 share/doc/libxml2/xmllint.html
 "
-TERMUX_PKG_DEPENDS="libandroid-glob, libiconv, libicu, zlib"
 TERMUX_PKG_BUILD_DEPENDS="doxygen, python, readline"
 TERMUX_PKG_BREAKS="libxml2-dev"
 TERMUX_PKG_REPLACES="libxml2-dev"
