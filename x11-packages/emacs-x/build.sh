@@ -12,9 +12,11 @@ TERMUX_PKG_CONFLICTS="emacs"
 TERMUX_PKG_REPLACES="emacs"
 TERMUX_PKG_PROVIDES="emacs"
 TERMUX_PKG_SERVICE_SCRIPT=("emacsd" 'exec emacs --fg-daemon 2>&1')
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="                                                           --disable-autodepend
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--disable-autodepend
 --without-gconf
---without-gpm                                                                               --without-gsettings
+--without-gpm
+--without-gsettings
 --without-imagemagick
 --without-libotf
 --without-selinux
