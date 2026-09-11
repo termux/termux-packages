@@ -1,0 +1,57 @@
+#!/bin/bash
+
+cfgtest=
+name=
+shared=
+compile=
+o=
+output_file=
+
+for f in "$@"; do
+	if test "${o}"; then
+		output_file="${f}"
+		o=
+	fi
+	case "${f}" in
+		-c )
+			compile=true
+			;;
+		-o )
+			o=true
+			;;
+		-o* )
+			output_file="${f#-o}"
+			;;
+		-shared )
+			shared=true
+			;;
+		*cfgtest_*.o )
+			cfgtest=true
+			name="${f##*cfgtest_}"
+			name="${name%.o}"
+			;;
+	esac
+done
+
+cfgtest_QtCore="shared"
+cfgtest_QtNetwork=
+cfgtest_QtGui="PyQt_Accessibility PyQt_OpenGL PyQt_Desktop_OpenGL PyQt_SessionManager PyQt_Vulkan PyQt_Wayland"
+cfgtest_QtPrintSupport=
+
+if test "${cfgtest}" && test -z "${compile}"; then
+	test -z "${output_file}" && output_file="${name}"
+	cat <<-EOF > "${output_file}"
+		#!/bin/sh
+		test "\$#" -ge 1 || exit 1
+		echo $(eval echo \$$(echo cfgtest_${name})) | tr ' ' '\n' > \$1
+	EOF
+	chmod 0755 "${output_file}"
+	exit 0
+fi
+
+libs=
+if test -z "${compile}"; then
+	libs="-L@TERMUX_PREFIX@/lib"
+	test "${shared}" && libs+=" -lpython@PYTHON_VERSION@"
+fi
+exec @CXX@ "$@" ${libs}
