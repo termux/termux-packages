@@ -1,0 +1,11 @@
+--- a/pnpm/crates/config/src/defaults.rs
++++ b/pnpm/crates/config/src/defaults.rs
+@@ -102,7 +102,7 @@
+ 
+     // <https://doc.rust-lang.org/std/env/consts/constant.OS.html>
+     match env::consts::OS {
+-        "linux" => home_dir.join(".local/share/pnpm/store").into(),
++        "android" | "linux" => home_dir.join(".local/share/pnpm/store").into(),
+         "macos" => home_dir.join("Library/pnpm/store").into(),
+         _ => panic!("unsupported operating system: {}", env::consts::OS),
+     }
