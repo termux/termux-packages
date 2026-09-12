@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Fast, disk space efficient package manager for JavaScrip
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
 TERMUX_PKG_VERSION="12.4.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/pnpm/pnpm/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=7388d1fe40ff2862d97645d4f5fca9f4a2459ac534c005d990717298aeacef6b
 TERMUX_PKG_DEPENDS="git, nodejs | nodejs-lts"
