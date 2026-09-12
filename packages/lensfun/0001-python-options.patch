@@ -1,0 +1,15 @@
+--- a/apps/CMakeLists.txt
++++ b/apps/CMakeLists.txt
+@@ -21,6 +21,7 @@
+ 
+ # Inspired by http://bloerg.net/2012/11/10/cmake-and-distutils.html
+ 
++IF(INSTALL_PYTHON_MODULE)
+ FIND_PROGRAM(PYTHON "python3")
+ IF(PYTHON)
+     SET(SETUP_PY_IN "${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in")
+@@ -44,3 +45,4 @@
+     ENDIF()
+     INSTALL(CODE "execute_process(COMMAND ${PYTHON} ${SETUP_PY} install --prefix=\$ENV{DESTDIR}${SETUP_PY_INSTALL_PREFIX})")
+ ENDIF(PYTHON)
++ENDIF(INSTALL_PYTHON_MODULE)
