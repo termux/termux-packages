@@ -1,0 +1,24 @@
+diff --git a/src/util/os_file.c b/src/util/os_file.c
+index d3d3fb01580..ffffb6d4d06 100644
+--- a/src/util/os_file.c
++++ b/src/util/os_file.c
+@@ -200,6 +200,10 @@ os_read_file(const char *filename, size_t *size)
+    return buf;
+ }
+ 
++#if DETECT_OS_LINUX
++#include <sys/epoll.h>
++#endif
++
+ #if (DETECT_OS_LINUX || DETECT_OS_FREEBSD) && ALLOW_KCMP
+ 
+ #include <sys/syscall.h>
+@@ -210,8 +214,6 @@ os_read_file(const char *filename, size_t *size)
+ #define KCMP_FILE 0
+ #endif
+ 
+-#elif DETECT_OS_LINUX
+-#include <sys/epoll.h>
+ #endif
+ 
+ #if DETECT_OS_DRAGONFLY || DETECT_OS_FREEBSD
