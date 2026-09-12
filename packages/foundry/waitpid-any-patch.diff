@@ -1,0 +1,38 @@
+--- a/src/lib.rs	2026-09-12 02:38:17.149043107 +0000
++++ b/src/lib.rs	2026-09-12 02:40:00.263000399 +0000
+@@ -25,7 +25,7 @@
+ use std::io::Result;
+ use std::time::Duration;
+
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ #[path = "./linux.rs"]
+ mod imp;
+
+--- a/src/linux.rs	2026-09-12 02:41:43.549328240 +0000
++++ b/src/linux.rs	2026-09-12 03:00:56.483203289 +0000
+@@ -3,14 +3,22 @@
+
+ use rustix::event::{poll, PollFd, PollFlags};
+ use rustix::io::Errno;
+-use rustix::process::{pidfd_open, Pid, PidfdFlags};
++use rustix::process::Pid;
++extern "C" {
++    fn syscall(number: std::ffi::c_long, ...) -> std::ffi::c_long;
++}
+
++const SYS_PIDFD_OPEN: std::ffi::c_long = 434;
+ pub type WaitHandle = rustix::fd::OwnedFd;
+
+ pub fn open(pid: i32) -> Result<WaitHandle> {
+     let pid = Pid::from_raw(pid)
+         .ok_or_else(|| Error::new(ErrorKind::InvalidInput, format!("invalid PID {pid}")))?;
+-    let pidfd = pidfd_open(pid, PidfdFlags::empty())?;
++    let raw_fd = unsafe { syscall(SYS_PIDFD_OPEN, pid.as_raw_nonzero().get() as std::ffi::c_long, 0 as std::ffi::c_uint) };
++    if raw_fd < 0 {
++        return Err(std::io::Error::last_os_error());
++    }
++    let pidfd = unsafe { std::os::fd::FromRawFd::from_raw_fd(raw_fd as _) };
+     Ok(pidfd)
+ }
+
