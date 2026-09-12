@@ -1,0 +1,18 @@
+diff --git a/src/calibre/devices/scanner.py b/src/calibre/devices/scanner.py
+index e745062841..0eacf32319 100644
+--- a/src/calibre/devices/scanner.py
++++ b/src/calibre/devices/scanner.py
+@@ -115,7 +115,12 @@ def read(f):
+             with open(f, 'rb') as s:
+                 return s.read().strip()
+ 
+-        for x in os.listdir(self.base):
++        try:
++            device_names = os.listdir(self.base)
++        except OSError:
++            return ans
++
++        for x in device_names:
+             base = os.path.join(self.base, x)
+             ven = os.path.join(base, 'idVendor')
+             prod = os.path.join(base, 'idProduct')
