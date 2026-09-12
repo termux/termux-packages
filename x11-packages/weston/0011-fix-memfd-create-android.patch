@@ -1,0 +1,18 @@
+diff --git a/shared/client-buffer-util.c b/shared/client-buffer-util.c
+index 067cf9f..73197b4 100644
+--- a/shared/client-buffer-util.c
++++ b/shared/client-buffer-util.c
+@@ -32,6 +32,12 @@
+ #include <linux/udmabuf.h>
+ #include <sys/ioctl.h>
+ #include <sys/mman.h>
++
++#if defined(__ANDROID__) && __ANDROID_API__ < 26
++#include <sys/syscall.h>
++#define memfd_create(name,flags) syscall(SYS_memfd_create,name,flags)
++#endif
++
+ #include <wayland-client.h>
+ 
+ #include "linux-dmabuf-unstable-v1-client-protocol.h"
+
