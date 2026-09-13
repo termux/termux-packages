@@ -1,0 +1,328 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dave Beckett <dave@dajobe.org>
+Date: Sun, 3 Sep 2023 21:41:59 -0700
+Subject: [PATCH] Add support for PCRE V2 (and prefer it)
+
+Intended to address GitHub Issue 12
+https://github.com/dajobe/rasqal/issues/12
+---
+ configure.ac       |  70 +++++++++++++++++++++++-
+ src/rasqal_regex.c | 133 ++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 197 insertions(+), 6 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 3b6c9ea2..6c6dbf63 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -448,8 +448,10 @@ AC_SUBST(RAPTOR_MIN_VERSION)
+ AM_CONDITIONAL(RASQAL_SORT, test $RAPTOR_VERSION_DEC -lt '20015')
+ 
+ dnl Checks for regex libraries
++have_regex_pcre2=0
+ have_regex_pcre=0
+ have_regex_posix=0
++need_regex_pcre2=0
+ need_regex_pcre=0
+ need_regex_posix=0
+ 
+@@ -501,6 +503,45 @@ if test "x$enable_pcre" != "xno" ; then
+ fi
+ 
+ 
++AC_ARG_WITH(pcre2-config, [  --with-pcre2-config=PATH     Location of PCRE2 pcre2-config (auto)], pcre2_config="$withval", pcre2_config="")
++
++if test "X$pcre2_config" != "Xno" ; then
++  if test "X$pcre2_config" != "X" ; then
++    AC_MSG_CHECKING(for $pcre2_config)
++
++    if test -x $pcre2_config ; then
++	PCRE2_CONFIG=$pcre2_config
++	AC_MSG_RESULT(yes)
++    else
++	AC_MSG_ERROR([pcre2-config not found at specified path $pcre2_config])
++    fi
++  fi
++  if test "X$PCRE2_CONFIG" = "X" ; then
++    AC_CHECK_PROGS(PCRE2_CONFIG, pcre2-config)
++  fi
++fi
++
++AC_MSG_CHECKING(for pcre2)
++PCRE2_VERSION=`$PCRE2_CONFIG --version 2>/dev/null`
++PCRE2_MIN_VERSION=10.37
++
++PCRE2_VERSION_DEC=`echo $PCRE2_VERSION | $AWK -F. '{printf("%d\n", 100*$1 + $2)};'`
++PCRE2_MIN_VERSION_DEC=`echo $PCRE2_MIN_VERSION | $AWK -F. '{printf("%d\n", 100*$1 + $2)};'`
++if test "X$PCRE2_VERSION" = X; then
++  AC_MSG_RESULT(not present)
++elif test "X$PCRE2_VERSION" -a $PCRE2_VERSION_DEC -ge $PCRE2_MIN_VERSION_DEC; then
++  have_regex_pcre2=1
++  AC_MSG_RESULT($PCRE2_VERSION)
++else
++  AC_MSG_WARN($PCRE2_VERSION - too old - need $PCRE2_MIN_VERSION)
++fi
++
++if test $have_regex_pcre2 = 1; then
++  AC_DEFINE(HAVE_REGEX_PCRE2, 1, [have PCRE2 regex - Perl Compatible Regular Expressions V2])
++fi
++
++
++
+ AC_MSG_CHECKING(for posix regex library)
+ oLIBS="$LIBS"
+ if test $ac_cv_header_regex_h = yes; then
+@@ -522,10 +563,18 @@ fi
+ 
+ 
+ 
+-AC_ARG_WITH(regex-library, [  --with-regex-library=NAME   Use regex library - posix, pcre (auto)], regex_library="$withval", regex_library="") 
++AC_ARG_WITH(regex-library, [  --with-regex-library=NAME   Use regex library - posix, pcre2, pcre (auto)], regex_library="$withval", regex_library="") 
+ 
+-for regex_library_name in $regex_library pcre posix; do
++for regex_library_name in $regex_library pcre2 pcre posix; do
+   case $regex_library_name in
++    pcre2)
++      if test $have_regex_pcre2 = 1; then
++        need_regex_pcre2=1
++        AC_DEFINE(RASQAL_REGEX_PCRE2, 1, [Use PCRE2 regex library])
++        break
++      fi
++      ;;
++
+     pcre)
+       if test $have_regex_pcre = 1; then
+         need_regex_pcre=1
+@@ -552,7 +601,9 @@ done
+ 
+ AC_MSG_CHECKING(regex library to use)
+ regex_library=
+-if test $need_regex_pcre = 1; then
++if test $need_regex_pcre2 = 1; then
++  regex_library=pcre2
++elif test $need_regex_pcre = 1; then
+   regex_library=pcre
+ elif test $need_regex_posix = 1; then
+   regex_library=posix
+@@ -929,6 +980,19 @@ if test $need_regex_pcre = 1; then
+ fi
+ 
+ 
++if test $need_regex_pcre2 = 1; then
++  C=`$PCRE2_CONFIG --cflags`
++  L=`$PCRE2_CONFIG --libs8`
++  RASQAL_INTERNAL_CPPFLAGS="$RASQAL_INTERNAL_CPPFLAGS $C"
++  RASQAL_EXTERNAL_LIBS="$RASQAL_EXTERNAL_LIBS $L"
++
++  PKGCONFIG_CFLAGS="$PKGCONFIG_CFLAGS $C"
++  PKGCONFIG_LIBS="$PKGCONFIG_LIBS $L"
++  unset C
++  unset L
++fi
++
++
+ if test $need_digest_mhash = yes; then
+   C=""
+   L="-lmhash"
+diff --git a/src/rasqal_regex.c b/src/rasqal_regex.c
+index 698c80fd..b2dcaf72 100644
+--- a/src/rasqal_regex.c
++++ b/src/rasqal_regex.c
+@@ -37,6 +37,11 @@
+ #endif
+ #include <stdarg.h>
+ 
++#ifdef RASQAL_REGEX_PCRE2
++#define PCRE2_CODE_UNIT_WIDTH 8
++#include <pcre2.h>
++#endif
++
+ #ifdef RASQAL_REGEX_PCRE
+ #include <pcre.h>
+ #endif
+@@ -81,6 +86,12 @@ rasqal_regex_match(rasqal_world* world, raptor_locator* locator,
+ {
+   int flag_i = 0; /* regex_flags contains i */
+   const char *p;
++#ifdef RASQAL_REGEX_PCRE2
++  pcre2_code* re_code;
++  uint32_t compile_options = 0;
++  int errornumber = 0;
++  PCRE2_SIZE erroroffset = 0;
++#endif
+ #ifdef RASQAL_REGEX_PCRE
+   pcre* re;
+   int compile_options = PCRE_UTF8;
+@@ -99,6 +110,48 @@ rasqal_regex_match(rasqal_world* world, raptor_locator* locator,
+     if(*p == 'i')
+       flag_i++;
+       
++#ifdef RASQAL_REGEX_PCRE2
++  if(flag_i)
++    compile_options |= PCRE2_CASELESS;
++
++  re_code = pcre2_compile(RASQAL_GOOD_CAST(PCRE2_SPTR, pattern),
++                          PCRE2_ZERO_TERMINATED,
++                          compile_options,
++                          &errornumber,
++                          &erroroffset,
++                          /* ccontext */ NULL);
++  if(!re_code) {
++    PCRE2_UCHAR buffer[256];
++    pcre2_get_error_message(errornumber, buffer, sizeof(buffer));
++    rasqal_log_error_simple(world, RAPTOR_LOG_LEVEL_ERROR, locator,
++                            "Regex compile of '%s' failed at offset %d: %s",
++                            pattern, (int)erroroffset, buffer);
++    rc = -1;
++  } else {
++    pcre2_match_data *md = pcre2_match_data_create(4, NULL);
++
++    rc = pcre2_match(re_code,
++                     RASQAL_GOOD_CAST(PCRE2_SPTR, subject),
++                     RASQAL_GOOD_CAST(PCRE2_SIZE, subject_len),
++                     /* startoffset */ 0,
++                     /* options */ 0,
++                     md,
++                     /* mcontext */ NULL  /* no match detail wanted */
++                     );
++    if(rc >= 0)
++      rc = 1;
++    else if(rc != PCRE2_ERROR_NOMATCH && rc != PCRE2_ERROR_NULL) {
++      rasqal_log_error_simple(world, RAPTOR_LOG_LEVEL_ERROR, locator,
++                              "Regex match failed - returned code %d", rc);
++      rc= -1;
++    } else
++      rc = 0;
++    pcre2_match_data_free(md);
++  }
++  pcre2_code_free(re_code);
++
++#endif
++
+ #ifdef RASQAL_REGEX_PCRE
+   if(flag_i)
+     compile_options |= PCRE_CASELESS;
+@@ -169,7 +222,7 @@ rasqal_regex_match(rasqal_world* world, raptor_locator* locator,
+ }
+ 
+ 
+-
++#if defined(RASQAL_REGEX_PCRE) || defined(RASQAL_REGEX_POSIX)
+ /*
+  * rasqal_regex_get_ref_number:
+  * @str: pointer to pointer to buffer at '$' symbol
+@@ -204,6 +257,7 @@ rasqal_regex_get_ref_number(const char **str)
+   *str = p;
+   return ref_number;	
+ }
++#endif
+ 
+ 
+ #ifdef RASQAL_REGEX_PCRE
+@@ -698,6 +752,12 @@ rasqal_regex_replace(rasqal_world* world, raptor_locator* locator,
+                      size_t* result_len_p) 
+ {
+   const char *p;
++#ifdef RASQAL_REGEX_PCRE2
++  pcre2_code* re_code;
++  uint32_t compile_options = 0;
++  int errornumber = 0;
++  PCRE2_SIZE erroroffset = 0;
++#endif
+ #ifdef RASQAL_REGEX_PCRE
+   pcre* re;
+   int compile_options = PCRE_UTF8;
+@@ -715,6 +775,73 @@ rasqal_regex_replace(rasqal_world* world, raptor_locator* locator,
+ #endif
+   char *result_s = NULL;
+ 
++#ifdef RASQAL_REGEX_PCRE2
++  for(p = regex_flags; p && *p; p++) {
++    if(*p == 'i')
++      compile_options |= PCRE2_CASELESS;
++  }
++
++  re_code = pcre2_compile(RASQAL_GOOD_CAST(PCRE2_SPTR, pattern),
++                          PCRE2_ZERO_TERMINATED,
++                          compile_options,
++                          &errornumber,
++                          &erroroffset,
++                          /* ccontext */ NULL);
++  if(!re_code) {
++    PCRE2_UCHAR buffer[256];
++    pcre2_get_error_message(errornumber, buffer, sizeof(buffer));
++    rasqal_log_error_simple(world, RAPTOR_LOG_LEVEL_ERROR, locator,
++                            "Regex compile of '%s' failed at offset %d: %s",
++                            pattern, (int)erroroffset, buffer);
++  } else {
++    uint32_t substitute_options = PCRE2_SUBSTITUTE_LITERAL | PCRE2_SUBSTITUTE_GLOBAL;
++    size_t output_len = 0;
++    char* output_buffer = NULL;
++    int rc;
++
++    /* Calculate size of output buffer */
++    rc = pcre2_substitute(re_code,
++                          RASQAL_GOOD_CAST(PCRE2_SPTR, subject),
++                          PCRE2_ZERO_TERMINATED,
++                          /* startoffset */ 0,
++                          substitute_options | PCRE2_SUBSTITUTE_OVERFLOW_LENGTH,
++                          /* match_data */ NULL,
++                          /* mcontext */ NULL,   /* no match detail wanted */
++                          RASQAL_GOOD_CAST(PCRE2_SPTR, replace),
++                          replace_len,
++                          /* outputbuffer */ NULL, /* forcing size calc */
++                          RASQAL_GOOD_CAST(PCRE2_SIZE*, &output_len));
++    if(rc == PCRE2_ERROR_NOMEMORY) {
++      output_buffer = RASQAL_MALLOC(char*, output_len + 1);
++
++      rc = pcre2_substitute(re_code,
++                            RASQAL_GOOD_CAST(PCRE2_SPTR, subject),
++                            PCRE2_ZERO_TERMINATED,
++                            /* startoffset */ 0,
++                            substitute_options,
++                            /* match_data */ NULL,
++                            /* mcontext */ NULL,   /* no match detail wanted */
++                            RASQAL_GOOD_CAST(PCRE2_SPTR, replace),
++                            replace_len,
++                            RASQAL_GOOD_CAST(PCRE2_UCHAR*, output_buffer),
++                            RASQAL_GOOD_CAST(PCRE2_SIZE*, &output_len));
++    }
++    if(rc < 0) {
++      rasqal_log_error_simple(world, RAPTOR_LOG_LEVEL_ERROR, locator,
++                              "Regex replace of '%s' failed with code %d",
++                              pattern, rc);
++      result_s = NULL;
++      if(output_buffer)
++        RASQAL_FREE(char*, output_buffer);
++    } else {
++      result_s = output_buffer;
++      if(result_len_p)
++        *result_len_p = output_len;
++    }
++  }
++  pcre2_code_free(re_code);
++#endif
++
+ #ifdef RASQAL_REGEX_PCRE
+   for(p = regex_flags; p && *p; p++) {
+     if(*p == 'i')
+@@ -794,7 +921,7 @@ main(int argc, char *argv[])
+ {
+   rasqal_world* world;
+   const char *program = rasqal_basename(argv[0]);
+-#ifdef RASQAL_REGEX_PCRE
++#if defined(RASQAL_REGEX_PCRE) || defined(RASQAL_REGEX_PCRE2)
+   raptor_locator* locator = NULL;
+   int test = 0;
+ #endif
+@@ -813,7 +940,7 @@ main(int argc, char *argv[])
+             program);
+ #endif
+ 
+-#ifdef RASQAL_REGEX_PCRE
++#if defined(RASQAL_REGEX_PCRE) || defined(RASQAL_REGEX_PCRE2)
+   for(test = 0; test < NTESTS; test++) {
+     const char* regex_flags = "";
+     const char* subject = "abcd1234-^";
+-- 
+2.42.0
+
