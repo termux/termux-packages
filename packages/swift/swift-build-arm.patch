@@ -1,69 +1,3 @@
-From 434d3a1ee5e666eec1437615ad328497662aa363
-From: Allan Shortlidge <shortlidge@apple.com>
-Date: Thu, 25 Sep 2025 22:34:25 -0700
-Subject: [PATCH] AST: Give `CustomAvailabilityDomain` 8 byte alignment.
-
-`AvailabilityDomain` is a pointer union over `CustomAvailabilityDomain` and an
-opaque pointer-like 24-bit value, which means the number of spare bits in an
-`AvailabilityDomain` representation is one fewer than a
-`CustomAvailabilityDomain` pointer. Other structures in the compiler rely on
-there being at least 2 spare bits in `AvailabilityDomain`, though, which was
-not the case when building for a 32 bit architecture. To ensure there are
-enough spare bits, always align `CustomAvailabilityDomain` to 8 bytes, the same
-as many AST data structures.
-
-diff --git a/swift/include/swift/AST/AvailabilityDomain.h b/swift/include/swift/AST/AvailabilityDomain.h
-index 7d5ecac7df03c..3c28bf0ba757e 100644
---- a/swift/include/swift/AST/AvailabilityDomain.h
-+++ b/swift/include/swift/AST/AvailabilityDomain.h
-@@ -22,6 +22,7 @@
- #include "swift/AST/AvailabilityRange.h"
- #include "swift/AST/Identifier.h"
- #include "swift/AST/PlatformKind.h"
-+#include "swift/AST/TypeAlignments.h"
- #include "swift/Basic/Assertions.h"
- #include "swift/Basic/LLVM.h"
- #include "swift/Basic/SourceLoc.h"
-@@ -334,7 +335,8 @@ struct StableAvailabilityDomainComparator {
- };
- 
- /// Represents an availability domain that has been defined in a module.
--class CustomAvailabilityDomain : public llvm::FoldingSetNode {
-+class alignas(1 << CustomAvailabilityDomainAlignInBits) CustomAvailabilityDomain
-+    : public llvm::FoldingSetNode {
- public:
-   enum class Kind {
-     /// A domain that is known to be enabled at compile time.
-diff --git a/swift/include/swift/AST/TypeAlignments.h b/swift/include/swift/AST/TypeAlignments.h
-index b4eb926d6a1e9..c9b5d49b8f78a 100644
---- a/swift/include/swift/AST/TypeAlignments.h
-+++ b/swift/include/swift/AST/TypeAlignments.h
-@@ -34,6 +34,7 @@ namespace swift {
-   class AttributeBase;
-   class BraceStmt;
-   class CaptureListExpr;
-+  class CustomAvailabilityDomain;
-   class Decl;
-   class DeclContext;
-   class DifferentiableAttr;
-@@ -80,6 +81,7 @@ namespace swift {
-   constexpr size_t ASTContextAlignInBits = 2;
-   constexpr size_t TypeVariableAlignInBits = 4;
-   constexpr size_t StoredDefaultArgumentAlignInBits = 3;
-+  constexpr size_t CustomAvailabilityDomainAlignInBits = 3;
- 
-   // Well, this is the *minimum* pointer alignment; it's going to be 3 on
-   // 64-bit targets, but that doesn't matter.
-@@ -165,6 +167,9 @@ LLVM_DECLARE_TYPE_ALIGNMENT(swift::CaseLabelItem, swift::PatternAlignInBits)
- LLVM_DECLARE_TYPE_ALIGNMENT(swift::StmtConditionElement,
-                             swift::PatternAlignInBits)
- 
-+LLVM_DECLARE_TYPE_ALIGNMENT(swift::CustomAvailabilityDomain,
-+                            swift::CustomAvailabilityDomainAlignInBits)
-+
- static_assert(alignof(void*) >= 2, "pointer alignment is too small");
- 
- #endif
 diff --git a/swift/include/swift/Basic/Feature.h b/swift/include/swift/Basic/Feature.h
 index b05080bbf3a..ebec19d9e53 100644
 --- a/swift/include/swift/Basic/Feature.h
@@ -90,18 +24,18 @@ diff --git a/swift/SwiftCompilerSources/Sources/SIL/Utilities/SmallProjectionPat
 index 9ce289094e4..61b949ddb7f 100644
 --- a/swift/SwiftCompilerSources/Sources/SIL/Utilities/SmallProjectionPath.swift
 +++ b/swift/SwiftCompilerSources/Sources/SIL/Utilities/SmallProjectionPath.swift
-@@ -936,9 +936,9 @@ extension SmallProjectionPath {
-       let (k2, _, s2) = p2.pop()
-       assert(k2 == .anything && s2.isEmpty)
+@@ -960,9 +960,9 @@ let smallProjectionPathTest = Test("small_projection_path") {
+     let (k2, _, s2) = p2.pop()
+     assert(k2 == .anything && s2.isEmpty)
  
--      let p3 = SmallProjectionPath(.indexedElement, index: 0xfffffffffffff)
-+      let p3 = SmallProjectionPath(.indexedElement, index: Int.max >> 12)
-       let (k3, i3, s3) = p3.pop()
--      assert(k3 == .indexedElement && i3 == 0xfffffffffffff && s3.isEmpty)
-+      assert(k3 == .indexedElement && i3 == Int.max >> 12 && s3.isEmpty)
+-    let p3 = SmallProjectionPath(.indexedElement, index: 0xfffffffffffff)
++    let p3 = SmallProjectionPath(.indexedElement, index: Int.max >> 12)
+     let (k3, i3, s3) = p3.pop()
+-    assert(k3 == .indexedElement && i3 == 0xfffffffffffff && s3.isEmpty)
++    assert(k3 == .indexedElement && i3 == Int.max >> 12 && s3.isEmpty)
  
-       let p4 = p3.push(.indexedElement, index: Int.max)
-       let (k4, _, s4) = p4.pop()
+     let p4 = p3.push(.indexedElement, index: Int.max)
+     let (k4, _, s4) = p4.pop()
 diff --git a/swift/include/swift/AST/ProtocolConformanceRef.h b/swift/include/swift/AST/ProtocolConformanceRef.h
 index 3884b14f096..0cedf52c90c 100644
 --- a/swift/include/swift/AST/ProtocolConformanceRef.h
@@ -140,6 +74,82 @@ index e79613464ae..1e17908c17b 100644
  };
  
  typedef struct BridgedSwiftObject * _Nonnull SwiftObject;
+diff --git a/swift/include/swift/Basic/PointerIntPair.h b/swift/include/swift/Basic/PointerIntPair.h
+new file mode 100644
+index 00000000000..13409721f7e
+--- /dev/null
++++ b/swift/include/swift/Basic/PointerIntPair.h
+@@ -0,0 +1,70 @@
++//===--- PointerIntPair.h - Pointer/int pair with 32-bit fallback -*- C++ -*-=//
++//
++// This source file is part of the Swift.org open source project
++//
++// Copyright (c) 2026 Apple Inc. and the Swift project authors
++// Licensed under Apache License v2.0 with Runtime Library Exception
++//
++// See https://swift.org/LICENSE.txt for license information
++// See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
++//
++//===----------------------------------------------------------------------===//
++
++#ifndef SWIFT_BASIC_POINTERINTPAIR_H
++#define SWIFT_BASIC_POINTERINTPAIR_H
++
++#include "llvm/ADT/PointerIntPair.h"
++#include "llvm/Support/PointerLikeTypeTraits.h"
++
++namespace swift {
++namespace pointer_int_pair_detail {
++
++/// Same value interface as llvm::PointerIntPair, but with the pointer and the
++/// integer in separate fields, used when the pointer type has too few spare
++/// low bits to pack IntBits into.
++template <typename PointerTy, typename IntType>
++class SeparateStorage {
++  PointerTy Ptr{};
++  IntType Int{};
++
++public:
++  constexpr SeparateStorage() = default;
++  SeparateStorage(PointerTy P, IntType I) : Ptr(P), Int(I) {}
++  explicit SeparateStorage(PointerTy P) : Ptr(P) {}
++
++  PointerTy getPointer() const { return Ptr; }
++  IntType getInt() const { return Int; }
++  void setPointer(PointerTy P) & { Ptr = P; }
++  void setInt(IntType I) & { Int = I; }
++  void initWithPointer(PointerTy P) & { Ptr = P; Int = IntType{}; }
++  void setPointerAndInt(PointerTy P, IntType I) & { Ptr = P; Int = I; }
++
++  bool operator==(const SeparateStorage &RHS) const {
++    return Ptr == RHS.Ptr && Int == RHS.Int;
++  }
++  bool operator!=(const SeparateStorage &RHS) const { return !(*this == RHS); }
++};
++
++template <bool HasEnoughBits, typename PointerTy, unsigned IntBits,
++          typename IntType, typename PtrTraits>
++struct Selector {
++  using type = llvm::PointerIntPair<PointerTy, IntBits, IntType, PtrTraits>;
++};
++
++template <typename PointerTy, unsigned IntBits, typename IntType,
++          typename PtrTraits>
++struct Selector<false, PointerTy, IntBits, IntType, PtrTraits> {
++  using type = SeparateStorage<PointerTy, IntType>;
++};
++
++} // namespace pointer_int_pair_detail
++
++template <typename PointerTy, unsigned IntBits, typename IntType = unsigned,
++          typename PtrTraits = llvm::PointerLikeTypeTraits<PointerTy>>
++using PointerIntPair = typename pointer_int_pair_detail::Selector<
++    (PtrTraits::NumLowBitsAvailable >= IntBits), PointerTy, IntBits, IntType,
++    PtrTraits>::type;
++
++} // namespace swift
++
++#endif // SWIFT_BASIC_POINTERINTPAIR_H
 diff --git a/swift/include/swift/Basic/SwiftObjectHeader.h b/swift/include/swift/Basic/SwiftObjectHeader.h
 index 8e6361a2188..943f6a60f21 100644
 --- a/swift/include/swift/Basic/SwiftObjectHeader.h
@@ -171,90 +181,70 @@ index e305d7c0403..9bc5a892288 100644
    Type conformingType;
    ProtocolDecl *requirement;
  
-diff --git a/swift-build/Sources/SWBUtil/FSProxy.swift b/swift-build/Sources/SWBUtil/FSProxy.swift
-index b446d21..f88f3c3 100644
---- a/swift-build/Sources/SWBUtil/FSProxy.swift
-+++ b/swift-build/Sources/SWBUtil/FSProxy.swift
-@@ -49,7 +49,7 @@ public struct FileInfo: Equatable, Sendable {
-         #if os(Windows)
-         return (statBuf.st_mode & UInt16(ucrt.S_IFREG)) != 0
-         #else
--        return (statBuf.st_mode & S_IFREG) != 0
-+        return (mode_t(statBuf.st_mode) & S_IFREG) != 0
-         #endif
-     }
+diff --git a/swift/lib/IRGen/Address.h b/swift/lib/IRGen/Address.h
+index ce6090608d2..864b28e355b 100644
+--- a/swift/lib/IRGen/Address.h
++++ b/swift/lib/IRGen/Address.h
+@@ -18,6 +18,7 @@
+ #define SWIFT_IRGEN_ADDRESS_H
  
-@@ -57,7 +57,7 @@ public struct FileInfo: Equatable, Sendable {
-         #if os(Windows)
-         return (statBuf.st_mode & UInt16(ucrt.S_IFDIR)) != 0
-         #else
--        return (statBuf.st_mode & S_IFDIR) != 0
-+        return (mode_t(statBuf.st_mode) & S_IFDIR) != 0
-         #endif
-     }
+ #include "IRGen.h"
++#include "swift/Basic/PointerIntPair.h"
+ #include "llvm/ADT/ilist.h"
+ #include "llvm/IR/Argument.h"
+ #include "llvm/IR/DerivedTypes.h"
+@@ -173,7 +174,7 @@ public:
+   /// The address of an object of type T.
+   Address Addr;
  
-@@ -65,7 +65,7 @@ public struct FileInfo: Equatable, Sendable {
-         #if os(Windows)
-         return (statBuf.st_mode & UInt16(S_IFLNK)) == S_IFLNK
-         #else
--        return (statBuf.st_mode & S_IFMT) == S_IFLNK
-+        return (mode_t(statBuf.st_mode) & S_IFMT) == S_IFLNK
-         #endif
-     }
+-  llvm::PointerIntPair<llvm::Value*, 3, Kind> ExtraInfoAndKind;
++  swift::PointerIntPair<llvm::Value*, 3, Kind> ExtraInfoAndKind;
  
-@@ -75,7 +75,7 @@ public struct FileInfo: Equatable, Sendable {
-         // Don't use FileManager.isExecutableFile due to https://github.com/swiftlang/swift-foundation/issues/860
-         return (statBuf.st_mode & UInt16(_S_IEXEC)) != 0
-         #else
--        return (statBuf.st_mode & S_IXUSR) != 0
-+        return (mode_t(statBuf.st_mode) & S_IXUSR) != 0
-         #endif
-     }
+ public:
+   StackAddress() : ExtraInfoAndKind(nullptr, StaticAlloca) {}
+diff --git a/swift/lib/SILOptimizer/Utils/StackNesting.cpp b/swift/lib/SILOptimizer/Utils/StackNesting.cpp
+index 4589f518ea9..ab30292ebde 100644
+--- a/swift/lib/SILOptimizer/Utils/StackNesting.cpp
++++ b/swift/lib/SILOptimizer/Utils/StackNesting.cpp
+@@ -12,6 +12,7 @@
  
-@@ -1395,9 +1395,9 @@ public class PseudoFS: FSProxy, @unchecked Sendable {
-                 #else
-                 info.st_mtimespec = timespec(tv_sec: time_t(node.timestamp), tv_nsec: 0)
-                 #endif
--                info.st_size = off_t(contents.bytes.count)
--                info.st_dev = node.device
--                info.st_ino = node.inode
-+                info.st_size = numericCast(contents.bytes.count)
-+                info.st_dev = numericCast(node.device)
-+                info.st_ino = numericCast(node.inode)
-                 return createFileInfo(info)
-             case .directory(let dir):
-                 var info = stat()
-@@ -1405,12 +1405,12 @@ public class PseudoFS: FSProxy, @unchecked Sendable {
-                 info.st_mode = UInt16(ucrt.S_IFDIR)
-                 info.st_mtimespec = timespec(tv_sec: Int64(node.timestamp), tv_nsec: 0)
-                 #else
--                info.st_mode = S_IFDIR
-+                info.st_mode = numericCast(S_IFDIR)
-                 info.st_mtimespec = timespec(tv_sec: time_t(node.timestamp), tv_nsec: 0)
-                 #endif
--                info.st_size = off_t(dir.contents.count)
--                info.st_dev = node.device
--                info.st_ino = node.inode
-+                info.st_size = numericCast(dir.contents.count)
-+                info.st_dev = numericCast(node.device)
-+                info.st_ino = numericCast(node.inode)
-                 return createFileInfo(info)
-             case .symlink(_):
-                 var info = stat()
-@@ -1418,12 +1418,12 @@ public class PseudoFS: FSProxy, @unchecked Sendable {
-                 info.st_mode = UInt16(S_IFLNK)
-                 info.st_mtimespec = timespec(tv_sec: Int64(node.timestamp), tv_nsec: 0)
-                 #else
--                info.st_mode = S_IFLNK
-+                info.st_mode = numericCast(S_IFLNK)
-                 info.st_mtimespec = timespec(tv_sec: time_t(node.timestamp), tv_nsec: 0)
-                 #endif
--                info.st_size = off_t(0)
--                info.st_dev = node.device
--                info.st_ino = node.inode
-+                info.st_size = numericCast(0)
-+                info.st_dev = numericCast(node.device)
-+                info.st_ino = numericCast(node.inode)
-                 return createFileInfo(info)
-             }
-         }
+ #include "swift/SILOptimizer/Utils/StackNesting.h"
+ #include "swift/Basic/Assertions.h"
++#include "swift/Basic/PointerIntPair.h"
+ #include "swift/SIL/BasicBlockUtils.h"
+ #include "swift/SIL/Dominance.h"
+ #include "swift/SIL/SILBuilder.h"
+@@ -286,30 +287,23 @@ static StringRef getNameForStatus(AllocationStatus status) {
+ }
+ 
+ class ActiveAllocation {
+-  llvm::PointerIntPair<SILInstruction*, 3, AllocationStatus> valueAndStatus;
++  swift::PointerIntPair<SILInstruction*, 3, AllocationStatus> valueAndStatus;
+ 
+ public:
+   explicit ActiveAllocation(SILInstruction *value)
+     : valueAndStatus(value, AllocationStatus::Allocated) {}
+ 
+-  SILInstruction *getValue() const {
+-    return valueAndStatus.getPointer();
+-  }
+-
+-  AllocationStatus getStatus() const {
+-    return valueAndStatus.getInt();
+-  }
++  SILInstruction *getValue() const { return valueAndStatus.getPointer(); }
++  AllocationStatus getStatus() const { return valueAndStatus.getInt(); }
+ 
+   void setPending() {
+     assert(getStatus() == AllocationStatus::Allocated);
+     valueAndStatus.setInt(AllocationStatus::Pending);
+   }
+-
+   void setNonNested() {
+     assert(getStatus() == AllocationStatus::Allocated);
+     valueAndStatus.setInt(AllocationStatus::AllocatedAndNonNested);
+   }
+-
+   void setDeallocated(bool expectPending) {
+     assert(expectPending
+              ? getStatus() == AllocationStatus::Pending
