@@ -1,0 +1,126 @@
+name: Lint PR
+
+on:
+  pull_request_target:
+    types: [opened, reopened]
+
+permissions: {} # none
+
+jobs:
+  lint-pr:
+    if: github.repository == 'termux/termux-packages' && github.event.pull_request.head.repo.fork
+    runs-on: ubuntu-slim
+    steps:
+      - name: Warn if maintainer edits are disabled
+        env:
+          GH_TOKEN: ${{ secrets.TERMUXBOT2_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          maintainer_can_modify=$(gh pr view "$PR_NUMBER" --repo "$REPO" --json maintainerCanModify --jq .maintainerCanModify)
+          if [ "$maintainer_can_modify" != "true" ]; then
+            gh pr comment "$PR_NUMBER" --repo "$REPO" --body "Please enable [\"Allow edits by maintainers\"](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/allowing-changes-to-a-pull-request-branch-created-from-a-fork) for this pull request. It lets maintainers push small fixes directly to your branch instead of going back and forth, which speeds up review and merging."
+          fi
+
+  check-new-package-source:
+    if: github.repository == 'termux/termux-packages'
+    runs-on: ubuntu-slim
+    steps:
+      - name: Check trustworthiness of newly packaged projects
+        env:
+          GH_TOKEN: ${{ secrets.TERMUXBOT2_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          HEAD_OWNER: ${{ github.event.pull_request.head.repo.owner.login }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.name }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          python3 <<'EOF'
+          import base64, json, os, re, subprocess, sys
+          from datetime import datetime, timezone
+
+          def gh_api(args):
+              return subprocess.run(["gh", "api", *args], capture_output=True, text=True, check=True)
+
+          repo = os.environ["REPO"]
+          owner = repo.split("/")[0]
+          pr_number = os.environ["PR_NUMBER"]
+          pr_author = os.environ["PR_AUTHOR"]
+          head_owner = os.environ["HEAD_OWNER"]
+          head_repo = os.environ["HEAD_REPO"]
+          head_sha = os.environ["HEAD_SHA"]
+
+          member = subprocess.run(["gh", "api", f"orgs/{owner}/memberships/{pr_author}"], capture_output=True)
+          if member.returncode == 0:
+              sys.exit(0)  # trusted org member, skip this check
+
+          files = json.loads(gh_api(["--paginate", f"repos/{repo}/pulls/{pr_number}/files"]).stdout)
+
+          build_sh_re = re.compile(r"^(?:packages|x11-packages|root-packages|disabled-packages)/[^/]+/build\.sh$")
+          added = [f for f in files if f["status"] == "added" and build_sh_re.match(f["filename"])]
+
+          flagged = []
+          for f in added:
+              try:
+                  res = gh_api(["--method", "GET", f"repos/{head_owner}/{head_repo}/contents/{f['filename']}", "-f", f"ref={head_sha}"])
+              except subprocess.CalledProcessError:
+                  continue
+              content = base64.b64decode(json.loads(res.stdout)["content"]).decode("utf-8", "replace")
+
+              srcurl_match = re.search(r"TERMUX_PKG_SRCURL=([^\n]*(?:\n(?!TERMUX_PKG_)[^\n]*)*)", content)
+              if not srcurl_match:
+                  continue
+              gh_match = re.search(r"github\.com[:/]([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+?)(?:\.git|[/\"')\s]|$)", srcurl_match.group(1))
+              if not gh_match:
+                  continue
+              upstream_owner, upstream_repo = gh_match.group(1), gh_match.group(2)
+
+              try:
+                  repo_data = json.loads(gh_api([f"repos/{upstream_owner}/{upstream_repo}"]).stdout)
+              except subprocess.CalledProcessError:
+                  continue
+
+              same_owner = repo_data["owner"]["login"].lower() == pr_author.lower()
+              created = datetime.strptime(repo_data["created_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+              age_days = (datetime.now(timezone.utc) - created).total_seconds() / 86400
+              is_new = age_days < 60
+              low_stars = repo_data["stargazers_count"] < 10
+
+              if same_owner and is_new and low_stars:
+                  flagged.append({
+                      "owner": upstream_owner,
+                      "repo": upstream_repo,
+                      "is_fork": repo_data["fork"],
+                      "parent": repo_data["parent"]["full_name"] if repo_data.get("parent") else None,
+                  })
+
+          if not flagged:
+              sys.exit(0)
+
+          intro = ("Thanks for the contribution! This PR can't be accepted as-is.\n\n"
+                   "Our [packaging policy](https://github.com/termux/termux-packages/blob/master/CONTRIBUTING.md#packaging-policy) "
+                   "requires packages to be **active, well-known projects with an established community** "
+                   "— this keeps maintenance sustainable for our small team.")
+
+          per_package = []
+          for pkg in flagged:
+              line = f"`{pkg['owner']}/{pkg['repo']}` was created recently and hasn't built up that kind of adoption yet, so it doesn't meet the bar for now."
+              if pkg["is_fork"] and pkg["parent"]:
+                  line += (f" It also appears to be a fork of `{pkg['parent']}` — if your goal is to fix or improve "
+                           "an existing package, please submit your changes as a patch next to that package's "
+                           "`build.sh` instead of packaging a separate fork.")
+              per_package.append(line)
+
+          any_fork = any(pkg["is_fork"] and pkg["parent"] for pkg in flagged)
+          outro = "If you think this doesn't apply here, leave a comment explaining why and a maintainer will take a look"
+          outro += (", for example if you'd rather point `TERMUX_PKG_SRCURL` at the original project instead of the fork."
+                    if any_fork else ".")
+
+          body = "\n\n".join([intro, *per_package, outro])
+
+          subprocess.run(["gh", "api", f"repos/{repo}/issues/{pr_number}/comments", "-f", f"body={body}"], check=True)
+          subprocess.run(["gh", "api", f"repos/{repo}/issues/{pr_number}/labels", "-f", "labels[]=invalid"], check=True)
+          subprocess.run(["gh", "api", "-X", "PATCH", f"repos/{repo}/pulls/{pr_number}", "-f", "state=closed"], check=True)
+          EOF
